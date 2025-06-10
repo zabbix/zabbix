@@ -12,7 +12,7 @@ Zabbix version: 7.4 and higher.
 ## Tested versions
 
 This template has been tested on:
-- PostgreSQL 10-15
+- PostgreSQL 10-17
 
 ## Configuration
 
@@ -82,31 +82,31 @@ For more information please read the PostgreSQL documentation `https://www.postg
 
 |Name|Description|Default|
 |----|-----------|-------|
-|{$PG.CACHE_HITRATIO.MIN.WARN}|<p>Minimum cache hit ratio percentage for trigger expression.</p>|`90`|
-|{$PG.CHECKPOINTS_REQ.MAX.WARN}|<p>Maximum required checkpoint occurrences for trigger expression.</p>|`5`|
-|{$PG.CONFLICTS.MAX.WARN}|<p>Maximum number of recovery conflicts for trigger expression.</p>|`0`|
-|{$PG.CONN_TOTAL_PCT.MAX.WARN}|<p>Maximum percentage of current connections for trigger expression.</p>|`90`|
-|{$PG.DATABASE}|<p>Default PostgreSQL database for the connection.</p>|`postgres`|
-|{$PG.DEADLOCKS.MAX.WARN}|<p>Maximum number of detected deadlocks for trigger expression.</p>|`0`|
-|{$PG.FROZENXID_PCT_STOP.MIN.HIGH}|<p>Minimum frozen XID before stop percentage for trigger expression.</p>|`75`|
 |{$PG.HOST}|<p>Hostname or IP of PostgreSQL host.</p>|`localhost`|
+|{$PG.PORT}|<p>PostgreSQL service port.</p>|`5432`|
+|{$PG.USER}|<p>PostgreSQL username.</p>|`zbx_monitor`|
+|{$PG.PASSWORD}|<p>PostgreSQL user password.</p>||
+|{$PG.DATABASE}|<p>Default PostgreSQL database for the connection.</p>|`postgres`|
 |{$PG.LLD.FILTER.DBNAME}|<p>Filter of discoverable databases.</p>|`.+`|
 |{$PG.LOCKS.MAX.WARN}|<p>Maximum number of locks for trigger expression.</p>|`100`|
 |{$PG.PING_TIME.MAX.WARN}|<p>Maximum time of connection response for trigger expression.</p>|`1s`|
-|{$PG.PORT}|<p>PostgreSQL service port.</p>|`5432`|
 |{$PG.QUERY_ETIME.MAX.WARN}|<p>Execution time limit for count of slow queries.</p>|`30`|
 |{$PG.REPL_LAG.MAX.WARN}|<p>Maximum replication lag time for trigger expression.</p>|`10m`|
 |{$PG.SLOW_QUERIES.MAX.WARN}|<p>Slow queries count threshold for a trigger.</p>|`5`|
-|{$PG.USER}|<p>PostgreSQL username.</p>|`zbx_monitor`|
-|{$PG.PASSWORD}|<p>PostgreSQL user password.</p>|`<Put the password here>`|
+|{$PG.CACHE_HITRATIO.MIN.WARN}|<p>Minimum cache hit ratio percentage for trigger expression.</p>|`90`|
+|{$PG.CHECKPOINTS_REQ.MAX.WARN}|<p>Maximum required checkpoint occurrences for trigger expression.</p>|`5`|
+|{$PG.CONN_TOTAL_PCT.MAX.WARN}|<p>Maximum percentage of current connections for trigger expression.</p>|`90`|
+|{$PG.DEADLOCKS.MAX.WARN}|<p>Maximum number of detected deadlocks for trigger expression.</p>|`0`|
+|{$PG.FROZENXID_PCT_STOP.MIN.HIGH}|<p>Minimum frozen XID before stop percentage for trigger expression.</p>|`75`|
+|{$PG.CONFLICTS.MAX.WARN}|<p>Maximum number of recovery conflicts for trigger expression.</p>|`0`|
 
 ### Items
 
 |Name|Description|Type|Key and additional info|
 |----|-----------|----|-----------------------|
 |Bgwriter: Buffers allocated per second|<p>Number of buffers allocated per second.</p>|Dependent item|pgsql.bgwriter.buffers_alloc.rate<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.buffers_alloc`</p></li><li>Change per second</li></ul>|
-|Bgwriter: Buffers written directly by a backend per second|<p>Number of buffers written directly by a backend per second.</p>|Dependent item|pgsql.bgwriter.buffers_backend.rate<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.buffers_backend`</p></li><li>Change per second</li></ul>|
-|Bgwriter: Times a backend executed its own fsync per second|<p>Number of times a backend had to execute its own fsync call per second (normally the background writer handles those even when the backend does its own write).</p>|Dependent item|pgsql.bgwriter.buffers_backend_fsync.rate<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.buffers_backend_fsync`</p></li><li>Change per second</li></ul>|
+|Bgwriter: Buffers written directly by a backend per second|<p>Number of buffers written directly by a backend per second. Available in PostgreSQL versions prior to 17.</p>|Dependent item|pgsql.bgwriter.buffers_backend.rate<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.buffers_backend`</p><p>⛔️Custom on fail: Discard value</p></li><li>Change per second</li></ul>|
+|Bgwriter: Times a backend executed its own fsync per second|<p>Number of times a backend had to execute its own fsync call per second (normally the background writer handles those even when the backend does its own write). Available in PostgreSQL versions prior to 17.</p>|Dependent item|pgsql.bgwriter.buffers_backend_fsync.rate<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.buffers_backend_fsync`</p><p>⛔️Custom on fail: Discard value</p></li><li>Change per second</li></ul>|
 |Checkpoint: Buffers written during checkpoints per second|<p>Number of buffers written during checkpoints per second.</p>|Dependent item|pgsql.bgwriter.buffers_checkpoint.rate<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.buffers_checkpoint`</p></li><li>Change per second</li></ul>|
 |Checkpoint: Buffers written by the background writer per second|<p>Number of buffers written by the background writer per second.</p>|Dependent item|pgsql.bgwriter.buffers_clean.rate<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.buffers_clean`</p></li><li>Change per second</li></ul>|
 |Checkpoint: Requested per second|<p>Number of requested checkpoints that have been performed per second.</p>|Dependent item|pgsql.bgwriter.checkpoints_req.rate<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.checkpoints_req`</p></li><li>Change per second</li></ul>|

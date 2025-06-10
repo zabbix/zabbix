@@ -4275,6 +4275,24 @@ class CApiInputValidatorTest extends TestCase {
 				'Invalid parameter "/output/3": value (name) already exists.'
 			],
 			[
+				['type' => API_OUTPUT, 'flags' => API_NORMALIZE, 'in' => 'hostid,name'],
+				'extend',
+				'/output',
+				['hostid', 'name']
+			],
+			[
+				['type' => API_OUTPUT, 'flags' => API_NORMALIZE, 'in' => 'hostid,name'],
+				['name'],
+				'/output',
+				['name']
+			],
+			[
+				['type' => API_OUTPUT, 'flags' => API_NORMALIZE, 'in' => 'hostid,name'],
+				'name',
+				'/output',
+				'Invalid parameter "/output": value must be "extend".'
+			],
+			[
 				['type' => API_PSK],
 				'0123456789abcdef0123456789abcdef',
 				'/psk',
@@ -5010,7 +5028,7 @@ class CApiInputValidatorTest extends TestCase {
 				['type' => API_PORT, 'flags' => API_ALLOW_USER_MACRO],
 				'{$}',
 				'/1/port',
-				'Invalid parameter "/1/port": an integer is expected.'
+				'Invalid parameter "/1/port": a port number is expected.'
 			],
 			[
 				['type' => API_PORT, 'flags' => API_ALLOW_USER_MACRO],
@@ -5034,7 +5052,7 @@ class CApiInputValidatorTest extends TestCase {
 				['type' => API_PORT, 'flags' => API_ALLOW_LLD_MACRO],
 				'{#}',
 				'/1/port',
-				'Invalid parameter "/1/port": an integer is expected.'
+				'Invalid parameter "/1/port": a port number is expected.'
 			],
 			[
 				['type' => API_PORT, 'flags' => API_ALLOW_LLD_MACRO],
@@ -5052,31 +5070,31 @@ class CApiInputValidatorTest extends TestCase {
 				['type' => API_PORT, 'flags' => API_ALLOW_USER_MACRO],
 				'{$MACRO10}{$MACRO11}',
 				'/1/port',
-				'Invalid parameter "/1/port": an integer is expected.'
+				'Invalid parameter "/1/port": a port number is expected.'
 			],
 			[
 				['type' => API_PORT, 'flags' => API_ALLOW_LLD_MACRO],
 				'{#MACRO8}{#MACRO9}',
 				'/1/port',
-				'Invalid parameter "/1/port": an integer is expected.'
+				'Invalid parameter "/1/port": a port number is expected.'
 			],
 			[
 				['type' => API_PORT],
 				'-1',
 				'/1/port',
-				'Invalid parameter "/1/port": value must be one of 0-65535.'
+				'Invalid parameter "/1/port": a port number is expected.'
 			],
 			[
 				['type' => API_PORT],
 				'9999999999',
 				'/1/port',
-				'Invalid parameter "/1/port": a number is too large.'
+				'Invalid parameter "/1/port": a port number is expected.'
 			],
 			[
 				['type' => API_PORT],
 				'65536',
 				'/1/port',
-				'Invalid parameter "/1/port": value must be one of 0-65535.'
+				'Invalid parameter "/1/port": a port number is expected.'
 			],
 			[
 				['type' => API_TRIGGER_EXPRESSION],
@@ -8830,6 +8848,103 @@ class CApiInputValidatorTest extends TestCase {
 				'{#MACRO}',
 				'/1/number',
 				'Invalid parameter "/1/number": incorrect syntax near "#MACRO}".'
+			],
+			[
+				['type' => API_SELEMENTID],
+				'',
+				'/1/selementid',
+				'Invalid parameter "/1/selementid": cannot be empty.'
+			],
+			[
+				['type' => API_SELEMENTID],
+				[],
+				'/1/selementid',
+				'Invalid parameter "/1/selementid": a number is expected.'
+			],
+			[
+				['type' => API_SELEMENTID],
+				true,
+				'/1/selementid',
+				'Invalid parameter "/1/selementid": a number is expected.'
+			],
+			[
+				['type' => API_SELEMENTID],
+				null,
+				'/1/selementid',
+				'Invalid parameter "/1/selementid": a number is expected.'
+			],
+			[
+				['type' => API_SELEMENTID],
+				'abc',
+				'/1/selementid',
+				'abc'
+			],
+			[
+				['type' => API_SELEMENTID],
+				123,
+				'/1/selementid',
+				'123'
+			],
+			[
+				['type' => API_SELEMENTID],
+				'123',
+				'/1/selementid',
+				'123'
+			],
+			[
+				['type' => API_SELEMENTID],
+				1.5,
+				'/1/selementid',
+				'Invalid parameter "/1/selementid": a number is expected.'
+			],
+			[
+				['type' => API_SELEMENTID],
+				'1.5',
+				'/1/selementid',
+				'1.5'
+			],
+			[
+				['type' => API_SELEMENTID],
+				005,
+				'/1/selementid',
+				'5'
+			],
+			[
+				['type' => API_SELEMENTID],
+				'005',
+				'/1/selementid',
+				'005'
+			],
+			[
+				['type' => API_SELEMENTID],
+				-1,
+				'/1/selementid',
+				'Invalid parameter "/1/selementid": a number is expected.'
+			],
+			[
+				['type' => API_SELEMENTID],
+				'-1',
+				'/1/selementid',
+				'-1'
+			],
+			[
+				['type' => API_SELEMENTID],
+				'{$MACRO}',
+				'/1/selementid',
+				'{$MACRO}'
+			],
+			[
+				['type' => API_SELEMENTID],
+				'Заббикс сервер',
+				'/1/selementid',
+				'Заббикс сервер'
+			],
+			[
+				['type' => API_SELEMENTID],
+				// broken UTF-8 byte sequence
+				'Заббикс '."\xd1".'сервер',
+				'/1/selementid',
+				'Invalid parameter "/1/selementid": invalid byte sequence in UTF-8.'
 			]
 		];
 	}

@@ -141,7 +141,8 @@ typedef enum
 	ITEM_TYPE_HTTPAGENT,
 	ITEM_TYPE_SNMP,
 	ITEM_TYPE_SCRIPT,
-	ITEM_TYPE_BROWSER	/* 22 */
+	ITEM_TYPE_BROWSER,
+	ITEM_TYPE_NESTED_LLD 	/* 23 */
 }
 zbx_item_type_t;
 
@@ -532,6 +533,7 @@ zbx_proxy_suppress_t;
 #define ZBX_JAN_1970_IN_SEC	2208988800.0	/* 1970 - 1900 in seconds */
 
 #define ZBX_MAX_RECV_DATA_SIZE		(1 * ZBX_GIBIBYTE)
+#define ZBX_MAX_RECV_2KB_DATA_SIZE	(2 * ZBX_KIBIBYTE)
 #if (4 < SIZEOF_SIZE_T)
 #define ZBX_MAX_RECV_LARGE_DATA_SIZE	(__UINT64_C(16) * ZBX_GIBIBYTE)
 #else
@@ -590,7 +592,7 @@ int	zbx_vsnprintf_check_len(const char *fmt, va_list args);
 char	*zbx_dsprintf(char *dest, const char *f, ...) __zbx_attr_format_printf(2, 3);
 
 /* used by zbxcommon, setproctitle */
-size_t	zbx_strlcpy(char *dst, const char *src, size_t size);
+size_t	zbx_strlcpy(char *dst, const char *src, size_t siz);
 
 /* used by dsprintf, which is used by log */
 char	*zbx_dvsprintf(char *dest, const char *f, va_list args);

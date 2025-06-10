@@ -43,15 +43,15 @@ class CControllerUserCreate extends CControllerUserUpdateGeneral {
 		];
 
 		$ret = $this->validateInput($fields);
-		$error = $this->GetValidationError();
+		$result = $this->getValidationResult();
 
 		if ($ret && (!$this->validatePassword() || !$this->validateUserRole())) {
-			$error = self::VALIDATION_ERROR;
+			$result = self::VALIDATION_ERROR;
 			$ret = false;
 		}
 
 		if (!$ret) {
-			switch ($error) {
+			switch ($result) {
 				case self::VALIDATION_ERROR:
 					$response = new CControllerResponseRedirect(
 						(new CUrl('zabbix.php'))->setArgument('action', 'user.edit')
@@ -86,16 +86,18 @@ class CControllerUserCreate extends CControllerUserUpdateGeneral {
 			$user['passwd'] = $this->getInput('password1');
 		}
 
-		$user['medias'] = [];
+		if ($this->checkAccess(CRoleHelper::ACTIONS_EDIT_USER_MEDIA)) {
+			$user['medias'] = [];
 
-		foreach ($this->getInput('medias', []) as $media) {
-			$user['medias'][] = [
-				'mediatypeid' => $media['mediatypeid'],
-				'sendto' => $media['sendto'],
-				'active' => $media['active'],
-				'severity' => $media['severity'],
-				'period' => $media['period']
-			];
+			foreach ($this->getInput('medias', []) as $media) {
+				$user['medias'][] = [
+					'mediatypeid' => $media['mediatypeid'],
+					'sendto' => $media['sendto'],
+					'active' => $media['active'],
+					'severity' => $media['severity'],
+					'period' => $media['period']
+				];
+			}
 		}
 
 		$result = (bool) API::User()->create($user);

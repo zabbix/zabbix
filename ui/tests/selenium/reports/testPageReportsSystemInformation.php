@@ -28,8 +28,6 @@ class testPageReportsSystemInformation extends testSystemInformation {
 		CElementQuery::getDriver()->executeScript("arguments[0].textContent = '';",
 				[$this->query('xpath://table[@class="list-table sticky-header"]/tbody/tr[3]/td[1]')->one()]
 		);
-		// TODO: Incorrect screenshot on Jenkins due to Chrome - need to remove mouse hover on last row in table.
-		$this->query('id:page-title-general')->one()->hoverMouse();
 		$this->assertScreenshotExcept(null, $this->query('xpath://footer')->one(), 'report_without_ha');
 	}
 
@@ -38,8 +36,6 @@ class testPageReportsSystemInformation extends testSystemInformation {
 	 */
 	public function testPageReportsSystemInformation_checkEnabledHA() {
 		$this->assertEnabledHACluster();
-		// TODO: Incorrect screenshot on Jenkins due to Chrome - need to remove mouse hover on last row in table.
-		$this->query('id:page-title-general')->one()->hoverMouse();
 		$this->assertScreenshotExcept(null, self::$skip_fields, 'report_with_ha');
 	}
 

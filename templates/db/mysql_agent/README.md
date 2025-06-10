@@ -44,6 +44,14 @@ password='<password>'
 
 For more information, please see [`MySQL documentation`](https://dev.mysql.com/doc/refman/8.0/en/option-files.html).
 
+**NOTE:** In order to collect replication metrics, MariaDB Enterprise Server 10.5.8-5 and above and MariaDB Community Server 10.5.9 and above require the `SLAVE MONITOR` privilege to be set for the monitoring user:
+
+```text
+GRANT REPLICATION CLIENT,PROCESS,SHOW DATABASES,SHOW VIEW,SLAVE MONITOR ON *.* TO 'zbx_monitor'@'%';
+```
+
+For more information, please read the [`MariaDB documentation`](https://mariadb.com/docs/server/ref/mdb/privileges/SLAVE_MONITOR/).
+
 NOTE: Linux distributions that use SELinux may require additional steps for access configuration.
 
 For example, the following rule could be added to the SELinux policy:
@@ -81,9 +89,9 @@ EOF
 
 |Name|Description|Default|
 |----|-----------|-------|
-|{$MYSQL.ABORTED_CONN.MAX.WARN}|<p>Number of failed attempts to connect to the MySQL server for trigger expressions.</p>|`3`|
 |{$MYSQL.HOST}|<p>Hostname or IP of MySQL host or container.</p>|`127.0.0.1`|
 |{$MYSQL.PORT}|<p>MySQL service port.</p>|`3306`|
+|{$MYSQL.ABORTED_CONN.MAX.WARN}|<p>Number of failed attempts to connect to the MySQL server for trigger expressions.</p>|`3`|
 |{$MYSQL.REPL_LAG.MAX.WARN}|<p>Amount of time the slave is behind the master for trigger expressions.</p>|`30m`|
 |{$MYSQL.SLOW_QUERIES.MAX.WARN}|<p>Number of slow queries for trigger expressions.</p>|`3`|
 |{$MYSQL.BUFF_UTIL.MIN.WARN}|<p>The minimum buffer pool utilization in percentage for trigger expressions.</p>|`50`|

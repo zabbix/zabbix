@@ -48,23 +48,23 @@ class CControllerUserUpdate extends CControllerUserUpdateGeneral {
 		];
 
 		$ret = $this->validateInput($fields);
-		$error = $this->GetValidationError();
+		$result = $this->getValidationResult();
 
 		if (CWebUser::$data['userid'] == $this->getInput('userid')
 				&& CWebUser::$data['roleid'] == USER_TYPE_SUPER_ADMIN) {
 			if ($ret && !$this->validateCurrentPassword()) {
-				$error = self::VALIDATION_ERROR;
+				$result = self::VALIDATION_ERROR;
 				$ret = false;
 			}
 		}
 
 		if ($ret && (!$this->validatePassword() || !$this->validateUserRole())) {
-			$error = self::VALIDATION_ERROR;
+			$result = self::VALIDATION_ERROR;
 			$ret = false;
 		}
 
 		if (!$ret) {
-			switch ($error) {
+			switch ($result) {
 				case self::VALIDATION_ERROR:
 					$response = new CControllerResponseRedirect(
 						(new CUrl('zabbix.php'))->setArgument('action', 'user.edit')
@@ -97,13 +97,20 @@ class CControllerUserUpdate extends CControllerUserUpdateGeneral {
 
 	protected function doAction() {
 		$user = [
-			'roleid' => 0,
-			'medias' => $this->getInputUserMedia()
+			'roleid' => 0
 		];
 
 		$this->getInputs($user, ['userid', 'username', 'name', 'surname', 'lang', 'timezone', 'theme', 'autologin',
 			'autologout', 'refresh', 'rows_per_page', 'url', 'roleid'
 		]);
+
+		$can_edit_media = bccomp(CWebUser::$data['userid'], $user['userid']) == 0
+			? $this->checkAccess(CRoleHelper::ACTIONS_EDIT_OWN_MEDIA)
+			: $this->checkAccess(CRoleHelper::ACTIONS_EDIT_USER_MEDIA);
+
+		if ($can_edit_media) {
+			$user['medias'] = $this->getInputUserMedia();
+		}
 
 		if ($this->getInput('current_password', '') !== '' || ($this->hasInput('current_password')
 				&& CWebUser::$data['auth_type'] == ZBX_AUTH_INTERNAL)) {

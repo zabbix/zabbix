@@ -20,8 +20,7 @@
 
 void	zbx_mock_test_entry(void **state)
 {
-	const char	*context = zbx_mock_get_parameter_string("in.context"),
-			*exp_result = zbx_mock_get_parameter_string("out.exp_result");
+	const char	*context = zbx_mock_get_parameter_string("in.context");
 	int		force_quote = zbx_mock_get_parameter_int("in.force_quote");
 	char		*error = NULL;
 
@@ -30,10 +29,13 @@ void	zbx_mock_test_entry(void **state)
 	char	*result = zbx_user_macro_quote_context_dyn(context, force_quote, &error);
 
 	if (NULL != result)
-		zbx_mock_assert_str_eq("return value str", exp_result, result);
-
-	zbx_free(result);
-
-	if (SUCCEED != force_quote)
+	{
+		zbx_mock_assert_str_eq("return value str", zbx_mock_get_parameter_string("out.exp_result"), result);
+		zbx_free(result);
+	}
+	else
+	{
+		zbx_mock_assert_str_eq("return error str", zbx_mock_get_parameter_string("out.exp_error"), error);
 		zbx_free(error);
+	}
 }

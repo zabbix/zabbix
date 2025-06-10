@@ -116,7 +116,7 @@ foreach ($data['items'] as $item) {
 			->setArgument('action', 'popup')
 			->setArgument('popup', 'trigger.edit')
 			->setArgument('triggerid', $trigger['triggerid'])
-			->setArgument('hostid', key($trigger['hosts']))
+			->setArgument('hostid', array_column($trigger['hosts'], 'hostid')[0])
 			->setArgument('context', $data['context'])
 			->getUrl();
 
@@ -156,8 +156,8 @@ foreach ($data['items'] as $item) {
 		$item['trends'] = '';
 	}
 
-	$disable_source = $item['status'] == ITEM_STATUS_DISABLED && $item['itemDiscovery']
-		? $item['itemDiscovery']['disable_source']
+	$disable_source = $item['status'] == ITEM_STATUS_DISABLED && $item['discoveryData']
+		? $item['discoveryData']['disable_source']
 		: '';
 
 	// Info
@@ -171,9 +171,9 @@ foreach ($data['items'] as $item) {
 		}
 
 
-		if ($item['flags'] == ZBX_FLAG_DISCOVERY_CREATED && $item['itemDiscovery']['status'] == ZBX_LLD_STATUS_LOST) {
-			$info_cell[] = getLldLostEntityIndicator(time(), $item['itemDiscovery']['ts_delete'],
-				$item['itemDiscovery']['ts_disable'], $disable_source, $item['status'] == ITEM_STATUS_DISABLED,
+		if ($item['flags'] == ZBX_FLAG_DISCOVERY_CREATED && $item['discoveryData']['status'] == ZBX_LLD_STATUS_LOST) {
+			$info_cell[] = getLldLostEntityIndicator(time(), $item['discoveryData']['ts_delete'],
+				$item['discoveryData']['ts_disable'], $disable_source, $item['status'] == ITEM_STATUS_DISABLED,
 				_('item')
 			);
 		}

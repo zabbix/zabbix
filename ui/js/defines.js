@@ -27,11 +27,31 @@ const ZBX_STYLE_NO_DATA_MESSAGE = 'no-data-message';
 const ZBX_STYLE_BTN = 'btn';
 const ZBX_STYLE_BTN_ALT = 'btn-alt';
 const ZBX_STYLE_BTN_GREY = 'btn-grey';
+const ZBX_STYLE_BTN_GREY_ICON = 'btn-grey-icon';
 const ZBX_STYLE_BTN_ICON = 'btn-icon';
 const ZBX_STYLE_BTN_LINK = 'btn-link';
 const ZBX_STYLE_BTN_SMALL = 'btn-small';
 
+const ZBX_STYLE_OVERLAY_DIALOGUE_HEADER = 'overlay-dialogue-header';
+
+const ZBX_STYLE_GRID_COLUMN_FIRST = 'column-first';
+const ZBX_STYLE_GRID_COLUMN_LAST = 'column-last';
+
 const ZBX_STYLE_FORM_GRID = 'form-grid';
+const ZBX_STYLE_FORM_FIELD = 'form-field';
+const ZBX_STYLE_FORM_FIELDS_HINT = 'form-fields-hint';
+const ZBX_STYLE_FORM_DESCRIPTION = 'form-description';
+
+const ZBX_STYLE_FIELD_LABEL_ASTERISK = 'form-label-asterisk';
+
+const ZBX_STYLE_MARKDOWN = 'markdown';
+const ZBX_STYLE_FORMATED_TEXT = 'formated-text';
+
+const ZBX_STYLE_TEXTAREA_FLEXIBLE = 'textarea-flexible';
+const ZBX_STYLE_TEXTAREA_FLEXIBLE_CONTAINER = 'textarea-flexible-container';
+const ZBX_STYLE_TEXTAREA_FLEXIBLE_PARENT = 'textarea-flexible-parent';
+
+const ZBX_STYLE_COLOR_PICKER = 'color-picker';
 
 const ZBX_STYLE_COLOR_WARNING = 'color-warning';
 
@@ -42,11 +62,35 @@ const ZBX_STYLE_COLLAPSED = 'collapsed';
 const ZBX_STYLE_DRAG_ICON = 'drag-icon';
 const ZBX_STYLE_PROBLEM_ICON_LINK = 'problem-icon-link';
 const ZBX_STYLE_PROBLEM_ICON_LIST_ITEM = 'problem-icon-list-item';
+const ZBX_STYLE_TOGGLE = 'toggle';
 
 const ZBX_STYLE_LINK_ALT = 'link-alt';
 
 const ZBX_STYLE_LIST_TABLE = 'list-table';
 const ZBX_STYLE_ROW_SELECTED = 'row-selected';
+
+const ZBX_STYLE_NA_BG = 'na-bg';
+const ZBX_STYLE_INFO_BG = 'info-bg';
+const ZBX_STYLE_WARNING_BG = 'warning-bg';
+const ZBX_STYLE_AVERAGE_BG = 'average-bg';
+const ZBX_STYLE_HIGH_BG = 'high-bg';
+const ZBX_STYLE_DISASTER_BG = 'disaster-bg';
+
+const ZBX_STYLE_STATUS_NA_BG = 'status-na-bg';
+const ZBX_STYLE_STATUS_INFO_BG = 'status-info-bg';
+const ZBX_STYLE_STATUS_WARNING_BG = 'status-warning-bg';
+const ZBX_STYLE_STATUS_AVERAGE_BG = 'status-average-bg';
+const ZBX_STYLE_STATUS_HIGH_BG = 'status-high-bg';
+const ZBX_STYLE_STATUS_DISASTER_BG = 'status-disaster-bg';
+
+const ZBX_STYLE_DEFAULT_OPTION = 'default-option';
+
+const ZBX_STYLE_TAG = 'tag';
+const ZBX_STYLE_TAGS_LIST = 'tags-list';
+
+const ZBX_STYLE_CHECKBOX_RADIO = 'checkbox-radio';
+
+const ZBX_STYLE_OVERLAY_DIALOGUE = 'overlay-dialogue';
 
 const ZBX_ICON_BELL = 'zi-bell';
 const ZBX_ICON_BELL_OFF = 'zi-bell-off';
@@ -77,7 +121,15 @@ const ZBX_ICON_SPEAKER_OFF = 'zi-speaker-off';
 const ZBX_ICON_TEXT = 'zi-text';
 const ZBX_ICON_WIDGET_AWAITING_DATA_LARGE = 'zi-widget-awaiting-data-large';
 const ZBX_ICON_WIDGET_EMPTY_REFERENCES_LARGE = 'zi-widget-empty-references-large';
+const ZBX_ICON_WIDGET_NOT_CONFIGURED_LARGE = ZBX_ICON_WIDGET_EMPTY_REFERENCES_LARGE;
 const ZBX_ICON_WRENCH_ALT_SMALL = 'zi-wrench-alt-small';
+
+const ITEM_VALUE_TYPE_FLOAT = 0;
+const ITEM_VALUE_TYPE_STR = 1;
+const ITEM_VALUE_TYPE_LOG = 2;
+const ITEM_VALUE_TYPE_UINT64 = 3;
+const ITEM_VALUE_TYPE_TEXT = 4;
+const ITEM_VALUE_TYPE_BINARY = 5;
 
 const TRIGGER_SEVERITY_NOT_CLASSIFIED = 0;
 const TRIGGER_SEVERITY_INFORMATION = 1;
@@ -86,28 +138,94 @@ const TRIGGER_SEVERITY_AVERAGE = 3;
 const TRIGGER_SEVERITY_HIGH = 4;
 const TRIGGER_SEVERITY_DISASTER = 5;
 
-const ZBX_STYLE_NA_BG = 'na-bg';
-const ZBX_STYLE_INFO_BG = 'info-bg';
-const ZBX_STYLE_WARNING_BG = 'warning-bg';
-const ZBX_STYLE_AVERAGE_BG = 'average-bg';
-const ZBX_STYLE_HIGH_BG = 'high-bg';
-const ZBX_STYLE_DISASTER_BG = 'disaster-bg';
+const ZBX_SECRET_MASK = '******';
 
-const ZBX_STYLE_STATUS_NA_BG = 'status-na-bg';
-const ZBX_STYLE_STATUS_INFO_BG = 'status-info-bg';
-const ZBX_STYLE_STATUS_WARNING_BG = 'status-warning-bg';
-const ZBX_STYLE_STATUS_AVERAGE_BG = 'status-average-bg';
-const ZBX_STYLE_STATUS_HIGH_BG = 'status-high-bg';
-const ZBX_STYLE_STATUS_DISASTER_BG = 'status-disaster-bg';
+const PERM_READ = 2;
+
+const TAG_EVAL_TYPE_AND_OR = 0;
 
 const MAINTENANCE_TYPE_NORMAL = 0;
 const MAINTENANCE_TYPE_NODATA = 1;
+
+const ZBX_TEMPLATE_DATA_COLLECTION_ANY = -1;
+const ZBX_TEMPLATE_DATA_COLLECTION_AGENT_BASED = 0;
+const ZBX_TEMPLATE_DATA_COLLECTION_AGENTLESS = 1;
+
+const ZBX_TEMPLATE_AGENT_MODE_ANY = -1;
+const ZBX_TEMPLATE_AGENT_MODE_ACTIVE = 0;
+const ZBX_TEMPLATE_AGENT_MODE_PASSIVE = 1;
+
+const ZBX_TEMPLATE_SHOW_ANY = -1;
+const ZBX_TEMPLATE_SHOW_LINKED = 0;
+const ZBX_TEMPLATE_SHOW_NOT_LINKED = 1;
+
+const SYSMAP_BACKGROUND_SCALE_COVER = 1;
 
 const SYSMAP_ELEMENT_TYPE_HOST = 0;
 const SYSMAP_ELEMENT_TYPE_MAP = 1;
 const SYSMAP_ELEMENT_TYPE_TRIGGER = 2;
 const SYSMAP_ELEMENT_TYPE_HOST_GROUP = 3;
 const SYSMAP_ELEMENT_TYPE_IMAGE = 4;
+
+const SYSMAP_ELEMENT_SUBTYPE_HOST_GROUP = 0;
+const SYSMAP_ELEMENT_SUBTYPE_HOST_GROUP_ELEMENTS = 1;
+
+const SYSMAP_ELEMENT_AREA_TYPE_FIT = 0;
+const SYSMAP_ELEMENT_AREA_TYPE_CUSTOM = 1;
+
+const SYSMAP_ELEMENT_USE_ICONMAP_ON = 1;
+const SYSMAP_ELEMENT_USE_ICONMAP_OFF = 0;
+
+const SYSMAP_SHAPE_BORDER_TYPE_NONE = 0;
+const SYSMAP_SHAPE_BORDER_TYPE_SOLID = 1;
+const SYSMAP_SHAPE_BORDER_TYPE_DOTTED = 2;
+const SYSMAP_SHAPE_BORDER_TYPE_DASHED = 3;
+
+const SYSMAP_SHAPE_BORDER_WIDTH_DEFAULT = 2;
+
+const SYSMAP_SHAPE_TYPE_RECTANGLE = 0;
+const SYSMAP_SHAPE_TYPE_ELLIPSE = 1;
+const SYSMAP_SHAPE_TYPE_LINE = 2;
+
+const SYSMAP_SHAPE_LABEL_HALIGN_LEFT = 1;
+const SYSMAP_SHAPE_LABEL_HALIGN_RIGHT = 2;
+
+const SYSMAP_SHAPE_LABEL_VALIGN_TOP = 1;
+const SYSMAP_SHAPE_LABEL_VALIGN_BOTTOM = 2;
+
+const SYSMAP_EXPAND_MACROS_OFF = 0;
+const SYSMAP_EXPAND_MACROS_ON = 1;
+
+const SYSMAP_GRID_SHOW_OFF = 0;
+const SYSMAP_GRID_SHOW_ON = 1;
+
+const SYSMAP_GRID_ALIGN_OFF = 0;
+const SYSMAP_GRID_ALIGN_ON = 1;
+
+const MAP_LABEL_LOC_DEFAULT = -1;
+const MAP_LABEL_LOC_BOTTOM = 0;
+const MAP_LABEL_LOC_LEFT = 1;
+const MAP_LABEL_LOC_RIGHT = 2;
+const MAP_LABEL_LOC_TOP = 3;
+
+const MAP_LABEL_TYPE_LABEL = 0;
+const MAP_LABEL_TYPE_IP = 1;
+const MAP_LABEL_TYPE_NAME = 2;
+const MAP_LABEL_TYPE_STATUS = 3;
+const MAP_LABEL_TYPE_NOTHING = 4;
+const MAP_LABEL_TYPE_CUSTOM = 5;
+
+const MAP_INDICATOR_TYPE_STATIC_LINK = 0;
+const MAP_INDICATOR_TYPE_TRIGGER = 1;
+const MAP_INDICATOR_TYPE_ITEM_VALUE = 2;
+
+const MAP_SHOW_LABEL_DEFAULT = -1;
+const MAP_SHOW_LABEL_AUTO_HIDE = 0;
+
+const DRAWTYPE_LINE = 0;
+const DRAWTYPE_BOLD_LINE = 2;
+const DRAWTYPE_DOT = 3;
+const DRAWTYPE_DASHED_LINE = 4;
 
 const KEY_ARROW_DOWN = 40;
 const KEY_ARROW_LEFT = 37;

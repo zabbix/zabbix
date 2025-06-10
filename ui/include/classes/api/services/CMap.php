@@ -30,6 +30,17 @@ class CMap extends CMapElement {
 	protected $tableAlias = 's';
 	protected $sortColumns = ['name', 'width', 'height'];
 
+	public const OUTPUT_FIELDS = ['sysmapid', 'userid', 'name', 'width', 'height', 'backgroundid', 'background_scale',
+		'iconmapid', 'highlight', 'markelements', 'expandproblem', 'label_format', 'label_type', 'label_type_hostgroup',
+		'label_string_hostgroup', 'label_type_host', 'label_string_host', 'label_type_trigger', 'label_string_trigger',
+		'label_type_map', 'label_string_map', 'label_type_image', 'label_string_image', 'label_location',
+		'show_element_label', 'show_link_label', 'show_unack', 'severity_min', 'show_suppressed', 'private',
+		'expand_macros', 'grid_show', 'grid_align', 'grid_size'
+	];
+
+	private const LINK_THRESHOLD_TYPE_THRESHOLD = 0;
+	private const LINK_THRESHOLD_TYPE_HIGHLIGHT = 1;
+
 	private $defOptions = [
 		'sysmapids'					=> null,
 		'userids'					=> null,
@@ -352,6 +363,26 @@ class CMap extends CMapElement {
 			self::setMapPermissions($sysmaps_r, $link_triggers, $db_triggers, $selement_maps);
 			self::setHasElements($sysmaps_r, $selement_triggers);
 			self::setHasElements($sysmaps_r, $link_triggers);
+
+			$sysmapids = self::getSysmapIds($sysmaps_r, $sysmaps_rw);
+		}
+
+		// Check permissions to items.
+		if ($sysmapids) {
+			$link_items = self::getLinkItems($sysmapids);
+
+			$db_items = API::Item()->get([
+				'output' => [],
+				'itemids' => array_keys($link_items),
+				'preservekeys' => true
+			]);
+
+			if ($editable) {
+				self::unsetMapsByElements($sysmaps_rw, $link_items, $db_items);
+			}
+
+			self::setMapPermissions($sysmaps_r, $link_items, $db_items, $selement_maps);
+			self::setHasElements($sysmaps_r, $link_items);
 		}
 
 		foreach ($sysmaps_r as $sysmapid => $sysmap_r) {
@@ -431,6 +462,23 @@ class CMap extends CMapElement {
 		}
 
 		return $link_triggers;
+	}
+
+	private static function getLinkItems(array $sysmapids): array {
+		$link_items = [];
+
+		$resource = DBselect(
+			'SELECT sl.sysmapid,sl.itemid'.
+			' FROM sysmaps_links sl'.
+			' WHERE sl.indicator_type='.MAP_INDICATOR_TYPE_ITEM_VALUE.
+				' AND '.dbConditionId('sl.sysmapid', $sysmapids)
+		);
+
+		while ($db_link = DBfetch($resource)) {
+			$link_items[$db_link['itemid']][] = ['sysmapid' => $db_link['sysmapid']];
+		}
+
+		return $link_items;
 	}
 
 	/**
@@ -574,14 +622,31 @@ class CMap extends CMapElement {
 	/**
 	 * Validate the input parameters for the create() method.
 	 *
-	 * @param array $maps		maps data array
+	 * @param array $maps
 	 *
 	 * @throws APIException if the input is invalid.
 	 */
-	protected function validateCreate(array $maps) {
-		if (!$maps) {
-			self::exception(ZBX_API_ERROR_PARAMETERS, _('Empty input parameter.'));
+	private function validateCreate(array &$maps): void {
+		$api_input_rules = ['type' => API_OBJECTS, 'flags' => API_NOT_EMPTY | API_NORMALIZE | API_ALLOW_UNEXPECTED, 'fields' => [
+			'background_scale' =>	['type' => API_INT32, 'in' => implode(',', [SYSMAP_BACKGROUND_SCALE_NONE, SYSMAP_BACKGROUND_SCALE_COVER])],
+			'show_element_label' =>	['type' => API_INT32, 'in' => implode(',', [MAP_SHOW_LABEL_AUTO_HIDE, MAP_SHOW_LABEL_ALWAYS])],
+			'show_link_label' =>	['type' => API_INT32, 'in' => implode(',', [MAP_SHOW_LABEL_AUTO_HIDE, MAP_SHOW_LABEL_ALWAYS])],
+			'selements' =>			['type' => API_OBJECTS, 'flags' => API_NORMALIZE | API_ALLOW_UNEXPECTED, 'uniq' => [['selementid']], 'fields' => [
+				'selementid' =>			['type' => API_SELEMENTID],
+				'show_label' =>			['type' => API_INT32, 'in' => implode(',', [MAP_SHOW_LABEL_DEFAULT, MAP_SHOW_LABEL_AUTO_HIDE, MAP_SHOW_LABEL_ALWAYS])],
+				'zindex' =>				['type' => API_INT32]
+			]],
+			'links' =>				['type' => API_OBJECTS, 'flags' => API_NORMALIZE | API_ALLOW_UNEXPECTED, 'fields' => [
+				'linkid' =>				['type' => API_UNEXPECTED],
+				'item_value_type' =>	['type' => API_UNEXPECTED]
+			]]
+		]];
+
+		if (!CApiInputValidator::validate($api_input_rules, $maps, '/', $error)) {
+			self::exception(ZBX_API_ERROR_PARAMETERS, $error);
 		}
+
+		self::validateLinks($maps);
 
 		$user_data = self::$userData;
 
@@ -976,10 +1041,7 @@ class CMap extends CMapElement {
 			}
 
 			if (array_key_exists('selements', $map)) {
-				if (!is_array($map['selements'])) {
-					self::exception(ZBX_API_ERROR_PARAMETERS, _('Incorrect arguments passed to function.'));
-				}
-				elseif (!CMapHelper::checkSelementPermissions($map['selements'])) {
+				if (!CMapHelper::checkSelementPermissions($map['selements'])) {
 					self::exception(ZBX_API_ERROR_PERMISSIONS,
 						_('No permissions to referred object or it does not exist!')
 					);
@@ -987,29 +1049,6 @@ class CMap extends CMapElement {
 
 				foreach (array_values($map['selements']) as $selement_index => $selement) {
 					$this->validateSelementTags($selement, '/'.($map_index + 1).'/selements/'.($selement_index + 1));
-				}
-			}
-
-			// Map selement links.
-			if (array_key_exists('links', $map) && $map['links']) {
-				$selementids = zbx_objectValues($map['selements'], 'selementid');
-
-				foreach ($map['links'] as $link) {
-					if (!in_array($link['selementid1'], $selementids)) {
-						self::exception(ZBX_API_ERROR_PARAMETERS, _s(
-							'Link "selementid1" field is pointing to a nonexistent map selement ID "%1$s" for map "%2$s".',
-							$link['selementid1'],
-							$map['name']
-						));
-					}
-
-					if (!in_array($link['selementid2'], $selementids)) {
-						self::exception(ZBX_API_ERROR_PARAMETERS, _s(
-							'Link "selementid2" field is pointing to a nonexistent map selement ID "%1$s" for map "%2$s".',
-							$link['selementid2'],
-							$map['name']
-						));
-					}
 				}
 			}
 		}
@@ -1023,30 +1062,65 @@ class CMap extends CMapElement {
 	 *
 	 * @throws APIException if the input is invalid.
 	 */
-	protected function validateUpdate(array $maps, array $db_maps) {
-		if (!$maps) {
-			self::exception(ZBX_API_ERROR_PARAMETERS, _('Empty input parameter.'));
+	protected function validateUpdate(array &$maps, ?array &$db_maps): void {
+		$api_input_rules = ['type' => API_OBJECTS, 'flags' => API_NOT_EMPTY | API_NORMALIZE | API_ALLOW_UNEXPECTED, 'uniq' => [['sysmapid']], 'fields' => [
+			'sysmapid' =>	['type' => API_ID, 'flags' => API_REQUIRED]
+		]];
+
+		if (!CApiInputValidator::validate($api_input_rules, $maps, '/', $error)) {
+			self::exception(ZBX_API_ERROR_PARAMETERS, $error);
 		}
 
-		$user_data = self::$userData;
+		$db_maps = $this->get([
+			'output' => self::OUTPUT_FIELDS,
+			'sysmapids' => array_column($maps, 'sysmapid'),
+			'selectShapes' => ['sysmap_shapeid', 'type', 'x', 'y', 'width', 'height', 'text', 'font', 'font_size',
+				'font_color', 'text_halign', 'text_valign', 'border_type', 'border_width', 'border_color',
+				'background_color', 'zindex'
+			],
+			'selectLines' => ['sysmap_shapeid', 'x1', 'y1', 'x2', 'y2', 'line_type', 'line_width', 'line_color',
+				'zindex'
+			],
+			'selectUrls' => ['sysmapid', 'sysmapurlid', 'name', 'url', 'elementtype'],
+			'selectUsers' => ['sysmapuserid', 'sysmapid', 'userid', 'permission'],
+			'selectUserGroups' => ['sysmapusrgrpid', 'sysmapid', 'usrgrpid', 'permission'],
+			'editable' => true,
+			'preservekeys' => true
+		]);
 
-		// Validate given IDs.
-		$this->checkObjectIds($maps, 'sysmapid',
-			_('No "%1$s" given for map.'),
-			_('Empty map ID.'),
-			_('Incorrect map ID.')
-		);
+		if (count($db_maps) != count($maps)) {
+			self::exception(ZBX_API_ERROR_PARAMETERS, _('No permissions to referred object or it does not exist!'));
+		}
+
+		$api_input_rules = ['type' => API_OBJECTS, 'flags' => API_ALLOW_UNEXPECTED, 'fields' => [
+			'sysmapid' =>			['type' => API_ANY],
+			'background_scale' =>	['type' => API_INT32, 'in' => implode(',', [SYSMAP_BACKGROUND_SCALE_NONE, SYSMAP_BACKGROUND_SCALE_COVER])],
+			'show_element_label' =>	['type' => API_INT32, 'in' => implode(',', [MAP_SHOW_LABEL_AUTO_HIDE, MAP_SHOW_LABEL_ALWAYS])],
+			'show_link_label' =>	['type' => API_INT32, 'in' => implode(',', [MAP_SHOW_LABEL_AUTO_HIDE, MAP_SHOW_LABEL_ALWAYS])],
+			'selements' =>			['type' => API_OBJECTS, 'flags' => API_NORMALIZE | API_ALLOW_UNEXPECTED, 'uniq' => [['selementid']], 'fields' => [
+				'selementid' =>			['type' => API_SELEMENTID],
+				'show_label' =>			['type' => API_INT32, 'in' => implode(',', [MAP_SHOW_LABEL_DEFAULT, MAP_SHOW_LABEL_AUTO_HIDE, MAP_SHOW_LABEL_ALWAYS])],
+				'zindex' =>				['type' => API_INT32]
+			]],
+			'links' =>				['type' => API_OBJECTS, 'flags' => API_NORMALIZE | API_ALLOW_UNEXPECTED, 'uniq' => [['linkid']], 'fields' => [
+				'linkid' =>				['type' => API_ID],
+				'item_value_type' =>	['type' => API_UNEXPECTED]
+			]]
+		]];
+
+		if (!CApiInputValidator::validate($api_input_rules, $maps, '/', $error)) {
+			self::exception(ZBX_API_ERROR_PARAMETERS, $error);
+		}
+
+		self::addAffectedObjects($maps, $db_maps);
+
+		self::validateLinks($maps, $db_maps);
+
+		$user_data = self::$userData;
 
 		$check_names = [];
 
 		foreach ($maps as $map) {
-			// Check if this map exists and user has write permissions.
-			if (!array_key_exists($map['sysmapid'], $db_maps)) {
-				self::exception(ZBX_API_ERROR_PERMISSIONS,
-					_('No permissions to referred object or it does not exist!')
-				);
-			}
-
 			// Validate "name" field.
 			if (array_key_exists('name', $map)) {
 				if (is_array($map['name'])) {
@@ -1450,36 +1524,9 @@ class CMap extends CMapElement {
 				}
 			}
 
-			if (array_key_exists('selements', $map) && !is_array($map['selements'])) {
-				self::exception(ZBX_API_ERROR_PARAMETERS, _('Incorrect arguments passed to function.'));
-			}
-
 			if (array_key_exists('selements', $map)) {
 				foreach (array_values($map['selements']) as $selement_index => $selement) {
 					$this->validateSelementTags($selement, '/'.($map_index + 1).'/selements/'.($selement_index + 1));
-				}
-			}
-
-			// Map selement links.
-			if (array_key_exists('links', $map) && $map['links']) {
-				$selementids = zbx_objectValues($map['selements'], 'selementid');
-
-				foreach ($map['links'] as $link) {
-					if (!in_array($link['selementid1'], $selementids)) {
-						self::exception(ZBX_API_ERROR_PARAMETERS, _s(
-							'Link "selementid1" field is pointing to a nonexistent map selement ID "%1$s" for map "%2$s".',
-							$link['selementid1'],
-							$map['name']
-						));
-					}
-
-					if (!in_array($link['selementid2'], $selementids)) {
-						self::exception(ZBX_API_ERROR_PARAMETERS, _s(
-							'Link "selementid2" field is pointing to a nonexistent map selement ID "%1$s" for map "%2$s".',
-							$link['selementid2'],
-							$map['name']
-						));
-					}
 				}
 			}
 		}
@@ -1492,6 +1539,668 @@ class CMap extends CMapElement {
 		unset($map);
 
 		$this->validateCircularReference($maps);
+	}
+
+	private static function addAffectedObjects(array $maps, array &$db_maps): void {
+		self::addAffectedSelements($maps, $db_maps);
+		self::addAffectedLinks($maps, $db_maps);
+	}
+
+	private static function addAffectedSelements(array $maps, array &$db_maps): void {
+		$sysmapids = [];
+
+		foreach ($maps as $map) {
+			if (array_key_exists('selements', $map) || array_key_exists('links', $map)) {
+				$sysmapids[] = $map['sysmapid'];
+				$db_maps[$map['sysmapid']]['selements'] = [];
+			}
+		}
+
+		if (!$sysmapids) {
+			return;
+		}
+
+		$options = [
+			'output' => ['selementid', 'sysmapid', 'elementtype', 'elementsubtype', 'areatype', 'width', 'height',
+				'viewtype', 'label', 'label_location', 'show_label', 'elementid', 'evaltype', 'use_iconmap',
+				'iconid_off', 'iconid_on', 'iconid_maintenance', 'iconid_disabled', 'x', 'y'
+			],
+			'filter' => ['sysmapid' => $sysmapids]
+		];
+		$resource = DBselect(DB::makeSql('sysmaps_elements', $options));
+
+		$db_selements = [];
+
+		while ($db_selement = DBfetch($resource)) {
+			$db_maps[$db_selement['sysmapid']]['selements'][$db_selement['selementid']] =
+				array_diff_key($db_selement, array_flip(['sysmapid']));
+
+			$db_selements[$db_selement['selementid']] =
+				&$db_maps[$db_selement['sysmapid']]['selements'][$db_selement['selementid']];
+		}
+
+		if (!$db_selements) {
+			return;
+		}
+
+		self::addAffectedSelementElements($db_selements);
+		self::addAffectedSelementUrls($db_selements);
+		self::addAffectedSelementTags($db_selements);
+	}
+
+	private static function addAffectedSelementElements(array &$db_selements): void {
+		$trigger_selementids = [];
+
+		foreach ($db_selements as $selementid => &$db_selement) {
+			$db_selement['elements'] = [];
+
+			switch ($db_selement['elementtype']) {
+				case SYSMAP_ELEMENT_TYPE_HOST:
+					$db_selement['elements'][] = ['hostid' => $db_selement['elementid']];
+					break;
+
+				case SYSMAP_ELEMENT_TYPE_MAP:
+					$db_selement['elements'][] = ['sysmapid' => $db_selement['elementid']];
+					break;
+
+				case SYSMAP_ELEMENT_TYPE_TRIGGER:
+					$trigger_selementids[] = $selementid;
+					break;
+
+				case SYSMAP_ELEMENT_TYPE_HOST_GROUP:
+					$db_selement['elements'][] = ['groupid' => $db_selement['elementid']];
+					break;
+			}
+
+			unset($db_selement['elementid']);
+		}
+		unset($db_selement);
+
+		if ($trigger_selementids) {
+			$resource = DBselect(
+				'SELECT st.selement_triggerid,st.selementid,st.triggerid'.
+				' FROM sysmap_element_trigger st,triggers t'.
+				' WHERE st.triggerid=t.triggerid'.
+					' AND '.dbConditionId('st.selementid', $trigger_selementids).
+				' ORDER BY t.priority DESC,st.selement_triggerid'
+			);
+
+			while ($db_trigger = DBfetch($resource)) {
+				$db_selements[$db_trigger['selementid']]['elements'][$db_trigger['selement_triggerid']] =
+					array_diff_key($db_trigger, array_flip(['selementid']));
+			}
+		}
+	}
+
+	private static function addAffectedSelementUrls(array &$db_selements): void {
+		foreach ($db_selements as &$db_selement) {
+			$db_selement['urls'] = [];
+		}
+		unset($db_selement);
+
+		$options = [
+			'output' => ['sysmapelementurlid', 'selementid', 'name', 'url'],
+			'filter' => ['selementid' => array_keys($db_selements)]
+		];
+		$resource = DBselect(DB::makeSql('sysmap_element_url', $options));
+
+		while ($db_url = DBfetch($resource)) {
+			$db_selements[$db_url['selementid']]['urls'][$db_url['sysmapelementurlid']] =
+				array_diff_key($db_url, array_flip(['selementid']));
+		}
+	}
+
+	private static function addAffectedSelementTags(array &$db_selements): void {
+		foreach ($db_selements as &$db_selement) {
+			$db_selement['tags'] = [];
+		}
+		unset($db_selement);
+
+		$options = [
+			'output' => ['selementtagid', 'selementid', 'tag', 'value', 'operator'],
+			'filter' => ['selementid' => array_keys($db_selements)]
+		];
+		$resource = DBselect(DB::makeSql('sysmaps_element_tag', $options));
+
+		while ($db_tag = DBfetch($resource)) {
+			$db_selements[$db_tag['selementid']]['tags'][$db_tag['selementtagid']] =
+				array_diff_key($db_tag, array_flip(['selementid']));
+		}
+	}
+
+	private static function addAffectedLinks(array $maps, array &$db_maps): void {
+		$sysmapids = [];
+
+		foreach ($maps as $map) {
+			if (array_key_exists('selements', $map) || array_key_exists('links', $map)) {
+				$sysmapids[] = $map['sysmapid'];
+				$db_maps[$map['sysmapid']]['links'] = [];
+			}
+		}
+
+		if (!$sysmapids) {
+			return;
+		}
+
+		$resource = DBselect(
+			'SELECT sl.linkid,sl.sysmapid,sl.selementid1,sl.selementid2,sl.label,sl.show_label,sl.drawtype,sl.color,'.
+				'sl.indicator_type,sl.itemid,'.dbConditionCoalesce('i.value_type', -1, 'item_value_type').
+			' FROM sysmaps_links sl'.
+			' LEFT JOIN items i ON sl.itemid=i.itemid'.
+			' WHERE '.dbConditionId('sl.sysmapid', $sysmapids)
+		);
+
+		$db_links = [];
+
+		while ($db_link = DBfetch($resource)) {
+			$db_maps[$db_link['sysmapid']]['links'][$db_link['linkid']] =
+				array_diff_key($db_link, array_flip(['sysmapid']));
+
+			$db_links[$db_link['linkid']] = &$db_maps[$db_link['sysmapid']]['links'][$db_link['linkid']];
+		}
+
+		if (!$db_links) {
+			return;
+		}
+
+		self::addAffectedLinkTriggers($db_links);
+		self::addAffectedLinkThresholds($db_links);
+		self::addAffectedLinkHighlights($db_links);
+	}
+
+	private static function addAffectedLinkTriggers(array &$db_links): void {
+		$linkids = [];
+
+		foreach ($db_links as &$db_link) {
+			$db_link['linktriggers'] = [];
+
+			if ($db_link['indicator_type'] == MAP_INDICATOR_TYPE_TRIGGER) {
+				$linkids[] = $db_link['linkid'];
+			}
+		}
+		unset($db_link);
+
+		if (!$linkids) {
+			return;
+		}
+
+		$options = [
+			'output' => ['linktriggerid', 'linkid', 'triggerid', 'drawtype', 'color'],
+			'filter' => ['linkid' => $linkids]
+		];
+		$resource = DBselect(DB::makeSql('sysmaps_link_triggers', $options));
+
+		while ($db_trigger = DBfetch($resource)) {
+			$db_links[$db_trigger['linkid']]['linktriggers'][$db_trigger['linktriggerid']] =
+				array_diff_key($db_trigger, array_flip(['linkid']));
+		}
+	}
+
+	private static function addAffectedLinkThresholds(array &$db_links): void {
+		$linkids = [];
+
+		foreach ($db_links as &$db_link) {
+			$db_link['thresholds'] = [];
+
+			if ($db_link['indicator_type'] == MAP_INDICATOR_TYPE_ITEM_VALUE) {
+				$linkids[] = $db_link['linkid'];
+			}
+		}
+		unset($db_link);
+
+		if (!$linkids) {
+			return;
+		}
+
+		$resource = DBselect(
+			'SELECT slt.linkthresholdid,slt.linkid,slt.threshold,slt.drawtype,slt.color'.
+			' FROM sysmap_link_threshold slt'.
+			' WHERE slt.type='.self::LINK_THRESHOLD_TYPE_THRESHOLD.
+				' AND '.dbConditionId('slt.linkid', $linkids)
+		);
+
+		while ($db_threshold = DBfetch($resource)) {
+			$db_links[$db_threshold['linkid']]['thresholds'][$db_threshold['linkthresholdid']] =
+				array_diff_key($db_threshold, array_flip(['linkid']));
+		}
+	}
+
+	private static function addAffectedLinkHighlights(array &$db_links): void {
+		$linkids = [];
+
+		foreach ($db_links as &$db_link) {
+			$db_link['highlights'] = [];
+
+			if ($db_link['indicator_type'] == MAP_INDICATOR_TYPE_ITEM_VALUE) {
+				$linkids[] = $db_link['linkid'];
+			}
+		}
+		unset($db_link);
+
+		if (!$linkids) {
+			return;
+		}
+
+		$resource = DBselect(
+			'SELECT slt.linkthresholdid,slt.linkid,slt.pattern,slt.sortorder,slt.drawtype,slt.color'.
+			' FROM sysmap_link_threshold slt'.
+			' WHERE slt.type='.self::LINK_THRESHOLD_TYPE_HIGHLIGHT.
+				' AND '.dbConditionId('slt.linkid', $linkids)
+		);
+
+		while ($db_threshold = DBfetch($resource)) {
+			$db_links[$db_threshold['linkid']]['highlights'][$db_threshold['linkthresholdid']] =
+				array_diff_key($db_threshold, array_flip(['linkid']));
+		}
+	}
+
+	private static function validateLinks(array &$maps, ?array $db_maps = null): void {
+		self::validateLinkIndicatorTypes($maps, $db_maps);
+
+		if ($db_maps !== null) {
+			self::addRequiredFieldsByLinkIndicatorType($maps, $db_maps);
+		}
+
+		self::validateLinkItemids($maps, $db_maps);
+
+		self::checkLinkItems($maps, $db_maps, $db_items, $link_indexes);
+		self::addLinkItemValueType($maps, $db_items, $link_indexes);
+
+		if ($db_maps !== null) {
+			self::addRequiredFieldsByItemValueType($maps, $db_maps);
+		}
+
+		self::validateLinkFields($maps);
+
+		if ($db_maps !== null) {
+			self::addLinkSelementids($maps, $db_maps);
+		}
+
+		self::checkLinkSelementids($maps, $db_maps);
+		self::checkLinkTriggers($maps, $db_maps);
+	}
+
+	private static function validateLinkIndicatorTypes(array &$maps, ?array $db_maps): void {
+		foreach ($maps as $i1 => &$map) {
+			if (!array_key_exists('links', $map)) {
+				continue;
+			}
+
+			$path = '/'.($i1 + 1).'/links';
+
+			foreach ($map['links'] as $i2 => &$link) {
+				$is_update = array_key_exists('linkid', $link);
+
+				if ($is_update && !array_key_exists($link['linkid'], $db_maps[$map['sysmapid']]['links'])) {
+					self::exception(ZBX_API_ERROR_PARAMETERS, _s('Invalid parameter "%1$s": %2$s.',
+						$path.'/'.($i2 + 1).'/linkid', _('object does not exist or belongs to another object')
+					));
+				}
+
+				$api_input_rules = ['type' => API_OBJECT, 'flags' => API_ALLOW_UNEXPECTED, 'fields' => [
+					'indicator_type' =>	['type' => API_INT32, 'in' => implode(',', [MAP_INDICATOR_TYPE_STATIC_LINK, MAP_INDICATOR_TYPE_TRIGGER, MAP_INDICATOR_TYPE_ITEM_VALUE])] + ($is_update ? [] : ['default' => DB::getDefault('sysmaps_links', 'indicator_type')])
+				]];
+
+				if (!CApiInputValidator::validate($api_input_rules, $link, $path.'/'.($i2 + 1), $error)) {
+					self::exception(ZBX_API_ERROR_PARAMETERS, $error);
+				}
+
+				if ($is_update) {
+					$link += [
+						'indicator_type' => $db_maps[$map['sysmapid']]['links'][$link['linkid']]['indicator_type']
+					];
+				}
+			}
+			unset($link);
+		}
+		unset($map);
+	}
+
+	private static function addRequiredFieldsByLinkIndicatorType(array &$maps, array $db_maps): void {
+		foreach ($maps as &$map) {
+			if (!array_key_exists('links', $map)) {
+				continue;
+			}
+
+			foreach ($map['links'] as &$link) {
+				if (!array_key_exists('linkid', $link)) {
+					continue;
+				}
+
+				$db_link = $db_maps[$map['sysmapid']]['links'][$link['linkid']];
+
+				if ($link['indicator_type'] != $db_link['indicator_type']
+						&& $link['indicator_type'] == MAP_INDICATOR_TYPE_TRIGGER) {
+					$link += ['linktriggers' => $db_link['linktriggers']];
+				}
+				elseif ($link['indicator_type'] == MAP_INDICATOR_TYPE_ITEM_VALUE) {
+					$link += array_intersect_key($db_link, array_flip(['itemid', 'item_value_type']));
+				}
+			}
+			unset($link);
+		}
+		unset($map);
+	}
+
+	private static function validateLinkItemids(array &$maps, ?array $db_maps): void {
+		foreach ($maps as $i1 => &$map) {
+			if (!array_key_exists('links', $map)) {
+				continue;
+			}
+
+			$path = '/'.($i1 + 1).'/links';
+
+			foreach ($map['links'] as $i2 => &$link) {
+				$is_update = array_key_exists('linkid', $link);
+
+				$api_required = $is_update ? 0 : API_REQUIRED;
+
+				$api_input_rules = ['type' => API_OBJECT, 'flags' => API_ALLOW_UNEXPECTED, 'fields' => [
+					'itemid' =>	['type' => API_MULTIPLE, 'rules' => [
+									['if' => ['field' => 'indicator_type', 'in' => MAP_INDICATOR_TYPE_ITEM_VALUE], 'type' => API_ID, 'flags' => $api_required],
+									['else' => true, 'type' => API_ID, 'in' => '0']
+					]]
+				]];
+
+				if (!CApiInputValidator::validate($api_input_rules, $link, $path.'/'.($i2 + 1), $error)) {
+					self::exception(ZBX_API_ERROR_PARAMETERS, $error);
+				}
+
+				if ($is_update && $link['indicator_type'] == MAP_INDICATOR_TYPE_ITEM_VALUE) {
+					$link += ['itemid' => $db_maps[$map['sysmapid']]['links'][$link['linkid']]['itemid']];
+				}
+			}
+			unset($link);
+		}
+		unset($map);
+	}
+
+	private static function checkLinkItems(array $maps, ?array $db_maps, ?array &$db_items = null,
+			?array &$link_indexes = null): void {
+		$db_items = [];
+		$link_indexes = [];
+
+		foreach ($maps as $i1 => $map) {
+			if (!array_key_exists('links', $map)) {
+				continue;
+			}
+
+			$db_links = $db_maps !== null ? $db_maps[$map['sysmapid']]['links'] : [];
+
+			foreach ($map['links'] as $i2 => $link) {
+				if ($link['indicator_type'] == MAP_INDICATOR_TYPE_ITEM_VALUE
+						&& (!array_key_exists('linkid', $link)
+							|| bccomp($link['itemid'], $db_links[$link['linkid']]['itemid']) != 0
+							|| $link['itemid'] == 0)) {
+					$link_indexes[$link['itemid']][$i1][] = $i2;
+				}
+			}
+		}
+
+		if (!$link_indexes) {
+			return;
+		}
+
+		$db_items = API::Item()->get([
+			'output' => ['value_type'],
+			'selectHosts' => ['status'],
+			'webitems' => true,
+			'itemids' => array_keys($link_indexes),
+			'preservekeys' => true
+		]);
+
+		$host_statuses = [HOST_STATUS_MONITORED, HOST_STATUS_NOT_MONITORED];
+
+		foreach ($link_indexes as $itemid => $indexes) {
+			$i1 = key($indexes);
+			$i2 = reset($indexes[$i1]);
+			$path = '/'.($i1 + 1).'/links/'.($i2 + 1).'/itemid';
+
+			if (!array_key_exists($itemid, $db_items)) {
+				self::exception(ZBX_API_ERROR_PARAMETERS,
+					_s('Invalid parameter "%1$s": %2$s.', $path,
+						_('object does not exist, or you have no permissions to it')
+					)
+				);
+			}
+
+			if (!in_array($db_items[$itemid]['hosts'][0]['status'], $host_statuses)) {
+				self::exception(ZBX_API_ERROR_PARAMETERS,
+					_s('Invalid parameter "%1$s": %2$s.', $path, _('host item ID is expected'))
+				);
+			}
+
+			if ($db_items[$itemid]['value_type'] == ITEM_VALUE_TYPE_BINARY) {
+				self::exception(ZBX_API_ERROR_PARAMETERS,
+					_s('Invalid parameter "%1$s": %2$s.', $path, _('binary item is not supported'))
+				);
+			}
+		}
+	}
+
+	private static function addLinkItemValueType(array &$maps, array $db_items, array $link_indexes): void {
+		foreach ($link_indexes as $itemid => $map_indexes) {
+			foreach ($map_indexes as $i1 => $indexes) {
+				foreach ($indexes as $i2) {
+					$maps[$i1]['links'][$i2]['item_value_type'] = $db_items[$itemid]['value_type'];
+				}
+			}
+		}
+	}
+
+	private static function addRequiredFieldsByItemValueType(array &$maps, array $db_maps): void {
+		foreach ($maps as &$map) {
+			if (!array_key_exists('links', $map)) {
+				continue;
+			}
+
+			foreach ($map['links'] as &$link) {
+				if (!array_key_exists('linkid', $link) || $link['indicator_type'] != MAP_INDICATOR_TYPE_ITEM_VALUE) {
+					continue;
+				}
+
+				$db_link = $db_maps[$map['sysmapid']]['links'][$link['linkid']];
+
+				if (in_array($link['item_value_type'], [ITEM_VALUE_TYPE_FLOAT, ITEM_VALUE_TYPE_UINT64])) {
+					if (!array_key_exists('thresholds', $link)) {
+						$link['thresholds'] = [];
+
+						foreach ($db_link['thresholds'] as $db_threshold) {
+							$link['thresholds'][] = array_intersect_key($db_threshold,
+								array_flip(['threshold', 'drawtype', 'color'])
+							);
+						}
+					}
+				}
+				elseif (!array_key_exists('highlights', $link)) {
+					$link['highlights'] = [];
+
+					foreach ($db_link['highlights'] as $db_highlight) {
+						$link['highlights'][] = array_intersect_key($db_highlight,
+							array_flip(['pattern', 'sortorder', 'drawtype', 'color'])
+						);
+					}
+				}
+			}
+			unset($link);
+		}
+		unset($map);
+	}
+
+	private static function validateLinkFields(array &$maps): void {
+		foreach ($maps as $i1 => &$map) {
+			if (!array_key_exists('links', $map)) {
+				continue;
+			}
+
+			$path = '/'.($i1 + 1).'/links';
+
+			foreach ($map['links'] as $i2 => &$link) {
+				$is_update = array_key_exists('linkid', $link);
+
+				$api_input_rules = ['type' => API_OBJECT, 'fields' => self::getLinkValidationFields($is_update)];
+
+				if (!CApiInputValidator::validate($api_input_rules, $link, $path.'/'.($i2 + 1), $error)) {
+					self::exception(ZBX_API_ERROR_PARAMETERS, $error);
+				}
+			}
+			unset($link);
+		}
+		unset($map);
+	}
+
+	private static function getLinkValidationFields(bool $is_update = false): array {
+		$api_required = $is_update ? 0 : API_REQUIRED;
+
+		$specific_rules = $is_update
+			? [
+				'linkid' =>	['type' => API_ANY]
+			]
+			: [];
+
+		return $specific_rules + [
+			'selementid1' =>		['type' => API_SELEMENTID, 'flags' => $api_required],
+			'selementid2' =>		['type' => API_SELEMENTID, 'flags' => $api_required],
+			'label' =>				['type' => API_STRING_UTF8, 'length' => DB::getFieldLength('sysmaps_links', 'label')],
+			'show_label' =>			['type' => API_INT32, 'in' => implode(',', [MAP_SHOW_LABEL_DEFAULT, MAP_SHOW_LABEL_AUTO_HIDE, MAP_SHOW_LABEL_ALWAYS])],
+			'drawtype' =>			['type' => API_INT32, 'in' => implode(',', [DRAWTYPE_LINE, DRAWTYPE_BOLD_LINE, DRAWTYPE_DOT, DRAWTYPE_DASHED_LINE])],
+			'color' =>				['type' => API_COLOR, 'flags' => API_NOT_EMPTY],
+			'indicator_type' =>		['type' => API_ANY],
+			'linktriggers' =>		['type' => API_MULTIPLE, 'rules' => [
+										['if' => ['field' => 'indicator_type', 'in' => MAP_INDICATOR_TYPE_TRIGGER], 'type' => API_OBJECTS, 'flags' => $api_required | API_NOT_EMPTY | API_NORMALIZE, 'uniq' => [['triggerid']], 'fields' => [
+											'triggerid' =>	['type' => API_ID, 'flags' => API_REQUIRED],
+											'drawtype' =>	['type' => API_INT32, 'in' => implode(',', [DRAWTYPE_LINE, DRAWTYPE_BOLD_LINE, DRAWTYPE_DOT, DRAWTYPE_DASHED_LINE])],
+											'color' =>		['type' => API_COLOR, 'flags' => API_NOT_EMPTY]
+										]],
+										['else' => true, 'type' => API_OBJECTS, 'length' => 0]
+			]],
+			'itemid' =>				['type' => API_ANY],
+			'item_value_type' =>	['type' => API_ANY],
+			'thresholds' =>			['type' => API_MULTIPLE, 'rules' => [
+										['if' => static fn($data): bool => $data['indicator_type'] == MAP_INDICATOR_TYPE_ITEM_VALUE && in_array($data['item_value_type'], [ITEM_VALUE_TYPE_FLOAT, ITEM_VALUE_TYPE_UINT64]), 'type' => API_OBJECTS, 'flags' => $api_required | API_NOT_EMPTY | API_NORMALIZE, 'uniq' => [['threshold']], 'fields' => [
+											'threshold' =>	['type' => API_NUMERIC, 'flags' => API_REQUIRED | API_NOT_EMPTY, 'length' => DB::getFieldLength('sysmap_link_threshold', 'threshold')],
+											'drawtype' =>	['type' => API_INT32, 'in' => implode(',', [DRAWTYPE_LINE, DRAWTYPE_BOLD_LINE, DRAWTYPE_DOT, DRAWTYPE_DASHED_LINE])],
+											'color' =>		['type' => API_COLOR, 'flags' => API_NOT_EMPTY]
+										]],
+										['else' => true, 'type' => API_OBJECTS, 'length' => 0]
+			]],
+			'highlights' =>			['type' => API_MULTIPLE, 'rules' => [
+										['if' => static fn($data): bool => $data['indicator_type'] == MAP_INDICATOR_TYPE_ITEM_VALUE && in_array($data['item_value_type'], [ITEM_VALUE_TYPE_STR, ITEM_VALUE_TYPE_LOG, ITEM_VALUE_TYPE_TEXT]), 'type' => API_OBJECTS, 'flags' => $api_required | API_NOT_EMPTY | API_NORMALIZE, 'uniq' => [['pattern'], ['sortorder']], 'fields' => [
+											'pattern' =>	['type' => API_REGEX, 'flags' => API_REQUIRED | API_NOT_EMPTY, 'length' => DB::getFieldLength('sysmap_link_threshold', 'pattern')],
+											'sortorder' =>	['type' => API_INT32, 'flags' => API_REQUIRED],
+											'drawtype' =>	['type' => API_INT32, 'in' => implode(',', [DRAWTYPE_LINE, DRAWTYPE_BOLD_LINE, DRAWTYPE_DOT, DRAWTYPE_DASHED_LINE])],
+											'color' =>		['type' => API_COLOR, 'flags' => API_NOT_EMPTY]
+										]],
+										['else' => true, 'type' => API_OBJECTS, 'length' => 0]
+			]]
+		];
+	}
+
+	private static function addLinkSelementids(array &$maps, array $db_maps): void {
+		foreach ($maps as &$map) {
+			if (!array_key_exists('links', $map)) {
+				continue;
+			}
+
+			foreach ($map['links'] as &$link) {
+				if (array_key_exists('linkid', $link)) {
+					$link += array_intersect_key($db_maps[$map['sysmapid']]['links'][$link['linkid']],
+						array_flip(['selementid1', 'selementid2'])
+					);
+				}
+			}
+			unset($link);
+		}
+		unset($map);
+	}
+
+	private static function checkLinkSelementids(array $maps, ?array $db_maps): void {
+		foreach ($maps as $i1 => $map) {
+			if (!array_key_exists('links', $map) || !$map['links']) {
+				continue;
+			}
+
+			$selementids = array_key_exists('selements', $map)
+				? array_column($map['selements'], 'selementid')
+				: array_column($db_maps[$map['sysmapid']]['selements'], 'selementid');
+			$path = '/'.($i1 + 1).'/links';
+
+			foreach ($map['links'] as $i2 => $link) {
+				if (!in_array($link['selementid1'], $selementids)) {
+					self::exception(ZBX_API_ERROR_PARAMETERS, _s('Invalid parameter "%1$s": %2$s.',
+						$path.'/'.($i2 + 1).'/selementid1', _('object does not exist or belongs to another object')
+					));
+				}
+
+				if (!in_array($link['selementid2'], $selementids)) {
+					self::exception(ZBX_API_ERROR_PARAMETERS, _s('Invalid parameter "%1$s": %2$s.',
+						$path.'/'.($i2 + 1).'/selementid2', _('object does not exist or belongs to another object')
+					));
+				}
+			}
+		}
+	}
+
+	private static function checkLinkTriggers(array $maps, ?array $db_maps): void {
+		$link_indexes = [];
+
+		foreach ($maps as $i1 => $map) {
+			if (!array_key_exists('links', $map)) {
+				continue;
+			}
+
+			$db_links = $db_maps !== null ? $db_maps[$map['sysmapid']]['links'] : [];
+
+			foreach ($map['links'] as $i2 => $link) {
+				if ($link['indicator_type'] != MAP_INDICATOR_TYPE_TRIGGER) {
+					continue;
+				}
+
+				$db_link_triggers = array_key_exists('linkid', $link)
+					? array_column($db_links[$link['linkid']]['linktriggers'], null, 'triggerid')
+					: [];
+
+				foreach ($link['linktriggers'] as $i3 => $linktrigger) {
+					if (!array_key_exists($linktrigger['triggerid'], $db_link_triggers)) {
+						$link_indexes[$linktrigger['triggerid']][$i1][$i2] = $i3;
+					}
+				}
+			}
+		}
+
+		if (!$link_indexes) {
+			return;
+		}
+
+		$db_triggers = API::Trigger()->get([
+			'output' => [],
+			'selectHosts' => ['status'],
+			'triggerids' => array_keys($link_indexes),
+			'preservekeys' => true
+		]);
+
+		$host_statuses = [HOST_STATUS_MONITORED, HOST_STATUS_NOT_MONITORED];
+
+		foreach ($link_indexes as $triggerid => $indexes) {
+			$i1 = key($indexes);
+			$i2 = key($indexes[$i1]);
+			$i3 = $indexes[$i1][$i2];
+			$path = '/'.($i1 + 1).'/links/'.($i2 + 1).'/linktriggers/'.($i3 + 1).'/triggerid';
+
+			if (!array_key_exists($triggerid, $db_triggers)) {
+				self::exception(ZBX_API_ERROR_PARAMETERS,
+					_s('Invalid parameter "%1$s": %2$s.', $path,
+						_('object does not exist, or you have no permissions to it')
+					)
+				);
+			}
+
+			if (!in_array($db_triggers[$triggerid]['hosts'][0]['status'], $host_statuses)) {
+				self::exception(ZBX_API_ERROR_PARAMETERS,
+					_s('Invalid parameter "%1$s": %2$s.', $path, _('host trigger ID is expected'))
+				);
+			}
+		}
 	}
 
 	/**
@@ -1512,11 +2221,11 @@ class CMap extends CMapElement {
 		}
 
 		$api_input_rules = ['type' => API_OBJECT, 'fields' => [
-			'evaltype'	=>		['type' => API_INT32, 'in' => implode(',', [CONDITION_EVAL_TYPE_AND_OR, CONDITION_EVAL_TYPE_OR]), 'default' => DB::getDefault('sysmaps_elements', 'evaltype')],
-			'tags'		=>		['type' => API_OBJECTS, 'uniq' => [['tag', 'value']], 'fields' => [
-				'tag'		=>		['type' => API_STRING_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY, 'length' => DB::getFieldLength('sysmaps_element_tag', 'tag')],
-				'value'		=>		['type' => API_STRING_UTF8, 'length' => DB::getFieldLength('sysmaps_element_tag', 'value'), 'default' => DB::getDefault('sysmaps_element_tag', 'value')],
-				'operator'	=>		['type' => API_STRING_UTF8, 'in' => implode(',', [TAG_OPERATOR_LIKE, TAG_OPERATOR_EQUAL, TAG_OPERATOR_NOT_LIKE, TAG_OPERATOR_NOT_EQUAL, TAG_OPERATOR_EXISTS, TAG_OPERATOR_NOT_EXISTS]), 'default' => DB::getDefault('sysmaps_element_tag', 'operator')]
+			'evaltype' =>	['type' => API_INT32, 'in' => implode(',', [CONDITION_EVAL_TYPE_AND_OR, CONDITION_EVAL_TYPE_OR]), 'default' => DB::getDefault('sysmaps_elements', 'evaltype')],
+			'tags' =>		['type' => API_OBJECTS, 'uniq' => [['tag', 'value']], 'fields' => [
+				'tag' =>		['type' => API_STRING_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY, 'length' => DB::getFieldLength('sysmaps_element_tag', 'tag')],
+				'value' =>		['type' => API_STRING_UTF8, 'length' => DB::getFieldLength('sysmaps_element_tag', 'value'), 'default' => DB::getDefault('sysmaps_element_tag', 'value')],
+				'operator' =>	['type' => API_STRING_UTF8, 'in' => implode(',', [TAG_OPERATOR_LIKE, TAG_OPERATOR_EQUAL, TAG_OPERATOR_NOT_LIKE, TAG_OPERATOR_NOT_EQUAL, TAG_OPERATOR_EXISTS, TAG_OPERATOR_NOT_EXISTS]), 'default' => DB::getDefault('sysmaps_element_tag', 'operator')]
 			]]
 		]];
 
@@ -1645,9 +2354,7 @@ class CMap extends CMapElement {
 	 *
 	 * @return array
 	 */
-	public function create($maps) {
-		$maps = zbx_toArray($maps);
-
+	public function create(array $maps): array {
 		$this->validateCreate($maps);
 
 		foreach ($maps as &$map) {
@@ -1666,8 +2373,6 @@ class CMap extends CMapElement {
 		$shared_user_groups = [];
 		$urls = [];
 		$shapes = [];
-		$selements = [];
-		$links = [];
 		$api_shape_rules = ['type' => API_OBJECTS, 'flags' => API_NORMALIZE, 'fields' => [
 			'type' =>				['type' => API_INT32, 'flags' => API_REQUIRED, 'in' => implode(',', [SYSMAP_SHAPE_TYPE_RECTANGLE, SYSMAP_SHAPE_TYPE_ELLIPSE])],
 			'x' =>					['type' => API_INT32],
@@ -1729,14 +2434,6 @@ class CMap extends CMapElement {
 				}
 			}
 
-			if (array_key_exists('selements', $maps[$key])) {
-				foreach ($maps[$key]['selements'] as $snum => $selement) {
-					$maps[$key]['selements'][$snum]['sysmapid'] = $sysmapid;
-				}
-
-				$selements = array_merge($selements, $maps[$key]['selements']);
-			}
-
 			if (array_key_exists('shapes', $maps[$key])) {
 				$path = '/'.($key + 1).'/shape';
 				$api_shape_rules['fields']['x']['in'] = '0:'.$maps[$key]['width'];
@@ -1784,62 +2481,423 @@ class CMap extends CMapElement {
 					$shapes[] = $shape;
 				}
 			}
-
-			if (array_key_exists('links', $maps[$key])) {
-				foreach ($maps[$key]['links'] as $lnum => $link) {
-					$maps[$key]['links'][$lnum]['sysmapid'] = $sysmapid;
-				}
-
-				$links = array_merge($links, $maps[$key]['links']);
-			}
 		}
 
 		DB::insert('sysmap_user', $shared_users);
 		DB::insert('sysmap_usrgrp', $shared_user_groups);
 		DB::insert('sysmap_url', $urls);
 
-		if ($selements) {
-			$selementids = $this->createSelements($selements);
-
-			if ($links) {
-				$map_virt_selements = [];
-				foreach ($selementids['selementids'] as $key => $selementid) {
-					$map_virt_selements[$selements[$key]['selementid']] = $selementid;
-				}
-
-				foreach ($links as $key => $link) {
-					$links[$key]['selementid1'] = $map_virt_selements[$link['selementid1']];
-					$links[$key]['selementid2'] = $map_virt_selements[$link['selementid2']];
-				}
-				unset($map_virt_selements);
-
-				$linkids = $this->createLinks($links);
-
-				$link_triggers = [];
-				foreach ($linkids['linkids'] as $key => $linkId) {
-					if (!array_key_exists('linktriggers', $links[$key])) {
-						continue;
-					}
-
-					foreach ($links[$key]['linktriggers'] as $link_trigger) {
-						$link_trigger['linkid'] = $linkId;
-						$link_triggers[] = $link_trigger;
-					}
-				}
-
-				if ($link_triggers) {
-					$this->createLinkTriggers($link_triggers);
-				}
-			}
-		}
-
 		if ($shapes) {
 			$this->createShapes($shapes);
 		}
 
+		$this->updateSelements($maps);
+		self::updateLinks($maps);
+
 		$this->addAuditBulk(CAudit::ACTION_ADD, CAudit::RESOURCE_MAP, $maps);
 
 		return ['sysmapids' => $sysmapids];
+	}
+
+	private function updateSelements(array &$maps, ?array $db_maps = null): void {
+		$ins_selements = [];
+		$upd_selements = [];
+		$del_selementids = [];
+
+		foreach ($maps as $map) {
+			if (!array_key_exists('selements', $map)) {
+				continue;
+			}
+
+			$db_selements = $db_maps !== null ? $db_maps[$map['sysmapid']]['selements'] : [];
+
+			foreach ($map['selements'] as $selement) {
+				if (array_key_exists('selementid', $selement)
+						&& array_key_exists($selement['selementid'], $db_selements)) {
+					unset($db_selements[$selement['selementid']]);
+
+					$upd_selements[] = ['sysmapid' => $map['sysmapid']] + $selement;
+				}
+				else {
+					$ins_selements[] = ['sysmapid' => $map['sysmapid']] + $selement;
+				}
+			}
+
+			$del_selementids = array_merge($del_selementids, array_keys($db_selements));
+		}
+
+		if ($del_selementids) {
+			DB::delete('sysmaps_elements', ['selementid' => $del_selementids]);
+		}
+
+		if ($upd_selements) {
+			$this->updateSelementsOld($upd_selements);
+		}
+
+		$selementids = [];
+
+		if ($ins_selements) {
+			$selementids = $this->createSelementsOld($ins_selements);
+		}
+
+		$arbitrary_to_selementids = [];
+
+		foreach ($selementids as $index => $selementid) {
+			if (array_key_exists('selementid', $ins_selements[$index])) {
+				$arbitrary_to_selementids[$ins_selements[$index]['selementid']] = $selementid;
+			}
+			else {
+				$arbitrary_to_selementids[$selementid] = $selementid;
+			}
+		}
+
+		foreach ($upd_selements as $selement) {
+			$arbitrary_to_selementids[$selement['selementid']] = $selement['selementid'];
+		}
+
+		foreach ($maps as &$map) {
+			if (!array_key_exists('selements', $map)) {
+				continue;
+			}
+
+			foreach ($map['selements'] as &$selement) {
+				if (!array_key_exists('selementid', $selement)) {
+					$selement['selementid'] = array_shift($selementids);
+				}
+			}
+			unset($selement);
+
+			if (!array_key_exists('links', $map)) {
+				continue;
+			}
+
+			foreach ($map['links'] as &$link) {
+				foreach (['selementid1', 'selementid2'] as $field) {
+					if (array_key_exists($link[$field], $arbitrary_to_selementids)) {
+						$link[$field] = $arbitrary_to_selementids[$link[$field]];
+					}
+				}
+			}
+			unset($link);
+		}
+		unset($map);
+	}
+
+	private static function updateLinks(array &$maps, ?array $db_maps = null): void {
+		$ins_links = [];
+		$upd_links = [];
+		$del_linkids = [];
+
+		foreach ($maps as $map) {
+			if (!array_key_exists('links', $map)) {
+				continue;
+			}
+
+			$db_links = $db_maps !== null ? $db_maps[$map['sysmapid']]['links'] : [];
+
+			foreach ($map['links'] as $link) {
+				if (array_key_exists('linkid', $link) && array_key_exists($link['linkid'], $db_links)) {
+					$db_link = $db_links[$link['linkid']];
+					unset($db_links[$link['linkid']]);
+
+					$upd_link = DB::getUpdatedValues('sysmaps_links', $link, $db_link);
+
+					if ($upd_link) {
+						$upd_links[] = [
+							'values' => $upd_link,
+							'where' => ['linkid' => $db_link['linkid']]
+						];
+					}
+				}
+				else {
+					$ins_links[] = ['sysmapid' => $map['sysmapid']] + $link;
+				}
+			}
+
+			$del_linkids = array_merge($del_linkids, array_keys($db_links));
+		}
+
+		if ($del_linkids) {
+			DB::delete('sysmaps_links', ['linkid' => $del_linkids]);
+		}
+
+		if ($upd_links) {
+			DB::update('sysmaps_links', $upd_links);
+		}
+
+		$linkids = [];
+
+		if ($ins_links) {
+			$linkids = DB::insert('sysmaps_links', $ins_links);
+		}
+
+		$links = [];
+		$db_links = null;
+
+		if ($db_maps !== null) {
+			$db_links = [];
+		}
+
+		foreach ($maps as &$map) {
+			if (!array_key_exists('links', $map)) {
+				continue;
+			}
+
+			foreach ($map['links'] as &$link) {
+				if (!array_key_exists('linkid', $link)) {
+					$link['linkid'] = array_shift($linkids);
+
+					if ($db_maps !== null) {
+						$db_links[$link['linkid']] = [
+							'linkid' => $link['linkid']
+						];
+
+						if (array_key_exists('linktriggers', $link)) {
+							$db_links[$link['linkid']]['linktriggers'] = [];
+						}
+
+						if (array_key_exists('thresholds', $link)) {
+							$db_links[$link['linkid']]['thresholds'] = [];
+						}
+
+						if (array_key_exists('highlights', $link)) {
+							$db_links[$link['linkid']]['highlights'] = [];
+						}
+					}
+				}
+				else {
+					$db_links[$link['linkid']] = $db_maps[$map['sysmapid']]['links'][$link['linkid']];
+				}
+
+				$links[] = &$link;
+			}
+			unset($link);
+		}
+		unset($map);
+
+		if ($links) {
+			self::updateLinkTriggers($links, $db_links);
+			self::updateLinkThresholds($links, $db_links);
+			self::updateLinkHighlights($links, $db_links);
+		}
+	}
+
+	private static function updateLinkTriggers(array &$links, ?array $db_links): void {
+		$ins_link_triggers = [];
+		$upd_link_triggers = [];
+		$del_linktriggerids = [];
+
+		foreach ($links as &$link) {
+			if (!array_key_exists('linktriggers', $link)) {
+				continue;
+			}
+
+			$db_link_triggers = $db_links !== null
+				? array_column($db_links[$link['linkid']]['linktriggers'], null, 'triggerid')
+				: [];
+
+			foreach ($link['linktriggers'] as &$link_trigger) {
+				if (array_key_exists($link_trigger['triggerid'], $db_link_triggers)) {
+					$db_link_trigger = $db_link_triggers[$link_trigger['triggerid']];
+					$link_trigger['linktriggerid'] = $db_link_trigger['linktriggerid'];
+					unset($db_link_triggers[$link_trigger['triggerid']]);
+
+					$upd_linktrigger = DB::getUpdatedValues('sysmaps_link_triggers', $link_trigger, $db_link_trigger);
+
+					if ($upd_linktrigger) {
+						$upd_link_triggers[] = [
+							'values' => $upd_linktrigger,
+							'where' => ['linktriggerid' => $db_link_trigger['linktriggerid']]
+						];
+					}
+				}
+				else {
+					$ins_link_triggers[] = ['linkid' => $link['linkid']] + $link_trigger;
+				}
+			}
+			unset($link_trigger);
+
+			$del_linktriggerids = array_merge($del_linktriggerids, array_column($db_link_triggers, 'linktriggerid'));
+		}
+		unset($link);
+
+		if ($del_linktriggerids) {
+			DB::delete('sysmaps_link_triggers', ['linktriggerid' => $del_linktriggerids]);
+		}
+
+		if ($upd_link_triggers) {
+			DB::update('sysmaps_link_triggers', $upd_link_triggers);
+		}
+
+		$linktriggerids = [];
+
+		if ($ins_link_triggers) {
+			$linktriggerids = DB::insert('sysmaps_link_triggers', $ins_link_triggers);
+		}
+
+		foreach ($links as &$link) {
+			if (!array_key_exists('linktriggers', $link)) {
+				continue;
+			}
+
+			foreach ($link['linktriggers'] as &$link_trigger) {
+				if (!array_key_exists('linktriggerid', $link_trigger)) {
+					$link_trigger['linktriggerid'] = array_shift($linktriggerids);
+				}
+			}
+			unset($link_trigger);
+		}
+		unset($link);
+	}
+
+	private static function updateLinkThresholds(array &$links, ?array $db_links): void {
+		$ins_link_thresholds = [];
+		$upd_link_thresholds = [];
+		$del_linkthresholdids = [];
+
+		foreach ($links as &$link) {
+			if (!array_key_exists('thresholds', $link)) {
+				continue;
+			}
+
+			$db_link_thresholds = $db_links !== null
+				? array_column($db_links[$link['linkid']]['thresholds'], null, 'threshold')
+				: [];
+
+			foreach ($link['thresholds'] as &$link_threshold) {
+				if (array_key_exists($link_threshold['threshold'], $db_link_thresholds)) {
+					$db_link_threshold = $db_link_thresholds[$link_threshold['threshold']];
+					$link_threshold['linkthresholdid'] = $db_link_threshold['linkthresholdid'];
+					unset($db_link_thresholds[$link_threshold['threshold']]);
+
+					$upd_link_threshold = DB::getUpdatedValues('sysmap_link_threshold', $link_threshold,
+						$db_link_threshold
+					);
+
+					if ($upd_link_threshold) {
+						$upd_link_thresholds[] = [
+							'values' => $upd_link_threshold,
+							'where' => ['linkthresholdid' => $db_link_threshold['linkthresholdid']]
+						];
+					}
+				}
+				else {
+					$ins_link_thresholds[] = [
+						'linkid' => $link['linkid'],
+						'type' => self::LINK_THRESHOLD_TYPE_THRESHOLD
+					] + $link_threshold;
+				}
+			}
+			unset($link_threshold);
+
+			$del_linkthresholdids = array_merge($del_linkthresholdids,
+				array_column($db_link_thresholds, 'linkthresholdid')
+			);
+		}
+		unset($link);
+
+		if ($del_linkthresholdids) {
+			DB::delete('sysmap_link_threshold', ['linkthresholdid' => $del_linkthresholdids]);
+		}
+
+		if ($upd_link_thresholds) {
+			DB::update('sysmap_link_threshold', $upd_link_thresholds);
+		}
+
+		$linkthresholdids = [];
+
+		if ($ins_link_thresholds) {
+			$linkthresholdids = DB::insert('sysmap_link_threshold', $ins_link_thresholds);
+		}
+
+		foreach ($links as &$link) {
+			if (!array_key_exists('thresholds', $link)) {
+				continue;
+			}
+
+			foreach ($link['thresholds'] as &$link_threshold) {
+				if (!array_key_exists('linkthresholdid', $link_threshold)) {
+					$link_threshold['linkthresholdid'] = array_shift($linkthresholdids);
+				}
+			}
+			unset($link_threshold);
+		}
+		unset($link);
+	}
+
+	private static function updateLinkHighlights(array &$links, ?array $db_links): void {
+		$ins_link_thresholds = [];
+		$upd_link_thresholds = [];
+		$del_linkthresholdids = [];
+
+		foreach ($links as &$link) {
+			if (!array_key_exists('highlights', $link)) {
+				continue;
+			}
+
+			$db_link_thresholds = $db_links !== null
+				? array_column($db_links[$link['linkid']]['highlights'], null, 'pattern')
+				: [];
+
+			foreach ($link['highlights'] as &$link_threshold) {
+				if (array_key_exists($link_threshold['pattern'], $db_link_thresholds)) {
+					$db_link_threshold = $db_link_thresholds[$link_threshold['pattern']];
+					$link_threshold['linkthresholdid'] = $db_link_threshold['linkthresholdid'];
+					unset($db_link_thresholds[$link_threshold['pattern']]);
+
+					$upd_link_threshold = DB::getUpdatedValues('sysmap_link_threshold', $link_threshold,
+						$db_link_threshold
+					);
+
+					if ($upd_link_threshold) {
+						$upd_link_thresholds[] = [
+							'values' => $upd_link_threshold,
+							'where' => ['linkthresholdid' => $db_link_threshold['linkthresholdid']]
+						];
+					}
+				}
+				else {
+					$ins_link_thresholds[] = [
+						'linkid' => $link['linkid'],
+						'type' => self::LINK_THRESHOLD_TYPE_HIGHLIGHT
+					] + $link_threshold;
+				}
+			}
+			unset($link_threshold);
+
+			$del_linkthresholdids = array_merge($del_linkthresholdids,
+				array_column($db_link_thresholds, 'linkthresholdid')
+			);
+		}
+		unset($link);
+
+		if ($del_linkthresholdids) {
+			DB::delete('sysmap_link_threshold', ['linkthresholdid' => $del_linkthresholdids]);
+		}
+
+		if ($upd_link_thresholds) {
+			DB::update('sysmap_link_threshold', $upd_link_thresholds);
+		}
+
+		$linkthresholdids = [];
+
+		if ($ins_link_thresholds) {
+			$linkthresholdids = DB::insert('sysmap_link_threshold', $ins_link_thresholds);
+		}
+
+		foreach ($links as &$link) {
+			if (!array_key_exists('highlights', $link)) {
+				continue;
+			}
+
+			foreach ($link['highlights'] as &$link_threshold) {
+				if (!array_key_exists('linkthresholdid', $link_threshold)) {
+					$link_threshold['linkthresholdid'] = array_shift($linkthresholdids);
+				}
+			}
+			unset($link_threshold);
+		}
+		unset($link);
 	}
 
 	/**
@@ -1859,44 +2917,16 @@ class CMap extends CMapElement {
 	 *
 	 * @return array
 	 */
-	public function update(array $maps) {
-		$maps = zbx_toArray($maps);
-		$sysmapids = zbx_objectValues($maps, 'sysmapid');
-
-		$db_maps = $this->get([
-			'output' => API_OUTPUT_EXTEND,
-			'sysmapids' => zbx_objectValues($maps, 'sysmapid'),
-			'selectLinks' => API_OUTPUT_EXTEND,
-			'selectSelements' => API_OUTPUT_EXTEND,
-			'selectShapes' => ['sysmap_shapeid', 'type', 'x', 'y', 'width', 'height', 'text', 'font', 'font_size',
-				'font_color', 'text_halign', 'text_valign', 'border_type', 'border_width', 'border_color',
-				'background_color', 'zindex'
-			],
-			'selectLines' => ['sysmap_shapeid', 'x1', 'y1', 'x2', 'y2', 'line_type', 'line_width', 'line_color',
-				'zindex'
-			],
-			'selectUrls' => ['sysmapid', 'sysmapurlid', 'name', 'url', 'elementtype'],
-			'selectUsers' => ['sysmapuserid', 'sysmapid', 'userid', 'permission'],
-			'selectUserGroups' => ['sysmapusrgrpid', 'sysmapid', 'usrgrpid', 'permission'],
-			'editable' => true,
-			'preservekeys' => true
-		]);
-
+	public function update(array $maps): array {
 		$this->validateUpdate($maps, $db_maps);
 
 		$update_maps = [];
 		$url_ids_to_delete = [];
 		$urls_to_update = [];
 		$urls_to_add = [];
-		$selements_to_delete = [];
-		$selements_to_update = [];
-		$selements_to_add = [];
 		$shapes_to_delete = [];
 		$shapes_to_update = [];
 		$shapes_to_add = [];
-		$links_to_delete = [];
-		$links_to_update = [];
-		$links_to_add = [];
 		$shared_userids_to_delete = [];
 		$shared_users_to_update = [];
 		$shared_users_to_add = [];
@@ -2014,25 +3044,6 @@ class CMap extends CMapElement {
 				);
 			}
 
-			// Map elements.
-			if (array_key_exists('selements', $map)) {
-				$selement_diff = zbx_array_diff($map['selements'], $db_map['selements'], 'selementid');
-
-				// We need sysmapid for add operations.
-				foreach ($selement_diff['first'] as $new_selement) {
-					$new_selement['sysmapid'] = $map['sysmapid'];
-					$selements_to_add[] = $new_selement;
-				}
-
-				foreach ($selement_diff['both'] as &$selement) {
-					$selement['sysmapid'] = $map['sysmapid'];
-				}
-				unset($selement);
-
-				$selements_to_update = array_merge($selements_to_update, $selement_diff['both']);
-				$selements_to_delete = array_merge($selements_to_delete, $selement_diff['second']);
-			}
-
 			$map_width = array_key_exists('width', $map) ? $map['width'] : $db_map['width'];
 			$map_height = array_key_exists('height', $map) ? $map['height'] : $db_map['height'];
 
@@ -2128,21 +3139,6 @@ class CMap extends CMapElement {
 					$shapes_to_add[] = $new_shape;
 				}
 			}
-
-			// Links.
-			if (array_key_exists('links', $map)) {
-				$link_diff = zbx_array_diff($map['links'], $db_map['links'], 'linkid');
-
-				// We need sysmapId for add operations.
-				foreach ($link_diff['first'] as $newLink) {
-					$newLink['sysmapid'] = $map['sysmapid'];
-
-					$links_to_add[] = $newLink;
-				}
-
-				$links_to_update = array_merge($links_to_update, $link_diff['both']);
-				$links_to_delete = array_merge($links_to_delete, $link_diff['second']);
-			}
 		}
 
 		DB::update('sysmaps', $update_maps);
@@ -2171,20 +3167,7 @@ class CMap extends CMapElement {
 			DB::delete('sysmap_url', ['sysmapurlid' => $url_ids_to_delete]);
 		}
 
-		// Selements.
-		$new_selementids = ['selementids' => []];
-		if ($selements_to_add) {
-			$new_selementids = $this->createSelements($selements_to_add);
-		}
-
-		if ($selements_to_update) {
-			$this->updateSelements($selements_to_update);
-		}
-
-		if ($selements_to_delete) {
-			$this->deleteSelements($selements_to_delete);
-		}
-
+		// Shapes.
 		if ($shapes_to_add) {
 			$this->createShapes($shapes_to_add);
 		}
@@ -2197,112 +3180,237 @@ class CMap extends CMapElement {
 			$this->deleteShapes($shapes_to_delete);
 		}
 
-		// Links.
-		if ($links_to_add || $links_to_update) {
-			$selements_names = [];
-			foreach ($new_selementids['selementids'] as $key => $selementId) {
-				$selements_names[$selements_to_add[$key]['selementid']] = $selementId;
-			}
+		$this->updateSelements($maps, $db_maps);
 
-			foreach ($selements_to_update as $selement) {
-				$selements_names[$selement['selementid']] = $selement['selementid'];
-			}
+		$this->updateForce($maps, $db_maps);
 
-			foreach ($links_to_add as $key => $link) {
-				if (array_key_exists($link['selementid1'], $selements_names)) {
-					$links_to_add[$key]['selementid1'] = $selements_names[$link['selementid1']];
-				}
-				if (array_key_exists($link['selementid2'], $selements_names)) {
-					$links_to_add[$key]['selementid2'] = $selements_names[$link['selementid2']];
-				}
-			}
+		return ['sysmapids' => array_column($maps, 'sysmapid')];
+	}
 
-			foreach ($links_to_update as $key => $link) {
-				if (array_key_exists($link['selementid1'], $selements_names)) {
-					$links_to_update[$key]['selementid1'] = $selements_names[$link['selementid1']];
-				}
-				if (array_key_exists($link['selementid2'], $selements_names)) {
-					$links_to_update[$key]['selementid2'] = $selements_names[$link['selementid2']];
-				}
-			}
+	public function updateForce(array $maps, array $db_maps): void {
+		self::addFieldDefaultsByLinkIndicatorType($maps, $db_maps);
 
-			unset($selements_names);
-		}
-
-		$new_linkids = ['linkids' => []];
-		$update_linkids = ['linkids' => []];
-
-		if ($links_to_add) {
-			$new_linkids = $this->createLinks($links_to_add);
-		}
-
-		if ($links_to_update) {
-			$update_linkids = $this->updateLinks($links_to_update);
-		}
-
-		if ($links_to_delete) {
-			$this->deleteLinks($links_to_delete);
-		}
-
-		// Link triggers.
-		$link_triggers_to_delete = [];
-		$link_triggers_to_update = [];
-		$link_triggers_to_add = [];
-
-		foreach ($new_linkids['linkids'] as $key => $linkid) {
-			if (!array_key_exists('linktriggers', $links_to_add[$key])) {
-				continue;
-			}
-
-			foreach ($links_to_add[$key]['linktriggers'] as $link_trigger) {
-				$link_trigger['linkid'] = $linkid;
-				$link_triggers_to_add[] = $link_trigger;
-			}
-		}
-
-		$db_links = [];
-
-		$link_trigger_resource = DBselect(
-			'SELECT slt.* FROM sysmaps_link_triggers slt WHERE '.dbConditionInt('slt.linkid', $update_linkids['linkids'])
-		);
-		while ($db_link_trigger = DBfetch($link_trigger_resource)) {
-			zbx_subarray_push($db_links, $db_link_trigger['linkid'], $db_link_trigger);
-		}
-
-		foreach ($update_linkids['linkids'] as $key => $linkid) {
-			if (!array_key_exists('linktriggers', $links_to_update[$key])) {
-				continue;
-			}
-
-			$db_link_triggers = array_key_exists($linkid, $db_links) ? $db_links[$linkid] : [];
-			$db_link_triggers_diff = zbx_array_diff($links_to_update[$key]['linktriggers'],
-				$db_link_triggers, 'linktriggerid'
-			);
-
-			foreach ($db_link_triggers_diff['first'] as $new_link_trigger) {
-				$new_link_trigger['linkid'] = $linkid;
-				$link_triggers_to_add[] = $new_link_trigger;
-			}
-
-			$link_triggers_to_update = array_merge($link_triggers_to_update, $db_link_triggers_diff['both']);
-			$link_triggers_to_delete = array_merge($link_triggers_to_delete, $db_link_triggers_diff['second']);
-		}
-
-		if ($link_triggers_to_delete) {
-			$this->deleteLinkTriggers($link_triggers_to_delete);
-		}
-
-		if ($link_triggers_to_add) {
-			$this->createLinkTriggers($link_triggers_to_add);
-		}
-
-		if ($link_triggers_to_update) {
-			$this->updateLinkTriggers($link_triggers_to_update);
-		}
+		self::updateLinks($maps, $db_maps);
 
 		$this->addAuditBulk(CAudit::ACTION_UPDATE, CAudit::RESOURCE_MAP, $maps, $db_maps);
+	}
 
-		return ['sysmapids' => $sysmapids];
+	private static function addFieldDefaultsByLinkIndicatorType(array &$maps, array $db_maps): void {
+		foreach ($maps as &$map) {
+			if (!array_key_exists('links', $map)) {
+				continue;
+			}
+
+			foreach ($map['links'] as &$link) {
+				if (!array_key_exists('linkid', $link)) {
+					continue;
+				}
+
+				$db_link = $db_maps[$map['sysmapid']]['links'][$link['linkid']];
+
+				if ($link['indicator_type'] != $db_link['indicator_type']) {
+					if ($db_link['indicator_type'] == MAP_INDICATOR_TYPE_TRIGGER) {
+						$link += ['linktriggers' => []];
+					}
+					elseif ($db_link['indicator_type'] == MAP_INDICATOR_TYPE_ITEM_VALUE) {
+						$link += ['itemid' => 0, 'thresholds' => [], 'highlights' => []];
+					}
+				}
+				elseif ($link['indicator_type'] == MAP_INDICATOR_TYPE_ITEM_VALUE) {
+					$link += in_array($link['item_value_type'], [ITEM_VALUE_TYPE_FLOAT, ITEM_VALUE_TYPE_UINT64])
+						? ['highlights' => []]
+						: ['thresholds' => []];
+				}
+			}
+			unset($link);
+		}
+		unset($map);
+	}
+
+	public function unlinkTriggers(array $triggerids): void {
+		self::unlinkSelementTriggers($triggerids);
+		$this->unlinkLinkTriggers($triggerids);
+	}
+
+	private static function unlinkSelementTriggers(array $triggerids): void {
+		$selement_triggerids = [];
+		$selementids = [];
+
+		$db_selement_triggers = DBselect(
+			'SELECT st.selement_triggerid,st.selementid'.
+			' FROM sysmap_element_trigger st'.
+			' WHERE '.dbConditionId('st.triggerid', $triggerids)
+		);
+
+		while ($db_selement_trigger = DBfetch($db_selement_triggers)) {
+			$selement_triggerids[] = $db_selement_trigger['selement_triggerid'];
+			$selementids[$db_selement_trigger['selementid']] = true;
+		}
+
+		if ($selement_triggerids) {
+			DB::delete('sysmap_element_trigger', ['selement_triggerid' => $selement_triggerids]);
+
+			// Remove map elements without triggers.
+			$db_selement_triggers = DBselect(
+				'SELECT DISTINCT st.selementid'.
+				' FROM sysmap_element_trigger st'.
+				' WHERE '.dbConditionId('st.selementid', array_keys($selementids))
+			);
+			while ($db_selement_trigger = DBfetch($db_selement_triggers)) {
+				unset($selementids[$db_selement_trigger['selementid']]);
+			}
+
+			if ($selementids) {
+				DB::delete('sysmaps_elements', ['selementid' => array_keys($selementids)]);
+			}
+		}
+	}
+
+	private function unlinkLinkTriggers(array $triggerids): void {
+		$resource = DBselect(
+			'SELECT slt.linktriggerid,slt.linkid,slt.triggerid,sl.indicator_type,sl.sysmapid,s.name'.
+			' FROM sysmaps_link_triggers slt'.
+			' LEFT JOIN sysmaps_links sl ON slt.linkid=sl.linkid'.
+			' LEFT JOIN sysmaps s ON sl.sysmapid=s.sysmapid'.
+			' WHERE '.dbConditionId('slt.triggerid', $triggerids)
+		);
+
+		$db_maps = [];
+		$db_link_triggers = [];
+
+		while ($row = DBfetch($resource)) {
+			if (!array_key_exists($row['sysmapid'], $db_maps)) {
+				$db_maps[$row['sysmapid']] = [
+					'sysmapid' => $row['sysmapid'],
+					'name' => $row['name'],
+					'links' => []
+				];
+			}
+
+			if (!array_key_exists($row['linkid'], $db_maps[$row['sysmapid']]['links'])) {
+				$db_maps[$row['sysmapid']]['links'][$row['linkid']] = [
+					'linkid' => $row['linkid'],
+					'indicator_type' => $row['indicator_type'],
+					'linktriggers' => []
+				];
+
+				$db_link_triggers[$row['linkid']] =
+					&$db_maps[$row['sysmapid']]['links'][$row['linkid']]['linktriggers'];
+			}
+
+			$db_maps[$row['sysmapid']]['links'][$row['linkid']]['linktriggers'][$row['linktriggerid']] = [
+				'linktriggerid' => $row['linktriggerid'],
+				'triggerid' => $row['triggerid']
+			];
+		}
+
+		$maps = [];
+		$link_triggers = [];
+		$i1 = 0;
+
+		foreach ($db_maps as $db_map) {
+			$maps[$i1] = ['sysmapid' => $db_map['sysmapid']];
+
+			$i2 = 0;
+
+			foreach ($db_map['links'] as $db_link) {
+				$maps[$i1]['links'][$i2] = [
+					'linkid' => $db_link['linkid'],
+					'linktriggers' => []
+				];
+
+				$link_triggers[$db_link['linkid']] = &$maps[$i1]['links'][$i2]['linktriggers'];
+
+				$i2++;
+			}
+
+			$i1++;
+		}
+
+		$resource = DBselect(
+			'SELECT slt.linktriggerid,slt.linkid,slt.triggerid'.
+			' FROM sysmaps_link_triggers slt'.
+			' WHERE '.dbConditionId('slt.linkid', array_keys($db_link_triggers)).
+				' AND '.dbConditionId('slt.triggerid', $triggerids, true)
+		);
+
+		while ($row = DBfetch($resource)) {
+			$link_triggers[$row['linkid']][] = ['triggerid' => $row['triggerid']];
+			$db_link_triggers[$row['linkid']][$row['linktriggerid']] = [
+				'linktriggerid' => $row['linktriggerid'],
+				'triggerid' => $row['triggerid']
+			];
+		}
+
+		foreach ($maps as &$map) {
+			foreach ($map['links'] as &$link) {
+				$link['indicator_type'] = $link['linktriggers']
+					? MAP_INDICATOR_TYPE_TRIGGER
+					: MAP_INDICATOR_TYPE_STATIC_LINK;
+			}
+			unset($link);
+		}
+		unset($map);
+
+		$this->updateForce($maps, $db_maps);
+	}
+
+	public function unlinkItems(array $itemids): void {
+		$resource = DBselect(
+			'SELECT sl.linkid,sl.sysmapid,sl.indicator_type,sl.itemid,s.name'.
+			' FROM sysmaps_links sl'.
+			' LEFT JOIN sysmaps s ON sl.sysmapid=s.sysmapid'.
+			' WHERE '.dbConditionId('sl.itemid', $itemids)
+		);
+
+		$db_maps = [];
+		$db_links = [];
+
+		while ($row = DBfetch($resource)) {
+			if (!array_key_exists($row['sysmapid'], $db_maps)) {
+				$db_maps[$row['sysmapid']] = [
+					'sysmapid' => $row['sysmapid'],
+					'name' => $row['name'],
+					'links' => []
+				];
+			}
+
+			$db_maps[$row['sysmapid']]['links'][$row['linkid']] = [
+				'linkid' => $row['linkid'],
+				'indicator_type' => $row['indicator_type'],
+				'itemid' => $row['itemid']
+			];
+
+			$db_links[$row['linkid']] = &$db_maps[$row['sysmapid']]['links'][$row['linkid']];
+		}
+
+		if (!$db_links) {
+			return;
+		}
+
+		self::addAffectedLinkThresholds($db_links);
+		self::addAffectedLinkHighlights($db_links);
+
+		$maps = [];
+		$i = 0;
+
+		foreach ($db_maps as $db_map) {
+			$maps[$i] = [
+				'sysmapid' => $db_map['sysmapid'],
+				'links' => []
+			];
+
+			foreach ($db_map['links'] as $db_link) {
+				$maps[$i]['links'][] = [
+					'linkid' => $db_link['linkid'],
+					'indicator_type' => MAP_INDICATOR_TYPE_STATIC_LINK
+				];
+			}
+
+			$i++;
+		}
+
+		$this->updateForce($maps, $db_maps);
 	}
 
 	/**
@@ -2673,7 +3781,9 @@ class CMap extends CMapElement {
 		// adding links
 		if ($options['selectLinks'] !== null && $options['selectLinks'] != API_OUTPUT_COUNT) {
 			$links = API::getApiService()->select('sysmaps_links', [
-				'output' => $this->outputExtend($options['selectLinks'], ['sysmapid', 'linkid']),
+				'output' => $this->outputExtend($options['selectLinks'], ['sysmapid', 'linkid', 'indicator_type',
+					'itemid'
+				]),
 				'filter' => ['sysmapid' => $sysmapIds],
 				'preservekeys' => true
 			]);
@@ -2681,13 +3791,57 @@ class CMap extends CMapElement {
 
 			// add link triggers
 			if ($this->outputIsRequested('linktriggers', $options['selectLinks'])) {
-				$linkTriggers = DBFetchArrayAssoc(DBselect(
-					'SELECT DISTINCT slt.*'.
+				$link_triggers = DBFetchArrayAssoc(DBselect(
+					'SELECT slt.linktriggerid,slt.linkid,slt.triggerid,slt.drawtype,slt.color'.
 					' FROM sysmaps_link_triggers slt'.
-					' WHERE '.dbConditionInt('slt.linkid', $relation_map->getRelatedIds())
+					' WHERE '.dbConditionId('slt.linkid', $relation_map->getRelatedIds())
 				), 'linktriggerid');
-				$linkTriggerRelationMap = $this->createRelationMap($linkTriggers, 'linkid', 'linktriggerid');
-				$links = $linkTriggerRelationMap->mapMany($links, $linkTriggers, 'linktriggers');
+				$link_trigger_relation_map = $this->createRelationMap($link_triggers, 'linkid', 'linktriggerid');
+				$link_triggers = $this->unsetExtraFields($link_triggers, ['linktriggerid', 'linkid']);
+				$links = $link_trigger_relation_map->mapMany($links, $link_triggers, 'linktriggers');
+			}
+
+			if ($this->outputIsRequested('thresholds', $options['selectLinks'])) {
+				$link_thresholds = DBFetchArrayAssoc(DBselect(
+					'SELECT slt.linkthresholdid,slt.linkid,slt.threshold,slt.drawtype,slt.color'.
+					' FROM sysmap_link_threshold slt'.
+					' WHERE slt.type='.self::LINK_THRESHOLD_TYPE_THRESHOLD.
+						' AND '.dbConditionId('slt.linkid', $relation_map->getRelatedIds())
+				), 'linkthresholdid');
+
+				if ($link_thresholds) {
+					$number_parser = new CNumberParser(['with_size_suffix' => true, 'with_time_suffix' => true]);
+
+					foreach ($link_thresholds as &$link_threshold) {
+						$number_parser->parse($link_threshold['threshold']);
+						$link_threshold['order_threshold'] = $number_parser->calcValue();
+					}
+					unset($link_threshold);
+
+					CArrayHelper::sort($link_thresholds, ['order_threshold']);
+
+					foreach ($link_thresholds as &$link_threshold) {
+						unset($link_threshold['order_threshold']);
+					}
+					unset($link_threshold);
+				}
+
+				$link_threshold_relation_map = $this->createRelationMap($link_thresholds, 'linkid', 'linkthresholdid');
+				$link_thresholds = $this->unsetExtraFields($link_thresholds, ['linkthresholdid', 'linkid']);
+				$links = $link_threshold_relation_map->mapMany($links, $link_thresholds, 'thresholds');
+			}
+
+			if ($this->outputIsRequested('highlights', $options['selectLinks'])) {
+				$link_highlights = DBFetchArrayAssoc(DBselect(
+					'SELECT slt.linkthresholdid,slt.linkid,slt.pattern,slt.sortorder,slt.drawtype,slt.color'.
+					' FROM sysmap_link_threshold slt'.
+					' WHERE slt.type='.self::LINK_THRESHOLD_TYPE_HIGHLIGHT.
+						' AND '.dbConditionId('slt.linkid', $relation_map->getRelatedIds()).
+					' ORDER BY slt.sortorder'
+				), 'linkthresholdid');
+				$link_highlight_relation_map = $this->createRelationMap($link_highlights, 'linkid', 'linkthresholdid');
+				$link_highlights = $this->unsetExtraFields($link_highlights, ['linkthresholdid', 'linkid']);
+				$links = $link_highlight_relation_map->mapMany($links, $link_highlights, 'highlights');
 			}
 
 			if ($this->outputIsRequested('permission', $options['selectLinks']) && $links) {
@@ -2704,44 +3858,74 @@ class CMap extends CMapElement {
 					unset($link);
 				}
 				else {
-					$db_link_triggers = DBselect(
-						'SELECT slt.linkid,slt.triggerid'.
-						' FROM sysmaps_link_triggers slt'.
-						' WHERE '.dbConditionInt('slt.linkid', array_keys($links))
-					);
-
-					$triggerids = [];
-					$has_triggers = [];
-
-					while ($db_link_trigger = DBfetch($db_link_triggers)) {
-						$triggerids[$db_link_trigger['triggerid']][] = $db_link_trigger['linkid'];
-						$has_triggers[$db_link_trigger['linkid']] = true;
-					}
+					$trigger_linkids = [];
+					$item_linkids = [];
 
 					foreach ($links as &$link) {
-						$link['permission'] = array_key_exists($link['linkid'], $has_triggers) ? PERM_NONE : PERM_READ;
+						if ($link['indicator_type'] == MAP_INDICATOR_TYPE_TRIGGER) {
+							$link['permission'] = PERM_NONE;
+							$trigger_linkids[$link['linkid']] = true;
+						}
+						elseif ($link['indicator_type'] == MAP_INDICATOR_TYPE_ITEM_VALUE) {
+							$link['permission'] = PERM_NONE;
+							$item_linkids[$link['itemid']][] = $link['linkid'];
+						}
+						else {
+							$link['permission'] = PERM_READ;
+						}
 					}
 					unset($link);
 
-					$db_triggers = $triggerids
-						? API::Trigger()->get([
-							'output' => [],
-							'triggerids' => array_keys($triggerids),
-							'preservekeys' => true
-						])
-						: [];
+					if ($trigger_linkids) {
+						$resource = DBselect(
+							'SELECT slt.linkid,slt.triggerid'.
+							' FROM sysmaps_link_triggers slt'.
+							' WHERE '.dbConditionId('slt.linkid', array_keys($trigger_linkids))
+						);
 
-					foreach ($triggerids as $triggerid => $linkids) {
-						if (array_key_exists($triggerid, $db_triggers)) {
-							foreach ($linkids as $linkid) {
-								$links[$linkid]['permission'] = PERM_READ;
+						$triggerids = [];
+
+						while ($db_link_trigger = DBfetch($resource)) {
+							$triggerids[$db_link_trigger['triggerid']][] = $db_link_trigger['linkid'];
+						}
+
+						$db_triggers = $triggerids
+							? API::Trigger()->get([
+								'output' => [],
+								'triggerids' => array_keys($triggerids),
+								'preservekeys' => true
+							])
+							: [];
+
+						foreach ($triggerids as $triggerid => $linkids) {
+							if (array_key_exists($triggerid, $db_triggers)) {
+								foreach ($linkids as $linkid) {
+									$links[$linkid]['permission'] = PERM_READ;
+								}
+							}
+						}
+					}
+
+					if ($item_linkids) {
+						$db_items = API::Item()->get([
+							'output' => [],
+							'itemids' => array_keys($item_linkids),
+							'preservekeys' => true
+						]);
+
+						foreach ($item_linkids as $itemid => $linkids) {
+							if (array_key_exists($itemid, $db_items)) {
+								foreach ($linkids as $linkid) {
+									$links[$linkid]['permission'] = PERM_READ;
+								}
 							}
 						}
 					}
 				}
 			}
 
-			$links = $this->unsetExtraFields($links, ['sysmapid', 'linkid'], $options['selectLinks']);
+			$links = $this->unsetExtraFields($links, ['sysmapid']);
+			$links = $this->unsetExtraFields($links, ['linkid', 'indicator_type', 'itemid'], $options['selectLinks']);
 			$result = $relation_map->mapMany($result, $links, 'links');
 		}
 

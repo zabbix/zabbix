@@ -111,6 +111,7 @@ class CPage {
 			$capabilities->setCapability(ChromeOptions::CAPABILITY, $options);
 		}
 
+		$capabilities->setCapability('unhandledPromptBehavior', 'ignore');
 		$phpunit_driver_address = PHPUNIT_DRIVER_ADDRESS;
 
 		if (strpos($phpunit_driver_address, ':') === false) {
@@ -131,6 +132,7 @@ class CPage {
 	 */
 	public function cleanup() {
 		$this->resetViewport();
+		CommandExecutor::setAlertStrategy(CommandExecutor::STRATEGY_DEFAULT);
 
 		if (self::$cookie !== null) {
 			foreach ($this->driver->manage()->getCookies() as $cookie) {
@@ -624,7 +626,7 @@ class CPage {
 		$this->waitUntilReady();
 
 		if ($check_logged_in) {
-			$this->checkUserLoggedIn($scenario);
+			$this->assertUserIsLoggedIn($scenario);
 		}
 	}
 
@@ -632,8 +634,10 @@ class CPage {
 	 * Checks if currently any user is logged in.
 	 *
 	 * @param int $scenario  TEST_BAD - it is expected to not be logged in, TEST_GOOD - expected to be logged in
+	 *
+	 * @return $this
 	 */
-	public function checkUserLoggedIn($scenario = TEST_GOOD) {
+	public function assertUserIsLoggedIn($scenario = TEST_GOOD) {
 		$sign_out = $this->query('class:zi-sign-out')->exists();
 
 		if ($scenario === TEST_GOOD && !$sign_out) {
@@ -642,6 +646,8 @@ class CPage {
 		elseif ($scenario === TEST_BAD && $sign_out) {
 			throw new \Exception('"Sign out" button is found on the page. Probably user is logged in, but shouldn\'t.');
 		}
+
+		return $this;
 	}
 
 	/**

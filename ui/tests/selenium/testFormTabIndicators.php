@@ -197,7 +197,8 @@ class testFormTabIndicators extends CWebTest {
 			// #2 Host prototype configuration form tab data.
 			[
 				[
-					'url' => 'host_prototypes.php?form=create&parent_discoveryid=42275&context=host',
+					// Zabbix server, Discovery rule => Block devices discovery
+					'url' => 'host_prototypes.php?form=create&parent_discoveryid=57096&context=host',
 					'form' => 'name:hostPrototypeForm',
 					'tabs' => [
 						[
@@ -273,7 +274,8 @@ class testFormTabIndicators extends CWebTest {
 			// #4 Item prototype configuration form tab data.
 			[
 				[
-					'url' => 'zabbix.php?action=item.prototype.list&parent_discoveryid=42275&context=host',
+					// Zabbix server, Discovery rule => Block devices discovery
+					'url' => 'zabbix.php?action=item.prototype.list&parent_discoveryid=57096&context=host',
 					'create_button' => 'Create item prototype',
 					'form' => 'name:itemForm',
 					'close_dialog' => true,
@@ -583,7 +585,7 @@ class testFormTabIndicators extends CWebTest {
 			[
 				[
 					'url' => 'zabbix.php?action=dashboard.view',
-					'form' => 'id:widget-dialogue-form',
+					'form' => 'id:widget-form',
 					'widget_type' => 'Graph',
 					'close_dialog' => true,
 					'tabs' => [
@@ -646,7 +648,7 @@ class testFormTabIndicators extends CWebTest {
 			[
 				[
 					'url' => 'zabbix.php?action=dashboard.view',
-					'form' => 'id:widget-dialogue-form',
+					'form' => 'id:widget-form',
 					'widget_type' => 'Pie chart',
 					'close_dialog' => true,
 					'tabs' => [

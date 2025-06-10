@@ -46,22 +46,26 @@ This template has been tested on:
 |Name|Description|Default|
 |----|-----------|-------|
 |{$CPU.UTIL.CRIT}|<p>Critical threshold of CPU utilization expressed in %.</p>|`90`|
-|{$IF.ERRORS.WARN}|<p>Warning threshold of error packet rate. Can be used with interface name as context.</p>|`2`|
-|{$IF.UTIL.MAX}|<p>Used as a threshold in the interface utilization trigger.</p>|`90`|
-|{$SYSTEM.FUZZYTIME.MAX}|<p>The upper threshold for difference of system time.</p>|`60s`|
-|{$SYSTEM.FUZZYTIME.MIN}|<p>The lower threshold for difference of system time. Used in recovery expression to avoid trigger flapping.</p>|`10s`|
-|{$KERNEL.MAXFILES.MIN}||`256`|
 |{$LOAD_AVG_PER_CPU.MAX.WARN}|<p>Load per CPU considered sustainable. Tune if needed.</p>|`1.5`|
-|{$NODE_EXPORTER_HOST}|<p>The hostname or IP address of the node_exporter host.</p>|`<SET NODE EXPORTER HOST>`|
-|{$NODE_EXPORTER_PORT}|<p>TCP Port node_exporter is listening on.</p>|`9100`|
-|{$SWAP.PFREE.MIN.WARN}|<p>Warning threshold of the minimum free swap.</p>|`50`|
-|{$VFS.DEV.READ.AWAIT.WARN}|<p>Disk read average response time (in ms) before the trigger fires.</p>|`20`|
-|{$VFS.DEV.WRITE.AWAIT.WARN}|<p>Disk write average response time (in ms) before the trigger fires.</p>|`20`|
-|{$VFS.DEV.DEVNAME.NOT_MATCHES}|<p>Used in block device discovery. Can be overridden on the host or linked template level.</p>|`Macro too long. Please see the template.`|
-|{$VFS.DEV.DEVNAME.MATCHES}|<p>Used in block device discovery. Can be overridden on the host or linked template level.</p>|`.+`|
 |{$MEMORY.UTIL.MAX}|<p>Used as a threshold in the memory utilization trigger.</p>|`90`|
 |{$MEMORY.AVAILABLE.MIN}|<p>Used as a threshold in the memory available trigger.</p>|`20M`|
+|{$SWAP.PFREE.MIN.WARN}|<p>Warning threshold of the minimum free swap.</p>|`50`|
 |{$IFCONTROL}|<p>Link status trigger will be fired only for interfaces where the context macro equals "1".</p>|`1`|
+|{$IF.UTIL.MAX}|<p>Used as a threshold in the interface utilization trigger.</p>|`90`|
+|{$IF.ERRORS.WARN}|<p>Warning threshold of error packet rate. Can be used with interface name as context.</p>|`2`|
+|{$KERNEL.MAXFILES.MIN}||`256`|
+|{$SYSTEM.FUZZYTIME.MIN}|<p>The lower threshold for difference of system time. Used in recovery expression to avoid trigger flapping.</p>|`10s`|
+|{$SYSTEM.FUZZYTIME.MAX}|<p>The upper threshold for difference of system time.</p>|`60s`|
+|{$NODE_EXPORTER_HOST}|<p>The hostname or IP address of the node_exporter host.</p>|`<SET NODE EXPORTER HOST>`|
+|{$NODE_EXPORTER_PORT}|<p>TCP Port node_exporter is listening on.</p>|`9100`|
+|{$VFS.DEV.READ.AWAIT.WARN}|<p>Disk read average response time (in ms) before the trigger fires.</p>|`20`|
+|{$VFS.DEV.WRITE.AWAIT.WARN}|<p>Disk write average response time (in ms) before the trigger fires.</p>|`20`|
+|{$VFS.FS.PUSED.MAX.WARN}|<p>The warning threshold of the filesystem utilization.</p>|`80`|
+|{$VFS.FS.PUSED.MAX.CRIT}|<p>The critical threshold of the filesystem utilization.</p>|`90`|
+|{$VFS.FS.INODE.PFREE.MIN.WARN}|<p>The warning threshold of the filesystem metadata utilization.</p>|`20`|
+|{$VFS.FS.INODE.PFREE.MIN.CRIT}|<p>The critical threshold of the filesystem metadata utilization.</p>|`10`|
+|{$VFS.DEV.DEVNAME.MATCHES}|<p>Used in block device discovery. Can be overridden on the host or linked template level.</p>|`.+`|
+|{$VFS.DEV.DEVNAME.NOT_MATCHES}|<p>Used in block device discovery. Can be overridden on the host or linked template level.</p>|`Macro too long. Please see the template.`|
 |{$NET.IF.IFNAME.MATCHES}|<p>Used for network interface discovery. Can be overridden on the host or linked template level.</p>|`^.*$`|
 |{$NET.IF.IFNAME.NOT_MATCHES}|<p>Filters out `loopbacks`, `nulls`, docker `veth` links and `docker0` bridge by default.</p>|`Macro too long. Please see the template.`|
 |{$NET.IF.IFOPERSTATUS.MATCHES}|<p>Used in network interface discovery rule filters.</p>|`^.*$`|
@@ -74,10 +78,6 @@ This template has been tested on:
 |{$VFS.FS.FSTYPE.NOT_MATCHES}|<p>Used in filesystem discovery. Can be overridden on the host or linked template level.</p>|`^\s$`|
 |{$VFS.FS.FSDEVICE.MATCHES}|<p>Used in filesystem discovery. Can be overridden on the host or linked template level.</p>|`^.+$`|
 |{$VFS.FS.FSDEVICE.NOT_MATCHES}|<p>Used in filesystem discovery. Can be overridden on the host or linked template level.</p>|`^\s$`|
-|{$VFS.FS.INODE.PFREE.MIN.CRIT}|<p>The critical threshold of the filesystem metadata utilization.</p>|`10`|
-|{$VFS.FS.INODE.PFREE.MIN.WARN}|<p>The warning threshold of the filesystem metadata utilization.</p>|`20`|
-|{$VFS.FS.PUSED.MAX.CRIT}|<p>The critical threshold of the filesystem utilization.</p>|`90`|
-|{$VFS.FS.PUSED.MAX.WARN}|<p>The warning threshold of the filesystem utilization.</p>|`80`|
 
 ### Items
 
@@ -177,7 +177,7 @@ This template has been tested on:
 |----|-----------|----|-----------------------|
 |FS [{#FSNAME}]: Space: Available|<p>Available storage space expressed in bytes.</p>|Dependent item|vfs.fs.free[node_exporter,"{#FSNAME}"]<p>**Preprocessing**</p><ul><li><p>Prometheus pattern: `The text is too long. Please see the template.`</p></li></ul>|
 |FS [{#FSNAME}]: Space: Total|<p>Total space expressed in bytes.</p>|Dependent item|vfs.fs.total[node_exporter,"{#FSNAME}"]<p>**Preprocessing**</p><ul><li><p>Prometheus pattern: `The text is too long. Please see the template.`</p></li></ul>|
-|FS [{#FSNAME}]: Space: Used|<p>Used storage expressed in bytes.</p><p>Reserverd space is not counted in.</p>|Dependent item|vfs.fs.used[node_exporter,"{#FSNAME}"]<p>**Preprocessing**</p><ul><li><p>Prometheus to JSON: `The text is too long. Please see the template.`</p></li><li><p>JavaScript: `The text is too long. Please see the template.`</p></li></ul>|
+|FS [{#FSNAME}]: Space: Used|<p>Used storage expressed in bytes.</p><p>Reserved space is not counted in.</p>|Dependent item|vfs.fs.used[node_exporter,"{#FSNAME}"]<p>**Preprocessing**</p><ul><li><p>Prometheus to JSON: `The text is too long. Please see the template.`</p></li><li><p>JavaScript: `The text is too long. Please see the template.`</p></li></ul>|
 |FS [{#FSNAME}]: Space: Used, in %|<p>Calculated as the percentage of currently used space compared to the maximum available space.</p>|Dependent item|vfs.fs.pused[node_exporter,"{#FSNAME}"]<p>**Preprocessing**</p><ul><li><p>Prometheus to JSON: `The text is too long. Please see the template.`</p></li><li><p>JavaScript: `The text is too long. Please see the template.`</p></li></ul>|
 |FS [{#FSNAME}]: Inodes: Free, in %|<p>Free metadata space expressed as a percentage.</p>|Dependent item|vfs.fs.inode.pfree[node_exporter,"{#FSNAME}"]<p>**Preprocessing**</p><ul><li><p>Prometheus to JSON: `{__name__=~"node_filesystem_files.*",mountpoint="{#FSNAME}"}`</p></li><li><p>JavaScript: `The text is too long. Please see the template.`</p></li></ul>|
 |FS [{#FSNAME}]: Filesystem is read-only|<p>The filesystem is mounted as read-only. It is available only for Zabbix agents 6.4 and higher.</p>|Dependent item|vfs.fs.[node_exporter,"{#FSNAME}"]<p>**Preprocessing**</p><ul><li><p>Prometheus pattern: `The text is too long. Please see the template.`</p></li></ul>|

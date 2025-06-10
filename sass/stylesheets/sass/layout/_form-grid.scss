@@ -242,6 +242,11 @@
 			}
 		}
 
+		.dynamic-row-control > td {
+			padding-bottom: 0;
+			line-height: 1.4;
+		}
+
 		.btn-icon,
 		.icon {
 			@extend %button-size-medium;
@@ -276,10 +281,18 @@
 				padding-right: 0;
 			}
 		}
+
+		.error-container-row {
+			td {
+				padding-top: 0;
+			}
+		}
 	}
 
 	.table-forms-separator {
 		display: inline-flex;
+		flex-direction: column;
+		align-items: start;
 	}
 
 	.btn-split {

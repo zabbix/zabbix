@@ -13,9 +13,10 @@
 **/
 
 #include "zbxalerter.h"
-#include "alerter_defs.h"
 
+#include "alerter_defs.h"
 #include "alerter_protocol.h"
+#include "alerter_internal.h"
 
 #include "zbxtimekeeper.h"
 #include "zbxlog.h"
@@ -34,6 +35,8 @@
 #include "zbxalgo.h"
 #include "zbxdbhigh.h"
 #include "zbxthreads.h"
+#include "audit/zbxaudit.h"
+#include "zbxdb.h"
 
 #define	ALARM_ACTION_TIMEOUT	40
 
@@ -159,62 +162,111 @@ static char	*create_email_inreplyto(zbx_uint64_t mediatypeid, const char *sendto
 static void	alerter_process_email(zbx_ipc_socket_t *socket, zbx_ipc_message_t *ipc_message,
 		const char *config_source_ip, const char *config_ssl_ca_location)
 {
-	zbx_uint64_t	alertid, mediatypeid, eventid, objectid;
-	char		*sendto, *subject, *message, *smtp_server, *smtp_helo, *smtp_email, *username, *password,
-			*inreplyto, *expression, *recovery_expression, *error = NULL;
-	unsigned short	smtp_port;
-	unsigned char	smtp_security, smtp_verify_peer, smtp_verify_host, smtp_authentication, message_format;
-	int		object, source, ret;
+#define EXPIRE_OFFSET	SEC_PER_MIN	/* offset before we will renew access token for OAuth2 */
 
-	zbx_alerter_deserialize_email(ipc_message->data, &alertid, &mediatypeid, &eventid, &source, &object, &objectid,
-			&sendto, &subject, &message, &smtp_server, &smtp_port, &smtp_helo, &smtp_email, &smtp_security,
-			&smtp_verify_peer, &smtp_verify_host, &smtp_authentication, &username, &password,
-			&message_format, &expression, &recovery_expression);
+	zbx_uint64_t	alertid, mediatypeid, eventid, objectid;
+	char		*sendto, *subject, *message, *smtp_server, *smtp_helo, *smtp_email, *inreplyto = NULL,
+			*expression, *recovery_expression, *mediatype_name, *error = NULL;
+	unsigned short	smtp_port;
+	unsigned char	smtp_security, smtp_verify_peer, smtp_verify_host, message_format;
+	int		maxattempts, object, source, ret;
+
+	zbx_media_auth_t	mailauth = {0};
+	zbx_oauth_data_t	data = {0};
+
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
+
+	zbx_alerter_deserialize_email(ipc_message->data, &alertid, &mediatypeid, &mediatype_name, &maxattempts,
+			&eventid, &source, &object, &objectid, &sendto, &subject, &message, &smtp_server, &smtp_port,
+			&smtp_helo, &smtp_email, &smtp_security, &smtp_verify_peer, &smtp_verify_host, &mailauth.type,
+			&mailauth.username, &mailauth.password, &message_format, &expression, &recovery_expression);
+
+	switch (mailauth.type)
+	{
+		case SMTP_AUTHENTICATION_PASSWORD:
+		{
+			/* fill data required by substitute_simple_macros_unmasked() for ZBX_MACRO_TYPE_ALERT_EMAIL */
+
+			zbx_db_event	event = {.eventid = eventid, .source = source, .object = object,
+					.objectid = objectid};
+
+			memset(&event.trigger, 0, sizeof(zbx_db_trigger));
+			event.trigger.expression = expression;
+			expression = NULL;
+			event.trigger.recovery_expression = recovery_expression;
+			recovery_expression = NULL;
+			zbx_dc_um_handle_t	*um_handle = zbx_dc_open_user_macros();
+
+			zbx_substitute_simple_macros_unmasked(NULL, &event, NULL, NULL, NULL, NULL, NULL, NULL, NULL,
+					NULL, NULL, NULL, &mailauth.username, ZBX_MACRO_TYPE_ALERT_EMAIL, NULL, 0);
+			zbx_substitute_simple_macros_unmasked(NULL, &event, NULL, NULL, NULL, NULL, NULL, NULL, NULL,
+					NULL, NULL, NULL, &mailauth.password, ZBX_MACRO_TYPE_ALERT_EMAIL, NULL, 0);
+
+			zbx_dc_close_user_macros(um_handle);
+			zbx_db_trigger_clean(&event.trigger);
+			break;
+		}
+		case SMTP_AUTHENTICATION_OAUTH:
+		{
+			if (SUCCEED != (ret = zbx_oauth_fetch_from_db(mediatypeid, mediatype_name, &data, &error)))
+				goto out;
+
+			if (data.access_token_updated + data.access_expires_in - EXPIRE_OFFSET < time(NULL))
+			{
+				char	*suberror = NULL;
+
+				do
+				{
+					zbx_free(suberror);	/* clear last error */
+
+					ret = zbx_oauth_access_refresh(&data, mediatype_name, ALARM_ACTION_TIMEOUT,
+							config_source_ip, config_ssl_ca_location, &suberror);
+				}
+				while (0 < maxattempts-- && NETWORK_ERROR == ret);
+
+				zbx_oauth_update(mediatypeid, &data, ret);
+				zbx_oauth_audit(ZBX_AUDIT_ALL_CONTEXT, mediatypeid, mediatype_name, &data, ret);
+
+				if (SUCCEED != ret)
+				{
+					error = suberror;
+					goto out;
+				}
+			}
+
+			mailauth.oauthbearer = zbx_strdup(NULL, data.access_token);
+			mailauth.username = zbx_strdup(mailauth.username, smtp_email);
+			break;
+		}
+	}
 
 	inreplyto = create_email_inreplyto(mediatypeid, sendto, eventid);
 
-	if (SMTP_AUTHENTICATION_NORMAL_PASSWORD == smtp_authentication)
-	{
-		/* fill data required by substitute_simple_macros_unmasked() for ZBX_MACRO_TYPE_ALERT_EMAIL */
-
-		zbx_db_event	event = {.eventid = eventid, .source = source, .object = object, .objectid = objectid};
-
-		memset(&event.trigger, 0, sizeof(zbx_db_trigger));
-		event.trigger.expression = expression;
-		event.trigger.recovery_expression = recovery_expression;
-
-		zbx_dc_um_handle_t	*um_handle = zbx_dc_open_user_macros();
-
-		zbx_substitute_simple_macros_unmasked(NULL, &event, NULL, NULL, NULL, NULL, NULL, NULL, NULL,
-				NULL, NULL, NULL, &username, ZBX_MACRO_TYPE_ALERT_EMAIL, NULL, 0);
-		zbx_substitute_simple_macros_unmasked(NULL, &event, NULL, NULL, NULL, NULL, NULL, NULL, NULL,
-				NULL, NULL, NULL, &password, ZBX_MACRO_TYPE_ALERT_EMAIL, NULL, 0);
-
-		zbx_dc_close_user_macros(um_handle);
-		zbx_db_trigger_clean(&event.trigger);
-	}
-	else
-	{
-		zbx_free(expression);
-		zbx_free(recovery_expression);
-	}
-
 	ret = send_email(smtp_server, smtp_port, smtp_helo, smtp_email, sendto, inreplyto, subject, message,
-			smtp_security, smtp_verify_peer, smtp_verify_host, smtp_authentication, username, password,
-			message_format, ALARM_ACTION_TIMEOUT, config_source_ip, config_ssl_ca_location, &error);
+			smtp_security, smtp_verify_peer, smtp_verify_host, &mailauth, message_format,
+			ALARM_ACTION_TIMEOUT, config_source_ip, config_ssl_ca_location, &error);
 
+out:
 	alerter_send_result(socket, NULL, ret, (SUCCEED == ret ? NULL : error), NULL);
 
+	zbx_free(expression);
+	zbx_free(recovery_expression);
 	zbx_free(error);
 	zbx_free(inreplyto);
 	zbx_free(sendto);
 	zbx_free(subject);
+	zbx_free(mediatype_name);
 	zbx_free(message);
 	zbx_free(smtp_server);
 	zbx_free(smtp_helo);
 	zbx_free(smtp_email);
-	zbx_free(username);
-	zbx_free(password);
+	zbx_free(mailauth.username);
+	zbx_free(mailauth.password);
+	zbx_free(mailauth.oauthbearer);
+	zbx_oauth_clean(&data);
+
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __func__, zbx_result_string(ret));
+#undef EXPIRE_OFFSET
 }
 
 /******************************************************************************
@@ -356,8 +408,6 @@ ZBX_THREAD_ENTRY(zbx_alerter_thread, args)
 
 	zbx_update_selfmon_counter(info, ZBX_PROCESS_STATE_BUSY);
 
-	zbx_setproctitle("%s [connecting to the database]", get_process_type_string(process_type));
-
 	zbx_es_init(&es_engine);
 
 	zbx_ipc_message_init(&message);
@@ -409,6 +459,11 @@ ZBX_THREAD_ENTRY(zbx_alerter_thread, args)
 
 		zbx_update_selfmon_counter(info, ZBX_PROCESS_STATE_BUSY);
 
+		zbx_setproctitle("%s [connecting to the database]", get_process_type_string(process_type));
+		zbx_db_connect(ZBX_DB_CONNECT_NORMAL);
+
+		zbx_audit_prepare(ZBX_AUDIT_ALL_CONTEXT);
+
 		time_read = zbx_time();
 		time_idle += time_read - time_now;
 		zbx_update_env(get_process_type_string(process_type), time_read);
@@ -431,6 +486,9 @@ ZBX_THREAD_ENTRY(zbx_alerter_thread, args)
 		}
 
 		zbx_ipc_message_clean(&message);
+
+		zbx_audit_flush(ZBX_AUDIT_ALL_CONTEXT);
+		zbx_db_close();
 	}
 
 	zbx_setproctitle("%s #%d [terminated]", get_process_type_string(process_type), process_num);
