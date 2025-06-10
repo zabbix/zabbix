@@ -1204,18 +1204,6 @@ out:
 	return ret;
 }
 
-static void	am_deinit(zbx_am_t *manager)
-{
-	zbx_hashset_iter_t	iter;
-	zbx_am_mediatype_t	*mediatype;
-
-	zbx_hashset_iter_reset(&manager->mediatypes, &iter);
-	while (NULL != (mediatype = (zbx_am_mediatype_t *)zbx_hashset_iter_next(&iter)))
-	{
-		am_remove_mediatype(manager, mediatype);
-	}
-}
-
 /******************************************************************************
  *                                                                            *
  * Purpose: update alert status in local cache to be flushed after reading    *
@@ -1341,6 +1329,8 @@ static void	am_sync_watchdog(zbx_am_t *manager, zbx_am_media_t **medias, int med
 			{
 				zabbix_log(LOG_LEVEL_DEBUG, "In %s(): watchdog oauth expires in %d s - renew", __func__,
 						(int)time(NULL) - mediatype->passwd_expires);
+
+				zbx_free(mediatype->error);
 
 				zbx_audit_prepare(ZBX_AUDIT_ALL_CONTEXT);
 
@@ -2562,8 +2552,6 @@ ZBX_THREAD_ENTRY(zbx_alert_manager_thread, args)
 		if (NULL != client)
 			zbx_ipc_client_release(client);
 	}
-
-	am_deinit(&manager);
 
 	zbx_setproctitle("%s #%d [terminated]", get_process_type_string(process_type), process_num);
 
