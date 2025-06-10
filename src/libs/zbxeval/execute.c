@@ -792,7 +792,7 @@ int	zbx_eval_var_vector_to_dbl(zbx_vector_var_t *input_vector, zbx_vector_dbl_t 
 	int	i;
 
 	for (i = 0; i < input_vector->values_num; i++)
-	{printf("isworking!!!\n");
+	{
 		if (input_vector->values[i].type == ZBX_VARIANT_STR)
 		{
 			zbx_variant_t	value_dbl;
