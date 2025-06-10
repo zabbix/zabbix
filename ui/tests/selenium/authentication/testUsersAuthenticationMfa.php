@@ -667,7 +667,7 @@ class testUsersAuthenticationMfa extends testFormAuthentication {
 		$this->page->removeFocus();
 		// TODO: unstable screenshot on Jenkins. Remove border radius from button element.
 		$this->page->getDriver()->executeScript('arguments[0].style.borderRadius=0;',
-				[$dialog_form->query('button:Add')->one()]);
+				[$dialog->query('button:Add')->one()]);
 		$this->assertScreenshot($dialog, 'type_totp');
 		$dialog_form->fill([
 			'Type' => 'Duo Universal Prompt',
