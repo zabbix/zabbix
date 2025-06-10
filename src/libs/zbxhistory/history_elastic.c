@@ -229,10 +229,10 @@ static void	elastic_log_error(CURL *handle, CURLcode error, const char *errbuf)
 
 /************************************************************************************
  *                                                                                  *
- * Purpose: removes easy handle from the multi session and frees allocated          *
+ * Purpose: removes easy handle from cURL multi session and frees allocated         *
  *          resources                                                               *
  *                                                                                  *
- * Parameters:  hist - [IN] the history storage interface                           *
+ * Parameters:  hist - [IN] history storage interface                               *
  *                                                                                  *
  ************************************************************************************/
 static void	elastic_close(zbx_history_iface_t *hist)
@@ -349,7 +349,7 @@ static void	elastic_writer_init(void)
 
 /************************************************************************************
  *                                                                                  *
- * Purpose: releases elastic writer handle resources, but not session.      *
+ * Purpose: releases elastic writer handle resources, but not cURL multi session    *
  *                                                                                  *
  ************************************************************************************/
 static void	elastic_writer_release(void)
@@ -600,9 +600,9 @@ end:
 
 /************************************************************************************
  *                                                                                  *
- * Purpose: destroys history storage interface and shuts down a multi session       *
+ * Purpose: destroys history storage interface and shuts down cURL multi session    *
  *                                                                                  *
- * Parameters:  hist - [IN] the history storage interface                           *
+ * Parameters:  hist - [IN] history storage interface                               *
  *                                                                                  *
  ************************************************************************************/
 static void	elastic_destroy(zbx_history_iface_t *hist)
