@@ -3092,7 +3092,7 @@ class CopyWidgetsDashboards {
 							[
 								'name' => 'Web monitoring widget',
 								'type' => 'web',
-								'x' => 17,
+								'x' => 24,
 								'y' => 10,
 								'width' => 10,
 								'height' => 4,
