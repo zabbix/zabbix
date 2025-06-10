@@ -525,6 +525,15 @@ class testFormTabIndicators extends CWebTest {
 								'old_value' => false
 							],
 							'field_type' => 'general_field'
+						],
+						[
+							'name' => 'MFA settings',
+							'entries' => [
+								'selector' => 'id:mfa_status',
+								'value' => true,
+								'old_value' => false
+							],
+							'field_type' => 'general_field'
 						]
 					]
 				]
