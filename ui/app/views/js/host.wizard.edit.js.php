@@ -1192,14 +1192,14 @@ window.host_wizard_edit = new class {
 				break;
 
 			case this.STEP_CREATE_HOST:
-				if ((step_init || path === 'host' || path === 'groups')) {
+				if (step_init || path === 'host' || path === 'host_new') {
+					this.#updateProgress();
+				}
+
+				if (step_init || path === 'groups') {
 					jQuery('#groups_', this.#dialogue).multiSelect('setDisabledEntries',
 						this.#data.groups.map(group => group.id)
 					);
-				}
-
-				if (this.#data.host !== null || this.#data.host_new !== null) {
-					this.#updateProgress();
 				}
 
 				this.#dialogue.querySelector('.js-groups-description').hidden = this.#data.host === null;
