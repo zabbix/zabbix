@@ -333,12 +333,12 @@ class testDashboardCopyWidgets extends CWebTest {
 					'copy to' => 'same page'
 				]
 			],
-//			[
-//				[
-//					'name' => 'Web monitoring widget',
-//					'copy to' => 'same page'
-//				]
-//			],
+			[
+				[
+					'name' => 'Web monitoring widget',
+					'copy to' => 'same page'
+				]
+			],
 			[
 				[
 					'name' => 'Clock widget',
@@ -411,12 +411,12 @@ class testDashboardCopyWidgets extends CWebTest {
 					'copy to' => 'another page'
 				]
 			],
-//			[
-//				[
-//					'name' => 'Web monitoring widget',
-//					'copy to' => 'another page'
-//				]
-//			],
+			[
+				[
+					'name' => 'Web monitoring widget',
+					'copy to' => 'another page'
+				]
+			],
 			[
 				[
 					'name' => 'Clock widget',
@@ -459,12 +459,12 @@ class testDashboardCopyWidgets extends CWebTest {
 					'copy to' => 'another dashboard'
 				]
 			],
-//			[
-//				[
-//					'name' => 'Web monitoring widget',
-//					'copy to' => 'another dashboard'
-//				]
-//			],
+			[
+				[
+					'name' => 'Web monitoring widget',
+					'copy to' => 'another dashboard'
+				]
+			],
 			[
 				[
 					'name' => 'Clock widget',
