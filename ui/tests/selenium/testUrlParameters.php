@@ -377,11 +377,12 @@ class testUrlParameters extends CLegacyWebTest {
 				'test_cases' => [
 					// context=template.
 					[
-						'url' => self::POPUP.'item.prototype.edit&context=template&itemid=46067&parent_discoveryid=46063',
+						// Acronis Cyber Protect Cloud MSP by HTTP -> Get devices: Acronis CPC: Device discovery -> Device [{#NAME}]:[{#ID}]: Agent enabled
+						'url' => self::POPUP.'item.prototype.edit&context=template&itemid=50089&parent_discoveryid=50085',
 						'text_present' => 'Item prototype'
 					],
 					[
-						'url' => self::POPUP.'item.prototype.edit&context=template&itemid=1&parent_discoveryid=46063',
+						'url' => self::POPUP.'item.prototype.edit&context=template&itemid=1&parent_discoveryid=50085',
 						'text_not_present' => 'Item prototype',
 						'access_denied' => true,
 						'text_present' => [
@@ -409,14 +410,14 @@ class testUrlParameters extends CLegacyWebTest {
 				'server_name_on_page' => false,
 				'test_cases' => [
 					[
-						'url' => self::POPUP.'item.prototype.edit&context=template&itemid=46067',
+						'url' => self::POPUP.'item.prototype.edit&context=template&itemid=50085',
 						'text_not_present' => 'Item prototype',
 						'fatal_error' => true,
 						'text_present' => [
 							'Controller: popup',
 							'action: popup',
 							'context: template',
-							'itemid: 46067',
+							'itemid: 50085',
 							'popup: item.prototype.edit'
 						]
 					],
@@ -1083,7 +1084,7 @@ class testUrlParameters extends CLegacyWebTest {
 	 */
 	public function testUrlParameters_UrlLoad($title, $check_server_name, $server_name_on_page, $test_cases) {
 		foreach ($test_cases as $test_case) {
-			$this->zbxTestLogin($test_case['url'], $server_name_on_page);
+			$this->page->login()->open($test_case['url'], $server_name_on_page)->waitUntilReady();
 			if (array_key_exists('fatal_error', $test_case)) {
 				$this->zbxTestCheckTitle('Fatal error, please report to the Zabbix team', false);
 			}
