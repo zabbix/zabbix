@@ -136,7 +136,8 @@ static int	pb_autoreg_add_row_mem(zbx_pb_t *pb, const char *host, const char *ip
 	int			ret = FAIL;
 
 	zabbix_log(LOG_LEVEL_TRACE, "In %s() free:" ZBX_FS_SIZE_T " request:" ZBX_FS_SIZE_T, __func__,
-			pb_get_free_size(), pb_autoreg_estimate_row_size(host, host_metadata, ip, dns));
+			(zbx_fs_size_t)pb_get_free_size(),
+			(zbx_fs_size_t)pb_autoreg_estimate_row_size(host, host_metadata, ip, dns));
 
 	if (NULL == (row = (zbx_pb_autoreg_t *)pb_malloc(sizeof(zbx_pb_autoreg_t))))
 			goto out;
@@ -168,7 +169,7 @@ out:
 		pb_list_free_autoreg(&get_pb_data()->autoreg, row);
 
 	zabbix_log(LOG_LEVEL_TRACE, "End of %s() ret:%s free:" ZBX_FS_SIZE_T , __func__, zbx_result_string(ret),
-			pb_get_free_size());
+			(zbx_fs_size_t)pb_get_free_size());
 
 	return ret;
 }
@@ -198,7 +199,7 @@ static int	pb_autoreg_write_host_mem(zbx_pb_t *pb, const char *host, const char 
 		if (FAIL == pb_free_space(get_pb_data(), size))
 		{
 			zabbix_log(LOG_LEVEL_WARNING, "auto registration record with size " ZBX_FS_SIZE_T
-					" is too large for proxy memory buffer, discarding", size);
+					" is too large for proxy memory buffer, discarding", (zbx_fs_size_t)size);
 			break;
 		}
 	}

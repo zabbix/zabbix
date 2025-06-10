@@ -535,7 +535,10 @@ static void	diag_prepare_default_request(struct zbx_json *j, unsigned int flags)
 		diag_add_section_request(j, ZBX_DIAG_VALUECACHE, "values", "request.values", NULL);
 
 	if (0 != (flags & (1 << ZBX_DIAGINFO_PREPROCESSING)))
-		diag_add_section_request(j, ZBX_DIAG_PREPROCESSING, "peak", "sequences", NULL);
+	{
+		diag_add_section_request(j, ZBX_DIAG_PREPROCESSING, "peak", "sequences", "values_num", "values_sz",
+				NULL);
+	}
 
 	if (0 != (flags & (1 << ZBX_DIAGINFO_LLD)))
 		diag_add_section_request(j, ZBX_DIAG_LLD, "values", NULL);
@@ -745,6 +748,8 @@ static void	diag_log_preprocessing(struct zbx_json_parse *jp, char **out, size_t
 
 	diag_log_top_view(jp, "top.sequences", "$.top.sequences", out, out_alloc, out_offset);
 	diag_log_top_view(jp, "top.peak", "$.top.peak", out, out_alloc, out_offset);
+	diag_log_top_view(jp, "top.values_num", "$.top.values_num", out, out_alloc, out_offset);
+	diag_log_top_view(jp, "top.values_sz", "$.top.values_sz", out, out_alloc, out_offset);
 
 	zbx_strlog_alloc(LOG_LEVEL_INFORMATION, out, out_alloc, out_offset, "==");
 }
