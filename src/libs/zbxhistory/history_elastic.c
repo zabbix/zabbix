@@ -348,8 +348,7 @@ static void	elastic_writer_init(void)
 
 /************************************************************************************
  *                                                                                  *
- * Purpose: releases initialized elastic writer by freeing allocated resources and  *
- *          setting its state to uninitialized.                                     *
+ * Purpose: releases elastic writer handle resources, but not session.              *
  *                                                                                  *
  ************************************************************************************/
 static void	elastic_writer_release(void)
