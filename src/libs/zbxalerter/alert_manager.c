@@ -1327,9 +1327,6 @@ static void	am_sync_watchdog(zbx_am_t *manager, zbx_am_media_t **medias, int med
 			/* make sure that in case of database down we will have valid OAuth bearer */
 			if (mediatype->passwd_expires - ZBX_WATCHDOG_EXPIRE_PERIOD < time(NULL))
 			{
-				zabbix_log(LOG_LEVEL_DEBUG, "In %s(): watchdog oauth expires in %d s - renew", __func__,
-						(int)time(NULL) - mediatype->passwd_expires);
-
 				zbx_free(mediatype->error);
 
 				zbx_audit_prepare(ZBX_AUDIT_ALL_CONTEXT);
@@ -2360,7 +2357,7 @@ static int	am_check_dbstatus(void)
 
 ZBX_THREAD_ENTRY(zbx_alert_manager_thread, args)
 {
-#define ZBX_AM_MEDIATYPE_CLEANUP_FREQUENCY	SEC_PER_HOUR
+#define ZBX_AM_MEDIATYPE_CLEANUP_PERIOD	SEC_PER_HOUR
 	zbx_thread_alert_manager_args	*alert_manager_args_in = (zbx_thread_alert_manager_args *)
 							(((zbx_thread_args_t *)args)->args);
 	zbx_am_t			manager;
@@ -2461,7 +2458,7 @@ ZBX_THREAD_ENTRY(zbx_alert_manager_thread, args)
 				zbx_queue_ptr_push(&manager.free_alerters, alerter);
 		}
 
-		if (time_mediatype + ZBX_AM_MEDIATYPE_CLEANUP_FREQUENCY < now)
+		if (time_mediatype + ZBX_AM_MEDIATYPE_CLEANUP_PERIOD < now)
 		{
 			am_remove_unused_mediatypes(&manager);
 			time_mediatype = now;
@@ -2557,5 +2554,5 @@ ZBX_THREAD_ENTRY(zbx_alert_manager_thread, args)
 
 	while (1)
 		zbx_sleep(SEC_PER_MIN);
-#undef ZBX_AM_MEDIATYPE_CLEANUP_FREQUENCY
+#undef ZBX_AM_MEDIATYPE_CLEANUP_PERIOD
 }
