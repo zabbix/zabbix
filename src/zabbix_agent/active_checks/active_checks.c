@@ -960,6 +960,8 @@ static int	refresh_active_checks(zbx_vector_addr_ptr_t *addrs, const zbx_config_
 	}
 	else
 	{
+		history_upload = ZBX_HISTORY_UPLOAD_DISABLED;
+
 		if (RECV_ERROR == ret)
 		{
 			/* server is unaware if configuration is actually delivered and saves session */
