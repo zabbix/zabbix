@@ -364,7 +364,7 @@ window.item_edit_form = new class {
 	clone() {
 		this.overlay = ZABBIX.PopupManager.open(
 			this.source === 'itemprototype' ? 'item.prototype.edit' : 'item.edit',
-			{clone: 1, ...getFormFields()},
+			{clone: 1, ...getFormFields(this.form_element)},
 			{reuse_existing: false}
 		);
 	}
