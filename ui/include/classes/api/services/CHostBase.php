@@ -1582,9 +1582,10 @@ abstract class CHostBase extends CApiService {
 
 				foreach ($db_hosts[$host[$id_field_name]]['macros'] as &$db_macro) {
 					if (array_key_exists('config', $db_macro)) {
-						foreach ($db_macro['config']['options'] as $i => &$db_option) {
-							$db_option['index'] = $i;
+						foreach ($db_macro['config']['options'] as $i1 => &$db_option) {
+							$db_option['index'] = $i1;
 						}
+						unset($db_option);
 					}
 				}
 				unset($db_macro);
