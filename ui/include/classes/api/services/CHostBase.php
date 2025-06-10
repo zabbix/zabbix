@@ -1579,16 +1579,6 @@ abstract class CHostBase extends CApiService {
 			if ($db_macros) {
 				$del_hostmacroids = array_merge($del_hostmacroids, array_keys($db_macros));
 				$changed = true;
-
-				foreach ($db_hosts[$host[$id_field_name]]['macros'] as &$db_macro) {
-					if (array_key_exists('config', $db_macro)) {
-						foreach ($db_macro['config']['options'] as $i1 => &$db_option) {
-							$db_option['index'] = $i1;
-						}
-						unset($db_option);
-					}
-				}
-				unset($db_macro);
 			}
 
 			if (self::isHostPrototype() && $db_hosts !== null) {
@@ -1638,9 +1628,7 @@ abstract class CHostBase extends CApiService {
 						$db_macros[$macro['hostmacroid']] =
 							$db_hosts[$host[$id_field_name]]['macros'][$macro['hostmacroid']];
 
-						self::prepareMacroConfigOptionsForAuditlog($macro,
-							$db_hosts[$host[$id_field_name]]['macros'][$macro['hostmacroid']]
-						);
+						self::prepareMacroConfigOptionsForAuditlog($macro);
 					}
 				}
 				unset($macro);
@@ -1682,6 +1670,12 @@ abstract class CHostBase extends CApiService {
 
 			if (array_key_exists($macro['hostmacroid'], $db_macros)) {
 				$db_macro = $db_macros[$macro['hostmacroid']];
+
+				foreach ($db_macro['config']['options'] as &$option) {
+					unset($option['index']);
+				}
+				unset($option);
+
 				$db_macro['config']['options'] = $db_macro['config']['options']
 					? json_encode($db_macro['config']['options'])
 					: '';
@@ -1744,7 +1738,7 @@ abstract class CHostBase extends CApiService {
 		);
 	}
 
-	private static function prepareMacroConfigOptionsForAuditlog(array &$macro, ?array &$db_macro = null): void {
+	private static function prepareMacroConfigOptionsForAuditlog(array &$macro): void {
 		if (!array_key_exists('options', $macro['config'])) {
 			return;
 		}
@@ -1753,13 +1747,6 @@ abstract class CHostBase extends CApiService {
 			$option['index'] = $i;
 		}
 		unset($option);
-
-		if ($db_macro !== null) {
-			foreach ($db_macro['config']['options'] as $i => &$db_option) {
-				$db_option['index'] = $i;
-			}
-			unset($db_option);
-		}
 	}
 
 	/**
@@ -2023,6 +2010,11 @@ abstract class CHostBase extends CApiService {
 
 		while ($db_config = DBfetch($resource)) {
 			$db_config['options'] = $db_config['options'] !== '' ? json_decode($db_config['options'], true) : [];
+
+			foreach ($db_config['options'] as $i => &$option) {
+				$option['index'] = $i;
+			}
+			unset($option);
 
 			$db_macros[$db_config['hostmacroid']]['config'] = array_diff_key($db_config, array_flip(['hostmacroid']));
 		}
