@@ -26,12 +26,14 @@ test -z "$CFLAGS"                                                            \
     && CFLAGS="$CFLAGS -Wmisleading-indentation -Wdangling-else"             \
     && CFLAGS="$CFLAGS -Wshadow"                                             \
     && CFLAGS="$CFLAGS -Wmaybe-uninitialized"                                \
+    && CFLAGS="$CFLAGS -Wswitch-default -Wswitch-enum"                       \
     && CFLAGS="$CFLAGS -Wuseless-cast"                                       \
     && CFLAGS="$CFLAGS -Wunused-result"                                      \
+    && CFLAGS="$CFLAGS -Wconversion -Warith-conversion"                      \
     && CFLAGS="$CFLAGS -Wfloat-conversion"                                   \
     && CFLAGS="$CFLAGS -Wincompatible-pointer-types"                         \
     && CFLAGS="$CFLAGS -Wnull-dereference -Wpointer-arith"                   \
-    && CFLAGS="$CFLAGS -Wcast-align -Wcast-function-type"                    \
+    && CFLAGS="$CFLAGS -Wcast-qual -Wcast-align -Wcast-function-type"        \
     && CFLAGS="$CFLAGS -Wwrite-strings"                                      \
     && CFLAGS="$CFLAGS -Woverlength-strings"                                 \
     && CFLAGS="$CFLAGS -Wformat -Wformat-security"                           \
