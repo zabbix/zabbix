@@ -580,9 +580,6 @@ static int	zbx_comms_exchange_data(zbx_socket_t *sock, const char *data, zbx_add
 
 	zabbix_log(LOG_LEVEL_DEBUG, "received: %s", sock->buffer);
 
-	if (NULL != out)
-		*out = zbx_socket_detach_buffer(sock);
-
 	return SUCCEED;
 }
 
@@ -635,12 +632,19 @@ int	zbx_comms_exchange_with_redirect(const char *source_ip, zbx_vector_addr_ptr_
 			{
 				if (0 != retries)
 				{
-					*error = zbx_strdup(NULL, "sequential redirect responses detected");
-					ret = SUCCEED;
-					break;
+					if (NULL != error)
+						*error = zbx_strdup(NULL, "sequential redirect responses detected");
+
+					ret = CONNECT_ERROR;
+					zbx_tcp_close(&sock);
+
+					goto out;
 				}
 				retries++;
 			}
+
+			if (NULL != out)
+				*out = zbx_socket_detach_buffer(&sock);
 
 			if (ZBX_REDIRECT_RESET == conn_ret)
 			{
