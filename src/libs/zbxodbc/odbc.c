@@ -99,14 +99,17 @@ static int	zbx_odbc_diag(SQLSMALLINT h_type, SQLHANDLE h, SQLRETURN rc, char **d
 
 	if (SQL_ERROR == rc || SQL_SUCCESS_WITH_INFO == rc)
 	{
-		SQLCHAR		sql_state[SQL_SQLSTATE_SIZE + 1], err_msg[128];
+		SQLCHAR		sql_state[SQL_SQLSTATE_SIZE + 1], err_msg[512];
 		SQLINTEGER	err_code = 0;
 		SQLSMALLINT	rec_nr = 1;
 
+		memset(err_msg, 0, sizeof(err_msg));
+
 		while (0 != SQL_SUCCEEDED(SQLGetDiagRec(h_type, h, rec_nr++, sql_state, &err_code, err_msg,
-				sizeof(err_msg), NULL)))
+				sizeof(err_msg) - 1, NULL)))
 		{
 			zbx_chrcpy_alloc(&buffer, &alloc, &offset, (NULL == buffer ? ':' : '|'));
+			zbx_replace_invalid_utf8((char *)err_msg);
 			zbx_snprintf_alloc(&buffer, &alloc, &offset, "[%s][%ld][%s]", sql_state, (long)err_code,
 					err_msg);
 		}
