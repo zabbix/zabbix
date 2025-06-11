@@ -402,7 +402,10 @@
 
 		.template-subfilter-item {
 			padding: 0 4px;
+			min-width: 0;
 			height: 22px;
+			overflow: hidden;
+			text-overflow: ellipsis;
 			border: 0;
 			background: transparent;
 			color: $font-alt-color;

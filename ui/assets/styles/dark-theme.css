@@ -6123,7 +6123,10 @@ div.dashboard-widget-web .list-table tr[data-hostgroupid] {
     flex-wrap: wrap; }
     .modal-popup-host-wizard .template-subfilter .template-subfilter-item {
       padding: 0 4px;
+      min-width: 0;
       height: 22px;
+      overflow: hidden;
+      text-overflow: ellipsis;
       border: 0;
       background: transparent;
       color: #737373;
