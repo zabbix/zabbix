@@ -361,6 +361,10 @@ class HostMacrosTabIndicatorItem extends TabIndicatorItem {
 	}
 
 	getValue() {
+		if (document.forms['host-form'] === undefined) {
+			return 0;
+		}
+
 		let macros = [...document.forms['host-form'].querySelectorAll('#tbl_macros .form_row')];
 
 		return macros
@@ -405,6 +409,10 @@ class HostPrototypeMacrosTabIndicatorItem extends TabIndicatorItem {
 	}
 
 	getValue() {
+		if (document.forms['host-prototype-form'] === undefined) {
+			return 0;
+		}
+
 		let macros = [...document.forms['host-prototype-form'].querySelectorAll('#tbl_macros .form_row')];
 
 		return macros
@@ -449,6 +457,10 @@ class TemplateMacrosTabIndicatorItem extends TabIndicatorItem {
 	}
 
 	getValue() {
+		if (document.forms['templates-form'] === undefined) {
+			return 0;
+		}
+
 		let macros = [...document.forms['templates-form'].querySelectorAll('#tbl_macros .form_row')];
 
 		return macros
