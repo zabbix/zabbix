@@ -548,13 +548,11 @@ class CTemplate extends CHostGeneral {
 	}
 
 	private static function addRequiredFieldsByMacroConfigType(array &$config, array $db_config): void {
-		if ($config['type'] != $db_config['type']) {
-			if ($config['type'] == ZBX_WIZARD_FIELD_TEXT) {
-				$config += array_intersect_key($db_config, array_flip(['label']));
-			}
-			if (in_array($config['type'], [ZBX_WIZARD_FIELD_LIST, ZBX_WIZARD_FIELD_CHECKBOX])) {
-				$config += array_intersect_key($db_config, array_flip(['label', 'options']));
-			}
+		if ($config['type'] == ZBX_WIZARD_FIELD_TEXT) {
+			$config += array_intersect_key($db_config, array_flip(['label']));
+		}
+		if (in_array($config['type'], [ZBX_WIZARD_FIELD_LIST, ZBX_WIZARD_FIELD_CHECKBOX])) {
+			$config += array_intersect_key($db_config, array_flip(['label', 'options']));
 		}
 	}
 

@@ -1619,16 +1619,12 @@ abstract class CHostBase extends CApiService {
 
 						if (array_key_exists('config', $macro)) {
 							$macros[] = $macro;
-
-							self::prepareMacroConfigOptionsForAuditlog($macro);
 						}
 					}
 					elseif (array_key_exists('config', $macro)) {
 						$macros[] = $macro;
 						$db_macros[$macro['hostmacroid']] =
 							$db_hosts[$host[$id_field_name]]['macros'][$macro['hostmacroid']];
-
-						self::prepareMacroConfigOptionsForAuditlog($macro);
 					}
 				}
 				unset($macro);
@@ -1670,11 +1666,6 @@ abstract class CHostBase extends CApiService {
 
 			if (array_key_exists($macro['hostmacroid'], $db_macros)) {
 				$db_macro = $db_macros[$macro['hostmacroid']];
-
-				foreach ($db_macro['config']['options'] as &$option) {
-					unset($option['index']);
-				}
-				unset($option);
 
 				$db_macro['config']['options'] = $db_macro['config']['options']
 					? json_encode($db_macro['config']['options'])
@@ -1736,17 +1727,6 @@ abstract class CHostBase extends CApiService {
 		$config += array_intersect_key(DB::getDefaults('hostmacro_config'),
 			array_flip(array_diff($type_fields[$db_config['type']], $type_fields[$config['type']]))
 		);
-	}
-
-	private static function prepareMacroConfigOptionsForAuditlog(array &$macro): void {
-		if (!array_key_exists('options', $macro['config'])) {
-			return;
-		}
-
-		foreach ($macro['config']['options'] as $i => &$option) {
-			$option['index'] = $i;
-		}
-		unset($option);
 	}
 
 	/**
@@ -2010,11 +1990,6 @@ abstract class CHostBase extends CApiService {
 
 		while ($db_config = DBfetch($resource)) {
 			$db_config['options'] = $db_config['options'] !== '' ? json_decode($db_config['options'], true) : [];
-
-			foreach ($db_config['options'] as $i => &$option) {
-				$option['index'] = $i;
-			}
-			unset($option);
 
 			$db_macros[$db_config['hostmacroid']]['config'] = array_diff_key($db_config, array_flip(['hostmacroid']));
 		}
