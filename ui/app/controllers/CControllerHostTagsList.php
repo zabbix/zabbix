@@ -47,7 +47,7 @@ class CControllerHostTagsList extends CController {
 		return $ret;
 	}
 
-	function checkPermissions(): bool {
+	protected function checkPermissions(): bool {
 		if (!$this->hasInput('hostid')) {
 			return true;
 		}
