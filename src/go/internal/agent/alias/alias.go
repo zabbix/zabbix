@@ -33,7 +33,9 @@ type Manager struct {
 func (m *Manager) addAliases(aliases []string) (err error) {
 	for _, data := range aliases {
 		var name, key string
-		if name, key, err = keyparser.ParseAlias(data); err != nil {
+		name, key, err = keyparser.ParseAlias(data)
+
+		if err != nil {
 			return fmt.Errorf("cannot add alias \"%s\": %s", data, err)
 		}
 		for _, existingAlias := range m.aliases {

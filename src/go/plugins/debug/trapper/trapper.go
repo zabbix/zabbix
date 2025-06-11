@@ -69,7 +69,10 @@ func (t *trapListener) run() {
 			}
 			continue
 		}
-		if b, err := ioutil.ReadAll(conn); err == nil {
+
+		b, err := ioutil.ReadAll(conn)
+
+		if err == nil {
 			t.manager.Lock()
 			t.manager.Notify(t, b)
 			t.manager.Flush(t)
@@ -81,7 +84,9 @@ func (t *trapListener) run() {
 
 func (t *trapListener) Initialize() (err error) {
 	t.log.Debugf("start listening on %d", t.port)
-	if t.listener, err = net.Listen("tcp", fmt.Sprintf(":%d", t.port)); err != nil {
+	t.listener, err = net.Listen("tcp", fmt.Sprintf(":%d", t.port))
+
+	if err != nil {
 		return
 	}
 	go t.run()
@@ -111,12 +116,16 @@ func (f *trapFilter) Process(v interface{}) (value *string, err error) {
 
 func (t *trapListener) NewFilter(key string) (filter watch.EventFilter, err error) {
 	var params []string
-	if _, params, err = keyparser.ParseKey(key); err != nil {
+	_, params, err = keyparser.ParseKey(key)
+
+	if err != nil {
 		return
 	}
 	var pattern *regexp.Regexp
+
 	if len(params) > 1 {
-		if pattern, err = regexp.Compile(params[1]); err != nil {
+		pattern, err = regexp.Compile(params[1])
+		if err != nil {
 			return
 		}
 	}
@@ -125,11 +134,15 @@ func (t *trapListener) NewFilter(key string) (filter watch.EventFilter, err erro
 
 func (p *Plugin) EventSourceByKey(key string) (es watch.EventSource, err error) {
 	var params []string
-	if _, params, err = keyparser.ParseKey(key); err != nil {
+	_, params, err = keyparser.ParseKey(key)
+
+	if err != nil {
 		return
 	}
 	var port int
-	if port, err = strconv.Atoi(params[0]); err != nil {
+	port, err = strconv.Atoi(params[0])
+
+	if err != nil {
 		return
 	}
 	var ok bool

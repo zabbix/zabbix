@@ -285,7 +285,8 @@ func (m *Manager) processUpdateRequestRun(update *updateRequest) {
 		var p *pluginAgent
 
 		r.Key = m.aliases.Get(r.Key)
-		if key, params, err = keyparser.ParseKey(r.Key); err == nil {
+		key, params, err = keyparser.ParseKey(r.Key)
+		if err == nil {
 			p, ok = m.plugins[key]
 			if ok && update.clientID != agent.LocalChecksClientID {
 				ok = keyaccess.CheckRules(key, params)

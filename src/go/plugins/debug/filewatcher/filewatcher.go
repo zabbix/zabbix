@@ -136,7 +136,10 @@ func (w *fileWatcher) NewFilter(key string) (filter watch.EventFilter, err error
 
 func (p *Plugin) EventSourceByKey(key string) (es watch.EventSource, err error) {
 	var params []string
-	if _, params, err = keyparser.ParseKey(key); err != nil {
+
+	_, params, err = keyparser.ParseKey(key)
+
+	if err != nil {
 		return
 	}
 	watcher, ok := p.eventSources[params[0]]
