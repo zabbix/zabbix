@@ -62,18 +62,16 @@ Note: Since version 7.2.0, you can also connect to the MSSQL instance using its 
 
 |Name|Description|Default|
 |----|-----------|-------|
-|{$MSSQL.URI}|<p>Connection string.</p>|`<Put your URI here>`|
-|{$MSSQL.USER}|<p>MSSQL username.</p>|`<Put your username here>`|
-|{$MSSQL.PASSWORD}|<p>MSSQL user password.</p>|`<Put your password here>`|
+|{$MSSQL.URI}|<p>Connection string.</p>||
+|{$MSSQL.USER}|<p>MSSQL username.</p>||
+|{$MSSQL.PASSWORD}|<p>MSSQL user password.</p>||
 |{$MSSQL.HOST}|<p>The hostname or IP address of the MSSQL instance.</p>|`localhost`|
 |{$MSSQL.PORT}|<p>MSSQL TCP port.</p>|`1433`|
-|{$MSSQL.DBNAME.MATCHES}|<p>This macro is used in database discovery. It can be overridden on the host or linked template level.</p>|`.*`|
-|{$MSSQL.DBNAME.NOT_MATCHES}|<p>This macro is used in database discovery. It can be overridden on the host or linked template level.</p>|`master\|tempdb\|model\|msdb`|
 |{$MSSQL.WORK_FILES.MAX}|<p>The maximum number of work files created per second - for the trigger expression.</p>|`20`|
 |{$MSSQL.WORK_TABLES.MAX}|<p>The maximum number of work tables created per second - for the trigger expression.</p>|`20`|
 |{$MSSQL.WORKTABLES_FROM_CACHE_RATIO.MIN.CRIT}|<p>The minimum percentage of work tables from the cache ratio - for the High trigger expression.</p>|`90`|
-|{$MSSQL.BUFFER_CACHE_RATIO.MIN.CRIT}|<p>The minimum buffer cache hit ratio, in percent - for the High trigger expression.</p>|`30`|
 |{$MSSQL.BUFFER_CACHE_RATIO.MIN.WARN}|<p>The minimum buffer cache hit ratio, in percent - for the Warning trigger expression.</p>|`50`|
+|{$MSSQL.BUFFER_CACHE_RATIO.MIN.CRIT}|<p>The minimum buffer cache hit ratio, in percent - for the High trigger expression.</p>|`30`|
 |{$MSSQL.FREE_LIST_STALLS.MAX}|<p>The maximum free list stalls per second - for the trigger expression.</p>|`2`|
 |{$MSSQL.LAZY_WRITES.MAX}|<p>The maximum lazy writes per second - for the trigger expression.</p>|`20`|
 |{$MSSQL.PAGE_LIFE_EXPECTANCY.MIN}|<p>The minimum page life expectancy - for the trigger expression.</p>|`300`|
@@ -89,18 +87,20 @@ Note: Since version 7.2.0, you can also connect to the MSSQL instance using its 
 |{$MSSQL.PERCENT_COMPILATIONS.MAX}|<p>The maximum percentage of Transact-SQL compilations - for the trigger expression.</p>|`10`|
 |{$MSSQL.PERCENT_RECOMPILATIONS.MAX}|<p>The maximum percentage of Transact-SQL recompilations - for the trigger expression.</p>|`10`|
 |{$MSSQL.PERCENT_READAHEAD.MAX}|<p>The maximum percentage of pages read per second in anticipation of use - for the trigger expression.</p>|`20`|
-|{$MSSQL.BACKUP_DIFF.CRIT}|<p>The maximum of days without a differential backup - for the High trigger expression.</p>|`6d`|
 |{$MSSQL.BACKUP_DIFF.WARN}|<p>The maximum of days without a differential backup - for the Warning trigger expression.</p>|`3d`|
-|{$MSSQL.BACKUP_FULL.CRIT}|<p>The maximum of days without a full backup - for the High trigger expression.</p>|`10d`|
+|{$MSSQL.BACKUP_DIFF.CRIT}|<p>The maximum of days without a differential backup - for the High trigger expression.</p>|`6d`|
 |{$MSSQL.BACKUP_FULL.WARN}|<p>The maximum of days without a full backup - for the Warning trigger expression.</p>|`9d`|
-|{$MSSQL.BACKUP_LOG.CRIT}|<p>The maximum of days without a log backup - for the High trigger expression.</p>|`8h`|
+|{$MSSQL.BACKUP_FULL.CRIT}|<p>The maximum of days without a full backup - for the High trigger expression.</p>|`10d`|
 |{$MSSQL.BACKUP_LOG.WARN}|<p>The maximum of days without a log backup - for the Warning trigger expression.</p>|`4h`|
-|{$MSSQL.JOB.MATCHES}|<p>This macro is used in job discovery. It can be overridden on the host or linked template level.</p>|`.*`|
-|{$MSSQL.JOB.NOT_MATCHES}|<p>This macro is used in job discovery. It can be overridden on the host or linked template level.</p>|`CHANGE_IF_NEEDED`|
+|{$MSSQL.BACKUP_LOG.CRIT}|<p>The maximum of days without a log backup - for the High trigger expression.</p>|`8h`|
 |{$MSSQL.BACKUP_DURATION.WARN}|<p>The maximum job duration - for the Warning trigger expression.</p>|`1h`|
 |{$MSSQL.BACKUP_FULL.USED}|<p>The flag for checking the age of a full backup. If set to a value other than "1", the trigger expression for the full backup age will not fire. Can be used with context for database name.</p>|`1`|
 |{$MSSQL.BACKUP_LOG.USED}|<p>The flag for checking the age of a log backup. If set to a value other than "1", the trigger expression for the log backup age will not fire. Can be used with context for database name.</p>|`1`|
 |{$MSSQL.BACKUP_DIFF.USED}|<p>The flag for checking the age of a differential backup. If set to a value other than "1", the trigger expression for the differential backup age will not fire. Can be used with context for database name.</p>|`1`|
+|{$MSSQL.DBNAME.MATCHES}|<p>This macro is used in database discovery. It can be overridden on the host or linked template level.</p>|`.*`|
+|{$MSSQL.DBNAME.NOT_MATCHES}|<p>This macro is used in database discovery. It can be overridden on the host or linked template level.</p>|`master\|tempdb\|model\|msdb`|
+|{$MSSQL.JOB.MATCHES}|<p>This macro is used in job discovery. It can be overridden on the host or linked template level.</p>|`.*`|
+|{$MSSQL.JOB.NOT_MATCHES}|<p>This macro is used in job discovery. It can be overridden on the host or linked template level.</p>|`CHANGE_IF_NEEDED`|
 |{$MSSQL.QUORUM.MEMBER.DISCOVERY.NAME.MATCHES}|<p>Filter to include discovered quorum member by name.</p>|`.*`|
 |{$MSSQL.QUORUM.MEMBER.DISCOVERY.NAME.NOT_MATCHES}|<p>Filter to exclude discovered quorum member by name.</p>|`CHANGE_IF_NEEDED`|
 

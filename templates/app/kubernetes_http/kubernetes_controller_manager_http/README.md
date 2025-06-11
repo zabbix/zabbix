@@ -24,7 +24,7 @@ This template has been tested on:
 ## Setup
 
 Internal service metrics are collected from /metrics endpoint.
-Template needs to use Authorization via API token. 
+Template needs to use Authorization via API token.
 
 Don't forget change macros {$KUBE.CONTROLLER.SERVER.URL}, {$KUBE.API.TOKEN}.
 Also, see the Macros section for a list of macros used to set trigger values.
@@ -40,8 +40,8 @@ For example, for clusters created with `kubeadm` it can be set in the following 
 
 |Name|Description|Default|
 |----|-----------|-------|
-|{$KUBE.CONTROLLER.SERVER.URL}|<p>Kubernetes Controller manager metrics endpoint URL.</p>|`https://localhost:10257/metrics`|
 |{$KUBE.API.TOKEN}|<p>API Authorization Token</p>||
+|{$KUBE.CONTROLLER.SERVER.URL}|<p>Kubernetes Controller manager metrics endpoint URL.</p>|`https://localhost:10257/metrics`|
 |{$KUBE.CONTROLLER.HTTP.CLIENT.ERROR}|<p>Maximum number of HTTP client requests failures used for trigger.</p>|`2`|
 
 ### Items

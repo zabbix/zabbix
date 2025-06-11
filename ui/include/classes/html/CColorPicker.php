@@ -83,6 +83,17 @@ class CColorPicker extends CTag {
 		return $this;
 	}
 
+	public function setReadonly(bool $readonly = true): self {
+		if ($readonly) {
+			$this->setAttribute('readonly', '');
+		}
+		else {
+			$this->removeAttribute('readonly');
+		}
+
+		return $this;
+	}
+
 	public function allowEmpty(bool $allow_empty = true): self {
 		if ($allow_empty) {
 			$this->setAttribute('allow-empty', '');

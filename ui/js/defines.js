@@ -32,7 +32,24 @@ const ZBX_STYLE_BTN_ICON = 'btn-icon';
 const ZBX_STYLE_BTN_LINK = 'btn-link';
 const ZBX_STYLE_BTN_SMALL = 'btn-small';
 
+const ZBX_STYLE_OVERLAY_DIALOGUE_HEADER = 'overlay-dialogue-header';
+
+const ZBX_STYLE_GRID_COLUMN_FIRST = 'column-first';
+const ZBX_STYLE_GRID_COLUMN_LAST = 'column-last';
+
 const ZBX_STYLE_FORM_GRID = 'form-grid';
+const ZBX_STYLE_FORM_FIELD = 'form-field';
+const ZBX_STYLE_FORM_FIELDS_HINT = 'form-fields-hint';
+const ZBX_STYLE_FORM_DESCRIPTION = 'form-description';
+
+const ZBX_STYLE_FIELD_LABEL_ASTERISK = 'form-label-asterisk';
+
+const ZBX_STYLE_MARKDOWN = 'markdown';
+const ZBX_STYLE_FORMATED_TEXT = 'formated-text';
+
+const ZBX_STYLE_TEXTAREA_FLEXIBLE = 'textarea-flexible';
+const ZBX_STYLE_TEXTAREA_FLEXIBLE_CONTAINER = 'textarea-flexible-container';
+const ZBX_STYLE_TEXTAREA_FLEXIBLE_PARENT = 'textarea-flexible-parent';
 
 const ZBX_STYLE_COLOR_PICKER = 'color-picker';
 
@@ -45,11 +62,31 @@ const ZBX_STYLE_COLLAPSED = 'collapsed';
 const ZBX_STYLE_DRAG_ICON = 'drag-icon';
 const ZBX_STYLE_PROBLEM_ICON_LINK = 'problem-icon-link';
 const ZBX_STYLE_PROBLEM_ICON_LIST_ITEM = 'problem-icon-list-item';
+const ZBX_STYLE_TOGGLE = 'toggle';
 
 const ZBX_STYLE_LINK_ALT = 'link-alt';
 
 const ZBX_STYLE_LIST_TABLE = 'list-table';
 const ZBX_STYLE_ROW_SELECTED = 'row-selected';
+
+const ZBX_STYLE_NA_BG = 'na-bg';
+const ZBX_STYLE_INFO_BG = 'info-bg';
+const ZBX_STYLE_WARNING_BG = 'warning-bg';
+const ZBX_STYLE_AVERAGE_BG = 'average-bg';
+const ZBX_STYLE_HIGH_BG = 'high-bg';
+const ZBX_STYLE_DISASTER_BG = 'disaster-bg';
+
+const ZBX_STYLE_STATUS_NA_BG = 'status-na-bg';
+const ZBX_STYLE_STATUS_INFO_BG = 'status-info-bg';
+const ZBX_STYLE_STATUS_WARNING_BG = 'status-warning-bg';
+const ZBX_STYLE_STATUS_AVERAGE_BG = 'status-average-bg';
+const ZBX_STYLE_STATUS_HIGH_BG = 'status-high-bg';
+const ZBX_STYLE_STATUS_DISASTER_BG = 'status-disaster-bg';
+
+const ZBX_STYLE_DEFAULT_OPTION = 'default-option';
+
+const ZBX_STYLE_TAG = 'tag';
+const ZBX_STYLE_TAGS_LIST = 'tags-list';
 
 const ZBX_STYLE_CHECKBOX_RADIO = 'checkbox-radio';
 
@@ -101,21 +138,7 @@ const TRIGGER_SEVERITY_AVERAGE = 3;
 const TRIGGER_SEVERITY_HIGH = 4;
 const TRIGGER_SEVERITY_DISASTER = 5;
 
-const ZBX_STYLE_NA_BG = 'na-bg';
-const ZBX_STYLE_INFO_BG = 'info-bg';
-const ZBX_STYLE_WARNING_BG = 'warning-bg';
-const ZBX_STYLE_AVERAGE_BG = 'average-bg';
-const ZBX_STYLE_HIGH_BG = 'high-bg';
-const ZBX_STYLE_DISASTER_BG = 'disaster-bg';
-
-const ZBX_STYLE_STATUS_NA_BG = 'status-na-bg';
-const ZBX_STYLE_STATUS_INFO_BG = 'status-info-bg';
-const ZBX_STYLE_STATUS_WARNING_BG = 'status-warning-bg';
-const ZBX_STYLE_STATUS_AVERAGE_BG = 'status-average-bg';
-const ZBX_STYLE_STATUS_HIGH_BG = 'status-high-bg';
-const ZBX_STYLE_STATUS_DISASTER_BG = 'status-disaster-bg';
-
-const ZBX_STYLE_DEFAULT_OPTION = 'default-option';
+const ZBX_SECRET_MASK = '******';
 
 const PERM_READ = 2;
 
@@ -123,6 +146,18 @@ const TAG_EVAL_TYPE_AND_OR = 0;
 
 const MAINTENANCE_TYPE_NORMAL = 0;
 const MAINTENANCE_TYPE_NODATA = 1;
+
+const ZBX_TEMPLATE_DATA_COLLECTION_ANY = -1;
+const ZBX_TEMPLATE_DATA_COLLECTION_AGENT_BASED = 0;
+const ZBX_TEMPLATE_DATA_COLLECTION_AGENTLESS = 1;
+
+const ZBX_TEMPLATE_AGENT_MODE_ANY = -1;
+const ZBX_TEMPLATE_AGENT_MODE_ACTIVE = 0;
+const ZBX_TEMPLATE_AGENT_MODE_PASSIVE = 1;
+
+const ZBX_TEMPLATE_SHOW_ANY = -1;
+const ZBX_TEMPLATE_SHOW_LINKED = 0;
+const ZBX_TEMPLATE_SHOW_NOT_LINKED = 1;
 
 const SYSMAP_BACKGROUND_SCALE_COVER = 1;
 

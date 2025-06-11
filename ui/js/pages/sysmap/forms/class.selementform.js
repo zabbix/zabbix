@@ -396,14 +396,14 @@ class SelementForm {
 	 * @param {object} selement
 	 */
 	setValues(selement) {
-		// jQuery left here for convenience purposes.
-		for (const field in selement) {
-			$(`[name=${field}]`, this.domNode).val([selement[field]]);
-		}
-
+		// Set default icon state.
 		['iconid_on', 'iconid_disabled', 'iconid_maintenance'].forEach((name) => {
 			$(`[name=${name}]`, this.domNode).val(0);
 		});
+
+		for (const field in selement) {
+			$(`[name=${field}]`, this.domNode).val([selement[field]]);
+		}
 
 		// Clear urls.
 		document.querySelectorAll('#urlContainer tbody tr').forEach((tr) => tr.remove());

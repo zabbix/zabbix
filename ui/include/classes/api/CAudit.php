@@ -86,6 +86,7 @@ class CAudit {
 	public const RESOURCE_HISTORY = 53;
 	public const RESOURCE_MFA = 54;
 	public const RESOURCE_PROXY_GROUP = 55;
+	public const RESOURCE_LLD_RULE_PROTOTYPE = 56;
 
 	/**
 	 * Audit details actions.
@@ -116,6 +117,7 @@ class CAudit {
 		self::RESOURCE_CORRELATION => 'correlation',
 		self::RESOURCE_DASHBOARD => 'dashboard',
 		self::RESOURCE_LLD_RULE => 'items',
+		self::RESOURCE_LLD_RULE_PROTOTYPE => 'items',
 		self::RESOURCE_HOST => 'hosts',
 		self::RESOURCE_HOST_GROUP => 'hstgrp',
 		self::RESOURCE_HOST_PROTOTYPE => 'hosts',
@@ -167,6 +169,7 @@ class CAudit {
 		self::RESOURCE_CORRELATION => 'name',
 		self::RESOURCE_DASHBOARD => 'name',
 		self::RESOURCE_LLD_RULE => 'name',
+		self::RESOURCE_LLD_RULE_PROTOTYPE => 'name',
 		self::RESOURCE_HOST => 'host',
 		self::RESOURCE_HOST_GROUP => 'name',
 		self::RESOURCE_HOST_PROTOTYPE => 'host',
@@ -210,6 +213,7 @@ class CAudit {
 		self::RESOURCE_CORRELATION => 'correlation',
 		self::RESOURCE_DASHBOARD => 'dashboard',
 		self::RESOURCE_LLD_RULE => 'discoveryrule',
+		self::RESOURCE_LLD_RULE_PROTOTYPE => 'discoveryruleprototype',
 		self::RESOURCE_HOST => 'host',
 		self::RESOURCE_HOST_GROUP => 'hostgroup',
 		self::RESOURCE_HOST_PROTOTYPE => 'hostprototype',
@@ -282,6 +286,25 @@ class CAudit {
 				]
 			],
 			['paths' => ['discoveryrule.ssl_key_password'], 'conditions' => ['type' => ITEM_TYPE_HTTPAGENT]]
+		],
+		self::RESOURCE_LLD_RULE_PROTOTYPE => [
+			[
+				'paths' => ['discoveryruleprototype.password'],
+				'conditions' => [
+					[
+						'type' => [ITEM_TYPE_SIMPLE, ITEM_TYPE_DB_MONITOR, ITEM_TYPE_SSH, ITEM_TYPE_TELNET,
+							ITEM_TYPE_JMX
+						]
+					],
+					[
+						'type' => ITEM_TYPE_HTTPAGENT,
+						'authtype' => [ZBX_HTTP_AUTH_BASIC, ZBX_HTTP_AUTH_NTLM, ZBX_HTTP_AUTH_KERBEROS,
+							ZBX_HTTP_AUTH_DIGEST
+						]
+					]
+				]
+			],
+			['paths' => ['discoveryruleprototype.ssl_key_password'], 'conditions' => ['type' => ITEM_TYPE_HTTPAGENT]]
 		],
 		self::RESOURCE_HOST_PROTOTYPE => [
 			'paths' => ['hostprototype.macros.value'],
@@ -416,6 +439,24 @@ class CAudit {
 		'discoveryrule.overrides.operations.optrends' => 'lld_override_optrends',
 		'discoveryrule.parameters' => 'item_parameter',
 		'discoveryrule.preprocessing' => 'item_preproc',
+		'discoveryruleprototype.filter' => 'items',
+		'discoveryruleprototype.filter.conditions' => 'item_condition',
+		'discoveryruleprototype.lld_macro_paths' => 'lld_macro_path',
+		'discoveryruleprototype.overrides' => 'lld_override',
+		'discoveryruleprototype.overrides.filter' => 'lld_override',
+		'discoveryruleprototype.overrides.filter.conditions' => 'lld_override_condition',
+		'discoveryruleprototype.overrides.operations' => 'lld_override_operation',
+		'discoveryruleprototype.overrides.operations.opdiscover' => 'lld_override_opdiscover',
+		'discoveryruleprototype.overrides.operations.ophistory' => 'lld_override_ophistory',
+		'discoveryruleprototype.overrides.operations.opinventory' => 'lld_override_opinventory',
+		'discoveryruleprototype.overrides.operations.opperiod' => 'lld_override_opperiod',
+		'discoveryruleprototype.overrides.operations.opseverity' => 'lld_override_opseverity',
+		'discoveryruleprototype.overrides.operations.opstatus' => 'lld_override_opstatus',
+		'discoveryruleprototype.overrides.operations.optag' => 'lld_override_optag',
+		'discoveryruleprototype.overrides.operations.optemplate' => 'lld_override_optemplate',
+		'discoveryruleprototype.overrides.operations.optrends' => 'lld_override_optrends',
+		'discoveryruleprototype.parameters' => 'item_parameter',
+		'discoveryruleprototype.preprocessing' => 'item_preproc',
 		'hostgroup.hosts' => 'hosts_groups',
 		'hostprototype.groupLinks' => 'group_prototype',
 		'hostprototype.groupPrototypes' => 'group_prototype',
@@ -517,6 +558,17 @@ class CAudit {
 		'discoveryrule.parameters' => 'item_parameterid',
 		'discoveryrule.preprocessing' => 'item_preprocid',
 		'discoveryrule.query_fields' => 'sortorder',
+		'discoveryruleprototype.filter.conditions' => 'item_conditionid',
+		'discoveryruleprototype.headers' => 'sortorder',
+		'discoveryruleprototype.lld_macro_paths' => 'lld_macro_pathid',
+		'discoveryruleprototype.overrides' => 'lld_overrideid',
+		'discoveryruleprototype.overrides.filter.conditions' => 'lld_override_conditionid',
+		'discoveryruleprototype.overrides.operations' => 'lld_override_operationid',
+		'discoveryruleprototype.overrides.operations.optag' => 'lld_override_optagid',
+		'discoveryruleprototype.overrides.operations.optemplate' => 'lld_override_optemplateid',
+		'discoveryruleprototype.parameters' => 'item_parameterid',
+		'discoveryruleprototype.preprocessing' => 'item_preprocid',
+		'discoveryruleprototype.query_fields' => 'sortorder',
 		'hostgroup.hosts' => 'hostgroupid',
 		'hostprototype.groupLinks' => 'group_prototypeid',
 		'hostprototype.groupPrototypes' => 'group_prototypeid',
@@ -556,6 +608,7 @@ class CAudit {
 		'sla.excluded_downtimes' => 'sla_excluded_downtimeid',
 		'template.groups' => 'hostgroupid',
 		'template.macros' => 'hostmacroid',
+		'template.macros.config.options' => 'index',
 		'template.tags' => 'hosttagid',
 		'template.templates' => 'hosttemplateid',
 		'template.templates_clear' => 'hosttemplateid',
