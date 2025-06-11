@@ -1098,8 +1098,7 @@ static void	ha_check_nodes(zbx_ha_info_t *info, zbx_ha_config_t *ha_config)
 	{
 		if (ZBX_NODE_STATUS_ACTIVE == info->ha_status)
 		{
-			if((db_time - node->lastaccess) > info->failover_delay &&
-				node->status != info->ha_status)
+			if (node->status != info->ha_status)
 			{
 				zabbix_log(LOG_LEVEL_WARNING, "HA node split brain detected");
 				ha_status = ZBX_NODE_STATUS_STANDBY;
