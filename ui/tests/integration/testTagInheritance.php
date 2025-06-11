@@ -95,7 +95,7 @@ class testTagInheritance extends CIntegrationTest {
 				'tags' => [
 					[
 						'tag' => self::TAG_TEMPLATE_NAME_PRE . $count,
-						'value' => self::TAG_TEMPLATE_VALUE_PRE . $count,
+						'value' => self::TAG_TEMPLATE_VALUE_PRE . $count
 					]
 				],
 				'templates' => [['templateid' => end(self::$template_ids)]],
@@ -108,7 +108,7 @@ class testTagInheritance extends CIntegrationTest {
 				'tags' => [
 					[
 						'tag' => self::TAG_TEMPLATE_NAME_PRE . $count,
-						'value' => self::TAG_TEMPLATE_VALUE_PRE . $count,
+						'value' => self::TAG_TEMPLATE_VALUE_PRE . $count
 					]
 				],
 				'groups' => [
@@ -167,7 +167,7 @@ class testTagInheritance extends CIntegrationTest {
 	public function prepareData() {
 		$this->createTemplate(false, 0);
 
-		/* Every newly created template refers to the previosly created template. */
+		/* Every newly created template refers to the previously created template. */
 		for ($i = 1; $i < self::NUMBER_OF_TEMPLATES; $i++) {
 			$this->createTemplate(true, $i);
 		}
@@ -181,7 +181,7 @@ class testTagInheritance extends CIntegrationTest {
 			'tags' => [
 				[
 					'tag' => self::TAG_HOST_NAME,
-					'value' => self::TAG_HOST_VALUE,
+					'value' => self::TAG_HOST_VALUE
 				]
 			],
 		]);
@@ -236,7 +236,7 @@ class testTagInheritance extends CIntegrationTest {
 
 		self::$event_response = $this->callUntilDataIsPresent('event.get', [
 			'hostids' => [self::$host_id],
-			'selectTags' => ['tag', 'value'],
+			'selectTags' => ['tag', 'value']
 		], 5, 2);
 
 		$this->assertCount(1, self::$event_response['result']);
@@ -264,7 +264,7 @@ class testTagInheritance extends CIntegrationTest {
 		$this->sendSenderValue(self::HOST_NAME, self::HOST_ITEM_KEY, self::VALUE_TO_FIRE_TRIGGER);
 		self::$event_response = $this->callUntilDataIsPresent('event.get', [
 			'hostids' => [self::$host_id],
-			'selectTags' => ['tag', 'value'],
+			'selectTags' => ['tag', 'value']
 		], 5, 2);
 
 		$this->assertCount(2, self::$event_response['result']);
@@ -272,7 +272,7 @@ class testTagInheritance extends CIntegrationTest {
 		$expected_no_template_tags = [
 			["tag" => "host_item_tag_tag_inheritance", "value" => "host_item_value_tag_inheritance"],
 			["tag" => "host_tag_tag_inheritance", "value" => "host_value_tag_inheritance"],
-			["tag" => "host_trigger_tag_tag_inheritance", "value" => "host_trigger_value_tag_inheritance"],
+			["tag" => "host_trigger_tag_tag_inheritance", "value" => "host_trigger_value_tag_inheritance"]
 		];
 
 		$result_tags = self::$event_response['result'][1]['tags'];
