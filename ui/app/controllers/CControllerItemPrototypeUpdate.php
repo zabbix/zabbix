@@ -152,7 +152,7 @@ class CControllerItemPrototypeUpdate extends CControllerItemPrototype {
 			],
 			'status_codes' => ['db items.status_codes',
 				'use' => [CRangesParser::class, ['usermacros' => true, 'lldmacros' => true, 'with_minus' => true]],
-				'messages' => ['use' => _('Invalid range expression.')],
+				'messages' => ['use' => _('Invalid HTTP status code or range.')],
 				'when' => ['type', 'in' => [ITEM_TYPE_HTTPAGENT]]
 			],
 			'follow_redirects' => ['db items.follow_redirects', 'in' => [HTTPTEST_STEP_FOLLOW_REDIRECTS_OFF, HTTPTEST_STEP_FOLLOW_REDIRECTS_ON], 'when' => ['type', 'in' => [ITEM_TYPE_HTTPAGENT]]],
