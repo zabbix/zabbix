@@ -6126,7 +6126,7 @@ div.dashboard-widget-web .list-table tr[data-hostgroupid] {
   .modal-popup-host-wizard .templates-card-list .template-info-item:not(:first-child) {
     margin-top: 1.5em; }
   .modal-popup-host-wizard .templates-card-list .template-info-toggle-container {
-    align-self: end; }
+    margin-top: auto; }
     .modal-popup-host-wizard .templates-card-list .template-info-toggle-container .btn-link {
       float: right;
       color: #000000; }
