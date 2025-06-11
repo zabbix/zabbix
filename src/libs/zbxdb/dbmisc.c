@@ -1395,3 +1395,16 @@ const char	*zbx_db_sql_id_cmp(zbx_uint64_t id)
 
 	return buf;
 }
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: invalidate idcache                                                *
+ *                                                                            *
+ ******************************************************************************/
+void	zbx_db_free_idcache(void)
+{
+	zbx_mutex_lock(idcache_mutex);
+	memset(idcache, 0, sizeof(zbx_db_idcache_t));
+	zbx_mutex_unlock(idcache_mutex);
+}
+

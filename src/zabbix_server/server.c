@@ -2222,6 +2222,7 @@ static void	server_teardown(zbx_rtc_t *rtc, zbx_socket_t *listen_sock)
 	zbx_vc_destroy();
 	zbx_vmware_destroy();
 	zbx_free_configuration_cache();
+	zbx_db_free_idcache();
 	zbx_free_database_cache(ZBX_SYNC_NONE, &events_cbs, config_history_storage_pipelines);
 	zbx_deinit_remote_commands_cache();
 #ifdef HAVE_PTHREAD_PROCESS_SHARED
