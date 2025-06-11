@@ -102,7 +102,8 @@ class CControllerHostTagsList extends CController {
 		$data = [
 			'hostid' => 0,
 			'show_inherited_tags' => 0,
-			'tags' => []
+			'tags' => [],
+			'has_inline_validation' => true
 		];
 		$this->getInputs($data, ['source', 'hostid', 'show_inherited_tags', 'tags']);
 

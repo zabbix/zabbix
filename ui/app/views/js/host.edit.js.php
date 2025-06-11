@@ -34,6 +34,7 @@ window.host_edit_popup = {
 		this.initial_proxy_groupid = proxy_groupid;
 		this.all_templateids = null;
 		this.show_inherited_tags = false;
+		this.tags_table = document.getElementById('tagsFormList').querySelector('[data-field-name="tags"]');
 		this.show_inherited_macros = false;
 
 		const return_url = new URL('zabbix.php', location.href);
@@ -276,7 +277,7 @@ window.host_edit_popup = {
 			this.show_inherited_tags = e.target.value == 1;
 			this.all_templateids = this.getAllTemplates();
 
-			this.updateTagsList(this.form.querySelector('.tags-table'));
+			this.updateTagsList();
 		});
 
 		const observer = new IntersectionObserver(entries => {
@@ -286,7 +287,7 @@ window.host_edit_popup = {
 				if (this.all_templateids === null || this.all_templateids.xor(templateids).length > 0) {
 					this.all_templateids = templateids;
 
-					this.updateTagsList(this.form.querySelector('.tags-table'));
+					this.updateTagsList();
 				}
 			}
 		});
@@ -294,8 +295,8 @@ window.host_edit_popup = {
 		observer.observe(document.getElementById('host-tags-tab'));
 	},
 
-	updateTagsList(table) {
-		const fields = getFormFields(this.form);
+	updateTagsList() {
+		const fields = getFormFields(this.form_element);
 
 		fields.tags = Object.values(fields.tags).reduce((tags, tag) => {
 			if (!('type' in tag) || (tag.type & <?= ZBX_PROPERTY_OWN ?>)) {
@@ -325,40 +326,16 @@ window.host_edit_popup = {
 		})
 			.then(response => response.json())
 			.then(response => {
-				const div = document.createElement('div');
-
-				div.innerHTML = response.body;
-
-				const new_table = div.firstChild;
-
-				table.replaceWith(new_table);
-				this.initTagsTableEvents(new_table);
+				this.tags_table.innerHTML = response.body;
+			})
+			.catch((message) => {
+				this.form.addGeneralErrors({[t('Unexpected server error.')]: message});
+				this.form.renderErrors();
+				throw message;
 			})
 			.finally(() => {
 				this.overlay.unsetLoading();
 			});
-	},
-
-	initTagsTableEvents(table) {
-		const $table = jQuery(table);
-
-		$table
-			.dynamicRows({template: '#tag-row-tmpl', allow_empty: true})
-			.on('afteradd.dynamicRows', () => {
-				$('.<?= ZBX_STYLE_TEXTAREA_FLEXIBLE ?>', $table).textareaFlexible();
-			})
-			.find('.<?= ZBX_STYLE_TEXTAREA_FLEXIBLE ?>')
-			.textareaFlexible();
-
-		table.addEventListener('click', e => {
-			const target = e.target;
-
-			if (target.matches('.element-table-disable')) {
-				const type_input = target.closest('.form_row').querySelector('input[name$="[type]"]');
-
-				type_input.value &= ~<?= ZBX_PROPERTY_OWN ?>;
-			}
-		});
 	},
 
 	/**
