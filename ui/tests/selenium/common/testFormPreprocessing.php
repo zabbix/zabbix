@@ -1324,7 +1324,7 @@ abstract class testFormPreprocessing extends CWebTest {
 						'Key' => 'javascript-with-linefeed[{#KEY}]'
 					],
 					'preprocessing' => [
-						['type' => 'JavaScript', 'parameter_1' => '   \n   \n   ']
+						['type' => 'JavaScript', 'parameter_1' => "   \n   \n   "]
 					],
 					'error' => 'Invalid parameter "/1/preprocessing/1/params/1": cannot be empty.'
 				]
