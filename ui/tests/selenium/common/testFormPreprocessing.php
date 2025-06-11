@@ -1324,7 +1324,7 @@ abstract class testFormPreprocessing extends CWebTest {
 						'Key' => 'javascript-with-linefeed[{#KEY}]'
 					],
 					'preprocessing' => [
-						['type' => 'JavaScript', 'parameter_1' => PHP_EOL.PHP_EOL]
+						['type' => 'JavaScript', 'parameter_1' => '   \n   \n   ']
 					],
 					'error' => 'Invalid parameter "/1/preprocessing/1/params/1": cannot be empty.'
 				]
@@ -1629,20 +1629,6 @@ abstract class testFormPreprocessing extends CWebTest {
 					],
 					'error' => 'Invalid parameter "/1/preprocessing/2": only one object can exist within '.
 							'the combinations of (type)=((9, 10)).'
-				]
-			],
-			// Custom scripts - JavaScript.
-			[
-				[
-					'expected' => TEST_BAD,
-					'fields' => [
-						'Name' => 'Custom scripts - Script with whitespaces and linefeed',
-						'Key' => 'custom-scripts-script-with-whitespaces-and-linefeed[{#KEY}]'
-					],
-					'preprocessing' => [
-						['type' => 'JavaScript', 'parameter_1' => '    '.PHP_EOL.PHP_EOL.'   ']
-					],
-					'error' => 'Invalid parameter "/1/preprocessing/1/params/1": cannot be empty.'
 				]
 			],
 			// Validation - In range.
@@ -3003,6 +2989,61 @@ abstract class testFormPreprocessing extends CWebTest {
 					],
 					'preprocessing' => [
 						['type' => 'Prometheus to JSON', 'parameter_1' => '  metric  ']
+					]
+				]
+			],
+			[
+				[
+					'fields' => [
+						'Name' => 'XML XPath trailing spaces',
+						'Key' => 'xml-xpath-space-in-parameter[{#KEY}]'
+					],
+					'preprocessing' => [
+						['type' => 'XML XPath', 'parameter_1' => '   number(/values/Item)    ']
+					]
+				]
+			],
+			[
+				[
+					'fields' => [
+						'Name' => 'JSONPath trailing spaces',
+						'Key' => 'json-path-space-in-parameter[{#KEY}]'
+					],
+					'preprocessing' => [
+						['type' => 'JSONPath', 'parameter_1' => '    $.data.key    ']
+					]
+				]
+			],
+			[
+				[
+					'fields' => [
+						'Name' => 'Javascript trailing spaces',
+						'Key' => 'javascript-space-in-parameter[{#KEY}]'
+					],
+					'preprocessing' => [
+						['type' => 'JavaScript', 'parameter_1' => "  Test line 1 \n  Test line 2 \n  Test line  3  \n \n "]
+					]
+				]
+			],
+			[
+				[
+					'fields' => [
+						'Name' => 'Check for error in JSON trailing spaces',
+						'Key' => 'check-for-error-in-json-space-in-parameter[{#KEY}]'
+					],
+					'preprocessing' => [
+						['type' => 'Check for error in JSON', 'parameter_1' => '   $.error     ']
+					]
+				]
+			],
+			[
+				[
+					'fields' => [
+						'Name' => 'Check for error in XML trailing spaces',
+						'Key' => 'check-for-error-in-xml-space-in-parameter[{#KEY}]'
+					],
+					'preprocessing' => [
+						['type' => 'Check for error in XML', 'parameter_1' => '   /tmp/path/   ']
 					]
 				]
 			]
