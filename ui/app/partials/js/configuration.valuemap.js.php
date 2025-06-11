@@ -34,8 +34,7 @@
 		PopUp('popup.valuemap.edit', {valuemap_names}, {dialogue_class: 'modal-popup-generic'});
 	}
 })();
-</script>
-<script type="text/javascript">
+
 var valuemap_number = 0;
 
 var AddValueMap = class {
@@ -63,11 +62,7 @@ var AddValueMap = class {
 	render(edit) {
 		if (edit instanceof Element) {
 			edit.replaceWith(this.row);
-
-			const name = this.escapeSpecialChars(this.data.name);
-			const selector = `input[value="${name}"] ~ a`;
-			const element = this.row.querySelector(selector);
-			element.focus();
+			this.row.querySelector(`#valuemaps_${valuemap_number}_href`).focus();
 		}
 		else {
 			document.querySelector(`#${'<?= $data['table_id'] ?>'} tbody`).append(this.row);
@@ -80,6 +75,7 @@ var AddValueMap = class {
 		link.textContent = this.data.name;
 		link.classList.add('wordbreak');
 		link.href = 'javascript:void(0);';
+		link.id = `valuemaps_${valuemap_number}_href`;
 		link.addEventListener('click', (e) => {
 			const valuemap_names = [];
 			const valuemap_table = e.target.closest('table');
