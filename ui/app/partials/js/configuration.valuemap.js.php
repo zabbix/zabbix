@@ -180,16 +180,6 @@ var AddValueMap = class {
 
 		return input;
 	}
-
-	escapeSpecialChars(value) {
-		const escape_chars = {
-			"'": "\\'",
-			'"': '\\"',
-			'\\': '\\\\'
-		};
-
-		return value.replace(/['"\\]/g, match => escape_chars[match]);
-	}
 }
 
 // Initialize value maps from data array.
