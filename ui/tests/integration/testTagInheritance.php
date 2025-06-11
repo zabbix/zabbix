@@ -183,7 +183,7 @@ class testTagInheritance extends CIntegrationTest {
 					'tag' => self::TAG_HOST_NAME,
 					'value' => self::TAG_HOST_VALUE
 				]
-			],
+			]
 		]);
 
 		$this->assertArrayHasKey('hostids', $response['result']);

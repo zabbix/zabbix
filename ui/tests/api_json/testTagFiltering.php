@@ -47,7 +47,7 @@ class testTagFiltering extends CAPITest {
 					],
 					'tags' => [
 						['tag' => 'Browser', 'value' => 'FF'],
-						['tag' => 'Webbrowser', 'value' => 'Mozilla'],
+						['tag' => 'Webbrowser', 'value' => 'Mozilla']
 					]
 				],
 				[
