@@ -614,6 +614,8 @@ static void	elastic_destroy(zbx_history_iface_t *hist)
 	if (0 != writer.initialized)
 		curl_multi_cleanup(writer.handle);
 
+	writer.initialized = 0;
+
 	zbx_free(data->base_url);
 	zbx_free(data);
 }
