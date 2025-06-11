@@ -18,8 +18,6 @@ require 'include/forms.inc.php';
 
 class CControllerHostTagsList extends CController {
 
-	private ?array $host;
-
 	protected function init(): void {
 		$this->disableCsrfValidation();
 		$this->setPostContentType(static::POST_CONTENT_TYPE_JSON);
@@ -49,53 +47,25 @@ class CControllerHostTagsList extends CController {
 		return $ret;
 	}
 
-	protected function checkPermissions(): bool {
-		if ($this->getInput('hostid', 0) == 0) {
+	function checkPermissions(): bool {
+		if (!$this->hasInput('hostid')) {
 			return true;
 		}
 
-		switch ($this->getInput('source')) {
-			case 'host':
-				$api = API::Host();
-				$options = [
-					'output' => ['hostid'],
-					'selectParentTemplates' => ['templateid'],
-					'hostids' => [$this->getInput('hostid')]
-				];
-				break;
-
-			case 'host_prototype':
-				$api = API::HostPrototype();
-				$options = [
-					'output' => ['hostid'],
-					'selectTemplates' => ['templateid'],
-					'hostids' => [$this->getInput('hostid')]
-				];
-				break;
-
-			case 'template':
-				$api = API::Template();
-				$options = [
-					'output' => ['templateid'],
-					'selectParentTemplates' => ['templateid'],
-					'templateids' => [$this->getInput('hostid')]
-				];
-				break;
-		}
-
-		if ($this->getInput('show_inherited_tags', 0)) {
-			$options['selectInheritedTags'] = ['tag', 'value', 'objectid'];
-		}
-
-		$db_hosts = $api->get($options);
-
-		if (!$db_hosts) {
-			return false;
-		}
-
-		$this->host = $db_hosts[0];
-
-		return true;
+		return (bool) match ($this->getInput('source')) {
+			'host' => API::Host()->get([
+				'output' => [],
+				'hostids' => [$this->getInput('hostid')]
+			]),
+			'host_prototype' => API::HostPrototype()->get([
+				'output' => [],
+				'hostids' => [$this->getInput('hostid')]
+			]),
+			'template' => API::Template()->get([
+				'output' => [],
+				'templateids' => [$this->getInput('hostid')]
+			])
+		};
 	}
 
 	protected function doAction(): void {
@@ -115,9 +85,14 @@ class CControllerHostTagsList extends CController {
 			$templateids = $this->getInput('templateids', []);
 
 			if ($data['hostid'] != 0) {
+				$host = match ($data['source']) {
+					'host' => self::getHostData($data['hostid']),
+					'host_prototype' => self::getHostPrototypeData($data['hostid']),
+					'template' => self::getTemplateData($data['hostid'])
+				};
 				$linked_templateids = $data['source'] === 'host_prototype'
-					? array_column($this->host['templates'], 'templateid')
-					: array_column($this->host['parentTemplates'], 'templateid');
+					? array_column($host['templates'], 'templateid')
+					: array_column($host['parentTemplates'], 'templateid');
 
 				$link_templateids = array_diff($templateids, $linked_templateids);
 				$unlink_templateids = array_diff($linked_templateids, $templateids);
@@ -127,7 +102,7 @@ class CControllerHostTagsList extends CController {
 
 				$inherited_tags = [];
 
-				foreach ($this->host['inheritedTags'] as $tag) {
+				foreach ($host['inheritedTags'] as $tag) {
 					if (!array_key_exists($tag['objectid'], $unlink_templateids)) {
 						$inherited_tags[] = $tag;
 					}
@@ -145,6 +120,51 @@ class CControllerHostTagsList extends CController {
 		$data['user'] = ['debug_mode' => $this->getDebugMode()];
 
 		$this->setResponse(new CControllerResponseData($data));
+	}
+
+	private static function getHostData(string $hostid): array {
+		$db_hosts = API::Host()->get([
+			'output' => [],
+			'selectParentTemplates' => ['templateid'],
+			'selectInheritedTags' => ['tag', 'value', 'objectid'],
+			'hostids' => [$hostid]
+		]);
+
+		if (!$db_hosts) {
+			throw new CAccessDeniedException();
+		}
+
+		return $db_hosts[0];
+	}
+
+	private static function getHostPrototypeData(string $hostid): array {
+		$db_hostprototypes = API::HostPrototype()->get([
+			'output' => [],
+			'selectTemplates' => ['templateid'],
+			'selectInheritedTags' => ['tag', 'value', 'objectid'],
+			'hostids' => [$hostid]
+		]);
+
+		if (!$db_hostprototypes) {
+			throw new CAccessDeniedException();
+		}
+
+		return $db_hostprototypes[0];
+	}
+
+	private static function getTemplateData(string $templateid): array {
+		$db_templates = API::Template()->get([
+			'output' => [],
+			'selectParentTemplates' => ['templateid'],
+			'selectInheritedTags' => ['tag', 'value', 'objectid'],
+			'templateids' => [$templateid]
+		]);
+
+		if (!$db_templates) {
+			throw new CAccessDeniedException();
+		}
+
+		return $db_templates[0];
 	}
 
 	private static function getAllTemplateTags(array $templateids): array {
