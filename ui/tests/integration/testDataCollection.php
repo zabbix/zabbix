@@ -296,7 +296,7 @@ class testDataCollection extends CIntegrationTest {
 				'UnreachablePeriod' => 5,
 				'UnavailableDelay' => 5,
 				'UnreachableDelay' => 1,
-				'DebugLevel' => 4,
+				'DebugLevel' => 5,
 				'Hostname' => 'proxy',
 				'Server' => '127.0.0.1:'.self::getConfigurationValue(self::COMPONENT_SERVER, 'ListenPort'),
 				'ProxyBufferMode' => 'memory',
@@ -565,7 +565,7 @@ class testDataCollection extends CIntegrationTest {
 		$this->reloadConfigurationCache(self::COMPONENT_SERVER);
 		self::stopComponent(self::COMPONENT_SERVER);
 
-		for ($i = 0; $i < 10; $i++) {
+		for ($i = 0; $i < 25; $i++) {
 			$this->sendSenderValue('proxy_host', 'trap', $many_a, self::COMPONENT_PROXY);
 		}
 
