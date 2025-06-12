@@ -1135,6 +1135,8 @@ static char	*am_substitute_mediatype_params(const char *mediatype_params, const 
 			zbx_substitute_macros(&value, NULL, 0, &mediatype_params_macro_resolv, subject, message);
 
 			zbx_json_addstring(&json, NULL, value, ZBX_JSON_TYPE_STRING);
+
+			zbx_free(value);
 		}
 
 		zbx_free(buf);
