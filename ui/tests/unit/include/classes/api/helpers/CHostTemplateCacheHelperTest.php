@@ -14,9 +14,6 @@
 **/
 
 
-namespace helpers;
-
-use CHostTemplateCacheHelper;
 use PHPUnit\Framework\TestCase;
 
 class CHostTemplateCacheHelperTest extends TestCase {
