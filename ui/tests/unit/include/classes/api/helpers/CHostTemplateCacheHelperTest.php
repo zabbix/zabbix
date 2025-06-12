@@ -18,7 +18,7 @@ use PHPUnit\Framework\TestCase;
 
 class CHostTemplateCacheHelperTest extends TestCase {
 
-	public function dataProviderCreateLinks(): array {
+	public static function dataProviderCreateLinks(): array {
 		return [
 			[
 				[],
@@ -179,7 +179,7 @@ class CHostTemplateCacheHelperTest extends TestCase {
 		];
 	}
 
-	public function dataProviderDeleteLinks(): array {
+	public static function dataProviderDeleteLinks(): array {
 		return [
 			[
 				[],
