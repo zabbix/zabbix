@@ -764,7 +764,7 @@ INSERT INTO ha_node (name,address,port,status,ha_nodeid) VALUES ('z-node','192.1
 INSERT INTO ha_node (name,address,port,status,ha_nodeid) VALUES ('node-active','192.168.1.13','10051','3','ckuo7i1nw000h0sajj3l3hh8u');
 
 -- binary value type
-INSERT INTO hosts (hostid, host, name, status, flags, description,readme) VALUES (99015, 'Host for binary item', 'Host for binary item', 0, 0, '','');
+INSERT INTO hosts (hostid, host, name, status, flags, description, readme) VALUES (99015, 'Host for binary item', 'Host for binary item', 0, 0, '','');
 INSERT INTO hstgrp (groupid, type, uuid, name) VALUES (50029, 0, '4d58962e533a4dbf9bfd1cb247f5b698', 'Host group for binary item');
 INSERT INTO hosts_groups (hostgroupid, hostid, groupid) VALUES (50025, 99015, 50029);
 INSERT INTO items (itemid, hostid, interfaceid, type, value_type, name, key_, delay, history, status, params,query_fields, description, posts, headers) VALUES (158738, 99015, 50022, 0, 0, 'master.for.binary', 'master.for.binary', '1d', '90d', 0, '','', '', '', '');
