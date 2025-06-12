@@ -16,7 +16,11 @@
 
 class CItemKeyValidator extends CValidator {
 
+	public const ERROR_CODE_PARSE = 1;
+	public const ERROR_CODE_LLD_MACRO = 2;
+
 	protected bool $lldmacros = false;
+	protected ?int $error_code = null;
 
 	public function __construct(array $options = []) {
 		if (array_key_exists('lldmacros', $options)) {
@@ -29,6 +33,7 @@ class CItemKeyValidator extends CValidator {
 		$result = $itemkey_parser->parse($value);
 
 		if ($result != CParser::PARSE_SUCCESS) {
+			$this->error_code = self::ERROR_CODE_PARSE;
 			$this->setError($itemkey_parser->getError());
 
 			return false;
@@ -39,12 +44,17 @@ class CItemKeyValidator extends CValidator {
 			['lldmacros' => $result] = CMacrosResolverGeneral::extractMacros($parameters, ['lldmacros' => true]);
 
 			if (!$result) {
-				$this->setError(_('This field must contain at least one low-level discovery macro.'));
+				$this->error_code = self::ERROR_CODE_LLD_MACRO;
+				$this->setError(_('must contain at least one low-level discovery macro'));
 
 				return false;
 			}
 		}
 
 		return true;
+	}
+
+	public function getErrorCode(): ?int {
+		return $this->error_code;
 	}
 }

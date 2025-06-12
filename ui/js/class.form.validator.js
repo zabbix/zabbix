@@ -577,6 +577,11 @@ class CFormValidator {
 						const curl = new Curl('zabbix.php');
 						curl.setArgument('action', 'validate');
 
+						let result_codes;
+						if (check.rules.messages?.use && check.rules.messages.use instanceof Object) {
+							result_codes = Object.keys(check.rules.messages.use);
+						}
+
 						return fetch(curl.getUrl(), {
 							method: 'POST',
 							headers: {
@@ -585,6 +590,7 @@ class CFormValidator {
 							credentials: 'same-origin',
 							body: JSON.stringify({
 								use: check.rules.use,
+								result_codes,
 								value: check.value,
 								jsonrpc: '2.0',
 								id: ++id
@@ -593,7 +599,15 @@ class CFormValidator {
 							.then((response) => response.json())
 							.then((response) => {
 								if ('result' in response && response.result !== '') {
-									check.error_msg = this.#getMessage(check.rules, 'use', response.result);
+									if (is_number(response.result)) {
+										check.error_msg = check.rules.messages.use[response.result];
+									}
+									else if (result_codes) {
+										check.error_msg = response.result;
+									}
+									else {
+										check.error_msg = this.#getMessage(check.rules, 'use', response.result);
+									}
 								}
 
 								resolve();

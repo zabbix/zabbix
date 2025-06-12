@@ -58,6 +58,10 @@ abstract class CValidator {
 		return $this->error;
 	}
 
+	public function getErrorCode(): ?int {
+		return null;
+	}
+
 	/**
 	 * Add validation error.
 	 *

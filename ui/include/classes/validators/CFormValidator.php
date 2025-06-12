@@ -615,13 +615,23 @@ class CFormValidator {
 	 * @param array   $rules['messages']    (optional) Array where check name is used as key and value as error message.
 	 * @param string  $check_name           Custom check error message to find in $rules['messages'] array.
 	 * @param string  $default              Default error message.
+	 * @param ?int    $error_code           Message key for multiple validator outputs.
 	 *
 	 * @return string
 	 */
-	private static function getMessage(array $rules, string $check_name, string $default): string {
-		return array_key_exists('messages', $rules) && array_key_exists($check_name, $rules['messages'])
-			? $rules['messages'][$check_name]
-			: $default;
+	private static function getMessage(array $rules, string $check_name, string $default,
+			?int $error_code = null): string {
+		if (array_key_exists('messages', $rules) && array_key_exists($check_name, $rules['messages'])) {
+			if (is_string($rules['messages'][$check_name])) {
+				return $rules['messages'][$check_name];
+			}
+
+			if (array_key_exists($error_code, $rules['messages'][$check_name])) {
+				return $rules['messages'][$check_name][$error_code];
+			}
+		}
+
+		return $default;
 	}
 
 	/**
@@ -689,8 +699,8 @@ class CFormValidator {
 						return;
 					}
 
-					if (!self::validateUse($rules, $data[$field], $error)) {
-						$error = self::getMessage($rules, 'use', $error);
+					if (!self::validateUse($rules, $data[$field], $error, $error_code)) {
+						$error = self::getMessage($rules, 'use', $error, $error_code);
 
 						$this->addError(self::ERROR, $path, $error, self::ERROR_LEVEL_DELAYED);
 
@@ -967,7 +977,8 @@ class CFormValidator {
 		return true;
 	}
 
-	public static function validateUse(array $rules, string $value, &$error): bool {
+	public static function validateUse(array $rules, string $value, &$error, &$error_code): bool {
+		$error_code = null;
 		if (!array_key_exists('use', $rules)) {
 			return true;
 		}
@@ -1007,6 +1018,7 @@ class CFormValidator {
 		elseif ($instance instanceof CValidator) {
 			if ($instance->validate($value) === false) {
 				$error = $instance->getError() ?? _('Invalid string.');
+				$error_code = $instance->getErrorCode();
 			}
 		}
 		else {
