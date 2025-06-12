@@ -5007,6 +5007,10 @@ msgstr "커뮤니케이션"
 msgid "Communication between Zabbix agent and server/proxy is secured with a unique user-defined pre-shared key identity and a secret pre-shared key linked to it."
 msgstr ""
 
+#: app/views/host.wizard.edit.php:414
+msgid "Communication between Zabbix agent and server/proxy is secured with the pre-shared key (PSK) encryption method."
+msgstr ""
+
 #: include/items.inc.php:946
 msgctxt "SNMP Community"
 msgid "Community"
@@ -6036,6 +6040,10 @@ msgstr "커스텀 심각도의 이름은 모두 언어에 영향을 받기 때�
 msgid "Custom size"
 msgstr "사용자 정의 사이즈"
 
+#: app/views/host.wizard.edit.php:138
+msgid "Custom templates are not supported."
+msgstr ""
+
 #: app/views/administration.miscconfig.edit.php:103
 #: include/classes/setup/CSetupWizard.php:561
 msgid "CyberArk Vault"
@@ -6202,6 +6210,10 @@ msgstr "데이터 수집"
 #, c-format
 msgid "Data from %1$s. Generated in %2$s sec."
 msgstr "Data from %1$s. Generated in %2$s sec."
+
+#: app/views/host.wizard.edit.php:168
+msgid "Data is collected by Zabbix agent, a lightweight software `component installed on your monitoring target."
+msgstr ""
 
 #: app/views/js/host.wizard.edit.js.php:89
 msgid "Data is collected by Zabbix agent, a lightweight software component installed on your monitoring target."
@@ -11891,6 +11903,10 @@ msgstr ""
 
 #: app/views/host.wizard.edit.php:512 app/views/host.wizard.edit.php:535
 msgid "Install Zabbix agent 2 and its plugins on your monitoring target by following the installation instructions below."
+msgstr ""
+
+#: app/views/host.wizard.edit.php:551 app/views/host.wizard.edit.php:574
+msgid "Install Zabbix agent and its plugins on your monitoring target by following the installation instructions below."
 msgstr ""
 
 #: setup.php:163
@@ -19412,6 +19428,10 @@ msgstr "보안 레벨"
 msgid "Security name"
 msgstr "보안 이름"
 
+#: app/views/host.wizard.edit.php:132
+msgid "See"
+msgstr ""
+
 #: app/views/popup.condition.edit.php:402 app/views/popup.generic.php:874
 #: app/views/popup.massupdate.item.php:440 app/views/popup.services.php:92
 #: app/views/popup.triggerexpr.php:88 include/classes/html/CMultiSelect.php:70
@@ -20309,6 +20329,11 @@ msgstr "이 항목의 내역 중 일부가 압축되어 있을 수 있으므로 
 msgid "Some templates (%1$s) are hidden. Custom templates are not supported."
 msgstr ""
 
+#: app/views/host.wizard.edit.php:130
+#, c-format
+msgid "Some templates (%1$s) are incompatible with the Host Wizard."
+msgstr ""
+
 #: widgets/actionlog/includes/WidgetForm.php:79
 #: widgets/problems/includes/WidgetForm.php:145
 msgid "Sort entries by"
@@ -20363,6 +20388,10 @@ msgstr "그래프를 보려면 호스트를 지정하십시오."
 #: app/views/popup.generic.php:180 include/views/monitoring.history.php:293
 msgid "Specify some filter condition to see the values."
 msgstr "값을 표시하기 위해 몇가지 필터조건을 지정해 주십시오."
+
+#: app/views/host.wizard.edit.php:365
+msgid "Specifying new or existing host groups will add the host to these groups without removing it from any current groups."
+msgstr ""
 
 #: httpdetails.php:107 include/classes/screens/CScreenHttpTestDetails.php:82
 msgid "Speed"
@@ -21610,6 +21639,10 @@ msgstr ""
 msgid "This check cannot be removed, as it is used as a condition in %1$s discovery action."
 msgid_plural "This check cannot be removed, as it is used as a condition in %1$s discovery actions."
 msgstr[0] ""
+
+#: app/views/host.wizard.edit.php:384
+msgid "This configuration will overwrite all existing encryption settings on the host."
+msgstr ""
 
 #: include/func.inc.php:2566
 msgid "This day last week"
@@ -26270,6 +26303,10 @@ msgstr "동일한 UUID를 가진 호스트 프로토타입이 이미 존재함"
 msgid "host trigger ID is expected"
 msgstr ""
 
+#: app/views/host.wizard.edit.php:134
+msgid "how to update them"
+msgstr ""
+
 #: include/classes/api/services/CMap.php:844
 #: include/classes/api/services/CMap.php:1311
 msgid "icon"
@@ -26633,6 +26670,10 @@ msgstr "m/d"
 #: include/translateDefines.inc.php:33
 msgid "m-d h:i A"
 msgstr "m/d H:i"
+
+#: app/views/host.wizard.edit.php:589
+msgid "macOS"
+msgstr ""
 
 #: include/classes/parsers/CUserMacroParser.php:37
 msgid "macro is empty"
