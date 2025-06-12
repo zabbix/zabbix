@@ -294,10 +294,40 @@ class CSystemInfoHelper {
 
 		CArrayHelper::sort($check_data['versions'], [['field' => 'version', 'order' => ZBX_SORT_DOWN]]);
 
-		$latest_release = null;
 		$is_lts_version = explode('.', ZABBIX_EXPORT_VERSION)[1] === '0';
 
-		foreach ($check_data['versions'] as $version) {
+		if ($is_lts_version) {
+			self::getLtsSupportAndReleaseData($check_data['versions'], $data);
+		}
+		else {
+			self::getSupportAndReleaseData($check_data['versions'], $data);
+		}
+
+
+		return $data;
+	}
+
+	private static function getLtsSupportAndReleaseData(array $versions, array &$data): void {
+		foreach ($versions as $version) {
+			if (version_compare($version['version'], CSettingsHelper::convertToMajorVersion(ZABBIX_VERSION), '<')) {
+				break;
+			}
+
+			if ($version['version'] === ZABBIX_EXPORT_VERSION) {
+				if (!$version['end_of_full_support']) {
+					$data['end_of_full_support'] = $version['end_of_full_support'];
+					$data['latest_release'] = $version['latest_release']['release'];
+				}
+
+				break;
+			}
+		}
+	}
+
+	private static function getSupportAndReleaseData(array $versions, array &$data): void {
+		$latest_release = null;
+
+		foreach ($versions as $version) {
 			if (version_compare($version['version'], ZABBIX_EXPORT_VERSION, '<')) {
 				break;
 			}
@@ -315,13 +345,10 @@ class CSystemInfoHelper {
 				break;
 			}
 
-			if ($latest_release === null && !$version['end_of_full_support']) {
-				if (!$is_lts_version || explode('.', $version['version'])[1] === '0') {
-					$latest_release = $version['latest_release']['release'];
-				}
+			if ($latest_release === null && !$version['end_of_full_support']
+					&& explode('.', $version['version'])[1] === '0') {
+				$latest_release = $version['latest_release']['release'];
 			}
 		}
-
-		return $data;
 	}
 }

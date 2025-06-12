@@ -109,7 +109,7 @@ class CControllerSoftwareVersionCheckUpdate extends CController {
 		$lastcheck = time();
 		$versions = $this->versions;
 
-		if (in_array(ZABBIX_EXPORT_VERSION, array_column($versions, 'version'))) {
+		if (in_array(CSettingsHelper::convertToMajorVersion(ZABBIX_VERSION), array_column($versions, 'version'))) {
 			$delay = self::NEXTCHECK_DELAY;
 			$lastcheck_success = $lastcheck;
 			$nextcheck = $lastcheck + $delay;
@@ -132,6 +132,7 @@ class CControllerSoftwareVersionCheckUpdate extends CController {
 			'lastcheck' => $lastcheck,
 			'lastcheck_success' => $lastcheck_success,
 			'nextcheck' => $nextcheck,
+			'lastcheck_success_version' => ZABBIX_VERSION,
 			'versions' => $versions
 		]];
 
