@@ -1,1 +1,1 @@
-..F....... [ZBX-26501] added verification of the existence of a form before select macros in host, template and host prototype (rgontarski)
+..F....... [ZBX-26501] changed the query responsible for retrieving macros from host, template and host prototype (rgontarski)
