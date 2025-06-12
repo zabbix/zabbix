@@ -16,16 +16,20 @@
 require_once dirname(__FILE__).'/../include/CIntegrationTest.php';
 require_once dirname(__FILE__).'/../include/helpers/CDataHelper.php';
 
+define("ALL_PRINTABLE_ASCII_ESCAPED", '\\\!\\\"#$%&\'()*+,-./0123456789:;<=>?@ABCDEFGHIJKLMNOPQRSTUVWXYZ[]^_\\\`abcdefghijklmnopqrstuvwxyz{|}~');
+
+// @backup history, hosts, host_rtdata, proxy, proxy_rtdata, changelog, settings, config_autoreg_tls, expressions
+// @backup globalmacro, hosts, interface, item_rtdata, items, proxy_history, regexps, ha_node
+
 /**
  * Test suite for data collection using both active and passive agents.
  *
- * @backup history, hosts, host_rtdata, proxy, proxy_rtdata, changelog, settings, config_autoreg_tls, expressions
- * @backup globalmacro, hosts, interface, item_rtdata, items, proxy_history, regexps, ha_node
  */
 class testDataCollection extends CIntegrationTest {
 
 	private static $hostids = [];
 	private static $itemids = [];
+	private static $proxyids = [];
 
 	/**
 	 * @inheritdoc
@@ -37,7 +41,7 @@ class testDataCollection extends CIntegrationTest {
 			'operating_mode' => PROXY_OPERATING_MODE_ACTIVE
 		]);
 
-		$proxyids = CDataHelper::getIds('name');
+		self::$proxyids = CDataHelper::getIds('name');
 
 		// Create host "agent", "custom_agent" and "proxy agent".
 		$interfaces = [
@@ -100,7 +104,7 @@ class testDataCollection extends CIntegrationTest {
 				'host' => 'proxy_agent',
 				'interfaces' => $interfaces,
 				'groups' => $groups,
-				'proxyid' => $proxyids['proxy'],
+				'proxyid' => self::$proxyids['proxy'],
 				'monitored_by' => ZBX_MONITORED_BY_PROXY,
 				'status' => HOST_STATUS_NOT_MONITORED,
 				'items' => [
@@ -294,7 +298,9 @@ class testDataCollection extends CIntegrationTest {
 				'UnreachableDelay' => 1,
 				'DebugLevel' => 4,
 				'Hostname' => 'proxy',
-				'Server' => '127.0.0.1:'.self::getConfigurationValue(self::COMPONENT_SERVER, 'ListenPort')
+				'Server' => '127.0.0.1:'.self::getConfigurationValue(self::COMPONENT_SERVER, 'ListenPort'),
+				'ProxyBufferMode' => 'memory',
+				'ProxyMemoryBufferSize' => '128K'
 			],
 			self::COMPONENT_AGENT => [
 				'Hostname' => 'proxy_agent',
@@ -511,5 +517,57 @@ class testDataCollection extends CIntegrationTest {
 		$this->assertEquals(1, count($response['result']));
 		$this->assertArrayHasKey('value', $response['result'][0]);
 		$this->assertEquals(444, $response['result'][0]['value']);
+	}
+
+
+	/**
+	 *
+	 * @required-components server, proxy
+	 * @configurationDataProvider proxyConfigurationProvider
+	 */
+	public function testDataCollection_proxy() {
+		$response = $this->call('host.create', [
+			[
+				'host' => 'proxy_host',
+				'monitored_by' => ZBX_MONITORED_BY_PROXY,
+				'proxyid' => self::$proxyids['proxy'],
+				'interfaces' => [
+					'type' => 1,
+					'main' => 1,
+					'useip' => 1,
+					'ip' => '127.0.0.1',
+					'dns' => '',
+					'port' => $this->getConfigurationValue(self::COMPONENT_AGENT, 'ListenPort')
+				],
+				'groups' => [['groupid' => 4]],
+				'status' => HOST_STATUS_MONITORED,
+			]
+		]);
+		$this->assertArrayHasKey('hostids', $response['result']);
+		$this->assertArrayHasKey(0, $response['result']['hostids']);
+		$hostid = $response['result']['hostids'][0];
+
+		$many_a = str_repeat('A', 4096);
+
+		$response = $this->call('item.create', [
+			'hostid' => $hostid,
+			'name' => 'trap',
+			'key_' => 'trap',
+			'type' => ITEM_TYPE_TRAPPER,
+			'value_type' => ITEM_VALUE_TYPE_TEXT,
+			'preprocessing' => [['type' => ZBX_PREPROC_STR_REPLACE, 'params' => "A\n" . ALL_PRINTABLE_ASCII_ESCAPED . $many_a]],
+		]);
+		$this->assertArrayHasKey('itemids', $response['result']);
+		$this->assertEquals(1, count($response['result']['itemids']));
+		$itemid = $response['result']['itemids'][0];
+
+		$this->reloadConfigurationCache(self::COMPONENT_PROXY);
+		$this->reloadConfigurationCache(self::COMPONENT_SERVER);
+		self::stopComponent(self::COMPONENT_SERVER);
+
+		for ($i = 0; $i < 100; $i++) {
+			$this->sendSenderValue('proxy_host', 'trap', $many_a, self::COMPONENT_PROXY);
+		}
+
 	}
 }
