@@ -565,7 +565,7 @@ class testDataCollection extends CIntegrationTest {
 		$this->reloadConfigurationCache(self::COMPONENT_SERVER);
 		self::stopComponent(self::COMPONENT_SERVER);
 
-		for ($i = 0; $i < 25; $i++) {
+		for ($i = 0; $i < 100; $i++) {
 			$this->sendSenderValue('proxy_host', 'trap', $many_a, self::COMPONENT_PROXY);
 		}
 
