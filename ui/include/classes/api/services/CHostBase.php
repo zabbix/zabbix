@@ -23,8 +23,24 @@ abstract class CHostBase extends CApiService {
 		'delete' => ['min_user_type' => USER_TYPE_ZABBIX_ADMIN]
 	];
 
+	public const DISCOVERY_DATA_OUTPUT_FIELDS = ['host', 'parent_hostid', 'status', 'ts_delete', 'ts_disable',
+		'disable_source'
+	];
+
 	protected $tableName = 'hosts';
 	protected $tableAlias = 'h';
+
+	protected static function isHost(): bool {
+		return static::class === 'CHost';
+	}
+
+	protected static function isTemplate(): bool {
+		return static::class === 'CTemplate';
+	}
+
+	private static function isHostPrototype(): bool {
+		return static::class === 'CHostPrototype';
+	}
 
 	protected function checkTemplates(array &$hosts, ?array &$db_hosts = null, ?string $path = null,
 			?array $template_indexes = null, ?string $path_clear = null, ?array $template_clear_indexes = null): void {
@@ -1524,8 +1540,8 @@ abstract class CHostBase extends CApiService {
 	 * @param array|null $db_hosts
 	 * @param array|null $upd_hostids
 	 */
-	protected function updateMacros(array &$hosts, ?array &$db_hosts = null, ?array &$upd_hostids = null): void {
-		$id_field_name = $this instanceof CTemplate ? 'templateid' : 'hostid';
+	protected static function updateMacros(array &$hosts, ?array &$db_hosts = null, ?array &$upd_hostids = null): void {
+		$id_field_name = self::isTemplate() ? 'templateid' : 'hostid';
 
 		$ins_hostmacros = [];
 		$upd_hostmacros = [];
@@ -1565,7 +1581,7 @@ abstract class CHostBase extends CApiService {
 				$changed = true;
 			}
 
-			if ($db_hosts !== null) {
+			if (self::isHostPrototype() && $db_hosts !== null) {
 				if ($changed) {
 					$upd_hostids[$i] = $host[$id_field_name];
 				}
@@ -1588,19 +1604,155 @@ abstract class CHostBase extends CApiService {
 			$hostmacroids = DB::insert('hostmacro', $ins_hostmacros);
 		}
 
-		foreach ($hosts as &$host) {
-			if (!array_key_exists('macros', $host)) {
-				continue;
+		if (self::isTemplate()) {
+			$macros = [];
+			$db_macros = $db_hosts !== null ? [] : null;
+
+			foreach ($hosts as &$host) {
+				if (!array_key_exists('macros', $host)) {
+					continue;
+				}
+
+				foreach ($host['macros'] as &$macro) {
+					if (!array_key_exists('hostmacroid', $macro)) {
+						$macro['hostmacroid'] = array_shift($hostmacroids);
+
+						if (array_key_exists('config', $macro)) {
+							self::prepareMacroConfigOptionsForAuditlog($macro);
+
+							if ($db_hosts !== null) {
+								$macros[] = $macro;
+								$db_macros[$macro['hostmacroid']] = ['config' => DB::getDefaults('hostmacro_config')];
+							}
+						}
+					}
+					elseif (array_key_exists('config', $macro)) {
+						$macros[] = $macro;
+						$db_macros[$macro['hostmacroid']] =
+							$db_hosts[$host[$id_field_name]]['macros'][$macro['hostmacroid']];
+
+						self::prepareMacroConfigOptionsForAuditlog($macro,
+							$db_hosts[$host[$id_field_name]]['macros'][$macro['hostmacroid']]
+						);
+					}
+				}
+				unset($macro);
+			}
+			unset($host);
+
+			if ($macros) {
+				self::updateMacroConfigs($macros, $db_macros);
+			}
+		}
+		else {
+			foreach ($hosts as &$host) {
+				if (!array_key_exists('macros', $host)) {
+					continue;
+				}
+
+				foreach ($host['macros'] as &$macro) {
+					if (!array_key_exists('hostmacroid', $macro)) {
+						$macro['hostmacroid'] = array_shift($hostmacroids);
+					}
+				}
+				unset($macro);
+			}
+			unset($host);
+		}
+	}
+
+	private static function updateMacroConfigs(array $macros, ?array $db_macros): void {
+		$ins_hostmacro_configs = [];
+		$upd_hostmacro_configs = [];
+		$del_hostmacroids = [];
+
+		foreach ($macros as $macro) {
+			if (array_key_exists('options', $macro['config'])) {
+				$macro['config']['options'] = $macro['config']['options']
+					? json_encode($macro['config']['options'])
+					: '';
 			}
 
-			foreach ($host['macros'] as &$macro) {
-				if (!array_key_exists('hostmacroid', $macro)) {
-					$macro['hostmacroid'] = array_shift($hostmacroids);
+			if (array_key_exists($macro['hostmacroid'], $db_macros)) {
+				$db_macro = $db_macros[$macro['hostmacroid']];
+				$db_macro['config']['options'] = $db_macro['config']['options']
+					? json_encode($db_macro['config']['options'])
+					: '';
+
+				if ($macro['config']['type'] != $db_macro['config']['type']) {
+					if ($db_macro['config']['type'] == ZBX_WIZARD_FIELD_NOCONF) {
+						$ins_hostmacro_configs[] = ['hostmacroid' => $macro['hostmacroid']] + $macro['config'];
+					}
+					elseif ($macro['config']['type'] == ZBX_WIZARD_FIELD_NOCONF) {
+						$del_hostmacroids[] = $macro['hostmacroid'];
+					}
+					else {
+						self::addMacroConfigFieldDefaultsByType($macro['config'], $db_macro['config']);
+
+						$upd_hostmacro_configs[] = [
+							'values' => DB::getUpdatedValues('hostmacro_config', $macro['config'], $db_macro['config']),
+							'where' => ['hostmacroid' => $macro['hostmacroid']]
+						];
+					}
+				}
+				elseif ($macro['config']['type'] != ZBX_WIZARD_FIELD_NOCONF) {
+					$upd_hostmacro_config =
+						DB::getUpdatedValues('hostmacro_config', $macro['config'], $db_macro['config']);
+
+					if ($upd_hostmacro_config) {
+						$upd_hostmacro_configs[] = [
+							'values' => $upd_hostmacro_config,
+							'where' => ['hostmacroid' => $macro['hostmacroid']]
+						];
+					}
 				}
 			}
-			unset($macro);
+			elseif ($macro['config']['type'] != ZBX_WIZARD_FIELD_NOCONF) {
+				$ins_hostmacro_configs[] = ['hostmacroid' => $macro['hostmacroid']] + $macro['config'];
+			}
 		}
-		unset($host);
+
+		if ($del_hostmacroids) {
+			DB::delete('hostmacro_config', ['hostmacroid' => $del_hostmacroids]);
+		}
+
+		if ($upd_hostmacro_configs) {
+			DB::update('hostmacro_config', $upd_hostmacro_configs);
+		}
+
+		if ($ins_hostmacro_configs) {
+			DB::insert('hostmacro_config', $ins_hostmacro_configs, false);
+		}
+	}
+
+	public static function addMacroConfigFieldDefaultsByType(array &$config, array $db_config): void {
+		$type_fields = [
+			ZBX_WIZARD_FIELD_TEXT => ['priority', 'section_name', 'label', 'description', 'required', 'regex'],
+			ZBX_WIZARD_FIELD_LIST => ['priority', 'section_name', 'label', 'description', 'required', 'options'],
+			ZBX_WIZARD_FIELD_CHECKBOX => ['priority', 'section_name', 'label', 'description', 'options']
+		];
+
+		$config += array_intersect_key(DB::getDefaults('hostmacro_config'),
+			array_flip(array_diff($type_fields[$db_config['type']], $type_fields[$config['type']]))
+		);
+	}
+
+	private static function prepareMacroConfigOptionsForAuditlog(array &$macro, ?array &$db_macro = null): void {
+		if (!array_key_exists('options', $macro['config'])) {
+			return;
+		}
+
+		foreach ($macro['config']['options'] as $i => &$option) {
+			$option['index'] = $i;
+		}
+		unset($option);
+
+		if ($db_macro !== null) {
+			foreach ($db_macro['config']['options'] as $i => &$db_option) {
+				$db_option['index'] = $i;
+			}
+			unset($db_option);
+		}
 	}
 
 	/**
@@ -1722,17 +1874,6 @@ abstract class CHostBase extends CApiService {
 		return $hosts;
 	}
 
-
-	/**
-	 * @param array $hosts
-	 * @param array $db_hosts
-	 */
-	protected function addAffectedObjects(array $hosts, array &$db_hosts): void {
-		$this->addAffectedTemplates($hosts, $db_hosts);
-		$this->addAffectedTags($hosts, $db_hosts);
-		$this->addAffectedMacros($hosts, $db_hosts);
-	}
-
 	/**
 	 * @param array $hosts
 	 * @param array $db_hosts
@@ -1814,12 +1955,8 @@ abstract class CHostBase extends CApiService {
 		}
 	}
 
-	/**
-	 * @param array $hosts
-	 * @param array $db_hosts
-	 */
-	protected function addAffectedMacros(array $hosts, array &$db_hosts): void {
-		$id_field_name = $this instanceof CTemplate ? 'templateid' : 'hostid';
+	protected static function addAffectedMacros(array $hosts, array &$db_hosts): void {
+		$id_field_name = self::isTemplate() ? 'templateid' : 'hostid';
 
 		$hostids = [];
 
@@ -1838,43 +1975,155 @@ abstract class CHostBase extends CApiService {
 			'output' => ['hostmacroid', 'hostid', 'macro', 'value', 'description', 'type', 'automatic'],
 			'filter' => ['hostid' => $hostids]
 		];
-		$db_macros = DBselect(DB::makeSql('hostmacro', $options));
+		$resource = DBselect(DB::makeSql('hostmacro', $options));
 
-		while ($db_macro = DBfetch($db_macros)) {
-			$db_hosts[$db_macro['hostid']]['macros'][$db_macro['hostmacroid']] =
-				array_diff_key($db_macro, array_flip(['hostid']));
+		if (self::isTemplate()) {
+			$db_macros = [];
+
+			while ($db_macro = DBfetch($resource)) {
+				$db_hosts[$db_macro['hostid']]['macros'][$db_macro['hostmacroid']] =
+					array_diff_key($db_macro, array_flip(['hostid']));
+
+				$db_macros[$db_macro['hostmacroid']] =
+					&$db_hosts[$db_macro['hostid']]['macros'][$db_macro['hostmacroid']];
+			}
+
+			if ($db_macros) {
+				self::addAffectedMacroConfigs($db_macros);
+			}
+		}
+		else {
+			while ($db_macro = DBfetch($resource)) {
+				$db_hosts[$db_macro['hostid']]['macros'][$db_macro['hostmacroid']] =
+					array_diff_key($db_macro, array_flip(['hostid']));
+			}
 		}
 	}
 
-	/**
-	 * Retrieves and adds additional requested data to the result set.
-	 *
-	 * @param array  $options
-	 * @param array  $result
-	 *
-	 * @return array
-	 */
-	protected function addRelatedObjects(array $options, array $result) {
-		$result = parent::addRelatedObjects($options, $result);
+	private static function addAffectedMacroConfigs(array &$db_macros): void {
+		foreach ($db_macros as &$db_macro) {
+			$db_macro['config'] = ['options' => []] + DB::getDefaults('hostmacro_config');
+		}
+		unset($db_macro);
 
-		$hostids = array_keys($result);
+		$options = [
+			'output' => ['hostmacroid', 'type', 'priority', 'section_name', 'label', 'description', 'required', 'regex',
+				'options'
+			],
+			'hostmacroids' => array_keys($db_macros)
+		];
+		$resource = DBselect(DB::makeSql('hostmacro_config', $options));
 
-		// adding macros
-		if ($options['selectMacros'] !== null && $options['selectMacros'] !== API_OUTPUT_COUNT) {
-			$macros = API::UserMacro()->get([
-				'output' => $this->outputExtend($options['selectMacros'], ['hostid', 'hostmacroid']),
-				'hostids' => $hostids,
-				'preservekeys' => true,
-				'nopermissions' => true
-			]);
+		while ($db_config = DBfetch($resource)) {
+			$db_config['options'] = $db_config['options'] !== '' ? json_decode($db_config['options'], true) : [];
 
-			$relationMap = $this->createRelationMap($macros, 'hostid', 'hostmacroid');
-			$macros = $this->unsetExtraFields($macros, ['hostid', 'hostmacroid'], $options['selectMacros']);
-			$result = $relationMap->mapMany($result, $macros, 'macros',
-				array_key_exists('limitSelects', $options) ? $options['limitSelects'] : null
-			);
+			$db_macros[$db_config['hostmacroid']]['config'] = array_diff_key($db_config, array_flip(['hostmacroid']));
+		}
+	}
+
+	protected static function addRelatedMacros(array $options, array &$result): void {
+		if ($options['selectMacros'] === null) {
+			return;
 		}
 
-		return $result;
+		foreach ($result as &$host) {
+			$host['macros'] = [];
+		}
+		unset($host);
+
+		$internal_fields = ['hostmacroid', 'hostid'];
+
+		$limit_selects_requested = (self::isHost() || self::isTemplate()) && $options['limitSelects'] !== null;
+
+		if ($limit_selects_requested) {
+			$internal_fields[] = 'macro';
+		}
+
+		$macros = API::UserMacro()->get([
+			'output' => array_unique(array_merge($internal_fields, $options['selectMacros'])),
+			'hostids' => array_keys($result),
+			'nopermissions' => true
+		]);
+
+		if ($limit_selects_requested) {
+			CArrayHelper::sort($macros, ['macro']);
+		}
+
+		$fields_to_unset = array_flip(array_diff($internal_fields, $options['selectMacros']));
+
+		foreach ($macros as $macro) {
+			if ($limit_selects_requested && count($result[$macro['hostid']]['macros']) == $options['limitSelects']) {
+				continue;
+			}
+
+			$result[$macro['hostid']]['macros'][] = array_diff_key($macro, $fields_to_unset);
+		}
+	}
+
+	protected static function addRelatedDiscoveryRules(array $options, array &$result): void {
+		if ($options['selectDiscoveryRule'] === null) {
+			return;
+		}
+
+		foreach ($result as &$host) {
+			$host['discoveryRule'] = [];
+		}
+		unset($host);
+
+		$resource = self::isHost()
+			? DBselect(
+				'SELECT hd.hostid,hd2.lldruleid'.
+				' FROM host_discovery hd'.
+				' JOIN host_discovery hd2 ON hd.parent_hostid=hd2.hostid'.
+				' WHERE '.dbConditionId('hd.hostid', array_keys($result))
+			)
+			: DBselect(
+				'SELECT hd.lldruleid,hd.hostid'.
+				' FROM host_discovery hd'.
+				' JOIN items i ON i.itemid=hd.lldruleid'.
+				' WHERE '.dbConditionId('hd.hostid', array_keys($result)).
+					' AND '.dbConditionId('i.flags', [ZBX_FLAG_DISCOVERY_RULE, ZBX_FLAG_DISCOVERY_RULE_CREATED])
+			);
+
+		$hostids = [];
+
+		while ($row = DBfetch($resource)) {
+			$hostids[$row['lldruleid']][] = $row['hostid'];
+		}
+
+		$parent_lld_rules = API::DiscoveryRule()->get([
+			'output' => $options['selectDiscoveryRule'],
+			'itemids' => array_keys($hostids),
+			'nopermissions' => true,
+			'preservekeys' => true
+		]);
+
+		foreach ($parent_lld_rules as $lldruleid => $parent_lld_rule) {
+			foreach ($hostids[$lldruleid] as $hostid) {
+				$result[$hostid]['discoveryRule'] = $parent_lld_rule;
+			}
+		}
+	}
+
+	protected static function addRelatedDiscoveryData(array $options, array &$result): void {
+		if ($options['selectDiscoveryData'] === null) {
+			return;
+		}
+
+		foreach ($result as &$host) {
+			$host['discoveryData'] = [];
+		}
+		unset($host);
+
+		$_options = [
+			'output' => array_merge(['hostid'], $options['selectDiscoveryData']),
+			'hostids' => array_keys($result)
+		];
+		$resource = DBselect(DB::makeSql('host_discovery', $_options));
+
+		while ($discovery_data = DBfetch($resource)) {
+			$result[$discovery_data['hostid']]['discoveryData'] =
+				array_diff_key($discovery_data, array_flip(['hostid']));
+		}
 	}
 }

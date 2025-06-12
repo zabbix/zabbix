@@ -370,6 +370,7 @@ int	zbx_is_item_processed_by_server(unsigned char type, const char *key)
 	switch (type)
 	{
 		case ITEM_TYPE_CALCULATED:
+		case ITEM_TYPE_NESTED_LLD:
 			ret = SUCCEED;
 			break;
 
@@ -554,6 +555,7 @@ int	zbx_is_counted_in_item_queue(unsigned char type, const char *key)
 		case ITEM_TYPE_DEPENDENT:
 		case ITEM_TYPE_HTTPTEST:
 		case ITEM_TYPE_SNMPTRAP:
+		case ITEM_TYPE_NESTED_LLD:
 			return FAIL;
 	}
 
@@ -1488,6 +1490,7 @@ static void	DCsync_hosts(zbx_dbsync_t *sync, zbx_uint64_t revision, zbx_vector_u
 
 		host = (ZBX_DC_HOST *)DCfind_id(&config->hosts, hostid, sizeof(ZBX_DC_HOST), &found);
 		host->revision = revision;
+		ZBX_STR2UINT64(host->flags, row[21]);
 
 		/* see whether we should and can update 'hosts_h' and 'proxies_p' indexes at this point */
 
@@ -2858,6 +2861,8 @@ static void	dc_item_type_free(ZBX_DC_ITEM *item, zbx_item_type_t type, zbx_uint6
 
 			__config_shmem_free_func(item->itemtype.browseritem);
 			break;
+		case ITEM_TYPE_NESTED_LLD:
+			break;
 	}
 }
 
@@ -3113,6 +3118,8 @@ static void	dc_item_type_update(int found, ZBX_DC_ITEM *item, zbx_item_type_t *o
 				}
 			}
 			break;
+		case ITEM_TYPE_NESTED_LLD:
+			break;
 	}
 
 	if (NULL != parameters)
@@ -3311,19 +3318,26 @@ static void	DCsync_items(zbx_dbsync_t *sync, zbx_uint64_t revision, zbx_synced_n
 			continue;
 		}
 
+		item_flags = (unsigned char)atoi(row[18]);
+
+		/* item prototype does not have item_rtdata and shouldn't be present in sync */
+		if (0 != (item_flags & ZBX_FLAG_DISCOVERY_PROTOTYPE))
+		{
+			template_item = (ZBX_DC_TEMPLATE_ITEM *)DCfind_id(&config->template_items, itemid,
+					sizeof(ZBX_DC_TEMPLATE_ITEM), &found);
+
+			template_item->hostid = hostid;
+			template_item->templateid = templateid;
+
+			THIS_SHOULD_NEVER_HAPPEN_MSG("item_rtdata entry unexpectedly is present for item "
+					"prototype: " ZBX_FS_UI64 " on hostid: " ZBX_FS_UI64, itemid, hostid);
+			continue;
+		}
+
 		if (NULL == host || host->hostid != hostid)
 		{
 			if (NULL == (host = (ZBX_DC_HOST *)zbx_hashset_search(&config->hosts, &hostid)))
 				continue;
-		}
-
-		item_flags = (unsigned char)atoi(row[18]);
-
-		/* item prototype does not have item_rtdata and shouldn't be present in sync */
-		if (item_flags != ZBX_FLAG_DISCOVERY_NORMAL && item_flags != ZBX_FLAG_DISCOVERY_CREATED &&
-				item_flags != ZBX_FLAG_DISCOVERY_RULE)
-		{
-			continue;
 		}
 
 		item = (ZBX_DC_ITEM *)DCfind_id_ext(&config->items, itemid, sizeof(ZBX_DC_ITEM), &found, uniq);
@@ -3543,6 +3557,16 @@ static void	DCsync_items(zbx_dbsync_t *sync, zbx_uint64_t revision, zbx_synced_n
 			item->poller_type = ZBX_NO_POLLER;
 		}
 
+		if (ITEM_TYPE_NESTED_LLD == item->type && 0 == (host->flags & ZBX_FLAG_DISCOVERY_CREATED)
+				&& 0 == (item->flags & ZBX_FLAG_DISCOVERY_CREATED))
+		{
+			zbx_timespec_t	ts = {(int)now, 0};
+
+			zbx_dc_add_history(item->itemid, item->value_type, 0, NULL, &ts,
+					ITEM_STATE_NOTSUPPORTED, "Nested LLD rule type is supported only for discovered"
+							" LLD rules or hosts.");
+		}
+
 		DCupdate_item_queue(item, old_poller_type, old_nextcheck);
 	}
 
@@ -3725,6 +3749,9 @@ static void	DCsync_item_discovery(zbx_dbsync_t *sync)
 		if (ZBX_DBSYNC_ROW_REMOVE == tag)
 			break;
 
+		if (SUCCEED == zbx_db_is_null(row[1]))
+			continue;
+
 		ZBX_STR2UINT64(itemid, row[0]);
 		item_discovery = (ZBX_DC_ITEM_DISCOVERY *)DCfind_id_ext(&config->item_discovery, itemid,
 				sizeof(ZBX_DC_ITEM_DISCOVERY), &found, uniq);
@@ -3788,7 +3815,7 @@ static void	DCsync_triggers(zbx_dbsync_t *sync, zbx_uint64_t revision)
 
 		ZBX_STR2UCHAR(trigger->flags, row[19]);
 
-		if (ZBX_FLAG_DISCOVERY_PROTOTYPE == trigger->flags)
+		if (0 != (trigger->flags & ZBX_FLAG_DISCOVERY_PROTOTYPE))
 			continue;
 
 		dc_strpool_replace(found, &trigger->description, row[1]);
@@ -3842,7 +3869,7 @@ static void	DCsync_triggers(zbx_dbsync_t *sync, zbx_uint64_t revision)
 			if (NULL == (trigger = (ZBX_DC_TRIGGER *)zbx_hashset_search(&config->triggers, &rowid)))
 				continue;
 
-			if (ZBX_FLAG_DISCOVERY_PROTOTYPE != trigger->flags)
+			if (0 == (trigger->flags & ZBX_FLAG_DISCOVERY_PROTOTYPE))
 			{
 				/* force trigger list update for items used in removed trigger */
 				if (NULL != trigger->itemids)
@@ -4318,7 +4345,7 @@ static void	dc_schedule_trigger_timers(zbx_hashset_t *trend_queue, int now)
 		if (NULL == (trigger = (ZBX_DC_TRIGGER *)zbx_hashset_search(&config->triggers, &function->triggerid)))
 			continue;
 
-		if (ZBX_FLAG_DISCOVERY_PROTOTYPE == trigger->flags)
+		if (0 != (trigger->flags & ZBX_FLAG_DISCOVERY_PROTOTYPE))
 			continue;
 
 		if (TRIGGER_STATUS_ENABLED != trigger->status || TRIGGER_FUNCTIONAL_TRUE != trigger->functional)
@@ -4361,7 +4388,7 @@ static void	dc_schedule_trigger_timers(zbx_hashset_t *trend_queue, int now)
 	zbx_hashset_iter_reset(&config->triggers, &iter);
 	while (NULL != (trigger = (ZBX_DC_TRIGGER *)zbx_hashset_iter_next(&iter)))
 	{
-		if (ZBX_FLAG_DISCOVERY_PROTOTYPE == trigger->flags)
+		if (0 != (trigger->flags & ZBX_FLAG_DISCOVERY_PROTOTYPE))
 			continue;
 
 		if (NULL == trigger->itemids)
@@ -5384,7 +5411,7 @@ static void	DCsync_trigger_tags(zbx_dbsync_t *sync)
 		if (0 == found)
 		{
 			trigger_tag->triggerid = triggerid;
-			if (ZBX_FLAG_DISCOVERY_PROTOTYPE != trigger->flags)
+			if (0 == (trigger->flags & ZBX_FLAG_DISCOVERY_PROTOTYPE))
 			{
 				zbx_vector_ptr_reserve(&trigger->tags, ZBX_VECTOR_ARRAY_RESERVE);
 				zbx_vector_ptr_append(&trigger->tags, trigger_tag);
@@ -5401,7 +5428,7 @@ static void	DCsync_trigger_tags(zbx_dbsync_t *sync)
 
 		if (NULL != (trigger = (ZBX_DC_TRIGGER *)zbx_hashset_search(&config->triggers, &trigger_tag->triggerid)))
 		{
-			if (ZBX_FLAG_DISCOVERY_PROTOTYPE != trigger->flags)
+			if (0 == (trigger->flags & ZBX_FLAG_DISCOVERY_PROTOTYPE))
 			{
 				if (FAIL != (index = zbx_vector_ptr_search(&trigger->tags, trigger_tag,
 						ZBX_DEFAULT_PTR_COMPARE_FUNC)))
@@ -6670,7 +6697,7 @@ static void	dc_trigger_update_topology(void)
 	zbx_hashset_iter_reset(&config->triggers, &iter);
 	while (NULL != (trigger = (ZBX_DC_TRIGGER *)zbx_hashset_iter_next(&iter)))
 	{
-		if (ZBX_FLAG_DISCOVERY_PROTOTYPE == trigger->flags)
+		if (0 != (trigger->flags & ZBX_FLAG_DISCOVERY_PROTOTYPE))
 			continue;
 
 		trigger->topoindex = 1;
@@ -6822,7 +6849,7 @@ static void	dc_trigger_update_cache(void)
 			continue;
 		}
 
-		if (ZBX_FLAG_DISCOVERY_PROTOTYPE == trigger->flags)
+		if (0 != (trigger->flags & ZBX_FLAG_DISCOVERY_PROTOTYPE))
 		{
 			trigger->functional = TRIGGER_FUNCTIONAL_FALSE;
 			continue;
@@ -7649,7 +7676,7 @@ zbx_uint64_t	zbx_dc_sync_configuration(unsigned char mode, zbx_synced_new_config
 	/* sync global configuration settings */
 	START_SYNC;
 
-	dc_sync_settings(&settings_sync, new_revision);
+	dc_sync_settings(&settings_sync, new_revision, get_program_type_cb());
 
 	/* must be done in the same cache locking with config sync */
 	DCsync_autoreg_config(&autoreg_config_sync, new_revision);
@@ -10029,7 +10056,7 @@ void	zbx_dc_config_get_preprocessable_items(zbx_hashset_t *items, zbx_dc_um_shar
 
 			if (NULL == dc_item->preproc_item && NULL == dc_item->master_item &&
 					ITEM_TYPE_INTERNAL != dc_item->type &&
-					ZBX_FLAG_DISCOVERY_RULE != dc_item->flags)
+					0 == (dc_item->flags & ZBX_FLAG_DISCOVERY_RULE))
 			{
 				continue;
 			}
@@ -12271,7 +12298,7 @@ static void	DCconfig_sort_triggers_topologically(void)
 	{
 		trigger = trigdep->trigger;
 
-		if (NULL == trigger || ZBX_FLAG_DISCOVERY_PROTOTYPE == trigger->flags || 1 < trigger->topoindex ||
+		if (NULL == trigger || 0 != (trigger->flags & ZBX_FLAG_DISCOVERY_PROTOTYPE) || 1 < trigger->topoindex ||
 				0 == trigdep->dependencies.values_num)
 		{
 			continue;
@@ -12886,7 +12913,7 @@ static void	get_trigger_statistics(zbx_hashset_t *triggers, zbx_dc_status_diff_t
 	/* loop over triggers to gather enabled and disabled trigger statistics */
 	while (NULL != (dc_trigger = (ZBX_DC_TRIGGER *)zbx_hashset_iter_next(&iter)))
 	{
-		if (ZBX_FLAG_DISCOVERY_PROTOTYPE == dc_trigger->flags || NULL == dc_trigger->itemids)
+		if (0 != (dc_trigger->flags & ZBX_FLAG_DISCOVERY_PROTOTYPE) || NULL == dc_trigger->itemids)
 			continue;
 
 		switch (dc_trigger->status)
@@ -15281,6 +15308,18 @@ static void	zbx_gather_tags_from_template_chain(zbx_uint64_t itemid, zbx_vector_
 	}
 }
 
+static zbx_uint64_t	zbx_get_parent_itemid(zbx_uint64_t itemid)
+{
+	ZBX_DC_ITEM_DISCOVERY	*item_discovery;
+
+	item_discovery = (ZBX_DC_ITEM_DISCOVERY *)zbx_hashset_search(&config->item_discovery, &itemid);
+
+	if (NULL == item_discovery || 0 == item_discovery->parent_itemid)
+		return itemid;
+
+	return zbx_get_parent_itemid(item_discovery->parent_itemid);
+}
+
 void	zbx_get_item_tags(zbx_uint64_t itemid, zbx_vector_item_tag_t *item_tags)
 {
 	ZBX_DC_ITEM		*item;
@@ -15302,15 +15341,13 @@ void	zbx_get_item_tags(zbx_uint64_t itemid, zbx_vector_item_tag_t *item_tags)
 	/* check for discovered item */
 	if (ZBX_FLAG_DISCOVERY_CREATED == item->flags)
 	{
-		ZBX_DC_ITEM_DISCOVERY	*item_discovery;
+		ZBX_DC_TEMPLATE_ITEM	*prototype_item;
+		zbx_uint64_t		parent_itemid;
 
-		if (NULL != (item_discovery = (ZBX_DC_ITEM_DISCOVERY *)zbx_hashset_search(&config->item_discovery,
-				&itemid)))
+		if (itemid != (parent_itemid = zbx_get_parent_itemid(itemid)))
 		{
-			ZBX_DC_TEMPLATE_ITEM	*prototype_item;
-
 			if (NULL != (prototype_item = (ZBX_DC_TEMPLATE_ITEM *)zbx_hashset_search(
-					&config->template_items, &item_discovery->parent_itemid)))
+					&config->template_items, &parent_itemid)))
 			{
 				if (0 != prototype_item->templateid)
 					zbx_gather_tags_from_template_chain(prototype_item->templateid, item_tags);

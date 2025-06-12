@@ -26,8 +26,6 @@ class CTriggerPrototype extends CTriggerGeneral {
 		'delete' => ['min_user_type' => USER_TYPE_ZABBIX_ADMIN]
 	];
 
-	protected const FLAGS = ZBX_FLAG_DISCOVERY_PROTOTYPE;
-
 	protected $tableName = 'triggers';
 	protected $tableAlias = 't';
 	protected $sortColumns = ['triggerid', 'description', 'status', 'priority', 'discover'];
@@ -45,7 +43,7 @@ class CTriggerPrototype extends CTriggerGeneral {
 		$sqlParts = [
 			'select'	=> ['triggers' => 't.triggerid'],
 			'from'		=> ['t' => 'triggers t'],
-			'where'		=> ['t.flags='.ZBX_FLAG_DISCOVERY_PROTOTYPE],
+			'where'		=> ['t.flags IN ('.ZBX_FLAG_DISCOVERY_PROTOTYPE.','.ZBX_FLAG_DISCOVERY_PROTOTYPE_CREATED.')'],
 			'group'		=> [],
 			'order'		=> [],
 			'limit'		=> null
@@ -85,7 +83,6 @@ class CTriggerPrototype extends CTriggerGeneral {
 			'selectItems'					=> null,
 			'selectFunctions'				=> null,
 			'selectDependencies'			=> null,
-			'selectDiscoveryRule'			=> null,
 			'selectTags'					=> null,
 			'countOutput'					=> false,
 			'groupCount'					=> false,
@@ -96,6 +93,8 @@ class CTriggerPrototype extends CTriggerGeneral {
 			'limitSelects'					=> null
 		];
 		$options = zbx_array_merge($defOptions, $options);
+
+		self::validateGet($options);
 
 		// editable + permission check
 		if (self::$userData['type'] != USER_TYPE_SUPER_ADMIN && !$options['nopermissions']) {
@@ -202,10 +201,10 @@ class CTriggerPrototype extends CTriggerGeneral {
 			$sqlParts['from']['item_discovery'] = 'item_discovery id';
 			$sqlParts['where']['fid'] = 'f.itemid=id.itemid';
 			$sqlParts['where']['ft'] = 'f.triggerid=t.triggerid';
-			$sqlParts['where'][] = dbConditionInt('id.parent_itemid', $options['discoveryids']);
+			$sqlParts['where'][] = dbConditionId('id.lldruleid', $options['discoveryids']);
 
 			if ($options['groupCount']) {
-				$sqlParts['group']['id'] = 'id.parent_itemid';
+				$sqlParts['group']['id'] = 'id.lldruleid';
 			}
 		}
 
@@ -419,6 +418,18 @@ class CTriggerPrototype extends CTriggerGeneral {
 		return $result;
 	}
 
+	private static function validateGet(array &$options): void {
+		$api_input_rules = ['type' => API_OBJECT, 'flags' => API_ALLOW_UNEXPECTED, 'fields' => [
+			'selectDiscoveryRule' =>			['type' => API_OUTPUT, 'flags' => API_ALLOW_NULL | API_NORMALIZE, 'in' => implode(',', CDiscoveryRule::OUTPUT_FIELDS), 'default' => null],
+			'selectDiscoveryRulePrototype' =>	['type' => API_OUTPUT, 'flags' => API_ALLOW_NULL | API_NORMALIZE, 'in' => implode(',', CDiscoveryRulePrototype::OUTPUT_FIELDS), 'default' => null],
+			'selectDiscoveryData' =>			['type' => API_OUTPUT, 'flags' => API_ALLOW_NULL | API_NORMALIZE, 'in' => implode(',', self::DISCOVERY_DATA_OUTPUT_FIELDS), 'default' => null]
+		]];
+
+		if (!CApiInputValidator::validate($api_input_rules, $options, '/', $error)) {
+			self::exception(ZBX_API_ERROR_PARAMETERS, $error);
+		}
+	}
+
 	/**
 	 * Create new trigger prototypes.
 	 *
@@ -570,29 +581,80 @@ class CTriggerPrototype extends CTriggerGeneral {
 			$result = $relationMap->mapMany($result, $items, 'items');
 		}
 
-		// adding discovery rule
-		if ($options['selectDiscoveryRule'] !== null && $options['selectDiscoveryRule'] != API_OUTPUT_COUNT) {
-			$dbRules = DBselect(
-				'SELECT id.parent_itemid,f.triggerid'.
-					' FROM item_discovery id,functions f'.
-					' WHERE '.dbConditionInt('f.triggerid', $triggerPrototypeIds).
-					' AND f.itemid=id.itemid'
-			);
-			$relationMap = new CRelationMap();
-			while ($rule = DBfetch($dbRules)) {
-				$relationMap->addRelation($rule['triggerid'], $rule['parent_itemid']);
-			}
-
-			$discoveryRules = API::DiscoveryRule()->get([
-				'output' => $options['selectDiscoveryRule'],
-				'itemids' => $relationMap->getRelatedIds(),
-				'nopermissions' => true,
-				'preservekeys' => true
-			]);
-			$result = $relationMap->mapOne($result, $discoveryRules, 'discoveryRule');
-		}
+		self::addRelatedDiscoveryRules($options, $result);
+		self::addRelatedDiscoveryRulePrototypes($options, $result);
+		self::addRelatedDiscoveryData($options, $result);
 
 		return $result;
 	}
 
+	private static function addRelatedDiscoveryRulePrototypes(array $options, array &$result): void {
+		if ($options['selectDiscoveryRulePrototype'] === null) {
+			return;
+		}
+
+		foreach ($result as &$trigger) {
+			$trigger['discoveryRulePrototype'] = [];
+		}
+		unset($trigger);
+
+		$resource = DBselect(
+			'SELECT DISTINCT f.triggerid,id.lldruleid'.
+			' FROM functions f'.
+			' JOIN item_discovery id ON f.itemid=id.itemid'.
+			' JOIN items i ON id.lldruleid=i.itemid'.
+			' WHERE '.dbConditionId('f.triggerid', array_keys($result)).
+				' AND '.dbConditionId('i.flags',
+					[ZBX_FLAG_DISCOVERY_RULE_PROTOTYPE, ZBX_FLAG_DISCOVERY_RULE_PROTOTYPE_CREATED]
+				)
+		);
+
+		$triggerids = [];
+
+		while ($row = DBfetch($resource)) {
+			$triggerids[$row['lldruleid']][] = $row['triggerid'];
+		}
+
+		$parent_lld_rules = API::DiscoveryRulePrototype()->get([
+			'output' => $options['selectDiscoveryRulePrototype'],
+			'itemids' => array_keys($triggerids),
+			'nopermissions' => true,
+			'preservekeys' => true
+		]);
+
+		foreach ($parent_lld_rules as $lldruleid => $parent_lld_rule) {
+			foreach ($triggerids[$lldruleid] as $triggerid) {
+				$result[$triggerid]['discoveryRulePrototype'] = $parent_lld_rule;
+			}
+		}
+	}
+
+	/**
+	 * Inherit trigger prototypes from given rules to hosts.
+	 *
+	 * @param array $ruleids
+	 * @param array $hostids
+	 */
+	public function linkTemplateObjects(array $ruleids, array $hostids) {
+		$output = ['triggerid', 'description', 'expression', 'recovery_mode', 'recovery_expression', 'url_name', 'url',
+			'status', 'priority', 'comments', 'type', 'correlation_mode', 'correlation_tag', 'manual_close', 'opdata',
+			'event_name', 'discover'
+		];
+
+		$triggers = $this->get([
+			'output' => $output,
+			'selectTags' => ['tag', 'value'],
+			'discoveryids' => $ruleids,
+			'preservekeys' => true,
+			'nopermissions' => true
+		]);
+
+		if ($triggers) {
+			$triggers = CMacrosResolverHelper::resolveTriggerExpressions($triggers,
+				['sources' => ['expression', 'recovery_expression']]
+			);
+
+			$this->inherit($triggers, $hostids);
+		}
+	}
 }

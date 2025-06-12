@@ -71,6 +71,7 @@ class CDocHelper {
 	const DATA_COLLECTION_HOST_PROTOTYPE_LIST =					'web_interface/frontend_sections/data_collection/hosts/discovery/host_prototypes';
 	const DATA_COLLECTION_HOST_TRIGGERS_LIST =					'web_interface/frontend_sections/data_collection/hosts/triggers';
 	const DATA_COLLECTION_HOST_TRIGGER_PROTOTYPE_LIST =			'web_interface/frontend_sections/data_collection/hosts/discovery/trigger_prototypes';
+	const DATA_COLLECTION_HOST_WIZARD =							'config/hosts/host_wizard';
 	const DATA_COLLECTION_HOSTGROUPS_EDIT =						'config/hosts/host#creating-a-host-group';
 	const DATA_COLLECTION_HOSTGROUPS_LIST =						'web_interface/frontend_sections/data_collection/hostgroups';
 	const DATA_COLLECTION_HTTPCONF_EDIT =						'web_monitoring#configuring-a-web-scenario';
@@ -96,6 +97,9 @@ class CDocHelper {
 	const DATA_COLLECTION_TRIGGERS_EDIT =						'config/triggers/trigger#configuration';
 	const INVENTORY_HOST_LIST =									'web_interface/frontend_sections/inventory/hosts';
 	const INVENTORY_HOST_OVERVIEW =								'web_interface/frontend_sections/inventory/overview';
+	const INSTALLATION_PACKAGES_MAC =							'installation/install_from_packages/mac_pkg';
+	const INSTALLATION_PACKAGES_MSI =							'installation/install_from_packages/win_msi';
+	const INSTALLATION_PACKAGES_OTHER =							'installation/install_from_packages';
 	const ITEM_TYPES_DB_MONITOR =								'config/items/itemtypes/odbc_checks';
 	const ITEM_TYPES_IPMI_AGENT =								'config/items/itemtypes/ipmi';
 	const ITEM_TYPES_JMX_AGENT =								'config/items/itemtypes/jmx_monitoring';
@@ -135,6 +139,7 @@ class CDocHelper {
 	const POPUP_TEMPLATE_IMPORT =								'xml_export_import/templates#importing';
 	const POPUP_TOKEN_EDIT =									'web_interface/frontend_sections/users/api_tokens';
 	const POPUP_TEST_EDIT =										'config/items/item#testing';
+	const PROCESSES_JAVA_GATEWAY =								'concepts/java';
 	const QUEUE_DETAILS =										'web_interface/frontend_sections/administration/queue#list-of-waiting-items';
 	const QUEUE_OVERVIEW =										'web_interface/frontend_sections/administration/queue#overview-by-item-type';
 	const QUEUE_OVERVIEW_PROXY =								'web_interface/frontend_sections/administration/queue#overview-by-proxy';

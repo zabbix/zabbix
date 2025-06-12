@@ -157,6 +157,10 @@ class CWidgetFieldMultiselect extends CWidgetField {
 
 		this.#multiselect
 			.on('before-add', () => {
+				// Do not use this.getName(), since name can be dynamic.
+				const name = this.#multiselect.multiSelect('getOption', 'name')
+					.replace(new RegExp(`(\\[]|\\[${CWidgetBase.FOREIGN_REFERENCE_KEY}\\])$`), '');
+
 				if (this.#is_selecting_typed_reference !== this.#is_selected_typed_reference) {
 					for (const item of this.#multiselect.multiSelect('getData')) {
 						this.#multiselect.multiSelect('removeSelected', item.id);
@@ -164,13 +168,13 @@ class CWidgetFieldMultiselect extends CWidgetField {
 
 					if (this.#is_selecting_typed_reference) {
 						this.#multiselect.multiSelect('modify', {
-							name: `${this.getName()}[${CWidgetBase.FOREIGN_REFERENCE_KEY}]`,
+							name: `${name}[${CWidgetBase.FOREIGN_REFERENCE_KEY}]`,
 							selectedLimit: 1
 						});
 					}
 					else {
 						this.#multiselect.multiSelect('modify', {
-							name: `${this.getName()}${this.#is_multiple ? '[]' : ''}`,
+							name: `${name}${this.#is_multiple ? '[]' : ''}`,
 							selectedLimit: this.#selected_limit
 						});
 					}
