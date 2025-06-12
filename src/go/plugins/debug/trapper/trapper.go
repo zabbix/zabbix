@@ -25,7 +25,7 @@ import (
 	"golang.zabbix.com/sdk/errs"
 	"golang.zabbix.com/sdk/log"
 	"golang.zabbix.com/sdk/plugin"
-	"golang.zabbix.com/sdk/plugin/keyparser"
+	"golang.zabbix.com/sdk/plugin/itemutil"
 )
 
 var impl Plugin
@@ -116,7 +116,7 @@ func (f *trapFilter) Process(v interface{}) (value *string, err error) {
 
 func (t *trapListener) NewFilter(key string) (filter watch.EventFilter, err error) {
 	var params []string
-	_, params, err = keyparser.ParseKey(key)
+	_, params, err = itemutil.ParseKey(key)
 
 	if err != nil {
 		return
@@ -134,7 +134,7 @@ func (t *trapListener) NewFilter(key string) (filter watch.EventFilter, err erro
 
 func (p *Plugin) EventSourceByKey(key string) (es watch.EventSource, err error) {
 	var params []string
-	_, params, err = keyparser.ParseKey(key)
+	_, params, err = itemutil.ParseKey(key)
 
 	if err != nil {
 		return

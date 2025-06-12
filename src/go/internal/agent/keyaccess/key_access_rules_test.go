@@ -20,7 +20,7 @@ import (
 	"testing"
 
 	"golang.zabbix.com/sdk/conf"
-	"golang.zabbix.com/sdk/plugin/keyparser"
+	"golang.zabbix.com/sdk/plugin/itemutil"
 )
 
 type accessRules struct {
@@ -58,7 +58,7 @@ func RunScenarios(t *testing.T, scenarios []scenario, rules accessRules, numRule
 		var key string
 		var params []string
 
-		if key, params, err = keyparser.ParseKey(test.metric); err != nil {
+		if key, params, err = itemutil.ParseKey(test.metric); err != nil {
 			t.Errorf("Failed to parse metric \"%s\"", test.metric)
 		}
 		if ok := CheckRules(key, params); ok != test.result {

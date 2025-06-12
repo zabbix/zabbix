@@ -35,7 +35,7 @@ import (
 	"golang.zabbix.com/sdk/log"
 	"golang.zabbix.com/sdk/plugin"
 	"golang.zabbix.com/sdk/plugin/comms"
-	"golang.zabbix.com/sdk/plugin/keyparser"
+	"golang.zabbix.com/sdk/plugin/itemutil"
 )
 
 const (
@@ -284,7 +284,7 @@ func (m *Manager) processUpdateRequestRun(update *updateRequest) {
 		var p *pluginAgent
 
 		r.Key = m.aliases.Get(r.Key)
-		key, params, err = keyparser.ParseKey(r.Key)
+		key, params, err = itemutil.ParseKey(r.Key)
 
 		if err == nil { //nolint:nestif
 			p, ok = m.plugins[key]

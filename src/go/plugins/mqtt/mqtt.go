@@ -34,7 +34,7 @@ import (
 	"golang.zabbix.com/agent2/pkg/watch"
 	"golang.zabbix.com/sdk/metric"
 	"golang.zabbix.com/sdk/plugin"
-	"golang.zabbix.com/sdk/plugin/keyparser"
+	"golang.zabbix.com/sdk/plugin/itemutil"
 	"golang.zabbix.com/sdk/tlsconfig"
 	"golang.zabbix.com/sdk/zbxerr"
 )
@@ -271,7 +271,7 @@ func (ms *mqttSub) NewFilter(key string) (filter watch.EventFilter, err error) {
 func (p *Plugin) EventSourceByKey(rawKey string) (es watch.EventSource, err error) {
 	var key string
 	var raw []string
-	key, raw, err = keyparser.ParseKey(rawKey)
+	key, raw, err = itemutil.ParseKey(rawKey)
 
 	if err != nil {
 		return

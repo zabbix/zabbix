@@ -22,7 +22,7 @@ import (
 	"golang.zabbix.com/agent2/pkg/watch"
 	"golang.zabbix.com/sdk/errs"
 	"golang.zabbix.com/sdk/plugin"
-	"golang.zabbix.com/sdk/plugin/keyparser"
+	"golang.zabbix.com/sdk/plugin/itemutil"
 )
 
 var impl Plugin
@@ -137,7 +137,7 @@ func (w *fileWatcher) NewFilter(key string) (filter watch.EventFilter, err error
 func (p *Plugin) EventSourceByKey(key string) (es watch.EventSource, err error) {
 	var params []string
 
-	_, params, err = keyparser.ParseKey(key)
+	_, params, err = itemutil.ParseKey(key)
 
 	if err != nil {
 		return

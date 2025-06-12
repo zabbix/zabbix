@@ -27,7 +27,7 @@ import (
 	"golang.zabbix.com/sdk/conf"
 	"golang.zabbix.com/sdk/errs"
 	"golang.zabbix.com/sdk/plugin"
-	"golang.zabbix.com/sdk/plugin/keyparser"
+	"golang.zabbix.com/sdk/plugin/itemutil"
 	"golang.zabbix.com/sdk/zbxerr"
 )
 
@@ -101,7 +101,7 @@ func (p *Plugin) Export(key string, params []string, ctx plugin.ContextProvider)
 		meta.Data = data
 	} else {
 		data = meta.Data.(*metadata)
-		if !keyparser.CompareKeysParams(key, params, data.key, data.params) {
+		if !itemutil.CompareKeysParams(key, params, data.key, data.params) {
 			zbxlib.FreeActiveMetric(data.blob)
 			data.key = key
 			data.params = params

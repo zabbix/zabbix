@@ -24,7 +24,7 @@ import (
 	"golang.zabbix.com/agent2/pkg/zbxcmd"
 	"golang.zabbix.com/sdk/errs"
 	"golang.zabbix.com/sdk/plugin"
-	"golang.zabbix.com/sdk/plugin/keyparser"
+	"golang.zabbix.com/sdk/plugin/itemutil"
 )
 
 type parameterInfo struct {
@@ -160,7 +160,7 @@ func InitUserParameterPlugin(
 			)
 		}
 
-		key, keyParams, err := keyparser.ParseKey(parts[0])
+		key, keyParams, err := itemutil.ParseKey(parts[0])
 		if err != nil {
 			return nil, fmt.Errorf(
 				"cannot add user parameter %q: %s", userParam, err.Error(),
