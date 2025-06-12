@@ -313,7 +313,7 @@ class CSystemInfoHelper {
 				break;
 			}
 
-			if ($version['version'] === ZABBIX_EXPORT_VERSION) {
+			if ($version['version'] === CSettingsHelper::convertToMajorVersion(ZABBIX_VERSION)) {
 				if (!$version['end_of_full_support']) {
 					$data['end_of_full_support'] = $version['end_of_full_support'];
 					$data['latest_release'] = $version['latest_release']['release'];
@@ -328,11 +328,11 @@ class CSystemInfoHelper {
 		$latest_release = null;
 
 		foreach ($versions as $version) {
-			if (version_compare($version['version'], ZABBIX_EXPORT_VERSION, '<')) {
+			if (version_compare($version['version'], CSettingsHelper::convertToMajorVersion(ZABBIX_VERSION), '<')) {
 				break;
 			}
 
-			if ($version['version'] === ZABBIX_EXPORT_VERSION) {
+			if ($version['version'] === CSettingsHelper::convertToMajorVersion(ZABBIX_VERSION)) {
 				if (!$version['end_of_full_support']) {
 					$data['end_of_full_support'] = $version['end_of_full_support'];
 					$data['latest_release'] = $version['latest_release']['release'];
