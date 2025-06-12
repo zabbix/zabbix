@@ -22,6 +22,13 @@ class CFieldSet extends CField {
 	 */
 	#fields = {};
 
+	/**
+	 * On frequent MutationObserver dispatching "field.change" event.
+	 *
+	 * @type {Number|Null}
+	 */
+	#on_blur_debounce = null;
+
 	init() {
 		super.init();
 
@@ -52,7 +59,8 @@ class CFieldSet extends CField {
 				|| observations.some(obs => obs.type === 'attributes' && obs.attributeName === 'data-skip-from-submit');
 
 			if (force_validate || !skip) {
-				this.onBlur();
+				this.#on_blur_debounce && clearTimeout(this.#on_blur_debounce);
+				this.#on_blur_debounce = setTimeout(() => this.onBlur(), 50);
 			}
 		});
 
