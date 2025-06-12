@@ -75,6 +75,7 @@ typedef struct
 	char		error[ZBX_INTERFACE_ERROR_LEN_MAX];
 	int		errors_from;
 	int		version;
+	zbx_uint64_t	revision;
 }
 zbx_dc_interface_t;
 

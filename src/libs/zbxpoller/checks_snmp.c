@@ -206,6 +206,7 @@ static pthread_rwlock_t			snmp_exec_rwlock;
 static char				snmp_rwlock_init_done;
 static zbx_hashset_t	engineid_cache;
 static int		engineid_cache_initialized = 0;
+static int		engineid_cache_modified;
 
 #define ZBX_SNMP_GET	0
 #define ZBX_SNMP_WALK	1
@@ -226,9 +227,10 @@ static void	zbx_init_snmp(const char *progname);
 
 typedef struct
 {
-	char	*address;
-	char	*hostname;
-	u_int	engineboots;
+	char		*address;
+	char		*hostname;
+	u_int		engineboots;
+	zbx_uint64_t	revision;
 }
 zbx_snmp_engineid_device_t;
 
@@ -242,6 +244,7 @@ typedef struct
 	zbx_vector_engineid_device_t	devices;
 	time_t				lastlog;
 	time_t				lastseen;
+	int				modified;
 }
 zbx_snmp_engineid_record_t;
 
@@ -298,6 +301,11 @@ void	zbx_destroy_snmp_engineid_cache(void)
 	zbx_hashset_destroy(&engineid_cache);
 }
 
+int	zbx_engineid_cache_modified(void)
+{
+	return engineid_cache_modified;
+}
+
 static int	zbx_snmp_cache_handle_engineid(netsnmp_session *session, zbx_dc_item_context_t *item_context)
 {
 	zbx_snmp_engineid_record_t	*ptr, local_record;
@@ -340,24 +348,29 @@ static int	zbx_snmp_cache_handle_engineid(netsnmp_session *session, zbx_dc_item_
 		d.address = zbx_strdup(NULL, item_context->interface.addr);
 		d.hostname = zbx_strdup(NULL, item_context->host);
 		d.engineboots = current_engineboots;
+		d.revision = item_context->interface.revision;
 
 		zbx_vector_engineid_device_append(&local_record.devices, d);
 		local_record.lastlog = 0;
 		local_record.lastseen = time(NULL);
+		local_record.modified = 0;
 		zbx_hashset_insert(&engineid_cache, &local_record, sizeof(local_record));
 
 		goto out;
 	}
 	else
 	{
-		char	*hosts = NULL;
-		size_t	hosts_alloc = 0, hosts_offset = 0;
-		int	diff_engineboots = 0, found = 0;
+		char		*hosts = NULL;
+		size_t		hosts_alloc = 0, hosts_offset = 0;
+		int		diff_engineboots = 0, found = 0;
+		zbx_uint64_t	revision = 0;
 
 		ptr->lastseen = time(NULL);
 
 		for (int i = 0; i < ptr->devices.values_num; i++)
 		{
+			revision = MAX(revision, ptr->devices.values[i].revision);
+
 			if ((0 == strcmp(item_context->interface.addr, ptr->devices.values[i].address) &&
 					0 == strcmp(item_context->host, ptr->devices.values[i].hostname)))
 			{
@@ -378,11 +391,27 @@ static int	zbx_snmp_cache_handle_engineid(netsnmp_session *session, zbx_dc_item_
 			}
 		}
 
+		if (revision < item_context->interface.revision)
+		{
+			ptr->modified = 1;
+			engineid_cache_modified = 1;
+
+			for (int i = 0; i < ptr->devices.values_num; i++)
+			{
+				zbx_free(ptr->devices.values[i].address);
+				zbx_free(ptr->devices.values[i].hostname);
+			}
+
+			zbx_vector_engineid_device_clear(&ptr->devices);
+			found = 0;
+		}
+
 		if (0 == found)
 		{
 			d.address = zbx_strdup(NULL, item_context->interface.addr);
 			d.hostname = zbx_strdup(NULL, item_context->host);
 			d.engineboots = current_engineboots;
+			d.revision = item_context->interface.revision;
 
 			zbx_vector_engineid_device_append(&ptr->devices, d);
 		}
@@ -428,6 +457,8 @@ void	zbx_housekeep_snmp_engineid_cache(void)
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
+	engineid_cache_modified = 0;
+
 	user = usm_get_userList();
 
 	while (NULL != user)
@@ -436,8 +467,13 @@ void	zbx_housekeep_snmp_engineid_cache(void)
 		engineid_local.engineid_len = user->engineIDLen;
 		memcpy(&engineid_local.engineid, user->engineID, user->engineIDLen);
 
-		if (NULL == zbx_hashset_search(&engineid_cache, &engineid_local))
+		engineid = (zbx_snmp_engineid_record_t *)zbx_hashset_search(&engineid_cache, &engineid_local);
+
+		if (NULL == engineid || 0 != engineid->modified)
 		{
+			if (NULL != engineid)
+				engineid->modified = 0;
+
 			prev_user = user;
 			user = user->next;
 			usm_remove_user(prev_user);

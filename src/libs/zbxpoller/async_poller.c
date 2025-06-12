@@ -668,7 +668,7 @@ ZBX_THREAD_ENTRY(zbx_async_poller_thread, args)
 
 	time_t				last_stat_time;
 #ifdef HAVE_NETSNMP
-	time_t				last_snmp_engineid_hk_time = 0;
+	time_t				last_snmp_hk_time = 0;
 #endif
 	zbx_ipc_async_socket_t		rtc;
 	const zbx_thread_info_t		*info = &((zbx_thread_args_t *)args)->info;
@@ -740,7 +740,7 @@ ZBX_THREAD_ENTRY(zbx_async_poller_thread, args)
 		if (ZBX_POLLER_TYPE_SNMP == poller_type)
 		{
 			zbx_init_snmp_engineid_cache();
-			last_snmp_engineid_hk_time = time(NULL);
+			last_snmp_hk_time = time(NULL);
 		}
 #endif
 	}
@@ -803,12 +803,17 @@ ZBX_THREAD_ENTRY(zbx_async_poller_thread, args)
 		}
 
 #ifdef HAVE_NETSNMP
-#define	SNMP_ENGINEID_HK_INTERVAL	86400
-		if (ZBX_POLLER_TYPE_SNMP == poller_type && time(NULL) >=
-				SNMP_ENGINEID_HK_INTERVAL + last_snmp_engineid_hk_time)
+#define	SNMP_ENGINEID_HK_INTERVAL		86400
+#define	SNMP_ENGINEID_MODIFIED_HK_INTERVAL	60
+		if (ZBX_POLLER_TYPE_SNMP == poller_type)
 		{
-			last_snmp_engineid_hk_time = time(NULL);
-			poller_config.clear_cache = ZBX_SNMP_POLLER_HOUSEKEEP_CACHE;
+			if ((time(NULL) >= SNMP_ENGINEID_HK_INTERVAL + last_snmp_hk_time ||
+					(time(NULL) >= SNMP_ENGINEID_MODIFIED_HK_INTERVAL + last_snmp_hk_time &&
+							0 != zbx_engineid_cache_modified())))
+			{
+				last_snmp_hk_time = time(NULL);
+				poller_config.clear_cache = ZBX_SNMP_POLLER_HOUSEKEEP_CACHE;
+			}
 		}
 #undef SNMP_ENGINEID_HK_INTERVAL
 #endif
