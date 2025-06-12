@@ -539,8 +539,6 @@ class testDiscoveryRules extends CIntegrationTest {
 	public function testDiscoveryRules_snmpErrorViaServer(): void  {
 		$this->stopComponent(self::COMPONENT_SERVER);
 
-		sleep(2000);
-
 		self::deleteAllActions();
 		self::deleteAllDrules();
 		$this->deleteAllHosts();
@@ -578,11 +576,6 @@ class testDiscoveryRules extends CIntegrationTest {
 
 		$this->waitForDiscoveryErr(self::SNMPAGENT_EXPECTED_INVALID_OID_ERR_MSG);
 		$this->waitForDiscovery(self::SNMPSIM_HOST_IP);
-
-		$this->stopComponent(self::COMPONENT_SERVER);
-
-		sleep(700);
-
 	}
 
 	/**
