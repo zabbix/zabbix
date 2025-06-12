@@ -4,7 +4,7 @@ msgstr ""
 "Project-Id-Version: Zabbix 6.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2024-04-02 17:26+0300\n"
-"PO-Revision-Date: 2025-06-04 08:01+0000\n"
+"PO-Revision-Date: 2025-06-06 01:37+0000\n"
 "Last-Translator: Akira <g42getd@gmail.com>\n"
 "Language-Team: Zabbix\n"
 "Language: ja\n"
@@ -19926,7 +19926,7 @@ msgstr "障害あり"
 
 #: app/views/popup.tophosts.column.edit.php:119
 msgid "With this setting only numeric items will be displayed in this column."
-msgstr "この設定では数値のアイテムのみがこの列に表示されます。"
+msgstr "この設定では数値アイテムのみがこの列に表示されます。"
 
 #: include/forms.inc.php:339 include/forms.inc.php:557
 msgid "With triggers"
