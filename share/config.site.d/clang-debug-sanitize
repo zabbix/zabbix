@@ -1,64 +1,56 @@
-# Be bourne shell compliant.
+#!/bin/bash
 
-test -z "$CC" && CC=clang
+if [ -z "$CC" ]
+then
+   CC=clang
+fi
 
-# -Wall and -Wextra enable groups of other warning flags.
-# Do not repeat them. See the Clang Diagnostic's Reference
-# for details[1].
-#
-# Warning flags go first, followed by code generation convention
-# flags (i.e. -f..)[2].
-# DO NOT list machine-specific flags (i.e. -m..)[3] here.
-#
-# --
-# [_]: https://clang.llvm.org/docs/UsersManual.html
-# [1]: https://clang.llvm.org/docs/DiagnosticsReference.html
-# [2]: [_]#controlling-code-generation
-# [3]: [_]#target-specific-features-and-limitations
-test -z "$CFLAGS"                                                            \
-    && CFLAGS="-std=gnu99"                                                   \
-    && CFLAGS="$CFLAGS -O0 -ggdb3"                                           \
-    && CFLAGS="$CFLAGS -Wall"                                                \
-    && CFLAGS="$CFLAGS -Wextra"                                              \
-    && CFLAGS="$CFLAGS -Winit-self"                                          \
-    && CFLAGS="$CFLAGS -Wmissing-declarations"                               \
-    && CFLAGS="$CFLAGS -Wmissing-prototypes"                                 \
-    && CFLAGS="$CFLAGS -Wmissing-field-initializers"                         \
-    && CFLAGS="$CFLAGS -Wredundant-decls"                                    \
-    && CFLAGS="$CFLAGS -Wdangling-else"                                      \
-    && CFLAGS="$CFLAGS -Wshadow"                                             \
-    && CFLAGS="$CFLAGS -Wnested-externs"                                     \
-    && CFLAGS="$CFLAGS -Wunused"                                             \
-    && CFLAGS="$CFLAGS -Wunused-parameter"                                   \
-    && CFLAGS="$CFLAGS -Wfloat-conversion"                                   \
-    && CFLAGS="$CFLAGS -Wincompatible-pointer-types"                         \
-    && CFLAGS="$CFLAGS -Wnull-dereference"                                   \
-    && CFLAGS="$CFLAGS -Wpointer-arith"                                      \
-    && CFLAGS="$CFLAGS -Wno-null-pointer-subtraction"                        \
-    && CFLAGS="$CFLAGS -Wno-overlength-strings"                              \
-    && CFLAGS="$CFLAGS -Wunreachable-code"                                   \
-    && CFLAGS="$CFLAGS -Wformat"                                             \
-    && CFLAGS="$CFLAGS -Wformat-extra-args"                                  \
-    && CFLAGS="$CFLAGS -Wold-style-definition"                               \
-    && CFLAGS="$CFLAGS -Wunused-result"                                      \
-    && CFLAGS="$CFLAGS -Wmisleading-indentation"                             \
-    && CFLAGS="$CFLAGS -Wimplicit-function-declaration"                      \
-    && CFLAGS="$CFLAGS -Wendif-labels"                                       \
-    && CFLAGS="$CFLAGS -Winvalid-pch"                                        \
-    && CFLAGS="$CFLAGS -Wformat-security"                                    \
-    && CFLAGS="$CFLAGS -Wcast-function-type"                                 \
-    && CFLAGS="$CFLAGS -fstrict-aliasing"
+if [ -z "$CFLAGS" ]
+then
+    CFLAGS="-std=gnu99"
+    CFLAGS+=" -O0 -ggdb3"
+    CFLAGS+=" -Wall"
+    CFLAGS+=" -Wextra"
+    CFLAGS+=" -Winit-self"
+    CFLAGS+=" -Wmissing-declarations"
+    CFLAGS+=" -Wmissing-prototypes"
+    CFLAGS+=" -Wmissing-field-initializers"
+    CFLAGS+=" -Wredundant-decls"
+    CFLAGS+=" -Wdangling-else"
+    CFLAGS+=" -Wshadow"
+    CFLAGS+=" -Wnested-externs"
+    CFLAGS+=" -Wunused"
+    CFLAGS+=" -Wunused-parameter"
+    CFLAGS+=" -Wfloat-conversion"
+    CFLAGS+=" -Wincompatible-pointer-types"
+    CFLAGS+=" -Wnull-dereference"
+    CFLAGS+=" -Wpointer-arith"
+    CFLAGS+=" -Wno-null-pointer-subtraction"
+    CFLAGS+=" -Wno-overlength-strings"
+    CFLAGS+=" -Wunreachable-code"
+    CFLAGS+=" -Wformat"
+    CFLAGS+=" -Wformat-extra-args"
+    CFLAGS+=" -Wold-style-definition"
+    CFLAGS+=" -Wunused-result"
+    CFLAGS+=" -Wmisleading-indentation"
+    CFLAGS+=" -Wimplicit-function-declaration"
+    CFLAGS+=" -Wendif-labels"
+    CFLAGS+=" -Winvalid-pch"
+    CFLAGS+=" -Wformat-security"
+    CFLAGS+=" -Wcast-function-type"
+    CFLAGS+=" -fstrict-aliasing"
 
-# flags for clang
-test -z "$CFLAGS"                                                            \
-    && CFLAGS="$CFLAGS -Wno-uninitialized"
+    # flags for clang
+    CFLAGS+=" -Wno-uninitialized"
 
-# flags for clang sanitizers
-    && CFLAGS="$CFLAGS -fsanitize=leak,address,undefined"                    \
-    && CFLAGS="$CFLAGS -fsanitize-address-use-after-scope"
+    # flags for clang sanitizers
+    CFLAGS+=" -fsanitize=leak,address,undefined"
+    CFLAGS+=" -fsanitize-address-use-after-scope"
+fi
 
 
-test -z "$LDFLAGS"                                                          \
-   && LDFLAGS="$LDFLAGS -fsanitize=leak,address,undefined"                  \
-   && LDFLAGS="$LDFLAGS -fsanitize-address-use-after-scope"
-
+if [ -z "$LDFLAGS" ]
+then
+   LDFLAGS="-fsanitize=leak,address,undefined"
+   LDFLAGS+=" -fsanitize-address-use-after-scope"
+fi

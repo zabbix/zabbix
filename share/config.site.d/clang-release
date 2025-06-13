@@ -1,24 +1,14 @@
-# Be bourne shell compliant.
+#!/bin/bash
 
-test -z "$CC" && CC=clang
+if [ -z "$CC" ]
+then
+   CC=clang
+fi
 
-# -Wall and -Wextra enable groups of other warning flags.
-# Do not repeat them. See the Clang Diagnostic's Reference
-# for details[1].
-#
-# Warning flags go first, followed by code generation convention
-# flags (i.e. -f..)[2].
-# DO NOT list machine-specific flags (i.e. -m..)[3] here.
-#
-# --
-# [_]: https://clang.llvm.org/docs/UsersManual.html
-# [1]: https://clang.llvm.org/docs/DiagnosticsReference.html
-# [2]: [_]#controlling-code-generation
-# [3]: [_]#target-specific-features-and-limitations
-test -z "$CFLAGS"                                                            \
-    && CFLAGS="-O2 -g"                                                       \
-    && CFLAGS="$CFLAGS -Wall -Wextra"                                        \
-    && CFLAGS="$CFLAGS -Wincompatible-pointer-types"                         \
-    && CFLAGS="$CFLAGS -Wnull-dereference -Wpointer-arith"                   \
-    && CFLAGS="$CFLAGS -Wwrite-strings"                                      \
-    && CFLAGS="$CFLAGS -Woverlength-strings"
+
+if [ -z "$CFLAGS" ]
+then
+   CFLAGS="-std=gnu99"
+   CFLAGS+=" -O2"
+   CFLAGS+=" -fPIE"
+fi
