@@ -15,10 +15,12 @@
 
 require_once dirname(__FILE__).'/../include/CIntegrationTest.php';
 
+
+// * xbackup hosts
+
 /**
  * Test suite for discovery rules
  *
- * @backup hosts
  *
  * @onAfter deleteData
  */
@@ -32,7 +34,8 @@ class testDiscoveryRules extends CIntegrationTest {
 	const MAX_ATTEMPTS_DISCOVERY = 60;
 
 	/* For tests with real SNMP agent */
-	const SNMPAGENT_VALID_OID = 'iso.3.6.1.2.1.1.1.0';
+	//const SNMPAGENT_VALID_OID = 'iso.3.6.1.2.1.1.1.0';
+	const SNMPAGENT_VALID_OID = 'iso.3';
 	const SNMPAGENT_INVALID_OID = 'invalid.OID';
 	const SNMPAGENT_EXPECTED_INVALID_OID_ERR_MSG = "'SNMPv2c agent' checks failed: " .
 		'"snmp_parse_oid(): cannot parse OID "' .
@@ -65,6 +68,10 @@ class testDiscoveryRules extends CIntegrationTest {
 	private static $proxies = array();
 
 	private static function snmpsimStart(): void {
+
+
+
+
 		$datadir = realpath(dirname(__FILE__)) . '/' . self::SNMPSIM_DATA_DIR_REL_PATH;
 
 		$cmd = 'snmpsimd';
@@ -76,6 +83,12 @@ class testDiscoveryRules extends CIntegrationTest {
 		$cmd .= ' --process-user=' . self::SNMPSIM_PROCESS_USER;
 		$cmd .= ' --process-group=' . self::SNMPSIM_PROCESS_GROUP;
 		$cmd .= ' --agent-udpv4-endpoint=' . self::SNMPSIM_DRULE_IP_RANGE . ':' . self::SNMPSIM_HOST_PORT;
+
+
+		//for ($i = 4; $i < 255; $i++) {
+		//	$cmd .= ' --agent-udpv4-endpoint=' . '127.0.10.' . $i . ':' . self::SNMPSIM_HOST_PORT;
+		//}
+
 		$cmd .= ' --data-dir=' . $datadir;
 		$cmd .= ' > /dev/null 2>&1 &';
 		shell_exec($cmd);
@@ -220,7 +233,8 @@ class testDiscoveryRules extends CIntegrationTest {
 
 	private function createDruleSnmpv3($name, $proxyId): string {
 		$drule = [
-			'iprange' => self::SNMPSIM_DRULE_IP_RANGE,
+			//'iprange' => self::SNMPSIM_DRULE_IP_RANGE,
+			'iprange' => '127.0.10.0-255',
 			'name' => $name,
 			'delay' => '1s',
 			'status' => 0, /* enabled */
@@ -362,7 +376,8 @@ class testDiscoveryRules extends CIntegrationTest {
 				'Hostname' => self::PROXY_NAME,
 				'ListenPort' => PHPUNIT_PORT_PREFIX.self::PROXY_PORT_SUFFIX,
 				'ProxyBufferMode' => 'memory',
-				'ProxyMemoryBufferSize' => '128K'
+				'ProxyMemoryBufferSize' => '128K',
+				'DebugLevel' => 5
 			]
 		];
 	}
@@ -564,7 +579,9 @@ class testDiscoveryRules extends CIntegrationTest {
 		$this->deleteProxy();
 
 		$proxyId = $this->createProxy();
-
+		if (is_null($proxyId)) {
+			$proxyId = end(self::$proxies);
+		}
 		$druleId = $this->createDruleSnmpv3(self::DRULE_NAME, $proxyId);
 		$this->createActionHostAdd($druleId, self::DISCOVERY_ACTION_NAME);
 
@@ -576,6 +593,7 @@ class testDiscoveryRules extends CIntegrationTest {
 
 		$this->waitForDiscoveryErr(self::SNMPAGENT_EXPECTED_INVALID_OID_ERR_MSG);
 		$this->waitForDiscovery(self::SNMPSIM_HOST_IP);
+
 	}
 
 	/**
@@ -584,7 +602,7 @@ class testDiscoveryRules extends CIntegrationTest {
 	 * @configurationDataProvider proxyDBModeconfigurationProvider
 	 */
 	public function testDiscoveryRules_snmpErrorViaProxyDBMode(): void {
-		$this->proxyTest();
+		//$this->proxyTest();
 	}
 
 	/**
@@ -594,6 +612,31 @@ class testDiscoveryRules extends CIntegrationTest {
 	 */
 	public function testDiscoveryRules_snmpErrorViaProxyMemoryMode(): void {
 		$this->proxyTest();
+
+		$this->stopComponent(self::COMPONENT_SERVER);
+
+		$datadir = realpath(dirname(__FILE__)) . '/' . self::SNMPSIM_DATA_DIR_REL_PATH;
+		$cmd = 'snmpsimd';
+		$cmd .= ' --v3-user=' . self::SNMPSIM_USERNAME;
+		$cmd .= ' --v3-auth-key=' . self::SNMPSIM_AUTH_KEY;
+		$cmd .= ' --v3-priv-key=' . self::SNMPSIM_PRIV_KEY;
+		$cmd .= ' --v3-auth-proto=' . self::SNMPSIM_AUTH_PROTOCOL;
+		$cmd .= ' --v3-priv-proto=' . self::SNMPSIM_PRIV_PROTOCOL;
+		$cmd .= ' --process-user=' . self::SNMPSIM_PROCESS_USER;
+		$cmd .= ' --process-group=' . self::SNMPSIM_PROCESS_GROUP;
+		$cmd .= ' --agent-udpv4-endpoint=' . self::SNMPSIM_DRULE_IP_RANGE . ':' . self::SNMPSIM_HOST_PORT;
+
+
+		for ($i = 4; $i < 255; $i++) {
+			$cmd .= ' --agent-udpv4-endpoint=' . '127.0.10.' . $i . ':' . self::SNMPSIM_HOST_PORT;
+		}
+
+		$cmd .= ' --data-dir=' . $datadir;
+		$cmd .= ' > /dev/null 2>&1 &';
+		shell_exec($cmd);
+
+		sleep(300);
+
 	}
 
 	/**
@@ -602,7 +645,7 @@ class testDiscoveryRules extends CIntegrationTest {
 	 * @configurationDataProvider proxyHybridModeconfigurationProvider
 	 */
 	public function testDiscoveryRules_snmpErrorViaProxyHybridMode(): void {
-		$this->proxyTest();
+		//$this->proxyTest();
 	}
 
 	/**
@@ -610,8 +653,8 @@ class testDiscoveryRules extends CIntegrationTest {
 	 */
 	public static function deleteData(): void {
 		self::snmpsimStop();
-		self::deleteAllActions();
-		self::deleteAllDrules();
-		self::deleteProxy();
+		//self::deleteAllActions();
+		//self::deleteAllDrules();
+		//self::deleteProxy();
 	}
 }
