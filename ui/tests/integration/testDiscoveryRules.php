@@ -270,7 +270,7 @@ class testDiscoveryRules extends CIntegrationTest {
 		$this->assertEquals(count($initial_timeouts), count($response['result']));
 
 		$drule = [
-			'iprange' => '127.0.10.1-100',
+			'iprange' => '127.0.10.1-200',
 			'name' => $name,
 			'delay' => '1s',
 			'status' => 0, /* enabled */
@@ -684,7 +684,7 @@ class testDiscoveryRules extends CIntegrationTest {
 		$cmd .= ' > /dev/null 2>&1 &';
 		shell_exec($cmd);
 
-		sleep(300);
+		sleep(400);
 
 	}
 
