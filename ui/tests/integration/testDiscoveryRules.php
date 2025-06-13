@@ -233,8 +233,7 @@ class testDiscoveryRules extends CIntegrationTest {
 
 	private function createDruleSnmpv3($name, $proxyId): string {
 		$drule = [
-			//'iprange' => self::SNMPSIM_DRULE_IP_RANGE,
-			'iprange' => '127.0.10.1-255',
+			'iprange' => self::SNMPSIM_DRULE_IP_RANGE,
 			'name' => $name,
 			'delay' => '1s',
 			'status' => 0, /* enabled */
@@ -271,6 +270,48 @@ class testDiscoveryRules extends CIntegrationTest {
 
 		return $response['result']['druleids'][0];
 	}
+
+
+	private function createDruleSnmpv3Multi($name, $proxyId): string {
+		$drule = [
+			'iprange' => self::SNMPSIM_DRULE_IP_RANGE,
+			'name' => $name,
+			'delay' => '1s',
+			'status' => 0, /* enabled */
+			'concurrency_max' => ZBX_DISCOVERY_CHECKS_UNLIMITED,
+			'dchecks' => [
+				[
+					'type' => SVC_SNMPv3,
+					'key_' => self::SNMPSIM_VALID_OID,
+					'ports' => self::SNMPSIM_HOST_PORT,
+					'snmpv3_authpassphrase' => self::SNMPSIM_AUTH_KEY,
+					'snmpv3_authprotocol' => self::SNMPSIM_DRULE_AUTH_PROTOCOL,
+					'snmpv3_contextname' => self::SNMPSIM_DRULE_CONTEXT_NAME,
+					'snmpv3_privpassphrase' => self::SNMPSIM_PRIV_KEY,
+					'snmpv3_privprotocol' => self::SNMPSIM_DRULE_PRIVACY_PROTOCOL,
+					'snmpv3_securitylevel' => self::SNMPSIM_DRULE_SECURITY_LEVEL,
+					'snmpv3_securityname' => self::SNMPSIM_USERNAME,
+					'uniq' => 0,
+					'host_source' => 2, /* IP */
+					'name_source' => 2  /* IP */
+				]
+			]
+		];
+
+		if (!is_null($proxyId)) {
+			$drule['proxyid'] = $proxyId;
+		}
+
+		$response = $this->call('drule.create', $drule);
+		$this->assertArrayHasKey('result', $response, 'Failed to create a discovery rule');
+		$this->assertArrayHasKey('druleids', $response['result'], 'Failed to create a discovery rule');
+		$this->assertCount(1, $response['result'], 'Failed to create a discovery rule');
+
+		array_push(self::$drules, $response['result']['druleids'][0]);
+
+		return $response['result']['druleids'][0];
+	}
+
 
 	private function createActionHostAdd($druleId, $actionName): string {
 		$response = $this->call('action.create', [
@@ -547,9 +588,19 @@ class testDiscoveryRules extends CIntegrationTest {
 		]);
 	}
 
+	public function defaultConfigurationProvider() {
+		return [
+			self::COMPONENT_SERVER => [
+				'DebugLevel' => 5,
+				'LogFileSize' => 0
+			],
+			}
+	}
+
 	/**
 	 * @depends testDiscoveryRules_opDelHostTags
 	 * @required-components server
+	 * @configurationDataProvider defaultConfigurationProvider
 	 */
 	public function testDiscoveryRules_snmpErrorViaServer(): void  {
 		$this->stopComponent(self::COMPONENT_SERVER);
@@ -582,7 +633,7 @@ class testDiscoveryRules extends CIntegrationTest {
 		if (is_null($proxyId)) {
 			$proxyId = end(self::$proxies);
 		}
-		$druleId = $this->createDruleSnmpv3(self::DRULE_NAME, $proxyId);
+		$druleId = $this->createDruleSnmpv3Multi(self::DRULE_NAME, $proxyId);
 		$this->createActionHostAdd($druleId, self::DISCOVERY_ACTION_NAME);
 
 		$druleWithErrId = $this->createDruleSnmpv2(self::DRULE_NAME_ERR, '127.0.0.1', self::SNMPAGENT_INVALID_OID, $proxyId);
