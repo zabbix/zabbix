@@ -233,8 +233,8 @@ class testDiscoveryRules extends CIntegrationTest {
 
 	private function createDruleSnmpv3($name, $proxyId): string {
 		$drule = [
-			//'iprange' => self::SNMPSIM_DRULE_IP_RANGE,
-			'iprange' => '127.0.10.0-255',
+			'iprange' => self::SNMPSIM_DRULE_IP_RANGE,
+			//'iprange' => '127.0.10.0-255',
 			'name' => $name,
 			'delay' => '1s',
 			'status' => 0, /* enabled */
