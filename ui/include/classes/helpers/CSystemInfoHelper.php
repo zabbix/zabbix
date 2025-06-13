@@ -303,7 +303,6 @@ class CSystemInfoHelper {
 			self::getSupportAndReleaseData($check_data['versions'], $data);
 		}
 
-
 		return $data;
 	}
 

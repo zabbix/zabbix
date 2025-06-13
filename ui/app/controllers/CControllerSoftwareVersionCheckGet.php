@@ -43,8 +43,7 @@ class CControllerSoftwareVersionCheckGet extends CController {
 				'versions' => []
 			];
 
-			if ($check_data['nextcheck'] > $now
-					&& version_compare($check_data['lastcheck_success_version'], ZABBIX_VERSION, '==')) {
+			if ($check_data['nextcheck'] > $now	&& $check_data['lastcheck_success_version'] === ZABBIX_VERSION) {
 				$data['delay'] = $check_data['nextcheck'] - $now + mt_rand(1, SEC_PER_MIN);
 			}
 			else {
