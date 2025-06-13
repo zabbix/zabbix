@@ -5220,6 +5220,10 @@ msgstr "Komunikácia"
 msgid "Communication between Zabbix agent and server/proxy is secured with a unique user-defined pre-shared key identity and a secret pre-shared key linked to it."
 msgstr "Komunikácia medzi agentom Zabbix a serverom/proxy je zabezpečená jedinečnou identitou vopred zdieľaného kľúča definovaného používateľom a tajným vopred zdieľaným kľúčom, ktorý je s ňou prepojený."
 
+#: app/views/host.wizard.edit.php:414
+msgid "Communication between Zabbix agent and server/proxy is secured with the pre-shared key (PSK) encryption method."
+msgstr ""
+
 #: include/items.inc.php:946
 msgctxt "SNMP Community"
 msgid "Community"
@@ -6261,6 +6265,10 @@ msgstr "Vlastné mená závažností ovplyvňujú všetky locales a vyžadujú m
 msgid "Custom size"
 msgstr "Vlastná veľkosť"
 
+#: app/views/host.wizard.edit.php:138
+msgid "Custom templates are not supported."
+msgstr ""
+
 #: app/views/administration.miscconfig.edit.php:103
 #: include/classes/setup/CSetupWizard.php:561
 msgid "CyberArk Vault"
@@ -6429,6 +6437,10 @@ msgstr "Zber dát"
 #, c-format
 msgid "Data from %1$s. Generated in %2$s sec."
 msgstr "Údaje z %1$s. Vygenerované za %2$s sek."
+
+#: app/views/host.wizard.edit.php:168
+msgid "Data is collected by Zabbix agent, a lightweight software `component installed on your monitoring target."
+msgstr ""
 
 #: app/views/js/host.wizard.edit.js.php:89
 msgid "Data is collected by Zabbix agent, a lightweight software component installed on your monitoring target."
@@ -12164,6 +12176,10 @@ msgstr "Inštalácia agenta Zabbix"
 #: app/views/host.wizard.edit.php:512 app/views/host.wizard.edit.php:535
 msgid "Install Zabbix agent 2 and its plugins on your monitoring target by following the installation instructions below."
 msgstr "Nainštalujte si Zabbix agenta 2 a jeho pluginy na váš monitorovací cieľ podľa pokynov na inštaláciu uvedených nižšie."
+
+#: app/views/host.wizard.edit.php:551 app/views/host.wizard.edit.php:574
+msgid "Install Zabbix agent and its plugins on your monitoring target by following the installation instructions below."
+msgstr ""
 
 #: setup.php:163
 msgid "Installation"
@@ -19754,6 +19770,10 @@ msgstr "Bezpečnostná úroveň"
 msgid "Security name"
 msgstr "Bezpečnostné meno"
 
+#: app/views/host.wizard.edit.php:132
+msgid "See"
+msgstr ""
+
 #: app/views/popup.condition.edit.php:402 app/views/popup.generic.php:874
 #: app/views/popup.massupdate.item.php:440 app/views/popup.services.php:92
 #: app/views/popup.triggerexpr.php:88 include/classes/html/CMultiSelect.php:70
@@ -20653,6 +20673,11 @@ msgstr "Časť histórie tejto položky môže byť komprimovaná, odstránenie 
 msgid "Some templates (%1$s) are hidden. Custom templates are not supported."
 msgstr "Niektoré šablóny (%1$s) sú skryté. Vlastné šablóny nie sú podporované."
 
+#: app/views/host.wizard.edit.php:130
+#, c-format
+msgid "Some templates (%1$s) are incompatible with the Host Wizard."
+msgstr ""
+
 #: widgets/actionlog/includes/WidgetForm.php:79
 #: widgets/problems/includes/WidgetForm.php:145
 msgid "Sort entries by"
@@ -20707,6 +20732,10 @@ msgstr "Ak chcete zobraziť grafy, zadajte hosta."
 #: app/views/popup.generic.php:180 include/views/monitoring.history.php:293
 msgid "Specify some filter condition to see the values."
 msgstr "Špecifikujte podmienky vyhľadávania pre zobrazenie hodnôt."
+
+#: app/views/host.wizard.edit.php:365
+msgid "Specifying new or existing host groups will add the host to these groups without removing it from any current groups."
+msgstr ""
 
 #: httpdetails.php:107 include/classes/screens/CScreenHttpTestDetails.php:82
 msgid "Speed"
@@ -21966,6 +21995,10 @@ msgid_plural "This check cannot be removed, as it is used as a condition in %1$s
 msgstr[0] "Nie je možné odstrániť túto položku, pretože sa používa ako podmienka v akcii zisťovania %1$s."
 msgstr[1] "Nie je možné odstrániť túto položku, pretože sa používa ako podmienka v akciách zisťovania %1$s."
 msgstr[2] "Nie je možné odstrániť túto položku, pretože sa používa ako podmienka v akciách zisťovania %1$s."
+
+#: app/views/host.wizard.edit.php:384
+msgid "This configuration will overwrite all existing encryption settings on the host."
+msgstr ""
 
 #: include/func.inc.php:2566
 msgid "This day last week"
@@ -26663,6 +26696,10 @@ msgstr "prototyp hosta s rovnakým UUID už existuje"
 msgid "host trigger ID is expected"
 msgstr "očakáva sa ID host spúšťača"
 
+#: app/views/host.wizard.edit.php:134
+msgid "how to update them"
+msgstr ""
+
 #: include/classes/api/services/CMap.php:844
 #: include/classes/api/services/CMap.php:1311
 msgid "icon"
@@ -27026,6 +27063,10 @@ msgstr "d-m"
 #: include/translateDefines.inc.php:33
 msgid "m-d h:i A"
 msgstr "d-m H:i"
+
+#: app/views/host.wizard.edit.php:589
+msgid "macOS"
+msgstr ""
 
 #: include/classes/parsers/CUserMacroParser.php:37
 msgid "macro is empty"

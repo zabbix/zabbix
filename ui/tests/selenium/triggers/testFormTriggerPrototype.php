@@ -316,7 +316,7 @@ class testFormTriggerPrototype extends CLegacyWebTest {
 				$dialog->asForm()->fill(['Name' => 'Layout test trigger']);
 			}
 
-			/* hoverMouse() added becouse #28 test case is unstable on Jenkins possibly due to scroll
+			/* hoverMouse() added because #28 test case is unstable on Jenkins possibly due to scroll
 			 * fails with error - other element would receive the click.
 			 */
 			$dialog->query('button:Expression constructor')->waitUntilClickable()->one()->hoverMouse()->click();
