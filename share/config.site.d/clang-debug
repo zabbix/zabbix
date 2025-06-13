@@ -50,5 +50,4 @@ test -z "$CFLAGS"                                                            \
     && CFLAGS="$CFLAGS -Winvalid-pch"                                        \
     && CFLAGS="$CFLAGS -Wformat-security"                                    \
     && CFLAGS="$CFLAGS -Wcast-function-type"                                 \
-    && CFLAGS="$CFLAGS -fstrict-aliasing"                                    \
-    && CFLAGS="$CFLAGS -Wcast-align"
+    && CFLAGS="$CFLAGS -fstrict-aliasing"
