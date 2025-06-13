@@ -46,7 +46,10 @@ test -z "$CFLAGS"                                                            \
     && CFLAGS="$CFLAGS -Winvalid-pch"                                        \
     && CFLAGS="$CFLAGS -Wformat-security"                                    \
     && CFLAGS="$CFLAGS -Wcast-function-type"                                 \
-    && CFLAGS="$CFLAGS -fstrict-aliasing"                                    \
+    && CFLAGS="$CFLAGS -fstrict-aliasing"
+
+# flags for gcc
+test -z "$CFLAGS"                                                            \
     && CFLAGS="$CFLAGS -Wno-maybe-uninitialized"                             \
     && CFLAGS="$CFLAGS -Wjump-misses-init"                                   \
     && CFLAGS="$CFLAGS -Wformat-signedness"
