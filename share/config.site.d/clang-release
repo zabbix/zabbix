@@ -2,13 +2,13 @@
 
 if [ -z "$CC" ]
 then
-   CC=clang
+	CC=clang
 fi
 
 
 if [ -z "$CFLAGS" ]
 then
-   CFLAGS="-std=gnu99"
-   CFLAGS+=" -O2"
-   CFLAGS+=" -fPIE"
+	CFLAGS="-std=gnu99"
+	CFLAGS+=" -O2"
+	CFLAGS+=" -fPIE"
 fi
