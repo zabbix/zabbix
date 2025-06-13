@@ -447,6 +447,9 @@ int	zbx_trapper_item_test_run(const struct zbx_json_parse *jp_data, zbx_uint64_t
 				config_java_gateway_port, config_externalscripts, get_value_internal_ext_cb,
 				config_ssh_key_location, config_webdriver_url);
 
+		if (ITEM_TYPE_SNMP == item.type)
+			zbx_clear_cache_snmp(ZBX_PROCESS_TYPE_TRAPPER, FAIL);
+
 		switch (errcode)
 		{
 			case SUCCEED:
