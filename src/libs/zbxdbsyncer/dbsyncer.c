@@ -29,6 +29,7 @@
 #include "zbx_rtc_constants.h"
 #include "zbxipcservice.h"
 #include "zbxlog.h"
+#include "zbxhistory.h"
 
 static sigset_t			orig_mask;
 
