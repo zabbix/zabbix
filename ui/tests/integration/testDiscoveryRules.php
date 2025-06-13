@@ -274,7 +274,7 @@ class testDiscoveryRules extends CIntegrationTest {
 
 	private function createDruleSnmpv3Multi($name, $proxyId): string {
 		$drule = [
-			'iprange' => '127.0.10.3-255',
+			'iprange' => '127.0.10.1-10',
 			'name' => $name,
 			'delay' => '1s',
 			'status' => 0, /* enabled */
