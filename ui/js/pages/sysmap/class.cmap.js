@@ -521,9 +521,8 @@ class CMap {
 				can_remove = false,
 				can_reorder = false;
 
-			// right-click on a border of a sysmap shape
-			if (item_data.id === undefined && $(element).closest('.sysmap_shape').length) {
-				item_data = $(element).closest('.sysmap_shape')[0].dataset
+			if (item_data.id === undefined && element.closest('.sysmap_shape') !== null) {
+				item_data = element.closest('.sysmap_shape').dataset
 			}
 
 			if (item_data.id === undefined) {
