@@ -603,11 +603,10 @@ ZABBIX.apps.map = (function($) {
 						can_remove = false,
 						can_reorder = false;
 
-					// right-click on a border of a sysmap shape
-					if (typeof item_data.id === 'undefined' && $(event.target).closest('.sysmap_shape').length) {
+					if (typeof item_data.id === 'undefined' && target.closest('.sysmap_shape').length) {
 						item_data = {
-							id: $(event.target).closest('.sysmap_shape').attr('data-id'),
-							type: $(event.target).closest('.sysmap_shape').attr('data-type')
+							id: target.closest('.sysmap_shape').attr('data-id'),
+							type: target.closest('.sysmap_shape').attr('data-type')
 						}
 					}
 
