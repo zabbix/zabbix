@@ -593,8 +593,8 @@ class testDiscoveryRules extends CIntegrationTest {
 			self::COMPONENT_SERVER => [
 				'DebugLevel' => 5,
 				'LogFileSize' => 0
-			],
-			}
+			]
+		];
 	}
 
 	/**
