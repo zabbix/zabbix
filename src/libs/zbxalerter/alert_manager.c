@@ -1970,11 +1970,15 @@ static void	am_process_external_alert_request(zbx_am_t *manager, zbx_uint64_t id
 			&smtp_verify_host, &smtp_authentication, &maxsessions, &maxattempts, &attempt_interval,
 			&message_format, &script, &timeout, &sendto, &subject, &message, &params);
 
+	zbx_audit_prepare(ZBX_AUDIT_ALL_CONTEXT);
+
 	/* update with initial 'remove' flag so the mediatype is removed if it's not used by other alerts */
 	am_update_mediatype(manager, mediatypeid, type, name, smtp_server, smtp_helo, smtp_email, exec_path, gsm_modem,
 			username, passwd, smtp_port, smtp_security, smtp_verify_peer, smtp_verify_host,
 			smtp_authentication, maxsessions, maxattempts, attempt_interval, message_format, script, timeout,
 			ZBX_AM_MEDIATYPE_FLAG_REMOVE, config_source_ip, config_ssl_ca_location);
+
+	zbx_audit_flush(ZBX_AUDIT_ALL_CONTEXT);
 
 	alert = am_create_alert(id, mediatypeid, ALERT_SOURCE_EXTERNAL, 0, id, sendto, subject, shared_str_new(message),
 			params, message_format, 0, 0, 0);
@@ -2104,6 +2108,8 @@ static void	am_process_send_dispatch(zbx_am_t *manager, zbx_ipc_client_t *client
 
 	zbx_alerter_deserialize_send_dispatch(data, &mt, &recipients);
 
+	zbx_audit_prepare(ZBX_AUDIT_ALL_CONTEXT);
+
 	/* update with initial 'remove' flag so the mediatype is removed */
 	/* if it's not used by other test alerts/dispatches              */
 	am_update_mediatype(manager, mt.mediatypeid, mt.type, mt.name, mt.smtp_server, mt.smtp_helo, mt.smtp_email,
@@ -2111,6 +2117,8 @@ static void	am_process_send_dispatch(zbx_am_t *manager, zbx_ipc_client_t *client
 			mt.smtp_verify_peer, mt.smtp_verify_host, mt.smtp_authentication, mt.maxsessions,
 			mt.maxattempts, mt.attempt_interval, mt.message_format, mt.script, mt.timeout,
 			ZBX_AM_MEDIATYPE_FLAG_REMOVE, config_source_ip, config_ssl_ca_location);
+
+	zbx_audit_flush(ZBX_AUDIT_ALL_CONTEXT);
 
 	am_prepare_dispatch_message(dispatch, &mt, &message, &message_format);
 
