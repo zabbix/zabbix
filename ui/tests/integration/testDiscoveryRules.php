@@ -261,8 +261,16 @@ class testDiscoveryRules extends CIntegrationTest {
 
 
 	private function createDruleSnmpv3Multi($name, $proxyId): string {
+
+		$initial_timeouts = [
+			'timeout_snmp_agent' => '30s'
+		];
+
+		$response = $this->call('settings.update', $initial_timeouts);
+		$this->assertEquals(count($initial_timeouts), count($response['result']));
+
 		$drule = [
-			'iprange' => '127.0.10.1-255',
+			'iprange' => '127.0.10.1-100',
 			'name' => $name,
 			'delay' => '1s',
 			'status' => 0, /* enabled */
