@@ -27,9 +27,7 @@ test -z "$CFLAGS"                                                            \
     && CFLAGS="$CFLAGS -Wredundant-decls"                                    \
     && CFLAGS="$CFLAGS -Wdangling-else"                                      \
     && CFLAGS="$CFLAGS -Wshadow"                                             \
-    && CFLAGS="$CFLAGS -Wno-maybe-uninitialized"                             \
     && CFLAGS="$CFLAGS -Wnested-externs"                                     \
-    && CFLAGS="$CFLAGS -Wjump-misses-init"                                   \
     && CFLAGS="$CFLAGS -Wunused"                                             \
     && CFLAGS="$CFLAGS -Wunused-parameter"                                   \
     && CFLAGS="$CFLAGS -Wfloat-conversion"                                   \
@@ -41,7 +39,6 @@ test -z "$CFLAGS"                                                            \
     && CFLAGS="$CFLAGS -Wunreachable-code"                                   \
     && CFLAGS="$CFLAGS -Wformat"                                             \
     && CFLAGS="$CFLAGS -Wformat-extra-args"                                  \
-    && CFLAGS="$CFLAGS -Wformat-signedness"                                  \
     && CFLAGS="$CFLAGS -Wold-style-definition"                               \
     && CFLAGS="$CFLAGS -Wunused-result"                                      \
     && CFLAGS="$CFLAGS -Wmisleading-indentation"                             \
@@ -50,4 +47,5 @@ test -z "$CFLAGS"                                                            \
     && CFLAGS="$CFLAGS -Winvalid-pch"                                        \
     && CFLAGS="$CFLAGS -Wformat-security"                                    \
     && CFLAGS="$CFLAGS -Wcast-function-type"                                 \
-    && CFLAGS="$CFLAGS -fstrict-aliasing"
+    && CFLAGS="$CFLAGS -fstrict-aliasing"                                    \
+    && CFLAGS="$CFLAGS -Wno-uninitialized"
