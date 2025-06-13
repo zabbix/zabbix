@@ -615,6 +615,7 @@ class testDiscoveryRules extends CIntegrationTest {
 
 		$this->stopComponent(self::COMPONENT_SERVER);
 
+		self::snmpsimStop();
 		$datadir = realpath(dirname(__FILE__)) . '/' . self::SNMPSIM_DATA_DIR_REL_PATH;
 		$cmd = 'snmpsimd';
 		$cmd .= ' --v3-user=' . self::SNMPSIM_USERNAME;
