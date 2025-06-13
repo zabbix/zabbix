@@ -15,9 +15,9 @@
 
 
 /**
- * Validate import data from Zabbix 5.4.x.
+ * Validate import data from Zabbix 4.4.x.
  */
-class C54XmlValidator extends CImportValidatorGeneral {
+class C44ImportValidator extends CImportValidatorGeneral {
 
 	private $PREPROCESSING_STEP_TYPE = [
 		CXmlConstantValue::MULTIPLIER => CXmlConstantName::MULTIPLIER,
@@ -38,15 +38,12 @@ class C54XmlValidator extends CImportValidatorGeneral {
 		CXmlConstantValue::CHECK_JSON_ERROR => CXmlConstantName::CHECK_JSON_ERROR,
 		CXmlConstantValue::CHECK_XML_ERROR => CXmlConstantName::CHECK_XML_ERROR,
 		CXmlConstantValue::CHECK_REGEX_ERROR => CXmlConstantName::CHECK_REGEX_ERROR,
-		CXmlConstantValue::CHECK_NOT_SUPPORTED => CXmlConstantName::CHECK_NOT_SUPPORTED,
 		CXmlConstantValue::DISCARD_UNCHANGED => CXmlConstantName::DISCARD_UNCHANGED,
 		CXmlConstantValue::DISCARD_UNCHANGED_HEARTBEAT => CXmlConstantName::DISCARD_UNCHANGED_HEARTBEAT,
 		CXmlConstantValue::JAVASCRIPT => CXmlConstantName::JAVASCRIPT,
 		CXmlConstantValue::PROMETHEUS_PATTERN => CXmlConstantName::PROMETHEUS_PATTERN,
 		CXmlConstantValue::PROMETHEUS_TO_JSON => CXmlConstantName::PROMETHEUS_TO_JSON,
-		CXmlConstantValue::CSV_TO_JSON => CXmlConstantName::CSV_TO_JSON,
-		CXmlConstantValue::STR_REPLACE => CXmlConstantName::STR_REPLACE,
-		CXmlConstantValue::XML_TO_JSON => CXmlConstantName::XML_TO_JSON
+		CXmlConstantValue::CSV_TO_JSON => CXmlConstantName::CSV_TO_JSON
 	];
 
 	private $PREPROCESSING_STEP_TYPE_DRULE = [
@@ -59,9 +56,7 @@ class C54XmlValidator extends CImportValidatorGeneral {
 		CXmlConstantValue::DISCARD_UNCHANGED_HEARTBEAT => CXmlConstantName::DISCARD_UNCHANGED_HEARTBEAT,
 		CXmlConstantValue::JAVASCRIPT => CXmlConstantName::JAVASCRIPT,
 		CXmlConstantValue::PROMETHEUS_TO_JSON => CXmlConstantName::PROMETHEUS_TO_JSON,
-		CXmlConstantValue::CSV_TO_JSON => CXmlConstantName::CSV_TO_JSON,
-		CXmlConstantValue::STR_REPLACE => CXmlConstantName::STR_REPLACE,
-		CXmlConstantValue::XML_TO_JSON => CXmlConstantName::XML_TO_JSON
+		CXmlConstantValue::CSV_TO_JSON => CXmlConstantName::CSV_TO_JSON
 	];
 
 	private $GRAPH_GRAPH_ITEM_CALC_FNC = [
@@ -212,10 +207,14 @@ class C54XmlValidator extends CImportValidatorGeneral {
 
 	private $ITEM_TYPE = [
 		CXmlConstantValue::ITEM_TYPE_ZABBIX_PASSIVE => CXmlConstantName::ZABBIX_PASSIVE,
+		CXmlConstantValue::ITEM_TYPE_SNMPV1 => CXmlConstantName::SNMPV1,
 		CXmlConstantValue::ITEM_TYPE_TRAP => CXmlConstantName::TRAP,
 		CXmlConstantValue::ITEM_TYPE_SIMPLE => CXmlConstantName::SIMPLE,
+		CXmlConstantValue::ITEM_TYPE_SNMPV2 => CXmlConstantName::SNMPV2,
 		CXmlConstantValue::ITEM_TYPE_INTERNAL => CXmlConstantName::INTERNAL,
+		CXmlConstantValue::ITEM_TYPE_SNMPV3 => CXmlConstantName::SNMPV3,
 		CXmlConstantValue::ITEM_TYPE_ZABBIX_ACTIVE => CXmlConstantName::ZABBIX_ACTIVE,
+		CXmlConstantValue::ITEM_TYPE_AGGREGATE => CXmlConstantName::AGGREGATE,
 		CXmlConstantValue::ITEM_TYPE_EXTERNAL => CXmlConstantName::EXTERNAL,
 		CXmlConstantValue::ITEM_TYPE_ODBC => CXmlConstantName::ODBC,
 		CXmlConstantValue::ITEM_TYPE_IPMI => CXmlConstantName::IPMI,
@@ -225,16 +224,17 @@ class C54XmlValidator extends CImportValidatorGeneral {
 		CXmlConstantValue::ITEM_TYPE_JMX => CXmlConstantName::JMX,
 		CXmlConstantValue::ITEM_TYPE_SNMP_TRAP => CXmlConstantName::SNMP_TRAP,
 		CXmlConstantValue::ITEM_TYPE_DEPENDENT => CXmlConstantName::DEPENDENT,
-		CXmlConstantValue::ITEM_TYPE_HTTP_AGENT => CXmlConstantName::HTTP_AGENT,
-		CXmlConstantValue::ITEM_TYPE_SNMP => CXmlConstantName::SNMP_AGENT,
-		CXmlConstantValue::ITEM_TYPE_SCRIPT => CXmlConstantName::SCRIPT
+		CXmlConstantValue::ITEM_TYPE_HTTP_AGENT => CXmlConstantName::HTTP_AGENT
 	];
 
 	private $ITEM_TYPE_DRULE = [
 		CXmlConstantValue::ITEM_TYPE_ZABBIX_PASSIVE => CXmlConstantName::ZABBIX_PASSIVE,
+		CXmlConstantValue::ITEM_TYPE_SNMPV1 => CXmlConstantName::SNMPV1,
 		CXmlConstantValue::ITEM_TYPE_TRAP => CXmlConstantName::TRAP,
 		CXmlConstantValue::ITEM_TYPE_SIMPLE => CXmlConstantName::SIMPLE,
+		CXmlConstantValue::ITEM_TYPE_SNMPV2 => CXmlConstantName::SNMPV2,
 		CXmlConstantValue::ITEM_TYPE_INTERNAL => CXmlConstantName::INTERNAL,
+		CXmlConstantValue::ITEM_TYPE_SNMPV3 => CXmlConstantName::SNMPV3,
 		CXmlConstantValue::ITEM_TYPE_ZABBIX_ACTIVE => CXmlConstantName::ZABBIX_ACTIVE,
 		CXmlConstantValue::ITEM_TYPE_EXTERNAL => CXmlConstantName::EXTERNAL,
 		CXmlConstantValue::ITEM_TYPE_ODBC => CXmlConstantName::ODBC,
@@ -243,9 +243,7 @@ class C54XmlValidator extends CImportValidatorGeneral {
 		CXmlConstantValue::ITEM_TYPE_TELNET => CXmlConstantName::TELNET,
 		CXmlConstantValue::ITEM_TYPE_JMX => CXmlConstantName::JMX,
 		CXmlConstantValue::ITEM_TYPE_DEPENDENT => CXmlConstantName::DEPENDENT,
-		CXmlConstantValue::ITEM_TYPE_HTTP_AGENT => CXmlConstantName::HTTP_AGENT,
-		CXmlConstantValue::ITEM_TYPE_SNMP => CXmlConstantName::SNMP_AGENT,
-		CXmlConstantValue::ITEM_TYPE_SCRIPT => CXmlConstantName::SCRIPT
+		CXmlConstantValue::ITEM_TYPE_HTTP_AGENT => CXmlConstantName::HTTP_AGENT
 	];
 
 	private $ITEM_VALUE_TYPE = [
@@ -271,128 +269,15 @@ class C54XmlValidator extends CImportValidatorGeneral {
 		CXmlConstantValue::TRIGGER_NONE => CXmlConstantName::NONE
 	];
 
-	private $MEDIA_TYPE = [
-		CXmlConstantValue::MEDIA_TYPE_EMAIL => CXmlConstantName::EMAIL,
-		CXmlConstantValue::MEDIA_TYPE_SCRIPT => CXmlConstantName::SCRIPT,
-		CXmlConstantValue::MEDIA_TYPE_SMS => CXmlConstantName::SMS,
-		CXmlConstantValue::MEDIA_TYPE_WEBHOOK => CXmlConstantName::WEBHOOK
-	];
-
-	private $SMTP_AUTHENTICATION = [
-		CXmlConstantValue::SMTP_AUTHENTICATION_NONE => CXmlConstantName::SMTP_AUTHENTICATION_NONE,
-		CXmlConstantValue::SMTP_AUTHENTICATION_PASSWORD => CXmlConstantName::SMTP_AUTHENTICATION_PASSWORD
-	];
-
-	private $SNMPV3_AUTHPROTOCOL = [
-		CXmlConstantValue::SNMPV3_MD5 => CXmlConstantName::MD5,
-		CXmlConstantValue::SNMPV3_SHA1 => CXmlConstantName::SHA1,
-		CXmlConstantValue::SNMPV3_SHA224 => CXmlConstantName::SHA224,
-		CXmlConstantValue::SNMPV3_SHA256 => CXmlConstantName::SHA256,
-		CXmlConstantValue::SNMPV3_SHA384 => CXmlConstantName::SHA384,
-		CXmlConstantValue::SNMPV3_SHA512 => CXmlConstantName::SHA512
-	];
-
-	private $SNMPV3_PRIVPROTOCOL = [
-		CXmlConstantValue::SNMPV3_DES => CXmlConstantName::DES,
-		CXmlConstantValue::SNMPV3_AES128 => CXmlConstantName::AES128,
-		CXmlConstantValue::SNMPV3_AES192 => CXmlConstantName::AES192,
-		CXmlConstantValue::SNMPV3_AES256 => CXmlConstantName::AES256,
-		CXmlConstantValue::SNMPV3_AES192C => CXmlConstantName::AES192C,
-		CXmlConstantValue::SNMPV3_AES256C => CXmlConstantName::AES256C
-	];
-
-	private $EVENT_SOURCE = [
-		CXmlConstantValue::EVENT_SOURCE_TRIGGERS => CXmlConstantName::TRIGGERS,
-		CXmlConstantValue::EVENT_SOURCE_DISCOVERY => CXmlConstantName::DISCOVERY,
-		CXmlConstantValue::EVENT_SOURCE_AUTOREGISTRATION => CXmlConstantName::AUTOREGISTRATION,
-		CXmlConstantValue::EVENT_SOURCE_INTERNAL => CXmlConstantName::INTERNAL
-	];
-
-	private $OPERATION_MODE = [
-		CXmlConstantValue::OPERATION_MODE_PROBLEM => CXmlConstantName::PROBLEM,
-		CXmlConstantValue::OPERATION_MODE_RECOVERY => CXmlConstantName::RECOVERY,
-		CXmlConstantValue::OPERATION_MODE_UPDATE => CXmlConstantName::UPDATE
-	];
-
-	private $LLD_OVERRIDE_STOP = [
-		CXmlConstantValue::LLD_OVERRIDE_STOP_NO => CXmlConstantName::LLD_OVERRIDE_STOP_NO,
-		CXmlConstantValue::LLD_OVERRIDE_STOP_YES => CXmlConstantName::LLD_OVERRIDE_STOP_YES
-	];
-
-	private $EVALTYPE = [
-		CXmlConstantValue::AND_OR => CXmlConstantName::AND_OR,
-		CXmlConstantValue::XML_AND => CXmlConstantName::XML_AND,
-		CXmlConstantValue::XML_OR => CXmlConstantName::XML_OR,
-		CXmlConstantValue::FORMULA => CXmlConstantName::FORMULA
-	];
-
-	private $FILTER_CONDITION_OPERATOR = [
-		CXmlConstantValue::CONDITION_MATCHES_REGEX => CXmlConstantName::MATCHES_REGEX,
-		CXmlConstantValue::CONDITION_NOT_MATCHES_REGEX => CXmlConstantName::NOT_MATCHES_REGEX,
-		CXmlConstantValue::CONDITION_EXISTS => CXmlConstantName::EXISTS,
-		CXmlConstantValue::CONDITION_NOT_EXISTS => CXmlConstantName::NOT_EXISTS
-	];
-
-	private $LLD_OVERRIDE_OPERATION_OBJECT = [
-		CXmlConstantValue::LLD_OVERRIDE_OPERATION_OBJECT_ITEM_PROTOTYPE => CXmlConstantName::LLD_OVERRIDE_OPERATION_OBJECT_ITEM_PROTOTYPE,
-		CXmlConstantValue::LLD_OVERRIDE_OPERATION_OBJECT_TRIGGER_PROTOTYPE => CXmlConstantName::LLD_OVERRIDE_OPERATION_OBJECT_TRIGGER_PROTOTYPE,
-		CXmlConstantValue::LLD_OVERRIDE_OPERATION_OBJECT_GRAPH_PROTOTYPE => CXmlConstantName::LLD_OVERRIDE_OPERATION_OBJECT_GRAPH_PROTOTYPE,
-		CXmlConstantValue::LLD_OVERRIDE_OPERATION_OBJECT_HOST_PROTOTYPE => CXmlConstantName::LLD_OVERRIDE_OPERATION_OBJECT_HOST_PROTOTYPE
-	];
-
-	private $CONDITION_OPERATOR = [
-		CXmlConstantValue::CONDITION_OPERATOR_EQUAL => CXmlConstantName::CONDITION_OPERATOR_EQUAL,
-		CXmlConstantValue::CONDITION_OPERATOR_NOT_EQUAL => CXmlConstantName::CONDITION_OPERATOR_NOT_EQUAL,
-		CXmlConstantValue::CONDITION_OPERATOR_LIKE => CXmlConstantName::CONDITION_OPERATOR_LIKE,
-		CXmlConstantValue::CONDITION_OPERATOR_NOT_LIKE => CXmlConstantName::CONDITION_OPERATOR_NOT_LIKE,
-		CXmlConstantValue::CONDITION_OPERATOR_REGEXP => CXmlConstantName::CONDITION_OPERATOR_REGEXP,
-		CXmlConstantValue::CONDITION_OPERATOR_NOT_REGEXP => CXmlConstantName::CONDITION_OPERATOR_NOT_REGEXP
-	];
-
-	private $INVENTORY_MODE = [
-		CXmlConstantValue::INV_MODE_DISABLED => CXmlConstantName::DISABLED,
-		CXmlConstantValue::INV_MODE_MANUAL => CXmlConstantName::MANUAL,
-		CXmlConstantValue::INV_MODE_AUTOMATIC => CXmlConstantName::AUTOMATIC
-	];
-
-	private $CUSTOM_INTERFACES = [
-		CXmlConstantValue::CUSTOM_INTERFACES_NO => CXmlConstantName::NO,
-		CXmlConstantValue::CUSTOM_INTERFACES_YES => CXmlConstantName::YES
-	];
-
-	private $DASHBOARD_WIDGET_TYPE = [
-		CXmlConstantValue::DASHBOARD_WIDGET_TYPE_CLOCK => CXmlConstantName::DASHBOARD_WIDGET_TYPE_CLOCK,
-		CXmlConstantValue::DASHBOARD_WIDGET_TYPE_GRAPH_CLASSIC => CXmlConstantName::DASHBOARD_WIDGET_TYPE_GRAPH_CLASSIC,
-		CXmlConstantValue::DASHBOARD_WIDGET_TYPE_GRAPH_PROTOTYPE => CXmlConstantName::DASHBOARD_WIDGET_TYPE_GRAPH_PROTOTYPE,
-		CXmlConstantValue::DASHBOARD_WIDGET_TYPE_PLAIN_TEXT => CXmlConstantName::DASHBOARD_WIDGET_TYPE_PLAIN_TEXT,
-		CXmlConstantValue::DASHBOARD_WIDGET_TYPE_URL => CXmlConstantName::DASHBOARD_WIDGET_TYPE_URL
-	];
-
-	private $DASHBOARD_WIDGET_FIELD_TYPE = [
-		CXmlConstantValue::DASHBOARD_WIDGET_FIELD_TYPE_INTEGER => CXmlConstantName::DASHBOARD_WIDGET_FIELD_TYPE_INTEGER,
-		CXmlConstantValue::DASHBOARD_WIDGET_FIELD_TYPE_STRING => CXmlConstantName::DASHBOARD_WIDGET_FIELD_TYPE_STRING,
-		CXmlConstantValue::DASHBOARD_WIDGET_FIELD_TYPE_HOST => CXmlConstantName::DASHBOARD_WIDGET_FIELD_TYPE_HOST,
-		CXmlConstantValue::DASHBOARD_WIDGET_FIELD_TYPE_ITEM => CXmlConstantName::DASHBOARD_WIDGET_FIELD_TYPE_ITEM,
-		CXmlConstantValue::DASHBOARD_WIDGET_FIELD_TYPE_ITEM_PROTOTYPE => CXmlConstantName::DASHBOARD_WIDGET_FIELD_TYPE_ITEM_PROTOTYPE,
-		CXmlConstantValue::DASHBOARD_WIDGET_FIELD_TYPE_GRAPH => CXmlConstantName::DASHBOARD_WIDGET_FIELD_TYPE_GRAPH,
-		CXmlConstantValue::DASHBOARD_WIDGET_FIELD_TYPE_GRAPH_PROTOTYPE => CXmlConstantName::DASHBOARD_WIDGET_FIELD_TYPE_GRAPH_PROTOTYPE
-	];
-
-	private $VALUEMAP_MAPPING_TYPE = [
-		CXmlConstantValue::MAPPING_EQUAL => CXmlConstantName::MAPPING_EQUAL,
-		CXmlConstantValue::MAPPING_GREATER_EQUAL => CXmlConstantName::MAPPING_GREATER_EQUAL,
-		CXmlConstantValue::MAPPING_LESS_EQUAL => CXmlConstantName::MAPPING_LESS_EQUAL,
-		CXmlConstantValue::MAPPING_IN_RANGE => CXmlConstantName::MAPPING_IN_RANGE,
-		CXmlConstantValue::MAPPING_REGEXP => CXmlConstantName::MAPPING_REGEXP,
-		CXmlConstantValue::MAPPING_DEFAULT => CXmlConstantName::MAPPING_DEFAULT
-	];
-
-	private $HTTP_TEST_AUTHENTICATION = [
-		CXmlConstantValue::NONE => CXmlConstantName::NONE,
-		CXmlConstantValue::BASIC => CXmlConstantName::BASIC,
-		CXmlConstantValue::NTLM => CXmlConstantName::NTLM,
-		CXmlConstantValue::KERBEROS => CXmlConstantName::KERBEROS
-	];
+	/**
+	 * Legacy screen resource types.
+	 */
+	private const SCREEN_RESOURCE_TYPE_GRAPH = 0;
+	private const SCREEN_RESOURCE_TYPE_SIMPLE_GRAPH = 1;
+	private const SCREEN_RESOURCE_TYPE_PLAIN_TEXT = 3;
+	private const SCREEN_RESOURCE_TYPE_CLOCK = 7;
+	private const SCREEN_RESOURCE_TYPE_LLD_SIMPLE_GRAPH = 19;
+	private const SCREEN_RESOURCE_TYPE_LLD_GRAPH = 20;
 
 	/**
 	 * Get validation rules schema.
@@ -405,7 +290,6 @@ class C54XmlValidator extends CImportValidatorGeneral {
 			'date' =>					['type' => XML_STRING, 'ex_validate' => [$this, 'validateDateTime']],
 			'groups' =>					['type' => XML_INDEXED_ARRAY, 'prefix' => 'group', 'rules' => [
 				'group' =>					['type' => XML_ARRAY, 'rules' => [
-					'uuid' =>					['type' => XML_STRING | XML_REQUIRED, 'flags' => CImportDataNormalizer::LOWERCASE],
 					'name' =>					['type' => XML_STRING | XML_REQUIRED]
 				]]
 			]],
@@ -422,6 +306,14 @@ class C54XmlValidator extends CImportValidatorGeneral {
 					'ipmi_privilege' =>			['type' => XML_STRING, 'default' => CXmlConstantValue::USER, 'in' => [CXmlConstantValue::CALLBACK => CXmlConstantName::CALLBACK, CXmlConstantValue::USER => CXmlConstantName::USER, CXmlConstantValue::OPERATOR => CXmlConstantName::OPERATOR, CXmlConstantValue::ADMIN => CXmlConstantName::ADMIN, CXmlConstantValue::OEM => CXmlConstantName::OEM]],
 					'ipmi_username' =>			['type' => XML_STRING, 'default' => ''],
 					'ipmi_password' =>			['type' => XML_STRING, 'default' => ''],
+					'tls_connect' =>			['type' => XML_STRING, 'default' => CXmlConstantValue::NO_ENCRYPTION, 'in' => [CXmlConstantValue::NO_ENCRYPTION => CXmlConstantName::NO_ENCRYPTION, CXmlConstantValue::TLS_PSK => CXmlConstantName::TLS_PSK, CXmlConstantValue::TLS_CERTIFICATE => CXmlConstantName::TLS_CERTIFICATE]],
+					'tls_accept' =>				['type' => XML_INDEXED_ARRAY, 'prefix' => 'option', 'default' => CXmlConstantValue::NO_ENCRYPTION, 'rules' => [
+						'option' => ['type' => XML_STRING, 'in' => [CXmlConstantValue::NO_ENCRYPTION => CXmlConstantName::NO_ENCRYPTION, CXmlConstantValue::TLS_PSK => CXmlConstantName::TLS_PSK, CXmlConstantValue::TLS_CERTIFICATE => CXmlConstantName::TLS_CERTIFICATE]]
+					]],
+					'tls_issuer' =>				['type' => XML_STRING, 'default' => ''],
+					'tls_subject' =>			['type' => XML_STRING, 'default' => ''],
+					'tls_psk_identity' =>		['type' => XML_STRING, 'default' => ''],
+					'tls_psk' =>				['type' => XML_STRING, 'default' => ''],
 					'templates' =>				['type' => XML_INDEXED_ARRAY, 'prefix' => 'template', 'rules' => [
 						'template' =>				['type' => XML_ARRAY, 'rules' => [
 							'name' =>					['type' => XML_STRING | XML_REQUIRED]
@@ -440,25 +332,20 @@ class C54XmlValidator extends CImportValidatorGeneral {
 							'ip' =>						['type' => XML_STRING, 'default' => '127.0.0.1'],
 							'dns' =>					['type' => XML_STRING, 'default' => ''],
 							'port' =>					['type' => XML_STRING, 'default' => '10050'],
-							'details' =>				['type' => XML_ARRAY, 'rules' => [
-								'version' =>				['type' => XML_STRING, 'default' => CXmlConstantValue::SNMP_V2, 'in' => [CXmlConstantValue::SNMP_V1 => CXmlConstantName::SNMPV1, CXmlConstantValue::SNMP_V2 => CXmlConstantName::SNMPV2, CXmlConstantValue::SNMP_V3 => CXmlConstantName::SNMPV3]],
-								'community' =>				['type' => XML_STRING, 'default' => ''],
-								'contextname' =>			['type' => XML_STRING, 'default' => ''],
-								'securityname' =>			['type' => XML_STRING, 'default' => ''],
-								'securitylevel' =>			['type' => XML_STRING, 'default' => CXmlConstantValue::NOAUTHNOPRIV, 'in' => $this->ITEM_SNMPV3_SECURITYLEVEL],
-								'authprotocol' =>			['type' => XML_STRING, 'default' => CXmlConstantValue::SNMPV3_MD5, 'in' => $this->SNMPV3_AUTHPROTOCOL],
-								'authpassphrase' =>			['type' => XML_STRING, 'default' => ''],
-								'privprotocol' =>			['type' => XML_STRING, 'default' => CXmlConstantValue::SNMPV3_DES, 'in' => $this->SNMPV3_PRIVPROTOCOL],
-								'privpassphrase' =>			['type' => XML_STRING, 'default' => ''],
-								'bulk' =>					['type' => XML_STRING, 'default' => CXmlConstantValue::YES, 'in' => [CXmlConstantValue::NO => CXmlConstantName::NO, CXmlConstantValue::YES => CXmlConstantName::YES]]
-							]],
+							'bulk' =>					['type' => XML_STRING, 'default' => CXmlConstantValue::YES, 'in' => [CXmlConstantValue::NO => CXmlConstantName::NO, CXmlConstantValue::YES => CXmlConstantName::YES]],
 							'interface_ref' =>			['type' => XML_STRING | XML_REQUIRED]
+						]]
+					]],
+					'applications' =>			['type' => XML_INDEXED_ARRAY, 'prefix' => 'application', 'rules' => [
+						'application' =>			['type' => XML_ARRAY, 'rules' => [
+							'name' =>					['type' => XML_STRING | XML_REQUIRED]
 						]]
 					]],
 					'items' =>					['type' => XML_INDEXED_ARRAY, 'prefix' => 'item', 'rules' => [
 						'item' =>					['type' => XML_ARRAY, 'rules' => [
 							'name' =>					['type' => XML_STRING | XML_REQUIRED],
 							'type' =>					['type' => XML_STRING, 'default' => CXmlConstantValue::ITEM_TYPE_ZABBIX_PASSIVE, 'in' => $this->ITEM_TYPE],
+							'snmp_community' =>			['type' => XML_STRING, 'default' => ''],
 							'snmp_oid' =>				['type' => XML_STRING, 'default' => ''],
 							'key' =>					['type' => XML_STRING | XML_REQUIRED],
 							'delay' =>					['type' => XML_STRING, 'default' => '1m'],
@@ -468,6 +355,13 @@ class C54XmlValidator extends CImportValidatorGeneral {
 							'value_type' =>				['type' => XML_STRING, 'default' => CXmlConstantValue::UNSIGNED, 'in' => $this->ITEM_VALUE_TYPE],
 							'allowed_hosts' =>			['type' => XML_STRING, 'default' => ''],
 							'units' =>					['type' => XML_STRING, 'default' => ''],
+							'snmpv3_contextname' =>		['type' => XML_STRING, 'default' => ''],
+							'snmpv3_securityname' =>	['type' => XML_STRING, 'default' => ''],
+							'snmpv3_securitylevel' =>	['type' => XML_STRING, 'default' => CXmlConstantValue::NOAUTHNOPRIV, 'in' => $this->ITEM_SNMPV3_SECURITYLEVEL],
+							'snmpv3_authprotocol' =>	['type' => XML_STRING, 'default' => CXmlConstantValue::SNMPV3_MD5, 'in' => [CXmlConstantValue::SNMPV3_MD5 => CXmlConstantName::MD5, CXmlConstantValue::SNMPV3_SHA1 => CXmlConstantName::SHA]],
+							'snmpv3_authpassphrase' =>	['type' => XML_STRING, 'default' => ''],
+							'snmpv3_privprotocol' =>	['type' => XML_STRING, 'default' => CXmlConstantValue::SNMPV3_DES, 'in' => [CXmlConstantValue::SNMPV3_DES => CXmlConstantName::DES, CXmlConstantValue::SNMPV3_AES128 => CXmlConstantName::AES]],
+							'snmpv3_privpassphrase' =>	['type' => XML_STRING, 'default' => ''],
 							'params' =>					['type' => XML_STRING, 'default' => ''],
 							'ipmi_sensor' =>			['type' => XML_STRING, 'default' => ''],
 							'authtype' =>				['type' => XML_STRING, 'default' => CXmlConstantValue::NONE, 'ex_validate' => [$this, 'validateAuthType'], 'ex_rules' => [$this, 'getAuthTypeExtendedRules']],
@@ -475,8 +369,14 @@ class C54XmlValidator extends CImportValidatorGeneral {
 							'password' =>				['type' => XML_STRING, 'default' => ''],
 							'publickey' =>				['type' => XML_STRING, 'default' => ''],
 							'privatekey' =>				['type' => XML_STRING, 'default' => ''],
+							'port' =>					['type' => XML_STRING, 'default' => ''],
 							'description' =>			['type' => XML_STRING, 'default' => ''],
 							'inventory_link' =>			['type' => XML_STRING, 'default' => CXmlConstantValue::NONE, 'in' => $this->ITEM_INVENTORY_LINK],
+							'applications' =>			['type' => XML_INDEXED_ARRAY, 'prefix' => 'application', 'rules' => [
+								'application' =>			['type' => XML_ARRAY, 'rules' => [
+									'name' =>					['type' => XML_STRING | XML_REQUIRED]
+								]]
+							]],
 							'valuemap' =>				['type' => XML_ARRAY, 'rules' => [
 								'name' =>					['type' => XML_STRING | XML_REQUIRED]
 							]],
@@ -484,10 +384,8 @@ class C54XmlValidator extends CImportValidatorGeneral {
 							'preprocessing' =>			['type' => XML_INDEXED_ARRAY, 'prefix' => 'step', 'rules' => [
 								'step' =>					['type' => XML_ARRAY, 'rules' => [
 									'type' =>					['type' => XML_STRING | XML_REQUIRED, 'in' => $this->PREPROCESSING_STEP_TYPE],
-									'parameters' =>				['type' => XML_INDEXED_ARRAY | XML_REQUIRED, 'prefix' => 'parameter', 'rules' => [
-										'parameter' =>				['type' => XML_STRING, 'flags' => CImportDataNormalizer::EOL_LF]
-									]],
-									'error_handler' =>			['type' => XML_STRING, 'ex_default' => [$this, 'defaultPreprocErrHandler'], 'ex_validate' => [$this, 'validatePreprocErrHandler'], 'in' => $this->ITEM_PREPROCESSING_ERROR_HANDLER],
+									'params' =>					['type' => XML_STRING | XML_REQUIRED],
+									'error_handler' =>			['type' => XML_STRING, 'default' => CXmlConstantValue::ORIGINAL_ERROR, 'in' => $this->ITEM_PREPROCESSING_ERROR_HANDLER],
 									'error_handler_params' =>	['type' => XML_STRING, 'default' => '']
 								]]
 							]],
@@ -500,12 +398,6 @@ class C54XmlValidator extends CImportValidatorGeneral {
 							'url' =>					['type' => XML_STRING, 'default' => ''],
 							'query_fields' =>			['type' => XML_INDEXED_ARRAY, 'prefix' => 'query_field', 'rules' => [
 								'query_field' =>			['type' => XML_ARRAY, 'rules' => [
-									'name' =>					['type' => XML_STRING | XML_REQUIRED],
-									'value' =>					['type' => XML_STRING, 'default' => '']
-								]]
-							]],
-							'parameters' =>			['type' => XML_INDEXED_ARRAY, 'prefix' => 'parameter', 'rules' => [
-								'parameter' =>			['type' => XML_ARRAY, 'rules' => [
 									'name' =>					['type' => XML_STRING | XML_REQUIRED],
 									'value' =>					['type' => XML_STRING, 'default' => '']
 								]]
@@ -530,12 +422,6 @@ class C54XmlValidator extends CImportValidatorGeneral {
 							'ssl_key_password' =>		['type' => XML_STRING, 'default' => ''],
 							'verify_peer' =>			['type' => XML_STRING, 'default' => CXmlConstantValue::NO, 'in' => [CXmlConstantValue::NO => CXmlConstantName::NO, CXmlConstantValue::YES => CXmlConstantName::YES]],
 							'verify_host' =>			['type' => XML_STRING, 'default' => CXmlConstantValue::NO, 'in' => [CXmlConstantValue::NO => CXmlConstantName::NO, CXmlConstantValue::YES => CXmlConstantName::YES]],
-							'tags' =>					['type' => XML_INDEXED_ARRAY, 'prefix' => 'tag', 'rules' => [
-								'tag' =>					['type' => XML_ARRAY, 'rules' => [
-									'tag' =>					['type' => XML_STRING | XML_REQUIRED],
-									'value' =>					['type' => XML_STRING, 'default' => '']
-								]]
-							]],
 							'triggers' =>				['type' => XML_INDEXED_ARRAY, 'prefix' => 'trigger', 'rules' => [
 								'trigger' =>				['type' => XML_ARRAY, 'rules' => [
 									'expression' =>				['type' => XML_STRING | XML_REQUIRED],
@@ -544,7 +430,6 @@ class C54XmlValidator extends CImportValidatorGeneral {
 									'correlation_mode' =>		['type' => XML_STRING, 'default' => CXmlConstantValue::TRIGGER_DISABLED, 'in' => [CXmlConstantValue::TRIGGER_DISABLED => CXmlConstantName::DISABLED, CXmlConstantValue::TRIGGER_TAG_VALUE => CXmlConstantName::TAG_VALUE]],
 									'correlation_tag' =>		['type' => XML_STRING, 'default' => ''],
 									'name' =>					['type' => XML_STRING | XML_REQUIRED],
-									'event_name' =>				['type' => XML_STRING, 'default' => ''],
 									'opdata' =>					['type' => XML_STRING, 'default' => ''],
 									'url' =>					['type' => XML_STRING, 'default' => ''],
 									'status' =>					['type' => XML_STRING, 'default' => CXmlConstantValue::ENABLED, 'in' => [CXmlConstantValue::ENABLED => CXmlConstantName::ENABLED, CXmlConstantValue::DISABLED => CXmlConstantName::DISABLED]],
@@ -573,11 +458,19 @@ class C54XmlValidator extends CImportValidatorGeneral {
 						'discovery_rule' =>			['type' => XML_ARRAY, 'rules' => [
 							'name' =>					['type' => XML_STRING | XML_REQUIRED],
 							'type' =>					['type' => XML_STRING, 'default' => CXmlConstantValue::ITEM_TYPE_ZABBIX_PASSIVE, 'in' => $this->ITEM_TYPE_DRULE],
+							'snmp_community' =>			['type' => XML_STRING, 'default' => ''],
 							'snmp_oid' =>				['type' => XML_STRING, 'default' => ''],
 							'key' =>					['type' => XML_STRING | XML_REQUIRED],
 							'delay' =>					['type' => XML_STRING, 'default' => '1m'],
 							'status' =>					['type' => XML_STRING, 'default' => CXmlConstantValue::ENABLED, 'in' => [CXmlConstantValue::ENABLED => CXmlConstantName::ENABLED, CXmlConstantValue::DISABLED => CXmlConstantName::DISABLED]],
 							'allowed_hosts' =>			['type' => XML_STRING, 'default' => ''],
+							'snmpv3_contextname' =>		['type' => XML_STRING, 'default' => ''],
+							'snmpv3_securityname' =>	['type' => XML_STRING, 'default' => ''],
+							'snmpv3_securitylevel' =>	['type' => XML_STRING, 'default' => CXmlConstantValue::NOAUTHNOPRIV, 'in' => $this->ITEM_SNMPV3_SECURITYLEVEL],
+							'snmpv3_authprotocol' =>	['type' => XML_STRING, 'default' => CXmlConstantValue::SNMPV3_MD5, 'in' => [CXmlConstantValue::SNMPV3_MD5 => CXmlConstantName::MD5, CXmlConstantValue::SNMPV3_SHA1 => CXmlConstantName::SHA]],
+							'snmpv3_authpassphrase' =>	['type' => XML_STRING, 'default' => ''],
+							'snmpv3_privprotocol' =>	['type' => XML_STRING, 'default' => CXmlConstantValue::SNMPV3_DES, 'in' => [CXmlConstantValue::SNMPV3_DES => CXmlConstantName::DES, CXmlConstantValue::SNMPV3_AES128 => CXmlConstantName::AES]],
+							'snmpv3_privpassphrase' =>	['type' => XML_STRING, 'default' => ''],
 							'params' =>					['type' => XML_STRING, 'default' => ''],
 							'ipmi_sensor' =>			['type' => XML_STRING, 'default' => ''],
 							'authtype' =>				['type' => XML_STRING, 'default' => CXmlConstantValue::NONE, 'ex_validate' => [$this, 'validateAuthType'], 'ex_rules' => [$this, 'getAuthTypeExtendedRules']],
@@ -585,14 +478,15 @@ class C54XmlValidator extends CImportValidatorGeneral {
 							'password' =>				['type' => XML_STRING, 'default' => ''],
 							'publickey' =>				['type' => XML_STRING, 'default' => ''],
 							'privatekey' =>				['type' => XML_STRING, 'default' => ''],
+							'port' =>					['type' => XML_STRING, 'default' => ''],
 							'filter' =>					['type' => XML_ARRAY, 'import' => [$this, 'itemFilterImport'], 'rules' => [
-								'evaltype' =>				['type' => XML_STRING, 'default' => CXmlConstantValue::AND_OR, 'in' => $this->EVALTYPE],
+								'evaltype' =>				['type' => XML_STRING, 'default' => CXmlConstantValue::AND_OR, 'in' => [CXmlConstantValue::AND_OR => CXmlConstantName::AND_OR, CXmlConstantValue::XML_AND => CXmlConstantName::XML_AND, CXmlConstantValue::XML_OR => CXmlConstantName::XML_OR, CXmlConstantValue::FORMULA => CXmlConstantName::FORMULA]],
 								'formula' =>				['type' => XML_STRING, 'default' => ''],
 								'conditions' =>				['type' => XML_INDEXED_ARRAY, 'prefix' => 'condition', 'rules' => [
 									'condition' =>				['type' => XML_ARRAY, 'rules' => [
 										'macro' =>					['type' => XML_STRING | XML_REQUIRED],
 										'value' =>					['type' => XML_STRING, 'default' => ''],
-										'operator' =>				['type' => XML_STRING, 'default' => CXmlConstantValue::CONDITION_MATCHES_REGEX, 'in' => $this->FILTER_CONDITION_OPERATOR],
+										'operator' =>				['type' => XML_STRING, 'default' => CXmlConstantValue::CONDITION_MATCHES_REGEX, 'in' => [CXmlConstantValue::CONDITION_MATCHES_REGEX => CXmlConstantName::MATCHES_REGEX, CXmlConstantValue::CONDITION_NOT_MATCHES_REGEX => CXmlConstantName::NOT_MATCHES_REGEX]],
 										'formulaid' =>				['type' => XML_STRING | XML_REQUIRED]
 									]]
 								]]
@@ -604,16 +498,23 @@ class C54XmlValidator extends CImportValidatorGeneral {
 								'item_prototype' =>			['type' => XML_ARRAY, 'rules' => [
 									'name' =>					['type' => XML_STRING | XML_REQUIRED],
 									'type' =>					['type' => XML_STRING, 'default' => CXmlConstantValue::ITEM_TYPE_ZABBIX_PASSIVE, 'in' => $this->ITEM_TYPE],
+									'snmp_community' =>			['type' => XML_STRING, 'default' => ''],
 									'snmp_oid' =>				['type' => XML_STRING, 'default' => ''],
 									'key' =>					['type' => XML_STRING | XML_REQUIRED],
 									'delay' =>					['type' => XML_STRING, 'default' => '1m'],
 									'history' =>				['type' => XML_STRING, 'default' => '90d'],
 									'trends' =>					['type' => XML_STRING, 'default' => '365d'],
 									'status' =>					['type' => XML_STRING, 'default' => CXmlConstantValue::ENABLED, 'in' => [CXmlConstantValue::ENABLED => CXmlConstantName::ENABLED, CXmlConstantValue::DISABLED => CXmlConstantName::DISABLED]],
-									'discover' =>				['type' => XML_STRING, 'default' => CXmlConstantValue::ITEM_DISCOVER, 'in' => [CXmlConstantValue::ITEM_DISCOVER => CXmlConstantName::DISCOVER, CXmlConstantValue::ITEM_NO_DISCOVER => CXmlConstantName::NO_DISCOVER]],
 									'value_type' =>				['type' => XML_STRING, 'default' => CXmlConstantValue::UNSIGNED, 'in' => $this->ITEM_VALUE_TYPE],
 									'allowed_hosts' =>			['type' => XML_STRING, 'default' => ''],
 									'units' =>					['type' => XML_STRING, 'default' => ''],
+									'snmpv3_contextname' =>		['type' => XML_STRING, 'default' => ''],
+									'snmpv3_securityname' =>	['type' => XML_STRING, 'default' => ''],
+									'snmpv3_securitylevel' =>	['type' => XML_STRING, 'default' => CXmlConstantValue::NOAUTHNOPRIV, 'in' => $this->ITEM_SNMPV3_SECURITYLEVEL],
+									'snmpv3_authprotocol' =>	['type' => XML_STRING, 'default' => CXmlConstantValue::SNMPV3_MD5, 'in' => [CXmlConstantValue::SNMPV3_MD5 => CXmlConstantName::MD5, CXmlConstantValue::SNMPV3_SHA1 => CXmlConstantName::SHA]],
+									'snmpv3_authpassphrase' =>	['type' => XML_STRING, 'default' => ''],
+									'snmpv3_privprotocol' =>	['type' => XML_STRING, 'default' => CXmlConstantValue::SNMPV3_DES, 'in' => [CXmlConstantValue::SNMPV3_DES => CXmlConstantName::DES, CXmlConstantValue::SNMPV3_AES128 => CXmlConstantName::AES]],
+									'snmpv3_privpassphrase' =>	['type' => XML_STRING, 'default' => ''],
 									'params' =>					['type' => XML_STRING, 'default' => ''],
 									'ipmi_sensor' =>			['type' => XML_STRING, 'default' => ''],
 									'authtype' =>				['type' => XML_STRING, 'default' => CXmlConstantValue::NONE, 'ex_validate' => [$this, 'validateAuthType'], 'ex_rules' => [$this, 'getAuthTypeExtendedRules']],
@@ -621,8 +522,19 @@ class C54XmlValidator extends CImportValidatorGeneral {
 									'password' =>				['type' => XML_STRING, 'default' => ''],
 									'publickey' =>				['type' => XML_STRING, 'default' => ''],
 									'privatekey' =>				['type' => XML_STRING, 'default' => ''],
+									'port' =>					['type' => XML_STRING, 'default' => ''],
 									'description' =>			['type' => XML_STRING, 'default' => ''],
 									'inventory_link' =>			['type' => XML_STRING, 'default' => CXmlConstantValue::NONE, 'in' => $this->ITEM_INVENTORY_LINK],
+									'applications' =>			['type' => XML_INDEXED_ARRAY, 'prefix' => 'application', 'rules' => [
+										'application' =>			['type' => XML_ARRAY, 'rules' => [
+											'name' =>					['type' => XML_STRING | XML_REQUIRED]
+										]]
+									]],
+									'application_prototypes' =>	['type' => XML_INDEXED_ARRAY, 'prefix' => 'application_prototype', 'rules' => [
+										'application_prototype' =>	['type' => XML_ARRAY, 'rules' => [
+											'name' =>					['type' => XML_STRING | XML_REQUIRED]
+										]]
+									]],
 									'valuemap' =>				['type' => XML_ARRAY, 'rules' => [
 										'name' =>					['type' => XML_STRING | XML_REQUIRED]
 									]],
@@ -630,10 +542,8 @@ class C54XmlValidator extends CImportValidatorGeneral {
 									'preprocessing' =>			['type' => XML_INDEXED_ARRAY, 'prefix' => 'step', 'rules' => [
 										'step' =>					['type' => XML_ARRAY, 'rules' => [
 											'type' =>					['type' => XML_STRING | XML_REQUIRED, 'in' => $this->PREPROCESSING_STEP_TYPE],
-											'parameters' =>				['type' => XML_INDEXED_ARRAY | XML_REQUIRED, 'prefix' => 'parameter', 'rules' => [
-												'parameter' =>				['type' => XML_STRING, 'flags' => CImportDataNormalizer::EOL_LF]
-											]],
-											'error_handler' =>			['type' => XML_STRING, 'ex_default' => [$this, 'defaultPreprocErrHandler'], 'ex_validate' => [$this, 'validatePreprocErrHandler'], 'in' => $this->ITEM_PREPROCESSING_ERROR_HANDLER],
+											'params' =>					['type' => XML_STRING | XML_REQUIRED],
+											'error_handler' =>			['type' => XML_STRING, 'default' => CXmlConstantValue::ORIGINAL_ERROR, 'in' => $this->ITEM_PREPROCESSING_ERROR_HANDLER],
 											'error_handler_params' =>	['type' => XML_STRING, 'default' => '']
 										]]
 									]],
@@ -646,12 +556,6 @@ class C54XmlValidator extends CImportValidatorGeneral {
 									'url' =>					['type' => XML_STRING, 'default' => ''],
 									'query_fields' =>			['type' => XML_INDEXED_ARRAY, 'prefix' => 'query_field', 'rules' => [
 										'query_field' =>			['type' => XML_ARRAY, 'rules' => [
-											'name' =>					['type' => XML_STRING | XML_REQUIRED],
-											'value' =>					['type' => XML_STRING, 'default' => '']
-										]]
-									]],
-									'parameters' =>			['type' => XML_INDEXED_ARRAY, 'prefix' => 'parameter', 'rules' => [
-										'parameter' =>			['type' => XML_ARRAY, 'rules' => [
 											'name' =>					['type' => XML_STRING | XML_REQUIRED],
 											'value' =>					['type' => XML_STRING, 'default' => '']
 										]]
@@ -676,12 +580,6 @@ class C54XmlValidator extends CImportValidatorGeneral {
 									'ssl_key_password' =>		['type' => XML_STRING, 'default' => ''],
 									'verify_peer' =>			['type' => XML_STRING, 'default' => CXmlConstantValue::NO, 'in' => [CXmlConstantValue::NO => CXmlConstantName::NO, CXmlConstantValue::YES => CXmlConstantName::YES]],
 									'verify_host' =>			['type' => XML_STRING, 'default' => CXmlConstantValue::NO, 'in' => [CXmlConstantValue::NO => CXmlConstantName::NO, CXmlConstantValue::YES => CXmlConstantName::YES]],
-									'tags' =>					['type' => XML_INDEXED_ARRAY, 'prefix' => 'tag', 'rules' => [
-										'tag' =>					['type' => XML_ARRAY, 'rules' => [
-											'tag' =>					['type' => XML_STRING | XML_REQUIRED],
-											'value' =>					['type' => XML_STRING, 'default' => '']
-										]]
-									]],
 									'trigger_prototypes' =>		['type' => XML_INDEXED_ARRAY, 'prefix' => 'trigger_prototype', 'rules' => [
 										'trigger_prototype' =>		['type' => XML_ARRAY, 'rules' => [
 											'expression' =>				['type' => XML_STRING | XML_REQUIRED],
@@ -690,11 +588,9 @@ class C54XmlValidator extends CImportValidatorGeneral {
 											'correlation_mode' =>		['type' => XML_STRING, 'default' => CXmlConstantValue::TRIGGER_DISABLED, 'in' => [CXmlConstantValue::TRIGGER_DISABLED => CXmlConstantName::DISABLED, CXmlConstantValue::TRIGGER_TAG_VALUE => CXmlConstantName::TAG_VALUE]],
 											'correlation_tag' =>		['type' => XML_STRING, 'default' => ''],
 											'name' =>					['type' => XML_STRING | XML_REQUIRED],
-											'event_name' =>				['type' => XML_STRING, 'default' => ''],
 											'opdata' =>					['type' => XML_STRING, 'default' => ''],
 											'url' =>					['type' => XML_STRING, 'default' => ''],
 											'status' =>					['type' => XML_STRING, 'default' => CXmlConstantValue::ENABLED, 'in' => [CXmlConstantValue::ENABLED => CXmlConstantName::ENABLED, CXmlConstantValue::DISABLED => CXmlConstantName::DISABLED]],
-											'discover' =>				['type' => XML_STRING, 'default' => CXmlConstantValue::TRIGGER_DISCOVER, 'in' => [CXmlConstantValue::TRIGGER_DISCOVER => CXmlConstantName::DISCOVER, CXmlConstantValue::TRIGGER_NO_DISCOVER => CXmlConstantName::NO_DISCOVER]],
 											'priority' =>				['type' => XML_STRING, 'default' => CXmlConstantValue::NOT_CLASSIFIED, 'in' => $this->TRIGGER_PRIORITY],
 											'description' =>			['type' => XML_STRING, 'default' => ''],
 											'type' =>					['type' => XML_STRING, 'default' => CXmlConstantValue::SINGLE, 'in' => [CXmlConstantValue::SINGLE => CXmlConstantName::SINGLE, CXmlConstantValue::MULTIPLE => CXmlConstantName::MULTIPLE]],
@@ -724,11 +620,9 @@ class C54XmlValidator extends CImportValidatorGeneral {
 									'correlation_mode' =>		['type' => XML_STRING, 'default' => CXmlConstantValue::TRIGGER_DISABLED, 'in' => [CXmlConstantValue::TRIGGER_DISABLED => CXmlConstantName::DISABLED, CXmlConstantValue::TRIGGER_TAG_VALUE => CXmlConstantName::TAG_VALUE]],
 									'correlation_tag' =>		['type' => XML_STRING, 'default' => ''],
 									'name' =>					['type' => XML_STRING | XML_REQUIRED],
-									'event_name' =>				['type' => XML_STRING, 'default' => ''],
 									'opdata' =>					['type' => XML_STRING, 'default' => ''],
 									'url' =>					['type' => XML_STRING, 'default' => ''],
 									'status' =>					['type' => XML_STRING, 'default' => CXmlConstantValue::ENABLED, 'in' => [CXmlConstantValue::ENABLED => CXmlConstantName::ENABLED, CXmlConstantValue::DISABLED => CXmlConstantName::DISABLED]],
-									'discover' =>				['type' => XML_STRING, 'default' => CXmlConstantValue::TRIGGER_DISCOVER, 'in' => [CXmlConstantValue::TRIGGER_DISCOVER => CXmlConstantName::DISCOVER, CXmlConstantValue::TRIGGER_NO_DISCOVER => CXmlConstantName::NO_DISCOVER]],
 									'priority' =>				['type' => XML_STRING, 'default' => CXmlConstantValue::NOT_CLASSIFIED, 'in' => $this->TRIGGER_PRIORITY],
 									'description' =>			['type' => XML_STRING, 'default' => ''],
 									'type' =>					['type' => XML_STRING, 'default' => CXmlConstantValue::SINGLE, 'in' => [CXmlConstantValue::SINGLE => CXmlConstantName::SINGLE, CXmlConstantValue::MULTIPLE => CXmlConstantName::MULTIPLE]],
@@ -781,8 +675,7 @@ class C54XmlValidator extends CImportValidatorGeneral {
 												'key' =>					['type' => XML_STRING | XML_REQUIRED]
 											]]
 										]]
-									]],
-									'discover' =>				['type' => XML_STRING, 'default' => CXmlConstantValue::GRAPH_DISCOVER, 'in' => [CXmlConstantValue::GRAPH_DISCOVER => CXmlConstantName::DISCOVER, CXmlConstantValue::GRAPH_NO_DISCOVER => CXmlConstantName::NO_DISCOVER]]
+									]]
 								]]
 							]],
 							'host_prototypes' =>		['type' => XML_INDEXED_ARRAY, 'prefix' => 'host_prototype', 'rules' => [
@@ -790,8 +683,7 @@ class C54XmlValidator extends CImportValidatorGeneral {
 									'host' =>					['type' => XML_STRING | XML_REQUIRED],
 									'name' =>					['type' => XML_STRING, 'default' => ''],
 									'status' =>					['type' => XML_STRING, 'default' => CXmlConstantValue::ENABLED, 'in' => [CXmlConstantValue::ENABLED => CXmlConstantName::ENABLED, CXmlConstantValue::DISABLED => CXmlConstantName::DISABLED]],
-									'discover' =>				['type' => XML_STRING, 'default' => CXmlConstantValue::HOST_DISCOVER, 'in' => [CXmlConstantValue::HOST_DISCOVER => CXmlConstantName::DISCOVER, CXmlConstantValue::HOST_NO_DISCOVER => CXmlConstantName::NO_DISCOVER]],
-									'inventory_mode' =>			['type' => XML_STRING, 'default' => CXmlConstantValue::INV_MODE_MANUAL, 'in' => $this->INVENTORY_MODE],
+									'inventory_mode' =>			['type' => XML_STRING, 'default' => CXmlConstantValue::INV_MODE_MANUAL, 'in' => [CXmlConstantValue::INV_MODE_DISABLED => CXmlConstantName::DISABLED, CXmlConstantValue::INV_MODE_MANUAL => CXmlConstantName::MANUAL, CXmlConstantValue::INV_MODE_AUTOMATIC => CXmlConstantName::AUTOMATIC]],
 									'group_links' =>			['type' => XML_INDEXED_ARRAY, 'prefix' => 'group_link', 'rules' => [
 										'group_link' =>				['type' => XML_ARRAY, 'rules' => [
 											'group' =>					['type' => XML_ARRAY | XML_REQUIRED, 'rules' => [
@@ -808,43 +700,6 @@ class C54XmlValidator extends CImportValidatorGeneral {
 										'template' =>				['type' => XML_ARRAY, 'rules' => [
 											'name' =>					['type' => XML_STRING | XML_REQUIRED]
 										]]
-									]],
-									'macros' =>					['type' => XML_INDEXED_ARRAY, 'prefix' => 'macro', 'rules' => [
-										'macro' =>					['type' => XML_ARRAY, 'rules' => [
-											'macro' =>					['type' => XML_STRING | XML_REQUIRED],
-											'type' =>					['type' => XML_STRING, 'default' => CXmlConstantValue::MACRO_TYPE_TEXT, 'in' => [CXmlConstantValue::MACRO_TYPE_TEXT => CXmlConstantName::MACRO_TYPE_TEXT, CXmlConstantValue::MACRO_TYPE_SECRET => CXmlConstantName::MACRO_TYPE_SECRET, CXmlConstantValue::MACRO_TYPE_VAULT => CXmlConstantName::MACRO_TYPE_VAULT]],
-											'value' =>					['type' => XML_STRING, 'default' => ''],
-											'description' =>			['type' => XML_STRING, 'default' => '']
-										]]
-									]],
-									'tags' =>					['type' => XML_INDEXED_ARRAY, 'prefix' => 'tag', 'rules' => [
-										'tag' =>					['type' => XML_ARRAY, 'rules' => [
-											'tag' =>					['type' => XML_STRING | XML_REQUIRED],
-											'value' =>					['type' => XML_STRING, 'default' => '']
-										]]
-									]],
-									'custom_interfaces' =>		['type' => XML_STRING, 'default' => CXmlConstantValue::CUSTOM_INTERFACES_NO, 'in' => $this->CUSTOM_INTERFACES],
-									'interfaces' =>				['type' => XML_INDEXED_ARRAY, 'prefix' => 'interface', 'rules' => [
-										'interface' =>				['type' => XML_ARRAY, 'rules' => [
-											'default' =>				['type' => XML_STRING, 'default' => CXmlConstantValue::YES, 'in' => [CXmlConstantValue::NO => CXmlConstantName::NO, CXmlConstantValue::YES => CXmlConstantName::YES]],
-											'type' =>					['type' => XML_STRING, 'default' => CXmlConstantValue::ZABBIX, 'in' => [CXmlConstantValue::ZABBIX => CXmlConstantName::ZABBIX, CXmlConstantValue::SNMP => CXmlConstantName::SNMP, CXmlConstantValue::IPMI => CXmlConstantName::IPMI, CXmlConstantValue::JMX => CXmlConstantName::JMX]],
-											'useip' =>					['type' => XML_STRING, 'default' => CXmlConstantValue::YES, 'in' => [CXmlConstantValue::NO => CXmlConstantName::NO, CXmlConstantValue::YES => CXmlConstantName::YES]],
-											'ip' =>						['type' => XML_STRING, 'default' => '127.0.0.1'],
-											'dns' =>					['type' => XML_STRING, 'default' => ''],
-											'port' =>					['type' => XML_STRING, 'default' => '10050'],
-											'details' =>				['type' => XML_ARRAY, 'rules' => [
-												'version' =>				['type' => XML_STRING, 'default' => CXmlConstantValue::SNMP_V2, 'in' => [CXmlConstantValue::SNMP_V1 => CXmlConstantName::SNMPV1, CXmlConstantValue::SNMP_V2 => CXmlConstantName::SNMPV2, CXmlConstantValue::SNMP_V3 => CXmlConstantName::SNMPV3]],
-												'community' =>				['type' => XML_STRING, 'default' => ''],
-												'contextname' =>			['type' => XML_STRING, 'default' => ''],
-												'securityname' =>			['type' => XML_STRING, 'default' => ''],
-												'securitylevel' =>			['type' => XML_STRING, 'default' => CXmlConstantValue::NOAUTHNOPRIV, 'in' => $this->ITEM_SNMPV3_SECURITYLEVEL],
-												'authprotocol' =>			['type' => XML_STRING, 'default' => CXmlConstantValue::SNMPV3_MD5, 'in' => $this->SNMPV3_AUTHPROTOCOL],
-												'authpassphrase' =>			['type' => XML_STRING, 'default' => ''],
-												'privprotocol' =>			['type' => XML_STRING, 'default' => CXmlConstantValue::SNMPV3_DES, 'in' => $this->SNMPV3_PRIVPROTOCOL],
-												'privpassphrase' =>			['type' => XML_STRING, 'default' => ''],
-												'bulk' =>					['type' => XML_STRING, 'default' => CXmlConstantValue::YES, 'in' => [CXmlConstantValue::NO => CXmlConstantName::NO, CXmlConstantValue::YES => CXmlConstantName::YES]]
-											]]
-										]]
 									]]
 								]]
 							]],
@@ -856,12 +711,6 @@ class C54XmlValidator extends CImportValidatorGeneral {
 							'url' =>					['type' => XML_STRING, 'default' => ''],
 							'query_fields' =>			['type' => XML_INDEXED_ARRAY, 'prefix' => 'query_field', 'rules' => [
 								'query_field' =>			['type' => XML_ARRAY, 'rules' => [
-									'name' =>					['type' => XML_STRING | XML_REQUIRED],
-									'value' =>					['type' => XML_STRING, 'default' => '']
-								]]
-							]],
-							'parameters' =>			['type' => XML_INDEXED_ARRAY, 'prefix' => 'parameter', 'rules' => [
-								'parameter' =>			['type' => XML_ARRAY, 'rules' => [
 									'name' =>					['type' => XML_STRING | XML_REQUIRED],
 									'value' =>					['type' => XML_STRING, 'default' => '']
 								]]
@@ -894,55 +743,9 @@ class C54XmlValidator extends CImportValidatorGeneral {
 							'preprocessing' =>			['type' => XML_INDEXED_ARRAY, 'prefix' => 'step', 'rules' => [
 								'step' =>					['type' => XML_ARRAY, 'rules' => [
 									'type' =>					['type' => XML_STRING | XML_REQUIRED, 'in' => $this->PREPROCESSING_STEP_TYPE_DRULE],
-									'parameters' =>				['type' => XML_INDEXED_ARRAY | XML_REQUIRED, 'prefix' => 'parameter', 'rules' => [
-										'parameter' =>				['type' => XML_STRING, 'flags' => CImportDataNormalizer::EOL_LF]
-									]],
-									'error_handler' =>			['type' => XML_STRING, 'ex_default' => [$this, 'defaultPreprocErrHandler'], 'ex_validate' => [$this, 'validatePreprocErrHandler'], 'in' => $this->ITEM_PREPROCESSING_ERROR_HANDLER],
+									'params' =>					['type' => XML_STRING | XML_REQUIRED],
+									'error_handler' =>			['type' => XML_STRING, 'default' => CXmlConstantValue::ORIGINAL_ERROR, 'in' => $this->ITEM_PREPROCESSING_ERROR_HANDLER],
 									'error_handler_params' =>	['type' => XML_STRING, 'default' => '']
-								]]
-							]],
-							'overrides'	=>				['type' => XML_INDEXED_ARRAY, 'prefix' => 'override', 'rules' => [
-								'override' =>				['type' => XML_ARRAY, 'rules' => [
-									'name' =>					['type' => XML_STRING | XML_REQUIRED],
-									'step' =>					['type' => XML_STRING | XML_REQUIRED],
-									'stop' =>					['type' => XML_STRING, 'default' => CXmlConstantValue::LLD_OVERRIDE_STOP_NO, 'in' => $this->LLD_OVERRIDE_STOP],
-									'filter' =>					['type' => XML_ARRAY, 'rules' => [
-										'evaltype' =>				['type' => XML_STRING, 'default' => CXmlConstantValue::AND_OR, 'in' => $this->EVALTYPE],
-										'formula' =>				['type' => XML_STRING, 'default' => ''],
-										'conditions' =>				['type' => XML_INDEXED_ARRAY | XML_REQUIRED, 'prefix' => 'condition', 'rules' => [
-											'condition' =>				['type' => XML_ARRAY | XML_REQUIRED, 'rules' => [
-												'macro' =>					['type' => XML_STRING | XML_REQUIRED],
-												'value' =>					['type' => XML_STRING, 'default' => ''],
-												'operator' =>				['type' => XML_STRING, 'default' => CXmlConstantValue::CONDITION_MATCHES_REGEX, 'in' => $this->FILTER_CONDITION_OPERATOR],
-												'formulaid' =>				['type' => XML_STRING | XML_REQUIRED]
-											]]
-										]]
-									]],
-									'operations' =>				['type' => XML_INDEXED_ARRAY, 'prefix' => 'operation', 'rules' => [
-										'operation' =>				['type' => XML_ARRAY, 'rules' => [
-											'operationobject' =>		['type' => XML_STRING, 'in' => $this->LLD_OVERRIDE_OPERATION_OBJECT],
-											'operator' =>				['type' => XML_STRING, 'default' => CXmlConstantValue::CONDITION_OPERATOR_EQUAL, 'in' => $this->CONDITION_OPERATOR],
-											'value' =>					['type' => XML_STRING, 'default' => ''],
-											'status' =>					['type' => XML_STRING, 'in' => [CXmlConstantValue::LLD_OVERRIDE_OPERATION_STATUS_ENABLED => CXmlConstantName::ENABLED, CXmlConstantValue::LLD_OVERRIDE_OPERATION_STATUS_DISABLED => CXmlConstantName::DISABLED]],
-											'discover' =>				['type' => XML_STRING, 'in' => [CXmlConstantValue::LLD_OVERRIDE_OPERATION_DISCOVER => CXmlConstantName::DISCOVER, CXmlConstantValue::LLD_OVERRIDE_OPERATION_NO_DISCOVER => CXmlConstantName::NO_DISCOVER]],
-											'delay' =>					['type' => XML_STRING, 'default' => ''],
-											'history' =>				['type' => XML_STRING, 'default' => ''],
-											'trends' =>					['type' => XML_STRING, 'default' => ''],
-											'severity' =>				['type' => XML_STRING, 'in' => $this->TRIGGER_PRIORITY],
-											'tags' =>					['type' => XML_INDEXED_ARRAY, 'prefix' => 'tag', 'rules' => [
-												'tag' =>					['type' => XML_ARRAY, 'rules' => [
-													'tag' =>					['type' => XML_STRING | XML_REQUIRED],
-													'value' =>					['type' => XML_STRING, 'default' => '']
-												]]
-											]],
-											'templates' =>				['type' => XML_INDEXED_ARRAY, 'prefix' => 'template', 'rules' => [
-												'template' =>				['type' => XML_ARRAY, 'rules' => [
-													'name' =>					['type' => XML_STRING | XML_REQUIRED]
-												]]
-											]],
-											'inventory_mode' =>			['type' => XML_STRING, 'in' => $this->INVENTORY_MODE]
-										]]
-									]]
 								]]
 							]]
 						]]
@@ -950,6 +753,9 @@ class C54XmlValidator extends CImportValidatorGeneral {
 					'httptests' =>				['type' => XML_INDEXED_ARRAY, 'prefix' => 'httptest', 'rules' => [
 						'httptest' =>				['type' => XML_ARRAY, 'rules' => [
 							'name' =>					['type' => XML_STRING | XML_REQUIRED],
+							'application' =>			['type' => XML_ARRAY, 'rules' => [
+								'name' =>					['type' => XML_STRING | XML_REQUIRED]
+							]],
 							'delay' =>					['type' => XML_STRING, 'default' => '1m'],
 							'attempts' =>				['type' => XML_STRING, 'default' => '1'],
 							'agent' =>					['type' => XML_STRING, 'default' => 'Zabbix'],
@@ -967,7 +773,7 @@ class C54XmlValidator extends CImportValidatorGeneral {
 								]]
 							]],
 							'status' =>					['type' => XML_STRING, 'default' => CXmlConstantValue::ENABLED, 'in' => [CXmlConstantValue::ENABLED => CXmlConstantName::ENABLED, CXmlConstantValue::DISABLED => CXmlConstantName::DISABLED]],
-							'authentication' =>			['type' => XML_STRING, 'default' => CXmlConstantValue::NONE, 'in' => $this->HTTP_TEST_AUTHENTICATION],
+							'authentication' =>			['type' => XML_STRING, 'default' => CXmlConstantValue::NONE, 'in' => [CXmlConstantValue::NONE => CXmlConstantName::NONE, CXmlConstantValue::BASIC => CXmlConstantName::BASIC, CXmlConstantValue::NTLM => CXmlConstantName::NTLM]],
 							'http_user' =>				['type' => XML_STRING, 'default' => ''],
 							'http_password' =>			['type' => XML_STRING, 'default' => ''],
 							'verify_peer' =>			['type' => XML_STRING, 'default' => CXmlConstantValue::NO, 'in' => [CXmlConstantValue::NO => CXmlConstantName::NO, CXmlConstantValue::YES => CXmlConstantName::YES]],
@@ -1004,12 +810,6 @@ class C54XmlValidator extends CImportValidatorGeneral {
 									'required' =>				['type' => XML_STRING, 'default' => ''],
 									'status_codes' =>			['type' => XML_STRING, 'default' => '']
 								]]
-							]],
-							'tags' =>					['type' => XML_INDEXED_ARRAY, 'prefix' => 'tag', 'rules' => [
-								'tag' =>					['type' => XML_ARRAY, 'rules' => [
-									'tag' =>					['type' => XML_STRING | XML_REQUIRED],
-									'value' =>					['type' => XML_STRING, 'default' => '']
-								]]
 							]]
 						]]
 					]],
@@ -1022,7 +822,6 @@ class C54XmlValidator extends CImportValidatorGeneral {
 					'macros' =>					['type' => XML_INDEXED_ARRAY, 'prefix' => 'macro', 'rules' => [
 						'macro' =>					['type' => XML_ARRAY, 'rules' => [
 							'macro' =>					['type' => XML_STRING | XML_REQUIRED],
-							'type' =>					['type' => XML_STRING, 'default' => CXmlConstantValue::MACRO_TYPE_TEXT, 'in' => [CXmlConstantValue::MACRO_TYPE_TEXT => CXmlConstantName::MACRO_TYPE_TEXT, CXmlConstantValue::MACRO_TYPE_SECRET => CXmlConstantName::MACRO_TYPE_SECRET, CXmlConstantValue::MACRO_TYPE_VAULT => CXmlConstantName::MACRO_TYPE_VAULT]],
 							'value' =>					['type' => XML_STRING, 'default' => ''],
 							'description' =>			['type' => XML_STRING, 'default' => '']
 						]]
@@ -1099,24 +898,11 @@ class C54XmlValidator extends CImportValidatorGeneral {
 						'poc_2_screen' =>			['type' => XML_STRING, 'default' => ''],
 						'poc_2_notes' =>			['type' => XML_STRING, 'default' => '']
 					]],
-					'inventory_mode' =>			['type' => XML_STRING, 'default' => CXmlConstantValue::INV_MODE_MANUAL, 'in' => $this->INVENTORY_MODE],
-					'valuemaps' =>				['type' => XML_INDEXED_ARRAY, 'prefix' => 'valuemap', 'rules' => [
-						'valuemap' =>				['type' => XML_ARRAY, 'rules' => [
-							'name' =>					['type' => XML_STRING | XML_REQUIRED],
-							'mappings' =>				['type' => XML_INDEXED_ARRAY | XML_REQUIRED, 'prefix' => 'mapping', 'rules' => [
-								'mapping' =>				['type' => XML_ARRAY, 'rules' => [
-									'type' =>					['type' => XML_STRING, 'default' => CXmlConstantValue::MAPPING_EQUAL, 'in' => $this->VALUEMAP_MAPPING_TYPE],
-									'value' =>					['type' => XML_STRING, 'default' => ''],
-									'newvalue' =>				['type' => XML_STRING | XML_REQUIRED]
-								]]
-							]]
-						]]
-					]]
+					'inventory_mode' =>			['type' => XML_STRING, 'default' => CXmlConstantValue::INV_MODE_MANUAL, 'in' => [CXmlConstantValue::INV_MODE_DISABLED => CXmlConstantName::DISABLED, CXmlConstantValue::INV_MODE_MANUAL => CXmlConstantName::MANUAL, CXmlConstantValue::INV_MODE_AUTOMATIC => CXmlConstantName::AUTOMATIC]]
 				]]
 			]],
 			'templates' =>				['type' => XML_INDEXED_ARRAY, 'prefix' => 'template', 'rules' => [
 				'template' =>				['type' => XML_ARRAY, 'rules' => [
-					'uuid' =>				['type' => XML_STRING | XML_REQUIRED, 'flags' => CImportDataNormalizer::LOWERCASE],
 					'template' =>				['type' => XML_STRING | XML_REQUIRED],
 					'name' =>					['type' => XML_STRING, 'default' => ''],
 					'description' =>			['type' => XML_STRING, 'default' => ''],
@@ -1130,11 +916,16 @@ class C54XmlValidator extends CImportValidatorGeneral {
 							'name' =>					['type' => XML_STRING | XML_REQUIRED]
 						]]
 					]],
+					'applications' =>			['type' => XML_INDEXED_ARRAY, 'prefix' => 'application', 'rules' => [
+						'application' =>			['type' => XML_ARRAY, 'rules' => [
+							'name' =>					['type' => XML_STRING | XML_REQUIRED]
+						]]
+					]],
 					'items' =>					['type' => XML_INDEXED_ARRAY, 'prefix' => 'item', 'rules' => [
 						'item' =>					['type' => XML_ARRAY, 'rules' => [
-							'uuid' =>					['type' => XML_STRING | XML_REQUIRED, 'flags' => CImportDataNormalizer::LOWERCASE],
 							'name' =>					['type' => XML_STRING | XML_REQUIRED],
 							'type' =>					['type' => XML_STRING, 'default' => CXmlConstantValue::ITEM_TYPE_ZABBIX_PASSIVE, 'in' => $this->ITEM_TYPE],
+							'snmp_community' =>			['type' => XML_STRING, 'default' => ''],
 							'snmp_oid' =>				['type' => XML_STRING, 'default' => ''],
 							'key' =>					['type' => XML_STRING | XML_REQUIRED],
 							'delay' =>					['type' => XML_STRING, 'default' => '1m'],
@@ -1144,6 +935,13 @@ class C54XmlValidator extends CImportValidatorGeneral {
 							'value_type' =>				['type' => XML_STRING, 'default' => CXmlConstantValue::UNSIGNED, 'in' => $this->ITEM_VALUE_TYPE],
 							'allowed_hosts' =>			['type' => XML_STRING, 'default' => ''],
 							'units' =>					['type' => XML_STRING, 'default' => ''],
+							'snmpv3_contextname' =>		['type' => XML_STRING, 'default' => ''],
+							'snmpv3_securityname' =>	['type' => XML_STRING, 'default' => ''],
+							'snmpv3_securitylevel' =>	['type' => XML_STRING, 'default' => CXmlConstantValue::NOAUTHNOPRIV, 'in' => $this->ITEM_SNMPV3_SECURITYLEVEL],
+							'snmpv3_authprotocol' =>	['type' => XML_STRING, 'default' => CXmlConstantValue::SNMPV3_MD5, 'in' => [CXmlConstantValue::SNMPV3_MD5 => CXmlConstantName::MD5, CXmlConstantValue::SNMPV3_SHA1 => CXmlConstantName::SHA]],
+							'snmpv3_authpassphrase' =>	['type' => XML_STRING, 'default' => ''],
+							'snmpv3_privprotocol' =>	['type' => XML_STRING, 'default' => CXmlConstantValue::SNMPV3_DES, 'in' => [CXmlConstantValue::SNMPV3_DES => CXmlConstantName::DES, CXmlConstantValue::SNMPV3_AES128 => CXmlConstantName::AES]],
+							'snmpv3_privpassphrase' =>	['type' => XML_STRING, 'default' => ''],
 							'params' =>					['type' => XML_STRING, 'default' => ''],
 							'ipmi_sensor' =>			['type' => XML_STRING, 'default' => ''],
 							'authtype' =>				['type' => XML_STRING, 'default' => CXmlConstantValue::NONE, 'ex_validate' => [$this, 'validateAuthType'], 'ex_rules' => [$this, 'getAuthTypeExtendedRules']],
@@ -1151,8 +949,14 @@ class C54XmlValidator extends CImportValidatorGeneral {
 							'password' =>				['type' => XML_STRING, 'default' => ''],
 							'publickey' =>				['type' => XML_STRING, 'default' => ''],
 							'privatekey' =>				['type' => XML_STRING, 'default' => ''],
+							'port' =>					['type' => XML_STRING, 'default' => ''],
 							'description' =>			['type' => XML_STRING, 'default' => ''],
 							'inventory_link' =>			['type' => XML_STRING, 'default' => CXmlConstantValue::NONE, 'in' => $this->ITEM_INVENTORY_LINK],
+							'applications' =>			['type' => XML_INDEXED_ARRAY, 'prefix' => 'application', 'rules' => [
+								'application' =>			['type' => XML_ARRAY, 'rules' => [
+									'name' =>					['type' => XML_STRING | XML_REQUIRED]
+								]]
+							]],
 							'valuemap' =>				['type' => XML_ARRAY, 'rules' => [
 								'name' =>					['type' => XML_STRING | XML_REQUIRED]
 							]],
@@ -1160,10 +964,8 @@ class C54XmlValidator extends CImportValidatorGeneral {
 							'preprocessing' =>			['type' => XML_INDEXED_ARRAY, 'prefix' => 'step', 'rules' => [
 								'step' =>					['type' => XML_ARRAY, 'rules' => [
 									'type' =>					['type' => XML_STRING | XML_REQUIRED, 'in' => $this->PREPROCESSING_STEP_TYPE],
-									'parameters' =>				['type' => XML_INDEXED_ARRAY | XML_REQUIRED, 'prefix' => 'parameter', 'rules' => [
-										'parameter' =>				['type' => XML_STRING, 'flags' => CImportDataNormalizer::EOL_LF]
-									]],
-									'error_handler' =>			['type' => XML_STRING, 'ex_default' => [$this, 'defaultPreprocErrHandler'], 'ex_validate' => [$this, 'validatePreprocErrHandler'], 'in' => $this->ITEM_PREPROCESSING_ERROR_HANDLER],
+									'params' =>					['type' => XML_STRING | XML_REQUIRED],
+									'error_handler' =>			['type' => XML_STRING, 'default' => CXmlConstantValue::ORIGINAL_ERROR, 'in' => $this->ITEM_PREPROCESSING_ERROR_HANDLER],
 									'error_handler_params' =>	['type' => XML_STRING, 'default' => '']
 								]]
 							]],
@@ -1175,12 +977,6 @@ class C54XmlValidator extends CImportValidatorGeneral {
 							'url' =>					['type' => XML_STRING, 'default' => ''],
 							'query_fields' =>			['type' => XML_INDEXED_ARRAY, 'prefix' => 'query_field', 'rules' => [
 								'query_field' =>			['type' => XML_ARRAY, 'rules' => [
-									'name' =>					['type' => XML_STRING | XML_REQUIRED],
-									'value' =>					['type' => XML_STRING, 'default' => '']
-								]]
-							]],
-							'parameters' =>			['type' => XML_INDEXED_ARRAY, 'prefix' => 'parameter', 'rules' => [
-								'parameter' =>			['type' => XML_ARRAY, 'rules' => [
 									'name' =>					['type' => XML_STRING | XML_REQUIRED],
 									'value' =>					['type' => XML_STRING, 'default' => '']
 								]]
@@ -1205,22 +1001,14 @@ class C54XmlValidator extends CImportValidatorGeneral {
 							'ssl_key_password' =>		['type' => XML_STRING, 'default' => ''],
 							'verify_peer' =>			['type' => XML_STRING, 'default' => CXmlConstantValue::NO, 'in' => [CXmlConstantValue::NO => CXmlConstantName::NO, CXmlConstantValue::YES => CXmlConstantName::YES]],
 							'verify_host' =>			['type' => XML_STRING, 'default' => CXmlConstantValue::NO, 'in' => [CXmlConstantValue::NO => CXmlConstantName::NO, CXmlConstantValue::YES => CXmlConstantName::YES]],
-							'tags' =>					['type' => XML_INDEXED_ARRAY, 'prefix' => 'tag', 'rules' => [
-								'tag' =>					['type' => XML_ARRAY, 'rules' => [
-									'tag' =>					['type' => XML_STRING | XML_REQUIRED],
-									'value' =>					['type' => XML_STRING, 'default' => '']
-								]]
-							]],
 							'triggers' =>				['type' => XML_INDEXED_ARRAY, 'prefix' => 'trigger', 'rules' => [
 								'trigger' =>				['type' => XML_ARRAY, 'rules' => [
-									'uuid' =>					['type' => XML_STRING | XML_REQUIRED, 'flags' => CImportDataNormalizer::LOWERCASE],
 									'expression' =>				['type' => XML_STRING | XML_REQUIRED],
 									'recovery_mode' =>			['type' => XML_STRING, 'default' => CXmlConstantValue::TRIGGER_EXPRESSION, 'in' => $this->TRIGGER_RECOVERY_MODE],
 									'recovery_expression' =>	['type' => XML_STRING, 'default' => ''],
 									'correlation_mode' =>		['type' => XML_STRING, 'default' => CXmlConstantValue::TRIGGER_DISABLED, 'in' => [CXmlConstantValue::TRIGGER_DISABLED => CXmlConstantName::DISABLED, CXmlConstantValue::TRIGGER_TAG_VALUE => CXmlConstantName::TAG_VALUE]],
 									'correlation_tag' =>		['type' => XML_STRING, 'default' => ''],
 									'name' =>					['type' => XML_STRING | XML_REQUIRED],
-									'event_name' =>				['type' => XML_STRING, 'default' => ''],
 									'opdata' =>					['type' => XML_STRING, 'default' => ''],
 									'url' =>					['type' => XML_STRING, 'default' => ''],
 									'status' =>					['type' => XML_STRING, 'default' => CXmlConstantValue::ENABLED, 'in' => [CXmlConstantValue::ENABLED => CXmlConstantName::ENABLED, CXmlConstantValue::DISABLED => CXmlConstantName::DISABLED]],
@@ -1247,14 +1035,21 @@ class C54XmlValidator extends CImportValidatorGeneral {
 					]],
 					'discovery_rules' =>		['type' => XML_INDEXED_ARRAY, 'prefix' => 'discovery_rule', 'rules' => [
 						'discovery_rule' =>			['type' => XML_ARRAY, 'rules' => [
-							'uuid' =>					['type' => XML_STRING | XML_REQUIRED, 'flags' => CImportDataNormalizer::LOWERCASE],
 							'name' =>					['type' => XML_STRING | XML_REQUIRED],
 							'type' =>					['type' => XML_STRING, 'default' => CXmlConstantValue::ITEM_TYPE_ZABBIX_PASSIVE, 'in' => $this->ITEM_TYPE_DRULE],
+							'snmp_community' =>			['type' => XML_STRING, 'default' => ''],
 							'snmp_oid' =>				['type' => XML_STRING, 'default' => ''],
 							'key' =>					['type' => XML_STRING | XML_REQUIRED],
 							'delay' =>					['type' => XML_STRING, 'default' => '1m'],
 							'status' =>					['type' => XML_STRING, 'default' => CXmlConstantValue::ENABLED, 'in' => [CXmlConstantValue::ENABLED => CXmlConstantName::ENABLED, CXmlConstantValue::DISABLED => CXmlConstantName::DISABLED]],
 							'allowed_hosts' =>			['type' => XML_STRING, 'default' => ''],
+							'snmpv3_contextname' =>		['type' => XML_STRING, 'default' => ''],
+							'snmpv3_securityname' =>	['type' => XML_STRING, 'default' => ''],
+							'snmpv3_securitylevel' =>	['type' => XML_STRING, 'default' => CXmlConstantValue::NOAUTHNOPRIV, 'in' => $this->ITEM_SNMPV3_SECURITYLEVEL],
+							'snmpv3_authprotocol' =>	['type' => XML_STRING, 'default' => CXmlConstantValue::SNMPV3_MD5, 'in' => [CXmlConstantValue::SNMPV3_MD5 => CXmlConstantName::MD5, CXmlConstantValue::SNMPV3_SHA1 => CXmlConstantName::SHA]],
+							'snmpv3_authpassphrase' =>	['type' => XML_STRING, 'default' => ''],
+							'snmpv3_privprotocol' =>	['type' => XML_STRING, 'default' => CXmlConstantValue::SNMPV3_DES, 'in' => [CXmlConstantValue::SNMPV3_DES => CXmlConstantName::DES, CXmlConstantValue::SNMPV3_AES128 => CXmlConstantName::AES]],
+							'snmpv3_privpassphrase' =>	['type' => XML_STRING, 'default' => ''],
 							'params' =>					['type' => XML_STRING, 'default' => ''],
 							'ipmi_sensor' =>			['type' => XML_STRING, 'default' => ''],
 							'authtype' =>				['type' => XML_STRING, 'default' => CXmlConstantValue::NONE, 'ex_validate' => [$this, 'validateAuthType'], 'ex_rules' => [$this, 'getAuthTypeExtendedRules']],
@@ -1262,14 +1057,15 @@ class C54XmlValidator extends CImportValidatorGeneral {
 							'password' =>				['type' => XML_STRING, 'default' => ''],
 							'publickey' =>				['type' => XML_STRING, 'default' => ''],
 							'privatekey' =>				['type' => XML_STRING, 'default' => ''],
+							'port' =>					['type' => XML_STRING, 'default' => ''],
 							'filter' =>					['type' => XML_ARRAY, 'import' => [$this, 'itemFilterImport'], 'rules' => [
-								'evaltype' =>				['type' => XML_STRING, 'default' => CXmlConstantValue::AND_OR, 'in' => $this->EVALTYPE],
+								'evaltype' =>				['type' => XML_STRING, 'default' => CXmlConstantValue::AND_OR, 'in' => [CXmlConstantValue::AND_OR => CXmlConstantName::AND_OR, CXmlConstantValue::XML_AND => CXmlConstantName::XML_AND, CXmlConstantValue::XML_OR => CXmlConstantName::XML_OR, CXmlConstantValue::FORMULA => CXmlConstantName::FORMULA]],
 								'formula' =>				['type' => XML_STRING, 'default' => ''],
 								'conditions' =>				['type' => XML_INDEXED_ARRAY, 'prefix' => 'condition', 'rules' => [
 									'condition' =>				['type' => XML_ARRAY, 'rules' => [
 										'macro' =>					['type' => XML_STRING | XML_REQUIRED],
 										'value' =>					['type' => XML_STRING, 'default' => ''],
-										'operator' =>				['type' => XML_STRING, 'default' => CXmlConstantValue::CONDITION_MATCHES_REGEX, 'in' => $this->FILTER_CONDITION_OPERATOR],
+										'operator' =>				['type' => XML_STRING, 'default' => CXmlConstantValue::CONDITION_MATCHES_REGEX, 'in' => [CXmlConstantValue::CONDITION_MATCHES_REGEX => CXmlConstantName::MATCHES_REGEX, CXmlConstantValue::CONDITION_NOT_MATCHES_REGEX => CXmlConstantName::NOT_MATCHES_REGEX]],
 										'formulaid' =>				['type' => XML_STRING | XML_REQUIRED]
 									]]
 								]]
@@ -1278,19 +1074,25 @@ class C54XmlValidator extends CImportValidatorGeneral {
 							'description' =>			['type' => XML_STRING, 'default' => ''],
 							'item_prototypes' =>		['type' => XML_INDEXED_ARRAY, 'prefix' => 'item_prototype', 'rules' => [
 								'item_prototype' =>			['type' => XML_ARRAY, 'rules' => [
-									'uuid' =>					['type' => XML_STRING | XML_REQUIRED, 'flags' => CImportDataNormalizer::LOWERCASE],
 									'name' =>					['type' => XML_STRING | XML_REQUIRED],
 									'type' =>					['type' => XML_STRING, 'default' => CXmlConstantValue::ITEM_TYPE_ZABBIX_PASSIVE, 'in' => $this->ITEM_TYPE],
+									'snmp_community' =>			['type' => XML_STRING, 'default' => ''],
 									'snmp_oid' =>				['type' => XML_STRING, 'default' => ''],
 									'key' =>					['type' => XML_STRING | XML_REQUIRED],
 									'delay' =>					['type' => XML_STRING, 'default' => '1m'],
 									'history' =>				['type' => XML_STRING, 'default' => '90d'],
 									'trends' =>					['type' => XML_STRING, 'default' => '365d'],
 									'status' =>					['type' => XML_STRING, 'default' => CXmlConstantValue::ENABLED, 'in' => [CXmlConstantValue::ENABLED => CXmlConstantName::ENABLED, CXmlConstantValue::DISABLED => CXmlConstantName::DISABLED]],
-									'discover' =>				['type' => XML_STRING, 'default' => CXmlConstantValue::ITEM_DISCOVER, 'in' => [CXmlConstantValue::ITEM_DISCOVER => CXmlConstantName::DISCOVER, CXmlConstantValue::ITEM_NO_DISCOVER => CXmlConstantName::NO_DISCOVER]],
 									'value_type' =>				['type' => XML_STRING, 'default' => CXmlConstantValue::UNSIGNED, 'in' => $this->ITEM_VALUE_TYPE],
 									'allowed_hosts' =>			['type' => XML_STRING, 'default' => ''],
 									'units' =>					['type' => XML_STRING, 'default' => ''],
+									'snmpv3_contextname' =>		['type' => XML_STRING, 'default' => ''],
+									'snmpv3_securityname' =>	['type' => XML_STRING, 'default' => ''],
+									'snmpv3_securitylevel' =>	['type' => XML_STRING, 'default' => CXmlConstantValue::NOAUTHNOPRIV, 'in' => $this->ITEM_SNMPV3_SECURITYLEVEL],
+									'snmpv3_authprotocol' =>	['type' => XML_STRING, 'default' => CXmlConstantValue::SNMPV3_MD5, 'in' => [CXmlConstantValue::SNMPV3_MD5 => CXmlConstantName::MD5, CXmlConstantValue::SNMPV3_SHA1 => CXmlConstantName::SHA]],
+									'snmpv3_authpassphrase' =>	['type' => XML_STRING, 'default' => ''],
+									'snmpv3_privprotocol' =>	['type' => XML_STRING, 'default' => CXmlConstantValue::SNMPV3_DES, 'in' => [CXmlConstantValue::SNMPV3_DES => CXmlConstantName::DES, CXmlConstantValue::SNMPV3_AES128 => CXmlConstantName::AES]],
+									'snmpv3_privpassphrase' =>	['type' => XML_STRING, 'default' => ''],
 									'params' =>					['type' => XML_STRING, 'default' => ''],
 									'ipmi_sensor' =>			['type' => XML_STRING, 'default' => ''],
 									'authtype' =>				['type' => XML_STRING, 'default' => CXmlConstantValue::NONE, 'ex_validate' => [$this, 'validateAuthType'], 'ex_rules' => [$this, 'getAuthTypeExtendedRules']],
@@ -1298,8 +1100,19 @@ class C54XmlValidator extends CImportValidatorGeneral {
 									'password' =>				['type' => XML_STRING, 'default' => ''],
 									'publickey' =>				['type' => XML_STRING, 'default' => ''],
 									'privatekey' =>				['type' => XML_STRING, 'default' => ''],
+									'port' =>					['type' => XML_STRING, 'default' => ''],
 									'description' =>			['type' => XML_STRING, 'default' => ''],
 									'inventory_link' =>			['type' => XML_STRING, 'default' => CXmlConstantValue::NONE, 'in' => $this->ITEM_INVENTORY_LINK],
+									'applications' =>			['type' => XML_INDEXED_ARRAY, 'prefix' => 'application', 'rules' => [
+										'application' =>			['type' => XML_ARRAY, 'rules' => [
+											'name' =>					['type' => XML_STRING | XML_REQUIRED]
+										]]
+									]],
+									'application_prototypes' =>	['type' => XML_INDEXED_ARRAY, 'prefix' => 'application_prototype', 'rules' => [
+										'application_prototype' =>	['type' => XML_ARRAY, 'rules' => [
+											'name' =>					['type' => XML_STRING | XML_REQUIRED]
+										]]
+									]],
 									'valuemap' =>				['type' => XML_ARRAY, 'rules' => [
 										'name' =>					['type' => XML_STRING | XML_REQUIRED]
 									]],
@@ -1307,10 +1120,8 @@ class C54XmlValidator extends CImportValidatorGeneral {
 									'preprocessing' =>			['type' => XML_INDEXED_ARRAY, 'prefix' => 'step', 'rules' => [
 										'step' =>					['type' => XML_ARRAY, 'rules' => [
 											'type' =>					['type' => XML_STRING | XML_REQUIRED, 'in' => $this->PREPROCESSING_STEP_TYPE],
-											'parameters' =>				['type' => XML_INDEXED_ARRAY | XML_REQUIRED, 'prefix' => 'parameter', 'rules' => [
-												'parameter' =>				['type' => XML_STRING, 'flags' => CImportDataNormalizer::EOL_LF]
-											]],
-											'error_handler' =>			['type' => XML_STRING, 'ex_default' => [$this, 'defaultPreprocErrHandler'], 'ex_validate' => [$this, 'validatePreprocErrHandler'], 'in' => $this->ITEM_PREPROCESSING_ERROR_HANDLER],
+											'params' =>					['type' => XML_STRING | XML_REQUIRED],
+											'error_handler' =>			['type' => XML_STRING, 'default' => CXmlConstantValue::ORIGINAL_ERROR, 'in' => $this->ITEM_PREPROCESSING_ERROR_HANDLER],
 											'error_handler_params' =>	['type' => XML_STRING, 'default' => '']
 										]]
 									]],
@@ -1322,12 +1133,6 @@ class C54XmlValidator extends CImportValidatorGeneral {
 									'url' =>					['type' => XML_STRING, 'default' => ''],
 									'query_fields' =>			['type' => XML_INDEXED_ARRAY, 'prefix' => 'query_field', 'rules' => [
 										'query_field' =>			['type' => XML_ARRAY, 'rules' => [
-											'name' =>					['type' => XML_STRING | XML_REQUIRED],
-											'value' =>					['type' => XML_STRING, 'default' => '']
-										]]
-									]],
-									'parameters' =>			['type' => XML_INDEXED_ARRAY, 'prefix' => 'parameter', 'rules' => [
-										'parameter' =>			['type' => XML_ARRAY, 'rules' => [
 											'name' =>					['type' => XML_STRING | XML_REQUIRED],
 											'value' =>					['type' => XML_STRING, 'default' => '']
 										]]
@@ -1352,26 +1157,17 @@ class C54XmlValidator extends CImportValidatorGeneral {
 									'ssl_key_password' =>		['type' => XML_STRING, 'default' => ''],
 									'verify_peer' =>			['type' => XML_STRING, 'default' => CXmlConstantValue::NO, 'in' => [CXmlConstantValue::NO => CXmlConstantName::NO, CXmlConstantValue::YES => CXmlConstantName::YES]],
 									'verify_host' =>			['type' => XML_STRING, 'default' => CXmlConstantValue::NO, 'in' => [CXmlConstantValue::NO => CXmlConstantName::NO, CXmlConstantValue::YES => CXmlConstantName::YES]],
-									'tags' =>					['type' => XML_INDEXED_ARRAY, 'prefix' => 'tag', 'rules' => [
-										'tag' =>					['type' => XML_ARRAY, 'rules' => [
-											'tag' =>					['type' => XML_STRING | XML_REQUIRED],
-											'value' =>					['type' => XML_STRING, 'default' => '']
-										]]
-									]],
 									'trigger_prototypes' =>		['type' => XML_INDEXED_ARRAY, 'prefix' => 'trigger_prototype', 'rules' => [
 										'trigger_prototype' =>		['type' => XML_ARRAY, 'rules' => [
-											'uuid' =>					['type' => XML_STRING | XML_REQUIRED, 'flags' => CImportDataNormalizer::LOWERCASE],
 											'expression' =>				['type' => XML_STRING | XML_REQUIRED],
 											'recovery_mode' =>			['type' => XML_STRING, 'default' => CXmlConstantValue::TRIGGER_EXPRESSION, 'in' => $this->TRIGGER_RECOVERY_MODE],
 											'recovery_expression' =>	['type' => XML_STRING, 'default' => ''],
 											'correlation_mode' =>		['type' => XML_STRING, 'default' => CXmlConstantValue::TRIGGER_DISABLED, 'in' => [CXmlConstantValue::TRIGGER_DISABLED => CXmlConstantName::DISABLED, CXmlConstantValue::TRIGGER_TAG_VALUE => CXmlConstantName::TAG_VALUE]],
 											'correlation_tag' =>		['type' => XML_STRING, 'default' => ''],
 											'name' =>					['type' => XML_STRING | XML_REQUIRED],
-											'event_name' =>				['type' => XML_STRING, 'default' => ''],
 											'opdata' =>					['type' => XML_STRING, 'default' => ''],
 											'url' =>					['type' => XML_STRING, 'default' => ''],
 											'status' =>					['type' => XML_STRING, 'default' => CXmlConstantValue::ENABLED, 'in' => [CXmlConstantValue::ENABLED => CXmlConstantName::ENABLED, CXmlConstantValue::DISABLED => CXmlConstantName::DISABLED]],
-											'discover' =>				['type' => XML_STRING, 'default' => CXmlConstantValue::TRIGGER_DISCOVER, 'in' => [CXmlConstantValue::TRIGGER_DISCOVER => CXmlConstantName::DISCOVER, CXmlConstantValue::TRIGGER_NO_DISCOVER => CXmlConstantName::NO_DISCOVER]],
 											'priority' =>				['type' => XML_STRING, 'default' => CXmlConstantValue::NOT_CLASSIFIED, 'in' => $this->TRIGGER_PRIORITY],
 											'description' =>			['type' => XML_STRING, 'default' => ''],
 											'type' =>					['type' => XML_STRING, 'default' => CXmlConstantValue::SINGLE, 'in' => [CXmlConstantValue::SINGLE => CXmlConstantName::SINGLE, CXmlConstantValue::MULTIPLE => CXmlConstantName::MULTIPLE]],
@@ -1395,18 +1191,15 @@ class C54XmlValidator extends CImportValidatorGeneral {
 							]],
 							'trigger_prototypes' =>		['type' => XML_INDEXED_ARRAY, 'prefix' => 'trigger_prototype', 'rules' => [
 								'trigger_prototype' =>		['type' => XML_ARRAY, 'rules' => [
-									'uuid' =>					['type' => XML_STRING | XML_REQUIRED, 'flags' => CImportDataNormalizer::LOWERCASE],
 									'expression' =>				['type' => XML_STRING | XML_REQUIRED],
 									'recovery_mode' =>			['type' => XML_STRING, 'default' => CXmlConstantValue::TRIGGER_EXPRESSION, 'in' => $this->TRIGGER_RECOVERY_MODE],
 									'recovery_expression' =>	['type' => XML_STRING, 'default' => ''],
 									'correlation_mode' =>		['type' => XML_STRING, 'default' => CXmlConstantValue::TRIGGER_DISABLED, 'in' => [CXmlConstantValue::TRIGGER_DISABLED => CXmlConstantName::DISABLED, CXmlConstantValue::TRIGGER_TAG_VALUE => CXmlConstantName::TAG_VALUE]],
 									'correlation_tag' =>		['type' => XML_STRING, 'default' => ''],
 									'name' =>					['type' => XML_STRING | XML_REQUIRED],
-									'event_name' =>				['type' => XML_STRING, 'default' => ''],
 									'opdata' =>					['type' => XML_STRING, 'default' => ''],
 									'url' =>					['type' => XML_STRING, 'default' => ''],
 									'status' =>					['type' => XML_STRING, 'default' => CXmlConstantValue::ENABLED, 'in' => [CXmlConstantValue::ENABLED => CXmlConstantName::ENABLED, CXmlConstantValue::DISABLED => CXmlConstantName::DISABLED]],
-									'discover' =>				['type' => XML_STRING, 'default' => CXmlConstantValue::TRIGGER_DISCOVER, 'in' => [CXmlConstantValue::TRIGGER_DISCOVER => CXmlConstantName::DISCOVER, CXmlConstantValue::TRIGGER_NO_DISCOVER => CXmlConstantName::NO_DISCOVER]],
 									'priority' =>				['type' => XML_STRING, 'default' => CXmlConstantValue::NOT_CLASSIFIED, 'in' => $this->TRIGGER_PRIORITY],
 									'description' =>			['type' => XML_STRING, 'default' => ''],
 									'type' =>					['type' => XML_STRING, 'default' => CXmlConstantValue::SINGLE, 'in' => [CXmlConstantValue::SINGLE => CXmlConstantName::SINGLE, CXmlConstantValue::MULTIPLE => CXmlConstantName::MULTIPLE]],
@@ -1428,7 +1221,6 @@ class C54XmlValidator extends CImportValidatorGeneral {
 							]],
 							'graph_prototypes' =>		['type' => XML_INDEXED_ARRAY, 'prefix' => 'graph_prototype', 'rules' => [
 								'graph_prototype' =>		['type' => XML_ARRAY, 'rules' => [
-									'uuid' =>					['type' => XML_STRING | XML_REQUIRED, 'flags' => CImportDataNormalizer::LOWERCASE],
 									'name' =>					['type' => XML_STRING | XML_REQUIRED],
 									'width' =>					['type' => XML_STRING, 'default' => '900'],
 									'height' =>					['type' => XML_STRING, 'default' => '200'],
@@ -1460,17 +1252,14 @@ class C54XmlValidator extends CImportValidatorGeneral {
 												'key' =>					['type' => XML_STRING | XML_REQUIRED]
 											]]
 										]]
-									]],
-									'discover' =>				['type' => XML_STRING, 'default' => CXmlConstantValue::GRAPH_DISCOVER, 'in' => [CXmlConstantValue::GRAPH_DISCOVER => CXmlConstantName::DISCOVER, CXmlConstantValue::GRAPH_NO_DISCOVER => CXmlConstantName::NO_DISCOVER]]
+									]]
 								]]
 							]],
 							'host_prototypes' =>		['type' => XML_INDEXED_ARRAY, 'prefix' => 'host_prototype', 'rules' => [
 								'host_prototype' =>			['type' => XML_ARRAY, 'rules' => [
-									'uuid' =>					['type' => XML_STRING | XML_REQUIRED, 'flags' => CImportDataNormalizer::LOWERCASE],
 									'host' =>					['type' => XML_STRING | XML_REQUIRED],
 									'name' =>					['type' => XML_STRING, 'default' => ''],
 									'status' =>					['type' => XML_STRING, 'default' => CXmlConstantValue::ENABLED, 'in' => [CXmlConstantValue::ENABLED => CXmlConstantName::ENABLED, CXmlConstantValue::DISABLED => CXmlConstantName::DISABLED]],
-									'discover' =>				['type' => XML_STRING, 'default' => CXmlConstantValue::HOST_DISCOVER, 'in' => [CXmlConstantValue::HOST_DISCOVER => CXmlConstantName::DISCOVER, CXmlConstantValue::HOST_NO_DISCOVER => CXmlConstantName::NO_DISCOVER]],
 									'group_links' =>			['type' => XML_INDEXED_ARRAY, 'prefix' => 'group_link', 'rules' => [
 										'group_link' =>				['type' => XML_ARRAY, 'rules' => [
 											'group' =>					['type' => XML_ARRAY | XML_REQUIRED, 'rules' => [
@@ -1487,45 +1276,7 @@ class C54XmlValidator extends CImportValidatorGeneral {
 										'template' =>				['type' => XML_ARRAY, 'rules' => [
 											'name' =>					['type' => XML_STRING | XML_REQUIRED]
 										]]
-									]],
-									'macros' =>					['type' => XML_INDEXED_ARRAY, 'prefix' => 'macro', 'rules' => [
-										'macro' =>					['type' => XML_ARRAY, 'rules' => [
-											'macro' =>					['type' => XML_STRING | XML_REQUIRED],
-											'type' =>					['type' => XML_STRING, 'default' => CXmlConstantValue::MACRO_TYPE_TEXT, 'in' => [CXmlConstantValue::MACRO_TYPE_TEXT => CXmlConstantName::MACRO_TYPE_TEXT, CXmlConstantValue::MACRO_TYPE_SECRET => CXmlConstantName::MACRO_TYPE_SECRET, CXmlConstantValue::MACRO_TYPE_VAULT => CXmlConstantName::MACRO_TYPE_VAULT]],
-											'value' =>					['type' => XML_STRING, 'default' => ''],
-											'description' =>			['type' => XML_STRING, 'default' => '']
-										]]
-									]],
-									'tags' =>					['type' => XML_INDEXED_ARRAY, 'prefix' => 'tag', 'rules' => [
-										'tag' =>					['type' => XML_ARRAY, 'rules' => [
-											'tag' =>					['type' => XML_STRING | XML_REQUIRED],
-											'value' =>					['type' => XML_STRING, 'default' => '']
-										]]
-									]],
-									'custom_interfaces' =>		['type' => XML_STRING, 'default' => CXmlConstantValue::CUSTOM_INTERFACES_NO, 'in' => $this->CUSTOM_INTERFACES],
-									'interfaces' =>				['type' => XML_INDEXED_ARRAY, 'prefix' => 'interface', 'rules' => [
-										'interface' =>				['type' => XML_ARRAY, 'rules' => [
-											'default' =>				['type' => XML_STRING, 'default' => CXmlConstantValue::YES, 'in' => [CXmlConstantValue::NO => CXmlConstantName::NO, CXmlConstantValue::YES => CXmlConstantName::YES]],
-											'type' =>					['type' => XML_STRING, 'default' => CXmlConstantValue::ZABBIX, 'in' => [CXmlConstantValue::ZABBIX => CXmlConstantName::ZABBIX, CXmlConstantValue::SNMP => CXmlConstantName::SNMP, CXmlConstantValue::IPMI => CXmlConstantName::IPMI, CXmlConstantValue::JMX => CXmlConstantName::JMX]],
-											'useip' =>					['type' => XML_STRING, 'default' => CXmlConstantValue::YES, 'in' => [CXmlConstantValue::NO => CXmlConstantName::NO, CXmlConstantValue::YES => CXmlConstantName::YES]],
-											'ip' =>						['type' => XML_STRING, 'default' => '127.0.0.1'],
-											'dns' =>					['type' => XML_STRING, 'default' => ''],
-											'port' =>					['type' => XML_STRING, 'default' => '10050'],
-											'details' =>				['type' => XML_ARRAY, 'rules' => [
-												'version' =>				['type' => XML_STRING, 'default' => CXmlConstantValue::SNMP_V2, 'in' => [CXmlConstantValue::SNMP_V1 => CXmlConstantName::SNMPV1, CXmlConstantValue::SNMP_V2 => CXmlConstantName::SNMPV2, CXmlConstantValue::SNMP_V3 => CXmlConstantName::SNMPV3]],
-												'community' =>				['type' => XML_STRING, 'default' => ''],
-												'contextname' =>			['type' => XML_STRING, 'default' => ''],
-												'securityname' =>			['type' => XML_STRING, 'default' => ''],
-												'securitylevel' =>			['type' => XML_STRING, 'default' => CXmlConstantValue::NOAUTHNOPRIV, 'in' => $this->ITEM_SNMPV3_SECURITYLEVEL],
-												'authprotocol' =>			['type' => XML_STRING, 'default' => CXmlConstantValue::SNMPV3_MD5, 'in' => $this->SNMPV3_AUTHPROTOCOL],
-												'authpassphrase' =>			['type' => XML_STRING, 'default' => ''],
-												'privprotocol' =>			['type' => XML_STRING, 'default' => CXmlConstantValue::SNMPV3_DES, 'in' => $this->SNMPV3_PRIVPROTOCOL],
-												'privpassphrase' =>			['type' => XML_STRING, 'default' => ''],
-												'bulk' =>					['type' => XML_STRING, 'default' => CXmlConstantValue::YES, 'in' => [CXmlConstantValue::NO => CXmlConstantName::NO, CXmlConstantValue::YES => CXmlConstantName::YES]]
-											]]
-										]]
-									]],
-									'inventory_mode' =>			['type' => XML_STRING, 'default' => CXmlConstantValue::INV_MODE_DISABLED, 'in' => $this->INVENTORY_MODE]
+									]]
 								]]
 							]],
 							'jmx_endpoint' =>			['type' => XML_STRING, 'default' => ''],
@@ -1536,12 +1287,6 @@ class C54XmlValidator extends CImportValidatorGeneral {
 							'url' =>					['type' => XML_STRING, 'default' => ''],
 							'query_fields' =>			['type' => XML_INDEXED_ARRAY, 'prefix' => 'query_field', 'rules' => [
 								'query_field' =>			['type' => XML_ARRAY, 'rules' => [
-									'name' =>					['type' => XML_STRING | XML_REQUIRED],
-									'value' =>					['type' => XML_STRING, 'default' => '']
-								]]
-							]],
-							'parameters' =>			['type' => XML_INDEXED_ARRAY, 'prefix' => 'parameter', 'rules' => [
-								'parameter' =>			['type' => XML_ARRAY, 'rules' => [
 									'name' =>					['type' => XML_STRING | XML_REQUIRED],
 									'value' =>					['type' => XML_STRING, 'default' => '']
 								]]
@@ -1574,63 +1319,19 @@ class C54XmlValidator extends CImportValidatorGeneral {
 							'preprocessing' =>			['type' => XML_INDEXED_ARRAY, 'prefix' => 'step', 'rules' => [
 								'step' =>					['type' => XML_ARRAY, 'rules' => [
 									'type' =>					['type' => XML_STRING | XML_REQUIRED, 'in' => $this->PREPROCESSING_STEP_TYPE_DRULE],
-									'parameters' =>				['type' => XML_INDEXED_ARRAY | XML_REQUIRED, 'prefix' => 'parameter', 'rules' => [
-										'parameter' =>				['type' => XML_STRING, 'flags' => CImportDataNormalizer::EOL_LF]
-									]],
-									'error_handler' =>			['type' => XML_STRING, 'ex_default' => [$this, 'defaultPreprocErrHandler'], 'ex_validate' => [$this, 'validatePreprocErrHandler'], 'in' => $this->ITEM_PREPROCESSING_ERROR_HANDLER],
+									'params' =>					['type' => XML_STRING | XML_REQUIRED],
+									'error_handler' =>			['type' => XML_STRING, 'default' => CXmlConstantValue::ORIGINAL_ERROR, 'in' => $this->ITEM_PREPROCESSING_ERROR_HANDLER],
 									'error_handler_params' =>	['type' => XML_STRING, 'default' => '']
-								]]
-							]],
-							'overrides'	=>				['type' => XML_INDEXED_ARRAY, 'prefix' => 'override', 'rules' => [
-								'override' =>				['type' => XML_ARRAY, 'rules' => [
-									'name' =>					['type' => XML_STRING | XML_REQUIRED],
-									'step' =>					['type' => XML_STRING | XML_REQUIRED],
-									'stop' =>					['type' => XML_STRING, 'default' => CXmlConstantValue::LLD_OVERRIDE_STOP_NO, 'in' => $this->LLD_OVERRIDE_STOP],
-									'filter' =>					['type' => XML_ARRAY, 'rules' => [
-										'evaltype' =>				['type' => XML_STRING, 'default' => CXmlConstantValue::AND_OR, 'in' => $this->EVALTYPE],
-										'formula' =>				['type' => XML_STRING, 'default' => ''],
-										'conditions' =>				['type' => XML_INDEXED_ARRAY | XML_REQUIRED, 'prefix' => 'condition', 'rules' => [
-											'condition' =>				['type' => XML_ARRAY | XML_REQUIRED, 'rules' => [
-												'macro' =>					['type' => XML_STRING | XML_REQUIRED],
-												'value' =>					['type' => XML_STRING, 'default' => ''],
-												'operator' =>				['type' => XML_STRING, 'default' => CXmlConstantValue::CONDITION_MATCHES_REGEX, 'in' => $this->FILTER_CONDITION_OPERATOR],
-												'formulaid' =>				['type' => XML_STRING | XML_REQUIRED]
-											]]
-										]]
-									]],
-									'operations' =>				['type' => XML_INDEXED_ARRAY, 'prefix' => 'operation', 'rules' => [
-										'operation' =>				['type' => XML_ARRAY, 'rules' => [
-											'operationobject' =>		['type' => XML_STRING, 'in' => $this->LLD_OVERRIDE_OPERATION_OBJECT],
-											'operator' =>				['type' => XML_STRING, 'default' => CXmlConstantValue::CONDITION_OPERATOR_EQUAL, 'in' => $this->CONDITION_OPERATOR],
-											'value' =>					['type' => XML_STRING, 'default' => ''],
-											'status' =>					['type' => XML_STRING, 'in' => [CXmlConstantValue::LLD_OVERRIDE_OPERATION_STATUS_ENABLED => CXmlConstantName::ENABLED, CXmlConstantValue::LLD_OVERRIDE_OPERATION_STATUS_DISABLED => CXmlConstantName::DISABLED]],
-											'discover' =>				['type' => XML_STRING, 'in' => [CXmlConstantValue::LLD_OVERRIDE_OPERATION_DISCOVER => CXmlConstantName::DISCOVER, CXmlConstantValue::LLD_OVERRIDE_OPERATION_NO_DISCOVER => CXmlConstantName::NO_DISCOVER]],
-											'delay' =>					['type' => XML_STRING, 'default' => ''],
-											'history' =>				['type' => XML_STRING, 'default' => ''],
-											'trends' =>					['type' => XML_STRING, 'default' => ''],
-											'severity' =>				['type' => XML_STRING, 'in' => $this->TRIGGER_PRIORITY],
-											'tags' =>					['type' => XML_INDEXED_ARRAY, 'prefix' => 'tag', 'rules' => [
-												'tag' =>					['type' => XML_ARRAY, 'rules' => [
-													'tag' =>					['type' => XML_STRING | XML_REQUIRED],
-													'value' =>					['type' => XML_STRING, 'default' => '']
-												]]
-											]],
-											'templates' =>				['type' => XML_INDEXED_ARRAY, 'prefix' => 'template', 'rules' => [
-												'template' =>				['type' => XML_ARRAY, 'rules' => [
-													'name' =>					['type' => XML_STRING | XML_REQUIRED]
-												]]
-											]],
-											'inventory_mode' =>			['type' => XML_STRING, 'in' => $this->INVENTORY_MODE]
-										]]
-									]]
 								]]
 							]]
 						]]
 					]],
 					'httptests' =>				['type' => XML_INDEXED_ARRAY, 'prefix' => 'httptest', 'rules' => [
 						'httptest' =>				['type' => XML_ARRAY, 'rules' => [
-							'uuid' =>					['type' => XML_STRING | XML_REQUIRED, 'flags' => CImportDataNormalizer::LOWERCASE],
 							'name' =>					['type' => XML_STRING | XML_REQUIRED],
+							'application' =>			['type' => XML_ARRAY, 'rules' => [
+								'name' =>					['type' => XML_STRING | XML_REQUIRED]
+							]],
 							'delay' =>					['type' => XML_STRING, 'default' => '1m'],
 							'attempts' =>				['type' => XML_STRING, 'default' => '1'],
 							'agent' =>					['type' => XML_STRING, 'default' => 'Zabbix'],
@@ -1648,7 +1349,7 @@ class C54XmlValidator extends CImportValidatorGeneral {
 								]]
 							]],
 							'status' =>					['type' => XML_STRING, 'default' => CXmlConstantValue::ENABLED, 'in' => [CXmlConstantValue::ENABLED => CXmlConstantName::ENABLED, CXmlConstantValue::DISABLED => CXmlConstantName::DISABLED]],
-							'authentication' =>			['type' => XML_STRING, 'default' => CXmlConstantValue::NONE, 'in' => $this->HTTP_TEST_AUTHENTICATION],
+							'authentication' =>			['type' => XML_STRING, 'default' => CXmlConstantValue::NONE, 'in' => [CXmlConstantValue::NONE => CXmlConstantName::NONE, CXmlConstantValue::BASIC => CXmlConstantName::BASIC, CXmlConstantValue::NTLM => CXmlConstantName::NTLM]],
 							'http_user' =>				['type' => XML_STRING, 'default' => ''],
 							'http_password' =>			['type' => XML_STRING, 'default' => ''],
 							'verify_peer' =>			['type' => XML_STRING, 'default' => CXmlConstantValue::NO, 'in' => [CXmlConstantValue::NO => CXmlConstantName::NO, CXmlConstantValue::YES => CXmlConstantName::YES]],
@@ -1685,12 +1386,6 @@ class C54XmlValidator extends CImportValidatorGeneral {
 									'required' =>				['type' => XML_STRING, 'default' => ''],
 									'status_codes' =>			['type' => XML_STRING, 'default' => '']
 								]]
-							]],
-							'tags' =>					['type' => XML_INDEXED_ARRAY, 'prefix' => 'tag', 'rules' => [
-								'tag' =>					['type' => XML_ARRAY, 'rules' => [
-									'tag' =>					['type' => XML_STRING | XML_REQUIRED],
-									'value' =>					['type' => XML_STRING, 'default' => '']
-								]]
 							]]
 						]]
 					]],
@@ -1703,68 +1398,51 @@ class C54XmlValidator extends CImportValidatorGeneral {
 					'macros' =>					['type' => XML_INDEXED_ARRAY, 'prefix' => 'macro', 'rules' => [
 						'macro' =>					['type' => XML_ARRAY, 'rules' => [
 							'macro' =>					['type' => XML_STRING | XML_REQUIRED],
-							'type' =>					['type' => XML_STRING, 'default' => CXmlConstantValue::MACRO_TYPE_TEXT, 'in' => [CXmlConstantValue::MACRO_TYPE_TEXT => CXmlConstantName::MACRO_TYPE_TEXT, CXmlConstantValue::MACRO_TYPE_SECRET => CXmlConstantName::MACRO_TYPE_SECRET, CXmlConstantValue::MACRO_TYPE_VAULT => CXmlConstantName::MACRO_TYPE_VAULT]],
 							'value' =>					['type' => XML_STRING, 'default' => ''],
 							'description' =>			['type' => XML_STRING, 'default' => '']
 						]]
 					]],
-					'dashboards' =>				['type' => XML_INDEXED_ARRAY, 'prefix' => 'dashboard', 'rules' => [
-						'dashboard' =>				['type' => XML_ARRAY, 'rules' => [
-							'uuid' =>					['type' => XML_STRING | XML_REQUIRED, 'flags' => CImportDataNormalizer::LOWERCASE],
+					'screens' =>				['type' => XML_INDEXED_ARRAY, 'prefix' => 'screen', 'rules' => [
+						'screen' =>					['type' => XML_ARRAY, 'rules' => [
 							'name' =>					['type' => XML_STRING | XML_REQUIRED],
-							'display_period' =>				['type' => XML_STRING, 'default' => '30'],
-							'auto_start' =>					['type' => XML_STRING, 'default' => CXmlConstantValue::YES, 'in' => [CXmlConstantValue::NO => CXmlConstantName::NO, CXmlConstantValue::YES => CXmlConstantName::YES]],
-							'pages' =>						['type' => XML_INDEXED_ARRAY, 'prefix' => 'page', 'rules' => [
-								'page' =>						['type' => XML_ARRAY, 'rules' => [
-									'name' =>						['type' => XML_STRING, 'default' => ''],
-									'display_period' =>				['type' => XML_STRING, 'default' => '0'],
-									'widgets' =>					['type' => XML_INDEXED_ARRAY, 'prefix' => 'widget', 'rules' => [
-										'widget' =>						['type' => XML_ARRAY, 'rules' => [
-											'type' =>						['type' => XML_STRING | XML_REQUIRED, 'in' => $this->DASHBOARD_WIDGET_TYPE],
-											'name' =>						['type' => XML_STRING, 'default' => ''],
-											'x' =>							['type' => XML_STRING, 'default' => '0'],
-											'y' =>							['type' => XML_STRING, 'default' => '0'],
-											'width' =>						['type' => XML_STRING, 'default' => '1'],
-											'height' =>						['type' => XML_STRING, 'default' => '2'],
-											'hide_header' =>				['type' => XML_STRING, 'default' => CXmlConstantValue::NO, 'in' => [CXmlConstantValue::NO => CXmlConstantName::NO, CXmlConstantValue::YES => CXmlConstantName::YES]],
-											'fields' =>						['type' => XML_INDEXED_ARRAY, 'prefix' => 'field', 'rules' => [
-												'field' =>						['type' => XML_ARRAY, 'rules' => [
-													'type' =>						['type' => XML_STRING | XML_REQUIRED, 'in' => $this->DASHBOARD_WIDGET_FIELD_TYPE],
-													'name' =>						['type' => XML_STRING | XML_REQUIRED],
-													'value' =>						['type' => XML_REQUIRED, 'ex_validate' => [$this, 'validateWidgetFieldValue'], 'ex_rules' => [$this, 'getWidgetFieldValueExtendedRules']]
-												]]
-											]]
-										]]
-									]]
+							'hsize' =>					['type' => XML_STRING | XML_REQUIRED],
+							'vsize' =>					['type' => XML_STRING | XML_REQUIRED],
+							'screen_items' =>			['type' => XML_INDEXED_ARRAY, 'prefix' => 'screen_item', 'rules' => [
+								'screen_item' =>			['type' => XML_ARRAY, 'rules' => [
+									// The tag 'resourcetype' should be validated before the 'resource' because it is used in 'ex_validate' method.
+									'resourcetype' =>			['type' => XML_STRING | XML_REQUIRED],
+									// The tag 'style' should be validated before the 'resource' because it is used in 'ex_validate' method.
+									'style' =>					['type' => XML_STRING | XML_REQUIRED],
+									'resource' =>				['type' => XML_REQUIRED, 'preprocessor' => [$this, 'transformZero2Array'], 'ex_validate' => [$this, 'validateScreenItemResource']],
+									'width' =>					['type' => XML_STRING | XML_REQUIRED],
+									'height' =>					['type' => XML_STRING | XML_REQUIRED],
+									'x' =>						['type' => XML_STRING | XML_REQUIRED],
+									'y' =>						['type' => XML_STRING | XML_REQUIRED],
+									'colspan' =>				['type' => XML_STRING | XML_REQUIRED],
+									'rowspan' =>				['type' => XML_STRING | XML_REQUIRED],
+									'elements' =>				['type' => XML_STRING | XML_REQUIRED],
+									'valign' =>					['type' => XML_STRING | XML_REQUIRED],
+									'halign' =>					['type' => XML_STRING | XML_REQUIRED],
+									'dynamic' =>				['type' => XML_STRING | XML_REQUIRED],
+									'sort_triggers' =>			['type' => XML_STRING | XML_REQUIRED],
+									'url' =>					['type' => XML_STRING | XML_REQUIRED],
+									'application' =>			['type' => XML_STRING | XML_REQUIRED],
+									'max_columns' =>			['type' => XML_STRING | XML_REQUIRED]
 								]]
 							]]
 						]]
 					]],
-					'valuemaps' =>				['type' => XML_INDEXED_ARRAY, 'prefix' => 'valuemap', 'rules' => [
-						'valuemap' =>				['type' => XML_ARRAY, 'rules' => [
-							'uuid' =>					['type' => XML_STRING | XML_REQUIRED, 'flags' => CImportDataNormalizer::LOWERCASE],
-							'name' =>					['type' => XML_STRING | XML_REQUIRED],
-							'mappings' =>				['type' => XML_INDEXED_ARRAY | XML_REQUIRED, 'prefix' => 'mapping', 'rules' => [
-								'mapping' =>				['type' => XML_ARRAY, 'rules' => [
-									'type' =>					['type' => XML_STRING, 'default' => CXmlConstantValue::MAPPING_EQUAL, 'in' => $this->VALUEMAP_MAPPING_TYPE],
-									'value' =>					['type' => XML_STRING, 'default' => ''],
-									'newvalue' =>				['type' => XML_STRING | XML_REQUIRED]
-								]]
-							]]
-						]]
-					]]
+					'inventory_mode' =>			['type' => XML_STRING, 'default' => CXmlConstantValue::INV_MODE_MANUAL, 'in' => [CXmlConstantValue::INV_MODE_DISABLED => CXmlConstantName::DISABLED, CXmlConstantValue::INV_MODE_MANUAL => CXmlConstantName::MANUAL, CXmlConstantValue::INV_MODE_AUTOMATIC => CXmlConstantName::AUTOMATIC]]
 				]]
 			]],
 			'triggers' =>				['type' => XML_INDEXED_ARRAY, 'prefix' => 'trigger', 'rules' => [
 				'trigger' =>				['type' => XML_ARRAY, 'rules' => [
-					'uuid' =>					['type' => XML_STRING, 'flags' => CImportDataNormalizer::LOWERCASE],
 					'expression' =>				['type' => XML_STRING | XML_REQUIRED],
 					'recovery_mode' =>			['type' => XML_STRING, 'default' => CXmlConstantValue::TRIGGER_EXPRESSION, 'in' => $this->TRIGGER_RECOVERY_MODE],
 					'recovery_expression' =>	['type' => XML_STRING, 'default' => ''],
 					'correlation_mode' =>		['type' => XML_STRING, 'default' => CXmlConstantValue::TRIGGER_DISABLED, 'in' => [CXmlConstantValue::TRIGGER_DISABLED => CXmlConstantName::DISABLED, CXmlConstantValue::TRIGGER_TAG_VALUE => CXmlConstantName::TAG_VALUE]],
 					'correlation_tag' =>		['type' => XML_STRING, 'default' => ''],
 					'name' =>					['type' => XML_STRING | XML_REQUIRED],
-					'event_name' =>				['type' => XML_STRING, 'default' => ''],
 					'opdata' =>					['type' => XML_STRING, 'default' => ''],
 					'url' =>					['type' => XML_STRING, 'default' => ''],
 					'status' =>					['type' => XML_STRING, 'default' => CXmlConstantValue::ENABLED, 'in' => [CXmlConstantValue::ENABLED => CXmlConstantName::ENABLED, CXmlConstantValue::DISABLED => CXmlConstantName::DISABLED]],
@@ -1789,7 +1467,6 @@ class C54XmlValidator extends CImportValidatorGeneral {
 			]],
 			'graphs' =>					['type' => XML_INDEXED_ARRAY, 'prefix' => 'graph', 'rules' => [
 				'graph' =>					['type' => XML_ARRAY, 'rules' => [
-					'uuid' =>					['type' => XML_STRING, 'flags' => CImportDataNormalizer::LOWERCASE],
 					'name' =>					['type' => XML_STRING | XML_REQUIRED],
 					'width' =>					['type' => XML_STRING, 'default' => '900'],
 					'height' =>					['type' => XML_STRING, 'default' => '200'],
@@ -1900,18 +1577,11 @@ class C54XmlValidator extends CImportValidatorGeneral {
 							'icon_maintenance' =>		['type' => XML_ARRAY | XML_REQUIRED, 'rules' => [
 								'name' =>					['type' => XML_STRING]
 							]],
+							'application' =>			['type' => XML_STRING | XML_REQUIRED],
 							'urls' =>					['type' => XML_INDEXED_ARRAY | XML_REQUIRED, 'prefix' => 'url', 'rules' => [
 								'url' =>					['type' => XML_ARRAY, 'rules' => [
 									'name' =>					['type' => XML_STRING | XML_REQUIRED],
 									'url' =>					['type' => XML_STRING | XML_REQUIRED]
-								]]
-							]],
-							'evaltype' =>				['type' => XML_STRING],
-							'tags' =>					['type' => XML_INDEXED_ARRAY, 'prefix' => 'tag', 'rules' => [
-								'tag' =>					['type' => XML_ARRAY, 'rules' => [
-									'tag' =>					['type' => XML_STRING | XML_REQUIRED],
-									'value' =>					['type' => XML_STRING],
-									'operator' =>				['type' => XML_STRING]
 								]]
 							]]
 						]]
@@ -1956,7 +1626,7 @@ class C54XmlValidator extends CImportValidatorGeneral {
 							'selementid1' =>			['type' => XML_STRING | XML_REQUIRED],
 							'selementid2' =>			['type' => XML_STRING | XML_REQUIRED],
 							'linktriggers' =>			['type' => XML_INDEXED_ARRAY | XML_REQUIRED, 'prefix' => 'linktrigger', 'rules' => [
-								'linktrigger' =>            ['type' => XML_ARRAY, 'rules' => [
+								'linktrigger' =>			['type' => XML_ARRAY, 'rules' => [
 									'drawtype' =>				['type' => XML_STRING | XML_REQUIRED],
 									'color' =>					['type' => XML_STRING | XML_REQUIRED],
 									'trigger' =>				['type' => XML_ARRAY | XML_REQUIRED, 'rules' => [
@@ -1973,7 +1643,7 @@ class C54XmlValidator extends CImportValidatorGeneral {
 			'media_types' =>			['type' => XML_INDEXED_ARRAY, 'prefix' => 'media_type', 'rules' => [
 				'media_type' =>				['type' => XML_ARRAY, 'rules' => [
 					'name' =>					['type' => XML_STRING | XML_REQUIRED],
-					'type' =>					['type' => XML_STRING | XML_REQUIRED, 'in' => $this->MEDIA_TYPE],
+					'type' =>					['type' => XML_STRING | XML_REQUIRED, 'in' => [CXmlConstantValue::MEDIA_TYPE_EMAIL => CXmlConstantName::EMAIL, CXmlConstantValue::MEDIA_TYPE_SCRIPT => CXmlConstantName::SCRIPT, CXmlConstantValue::MEDIA_TYPE_SMS => CXmlConstantName::SMS, CXmlConstantValue::MEDIA_TYPE_WEBHOOK => CXmlConstantName::WEBHOOK]],
 					'smtp_server' =>			['type' => XML_STRING, 'default' => ''],
 					'smtp_port' =>				['type' => XML_STRING, 'default' => '25'],
 					'smtp_helo' =>				['type' => XML_STRING, 'default' => ''],
@@ -1981,7 +1651,7 @@ class C54XmlValidator extends CImportValidatorGeneral {
 					'smtp_security' =>			['type' => XML_STRING, 'default' => CXmlConstantValue::NONE, 'in' => [CXmlConstantValue::NONE => CXmlConstantName::NONE, CXmlConstantValue::STARTTLS => CXmlConstantName::STARTTLS, CXmlConstantValue::SSL_OR_TLS => CXmlConstantName::SSL_OR_TLS]],
 					'smtp_verify_host' =>		['type' => XML_STRING, 'default' => CXmlConstantValue::NO, 'in' => [CXmlConstantValue::NO => CXmlConstantName::NO, CXmlConstantValue::YES => CXmlConstantName::YES]],
 					'smtp_verify_peer' =>		['type' => XML_STRING, 'default' => CXmlConstantValue::NO, 'in' => [CXmlConstantValue::NO => CXmlConstantName::NO, CXmlConstantValue::YES => CXmlConstantName::YES]],
-					'smtp_authentication' =>	['type' => XML_STRING, 'default' => CXmlConstantValue::SMTP_AUTHENTICATION_NONE, 'in' => $this->SMTP_AUTHENTICATION],
+					'smtp_authentication' =>	['type' => XML_STRING, 'default' => CXmlConstantValue::SMTP_AUTHENTICATION_NONE, 'in' => [CXmlConstantValue::SMTP_AUTHENTICATION_NONE => CXmlConstantName::SMTP_AUTHENTICATION_NONE, CXmlConstantValue::SMTP_AUTHENTICATION_PASSWORD => CXmlConstantName::SMTP_AUTHENTICATION_PASSWORD]],
 					'username' =>				['type' => XML_STRING, 'default' => ''],
 					'password' =>				['type' => XML_STRING, 'default' => ''],
 					'content_type' =>			['type' => XML_STRING, 'default' => CXmlConstantValue::MESSAGE_FORMAT_HTML, 'in' => [CXmlConstantValue::MESSAGE_FORMAT_TEXT => CXmlConstantName::MESSAGE_FORMAT_TEXT, CXmlConstantValue::MESSAGE_FORMAT_HTML => CXmlConstantName::MESSAGE_FORMAT_HTML]],
@@ -1998,13 +1668,16 @@ class C54XmlValidator extends CImportValidatorGeneral {
 					'show_event_menu' => 		['type' => XML_STRING, 'default' => CXmlConstantValue::NO, 'in' => [CXmlConstantValue::NO => CXmlConstantName::NO, CXmlConstantValue::YES => CXmlConstantName::YES]],
 					'event_menu_url' => 		['type' => XML_STRING, 'default' => ''],
 					'event_menu_name' => 		['type' => XML_STRING, 'default' => ''],
-					'description' => 			['type' => XML_STRING, 'default' => ''],
-					'message_templates' =>		['type' => XML_INDEXED_ARRAY, 'prefix' => 'message_template', 'rules' => [
-						'message_template' =>		['type' => XML_ARRAY, 'rules' => [
-							'event_source' =>			['type' => XML_STRING | XML_REQUIRED, 'in' => $this->EVENT_SOURCE],
-							'operation_mode' =>			['type' => XML_STRING | XML_REQUIRED, 'in' => $this->OPERATION_MODE],
-							'subject' =>				['type' => XML_STRING, 'default' => ''],
-							'message' =>				['type' => XML_STRING, 'default' => '']
+					'description' => 			['type' => XML_STRING, 'default' => '']
+				]]
+			]],
+			'value_maps' =>				['type' => XML_INDEXED_ARRAY, 'prefix' => 'value_map', 'rules' => [
+				'value_map' =>				['type' => XML_ARRAY, 'rules' => [
+					'name' =>					['type' => XML_STRING | XML_REQUIRED],
+					'mappings' =>				['type' => XML_INDEXED_ARRAY, 'prefix' => 'mapping', 'rules' => [
+						'mapping' =>				['type' => XML_ARRAY, 'rules' => [
+							'value' =>					['type' => XML_STRING, 'default' => ''],
+							'newvalue' =>				['type' => XML_STRING, 'default' => '']
 						]]
 					]]
 				]]
@@ -2021,7 +1694,7 @@ class C54XmlValidator extends CImportValidatorGeneral {
 	 * @return array  Validator does some manipulations for the incoming data. For example, converts empty tags to an
 	 *                array, if desired. Converted array is returned.
 	 */
-	public function validate(array $data, $path) {
+	public function validate(array $data, string $path) {
 		return $this->doValidate($this->getSchema(), $data, $path);
 	}
 
@@ -2080,18 +1753,48 @@ class C54XmlValidator extends CImportValidatorGeneral {
 	}
 
 	/**
-	 * Chooses default value for preprocessing step error handler.
+	 * Validate "screen_item/resource" tag.
 	 *
-	 * @param array $parent_data  Data's parent array.
+	 * @param array|string $data         Import data.
+	 * @param array|null   $parent_data  Data's parent array.
+	 * @param string       $path         XML path.
 	 *
-	 * @return int
+	 * @return array|string
 	 */
-	public function defaultPreprocErrHandler(array $parent_data): int {
-		if ($parent_data['type'] == CXmlConstantValue::CHECK_NOT_SUPPORTED) {
-			return CXmlConstantValue::DISCARD_VALUE;
+	public function validateScreenItemResource($data, ?array $parent_data, $path) {
+		if (zbx_is_int($parent_data['resourcetype'])) {
+			switch ($parent_data['resourcetype']) {
+				case self::SCREEN_RESOURCE_TYPE_GRAPH:
+				case self::SCREEN_RESOURCE_TYPE_LLD_GRAPH:
+					$rules = ['type' => XML_ARRAY, 'rules' => [
+						'name' =>			['type' => XML_STRING | XML_REQUIRED],
+						'host' =>			['type' => XML_STRING | XML_REQUIRED]
+					]];
+					break;
+
+				case self::SCREEN_RESOURCE_TYPE_CLOCK:
+					if ($parent_data['style'] != TIME_TYPE_HOST) {
+						return $data;
+					}
+					// break; is not missing here
+
+				case self::SCREEN_RESOURCE_TYPE_SIMPLE_GRAPH:
+				case self::SCREEN_RESOURCE_TYPE_LLD_SIMPLE_GRAPH:
+				case self::SCREEN_RESOURCE_TYPE_PLAIN_TEXT:
+					$rules = ['type' => XML_ARRAY, 'rules' => [
+						'key' =>			['type' => XML_STRING | XML_REQUIRED],
+						'host' =>			['type' => XML_STRING | XML_REQUIRED]
+					]];
+					break;
+
+				default:
+					return $data;
+			}
+
+			$data = $this->doValidate($rules, $data, $path);
 		}
 
-		return CXmlConstantValue::ORIGINAL_ERROR;
+		return $data;
 	}
 
 	/**
@@ -2170,7 +1873,7 @@ class C54XmlValidator extends CImportValidatorGeneral {
 	 *
 	 * @param mixed $value
 	 *
-	 * @return mixed  Converted value.
+	 * @return mixed
 	 */
 	public function transformZero2Array($value) {
 		return ($value === '0') ? [] : $value;
@@ -2257,42 +1960,6 @@ class C54XmlValidator extends CImportValidatorGeneral {
 	}
 
 	/**
-	 * Validate preprocessing step error handler.
-	 *
-	 * @param string|array $data         Import data.
-	 * @param array|null   $parent_data  Data's parent array.
-	 * @param string       $path         XML path.
-	 *
-	 * @return string|array
-	 */
-	public function validatePreprocErrHandler($data, ?array $parent_data, $path) {
-		$in = $this->ITEM_PREPROCESSING_ERROR_HANDLER;
-
-		if ($parent_data['type'] == CXmlConstantName::CHECK_NOT_SUPPORTED) {
-			unset($in[CXmlConstantValue::ORIGINAL_ERROR]);
-		}
-
-		$rules = ['type' => XML_STRING, 'in' => $in];
-
-		return $this->doValidate($rules, $data, $path);
-	}
-
-	/**
-	 * Validate widget field "value" tag.
-	 *
-	 * @param string|array $data         Import data.
-	 * @param array|null   $parent_data  Data's parent array.
-	 * @param string       $path         XML path.
-	 *
-	 * @return string|array
-	 */
-	public function validateWidgetFieldValue($data, ?array $parent_data, string $path) {
-		$rules = $this->getWidgetFieldValueExtendedRules($parent_data);
-
-		return $this->doValidate($rules, $data, $path);
-	}
-
-	/**
 	 * @param array $data  Import data.
 	 *
 	 * @return array
@@ -2304,7 +1971,7 @@ class C54XmlValidator extends CImportValidatorGeneral {
 			}
 		}
 
-		return ['type' => XML_STRING, 'default' => CXmlConstantValue::NONE, 'in' => [CXmlConstantValue::NONE => CXmlConstantName::NONE, CXmlConstantValue::BASIC => CXmlConstantName::BASIC, CXmlConstantValue::NTLM => CXmlConstantName::NTLM, CXmlConstantValue::KERBEROS => CXmlConstantName::KERBEROS, CXmlConstantValue::DIGEST => CXmlConstantName::DIGEST]];
+		return ['type' => XML_STRING, 'default' => CXmlConstantValue::NONE, 'in' => [CXmlConstantValue::NONE => CXmlConstantName::NONE, CXmlConstantValue::BASIC => CXmlConstantName::BASIC, CXmlConstantValue::NTLM => CXmlConstantName::NTLM, CXmlConstantValue::KERBEROS => CXmlConstantName::KERBEROS]];
 	}
 
 	/**
@@ -2375,39 +2042,6 @@ class C54XmlValidator extends CImportValidatorGeneral {
 
 			default:
 				return ['type' => XML_ARRAY, 'rules' => []];
-		}
-	}
-
-	/**
-	 * @param array $data
-	 *
-	 * @return array
-	 */
-	public function getWidgetFieldValueExtendedRules(array $data): array {
-		switch ($data['type']) {
-			case CXmlConstantName::DASHBOARD_WIDGET_FIELD_TYPE_HOST:
-			case CXmlConstantValue::DASHBOARD_WIDGET_FIELD_TYPE_HOST:
-				return ['type' => XML_ARRAY, 'rules' => [
-					'host' => ['type' => XML_STRING | XML_REQUIRED]
-				]];
-			case CXmlConstantName::DASHBOARD_WIDGET_FIELD_TYPE_ITEM:
-			case CXmlConstantName::DASHBOARD_WIDGET_FIELD_TYPE_ITEM_PROTOTYPE:
-			case CXmlConstantValue::DASHBOARD_WIDGET_FIELD_TYPE_ITEM:
-			case CXmlConstantValue::DASHBOARD_WIDGET_FIELD_TYPE_ITEM_PROTOTYPE:
-				return ['type' => XML_ARRAY, 'rules' => [
-					'host' => ['type' => XML_STRING | XML_REQUIRED],
-					'key' => ['type' => XML_STRING | XML_REQUIRED]
-				]];
-			case CXmlConstantName::DASHBOARD_WIDGET_FIELD_TYPE_GRAPH:
-			case CXmlConstantName::DASHBOARD_WIDGET_FIELD_TYPE_GRAPH_PROTOTYPE:
-			case CXmlConstantValue::DASHBOARD_WIDGET_FIELD_TYPE_GRAPH:
-			case CXmlConstantValue::DASHBOARD_WIDGET_FIELD_TYPE_GRAPH_PROTOTYPE:
-				return ['type' => XML_ARRAY, 'rules' => [
-					'host' => ['type' => XML_STRING | XML_REQUIRED],
-					'name' => ['type' => XML_STRING | XML_REQUIRED]
-				]];
-			default:
-				return ['type' => XML_STRING | XML_REQUIRED];
 		}
 	}
 

@@ -15,9 +15,9 @@
 
 
 /**
- * Validate import data from Zabbix 4.2.x.
+ * Validate import data from Zabbix 4.0.x.
  */
-class C42XmlValidator extends CImportValidatorGeneral {
+class C40ImportValidator extends CImportValidatorGeneral {
 
 	/**
 	 * Legacy screen resource types.
@@ -35,8 +35,8 @@ class C42XmlValidator extends CImportValidatorGeneral {
 	 * @param array  $data  Import data.
 	 * @param string $path  XML path (for error reporting).
 	 *
-	 * @return array  Validator does some manipulations for the incoming data. For example, converts empty tags to an
-	 *                array, if desired. Converted array is returned.
+	 * @return array        Validator does some manipulation for the incoming data. For example, converts empty tags to
+	 *                      an array, if desired. Converted array is returned.
 	 */
 	public function validate(array $data, string $path) {
 		$rules = ['type' => XML_ARRAY, 'rules' => [
@@ -136,9 +136,7 @@ class C42XmlValidator extends CImportValidatorGeneral {
 							'preprocessing' =>			['type' => XML_INDEXED_ARRAY | XML_REQUIRED, 'prefix' => 'step', 'rules' => [
 								'step' =>					['type' => XML_ARRAY, 'rules' => [
 									'type' =>					['type' => XML_STRING | XML_REQUIRED],
-									'params' =>					['type' => XML_STRING | XML_REQUIRED],
-									'error_handler' =>			['type' => XML_STRING | XML_REQUIRED],
-									'error_handler_params' =>	['type' => XML_STRING | XML_REQUIRED]
+									'params' =>					['type' => XML_STRING | XML_REQUIRED]
 								]]
 							]],
 							'interface_ref' =>			['type' => XML_STRING],
@@ -266,9 +264,7 @@ class C42XmlValidator extends CImportValidatorGeneral {
 									'preprocessing' =>			['type' => XML_INDEXED_ARRAY | XML_REQUIRED, 'prefix' => 'step', 'rules' => [
 										'step' =>					['type' => XML_ARRAY, 'rules' => [
 											'type' =>					['type' => XML_STRING | XML_REQUIRED],
-											'params' =>					['type' => XML_STRING | XML_REQUIRED],
-											'error_handler' =>			['type' => XML_STRING | XML_REQUIRED],
-											'error_handler_params' =>	['type' => XML_STRING | XML_REQUIRED]
+											'params' =>					['type' => XML_STRING | XML_REQUIRED]
 										]]
 									]],
 									'interface_ref' =>			['type' => XML_STRING],
@@ -398,9 +394,6 @@ class C42XmlValidator extends CImportValidatorGeneral {
 								]]
 							]],
 							'jmx_endpoint' =>			['type' => XML_STRING | XML_REQUIRED],
-							'master_item' =>			['type' => XML_ARRAY | XML_REQUIRED, 'ex_validate' => [$this, 'validateMasterItem'], 'prefix' => 'master_item', 'rules' => [
-								'key' =>					['type' => XML_STRING]
-							]],
 							'timeout' =>				['type' => XML_STRING | XML_REQUIRED],
 							'url' =>					['type' => XML_STRING | XML_REQUIRED],
 							'query_fields' =>			['type' => XML_INDEXED_ARRAY | XML_REQUIRED,
@@ -429,21 +422,7 @@ class C42XmlValidator extends CImportValidatorGeneral {
 							'ssl_key_file' =>			['type' => XML_STRING | XML_REQUIRED],
 							'ssl_key_password' =>		['type' => XML_STRING | XML_REQUIRED],
 							'verify_peer' =>			['type' => XML_STRING | XML_REQUIRED],
-							'verify_host' =>			['type' => XML_STRING | XML_REQUIRED],
-							'lld_macro_paths' =>		['type' => XML_INDEXED_ARRAY | XML_REQUIRED, 'prefix' => 'lld_macro_path', 'rules' => [
-								'lld_macro_path' =>			['type' => XML_ARRAY, 'rules' => [
-									'lld_macro' =>				['type' => XML_STRING | XML_REQUIRED],
-									'path' =>					['type' => XML_STRING | XML_REQUIRED]
-								]]
-							]],
-							'preprocessing' =>			['type' => XML_INDEXED_ARRAY | XML_REQUIRED, 'prefix' => 'step', 'rules' => [
-								'step' =>					['type' => XML_ARRAY, 'rules' => [
-									'type' =>					['type' => XML_STRING | XML_REQUIRED],
-									'params' =>					['type' => XML_STRING | XML_REQUIRED],
-									'error_handler' =>			['type' => XML_STRING | XML_REQUIRED],
-									'error_handler_params' =>	['type' => XML_STRING | XML_REQUIRED]
-								]]
-							]]
+							'verify_host' =>			['type' => XML_STRING | XML_REQUIRED]
 						]]
 					]],
 					'httptests' =>				['type' => XML_INDEXED_ARRAY, 'prefix' => 'httptest', 'rules' => [
@@ -507,12 +486,6 @@ class C42XmlValidator extends CImportValidatorGeneral {
 									'status_codes' =>			['type' => XML_STRING | XML_REQUIRED]
 								]]
 							]]
-						]]
-					]],
-					'tags' =>					['type' => XML_INDEXED_ARRAY | XML_REQUIRED, 'prefix' => 'tag', 'rules' => [
-						'tag' =>					['type' => XML_ARRAY, 'rules' => [
-							'tag' =>					['type' => XML_STRING | XML_REQUIRED],
-							'value' =>					['type' => XML_STRING | XML_REQUIRED]
 						]]
 					]],
 					'macros' =>					['type' => XML_INDEXED_ARRAY, 'prefix' => 'macro', 'rules' => [
@@ -658,9 +631,7 @@ class C42XmlValidator extends CImportValidatorGeneral {
 							'preprocessing' =>			['type' => XML_INDEXED_ARRAY | XML_REQUIRED, 'prefix' => 'step', 'rules' => [
 								'step' =>					['type' => XML_ARRAY, 'rules' => [
 									'type' =>					['type' => XML_STRING | XML_REQUIRED],
-									'params' =>					['type' => XML_STRING | XML_REQUIRED],
-									'error_handler' =>			['type' => XML_STRING | XML_REQUIRED],
-									'error_handler_params' =>	['type' => XML_STRING | XML_REQUIRED]
+									'params' =>					['type' => XML_STRING | XML_REQUIRED]
 								]]
 							]],
 							'logtimefmt' =>				['type' => XML_STRING | XML_REQUIRED],
@@ -786,9 +757,7 @@ class C42XmlValidator extends CImportValidatorGeneral {
 									'preprocessing' =>			['type' => XML_INDEXED_ARRAY | XML_REQUIRED, 'prefix' => 'step', 'rules' => [
 										'step' =>					['type' => XML_ARRAY, 'rules' => [
 											'type' =>					['type' => XML_STRING | XML_REQUIRED],
-											'params' =>					['type' => XML_STRING | XML_REQUIRED],
-											'error_handler' =>			['type' => XML_STRING | XML_REQUIRED],
-											'error_handler_params' =>	['type' => XML_STRING | XML_REQUIRED]
+											'params' =>					['type' => XML_STRING | XML_REQUIRED]
 										]]
 									]],
 									'logtimefmt' =>				['type' => XML_STRING | XML_REQUIRED],
@@ -918,9 +887,6 @@ class C42XmlValidator extends CImportValidatorGeneral {
 								]]
 							]],
 							'jmx_endpoint' =>			['type' => XML_STRING | XML_REQUIRED],
-							'master_item' =>			['type' => XML_ARRAY | XML_REQUIRED, 'ex_validate' => [$this, 'validateMasterItem'], 'prefix' => 'master_item', 'rules' => [
-								'key' =>					['type' => XML_STRING]
-							]],
 							'timeout' =>				['type' => XML_STRING | XML_REQUIRED],
 							'url' =>					['type' => XML_STRING | XML_REQUIRED],
 							'query_fields' =>			['type' => XML_INDEXED_ARRAY | XML_REQUIRED,
@@ -949,21 +915,7 @@ class C42XmlValidator extends CImportValidatorGeneral {
 							'ssl_key_file' =>			['type' => XML_STRING | XML_REQUIRED],
 							'ssl_key_password' =>		['type' => XML_STRING | XML_REQUIRED],
 							'verify_peer' =>			['type' => XML_STRING | XML_REQUIRED],
-							'verify_host' =>			['type' => XML_STRING | XML_REQUIRED],
-							'lld_macro_paths' =>		['type' => XML_INDEXED_ARRAY | XML_REQUIRED, 'prefix' => 'lld_macro_path', 'rules' => [
-								'lld_macro_path' =>			['type' => XML_ARRAY, 'rules' => [
-									'lld_macro' =>				['type' => XML_STRING | XML_REQUIRED],
-									'path' =>					['type' => XML_STRING | XML_REQUIRED]
-								]]
-							]],
-							'preprocessing' =>			['type' => XML_INDEXED_ARRAY | XML_REQUIRED, 'prefix' => 'step', 'rules' => [
-								'step' =>					['type' => XML_ARRAY, 'rules' => [
-									'type' =>					['type' => XML_STRING | XML_REQUIRED],
-									'params' =>					['type' => XML_STRING | XML_REQUIRED],
-									'error_handler' =>			['type' => XML_STRING | XML_REQUIRED],
-									'error_handler_params' =>	['type' => XML_STRING | XML_REQUIRED]
-								]]
-							]]
+							'verify_host' =>			['type' => XML_STRING | XML_REQUIRED]
 						]]
 					]],
 					'httptests' =>				['type' => XML_INDEXED_ARRAY, 'prefix' => 'httptest', 'rules' => [
@@ -1027,12 +979,6 @@ class C42XmlValidator extends CImportValidatorGeneral {
 									'status_codes' =>			['type' => XML_STRING | XML_REQUIRED]
 								]]
 							]]
-						]]
-					]],
-					'tags' =>					['type' => XML_INDEXED_ARRAY | XML_REQUIRED, 'prefix' => 'tag', 'rules' => [
-						'tag' =>					['type' => XML_ARRAY, 'rules' => [
-							'tag' =>					['type' => XML_STRING | XML_REQUIRED],
-							'value' =>					['type' => XML_STRING | XML_REQUIRED]
 						]]
 					]],
 					'macros' =>					['type' => XML_INDEXED_ARRAY, 'prefix' => 'macro', 'rules' => [
@@ -1300,7 +1246,7 @@ class C42XmlValidator extends CImportValidatorGeneral {
 	 * @param array|null $parent_data  Data's parent array.
 	 * @param string     $path         XML path (for error reporting).
 	 *
-	 * @throws Exception If the date or time is invalid.
+	 * @throws Exception if the date or time is invalid.
 	 * @return string
 	 */
 	public function validateDateTime($data, ?array $parent_data, $path) {
@@ -1335,9 +1281,9 @@ class C42XmlValidator extends CImportValidatorGeneral {
 	/**
 	 * Validate map elements.
 	 *
-	 * @param array|string $data         Import data.
-	 * @param array|null   $parent_data  Data's parent array.
-	 * @param string       $path         XML path.
+	 * @param string     $data         Import data.
+	 * @param array|null $parent_data  Data's parent array.
+	 * @param string     $path         XML path.
 	 *
 	 * @return mixed
 	 */
@@ -1384,9 +1330,9 @@ class C42XmlValidator extends CImportValidatorGeneral {
 	/**
 	 * Validate "screen_item/resource" tag.
 	 *
-	 * @param array|string $data         Import data.
-	 * @param array|null   $parent_data  Data's parent array.
-	 * @param string       $path         XML path.
+	 * @param string     $data         Import data.
+	 * @param array|null $parent_data  Data's parent array.
+	 * @param string     $path         XML path.
 	 *
 	 * @return mixed
 	 */
@@ -1433,7 +1379,7 @@ class C42XmlValidator extends CImportValidatorGeneral {
 	 * @param array|null $parent_data  Data's parent array.
 	 * @param string     $path         XML path.
 	 *
-	 * @return array
+	 * @return mixed
 	 */
 	public function validateYMinItem($data, ?array $parent_data, $path) {
 		if (zbx_is_int($parent_data['ymin_type_1']) && $parent_data['ymin_type_1'] == GRAPH_YAXIS_TYPE_ITEM_VALUE) {
@@ -1456,7 +1402,7 @@ class C42XmlValidator extends CImportValidatorGeneral {
 	 * @param array|null $parent_data  Data's parent array.
 	 * @param string     $path         XML path.
 	 *
-	 * @return array
+	 * @return mixed
 	 */
 	public function validateYMaxItem($data, ?array $parent_data, $path) {
 		if (zbx_is_int($parent_data['ymax_type_1']) && $parent_data['ymax_type_1'] == GRAPH_YAXIS_TYPE_ITEM_VALUE) {
@@ -1486,11 +1432,11 @@ class C42XmlValidator extends CImportValidatorGeneral {
 	/**
 	 * Validate "posts" tag of http test step.
 	 *
-	 * @param array|string $data         Import data.
-	 * @param array|null   $parent_data  Data's parent array.
-	 * @param string       $path         XML path.
+	 * @param string     $data         Import data.
+	 * @param array|null $parent_data  Data's parent array.
+	 * @param string     $path         XML path.
 	 *
-	 * @return array
+	 * @return mixed
 	 */
 	public function validateHttpPosts($data, ?array $parent_data, $path) {
 		if (is_array($data)) {
@@ -1517,7 +1463,7 @@ class C42XmlValidator extends CImportValidatorGeneral {
 	 * @param array|null $parent_data  Data's parent array.
 	 * @param string     $path         XML path.
 	 *
-	 * @return array
+	 * @return mixed
 	 */
 	public function validateMasterItem($data, ?array $parent_data, $path) {
 		$prefix = substr(strrchr($path, '/'), 1);

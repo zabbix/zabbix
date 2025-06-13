@@ -15,9 +15,9 @@
 
 
 /**
- * Validate import data from Zabbix 3.0.x.
+ * Validate import data from Zabbix 2.x.
  */
-class C30XmlValidator extends CImportValidatorGeneral {
+class C20ImportValidator extends CImportValidatorGeneral {
 
 	/**
 	 * Legacy screen resource types.
@@ -25,7 +25,6 @@ class C30XmlValidator extends CImportValidatorGeneral {
 	private const SCREEN_RESOURCE_TYPE_GRAPH = 0;
 	private const SCREEN_RESOURCE_TYPE_SIMPLE_GRAPH = 1;
 	private const SCREEN_RESOURCE_TYPE_PLAIN_TEXT = 3;
-	private const SCREEN_RESOURCE_TYPE_CLOCK = 7;
 	private const SCREEN_RESOURCE_TYPE_LLD_SIMPLE_GRAPH = 19;
 	private const SCREEN_RESOURCE_TYPE_LLD_GRAPH = 20;
 
@@ -51,7 +50,7 @@ class C30XmlValidator extends CImportValidatorGeneral {
 				'host' =>					['type' => XML_ARRAY, 'rules' => [
 					'host' =>					['type' => XML_STRING | XML_REQUIRED],
 					'name' =>					['type' => XML_STRING | XML_REQUIRED],
-					'description' =>			['type' => XML_STRING | XML_REQUIRED],
+					'description' =>			['type' => XML_STRING],
 					'proxy' =>					['type' => XML_ARRAY | XML_REQUIRED, 'rules' => [
 						'name' =>					['type' => XML_STRING]
 					]],
@@ -60,12 +59,6 @@ class C30XmlValidator extends CImportValidatorGeneral {
 					'ipmi_privilege' =>			['type' => XML_STRING | XML_REQUIRED],
 					'ipmi_username' =>			['type' => XML_STRING | XML_REQUIRED],
 					'ipmi_password' =>			['type' => XML_STRING | XML_REQUIRED],
-					'tls_connect' =>			['type' => XML_STRING | XML_REQUIRED],
-					'tls_accept' =>				['type' => XML_STRING | XML_REQUIRED],
-					'tls_issuer' =>				['type' => XML_STRING | XML_REQUIRED],
-					'tls_subject' =>			['type' => XML_STRING | XML_REQUIRED],
-					'tls_psk_identity' =>		['type' => XML_STRING | XML_REQUIRED],
-					'tls_psk' =>				['type' => XML_STRING | XML_REQUIRED],
 					'templates' =>				['type' => XML_INDEXED_ARRAY, 'prefix' => 'template', 'rules' => [
 						'template' =>				['type' => XML_ARRAY, 'rules' => [
 							'name' =>					['type' => XML_STRING | XML_REQUIRED]
@@ -84,7 +77,7 @@ class C30XmlValidator extends CImportValidatorGeneral {
 							'ip' =>						['type' => XML_STRING | XML_REQUIRED],
 							'dns' =>					['type' => XML_STRING | XML_REQUIRED],
 							'port' =>					['type' => XML_STRING | XML_REQUIRED],
-							'bulk' =>					['type' => XML_STRING | XML_REQUIRED],
+							'bulk' =>					['type' => XML_STRING],
 							'interface_ref' =>			['type' => XML_STRING | XML_REQUIRED]
 						]]
 					]],
@@ -109,12 +102,12 @@ class C30XmlValidator extends CImportValidatorGeneral {
 							'allowed_hosts' =>			['type' => XML_STRING | XML_REQUIRED],
 							'units' =>					['type' => XML_STRING | XML_REQUIRED],
 							'delta' =>					['type' => XML_STRING | XML_REQUIRED],
-							'snmpv3_contextname' =>		['type' => XML_STRING | XML_REQUIRED],
+							'snmpv3_contextname' =>		['type' => XML_STRING],
 							'snmpv3_securityname' =>	['type' => XML_STRING | XML_REQUIRED],
 							'snmpv3_securitylevel' =>	['type' => XML_STRING | XML_REQUIRED],
-							'snmpv3_authprotocol' =>	['type' => XML_STRING | XML_REQUIRED],
+							'snmpv3_authprotocol' =>	['type' => XML_STRING],
 							'snmpv3_authpassphrase' =>	['type' => XML_STRING | XML_REQUIRED],
-							'snmpv3_privprotocol' =>	['type' => XML_STRING | XML_REQUIRED],
+							'snmpv3_privprotocol' =>	['type' => XML_STRING],
 							'snmpv3_privpassphrase' =>	['type' => XML_STRING | XML_REQUIRED],
 							'formula' =>				['type' => XML_STRING | XML_REQUIRED],
 							'delay_flex' =>				['type' => XML_STRING | XML_REQUIRED],
@@ -137,7 +130,7 @@ class C30XmlValidator extends CImportValidatorGeneral {
 							'valuemap' =>				['type' => XML_ARRAY | XML_REQUIRED, 'rules' => [
 								'name' =>					['type' => XML_STRING]
 							]],
-							'logtimefmt' =>				['type' => XML_STRING | XML_REQUIRED],
+							'logtimefmt' =>				['type' => XML_STRING],
 							'interface_ref' =>			['type' => XML_STRING]
 						]]
 					]],
@@ -151,12 +144,12 @@ class C30XmlValidator extends CImportValidatorGeneral {
 							'delay' =>					['type' => XML_STRING | XML_REQUIRED],
 							'status' =>					['type' => XML_STRING | XML_REQUIRED],
 							'allowed_hosts' =>			['type' => XML_STRING | XML_REQUIRED],
-							'snmpv3_contextname' =>		['type' => XML_STRING | XML_REQUIRED],
+							'snmpv3_contextname' =>		['type' => XML_STRING],
 							'snmpv3_securityname' =>	['type' => XML_STRING | XML_REQUIRED],
 							'snmpv3_securitylevel' =>	['type' => XML_STRING | XML_REQUIRED],
-							'snmpv3_authprotocol' =>	['type' => XML_STRING | XML_REQUIRED],
+							'snmpv3_authprotocol' =>	['type' => XML_STRING],
 							'snmpv3_authpassphrase' =>	['type' => XML_STRING | XML_REQUIRED],
-							'snmpv3_privprotocol' =>	['type' => XML_STRING | XML_REQUIRED],
+							'snmpv3_privprotocol' =>	['type' => XML_STRING],
 							'snmpv3_privpassphrase' =>	['type' => XML_STRING | XML_REQUIRED],
 							'delay_flex' =>				['type' => XML_STRING | XML_REQUIRED],
 							'params' =>					['type' => XML_STRING | XML_REQUIRED],
@@ -167,18 +160,7 @@ class C30XmlValidator extends CImportValidatorGeneral {
 							'publickey' =>				['type' => XML_STRING | XML_REQUIRED],
 							'privatekey' =>				['type' => XML_STRING | XML_REQUIRED],
 							'port' =>					['type' => XML_STRING | XML_REQUIRED],
-							'filter' =>					['type' => XML_ARRAY | XML_REQUIRED, 'rules' => [
-								'evaltype' =>				['type' => XML_STRING | XML_REQUIRED],
-								'formula' =>				['type' => XML_STRING | XML_REQUIRED],
-								'conditions' =>				['type' => XML_INDEXED_ARRAY | XML_REQUIRED, 'prefix' => 'condition', 'rules' => [
-									'condition' =>				['type' => XML_ARRAY, 'rules' => [
-										'macro' =>					['type' => XML_STRING | XML_REQUIRED],
-										'value' =>					['type' => XML_STRING | XML_REQUIRED],
-										'operator' =>				['type' => XML_STRING | XML_REQUIRED],
-										'formulaid' =>				['type' => XML_STRING | XML_REQUIRED]
-									]]
-								]]
-							]],
+							'filter' =>					['type' => XML_REQUIRED, 'ex_validate' => [$this, 'validateFilter']],
 							'lifetime' =>				['type' => XML_STRING | XML_REQUIRED],
 							'description' =>			['type' => XML_STRING | XML_REQUIRED],
 							'interface_ref' =>			['type' => XML_STRING],
@@ -198,12 +180,12 @@ class C30XmlValidator extends CImportValidatorGeneral {
 									'allowed_hosts' =>			['type' => XML_STRING | XML_REQUIRED],
 									'units' =>					['type' => XML_STRING | XML_REQUIRED],
 									'delta' =>					['type' => XML_STRING | XML_REQUIRED],
-									'snmpv3_contextname' =>		['type' => XML_STRING | XML_REQUIRED],
+									'snmpv3_contextname' =>		['type' => XML_STRING],
 									'snmpv3_securityname' =>	['type' => XML_STRING | XML_REQUIRED],
 									'snmpv3_securitylevel' =>	['type' => XML_STRING | XML_REQUIRED],
-									'snmpv3_authprotocol' =>	['type' => XML_STRING | XML_REQUIRED],
+									'snmpv3_authprotocol' =>	['type' => XML_STRING],
 									'snmpv3_authpassphrase' =>	['type' => XML_STRING | XML_REQUIRED],
-									'snmpv3_privprotocol' =>	['type' => XML_STRING | XML_REQUIRED],
+									'snmpv3_privprotocol' =>	['type' => XML_STRING],
 									'snmpv3_privpassphrase' =>	['type' => XML_STRING | XML_REQUIRED],
 									'formula' =>				['type' => XML_STRING | XML_REQUIRED],
 									'delay_flex' =>				['type' => XML_STRING | XML_REQUIRED],
@@ -223,15 +205,10 @@ class C30XmlValidator extends CImportValidatorGeneral {
 											'name' =>					['type' => XML_STRING | XML_REQUIRED]
 										]]
 									]],
-									'application_prototypes' =>		['type' => XML_INDEXED_ARRAY | XML_REQUIRED, 'prefix' => 'application_prototype', 'rules' => [
-										'application_prototype' =>		['type' => XML_ARRAY, 'rules' => [
-											'name' =>						['type' => XML_STRING | XML_REQUIRED]
-										]]
-									]],
 									'valuemap' =>				['type' => XML_ARRAY | XML_REQUIRED, 'rules' => [
 										'name' =>					['type' => XML_STRING]
 									]],
-									'logtimefmt' =>				['type' => XML_STRING | XML_REQUIRED],
+									'logtimefmt' =>				['type' => XML_STRING],
 									'interface_ref' =>			['type' => XML_STRING]
 								]]
 							]],
@@ -243,13 +220,7 @@ class C30XmlValidator extends CImportValidatorGeneral {
 									'status' =>					['type' => XML_STRING | XML_REQUIRED],
 									'priority' =>				['type' => XML_STRING | XML_REQUIRED],
 									'description' =>			['type' => XML_STRING | XML_REQUIRED],
-									'type' =>					['type' => XML_STRING | XML_REQUIRED],
-									'dependencies' =>			['type' => XML_INDEXED_ARRAY, 'prefix' => 'dependency', 'rules' => [
-										'dependency' =>				['type' => XML_ARRAY, 'rules' => [
-											'name' =>					['type' => XML_STRING | XML_REQUIRED],
-											'expression' =>				['type' => XML_STRING | XML_REQUIRED]
-										]]
-									]]
+									'type' =>					['type' => XML_STRING | XML_REQUIRED]
 								]]
 							]],
 							'graph_prototypes' =>		['type' => XML_INDEXED_ARRAY | XML_REQUIRED, 'prefix' => 'graph_prototype', 'rules' => [
@@ -288,7 +259,7 @@ class C30XmlValidator extends CImportValidatorGeneral {
 									]]
 								]]
 							]],
-							'host_prototypes' =>		['type' => XML_INDEXED_ARRAY | XML_REQUIRED, 'prefix' => 'host_prototype', 'rules' => [
+							'host_prototypes' =>		['type' => XML_INDEXED_ARRAY, 'prefix' => 'host_prototype', 'rules' => [
 								'host_prototype' =>			['type' => XML_ARRAY, 'rules' => [
 									'host' =>					['type' => XML_STRING | XML_REQUIRED],
 									'name' =>					['type' => XML_STRING | XML_REQUIRED],
@@ -399,7 +370,7 @@ class C30XmlValidator extends CImportValidatorGeneral {
 				'template' =>				['type' => XML_ARRAY, 'rules' => [
 					'template' =>				['type' => XML_STRING | XML_REQUIRED],
 					'name' =>					['type' => XML_STRING | XML_REQUIRED],
-					'description' =>			['type' => XML_STRING | XML_REQUIRED],
+					'description' =>			['type' => XML_STRING],
 					'templates' =>				['type' => XML_INDEXED_ARRAY, 'prefix' => 'template', 'rules' => [
 						'template' =>				['type' => XML_ARRAY, 'rules' => [
 							'name' =>					['type' => XML_STRING | XML_REQUIRED]
@@ -431,12 +402,12 @@ class C30XmlValidator extends CImportValidatorGeneral {
 							'allowed_hosts' =>			['type' => XML_STRING | XML_REQUIRED],
 							'units' =>					['type' => XML_STRING | XML_REQUIRED],
 							'delta' =>					['type' => XML_STRING | XML_REQUIRED],
-							'snmpv3_contextname' =>		['type' => XML_STRING | XML_REQUIRED],
+							'snmpv3_contextname' =>		['type' => XML_STRING],
 							'snmpv3_securityname' =>	['type' => XML_STRING | XML_REQUIRED],
 							'snmpv3_securitylevel' =>	['type' => XML_STRING | XML_REQUIRED],
-							'snmpv3_authprotocol' =>	['type' => XML_STRING | XML_REQUIRED],
+							'snmpv3_authprotocol' =>	['type' => XML_STRING],
 							'snmpv3_authpassphrase' =>	['type' => XML_STRING | XML_REQUIRED],
-							'snmpv3_privprotocol' =>	['type' => XML_STRING | XML_REQUIRED],
+							'snmpv3_privprotocol' =>	['type' => XML_STRING],
 							'snmpv3_privpassphrase' =>	['type' => XML_STRING | XML_REQUIRED],
 							'formula' =>				['type' => XML_STRING | XML_REQUIRED],
 							'delay_flex' =>				['type' => XML_STRING | XML_REQUIRED],
@@ -459,7 +430,7 @@ class C30XmlValidator extends CImportValidatorGeneral {
 							'valuemap' =>				['type' => XML_ARRAY | XML_REQUIRED, 'rules' => [
 								'name' =>					['type' => XML_STRING]
 							]],
-							'logtimefmt' =>				['type' => XML_STRING | XML_REQUIRED]
+							'logtimefmt' =>				['type' => XML_STRING]
 						]]
 					]],
 					'discovery_rules' =>		['type' => XML_INDEXED_ARRAY, 'prefix' => 'discovery_rule', 'rules' => [
@@ -472,12 +443,12 @@ class C30XmlValidator extends CImportValidatorGeneral {
 							'delay' =>					['type' => XML_STRING | XML_REQUIRED],
 							'status' =>					['type' => XML_STRING | XML_REQUIRED],
 							'allowed_hosts' =>			['type' => XML_STRING | XML_REQUIRED],
-							'snmpv3_contextname' =>		['type' => XML_STRING | XML_REQUIRED],
+							'snmpv3_contextname' =>		['type' => XML_STRING],
 							'snmpv3_securityname' =>	['type' => XML_STRING | XML_REQUIRED],
 							'snmpv3_securitylevel' =>	['type' => XML_STRING | XML_REQUIRED],
-							'snmpv3_authprotocol' =>	['type' => XML_STRING | XML_REQUIRED],
+							'snmpv3_authprotocol' =>	['type' => XML_STRING],
 							'snmpv3_authpassphrase' =>	['type' => XML_STRING | XML_REQUIRED],
-							'snmpv3_privprotocol' =>	['type' => XML_STRING | XML_REQUIRED],
+							'snmpv3_privprotocol' =>	['type' => XML_STRING],
 							'snmpv3_privpassphrase' =>	['type' => XML_STRING | XML_REQUIRED],
 							'delay_flex' =>				['type' => XML_STRING | XML_REQUIRED],
 							'params' =>					['type' => XML_STRING | XML_REQUIRED],
@@ -488,18 +459,7 @@ class C30XmlValidator extends CImportValidatorGeneral {
 							'publickey' =>				['type' => XML_STRING | XML_REQUIRED],
 							'privatekey' =>				['type' => XML_STRING | XML_REQUIRED],
 							'port' =>					['type' => XML_STRING | XML_REQUIRED],
-							'filter' =>					['type' => XML_ARRAY | XML_REQUIRED, 'rules' => [
-								'evaltype' =>				['type' => XML_STRING | XML_REQUIRED],
-								'formula' =>				['type' => XML_STRING | XML_REQUIRED],
-								'conditions' =>				['type' => XML_INDEXED_ARRAY | XML_REQUIRED, 'prefix' => 'condition', 'rules' => [
-									'condition' =>				['type' => XML_ARRAY, 'rules' => [
-										'macro' =>					['type' => XML_STRING | XML_REQUIRED],
-										'value' =>					['type' => XML_STRING | XML_REQUIRED],
-										'operator' =>				['type' => XML_STRING | XML_REQUIRED],
-										'formulaid' =>				['type' => XML_STRING | XML_REQUIRED]
-									]]
-								]]
-							]],
+							'filter' =>					['type' => XML_REQUIRED, 'ex_validate' => [$this, 'validateFilter']],
 							'lifetime' =>				['type' => XML_STRING | XML_REQUIRED],
 							'description' =>			['type' => XML_STRING | XML_REQUIRED],
 							'item_prototypes' =>		['type' => XML_INDEXED_ARRAY | XML_REQUIRED, 'prefix' => 'item_prototype', 'rules' => [
@@ -518,12 +478,12 @@ class C30XmlValidator extends CImportValidatorGeneral {
 									'allowed_hosts' =>			['type' => XML_STRING | XML_REQUIRED],
 									'units' =>					['type' => XML_STRING | XML_REQUIRED],
 									'delta' =>					['type' => XML_STRING | XML_REQUIRED],
-									'snmpv3_contextname' =>		['type' => XML_STRING | XML_REQUIRED],
+									'snmpv3_contextname' =>		['type' => XML_STRING],
 									'snmpv3_securityname' =>	['type' => XML_STRING | XML_REQUIRED],
 									'snmpv3_securitylevel' =>	['type' => XML_STRING | XML_REQUIRED],
-									'snmpv3_authprotocol' =>	['type' => XML_STRING | XML_REQUIRED],
+									'snmpv3_authprotocol' =>	['type' => XML_STRING],
 									'snmpv3_authpassphrase' =>	['type' => XML_STRING | XML_REQUIRED],
-									'snmpv3_privprotocol' =>	['type' => XML_STRING | XML_REQUIRED],
+									'snmpv3_privprotocol' =>	['type' => XML_STRING],
 									'snmpv3_privpassphrase' =>	['type' => XML_STRING | XML_REQUIRED],
 									'formula' =>				['type' => XML_STRING | XML_REQUIRED],
 									'delay_flex' =>				['type' => XML_STRING | XML_REQUIRED],
@@ -543,15 +503,10 @@ class C30XmlValidator extends CImportValidatorGeneral {
 											'name' =>					['type' => XML_STRING | XML_REQUIRED]
 										]]
 									]],
-									'application_prototypes' =>		['type' => XML_INDEXED_ARRAY | XML_REQUIRED, 'prefix' => 'application_prototype', 'rules' => [
-										'application_prototype' =>		['type' => XML_ARRAY, 'rules' => [
-											'name' =>						['type' => XML_STRING | XML_REQUIRED]
-										]]
-									]],
 									'valuemap' =>				['type' => XML_ARRAY | XML_REQUIRED, 'rules' => [
 										'name' =>					['type' => XML_STRING]
 									]],
-									'logtimefmt' =>				['type' => XML_STRING | XML_REQUIRED]
+									'logtimefmt' =>				['type' => XML_STRING]
 								]]
 							]],
 							'trigger_prototypes' =>		['type' => XML_INDEXED_ARRAY | XML_REQUIRED, 'prefix' => 'trigger_prototype', 'rules' => [
@@ -562,13 +517,7 @@ class C30XmlValidator extends CImportValidatorGeneral {
 									'status' =>					['type' => XML_STRING | XML_REQUIRED],
 									'priority' =>				['type' => XML_STRING | XML_REQUIRED],
 									'description' =>			['type' => XML_STRING | XML_REQUIRED],
-									'type' =>					['type' => XML_STRING | XML_REQUIRED],
-									'dependencies' =>			['type' => XML_INDEXED_ARRAY, 'prefix' => 'dependency', 'rules' => [
-										'dependency' =>				['type' => XML_ARRAY, 'rules' => [
-											'name' =>					['type' => XML_STRING | XML_REQUIRED],
-											'expression' =>				['type' => XML_STRING | XML_REQUIRED]
-										]]
-									]]
+									'type' =>					['type' => XML_STRING | XML_REQUIRED]
 								]]
 							]],
 							'graph_prototypes' =>		['type' => XML_INDEXED_ARRAY | XML_REQUIRED, 'prefix' => 'graph_prototype', 'rules' => [
@@ -607,7 +556,7 @@ class C30XmlValidator extends CImportValidatorGeneral {
 									]]
 								]]
 							]],
-							'host_prototypes' =>		['type' => XML_INDEXED_ARRAY | XML_REQUIRED, 'prefix' => 'host_prototype', 'rules' => [
+							'host_prototypes' =>		['type' => XML_INDEXED_ARRAY, 'prefix' => 'host_prototype', 'rules' => [
 								'host_prototype' =>			['type' => XML_ARRAY, 'rules' => [
 									'host' =>					['type' => XML_STRING | XML_REQUIRED],
 									'name' =>					['type' => XML_STRING | XML_REQUIRED],
@@ -648,8 +597,6 @@ class C30XmlValidator extends CImportValidatorGeneral {
 								'screen_item' =>			['type' => XML_ARRAY, 'rules' => [
 									// The tag 'resourcetype' should be validated before the 'resource' because it is used in 'ex_required' and 'ex_validate' methods.
 									'resourcetype' =>			['type' => XML_STRING | XML_REQUIRED],
-									// The tag 'style' should be validated before the 'resource' because it is used in 'ex_required' and 'ex_validate' methods.
-									'style' =>					['type' => XML_STRING | XML_REQUIRED],
 									'resource' =>				['type' => XML_REQUIRED, 'preprocessor' => [$this, 'transformZero2Array'], 'ex_validate' => [$this, 'validateScreenItemResource']],
 									'width' =>					['type' => XML_STRING | XML_REQUIRED],
 									'height' =>					['type' => XML_STRING | XML_REQUIRED],
@@ -660,11 +607,12 @@ class C30XmlValidator extends CImportValidatorGeneral {
 									'elements' =>				['type' => XML_STRING | XML_REQUIRED],
 									'valign' =>					['type' => XML_STRING | XML_REQUIRED],
 									'halign' =>					['type' => XML_STRING | XML_REQUIRED],
+									'style' =>					['type' => XML_STRING | XML_REQUIRED],
 									'dynamic' =>				['type' => XML_STRING | XML_REQUIRED],
 									'sort_triggers' =>			['type' => XML_STRING | XML_REQUIRED],
-									'url' =>					['type' => XML_STRING | XML_REQUIRED],
-									'application' =>			['type' => XML_STRING | XML_REQUIRED],
-									'max_columns' =>			['type' => XML_STRING | XML_REQUIRED]
+									'url' =>					['type' => XML_STRING],
+									'application' =>			['type' => XML_STRING],
+									'max_columns' =>			['type' => XML_STRING]
 								]]
 							]]
 						]]
@@ -742,7 +690,7 @@ class C30XmlValidator extends CImportValidatorGeneral {
 					'expandproblem' =>			['type' => XML_STRING | XML_REQUIRED],
 					'markelements' =>			['type' => XML_STRING | XML_REQUIRED],
 					'show_unack' =>				['type' => XML_STRING | XML_REQUIRED],
-					'severity_min' =>			['type' => XML_STRING | XML_REQUIRED],
+					'severity_min' =>			['type' => XML_STRING],
 					'grid_size' =>				['type' => XML_STRING | XML_REQUIRED],
 					'grid_show' =>				['type' => XML_STRING | XML_REQUIRED],
 					'grid_align' =>				['type' => XML_STRING | XML_REQUIRED],
@@ -799,7 +747,7 @@ class C30XmlValidator extends CImportValidatorGeneral {
 							'icon_maintenance' =>		['type' => XML_ARRAY | XML_REQUIRED, 'rules' => [
 								'name' =>					['type' => XML_STRING]
 							]],
-							'application' =>			['type' => XML_STRING | XML_REQUIRED],
+							'application' =>			['type' => XML_STRING],
 							'urls' =>					['type' => XML_INDEXED_ARRAY | XML_REQUIRED, 'prefix' => 'url', 'rules' => [
 								'url' =>					['type' => XML_ARRAY, 'rules' => [
 									'name' =>					['type' => XML_STRING | XML_REQUIRED],
@@ -828,17 +776,6 @@ class C30XmlValidator extends CImportValidatorGeneral {
 						]]
 					]]
 				]]
-			]],
-			'value_maps' =>				['type' => XML_INDEXED_ARRAY, 'prefix' => 'value_map', 'rules' => [
-				'value_map' =>				['type' => XML_ARRAY, 'rules' => [
-					'name' =>					['type' => XML_STRING | XML_REQUIRED],
-					'mappings' =>				['type' => XML_INDEXED_ARRAY | XML_REQUIRED, 'prefix' => 'mapping', 'rules' => [
-						'mapping' =>				['type' => XML_ARRAY, 'rules' => [
-							'value' =>					['type' => XML_STRING | XML_REQUIRED],
-							'newvalue' =>				['type' => XML_STRING | XML_REQUIRED]
-						]]
-					]]
-				]]
 			]]
 		]];
 
@@ -858,6 +795,36 @@ class C30XmlValidator extends CImportValidatorGeneral {
 	public function validateDateTime($data, ?array $parent_data, $path) {
 		if (!preg_match('/^20[0-9]{2}-(0[1-9]|1[0-2])-(0[1-9]|[1-2][0-9]|3[01])T(2[0-3]|[01][0-9]):[0-5][0-9]:[0-5][0-9]Z$/', $data)) {
 			throw new Exception(_s('Invalid tag "%1$s": %2$s.', $path, _s('"%1$s" is expected', _x('YYYY-MM-DDThh:mm:ssZ', 'XML date and time format'))));
+		}
+
+		return $data;
+	}
+
+	/**
+	 * Validate the "discovery_rule/filter" tag.
+	 *
+	 * @param string     $data         Import data.
+	 * @param array|null $parent_data  Data's parent array.
+	 * @param string     $path         XML path (for error reporting).
+	 *
+	 * @return mixed
+	 */
+	public function validateFilter($data, ?array $parent_data, $path) {
+		if (is_array($data)) {
+			$rules = ['type' => XML_ARRAY, 'rules' => [
+				'evaltype' =>	['type' => XML_STRING | XML_REQUIRED],
+				'formula' =>	['type' => XML_STRING | XML_REQUIRED],
+				'conditions' =>	['type' => XML_INDEXED_ARRAY | XML_REQUIRED, 'prefix' => 'condition', 'rules' => [
+					'condition' =>	['type' => XML_ARRAY, 'rules' => [
+						'macro' =>		['type' => XML_STRING | XML_REQUIRED],
+						'value' =>		['type' => XML_STRING | XML_REQUIRED],
+						'operator' =>	['type' => XML_STRING | XML_REQUIRED],
+						'formulaid' =>	['type' => XML_STRING | XML_REQUIRED]
+					]]
+				]]
+			]];
+
+			$data = $this->doValidate($rules, $data, $path);
 		}
 
 		return $data;
@@ -936,7 +903,7 @@ class C30XmlValidator extends CImportValidatorGeneral {
 	 *
 	 * @param string     $data         Import data.
 	 * @param array|null $parent_data  Data's parent array.
-	 * @param string     $path         XML path
+	 * @param string     $path         XML path.
 	 *
 	 * @return mixed
 	 */
@@ -950,12 +917,6 @@ class C30XmlValidator extends CImportValidatorGeneral {
 						'host' =>			['type' => XML_STRING | XML_REQUIRED]
 					]];
 					break;
-
-				case self::SCREEN_RESOURCE_TYPE_CLOCK:
-					if ($parent_data['style'] != TIME_TYPE_HOST) {
-						return $data;
-					}
-					// break; is not missing here
 
 				case self::SCREEN_RESOURCE_TYPE_SIMPLE_GRAPH:
 				case self::SCREEN_RESOURCE_TYPE_LLD_SIMPLE_GRAPH:
