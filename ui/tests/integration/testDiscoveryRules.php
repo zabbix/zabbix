@@ -20,7 +20,7 @@ require_once dirname(__FILE__).'/../include/CIntegrationTest.php';
 /**
  * Test suite for discovery rules
  *
- * @backup hosts
+ * xbackup hosts
  *
  * @onAfter deleteData
  */
@@ -274,7 +274,7 @@ class testDiscoveryRules extends CIntegrationTest {
 
 	private function createDruleSnmpv3Multi($name, $proxyId): string {
 		$drule = [
-			'iprange' => self::SNMPSIM_DRULE_IP_RANGE,
+			'iprange' => '127.0.10.3-255',
 			'name' => $name,
 			'delay' => '1s',
 			'status' => 0, /* enabled */
@@ -418,7 +418,8 @@ class testDiscoveryRules extends CIntegrationTest {
 				'ListenPort' => PHPUNIT_PORT_PREFIX.self::PROXY_PORT_SUFFIX,
 				'ProxyBufferMode' => 'memory',
 				'ProxyMemoryBufferSize' => '128K',
-				'DebugLevel' => 5
+				'DebugLevel' => 5,
+				'LogFileSize' => 0
 			]
 		];
 	}
@@ -633,7 +634,7 @@ class testDiscoveryRules extends CIntegrationTest {
 		if (is_null($proxyId)) {
 			$proxyId = end(self::$proxies);
 		}
-		$druleId = $this->createDruleSnmpv3Multi(self::DRULE_NAME, $proxyId);
+		$druleId = $this->createDruleSnmpv3Multi(self::DRULE_NAME . '3', $proxyId);
 		$this->createActionHostAdd($druleId, self::DISCOVERY_ACTION_NAME);
 
 		$druleWithErrId = $this->createDruleSnmpv2(self::DRULE_NAME_ERR, '127.0.0.1', self::SNMPAGENT_INVALID_OID, $proxyId);
@@ -705,8 +706,8 @@ class testDiscoveryRules extends CIntegrationTest {
 	 */
 	public static function deleteData(): void {
 		self::snmpsimStop();
-		self::deleteAllActions();
-		self::deleteAllDrules();
-		self::deleteProxy();
+		//self::deleteAllActions();
+		//self::deleteAllDrules();
+		//self::deleteProxy();
 	}
 }
