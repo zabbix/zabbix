@@ -1332,9 +1332,9 @@ static void	am_sync_watchdog(zbx_am_t *manager, zbx_am_media_t **medias, int med
 				zbx_audit_prepare(ZBX_AUDIT_ALL_CONTEXT);
 
 				zbx_oauth_get(mediatype->mediatypeid, mediatype->name, mediatype->timeout,
-					mediatype->maxattempts, ZBX_WATCHDOG_EXPIRE_PERIOD, config_source_ip,
-					config_ssl_ca_location, &mediatype->passwd, &mediatype->passwd_expires,
-					&mediatype->error);
+						mediatype->maxattempts, ZBX_WATCHDOG_EXPIRE_PERIOD, config_source_ip,
+						config_ssl_ca_location, &mediatype->passwd, &mediatype->passwd_expires,
+						&mediatype->error);
 
 				zbx_audit_flush(ZBX_AUDIT_ALL_CONTEXT);
 			}
