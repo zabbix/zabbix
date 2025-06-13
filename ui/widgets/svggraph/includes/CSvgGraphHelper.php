@@ -154,6 +154,9 @@ class CSvgGraphHelper {
 				'output' => ['itemid', 'hostid', 'history', 'trends', 'units', 'value_type'],
 				'selectHosts' => ['name'],
 				'webitems' => true,
+				'evaltype' => $data_set['item_tags_evaltype'],
+				'tags' => $data_set['item_tags'] ?: null,
+				'inheritedTags' => true,
 				'filter' => [
 					'value_type' => [ITEM_VALUE_TYPE_UINT64, ITEM_VALUE_TYPE_FLOAT]
 				],
@@ -314,9 +317,6 @@ class CSvgGraphHelper {
 				],
 				'selectHosts' => ['name'],
 				'webitems' => true,
-				'evaltype' => $data_set['item_tags_evaltype'],
-				'tags' => $data_set['item_tags'] ?: null,
-				'inheritedTags' => true,
 				'filter' => [
 					'value_type' => [ITEM_VALUE_TYPE_UINT64, ITEM_VALUE_TYPE_FLOAT]
 				],
