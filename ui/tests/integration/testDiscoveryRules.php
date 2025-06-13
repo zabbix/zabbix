@@ -16,11 +16,11 @@
 require_once dirname(__FILE__).'/../include/CIntegrationTest.php';
 
 
-// * xbackup hosts
 
 /**
  * Test suite for discovery rules
  *
+ * @backup hosts
  *
  * @onAfter deleteData
  */
@@ -34,8 +34,8 @@ class testDiscoveryRules extends CIntegrationTest {
 	const MAX_ATTEMPTS_DISCOVERY = 60;
 
 	/* For tests with real SNMP agent */
-	//const SNMPAGENT_VALID_OID = 'iso.3.6.1.2.1.1.1.0';
-	const SNMPAGENT_VALID_OID = 'iso.3';
+	const SNMPAGENT_VALID_OID = 'iso.3.6.1.2.1.1.1.0';
+	//const SNMPAGENT_VALID_OID = 'iso.3';
 	const SNMPAGENT_INVALID_OID = 'invalid.OID';
 	const SNMPAGENT_EXPECTED_INVALID_OID_ERR_MSG = "'SNMPv2c agent' checks failed: " .
 		'"snmp_parse_oid(): cannot parse OID "' .
@@ -653,8 +653,8 @@ class testDiscoveryRules extends CIntegrationTest {
 	 */
 	public static function deleteData(): void {
 		self::snmpsimStop();
-		//self::deleteAllActions();
-		//self::deleteAllDrules();
-		//self::deleteProxy();
+		self::deleteAllActions();
+		self::deleteAllDrules();
+		self::deleteProxy();
 	}
 }
