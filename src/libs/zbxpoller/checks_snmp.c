@@ -865,12 +865,6 @@ static int	zbx_get_snmp_response_error(const zbx_snmp_sess_t ssp, const zbx_dc_i
 
 		snmp_sess_error(ssp, NULL, &snmp_err, &tmp_err_str);
 
-		if (SNMPERR_AUTHENTICATION_FAILURE == snmp_err)
-		{
-			tmp_err_str = zbx_strdup(tmp_err_str, "Authentication failure (incorrect password, community, "
-					"key or duplicate engineID)");
-		}
-
 		zbx_snprintf(error, max_error_len, "Cannot connect to \"%s:%hu\": %s.",
 				interface->addr, interface->port, tmp_err_str);
 		zbx_free(tmp_err_str);
@@ -2896,6 +2890,17 @@ static int	asynch_response(int operation, struct snmp_session *sp, int reqid, st
 		zabbix_log(LOG_LEVEL_DEBUG, "itemid:" ZBX_FS_UI64 " probe response", snmp_context->item.itemid);
 		ret = SUCCEED;
 		goto out;
+	}
+
+	if (NULL != pdu && SNMP_MSG_REPORT == pdu->command)
+	{
+		int	report_type = snmpv3_get_report_type(pdu);
+
+		if (SNMPERR_UNKNOWN_REPORT != report_type)
+			sp->s_snmp_errno = report_type;
+
+		zabbix_log(LOG_LEVEL_DEBUG, "itemid:" ZBX_FS_UI64 " api_error:%s", snmp_context->item.itemid,
+				snmp_api_errstring(sp->s_snmp_errno));
 	}
 
 	switch (operation)
