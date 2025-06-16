@@ -986,6 +986,17 @@ static void	lld_items_get(const zbx_vector_lld_item_prototype_ptr_t *item_protot
 
 		zbx_vector_lld_override_data_ptr_destroy(&overrides);
 	}
+
+	zbx_db_execute_multiple_query(
+				"delete from item_template_cache"
+					" where", "itemid", &itemids);
+
+	zbx_db_execute_multiple_query(
+			"insert into item_template_cache"
+			" select id.itemid,itc.link_hostid from item_template_cache itc"
+			" join item_discovery id on itc.itemid=id.parent_itemid"
+			" where", "id.itemid", &itemids);
+
 out:
 	zbx_free(sql);
 	zbx_vector_uint64_destroy(&parent_itemids);
@@ -3617,12 +3628,6 @@ static int	lld_items_save(zbx_uint64_t hostid, const zbx_vector_lld_item_prototy
 
 		zbx_db_insert_execute(&db_insert_irtdata);
 		zbx_db_insert_clean(&db_insert_irtdata);
-
-		zbx_db_execute_multiple_query(
-				"insert into item_template_cache"
-					" select id.itemid,itc.link_hostid from item_template_cache itc"
-					" join item_discovery id on itc.itemid=id.parent_itemid"
-					" where", "id.itemid", &new_itemids);
 
 		zbx_vector_lld_item_full_ptr_sort(items, lld_item_full_compare_func);
 	}
