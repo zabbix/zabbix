@@ -410,9 +410,10 @@ static void	zbx_am_update_webhook(zbx_am_t *manager, zbx_am_mediatype_t *mediaty
  *                                                                            *
  * Purpose: updates media type object, creating one if necessary              *
  *                                                                            *
- * Parameters: manager          - [IN]                                        *
- *             ...              - [IN] media type properties                  *
- *             config_source_ip - [IN]                                        *
+ * Parameters: manager                - [IN]                                  *
+ *             ...                    - [IN] media type properties            *
+ *             config_source_ip       - [IN]                                  *
+ *             config_ssl_ca_location - [IN]                                  *
  *                                                                            *
  ******************************************************************************/
 static void	am_update_mediatype(zbx_am_t *manager, zbx_uint64_t mediatypeid, unsigned char type, const char *name,
@@ -1284,9 +1285,11 @@ static void	am_external_alert_send_response(const zbx_ipc_service_t *alerter_ser
  *                                                                            *
  * Purpose: synchronizes watchdog alert recipients                            *
  *                                                                            *
- * Parameters: manager    - [IN]                                              *
- *             medias     - [IN] new watchdog media list                      *
- *             medias_num - [IN] number of watchdog medias                    *
+ * Parameters: manager                - [IN]                                  *
+ *             medias                 - [IN] new watchdog media list          *
+ *             medias_num             - [IN] number of watchdog medias        *
+ *             config_source_ip       - [IN]                                  *
+ *             config_ssl_ca_location - [IN]                                  *
  *                                                                            *
  ******************************************************************************/
 static void	am_sync_watchdog(zbx_am_t *manager, zbx_am_media_t **medias, int medias_num,
