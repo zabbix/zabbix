@@ -530,7 +530,7 @@ static int	comms_check_redirect(const char *data, zbx_vector_addr_ptr_t *addrs)
  * Parameters: sock  - [IN] socket descriptor                                 *
  *             data  - [IN] data to send                                      *
  *             addr  - [IN] address information for logging                   *
- *             out   - [OUT] buffer for response                              *
+ *             out   - [IN] wait for response if not NULL                     *
  *             error - [OUT] error message in case of failure                 *
  *                                                                            *
  * Return value: SUCCEED - data successfully exchanged                        *
@@ -643,18 +643,12 @@ int	zbx_comms_exchange_with_redirect(const char *source_ip, zbx_vector_addr_ptr_
 				retries++;
 			}
 
-			if (NULL != out)
-				*out = zbx_socket_detach_buffer(&sock);
-
 			if (ZBX_REDIRECT_RESET == conn_ret)
 			{
 				zabbix_log(LOG_LEVEL_DEBUG, "%s() redirect response found, retrying to: [%s]:%hu",
 						__func__, addrs->values[0]->ip, addrs->values[0]->port);
 
 				zbx_tcp_close(&sock);
-
-				if (NULL != out)
-					zbx_free(*out);
 
 				conn_ret = zbx_connect_to_server(&sock, source_ip, addrs, timeout, connect_timeout,
 						retry_interval, loglevel, config_tls);
@@ -666,9 +660,6 @@ int	zbx_comms_exchange_with_redirect(const char *source_ip, zbx_vector_addr_ptr_
 				zbx_vector_addr_ptr_t	addrs_tmp;
 
 				zbx_tcp_close(&sock);
-
-				if (NULL != out)
-					zbx_free(*out);
 
 				zabbix_log(LOG_LEVEL_DEBUG, "%s() redirect connection without failover to: [%s]:%hu",
 						__func__, addrs->values[0]->ip, addrs->values[0]->port);
@@ -698,6 +689,8 @@ int	zbx_comms_exchange_with_redirect(const char *source_ip, zbx_vector_addr_ptr_
 
 	if (SUCCEED != ret)
 		zbx_addrs_failover(addrs);
+	else if (NULL != out)
+		*out = zbx_socket_detach_buffer(&sock);
 
 	zbx_tcp_close(&sock);
 out:
