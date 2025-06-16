@@ -3228,24 +3228,22 @@ static int	snmp_task_process(short event, void *data, int *fd, zbx_vector_addres
 		}
 		else
 		{
-			err_detail = "cannot retrieve OID";
-			snmp_context->item.ret = TIMEOUT_ERROR;
+			if (ZBX_IF_SNMP_VERSION_3 == snmp_context->snmp_version && 0 == snmp_context->probe)
+			{
+				err_detail = "Probe successful, cannot retrieve OID";
+				snmp_context->item.ret = CONFIG_ERROR;
+			}
+			else
+			{
+				err_detail = "cannot retrieve OID";
+				snmp_context->item.ret = TIMEOUT_ERROR;
+			}
 		}
 
-		if (ZBX_IF_SNMP_VERSION_3 == snmp_context->snmp_version && 0 == snmp_context->probe)
-		{
-			SET_MSG_RESULT(&snmp_context->item.result, zbx_dsprintf(NULL,
-					"Probe successful, %s: '%s' from [[%s]:%hu]:"
-					" timed out", err_detail, buffer, snmp_context->item.interface.addr,
-					snmp_context->item.interface.port));
-		}
-		else
-		{
-			SET_MSG_RESULT(&snmp_context->item.result, zbx_dsprintf(NULL,
-					"%s: '%s' from [[%s]:%hu]:"
-					" timed out", err_detail, buffer, snmp_context->item.interface.addr,
-					snmp_context->item.interface.port));
-		}
+		SET_MSG_RESULT(&snmp_context->item.result, zbx_dsprintf(NULL,
+				"%s: '%s' from [[%s]:%hu]:"
+				" timed out", err_detail, buffer, snmp_context->item.interface.addr,
+				snmp_context->item.interface.port));
 
 		goto stop;
 	}

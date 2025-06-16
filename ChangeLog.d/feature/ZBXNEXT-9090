@@ -1,0 +1,1 @@
+.......PS. [ZBXNEXT-9090] improved SNMP agent walk[] and get[] not to be stuck in unsupported state if credentials are changed on interface (vso)
