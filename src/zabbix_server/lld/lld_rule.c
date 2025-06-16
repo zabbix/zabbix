@@ -2823,16 +2823,34 @@ static int	lld_row_index_compare(const void *v1, const void *v2)
 
 typedef struct
 {
-	zbx_uint64_t	itemid;
-	zbx_hashset_t	rule_index;
+	zbx_uint64_t			itemid;
+	zbx_hashset_t			rule_index;
+	zbx_vector_lld_row_ptr_t	lld_rows;
+	const zbx_lld_item_prototype_t	*prototype;
 }
 zbx_lld_prototype_rules_t;
 
-static void	lld_prototype_items_clear(void *v)
+ZBX_PTR_VECTOR_DECL(lld_prototype_rules_ptr, zbx_lld_prototype_rules_t *)
+ZBX_PTR_VECTOR_IMPL(lld_prototype_rules_ptr, zbx_lld_prototype_rules_t *)
+
+static int	lld_prototype_rules_compare(const void *v1, const void *v2)
+{
+	const zbx_lld_prototype_rules_t        *pi1 = *(const zbx_lld_prototype_rules_t * const *)v1;
+	const zbx_lld_prototype_rules_t        *pi2 = *(const zbx_lld_prototype_rules_t * const *)v2;
+
+	ZBX_RETURN_IF_NOT_EQUAL(pi1->itemid, pi2->itemid);
+
+	return 0;
+}
+
+static void	lld_prototype_rules_clear(void *v)
 {
 	zbx_lld_prototype_rules_t	*pi = (zbx_lld_prototype_rules_t *)v;
 
 	zbx_hashset_destroy(&pi->rule_index);
+
+	zbx_vector_lld_row_ptr_clear_ext(&pi->lld_rows, lld_row_free);
+	zbx_vector_lld_row_ptr_destroy(&pi->lld_rows);
 }
 
 /* lld rule index by lld rows for macro export */
@@ -2955,33 +2973,18 @@ int	lld_rule_discover_prototypes(zbx_uint64_t hostid, const zbx_vector_lld_row_p
 		const zbx_vector_lld_item_prototype_ptr_t *item_prototypes, zbx_vector_lld_item_full_ptr_t *items,
 		char **error, int lastcheck, zbx_hashset_t *items_index)
 {
-	int				ret = SUCCEED;
-	zbx_hashset_t			prototype_rules;
-	zbx_hashset_iter_t		iter;
-	zbx_vector_lld_row_ptr_t	lld_rows_copy;
+	int					ret = SUCCEED;
+	zbx_hashset_t				prototype_rules;
+	zbx_hashset_iter_t			iter;
+	zbx_vector_lld_prototype_rules_ptr_t	prototype_rules_sorted;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
+	zbx_vector_lld_prototype_rules_ptr_create(&prototype_rules_sorted);
+
 	zbx_hashset_create_ext(&prototype_rules, (size_t)item_prototypes->values_num, ZBX_DEFAULT_UINT64_HASH_FUNC,
-			ZBX_DEFAULT_UINT64_COMPARE_FUNC, lld_prototype_items_clear,
+			ZBX_DEFAULT_UINT64_COMPARE_FUNC, lld_prototype_rules_clear,
 			ZBX_DEFAULT_MEM_MALLOC_FUNC, ZBX_DEFAULT_MEM_REALLOC_FUNC, ZBX_DEFAULT_MEM_FREE_FUNC);
-
-	/* create copy of lld_rows to leave original item_links untouched */
-
-	zbx_vector_lld_row_ptr_create(&lld_rows_copy);
-	zbx_vector_lld_row_ptr_reserve(&lld_rows_copy, (size_t)lld_rows->values_num);
-
-	for (int i = 0; i < lld_rows->values_num; i++)
-	{
-		zbx_lld_row_t		*copy;
-		const zbx_lld_row_t	*lld_row = lld_rows->values[i];
-
-		copy = (zbx_lld_row_t *)zbx_malloc(NULL, sizeof(zbx_lld_row_t));
-		copy->data = lld_row->data;
-		zbx_vector_lld_item_link_ptr_create(&copy->item_links);
-		zbx_vector_lld_override_ptr_create(&copy->overrides);
-		zbx_vector_lld_row_ptr_append(&lld_rows_copy, copy);
-	}
 
 	lld_rule_export_lld_macros(items);
 	lld_rule_process_nested_rules(hostid, items);
@@ -3009,45 +3012,50 @@ int	lld_rule_discover_prototypes(zbx_uint64_t hostid, const zbx_vector_lld_row_p
 					sizeof(prules_local));
 			zbx_hashset_create(&prules->rule_index, (size_t )lld_rows->values_num, lld_row_index_hash,
 					lld_row_index_compare);
+
+			prules->prototype = item_index->item->prototype;
+			zbx_vector_lld_row_ptr_create(&prules->lld_rows);
+			zbx_vector_lld_row_ptr_reserve(&prules->lld_rows, (size_t)lld_rows->values_num);
+
+			zbx_vector_lld_prototype_rules_ptr_append(&prototype_rules_sorted, prules);
 		}
 
 		row_ruleid_local.ruleid = item_index->item->itemid;
 		row_ruleid_local.data = item_index->lld_row->data;
+
+		zbx_lld_row_t		*copy;
+
+		copy = (zbx_lld_row_t *)zbx_malloc(NULL, sizeof(zbx_lld_row_t));
+		copy->data = item_index->lld_row->data;
+		zbx_vector_lld_item_link_ptr_create(&copy->item_links);
+		zbx_vector_lld_override_ptr_create(&copy->overrides);
+		zbx_vector_lld_row_ptr_append(&prules->lld_rows, copy);
 
 		zbx_hashset_insert(&prules->rule_index, &row_ruleid_local, sizeof(row_ruleid_local));
 	}
 
 	/* discovery corresponding LLD rule prototypes */
 
-	zbx_lld_lifetime_t	lifetime = {ZBX_LLD_LIFETIME_TYPE_IMMEDIATELY, 0},
-				enabled_lifetime = {ZBX_LLD_LIFETIME_TYPE_NEVER, 0};
+	zbx_lld_lifetime_t		lifetime = {ZBX_LLD_LIFETIME_TYPE_IMMEDIATELY, 0},
+					enabled_lifetime = {ZBX_LLD_LIFETIME_TYPE_NEVER, 0};
 
-	for (int i = 0; i < item_prototypes->values_num; i++)
+	zbx_vector_lld_prototype_rules_ptr_sort(&prototype_rules_sorted, lld_prototype_rules_compare);
+	for (int i = 0; i < prototype_rules_sorted.values_num; i++)
 	{
-		zbx_lld_prototype_rules_t	prules_local, *prules;
-		zbx_hashset_t			*proto_rule_index;
-		zbx_lld_item_prototype_t	*item_prototype = item_prototypes->values[i];
+		zbx_lld_prototype_rules_t	*prules = prototype_rules_sorted.values[i];
+		const zbx_lld_item_prototype_t	*item_prototype = prules->prototype;
 
-		if (0 == (item_prototype->item_flags & ZBX_FLAG_DISCOVERY_RULE))
-			continue;
-
-		prules_local.itemid = item_prototype->itemid;
-		if (NULL != (prules = (zbx_lld_prototype_rules_t *)zbx_hashset_search(&prototype_rules, &prules_local)))
-			proto_rule_index = &prules->rule_index;
-		else
-			proto_rule_index = NULL;
-
-		if (FAIL == lld_update_items(hostid, item_prototype->itemid,  &lld_rows_copy, error, &lifetime,
-				&enabled_lifetime, lastcheck, ZBX_FLAG_DISCOVERY_PROTOTYPE, proto_rule_index))
+		if (FAIL == lld_update_items(hostid, item_prototype->itemid,  &prules->lld_rows, error, &lifetime,
+				&enabled_lifetime, lastcheck, ZBX_FLAG_DISCOVERY_PROTOTYPE, &prules->rule_index))
 		{
 			zabbix_log(LOG_LEVEL_DEBUG, "cannot update/add items because parent host was removed while"
 					" processing lld rule");
 			goto out;
 		}
 
-		lld_item_links_sort(&lld_rows_copy);
+		lld_item_links_sort(&prules->lld_rows);
 
-		if (SUCCEED != lld_update_triggers(hostid, item_prototype->itemid, &lld_rows_copy, error, &lifetime,
+		if (SUCCEED != lld_update_triggers(hostid, item_prototype->itemid, &prules->lld_rows, error, &lifetime,
 				&enabled_lifetime, lastcheck, ZBX_FLAG_DISCOVERY_PROTOTYPE))
 		{
 			zabbix_log(LOG_LEVEL_DEBUG, "cannot update/add triggers because parent host was removed while"
@@ -3055,7 +3063,7 @@ int	lld_rule_discover_prototypes(zbx_uint64_t hostid, const zbx_vector_lld_row_p
 			goto out;
 		}
 
-		if (SUCCEED != lld_update_graphs(hostid, item_prototype->itemid, &lld_rows_copy, error, &lifetime,
+		if (SUCCEED != lld_update_graphs(hostid, item_prototype->itemid, &prules->lld_rows, error, &lifetime,
 				lastcheck, ZBX_FLAG_DISCOVERY_PROTOTYPE))
 		{
 			zabbix_log(LOG_LEVEL_DEBUG, "cannot update/add graphs because parent host was removed while"
@@ -3063,16 +3071,14 @@ int	lld_rule_discover_prototypes(zbx_uint64_t hostid, const zbx_vector_lld_row_p
 			goto out;
 		}
 
-		lld_update_hosts(item_prototype->itemid, &lld_rows_copy, error, &lifetime, &enabled_lifetime,
-				lastcheck, ZBX_FLAG_DISCOVERY_PROTOTYPE, proto_rule_index);
+		lld_update_hosts(item_prototype->itemid, &prules->lld_rows, error, &lifetime, &enabled_lifetime,
+				lastcheck, ZBX_FLAG_DISCOVERY_PROTOTYPE, &prules->rule_index);
 	}
 
 	ret = SUCCEED;
 out:
-	zbx_vector_lld_row_ptr_clear_ext(&lld_rows_copy, lld_row_free);
-	zbx_vector_lld_row_ptr_destroy(&lld_rows_copy);
-
 	zbx_hashset_destroy(&prototype_rules);
+	zbx_vector_lld_prototype_rules_ptr_destroy(&prototype_rules_sorted);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 

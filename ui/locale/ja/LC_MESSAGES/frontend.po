@@ -4,7 +4,7 @@ msgstr ""
 "Project-Id-Version: Zabbix 6.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2023-10-19 13:48+0300\n"
-"PO-Revision-Date: 2025-06-05 05:50+0000\n"
+"PO-Revision-Date: 2025-06-10 05:46+0000\n"
 "Last-Translator: Akira <g42getd@gmail.com>\n"
 "Language-Team: Zabbix\n"
 "Language: ja\n"
@@ -372,7 +372,7 @@ msgstr "12時間表示"
 
 #: app/views/host.wizard.edit.php:867
 msgid "2. Configure your Java application to support remote JMX monitoring. For example:"
-msgstr "2. リモートJMX監視をサポートするようにJavaアプリケーションを設定します。例："
+msgstr "2. リモートJMX監視をサポートするようにJavaアプリケーションを設定します。例:"
 
 #: tests/selenium/modules/clock32/includes/WidgetForm.php:115
 #: widgets/clock/includes/WidgetForm.php:115
@@ -2614,17 +2614,17 @@ msgstr "POSTデータを変換できません:"
 #: include/classes/helpers/CItemGeneralHelper.php:1016
 #, c-format
 msgid "Cannot copy LLD rule prototype with key \"%1$s\" without its master item prototype with key \"%2$s\"."
-msgstr ""
+msgstr "キー\"%2$s\"のマスターアイテムプロトタイプなしでキー\"%1$s\"のLLDルールのプロトタイプをコピーできません。"
 
 #: include/classes/helpers/CItemGeneralHelper.php:1004
 #, c-format
 msgid "Cannot copy LLD rule prototype with key \"%1$s\" without its master item with key \"%2$s\"."
-msgstr ""
+msgstr "キー\"%2$s\"のマスターアイテムなしでキー\"%1$s\"のLLDルールのプロトタイプをコピーできません。"
 
 #: include/classes/helpers/CItemGeneralHelper.php:1003
 #, c-format
 msgid "Cannot copy LLD rule with key \"%1$s\" without its master item with key \"%2$s\"."
-msgstr ""
+msgstr "キー\"%2$s\"のマスターアイテムなしでキー\"%1$s\"のLLDルールをコピーできません。"
 
 #: app/controllers/CControllerCopyCreate.php:183
 msgid "Cannot copy graph"
@@ -3272,7 +3272,7 @@ msgstr "マクロを展開できません。"
 #: include/classes/import/CConfigurationImport.php:1159
 #, c-format
 msgid "Cannot find \"parent_discovery_rule\" with key \"%1$s\" used for LLD rule prototype with key \"%2$s\" on \"%3$s\"."
-msgstr ""
+msgstr "\"%3$s\"のキー\"%2$s\"を持つLLDルールプロトタイプに使用されるキー\"%1$s\"を持つ\"parent_discovery_rule\"が見つかりません。"
 
 #: include/classes/import/importers/CTemplateDashboardImporter.php:217
 #, c-format
@@ -3317,7 +3317,7 @@ msgstr "\"%4$s\"上のディスカバリルール\"%3$s\"のホストのプロ�
 #: include/classes/import/CConfigurationImport.php:1326
 #, c-format
 msgid "Cannot find host group \"%1$s\" for host prototype \"%2$s\" of discovery rule prototype \"%3$s\" on \"%4$s\"."
-msgstr ""
+msgstr "\"%4$s\"上のディスカバリルールプロトタイプ\"%3$s\"のホストプロトタイプ\"%2$s\"のためのホストグループ\"%1$s\"が見つかりません。"
 
 #: include/classes/api/services/CDiscoveryRule.php:3350
 #, c-format
@@ -3362,7 +3362,7 @@ msgstr "\"%4$s\"上のディスカバリルール\"%3$s\"のアイテムプロ�
 #: include/classes/import/CConfigurationImport.php:1220
 #, c-format
 msgid "Cannot find interface \"%1$s\" used for item prototype \"%2$s\" of discovery rule prototype \"%3$s\" on \"%4$s\"."
-msgstr ""
+msgstr "\"%4$s\"上のディスカバリルールプロトタイプ\"%3$s\"のアイテムプロトタイプ\"%2$s\"で使用されているインターフェース\"%1$s\"が見つかりません。"
 
 #: include/classes/import/CConfigurationImport.php:1852
 #, c-format
@@ -3377,7 +3377,7 @@ msgstr "\"%5$s\"上のディスカバリルール\"%4$s\"のグラフのプロ�
 #: include/classes/import/CConfigurationImport.php:1515
 #, c-format
 msgid "Cannot find item \"%1$s\" on \"%2$s\" used as the Y axis MAX value for graph prototype \"%3$s\" of discovery rule prototype \"%4$s\" on \"%5$s\"."
-msgstr ""
+msgstr "\"%5$s\"上のディスカバリルールプロトタイプ\"%4$s\"のグラフのプロトタイプ\"%3$s\"でY軸の最大値として利用されている\"%2$s\"上のアイテム\"%1$s\"が見つかりません。"
 
 #: include/classes/import/CConfigurationImport.php:1834
 #, c-format
@@ -3392,12 +3392,12 @@ msgstr "\"%5$s\"上のディスカバリルール\"%4$s\"のグラフのプロ�
 #: include/classes/import/CConfigurationImport.php:1490
 #, c-format
 msgid "Cannot find item \"%1$s\" on \"%2$s\" used as the Y axis MIN value for graph prototype \"%3$s\" of discovery rule prototype \"%4$s\" on \"%5$s\"."
-msgstr ""
+msgstr "\"%5$s\"上のディスカバリルールプロトタイプ\"%4$s\"のグラフのプロトタイプ\"%3$s\"でY軸の最小値として利用されている\"%2$s\"上のアイテム\"%1$s\"が見つかりません。"
 
 #: include/classes/import/importers/CMapImporter.php:244
 #, c-format
 msgid "Cannot find item \"%1$s\" on \"%2$s\" used in a link of map \"%3$s\"."
-msgstr "マップ \"%3$s\" のリンクで使用されている \"%2$s\" のアイテム \"%1$s\" が見つかりません。"
+msgstr "マップ\"%3$s\"のリンクで使用されている\"%2$s\"のアイテム\"%1$s\"が見つかりません。"
 
 #: include/classes/import/CConfigurationImport.php:1872
 #, c-format
@@ -3412,7 +3412,7 @@ msgstr "\"%5$s\"上のディスカバリルール\"%4$s\"のグラフのプロ�
 #: include/classes/import/CConfigurationImport.php:1540
 #, c-format
 msgid "Cannot find item \"%1$s\" on \"%2$s\" used in graph prototype \"%3$s\" of discovery rule prototype \"%4$s\" on \"%5$s\"."
-msgstr ""
+msgstr "\"%5$s\"上のディスカバリルールプロトタイプ\"%4$s\"のグラフのプロトタイプ\"%3$s\"で使用されている\"%2$s\"上のアイテム\"%1$s\"が見つかりません。"
 
 #: include/classes/import/importers/CTemplateDashboardImporter.php:166
 #, c-format
@@ -3447,7 +3447,7 @@ msgstr "\"%4$s\"上のディスカバリルール\"%3$s\"のホストのプロ�
 #: include/classes/import/CConfigurationImport.php:1353
 #, c-format
 msgid "Cannot find template \"%1$s\" for host prototype \"%2$s\" of discovery rule prototype \"%3$s\" on \"%4$s\"."
-msgstr ""
+msgstr "\"%4$s\"上のディスカバリルールプロトタイプ\"%3$s\"のホストのプロトタイプ\"%2$s\"のためのテンプレート\"%1$s\"が見つかりません。"
 
 #: include/classes/import/CConfigurationImport.php:1182
 #, c-format
@@ -3482,7 +3482,7 @@ msgstr "\"%4$s\"上のディスカバリルール\"%3$s\"のアイテムのプ�
 #: include/classes/import/CConfigurationImport.php:1243
 #, c-format
 msgid "Cannot find value map \"%1$s\" used for item prototype \"%2$s\" of discovery rule prototype \"%3$s\" on \"%4$s\"."
-msgstr ""
+msgstr "\"%4$s\"上のディスカバリルールプロトタイプ\"%3$s\"のアイテムのプロトタイプ\"%2$s\"で使用されている値のマッピング\"%1$s\"がみつかりません。"
 
 #: app/views/oauth.edit.php:230
 msgid "Cannot get authorization code."
@@ -3522,72 +3522,72 @@ msgstr "キーはテンプレート\"%4$s\"上でユニークでなければな�
 #: include/classes/api/services/CItemGeneral.php:1000
 #, c-format
 msgid "Cannot inherit LLD rule prototype with key \"%1$s\" of template \"%2$s\" and LLD rule \"%3$s\" to host \"%4$s\", because an LLD rule prototype with the same key already belongs to LLD rule \"%5$s\"."
-msgstr ""
+msgstr "同じキーのLLDルールプロトタイプがLLDルール\"%5$s\"にすでに属しているため、テンプレート\"%2$s\"のキー\"%1$s\"とLLDルール\"%3$s\"のLLDルールプロトタイプをホスト\"%4$s\"に継承できません。"
 
 #: include/classes/api/services/CItemGeneral.php:1001
 #, c-format
 msgid "Cannot inherit LLD rule prototype with key \"%1$s\" of template \"%2$s\" and LLD rule \"%3$s\" to template \"%4$s\", because an LLD rule prototype with the same key already belongs to LLD rule \"%5$s\"."
-msgstr ""
+msgstr "同じキーのLLDルールプロトタイプがLLDルール\"%5$s\"にすでに属しているため、テンプレート\"%2$s\"のキー\"%1$s\"とLLDルール\"%3$s\"のLLDルールプロトタイプをテンプレート\"%4$s\"に継承できません。"
 
 #: include/classes/api/services/CItemGeneral.php:926
 #, c-format
 msgid "Cannot inherit LLD rule prototype with key \"%1$s\" of template \"%2$s\" to host \"%3$s\", because a discovered LLD rule prototype with the same key already exists."
-msgstr ""
+msgstr "同じキーの検出されたLLDルールプロトタイプがすでに存在するので、テンプレート\"%2$s\"のキー\"%1$s\"のLLDルールプロトタイプをホスト\"%3$s\"に継承できません。"
 
 #: include/classes/api/services/CItemGeneral.php:1358
 #, c-format
 msgid "Cannot inherit LLD rule prototype with key \"%1$s\" of template \"%2$s\" to host \"%3$s\", because a host interface of type \"%4$s\" is required."
-msgstr ""
+msgstr "タイプが\"%4$s\"のホストインターフェースが必要なため、テンプレート\"%2$s\"のキー\"%1$s\"のLLDルールプロトタイプをホスト\"%3$s\"に継承できません。"
 
 #: include/classes/api/services/CItemGeneral.php:969
 #, c-format
 msgid "Cannot inherit LLD rule prototype with key \"%1$s\" of template \"%2$s\" to host \"%3$s\", because an LLD rule prototype with the same key is already inherited from template \"%4$s\"."
-msgstr ""
+msgstr "同じキーのLLDルールプロトタイプをテンプレート\"%4$s\"からすでに継承しているので、テンプレート\"%2$s\"のキー\"%1$s\"のLLDルールプロトタイプをホスト\"%3$s\"に継承できません。"
 
 #: include/classes/api/services/CItemGeneral.php:921
 #, c-format
 msgid "Cannot inherit LLD rule prototype with key \"%1$s\" of template \"%2$s\" to host \"%3$s\", because an LLD rule with the same key already exists."
-msgstr ""
+msgstr "同じキーを持つLLDルールがすでに存在するため、テンプレート\"%2$s\"のキー\"%1$s\"のLLDルールプロトタイプをホスト\"%3$s\"に継承できません。"
 
 #: include/classes/api/services/CItemGeneral.php:914
 #, c-format
 msgid "Cannot inherit LLD rule prototype with key \"%1$s\" of template \"%2$s\" to host \"%3$s\", because an item prototype with the same key already exists."
-msgstr ""
+msgstr "同じアイテムキーのアイテムのプロトタイプがすでにあるので、テンプレート\"%2$s\"のキー\"%1$s\"のLLDルールプロトタイプをホスト\"%3$s\"に継承できません。"
 
 #: include/classes/api/services/CItemGeneral.php:907
 #, c-format
 msgid "Cannot inherit LLD rule prototype with key \"%1$s\" of template \"%2$s\" to host \"%3$s\", because an item with the same key already exists."
-msgstr ""
+msgstr "同じアイテムキーのアイテムがすでにあるので、テンプレート\"%2$s\"のキー\"%1$s\"のLLDルールプロトタイプをホスト\"%3$s\"に継承できません。"
 
 #: include/classes/api/services/CItemGeneral.php:970
 #, c-format
 msgid "Cannot inherit LLD rule prototype with key \"%1$s\" of template \"%2$s\" to template \"%3$s\", because an LLD rule prototype with the same key is already inherited from template \"%4$s\"."
-msgstr ""
+msgstr "同じキーのLLDルールプロトタイプをテンプレート\"%4$s\"からすでに継承しているので、テンプレート\"%2$s\"のキー\"%1$s\"のLLDルールプロトタイプをテンプレート\"%3$s\"に継承できません。"
 
 #: include/classes/api/services/CItemGeneral.php:922
 #, c-format
 msgid "Cannot inherit LLD rule prototype with key \"%1$s\" of template \"%2$s\" to template \"%3$s\", because an LLD rule with the same key already exists."
-msgstr ""
+msgstr "同じキーのLLDルールがすでに存在するので、テンプレート\"%2$s\"のキー\"%1$s\"のLLDルールプロトタイプをテンプレート\"%3$s\"に継承できません。"
 
 #: include/classes/api/services/CItemGeneral.php:915
 #, c-format
 msgid "Cannot inherit LLD rule prototype with key \"%1$s\" of template \"%2$s\" to template \"%3$s\", because an item prototype with the same key already exists."
-msgstr ""
+msgstr "同じキーのアイテムプロトタイプがすでに存在するので、テンプレート\"%2$s\"のキー\"%1$s\"のLLDルールプロトタイプをテンプレート\"%3$s\"に継承できません。"
 
 #: include/classes/api/services/CItemGeneral.php:908
 #, c-format
 msgid "Cannot inherit LLD rule prototype with key \"%1$s\" of template \"%2$s\" to template \"%3$s\", because an item with the same key already exists."
-msgstr ""
+msgstr "同じキーのアイテムがすでに存在するので、テンプレート\"%2$s\"のキー\"%1$s\"のLLDルールプロトタイプをテンプレート\"%3$s\"に継承できません。"
 
 #: include/classes/api/services/CItemGeneral.php:717
 #, c-format
 msgid "Cannot inherit LLD rule prototypes with key \"%1$s\" of both \"%2$s\" and \"%3$s\" templates, because the key must be unique on host \"%4$s\"."
-msgstr ""
+msgstr "キーはホスト\"%4$s\"上でユニークでなければならないので、\"%2$s\"と\"%3$s\"の両方のテンプレートのキー\"%1$s\"のLLDルールプロトタイプを継承できません。"
 
 #: include/classes/api/services/CItemGeneral.php:718
 #, c-format
 msgid "Cannot inherit LLD rule prototypes with key \"%1$s\" of both \"%2$s\" and \"%3$s\" templates, because the key must be unique on template \"%4$s\"."
-msgstr ""
+msgstr "キーはテンプレート\"%4$s\"上でユニークでなければならないので、\"%2$s\"と\"%3$s\"の両方のテンプレートのキー\"%1$s\"のLLDルールプロトタイプを継承できません。"
 
 #: include/classes/api/services/CItemGeneral.php:819
 #, c-format
@@ -3602,7 +3602,7 @@ msgstr "タイプが\"%4$s\"のホストインターフェースが必要なた�
 #: include/classes/api/services/CItemGeneral.php:897
 #, c-format
 msgid "Cannot inherit LLD rule with key \"%1$s\" of template \"%2$s\" to host \"%3$s\", because an LLD rule prototype with the same key already exists."
-msgstr ""
+msgstr "同じキーのLLDルールのプロトタイプがすでに存在するので、テンプレート\"%2$s\"のキー\"%1$s\"のLLDルールをホスト\"%3$s\"に継承できません。"
 
 #: include/classes/api/services/CItemGeneral.php:874
 #, c-format
@@ -3627,7 +3627,7 @@ msgstr "同じキーの検出されたアイテムがすでに存在するので
 #: include/classes/api/services/CItemGeneral.php:898
 #, c-format
 msgid "Cannot inherit LLD rule with key \"%1$s\" of template \"%2$s\" to template \"%3$s\", because an LLD rule prototype with the same key already exists."
-msgstr ""
+msgstr "同じキーのLLDルールプロトタイプがすでに存在するので、テンプレート\"%2$s\"のキー\"%1$s\"のLLDルールをテンプレート\"%3$s\"に継承できません。"
 
 #: include/classes/api/services/CItemGeneral.php:875
 #, c-format
@@ -3667,7 +3667,7 @@ msgstr "同じキーのアイテムプロトタイプがLLDルール\"%5$s\"に�
 #: include/classes/api/services/CItemGeneral.php:856
 #, c-format
 msgid "Cannot inherit item prototype with key \"%1$s\" of template \"%2$s\" to host \"%3$s\", because a discovered item prototype with the same key already exists."
-msgstr ""
+msgstr "同じキーの検出されたアイテムプロトタイプがすでに存在するので、テンプレート\"%2$s\"のキー\"%1$s\"のアイテムプロトタイプをホスト\"%3$s\"に継承できません。"
 
 #: include/classes/api/services/CItemGeneral.php:841
 #, c-format
@@ -3682,7 +3682,7 @@ msgstr "タイプ\"%4$s\"のホストインターフェースが必要なため�
 #: include/classes/api/services/CItemGeneral.php:869
 #, c-format
 msgid "Cannot inherit item prototype with key \"%1$s\" of template \"%2$s\" to host \"%3$s\", because an LLD rule prototype with the same key already exists."
-msgstr ""
+msgstr "同じキーのLLDルールプロトタイプがすでに存在するので、テンプレート\"%2$s\"のキー\"%1$s\"のアイテムプロトタイプをホスト\"%3$s\"に継承できません。"
 
 #: include/classes/api/services/CItemGeneral.php:835
 #, c-format
@@ -3707,7 +3707,7 @@ msgstr "同じキーの検出されたアイテムがすでに存在するので
 #: include/classes/api/services/CItemGeneral.php:870
 #, c-format
 msgid "Cannot inherit item prototype with key \"%1$s\" of template \"%2$s\" to template \"%3$s\", because an LLD rule prototype with the same key already exists."
-msgstr ""
+msgstr "同じキーのLLDルールプロトタイプがすでに存在するので、テンプレート\"%2$s\"のキー\"%1$s\"のアイテムプロトタイプをテンプレート\"%3$s\"に継承できません。"
 
 #: include/classes/api/services/CItemGeneral.php:836
 #, c-format
@@ -3747,7 +3747,7 @@ msgstr "同じインベントリフィールド\"%6$s\"に入力されるため�
 #: include/classes/api/services/CItemGeneral.php:891
 #, c-format
 msgid "Cannot inherit item with key \"%1$s\" of template \"%2$s\" to host \"%3$s\", because a discovered LLD rule with the same key already exists."
-msgstr ""
+msgstr "同じキーの検出されたLLDルールがすでに存在するので、テンプレート\"%2$s\"のキー\"%1$s\"のアイテムをホスト\"%3$s\"に継承できません。"
 
 #: include/classes/api/services/CItemGeneral.php:797
 #, c-format
@@ -3762,7 +3762,7 @@ msgstr "タイプ\"%4$s\"のホストインターフェースが必要なため�
 #: include/classes/api/services/CItemGeneral.php:841
 #, c-format
 msgid "Cannot inherit item with key \"%1$s\" of template \"%2$s\" to host \"%3$s\", because an LLD rule prototype with the same key already exists."
-msgstr ""
+msgstr "同じキーのLLDルールプロトタイプがすでに存在するので、テンプレート\"%2$s\"のキー\"%1$s\"のアイテムをホスト\"%3$s\"に継承できません。"
 
 #: include/classes/api/services/CItemGeneral.php:785
 #, c-format
@@ -3792,7 +3792,7 @@ msgstr "同じキーの検出されたアイテムがすでに存在するので
 #: include/classes/api/services/CItemGeneral.php:842
 #, c-format
 msgid "Cannot inherit item with key \"%1$s\" of template \"%2$s\" to template \"%3$s\", because an LLD rule prototype with the same key already exists."
-msgstr ""
+msgstr "同じキーのLLDルールプロトタイプがすでに存在するため、テンプレート\"%2$s\"のキー\"%1$s\"のアイテムをテンプレート\"%3$s\"に継承できません。"
 
 #: include/classes/api/services/CItemGeneral.php:786
 #, c-format
@@ -5007,6 +5007,10 @@ msgstr "通信"
 msgid "Communication between Zabbix agent and server/proxy is secured with a unique user-defined pre-shared key identity and a secret pre-shared key linked to it."
 msgstr "Zabbixエージェントとサーバー/プロキシ間の通信は、一意のユーザー定義の事前共有キー識別子と、それにリンクされた秘密の事前共有キーによって保護されます。"
 
+#: app/views/host.wizard.edit.php:414
+msgid "Communication between Zabbix agent and server/proxy is secured with the pre-shared key (PSK) encryption method."
+msgstr ""
+
 #: include/items.inc.php:946
 msgctxt "SNMP Community"
 msgid "Community"
@@ -6036,6 +6040,10 @@ msgstr "カスタム深刻度の名前はすべての言語に影響するため
 msgid "Custom size"
 msgstr "カスタムサイズ"
 
+#: app/views/host.wizard.edit.php:138
+msgid "Custom templates are not supported."
+msgstr ""
+
 #: app/views/administration.miscconfig.edit.php:103
 #: include/classes/setup/CSetupWizard.php:561
 msgid "CyberArk Vault"
@@ -6202,6 +6210,10 @@ msgstr "データ収集"
 #, c-format
 msgid "Data from %1$s. Generated in %2$s sec."
 msgstr "Data from %1$s. Generated in %2$s sec."
+
+#: app/views/host.wizard.edit.php:168
+msgid "Data is collected by Zabbix agent, a lightweight software `component installed on your monitoring target."
+msgstr ""
 
 #: app/views/js/host.wizard.edit.js.php:89
 msgid "Data is collected by Zabbix agent, a lightweight software component installed on your monitoring target."
@@ -8168,7 +8180,7 @@ msgstr "多要素認証の有効化"
 
 #: app/views/host.wizard.edit.php:859
 msgid "Enable remote JMX monitoring"
-msgstr ""
+msgstr "リモートJMX監視を有効にする"
 
 #: app/views/administration.token.list.php:205
 #: app/views/administration.user.token.list.php:158
@@ -11892,6 +11904,10 @@ msgstr "Zabbixエージェントをインストール"
 msgid "Install Zabbix agent 2 and its plugins on your monitoring target by following the installation instructions below."
 msgstr "以下のインストール手順に従って、監視対象にZabbixエージェント2とそのプラグインをインストールしてください。"
 
+#: app/views/host.wizard.edit.php:551 app/views/host.wizard.edit.php:574
+msgid "Install Zabbix agent and its plugins on your monitoring target by following the installation instructions below."
+msgstr ""
+
 #: setup.php:163
 msgid "Installation"
 msgstr "インストール"
@@ -12801,7 +12817,7 @@ msgstr "JMX"
 
 #: app/views/host.wizard.edit.php:835
 msgid "JMX address"
-msgstr ""
+msgstr "JMXアドレス"
 
 #: include/items.inc.php:99
 msgid "JMX agent"
@@ -12820,11 +12836,11 @@ msgstr "JMXインターフェース"
 
 #: app/views/host.wizard.edit.php:874
 msgid "JMX monitoring"
-msgstr ""
+msgstr "JMX監視"
 
 #: app/views/host.wizard.edit.php:841
 msgid "JMX port"
-msgstr ""
+msgstr "JMXポート"
 
 #: include/classes/html/CButtonExport.php:79
 msgid "JSON"
@@ -12878,7 +12894,7 @@ msgstr "日本語 (ja_JP)"
 
 #: app/views/js/host.wizard.edit.js.php:99
 msgid "Java Management Extensions (JMX) interface"
-msgstr ""
+msgstr "Java Management Extensions (JMX)インターフェース"
 
 #: app/views/administration.mediatype.edit.php:235
 #: app/views/administration.script.edit.php:241
@@ -19411,6 +19427,10 @@ msgstr "セキュリティレベル"
 msgid "Security name"
 msgstr "セキュリティ名"
 
+#: app/views/host.wizard.edit.php:132
+msgid "See"
+msgstr ""
+
 #: app/views/popup.condition.edit.php:402 app/views/popup.generic.php:874
 #: app/views/popup.massupdate.item.php:440 app/views/popup.services.php:92
 #: app/views/popup.triggerexpr.php:88 include/classes/html/CMultiSelect.php:70
@@ -19775,11 +19795,11 @@ msgstr "この表示をデフォルトにセット"
 
 #: app/views/host.wizard.edit.php:493
 msgid "Set up Zabbix agent on your monitoring target by executing the following PowerShell script [with administrator permissions]:"
-msgstr ""
+msgstr "次のPowerShellスクリプトを[管理者権限で]実行し、監視対象にZabbixエージェントを設定します。"
 
 #: app/views/host.wizard.edit.php:477
 msgid "Set up Zabbix agent on your monitoring target by executing the following script [bash under root]:"
-msgstr ""
+msgstr "次のスクリプト[root下のbash]を実行して、監視対象にZabbixエージェントを設定します。"
 
 #: app/views/js/popup.itemtestedit.view.js.php:383 include/forms.inc.php:1599
 #: include/views/js/item.preprocessing.js.php:67
@@ -20244,7 +20264,7 @@ msgstr "Zabbixサーバー\"%1$s\"から受信したデータのサイズが上�
 
 #: app/views/host.wizard.edit.php:355
 msgid "Skip OS selection if you already have Zabbix agent installed."
-msgstr ""
+msgstr "Zabbixエージェントがすでにインストールされている場合は、OSの選択をスキップします。"
 
 #: include/locales.inc.php:61
 msgid "Slovak (sk_SK)"
@@ -20308,6 +20328,11 @@ msgstr "このアイテムのヒストリの一部は圧縮されている可能
 msgid "Some templates (%1$s) are hidden. Custom templates are not supported."
 msgstr ""
 
+#: app/views/host.wizard.edit.php:130
+#, c-format
+msgid "Some templates (%1$s) are incompatible with the Host Wizard."
+msgstr ""
+
 #: widgets/actionlog/includes/WidgetForm.php:79
 #: widgets/problems/includes/WidgetForm.php:145
 msgid "Sort entries by"
@@ -20362,6 +20387,10 @@ msgstr "グラフを表示するホストを指定してください。"
 #: app/views/popup.generic.php:180 include/views/monitoring.history.php:293
 msgid "Specify some filter condition to see the values."
 msgstr "値を表示するにはいくつかのフィルター条件を指定してください。"
+
+#: app/views/host.wizard.edit.php:365
+msgid "Specifying new or existing host groups will add the host to these groups without removing it from any current groups."
+msgstr ""
 
 #: httpdetails.php:107 include/classes/screens/CScreenHttpTestDetails.php:82
 msgid "Speed"
@@ -21470,7 +21499,7 @@ msgstr "ディスカバリされたグラフが見つかりませんでした。
 
 #: app/controllers/CControllerHostEdit.php:306 host_prototypes.php:197
 msgid "The host being cloned belongs to a host group you don't have write permissions to. Non-writable group has been removed from the new host."
-msgstr ""
+msgstr "クローン中のホストは、書き込み権限のないホストグループに属しています。書き込み権限のないグループは新しいホストから削除されました。"
 
 #: include/html.inc.php:670
 #, c-format
@@ -21519,7 +21548,7 @@ msgstr "最大ズームレベルは\"%1$s\"です。"
 #: include/classes/api/services/CDiscoveryRule.php:962
 #, c-format
 msgid "The nested LLD rule with key \"%1$s\" of the template \"%2$s\" cannot be inherited to non-discovered host \"%3$s\"."
-msgstr ""
+msgstr "テンプレート\"%2$s\"のキー\"%1$s\"を持つネストされたLLDルールは、検出されていないホスト\"%3$s\"に継承できません。"
 
 #: include/classes/data/CItemData.php:1281
 msgid "The number of processes. Returns integer"
@@ -21540,7 +21569,7 @@ msgstr "受信したリモートプロシージャーは存在しないか利用
 
 #: app/controllers/CControllerTemplateEdit.php:196
 msgid "The template being cloned belongs to a template group you don't have write permissions to. Non-writable group has been removed from the new template."
-msgstr ""
+msgstr "クローン中のテンプレートは、書き込み権限のないテンプレートグループに属しています。書き込み権限のないグループは新しいテンプレートから削除されました。"
 
 #: app/views/host.wizard.edit.php:275
 #, c-format
@@ -21550,7 +21579,7 @@ msgstr ""
 #: app/views/host.wizard.edit.php:353
 #, c-format
 msgid "The template you selected (%1$s) requires Zabbix agent to be installed and running on your monitoring target."
-msgstr ""
+msgstr "選択したテンプレート(%1$s)では、監視対象にZabbixエージェントがインストールされ、実行されている必要があります。"
 
 #: app/views/host.wizard.edit.php:899
 #, c-format
@@ -21609,6 +21638,10 @@ msgstr ""
 msgid "This check cannot be removed, as it is used as a condition in %1$s discovery action."
 msgid_plural "This check cannot be removed, as it is used as a condition in %1$s discovery actions."
 msgstr[0] ""
+
+#: app/views/host.wizard.edit.php:384
+msgid "This configuration will overwrite all existing encryption settings on the host."
+msgstr ""
 
 #: include/func.inc.php:2566
 msgid "This day last week"
@@ -22720,7 +22753,7 @@ msgstr "TimescaleDBのバージョンを取得できません。"
 #: include/views/mfa.login.php:65
 #, c-format
 msgid "Unable to scan? You can use %1$s secret key to manually configure your authenticator app:"
-msgstr ""
+msgstr "スキャンできませんか？%1$sの秘密鍵を使用して認証アプリを手動で設定できます:"
 
 #: include/classes/db/DbBackend.php:147
 msgid "Unable to select configuration."
@@ -23260,7 +23293,7 @@ msgstr "iframeサンドボックスを使用する"
 
 #: widgets/itemhistory/views/column.edit.php:232
 msgid "Use monospace font"
-msgstr ""
+msgstr "等幅フォントを使用する"
 
 #: app/partials/monitoring.latest.view.html.php:36
 #: app/views/popup.generic.php:180
@@ -23483,7 +23516,7 @@ msgstr "ユーザーグループ"
 
 #: app/controllers/CControllerScriptUserInputCheck.php:61
 msgid "User input has been successfully tested."
-msgstr ""
+msgstr "ユーザー入力が正常にテストされました。"
 
 #: include/classes/api/services/CUser.php:1282
 msgid "User is not allowed to delete himself."
@@ -23681,7 +23714,7 @@ msgstr "ユーザー"
 
 #: include/locales.inc.php:62
 msgid "Uzbek (uz_UZ)"
-msgstr ""
+msgstr "ウズベク語 (uz_UZ)"
 
 #: include/classes/data/CItemData.php:1876
 msgid "VMware Distributed Virtual Switch, \"url\" - VMware service URL. Returns JSON"
@@ -24681,16 +24714,16 @@ msgstr "障害あり"
 
 #: widgets/tophosts/views/column.edit.php:130
 msgid "With this setting only numeric data will be displayed."
-msgstr ""
+msgstr "この設定では数値データのみが表示されます。"
 
 #: widgets/tophosts/views/column.edit.php:135
 msgid "With this setting only numeric items will be displayed in this column."
-msgstr "この設定では、数値アイテムだけがこの列内に表示されます。"
+msgstr "この設定では数値アイテムのみがこの列に表示されます。"
 
 #: widgets/item/views/widget.edit.php:70
 #: widgets/tophosts/views/column.edit.php:225
 msgid "With this setting only numeric items will be displayed."
-msgstr ""
+msgstr "この設定では数値アイテムのみが表示されます。"
 
 #: include/forms.inc.php:339 include/forms.inc.php:557
 msgid "With triggers"
@@ -25053,7 +25086,7 @@ msgstr "Zabbixエージェント(パッシブチェック)"
 
 #: app/views/js/host.wizard.edit.js.php:91
 msgid "Zabbix agent initiates connections to Zabbix server or proxy to send data. Recommended for monitoring targets behind a firewall."
-msgstr ""
+msgstr "Zabbixエージェントは、Zabbixサーバーまたはプロキシへの接続を開始してデータを送信します。ファイアウォール越しにターゲットを監視する場合推奨されます。"
 
 #: app/views/host.wizard.edit.php:863
 msgid "Zabbix documentation"
@@ -25125,7 +25158,7 @@ msgstr "Zabbixサーバー名"
 
 #: app/views/js/host.wizard.edit.js.php:92
 msgid "Zabbix server or proxy initiates connections to Zabbix agent to request data. Recommended for networks without a firewall or with open firewall ports."
-msgstr ""
+msgstr "Zabbixサーバーまたはプロキシは、Zabbixエージェントへの接続を開始してデータを要求します。エージェントとの間にファイアウォールが存在しない、またはファイアウォールポートが開放されているネットワークに推奨されます。"
 
 #: app/partials/administration.system.info.php:40
 msgid "Zabbix server version"
@@ -25310,37 +25343,37 @@ msgstr "acos() - 角度の値のアークコサイン、ラジアンで示す"
 #: include/classes/api/services/CDRule.php:773
 #, c-format
 msgid "action \"%1$s\" uses this discovery check"
-msgstr ""
+msgstr "アクション\"%1$s\"はこのディスカバリチェックを使用します"
 
 #: include/classes/api/services/CDRule.php:980
 #, c-format
 msgid "action \"%1$s\" uses this discovery rule"
-msgstr ""
+msgstr "アクション\"%1$s\"はこのディスカバリルールを使用します"
 
 #: include/classes/api/services/CHost.php:1632
 #, c-format
 msgid "action \"%1$s\" uses this host"
-msgstr ""
+msgstr "アクション\"%1$s\"はこのホストを使用します"
 
 #: include/classes/api/services/CHostGroup.php:768
 #, c-format
 msgid "action \"%1$s\" uses this host group"
-msgstr ""
+msgstr "アクション\"%1$s\"はこのホストグループを使用します"
 
 #: include/classes/api/services/CService.php:487
 #, c-format
 msgid "action \"%1$s\" uses this service"
-msgstr ""
+msgstr "アクション\"%1$s\"はこのサービスを使用します"
 
 #: include/classes/api/services/CTemplate.php:806
 #, c-format
 msgid "action \"%1$s\" uses this template"
-msgstr ""
+msgstr "アクション\"%1$s\"はこのテンプレートを使用します"
 
 #: include/classes/api/managers/CTriggerManager.php:127
 #, c-format
 msgid "action \"%1$s\" uses this trigger"
-msgstr ""
+msgstr "アクション\"%1$s\"はこのトリガーを使用します"
 
 #: app/partials/monitoring.charts.subfilter.php:182
 #: app/partials/monitoring.latest.subfilter.php:186 include/forms.inc.php:144
@@ -25817,7 +25850,7 @@ msgstr "継承されたLLDルールを削除できません"
 
 #: include/classes/api/services/CDiscoveryRulePrototype.php:1231
 msgid "cannot delete inherited LLD rule prototype"
-msgstr ""
+msgstr "継承されたLLDルールのプロトタイプを削除できません"
 
 #: include/classes/api/services/CItem.php:909
 msgid "cannot delete inherited item"
@@ -26034,11 +26067,11 @@ msgstr "すべてのアクションを表示"
 
 #: app/views/mediatype.list.php:80
 msgid "display only actions where All available media types are used in action operation"
-msgstr ""
+msgstr "アクション操作で利用可能なメディアタイプすべてが使用されているアクションのみを表示します"
 
 #: app/views/mediatype.list.php:84
 msgid "display only actions where specific media type is used in action operation"
-msgstr ""
+msgstr "アクション操作で特定のメディアタイプが使用されているアクションのみを表示します"
 
 #: app/views/popup.lldoperation.php:65 include/actions.inc.php:27
 #: include/classes/helpers/CCorrelationHelper.php:37
@@ -26217,11 +26250,11 @@ msgstr "H:i:s"
 
 #: include/html.inc.php:709 include/html.inc.php:714 include/html.inc.php:719
 msgid "has been disabled"
-msgstr ""
+msgstr "無効化されました"
 
 #: include/html.inc.php:725
 msgid "has been manually disabled"
-msgstr ""
+msgstr "手動で無効化されました"
 
 #: include/classes/import/validators/C10XmlValidator.php:340
 msgctxt "XML time format"
@@ -26267,6 +26300,10 @@ msgstr "同じUUIDのホストプロトタイプがすでに存在します"
 #: include/classes/api/services/CMap.php:2198
 msgid "host trigger ID is expected"
 msgstr "ホストトリガーIDが必要です"
+
+#: app/views/host.wizard.edit.php:134
+msgid "how to update them"
+msgstr ""
 
 #: include/classes/api/services/CMap.php:844
 #: include/classes/api/services/CMap.php:1311
@@ -26631,6 +26668,10 @@ msgstr "m/d"
 #: include/translateDefines.inc.php:33
 msgid "m-d h:i A"
 msgstr "m/d H:i"
+
+#: app/views/host.wizard.edit.php:589
+msgid "macOS"
+msgstr ""
 
 #: include/classes/parsers/CUserMacroParser.php:37
 msgid "macro is empty"
@@ -27462,7 +27503,7 @@ msgstr "timeleft() - 期間Tに基づく閾値に達するまでの時間"
 
 #: include/classes/api/services/CProxy.php:835
 msgid "timeouts are disabled because the proxy and server versions do not match"
-msgstr ""
+msgstr "プロキシとサーバーのバージョンが一致しないため、タイムアウトは無効になっています。"
 
 #: include/views/configuration.item.edit.php:643
 #: include/views/configuration.item.prototype.edit.php:614
@@ -27879,30 +27920,30 @@ msgstr "「*」を利用したワイルドカード指定が可能です"
 #: include/html.inc.php:806
 #, c-format
 msgid "will be deleted in %1$s"
-msgstr ""
+msgstr "%1$sで削除されます"
 
 #: include/html.inc.php:679 include/html.inc.php:720 include/html.inc.php:735
 #: include/html.inc.php:801
 msgid "will be deleted the next time discovery rule is processed"
-msgstr "次のディスカバリルールの処理時に削除されます。"
+msgstr "次のディスカバリルールの処理時に削除されます"
 
 #: include/html.inc.php:747 include/html.inc.php:770
 #, c-format
 msgid "will be disabled in %1$s"
-msgstr ""
+msgstr "%1$sで無効化されます"
 
 #: include/html.inc.php:753 include/html.inc.php:764
 msgid "will be disabled the next time discovery rule is processed"
-msgstr "次のディスカバリルールの処理時に無効になります。"
+msgstr "次のディスカバリルールの処理時に無効化されます"
 
 #: include/html.inc.php:715 include/html.inc.php:726 include/html.inc.php:759
 #: include/html.inc.php:796
 msgid "will not be deleted"
-msgstr ""
+msgstr "削除されません"
 
 #: include/html.inc.php:741 include/html.inc.php:776
 msgid "will not be disabled"
-msgstr ""
+msgstr "無効化されません"
 
 #: include/classes/validators/CFormValidator.php:1393
 #: include/classes/validators/CFormValidator.php:1438 jsLoader.php:436
