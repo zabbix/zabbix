@@ -221,9 +221,7 @@ window.graph_edit_popup = new class {
 
 	#initPreviewTab() {
 		$('#tabs').on('tabscreate tabsactivate', (event, ui) => {
-			document.querySelector('#preview-tab').style.overflow = document.getElementById('width').value > 900
-				? 'auto'
-				: ''
+			document.querySelector('#preview-tab').style.overflow = 'auto'
 
 			const $panel = (event.type === 'tabscreate') ? ui.panel : ui.newPanel;
 
