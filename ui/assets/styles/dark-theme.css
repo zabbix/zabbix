@@ -8575,6 +8575,9 @@ svg {
 #graph-tab .graph-items {
   max-width: 750px; }
 
+#graph-preview-tab {
+  overflow: auto; }
+
 .z-select.z-select-host-interface .description:not(:empty),
 z-select.z-select-host-interface .description:not(:empty) {
   display: block;
