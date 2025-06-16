@@ -1325,19 +1325,16 @@ static void	am_sync_watchdog(zbx_am_t *manager, zbx_am_media_t **medias, int med
 		if (SMTP_AUTHENTICATION_OAUTH == mediatype->smtp_authentication)
 		{
 			/* make sure that in case of database down we will have valid OAuth bearer */
-			if (mediatype->passwd_expires - ZBX_WATCHDOG_EXPIRE_PERIOD < time(NULL))
-			{
-				zbx_free(mediatype->error);
+			zbx_free(mediatype->error);
 
-				zbx_audit_prepare(ZBX_AUDIT_ALL_CONTEXT);
+			zbx_audit_prepare(ZBX_AUDIT_ALL_CONTEXT);
 
-				zbx_oauth_get(mediatype->mediatypeid, mediatype->name, mediatype->timeout,
-						mediatype->maxattempts, ZBX_WATCHDOG_EXPIRE_PERIOD, config_source_ip,
-						config_ssl_ca_location, &mediatype->passwd, &mediatype->passwd_expires,
-						&mediatype->error);
+			zbx_oauth_get(mediatype->mediatypeid, mediatype->name, mediatype->timeout,
+					mediatype->maxattempts, ZBX_WATCHDOG_EXPIRE_PERIOD, config_source_ip,
+					config_ssl_ca_location, &mediatype->passwd, &mediatype->passwd_expires,
+					&mediatype->error);
 
-				zbx_audit_flush(ZBX_AUDIT_ALL_CONTEXT);
-			}
+			zbx_audit_flush(ZBX_AUDIT_ALL_CONTEXT);
 		}
 
 		zbx_hashset_insert(&mediaids, &media->mediaid, sizeof(media->mediaid));
