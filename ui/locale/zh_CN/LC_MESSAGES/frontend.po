@@ -7,7 +7,7 @@ msgstr ""
 "Project-Id-Version: Zabbix 6.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2023-10-19 13:48+0300\n"
-"PO-Revision-Date: 2025-04-16 12:07+0000\n"
+"PO-Revision-Date: 2025-06-03 03:25+0000\n"
 "Last-Translator: NoYoWiFi <1284524409@qq.com>\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
 "Language: zh_CN\n"
@@ -1092,7 +1092,7 @@ msgstr "地址"
 #: app/controllers/CControllerProxyUpdate.php:75
 #: app/views/popup.proxy.edit.php:90
 msgid "Address for active agents"
-msgstr "Proxy组VIP"
+msgstr "active agents地址"
 
 #: include/hosts.inc.php:63 include/users.inc.php:53
 msgid "Admin"
@@ -5837,7 +5837,7 @@ msgstr "数据库 TLS 密钥文件"
 #: include/classes/api/clients/CLocalApiClient.php:133
 #: include/classes/api/clients/CLocalApiClient.php:147
 msgid "Database error occurred."
-msgstr ""
+msgstr "数据库错误。"
 
 #: app/partials/administration.system.info.php:130
 msgid "Database history tables use primary key"
@@ -7039,7 +7039,7 @@ msgstr "VMware 发现的集群，“url”- VMware 服务 URL。返回 JSON"
 
 #: include/classes/data/CItemData.php:1931
 msgid "Discovery of VMware datastores, \"url\" - VMware service URL, \"filter_uuid\" - one hv uuid or vm uuid (empty by default). Returns JSON"
-msgstr ""
+msgstr "发现 VMware 数据存储，\"url\" - VMware 服务 URL，\"filter_uuid\" - 一个主机（HV）UUID 或虚拟机（VM）UUID（默认为空）。返回 JSON"
 
 #: include/classes/data/CItemData.php:1799
 msgid "Discovery of VMware datastores, \"url\" - VMware service URL. Returns JSON"
@@ -19286,7 +19286,7 @@ msgstr "代理内存缓冲区的统计信息和可用性。模式（模式：pfr
 
 #: include/classes/data/CItemData.php:2854
 msgid "Statistics of values received by the preprocessing manager."
-msgstr ""
+msgstr " preprocessing manager接收的值的统计信息。"
 
 #: app/controllers/CControllerPopupGeneric.php:237
 #: app/controllers/CControllerPopupGeneric.php:251

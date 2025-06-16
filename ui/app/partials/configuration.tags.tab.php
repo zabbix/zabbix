@@ -62,7 +62,7 @@ if (in_array($data['source'], ['trigger', 'trigger_prototype', 'item', 'httptest
 $table = new CPartial('tags.list.html', $data);
 
 $form_grid->addItem([
-	new CLabel('Tags'),
+	new CLabel(_('Tags')),
 	new CFormField((new CDiv($table))->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR))
 ]);
 
