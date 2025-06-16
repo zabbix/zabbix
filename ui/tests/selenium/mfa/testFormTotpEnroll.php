@@ -17,6 +17,9 @@
 require_once __DIR__.'/../common/testFormTotp.php';
 
 /**
+ * Tests the enrollment process for MFA using TOTP. Verifies behavior when the TOTP secret is not
+ * yet stored in the database and the user needs to scan a QR code and submit a valid code.
+ *
  * @backup mfa
  *
  * @onBefore prepareData
@@ -24,7 +27,7 @@ require_once __DIR__.'/../common/testFormTotp.php';
 class testFormTotpEnroll extends testFormTotp {
 
 	// Maps Zabbix API hash algorithms to their UI display name.
-	protected static $algo_ui_map = [
+	const ALGORITHMS = [
 		TOTP_HASH_SHA1 => 'SHA1',
 		TOTP_HASH_SHA256 => 'SHA256',
 		TOTP_HASH_SHA512 => 'SHA512'
@@ -49,16 +52,15 @@ class testFormTotpEnroll extends testFormTotp {
 		);
 
 		// Assert the QR code and get the secret.
-		$qr_code = $container->query('class:qr-code')->one();
-		$totp_secret = $this->validateQrCodeAndExtractSecret($qr_code);
+		$totp_secret = $this->validateQrCodeAndExtractSecret();
 
 		// Assert the QR code image.
-		$qr_img = $qr_code->query('tag:img')->one();
+		$qr_img = $container->query('class:qr-code')->query('tag:img')->one();
 		$this->assertTrue($qr_img->isVisible());
 		$this->assertEquals('Scan me!', $qr_img->getAttribute('alt'));
 
 		// Assert the description text.
-		$this->assertEnrollDescription($container, self::DEFAULT_ALGO, $totp_secret);
+		$this->assertEnrollDescription($container, self::DEFAULT_ALGORITHM, $totp_secret);
 
 		// The other elements are common with the Verification form, reuse the code.
 		$this->testTotpLayout();
@@ -103,15 +105,14 @@ class testFormTotpEnroll extends testFormTotp {
 
 		// Get the used TOTP parameters.
 		$totp_name = CTestArrayHelper::get($data, 'mfa_data.name', self::DEFAULT_METHOD_NAME);
-		$totp_algo = CTestArrayHelper::get($data, 'mfa_data.hash_function', self::DEFAULT_ALGO);
+		$totp_algo = CTestArrayHelper::get($data, 'mfa_data.hash_function', self::DEFAULT_ALGORITHM);
 		$totp_code_length = CTestArrayHelper::get($data, 'mfa_data.code_length', self::DEFAULT_TOTP_CODE_LENGTH);
 
 		// Get elements.
 		$form = $this->page->query('class:signin-container')->asForm()->one();
-		$qr_code = $form->query('class:qr-code')->one();
 
 		// Assert the QR code and get the secret.
-		$totp_secret = $this->validateQrCodeAndExtractSecret($qr_code, $totp_name, self::USER_NAME, $totp_algo,
+		$totp_secret = $this->validateQrCodeAndExtractSecret($totp_name, self::USER_NAME, $totp_algo,
 				$totp_code_length
 		);
 
@@ -133,7 +134,9 @@ class testFormTotpEnroll extends testFormTotp {
 		$this->page->waitUntilReady();
 		if (CTestArrayHelper::get($data, 'expected', TEST_GOOD) === TEST_GOOD) {
 			// Successful login.
-			$this->page->checkUserLoggedIn();
+			$this->page->assertUserIsLoggedIn();
+			// Check that no error messages are displayed after logging in.
+			$this->assertFalse($this->query('class:msg-bad')->one(false)->isValid(), 'Unexpected error on page.');
 		}
 		else {
 			// Verify validation error.
@@ -174,7 +177,7 @@ class testFormTotpEnroll extends testFormTotp {
 		$this->userLogin();
 		$form = $this->page->query('class:signin-container')->asForm()->one();
 		$this->performEnroll($form);
-		$this->page->checkUserLoggedIn();
+		$this->page->assertUserIsLoggedIn();
 		$this->page->logout();
 
 		// Create a different MFA method and assign it to the user.
@@ -182,7 +185,7 @@ class testFormTotpEnroll extends testFormTotp {
 		$mfa_id = CDataHelper::call('mfa.create', [
 			'type' => MFA_TYPE_TOTP,
 			'name' => $alternative_mfa_name,
-			'hash_function' => self::DEFAULT_ALGO,
+			'hash_function' => self::DEFAULT_ALGORITHM,
 			'code_length' => self::DEFAULT_TOTP_CODE_LENGTH
 		])['mfaids'][0];
 
@@ -195,7 +198,7 @@ class testFormTotpEnroll extends testFormTotp {
 		// Check that enrollment is required again.
 		$this->userLogin();
 		$this->performEnroll($form, $alternative_mfa_name);
-		$this->page->checkUserLoggedIn();
+		$this->page->assertUserIsLoggedIn();
 		$this->page->logout();
 
 		// Change the default MFA method back to the original.
@@ -207,7 +210,7 @@ class testFormTotpEnroll extends testFormTotp {
 		// Check that the user has to enroll the initial MFA method again.
 		$this->userLogin();
 		$this->performEnroll($form);
-		$this->page->checkUserLoggedIn();
+		$this->page->assertUserIsLoggedIn();
 	}
 
 	/**
@@ -243,7 +246,6 @@ class testFormTotpEnroll extends testFormTotp {
 	 * Validates if the QR code is displaying the correct data and extracts the TOTP secret string and returns it.
 	 * This is done by looking at the QR code's HTML 'title' attribute, no visual inspection is done.
 	 *
-	 * @param CElement $qr_code      QR code element.
 	 * @param string   $method_name  The expected TOTP method name.
 	 * @param string   $user_name    User that is trying to enroll.
 	 * @param int      $algorithm    The expected TOTP Cryptographic algorithm.
@@ -251,28 +253,32 @@ class testFormTotpEnroll extends testFormTotp {
 	 *
 	 * @return string
 	 */
-	protected function validateQrCodeAndExtractSecret($qr_code = null, $method_name = self::DEFAULT_METHOD_NAME,
-			$user_name = self::USER_NAME, $algorithm = self::DEFAULT_ALGO,
+	protected function validateQrCodeAndExtractSecret($method_name = self::DEFAULT_METHOD_NAME,
+			$user_name = self::USER_NAME, $algorithm = self::DEFAULT_ALGORITHM,
 			$code_length = self::DEFAULT_TOTP_CODE_LENGTH) {
-		if ($qr_code === null) {
-			$qr_code = $this->page->query('class:qr-code')->one();
-		}
+		// QR code element.
+		$qr_code = $this->page->query('class:qr-code')->one();
 
 		/*
 		 * The expected QR code's URL should follow this format:
 		 * otpauth://totp/{method-name}:{user-name}?secret={secret}&issuer={method-name}
-		 * &algorithm={algo}&digits={code_length}&period=30
+		 * &algorithm={algorithms}&digits={code_length}&period=30
 		 */
-		$regex = '@^otpauth:\/\/totp\/'.preg_quote($method_name).':'.$user_name.'\?secret=(['.
-			CMfaTotpHelper::VALID_BASE32_CHARS.']{32})&issuer='.preg_quote($method_name).'&algorithm='.
-			self::$algo_ui_map[$algorithm].'&digits='.$code_length.'&period=30$@';
+		$regex = '@^otpauth:\/\/totp\/'.preg_quote($method_name).':'.$user_name.
+			'\?secret=(['.CMfaTotpHelper::VALID_BASE32_CHARS.']{32})'.
+			'&issuer='.preg_quote($method_name).
+			'&algorithm='.self::ALGORITHMS[$algorithm].
+			'&digits='.$code_length.
+			'&period=30$@';
 
+		// The QR code title contains URL-encoded characters (e.g., spaces as %20), so we need to decode it.
 		$qr_title = urldecode($qr_code->getAttribute('title'));
 		$this->assertEquals(1, preg_match($regex, $qr_title, $matches),
 				"Failed to assert the QR code.\nExpected title regex: ".$regex."\nActual title: ".$qr_title
 		);
 
 		// Extract the secret with regex and return it.
+		$this->assertArrayHasKey(1, $matches, 'Secret not found in QR code URL');
 		return $matches[1];
 	}
 
@@ -283,9 +289,9 @@ class testFormTotpEnroll extends testFormTotp {
 	 * @param string   $mfa_name  Override for the expected MFA method name.
 	 */
 	protected function performEnroll($form, $mfa_name = null) {
-		$qr_code = $form->query('class:qr-code')->one();
-		$totp_secret = $this->validateQrCodeAndExtractSecret($qr_code, $mfa_name ?? self::DEFAULT_METHOD_NAME);
+		$totp_secret = $this->validateQrCodeAndExtractSecret($mfa_name ?? self::DEFAULT_METHOD_NAME);
 		$totp = CMfaTotpHelper::generateTotp($totp_secret);
+		$form->invalidate();
 		$form->getField('id:verification_code')->fill($totp);
 		$form->query('button:Sign in')->one()->click();
 		$this->page->waitUntilReady();
@@ -299,7 +305,7 @@ class testFormTotpEnroll extends testFormTotp {
 	 * @param string   $secret     The secret that should be displayed.
 	 */
 	protected function assertEnrollDescription($container, $algorithm, $secret) {
-		$description = 'Unable to scan? You can use '.self::$algo_ui_map[$algorithm].
+		$description = 'Unable to scan? You can use '.self::ALGORITHMS[$algorithm].
 			' secret key to manually configure your authenticator app:';
 		$this->assertTrue($container->query('xpath:.//div[text()='.CXPathHelper::escapeQuotes($description).']')
 				->one()->isVisible()

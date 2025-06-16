@@ -17,17 +17,17 @@
 class testFormTotp extends CWebTest {
 
 	// User for testing TOTP.
-	protected const USER_NAME = 'totp-user';
-	protected const USER_PASS = 'zabbixzabbix';
+	const USER_NAME = 'totp-user';
+	const USER_PASS = 'zabbixzabbix';
 
 	// Default parameters for the TOTP MFA method.
-	protected const DEFAULT_METHOD_NAME = 'TOTP';
-	protected const DEFAULT_ALGO = TOTP_HASH_SHA1;
-	protected const DEFAULT_TOTP_CODE_LENGTH = TOTP_CODE_LENGTH_6;
-	protected const DEFAULT_ERROR = 'The verification code was incorrect, please try again.';
+	const DEFAULT_METHOD_NAME = 'TOTP';
+	const DEFAULT_ALGORITHM = TOTP_HASH_SHA1;
+	const DEFAULT_TOTP_CODE_LENGTH = TOTP_CODE_LENGTH_6;
+	const DEFAULT_ERROR = 'The verification code was incorrect, please try again.';
 
 	// Number of TOTP verification attempts, after which a user is blocked.
-	protected const BLOCK_COUNT = 5;
+	const BLOCK_COUNT = 5;
 
 	// For storing object IDs created with API.
 	protected static $user_id;
@@ -50,7 +50,7 @@ class testFormTotp extends CWebTest {
 		self::$mfa_id = CDataHelper::call('mfa.create', [
 			'type' => MFA_TYPE_TOTP,
 			'name' => self::DEFAULT_METHOD_NAME,
-			'hash_function' => self::DEFAULT_ALGO,
+			'hash_function' => self::DEFAULT_ALGORITHM,
 			'code_length' => self::DEFAULT_TOTP_CODE_LENGTH
 		])['mfaids'][0];
 
@@ -105,14 +105,14 @@ class testFormTotp extends CWebTest {
 		// Since index_mfa.php is a unique form, also check the generic elements.
 		$links = $this->page->query('class:signin-links')->one();
 
-		$help_link = $links->query('xpath:./a[text()="Help"]')->one();
+		$help_link = $links->query('link:Help')->one();
 		$this->assertTrue($help_link->isClickable());
 		$this->assertEquals(1,
 				preg_match('/^https:\/\/www.zabbix.com\/documentation\/\d.\d\/$/', $help_link->getAttribute('href'))
 		);
 		$this->assertEquals('_blank', $help_link->getAttribute('target')); // opens link in a new tab
 
-		$support_link = $links->query('xpath:./a[text()="Support"]')->one();
+		$support_link = $links->query('link:Support')->one();
 		$this->assertTrue($support_link->isClickable());
 		$this->assertEquals('https://www.zabbix.com/support', $support_link->getAttribute('href'));
 		$this->assertEquals('_blank', $support_link->getAttribute('target')); // opens link in a new tab
@@ -232,7 +232,7 @@ class testFormTotp extends CWebTest {
 
 		$this->resetTotpConfiguration(
 				CTestArrayHelper::get($data, 'mfa_data.name', self::DEFAULT_METHOD_NAME),
-				CTestArrayHelper::get($data, 'mfa_data.hash_function', self::DEFAULT_ALGO),
+				CTestArrayHelper::get($data, 'mfa_data.hash_function', self::DEFAULT_ALGORITHM),
 				CTestArrayHelper::get($data, 'mfa_data.code_length', self::DEFAULT_TOTP_CODE_LENGTH)
 		);
 
@@ -271,7 +271,7 @@ class testFormTotp extends CWebTest {
 	/**
 	 * Resets the TOTP configuration and secret.
 	 */
-	protected function resetTotpConfiguration($name = self::DEFAULT_METHOD_NAME, $hash_function = self::DEFAULT_ALGO,
+	protected function resetTotpConfiguration($name = self::DEFAULT_METHOD_NAME, $hash_function = self::DEFAULT_ALGORITHM,
 			$code_length = self::DEFAULT_TOTP_CODE_LENGTH) {
 		// Set the needed MFA configuration via API.
 		CDataHelper::call('mfa.update', [

@@ -17,14 +17,17 @@
 require_once __DIR__.'/../common/testFormTotp.php';
 
 /**
+ * Tests the user login process when the MFA TOTP secret is already set in the database.
+ * Simulates login using a TOTP code from an authenticator app (e.g., Google Authenticator).
+ *
  * @backup mfa
  *
  * @onBefore prepareData
  */
 class testFormTotpValidate extends testFormTotp {
 
-	protected const TOTP_SECRET_16 = 'AAAAAAAAAAAAAAAA';
-	protected const TOTP_SECRET_32 = 'AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA';
+	const TOTP_SECRET_16 = 'AAAAAAAAAAAAAAAA';
+	const TOTP_SECRET_32 = 'AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA';
 
 	public function testFormTotpValidate_Layout() {
 		$this->quickEnrollUser();
@@ -32,6 +35,11 @@ class testFormTotpValidate extends testFormTotp {
 
 		// All elements in the Validate form are also present in the enroll form, so reuse code from there.
 		$this->testTotpLayout();
+
+		// QR code should not be visible.
+		$container = $this->page->query('class:signin-container')->one();
+		$this->assertFalse($container->query('xpath:.//div[text()="Scan this QR code"]')->one(false)->isVisible());
+		$this->assertFalse($container->query('class:qr-code')->query('tag:img')->one(false)->isVisible());
 	}
 
 	public function getValidateData() {
@@ -63,7 +71,7 @@ class testFormTotpValidate extends testFormTotp {
 		$this->userLogin();
 
 		// Get TOTP parameters.
-		$totp_algo = CTestArrayHelper::get($data, 'mfa_data.hash_function', self::DEFAULT_ALGO);
+		$totp_algo = CTestArrayHelper::get($data, 'mfa_data.hash_function', self::DEFAULT_ALGORITHM);
 		$totp_code_length = CTestArrayHelper::get($data, 'mfa_data.code_length', self::DEFAULT_TOTP_CODE_LENGTH);
 		$totp_secret = CTestArrayHelper::get($data, 'totp_secret', self::TOTP_SECRET_32);
 
@@ -84,7 +92,9 @@ class testFormTotpValidate extends testFormTotp {
 		$this->page->waitUntilReady();
 		if (CTestArrayHelper::get($data, 'expected', TEST_GOOD) === TEST_GOOD) {
 			// Successful login.
-			$this->page->checkUserLoggedIn();
+			$this->page->assertUserIsLoggedIn();
+			// Check that no error messages are displayed after logging in.
+			$this->assertFalse($this->query('class:msg-bad')->one(false)->isValid(), 'Unexpected error on page.');
 		}
 		else {
 			// Verify validation error.
@@ -108,7 +118,7 @@ class testFormTotpValidate extends testFormTotp {
 		$form->getField('id:verification_code')->fill($totp);
 		$form->query('button:Sign in')->one()->click();
 		$this->page->waitUntilReady();
-		$this->page->checkUserLoggedIn();
+		$this->page->assertUserIsLoggedIn();
 
 		// Log out and try to log in using the same code. Should fail.
 		$this->page->logout();

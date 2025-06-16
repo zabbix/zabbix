@@ -24,7 +24,7 @@ class CMfaTotpHelper {
 	const VALID_BASE32_CHARS = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ234567';
 
 	// Maps Zabbix API hash algorithms to PHP hash_algos().
-	protected static $algo_map = [
+	protected static $algorithms_map = [
 		TOTP_HASH_SHA1 => 'sha1',
 		TOTP_HASH_SHA256 => 'sha256',
 		TOTP_HASH_SHA512 => 'sha512'
@@ -63,7 +63,7 @@ class CMfaTotpHelper {
 		$secret_binary = self::base32Decode($secret);
 
 		// Generate the hash that the TOTP is extracted from.
-		$hash_binary = hash_hmac(self::$algo_map[$algorithm], $time_step_binary, $secret_binary, true);
+		$hash_binary = hash_hmac(self::$algorithms_map[$algorithm], $time_step_binary, $secret_binary, true);
 
 		/*
 		 * Determine the offset for TOTP extraction.
@@ -115,7 +115,7 @@ class CMfaTotpHelper {
 			// Sleep until next window starts, and then another buffer amount, to safely be in a TOTP window.
 			usleep((int) (($remaining_time + $buffer) * 1000000));
 		}
-		else if ($time_in_window < $buffer) {
+		elseif ($time_in_window < $buffer) {
 			// Second case - the window has just started, wait to be outside the buffer zone.
 			usleep((int) (($buffer - $time_in_window) * 1000000));
 		}
@@ -123,6 +123,7 @@ class CMfaTotpHelper {
 
 	/**
 	 * Checks if a string is a valid TOTP secret (in the context of Zabbix).
+	 * The secret must be between 16 and 32 characters long and consist only of allowed Base32 characters.
 	 *
 	 * @param string $secret  The secret string that must be validated.
 	 *
