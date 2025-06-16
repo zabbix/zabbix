@@ -1255,14 +1255,17 @@ window.host_wizard_edit = new class {
 					}
 				})();
 
+				let hostname = this.#data.host_new !== null ? this.#data.host_new.id : this.#data.host?.name;
+				let server_host = '';
 				let psk_identity = '';
 				let psk = '';
-				let server_host = '';
 
 				if (this.#data.monitoring_os === 'linux') {
 					server_host = this.#data.agent_script_server_host !== ''
 						? `--server-host '${this.#data.agent_script_server_host}'`
 						: `--server-host-stdin`;
+
+					hostname = `--hostname '${hostname}'`;
 
 					psk_identity = this.#data.tls_psk_identity !== ''
 						? `--psk-identity '${this.#data.tls_psk_identity.replace(/'/g, `\\'`)}'`
@@ -1278,6 +1281,8 @@ window.host_wizard_edit = new class {
 						? `-serverHost '${this.#data.agent_script_server_host}'`
 						: `-serverHostSTDIN`;
 
+					hostname = `-hostName '${hostname}'`;
+
 					psk_identity = this.#data.tls_psk_identity !== ''
 						? `-pskIdentity '${this.#data.tls_psk_identity.replace(/'/g, `\\'`)}'`
 						: `-pskIdentitySTDIN`;
@@ -1289,6 +1294,7 @@ window.host_wizard_edit = new class {
 
 				this.#dialogue.querySelector('.js-install-agent-readme').innerHTML = readme_template.evaluate({
 					server_host,
+					hostname,
 					psk_identity,
 					psk
 				});
