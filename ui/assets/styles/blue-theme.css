@@ -6161,7 +6161,7 @@ div.dashboard-widget-web .list-table tr[data-hostgroupid] {
     text-overflow: ellipsis;
     line-clamp: 2;
     white-space: normal;
-    word-break: break-all;
+    word-break: break-word;
     -webkit-line-clamp: 2;
     -webkit-box-orient: vertical; }
   .modal-popup-host-wizard .templates-card-list .template-tags label {
