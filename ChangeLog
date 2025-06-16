@@ -3,6 +3,11 @@ Changes for 7.4.0rc2
 New features:
 
 Bug fixes:
+..F....... [ZBX-26527] fixed access to server status information for users of non-super admin roles (talbergs)
+..F....... [ZBX-26517] disabled discovered item prototype's popup menu entries for creating trigger or dependent item prototype (wczerneha)
+..F....... [ZBX-26523] added support for mass update of trigger prototypes with LLD rule prototype as parent (wczerneha)
+..F....... [ZBX-26512] removed unnecessary button from the discovery prototype form (wczerneha)
+..F....... [ZBX-26530] fixed notices when accessing prototype pages while not logged in (jfreibergs)
 
 --------------------------------------------------------------------------------
 Changes for 7.4.0rc1

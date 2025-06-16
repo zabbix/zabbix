@@ -2173,6 +2173,15 @@ class testNestedLLD extends CIntegrationTest{
 		];
 
 		$this->sendRuleData($hostname, 'main_drule', $data);
+
+		$response = $this->call('discoveryrule.get', [
+			'hostids' => [$hostid],
+			'search' => [
+				'name' => 'nested[xxx,zzz,test2]'
+			],
+			'countOutput' => true
+		]);
+		$this->assertEquals(1, $response['result'], 'rule should have been discovered');
 	}
 
 	// Test discovery rule prototype having item prototype as a master item.
