@@ -4,7 +4,7 @@ msgstr ""
 "Project-Id-Version: Zabbix 6.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2023-10-19 13:48+0300\n"
-"PO-Revision-Date: 2025-06-03 22:00+0000\n"
+"PO-Revision-Date: 2025-06-08 07:21+0000\n"
 "Last-Translator: Xevi Noè i Nogueiras <xevi.noe@gmail.com>\n"
 "Language-Team: none\n"
 "Language: ca\n"
@@ -463,7 +463,7 @@ msgstr "S'espera un valor de coma flotant."
 
 #: app/views/host.wizard.edit.php:139
 msgid "A template is a set of predefined configurations (metrics to be collected, conditions for generating alerts, etc.) designed for your monitoring target."
-msgstr ""
+msgstr "Una plantilla és un conjunt de configuracions predefinides (mètriques que s'han de recopilar, condicions per generar alertes, etc.) dissenyades per al vostre objectiu de monitoratge."
 
 #: widgets/svggraph/includes/CWidgetFieldOverrideView.php:199
 msgid "ADD OVERRIDE"
@@ -1015,7 +1015,7 @@ msgstr "Afegir equip"
 
 #: app/views/host.wizard.edit.php:571 app/views/js/host.wizard.edit.js.php:1133
 msgid "Add host interface"
-msgstr ""
+msgstr "Afegir interfície de l'equip"
 
 #: include/actions.inc.php:653 include/actions.inc.php:871
 msgid "Add host tags"
@@ -1135,7 +1135,7 @@ msgstr "Normes addicionals"
 
 #: app/views/host.wizard.edit.php:521 app/views/host.wizard.edit.php:544
 msgid "Additionally, make sure to complete the agent installation as described in this step, then return to this screen to continue to the next step."
-msgstr ""
+msgstr "A més, assegureu-vos d'acabar la instal·lació de l'agent tal com es descriu en aquesta passa i, tot seguit, torneu a aquesta pantalla per continuar amb la passa següent."
 
 #: app/controllers/CControllerProxyCreate.php:82
 #: app/controllers/CControllerProxyUpdate.php:76
@@ -1217,7 +1217,7 @@ msgstr "Agent (passiu)"
 
 #: app/views/host.wizard.edit.php:597
 msgid "Agent address"
-msgstr ""
+msgstr "Adreça de l'agent"
 
 #: include/classes/data/CItemData.php:911
 msgid "Agent availability check. Returns nothing - unavailable; 1 - available"
@@ -1237,7 +1237,7 @@ msgstr "Nom d'equip de l'agent. Retorna una cadena"
 
 #: app/views/js/host.wizard.edit.js.php:96
 msgid "Agent interface"
-msgstr ""
+msgstr "Interfície d'agent"
 
 #: include/views/inventory.host.view.php:64
 msgid "Agent interfaces"
@@ -1245,11 +1245,11 @@ msgstr "Interfícies d'agent"
 
 #: app/views/host.wizard.edit.php:163 app/views/js/host.wizard.edit.js.php:1788
 msgid "Agent mode"
-msgstr ""
+msgstr "Mode d'agent"
 
 #: app/views/host.wizard.edit.php:603
 msgid "Agent port"
-msgstr ""
+msgstr "Port de l'agent"
 
 #: include/classes/data/CItemData.php:919
 msgid "Agent variant check. Returns 1 - for Zabbix agent; 2 - for Zabbix agent 2"
@@ -1257,11 +1257,11 @@ msgstr "Comprovació de variants d'agent. Retorna 1 - per a l'agent Zabbix; 2 - 
 
 #: app/views/host.wizard.edit.php:158 app/views/js/host.wizard.edit.js.php:1781
 msgid "Agent-based"
-msgstr ""
+msgstr "Basat en agents"
 
 #: app/views/host.wizard.edit.php:159 app/views/js/host.wizard.edit.js.php:1782
 msgid "Agentless"
-msgstr ""
+msgstr "Sense agent"
 
 #: widgets/svggraph/includes/CWidgetFieldDataSetView.php:417
 msgid "Aggregate"
@@ -1453,12 +1453,12 @@ msgstr "Quantitat de memòria física de l'equip consumida per fer una còpia de
 #: include/classes/api/services/CItemGeneral.php:1913
 #, c-format
 msgid "An LLD rule prototype with key \"%1$s\" already exists on the host \"%2$s\"."
-msgstr ""
+msgstr "El prototip de regla LLD amb la clau \"%1$s\" ja existeix a l'equip \"%2$s\"."
 
 #: include/classes/api/services/CItemGeneral.php:1912
 #, c-format
 msgid "An LLD rule prototype with key \"%1$s\" already exists on the template \"%2$s\"."
-msgstr ""
+msgstr "El prototip de regla LLD amb la clau \"%1$s\" ja existeix a la plantilla \"%2$s\"."
 
 #: include/classes/api/services/CItemGeneral.php:1781
 #, c-format
@@ -1584,7 +1584,7 @@ msgstr "Qualsevol plantilla existent que no sigui present al fitxer d'importaci�
 
 #: app/views/host.wizard.edit.php:148
 msgid "Apache, AWS, MySQL, etc."
-msgstr ""
+msgstr "Apache, AWS, MySQL, etc."
 
 #: include/classes/core/CJsonRpc.php:225
 msgid "Application error."
@@ -2389,7 +2389,7 @@ msgstr "Cancel·lar"
 
 #: app/views/host.wizard.edit.php:1042
 msgid "Cancel Host Wizard?"
-msgstr ""
+msgstr "Voleu cancel·lar l'assistent d'equips?"
 
 #: app/controllers/CControllerTokenCreate.php:65
 #: app/controllers/CControllerTokenCreate.php:135
@@ -2420,7 +2420,7 @@ msgstr "No es pot pas afegir la pàgina tauler: s'han afegit el nombre màxim de
 
 #: host_discovery_prototypes.php:518
 msgid "Cannot add discovery prototype"
-msgstr ""
+msgstr "No es pot pas afegir un prototip de descoberta"
 
 #: host_discovery.php:540
 msgid "Cannot add discovery rule"
@@ -2639,17 +2639,17 @@ msgstr "No es poden pas convertir les dades POST:"
 #: include/classes/helpers/CItemGeneralHelper.php:1016
 #, c-format
 msgid "Cannot copy LLD rule prototype with key \"%1$s\" without its master item prototype with key \"%2$s\"."
-msgstr ""
+msgstr "No es pot pas copiar un prototip de regla LLD amb la clau \"%1$s\" sense el seu prototip d'element principal amb clau \"%2$s\"."
 
 #: include/classes/helpers/CItemGeneralHelper.php:1004
 #, c-format
 msgid "Cannot copy LLD rule prototype with key \"%1$s\" without its master item with key \"%2$s\"."
-msgstr ""
+msgstr "No es pot pas copiar el prototip de regla LLD amb la clau \"%1$s\" sense el seu element principal amb clau \"%2$s\"."
 
 #: include/classes/helpers/CItemGeneralHelper.php:1003
 #, c-format
 msgid "Cannot copy LLD rule with key \"%1$s\" without its master item with key \"%2$s\"."
-msgstr ""
+msgstr "No es pot pas copiar la regla LLD amb la clau \"%1$s\" sense el seu element principal amb clau \"%2$s\"."
 
 #: app/controllers/CControllerCopyCreate.php:183
 msgid "Cannot copy graph"
@@ -2858,8 +2858,8 @@ msgstr "No es pot esborrar la comprovació de descoberta \"%1$s\" de la regla de
 #: host_discovery_prototypes.php:313 host_discovery_prototypes.php:605
 msgid "Cannot delete discovery prototype"
 msgid_plural "Cannot delete discovery prototypes"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "No es pot pas esborrar un prototip de descoberta"
+msgstr[1] "No es poden pas esborrar els prototips de descoberta"
 
 #: app/controllers/CControllerDiscoveryDelete.php:68 host_discovery.php:390
 #: host_discovery.php:597
@@ -3184,8 +3184,8 @@ msgstr[1] "No poden pas desactivar els connectors"
 #: host_discovery_prototypes.php:586
 msgid "Cannot disable discovery prototype"
 msgid_plural "Cannot disable discovery prototypes"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "No es pot pas desactivar un prototip de descoberta"
+msgstr[1] "No es poden pas desactivar els prototips de descoberta"
 
 #: app/controllers/CControllerDiscoveryDisable.php:76 host_discovery.php:584
 msgid "Cannot disable discovery rule"
@@ -3280,8 +3280,8 @@ msgstr[1] "No poden pas activar els connectors"
 #: host_discovery_prototypes.php:585
 msgid "Cannot enable discovery prototype"
 msgid_plural "Cannot enable discovery prototypes"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "No es pot pas activar un prototip de descoberta"
+msgstr[1] "No es poden pas activar els prototips de descoberta"
 
 #: app/controllers/CControllerDiscoveryEnable.php:76 host_discovery.php:583
 msgid "Cannot enable discovery rule"
@@ -3363,7 +3363,7 @@ msgstr "No es poden pas ampliar les macros."
 #: include/classes/import/CConfigurationImport.php:1159
 #, c-format
 msgid "Cannot find \"parent_discovery_rule\" with key \"%1$s\" used for LLD rule prototype with key \"%2$s\" on \"%3$s\"."
-msgstr ""
+msgstr "No es pot trobar \"parent_discovery_rule\" amb la clau \"%1$s\" emprada per al prototip de regla LLD amb la clau \"%2$s\" a \"%3$s\"."
 
 #: include/classes/import/importers/CTemplateDashboardImporter.php:217
 #, c-format
@@ -3408,7 +3408,7 @@ msgstr "No es troba el grup d'equips \"%1$s\" per al prototip d'equips \"%2$s\" 
 #: include/classes/import/CConfigurationImport.php:1326
 #, c-format
 msgid "Cannot find host group \"%1$s\" for host prototype \"%2$s\" of discovery rule prototype \"%3$s\" on \"%4$s\"."
-msgstr ""
+msgstr "No es troba el grup d'equips \"%1$s\" per al prototip d'equips \"%2$s\" del prototip de regla de descoberta \"%3$s\" a \"%4$s\"."
 
 #: include/classes/api/services/CDiscoveryRule.php:3350
 #, c-format
@@ -3453,7 +3453,7 @@ msgstr "No es pot pas trobar la interfície \"%1$s\" emprada per al prototip d'e
 #: include/classes/import/CConfigurationImport.php:1220
 #, c-format
 msgid "Cannot find interface \"%1$s\" used for item prototype \"%2$s\" of discovery rule prototype \"%3$s\" on \"%4$s\"."
-msgstr ""
+msgstr "No es pot pas trobar la interfície \"%1$s\" emprada per al prototip d'element \"%2$s\" del prototip de regla de descoberta \"%3$s\" a \"%4$s\"."
 
 #: include/classes/import/CConfigurationImport.php:1852
 #, c-format
@@ -3468,7 +3468,7 @@ msgstr "No es pot pas trobar l'element \"%1$s\" a \"%2$s\" emprat com a valor MA
 #: include/classes/import/CConfigurationImport.php:1515
 #, c-format
 msgid "Cannot find item \"%1$s\" on \"%2$s\" used as the Y axis MAX value for graph prototype \"%3$s\" of discovery rule prototype \"%4$s\" on \"%5$s\"."
-msgstr ""
+msgstr "No es pot pas trobar l'element \"%1$s\" a \"%2$s\" emprat com a valor MAX de l'eix Y per al prototip de gràfic \"%3$s\" del prototip de regla de descoberta \"%4$s\" a \"%5$s\"."
 
 #: include/classes/import/CConfigurationImport.php:1834
 #, c-format
@@ -3483,7 +3483,7 @@ msgstr "No es pot pas trobar l'element \"%1$s\" a \"%2$s\" emprat com a valor MI
 #: include/classes/import/CConfigurationImport.php:1490
 #, c-format
 msgid "Cannot find item \"%1$s\" on \"%2$s\" used as the Y axis MIN value for graph prototype \"%3$s\" of discovery rule prototype \"%4$s\" on \"%5$s\"."
-msgstr ""
+msgstr "No es pot pas trobar l'element \"%1$s\" a \"%2$s\" emprat com a valor MIN de l'eix Y per al prototip de gràfic \"%3$s\" del prototip de regla de descoberta \"%4$s\" a \"%5$s\"."
 
 #: include/classes/import/importers/CMapImporter.php:244
 #, c-format
@@ -3503,7 +3503,7 @@ msgstr "No es pot pas trobar l'element \"%1$s\" a \"%2$s\" emprat al prototip de
 #: include/classes/import/CConfigurationImport.php:1540
 #, c-format
 msgid "Cannot find item \"%1$s\" on \"%2$s\" used in graph prototype \"%3$s\" of discovery rule prototype \"%4$s\" on \"%5$s\"."
-msgstr ""
+msgstr "No es pot pas trobar l'element \"%1$s\" a \"%2$s\" emprat al prototip de gràfic \"%3$s\" del prototip de regla de descoberta \"%4$s\" a \"%5$s\"."
 
 #: include/classes/import/importers/CTemplateDashboardImporter.php:166
 #, c-format
@@ -3538,7 +3538,7 @@ msgstr "No es pot pas trobar la plantilla \"%1$s\" per al prototip d'equip \"%2$
 #: include/classes/import/CConfigurationImport.php:1353
 #, c-format
 msgid "Cannot find template \"%1$s\" for host prototype \"%2$s\" of discovery rule prototype \"%3$s\" on \"%4$s\"."
-msgstr ""
+msgstr "No es pot pas trobar la plantilla \"%1$s\" per al prototip d'equip \"%2$s\" del prototip de regla de descoberta \"%3$s\" a \"%4$s\"."
 
 #: include/classes/import/CConfigurationImport.php:1182
 #, c-format
@@ -3573,7 +3573,7 @@ msgstr "No es pot pas trobar el mapa de valors \"%1$s\" emprat al prototip d'ele
 #: include/classes/import/CConfigurationImport.php:1243
 #, c-format
 msgid "Cannot find value map \"%1$s\" used for item prototype \"%2$s\" of discovery rule prototype \"%3$s\" on \"%4$s\"."
-msgstr ""
+msgstr "No es pot pas trobar el mapa de valors \"%1$s\" emprat al prototip d'element \"%2$s\" del prototip de regla de descoberta \"%3$s\" a \"%4$s\"."
 
 #: app/views/oauth.edit.php:230
 msgid "Cannot get authorization code."
@@ -3614,72 +3614,72 @@ msgstr "No es poden pas heretar les regles LLD la clau \"%1$s\" dels models \"%2
 #: include/classes/api/services/CItemGeneral.php:1000
 #, c-format
 msgid "Cannot inherit LLD rule prototype with key \"%1$s\" of template \"%2$s\" and LLD rule \"%3$s\" to host \"%4$s\", because an LLD rule prototype with the same key already belongs to LLD rule \"%5$s\"."
-msgstr ""
+msgstr "No es pot pas heretar un prototip de regla LLD amb la clau \"%1$s\" de la plantilla \"%2$s\" i la regla LLD \"%3$s\" sobre l'equip \"%4$s\", doncs un prototip de regla LLD amb la mateixa clau ja pertany a la regla LLD \"%5$s\"."
 
 #: include/classes/api/services/CItemGeneral.php:1001
 #, c-format
 msgid "Cannot inherit LLD rule prototype with key \"%1$s\" of template \"%2$s\" and LLD rule \"%3$s\" to template \"%4$s\", because an LLD rule prototype with the same key already belongs to LLD rule \"%5$s\"."
-msgstr ""
+msgstr "No es pot pas heretar un prototip de regla LLD amb la clau \"%1$s\" de l'equip \"%2$s\" i la regla LLD \"%3$s\" sobre l'equip \"%4$s\", doncs un prototip de regla LLD amb la mateixa clau ja pertany a la regla LLD \"%5$s\"."
 
 #: include/classes/api/services/CItemGeneral.php:926
 #, c-format
 msgid "Cannot inherit LLD rule prototype with key \"%1$s\" of template \"%2$s\" to host \"%3$s\", because a discovered LLD rule prototype with the same key already exists."
-msgstr ""
+msgstr "No es pot pas heretar el prototip de regla LDD amb la clau \"%1$s\" de la plantilla \"%2$s\" a l'equip \"%3$s\", doncs ja hi ha un prototip de regla LLD descobert amb la mateixa clau."
 
 #: include/classes/api/services/CItemGeneral.php:1358
 #, c-format
 msgid "Cannot inherit LLD rule prototype with key \"%1$s\" of template \"%2$s\" to host \"%3$s\", because a host interface of type \"%4$s\" is required."
-msgstr ""
+msgstr "No es pot pas heretar el prototip de regla LDD amb la clau \"%1$s\" de la plantilla \"%2$s\" a l'equip \"%3$s\", doncs es requereix una interfície d'equip del tipus \"%4$s\"."
 
 #: include/classes/api/services/CItemGeneral.php:969
 #, c-format
 msgid "Cannot inherit LLD rule prototype with key \"%1$s\" of template \"%2$s\" to host \"%3$s\", because an LLD rule prototype with the same key is already inherited from template \"%4$s\"."
-msgstr ""
+msgstr "No es pot pas heretar el prototip de regla LDD amb la clau \"%1$s\" de la plantilla \"%2$s\" a l'equip \"%3$s\", doncs ja hi ha un prototip de regla LLD amb la mateixa clau heretat de la plantilla \"%4$s\"."
 
 #: include/classes/api/services/CItemGeneral.php:921
 #, c-format
 msgid "Cannot inherit LLD rule prototype with key \"%1$s\" of template \"%2$s\" to host \"%3$s\", because an LLD rule with the same key already exists."
-msgstr ""
+msgstr "No es pot pas heretar el prototip de regla LLD amb clau \"%1$s\" de la plantilla \"%2$s\" a l'equip \"%3$s\", doncs ja hi ha una regla LLD amb la mateixa clau."
 
 #: include/classes/api/services/CItemGeneral.php:914
 #, c-format
 msgid "Cannot inherit LLD rule prototype with key \"%1$s\" of template \"%2$s\" to host \"%3$s\", because an item prototype with the same key already exists."
-msgstr ""
+msgstr "No es pot pas heretar el prototip de regla LDD amb la clau \"%1$s\" de la plantilla \"%2$s\" a l'equip \"%3$s\", doncs ja hi ha un prototip d'element amb la mateixa clau."
 
 #: include/classes/api/services/CItemGeneral.php:907
 #, c-format
 msgid "Cannot inherit LLD rule prototype with key \"%1$s\" of template \"%2$s\" to host \"%3$s\", because an item with the same key already exists."
-msgstr ""
+msgstr "No es pot pas heretar el prototip de regla LDD amb la clau \"%1$s\" de la plantilla \"%2$s\" a l'equip \"%3$s\", doncs ja hi ha un element amb la mateixa clau."
 
 #: include/classes/api/services/CItemGeneral.php:970
 #, c-format
 msgid "Cannot inherit LLD rule prototype with key \"%1$s\" of template \"%2$s\" to template \"%3$s\", because an LLD rule prototype with the same key is already inherited from template \"%4$s\"."
-msgstr ""
+msgstr "No es pot pas heretar el prototip de regla LDD amb la clau \"%1$s\" de la plantilla \"%2$s\" a la plantilla \"%3$s\", doncs ja hi ha un prototip de regla LLD amb la mateixa clau heretat de la plantilla \"%4$s\"."
 
 #: include/classes/api/services/CItemGeneral.php:922
 #, c-format
 msgid "Cannot inherit LLD rule prototype with key \"%1$s\" of template \"%2$s\" to template \"%3$s\", because an LLD rule with the same key already exists."
-msgstr ""
+msgstr "No es pot pas heretar el prototip de regla LLD amb clau \"%1$s\" de la plantilla \"%2$s\" a la plantilla \"%3$s\", doncs ja hi ha una regla LLD amb la mateixa clau."
 
 #: include/classes/api/services/CItemGeneral.php:915
 #, c-format
 msgid "Cannot inherit LLD rule prototype with key \"%1$s\" of template \"%2$s\" to template \"%3$s\", because an item prototype with the same key already exists."
-msgstr ""
+msgstr "No es pot pas heretar el prototip de regla LDD amb la clau \"%1$s\" de la plantilla \"%2$s\" a la plantilla \"%3$s\", doncs ja hi ha un prototip d'element amb la mateixa clau."
 
 #: include/classes/api/services/CItemGeneral.php:908
 #, c-format
 msgid "Cannot inherit LLD rule prototype with key \"%1$s\" of template \"%2$s\" to template \"%3$s\", because an item with the same key already exists."
-msgstr ""
+msgstr "No es pot pas heretar el prototip de regla LDD amb la clau \"%1$s\" de la plantilla \"%2$s\" a la plantilla \"%3$s\", doncs ja hi ha un element amb la mateixa clau."
 
 #: include/classes/api/services/CItemGeneral.php:717
 #, c-format
 msgid "Cannot inherit LLD rule prototypes with key \"%1$s\" of both \"%2$s\" and \"%3$s\" templates, because the key must be unique on host \"%4$s\"."
-msgstr ""
+msgstr "No es poden pas heretar els prototips de regles LLD la clau \"%1$s\" dels models \"%2$s\" i \"%3$s\", doncs la clau ha d'ésser única a l'equip \"%4$s\"."
 
 #: include/classes/api/services/CItemGeneral.php:718
 #, c-format
 msgid "Cannot inherit LLD rule prototypes with key \"%1$s\" of both \"%2$s\" and \"%3$s\" templates, because the key must be unique on template \"%4$s\"."
-msgstr ""
+msgstr "No es poden pas heretar els prototips de regles LLD la clau \"%1$s\" dels models \"%2$s\" i \"%3$s\", doncs la clau ha d'ésser única a la plantilla \"%4$s\"."
 
 #: include/classes/api/services/CItemGeneral.php:819
 #, c-format
@@ -3694,7 +3694,7 @@ msgstr "No es pot pas heretar la regla LLD amb la clau \"%1$s\" de la plantilla 
 #: include/classes/api/services/CItemGeneral.php:897
 #, c-format
 msgid "Cannot inherit LLD rule with key \"%1$s\" of template \"%2$s\" to host \"%3$s\", because an LLD rule prototype with the same key already exists."
-msgstr ""
+msgstr "No es pot pas heretar la regla LDD amb la clau \"%1$s\" de la plantilla \"%2$s\" a l'equip \"%3$s\", doncs ja hi ha un prototip de regla LLD amb la mateixa clau."
 
 #: include/classes/api/services/CItemGeneral.php:874
 #, c-format
@@ -3719,7 +3719,7 @@ msgstr "No es pot pas heretar la regla LLD amb la clau \"%1$s\" de la plantilla 
 #: include/classes/api/services/CItemGeneral.php:898
 #, c-format
 msgid "Cannot inherit LLD rule with key \"%1$s\" of template \"%2$s\" to template \"%3$s\", because an LLD rule prototype with the same key already exists."
-msgstr ""
+msgstr "No es pot pas heretar la regla LDD amb la clau \"%1$s\" de la plantilla \"%2$s\" a la plantilla \"%3$s\", doncs ja hi ha un prototip de regla LLD amb la mateixa clau."
 
 #: include/classes/api/services/CItemGeneral.php:875
 #, c-format
@@ -3759,7 +3759,7 @@ msgstr "No es pot pas heretar un prototip d'element amb la clau \"%1$s\" de la p
 #: include/classes/api/services/CItemGeneral.php:856
 #, c-format
 msgid "Cannot inherit item prototype with key \"%1$s\" of template \"%2$s\" to host \"%3$s\", because a discovered item prototype with the same key already exists."
-msgstr ""
+msgstr "No es pot pas heretar el prototip d'element amb clau \"%1$s\" de la plantilla \"%2$s\" a l'equip \"%3$s\", doncs ja hi ha un protip d'element descobert amb la mateixa clau."
 
 #: include/classes/api/services/CItemGeneral.php:841
 #, c-format
@@ -3774,7 +3774,7 @@ msgstr "No es pot pas heretar el prototip d'element amb la clau \"%1$s\" de la p
 #: include/classes/api/services/CItemGeneral.php:869
 #, c-format
 msgid "Cannot inherit item prototype with key \"%1$s\" of template \"%2$s\" to host \"%3$s\", because an LLD rule prototype with the same key already exists."
-msgstr ""
+msgstr "No es pot pas heretar el prototip d'element amb clau \"%1$s\" de la plantilla \"%2$s\" a l'equip \"%3$s\", doncs ja hi ha un prototip de regla LLD amb la mateixa clau."
 
 #: include/classes/api/services/CItemGeneral.php:835
 #, c-format
@@ -3799,7 +3799,7 @@ msgstr "No es pot pas heretar el prototip d'element amb clau \"%1$s\" de la plan
 #: include/classes/api/services/CItemGeneral.php:870
 #, c-format
 msgid "Cannot inherit item prototype with key \"%1$s\" of template \"%2$s\" to template \"%3$s\", because an LLD rule prototype with the same key already exists."
-msgstr ""
+msgstr "No es pot pas heretar el prototip d'element amb clau \"%1$s\" de la plantilla \"%2$s\" a la plantilla \"%3$s\", doncs ja hi ha un prototip de regla LLD amb la mateixa clau."
 
 #: include/classes/api/services/CItemGeneral.php:836
 #, c-format
@@ -3839,7 +3839,7 @@ msgstr "No es pot pas heretar l'element amb clau \"%1$s\" de la plantilla \"%2$s
 #: include/classes/api/services/CItemGeneral.php:891
 #, c-format
 msgid "Cannot inherit item with key \"%1$s\" of template \"%2$s\" to host \"%3$s\", because a discovered LLD rule with the same key already exists."
-msgstr ""
+msgstr "No es pot pas heretar l'element amb la clau \"%1$s\" de la plantilla \"%2$s\" a l'equip \"%3$s\", doncs ja hi ha una regla LLD trobada amb la mateixa clau."
 
 #: include/classes/api/services/CItemGeneral.php:797
 #, c-format
@@ -3854,7 +3854,7 @@ msgstr "No es pot pas heretar l'element amb la clau \"%1$s\" de la plantilla \"%
 #: include/classes/api/services/CItemGeneral.php:841
 #, c-format
 msgid "Cannot inherit item with key \"%1$s\" of template \"%2$s\" to host \"%3$s\", because an LLD rule prototype with the same key already exists."
-msgstr ""
+msgstr "No es pot pas heretar l'element amb clau \"%1$s\" de la plantilla \"%2$s\" a l'equip \"%3$s\", doncs ja hi ha un prototip de regla LLD amb la mateixa clau."
 
 #: include/classes/api/services/CItemGeneral.php:785
 #, c-format
@@ -3884,7 +3884,7 @@ msgstr "No es pot pas heretar l'element amb la clau \"%1$s\" de la plantilla \"%
 #: include/classes/api/services/CItemGeneral.php:842
 #, c-format
 msgid "Cannot inherit item with key \"%1$s\" of template \"%2$s\" to template \"%3$s\", because an LLD rule prototype with the same key already exists."
-msgstr ""
+msgstr "No es pot pas heretar l'element amb clau \"%1$s\" de la plantilla \"%2$s\" a la plantilla \"%3$s\", doncs ja hi ha un prototip de regla LLD amb la mateixa clau."
 
 #: include/classes/api/services/CItemGeneral.php:786
 #, c-format
@@ -4382,7 +4382,7 @@ msgstr "No pot pas actualitzar el connector"
 
 #: host_discovery_prototypes.php:526 host_discovery_prototypes.php:550
 msgid "Cannot update discovery prototype"
-msgstr ""
+msgstr "No es pot pas actualitzar un prototip de descoberta"
 
 #: app/controllers/CControllerDiscoveryUpdate.php:48
 #: app/controllers/CControllerDiscoveryUpdate.php:96 host_discovery.php:548
@@ -4715,7 +4715,7 @@ msgstr "Canvi per segon"
 
 #: app/views/host.wizard.edit.php:386
 msgid "Change pre-shared key"
-msgstr ""
+msgstr "Canvia la clau precompartida"
 
 #: include/classes/helpers/CRoleHelper.php:561
 msgid "Change problem ranking"
@@ -4913,16 +4913,16 @@ msgstr "Esborra en desenllaçar"
 #: app/views/host.wizard.edit.php:1007
 #, c-format
 msgid "Click %1$s to complete the setup."
-msgstr ""
+msgstr "Feu clic a %1$s per acabar la configuració."
 
 #: app/views/js/host.wizard.edit.js.php:771
 msgid "Click Finish to close the Host wizard."
-msgstr ""
+msgstr "Feu clic a Acabar per tancar l'assistent d'equip."
 
 #: app/views/js/host.wizard.edit.js.php:770
 #, c-format
 msgid "Click Finish to navigate to the Latest data section and view the most recent data for your host (%1$s)."
-msgstr ""
+msgstr "Feu clic a Acabar per navegar a la secció de Dades més recents i veure les dades més recents del vostre equip (%1$s)."
 
 #: jsLoader.php:157
 msgid "Click and drag to desired size."
@@ -5070,7 +5070,7 @@ msgstr "El color \"%1$s\" no és correcte: s'espera un codi de color hexadecimal
 
 #: include/views/js/monitoring.sysmaps.js.php:807
 msgid "Color (OK)"
-msgstr "Color (d'acord)"
+msgstr "Color (correcte)"
 
 #: widgets/honeycomb/includes/WidgetForm.php:213
 msgid "Color interpolation"
@@ -5110,6 +5110,10 @@ msgstr "Comunicació"
 
 #: app/views/host.wizard.edit.php:375
 msgid "Communication between Zabbix agent and server/proxy is secured with a unique user-defined pre-shared key identity and a secret pre-shared key linked to it."
+msgstr "La comunicació entre l'agent Zabbix i el servidor/proxy és protegida amb una identitat de clau precompartida única definida per l'usuari i una clau secreta precompartida vinculada a aquesta."
+
+#: app/views/host.wizard.edit.php:414
+msgid "Communication between Zabbix agent and server/proxy is secured with the pre-shared key (PSK) encryption method."
 msgstr ""
 
 #: include/items.inc.php:946
@@ -5175,7 +5179,7 @@ msgstr "Estadístiques de configuració de la memòria cau. Memòria cau - memò
 
 #: app/views/host.wizard.edit.php:1024
 msgid "Configuration complete"
-msgstr ""
+msgstr "Configuració acabada"
 
 #: include/classes/setup/CSetupWizard.php:1061
 #, c-format
@@ -5205,7 +5209,7 @@ msgstr "Configuració dels quadres de comandament"
 
 #: host_discovery_prototypes.php:22
 msgid "Configuration of discovery prototypes"
-msgstr ""
+msgstr "Configuració dels prototips de descoberta"
 
 #: app/controllers/CControllerDiscoveryEdit.php:144
 #: app/controllers/CControllerDiscoveryList.php:143 host_discovery.php:27
@@ -5375,13 +5379,13 @@ msgstr "Configurar el provisionament JIT"
 
 #: app/views/host.wizard.edit.php:368
 msgid "Configure encryption"
-msgstr ""
+msgstr "Configurar el xifrat"
 
 #: app/views/host.wizard.edit.php:895 app/views/host.wizard.edit.php:926
 #: app/views/host.wizard.edit.php:1006
 #: app/views/js/host.wizard.edit.js.php:1138
 msgid "Configure host"
-msgstr ""
+msgstr "Configurar equip"
 
 #: app/controllers/CControllerOauthAuthorize.php:166
 #: app/views/mediatype.edit.php:155
@@ -5738,7 +5742,7 @@ msgstr "Recompte de valors encuats a la cua de preprocessament."
 #: app/views/js/host.wizard.edit.js.php:761
 #: app/views/js/host.wizard.edit.js.php:1441
 msgid "Create"
-msgstr ""
+msgstr "Crear"
 
 #: app/views/administration.token.list.php:109
 #: app/views/administration.user.token.list.php:76
@@ -5802,7 +5806,7 @@ msgstr "Crea desactivat"
 
 #: include/views/configuration.host.discovery.prototype.list.php:34
 msgid "Create discovery prototype"
-msgstr ""
+msgstr "Crear un prototip de descoberta"
 
 #: app/views/configuration.discovery.list.php:35
 #: include/views/configuration.host.discovery.list.php:39
@@ -5942,7 +5946,7 @@ msgstr "Crea un informe nou"
 
 #: app/views/host.wizard.edit.php:273 app/views/js/host.wizard.edit.js.php:1122
 msgid "Create or select a host"
-msgstr ""
+msgstr "Crear o triar un equip"
 
 #: app/views/administration.proxy.list.php:239
 msgid "Create proxy"
@@ -6147,6 +6151,10 @@ msgstr "Els noms de gravetat personalitzats afecten a totes les configuracions r
 msgid "Custom size"
 msgstr "Mida personalitzada"
 
+#: app/views/host.wizard.edit.php:138
+msgid "Custom templates are not supported."
+msgstr ""
+
 #: app/views/administration.miscconfig.edit.php:103
 #: include/classes/setup/CSetupWizard.php:561
 msgid "CyberArk Vault"
@@ -6315,13 +6323,17 @@ msgstr "Recollida d'informació"
 msgid "Data from %1$s. Generated in %2$s sec."
 msgstr "Dades de %1$s. Generat en %2$s segons."
 
+#: app/views/host.wizard.edit.php:168
+msgid "Data is collected by Zabbix agent, a lightweight software `component installed on your monitoring target."
+msgstr ""
+
 #: app/views/js/host.wizard.edit.js.php:89
 msgid "Data is collected by Zabbix agent, a lightweight software component installed on your monitoring target."
-msgstr ""
+msgstr "Les dades les recull l'agent Zabbix, un component de programari lleuger instal·lat a l'equip a monitorar."
 
 #: app/views/js/host.wizard.edit.js.php:90
 msgid "Data is collected by Zabbix server or proxy using standard protocols (e.g., SNMP, ICMP) or remote access methods (e.g., SSH)."
-msgstr ""
+msgstr "Les dades són recollides pel servidor o proxy Zabbix mitjançant protocols estàndard (per exemple, SNMP, ICMP) o mètodes d'accés remot (per exemple, SSH)."
 
 #: app/views/js/webscenario.step.edit.js.php:297
 msgid "Data is not properly encoded."
@@ -6734,7 +6746,7 @@ msgstr "Vols esborrar el tauler?"
 
 #: include/views/configuration.host.discovery.prototype.edit.php:1086
 msgid "Delete discovery prototype?"
-msgstr ""
+msgstr "Esborrem el prototip de descoberta?"
 
 #: app/views/configuration.discovery.edit.php:264
 #: include/views/configuration.host.discovery.edit.php:1032
@@ -6839,11 +6851,11 @@ msgstr "Vols esborrar els taulers de control triats?"
 
 #: include/views/configuration.host.discovery.prototype.list.php:280
 msgid "Delete selected discovery prototype?"
-msgstr ""
+msgstr "Esborrem el prototip de descoberta triat?"
 
 #: include/views/configuration.host.discovery.prototype.list.php:281
 msgid "Delete selected discovery prototypes?"
-msgstr ""
+msgstr "Esborrem els prototips de descoberta triats?"
 
 #: app/views/js/configuration.discovery.list.js.php:113
 #: include/views/configuration.host.discovery.list.php:370
@@ -7385,11 +7397,11 @@ msgstr "Desactivar els connectors escollits?"
 
 #: include/views/configuration.host.discovery.prototype.list.php:265
 msgid "Disable selected discovery prototype?"
-msgstr ""
+msgstr "Desactivem el prototip de descoberta triat?"
 
 #: include/views/configuration.host.discovery.prototype.list.php:266
 msgid "Disable selected discovery prototypes?"
-msgstr ""
+msgstr "Desactivem els prototips de descoberta triats?"
 
 #: app/views/js/configuration.discovery.list.js.php:97
 #: include/views/configuration.host.discovery.list.php:349
@@ -7664,33 +7676,33 @@ msgstr "Descoberta de màquines virtuals VMware, \"url\" - URL del servei de VMw
 #: include/views/configuration.host.discovery.prototype.edit.php:1051
 #: include/views/js/configuration.host.discovery.edit.overr.js.php:156
 msgid "Discovery prototype"
-msgstr ""
+msgstr "Prototip de descoberta"
 
 #: host_discovery_prototypes.php:515
 msgid "Discovery prototype created"
-msgstr ""
+msgstr "Prototip de descoberta creat"
 
 #: host_discovery_prototypes.php:313 host_discovery_prototypes.php:604
 msgid "Discovery prototype deleted"
 msgid_plural "Discovery prototypes deleted"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "Prototip de descoberta esborrat"
+msgstr[1] "Prototips de descoberta esborrats"
 
 #: host_discovery_prototypes.php:579
 msgid "Discovery prototype disabled"
 msgid_plural "Discovery prototypes disabled"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "Prototip de descoberta desactivat"
+msgstr[1] "Prototips de descoberta desactivats"
 
 #: host_discovery_prototypes.php:578
 msgid "Discovery prototype enabled"
 msgid_plural "Discovery prototypes enabled"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "Prototip de descoberta activat"
+msgstr[1] "Prototips de descoberta activats"
 
 #: host_discovery_prototypes.php:523 host_discovery_prototypes.php:547
 msgid "Discovery prototype updated"
-msgstr ""
+msgstr "Prototip de descoberta actualitzat"
 
 #: include/html.inc.php:645
 #: include/views/configuration.host.discovery.list.php:389
@@ -7698,7 +7710,7 @@ msgstr ""
 #: include/views/configuration.host.discovery.prototype.list.php:25
 #: include/views/configuration.host.discovery.prototype.list.php:241
 msgid "Discovery prototypes"
-msgstr ""
+msgstr "Prototips de descoberta"
 
 #: app/controllers/CControllerAuditLogList.php:228
 #: app/views/configuration.discovery.edit.php:285
@@ -7865,7 +7877,7 @@ msgstr "Denominador de divisió"
 
 #: app/views/host.wizard.edit.php:114
 msgid "Do not show welcome screen"
-msgstr ""
+msgstr "Treure la pantalla de benvinguda"
 
 #: app/views/popup.lldoperation.php:188 app/views/popup.lldoperation.php:209
 #: app/views/popup.massupdate.item.php:315
@@ -8207,7 +8219,7 @@ msgstr "Activar l'autenticació HTTP per a tots els usuaris."
 
 #: app/views/host.wizard.edit.php:811
 msgid "Enable IPMI checks on Zabbix server"
-msgstr ""
+msgstr "Activar les comprovacions IPMI al servidor Zabbix"
 
 #: app/views/administration.authentication.edit.php:209
 #: app/views/administration.authentication.edit.php:281
@@ -8286,7 +8298,7 @@ msgstr "Activa l'autenticació multifactor"
 
 #: app/views/host.wizard.edit.php:859
 msgid "Enable remote JMX monitoring"
-msgstr ""
+msgstr "Activar el monitoratge remot de JMX"
 
 #: app/views/administration.token.list.php:205
 #: app/views/administration.user.token.list.php:158
@@ -8324,11 +8336,11 @@ msgstr "Activar els connectors escollits?"
 
 #: include/views/configuration.host.discovery.prototype.list.php:259
 msgid "Enable selected discovery prototype?"
-msgstr ""
+msgstr "Activem el prototip de descoberta triat?"
 
 #: include/views/configuration.host.discovery.prototype.list.php:260
 msgid "Enable selected discovery prototypes?"
-msgstr ""
+msgstr "Activem els prototips de descoberta triats?"
 
 #: app/views/js/configuration.discovery.list.js.php:81
 #: include/views/configuration.host.discovery.list.php:343
@@ -8481,7 +8493,7 @@ msgstr "Xifrar"
 #: include/classes/setup/CSetupWizard.php:846
 #: include/classes/setup/CSetupWizard.php:1075
 msgid "Encrypt connections from Web interface"
-msgstr ""
+msgstr "Xifrar les connexions des de la interfície web"
 
 #: app/partials/configuration.host.edit.html.php:513
 #: app/views/administration.proxy.list.php:88
@@ -8512,23 +8524,23 @@ msgstr "Anglès (en_US)"
 
 #: app/views/host.wizard.edit.php:399
 msgid "Enter a non-secret pre-shared key identity string. Avoid including sensitive data."
-msgstr ""
+msgstr "Entreu una cadena d'identitat de clau compartida prèviament que no sigui secreta. Eviteu incloure-hi dades sensibles."
 
 #: app/views/host.wizard.edit.php:609
 msgid "Enter the IP/DNS address and port of the Zabbix agent installed on your monitoring target."
-msgstr ""
+msgstr "Entreu l'adreça IP/DNS i el port de l'agent Zabbix instal·lat a l'equip a monitorar."
 
 #: app/views/host.wizard.edit.php:771
 msgid "Enter the IP/DNS address and port of your IPMI-enabled monitoring target."
-msgstr ""
+msgstr "Entreu l'adreça IP/DNS i el port de l'equip a monitorar habilitat per a IPMI."
 
 #: app/views/host.wizard.edit.php:847
 msgid "Enter the IP/DNS address and port of your JMX-enabled monitoring target."
-msgstr ""
+msgstr "Entreu l'adreça IP/DNS i el port de l'equip a monitorar habilitat per a JMX."
 
 #: app/views/host.wizard.edit.php:642
 msgid "Enter the IP/DNS address, port, and authentication details of your SNMP-enabled monitoring target."
-msgstr ""
+msgstr "Entreu l'adreça IP/DNS, el port i els detalls d'autenticació de l'equip a monitorar amb SNMP activat."
 
 #: include/classes/validators/CFormValidator.php:1192 jsLoader.php:435
 #, c-format
@@ -9311,7 +9323,7 @@ msgstr "Mida de la lletra"
 
 #: app/views/host.wizard.edit.php:816 app/views/host.wizard.edit.php:873
 msgid "For more details, see"
-msgstr ""
+msgstr "Per a més detalls, veieu"
 
 #: app/views/webscenario.step.edit.php:106
 msgid "Form data"
@@ -9416,11 +9428,11 @@ msgstr "General"
 
 #: app/views/host.wizard.edit.php:417
 msgid "Generate a secret pre-shared key hexadecimal string."
-msgstr ""
+msgstr "Genereu una cadena hexadecimal de clau secreta precompartida."
 
 #: app/views/host.wizard.edit.php:411
 msgid "Generate new"
-msgstr ""
+msgstr "Generar-ne un de nou"
 
 #: app/partials/scheduledreport.subscription.php:34
 #: app/views/popup.scheduledreport.subscription.php:98
@@ -9653,7 +9665,7 @@ msgstr "Prototip de gràfic"
 #: include/classes/api/services/CGraphGeneral.php:1354
 #, c-format
 msgid "Graph prototype \"%1$s\" already exists on \"%2$s\" as a discovered graph prototype."
-msgstr ""
+msgstr "El prototip de gràfic \"%1$s\" ja existeix a \"%2$s\" com a prototip de gràfic trobat."
 
 #: include/classes/api/services/CGraphPrototype.php:470
 #, c-format
@@ -10185,7 +10197,7 @@ msgstr "IP de l'equip"
 #: app/controllers/CControllerPopup.php:49
 #: app/views/configuration.host.list.php:35
 msgid "Host Wizard"
-msgstr ""
+msgstr "Assistent d'equip"
 
 #: app/views/administration.script.list.php:99
 msgid "Host access"
@@ -10197,7 +10209,7 @@ msgstr "S'ha afegit l'equip"
 
 #: app/controllers/CControllerHostWizardCreate.php:142
 msgid "Host added successfully"
-msgstr ""
+msgstr "S'ha afegit correctament l'equip"
 
 #: app/controllers/CControllerPopupItemTest.php:1351
 #: app/views/popup.itemtestedit.view.php:99
@@ -10558,7 +10570,7 @@ msgstr[1] "Equips actualitzats"
 
 #: app/controllers/CControllerHostWizardUpdate.php:147
 msgid "Host updated successfully"
-msgstr ""
+msgstr "S'ha actualitzat correctament l'equip"
 
 #: include/classes/api/services/CDashboardGeneral.php:583
 #, c-format
@@ -10635,7 +10647,7 @@ msgstr "Equips"
 
 #: app/views/host.wizard.edit.php:278
 msgid "Hosts are organized into host groups for easier management and access control."
-msgstr ""
+msgstr "Els equips s'organitzen en grups d'equips per facilitar la gestió i el control d'accés."
 
 #: widgets/dataover/includes/WidgetForm.php:65
 #: widgets/trigover/includes/WidgetForm.php:72
@@ -10737,7 +10749,7 @@ msgstr "IPMI"
 
 #: app/views/host.wizard.edit.php:759
 msgid "IPMI address"
-msgstr ""
+msgstr "Adreça IPMI"
 
 #: include/items.inc.php:96
 msgid "IPMI agent"
@@ -10745,7 +10757,7 @@ msgstr "Agent IPMI"
 
 #: app/views/host.wizard.edit.php:818
 msgid "IPMI checks"
-msgstr ""
+msgstr "Comprovacions IPMI"
 
 #: include/views/inventory.host.view.php:67
 msgid "IPMI interfaces"
@@ -10753,7 +10765,7 @@ msgstr "Interfícies IPMI"
 
 #: app/views/host.wizard.edit.php:765
 msgid "IPMI port"
-msgstr ""
+msgstr "Port IPMI"
 
 #: disc_prototypes.php:116 host_discovery.php:106
 #: include/views/configuration.host.discovery.edit.php:569
@@ -10924,7 +10936,7 @@ msgstr "Si el pes dels serveis fill amb l'estat %1$s o inferior és inferior a %
 
 #: app/views/host.wizard.edit.php:380
 msgid "If you do not know your PSK or would like to change it, click the button below. Note that changing the PSK may impact existing configurations."
-msgstr ""
+msgstr "Si no coneixeu pas la vostra PSK o voleu canviar-la, feu clic al botó següent. Tingueu en compte que canviar la PSK pot afectar les configuracions existents."
 
 #: include/classes/core/ZBase.php:767 include/func.inc.php:1688
 #: include/func.inc.php:1710
@@ -11039,7 +11051,7 @@ msgstr "En rang"
 
 #: app/views/host.wizard.edit.php:813
 msgid "In the Zabbix server configuration file (zabbix_server.conf), set the StartIPMIPollers parameter to a non-zero value."
-msgstr ""
+msgstr "Al fitxer de configuració del servidor Zabbix (zabbix_server.conf), definiu el paràmetre StartIPMIPollers a un valor diferent de zero."
 
 #: include/classes/widgets/fields/CWidgetFieldMultiSelectSla.php:31
 msgid "Inaccessible SLA"
@@ -11872,7 +11884,7 @@ msgstr "Camp d'inventari \"%1$s\": %2$s incorrecte."
 #: app/controllers/CControllerHostWizardUpdateGeneral.php:107
 #, c-format
 msgid "Incorrect value for macro \"%1$s\": %2$s."
-msgstr ""
+msgstr "Valor incorrecte per a la macro \"%1$s\": %2$s."
 
 #: include/classes/helpers/CServiceHelper.php:149
 msgid "Increase by"
@@ -11933,7 +11945,7 @@ msgstr "Sensors d'estat del proveïdor de maquinari de l'hipervisor de VMware, \
 
 #: include/func.inc.php:1610
 msgid "Info message"
-msgstr ""
+msgstr "Missatge d'informació"
 
 #: app/views/administration.trigdisplay.edit.php:110 include/items.inc.php:31
 #: widgets/geomap/Widget.php:40
@@ -12021,10 +12033,14 @@ msgstr "Instal·lar"
 
 #: app/views/host.wizard.edit.php:351 app/views/js/host.wizard.edit.js.php:1128
 msgid "Install Zabbix agent"
-msgstr ""
+msgstr "Instal·lar l'agent Zabbix"
 
 #: app/views/host.wizard.edit.php:512 app/views/host.wizard.edit.php:535
 msgid "Install Zabbix agent 2 and its plugins on your monitoring target by following the installation instructions below."
+msgstr "Instal·leu l'agent 2 de Zabbix i els seus complements a l'equip a monitorar seguint les instruccions d'instal·lació següents."
+
+#: app/views/host.wizard.edit.php:551 app/views/host.wizard.edit.php:574
+msgid "Install Zabbix agent and its plugins on your monitoring target by following the installation instructions below."
 msgstr ""
 
 #: setup.php:163
@@ -12049,7 +12065,7 @@ msgstr "Integracions"
 
 #: app/views/js/host.wizard.edit.js.php:98
 msgid "Intelligent Platform Management Interface (IPMI)"
-msgstr ""
+msgstr "Interfície de gestió de plataformes intel·ligents (IPMI)"
 
 #: app/partials/monitoring.host.view.html.php:36
 #: app/views/configuration.host.list.php:208 app/views/popup.proxy.edit.php:68
@@ -12943,7 +12959,7 @@ msgstr "JMX"
 
 #: app/views/host.wizard.edit.php:835
 msgid "JMX address"
-msgstr ""
+msgstr "Adreça JMX"
 
 #: include/items.inc.php:99
 msgid "JMX agent"
@@ -12962,11 +12978,11 @@ msgstr "Interfícies JMX"
 
 #: app/views/host.wizard.edit.php:874
 msgid "JMX monitoring"
-msgstr ""
+msgstr "Monitoratge JMX"
 
 #: app/views/host.wizard.edit.php:841
 msgid "JMX port"
-msgstr ""
+msgstr "Port JMX"
 
 #: include/classes/html/CButtonExport.php:79
 msgid "JSON"
@@ -13020,7 +13036,7 @@ msgstr "Japonès (ja_JP)"
 
 #: app/views/js/host.wizard.edit.js.php:99
 msgid "Java Management Extensions (JMX) interface"
-msgstr ""
+msgstr "Interfície de les extensions de gestió de Java (JMX)"
 
 #: app/views/administration.mediatype.edit.php:235
 #: app/views/administration.script.edit.php:241
@@ -13146,11 +13162,11 @@ msgstr "Regla LLD"
 
 #: app/controllers/CControllerAuditLogList.php:227
 msgid "LLD rule prototype"
-msgstr ""
+msgstr "Prototip de regla LLD"
 
 #: include/classes/api/services/CItemGeneral.php:566
 msgid "LLD rule prototype with the same UUID already exists"
-msgstr ""
+msgstr "ja existeix un prototip de regla LLD amb el mateix UUID"
 
 #: include/classes/api/services/CItemGeneral.php:539
 msgid "LLD rule with the same UUID already exists"
@@ -13446,7 +13462,7 @@ msgstr "Plantilles d'enllaç"
 
 #: app/views/host.wizard.edit.php:174
 msgid "Linked"
-msgstr ""
+msgstr "Enllaçat"
 
 #: widgets/navtree/views/navtreeitem.edit.php:65
 msgid "Linked map"
@@ -13467,7 +13483,7 @@ msgstr "Enllaços"
 
 #: app/views/host.wizard.edit.php:431
 msgid "Linux"
-msgstr ""
+msgstr "Linux"
 
 #: include/classes/html/CList.php:39
 msgid "List is empty"
@@ -13738,7 +13754,7 @@ msgstr "Configuració de l'MFA"
 
 #: app/views/host.wizard.edit.php:550
 msgid "Mac OS"
-msgstr ""
+msgstr "Mac OS"
 
 #: app/controllers/CControllerAuditLogList.php:243
 #: app/partials/hostmacros.inherited.list.html.php:49
@@ -13765,7 +13781,7 @@ msgstr "La macro \"%1$s\" ja existeix."
 #: app/controllers/CControllerHostWizardUpdateGeneral.php:63
 #, c-format
 msgid "Macro \"%1$s\" is missing."
-msgstr ""
+msgstr "Manca la macro \"%1$s\"."
 
 #: app/controllers/CControllerHostCreate.php:180
 #: app/controllers/CControllerHostUpdate.php:185
@@ -15030,7 +15046,7 @@ msgstr "Necessari"
 
 #: include/items.inc.php:100
 msgid "Nested"
-msgstr ""
+msgstr "Niuat"
 
 #: app/views/administration.housekeeping.edit.php:77
 msgid "Network discovery data storage period"
@@ -15270,7 +15286,7 @@ msgstr "Nous valors"
 
 #: app/views/host.wizard.edit.php:59 app/views/js/host.wizard.edit.js.php:1450
 msgid "Next"
-msgstr ""
+msgstr "Següent"
 
 #: app/views/monitoring.host.dashboard.view.php:146
 msgid "Next dashboard"
@@ -15923,7 +15939,7 @@ msgstr "Elements no heretats"
 
 #: app/views/host.wizard.edit.php:175
 msgid "Not linked"
-msgstr ""
+msgstr "Sense enllaçar"
 
 #: app/controllers/CControllerLatest.php:546
 #: app/partials/configuration.filter.items.php:184
@@ -15941,12 +15957,12 @@ msgstr "Tingueu en compte que %1$s o %2$s es consideraran noms d'equips si s'emp
 
 #: app/views/host.wizard.edit.php:518 app/views/host.wizard.edit.php:541
 msgid "Note that during agent installation, you will need to configure both the PSK identity and PSK. Make sure they match the PSK identity and PSK set in step 1."
-msgstr ""
+msgstr "Tingueu en compte que durant la instal·lació de l'agent, haureu de configurar tant la identitat PSK com la PSK. Assegureu-vos que coincideixin amb la identitat PSK i la PSK establertes a la passa 1."
 
 #: app/views/host.wizard.edit.php:578
 #, c-format
 msgid "Note: %1$s must be configured and enabled on your monitoring target."
-msgstr ""
+msgstr "Nota: Cal configurar i activar %1$s a l'equip a monitorar."
 
 #: include/hosts.inc.php:229
 msgid "Notes"
@@ -16181,7 +16197,7 @@ msgstr "Prefixe OID"
 #: include/classes/screens/CScreenHttpTest.php:139 include/maps.inc.php:428
 #: include/triggers.inc.php:72
 msgid "OK"
-msgstr "D'acord"
+msgstr "Bé"
 
 #: app/partials/trigger.edit.trigger.tab.php:245
 msgid "OK event closes"
@@ -16252,12 +16268,12 @@ msgstr "Fora de línia"
 #: include/views/js/common.item.edit.js.php:294 jsLoader.php:416
 #: report2.php:512
 msgid "Ok"
-msgstr "D'acord"
+msgstr "Bé"
 
 #: widgets/web/views/widget.view.php:41
 msgctxt "compact table header"
 msgid "Ok"
-msgstr "D'acord"
+msgstr "Bé"
 
 #: app/views/js/correlation.edit.js.php:243
 #: include/classes/helpers/CCorrelationHelper.php:52
@@ -16275,7 +16291,7 @@ msgstr "Nom d'etiqueta antiga"
 
 #: app/views/host.wizard.edit.php:454
 msgid "Older version"
-msgstr ""
+msgstr "Versió anterior"
 
 #: include/views/monitoring.sysmap.constructor.php:51
 #: include/views/monitoring.sysmap.constructor.php:61 jsLoader.php:251
@@ -16402,7 +16418,7 @@ msgstr "Obrir a una nova finestra"
 #: app/views/host.wizard.edit.php:524 app/views/host.wizard.edit.php:547
 #: app/views/host.wizard.edit.php:553
 msgid "Open installation instructions"
-msgstr ""
+msgstr "Obrir les instruccions d'instal·lació"
 
 #: app/views/mediatype.test.edit.php:101 app/views/popup.scriptexec.php:41
 msgid "Open log"
@@ -16410,7 +16426,7 @@ msgstr "Obriu el registre"
 
 #: include/classes/server/CZabbixServer.php:627
 msgid "OpenSSL extension is not available."
-msgstr ""
+msgstr "L'extensió OpenSSL no és pas disponible."
 
 #: include/httptest.inc.php:414
 msgid "Opera"
@@ -16613,7 +16629,7 @@ msgstr "Un altre"
 
 #: app/views/host.wizard.edit.php:556
 msgid "Other OS"
-msgstr ""
+msgstr "Altres sistemes operatius"
 
 #: app/controllers/CControllerMiscConfigEdit.php:112
 #: app/views/administration.miscconfig.edit.php:30
@@ -17003,7 +17019,7 @@ msgstr "Els paràmetres \"esc_step_from\" i \"esc_step_to\" s'han d'establir con
 
 #: include/views/configuration.host.discovery.prototype.edit.php:66
 msgid "Parent discovery prototypes"
-msgstr ""
+msgstr "Prototips de descoberta principals"
 
 #: include/views/configuration.host.discovery.edit.php:56
 #: include/views/configuration.host.prototype.edit.php:66
@@ -17402,11 +17418,11 @@ msgstr "Resum de preinstal·lació"
 
 #: app/views/host.wizard.edit.php:405
 msgid "Pre-shared key"
-msgstr ""
+msgstr "Clau precompartida"
 
 #: app/views/host.wizard.edit.php:394
 msgid "Pre-shared key identity"
-msgstr ""
+msgstr "Identitat de clau precompartida"
 
 #: app/views/popup.triggerexpr.php:132
 msgid "Prediction functions"
@@ -19096,7 +19112,7 @@ msgstr "SNMP OID"
 
 #: app/views/host.wizard.edit.php:630
 msgid "SNMP address"
-msgstr ""
+msgstr "Adreça SNMP"
 
 #: app/views/administration.timeouts.edit.php:65
 #: app/views/popup.proxy.edit.php:228 include/items.inc.php:89
@@ -19120,7 +19136,7 @@ msgstr "Interfícies SNMP"
 
 #: app/views/host.wizard.edit.php:636
 msgid "SNMP port"
-msgstr ""
+msgstr "Port SNMP"
 
 #: include/items.inc.php:90
 msgid "SNMP trap"
@@ -19581,6 +19597,10 @@ msgstr "Nivell de seguretat"
 msgid "Security name"
 msgstr "Nom de seguretat"
 
+#: app/views/host.wizard.edit.php:132
+msgid "See"
+msgstr ""
+
 #: app/views/popup.condition.edit.php:402 app/views/popup.generic.php:874
 #: app/views/popup.massupdate.item.php:440 app/views/popup.services.php:92
 #: app/views/popup.triggerexpr.php:88 include/classes/html/CMultiSelect.php:70
@@ -19596,7 +19616,7 @@ msgstr "Tria un SLA per mostrar l'informe de l'SLA."
 
 #: app/views/host.wizard.edit.php:137 app/views/js/host.wizard.edit.js.php:1116
 msgid "Select a template"
-msgstr ""
+msgstr "Triar una plantilla"
 
 #: app/views/popup.massupdate.item.php:458 app/views/popup.triggerexpr.php:95
 #: include/views/configuration.graph.edit.php:242
@@ -19611,11 +19631,11 @@ msgstr "Trieu el mètode de recuperació: automàticament a través d'una pàgin
 
 #: app/views/host.wizard.edit.php:447
 msgid "Select the OS distribution"
-msgstr ""
+msgstr "Triar la distribució del sistema operatiu"
 
 #: app/views/host.wizard.edit.php:424
 msgid "Select the OS of your monitoring target"
-msgstr ""
+msgstr "Triar el sistema operatiu de l'equip a monitorar"
 
 #: app/views/administration.script.edit.php:283
 #: include/views/monitoring.history.php:185
@@ -19632,7 +19652,7 @@ msgstr "Elements triats"
 
 #: app/views/js/host.wizard.edit.js.php:1110
 msgid "Selected host"
-msgstr ""
+msgstr "Equip triat"
 
 #: widgets/svggraph/includes/WidgetForm.php:380
 msgid "Selected items only"
@@ -19748,17 +19768,17 @@ msgstr "Servidor (servidor intermediari)"
 
 #: include/classes/setup/CSetupWizard.php:1081
 msgid "Server TLS CA file"
-msgstr ""
+msgstr "Fitxer CA del servidor TLS"
 
 #: include/classes/setup/CSetupWizard.php:890
 #: include/classes/setup/CSetupWizard.php:1095
 msgid "Server TLS certificate issuer"
-msgstr ""
+msgstr "Emissor del certificat TLS del servidor"
 
 #: include/classes/setup/CSetupWizard.php:899
 #: include/classes/setup/CSetupWizard.php:1099
 msgid "Server TLS certificate subject"
-msgstr ""
+msgstr "Assumpte del certificat TLS del servidor"
 
 #: tests/selenium/modules/clock32/includes/WidgetForm.php:62
 #: widgets/clock/includes/WidgetForm.php:62
@@ -19938,7 +19958,7 @@ msgstr "Estableix l'estat a"
 
 #: include/classes/helpers/CServiceHelper.php:28
 msgid "Set status to OK"
-msgstr "Estableix l'estat a d'acord"
+msgstr "Estableix l'estat a correcte"
 
 #: widgets/geomap/Widget.php:36
 msgid "Set this view as default"
@@ -19946,11 +19966,11 @@ msgstr "Estableix aquesta vista com a predeterminada"
 
 #: app/views/host.wizard.edit.php:493
 msgid "Set up Zabbix agent on your monitoring target by executing the following PowerShell script [with administrator permissions]:"
-msgstr ""
+msgstr "Configureu l'agent Zabbix a l'equip a monitorar executant el següent script de PowerShell [amb permisos d'administrador]:"
 
 #: app/views/host.wizard.edit.php:477
 msgid "Set up Zabbix agent on your monitoring target by executing the following script [bash under root]:"
-msgstr ""
+msgstr "Configureu l'agent Zabbix a l'equip a monitorar executant el següent script [bash com a root]:"
 
 #: app/views/js/popup.itemtestedit.view.js.php:383 include/forms.inc.php:1599
 #: include/views/js/item.preprocessing.js.php:67
@@ -20136,7 +20156,7 @@ msgstr "Mostra la llegenda"
 
 #: app/views/js/host.wizard.edit.js.php:1507
 msgid "Show less"
-msgstr ""
+msgstr "Veure'n menys"
 
 #: widgets/actionlog/includes/WidgetForm.php:91
 #: widgets/plaintext/includes/WidgetForm.php:55
@@ -20154,7 +20174,7 @@ msgstr "Veure les etiquetes dels elements del mapa"
 
 #: app/views/host.wizard.edit.php:247 app/views/js/host.wizard.edit.js.php:1508
 msgid "Show more"
-msgstr ""
+msgstr "Veure'n més"
 
 #: app/views/popup.tabfilter.edit.php:34
 msgid "Show number of records"
@@ -20220,7 +20240,7 @@ msgstr "Mostra les errades tècnics"
 
 #: app/views/host.wizard.edit.php:171
 msgid "Show templates"
-msgstr ""
+msgstr "Veure les plantilles"
 
 #: widgets/plaintext/includes/WidgetForm.php:62
 msgid "Show text as HTML"
@@ -20312,7 +20332,7 @@ msgstr "Simple"
 
 #: app/views/js/host.wizard.edit.js.php:97
 msgid "Simple Network Management Protocol (SNMP) interface"
-msgstr ""
+msgstr "Interfície del protocol simple de gestió de xarxa (SNMP)"
 
 #: include/items.inc.php:1578
 msgid "Simple change"
@@ -20415,7 +20435,7 @@ msgstr "La mida de la resposta rebuda del servidor Zabbix \"%1$s\" supera la mid
 
 #: app/views/host.wizard.edit.php:355
 msgid "Skip OS selection if you already have Zabbix agent installed."
-msgstr ""
+msgstr "Ometre la tria del sistema operatiu si ja teniu l'agent Zabbix instal·lat."
 
 #: include/locales.inc.php:61
 msgid "Slovak (sk_SK)"
@@ -20477,6 +20497,11 @@ msgstr "Part de l'historial d'aquest element pot estar comprimit; no es pot pas 
 #: app/views/host.wizard.edit.php:129
 #, c-format
 msgid "Some templates (%1$s) are hidden. Custom templates are not supported."
+msgstr "Algunes plantilles (%1$s) són amagades. No s'admeten pas plantilles personalitzades."
+
+#: app/views/host.wizard.edit.php:130
+#, c-format
+msgid "Some templates (%1$s) are incompatible with the Host Wizard."
 msgstr ""
 
 #: widgets/actionlog/includes/WidgetForm.php:79
@@ -20533,6 +20558,10 @@ msgstr "Especifiqueu l'equip per veure els gràfics."
 #: app/views/popup.generic.php:180 include/views/monitoring.history.php:293
 msgid "Specify some filter condition to see the values."
 msgstr "Especifiqueu alguna condició de filtre per veure els valors."
+
+#: app/views/host.wizard.edit.php:365
+msgid "Specifying new or existing host groups will add the host to these groups without removing it from any current groups."
+msgstr ""
 
 #: httpdetails.php:107 include/classes/screens/CScreenHttpTestDetails.php:82
 msgid "Speed"
@@ -20600,11 +20629,11 @@ msgstr "L'hora d'inici ha de ser abans de l'hora de finalització del temps d'in
 
 #: app/views/host.wizard.edit.php:310
 msgid "Start typing or click Select to choose an existing host, or enter a new host name."
-msgstr ""
+msgstr "Escriviu o feu clic a Triar per triar un equip existent o poseu el nom nou de l'equip."
 
 #: app/views/host.wizard.edit.php:334
 msgid "Start typing or click Select to choose existing host groups, or enter a new host group name."
-msgstr ""
+msgstr "Escriviu o feu clic a Triar per triar un grup d'equips existent o poseu el nom nou del grup d'equips."
 
 #: app/views/popup.ldap.edit.php:287
 msgid "StartTLS"
@@ -21074,22 +21103,22 @@ msgstr "Agent de TELNET"
 
 #: include/classes/setup/CSetupWizard.php:855
 msgid "TLS CA file"
-msgstr ""
+msgstr "Arxiu TLS CA"
 
 #: include/classes/setup/CSetupWizard.php:873
 msgid "TLS certificate file"
-msgstr ""
+msgstr "Arxiu de certificat TLS"
 
 #: include/classes/server/CZabbixServer.php:634
 #: include/classes/server/CZabbixServer.php:641
 #: include/classes/server/CZabbixServer.php:648
 #: include/classes/setup/CSetupWizard.php:911
 msgid "TLS fields are misconfigured or the files are not accessible."
-msgstr ""
+msgstr "Els camps TLS són mal configurats o no es pot accedir als fitxers."
 
 #: include/classes/setup/CSetupWizard.php:865
 msgid "TLS key file"
-msgstr ""
+msgstr "Arxiu de clau TLS"
 
 #: include/classes/screens/CScreenHttpTestDetails.php:190
 msgid "TOTAL"
@@ -21582,7 +21611,7 @@ msgstr "Ja no es descobreix %1$s i %2$s."
 
 #: app/views/host.wizard.edit.php:101
 msgid "The Host Wizard will help you set up your monitoring target (device, application, service, etc.) in Zabbix."
-msgstr ""
+msgstr "L'assistent d'equips us ajudarà a configurar el vostre equip a monitorar (dispositiu, aplicació, servei, etc.) a Zabbix."
 
 #: app/views/oauth.edit.php:48
 msgid "The URL must comply with the OAuth provider's policy."
@@ -21695,7 +21724,7 @@ msgstr "El nivell de zoom màxim és \"%1$s\"."
 #: include/classes/api/services/CDiscoveryRule.php:962
 #, c-format
 msgid "The nested LLD rule with key \"%1$s\" of the template \"%2$s\" cannot be inherited to non-discovered host \"%3$s\"."
-msgstr ""
+msgstr "La regla LLD niuada amb la clau \"%1$s\" de la plantilla \"%2$s\" no es pot pas heretar a l'equip no trobat \"%3$s\"."
 
 #: include/classes/data/CItemData.php:1281
 msgid "The number of processes. Returns integer"
@@ -21721,22 +21750,22 @@ msgstr "La plantilla clonada pertany a un grup de plantilles al qual no teniu pe
 #: app/views/host.wizard.edit.php:275
 #, c-format
 msgid "The template you selected (%1$s) must be linked to a host - an entity in Zabbix that represents your monitoring target."
-msgstr ""
+msgstr "La plantilla que heu triat (%1$s) ha d'ésser vinculada a un equip, és a dir, una entitat de Zabbix que representi l'equip a monitorar."
 
 #: app/views/host.wizard.edit.php:353
 #, c-format
 msgid "The template you selected (%1$s) requires Zabbix agent to be installed and running on your monitoring target."
-msgstr ""
+msgstr "La plantilla que heu triat (%1$s) necessita que l'agent Zabbix sigui instal·lat i engegat a l'equip a monitorar."
 
 #: app/views/host.wizard.edit.php:899
 #, c-format
 msgid "The template you selected (%1$s) requires additional configuration."
-msgstr ""
+msgstr "La plantilla que heu triat (%1$s) necessita una configuració addicional."
 
 #: app/views/host.wizard.edit.php:573
 #, c-format
 msgid "The template you selected (%1$s) requires the %2$s to be added to the host (%3$s)."
-msgstr ""
+msgstr "La plantilla que heu triat (%1$s) necessita que %2$s s'afegeixi a l'equip (%3$s)."
 
 #: app/views/popup.token.view.php:62
 msgid "The token has expired. Please update the expiry date to use the token."
@@ -21753,7 +21782,7 @@ msgstr "El trigger ja no es troba pas i s'esborrarà el proper cop que es proces
 
 #: app/views/js/host.wizard.edit.js.php:722
 msgid "The value does not match the existing value on the selected host."
-msgstr ""
+msgstr "El valor no coincideix pas amb el valor existent a l'equip triat."
 
 #: include/views/configuration.host.discovery.edit.php:712
 msgid "The value should be greater than LLD rule update interval."
@@ -21786,6 +21815,10 @@ msgid "This check cannot be removed, as it is used as a condition in %1$s discov
 msgid_plural "This check cannot be removed, as it is used as a condition in %1$s discovery actions."
 msgstr[0] "Aquesta comprovació no es pot pas eliminar, ja que s'empra com a condició en l'acció de descoberta de %1$s."
 msgstr[1] "Aquesta comprovació no es pot eliminar, ja que s'empra com a condició a les accions de descoberta de %1$s."
+
+#: app/views/host.wizard.edit.php:384
+msgid "This configuration will overwrite all existing encryption settings on the host."
+msgstr ""
 
 #: include/func.inc.php:2566
 msgid "This day last week"
@@ -21903,7 +21936,7 @@ msgstr "Aquest valor és massa llarg."
 
 #: app/views/js/host.wizard.edit.js.php:2045
 msgid "This value is too short."
-msgstr ""
+msgstr "Aquest valor és massa curt."
 
 #: include/classes/validators/CFormValidator.php:1397
 #: include/classes/validators/CFormValidator.php:1461 jsLoader.php:431
@@ -22151,7 +22184,7 @@ msgstr "A"
 
 #: app/views/host.wizard.edit.php:930
 msgid "To complete the setup, configure the following variables (host macros)."
-msgstr ""
+msgstr "Per acabar la configuració, configureu les variables següents (macros de l'equip)."
 
 #: jsLoader.php:398
 msgid "To set a host interface select a single item type for all items"
@@ -22611,7 +22644,7 @@ msgstr "Font del trigger"
 
 #: jsLoader.php:366
 msgid "Trigger status \"OK\""
-msgstr "Estat del trigger \"D'acord\""
+msgstr "Estat del trigger \"Correcte\""
 
 #: jsLoader.php:367
 msgid "Trigger status \"Problem\""
@@ -22723,11 +22756,11 @@ msgstr "Tipus (detalls complets)"
 
 #: include/views/js/monitoring.sysmaps.js.php:797
 msgid "Type (OK)"
-msgstr "Tipus (d'acord)"
+msgstr "Tipus (correcte)"
 
 #: app/views/host.wizard.edit.php:149
 msgid "Type a keyword to search for templates."
-msgstr ""
+msgstr "Escriviu una paraula clau per cercar plantilles."
 
 #: app/views/correlation.edit.php:195 app/views/popup.action.edit.php:125
 #: app/views/popup.lldoverride.php:77 app/views/popup.operation.edit.php:423
@@ -22855,7 +22888,7 @@ msgstr "No es poden pas canviar els permisos del fitxer de configuració a 0600.
 #: include/classes/server/CZabbixServer.php:673
 #: include/classes/server/CZabbixServer.php:681 jsrpc.php:86 jsrpc.php:101
 msgid "Unable to connect to the Zabbix server due to TLS settings. Some functions are unavailable."
-msgstr ""
+msgstr "No es pot pas connectar al servidor Zabbix degut a la configuració TLS. Algunes funcions no són pas disponibles."
 
 #: include/classes/core/CConfigFile.php:237
 msgid "Unable to create the configuration file."
@@ -22982,8 +23015,8 @@ msgstr "Codi d'estat de resposta HTTP inesperat."
 #, c-format
 msgid "Unexpected macro \"%1$s\""
 msgid_plural "Unexpected macros \"%1$s\""
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "Macro no esperada \"%1$s\""
+msgstr[1] "Macros no esperades \"%1$s\""
 
 #: include/classes/core/ZBase.php:679
 #, c-format
@@ -23874,7 +23907,7 @@ msgstr "Usuaris"
 
 #: include/locales.inc.php:62
 msgid "Uzbek (uz_UZ)"
-msgstr ""
+msgstr "Uzbek (uz_UZ)"
 
 #: include/classes/data/CItemData.php:1876
 msgid "VMware Distributed Virtual Switch, \"url\" - VMware service URL. Returns JSON"
@@ -24535,7 +24568,7 @@ msgstr "Verificar el certificat de la base de dades"
 
 #: include/classes/setup/CSetupWizard.php:881
 msgid "Verify server certificate issuer and subject"
-msgstr ""
+msgstr "Verifiqueu l'emissor i l'assumpte del certificat del servidor"
 
 #: app/views/administration.proxy.list.php:62
 #: app/views/administration.proxy.list.php:89 app/views/module.edit.php:40
@@ -24673,11 +24706,11 @@ msgstr "Web"
 
 #: include/classes/setup/CSetupWizard.php:1089
 msgid "Web interface TLS certificate file"
-msgstr ""
+msgstr "Fitxer de certificat TLS de la interfície web"
 
 #: include/classes/setup/CSetupWizard.php:1085
 msgid "Web interface TLS key file"
-msgstr ""
+msgstr "Fitxer de clau TLS de la interfície web"
 
 #: app/controllers/CControllerWebView.php:163
 #: app/views/monitoring.web.view.php:37 include/items.inc.php:101
@@ -24782,7 +24815,7 @@ msgstr "Benvingut a"
 
 #: app/views/host.wizard.edit.php:99
 msgid "Welcome to the Host Wizard"
-msgstr ""
+msgstr "Benvinguts a l'assistent d'equips"
 
 #: app/views/administration.user.edit.php:334 app/views/popup.media.php:96
 msgid "When active"
@@ -24842,11 +24875,11 @@ msgstr "Amplada"
 
 #: app/views/host.wizard.edit.php:435
 msgid "Windows"
-msgstr ""
+msgstr "Windows"
 
 #: app/views/host.wizard.edit.php:450
 msgid "Windows 10/Server 2016 or later"
-msgstr ""
+msgstr "Windows 10/Server 2016 o posterior"
 
 #: app/controllers/CControllerLatest.php:554
 msgid "With data"
@@ -25166,7 +25199,7 @@ msgstr "No teniu pas sessió iniciada"
 
 #: app/views/host.wizard.edit.php:103
 msgid "You can always access Host Wizard from Data collection > Hosts."
-msgstr ""
+msgstr "Sempre podeu accedir a l'Auxiliar d'equips des de Recull de dades > Equips."
 
 #: app/views/popup.generic.php:74
 msgid "You cannot switch hosts for current selection."
@@ -25210,7 +25243,7 @@ msgstr "La vostra base de dades no funciona correctament. Espereu uns minuts i p
 
 #: app/views/host.wizard.edit.php:1044
 msgid "Your progress will be discarded and you will exit the Host Wizard. Are you sure you want to cancel?"
-msgstr ""
+msgstr "El vostre progrés es descartarà i sortireu de l'Auxiliar d'eequips. Segur que voleu cancel·lar?"
 
 #: include/page_header.php:122
 msgid "Zabbix"
@@ -25249,11 +25282,11 @@ msgstr "Agent de Zabbix (validacions passives)"
 
 #: app/views/js/host.wizard.edit.js.php:91
 msgid "Zabbix agent initiates connections to Zabbix server or proxy to send data. Recommended for monitoring targets behind a firewall."
-msgstr ""
+msgstr "L'agent Zabbix inicia connexions al servidor o proxy Zabbix per enviar dades. Recomanat per monitorar equips darrere d'un tallafocs."
 
 #: app/views/host.wizard.edit.php:863
 msgid "Zabbix documentation"
-msgstr ""
+msgstr "Documentació de Zabbix"
 
 #: app/partials/administration.system.info.php:45
 msgid "Zabbix frontend version"
@@ -25321,7 +25354,7 @@ msgstr "Nom del servidor Zabbix"
 
 #: app/views/js/host.wizard.edit.js.php:92
 msgid "Zabbix server or proxy initiates connections to Zabbix agent to request data. Recommended for networks without a firewall or with open firewall ports."
-msgstr ""
+msgstr "El servidor o proxy Zabbix inicia connexions a l'agent Zabbix per demanar dades. Recomanat per a xarxes sense tallafocs o amb ports de tallafocs oberts."
 
 #: app/partials/administration.system.info.php:40
 msgid "Zabbix server version"
@@ -26013,7 +26046,7 @@ msgstr "No es pot pas esborrar la regla LLD heretada"
 
 #: include/classes/api/services/CDiscoveryRulePrototype.php:1231
 msgid "cannot delete inherited LLD rule prototype"
-msgstr ""
+msgstr "No es pot pas esborrar el prototip de regla LLD heretat"
 
 #: include/classes/api/services/CItem.php:909
 msgid "cannot delete inherited item"
@@ -26029,7 +26062,7 @@ msgstr "no es pot pas esborrar el prototip d'amfitrió amb plantilla"
 
 #: include/classes/api/services/CDiscoveryRule.php:726
 msgid "cannot have a nested LLD rule on a non-discovered host"
-msgstr ""
+msgstr "no es pot pas tindre una regla LLD heretada a un equip no trobat"
 
 #: include/classes/api/services/CHostPrototype.php:1411
 msgid "cannot have more than one default interface of the same type"
@@ -26464,6 +26497,10 @@ msgstr "ja existeix un prototip d'equip amb el mateix UUID"
 msgid "host trigger ID is expected"
 msgstr "S'espera l'ID del trigger d'equip"
 
+#: app/views/host.wizard.edit.php:134
+msgid "how to update them"
+msgstr ""
+
 #: include/classes/api/services/CMap.php:844
 #: include/classes/api/services/CMap.php:1311
 msgid "icon"
@@ -26550,7 +26587,7 @@ msgstr "ús incorrecte de la funció \"%1$s\""
 #: app/controllers/CControllerHostWizardUpdateGeneral.php:88
 #, c-format
 msgid "input does not match the pattern: %1$s"
-msgstr ""
+msgstr "l'entrada no coincideix amb el patró: %1$s"
 
 #: app/controllers/CControllerScriptUserInputCheck.php:111
 #: include/classes/api/services/CScript.php:517
@@ -26827,6 +26864,10 @@ msgstr "m-d"
 #: include/translateDefines.inc.php:33
 msgid "m-d h:i A"
 msgstr "m-d H:i"
+
+#: app/views/host.wizard.edit.php:589
+msgid "macOS"
+msgstr ""
 
 #: include/classes/parsers/CUserMacroParser.php:37
 msgid "macro is empty"
