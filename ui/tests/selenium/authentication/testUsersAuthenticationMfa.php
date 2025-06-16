@@ -17,7 +17,7 @@
 require_once __DIR__.'/../common/testFormAuthentication.php';
 
 /**
- * @backup settings
+ * @backup config
  *
  * @onBefore prepareData
  */

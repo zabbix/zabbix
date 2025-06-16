@@ -167,7 +167,7 @@ class testFormTotpEnroll extends testFormTotp {
 	/**
 	 * Tests that new enrollment is required after changing the MFA method.
 	 *
-	 * @backup settings
+	 * @backup config
 	 */
 	public function testFormTotpEnroll_ChangeMfaMethod() {
 		// Reset TOTP secret to make sure user has not already been enrolled.
