@@ -426,8 +426,8 @@ int	zbx_oauth_get(zbx_uint64_t mediatypeid, const char *mediatype_name, int time
 out:
 	oauth_clean(&data);
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s() ret:%s expires:%d", __func__, zbx_result_string(ret),
-		(NULL != expires ? *expires : 0));
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s() ret:%s expires:%d", __func__, zbx_result_string(ret),
+			(NULL != expires ? *expires : 0));
 
 	return ret;
 }
