@@ -1779,7 +1779,7 @@ class CLineGraphDraw extends CGraphDraw {
 
 				if ($calc_fnc == CALC_FNC_ALL) {
 					if (PHP_VERSION_ID >= 80100) {
-						imagefilledpolygon($this->im, $a, $avg_color);
+						imagefilledpolygon($this->im, $a, $minmax_color);
 					}
 					else {
 						imagefilledpolygon($this->im, $a, 4, $minmax_color);
