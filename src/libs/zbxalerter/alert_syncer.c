@@ -447,8 +447,7 @@ static void	am_db_update_mediatypes(zbx_am_db_t *amdb, const zbx_uint64_t *media
 			zbx_vector_am_db_mediatype_ptr_append(mediatypes, mediatype);
 
 		if (NULL != auth_email_mediatypeids && MEDIA_TYPE_EMAIL == type &&
-				(SMTP_AUTHENTICATION_PASSWORD == smtp_authentication ||
-				SMTP_AUTHENTICATION_OAUTH == smtp_authentication))
+				SMTP_AUTHENTICATION_PASSWORD == smtp_authentication)
 		{
 			zbx_vector_uint64_append(auth_email_mediatypeids, mediatypeid);
 		}
@@ -854,11 +853,12 @@ static int	am_db_flush_results(zbx_hashset_t *mediatypes, const unsigned char *d
 		}
 
 		zbx_free(sql);
+
+		zbx_free(results);
 	}
 
 	zbx_vector_events_tags_clear_ext(&update_events_tags, event_tags_free);
 	zbx_vector_events_tags_destroy(&update_events_tags);
-	zbx_free(results);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s() flushed:%d", __func__, results_num);
 
@@ -1014,12 +1014,16 @@ static void	am_db_update_watchdog(zbx_am_db_t *amdb, uint64_t alert_usrgrpid)
 			zbx_free(data);
 		}
 	}
+	if (0 == medias.values_num)
+		goto out;
 
 	data_len = zbx_alerter_serialize_medias(&data, (zbx_am_media_t **)medias.values, medias.values_num);
+
 	if (FAIL == zbx_ipc_async_socket_send(&amdb->am, ZBX_IPC_ALERTER_WATCHDOG, data, data_len))
 		zabbix_log(LOG_LEVEL_ERR, "failed to update watchdog recipients");
-	zbx_free(data);
 
+	zbx_free(data);
+out:
 	medias_num = medias.values_num;
 
 	zbx_vector_am_media_ptr_clear_ext(&medias, zbx_am_media_free);
@@ -1074,8 +1078,8 @@ ZBX_THREAD_ENTRY(zbx_alert_syncer_thread, args)
 
 	sleeptime = ZBX_POLL_INTERVAL;
 
-	if (ZBX_WATCHDOG_ALERT_FREQUENCY < (freq_watchdog = alert_syncer_args_in->confsyncer_frequency))
-		freq_watchdog = ZBX_WATCHDOG_ALERT_FREQUENCY;
+	if (ZBX_WATCHDOG_ALERT_PERIOD < (freq_watchdog = alert_syncer_args_in->confsyncer_frequency))
+		freq_watchdog = ZBX_WATCHDOG_ALERT_PERIOD;
 
 	zbx_setproctitle("%s [queuing alerts]", get_process_type_string(process_type));
 

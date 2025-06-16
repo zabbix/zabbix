@@ -65,8 +65,8 @@ class CLegacyAction extends CAction {
 		}
 
 		if ($user_type < USER_TYPE_ZABBIX_ADMIN) {
-			$denied = array_merge($denied, ['host_discovery.php', 'host_prototypes.php', 'host.list',
-				'httpconf.php', 'report4.php', 'template.list'
+			$denied = array_merge($denied, ['host_discovery.php', 'host_discovery_prototypes.php',
+				'host_prototypes.php', 'host.list', 'httpconf.php', 'report4.php', 'template.list'
 			]);
 		}
 

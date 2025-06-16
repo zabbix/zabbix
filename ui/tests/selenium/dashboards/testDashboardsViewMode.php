@@ -92,6 +92,9 @@ class testDashboardsViewMode extends CLegacyWebTest {
 			$this->assertEquals("0\nTotal", $host_total);
 			$this->assertEquals("0\nWarning", $problems_warning);
 			$this->assertFalse($geomap_icon->exists());
+
+			// Check that no bad messages are displayed.
+			$this->assertFalse($this->query('class:msg-bad')->one(false)->isValid());
 		}
 		else {
 			foreach (array_values($no_data_widgets) as $header) {

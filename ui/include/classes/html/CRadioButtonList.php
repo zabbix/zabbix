@@ -43,7 +43,7 @@ class CRadioButtonList extends CList {
 	 */
 	protected $values = [];
 
-	public function __construct($name, $value) {
+	public function __construct($name, $value = null) {
 		parent::__construct();
 
 		$this->name = $name;

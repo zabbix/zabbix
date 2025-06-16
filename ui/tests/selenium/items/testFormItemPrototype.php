@@ -2265,11 +2265,10 @@ class testFormItemPrototype extends CLegacyWebTest {
 					$this->zbxTestInputTypeOverwrite('delay_flex_'.$itemCount.'_delay', $period['flexDelay']);
 				}
 				$itemCount ++;
-				$form->query("xpath://div[@id='js-item-flex-intervals-field']//button[@class='btn-link element-table-add']")
-					->one()->click();
+				$form->getFieldContainer('Custom intervals')->query('button:Add')->one()->click();
 
-				$this->zbxTestAssertVisibleId('delay_flex_'.$itemCount.'_delay');
-				$this->zbxTestAssertVisibleId('delay_flex_'.$itemCount.'_period');
+				$this->assertTrue($this->query('id', 'delay_flex_'.$itemCount.'_delay')->waitUntilVisible()->one()->isValid());
+				$this->assertTrue($this->query('id', 'delay_flex_'.$itemCount.'_period')->waitUntilVisible()->one()->isValid());
 
 				if (isset($period['remove'])) {
 					$form->query("xpath://table[@id='delay-flex-table']/tbody/tr[1]/td[4]/button")->one()

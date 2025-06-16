@@ -194,8 +194,8 @@ foreach ($data['graphs'] as $graph) {
 
 	$info_icons = [];
 
-	if ($graph['graphDiscovery'] && $graph['graphDiscovery']['status'] == ZBX_LLD_STATUS_LOST) {
-		$info_icons[] = getGraphLifetimeIndicator(time(), (int) $graph['graphDiscovery']['ts_delete']);
+	if ($graph['discoveryData'] && $graph['discoveryData']['status'] == ZBX_LLD_STATUS_LOST) {
+		$info_icons[] = getGraphLifetimeIndicator(time(), (int) $graph['discoveryData']['ts_delete']);
 	}
 
 	$graphs_table->addRow([

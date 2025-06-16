@@ -160,16 +160,18 @@ function getGraphParentTemplates(array $graphs, $flag) {
 
 	$all_parent_graphids = [];
 	$hostids = [];
-	if ($flag == ZBX_FLAG_DISCOVERY_PROTOTYPE) {
+
+	if ($flag & ZBX_FLAG_DISCOVERY_PROTOTYPE) {
 		$lld_ruleids = [];
 	}
 
 	do {
-		if ($flag == ZBX_FLAG_DISCOVERY_PROTOTYPE) {
+		if ($flag & ZBX_FLAG_DISCOVERY_PROTOTYPE) {
 			$db_graphs = API::GraphPrototype()->get([
 				'output' => ['graphid', 'templateid'],
 				'selectHosts' => ['hostid'],
 				'selectDiscoveryRule' => ['itemid'],
+				'selectDiscoveryRulePrototype' => ['itemid'],
 				'graphids' => array_keys($parent_graphids)
 			]);
 		}
@@ -189,8 +191,10 @@ function getGraphParentTemplates(array $graphs, $flag) {
 			$data['templates'][$db_graph['hosts'][0]['hostid']] = [];
 			$hostids[$db_graph['graphid']] = $db_graph['hosts'][0]['hostid'];
 
-			if ($flag == ZBX_FLAG_DISCOVERY_PROTOTYPE) {
-				$lld_ruleids[$db_graph['graphid']] = $db_graph['discoveryRule']['itemid'];
+			if ($flag & ZBX_FLAG_DISCOVERY_PROTOTYPE) {
+				$lld_ruleids[$db_graph['graphid']] = $db_graph['discoveryRule']
+					? $db_graph['discoveryRule']['itemid']
+					: $db_graph['discoveryRulePrototype']['itemid'];
 			}
 
 			if ($db_graph['templateid'] != 0) {
@@ -209,7 +213,7 @@ function getGraphParentTemplates(array $graphs, $flag) {
 			? $hostids[$parent_graph['graphid']]
 			: 0;
 
-		if ($flag == ZBX_FLAG_DISCOVERY_PROTOTYPE) {
+		if ($flag & ZBX_FLAG_DISCOVERY_PROTOTYPE) {
 			$parent_graph['lld_ruleid'] = array_key_exists($parent_graph['graphid'], $lld_ruleids)
 				? $lld_ruleids[$parent_graph['graphid']]
 				: 0;
@@ -281,7 +285,7 @@ function makeGraphTemplatePrefix($graphid, array $parent_templates, $flag, bool 
 			->setArgument('context', 'template')
 			->setArgument('uncheck', '1');
 
-		if ($flag == ZBX_FLAG_DISCOVERY_PROTOTYPE) {
+		if ($flag & ZBX_FLAG_DISCOVERY_PROTOTYPE) {
 			$url->setArgument('parent_discoveryid', $parent_templates['links'][$graphid]['lld_ruleid']);
 		}
 		// ZBX_FLAG_DISCOVERY_NORMAL
@@ -322,7 +326,7 @@ function makeGraphTemplatesHtml($graphid, array $parent_templates, $flag, bool $
 				->setArgument('context', 'template')
 				->setArgument('graphid', $parent_templates['links'][$graphid]['graphid']);
 
-			if ($flag == ZBX_FLAG_DISCOVERY_PROTOTYPE) {
+			if ($flag & ZBX_FLAG_DISCOVERY_PROTOTYPE) {
 				$url
 					->setArgument('popup', 'graph.prototype.edit')
 					->setArgument('parent_discoveryid', $parent_templates['links'][$graphid]['lld_ruleid']);
