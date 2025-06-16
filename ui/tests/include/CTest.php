@@ -26,11 +26,13 @@ require_once __DIR__.'/helpers/CDataHelper.php';
 require_once __DIR__.'/helpers/CExceptionHelper.php';
 require_once __DIR__.'/helpers/CTestArrayHelper.php';
 require_once __DIR__.'/helpers/CDateTimeHelper.php';
+require_once __DIR__.'/helpers/CMfaTotpHelper.php';
 
 define('USER_ACTION_ADD', 'add');
 define('USER_ACTION_UPDATE', 'update');
 define('USER_ACTION_REMOVE', 'remove');
 
+define('INT_255', str_repeat(1, 255));
 define('STRING_6000', str_repeat('long_string_', 500));
 define('STRING_2200', substr(STRING_6000, 0, 2200));
 define('STRING_2048', substr(STRING_6000, 0, 2048));
