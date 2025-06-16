@@ -694,7 +694,7 @@ class testDiscoveryRules extends CIntegrationTest {
 	 * @configurationDataProvider proxyHybridModeconfigurationProvider
 	 */
 	public function testDiscoveryRules_snmpErrorViaProxyHybridMode(): void {
-		//$this->proxyTest();
+		$this->proxyTest();
 	}
 
 	/**
@@ -702,8 +702,8 @@ class testDiscoveryRules extends CIntegrationTest {
 	 */
 	public static function deleteData(): void {
 		self::snmpsimStop();
-		//self::deleteAllActions();
-		//self::deleteAllDrules();
-		//self::deleteProxy();
+		self::deleteAllActions();
+		self::deleteAllDrules();
+		self::deleteProxy();
 	}
 }
