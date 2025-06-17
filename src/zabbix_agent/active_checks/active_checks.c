@@ -960,8 +960,6 @@ static int	refresh_active_checks(zbx_vector_addr_ptr_t *addrs, const zbx_config_
 	}
 	else
 	{
-		history_upload = ZBX_HISTORY_UPLOAD_DISABLED;
-
 		if (RECV_ERROR == ret)
 		{
 			/* server is unaware if configuration is actually delivered and saves session */
@@ -1271,7 +1269,9 @@ static int	send_buffer(zbx_vector_addr_ptr_t *addrs, zbx_vector_pre_persistent_t
 			zabbix_log(LOG_LEVEL_DEBUG, "OK");
 
 		zbx_free(data);
-	} else {
+	}
+	else
+	{
 		history_upload = ZBX_HISTORY_UPLOAD_DISABLED;
 	}
 
