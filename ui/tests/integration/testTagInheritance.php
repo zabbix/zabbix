@@ -24,30 +24,30 @@ require_once dirname(__FILE__).'/../include/helpers/CDataHelper.php';
  * @onAfter clearData
  */
 class testTagInheritance extends CIntegrationTest {
-	const TEMPLATE_NAME_PRE = 'template_tag_inheritance_';
+	const TEMPLATE_NAME_PREFIX = 'template_tag_inheritance_';
 	const HOST_NAME = 'host_tag_inheritance';
 
 	const HOST_ITEM_NAME = 'item_name_tag_inheritance';
 	const HOST_ITEM_KEY = 'item_key_tag_inheritance';
-	const ITEM_NAME_PRE = 'strataX_item_name_tag_inheritance_';
-	const ITEM_KEY_PRE = 'strataX_item_key_tag_inheritance_';
+	const TEMPLATE_ITEM_NAME_PREFIX = 'strataX_item_name_tag_inheritance_';
+	const TEMPLATE_ITEM_KEY_PREFIX = 'strataX_item_key_tag_inheritance_';
 
-	const TEMPLATE_TAG_NAME_PRE = 'strataX_template_tag_tag_inheritance_';
-	const TEMPLATE_TAG_VALUE_PRE = 'strataX_template_value_tag_inheritance_';
+	const TEMPLATE_TAG_NAME_PREFIX = 'strataX_template_tag_tag_inheritance_';
+	const TEMPLATE_TAG_VALUE_PREFIX = 'strataX_template_value_tag_inheritance_';
 	const HOST_TAG_NAME = 'host_tag_tag_inheritance';
 	const HOST_TAG_VALUE = 'host_value_tag_inheritance';
 
-	const TEMPLATE_ITEM_TAG_NAME_PRE = 'strataX_item_tag_tag_inheritance_';
-	const TEMPLATE_ITEM_TAG_VALUE_PRE = 'strataX_item_value_tag_inheritance_';
+	const TEMPLATE_ITEM_TAG_NAME_PREFIX = 'strataX_item_tag_tag_inheritance_';
+	const TEMPLATE_ITEM_TAG_VALUE_PREFIX = 'strataX_item_value_tag_inheritance_';
 	const HOST_ITEM_TAG_NAME = 'host_item_tag_tag_inheritance';
 	const HOST_ITEM_TAG_VALUE = 'host_item_value_tag_inheritance';
 
-	const TEMPLATE_TRIGGER_TAG_NAME_PRE = 'strataX_trigger_tag_tag_inheritance_';
-	const TEMPLATE_TRIGGER_TAG_VALUE_PRE = 'strataX_trigger_value_tag_inheritance_';
+	const TEMPLATE_TRIGGER_TAG_NAME_PREFIX = 'strataX_trigger_tag_tag_inheritance_';
+	const TEMPLATE_TRIGGER_TAG_VALUE_PREFIX = 'strataX_trigger_value_tag_inheritance_';
 	const HOST_TRIGGER_TAG_NAME = 'host_trigger_tag_tag_inheritance';
 	const HOST_TRIGGER_TAG_VALUE = 'host_trigger_value_tag_inheritance';
 
-	const TRIGGER_DESCRIPTION_PRE = 'strataX_trigger_description_tag_inheritance_';
+	const TRIGGER_DESCRIPTION_PREFIX = 'strataX_trigger_description_tag_inheritance_';
 	const TRIGGER_HOST_DESCRIPTION = 'host_trigger_description_tag_inheritance';
 
 	const TRIGGER_PRIORITY = 4;
@@ -94,11 +94,11 @@ class testTagInheritance extends CIntegrationTest {
 		/* First template has no templates linked to it. */
 		if ($hasTemplate) {
 			$response = $this->call('template.create', [
-				'host' => self::TEMPLATE_NAME_PRE . $count,
+				'host' => self::TEMPLATE_NAME_PREFIX . $count,
 				'tags' => [
 					[
-						'tag' => self::TEMPLATE_TAG_NAME_PRE . $count,
-						'value' => self::TEMPLATE_TAG_VALUE_PRE . $count
+						'tag' => self::TEMPLATE_TAG_NAME_PREFIX . $count,
+						'value' => self::TEMPLATE_TAG_VALUE_PREFIX . $count
 					]
 				],
 				'templates' => [['templateid' => end(self::$template_ids)]],
@@ -107,11 +107,11 @@ class testTagInheritance extends CIntegrationTest {
 				]]);
 		} else {
 			$response = $this->call('template.create', [
-				'host' => self::TEMPLATE_NAME_PRE . $count,
+				'host' => self::TEMPLATE_NAME_PREFIX . $count,
 				'tags' => [
 					[
-						'tag' => self::TEMPLATE_TAG_NAME_PRE . $count,
-						'value' => self::TEMPLATE_TAG_VALUE_PRE . $count
+						'tag' => self::TEMPLATE_TAG_NAME_PREFIX . $count,
+						'value' => self::TEMPLATE_TAG_VALUE_PREFIX . $count
 					]
 				],
 				'groups' => [
@@ -128,14 +128,14 @@ class testTagInheritance extends CIntegrationTest {
 
 		$response = $this->call('item.create', [
 			'hostid' => end(self::$template_ids),
-			'name' => self::ITEM_NAME_PRE . $count,
-			'key_' => self::ITEM_KEY_PRE . $count,
+			'name' => self::TEMPLATE_ITEM_NAME_PREFIX . $count,
+			'key_' => self::TEMPLATE_ITEM_KEY_PREFIX . $count,
 			'type' => ITEM_TYPE_TRAPPER,
 			'value_type' => ITEM_VALUE_TYPE_UINT64,
 			'tags' => [
 				[
-					'tag' => self::TEMPLATE_ITEM_TAG_NAME_PRE . $count,
-					'value' => self::TEMPLATE_ITEM_TAG_VALUE_PRE . $count
+					'tag' => self::TEMPLATE_ITEM_TAG_NAME_PREFIX . $count,
+					'value' => self::TEMPLATE_ITEM_TAG_VALUE_PREFIX . $count
 				]
 			]
 		]);
@@ -145,18 +145,18 @@ class testTagInheritance extends CIntegrationTest {
 		array_push(self::$item_ids, $response['result']['itemids'][0]);
 
 		$response = $this->call('trigger.create', [
-			'description' => self::TRIGGER_DESCRIPTION_PRE . $count,
+			'description' => self::TRIGGER_DESCRIPTION_PREFIX . $count,
 			'priority' => self::TRIGGER_PRIORITY,
 			'status' => TRIGGER_STATUS_ENABLED,
 			'type' => self::TRIGGER_TYPE,
 			'recovery_mode' => ZBX_RECOVERY_MODE_NONE,
 			'manual_close' => self::TRIGGER_MANUAL_CLOSE,
-			'expression' => 'last(/' . self::TEMPLATE_NAME_PRE . $count . '/' .
-				self::ITEM_KEY_PRE . $count . ')=' . self::VALUE_TO_FIRE_TRIGGER,
+			'expression' => 'last(/' . self::TEMPLATE_NAME_PREFIX . $count . '/' .
+				self::TEMPLATE_ITEM_KEY_PREFIX . $count . ')=' . self::VALUE_TO_FIRE_TRIGGER,
 			'tags' => [
 				[
-					'tag' => self::TEMPLATE_TRIGGER_TAG_NAME_PRE . $count,
-					'value' => self::TEMPLATE_TRIGGER_TAG_VALUE_PRE . $count
+					'tag' => self::TEMPLATE_TRIGGER_TAG_NAME_PREFIX . $count,
+					'value' => self::TEMPLATE_TRIGGER_TAG_VALUE_PREFIX . $count
 				]
 			]
 		]);
@@ -234,7 +234,7 @@ class testTagInheritance extends CIntegrationTest {
 	}
 
 	public function testInheritedTags() {
-		$this->sendSenderValue(self::HOST_NAME, self::ITEM_KEY_PRE . '0', self::VALUE_TO_FIRE_TRIGGER);
+		$this->sendSenderValue(self::HOST_NAME, self::TEMPLATE_ITEM_KEY_PREFIX . '0', self::VALUE_TO_FIRE_TRIGGER);
 
 		self::$event_response = $this->callUntilDataIsPresent('event.get', [
 			'hostids' => [self::$host_id],
