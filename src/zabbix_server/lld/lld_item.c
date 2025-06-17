@@ -302,6 +302,62 @@ static void	add_batch_select_condition(char **sql, size_t *sql_alloc, size_t *sq
 	*index = new_index;
 }
 
+static void	update_item_template_cache(zbx_vector_uint64_t *in_itemids)
+{
+	zbx_db_result_t		result;
+	zbx_db_row_t		row;
+	char			*sql = NULL, *template_names = NULL;
+	size_t			sql_alloc = 256, sql_offset = 0, tmp_alloc = 64;
+	zbx_vector_uint64_t	itc_itemids, itc_link_hostids;
+	zbx_db_insert_t         db_insert;
+
+	sql = (char *)zbx_malloc(sql, sql_alloc);
+	template_names = (char *)zbx_malloc(template_names, tmp_alloc);
+
+	zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset,
+			" select id.itemid,itc.link_hostid from item_template_cache itc"
+			" join item_discovery id on itc.itemid=id.parent_itemid"
+			" where");
+
+	zbx_db_add_condition_alloc(&sql, &sql_alloc, &sql_offset, "id.itemid",
+			in_itemids->values, in_itemids->values_num);
+
+	result = zbx_db_select("%s", sql);
+
+	zbx_vector_uint64_create(&itc_itemids);
+	zbx_vector_uint64_create(&itc_link_hostids);
+
+	while (NULL != (row = zbx_db_fetch(result)))
+	{
+		zbx_uint64_t	itc_itemid, itc_link_hostid;
+
+		ZBX_STR2UINT64(itc_itemid, row[0]);
+		ZBX_STR2UINT64(itc_link_hostid, row[1]);
+
+		zbx_vector_uint64_append(&itc_itemids, itc_itemid);
+		zbx_vector_uint64_append(&itc_link_hostids, itc_link_hostid);
+	}
+
+	zbx_db_free_result(result);
+	zbx_free(sql);
+
+	zbx_db_execute_multiple_query(
+			"delete from item_template_cache"
+			" where", "itemid", &itc_itemids);
+
+	zbx_db_insert_prepare(&db_insert, "item_template_cache", "itemid", "link_hostid", (char *)NULL);
+
+	for (int i = 0; i < itc_itemids.values_num; i++)
+		zbx_db_insert_add_values(&db_insert, itc_itemids.values[i], itc_link_hostids.values[i]);
+
+	zbx_db_insert_execute(&db_insert);
+	zbx_db_insert_clean(&db_insert);
+
+	zbx_vector_uint64_destroy(&itc_itemids);
+	zbx_vector_uint64_destroy(&itc_link_hostids);
+}
+
+
 /******************************************************************************
  *                                                                            *
  * Purpose: Retrieves existing items for the specified item prototypes.       *
@@ -986,63 +1042,7 @@ static void	lld_items_get(const zbx_vector_lld_item_prototype_ptr_t *item_protot
 
 		zbx_vector_lld_override_data_ptr_destroy(&overrides);
 	}
-
-	{
-		zbx_db_result_t	result;
-		zbx_db_row_t		row;
-		char			*sql = NULL, *template_names = NULL;
-		size_t			sql_alloc = 256, sql_offset=0, tmp_alloc = 64, tmp_offset = 0;
-
-		sql = (char *)zbx_malloc(sql, sql_alloc);
-		template_names = (char *)zbx_malloc(template_names, tmp_alloc);
-
-		zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset,
-				" select id.itemid,itc.link_hostid from item_template_cache itc"
-				" join item_discovery id on itc.itemid=id.parent_itemid"
-				" where");
-
-		zbx_db_add_condition_alloc(&sql, &sql_alloc, &sql_offset, "id.itemid",
-				itemids.values, itemids.values_num);
-
-		result = zbx_db_select("%s", sql);
-
-		zbx_vector_uint64_t	ii, hh;
-
-		zbx_vector_uint64_create(&ii);
-		zbx_vector_uint64_create(&hh);
-
-		while (NULL != (row = zbx_db_fetch(result)))
-		{
-			zbx_uint64_t	itemid, hostid;
-
-			ZBX_STR2UINT64(itemid, row[0]);
-
-			ZBX_STR2UINT64(hostid, row[1]);
-			zbx_vector_uint64_append(&ii, itemid);
-			zbx_vector_uint64_append(&hh, hostid);
-		}
-
-		zbx_db_free_result(result);
-		zbx_free(sql);
-
-		zbx_db_execute_multiple_query(
-				"delete from item_template_cache"
-				" where", "itemid", &itemids);
-
-		{
-			zbx_db_insert_t         db_insert;
-			zbx_db_insert_prepare(&db_insert, "item_template_cache", "itemid", "link_hostid", (char *)NULL);
-			for (int i = 0; i < ii.values_num; i++)
-			{
-				zbx_db_insert_add_values(&db_insert, ii.values[i], hh.values[i]);
-			}
-			zbx_db_insert_execute(&db_insert);
-			zbx_db_insert_clean(&db_insert);
-		}
-
-		zbx_vector_uint64_destroy(&ii);
-		zbx_vector_uint64_destroy(&hh);
-	}
+	update_item_template_cache(&itemids);
 out:
 	zbx_free(sql);
 	zbx_vector_uint64_destroy(&parent_itemids);
