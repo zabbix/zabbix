@@ -807,11 +807,13 @@ ZBX_THREAD_ENTRY(zbx_async_poller_thread, args)
 #define	SNMP_ENGINEID_MODIFIED_HK_INTERVAL	60
 		if (ZBX_POLLER_TYPE_SNMP == poller_type)
 		{
-			if ((time(NULL) >= SNMP_ENGINEID_HK_INTERVAL + last_snmp_hk_time ||
-					(time(NULL) >= SNMP_ENGINEID_MODIFIED_HK_INTERVAL + last_snmp_hk_time &&
+			time_t	now = time(NULL);
+
+			if ((now >= SNMP_ENGINEID_HK_INTERVAL + last_snmp_hk_time ||
+					(now >= SNMP_ENGINEID_MODIFIED_HK_INTERVAL + last_snmp_hk_time &&
 							0 != zbx_engineid_cache_modified())))
 			{
-				last_snmp_hk_time = time(NULL);
+				last_snmp_hk_time = now;
 				poller_config.clear_cache = ZBX_SNMP_POLLER_HOUSEKEEP_CACHE;
 			}
 		}
