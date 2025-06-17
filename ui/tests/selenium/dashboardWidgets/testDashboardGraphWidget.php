@@ -19,8 +19,6 @@ require_once __DIR__.'/../behaviors/CMessageBehavior.php';
 require_once __DIR__.'/../behaviors/CTagBehavior.php';
 require_once __DIR__.'/../common/testWidgets.php';
 
-use Facebook\WebDriver\WebDriverKeys;
-
 /**
  * @backup widget, profiles
  *
@@ -285,7 +283,6 @@ class testDashboardGraphWidget extends testWidgets {
 		$overlay = $dashboard->addWidget();
 		$dashboard->getWidget('Graph');
 		$form = $overlay->asForm();
-		$element = $overlay->query('id:svg-graph-preview')->one();
 		// TODO: removed Add button from screenshots due to overlay height with decimal value and unstable test on Jenkins.
 		$add_button = $overlay->getFooter()->query('button:Add')->one();
 
@@ -300,7 +297,7 @@ class testDashboardGraphWidget extends testWidgets {
 
 			$this->page->removeFocus();
 			sleep(1);
-			$this->assertScreenshotExcept($overlay, [$element, $add_button], 'tab_'.$tab);
+			$this->assertScreenshotExcept($overlay, $add_button, 'tab_'.$tab);
 		}
 
 		$overlay->close();

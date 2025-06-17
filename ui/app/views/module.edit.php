@@ -70,7 +70,11 @@ $module_form = (new CFormGrid())
 
 $form
 	->addItem($module_form)
-	->addItem((new CScriptTag('module_edit.init();'))->setOnDocumentReady());
+	->addItem(
+		(new CScriptTag('module_edit.init('.json_encode([
+			'rules' => $data['js_validation_rules']
+		]).');'))->setOnDocumentReady()
+	);
 
 $output = [
 	'header' => _('Module'),

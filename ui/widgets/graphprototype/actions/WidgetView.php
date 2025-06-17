@@ -66,15 +66,17 @@ class WidgetView extends CControllerWidgetIterator {
 		$options = [
 			'output' => ['graphid', 'name'],
 			'selectHosts' => ['hostid', 'name'],
-			'selectDiscoveryRule' => ['hostid']
+			'selectDiscoveryRule' => ['hostid'],
+			'selectDiscoveryRulePrototype' => ['hostid']
 		];
 
-		if ($this->fields_values['override_hostid']) {
+		if (!$this->isTemplateDashboard() && $this->fields_values['override_hostid']) {
 			// The key of the actual graph prototype selected on widget's edit form.
 			$graph_prototype = API::GraphPrototype()->get([
 				'output' => ['name'],
 				'graphids' => reset($this->fields_values['graphid'])
 			]);
+
 			if ($graph_prototype) {
 				$graph_prototype = reset($graph_prototype);
 			}
@@ -93,6 +95,7 @@ class WidgetView extends CControllerWidgetIterator {
 
 		// Use this graph prototype as base for collecting created graphs.
 		$graph_prototype = API::GraphPrototype()->get($options);
+
 		if ($graph_prototype) {
 			$graph_prototype = reset($graph_prototype);
 		}
@@ -104,18 +107,22 @@ class WidgetView extends CControllerWidgetIterator {
 
 		// Do not collect graphs while editing a template dashboard.
 		if (!$this->isTemplateDashboard() || $this->fields_values['override_hostid']) {
+			$parent_lld = $graph_prototype['discoveryRule'] ?: $graph_prototype['discoveryRulePrototype'];
+
 			$graphs_created_all = API::Graph()->get([
 				'output' => ['graphid', 'name'],
-				'hostids' => [$graph_prototype['discoveryRule']['hostid']],
-				'selectGraphDiscovery' => ['graphid', 'parent_graphid'],
+				'hostids' => [$parent_lld['hostid']],
+				'selectDiscoveryData' => ['parent_graphid'],
 				'selectHosts' => ['name'],
-				'filter' => ['flags' => ZBX_FLAG_DISCOVERY_CREATED],
+				'filter' => [
+					'flags' => [ZBX_FLAG_DISCOVERY_CREATED]
+				],
 				'expandName' => true
 			]);
 
 			// Collect graphs based on the graph prototype.
 			foreach ($graphs_created_all as $graph) {
-				if ($graph['graphDiscovery']['parent_graphid'] === $graph_prototype['graphid']) {
+				if ($graph['discoveryData']['parent_graphid'] === $graph_prototype['graphid']) {
 					$prepend_host_name = $this->isTemplateDashboard()
 						? false
 						: count($graph['hosts']) == 1 || $this->fields_values['override_hostid'];
@@ -174,7 +181,8 @@ class WidgetView extends CControllerWidgetIterator {
 		}
 		else {
 			$host_names = array_column($graph_prototype['hosts'], 'name', 'hostid');
-			$host_name = $host_names[$graph_prototype['discoveryRule']['hostid']];
+			$parent_lld = $graph_prototype['discoveryRule'] ?: $graph_prototype['discoveryRulePrototype'];
+			$host_name = $host_names[$parent_lld['hostid']];
 
 			$widget_name = $this->isTemplateDashboard()
 				? $graph_prototype['name']
@@ -197,10 +205,11 @@ class WidgetView extends CControllerWidgetIterator {
 		$options = [
 			'output' => ['itemid', 'name'],
 			'selectHosts' => ['name'],
-			'selectDiscoveryRule' => ['hostid']
+			'selectDiscoveryRule' => ['hostid'],
+			'selectDiscoveryRulePrototype' => ['hostid']
 		];
 
-		if ($this->fields_values['override_hostid']) {
+		if (!$this->isTemplateDashboard() && $this->fields_values['override_hostid']) {
 			// The key of the actual item prototype selected on widget's edit form.
 			$item_prototype = API::ItemPrototype()->get([
 				'output' => ['key_'],
@@ -235,17 +244,21 @@ class WidgetView extends CControllerWidgetIterator {
 
 		// Do not collect items while editing a template dashboard.
 		if (!$this->isTemplateDashboard() || $this->fields_values['override_hostid']) {
+			$parent_lld = $item_prototype['discoveryRule'] ?: $item_prototype['discoveryRulePrototype'];
+
 			$items_created_all = API::Item()->get([
 				'output' => ['itemid', 'name_resolved'],
-				'hostids' => [$item_prototype['discoveryRule']['hostid']],
-				'selectItemDiscovery' => ['itemid', 'parent_itemid'],
-				'filter' => ['flags' => ZBX_FLAG_DISCOVERY_CREATED]
+				'hostids' => [$parent_lld['hostid']],
+				'selectDiscoveryData' => ['parent_itemid'],
+				'filter' => [
+					'flags' => [ZBX_FLAG_DISCOVERY_CREATED]
+				]
 			]);
 
 			// Collect items based on the item prototype.
 			$items_created = [];
 			foreach ($items_created_all as $item) {
-				if ($item['itemDiscovery']['parent_itemid'] === $item_prototype['itemid']) {
+				if ($item['discoveryData']['parent_itemid'] === $item_prototype['itemid']) {
 					$items_created[] = $item;
 				}
 			}

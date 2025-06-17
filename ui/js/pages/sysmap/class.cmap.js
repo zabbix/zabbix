@@ -891,7 +891,7 @@ class CMap {
 			const disable = e.target.value == SVGMapShape.BORDER_TYPE_NONE;
 
 			document.getElementById('border_width').disabled = disable;
-			document.getElementById('border_color').disabled = disable;
+			document.querySelector(`.${ZBX_STYLE_COLOR_PICKER}[color-field-name="border_color"]`).disabled = disable;
 		});
 
 		// Add event listeners on border type and width in shape mass update form.
@@ -907,7 +907,8 @@ class CMap {
 				chkbox_border_width.disabled = disable;
 				chkbox_border_color.disabled = disable;
 				document.getElementById('mass_border_width').disabled = disable || !chkbox_border_width.checked;
-				document.getElementById('mass_border_color').disabled = disable || !chkbox_border_color.checked;
+				document.querySelector(`.${ZBX_STYLE_COLOR_PICKER}[color-field-name="mass_border_color"]`).disabled =
+					disable || !chkbox_border_color.checked;
 			})
 		);
 

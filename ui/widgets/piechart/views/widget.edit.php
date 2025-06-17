@@ -115,7 +115,7 @@ function getDisplayOptionsTab(CWidgetFormView $form, array $fields): CDiv {
 						$merge_field->getView(),
 						($merge_percent_field->getView())->setWidth(ZBX_TEXTAREA_NUMERIC_SMALL_WIDTH),
 						' % ',
-						$merge_color_field->withNewView()->getView()
+						$merge_color_field->getView()
 					])
 				])
 
@@ -148,7 +148,7 @@ function getDisplayOptionsTab(CWidgetFormView $form, array $fields): CDiv {
 				])
 				->addItem([
 					$value_color_field->getLabel(),
-					new CFormField($value_color_field->withNewView()->getView())
+					new CFormField($value_color_field->getView())
 				])->setId('show_total_fields')
 		);
 }

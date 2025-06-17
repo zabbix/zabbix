@@ -670,6 +670,14 @@ void	zbx_alerter_deserialize_medias(const unsigned char *data, zbx_am_media_t **
 	zbx_uint32_t	len;
 
 	data += zbx_deserialize_value(data, medias_num);
+
+	if (0 == *medias_num)
+	{
+		zabbix_log(LOG_LEVEL_CRIT, "Unexpectedly received 0 medias");
+		THIS_SHOULD_NEVER_HAPPEN;
+		return;
+	}
+
 	*medias = (zbx_am_media_t **)zbx_malloc(NULL, *medias_num * sizeof(zbx_am_media_t *));
 	for (int i = 0; i < *medias_num; i++)
 	{
@@ -733,7 +741,12 @@ void	zbx_alerter_deserialize_results(const unsigned char *data, zbx_am_result_t 
 	zbx_uint32_t	len;
 
 	data += zbx_deserialize_value(data, results_num);
-	*results = (zbx_am_result_t **)zbx_malloc(NULL, *results_num * sizeof(zbx_am_result_t *));
+
+	/* *results num can be 0 in the message, when request for results is sent */
+	if (0 == *results_num)
+		return;
+
+	*results = (zbx_am_result_t **)zbx_malloc(NULL, (size_t)*results_num * sizeof(zbx_am_result_t *));
 
 	for (int i = 0; i < *results_num; i++)
 	{

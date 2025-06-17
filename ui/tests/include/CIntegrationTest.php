@@ -686,7 +686,7 @@ class CIntegrationTest extends CAPITest {
 		}
 
 		return new CZabbixClient('localhost', self::getConfigurationValue($component, 'ListenPort', 10051), 3, 3,
-			ZBX_SOCKET_BYTES_LIMIT
+			ZBX_SOCKET_BYTES_LIMIT, tls_config: ['ACTIVE' => '0']
 		);
 	}
 

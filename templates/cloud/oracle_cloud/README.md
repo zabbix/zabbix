@@ -205,8 +205,8 @@ LLD filter values and trigger threshold values can be changed with the respectiv
 |{$OCI.VOLUME.BOOT.DISCOVERY.STATE.NOT_MATCHES}|<p>Sets the regex string of boot volume states to ignore in discovery.</p>|`CHANGE_IF_NEEDED`|
 |{$OCI.VOLUME.BOOT.DISCOVERY.NAME.MATCHES}|<p>Sets the regex string of boot volume names to allow in discovery.</p>|`.*`|
 |{$OCI.VOLUME.BOOT.DISCOVERY.NAME.NOT_MATCHES}|<p>Sets the regex string of boot volume names to ignore in discovery.</p>|`CHANGE_IF_NEEDED`|
-|{$OCI.OBJECT.STORAGE.DISCOVERY.NAME.MATCHES}|<p>Set an HTTP proxy for OCI API requests if needed.</p>|`.*`|
-|{$OCI.OBJECT.STORAGE.DISCOVERY.NAME.NOT_MATCHES}|<p>Set an HTTP proxy for OCI API requests if needed.</p>|`CHANGE_IF_NEEDED`|
+|{$OCI.OBJECT.STORAGE.DISCOVERY.NAME.MATCHES}|<p>Sets the regex string of storage names to allow in discovery.</p>|`.*`|
+|{$OCI.OBJECT.STORAGE.DISCOVERY.NAME.NOT_MATCHES}|<p>Sets the regex string of storage names to ignore in discovery.</p>|`CHANGE_IF_NEEDED`|
 |{$OCI.AUTONOMOUS.DB.DISCOVERY.STATE.MATCHES}|<p>Sets the regex string of autonomous database states to allow in discovery.</p>|`.*`|
 |{$OCI.AUTONOMOUS.DB.DISCOVERY.STATE.NOT_MATCHES}|<p>Sets the regex string of autonomous database states to ignore in discovery.</p>|`CHANGE_IF_NEEDED`|
 |{$OCI.AUTONOMOUS.DB.DISCOVERY.NAME.MATCHES}|<p>Sets the regex string of autonomous database names to allow in discovery.</p>|`.*`|
