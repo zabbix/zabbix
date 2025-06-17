@@ -1689,7 +1689,7 @@ class CLineGraphDraw extends CGraphDraw {
 		$avg_to = $data['avg'][$to] + $shift_avg_to;
 
 		$x1 = $from + $this->shiftXleft;
-		$x2 = $to + $this->shiftXleft;
+		$x2 = $to + $this->shiftXleft + 1;
 
 		$y1min = (int) round($zero - ($min_from - $oxy) / $unit2px);
 		$y2min = (int) round($zero - ($min_to - $oxy) / $unit2px);
