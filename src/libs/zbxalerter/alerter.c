@@ -34,7 +34,7 @@
 #include "zbxalgo.h"
 #include "zbxdbhigh.h"
 #include "zbxthreads.h"
-#include "zbxdb.h"
+#include "zbxexpr.h"
 
 #define	ALARM_ACTION_TIMEOUT	40
 
