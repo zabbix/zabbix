@@ -5010,6 +5010,10 @@ msgstr "通讯"
 msgid "Communication between Zabbix agent and server/proxy is secured with a unique user-defined pre-shared key identity and a secret pre-shared key linked to it."
 msgstr "Zabbix agent与server/proxy之间的通信通过唯一的用户定义预共享密钥标识和与之关联的密钥进行加密保护"
 
+#: app/views/host.wizard.edit.php:414
+msgid "Communication between Zabbix agent and server/proxy is secured with the pre-shared key (PSK) encryption method."
+msgstr ""
+
 #: include/items.inc.php:946
 msgctxt "SNMP Community"
 msgid "Community"
@@ -6039,6 +6043,10 @@ msgstr "自定义的严重性的名称影响所有的语系而必须手动翻译
 msgid "Custom size"
 msgstr "自定义大小"
 
+#: app/views/host.wizard.edit.php:138
+msgid "Custom templates are not supported."
+msgstr ""
+
 #: app/views/administration.miscconfig.edit.php:103
 #: include/classes/setup/CSetupWizard.php:561
 msgid "CyberArk Vault"
@@ -6205,6 +6213,10 @@ msgstr "数据采集"
 #, c-format
 msgid "Data from %1$s. Generated in %2$s sec."
 msgstr "数据来自 %1$s. 产生于 %2$s 秒."
+
+#: app/views/host.wizard.edit.php:168
+msgid "Data is collected by Zabbix agent, a lightweight software `component installed on your monitoring target."
+msgstr ""
 
 #: app/views/js/host.wizard.edit.js.php:89
 msgid "Data is collected by Zabbix agent, a lightweight software component installed on your monitoring target."
@@ -11894,6 +11906,10 @@ msgstr "安装Zabbix agent"
 #: app/views/host.wizard.edit.php:512 app/views/host.wizard.edit.php:535
 msgid "Install Zabbix agent 2 and its plugins on your monitoring target by following the installation instructions below."
 msgstr "按照以下安装说明在监控目标上安装Zabbix agent 2及其插件"
+
+#: app/views/host.wizard.edit.php:551 app/views/host.wizard.edit.php:574
+msgid "Install Zabbix agent and its plugins on your monitoring target by following the installation instructions below."
+msgstr ""
 
 #: setup.php:163
 msgid "Installation"
@@ -19414,6 +19430,10 @@ msgstr "安全级别"
 msgid "Security name"
 msgstr "安全名称"
 
+#: app/views/host.wizard.edit.php:132
+msgid "See"
+msgstr ""
+
 #: app/views/popup.condition.edit.php:402 app/views/popup.generic.php:874
 #: app/views/popup.massupdate.item.php:440 app/views/popup.services.php:92
 #: app/views/popup.triggerexpr.php:88 include/classes/html/CMultiSelect.php:70
@@ -20311,6 +20331,11 @@ msgstr "此监控项的某些历史记录可能会被压缩，无法删除。"
 msgid "Some templates (%1$s) are hidden. Custom templates are not supported."
 msgstr "部分模板(%1$s)已隐藏。不支持自定义模板"
 
+#: app/views/host.wizard.edit.php:130
+#, c-format
+msgid "Some templates (%1$s) are incompatible with the Host Wizard."
+msgstr ""
+
 #: widgets/actionlog/includes/WidgetForm.php:79
 #: widgets/problems/includes/WidgetForm.php:145
 msgid "Sort entries by"
@@ -20365,6 +20390,10 @@ msgstr "查看指定主机图形。"
 #: app/views/popup.generic.php:180 include/views/monitoring.history.php:293
 msgid "Specify some filter condition to see the values."
 msgstr "指定过滤器条件以用于查看值"
+
+#: app/views/host.wizard.edit.php:365
+msgid "Specifying new or existing host groups will add the host to these groups without removing it from any current groups."
+msgstr ""
 
 #: httpdetails.php:107 include/classes/screens/CScreenHttpTestDetails.php:82
 msgid "Speed"
@@ -21612,6 +21641,10 @@ msgstr "由于先前删除的对象，此操作缺少条件或操作。"
 msgid "This check cannot be removed, as it is used as a condition in %1$s discovery action."
 msgid_plural "This check cannot be removed, as it is used as a condition in %1$s discovery actions."
 msgstr[0] "此检查无法删除，因为它在%1$s发现操作中被用作一个条件。"
+
+#: app/views/host.wizard.edit.php:384
+msgid "This configuration will overwrite all existing encryption settings on the host."
+msgstr ""
 
 #: include/func.inc.php:2566
 msgid "This day last week"
@@ -26271,6 +26304,10 @@ msgstr "具有相同 UUID 的主机原型已存在"
 msgid "host trigger ID is expected"
 msgstr "需要主机触发器ID"
 
+#: app/views/host.wizard.edit.php:134
+msgid "how to update them"
+msgstr ""
+
 #: include/classes/api/services/CMap.php:844
 #: include/classes/api/services/CMap.php:1311
 msgid "icon"
@@ -26634,6 +26671,10 @@ msgstr "m-d"
 #: include/translateDefines.inc.php:33
 msgid "m-d h:i A"
 msgstr "m-d H:i"
+
+#: app/views/host.wizard.edit.php:589
+msgid "macOS"
+msgstr ""
 
 #: include/classes/parsers/CUserMacroParser.php:37
 msgid "macro is empty"

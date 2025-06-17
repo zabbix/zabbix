@@ -126,7 +126,17 @@ function stepSelectTemplate($old_template_count): array {
 			(new CDiv([
 				$old_template_count > 0
 					? makeMessageBox(ZBX_STYLE_MSG_INFO, [],
-						_s('Some templates (%1$s) are hidden. Custom templates are not supported.', $old_template_count),
+						[
+							_s('Some templates (%1$s) are incompatible with the Host Wizard.', $old_template_count),
+							' ',
+							_('See'),
+							' ',
+							(new CLink(_('how to update them'), CDocHelper::getUrl(CDocHelper::TEMPLATES_OUT_OF_THE_BOX)))
+								->addClass(ZBX_STYLE_LINK_EXTERNAL)
+								->setTarget('_blank'),
+							'. ',
+							_('Custom templates are not supported.')
+						],
 						false
 					)
 					: null,
@@ -152,7 +162,14 @@ function stepSelectTemplate($old_template_count): array {
 					->addItem(
 						(new CDiv([
 							new CFormField([
-								new CLabel(_('Data collection')),
+								new CLabel([
+									_('Data collection'),
+									helpHint([
+										[bold(_('Agent-based')), ' - ', _('Data is collected by Zabbix agent, a lightweight software `component installed on your monitoring target.')],
+										BR(),
+										[bold(_('Agentless')), ' - ', _('Data is collected by Zabbix server or proxy using standard protocols (e.g., SNMP, ICMP) or remote access methods (e.g., SSH).')]
+									])
+								]),
 								(new CRadioButtonList('data_collection'))
 									->addValue(_('All'), ZBX_TEMPLATE_DATA_COLLECTION_ANY)
 									->addValue(_('Agent-based'), ZBX_TEMPLATE_DATA_COLLECTION_AGENT_BASED)
@@ -160,7 +177,14 @@ function stepSelectTemplate($old_template_count): array {
 									->setModern()
 							]),
 							new CFormField([
-								new CLabel(_('Agent mode')),
+								new CLabel([
+									_('Agent mode'),
+									helpHint([
+										[bold(_('Active')), ' - ', _('Zabbix agent initiates connections to Zabbix server or proxy to send data. Recommended for monitoring targets behind a firewall.')],
+										BR(),
+										[bold(_('Passive')), ' - ', _('Zabbix server or proxy initiates connections to Zabbix agent to request data. Recommended for networks without a firewall or with open firewall ports.')]
+									])
+								]),
 								(new CRadioButtonList('agent_mode'))
 									->addValue(_('All'), ZBX_TEMPLATE_AGENT_MODE_ANY)
 									->addValue(_('Active'), ZBX_TEMPLATE_AGENT_MODE_ACTIVE)
@@ -230,7 +254,9 @@ function stepSelectTemplate($old_template_count): array {
 							(new CInput('radio', null, '#{category}:#{templateid}'))
 								->setAttribute('name', 'selected_template')
 						))->addClass(CRadioCardList::ZBX_STYLE_CLASS_SELECTOR)
-					]))->addClass(CRadioCardList::ZBX_STYLE_CLASS_LABEL),
+					]))
+						->setTitle('#{title}')
+						->addClass(CRadioCardList::ZBX_STYLE_CLASS_LABEL),
 				)
 				->addItem(
 					(new CDiv([
@@ -311,7 +337,7 @@ function stepCreateHost($form): CTemplateTag {
 						))->addClass(ZBX_STYLE_FORM_FIELDS_HINT)
 					]))->addClass(ZBX_STYLE_GRID_COLUMN_FIRST)
 				)
-				->addItem(
+				->addItem([
 					(new CFormField([
 						new CLabel(_('Host groups')),
 						new CMultiSelect([
@@ -333,8 +359,17 @@ function stepCreateHost($form): CTemplateTag {
 						(new CDiv(
 							_('Start typing or click Select to choose existing host groups, or enter a new host group name.')
 						))->addClass(ZBX_STYLE_FORM_FIELDS_HINT)
-					]))->addClass(ZBX_STYLE_GRID_COLUMN_FIRST)
-				)
+					]))->addClass(ZBX_STYLE_GRID_COLUMN_FIRST),
+					(new CDiv([
+						new CTag('p', true,
+							_('Specifying new or existing host groups will add the host to these groups without removing it from any current groups.'),
+						)
+					]))
+						->addClass(ZBX_STYLE_FORM_DESCRIPTION)
+						->addClass(ZBX_STYLE_MARKDOWN)
+						->addClass('field-baseline')
+						->addClass('js-groups-description')
+				])
 				->addClass(ZBX_STYLE_GRID_COLUMNS)
 				->addClass(ZBX_STYLE_GRID_COLUMNS_2)
 		]))->addClass('step-form-body')
@@ -345,6 +380,10 @@ function stepInstallAgent($agent_script_data): array {
 	return [
 		new CTemplateTag('host-wizard-step-install-agent',
 			(new CDiv([
+				(makeMessageBox(ZBX_STYLE_MSG_WARNING, [],
+					_('This configuration will overwrite all existing encryption settings on the host.'), false
+				))->addClass('js-agent-encryption-overwrite'),
+
 				(new CSection())
 					->addItem(
 						(new CDiv([
@@ -363,16 +402,48 @@ function stepInstallAgent($agent_script_data): array {
 				(new CSection())
 					->addItem(
 						(new CList([
-							(new CListItem())
-								->addItem(
+							(new CListItem([
+								(new CDiv([
+									(new CTag('h6', true, [_('Verify Zabbix server, proxy, or cluster address')]))
+										->addClass(ZBX_STYLE_ORDERED_LIST_COUNTER),
+									(new CFormField([
+										new CTextBox('agent_script_server_host'),
+										(new CDiv(
+											_('Enter the IP/DNS address and port of your Zabbix server, proxy, or cluster configuration.')
+										))->addClass(ZBX_STYLE_FORM_FIELDS_HINT)
+									]))->addClass('js-agent-script-server-host-input')
+								]))->addClass(ZBX_STYLE_GRID_COLUMN_FIRST),
+								(new CDiv([
+									new CTag('h5', true, _('Example:')),
+									new CTag('p', true,
+										'192.0.2.0:10051, [2001:db8::]:10051, zbx1.local:10051;zbx2.local:10051'
+									),
+									new CTag('p', true,
+										_('Zabbix agent must be able to connect to the specified address or list of addresses.')
+									),
+									new CTag('h5', true, _('Use:')),
+									new CList([
+										_('Colon to separate IP/DNS address from port'),
+										_('Comma to separate multiple Zabbix servers, proxies, or clusters'),
+										_('Semicolon to separate clusters (one or more server addresses)'),
+										_('Brackets to specify IPv6 addresses')
+									])
+								]))
+									->addClass(ZBX_STYLE_FORM_DESCRIPTION)
+									->addClass(ZBX_STYLE_MARKDOWN)
+							]))
+								->addClass(ZBX_STYLE_ORDERED_LIST_ITEM)
+								->addClass(ZBX_STYLE_GRID_COLUMNS)
+								->addClass(ZBX_STYLE_GRID_COLUMNS_2),
+
+							(new CListItem(
+								(new CDiv([
 									(new CTag('h6', true, [_('Configure encryption')]))
-										->addClass(ZBX_STYLE_ORDERED_LIST_COUNTER)
-								)
-								->addItem(
+										->addClass(ZBX_STYLE_ORDERED_LIST_COUNTER),
 									(new CDiv([
 										(new CDiv(
 											new CTag('p', true,
-												_('Communication between Zabbix agent and server/proxy is secured with a unique user-defined pre-shared key identity and a secret pre-shared key linked to it.')
+												_('Communication between Zabbix agent and server/proxy is secured with the pre-shared key (PSK) encryption method.')
 											)
 										))->addClass(ZBX_STYLE_FORMATED_TEXT),
 										(new CDiv(
@@ -387,9 +458,7 @@ function stepInstallAgent($agent_script_data): array {
 												->addClass(ZBX_STYLE_BTN_ALT)
 												->addClass('js-tls-key-change')
 										))->addClass('js-tls-exists')
-									]))->addClass(ZBX_STYLE_FORMATED_GROUP)
-								)
-								->addItem(
+									]))->addClass(ZBX_STYLE_FORMATED_GROUP),
 									(new CFormField([
 										new CLabel(_('Pre-shared key identity')),
 										(new CTextBox('tls_psk_identity', '', false,
@@ -398,9 +467,7 @@ function stepInstallAgent($agent_script_data): array {
 										(new CDiv(
 											_('Enter a non-secret pre-shared key identity string. Avoid including sensitive data.')
 										))->addClass(ZBX_STYLE_FORM_FIELDS_HINT)
-									]))->addClass('js-tls-input')
-								)
-								->addItem(
+									]))->addClass('js-tls-input'),
 									(new CFormField([
 										new CLabel(_('Pre-shared key')),
 										(new CDiv([
@@ -417,14 +484,16 @@ function stepInstallAgent($agent_script_data): array {
 											_('Generate a secret pre-shared key hexadecimal string.')
 										))->addClass(ZBX_STYLE_FORM_FIELDS_HINT)
 									]))->addClass('js-tls-input')
-								)
-								->addClass(ZBX_STYLE_ORDERED_LIST_ITEM),
-							(new CListItem())
-								->addItem(
+								]))->addClass(ZBX_STYLE_GRID_COLUMN_FIRST)
+							))
+								->addClass(ZBX_STYLE_ORDERED_LIST_ITEM)
+								->addClass(ZBX_STYLE_GRID_COLUMNS)
+								->addClass(ZBX_STYLE_GRID_COLUMNS_2),
+
+							(new CListItem(
+								(new CDiv([
 									(new CTag('h6', true, [_('Select the OS of your monitoring target')]))
-										->addClass(ZBX_STYLE_ORDERED_LIST_COUNTER)
-								)
-								->addItem(
+										->addClass(ZBX_STYLE_ORDERED_LIST_COUNTER),
 									new CFormField(
 										(new CRadioCardList('monitoring_os', 'linux'))
 											->addValue([
@@ -440,9 +509,7 @@ function stepInstallAgent($agent_script_data): array {
 												'value' => 'other'
 											])
 											->addClass(ZBX_STYLE_GRID_COLUMNS)
-									)
-								)
-								->addItem(
+									),
 									(new CFormField([
 										new CLabel(_('Select the OS distribution'), 'windows-new'),
 										(new CRadioCardList('monitoring_os_distribution'))
@@ -456,17 +523,23 @@ function stepInstallAgent($agent_script_data): array {
 											])
 											->addClass(ZBX_STYLE_GRID_COLUMNS)
 									]))->addClass('js-windows-distribution-select')
-								)
-								->addClass(ZBX_STYLE_ORDERED_LIST_ITEM),
-							(new CListItem())
+								]))->addClass(ZBX_STYLE_GRID_COLUMN_FIRST)
+							))
 								->addClass(ZBX_STYLE_ORDERED_LIST_ITEM)
-								->addclass('js-install-agent-readme')
-						]))
-							->addClass(ZBX_STYLE_ORDERED_LIST)
-							->addClass(ZBX_STYLE_GRID_COLUMN_FIRST)
+								->addClass(ZBX_STYLE_GRID_COLUMNS)
+								->addClass(ZBX_STYLE_GRID_COLUMNS_2),
+
+							(new CListItem(
+								(new CDiv())
+									->addClass(ZBX_STYLE_GRID_COLUMN_FIRST)
+									->addclass('js-install-agent-readme')
+							))
+								->addClass(ZBX_STYLE_ORDERED_LIST_ITEM)
+								->addClass(ZBX_STYLE_GRID_COLUMNS)
+								->addClass(ZBX_STYLE_GRID_COLUMNS_2)
+
+						]))->addClass(ZBX_STYLE_ORDERED_LIST)
 					)
-					->addClass(ZBX_STYLE_GRID_COLUMNS)
-					->addClass(ZBX_STYLE_GRID_COLUMNS_2)
 			]))->addClass('step-form-body')
 		),
 
@@ -480,7 +553,7 @@ function stepInstallAgent($agent_script_data): array {
 				->addItem(
 					(new CDiv([
 						new CTag('pre', true,
-							"$(command -v curl || echo $(command -v wget) -O -) https://cdn.zabbix.com/scripts/{$agent_script_data['version']}/install-zabbix.sh | bash -s -- #{server_host} #{psk_identity} #{psk}"
+							"$(command -v curl || echo $(command -v wget) -O -) https://cdn.zabbix.com/scripts/{$agent_script_data['version']}/install-zabbix.sh | bash -s -- #{server_host} #{hostname} #{psk_identity} #{psk}"
 						)
 					]))->addClass(ZBX_STYLE_FORMATED_TEXT)
 				)
@@ -499,7 +572,7 @@ function stepInstallAgent($agent_script_data): array {
 							"Invoke-WebRequest -Uri https://cdn.zabbix.com/scripts/{$agent_script_data['version']}/install-zabbix.ps1 -OutFile install-zabbix.ps1"
 						),
 						new CTag('pre', true,
-							"powershell -executionpolicy bypass .\install-zabbix.ps1 #{server_host} #{psk_identity} #{psk}"
+							"powershell -executionpolicy bypass .\install-zabbix.ps1 #{server_host} #{hostname} #{psk_identity} #{psk}"
 						)
 					]))->addClass(ZBX_STYLE_FORMATED_TEXT)
 				)
@@ -509,7 +582,7 @@ function stepInstallAgent($agent_script_data): array {
 			(new CListItem())
 				->addItem(
 					(new CTag('h6', true,
-						_('Install Zabbix agent 2 and its plugins on your monitoring target by following the installation instructions below.')
+						_('Install Zabbix agent and its plugins on your monitoring target by following the installation instructions below.')
 					))->addClass(ZBX_STYLE_ORDERED_LIST_COUNTER)
 				)
 				->addItem(
@@ -532,7 +605,7 @@ function stepInstallAgent($agent_script_data): array {
 			(new CListItem())
 				->addItem(
 					(new CTag('h6', true,
-						_('Install Zabbix agent 2 and its plugins on your monitoring target by following the installation instructions below.')
+						_('Install Zabbix agent and its plugins on your monitoring target by following the installation instructions below.')
 					))->addClass(ZBX_STYLE_ORDERED_LIST_COUNTER)
 				)
 				->addItem(
@@ -547,7 +620,7 @@ function stepInstallAgent($agent_script_data): array {
 							(new CLink(_('Open installation instructions'),
 								CDocHelper::getUrl(CDocHelper::INSTALLATION_PACKAGES_MAC)
 							))->setTarget('_blank'),
-							' (', _('Mac OS'), ')'
+							' (', _('macOS'), ')'
 						]),
 						new CTag('p', true, [
 							(new CLink(_('Open installation instructions'),
@@ -918,7 +991,7 @@ function stepReadme(): CTemplateTag {
 function stepConfigureHost(): array {
 	return [
 		new CTemplateTag('host-wizard-step-configure-host',
-			(new CDiv([
+			(new CDiv(
 				(new CSection())
 					->addItem(
 						(new CDiv([
@@ -934,14 +1007,27 @@ function stepConfigureHost(): array {
 							->addClass(ZBX_STYLE_FORMATED_TEXT)
 					)
 					->addClass(ZBX_STYLE_GRID_COLUMNS)
-					->addClass(ZBX_STYLE_GRID_COLUMNS_2),
-				(new CSection())
-					->addItem(
-						(new CDiv())->addClass('host-macro-list')
-					)
-					->addClass(ZBX_STYLE_GRID_COLUMNS)
 					->addClass(ZBX_STYLE_GRID_COLUMNS_2)
-			]))->addClass('step-form-body')
+
+			))->addClass('step-form-body')
+		),
+		new CTemplateTag('host-wizard-step-configure-host-macros-section',
+			(new CSection())
+				->addItem(
+					(new CDiv())->addClass('host-macro-list')
+				)
+				->addClass(ZBX_STYLE_GRID_COLUMNS)
+				->addClass(ZBX_STYLE_GRID_COLUMNS_2)
+		),
+		new CTemplateTag('host-wizard-step-configure-host-macros-collapsible-section',
+			(new CSectionCollapsible())
+				->setToggleLabel(_('#{section_name}'))
+				->addItem(
+					(new CDiv())->addClass('host-macro-list')
+				)
+				->setExpanded(false)
+				->addClass(ZBX_STYLE_GRID_COLUMNS)
+				->addClass(ZBX_STYLE_GRID_COLUMNS_2)
 		),
 		new CTemplateTag('host-wizard-macro-field-checkbox',
 			(new CFormField([
@@ -1051,4 +1137,10 @@ function cancelScreen(): CTemplateTag {
 				->addClass(ZBX_STYLE_GRID_COLUMNS_2)
 		]))->addClass('step-form-body')
 	);
+}
+
+function helpHint(mixed $help_text): CButtonIcon {
+	return (new CButtonIcon(ZBX_ICON_CIRCLE_QUESTION))
+		->setSmall()
+		->setHint($help_text, ZBX_STYLE_HINTBOX_WRAP);
 }

@@ -1762,7 +1762,8 @@ static int	server_startup(zbx_socket_t *listen_sock, int *ha_stat, int *ha_failo
 			.get_process_forks_cb_arg = get_config_forks,
 			.get_scripts_path_cb_arg = get_zbx_config_alert_scripts_path,
 			.db_config = zbx_db_config,
-			.config_source_ip = zbx_config_source_ip
+			.config_source_ip = zbx_config_source_ip,
+			.config_ssl_ca_location = config_ssl_ca_location
 		};
 
 	zbx_thread_lld_manager_args	lld_manager_args =
