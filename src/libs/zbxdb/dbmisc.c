@@ -1395,24 +1395,3 @@ const char	*zbx_db_sql_id_cmp(zbx_uint64_t id)
 
 	return buf;
 }
-
-/******************************************************************************
- *                                                                            *
- * Purpose: invalidate idcache                                                *
- *                                                                            *
- * Parameters:  error - [OUT] the error message                               *
- *                                                                            *
- * Return value: If the function succeeds, then return SUCCEED,               *
- *               FAIL on an error                                             *
- *                                                                            *
- ******************************************************************************/
-int	zbx_db_free_idcache(char **error)
-{
-	int ret;
-
-	zbx_mutex_destroy(&idcache_mutex);
-	memset(idcache, 0, sizeof(zbx_db_idcache_t));
-	ret = zbx_mutex_create(&idcache_mutex, ZBX_MUTEX_CACHE_IDS, error);
-
-	return ret;
-}

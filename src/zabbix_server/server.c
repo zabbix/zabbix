@@ -2224,10 +2224,11 @@ static void	server_teardown(zbx_rtc_t *rtc, zbx_socket_t *listen_sock)
 	zbx_free_configuration_cache();
 	zbx_free_database_cache(ZBX_SYNC_NONE, &events_cbs, config_history_storage_pipelines);
 	zbx_deinit_remote_commands_cache();
+	zbx_db_deinit();
 
-	if (SUCCEED != zbx_db_free_idcache(&error))
+	if (SUCCEED != zbx_db_init(&error))
 	{
-		zabbix_log(LOG_LEVEL_CRIT, "cannot free idcache: %s", error);
+		zabbix_log(LOG_LEVEL_CRIT, "cannot initialize database: %s", error);
 		zbx_free(error);
 		exit(EXIT_FAILURE);
 	}
