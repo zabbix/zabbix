@@ -72,7 +72,6 @@ class testTagInheritance extends CIntegrationTest {
 	private static $host_trigger_id;
 
 	private static $event_response;
-	private static $event_ids = array();
 
 	public function serverConfigurationProvider() {
 		return [
@@ -256,10 +255,11 @@ class testTagInheritance extends CIntegrationTest {
 			["tag" => "strataX_template_tag_tag_inheritance_9", "value" => "strataX_template_value_tag_inheritance_9"],
 			["tag" => "strataX_trigger_tag_tag_inheritance_0", "value" => "strataX_trigger_value_tag_inheritance_0"]];
 
-
 		$result_tags = self::$event_response['result'][0]['tags'];
 		sort($result_tags);
 		$this->assertEquals(json_encode($expected_template_tags), json_encode($result_tags));
+
+		DB::delete('events', ['eventid' => [self::$event_response['result'][0]['eventid']]]);
 
 		$this->sendSenderValue(self::HOST_NAME, self::HOST_ITEM_KEY, self::VALUE_TO_FIRE_TRIGGER);
 		self::$event_response = $this->callUntilDataIsPresent('event.get', [
@@ -267,7 +267,7 @@ class testTagInheritance extends CIntegrationTest {
 			'selectTags' => ['tag', 'value']
 		], 5, 2);
 
-		$this->assertCount(2, self::$event_response['result']);
+		$this->assertCount(1, self::$event_response['result']);
 
 		$expected_no_template_tags = [
 			["tag" => "host_item_tag_tag_inheritance", "value" => "host_item_value_tag_inheritance"],
@@ -275,17 +275,15 @@ class testTagInheritance extends CIntegrationTest {
 			["tag" => "host_trigger_tag_tag_inheritance", "value" => "host_trigger_value_tag_inheritance"]
 		];
 
-		$result_tags = self::$event_response['result'][1]['tags'];
-		array_push(self::$event_ids, self::$event_response['result'][0]['eventid']);
-		array_push(self::$event_ids, self::$event_response['result'][1]['eventid']);
+		$result_tags = self::$event_response['result'][0]['tags'];
 
 		sort($result_tags);
 		$this->assertEquals(json_encode($expected_no_template_tags), json_encode($result_tags));
+
+		DB::delete('events', ['eventid' => [self::$event_response['result'][0]['eventid']]]);
 	}
 
 	public static function clearData(): void {
-		DB::delete('events', ['eventid' => self::$event_ids]);
-
 		CDataHelper::call('trigger.delete', [self::$host_trigger_id]);
 		CDataHelper::call('trigger.delete', self::$trigger_ids);
 
