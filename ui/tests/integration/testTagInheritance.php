@@ -32,20 +32,20 @@ class testTagInheritance extends CIntegrationTest {
 	const ITEM_NAME_PRE = 'strataX_item_name_tag_inheritance_';
 	const ITEM_KEY_PRE = 'strataX_item_key_tag_inheritance_';
 
-	const TAG_TEMPLATE_NAME_PRE = 'strataX_template_tag_tag_inheritance_';
-	const TAG_TEMPLATE_VALUE_PRE = 'strataX_template_value_tag_inheritance_';
-	const TAG_HOST_NAME = 'host_tag_tag_inheritance';
-	const TAG_HOST_VALUE = 'host_value_tag_inheritance';
+	const TEMPLATE_TAG_NAME_PRE = 'strataX_template_tag_tag_inheritance_';
+	const TEMPLATE_TAG_VALUE_PRE = 'strataX_template_value_tag_inheritance_';
+	const HOST_TAG_NAME = 'host_tag_tag_inheritance';
+	const HOST_TAG_VALUE = 'host_value_tag_inheritance';
 
-	const TAG_ITEM_NAME_PRE = 'strataX_item_tag_tag_inheritance_';
-	const TAG_ITEM_VALUE_PRE = 'strataX_item_value_tag_inheritance_';
-	const TAG_HOST_ITEM_NAME = 'host_item_tag_tag_inheritance';
-	const TAG_HOST_ITEM_VALUE = 'host_item_value_tag_inheritance';
+	const TEMPLATE_ITEM_TAG_NAME_PRE = 'strataX_item_tag_tag_inheritance_';
+	const TEMPLATE_ITEM_TAG_VALUE_PRE = 'strataX_item_value_tag_inheritance_';
+	const HOST_ITEM_TAG_NAME = 'host_item_tag_tag_inheritance';
+	const HOST_ITEM_TAG_VALUE = 'host_item_value_tag_inheritance';
 
-	const TAG_TRIGGER_NAME_PRE = 'strataX_trigger_tag_tag_inheritance_';
-	const TAG_TRIGGER_VALUE_PRE = 'strataX_trigger_value_tag_inheritance_';
-	const TAG_HOST_TRIGGER_NAME = 'host_trigger_tag_tag_inheritance';
-	const TAG_HOST_TRIGGER_VALUE = 'host_trigger_value_tag_inheritance';
+	const TEMPLATE_TRIGGER_TAG_NAME_PRE = 'strataX_trigger_tag_tag_inheritance_';
+	const TEMPLATE_TRIGGER_TAG_VALUE_PRE = 'strataX_trigger_value_tag_inheritance_';
+	const HOST_TRIGGER_TAG_NAME = 'host_trigger_tag_tag_inheritance';
+	const HOST_TRIGGER_TAG_VALUE = 'host_trigger_value_tag_inheritance';
 
 	const TRIGGER_DESCRIPTION_PRE = 'strataX_trigger_description_tag_inheritance_';
 	const TRIGGER_HOST_DESCRIPTION = 'host_trigger_description_tag_inheritance';
@@ -97,8 +97,8 @@ class testTagInheritance extends CIntegrationTest {
 				'host' => self::TEMPLATE_NAME_PRE . $count,
 				'tags' => [
 					[
-						'tag' => self::TAG_TEMPLATE_NAME_PRE . $count,
-						'value' => self::TAG_TEMPLATE_VALUE_PRE . $count
+						'tag' => self::TEMPLATE_TAG_NAME_PRE . $count,
+						'value' => self::TEMPLATE_TAG_VALUE_PRE . $count
 					]
 				],
 				'templates' => [['templateid' => end(self::$template_ids)]],
@@ -110,8 +110,8 @@ class testTagInheritance extends CIntegrationTest {
 				'host' => self::TEMPLATE_NAME_PRE . $count,
 				'tags' => [
 					[
-						'tag' => self::TAG_TEMPLATE_NAME_PRE . $count,
-						'value' => self::TAG_TEMPLATE_VALUE_PRE . $count
+						'tag' => self::TEMPLATE_TAG_NAME_PRE . $count,
+						'value' => self::TEMPLATE_TAG_VALUE_PRE . $count
 					]
 				],
 				'groups' => [
@@ -134,8 +134,8 @@ class testTagInheritance extends CIntegrationTest {
 			'value_type' => ITEM_VALUE_TYPE_UINT64,
 			'tags' => [
 				[
-					'tag' => self::TAG_ITEM_NAME_PRE . $count,
-					'value' => self::TAG_ITEM_VALUE_PRE . $count
+					'tag' => self::TEMPLATE_ITEM_TAG_NAME_PRE . $count,
+					'value' => self::TEMPLATE_ITEM_TAG_VALUE_PRE . $count
 				]
 			]
 		]);
@@ -155,8 +155,8 @@ class testTagInheritance extends CIntegrationTest {
 				self::ITEM_KEY_PRE . $count . ')=' . self::VALUE_TO_FIRE_TRIGGER,
 			'tags' => [
 				[
-					'tag' => self::TAG_TRIGGER_NAME_PRE . $count,
-					'value' => self::TAG_TRIGGER_VALUE_PRE . $count
+					'tag' => self::TEMPLATE_TRIGGER_TAG_NAME_PRE . $count,
+					'value' => self::TEMPLATE_TRIGGER_TAG_VALUE_PRE . $count
 				]
 			]
 		]);
@@ -182,8 +182,8 @@ class testTagInheritance extends CIntegrationTest {
 			'templates' => [['templateid' => end(self::$template_ids)]],
 			'tags' => [
 				[
-					'tag' => self::TAG_HOST_NAME,
-					'value' => self::TAG_HOST_VALUE
+					'tag' => self::HOST_TAG_NAME,
+					'value' => self::HOST_TAG_VALUE
 				]
 			]
 		]);
@@ -200,8 +200,8 @@ class testTagInheritance extends CIntegrationTest {
 			'value_type' => ITEM_VALUE_TYPE_UINT64,
 			'tags' => [
 				[
-					'tag' => self::TAG_HOST_ITEM_NAME,
-					'value' => self::TAG_HOST_ITEM_VALUE
+					'tag' => self::HOST_ITEM_TAG_NAME,
+					'value' => self::HOST_ITEM_TAG_VALUE
 				]
 			]
 		]);
@@ -221,8 +221,8 @@ class testTagInheritance extends CIntegrationTest {
 				self::HOST_ITEM_KEY . ')=' . self::VALUE_TO_FIRE_TRIGGER,
 			'tags' => [
 				[
-					'tag' => self::TAG_HOST_TRIGGER_NAME,
-					'value' => self::TAG_HOST_TRIGGER_VALUE
+					'tag' => self::HOST_TRIGGER_TAG_NAME,
+					'value' => self::HOST_TRIGGER_TAG_VALUE
 				]
 			]
 		]);
