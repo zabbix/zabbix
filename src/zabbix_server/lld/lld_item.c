@@ -338,9 +338,6 @@ static void	update_item_template_cache(zbx_vector_uint64_t *in_itemids)
 		zbx_vector_uint64_append(&itc_link_hostids, itc_link_hostid);
 	}
 
-	zbx_db_free_result(result);
-	zbx_free(sql);
-
 	zbx_db_execute_multiple_query(
 			"delete from item_template_cache"
 			" where", "itemid", &itc_itemids);
@@ -351,10 +348,13 @@ static void	update_item_template_cache(zbx_vector_uint64_t *in_itemids)
 		zbx_db_insert_add_values(&db_insert, itc_itemids.values[i], itc_link_hostids.values[i]);
 
 	zbx_db_insert_execute(&db_insert);
-	zbx_db_insert_clean(&db_insert);
 
+	zbx_db_insert_clean(&db_insert);
 	zbx_vector_uint64_destroy(&itc_itemids);
 	zbx_vector_uint64_destroy(&itc_link_hostids);
+	zbx_db_free_result(result);
+	zbx_free(sql);
+	zbx_free(template_names);
 }
 
 /******************************************************************************
