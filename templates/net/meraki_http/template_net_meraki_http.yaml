@@ -494,7 +494,7 @@ zabbix_export:
           value_type: TEXT
           trends: '0'
           description: |
-            Device operation system
+            Notes about the device
             Network: {$NETWORK.ID}
           inventory_link: NOTES
           preprocessing:
@@ -529,7 +529,7 @@ zabbix_export:
             - tag: component
               value: system
         - uuid: 2280b9212c474d99835ec1334ff780eb
-          name: 'public IP'
+          name: 'Public IP'
           type: DEPENDENT
           key: meraki.device.public.ip
           delay: '0'
@@ -568,7 +568,7 @@ zabbix_export:
             - tag: component
               value: system
         - uuid: 324b748bfe2e4383927176046e246acb
-          name: status
+          name: Status
           type: DEPENDENT
           key: meraki.device.status
           delay: '0'
@@ -770,20 +770,7 @@ zabbix_export:
             
             var response,
             	error_msg = '',
-            	device = [],
-            	uplinksLL = [];
-            
-            function isFloat(n) {
-            	n = parseFloat(n);
-            	return Number(n) === n && n % 1 !== 0;
-            };
-            
-            function checkNumber(string) {
-            	if (typeof string !== "string" || isNaN(string) || isFloat(string)) {
-            		throw 'Incorrect "timespan" parameter given: ' + string + ' Must be an unsigned number';
-            	}
-            	return string;
-            };
+            	deviceInfo = [];
             
             function getHttpData(url) {
             	response = request.get(url);
@@ -829,12 +816,6 @@ zabbix_export:
             
             	if (typeof params.httpproxy !== 'undefined' && params.httpproxy !== '') {
             		request.setProxy(params.httpproxy);
-            	}
-            
-            	timespan = checkNumber('{$MERAKI.UPLINK.LL.TIMESPAN}');
-            
-            	if (timespan > 86400 || timespan < 1) {
-            		throw 'Incorrect "timespan" parameter given: ' + timespan + ' Must be between 1 and 86400 seconds.';
             	}
             
             	deviceInfo = getHttpData(params.url + 'organizations/' + encodeURIComponent(params.organizationId) + '/devices?serial=' + encodeURIComponent(params.serial));
