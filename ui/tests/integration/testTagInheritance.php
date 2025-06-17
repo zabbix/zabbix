@@ -142,7 +142,7 @@ class testTagInheritance extends CIntegrationTest {
 		]);
 
 		$this->assertArrayHasKey('itemids', $response['result']);
-		$this->assertEquals(1, n($response['result']['itemids']));
+		$this->assertEquals(1, count($response['result']['itemids']));
 		array_push(self::$item_ids, $response['result']['itemids'][0]);
 
 		$response = $this->call('trigger.create', [
@@ -244,6 +244,8 @@ class testTagInheritance extends CIntegrationTest {
 
 		$this->assertCount(1, self::$event_response['result']);
 
+		array_push(self::$event_ids, self::$event_response['result'][0]['eventid']);
+
 		$expected_template_tags = [
 			["tag" => "host_tag_tag_inheritance", "value" => "host_value_tag_inheritance"],
 			["tag" => "strataX_item_tag_tag_inheritance_0", "value" => "strataX_item_value_tag_inheritance_0"],
@@ -267,7 +269,8 @@ class testTagInheritance extends CIntegrationTest {
 		$this->sendSenderValue(self::HOST_NAME, self::HOST_ITEM_KEY, self::VALUE_TO_FIRE_TRIGGER);
 		self::$event_response = $this->callUntilDataIsPresent('event.get', [
 			'hostids' => [self::$host_id],
-			'selectTags' => ['tag', 'value']
+			'selectTags' => ['tag', 'value'],
+			'preservekeys' => true
 		], 5, 2);
 
 		$this->assertCount(2, self::$event_response['result']);
@@ -278,9 +281,15 @@ class testTagInheritance extends CIntegrationTest {
 			["tag" => "host_trigger_tag_tag_inheritance", "value" => "host_trigger_value_tag_inheritance"]
 		];
 
-		$result_tags = self::$event_response['result'][1]['tags'];
-		array_push(self::$event_ids, self::$event_response['result'][0]['eventid']);
-		array_push(self::$event_ids, self::$event_response['result'][1]['eventid']);
+		/* Need to find out the second event id and we have array of 2 event ids and know the id of the first event. */
+		$res_event_ids = array_keys(self::$event_response['result']);
+		if ($res_event_ids[0] == end(self::$event_ids)) {
+			array_push(self::$event_ids, $res_event_ids[1]);
+		} else {
+			array_push(self::$event_ids, $res_event_ids[0]);
+		}
+
+		$result_tags = self::$event_response['result'][end(self::$event_ids)]['tags'];
 
 		sort($result_tags);
 		$this->assertEquals(json_encode($expected_no_template_tags), json_encode($result_tags));
