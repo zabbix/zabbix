@@ -60,7 +60,7 @@
 		<replace file="ui/tests/bootstrap.php" token="{BINARY_DIR}" value="${basedir}/sbin/"/>
 		<replace file="ui/tests/bootstrap.php" token="{CONFIG_SOURCE_DIR}" value="${basedir}/conf/"/>
 		<replace file="ui/tests/bootstrap.php" token="{CONFIG_DIR}" value="${basedir}/etc/"/>
-		<replace file="ui/tests/bootstrap.php" token="{COMPONENT_DIR}" value="${basedir}/runtime/"/>
+		<replace file="ui/tests/bootstrap.php" token="{COMPONENT_DIR}" value="${basedir}/../runtime/"/>
 		<replace file="ui/tests/bootstrap.php" token="{PORT_PREFIX}" value="${phpunit_port_prefix}"/>
 		<replace file="ui/tests/bootstrap.php" token="{SCREENSHOT_REFERENCES_DIR}" value="${screenshot_references_dir}"/>
 		<replace file="ui/tests/bootstrap.php" token="{PHPUNIT_DRIVER_ADDRESS}" value="${phpunit_driver_address}"/>
