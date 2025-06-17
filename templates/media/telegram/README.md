@@ -3,10 +3,10 @@
 
 ## Overview
 
-This guide describes how to integrate your Zabbix installation with Telegram messenger using the Telegram Bot API and Zabbix webhook feature.
+This guide describes how to integrate your Zabbix installation with Telegram messenger using the Telegram Bot API and Zabbix webhook feature, providing instructions on setting up a media type, user, and action in Zabbix.
 
 ### Supported features:
-* Personal and group notifications
+* Personal and group notifications (including topics in supergroups)
 * Markdown/HTML support
 
 ## Requirements
@@ -52,58 +52,68 @@ Internal parameters are reserved for predefined macros that are not meant to be 
 
 [![](images/thumb.1.png?raw=true)](images/1.png)
 
-2\. If you want to send personal notifications, you need to obtain the chat ID of the user the bot should send messages to.
+2\. Set up personal or group notifications:
 
-Send `/getid` to `@myidbot` in the Telegram messenger.
+2\.1 Personal notifications:
 
-[![](images/thumb.3.png?raw=true)](images/3.png)
-
-Ask the user to send `/start` to the bot created in step 1. If you skip this step, the Telegram bot won't be able to send messages to the user.
-
-[![](images/thumb.5.png?raw=true)](images/5.png)
-
-3\.If you want to send group notifications, you need to obtain the group ID of the group that the bot should send messages to. To do so:
-
-Add `@myidbot` and `@your_bot_name_here` to your group.
-In the group chat, send: `/getgroupid@myidbot`.
-In the group chat, send: `/start@your_bot_name_here`. If you skip this step, the Telegram bot won't be able to send messages to the group.
-
-[![](images/thumb.9.png?raw=true)](images/9.png)
-
-## Zabbix configuration
-
-1\. In the Zabbix interface *Alerts* > *Media types* section, import the [`media_telegram.yaml`](media_telegram.yaml) file.
-
-2\. Configure the added media type: 
-
-Copy and paste your Telegram bot token into the *telegramToken* field.
+2\.1\.1 Retrieve the chat ID of the user the bot should send messages to. The user should send `/getid` to `@myidbot` in the Telegram messenger.
 
 [![](images/thumb.2.png?raw=true)](images/2.png)
 
-In the `ParseMode` parameter, set the required option according to Telegram documentation.
+2\.1\.2 The user should also send `/start` to the bot created in step 1. If you skip this step, the Telegram bot won't be able to send messages to the user (bots cannot initiate conversations with users).
 
-More on formatting action notification messages in Telegram Bot API documentation: [Markdown](https://core.telegram.org/bots/api#markdown-style) / [HTML](https://core.telegram.org/bots/api#html-style) / [MarkdownV2](https://core.telegram.org/bots/api#markdownv2-style).
+[![](images/thumb.3.png?raw=true)](images/3.png)
 
-Note: Your Telegram-related actions should be separated from other notification actions (for example, SMS), otherwise you may get plain-text alerts with raw Markdown/HTML tags.
+2\.2 Group notifications:
 
-Test the media type using your chat ID or group ID.
+2\.2\.1 Retrieve the group ID of the group that the bot should send messages to. Add `@myidbot` and the bot created in step 1 to your group.
 
-[![](images/thumb.6.png?raw=true)](images/6.png)
-[![](images/thumb.7.png?raw=true)](images/7.png)
-
-If you have forgotten to send `/start` to the Telegram bot, you will get the following error:
-
-[![](images/thumb.8.png?raw=true)](images/8.png)
-
-3\.To receive notifications in Telegram, you need to create a Zabbix user and add **Media** with the **Telegram** media type.
-
-In the *Send to* field, enter the Telegram user chat ID or group ID obtained during Telegram setup.
+2\.2\.2 In the group chat, send: `/getgroupid@myidbot`.
 
 [![](images/thumb.4.png?raw=true)](images/4.png)
 
-Make sure the user has access to all the hosts for which you would like to receive Telegram notifications.
+2\.2\.3 If the bot is added to a supergroup and you want the bot to send messages to a specific topic instead of the default *General* channel, right-click any message in that topic and click *Copy Message Link*. The copied link will have the following format: `https://t.me/c/<short_group_id>/<topic_id>/<message_id>`, for example: `https://t.me/c/1234567890/2/1`. In this example, the topic ID is `2`.
 
-Done! You can now start receiving Zabbix notifications in Telegram.
+[![](images/thumb.5.png?raw=true)](images/5.png)
+
+Note:
+- The group ID is a negative number, for example: `-1234567890`.
+- The supergroup ID is a negative number prefixed with `-100`, for example: `-1001234567890`.
+- The public group or supergroup ID can also be specified in media type properties as a name prefixed by `@`, for example: `@MyGroupName`.
+
+3\. Depending on where you want to send notifications, copy and save the bot token, personal chat ID or group ID, and topic ID (if you want to send messages to a specific supergroup topic), as you will need these later to set up the media type in Zabbix.
+
+## Zabbix configuration
+
+1. Import the media type:
+- In the *Alerts* > *Media types* section, import the [`media_telegram.yaml`](media_telegram.yaml) file.
+
+2. Open the imported **Telegram** media type and set the following webhook parameters:
+- `api_parse_mode` - the formatting mode applied for messages (possible values: `markdown`, `html`, `markdownv2`)
+- `api_token` - the token of the bot used to send messages
+
+[![](images/thumb.6.png?raw=true)](images/6.png)
+
+Learn more about message formatting options in Telegram Bot API documentation:
+- [Markdown](https://core.telegram.org/bots/api#markdown-style)
+- [HTML](https://core.telegram.org/bots/api#html-style)
+- [MarkdownV2](https://core.telegram.org/bots/api#markdownv2-style)
+
+Note: Your Telegram-related actions should be separated from other notification types (e.g., SMS); otherwise, if you use Markdown or HTML in the alert subject or body, you may receive plain-text alerts with raw tags.
+
+3. Click the *Enabled* checkbox to enable the media type and click the *Update* button to save the webhook settings.
+
+4. Create a Zabbix user and add media:
+  - To create a new user, go to the *Users* > *Users* section and click the *Create user* button in the top-right corner. In the *User* tab, fill in all the required fields (marked with red asterisks).
+  - Make sure this user has access to all the hosts for which you would like problem notifications to be sent to **Telegram**.
+  - In the *Media* tab, click *Add* and select **Telegram** from the *Type* drop-down list.
+  - In the *Send to* field, specify the Telegram user chat ID or group ID that you retrieved during Telegram setup. To send notifications to a specific topic within a supergroup, specify the topic ID after the semicolon delimiter in the format `<group_id>:<topic_id>`, for example: `-1001234567890:2`, `@MyGroupName:2`.
+
+[![](images/thumb.7.png?raw=true)](images/7.png)
+[![](images/thumb.8.png?raw=true)](images/8.png)
+[![](images/thumb.9.png?raw=true)](images/9.png)
+
+5. Done! You can now start using this media type in actions and send notifications.
 
 ## Feedback
 
