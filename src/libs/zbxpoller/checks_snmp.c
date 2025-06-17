@@ -312,6 +312,7 @@ static int	zbx_snmp_cache_handle_engineid(netsnmp_session *session, zbx_dc_item_
 	zbx_snmp_engineid_device_t	d;
 	u_int				current_engineboots = 0;
 	int				ret = SUCCEED;
+	time_t				now;
 
 	if (0 == engineid_cache_initialized)
 		return SUCCEED;
@@ -342,6 +343,8 @@ static int	zbx_snmp_cache_handle_engineid(netsnmp_session *session, zbx_dc_item_
 		}
 	}
 
+	now = time(NULL);
+
 	if (NULL == (ptr = zbx_hashset_search(&engineid_cache, &local_record)))
 	{
 		zbx_vector_engineid_device_create(&local_record.devices);
@@ -352,7 +355,7 @@ static int	zbx_snmp_cache_handle_engineid(netsnmp_session *session, zbx_dc_item_
 
 		zbx_vector_engineid_device_append(&local_record.devices, d);
 		local_record.lastlog = 0;
-		local_record.lastseen = time(NULL);
+		local_record.lastseen = now;
 		local_record.modified = 0;
 		zbx_hashset_insert(&engineid_cache, &local_record, sizeof(local_record));
 
@@ -365,7 +368,7 @@ static int	zbx_snmp_cache_handle_engineid(netsnmp_session *session, zbx_dc_item_
 		int		diff_engineboots = 0, found = 0;
 		zbx_uint64_t	revision = 0;
 
-		ptr->lastseen = time(NULL);
+		ptr->lastseen = now;
 
 		for (int i = 0; i < ptr->devices.values_num; i++)
 		{
@@ -419,8 +422,6 @@ static int	zbx_snmp_cache_handle_engineid(netsnmp_session *session, zbx_dc_item_
 		if (1 == diff_engineboots)
 		{
 #define	ZBX_SNMP_ENGINEID_WARNING_PERIOD	300
-			time_t	now = time(NULL);
-
 			if (now >= ptr->lastlog + ZBX_SNMP_ENGINEID_WARNING_PERIOD)
 			{
 				zabbix_log(LOG_LEVEL_WARNING, "SNMP engineId is not unique across following "
