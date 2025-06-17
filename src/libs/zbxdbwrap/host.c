@@ -5915,7 +5915,6 @@ int	zbx_db_copy_template_elements(zbx_uint64_t hostid, zbx_vector_uint64_t *lnk_
 		DBcopy_template_httptests(hostid, lnk_templateids, audit_context_mode);
 	}
 clean:
-
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __func__, zbx_result_string(res));
 
 	return res;

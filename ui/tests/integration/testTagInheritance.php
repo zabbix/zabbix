@@ -21,7 +21,6 @@ require_once dirname(__FILE__).'/../include/helpers/CDataHelper.php';
  *
  * @required-components server
  * @configurationDataProvider serverConfigurationProvider
- * @hosts test_tag_inheritance
  * @onAfter clearData
  */
 class testTagInheritance extends CIntegrationTest {
@@ -76,7 +75,6 @@ class testTagInheritance extends CIntegrationTest {
 	public function serverConfigurationProvider() {
 		return [
 			self::COMPONENT_SERVER => [
-				'DebugLevel' => 4,
 				'LogFileSize' => 0,
 				'LogFile' => self::getLogPath(self::COMPONENT_SERVER),
 				'PidFile' => PHPUNIT_COMPONENT_DIR.'zabbix_server.pid',
@@ -86,8 +84,14 @@ class testTagInheritance extends CIntegrationTest {
 		];
 	}
 
+	/**
+	 * Initializes templates.
+	 *
+	 * @param bool $hasTemplate does the templates itself links to another template (end of self::$template_ids array)
+	 * @param int $count postfix when naming templates
+	 */
 	private function createTemplate($hasTemplate, $count) {
-		/* First template has no templates link to it. */
+		/* First template has no templates linked to it. */
 		if ($hasTemplate) {
 			$response = $this->call('template.create', [
 				'host' => self::TEMPLATE_NAME_PRE . $count,
@@ -99,7 +103,7 @@ class testTagInheritance extends CIntegrationTest {
 				],
 				'templates' => [['templateid' => end(self::$template_ids)]],
 				'groups' => [
-					'groupid' => 1
+					'groupid' => 1 // Templates
 				]]);
 		} else {
 			$response = $this->call('template.create', [
@@ -111,7 +115,7 @@ class testTagInheritance extends CIntegrationTest {
 					]
 				],
 				'groups' => [
-					'groupid' => 1
+					'groupid' => 1 // Templates
 				]]);
 		}
 
@@ -166,15 +170,14 @@ class testTagInheritance extends CIntegrationTest {
 	public function prepareData() {
 		$this->createTemplate(false, 0);
 
-		/* Every newly created template refers to the previously created template. */
+		/* Every newly created template links to the previously created template. */
 		for ($i = 1; $i < self::NUMBER_OF_TEMPLATES; $i++) {
 			$this->createTemplate(true, $i);
 		}
 
 		$response = $this->call('host.create', [
 			'host' => self::HOST_NAME,
-			'interfaces' => [],
-			'groups' => ['groupid' => 4],
+			'groups' => ['groupid' => 4], // Zabbix servers
 			'status' => HOST_STATUS_MONITORED,
 			'templates' => [['templateid' => end(self::$template_ids)]],
 			'tags' => [
