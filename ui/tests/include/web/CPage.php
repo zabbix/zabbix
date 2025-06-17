@@ -612,6 +612,8 @@ class CPage {
 	 * @param int $scenario  	     TEST_BAD - expected bad credentials, TEST_GOOD - user successfully logged in
 	 * @param string $url		     Direct link to certain Zabbix page
 	 * @param bool $check_logged_in  Check if the user is logged in
+	 *
+	 * @return $this
 	 */
 	public function userLogin($alias, $password, $scenario = TEST_GOOD, $url = 'index.php', $check_logged_in = true) {
 		if (self::$cookie === null) {
@@ -628,6 +630,8 @@ class CPage {
 		if ($check_logged_in) {
 			$this->assertUserIsLoggedIn($scenario);
 		}
+
+		return $this;
 	}
 
 	/**
