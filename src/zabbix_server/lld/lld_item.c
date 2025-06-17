@@ -309,7 +309,7 @@ static void	update_item_template_cache(zbx_vector_uint64_t *in_itemids)
 	char			*sql = NULL, *template_names = NULL;
 	size_t			sql_alloc = 256, sql_offset = 0, tmp_alloc = 64;
 	zbx_vector_uint64_t	itc_itemids, itc_link_hostids;
-	zbx_db_insert_t         db_insert;
+	zbx_db_insert_t		db_insert;
 
 	sql = (char *)zbx_malloc(sql, sql_alloc);
 	template_names = (char *)zbx_malloc(template_names, tmp_alloc);
@@ -356,7 +356,6 @@ static void	update_item_template_cache(zbx_vector_uint64_t *in_itemids)
 	zbx_vector_uint64_destroy(&itc_itemids);
 	zbx_vector_uint64_destroy(&itc_link_hostids);
 }
-
 
 /******************************************************************************
  *                                                                            *
