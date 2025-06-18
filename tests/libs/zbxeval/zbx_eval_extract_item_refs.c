@@ -41,12 +41,12 @@ void	zbx_mock_test_entry(void **state)
 	zbx_eval_context_t	ctx;
 	char			*error = NULL;
 	zbx_uint64_t		rules;
-	zbx_vector_str_t	refs, exp_refs, parametrs;
+	zbx_vector_str_t	refs, exp_refs, parameters;
 
 	ZBX_UNUSED(state);
 
 	zbx_vector_str_create(&refs);
-	zbx_vector_str_create(&parametrs);
+	zbx_vector_str_create(&parameters);
 
 	rules = mock_eval_read_rules("in.rules");
 	returned_ret = zbx_eval_parse_expression(&ctx, zbx_mock_get_parameter_string("in.expression"), rules, &error);

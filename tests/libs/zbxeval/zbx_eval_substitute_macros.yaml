@@ -1,5 +1,5 @@
 ---
-test case: 'macro replacment ZBX_EVAL_TOKEN_VAR_MACRO'
+test case: 'macro replacement ZBX_EVAL_TOKEN_VAR_MACRO'
 in:
   rules: [ZBX_EVAL_PARSE_MACRO]
   expression: '{MACRO}'
@@ -8,7 +8,7 @@ in:
 out:
   result: SUCCEED
 ---
-test case: 'usermacro replacment ZBX_EVAL_TOKEN_VAR_STR'
+test case: 'usermacro replacement ZBX_EVAL_TOKEN_VAR_STR'
 in:
   rules: [ZBX_EVAL_PARSE_MACRO, ZBX_EVAL_PARSE_MATH,ZBX_EVAL_PARSE_FUNCTION,ZBX_EVAL_PARSE_GROUP,ZBX_EVAL_PARSE_VAR]
   expression: 'min(1,"{$USER}")'
