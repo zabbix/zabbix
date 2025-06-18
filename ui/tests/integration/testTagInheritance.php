@@ -698,7 +698,7 @@ class testTagInheritance extends CIntegrationTest {
 				],
 				'expected' => [
 				]
-			],
+			]
 		];
 	}
 
