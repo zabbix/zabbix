@@ -143,7 +143,7 @@ class testTagInheritance extends CIntegrationTest {
 			'recovery_mode' => ZBX_RECOVERY_MODE_NONE,
 			'manual_close' => self::TRIGGER_MANUAL_CLOSE,
 			'expression' => 'last(/' . self::TEMPLATE_NAME_PREFIX . $n . '/' .
-				self::TEMPLATE_ITEM_KEY_PREFIX . $n . ')=' . self::VALUE_TO_FIRE_TRIGGER,
+				self::TEMPLATE_ITEM_KEY_PREFIX . $n . ')=' . self::VALUE_TO_FIRE_TRIGGER
 		];
 
 		switch ($n) {
@@ -174,7 +174,7 @@ class testTagInheritance extends CIntegrationTest {
 					[
 						'tag' => 'tag1',
 						'value' => 'value1'
-					],
+					]
 				]];
 		case 2:
 						$tg +=
@@ -195,13 +195,10 @@ class testTagInheritance extends CIntegrationTest {
 						'tag' => 'tag1',
 						'value' => 'value1'
 					],
-
 					[
 						'tag' => 'tag2',
 						'value' => '6'
 					]
-
-
 				]];
 		case 3:
 			$tg +=
@@ -224,7 +221,7 @@ class testTagInheritance extends CIntegrationTest {
 					]
 				]];
 		case 4:
-						$tg +=
+			$tg +=
 				['tags' => [
 					[
 						'tag' => self::TEMPLATE_TRIGGER_TAG_NAME_PREFIX . $n,
@@ -245,7 +242,7 @@ class testTagInheritance extends CIntegrationTest {
 					[
 						'tag' => 'tag1',
 						'value' => 'value5'
-					],
+					]
 				]];
 		case 6:
 			$tg +=
@@ -258,7 +255,6 @@ class testTagInheritance extends CIntegrationTest {
 						'tag' => 'tag2',
 						'value' => 'value6'
 					]
-
 				]];
 		case 7:
 			$tg +=
@@ -266,7 +262,7 @@ class testTagInheritance extends CIntegrationTest {
 					[
 						'tag' => self::TEMPLATE_TRIGGER_TAG_NAME_PREFIX . $n,
 						'value' => self::TEMPLATE_TRIGGER_TAG_VALUE_PREFIX . $n
-					],
+					]
 				]];
 		case 8:
 			$tg +=
@@ -274,7 +270,7 @@ class testTagInheritance extends CIntegrationTest {
 					[
 						'tag' => self::TEMPLATE_TRIGGER_TAG_NAME_PREFIX . $n,
 						'value' => self::TEMPLATE_TRIGGER_TAG_VALUE_PREFIX . $n
-					],
+					]
 				]];
 		case 9:
 			$tg +=
@@ -282,7 +278,7 @@ class testTagInheritance extends CIntegrationTest {
 					[
 						'tag' => self::TEMPLATE_TRIGGER_TAG_NAME_PREFIX . $n,
 						'value' => self::TEMPLATE_TRIGGER_TAG_VALUE_PREFIX . $n
-					],
+					]
 				]];
 		}
 
@@ -396,7 +392,7 @@ class testTagInheritance extends CIntegrationTest {
 		self::$event_response = $this->callUntilDataIsPresent('event.get', [
 			'objectids' => self::$host_trigger_id,
 			'hostids' => [self::$host_id],
-			'selectTags' => ['tag', 'value'],
+			'selectTags' => ['tag', 'value']
 		], 5, 2);
 
 		$this->assertCount(1, self::$event_response['result']);
@@ -536,7 +532,7 @@ class testTagInheritance extends CIntegrationTest {
 					'strataX_trigger_description_tag_inheritance_3',
 					'strataX_trigger_description_tag_inheritance_5',
 					'strataX_trigger_description_tag_inheritance_7',
-					'strataX_trigger_description_tag_inheritance_8',
+					'strataX_trigger_description_tag_inheritance_8'
 				]
 			],
 			'events-not-equal-single-tag' => [
@@ -554,7 +550,7 @@ class testTagInheritance extends CIntegrationTest {
 					'strataX_trigger_description_tag_inheritance_5',
 					'strataX_trigger_description_tag_inheritance_6',
 					'strataX_trigger_description_tag_inheritance_7',
-					'strataX_trigger_description_tag_inheritance_8',
+					'strataX_trigger_description_tag_inheritance_8'
 				]
 			],
 			'events-not-equal-two-tags' => [
@@ -572,7 +568,7 @@ class testTagInheritance extends CIntegrationTest {
 					'strataX_trigger_description_tag_inheritance_3',
 					'strataX_trigger_description_tag_inheritance_6',
 					'strataX_trigger_description_tag_inheritance_7',
-					'strataX_trigger_description_tag_inheritance_8',
+					'strataX_trigger_description_tag_inheritance_8'
 				]
 			],
 			'events-not-contain-single-tag' => [
@@ -588,7 +584,7 @@ class testTagInheritance extends CIntegrationTest {
 					'strataX_trigger_description_tag_inheritance_3',
 					'strataX_trigger_description_tag_inheritance_6',
 					'strataX_trigger_description_tag_inheritance_7',
-					'strataX_trigger_description_tag_inheritance_8',
+					'strataX_trigger_description_tag_inheritance_8'
 				]
 			],
 
@@ -604,7 +600,7 @@ class testTagInheritance extends CIntegrationTest {
 				'expected' => [
 					'strataX_trigger_description_tag_inheritance_2',
 					'strataX_trigger_description_tag_inheritance_3',
-					'strataX_trigger_description_tag_inheritance_6',
+					'strataX_trigger_description_tag_inheritance_6'
 				]
 			],
 			'events-tag-exists-or-another-empty' => [
@@ -618,7 +614,7 @@ class testTagInheritance extends CIntegrationTest {
 				'expected' => [
 					'strataX_trigger_description_tag_inheritance_2',
 					'strataX_trigger_description_tag_inheritance_3',
-					'strataX_trigger_description_tag_inheritance_6',
+					'strataX_trigger_description_tag_inheritance_6'
 				]
 			],
 			'events-contains-one-of-two-tags' => [
@@ -630,7 +626,7 @@ class testTagInheritance extends CIntegrationTest {
 					]
 				],
 				'expected' => [
-					'strataX_trigger_description_tag_inheritance_5',
+					'strataX_trigger_description_tag_inheritance_5'
 				]
 			],
 			'events-not-exist-one-of-two-tags' => [
@@ -649,7 +645,7 @@ class testTagInheritance extends CIntegrationTest {
 					'strataX_trigger_description_tag_inheritance_5',
 					'strataX_trigger_description_tag_inheritance_6',
 					'strataX_trigger_description_tag_inheritance_7',
-					'strataX_trigger_description_tag_inheritance_8',
+					'strataX_trigger_description_tag_inheritance_8'
 				]
 			],
 			'events-not-equal-one-of-two-tag-values' => [
@@ -672,7 +668,7 @@ class testTagInheritance extends CIntegrationTest {
 					'strataX_trigger_description_tag_inheritance_5',
 					'strataX_trigger_description_tag_inheritance_6',
 					'strataX_trigger_description_tag_inheritance_7',
-					'strataX_trigger_description_tag_inheritance_8',
+					'strataX_trigger_description_tag_inheritance_8'
 				]
 			],
 			'events-not-contain-one-of-two-tags' => [
@@ -691,7 +687,7 @@ class testTagInheritance extends CIntegrationTest {
 					'strataX_trigger_description_tag_inheritance_5',
 					'strataX_trigger_description_tag_inheritance_6',
 					'strataX_trigger_description_tag_inheritance_7',
-					'strataX_trigger_description_tag_inheritance_8',
+					'strataX_trigger_description_tag_inheritance_8'
 				]
 			],
 			'events-contains-no-tags' => [
