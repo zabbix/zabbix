@@ -73,8 +73,7 @@ var AddValueMap = class {
 		const cell = document.createElement('td');
 		const link = document.createElement('a');
 		link.textContent = this.data.name;
-		link.classList.add('wordbreak');
-		link.classList.add('js-label');
+		link.classList.add('wordbreak', 'js-label');
 		link.href = 'javascript:void(0);';
 		link.addEventListener('click', (e) => {
 			const valuemap_names = [];
