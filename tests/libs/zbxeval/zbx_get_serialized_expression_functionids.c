@@ -36,13 +36,13 @@ void	zbx_mock_test_entry(void **state)
 	returned_ret = zbx_eval_parse_expression(&ctx, zbx_mock_get_parameter_string("in.expression"), rules, &error);
 
 	if (SUCCEED != returned_ret)
-		printf("ERROR: %s\n", error);
+		fail_msg("ERROR: %s\n", error);
 	else
 		mock_dump_stack(&ctx);
 
-	if (SUCCEED == zbx_mock_parameter_exists("in.variant"))
+	if (ZBX_MOCK_SUCCESS == zbx_mock_parameter_exists("in.variant"))
 	{
-		if (SUCCEED == strcmp("ZBX_VARIANT_STR", zbx_mock_get_parameter_string("in.variant")))
+		if (0 == strcmp("ZBX_VARIANT_STR", zbx_mock_get_parameter_string("in.variant")))
 		{
 			for (int i = 0; i < ctx.stack.values_num; i++)
 			{
@@ -50,7 +50,7 @@ void	zbx_mock_test_entry(void **state)
 						zbx_mock_get_parameter_string("in.variant")));
 			}
 		}
-		else if (SUCCEED == strcmp("ZBX_VARIANT_UI64", zbx_mock_get_parameter_string("in.variant")))
+		else if (0 == strcmp("ZBX_VARIANT_UI64", zbx_mock_get_parameter_string("in.variant")))
 		{
 			for (int i = 0; i < ctx.stack.values_num; i++)
 			{
@@ -58,7 +58,7 @@ void	zbx_mock_test_entry(void **state)
 						zbx_mock_get_parameter_uint64("in.variant_ui64_data"));
 			}
 		}
-		else if (SUCCEED == strcmp("ZBX_VARIANT_DBL", zbx_mock_get_parameter_string("in.variant")))
+		else if (0 == strcmp("ZBX_VARIANT_DBL", zbx_mock_get_parameter_string("in.variant")))
 		{
 			for (int i = 0; i < ctx.stack.values_num; i++)
 			{
@@ -75,9 +75,7 @@ void	zbx_mock_test_entry(void **state)
 	zbx_mock_extract_yaml_values_uint64(zbx_mock_get_parameter_handle("out.ids"), &functionids_out);
 
 	zbx_mock_assert_int_eq("return value:", SUCCEED, compare_vectors_uint64(&functionids, &functionids_out));
-	zbx_vector_uint64_clear(&functionids);
 	zbx_vector_uint64_destroy(&functionids);
-	zbx_vector_uint64_clear(&functionids_out);
 	zbx_vector_uint64_destroy(&functionids_out);
 	zbx_free(data);
 	zbx_eval_clear(&ctx);

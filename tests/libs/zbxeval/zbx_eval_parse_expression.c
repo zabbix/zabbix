@@ -39,7 +39,7 @@ void	zbx_mock_test_entry(void **state)
 	expected_ret = zbx_mock_str_to_return_code(zbx_mock_get_parameter_string("out.result"));
 
 	if (SUCCEED != returned_ret)
-		printf("ERROR: %s\n", error);
+		fail_msg("ERROR: %s\n", error);
 	else
 		mock_dump_stack(&ctx);
 

@@ -43,7 +43,6 @@ void	zbx_mock_test_entry(void **state)
 		zbx_mock_assert_double_eq("return function value", exp_function_result, function_result);
 	}
 
-	zbx_vector_dbl_clear(&values);
 	zbx_vector_dbl_destroy(&values);
 	zbx_free(error);
 }

@@ -24,7 +24,7 @@
 
 static int	compare_ctx_no_rules(zbx_eval_context_t *ctx1, zbx_eval_context_t *ctx2)
 {
-	if (SUCCEED != zbx_strcmp_natural(ctx1->expression, ctx2->expression))
+	if (0 != zbx_strcmp_natural(ctx1->expression, ctx2->expression))
 		return FAIL;
 
 	if (ctx1->stack.values_num != ctx2->stack.values_num)
@@ -61,13 +61,13 @@ void	zbx_mock_test_entry(void **state)
 	returned_ret = zbx_eval_parse_expression(&ctx1, zbx_mock_get_parameter_string("in.expression"), rules, &error);
 
 	if (SUCCEED != returned_ret)
-		printf("ERROR: %s\n", error);
+		fail_msg("ERROR: %s\n", error);
 	else
 		mock_dump_stack(&ctx1);
 
 	zbx_eval_serialize(&ctx1, NULL, &data);
 
-	if (SUCCEED == zbx_mock_parameter_exists("in.skip_ids"))
+	if (ZBX_MOCK_SUCCESS == zbx_mock_parameter_exists("in.skip_ids"))
 		ctx2 = zbx_eval_deserialize_dyn(data, zbx_mock_get_parameter_string("in.expression"),
 				ZBX_EVAL_EXTRACT_VAR_STR);
 	else

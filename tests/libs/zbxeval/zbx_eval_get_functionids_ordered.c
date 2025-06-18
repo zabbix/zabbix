@@ -40,11 +40,11 @@ void	zbx_mock_test_entry(void **state)
 	zbx_mock_assert_int_eq("eval status return value", SUCCEED, status);
 
 	if (SUCCEED != returned_ret)
-		printf("ERROR: %s\n", error);
+		fail_msg("ERROR: %s\n", error);
 	else
 		mock_dump_stack(&ctx);
 
-	if (SUCCEED == zbx_mock_parameter_exists("in.variant"))
+	if (ZBX_MOCK_SUCCESS == zbx_mock_parameter_exists("in.variant"))
 	{
 		for (int i = 0; i < ctx.stack.values_num; i++)
 		{
@@ -59,9 +59,7 @@ void	zbx_mock_test_entry(void **state)
 	zbx_mock_extract_yaml_values_uint64(zbx_mock_get_parameter_handle("out.ids"), &functionids_out);
 
 	zbx_mock_assert_int_eq("returned value", SUCCEED, compare_vectors_uint64(&functionids, &functionids_out));
-	zbx_vector_uint64_clear(&functionids);
 	zbx_vector_uint64_destroy(&functionids);
-	zbx_vector_uint64_clear(&functionids_out);
 	zbx_vector_uint64_destroy(&functionids_out);
 
 	zbx_free(error);
