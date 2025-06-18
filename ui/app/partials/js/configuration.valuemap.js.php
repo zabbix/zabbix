@@ -74,8 +74,8 @@ var AddValueMap = class {
 		const link = document.createElement('a');
 		link.textContent = this.data.name;
 		link.classList.add('wordbreak');
+		link.classList.add('js-label');
 		link.href = 'javascript:void(0);';
-		link.className = 'js-label';
 		link.addEventListener('click', (e) => {
 			const valuemap_names = [];
 			const valuemap_table = e.target.closest('table');
