@@ -92,34 +92,24 @@ class testTagInheritance extends CIntegrationTest {
 	 * @param int $n postfix when naming templates and their components
 	 */
 	private function createTemplate($hasTemplate, $n) {
+		$r = [
+			'host' => self::TEMPLATE_NAME_PREFIX . $n,
+			'tags' => [
+				[
+					'tag' => self::TEMPLATE_TAG_NAME_PREFIX . $n,
+					'value' => self::TEMPLATE_TAG_VALUE_PREFIX . $n
+				]
+			],
+			'groups' => [
+				'groupid' => 1 // Templates
+			]];
+
 		/* First template has no templates linked to it. */
 		if ($hasTemplate) {
-			$response = $this->call('template.create', [
-				'host' => self::TEMPLATE_NAME_PREFIX . $n,
-				'tags' => [
-					[
-						'tag' => self::TEMPLATE_TAG_NAME_PREFIX . $n,
-						'value' => self::TEMPLATE_TAG_VALUE_PREFIX . $n
-					]
-				],
-				'templates' => [['templateid' => end(self::$template_ids)]],
-				'groups' => [
-					'groupid' => 1 // Templates
-				]]);
-		} else {
-			$response = $this->call('template.create', [
-				'host' => self::TEMPLATE_NAME_PREFIX . $n,
-				'tags' => [
-					[
-						'tag' => self::TEMPLATE_TAG_NAME_PREFIX . $n,
-						'value' => self::TEMPLATE_TAG_VALUE_PREFIX . $n
-					]
-				],
-				'groups' => [
-					'groupid' => 1 // Templates
-				]]);
+			$r += ['templates' => [['templateid' => end(self::$template_ids)]]];
 		}
 
+		$response = $this->call('template.create', $r);
 		$ep = json_encode($response, JSON_PRETTY_PRINT);
 
 		$this->assertArrayHasKey('templateids', $response['result'], $ep);
@@ -145,7 +135,7 @@ class testTagInheritance extends CIntegrationTest {
 		$this->assertEquals(1, count($response['result']['itemids']));
 		array_push(self::$item_ids, $response['result']['itemids'][0]);
 
-		$response = $this->call('trigger.create', [
+		$tg = [
 			'description' => self::TRIGGER_DESCRIPTION_PREFIX . $n,
 			'priority' => self::TRIGGER_PRIORITY,
 			'status' => TRIGGER_STATUS_ENABLED,
@@ -154,13 +144,149 @@ class testTagInheritance extends CIntegrationTest {
 			'manual_close' => self::TRIGGER_MANUAL_CLOSE,
 			'expression' => 'last(/' . self::TEMPLATE_NAME_PREFIX . $n . '/' .
 				self::TEMPLATE_ITEM_KEY_PREFIX . $n . ')=' . self::VALUE_TO_FIRE_TRIGGER,
-			'tags' => [
-				[
-					'tag' => self::TEMPLATE_TRIGGER_TAG_NAME_PREFIX . $n,
-					'value' => self::TEMPLATE_TRIGGER_TAG_VALUE_PREFIX . $n
-				]
-			]
-		]);
+		];
+
+		switch ($n) {
+		case 0:
+			$tg +=
+				['tags' => [
+					[
+						'tag' => self::TEMPLATE_TRIGGER_TAG_NAME_PREFIX . $n,
+						'value' => self::TEMPLATE_TRIGGER_TAG_VALUE_PREFIX . $n
+					],
+					[
+						'tag' => 'OS',
+						'value' => 'OS'
+					]
+				]];
+
+		case 1:
+			$tg +=
+				['tags' => [
+					[
+						'tag' => self::TEMPLATE_TRIGGER_TAG_NAME_PREFIX . $n,
+						'value' => self::TEMPLATE_TRIGGER_TAG_VALUE_PREFIX . $n
+					],
+					[
+						'tag' => 'OS',
+						'value' => 'OS'
+					],
+					[
+						'tag' => 'tag1',
+						'value' => 'value1'
+					],
+				]];
+		case 2:
+						$tg +=
+				['tags' => [
+					[
+						'tag' => self::TEMPLATE_TRIGGER_TAG_NAME_PREFIX . $n,
+						'value' => self::TEMPLATE_TRIGGER_TAG_VALUE_PREFIX . $n
+					],
+					[
+						'tag' => 'OS',
+						'value' => 'OS'
+					],
+					[
+						'tag' => 'tag2',
+						'value' => ''
+					],
+					[
+						'tag' => 'tag1',
+						'value' => 'value1'
+					],
+
+					[
+						'tag' => 'tag2',
+						'value' => '6'
+					]
+
+
+				]];
+		case 3:
+			$tg +=
+				['tags' => [
+					[
+						'tag' => self::TEMPLATE_TRIGGER_TAG_NAME_PREFIX . $n,
+						'value' => self::TEMPLATE_TRIGGER_TAG_VALUE_PREFIX . $n
+					],
+					[
+						'tag' => 'OS',
+						'value' => 'OS'
+					],
+					[
+						'tag' => 'tag3',
+						'value' => 'value3'
+					],
+					[
+						'tag' => 'tag3',
+						'value' => 'value4'
+					]
+				]];
+		case 4:
+						$tg +=
+				['tags' => [
+					[
+						'tag' => self::TEMPLATE_TRIGGER_TAG_NAME_PREFIX . $n,
+						'value' => self::TEMPLATE_TRIGGER_TAG_VALUE_PREFIX . $n
+					],
+					[
+						'tag' => 'OS',
+						'value' => 'OS'
+					]
+				]];
+		case 5:
+			$tg +=
+				['tags' => [
+					[
+						'tag' => self::TEMPLATE_TRIGGER_TAG_NAME_PREFIX . $n,
+						'value' => self::TEMPLATE_TRIGGER_TAG_VALUE_PREFIX . $n
+					],
+					[
+						'tag' => 'tag1',
+						'value' => 'value5'
+					],
+				]];
+		case 6:
+			$tg +=
+				['tags' => [
+					[
+						'tag' => self::TEMPLATE_TRIGGER_TAG_NAME_PREFIX . $n,
+						'value' => self::TEMPLATE_TRIGGER_TAG_VALUE_PREFIX . $n
+					],
+					[
+						'tag' => 'tag2',
+						'value' => 'value6'
+					]
+
+				]];
+		case 7:
+			$tg +=
+				['tags' => [
+					[
+						'tag' => self::TEMPLATE_TRIGGER_TAG_NAME_PREFIX . $n,
+						'value' => self::TEMPLATE_TRIGGER_TAG_VALUE_PREFIX . $n
+					],
+				]];
+		case 8:
+			$tg +=
+				['tags' => [
+					[
+						'tag' => self::TEMPLATE_TRIGGER_TAG_NAME_PREFIX . $n,
+						'value' => self::TEMPLATE_TRIGGER_TAG_VALUE_PREFIX . $n
+					],
+				]];
+		case 9:
+			$tg +=
+				['tags' => [
+					[
+						'tag' => self::TEMPLATE_TRIGGER_TAG_NAME_PREFIX . $n,
+						'value' => self::TEMPLATE_TRIGGER_TAG_VALUE_PREFIX . $n
+					],
+				]];
+		}
+
+		$response = $this->call('trigger.create', $tg);
 
 		$this->assertArrayHasKey('triggerids', $response['result']);
 		$this->assertArrayHasKey(0, $response['result']['triggerids']);
@@ -247,6 +373,7 @@ class testTagInheritance extends CIntegrationTest {
 		array_push(self::$event_ids, self::$event_response['result'][0]['eventid']);
 
 		$expected_template_tags = [
+			["tag" => "OS", "value" => "OS"],
 			["tag" => "host_tag_tag_inheritance", "value" => "host_value_tag_inheritance"],
 			["tag" => "strataX_item_tag_tag_inheritance_0", "value" => "strataX_item_value_tag_inheritance_0"],
 			["tag" => "strataX_template_tag_tag_inheritance_0", "value" => "strataX_template_value_tag_inheritance_0"],
@@ -261,19 +388,18 @@ class testTagInheritance extends CIntegrationTest {
 			["tag" => "strataX_template_tag_tag_inheritance_9", "value" => "strataX_template_value_tag_inheritance_9"],
 			["tag" => "strataX_trigger_tag_tag_inheritance_0", "value" => "strataX_trigger_value_tag_inheritance_0"]];
 
-
 		$result_tags = self::$event_response['result'][0]['tags'];
 		sort($result_tags);
 		$this->assertEquals(json_encode($expected_template_tags), json_encode($result_tags));
 
 		$this->sendSenderValue(self::HOST_NAME, self::HOST_ITEM_KEY, self::VALUE_TO_FIRE_TRIGGER);
 		self::$event_response = $this->callUntilDataIsPresent('event.get', [
+			'objectids' => self::$host_trigger_id,
 			'hostids' => [self::$host_id],
 			'selectTags' => ['tag', 'value'],
-			'preservekeys' => true
 		], 5, 2);
 
-		$this->assertCount(2, self::$event_response['result']);
+		$this->assertCount(1, self::$event_response['result']);
 
 		$expected_no_template_tags = [
 			["tag" => "host_item_tag_tag_inheritance", "value" => "host_item_value_tag_inheritance"],
@@ -281,18 +407,358 @@ class testTagInheritance extends CIntegrationTest {
 			["tag" => "host_trigger_tag_tag_inheritance", "value" => "host_trigger_value_tag_inheritance"]
 		];
 
-		/* Need to find out the second event id and we have array of 2 event ids and know the id of the first event. */
-		$res_event_ids = array_keys(self::$event_response['result']);
-		if ($res_event_ids[0] == end(self::$event_ids)) {
-			array_push(self::$event_ids, $res_event_ids[1]);
-		} else {
-			array_push(self::$event_ids, $res_event_ids[0]);
-		}
+		array_push(self::$event_ids, self::$event_response['result'][0]['eventid']);
 
-		$result_tags = self::$event_response['result'][end(self::$event_ids)]['tags'];
+		$result_tags = self::$event_response['result'][0]['tags'];
 
 		sort($result_tags);
 		$this->assertEquals(json_encode($expected_no_template_tags), json_encode($result_tags));
+
+		$this->generateEvent(1);
+		$this->generateEvent(2);
+		$this->generateEvent(3);
+		// note, there is no 4
+		$this->generateEvent(5);
+		$this->generateEvent(6);
+		$this->generateEvent(7);
+		$this->generateEvent(8);
+
+	}
+
+	/**
+	 * Test cases for event.get and problem.get API methods. (moved from api_json)
+	 */
+	public static function event_get_data() {
+		return [
+			// evaltype: AND/OR
+			'events-exists-single-tag' => [
+				'filter' => [
+					'evaltype' => TAG_EVAL_TYPE_AND_OR,
+					'tags' => [
+						['tag' => 'OS', 'operator' => TAG_OPERATOR_EXISTS]
+					]
+				],
+				'expected' => [
+					'strataX_trigger_description_tag_inheritance_0',
+					'strataX_trigger_description_tag_inheritance_1',
+					'strataX_trigger_description_tag_inheritance_2',
+					'strataX_trigger_description_tag_inheritance_3' //note, 4 did not fire
+				]
+			],
+			'events-exists-two-tags' => [
+				'filter' => [
+					'evaltype' => TAG_EVAL_TYPE_AND_OR,
+					'tags' => [
+						['tag' => 'OS', 'operator' => TAG_OPERATOR_EXISTS],
+						['tag' => self::TEMPLATE_TAG_NAME_PREFIX . '1', 'operator' => TAG_OPERATOR_EXISTS],
+						['tag' => self::TEMPLATE_TAG_NAME_PREFIX . '2', 'operator' => TAG_OPERATOR_EXISTS]
+					]
+				],
+				'expected' => [
+					'strataX_trigger_description_tag_inheritance_0',
+					'strataX_trigger_description_tag_inheritance_1'
+				]
+			],
+			'events-equals-single-tag' => [
+				'filter' => [
+					'evaltype' => TAG_EVAL_TYPE_AND_OR,
+					'tags' => [
+						['tag' => 'tag2', 'operator' => TAG_OPERATOR_EQUAL, 'value' => '6']
+					]
+				],
+				'expected' => [
+					'strataX_trigger_description_tag_inheritance_2'
+				]
+			],
+			'events-equals-two-tags' => [
+				'filter' => [
+					'evaltype' => TAG_EVAL_TYPE_AND_OR,
+					'tags' => [
+						['tag' => 'tag1', 'operator' => TAG_OPERATOR_EQUAL, 'value' => 'value1'],
+						['tag' => 'tag1', 'operator' => TAG_OPERATOR_EQUAL, 'value' => 'value5']
+					]
+				],
+				'expected' => [
+					'strataX_trigger_description_tag_inheritance_1',
+					'strataX_trigger_description_tag_inheritance_2',
+					'strataX_trigger_description_tag_inheritance_5'
+				]
+			],
+			'events-equals-two-tags-one-empty' => [
+				'filter' => [
+					'evaltype' => TAG_EVAL_TYPE_AND_OR,
+					'tags' => [
+						['tag' => 'tag2', 'operator' => TAG_OPERATOR_EQUAL, 'value' => 'value6'],
+						['tag' => 'tag2', 'operator' => TAG_OPERATOR_EQUAL, 'value' => '']
+					]
+				],
+				'expected' => [
+					'strataX_trigger_description_tag_inheritance_2',
+					'strataX_trigger_description_tag_inheritance_6'
+				]
+			],
+			'events-contains-single-tag' => [
+				'filter' => [
+					'evaltype' => TAG_EVAL_TYPE_AND_OR,
+					'tags' => [
+						['tag' => 'tag3', 'operator' => TAG_OPERATOR_LIKE, 'value' => 'value']
+					]
+				],
+				'expected' => [
+					'strataX_trigger_description_tag_inheritance_3'
+				]
+			],
+			'events-contains-two-tags' => [
+				'filter' => [
+					'evaltype' => TAG_EVAL_TYPE_AND_OR,
+					'tags' => [
+						['tag' => 'tag1', 'operator' => TAG_OPERATOR_LIKE, 'value' => 'value'],
+						['tag' => 'OS', 'operator' => TAG_OPERATOR_LIKE, 'value' => 'OS']
+					]
+				],
+				'expected' => [
+					'strataX_trigger_description_tag_inheritance_1',
+					'strataX_trigger_description_tag_inheritance_2'
+
+				]
+			],
+			'events-not-exist-single-tag' => [
+				'filter' => [
+					'evaltype' => TAG_EVAL_TYPE_AND_OR,
+					'tags' => [
+						['tag' => 'tag2', 'operator' => TAG_OPERATOR_NOT_EXISTS]
+					]
+				],
+				'expected' => [
+					'host_trigger_description_tag_inheritance',
+					'strataX_trigger_description_tag_inheritance_0',
+					'strataX_trigger_description_tag_inheritance_1',
+					'strataX_trigger_description_tag_inheritance_3',
+					'strataX_trigger_description_tag_inheritance_5',
+					'strataX_trigger_description_tag_inheritance_7',
+					'strataX_trigger_description_tag_inheritance_8',
+				]
+			],
+			'events-not-equal-single-tag' => [
+				'filter' => [
+					'evaltype' => TAG_EVAL_TYPE_AND_OR,
+					'tags' => [
+						['tag' => 'tag2', 'operator' => TAG_OPERATOR_NOT_EQUAL, 'value' => '']
+					]
+				],
+				'expected' => [
+					'host_trigger_description_tag_inheritance',
+					'strataX_trigger_description_tag_inheritance_0',
+					'strataX_trigger_description_tag_inheritance_1',
+					'strataX_trigger_description_tag_inheritance_3',
+					'strataX_trigger_description_tag_inheritance_5',
+					'strataX_trigger_description_tag_inheritance_6',
+					'strataX_trigger_description_tag_inheritance_7',
+					'strataX_trigger_description_tag_inheritance_8',
+				]
+			],
+			'events-not-equal-two-tags' => [
+				'filter' => [
+					'evaltype' => TAG_EVAL_TYPE_AND_OR,
+					'tags' => [
+						['tag' => 'tag2', 'operator' => TAG_OPERATOR_NOT_EQUAL, 'value' => ''],
+						['tag' => 'tag1', 'operator' => TAG_OPERATOR_NOT_EQUAL, 'value' => 'value5']
+					]
+				],
+				'expected' => [
+					'host_trigger_description_tag_inheritance',
+					'strataX_trigger_description_tag_inheritance_0',
+					'strataX_trigger_description_tag_inheritance_1',
+					'strataX_trigger_description_tag_inheritance_3',
+					'strataX_trigger_description_tag_inheritance_6',
+					'strataX_trigger_description_tag_inheritance_7',
+					'strataX_trigger_description_tag_inheritance_8',
+				]
+			],
+			'events-not-contain-single-tag' => [
+				'filter' => [
+					'evaltype' => TAG_EVAL_TYPE_AND_OR,
+					'tags' => [
+						['tag' => 'tag1', 'operator' => TAG_OPERATOR_NOT_LIKE, 'value' => 'value']
+					]
+				],
+				'expected' => [
+					'host_trigger_description_tag_inheritance',
+					'strataX_trigger_description_tag_inheritance_0',
+					'strataX_trigger_description_tag_inheritance_3',
+					'strataX_trigger_description_tag_inheritance_6',
+					'strataX_trigger_description_tag_inheritance_7',
+					'strataX_trigger_description_tag_inheritance_8',
+				]
+			],
+
+			// evaltype: OR
+			'events-exist-one-of-two-tags' => [
+				'filter' => [
+					'evaltype' => TAG_EVAL_TYPE_OR,
+					'tags' => [
+						['tag' => 'tag2', 'operator' => TAG_OPERATOR_EXISTS],
+						['tag' => 'tag3', 'operator' => TAG_OPERATOR_EXISTS]
+					]
+				],
+				'expected' => [
+					'strataX_trigger_description_tag_inheritance_2',
+					'strataX_trigger_description_tag_inheritance_3',
+					'strataX_trigger_description_tag_inheritance_6',
+				]
+			],
+			'events-tag-exists-or-another-empty' => [
+				'filter' => [
+					'evaltype' => TAG_EVAL_TYPE_OR,
+					'tags' => [
+						['tag' => 'tag2', 'operator' => TAG_OPERATOR_LIKE, 'value' => ''],
+						['tag' => 'tag3', 'operator' => TAG_OPERATOR_EXISTS]
+					]
+				],
+				'expected' => [
+					'strataX_trigger_description_tag_inheritance_2',
+					'strataX_trigger_description_tag_inheritance_3',
+					'strataX_trigger_description_tag_inheritance_6',
+				]
+			],
+			'events-contains-one-of-two-tags' => [
+				'filter' => [
+					'evaltype' => TAG_EVAL_TYPE_OR,
+					'tags' => [
+						['tag' => 'tag1', 'operator' => TAG_OPERATOR_LIKE, 'value' => '5'],
+						['tag' => 'tag1', 'operator' => TAG_OPERATOR_LIKE, 'value' => '7']
+					]
+				],
+				'expected' => [
+					'strataX_trigger_description_tag_inheritance_5',
+				]
+			],
+			'events-not-exist-one-of-two-tags' => [
+				'filter' => [
+					'evaltype' => TAG_EVAL_TYPE_OR,
+					'tags' => [
+						['tag' => 'tag1', 'operator' => TAG_OPERATOR_NOT_EXISTS],
+						['tag' => 'tag2', 'operator' => TAG_OPERATOR_NOT_EXISTS]
+					]
+				],
+				'expected' => [
+					'host_trigger_description_tag_inheritance',
+					'strataX_trigger_description_tag_inheritance_0',
+					'strataX_trigger_description_tag_inheritance_1',
+					'strataX_trigger_description_tag_inheritance_3',
+					'strataX_trigger_description_tag_inheritance_5',
+					'strataX_trigger_description_tag_inheritance_6',
+					'strataX_trigger_description_tag_inheritance_7',
+					'strataX_trigger_description_tag_inheritance_8',
+				]
+			],
+			'events-not-equal-one-of-two-tag-values' => [
+				'filter' => [
+					'evaltype' => TAG_EVAL_TYPE_OR,
+					'tags' => [
+						[
+							'tag' => self::TEMPLATE_TRIGGER_TAG_NAME_PREFIX . 0,
+							'value' => self::TEMPLATE_TRIGGER_TAG_VALUE_PREFIX . 0,
+							'operator' => TAG_OPERATOR_NOT_EQUAL
+						],
+						['tag' => 'OS', 'operator' => TAG_OPERATOR_NOT_EQUAL, 'value' => 'OS']
+					]
+				],
+				'expected' => [
+					'host_trigger_description_tag_inheritance',
+					'strataX_trigger_description_tag_inheritance_1',
+					'strataX_trigger_description_tag_inheritance_2',
+					'strataX_trigger_description_tag_inheritance_3',
+					'strataX_trigger_description_tag_inheritance_5',
+					'strataX_trigger_description_tag_inheritance_6',
+					'strataX_trigger_description_tag_inheritance_7',
+					'strataX_trigger_description_tag_inheritance_8',
+				]
+			],
+			'events-not-contain-one-of-two-tags' => [
+				'filter' => [
+					'evaltype' => TAG_EVAL_TYPE_OR,
+					'tags' => [
+						['tag' => 'tag2', 'operator' => TAG_OPERATOR_NOT_LIKE, 'value' => '6'],
+						['tag' => 'OS', 'operator' => TAG_OPERATOR_NOT_LIKE, 'value' => 'OS']
+					]
+				],
+				'expected' => [
+					'host_trigger_description_tag_inheritance',
+					'strataX_trigger_description_tag_inheritance_0',
+					'strataX_trigger_description_tag_inheritance_1',
+					'strataX_trigger_description_tag_inheritance_3',
+					'strataX_trigger_description_tag_inheritance_5',
+					'strataX_trigger_description_tag_inheritance_6',
+					'strataX_trigger_description_tag_inheritance_7',
+					'strataX_trigger_description_tag_inheritance_8',
+				]
+			],
+			'events-contains-no-tags' => [
+				'filter' => [
+					'evaltype' => TAG_EVAL_TYPE_OR,
+					'tags' => [
+					]
+				],
+				'expected' => [
+				]
+			],
+		];
+	}
+
+	private function generateEvent($n) {
+
+		$this->sendSenderValue(self::HOST_NAME, self::TEMPLATE_ITEM_KEY_PREFIX . $n, self::VALUE_TO_FIRE_TRIGGER);
+
+		self::$event_response = $this->callUntilDataIsPresent('event.get', [
+			'tags' => [['tag' => self::TEMPLATE_TRIGGER_TAG_NAME_PREFIX . $n,
+						'value' => self::TEMPLATE_TRIGGER_TAG_VALUE_PREFIX . $n]],
+			'selectTags' => ['tag', 'value']
+		], 5, 2);
+
+		$this->assertCount(1, self::$event_response['result']);
+		array_push(self::$event_ids, self::$event_response['result'][0]['eventid']);
+	}
+
+	/**
+	 * @depends testInheritedTags
+	 * @dataProvider event_get_data
+	 */
+	public function testEvent_Get($filter, $expected) {
+
+		$request = [
+			'output' => ['name'],
+			'groupids' => 4 // Zabbx servers
+		] + $filter;
+
+		['result' => $result] = $this->call('event.get', $request);
+
+		$result = array_column($result, 'name');
+
+		sort($result);
+		sort($expected);
+
+		$this->assertEquals(json_encode($result), json_encode($expected));
+	}
+
+	/**
+	 * @depends testInheritedTags
+	 * @dataProvider event_get_data
+	 */
+	public function testProblem_Get($filter, $expected) {
+		$request = [
+			'output' => ['name'],
+			'groupids' => 4 // Zabbix servers
+		] + $filter;
+
+		['result' => $result] = $this->call('problem.get', $request);
+
+		$result = array_column($result, 'name');
+
+		sort($result);
+		sort($expected);
+
+		$this->assertEquals(json_encode($result), json_encode($expected));
 	}
 
 	public static function clearData(): void {
