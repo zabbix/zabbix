@@ -62,7 +62,7 @@ var AddValueMap = class {
 	render(edit) {
 		if (edit instanceof Element) {
 			edit.replaceWith(this.row);
-			this.row.querySelector(`#valuemaps_${valuemap_number}_href`).focus();
+			this.row.querySelector('.js-label').focus();
 		}
 		else {
 			document.querySelector(`#${'<?= $data['table_id'] ?>'} tbody`).append(this.row);
@@ -75,7 +75,7 @@ var AddValueMap = class {
 		link.textContent = this.data.name;
 		link.classList.add('wordbreak');
 		link.href = 'javascript:void(0);';
-		link.id = `valuemaps_${valuemap_number}_href`;
+		link.className = 'js-label';
 		link.addEventListener('click', (e) => {
 			const valuemap_names = [];
 			const valuemap_table = e.target.closest('table');
