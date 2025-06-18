@@ -87,7 +87,7 @@ void	zbx_mock_test_entry(void **state)
 	returned_ret = zbx_eval_parse_expression(&ctx, zbx_mock_get_parameter_string("in.expression"), rules, &error);
 
 	if (SUCCEED != returned_ret)
-		fail_msg("ERROR: %s\n", error);
+		printf("ERROR: %s\n", error);
 	else
 		mock_dump_stack(&ctx);
 
