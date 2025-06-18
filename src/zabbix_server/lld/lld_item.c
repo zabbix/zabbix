@@ -1041,7 +1041,6 @@ static void	lld_items_get(const zbx_vector_lld_item_prototype_ptr_t *item_protot
 
 		zbx_vector_lld_override_data_ptr_destroy(&overrides);
 	}
-	update_item_template_cache(&itemids);
 out:
 	zbx_free(sql);
 	zbx_vector_uint64_destroy(&parent_itemids);
@@ -3674,12 +3673,6 @@ static int	lld_items_save(zbx_uint64_t hostid, const zbx_vector_lld_item_prototy
 		zbx_db_insert_execute(&db_insert_irtdata);
 		zbx_db_insert_clean(&db_insert_irtdata);
 
-	zbx_db_execute_multiple_query(
-				"insert into item_template_cache"
-					" select id.itemid,itc.link_hostid from item_template_cache itc"
-					" join item_discovery id on itc.itemid=id.parent_itemid"
-					" where", "id.itemid", &new_itemids);
-
 		zbx_vector_lld_item_full_ptr_sort(items, lld_item_full_compare_func);
 	}
 
@@ -4617,12 +4610,14 @@ static void	lld_link_dependent_items(zbx_vector_lld_item_full_ptr_t *items, zbx_
 static void	lld_process_lost_items(zbx_vector_lld_item_full_ptr_t *items, const zbx_lld_lifetime_t *lifetime,
 		const zbx_lld_lifetime_t *enabled_lifetime, int now)
 {
-	zbx_hashset_t	discoveries;
+	zbx_hashset_t		discoveries;
+	zbx_vector_uint64_t	itc_itemids;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
 	zbx_hashset_create(&discoveries, (size_t)items->values_num, ZBX_DEFAULT_UINT64_HASH_FUNC,
 			ZBX_DEFAULT_UINT64_COMPARE_FUNC);
+	zbx_vector_uint64_create(&itc_itemids);
 
 	for (int i = 0; i < items->values_num; i++)
 	{
@@ -4634,11 +4629,15 @@ static void	lld_process_lost_items(zbx_vector_lld_item_full_ptr_t *items, const 
 				ZBX_LLD_OBJECT_STATUS_ENABLED);
 		discovery = lld_add_discovery(&discoveries, item->itemid, item->name);
 
+
 		if (0 != (item->flags & ZBX_FLAG_LLD_ITEM_DISCOVERED))
 		{
 			lld_process_discovered_object(discovery, item->discovery_status, item->ts_delete,
 					item->lastcheck, now);
 			lld_enable_discovered_object(discovery, object_status, item->disable_source, item->ts_disable);
+
+			zbx_vector_uint64_append(&itc_itemids, item->itemid);
+
 			continue;
 		}
 
@@ -4651,10 +4650,13 @@ static void	lld_process_lost_items(zbx_vector_lld_item_full_ptr_t *items, const 
 				item->ts_disable);
 	}
 
+	update_item_template_cache(&itc_itemids);
+
 	lld_flush_discoveries(&discoveries, "itemid", "items", "item_discovery", now, get_item_status_value,
 			zbx_db_delete_items, zbx_audit_item_create_entry, zbx_audit_item_update_json_update_status);
 
 	zbx_hashset_destroy(&discoveries);
+	zbx_vector_uint64_destroy(&itc_itemids);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 }
