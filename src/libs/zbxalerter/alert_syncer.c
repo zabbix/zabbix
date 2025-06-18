@@ -1069,6 +1069,7 @@ ZBX_THREAD_ENTRY(zbx_alert_syncer_thread, args)
 		if (SUCCEED != zbx_ipc_async_socket_recv(&amdb.am, sleeptime, &message))
 		{
 			zabbix_log(LOG_LEVEL_CRIT, "cannot read alert syncer request");
+			am_db_clear(&amdb);
 			exit(EXIT_FAILURE);
 		}
 		zbx_update_selfmon_counter(info, ZBX_PROCESS_STATE_BUSY);

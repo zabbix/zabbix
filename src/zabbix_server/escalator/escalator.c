@@ -3835,7 +3835,7 @@ ZBX_THREAD_ENTRY(escalator_thread, args)
 			{
 				case ZBX_RTC_SHUTDOWN:
 					zbx_set_exiting_with_succeed();
-					break;
+					goto out;
 				case ZBX_RTC_ESCALATOR_NOTIFY:
 					deserialize_escalationids(&escalationids, rtc_data);
 					zbx_free(rtc_data);
@@ -3853,6 +3853,8 @@ ZBX_THREAD_ENTRY(escalator_thread, args)
 #		undef STAT_INTERVAL
 	}
 
+out:
+	zbx_ipc_async_socket_close(&rtc);
 	zbx_vector_uint64_destroy(&escalationids);
 	notify_alerter(ALERTER_CLOSE);
 
