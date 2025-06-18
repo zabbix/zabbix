@@ -84,8 +84,10 @@ int	zbx_db_init(char **error)
 		return FAIL;
 	}
 
-	idcache = zbx_shmem_malloc(idcache_mem, NULL, sizeof(zbx_db_idcache_t));
-	memset(idcache, 0, sizeof(idcache));
+	if (NULL == (idcache = zbx_shmem_malloc(idcache_mem, NULL, sizeof(zbx_db_idcache_t))))
+		return FAIL;
+
+	memset(idcache->lastids, 0, sizeof(idcache->lastids));
 
 	return SUCCEED;
 }
