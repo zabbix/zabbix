@@ -19,7 +19,8 @@ libzbxlld_a_SOURCES = \
 	lld_worker.c \
 	lld_worker.h \
 	lld_entry.c \
-	lld_macro.c
+	lld_macro.c \
+	lld_rule.c
 
 libzbxlld_a_CFLAGS = \
 	$(LIBXML2_CFLAGS) \

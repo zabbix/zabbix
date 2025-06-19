@@ -500,7 +500,14 @@ function closeDialogHandler(event) {
 			switch (overlay.type) {
 				// Close overlay popup.
 				case 'popup':
-					overlayDialogueDestroy(overlay.dialogueid, Overlay.prototype.CLOSE_BY_USER);
+					if (overlay.has_custom_cancel) {
+						overlay.$dialogue[0].dispatchEvent(new CustomEvent('dialogue.cancel', {detail: {
+							dialogueid: overlay.dialogueid
+						}}));
+					}
+					else {
+						overlayDialogueDestroy(overlay.dialogueid, Overlay.prototype.CLOSE_BY_USER);
+					}
 					break;
 
 				// Close overlay hintbox.

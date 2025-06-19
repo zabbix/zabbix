@@ -1,0 +1,25 @@
+.ordered-list {
+	counter-reset: item 0;
+	list-style: none;
+
+	.ordered-list-item {
+		position: relative;
+		counter-increment: item;
+	}
+
+	.ordered-list-counter {
+		padding-left: calc(var(--counter-width, 3ch) + 4px);
+		white-space: normal;
+
+		&::before {
+			content: counter(item) '.';
+			position: absolute;
+			left: 0;
+			top: 0;
+			display: inline-block;
+			margin-right: 4px;
+			width: var(--counter-width, 3ch);
+			text-align: right;
+		}
+	}
+}

@@ -155,7 +155,7 @@ class testPermissionsWithoutCSRF extends CWebTest {
 				[
 					'db' => 'SELECT * FROM hosts',
 					'link' => 'zabbix.php?action=host.list',
-					'overlay' => 'create',
+					'overlay' => 'create_host',
 					'fields' => [
 						'id:host' => 'CSRF validation host create',
 						'xpath://div[@id="groups_"]/..' => 'Zabbix servers'
@@ -688,6 +688,7 @@ class testPermissionsWithoutCSRF extends CWebTest {
 		if (array_key_exists('overlay', $data)) {
 			$selectors = [
 				'create' => "//div[@class=\"header-controls\"]//button",
+				'create_host' => "//div[@class=\"header-controls\"]//button[@class=\"js-create-host\"]",
 				'update' => "//table[@class=\"list-table\"]//tr[1]/td[2]/a",
 				'trigger_update' => "//table[@class=\"list-table\"]//tr[1]/td[4]/a",
 				'item_update' => "//table[@class=\"list-table\"]//tr[1]/td[3]/a",

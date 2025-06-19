@@ -81,6 +81,10 @@ window.trigger_edit_popup = new class {
 		// Form submit on Enter for event_name field, because textareaflexible.js triggers JQuery event.
 		this.form_element.querySelector('[name="event_name"]').addEventListener('keyup', e => {
 			if (e.key === 'Enter') {
+				if (e.target.readOnly) {
+					return;
+				}
+
 				$(this.form_element).submit();
 			}
 		});

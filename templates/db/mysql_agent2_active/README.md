@@ -51,13 +51,13 @@ For more information about configuring the Zabbix MySQL plugin, see the document
 
 |Name|Description|Default|
 |----|-----------|-------|
+|{$MYSQL.DSN}|<p>System data source name such as <tcp://host:port or unix:/path/to/socket)/>.</p>||
 |{$MYSQL.USER}|<p>MySQL user name.</p>||
 |{$MYSQL.PASSWORD}|<p>MySQL user password.</p>||
 |{$MYSQL.ABORTED_CONN.MAX.WARN}|<p>Number of failed attempts to connect to the MySQL server for trigger expressions.</p>|`3`|
 |{$MYSQL.REPL_LAG.MAX.WARN}|<p>Amount of time the slave is behind the master for trigger expressions.</p>|`30m`|
 |{$MYSQL.SLOW_QUERIES.MAX.WARN}|<p>Number of slow queries for trigger expressions.</p>|`3`|
 |{$MYSQL.BUFF_UTIL.MIN.WARN}|<p>The minimum buffer pool utilization in percentage for trigger expressions.</p>|`50`|
-|{$MYSQL.DSN}|<p>System data source name such as <tcp://host:port or unix:/path/to/socket)/>.</p>|`<Put your DSN>`|
 |{$MYSQL.CREATED_TMP_TABLES.MAX.WARN}|<p>The maximum number of temporary tables created in memory per second for trigger expressions.</p>|`30`|
 |{$MYSQL.CREATED_TMP_DISK_TABLES.MAX.WARN}|<p>The maximum number of temporary tables created on a disk per second for trigger expressions.</p>|`10`|
 |{$MYSQL.CREATED_TMP_FILES.MAX.WARN}|<p>The maximum number of temporary files created on a disk per second for trigger expressions.</p>|`10`|

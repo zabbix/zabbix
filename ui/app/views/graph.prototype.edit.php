@@ -32,8 +32,7 @@ $graph_form = (new CForm())
 	->addStyle('display: none;');
 
 $is_templated = (bool) $data['templates'];
-$discovered_graph = array_key_exists('flags', $data) && $data['flags'] == ZBX_FLAG_DISCOVERY_CREATED;
-$readonly = $is_templated || $discovered_graph;
+$readonly = $is_templated || $data['is_discovered_prototype'];
 
 // Preview tab.
 $preview_table = (new CTable())
@@ -51,14 +50,16 @@ if ($data['graphid'] != 0) {
 			'title' => _('Update'),
 			'keepOpen' => true,
 			'isSubmit' => true,
-			'action' => 'graph_edit_popup.submit();'
+			'action' => 'graph_edit_popup.submit();',
+			'enabled' => !$data['is_discovered_prototype']
 		],
 		[
 			'title' => _('Clone'),
 			'class' => ZBX_STYLE_BTN_ALT,
 			'keepOpen' => true,
 			'isSubmit' => false,
-			'action' => 'graph_edit_popup.clone();'
+			'action' => 'graph_edit_popup.clone();',
+			'enabled' => !$data['is_discovered_prototype']
 		],
 		[
 			'title' => _('Delete'),
@@ -96,7 +97,6 @@ $graph_form
 				new CPartial('graph.edit.graph.tab', array_merge($data,[
 					'readonly' => $readonly,
 					'is_templated' => $is_templated,
-					'discovered_graph' => $discovered_graph,
 					'form_name' => $graph_form->getName()
 				]))
 			)

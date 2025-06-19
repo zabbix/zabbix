@@ -120,6 +120,19 @@ class CControllerItemPrototypeEdit extends CControllerItemPrototype {
 			}
 		}
 
+		if ($item['flags'] & ZBX_FLAG_DISCOVERY_CREATED) {
+			$db_parent = API::ItemPrototype()->get([
+				'itemids' => $item['discoveryData']['parent_itemid'],
+				'selectDiscoveryRule' => ['itemid'],
+				'selectDiscoveryRulePrototype' => ['itemid'],
+				'nopermissions' => true
+			]);
+			$db_parent = reset($db_parent);
+
+			$parent_lld = $db_parent['discoveryRule'] ?: $db_parent['discoveryRulePrototype'];
+			$item['discoveryData']['lldruleid'] = $parent_lld['itemid'];
+		}
+
 		$data = [
 			'js_test_validation_rules' => (new CFormValidator(
 				CControllerPopupItemTestSend::getValidationRules(allow_lld_macro: true)
@@ -130,7 +143,7 @@ class CControllerItemPrototypeEdit extends CControllerItemPrototype {
 			'item' => $item,
 			'host' => $host,
 			'readonly' => (bool) $item['templateid'],
-			'types' => array_diff_key(item_type2str(), array_flip([ITEM_TYPE_HTTPTEST])),
+			'types' => array_diff_key(item_type2str(), array_flip([ITEM_TYPE_HTTPTEST, ITEM_TYPE_NESTED])),
 			'testable_item_types' => CControllerPopupItemTest::getTestableItemTypes($host['hostid']),
 			'inherited_timeouts' => $inherited_timeouts,
 			'interface_types' => itemTypeInterface(),
@@ -274,7 +287,9 @@ class CControllerItemPrototypeEdit extends CControllerItemPrototype {
 					'request_method', 'output_format', 'ssl_cert_file', 'ssl_key_file', 'ssl_key_password', 'verify_peer',
 					'verify_host', 'allow_traps', 'discover'
 				],
-				'selectDiscoveryRule' => ['itemid', 'templateid'],
+				'selectDiscoveryRule' => ['itemid', 'name', 'templateid'],
+				'selectDiscoveryRulePrototype' => ['itemid', 'name', 'templateid'],
+				'selectDiscoveryData' => ['parent_itemid', 'disable_source'],
 				'selectPreprocessing' => ['type', 'params', 'error_handler', 'error_handler_params'],
 				'selectTags' => ['tag', 'value'],
 				'itemids' => $this->getInput('itemid')

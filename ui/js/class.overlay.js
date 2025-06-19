@@ -43,6 +43,7 @@ function Overlay({
 	this._position = position;
 	this._position_fix = position_fix;
 	this.element = trigger_element;
+	this.has_custom_cancel = false;
 
 	this.headerid = `overlay-dialogue-header-title-${this.dialogueid}`;
 
@@ -129,7 +130,15 @@ Overlay.prototype._initListeners = function() {
 	this._listeners = {
 		close_button_click: e => {
 			e.preventDefault();
-			overlayDialogueDestroy(this.dialogueid, this.CLOSE_BY_USER);
+
+			if (this.has_custom_cancel) {
+				this.$dialogue[0].dispatchEvent(new CustomEvent('dialogue.cancel', {detail: {
+					dialogueid: this.dialogueid
+				}}));
+			}
+			else {
+				overlayDialogueDestroy(this.dialogueid, this.CLOSE_BY_USER);
+			}
 		},
 		form_submit: e => {
 			e.preventDefault();
@@ -318,13 +327,13 @@ Overlay.prototype.recoverFocus = function() {
 	}
 
 	if (jQuery('[autofocus=autofocus]', this.$dialogue).length) {
-		jQuery('[autofocus=autofocus]', this.$dialogue)[0].focus({preventScroll: true});
+		jQuery('[autofocus=autofocus]', this.$dialogue)[0]?.focus({preventScroll: true});
 	}
 	else if (jQuery('.overlay-dialogue-body form :focusable', this.$dialogue).length) {
-		jQuery('.overlay-dialogue-body form :focusable', this.$dialogue)[0].focus({preventScroll: true});
+		jQuery('.overlay-dialogue-body form :focusable', this.$dialogue)[0]?.focus({preventScroll: true});
 	}
 	else {
-		jQuery(':focusable:first', this.$dialogue)[0].focus({preventScroll: true});
+		jQuery(':focusable:first', this.$dialogue)[0]?.focus({preventScroll: true});
 	}
 };
 
@@ -337,8 +346,8 @@ Overlay.prototype.containFocus = function() {
 	focusable.off('keydown.containFocus');
 
 	if (focusable.length > 1) {
-		var first_focusable = focusable.filter(':first'),
-			last_focusable = focusable.filter(':last');
+		var first_focusable = focusable.filter(':first:not([disabled])'),
+			last_focusable = focusable.filter(':last:not([disabled])');
 
 		first_focusable
 			.on('keydown.containFocus', function(e) {
@@ -558,7 +567,14 @@ Overlay.prototype.makeButton = function(obj) {
 			this._block_cancel_action = true;
 
 			if (!obj.keepOpen) {
-				overlayDialogueDestroy(this.dialogueid, this.CLOSE_BY_USER);
+				if (this.has_custom_cancel) {
+					this.$dialogue[0].dispatchEvent(new CustomEvent('dialogue.cancel', {detail: {
+						dialogueid: this.dialogueid
+					}}));
+				}
+				else {
+					overlayDialogueDestroy(this.dialogueid, this.CLOSE_BY_USER);
+				}
 			}
 		}
 
