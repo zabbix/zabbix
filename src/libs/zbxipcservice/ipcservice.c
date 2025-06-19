@@ -1560,11 +1560,15 @@ void	zbx_ipc_service_close(zbx_ipc_service_t *service)
 	if (-1 == unlink(service->path))
 		zabbix_log(LOG_LEVEL_WARNING, "cannot remove socket at %s: %s.", service->path, zbx_strerror(errno));
 
+	/* remove received clients which are not registred */
+	while (NULL != (client = (zbx_ipc_client_t *)zbx_queue_ptr_pop(&service->clients_recv)))
+	{
+		if (FAIL == zbx_vector_ipc_client_ptr_search(&service->clients, client, ZBX_DEFAULT_PTR_COMPARE_FUNC))
+			ipc_client_free(client);
+	}
+
 	for (int i = 0; i < service->clients.values_num; i++)
 		ipc_client_free(service->clients.values[i]);
-
-	while (NULL != (client = (zbx_ipc_client_t *)zbx_queue_ptr_pop(&service->clients_recv)))
-		ipc_client_free(client);
 
 	zbx_free(service->path);
 
