@@ -316,6 +316,7 @@ static void	snmp_remove_user_by_engineid(const zbx_snmp_engineid_record_t *targe
 			current_user = user_to_remove->next;
 			usm_remove_user(user_to_remove);
 			free_enginetime(user_to_remove->engineID, user_to_remove->engineIDLen);
+			usm_free_user(user_to_remove);
 		}
 		else
 			current_user = current_user->next;
