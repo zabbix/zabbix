@@ -308,7 +308,8 @@ static void	snmp_remove_user_by_engineid(const zbx_snmp_engineid_record_t *targe
 	while (NULL != current_user)
 	{
 		if (target_engineid->engineid_len == current_user->engineIDLen &&
-				0 == memcmp(target_engineid->engineid, current_user->engineID, current_user->engineIDLen))
+				0 == memcmp(target_engineid->engineid, current_user->engineID,
+				current_user->engineIDLen))
 		{
 			struct usmUser	*user_to_remove = current_user;
 
