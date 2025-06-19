@@ -319,6 +319,7 @@ static void	snmp_remove_user_by_engineid(const zbx_snmp_engineid_record_t	*ptr)
 				free_enginetime(tmp_user->engineID, tmp_user->engineIDLen);
 
 			usm_free_user(tmp_user);
+			break;
 		}
 		else
 			user = user->next;
