@@ -13,6 +13,7 @@
 ** If not, see <https://www.gnu.org/licenses/>.
 **/
 
+
 class CConditionFormulaParser extends CParser {
 
 	public function parse($source, $pos = 0) {
