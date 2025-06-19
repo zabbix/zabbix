@@ -1051,18 +1051,19 @@ class CIntegrationTest extends CAPITest {
 			$description = 'line "'.$lines.'"';
 		}
 
-		$c = CLogHelper::readLog(self::getLogPath($component), false, true);
+		$error_msg = 'Failed to wait for '.$description.' to be present in '.$component.
+				'log file: '.self::getLogPath($component)."\n";
 
-		if (file_exists(self::getLogPath(self::COMPONENT_AGENT))) {
-			$c2 = @CLogHelper::readLog(self::getLogPath(self::COMPONENT_AGENT), false, true);
-		}
-		else {
-			$c2 = '';
+		$error_msg .= CLogHelper::readLog(self::getLogPath($component), false, true);
+
+		foreach (self::getComponents() as $c) {
+			if ($c !== $component && file_exists(self::getLogPath($c))) {
+				$error_msg .= "\n\n".$c.' log file contents:'."\n";
+				$error_msg .= @CLogHelper::readLog(self::getLogPath($c), false, true);
+			}
 		}
 
-		throw new Exception('Failed to wait for '.$description.' to be present in '.$component .
-				'log file path:'.self::getLogPath($component).' and server log file contents: ' .
-				$c  . "\n and agent log file contents: " . $c2);
+		throw new Exception($error_msg);
 	}
 
 	/**
