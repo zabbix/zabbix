@@ -72,7 +72,7 @@ $parameters += $data['templateid'] === ''
 $item_select = (new CMultiSelect([
 	'name' => 'itemid',
 	'object_name' => 'items',
-	'data' => $data['ms_item'] ? [$data['ms_item']] : '',
+	'data' => $data['ms_item'] ? [$data['ms_item']] : [],
 	'multiple' => false,
 	'popup' => [
 		'parameters' => $parameters
@@ -90,7 +90,11 @@ $form_grid->addItem([
 // Base color.
 $form_grid->addItem([
 	new CLabel(_('Base color'), 'lbl_base_color'),
-	new CFormField(new CColor('base_color', $data['base_color']))
+	new CFormField(
+		(new CColorPicker('base_color'))
+			->setColor($data['base_color'])
+			->allowEmpty()
+	)
 ]);
 
 // Highlights table
@@ -117,7 +121,9 @@ $highlights = (new CDiv(
 $highlights->addItem(
 	(new CTemplateTag('highlights-row-tmpl'))
 		->addItem((new CRow([
-			(new CColor('highlights[#{rowNum}][color]', '#{color}'))->appendColorPickerJs(false),
+			(new CColorPicker('highlights[#{rowNum}][color]'))
+				->setColor('#{color}')
+				->allowEmpty(),
 			(new CTextBox('highlights[#{rowNum}][pattern]', '#{pattern}', false))
 				->setWidth(ZBX_TEXTAREA_MEDIUM_WIDTH)
 				->setAriaRequired(),
@@ -199,7 +205,9 @@ $thresholds = (new CDiv(
 $thresholds->addItem(
 	(new CTemplateTag('thresholds-row-tmpl'))
 		->addItem((new CRow([
-			(new CColor('thresholds[#{rowNum}][color]', '#{color}'))->appendColorPickerJs(false),
+			(new CColorPicker('thresholds[#{rowNum}][color]'))
+				->setColor('#{color}')
+				->allowEmpty(),
 			(new CTextBox('thresholds[#{rowNum}][threshold]', '#{threshold}', false))
 				->setWidth(ZBX_TEXTAREA_SMALL_WIDTH)
 				->setAriaRequired(),
@@ -237,8 +245,8 @@ $form_grid->addItem([
 // Local time.
 $form_grid->addItem([
 	(new CLabel([
-		_('Display local time'),
-		makeHelpIcon(_('This setting will display local time instead of the timestamp. "Show timestamp" must also be checked in the advanced configuration.'))
+		_('Display log time'),
+		makeHelpIcon(_('This setting will display log time instead of item\'s timestamp. "Show timestamp" must also be checked in the advanced configuration.'))
 	], 'local_time'))->addClass('js-local-time-row'),
 	(new CFormField(
 		(new CCheckBox('local_time'))->setChecked($data['local_time'])

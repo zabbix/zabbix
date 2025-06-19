@@ -14,10 +14,10 @@
 **/
 
 
-require_once dirname(__FILE__).'/../../include/CWebTest.php';
-require_once dirname(__FILE__).'/../behaviors/CMessageBehavior.php';
-require_once dirname(__FILE__).'/../behaviors/CTableBehavior.php';
-require_once dirname(__FILE__).'/../../include/helpers/CDataHelper.php';
+require_once __DIR__.'/../../include/CWebTest.php';
+require_once __DIR__.'/../behaviors/CMessageBehavior.php';
+require_once __DIR__.'/../behaviors/CTableBehavior.php';
+require_once __DIR__.'/../../include/helpers/CDataHelper.php';
 
 use Facebook\WebDriver\WebDriverKeys;
 
@@ -551,13 +551,13 @@ class testUserRolesPermissions extends CWebTest {
 			$this->page->open('zabbix.php?action=problem.view')->waitUntilReady();
 			$problem_row = $this->query('class:list-table')->asTable()->one()->findRow('Problem', $problem);
 			$this->assertEquals($action_status, $problem_row->getColumn('Update')->query('xpath:.//*[text()="Update"]')
-					->one()->isAttributePresent('data-action'));
+					->one()->isAttributePresent('href'));
 
 			// Problem widget in dashboard.
 			$this->page->open('zabbix.php?action=dashboard.view&dashboardid=1')->waitUntilReady();
 			$table = CDashboardElement::find()->one()->getWidget('Current problems')->query('class:list-table')->asTable()->one();
 			$this->assertEquals($action_status, $table->findRow('Problem • Severity', $problem)->getColumn('Update')
-					->query('xpath:.//*[text()="Update"]')->one()->isAttributePresent('data-action'));
+					->query('xpath:.//*[text()="Update"]')->one()->isAttributePresent('href'));
 
 			// Event details page.
 			$this->page->open('tr_events.php?triggerid=99251&eventid=93')->waitUntilReady();
@@ -565,7 +565,7 @@ class testUserRolesPermissions extends CWebTest {
 			$table = $this->query('xpath://h4[text()='.CXPathHelper::escapeQuotes('Event list [previous 20]').
 					']/../..//table')->asTable()->one();
 			$this->assertEquals($action_status, $table->query('xpath:(.//*[text()="Update"])[2]')
-					->one()->isAttributePresent('data-action'));
+					->one()->isAttributePresent('href'));
 
 			if ($action_status) {
 				$this->changeRoleRule($actions);
@@ -1621,7 +1621,7 @@ class testUserRolesPermissions extends CWebTest {
 
 		$services_mode = $this->query('id:list_mode')->asSegmentedRadio()->one(false);
 
-		// Check that table service list content and edit mode in not available if the user doest have permissions.
+		// Check that table service list content and edit mode in not available if the user does not have permissions.
 		if ($data['services'] === null) {
 			$this->assertTableData();
 			$this->assertFalse($services_mode->isValid());

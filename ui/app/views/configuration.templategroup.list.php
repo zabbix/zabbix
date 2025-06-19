@@ -96,8 +96,6 @@ foreach ($data['groups'] as $group) {
 				->getUrl();
 
 			$templates_output[] = (new CLink($template['name'], $template_url))
-				->setAttribute('data-templateid', $template['templateid'])
-				->setAttribute('data-action', 'template.edit')
 				->addClass(ZBX_STYLE_LINK_ALT)
 				->addClass(ZBX_STYLE_GREY);
 		}
@@ -114,9 +112,7 @@ foreach ($data['groups'] as $group) {
 		->setArgument('groupid', $group['groupid'])
 		->getUrl();
 
-	$name = (new CLink($group['name'], $templategroup_url))
-		->setAttribute('data-groupid', $group['groupid'])
-		->setAttribute('data-action', 'templategroup.edit');
+	$name = new CLink($group['name'], $templategroup_url);
 
 	$count = '';
 	if ($template_count > 0) {
@@ -135,11 +131,9 @@ foreach ($data['groups'] as $group) {
 
 	$table->addRow([
 		new CCheckBox('groupids['.$group['groupid'].']', $group['groupid']),
-		(new CCol($name))
-			->addClass(ZBX_STYLE_WORDBREAK)
-			->setWidth('15%'),
+		(new CCol($name))->addClass(ZBX_STYLE_NOWRAP),
 		(new CCol($count))->addClass(ZBX_STYLE_CELL_WIDTH),
-		$templates_output ? (new CCol($templates_output))->addClass(ZBX_STYLE_WORDBREAK) : ''
+		$templates_output ?: ''
 	]);
 }
 

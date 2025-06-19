@@ -183,7 +183,7 @@ class CCorrelation extends CApiService {
 	 * @param array|null $db_correlations
 	 */
 	private static function updateConditions(array &$correlations, string $method,
-			array $db_correlations = null): void {
+			?array $db_correlations = null): void {
 		$ins_conditions = [];
 		$del_corr_conditionids = [];
 
@@ -314,7 +314,7 @@ class CCorrelation extends CApiService {
 	 * @param array|null $db_correlations
 	 */
 	private static function updateOperations(array &$correlations, string $method,
-			array $db_correlations = null): void {
+			?array $db_correlations = null): void {
 		$ins_operations = [];
 		$del_corr_operationids = [];
 
@@ -442,7 +442,7 @@ class CCorrelation extends CApiService {
 	 *
 	 * @throws APIException if the input is invalid.
 	 */
-	private static function validateDelete(array &$correlationids, array &$db_correlations = null): void {
+	private static function validateDelete(array &$correlationids, ?array &$db_correlations = null): void {
 		$api_input_rules = ['type' => API_IDS, 'flags' => API_NOT_EMPTY, 'uniq' => true];
 
 		if (!CApiInputValidator::validate($api_input_rules, $correlationids, '/', $error)) {
@@ -468,7 +468,7 @@ class CCorrelation extends CApiService {
 	 *
 	 * @throws APIException if event correlation  names are not unique.
 	 */
-	protected static function checkDuplicates(array $correlations, array $db_correlations = null): void {
+	protected static function checkDuplicates(array $correlations, ?array $db_correlations = null): void {
 		$names = [];
 
 		foreach ($correlations as $correlation) {
@@ -616,7 +616,7 @@ class CCorrelation extends CApiService {
 	 *
 	 * @throws APIException if the input is invalid.
 	 */
-	private static function validateUpdate(array &$correlations, array &$db_correlations = null): void {
+	private static function validateUpdate(array &$correlations, ?array &$db_correlations = null): void {
 		$api_input_rules = ['type' => API_OBJECTS, 'flags' => API_NOT_EMPTY | API_NORMALIZE, 'uniq' => [['correlationid'], ['name']], 'fields' => [
 			'correlationid' =>	['type' => API_ID, 'flags' => API_REQUIRED],
 			'name' =>			['type' => API_STRING_UTF8, 'flags' => API_NOT_EMPTY, 'length' => DB::getFieldLength('correlation', 'name')],

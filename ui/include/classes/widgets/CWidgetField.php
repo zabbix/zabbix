@@ -62,7 +62,7 @@ abstract class CWidgetField {
 	 * @param string      $name   Field name in form.
 	 * @param string|null $label  Label for the field in form.
 	 */
-	public function __construct(string $name, string $label = null) {
+	public function __construct(string $name, ?string $label = null) {
 		$this->name = $name;
 		$this->label = $label;
 		$this->value = null;
@@ -81,7 +81,7 @@ abstract class CWidgetField {
 	 * Prefix field label to enhance clarity in case of error messages. For example:
 	 * Invalid parameter "<LABEL PREFIX>: <LABEL>": too many decimal places.
 	 */
-	public function prefixLabel(?string $prefix): self {
+	public function prefixLabel(?string $prefix): static {
 		$this->label_prefix = $prefix;
 
 		return $this;

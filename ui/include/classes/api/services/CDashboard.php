@@ -272,7 +272,7 @@ class CDashboard extends CDashboardGeneral {
 	 *
 	 * @throws APIException if the input is invalid.
 	 */
-	protected function validateUpdate(array &$dashboards, array &$db_dashboards = null): void {
+	protected function validateUpdate(array &$dashboards, ?array &$db_dashboards = null): void {
 		$api_input_rules = ['type' => API_OBJECTS, 'flags' => API_NOT_EMPTY | API_NORMALIZE, 'uniq' => [['dashboardid'], ['name']], 'fields' => [
 			'dashboardid' =>		['type' => API_ID, 'flags' => API_REQUIRED],
 			'name' =>				['type' => API_STRING_UTF8, 'flags' => API_NOT_EMPTY, 'length' => DB::getFieldLength('dashboard', 'name')],
@@ -353,7 +353,7 @@ class CDashboard extends CDashboardGeneral {
 	 *
 	 * @throws APIException if dashboard names are not unique.
 	 */
-	protected function checkDuplicates(array $dashboards, array $db_dashboards = null): void {
+	protected function checkDuplicates(array $dashboards, ?array $db_dashboards = null): void {
 		$names = [];
 
 		foreach ($dashboards as $dashboard) {
@@ -387,7 +387,7 @@ class CDashboard extends CDashboardGeneral {
 	 *
 	 * @throws APIException if user is not valid.
 	 */
-	protected function checkUsers(array $dashboards, array $db_dashboards = null): void {
+	protected function checkUsers(array $dashboards, ?array $db_dashboards = null): void {
 		$userids = [];
 
 		foreach ($dashboards as $dashboard) {
@@ -477,7 +477,7 @@ class CDashboard extends CDashboardGeneral {
 	 * @param string     $method
 	 * @param array|null $db_dashboards
 	 */
-	protected function updateDashboardUser(array &$dashboards, string $method, array $db_dashboards = null): void {
+	protected function updateDashboardUser(array &$dashboards, string $method, ?array $db_dashboards = null): void {
 		$ins_dashboard_users = [];
 		$upd_dashboard_users = [];
 		$del_dashboard_userids = [];
@@ -554,7 +554,7 @@ class CDashboard extends CDashboardGeneral {
 	 * @param string     $method
 	 * @param array|null $db_dashboards
 	 */
-	protected function updateDashboardUsrgrp(array &$dashboards, string $method, array $db_dashboards = null): void {
+	protected function updateDashboardUsrgrp(array &$dashboards, string $method, ?array $db_dashboards = null): void {
 		$ins_dashboard_usrgrps = [];
 		$upd_dashboard_usrgrps = [];
 		$del_dashboard_usrgrpids = [];

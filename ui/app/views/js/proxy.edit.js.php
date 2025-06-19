@@ -29,10 +29,9 @@ window.proxy_edit_popup = new class {
 		this.form = this.overlay.$dialogue.$body[0].querySelector('form');
 		this.footer = this.overlay.$dialogue.$footer[0];
 
-		const backurl = new Curl('zabbix.php');
-
-		backurl.setArgument('action', 'proxy.list');
-		this.overlay.backurl = backurl.getUrl();
+		const return_url = new URL('zabbix.php', location.href);
+		return_url.searchParams.set('action', 'proxy.list');
+		ZABBIX.PopupManager.setReturnUrl(return_url.href);
 
 		this.display_change_psk =
 			this.form.querySelector('#tls_connect input:checked').value == <?= HOST_ENCRYPTION_PSK ?>

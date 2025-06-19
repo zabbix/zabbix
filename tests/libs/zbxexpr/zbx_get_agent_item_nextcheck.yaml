@@ -1,0 +1,78 @@
+# Zabbix API validates delay to be between 1-86400 seconds
+---
+test case: "Delay 1s"
+in:
+  itemid: 1000
+  delay: "1s"
+  now: "2023-12-18T14:30:00"
+out:
+  return: SUCCEED
+  nextcheck: 1702909801
+---
+test case: "Delay 10s"
+in:
+  itemid: 1
+  delay: "10s"
+  now: "2023-12-18T14:30:00"
+out:
+  return: SUCCEED
+  nextcheck: 1702909801
+---
+test case: "Delay 1d"
+in:
+  itemid: 123
+  delay: "1d"
+  now: "2023-12-18T14:30:00"
+out:
+  return: SUCCEED
+  nextcheck: 1702944123
+---
+test case: "Delay 1w"
+in:
+  itemid: 1000
+  delay: "1w"
+  now: "2023-12-18T14:30:00"
+out:
+  return: FAIL
+  nextcheck: 2145916800 #if FAIL than ZBX_JAN_2038
+---
+test case: "Delay 1s over Jan 2038"
+in:
+  time_over_jan2038: 1
+  itemid: 1000
+  delay: "1s"
+  now: "2040-12-18T14:30:00"
+out:
+  return: SUCCEED
+  nextcheck: 2239446631
+---
+test case: "Delay 10s over Jan 2038"
+in:
+  time_over_jan2038: 1
+  itemid: 1000
+  delay: "10s"
+  now: "2040-12-18T14:30:00"
+out:
+  return: SUCCEED
+  nextcheck: 2239453810
+---
+test case: "Delay 1d over Jan 2038"
+in:
+  time_over_jan2038: 1
+  itemid: 1
+  delay: "1d"
+  now: "2040-12-18T14:30:00"
+out:
+  return: SUCCEED
+  nextcheck: 2239488001
+---
+test case: "Delay 1w over Jan 2038"
+in:
+  time_over_jan2038: 1
+  itemid: 1000
+  delay: "1d"
+  now: "2040-12-18T14:30:00"
+out:
+  return: FAIL
+  nextcheck: 1844674407370955161 #max uint64 value
+...

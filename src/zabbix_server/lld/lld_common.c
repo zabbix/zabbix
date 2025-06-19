@@ -20,9 +20,8 @@
 #include "zbxnum.h"
 #include "zbxalgo.h"
 #include "zbxstr.h"
+#include "zbxdbwrap.h"
 
-ZBX_VECTOR_DECL(id_name_pair, zbx_id_name_pair_t)
-ZBX_VECTOR_IMPL(id_name_pair, zbx_id_name_pair_t)
 ZBX_VECTOR_IMPL(lld_discovery_ptr, zbx_lld_discovery_t *)
 
 int	lld_ids_names_compare_func(const void *d1, const void *d2)
@@ -501,7 +500,7 @@ void	lld_flush_discoveries(zbx_hashset_t *discoveries, const char *id_field, con
 	}
 
 	/* prepare updates */
-	zbx_vector_lld_discovery_ptr_reserve(&discovery_updates, discoveries->num_data);
+	zbx_vector_lld_discovery_ptr_reserve(&discovery_updates, (size_t)discoveries->num_data);
 	zbx_hashset_iter_reset(discoveries, &iter);
 	while (NULL != (discovery = (zbx_lld_discovery_t *)zbx_hashset_iter_next(&iter)))
 	{

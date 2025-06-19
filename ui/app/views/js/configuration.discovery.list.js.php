@@ -24,7 +24,7 @@
 
 		init() {
 			document.getElementById('js-create').addEventListener('click', () => {
-				window.popupManagerInstance.openPopup('discovery.edit', {});
+				ZABBIX.PopupManager.open('discovery.edit');
 			});
 
 			document.getElementById('js-massenable').addEventListener('click', (e) => {
@@ -48,7 +48,7 @@
 				}
 			});
 
-			this.#setSubmitCallback();
+			this.#initPopupListeners();
 		}
 
 		#enable(target, druleids, massenable = false) {
@@ -143,18 +143,13 @@
 				});
 		}
 
-		#setSubmitCallback() {
-			window.popupManagerInstance.setSubmitCallback((e) => {
-				if ('success' in e.detail) {
-					postMessageOk(e.detail.success.title);
-
-					if ('messages' in e.detail.success) {
-						postMessageDetails('success', e.detail.success.messages);
-					}
-				}
-
-				uncheckTableRows('discovery');
-				location.href = location.href;
+		#initPopupListeners() {
+			ZABBIX.EventHub.subscribe({
+				require: {
+					context: CPopupManager.EVENT_CONTEXT,
+					event: CPopupManagerEvent.EVENT_SUBMIT
+				},
+				callback: () => uncheckTableRows('discovery')
 			});
 		}
 	};

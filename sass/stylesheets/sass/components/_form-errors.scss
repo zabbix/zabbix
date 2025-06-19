@@ -16,6 +16,7 @@
 	display: block;
 	margin-top: 4px;
 	white-space: break-spaces;
+	word-break: break-word;
 	line-height: $body-line-height;
 	color: $error;
 }
@@ -48,6 +49,14 @@ textarea.has-error {
 			.multiselect {
 				border-color: $error-focus;
 			}
+		}
+	}
+}
+
+.multilineinput-control {
+	&.has-error {
+		> input[readonly][type="text"] {
+			border: 1px solid $error;
 		}
 	}
 }
@@ -100,7 +109,7 @@ div[data-field-type="set"] {
 	}
 
 	.has-error {
-		& + .btn-und,
+		& + .btn-undo,
 		&:focus + .btn-undo,
 		& + .btn-undo:focus {
 			border-color: $error;

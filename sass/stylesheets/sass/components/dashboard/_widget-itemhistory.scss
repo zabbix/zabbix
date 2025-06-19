@@ -19,6 +19,10 @@ $thumbnail-height: 56px;
 
 div.dashboard-widget-itemhistory {
 	.list-table {
+		pre {
+			font-family: inherit;
+		}
+
 		&.show-thumbnail {
 			tbody td {
 				height: $thumbnail-height;

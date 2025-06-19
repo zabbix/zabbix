@@ -123,12 +123,15 @@ static int	curl_page_get(char *url, int timeout, char **buffer, char **error)
 	int			ret = SYSINFO_RET_FAIL;
 	zbx_http_response_t	body = {0}, header = {0};
 	char			errbuf[CURL_ERROR_SIZE];
+	struct curl_slist	*headers = NULL;
 
 	if (NULL == (easyhandle = curl_easy_init()))
 	{
 		*error = zbx_strdup(*error, "Cannot initialize cURL library.");
 		return SYSINFO_RET_FAIL;
 	}
+
+	headers = curl_slist_append(headers, "Connection: close");
 
 	if (CURLE_OK != (err = curl_easy_setopt(easyhandle, CURLOPT_USERAGENT, "Zabbix " ZABBIX_VERSION)) ||
 			CURLE_OK != (err = curl_easy_setopt(easyhandle, CURLOPT_SSL_VERIFYPEER, 0L)) ||
@@ -140,6 +143,7 @@ static int	curl_page_get(char *url, int timeout, char **buffer, char **error)
 					sysinfo_get_config_source_ip()))) ||
 			CURLE_OK != (err = curl_easy_setopt(easyhandle, CURLOPT_TIMEOUT,
 					(long)timeout)) ||
+			CURLE_OK != (err = curl_easy_setopt(easyhandle, CURLOPT_HTTPHEADER, headers)) ||
 			CURLE_OK != (err = curl_easy_setopt(easyhandle, CURLOPT_ACCEPT_ENCODING, "")))
 	{
 		*error = zbx_dsprintf(*error, "Cannot set cURL option: %s.", curl_easy_strerror(err));
@@ -188,6 +192,7 @@ static int	curl_page_get(char *url, int timeout, char **buffer, char **error)
 				curl_easy_strerror(err) : errbuf);
 	}
 out:
+	curl_slist_free_all(headers);
 	curl_easy_cleanup(easyhandle);
 	zbx_free(header.data);
 	zbx_free(body.data);

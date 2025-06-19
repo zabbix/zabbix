@@ -41,8 +41,6 @@ class CMacrosResolver extends CMacrosResolverGeneral {
 	 * Macros examples:
 	 * user: {$MACRO1}, {$MACRO2}, ...
 	 * host: {HOSTNAME}, {HOST.HOST}, {HOST.NAME}
-	 * ip: {IPADDRESS}, {HOST.IP}, {HOST.DNS}, {HOST.CONN}
-	 * item: {ITEM.LASTVALUE}, {ITEM.VALUE}
 	 *
 	 * @param array  $options
 	 * @param string $options['config']
@@ -137,7 +135,10 @@ class CMacrosResolver extends CMacrosResolverGeneral {
 			'macros_n' => [
 				'host' => ['{HOSTNAME}', '{HOST.HOST}', '{HOST.NAME}'],
 				'interface' => ['{IPADDRESS}', '{HOST.IP}', '{HOST.DNS}', '{HOST.CONN}', '{HOST.PORT}'],
-				'item' => ['{ITEM.LASTVALUE}', '{ITEM.VALUE}'],
+				'item' => ['{ITEM.LASTVALUE}', '{ITEM.LASTVALUE.DATE}', '{ITEM.LASTVALUE.TIME}',
+					'{ITEM.LASTVALUE.TIMESTAMP}', '{ITEM.LASTVALUE.AGE}', '{ITEM.VALUE}', '{ITEM.VALUE.DATE}',
+					'{ITEM.VALUE.TIME}', '{ITEM.VALUE.TIMESTAMP}', '{ITEM.VALUE.AGE}'
+				],
 				'log' => ['{ITEM.LOG.DATE}', '{ITEM.LOG.TIME}', '{ITEM.LOG.TIMESTAMP}', '{ITEM.LOG.AGE}',
 					'{ITEM.LOG.SOURCE}', '{ITEM.LOG.SEVERITY}', '{ITEM.LOG.NSEVERITY}', '{ITEM.LOG.EVENTID}'
 				]
@@ -224,7 +225,10 @@ class CMacrosResolver extends CMacrosResolverGeneral {
 			'macros_n' => [
 				'host' => ['{HOSTNAME}', '{HOST.HOST}', '{HOST.NAME}'],
 				'interface' => ['{IPADDRESS}', '{HOST.IP}', '{HOST.DNS}', '{HOST.CONN}', '{HOST.PORT}'],
-				'item' => ['{ITEM.LASTVALUE}', '{ITEM.VALUE}'],
+				'item' => ['{ITEM.LASTVALUE}', '{ITEM.LASTVALUE.DATE}', '{ITEM.LASTVALUE.TIME}',
+					'{ITEM.LASTVALUE.TIMESTAMP}', '{ITEM.LASTVALUE.AGE}', '{ITEM.VALUE}', '{ITEM.VALUE.DATE}',
+					'{ITEM.VALUE.TIME}', '{ITEM.VALUE.TIMESTAMP}', '{ITEM.VALUE.AGE}'
+				],
 				'log' => ['{ITEM.LOG.DATE}', '{ITEM.LOG.TIME}', '{ITEM.LOG.TIMESTAMP}', '{ITEM.LOG.AGE}',
 					'{ITEM.LOG.SOURCE}', '{ITEM.LOG.SEVERITY}', '{ITEM.LOG.NSEVERITY}', '{ITEM.LOG.EVENTID}'
 				]
@@ -332,7 +336,10 @@ class CMacrosResolver extends CMacrosResolverGeneral {
 			'macros_n' => [
 				'host' => ['{HOST.ID}', '{HOST.HOST}', '{HOST.NAME}'],
 				'interface' => ['{HOST.IP}', '{HOST.DNS}', '{HOST.CONN}', '{HOST.PORT}'],
-				'item' => ['{ITEM.LASTVALUE}', '{ITEM.VALUE}'],
+				'item' => ['{ITEM.LASTVALUE}', '{ITEM.LASTVALUE.DATE}', '{ITEM.LASTVALUE.TIME}',
+					'{ITEM.LASTVALUE.TIMESTAMP}', '{ITEM.LASTVALUE.AGE}', '{ITEM.VALUE}', '{ITEM.VALUE.DATE}',
+					'{ITEM.VALUE.TIME}', '{ITEM.VALUE.TIMESTAMP}', '{ITEM.VALUE.AGE}'
+				],
 				'log' => ['{ITEM.LOG.DATE}', '{ITEM.LOG.TIME}', '{ITEM.LOG.TIMESTAMP}', '{ITEM.LOG.AGE}',
 					'{ITEM.LOG.SOURCE}', '{ITEM.LOG.SEVERITY}', '{ITEM.LOG.NSEVERITY}', '{ITEM.LOG.EVENTID}'
 				]
@@ -509,17 +516,18 @@ class CMacrosResolver extends CMacrosResolverGeneral {
 				// Selecting items.
 				if ($itemids) {
 					if ($options['html']) {
-						$sql = 'SELECT i.itemid,i.hostid,i.key_,i.type,i.flags,i.status,ir.state,id.parent_itemid'.
+						$sql = 'SELECT i.itemid,i.hostid,i.key_,i.type,i.flags,i.status,ir.state,id.lldruleid'.
 							' FROM items i'.
 								' LEFT JOIN item_rtdata ir ON i.itemid=ir.itemid'.
 								' LEFT JOIN item_discovery id ON i.itemid=id.itemid'.
-							' WHERE '.dbConditionInt('i.itemid', array_keys($itemids));
+							' WHERE '.dbConditionId('i.itemid', array_keys($itemids));
 					}
 					else {
 						$sql = 'SELECT i.itemid,i.hostid,i.key_'.
 							' FROM items i'.
-							' WHERE '.dbConditionInt('i.itemid', array_keys($itemids));
+							' WHERE '.dbConditionId('i.itemid', array_keys($itemids));
 					}
+
 					$result = DBselect($sql);
 
 					while ($row = DBfetch($result)) {
@@ -564,12 +572,13 @@ class CMacrosResolver extends CMacrosResolverGeneral {
 					$function['hostid'] = $item['hostid'];
 					$function['host'] = $host['host'];
 					$function['key_'] = $item['key_'];
+
 					if ($options['html']) {
 						$function['type'] = $item['type'];
 						$function['flags'] = $item['flags'];
 						$function['status'] = $item['status'];
 						$function['state'] = $item['state'];
-						$function['parent_itemid'] = $item['parent_itemid'];
+						$function['lldruleid'] = $item['lldruleid'];
 					}
 				}
 				unset($function);
@@ -591,23 +600,19 @@ class CMacrosResolver extends CMacrosResolverGeneral {
 								if ($function['type'] == ITEM_TYPE_HTTPTEST) {
 									$link = (new CSpan('/'.$function['host'].'/'.$function['key_']))->addClass($style);
 								}
-								elseif ($function['flags'] == ZBX_FLAG_DISCOVERY_PROTOTYPE) {
+								elseif ($function['flags'] & ZBX_FLAG_DISCOVERY_PROTOTYPE) {
 									$item_url = (new CUrl('zabbix.php'))
 										->setArgument('action', 'popup')
 										->setArgument('popup', 'item.prototype.edit')
 										->setArgument('context', $options['context'])
 										->setArgument('itemid', $function['itemid'])
-										->setArgument('parent_discoveryid', $function['parent_itemid'])
+										->setArgument('parent_discoveryid', $function['lldruleid'])
 										->getUrl();
 
 									$link = CWebUser::checkAccess(CRoleHelper::UI_CONFIGURATION_HOSTS)
 										? (new CLink('/'.$function['host'].'/'.$function['key_'], $item_url))
 											->addClass($style)
 											->addClass(ZBX_STYLE_LINK_ALT)
-											->setAttribute('data-context', $options['context'])
-											->setAttribute('data-itemid', $function['itemid'])
-											->setAttribute('data-parent_discoveryid', $function['parent_itemid'])
-											->setAttribute('data-action', 'item.prototype.edit')
 										: (new CSpan('/'.$function['host'].'/'.$function['key_']))
 											->addClass($style);
 								}
@@ -623,9 +628,6 @@ class CMacrosResolver extends CMacrosResolverGeneral {
 										? (new CLink('/'.$function['host'].'/'.$function['key_'], $item_url))
 											->addClass($style)
 											->addClass(ZBX_STYLE_LINK_ALT)
-											->setAttribute('data-itemid', $function['itemid'])
-											->setAttribute('data-context', $options['context'])
-											->setAttribute('data-action', 'item.edit')
 										: (new CSpan('/'.$function['host'].'/'.$function['key_']))
 											->addClass($style);
 								}
@@ -992,9 +994,11 @@ class CMacrosResolver extends CMacrosResolverGeneral {
 				'item' => ['{ITEM.DESCRIPTION}', '{ITEM.DESCRIPTION.ORIG}', '{ITEM.ID}', '{ITEM.KEY}',
 					'{ITEM.KEY.ORIG}', '{ITEM.NAME}', '{ITEM.NAME.ORIG}', '{ITEM.STATE}', '{ITEM.VALUETYPE}'
 				],
-				'item_value' => ['{ITEM.LASTVALUE}', '{ITEM.VALUE}', '{ITEM.LOG.DATE}', '{ITEM.LOG.TIME}',
-					'{ITEM.LOG.TIMESTAMP}', '{ITEM.LOG.AGE}', '{ITEM.LOG.SOURCE}', '{ITEM.LOG.SEVERITY}',
-					'{ITEM.LOG.NSEVERITY}', '{ITEM.LOG.EVENTID}'
+				'item_value' => ['{ITEM.LASTVALUE}', '{ITEM.LASTVALUE.DATE}', '{ITEM.LASTVALUE.TIME}',
+					'{ITEM.LASTVALUE.TIMESTAMP}', '{ITEM.LASTVALUE.AGE}', '{ITEM.VALUE}', '{ITEM.VALUE.DATE}',
+					'{ITEM.VALUE.TIME}', '{ITEM.VALUE.TIMESTAMP}', '{ITEM.VALUE.AGE}', '{ITEM.LOG.DATE}',
+					'{ITEM.LOG.TIME}', '{ITEM.LOG.TIMESTAMP}', '{ITEM.LOG.AGE}', '{ITEM.LOG.SOURCE}',
+					'{ITEM.LOG.SEVERITY}', '{ITEM.LOG.NSEVERITY}', '{ITEM.LOG.EVENTID}'
 				],
 				'inventory' => array_keys(self::getSupportedHostInventoryMacrosMap())
 			],

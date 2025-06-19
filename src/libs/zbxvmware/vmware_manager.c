@@ -121,12 +121,23 @@ unlock:
 static int	vmware_job_exec(zbx_vmware_job_t *job, const char *config_source_ip, int config_vmware_timeout,
 		int config_vmware_frequency)
 {
-	int	ret = FAIL;
+	int	ret = SUCCEED;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() type:%s revision:%d", __func__, vmware_job_type_string(job),
 			job->revision);
 
+	zbx_vmware_lock();
+
 	if (ZBX_VMWARE_UPDATE_CONF != job->type && 0 == (job->service->state & ZBX_VMWARE_STATE_READY))
+		ret = FAIL;
+	else if (0 != (job->service->jobs_flag & (job->type << ZBX_VMWARE_JOB_RUN)))
+		ret = FAIL;
+	else
+		job->service->jobs_flag |= (job->type << ZBX_VMWARE_JOB_RUN);
+
+	zbx_vmware_unlock();
+
+	if (FAIL == ret)
 		goto out;
 
 	switch (job->type)
@@ -147,6 +158,10 @@ static int	vmware_job_exec(zbx_vmware_job_t *job, const char *config_source_ip, 
 		default:
 			ret = FAIL;
 	}
+
+	zbx_vmware_lock();
+	job->service->jobs_flag &= ~(job->type << ZBX_VMWARE_JOB_RUN);
+	zbx_vmware_unlock();
 out:
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s() type:%s ret:%s", __func__, vmware_job_type_string(job),
 			zbx_result_string(ret));
@@ -216,7 +231,7 @@ static void	vmware_job_schedule(zbx_vmware_t *vmw, zbx_vmware_job_t *job, time_t
 	zbx_vmware_unlock();
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s() type:%s nextcheck:%s ttl:" ZBX_FS_TIME_T, __func__,
-			vmware_job_type_string(job), zbx_time2str(job->nextcheck, NULL), job->ttl);
+			vmware_job_type_string(job), zbx_time2str(job->nextcheck, NULL), (zbx_fs_time_t)job->ttl);
 
 #undef ZBX_VMWARE_EVENTLOG_MIN_INTERVAL
 #undef ZBX_VMWARE_SERVICE_TTL

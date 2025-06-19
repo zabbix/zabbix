@@ -1,21 +1,16 @@
 <?php declare(strict_types = 0);
 /*
-** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2025 Zabbix SIA
 **
-** This program is free software; you can redistribute it and/or modify
-** it under the terms of the GNU General Public License as published by
-** the Free Software Foundation; either version 2 of the License, or
-** (at your option) any later version.
+** This program is free software: you can redistribute it and/or modify it under the terms of
+** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
 **
-** This program is distributed in the hope that it will be useful,
-** but WITHOUT ANY WARRANTY; without even the implied warranty of
-** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-** GNU General Public License for more details.
+** This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+** without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+** See the GNU Affero General Public License for more details.
 **
-** You should have received a copy of the GNU General Public License
-** along with this program; if not, write to the Free Software
-** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+** You should have received a copy of the GNU Affero General Public License along with this program.
+** If not, see <https://www.gnu.org/licenses/>.
 **/
 
 
@@ -37,11 +32,13 @@ class CFormValidatorTest extends TestCase {
 		return [
 			[
 				[],
-				null
+				null,
+				'[RULES ERROR] Rule "type" is mandatory (Path: )'
 			],
 			[
 				['object', 'fields' => []],
-				null
+				null,
+				'[RULES ERROR] Rule "fields" should contain non-empty array (Path: )'
 			],
 			[
 				['object', 'fields' => [
@@ -53,19 +50,22 @@ class CFormValidatorTest extends TestCase {
 			],
 			[
 				['host' => 'required'],
-				null
+				null,
+				'[RULES ERROR] Unknown rule "host" (Path: )'
 			],
 			[
 				['object', 'fields' => [
 					'host' => 'required'
 				]],
-				null
+				null,
+				'[RULES ERROR] Field "host" should have an array of rule rows (Path: )'
 			],
 			[
 				['object', 'fields' => [
 					'host' => ['required']
 				]],
-				null
+				null,
+				'[RULES ERROR] Rule "type" is mandatory (Path: /host)'
 			],
 			[
 				['object', 'fields' => [
@@ -79,7 +79,8 @@ class CFormValidatorTest extends TestCase {
 				['object', 'fields' => [
 					'host' => [['required']]
 				]],
-				null
+				null,
+				'[RULES ERROR] Rule "type" is mandatory (Path: /host)'
 			],
 			[
 				['object', 'fields' => [
@@ -133,13 +134,15 @@ class CFormValidatorTest extends TestCase {
 				['object', 'fields' => [
 					'host' => ['db hosts.hostid', 'id']
 				]],
-				null
+				null,
+				'[RULES ERROR] Rule "type" is specified multiple times (Path: /host)'
 			],
 			[
 				['object', 'fields' => [
 					'host' => ['db hosts.description', 'length' => 65535]
 				]],
-				null
+				null,
+				'[RULES ERROR] Rule "length" is specified multiple times (Path: /host)'
 			],
 			[
 				['object', 'fields' => [
@@ -225,7 +228,8 @@ class CFormValidatorTest extends TestCase {
 				['object', 'fields' => [
 					'status' => ['in' => [[1, 2, 4]], 'integer']
 				]],
-				null
+				null,
+				'[RULES ERROR] Invalid value for rule "in" or "not_in" (Path: /status)'
 			],
 			[
 				['object', 'fields' => [
@@ -237,27 +241,31 @@ class CFormValidatorTest extends TestCase {
 			],
 			[
 				['object', 'fields' => [
-					'host' => ['sring']
+					'host' => ['not_a_rule']
 				]],
-				null
+				null,
+				'[RULES ERROR] Unknown rule "not_a_rule" (Path: /host)'
 			],
 			[
 				['object', 'fields' => [
 					'host' => ['abc' => true]
 				]],
-				null
+				null,
+				'[RULES ERROR] Unknown rule "abc" (Path: /host)'
 			],
 			[
 				['object', 'fields' => [
 					'host' => ['required', 'required']
 				]],
-				null
+				null,
+				'[RULES ERROR] Option "required" is specified multiple times (Path: /host)'
 			],
 			[
 				['object', 'fields' => [
 					'host' => ['not_empty', 'integer']
 				]],
-				null
+				null,
+				'[RULES ERROR] Rule "not_empty" is not compatible with type "integer" (Path: /host)'
 			],
 			[
 				['object', 'fields' => [
@@ -271,13 +279,15 @@ class CFormValidatorTest extends TestCase {
 				['object', 'fields' => [
 					'host' => ['in' => '1,2,3', 'string']
 				]],
-				null
+				null,
+				'[RULES ERROR] Rule "in" should contain non-empty array (Path: /host)'
 			],
 			[
 				['object', 'fields' => [
 					'interfaces' => ['objects']
 				]],
-				null
+				null,
+				'[RULES ERROR] For object/objects in non-conditional rule row "fields" rule must be present (Path: /interfaces)'
 			],
 			[
 				['object', 'fields' => [
@@ -319,13 +329,15 @@ class CFormValidatorTest extends TestCase {
 				['object', 'fields' => [
 					'interfaces' => ['fields' => ['ip' => []]]
 				]],
-				null
+				null,
+				'[RULES ERROR] Rule "type" is mandatory (Path: /interfaces)'
 			],
 			[
 				['object', 'fields' => [
 					'interfaces' => ['objects', 'fields' => []]
 				]],
-				null
+				null,
+				'[RULES ERROR] Rule "fields" should contain non-empty array (Path: /interfaces)'
 			],
 			[
 				['object', 'fields' => [
@@ -371,7 +383,8 @@ class CFormValidatorTest extends TestCase {
 				['object', 'fields' => [
 					'details' => ['object']
 				]],
-				null
+				null,
+				'[RULES ERROR] For object/objects in non-conditional rule row "fields" rule must be present (Path: /details)'
 			],
 			[
 				['object', 'fields' => [
@@ -389,13 +402,15 @@ class CFormValidatorTest extends TestCase {
 				['object', 'fields' => [
 					'details' => ['fields' => ['version' => []]]
 				]],
-				null
+				null,
+				'[RULES ERROR] Rule "type" is mandatory (Path: /details)'
 			],
 			[
 				['object', 'fields' => [
 					'details' => ['object', 'fields' => []]
 				]],
-				null
+				null,
+				'[RULES ERROR] Rule "fields" should contain non-empty array (Path: /details)'
 			],
 			[
 				['object', 'fields' => [
@@ -429,13 +444,15 @@ class CFormValidatorTest extends TestCase {
 				['object', 'fields' => [
 					'groups' => ['field' => ['id']]
 				]],
-				null
+				null,
+				'[RULES ERROR] Rule "type" is mandatory (Path: /groups)'
 			],
 			[
 				['object', 'fields' => [
 					'groups' => ['array', 'field' => []]
 				]],
-				null
+				null,
+				'[RULES ERROR] Rule "field" should contain non-empty array (Path: /groups)'
 			],
 			[
 				['object', 'fields' => [
@@ -449,7 +466,8 @@ class CFormValidatorTest extends TestCase {
 				['object', 'fields' => [
 					'groups' => ['array', 'field' => [['id'], ['string']]]
 				]],
-				null
+				null,
+				'[RULES ERROR] For numeric keys, rule value should be a string: (Path: /groups, Key: 0)'
 			],
 			[
 				['object', 'fields' => [
@@ -475,13 +493,15 @@ class CFormValidatorTest extends TestCase {
 				['object', 'fields' => [
 					'ip' => ['when' => ['ip', 'not_empty']]
 				]],
-				null
+				null,
+				'[RULES ERROR] Rule "type" is mandatory (Path: /ip)'
 			],
 			[
 				['object', 'fields' => [
 					'ip' => ['when' => ['key', 'string', 'not_empty']]
 				]],
-				null
+				null,
+				'[RULES ERROR] When condition should be an array with at least two elements (Path: /ip)'
 			],
 			[
 				['object', 'fields' => [
@@ -573,7 +593,8 @@ class CFormValidatorTest extends TestCase {
 				['object', 'fields' => [
 					'ip' => [['integer'], ['required']]
 				]],
-				null
+				null,
+				'[RULES ERROR] Rule "type" is mandatory (Path: /ip)'
 			],
 			[
 				['object', 'fields' => [
@@ -595,35 +616,41 @@ class CFormValidatorTest extends TestCase {
 				['object', 'fields' => [
 					'ip' => ['string', 'length' => 6.1]
 				]],
-				null
+				null,
+				'[RULES ERROR] Rule "length" should contain an integer (Path: /ip)'
 			],
 			[
 				['object', 'fields' => [
 					'ip' => ['string', 'min' =>'6']
 				]],
-				null
+				null,
+				'[RULES ERROR] Rule "min" should contain a number (Path: /ip)'
 			],
 			[
 				['object', 'fields' => [
 					'ip' => ['string', 'min' => 6]
 				]],
-				null
+				null,
+				'[RULES ERROR] Rule "min" or "max" is not compatible with type "string" (Path: /ip)'
 			],
 			[
 				['object', 'fields' => [
 					'ip' => ['object', 'length' => 6]
 				]],
-				null
+				null,
+				'[RULES ERROR] For object/objects in non-conditional rule row "fields" rule must be present (Path: /ip)'
 			],
 			[
 				['required' => 'host'],
-				null
+				null,
+				'[RULES ERROR] Unknown rule "required" (Path: )'
 			],
 			[
 				['object', 'fields' => [
 					'ip' => ['string', 'invalid' => 'ipaddress']
 				]],
-				null
+				null,
+				'[RULES ERROR] Unknown rule "invalid" (Path: /ip)'
 			],
 			[
 				['object',
@@ -780,7 +807,8 @@ class CFormValidatorTest extends TestCase {
 					],
 					'ip' => ['string']
 				]],
-				null
+				null,
+				'[RULES ERROR] Only fields defined prior to this can be used for "when" checks (Path: /dns)'
 			]
 		];
 	}
@@ -791,14 +819,14 @@ class CFormValidatorTest extends TestCase {
 	 * @param array  $rules
 	 * @param mixed  $expected
 	 */
-	public function testNormalizeRules(array $rules, $expected) {
+	public function testNormalizeRules(array $rules, $expected, $error_message = '') {
 		global $DB;
 
 		$DB['TYPE'] = ZBX_DB_MYSQL;
 
 		if ($expected === null) {
 			$this->expectException(Exception::class);
-			$this->expectExceptionMessage('Internal error');
+			$this->expectExceptionMessage($error_message);
 		}
 
 		$validator = new CFormValidator($rules);
@@ -2232,6 +2260,28 @@ class CFormValidatorTest extends TestCase {
 			],
 			[
 				['object', 'fields' => [
+					'field1' => ['string'],
+					'field2' => ['integer', 'required', 'when' => ['field1', 'regex' => '/^match$/']]
+				]],
+				['field1' => 'notmatch'],
+				['field1' => 'notmatch'],
+				CFormValidator::SUCCESS,
+				[]
+			],
+			[
+				['object', 'fields' => [
+					'field1' => ['string'],
+					'field2' => ['integer', 'required', 'when' => ['field1', 'regex' => '/^match$/']]
+				]],
+				['field1' => 'match'],
+				['field1' => 'match'],
+				CFormValidator::ERROR,
+				['/field2' => [
+					['message' => 'Required field is missing.', 'level' => CFormValidator::ERROR_LEVEL_PRIMARY]
+				]]
+			],
+			[
+				['object', 'fields' => [
 					'field1' => ['integer'],
 					'field2' => ['objects', 'fields' => [
 						'ifield1' => ['integer'],
@@ -2344,7 +2394,7 @@ class CFormValidatorTest extends TestCase {
 				['/value' => [
 					['message' => 'This value must be "abc".', 'level' => CFormValidator::ERROR_LEVEL_PRIMARY]
 				]]
-			],
+			]
 		];
 	}
 

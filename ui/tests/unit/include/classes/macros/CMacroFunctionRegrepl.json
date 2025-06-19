@@ -8,6 +8,30 @@
         "result": "\\*myitem\\*\\_\\\"value\\\""
     },
     {
+        "value": "TEST 012345",
+        "macrofunc": {
+            "function": "regrepl",
+            "parameters": ["([^a-z])", "\\\\\\1"]
+        },
+        "result": "\\T\\E\\S\\T\\ \\0\\1\\2\\3\\4\\5"
+    },
+    {
+        "value": "TEST 012345",
+        "macrofunc": {
+            "function": "regrepl",
+            "parameters": ["[^a-z]", "\\\\\\0"]
+        },
+        "result": "\\T\\E\\S\\T\\ \\0\\1\\2\\3\\4\\5"
+    },
+    {
+        "value": "TEST 012345",
+        "macrofunc": {
+            "function": "regrepl",
+            "parameters": ["[^a-z]", "\\\\\\1"]
+        },
+        "result": "\\\\\\\\\\\\\\\\\\\\\\"
+    },
+    {
         "value": "*myitem*_\"value\"",
         "macrofunc": {
             "function": "regrepl",
@@ -122,6 +146,14 @@
         "result": "Problem ID: 123 Log line"
     },
     {
+        "value": "test",
+        "macrofunc": {
+            "function": "regrepl",
+            "parameters": [".*", "\\0\\0\\0"]
+        },
+        "result": "testtesttest"
+    },
+    {
         "value": "Log line",
         "macrofunc": {
             "function": "regrepl",
@@ -133,9 +165,17 @@
         "value": "Log line",
         "macrofunc": {
             "function": "regrepl",
-            "parameters": [".*", "Problem ID:\\1"]
+            "parameters": [".*", "Problem ID: \\1"]
         },
-        "result": "Problem ID:Problem ID:"
+        "result": "Problem ID: Problem ID: "
+    },
+    {
+        "value": "Log line",
+        "macrofunc": {
+            "function": "regrepl",
+            "parameters": ["^.*", "Problem ID: \\1"]
+        },
+        "result": "Problem ID: "
     },
     {
         "value": "MySQL crashed err no 123 ORACLE not supported 0",
@@ -386,5 +426,61 @@
             "parameters": ["\\w+$", "test"]
         },
         "result": "test123 pārbaude test"
+    },
+    {
+        "value": "test1 test2 test3",
+        "macrofunc": {
+            "function": "regrepl",
+            "parameters": ["(test2)", "{\\1}{\\2}{\\3}"]
+        },
+        "result": "test1 {test2}{}{} test3"
+    },
+    {
+        "value": "TEST abc",
+        "macrofunc": {
+            "function": "regrepl",
+            "parameters": ["([a-z])", "\\\\\\2"]
+        },
+        "result": "TEST \\\\\\"
+    },
+    {
+        "value": "TEST abc",
+        "macrofunc": {
+            "function": "regrepl",
+            "parameters": ["([a-z])", "\\2"]
+        },
+        "result": "TEST "
+    },
+    {
+        "value": "TEST abc",
+        "macrofunc": {
+            "function": "regrepl",
+            "parameters": ["([a-z])", "\\1"]
+        },
+        "result": "TEST abc"
+    },
+    {
+        "value": "TEST abc",
+        "macrofunc": {
+            "function": "regrepl",
+            "parameters": ["([a-z])", "\\10"]
+        },
+        "result": "TEST a0b0c0"
+    },
+    {
+        "value": "abc TEST",
+        "macrofunc": {
+            "function": "regrepl",
+            "parameters": ["[a-z]", "\\10"]
+        },
+        "result": "000 TEST"
+    },
+    {
+        "value": "TEST 012345",
+        "macrofunc": {
+            "function": "regrepl",
+            "parameters": ["([^a-z])", "\\\\\\1;"]
+        },
+        "result": "\\T;\\E;\\S;\\T;\\ ;\\0;\\1;\\2;\\3;\\4;\\5;"
     }
 ]

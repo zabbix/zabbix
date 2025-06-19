@@ -44,11 +44,12 @@
 			this.refresh_simple_url = url.getUrl();
 
 			this.initTabFilter(filter_options);
+			this.initEvents();
+			this.initPopupListeners();
 
 			this.host_view_form = $('form[name=host_view]');
 			this.running = true;
 			this.refresh();
-			this.setSubmitCallback();
 		},
 
 		initTabFilter(filter_options) {
@@ -60,6 +61,48 @@
 			this.filter = new CTabFilter($('#monitoring_hosts_filter')[0], filter_options);
 			this.filter.on(TABFILTER_EVENT_URLSET, () => {
 				this.reloadPartialAndTabCounters();
+			});
+		},
+
+		initEvents() {
+			document.querySelector('.js-create-host')?.addEventListener('click', () => {
+				ZABBIX.PopupManager.open('host.edit', {groupids: this.applied_filter_groupids});
+			});
+		},
+
+		initPopupListeners() {
+			ZABBIX.EventHub.subscribe({
+				require: {
+					context: CPopupManager.EVENT_CONTEXT,
+					event: CPopupManagerEvent.EVENT_OPEN
+				},
+				callback: () => this.unscheduleRefresh()
+			});
+
+			ZABBIX.EventHub.subscribe({
+				require: {
+					context: CPopupManager.EVENT_CONTEXT,
+					event: CPopupManagerEvent.EVENT_CANCEL
+				},
+				callback: () => this.scheduleRefresh()
+			});
+
+			ZABBIX.EventHub.subscribe({
+				require: {
+					context: CPopupManager.EVENT_CONTEXT,
+					event: CPopupManagerEvent.EVENT_SUBMIT
+				},
+				callback: ({data, event}) => {
+					event.preventDefault();
+
+					if ('success' in data.submit) {
+						this._addPopupMessage(
+							makeMessageBox('good', data.submit.success.messages, data.submit.success.title)
+						);
+					}
+
+					this.reloadPartialAndTabCounters();
+				}
 			});
 		},
 
@@ -244,31 +287,6 @@
 			if (this.deferred) {
 				this.deferred.abort();
 			}
-		},
-
-		createHost() {
-			window.popupManagerInstance.openPopup('host.edit',
-				this.applied_filter_groupids ? {groupids: this.applied_filter_groupids} : {}
-			);
-		},
-
-		setSubmitCallback() {
-			window.popupManagerInstance.setSubmitCallback((e) => {
-				const data = e.detail;
-
-				if ('success' in data) {
-					const title = data.success.title;
-					let messages = [];
-
-					if ('messages' in data.success) {
-						messages = data.success.messages;
-					}
-
-					view._addPopupMessage(makeMessageBox('good', messages, title));
-				}
-
-				view.reloadPartialAndTabCounters();
-			});
 		}
 	};
 </script>

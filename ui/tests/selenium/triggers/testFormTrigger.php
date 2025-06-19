@@ -14,8 +14,8 @@
 **/
 
 
-require_once dirname(__FILE__).'/../../include/CLegacyWebTest.php';
-require_once dirname(__FILE__).'/../behaviors/CMessageBehavior.php';
+require_once __DIR__.'/../../include/CLegacyWebTest.php';
+require_once __DIR__.'/../behaviors/CMessageBehavior.php';
 
 use Facebook\WebDriver\WebDriverBy;
 use Facebook\WebDriver\WebDriverKeys;
@@ -417,6 +417,9 @@ class testFormTrigger extends CLegacyWebTest {
 			$this->assertEquals($value, $entry_name->getAttribute($attribute));
 		}
 
+		// Focus is removed to preventively trigger inline error that alters the HTML during click on icon.
+		$this->page->removeFocus();
+
 		// Check hintbox.
 		$this->query('class:zi-help-filled-small')->one()->click();
 		$hint = $this->query('xpath:.//div[@class="overlay-dialogue wordbreak"]')->waitUntilPresent()->one();
@@ -538,10 +541,9 @@ class testFormTrigger extends CLegacyWebTest {
 			[
 				[
 					'expected' => TEST_BAD,
-					'error_msg' => 'Cannot add trigger',
-					'errors' => [
-						'Incorrect value for field "name": cannot be empty.',
-						'Incorrect value for field "expression": cannot be empty.'
+					'inline_errors' => [
+						'Name' => 'This field cannot be empty.',
+						'Expression' => 'This field cannot be empty.'
 					]
 				]
 			],
@@ -550,9 +552,8 @@ class testFormTrigger extends CLegacyWebTest {
 				[
 					'expected' => TEST_BAD,
 					'description' => 'MyTrigger',
-					'error_msg' => 'Cannot add trigger',
-					'errors' => [
-						'Incorrect value for field "expression": cannot be empty.'
+					'inline_errors' => [
+						'Expression' => 'This field cannot be empty.'
 					]
 				]
 			],
@@ -561,9 +562,8 @@ class testFormTrigger extends CLegacyWebTest {
 				[
 					'expected' => TEST_BAD,
 					'expression' => '6 & 0 | 0',
-					'error_msg' => 'Cannot add trigger',
-					'errors' => [
-						'Incorrect value for field "name": cannot be empty.'
+					'inline_errors' => [
+						'Name' => 'This field cannot be empty.'
 					]
 				]
 			],
@@ -573,9 +573,8 @@ class testFormTrigger extends CLegacyWebTest {
 					'expected' => TEST_BAD,
 					'description' => 'MyTrigger',
 					'expression' => '6 and 0 or 0',
-					'error_msg' => 'Cannot add trigger',
-					'errors' => [
-						'Invalid parameter "/1/expression": trigger expression must contain at least one /host/key reference.'
+					'inline_errors' => [
+						'Expression' => 'Trigger expression must contain at least one /host/key reference.'
 					]
 				]
 			],
@@ -585,9 +584,8 @@ class testFormTrigger extends CLegacyWebTest {
 					'expected' => TEST_BAD,
 					'description' => 'MyTrigger',
 					'expression' => '{self::HOST}',
-					'error_msg' => 'Cannot add trigger',
-					'errors' => [
-						'Invalid parameter "/1/expression": incorrect expression starting from "{self::HOST}".'
+					'inline_errors' => [
+						'Expression' => 'Incorrect expression starting from "{self::HOST}".'
 					]
 				]
 			],
@@ -755,13 +753,12 @@ class testFormTrigger extends CLegacyWebTest {
 					'description' => 'MyTrigger_CheckUrl',
 					'expression' => 'last(/'.self::HOST.'/Unsigned,#1)<5',
 					'url' => 'javascript:alert(123);',
-					'error_msg' => 'Cannot add trigger',
-					'errors' => [
-						'Invalid parameter "/1/url": unacceptable URL.'
+					'inline_errors' => [
+						'Menu entry URL' => 'Unacceptable URL.'
 					]
 				]
 			],
-			// #22.
+			// #22. TODO: Move this check to inline validation once DEV-4259 is fixed
 			[
 				[
 					'expected' => TEST_BAD,
@@ -773,7 +770,7 @@ class testFormTrigger extends CLegacyWebTest {
 					]
 				]
 			],
-			// #23.
+			// #23. TODO: Move this check to inline validation once DEV-4259 is fixed
 			[
 				[
 					'expected' => TEST_BAD,
@@ -792,9 +789,8 @@ class testFormTrigger extends CLegacyWebTest {
 					'expected' => TEST_BAD,
 					'description' => 'MyTrigger',
 					'expression' => 'somefunc(/'.self::HOST.'/Float,#1)<0',
-					'error_msg' => 'Cannot add trigger',
-					'errors' => [
-						'Invalid parameter "/1/expression": unknown function "somefunc".'
+					'inline_errors' => [
+						'Expression' => 'Unknown function "somefunc".'
 					]
 				]
 			],
@@ -804,9 +800,8 @@ class testFormTrigger extends CLegacyWebTest {
 					'expected' => TEST_BAD,
 					'description' => 'MyTrigger',
 					'expression' => 'last(/'.self::HOST.'/Float,#1) or {#MACRO}',
-					'error_msg' => 'Cannot add trigger',
-					'errors' => [
-						'Invalid parameter "/1/expression": incorrect expression starting from "{#MACRO}".'
+					'inline_errors' => [
+						'Expression' => 'Incorrect expression starting from "{#MACRO}".'
 					]
 				]
 			],
@@ -815,7 +810,7 @@ class testFormTrigger extends CLegacyWebTest {
 				[
 					'expected' => TEST_BAD,
 					'description' => 'MyTrigger',
-					'expression' => 'last(/'.self::HOST.'/Float,#1) or {#MACRO}',
+					'expression' => 'last(/'.self::HOST.'/Float,#1) or {$MACRO}',
 					'constructor' => [
 						'text' => ['A or B', 'A', 'B'],
 						'elements' => ['expr_0_37', 'expr_42_49']
@@ -861,14 +856,14 @@ class testFormTrigger extends CLegacyWebTest {
 				[
 					'expected' => TEST_BAD,
 					'description' => 'MyTrigger',
-					'expression' => 'lasta(/'.self::HOST.'/Float,#1)<0 or 8 and 9 + last(/'.self::HOST.'/Float2,#1)',
+					'expression' => 'last(/'.self::HOST.'/Float,#1)<0 or 8 and 9 + last(/'.self::HOST.'/Float2,#1)',
 					'constructor' => [
+						// TODO: convert this case to inline validation check when the item check will be fixed.
 						'text' => ['A or (B and C)', 'A', 'B', 'C'],
-						'elements' => ['expr_0_40', 'expr_45_45', 'expr_51_93'],
+						'elements' => ['expr_0_39', 'expr_44_44', 'expr_50_92'],
 						'elementError' => true,
-						'element_count' => 4,
+						'element_count' => 3,
 						'errors' => [
-							'lasta(/'.self::HOST.'/Float,#1): Incorrect function is used',
 							'last(/'.self::HOST.'/Float2,#1): Unknown host item, no such item in selected host'
 						]
 					]
@@ -880,12 +875,8 @@ class testFormTrigger extends CLegacyWebTest {
 					'expected' => TEST_BAD,
 					'description' => 'MyTrigger',
 					'expression' => 'last(/'.self::HOST.'@/Float,#1)<0',
-					'constructor' => [
-						'errors' => [
-							'header' => 'Expression syntax error.',
-							'details' => 'Cannot build expression tree: incorrect expression starting from'.
-									' "last(/'.self::HOST.'@/Float,#1)<0".'
-						]
+					'inline_errors' => [
+						'Expression' => 'Incorrect expression starting from "last(/'.self::HOST.'@/Float,#1)<0".'
 					]
 				]
 			],
@@ -895,12 +886,9 @@ class testFormTrigger extends CLegacyWebTest {
 					'expected' => TEST_BAD,
 					'description' => 'MyTrigger',
 					'expression' => 'last(/'.self::HOST.'/system .uptime,#1)<0',
-					'constructor' => [
-						'errors' => [
-							'header' => 'Expression syntax error.',
-							'details' => 'Cannot build expression tree: incorrect expression starting from '.
-									'"last(/'.self::HOST.'/system .uptime,#1)<0".'
-						]
+					'inline_errors' => [
+						'Expression' => 'Incorrect expression starting from "last(/'.self::HOST.
+								'/system .uptime,#1)<0".'
 					]
 				]
 			],
@@ -910,12 +898,8 @@ class testFormTrigger extends CLegacyWebTest {
 					'expected' => TEST_BAD,
 					'description' => 'MyTrigger',
 					'expression' => 'lastA(/'.self::HOST.'/Float,#1)<0',
-					'constructor' => [
-						'errors' => [
-							'header' => 'Expression syntax error.',
-							'details' => 'Cannot build expression tree: incorrect expression starting from '.
-									'"lastA(/'.self::HOST.'/Float,#1)<0".'
-						]
+					'inline_errors' => [
+						'Expression' => 'Incorrect expression starting from "lastA(/'.self::HOST.'/Float,#1)<0".'
 					]
 				]
 			],
@@ -933,10 +917,8 @@ class testFormTrigger extends CLegacyWebTest {
 					'expected' => TEST_BAD,
 					'description' => 'MyTrigger_rate_bad_second_par',
 					'expression' => 'rate(/'.self::HOST.'/Float,test)>0.5',
-					'error_msg' => 'Cannot add trigger',
-					'errors' => [
-						"Invalid parameter \"/1/expression\": incorrect expression starting from ".
-								"\"rate(/".self::HOST."/Float,test)>0.5\"."
+					'inline_errors' => [
+						'Expression' => 'Incorrect expression starting from "rate(/'.self::HOST.'/Float,test)>0.5".'
 					]
 				]
 			],
@@ -946,14 +928,12 @@ class testFormTrigger extends CLegacyWebTest {
 					'expected' => TEST_BAD,
 					'description' => 'MyTrigger_rate_no_slash',
 					'expression' => 'rate('.self::HOST.'/Float,1h)>0.5',
-					'error_msg' => 'Cannot add trigger',
-					'errors' => [
-						"Invalid parameter \"/1/expression\": incorrect expression starting from ".
-								"\"rate(".self::HOST."/Float,1h)>0.5\"."
+					'inline_errors' => [
+						'Expression' => 'Incorrect expression starting from "rate('.self::HOST.'/Float,1h)>0.5".'
 					]
 				]
 			],
-			// #36.
+			// #36. TODO: Move this check to inline validation once DEV-4259 is fixed
 			[
 				[
 					'expected' => TEST_BAD,
@@ -983,7 +963,7 @@ class testFormTrigger extends CLegacyWebTest {
 					'expression' => 'jsonpath(last(/'.self::HOST.'/Text),"$.last_name")<>"Test"'
 				]
 			],
-			// #39.
+			// #39. TODO: Move this check to inline validation once DEV-4259 is fixed
 			[
 				[
 					'expected' => TEST_BAD,
@@ -1001,9 +981,8 @@ class testFormTrigger extends CLegacyWebTest {
 					'expected' => TEST_BAD,
 					'description' => 'Missing json parameters',
 					'expression' => 'jsonpath(last(/'.self::HOST.'/Text,#1:now-5m))="Test"',
-					'error_msg' => 'Cannot add trigger',
-					'errors' => [
-						'Invalid parameter "/1/expression": invalid number of parameters in function "jsonpath".'
+					'inline_errors' => [
+						'Expression' => 'Invalid number of parameters in function "jsonpath".'
 					]
 				]
 			],
@@ -1013,9 +992,8 @@ class testFormTrigger extends CLegacyWebTest {
 					'expected' => TEST_BAD,
 					'description' => 'Wrong json parameters',
 					'expression' => 'jsonpath(last(/'.self::HOST.'/Text,20),"$.[0].last_name")="Test"',
-					'error_msg' => 'Cannot add trigger',
-					'errors' => [
-						'Invalid parameter "/1/expression": invalid second parameter in function "last".'
+					'inline_errors' => [
+						'Expression' => 'Invalid second parameter in function "last".'
 					]
 				]
 			],
@@ -1025,10 +1003,9 @@ class testFormTrigger extends CLegacyWebTest {
 					'expected' => TEST_BAD,
 					'description' => 'Incorrect json expression',
 					'expression' => 'jsonpath(last(/'.self::HOST.'/Character,#5-now),"$.[0].last_name","last")<"Test"',
-					'error_msg' => 'Cannot add trigger',
-					'errors' => [
-						'Invalid parameter "/1/expression": incorrect expression starting from "jsonpath(last(/'.
-								self::HOST.'/Character,#5-now),"$.[0].last_name","last")<"Test"".'
+					'inline_errors' => [
+						'Expression' => 'Incorrect expression starting from "jsonpath(last(/'.self::HOST.
+								'/Character,#5-now),"$.[0].last_name","last")<"Test"".'
 					]
 				]
 			],
@@ -1049,7 +1026,7 @@ class testFormTrigger extends CLegacyWebTest {
 					'expression' => 'xmlxpath(last(/'.self::HOST.'/Character),"/zabbix_export/version")=1'
 				]
 			],
-			// #45.
+			// #45. TODO: Move this check to inline validation once DEV-4259 is fixed
 			[
 				[
 					'expected' => TEST_BAD,
@@ -1067,9 +1044,8 @@ class testFormTrigger extends CLegacyWebTest {
 					'expected' => TEST_BAD,
 					'description' => 'Missing xml parameters',
 					'expression' => 'xmlxpath(last(/'.self::HOST.'/Text,#1:now-5m))="Test"',
-					'error_msg' => 'Cannot add trigger',
-					'errors' => [
-						'Invalid parameter "/1/expression": invalid number of parameters in function "xmlxpath".'
+					'inline_errors' => [
+						'Expression' => 'Invalid number of parameters in function "xmlxpath".'
 					]
 				]
 			],
@@ -1079,9 +1055,8 @@ class testFormTrigger extends CLegacyWebTest {
 					'expected' => TEST_BAD,
 					'description' => 'Wrong xml parameters',
 					'expression' => 'xmlxpath(last(/'.self::HOST.'/Text,4),5.0)=7.0',
-					'error_msg' => 'Cannot add trigger',
-					'errors' => [
-						'Invalid parameter "/1/expression": invalid second parameter in function "last".'
+					'inline_errors' => [
+						'Expression' => 'Invalid second parameter in function "last".'
 					]
 				]
 			],
@@ -1109,10 +1084,9 @@ class testFormTrigger extends CLegacyWebTest {
 					'expected' => TEST_BAD,
 					'description' => 'Incorrect json expression',
 					'expression' => 'xmlxpath(last(/'.self::HOST.'/Text,#3-now),"/zabbix_export/version/text()",5.0)=7.0',
-					'error_msg' => 'Cannot add trigger',
-					'errors' => [
-						'Invalid parameter "/1/expression": incorrect expression starting from "xmlxpath(last(/'.
-								self::HOST.'/Text,#3-now),"/zabbix_export/version/text()",5.0)=7.0".'
+					'inline_errors' => [
+						'Expression' => 'Incorrect expression starting from "xmlxpath(last(/'.self::HOST.
+						'/Text,#3-now),"/zabbix_export/version/text()",5.0)=7.0".'
 					]
 				]
 			]
@@ -1210,6 +1184,7 @@ class testFormTrigger extends CLegacyWebTest {
 				COverlayDialogElement::find()->one()->close();
 			}
 			else {
+				$this->query('id:expression-constructor-buttons')->waitUntilVisible();
 				$this->zbxTestAssertVisibleXpath("//div[@id='expression-constructor-buttons']//button[@id='and_expression']");
 				$this->zbxTestAssertVisibleXpath("//div[@id='expression-constructor-buttons']//button[@id='or_expression']");
 				$this->zbxTestAssertVisibleXpath("//div[@id='expression-constructor-buttons']//button[@id='replace_expression']");
@@ -1247,6 +1222,7 @@ class testFormTrigger extends CLegacyWebTest {
 		if (!isset($data['constructor'])) {
 			$dialog->getFooter()->query('button:Add')->one()->click();
 			$this->page->waitUntilReady();
+
 			switch ($data['expected']) {
 				case TEST_GOOD:
 					$this->zbxTestWaitUntilMessageTextPresent('msg-good', 'Trigger added');
@@ -1255,7 +1231,14 @@ class testFormTrigger extends CLegacyWebTest {
 					$this->zbxTestAssertElementText("//a[text()='$description']/ancestor::tr/td[6]", $expression);
 					break;
 				case TEST_BAD:
-					$this->assertMessage(TEST_BAD, $data['error_msg'], $data['errors']);
+					// TODO: All error checks should be moced to inline validation once DEV-4259 is fixed.
+					if (array_key_exists('inline_errors', $data)) {
+						$this->assertInlineError($dialog->asForm(), $data['inline_errors']);
+					}
+					else {
+						$this->assertMessage(TEST_BAD, $data['error_msg'], $data['errors']);
+					}
+
 					$this->zbxTestTextPresent('Name');
 					$this->zbxTestTextPresent('Expression');
 					$this->zbxTestTextPresent('Description');
@@ -1377,7 +1360,9 @@ class testFormTrigger extends CLegacyWebTest {
 
 		// Get the saved trigger's ID from UI.
 		$link = (array_key_exists('form_data', $data)) ? $data['form_data']['Name'] : $data['link_name'];
-		$triggerid = $this->page->query('link', $link)->one()->getAttribute('data-triggerid');
+		$linkElement = $this->page->query('link', $link)->one()->getAttribute('href');
+		parse_str(parse_url($linkElement, PHP_URL_QUERY), $params);
+		$triggerid = $params['triggerid'];
 
 		// Get the newly saved trigger's expression, as it is saved in the DB.
 		$db_expression = CDBHelper::getValue('SELECT expression FROM triggers WHERE triggerid = '.$triggerid);

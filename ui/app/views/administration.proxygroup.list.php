@@ -117,9 +117,7 @@ foreach ($data['proxy_groups'] as $proxy_groupid => $proxy_group) {
 				->getUrl();
 
 			$proxies[] = $data['user']['can_edit_proxies']
-				? (new CLink($proxy['name'], $proxy_url))
-					->setAttribute('data-proxyid', $proxy['proxyid'])
-					->setAttribute('data-action', 'proxy.edit')
+				? new CLink($proxy['name'], $proxy_url)
 				: $proxy['name'];
 			$proxies[] = ', ';
 		}
@@ -142,9 +140,7 @@ foreach ($data['proxy_groups'] as $proxy_groupid => $proxy_group) {
 	$proxy_group_list->addRow([
 		new CCheckBox('proxy_groupids['.$proxy_groupid.']', $proxy_groupid),
 		(new CCol(
-			(new CLink($proxy_group['name'], $proxy_group_url))
-				->setAttribute('data-proxy_groupid', $proxy_groupid)
-				->setAttribute('data-action', 'proxygroup.edit')
+			new CLink($proxy_group['name'], $proxy_group_url)
 		))->addClass(ZBX_STYLE_WORDBREAK),
 		$state,
 		$proxy_group['failover_delay'],

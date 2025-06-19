@@ -1,6 +1,6 @@
 <?php declare(strict_types = 0);
 /*
-** Copyright (C) 2001-2024 Zabbix SIA
+** Copyright (C) 2001-2025 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -27,12 +27,6 @@ class CPortParserTest extends TestCase {
 				'', [], [
 					'rc' => CParser::PARSE_FAIL,
 					'match' => ''
-				]
-			],
-			[
-				'0', [], [
-					'rc' => CParser::PARSE_SUCCESS,
-					'match' => '0'
 				]
 			],
 			[
@@ -117,6 +111,30 @@ class CPortParserTest extends TestCase {
 				'{$ASD:  regex:   asd"}', ['usermacros' => true], [
 					'rc' => CParser::PARSE_SUCCESS,
 					'match' => '{$ASD:  regex:   asd"}'
+				]
+			],
+			[
+				sprintf('%s', ZBX_MIN_PORT_NUMBER), [], [
+					'rc' => CParser::PARSE_SUCCESS,
+					'match' => sprintf('%s', ZBX_MIN_PORT_NUMBER)
+				]
+			],
+			[
+				sprintf('%s', ZBX_MIN_PORT_NUMBER - 1), [], [
+					'rc' => CParser::PARSE_FAIL,
+					'match' => ''
+				]
+			],
+			[
+				sprintf('%s', ZBX_MAX_PORT_NUMBER), [], [
+					'rc' => CParser::PARSE_SUCCESS,
+					'match' => sprintf('%s', ZBX_MAX_PORT_NUMBER)
+				]
+			],
+			[
+				sprintf('%s', ZBX_MAX_PORT_NUMBER + 1), [], [
+					'rc' => CParser::PARSE_FAIL,
+					'match' => ''
 				]
 			]
 		];

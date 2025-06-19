@@ -23,8 +23,8 @@
 #include "zbxtime.h"
 #include "zbxtypes.h"
 
-#define ZBX_MAX_HRECORDS	1000
-#define ZBX_MAX_HRECORDS_TOTAL	10000
+#define	ZBX_MAX_HRECORDS	1000
+#define	ZBX_MAX_HRECORDS_TOTAL	10000
 
 /* the space reserved in json buffer to hold at least one record plus service data */
 #define ZBX_DATA_JSON_RESERVED		(ZBX_HISTORY_TEXT_VALUE_LEN * 4 + ZBX_KIBIBYTE * 4)

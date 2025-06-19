@@ -20,11 +20,15 @@
 
 $this->addJsFile('gtlc.js');
 $this->addJsFile('flickerfreescreen.js');
-$this->addJsFile('class.svg.canvas.js');
-$this->addJsFile('class.svg.map.js');
+$this->addJsFile('class.imagecache.js');
+$this->addJsFile('class.svgcanvas.js');
+$this->addJsFile('class.svgtextarea.js');
+$this->addJsFile('class.svgelement.js');
+$this->addJsFile('class.svgmap.js');
+$this->addJsFile('class.svgmapelement.js');
+$this->addJsFile('class.svgmaplink.js');
+$this->addJsFile('class.svgmapshape.js');
 $this->addJsFile('layout.mode.js');
-$this->addJsFile('items.js');
-$this->addJsFile('multilineinput.js');
 $this->includeJsFile('monitoring.map.view.js.php');
 
 $this->enableLayoutModes();

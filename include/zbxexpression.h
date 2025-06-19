@@ -27,25 +27,13 @@
 #define ZBX_MACRO_TYPE_TRIGGER_URL		0x00000004
 #define ZBX_MACRO_TYPE_TRIGGER_DESCRIPTION	0x00000010	/* name */
 #define ZBX_MACRO_TYPE_TRIGGER_COMMENTS		0x00000020	/* description */
-#define ZBX_MACRO_TYPE_ITEM_KEY			0x00000040
 #define ZBX_MACRO_TYPE_ALERT_EMAIL		0x00000080
-#define ZBX_MACRO_TYPE_COMMON			0x00000100
-#define ZBX_MACRO_TYPE_PARAMS_FIELD		0x00000200
 #define ZBX_MACRO_TYPE_SCRIPT			0x00000400
-#define ZBX_MACRO_TYPE_SNMP_OID			0x00000800
-#define ZBX_MACRO_TYPE_LLD_FILTER		0x00002000
-#define ZBX_MACRO_TYPE_TRIGGER_TAG		0x00004000
 #define ZBX_MACRO_TYPE_JMX_ENDPOINT		0x00008000
 #define ZBX_MACRO_TYPE_MESSAGE_UPDATE		0x00010000
-#define ZBX_MACRO_TYPE_HTTP_RAW			0x00020000
-#define ZBX_MACRO_TYPE_HTTP_JSON		0x00040000
-#define ZBX_MACRO_TYPE_HTTP_XML			0x00080000
-#define ZBX_MACRO_TYPE_ALLOWED_HOSTS		0x00100000
 #define ZBX_MACRO_TYPE_EVENT_NAME		0x00400000	/* event name in trigger configuration */
-#define ZBX_MACRO_TYPE_SCRIPT_PARAMS_FIELD	0x00800000
 #define ZBX_MACRO_TYPE_SCRIPT_NORMAL		0x01000000
 #define ZBX_MACRO_TYPE_SCRIPT_RECOVERY		0x02000000
-#define ZBX_MACRO_TYPE_QUERY_FILTER		0x08000000
 
 #define ZBX_MACRO_EXPAND_NO			0
 #define ZBX_MACRO_EXPAND_YES			1
@@ -130,8 +118,6 @@ int	zbx_substitute_simple_macros_unmasked(const zbx_uint64_t *actionid, const zb
 		const zbx_db_acknowledge *ack, const zbx_service_alarm_t *service_alarm, const zbx_db_service *service,
 		const char *tz, char **data, int macro_type, char *error, int maxerrlen);
 
-void	zbx_substitute_simple_macros_allowed_hosts(zbx_history_recv_item_t *item, char **allowed_peers);
-
 void	zbx_format_value(char *value, size_t max_len, zbx_uint64_t valuemapid,
 		const char *units, unsigned char value_type);
 
@@ -155,30 +141,11 @@ int	zbx_evaluatable_for_notsupported(const char *fn);
 int	zbx_evaluate_function(zbx_variant_t *value, const zbx_dc_evaluate_item_t *item, const char *function,
 		const char *parameter, const zbx_timespec_t *ts, char **error);
 
-int	zbx_substitute_lld_macros(char **data, const struct zbx_json_parse *jp_row,
-		const zbx_vector_lld_macro_path_ptr_t *lld_macro_paths, int flags, char *error, size_t max_error_len);
-int	zbx_substitute_key_macros(char **data, zbx_uint64_t *hostid, zbx_dc_item_t *dc_item,
-		const struct zbx_json_parse *jp_row, const zbx_vector_lld_macro_path_ptr_t *lld_macro_paths,
-		int macro_type, char *error, size_t maxerrlen);
-int	zbx_substitute_key_macros_unmasked(char **data, zbx_uint64_t *hostid, zbx_dc_item_t *dc_item,
-		const struct zbx_json_parse *jp_row, const zbx_vector_lld_macro_path_ptr_t *lld_macro_paths,
-		int macro_type, char *error, size_t maxerrlen);
-int	zbx_substitute_function_lld_param(const char *e, size_t len, unsigned char key_in_param,
-		char **exp, size_t *exp_alloc, size_t *exp_offset, const struct zbx_json_parse *jp_row,
-		const zbx_vector_lld_macro_path_ptr_t *lld_macro_paths, int esc_flags, char *error,
-		size_t max_error_len);
-int	zbx_substitute_macros_xml(char **data, const zbx_dc_item_t *item, const struct zbx_json_parse *jp_row,
-		const zbx_vector_lld_macro_path_ptr_t *lld_macro_paths, char *error, int maxerrlen);
-int	zbx_substitute_macros_xml_unmasked(char **data, const zbx_dc_item_t *item, const struct zbx_json_parse *jp_row,
-		const zbx_vector_lld_macro_path_ptr_t *lld_macro_paths, char *error, int maxerrlen);
-int	zbx_substitute_macros_in_json_pairs(char **data, const struct zbx_json_parse *jp_row,
-		const zbx_vector_lld_macro_path_ptr_t *lld_macro_paths, char *error, int maxerrlen);
-
-int	zbx_substitute_expression_lld_macros(char **data, zbx_uint64_t rules, const struct zbx_json_parse *jp_row,
-		const zbx_vector_lld_macro_path_ptr_t *lld_macro_paths, char **error);
-
 void	zbx_count_dbl_vector_with_pattern(zbx_eval_count_pattern_data_t *pdata, char *pattern,
 		zbx_vector_dbl_t *values, int *count);
 
 const char	*zbx_dservice_type_string(zbx_dservice_type_t service);
+
+int	zbx_get_history_log_value(const char *m, const zbx_db_trigger *trigger, char **replace_to, int N_functionid,
+		int clock, int ns, const char *tz);
 #endif

@@ -1,20 +1,15 @@
 /*
-** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2025 Zabbix SIA
 **
-** This program is free software; you can redistribute it and/or modify
-** it under the terms of the GNU General Public License as published by
-** the Free Software Foundation; either version 2 of the License, or
-** (at your option) any later version.
+** This program is free software: you can redistribute it and/or modify it under the terms of
+** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
 **
-** This program is distributed in the hope that it will be useful,
-** but WITHOUT ANY WARRANTY; without even the implied warranty of
-** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-** GNU General Public License for more details.
+** This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+** without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+** See the GNU Affero General Public License for more details.
 **
-** You should have received a copy of the GNU General Public License
-** along with this program; if not, write to the Free Software
-** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+** You should have received a copy of the GNU Affero General Public License along with this program.
+** If not, see <https://www.gnu.org/licenses/>.
 **/
 
 
@@ -108,7 +103,7 @@ class CField {
 	}
 
 	getPath() {
-		return '/' + this.getName().replace('[', '/').replace(']', '');
+		return '/' + this.getName().replaceAll('[', '/').replaceAll(']', '');
 	}
 
 	isSameField(field) {
@@ -137,7 +132,7 @@ class CField {
 		}
 		else {
 			if (!document.body.contains(this._field)) {
-				this.setGlobalError(message);
+				console.log('Validation error for missing field "' + this.getName() + '": ' + message);
 			}
 			else if (this._error_level === -1 || this._error_level >= level) {
 				this._error_msg = message;
@@ -151,18 +146,27 @@ class CField {
 	}
 
 	showErrors() {
-		if (this.hasErrorHint()) {
-			this.removeErrorHint();
-		}
-
-		if (this._error_msg !== null) {
-			this._error_hint = this.errorHint();
-
-			if (this._error_container !== null) {
-				this._appendErrorToContainer(this._error_hint);
+		if (this._error_msg === null) {
+			if (this.hasErrorHint()) {
+				this.removeErrorHint();
 			}
-			else {
-				this._appendErrorHint(this._error_hint);
+		}
+		else {
+			const new_hint = this.errorHint();
+
+			if (!this.hasErrorHint() || this._error_hint.textContent !== new_hint.textContent) {
+				if (this.hasErrorHint()) {
+					this.removeErrorHint();
+				}
+
+				this._error_hint = new_hint;
+
+				if (this._error_container !== null) {
+					this._appendErrorToContainer(this._error_hint);
+				}
+				else {
+					this._appendErrorHint(this._error_hint);
+				}
 			}
 		}
 

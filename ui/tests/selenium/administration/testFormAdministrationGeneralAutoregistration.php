@@ -14,10 +14,10 @@
 **/
 
 
-require_once dirname(__FILE__) . '/../../include/CWebTest.php';
+require_once __DIR__ . '/../../include/CWebTest.php';
 
 /**
- * @backup config
+ * @backup settings
  */
 class testFormAdministrationGeneralAutoregistration extends CWebTest {
 
@@ -81,7 +81,7 @@ class testFormAdministrationGeneralAutoregistration extends CWebTest {
 						'User' => 'Admin',
 						'Resource' => 'Autoregistration',
 						'Action' => 'Update',
-						'ID' => 1,
+						'ID' => 0,
 						'Details' => [
 							'Details',
 							'autoregistration.tls_accept: 1 => 2',
@@ -105,7 +105,7 @@ class testFormAdministrationGeneralAutoregistration extends CWebTest {
 						'User' => 'Admin',
 						'Resource' => 'Autoregistration',
 						'Action' => 'Update',
-						'ID' => 1,
+						'ID' => 0,
 						'Details' => ['autoregistration.tls_accept: 2 => 3']
 					]
 				]
@@ -120,7 +120,7 @@ class testFormAdministrationGeneralAutoregistration extends CWebTest {
 						'User' => 'Admin',
 						'Resource' => 'Autoregistration',
 						'Action' => 'Update',
-						'ID' => 1,
+						'ID' => 0,
 						'Details' => [
 							'Details',
 							'autoregistration.tls_accept: 3 => 1',
@@ -139,7 +139,8 @@ class testFormAdministrationGeneralAutoregistration extends CWebTest {
 
 	/**
 	 * @dataProvider getAuditReportData
-	 * @backupOnce config
+	 *
+	 * @backupOnce settings
 	 *
 	 * Check record on Audit report page, after updating autoregistration.
 	 */
@@ -289,7 +290,7 @@ class testFormAdministrationGeneralAutoregistration extends CWebTest {
 
 	/**
 	 * @dataProvider getAutoregistrationValidationData
-	 * @backupOnce config
+	 * @backupOnce settings
 	 *
 	 * Check autoregistration validation on first update.
 	 */
@@ -304,9 +305,9 @@ class testFormAdministrationGeneralAutoregistration extends CWebTest {
 	 * @param boolean $change  Change existing values of PSK.
 	 */
 	private function executeValidation($data, $change = false) {
-		$sql_config = 'SELECT * FROM config';
+		$sql_settings = 'SELECT * FROM settings';
 		$sql_autoreg = 'SELECT * FROM config_autoreg_tls';
-		$old_config_hash = CDBHelper::getHash($sql_config);
+		$old_settings_hash = CDBHelper::getHash($sql_settings);
 		$old_autoreg_hash = CDBHelper::getHash($sql_autoreg);
 
 		$this->page->login()->open('zabbix.php?action=autoreg.edit');
@@ -326,7 +327,7 @@ class testFormAdministrationGeneralAutoregistration extends CWebTest {
 		$this->assertEquals('Cannot update configuration', $message->getTitle());
 		$this->assertTrue($message->hasLine($data['error']));
 		// Check that DB entries aren't changed.
-		$this->assertEquals($old_config_hash, CDBHelper::getHash($sql_config));
+		$this->assertEquals($old_settings_hash, CDBHelper::getHash($sql_settings));
 		$this->assertEquals($old_autoreg_hash, CDBHelper::getHash($sql_autoreg));
 	}
 
@@ -334,6 +335,7 @@ class testFormAdministrationGeneralAutoregistration extends CWebTest {
 	 * Successfully update autoregistration.
 	 */
 	private function executeUpdate($data) {
+		$tls_accept_sql = 'SELECT value_int FROM settings WHERE name=\'autoreg_tls_accept\'';
 		$this->page->login()->open('zabbix.php?action=autoreg.edit');
 		$form = $this->query('id:autoreg-form')->asForm()->one();
 
@@ -363,7 +365,7 @@ class testFormAdministrationGeneralAutoregistration extends CWebTest {
 			$this->assertFalse($form->query('button:Change PSK')->one(false)->isValid());
 
 			// Check encryption level and empty PSK values in DB.
-			$this->assertEquals(HOST_ENCRYPTION_NONE, CDBHelper::getValue('SELECT autoreg_tls_accept FROM config'));
+			$this->assertEquals(HOST_ENCRYPTION_NONE, CDBHelper::getValue($tls_accept_sql));
 			$tls_bd = CDBHelper::getRow('SELECT * FROM config_autoreg_tls WHERE autoreg_tlsid=1');
 			$this->assertEquals('', $tls_bd['tls_psk_identity']);
 			$this->assertEquals('', $tls_bd['tls_psk']);
@@ -377,11 +379,11 @@ class testFormAdministrationGeneralAutoregistration extends CWebTest {
 			// Check encryption level in DB.
 			if (count($data['fields']['Encryption level']) === 1) {
 				// Only PSK was selected.
-				$this->assertEquals(HOST_ENCRYPTION_PSK, CDBHelper::getValue('SELECT autoreg_tls_accept FROM config'));
+				$this->assertEquals(HOST_ENCRYPTION_PSK, CDBHelper::getValue($tls_accept_sql));
 			}
 			else {
 				// PSK and "No encryption" levels were selected.
-				$this->assertEquals((HOST_ENCRYPTION_PSK|HOST_ENCRYPTION_NONE), CDBHelper::getValue('SELECT autoreg_tls_accept FROM config'));
+				$this->assertEquals((HOST_ENCRYPTION_PSK|HOST_ENCRYPTION_NONE), CDBHelper::getValue($tls_accept_sql));
 			}
 		}
 	}
@@ -421,7 +423,7 @@ class testFormAdministrationGeneralAutoregistration extends CWebTest {
 
 	/**
 	 * @dataProvider getAutoregistrationUpdateData
-	 * @backup config
+	 * @backup settings
 	 *
 	 * First time update Autoregistration data.
 	 */
@@ -459,7 +461,7 @@ class testFormAdministrationGeneralAutoregistration extends CWebTest {
 	/**
 	 * @dataProvider getAutoregistrationValidationData
 	 * @depends testFormAdministrationGeneralAutoregistration_AddPskEncryption
-	 * @backupOnce config
+	 * @backupOnce settings
 	 *
 	 * Check autoregistration validation, when change PSK values.
 	 */
@@ -513,7 +515,7 @@ class testFormAdministrationGeneralAutoregistration extends CWebTest {
 	/**
 	 * @dataProvider getAutoregistrationChangeData
 	 * @depends testFormAdministrationGeneralAutoregistration_AddPskEncryption
-	 * @backup config
+	 * @backup settings
 	 *
 	 * Change autoregistration data.
 	 */

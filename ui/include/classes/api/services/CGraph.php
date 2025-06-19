@@ -23,8 +23,6 @@ class CGraph extends CGraphGeneral {
 	protected $tableAlias = 'g';
 	protected $sortColumns = ['graphid', 'name', 'graphtype'];
 
-	protected const FLAGS = ZBX_FLAG_DISCOVERY_NORMAL;
-
 	public function __construct() {
 		parent::__construct();
 
@@ -82,8 +80,6 @@ class CGraph extends CGraphGeneral {
 			'selectHosts'				=> null,
 			'selectItems'				=> null,
 			'selectGraphItems'			=> null,
-			'selectDiscoveryRule'		=> null,
-			'selectGraphDiscovery'		=> null,
 			'countOutput'				=> false,
 			'groupCount'				=> false,
 			'preservekeys'				=> false,
@@ -91,7 +87,10 @@ class CGraph extends CGraphGeneral {
 			'sortorder'					=> '',
 			'limit'						=> null
 		];
+
 		$options = zbx_array_merge($defOptions, $options);
+
+		self::validateGet($options);
 
 		// permission check
 		if (self::$userData['type'] != USER_TYPE_SUPER_ADMIN && !$options['nopermissions']) {
@@ -293,14 +292,25 @@ class CGraph extends CGraphGeneral {
 
 		if ($result) {
 			$result = $this->addRelatedObjects($options, $result);
-		}
 
-		// removing keys (hash -> array)
-		if (!$options['preservekeys']) {
-			$result = zbx_cleanHashes($result);
+			if (!$options['preservekeys']) {
+				$result = array_values($result);
+			}
 		}
 
 		return $result;
+	}
+
+	private static function validateGet(array &$options): void {
+		$api_input_rules = ['type' => API_OBJECT, 'flags' => API_ALLOW_UNEXPECTED, 'fields' => [
+			'selectDiscoveryRule' =>	['type' => API_OUTPUT, 'flags' => API_ALLOW_NULL | API_NORMALIZE, 'in' => implode(',', CDiscoveryRule::OUTPUT_FIELDS), 'default' => null],
+			'selectGraphDiscovery' =>	['type' => API_OUTPUT, 'flags' => API_ALLOW_NULL | API_NORMALIZE | API_DEPRECATED, 'in' => implode(',', self::DISCOVERY_DATA_OUTPUT_FIELDS), 'default' => null],
+			'selectDiscoveryData' =>	['type' => API_OUTPUT, 'flags' => API_ALLOW_NULL | API_NORMALIZE, 'in' => implode(',', self::DISCOVERY_DATA_OUTPUT_FIELDS), 'default' => null]
+		]];
+
+		if (!CApiInputValidator::validate($api_input_rules, $options, '/', $error)) {
+			self::exception(ZBX_API_ERROR_PARAMETERS, $error);
+		}
 	}
 
 	/**
@@ -328,7 +338,7 @@ class CGraph extends CGraphGeneral {
 	 *
 	 * @throws APIException if the input is invalid.
 	 */
-	private function validateDelete(array &$graphids, array &$db_graphs = null) {
+	private function validateDelete(array &$graphids, ?array &$db_graphs = null) {
 		$api_input_rules = ['type' => API_IDS, 'flags' => API_NOT_EMPTY, 'uniq' => true];
 		if (!CApiInputValidator::validate($api_input_rules, $graphids, '/', $error)) {
 			self::exception(ZBX_API_ERROR_PARAMETERS, $error);
@@ -357,68 +367,46 @@ class CGraph extends CGraphGeneral {
 	protected function addRelatedObjects(array $options, array $result) {
 		$result = parent::addRelatedObjects($options, $result);
 
-		$graphids = array_keys($result);
-
 		// adding Items
 		if ($options['selectItems'] !== null && $options['selectItems'] !== API_OUTPUT_COUNT) {
-			$relationMap = $this->createRelationMap($result, 'graphid', 'itemid', 'graphs_items');
+			$relation_map = $this->createRelationMap($result, 'graphid', 'itemid', 'graphs_items');
 			$items = API::Item()->get([
 				'output' => $options['selectItems'],
-				'itemids' => $relationMap->getRelatedIds(),
+				'itemids' => $relation_map->getRelatedIds(),
 				'webitems' => true,
 				'nopermissions' => true,
 				'preservekeys' => true
 			]);
-			$result = $relationMap->mapMany($result, $items, 'items');
+			$result = $relation_map->mapMany($result, $items, 'items');
 		}
 
-		// adding discoveryRule
-		if ($options['selectDiscoveryRule'] !== null) {
-			$discoveryRules = [];
-			$relationMap = new CRelationMap();
-			$dbRules = DBselect(
-				'SELECT id.parent_itemid,gd.graphid'.
-					' FROM graph_discovery gd,item_discovery id,graphs_items gi,items i'.
-					' WHERE '.dbConditionInt('gd.graphid', $graphids).
-					' AND gd.parent_graphid=gi.graphid'.
-						' AND gi.itemid=id.itemid'.
-						' AND id.parent_itemid=i.itemid'.
-						' AND i.flags='.ZBX_FLAG_DISCOVERY_RULE
-			);
-
-			while ($relation = DBfetch($dbRules)) {
-				$relationMap->addRelation($relation['graphid'], $relation['parent_itemid']);
-			}
-
-			$related_ids = $relationMap->getRelatedIds();
-
-			if ($related_ids) {
-				$discoveryRules = API::DiscoveryRule()->get([
-					'output' => $options['selectDiscoveryRule'],
-					'itemids' => $related_ids,
-					'nopermissions' => true,
-					'preservekeys' => true
-				]);
-			}
-			$result = $relationMap->mapOne($result, $discoveryRules, 'discoveryRule');
-		}
-
-		// adding graph discovery
-		if ($options['selectGraphDiscovery'] !== null) {
-			$graphDiscoveries = API::getApiService()->select('graph_discovery', [
-				'output' => $this->outputExtend($options['selectGraphDiscovery'], ['graphid']),
-				'filter' => ['graphid' => array_keys($result)],
-				'preservekeys' => true
-			]);
-			$relationMap = $this->createRelationMap($graphDiscoveries, 'graphid', 'graphid');
-
-			$graphDiscoveries = $this->unsetExtraFields($graphDiscoveries, ['graphid'],
-				$options['selectGraphDiscovery']
-			);
-			$result = $relationMap->mapOne($result, $graphDiscoveries, 'graphDiscovery');
-		}
+		self::addRelatedDiscoveryRules($options, $result);
+		self::addRelatedGraphDiscovery($options, $result);
+		self::addRelatedDiscoveryData($options, $result);
 
 		return $result;
+	}
+
+	private static function addRelatedGraphDiscovery(array $options, array &$result): void {
+		if ($options['selectGraphDiscovery'] === null) {
+			return;
+		}
+
+		foreach ($result as &$graph) {
+			$graph['graphDiscovery'] = [];
+		}
+		unset($graph);
+
+		$_options = [
+			'output' => array_merge(['graphid'], $options['selectGraphDiscovery']),
+			'graphids' => array_keys($result)
+		];
+		$resource = DBselect(DB::makeSql('graph_discovery', $_options));
+
+		while ($graph_discovery = DBfetch($resource)) {
+			$result[$graph_discovery['graphid']]['graphDiscovery'] =
+				array_diff_key($graph_discovery, array_flip(['graphid']));
+		}
 	}
 
 	/**
@@ -484,6 +472,31 @@ class CGraph extends CGraphGeneral {
 					self::exception(ZBX_API_ERROR_PARAMETERS, sprintf($error, $graph['name'], $hosts[0]['host']));
 				}
 			}
+		}
+	}
+
+	/**
+	 * Inherit template graphs from to hosts.
+	 *
+	 * @param array $templateids
+	 * @param array $hostids
+	 */
+	public function linkTemplateObjects(array $templateids, array $hostids): void {
+		$output = ['graphid', 'name', 'width', 'height', 'yaxismin', 'yaxismax', 'templateid', 'show_work_period',
+			'show_triggers', 'graphtype', 'show_legend', 'show_3d', 'percent_left', 'percent_right', 'ymin_type',
+			'ymax_type', 'ymin_itemid', 'ymax_itemid'
+		];
+
+		$graphs = $this->get([
+			'output' => $output,
+			'selectGraphItems' => ['itemid', 'drawtype', 'sortorder', 'color', 'yaxisside', 'calc_fnc', 'type'],
+			'hostids' => $templateids,
+			'preservekeys' => true,
+			'nopermissions' => true
+		]);
+
+		if ($graphs) {
+			$this->inherit($graphs, $hostids);
 		}
 	}
 }

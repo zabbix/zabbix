@@ -93,7 +93,7 @@ class CWidgetFieldTimePeriodView extends CWidgetFieldView {
 					->addClass($this->getLabelClass())
 					->addClass('js-'.$field_selector.'-reference')
 					->setAsteriskMark(),
-				'view' =>  (new CMultiSelect([
+				'view' => (new CMultiSelect([
 					'name' => $field_name.'['.CWidgetField::FOREIGN_REFERENCE_KEY.']',
 					'add_post_js' => false
 				]))
@@ -145,16 +145,18 @@ class CWidgetFieldTimePeriodView extends CWidgetFieldView {
 
 	public function getJavaScript(): string {
 		return '
-			document.forms["'.$this->form_name.'"].fields["'.$this->field->getName().'"] =
+			CWidgetForm.addField(
 				new CWidgetFieldTimePeriod('.json_encode([
-					'field_name' => $this->field->getName(),
-					'field_selector' => zbx_formatDomId($this->field->getName()),
-					'field_value' => $this->field->getValue(),
+					'name' => $this->field->getName(),
+					'form_name' => $this->form_name,
+					'selector' => zbx_formatDomId($this->field->getName()),
+					'value' => $this->field->getValue(),
 					'in_type' => $this->field->getInType(),
 					'widget_accepted' => $this->field->isWidgetAccepted(),
 					'dashboard_accepted' => $this->field->isDashboardAccepted(),
 					'data_source' => $this->field->getDataSource()
-				]).');
+				]).')
+			);
 		';
 	}
 

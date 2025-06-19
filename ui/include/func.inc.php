@@ -124,51 +124,6 @@ function getDayOfWeekCaption($num) {
 	return _s('[Wrong value for day: "%1$s" ]', $num);
 }
 
-// Convert seconds (0..SEC_PER_WEEK) to string representation. For example, 212400 -> 'Tuesday 11:00'
-function dowHrMinToStr($value, $display24Hours = false) {
-	$dow = $value - $value % SEC_PER_DAY;
-	$hr = $value - $dow;
-	$hr -= $hr % SEC_PER_HOUR;
-	$min = $value - $dow - $hr;
-	$min -= $min % SEC_PER_MIN;
-
-	$dow /= SEC_PER_DAY;
-	$hr /= SEC_PER_HOUR;
-	$min /= SEC_PER_MIN;
-
-	if ($display24Hours && $hr == 0 && $min == 0) {
-		$dow--;
-		$hr = 24;
-	}
-
-	return sprintf('%s %02d:%02d', getDayOfWeekCaption($dow), $hr, $min);
-}
-
-// Convert Day Of Week, Hours and Minutes to seconds representation. For example, 2 11:00 -> 212400. false if error occurred
-function dowHrMinToSec($dow, $hr, $min) {
-	if (zbx_empty($dow) || zbx_empty($hr) || zbx_empty($min) || !zbx_ctype_digit($dow) || !zbx_ctype_digit($hr) || !zbx_ctype_digit($min)) {
-		return false;
-	}
-
-	if ($dow == 7) {
-		$dow = 0;
-	}
-
-	if ($dow < 0 || $dow > 6) {
-		return false;
-	}
-
-	if ($hr < 0 || $hr > 24) {
-		return false;
-	}
-
-	if ($min < 0 || $min > 59) {
-		return false;
-	}
-
-	return $dow * SEC_PER_DAY + $hr * SEC_PER_HOUR + $min * SEC_PER_MIN;
-}
-
 /**
  * Convert time to a string representation. Return 'Never' if timestamp is 0.
  *
@@ -180,7 +135,7 @@ function dowHrMinToSec($dow, $hr, $min) {
  *
  * @return string
  */
-function zbx_date2str($format, $time = null, string $timezone = null) {
+function zbx_date2str($format, $time = null, ?string $timezone = null) {
 	static $weekdaynames, $weekdaynameslong, $months, $monthslong;
 
 	if ($time === null) {
@@ -348,40 +303,6 @@ function hex2rgb($color) {
 	}
 
 	return [hexdec($r), hexdec($g), hexdec($b)];
-}
-
-function getColorVariations($color, $variations_requested = 1) {
-	if ($variations_requested <= 1) {
-		return [$color];
-	}
-
-	$change = hex2rgb('#ffffff'); // Color which is increased/decreased in variations.
-	$max = 50;
-
-	$color = hex2rgb($color);
-	$variations = [];
-
-	$range = range(-1 * $max, $max, $max * 2 / $variations_requested);
-
-	// Remove redundant values.
-	while (count($range) > $variations_requested) {
-		(count($range) % 2) ? array_shift($range) : array_pop($range);
-	}
-
-	// Calculate colors.
-	foreach ($range as $var) {
-		$r = $color[0] + ($change[0] / 100 * $var);
-		$g = $color[1] + ($change[1] / 100 * $var);
-		$b = $color[2] + ($change[2] / 100 * $var);
-
-		$variations[] = '#' . rgb2hex([
-			$r < 0 ? 0 : ($r > 255 ? 255 : (int) $r),
-			$g < 0 ? 0 : ($g > 255 ? 255 : (int) $g),
-			$b < 0 ? 0 : ($b > 255 ? 255 : (int) $b)
-		]);
-	}
-
-	return $variations;
 }
 
 /**
@@ -952,42 +873,6 @@ function zbx_array_diff(array $primary, array $secondary, $field) {
 	return $result;
 }
 
-function zbx_array_push(&$array, $add) {
-	foreach ($array as $key => $value) {
-		foreach ($add as $newKey => $newValue) {
-			$array[$key][$newKey] = $newValue;
-		}
-	}
-}
-
-/**
- * Find if array has any duplicate values and return an array with info about them.
- * In case of no duplicates, empty array is returned.
- * Example of usage:
- *     $result = zbx_arrayFindDuplicates(
- *         array('a', 'b', 'c', 'c', 'd', 'd', 'd', 'e')
- *     );
- *     array(
- *         'd' => 3,
- *         'c' => 2,
- *     )
- *
- * @param array $array
- *
- * @return array
- */
-function zbx_arrayFindDuplicates(array $array) {
-	$countValues = array_count_values($array); // counting occurrences of every value in array
-	foreach ($countValues as $value => $count) {
-		if ($count <= 1) {
-			unset($countValues[$value]);
-		}
-	}
-	arsort($countValues); // sorting, so that the most duplicates would be at the top
-
-	return $countValues;
-}
-
 /************* STRING *************/
 function zbx_nl2br($str) {
 	$str_res = [];
@@ -1324,18 +1209,6 @@ function zbx_objectValues($value, $field) {
 	return $result;
 }
 
-function zbx_cleanHashes(&$value) {
-	if (is_array($value)) {
-		// reset() is needed to move internal array pointer to the beginning of the array
-		reset($value);
-		if (zbx_ctype_digit(key($value))) {
-			$value = array_values($value);
-		}
-	}
-
-	return $value;
-}
-
 function zbx_toCSV($values) {
 	$csv = '';
 	$glue = '","';
@@ -1433,21 +1306,6 @@ function make_sorting_header($obj, $tabfield, $sortField, $sortOrder, $link = nu
 }
 
 /**
- * Get decimal point and thousands separator for number formatting according to the current locale.
- *
- * @return array  'decimal_point' and 'thousands_sep' values.
- */
-function getNumericFormatting(): array {
-	static $numeric_formatting = null;
-
-	if ($numeric_formatting === null) {
-		$numeric_formatting = array_intersect_key(localeconv(), array_flip(['decimal_point', 'thousands_sep']));
-	}
-
-	return $numeric_formatting;
-}
-
-/**
  * Format floating-point number in the best possible way for displaying.
  *
  * @param float $number   Valid number in decimal or scientific notation.
@@ -1542,36 +1400,23 @@ function formatFloat(float $number, array $options = []): string {
 		return '0';
 	}
 
-	[
-		'decimal_point' => $decimal_point,
-		'thousands_sep' => $thousands_sep
-	] = getNumericFormatting();
-
 	$exponent = (int) explode('E', sprintf('%.'.($precision - 1).'E', $number))[1];
 
 	if ($exponent < 0) {
 		if (!$small_scientific
 				|| $digits - $exponent <= ($decimals_exact ? min($decimals + 1, $precision) : $precision)) {
-			return number_format($number, $decimals_exact ? $decimals : $digits - $exponent - 1, $decimal_point,
-				$thousands_sep
-			);
+			return number_format($number, $decimals_exact ? $decimals : $digits - $exponent - 1, '.', '');
 		}
 		else {
-			return str_replace('.', $decimal_point,
-				sprintf('%.'.($decimals_exact ? $decimals : min($digits - 1, $decimals)).'E', $number)
-			);
+			return sprintf('%.'.($decimals_exact ? $decimals : min($digits - 1, $decimals)).'E', $number);
 		}
 	}
 	elseif ($exponent >= min(PHP_FLOAT_DIG, $precision + 3)
 			|| ($exponent >= $precision && $number != $number_original)) {
-		return str_replace('.', $decimal_point,
-			sprintf('%.'.($decimals_exact ? $decimals : min($digits - 1, $decimals)).'E', $number)
-		);
+		return sprintf('%.'.($decimals_exact ? $decimals : min($digits - 1, $decimals)).'E', $number);
 	}
 	else {
-		return number_format($number, $decimals_exact ? $decimals : max(0, min($digits - $exponent - 1, $decimals)),
-			$decimal_point, $thousands_sep
-		);
+		return number_format($number, $decimals_exact ? $decimals : max(0, min($digits - $exponent - 1, $decimals)), '.', '');
 	}
 }
 
@@ -1751,19 +1596,20 @@ function detect_page_type($default = PAGE_TYPE_HTML) {
  *                                            ZBX_STYLE_MSG_GOOD, ZBX_STYLE_MSG_BAD, ZBX_STYLE_MSG_WARNING.
  * @param array       $messages               An array of messages.
  * @param string      $messages[]['message']  Message text.
- * @param string|null $title                  (optional) Message box title.
+ * @param mixed       $title                  (optional) Message box title.
  * @param bool        $show_close_box         (optional) Show or hide close button in error message box.
  * @param bool        $show_details           (optional) Show or hide message details.
  *
  * @return CTag
  */
-function makeMessageBox(string $class, array $messages, string $title = null, bool $show_close_box = true,
+function makeMessageBox(string $class, array $messages, mixed $title = null, bool $show_close_box = true,
 		bool $show_details = false): CTag {
 
 	$aria_labels = [
 		ZBX_STYLE_MSG_GOOD => _('Success message'),
-		ZBX_STYLE_MSG_BAD => _('Error message'),
-		ZBX_STYLE_MSG_WARNING => _('Warning message')
+		ZBX_STYLE_MSG_INFO => _('Info message'),
+		ZBX_STYLE_MSG_WARNING => _('Warning message'),
+		ZBX_STYLE_MSG_BAD => _('Error message')
 	];
 
 	$message_box = (new CTag('output', true))
@@ -1858,7 +1704,7 @@ function filter_messages(): array {
  *
  * @return CTag|null
  */
-function getMessages(bool $good = false, string $title = null, bool $show_close_box = true): ?CTag {
+function getMessages(bool $good = false, ?string $title = null, bool $show_close_box = true): ?CTag {
 	$messages = get_and_clear_messages();
 
 	$message_box = ($title || $messages)

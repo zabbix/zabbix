@@ -62,7 +62,6 @@ type AgentOptions struct {
 	TLSCipherPSK13           string   `conf:"optional,nonempty"`
 	TLSCipherAll             string   `conf:"optional,nonempty"`
 	TLSCipherAll13           string   `conf:"optional,nonempty"`
-	ExternalPlugins          []string `conf:"optional,name=PluginPath"`
 	ExternalPluginTimeout    int      `conf:"optional,name=PluginTimeout,range=1:30"`
 	ExternalPluginsSocket    string   `conf:"optional,name=PluginSocket,default=\\\\.\\pipe\\agent.plugin.sock"`
 	ForceActiveChecksOnStart int      `conf:"optional,nonempty,range=0:1,default=0"`

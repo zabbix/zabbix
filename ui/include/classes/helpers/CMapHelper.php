@@ -28,11 +28,12 @@ class CMapHelper {
 	 */
 	public static function get($sysmapids, array $options = []) {
 		$maps = API::Map()->get([
-			'output' => ['sysmapid', 'name', 'width', 'height', 'backgroundid', 'label_type', 'label_location',
-				'highlight', 'expandproblem', 'markelements', 'show_unack', 'label_format', 'label_type_host',
-				'label_type_hostgroup', 'label_type_trigger', 'label_type_map', 'label_type_image', 'label_string_host',
-				'label_string_hostgroup', 'label_string_trigger', 'label_string_map', 'label_string_image', 'iconmapid',
-				'severity_min', 'show_suppressed'
+			'output' => ['sysmapid', 'name', 'width', 'height', 'backgroundid', 'background_scale', 'label_type',
+				'label_location', 'show_element_label', 'show_link_label', 'highlight', 'expandproblem', 'markelements',
+				'show_unack', 'label_format', 'label_type_host', 'label_type_hostgroup', 'label_type_trigger',
+				'label_type_map', 'label_type_image', 'label_string_host', 'label_string_hostgroup',
+				'label_string_trigger', 'label_string_map', 'label_string_image', 'iconmapid', 'severity_min',
+				'show_suppressed'
 			],
 			'selectShapes' => ['sysmap_shapeid', 'type', 'x', 'y', 'width', 'height', 'text', 'font', 'font_size',
 				'font_color', 'text_halign', 'text_valign', 'border_type', 'border_width', 'border_color',
@@ -42,11 +43,11 @@ class CMapHelper {
 				'zindex'
 			],
 			'selectSelements' => ['selementid', 'elements', 'elementtype', 'iconid_off', 'iconid_on', 'label',
-				'label_location', 'x', 'y', 'iconid_disabled', 'iconid_maintenance', 'elementsubtype', 'areatype',
-				'width', 'height', 'viewtype', 'use_iconmap', 'permission', 'evaltype', 'tags'
+				'label_location', 'show_label', 'x', 'y', 'iconid_disabled', 'iconid_maintenance', 'elementsubtype',
+				'areatype', 'width', 'height', 'viewtype', 'use_iconmap', 'permission', 'evaltype', 'tags', 'zindex'
 			],
-			'selectLinks' => ['linkid', 'selementid1', 'selementid2', 'drawtype', 'color', 'label', 'linktriggers',
-				'permission'
+			'selectLinks' => ['linkid', 'selementid1', 'selementid2', 'drawtype', 'color', 'label', 'show_label',
+				'linktriggers', 'permission', 'indicator_type', 'itemid', 'thresholds', 'highlights'
 			],
 			'sysmapids' => $sysmapids,
 			'preservekeys' => true
@@ -61,11 +62,15 @@ class CMapHelper {
 				'width' => 320,
 				'height' => 150,
 				'backgroundid' => null,
+				'background_scale' => SYSMAP_BACKGROUND_SCALE_NONE,
 				'severity_min' => 0,
 				'show_unack' => EXTACK_OPTION_ALL,
 				'label_location' => MAP_LABEL_LOC_BOTTOM,
+				'show_element_label' => MAP_SHOW_LABEL_ALWAYS,
+				'show_link_label' => MAP_SHOW_LABEL_ALWAYS,
 				'selements' => [],
 				'links' => [],
+				'duplicated_links' => [],
 				'shapes' => [[
 					'type' => SYSMAP_SHAPE_TYPE_RECTANGLE,
 					'x' => 0,
@@ -111,9 +116,13 @@ class CMapHelper {
 			'refresh' => 'map.php?sysmapid='.$map['sysmapid'].'&severity_min='.$map['severity_min']
 				.(array_key_exists('unique_id', $options) ? '&unique_id='.$options['unique_id'] : ''),
 			'background' => $map['backgroundid'],
+			'background_scale' => $map['background_scale'],
 			'label_location' => $map['label_location'],
+			'show_element_label' => $map['show_element_label'],
+			'show_link_label' => $map['show_link_label'],
 			'elements' => array_values($map['selements']),
 			'links' => array_values($map['links']),
+			'duplicated_links' => array_values($map['duplicated_links']),
 			'shapes' => array_values($map['shapes']),
 			'aria_label' => $map['aria_label'],
 			'timestamp' => zbx_date2str(DATE_TIME_FORMAT_SECONDS)
@@ -230,7 +239,7 @@ class CMapHelper {
 						$trigger_pos = 0;
 
 						foreach ($element['elements'] as $i => $trigger) {
-							if ($trigger['triggerid'] == $map_info[$id]['triggerid']) {
+							if (bccomp($trigger['triggerid'], $map_info[$id]['triggerid']) == 0) {
 								$trigger_pos = $i;
 								break;
 							}
@@ -251,9 +260,10 @@ class CMapHelper {
 		unset($element);
 
 		$labels = getMapLabels($sysmap, $map_info);
-		$highlights = getMapHighligts($sysmap, $map_info);
+		$highlights = getMapHighlights($sysmap, $map_info);
 		$actions = getActionsBySysmap($sysmap, $options);
 		$link_triggers_info = getMapLinkTriggerInfo($sysmap, $options);
+		$link_items_info = getMapLinkItemInfo($sysmap);
 
 		$problems_total = 0;
 		$status_problems = [];
@@ -324,39 +334,176 @@ class CMapHelper {
 			$sysmap['shapes'][] = self::convertLineToShape($line);
 		}
 
+		$duplicated_links = [];
+
+		$number_parser = new CNumberParser([
+			'with_size_suffix' => true,
+			'with_time_suffix' => true,
+			'is_binary_size' => false
+		]);
+
+		$number_parser_binary = new CNumberParser([
+			'with_size_suffix' => true,
+			'with_time_suffix' => true,
+			'is_binary_size' => true
+		]);
+
+		$linkid = 1;
+
 		foreach ($sysmap['links'] as &$link) {
-			if ($link['permission'] >= PERM_READ && $link['linktriggers']) {
-				$link_triggers = array_filter($link['linktriggers'],
-					function ($link_trigger) use ($link_triggers_info, $options) {
-						return (array_key_exists($link_trigger['triggerid'], $link_triggers_info)
-							&& $link_triggers_info[$link_trigger['triggerid']]['status'] == TRIGGER_STATUS_ENABLED
-							&& $link_triggers_info[$link_trigger['triggerid']]['value'] == TRIGGER_VALUE_TRUE
-							&& $link_triggers_info[$link_trigger['triggerid']]['priority'] >= $options['severity_min']
-						);
-					}
+			if ($link['permission'] < PERM_READ) {
+				continue;
+			}
+
+			if ($link['show_label'] == MAP_SHOW_LABEL_DEFAULT) {
+				$link['show_label'] = $sysmap['show_link_label'];
+			}
+
+			$hint_label = $link['label'];
+
+			if ($link['indicator_type'] == MAP_INDICATOR_TYPE_TRIGGER && $link['linktriggers']) {
+				$existing_link_triggers = array_filter($link['linktriggers'], static fn($link_trigger) =>
+					array_key_exists($link_trigger['triggerid'], $link_triggers_info)
+				);
+				$triggered_link_triggers = array_filter($existing_link_triggers, static fn($link_trigger) =>
+					$link_triggers_info[$link_trigger['triggerid']]['status'] == TRIGGER_STATUS_ENABLED
+						&& $link_triggers_info[$link_trigger['triggerid']]['value'] == TRIGGER_VALUE_TRUE
+						&& $link_triggers_info[$link_trigger['triggerid']]['priority'] >= $options['severity_min']
 				);
 
 				// Link-trigger with highest severity or lower triggerid defines link color and drawtype.
-				if ($link_triggers) {
-					$link_triggers = array_map(function ($link_trigger) use ($link_triggers_info) {
-						return [
-							'priority' => $link_triggers_info[$link_trigger['triggerid']]['priority']
-						] + $link_trigger;
-					}, $link_triggers);
+				if ($triggered_link_triggers) {
+					$triggered_link_triggers = array_map(function ($link_trigger) use ($link_triggers_info) {
+						$trigger_info = $link_triggers_info[$link_trigger['triggerid']];
+						$trigger_name = $trigger_info['hosts'][0]['name'].NAME_DELIMITER.$trigger_info['description'];
 
-					CArrayHelper::sort($link_triggers, [
+						return [
+							'priority' => $trigger_info['priority'],
+							'trigger_name' => $trigger_name
+						] + $link_trigger;
+					}, $triggered_link_triggers);
+
+					CArrayHelper::sort($triggered_link_triggers, [
 						['field' => 'priority', 'order' => ZBX_SORT_DOWN],
 						['field' => 'triggerid', 'order' => ZBX_SORT_UP]
 					]);
 
-					$styling_link_triggers = reset($link_triggers);
+					$styling_link_triggers = reset($triggered_link_triggers);
 
 					$link['color'] = $styling_link_triggers['color'];
 					$link['drawtype'] = $styling_link_triggers['drawtype'];
+
+					if ($hint_label === '') {
+						$hint_label = $styling_link_triggers['trigger_name'];
+					}
+				}
+				elseif ($hint_label === '' && $existing_link_triggers) {
+					$first_trigger = reset($existing_link_triggers);
+					$trigger_info = $link_triggers_info[$first_trigger['triggerid']];
+					$hint_label = $trigger_info['hosts'][0]['name'].NAME_DELIMITER.$trigger_info['description'];
 				}
 			}
+			elseif ($link['indicator_type'] == MAP_INDICATOR_TYPE_ITEM_VALUE) {
+				if ($link['itemid'] !== null && array_key_exists($link['itemid'], $link_items_info)) {
+					if ($hint_label === '') {
+						$hint_label = $link_items_info[$link['itemid']]['hosts'][0]['name']
+							.NAME_DELIMITER.$link_items_info[$link['itemid']]['name_resolved'];
+					}
+
+					$item_value = $link_items_info[$link['itemid']]['value'];
+
+					if ($item_value !== null) {
+						$value_type = $link_items_info[$link['itemid']]['value_type'];
+
+						if (in_array($value_type, [ITEM_VALUE_TYPE_STR, ITEM_VALUE_TYPE_LOG, ITEM_VALUE_TYPE_TEXT])) {
+							foreach ($link['highlights'] as $highlight) {
+								if (@preg_match('('.$highlight['pattern'].')', $item_value)) {
+									$link['color'] = $highlight['color'];
+									$link['drawtype'] = $highlight['drawtype'];
+
+									break;
+								}
+							}
+						}
+						elseif ($value_type == ITEM_VALUE_TYPE_FLOAT || $value_type == ITEM_VALUE_TYPE_UINT64) {
+							$has_binary_units = isBinaryUnits($link_items_info[$link['itemid']]['units']);
+
+							if ($has_binary_units) {
+								$number_parser_binary->parse($item_value);
+								$parsed_item_value = $number_parser_binary->calcValue();
+							}
+							else {
+								$number_parser->parse($item_value);
+								$parsed_item_value = $number_parser->calcValue();
+							}
+
+							foreach ($link['thresholds'] as &$threshold) {
+								if ($has_binary_units) {
+									$number_parser_binary->parse($threshold['threshold']);
+									$parsed_threshold_value = $number_parser_binary->calcValue();
+								}
+								else {
+									$number_parser->parse($threshold['threshold']);
+									$parsed_threshold_value = $number_parser->calcValue();
+								}
+
+								if ($parsed_item_value < $parsed_threshold_value) {
+									break;
+								}
+
+								$link['color'] = $threshold['color'];
+								$link['drawtype'] = $threshold['drawtype'];
+							}
+						}
+					}
+				}
+			}
+
+			$is_duplicate = false;
+
+			foreach ($duplicated_links as &$duplicated_link) {
+				if ((bccomp($link['selementid1'], $duplicated_link['selementid1'], 0) != 0
+							&& bccomp($link['selementid1'], $duplicated_link['selementid2'], 0) != 0)
+						|| (bccomp($link['selementid2'], $duplicated_link['selementid1'], 0) != 0
+							&& bccomp($link['selementid2'], $duplicated_link['selementid2'], 0) != 0)) {
+					continue;
+				}
+
+				$duplicated_link['links'][] = [
+					'color' => $link['color'],
+					'show_label' => $link['show_label'],
+					'label' => $hint_label
+				];
+
+				$is_duplicate = true;
+				break;
+			}
+			unset($duplicated_link);
+
+			if (!$is_duplicate) {
+				$duplicated_links[] = [
+					'linkid' => 'hover'.$linkid,
+					'selementid1' => $link['selementid1'],
+					'selementid2' => $link['selementid2'],
+					'hover_link' => true,
+					'links' => [[
+						'color' => $link['color'],
+						'show_label' => $link['show_label'],
+						'label' => $hint_label
+					]]
+				];
+			}
+
+			if ($link['show_label'] == MAP_SHOW_LABEL_AUTO_HIDE) {
+				$link['label'] = '';
+			}
+			$linkid++;
 		}
 		unset($link);
+
+		$sysmap['duplicated_links'] = array_filter($duplicated_links, static fn($duplicated_link) =>
+			in_array(MAP_SHOW_LABEL_AUTO_HIDE, array_column($duplicated_link['links'], 'show_label'))
+		);
 	}
 
 	/**
@@ -580,20 +727,23 @@ class CMapHelper {
 		$areas = [];
 
 		if ($groupids) {
-			$groups = API::HostGroup()->get([
-				'output' => [],
-				'selectHosts' => ['hostid', 'name'],
-				'groupids' => array_keys($groupids),
-				'preservekeys' => true
-			]);
+			// Assign the hosts of nested host groups to the top host groups.
+			$groups = [];
+			foreach ($groupids as $groupid => $bar) {
+				$sub_groups = getSubGroups([$groupid]);
+				$groups[$groupid]['hosts'] = API::Host()->get([
+					'output' => ['hostid', 'name'],
+					'groupids' => $sub_groups
+				]);
+			}
 
-			$new_selementid = (count($sysmap['selements']) > 0)
-				? (int) max(zbx_objectValues($sysmap['selements'], 'selementid'))
+			$new_selementid = count($sysmap['selements']) > 0
+				? (int) max(array_column($sysmap['selements'], 'selementid'))
 				: 0;
 
-			$new_linkid = (count($sysmap['links']) > 0) ? (int) max(array_keys($sysmap['links'])) : 0;
+			$new_linkid = count($sysmap['links']) > 0 ? (int) max(array_column($sysmap['links'], 'linkid')) : 0;
 
-			foreach ($sysmap['selements'] as $selement_key => &$selement) {
+			foreach ($sysmap['selements'] as &$selement) {
 				if ($selement['elementtype'] != SYSMAP_ELEMENT_TYPE_HOST_GROUP
 						|| $selement['elementsubtype'] != SYSMAP_ELEMENT_SUBTYPE_HOST_GROUP_ELEMENTS) {
 					continue;
@@ -649,6 +799,7 @@ class CMapHelper {
 				// Add selected hosts as map selements.
 				foreach ($group['hosts'] as $host) {
 					$new_selementid++;
+					$new_selementid = (string) $new_selementid;
 
 					$area['selementids'][] = $new_selementid;
 					$sysmap['selements'][$new_selementid] = [
@@ -678,10 +829,10 @@ class CMapHelper {
 						continue;
 					}
 
-					if ($id1 == $original_selement['selementid']) {
+					if (bccomp($id1, $original_selement['selementid']) == 0) {
 						$id_number = 'selementid1';
 					}
-					elseif ($id2 == $original_selement['selementid']) {
+					elseif (bccomp($id2, $original_selement['selementid']) == 0) {
 						$id_number = 'selementid2';
 					}
 					else {
@@ -690,7 +841,8 @@ class CMapHelper {
 
 					foreach ($area['selementids'] as $selement_id) {
 						$new_linkid++;
-						$link['linkid'] = -$new_linkid;
+						$new_linkid = (string) $new_linkid;
+						$link['linkid'] = $new_linkid;
 						$link[$id_number] = $selement_id;
 						$sysmap['links'][$new_linkid] = $link;
 					}

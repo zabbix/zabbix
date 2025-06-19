@@ -40,7 +40,8 @@ typedef enum
 	ZBX_MOCK_NOT_A_BINARY,
 	ZBX_MOCK_NOT_AN_UINT64,
 	ZBX_MOCK_NOT_A_FLOAT,
-	ZBX_MOCK_NOT_AN_INT
+	ZBX_MOCK_NOT_AN_INT,
+	ZBX_MOCK_NOT_AN_UINT32
 }
 zbx_mock_error_t;
 
@@ -61,6 +62,7 @@ zbx_mock_error_t	zbx_mock_parameter_exists(const char *path);
 zbx_mock_error_t	zbx_mock_uint64(zbx_mock_handle_t object, zbx_uint64_t *value);
 zbx_mock_error_t	zbx_mock_float(zbx_mock_handle_t object, double *value);
 zbx_mock_error_t	zbx_mock_int(zbx_mock_handle_t object, int *value);
+zbx_mock_error_t	zbx_mock_uint32(zbx_mock_handle_t object, zbx_uint32_t *value);
 
 /* date/time support */
 #define ZBX_MOCK_TIMESTAMP_MAX_LEN	37

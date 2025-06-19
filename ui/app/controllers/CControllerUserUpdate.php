@@ -66,7 +66,9 @@ class CControllerUserUpdate extends CControllerUserUpdateGeneral {
 		if (!$ret) {
 			switch ($result) {
 				case self::VALIDATION_ERROR:
-					$response = new CControllerResponseRedirect('zabbix.php?action=user.edit');
+					$response = new CControllerResponseRedirect(
+						(new CUrl('zabbix.php'))->setArgument('action', 'user.edit')
+					);
 					$response->setFormData($this->getInputAll());
 					CMessageHelper::setErrorTitle(_('Cannot update user'));
 					$this->setResponse($response);
@@ -95,13 +97,20 @@ class CControllerUserUpdate extends CControllerUserUpdateGeneral {
 
 	protected function doAction() {
 		$user = [
-			'roleid' => 0,
-			'medias' => $this->getInputUserMedia()
+			'roleid' => 0
 		];
 
 		$this->getInputs($user, ['userid', 'username', 'name', 'surname', 'lang', 'timezone', 'theme', 'autologin',
 			'autologout', 'refresh', 'rows_per_page', 'url', 'roleid'
 		]);
+
+		$can_edit_media = bccomp(CWebUser::$data['userid'], $user['userid']) == 0
+			? $this->checkAccess(CRoleHelper::ACTIONS_EDIT_OWN_MEDIA)
+			: $this->checkAccess(CRoleHelper::ACTIONS_EDIT_USER_MEDIA);
+
+		if ($can_edit_media) {
+			$user['medias'] = $this->getInputUserMedia();
+		}
 
 		if ($this->getInput('current_password', '') !== '' || ($this->hasInput('current_password')
 				&& CWebUser::$data['auth_type'] == ZBX_AUTH_INTERNAL)) {
@@ -132,16 +141,17 @@ class CControllerUserUpdate extends CControllerUserUpdateGeneral {
 				redirect('index.php');
 			}
 
-			$response = new CControllerResponseRedirect((new CUrl('zabbix.php'))
-				->setArgument('action', 'user.list')
-				->setArgument('page', CPagerHelper::loadPage('user.list', null))
+			$response = new CControllerResponseRedirect(
+				(new CUrl('zabbix.php'))
+					->setArgument('action', 'user.list')
+					->setArgument('page', CPagerHelper::loadPage('user.list', null))
 			);
 			$response->setFormData(['uncheck' => '1']);
 			CMessageHelper::setSuccessTitle(_('User updated'));
 		}
 		else {
-			$response = new CControllerResponseRedirect((new CUrl('zabbix.php'))
-				->setArgument('action', 'user.edit')
+			$response = new CControllerResponseRedirect(
+				(new CUrl('zabbix.php'))->setArgument('action', 'user.edit')
 			);
 			$response->setFormData($this->getInputAll());
 			CMessageHelper::setErrorTitle(_('Cannot update user'));

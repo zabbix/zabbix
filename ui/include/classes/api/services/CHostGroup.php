@@ -36,7 +36,7 @@ class CHostGroup extends CApiService {
 
 	public const OUTPUT_FIELDS = ['groupid', 'name', 'flags', 'uuid'];
 
-	private const GROUP_DISCOVERY_FIELDS = ['parent_group_prototypeid', 'name', 'lastcheck', 'ts_delete', 'status'];
+	public const DISCOVERY_DATA_OUTPUT_FIELDS = ['parent_group_prototypeid', 'name', 'ts_delete', 'status'];
 
 	/**
 	 * Get host groups.
@@ -52,13 +52,6 @@ class CHostGroup extends CApiService {
 			'ipmi_privilege', 'ipmi_password', 'ipmi_username', 'inventory_mode', 'tls_connect', 'tls_accept',
 			'tls_psk_identity', 'tls_psk', 'tls_issuer', 'tls_subject', 'maintenanceid', 'maintenance_type',
 			'maintenance_from', 'maintenance_status', 'flags'
-		];
-		$discovery_rule_fields = ['itemid', 'hostid', 'name', 'type', 'key_', 'url', 'query_fields', 'request_method',
-			'timeout', 'post_type', 'posts', 'headers', 'status_codes', 'follow_redirects', 'retrieve_mode',
-			'http_proxy', 'authtype', 'verify_peer', 'verify_host', 'ssl_cert_file', 'ssl_key_file', 'ssl_key_password',
-			'ipmi_sensor', 'jmx_endpoint', 'interfaceid', 'username', 'publickey', 'privatekey', 'password', 'snmp_oid',
-			'parameters', 'params', 'delay', 'master_itemid', 'lifetime', 'trapper_hosts', 'allow_traps', 'description',
-			'status', 'state', 'error', 'templateid'
 		];
 		$host_prototype_fields = ['hostid', 'host', 'name', 'status', 'templateid', 'inventory_mode', 'discover',
 			'custom_interfaces', 'uuid'
@@ -93,8 +86,9 @@ class CHostGroup extends CApiService {
 			// output
 			'output' =>								['type' => API_OUTPUT, 'in' => implode(',', self::OUTPUT_FIELDS), 'default' => API_OUTPUT_EXTEND],
 			'selectHosts' =>						['type' => API_OUTPUT, 'flags' => API_ALLOW_NULL | API_ALLOW_COUNT, 'in' => implode(',', $host_fields), 'default' => null],
-			'selectGroupDiscoveries' =>				['type' => API_OUTPUT, 'flags' => API_ALLOW_NULL, 'in' => implode(',', self::GROUP_DISCOVERY_FIELDS), 'default' => null],
-			'selectDiscoveryRules' =>				['type' => API_OUTPUT, 'flags' => API_ALLOW_NULL, 'in' => implode(',', $discovery_rule_fields), 'default' => null],
+			'selectGroupDiscoveries' =>				['type' => API_OUTPUT, 'flags' => API_ALLOW_NULL | API_NORMALIZE | API_DEPRECATED, 'in' => implode(',', self::DISCOVERY_DATA_OUTPUT_FIELDS), 'default' => null],
+			'selectDiscoveryData' =>				['type' => API_OUTPUT, 'flags' => API_ALLOW_NULL | API_NORMALIZE, 'in' => implode(',', self::DISCOVERY_DATA_OUTPUT_FIELDS), 'default' => null],
+			'selectDiscoveryRules' =>				['type' => API_OUTPUT, 'flags' => API_ALLOW_NULL | API_NORMALIZE, 'in' => implode(',', CDiscoveryRule::getOutputFieldsOnHost()), 'default' => null],
 			'selectHostPrototypes' =>				['type' => API_OUTPUT, 'flags' => API_ALLOW_NULL, 'in' => implode(',', $host_prototype_fields), 'default' => null],
 			'countOutput' =>						['type' => API_BOOLEAN, 'default' => false],
 			// sort and limit
@@ -449,90 +443,6 @@ class CHostGroup extends CApiService {
 		// delete sysmap element
 		DB::delete('sysmaps_elements', ['elementtype' => SYSMAP_ELEMENT_TYPE_HOST_GROUP, 'elementid' => $groupids]);
 
-		// disable actions
-		// actions from conditions
-		$actionids = [];
-		$db_actions = DBselect(
-			'SELECT DISTINCT c.actionid'.
-			' FROM conditions c'.
-			' WHERE c.conditiontype='.ZBX_CONDITION_TYPE_HOST_GROUP.
-				' AND '.dbConditionString('c.value', $groupids)
-		);
-		while ($db_action = DBfetch($db_actions)) {
-			$actionids[$db_action['actionid']] = $db_action['actionid'];
-		}
-
-		// actions from operations
-		$db_actions = DBselect(
-			'SELECT o.actionid'.
-			' FROM operations o,opgroup og'.
-			' WHERE o.operationid=og.operationid AND '.dbConditionInt('og.groupid', $groupids).
-			' UNION'.
-			' SELECT o.actionid'.
-			' FROM operations o,opcommand_grp ocg'.
-			' WHERE o.operationid=ocg.operationid AND '.dbConditionInt('ocg.groupid', $groupids)
-		);
-		while ($db_action = DBfetch($db_actions)) {
-			$actionids[$db_action['actionid']] = $db_action['actionid'];
-		}
-
-		if (!empty($actionids)) {
-			$update = [];
-			$update[] = [
-				'values' => ['status' => ACTION_STATUS_DISABLED],
-				'where' => ['actionid' => $actionids]
-			];
-			DB::update('actions', $update);
-		}
-
-		// delete action conditions
-		DB::delete('conditions', [
-			'conditiontype' => ZBX_CONDITION_TYPE_HOST_GROUP,
-			'value' => $groupids
-		]);
-
-		// delete action operation groups
-		$operationids = [];
-		$db_operations = DBselect(
-			'SELECT DISTINCT og.operationid'.
-			' FROM opgroup og'.
-			' WHERE '.dbConditionInt('og.groupid', $groupids)
-		);
-		while ($db_operation = DBfetch($db_operations)) {
-			$operationids[$db_operation['operationid']] = $db_operation['operationid'];
-		}
-		DB::delete('opgroup', [
-			'groupid' => $groupids
-		]);
-
-		// delete action operation commands
-		$db_operations = DBselect(
-			'SELECT DISTINCT ocg.operationid'.
-			' FROM opcommand_grp ocg'.
-			' WHERE '.dbConditionInt('ocg.groupid', $groupids)
-		);
-		while ($db_operation = DBfetch($db_operations)) {
-			$operationids[$db_operation['operationid']] = $db_operation['operationid'];
-		}
-		DB::delete('opcommand_grp', [
-			'groupid' => $groupids
-		]);
-
-		// delete empty operations
-		$del_operationids = [];
-		$db_operations = DBselect(
-			'SELECT DISTINCT o.operationid'.
-			' FROM operations o'.
-			' WHERE '.dbConditionInt('o.operationid', $operationids).
-				' AND NOT EXISTS (SELECT NULL FROM opgroup og WHERE o.operationid=og.operationid)'.
-				' AND NOT EXISTS (SELECT NULL FROM opcommand_grp ocg WHERE o.operationid=ocg.operationid)'
-		);
-		while ($db_operation = DBfetch($db_operations)) {
-			$del_operationids[$db_operation['operationid']] = $db_operation['operationid'];
-		}
-
-		DB::delete('operations', ['operationid' => $del_operationids]);
-
 		$this->unlinkHosts($db_groups);
 
 		DB::delete('hstgrp', ['groupid' => $groupids]);
@@ -582,7 +492,7 @@ class CHostGroup extends CApiService {
 	 *
 	 * @throws APIException if the input is invalid.
 	 */
-	protected function validateUpdate(array &$groups, array &$db_groups = null): void {
+	protected function validateUpdate(array &$groups, ?array &$db_groups = null): void {
 		$api_input_rules = ['type' => API_OBJECTS, 'flags' => API_NOT_EMPTY | API_NORMALIZE, 'uniq' => [['uuid'], ['groupid'], ['name']], 'fields' => [
 			'uuid' => 		['type' => API_UUID],
 			'groupid' =>	['type' => API_ID, 'flags' => API_REQUIRED],
@@ -617,7 +527,7 @@ class CHostGroup extends CApiService {
 	 *
 	 * @throws APIException if the input is invalid.
 	 */
-	private function validateDelete(array $groupids, array &$db_groups = null): void {
+	private function validateDelete(array $groupids, ?array &$db_groups = null): void {
 		$api_input_rules = ['type' => API_IDS, 'flags' => API_NOT_EMPTY, 'uniq' => true];
 
 		if (!CApiInputValidator::validate($api_input_rules, $groupids, '/', $error)) {
@@ -697,6 +607,7 @@ class CHostGroup extends CApiService {
 			);
 		}
 
+		self::checkUsedInActions($db_groups);
 		self::checkMaintenances($groupids);
 	}
 
@@ -708,7 +619,7 @@ class CHostGroup extends CApiService {
 	 *
 	 * @throws APIException if host group names are not unique.
 	 */
-	private static function checkDuplicates(array $groups, array $db_groups = null): void {
+	private static function checkDuplicates(array $groups, ?array $db_groups = null): void {
 		$names = [];
 
 		foreach ($groups as $group) {
@@ -758,7 +669,7 @@ class CHostGroup extends CApiService {
 	 *
 	 * @throws APIException
 	 */
-	private static function checkUuidDuplicates(array $groups, array $db_groups = null): void {
+	private static function checkUuidDuplicates(array $groups, ?array $db_groups = null): void {
 		$group_indexes = [];
 
 		foreach ($groups as $i => $group) {
@@ -809,6 +720,47 @@ class CHostGroup extends CApiService {
 					_s('Cannot update a discovered host group "%1$s".', $db_group['name'])
 				);
 			}
+		}
+	}
+
+	private static function checkUsedInActions(array $db_groups): void {
+		$groupids = array_keys($db_groups);
+
+		$row = DBfetch(DBselect(
+			'SELECT c.value AS groupid,a.name'.
+			' FROM conditions c'.
+			' JOIN actions a ON c.actionid=a.actionid'.
+			' WHERE c.conditiontype='.ZBX_CONDITION_TYPE_HOST_GROUP.
+				' AND '.dbConditionString('c.value', $groupids),
+			1
+		));
+
+		if (!$row) {
+			$row = DBfetch(DBselect(
+				'SELECT og.groupid,a.name'.
+				' FROM opgroup og'.
+				' JOIN operations o ON og.operationid=o.operationid'.
+				' JOIN actions a ON o.actionid=a.actionid'.
+				' WHERE '.dbConditionId('og.groupid', $groupids),
+				1
+			));
+		}
+
+		if (!$row) {
+			$row = DBfetch(DBselect(
+				'SELECT ocg.groupid,a.name'.
+				' FROM opcommand_grp ocg'.
+				' JOIN operations o ON ocg.operationid=o.operationid'.
+				' JOIN actions a ON o.actionid=a.actionid'.
+				' WHERE '.dbConditionId('ocg.groupid', $groupids),
+				1
+			));
+		}
+
+		if ($row) {
+			self::exception(ZBX_API_ERROR_PARAMETERS, _s('Cannot delete host group "%1$s": %2$s.',
+				$db_groups[$row['groupid']]['name'], _s('action "%1$s" uses this host group', $row['name'])
+			));
 		}
 	}
 
@@ -1221,27 +1173,6 @@ class CHostGroup extends CApiService {
 			}
 		}
 
-		// adding discovery rule
-		if ($options['selectDiscoveryRules'] !== null) {
-			// discovered items
-			$discovery_rules = DBFetchArray(DBselect(
-				'SELECT gd.groupid,hd.parent_itemid'.
-					' FROM group_discovery gd,group_prototype gp,host_discovery hd'.
-					' WHERE '.dbConditionInt('gd.groupid', $groupids).
-					' AND gd.parent_group_prototypeid=gp.group_prototypeid'.
-					' AND gp.hostid=hd.hostid'
-			));
-			$relation_map = $this->createRelationMap($discovery_rules, 'groupid', 'parent_itemid');
-
-			$discovery_rules = API::DiscoveryRule()->get([
-				'output' => $options['selectDiscoveryRules'],
-				'itemids' => $relation_map->getRelatedIds(),
-				'preservekeys' => true
-			]);
-
-			$result = $relation_map->mapMany($result, $discovery_rules, 'discoveryRules');
-		}
-
 		// adding host prototype
 		if ($options['selectHostPrototypes'] !== null) {
 			$db_links = DBFetchArray(DBselect(
@@ -1269,25 +1200,93 @@ class CHostGroup extends CApiService {
 			}
 		}
 
-		// adding group discovery
-		if ($options['selectGroupDiscoveries'] !== null) {
-			$output = $options['selectGroupDiscoveries'] === API_OUTPUT_EXTEND
-				? self::GROUP_DISCOVERY_FIELDS
-				: $options['selectGroupDiscoveries'];
-
-			$group_discoveries = API::getApiService()->select('group_discovery', [
-				'output' => $this->outputExtend($output, ['groupid', 'groupdiscoveryid']),
-				'filter' => ['groupid' => $groupids],
-				'preservekeys' => true
-			]);
-			$relation_map = $this->createRelationMap($group_discoveries, 'groupid', 'groupdiscoveryid');
-
-			$group_discoveries = $this->unsetExtraFields($group_discoveries, ['groupid', 'groupdiscoveryid'], $output);
-
-			$result = $relation_map->mapMany($result, $group_discoveries, 'groupDiscoveries');
-		}
+		self::addRelatedDiscoveryRules($options, $result);
+		self::addRelatedGroupDiscoveries($options, $result);
+		self::addRelatedDiscoveryData($options, $result);
 
 		return $result;
+	}
+
+	private static function addRelatedDiscoveryRules(array $options, array &$result): void {
+		if ($options['selectDiscoveryRules'] === null) {
+			return;
+		}
+
+		foreach ($result as &$group) {
+			$group['discoveryRules'] = [];
+		}
+		unset($group);
+
+		$resource = DBselect(
+			'SELECT gd.groupid,hd.lldruleid'.
+			' FROM group_discovery gd'.
+			' JOIN group_prototype gp ON gd.parent_group_prototypeid=gp.group_prototypeid'.
+			' JOIN host_discovery hd ON gp.hostid=hd.hostid'.
+			' WHERE '.dbConditionId('gd.groupid', array_keys($result))
+		);
+
+		$groupids = [];
+
+		while ($row = DBfetch($resource)) {
+			$groupids[$row['lldruleid']][] = $row['groupid'];
+		}
+
+		$parent_lld_rules = API::DiscoveryRule()->get([
+			'output' => $options['selectDiscoveryRules'],
+			'itemids' => array_keys($groupids),
+			'nopermissions' => true,
+			'preservekeys' => true
+		]);
+
+		foreach ($parent_lld_rules as $lldruleid => $parent_lld_rule) {
+			foreach ($groupids[$lldruleid] as $groupid) {
+				$result[$groupid]['discoveryRules'][] = $parent_lld_rule;
+			}
+		}
+	}
+
+	private static function addRelatedGroupDiscoveries(array $options, array &$result): void {
+		if ($options['selectGroupDiscoveries'] === null) {
+			return;
+		}
+
+		foreach ($result as &$group) {
+			$group['groupDiscoveries'] = [];
+		}
+		unset($group);
+
+		$_options = [
+			'output' => array_merge(['groupid'], $options['selectGroupDiscoveries']),
+			'filter' => ['groupid' => array_keys($result)]
+		];
+		$resource = DBselect(DB::makeSql('group_discovery', $_options));
+
+		while ($group_discovery = DBfetch($resource)) {
+			$result[$group_discovery['groupid']]['discoveryData'][] =
+				array_diff_key($group_discovery, array_flip(['groupid']));
+		}
+	}
+
+	private static function addRelatedDiscoveryData(array $options, array &$result): void {
+		if ($options['selectDiscoveryData'] === null) {
+			return;
+		}
+
+		foreach ($result as &$group) {
+			$group['discoveryData'] = [];
+		}
+		unset($group);
+
+		$_options = [
+			'output' => array_merge(['groupid'], $options['selectDiscoveryData']),
+			'filter' => ['groupid' => array_keys($result)]
+		];
+		$resource = DBselect(DB::makeSql('group_discovery', $_options));
+
+		while ($discovery_data = DBfetch($resource)) {
+			$result[$discovery_data['groupid']]['discoveryData'][] =
+				array_diff_key($discovery_data, array_flip(['groupid']));
+		}
 	}
 
 	/**
@@ -1324,7 +1323,7 @@ class CHostGroup extends CApiService {
 	 *
 	 * @throws APIException if the input is invalid.
 	 */
-	private function validatePropagate(array &$data, array &$db_groups = null): void {
+	private function validatePropagate(array &$data, ?array &$db_groups = null): void {
 		$api_input_rules = ['type' => API_OBJECT, 'fields' => [
 			'groups' =>			['type' => API_OBJECTS, 'flags' => API_REQUIRED | API_NOT_EMPTY | API_NORMALIZE, 'uniq' => [['groupid']], 'fields' => [
 				'groupid' =>		['type' => API_ID, 'flags' => API_REQUIRED]

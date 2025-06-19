@@ -14,8 +14,8 @@
 **/
 
 
-require_once dirname(__FILE__).'/../../include/CLegacyWebTest.php';
-require_once dirname(__FILE__).'/../behaviors/CMessageBehavior.php';
+require_once __DIR__.'/../../include/CLegacyWebTest.php';
+require_once __DIR__.'/../behaviors/CMessageBehavior.php';
 
 /**
  * Test the creation of inheritance of new objects on a previously linked template.
@@ -45,7 +45,7 @@ class testInheritanceTriggerPrototype extends CLegacyWebTest {
 	// Returns update data
 	public static function update() {
 		return CDBHelper::getDataProvider(
-			'SELECT DISTINCT t.description,id.parent_itemid'.
+			'SELECT DISTINCT t.description,id.lldruleid'.
 			' FROM triggers t,functions f,item_discovery id'.
 			' WHERE t.triggerid=f.triggerid'.
 				' AND f.itemid=id.itemid'.
@@ -68,7 +68,7 @@ class testInheritanceTriggerPrototype extends CLegacyWebTest {
 		$sqlTriggers = 'SELECT * FROM triggers ORDER BY triggerid';
 		$oldHashTriggers = CDBHelper::getHash($sqlTriggers);
 
-		$this->zbxTestLogin('zabbix.php?action=trigger.prototype.list&context=host&parent_discoveryid='.$data['parent_itemid']);
+		$this->zbxTestLogin('zabbix.php?action=trigger.prototype.list&context=template&parent_discoveryid='.$data['lldruleid']);
 		$this->zbxTestClickLinkTextWait($data['description']);
 		COverlayDialogElement::find()->waitUntilReady()->one();
 		$this->query('button:Update')->one()->click();
@@ -106,7 +106,7 @@ class testInheritanceTriggerPrototype extends CLegacyWebTest {
 	 */
 	public function testInheritanceTriggerPrototype_SimpleCreate($data) {
 
-		$this->zbxTestLogin('zabbix.php?action=trigger.prototype.list&context=host&parent_discoveryid='.
+		$this->zbxTestLogin('zabbix.php?action=trigger.prototype.list&context=template&parent_discoveryid='.
 				$this->discoveryRuleId);
 		$this->zbxTestContentControlButtonClickTextWait('Create trigger prototype');
 		$dialog = COverlayDialogElement::find()->waitUntilReady()->one();

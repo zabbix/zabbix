@@ -36,15 +36,14 @@ const ZBX_PROPERTY_OWN = <?= ZBX_PROPERTY_OWN ?>;
 const ZBX_ITEM_CUSTOM_TIMEOUT_ENABLED = <?= ZBX_ITEM_CUSTOM_TIMEOUT_ENABLED ?>;
 const ZBX_STYLE_BTN_GREY = <?= json_encode(ZBX_STYLE_BTN_GREY) ?>;
 const ZBX_STYLE_DISPLAY_NONE = <?= json_encode(ZBX_STYLE_DISPLAY_NONE) ?>;
-const ZBX_STYLE_FIELD_LABEL_ASTERISK = <?= json_encode(ZBX_STYLE_FIELD_LABEL_ASTERISK) ?>;
 const ZBX_STYLE_FORM_INPUT_MARGIN = <?= json_encode(ZBX_STYLE_FORM_INPUT_MARGIN) ?>;
 const ZBX_STYLE_TEXTAREA_FLEXIBLE = <?= json_encode(ZBX_STYLE_TEXTAREA_FLEXIBLE) ?>;
 
 window.item_edit_form = new class {
 
 	init({
-		actions, field_switches, form_data, host, interface_types, inherited_timeouts, readonly, testable_item_types,
-		type_with_key_select, value_type_keys, source, backurl
+		rules, actions, field_switches, form_data, host, interface_types, inherited_timeouts, readonly, testable_item_types,
+		type_with_key_select, value_type_keys, source, return_url
 	}) {
 		this.actions = actions;
 		this.form_data = form_data;
@@ -76,12 +75,25 @@ window.item_edit_form = new class {
 
 		this.overlay = overlays_stack.end();
 		this.dialogue = this.overlay.$dialogue[0];
-		this.form = this.overlay.$dialogue.$body[0].querySelector('form');
+		this.form_element = this.overlay.$dialogue.$body[0].querySelector('form');
+		this.form = new CForm(this.form_element, rules);
+
+		const interface_field = this.form.findFieldByName('interfaceid');
+
+		if (interface_field) {
+			interface_field.setChanged();
+			this.form.validateChanges(['interfaceid']);
+		}
+
 		this.footer = this.overlay.$dialogue.$footer[0];
-		this.overlay.backurl = backurl;
+		this.tags_table = document.getElementById('tagsFormList').querySelector('[data-field-name="tags"]');
+
+		ZABBIX.PopupManager.setReturnUrl(return_url);
 
 		this.initForm(field_switches);
+		this.initFormCustomIntervals();
 		this.initEvents();
+		this.#initPopupListeners();
 
 		if (this.source === 'itemprototype') {
 			this.initItemPrototypeForm();
@@ -90,8 +102,11 @@ window.item_edit_form = new class {
 
 		this.updateFieldsVisibility();
 
-		this.initial_form_fields = this.#getFormFields(this.form);
-		this.form.style.display = '';
+		this.initial_tags_state = {
+			tags: Object.values(this.form.findFieldByName('tags')?.getValue() || [{tag: '', value: ''}]),
+			show_inherited_tags: this.form.findFieldByName('show_inherited_tags')?.getValue() || '0'
+		};
+		this.form_element.style.display = '';
 		this.overlay.recoverFocus();
 	}
 
@@ -103,33 +118,33 @@ window.item_edit_form = new class {
 		new CViewSwitcher('value_type', 'change', field_switches.for_value_type);
 
 		this.field = {
-			custom_timeout: this.form.querySelectorAll('[name="custom_timeout"]'),
-			history: this.form.querySelector('[name="history"]'),
-			history_mode: this.form.querySelectorAll('[name="history_mode"]'),
-			interfaceid: this.form.querySelector('[name="interfaceid"]'),
-			key: this.form.querySelector('[name="key"]'),
-			key_button: this.form.querySelector('[name="key"] ~ .js-select-key'),
-			inherited_timeout: this.form.querySelector('[name="inherited_timeout"]'),
-			snmp_oid: this.form.querySelector('[name="snmp_oid"]'),
-			timeout: this.form.querySelector('[name="timeout"]'),
-			trends: this.form.querySelector('[name="trends"]'),
-			trends_mode: this.form.querySelectorAll('[name="trends_mode"]'),
-			type: this.form.querySelector('[name="type"]'),
-			url: this.form.querySelector('[name="url"]'),
-			username: this.form.querySelector('[name=username]'),
-			value_type: this.form.querySelector('[name="value_type"]'),
-			value_type_steps: this.form.querySelector('[name="value_type_steps"]'),
-			ipmi_sensor: this.form.querySelector('[name="ipmi_sensor"]'),
-			request_method: this.form.querySelector('[name="request_method"'),
-			retrieve_mode: this.form.querySelectorAll('[name="retrieve_mode"]')
+			custom_timeout: this.form_element.querySelectorAll('[name="custom_timeout"]'),
+			history: this.form_element.querySelector('[name="history"]'),
+			history_mode: this.form_element.querySelectorAll('[name="history_mode"]'),
+			interfaceid: this.form_element.querySelector('[name="interfaceid"]'),
+			key: this.form_element.querySelector('[name="key"]'),
+			key_button: this.form_element.querySelector('[name="key"] ~ .js-select-key'),
+			inherited_timeout: this.form_element.querySelector('[name="inherited_timeout"]'),
+			snmp_oid: this.form_element.querySelector('[name="snmp_oid"]'),
+			timeout: this.form_element.querySelector('[name="timeout"]'),
+			trends: this.form_element.querySelector('[name="trends"]'),
+			trends_mode: this.form_element.querySelectorAll('[name="trends_mode"]'),
+			type: this.form_element.querySelector('[name="type"]'),
+			url: this.form_element.querySelector('[name="url"]'),
+			username: this.form_element.querySelector('[name=username]'),
+			value_type: this.form_element.querySelector('[name="value_type"]'),
+			value_type_steps: this.form_element.querySelector('[name="value_type_steps"]'),
+			ipmi_sensor: this.form_element.querySelector('[name="ipmi_sensor"]'),
+			request_method: this.form_element.querySelector('[name="request_method"'),
+			retrieve_mode: this.form_element.querySelectorAll('[name="retrieve_mode"]')
 		};
 		this.label = {
-			interfaceid: this.form.querySelector('[for="interfaceid"]'),
-			value_type_hint: this.form.querySelector('[for="label-value-type"] .js-hint'),
-			username: this.form.querySelector('[for=username]'),
-			ipmi_sensor: this.form.querySelector('[for="ipmi_sensor"]'),
-			history_hint: this.form.querySelector('[for="history"] .js-hint'),
-			trends_hint: this.form.querySelector('[for="trends"] .js-hint')
+			interfaceid: this.form_element.querySelector('[for="interfaceid"]'),
+			value_type_hint: this.form_element.querySelector('[for="label-value-type"] .js-hint'),
+			username: this.form_element.querySelector('[for=username]'),
+			ipmi_sensor: this.form_element.querySelector('[for="ipmi_sensor"]'),
+			history_hint: this.form_element.querySelector('[for="history"] .js-hint'),
+			trends_hint: this.form_element.querySelector('[for="trends"] .js-hint')
 		};
 		jQuery('#parameters-table').dynamicRows({
 			template: '#parameter-row-tmpl',
@@ -160,12 +175,7 @@ window.item_edit_form = new class {
 				enable_sorting: !this.form_readonly
 			}
 		});
-		jQuery('#delay-flex-table').dynamicRows({
-			template: '#delay-flex-row-tmpl',
-			rows: this.form_data.delay_flex,
-			allow_empty: true
-		});
-		this.form.querySelectorAll('#delay-flex-table .form_row')?.forEach(row => {
+		this.form_element.querySelectorAll('#delay-flex-table .form_row')?.forEach(row => {
 			const flexible = row.querySelector('[name$="[type]"]:checked').value == ITEM_DELAY_FLEXIBLE;
 
 			row.querySelector('[name$="[delay]"]').classList.toggle(ZBX_STYLE_DISPLAY_NONE, !flexible);
@@ -187,9 +197,30 @@ window.item_edit_form = new class {
 		});
 	}
 
+	initFormCustomIntervals() {
+		const table = document.getElementById('delay-flex-table');
+		const row_tmpl = document.getElementById('delay-flex-row-tmpl');
+
+		table.addEventListener('click', e => {
+			if (e.target.classList.contains('element-table-add')) {
+				const tmpl = new Template(row_tmpl.innerHTML);
+				const value_keys = Object.keys(this.form.findFieldByName('delay_flex').getValue());
+				const end_key = value_keys.length ? Math.max(...value_keys) : -1;
+
+				e.target.closest('tr').insertAdjacentHTML('beforebegin', tmpl.evaluate({
+					rowNum: end_key + 1,
+				}));
+			}
+			else if (e.target.classList.contains('element-table-remove')) {
+				e.target.closest('tr').nextSibling.remove();
+				e.target.closest('tr').remove();
+			}
+		});
+	}
+
 	initItemPrototypeForm() {
 		let node;
-		const master_item = this.form.querySelector('#master_itemid').closest('.multiselect-control');
+		const master_item = this.form_element.querySelector('#master_itemid').closest('.multiselect-control');
 
 		node = document.createElement('div');
 		node.classList.add(ZBX_STYLE_FORM_INPUT_MARGIN);
@@ -212,7 +243,7 @@ window.item_edit_form = new class {
 		this.field.type.addEventListener('change', this.#typeChangeHandler.bind(this));
 		this.field.value_type.addEventListener('change', this.#valueTypeChangeHandler.bind(this));
 		this.field.request_method.addEventListener('change', this.updateFieldsVisibility.bind(this));
-		this.form.addEventListener('click', e => {
+		this.form_element.addEventListener('click', e => {
 			const target = e.target;
 
 			switch (target.getAttribute('name')) {
@@ -230,7 +261,9 @@ window.item_edit_form = new class {
 						return this.#showErrorDialog(target.getAttribute('error-message'), target);
 					}
 
-					if (url.pairs.length) {
+					const has_pairs = url.pairs.length != 0;
+
+					if (has_pairs) {
 						const dynamic_rows = jQuery('#query-fields-table').data('dynamicRows');
 
 						dynamic_rows.addRows(url.pairs);
@@ -243,14 +276,19 @@ window.item_edit_form = new class {
 
 					this.field.url.value = url.url;
 
+					if (has_pairs) {
+						this.form.discoverAllFields();
+						setTimeout(() => {
+							const fields = this.form.findFieldByName('query_fields').getFields();
+							Object.values(fields).entries().forEach(([index, field]) => field.setChanged());
+							this.form.validateChanges(['query_fields']);
+						}, 0);
+					}
+
 					break;
 			}
-
-			if (target.matches('a') && target.closest('.js-parent-items')) {
-				this.setActions(e.target.dataset);
-			}
 		});
-		this.form.querySelector('#delay-flex-table').addEventListener('click', e => this.#intervalTypeChangeHandler(e));
+		this.form_element.querySelector('#delay-flex-table').addEventListener('click', e => this.#intervalTypeChangeHandler(e));
 
 		const updateSortOrder = (table, field_name) => {
 			table.querySelectorAll('.form_row').forEach((row, index) => {
@@ -263,19 +301,12 @@ window.item_edit_form = new class {
 		jQuery('#headers-table').on('tableupdate.dynamicRows', (e) => updateSortOrder(e.target, 'headers'));
 
 		// Tags tab events.
-		this.form.querySelectorAll('[name="show_inherited_tags"]')
-			.forEach(o => o.addEventListener('change', this.#inheritedTagsChangeHandler.bind(this)));
-		this.form.addEventListener('click', e => {
-			const target = e.target;
-
-			if (target.matches('.js-edit-template') || target.matches('.js-edit-proxy')) {
-				this.setActions(e.target.dataset);
-			}
-		});
+		document.getElementById('show_inherited_tags')
+			.addEventListener('change', (e) => this.#updateTagsList(e.target.value));
 
 		// Preprocessing tab events.
 		this.field.value_type_steps.addEventListener('change', e => this.#valueTypeChangeHandler(e));
-		this.form.querySelector('#processing-tab').addEventListener('click', e => {
+		this.form_element.querySelector('#processing-tab').addEventListener('click', e => {
 			const target = e.target;
 
 			if (target.matches('.element-table-add') || target.matches('.element-table-remove')) {
@@ -284,53 +315,52 @@ window.item_edit_form = new class {
 		});
 	}
 
-	setActions(dataset) {
-		const {action, ...params} = dataset;
+	#initPopupListeners() {
+		const subscriptions = [];
 
-		window.popupManagerInstance.setAdditionalActions(() => {
-			const fields = this.#getFormFields(this.form);
+		for (const action of ['template.edit', 'proxy.edit', 'item.edit', 'item.prototype.edit']) {
+			subscriptions.push(
+				ZABBIX.EventHub.subscribe({
+					require: {
+						context: CPopupManager.EVENT_CONTEXT,
+						event: CPopupManagerEvent.EVENT_OPEN,
+						action
+					},
+					callback: ({data, event}) => {
+						if (data.action_parameters.itemid === this.form_data.itemid || this.form_data.itemid === 0) {
+							return;
+						}
 
-			fields.show_inherited_tags = this.initial_form_fields.show_inherited_tags;
-
-			if (!fields.tags.length) {
-				fields.tags.push({tag: '', value: ''});
-			}
-
-			const url = new Curl('zabbix.php');
-			url.setArgument('action', 'popup');
-			url.setArgument('popup', action);
-
-			for (const [key, value] of Object.entries(params)) {
-				url.setArgument(key, value);
-			}
-
-			if (JSON.stringify(this.initial_form_fields) !== JSON.stringify(fields)) {
-				if (!window.confirm(<?= json_encode(_('Any changes made in the current form will be lost.')) ?>)) {
-					return false;
-				}
-				else {
-					overlayDialogueDestroy(this.overlay.dialogueid);
-
-					const url = new Curl(location.href);
-					for (const [key, value] of Object.entries(params)) {
-						url.setArgument(key, value);
+						if (!this.#isConfirmed()) {
+							event.preventDefault();
+						}
 					}
+				})
+			);
+		}
 
-					history.replaceState(null, '', url.getUrl());
+		subscriptions.push(
+			ZABBIX.EventHub.subscribe({
+				require: {
+					context: CPopupManager.EVENT_CONTEXT,
+					event: CPopupManagerEvent.EVENT_END_SCRIPTING,
+					action: this.overlay.dialogueid
+				},
+				callback: () => ZABBIX.EventHub.unsubscribeAll(subscriptions)
+			})
+		);
+	}
 
-					return true;
-				}
-			}
+	#isConfirmed() {
+		const tags = Object.values(this.form.findFieldByName('tags')?.getValue() || [{tag: '', value: ''}]);
+		const show_inherited_tags = this.form.findFieldByName('show_inherited_tags')?.getValue() || '';
 
-			overlayDialogueDestroy(this.overlay.dialogueid);
-			history.replaceState(null, '', url.getUrl());
-
-			return true;
-		});
+		return JSON.stringify(this.initial_tags_state) === JSON.stringify({tags, show_inherited_tags})
+			|| window.confirm(<?= json_encode(_('Any changes made in the current form will be lost.')) ?>);
 	}
 
 	initItemPrototypeEvents() {
-		this.form.querySelector('[name="master-item-prototype"]').addEventListener('click', (e) => {
+		this.form_element.querySelector('[name="master-item-prototype"]').addEventListener('click', (e) => {
 			this.#openMasterItemPrototypePopup();
 
 			return cancelEvent(e);
@@ -338,10 +368,10 @@ window.item_edit_form = new class {
 	}
 
 	clone() {
-		this.overlay.setLoading();
-		window.popupManagerInstance.openPopup(
+		this.overlay = ZABBIX.PopupManager.open(
 			this.source === 'itemprototype' ? 'item.prototype.edit' : 'item.edit',
-			{clone: 1, ...this.#getFormFields()}
+			{clone: 1, ...getFormFields(this.form_element)},
+			{reuse_existing: false}
 		);
 	}
 
@@ -350,7 +380,15 @@ window.item_edit_form = new class {
 		const curl = new Curl('zabbix.php');
 
 		curl.setArgument('action', this.actions.create);
-		this.#post(curl.getUrl(), fields);
+
+		this.form.validateSubmit(fields).then((result) => {
+			if (!result) {
+				this.overlay.unsetLoading();
+				return;
+			}
+
+			this.#post(curl.getUrl(), fields);
+		});
 	}
 
 	update() {
@@ -358,19 +396,43 @@ window.item_edit_form = new class {
 		const curl = new Curl('zabbix.php');
 
 		curl.setArgument('action', this.actions.update);
-		this.#post(curl.getUrl(), fields);
+
+		this.form.validateSubmit(fields).then((result) => {
+			if (!result) {
+				this.overlay.unsetLoading();
+				return;
+			}
+
+			this.#post(curl.getUrl(), fields);
+		});
 	}
 
-	test() {
+	#testDialog() {
 		const indexes = [].map.call(
-			this.form.querySelectorAll('z-select[name^="preprocessing"][name$="[type]"]'),
+			this.form_element.querySelectorAll('z-select[name^="preprocessing"][name$="[type]"]'),
 			type => type.getAttribute('name').match(/preprocessing\[(?<step>[\d]+)\]/).groups.step
 		);
 
-		this.overlay.unsetLoading();
-		this.#updateActionButtons();
 		// Method requires form name to be set to itemForm.
 		openItemTestDialog(indexes, true, true, this.footer.querySelector('.js-test-item'), -2);
+	}
+
+	test({rules}) {
+		this.form.findFieldByName('key').setChanged();
+		this.form.findFieldByName('params_f').setChanged();
+		for (const field of Object.values(this.form.findFieldByName('preprocessing').getFields())) {
+			field.setChanged();
+		}
+		this.form.validateFieldsForAction(['key', 'preprocessing', 'params_f'], rules).then((result) => {
+			this.overlay.unsetLoading();
+			this.#updateActionButtons();
+
+			if (!result) {
+				return;
+			}
+
+			this.#testDialog();
+		});
 	}
 
 	delete() {
@@ -412,7 +474,7 @@ window.item_edit_form = new class {
 		const username_required = type == ITEM_TYPE_SSH || type == ITEM_TYPE_TELNET;
 		const ipmi_sensor_required = type == ITEM_TYPE_IPMI && key !== 'ipmi.get';
 		const interface_optional = this.optional_interfaces.indexOf(type) != -1;
-		const preprocessing_active = this.form.querySelector('[name^="preprocessing"][name$="[type]"]') !== null;
+		const preprocessing_active = this.form_element.querySelector('[name^="preprocessing"][name$="[type]"]') !== null;
 
 		this.#updateActionButtons();
 		this.#updateCustomIntervalVisibility();
@@ -431,7 +493,7 @@ window.item_edit_form = new class {
 		this.field.ipmi_sensor[ipmi_sensor_required ? 'setAttribute' : 'removeAttribute']('aria-required', 'true');
 		this.label.ipmi_sensor.classList.toggle(ZBX_STYLE_FIELD_LABEL_ASTERISK, ipmi_sensor_required);
 		organizeInterfaces(this.type_interfaceids, this.interface_types, parseInt(this.field.type.value, 10));
-		this.form.querySelectorAll('.js-item-preprocessing-type').forEach(
+		this.form_element.querySelectorAll('.js-item-preprocessing-type').forEach(
 			node => node.classList.toggle(ZBX_STYLE_DISPLAY_NONE, !preprocessing_active)
 		);
 	}
@@ -439,7 +501,7 @@ window.item_edit_form = new class {
 	#showErrorDialog(body, trigger_element) {
 		overlayDialogue({
 			title: <?= json_encode(_('Error')) ?>,
-			class: 'modal-popup position-middle',
+			class: 'modal-popup',
 			content: jQuery('<span>').html(body),
 			buttons: [{
 				title: <?= json_encode(_('Ok')) ?>,
@@ -447,74 +509,86 @@ window.item_edit_form = new class {
 				focused: true,
 				action: function() {}
 			}]
-		}, jQuery(trigger_element));
+		}, {
+			position: Overlay.prototype.POSITION_CENTER,
+			trigger_element: jQuery(trigger_element)
+		});
 	}
 
 	#getFormFields() {
-		const fields = getFormFields(this.form);
+		const values = this.form.getAllValues();
 
-		for (let key in fields) {
-			switch (key) {
-				case 'ipmi_sensor':
-					// Value of ipmi sensor should not be trimmed.
-					break;
+		if (values.delay === null) {
+			values.delay = '';
+		}
 
-				case 'query_fields':
-				case 'headers':
-					fields[key] = Object.values(fields[key]).sort(
-						(a, b) => parseFloat(a.sortorder) - parseFloat(b.sortorder)
-					);
-					// falls through
+		if (values.preprocessing) {
+			for (let index in values.preprocessing) {
+				const step = values.preprocessing[index];
 
-				case 'parameters':
-					for (const [i, param] of Object.entries(fields[key])) {
-						fields[key][i] = {name: param.name.trim(), value: param.value.trim()}
-					}
+				if (step.error_handler_params === null) {
+					step.error_handler_params = '';
+				}
 
-					break;
-
-				case 'delay_flex':
-					for (const [i, custom_interval] of Object.entries(fields.delay_flex)) {
-						fields.delay_flex[i] = {
-							type: custom_interval.type,
-							delay: custom_interval.delay.trim(),
-							schedule: custom_interval.schedule.trim(),
-							period: custom_interval.period.trim()
-						}
-					}
-
-					break;
-
-				case 'tags':
-					fields.tags = Object.values(fields.tags).reduce((tags, tag) => {
-						if (!('type' in tag) || (tag.type & ZBX_PROPERTY_OWN)) {
-							tags.push({tag: tag.tag.trim(), value: tag.value.trim()});
-						}
-
-						return tags;
-					}, []);
-
-					break;
-
-				default:
-					if (typeof fields[key] === 'string') {
-						fields[key] = fields[key].trim();
-					}
-
-					break;
+				if (step.on_fail === null) {
+					delete step.error_handler;
+					delete step.error_handler_params;
+				}
 			}
 		}
 
-		if (fields.preprocessing) {
-			fields.preprocessing = Object.entries(fields.preprocessing).map(p => p[1]);
+		const delay_flex = [];
+		for (let key in values.delay_flex) {
+			let { schedule, period, type, delay } = values.delay_flex[key];
+			type = parseInt(type);
+
+			if (type == <?= ITEM_DELAY_FLEXIBLE ?> && delay === '' && period === '') {
+				continue;
+			}
+
+			if (type == <?= ITEM_DELAY_SCHEDULING ?> && schedule === '') {
+				continue;
+			}
+
+			delay_flex.push(values.delay_flex[key]);
 		}
 
-		return fields;
+		const query_fields = [];
+		for (let key in values.query_fields) {
+			let {name, value} = values.query_fields[key];
+
+			if (name === '' && value === '') {
+				continue;
+			}
+			query_fields.push({name, value});
+		}
+
+		const parameters = [];
+		for (let key in values.parameters) {
+			let {name, value} = values.parameters[key];
+
+			if (name === '' && value === '') {
+				continue;
+			}
+			parameters.push({name, value});
+		}
+
+		const headers = [];
+		for (let key in values.headers) {
+			let {name, value} = values.headers[key];
+
+			if (name === '' && value === '') {
+				continue;
+			}
+			headers.push({name, value});
+		}
+
+		return {...values, ...{query_fields, headers, delay_flex, parameters}};
 	}
 
 	#post(url, data, keep_open = false) {
-		if (this.form[CSRF_TOKEN_NAME]) {
-			data[CSRF_TOKEN_NAME] = this.form[CSRF_TOKEN_NAME].value;
+		if (this.form_element[CSRF_TOKEN_NAME]) {
+			data[CSRF_TOKEN_NAME] = this.form_element[CSRF_TOKEN_NAME].value;
 		}
 
 		fetch(url, {
@@ -528,12 +602,19 @@ window.item_edit_form = new class {
 					throw {error: response.error};
 				}
 
+				if ('form_errors' in response) {
+					this.form.setErrors(response.form_errors, true, true);
+					this.form.renderErrors();
+
+					return;
+				}
+
 				if (keep_open) {
 					const message_box = makeMessageBox('good', response.success.messages, response.success.title)[0];
 
-					this.form.parentNode.querySelectorAll('.msg-good,.msg-bad,.msg-warning')
+					this.form_element.parentNode.querySelectorAll('.msg-good,.msg-bad,.msg-warning')
 						.forEach(node => node.remove());
-					this.form.parentNode.insertBefore(message_box, this.form);
+					this.form_element.parentNode.insertBefore(message_box, this.form_element);
 				}
 				else {
 					const action = (new Curl(url)).getArgument('action');
@@ -544,7 +625,7 @@ window.item_edit_form = new class {
 				}
 			})
 			.catch((exception) => {
-				for (const element of this.form.parentNode.children) {
+				for (const element of this.form_element.parentNode.children) {
 					if (element.matches('.msg-good, .msg-bad, .msg-warning')) {
 						element.parentNode.removeChild(element);
 					}
@@ -562,7 +643,7 @@ window.item_edit_form = new class {
 
 				const message_box = makeMessageBox('bad', messages, title)[0];
 
-				this.form.parentNode.insertBefore(message_box, this.form);
+				this.form_element.parentNode.insertBefore(message_box, this.form_element);
 				this.#updateActionButtons();
 			})
 			.finally(() => {
@@ -578,22 +659,6 @@ window.item_edit_form = new class {
 		return type == ITEM_TYPE_SIMPLE
 			? key.substr(0, 7) !== 'vmware.' && key.substr(0, 8) !== 'icmpping'
 			: this.testable_item_types.indexOf(type) != -1;
-	}
-
-	#isFormModified() {
-		const fields = this.#getFormFields(this.form);
-
-		fields.show_inherited_tags = this.initial_form_fields.show_inherited_tags;
-
-		if (!fields.tags.length) {
-			fields.tags.push({tag: '', value: ''});
-		}
-
-		return JSON.stringify(this.initial_form_fields) !== JSON.stringify(fields);
-	}
-
-	#isConfirmed() {
-		return window.confirm(<?= json_encode(_('Any changes made in the current form will be lost.')) ?>);
 	}
 
 	#updateActionButtons() {
@@ -614,9 +679,8 @@ window.item_edit_form = new class {
 		fields.forEach(id => switcher[action]({id}));
 	}
 
-	#updateTagsList(table) {
+	#updateTagsList(show_inherited_tags) {
 		const fields = this.#getFormFields();
-		const url = new Curl('zabbix.php');
 		const data = {
 			tags: fields.tags,
 			show_inherited_tags: fields.show_inherited_tags,
@@ -624,6 +688,7 @@ window.item_edit_form = new class {
 			hostid: fields.hostid
 		}
 
+		const url = new Curl('zabbix.php');
 		url.setArgument('action', 'item.tags.list');
 		this.overlay.setLoading();
 
@@ -634,14 +699,12 @@ window.item_edit_form = new class {
 		})
 			.then((response) => response.json())
 			.then((response) => {
-				const div = document.createElement('div');
-
-				div.innerHTML = response.body;
-
-				const new_table = div.firstChild;
-
-				table.replaceWith(new_table);
-				this.#initTagsTableEvents(new_table);
+				this.tags_table.innerHTML = response.body;
+			})
+			.catch((message) => {
+				this.form.addGeneralErrors({[t('Unexpected server error.')]: message});
+				this.form.renderErrors();
+				throw message;
 			})
 			.finally(() => {
 				this.overlay.unsetLoading();
@@ -649,34 +712,12 @@ window.item_edit_form = new class {
 			});
 	}
 
-	#initTagsTableEvents(table) {
-		const $table = jQuery(table);
-
-		$table
-			.dynamicRows({template: '#tag-row-tmpl', allow_empty: true})
-			.on('afteradd.dynamicRows', () => {
-				$(`.${ZBX_STYLE_TEXTAREA_FLEXIBLE}`, $table).textareaFlexible();
-			})
-			.find(`.${ZBX_STYLE_TEXTAREA_FLEXIBLE}`)
-			.textareaFlexible();
-
-		table.addEventListener('click', e => {
-			const target = e.target;
-
-			if (target.matches('.element-table-disable')) {
-				const type_input = target.closest('.form_row').querySelector('input[name$="[type]"]');
-
-				type_input.value &= ~ZBX_PROPERTY_OWN;
-			}
-		});
-	}
-
 	#updateTimeoutOverrideVisibility() {
 		const custom_timeout = [].filter.call(this.field.custom_timeout, e => e.matches(':checked')).pop();
 		const inherited_hidden = custom_timeout.value == ZBX_ITEM_CUSTOM_TIMEOUT_ENABLED;
 
-		this.form.inherited_timeout.classList.toggle(ZBX_STYLE_DISPLAY_NONE, inherited_hidden);
-		this.form.timeout.classList.toggle(ZBX_STYLE_DISPLAY_NONE, !inherited_hidden);
+		this.form_element.inherited_timeout.classList.toggle(ZBX_STYLE_DISPLAY_NONE, inherited_hidden);
+		this.form_element.timeout.classList.toggle(ZBX_STYLE_DISPLAY_NONE, !inherited_hidden);
 	}
 
 	#updateTimeoutVisibility() {
@@ -821,20 +862,17 @@ window.item_edit_form = new class {
 		}
 
 		this.updateFieldsVisibility();
+		this.form.validateChanges(['key']);
 	}
 
 	#keySelectClickHandler() {
 		PopUp('popup.generic', {
 			srctbl: 'help_items',
 			srcfld1: 'key',
-			dstfrm: this.form.getAttribute('name'),
+			dstfrm: this.form_element.getAttribute('name'),
 			dstfld1: 'key',
 			itemtype: this.field.type.value
 		}, {dialogue_class: 'modal-popup-generic'});
-	}
-
-	#inheritedTagsChangeHandler(e) {
-		this.#updateTagsList(this.form.querySelector('.tags-table'));
 	}
 
 	#openMasterItemPrototypePopup() {
@@ -842,10 +880,10 @@ window.item_edit_form = new class {
 			srctbl: 'item_prototypes',
 			srcfld1: 'itemid',
 			srcfld2: 'name',
-			dstfrm: this.form.getAttribute('name'),
+			dstfrm: this.form_element.getAttribute('name'),
 			dstfld1: 'master_itemid',
 			parent_discoveryid: this.form_data.parent_discoveryid,
-			excludeids: 'itemid' in this.form_data ? [this.form_data.itemid] : [],
+			excludeids: 'itemid' in this.form_data ? [this.form_data.itemid] : []
 		}
 
 		PopUp('popup.generic', parameters, {dialogue_class: 'modal-popup-generic'});

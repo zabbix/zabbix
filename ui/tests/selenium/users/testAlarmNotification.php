@@ -14,7 +14,7 @@
 **/
 
 
-require_once dirname(__FILE__) . '/../../include/CWebTest.php';
+require_once __DIR__ . '/../../include/CWebTest.php';
 
 /**
  * @backup profiles
@@ -39,7 +39,7 @@ class testAlarmNotification extends CWebTest {
 	protected static $maintenanceid;
 	protected static $eventids;
 	protected static $hostid;
-	const DEFAULT_COLORPICKER = 'xpath:./following::div[@class="color-picker"]';
+	const DEFAULT_COLORPICKER = 'xpath:./following::z-color-picker';
 
 	/**
 	 * Trigger names.
@@ -605,8 +605,8 @@ class testAlarmNotification extends CWebTest {
 	 */
 	public function testAlarmNotification_NotificationSettings($data) {
 		// Set checked trigger severity in messaging settings.
-		$this->page->login()->open('zabbix.php?action=userprofile.edit')->waitUntilReady();
-		$form = $this->query('id:user-form')->asForm()->one();
+		$this->page->login()->open('zabbix.php?action=userprofile.notification.edit')->waitUntilReady();
+		$form = $this->query('id:userprofile-notification-form')->asForm()->one();
 		$form->selectTab('Frontend notifications');
 		$form->fill($data['profile_setting']);
 		$form->submit();
@@ -626,7 +626,7 @@ class testAlarmNotification extends CWebTest {
 			self::$eventids = CDBHelper::setTriggerProblem(self::ALL_TRIGGERS);
 		}
 
-		$this->page->login()->open('zabbix.php?action=problem.view&acknowledgement_status=1&show_suppressed=1&sort=name&sortorder=ASC&hostids%5B%5D='.
+		$this->page->open('zabbix.php?action=problem.view&acknowledgement_status=1&show_suppressed=1&sort=name&sortorder=ASC&hostids%5B%5D='.
 				self::$hostid[self::HOST_NAME].'&hostids%5B%5D='.self::$hostid['Host for maintenance alarm'])->waitUntilReady();
 
 		// Check that problems displayed in table.
@@ -647,6 +647,9 @@ class testAlarmNotification extends CWebTest {
 			// Check close button.
 			$alarm_dialog->query('xpath:.//button[@title="Close"]')->one()->click()->waitUntilNotVisible();
 		}
+
+		// Delete the events so they don't appear in the next test case.
+		DB::delete('events', ['eventid' => self::$eventids]);
 	}
 
 	/**

@@ -200,8 +200,8 @@ void	__zbx_mock_assert_json_eq(const char *file, int line, const char *prefix_ms
 
 		if (0 != strcmp(pair_expected->first, pair_returned->first))
 		{
-			_FAIL(file, line, prefix_msg, "Expected key \"%s\" while got \"%s\"", pair_expected->first,
-					pair_returned->first);
+			_FAIL(file, line, prefix_msg, "Expected key \"%s\" while got \"%s\"",
+					(char *)pair_expected->first, (char *)pair_returned->first);
 		}
 
 		if ('/' == *(char *)pair_expected->second)
@@ -210,7 +210,7 @@ void	__zbx_mock_assert_json_eq(const char *file, int line, const char *prefix_ms
 			if (NULL == zbx_regexp_match(pair_returned->second, pattern, NULL))
 			{
 				_FAIL(file, line, prefix_msg, "Key \"%s\" value \"%s\" does not match pattern \"%s\"",
-						pair_returned->first, pair_returned->second, pattern);
+						(char *)pair_returned->first, (char *)pair_returned->second, pattern);
 			}
 		}
 		else
@@ -218,7 +218,8 @@ void	__zbx_mock_assert_json_eq(const char *file, int line, const char *prefix_ms
 			if (0 != strcmp(pair_expected->second, pair_returned->second))
 			{
 				_FAIL(file, line, prefix_msg, "Expected key \"%s\" value \"%s\" while got \"%s\"",
-						pair_expected->first, pair_expected->second, pair_returned->second);
+						(char *)pair_expected->first, (char *)pair_expected->second,
+						(char *)pair_returned->second);
 
 			}
 		}
@@ -227,13 +228,13 @@ void	__zbx_mock_assert_json_eq(const char *file, int line, const char *prefix_ms
 	if (i < props_expected.values_num)
 	{
 		zbx_ptr_pair_t	*pair_expected = &props_expected.values[i];
-		_FAIL(file, line, prefix_msg, "Expected key \"%s\" while got nothing", pair_expected->first);
+		_FAIL(file, line, prefix_msg, "Expected key \"%s\" while got nothing", (char *)pair_expected->first);
 	}
 
 	if (i < props_returned.values_num)
 	{
 		zbx_ptr_pair_t	*pair_returned = &props_returned.values[i];
-		_FAIL(file, line, prefix_msg, "Did not expect key \"%s\"", pair_returned->first);
+		_FAIL(file, line, prefix_msg, "Did not expect key \"%s\"", (char *)pair_returned->first);
 	}
 
 	for (i = 0; i < props_expected.values_num; i++)

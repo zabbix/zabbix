@@ -1,20 +1,15 @@
 /*
-** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2025 Zabbix SIA
 **
-** This program is free software; you can redistribute it and/or modify
-** it under the terms of the GNU General Public License as published by
-** the Free Software Foundation; either version 2 of the License, or
-** (at your option) any later version.
+** This program is free software: you can redistribute it and/or modify it under the terms of
+** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
 **
-** This program is distributed in the hope that it will be useful,
-** but WITHOUT ANY WARRANTY; without even the implied warranty of
-** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-** GNU General Public License for more details.
+** This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+** without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+** See the GNU Affero General Public License for more details.
 **
-** You should have received a copy of the GNU General Public License
-** along with this program; if not, write to the Free Software
-** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+** You should have received a copy of the GNU Affero General Public License along with this program.
+** If not, see <https://www.gnu.org/licenses/>.
 **/
 
 
@@ -145,7 +140,7 @@ class CFieldSet extends CField {
 				name_parts.shift();
 			}
 
-			result = objectSetDeepValue(result, name_parts, trim_value ? field.getValue() : field.getValueTrimmed());
+			result = objectSetDeepValue(result, name_parts, trim_value ? field.getValueTrimmed() : field.getValue());
 		}
 
 		return result;
@@ -217,21 +212,21 @@ class CFieldSet extends CField {
 						|| field_errors.some((error) => error.message === '' || error.level == CFormValidator.ERROR_LEVEL_UNIQ)) {
 					field_errors.forEach((error) => this.#fields[key_full].setErrors(error));
 
-					missing_field_errors = {...missing_field_errors, ...this.#fields[key_full].getGlobalErrors()};
+					this._global_errors = {...this._global_errors, ...this.#fields[key_full].getGlobalErrors()};
 				}
 			}
 			else if (errors[key] !== '') {
 				// Field is not present in fields, display generic error.
-				const extended_name = this.getName() + key;
-				const missing_errors = field_errors.filter(error => error.message !== '').map(error => error.message);
+				let extended_name = this.getName() + key;
+				extended_name = '/' + extended_name.replaceAll('[', '/').replaceAll(']', '');
 
-				if (missing_errors.length != 0) {
-					missing_field_errors[extended_name] = missing_errors;
-				}
+				field_errors.forEach(error => {
+					if (error.message !== '') {
+						console.log('Validation error for missing field "' + extended_name + '": ' + error.message);
+					}
+				});
 			}
 		}
-
-		this._global_errors = {...this._global_errors, ...missing_field_errors};
 	}
 
 	focusErrorField() {

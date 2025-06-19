@@ -1,0 +1,220 @@
+---
+test case: Expand '={?{last(/{HOST.KEY}/key[{#A}]}}=' with {#A}=[]
+in:
+  flags: [ZBX_MACRO_ANY, ZBX_TOKEN_EXPRESSION_MACRO]
+  lld: '{"a":"[]"}'
+  macros:
+    - {macro: '{#A}', path: $.a}
+  expression: '={?{last(/{HOST.KEY}/key[{#A}]}}='
+out:
+  expression: '={?{last(/{HOST.KEY}/key[[]]}}='
+  return: SUCCEED
+---
+test case: Expand 'Expression:{?last(/host/key) = "{#A}" }.' with {#A}=value:"xyz"
+in:
+  flags: [ZBX_MACRO_ANY, ZBX_TOKEN_EXPRESSION_MACRO]
+  lld: '{"a":"value:\"xyz\""}'
+  macros:
+    - {macro: '{#A}', path: $.a}
+  expression: 'Expression:{?last(/host/key) = "{#A}" }.'
+out:
+  expression: 'Expression:{?last(/host/key) = "value:\"xyz\"" }.'
+  return: SUCCEED
+---
+test case: Expand '={?last(/host/key[{#A}],,{#A})}=' with {#A}=()
+in:
+  flags: [ZBX_MACRO_ANY, ZBX_TOKEN_EXPRESSION_MACRO]
+  lld: '{"a":"()"}'
+  macros:
+    - {macro: '{#A}', path: $.a}
+  expression: '={?last(/host/key[{#A}],,{#A})}='
+out:
+  expression: '={?last(/host/key[()],,"()")}='
+  return: SUCCEED
+---
+test case: Expand '={?func({#A})}=' with {#A}=()
+in:
+  flags: [ZBX_MACRO_ANY, ZBX_TOKEN_EXPRESSION_MACRO]
+  lld: '{"a":"()"}'
+  macros:
+    - {macro: '{#A}', path: $.a}
+  expression: '={?func({#A})}='
+out:
+  expression: '={?func("()")}='
+  return: SUCCEED
+---
+test case: Expand '{?{$MACRO:"{#A}"} {?last(/host/key[{#B1},{#B2}],{#B1},{#B2})}' with {#A}=x"z, {#B1}=[], {#B2}=()
+in:
+  flags: [ZBX_MACRO_ANY, ZBX_TOKEN_EXPRESSION_MACRO]
+  lld: '{"a":"x\"z", "b1":"[]", "b2":"()"}'
+  macros:
+    - {macro: '{#A}', path: $.a}
+    - {macro: '{#B1}', path: $.b1}
+    - {macro: '{#B2}', path: $.b2}
+  expression: '{?{$MACRO:"{#A}"} {?last(/host/key[{#B1},{#B2}],{#B1},{#B2})}'
+out:
+  expression: '{?{$MACRO:"x\"z"} {?last(/host/key["[]",()],[],"()")}'
+  return: SUCCEED
+---
+test case: Expand '{?last(/host/key[{#B1},{#B2}],{#B1},{#B2})} last(/host/key[{#B1},{#B2}],{#B1},{#B2})' with {#B1}=[], {#B2}=()
+in:
+  flags: [ZBX_MACRO_ANY, ZBX_TOKEN_EXPRESSION_MACRO]
+  lld: '{"b1":"[]", "b2":"()"}'
+  macros:
+    - {macro: '{#B1}', path: $.b1}
+    - {macro: '{#B2}', path: $.b2}
+  expression: '{?last(/host/key[{#B1},{#B2}],{#B1},{#B2})} last(/host/key[{#B1},{#B2}],{#B1},{#B2})'
+out:
+  expression: '{?last(/host/key["[]",()],[],"()")} last(/host/key[[],()],[],())'
+  return: SUCCEED
+---
+test case: Expand '{?last(/host/key[{#B1},{#B2}],{#B1},{#B2})} {?last(/host/key[{#B2},{#B1}],{#B2},{#B1})}' with {#B1}=[], {#B2}=()
+in:
+  flags: [ZBX_MACRO_ANY, ZBX_TOKEN_EXPRESSION_MACRO]
+  lld: '{"b1":"[]", "b2":"()"}'
+  macros:
+    - {macro: '{#B1}', path: $.b1}
+    - {macro: '{#B2}', path: $.b2}
+  expression: '{?last(/host/key[{#B1},{#B2}],{#B1},{#B2})} {?last(/host/key[{#B2},{#B1}],{#B2},{#B1})}'
+out:
+  expression: '{?last(/host/key["[]",()],[],"()")} {?last(/host/key[(),"[]"],(),"[]")}'
+  return: SUCCEED
+---
+test case: Expand 'Expression:{?last(/host/key) {#A} }.' with {#A}='= "xyz"'
+in:
+  flags: [ZBX_MACRO_ANY, ZBX_TOKEN_EXPRESSION_MACRO]
+  lld: '{"a":"= \"xyz\""}'
+  macros:
+    - {macro: '{#A}', path: $.a}
+  expression: 'Expression:{?last(/host/key) {#A} }.'
+out:
+  expression: 'Expression:{?last(/host/key) = "xyz" }.'
+  return: SUCCEED
+---
+test case: Expand '={?{last(/{HOST.KEY}/key[{{#A}.regsub("2","\0")}]}}=' with {#A}=123
+in:
+  flags: [ZBX_MACRO_ANY, ZBX_TOKEN_EXPRESSION_MACRO]
+  lld: '{"a":"123"}'
+  macros:
+    - {macro: '{#A}', path: $.a}
+  expression: '={?{last(/{HOST.KEY}/key[{{#A}.regsub("2","\0")}]}}='
+out:
+  expression: '={?{last(/{HOST.KEY}/key[2]}}='
+  return: SUCCEED
+---
+test case: Expand '={?{last(/{HOST.KEY}/key[{{#A}.iregsub("a","\0")}]}}=' with {#A}=ABC
+in:
+  flags: [ZBX_MACRO_ANY, ZBX_TOKEN_EXPRESSION_MACRO]
+  lld: '{"a":"ABC"}'
+  macros:
+    - {macro: '{#A}', path: $.a}
+  expression: '={?{last(/{HOST.KEY}/key[{{#A}.iregsub("a","\0")}]}}='
+out:
+  expression: '={?{last(/{HOST.KEY}/key[A]}}='
+  return: SUCCEED
+---
+test case: Expand '={?{last(/{HOST.KEY}/key[{{#A}.fmtnum(1)}]}}=' with {#A}=123.456
+in:
+  flags: [ZBX_MACRO_ANY, ZBX_TOKEN_EXPRESSION_MACRO]
+  lld: '{"a":"123.456"}'
+  macros:
+    - {macro: '{#A}', path: $.a}
+  expression: '={?{last(/{HOST.KEY}/key[{{#A}.fmtnum(1)}]}}='
+out:
+  expression: '={?{last(/{HOST.KEY}/key[123.5]}}='
+  return: SUCCEED
+---
+test case: Expand '{{ITEM.VALUE}.regsub({#A}, \1, "\1")}' with {#A}=(.*) and no macro function support
+in:
+  flags: [ZBX_MACRO_ANY, ZBX_TOKEN_EXPRESSION_MACRO]
+  lld: '{"a":"(.*)"}'
+  macros:
+    - {macro: '{#A}', path: $.a}
+  expression: '{{ITEM.VALUE}.regsub({#A}, \1, "\1")}'
+out:
+  expression: '{{ITEM.VALUE}.regsub((.*), \1, "\1")}'
+  return: SUCCEED
+---
+test case: Expand '{{ITEM.VALUE}.regsub({#A}, \1, "\1")}' with {#A}=(.*)
+in:
+  flags: [ZBX_MACRO_ANY, ZBX_TOKEN_EXPRESSION_MACRO, ZBX_MACRO_FUNC]
+  lld: '{"a":"(.*)"}'
+  macros:
+    - {macro: '{#A}', path: $.a}
+  expression: '{{ITEM.VALUE}.regsub({#A}, \1, "\1")}'
+out:
+  expression: '{{ITEM.VALUE}.regsub("(.*)", \1, "\1")}'
+  return: SUCCEED
+---
+test case: Expand '{{$MACRO}.regsub({#A}, \1, "\1")}' with {#A}=(.*)
+in:
+  flags: [ZBX_MACRO_ANY, ZBX_TOKEN_EXPRESSION_MACRO, ZBX_MACRO_FUNC]
+  lld: '{"a":"(.*)"}'
+  macros:
+    - {macro: '{#A}', path: $.a}
+  expression: '{{$MACRO}.regsub({#A}, \1, "\1")}'
+out:
+  expression: '{{$MACRO}.regsub("(.*)", \1, "\1")}'
+  return: SUCCEED
+---
+test case: Expand '{{$MACRO}.regsub({#A}, \\1, "\\1")}' with {#A}=(.*)
+in:
+  flags: [ZBX_MACRO_ANY, ZBX_TOKEN_EXPRESSION_MACRO, ZBX_MACRO_FUNC]
+  lld: '{"a":"(.*)"}'
+  macros:
+    - {macro: '{#A}', path: $.a}
+  expression: '{{$MACRO}.regsub({#A}, \\1, "\\1")}'
+out:
+  expression: '{{$MACRO}.regsub("(.*)", \\1, "\\1")}'
+  return: SUCCEED
+---
+test case: Expand '{?concat(/host/key[{#A}],"\\{#A}")}' with {#A}=\
+in:
+  flags: [ZBX_MACRO_ANY, ZBX_TOKEN_EXPRESSION_MACRO]
+  lld: '{"a":"\\"}'
+  macros:
+    - {macro: '{#A}', path: $.a}
+  expression: '{?concat(last(/host/key[{#A}]),"\\{#A}",{#A})}'
+out:
+  expression: '{?concat(last(/host/key[\]),"\\\\","\\")}'
+  return: SUCCEED
+---
+test case: Expand '{?{$MACRO:"{#A}"}}' with {#A}=c:\
+in:
+  flags: [ZBX_MACRO_ANY, ZBX_TOKEN_EXPRESSION_MACRO]
+  lld: '{"{#A}":"c:\\"}'
+  macros: []
+  expression: '{?{$MACRO:"{#A}"}}'
+out:
+  expression: '{?{$MACRO:c:\}}'
+  return: SUCCEED
+---
+test case: 'Expand ''{?{$MACRO:"{#A}"}}'' with {#A}=c:'
+in:
+  flags: [ZBX_MACRO_ANY, ZBX_TOKEN_EXPRESSION_MACRO]
+  lld: '{"{#A}":"c:"}'
+  macros: []
+  expression: '{?{$MACRO:"{#A}"}}'
+out:
+  expression: '{?{$MACRO:"c:"}}'
+  return: SUCCEED
+---
+test case: Expand '{?{$MACRO:"{#A}"}}' with {#A}=c}:\
+in:
+  flags: [ZBX_MACRO_ANY, ZBX_TOKEN_EXPRESSION_MACRO]
+  lld: '{"{#A}":"c}:\\"}'
+  macros: []
+  expression: '{?{$MACRO:"{#A}"}}'
+out:
+  return: FAIL
+---
+test case: Expand '{?{$MACRO:"{#A}"}}' with {#A}=c:\\
+in:
+  flags: [ZBX_MACRO_ANY, ZBX_TOKEN_EXPRESSION_MACRO]
+  lld: '{"{#A}":"c:\\\\"}'
+  macros: []
+  expression: '{?{$MACRO:"{#A}"}}'
+out:
+  expression: '{?{$MACRO:c:\\}}'
+  return: SUCCEED
+...

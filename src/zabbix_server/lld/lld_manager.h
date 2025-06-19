@@ -50,6 +50,9 @@ typedef struct
 
 	/* the oldest value in queue */
 	zbx_lld_data_t	*head;
+
+	/* possible duplicate data */
+	zbx_lld_data_t	*dup;
 }
 zbx_lld_rule_t;
 

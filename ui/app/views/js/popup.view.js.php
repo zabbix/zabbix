@@ -22,10 +22,27 @@
 <script>
 	const view = new class {
 
-	init({action, options}) {
-		const popup_manager = new Popupmanager();
+		init({action, action_parameters}) {
+			ZABBIX.EventHub.subscribe({
+				require: {
+					context: CPopupManager.EVENT_CONTEXT,
+					event: CPopupManagerEvent.EVENT_SUBMIT,
+					action: 'host.wizard.edit'
+				},
+				callback: ({data, event}) => {
+					if (data.submit.redirect_latest) {
+						const url = new URL('zabbix.php', location.href);
 
-		popup_manager.openPopup(action, options, true);
-	}
-};
+						url.searchParams.set('action', 'latest.view');
+						url.searchParams.set('hostids[]', data.submit.hostid);
+						url.searchParams.set('filter_set', '1');
+
+						event.setRedirectUrl(url.href);
+					}
+				}
+			});
+
+			ZABBIX.PopupManager.open(action, action_parameters, {supports_standalone: true});
+		}
+	};
 </script>

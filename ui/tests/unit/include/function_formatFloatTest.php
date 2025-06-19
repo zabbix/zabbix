@@ -44,7 +44,7 @@ class function_formatFloatTest extends TestCase {
 			[1E+6,					['precision' => 4],	'1000000'],
 			[1E+7,					['precision' => 4],	'1E+7'],
 			[1.4E+100,				['precision' => 4],	'1E+100'],
-			[1.5E+100,				['precision' => 4],	'2E+100'],
+			[1.5E+10,				['precision' => 4],	'2E+10'],
 
 			[1.004E+100,			['precision' => 4, 'decimals' => 2],	'1E+100'],
 			[1.005E+100,			['precision' => 4, 'decimals' => 2],	'1.01E+100'],
@@ -95,7 +95,7 @@ class function_formatFloatTest extends TestCase {
 			[1E+6,					['precision' => 4, 'small_scientific' => false],	'1000000'],
 			[1E+7,					['precision' => 4, 'small_scientific' => false],	'1E+7'],
 			[1.4E+100,				['precision' => 4, 'small_scientific' => false],	'1E+100'],
-			[1.5E+100,				['precision' => 4, 'small_scientific' => false],	'2E+100'],
+			[1.5E+10,				['precision' => 4, 'small_scientific' => false],	'2E+10'],
 
 			[1.004E+100,			['precision' => 4, 'decimals' => 2, 'small_scientific' => false],	'1E+100'],
 			[1.005E+100,			['precision' => 4, 'decimals' => 2, 'small_scientific' => false],	'1.01E+100'],

@@ -37,7 +37,7 @@ class CExpressionParser extends CParser {
 	 *
 	 * @var string
 	 */
-	private $error = '';
+	protected $error = '';
 
 	/**
 	 * An options array.
@@ -56,7 +56,7 @@ class CExpressionParser extends CParser {
 	 *
 	 * @var array
 	 */
-	private $options = [
+	protected $options = [
 		'usermacros' => false,
 		'lldmacros' => false,
 		'collapsed_expression' => false,
@@ -154,7 +154,7 @@ class CExpressionParser extends CParser {
 	 * @return bool  Returns true if parsed successfully, false otherwise.
 	 */
 	private static function parseExpression(string $source, int &$pos, array &$tokens, array $options,
-			int &$parsed_pos = null, int $depth = 0): bool {
+			?int &$parsed_pos = null, int $depth = 0): bool {
 		$binary_operator_parser = new CSetParser(['<', '>', '<=', '>=', '+', '-', '/', '*', '=', '<>']);
 		$logical_operator_parser = new CSetParser(['and', 'or']);
 

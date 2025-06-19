@@ -17,9 +17,8 @@
 
 #include "zbxalgo.h"
 #include "zbxjson.h"
-#include "zbxdbhigh.h"
 #include "zbxcacheconfig.h"
-#include "zbxregexp.h"
+#include "zbxdbhigh.h"
 
 typedef struct zbx_lld_item_full_s zbx_lld_item_full_t;
 typedef struct zbx_lld_dependency_s zbx_lld_dependency_t;
@@ -50,41 +49,65 @@ zbx_lld_item_link_t;
 ZBX_PTR_VECTOR_DECL(lld_item_link_ptr, zbx_lld_item_link_t*)
 
 int	lld_item_link_compare_func(const void *d1, const void *d2);
+void	lld_item_link_free(zbx_lld_item_link_t *item_link);
 
-/* lld rule filter condition (item_condition table record) */
-typedef struct
-{
-	zbx_uint64_t		id;
-	char			*macro;
-	char			*regexp;
-	zbx_vector_expression_t	regexps;
-	unsigned char		op;
-}
-lld_condition_t;
-
-ZBX_PTR_VECTOR_DECL(lld_condition_ptr, lld_condition_t*)
-
-/* lld rule filter */
-typedef struct
-{
-	zbx_vector_lld_condition_ptr_t	conditions;
-	char				*expression;
-	int				evaltype;
-}
-zbx_lld_filter_t;
-
-typedef struct
-{
-	zbx_uint64_t	id;
-	char		*name;
-}
-zbx_id_name_pair_t;
 
 #define ZBX_LLD_DISCOVERY_STATUS_NORMAL		0
 #define ZBX_LLD_DISCOVERY_STATUS_LOST		1
 
 #define ZBX_LLD_OBJECT_STATUS_ENABLED		0
 #define ZBX_LLD_OBJECT_STATUS_DISABLED		1
+
+typedef struct
+{
+	char	*lld_macro;
+	char	*path;
+}
+zbx_lld_macro_path_t;
+
+ZBX_PTR_VECTOR_DECL(lld_macro_path_ptr, zbx_lld_macro_path_t *)
+
+int	zbx_lld_macro_paths_get(zbx_uint64_t lld_ruleid, zbx_vector_lld_macro_path_ptr_t *lld_macro_paths,
+		char **error);
+void	zbx_lld_macro_path_free(zbx_lld_macro_path_t *lld_macro_path);
+int	zbx_lld_macro_paths_compare(const void *d1, const void *d2);
+zbx_lld_macro_path_t	*lld_macro_path_create(const char *lld_macro, const char *path);
+
+typedef struct
+{
+	char	*macro;
+	char	*value;
+}
+zbx_lld_macro_t;
+
+ZBX_VECTOR_DECL(lld_macro, zbx_lld_macro_t)
+
+/* LLD macros extracted from LLD row */
+typedef struct
+{
+	zbx_vector_lld_macro_t	macros;
+	zbx_vector_lld_macro_t	*exported_macros;
+	const zbx_jsonobj_t	*source;
+}
+zbx_lld_entry_t;
+
+ZBX_PTR_VECTOR_DECL(lld_entry_ptr, zbx_lld_entry_t *)
+
+void	lld_entry_clear(zbx_lld_entry_t *entry);
+
+zbx_hash_t	lld_entry_hash(const void *data);
+int	lld_entry_compare(const void *d1, const void *d2);
+void	lld_entry_snprintf_alloc(const zbx_lld_entry_t *entry, char **str, size_t *str_alloc, size_t *str_offset);
+const char	*lld_entry_get_macro(const zbx_lld_entry_t *entry, const char *macro);
+
+int	lld_extract_entries(zbx_hashset_t *entries, zbx_vector_lld_entry_ptr_t *entries_sorted,
+		const zbx_jsonobj_t *lld_obj, const zbx_vector_lld_macro_path_ptr_t *lld_macro_paths, char **error);
+void	lld_free_entries(zbx_hashset_t *entries);
+int	lld_compare_entries(const zbx_hashset_t *entries1, const zbx_hashset_t *entries2);
+
+int	lld_macro_value_by_name(const zbx_lld_entry_t *lld_obj, const char *macro, char **value);
+void	lld_macro_clear(zbx_lld_macro_t *macro);
+int	lld_macro_compare(const void *d1, const void *d2);
 
 /* lld rule lifetime */
 typedef struct
@@ -98,28 +121,17 @@ typedef struct
 }
 zbx_lld_lifetime_t;
 
-/* lld rule override */
 typedef struct
 {
-	zbx_uint64_t				overrideid;
-	zbx_lld_filter_t			filter;
-	zbx_vector_lld_override_operation_t	override_operations;
-	int					step;
-	unsigned char				stop;
-}
-zbx_lld_override_t;
-
-ZBX_PTR_VECTOR_DECL(lld_override_ptr, zbx_lld_override_t*)
-
-typedef struct
-{
-	struct zbx_json_parse		jp_row;
+	const zbx_lld_entry_t		*data;
 	zbx_vector_lld_item_link_ptr_t	item_links;	/* the list of item prototypes */
 	zbx_vector_lld_override_ptr_t	overrides;
 }
 zbx_lld_row_t;
 
 ZBX_PTR_VECTOR_DECL(lld_row_ptr, zbx_lld_row_t*)
+
+void	lld_row_free(zbx_lld_row_t *lld_row);
 
 typedef struct
 {
@@ -153,6 +165,22 @@ typedef struct
 zbx_lld_item_preproc_t;
 
 ZBX_PTR_VECTOR_DECL(lld_item_preproc_ptr, zbx_lld_item_preproc_t*)
+
+typedef struct
+{
+	zbx_uint64_t		overrideid;
+	zbx_sync_rowset_t	conditions;
+	zbx_sync_rowset_t	operations;
+	zbx_sync_rowset_t	optags;
+	zbx_sync_rowset_t	optemplates;
+}
+zbx_lld_override_data_t;
+
+ZBX_PTR_VECTOR_DECL(lld_override_data_ptr, zbx_lld_override_data_t *)
+
+zbx_lld_override_data_t *lld_override_data_create(zbx_uint64_t overrideid);
+void	lld_override_data_free(void *v);
+int	lld_override_data_compare(const void *v1, const void *v2);
 
 typedef struct
 {
@@ -207,6 +235,17 @@ typedef struct
 	zbx_vector_db_tag_ptr_t			item_tags;
 	zbx_hashset_t				item_index;
 	zbx_vector_str_t			keys;		/* keys used to create items from this prototype */
+
+	char					*lifetime;
+	char					*enabled_lifetime;
+	int					lifetime_type;
+	int					enabled_lifetime_type;
+	int					evaltype;
+	int					item_flags;
+
+	zbx_sync_rowset_t			macro_paths;
+	zbx_sync_rowset_t                       filters;
+	zbx_sync_rowset_t			overrides;
 }
 zbx_lld_item_prototype_t;
 
@@ -226,44 +265,51 @@ struct zbx_lld_item_full_s
 #define ZBX_FLAG_LLD_ITEM_UPDATE_KEY			__UINT64_C(0x0000000000000004)
 #define ZBX_FLAG_LLD_ITEM_UPDATE_TYPE			__UINT64_C(0x0000000000000008)
 #define ZBX_FLAG_LLD_ITEM_UPDATE_VALUE_TYPE		__UINT64_C(0x0000000000000010)
-#define ZBX_FLAG_LLD_ITEM_UPDATE_DELAY			__UINT64_C(0x0000000000000040)
-#define ZBX_FLAG_LLD_ITEM_UPDATE_HISTORY		__UINT64_C(0x0000000000000100)
-#define ZBX_FLAG_LLD_ITEM_UPDATE_TRENDS			__UINT64_C(0x0000000000000200)
-#define ZBX_FLAG_LLD_ITEM_UPDATE_TRAPPER_HOSTS		__UINT64_C(0x0000000000000400)
-#define ZBX_FLAG_LLD_ITEM_UPDATE_UNITS			__UINT64_C(0x0000000000000800)
-#define ZBX_FLAG_LLD_ITEM_UPDATE_FORMULA		__UINT64_C(0x0000000000004000)
-#define ZBX_FLAG_LLD_ITEM_UPDATE_LOGTIMEFMT		__UINT64_C(0x0000000000008000)
-#define ZBX_FLAG_LLD_ITEM_UPDATE_VALUEMAPID		__UINT64_C(0x0000000000010000)
-#define ZBX_FLAG_LLD_ITEM_UPDATE_PARAMS			__UINT64_C(0x0000000000020000)
-#define ZBX_FLAG_LLD_ITEM_UPDATE_IPMI_SENSOR		__UINT64_C(0x0000000000040000)
-#define ZBX_FLAG_LLD_ITEM_UPDATE_SNMP_OID		__UINT64_C(0x0000000000100000)
-#define ZBX_FLAG_LLD_ITEM_UPDATE_AUTHTYPE		__UINT64_C(0x0000000010000000)
-#define ZBX_FLAG_LLD_ITEM_UPDATE_USERNAME		__UINT64_C(0x0000000020000000)
-#define ZBX_FLAG_LLD_ITEM_UPDATE_PASSWORD		__UINT64_C(0x0000000040000000)
-#define ZBX_FLAG_LLD_ITEM_UPDATE_PUBLICKEY		__UINT64_C(0x0000000080000000)
-#define ZBX_FLAG_LLD_ITEM_UPDATE_PRIVATEKEY		__UINT64_C(0x0000000100000000)
-#define ZBX_FLAG_LLD_ITEM_UPDATE_DESCRIPTION		__UINT64_C(0x0000000200000000)
-#define ZBX_FLAG_LLD_ITEM_UPDATE_INTERFACEID		__UINT64_C(0x0000000400000000)
-#define ZBX_FLAG_LLD_ITEM_UPDATE_JMX_ENDPOINT		__UINT64_C(0x0000001000000000)
-#define ZBX_FLAG_LLD_ITEM_UPDATE_MASTER_ITEM		__UINT64_C(0x0000002000000000)
-#define ZBX_FLAG_LLD_ITEM_UPDATE_TIMEOUT		__UINT64_C(0x0000004000000000)
-#define ZBX_FLAG_LLD_ITEM_UPDATE_URL			__UINT64_C(0x0000008000000000)
-#define ZBX_FLAG_LLD_ITEM_UPDATE_QUERY_FIELDS		__UINT64_C(0x0000010000000000)
-#define ZBX_FLAG_LLD_ITEM_UPDATE_POSTS			__UINT64_C(0x0000020000000000)
-#define ZBX_FLAG_LLD_ITEM_UPDATE_STATUS_CODES		__UINT64_C(0x0000040000000000)
-#define ZBX_FLAG_LLD_ITEM_UPDATE_FOLLOW_REDIRECTS	__UINT64_C(0x0000080000000000)
-#define ZBX_FLAG_LLD_ITEM_UPDATE_POST_TYPE		__UINT64_C(0x0000100000000000)
-#define ZBX_FLAG_LLD_ITEM_UPDATE_HTTP_PROXY		__UINT64_C(0x0000200000000000)
-#define ZBX_FLAG_LLD_ITEM_UPDATE_HEADERS		__UINT64_C(0x0000400000000000)
-#define ZBX_FLAG_LLD_ITEM_UPDATE_RETRIEVE_MODE		__UINT64_C(0x0000800000000000)
-#define ZBX_FLAG_LLD_ITEM_UPDATE_REQUEST_METHOD		__UINT64_C(0x0001000000000000)
-#define ZBX_FLAG_LLD_ITEM_UPDATE_OUTPUT_FORMAT		__UINT64_C(0x0002000000000000)
-#define ZBX_FLAG_LLD_ITEM_UPDATE_SSL_CERT_FILE		__UINT64_C(0x0004000000000000)
-#define ZBX_FLAG_LLD_ITEM_UPDATE_SSL_KEY_FILE		__UINT64_C(0x0008000000000000)
-#define ZBX_FLAG_LLD_ITEM_UPDATE_SSL_KEY_PASSWORD	__UINT64_C(0x0010000000000000)
-#define ZBX_FLAG_LLD_ITEM_UPDATE_VERIFY_PEER		__UINT64_C(0x0020000000000000)
-#define ZBX_FLAG_LLD_ITEM_UPDATE_VERIFY_HOST		__UINT64_C(0x0040000000000000)
-#define ZBX_FLAG_LLD_ITEM_UPDATE_ALLOW_TRAPS		__UINT64_C(0x0080000000000000)
+#define ZBX_FLAG_LLD_ITEM_UPDATE_DELAY			__UINT64_C(0x0000000000000020)
+#define ZBX_FLAG_LLD_ITEM_UPDATE_HISTORY		__UINT64_C(0x0000000000000040)
+#define ZBX_FLAG_LLD_ITEM_UPDATE_TRENDS			__UINT64_C(0x0000000000000080)
+#define ZBX_FLAG_LLD_ITEM_UPDATE_TRAPPER_HOSTS		__UINT64_C(0x0000000000000100)
+#define ZBX_FLAG_LLD_ITEM_UPDATE_UNITS			__UINT64_C(0x0000000000000200)
+#define ZBX_FLAG_LLD_ITEM_UPDATE_FORMULA		__UINT64_C(0x0000000000000400)
+#define ZBX_FLAG_LLD_ITEM_UPDATE_LOGTIMEFMT		__UINT64_C(0x0000000000000800)
+#define ZBX_FLAG_LLD_ITEM_UPDATE_VALUEMAPID		__UINT64_C(0x0000000000001000)
+#define ZBX_FLAG_LLD_ITEM_UPDATE_PARAMS			__UINT64_C(0x0000000000002000)
+#define ZBX_FLAG_LLD_ITEM_UPDATE_IPMI_SENSOR		__UINT64_C(0x0000000000004000)
+#define ZBX_FLAG_LLD_ITEM_UPDATE_SNMP_OID		__UINT64_C(0x0000000000008000)
+#define ZBX_FLAG_LLD_ITEM_UPDATE_AUTHTYPE		__UINT64_C(0x0000000000010000)
+#define ZBX_FLAG_LLD_ITEM_UPDATE_USERNAME		__UINT64_C(0x0000000000020000)
+#define ZBX_FLAG_LLD_ITEM_UPDATE_PASSWORD		__UINT64_C(0x0000000000040000)
+#define ZBX_FLAG_LLD_ITEM_UPDATE_PUBLICKEY		__UINT64_C(0x0000000000080000)
+#define ZBX_FLAG_LLD_ITEM_UPDATE_PRIVATEKEY		__UINT64_C(0x0000000000100000)
+#define ZBX_FLAG_LLD_ITEM_UPDATE_DESCRIPTION		__UINT64_C(0x0000000000200000)
+#define ZBX_FLAG_LLD_ITEM_UPDATE_INTERFACEID		__UINT64_C(0x0000000000400000)
+#define ZBX_FLAG_LLD_ITEM_UPDATE_JMX_ENDPOINT		__UINT64_C(0x0000000000800000)
+#define ZBX_FLAG_LLD_ITEM_UPDATE_MASTER_ITEM		__UINT64_C(0x0000000001000000)
+#define ZBX_FLAG_LLD_ITEM_UPDATE_TIMEOUT		__UINT64_C(0x0000000002000000)
+#define ZBX_FLAG_LLD_ITEM_UPDATE_URL			__UINT64_C(0x0000000004000000)
+#define ZBX_FLAG_LLD_ITEM_UPDATE_QUERY_FIELDS		__UINT64_C(0x0000000008000000)
+#define ZBX_FLAG_LLD_ITEM_UPDATE_POSTS			__UINT64_C(0x0000000010000000)
+#define ZBX_FLAG_LLD_ITEM_UPDATE_STATUS_CODES		__UINT64_C(0x0000000020000000)
+#define ZBX_FLAG_LLD_ITEM_UPDATE_FOLLOW_REDIRECTS	__UINT64_C(0x0000000040000000)
+#define ZBX_FLAG_LLD_ITEM_UPDATE_POST_TYPE		__UINT64_C(0x0000000080000000)
+#define ZBX_FLAG_LLD_ITEM_UPDATE_HTTP_PROXY		__UINT64_C(0x0000000100000000)
+#define ZBX_FLAG_LLD_ITEM_UPDATE_HEADERS		__UINT64_C(0x0000000200000000)
+#define ZBX_FLAG_LLD_ITEM_UPDATE_RETRIEVE_MODE		__UINT64_C(0x0000000400000000)
+#define ZBX_FLAG_LLD_ITEM_UPDATE_REQUEST_METHOD		__UINT64_C(0x0000000800000000)
+#define ZBX_FLAG_LLD_ITEM_UPDATE_OUTPUT_FORMAT		__UINT64_C(0x0000001000000000)
+#define ZBX_FLAG_LLD_ITEM_UPDATE_SSL_CERT_FILE		__UINT64_C(0x0000002000000000)
+#define ZBX_FLAG_LLD_ITEM_UPDATE_SSL_KEY_FILE		__UINT64_C(0x0000004000000000)
+#define ZBX_FLAG_LLD_ITEM_UPDATE_SSL_KEY_PASSWORD	__UINT64_C(0x0000008000000000)
+#define ZBX_FLAG_LLD_ITEM_UPDATE_VERIFY_PEER		__UINT64_C(0x0000010000000000)
+#define ZBX_FLAG_LLD_ITEM_UPDATE_VERIFY_HOST		__UINT64_C(0x0000020000000000)
+#define ZBX_FLAG_LLD_ITEM_UPDATE_ALLOW_TRAPS		__UINT64_C(0x0000040000000000)
+#define ZBX_FLAG_LLD_ITEM_UPDATE_LIFETIME		__UINT64_C(0x0000080000000000)
+#define ZBX_FLAG_LLD_ITEM_UPDATE_LIFETIME_TYPE		__UINT64_C(0x0000100000000000)
+#define ZBX_FLAG_LLD_ITEM_UPDATE_ENABLED_LIFETIME	__UINT64_C(0x0000200000000000)
+#define ZBX_FLAG_LLD_ITEM_UPDATE_ENABLED_LIFETIME_TYPE	__UINT64_C(0x0000400000000000)
+#define ZBX_FLAG_LLD_ITEM_UPDATE_EVALTYPE		__UINT64_C(0x0000800000000000)
+#define ZBX_FLAG_LLD_ITEM_UPDATE_STATUS			__UINT64_C(0x0001000000000000)
+#define ZBX_FLAG_LLD_ITEM_UPDATE_DISCOVER		__UINT64_C(0x0002000000000000)
 #define ZBX_FLAG_LLD_ITEM_UPDATE			(~ZBX_FLAG_LLD_ITEM_DISCOVERED)
 	zbx_uint64_t				flags;
 	char					*key_proto;
@@ -313,22 +359,27 @@ struct zbx_lld_item_full_s
 	char					*ssl_key_file;
 	char					*ssl_key_password_orig;
 	char					*ssl_key_password;
-	int					lastcheck;
 	unsigned char				discovery_status;
+	int					lastcheck;
 	int					ts_delete;
 	int					ts_disable;
 	unsigned char				disable_source;
 	const zbx_lld_row_t			*lld_row;
+	const zbx_lld_item_prototype_t		*prototype;
 	zbx_vector_lld_item_preproc_ptr_t	preproc_ops;
 	zbx_vector_lld_item_full_ptr_t		dependent_items;
 	zbx_vector_item_param_ptr_t		item_params;
 	zbx_vector_db_tag_ptr_t			item_tags;
 	zbx_vector_db_tag_ptr_t			override_tags;
 	unsigned char				status;
+	unsigned char				status_orig;
 	unsigned char				type_orig;
 	unsigned char				type;
 	unsigned char				value_type_orig;
+	unsigned char				discover;
+	unsigned char				discover_orig;
 	char					*trapper_hosts_orig;
+	char					*formula;
 	char					*formula_orig;
 	char					*logtimefmt_orig;
 	zbx_uint64_t				valuemapid_orig;
@@ -344,7 +395,25 @@ struct zbx_lld_item_full_s
 	unsigned char				verify_peer_orig;
 	unsigned char				verify_host_orig;
 	unsigned char				allow_traps_orig;
+
+	char					*lifetime_orig;
+	char					*enabled_lifetime_orig;
+	int					lifetime_type_orig;
+	int					enabled_lifetime_type_orig;
+	int					evaltype_orig;
+	int					item_flags;		/* discovery flag - lld rule/prototype */
+
+	zbx_sync_rowset_t			macro_paths;
+	zbx_sync_rowset_t			filters;
+	zbx_sync_rowset_t			overrides;
 };
+
+typedef struct
+{
+	const zbx_lld_entry_t	*data;
+	zbx_uint64_t 		ruleid;
+}
+zbx_lld_row_ruleid_t;
 
 int	lld_item_full_compare_func(const void *d1, const void *d2);
 
@@ -353,6 +422,8 @@ void	lld_field_str_rollback(char **field, char **field_orig, zbx_uint64_t *flags
 
 void	lld_override_item(const zbx_vector_lld_override_ptr_t *overrides, const char *name, const char **delay,
 		const char **history, const char **trends, zbx_vector_db_tag_ptr_t *override_tags,
+		unsigned char *status, unsigned char *discover);
+void	lld_override_lldrule(const zbx_vector_lld_override_ptr_t *overrides, const char *name, const char **delay,
 		unsigned char *status, unsigned char *discover);
 void	lld_override_trigger(const zbx_vector_lld_override_ptr_t *overrides, const char *name, unsigned char *severity,
 		zbx_vector_db_tag_ptr_t *override_tags, unsigned char *status, unsigned char *discover);
@@ -363,24 +434,29 @@ void	lld_override_graph(const zbx_vector_lld_override_ptr_t *overrides, const ch
 
 int	lld_validate_item_override_no_discover(const zbx_vector_lld_override_ptr_t *overrides, const char *name,
 		unsigned char override_default);
+int	lld_validate_lldrule_override_no_discover(const zbx_vector_lld_override_ptr_t *overrides, const char *name,
+		unsigned char override_default);
 
-int	lld_update_items(zbx_uint64_t hostid, zbx_uint64_t lld_ruleid, zbx_vector_lld_row_ptr_t *lld_rows,
-		const zbx_vector_lld_macro_path_ptr_t *lld_macro_paths, char **error,
-		const zbx_lld_lifetime_t *lifetime, const zbx_lld_lifetime_t *enabled_lifetime, int lastcheck);
+int	lld_update_items(zbx_uint64_t hostid, zbx_uint64_t lld_ruleid, zbx_vector_lld_row_ptr_t *lld_rows, char **error,
+		const zbx_lld_lifetime_t *lifetime, const zbx_lld_lifetime_t *enabled_lifetime, int lastcheck,
+		int dflags, zbx_hashset_t *rule_index);
 
 void	lld_item_links_sort(zbx_vector_lld_row_ptr_t *lld_rows);
 
 int	lld_update_triggers(zbx_uint64_t hostid, zbx_uint64_t lld_ruleid, const zbx_vector_lld_row_ptr_t *lld_rows,
-		const zbx_vector_lld_macro_path_ptr_t *lld_macro_paths, char **error, zbx_lld_lifetime_t *lifetime,
-		zbx_lld_lifetime_t *enabled_lifetime, int lastcheck);
+		char **error, const zbx_lld_lifetime_t *lifetime, const zbx_lld_lifetime_t *enabled_lifetime,
+		int lastcheck, int dflags);
 
 int	lld_update_graphs(zbx_uint64_t hostid, zbx_uint64_t lld_ruleid, const zbx_vector_lld_row_ptr_t *lld_rows,
-		const zbx_vector_lld_macro_path_ptr_t *lld_macro_paths, char **error,
-		const zbx_lld_lifetime_t *lifetime, int lastcheck);
+		char **error, const zbx_lld_lifetime_t *lifetime, int lastcheck, int dflags);
 
-void	lld_update_hosts(zbx_uint64_t lld_ruleid, const zbx_vector_lld_row_ptr_t *lld_rows,
-		const zbx_vector_lld_macro_path_ptr_t *lld_macro_paths, char **error, zbx_lld_lifetime_t *lifetime,
-		zbx_lld_lifetime_t *enabled_lifetime, int lastcheck);
+void	lld_update_hosts(zbx_uint64_t lld_ruleid, const zbx_vector_lld_row_ptr_t *lld_rows, char **error,
+		const zbx_lld_lifetime_t *lifetime, const zbx_lld_lifetime_t *enabled_lifetime, int lastcheck,
+		int dflags, zbx_hashset_t *rule_index);
+
+int	lld_rule_discover_prototypes(zbx_uint64_t hostid, const zbx_vector_lld_row_ptr_t *lld_rows,
+		const zbx_vector_lld_item_prototype_ptr_t *item_prototypes, zbx_vector_lld_item_full_ptr_t *items,
+		char **error, int lastcheck, zbx_hashset_t *items_index);
 
 int	lld_end_of_life(int lastcheck, int lifetime);
 
@@ -389,9 +465,9 @@ typedef void	(*object_audit_entry_create_f)(int audit_context_mode, int audit_ac
 		const char *name, int flags);
 typedef void	(*object_audit_entry_update_status_f)(int audit_context_mode, zbx_uint64_t objectid, int flags,
 		int status_old, int status_new);
-typedef int	(get_object_status_val)(int status);
+typedef unsigned char	(get_object_status_val)(int status);
 
-int	lld_process_discovery_rule(zbx_uint64_t lld_ruleid, const char *value, char **error);
+int	lld_process_discovery_rule(zbx_dc_item_t *item, zbx_vector_lld_entry_ptr_t *lld_entries, char **error);
 
 /* discovered resource tracking (*_discovery tables) */
 typedef struct
@@ -457,5 +533,37 @@ typedef struct
 	zbx_lld_item_full_t	*item;
 }
 zbx_lld_item_ref_t;
+
+int	lld_substitute_key_cb(const char *data, int level, int num, int quoted, char **param, va_list args);
+
+int	zbx_substitute_lld_macros(char **data, const zbx_lld_entry_t *lld_obj, int flags, char *error,
+		size_t max_error_len);
+int	zbx_substitute_function_lld_param(const char *e, size_t len, unsigned char key_in_param,
+		char **exp, size_t *exp_alloc, size_t *exp_offset, const zbx_lld_entry_t *lld_obj,
+		int esc_flags, char *error, size_t max_error_len);
+int	zbx_substitute_expression_lld_macros(char **data, zbx_uint64_t rules, const zbx_lld_entry_t *lld_obj,
+		char **error);
+int	zbx_substitute_macros_in_json_pairs(char **data, const zbx_lld_entry_t *lld_obj, char *error, int maxerrlen);
+
+void	lld_sync_exported_macros(const zbx_vector_uint64_t *ruleids, const zbx_lld_entry_t *entry);
+void	lld_rule_get_exported_macros(zbx_uint64_t ruleid, zbx_vector_lld_macro_t *macros);
+
+void	lld_rule_get_prototype_macro_paths(zbx_vector_lld_item_prototype_ptr_t *item_prototypes,
+		zbx_vector_uint64_t *protoids);
+void	lld_rule_get_prototype_filters(zbx_vector_lld_item_prototype_ptr_t *item_prototypes,
+		zbx_vector_uint64_t *protoids);
+void	lld_rule_get_prototype_overrides(zbx_vector_lld_item_prototype_ptr_t *item_prototypes,
+		zbx_vector_uint64_t *protoids);
+void	lld_rule_fetch_override_data(zbx_vector_lld_override_data_ptr_t *overrides);
+void	lld_override_dump(zbx_sync_rowset_t *rowset);
+void	lld_rule_process_nested_rule(zbx_uint64_t hostid, zbx_uint64_t itemid, const zbx_lld_row_t *lld_row);
+
+void	lld_rule_macro_paths_make(zbx_vector_lld_item_full_ptr_t *items);
+void	lld_rule_filters_make(zbx_vector_lld_item_full_ptr_t *items, char **info);
+void	lld_rule_overrides_make(zbx_vector_lld_item_full_ptr_t *items, char **info);
+
+int	lld_rule_filters_save(zbx_uint64_t hostid, zbx_vector_lld_item_full_ptr_t *items, int *host_locked);
+int	lld_items_overrides_save(zbx_uint64_t hostid, zbx_vector_lld_item_full_ptr_t *items, int *host_locked);
+int	lld_rule_macro_paths_save(zbx_uint64_t hostid, zbx_vector_lld_item_full_ptr_t *items, int *host_locked);
 
 #endif

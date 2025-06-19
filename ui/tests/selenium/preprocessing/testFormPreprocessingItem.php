@@ -14,12 +14,15 @@
 **/
 
 
-require_once dirname(__FILE__).'/../common/testFormPreprocessing.php';
-require_once dirname(__FILE__).'/../../include/helpers/CDataHelper.php';
+require_once __DIR__.'/../common/testFormPreprocessing.php';
+require_once __DIR__.'/../../include/helpers/CDataHelper.php';
 
 /**
  * @backup items,users
  * @onBefore setRowsPerPage
+ *
+ * TODO: remove ignoreBrowserErrors after DEV-4233
+ * @ignoreBrowserErrors
  */
 class testFormPreprocessingItem extends testFormPreprocessing {
 
@@ -45,7 +48,9 @@ class testFormPreprocessingItem extends testFormPreprocessing {
 						['type' => 'Prometheus pattern', 'parameter_1' => '{#METRICNAME}==1']
 
 					],
-					'error' => 'Invalid parameter "/1/preprocessing/1/params/1": invalid Prometheus pattern.'
+					'inline_errors' => [
+						'id:preprocessing_0_params_0' => 'Pattern: Invalid Prometheus pattern.'
+					]
 				]
 			],
 			[
@@ -63,7 +68,9 @@ class testFormPreprocessingItem extends testFormPreprocessing {
 							'parameter_3' => '{#LABELNAME}'
 						]
 					],
-					'error' => 'Invalid parameter "/1/preprocessing/1/params/3": invalid Prometheus label.'
+					'inline_errors' => [
+						'id:preprocessing_0_params_2' => 'Label: Invalid Prometheus label.'
+					]
 				]
 			],
 			[
@@ -77,7 +84,9 @@ class testFormPreprocessingItem extends testFormPreprocessing {
 						['type' => 'Prometheus to JSON', 'parameter_1' => '{#METRICNAME}==1']
 
 					],
-					'error' => 'Invalid parameter "/1/preprocessing/1/params/1": invalid Prometheus pattern.'
+					'inline_errors' => [
+						'id:preprocessing_0_params_0' => 'Pattern: Invalid Prometheus pattern.'
+					]
 				]
 			]
 		]);
@@ -205,7 +214,7 @@ class testFormPreprocessingItem extends testFormPreprocessing {
 
 		// Check default values.
 		$fields = [
-			'dropdown' => 'name:preprocessing[0][params][1]',
+			'dropdown' => 'name:preprocessing[0][params_1]',
 			'value' => 'id:preprocessing_0_params_2'
 		];
 

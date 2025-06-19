@@ -14,11 +14,25 @@
 **/
 
 
-require_once dirname(__FILE__).'/../../include/CWebTest.php';
+require_once __DIR__.'/../../include/CWebTest.php';
 
 class testWidgets extends CWebTest {
 	const HOST_ALL_ITEMS = 'Host for all item value types';
 	const TABLE_SELECTOR = 'xpath://form[@name="itemform"]//table';
+	const USER_MACRO = '{$USER.MACRO}';
+	const USER_MACRO_VALUE = 'Macro function Test 12345';
+	const USER_SECRET_MACRO = '{$SECRET.MACRO}';
+	const MACRO_CHAR = '{$MACRO.CHAR}';
+	const MACRO_HTML_ENCODE = '{$MACRO.HTML.ENCODE}';
+	const MACRO_HTML_ENCODE_VALUE = '<a href="test.url">"test&"</a>';
+	const MACRO_HTML_DECODE = '{$MACRO.HTML.DECODE}';
+	const MACRO_HTML_DECODE_VALUE = '&lt;a href=&quot;test.url&quot;&gt;&quot;test&amp;&quot;&lt;/a&gt;';
+	const MACRO_CHAR_VALUE = '000 ЙщфхжЖŽzŠsšĒĀīī🌴 ₰₰₰';
+	const MACRO_URL_ENCODE = '{$MACRO.URL.ENCODE}';
+	const MACRO_URL_ENCODE_VALUE = 'h://test.com/macro?functions=urlencode&urld=a🎸';
+	const MACRO_URL_DECODE = '{$MACRO.URL.DECODE}';
+	const MACRO_URL_DECODE_VALUE = 'h%3A%2F%2Ftest.com%2Fmacro%3Ffunctions%3Durlencode%26urld%3Da%F0%9F%8E%B8';
+	const PATH_TO_COLOR_PICKER = 'xpath:.//z-color-picker[@color-field-name=';
 
 	protected static $dashboardid;
 
@@ -51,7 +65,7 @@ class testWidgets extends CWebTest {
 		// Assign the dialog from where the last Select button will be clicked.
 		$select_dialog = $widget_dialog;
 
-		// Item types expected in items table. For the most cases theses are all items except of Binary and dependent.
+		// Item types expected in items table. For the most cases these are all items except of Binary and dependent.
 		$item_types = (in_array($widget, ['Item navigator', 'Item history', 'Honeycomb', 'Top hosts']))
 			? ['Binary item', 'Character item', 'Float item', 'Log item', 'Text item', 'Unsigned item', 'Unsigned_dependent item']
 			: ['Character item', 'Float item', 'Log item', 'Text item', 'Unsigned item', 'Unsigned_dependent item'];
@@ -102,8 +116,7 @@ class testWidgets extends CWebTest {
 		$select_dialog->query($select_button)->one()->waitUntilClickable()->click();
 
 		// Open the dialog where items will be tested.
-		$items_dialog = COverlayDialogElement::find()->all()->last()->waitUntilReady();
-		$this->assertEquals($widget === 'Graph prototype' ? 'Item prototypes' : 'Items', $items_dialog->getTitle());
+		$items_dialog = COverlayDialogElement::get($widget === 'Graph prototype' ? 'Item prototypes' : 'Items');
 
 		// Find the table where items will be expected.
 		$table = $items_dialog->query(self::TABLE_SELECTOR)->asTable()->one()->waitUntilVisible();
@@ -111,15 +124,11 @@ class testWidgets extends CWebTest {
 		// Fill the host name and check the table.
 		$items_dialog->query('class:multiselect-control')->asMultiselect()->one()->fill(self::HOST_ALL_ITEMS);
 		$table->waitUntilReloaded();
+		$items_dialog->query('button:Select')->waitUntilClickable();
 		$this->assertTableDataColumn($item_types, 'Name', self::TABLE_SELECTOR);
 
 		// Close all dialogs.
-		$dialogs = COverlayDialogElement::find()->all();
-
-		$dialog_count = $dialogs->count();
-		for ($i = $dialog_count - 1; $i >= 0; $i--) {
-			$dialogs->get($i)->close(true);
-		}
+		COverlayDialogElement::closeAll();
 	}
 
 	/**
@@ -327,6 +336,19 @@ class testWidgets extends CWebTest {
 
 		foreach ($expected_values as $attribute => $expected_value) {
 			$this->assertEquals($expected_value, $range->getAttribute($attribute));
+		}
+	}
+
+	/**
+	 * Verify that it is not possible to submit color-picker dialog with invalid color and exit this scenario.
+	 *
+	 * @param array             $data         data provider
+	 */
+	public function checkColorPickerState($data) {
+		if (CTestArrayHelper::get($data, 'invalid_color')) {
+			$color_picker = $this->query('class:color-picker-dialog')->one()->asColorPicker();
+			$this->assertTrue($color_picker->isSubmittionDisabled());
+			$color_picker->close();
 		}
 	}
 }

@@ -33,6 +33,12 @@ const (
 
 	tcpProtocol = "tcp"
 	udpProtocol = "udp"
+
+	inAddrSuffix   = ".in-addr.arpa"
+	inAddrV6Suffix = ".ip6.arpa"
+
+	defaultCount      = 2
+	defaultRecordType = dns.TypeSOA
 )
 
 const (
@@ -473,6 +479,7 @@ func (o *options) setDNSType(dnsType string) error {
 }
 
 func (o *options) setDefaults() error {
+
 	if o.ip == "" {
 		err := o.setDefaultIP()
 		if err != nil {
@@ -485,7 +492,7 @@ func (o *options) setDefaults() error {
 	}
 
 	if o.dnsType == dns.TypeNone {
-		o.dnsType = dns.TypeSOA
+		o.dnsType = defaultRecordType
 	}
 
 	if o.timeout < 1 {
@@ -493,7 +500,7 @@ func (o *options) setDefaults() error {
 	}
 
 	if o.count < 1 {
-		o.count = 2
+		o.count = defaultCount
 	}
 
 	if o.protocol == "" {
@@ -512,7 +519,9 @@ func runQuery(resolver, domain, net string, record uint16, timeout time.Duration
 	}
 
 	var err error
-	if record == dns.TypePTR {
+	if record == dns.TypePTR &&
+		!strings.HasSuffix(domain, inAddrSuffix) &&
+		!strings.HasSuffix(domain, inAddrV6Suffix) {
 		domain, err = dns.ReverseAddr(domain)
 		if err != nil {
 			return nil, err

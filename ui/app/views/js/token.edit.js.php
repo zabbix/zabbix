@@ -34,10 +34,9 @@ window.token_edit_popup = {
 		this.dialogue = this.overlay.$dialogue[0];
 		this.form = this.overlay.$dialogue.$body[0].querySelector('form');
 
-		const backurl = new Curl('zabbix.php');
-
-		backurl.setArgument('action', admin_mode == 1 ? 'token.list' : 'user.token.list');
-		this.overlay.backurl = backurl.getUrl();
+		const return_url = new URL('zabbix.php', location.href);
+		return_url.searchParams.set('action', admin_mode == 1 ? 'token.list' : 'user.token.list');
+		ZABBIX.PopupManager.setReturnUrl(return_url.href);
 
 		this.expires_at_field = document.getElementById('expires-at-row').parentNode;
 		this.expires_at_label = this.expires_at_field.previousSibling;
@@ -139,7 +138,7 @@ window.token_edit_popup = {
 	},
 
 	close() {
-		this.overlay.$dialogue[0].dispatchEvent(new CustomEvent('dialogue.close', {detail: 'token.edit'}));
+		this.overlay.$dialogue[0].dispatchEvent(new CustomEvent('token-edit.close'));
 	},
 
 	removePopupMessages() {
@@ -223,21 +222,28 @@ window.token_edit_popup = {
 					throw {error: response.error};
 				}
 
-				this.overlay.$dialogue[0].addEventListener('dialogue.close', this.events.overlayCloseAfterUpdate,
-					{once: true}
-				);
+				// Popup Manager shall not intercept this event.
+				this.overlay.$dialogue[0].addEventListener('dialogue.close', e => {
+					e.preventDefault();
+					e.stopImmediatePropagation();
+
+					// Set timeout to overcome browser preventing page reload on ESC key.
+					setTimeout(() => {
+						this.overlay.$dialogue[0].dispatchEvent(new CustomEvent('dialogue.submit', {detail: {}}));
+					});
+				}, {capture: true});
+
+				this.overlay.$dialogue[0].addEventListener('token-edit.close', () => {
+					this.overlay.$dialogue[0].dispatchEvent(new CustomEvent('dialogue.submit', {detail: {}}));
+				});
 
 				this.overlay.setProperties({...response, prevent_navigation: false});
 			})
 			.catch(this.ajaxExceptionHandler)
 			.finally(() => {
 				this.overlay.unsetLoading();
+				this.overlay.recoverFocus();
+				this.overlay.containFocus();
 			});
-	},
-
-	events: {
-		overlayCloseAfterUpdate() {
-			token_edit_popup.dialogue.dispatchEvent(new CustomEvent('dialogue.submit', {}));
-		}
 	}
 };

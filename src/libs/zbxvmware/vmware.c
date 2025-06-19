@@ -379,8 +379,12 @@ int	zbx_soap_post(const char *fn_parent, CURL *easyhandle, const char *request, 
 	{
 		if (NULL != val)
 		{
-			zbx_free(*error);
-			*error = val;
+			if (NULL != error)
+			{
+				zbx_free(*error);
+				*error = val;
+			}
+
 			ret = FAIL;
 		}
 
@@ -1112,6 +1116,8 @@ int	vmware_service_logout(zbx_vmware_service_t *service, CURL *easyhandle, char 
 		ZBX_POST_VSPHERE_FOOTER
 
 	char	tmp[MAX_STRING_LEN];
+
+	zabbix_log(LOG_LEVEL_DEBUG, "%s() '%s'@'%s'", __func__, service->username, service->url);
 
 	zbx_snprintf(tmp, sizeof(tmp), ZBX_POST_VMWARE_LOGOUT,
 			get_vmware_service_objects()[service->type].session_manager);
@@ -2268,7 +2274,7 @@ static void	vmware_service_dvswitch_load(CURL *easyhandle, zbx_vector_cq_value_p
 		ZBX_POST_VSPHERE_FOOTER
 
 	size_t	offset;
-	char	*error, tmp[MAX_STRING_LEN], criteria[MAX_STRING_LEN];
+	char	*error = NULL, tmp[MAX_STRING_LEN], criteria[MAX_STRING_LEN];
 	int	count = 0;
 	xmlDoc	*doc = NULL;
 
@@ -2821,7 +2827,7 @@ static void	zbx_vmware_jobs_create(zbx_vmware_t *vmw, zbx_vmware_service_t *serv
  ******************************************************************************/
 zbx_vmware_service_t	*zbx_vmware_get_service(const char* url, const char* username, const char* password)
 {
-	int			now;
+	time_t			now;
 	zbx_vmware_service_t	*service = NULL;
 	zbx_vmware_t		*vmw = zbx_vmware_get_vmware();
 
@@ -2867,6 +2873,7 @@ zbx_vmware_service_t	*zbx_vmware_get_service(const char* url, const char* userna
 	service->eventlog.req_sz = 0;
 	service->eventlog.oom = 0;
 	service->eventlog.job_revision = 0;
+	service->eventlog.end_time = 0;
 	service->jobs_num = 0;
 	vmware_shmem_vector_vmware_entity_tags_ptr_create_ext(&service->data_tags.entity_tags);
 	service->data_tags.error = NULL;
@@ -3088,7 +3095,7 @@ static void	zbx_vmware_job_create(zbx_vmware_t *vmw, zbx_vmware_service_t *servi
  ******************************************************************************/
 static void	zbx_vmware_jobs_create(zbx_vmware_t *vmw, zbx_vmware_service_t *service)
 {
-	int	req_flag = 0x1, jobs_req = service->jobs_flag >> ZBX_VMWARE_REQ;
+	int	req_flag = 0x1, jobs_req = ((service->jobs_flag & ZBX_VMWARE_REQ_MASK) >> ZBX_VMWARE_REQ);
 
 	while (0 != jobs_req)
 	{
@@ -3134,7 +3141,7 @@ int	zbx_vmware_job_remove(zbx_vmware_job_t *job)
 		zbx_vmware_service_remove(service);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "%s() service jobs_num:%d job_type:%X revision:%d", __func__, jobs_num,
-			job_type, revision);
+		(unsigned int)job_type, revision);
 
 	return 0 == jobs_num ? 1 : 0;
 }

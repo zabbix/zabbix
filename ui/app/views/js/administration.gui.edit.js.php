@@ -29,46 +29,46 @@
 
 		$("#resetDefaults").click(function() {
 			overlayDialogue({
-				'title': <?= json_encode(_('Reset confirmation')) ?>,
-				'class': 'position-middle',
-				'content': $('<span>').text(<?= json_encode(_('Reset all fields to default values?')) ?>),
-				'buttons': [
+				title: <?= json_encode(_('Reset confirmation')) ?>,
+				content: $('<span>').text(<?= json_encode(_('Reset all fields to default values?')) ?>),
+				buttons: [
 					{
-						'title': <?= json_encode(_('Cancel')) ?>,
-						'cancel': true,
-						'class': '<?= ZBX_STYLE_BTN_ALT ?>',
-						'action': function() {}
+						title: <?= json_encode(_('Cancel')) ?>,
+						cancel: true,
+						class: '<?= ZBX_STYLE_BTN_ALT ?>',
+						action: function() {}
 					},
 					{
-						'title': <?= json_encode(_('Reset defaults')) ?>,
-						'focused': true,
-						'action': function() {
+						title: <?= json_encode(_('Reset defaults')) ?>,
+						focused: true,
+						action: function() {
 							$('main')
 								.prev('.msg-bad')
 								.remove();
 
-							$('#default_lang').val("<?= DB::getDefault('config', 'default_lang') ?>");
-							$('#default_timezone').val("<?= DB::getDefault('config', 'default_timezone') ?>");
-							$('#default_theme').val("<?= DB::getDefault('config', 'default_theme') ?>");
-							$('#search_limit').val("<?= DB::getDefault('config', 'search_limit') ?>");
-							$('#max_overview_table_size').val(
-								"<?= DB::getDefault('config', 'max_overview_table_size') ?>"
+							$('#default_lang').val("<?= CSettingsSchema::getDefault('default_lang') ?>");
+							$('#default_timezone').val("<?= CSettingsSchema::getDefault('default_timezone') ?>");
+							$('#default_theme').val("<?= CSettingsSchema::getDefault('default_theme') ?>");
+							$('#search_limit').val("<?= CSettingsSchema::getDefault('search_limit') ?>");
+							$('#max_overview_table_size').val("<?= CSettingsSchema::getDefault('max_overview_table_size') ?>");
+							$('#max_in_table').val("<?= CSettingsSchema::getDefault('max_in_table') ?>");
+							$('#server_check_interval').prop('checked',
+								<?= json_encode((bool) CSettingsSchema::getDefault('server_check_interval')) ?>
 							);
-							$('#max_in_table').val("<?= DB::getDefault('config', 'max_in_table') ?>");
-							$('#server_check_interval').prop('checked', <?=
-								json_encode((bool) DB::getDefault('config', 'server_check_interval'))
-							?>);
-							$('#work_period').val("<?= DB::getDefault('config', 'work_period') ?>");
-							$('#show_technical_errors').prop('checked', <?=
-								json_encode((bool) DB::getDefault('config', 'show_technical_errors'))
-							?>);
-							$('#history_period').val("<?= DB::getDefault('config', 'history_period') ?>");
-							$('#period_default').val("<?= DB::getDefault('config', 'period_default') ?>");
-							$('#max_period').val("<?= DB::getDefault('config', 'max_period') ?>");
+							$('#work_period').val("<?= CSettingsSchema::getDefault('work_period') ?>");
+							$('#show_technical_errors').prop('checked',
+								<?= json_encode((bool) CSettingsSchema::getDefault('show_technical_errors')) ?>
+							);
+							$('#history_period').val("<?= CSettingsSchema::getDefault('history_period') ?>");
+							$('#period_default').val("<?= CSettingsSchema::getDefault('period_default') ?>");
+							$('#max_period').val("<?= CSettingsSchema::getDefault('max_period') ?>");
 						}
 					}
 				]
-			}, this);
+			}, {
+				position: Overlay.prototype.POSITION_CENTER,
+				trigger_element: this
+			});
 		});
 	});
 </script>

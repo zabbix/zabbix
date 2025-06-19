@@ -375,7 +375,7 @@ class testItemTimeouts extends CIntegrationTest {
 	 *
 	 * @required-components server
 	 * @configurationDataProvider serverConfigurationProviderTrace
-	 * @backup config
+	 * @backup settings
 	 */
 	public function testItemTimeouts_checkConfigSync() {
 		self::stopComponent(self::COMPONENT_SERVER);
@@ -436,7 +436,7 @@ class testItemTimeouts extends CIntegrationTest {
 	 *
 	 * @required-components server, agent, agent2
 	 * @configurationDataProvider defaultConfigurationProvider
-	 * @backup config, history_text, items, item_rtdata
+	 * @backup settings, history_text, items, item_rtdata
 	 */
 	public function testItemTimeouts_checkTimeouts() {
 		$this->reloadConfigurationCache(self::COMPONENT_SERVER);
@@ -476,7 +476,7 @@ class testItemTimeouts extends CIntegrationTest {
 	 *
 	 * @required-components server
 	 * @configurationDataProvider defaultConfigurationProvider
-	 * @backup config, hosts, items, item_rtdata
+	 * @backup settings, hosts, items, item_rtdata
 	 */
 	public function testItemTimeouts_checkSnmp() {
 		self::stopComponent(self::COMPONENT_SERVER);
@@ -500,9 +500,12 @@ class testItemTimeouts extends CIntegrationTest {
 
 		$this->waitForLogLineToBePresent(self::COMPONENT_SERVER, "In zbx_async_check_snmp", true, 90, 1, true);
 		$tm1 = time();
-		$this->waitForLogLineToBePresent(self::COMPONENT_SERVER, "End of process_async_result", true, 90, 1, true);
+
+		$fail_logmsg = ":10987.*timed out, retrying";
+		$this->waitForLogLineToBePresent(self::COMPONENT_SERVER, $fail_logmsg, true, 90, 1, true);
+
 		$tm2 = time();
-		$this->assertTrue($tm2 - $tm1 <= 7 * 2);
+		$this->assertLessThanOrEqual(8, $tm2 - $tm1);
 	}
 
 	/**
@@ -510,7 +513,7 @@ class testItemTimeouts extends CIntegrationTest {
 	 *
 	 * @required-components server
 	 * @configurationDataProvider defaultConfigurationProvider
-	 * @backup config, hosts, items, item_rtdata
+	 * @backup settings, hosts, items, item_rtdata
 	 */
 	public function testItemTimeouts_checkSsh() {
 		self::stopComponent(self::COMPONENT_SERVER);
@@ -547,7 +550,7 @@ class testItemTimeouts extends CIntegrationTest {
 	 *
 	 * @required-components server
 	 * @configurationDataProvider defaultConfigurationProvider
-	 * @backup config, hosts, items, item_rtdata
+	 * @backup settings, hosts, items, item_rtdata
 	 */
 	public function testItemTimeouts_checkSimple() {
 		$response = $this->call('host.update', [

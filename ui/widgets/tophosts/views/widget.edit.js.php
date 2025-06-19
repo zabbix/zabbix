@@ -15,7 +15,7 @@
 ?>
 
 
-window.widget_tophosts_form = new class {
+window.widget_form = new class extends CWidgetForm {
 
 	/**
 	 * Widget form.
@@ -39,16 +39,19 @@ window.widget_tophosts_form = new class {
 	#list_columns;
 
 	init({templateid}) {
-		this.#form = document.getElementById('widget-dialogue-form');
+		this.#form = this.getForm();
 		this.#list_columns = document.getElementById('list_columns');
 		this.#templateid = templateid;
 
 		new CSortable(this.#list_columns.querySelector('tbody'), {
 			selector_handle: 'div.<?= ZBX_STYLE_DRAG_ICON ?>',
 			freeze_end: 1
-		});
+		})
+			.on(CSortable.EVENT_SORT, () => this.registerUpdateEvent());
 
 		this.#list_columns.addEventListener('click', (e) => this.#processColumnsAction(e));
+
+		this.ready();
 	}
 
 	#processColumnsAction(e) {
@@ -76,7 +79,6 @@ window.widget_tophosts_form = new class {
 				).$dialogue[0];
 
 				column_popup.addEventListener('dialogue.submit', (e) => this.#updateColumns(column_index, e.detail));
-				column_popup.addEventListener('dialogue.close', this.#removeColorpicker);
 				break;
 
 			case 'edit':
@@ -97,12 +99,11 @@ window.widget_tophosts_form = new class {
 					).$dialogue[0];
 
 				column_popup.addEventListener('dialogue.submit', (e) => this.#updateColumns(column_index, e.detail));
-				column_popup.addEventListener('dialogue.close', this.#removeColorpicker);
 				break;
 
 			case 'remove':
 				target.closest('tr').remove();
-				ZABBIX.Dashboard.reloadWidgetProperties();
+				this.reload();
 				break;
 		}
 	}
@@ -158,7 +159,7 @@ window.widget_tophosts_form = new class {
 			}
 		}
 
-		ZABBIX.Dashboard.reloadWidgetProperties();
+		this.reload();
 	}
 
 	#addVar(name, value) {
@@ -167,10 +168,5 @@ window.widget_tophosts_form = new class {
 		input.setAttribute('name', name);
 		input.setAttribute('value', value);
 		this.#form.appendChild(input);
-	}
-
-	// Need to remove function after sub-popups auto close.
-	#removeColorpicker() {
-		$('#color_picker').hide();
 	}
 };

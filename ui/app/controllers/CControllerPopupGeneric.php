@@ -742,6 +742,13 @@ class CControllerPopupGeneric extends CController {
 			]);
 
 			if (!$lld_rules) {
+				$lld_rules = API::DiscoveryRulePrototype()->get([
+					'output' => [],
+					'itemids' => $this->getInput('parent_discoveryid')
+				]);
+			}
+
+			if (!$lld_rules) {
 				return false;
 			}
 		}
@@ -1268,7 +1275,7 @@ class CControllerPopupGeneric extends CController {
 
 			case 'users':
 				$options += [
-					'output' => ['userid', 'username', 'name', 'surname', 'type', 'theme', 'lang']
+					'output' => ['userid', 'username', 'name', 'surname']
 				];
 
 				if ($this->hasInput('exclude_provisioned')) {
@@ -1318,6 +1325,10 @@ class CControllerPopupGeneric extends CController {
 						'with_monitored_items' => true,
 						'monitored_hosts' => true
 					];
+				}
+
+				if ($this->hasInput('normal_only')) {
+					$options['filter']['flags'] = ZBX_FLAG_DISCOVERY_NORMAL;
 				}
 
 				$records = (!$this->group_preselect_required || $this->groupids)
@@ -1592,6 +1603,7 @@ class CControllerPopupGeneric extends CController {
 
 				if ($this->source_table === 'graph_prototypes') {
 					$options['selectDiscoveryRule'] = ['hostid'];
+					$options['selectDiscoveryRulePrototype'] = ['hostid'];
 
 					$records = (!$this->host_preselect_required || $this->hostids)
 						? API::GraphPrototype()->get($options)

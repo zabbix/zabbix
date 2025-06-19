@@ -18,6 +18,5 @@
 #include "zbxmockdata.h"
 
 int	compare_str_vectors(const zbx_vector_str_t *v1, const zbx_vector_str_t *v2);
-void	extract_yaml_values(const char *path, zbx_vector_str_t *values);
 
 #endif

@@ -1,0 +1,31 @@
+---
+test case: "1. Find min"
+in:
+  func: "find_min"
+  heap_in: [[0, 2147483647], [1, 2147483647], [3, 2147483647], [4, 0]]
+out:
+  key: 4
+  data: 0
+---
+test case: "2. Remove min"
+in:
+  func: "remove_min"
+  heap_in: [[0, 2147483647], [0, 2147483647], [0, 2147483647], [0,-2147483647]]
+out:
+  heap_out: [[0, 2147483647], [0, 2147483647], [0, 2147483647]]
+---
+test case: "3. Find min all elements are same"
+in:
+  func: "find_min"
+  heap_in: [[0, 2147483647], [0, 2147483647], [0, 2147483647], [0, 2147483647]]
+out:
+  key: 0
+  data: 2147483647
+---
+test case: "4. Remove min all elements are same"
+in:
+  func: "remove_min"
+  heap_in: [[0, -2147483647], [0, -2147483647], [0, -2147483647], [0, -2147483647]]
+out:
+  heap_out: [[0, -2147483647], [0, -2147483647], [0, -2147483647]]
+...

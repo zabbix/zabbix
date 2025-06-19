@@ -20,7 +20,7 @@
 
 		init({default_inventory_mode, iframe_sandboxing_enabled, iframe_sandboxing_exceptions, login_attempts,
 				login_block, snmptrap_logging, uri_valid_schemes, url, validate_uri_schemes, vault_provider,
-				x_frame_options}) {
+				proxy_secrets_provider, x_frame_options}) {
 			const $form = jQuery('#miscconfig-form');
 
 			$('#validate_uri_schemes').change(function() {
@@ -43,20 +43,19 @@
 
 			$("#resetDefaults").click(function() {
 				overlayDialogue({
-					'title': <?= json_encode(_('Reset confirmation')) ?>,
-					'class': 'position-middle',
-					'content': $('<span>').text(<?= json_encode(_('Reset all fields to default values?')) ?>),
-					'buttons': [
+					title: <?= json_encode(_('Reset confirmation')) ?>,
+					content: $('<span>').text(<?= json_encode(_('Reset all fields to default values?')) ?>),
+					buttons: [
 						{
-							'title': <?= json_encode(_('Cancel')) ?>,
-							'cancel': true,
-							'class': '<?= ZBX_STYLE_BTN_ALT ?>',
-							'action': function() {}
+							title: <?= json_encode(_('Cancel')) ?>,
+							cancel: true,
+							class: '<?= ZBX_STYLE_BTN_ALT ?>',
+							action: function() {}
 						},
 						{
-							'title': <?= json_encode(_('Reset defaults')) ?>,
-							'focused': true,
-							'action': function() {
+							title: <?= json_encode(_('Reset defaults')) ?>,
+							focused: true,
+							action: function() {
 								$('main')
 									.prev('.msg-bad')
 									.remove();
@@ -74,6 +73,8 @@
 
 								// Storage of secrets.
 								$(`#vault_provider input[value=${vault_provider}]`).prop('checked', true);
+								$(`#proxy_secrets_provider input[value=${proxy_secrets_provider}]`)
+									.prop('checked', true);
 
 								// Security.
 								$('#validate_uri_schemes')
@@ -81,9 +82,7 @@
 									.change();
 								$('#uri_valid_schemes').val(uri_valid_schemes);
 								$('#x_frame_header_enabled')
-									.prop('checked',
-										<?= DB::getDefault('config', 'x_frame_options') === 'null' ? 'false' : 'true' ?>
-									)
+									.prop('checked', x_frame_options !== 'null')
 									.change();
 								$('#x_frame_options').val(x_frame_options);
 								$('#iframe_sandboxing_enabled')
@@ -93,7 +92,10 @@
 							}
 						}
 					]
-				}, this);
+				}, {
+					position: Overlay.prototype.POSITION_CENTER,
+					trigger_element: this
+				});
 			});
 		}
 	}

@@ -121,7 +121,7 @@ class CControllerServiceListEditRefresh extends CControllerServiceListGeneral {
 				->setArgument('filter_set', 1);
 		}
 
-		$data['back_url'] = (clone $paging_curl)
+		$data['return_url'] = (clone $paging_curl)
 			->setArgument('action', 'service.list.edit')
 			->setArgument('page', $this->hasInput('page') ? $this->getInput('page') : null)
 			->getUrl();

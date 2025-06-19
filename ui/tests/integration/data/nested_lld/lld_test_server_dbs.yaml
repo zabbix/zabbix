@@ -1,0 +1,28 @@
+zabbix_export:
+  version: '7.4'
+  host_groups:
+    - uuid: f2481361f99448eea617b7b1d4765566
+      name: 'Discovered hosts'
+  hosts:
+    - host: host_server_db_discovery
+      name: host_server_db_discovery
+      groups:
+        - name: 'Discovered hosts'
+      discovery_rules:
+        - name: 'Discover databases and tablespaces'
+          type: TRAP
+          key: main_drule
+          host_prototypes:
+            - host: 'Host for database {#DB}'
+              name: 'Host for database {#DB}'
+              group_links:
+                - group:
+                    name: 'Discovered hosts'
+              templates:
+                - name: lld_test_dbs_template
+              macros:
+                - macro: '{$DB}'
+                  value: '{#DB}'
+          lld_macro_paths:
+            - lld_macro: '{#DB}'
+              path: $.database

@@ -28,7 +28,7 @@ $html_page = (new CHtmlPage())
 
 $from_list = (new CFormList())
 	->addRow(new CLabel(_('Frontend URL'), 'url'),
-		(new CTextBox('url', $data['url'], false, DB::getFieldLength('config', 'url')))
+		(new CTextBox('url', $data['url'], false, CSettingsSchema::getFieldLength('url')))
 			->setWidth(ZBX_TEXTAREA_MEDIUM_WIDTH)
 			->setAttribute('placeholder', _('Example: https://localhost/zabbix/ui/'))
 			->setAttribute('autofocus', 'autofocus')
@@ -87,7 +87,7 @@ $from_list = (new CFormList())
 	)
 	->addRow(
 		(new CLabel(_('Login blocking interval'), 'login_block'))->setAsteriskMark(),
-		(new CTextBox('login_block', $data['login_block'], false, DB::getFieldLength('config', 'login_block')))
+		(new CTextBox('login_block', $data['login_block'], false, CSettingsSchema::getFieldLength('login_block')))
 			->setWidth(ZBX_TEXTAREA_TINY_WIDTH)
 			->setAriaRequired()
 	)
@@ -96,7 +96,21 @@ $from_list = (new CFormList())
 		(new CRadioButtonList('vault_provider', (int) $data['vault_provider']))
 			->addValue(_('HashiCorp Vault'), ZBX_VAULT_TYPE_HASHICORP)
 			->addValue(_('CyberArk Vault'), ZBX_VAULT_TYPE_CYBERARK)
-			->setModern(true)
+			->setModern()
+	)
+	->addRow(
+		new CLabel([
+			_('Resolve secret vault macros by'),
+			makeHelpIcon([
+				_('Zabbix server: secrets are retrieved from Vault by Zabbix server and forwarded to proxies when needed.'),
+				BR(),
+				_('Zabbix server and proxy: secrets are retrieved from Vault by both Zabbix server and proxies, allowing them to resolve macros independently.')
+			])
+		]),
+		(new CRadioButtonList('proxy_secrets_provider', (int) $data['proxy_secrets_provider']))
+			->addValue(_('Zabbix server'), ZBX_PROXY_SECRETS_PROVIDER_SERVER)
+			->addValue(_('Zabbix server and proxy'), ZBX_PROXY_SECRETS_PROVIDER_PROXY)
+			->setModern()
 	)
 	->addRow((new CTag('h4', true, _('Security')))->addClass('input-section-header'))
 	->addRow(
@@ -106,7 +120,7 @@ $from_list = (new CFormList())
 				->setUncheckedValue('0')
 				->setChecked($data['validate_uri_schemes'] == 1),
 			(new CTextBox('uri_valid_schemes', $data['uri_valid_schemes'], false,
-				DB::getFieldLength('config', 'uri_valid_schemes')
+				CSettingsSchema::getFieldLength('uri_valid_schemes')
 			))
 				->setAttribute('placeholder', _('Valid URI schemes'))
 				->setWidth(ZBX_TEXTAREA_MEDIUM_WIDTH)
@@ -140,7 +154,7 @@ $from_list = (new CFormList())
 				->setUncheckedValue('0')
 				->setChecked($data['x_frame_header_enabled'] == 1),
 			(new CTextBox('x_frame_options', $data['x_frame_options'], false,
-				DB::getFieldLength('config', 'x_frame_options')
+				CSettingsSchema::getFieldLength('x_frame_options')
 			))
 				->setWidth(ZBX_TEXTAREA_MEDIUM_WIDTH)
 				->setAttribute('placeholder', _('X-Frame-Options HTTP header'))
@@ -155,7 +169,7 @@ $from_list = (new CFormList())
 				->setUncheckedValue('0')
 				->setChecked($data['iframe_sandboxing_enabled'] == 1),
 			(new CTextBox('iframe_sandboxing_exceptions', $data['iframe_sandboxing_exceptions'], false,
-				DB::getFieldLength('config', 'iframe_sandboxing_exceptions')
+				CSettingsSchema::getFieldLength('iframe_sandboxing_exceptions')
 			))
 				->setWidth(ZBX_TEXTAREA_MEDIUM_WIDTH)
 				->setAttribute('placeholder', _('Iframe sandboxing exceptions'))
@@ -188,17 +202,18 @@ $html_page
 
 (new CScriptTag('
 	view.init('.json_encode([
-		'default_inventory_mode' => DB::getDefault('config', 'default_inventory_mode'),
-		'iframe_sandboxing_enabled' => DB::getDefault('config', 'iframe_sandboxing_enabled'),
-		'iframe_sandboxing_exceptions' => DB::getDefault('config', 'iframe_sandboxing_exceptions'),
-		'login_attempts' => DB::getDefault('config', 'login_attempts'),
-		'login_block' => DB::getDefault('config', 'login_block'),
-		'snmptrap_logging' => DB::getDefault('config', 'snmptrap_logging'),
-		'uri_valid_schemes' => DB::getDefault('config', 'uri_valid_schemes'),
-		'url' => DB::getDefault('config', 'url'),
-		'validate_uri_schemes' => DB::getDefault('config', 'validate_uri_schemes'),
-		'vault_provider' => DB::getDefault('config', 'vault_provider'),
-		'x_frame_options' => DB::getDefault('config', 'x_frame_options')
+		'default_inventory_mode' => CSettingsSchema::getDefault('default_inventory_mode'),
+		'iframe_sandboxing_enabled' => CSettingsSchema::getDefault('iframe_sandboxing_enabled'),
+		'iframe_sandboxing_exceptions' => CSettingsSchema::getDefault('iframe_sandboxing_exceptions'),
+		'login_attempts' => CSettingsSchema::getDefault('login_attempts'),
+		'login_block' => CSettingsSchema::getDefault('login_block'),
+		'snmptrap_logging' => CSettingsSchema::getDefault('snmptrap_logging'),
+		'uri_valid_schemes' => CSettingsSchema::getDefault('uri_valid_schemes'),
+		'url' => CSettingsSchema::getDefault('url'),
+		'validate_uri_schemes' => CSettingsSchema::getDefault('validate_uri_schemes'),
+		'vault_provider' => CSettingsSchema::getDefault('vault_provider'),
+		'proxy_secrets_provider' => CSettingsSchema::getDefault('proxy_secrets_provider'),
+		'x_frame_options' => CSettingsSchema::getDefault('x_frame_options')
 	]).');
 '))
 	->setOnDocumentReady()

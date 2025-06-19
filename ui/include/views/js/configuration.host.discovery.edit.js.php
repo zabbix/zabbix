@@ -95,10 +95,13 @@ include __DIR__.'/configuration.host.discovery.edit.overr.js.php';
 		form_name: null,
 		context: null,
 
-		init({form_name, counter, context, token, readonly, query_fields, headers}) {
+		init({form_name, counter, context, token, readonly, query_fields, headers, parent_discoveryid, excludeids}) {
 			this.form_name = form_name;
 			this.context = context;
 			this.token = token;
+			this.parent_discoveryid = parent_discoveryid;
+			this.readonly = readonly;
+			this.excludeids = excludeids;
 
 			$('#conditions')
 				.dynamicRows({
@@ -220,7 +223,11 @@ include __DIR__.'/configuration.host.discovery.edit.overr.js.php';
 			});
 
 			this.updateLostResourcesFields();
-			this.setSubmitCallback();
+			this.initPopupListeners();
+
+			if (this.parent_discoveryid) {
+				this.initItemPrototypeForm();
+			}
 		},
 
 		updateLostResourcesFields() {
@@ -341,31 +348,72 @@ include __DIR__.'/configuration.host.discovery.edit.overr.js.php';
 			post(url.getUrl(), fields);
 		},
 
-		setSubmitCallback() {
-			window.popupManagerInstance.setSubmitCallback((e) => {
-				const data = e.detail;
-				let curl = null;
+		initPopupListeners() {
+			ZABBIX.EventHub.subscribe({
+				require: {
+					context: CPopupManager.EVENT_CONTEXT,
+					event: CPopupManagerEvent.EVENT_SUBMIT
+				},
+				callback: ({data, event}) => {
+					if (data.submit.success?.action === 'delete') {
+						const url = new URL('host_discovery.php', location.href);
 
-				if ('success' in data) {
-					postMessageOk(data.success.title);
+						url.searchParams.set('context', this.context);
 
-					if ('messages' in data.success) {
-						postMessageDetails('success', data.success.messages);
+						event.setRedirectUrl(url.href);
 					}
-
-					if ('action' in data.success && data.success.action === 'delete') {
-						curl = new Curl('host_discovery.php');
-						curl.setArgument('context', this.context);
+					else {
+						this.refresh();
 					}
-				}
-
-				if (curl) {
-					location.href = curl.getUrl();
-				}
-				else {
-					view.refresh();
 				}
 			});
+		},
+
+		initItemPrototypeForm() {
+			const observer = new MutationObserver(() => {
+				const master_item = document.getElementById('master_itemid').closest('.multiselect-control');
+
+				if (master_item === null) {
+					return;
+				}
+
+				const spacer = document.createElement('div');
+				spacer.classList.add('<?= ZBX_STYLE_FORM_INPUT_MARGIN ?>');
+
+				master_item.append(spacer);
+
+				const button = document.createElement('button');
+				button.textContent = <?= json_encode(_('Select prototype')) ?>;
+				button.classList.add(ZBX_STYLE_BTN_GREY);
+				button.setAttribute('name', 'master-item-prototype');
+				button.setAttribute('type', 'button');
+				button.disabled = this.readonly;
+				button.addEventListener('click', (e) => {
+					this.openMasterItemPrototypePopup();
+
+					return cancelEvent(e);
+				});
+
+				master_item.append(button);
+
+				observer.disconnect();
+			});
+
+			observer.observe(document.getElementById('js-item-master-item-field'), {childList: true});
+		},
+
+		openMasterItemPrototypePopup() {
+			const parameters = {
+				srctbl: 'item_prototypes',
+				srcfld1: 'itemid',
+				srcfld2: 'name',
+				dstfrm: this.form_name,
+				dstfld1: 'master_itemid',
+				parent_discoveryid: this.parent_discoveryid,
+				excludeids: this.excludeids
+			};
+
+			PopUp('popup.generic', parameters, {dialogue_class: 'modal-popup-generic'});
 		}
 	};
 </script>

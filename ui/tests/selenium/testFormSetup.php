@@ -13,9 +13,9 @@
 ** If not, see <https://www.gnu.org/licenses/>.
 **/
 
-require_once dirname(__FILE__) . '/../include/CWebTest.php';
-require_once dirname(__FILE__).'/behaviors/CMessageBehavior.php';
-require_once dirname(__FILE__).'/behaviors/CTableBehavior.php';
+require_once __DIR__ . '/../include/CWebTest.php';
+require_once __DIR__.'/behaviors/CMessageBehavior.php';
+require_once __DIR__.'/behaviors/CTableBehavior.php';
 
 /**
  * @backup sessions
@@ -37,7 +37,7 @@ class testFormSetup extends CWebTest {
 	}
 
 	/**
-	 * @backup config
+	 * @backup settings
 	 */
 	public function testFormSetup_welcomeSectionLayout() {
 		$this->page->login()->open('setup.php')->waitUntilReady();
@@ -65,54 +65,53 @@ class testFormSetup extends CWebTest {
 		$this->assertScreenshotExcept($form, $this->query('id:default-lang')->one(), 'Welcome_Rus');
 	}
 
-// Commented until Jenkins issue investigated.
-//	public function testFormSetup_prerequisitesSectionLayout() {
-//		$this->page->login()->open('setup.php')->waitUntilReady();
-//		$this->query('button:Next step')->one()->click();
-//
-//		// Check Pre-requisites section.
-//		$this->checkPageTextElements('Check of pre-requisites');
-//		$headers = $this->query('class:list-table')->asTable()->one()->getHeadersText();
-//		$this->assertEquals(['', 'Current value', 'Required', ''], $headers);
-//
-//		$prerequisites = [
-//			'PHP version',
-//			'PHP option "memory_limit"',
-//			'PHP option "post_max_size"',
-//			'PHP option "upload_max_filesize"',
-//			'PHP option "max_execution_time"',
-//			'PHP option "max_input_time"',
-//			'PHP databases support',
-//			'PHP bcmath',
-//			'PHP mbstring',
-//			'PHP option "mbstring.func_overload"',
-//			'PHP sockets',
-//			'PHP gd',
-//			'PHP gd PNG support',
-//			'PHP gd JPEG support',
-//			'PHP gd GIF support',
-//			'PHP gd FreeType support',
-//			'PHP libxml',
-//			'PHP xmlwriter',
-//			'PHP xmlreader',
-//			'PHP LDAP',
-//			'PHP OpenSSL',
-//			'PHP ctype',
-//			'PHP session',
-//			'PHP option "session.auto_start"',
-//			'PHP gettext',
-//			'PHP option "arg_separator.output"',
-//			'PHP curl',
-//			'System locale'
-//		];
-//		$this->assertTableDataColumn($prerequisites, '');
-//		$this->checkSections('Check of pre-requesties');
-//		$this->checkButtons();
-//
-//		global $DB;
-//		$php_version = $this->query('xpath://td[text()="PHP version"]/following-sibling::td')->one();
-//		$this->assertScreenshotExcept($this->query('xpath://form')->one(), $php_version, 'Prerequisites_'.$DB['TYPE']);
-//	}
+	public function testFormSetup_prerequisitesSectionLayout() {
+		$this->page->login()->open('setup.php')->waitUntilReady();
+		$this->query('button:Next step')->one()->click();
+
+		// Check Pre-requisites section.
+		$this->checkPageTextElements('Check of pre-requisites');
+		$headers = $this->query('class:list-table')->asTable()->one()->getHeadersText();
+		$this->assertEquals(['', 'Current value', 'Required', ''], $headers);
+
+		$prerequisites = [
+			'PHP version',
+			'PHP option "memory_limit"',
+			'PHP option "post_max_size"',
+			'PHP option "upload_max_filesize"',
+			'PHP option "max_execution_time"',
+			'PHP option "max_input_time"',
+			'PHP databases support',
+			'PHP bcmath',
+			'PHP mbstring',
+			'PHP option "mbstring.func_overload"',
+			'PHP sockets',
+			'PHP gd',
+			'PHP gd PNG support',
+			'PHP gd JPEG support',
+			'PHP gd GIF support',
+			'PHP gd FreeType support',
+			'PHP libxml',
+			'PHP xmlwriter',
+			'PHP xmlreader',
+			'PHP LDAP',
+			'PHP OpenSSL',
+			'PHP ctype',
+			'PHP session',
+			'PHP option "session.auto_start"',
+			'PHP gettext',
+			'PHP option "arg_separator.output"',
+			'PHP curl',
+			'System locale'
+		];
+		$this->assertTableDataColumn($prerequisites, '');
+		$this->checkSections('Check of pre-requesties');
+		$this->checkButtons();
+
+		global $DB;
+		$php_version = $this->query('xpath://td[text()="PHP version"]/following-sibling::td')->one();
+		$this->assertScreenshotExcept($this->query('xpath://form')->one(), $php_version, 'Prerequisites_'.$DB['TYPE']);
+	}
 
 	public function testFormSetup_dbConnectionSectionLayout() {
 		$this->openSpecifiedSection('Configure DB connection');
@@ -256,47 +255,53 @@ class testFormSetup extends CWebTest {
 	}
 
 	/**
-	 * @backup config
+	 * @backup settings
 	 */
 	public function testFormSetup_settingsSection() {
 		// Open the Pre-installation summary section.
 		$this->openSpecifiedSection('Settings');
+
 		// Check GUI settings section.
 		$this->checkPageTextElements('Settings');
 		$this->checkButtons();
 		$form = $this->query('xpath://form')->asForm()->one();
+
 		// Check layout via screenshot for default theme.
 		$this->assertScreenshotExcept($form, $this->query('id:label-default-timezone')->one(), 'GUISettings_Default');
 
 		// Check Zabbix server name field.
-		$server_name = $form->getField('Zabbix server name');
+		$server_name = $this->query('id:zbx_server_name')->one();
 		$this->assertEquals(255, $server_name->getAttribute('maxlength'));
 		$this->assertEquals('', $server_name->getValue());
 
 		// Check timezone field.
-		$timezones_field = $form->getField('Default time zone');
-		$timezones = $timezones_field->getOptions()->asText();
+		$timezones_field = $this->query('name:default_timezone');
+		$timezones = $timezones_field->asDropdown()->one()->getOptions()->asText();
 
-		// Note that count of available timezones may differ based on the local environment configuration.
-		$this->assertEquals(420, count($timezones));
+		// Note that count of available timezones may differ based on the local environment configuration and php version.
+		$this->assertGreaterThan(415, count($timezones));
+		$this->assertContains(CDateTimeHelper::getTimeZoneFormat('Europe/Riga'), $timezones);
 
 		foreach (['System', 'Europe/Riga'] as $timezone_value) {
 			$timezone = CDateTimeHelper::getTimeZoneFormat($timezone_value);
 			$this->assertContains($timezone, $timezones);
 		}
 		// Select a certain timezone.
-		$form->getField('Default time zone')->select(CDateTimeHelper::getTimeZoneFormat('Europe/Riga'));
+		$timezones_field->one()->select(CDateTimeHelper::getTimeZoneFormat('Europe/Riga'));
 
 		// Check Default theme field.
-		$themes = $form->getField('Default theme');
-		$this->assertEquals(['Blue', 'Dark', 'High-contrast light', 'High-contrast dark'], $themes->getOptions()->asText());
+		$this->assertEquals(['Blue', 'Dark', 'High-contrast light', 'High-contrast dark'], $this->query('id:default-theme')
+				->asDropdown()->one()->getOptions()->asText()
+		);
+
 		// Select Dark theme.
-		$form->getField('Default theme')->select('Dark');
+		$this->query('id:default-theme')->one()->asDropdown()->select('Dark');
 
 		// Check that default theme has changed.
 		$stylesheet = $this->query('xpath://link[@rel="stylesheet"]')->one();
 		$parts = explode('/', $stylesheet->getAttribute('href'));
 		$this->assertContains('dark-theme.css', explode('?', end($parts)));
+
 		// Check layout via screenshot for dark theme.
 		$this->assertScreenshotExcept($form, $this->query('id:label-default-timezone')->one(), 'GUISettings_Dark');
 
@@ -304,7 +309,10 @@ class testFormSetup extends CWebTest {
 		$this->query('button:Next step')->one()->click();
 		$this->query('button:Next step')->one()->click();
 		$this->query('button:Finish')->one()->click();
-		$db_values = CDBHelper::getRow('SELECT default_theme, default_timezone FROM config');
+
+		$db_values = CDBHelper::getColumn('SELECT name, value_str FROM settings WHERE name IN (\'default_theme\','.
+				' \'default_timezone\') ORDER BY name', 'value_str'
+		);
 		$this->assertEquals(['dark-theme', 'Europe/Riga'], array_values($db_values));
 	}
 
@@ -314,8 +322,9 @@ class testFormSetup extends CWebTest {
 		// Check that Zabbix server name field is not displayed if it is not populated.
 		$this->assertFalse($this->query('xpath://span[text()="Zabbix server name"]')->one(false)->isValid());
 		$this->query('button:Back')->one()->click();
+
 		// Fill in the Zabbix server name field and proceed with checking Pre-installation summary.
-		$this->query('id:setup-form')->asForm()->one()->getField('Zabbix server name')->fill('Zabbix server name');
+		$this->query('id:zbx_server_name')->one()->fill('Zabbix server name');
 		$this->query('button:Next step')->one()->click();
 		$db_parameters = $this->getDbParameters();
 		$text = 'Please check configuration parameters. If all is correct, press "Next step" button, or "Back" button '.
@@ -327,7 +336,8 @@ class testFormSetup extends CWebTest {
 			'Database name' => $db_parameters['Database name'],
 			'Database user' => $db_parameters['User'],
 			'Database password' => '******',
-			'Zabbix server name' => 'Zabbix server name'
+			'Zabbix server name' => 'Zabbix server name',
+			'Encrypt connections from Web interface' => 'false'
 		];
 
 		if ($db_parameters['Database type'] === 'PostgreSQL') {
@@ -343,6 +353,7 @@ class testFormSetup extends CWebTest {
 		$summary_fields['Database port'] = ($db_parameters['Database port'] === '0') ? 'default' : $db_parameters['Database port'];
 		foreach ($summary_fields as $field_name => $value) {
 			$xpath = 'xpath://span[text()='.CXPathHelper::escapeQuotes($field_name).']/../../div[@class="table-forms-td-right"]';
+
 			// Assert contains is used as Password length can differ.
 			if ($field_name === 'Database password') {
 				$this->assertStringContainsString($value, $this->query($xpath)->one()->getText());

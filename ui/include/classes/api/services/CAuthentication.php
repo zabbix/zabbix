@@ -24,9 +24,6 @@ class CAuthentication extends CApiService {
 		'update' => ['min_user_type' => USER_TYPE_SUPER_ADMIN]
 	];
 
-	protected $tableName = 'config';
-	protected $tableAlias = 'c';
-
 	/**
 	 * @param array $options
 	 *
@@ -49,15 +46,7 @@ class CAuthentication extends CApiService {
 			$options['output'] = $output_fields;
 		}
 
-		$db_auth = [];
-
-		$result = DBselect($this->createSelectQuery($this->tableName(), $options));
-		while ($row = DBfetch($result)) {
-			$db_auth[] = $row;
-		}
-		$db_auth = $this->unsetExtraFields($db_auth, ['configid'], []);
-
-		return $db_auth[0];
+		return CApiSettingsHelper::getParameters($options['output']);
 	}
 
 	/**
@@ -67,18 +56,12 @@ class CAuthentication extends CApiService {
 	public static function getPublic(): array {
 		global $ALLOW_HTTP_AUTH;
 
-		$output_fields = ['authentication_type', 'http_auth_enabled', 'http_login_form', 'http_strip_domains',
-			'http_case_sensitive', 'saml_auth_enabled', 'saml_case_sensitive', 'saml_jit_status', 'disabled_usrgrpid',
-			'mfa_status', 'mfaid', 'ldap_userdirectoryid'
-		];
-
-		$db_auth = DB::select('config', ['output' => $output_fields])[0];
-
-		if (!$ALLOW_HTTP_AUTH) {
-			$db_auth['http_auth_enabled'] = (string) ZBX_AUTH_HTTP_DISABLED;
-		}
-
-		return $db_auth;
+		return ($ALLOW_HTTP_AUTH ? [] : ['http_auth_enabled' => ZBX_AUTH_HTTP_DISABLED]) +
+			CApiSettingsHelper::getParameters([
+				'authentication_type', 'http_auth_enabled', 'http_login_form', 'http_strip_domains',
+				'http_case_sensitive', 'saml_auth_enabled', 'saml_case_sensitive',	'saml_jit_status',
+				'disabled_usrgrpid', 'mfa_status', 'mfaid',	'ldap_userdirectoryid'
+			]);
 	}
 
 	/**
@@ -95,37 +78,25 @@ class CAuthentication extends CApiService {
 			);
 		}
 
-		$db_auth = $this->validateUpdate($auth);
+		$this->validateUpdate($auth, $db_auth);
 
-		$upd_config = DB::getUpdatedValues('config', $auth, $db_auth);
+		CApiSettingsHelper::updateParameters($auth, $db_auth);
 
-		if ($upd_config) {
-			DB::update('config', [
-				'values' => $upd_config,
-				'where' => ['configid' => $db_auth['configid']]
-			]);
-		}
-
-		self::addAuditLog(CAudit::ACTION_UPDATE, CAudit::RESOURCE_AUTHENTICATION,
-			[['configid' => $db_auth['configid']] + $auth], [$db_auth['configid'] => $db_auth]
-		);
+		self::addAuditLog(CAudit::ACTION_UPDATE, CAudit::RESOURCE_AUTHENTICATION, [$auth], [$db_auth]);
 
 		return array_keys($auth);
 	}
 
 	/**
-	 * @param array  $auth
+	 * @param array      $auth
+	 * @param array|null $db_auth
 	 *
-	 * @throws APIException if the input is invalid.
-	 *
-	 * @return array
+	 * @throws APIException
 	 */
-	protected function validateUpdate(array $auth): array {
+	protected function validateUpdate(array $auth, ?array &$db_auth): void {
 		global $ALLOW_HTTP_AUTH;
 
-		$db_auth = DB::select('config', ['output' => array_merge(['configid'], self::getOutputFields())])[0];
-		$auth += array_diff_key($db_auth, array_flip(['configid']));
-
+		$auth += CApiSettingsHelper::getParameters(['authentication_type']);
 		$api_input_rules = ['type' => API_OBJECT, 'fields' => [
 			'authentication_type' =>		['type' => API_INT32, 'in' => ZBX_AUTH_INTERNAL.','.ZBX_AUTH_LDAP],
 			'ldap_auth_enabled' =>			['type' => API_MULTIPLE, 'rules' => [
@@ -136,10 +107,10 @@ class CAuthentication extends CApiService {
 			'ldap_userdirectoryid' =>		['type' => API_ID],
 			'saml_auth_enabled' =>			['type' => API_INT32, 'in' => ZBX_AUTH_SAML_DISABLED.','.ZBX_AUTH_SAML_ENABLED],
 			'saml_case_sensitive' =>		['type' => API_INT32, 'in' => ZBX_AUTH_CASE_INSENSITIVE.','.ZBX_AUTH_CASE_SENSITIVE],
-			'passwd_min_length' =>			['type' => API_INT32, 'in' => '1:70', 'default' => DB::getDefault('config', 'passwd_min_length')],
-			'passwd_check_rules' =>			['type' => API_INT32, 'in' => '0:'.(PASSWD_CHECK_CASE | PASSWD_CHECK_DIGITS | PASSWD_CHECK_SPECIAL | PASSWD_CHECK_SIMPLE), 'default' => DB::getDefault('config', 'passwd_check_rules')],
+			'passwd_min_length' =>			['type' => API_INT32, 'in' => '1:70'],
+			'passwd_check_rules' =>			['type' => API_INT32, 'in' => '0:'.(PASSWD_CHECK_CASE | PASSWD_CHECK_DIGITS | PASSWD_CHECK_SPECIAL | PASSWD_CHECK_SIMPLE)],
 			'disabled_usrgrpid' =>			['type' => API_ID],
-			'jit_provision_interval' =>		['type' => API_TIME_UNIT, 'flags' => API_NOT_EMPTY | API_TIME_UNIT_WITH_YEAR, 'in' => implode(':', [SEC_PER_HOUR, 25 * SEC_PER_YEAR])],
+			'jit_provision_interval' =>		['type' => API_TIME_UNIT, 'flags' => API_TIME_UNIT_WITH_YEAR, 'in' => implode(':', [SEC_PER_HOUR, 25 * SEC_PER_YEAR])],
 			'saml_jit_status' =>			['type' => API_INT32, 'in' => implode(',', [JIT_PROVISIONING_DISABLED, JIT_PROVISIONING_ENABLED])],
 			'ldap_jit_status' =>			['type' => API_INT32, 'in' => implode(',', [JIT_PROVISIONING_DISABLED, JIT_PROVISIONING_ENABLED])],
 			'mfa_status' =>					['type' => API_INT32, 'in' => implode(',', [MFA_DISABLED, MFA_ENABLED])],
@@ -150,7 +121,7 @@ class CAuthentication extends CApiService {
 			$api_input_rules['fields'] += [
 				'http_auth_enabled' =>		['type' => API_INT32, 'in' => ZBX_AUTH_HTTP_DISABLED.','.ZBX_AUTH_HTTP_ENABLED],
 				'http_login_form' =>		['type' => API_INT32, 'in' => ZBX_AUTH_FORM_ZABBIX.','.ZBX_AUTH_FORM_HTTP],
-				'http_strip_domains' =>		['type' => API_STRING_UTF8, 'length' => DB::getFieldLength('config', 'http_strip_domains')],
+				'http_strip_domains' =>		['type' => API_STRING_UTF8, 'length' => CSettingsSchema::getFieldLength('http_strip_domains')],
 				'http_case_sensitive' =>	['type' => API_INT32, 'in' => ZBX_AUTH_CASE_INSENSITIVE.','.ZBX_AUTH_CASE_SENSITIVE]
 			];
 		}
@@ -159,10 +130,42 @@ class CAuthentication extends CApiService {
 			self::exception(ZBX_API_ERROR_PARAMETERS, $error);
 		}
 
-		self::checkUserDirectoryid($auth, $db_auth);
+		$db_auth = CApiSettingsHelper::getParameters(self::getOutputFields(), false);
+		CApiSettingsHelper::checkUndeclaredParameters($auth, $db_auth);
 
-		// Check if deprovisioning user group exists and is set properly.
-		if ($auth['disabled_usrgrpid']) {
+		$auth += array_intersect_key($db_auth, array_flip(['ldap_auth_enabled', 'ldap_userdirectoryid',
+			'disabled_usrgrpid', 'saml_auth_enabled', 'saml_jit_status', 'ldap_jit_status', 'mfa_status', 'mfaid'
+		]));
+
+		self::checkUserDirectoryid($auth, $db_auth);
+		self::checkDeprovisionedUsersGroup($auth);
+		self::checkMfaExists($auth);
+		self::checkMfaid($auth, $db_auth);
+	}
+
+	private static function checkUserDirectoryid(array $auth, array $db_auth): void {
+		if ($auth['ldap_userdirectoryid'] != 0) {
+			if (bccomp($auth['ldap_userdirectoryid'], $db_auth['ldap_userdirectoryid']) != 0) {
+				$default_ldap_exists = API::UserDirectory()->get([
+					'output' => [],
+					'userdirectoryids' => [$auth['ldap_userdirectoryid']],
+					'filter' => ['idp_type' => IDP_TYPE_LDAP]
+				]);
+
+				if (!$default_ldap_exists) {
+					static::exception(ZBX_API_ERROR_PARAMETERS,
+						_s('Invalid parameter "%1$s": %2$s.', '/ldap_userdirectoryid', _('object does not exist'))
+					);
+				}
+			}
+		}
+		elseif ($auth['ldap_auth_enabled'] == ZBX_AUTH_LDAP_ENABLED) {
+			self::exception(ZBX_API_ERROR_PARAMETERS, _('Default LDAP server must be specified.'));
+		}
+	}
+
+	private static function checkDeprovisionedUsersGroup(array $auth): void {
+		if ($auth['disabled_usrgrpid'] != 0) {
 			$groups = API::UserGroup()->get([
 				'output' => ['users_status'],
 				'usrgrpids' => [$auth['disabled_usrgrpid']]
@@ -188,35 +191,9 @@ class CAuthentication extends CApiService {
 				static::exception(ZBX_API_ERROR_PARAMETERS, _('Deprovisioned users group cannot be empty.'));
 			}
 		}
-
-		self::checkMfaExists($auth, $db_auth);
-		self::checkMfaid($auth, $db_auth);
-
-		return $db_auth;
 	}
 
-	private static function checkUserDirectoryid(array $auth, array $db_auth): void {
-		if ($auth['ldap_userdirectoryid'] != 0) {
-			if (bccomp($auth['ldap_userdirectoryid'], $db_auth['ldap_userdirectoryid']) != 0) {
-				$default_ldap_exists = API::UserDirectory()->get([
-					'output' => [],
-					'userdirectoryids' => [$auth['ldap_userdirectoryid']],
-					'filter' => ['idp_type' => IDP_TYPE_LDAP]
-				]);
-
-				if (!$default_ldap_exists) {
-					static::exception(ZBX_API_ERROR_PARAMETERS,
-						_s('Invalid parameter "%1$s": %2$s.', '/ldap_userdirectoryid', _('object does not exist'))
-					);
-				}
-			}
-		}
-		elseif ($auth['ldap_auth_enabled'] == ZBX_AUTH_LDAP_ENABLED) {
-			self::exception(ZBX_API_ERROR_PARAMETERS, _('Default LDAP server must be specified.'));
-		}
-	}
-
-	private static function checkMfaExists(array $auth, array $db_auth): void {
+	private static function checkMfaExists(array $auth): void {
 		if ($auth['mfa_status'] == MFA_ENABLED) {
 			$mfa_count = DB::select('mfa', ['countOutput' => true]);
 

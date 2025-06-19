@@ -1,0 +1,55 @@
+---
+test case: "update single entry"
+in:
+  heap_in: [[0, 50]]
+  upd_key: 0
+  upd_data: 0
+out:
+  heap_out: [[1, 0]]
+---
+test case: "update last entry"
+in:
+  heap_in: [[0, 0], [2, 40], [3, 2147483647], [2147483647, 0]]
+  upd_key: 2147483647
+  upd_data: 2147483647
+out:
+  heap_out: [[0, 0], [2, 40], [3, 2147483647], [2147483647, 2147483647]]
+---
+test case: "update to the same value"
+in:
+  heap_in: [[0, 0]]
+  upd_key: 0
+  upd_data: 0
+out:
+  heap_out: [[0, 0]]
+---
+test case: "update non-existing entry"
+in:
+  heap_in: [[1, 50], [2, 40], [3, 30]]
+  upd_key: 0
+  upd_data: 0
+exit code: failure
+---
+test case: "update empty vector"
+in:
+  heap_in: []
+  upd_key: 0
+  upd_data: 0
+exit code: failure
+---
+test case: "invalid heap"
+in:
+  heap_in: [[0, 0], [0, 0]]
+  upd_key: 0
+  upd_data: 0
+exit code: failure
+---
+test case: "over 512 elements in heap"
+in:
+  elements: 513
+  heap_in: [[0, 0]]
+  upd_key: 0
+  upd_data: 0
+out:
+  heap_out: [[0, 0]]
+...

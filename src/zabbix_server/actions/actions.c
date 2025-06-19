@@ -669,10 +669,12 @@ static int	check_time_period_condition(const zbx_vector_db_event_t *esc_events, 
 	if (ZBX_CONDITION_OPERATOR_IN != condition->op && ZBX_CONDITION_OPERATOR_NOT_IN != condition->op)
 		return NOTSUPPORTED;
 
-	char	*period = zbx_strdup(NULL, condition->value);
+	char			*period = zbx_strdup(NULL, condition->value);
+	zbx_dc_um_handle_t	*um_handle = zbx_dc_open_user_macros();
 
-	zbx_substitute_simple_macros(NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, &period,
-			ZBX_MACRO_TYPE_COMMON, NULL, 0);
+	zbx_dc_expand_user_and_func_macros(um_handle, &period, NULL, 0, NULL);
+
+	zbx_dc_close_user_macros(um_handle);
 
 	for (int i = 0; i < esc_events->values_num; i++)
 	{
@@ -2212,13 +2214,11 @@ static void	item_parents_sql_alloc(char **sql, size_t *sql_alloc, zbx_vector_uin
 {
 	size_t	sql_offset = 0;
 
-	zbx_snprintf_alloc(sql, sql_alloc, &sql_offset,
+	zbx_strcpy_alloc(sql, sql_alloc, &sql_offset,
 			"select i.itemid,id.parent_itemid"
 			" from item_discovery id,items i"
 			" where id.itemid=i.itemid"
-				" and i.flags=%d"
-				" and",
-			ZBX_FLAG_DISCOVERY_CREATED);
+				" and");
 
 	zbx_db_add_condition_alloc(sql, sql_alloc, &sql_offset, "i.itemid",
 			objectids_tmp->values, objectids_tmp->values_num);
@@ -2822,6 +2822,8 @@ static void	execute_operations(const zbx_db_event *event, zbx_uint64_t actionid)
 
 	if (0 != new_optagids.values_num || 0 != del_optagids.values_num)
 		op_add_del_tags(event, &cfg,  &new_optagids, &del_optagids);
+
+	zbx_config_clean(&cfg);
 
 	zbx_vector_uint64_destroy(&del_groupids);
 	zbx_vector_uint64_destroy(&new_groupids);
@@ -3542,11 +3544,12 @@ out:
  ******************************************************************************/
 void	get_db_actions_info(zbx_vector_uint64_t *actionids, zbx_vector_db_action_ptr_t *actions)
 {
-	zbx_db_result_t	result;
-	zbx_db_row_t	row;
-	char		*filter = NULL;
-	size_t		filter_alloc = 0, filter_offset = 0;
-	zbx_db_action	*action;
+	zbx_db_result_t		result;
+	zbx_db_row_t		row;
+	char			*filter = NULL;
+	size_t			filter_alloc = 0, filter_offset = 0;
+	zbx_db_action		*action;
+	zbx_dc_um_handle_t	*um_handle = zbx_dc_open_user_macros();
 
 	zbx_vector_uint64_sort(actionids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
 	zbx_vector_uint64_uniq(actionids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
@@ -3569,8 +3572,7 @@ void	get_db_actions_info(zbx_vector_uint64_t *actionids, zbx_vector_db_action_pt
 		ZBX_STR2UCHAR(action->eventsource, row[3]);
 
 		tmp = zbx_strdup(NULL, row[4]);
-		zbx_substitute_simple_macros(NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL,
-				&tmp, ZBX_MACRO_TYPE_COMMON, NULL, 0);
+		zbx_dc_expand_user_and_func_macros(um_handle, &tmp, NULL, 0, NULL);
 		if (SUCCEED != zbx_is_time_suffix(tmp, &action->esc_period, ZBX_LENGTH_UNLIMITED))
 		{
 			zabbix_log(LOG_LEVEL_WARNING, "Invalid default operation step duration \"%s\" for action"
@@ -3588,6 +3590,7 @@ void	get_db_actions_info(zbx_vector_uint64_t *actionids, zbx_vector_db_action_pt
 		zbx_vector_db_action_ptr_append(actions, action);
 	}
 	zbx_db_free_result(result);
+	zbx_dc_close_user_macros(um_handle);
 
 	result = zbx_db_select("select actionid from operations where recovery=%d and%s",
 			ZBX_OPERATION_MODE_RECOVERY, filter);

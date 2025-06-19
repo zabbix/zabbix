@@ -1,0 +1,36 @@
+---
+test case: "1. Case value"
+in:
+  str_mode: "value"
+out:
+  return: SUCCEED
+  mode_str_exp: "VALUE"
+---
+test case: "2. Case max"
+in:
+  str_mode: "max"
+out:
+  return: SUCCEED
+  mode_str_exp: "MAX"
+---
+test case: "3. Case min"
+in:
+  str_mode: "min"
+out:
+  return: SUCCEED
+  mode_str_exp: "MIN"
+---
+test case: "4. Case delta"
+in:
+  str_mode: "delta"
+out:
+  return: SUCCEED
+  mode_str_exp: "DELTA"
+---
+test case: "5. Case avg"
+in:
+  str_mode: "avg"
+out:
+  return: SUCCEED
+  mode_str_exp: "AVG"
+...

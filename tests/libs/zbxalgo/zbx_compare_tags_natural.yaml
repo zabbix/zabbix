@@ -1,0 +1,64 @@
+---
+test case: "1. Different tags"
+in:
+  tag1: "First"
+  value1: "Test"
+  tag2: "Second"
+  value2: "Test"
+out:
+  result: -13
+---
+test case: "2. Identical tags and values"
+in:
+  tag1: "First"
+  value1: "!"#$%&'()*+,-./0123456789:;<=>?@ABCDEFGHIJKLMNOPQRSTUVWXYZ[]^_`abcdefghijklmnopqrstuvwxyz{|}"
+  tag2: "First"
+  value2: "!"#$%&'()*+,-./0123456789:;<=>?@ABCDEFGHIJKLMNOPQRSTUVWXYZ[]^_`abcdefghijklmnopqrstuvwxyz{|}"
+out:
+  result: 0
+---
+test case: "3. Identical tags and different values"
+in:
+  tag1: "First"
+  value1: "Hello"
+  tag2: "First"
+  value2: "Bye"
+out:
+  result: 6
+---
+test case: "4. Long identical values (255)"
+in:
+  tag1: "First"
+  value1: "testtesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttes"
+  tag2: "First"
+  value2: "testtesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttes"
+out:
+  result: 0
+---
+test case: "5. Empty tags and values"
+in:
+  tag1: ""
+  value1: ""
+  tag2: ""
+  value2: ""
+out:
+  result: 0
+---
+test case: "6. Newline in tags"
+in:
+  tag1: "aaa\n\n\nbbb"
+  value1: ""
+  tag2: "aaa\n\n\nccc"
+  value2: ""
+out:
+  result: -1
+---
+test case: "7. Backslash in value"
+in:
+  tag1: ""
+  value1: '"\\\\"'
+  tag2: ""
+  value2: '"\\\\"'
+out:
+  result: 0
+...

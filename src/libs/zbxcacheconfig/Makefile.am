@@ -3,6 +3,7 @@
 noinst_LIBRARIES = libzbxcacheconfig.a
 
 libzbxcacheconfig_a_SOURCES = \
+	dbsettings.c \
 	dbhistoryconfig.c \
 	dbconfig.c \
 	dbconfig.h \
@@ -11,7 +12,8 @@ libzbxcacheconfig_a_SOURCES = \
 	dbsync.c \
 	dbsync.h \
 	inventory.c \
-	lld_macro.c \
+	item.c \
+	macro_ctx.c \
 	trigger.c \
 	user_macro.c \
 	user_macro.h \

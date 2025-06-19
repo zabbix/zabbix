@@ -21,7 +21,6 @@
 #include "autoreg/autoreg_server.h"
 
 #include "zbxtimekeeper.h"
-#include "zbxexpression.h"
 #include "zbxdbwrap.h"
 #include "zbxnix.h"
 #include "zbxself.h"
@@ -38,6 +37,7 @@
 #include "zbxcacheconfig.h"
 #include "zbxipcservice.h"
 #include "zbxjson.h"
+#include "zbxautoreg.h"
 
 static zbx_get_program_type_f		zbx_get_program_type_cb = NULL;
 
@@ -591,12 +591,10 @@ static int	process_proxy(const zbx_config_vault_t *config_vault, int config_time
 			int	check_tasks = 0;
 
 			proxy.addr = zbx_strdup(NULL, proxy.addr_orig);
-			zbx_substitute_simple_macros(NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL,
-					NULL, &proxy.addr, ZBX_MACRO_TYPE_COMMON, NULL, 0);
+			zbx_dc_expand_user_and_func_macros(um_handle, &proxy.addr, NULL, 0, NULL);
 
 			port = zbx_strdup(port, proxy.port_orig);
-			zbx_substitute_simple_macros(NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL,
-					NULL, &port, ZBX_MACRO_TYPE_COMMON, NULL, 0);
+			zbx_dc_expand_user_and_func_macros(um_handle, &port, NULL, 0, NULL);
 			if (FAIL == zbx_is_ushort(port, &proxy.port))
 			{
 				zabbix_log(LOG_LEVEL_ERR, "invalid proxy \"%s\" port: \"%s\"", proxy.name, port);

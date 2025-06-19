@@ -24,7 +24,6 @@ if ($data['uncheck']) {
 }
 
 $this->includeJsFile('administration.token.list.js.php');
-$this->addJsFile('class.calendar.js');
 
 $filter = (new CFilter())
 	->setResetUrl((new CUrl('zabbix.php'))->setArgument('action', 'token.list'))
@@ -161,22 +160,17 @@ foreach ($data['tokens'] as $token) {
 		->setArgument('admin_mode', 1)
 		->getUrl();
 
-	$name = (new CLink($token['name'], $token_url))
-		->setAttribute('data-tokenid', $token['tokenid'])
-		->setAttribute('data-action', 'token.edit')
-		->setAttribute('data-admin_mode', '1');
+	$name = new CLink($token['name'], $token_url);
 
 	$token_table->addRow([
 		new CCheckBox('tokenids['.$token['tokenid'].']', $token['tokenid']),
 		(new CCol($name))->addClass(ZBX_STYLE_NOWRAP),
-		(new CCol($token['user']))->addClass(ZBX_STYLE_WORDBREAK),
+		$token['user'],
 		(new CSpan(zbx_date2str(DATE_TIME_FORMAT_SECONDS, $token['expires_at'])))->addClass(
 			$token['is_expired'] ? ZBX_STYLE_RED : ZBX_STYLE_GREEN
 		),
 		zbx_date2str(DATE_TIME_FORMAT_SECONDS, $token['created_at']),
-		($token['creator'] === null)
-			? italic(_('Unknown'))
-			: (new CCol($token['creator']))->addClass(ZBX_STYLE_WORDBREAK),
+		$token['creator'] === null ? italic(_('Unknown')) : $token['creator'],
 		zbx_date2str(DATE_TIME_FORMAT_SECONDS, $token['lastaccess']),
 		($token['status'] == ZBX_AUTH_TOKEN_ENABLED)
 			? (new CLink(_('Enabled'), (new CUrl('zabbix.php'))

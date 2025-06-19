@@ -188,6 +188,17 @@ void	*zbx_hashset_iter_next(zbx_hashset_iter_t *iter);
 void	zbx_hashset_iter_remove(zbx_hashset_iter_t *iter);
 void	zbx_hashset_copy(zbx_hashset_t *dst, const zbx_hashset_t *src, size_t size);
 
+typedef struct
+{
+	const zbx_hashset_t		*hashset;
+	int				slot;
+	const ZBX_HASHSET_ENTRY_T	*entry;
+}
+zbx_hashset_const_iter_t;
+
+void	zbx_hashset_const_iter_reset(const zbx_hashset_t *hs, zbx_hashset_const_iter_t *iter);
+const void	*zbx_hashset_const_iter_next(zbx_hashset_const_iter_t *iter);
+
 /* hashmap */
 
 /* currently, we only have a very specialized hashmap */
@@ -708,8 +719,7 @@ typedef enum
 	MODE_MAX,
 	MODE_MIN,
 	MODE_DELTA,
-	MODE_AVG,
-	MODE_INVALID
+	MODE_AVG
 }
 zbx_mode_t;
 

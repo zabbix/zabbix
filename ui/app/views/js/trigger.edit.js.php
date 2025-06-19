@@ -21,8 +21,8 @@
 ?>
 window.trigger_edit_popup = new class {
 
-	init({triggerid, expression_popup_parameters, recovery_popup_parameters, readonly, dependencies, action,
-			context, db_trigger, backurl, overlayid, parent_discoveryid
+	init({rules, triggerid, expression_popup_parameters, recovery_popup_parameters, readonly, dependencies, action,
+			context, db_trigger, return_url, overlayid, parent_discoveryid
 	}) {
 		this.triggerid = triggerid;
 		this.expression_popup_parameters = expression_popup_parameters;
@@ -33,24 +33,29 @@ window.trigger_edit_popup = new class {
 		this.context = context;
 		this.db_trigger = db_trigger;
 		this.overlay = overlays_stack.getById(overlayid);
-		this.overlay.backurl = backurl;
 		this.parent_discoveryid = parent_discoveryid;
 		this.dialogue = this.overlay.$dialogue[0];
-		this.form = this.overlay.$dialogue.$body[0].querySelector('form');
-		this.expression = this.form.querySelector('#expression');
-		this.expr_temp = this.form.querySelector('#expr_temp');
-		this.name = this.form.querySelector('#name');
-		this.recovery_expression = this.form.querySelector('#recovery_expression');
-		this.recovery_expr_temp = this.form.querySelector('#recovery_expr_temp');
+		this.form_element = this.overlay.$dialogue.$body[0].querySelector('form');
+		this.form = new CForm(this.form_element, rules);
+		this.expression = this.form_element.querySelector('#expression');
+		this.expr_temp = this.form_element.querySelector('#expr_temp');
+		this.name = this.form_element.querySelector('#name');
+		this.recovery_expression = this.form_element.querySelector('#recovery_expression');
+		this.recovery_expr_temp = this.form_element.querySelector('#recovery_expr_temp');
 		this.expression_constructor_active = false;
 		this.recovery_expression_constructor_active = false;
 		this.selected_dependencies = [];
+
+		ZABBIX.PopupManager.setReturnUrl(return_url);
 
 		window.addPopupValues = (data) => {
 			this.addPopupValues(data.values);
 		}
 
+		this.form_element.style.display = '';
+
 		this.#initActions();
+		this.#initPopupListeners();
 		this.#initTriggersTab();
 		this.#changeRecoveryMode();
 		this.#changeCorrelationMode();
@@ -59,32 +64,44 @@ window.trigger_edit_popup = new class {
 			this.#loadDependencyTable(this.dependencies);
 		}
 
-		this.form.style.display = '';
 		this.overlay.recoverFocus();
 	}
 
 	#initActions() {
 		['input', 'keydown', 'paste'].forEach((event_type) => {
 			this.name.addEventListener(event_type,
-				(e) => this.form.querySelector('#event_name').placeholder = e.target.value
+				(e) => {
+					this.form_element.querySelector('#event_name').placeholder = e.target.value;
+					$(this.form_element.querySelector('#event_name')).textareaFlexible('updateHeight');
+				}
 			);
 			this.name.dispatchEvent(new Event('input'));
 		});
 
 		// Form submit on Enter for event_name field, because textareaflexible.js triggers JQuery event.
-		this.form.querySelector('[name="event_name"]').addEventListener('keyup', e => {
+		this.form_element.querySelector('[name="event_name"]').addEventListener('keyup', e => {
 			if (e.key === 'Enter') {
-				$(this.form).submit();
+				if (e.target.readOnly) {
+					return;
+				}
+
+				$(this.form_element).submit();
 			}
 		});
 
 		// Tags tab events.
-		this.form.querySelectorAll('[name="show_inherited_tags"]')
+		this.form_element.querySelectorAll('[name="show_inherited_tags"]')
 			.forEach(o => o.addEventListener('change', e => this.#toggleInheritedTags()));
 
-		this.form.addEventListener('click', (e) => {
+		this.form_element.addEventListener('click', (e) => {
 			if (e.target.id === 'expression-constructor' || e.target.id === 'close-expression-constructor') {
-				this.#toggleExpressionConstructor(e.target.id);
+				if (!this.expression_constructor_active && this.expression.value) {
+					this.form.validateFieldsForAction(['expression'])
+						.then((result) => result && this.#toggleExpressionConstructor(e.target.id))
+				}
+				else {
+					this.#toggleExpressionConstructor(e.target.id);
+				}
 			}
 			else if (e.target.id === 'insert-expression') {
 				this.#openPopupTriggerExpr({
@@ -115,10 +132,17 @@ window.trigger_edit_popup = new class {
 			}
 			else if (e.target.name === 'recovery_mode' && !e.target.readOnly) {
 				this.#changeRecoveryMode();
+				this.#changeCorrelationMode();
 			}
 			else if (e.target.id === 'recovery-expression-constructor'
 					|| e.target.id === 'close-recovery-expression-constructor') {
-				this.#toggleRecoveryExpressionConstructor(e.target.id);
+				if (!this.recovery_expression_constructor_active && this.recovery_expression.value) {
+					this.form.validateFieldsForAction(['recovery_expression'])
+						.then((result) => result && this.#toggleRecoveryExpressionConstructor(e.target.id))
+				}
+				else {
+					this.#toggleRecoveryExpressionConstructor(e.target.id);
+				}
 			}
 			else if (e.target.id === 'insert-recovery-expression') {
 				this.#openPopupTriggerExpr({
@@ -165,16 +189,13 @@ window.trigger_edit_popup = new class {
 			else if (e.target.classList.contains('js-check-recovery-target')) {
 				check_target(e.target, <?= json_encode(TRIGGER_RECOVERY_EXPRESSION) ?>);
 			}
-			else if (e.target.classList.contains('js-edit-template')
-					|| e.target.classList.contains('js-related-trigger-edit')) {
-				this.#setActions(e.target.dataset);
-			}
 		});
 
 		this.expression.addEventListener('change', (e) => {
 			const button_ids = ['#add_expression', '#and_expression', '#or_expression', '#replace_expression'];
 
 			this.#disableExpressionConstructorButtons(button_ids, e.target);
+			this.form.validateChanges(['expression']);
 		})
 
 		this.recovery_expression.addEventListener('change', (e) => {
@@ -183,59 +204,53 @@ window.trigger_edit_popup = new class {
 			];
 
 			this.#disableExpressionConstructorButtons(button_ids, e.target);
+			this.form.validateChanges(['expression_recovery']);
 		})
 	}
 
-	#setActions(dataset) {
-		const {action, ...params} = dataset;
+	#initPopupListeners() {
+		const subscriptions = [];
 
-		window.popupManagerInstance.setAdditionalActions(() => {
-			const url = new Curl('zabbix.php');
+		for (const action of ['template.edit', 'trigger.edit', 'trigger.prototype.edit']) {
+			subscriptions.push(
+				ZABBIX.EventHub.subscribe({
+					require: {
+						context: CPopupManager.EVENT_CONTEXT,
+						event: CPopupManagerEvent.EVENT_OPEN,
+						action
+					},
+					callback: ({data, event}) => {
+						if (data.action_parameters.triggerid === this.triggerid || this.triggerid === null) {
+							return;
+						}
 
-			url.setArgument('action', 'popup');
-			url.setArgument('popup', action);
-
-			for (const [key, value] of Object.entries(params)) {
-				url.setArgument(key, value);
-			}
-
-			if (this.#isFormModified()) {
-				if (!window.confirm(<?= json_encode(_('Any changes made in the current form will be lost.')) ?>)) {
-					return false;
-				}
-				else {
-					overlayDialogueDestroy(this.overlay.dialogueid);
-
-					const url = new Curl(location.href);
-
-					url.setArgument('action', 'popup');
-					for (const [key, value] of Object.entries(params)) {
-						url.setArgument(key, value);
+						if (!this.#isConfirmed()) {
+							event.preventDefault();
+						}
 					}
+				})
+			);
+		}
 
-					history.replaceState(null, '', url.getUrl());
-
-					return true;
-				}
-			}
-
-			overlayDialogueDestroy(this.overlay.dialogueid);
-			history.replaceState(null, '', url.getUrl());
-
-			return true;
-		});
+		subscriptions.push(
+			ZABBIX.EventHub.subscribe({
+				require: {
+					context: CPopupManager.EVENT_CONTEXT,
+					event: CPopupManagerEvent.EVENT_END_SCRIPTING,
+					action: this.overlay.dialogueid
+				},
+				callback: () => ZABBIX.EventHub.unsubscribeAll(subscriptions)
+			})
+		);
 	}
 
 	#initTriggersTab() {
-		$('#tabs').one('tabscreate tabsactivate', (event, ui) => {
-			const panel = (event.type === 'tabscreate') ? ui.panel : ui.newPanel;
-
-			if (panel.attr('id') === 'triggersTab') {
-				$('#triggersTab')
-					.find('.<?= ZBX_STYLE_TEXTAREA_FLEXIBLE ?>')
-					.textareaFlexible();
+		$('#tabs').on('tabsactivate', (event, ui) => {
+			if (ui.newPanel.is('#triggersTab')) {
+				ui.newPanel.find('.<?= ZBX_STYLE_TEXTAREA_FLEXIBLE ?>').textareaFlexible();
 			}
 		});
+		$('#triggersTab .<?= ZBX_STYLE_TEXTAREA_FLEXIBLE ?>').textareaFlexible();
 	}
 
 	#addDepTrigger(button) {
@@ -300,13 +315,13 @@ window.trigger_edit_popup = new class {
 	}
 
 	#changeRecoveryMode() {
-		const recovery_mode = this.form.querySelector('input[name=recovery_mode]:checked').value;
-		const recovery_expression_row = this.form.querySelector('#recovery-expression-row');
-		const ok_event_closes = this.form.querySelector('#ok-event-closes');
+		const recovery_mode = this.form_element.querySelector('input[name=recovery_mode]:checked').value;
+		const recovery_expression_row = this.form_element.querySelector('#recovery-expression-row');
+		const ok_event_closes = this.form_element.querySelector('#ok-event-closes');
 		const recovery_fields = [recovery_expression_row, recovery_expression_row.previousElementSibling,
 			ok_event_closes, ok_event_closes.previousElementSibling];
 
-		this.form.querySelector('#expression-row').previousElementSibling.textContent =
+		this.form_element.querySelector('#expression-row').previousElementSibling.textContent =
 			(recovery_mode == <?= ZBX_RECOVERY_MODE_RECOVERY_EXPRESSION ?>)
 				? <?= json_encode(_('Problem expression')) ?>
 				: <?= json_encode(_('Expression')) ?>;
@@ -330,9 +345,9 @@ window.trigger_edit_popup = new class {
 	}
 
 	#changeCorrelationMode() {
-		const recovery_mode = this.form.querySelector('input[name=recovery_mode]:checked').value;
-		const correlation_mode = this.form.querySelector('input[name=correlation_mode]:checked').value;
-		const correlation_tag = this.form.querySelector('#correlation_tag');
+		const recovery_mode = this.form_element.querySelector('input[name=recovery_mode]:checked').value;
+		const correlation_mode = this.form_element.querySelector('input[name=correlation_mode]:checked').value;
+		const correlation_tag = this.form_element.querySelector('#correlation_tag');
 
 		if ((recovery_mode == <?= ZBX_RECOVERY_MODE_EXPRESSION ?>
 				|| recovery_mode == <?= ZBX_RECOVERY_MODE_RECOVERY_EXPRESSION ?>)
@@ -371,9 +386,8 @@ window.trigger_edit_popup = new class {
 			dependencies.push({
 				name: name,
 				triggerid: dependency.triggerid,
-				prototype: prototype,
-				trigger_url: this.#constructTriggerUrl(dependency.triggerid, prototype === '1'),
-				action: prototype === '1' ? 'trigger.prototype.edit' : 'trigger.edit'
+				prototype,
+				trigger_url: this.#constructTriggerUrl(dependency.triggerid, prototype === '1')
 			});
 		});
 
@@ -381,10 +395,10 @@ window.trigger_edit_popup = new class {
 	}
 
 	#addDependencies(dependencies) {
-		const template = new Template(document.getElementById('dependency-row-tmpl').innerHTML)
+		const template = new Template(document.getElementById('dependency-row-tmpl').innerHTML);
 		const tbody = Object.values(dependencies).map(row => template.evaluate(row)).join('');
 
-		this.form.querySelector('#dependency-table tbody').insertAdjacentHTML('beforeend', tbody);
+		this.form_element.querySelector('#dependency-table tbody').insertAdjacentHTML('beforeend', tbody);
 		this.selected_dependencies = dependencies.map(({triggerid}) => triggerid);
 	}
 
@@ -393,12 +407,12 @@ window.trigger_edit_popup = new class {
 			'#insert-macro', '#expression-constructor-buttons', '#expression-table',
 			'#close-expression-constructor-field'
 		];
-		const expression_constructor = this.form.querySelector('#expression-constructor');
-		const insert_expression = this.form.querySelector('#insert-expression');
+		const expression_constructor = this.form_element.querySelector('#expression-constructor');
+		const insert_expression = this.form_element.querySelector('#insert-expression');
 
 		if (id === 'expression-constructor') {
 			elements.forEach((element) => {
-				this.form.querySelector(element).style.display = '';
+				this.form_element.querySelector(element).style.display = '';
 			});
 
 			expression_constructor.style.display = 'none';
@@ -421,7 +435,7 @@ window.trigger_edit_popup = new class {
 		}
 		else {
 			elements.forEach((element) => {
-				this.form.querySelector(element).style.display = 'none';
+				this.form_element.querySelector(element).style.display = 'none';
 			});
 
 			expression_constructor.style.display = '';
@@ -434,6 +448,11 @@ window.trigger_edit_popup = new class {
 			this.expression.value = this.expr_temp.value;
 			this.expression_constructor_active = false;
 		}
+
+		this.form.discoverAllFields();
+		this.form.findFieldByName('expression').setErrors({message: '', level: 0});
+		this.form.findFieldByName('expr_temp').setErrors({message: '', level: 0});
+		this.form.validateChanges(['expression']);
 	}
 
 	#toggleRecoveryExpressionConstructor(id) {
@@ -442,12 +461,12 @@ window.trigger_edit_popup = new class {
 			'#close-recovery-expression-constructor-field'
 		];
 
-		const recovery_expression_constructor = this.form.querySelector('#recovery-expression-constructor');
-		const insert_recovery_expression = this.form.querySelector('#insert-recovery-expression');
+		const recovery_expression_constructor = this.form_element.querySelector('#recovery-expression-constructor');
+		const insert_recovery_expression = this.form_element.querySelector('#insert-recovery-expression');
 
 		if (id === 'recovery-expression-constructor') {
 			elements.forEach((element) => {
-				this.form.querySelector(element).style.display = '';
+				this.form_element.querySelector(element).style.display = '';
 			});
 
 			recovery_expression_constructor.style.display = 'none';
@@ -470,7 +489,7 @@ window.trigger_edit_popup = new class {
 		}
 		else {
 			elements.forEach((element) => {
-				this.form.querySelector(element).style.display = 'none';
+				this.form_element.querySelector(element).style.display = 'none';
 			});
 
 			recovery_expression_constructor.style.display = '';
@@ -483,6 +502,11 @@ window.trigger_edit_popup = new class {
 			this.recovery_expression.value = this.recovery_expr_temp.value;
 			this.recovery_expression_constructor_active = false;
 		}
+
+		this.form.discoverAllFields();
+		this.form.findFieldByName('recovery_expression').setErrors({message: '', level: 0});
+		this.form.findFieldByName('recovery_expr_temp').setErrors({message: '', level: 0});
+		this.form.validateChanges(['recovery_expression']);
 	}
 
 	#openPopupTriggerExpr(trigger_options) {
@@ -505,7 +529,7 @@ window.trigger_edit_popup = new class {
 			else {
 				fields.expression = this.expr_temp.value.trim();
 				fields.expr_temp = this.expression.value.trim();
-				fields.expr_target_single = this.form
+				fields.expr_target_single = this.form_element
 					.querySelector('input[name="expr_target_single"]:checked').value;
 			}
 
@@ -519,7 +543,7 @@ window.trigger_edit_popup = new class {
 			else {
 				fields.recovery_expression = this.recovery_expr_temp.value.trim();
 				fields.recovery_expr_temp = this.recovery_expression.value.trim();
-				fields.recovery_expr_target_single = this.form
+				fields.recovery_expr_target_single = this.form_element
 					.querySelector('input[name="recovery_expr_target_single"]:checked').value;
 			}
 
@@ -545,8 +569,10 @@ window.trigger_edit_popup = new class {
 				}
 
 				if (expression_type === <?= TRIGGER_EXPRESSION ?>) {
-					const table = this.form.querySelector('#expression-table');
+					const table = this.form_element.querySelector('#expression-table');
+					const error_container = table.querySelector('.error-container');
 					table.innerHTML = response.body;
+					table.appendChild(error_container);
 					this.expr_temp.value = response.expression;
 
 					if (table.querySelector('tbody').innerHTML !== '') {
@@ -557,8 +583,10 @@ window.trigger_edit_popup = new class {
 					}
 				}
 				else {
-					const table = this.form.querySelector('#recovery-expression-table');
+					const table = this.form_element.querySelector('#recovery-expression-table');
+					const error_container = table.querySelector('.error-container');
 					table.innerHTML = response.body;
+					table.appendChild(error_container);
 					this.recovery_expr_temp.value = response.expression;
 
 					if (table.querySelector('tbody').innerHTML !== '') {
@@ -571,7 +599,7 @@ window.trigger_edit_popup = new class {
 
 			})
 			.catch((exception) => {
-				for (const element of this.form.parentNode.children) {
+				for (const element of this.form_element.parentNode.children) {
 					if (element.matches('.msg-good, .msg-bad, .msg-warning')) {
 						element.parentNode.removeChild(element);
 					}
@@ -598,7 +626,7 @@ window.trigger_edit_popup = new class {
 					this.#toggleRecoveryExpressionConstructor();
 				}
 
-				this.form.parentNode.insertBefore(message_box, this.form);
+				this.form_element.parentNode.insertBefore(message_box, this.form_element);
 			})
 			.finally(() => {
 				this.overlay.unsetLoading();
@@ -607,10 +635,10 @@ window.trigger_edit_popup = new class {
 	}
 
 	#showConstructorAddButton(show = true) {
-		const and_button = this.form.querySelector('#and_expression');
-		const or_button = this.form.querySelector('#or_expression');
-		const replace_button = this.form.querySelector('#replace_expression');
-		const add_button = this.form.querySelector('#add_expression');
+		const and_button = this.form_element.querySelector('#and_expression');
+		const or_button = this.form_element.querySelector('#or_expression');
+		const replace_button = this.form_element.querySelector('#replace_expression');
+		const add_button = this.form_element.querySelector('#add_expression');
 
 		if (show) {
 			and_button.style.display = 'none';
@@ -627,10 +655,10 @@ window.trigger_edit_popup = new class {
 	}
 
 	#showRecoveryConstructorAddButton(show = true) {
-		const and_button = this.form.querySelector('#and_expression_recovery');
-		const or_button = this.form.querySelector('#or_expression_recovery');
-		const replace_button = this.form.querySelector('#replace_expression_recovery');
-		const add_button = this.form.querySelector('#add_expression_recovery');
+		const and_button = this.form_element.querySelector('#and_expression_recovery');
+		const or_button = this.form_element.querySelector('#or_expression_recovery');
+		const replace_button = this.form_element.querySelector('#replace_expression_recovery');
+		const add_button = this.form_element.querySelector('#add_expression_recovery');
 
 		if (show) {
 			and_button.style.display = 'none';
@@ -652,27 +680,18 @@ window.trigger_edit_popup = new class {
 		form_refresh.setAttribute('type', 'hidden');
 		form_refresh.setAttribute('name', 'form_refresh');
 		form_refresh.setAttribute('value', 1);
-		this.form.append(form_refresh);
+		this.form_element.append(form_refresh);
 
-		reloadPopup(this.form, this.action);
+		reloadPopup(this.form_element, this.action);
 	}
 
 	#getFormFields() {
-		const fields = getFormFields(this.form);
+		return this.form.getAllValues();
+	}
 
-		for (let key in fields) {
-			if (typeof fields[key] === 'string' && key !== 'confirmation') {
-				fields[key] = fields[key].trim();
-			}
-			else if (key === 'tags') {
-				for (let tag in fields['tags'] ) {
-					fields['tags'][tag].tag = fields['tags'][tag].tag.trim();
-					fields['tags'][tag].value = fields['tags'][tag].value.trim();
-				}
-			}
-		}
-
-		return fields;
+	#isConfirmed() {
+		return !this.#isFormModified()
+			|| window.confirm(<?= json_encode(_('Any changes made in the current form will be lost.')) ?>);
 	}
 
 	#isFormModified() {
@@ -730,12 +749,12 @@ window.trigger_edit_popup = new class {
 	#disableExpressionConstructorButtons(buttons, target) {
 		if (target.value != '') {
 			buttons.forEach((button) => {
-				this.form.querySelector(button).disabled = false;
+				this.form_element.querySelector(button).disabled = false;
 			});
 		}
 		else {
 			buttons.forEach((button) => {
-				this.form.querySelector(button).disabled = true;
+				this.form_element.querySelector(button).disabled = true;
 			});
 		}
 	}
@@ -776,7 +795,7 @@ window.trigger_edit_popup = new class {
 				this.dialogue.dispatchEvent(new CustomEvent('dialogue.submit', {detail: response}));
 			})
 			.catch((exception) => {
-				for (const element of this.form.parentNode.children) {
+				for (const element of this.form_element.parentNode.children) {
 					if (element.matches('.msg-good, .msg-bad, .msg-warning')) {
 						element.parentNode.removeChild(element);
 					}
@@ -794,7 +813,7 @@ window.trigger_edit_popup = new class {
 
 				const message_box = makeMessageBox('bad', messages, title)[0];
 
-				this.form.parentNode.insertBefore(message_box, this.form);
+				this.form_element.parentNode.insertBefore(message_box, this.form_element);
 			})
 			.finally(() => {
 				this.overlay.unsetLoading();
@@ -815,19 +834,35 @@ window.trigger_edit_popup = new class {
 			);
 		}
 
-		this.#post(curl.getUrl(), fields);
+		this.form.validateSubmit(fields).then((result) => {
+			if (!result) {
+				this.overlay.unsetLoading();
+				return;
+			}
+
+			this.#post(curl.getUrl(), fields);
+		});
 	}
 
-	clone() {
+	clone({title, buttons, rules}) {
+		this.form.reload(rules);
+		if (!this.readonly) {
+			this.triggerid = null;
+			this.overlay.setProperties({title, buttons});
+			this.overlay.recoverFocus();
+			this.overlay.containFocus();
+			return;
+		}
+
 		const form_refresh = document.createElement('input');
 
 		form_refresh.setAttribute('type', 'hidden');
 		form_refresh.setAttribute('name', 'form_refresh');
 		form_refresh.setAttribute('value', 1);
-		this.form.append(form_refresh);
+		this.form_element.append(form_refresh);
 
-		this.form.querySelector('[name="triggerid"]').remove();
-		reloadPopup(this.form, this.action);
+		this.form_element.querySelector('[name="triggerid"]').remove();
+		reloadPopup(this.form_element, this.action);
 	}
 
 	delete() {
@@ -848,20 +883,17 @@ window.trigger_edit_popup = new class {
 	 * @see init.js add.popup event
 	 */
 	addPopupValues(data) {
-		const dependency_table = this.form.querySelector('#dependency-table tbody');
+		const dependency_table = this.form_element.querySelector('#dependency-table tbody');
 		let dependencies = [];
 
 		dependency_table
 			.querySelectorAll('.js-related-trigger-edit')
 			.forEach(row => {
-				const prototype = row.dataset.prototype && row.dataset.prototype === '1';
-
 				dependencies.push({
 					name: row.textContent,
 					triggerid: row.dataset.triggerid,
 					prototype: row.dataset.prototype,
-					trigger_url: this.#constructTriggerUrl(row.dataset.triggerid, prototype),
-					action: prototype ? 'trigger.prototype.edit' : 'trigger.edit'
+					trigger_url: this.#constructTriggerUrl(row.dataset.triggerid, row.dataset.prototype === '1')
 				});
 			});
 
@@ -870,10 +902,10 @@ window.trigger_edit_popup = new class {
 				return;
 			}
 
-			const prototype = new_dependency.prototype === '1';
-
-			new_dependency.action = prototype ? 'trigger.prototype.edit' : 'trigger.edit';
-			new_dependency.trigger_url = this.#constructTriggerUrl(new_dependency.triggerid, prototype);
+			new_dependency.trigger_url = this.#constructTriggerUrl(
+				new_dependency.triggerid,
+				new_dependency.prototype === '1'
+			);
 
 			dependencies.push(new_dependency);
 		})
@@ -885,6 +917,7 @@ window.trigger_edit_popup = new class {
 
 	#constructTriggerUrl(triggerid, is_prototype) {
 		const url = new Curl('zabbix.php');
+
 		url.setArgument('action', 'popup');
 		url.setArgument('popup', is_prototype ? 'trigger.prototype.edit' : 'trigger.edit');
 		url.setArgument('triggerid', triggerid);
@@ -895,30 +928,5 @@ window.trigger_edit_popup = new class {
 		}
 
 		return url.getUrl();
-	}
-
-	elementSuccess(context, discovery, e) {
-		const data = e.detail;
-		let curl = null;
-
-		if ('success' in data) {
-			postMessageOk(data.success.title);
-
-			if ('messages' in data.success) {
-				postMessageDetails('success', data.success.messages);
-			}
-
-			if ('action' in data.success && data.success.action === 'delete') {
-				curl = discovery ? new Curl('host_discovery.php') : new Curl('zabbix.php?action=trigger.list')
-				curl.setArgument('context', context);
-			}
-		}
-
-		if (curl === null) {
-			location.href = location.href;
-		}
-		else {
-			location.href = curl.getUrl();
-		}
 	}
 }

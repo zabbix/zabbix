@@ -70,9 +70,11 @@ typedef struct zbx_telnet_context
 }
 zbx_telnet_context_t;
 
-void	zbx_async_check_telnet(zbx_dc_item_t *item, zbx_async_task_clear_cb_t clear_cb, void *arg,
+void	zbx_async_check_telnet(zbx_dc_item_t *item,
+		zbx_async_task_process_result_cb_t async_task_process_result_telnet_cb, void *arg,
 		void *arg_action, struct event_base *base, struct evdns_base *dnsbase, const char *config_source_ip,
 		zbx_async_resolve_reverse_dns_t resolve_reverse_dns);
+
 void	zbx_async_check_telnet_free(zbx_telnet_context_t *agent_context);
 
 #endif /* ZABBIX_ASYNC_TELNET_H_ */

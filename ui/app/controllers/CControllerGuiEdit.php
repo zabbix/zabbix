@@ -31,18 +31,18 @@ class CControllerGuiEdit extends CController {
 
 	protected function checkInput() {
 		$fields = [
-			'default_lang' =>				'db config.default_lang',
-			'default_timezone' =>			'db config.default_timezone|in '.implode(',', array_keys($this->timezones)),
-			'default_theme' =>				'db config.default_theme',
-			'search_limit' =>				'db config.search_limit',
-			'max_overview_table_size' =>	'db config.max_overview_table_size',
-			'max_in_table' =>				'db config.max_in_table',
-			'server_check_interval' =>		'db config.server_check_interval',
-			'work_period' =>				'db config.work_period',
-			'show_technical_errors' =>		'db config.show_technical_errors',
-			'history_period' =>				'db config.history_period',
-			'period_default' =>				'db config.period_default',
-			'max_period' =>					'db config.max_period'
+			'default_lang' =>				'setting default_lang',
+			'default_timezone' =>			'in '.implode(',', array_keys($this->timezones)),
+			'default_theme' =>				'setting default_theme',
+			'search_limit' =>				'setting search_limit',
+			'max_overview_table_size' =>	'setting max_overview_table_size',
+			'max_in_table' =>				'setting max_in_table',
+			'server_check_interval' =>		'setting server_check_interval',
+			'work_period' =>				'setting work_period',
+			'show_technical_errors' =>		'setting show_technical_errors',
+			'history_period' =>				'setting history_period',
+			'period_default' =>				'setting period_default',
+			'max_period' =>					'setting max_period'
 		];
 
 		$ret = $this->validateInput($fields);

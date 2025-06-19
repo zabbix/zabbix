@@ -113,11 +113,13 @@ final class CSlaHelper {
 	 * @param int    $period_from
 	 * @param int    $period_to
 	 * @param string $timezone
+	 * @param bool   $is_vertical
 	 *
 	 * @return CTag
 	 */
-	public static function getPeriodTag(int $period, int $period_from, int $period_to, string $timezone): CTag {
-		$tag = new CSpan();
+	public static function getPeriodTag(int $period, int $period_from, int $period_to, string $timezone,
+			bool $is_vertical = false): CTag {
+		$tag = $is_vertical ? new CVertical() : new CSpan();
 
 		try {
 			$datetime_from = (new DateTime('@'.$period_from))

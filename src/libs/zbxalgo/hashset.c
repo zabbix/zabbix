@@ -447,6 +447,41 @@ void	zbx_hashset_iter_remove(zbx_hashset_iter_t *iter)
 	}
 }
 
+void	zbx_hashset_const_iter_reset(const zbx_hashset_t *hs, zbx_hashset_const_iter_t *iter)
+{
+	iter->hashset = hs;
+	iter->slot = ITER_START;
+}
+
+const void	*zbx_hashset_const_iter_next(zbx_hashset_const_iter_t *iter)
+{
+	if (ITER_FINISH == iter->slot)
+		return NULL;
+
+	if (ITER_START != iter->slot && NULL != iter->entry && NULL != iter->entry->next)
+	{
+		iter->entry = iter->entry->next;
+		return iter->entry->data;
+	}
+
+	while (1)
+	{
+		iter->slot++;
+
+		if (iter->slot == iter->hashset->num_slots)
+		{
+			iter->slot = ITER_FINISH;
+			return NULL;
+		}
+
+		if (NULL != iter->hashset->slots[iter->slot])
+		{
+			iter->entry = iter->hashset->slots[iter->slot];
+			return iter->entry->data;
+		}
+	}
+}
+
 /*********************************************************************************
  *                                                                               *
  * Purpose: copy hashset with fixed size entries                                 *

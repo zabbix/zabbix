@@ -1,0 +1,61 @@
+---
+test case: "linux-w7x1"
+in:
+  host: "linux-w7x1"
+out:
+  return: SUCCEED
+---
+test case: "$$$"
+in:
+  host: "$$$"
+out:
+  return: FAIL
+---
+test case: "linux with newline"
+in:
+  host: "linux\n"
+out:
+  return: FAIL
+---
+test case: "linux with quotes"
+in:
+  host: "'linux'"
+out:
+  return: FAIL
+---
+test case: "Long host name over ZBX_MAX_HOSTNAME_LEN"
+in:
+  host: "linuxlinuxlinuxlinuxlinuxlinuxlinuxlinuxlinuxlinuxlinuxlinuxlinuxlinuxlinuxlinuxlinuxlinuxlinuxlinuxlinuxlinuxlinuxlinuxlinuxlinuxlinuxlinuxlinuxlinuxlinux"
+out:
+  return: FAIL
+---
+test case: "Empty host name"
+in:
+  host: ""
+out:
+  return: FAIL
+---
+test case: "some ASCII"
+in:
+  host: "!#$%&'()*+,-./0123456789:;<=>?@ABCDEFGHIJKLMNOPQRSTUVWXYZ[]^_`abcdefghijklmnopqrstuvwxyz{|}"
+out:
+  return: FAIL
+---
+test case: "only numbers"
+in:
+  host: "0123456789"
+out:
+  return: SUCCEED
+---
+test case: "chars with space"
+in:
+  host: "abc abc"
+out:
+  return: SUCCEED
+---
+test case: "Capitals"
+in:
+  host: "CAPITAL"
+out:
+  return: SUCCEED
+...

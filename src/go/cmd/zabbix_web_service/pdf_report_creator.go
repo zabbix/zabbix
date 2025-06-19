@@ -37,8 +37,10 @@ import (
 )
 
 const (
-	netErrCertAuthorityInvalid = "net::ERR_CERT_AUTHORITY_INVALID"
-	ctxErrDeadlineExceeded     = "context deadline exceeded"
+	netErrCertCommonNameInvalid = "net::ERR_CERT_COMMON_NAME_INVALID"
+	netErrCertAuthorityInvalid  = "net::ERR_CERT_AUTHORITY_INVALID"
+	netErrCertDateInvalid       = "net::ERR_CERT_DATE_INVALID"
+	netErrCertWeakSignatureAlg  = "net::ERR_CERT_WEAK_SIGNATURE_ALGORITHM"
 )
 
 type requestBody struct {
@@ -78,6 +80,24 @@ func (b *requestBody) httpCookiesGet() []*http.Cookie {
 	return r.Cookies()
 }
 
+// extractIPv4AddrFromHTTPReq returns extracted net.IP address from a given http.Request.RemoteAddr.
+func extractIPv4AddrFromHTTPReq(r *http.Request) (net.IP, error) {
+	sep := ":"
+
+	if strings.Contains(r.RemoteAddr, "%") {
+		sep = "%"
+	}
+
+	ip := strings.Split(r.RemoteAddr, sep)[0]
+
+	parsedIP := net.ParseIP(ip)
+	if parsedIP == nil {
+		return nil, errs.Errorf("invalid IP address %q", ip)
+	}
+
+	return parsedIP, nil
+}
+
 func logAndWriteError(w http.ResponseWriter, errMsg string, code int) {
 	log.Errf("%s", errMsg)
 	w.Header().Set("Content-Type", "application/problem+json")
@@ -95,15 +115,41 @@ func logAndWriteError(w http.ResponseWriter, errMsg string, code int) {
 func (h *handler) report(w http.ResponseWriter, r *http.Request) {
 	log.Infof("received report request from %s", r.RemoteAddr)
 
-	host, _, err := net.SplitHostPort(r.RemoteAddr)
+	var remoteIP net.IP
+
+	remoteTcpAddr, err := net.ResolveTCPAddr("tcp", r.RemoteAddr)
 	if err != nil {
-		logAndWriteError(w, fmt.Sprintf("Cannot remove port from host for incoming ip %s.", err.Error()), http.StatusInternalServerError)
+		log.Debugf("Error '%s' happened while resolving tcp addr: '%s'", err.Error(), r.RemoteAddr)
+		// This is a workaround.
+		// Due to a suspected bug in net.ResolveTCPAddr, it cannot handle IPv4 addresses with interfaces,
+		// for example, "169.254.100.101%Ethernet 3:34018". It is needed for on Windows.
+		// If the bug will be fixed in future, this workaround may be removed.
+		// The bug was registered here https://github.com/golang/go/issues/73071.
+		remoteIP, err = extractIPv4AddrFromHTTPReq(r)
+	} else {
+		remoteIP = remoteTcpAddr.IP
+	}
+
+	if err != nil {
+		logAndWriteError(
+			w,
+			fmt.Sprintf(
+				"Cannot extract a valid IP from HTTP request remote address %q: %s.",
+				r.RemoteAddr,
+				err.Error(),
+			),
+			http.StatusInternalServerError,
+		)
 
 		return
 	}
 
-	if !h.allowedPeers.CheckPeer(net.ParseIP(host)) {
-		logAndWriteError(w, fmt.Sprintf("Cannot accept incoming connection for peer: %s.", r.RemoteAddr), http.StatusInternalServerError)
+	if !h.allowedPeers.CheckPeer(remoteIP) {
+		logAndWriteError(
+			w,
+			fmt.Sprintf("Cannot accept incoming connection for peer: %s.", remoteIP.String()),
+			http.StatusInternalServerError,
+		)
 
 		return
 	}
@@ -254,17 +300,35 @@ func runCDP(
 		listenerErr error
 	)
 
+	requests := make(map[network.RequestID]string)
+
 	chromedp.ListenTarget(
 		ctx,
 		func(ev any) {
-			failEvent, ok := ev.(*network.EventLoadingFailed)
-			if !ok {
-				return
+			switch evt := ev.(type) {
+			case *network.EventRequestWillBeSent:
+				requests[evt.RequestID] = evt.Request.URL
+			case *network.EventLoadingFailed:
+				reqURL := "unknown"
+
+				evtReqSentURL, ok := requests[evt.RequestID]
+				if ok {
+					if evtReqSentURL == req.url {
+						listenerErr = handleCriticalNetErr(evt.ErrorText)
+
+						cancel()
+
+						return
+					}
+
+					reqURL = evtReqSentURL
+				}
+
+				log.Warningf("network.EventLoadingFailed with error %q was received "+
+					"while loading external widget content, "+
+					"continuing to generate a report, URL: %s",
+					evt.ErrorText, reqURL)
 			}
-
-			listenerErr = handleErr(failEvent.ErrorText)
-
-			cancel()
 		},
 	)
 
@@ -374,11 +438,31 @@ func parseUrl(u string) (*url.URL, error) {
 	return parsed, nil
 }
 
-// handleErr returns a user friendly error message for network.EventLoadingFailed errors.
-func handleErr(errStr string) error {
+// handleCriticalNetErr returns a user friendly error message for network.EventLoadingFailed errors.
+func handleCriticalNetErr(errStr string) error {
 	switch errStr {
+	case netErrCertCommonNameInvalid:
+		return errs.New(
+			"Invalid certificate common name detected while loading dashboard. Fix TLS configuration or " +
+				"configure Zabbix web service to ignore TLS certificate errors when accessing " +
+				"frontend URL.",
+		)
+	case netErrCertDateInvalid:
+		return errs.New(
+			"Invalid certificate date detected while loading dashboard " +
+				"(certificate's validity period has expired or is not yet valid). " +
+				"configure Zabbix web service to ignore TLS certificate errors when accessing " +
+				"frontend URL.",
+		)
+	case netErrCertWeakSignatureAlg:
+		return errs.New(
+			"Weak certificate signature algorithm detected while loading dashboard. " +
+				"Fix TLS configuration or configure Zabbix web service to ignore " +
+				"TLS certificate errors when accessing frontend URL.",
+		)
+
 	case netErrCertAuthorityInvalid:
-		return errs.Errorf(
+		return errs.New(
 			"Invalid certificate authority detected while loading dashboard. Fix TLS configuration or " +
 				"configure Zabbix web service to ignore TLS certificate errors when accessing " +
 				"frontend URL.",

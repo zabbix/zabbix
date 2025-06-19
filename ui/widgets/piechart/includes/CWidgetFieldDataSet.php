@@ -37,14 +37,14 @@ class CWidgetFieldDataSet extends CWidgetField {
 
 	// Predefined colors for data-sets in JSON format. Each next data set takes next sequential value from palette.
 	public const DEFAULT_COLOR_PALETTE = [
-		'FF465C', 'FFD54F', '0EC9AC', '524BBC', 'ED1248', 'D1E754', '2AB5FF', '385CC7', 'EC1594', 'BAE37D',
-		'6AC8FF', 'EE2B29', '3CA20D', '6F4BBC', '00A1FF', 'F3601B', '1CAE59', '45CFDB', '894BBC', '6D6D6D'
+		'FFD54F', '0EC9AC', '524BBC', 'ED1248', 'D1E754', '2AB5FF', '385CC7', 'EC1594', 'BAE37D', '6AC8FF', 'EE2B29',
+		'3CA20D', '6F4BBC', '00A1FF', 'F3601B', '1CAE59', '45CFDB', '894BBC', '6D6D6D'
 	];
 
-	// First color from the default color palette.
-	private const DEFAULT_COLOR = 'FF465C';
+	// First palette from predefined palettes.
+	private const DEFAULT_PALETTE = 0;
 
-	public function __construct(string $name, string $label = null) {
+	public function __construct(string $name, ?string $label = null) {
 		parent::__construct($name, $label);
 
 		$this
@@ -55,7 +55,8 @@ class CWidgetFieldDataSet extends CWidgetField {
 				'items'					=> ['type' => API_STRINGS_UTF8],
 				'itemids'				=> ['type' => API_IDS],
 				'references'			=> ['type' => API_STRINGS_UTF8],
-				'color'					=> ['type' => API_COLOR, 'flags' => API_REQUIRED | API_NOT_EMPTY],
+				'color'					=> ['type' => API_COLOR, 'flags' => API_NOT_EMPTY],
+				'color_palette'			=> ['type' => API_INT32, 'flags' => API_NOT_EMPTY],
 				'aggregate_function'	=> ['type' => API_INT32, 'flags' => API_REQUIRED, 'in' => implode(',', [AGGREGATE_MIN, AGGREGATE_MAX, AGGREGATE_AVG, AGGREGATE_COUNT, AGGREGATE_SUM, AGGREGATE_FIRST, AGGREGATE_LAST])],
 				'dataset_aggregation'	=> ['type' => API_INT32, 'flags' => API_REQUIRED, 'in' => implode(',', [AGGREGATE_NONE, AGGREGATE_MIN, AGGREGATE_MAX, AGGREGATE_AVG, AGGREGATE_COUNT, AGGREGATE_SUM])],
 				'type'					=> ['type' => API_INTS32, 'flags' => null, 'in' => implode(',', [self::ITEM_TYPE_NORMAL, self::ITEM_TYPE_TOTAL])],
@@ -79,7 +80,7 @@ class CWidgetFieldDataSet extends CWidgetField {
 			'hosts' => [],
 			'items' => [],
 			'itemids' => [],
-			'color' => self::DEFAULT_COLOR,
+			'color_palette' => self::DEFAULT_PALETTE,
 			'aggregate_function' => AGGREGATE_LAST,
 			'dataset_aggregation' => AGGREGATE_NONE,
 			'type' => [],
@@ -262,11 +263,20 @@ class CWidgetFieldDataSet extends CWidgetField {
 				}
 			}
 			else {
-				$widget_fields[] = [
-					'type' => ZBX_WIDGET_FIELD_TYPE_STR,
-					'name' => $this->name.'.'.$index.'.color',
-					'value' => $value['color']
-				];
+				if (array_key_exists('color', $value)) {
+					$widget_fields[] = [
+						'type' => ZBX_WIDGET_FIELD_TYPE_STR,
+						'name' => $this->name.'.'.$index.'.color',
+						'value' => $value['color']
+					];
+				}
+				elseif (array_key_exists('color_palette', $value)) {
+					$widget_fields[] = [
+						'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
+						'name' => $this->name.'.'.$index.'.color_palette',
+						'value' => $value['color_palette']
+					];
+				}
 			}
 
 			// Other dataset fields are stored if different from the defaults.

@@ -14,7 +14,7 @@
 **/
 
 
-require_once dirname(__FILE__).'/../common/testItemTest.php';
+require_once __DIR__.'/../common/testItemTest.php';
 
 /**
  * "Test item" function tests.
@@ -49,6 +49,9 @@ class testFormTestLowLevelDiscovery extends testItemTest {
 	 * @dataProvider getCommonTestItemData
 	 *
 	 * @depends testFormTestLowLevelDiscovery_CheckButtonStateHost
+	 *
+	 * TODO: remove ignoreBrowserErrors after DEV-4233
+	 * @ignoreBrowserErrors
 	 */
 	public function testFormTestLowLevelDiscovery_TestLLDHost($data) {
 		$this->checkTestItem($data, true, self::HOST_ID, 'host_discovery', true);
@@ -60,6 +63,9 @@ class testFormTestLowLevelDiscovery extends testItemTest {
 	 * @dataProvider getCommonTestItemData
 	 *
 	 * @depends testFormTestLowLevelDiscovery_CheckButtonStateTemplate
+	 *
+	 * TODO: remove ignoreBrowserErrors after DEV-4233
+	 * @ignoreBrowserErrors
 	 */
 	public function testFormTestLowLevelDiscovery_TestLLDTemplate($data) {
 		$this->checkTestItem($data, false, self::TEMPLATE_ID, 'host_discovery', true);

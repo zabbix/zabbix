@@ -203,10 +203,12 @@ function getSystemStatusData(array $filter) {
 			}
 		}
 
-		$visible_problems = [];
+		CArrayHelper::sort($problems, [
+			['field' => 'clock', 'order' => ZBX_SORT_DOWN],
+			['field' => 'ns', 'order' => ZBX_SORT_DOWN]
+		]);
 
-		$limit = CSettingsHelper::get(CSettingsHelper::SEARCH_LIMIT);
-		$problems = CScreenProblem::sortData(['problems' => $problems], $limit, 'clock', ZBX_SORT_DOWN)['problems'];
+		$visible_problems = [];
 
 		foreach ($problems as $eventid => $problem) {
 			$trigger = $data['triggers'][$problem['objectid']];
@@ -391,7 +393,7 @@ function getSystemStatusTotals(array $data) {
  *
  * @return CTableInfo
  */
-function makeSeverityTable(array $data, $hide_empty_groups = false, CUrl $groupurl = null) {
+function makeSeverityTable(array $data, $hide_empty_groups = false, ?CUrl $groupurl = null) {
 	$table = new CTableInfo();
 
 	foreach ($data['data']['groups'] as $group) {
@@ -758,10 +760,7 @@ function makeProblemsPopup(array $problems, array $triggers, array $actions, arr
 		$is_acknowledged = ($problem['acknowledged'] == EVENT_ACKNOWLEDGED);
 		$problem_update_link = ($allowed['add_comments'] || $allowed['change_severity'] || $allowed['acknowledge']
 				|| $can_be_closed || $allowed['suppress'])
-			? (new CLink(_('Update'), $problem_update_url))
-				->addClass(ZBX_STYLE_LINK_ALT)
-				->setAttribute('data-eventids[]', $problem['eventid'])
-				->setAttribute('data-action', 'acknowledge.edit')
+			? (new CLink(_('Update'), $problem_update_url))->addClass(ZBX_STYLE_LINK_ALT)
 			: new CSpan(_('Update'));
 
 		$table->addRow(array_merge($row, [

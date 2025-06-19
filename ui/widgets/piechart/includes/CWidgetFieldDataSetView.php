@@ -20,7 +20,7 @@ use CButton,
 	CButtonIcon,
 	CButtonLink,
 	CCol,
-	CColor,
+	CColorPicker,
 	CDiv,
 	CFormField,
 	CFormGrid,
@@ -32,6 +32,7 @@ use CButton,
 	CListItem,
 	CPatternSelect,
 	CRow,
+	CScriptTag,
 	CSelect,
 	CSimpleButton,
 	CSpan,
@@ -213,11 +214,19 @@ class CWidgetFieldDataSetView extends CWidgetFieldView {
 				]))->addClass('js-items-multiselect');
 			}
 
-			$dataset_head = array_merge($dataset_head, [
-				(new CColor($field_name.'['.$row_num.'][color]', $value['color']))->appendColorPickerJs(false),
-				$host_pattern_field,
-				$item_pattern_field
-			]);
+			$dataset_head[] = (new CColorPicker($field_name.'['.$row_num.'][color]',
+				$field_name.'['.$row_num.'][color_palette]')
+			)
+				->setPalette($value['color_palette'] ?? null)
+				->setColor($value['color'] ?? null);
+
+			if ($host_pattern_field !== null) {
+				$dataset_head[] = $host_pattern_field;
+				$dataset_head[] = new CScriptTag($host_pattern_field->getPostJS());
+			}
+
+			$dataset_head[] = $item_pattern_field;
+			$dataset_head[] = new CScriptTag($item_pattern_field->getPostJS());
 		}
 		else {
 			$item_rows = [];
@@ -356,9 +365,7 @@ class CWidgetFieldDataSetView extends CWidgetFieldView {
 				->addClass('table-col-handle')
 				->addClass(ZBX_STYLE_TD_DRAG_ICON),
 			(new CCol(
-				(new CColor($this->field->getName().'['.$ds_num.'][color][]', $color,
-					'items_'.$ds_num.'_'.$row_num.'_color'
-				))->appendColorPickerJs(false)
+				(new CColorPicker($this->field->getName().'['.$ds_num.'][color][]'))->setColor($color)
 			))->addClass('table-col-color'),
 			(new CCol(new CSpan($row_num.':')))->addClass('table-col-no'),
 			(new CCol([

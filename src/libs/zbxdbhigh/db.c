@@ -78,8 +78,11 @@ void	zbx_db_flush_version_requirements(const char *version)
 {
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
-	if (ZBX_DB_OK > zbx_db_execute("update config set dbversion_status='%s'", version))
+	if (ZBX_DB_OK > zbx_db_execute("update settings set value_str='%s' where name='dbversion_status'",
+			version))
+	{
 		zabbix_log(LOG_LEVEL_CRIT, "Failed to set dbversion_status");
+	}
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 }
@@ -398,7 +401,7 @@ char	*zbx_db_get_unique_hostname_by_sample(const char *host_name_sample, const c
 			"select %s"
 			" from hosts"
 			" where %s like '%s%%' escape '%c'"
-				" and flags<>%d"
+				" and flags&%d=0"
 				" and status in (%d,%d,%d)",
 				field_name, field_name, host_name_sample_esc, ZBX_SQL_LIKE_ESCAPE_CHAR,
 			ZBX_FLAG_DISCOVERY_PROTOTYPE,
@@ -666,7 +669,7 @@ void	zbx_user_free(zbx_user_t *user)
 
 /******************************************************************************
  *                                                                            *
- * Purpose: checks instanceid value in config table and generates new         *
+ * Purpose: checks instanceid value in settings table and generates new       *
  *          instance id if its empty                                          *
  *                                                                            *
  * Return value: SUCCEED - valid instance id either exists or was created     *
@@ -680,15 +683,16 @@ int	zbx_db_check_instanceid(void)
 	zbx_db_row_t	row;
 	int		ret = SUCCEED;
 
-	result = zbx_db_select("select configid,instanceid from config order by configid");
+	result = zbx_db_select("select value_str from settings where name='instanceid'");
 	if (NULL != (row = zbx_db_fetch(result)))
 	{
-		if (SUCCEED == zbx_db_is_null(row[1]) || '\0' == *row[1])
+		if (SUCCEED == zbx_db_is_null(row[0]) || '\0' == *row[0])
 		{
 			char	*token;
 
 			token = zbx_create_token(0);
-			if (ZBX_DB_OK > zbx_db_execute("update config set instanceid='%s' where configid=%s", token, row[0]))
+			if (ZBX_DB_OK > zbx_db_execute(
+					"update settings set value_str='%s' where name='instanceid'", token))
 			{
 				zabbix_log(LOG_LEVEL_ERR, "cannot update instance id in database");
 				ret = FAIL;
@@ -712,7 +716,7 @@ int	zbx_db_update_software_update_checkid(void)
 	zbx_db_row_t	row;
 	int		ret = SUCCEED;
 
-	result = zbx_db_select("select software_update_checkid from config");
+	result = zbx_db_select("select value_str from settings where name='software_update_checkid'");
 	if (NULL != (row = zbx_db_fetch(result)))
 	{
 		if (SUCCEED == zbx_db_is_null(row[0]) || '\0' == *row[0])
@@ -720,9 +724,10 @@ int	zbx_db_update_software_update_checkid(void)
 			char	*token;
 
 			token = zbx_create_token(0);
-			if (ZBX_DB_OK > zbx_db_execute("update config set software_update_checkid='%s'", token))
+			if (ZBX_DB_OK > zbx_db_execute("update settings set value_str='%s'"
+					" where name='software_update_checkid'", token))
 			{
-				zabbix_log(LOG_LEVEL_ERR, "cannot update software_update_checkid in config table");
+				zabbix_log(LOG_LEVEL_ERR, "cannot update software_update_checkid in settings table");
 				ret = FAIL;
 			}
 			zbx_free(token);
@@ -730,7 +735,7 @@ int	zbx_db_update_software_update_checkid(void)
 	}
 	else
 	{
-		zabbix_log(LOG_LEVEL_ERR, "cannot read config record from database");
+		zabbix_log(LOG_LEVEL_ERR, "cannot read settings record from database");
 		ret = FAIL;
 	}
 	zbx_db_free_result(result);

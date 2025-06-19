@@ -19,7 +19,17 @@
  */
 abstract class CTriggerGeneral extends CApiService {
 
-	protected const FLAGS = null;
+	public const DISCOVERY_DATA_OUTPUT_FIELDS = ['parent_triggerid', 'status', 'ts_delete', 'ts_disable',
+		'disable_source'
+	];
+
+	private static function isTrigger(): bool {
+		return static::class === 'CTrigger';
+	}
+
+	private static function isTriggerPrototype(): bool {
+		return static::class === 'CTriggerPrototype';
+	}
 
 	/**
 	 * @abstract
@@ -36,8 +46,8 @@ abstract class CTriggerGeneral extends CApiService {
 	 * @param array  $tpl_triggers
 	 * @param string $tpl_triggers[<tnum>]['triggerid']
 	 */
-	private function prepareInheritedTriggers(array $tpl_triggers, array $hostids = null, array &$ins_triggers = null,
-			array &$upd_triggers = null, array &$db_triggers = null) {
+	private function prepareInheritedTriggers(array $tpl_triggers, ?array $hostids = null, ?array &$ins_triggers = null,
+			?array &$upd_triggers = null, ?array &$db_triggers = null) {
 		$ins_triggers = [];
 		$upd_triggers = [];
 		$db_triggers = [];
@@ -120,11 +130,11 @@ abstract class CTriggerGeneral extends CApiService {
 
 		// List of triggers to check for duplicates. Grouped by description.
 		$descriptions = [];
-		$triggerids = [];
 
 		$output = ['url_name', 'url', 'status', 'priority', 'comments', 'type', 'correlation_mode', 'correlation_tag',
 			'manual_close', 'opdata', 'event_name'
 		];
+
 		if ($this instanceof CTriggerPrototype) {
 			$output[] = 'discover';
 		}
@@ -201,7 +211,6 @@ abstract class CTriggerGeneral extends CApiService {
 							'templateid' => $tpl_trigger['triggerid']
 						];
 						$db_triggers[$chd_trigger['triggerid']] = $chd_trigger;
-						$triggerids[] = $chd_trigger['triggerid'];
 
 						$check_duplicates = ($chd_trigger['description'] !== $new_trigger['description']
 							|| $chd_trigger['expression'] !== $new_trigger['expression']
@@ -226,12 +235,12 @@ abstract class CTriggerGeneral extends CApiService {
 			}
 		}
 
-		if ($triggerids) {
+		if ($db_triggers) {
 			// Add trigger tags.
 			$result = DBselect(
 				'SELECT tt.triggertagid,tt.triggerid,tt.tag,tt.value'.
 				' FROM trigger_tag tt'.
-				' WHERE '.dbConditionInt('tt.triggerid', $triggerids)
+				' WHERE '.dbConditionId('tt.triggerid', array_keys($db_triggers))
 			);
 
 			$trigger_tags = [];
@@ -251,25 +260,18 @@ abstract class CTriggerGeneral extends CApiService {
 			}
 			unset($db_trigger);
 
-			// Add discovery rule IDs.
-			if ($this instanceof CTriggerPrototype) {
+			if (self::isTriggerPrototype()) {
 				$result = DBselect(
-					'SELECT id.parent_itemid,f.triggerid'.
-						' FROM item_discovery id,functions f'.
-						' WHERE '.dbConditionInt('f.triggerid', $triggerids).
-						' AND f.itemid=id.itemid'
+					'SELECT DISTINCT f.triggerid,id.lldruleid'.
+					' FROM functions f'.
+					' JOIN item_discovery id ON f.itemid=id.itemid'.
+					' JOIN items i ON id.lldruleid=i.itemid'.
+					' WHERE '.dbConditionId('f.triggerid', array_keys($db_triggers))
 				);
 
-				$drule_by_triggerid = [];
-
 				while ($row = DBfetch($result)) {
-					$drule_by_triggerid[$row['triggerid']] = $row['parent_itemid'];
+					$db_triggers[$row['triggerid']]['ruleid'] = $row['lldruleid'];
 				}
-
-				foreach ($db_triggers as &$db_trigger) {
-					$db_trigger['discoveryRule']['itemid'] = $drule_by_triggerid[$db_trigger['triggerid']];
-				}
-				unset($db_trigger);
 			}
 		}
 
@@ -296,7 +298,7 @@ abstract class CTriggerGeneral extends CApiService {
 	 *
 	 * @return array
 	 */
-	private static function getLinkedHosts(array $tpl_hostids, array $hostids = null) {
+	private static function getLinkedHosts(array $tpl_hostids, ?array $hostids = null) {
 		// Fetch all child hosts and templates
 		$sql = 'SELECT ht.hostid,ht.templateid,h.host,h.status'.
 			' FROM hosts_templates ht,hosts h'.
@@ -338,7 +340,7 @@ abstract class CTriggerGeneral extends CApiService {
 	 *
 	 * @return array
 	 */
-	private function getHostTriggersByTemplateId(array $tpl_triggerids, array $hostids = null) {
+	private function getHostTriggersByTemplateId(array $tpl_triggerids, ?array $hostids = null) {
 		$output = 't.triggerid,t.expression,t.description,t.url_name,t.url,t.status,t.priority,t.comments,t.type,'.
 			't.recovery_mode,t.recovery_expression,t.correlation_mode,t.correlation_tag,t.manual_close,t.opdata,'.
 			't.templateid,t.event_name,i.hostid';
@@ -519,7 +521,7 @@ abstract class CTriggerGeneral extends CApiService {
 	 * @param string $triggers[]['recovery_expression']
 	 * @param array  $hostids
 	 */
-	protected function inherit(array $triggers, array $hostids = null) {
+	protected function inherit(array $triggers, ?array $hostids = null) {
 		$this->prepareInheritedTriggers($triggers, $hostids, $ins_triggers, $upd_triggers, $db_triggers);
 
 		if ($ins_triggers) {
@@ -560,14 +562,11 @@ abstract class CTriggerGeneral extends CApiService {
 			}
 		}
 
-		$db_hosts = DBselect(
-			'SELECT h.hostid,h.host,h.status'.
-			' FROM hosts h'.
-			' WHERE '.dbConditionString('h.host', array_keys($hosts)).
-				' AND '.dbConditionInt('h.status',
-					[HOST_STATUS_MONITORED, HOST_STATUS_NOT_MONITORED, HOST_STATUS_TEMPLATE]
-				)
-		);
+		$options = [
+			'output' => ['hostid', 'host', 'status'],
+			'filter' => ['host' => array_keys($hosts)]
+		];
+		$db_hosts = DBSelect(DB::makeSql('hosts', $options));
 
 		while ($db_host = DBfetch($db_hosts)) {
 			foreach ($hosts[$db_host['host']] as $description => $indexes) {
@@ -642,7 +641,7 @@ abstract class CTriggerGeneral extends CApiService {
 	 *
 	 * @throws APIException
 	 */
-	private static function checkUuidDuplicates(array $triggers, array $db_triggers = null): void {
+	private static function checkUuidDuplicates(array $triggers, ?array $db_triggers = null): void {
 		$trigger_indexes = [];
 
 		foreach ($triggers as $i => $trigger) {
@@ -662,28 +661,19 @@ abstract class CTriggerGeneral extends CApiService {
 		$duplicates = DB::select('triggers', [
 			'output' => ['uuid'],
 			'filter' => [
-				'flags' => static::FLAGS,
+				'flags' => self::isTrigger() ? ZBX_FLAG_DISCOVERY_NORMAL : ZBX_FLAG_DISCOVERY_PROTOTYPE,
 				'uuid' => array_keys($trigger_indexes)
 			],
 			'limit' => 1
 		]);
 
 		if ($duplicates) {
-			switch (static::FLAGS) {
-				case ZBX_FLAG_DISCOVERY_NORMAL:
-					$error = _s('Invalid parameter "%1$s": %2$s.', '/'.($trigger_indexes[$duplicates[0]['uuid']] + 1),
-						_('trigger with the same UUID already exists')
-					);
-					break;
-
-				case ZBX_FLAG_DISCOVERY_PROTOTYPE:
-					$error = _s('Invalid parameter "%1$s": %2$s.', '/'.($trigger_indexes[$duplicates[0]['uuid']] + 1),
-						_('trigger prototype with the same UUID already exists')
-					);
-					break;
-			}
-
-			self::exception(ZBX_API_ERROR_PARAMETERS, $error);
+			self::exception(ZBX_API_ERROR_PARAMETERS, _s('Invalid parameter "%1$s": %2$s.',
+				'/'.($trigger_indexes[$duplicates[0]['uuid']] + 1),
+				self::isTrigger()
+					? _('trigger with the same UUID already exists')
+					: _('trigger prototype with the same UUID already exists')
+			));
 		}
 	}
 
@@ -705,7 +695,7 @@ abstract class CTriggerGeneral extends CApiService {
 			foreach ($triggers as $trigger) {
 				if (array_key_exists('name_updated', $trigger) && !$trigger['name_updated']) {
 					continue;
-				}
+			}
 
 				$hostids[$trigger['host']['hostid']] = true;
 				$expressions[$trigger['expression']][$trigger['recovery_expression']] = $trigger['host']['hostid'];
@@ -884,6 +874,75 @@ abstract class CTriggerGeneral extends CApiService {
 			: [];
 
 		$result = $relation_map->mapMany($result, $groups, 'templategroups');
+	}
+
+	protected static function addRelatedDiscoveryRules(array $options, array &$result): void {
+		if ($options['selectDiscoveryRule'] === null) {
+			return;
+		}
+
+		foreach ($result as &$trigger) {
+			$trigger['discoveryRule'] = [];
+		}
+		unset($trigger);
+
+		$resource = self::isTrigger()
+			? DBselect(
+				'SELECT DISTINCT td.triggerid,id.lldruleid'.
+				' FROM trigger_discovery td'.
+				' JOIN functions f ON td.parent_triggerid=f.triggerid'.
+				' JOIN item_discovery id ON f.itemid=id.itemid'.
+				' WHERE '.dbConditionId('td.triggerid', array_keys($result))
+			)
+			: DBselect(
+				'SELECT DISTINCT f.triggerid,id.lldruleid'.
+				' FROM functions f'.
+				' JOIN item_discovery id ON f.itemid=id.itemid'.
+				' JOIN items i ON id.lldruleid=i.itemid'.
+				' WHERE '.dbConditionId('f.triggerid', array_keys($result)).
+					' AND '.dbConditionId('i.flags', [ZBX_FLAG_DISCOVERY_RULE, ZBX_FLAG_DISCOVERY_RULE_CREATED])
+		);
+
+		$triggerids = [];
+
+		while ($row = DBfetch($resource)) {
+			$triggerids[$row['lldruleid']][] = $row['triggerid'];
+		}
+
+		$parent_lld_rules = API::DiscoveryRule()->get([
+			'output' => $options['selectDiscoveryRule'],
+			'itemids' => array_keys($triggerids),
+			'nopermissions' => true,
+			'preservekeys' => true
+		]);
+
+		foreach ($parent_lld_rules as $lldruleid => $parent_lld_rule) {
+			foreach ($triggerids[$lldruleid] as $triggerid) {
+				$result[$triggerid]['discoveryRule'] = $parent_lld_rule;
+			}
+		}
+	}
+
+	protected static function addRelatedDiscoveryData(array $options, array &$result): void {
+		if ($options['selectDiscoveryData'] === null) {
+			return;
+		}
+
+		foreach ($result as &$trigger) {
+			$trigger['discoveryData'] = [];
+		}
+		unset($trigger);
+
+		$_options = [
+			'output' => array_merge(['triggerid'], $options['selectDiscoveryData']),
+			'triggerids' => array_keys($result)
+		];
+		$resource = DBselect(DB::makeSql('trigger_discovery', $_options));
+
+		while ($discovery_data = DBfetch($resource)) {
+			$result[$discovery_data['triggerid']]['discoveryData'] =
+				array_diff_key($discovery_data, array_flip(['triggerid']));
+		}
 	}
 
 	/**
@@ -1077,7 +1136,7 @@ abstract class CTriggerGeneral extends CApiService {
 	 *
 	 * @throws APIException if validation failed.
 	 */
-	protected function validateUpdate(array &$triggers, array &$db_triggers = null) {
+	protected function validateUpdate(array &$triggers, ?array &$db_triggers = null) {
 		$api_input_rules = ['type' => API_OBJECTS, 'flags' => API_NOT_EMPTY | API_NORMALIZE, 'uniq' => [['description', 'expression']], 'fields' => [
 			'uuid' => 					['type' => API_ANY],
 			'triggerid' =>				['type' => API_ID, 'flags' => API_REQUIRED],
@@ -1121,7 +1180,7 @@ abstract class CTriggerGeneral extends CApiService {
 				'comments', 'type', 'templateid', 'recovery_mode', 'recovery_expression', 'correlation_mode',
 				'correlation_tag', 'manual_close', 'opdata', 'event_name'
 			],
-			'triggerids' => zbx_objectValues($triggers, 'triggerid'),
+			'triggerids' => array_column($triggers, 'triggerid'),
 			'editable' => true,
 			'preservekeys' => true
 		];
@@ -1143,7 +1202,7 @@ abstract class CTriggerGeneral extends CApiService {
 			case 'CTriggerPrototype':
 				$error_cannot_update = _('Cannot update "%1$s" for templated trigger prototype "%2$s".');
 				$options['output'][] = 'discover';
-				$options['selectDiscoveryRule'] = ['itemid'];
+				$options['filter'] = ['flags' => ZBX_FLAG_DISCOVERY_PROTOTYPE];
 				break;
 
 			default:
@@ -1159,6 +1218,20 @@ abstract class CTriggerGeneral extends CApiService {
 		$db_triggers = CMacrosResolverHelper::resolveTriggerExpressions($db_triggers, [
 			'sources' => ['expression', 'recovery_expression']
 		]);
+
+		if (self::isTriggerPrototype()) {
+			$result = DBselect(
+				'SELECT DISTINCT f.triggerid,id.lldruleid'.
+				' FROM functions f'.
+				' JOIN item_discovery id ON f.itemid=id.itemid'.
+				' JOIN items i ON id.lldruleid=i.itemid'.
+				' WHERE '.dbConditionId('f.triggerid', array_keys($db_triggers))
+			);
+
+			while ($row = DBfetch($result)) {
+				$db_triggers[$row['triggerid']]['ruleid'] = $row['lldruleid'];
+			}
+		}
 
 		$this->addAffectedObjects($triggers, $db_triggers);
 
@@ -1356,7 +1429,7 @@ abstract class CTriggerGeneral extends CApiService {
 	 *
 	 * @throws APIException
 	 */
-	private function checkDependencies(array $triggers, array $db_triggers = null): void {
+	private function checkDependencies(array $triggers, ?array $db_triggers = null): void {
 		$edit_triggerids_up = [];
 
 		foreach ($triggers as $trigger) {
@@ -1429,7 +1502,7 @@ abstract class CTriggerGeneral extends CApiService {
 			}
 
 			$result = DBselect(
-				'SELECT DISTINCT f.triggerid,id.parent_itemid'.
+				'SELECT DISTINCT f.triggerid,id.lldruleid'.
 				' FROM functions f,item_discovery id'.
 				' WHERE f.itemid=id.itemid'.
 					' AND '.dbConditionId('f.triggerid', array_keys($ins_dependencies + $triggerids))
@@ -1438,7 +1511,7 @@ abstract class CTriggerGeneral extends CApiService {
 			$lld_rules = [];
 
 			while ($row = DBfetch($result)) {
-				$lld_rules[$row['triggerid']] = $row['parent_itemid'];
+				$lld_rules[$row['triggerid']] = $row['lldruleid'];
 			}
 
 			foreach ($ins_dependencies as $triggerid_up => $triggerids) {
@@ -1459,7 +1532,7 @@ abstract class CTriggerGeneral extends CApiService {
 	 * @param array      $triggers
 	 * @param array|null $db_triggers
 	 */
-	protected function checkDependenciesLinks(array $triggers, array $db_triggers = null): void {
+	protected function checkDependenciesLinks(array $triggers, ?array $db_triggers = null): void {
 		$ins_dependencies = [];
 		$del_dependencies = [];
 
@@ -1637,8 +1710,6 @@ abstract class CTriggerGeneral extends CApiService {
 	 * @param string $db_triggers[<tnum>]['comments']                [IN]
 	 * @param int    $db_triggers[<tnum>]['type']                    [IN]
 	 * @param string $db_triggers[<tnum>]['templateid']              [IN]
-	 * @param array  $db_triggers[<tnum>]['discoveryRule']           [IN] For trigger prototypes only.
-	 * @param string $db_triggers[<tnum>]['discoveryRule']['itemid'] [IN]
 	 * @param array  $db_triggers[<tnum>]['tags']                    [IN]
 	 * @param string $db_triggers[<tnum>]['tags'][]['tag']           [IN]
 	 * @param string $db_triggers[<tnum>]['tags'][]['value']         [IN]
@@ -1947,14 +2018,27 @@ abstract class CTriggerGeneral extends CApiService {
 			$host_keys['status'] = $_db_host['status'];
 
 			if ($class === 'CTriggerPrototype') {
-				$sql = 'SELECT i.itemid,i.key_,i.value_type,i.flags,id.parent_itemid'.
-					' FROM items i'.
+				$sql = $db_triggers === null && !$inherited
+					? 'SELECT i.itemid,i.key_,i.value_type,i.flags,id.lldruleid'.
+						' FROM items i'.
 						' LEFT JOIN item_discovery id ON i.itemid=id.itemid'.
-					' WHERE i.hostid='.$host_keys['hostid'].
+						' LEFT JOIN items ii ON id.lldruleid=ii.itemid'.
+						' WHERE i.hostid='.$host_keys['hostid'].
+							' AND '.dbConditionString('i.key_', array_keys($host_keys['keys'])).
+							' AND '.dbConditionInt('i.flags', [
+								ZBX_FLAG_DISCOVERY_NORMAL, ZBX_FLAG_DISCOVERY_CREATED, ZBX_FLAG_DISCOVERY_PROTOTYPE
+							]).
+							' AND (id.lldruleid IS NULL OR '.dbConditionInt('ii.flags', [
+								ZBX_FLAG_DISCOVERY_RULE, ZBX_FLAG_DISCOVERY_RULE_PROTOTYPE
+							]).')'
+					: 'SELECT i.itemid,i.key_,i.value_type,i.flags,id.lldruleid'.
+						' FROM items i'.
+						' LEFT JOIN item_discovery id ON i.itemid=id.itemid'.
+						' WHERE i.hostid='.$host_keys['hostid'].
 						' AND '.dbConditionString('i.key_', array_keys($host_keys['keys'])).
-						' AND '.dbConditionInt('i.flags',
-							[ZBX_FLAG_DISCOVERY_NORMAL, ZBX_FLAG_DISCOVERY_PROTOTYPE, ZBX_FLAG_DISCOVERY_CREATED]
-						);
+						' AND '.dbConditionInt('i.flags', [
+							ZBX_FLAG_DISCOVERY_NORMAL, ZBX_FLAG_DISCOVERY_CREATED, ZBX_FLAG_DISCOVERY_PROTOTYPE
+						]);
 			}
 			else {
 				$sql = 'SELECT i.itemid,i.key_,i.value_type,i.flags'.
@@ -1972,7 +2056,7 @@ abstract class CTriggerGeneral extends CApiService {
 				$host_keys['keys'][$_db_item['key_']]['flags'] = $_db_item['flags'];
 
 				if ($class === 'CTriggerPrototype' && $_db_item['flags'] == ZBX_FLAG_DISCOVERY_PROTOTYPE) {
-					$host_keys['keys'][$_db_item['key_']]['lld_ruleid'] = $_db_item['parent_itemid'];
+					$host_keys['keys'][$_db_item['key_']]['lld_ruleid'] = $_db_item['lldruleid'];
 				}
 			}
 
@@ -2147,11 +2231,12 @@ abstract class CTriggerGeneral extends CApiService {
 						$trigger['description']
 					));
 				}
-				elseif ($db_triggers !== null
-						&& !idcmp($lld_ruleids[0], $db_triggers[$trigger['triggerid']]['discoveryRule']['itemid'])) {
-					self::exception(ZBX_API_ERROR_PARAMETERS, _s('Cannot update trigger prototype "%1$s": %2$s.',
-						$trigger['description'], _('trigger prototype cannot be moved to another template or host')
-					));
+				elseif ($db_triggers !== null) {
+					if (bccomp($lld_ruleids[0], $db_triggers[$trigger['triggerid']]['ruleid']) != 0) {
+						self::exception(ZBX_API_ERROR_PARAMETERS, _s('Cannot update trigger prototype "%1$s": %2$s.',
+							$trigger['description'], _('trigger prototype cannot be moved to another template or host')
+						));
+					}
 				}
 			}
 		}
@@ -2319,38 +2404,6 @@ abstract class CTriggerGeneral extends CApiService {
 				_('trigger with linkages cannot be moved to another template or host')
 			));
 		}
-	}
-
-	/**
-	 * Adds triggers and trigger prototypes from template to hosts.
-	 *
-	 * @param array $data
-	 */
-	public function syncTemplates(array $data) {
-		$data['templateids'] = zbx_toArray($data['templateids']);
-		$data['hostids'] = zbx_toArray($data['hostids']);
-
-		$output = ['triggerid', 'description', 'expression', 'recovery_mode', 'recovery_expression', 'url_name', 'url',
-			'status', 'priority', 'comments', 'type', 'correlation_mode', 'correlation_tag', 'manual_close', 'opdata',
-			'event_name'
-		];
-		if ($this instanceof CTriggerPrototype) {
-			$output[] = 'discover';
-		}
-
-		$triggers = $this->get([
-			'output' => $output,
-			'selectTags' => ['tag', 'value'],
-			'hostids' => $data['templateids'],
-			'preservekeys' => true,
-			'nopermissions' => true
-		]);
-
-		$triggers = CMacrosResolverHelper::resolveTriggerExpressions($triggers,
-			['sources' => ['expression', 'recovery_expression']]
-		);
-
-		$this->inherit($triggers, $data['hostids']);
 	}
 
 	/**
@@ -2973,7 +3026,7 @@ abstract class CTriggerGeneral extends CApiService {
 	 * @param array      $triggers
 	 * @param array|null $db_triggers
 	 */
-	public static function updateDependencies(array &$triggers, array $db_triggers = null): void {
+	public static function updateDependencies(array &$triggers, ?array $db_triggers = null): void {
 		$ins_trigger_deps = [];
 		$del_triggerdepids = [];
 		$edit_dependencies = [];
@@ -3076,7 +3129,7 @@ abstract class CTriggerGeneral extends CApiService {
 	 * @param array $edit_dependencies[<triggerid>][<triggerid_up>]
 	 * @param array $hostids
 	 */
-	protected static function inheritDependencies(array $edit_dependencies, array $hostids = null): void {
+	protected static function inheritDependencies(array $edit_dependencies, ?array $hostids = null): void {
 		$all_triggerids = $edit_dependencies;
 		$all_triggerids_up = [];
 

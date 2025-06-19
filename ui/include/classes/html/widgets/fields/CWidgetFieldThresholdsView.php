@@ -23,18 +23,20 @@ class CWidgetFieldThresholdsView extends CWidgetFieldView {
 	}
 
 	public function getView(): CDiv {
+		$header_row = [
+			'',
+			_('Threshold'),
+			(new CColHeader(''))->setWidth('100%')
+		];
+
 		$thresholds_table = (new CTable())
 			->setId($this->field->getName().'-table')
 			->addClass(ZBX_STYLE_TABLE_FORMS)
-			->setHeader([
-				'',
-				_('Threshold'),
-				(new CColHeader(''))->setWidth('100%')
-			])
+			->setHeader($header_row)
 			->setFooter(new CRow(
-				new CCol(
+				(new CCol(
 					(new CButtonLink(_('Add')))->addClass('element-table-add')
-				)
+				))->setColSpan(count($header_row))
 			));
 
 		foreach ($this->field->getValue() as $i => $threshold) {
@@ -48,26 +50,12 @@ class CWidgetFieldThresholdsView extends CWidgetFieldView {
 
 	public function getJavaScript(): string {
 		return '
-			var $thresholds_table = jQuery("#'.$this->field->getName().'-table");
-
-			$thresholds_table
-				.dynamicRows({template: "#'.$this->field->getName().'-row-tmpl", allow_empty: true})
-				.on("afteradd.dynamicRows", function(opt) {
-					const rows = this.querySelectorAll(".form_row");
-					const colors = jQuery("#widget-dialogue-form")[0]
-						.querySelectorAll(".'.ZBX_STYLE_COLOR_PICKER.' input");
-					const used_colors = [];
-					for (const color of colors) {
-						if (color.value !== "" && color.name.includes("thresholds")) {
-							used_colors.push(color.value);
-						}
-					}
-					jQuery(".color-picker input", rows[rows.length - 1])
-						.val(colorPalette.getNextColor(used_colors))
-						.colorpicker({
-							appendTo: ".overlay-dialogue-body"
-						});
-				});
+			CWidgetForm.addField(
+				new CWidgetFieldThresholds('.json_encode([
+					'name' => $this->field->getName(),
+					'form_name' => $this->form_name
+				]).')
+			);
 		';
 	}
 
@@ -79,7 +67,7 @@ class CWidgetFieldThresholdsView extends CWidgetFieldView {
 
 	public function getRowTemplate($row_num = '#{rowNum}', $color = '#{color}', $threshold = '#{threshold}'): CRow {
 		return (new CRow([
-			(new CColor($this->field->getName().'['.$row_num.'][color]', $color))->appendColorPickerJs(false),
+			(new CColorPicker($this->field->getName().'['.$row_num.'][color]'))->setColor($color),
 			(new CTextBox($this->field->getName().'['.$row_num.'][threshold]', $threshold, false))
 				->setWidth(ZBX_TEXTAREA_TINY_WIDTH)
 				->setAriaRequired(),

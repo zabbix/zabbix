@@ -102,12 +102,12 @@
 
 /* expression parsing rules */
 
-#define	ZBX_EVAL_PARSE_TRIGGER_EXPRESSION	(ZBX_EVAL_PARSE_MACRO | ZBX_EVAL_PARSE_USERMACRO 	|\
+#define ZBX_EVAL_PARSE_TRIGGER_EXPRESSION	(ZBX_EVAL_PARSE_MACRO | ZBX_EVAL_PARSE_USERMACRO 	|\
 						ZBX_EVAL_PARSE_FUNCTIONID | ZBX_EVAL_PARSE_FUNCTION 	|\
 						ZBX_EVAL_PARSE_MATH | ZBX_EVAL_PARSE_COMPARE 		|\
 						ZBX_EVAL_PARSE_LOGIC | ZBX_EVAL_PARSE_VAR)
 
-#define	ZBX_EVAL_PARSE_CALC_EXPRESSION		(ZBX_EVAL_PARSE_MACRO | ZBX_EVAL_PARSE_USERMACRO 	|\
+#define ZBX_EVAL_PARSE_CALC_EXPRESSION		(ZBX_EVAL_PARSE_MACRO | ZBX_EVAL_PARSE_USERMACRO 	|\
 						ZBX_EVAL_PARSE_ITEM_QUERY | ZBX_EVAL_PARSE_FUNCTION	|\
 						ZBX_EVAL_PARSE_MATH | ZBX_EVAL_PARSE_COMPARE 		|\
 						ZBX_EVAL_PARSE_LOGIC | ZBX_EVAL_PARSE_VAR 		|\
@@ -117,11 +117,14 @@
 						ZBX_EVAL_PARSE_LOGIC | ZBX_EVAL_PARSE_GROUP 			|\
 						ZBX_EVAL_PARSE_VAR_STR | ZBX_EVAL_PARSE_PROPERTY)
 
-#define	ZBX_EVAL_PARSE_EXPRESSION_MACRO		(ZBX_EVAL_PARSE_MACRO | ZBX_EVAL_PARSE_USERMACRO 	|\
+#define ZBX_EVAL_PARSE_EXPRESSION_MACRO		(ZBX_EVAL_PARSE_MACRO | ZBX_EVAL_PARSE_USERMACRO 	|\
 						ZBX_EVAL_PARSE_ITEM_QUERY | ZBX_EVAL_PARSE_FUNCTION	|\
 						ZBX_EVAL_PARSE_MATH | ZBX_EVAL_PARSE_COMPARE 		|\
 						ZBX_EVAL_PARSE_LOGIC | ZBX_EVAL_PARSE_VAR 		|\
 						ZBX_EVAL_PARSE_COMPOUND_CONST)
+
+#define ZBX_EVAL_PARSE_LLD_FILTER_EXPRESSION	(ZBX_EVAL_PARSE_LOGIC | ZBX_EVAL_PARSE_FUNCTIONID |\
+						ZBX_EVAL_PARSE_GROUP)
 /* expression composition rules */
 
 #define ZBX_EVAL_COMPOSE_LLD			__UINT64_C(0x01000000)
@@ -201,9 +204,9 @@ typedef struct
 	zbx_timespec_t		ts;
 	zbx_vector_eval_token_t	stack;
 	zbx_vector_eval_token_t	ops;
-	zbx_eval_function_cb_t	common_func_cb;
-	zbx_eval_function_cb_t	history_func_cb;
-	void			*data_cb;
+	zbx_eval_function_cb_t	eval_function_common_cb;
+	zbx_eval_function_cb_t	eval_function_history_cb;
+	void			*eval_function_data_cb;
 }
 zbx_eval_context_t;
 
@@ -223,8 +226,9 @@ void	zbx_eval_deserialize(zbx_eval_context_t *ctx, const char *expression, zbx_u
 		const unsigned char *data);
 void	zbx_eval_compose_expression(const zbx_eval_context_t *ctx, char **expression);
 int	zbx_eval_execute(zbx_eval_context_t *ctx, const zbx_timespec_t *ts, zbx_variant_t *value, char **error);
-int	zbx_eval_execute_ext(zbx_eval_context_t *ctx, const zbx_timespec_t *ts, zbx_eval_function_cb_t common_func_cb,
-		zbx_eval_function_cb_t history_func_cb, void *data, zbx_variant_t *value, char **error);
+int	zbx_eval_execute_ext(zbx_eval_context_t *ctx, const zbx_timespec_t *ts,
+		zbx_eval_function_cb_t eval_function_common_cb, zbx_eval_function_cb_t eval_function_history_cb,
+		void *data, zbx_variant_t *value, char **error);
 void	zbx_eval_get_functionids(zbx_eval_context_t *ctx, zbx_vector_uint64_t *functionids);
 void	zbx_eval_get_functionids_ordered(zbx_eval_context_t *ctx, zbx_vector_uint64_t *functionids);
 int	zbx_eval_substitute_macros(const zbx_eval_context_t *ctx, char **error, zbx_eval_subst_macros_func_t resolver,

@@ -649,7 +649,7 @@ BEGIN
 		RAISE NOTICE 'TimescaleDB version % is valid', current_timescaledb_version_full;
 	END IF;
 
-	SELECT db_extension FROM config INTO current_db_extension;
+	SELECT value_str FROM settings WHERE name='db_extension' INTO current_db_extension;
 
 EOF
 	;
@@ -683,8 +683,11 @@ EOF
 	IF (current_db_extension = 'timescaledb') THEN
 		RAISE NOTICE 'TimescaleDB extension is already installed; not changing configuration';
 	ELSE
-		UPDATE config SET db_extension='timescaledb',hk_history_global=1,hk_trends_global=1;
-		UPDATE config SET compression_status=1,compress_older='7d';
+		UPDATE settings SET value_str='timescaledb' WHERE name='db_extension';
+		UPDATE settings SET value_int=1 WHERE name='hk_history_global';
+		UPDATE settings SET value_int=1 WHERE name='hk_trends_global';
+		UPDATE settings SET value_int=1 WHERE name='compression_status';
+		UPDATE settings SET value_str='7d' WHERE name='compress_older';
 	END IF;
 
 	RAISE NOTICE 'TimescaleDB is configured successfully';

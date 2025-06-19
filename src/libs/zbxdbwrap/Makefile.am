@@ -16,6 +16,7 @@ libzbxdbwrap_a_SOURCES = \
 	graph_linking.c \
 	graph_linking.h \
 	host.c \
+	item.c \
 	user.c \
 	permission.c \
 	macro_ctx_trigger.c

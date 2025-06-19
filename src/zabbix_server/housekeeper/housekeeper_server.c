@@ -20,7 +20,6 @@
 #include "zbxlog.h"
 #include "zbxnix.h"
 #include "zbxself.h"
-#include "zbxexpression.h"
 #include "zbxrtc.h"
 #include "zbxnum.h"
 #include "zbxtime.h"
@@ -69,7 +68,7 @@ typedef struct
 	int		min_clock;
 
 	/* a reference to the housekeeping configuration mode (enable) option for this table */
-	unsigned char	*poption_mode;
+	int		*poption_mode;
 
 	/* a reference to the settings value specifying number of seconds the records must be kept */
 	int		*phistory;
@@ -85,10 +84,10 @@ typedef struct
 	const char	*name;
 
 	/* a reference to housekeeping configuration enable value for this table */
-	unsigned char	*poption_mode;
+	int		*poption_mode;
 
 	/* a reference to the housekeeping configuration overwrite option for this table */
-	unsigned char	*poption_global;
+	int		*poption_global;
 }
 zbx_hk_cleanup_table_t;
 
@@ -124,10 +123,10 @@ typedef struct
 	const char				*history;
 
 	/* a reference to the housekeeping configuration mode (enable) option for this table */
-	unsigned char				*poption_mode;
+	int					*poption_mode;
 
 	/* a reference to the housekeeping configuration overwrite option for this table */
-	unsigned char				*poption_global;
+	int					*poption_global;
 
 	/* a reference to the housekeeping configuration history value for this table */
 	int					*poption;
@@ -151,8 +150,8 @@ static int	tsdb_version = 0;
 
 static int	hk_period;
 
-static unsigned char poption_mode_regular	= ZBX_HK_MODE_REGULAR;
-static unsigned char poption_global_disabled	= ZBX_HK_OPTION_DISABLED;
+static int	poption_mode_regular	= ZBX_HK_MODE_REGULAR;
+static int	poption_global_disabled	= ZBX_HK_OPTION_DISABLED;
 
 /* global configuration data containing housekeeping configuration */
 static zbx_config_t	cfg;
@@ -390,10 +389,10 @@ static void	hk_history_update(zbx_hk_history_rule_t *rules, int now)
 	result = zbx_db_select(
 			"select i.itemid,i.value_type,i.history,i.trends,h.hostid"
 			" from items i,hosts h"
-			" where i.flags in (%d,%d)"
+			" where i.flags&%d=0"
 				" and i.hostid=h.hostid"
 				" and h.status in (%d,%d)",
-			ZBX_FLAG_DISCOVERY_NORMAL, ZBX_FLAG_DISCOVERY_CREATED,
+			ZBX_FLAG_DISCOVERY_RULE | ZBX_FLAG_DISCOVERY_PROTOTYPE,
 			HOST_STATUS_MONITORED, HOST_STATUS_NOT_MONITORED);
 
 	um_handle = zbx_dc_open_user_macros();
@@ -414,8 +413,7 @@ static void	hk_history_update(zbx_hk_history_rule_t *rules, int now)
 			int	history;
 
 			tmp = zbx_strdup(tmp, row[2]);
-			zbx_substitute_simple_macros(NULL, NULL, NULL, NULL, &hostid, NULL, NULL, NULL, NULL, NULL,
-					NULL, NULL, &tmp, ZBX_MACRO_TYPE_COMMON, NULL, 0);
+			zbx_dc_expand_user_and_func_macros(um_handle, &tmp, &hostid, 1, NULL);
 
 			if (SUCCEED != zbx_is_time_suffix(tmp, &history, ZBX_LENGTH_UNLIMITED))
 			{
@@ -450,8 +448,7 @@ static void	hk_history_update(zbx_hk_history_rule_t *rules, int now)
 				rule_add = rule;
 
 			tmp = zbx_strdup(tmp, row[3]);
-			zbx_substitute_simple_macros(NULL, NULL, NULL, NULL, &hostid, NULL, NULL, NULL, NULL, NULL,
-					NULL, NULL, &tmp, ZBX_MACRO_TYPE_COMMON, NULL, 0);
+			zbx_dc_expand_user_and_func_macros(um_handle, &tmp, &hostid, 1, NULL);
 
 			if (SUCCEED != zbx_is_time_suffix(tmp, &trends, ZBX_LENGTH_UNLIMITED))
 			{

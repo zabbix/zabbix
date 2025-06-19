@@ -21,7 +21,7 @@ require_once dirname(__FILE__).'/../include/CIntegrationTest.php';
  * @required-components server, agent
  * @configurationDataProvider serverConfigurationProvider
  * @backup hosts,actions,permission,alerts
- * @backup auditlog,changelog,config
+ * @backup auditlog,changelog,settings
  */
 class testPermissions extends CIntegrationTest {
 	const HOST_NAME_01 = 'h01';

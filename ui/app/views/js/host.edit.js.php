@@ -26,18 +26,18 @@ window.host_edit_popup = {
 	form: null,
 	form_element: null,
 
-	init({rules, popup_url, host_interfaces, proxy_groupid, host_is_discovered, warnings}) {
+	init({rules, host_interfaces, proxy_groupid, host_is_discovered, warnings}) {
 		this.overlay = overlays_stack.getById('host.edit');
 		this.dialogue = this.overlay.$dialogue[0];
 		this.form_element = this.overlay.$dialogue.$body[0].querySelector('form');
 		this.form = new CForm(this.form_element, rules);
 		this.initial_proxy_groupid = proxy_groupid;
 		this.macros_templateids = null;
+		this.show_inherited_macros = false;
 
-		const backurl = new Curl('zabbix.php');
-
-		backurl.setArgument('action', 'host.list');
-		this.overlay.backurl = backurl.getUrl();
+		const return_url = new URL('zabbix.php', location.href);
+		return_url.searchParams.set('action', 'host.list');
+		ZABBIX.PopupManager.setReturnUrl(return_url.href);
 
 		if (warnings.length) {
 			const message_box = warnings.length == 1
@@ -56,23 +56,50 @@ window.host_edit_popup = {
 
 		this.initial_form_fields = getFormFields(this.form_element);
 		this.initEvents();
+		this.initPopupListeners();
 	},
 
 	initEvents() {
-		this.form_element.addEventListener('click', (e) => {
-			const target = e.target;
-
-			if (target.matches('.js-edit-template') || target.matches('.js-edit-proxy')
-					|| target.matches('.js-update-item')) {
-				this.setActions(e.target.dataset);
-			}
-			else if (e.target.classList.contains('js-unlink')) {
-				this.unlinkTemplate(e.target)
+		this.form_element.addEventListener('click', e => {
+			if (e.target.classList.contains('js-unlink')) {
+				this.unlinkTemplate(e.target);
 			}
 			else if (e.target.classList.contains('js-unlink-and-clear')) {
-				this.unlinkAndClearTemplate(e.target, e.target.dataset.templateid)
+				this.unlinkAndClearTemplate(e.target, e.target.dataset.templateid);
 			}
 		});
+	},
+
+	initPopupListeners() {
+		const subscriptions = [];
+
+		for (const action of ['template.edit', 'proxy.edit', 'item.edit']) {
+			subscriptions.push(
+				ZABBIX.EventHub.subscribe({
+					require: {
+						context: CPopupManager.EVENT_CONTEXT,
+						event: CPopupManagerEvent.EVENT_OPEN,
+						action
+					},
+					callback: ({event}) => {
+						if (!this.isConfirmed()) {
+							event.preventDefault();
+						}
+					}
+				})
+			);
+		}
+
+		subscriptions.push(
+			ZABBIX.EventHub.subscribe({
+				require: {
+					context: CPopupManager.EVENT_CONTEXT,
+					event: CPopupManagerEvent.EVENT_END_SCRIPTING,
+					action: this.overlay.dialogueid
+				},
+				callback: () => ZABBIX.EventHub.unsubscribeAll(subscriptions)
+			})
+		);
 	},
 
 	/**
@@ -190,39 +217,6 @@ window.host_edit_popup = {
 		this.form.discoverAllFields();
 
 		this.unlinkTemplate(button);
-	},
-
-	setActions(dataset) {
-		const {action, ...params} = dataset;
-
-		window.popupManagerInstance.setAdditionalActions(() => {
-			const form_fields = getFormFields(this.form_element);
-
-			const url = new Curl('zabbix.php');
-			url.setArgument('action', 'popup');
-			url.setArgument('popup', action);
-
-			for (const [key, value] of Object.entries(params)) {
-				url.setArgument(key, value);
-			}
-
-			if (JSON.stringify(this.initial_form_fields) !== JSON.stringify(form_fields)) {
-				if (!window.confirm(<?= json_encode(_('Any changes made in the current form will be lost.')) ?>)) {
-					return false;
-				}
-				else {
-					overlayDialogueDestroy(this.overlay.dialogueid);
-					history.replaceState(null, '', url.getUrl());
-
-					return true;
-				}
-			}
-
-			overlayDialogueDestroy(this.overlay.dialogueid);
-			history.replaceState(null, '', url.getUrl());
-
-			return true;
-		});
 	},
 
 	/**
@@ -504,15 +498,8 @@ window.host_edit_popup = {
 	},
 
 	isConfirmed() {
-		const form_fields = getFormFields(this.form_element);
-
-		if (JSON.stringify(this.initial_form_fields) !== JSON.stringify(form_fields)) {
-			if (!window.confirm(<?= json_encode(_('Any changes made in the current form will be lost.')) ?>)) {
-				return false;
-			}
-		}
-
-		return true;
+		return JSON.stringify(this.initial_form_fields) === JSON.stringify(getFormFields(this.form_element))
+			|| window.confirm(<?= json_encode(_('Any changes made in the current form will be lost.')) ?>);
 	},
 
 	submit() {
@@ -567,8 +554,7 @@ window.host_edit_popup = {
 		parameters.clone = 1;
 
 		this.form.release();
-
-		this.overlay = window.popupManagerInstance.openPopup('host.edit', parameters);
+		this.overlay = ZABBIX.PopupManager.open('host.edit', parameters);
 	},
 
 	delete(hostid) {

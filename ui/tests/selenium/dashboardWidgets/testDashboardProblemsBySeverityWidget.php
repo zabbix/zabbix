@@ -13,9 +13,9 @@
 ** If not, see <https://www.gnu.org/licenses/>.
 **/
 
-require_once dirname(__FILE__).'/../../include/CWebTest.php';
-require_once dirname(__FILE__).'/../behaviors/CTagBehavior.php';
-require_once dirname(__FILE__).'/../../include/helpers/CDataHelper.php';
+require_once __DIR__.'/../../include/CWebTest.php';
+require_once __DIR__.'/../behaviors/CTagBehavior.php';
+require_once __DIR__.'/../../include/helpers/CDataHelper.php';
 
 /**
  * @backup widget, profiles
@@ -1432,10 +1432,10 @@ class testDashboardProblemsBySeverityWidget extends CWebTest {
 			$form = $widget->edit();
 		}
 		else {
+			$widget = $dashboard->getWidgets()->last();
 			$overlay = $dashboard->addWidget();
 			$form = $overlay->asForm();
 			$form->getField('Type')->fill('Problems by severity');
-			$widget = $dashboard->getWidgets()->last();
 		}
 		$form->getField('Name')->fill('Widget to be cancelled');
 

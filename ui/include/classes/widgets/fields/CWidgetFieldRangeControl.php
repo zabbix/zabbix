@@ -30,7 +30,7 @@ class CWidgetFieldRangeControl extends CWidgetField {
 	 * @param int $min  Minimal allowed value.
 	 * @param int $max  Maximal allowed value.
 	 */
-	public function __construct(string $name, string $label = null, int $min = 0, int $max = ZBX_MAX_INT32,
+	public function __construct(string $name, ?string $label = null, int $min = 0, int $max = ZBX_MAX_INT32,
 			int $step = 1) {
 		parent::__construct($name, $label);
 

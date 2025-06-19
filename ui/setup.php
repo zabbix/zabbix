@@ -33,41 +33,48 @@ catch (Exception $e) {
 
 // VAR	TYPE	OPTIONAL	FLAGS	VALIDATION	EXCEPTION
 $fields = [
-	'default_lang' =>			[T_ZBX_STR, O_OPT, null,	null,				null],
-	'type' =>					[T_ZBX_STR, O_OPT, null,	IN('"'.ZBX_DB_MYSQL.'","'.ZBX_DB_POSTGRESQL.'"'), null],
-	'server' =>					[T_ZBX_STR, O_OPT, null,	null,				null],
-	'port' =>					[T_ZBX_INT, O_OPT, null,	BETWEEN(0, 65535),	null, _('Database port')],
-	'database' =>				[T_ZBX_STR, O_OPT, null,	NOT_EMPTY,			null, _('Database name')],
-	'user' =>					[T_ZBX_STR, O_OPT, null,	null,				null],
-	'password' =>				[T_ZBX_STR, O_OPT, null,	null, 				null],
-	'schema' =>					[T_ZBX_STR, O_OPT, null,	null, 				null],
-	'tls_encryption' =>			[T_ZBX_INT, O_OPT, null,	IN([0,1]),			null],
-	'verify_certificate' =>		[T_ZBX_INT, O_OPT, null,	IN([0,1]),			null],
-	'verify_host' =>			[T_ZBX_INT, O_OPT, null,	IN([0,1]),			null],
-	'key_file' =>				[T_ZBX_STR, O_OPT, null,	null, 				null],
-	'cert_file' =>				[T_ZBX_STR, O_OPT, null,	null, 				null],
-	'ca_file' =>				[T_ZBX_STR, O_OPT, null,	null, 				null],
-	'cipher_list' =>			[T_ZBX_STR, O_OPT, null,	null, 				null],
-	'creds_storage' =>			[T_ZBX_INT, O_OPT, null,	IN([DB_STORE_CREDS_CONFIG, DB_STORE_CREDS_VAULT_HASHICORP, DB_STORE_CREDS_VAULT_CYBERARK]), null],
-	'vault_url' =>				[T_ZBX_STR, O_OPT, null,	null,				null],
-	'vault_prefix_hashicorp' =>	[T_ZBX_STR, O_OPT, null,	null,				null],
-	'vault_prefix_cyberark' =>	[T_ZBX_STR, O_OPT, null,	null,				null],
-	'vault_db_path' =>			[T_ZBX_STR, O_OPT, null,	null,				null],
-	'vault_query_string' =>		[T_ZBX_STR, O_OPT, null,	null,				null],
-	'vault_token' =>			[T_ZBX_STR, O_OPT, null,	null,				null],
-	'vault_certificates' =>		[T_ZBX_INT, O_OPT, null,	IN([0,1]),			null],
-	'vault_cert_file' =>		[T_ZBX_STR, O_OPT, null,	null,				null],
-	'vault_key_file' =>			[T_ZBX_STR, O_OPT, null,	null,				null],
-	'zbx_server_name' =>		[T_ZBX_STR, O_OPT, null,	null,				null],
-	'default_timezone' =>		[T_ZBX_STR, O_OPT, null,	null,				null],
-	'default_theme' =>			[T_ZBX_STR, O_OPT, null,	null,				null],
+	'default_lang' =>                       [T_ZBX_STR, O_OPT, null,	null,				null],
+	'type' =>                               [T_ZBX_STR, O_OPT, null,	IN('"'.ZBX_DB_MYSQL.'","'.ZBX_DB_POSTGRESQL.'"'), null],
+	'server' =>                             [T_ZBX_STR, O_OPT, null,	null,				null],
+	'port' =>                               [T_ZBX_INT, O_OPT, null,	BETWEEN(0, 65535),	null, _('Database port')],
+	'database' =>                           [T_ZBX_STR, O_OPT, null,	NOT_EMPTY,			null, _('Database name')],
+	'user' =>                               [T_ZBX_STR, O_OPT, null,	null,				null],
+	'password' =>                           [T_ZBX_STR, O_OPT, null,	null, 				null],
+	'schema' =>                             [T_ZBX_STR, O_OPT, null,	null, 				null],
+	'tls_encryption' =>                     [T_ZBX_INT, O_OPT, null,	IN([0,1]),			null],
+	'verify_certificate' =>                 [T_ZBX_INT, O_OPT, null,	IN([0,1]),			null],
+	'verify_host' =>                        [T_ZBX_INT, O_OPT, null,	IN([0,1]),			null],
+	'key_file' =>                           [T_ZBX_STR, O_OPT, null,	null, 				null],
+	'cert_file' =>                          [T_ZBX_STR, O_OPT, null,	null, 				null],
+	'ca_file' =>                            [T_ZBX_STR, O_OPT, null,	null, 				null],
+	'cipher_list' =>                        [T_ZBX_STR, O_OPT, null,	null, 				null],
+	'creds_storage' =>                      [T_ZBX_INT, O_OPT, null,	IN([DB_STORE_CREDS_CONFIG, DB_STORE_CREDS_VAULT_HASHICORP, DB_STORE_CREDS_VAULT_CYBERARK]), null],
+	'vault_url' =>                          [T_ZBX_STR, O_OPT, null,	null,				null],
+	'vault_prefix_hashicorp' =>             [T_ZBX_STR, O_OPT, null,	null,				null],
+	'vault_prefix_cyberark' =>              [T_ZBX_STR, O_OPT, null,	null,				null],
+	'vault_db_path' =>                      [T_ZBX_STR, O_OPT, null,	null,				null],
+	'vault_query_string' =>                 [T_ZBX_STR, O_OPT, null,	null,				null],
+	'vault_token' =>                        [T_ZBX_STR, O_OPT, null,	null,				null],
+	'vault_certificates' =>                 [T_ZBX_INT, O_OPT, null,	IN([0,1]),			null],
+	'vault_cert_file' =>                    [T_ZBX_STR, O_OPT, null,	null,				null],
+	'vault_key_file' =>                     [T_ZBX_STR, O_OPT, null,	null,				null],
+	'zbx_server_name' =>                    [T_ZBX_STR, O_OPT, null,	null,				null],
+	'default_timezone' =>                   [T_ZBX_STR, O_OPT, null,	null,				null],
+	'default_theme' =>                      [T_ZBX_STR, O_OPT, null,	null,				null],
+	'zbx_server_tls' =>                     [T_ZBX_INT, O_OPT, null,	IN([0,1]),			null],
+	'zbx_server_tls_ca_file' =>             [T_ZBX_STR, O_OPT, null,	null,				null],
+	'zbx_server_tls_key_file' =>            [T_ZBX_STR, O_OPT, null,	null,				null],
+	'zbx_server_tls_cert_file' =>           [T_ZBX_STR, O_OPT, null,	null,				null],
+	'zbx_server_tls_certificate_check' =>   [T_ZBX_INT, O_OPT, null,	IN([0,1]),			null],
+	'zbx_server_tls_certificate_issuer' =>  [T_ZBX_STR, O_OPT, null,	null,				null],
+	'zbx_server_tls_certificate_subject' => [T_ZBX_STR, O_OPT, null,	null,				null],
 	// actions
-	'save_config' =>			[T_ZBX_STR, O_OPT, P_SYS,	null,				null],
-	'retry' =>					[T_ZBX_STR, O_OPT, P_SYS,	null,				null],
-	'cancel' =>					[T_ZBX_STR, O_OPT, P_SYS,	null,				null],
-	'finish' =>					[T_ZBX_STR, O_OPT, P_SYS,	null,				null],
-	'next' =>					[T_ZBX_STR, O_OPT, P_SYS|P_ONLY_ARRAY,	null,	null],
-	'back' =>					[T_ZBX_STR, O_OPT, P_SYS|P_ONLY_ARRAY,	null,	null]
+	'save_config' =>                        [T_ZBX_STR, O_OPT, P_SYS,	null,				null],
+	'retry' =>                              [T_ZBX_STR, O_OPT, P_SYS,	null,				null],
+	'cancel' =>                             [T_ZBX_STR, O_OPT, P_SYS,	null,				null],
+	'finish' =>                             [T_ZBX_STR, O_OPT, P_SYS,	null,				null],
+	'next' =>                               [T_ZBX_STR, O_OPT, P_SYS|P_ONLY_ARRAY,	null,	null],
+	'back' =>                               [T_ZBX_STR, O_OPT, P_SYS|P_ONLY_ARRAY,	null,	null]
 ];
 
 $check_fields_result = check_fields($fields, false);
@@ -129,6 +136,15 @@ if ($default_timezone !== ZBX_DEFAULT_TIMEZONE && !CTimezoneHelper::isSupported(
 	$default_timezone = ZBX_DEFAULT_TIMEZONE;
 }
 
+$tz_offsets = array_column(
+	(new DateTimeZone($default_timezone !== ZBX_DEFAULT_TIMEZONE
+		? $default_timezone
+		: CTimezoneHelper::getSystemTimezone()
+	))->getTransitions(0, ZBX_MAX_DATE),
+	'offset',
+	'ts'
+);
+
 CSessionHelper::set('default_timezone', $default_timezone);
 
 // Set default theme.
@@ -162,6 +178,10 @@ $page_header = (new CHtmlPageHeader(_('Installation'), substr($default_lang, 0, 
 $page_header
 	->setTheme($default_theme)
 	->addCssFile('assets/styles/'.$page_header->getTheme().'.css')
+	->addJavaScript('
+		const PHP_ZBX_FULL_DATE_TIME = "'.DATE_TIME_FORMAT_SECONDS.'";
+		const PHP_TZ_OFFSETS = '.json_encode($tz_offsets).';
+	')
 	->addJsFile((new CUrl('js/browsers.js'))->getUrl())
 	->addJsFile((new CUrl('jsLoader.php'))
 		->setArgument('ver', ZABBIX_VERSION)

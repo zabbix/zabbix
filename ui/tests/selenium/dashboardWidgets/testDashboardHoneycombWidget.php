@@ -14,7 +14,7 @@
 **/
 
 
-require_once dirname(__FILE__).'/../common/testWidgets.php';
+require_once __DIR__.'/../common/testWidgets.php';
 
 /**
  * @backup dashboard, globalmacro
@@ -57,6 +57,9 @@ class testDashboardHoneycombWidget extends testWidgets {
 	 * Id of dashboard for update scenarios.
 	 */
 	protected static $disposable_dashboard_id;
+
+	const DASHBOARD_FOR_MACRO_FUNCTIONS = 'Dashboard for testing macro functions';
+	const WIDGET_FOR_MACRO_FUNCTIONS = 'Widget for testing macro functions';
 
 	public static function prepareHoneycombWidgetData() {
 		CDataHelper::call('hostgroup.create', [
@@ -694,6 +697,31 @@ class testDashboardHoneycombWidget extends testWidgets {
 						]
 					]
 				]
+			],
+			[
+				'name' => self::DASHBOARD_FOR_MACRO_FUNCTIONS,
+				'auto_start' => 0,
+				'pages' => [
+					[
+						'widgets' => [
+							[
+								'type' => 'honeycomb',
+								'name' => self::WIDGET_FOR_MACRO_FUNCTIONS,
+								'x' => 0,
+								'y' => 0,
+								'width' => 12,
+								'height' => 5,
+								'fields' => [
+									[
+										'type' => 1,
+										'name' => 'items.4',
+										'value' => 'Display item 5'
+									]
+								]
+							]
+						]
+					]
+				]
 			]
 		]);
 		self::$dashboardid = CDataHelper::getIds('name');
@@ -707,6 +735,35 @@ class testDashboardHoneycombWidget extends testWidgets {
 				'macro' => '{$SECRET_TEXT}',
 				'type' => 1,
 				'value' => 'secret_macro'
+			],
+			[
+				'macro' => self::USER_MACRO,
+				'value' => self::USER_MACRO_VALUE
+			],
+			[
+				'macro' => self::USER_SECRET_MACRO,
+				'type' => 1,
+				'value' => self::USER_MACRO_VALUE
+			],
+			[
+				'macro' => self::MACRO_CHAR,
+				'value' => self::MACRO_CHAR_VALUE
+			],
+			[
+				'macro' => self::MACRO_HTML_ENCODE,
+				'value' => self::MACRO_HTML_ENCODE_VALUE
+			],
+			[
+				'macro' => self::MACRO_HTML_DECODE,
+				'value' => self::MACRO_HTML_DECODE_VALUE
+			],
+			[
+				'macro' => self::MACRO_URL_ENCODE,
+				'value' => self::MACRO_URL_ENCODE_VALUE
+			],
+			[
+				'macro' => self::MACRO_URL_DECODE,
+				'value' => self::MACRO_URL_DECODE_VALUE
 			]
 		]);
 	}
@@ -934,7 +991,7 @@ class testDashboardHoneycombWidget extends testWidgets {
 
 		// Check added threshold colors.
 		$table->query('button:Add')->one()->click();
-		$colorpicker = $table->query('xpath:.//input[@id="thresholds_0_color"]/..')->asColorPicker()->one();
+		$colorpicker = $table->query(self::PATH_TO_COLOR_PICKER.'"thresholds[0][color]"]')->asColorPicker()->one();
 		$this->assertEquals('E65660', $colorpicker->getValue());
 		$this->assertTrue($colorpicker->isClickable());
 
@@ -968,39 +1025,15 @@ class testDashboardHoneycombWidget extends testWidgets {
 					]
 				]
 			],
-			// #1.
+			// #1. Mixed scenario with color picker and show parameter check.
 			[
 				[
 					'expected' => TEST_BAD,
 					'fields' => [
 						'Item patterns' => 'test',
 						'id:show_1' => false, // Show - Primary label.
-						'id:show_2' => false // Show - Secondary label.
-					],
-					'error_message' => [
-						'Invalid parameter "Show": at least one option must be selected.'
-					]
-				]
-			],
-			// #2.
-			[
-				[
-					'expected' => TEST_BAD,
-					'fields' => [
-						'Item patterns' => 'test',
-						'Background colour' => 'tests1'
-					],
-					'error_message' => [
-						'Invalid parameter "Background colour": a hexadecimal colour code (6 symbols) is expected.'
-					]
-				]
-			],
-			// #3.
-			[
-				[
-					'expected' => TEST_BAD,
-					'fields' => [
-						'Item patterns' => 'test'
+						'id:show_2' => false, // Show - Secondary label.
+						self::PATH_TO_COLOR_PICKER.'"bg_color"]' => 'tests1'
 					],
 					'thresholds' => [
 						[
@@ -1009,11 +1042,12 @@ class testDashboardHoneycombWidget extends testWidgets {
 						]
 					],
 					'error_message' => [
-						'Invalid parameter "Thresholds/1/color": a hexadecimal colour code (6 symbols) is expected.'
-					]
+						'Invalid parameter "Show": at least one option must be selected.'
+					],
+					'invalid_color' => true
 				]
 			],
-			// #4.
+			// #2.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -1031,29 +1065,7 @@ class testDashboardHoneycombWidget extends testWidgets {
 					]
 				]
 			],
-			// #5.
-			[
-				[
-					'expected' => TEST_BAD,
-					'fields' => [
-						'Item patterns' => 'test'
-					],
-					'thresholds' => [
-						[
-							'threshold' => '1',
-							'color' => 'FF465C'
-						],
-						[
-							'threshold' => '1',
-							'color' => 'TESTS1'
-						]
-					],
-					'error_message' => [
-						'Invalid parameter "Thresholds/2/color": a hexadecimal colour code (6 symbols) is expected.'
-					]
-				]
-			],
-			// #6.
+			// #3.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -1075,7 +1087,7 @@ class testDashboardHoneycombWidget extends testWidgets {
 					]
 				]
 			],
-			// #7.
+			// #4.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -1097,7 +1109,7 @@ class testDashboardHoneycombWidget extends testWidgets {
 					]
 				]
 			],
-			// #8.
+			// #5.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -1110,7 +1122,7 @@ class testDashboardHoneycombWidget extends testWidgets {
 					]
 				]
 			],
-			// #9.
+			// #6.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -1124,7 +1136,7 @@ class testDashboardHoneycombWidget extends testWidgets {
 					]
 				]
 			],
-			// #10.
+			// #7.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -1141,7 +1153,7 @@ class testDashboardHoneycombWidget extends testWidgets {
 					]
 				]
 			],
-			// #11.
+			// #8.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -1151,19 +1163,21 @@ class testDashboardHoneycombWidget extends testWidgets {
 						'id:primary_label_size_type' => 'Custom', // Primary label Size - custom.
 						'id:secondary_label_size_type' => 'Custom', // Secondary label Size - custom.
 						'id:primary_label_size' => 'text', // Primary label Custom size input field.
-						'id:secondary_label_size' => 'text',  // Secondary label Custom size input field.
+						'id:secondary_label_size' => 'text', // Secondary label Custom size input field.
 						'id:primary_label' => '', // Primary label text field.
-						'id:secondary_label' => '' // Secondary label text field.
+						'id:secondary_label' => '', // Secondary label text field.
+						self::PATH_TO_COLOR_PICKER.'"primary_label_color"]' => 'TESTS1' // Primary label Color.
 					],
 					'error_message' => [
 						'Invalid parameter "Primary label: Text": cannot be empty.',
 						'Invalid parameter "Primary label: Size": value must be one of 1-100.',
 						'Invalid parameter "Secondary label: Text": cannot be empty.',
 						'Invalid parameter "Secondary label: Size": value must be one of 1-100.'
-					]
+					],
+					'invalid_color' => true
 				]
 			],
-			// #12.
+			// #9.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -1176,29 +1190,25 @@ class testDashboardHoneycombWidget extends testWidgets {
 						'id:secondary_label_size' => '🙂🙃',  // Secondary label Custom size input field.
 						'id:primary_label' => '', // Primary label text field.
 						'id:secondary_label' => '', // Secondary label text field.
-						'xpath:.//input[@id="primary_label_color"]/..' => 'TESTS1', // Primary label Color.
-						'xpath:.//input[@id="secondary_label_color"]/..' => 'TESTS2' // Secondary label Color.
+						self::PATH_TO_COLOR_PICKER.'"secondary_label_color"]' => 'ZABBIX' // Secondary label Color.
 					],
 					'thresholds' => [
 						[
 							'threshold' => '1',
-							'color' => 'TESTS1'
+							'color' => 'ZABBIX'
 						]
 					],
 					'error_message' => [
 						'Invalid parameter "Item patterns": cannot be empty.',
 						'Invalid parameter "Primary label: Text": cannot be empty.',
 						'Invalid parameter "Primary label: Size": value must be one of 1-100.',
-						'Invalid parameter "Primary label: Colour": a hexadecimal colour code (6 symbols) is expected.',
 						'Invalid parameter "Secondary label: Text": cannot be empty.',
-						'Invalid parameter "Secondary label: Size": value must be one of 1-100.',
-						'Invalid parameter "Secondary label: Colour": a hexadecimal colour code (6 symbols) is expected.',
-						'Invalid parameter "Thresholds/1/color": a hexadecimal colour code (6 symbols) is expected.',
-						'Invalid parameter "Thresholds/1/color": a hexadecimal colour code (6 symbols) is expected.'
-					]
+						'Invalid parameter "Secondary label: Size": value must be one of 1-100.'
+					],
+					'invalid_color' => true
 				]
 			],
-			// #13.
+			// #10.
 			[
 				[
 					'fields' => [
@@ -1209,7 +1219,7 @@ class testDashboardHoneycombWidget extends testWidgets {
 					]
 				]
 			],
-			// #14.
+			// #11.
 			[
 				[
 					'fields' => [
@@ -1219,11 +1229,11 @@ class testDashboardHoneycombWidget extends testWidgets {
 						'id:primary_label' => '{$RANDOM}, some text, {TIME}, 12345, !@#$%^&*, {#WHY}',
 						'id:primary_label_size_type' => 'Custom', // Primary label Size - custom.
 						'id:primary_label_size' => 99,
-						'xpath:.//input[@id="primary_label_color"]/..' => '81C784' // Primary label Color.
+						self::PATH_TO_COLOR_PICKER.'"primary_label_color"]' => '81C784' // Primary label Color.
 					]
 				]
 			],
-			// #15.
+			// #12.
 			[
 				[
 					'fields' => [
@@ -1234,11 +1244,11 @@ class testDashboardHoneycombWidget extends testWidgets {
 						'id:secondary_label' => '{$RANDOM}, some text, {TIME}, 12345, !@#$%^&*, {#WHY}',
 						'id:secondary_label_size_type' => 'Custom', // Primary label Size - custom.
 						'id:secondary_label_size' => 99,
-						'xpath:.//input[@id="secondary_label_color"]/..' => '81C784' // Secondary label Color.
+						self::PATH_TO_COLOR_PICKER.'"secondary_label_color"]' => '81C784' // Secondary label Color.
 					]
 				]
 			],
-			// #16.
+			// #13.
 			[
 				[
 					'fields' => [
@@ -1250,8 +1260,8 @@ class testDashboardHoneycombWidget extends testWidgets {
 						'id:secondary_label_decimal_places' => 2,
 						'id:primary_label_bold' => true,
 						'id:secondary_label_bold' => true,
-						'xpath:.//input[@id="primary_label_color"]/..' => '81C784', // Primary label Color.
-						'xpath:.//input[@id="secondary_label_color"]/..' => '81C784', // Primary label Color.
+						self::PATH_TO_COLOR_PICKER.'"primary_label_color"]' => '81C784', // Primary label Color.
+						self::PATH_TO_COLOR_PICKER.'"secondary_label_color"]' => '81C784', // Primary label Color.
 						'id:primary_label_units_pos' => 'Before value',
 						'id:secondary_label_units_pos' => 'Before value',
 						'id:primary_label_units' => 'primary',
@@ -1259,7 +1269,7 @@ class testDashboardHoneycombWidget extends testWidgets {
 					]
 				]
 			],
-			// #17.
+			// #14.
 			[
 				[
 					'fields' => [
@@ -1270,7 +1280,7 @@ class testDashboardHoneycombWidget extends testWidgets {
 					]
 				]
 			],
-			// #18.
+			// #15.
 			[
 				[
 					'fields' => [
@@ -1286,7 +1296,7 @@ class testDashboardHoneycombWidget extends testWidgets {
 					]
 				]
 			],
-			// #19.
+			// #16.
 			[
 				[
 					'fields' => [
@@ -1305,7 +1315,7 @@ class testDashboardHoneycombWidget extends testWidgets {
 					]
 				]
 			],
-			// #20.
+			// #17.
 			[
 				[
 					'fields' => [
@@ -1325,7 +1335,7 @@ class testDashboardHoneycombWidget extends testWidgets {
 					]
 				]
 			],
-			// #21.
+			// #18.
 			[
 				[
 					'fields' => [
@@ -1335,7 +1345,7 @@ class testDashboardHoneycombWidget extends testWidgets {
 					]
 				]
 			],
-			// #22.
+			// #19.
 			[
 				[
 					'fields' => [
@@ -1362,7 +1372,7 @@ class testDashboardHoneycombWidget extends testWidgets {
 					]
 				]
 			],
-			// #23.
+			// #20.
 			[
 				[
 					'fields' => [
@@ -1379,8 +1389,8 @@ class testDashboardHoneycombWidget extends testWidgets {
 						'id:secondary_label_bold' => false,
 						'id:primary_label_size' => 99,
 						'id:secondary_label_size' => 99,
-						'xpath:.//input[@id="primary_label_color"]/..' => '81C784', // Primary label Color.
-						'xpath:.//input[@id="secondary_label_color"]/..' => '81C784', // Primary label Color.
+						self::PATH_TO_COLOR_PICKER.'"primary_label_color"]' => '81C784', // Primary label Color.
+						self::PATH_TO_COLOR_PICKER.'"secondary_label_color"]' => '81C784', // Primary label Color.
 						'id:primary_label_units_pos' => 'Before value',
 						'id:primary_label_units' => 'primary',
 						'Background colour' => 'B2DFDB'
@@ -1770,8 +1780,8 @@ class testDashboardHoneycombWidget extends testWidgets {
 						'id:secondary_label_type' => 'Text',
 						'id:primary_label' => 'COLOR',
 						'id:secondary_label' => 'COLOR',
-						'xpath:.//input[@id="primary_label_color"]/..' => '66BB6A', // Primary label Color.
-						'xpath:.//input[@id="secondary_label_color"]/..' => '80DEEA', // Primary label Color.
+						self::PATH_TO_COLOR_PICKER.'"primary_label_color"]' => '66BB6A', // Primary label Color.
+						self::PATH_TO_COLOR_PICKER.'"secondary_label_color"]' => '80DEEA', // Primary label Color.
 						'Background colour' => 'D1C4E9'
 					],
 					'colors' => [
@@ -2274,6 +2284,260 @@ class testDashboardHoneycombWidget extends testWidgets {
 		$this->assertEquals($data['filtered_items'], $filtered);
 	}
 
+	public static function getMacroFunctions() {
+		return [
+			'Incorrectly added parameter for non-argument macro functions' => [
+				[
+					'fields' => [
+						'Advanced configuration' => true,
+						'id:primary_label_type' => 'Text',
+						'id:primary_label' => '{{ITEM.NAME}.btoa(\)}, {'.self::USER_MACRO.'.htmldecode(test)}, '.
+							'{'.self::USER_MACRO.'.htmlencode(test)}, {{ITEM.NAME}.lowercase([test])}, '.
+							'{{ITEM.NAME}.uppercase([test])}, {{ITEM.NAME}.urldecode([test])}, '.
+							'{'.self::USER_SECRET_MACRO.'.urlencode(\/)}',
+						'id:secondary_label_type' => 'Text',
+						'id:secondary_label' => '{{ITEM.NAME}.btoa(\)}, {'.self::USER_MACRO.'.htmldecode(test)}, '.
+							'{'.self::USER_MACRO.'.htmlencode(test)}, {{ITEM.NAME}.lowercase([test])}, '.
+							'{{ITEM.NAME}.uppercase([test])}, {{ITEM.NAME}.urldecode([test])}, '.
+							'{'.self::USER_SECRET_MACRO.'.urlencode(\/)}'
+					],
+					'result' => [
+						'primary' => '*UNKNOWN*, *UNKNOWN*, *UNKNOWN*, *UNKNOWN*, *UNKNOWN*, *UNKNOWN*, *UNKNOWN*',
+						'secondary' => '*UNKNOWN*, *UNKNOWN*, *UNKNOWN*, *UNKNOWN*, *UNKNOWN*, *UNKNOWN*, *UNKNOWN*'
+					]
+				]
+			],
+			'Secret macro value is not exposed when using macro functions' => [
+				[
+					'fields' => [
+						'Advanced configuration' => true,
+						'id:primary_label_type' => 'Text',
+						'id:primary_label' => '{'.self::USER_SECRET_MACRO.'.btoa()}, {'.self::USER_SECRET_MACRO.'.htmldecode()}, '.
+							'{'.self::USER_SECRET_MACRO.'.htmlencode()}, {'.self::USER_SECRET_MACRO.'.lowercase()}, '.
+							'{'.self::USER_SECRET_MACRO.'.uppercase()}, {'.self::USER_SECRET_MACRO.'.regrepl(a, b)}, '.
+							'{'.self::USER_SECRET_MACRO.'.tr(a-z, b)}, {'.self::USER_SECRET_MACRO.'.urldecode()}, '.
+							'{'.self::USER_SECRET_MACRO.'.urlencode()}',
+						'id:secondary_label_type' => 'Text',
+						'id:secondary_label' => '{'.self::USER_SECRET_MACRO.'.btoa()}, {'.self::USER_SECRET_MACRO.'.htmldecode()}, '.
+							'{'.self::USER_SECRET_MACRO.'.htmlencode()}, {'.self::USER_SECRET_MACRO.'.lowercase()}, '.
+							'{'.self::USER_SECRET_MACRO.'.uppercase()}, {'.self::USER_SECRET_MACRO.'.regrepl(a, b)}, '.
+							'{'.self::USER_SECRET_MACRO.'.tr(a-z, b)}, {'.self::USER_SECRET_MACRO.'.urldecode()}, '.
+							'{'.self::USER_SECRET_MACRO.'.urlencode()}'
+					],
+					'result' => [
+						'primary' => 'KioqKioq, ******, ******, ******, ******, ******, ******, ******, %2A%2A%2A%2A%2A%2A',
+						'secondary' => 'KioqKioq, ******, ******, ******, ******, ******, ******, ******, %2A%2A%2A%2A%2A%2A'
+					]
+				]
+			],
+			'Built-in macros with non-argument macro functions' => [
+				[
+					'fields' => [
+						'Advanced configuration' => true,
+						'id:primary_label_type' => 'Text',
+						'id:primary_label' => '{{ITEM.NAME}.btoa()}, {{ITEM.NAME}.htmldecode()}, {{ITEM.NAME}.htmlencode()}, '.
+							'{{ITEM.NAME}.lowercase()}, {{ITEM.NAME}.uppercase()}, {{ITEM.NAME}.urlencode()}, '.
+							'{{ITEM.NAME}.urldecode()}',
+						'id:secondary_label_type' => 'Text',
+						'id:secondary_label' => '{{ITEM.NAME}.btoa()}, {{ITEM.NAME}.htmldecode()}, {{ITEM.NAME}.htmlencode()}, '.
+							'{{ITEM.NAME}.lowercase()}, {{ITEM.NAME}.uppercase()}, {{ITEM.NAME}.urlencode()}, '.
+							'{{ITEM.NAME}.urldecode()}'
+					],
+					'result' => [
+						'primary' => 'RGlzcGxheSBpdGVtIDU=, Display item 5, Display item 5, display item 5, '.
+							'DISPLAY ITEM 5, Display%20item%205, Display item 5',
+						'secondary' => 'RGlzcGxheSBpdGVtIDU=, Display item 5, Display item 5, display item 5, '.
+							'DISPLAY ITEM 5, Display%20item%205, Display item 5'
+					]
+				]
+			],
+			'User macros with btoa(), htmlencode(), htmldecode() macro functions' => [
+				[
+					'fields' => [
+						'Advanced configuration' => true,
+						'id:primary_label_type' => 'Text',
+						'id:primary_label' => '{'.self::USER_MACRO.'.btoa()}, {'.self::MACRO_HTML_ENCODE.'.htmlencode()}, '.
+							'{'.self::MACRO_HTML_DECODE.'.htmldecode()}',
+						'id:secondary_label_type' => 'Text',
+						'id:secondary_label' => '{'.self::USER_MACRO.'.btoa()}, {'.self::MACRO_HTML_ENCODE.'.htmlencode()}, '.
+							'{'.self::MACRO_HTML_DECODE.'.htmldecode()}'
+					],
+					'result' => [
+						'primary' => base64_encode(self::USER_MACRO_VALUE).', '.self::MACRO_HTML_DECODE_VALUE.', '.
+							self::MACRO_HTML_ENCODE_VALUE,
+						'secondary' => base64_encode(self::USER_MACRO_VALUE).', '.self::MACRO_HTML_DECODE_VALUE.', '.
+							self::MACRO_HTML_ENCODE_VALUE
+					]
+				]
+			],
+			'User macros with urlencode(), urldecode(), uppercase(), lowercase() macro functions' => [
+				[
+					'fields' => [
+						'Advanced configuration' => true,
+						'id:primary_label_type' => 'Text',
+						'id:primary_label' => '{'.self::MACRO_URL_ENCODE.'.urlencode()}, '.
+							'{'.self::MACRO_URL_DECODE.'.urldecode()}, {'.self::USER_MACRO.'.uppercase()}, '.
+							'{'.self::USER_MACRO.'.lowercase()}',
+						'id:secondary_label_type' => 'Text',
+						'id:secondary_label' => '{'.self::MACRO_URL_ENCODE.'.urlencode()}, '.
+							'{'.self::MACRO_URL_DECODE.'.urldecode()}, {'.self::USER_MACRO.'.uppercase()}, '.
+							'{'.self::USER_MACRO.'.lowercase()}'
+					],
+					'result' => [
+						'primary' => self::MACRO_URL_DECODE_VALUE.', '.self::MACRO_URL_ENCODE_VALUE.
+							', MACRO FUNCTION TEST 12345, macro function test 12345',
+						'secondary' => self::MACRO_URL_DECODE_VALUE.', '.self::MACRO_URL_ENCODE_VALUE.
+							', MACRO FUNCTION TEST 12345, macro function test 12345'
+					]
+				]
+			],
+			'Incorrectly used parameters in regrepl(), tr(), regsub(), iregsub() macro functions' => [
+				[
+					'fields' => [
+						'Advanced configuration' => true,
+						'id:primary_label_type' => 'Text',
+						'id:primary_label' => '{'.self::USER_MACRO.'.regrepl()}, {'.self::MACRO_CHAR.'.regrepl([a])}, '.
+							'{'.self::USER_MACRO.'.tr()}, {'.self::USER_MACRO.'.tr(z-a,Z-A)}, {'.self::USER_MACRO.'.tr(1,2,3)}'.
+							', {'.self::USER_MACRO.'.regsub()}, {'.self::USER_MACRO.'.iregsub()}',
+						'id:secondary_label_type' => 'Text',
+						'id:secondary_label' => '{'.self::USER_MACRO.'.regrepl()}, {'.self::MACRO_CHAR.'.regrepl([a])}, '.
+							'{'.self::USER_MACRO.'.tr()}, {'.self::USER_MACRO.'.tr(z-a,Z-A)}, {'.self::USER_MACRO.'.tr(1,2,3)}'.
+							', {'.self::USER_MACRO.'.regsub()}, {'.self::USER_MACRO.'.iregsub()}'
+					],
+					'result' => [
+						'primary' => '*UNKNOWN*, *UNKNOWN*, *UNKNOWN*, *UNKNOWN*, *UNKNOWN*, *UNKNOWN*, *UNKNOWN*',
+						'secondary' => '*UNKNOWN*, *UNKNOWN*, *UNKNOWN*, *UNKNOWN*, *UNKNOWN*, *UNKNOWN*, *UNKNOWN*'
+					]
+				]
+			],
+			'Regrepl function - multibyte characters and case sensitive check' => [
+				[
+					'fields' => [
+						'Advanced configuration' => true,
+						'id:primary_label_type' => 'Text',
+						'id:primary_label' => '{'.self::USER_MACRO.'.regrepl([[:digit:]], /, [A-Z], \)}',
+						'id:secondary_label_type' => 'Text',
+						'id:secondary_label' => '{'.self::MACRO_CHAR.'.regrepl(🌴, 🌝, [а-я], Q, \d, 🌞)}'
+					],
+					'result' => [
+						'primary' => '\acro function \est /////',
+						'secondary' => '🌞🌞🌞 ЙQQQQЖŽzŠsšĒĀīī🌝 ₰₰₰'
+					]
+				]
+			],
+			'Regrepl function with big amount of processed data' => [
+				[
+					'fields' => [
+						'Advanced configuration' => true,
+						'id:primary_label_type' => 'Text',
+						'id:primary_label' => '{'.self::USER_MACRO.''.
+							'.regrepl(1{0}, test, 1{0}, test, 1{0},test, 1{0}, test, 1{0}, test, 1{0}, test)}',
+						'id:secondary_label_type' => 'Text',
+						'id:secondary_label' => '{'.self::USER_MACRO.''.
+							'.regrepl(1{0}, test, 1{0}, test, 1{0},test, 1{0}, test, 1{0}, test, 1{0}, test)}'
+					],
+					'result' => [
+						'primary' => '*UNKNOWN*',
+						'secondary' => '*UNKNOWN*'
+					]
+				]
+			],
+			'Macro functions tr(), uppercase(), lowercase() with non-ascii characters' => [
+				[
+					'fields' => [
+						'Advanced configuration' => true,
+						'id:primary_label_type' => 'Text',
+						'id:primary_label' => '{'.self::MACRO_CHAR.'.tr(0-9, Ī)}, {'.self::MACRO_CHAR.'.lowercase()}, '.
+							'{'.self::MACRO_CHAR.'.uppercase()}',
+						'id:secondary_label_type' => 'Text',
+						'id:secondary_label' => '{'.self::MACRO_CHAR.'.tr(0-9, Ī)}, {'.self::MACRO_CHAR.'.lowercase()}, '.
+							'{'.self::MACRO_CHAR.'.uppercase()}'
+					],
+					'result' => [
+						'primary' => '??? ЙщфхжЖŽzŠsšĒĀīī🌴 ₰₰₰, 000 ЙщфхжЖŽzŠsšĒĀīī🌴 ₰₰₰, 000 ЙщфхжЖŽZŠSšĒĀīī🌴 ₰₰₰',
+						'secondary' => '??? ЙщфхжЖŽzŠsšĒĀīī🌴 ₰₰₰, 000 ЙщфхжЖŽzŠsšĒĀīī🌴 ₰₰₰, 000 ЙщфхжЖŽZŠSšĒĀīī🌴 ₰₰₰'
+					]
+				]
+			],
+			'Macro function tr() - use of escaping and range' => [
+				[
+					'fields' => [
+						'Advanced configuration' => true,
+						'id:primary_label_type' => 'Text',
+						'id:primary_label' => '{'.self::MACRO_URL_ENCODE.'.tr("\/","\"")}, {'.self::MACRO_CHAR.'.tr(0-9abcA-L,*)}',
+						'id:secondary_label_type' => 'Text',
+						'id:secondary_label' => '{'.self::MACRO_URL_ENCODE.'.tr("\/","\"")}, {'.self::MACRO_CHAR.'.tr(0-9abcA-L,*)}'
+					],
+					'result' => [
+						'primary' => 'h:""test.com"macro?functions=urlencode&urld=a🎸, *** ЙщфхжЖŽzŠsšĒĀīī🌴 ₰₰₰',
+						'secondary' => 'h:""test.com"macro?functions=urlencode&urld=a🎸, *** ЙщфхжЖŽzŠsšĒĀīī🌴 ₰₰₰'
+					]
+				]
+			],
+			'Macro functions regsub(), iregsub() - successful scenarios' => [
+				[
+					'fields' => [
+						'Advanced configuration' => true,
+						'id:primary_label_type' => 'Text',
+						'id:primary_label' => '{'.self::USER_MACRO.'.regsub(^[0-9]+, Problem)}, '.
+							'{'.self::USER_MACRO.'.iregsub(^[0-9]+, Problem)}, {{ITEM.NAME}.regsub(^[0-9]+, Problem)}, '.
+							'{{ITEM.NAME}.iregsub(^[0-9]+, Problem)}, {'.self::USER_SECRET_MACRO.'.regsub(^[0-9]+, Problem)}, '.
+							'{'.self::USER_SECRET_MACRO.'.iregsub(^[0-9]+, Problem)}',
+						'id:secondary_label_type' => 'Text',
+						'id:secondary_label' => '{'.self::USER_MACRO.'.regsub(^[0-9]+, Problem)}, '.
+							'{'.self::USER_MACRO.'.iregsub(^[0-9]+, Problem)}, {{ITEM.NAME}.regsub(^[0-9]+, Problem)}, '.
+							'{{ITEM.NAME}.iregsub(^[0-9]+, Problem)}, {'.self::USER_SECRET_MACRO.'.regsub(^[0-9]+, Problem)}, '.
+							'{'.self::USER_SECRET_MACRO.'.iregsub(^[0-9]+, Problem)}'
+					],
+					'result' => [
+						'primary' => 'Problem, Problem, Problem, Problem, Problem, Problem',
+						'secondary' => 'Problem, Problem, Problem, Problem, Problem, Problem'
+					]
+				]
+			]
+			// TODO: Uncomment and check the test case, after ZBX-25420 fix.
+//			'Macro functions regsub(), iregsub() - empty value in case of no match' => [
+//				[
+//					'fields' => [
+//						'Advanced configuration' => true,
+//						'id:primary_label_type' => 'Text',
+//						'id:primary_label' => '{'.self::USER_MACRO.'.regsub(0, Problem)}, '.
+//							'{'.self::USER_MACRO.'.iregsub(0, Problem)}, {{ITEM.NAME}.regsub(0, Problem)}, '.
+//							'{{ITEM.NAME}.iregsub(0, Problem)}, {'.self::USER_SECRET_MACRO.'.regsub(0, Problem)}, '.
+//							'{'.self::USER_SECRET_MACRO.'.iregsub(0, Problem)}, ',
+//						'id:secondary_label_type' => 'Text',
+//						'id:secondary_label' => '{'.self::USER_MACRO.'.regsub(0, Problem)}, '.
+//							'{'.self::USER_MACRO.'.iregsub(0, Problem)}, {{ITEM.NAME}.regsub(0, Problem)}, '.
+//							'{{ITEM.NAME}.iregsub(0, Problem)}, {'.self::USER_SECRET_MACRO.'.regsub(0, Problem)}, '.
+//							'{'.self::USER_SECRET_MACRO.'.iregsub(0, Problem)}, '
+//					],
+//					'result' => [
+//						'primary' => ', , , , ,',
+//						'secondary' => ', , , , ,'
+//					]
+//				]
+//			]
+		];
+	}
+
+	/**
+	 * @dataProvider getMacroFunctions
+	 */
+	public function testDashboardHoneycombWidget_CheckMacroFunctions($data) {
+		$this->setWidgetConfiguration(self::$dashboardid[self::DASHBOARD_FOR_MACRO_FUNCTIONS],
+				self::WIDGET_FOR_MACRO_FUNCTIONS, $data['fields']
+		);
+		CDashboardElement::find()->one()->save()->waitUntilReady();
+
+		// Check the resolution of macrofunction.
+		$this->assertEquals($data['result']['primary'],
+				$this->query('xpath://div[@class="svg-honeycomb-label svg-honeycomb-label-primary"]')->one()->getText()
+		);
+		$this->assertEquals($data['result']['secondary'],
+				$this->query('xpath://div[@class="svg-honeycomb-label svg-honeycomb-label-secondary"]')->one()->getText()
+		);
+	}
+
 	/**
 	 * Get threshold table element with mapping set.
 	 *
@@ -2316,6 +2580,7 @@ class testDashboardHoneycombWidget extends testWidgets {
 		if (array_key_exists('thresholds', $data)) {
 			$this->getTreshholdTable()->fill($data['thresholds']);
 			unset($data['thresholds']);
+			$this->checkColorPickerState($data);
 		}
 
 		if (array_key_exists('tags', $data)) {
@@ -2323,6 +2588,7 @@ class testDashboardHoneycombWidget extends testWidgets {
 		}
 
 		$form->fill($data['fields']);
+		$this->checkColorPickerState($data);
 		$form->submit();
 	}
 

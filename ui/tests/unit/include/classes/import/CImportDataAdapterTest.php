@@ -68,7 +68,78 @@ class CImportDataAdapterTest extends TestCase {
 
 		$this->assertEquals([
 			[
-				'inventory' => [],
+				'inventory' => [
+					'type' => '',
+					'type_full' => '',
+					'name' => '',
+					'alias' => '',
+					'os' => '',
+					'os_full' => '',
+					'os_short' => '',
+					'serialno_a' => '',
+					'serialno_b' => '',
+					'tag' => '',
+					'asset_tag' => '',
+					'macaddress_a' => '',
+					'macaddress_b' => '',
+					'hardware' => '',
+					'hardware_full' => '',
+					'software' => '',
+					'software_full' => '',
+					'software_app_a' => '',
+					'software_app_b' => '',
+					'software_app_c' => '',
+					'software_app_d' => '',
+					'software_app_e' => '',
+					'contact' => '',
+					'location' => '',
+					'location_lat' => '',
+					'location_lon' => '',
+					'notes' => '',
+					'chassis' => '',
+					'model' => '',
+					'hw_arch' => '',
+					'vendor' => '',
+					'contract_number' => '',
+					'installer_name' => '',
+					'deployment_status' => '',
+					'url_a' => '',
+					'url_b' => '',
+					'url_c' => '',
+					'host_networks' => '',
+					'host_netmask' => '',
+					'host_router' => '',
+					'oob_ip' => '',
+					'oob_netmask' => '',
+					'oob_router' => '',
+					'date_hw_purchase' => '',
+					'date_hw_install' => '',
+					'date_hw_expiry' => '',
+					'date_hw_decomm' => '',
+					'site_address_a' => '',
+					'site_address_b' => '',
+					'site_address_c' => '',
+					'site_city' => '',
+					'site_state' => '',
+					'site_country' => '',
+					'site_zip' => '',
+					'site_rack' => '',
+					'site_notes' => '',
+					'poc_1_name' => '',
+					'poc_1_email' => '',
+					'poc_1_phone_a' => '',
+					'poc_1_phone_b' => '',
+					'poc_1_cell' => '',
+					'poc_1_screen' => '',
+					'poc_1_notes' => '',
+					'poc_2_name' => '',
+					'poc_2_email' => '',
+					'poc_2_phone_a' => '',
+					'poc_2_phone_b' => '',
+					'poc_2_cell' => '',
+					'poc_2_screen' => '',
+					'poc_2_notes' => ''
+				],
 				'monitored_by' => '0',
 				'proxy' => [],
 				'proxy_group' => [],
@@ -87,7 +158,6 @@ class CImportDataAdapterTest extends TestCase {
 						'dns' => '',
 						'port' => '10050',
 						'interface_ref' => 'if1',
-						'details' => [],
 						'main' => '1'
 					]
 				],
@@ -214,7 +284,6 @@ class CImportDataAdapterTest extends TestCase {
 						'dns' => '',
 						'port' => '10050',
 						'interface_ref' => 'if1',
-						'details' => [],
 						'main' => '1'
 					],
 					[
@@ -224,7 +293,6 @@ class CImportDataAdapterTest extends TestCase {
 						'dns' => '',
 						'port' => '623',
 						'interface_ref' => 'if4',
-						'details' => [],
 						'main' => '1'
 					],
 					[
@@ -234,7 +302,6 @@ class CImportDataAdapterTest extends TestCase {
 						'dns' => '',
 						'port' => '12345',
 						'interface_ref' => 'if3',
-						'details' => [],
 						'main' => '1'
 					],
 					[
@@ -294,7 +361,9 @@ class CImportDataAdapterTest extends TestCase {
 				'vendor_name' => '',
 				'vendor_version' => '',
 				'tags' => [],
-				'valuemaps' => []
+				'valuemaps' => [],
+				'wizard_ready' => (string) ZBX_WIZARD_NOT_READY,
+				'readme' => ''
 			],
 			[
 				'uuid' => '00fda66f07e4479498058bf352711a06',
@@ -308,13 +377,19 @@ class CImportDataAdapterTest extends TestCase {
 						'macro' => '{$MACRO}',
 						'value' => '2',
 						'type' => '0',
-						'description' => ''
+						'description' => '',
+						'config' => [
+							'type' => (string) ZBX_WIZARD_FIELD_NOCONF
+						]
 					],
 					[
 						'macro' => '{$SNMP_COMMUNITY}',
 						'value' => '1',
 						'type' => '0',
-						'description' => ''
+						'description' => '',
+						'config' => [
+							'type' => (string) ZBX_WIZARD_FIELD_NOCONF
+						]
 					]
 				],
 				'templates' => [
@@ -331,7 +406,9 @@ class CImportDataAdapterTest extends TestCase {
 				'vendor_name' => '',
 				'vendor_version' => '',
 				'tags' => [],
-				'valuemaps' => []
+				'valuemaps' => [],
+				'wizard_ready' => (string) ZBX_WIZARD_NOT_READY,
+				'readme' => ''
 			]
 		], $adapter->getTemplates());
 	}
@@ -1162,12 +1239,8 @@ class CImportDataAdapterTest extends TestCase {
 				'label_string_map' => '',
 				'label_string_image' => '',
 				'expand_macros' => '0',
-				'background' => [
-					'name' => ''
-				],
-				'iconmap' => [
-					'name' => ''
-				],
+				'background' => [],
+				'iconmap' => [],
 				'urls' => [],
 				'selements' => [],
 				'links' => [],
@@ -1189,7 +1262,10 @@ class CImportDataAdapterTest extends TestCase {
 					'background_color' => '',
 					'zindex' => '0'
 				]],
-				'lines' => []
+				'lines' => [],
+				'background_scale' => (string) SYSMAP_BACKGROUND_SCALE_NONE,
+				'show_element_label' => (string) MAP_SHOW_LABEL_ALWAYS,
+				'show_link_label' => (string) MAP_SHOW_LABEL_ALWAYS
 			],
 			[
 				'name' => 'map',
@@ -1218,12 +1294,8 @@ class CImportDataAdapterTest extends TestCase {
 				'label_string_map' => '',
 				'label_string_image' => '',
 				'expand_macros' => '0',
-				'background' => [
-					'name' => ''
-				],
-				'iconmap' => [
-					'name' => ''
-				],
+				'background' => [],
+				'iconmap' => [],
 				'urls' => [
 					[
 						'name' => 'url',
@@ -1248,16 +1320,10 @@ class CImportDataAdapterTest extends TestCase {
 						'icon_off' => [
 							'name' => 'Server_(96)'
 						],
-						'icon_on' => [
-							'name' => ''
-						],
-						'icon_disabled' => [
-							'name' => ''
-						],
-						'icon_maintenance' => [
-							'name' => ''
-						],
-						'evaltype' => TAG_EVAL_TYPE_AND_OR,
+						'icon_on' => [],
+						'icon_disabled' => [],
+						'icon_maintenance' => [],
+						'evaltype' => (string) TAG_EVAL_TYPE_AND_OR,
 						'tags' => [],
 						'urls' => [
 							[
@@ -1271,7 +1337,9 @@ class CImportDataAdapterTest extends TestCase {
 								'expression' => 'last(/export-host/item)<>0 or last(/export-host/item)<>0 and last(/export-host/item)<>0',
 								'recovery_expression' => ''
 							]
-						]
+						],
+						'show_label' => (string) MAP_SHOW_LABEL_DEFAULT,
+						'zindex' => '0'
 					],
 					[
 						'elementtype' => '0',
@@ -1289,23 +1357,19 @@ class CImportDataAdapterTest extends TestCase {
 						'icon_off' => [
 							'name' => 'Server_(96)'
 						],
-						'icon_on' => [
-							'name' => ''
-						],
-						'icon_disabled' => [
-							'name' => ''
-						],
-						'icon_maintenance' => [
-							'name' => ''
-						],
-						'evaltype' => TAG_EVAL_TYPE_AND_OR,
+						'icon_on' => [],
+						'icon_disabled' => [],
+						'icon_maintenance' => [],
+						'evaltype' => (string) TAG_EVAL_TYPE_AND_OR,
 						'tags' => [],
 						'urls' => [],
 						'elements' => [
 							[
 								'host' => 'export-host'
 							]
-						]
+						],
+						'show_label' => (string) MAP_SHOW_LABEL_DEFAULT,
+						'zindex' => '1'
 					],
 					[
 						'elementtype' => '3',
@@ -1323,23 +1387,19 @@ class CImportDataAdapterTest extends TestCase {
 						'icon_off' => [
 							'name' => 'Server_(96)'
 						],
-						'icon_on' => [
-							'name' => ''
-						],
-						'icon_disabled' => [
-							'name' => ''
-						],
-						'icon_maintenance' => [
-							'name' => ''
-						],
-						'evaltype' => TAG_EVAL_TYPE_AND_OR,
+						'icon_on' => [],
+						'icon_disabled' => [],
+						'icon_maintenance' => [],
+						'evaltype' => (string) TAG_EVAL_TYPE_AND_OR,
 						'tags' => [],
 						'urls' => [],
 						'elements' => [
 							[
 								'name' => 'Zabbix servers'
 							]
-						]
+						],
+						'show_label' => (string) MAP_SHOW_LABEL_DEFAULT,
+						'zindex' => '2'
 					]
 				],
 				'links' => [
@@ -1359,7 +1419,9 @@ class CImportDataAdapterTest extends TestCase {
 									'recovery_expression' => ''
 								]
 							]
-						]
+						],
+						'indicator_type' => (string) MAP_INDICATOR_TYPE_TRIGGER,
+						'show_label' => (string) MAP_SHOW_LABEL_DEFAULT
 					],
 					[
 						'drawtype' => '0',
@@ -1367,7 +1429,8 @@ class CImportDataAdapterTest extends TestCase {
 						'label' => '',
 						'selementid1' => '32',
 						'selementid2' => '34',
-						'linktriggers' => []
+						'indicator_type' => (string) MAP_INDICATOR_TYPE_STATIC_LINK,
+						'show_label' => (string) MAP_SHOW_LABEL_DEFAULT
 					]
 				],
 				'shapes' => [[
@@ -1388,7 +1451,10 @@ class CImportDataAdapterTest extends TestCase {
 					'background_color' => '',
 					'zindex' => '0'
 				]],
-				'lines' => []
+				'lines' => [],
+				'background_scale' => (string) SYSMAP_BACKGROUND_SCALE_NONE,
+				'show_element_label' => (string) MAP_SHOW_LABEL_ALWAYS,
+				'show_link_label' => (string) MAP_SHOW_LABEL_ALWAYS
 			]
 		], $adapter->getMaps());
 	}
@@ -1397,6 +1463,9 @@ class CImportDataAdapterTest extends TestCase {
 		$adapter = $this->getAdapter($this->getMediaTypeXml());
 
 		$defaults = DB::getDefaults('media_type') + ['message_templates' => []];
+		$defaults += array_intersect_key(DB::getDefaults('media_type_oauth'), array_flip([
+			'redirection_url', 'client_id', 'client_secret', 'authorization_url', 'token_url'
+		]));
 
 		$this->assertEquals([
 			[
@@ -1431,15 +1500,15 @@ class CImportDataAdapterTest extends TestCase {
 				'name' => 'SMS',
 				'type' => (string) CXmlConstantValue::MEDIA_TYPE_SMS,
 				'gsm_modem' => '/dev/ttyS0',
-				'parameters' => [],
-				'status' => MEDIA_TYPE_STATUS_ACTIVE
+				'status' => MEDIA_TYPE_STATUS_ACTIVE,
+				'parameters' => []
 			] + $defaults,
 			[
 				'name' => 'Webhook without parameters',
 				'type' => (string) CXmlConstantValue::MEDIA_TYPE_WEBHOOK,
-				'parameters' => [],
 				'script' => 'return true;',
-				'status' => MEDIA_TYPE_STATUS_ACTIVE
+				'status' => MEDIA_TYPE_STATUS_ACTIVE,
+				'parameters' => []
 			] + $defaults,
 			[
 				'name' => 'Webhook with parameters',
@@ -1496,7 +1565,6 @@ class CImportDataAdapterTest extends TestCase {
 						'dns' => 'localhost',
 						'port' => '10050',
 						'interface_ref' => 'if0',
-						'details' => [],
 						'main' => '1'
 					]
 				],
@@ -1507,7 +1575,6 @@ class CImportDataAdapterTest extends TestCase {
 				'ipmi_username' => '',
 				'ipmi_password' => '',
 				'inventory_mode' => '-1',
-				'inventory' => [],
 				'groups' =>	[
 					[
 						'name' => 'Linux servers'
@@ -1532,13 +1599,19 @@ class CImportDataAdapterTest extends TestCase {
 						'value' => '21',
 						'macro' => '{$PORT.FTP}',
 						'type' => '0',
-						'description' => ''
+						'description' => '',
+						'config' => [
+							'type' => (string) ZBX_WIZARD_FIELD_NOCONF
+						]
 					],
 					[
 						'value' => '22',
 						'macro' => '{$PORT.SSH}',
 						'type' => '0',
-						'description' => ''
+						'description' => '',
+						'config' => [
+							'type' => (string) ZBX_WIZARD_FIELD_NOCONF
+						]
 					]
 				],
 				'host' => 'Template_Linux',
@@ -1553,7 +1626,9 @@ class CImportDataAdapterTest extends TestCase {
 				'vendor_name' => '',
 				'vendor_version' => '',
 				'tags' => [],
-				'valuemaps' => []
+				'valuemaps' => [],
+				'wizard_ready' => (string) ZBX_WIZARD_NOT_READY,
+				'readme' => ''
 			],
 			[
 				'uuid' => 'a038cce155ec42a4a85d6fea05632ed1',
@@ -1570,7 +1645,9 @@ class CImportDataAdapterTest extends TestCase {
 				'vendor_name' => '',
 				'vendor_version' => '',
 				'tags' => [],
-				'valuemaps' => []
+				'valuemaps' => [],
+				'wizard_ready' => (string) ZBX_WIZARD_NOT_READY,
+				'readme' => ''
 			]
 		], $adapter->getTemplates());
 
@@ -1887,8 +1964,7 @@ class CImportDataAdapterTest extends TestCase {
 						'dns' => 'localhost',
 						'port' => '10050',
 						'main' => '1',
-						'interface_ref' => 'if0',
-						'details' => []
+						'interface_ref' => 'if0'
 					]
 				],
 				'monitored_by' => '0',
@@ -1896,7 +1972,6 @@ class CImportDataAdapterTest extends TestCase {
 				'proxy_group' => [],
 				'inventory_mode' => '-1',
 				'description' => '',
-				'inventory' => [],
 				'ipmi_password' => '',
 				'ipmi_username' => '',
 				'macros' => [],
@@ -1917,7 +1992,10 @@ class CImportDataAdapterTest extends TestCase {
 						'value' => '23',
 						'macro' => '{#VALUE}',
 						'type' => '0',
-						'description' => ''
+						'description' => '',
+						'config' => [
+							'type' => (string) ZBX_WIZARD_FIELD_NOCONF
+						]
 					]
 				],
 				'templates' => [
@@ -1932,7 +2010,9 @@ class CImportDataAdapterTest extends TestCase {
 				'vendor_name' => '',
 				'vendor_version' => '',
 				'tags' => [],
-				'valuemaps' => []
+				'valuemaps' => [],
+				'wizard_ready' => (string) ZBX_WIZARD_NOT_READY,
+				'readme' => ''
 			]
 		], $adapter->getTemplates());
 
@@ -2091,8 +2171,9 @@ class CImportDataAdapterTest extends TestCase {
 					'values' => [
 						'var0' => 'test',
 						'var1' => '1',
-						'var2' => '',
-						'var3' => [],
+						'var3' => [
+							'subvar1' => 'array'
+						],
 						'var4' => [
 							'subvar1' => 'array'
 						]
@@ -2208,7 +2289,9 @@ class CImportDataAdapterTest extends TestCase {
 				'vendor_name' => '',
 				'vendor_version' => '',
 				'tags' => [],
-				'valuemaps' => []
+				'valuemaps' => [],
+				'wizard_ready' => (string) ZBX_WIZARD_NOT_READY,
+				'readme' => ''
 			]
 		], $adapter->getTemplates());
 
@@ -2486,7 +2569,6 @@ class CImportDataAdapterTest extends TestCase {
 
 		$this->assertEquals([
 			[
-				'inventory' => [],
 				'monitored_by' => '0',
 				'proxy' => [],
 				'proxy_group' => [],
@@ -2505,7 +2587,6 @@ class CImportDataAdapterTest extends TestCase {
 						'ip' => '127.0.0.1',
 						'dns' => '',
 						'port' => '10050',
-						'details' => [],
 						'main' => '1'
 					],
 					[
@@ -2965,7 +3046,9 @@ class CImportDataAdapterTest extends TestCase {
 				'vendor_name' => 'Zabbix',
 				'vendor_version' => '6.4-0',
 				'tags' => [],
-				'valuemaps' => []
+				'valuemaps' => [],
+				'wizard_ready' => (string) ZBX_WIZARD_NOT_READY,
+				'readme' => ''
 			]
 		], $adapter->getTemplates());
 	}
@@ -2995,7 +3078,6 @@ class CImportDataAdapterTest extends TestCase {
 				'interfaces' => [],
 				'tags' => [],
 				'macros' => [],
-				'inventory' => [],
 				'inventory_mode' => '-1',
 				'valuemaps' => []
 			],
@@ -3022,7 +3104,6 @@ class CImportDataAdapterTest extends TestCase {
 				'interfaces' => [],
 				'tags' => [],
 				'macros' => [],
-				'inventory' => [],
 				'inventory_mode' => '-1',
 				'valuemaps' => []
 			],
@@ -3049,7 +3130,6 @@ class CImportDataAdapterTest extends TestCase {
 				'interfaces' => [],
 				'tags' => [],
 				'macros' => [],
-				'inventory' => [],
 				'inventory_mode' => '-1',
 				'valuemaps' => []
 			]
@@ -3063,7 +3143,7 @@ class CImportDataAdapterTest extends TestCase {
 		$import_validator_factory = new CImportValidatorFactory(CImportReaderFactory::XML);
 		$import_converter_factory = new CImportConverterFactory();
 
-		$validator = new CXmlValidator($import_validator_factory, CImportReaderFactory::XML);
+		$validator = new CImportXmlValidator($import_validator_factory, CImportReaderFactory::XML);
 
 		$source = $validator
 			->setStrict(true)

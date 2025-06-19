@@ -151,6 +151,14 @@ output {
 		}
 	}
 
+	&.msg-info {
+		border-color: $msg-info-color;
+
+		&::before {
+			content: $zi-circle-info-filled;
+		}
+	}
+
 	&.msg-warning {
 		border-color: $msg-warning-color;
 
@@ -167,7 +175,7 @@ output {
 	&.msg-global-footer {
 		position: fixed;
 		bottom: 0;
-		z-index: 10000;
+		z-index: 1000;
 		display: none;
 		padding-top: 4px;
 		padding-bottom: 4px;

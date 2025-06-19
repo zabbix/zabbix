@@ -48,8 +48,6 @@ You can also try to use `snmpconf`:
 
 http://www.net-snmp.org/wiki/index.php/TUT:snmpd_configuration
 
-Change `{$SNMP_COMMUNITY}` on the host level in Zabbix.
-
 ### Macros used
 
 |Name|Description|Default|
@@ -61,20 +59,20 @@ Change `{$SNMP_COMMUNITY}` on the host level in Zabbix.
 |{$VFS.DEV.DEVNAME.NOT_MATCHES}|<p>Used in block device discovery. Can be overridden on the host or linked template level.</p>|`Macro too long. Please see the template.`|
 |{$CPU.UTIL.CRIT}|<p>Critical threshold of CPU utilization expressed in %.</p>|`90`|
 |{$LOAD_AVG_PER_CPU.MAX.WARN}|<p>Load per CPU considered sustainable. Tune if needed.</p>|`1.5`|
-|{$VFS.FS.FSNAME.NOT_MATCHES}|<p>Used in filesystem discovery. Can be overridden on the host or linked template level.</p>|`^(/dev\|/sys\|/run\|/proc\|.+/shm$)`|
-|{$VFS.FS.FSNAME.MATCHES}|<p>Used in filesystem discovery. Can be overridden on the host or linked template level.</p>|`.+`|
-|{$VFS.FS.FSDEVICE.NOT_MATCHES}|<p>Used in filesystem discovery. Can be overridden on the host or linked template level.</p>|`.*(tmpfs\|shm)$`|
-|{$VFS.FS.FSDEVICE.MATCHES}|<p>Used in filesystem discovery. Can be overridden on the host or linked template level.</p>|`.+`|
-|{$VFS.FS.INODE.PFREE.MIN.CRIT}|<p>The critical threshold of the filesystem metadata utilization.</p>|`10`|
-|{$VFS.FS.INODE.PFREE.MIN.WARN}|<p>The warning threshold of the filesystem metadata utilization.</p>|`20`|
-|{$VFS.FS.PUSED.MAX.CRIT}|<p>The critical threshold of the filesystem utilization.</p>|`90`|
 |{$VFS.FS.PUSED.MAX.WARN}|<p>The warning threshold of the filesystem utilization.</p>|`80`|
+|{$VFS.FS.PUSED.MAX.CRIT}|<p>The critical threshold of the filesystem utilization.</p>|`90`|
+|{$VFS.FS.INODE.PFREE.MIN.WARN}|<p>The warning threshold of the filesystem metadata utilization.</p>|`20`|
+|{$VFS.FS.INODE.PFREE.MIN.CRIT}|<p>The critical threshold of the filesystem metadata utilization.</p>|`10`|
+|{$VFS.FS.FSNAME.MATCHES}|<p>Used in filesystem discovery. Can be overridden on the host or linked template level.</p>|`.+`|
+|{$VFS.FS.FSNAME.NOT_MATCHES}|<p>Used in filesystem discovery. Can be overridden on the host or linked template level.</p>|`^(/dev\|/sys\|/run\|/proc\|.+/shm$)`|
+|{$VFS.FS.FSDEVICE.MATCHES}|<p>Used in filesystem discovery. Can be overridden on the host or linked template level.</p>|`.+`|
+|{$VFS.FS.FSDEVICE.NOT_MATCHES}|<p>Used in filesystem discovery. Can be overridden on the host or linked template level.</p>|`.*(tmpfs\|shm)$`|
 |{$SNMP.TIMEOUT}|<p>Time interval for the SNMP availability trigger.</p>|`5m`|
 |{$ICMP_LOSS_WARN}|<p>Warning threshold of ICMP packet loss in %.</p>|`20`|
 |{$ICMP_RESPONSE_TIME_WARN}|<p>Warning threshold of the average ICMP response time in seconds.</p>|`0.15`|
-|{$IF.ERRORS.WARN}|<p>Warning threshold of error packet rate. Can be used with interface name as context.</p>|`2`|
-|{$IF.UTIL.MAX}|<p>Used as a threshold in the interface utilization trigger.</p>|`90`|
 |{$IFCONTROL}|<p>Link status trigger will be fired only for interfaces where the context macro equals "1".</p>|`1`|
+|{$IF.UTIL.MAX}|<p>Used as a threshold in the interface utilization trigger.</p>|`90`|
+|{$IF.ERRORS.WARN}|<p>Warning threshold of error packet rate. Can be used with interface name as context.</p>|`2`|
 |{$NET.IF.IFNAME.MATCHES}|<p>Used for network interface discovery. Can be overridden on the host or linked template level.</p>|`^.*$`|
 |{$NET.IF.IFNAME.NOT_MATCHES}|<p>Filters out `loopbacks`, `nulls`, docker `veth` links and `docker0 bridge` by default.</p>|`Macro too long. Please see the template.`|
 |{$NET.IF.IFOPERSTATUS.MATCHES}|<p>Used for network interface discovery. Can be overridden on the host or linked template level.</p>|`^.*$`|
@@ -193,7 +191,7 @@ Change `{$SNMP_COMMUNITY}` on the host level in Zabbix.
 |Name|Description|Type|Key and additional info|
 |----|-----------|----|-----------------------|
 |FS [{#FSNAME}]: Get data|<p>MIB: UCD-SNMP-MIB</p><p>Intermediate data for subsequent processing.</p>|Dependent item|vfs.fs.walk.data[dskEntry.{#SNMPINDEX}]<p>**Preprocessing**</p><ul><li><p>JavaScript: `The text is too long. Please see the template.`</p></li></ul>|
-|FS [{#FSNAME}]: Space: Used|<p>MIB: UCD-SNMP-MIB</p><p>Used storage is calculated from two portions:</p><p>  dskUsedHigh</p><p>  dskUsedLow</p><p>Together they compose 64-bit number.</p><p>Reserverd space is not counted in.</p>|Dependent item|vfs.fs.used[dskUsed.{#SNMPINDEX}]<p>**Preprocessing**</p><ul><li><p>JavaScript: `The text is too long. Please see the template.`</p></li></ul>|
+|FS [{#FSNAME}]: Space: Used|<p>MIB: UCD-SNMP-MIB</p><p>Used storage is calculated from two portions:</p><p>  dskUsedHigh</p><p>  dskUsedLow</p><p>Together they compose 64-bit number.</p><p>Reserved space is not counted in.</p>|Dependent item|vfs.fs.used[dskUsed.{#SNMPINDEX}]<p>**Preprocessing**</p><ul><li><p>JavaScript: `The text is too long. Please see the template.`</p></li></ul>|
 |FS [{#FSNAME}]: Space: Total|<p>MIB: UCD-SNMP-MIB</p><p>Total storage is calculated from two portions:</p><p>  dskTotalHigh</p><p>  dskTotalLow</p><p>Together they compose 64-bit number.</p>|Dependent item|vfs.fs.total[dskTotal.{#SNMPINDEX}]<p>**Preprocessing**</p><ul><li><p>JavaScript: `The text is too long. Please see the template.`</p></li></ul>|
 |FS [{#FSNAME}]: Space: Available|<p>UCD-SNMP-MIB::dskEntry</p><p>Available storage space is calculated from two portions:</p><p>  dskAvailHigh</p><p>  dskAvailLow</p><p>Together they compose 64-bit number.</p>|Dependent item|vfs.fs.free[dskAvail.{#SNMPINDEX}]<p>**Preprocessing**</p><ul><li><p>JavaScript: `The text is too long. Please see the template.`</p></li></ul>|
 |FS [{#FSNAME}]: Space: Used, in %|<p>UCD-SNMP-MIB::dskEntry</p><p>Space utilization is calculated as the percentage of currently used space compared to the maximum available space.</p>|Dependent item|vfs.fs.pused[{#SNMPINDEX}]<p>**Preprocessing**</p><ul><li><p>JavaScript: `The text is too long. Please see the template.`</p></li></ul>|

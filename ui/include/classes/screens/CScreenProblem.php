@@ -1151,10 +1151,13 @@ class CScreenProblem extends CScreenBase {
 
 			$footer = new CActionButtonList('action', 'eventids', [
 				'acknowledge.edit' => [
-					'name' => _('Mass update'),
-					'disabled' => !($allowed['add_comments'] || $allowed['change_severity'] || $allowed['acknowledge']
+					'content' => (new CSimpleButton(_('Mass update')))
+						->addClass(ZBX_STYLE_BTN_ALT)
+						->addClass('js-massupdate-problem')
+						->addClass('js-no-chkbxrange')
+						->setEnabled($allowed['add_comments'] || $allowed['change_severity'] || $allowed['acknowledge']
 							|| $allowed['close'] || $allowed['suppress_problems'] || $allowed['rank_change']
-					)
+						)
 				]
 			], 'problem');
 
@@ -1647,10 +1650,7 @@ class CScreenProblem extends CScreenBase {
 			$problem_update_link = ($data['allowed']['add_comments'] || $data['allowed']['change_severity']
 					|| $data['allowed']['acknowledge'] || $can_be_closed || $data['allowed']['suppress_problems']
 					|| $data['allowed']['rank_change'])
-				? (new CLink(_('Update'), $problem_update_url))
-					->addClass(ZBX_STYLE_LINK_ALT)
-					->setAttribute('data-eventids[]', $problem['eventid'])
-					->setAttribute('data-action', 'acknowledge.edit')
+				? (new CLink(_('Update'), $problem_update_url))->addClass(ZBX_STYLE_LINK_ALT)
 				: new CSpan(_('Update'));
 
 			$row->addItem([

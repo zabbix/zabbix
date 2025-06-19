@@ -171,20 +171,22 @@ class CMenuHelper {
 					->setAction('template.list')
 					->setAliases([
 						'template.dashboard.list', 'template.dashboard.edit', 'item.list?context=template',
-						'trigger.list?context=template', 'graphs.php?context=template',
+						'trigger.list?context=template', 'graph.list?context=template',
 						'host_discovery.php?context=template', 'item.prototype.list?context=template',
-						'trigger.prototype.list?context=template', 'host_prototypes.php?context=template',
-						'httpconf.php?context=template'
+						'trigger.prototype.list?context=template', 'graph.prototype.list?context=template',
+						'host_prototypes.php?context=template', 'httpconf.php?context=template',
+						'host_discovery_prototypes.php?context=template'
 					])
 				: null,
 			CWebUser::checkAccess(CRoleHelper::UI_CONFIGURATION_HOSTS)
 				? (new CMenuItem(_('Hosts')))
 					->setAction('host.list')
 					->setAliases([
-						'item.list?context=host', 'trigger.list?context=host', 'graphs.php?context=host',
+						'item.list?context=host', 'trigger.list?context=host', 'graph.list?context=host',
 						'host_discovery.php?context=host', 'item.prototype.list?context=host',
-						'trigger.prototype.list?context=host', 'host_prototypes.php?context=host',
-						'httpconf.php?context=host'
+						'trigger.prototype.list?context=host', 'graph.prototype.list?context=host',
+						'host_prototypes.php?context=host', 'httpconf.php?context=host',
+						'host_discovery_prototypes.php?context=host'
 					])
 				: null,
 			CWebUser::checkAccess(CRoleHelper::UI_CONFIGURATION_MAINTENANCE)
@@ -462,6 +464,8 @@ class CMenuHelper {
 					->setSubMenu(new CMenu([
 						(new CMenuItem(_('Profile')))
 							->setAction('userprofile.edit'),
+						(new CMenuItem(_('Notifications')))
+							->setAction('userprofile.notification.edit'),
 						(new CMenuItem(_('API tokens')))
 							->setAction('user.token.list')
 					]))
@@ -471,8 +475,13 @@ class CMenuHelper {
 			$menu->add(
 				(new CMenuItem(_('User settings')))
 					->setIcon(ZBX_ICON_USER_SETTINGS)
-					->setAction('userprofile.edit')
 					->setTitle(getUserFullname($user))
+					->setSubMenu(new CMenu([
+						(new CMenuItem(_('Profile')))
+							->setAction('userprofile.edit'),
+						(new CMenuItem(_('Notifications')))
+							->setAction('userprofile.notification.edit')
+					]))
 			);
 		}
 

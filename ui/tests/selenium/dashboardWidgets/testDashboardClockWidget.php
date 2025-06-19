@@ -14,11 +14,11 @@
 **/
 
 
-require_once dirname(__FILE__) . '/../../include/CWebTest.php';
-require_once dirname(__FILE__).'/../../include/helpers/CDataHelper.php';
-require_once dirname(__FILE__).'/../behaviors/CMessageBehavior.php';
-require_once dirname(__FILE__).'/../behaviors/CTableBehavior.php';
-require_once dirname(__FILE__).'/../common/testWidgets.php';
+require_once __DIR__ . '/../../include/CWebTest.php';
+require_once __DIR__.'/../../include/helpers/CDataHelper.php';
+require_once __DIR__.'/../behaviors/CMessageBehavior.php';
+require_once __DIR__.'/../behaviors/CTableBehavior.php';
+require_once __DIR__.'/../common/testWidgets.php';
 
 /**
  * @backup widget, profiles
@@ -282,15 +282,22 @@ class testDashboardClockWidget extends testWidgets {
 				$form->fill(['id:show_1' => true, 'id:show_3' => true]);
 
 				$advanced_configuration = [
-					'Date' => ['id:date_bold' => false, 'id:date_color' => null],
-					'Time' => ['id:time_bold' => false, 'id:time_color' => null,
-							'id:time_sec' => true, 'id:time_format' => '24-hour'
+					'Date' => [
+						'id:date_bold' => false,
+						'xpath:.//z-color-picker[@color-field-name="date_color"]' => null
+					],
+					'Time' => [
+						'id:time_bold' => false,
+						'xpath:.//z-color-picker[@color-field-name="time_color"]' => null,
+						'id:time_sec' => true,
+						'id:time_format' => '24-hour'
 					],
 					// This is Time zone field found by xpath, because we have one more field with Time zone label.
 					'xpath:.//div[@class="fields-group fields-group-tzone"]' => [
-							'id:tzone_bold' => false, 'id:tzone_color' => null,
-							'id:tzone_timezone' => 'Local default: '.CDateTimeHelper::getTimeZoneFormat('Europe/Riga'),
-							'id:tzone_format' => 'Short'
+						'id:tzone_bold' => false,
+						'xpath:.//z-color-picker[@color-field-name="date_color"]' => null,
+						'id:tzone_timezone' => 'Local default: '.CDateTimeHelper::getTimeZoneFormat('Europe/Riga'),
+						'id:tzone_format' => 'Short'
 					]
 				];
 
@@ -302,7 +309,7 @@ class testDashboardClockWidget extends testWidgets {
 					// Check that with Host time 'Time zone' and 'Format' fields disappear.
 					if ($type === 'Host time') {
 						$advanced_configuration['xpath:.//div[@class="fields-group fields-group-tzone"]'] =
-								['id:tzone_bold' => false, 'id:tzone_color' => null];
+								['id:tzone_bold' => false, 'xpath:.//z-color-picker[@color-field-name="tzone_color"]' => null];
 
 						foreach (['id:tzone_timezone', 'id:tzone_format'] as $id) {
 							$this->assertFalse($form->getField($id)->isVisible());
@@ -314,8 +321,8 @@ class testDashboardClockWidget extends testWidgets {
 						$advanced_field = $form->getField($field);
 						$this->assertTrue($advanced_field->isClickable());
 
-						foreach ($config as $id => $value) {
-							$advanced_subfield = $form->getField($id);
+						foreach ($config as $locator => $value) {
+							$advanced_subfield = $form->getField($locator);
 							$this->assertEquals($value, $advanced_subfield->getValue());
 							$this->assertTrue($advanced_subfield->isEnabled());
 						}
@@ -349,15 +356,15 @@ class testDashboardClockWidget extends testWidgets {
 		$this->page->login()->open('zabbix.php?action=dashboard.view&dashboardid='.
 				self::$dashboardid['Dashboard for creating clock widgets']);
 		$dashboard = CDashboardElement::find()->one();
-		$form = $dashboard->getWidget('LayoutClock')->edit();
-		$form->fill(['Name' => '']);
-		$this->query('button', 'Apply')->waitUntilClickable()->one()->click();
+		$dashboard->getWidget('LayoutClock')->edit()->fill(['Name' => '']);
+		COverlayDialogElement::get('Edit widget')->waitUntilReady()->asForm()->submit();
 		$this->page->waitUntilReady();
 		$dashboard->save();
 		$this->assertMessage(TEST_GOOD, 'Dashboard updated');
-		$this->assertTrue($dashboard->getWidget('Host for clock widget', false)->isValid());
+		$dashboard->waitUntilReady();
+		$this->assertTrue($dashboard->getWidget('Host for clock widget')->isValid());
 		$dashboard->getWidget('Host for clock widget')->edit()->fill(['Name' => 'LayoutClock']);
-		$this->query('button', 'Apply')->waitUntilClickable()->one()->click();
+		COverlayDialogElement::get('Edit widget')->waitUntilReady()->asForm()->submit();
 		$this->page->waitUntilReady();
 		$dashboard->save();
 		$this->assertMessage(TEST_GOOD, 'Dashboard updated');

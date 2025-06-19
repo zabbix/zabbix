@@ -66,7 +66,7 @@ class CConfigurationExportBuilder {
 			$default_value = (string) call_user_func($rule['ex_default'], $row);
 		}
 		elseif (array_key_exists('default', $rule)) {
-			$default_value = (string) $rule['default'];
+			$default_value = is_array($rule['default']) ? $rule['default'] : (string) $rule['default'];
 		}
 		else {
 			$default_value = null;
@@ -314,7 +314,7 @@ class CConfigurationExportBuilder {
 	 * @param array $templates
 	 * @param array $simple_triggers
 	 */
-	protected function formatTemplates(array $templates, array $simple_triggers = null) {
+	protected function formatTemplates(array $templates, ?array $simple_triggers = null) {
 		$result = [];
 
 		CArrayHelper::sort($templates, ['host']);
@@ -335,11 +335,13 @@ class CConfigurationExportBuilder {
 				'name' => $template['name'],
 				'description' => $template['description'],
 				'vendor' => $vendor,
+				'wizard_ready' => $template['wizard_ready'],
+				'readme' => $template['readme'],
 				'groups' => $this->formatGroups($template['templategroups']),
 				'items' => $this->formatItems($template['items'], $simple_triggers),
 				'discovery_rules' => $this->formatDiscoveryRules($template['discoveryRules']),
 				'httptests' => $this->formatHttpTests($template['httptests']),
-				'macros' => $this->formatMacros($template['macros']),
+				'macros' => $this->formatTemplateMacros($template['macros']),
 				'templates' => $this->formatTemplateLinkage($template['parentTemplates']),
 				'dashboards' => $this->formatDashboards($template['dashboards']),
 				'tags' => $this->formatTags($template['tags']),
@@ -356,7 +358,7 @@ class CConfigurationExportBuilder {
 	 * @param array $hosts
 	 * @param array $simple_triggers
 	 */
-	protected function formatHosts(array $hosts, array $simple_triggers = null) {
+	protected function formatHosts(array $hosts, ?array $simple_triggers = null) {
 		$result = [];
 
 		CArrayHelper::sort($hosts, ['host']);
@@ -382,7 +384,7 @@ class CConfigurationExportBuilder {
 				'items' => $this->formatItems($host['items'], $simple_triggers),
 				'discovery_rules' => $this->formatDiscoveryRules($host['discoveryRules']),
 				'httptests' => $this->formatHttpTests($host['httptests']),
-				'macros' => $this->formatMacros($host['macros']),
+				'macros' => $this->formatHostMacros($host['macros']),
 				'inventory_mode' => $host['inventory_mode'],
 				'inventory' => $this->formatHostInventory($host['inventory']),
 				'tags' => $this->formatTags($host['tags']),
@@ -429,6 +431,8 @@ class CConfigurationExportBuilder {
 				'height' => $map['height'],
 				'label_type' => $map['label_type'],
 				'label_location' => $map['label_location'],
+				'show_element_label' => $map['show_element_label'],
+				'show_link_label' => $map['show_link_label'],
 				'highlight' => $map['highlight'],
 				'expandproblem' => $map['expandproblem'],
 				'markelements' => $map['markelements'],
@@ -451,6 +455,7 @@ class CConfigurationExportBuilder {
 				'label_string_image' => $map['label_string_image'],
 				'expand_macros' => $map['expand_macros'],
 				'background' => $map['backgroundid'],
+				'background_scale' => $map['background_scale'],
 				'iconmap' => $map['iconmap'],
 				'urls' => $this->formatMapUrls($map['urls']),
 				'selements' => $tmpSelements,
@@ -487,6 +492,11 @@ class CConfigurationExportBuilder {
 				'smtp_authentication' => $media_type['smtp_authentication'],
 				'username' => $media_type['username'],
 				'password' => $media_type['passwd'],
+				'redirection_url' => $media_type['redirection_url'],
+				'client_id' => $media_type['client_id'],
+				'client_secret' => $media_type['client_secret'],
+				'authorization_url' => $media_type['authorization_url'],
+				'token_url' => $media_type['token_url'],
 				'message_format' => $media_type['message_format'],
 				'script_name' => $media_type['exec_path'],
 				'parameters' => self::formatMediaTypeParameters($media_type),
@@ -654,7 +664,6 @@ class CConfigurationExportBuilder {
 			}
 
 			$data = [
-				'uuid' => $discoveryRule['uuid'],
 				'name' => $discoveryRule['name'],
 				'type' => $discoveryRule['type'],
 				'snmp_oid' => $discoveryRule['snmp_oid'],
@@ -707,11 +716,11 @@ class CConfigurationExportBuilder {
 				unset($data['filter']);
 			}
 
-			if (isset($discoveryRule['interface_ref'])) {
-				$data['interface_ref'] = $discoveryRule['interface_ref'];
-			}
+			$data += array_intersect_key($discoveryRule, array_flip([
+				'uuid', 'interface_ref', 'parent_discovery_rule', 'discover'
+			]));
 
-			$data['master_item'] = ($discoveryRule['type'] == ITEM_TYPE_DEPENDENT)
+			$data['master_item'] = $discoveryRule['type'] == ITEM_TYPE_DEPENDENT
 				? ['key' => $discoveryRule['master_item']['key_']]
 				: [];
 
@@ -966,7 +975,7 @@ class CConfigurationExportBuilder {
 				'discover' => $hostPrototype['discover'],
 				'group_links' => $this->formatGroupLinks($hostPrototype['groupLinks']),
 				'group_prototypes' => $this->formatGroupPrototypes($hostPrototype['groupPrototypes']),
-				'macros' => $this->formatMacros($hostPrototype['macros']),
+				'macros' => $this->formatHostMacros($hostPrototype['macros']),
 				'tags' => $this->formatTags($hostPrototype['tags']),
 				'templates' => $this->formatTemplateLinkage($hostPrototype['templates']),
 				'inventory_mode' => $hostPrototype['inventory_mode'],
@@ -1276,13 +1285,38 @@ class CConfigurationExportBuilder {
 	}
 
 	/**
-	 * Format macros.
+	 * Format template macros.
 	 *
 	 * @param array $macros
 	 *
 	 * @return array
 	 */
-	protected function formatMacros(array $macros) {
+	protected function formatTemplateMacros(array $macros) {
+		$result = [];
+
+		$macros = order_macros($macros, 'macro');
+
+		foreach ($macros as $macro) {
+			$result[] = [
+				'macro' => $macro['macro'],
+				'type' => $macro['type'],
+				'value' => array_key_exists('value', $macro) ? $macro['value'] : '',
+				'description' => $macro['description'],
+				'config' => $macro['config']
+			];
+		}
+
+		return $result;
+	}
+
+	/**
+	 * Format host and host prototype macros.
+	 *
+	 * @param array $macros
+	 *
+	 * @return array
+	 */
+	protected function formatHostMacros(array $macros) {
 		$result = [];
 
 		$macros = order_macros($macros, 'macro');
@@ -1602,14 +1636,31 @@ class CConfigurationExportBuilder {
 		CArrayHelper::sort($links, ['selementpos1', 'selementpos2']);
 
 		foreach ($links as $link) {
-			$result[] = [
-				'drawtype' => $link['drawtype'],
-				'color' => $link['color'],
-				'label' => $link['label'],
+			$data = [
 				'selementid1' => $link['selementid1'],
 				'selementid2' => $link['selementid2'],
-				'linktriggers' => $this->formatMapLinkTriggers($link['linktriggers'])
+				'label' => $link['label'],
+				'show_label' => $link['show_label'],
+				'drawtype' => $link['drawtype'],
+				'color' => $link['color'],
+				'indicator_type' => $link['indicator_type']
 			];
+
+			if ($link['indicator_type'] == MAP_INDICATOR_TYPE_TRIGGER) {
+				$data['linktriggers'] = $this->formatMapLinkTriggers($link['linktriggers']);
+			}
+			elseif ($link['indicator_type'] == MAP_INDICATOR_TYPE_ITEM_VALUE) {
+				$data['item'] = $link['item'];
+
+				if ($link['thresholds']) {
+					$data['thresholds'] = $link['thresholds'];
+				}
+				elseif ($link['highlights']) {
+					$data['highlights'] = $link['highlights'];
+				}
+			}
+
+			$result[] = $data;
 		}
 
 		return $result;
@@ -1662,6 +1713,7 @@ class CConfigurationExportBuilder {
 				'elementtype' => $element['elementtype'],
 				'label' => $element['label'],
 				'label_location' => $element['label_location'],
+				'show_label' => $element['show_label'],
 				'x' => $element['x'],
 				'y' => $element['y'],
 				'elementsubtype' => $element['elementsubtype'],
@@ -1678,7 +1730,8 @@ class CConfigurationExportBuilder {
 				'icon_maintenance' => $element['iconid_maintenance'],
 				'urls' => $this->formatMapElementUrls($element['urls']),
 				'evaltype' => $element['evaltype'],
-				'tags' => $this->formatTags($element['tags'])
+				'tags' => $this->formatTags($element['tags']),
+				'zindex' => $element['zindex']
 			];
 		}
 

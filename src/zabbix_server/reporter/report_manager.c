@@ -841,18 +841,27 @@ static void	rm_update_cache_settings(zbx_rm_t *manager)
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
-	zbx_db_result_t	result = zbx_db_select("select session_key,url from config");
+	zbx_db_result_t	result = zbx_db_select("select name, value_str from settings"
+			" where name='session_key' or name='url'");
 
-	if (NULL != (row = zbx_db_fetch(result)))
+	manager->session_key = zbx_strdup(manager->session_key, "");
+	manager->zabbix_url = zbx_strdup(manager->zabbix_url, "");
+
+	while (NULL != (row = zbx_db_fetch(result)))
 	{
-		manager->session_key = zbx_strdup(manager->session_key, row[0]);
-		manager->zabbix_url = zbx_strdup(manager->zabbix_url, row[1]);
+		const char	*name = row[0];
+		const char	*value = row[1];
+
+		if (0 == strcmp(name, "session_key"))
+		{
+			manager->session_key = zbx_strdup(manager->session_key, value);
+		}
+		else if (0 == strcmp(name, "url"))
+		{
+			manager->zabbix_url = zbx_strdup(manager->zabbix_url, value);
+		}
 	}
-	else
-	{
-		manager->session_key = zbx_strdup(manager->session_key, "");
-		manager->zabbix_url = zbx_strdup(manager->zabbix_url, "");
-	}
+
 	zbx_db_free_result(result);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
@@ -863,18 +872,18 @@ static void	rm_update_cache_settings(zbx_rm_t *manager)
  * Purpose: checks if report is active based on specified time                *
  *                                                                            *
  * Parameters: report - [IN]                                                  *
- *             now    - [IN] current  time                                    *
+ *             when   - [IN] next check time                                  *
  *                                                                            *
  * Return value: SUCCEED - report is active                                   *
  *               FAIL    - otherwise                                          *
  *                                                                            *
  ******************************************************************************/
-static int	rm_is_report_active(const zbx_rm_report_t *report, int now)
+static int	rm_is_report_active(const zbx_rm_report_t *report, int when)
 {
-	if (0 != report->active_since && now < report->active_since)
+	if (0 != report->active_since && when < report->active_since)
 		return FAIL;
 
-	if (0 != report->active_till && now >= report->active_till)
+	if (0 != report->active_till && when >= report->active_till)
 		return FAIL;
 
 	return SUCCEED;
@@ -1018,7 +1027,7 @@ static void	rm_update_cache_reports(zbx_rm_t *manager, int now)
 		{
 			if (nextcheck != report->nextcheck)
 			{
-				if (SUCCEED == rm_is_report_active(report, now))
+				if (SUCCEED == rm_is_report_active(report, nextcheck))
 				{
 					zbx_binary_heap_elem_t	elem = {report->reportid, (void *)report};
 					int			nextcheck_old = report->nextcheck;
@@ -1490,7 +1499,7 @@ static int	rm_writer_process_job(zbx_rm_writer_t *writer, zbx_rm_job_t *job, cha
 				"select mediatypeid,type,smtp_server,smtp_helo,smtp_email,exec_path,gsm_modem,username,"
 					"passwd,smtp_port,smtp_security,smtp_verify_peer,smtp_verify_host,"
 					"smtp_authentication,maxsessions,maxattempts,attempt_interval,"
-					"message_format,script,timeout"
+					"message_format,script,timeout,name"
 				" from media_type"
 				" where");
 
@@ -1524,6 +1533,7 @@ static int	rm_writer_process_job(zbx_rm_writer_t *writer, zbx_rm_job_t *job, cha
 			ZBX_STR2UCHAR(mt.message_format, row[17]);
 			mt.script = zbx_strdup(NULL, row[18]);
 			mt.timeout = zbx_strdup(NULL, row[19]);
+			mt.name = zbx_strdup(NULL, row[20]);
 
 			for (; index < dsts.values_num; index++)
 			{
@@ -1871,7 +1881,7 @@ static int	rm_schedule_jobs(zbx_rm_t *manager, int now)
 		{
 			if (-1 != (nextcheck = rm_report_calc_nextcheck(report, now, &error)))
 			{
-				if (SUCCEED == rm_is_report_active(report, now))
+				if (SUCCEED == rm_is_report_active(report, nextcheck))
 				{
 					zbx_binary_heap_elem_t	elem_new = {report->reportid, report};
 

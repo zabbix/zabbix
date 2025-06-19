@@ -97,7 +97,7 @@ else {
 $item_select = (new CPatternSelect([
 	'name' => 'item',
 	'object_name' => 'items',
-	'data' => $data['item'] === '' ? '' : [$data['item']],
+	'data' => $data['item'] === '' ? [] : [$data['item']],
 	'multiple' => false,
 	'popup' => [
 		'parameters' => $parameters
@@ -129,7 +129,11 @@ $form_grid->addItem([
 // Base color.
 $form_grid->addItem([
 	new CLabel(_('Base color'), 'lbl_base_color'),
-	new CFormField(new CColor('base_color', $data['base_color']))
+	new CFormField(
+		(new CColorPicker('base_color'))
+			->setColor($data['base_color'])
+			->allowEmpty()
+	)
 ]);
 
 // Display item value as.
@@ -212,7 +216,9 @@ $thresholds = (new CDiv([
 		)),
 	(new CTemplateTag('thresholds-row-tmpl'))
 		->addItem((new CRow([
-			(new CColor('thresholds[#{rowNum}][color]', '#{color}'))->appendColorPickerJs(false),
+			(new CColorPicker('thresholds[#{rowNum}][color]'))
+				->setColor('#{color}')
+				->allowEmpty(),
 			(new CTextBox('thresholds[#{rowNum}][threshold]', '#{threshold}', false))
 				->setWidth(ZBX_TEXTAREA_SMALL_WIDTH)
 				->setAriaRequired(),
@@ -256,7 +262,9 @@ $highlights = (new CDiv([
 		)),
 	(new CTemplateTag('highlights-row-tmpl'))
 		->addItem((new CRow([
-			(new CColor('highlights[#{rowNum}][color]', '#{color}'))->appendColorPickerJs(false),
+			(new CColorPicker('highlights[#{rowNum}][color]'))
+				->setColor('#{color}')
+				->allowEmpty(),
 			(new CTextBox('highlights[#{rowNum}][pattern]', '#{pattern}', false))
 				->setWidth(ZBX_TEXTAREA_MEDIUM_WIDTH)
 				->setAriaRequired(),

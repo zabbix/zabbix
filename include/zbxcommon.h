@@ -95,6 +95,7 @@ const char	*zbx_result_string(int result);
 
 #define ZBX_MAX_UINT64		(~__UINT64_C(0))
 #define ZBX_MAX_UINT64_LEN	21
+#define ZBX_MAX_UINT32_LEN	11
 #define ZBX_MAX_DOUBLE_LEN	24
 
 #define ZBX_SIZE_T_MAX	(~(size_t)0)
@@ -140,7 +141,8 @@ typedef enum
 	ITEM_TYPE_HTTPAGENT,
 	ITEM_TYPE_SNMP,
 	ITEM_TYPE_SCRIPT,
-	ITEM_TYPE_BROWSER	/* 22 */
+	ITEM_TYPE_BROWSER,
+	ITEM_TYPE_NESTED_LLD 	/* 23 */
 }
 zbx_item_type_t;
 
@@ -415,7 +417,7 @@ while (0)
 		THIS_SHOULD_NEVER_HAPPEN;									\
 		zbx_error(__VA_ARGS__);									\
 	}													\
-	while(0)
+	while (0)
 #else
 #	define THIS_SHOULD_NEVER_HAPPEN_MSG									\
 			THIS_SHOULD_NEVER_HAPPEN;								\
@@ -531,6 +533,7 @@ zbx_proxy_suppress_t;
 #define ZBX_JAN_1970_IN_SEC	2208988800.0	/* 1970 - 1900 in seconds */
 
 #define ZBX_MAX_RECV_DATA_SIZE		(1 * ZBX_GIBIBYTE)
+#define ZBX_MAX_RECV_2KB_DATA_SIZE	(2 * ZBX_KIBIBYTE)
 #if (4 < SIZEOF_SIZE_T)
 #define ZBX_MAX_RECV_LARGE_DATA_SIZE	(__UINT64_C(16) * ZBX_GIBIBYTE)
 #else
@@ -709,8 +712,6 @@ int	zbx_alarm_timed_out(void);
 #define ZBX_PREPROC_FAIL_SET_VALUE	2
 #define ZBX_PREPROC_FAIL_SET_ERROR	3
 
-
-
 /* includes terminating '\0' */
 #define CUID_LEN	26
 void	zbx_new_cuid(char *cuid);
@@ -792,7 +793,7 @@ static	type2	get_##varname(void) \
 typedef void (*zbx_log_func_t)(int level, const char *fmt, va_list args);
 
 void	zbx_init_library_common(zbx_log_func_t log_func, zbx_get_progname_f get_progname, zbx_backtrace_f backtrace);
-void	zbx_log_handle(int level, const char *fmt, ...);
+void	zbx_log_handle(int level, const char *fmt, ...) __zbx_attr_format_printf(2, 3);
 int	zbx_get_log_level(void);
 void	zbx_set_log_level(int level);
 const char	*zbx_get_log_component_name(void);

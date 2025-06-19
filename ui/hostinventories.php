@@ -20,7 +20,6 @@ require_once dirname(__FILE__).'/include/forms.inc.php';
 
 $page['title'] = _('Host inventory');
 $page['file'] = 'hostinventories.php';
-$page['scripts'] = ['multilineinput.js', 'items.js'];
 
 $hostId = getRequest('hostid', 0);
 
@@ -84,7 +83,7 @@ if ($hostId > 0) {
 		'selectTriggers' => API_OUTPUT_COUNT,
 		'selectInventory' => $inventoryFields,
 		'selectGraphs' => API_OUTPUT_COUNT,
-		'selectDiscoveries' => API_OUTPUT_COUNT,
+		'selectDiscoveryRules' => API_OUTPUT_COUNT,
 		'selectHttpTests' => API_OUTPUT_COUNT,
 		'hostids' => $hostId,
 		'preservekeys' => true

@@ -78,6 +78,7 @@ if ($item['itemid']) {
 			'title' => _('Update'),
 			'keepOpen' => true,
 			'isSubmit' => true,
+			'enabled' => !$item['discovered'],
 			'action' => 'item_edit_form.update()'
 		],
 		[
@@ -85,6 +86,7 @@ if ($item['itemid']) {
 			'class' => ZBX_STYLE_BTN_ALT,
 			'keepOpen' => true,
 			'isSubmit' => false,
+			'enabled' => !$item['discovered'],
 			'action' => 'item_edit_form.clone()'
 		],
 		[
@@ -92,7 +94,7 @@ if ($item['itemid']) {
 			'class' => implode(' ', [ZBX_STYLE_BTN_ALT, 'js-test-item']),
 			'keepOpen' => true,
 			'isSubmit' => false,
-			'action' => 'item_edit_form.test();'
+			'action' => 'item_edit_form.test('.json_encode(['rules' => $data['js_test_validation_rules']]).');'
 		],
 		[
 			'title' => _('Delete'),
@@ -118,7 +120,7 @@ else {
 			'class' => implode(' ', [ZBX_STYLE_BTN_ALT, 'js-test-item']),
 			'keepOpen' => true,
 			'isSubmit' => false,
-			'action' => 'item_edit_form.test();'
+			'action' => 'item_edit_form.test('.json_encode(['rules' => $data['js_test_validation_rules']]).');'
 		]
 	];
 }
@@ -148,7 +150,7 @@ $tabs = (new CTabView(['id' => $tabsid]))
 			'tabs_id' => $tabsid,
 			'tags' => $item['tags'],
 			'tags_tab_id' => 'tags-tab',
-			'has_inline_validation' => false
+			'has_inline_validation' => true
 		]),
 		TAB_INDICATOR_TAGS
 	)
@@ -163,7 +165,7 @@ $tabs = (new CTabView(['id' => $tabsid]))
 		TAB_INDICATOR_PREPROCESSING
 	);
 
-$backurl = (new CUrl('zabbix.php'))
+$return_url = (new CUrl('zabbix.php'))
 	->setArgument('action', 'item.prototype.list')
 	->setArgument('parent_discoveryid', $item['parent_discoveryid'])
 	->setArgument('context', $item['context'])
@@ -172,6 +174,7 @@ $backurl = (new CUrl('zabbix.php'))
 $form
 	->addItem($tabs)
 	->addItem((new CScriptTag('item_edit_form.init('.json_encode([
+			'rules' => $data['js_validation_rules'],
 			'actions' => [
 				'form' => 'item.prototype.edit',
 				'update' => 'item.prototype.update',
@@ -188,7 +191,7 @@ $form
 			'testable_item_types' => $data['testable_item_types'],
 			'type_with_key_select' => $type_with_key_select,
 			'value_type_keys' => $data['value_type_keys'],
-			'backurl' => $backurl
+			'return_url' => $return_url
 		]).');'))->setOnDocumentReady()
 	);
 $output = [

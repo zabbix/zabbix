@@ -13,9 +13,9 @@
 ** If not, see <https://www.gnu.org/licenses/>.
 **/
 
-require_once dirname(__FILE__).'/../../include/CLegacyWebTest.php';
-require_once dirname(__FILE__).'/../behaviors/CMacrosBehavior.php';
-require_once dirname(__FILE__).'/../behaviors/CMessageBehavior.php';
+require_once __DIR__.'/../../include/CLegacyWebTest.php';
+require_once __DIR__.'/../behaviors/CMacrosBehavior.php';
+require_once __DIR__.'/../behaviors/CMessageBehavior.php';
 
 use Facebook\WebDriver\WebDriverBy;
 
@@ -541,7 +541,7 @@ class testFormHostPrototype extends CLegacyWebTest {
 				' WHERE hostid IN ('.
 				'SELECT hostid'.
 				' FROM host_discovery'.
-				' WHERE parent_itemid='.self::DISCOVERY_RULE_ID.
+				' WHERE lldruleid='.self::DISCOVERY_RULE_ID.
 				')'.
 				'LIMIT 2';
 		$sql_hash = 'SELECT * FROM hosts ORDER BY hostid';
@@ -795,7 +795,7 @@ class testFormHostPrototype extends CLegacyWebTest {
 		$this->assertMessage(TEST_GOOD, 'Host updated');
 
 		// Go back to prototype and check changes.
-		$this->zbxTestLogin('host_prototypes.php?form=update&parent_discoveryid='.self::DISCOVERY_RULE_ID.
+		$this->zbxTestOpen('host_prototypes.php?form=update&parent_discoveryid='.self::DISCOVERY_RULE_ID.
 				'&hostid='.self::HOST_PROTOTYPE_ID.'&context=host');
 		$this->zbxTestTabSwitch('Encryption');
 		$this->zbxTestWaitForPageToLoad();
@@ -1026,7 +1026,7 @@ class testFormHostPrototype extends CLegacyWebTest {
 				' WHERE hostid IN ('.
 				'SELECT hostid'.
 				' FROM host_discovery'.
-				' WHERE parent_itemid='.self::DISCOVERY_RULE_ID.
+				' WHERE lldruleid='.self::DISCOVERY_RULE_ID.
 				')'.
 				'LIMIT 1';
 

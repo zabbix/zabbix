@@ -24,7 +24,7 @@ require_once dirname(__FILE__).'/include/html.inc.php';
 $page['title'] = _('Event details');
 $page['file'] = 'tr_events.php';
 $page['type'] = detect_page_type();
-$page['scripts'] = ['layout.mode.js', 'class.calendar.js', 'multilineinput.js', 'items.js'];
+$page['scripts'] = ['layout.mode.js'];
 $page['web_layout_mode'] = CViewHelper::loadLayoutMode();
 
 require_once dirname(__FILE__).'/include/page_header.php';

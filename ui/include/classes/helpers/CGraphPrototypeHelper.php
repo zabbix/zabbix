@@ -74,6 +74,9 @@ class CGraphPrototypeHelper extends CGraphGeneralHelper {
 				'ymax_type', 'yaxismax', 'ymax_itemid', 'discover'
 			],
 			'selectGraphItems' => ['sortorder', 'itemid', 'type', 'calc_fnc', 'drawtype', 'yaxisside', 'color'],
+			'filter' => [
+				'flags' => [ZBX_FLAG_DISCOVERY_PROTOTYPE]
+			],
 			'preservekeys' => true
 		] + $src_options);
 	}
@@ -88,7 +91,7 @@ class CGraphPrototypeHelper extends CGraphGeneralHelper {
 	 * @throws Exception
 	 */
 	protected static function getDestinationItems(array $src_graphs, array $dst_options,
-			array $src_options = null): array {
+			?array $src_options = null): array {
 		$dst_hostids = reset($dst_options);
 		$src_item_graphs = [];
 

@@ -583,6 +583,7 @@ function getHostPrototypeParentTemplates(array $host_prototypes) {
 		$db_host_prototypes = API::HostPrototype()->get([
 			'output' => ['hostid', 'templateid'],
 			'selectDiscoveryRule' => ['itemid'],
+			'selectDiscoveryRulePrototype' => ['itemid'],
 			'selectParentHost' => ['hostid'],
 			'hostids' => array_keys($parent_host_prototypeids)
 		]);
@@ -593,7 +594,9 @@ function getHostPrototypeParentTemplates(array $host_prototypes) {
 		foreach ($db_host_prototypes as $db_host_prototype) {
 			$data['templates'][$db_host_prototype['parentHost']['hostid']] = [];
 			$hostids[$db_host_prototype['hostid']] = $db_host_prototype['parentHost']['hostid'];
-			$lld_ruleids[$db_host_prototype['hostid']] = $db_host_prototype['discoveryRule']['itemid'];
+
+			$parent_lld = $db_host_prototype['discoveryRule'] ?: $db_host_prototype['discoveryRulePrototype'];
+			$lld_ruleids[$db_host_prototype['hostid']] = $parent_lld['itemid'];
 
 			if ($db_host_prototype['templateid'] != 0) {
 				if (!array_key_exists($db_host_prototype['templateid'], $all_parent_host_prototypeids)) {
@@ -1189,19 +1192,6 @@ function renderInterfaceHeaders() {
 		);
 }
 
-function getHostDashboards(string $hostid, array $dashboard_fields = []): array {
-	$dashboard_fields = array_merge($dashboard_fields, ['dashboardid']);
-	$dashboard_fields = array_keys(array_flip($dashboard_fields));
-
-	$templateids = CApiHostHelper::getParentTemplates([$hostid])[1];
-
-	return API::TemplateDashboard()->get([
-		'output' => $dashboard_fields,
-		'templateids' => $templateids,
-		'preservekeys' => true
-	]);
-}
-
 /**
  * Return macro value to display in the list of inherited macros.
  *
@@ -1397,11 +1387,17 @@ function getSanitizedHostPrototypeInterfaceDetailsFields(array $details): array 
 /**
  * Get summary interface availability status.
  *
- * @param array  $interfaces
+ * @param array $interfaces
  *
  * @return int
  */
 function getInterfaceAvailabilityStatus(array $interfaces): int {
+	$interfaces_with_enabled_items = array_filter($interfaces,
+		static fn ($interface) => $interface['has_enabled_items']
+	);
+
+	$interfaces = $interfaces_with_enabled_items ?: $interfaces;
+
 	$available = array_column($interfaces, 'available');
 
 	if (in_array(INTERFACE_AVAILABLE_MIXED, $available)) {

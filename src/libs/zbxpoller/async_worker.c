@@ -239,7 +239,7 @@ static void	*async_worker_entry(void *args)
 			poller_item = dc_config_async_get_poller_items(processing_num, poller_type, config_timeout,
 					processing_limit);
 
-			zabbix_log(LOG_LEVEL_DEBUG, "queue processing_num:" ZBX_FS_UI64 " pending:%d",
+			zabbix_log(LOG_LEVEL_DEBUG, "queue processing_num:" ZBX_FS_UI64 " pending:" ZBX_FS_UI64,
 					processing_num, queue_poller_items_values_num);
 		}
 
@@ -250,8 +250,8 @@ static void	*async_worker_entry(void *args)
 			processing_num = queue->processing_num += poller_item->num;
 			zbx_vector_poller_item_append(&queue->poller_items, poller_item);
 
-			if (NULL != worker->finished_cb)
-				worker->finished_cb(worker->finished_data);
+			if (NULL != worker->async_notify_cb)
+				worker->async_notify_cb(worker->finished_data);
 		}
 
 		if (SUCCEED != async_task_queue_wait(queue, &error))
@@ -323,14 +323,15 @@ void	async_worker_destroy(zbx_async_worker_t *worker)
  *                                                                            *
  * Purpose: sets callback to call after task is processed                     *
  *                                                                            *
- * Parameters: worker        - [IN]                                           *
- *             finished_cb   - [IN] callback to call after finishing          *
- *                                  task                                      *
- *             finished_data - [IN] callback data                             *
+ * Parameters: worker             - [IN]                                      *
+ *             async_notify_func  - [IN] callback to call after finishing     *
+ *                                       task                                 *
+ *             finished_data      - [IN] callback data                        *
  *                                                                            *
  ******************************************************************************/
-void	async_worker_set_finished_cb(zbx_async_worker_t *worker, zbx_async_notify_cb_t finished_cb, void *finished_data)
+void	async_worker_set_async_notify_cb(zbx_async_worker_t *worker, zbx_async_notify_cb_t async_notify_func,
+		void *finished_data)
 {
-	worker->finished_cb = finished_cb;
+	worker->async_notify_cb = async_notify_func;
 	worker->finished_data = finished_data;
 }

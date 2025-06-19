@@ -181,6 +181,18 @@ void	zbx_jsonobj_clear(zbx_jsonobj_t *obj)
 		default:
 			break;
 	}
+
+	obj->type = ZBX_JSON_TYPE_UNKNOWN;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: initialize object                                                 *
+ *                                                                            *
+ ******************************************************************************/
+void	zbx_jsonobj_init(zbx_jsonobj_t *obj)
+{
+	obj->type = ZBX_JSON_TYPE_UNKNOWN;
 }
 
 /******************************************************************************
@@ -188,12 +200,12 @@ void	zbx_jsonobj_clear(zbx_jsonobj_t *obj)
  * Purpose: convert json object to text format                                *
  *                                                                            *
  ******************************************************************************/
-int	zbx_jsonobj_to_string(char **str, size_t *str_alloc, size_t *str_offset, zbx_jsonobj_t *obj)
+int	zbx_jsonobj_to_string(char **str, size_t *str_alloc, size_t *str_offset, const zbx_jsonobj_t *obj)
 {
-	char			*tmp, buf[32];
-	int			i;
-	zbx_hashset_iter_t	iter;
-	zbx_jsonobj_el_t	*el;
+	char				*tmp, buf[32];
+	int				i;
+	zbx_hashset_const_iter_t	iter;
+	const zbx_jsonobj_el_t		*el;
 
 	switch (obj->type)
 	{
@@ -229,8 +241,8 @@ int	zbx_jsonobj_to_string(char **str, size_t *str_alloc, size_t *str_offset, zbx
 			break;
 		case ZBX_JSON_TYPE_OBJECT:
 			zbx_chrcpy_alloc(str, str_alloc, str_offset, '{');
-			zbx_hashset_iter_reset(&obj->data.object, &iter);
-			while (NULL != (el = (zbx_jsonobj_el_t *)zbx_hashset_iter_next(&iter)))
+			zbx_hashset_const_iter_reset(&obj->data.object, &iter);
+			while (NULL != (el = (const zbx_jsonobj_el_t *)zbx_hashset_const_iter_next(&iter)))
 			{
 				if ((*str)[*str_offset - 1] != '{')
 					zbx_chrcpy_alloc(str, str_alloc, str_offset, ',');
@@ -260,19 +272,20 @@ int	zbx_jsonobj_to_string(char **str, size_t *str_alloc, size_t *str_offset, zbx
  ******************************************************************************/
 int	zbx_jsonobj_open(const char *data, zbx_jsonobj_t *obj)
 {
-	int	ret = FAIL;
-	char	*error = NULL;
+	zbx_int64_t	offset;
+	int		ret = FAIL;
+	char		*error = NULL;
 
 	SKIP_WHITESPACE(data);
 
 	switch (*data)
 	{
 		case '{':
-			if (0 == json_parse_object(data, obj, 0, &error))
+			if (0 == (offset = json_parse_object(data, obj, 0, &error)))
 				goto out;
 			break;
 		case '[':
-			if (0 == json_parse_array(data, obj, 0, &error))
+			if (0 == (offset = json_parse_array(data, obj, 0, &error)))
 				goto out;
 			break;
 		default:
@@ -282,7 +295,13 @@ int	zbx_jsonobj_open(const char *data, zbx_jsonobj_t *obj)
 			goto out;
 	}
 
-	ret = SUCCEED;
+	data += offset;
+	SKIP_WHITESPACE(data);
+
+	if ('\0' != *data)
+		(void)json_error("invalid data trailing JSON object", data, &error);
+	else
+		ret = SUCCEED;
 out:
 	if (FAIL == ret)
 	{
@@ -308,11 +327,32 @@ void	jsonobj_clear_ref_vector(zbx_vector_jsonobj_ref_t *refs)
 		zbx_jsonobj_ref_t	*ref = &refs->values[i];
 
 		zbx_free(ref->name);
-		if (0 == ref->external)
+		if (NULL != ref->internal)
 		{
-			zbx_jsonobj_clear(ref->value);
-			zbx_free(ref->value);
+			zbx_jsonobj_clear(ref->internal);
+			zbx_free(ref->internal);
 		}
 	}
+
 	zbx_vector_jsonobj_ref_clear(refs);
 }
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: get json value by name                                            *
+ *                                                                            *
+ ******************************************************************************/
+const zbx_jsonobj_t *zbx_jsonobj_get_value(const zbx_jsonobj_t *obj, const char *name)
+{
+	zbx_jsonobj_el_t	el_local, *el;
+
+	if (ZBX_JSON_TYPE_OBJECT != obj->type)
+		return NULL;
+
+	el_local.name = (char *)name;
+	if (NULL == (el = (zbx_jsonobj_el_t *)zbx_hashset_search(&obj->data.object, &el_local)))
+		return NULL;
+
+	return &el->value;
+}
+

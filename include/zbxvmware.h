@@ -64,7 +64,7 @@ typedef struct
 	time_t				last_used;
 
 	/* alternate query instance (for the case when 'entity' query is TOTAL) */
-	char				*query_instance;
+	zbx_vector_str_t		query_instance;
 }
 zbx_vmware_perf_counter_t;
 
@@ -179,6 +179,7 @@ typedef struct
 {
 	char				*name;
 	char				*uuid;
+	char				*id;
 	zbx_vector_vmware_hvdisk_t	hvdisks;
 }
 zbx_vmware_dsname_t;
@@ -293,6 +294,7 @@ typedef struct
 	unsigned int				snapshot_count;
 	zbx_vector_vmware_custom_attr_ptr_t	custom_attrs;
 	zbx_vector_str_t			alarm_ids;
+	zbx_vector_str_t			ds_ids;
 }
 zbx_vmware_vm_t;
 
@@ -386,6 +388,7 @@ typedef struct
 	time_t		interval;	/* last interval of vmware.eventlog[] item */
 	zbx_uint64_t	owner_itemid;	/* single item that will receive all events */
 	int		job_revision;	/* actual revision of the responsible (last created) job */
+	time_t		end_time;	/* limit of time up to which events will be requested */
 
 	/* service event log data object that is swapped with new one during service event log update */
 	zbx_vmware_eventlog_data_t	*data;
@@ -557,7 +560,8 @@ typedef struct
 	int				jobs_num;
 
 	/* linked jobs types */
-#define ZBX_VMWARE_REQ				(8*2)
+#define ZBX_VMWARE_REQ				(8)
+#define ZBX_VMWARE_REQ_MASK			(0xFF00)
 #define ZBX_VMWARE_REQ_UPDATE_CONF		(ZBX_VMWARE_UPDATE_CONF		<< ZBX_VMWARE_REQ)
 #define ZBX_VMWARE_REQ_UPDATE_PERFCOUNTERS	(ZBX_VMWARE_UPDATE_PERFCOUNTERS	<< ZBX_VMWARE_REQ)
 #define ZBX_VMWARE_REQ_UPDATE_REST_TAGS		(ZBX_VMWARE_UPDATE_REST_TAGS	<< ZBX_VMWARE_REQ)
@@ -565,6 +569,7 @@ typedef struct
 #define ZBX_VMWARE_REQ_UPDATE_ALL										\
 					(ZBX_VMWARE_REQ_UPDATE_CONF | ZBX_VMWARE_REQ_UPDATE_PERFCOUNTERS |	\
 					ZBX_VMWARE_REQ_UPDATE_REST_TAGS | ZBX_VMWARE_REQ_UPDATE_EVENTLOG)
+#define ZBX_VMWARE_JOB_RUN			(8*2)
 	int				jobs_flag;
 
 	/* vmware entity (vm, hv etc) and linked tags */
@@ -688,14 +693,13 @@ void	zbx_vmware_eventlog_job_create(zbx_vmware_service_t *service);
 #define ZBX_VMWARE_VMPROP_GUESTFULLNAME			19
 #define ZBX_VMWARE_VMPROP_FOLDER			20
 #define ZBX_VMWARE_VMPROP_SNAPSHOT			21
-#define ZBX_VMWARE_VMPROP_DATASTOREID			22
-#define ZBX_VMWARE_VMPROP_CONSOLIDATION_NEEDED		23
-#define ZBX_VMWARE_VMPROP_RESOURCEPOOL			24
-#define ZBX_VMWARE_VMPROP_TOOLS_VERSION			25
-#define ZBX_VMWARE_VMPROP_TOOLS_RUNNING_STATUS		26
-#define ZBX_VMWARE_VMPROP_STATE				27
+#define ZBX_VMWARE_VMPROP_CONSOLIDATION_NEEDED		22
+#define ZBX_VMWARE_VMPROP_RESOURCEPOOL			23
+#define ZBX_VMWARE_VMPROP_TOOLS_VERSION			24
+#define ZBX_VMWARE_VMPROP_TOOLS_RUNNING_STATUS		25
+#define ZBX_VMWARE_VMPROP_STATE				26
 
-#define ZBX_VMWARE_VMPROPS_NUM				28
+#define ZBX_VMWARE_VMPROPS_NUM				27
 
 /* vmware service types */
 #define ZBX_VMWARE_TYPE_UNKNOWN	0

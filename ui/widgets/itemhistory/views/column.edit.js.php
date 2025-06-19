@@ -108,6 +108,12 @@ window.item_history_column_edit = new class {
 			}
 		});
 
+		this.#form.addEventListener('change', ({target}) => {
+			if (target.matches('[type="text"]')) {
+				target.value = target.value.trim();
+			}
+		});
+
 		colorPalette.setThemeColors(colors);
 
 		// Initialize highlights table
@@ -118,12 +124,12 @@ window.item_history_column_edit = new class {
 				allow_empty: true,
 				dataCallback: (row_data) => {
 					if (!('color' in row_data)) {
-						const colors = this.#form.querySelectorAll('.<?= ZBX_STYLE_COLOR_PICKER ?> input');
+						const color_pickers = this.#form.querySelectorAll(`.${ZBX_STYLE_COLOR_PICKER}`);
 						const used_colors = [];
 
-						for (const color of colors) {
-							if (color.value !== '') {
-								used_colors.push(color.value);
+						for (const color_picker of color_pickers) {
+							if (color_picker.color !== '') {
+								used_colors.push(color_picker.color);
 							}
 						}
 
@@ -131,18 +137,8 @@ window.item_history_column_edit = new class {
 					}
 				}
 			})
-			.on('afteradd.dynamicRows', e => {
-				const $colorpicker = $('tr.form_row:last input[name$="[color]"]', e.target);
-
-				$colorpicker.colorpicker({appendTo: $colorpicker.closest('.input-color-picker')});
-
-				this.#updateForm();
-			})
+			.on('afteradd.dynamicRows', () => this.#updateForm())
 			.on('afterremove.dynamicRows', () => this.#updateForm());
-
-		for (const colorpicker of this.#highlights_table.querySelectorAll('tr.form_row input[name$="[color]"]')) {
-			$(colorpicker).colorpicker({appendTo: $(colorpicker).closest('.input-color-picker')});
-		}
 
 		// Initialize display event listener
 		document.getElementById('display').addEventListener('change', () => this.#updateForm());
@@ -155,12 +151,12 @@ window.item_history_column_edit = new class {
 				allow_empty: true,
 				dataCallback: (row_data) => {
 					if (!('color' in row_data)) {
-						const colors = this.#form.querySelectorAll('.<?= ZBX_STYLE_COLOR_PICKER ?> input');
+						const color_pickers = this.#form.querySelectorAll(`.${ZBX_STYLE_COLOR_PICKER}`);
 						const used_colors = [];
 
-						for (const color of colors) {
-							if (color.value !== '') {
-								used_colors.push(color.value);
+						for (const color_picker of color_pickers) {
+							if (color_picker.color !== '') {
+								used_colors.push(color_picker.color);
 							}
 						}
 
@@ -168,19 +164,8 @@ window.item_history_column_edit = new class {
 					}
 				}
 			})
-			.on('afteradd.dynamicRows', e => {
-				const $colorpicker = $('tr.form_row:last input[name$="[color]"]', e.target);
-
-				$colorpicker.colorpicker({appendTo: $colorpicker.closest('.input-color-picker')});
-
-				this.#updateForm();
-			})
-			.on('afterremove.dynamicRows', () => this.#updateForm())
-			.on('change', (e) => e.target.value = e.target.value.trim());
-
-		for (const colorpicker of this.#$thresholds_table.querySelectorAll('tr.form_row input[name$="[color]"]')) {
-			$(colorpicker).colorpicker({appendTo: $(colorpicker).closest('.input-color-picker')});
-		}
+			.on('afteradd.dynamicRows', () => this.#updateForm())
+			.on('afterremove.dynamicRows', () => this.#updateForm());
 
 		// Adding field trimming
 		const fields_to_trim = ['name', 'max_length', 'min', 'max'];

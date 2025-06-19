@@ -37,7 +37,6 @@ class WidgetView extends CControllerDashboardWidgetView {
 		parent::init();
 
 		$this->addValidationRules([
-			'edit_mode' => 'in 0,1',
 			'contents_width' => 'int32|ge '.self::GRAPH_WIDTH_MIN.'|le '.self::GRAPH_WIDTH_MAX,
 			'contents_height' => 'int32|ge '.self::GRAPH_HEIGHT_MIN.'|le '.self::GRAPH_HEIGHT_MAX,
 			'has_custom_time_period' => 'in 1',
@@ -46,20 +45,10 @@ class WidgetView extends CControllerDashboardWidgetView {
 	}
 
 	protected function doAction(): void {
-		$edit_mode = $this->getInput('edit_mode', 0);
 		$width = (int) $this->getInput('contents_width', self::GRAPH_WIDTH_MIN);
 		$height = (int) $this->getInput('contents_height', self::GRAPH_HEIGHT_MIN);
 		$has_custom_time_period = $this->hasInput('has_custom_time_period');
 		$preview = $this->hasInput('preview'); // Configuration preview.
-
-		// Hide left/right Y axis if it is not used by any dataset.
-		$ds_y_axes = array_column($this->fields_values['ds'], 'axisy', 'axisy');
-		$lefty = array_key_exists(GRAPH_YAXIS_SIDE_LEFT, $ds_y_axes)
-			? $this->fields_values['lefty']
-			: SVG_GRAPH_AXIS_OFF;
-		$righty = array_key_exists(GRAPH_YAXIS_SIDE_RIGHT, $ds_y_axes)
-			? $this->fields_values['righty']
-			: SVG_GRAPH_AXIS_OFF;
 
 		$parser = new CNumberParser(['with_size_suffix' => true, 'with_time_suffix' => true]);
 
@@ -90,7 +79,8 @@ class WidgetView extends CControllerDashboardWidgetView {
 		$graph_data = [
 			'data_sets' => array_values($this->fields_values['ds']),
 			'data_source' => $this->fields_values['source'],
-			'fix_time_period' => $has_custom_time_period || $edit_mode,
+			'fix_time_period' => ($this->isTemplateDashboard() && !$this->fields_values['override_hostid'])
+				|| $has_custom_time_period,
 			'displaying' => [
 				'show_simple_triggers' => $this->fields_values['simple_triggers'] == SVG_GRAPH_SIMPLE_TRIGGERS_ON,
 				'show_working_time' => $this->fields_values['working_time'] == SVG_GRAPH_WORKING_TIME_ON,
@@ -104,14 +94,14 @@ class WidgetView extends CControllerDashboardWidgetView {
 				'time_to' => $this->fields_values['time_period']['to_ts']
 			],
 			'axes' => [
-				'show_left_y_axis' => $lefty == SVG_GRAPH_AXIS_ON,
+				'show_left_y_axis' => $this->fields_values['lefty'] == SVG_GRAPH_AXIS_ON,
 				'left_y_scale' => $this->fields_values['lefty_scale'],
 				'left_y_min' => $lefty_min,
 				'left_y_max' => $lefty_max,
 				'left_y_units' => $this->fields_values['lefty_units'] == SVG_GRAPH_AXIS_UNITS_STATIC
 					? $this->fields_values['lefty_static_units']
 					: null,
-				'show_right_y_axis' => $righty == SVG_GRAPH_AXIS_ON,
+				'show_right_y_axis' => $this->fields_values['righty'] == SVG_GRAPH_AXIS_ON,
 				'right_y_scale' => $this->fields_values['righty_scale'],
 				'right_y_min' => $righty_min,
 				'right_y_max' => $righty_max,
@@ -151,7 +141,8 @@ class WidgetView extends CControllerDashboardWidgetView {
 
 		if (!$preview) {
 			$svg_options['data'] = zbx_array_merge($svg_options['data'], [
-				'sbox' => !$has_custom_time_period && !$edit_mode,
+				'sbox' => (!$this->isTemplateDashboard() || $this->fields_values['override_hostid'])
+					&& !$has_custom_time_period,
 				'show_problems' => $graph_data['problems']['show_problems'],
 				'show_simple_triggers' => $graph_data['displaying']['show_simple_triggers'],
 				'time_period' => $this->fields_values['time_period'],

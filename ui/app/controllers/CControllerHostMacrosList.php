@@ -125,7 +125,7 @@ class CControllerHostMacrosList extends CController {
 			'macros' => $macros,
 			'show_inherited_macros' => $show_inherited_macros,
 			'readonly' => $readonly,
-			'has_inline_validation' => $this->getInput('source') === 'host',
+			'has_inline_validation' => $this->getInput('source') === 'host' || $this->getInput('source') === 'template',
 			'user' => [
 				'debug_mode' => $this->getDebugMode()
 			]

@@ -166,7 +166,8 @@ static int	pb_discovery_add_row_mem(zbx_pb_t *pb, zbx_pb_discovery_t *src)
 	int			ret = FAIL;
 
 	zabbix_log(LOG_LEVEL_TRACE, "In %s() free:" ZBX_FS_SIZE_T " request:" ZBX_FS_SIZE_T, __func__,
-			pb_get_free_size(), pb_discovery_estimate_row_size(src->value, src->ip, src->dns, src->error));
+			(zbx_fs_size_t)pb_get_free_size(),
+			(zbx_fs_size_t)pb_discovery_estimate_row_size(src->value, src->ip, src->dns, src->error));
 
 	if (NULL == (row = (zbx_pb_discovery_t *)pb_malloc(sizeof(zbx_pb_discovery_t))))
 		goto out;
@@ -177,17 +178,22 @@ static int	pb_discovery_add_row_mem(zbx_pb_t *pb, zbx_pb_discovery_t *src)
 	{
 		row->dns = NULL;
 		row->value = NULL;
+		row->error = NULL;
 		goto out;
 	}
 
 	if (NULL == (row->dns = pb_strdup(src->dns)))
 	{
 		row->value = NULL;
+		row->error = NULL;
 		goto out;
 	}
 
 	if (NULL == (row->value = pb_strdup(src->value)))
+	{
+		row->error = NULL;
 		goto out;
+	}
 
 	if (NULL == (row->error = pb_strdup(src->error)))
 		goto out;
@@ -198,7 +204,7 @@ out:
 		pb_list_free_discovery(&pb->discovery, row);
 
 	zabbix_log(LOG_LEVEL_TRACE, "End of %s() ret:%s free:" ZBX_FS_SIZE_T, __func__, zbx_result_string(ret),
-			pb_get_free_size());
+			(zbx_fs_size_t)pb_get_free_size());
 
 	return ret;
 }
@@ -265,7 +271,8 @@ static zbx_list_item_t	*pb_discovery_add_rows_mem(zbx_pb_t *pb, zbx_list_t *rows
 			if (FAIL == pb_free_space(get_pb_data(), size))
 			{
 				zabbix_log(LOG_LEVEL_WARNING, "discovery record with size " ZBX_FS_SIZE_T
-						" is too large for proxy memory buffer, discarding", size);
+						" is too large for proxy memory buffer, discarding",
+						(zbx_fs_size_t)size);
 				break;
 			}
 		}
@@ -273,7 +280,7 @@ static zbx_list_item_t	*pb_discovery_add_rows_mem(zbx_pb_t *pb, zbx_list_t *rows
 		rows_num++;
 	}
 out:
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s() rows_num:%d next:%p", __func__, rows_num, li.current);
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s() rows_num:%d next:%p", __func__, rows_num, (void *)li.current);
 
 	return li.current;
 }
@@ -294,7 +301,7 @@ static void	pb_discovery_add_rows_db(zbx_list_t *rows, zbx_list_item_t *next, zb
 	zbx_db_insert_t		db_insert;
 	int			rows_num = 0;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s() next:%p", __func__, next);
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s() next:%p", __func__, (void *)next);
 
 	if (SUCCEED == zbx_list_iterator_init_with(rows, next, &li))
 	{

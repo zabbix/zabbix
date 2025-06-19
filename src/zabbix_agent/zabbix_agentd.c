@@ -27,6 +27,7 @@
 #include "zbxcfg.h"
 #include "zbxmutexs.h"
 #include "zbxbincommon.h"
+#include "zbxtime.h"
 
 static char	*config_pid_file = NULL;
 
@@ -814,7 +815,8 @@ static void	zbx_validate_config(ZBX_TASK_EX *task)
 	zbx_config_eventlog_max_lines_per_second = zbx_config_max_lines_per_second;
 }
 
-static int	add_serveractive_host_cb(const zbx_vector_addr_ptr_t *addrs, zbx_vector_str_t *hostnames, void *data)
+static int	add_serveractive_host_agent_cb(const zbx_vector_addr_ptr_t *addrs, zbx_vector_str_t *hostnames,
+		void *data)
 {
 	int	forks, new_forks;
 
@@ -1085,7 +1087,7 @@ static void	zbx_load_config(int requirement, ZBX_TASK_EX *task)
 		char	*error;
 
 		if (FAIL == zbx_set_data_destination_hosts(active_hosts, ZBX_DEFAULT_SERVER_PORT, "ServerActive",
-				add_serveractive_host_cb, &hostnames, NULL, &error))
+				add_serveractive_host_agent_cb, &hostnames, NULL, &error))
 		{
 			zbx_error("%s", error);
 			exit(EXIT_FAILURE);
@@ -1250,33 +1252,6 @@ static void	signal_redirect_cb(int flags, zbx_signal_handler_f sigusr_handler)
 				sigusr_handler(flags);
 	}
 #endif
-}
-#endif
-
-#ifndef _WINDOWS
-static int	wait_for_children(const ZBX_THREAD_HANDLE *pids, size_t pids_num)
-{
-	int	ws;
-	pid_t	pid;
-
-	pid = wait(&ws);
-
-	if (-1 == pid)
-	{
-		if (EINTR != errno)
-		{
-			zabbix_log(LOG_LEVEL_ERR, "failed to wait on child processes: %s", zbx_strerror(errno));
-			zbx_set_exiting_with_fail();
-			return FAIL;
-		}
-
-		return SUCCEED;
-	}
-
-	if (FAIL == zbx_is_child_pid(pid, pids, pids_num))
-		return SUCCEED;
-
-	return FAIL;
 }
 #endif
 
@@ -1497,8 +1472,30 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 	zbx_set_child_pids(zbx_threads, zbx_threads_num);
 	zbx_unset_exit_on_terminate();
 
-	while (ZBX_IS_RUNNING() && SUCCEED == wait_for_children(zbx_threads, zbx_threads_num))
-		;
+	while (ZBX_IS_RUNNING())
+	{
+		int	ws;
+		pid_t	pid;
+
+		zbx_sleep(1);
+		__zbx_update_env(zbx_time());
+
+		if (0 < (pid = waitpid((pid_t)-1, &ws, WNOHANG)))
+		{
+			if (SUCCEED == zbx_is_child_pid(pid, zbx_threads, zbx_threads_num))
+			{
+				zbx_set_exiting_with_fail();
+				break;
+			}
+		}
+
+		if (-1 == pid && EINTR != errno)
+		{
+			zabbix_log(LOG_LEVEL_ERR, "failed to wait on child processes: %s", zbx_strerror(errno));
+			zbx_set_exiting_with_fail();
+			break;
+		}
+	}
 
 	zbx_log_exit_signal();
 

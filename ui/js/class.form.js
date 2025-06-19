@@ -1,20 +1,15 @@
 /*
-** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2025 Zabbix SIA
 **
-** This program is free software; you can redistribute it and/or modify
-** it under the terms of the GNU General Public License as published by
-** the Free Software Foundation; either version 2 of the License, or
-** (at your option) any later version.
+** This program is free software: you can redistribute it and/or modify it under the terms of
+** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
 **
-** This program is distributed in the hope that it will be useful,
-** but WITHOUT ANY WARRANTY; without even the implied warranty of
-** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-** GNU General Public License for more details.
+** This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+** without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+** See the GNU Affero General Public License for more details.
 **
-** You should have received a copy of the GNU General Public License
-** along with this program; if not, write to the Free Software
-** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+** You should have received a copy of the GNU Affero General Public License along with this program.
+** If not, see <https://www.gnu.org/licenses/>.
 **/
 
 
@@ -24,6 +19,7 @@ class CForm {
 		'array': CFieldArray,
 		'checkbox': CFieldCheckBox,
 		'hidden': CFieldHidden,
+		'multiline': CFieldMultiline,
 		'multiselect': CFieldMultiselect,
 		'radio-list': CFieldRadioList,
 		'set': CFieldSet,
@@ -259,6 +255,7 @@ class CForm {
 	}
 
 	extendValidation(callback) {
+		throw new Error('Missing implementation.');
 		this.#custom_validation.push(callback);
 	}
 
@@ -322,15 +319,16 @@ class CForm {
 	 * is completed so that popup can be opened only when validation succeeds.
 	 *
 	 * @param {Array} fields
+	 * @param {?Object} rules
 	 *
 	 * @returns {Promise}
 	 */
-	validateFieldsForAction(fields) {
-		const validator = new CFormValidator(this.#rules);
+	validateFieldsForAction(fields, rules) {
+		const validator = new CFormValidator(rules ? rules : this.#rules);
 
 		return validator.validateChanges(this.getAllValues(), fields)
 			.then((result) => {
-				this.setErrors(validator.getErrors(), false);
+				this.setErrors(validator.getErrors(), true);
 				this.renderErrors();
 
 				return result;
@@ -362,16 +360,20 @@ class CForm {
 				this.addGeneralErrors(field.getGlobalErrors());
 			}
 			else {
-				this.addGeneralErrors({[key]: errors});
+				errors.forEach((error) => {
+					if (error.message !== '') {
+						console.log('Validation error for missing field "' + key + '": ' + error.message);
+					}
+				});
 			}
 		});
 
 		Object.entries(general_errors).forEach(([key, errors]) => {
-			errors
-				.filter(({message}) => message !== '')
-				.forEach(({message}) => {
-					this.addGeneralErrors({[key]: message});
-				});
+			errors.forEach((error) => {
+				if (error.message !== '') {
+					console.log('Validation error for missing field "' + key + '": ' + error.message);
+				}
+			});
 		});
 
 		if ('' in raw_errors) {
@@ -379,7 +381,7 @@ class CForm {
 		}
 
 		if (focus_error_field) {
-			this.focusErrorField();
+			this.focusErrorField(Object.keys(field_errors));
 		}
 	}
 
@@ -397,6 +399,25 @@ class CForm {
 			const field_name = field.getName();
 			const field_path = field.getPath();
 			const subfield_path = new RegExp('^' + field_path + '/');
+
+			if (field instanceof CFieldMultiselect) {
+				const affixed_path = '/' + field_name + '_new';
+				const affixed_subfield = new RegExp('^/' + field_name + '_new/');
+
+				for (const error_path in raw_errors) {
+					const affixed = error_path === affixed_path || affixed_subfield.test(error_path);
+
+					if (!affixed) {
+						continue;
+					}
+
+					if (raw_errors[error_path].length) {
+						raw_errors[field_path] = [...raw_errors[field_path], ...raw_errors[error_path]]
+							.filter(({message}) => message.length);
+						raw_errors[error_path] = [];
+					}
+				}
+			}
 
 			Object.entries(raw_errors).filter(([path]) => {
 				return field_path === path || subfield_path.test(path);
@@ -454,10 +475,13 @@ class CForm {
 		});
 	}
 
-	focusErrorField() {
-		for (const field of Object.values(this.#fields)) {
-			if (field.hasErrors()) {
-				$(this.#tabs).tabs({active: $(`a[href="#${field.getTabId()}"]`, $(this.#tabs)).parent().index()});
+	focusErrorField(field_names) {
+		for (const [key, field] of Object.entries(this.#fields)) {
+			if (field_names.includes(key) && field.hasErrors()) {
+				if (field.getTabId() !== null) {
+					$(this.#tabs).tabs({active: $(`a[href="#${field.getTabId()}"]`, $(this.#tabs)).parent().index()});
+				}
+
 				field.focusErrorField();
 				break;
 			}

@@ -29,10 +29,9 @@ window.connector_edit_popup = new class {
 		this.form = this.overlay.$dialogue.$body[0].querySelector('form');
 		this.footer = this.overlay.$dialogue.$footer[0];
 
-		const backurl = new Curl('zabbix.php');
-
-		backurl.setArgument('action', 'connector.list');
-		this.overlay.backurl = backurl.getUrl();
+		const return_url = new URL('zabbix.php', location.href);
+		return_url.searchParams.set('action', 'connector.list');
+		ZABBIX.PopupManager.setReturnUrl(return_url.href);
 
 		jQuery('#tags').dynamicRows({
 			template: '#tag-row-tmpl',

@@ -1,20 +1,15 @@
 /*
-** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2025 Zabbix SIA
 **
-** This program is free software; you can redistribute it and/or modify
-** it under the terms of the GNU General Public License as published by
-** the Free Software Foundation; either version 2 of the License, or
-** (at your option) any later version.
+** This program is free software: you can redistribute it and/or modify it under the terms of
+** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
 **
-** This program is distributed in the hope that it will be useful,
-** but WITHOUT ANY WARRANTY; without even the implied warranty of
-** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-** GNU General Public License for more details.
+** This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+** without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+** See the GNU Affero General Public License for more details.
 **
-** You should have received a copy of the GNU General Public License
-** along with this program; if not, write to the Free Software
-** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+** You should have received a copy of the GNU Affero General Public License along with this program.
+** If not, see <https://www.gnu.org/licenses/>.
 **/
 
 
@@ -108,11 +103,11 @@ class CFormValidator {
 			this.#use_checks = use_checks;
 
 			try {
-				this.#validate(values_to_validate, validation_rules);
-				await this.#validateDelayed();
-				await this.#validateApiUniqueness();
-				this.#validateDistinctness(values, validation_rules);
-				resolve_whole();
+				const r1 = this.#validate(values_to_validate, validation_rules);
+				const r2 = await this.#validateDelayed();
+				const r3 = await this.#validateApiUniqueness();
+				const r4 = this.#validateDistinctness(values, validation_rules);
+				resolve_whole(r1 && r2 && r3 && r4);
 			}
 			catch (error) {
 				if (error.cause !== 'RulesError' && error.type !== 'abort') {
@@ -230,7 +225,7 @@ class CFormValidator {
 					if (field_type === 'array') {
 						when_fields_data[when_path] = {
 							type: field_type,
-							value: field_data.length > 0
+							value: field_data instanceof Array && (field_data.length > 0)
 						};
 					}
 					else if (field_type === 'objects') {
@@ -296,6 +291,10 @@ class CFormValidator {
 				const next_level_matching_rulesets = [];
 
 				matching_rulesets.forEach(({type, fields, field}) => {
+					if (fields === undefined) {
+						fields = {};
+					}
+
 					if (type === 'object' || type === 'objects') {
 						next_level_matching_rulesets.push(...filterMatchingRuleSets(fields[part], path_so_far));
 					}
@@ -693,25 +692,27 @@ class CFormValidator {
 	#getRelatedRules(fields) {
 		fields = fields.map((field) => field.split('/').filter(part => /^\d+$/.test(part) === false).join('/'));
 
-		const getRules = (rules, rule_path, is_matching = false) => {
+		const getRules = (rules, rule_path, parent_matching = false) => {
 			const rule = {};
+			let path_matching = false;
 
 			Object.entries(rules).forEach(([key, value]) => {
 				if (key === 'fields') {
 					Object.entries(value).forEach(([field_name, rule_sets]) => {
-						const matching = fields.includes(rule_path + '/' + field_name);
+						const child_matching = parent_matching || fields.includes(rule_path + '/' + field_name);
 
 						rule_sets = [...rule_sets].map(rule_set => {
-							return getRules(rule_set, rule_path + '/' + field_name, matching);
-						}).filter(rule_set => rule_set);
+							return getRules(rule_set, rule_path + '/' + field_name, child_matching);
+						});
 
+						rule_sets = rule_sets.filter(rule_set => rule_set);
 						if (rule_sets.length) {
 							if (!('fields' in rule)) {
 								rule.fields = {};
 							}
 
 							rule.fields[field_name] = rule_sets;
-							is_matching = true;
+							path_matching = true;
 						}
 					});
 				}
@@ -722,7 +723,7 @@ class CFormValidator {
 				}
 			});
 
-			return is_matching ? rule : false;
+			return parent_matching || path_matching ? rule : false;
 		};
 
 		return getRules(this.#rules, '');
@@ -751,6 +752,10 @@ class CFormValidator {
 				const next_level_rules = [];
 
 				for (const rule of rules) {
+					if (rule.fields === undefined) {
+						return false;
+					}
+
 					if (!this.#isTypeObject(rule) || !(part in rule.fields)) {
 						return false;
 					}

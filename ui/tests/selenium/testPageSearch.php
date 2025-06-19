@@ -16,8 +16,8 @@
 
 use Facebook\WebDriver\Exception\TimeoutException;
 
-require_once dirname(__FILE__).'/../include/CWebTest.php';
-require_once dirname(__FILE__).'/behaviors/CTableBehavior.php';
+require_once __DIR__.'/../include/CWebTest.php';
+require_once __DIR__.'/behaviors/CTableBehavior.php';
 
 /**
  * @backup hstgrp
@@ -55,7 +55,7 @@ class testPageSearch extends CWebTest {
 				['text' => 'Web', 'href' => 'zabbix.php?action=web.view&filter_hostids%5B%5D={id}&filter_set=1'],
 				['text' => 'Items', 'href' => 'zabbix.php?action=item.list&filter_set=1&filter_hostids%5B0%5D={id}&context=host'],
 				['text' => 'Triggers', 'href' => 'zabbix.php?action=trigger.list&filter_set=1&filter_hostids%5B0%5D={id}&context=host'],
-				['text' => 'Graphs', 'href' => 'graphs.php?filter_set=1&filter_hostids%5B0%5D={id}&context=host'],
+				['text' => 'Graphs', 'href' => 'zabbix.php?action=graph.list&filter_set=1&filter_hostids%5B0%5D={id}&context=host'],
 				['text' => 'Discovery', 'href' => 'host_discovery.php?filter_set=1&filter_hostids%5B0%5D={id}&context=host'],
 				['text' => 'Web', 'href' => 'httpconf.php?filter_set=1&filter_hostids%5B0%5D={id}&context=host']
 			]
@@ -84,7 +84,7 @@ class testPageSearch extends CWebTest {
 				['text' => 'Test object Template', 'href' => 'zabbix.php?action=popup&popup=template.edit&templateid={id}'],
 				['text' => 'Items', 'href' => 'zabbix.php?action=item.list&filter_set=1&filter_hostids%5B0%5D={id}&context=template'],
 				['text' => 'Triggers', 'href' => 'zabbix.php?action=trigger.list&filter_set=1&filter_hostids%5B0%5D={id}&context=template'],
-				['text' => 'Graphs', 'href' => 'graphs.php?filter_set=1&filter_hostids%5B0%5D={id}&context=template'],
+				['text' => 'Graphs', 'href' => 'zabbix.php?action=graph.list&filter_set=1&filter_hostids%5B0%5D={id}&context=template'],
 				['text' => 'Dashboards', 'href' => 'zabbix.php?action=template.dashboard.list&templateid={id}'],
 				['text' => 'Discovery', 'href' => 'host_discovery.php?filter_set=1&filter_hostids%5B0%5D={id}&context=template'],
 				['text' => 'Web', 'href' => 'httpconf.php?filter_set=1&filter_hostids%5B0%5D={id}&context=template']
@@ -339,7 +339,7 @@ class testPageSearch extends CWebTest {
 
 			// Check expanding functionality.
 			$widget_body = $widget->query('class:section-body')->one();
-			$toggle_button = $widget->query('class:section-toggle')->one();
+			$toggle_button = $widget->query('class:toggle')->one();
 			$this->assertEquals('Collapse', $toggle_button->getAttribute('title'));
 
 			$toggle_button->click();

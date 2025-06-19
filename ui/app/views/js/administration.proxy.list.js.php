@@ -20,12 +20,12 @@
 
 		init() {
 			this.#initActions();
-			this.#setSubmitCallback();
+			this.#initPopupListeners();
 		}
 
 		#initActions() {
 			document.querySelector('.js-create-proxy').addEventListener('click', () => {
-				window.popupManagerInstance.openPopup('proxy.edit', {});
+				ZABBIX.PopupManager.open('proxy.edit');
 			});
 
 			const form = document.getElementById('proxy-list');
@@ -52,6 +52,16 @@
 				.addEventListener('click', (e) => {
 					this.#delete(e.target, Object.keys(chkbxRange.getSelectedIds()));
 				});
+		}
+
+		#initPopupListeners() {
+			ZABBIX.EventHub.subscribe({
+				require: {
+					context: CPopupManager.EVENT_CONTEXT,
+					event: CPopupManagerEvent.EVENT_SUBMIT
+				},
+				callback: () => uncheckTableRows('proxy')
+			});
 		}
 
 		#refreshConfig(target, proxyids) {
@@ -157,21 +167,6 @@
 				.finally(() => {
 					target.classList.remove('is-loading');
 				});
-		}
-
-		#setSubmitCallback() {
-			window.popupManagerInstance.setSubmitCallback((e) => {
-				if ('success' in e.detail) {
-					postMessageOk(e.detail.success.title);
-
-					if ('messages' in e.detail.success) {
-						postMessageDetails('success', e.detail.success.messages);
-					}
-				}
-
-				uncheckTableRows('proxy');
-				location.href = location.href;
-			});
 		}
 	};
 </script>

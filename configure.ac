@@ -14,7 +14,7 @@ dnl
 
 dnl Process this file with autoconf to produce a configure script.
 
-AC_INIT([Zabbix], [7.4.0alpha1])
+AC_INIT([Zabbix], [7.4.0rc2])
 
 AC_MSG_NOTICE([Configuring $PACKAGE_NAME $PACKAGE_VERSION])
 
@@ -1088,10 +1088,14 @@ dnl *****************************************************************
 AC_FUNC_FORK
 AC_FUNC_GETMNTENT
 AC_FUNC_LSTAT_FOLLOWS_SLASHED_SYMLINK
-AC_FUNC_MALLOC
+dnl Macros AC_FUNC_MALLOC and AC_FUNC_REALLOC are commented out because their checks
+dnl whether malloc() and realloc() are GNU libc compatible break compilation on AIX.
+dnl zbx_malloc2() and zbx_realloc2() provide a protection similar to rpl_malloc() and
+dnl rpl_realloc() required by AC_FUNC_MALLOC and AC_FUNC_REALLOC on AIX.
+dnl AC_FUNC_MALLOC
 AC_FUNC_MKTIME
 AC_FUNC_MMAP
-AC_FUNC_REALLOC
+dnl AC_FUNC_REALLOC
 AC_FUNC_STRTOD
 
 AC_CHECK_FUNCS([alarm atexit clock_gettime dup2 fesetround floor getcwd       \
@@ -1531,9 +1535,11 @@ if test "x$server" = "xyes" || test "x$proxy" = "xyes"; then
 
 			saved_CPPFLAGS="$CPPFLAGS"
 			saved_LDFLAGS="$LDFLAGS"
+			saved_LIBS="$LIBS"
 
 			CPPFLAGS="$CPPFLAGS $SQLITE3_CPPFLAGS"
-			LDFLAGS="$LDFLAGS $SQLITE3_LDFLAGS $SQLITE3_LIBS"
+			LDFLAGS="$LDFLAGS $SQLITE3_LDFLAGS"
+			LIBS="$LIBS $SQLITE3_LIBS"
 
 			AC_MSG_CHECKING([for function sqlite3_open_v2() in sqlite3.h])
 			AC_LINK_IFELSE([AC_LANG_PROGRAM([[#include <sqlite3.h>]], [[sqlite3 *conn = 0;
@@ -1543,6 +1549,7 @@ if test "x$server" = "xyes" || test "x$proxy" = "xyes"; then
 
 			CPPFLAGS="$saved_CPPFLAGS"
 			LDFLAGS="$saved_LDFLAGS"
+			LIBS="$saved_LIBS"
 		else
 			AC_MSG_ERROR([SQLite3 library not found])
 		fi
@@ -1631,8 +1638,8 @@ if test "x$server" = "xyes" || test "x$proxy" = "xyes"; then
 
 	AC_SUBST(SNMP_CFLAGS)
 
-	dnl Check for LIBSSH2 [by default - skip] at least of version 1.0.0.
-	LIBSSH2_CHECK_CONFIG([no])
+	dnl Check for LIBSSH2 [by default - skip]
+	LIBSSH2_CHECK_CONFIG([no],[1.8.0])
 	LIBSSH_CHECK_CONFIG([no])
 	if test "x$want_ssh2" = "xyes"; then
 		if test "x$want_ssh" != "xno"; then
@@ -1642,7 +1649,7 @@ if test "x$server" = "xyes" || test "x$proxy" = "xyes"; then
 		if test "x$found_ssh2" != "xyes"; then
 			AC_MSG_ERROR([SSH2 library not found])
 		elif test "x$accept_ssh2_version" != "xyes"; then
-			AC_MSG_ERROR([SSH2 library version requirement not met (>= 1.0.0)])
+			AC_MSG_ERROR([SSH2 library version requirement not met (>= 1.8.0)])
 		else
 			have_ssh="yes (libssh2)"
 		fi
@@ -1699,6 +1706,22 @@ if test "x$server" = "xyes" || test "x$proxy" = "xyes"; then
 	fi
 
 	AC_SUBST(ZLIB_CFLAGS)
+
+	dnl Checking for c-ares support
+	ARES_CHECK_CONFIG([no])
+	if test "x$want_ares" = "xyes"; then
+		if test "x$found_ares" != "xyes"; then
+			AC_MSG_ERROR([Unable to use ares (ares check failed)])
+		fi
+		have_ares="yes"
+	fi
+	SERVER_LDFLAGS="$SERVER_LDFLAGS $ARES_LDFLAGS"
+	SERVER_LIBS="$SERVER_LIBS $ARES_LIBS"
+
+	PROXY_LDFLAGS="$PROXY_LDFLAGS $ARES_LDFLAGS"
+	PROXY_LIBS="$PROXY_LIBS $ARES_LIBS"
+
+	AC_SUBST(ARES_CFLAGS)
 
 	dnl Check for 'libpthread' library that supports PTHREAD_PROCESS_SHARED flag
 	LIBPTHREAD_CHECK_CONFIG([no])
@@ -1942,37 +1965,6 @@ ZBXJS_LDFLAGS="$ZBXJS_LDFLAGS $LIBCURL_LDFLAGS"
 ZBXJS_LIBS="$ZBXJS_LIBS $LIBCURL_LIBS"
 
 if test "x$server" = "xyes" || test "x$proxy" = "xyes" || test "x$agent" = "xyes" || test "x$agent2" = "xyes"; then
-LIBPCRE_CHECK_CONFIG([flags-only])
-LIBPCRE2_CHECK_CONFIG([flags-only])
-
-if test "x$want_libpcre2" = "xno"; then # default to old pcre
-	if test "x$want_libpcre" = "xno"; then
-		AC_MSG_NOTICE([using old pcre library by default])
-	fi
-
-	LIBPCRE_CHECK_CONFIG([mandatory])
-
-	if test "x$found_libpcre" != "xyes"; then
-		AC_MSG_ERROR([unable to use libpcre (libpcre check failed)])
-	fi
-
-	LIBPCRE_CHECK_CONFIG([no])
-
-	CFLAGS="$CFLAGS $LIBPCRE_CFLAGS"
-	LDFLAGS="$LDFLAGS $LIBPCRE_LDFLAGS"
-	if test "x$ARCH" = "xosx"; then
-		LIBS="$LIBPCRE_LIBS $LIBS"
-	else
-		LIBS="$LIBS $LIBPCRE_LIBS"
-	fi
-
-	AC_DEFINE([HAVE_PCRE_H], 1, [Define to 1 if you have the 'libpcre' library (-lpcre)])
-	have_pcre=1
-else
-	if test "x$want_libpcre" != "xno"; then
-		AC_MSG_ERROR([cannot use both pcre and pcre2 at the same time])
-	fi
-
 	LIBPCRE2_CHECK_CONFIG([mandatory])
 
 	if test "x$found_libpcre2" != "xyes"; then
@@ -1991,12 +1983,6 @@ else
 	have_pcre2=1
 fi
 
-if test "x$have_pcre" != "x1" && test "x$have_pcre2" != "x1"; then
-    AC_MSG_ERROR([cannot build with libpcre or libpcre2])
-fi
-fi
-
-AM_CONDITIONAL([HAVE_PCRE], [test "x$have_pcre" = "x1"])
 AM_CONDITIONAL([HAVE_PCRE2], [test "x$have_pcre2" = "x1"])
 
 found_iconv="no"
@@ -2058,7 +2044,7 @@ if test "x$HAVE_START_GROUP" = "xyes"; then
 fi
 
 if test "x$agent2" = "xyes"; then
-	CGO_CFLAGS="$TLS_CFLAGS $LIBPCRE_CFLAGS $LIBPCRE2_CFLAGS"
+	CGO_CFLAGS="$TLS_CFLAGS $LIBPCRE2_CFLAGS"
 	CGO_LDFLAGS="$AGENT2_LDFLAGS $LD_START_GROUP \
 		\${abs_top_builddir}/src/libs/zbxalgo/libzbxalgo.a \
 		\${abs_top_builddir}/src/libs/zbxinterface/libzbxinterface.a \
@@ -2398,10 +2384,6 @@ if test "x$DB_CFLAGS" != "x"; then
 	echo "    database:              ${DB_CFLAGS}"
 fi
 
-if test "x$LIBPCRE_CFLAGS" != "x"; then
-	echo "    libpcre:               ${LIBPCRE_CFLAGS}"
-fi
-
 if test "x$LIBPCRE2_CFLAGS" != "x"; then
 	echo "    libpcre2:              ${LIBPCRE2_CFLAGS}"
 fi
@@ -2412,6 +2394,10 @@ fi
 
 if test "x$UNIXODBC_CFLAGS" != "x"; then
 	echo "    unixODBC:              ${UNIXODBC_CFLAGS}"
+fi
+
+if test "x$ARES_CFLAGS" != "x"; then
+	echo "    c-ares:              ${ARES_CFLAGS}"
 fi
 
 if test "x$SNMP_CFLAGS" != "x"; then

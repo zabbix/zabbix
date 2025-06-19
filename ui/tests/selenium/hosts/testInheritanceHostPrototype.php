@@ -14,8 +14,8 @@
 **/
 
 
-require_once dirname(__FILE__).'/../../include/CLegacyWebTest.php';
-require_once dirname(__FILE__).'/../behaviors/CMacrosBehavior.php';
+require_once __DIR__.'/../../include/CLegacyWebTest.php';
+require_once __DIR__.'/../behaviors/CMacrosBehavior.php';
 
 /**
  * Test the creation of inheritance of new objects on a previously linked template.
@@ -192,8 +192,7 @@ class testInheritanceHostPrototype extends CLegacyWebTest {
 		$this->page->waitUntilReady();
 
 		$this->zbxTestWaitUntilMessageTextPresent('msg-good', 'Host added');
-
-		COverlayDialogElement::ensureNotPresent();
+		$dialog->ensureNotPresent();
 
 		// DB check.
 		$hosts_templates = 'SELECT NULL'.
@@ -231,7 +230,7 @@ class testInheritanceHostPrototype extends CLegacyWebTest {
 						' WHERE flags=2 AND hostid IN ('.
 							'SELECT hostid'.
 							' FROM host_discovery'.
-							' WHERE parent_itemid IN ('.
+							' WHERE lldruleid IN ('.
 								'SELECT itemid'.
 								' FROM items'.
 								' WHERE hostid in ('.

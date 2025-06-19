@@ -58,13 +58,15 @@ static void	db_insert_clear_rows(zbx_db_insert_t *db_insert)
 
 /******************************************************************************
  *                                                                            *
- * Purpose: releases resources allocated by bulk insert operations            *
+ * Purpose: release resources allocated by bulk insert operations             *
  *                                                                            *
- * Parameters: self        - [IN] the bulk insert data                        *
+ * Parameters: db_insert   - [IN] the bulk insert data                        *
  *                                                                            *
  ******************************************************************************/
 void	zbx_db_insert_clean(zbx_db_insert_t *db_insert)
 {
+	zbx_free(db_insert->clause);
+
 	db_insert_clear_rows(db_insert);
 	zbx_vector_db_value_ptr_destroy(&db_insert->rows);
 
@@ -107,6 +109,7 @@ void	zbx_dbconn_prepare_insert_dyn(zbx_dbconn_t *db, zbx_db_insert_t *db_insert,
 	db_insert->autoincrement = -1;
 	db_insert->lastid = 0;
 	db_insert->batch_size = 0;
+	db_insert->clause = NULL;
 
 	zbx_vector_const_db_field_ptr_create(&db_insert->fields);
 	zbx_vector_db_value_ptr_create(&db_insert->rows);
@@ -336,14 +339,17 @@ static void	decode_and_escape_binary_value_for_sql(zbx_dbconn_t *db, char **sql_
 
 	zbx_base64_decode(*sql_insert_data, binary_data, binary_data_max_len, &binary_data_len);
 
+	if (0 == binary_data_len)
+		goto out;
 #if defined (HAVE_MYSQL)
-	escaped_binary = (char*)zbx_malloc(NULL, 2 * binary_data_len);
+		escaped_binary = (char*)zbx_malloc(NULL, 2 * binary_data_len);
 #endif
 	dbconn_escape_bin(db, binary_data, &escaped_binary, binary_data_len);
 
-	zbx_free(binary_data);
 	zbx_free(*sql_insert_data);
 	*sql_insert_data = escaped_binary;
+out:
+	zbx_free(binary_data);
 }
 #else
 static void	decode_and_escape_binary_value_for_sql(zbx_dbconn_t *db, char **sql_insert_data)
@@ -491,8 +497,10 @@ int	zbx_db_insert_execute(zbx_db_insert_t *db_insert)
 					break;
 				case ZBX_TYPE_BLOB:
 					zbx_chrcpy_alloc(&sql, &sql_alloc, &sql_offset, '\'');
-					decode_and_escape_binary_value_for_sql(db_insert->db, &(value->str));
-					zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, value->str);
+					if (NULL != value->str)
+						decode_and_escape_binary_value_for_sql(db_insert->db, &(value->str));
+					if (NULL != value->str)
+						zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, value->str);
 					zbx_chrcpy_alloc(&sql, &sql_alloc, &sql_offset, '\'');
 					break;
 				case ZBX_TYPE_INT:
@@ -521,8 +529,11 @@ int	zbx_db_insert_execute(zbx_db_insert_t *db_insert)
 
 		zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, ")" ZBX_ROW_DL);
 
-		if (SUCCEED != (ret = zbx_dbconn_execute_overflowed_sql(db_insert->db, &sql, &sql_alloc, &sql_offset)))
+		if (SUCCEED != (ret = zbx_dbconn_execute_overflowed_sql(db_insert->db, &sql, &sql_alloc, &sql_offset,
+				db_insert->clause)))
+		{
 			goto out;
+		}
 	}
 
 	if (0 != sql_offset)
@@ -531,6 +542,9 @@ int	zbx_db_insert_execute(zbx_db_insert_t *db_insert)
 		if (',' == sql[sql_offset - 1])
 		{
 			sql_offset--;
+			if (NULL != db_insert->clause)
+				zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, db_insert->clause);
+
 			zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, ";\n");
 		}
 #endif
@@ -576,6 +590,18 @@ void	zbx_db_insert_autoincrement(zbx_db_insert_t *db_insert, const char *field_n
 
 /******************************************************************************
  *                                                                            *
+ * Purpose: adds clause to insert statement                                   *
+ *                                                                            *
+ * Parameters: self - [IN] the bulk insert data                               *
+ *                                                                            *
+ ******************************************************************************/
+void	zbx_db_insert_clause(zbx_db_insert_t *self, const char *clause)
+{
+	self->clause = zbx_strdup(self->clause, clause);
+}
+
+/******************************************************************************
+ *                                                                            *
  * Purpose: return the last id assigned by autoincrement                      *
  *                                                                            *
  ******************************************************************************/
@@ -598,4 +624,14 @@ zbx_uint64_t	zbx_db_insert_get_lastid(zbx_db_insert_t *self)
 void	zbx_db_insert_set_batch_size(zbx_db_insert_t *self, int batch_size)
 {
 	self->batch_size = batch_size;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: get number of rows to be inserted                                 *
+ *                                                                            *
+ ******************************************************************************/
+int	zbx_db_insert_get_row_count(zbx_db_insert_t *self)
+{
+	return self->rows.values_num;
 }

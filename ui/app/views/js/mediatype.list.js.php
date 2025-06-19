@@ -23,9 +23,9 @@
 	const view = new class {
 
 		init() {
-			document.getElementById('js-create').addEventListener('click', () =>
-				window.popupManagerInstance.openPopup('mediatype.edit', {})
-			);
+			document.getElementById('js-create').addEventListener('click', () => {
+				ZABBIX.PopupManager.open('mediatype.edit');
+			});
 
 			document.getElementById('js-massenable').addEventListener('click', (e) =>
 				this.#enable(e.target, Object.keys(chkbxRange.getSelectedIds()), true)
@@ -56,7 +56,17 @@
 				}
 			});
 
-			this.#setSubmitCallback();
+			this.#initPopupListeners();
+		}
+
+		#initPopupListeners() {
+			ZABBIX.EventHub.subscribe({
+				require: {
+					context: CPopupManager.EVENT_CONTEXT,
+					event: CPopupManagerEvent.EVENT_SUBMIT
+				},
+				callback: () => uncheckTableRows('mediatype')
+			});
 		}
 
 		/**
@@ -183,21 +193,6 @@
 					addMessage(message_box);
 				})
 				.finally(() => target.classList.remove('is-loading'));
-		}
-
-		#setSubmitCallback() {
-			window.popupManagerInstance.setSubmitCallback((e) => {
-				if ('success' in e.detail) {
-					postMessageOk(e.detail.success.title);
-
-					if ('messages' in e.detail.success) {
-						postMessageDetails('success', e.detail.success.messages);
-					}
-				}
-
-				uncheckTableRows('mediatype');
-				location.href = location.href;
-			});
 		}
 	};
 </script>

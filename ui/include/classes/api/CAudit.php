@@ -86,6 +86,7 @@ class CAudit {
 	public const RESOURCE_HISTORY = 53;
 	public const RESOURCE_MFA = 54;
 	public const RESOURCE_PROXY_GROUP = 55;
+	public const RESOURCE_LLD_RULE_PROTOTYPE = 56;
 
 	/**
 	 * Audit details actions.
@@ -111,17 +112,15 @@ class CAudit {
 	 */
 	private const TABLE_NAMES = [
 		self::RESOURCE_ACTION => 'actions',
-		self::RESOURCE_AUTHENTICATION => 'config',
 		self::RESOURCE_AUTH_TOKEN => 'token',
-		self::RESOURCE_AUTOREGISTRATION => 'config',
 		self::RESOURCE_CONNECTOR => 'connector',
 		self::RESOURCE_CORRELATION => 'correlation',
 		self::RESOURCE_DASHBOARD => 'dashboard',
 		self::RESOURCE_LLD_RULE => 'items',
+		self::RESOURCE_LLD_RULE_PROTOTYPE => 'items',
 		self::RESOURCE_HOST => 'hosts',
 		self::RESOURCE_HOST_GROUP => 'hstgrp',
 		self::RESOURCE_HOST_PROTOTYPE => 'hosts',
-		self::RESOURCE_HOUSEKEEPING => 'config',
 		self::RESOURCE_ICON_MAP => 'icon_map',
 		self::RESOURCE_IMAGE => 'images',
 		self::RESOURCE_ITEM => 'items',
@@ -138,7 +137,6 @@ class CAudit {
 		self::RESOURCE_SCENARIO => 'httptest',
 		self::RESOURCE_SCHEDULED_REPORT => 'report',
 		self::RESOURCE_SCRIPT => 'scripts',
-		self::RESOURCE_SETTINGS => 'config',
 		self::RESOURCE_SLA => 'sla',
 		self::RESOURCE_TEMPLATE => 'hosts',
 		self::RESOURCE_TEMPLATE_DASHBOARD => 'dashboard',
@@ -155,7 +153,6 @@ class CAudit {
 	 * @var array
 	 */
 	private const ID_FIELD_NAMES = [
-		self::RESOURCE_PROXY => 'proxyid',
 		self::RESOURCE_TEMPLATE => 'templateid'
 	];
 
@@ -167,17 +164,15 @@ class CAudit {
 	 */
 	private const FIELD_NAMES = [
 		self::RESOURCE_ACTION => 'name',
-		self::RESOURCE_AUTHENTICATION => null,
 		self::RESOURCE_AUTH_TOKEN => 'name',
-		self::RESOURCE_AUTOREGISTRATION => null,
 		self::RESOURCE_CONNECTOR => 'name',
 		self::RESOURCE_CORRELATION => 'name',
 		self::RESOURCE_DASHBOARD => 'name',
 		self::RESOURCE_LLD_RULE => 'name',
+		self::RESOURCE_LLD_RULE_PROTOTYPE => 'name',
 		self::RESOURCE_HOST => 'host',
 		self::RESOURCE_HOST_GROUP => 'name',
 		self::RESOURCE_HOST_PROTOTYPE => 'host',
-		self::RESOURCE_HOUSEKEEPING => null,
 		self::RESOURCE_ICON_MAP => 'name',
 		self::RESOURCE_IMAGE => 'name',
 		self::RESOURCE_ITEM => 'name',
@@ -194,7 +189,6 @@ class CAudit {
 		self::RESOURCE_SCENARIO => 'name',
 		self::RESOURCE_SCHEDULED_REPORT => 'name',
 		self::RESOURCE_SCRIPT => 'name',
-		self::RESOURCE_SETTINGS => null,
 		self::RESOURCE_SLA => 'name',
 		self::RESOURCE_TEMPLATE => 'host',
 		self::RESOURCE_TEMPLATE_DASHBOARD => 'name',
@@ -219,6 +213,7 @@ class CAudit {
 		self::RESOURCE_CORRELATION => 'correlation',
 		self::RESOURCE_DASHBOARD => 'dashboard',
 		self::RESOURCE_LLD_RULE => 'discoveryrule',
+		self::RESOURCE_LLD_RULE_PROTOTYPE => 'discoveryruleprototype',
 		self::RESOURCE_HOST => 'host',
 		self::RESOURCE_HOST_GROUP => 'hostgroup',
 		self::RESOURCE_HOST_PROTOTYPE => 'hostprototype',
@@ -292,6 +287,25 @@ class CAudit {
 			],
 			['paths' => ['discoveryrule.ssl_key_password'], 'conditions' => ['type' => ITEM_TYPE_HTTPAGENT]]
 		],
+		self::RESOURCE_LLD_RULE_PROTOTYPE => [
+			[
+				'paths' => ['discoveryruleprototype.password'],
+				'conditions' => [
+					[
+						'type' => [ITEM_TYPE_SIMPLE, ITEM_TYPE_DB_MONITOR, ITEM_TYPE_SSH, ITEM_TYPE_TELNET,
+							ITEM_TYPE_JMX
+						]
+					],
+					[
+						'type' => ITEM_TYPE_HTTPAGENT,
+						'authtype' => [ZBX_HTTP_AUTH_BASIC, ZBX_HTTP_AUTH_NTLM, ZBX_HTTP_AUTH_KERBEROS,
+							ZBX_HTTP_AUTH_DIGEST
+						]
+					]
+				]
+			],
+			['paths' => ['discoveryruleprototype.ssl_key_password'], 'conditions' => ['type' => ITEM_TYPE_HTTPAGENT]]
+		],
 		self::RESOURCE_HOST_PROTOTYPE => [
 			'paths' => ['hostprototype.macros.value'],
 			'conditions' => ['type' => ZBX_MACRO_TYPE_SECRET]
@@ -339,16 +353,16 @@ class CAudit {
 			'conditions' => ['type' => ZBX_MACRO_TYPE_SECRET]
 		],
 		self::RESOURCE_MEDIA_TYPE => [
-			'paths' => ['mediatype.passwd'],
-			'conditions' => [
-				[
-					'provider' => [CMediatypeHelper::EMAIL_PROVIDER_SMTP, CMediatypeHelper::EMAIL_PROVIDER_GMAIL_RELAY,
-						CMediatypeHelper::EMAIL_PROVIDER_OFFICE365_RELAY
-					],
-					'smtp_authentication' => SMTP_AUTHENTICATION_NORMAL
-				],
-				[
-					'provider' => [CMediatypeHelper::EMAIL_PROVIDER_GMAIL, CMediatypeHelper::EMAIL_PROVIDER_OFFICE365]
+			[
+				'paths' => ['mediatype.passwd'],
+				'conditions' => [
+					['smtp_authentication' => SMTP_AUTHENTICATION_PASSWORD]
+				]
+			],
+			[
+				'paths' => ['mediatype.client_secret', 'mediatype.access_token', 'mediatype.refresh_token'],
+				'conditions' => [
+					['smtp_authentication' => SMTP_AUTHENTICATION_OAUTH]
 				]
 			]
 		],
@@ -425,6 +439,24 @@ class CAudit {
 		'discoveryrule.overrides.operations.optrends' => 'lld_override_optrends',
 		'discoveryrule.parameters' => 'item_parameter',
 		'discoveryrule.preprocessing' => 'item_preproc',
+		'discoveryruleprototype.filter' => 'items',
+		'discoveryruleprototype.filter.conditions' => 'item_condition',
+		'discoveryruleprototype.lld_macro_paths' => 'lld_macro_path',
+		'discoveryruleprototype.overrides' => 'lld_override',
+		'discoveryruleprototype.overrides.filter' => 'lld_override',
+		'discoveryruleprototype.overrides.filter.conditions' => 'lld_override_condition',
+		'discoveryruleprototype.overrides.operations' => 'lld_override_operation',
+		'discoveryruleprototype.overrides.operations.opdiscover' => 'lld_override_opdiscover',
+		'discoveryruleprototype.overrides.operations.ophistory' => 'lld_override_ophistory',
+		'discoveryruleprototype.overrides.operations.opinventory' => 'lld_override_opinventory',
+		'discoveryruleprototype.overrides.operations.opperiod' => 'lld_override_opperiod',
+		'discoveryruleprototype.overrides.operations.opseverity' => 'lld_override_opseverity',
+		'discoveryruleprototype.overrides.operations.opstatus' => 'lld_override_opstatus',
+		'discoveryruleprototype.overrides.operations.optag' => 'lld_override_optag',
+		'discoveryruleprototype.overrides.operations.optemplate' => 'lld_override_optemplate',
+		'discoveryruleprototype.overrides.operations.optrends' => 'lld_override_optrends',
+		'discoveryruleprototype.parameters' => 'item_parameter',
+		'discoveryruleprototype.preprocessing' => 'item_preproc',
 		'hostgroup.hosts' => 'hosts_groups',
 		'hostprototype.groupLinks' => 'group_prototype',
 		'hostprototype.groupPrototypes' => 'group_prototype',
@@ -526,6 +558,17 @@ class CAudit {
 		'discoveryrule.parameters' => 'item_parameterid',
 		'discoveryrule.preprocessing' => 'item_preprocid',
 		'discoveryrule.query_fields' => 'sortorder',
+		'discoveryruleprototype.filter.conditions' => 'item_conditionid',
+		'discoveryruleprototype.headers' => 'sortorder',
+		'discoveryruleprototype.lld_macro_paths' => 'lld_macro_pathid',
+		'discoveryruleprototype.overrides' => 'lld_overrideid',
+		'discoveryruleprototype.overrides.filter.conditions' => 'lld_override_conditionid',
+		'discoveryruleprototype.overrides.operations' => 'lld_override_operationid',
+		'discoveryruleprototype.overrides.operations.optag' => 'lld_override_optagid',
+		'discoveryruleprototype.overrides.operations.optemplate' => 'lld_override_optemplateid',
+		'discoveryruleprototype.parameters' => 'item_parameterid',
+		'discoveryruleprototype.preprocessing' => 'item_preprocid',
+		'discoveryruleprototype.query_fields' => 'sortorder',
 		'hostgroup.hosts' => 'hostgroupid',
 		'hostprototype.groupLinks' => 'group_prototypeid',
 		'hostprototype.groupPrototypes' => 'group_prototypeid',
@@ -565,6 +608,7 @@ class CAudit {
 		'sla.excluded_downtimes' => 'sla_excluded_downtimeid',
 		'template.groups' => 'hostgroupid',
 		'template.macros' => 'hostmacroid',
+		'template.macros.config.options' => null,
 		'template.tags' => 'hosttagid',
 		'template.templates' => 'hosttemplateid',
 		'template.templates_clear' => 'hosttemplateid',
@@ -644,18 +688,41 @@ class CAudit {
 				break;
 
 			default:
-				$table_key = array_key_exists($resource, self::ID_FIELD_NAMES)
-					? self::ID_FIELD_NAMES[$resource]
-					: DB::getPk(self::TABLE_NAMES[$resource]);
+				if (array_key_exists($resource, self::ID_FIELD_NAMES)) {
+					$pk = self::ID_FIELD_NAMES[$resource];
+				}
+				elseif (array_key_exists($resource, self::TABLE_NAMES)) {
+					$pk = DB::getPk(self::TABLE_NAMES[$resource]);
+				}
+				else {
+					$diff = self::handleObjectDiff($resource, $action, reset($objects), reset($db_objects));
+
+					if (!$diff) {
+						return;
+					}
+
+					$auditlog[] = [
+						'userid' => $userid,
+						'username' => $username,
+						'clock' => $clock,
+						'ip' => $ip,
+						'action' => $action,
+						'resourcetype' => $resource,
+						'resourceid' => null,
+						'resourcename' => '',
+						'recordsetid' => $recordsetid,
+						'details' => json_encode($diff)
+					];
+
+					break;
+				}
 
 				foreach ($objects as $object) {
-					$resourceid = $object[$table_key];
-					$db_object = ($action == self::ACTION_UPDATE) ? $db_objects[$resourceid] : [];
-					$resource_name = self::getResourceName($resource, $action, $object, $db_object);
-
+					$resourceid = $object[$pk];
+					$db_object = $action == self::ACTION_UPDATE ? $db_objects[$resourceid] : [];
 					$diff = self::handleObjectDiff($resource, $action, $object, $db_object);
 
-					if ($action == self::ACTION_UPDATE && count($diff) === 0) {
+					if ($action == self::ACTION_UPDATE && !$diff) {
 						continue;
 					}
 
@@ -667,9 +734,9 @@ class CAudit {
 						'action' => $action,
 						'resourcetype' => $resource,
 						'resourceid' => $resourceid,
-						'resourcename' => $resource_name,
+						'resourcename' => self::getResourceName($resource, $action, $object, $db_object),
 						'recordsetid' => $recordsetid,
-						'details' => (count($diff) == 0) ? '' : json_encode($diff)
+						'details' => $diff ? json_encode($diff) : ''
 					];
 				}
 		}
@@ -749,61 +816,49 @@ class CAudit {
 				return self::handleAdd($resource, $details);
 
 			case self::ACTION_UPDATE:
-				$db_details = self::convertKeysToPaths($api_name,
-					self::intersectObjects($api_name, $db_object, $object)
-				);
+				self::intersectObjectFields($api_name, $db_object, $object);
+
+				$db_details = self::convertKeysToPaths($api_name, $db_object);
 
 				return self::handleUpdate($resource, $details, $db_details);
 		}
 	}
 
-	/**
-	 * Computes the intersection of $db_object and $object using keys for comparison.
-	 * Recursively removes $db_object properties if they are not present in $object.
-	 *
-	 * @param string $path
-	 * @param array  $db_object
-	 * @param array  $object
-	 *
-	 * @return array
-	 */
-	private static function intersectObjects(string $path, array $db_object, array $object): array {
-		foreach ($db_object as $db_key => &$db_value) {
-			if (is_string($db_key) && !array_key_exists($db_key, $object)) {
-				unset($db_object[$db_key]);
+	private static function intersectObjectFields(string $path, array &$db_object, array $object): void {
+		foreach ($db_object as $field => &$db_value) {
+			if (!array_key_exists($field, $object)) {
+				unset($db_object[$field]);
+
 				continue;
 			}
 
-			if (!is_array($db_value)) {
-				continue;
+			if (is_array($db_value) && $db_value) {
+				ctype_digit((string) key($db_value))
+					? self::intersectNestedObjects($path.'.'.$field, $db_value, $object[$field])
+					: self::intersectObjectFields($path.'.'.$field, $db_value, $object[$field]);
 			}
-
-			$key = $db_key;
-			$subpath = $path.'.'.$db_key;
-
-			if (is_int($db_key)) {
-				$key = null;
-
-				$pk = self::NESTED_OBJECTS_ID_FIELD_NAMES[$path];
-
-				foreach ($object as $i => $nested_object) {
-					if (bccomp($nested_object[$pk], $db_key) == 0) {
-						$key = $i;
-						$subpath = $path;
-						break;
-					}
-				}
-
-				if ($key === null) {
-					continue;
-				}
-			}
-
-			$db_value = self::intersectObjects($subpath, $db_value, $object[$key]);
 		}
 		unset($db_value);
+	}
 
-		return $db_object;
+	private static function intersectNestedObjects(string $path, array &$db_objects, array $objects): void {
+		$id_field_name = self::NESTED_OBJECTS_ID_FIELD_NAMES[$path];
+
+		if ($id_field_name === null) {
+			foreach ($db_objects as $i => &$db_object) {
+				if (array_key_exists($i, $objects)) {
+					self::intersectObjectFields($path, $db_object, $objects[$i]);
+				}
+			}
+			unset($db_object);
+		}
+		else {
+			foreach ($objects as $object) {
+				if (array_key_exists($object[$id_field_name], $db_objects)) {
+					self::intersectObjectFields($path, $db_objects[$object[$id_field_name]], $object);
+				}
+			}
+		}
 	}
 
 	/**
@@ -888,41 +943,40 @@ class CAudit {
 	private static function convertKeysToPaths(string $path, array $object): array {
 		$result = [];
 
-		$is_field_of_another_object = strpos($path, '.') !== false && !preg_match('/\[[0-9]+\]$/', $path);
-		$is_array_of_objects = false;
+		$is_nested_object_field = strpos($path, '.') !== false && !preg_match('/\[[0-9]+\]$/', $path);
 
-		if ($is_field_of_another_object) {
+		if ($is_nested_object_field) {
 			$abstract_path = self::getAbstractPath($path);
 			$is_array_of_objects = array_key_exists($abstract_path, self::NESTED_OBJECTS_ID_FIELD_NAMES);
 
 			if ($is_array_of_objects) {
+				$objects = $object;
 				$id_field_name = self::NESTED_OBJECTS_ID_FIELD_NAMES[$abstract_path];
+
+				foreach ($objects as $i => $object) {
+					$path_to_object = $id_field_name === null
+						? $path.'['.$i.']'
+						: $path.'['.$object[$id_field_name].']';
+
+					$result += self::convertKeysToPaths($path_to_object, $object);
+				}
+
+				return $result;
 			}
 		}
 
-		if ($is_array_of_objects) {
-			$objects = $object;
+		foreach ($object as $field => $value) {
+			$path_to_field = $path.'.'.$field;
 
-			foreach ($objects as $object) {
-				$path_to_object = $path.'['.$object[$id_field_name].']';
-
-				$result += self::convertKeysToPaths($path_to_object, $object);
+			if (in_array(self::getAbstractPath($path_to_field), self::SKIP_FIELDS)) {
+				continue;
 			}
-		}
-		else {
-			foreach ($object as $field => $value) {
-				$path_to_field = $path.'.'.$field;
 
-				if (in_array(self::getAbstractPath($path_to_field), self::SKIP_FIELDS)) {
-					continue;
-				}
-
-				if (is_array($value)) {
-					$result += self::convertKeysToPaths($path_to_field, $value);
-				}
-				else {
-					$result[$path_to_field] = (string) $value;
-				}
+			if (is_array($value)) {
+				$result += self::convertKeysToPaths($path_to_field, $value);
+			}
+			else {
+				$result[$path_to_field] = (string) $value;
 			}
 		}
 

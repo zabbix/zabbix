@@ -1,52 +1,38 @@
 zabbix_export:
   version: '7.4'
   media_types:
-    -
-      name: 'SolarWinds Service Desk'
+    - name: 'SolarWinds Service Desk'
       type: WEBHOOK
       parameters:
-        -
-          name: alert_message
+        - name: alert_message
           value: '{ALERT.MESSAGE}'
-        -
-          name: alert_subject
+        - name: alert_subject
           value: '{ALERT.SUBJECT}'
-        -
-          name: event_nseverity
+        - name: event_nseverity
           value: '{EVENT.NSEVERITY}'
-        -
-          name: event_recovery_value
+        - name: event_recovery_value
           value: '{EVENT.RECOVERY.VALUE}'
-        -
-          name: event_source
+        - name: event_source
           value: '{EVENT.SOURCE}'
-        -
-          name: event_update_status
+        - name: event_update_status
           value: '{EVENT.UPDATE.STATUS}'
-        -
-          name: event_value
+        - name: event_value
           value: '{EVENT.VALUE}'
-        -
-          name: priority_average
+        - name: priority_average
           value: Medium
-        -
-          name: priority_default
+        - name: priority_default
           value: Low
-        -
-          name: priority_disaster
+        - name: priority_disaster
           value: Critical
-        -
-          name: priority_high
+        - name: priority_high
           value: High
-        -
-          name: samanage_incident_id
+        - name: samanage_incident_id
           value: '{EVENT.TAGS.__zbx_solarwinds_inc_id}'
-        -
-          name: samanage_token
+        - name: samanage_token
           value: '<PUT YOUR TOKEN HERE>'
-        -
-          name: samanage_url
+        - name: samanage_url
           value: '<PUT YOUR INSTANCE URL HERE>'
+      status: DISABLED
       script: |
         var SolarWinds = {
             params: {},
@@ -329,8 +315,7 @@ zabbix_export:
       event_menu_url: '{EVENT.TAGS.__zbx_solarwinds_inc_link}'
       event_menu_name: 'SolarWinds incident ID: {EVENT.TAGS.__zbx_solarwinds_inc_id}'
       message_templates:
-        -
-          event_source: TRIGGERS
+        - event_source: TRIGGERS
           operation_mode: PROBLEM
           subject: '[{EVENT.STATUS}] {EVENT.NAME}'
           message: |
@@ -342,8 +327,7 @@ zabbix_export:
             Original problem ID: {EVENT.ID}
             
             Trigger description: {TRIGGER.DESCRIPTION}
-        -
-          event_source: TRIGGERS
+        - event_source: TRIGGERS
           operation_mode: RECOVERY
           subject: '[{EVENT.STATUS}] {EVENT.NAME}'
           message: |
@@ -353,8 +337,7 @@ zabbix_export:
             Severity: {EVENT.SEVERITY}
             Original problem ID: {EVENT.ID}
             {TRIGGER.URL}
-        -
-          event_source: TRIGGERS
+        - event_source: TRIGGERS
           operation_mode: UPDATE
           subject: '[{EVENT.STATUS}] {EVENT.NAME}'
           message: |
@@ -362,8 +345,7 @@ zabbix_export:
             {EVENT.UPDATE.MESSAGE}
             
             Current problem status is {EVENT.STATUS}, acknowledged: {EVENT.ACK.STATUS}.
-        -
-          event_source: DISCOVERY
+        - event_source: DISCOVERY
           operation_mode: PROBLEM
           subject: 'Discovery: {DISCOVERY.DEVICE.STATUS} {DISCOVERY.DEVICE.IPADDRESS}'
           message: |
@@ -378,8 +360,7 @@ zabbix_export:
             Device service port: {DISCOVERY.SERVICE.PORT}
             Device service status: {DISCOVERY.SERVICE.STATUS}
             Device service uptime: {DISCOVERY.SERVICE.UPTIME}
-        -
-          event_source: AUTOREGISTRATION
+        - event_source: AUTOREGISTRATION
           operation_mode: PROBLEM
           subject: 'Autoregistration: {HOST.HOST}'
           message: |

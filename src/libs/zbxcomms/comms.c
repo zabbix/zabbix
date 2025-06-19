@@ -74,6 +74,11 @@ zbx_config_tls_t	*zbx_config_tls_new(void)
 	config_tls->cipher_all		= NULL;
 	config_tls->cipher_cmd13	= NULL;
 	config_tls->cipher_cmd		= NULL;
+	config_tls->tls_listen		= NULL;
+	config_tls->frontend_accept	= NULL;
+	config_tls->frontend_cert_issuer	= NULL;
+	config_tls->frontend_cert_subject	= NULL;
+	config_tls->frontend_accept_modes	= ZBX_TCP_SEC_UNENCRYPTED;
 
 	return config_tls;
 }
@@ -98,6 +103,10 @@ void	zbx_config_tls_free(zbx_config_tls_t *config_tls)
 	zbx_free(config_tls->cipher_all);
 	zbx_free(config_tls->cipher_cmd13);
 	zbx_free(config_tls->cipher_cmd);
+	zbx_free(config_tls->frontend_accept);
+	zbx_free(config_tls->tls_listen);
+	zbx_free(config_tls->frontend_cert_issuer);
+	zbx_free(config_tls->frontend_cert_subject);
 
 	zbx_free(config_tls);
 }
@@ -239,11 +248,11 @@ int	zbx_inet_pton(int af, const char *src, void *dst)
 	return FAIL;
 }
 
-int	zbx_inet_ntop(struct addrinfo *ai, char *ip, socklen_t len)
+int	zbx_inet_ntop(struct sockaddr *ai_addr, char *ip, socklen_t len)
 {
-	if (AF_INET == ai->ai_addr->sa_family)
+	if (AF_INET == ai_addr->sa_family)
 	{
-		const struct sockaddr_in	*sin = (const struct sockaddr_in *) (void *)ai->ai_addr;
+		const struct sockaddr_in	*sin = (const struct sockaddr_in *) (void *)ai_addr;
 
 		if (NULL == inet_ntop(AF_INET, &sin->sin_addr, ip, len))
 		{
@@ -253,9 +262,9 @@ int	zbx_inet_ntop(struct addrinfo *ai, char *ip, socklen_t len)
 
 		return SUCCEED;
 	}
-	else if (AF_INET6 == ai->ai_addr->sa_family)
+	else if (AF_INET6 == ai_addr->sa_family)
 	{
-		const struct sockaddr_in6	*sin6 = (const struct sockaddr_in6 *) (void *)ai->ai_addr;
+		const struct sockaddr_in6	*sin6 = (const struct sockaddr_in6 *) (void *)ai_addr;
 
 		if (NULL == inet_ntop(AF_INET6, &sin6->sin6_addr, ip, len))
 		{
@@ -266,7 +275,7 @@ int	zbx_inet_ntop(struct addrinfo *ai, char *ip, socklen_t len)
 		return SUCCEED;
 	}
 
-	zabbix_log(LOG_LEVEL_DEBUG, "unknown address family:%d", ai->ai_addr->sa_family);
+	zabbix_log(LOG_LEVEL_DEBUG, "unknown address family:%d", ai_addr->sa_family);
 	return FAIL;
 }
 
@@ -290,7 +299,7 @@ void	zbx_getip_by_host(const char *host, char *ip, size_t iplen)
 		goto out;
 	}
 
-	if (FAIL == zbx_inet_ntop(ai, ip, (socklen_t)iplen))
+	if (FAIL == zbx_inet_ntop(ai->ai_addr, ip, (socklen_t)iplen))
 		ip[0] = '\0';
 out:
 	if (NULL != ai)
@@ -822,7 +831,8 @@ int	zbx_tcp_send_context_init(const char *data, size_t len, size_t reserved, uns
 	if (ZBX_MAX_RECV_LARGE_DATA_SIZE < len)
 	{
 		zbx_set_socket_strerror("cannot send data: message size " ZBX_FS_UI64 " exceeds the maximum"
-				" size " ZBX_FS_UI64 " bytes.", (zbx_uint64_t)len, ZBX_MAX_RECV_LARGE_DATA_SIZE);
+				" size " ZBX_FS_UI64 " bytes.", (zbx_uint64_t)len,
+				(zbx_uint64_t)ZBX_MAX_RECV_LARGE_DATA_SIZE);
 		return FAIL;
 	}
 
@@ -830,7 +840,7 @@ int	zbx_tcp_send_context_init(const char *data, size_t len, size_t reserved, uns
 	{
 		zbx_set_socket_strerror("cannot send data: uncompressed message size " ZBX_FS_UI64
 				" exceeds the maximum size " ZBX_FS_UI64 " bytes.", (zbx_uint64_t)reserved,
-				ZBX_MAX_RECV_LARGE_DATA_SIZE);
+				(zbx_uint64_t)ZBX_MAX_RECV_LARGE_DATA_SIZE);
 		return FAIL;
 	}
 
@@ -1581,14 +1591,17 @@ void	zbx_tcp_unlisten(zbx_socket_t *s)
  * Parameters: s              - [IN/OUT] socket to listen                     *
  *             tls_accept     - [IN] TLS configuration                        *
  *             poll_timeout   - [IN] milliseconds to wait for connection      *
- *                                  (0 - don't wait, -1 - wait forever        *
+ *                                  0 - don't wait, -1 - wait forever         *
+ *             tls_listen     - [IN] allow unencrypted inbound                *
+ *             unencrypted_allowed_ip - [IN]                                  *
  *                                                                            *
  * Return value: SUCCEED       - success                                      *
  *               FAIL          - an error occurred                            *
  *               TIMEOUT_ERROR - no connections for the timeout period        *
  *                                                                            *
  ******************************************************************************/
-int	zbx_tcp_accept(zbx_socket_t *s, unsigned int tls_accept, int poll_timeout)
+int	zbx_tcp_accept(zbx_socket_t *s, unsigned int tls_accept, int poll_timeout, char *tls_listen,
+		const char *unencrypted_allowed_ip)
 {
 	ZBX_SOCKADDR	serv_addr;
 	ZBX_SOCKET	accepted_socket;
@@ -1720,6 +1733,23 @@ int	zbx_tcp_accept(zbx_socket_t *s, unsigned int tls_accept, int poll_timeout)
 		}
 
 		s->connection_type = ZBX_TCP_SEC_UNENCRYPTED;
+	}
+
+	s->max_len_limit = 0;
+
+	if (ZBX_TCP_SEC_UNENCRYPTED == s->connection_type && NULL != tls_listen)
+	{
+		if (NULL == unencrypted_allowed_ip || SUCCEED != zbx_tcp_check_allowed_peers(s, unencrypted_allowed_ip))
+		{
+			zbx_set_socket_strerror("from %s: unencrypted connections are not allowed", s->peer);
+			zbx_tcp_unaccept(s);
+			goto out;
+		}
+		else
+		{
+			/* stats request allowed exception when unencrypted connection not allowed */
+			s->max_len_limit = ZBX_MAX_RECV_2KB_DATA_SIZE;
+		}
 	}
 
 	zbx_socket_set_deadline(s, 0);
@@ -2003,8 +2033,18 @@ void	zbx_tcp_recv_context_init(zbx_socket_t *s, zbx_tcp_recv_context_t *tcp_recv
 #if defined(_WINDOWS)
 	tcp_recv_context->max_len = ZBX_MAX_RECV_DATA_SIZE;
 #else
-	tcp_recv_context->max_len = 0 != (flags & ZBX_TCP_LARGE) ? ZBX_MAX_RECV_LARGE_DATA_SIZE :
-			ZBX_MAX_RECV_DATA_SIZE;
+	if (0 != s->max_len_limit)
+	{
+		tcp_recv_context->max_len = s->max_len_limit;
+	}
+	else if (0 != (flags & ZBX_TCP_LARGE))
+	{
+		tcp_recv_context->max_len = ZBX_MAX_RECV_LARGE_DATA_SIZE;
+	}
+	else
+	{
+		tcp_recv_context->max_len = ZBX_MAX_RECV_DATA_SIZE;
+	}
 #endif
 	zbx_socket_free(s);
 	tcp_recv_context->allocated = 0;
@@ -2140,8 +2180,20 @@ ssize_t	zbx_tcp_recv_context(zbx_socket_t *s, zbx_tcp_recv_context_t *context, u
 			}
 			else
 			{
+				char	*buffer;
+
+				if (NULL == (buffer = (char *)malloc(context->expected_len + 1)))
+				{
+					zbx_set_socket_strerror("cannot allocate memory: out of memory");
+					zabbix_log(LOG_LEVEL_WARNING, "Message size " ZBX_FS_UI64
+							" from %s exceeds the available memory size."
+							" Message ignored.", context->expected_len, s->peer);
+					nbytes = ZBX_PROTO_ERROR;
+					goto out;
+				}
+
 				s->buf_type = ZBX_BUF_TYPE_DYN;
-				s->buffer = (char *)zbx_malloc(NULL, context->expected_len + 1);
+				s->buffer = buffer;
 				context->buf_dyn_bytes = context->buf_stat_bytes - context->offset;
 				context->buf_stat_bytes = 0;
 				memcpy(s->buffer, s->buf_stat + context->offset, context->buf_dyn_bytes);
@@ -2162,8 +2214,17 @@ ssize_t	zbx_tcp_recv_context(zbx_socket_t *s, zbx_tcp_recv_context_t *context, u
 			{
 				char	*out;
 				size_t	out_size = context->reserved;
+				if (NULL == (out = (char *)malloc(context->reserved + 1)))
+				{
+					zbx_set_socket_strerror("cannot allocate memory to uncompress data:"
+							" out of memory");
+					zabbix_log(LOG_LEVEL_WARNING, "Uncompressed message size " ZBX_FS_UI64
+							" from %s exceeds the available memory size."
+							" Message ignored.", context->reserved, s->peer);
+					nbytes = ZBX_PROTO_ERROR;
+					goto out;
+				}
 
-				out = (char *)zbx_malloc(NULL, context->reserved + 1);
 				if (FAIL == zbx_uncompress(s->buffer, context->buf_stat_bytes + context->buf_dyn_bytes,
 						out, &out_size))
 				{

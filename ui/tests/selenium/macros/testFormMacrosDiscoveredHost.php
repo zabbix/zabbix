@@ -14,14 +14,14 @@
 **/
 
 
-require_once dirname(__FILE__).'/../common/testFormMacros.php';
+require_once __DIR__.'/../common/testFormMacros.php';
 
 /**
  * @onBefore prepareDiscoveredHostMacrosData
  *
  * @dataSource GlobalMacros
  *
- * @backup hosts, config
+ * @backup hosts, settings
  */
 class testFormMacrosDiscoveredHost extends testFormMacros {
 
@@ -379,8 +379,8 @@ class testFormMacrosDiscoveredHost extends testFormMacros {
 
 		// Emulate host discoveries in DB.
 		foreach (self::$hosts as $host) {
-			DBexecute("INSERT INTO hosts (hostid, host, name, status, flags, description) VALUES (".zbx_dbstr($host['hostid']).
-					", ".zbx_dbstr($host['name']).", ".zbx_dbstr($host['name']).", 0, 4, '')"
+			DBexecute("INSERT INTO hosts (hostid, host, name, status, flags, description, readme) VALUES (".zbx_dbstr($host['hostid']).
+					", ".zbx_dbstr($host['name']).", ".zbx_dbstr($host['name']).", 0, 4, '', '')"
 			);
 			DBexecute("INSERT INTO host_discovery (hostid, parent_hostid) VALUES (".zbx_dbstr($host['hostid']).", ".
 					zbx_dbstr($prototypeids[$host['prototype_name']]).")"

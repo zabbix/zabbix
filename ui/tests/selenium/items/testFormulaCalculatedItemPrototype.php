@@ -14,10 +14,13 @@
 **/
 
 
-require_once dirname(__FILE__).'/../common/testCalculatedFormula.php';
+require_once __DIR__.'/../common/testCalculatedFormula.php';
 
 /**
  * @backup items
+ *
+ * TODO: remove ignoreBrowserErrors after DEV-4233
+ * @ignoreBrowserErrors
  */
 class testFormulaCalculatedItemPrototype extends testCalculatedFormula {
 
@@ -145,7 +148,9 @@ class testFormulaCalculatedItemPrototype extends testCalculatedFormula {
 				[
 					'expected' => TEST_BAD,
 					'formula' => 'bitand(last(/host/key,{#LLD}:now-24h),123)',
-					'error' => 'Invalid parameter "/1/params": invalid second parameter in function "last".'
+					'inline_error' => [
+						'Formula' => 'Invalid second parameter in function "last".'
+					]
 				]
 			],
 			[

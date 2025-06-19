@@ -3,6 +3,7 @@
 noinst_LIBRARIES = libzbxdbhigh.a
 
 libzbxdbhigh_a_SOURCES = \
+	db_settings.c \
 	db.c \
 	item.c \
 	maintenance.c \
@@ -11,7 +12,8 @@ libzbxdbhigh_a_SOURCES = \
 	tag.c \
 	item_param.c \
 	lld_override.c \
-	mediatype.c
+	mediatype.c \
+	sync.c
 
 libzbxdbhigh_a_CFLAGS = \
 	-I$(top_srcdir)/src/zabbix_server/ \

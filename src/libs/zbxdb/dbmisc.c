@@ -40,7 +40,9 @@ ZBX_PTR_VECTOR_IMPL(db_value_ptr, zbx_db_value_t *)
 
 const char	*idcache_tables[] = {"events", "event_tag", "problem_tag", "dservices", "dhosts", "alerts",
 					"escalations", "autoreg_host", "event_suppress", "trigger_queue",
-					"proxy_history", "proxy_dhistory", "proxy_autoreg_host", "host_proxy"};
+					"proxy_history", "proxy_dhistory", "proxy_autoreg_host", "host_proxy",
+					"lld_macro_export"
+};
 
 #define ZBX_IDS_SIZE	ARRSIZE(idcache_tables)
 
@@ -297,7 +299,8 @@ int	zbx_dbconn_flush_overflowed_sql(zbx_dbconn_t *db, char *sql, size_t sql_offs
  * Purpose: execute a set of SQL statements IF it is big enough               *
  *                                                                            *
  ******************************************************************************/
-int	zbx_dbconn_execute_overflowed_sql(zbx_dbconn_t *db, char **sql, size_t *sql_alloc, size_t *sql_offset)
+int	zbx_dbconn_execute_overflowed_sql(zbx_dbconn_t *db, char **sql, size_t *sql_alloc, size_t *sql_offset,
+			const char *clause)
 {
 	int	ret = SUCCEED;
 
@@ -307,10 +310,15 @@ int	zbx_dbconn_execute_overflowed_sql(zbx_dbconn_t *db, char **sql, size_t *sql_
 		if (',' == (*sql)[*sql_offset - 1])
 		{
 			(*sql_offset)--;
+
+			if (NULL != clause)
+				zbx_strcpy_alloc(sql, sql_alloc, sql_offset, clause);
+
 			zbx_strcpy_alloc(sql, sql_alloc, sql_offset, ";\n");
 		}
 #else
 		ZBX_UNUSED(sql_alloc);
+		ZBX_UNUSED(clause);
 #endif
 		/* For Oracle with max_overflow_sql_size == 0, jump over "begin\n" */
 		/* before execution. ZBX_SQL_EXEC_FROM is 0 for all other cases. */
@@ -812,6 +820,13 @@ void	zbx_db_config_validate(zbx_db_config_t *config)
 				" \"DBTLSKeyFile\", \"DBTLSCertFile\" or \"DBTLSCAFile\" is not defined");
 		exit(EXIT_FAILURE);
 	}
+
+	if (NULL != config->dbsocket && 0 != config->dbport)
+	{
+		zabbix_log(LOG_LEVEL_CRIT, "Both parameters \"DBPort\" and \"DBSocket\" are defined. Either one of "
+				"them can be defined, or neither.");
+		exit(EXIT_FAILURE);
+	}
 }
 #endif
 
@@ -820,7 +835,7 @@ void	zbx_db_config_validate(zbx_db_config_t *config)
  *                                                                            *
  * Purpose: retrieves TimescaleDB (TSDB) license information                  *
  *                                                                            *
- * Return value: license information from datase as string                    *
+ * Return value: license information from database as string                  *
  *               "apache"    for TimescaleDB Apache 2 Edition                 *
  *               "timescale" for TimescaleDB Community Edition                *
  *                                                                            *
@@ -856,11 +871,20 @@ int	zbx_dbconn_check_extension(zbx_dbconn_t *db, struct zbx_db_version_info_t *i
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
-	/* in case of major upgrade, db_extension may be missing */
-	if (FAIL == zbx_db_field_exists("config", "db_extension"))
-		goto out;
-
-	if (NULL == (result = zbx_dbconn_select(db, "select db_extension from config")))
+	if (SUCCEED == zbx_db_table_exists("settings"))
+	{
+		if (NULL == (result = zbx_dbconn_select(db,
+				"select value_str from settings where name='db_extension'")))
+		{
+			goto out;
+		}
+	}
+	else if (SUCCEED == zbx_db_field_exists("config", "db_extension"))
+	{
+		if (NULL == (result = zbx_dbconn_select(db, "select db_extension from config")))
+			goto out;
+	}
+	else
 		goto out;
 
 	if (NULL == (row = zbx_db_fetch(result)) || '\0' == *row[0])

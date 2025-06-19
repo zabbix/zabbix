@@ -274,28 +274,18 @@ class CTriggerGeneralHelper {
 	 * @param array $input_tags
 	 */
 	public static function getInheritedTags(array $data, array $input_tags): array {
-		$items = [];
-		$item_prototypes = [];
+		CItemGeneralHelper::findParentLldTemplateid($data);
 
-		foreach ($data['items'] as $item) {
-			if ($item['flags'] == ZBX_FLAG_DISCOVERY_NORMAL) {
-				$items[] = $item;
-			}
-			else {
-				$item_prototypes[] = $item;
-			}
-		}
+		$parent_templates = array_key_exists('parent_lld', $data)
+			? getItemParentTemplates([$data['parent_lld']], $data['parent_lld']['flags'])['templates']
+			: getItemParentTemplates($data['items'], ZBX_FLAG_DISCOVERY_NORMAL)['templates'];
+		unset($parent_templates[0]);
 
-		$item_parent_templates = getItemParentTemplates($items, ZBX_FLAG_DISCOVERY_NORMAL)['templates']
-			+ getItemParentTemplates($item_prototypes, ZBX_FLAG_DISCOVERY_PROTOTYPE)['templates'];
-
-		unset($item_parent_templates[0]);
-
-		$db_templates = $item_parent_templates
+		$db_templates = $parent_templates
 			? API::Template()->get([
 				'output' => ['templateid'],
 				'selectTags' => ['tag', 'value'],
-				'templateids' => array_keys($item_parent_templates),
+				'templateids' => array_keys($parent_templates),
 				'preservekeys' => true
 			])
 			: [];
@@ -303,7 +293,7 @@ class CTriggerGeneralHelper {
 		$inherited_tags = [];
 
 		// Make list of parent template tags.
-		foreach ($item_parent_templates as $templateid => $template) {
+		foreach ($parent_templates as $templateid => $template) {
 			if (array_key_exists($templateid, $db_templates)) {
 				foreach ($db_templates[$templateid]['tags'] as $tag) {
 					if (array_key_exists($tag['tag'], $inherited_tags)
@@ -409,11 +399,11 @@ class CTriggerGeneralHelper {
 		);
 		$trigger = reset($triggers);
 
-		if ($trigger['flags'] == ZBX_FLAG_DISCOVERY_PROTOTYPE) {
+		if ($trigger['flags'] & ZBX_FLAG_DISCOVERY_PROTOTYPE) {
 			unset($trigger['hostid']);
 		}
 		else {
-			$data['hostid'] = $trigger['hosts'][0]['hostid'];
+			$trigger['hostid'] = $trigger['hosts'][0]['hostid'];
 		}
 
 		if ($trigger['tags']) {
@@ -421,18 +411,11 @@ class CTriggerGeneralHelper {
 			$trigger['tags'] = array_values($trigger['tags']);
 		}
 
-		$data = [
+		return [
 			'description' => $trigger['comments'],
 			'name' => $trigger['description']
-		];
-
-		unset($trigger['comments'], $trigger['hosts'], $trigger['discoveryRule'], $trigger['flags'], $trigger['state'],
-			$trigger['templateid'], $trigger['triggerDiscovery'], $trigger['dependencies'], $trigger['correlation_tag'],
-			$trigger['items']
-		);
-
-		$data = array_merge($trigger, $data);
-
-		return $data;
+		] + array_diff_key($trigger, array_flip(['comments', 'hosts', 'flags', 'state', 'templateid',
+			'dependencies', 'correlation_tag', 'items', 'discoveryRule', 'discoveryRulePrototype', 'discoveryData'
+		]));
 	}
 }

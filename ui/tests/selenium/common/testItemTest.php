@@ -14,9 +14,9 @@
 **/
 
 
-require_once dirname(__FILE__).'/../../include/CWebTest.php';
-require_once dirname(__FILE__).'/../behaviors/CMessageBehavior.php';
-require_once dirname(__FILE__).'/../behaviors/CPreprocessingBehavior.php';
+require_once __DIR__.'/../../include/CWebTest.php';
+require_once __DIR__.'/../behaviors/CMessageBehavior.php';
+require_once __DIR__.'/../behaviors/CPreprocessingBehavior.php';
 
 /**
  * Base class for "Test item" function tests.
@@ -437,6 +437,9 @@ class testItemTest extends CWebTest {
 						'Type' => 'Zabbix agent',
 						'Key' => ''
 					],
+					'inline_errors' => [
+						'Key' => 'This field cannot be empty.'
+					],
 					'error' => 'Incorrect value for field "key_": key is empty.'
 				]
 			],
@@ -446,6 +449,9 @@ class testItemTest extends CWebTest {
 					'fields' => [
 						'Type' => 'Zabbix agent',
 						'Key' => 'key space'
+					],
+					'inline_errors' => [
+						'Key' => 'Incorrect syntax near " space".'
 					],
 					'error' => 'Incorrect value for field "key_": incorrect syntax near " space".'
 				]
@@ -460,6 +466,9 @@ class testItemTest extends CWebTest {
 					'preprocessing' => [
 						['type' => 'Regular expression', 'parameter_1' => '', 'parameter_2' => '2']
 					],
+					'inline_errors' => [
+						'id:preprocessing_0_params_0' => 'Pattern: This field cannot be empty.'
+					],
 					'error' => 'Invalid parameter "/1/params/1": cannot be empty.'
 				]
 			],
@@ -473,6 +482,9 @@ class testItemTest extends CWebTest {
 					'preprocessing' => [
 						['type' => 'Regular expression', 'parameter_1' => '1', 'parameter_2' => '']
 					],
+					'inline_errors' => [
+						'id:preprocessing_0_params_1' => 'Output: This field cannot be empty.'
+					],
 					'error' => 'Invalid parameter "/1/params/2": cannot be empty.'
 				]
 			],
@@ -485,6 +497,9 @@ class testItemTest extends CWebTest {
 					],
 					'preprocessing' => [
 						['type' => 'XML XPath', 'parameter_1' => '']
+					],
+					'inline_errors' => [
+						'id:preprocessing_0_params_0' => 'XPath: This field cannot be empty.'
 					],
 					'error' => 'Invalid parameter "/1/params/1": cannot be empty.'
 				]
@@ -503,6 +518,9 @@ class testItemTest extends CWebTest {
 						'on_fail' => true,
 						'error_handler' => 'Set error to',
 						'error_handler_params' => '']
+					],
+					'inline_errors' => [
+						'id:preprocessing_0_error_handler_params' => 'Error message: This field cannot be empty.'
 					],
 					'error' => 'Invalid parameter "/1/error_handler_params": cannot be empty.'
 				]
@@ -580,7 +598,9 @@ class testItemTest extends CWebTest {
 						'Type' => 'Calculated',
 						'Key' => 'calculated0'
 					],
-					'test_error' => 'Incorrect value for field "Formula": incorrect expression starting from "".'
+					'inline_errors' => [
+						'Formula' => 'This field cannot be empty.'
+					]
 				]
 			],
 			[
@@ -591,7 +611,9 @@ class testItemTest extends CWebTest {
 						'Key' => 'calculated1',
 						'Formula' => '((),9'
 					],
-					'test_error' => 'Incorrect value for field "Formula": incorrect expression starting from "),9".'
+					'inline_errors' => [
+						'Formula' => 'Incorrect expression starting from "),9".'
+					]
 				]
 			],
 			[
@@ -602,7 +624,9 @@ class testItemTest extends CWebTest {
 						'Key' => 'calculated2',
 						'Formula' => '{{?{{?{{?'
 					],
-					'test_error' => 'Incorrect value for field "Formula": incorrect expression starting from "{{?{{?{{?".'
+					'inline_errors' => [
+						'Formula' => 'Incorrect expression starting from "{{?{{?{{?".'
+					]
 				]
 			],
 			[
@@ -769,9 +793,15 @@ class testItemTest extends CWebTest {
 			$this->addPreprocessingSteps($data['preprocessing']);
 		}
 
-		// Open Test item dialog form.
+		// Open Test item dialog form. Dialog should not be opened in case if inline validation error persists.
 		$dialog->getFooter()->query('button:Test')->one()->click();
-		$overlay = COverlayDialogElement::find()->all()->last()->waitUntilReady();
+
+		if (array_key_exists('inline_errors', $data)) {
+			$this->assertEquals(1, COverlayDialogElement::find()->all()->count());
+		}
+		else {
+			$overlay = COverlayDialogElement::find(1)->waitUntilPresent()->one()->waitUntilReady();
+		}
 
 		switch ($data['expected']) {
 			case TEST_GOOD:
@@ -1162,17 +1192,21 @@ class testItemTest extends CWebTest {
 				}
 				break;
 			case TEST_BAD:
-				if (CTestArrayHelper::get($data, 'test_error')) {
-					$overlay->query('button:Get value and test')->one()->click();
-					$data['error'] = $data['test_error'];
+				if (array_key_exists('inline_errors', $data)) {
+					$this->assertInlineError($item_form, $data['inline_errors']);
 				}
+				else {
+					if (CTestArrayHelper::get($data, 'test_error')) {
+						$overlay->query('button:Get value and test')->one()->click();
+						$data['error'] = $data['test_error'];
+					}
 
-				$this->assertMessage(TEST_BAD, null, $data['error']);
+					$this->assertMessage(TEST_BAD, null, $data['error']);
+				}
 				break;
 		}
 
-		$overlay->close();
-		$dialog->close();
+		COverlayDialogElement::closeAll();
 	}
 
 	/**

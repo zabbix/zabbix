@@ -247,7 +247,7 @@ void	__zbx_mock_assert_vector_uint64_eq(const char *file, int line, const char *
 				expected_value->values[i], returned_value->values[i]);
 	}
 
-	_FAIL(file, line, prefix_msg, "Expected values number \"" ZBX_FS_UI64 "\" while got \"" ZBX_FS_UI64 "\"",
+	_FAIL(file, line, prefix_msg, "Expected values number \"%d\" while got \"%d\"",
 			expected_value->values_num, returned_value->values_num);
 }
 

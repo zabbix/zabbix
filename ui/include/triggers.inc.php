@@ -629,7 +629,7 @@ function make_trigger_details($trigger, $eventid) {
  *
  * @return array|bool
  */
-function analyzeExpression(string $expression, int $type, string &$error = null) {
+function analyzeExpression(string $expression, int $type, ?string &$error = null) {
 	if ($expression === '') {
 		return ['', null];
 	}
@@ -993,7 +993,7 @@ function getExpressionTree(CExpressionParser $expression_parser, int $start, int
  *
  * @return bool|string  Returns new expression or false if expression is incorrect.
  */
-function remakeExpression($expression, $expression_id, $action, $new_expression, string &$error = null) {
+function remakeExpression($expression, $expression_id, $action, $new_expression, ?string &$error = null) {
 	if ($expression === '') {
 		return false;
 	}
@@ -1262,13 +1262,16 @@ function get_item_function_info(string $expr) {
 		'countunique' => $rules['numeric_as_uint'] + $rules['string_as_uint'],
 		'find' => $rules['numeric_as_0or1'] + $rules['string_as_0or1'],
 		'first' => $rules['numeric'] + $rules['string'],
+		'firstclock' => $rules['numeric'] + $rules['string'],
 		'forecast' => $rules['numeric_as_float'],
 		'fuzzytime' => $rules['numeric_as_0or1'],
 		'kurtosis' => $rules['numeric_as_float'],
 		'last' => $rules['numeric'] + $rules['string'],
+		'lastclock' => $rules['numeric'] + $rules['string'],
 		'logeventid' => $rules['log_as_0or1'],
 		'logseverity' => $rules['log_as_uint'],
 		'logsource' => $rules['log_as_0or1'],
+		'logtimestamp' => $rules['log_as_0or1'],
 		'mad' => $rules['numeric_as_float'],
 		'max' => $rules['numeric'],
 		'min' => $rules['numeric'],
@@ -1645,7 +1648,7 @@ function makeTriggersHostsList(array $triggers_hosts) {
 /**
  * Get parent templates for each given trigger.
  *
- * @param $array $triggers                  An array of triggers.
+ * @param array  $triggers                  An array of triggers.
  * @param string $triggers[]['triggerid']   ID of a trigger.
  * @param string $triggers[]['templateid']  ID of parent template trigger.
  * @param int    $flag                      Origin of the trigger (ZBX_FLAG_DISCOVERY_NORMAL or
@@ -1673,16 +1676,17 @@ function getTriggerParentTemplates(array $triggers, $flag) {
 
 	$all_parent_triggerids = [];
 	$hostids = [];
-	if ($flag == ZBX_FLAG_DISCOVERY_PROTOTYPE) {
+	if ($flag & ZBX_FLAG_DISCOVERY_PROTOTYPE) {
 		$lld_ruleids = [];
 	}
 
 	do {
-		if ($flag == ZBX_FLAG_DISCOVERY_PROTOTYPE) {
+		if ($flag & ZBX_FLAG_DISCOVERY_PROTOTYPE) {
 			$db_triggers = API::TriggerPrototype()->get([
 				'output' => ['triggerid', 'templateid'],
 				'selectHosts' => ['hostid'],
 				'selectDiscoveryRule' => ['itemid'],
+				'selectDiscoveryRulePrototype' => ['itemid'],
 				'triggerids' => array_keys($parent_triggerids)
 			]);
 		}
@@ -1704,8 +1708,9 @@ function getTriggerParentTemplates(array $triggers, $flag) {
 				$hostids[$db_trigger['triggerid']][] = $host['hostid'];
 			}
 
-			if ($flag == ZBX_FLAG_DISCOVERY_PROTOTYPE) {
-				$lld_ruleids[$db_trigger['triggerid']] = $db_trigger['discoveryRule']['itemid'];
+			if ($flag & ZBX_FLAG_DISCOVERY_PROTOTYPE) {
+				$parent_lld = $db_trigger['discoveryRule'] ?: $db_trigger['discoveryRulePrototype'];
+				$lld_ruleids[$db_trigger['triggerid']] = $parent_lld['itemid'];
 			}
 
 			if ($db_trigger['templateid'] != 0) {
@@ -1724,7 +1729,7 @@ function getTriggerParentTemplates(array $triggers, $flag) {
 			? $hostids[$parent_trigger['triggerid']]
 			: [0];
 
-		if ($flag == ZBX_FLAG_DISCOVERY_PROTOTYPE) {
+		if ($flag & ZBX_FLAG_DISCOVERY_PROTOTYPE) {
 			$parent_trigger['lld_ruleid'] = array_key_exists($parent_trigger['triggerid'], $lld_ruleids)
 				? $lld_ruleids[$parent_trigger['triggerid']]
 				: 0;
@@ -1799,7 +1804,7 @@ function makeTriggerTemplatePrefix($triggerid, array $parent_templates, $flag, b
 
 	foreach ($templates as $template) {
 		if ($provide_links && $template['permission'] == PERM_READ_WRITE) {
-			if ($flag == ZBX_FLAG_DISCOVERY_PROTOTYPE) {
+			if ($flag & ZBX_FLAG_DISCOVERY_PROTOTYPE) {
 				$url = (new CUrl('zabbix.php'))
 					->setArgument('action', 'trigger.prototype.list')
 					->setArgument('parent_discoveryid', $parent_templates['links'][$triggerid]['lld_ruleid'])
@@ -1861,7 +1866,7 @@ function makeTriggerTemplatesHtml($triggerid, array $parent_templates, $flag, bo
 
 		foreach ($templates as $template) {
 			if ($provide_links && $template['permission'] == PERM_READ_WRITE) {
-				if ($flag == ZBX_FLAG_DISCOVERY_PROTOTYPE) {
+				if ($flag & ZBX_FLAG_DISCOVERY_PROTOTYPE) {
 					$attribute_name = 'data-parent_discoveryid';
 					$attribute_value = $parent_templates['links'][$triggerid]['lld_ruleid'];
 					$prototype = '1';
@@ -1886,7 +1891,6 @@ function makeTriggerTemplatesHtml($triggerid, array $parent_templates, $flag, bo
 
 				$name = (new CLink($template['name'], $trigger_url))
 					->addClass('js-related-trigger-edit')
-					->setAttribute('data-action', $prototype === '1' ? 'trigger.prototype.edit' : 'trigger.edit')
 					->setAttribute('data-triggerid', $parent_templates['links'][$triggerid]['triggerid'])
 					->setAttribute('data-context', 'template')
 					->setAttribute($attribute_name, $attribute_value);

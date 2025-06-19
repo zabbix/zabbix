@@ -18,6 +18,8 @@
 #include "zbxautoreg.h"
 #include "zbxdbhigh.h"
 
+#include "zbxcacheconfig.h"
+
 void	zbx_autoreg_host_free_server(zbx_autoreg_host_t *autoreg_host);
 
 void	zbx_autoreg_update_host_server(const zbx_dc_proxy_t *proxy, const char *host, const char *ip, const char *dns,

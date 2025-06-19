@@ -40,7 +40,7 @@ void	zbx_mock_test_entry(void **state)
 		fail_msg("failed to parse iprange");
 
 	zbx_vector_str_create(&ip_out);
-	extract_yaml_values("out.ip", &ip_out);
+	zbx_mock_extract_yaml_values_str("out.ip", &ip_out);
 
 	char		ip[ZBX_INTERFACE_IP_LEN_MAX];
 

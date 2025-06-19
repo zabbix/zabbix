@@ -19,8 +19,6 @@
  * @var array $data
  */
 
-$this->addJsFile('multilineinput.js');
-$this->addJsFile('items.js');
 $this->includeJsFile('item.prototype.list.js.php');
 
 $form = (new CForm())
@@ -57,6 +55,22 @@ foreach ($data['items'] as $item) {
 		$data['allowed_ui_conf_templates']
 	)];
 
+	if ($item['flags'] & ZBX_FLAG_DISCOVERY_CREATED) {
+		$name[] = (new CLink($data['source_link_data']['name'],
+			(new CUrl('zabbix.php'))
+				->setArgument('action', 'popup')
+				->setArgument('popup', 'item.prototype.edit')
+				->setArgument('parent_discoveryid', $data['source_link_data']['parent_itemid'])
+				->setArgument('itemid', $item['discoveryData']['parent_itemid'])
+				->setArgument('context', 'host')
+				->getUrl()
+		))
+			->addClass(ZBX_STYLE_LINK_ALT)
+			->addClass(ZBX_STYLE_ORANGE);
+
+		$name[] = NAME_DELIMITER;
+	}
+
 	if ($item['type'] == ITEM_TYPE_DEPENDENT) {
 		if ($item['master_item']['type'] == ITEM_TYPE_HTTPTEST) {
 			$name[] = $item['master_item']['name'];
@@ -73,11 +87,7 @@ foreach ($data['items'] as $item) {
 
 				$name[] = (new CLink($item['master_item']['name'], $item_prototype_url))
 					->addClass(ZBX_STYLE_LINK_ALT)
-					->addClass(ZBX_STYLE_TEAL)
-					->setAttribute('data-action', 'item.prototype.edit')
-					->setAttribute('data-itemid', $item['master_item']['itemid'])
-					->setAttribute('data-parent_discoveryid', $data['parent_discoveryid'])
-					->setAttribute('data-context', $data['context']);
+					->addClass(ZBX_STYLE_TEAL);
 			}
 			else {
 				$item_url = (new CUrl('zabbix.php'))
@@ -89,10 +99,7 @@ foreach ($data['items'] as $item) {
 
 				$name[] = (new CLink($item['master_item']['name'], $item_url))
 					->addClass(ZBX_STYLE_LINK_ALT)
-					->addClass(ZBX_STYLE_TEAL)
-					->setAttribute('data-action', 'item.edit')
-					->setAttribute('data-itemid', $item['master_item']['itemid'])
-					->setAttribute('data-context', $data['context']);
+					->addClass(ZBX_STYLE_TEAL);
 			}
 		}
 
@@ -107,11 +114,27 @@ foreach ($data['items'] as $item) {
 		->setArgument('context', $data['context'])
 		->getUrl();
 
-	$name[] = (new CLink($item['name'], $item_prototype_url))
-		->setAttribute('data-action', 'item.prototype.edit')
-		->setAttribute('data-itemid', $item['itemid'])
-		->setAttribute('data-parent_discoveryid', $data['parent_discoveryid'])
-		->setAttribute('data-context', $data['context']);
+	$name[] = new CLink($item['name'], $item_prototype_url);
+
+	$status_disabled = $item['status'] == ITEM_STATUS_DISABLED;
+	$status_toggle = $data['is_parent_discovered']
+		? (new CSpan($status_disabled ? _('No') : _('Yes')))
+		: (new CLink($status_disabled ? _('No') : _('Yes')))
+			->addClass(ZBX_STYLE_LINK_ACTION)
+			->addClass($status_disabled ? 'js-enable-itemprototype' : 'js-disable-itemprototype')
+			->setAttribute('data-itemid', $item['itemid'])
+			->setAttribute('data-field', 'status')
+			->setAttribute('data-context', $data['context']);
+
+	$no_discover = $item['discover'] == ZBX_PROTOTYPE_NO_DISCOVER;
+	$discover_toggle = $data['is_parent_discovered']
+		? (new CSpan($no_discover ? _('No') : _('Yes')))
+		: (new CLink($no_discover ? _('No') : _('Yes')))
+			->addClass(ZBX_STYLE_LINK_ACTION)
+			->addClass($no_discover ? 'js-enable-itemprototype' : 'js-disable-itemprototype')
+			->setAttribute('data-itemid', $item['itemid'])
+			->setAttribute('data-field', 'discover')
+			->setAttribute('data-context', $data['context']);
 
 	$table->addRow([
 		new CCheckBox('itemids['.$item['itemid'].']', $item['itemid']),
@@ -129,20 +152,8 @@ foreach ($data['items'] as $item) {
 		$item['history'],
 		$item['trends'],
 		item_type2str($item['type']),
-		(new CLink(($item['status'] == ITEM_STATUS_DISABLED) ? _('No') : _('Yes')))
-			->addClass(ZBX_STYLE_LINK_ACTION)
-			->addClass(itemIndicatorStyle($item['status']))
-			->addClass($item['status'] == ITEM_STATUS_DISABLED ? 'js-enable-itemprototype' : 'js-disable-itemprototype')
-			->setAttribute('data-itemid', $item['itemid'])
-			->setAttribute('data-field', 'status')
-			->setAttribute('data-context', $data['context']),
-		(new CLink(($item['discover'] == ZBX_PROTOTYPE_NO_DISCOVER) ? _('No') : _('Yes')))
-			->addClass(ZBX_STYLE_LINK_ACTION)
-			->addClass($item['discover'] == ZBX_PROTOTYPE_NO_DISCOVER ? ZBX_STYLE_RED : ZBX_STYLE_GREEN)
-			->addClass($item['discover'] == ZBX_PROTOTYPE_NO_DISCOVER ? 'js-enable-itemprototype' : 'js-disable-itemprototype')
-			->setAttribute('data-itemid', $item['itemid'])
-			->setAttribute('data-field', 'discover')
-			->setAttribute('data-context', $data['context']),
+		$status_toggle->addClass(itemIndicatorStyle($item['status'])),
+		$discover_toggle->addClass($item['discover'] == ZBX_PROTOTYPE_NO_DISCOVER ? ZBX_STYLE_RED : ZBX_STYLE_GREEN),
 		$data['tags'][$item['itemid']]
 	]);
 }
@@ -167,16 +178,26 @@ $buttons = [
 			->addClass(ZBX_STYLE_BTN_ALT)
 			->addClass('js-massupdate-itemprototype')
 			->addClass('js-no-chkbxrange')
-	],
-	[
-		'content' => (new CSimpleButton(_('Delete')))
-			->addClass(ZBX_STYLE_BTN_ALT)
-			->addClass('js-massdelete-itemprototype')
-			->addClass('js-no-chkbxrange')
 	]
 ];
 
-$form->addItem(new CActionButtonList('action', 'itemids', $buttons, $data['parent_discoveryid']));
+if ($data['is_parent_discovered']) {
+	foreach ($buttons as &$button) {
+		$button['content']
+			->setEnabled(false)
+			->setAttribute('data-disabled', $data['is_parent_discovered']);
+	}
+	unset($button);
+}
+
+$buttons[] = [
+	'content' => (new CSimpleButton(_('Delete')))
+		->addClass(ZBX_STYLE_BTN_ALT)
+		->addClass('js-massdelete-itemprototype')
+		->addClass('js-no-chkbxrange')
+];
+
+$form->addItem(new CActionButtonList('action', 'itemids', $buttons, 'item_prototypes_'.$data['parent_discoveryid']));
 
 (new CHtmlPage())
 	->setTitle(_('Item prototypes'))
@@ -192,6 +213,7 @@ $form->addItem(new CActionButtonList('action', 'itemids', $buttons, $data['paren
 						->setAttribute('data-parent_discoveryid', $data['parent_discoveryid'])
 						->setAttribute('data-context', $data['context'])
 						->addClass('js-create-item-prototype')
+						->setEnabled(!$data['is_parent_discovered'])
 				)
 		))->setAttribute('aria-label', _('Content controls'))
 	)

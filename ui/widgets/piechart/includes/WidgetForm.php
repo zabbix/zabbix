@@ -146,7 +146,7 @@ class WidgetForm extends CWidgetForm {
 					->setDefault(self::SPACE_DEFAULT)
 			)
 			->addField(
-				new CWidgetFieldCheckBox('merge', null, _('Merge sectors smaller than '))
+				new CWidgetFieldCheckBox('merge', null, _('Merge sectors smaller than'))
 			)
 			->addField(
 				(new CWidgetFieldIntegerBox('merge_percent', null,
@@ -189,7 +189,7 @@ class WidgetForm extends CWidgetForm {
 				(new CWidgetFieldCheckBox('value_bold', _('Bold')))
 			)
 			->addField(
-				new CWidgetFieldColor('value_color', _('Color'))
+				(new CWidgetFieldColor('value_color', _('Color')))->allowInherited()
 			);
 	}
 

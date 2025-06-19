@@ -25,7 +25,7 @@ class CWidgetFieldColor extends CWidgetField {
 
 	private bool $allow_inherited = false;
 
-	public function __construct(string $name, string $label = null) {
+	public function __construct(string $name, ?string $label = null) {
 		parent::__construct($name, $label);
 
 		$this
@@ -40,7 +40,7 @@ class CWidgetFieldColor extends CWidgetField {
 	/**
 	 * Tell the Color picker whether to use Default (inherited) color feature or not.
 	 */
-	public function allowInherited($allow_inherited = true): self {
+	public function allowInherited(bool $allow_inherited = true): self {
 		$this->allow_inherited = $allow_inherited;
 
 		return $this;

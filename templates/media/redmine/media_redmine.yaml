@@ -1,55 +1,40 @@
 zabbix_export:
   version: '7.4'
   media_types:
-    -
-      name: Redmine
+    - name: Redmine
       type: WEBHOOK
       parameters:
-        -
-          name: alert_message
+        - name: alert_message
           value: '{ALERT.MESSAGE}'
-        -
-          name: alert_subject
+        - name: alert_subject
           value: '{ALERT.SUBJECT}'
-        -
-          name: event_id
+        - name: event_id
           value: '{EVENT.ID}'
-        -
-          name: event_nseverity
+        - name: event_nseverity
           value: '{EVENT.NSEVERITY}'
-        -
-          name: event_source
+        - name: event_source
           value: '{EVENT.SOURCE}'
-        -
-          name: event_update_message
+        - name: event_update_message
           value: '{EVENT.UPDATE.MESSAGE}'
-        -
-          name: event_update_status
+        - name: event_update_status
           value: '{EVENT.UPDATE.STATUS}'
-        -
-          name: event_value
+        - name: event_value
           value: '{EVENT.VALUE}'
-        -
-          name: redmine_access_key
+        - name: redmine_access_key
           value: '<PUT YOUR ACCESS KEY>'
-        -
-          name: redmine_issue_key
+        - name: redmine_issue_key
           value: '{EVENT.TAGS.__zbx_redmine_issue_id}'
-        -
-          name: redmine_project
+        - name: redmine_project
           value: '<PUT YOUR PROJECT ID OR NAME>'
-        -
-          name: redmine_tracker_id
+        - name: redmine_tracker_id
           value: '<PUT YOUR TRACKER ID>'
-        -
-          name: redmine_url
+        - name: redmine_url
           value: '<PUT YOUR REDMINE URL>'
-        -
-          name: trigger_id
+        - name: trigger_id
           value: '{TRIGGER.ID}'
-        -
-          name: zabbix_url
+        - name: zabbix_url
           value: '{$ZABBIX.URL}'
+      status: DISABLED
       script: |
         var Redmine = {
             params: {},
@@ -353,8 +338,7 @@ zabbix_export:
       event_menu_url: '{EVENT.TAGS.__zbx_redmine_issuelink}'
       event_menu_name: 'Redmine: issue #{EVENT.TAGS.__zbx_redmine_issue_id}'
       message_templates:
-        -
-          event_source: TRIGGERS
+        - event_source: TRIGGERS
           operation_mode: PROBLEM
           subject: 'Problem: {EVENT.NAME}'
           message: |
@@ -365,8 +349,7 @@ zabbix_export:
             Operational data: {EVENT.OPDATA}
             Original problem ID: {EVENT.ID}
             {TRIGGER.URL}
-        -
-          event_source: TRIGGERS
+        - event_source: TRIGGERS
           operation_mode: RECOVERY
           subject: 'Resolved: {EVENT.NAME}'
           message: |
@@ -376,8 +359,7 @@ zabbix_export:
             Severity: {EVENT.SEVERITY}
             Original problem ID: {EVENT.ID}
             {TRIGGER.URL}
-        -
-          event_source: TRIGGERS
+        - event_source: TRIGGERS
           operation_mode: UPDATE
           subject: 'Updated problem: {EVENT.NAME}'
           message: |
@@ -385,8 +367,7 @@ zabbix_export:
             {EVENT.UPDATE.MESSAGE}
             
             Current problem status is {EVENT.STATUS}, acknowledged: {EVENT.ACK.STATUS}.
-        -
-          event_source: DISCOVERY
+        - event_source: DISCOVERY
           operation_mode: PROBLEM
           subject: 'Discovery: {DISCOVERY.DEVICE.STATUS} {DISCOVERY.DEVICE.IPADDRESS}'
           message: |
@@ -401,8 +382,7 @@ zabbix_export:
             Device service port: {DISCOVERY.SERVICE.PORT}
             Device service status: {DISCOVERY.SERVICE.STATUS}
             Device service uptime: {DISCOVERY.SERVICE.UPTIME}
-        -
-          event_source: AUTOREGISTRATION
+        - event_source: AUTOREGISTRATION
           operation_mode: PROBLEM
           subject: 'Autoregistration: {HOST.HOST}'
           message: |

@@ -19,19 +19,14 @@
  * @var array $data
  */
 
-$this->addJsFile('class.calendar.js');
-$this->addJsFile('multilineinput.js');
-$this->addJsFile('class.form.fieldset.collapsible.js');
 $this->includeJsFile('popup.view.js.php');
-$this->addJsFile('items.js');
-$this->addJsFile('class.tagfilteritem.js');
 
 $html_page = (new CHtmlPage())->show();
 
 (new CScriptTag('
 	view.init('.json_encode([
 		'action' => $data['popup']['action'],
-		'options' => $data['popup']['options']
+		'action_parameters' => $data['popup']['action_parameters']
 	]).');
 '))
 	->setOnDocumentReady()

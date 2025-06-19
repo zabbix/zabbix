@@ -1,0 +1,71 @@
+---
+test case: "hostname:[test]"
+in:
+  exp: "hostname:[test]"
+out:
+  return: SUCCEED
+  exp_host: "hostname"
+  exp_key: "[test]"
+---
+test case: "hostname:[test"
+in:
+  exp: "hostname:[test"
+out:
+  return: SUCCEED
+  exp_host: "hostname"
+  exp_key: "[test"
+---
+test case: "hostname:"
+in:
+  exp: "hostname:"
+out:
+  return: SUCCEED
+  exp_host: "hostname"
+  exp_key: ""
+---
+test case: ":[]"
+in:
+  exp: ":[]"
+out:
+  return: SUCCEED
+  exp_host: ""
+  exp_key: "[]"
+---
+test case: ":"
+in:
+  exp: ":"
+out:
+  return: SUCCEED
+  exp_host: ""
+  exp_key: ""
+---
+test case: ":[test]"
+in:
+  exp: ":[test]"
+out:
+  return: SUCCEED
+  exp_host: ""
+  exp_key: "[test]"
+---
+test case: "Empty"
+in:
+  exp: ""
+out:
+  return: FAIL
+---
+test case: "Newlines"
+in:
+  exp: "hostname:\n\n\n"
+out:
+  return: SUCCEED
+  exp_host: "hostname"
+  exp_key: "\n\n\n"
+---
+test case: "some ASCII"
+in:
+  exp: "hostname:\n!#$%&'()*+,-./0123456789:;<=>?@ABCDEFGHIJKLMNOPQRSTUVWXYZ[]^_`abcdefghijklmnopqrstuvwxyz{|}"
+out:
+  return: SUCCEED
+  exp_host: "hostname"
+  exp_key: "\n!#$%&'()*+,-./0123456789:;<=>?@ABCDEFGHIJKLMNOPQRSTUVWXYZ[]^_`abcdefghijklmnopqrstuvwxyz{|}"
+...

@@ -180,10 +180,7 @@ if (array_key_exists('problems', $data)) {
 		// Create acknowledge link.
 		$problem_update_link = ($data['allowed_add_comments'] || $data['allowed_change_severity']
 				|| $data['allowed_acknowledge'] || $can_be_closed || $data['allowed_suppress'])
-			? (new CLink(_('Update'), $problem_update_url))
-				->addClass(ZBX_STYLE_LINK_ALT)
-				->setAttribute('data-eventids[]', $problem['eventid'])
-				->setAttribute('data-action', 'acknowledge.edit')
+			? (new CLink(_('Update'), $problem_update_url))->addClass(ZBX_STYLE_LINK_ALT)
 			: new CSpan(_('Update'));
 
 		$table->addRow(array_merge($row, [

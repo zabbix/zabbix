@@ -38,7 +38,6 @@
 			});
 
 			timeControl.processObjects();
-			this.#setSubmitCallback();
 		}
 
 		#initTagFilter() {
@@ -53,20 +52,6 @@
 			for (const row of document.querySelectorAll('#filter-tags .form_row')) {
 				new CTagFilterItem(row);
 			}
-		}
-
-		#setSubmitCallback() {
-			window.popupManagerInstance.setSubmitCallback((e) => {
-				if ('success' in e.detail) {
-					postMessageOk(e.detail.success.title);
-
-					if ('messages' in e.detail.success) {
-						postMessageDetails('success', e.detail.success.messages);
-					}
-				}
-
-				location.href = location.href;
-			});
 		}
 	};
 </script>

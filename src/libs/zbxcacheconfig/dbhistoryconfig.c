@@ -170,7 +170,7 @@ void	zbx_dc_config_history_sync_get_items_by_itemids(zbx_history_sync_item_t *it
 	size_t			i;
 	const ZBX_DC_ITEM	*dc_item;
 	const ZBX_DC_HOST	*dc_host = NULL;
-	zbx_config_hk_t		config_hk;
+	zbx_config_hk_t		config_hk = {0};
 	zbx_dc_um_handle_t	*um_handle;
 	zbx_dc_config_t		*dc_config = get_dc_config();
 

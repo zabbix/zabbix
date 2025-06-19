@@ -27,13 +27,6 @@ class CLdapAuthValidator extends CValidator {
 	public $ldap;
 
 	/**
-	 * Switch between more detailed or more generic error message mode.
-	 *
-	 * @var type
-	 */
-	protected $detailed_errors = false;
-
-	/**
 	 * Checks if the given user name and password are valid.
 	 *
 	 * The $value array must have the following attributes:
@@ -61,6 +54,7 @@ class CLdapAuthValidator extends CValidator {
 	 */
 	public function getError() {
 		$error = parent::getError();
+
 		$messages = [
 			CLdap::ERR_PHP_EXTENSION => _('PHP LDAP extension missing.'),
 			CLdap::ERR_SERVER_UNAVAILABLE => _('Cannot connect to LDAP server.'),
@@ -70,12 +64,9 @@ class CLdapAuthValidator extends CValidator {
 			CLdap::ERR_OPT_TLS_FAILED => _('Starting TLS failed.'),
 			CLdap::ERR_OPT_REFERRALS_FAILED => _('Setting LDAP referrals to "Off" failed.'),
 			CLdap::ERR_OPT_DEREF_FAILED => _('Setting LDAP dereferencing mode failed.'),
-			CLdap::ERR_BIND_DNSTRING_UNAVAILABLE => _('Cannot bind to LDAP server.')
+			CLdap::ERR_BIND_DNSTRING_UNAVAILABLE => _('Cannot bind to LDAP server.'),
+			CLdap::ERR_USER_NOT_FOUND => _('Incorrect user name or password or account is temporarily blocked.')
 		];
-
-		$messages[CLdap::ERR_USER_NOT_FOUND] = $this->detailed_errors
-			? _('Login name or password is incorrect.')
-			: _('Incorrect user name or password or account is temporarily blocked.');
 
 		return array_key_exists($error, $messages) ? $messages[$error] : '';
 	}

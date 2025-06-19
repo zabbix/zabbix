@@ -141,6 +141,7 @@ static const char	*help_message[] = {
 	"                                        section (historycache, preprocessing, alerting,",
 	"                                        lld, valuecache, locks, connector) or everything if section is",
 	"                                        not specified",
+	"      " ZBX_HISTORY_CACHE_CLEAR "=target      Clear history cache for item specified by its ID",
 	"      " ZBX_PROF_ENABLE "=target              Enable profiling, affects all processes if",
 	"                                        target is not specified",
 	"      " ZBX_PROF_DISABLE "=target             Disable profiling, affects all processes if",
@@ -383,6 +384,7 @@ static int	config_allow_root			= 0;
 static int	config_enable_global_scripts		= 1;
 static int	config_allow_software_update_check	= 1;
 static char	*config_sms_devices			= NULL;
+static char	*config_frontend_allowed_ip		= NULL;
 static zbx_config_log_t	log_file_cfg			= {NULL, NULL, ZBX_LOG_TYPE_UNDEFINED, 1};
 
 struct zbx_db_version_info_t	db_version_info;
@@ -756,6 +758,14 @@ static void	zbx_validate_config(ZBX_TASK_EX *task)
 		err = 1;
 	}
 
+	if (NULL != config_frontend_allowed_ip && FAIL == zbx_validate_peer_list(config_frontend_allowed_ip, &ch_error))
+	{
+		zabbix_log(LOG_LEVEL_CRIT, "invalid entry in \"FrontendAllowedIP\" configuration parameter: %s",
+			ch_error);
+		zbx_free(ch_error);
+		err = 1;
+	}
+
 	if (SUCCEED != zbx_validate_export_type(zbx_config_export.type, NULL))
 	{
 		zabbix_log(LOG_LEVEL_CRIT, "invalid \"ExportType\" configuration parameter: %s",
@@ -821,14 +831,21 @@ static void	zbx_validate_config(ZBX_TASK_EX *task)
 	err |= (FAIL == zbx_check_cfg_feature_str("TLSCRLFile", zbx_config_tls->crl_file, "TLS support"));
 	err |= (FAIL == zbx_check_cfg_feature_str("TLSCertFile", zbx_config_tls->cert_file, "TLS support"));
 	err |= (FAIL == zbx_check_cfg_feature_str("TLSKeyFile", zbx_config_tls->key_file, "TLS support"));
-#endif
-#if !(defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL))
 	err |= (FAIL == zbx_check_cfg_feature_str("TLSCipherCert", zbx_config_tls->cipher_cert,
 			"GnuTLS or OpenSSL"));
 	err |= (FAIL == zbx_check_cfg_feature_str("TLSCipherPSK", zbx_config_tls->cipher_psk,
 			"GnuTLS or OpenSSL"));
 	err |= (FAIL == zbx_check_cfg_feature_str("TLSCipherAll", zbx_config_tls->cipher_all,
 			"GnuTLS or OpenSSL"));
+	err |= (FAIL == zbx_check_cfg_feature_str("TLSFrontendCertSubject", zbx_config_tls->frontend_cert_subject,
+		"GnuTLS or OpenSSL"));
+	err |= (FAIL == zbx_check_cfg_feature_str("TLSFrontendCertIssuer", zbx_config_tls->frontend_cert_issuer,
+		"GnuTLS or OpenSSL"));
+	err |= (FAIL == zbx_check_cfg_feature_str("TLSListen", zbx_config_tls->tls_listen,
+		"GnuTLS or OpenSSL"));
+	err |= (FAIL == zbx_check_cfg_feature_str("TLSFrontendAccept", zbx_config_tls->frontend_accept,
+		"GnuTLS or OpenSSL"));
+
 #endif
 #if !defined(HAVE_OPENSSL)
 	err |= (FAIL == zbx_check_cfg_feature_str("TLSCipherCert13", zbx_config_tls->cipher_cert13,
@@ -913,11 +930,11 @@ static void	zbx_load_config(ZBX_TASK_EX *task)
 		{"CacheSize",			&config_conf_cache_size,		ZBX_CFG_TYPE_UINT64,
 				ZBX_CONF_PARM_OPT,	128 * ZBX_KIBIBYTE,	__UINT64_C(64) * ZBX_GIBIBYTE},
 		{"HistoryCacheSize",		&config_history_cache_size,		ZBX_CFG_TYPE_UINT64,
-				ZBX_CONF_PARM_OPT,	128 * ZBX_KIBIBYTE,	__UINT64_C(2) * ZBX_GIBIBYTE},
+				ZBX_CONF_PARM_OPT,	128 * ZBX_KIBIBYTE,	__UINT64_C(16) * ZBX_GIBIBYTE},
 		{"HistoryIndexCacheSize",	&config_history_index_cache_size,	ZBX_CFG_TYPE_UINT64,
-				ZBX_CONF_PARM_OPT,	128 * ZBX_KIBIBYTE,	__UINT64_C(2) * ZBX_GIBIBYTE},
+				ZBX_CONF_PARM_OPT,	128 * ZBX_KIBIBYTE,	__UINT64_C(16) * ZBX_GIBIBYTE},
 		{"TrendCacheSize",		&config_trends_cache_size,		ZBX_CFG_TYPE_UINT64,
-				ZBX_CONF_PARM_OPT,	128 * ZBX_KIBIBYTE,	__UINT64_C(2) * ZBX_GIBIBYTE},
+				ZBX_CONF_PARM_OPT,	128 * ZBX_KIBIBYTE,	__UINT64_C(16) * ZBX_GIBIBYTE},
 		{"TrendFunctionCacheSize",	&config_trend_func_cache_size,		ZBX_CFG_TYPE_UINT64,
 				ZBX_CONF_PARM_OPT,	0,			__UINT64_C(2) * ZBX_GIBIBYTE},
 		{"ValueCacheSize",		&config_value_cache_size,		ZBX_CFG_TYPE_UINT64,
@@ -1068,6 +1085,14 @@ static void	zbx_load_config(ZBX_TASK_EX *task)
 				ZBX_CONF_PARM_OPT,	0,			0},
 		{"TLSCipherAll",		&(zbx_config_tls->cipher_all),		ZBX_CFG_TYPE_STRING,
 				ZBX_CONF_PARM_OPT,	0,			0},
+		{"TLSFrontendCertIssuer",	&(zbx_config_tls->frontend_cert_issuer),	ZBX_CFG_TYPE_STRING,
+			ZBX_CONF_PARM_OPT,	0,			0},
+		{"TLSFrontendCertSubject",	&(zbx_config_tls->frontend_cert_subject),	ZBX_CFG_TYPE_STRING,
+				ZBX_CONF_PARM_OPT,	0,			0},
+		{"TLSFrontendAccept",		&(zbx_config_tls->frontend_accept),	ZBX_CFG_TYPE_STRING_LIST,
+			ZBX_CONF_PARM_OPT,	0,			0},
+		{"TLSListen",			&zbx_config_tls->tls_listen,		ZBX_CFG_TYPE_STRING,
+				ZBX_CONF_PARM_OPT,	0,			0},
 		{"SocketDir",			&CONFIG_SOCKET_PATH,			ZBX_CFG_TYPE_STRING,
 				ZBX_CONF_PARM_OPT,	0,			0},
 		{"StartAlerters",		&config_forks[ZBX_PROCESS_TYPE_ALERTER],
@@ -1146,6 +1171,8 @@ static void	zbx_load_config(ZBX_TASK_EX *task)
 				ZBX_CONF_PARM_OPT,	0,			0},
 		{"SMSDevices",			&config_sms_devices,			ZBX_CFG_TYPE_STRING_LIST,
 				ZBX_CONF_PARM_OPT,	0,			1},
+		{"FrontendAllowedIP",		&config_frontend_allowed_ip,		ZBX_CFG_TYPE_STRING_LIST,
+			ZBX_CONF_PARM_OPT,	0,			0},
 		{0}
 	};
 
@@ -1453,7 +1480,7 @@ static int	zbx_check_db(void)
 			goto out;
 	}
 
-	if (SUCCEED == zbx_db_field_exists("config", "dbversion_status"))
+	if (SUCCEED == zbx_db_setting_exists("dbversion_status"))
 	{
 		zbx_json_initarray(&db_version_json, ZBX_JSON_STAT_BUF_LEN);
 
@@ -1511,7 +1538,7 @@ static void	zbx_db_save_server_status(void)
 
 	zbx_json_close(&json);
 
-	if (ZBX_DB_OK > zbx_db_execute("update config set server_status='%s'", json.buffer))
+	if (ZBX_DB_OK > zbx_db_execute("update settings set value_str='%s' where name='server_status'", json.buffer))
 		zabbix_log(LOG_LEVEL_WARNING, "Failed to save server status to database");
 
 	zbx_json_free(&json);
@@ -1528,96 +1555,263 @@ static int	server_startup(zbx_socket_t *listen_sock, int *ha_stat, int *ha_failo
 	int				i, ret = SUCCEED;
 	char				*error = NULL;
 
-	zbx_config_comms_args_t		config_comms = {zbx_config_tls, NULL, config_server, 0, zbx_config_timeout,
-							zbx_config_trapper_timeout, zbx_config_source_ip,
-							config_ssl_ca_location, config_ssl_cert_location,
-							config_ssl_key_location};
+	zbx_config_comms_args_t		config_comms =
+		{
+			.config_tls = zbx_config_tls,
+			.hostname = NULL,
+			.server = config_server,
+			.proxymode = 0,
+			.config_timeout = zbx_config_timeout,
+			.config_trapper_timeout = zbx_config_trapper_timeout,
+			.config_source_ip = zbx_config_source_ip,
+			.config_ssl_ca_location = config_ssl_ca_location,
+			.config_ssl_cert_location = config_ssl_cert_location,
+			.config_ssl_key_location = config_ssl_key_location
+		};
 
 	zbx_thread_args_t		thread_args;
 
-	zbx_thread_poller_args		poller_args = {&config_comms, get_zbx_program_type, zbx_progname,
-							ZBX_NO_POLLER, config_startup_time, config_unavailable_delay,
-							config_unreachable_period, config_unreachable_delay,
-							config_max_concurrent_checks_per_poller, get_config_forks,
-							config_java_gateway, config_java_gateway_port,
-							config_externalscripts, zbx_get_value_internal_ext_server,
-							config_ssh_key_location, config_webdriver_url};
-	zbx_thread_trapper_args		trapper_args = {&config_comms, &zbx_config_vault, get_zbx_program_type,
-							zbx_progname, &events_cbs, listen_sock, config_startup_time,
-							config_proxydata_frequency, get_config_forks,
-							config_stats_allowed_ip, config_java_gateway,
-							config_java_gateway_port, config_externalscripts,
-							config_enable_global_scripts, zbx_get_value_internal_ext_server,
-							config_ssh_key_location, config_webdriver_url,
-							zbx_trapper_process_request_server,
-							zbx_autoreg_update_host_server};
-	zbx_thread_escalator_args	escalator_args = {zbx_config_tls, get_zbx_program_type, zbx_config_timeout,
-							zbx_config_trapper_timeout, zbx_config_source_ip,
-							config_ssh_key_location, get_config_forks,
-							config_enable_global_scripts};
-	zbx_thread_proxy_poller_args	proxy_poller_args = {zbx_config_tls, &zbx_config_vault, get_zbx_program_type,
-							zbx_config_timeout, zbx_config_trapper_timeout,
-							zbx_config_source_ip, config_ssl_ca_location,
-							config_ssl_cert_location, config_ssl_key_location,
-							&events_cbs, config_proxyconfig_frequency,
-							config_proxydata_frequency};
-	zbx_thread_httppoller_args	httppoller_args = {zbx_config_source_ip, config_ssl_ca_location,
-							config_ssl_cert_location, config_ssl_key_location};
-	zbx_thread_discoverer_args	discoverer_args = {zbx_config_tls, get_zbx_program_type, get_zbx_progname,
-							zbx_config_timeout, config_forks[ZBX_PROCESS_TYPE_DISCOVERER],
-							zbx_config_source_ip, &events_cbs, zbx_discovery_open_server,
-							zbx_discovery_close_server, zbx_discovery_find_host_server,
-							zbx_discovery_update_host_server,
-							zbx_discovery_update_service_server,
-							zbx_discovery_update_service_down_server,
-							zbx_discovery_update_drule_server};
-	zbx_thread_report_writer_args	report_writer_args = {zbx_config_tls->ca_file, zbx_config_tls->cert_file,
-							zbx_config_tls->key_file, zbx_config_source_ip,
-							zbx_config_webservice_url};
-	zbx_thread_housekeeper_args	housekeeper_args = {&db_version_info, zbx_config_timeout,
-							config_housekeeping_frequency, config_max_housekeeper_delete};
-	zbx_thread_server_trigger_housekeeper_args	trigger_housekeeper_args = {zbx_config_timeout,
-							config_problemhousekeeping_frequency};
-	zbx_thread_taskmanager_args	taskmanager_args = {zbx_config_timeout, config_startup_time};
-	zbx_thread_dbconfig_args	dbconfig_args = {&zbx_config_vault, zbx_config_timeout,
-							config_proxyconfig_frequency, config_proxydata_frequency,
-							config_confsyncer_frequency, zbx_config_source_ip,
-							config_ssl_ca_location, config_ssl_cert_location,
-							config_ssl_key_location};
-	zbx_thread_alerter_args		alerter_args = {zbx_config_source_ip, config_ssl_ca_location,
-							config_sms_devices};
-	zbx_thread_pinger_args		pinger_args = {zbx_config_timeout};
-	zbx_thread_pp_manager_args	preproc_man_args = {
-						.workers_num = config_forks[ZBX_PROCESS_TYPE_PREPROCESSOR],
-						.config_timeout = zbx_config_timeout,
-						zbx_config_source_ip};
-#ifdef HAVE_OPENIPMI
-	zbx_thread_ipmi_manager_args	ipmi_manager_args = {zbx_config_timeout, config_unavailable_delay,
-							config_unreachable_period, config_unreachable_delay,
-							get_config_forks};
-#endif
-	zbx_thread_connector_worker_args	connector_worker_args = {zbx_config_source_ip, config_ssl_ca_location,
-									config_ssl_cert_location,
-									config_ssl_key_location};
-	zbx_thread_report_manager_args	report_manager_args = {get_config_forks};
-	zbx_thread_alert_syncer_args	alert_syncer_args = {config_confsyncer_frequency};
-	zbx_thread_alert_manager_args	alert_manager_args = {get_config_forks, get_zbx_config_alert_scripts_path,
-								zbx_db_config, zbx_config_source_ip};
-	zbx_thread_lld_manager_args	lld_manager_args = {get_config_forks};
-	zbx_thread_connector_manager_args	connector_manager_args = {get_config_forks};
-	zbx_thread_dbsyncer_args		dbsyncer_args = {&events_cbs, config_histsyncer_frequency,
-								zbx_config_timeout, config_history_storage_pipelines};
-	zbx_thread_vmware_args			vmware_args = {zbx_config_source_ip, config_vmware_frequency,
-								config_vmware_perf_frequency, config_vmware_timeout};
-	zbx_thread_timer_args		timer_args = {get_config_forks};
-	zbx_thread_snmptrapper_args	snmptrapper_args = {.config_snmptrap_file = zbx_config_snmptrap_file,
-								.config_ha_node_name = CONFIG_HA_NODE_NAME};
-	zbx_thread_service_manager_args	service_manager_args = {.config_timeout = zbx_config_timeout,
-								.config_service_manager_sync_frequency =
-								config_service_manager_sync_frequency};
+	zbx_thread_poller_args		poller_args =
+		{
+			.config_comms = &config_comms,
+			.zbx_get_program_type_cb_arg = get_zbx_program_type,
+			.progname = zbx_progname,
+			.poller_type = ZBX_NO_POLLER,
+			.config_startup_time = config_startup_time,
+			.config_unavailable_delay = config_unavailable_delay,
+			.config_unreachable_period = config_unreachable_period,
+			.config_unreachable_delay = config_unreachable_delay,
+			.config_max_concurrent_checks_per_poller = config_max_concurrent_checks_per_poller,
+			.get_config_forks = get_config_forks,
+			.config_java_gateway = config_java_gateway,
+			.config_java_gateway_port = config_java_gateway_port,
+			.config_externalscripts = config_externalscripts,
+			.zbx_get_value_internal_ext_cb = zbx_get_value_internal_ext_server,
+			.config_ssh_key_location = config_ssh_key_location,
+			.config_webdriver_url = config_webdriver_url
+		};
 
-	if (SUCCEED != zbx_init_database_cache(get_zbx_program_type, zbx_sync_server_history, config_history_cache_size,
-			config_history_index_cache_size, &config_trends_cache_size, &error))
+	zbx_thread_trapper_args		trapper_args =
+		{
+			.config_comms = &config_comms,
+			.config_vault = &zbx_config_vault,
+			.zbx_get_program_type_cb_arg = get_zbx_program_type,
+			.progname = zbx_progname,
+			.events_cbs = &events_cbs,
+			.listen_sock = listen_sock,
+			.config_startup_time = config_startup_time,
+			.proxydata_frequency = config_proxydata_frequency,
+			.get_process_forks_cb_arg = get_config_forks,
+			.config_stats_allowed_ip = config_stats_allowed_ip,
+			.config_java_gateway = config_java_gateway,
+			.config_java_gateway_port = config_java_gateway_port,
+			.config_externalscripts = config_externalscripts,
+			.config_enable_global_scripts = config_enable_global_scripts,
+			.zbx_get_value_internal_ext_cb = zbx_get_value_internal_ext_server,
+			.config_ssh_key_location = config_ssh_key_location,
+			.config_webdriver_url = config_webdriver_url,
+			.trapper_process_request_func_cb = zbx_trapper_process_request_server,
+			.autoreg_update_host_cb = zbx_autoreg_update_host_server,
+			.config_frontend_allowed_ip = config_frontend_allowed_ip
+		};
+
+	zbx_thread_escalator_args	escalator_args =
+		{
+			.zbx_config_tls = zbx_config_tls,
+			.zbx_get_program_type_cb_arg = get_zbx_program_type,
+			.config_timeout = zbx_config_timeout,
+			.config_trapper_timeout = zbx_config_trapper_timeout,
+			.config_source_ip = zbx_config_source_ip,
+			.config_ssh_key_location = config_ssh_key_location,
+			.get_process_forks_cb_arg = get_config_forks,
+			.config_enable_global_scripts = config_enable_global_scripts
+		};
+
+	zbx_thread_proxy_poller_args	proxy_poller_args =
+		{
+			.config_tls = zbx_config_tls,
+			.config_vault = &zbx_config_vault,
+			.zbx_get_program_type_cb_arg = get_zbx_program_type,
+			.config_timeout = zbx_config_timeout,
+			.config_trapper_timeout = zbx_config_trapper_timeout,
+			.config_source_ip = zbx_config_source_ip,
+			.config_ssl_ca_location = config_ssl_ca_location,
+			.config_ssl_cert_location = config_ssl_cert_location,
+			.config_ssl_key_location = config_ssl_key_location,
+			.events_cbs = &events_cbs,
+			.proxyconfig_frequency = config_proxyconfig_frequency,
+			.proxydata_frequency = config_proxydata_frequency
+		};
+
+	zbx_thread_httppoller_args	httppoller_args =
+		{
+			.config_source_ip = zbx_config_source_ip,
+			.config_ssl_ca_location = config_ssl_ca_location,
+			.config_ssl_cert_location = config_ssl_cert_location,
+			.config_ssl_key_location = config_ssl_key_location
+		};
+
+	zbx_thread_discoverer_args	discoverer_args =
+		{
+			.zbx_config_tls = zbx_config_tls,
+			.zbx_get_program_type_cb_arg = get_zbx_program_type,
+			.zbx_get_progname_cb_arg = get_zbx_progname,
+			.config_timeout = zbx_config_timeout,
+			.workers_num = config_forks[ZBX_PROCESS_TYPE_DISCOVERER],
+			.config_source_ip = zbx_config_source_ip,
+			.events_cbs = &events_cbs,
+			.discovery_open_cb = zbx_discovery_open_server,
+			.discovery_close_cb = zbx_discovery_close_server,
+			.discovery_find_host_cb = zbx_discovery_find_host_server,
+			.discovery_update_host_cb = zbx_discovery_update_host_server,
+			.discovery_update_service_cb = zbx_discovery_update_service_server,
+			.discovery_update_service_down_cb = zbx_discovery_update_service_down_server,
+			.discovery_update_drule_cb = zbx_discovery_update_drule_server
+		};
+
+	zbx_thread_report_writer_args	report_writer_args =
+		{
+			.config_tls_ca_file = zbx_config_tls->ca_file,
+			.config_tls_cert_file = zbx_config_tls->cert_file,
+			.config_tls_key_file = zbx_config_tls->key_file,
+			.config_source_ip = zbx_config_source_ip,
+			.config_webservice_url = zbx_config_webservice_url
+		};
+
+	zbx_thread_housekeeper_args	housekeeper_args =
+		{
+			.db_version_info = &db_version_info,
+			.config_timeout = zbx_config_timeout,
+			.config_housekeeping_frequency = config_housekeeping_frequency,
+			.config_max_housekeeper_delete = config_max_housekeeper_delete
+		};
+
+	zbx_thread_server_trigger_housekeeper_args	trigger_housekeeper_args =
+		{
+			.config_timeout = zbx_config_timeout,
+			.config_problemhousekeeping_frequency = config_problemhousekeeping_frequency
+		};
+
+	zbx_thread_taskmanager_args	taskmanager_args =
+		{
+			.config_timeout = zbx_config_timeout,
+			.config_startup_time = config_startup_time
+		};
+
+	zbx_thread_dbconfig_args	dbconfig_args =
+		{
+			.config_vault = &zbx_config_vault,
+			.config_timeout = zbx_config_timeout,
+			.proxyconfig_frequency = config_proxyconfig_frequency,
+			.proxydata_frequency = config_proxydata_frequency,
+			.config_confsyncer_frequency = config_confsyncer_frequency,
+			.config_source_ip = zbx_config_source_ip,
+			.config_ssl_ca_location = config_ssl_ca_location,
+			.config_ssl_cert_location = config_ssl_cert_location,
+			.config_ssl_key_location = config_ssl_key_location
+		};
+
+	zbx_thread_alerter_args		alerter_args =
+		{
+			.config_source_ip = zbx_config_source_ip,
+			.config_ssl_ca_location = config_ssl_ca_location,
+			.config_sms_devices = config_sms_devices
+		};
+
+	zbx_thread_pinger_args		pinger_args =
+		{
+			.config_timeout = zbx_config_timeout
+		};
+
+	zbx_thread_pp_manager_args	preproc_man_args =
+		{
+			.workers_num = config_forks[ZBX_PROCESS_TYPE_PREPROCESSOR],
+			.config_timeout = zbx_config_timeout,
+			.config_source_ip = zbx_config_source_ip
+		};
+#ifdef HAVE_OPENIPMI
+	zbx_thread_ipmi_manager_args	ipmi_manager_args =
+		{
+			.config_timeout = zbx_config_timeout,
+			.config_unavailable_delay = config_unavailable_delay,
+			.config_unreachable_period = config_unreachable_period,
+			.config_unreachable_delay = config_unreachable_delay,
+			.get_config_forks = get_config_forks
+		};
+#endif
+	zbx_thread_connector_worker_args	connector_worker_args =
+		{
+			.config_source_ip = zbx_config_source_ip,
+			.config_ssl_ca_location = config_ssl_ca_location,
+			.config_ssl_cert_location = config_ssl_cert_location,
+			.config_ssl_key_location = config_ssl_key_location
+		};
+
+	zbx_thread_report_manager_args	report_manager_args =
+		{
+			.get_process_forks_cb_arg = get_config_forks
+		};
+
+	zbx_thread_alert_syncer_args	alert_syncer_args =
+		{
+			.confsyncer_frequency = config_confsyncer_frequency
+		};
+
+	zbx_thread_alert_manager_args	alert_manager_args =
+		{
+			.get_process_forks_cb_arg = get_config_forks,
+			.get_scripts_path_cb_arg = get_zbx_config_alert_scripts_path,
+			.db_config = zbx_db_config,
+			.config_source_ip = zbx_config_source_ip,
+			.config_ssl_ca_location = config_ssl_ca_location
+		};
+
+	zbx_thread_lld_manager_args	lld_manager_args =
+		{
+			.get_process_forks_cb_arg = get_config_forks
+		};
+
+	zbx_thread_connector_manager_args	connector_manager_args =
+		{
+			.get_process_forks_cb_arg = get_config_forks
+		};
+
+	zbx_thread_dbsyncer_args		dbsyncer_args =
+		{
+			.events_cbs = &events_cbs,
+			.config_histsyncer_frequency = config_histsyncer_frequency,
+			.config_timeout = zbx_config_timeout,
+			.config_history_storage_pipelines = config_history_storage_pipelines,
+			.config_syncer_num = get_config_forks(ZBX_PROCESS_TYPE_HISTSYNCER)
+		};
+
+	zbx_thread_vmware_args			vmware_args =
+		{
+			.config_source_ip = zbx_config_source_ip,
+			.config_vmware_frequency = config_vmware_frequency,
+			.config_vmware_perf_frequency = config_vmware_perf_frequency,
+			.config_vmware_timeout = config_vmware_timeout
+		};
+
+	zbx_thread_timer_args		timer_args =
+		{
+			.get_process_forks_cb_arg = get_config_forks
+		};
+
+	zbx_thread_snmptrapper_args	snmptrapper_args =
+		{
+			.config_snmptrap_file = zbx_config_snmptrap_file,
+			.config_ha_node_name = CONFIG_HA_NODE_NAME
+		};
+
+	zbx_thread_service_manager_args	service_manager_args =
+		{
+			.config_timeout = zbx_config_timeout,
+			.config_service_manager_sync_frequency = config_service_manager_sync_frequency
+		};
+
+	if (SUCCEED != zbx_init_database_cache(get_zbx_program_type, zbx_sync_history_cache_server,
+			config_history_cache_size, config_history_index_cache_size, &config_trends_cache_size, &error))
 	{
 		zabbix_log(LOG_LEVEL_CRIT, "cannot initialize database cache: %s", error);
 		zbx_free(error);
@@ -2282,8 +2476,8 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 		goto out;
 	}
 
-	if (SUCCEED != zbx_init_database_cache(get_zbx_program_type, zbx_sync_server_history, config_history_cache_size,
-			config_history_index_cache_size, &config_trends_cache_size, &error))
+	if (SUCCEED != zbx_init_database_cache(get_zbx_program_type, zbx_sync_history_cache_server,
+			config_history_cache_size, config_history_index_cache_size, &config_trends_cache_size, &error))
 	{
 		zabbix_log(LOG_LEVEL_CRIT, "cannot initialize database cache: %s", error);
 		zbx_free(error);
@@ -2360,13 +2554,13 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 		zbx_set_exiting_with_fail();
 	}
 
-	zbx_register_stats_data_func(zbx_preproc_stats_ext_get, NULL);
-	zbx_register_stats_data_func(zbx_discovery_stats_ext_get, NULL);
-	zbx_register_stats_data_func(zbx_server_stats_ext_get, NULL);
-	zbx_register_stats_ext_func(zbx_vmware_stats_ext_get, NULL);
-	zbx_register_stats_procinfo_func(ZBX_PROCESS_TYPE_PREPROCESSOR, zbx_preprocessor_get_worker_info);
-	zbx_register_stats_procinfo_func(ZBX_PROCESS_TYPE_DISCOVERER, zbx_discovery_get_worker_info);
-	zbx_diag_init(diag_add_section_info);
+	zbx_register_stats_ext_get_data_func(zbx_preproc_stats_ext_get_data, NULL);
+	zbx_register_stats_ext_get_data_func(zbx_discovery_stats_ext_get_data, NULL);
+	zbx_register_stats_ext_get_data_func(zbx_stats_ext_get_data_server, NULL);
+	zbx_register_stats_ext_get_func(zbx_vmware_stats_ext_get, NULL);
+	zbx_register_stats_procinfo_func(ZBX_PROCESS_TYPE_PREPROCESSOR, zbx_preprocessor_stats_procinfo);
+	zbx_register_stats_procinfo_func(ZBX_PROCESS_TYPE_DISCOVERER, zbx_discovery_stats_procinfo);
+	zbx_diag_init(diag_add_section_info_server);
 
 	if (ZBX_NODE_STATUS_ACTIVE == ha_status)
 	{
@@ -2524,6 +2718,8 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 
 		zbx_vault_renew_token(&zbx_config_vault, zbx_config_source_ip, config_ssl_ca_location,
 				config_ssl_cert_location, config_ssl_key_location);
+
+		__zbx_update_env(zbx_time());
 	}
 
 	zbx_log_exit_signal();

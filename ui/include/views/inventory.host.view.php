@@ -177,9 +177,7 @@ if ($data['allowed_ui_conf_hosts'] && $data['rwHost']) {
 		->setArgument('hostid', $data['host']['hostid'])
 		->getUrl();
 
-	$hostLink = (new CLink(_('Host'), $host_url))
-		->setAttribute('data-hostid', $data['host']['hostid'])
-		->setAttribute('data-action', 'host.edit');
+	$hostLink = new CLink(_('Host'), $host_url);
 
 	$itemsLink = new CLink(_('Items'),
 		(new CUrl('zabbix.php'))
@@ -196,7 +194,8 @@ if ($data['allowed_ui_conf_hosts'] && $data['rwHost']) {
 			->setArgument('context', 'host')
 	);
 	$graphsLink = new CLink(_('Graphs'),
-		(new CUrl('graphs.php'))
+		(new CUrl('zabbix.php'))
+			->setArgument('action', 'graph.list')
 			->setArgument('filter_set', '1')
 			->setArgument('filter_hostids', [$data['host']['hostid']])
 			->setArgument('context', 'host')
@@ -229,7 +228,7 @@ $overviewFormList->addRow(_('Configuration'),
 		(new CSpan([$itemsLink, CViewHelper::showNum($data['host']['items'])])),
 		(new CSpan([$triggersLink, CViewHelper::showNum($data['host']['triggers'])])),
 		(new CSpan([$graphsLink, CViewHelper::showNum($data['host']['graphs'])])),
-		(new CSpan([$discoveryLink, CViewHelper::showNum($data['host']['discoveries'])])),
+		(new CSpan([$discoveryLink, CViewHelper::showNum($data['host']['discoveryRules'])])),
 		(new CSpan([$webLink, CViewHelper::showNum($data['host']['httpTests'])]))
 	])
 );

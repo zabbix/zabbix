@@ -52,7 +52,6 @@ $remove_container->addItem([
 	(new CMultiSelect([
 		'name' => 'valuemap_remove[]',
 		'object_name' => 'valuemap_names',
-		'data' => [],
 		'popup' => [
 			'parameters' => [
 				'srctbl' => 'valuemap_names',

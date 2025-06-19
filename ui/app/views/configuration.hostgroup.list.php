@@ -19,8 +19,6 @@
  * @var array $data
  */
 
-$this->addJsFile('items.js');
-$this->addJsFile('multilineinput.js');
 $this->includeJsFile('configuration.hostgroup.list.js.php');
 
 $html_page = (new CHtmlPage())
@@ -99,10 +97,7 @@ foreach ($data['groups'] as $group) {
 				->setArgument('hostid', $host['hostid'])
 				->getUrl();
 
-			$host_output = (new CLink($host['name'], $host_url))
-				->setAttribute('data-hostid', $host['hostid'])
-				->setAttribute('data-action', 'host.edit')
-				->addClass(ZBX_STYLE_LINK_ALT);
+			$host_output = (new CLink($host['name'], $host_url))->addClass(ZBX_STYLE_LINK_ALT);
 		}
 		else {
 			$host_output = new CSpan($host['name']);
@@ -167,23 +162,21 @@ foreach ($data['groups'] as $group) {
 		->setArgument('groupid', $group['groupid'])
 		->getUrl();
 
-	$name[] = (new CLink($group['name'], $group_url))
-		->setAttribute('data-groupid', $group['groupid'])
-		->setAttribute('data-action', 'hostgroup.edit');
+	$name[] = new CLink($group['name'], $group_url);
 
 	$info_icons = [];
 
 	if ($group['flags'] == ZBX_FLAG_DISCOVERY_CREATED) {
 		$max = 0;
 
-		foreach ($group['groupDiscoveries'] as $group_discovery) {
-			if ($group_discovery['ts_delete'] == 0) {
+		foreach ($group['discoveryData'] as $discovery_data) {
+			if ($discovery_data['ts_delete'] == 0) {
 				$max = 0;
 				break;
 			}
 
-			if ($group_discovery['status'] == ZBX_LLD_STATUS_LOST) {
-				$max = max($max, (int) $group_discovery['ts_delete']);
+			if ($discovery_data['status'] == ZBX_LLD_STATUS_LOST) {
+				$max = max($max, (int) $discovery_data['ts_delete']);
 			}
 		}
 
@@ -209,11 +202,9 @@ foreach ($data['groups'] as $group) {
 
 	$table->addRow([
 		new CCheckBox('groups['.$group['groupid'].']', $group['groupid']),
-		(new CCol($name))
-			->addClass(ZBX_STYLE_WORDBREAK)
-			->setWidth('15%'),
+		(new CCol($name))->addClass(ZBX_STYLE_NOWRAP),
 		(new CCol($count))->addClass(ZBX_STYLE_CELL_WIDTH),
-		$hosts_output ? (new CCol($hosts_output))->addClass(ZBX_STYLE_WORDBREAK) : '',
+		$hosts_output ?: '',
 		makeInformationList($info_icons)
 	]);
 }

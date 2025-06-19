@@ -106,6 +106,7 @@ typedef struct
 {
 	unsigned int	connect_mode;	/* not used in server */
 	unsigned int	accept_modes;	/* not used in server */
+	unsigned int	frontend_accept_modes;
 
 	char		*connect;
 	char		*accept;	/* not used in zabbix_sender, zabbix_get */
@@ -127,11 +128,14 @@ typedef struct
 					/*'TLSCipherAll' */
 	char		*cipher_cmd13;	/* not used in agent, server, proxy, config file parameter '--tls-cipher13' */
 	char		*cipher_cmd;	/* not used in agent, server, proxy, config file parameter 'tls-cipher' */
+	char		*frontend_cert_issuer;
+	char		*frontend_cert_subject;
+	char		*frontend_accept;
+	char		*tls_listen;
 } zbx_config_tls_t;
 
 zbx_config_tls_t	*zbx_config_tls_new(void);
 void	zbx_config_tls_free(zbx_config_tls_t *config_tls);
-
 
 typedef struct
 {
@@ -203,6 +207,9 @@ typedef struct
 	int				protocol;
 	int				timeout;
 	zbx_timespec_t			deadline;
+
+	/* limits tcp received packet size, overrides flags limits */
+	zbx_uint64_t			max_len_limit;
 }
 zbx_socket_t;
 
@@ -240,7 +247,7 @@ const char	*zbx_socket_strerror(void);
 #if !defined(_WINDOWS) && !defined(__MINGW32__)
 void	zbx_gethost_by_ip(const char *ip, char *host, size_t hostlen);
 void	zbx_getip_by_host(const char *host, char *ip, size_t iplen);
-int	zbx_inet_ntop(struct addrinfo *ai, char *ip, socklen_t len);
+int	zbx_inet_ntop(struct sockaddr *ai_addr, char *ip, socklen_t len);
 #endif
 int	zbx_inet_pton(int af, const char *src, void *dst);
 
@@ -292,7 +299,8 @@ int	zbx_tcp_listen(zbx_socket_t *s, const char *listen_ip, unsigned short listen
 		int config_tcp_max_backlog_size);
 void	zbx_tcp_unlisten(zbx_socket_t *s);
 
-int	zbx_tcp_accept(zbx_socket_t *s, unsigned int tls_accept, int poll_timeout);
+int	zbx_tcp_accept(zbx_socket_t *s, unsigned int tls_accept, int poll_timeout, char *tls_listen,
+		const char *unencrypted_allowed_ip);
 void	zbx_tcp_unaccept(zbx_socket_t *s);
 
 #define ZBX_TCP_READ_UNTIL_CLOSE 0x01
@@ -313,7 +321,6 @@ void	zbx_tcp_recv_context_init(zbx_socket_t *s, zbx_tcp_recv_context_t *tcp_recv
 ssize_t	zbx_tcp_recv_context(zbx_socket_t *s, zbx_tcp_recv_context_t *context, unsigned char flags, short *events);
 ssize_t	zbx_tcp_recv_context_raw(zbx_socket_t *s, zbx_tcp_recv_context_t *context, short *events, int once);
 const char	*zbx_tcp_recv_context_line(zbx_socket_t *s, zbx_tcp_recv_context_t *context, short *events);
-
 
 void	zbx_socket_set_deadline(zbx_socket_t *s, int timeout);
 int	zbx_socket_check_deadline(zbx_socket_t *s);
@@ -475,6 +482,5 @@ typedef struct
 	unsigned char	reset;
 }
 zbx_comms_redirect_t;
-
 
 #endif /* ZABBIX_ZBXCOMMS_H */

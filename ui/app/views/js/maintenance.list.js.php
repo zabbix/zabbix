@@ -29,19 +29,18 @@
 			this.#updateMultiselect($filter_groups);
 
 			this.#initActions();
+			this.#initPopupListeners();
 		}
 
 		#initActions() {
 			document.addEventListener('click', (e) => {
 				if (e.target.classList.contains('js-create-maintenance')) {
-					window.popupManagerInstance.openPopup('maintenance.edit', {});
+					ZABBIX.PopupManager.open('maintenance.edit');
 				}
 				else if (e.target.classList.contains('js-massdelete-maintenance')) {
 					this.#delete(e.target, Object.keys(chkbxRange.getSelectedIds()));
 				}
 			});
-
-			this.#setSubmitCallback();
 		}
 
 		#delete(target, maintenanceids) {
@@ -111,18 +110,13 @@
 			$ms.multiSelect('setDisabledEntries', [...$ms.multiSelect('getData').map((entry) => entry.id)]);
 		}
 
-		#setSubmitCallback() {
-			window.popupManagerInstance.setSubmitCallback((e) => {
-				if ('success' in e.detail) {
-					postMessageOk(e.detail.success.title);
-
-					if ('messages' in e.detail.success) {
-						postMessageDetails('success', e.detail.success.messages);
-					}
-				}
-
-				uncheckTableRows('maintenance');
-				location.href = location.href;
+		#initPopupListeners() {
+			ZABBIX.EventHub.subscribe({
+				require: {
+					context: CPopupManager.EVENT_CONTEXT,
+					event: CPopupManagerEvent.EVENT_SUBMIT
+				},
+				callback: () => uncheckTableRows('maintenance')
 			});
 		}
 	};

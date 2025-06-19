@@ -43,7 +43,7 @@ class CControllerUserCreate extends CControllerUserUpdateGeneral {
 		];
 
 		$ret = $this->validateInput($fields);
-		$result = $this->GetValidationResult();
+		$result = $this->getValidationResult();
 
 		if ($ret && (!$this->validatePassword() || !$this->validateUserRole())) {
 			$result = self::VALIDATION_ERROR;
@@ -53,7 +53,9 @@ class CControllerUserCreate extends CControllerUserUpdateGeneral {
 		if (!$ret) {
 			switch ($result) {
 				case self::VALIDATION_ERROR:
-					$response = new CControllerResponseRedirect('zabbix.php?action=user.edit');
+					$response = new CControllerResponseRedirect(
+						(new CUrl('zabbix.php'))->setArgument('action', 'user.edit')
+					);
 					$response->setFormData($this->getInputAll());
 					CMessageHelper::setErrorTitle(_('Cannot add user'));
 					$this->setResponse($response);
@@ -84,31 +86,34 @@ class CControllerUserCreate extends CControllerUserUpdateGeneral {
 			$user['passwd'] = $this->getInput('password1');
 		}
 
-		$user['medias'] = [];
+		if ($this->checkAccess(CRoleHelper::ACTIONS_EDIT_USER_MEDIA)) {
+			$user['medias'] = [];
 
-		foreach ($this->getInput('medias', []) as $media) {
-			$user['medias'][] = [
-				'mediatypeid' => $media['mediatypeid'],
-				'sendto' => $media['sendto'],
-				'active' => $media['active'],
-				'severity' => $media['severity'],
-				'period' => $media['period']
-			];
+			foreach ($this->getInput('medias', []) as $media) {
+				$user['medias'][] = [
+					'mediatypeid' => $media['mediatypeid'],
+					'sendto' => $media['sendto'],
+					'active' => $media['active'],
+					'severity' => $media['severity'],
+					'period' => $media['period']
+				];
+			}
 		}
 
 		$result = (bool) API::User()->create($user);
 
 		if ($result) {
-			$response = new CControllerResponseRedirect((new CUrl('zabbix.php'))
-				->setArgument('action', 'user.list')
-				->setArgument('page', CPagerHelper::loadPage('user.list', null))
+			$response = new CControllerResponseRedirect(
+				(new CUrl('zabbix.php'))
+					->setArgument('action', 'user.list')
+					->setArgument('page', CPagerHelper::loadPage('user.list', null))
 			);
 			$response->setFormData(['uncheck' => '1']);
 			CMessageHelper::setSuccessTitle(_('User added'));
 		}
 		else {
-			$response = new CControllerResponseRedirect((new CUrl('zabbix.php'))
-				->setArgument('action', 'user.edit')
+			$response = new CControllerResponseRedirect(
+				(new CUrl('zabbix.php'))->setArgument('action', 'user.edit')
 			);
 			$response->setFormData($this->getInputAll());
 			CMessageHelper::setErrorTitle(_('Cannot add user'));

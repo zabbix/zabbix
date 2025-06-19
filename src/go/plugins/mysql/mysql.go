@@ -20,6 +20,7 @@ import (
 	"time"
 
 	"github.com/omeid/go-yarn"
+	"golang.zabbix.com/sdk/errs"
 	"golang.zabbix.com/sdk/metric"
 	"golang.zabbix.com/sdk/plugin"
 	"golang.zabbix.com/sdk/uri"
@@ -44,6 +45,10 @@ var impl Plugin
 
 // Export implements the Exporter interface.
 func (p *Plugin) Export(key string, rawParams []string, _ plugin.ContextProvider) (any, error) {
+	if key == keyCustomQuery && !p.options.CustomQueriesEnabled {
+		return nil, errs.Errorf("key %q is disabled", keyCustomQuery)
+	}
+
 	params, extraParams, hc, err := metrics[key].EvalParams(rawParams, p.options.Sessions)
 	if err != nil {
 		return nil, zbxerr.ErrorInvalidParams.Wrap(err)
@@ -100,7 +105,7 @@ func (p *Plugin) Start() {
 }
 
 func (p *Plugin) setCustomQuery() yarn.Yarn {
-	if p.options.CustomQueriesPath == "" {
+	if !p.options.CustomQueriesEnabled {
 		return yarn.NewFromMap(map[string]string{})
 	}
 

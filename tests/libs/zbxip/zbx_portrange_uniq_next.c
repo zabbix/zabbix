@@ -60,7 +60,7 @@ void	zbx_mock_test_entry(void **state)
 		fail_msg("failed to parse portrange");
 
 	zbx_vector_str_create(&port_out);
-	extract_yaml_values("out.port", &port_out);
+	zbx_mock_extract_yaml_values_str("out.port", &port_out);
 
 	int		port = ZBX_PORTRANGE_INIT_PORT;
 	char		str[16];

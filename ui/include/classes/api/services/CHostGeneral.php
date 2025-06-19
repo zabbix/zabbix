@@ -29,8 +29,8 @@ abstract class CHostGeneral extends CHostBase {
 		'massremove' => ['min_user_type' => USER_TYPE_ZABBIX_ADMIN]
 	];
 
-	protected function checkGroups(array $hosts, array $db_hosts = null, string $path = null,
-			array $group_indexes = null): void {
+	protected function checkGroups(array $hosts, ?array $db_hosts = null, ?string $path = null,
+			?array $group_indexes = null): void {
 		$id_field_name = $this instanceof CTemplate ? 'templateid' : 'hostid';
 
 		$ins_group_indexes = [];
@@ -111,7 +111,7 @@ abstract class CHostGeneral extends CHostBase {
 	 *
 	 * @throws APIException if host names are not unique.
 	 */
-	protected function checkDuplicates(array $hosts, array $db_hosts = null): void {
+	protected function checkDuplicates(array $hosts, ?array $db_hosts = null): void {
 		$id_field_name = $this instanceof CTemplate ? 'templateid' : 'hostid';
 
 		$h_names = [];
@@ -178,7 +178,7 @@ abstract class CHostGeneral extends CHostBase {
 	 * @param array      $hosts
 	 * @param array|null $db_hosts
 	 */
-	protected function updateGroups(array &$hosts, array $db_hosts = null): void {
+	protected function updateGroups(array &$hosts, ?array $db_hosts = null): void {
 		$id_field_name = $this instanceof CTemplate ? 'templateid' : 'hostid';
 
 		$ins_hosts_groups = [];
@@ -238,7 +238,7 @@ abstract class CHostGeneral extends CHostBase {
 		unset($host);
 	}
 
-	protected function updateHgSets(array $hosts, array $db_hosts = null): void {
+	protected function updateHgSets(array $hosts, ?array $db_hosts = null): void {
 		$id_field_name = $this instanceof CTemplate ? 'templateid' : 'hostid';
 
 		$hgsets = [];
@@ -493,7 +493,7 @@ abstract class CHostGeneral extends CHostBase {
 	 * @param array|null $db_hosts
 	 * @param array|null $upd_hostids
 	 */
-	protected function updateTemplates(array &$hosts, array &$db_hosts = null, array &$upd_hostids = null): void {
+	protected function updateTemplates(array &$hosts, ?array &$db_hosts = null, ?array &$upd_hostids = null): void {
 		$id_field_name = $this instanceof CTemplate ? 'templateid' : 'hostid';
 
 		parent::updateTemplates($hosts, $db_hosts);
@@ -597,11 +597,11 @@ abstract class CHostGeneral extends CHostBase {
 	 * @param array|null $hostids
 	 * @param bool       $clear
 	 */
-	protected static function unlinkTemplatesObjects(array $templateids, array $hostids = null,
+	protected static function unlinkTemplatesObjects(array $templateids, ?array $hostids = null,
 			bool $clear = false): void {
-		$flags = ($clear)
-			? [ZBX_FLAG_DISCOVERY_NORMAL, ZBX_FLAG_DISCOVERY_RULE]
-			: [ZBX_FLAG_DISCOVERY_NORMAL, ZBX_FLAG_DISCOVERY_RULE, ZBX_FLAG_DISCOVERY_PROTOTYPE];
+		$flags = $clear
+			? [ZBX_FLAG_DISCOVERY_NORMAL]
+			: [ZBX_FLAG_DISCOVERY_NORMAL, ZBX_FLAG_DISCOVERY_PROTOTYPE];
 
 		// triggers
 		$db_triggers = DBselect(
@@ -786,23 +786,17 @@ abstract class CHostGeneral extends CHostBase {
 	 * @param array $hostids
 	 */
 	private static function linkTemplatesObjects(array $templateids, array $hostids): void {
-		// TODO: Modify parameters of syncTemplates methods when complete audit log will be implementing for hosts.
-		$link_request = [
-			'templateids' => $templateids,
-			'hostids' => $hostids
-		];
-
 		foreach ($templateids as $templateid) {
 			// Fist link web items, so that later regular items can use web item as their master item.
 			Manager::HttpTest()->link($templateid, $hostids);
 		}
 
 		CItem::linkTemplateObjects($templateids, $hostids);
-		API::Trigger()->syncTemplates($link_request);
-		API::Graph()->syncTemplates($link_request);
+		API::Trigger()->linkTemplateObjects($templateids, $hostids);
+		API::Graph()->linkTemplateObjects($templateids, $hostids);
 		CDiscoveryRule::linkTemplateObjects($templateids, $hostids);
 
-		CTriggerGeneral::syncTemplateDependencies($link_request['templateids'], $link_request['hostids']);
+		CTriggerGeneral::syncTemplateDependencies($templateids, $hostids);
 	}
 
 	protected function addRelatedObjects(array $options, array $result) {
@@ -951,40 +945,6 @@ abstract class CHostGeneral extends CHostBase {
 				$items = zbx_toHash($items, 'hostid');
 				foreach ($result as $hostid => $host) {
 					$result[$hostid]['items'] = array_key_exists($hostid, $items) ? $items[$hostid]['rowscount'] : '0';
-				}
-			}
-		}
-
-		if ($options['selectDiscoveries'] !== null) {
-			if ($options['selectDiscoveries'] != API_OUTPUT_COUNT) {
-				$items = API::DiscoveryRule()->get([
-					'output' => $this->outputExtend($options['selectDiscoveries'], ['hostid', 'itemid']),
-					'hostids' => $hostids,
-					'nopermissions' => true,
-					'preservekeys' => true
-				]);
-
-				if (!is_null($options['limitSelects'])) {
-					order_result($items, 'name');
-				}
-
-				$relationMap = $this->createRelationMap($items, 'hostid', 'itemid');
-
-				$items = $this->unsetExtraFields($items, ['hostid', 'itemid'], $options['selectDiscoveries']);
-				$result = $relationMap->mapMany($result, $items, 'discoveries', $options['limitSelects']);
-			}
-			else {
-				$items = API::DiscoveryRule()->get([
-					'hostids' => $hostids,
-					'nopermissions' => true,
-					'countOutput' => true,
-					'groupCount' => true
-				]);
-				$items = zbx_toHash($items, 'hostid');
-				foreach ($result as $hostid => $host) {
-					$result[$hostid]['discoveries'] = array_key_exists($hostid, $items)
-						? $items[$hostid]['rowscount']
-						: '0';
 				}
 			}
 		}
@@ -1159,6 +1119,126 @@ abstract class CHostGeneral extends CHostBase {
 		return $result;
 	}
 
+	protected static function addRelatedChildDiscoveries(array $options, array &$result): void {
+		if ($options['selectDiscoveries'] === null) {
+			return;
+		}
+
+		if ($options['selectDiscoveries'] === API_OUTPUT_COUNT) {
+			foreach ($result as &$host) {
+				$host['discoveries'] = '0';
+			}
+			unset($host);
+
+			$items = API::DiscoveryRule()->get([
+				'countOutput' => true,
+				'groupCount' => true,
+				'hostids' => array_keys($result),
+				'nopermissions' => true
+			]);
+
+			foreach ($items as $item) {
+				$result[$item['hostid']]['discoveries'] = $item['rowscount'];
+			}
+
+			return;
+		}
+
+		foreach ($result as &$host) {
+			$host['discoveries'] = [];
+		}
+		unset($host);
+
+		$internal_fields = ['hostid'];
+
+		if ($options['limitSelects'] !== null) {
+			$internal_fields[] = 'name';
+		}
+
+		$items = API::DiscoveryRule()->get([
+			'output' => array_unique(array_merge($options['selectDiscoveries'], $internal_fields)),
+			'hostids' => array_keys($result),
+			'nopermissions' => true
+		]);
+
+		if ($options['limitSelects'] !== null) {
+			CArrayHelper::sort($items, ['name']);
+		}
+
+		$fields_to_unset = array_flip(array_diff($internal_fields, $options['selectDiscoveries']));
+
+		foreach ($items as $item) {
+			if ($options['limitSelects'] !== null
+					&& count($result[$item['hostid']]['discoveries']) == $options['limitSelects']) {
+				continue;
+			}
+
+			$result[$item['hostid']]['discoveries'][] = $fields_to_unset
+				? array_diff_key($item, $fields_to_unset)
+				: $item;
+		}
+	}
+
+	protected static function addRelatedChildDiscoveryRules(array $options, array &$result): void {
+		if ($options['selectDiscoveryRules'] === null) {
+			return;
+		}
+
+		if ($options['selectDiscoveryRules'] === API_OUTPUT_COUNT) {
+			foreach ($result as &$host) {
+				$host['discoveryRules'] = '0';
+			}
+			unset($host);
+
+			$items = API::DiscoveryRule()->get([
+				'countOutput' => true,
+				'groupCount' => true,
+				'hostids' => array_keys($result),
+				'nopermissions' => true
+			]);
+
+			foreach ($items as $item) {
+				$result[$item['hostid']]['discoveryRules'] = $item['rowscount'];
+			}
+
+			return;
+		}
+
+		foreach ($result as &$host) {
+			$host['discoveryRules'] = [];
+		}
+		unset($host);
+
+		$internal_fields = ['hostid'];
+
+		if ($options['limitSelects'] !== null) {
+			$internal_fields[] = 'name';
+		}
+
+		$items = API::DiscoveryRule()->get([
+			'output' => array_unique(array_merge($options['selectDiscoveryRules'], $internal_fields)),
+			'hostids' => array_keys($result),
+			'nopermissions' => true
+		]);
+
+		if ($options['limitSelects'] !== null) {
+			CArrayHelper::sort($items, ['name']);
+		}
+
+		$fields_to_unset = array_flip(array_diff($internal_fields, $options['selectDiscoveryRules']));
+
+		foreach ($items as $item) {
+			if ($options['limitSelects'] !== null
+					&& count($result[$item['hostid']]['discoveryRules']) == $options['limitSelects']) {
+				continue;
+			}
+
+			$result[$item['hostid']]['discoveryRules'][] = $fields_to_unset
+				? array_diff_key($item, $fields_to_unset)
+				: $item;
+		}
+	}
+
 	protected static function addGroupsByData(array $data, array &$hosts): void {
 		if (!array_key_exists('groups', $data) && (!array_key_exists('groupids', $data) || !$data['groupids'])) {
 			return;
@@ -1220,17 +1300,6 @@ abstract class CHostGeneral extends CHostBase {
 			$host['templates_clear'] = $data['templates_clear'];
 		}
 		unset($host);
-	}
-
-	/**
-	 * Add the existing host or template groups, templates, tags, macros.
-	 *
-	 * @param array $hosts
-	 * @param array $db_hosts
-	 */
-	protected function addAffectedObjects(array $hosts, array &$db_hosts): void {
-		$this->addAffectedGroups($hosts, $db_hosts);
-		parent::addAffectedObjects($hosts, $db_hosts);
 	}
 
 	/**

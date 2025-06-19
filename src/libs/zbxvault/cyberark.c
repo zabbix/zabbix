@@ -20,10 +20,10 @@
 
 #include "zbxjson.h"
 
-int	zbx_cyberark_kvs_get(const char *vault_url, const char *prefix, const char *token, const char *ssl_cert_file,
-		const char *ssl_key_file, const char *config_source_ip, const char *config_ssl_ca_location,
-		const char *config_ssl_cert_location, const char *config_ssl_key_location, const char *path,
-		long timeout, zbx_kvs_t *kvs, char **error)
+int	zbx_vault_get_kvs_cyberark(const char *vault_url, const char *prefix, const char *token,
+		const char *ssl_cert_file, const char *ssl_key_file, const char *config_source_ip,
+		const char *config_ssl_ca_location, const char *config_ssl_cert_location,
+		const char *config_ssl_key_location, const char *path, long timeout, zbx_kvs_t *kvs, char **error)
 {
 #ifndef HAVE_LIBCURL
 	ZBX_UNUSED(vault_url);

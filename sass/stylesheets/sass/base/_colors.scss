@@ -38,6 +38,11 @@ $disabled-item-bg-color: #ccd5d9 !default;
 $error: #cc0000 !default;
 $error-focus: #ad1f1f !default;
 
+$progress-complete-color: #0275b8 !default;
+$progress-current-color: #768d99 !default;
+$progress-error-color: $negative-color !default;
+$progress-default-color: #ccd5d9 !default;
+
 // Layout.
 $header-bg-color: #ffffff !default;
 
@@ -60,6 +65,7 @@ $scrollbar-thumb-color-darken: 5% !default;
 
 // Main.
 $font-color: #1f2c33 !default;
+$font-light-color: #acbbc2 !default;
 $font-selected-color: #ffffff !default;
 $font-alt-color: #768d99 !default;
 $body-bg-color: #ebeef0 !default;
@@ -160,10 +166,15 @@ $colorpicker-empty-color: #d40000 !default;
 // Forms.
 $form-font-color: $font-color !default;
 $form-bg-color: $ui-bg-color !default;
+$form-dark-bg-color: #f8f8f8 !default;
+$form-darker-bg-color: #ebebeb !default;
 $form-border-color: #acbbc2 !default;
 $form-focus-border-color: #02659f !default;
 $form-label-asterisk-color: $red;
 $form-fields-group-border-color: #ebeef0 !default;
+$form-field-hint-color: #5e7988 !default;
+$form-radio-selected-color: #02659f !default;
+$form-description-border-color: #0275b8 !default;
 
 $form-hover-bg-color: $ui-hover-bg-color !default;
 
@@ -235,6 +246,7 @@ $link-alt-underline-color: #768d99 !default;
 $msg-bad-color: #dc3838 !default;
 $msg-bad-btn-color: $msg-bad-color !default;
 $msg-good-color: #29a847 !default;
+$msg-info-color: #0275b8 !default;
 $msg-warning-color: #f4af25 !default;
 
 // Tabfilter.
@@ -307,9 +319,9 @@ $text-placeholder-color: #ffffff !default;
 $text-placeholder-bg-color: $ui-bg-selected-color !default;
 
 // Change indicators.
-$arrow-fill-up: #3DC51D;
-$arrow-fill-down: #FC5A5A;
-$arrow-fill-up-down: #3DC51D;
+$arrow-fill-up: #3dc51d;
+$arrow-fill-down: #fc5a5a;
+$arrow-fill-up-down: #3dc51d;
 
 // Analog clock.
 $clock-face-color: #ebebeb !default;

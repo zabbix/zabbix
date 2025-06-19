@@ -244,43 +244,58 @@ class CControllerHostList extends CController {
 				'details'
 			],
 			'selectItems' => API_OUTPUT_COUNT,
-			'selectDiscoveries' => API_OUTPUT_COUNT,
+			'selectDiscoveryRules' => API_OUTPUT_COUNT,
 			'selectTriggers' => API_OUTPUT_COUNT,
 			'selectGraphs' => API_OUTPUT_COUNT,
 			'selectHttpTests' => API_OUTPUT_COUNT,
 			'selectDiscoveryRule' => ['itemid', 'name', 'lifetime_type', 'enabled_lifetime_type'],
-			'selectHostDiscovery' => ['parent_hostid', 'status', 'ts_delete', 'ts_disable', 'disable_source'],
+			'selectDiscoveryData' => ['parent_hostid', 'status', 'ts_delete', 'ts_disable', 'disable_source'],
 			'selectTags' => ['tag', 'value'],
 			'hostids' => array_column($hosts, 'hostid'),
 			'preservekeys' => true
 		]);
 
-		foreach ($hosts as &$host) {
-			$host['is_discovery_rule_editable'] = $host['discoveryRule']
-				&& API::DiscoveryRule()->get([
-					'output' => [],
-					'itemids' => $host['discoveryRule']['itemid'],
-					'editable' => true
-				]);
+		$lld_parentids = [];
+
+		foreach ($hosts as $host) {
+			if ($host['discoveryRule']) {
+				$lld_parentids[$host['discoveryRule']['itemid']] = true;
+			}
 		}
-		unset($host);
+
+		if ($lld_parentids) {
+			$editable_lld_parents = API::DiscoveryRule()->get([
+				'output' => [],
+				'itemids' => array_keys($lld_parentids),
+				'editable' => true,
+				'preservekeys' => true
+			]);
+
+			foreach ($hosts as &$host) {
+				if ($host['discoveryRule']) {
+					$host['is_discovery_rule_editable'] =
+						array_key_exists($host['discoveryRule']['itemid'], $editable_lld_parents);
+				}
+			}
+			unset($host);
+		}
 
 		order_result($hosts, $sort_field, $sort_order);
 
 		$hostids = array_column($hosts, 'hostid');
-
-		// Get count for every host with item type ITEM_TYPE_ZABBIX_ACTIVE (7) and ITEM_TYPE_ZABBIX (0).
-		$active_item_count_by_hostid = getItemTypeCountByHostId(ITEM_TYPE_ZABBIX_ACTIVE, $hostids);
-		$passive_item_count_by_hostid = getItemTypeCountByHostId(ITEM_TYPE_ZABBIX, $hostids);
+		$active_item_count_by_hostid = getEnabledItemTypeCountByHostId(ITEM_TYPE_ZABBIX_ACTIVE, $hostids);
 
 		// Selecting linked templates to templates linked to hosts.
 		$templateids = [];
+		$interfaceids = [];
 
 		foreach ($hosts as $host) {
 			$templateids = array_merge($templateids, array_column($host['parentTemplates'], 'templateid'));
+			$interfaceids = array_merge($interfaceids, array_column($host['interfaces'], 'interfaceid'));
 		}
 
 		$templateids = array_keys(array_flip($templateids));
+		$interface_enabled_items_count = getEnabledItemsCountByInterfaceIds($interfaceids);
 
 		$templates = API::Template()->get([
 			'output' => ['templateid', 'name'],
@@ -314,19 +329,24 @@ class CControllerHostList extends CController {
 				['field' => 'main', 'order' => ZBX_SORT_DOWN]
 			]);
 
+			foreach ($host['interfaces'] as &$interface) {
+				$interfaceid = $interface['interfaceid'];
+				$interface['has_enabled_items'] = array_key_exists($interfaceid, $interface_enabled_items_count)
+					&& $interface_enabled_items_count[$interfaceid] > 0;
+			}
+			unset($interface);
+
 			// Add active checks interface if host have items with type ITEM_TYPE_ZABBIX_ACTIVE (7).
 			if (array_key_exists($host['hostid'], $active_item_count_by_hostid)
 					&& $active_item_count_by_hostid[$host['hostid']] > 0) {
 				$host['interfaces'][] = [
 					'type' => INTERFACE_TYPE_AGENT_ACTIVE,
 					'available' => $host['active_available'],
+					'has_enabled_items' => true,
 					'error' => ''
 				];
 			}
 			unset($host['active_available']);
-
-			$host['has_passive_checks'] = array_key_exists($host['hostid'], $passive_item_count_by_hostid)
-				&& $passive_item_count_by_hostid[$host['hostid']] > 0;
 
 			if ($host['monitored_by'] == ZBX_MONITORED_BY_PROXY) {
 				$proxyids[$host['proxyid']] = true;

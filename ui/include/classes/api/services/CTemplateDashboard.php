@@ -65,7 +65,7 @@ class CTemplateDashboard extends CDashboardGeneral {
 		$sql_parts = [
 			'select' => ['dashboard' => 'd.dashboardid'],
 			'from' => ['dashboard' => 'dashboard d'],
-			'where' => [],
+			'where' => ['templateids' => 'd.templateid IS NOT NULL'],
 			'order' => [],
 			'group' => []
 		];
@@ -84,65 +84,26 @@ class CTemplateDashboard extends CDashboardGeneral {
 				return $options['countOutput'] ? '0' : [];
 			}
 
+			$sql_parts['from'][] = 'host_hgset hh';
+			$sql_parts['from'][] = 'permission p';
+			$sql_parts['where'][] = 'd.templateid=hh.hostid';
+			$sql_parts['where'][] = 'hh.hgsetid=p.hgsetid';
+			$sql_parts['where'][] = 'p.ugsetid='.self::$userData['ugsetid'];
+
 			if ($options['editable']) {
-				$sql_parts['from'][] = 'host_hgset hh';
-				$sql_parts['from'][] = 'permission p';
-				$sql_parts['where'][] = 'd.templateid=hh.hostid';
-				$sql_parts['where'][] = 'hh.hgsetid=p.hgsetid';
-				$sql_parts['where'][] = 'p.ugsetid='.self::$userData['ugsetid'];
 				$sql_parts['where'][] = 'p.permission='.PERM_READ_WRITE;
-			}
-			else {
-				$db_host_templates = DBselect(
-					'SELECT DISTINCT ht.templateid'.
-					' FROM hosts h'.
-					' JOIN host_hgset hh ON h.hostid=hh.hostid'.
-					' JOIN permission p ON hh.hgsetid=p.hgsetid'.
-						' AND p.ugsetid='.self::$userData['ugsetid'].
-					' JOIN hosts_templates ht ON h.hostid=ht.hostid'.
-					' WHERE h.status IN ('.HOST_STATUS_MONITORED.','.HOST_STATUS_NOT_MONITORED.')'.
-						' AND h.flags IN ('.ZBX_FLAG_DISCOVERY_NORMAL.','.ZBX_FLAG_DISCOVERY_CREATED.')'
-				);
-
-				$templateids = [];
-
-				while ($db_host_template = DBfetch($db_host_templates)) {
-					$templateids[$db_host_template['templateid']] = true;
-				}
-
-				$all_templateids = [];
-
-				while ($templateids) {
-					$all_templateids += $templateids;
-
-					$db_parent_templates = DBselect(
-						'SELECT ht.templateid'.
-						' FROM hosts_templates ht'.
-						' WHERE '.dbConditionId('ht.hostid', array_keys($templateids))
-					);
-
-					$templateids = [];
-
-					while ($db_parent_template = DBfetch($db_parent_templates)) {
-						$templateids[$db_parent_template['templateid']] = true;
-					}
-				}
-
-				$options['templateids'] = $options['templateids'] !== null
-					? array_intersect($options['templateids'], array_keys($all_templateids))
-					: array_keys($all_templateids);
 			}
 		}
 
 		// dashboardids
 		if ($options['dashboardids'] !== null) {
-			$sql_parts['where'][] = dbConditionInt('d.dashboardid', $options['dashboardids']);
+			$sql_parts['where'][] = dbConditionId('d.dashboardid', $options['dashboardids']);
 		}
 
-		// dashboardids
-		$sql_parts['where'][] = ($options['templateids'] !== null)
-			? dbConditionInt('d.templateid', $options['templateids'])
-			: 'd.templateid IS NOT NULL';
+		// templateids
+		if ($options['templateids'] !== null) {
+			$sql_parts['where']['templateids'] = dbConditionId('d.templateid', $options['templateids']);
+		}
 
 		// filter
 		if ($options['filter'] !== null) {
@@ -333,7 +294,7 @@ class CTemplateDashboard extends CDashboardGeneral {
 	 *
 	 * @throws APIException
 	 */
-	private static function checkUuidDuplicates(array $dashboards, array $db_dashboards = null): void {
+	private static function checkUuidDuplicates(array $dashboards, ?array $db_dashboards = null): void {
 		$dashboard_indexes = [];
 
 		foreach ($dashboards as $i => $dashboard) {
@@ -373,7 +334,7 @@ class CTemplateDashboard extends CDashboardGeneral {
 	 *
 	 * @throws APIException if the input is invalid.
 	 */
-	protected function validateUpdate(array &$dashboards, array &$db_dashboards = null): void {
+	protected function validateUpdate(array &$dashboards, ?array &$db_dashboards = null): void {
 		$api_input_rules = ['type' => API_OBJECTS, 'flags' => API_NOT_EMPTY | API_NORMALIZE, 'uniq' => [['uuid'], ['dashboardid']], 'fields' => [
 			'uuid' => 				['type' => API_UUID],
 			'dashboardid' =>		['type' => API_ID, 'flags' => API_REQUIRED],
@@ -453,7 +414,7 @@ class CTemplateDashboard extends CDashboardGeneral {
 	 *
 	 * @throws APIException if dashboard names are not unique.
 	 */
-	protected function checkDuplicates(array $dashboards, array $db_dashboards = null): void {
+	protected function checkDuplicates(array $dashboards, ?array $db_dashboards = null): void {
 		$names_by_templateid = [];
 
 		foreach ($dashboards as $dashboard) {

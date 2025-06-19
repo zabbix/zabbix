@@ -240,7 +240,9 @@ class testAgentJsonProtocol extends CIntegrationTest {
 			]
 		];
 
-		$server = new CZabbixServer('localhost', $this->getConfigurationValue(self::COMPONENT_SERVER, 'ListenPort'), 8, 10, ZBX_SOCKET_BYTES_LIMIT);
+		$server = new CZabbixServer('localhost', $this->getConfigurationValue(self::COMPONENT_SERVER, 'ListenPort'), 8,
+			10, ZBX_SOCKET_BYTES_LIMIT, tls_config: ['ACTIVE' => '0']
+		);
 		$result = $server->testItem($item_test_data, self::$sid);
 
 		$this->assertFalse($result === false);
@@ -389,10 +391,30 @@ class testAgentJsonProtocol extends CIntegrationTest {
 		return true;
 	}
 
+	private function purgeActions() {
+		$params = [
+			'output' => 'actionid',
+			'preservekeys' => true
+		];
+
+		$response = $this->call('action.get', $params);
+
+		$this->assertArrayHasKey('result', $response);
+
+		$ids = array_keys($response['result']);
+
+		if ($ids === []) {
+			return;
+		}
+
+		$response = $this->call('action.delete', $ids);
+	}
+
 	private function checkDiscovery($agent_component) {
 		$this->stopComponent(self::COMPONENT_SERVER);
 		$this->stopComponent($agent_component);
 
+		$this->purgeActions();
 		$this->call('host.delete', [self::$hostid]);
 
 		$response = $this->call('drule.create', [

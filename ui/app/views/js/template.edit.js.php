@@ -21,18 +21,19 @@
 
 window.template_edit_popup = new class {
 
-	init({templateid, warnings}) {
+	init({rules, templateid, warnings}) {
 		this.overlay = overlays_stack.getById('template.edit');
 		this.dialogue = this.overlay.$dialogue[0];
-		this.form = this.overlay.$dialogue.$body[0].querySelector('form');
+		this.form_element = this.overlay.$dialogue.$body[0].querySelector('form');
+		this.form = new CForm(this.form_element, rules);
 		this.templateid = templateid;
 		this.linked_templateids = this.#getLinkedTemplates();
 		this.macros_templateids = null;
+		this.show_inherited_macros = false;
 
-		const backurl = new Curl('zabbix.php');
-
-		backurl.setArgument('action', 'template.list');
-		this.overlay.backurl = backurl.getUrl();
+		const return_url = new URL('zabbix.php', location.href);
+		return_url.searchParams.set('action', 'template.list');
+		ZABBIX.PopupManager.setReturnUrl(return_url.href);
 
 		if (warnings.length > 0) {
 			const message_box = warnings.length > 1
@@ -41,21 +42,19 @@ window.template_edit_popup = new class {
 				)[0]
 				: makeMessageBox('warning', warnings, null, true, false)[0];
 
-			this.form.parentNode.insertBefore(message_box, this.form);
+			this.form_element.parentNode.insertBefore(message_box, this.form_element);
 		}
 
 		this.#initActions();
 		this.#initTemplateTab();
 		this.#initMacrosTab();
+		this.#initPopupListeners();
 
-		this.initial_form_fields = getFormFields(this.form);
+		this.initial_form_fields = this.form.getAllValues();
 	}
 
 	#initActions() {
-		this.form.addEventListener('click', (e) => {
-			if (e.target.classList.contains('js-edit-template')) {
-				this.setActions(e.target.dataset.templateid);
-			}
+		this.form_element.addEventListener('click', e => {
 			if (e.target.classList.contains('js-unlink')) {
 				this.#unlink(e);
 			}
@@ -66,45 +65,16 @@ window.template_edit_popup = new class {
 		});
 
 		// Add visible name input field placeholder.
-		const template_name = this.form.querySelector('#template_name');
-		const visible_name = this.form.querySelector('#visiblename');
+		const template_name = this.form_element.querySelector('#template_name');
+		const visible_name = this.form_element.querySelector('#visiblename');
 
 		template_name.addEventListener('input', () => visible_name.placeholder = template_name.value);
 		template_name.dispatchEvent(new Event('input'));
 	}
 
-	setActions(templateid) {
-		window.popupManagerInstance.setAdditionalActions(() => {
-			const form_fields = getFormFields(this.form);
-
-			if (JSON.stringify(this.initial_form_fields) !== JSON.stringify(form_fields)) {
-				if (!window.confirm(<?= json_encode(_('Any changes made in the current form will be lost.')) ?>)) {
-					return false;
-				}
-				else {
-					overlayDialogueDestroy(this.overlay.dialogueid);
-
-					const url = new Curl(location.href);
-
-					url.setArgument('templateid', templateid);
-					history.replaceState(null, '', url.getUrl());
-
-					return true;
-				}
-			}
-
-			const url = new Curl(location.href);
-
-			url.setArgument('templateid', templateid);
-			history.replaceState(null, '', url.getUrl());
-
-			return true;
-		});
-	}
-
 	#initTemplateTab() {
-		const $groups_ms = $('#template_groups_', this.form);
-		const $template_ms = $('#template_add_templates_', this.form);
+		const $groups_ms = $('#template_groups_', this.form_element);
+		const $template_ms = $('#template_add_templates_', this.form_element);
 
 		$template_ms.on('change', () => {
 			$template_ms.multiSelect('setDisabledEntries', this.#getLinkedTemplates().concat(this.#getNewTemplates()));
@@ -121,45 +91,84 @@ window.template_edit_popup = new class {
 	#initMacrosTab() {
 		this.macros_manager = new HostMacrosManager({
 			container: $('#template_macros_container .table-forms-td-right'),
-			source: 'template'
-		});
-		let macros_initialized = false;
+			source: 'template',
+			load_callback: () => {
+				this.form.discoverAllFields();
 
-		$('#template-tabs', this.form).on('tabscreate tabsactivate', (event, ui) => {
-			let panel = (event.type === 'tabscreate') ? ui.panel : ui.newPanel;
-			const show_inherited_macros = this.form
-				.querySelector('input[name=show_inherited_template_macros]:checked').value == 1;
+				const fields = [];
 
-			if (panel.attr('id') === 'template-macro-tab') {
-				// Please note that macro initialization must take place once and only when the tab is visible.
-				if (event.type === 'tabsactivate') {
-					const templateids = this.linked_templateids.concat(this.#getNewTemplates());
+				Object.values(this.form.findFieldByName('macros').getFields()).forEach(field => {
+					fields.push(field.getName());
+					field.setChanged();
+				});
 
-					if (this.macros_templateids === null) {
-						this.macros_templateids = templateids;
-					}
-
-					// After initialization load inherited macros only if templates changed.
-					if (show_inherited_macros && this.macros_templateids.xor(templateids).length > 0) {
-						this.macros_templateids = templateids;
-						this.macros_manager.load(show_inherited_macros, templateids);
-					}
-				}
-
-				if (macros_initialized) {
-					return;
-				}
-
-				// Initialize macros.
-				this.macros_manager.initMacroTable(show_inherited_macros);
-
-				macros_initialized = true;
+				this.form.validateChanges(fields, true);
 			}
 		});
 
-		this.form.querySelector('#show_inherited_template_macros').onchange = (e) => {
-			this.macros_manager.load(e.target.value == 1, this.linked_templateids.concat(this.#getNewTemplates()));
-		}
+		const show_inherited_macros_element = document.getElementById('show_inherited_template_macros');
+		this.show_inherited_macros = show_inherited_macros_element.querySelector('input:checked').value == 1;
+
+		this.macros_manager.initMacroTable(this.show_inherited_macros);
+
+		const observer = new IntersectionObserver(entries => {
+			if (entries[0].isIntersecting && this.show_inherited_macros) {
+				const templateids = this.linked_templateids.concat(this.#getNewTemplates());
+
+				if (this.macros_templateids === null || this.macros_templateids.xor(templateids).length > 0) {
+					this.macros_templateids = templateids;
+
+					this.macros_manager.load(this.show_inherited_macros, templateids);
+				}
+			}
+		});
+		observer.observe(document.getElementById('template-macro-tab'));
+
+		show_inherited_macros_element.addEventListener('change', e => {
+			this.show_inherited_macros = e.target.value == 1;
+			this.macros_templateids = this.linked_templateids.concat(this.#getNewTemplates());
+
+			this.macros_manager.load(this.show_inherited_macros, this.macros_templateids);
+		});
+	}
+
+	#initPopupListeners() {
+		const subscriptions = [];
+
+		subscriptions.push(
+			ZABBIX.EventHub.subscribe({
+				require: {
+					context: CPopupManager.EVENT_CONTEXT,
+					event: CPopupManagerEvent.EVENT_OPEN,
+					action: 'template.edit'
+				},
+				callback: ({data, event}) => {
+					if (data.action_parameters.templateid === this.templateid || this.templateid === null) {
+						return;
+					}
+
+					if (!this.#isConfirmed()) {
+						event.preventDefault();
+					}
+				}
+			})
+		);
+
+		subscriptions.push(
+			ZABBIX.EventHub.subscribe({
+				require: {
+					context: CPopupManager.EVENT_CONTEXT,
+					event: CPopupManagerEvent.EVENT_END_SCRIPTING,
+					action: this.overlay.dialogueid
+				},
+				callback: () => ZABBIX.EventHub.unsubscribeAll(subscriptions)
+			})
+		);
+	}
+
+	#isConfirmed() {
+		return JSON.stringify(this.initial_form_fields) === JSON.stringify(this.form.getAllValues())
+			|| window.confirm(<?= json_encode(_('Any changes made in the current form will be lost.')) ?>);
 	}
 
 	/**
@@ -175,7 +184,7 @@ window.template_edit_popup = new class {
 			value != e.target.dataset.templateid
 		);
 
-		$('#template_add_templates_', this.form).trigger('change');
+		$('#template_add_templates_', this.form_element).trigger('change');
 	}
 
 	/**
@@ -186,10 +195,12 @@ window.template_edit_popup = new class {
 	#clear(templateid) {
 		const clear_template = document.createElement('input');
 
+		clear_template.setAttribute('data-field-type', 'hidden');
 		clear_template.type = 'hidden';
-		clear_template.name = 'clear_templates[]';
+		clear_template.name = `clear_templates[${templateid}]`;
 		clear_template.value = templateid;
-		this.form.appendChild(clear_template);
+		this.form_element.appendChild(clear_template);
+		this.form.discoverAllFields();
 	}
 
 	/**
@@ -200,7 +211,7 @@ window.template_edit_popup = new class {
 	#getLinkedTemplates() {
 		const linked_templateids = [];
 
-		this.form.querySelectorAll('[name^="templates["').forEach((input) => {
+		this.form_element.querySelectorAll('[name^="templates["').forEach((input) => {
 			linked_templateids.push(input.value);
 		});
 
@@ -213,7 +224,7 @@ window.template_edit_popup = new class {
 	 * @return {array}  Templateids.
 	 */
 	#getNewTemplates() {
-		const $template_multiselect = $('#template_add_templates_', this.form);
+		const $template_multiselect = $('#template_add_templates_', this.form_element);
 		const templateids = [];
 
 		if ($template_multiselect.length) {
@@ -226,13 +237,13 @@ window.template_edit_popup = new class {
 	}
 
 	clone() {
-		const parameters = this.#trimFields(getFormFields(this.form));
+		const parameters = this.#trimFields(this.form.getAllValues());
 
 		parameters.clone = 1;
 		parameters.templateid = this.templateid;
-		this.#prepareFields(parameters);
 
-		this.overlay = window.popupManagerInstance.openPopup('template.edit', parameters);
+		this.form.release();
+		this.overlay = ZABBIX.PopupManager.open('template.edit', parameters);
 	}
 
 	deleteAndClear() {
@@ -250,48 +261,33 @@ window.template_edit_popup = new class {
 			data.clear = 1;
 		}
 
-		this.#post(curl.getUrl(), data, (response) => {
-			overlayDialogueDestroy(this.overlay.dialogueid);
-
-			this.dialogue.dispatchEvent(new CustomEvent('dialogue.submit', {detail: response}));
-		});
+		this.#post(curl.getUrl(), data);
 	}
 
 	submit() {
-		const fields = getFormFields(this.form);
+		const fields = this.form.getAllValues();
+		this.#trimFields(fields);
 
 		if (this.templateid !== null) {
 			fields.templateid = this.templateid;
 		}
 
-		this.#prepareFields(fields);
-		this.#trimFields(fields);
 		this.overlay.setLoading();
 
 		const curl = new Curl('zabbix.php');
 
 		curl.setArgument('action', this.templateid === null ? 'template.create' : 'template.update');
 
-		this.#post(curl.getUrl(), fields, (response) => {
-			overlayDialogueDestroy(this.overlay.dialogueid);
+		this.form.validateSubmit(fields)
+			.then((result) => {
+				if (!result) {
+					this.overlay.unsetLoading();
 
-			this.dialogue.dispatchEvent(new CustomEvent('dialogue.submit', {detail: response}));
-		});
-	}
+					return;
+				}
 
-	#prepareFields(parameters) {
-		const mappings = [
-			{from: 'template_groups', to: 'groups'},
-			{from: 'template_add_templates', to: 'add_templates'},
-			{from: 'show_inherited_template_macros', to: 'show_inherited_macros'}
-		];
-
-		for (const mapping of mappings) {
-			parameters[mapping.to] = parameters[mapping.from];
-			delete parameters[mapping.from];
-		}
-
-		return parameters;
+				this.#post(curl.getUrl(), fields);
+			});
 	}
 
 	#trimFields(fields) {
@@ -326,7 +322,12 @@ window.template_edit_popup = new class {
 				macro.macro = macro.macro.trim();
 
 				if ('value' in macro) {
-					macro.value = macro.value.trim();
+					if (macro.value === null) {
+						delete macro.value;
+					}
+					else {
+						macro.value = macro.value.trim();
+					}
 				}
 				if ('description' in macro) {
 					macro.description = macro.description.trim();
@@ -342,9 +343,8 @@ window.template_edit_popup = new class {
 	 *
 	 * @param {string}   url               The URL to send the POST request to.
 	 * @param {object}   data              The data to send with the POST request.
-	 * @param {callback} success_callback  The function to execute when a successful response is received.
 	 */
-	#post(url, data, success_callback) {
+	#post(url, data) {
 		fetch(url, {
 			method: 'POST',
 			headers: {'Content-Type': 'application/json'},
@@ -356,11 +356,19 @@ window.template_edit_popup = new class {
 					throw {error: response.error};
 				}
 
-				return response;
+				if ('form_errors' in response) {
+					this.form.setErrors(response.form_errors, true, true);
+					this.form.renderErrors();
+
+					return;
+				}
+
+				overlayDialogueDestroy(this.overlay.dialogueid);
+
+				this.dialogue.dispatchEvent(new CustomEvent('dialogue.submit', {detail: response}));
 			})
-			.then(success_callback)
 			.catch((exception) => {
-				for (const element of this.form.parentNode.children) {
+				for (const element of this.form_element.parentNode.children) {
 					if (element.matches('.msg-good, .msg-bad, .msg-warning')) {
 						element.parentNode.removeChild(element);
 					}
@@ -378,7 +386,7 @@ window.template_edit_popup = new class {
 
 				const message_box = makeMessageBox('bad', messages, title)[0];
 
-				this.form.parentNode.insertBefore(message_box, this.form);
+				this.form_element.parentNode.insertBefore(message_box, this.form_element);
 			})
 			.finally(() => {
 				this.overlay.unsetLoading();

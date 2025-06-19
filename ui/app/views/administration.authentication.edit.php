@@ -19,7 +19,6 @@
  * @var array $data
  */
 
-$this->addJsFile('class.form.fieldset.collapsible.js');
 $this->includeJsFile('administration.authentication.edit.js.php');
 
 $form = (new CForm())
@@ -585,7 +584,7 @@ if ($data['is_http_auth_allowed']) {
 			new CLabel(_('Remove domain name'), 'http_strip_domains'),
 			new CFormField(
 				(new CTextBox('http_strip_domains', $data['http_strip_domains'], false,
-					DB::getFieldLength('config', 'http_strip_domains')
+					CSettingsSchema::getFieldLength('http_strip_domains')
 				))
 					->setEnabled($data['http_auth_enabled'])
 					->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)

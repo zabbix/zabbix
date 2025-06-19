@@ -14,7 +14,7 @@
 **/
 
 
-require_once dirname(__FILE__).'/../../include/CLegacyWebTest.php';
+require_once __DIR__.'/../../include/CLegacyWebTest.php';
 
 use Facebook\WebDriver\WebDriverBy;
 
@@ -106,6 +106,9 @@ class testTemplateInheritance extends CLegacyWebTest {
 
 	/**
 	 * @dataProvider dataCreate
+	 *
+	 * TODO: remove ignoreBrowserErrors after DEV-4233
+	 * @ignoreBrowserErrors
 	 */
 	public function testTemplateInheritance_Create($result, $template, $itemName, $keyName, $errorMsgs) {
 		$this->zbxTestLogin('zabbix.php?action=template.list&filter_name='.$template.'&filter_set=1');
@@ -263,7 +266,9 @@ class testTemplateInheritance extends CLegacyWebTest {
 		$this->zbxTestClick('add_item');
 		$this->zbxTestLaunchOverlayDialog('Items');
 		$this->zbxTestClickLinkText('testInheritanceItem1');
-		$this->zbxTestClickWait('add');
+
+		COverlayDialogElement::find()->waitUntilReady()->one()->asForm()->submit();
+
 		$this->assertMessage(TEST_GOOD,'Graph added');
 
 		// check that the inherited graph matches the original
@@ -305,7 +310,7 @@ class testTemplateInheritance extends CLegacyWebTest {
 		$this->zbxTestDropdownSelect('type', 'Simple check');
 		$this->zbxTestInputType('delay', '31s');
 		$this->zbxTestInputType('lifetime', '32d');
-		$this->zbxTestInputType('description', 'description');
+		$this->zbxTestInputType('js-item-description-field', 'description');
 		$this->zbxTestInputType('delay_flex_0_delay', '50s');
 		$this->zbxTestInputType('delay_flex_0_period', '1-7,00:00-24:00');
 		$this->zbxTestClickWait('interval_add');
@@ -337,6 +342,8 @@ class testTemplateInheritance extends CLegacyWebTest {
 	 * Creates a new item prototype on the template and checks that the inherited item prototype matches
 	 * the original.
 	 *
+	 * TODO: remove ignoreBrowserErrors after DEV-4233
+	 * @ignoreBrowserErrors
 	 */
 	public function testTemplateInheritance_CreateItemPrototype() {
 		$this->zbxTestLogin('zabbix.php?action=template.list&filter_name='.$this->templateName.'&filter_set=1');
@@ -489,7 +496,7 @@ class testTemplateInheritance extends CLegacyWebTest {
 		$this->zbxTestDropdownSelect('ymin_type', 'Calculated');
 		$this->zbxTestDropdownSelect('ymax_type', 'Calculated');
 
-		$this->zbxTestClick('add_protoitem');
+		$this->zbxTestClick('add_item_prototype');
 		$this->zbxTestLaunchOverlayDialog('Item prototypes');
 		$this->zbxTestClickLinkText('itemDiscovery');
 		$this->zbxTestTextPresent($this->templateName.': itemDiscovery');
@@ -499,7 +506,8 @@ class testTemplateInheritance extends CLegacyWebTest {
 		$this->zbxTestClickLinkText('testInheritanceItem1');
 		$this->zbxTestTextPresent($this->templateName.': testInheritanceItem1');
 
-		$this->zbxTestClickWait('add');
+		COverlayDialogElement::find()->waitUntilReady()->one()->asForm()->submit();
+
 		$this->assertMessage(TEST_GOOD,'Graph prototype added');
 		$this->zbxTestTextPresent('Test LLD graph');
 
