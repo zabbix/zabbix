@@ -62,7 +62,7 @@ class CWidgetEditSandbox {
 			}
 			else {
 				if (pos === null) {
-					pos = this.#findPosForNewWidget();
+					pos = this.#findPosForNewWidget(type);
 
 					if (pos === null) {
 						throw t('Cannot add widget: not enough free space on the dashboard.');
@@ -172,24 +172,20 @@ class CWidgetEditSandbox {
 		});
 	}
 
-	#findPosForNewWidget() {
+	#findPosForNewWidget(type) {
+		const default_size = this.#widget_defaults[type].size;
+
 		let pos_best = null;
 		let pos_best_value = null;
 
 		for (const pos of this.#dashboard_page.findFreePosAll()) {
 			let pos_value = 0;
 
-			for (const widget_defaults of Object.values(this.#widget_defaults)) {
-				let best_intersection = 0;
-
-				for (const pos_size of pos.sizes) {
-					best_intersection = Math.max(best_intersection,
-						Math.min(pos_size.width, widget_defaults.size.width) / widget_defaults.size.width
-							* Math.min(pos_size.height, widget_defaults.size.height) / widget_defaults.size.height
-					);
-				}
-
-				pos_value += best_intersection;
+			for (const pos_size of pos.sizes) {
+				pos_value = Math.max(pos_value,
+					Math.min(pos_size.width, default_size.width) / default_size.width
+						* Math.min(pos_size.height, default_size.height) / default_size.height
+				);
 			}
 
 			if (pos_best === null || pos_value > pos_best_value

@@ -20,6 +20,7 @@ class CPassBox extends CInput {
 		parent::__construct('password', $name, $value);
 		$this->setAttribute('maxlength', $maxlength);
 		$this->setAttribute('autocomplete', 'new-password');
+		$this->setAttribute('data-field-type', 'text-box');
 	}
 
 	public function setWidth($value) {

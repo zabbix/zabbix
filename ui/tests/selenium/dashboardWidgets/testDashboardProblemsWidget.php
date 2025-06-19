@@ -29,16 +29,6 @@ class testDashboardProblemsWidget extends CWebTest {
 	private static $update_widget = 'Problem widget for updating';
 
 	/**
-	 * Callback executed before every test case.
-	 *
-	 * @before
-	 */
-	public function onBeforeTestCase() {
-		parent::onBeforeTestCase();
-		CommandExecutor::setAlertStrategy(CommandExecutor::STRATEGY_ACCEPT_ALERT);
-	}
-
-	/**
 	 * Attach MessageBehavior to the test.
 	 *
 	 * @return array
@@ -652,6 +642,9 @@ class testDashboardProblemsWidget extends CWebTest {
 		}
 
 		COverlayDialogElement::find()->one()->close();
+		// Change dashboard from cancelEditing() to save() to check deadlock issue.
+		$dashboard->save();
+		$this->assertMessage(TEST_GOOD, 'Dashboard updated');
 	}
 
 	public function testDashboardProblemsWidget_SimpleUpdate() {

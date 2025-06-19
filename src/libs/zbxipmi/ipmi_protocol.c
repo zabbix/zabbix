@@ -19,23 +19,25 @@
 #include "ipmi_protocol.h"
 
 #include "zbxserialize.h"
-#include "zbxexpression.h"
+#include "zbxcacheconfig.h"
 
 zbx_uint32_t	zbx_ipmi_serialize_request(unsigned char **data, zbx_uint64_t hostid, zbx_uint64_t objectid,
 		const char *addr, unsigned short port, signed char authtype, unsigned char privilege,
 		const char *username, const char *password, const char *sensor, int command, const char *key)
 {
-	unsigned char	*ptr;
-	char		*user, *pwd;
-	zbx_uint32_t	data_len, addr_len, username_len, password_len, sensor_len, key_len;
+	unsigned char		*ptr;
+	char			*user, *pwd;
+	zbx_uint32_t		data_len, addr_len, username_len, password_len, sensor_len, key_len;
 
 	addr_len = strlen(addr) + 1;
 	user = zbx_strdup(NULL, username);
 	pwd = zbx_strdup(NULL, password);
-	zbx_substitute_simple_macros_unmasked(NULL, NULL, NULL, NULL, &hostid, NULL, NULL, NULL, NULL, NULL, NULL, NULL,
-			&user, ZBX_MACRO_TYPE_COMMON, NULL, 0);
-	zbx_substitute_simple_macros_unmasked(NULL, NULL, NULL, NULL, &hostid, NULL, NULL, NULL, NULL, NULL, NULL, NULL,
-			&pwd, ZBX_MACRO_TYPE_COMMON, NULL, 0);
+
+	zbx_dc_um_handle_t	*um_handle_secure = zbx_dc_open_user_macros_secure();
+	zbx_dc_expand_user_and_func_macros(um_handle_secure, &user, &hostid, 1, NULL);
+	zbx_dc_expand_user_and_func_macros(um_handle_secure, &pwd, &hostid, 1, NULL);
+	zbx_dc_close_user_macros(um_handle_secure);
+
 	username_len = strlen(user) + 1;
 	password_len = strlen(pwd) + 1;
 	sensor_len = strlen(sensor) + 1;

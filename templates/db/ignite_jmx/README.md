@@ -66,7 +66,7 @@ This template works with standalone and cluster instances. Metrics are collected
 
 |Name|Description|Expression|Severity|Dependencies and additional info|
 |----|-----------|----------|--------|--------------------------------|
-|Ignite: [{#JMXIGNITEINSTANCENAME}]: has been restarted|<p>Uptime is less than 10 minutes.</p>|`last(/Ignite by JMX/jmx["{#JMXOBJ}",UpTime])<10m`|Info|**Manual close**: Yes|
+|Ignite: [{#JMXIGNITEINSTANCENAME}]: Instance has been restarted|<p>Uptime is less than 10 minutes.</p>|`last(/Ignite by JMX/jmx["{#JMXOBJ}",UpTime])<10m`|Info|**Manual close**: Yes|
 |Ignite: [{#JMXIGNITEINSTANCENAME}]: Failed to fetch info data|<p>Zabbix has not received data for items for the last 10 minutes.</p>|`nodata(/Ignite by JMX/jmx["{#JMXOBJ}",UpTime],10m)=1`|Warning|**Manual close**: Yes|
 |Ignite: [{#JMXIGNITEINSTANCENAME}]: Version has changed|<p>[{#JMXIGNITEINSTANCENAME}] version has changed. Acknowledge to close the problem manually.</p>|`last(/Ignite by JMX/jmx["{#JMXOBJ}",FullVersion],#1)<>last(/Ignite by JMX/jmx["{#JMXOBJ}",FullVersion],#2) and length(last(/Ignite by JMX/jmx["{#JMXOBJ}",FullVersion]))>0`|Info|**Manual close**: Yes|
 

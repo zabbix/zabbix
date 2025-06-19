@@ -16,6 +16,7 @@ package oracle
 
 import (
 	"context"
+	"fmt"
 	"strings"
 
 	"golang.zabbix.com/sdk/errs"
@@ -62,12 +63,20 @@ func getTablespacesQuery(params map[string]string) (string, []any, error) {
 	t := params["Type"]
 	conn := params["Conname"]
 
+	// Check if first character is numeric
+	var conntype string
+	if conn != "" && strings.ToUpper(conn)[0] < 65 {
+		conntype = "CON_ID"
+	} else {
+		conntype = "CON$NAME"
+	}
+
 	if ts == "" && t == "" {
 		if conn == "" {
 			return getFullQuery(), nil, nil
 		}
 
-		return getFullQueryConn(), []any{conn, conn}, nil
+		return getFullQueryConn(conntype), []any{conn, conn}, nil
 	}
 
 	var err error
@@ -79,13 +88,13 @@ func getTablespacesQuery(params map[string]string) (string, []any, error) {
 	switch t {
 	case perm, undo:
 		if conn != "" {
-			return getPermQueryConnPart(), []any{conn, ts}, nil
+			return getPermQueryConnPart(conntype), []any{conn, ts}, nil
 		}
 
 		return getPermQueryPart(), []any{ts}, nil
 	case temp:
 		if conn != "" {
-			return getTempQueryConnPart(), []any{conn, ts}, nil
+			return getTempQueryConnPart(conntype), []any{conn, ts}, nil
 		}
 
 		return getTempQueryPart(), []any{ts}, nil
@@ -249,8 +258,8 @@ FROM (SELECT df.CON_NAME,
 GROUP BY CON_NAME`
 }
 
-func getFullQueryConn() string {
-	return `
+func getFullQueryConn(conntype string) string {
+	return fmt.Sprintf(`
 SELECT JSON_ARRAYAGG(
                JSON_OBJECT(TABLESPACE_NAME VALUE
                            JSON_OBJECT(
@@ -302,7 +311,7 @@ FROM (SELECT df.TABLESPACE_NAME                  AS TABLESPACE_NAME,
                  CDB_TABLESPACES ct
             WHERE cdf.TABLESPACE_NAME = ct.TABLESPACE_NAME
               AND cdf.CON_ID = ct.CON_ID
-              AND (ct.CON$NAME = :1 or (ct.CON$NAME is null and ct.CON_ID = 0))) df,
+              AND (ct.%s = :1 or (ct.CON$NAME is null and ct.CON_ID = 0))) df,
            (SELECT TRUNC(SUM(BYTES)) AS FREE,
                    FILE_ID
             FROM CDB_FREE_SPACE
@@ -372,11 +381,11 @@ FROM (SELECT df.TABLESPACE_NAME                  AS TABLESPACE_NAME,
                  CDB_TABLESPACES ct
             WHERE ctf.TABLESPACE_NAME = ct.TABLESPACE_NAME
               AND ctf.CON_ID = ct.CON_ID
-              AND ((ct.CON$NAME = :2) or (ct.CON$NAME is null and ct.CON_ID = 0))) Y
+              AND (ct.%s = :2 or (ct.CON$NAME is null and ct.CON_ID = 0))) Y
       GROUP BY Y.CON_NAME,
                Y.NAME,
                Y.CONTENTS,
-               Y.STATUS)`
+               Y.STATUS)`, conntype, conntype)
 }
 
 func getPermQueryPart() string {
@@ -536,8 +545,8 @@ FROM (SELECT Y.CON_NAME,
 GROUP BY CON_NAME`
 }
 
-func getPermQueryConnPart() string {
-	return `
+func getPermQueryConnPart(conntype string) string {
+	return fmt.Sprintf(`
 SELECT JSON_ARRAYAGG(
                JSON_OBJECT(
                        TABLESPACE_NAME VALUE JSON_OBJECT(
@@ -589,21 +598,21 @@ FROM (SELECT df.TABLESPACE_NAME                  AS TABLESPACE_NAME,
                  CDB_TABLESPACES ct
             WHERE cdf.TABLESPACE_NAME = ct.TABLESPACE_NAME
               AND cdf.CON_ID = ct.CON_ID
-              AND (ct.CON$NAME = :1 or (ct.CON$NAME is null and ct.CON_ID = 0))) df,
+              AND (ct.%s = :1 or (ct.CON$NAME is null and ct.CON_ID = 0))) df,
            (SELECT TRUNC(SUM(BYTES)) AS FREE,
                    FILE_ID
             FROM CDB_FREE_SPACE
             GROUP BY FILE_ID) f
       WHERE df.FILE_ID = f.FILE_ID (+)
-        AND df.TABLESPACE_NAME = :2 
+        AND df.TABLESPACE_NAME = :2
       GROUP BY df.CON_NAME,
                df.TABLESPACE_NAME,
                df.CONTENTS,
-               df.STATUS)`
+               df.STATUS)`, conntype)
 }
 
-func getTempQueryConnPart() string {
-	return `
+func getTempQueryConnPart(conntype string) string {
+	return fmt.Sprintf(`
 SELECT JSON_ARRAYAGG(
                JSON_OBJECT(
                        TABLESPACE_NAME VALUE JSON_OBJECT(
@@ -678,7 +687,7 @@ FROM (SELECT Y.NAME                                   AS TABLESPACE_NAME,
                  CDB_TABLESPACES ct
             WHERE ctf.TABLESPACE_NAME = ct.TABLESPACE_NAME
               AND ctf.CON_ID = ct.CON_ID
-              AND ((ct.CON$NAME = :1) or (ct.CON$NAME is null and ct.CON_ID = 0))
+              AND (ct.%s = :1 or (ct.CON$NAME is null and ct.CON_ID = 0))
               AND ctf.TABLESPACE_NAME = :2) Y
-      GROUP BY Y.CON_NAME, Y.NAME, Y.CONTENTS, Y.STATUS)`
+      GROUP BY Y.CON_NAME, Y.NAME, Y.CONTENTS, Y.STATUS)`, conntype)
 }
