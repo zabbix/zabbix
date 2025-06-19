@@ -20,7 +20,8 @@ class CConditionFormulaParser extends CParser {
 		$parser->parse($source);
 
 		if (!$parser->isValid) {
-			$this->errorPos($source, $parser->getPosition());
+			$error_pos = $parser->getPosition();
+			$this->errorPos($source, $error_pos == 0 ? 0 : $error_pos - 1);
 
 			return CParser::PARSE_FAIL;
 		}
