@@ -33,27 +33,27 @@ Refer to the vendor documentation.
 
 |Name|Description|Default|
 |----|-----------|-------|
-|{$VFS.FS.PUSED.MAX.CRIT}||`90`|
-|{$VFS.FS.PUSED.MAX.WARN}||`80`|
 |{$CPU.UTIL.CRIT}||`90`|
-|{$TEMP_CRIT}||`60`|
+|{$MEMORY.UTIL.MAX}||`90`|
 |{$TEMP_CRIT_LOW}||`5`|
 |{$TEMP_WARN}||`50`|
-|{$TEMP_CRIT:"CPU"}||`75`|
+|{$TEMP_CRIT}||`60`|
 |{$TEMP_WARN:"CPU"}||`70`|
-|{$MEMORY.UTIL.MAX}||`90`|
-|{$IFNAME.WIFI.MATCHES}|<p>This macro is used in CAPsMAN AP channel discovery. It can be overridden on the host level.</p>|`WIFI`|
-|{$IFNAME.LTEMODEM.MATCHES}|<p>This macro is used in LTE modem discovery. It can be overridden on the host.</p>|`^lte`|
+|{$TEMP_CRIT:"CPU"}||`75`|
+|{$VFS.FS.PUSED.MAX.WARN}||`80`|
+|{$VFS.FS.PUSED.MAX.CRIT}||`90`|
 |{$LTEMODEM.RSSI.MIN.WARN}|<p>The LTE modem RSSI minimum value for warning trigger expression.</p>|`-100`|
 |{$LTEMODEM.RSRP.MIN.WARN}|<p>The LTE modem RSRP minimum value for warning trigger expression.</p>|`-100`|
 |{$LTEMODEM.RSRQ.MIN.WARN}|<p>The LTE modem RSRQ minimum value for warning trigger expression.</p>|`-20`|
 |{$LTEMODEM.SINR.MIN.WARN}|<p>The LTE modem SINR minimum value for warning trigger expression.</p>|`0`|
+|{$IFNAME.LTEMODEM.MATCHES}|<p>This macro is used in LTE modem discovery. It can be overridden on the host.</p>|`^lte`|
+|{$IFNAME.WIFI.MATCHES}|<p>This macro is used in CAPsMAN AP channel discovery. It can be overridden on the host level.</p>|`WIFI`|
 |{$SNMP.TIMEOUT}|<p>Time interval for the SNMP availability trigger.</p>|`5m`|
 |{$ICMP_LOSS_WARN}|<p>Warning threshold of ICMP packet loss in %.</p>|`20`|
 |{$ICMP_RESPONSE_TIME_WARN}|<p>Warning threshold of the average ICMP response time in seconds.</p>|`0.15`|
-|{$IF.ERRORS.WARN}|<p>Warning threshold of error packet rate. Can be used with interface name as context.</p>|`2`|
-|{$IF.UTIL.MAX}|<p>Used as a threshold in the interface utilization trigger.</p>|`90`|
 |{$IFCONTROL}|<p>Link status trigger will be fired only for interfaces where the context macro equals "1".</p>|`1`|
+|{$IF.UTIL.MAX}|<p>Used as a threshold in the interface utilization trigger.</p>|`90`|
+|{$IF.ERRORS.WARN}|<p>Warning threshold of error packet rate. Can be used with interface name as context.</p>|`2`|
 |{$NET.IF.IFNAME.MATCHES}|<p>Used for network interface discovery. Can be overridden on the host or linked template level.</p>|`^.*$`|
 |{$NET.IF.IFNAME.NOT_MATCHES}|<p>Filters out `loopbacks`, `nulls`, docker `veth` links and `docker0 bridge` by default.</p>|`Macro too long. Please see the template.`|
 |{$NET.IF.IFOPERSTATUS.MATCHES}|<p>Used for network interface discovery. Can be overridden on the host or linked template level.</p>|`^.*$`|
@@ -73,8 +73,6 @@ Refer to the vendor documentation.
 |----|-----------|----|-----------------------|
 |SNMP walk wireless interfaces||SNMP agent|net.if.wireless.walk|
 |SNMP walk system CPUs|<p>MIB: HOST-RESOURCES-MIB</p><p>Discovering system CPUs.</p>|SNMP agent|system.cpu.walk|
-|SNMP walk CPU temperature sensors|<p>MIB: MIKROTIK-MIB</p><p>Discovering CPU temperature sensors.</p>|SNMP agent|sensor.cpu.temp.walk|
-|SNMP walk temperature sensors|<p>MIB: MIKROTIK-MIB</p><p>Discovering temperature sensors.</p>|SNMP agent|sensor.temp.walk|
 |SNMP walk mounted filesystems|<p>MIB: HOST-RESOURCES-MIB</p><p>Discovering mounted filesystems.</p>|SNMP agent|vfs.fs.walk|
 |Used memory|<p>MIB: HOST-RESOURCES-MIB</p><p>The amount of the storage represented by this entry that is allocated, in units of hrStorageAllocationUnits.</p>|SNMP agent|vm.memory.used[hrStorageUsed.Memory]<p>**Preprocessing**</p><ul><li><p>Custom multiplier: `1024`</p></li></ul>|
 |Total memory|<p>MIB: HOST-RESOURCES-MIB</p><p>The size of the storage represented by this entry, in</p><p>units of hrStorageAllocationUnits. This object is</p><p>writable to allow remote configuration of the size of</p><p>the storage area in those cases where such an</p><p>operation makes sense and is possible on the</p><p>underlying system. For example, the amount of main</p><p>memory allocated to a buffer pool might be modified or</p><p>the amount of disk space allocated to virtual memory</p><p>might be modified.</p>|SNMP agent|vm.memory.total[hrStorageSize.Memory]<p>**Preprocessing**</p><ul><li><p>Custom multiplier: `1024`</p></li></ul>|
@@ -134,13 +132,13 @@ Refer to the vendor documentation.
 
 |Name|Description|Type|Key and additional info|
 |----|-----------|----|-----------------------|
-|Temperature CPU discovery|<p>MIKROTIK-MIB::mtxrHlProcessorTemperature</p><p>Since temperature of CPU is not available on all Mikrotik hardware, this is done to avoid unsupported items.</p>|Dependent item|mtxrHlProcessorTemperature.discovery<p>**Preprocessing**</p><ul><li><p>SNMP walk to JSON</p><p>⛔️Custom on fail: Discard value</p></li><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
+|Temperature CPU discovery|<p>MIKROTIK-MIB::mtxrHlProcessorTemperature</p><p>Since temperature of CPU is not available on all Mikrotik hardware, this is done to avoid unsupported items.</p>|SNMP agent|mtxrHlProcessorTemperature.discovery<p>**Preprocessing**</p><ul><li><p>SNMP walk to JSON</p><p>⛔️Custom on fail: Discard value</p></li></ul>|
 
 ### Item prototypes for Temperature CPU discovery
 
 |Name|Description|Type|Key and additional info|
 |----|-----------|----|-----------------------|
-|CPU: Temperature|<p>MIB: MIKROTIK-MIB</p><p>mtxrHlProcessorTemperature Processor temperature in Celsius (degrees C).</p><p>Might be missing in entry models (RB750, RB450G..).</p>|Dependent item|sensor.temp.value[mtxrHlProcessorTemperature.{#SNMPINDEX}]<p>**Preprocessing**</p><ul><li><p>SNMP walk value: `1.3.6.1.4.1.14988.1.1.3.11.{#SNMPINDEX}`</p></li><li><p>Custom multiplier: `0.1`</p></li><li><p>Discard unchanged with heartbeat: `3m`</p></li></ul>|
+|CPU: Temperature|<p>MIB: MIKROTIK-MIB</p><p>mtxrHlProcessorTemperature Processor temperature in Celsius (degrees C).</p><p>Might be missing in entry models (RB750, RB450G..).</p>|SNMP agent|sensor.temp.value[mtxrHlProcessorTemperature.{#SNMPINDEX}]<p>**Preprocessing**</p><ul><li><p>Custom multiplier: `0.1`</p></li><li><p>Discard unchanged with heartbeat: `3m`</p></li></ul>|
 
 ### Trigger prototypes for Temperature CPU discovery
 
@@ -154,13 +152,13 @@ Refer to the vendor documentation.
 
 |Name|Description|Type|Key and additional info|
 |----|-----------|----|-----------------------|
-|Temperature sensor discovery|<p>MIKROTIK-MIB::mtxrHlTemperature</p><p>Since temperature sensor is not available on all Mikrotik hardware, this is done to avoid unsupported items.</p>|Dependent item|mtxrHlTemperature.discovery<p>**Preprocessing**</p><ul><li><p>SNMP walk to JSON</p><p>⛔️Custom on fail: Discard value</p></li><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
+|Temperature sensor discovery|<p>MIKROTIK-MIB::mtxrHlTemperature</p><p>Since temperature sensor is not available on all Mikrotik hardware, this is done to avoid unsupported items.</p>|SNMP agent|mtxrHlTemperature.discovery<p>**Preprocessing**</p><ul><li><p>SNMP walk to JSON</p><p>⛔️Custom on fail: Discard value</p></li></ul>|
 
 ### Item prototypes for Temperature sensor discovery
 
 |Name|Description|Type|Key and additional info|
 |----|-----------|----|-----------------------|
-|Device: Temperature|<p>MIB: MIKROTIK-MIB</p><p>mtxrHlTemperature Device temperature in Celsius (degrees C).</p><p>Might be missing in entry models (RB750, RB450G..).</p><p></p><p>Reference: http://wiki.mikrotik.com/wiki/Manual:SNMP</p>|Dependent item|sensor.temp.value[mtxrHlTemperature.{#SNMPINDEX}]<p>**Preprocessing**</p><ul><li><p>SNMP walk value: `1.3.6.1.4.1.14988.1.1.3.10.{#SNMPINDEX}`</p></li><li><p>Custom multiplier: `0.1`</p></li><li><p>Discard unchanged with heartbeat: `3m`</p></li></ul>|
+|Device: Temperature|<p>MIB: MIKROTIK-MIB</p><p>mtxrHlTemperature Device temperature in Celsius (degrees C).</p><p>Might be missing in entry models (RB750, RB450G..).</p><p></p><p>Reference: http://wiki.mikrotik.com/wiki/Manual:SNMP</p>|SNMP agent|sensor.temp.value[mtxrHlTemperature.{#SNMPINDEX}]<p>**Preprocessing**</p><ul><li><p>Custom multiplier: `0.1`</p></li><li><p>Discard unchanged with heartbeat: `3m`</p></li></ul>|
 
 ### Trigger prototypes for Temperature sensor discovery
 

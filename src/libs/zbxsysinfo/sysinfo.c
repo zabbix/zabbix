@@ -1684,7 +1684,8 @@ static int	deserialize_agent_result(char *data, size_t data_offset, AGENT_RESULT
 	/* normally forked program should return data or error on abnormal termination, handle unexpected case */
 	if (data_offset < sizeof(int) + 1)
 	{
-		SET_MSG_RESULT(result, zbx_dsprintf(NULL, "Invalid data length:" ZBX_FS_SIZE_T, data_offset));
+		SET_MSG_RESULT(result, zbx_dsprintf(NULL, "Invalid data length:" ZBX_FS_SIZE_T,
+				(zbx_fs_size_t)data_offset));
 		return SYSINFO_RET_FAIL;
 	}
 

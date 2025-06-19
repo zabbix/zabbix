@@ -46,7 +46,7 @@ class TabIndicators {
 	getForm() {
 		const ACTION = document.querySelector('#action-form');
 		const AUTHENTICATION = document.querySelector('#authentication-form');
-		const GRAPH = document.querySelector('#widget-dialogue-form');
+		const GRAPH = document.querySelector('form.dashboard-widget-svggraph');
 		const HOST = document.querySelector('#host-form');
 		const HOST_DISCOVERY = document.querySelector('#host-discovery-form');
 		const HOST_PROTOTYPE = document.querySelector('#host-prototype-form');
@@ -54,7 +54,7 @@ class TabIndicators {
 		const ITEM_PROTOTYPE = document.querySelector('#item-prototype-form');
 		const MAP = document.querySelector('#sysmap-form');
 		const MEDIA_TYPE = document.querySelector('#media-type-form');
-		const PIE_CHART = document.querySelector('#widget-dialogue-form');
+		const PIE_CHART = document.querySelector('form.dashboard-widget-piechart');
 		const PROXY = document.querySelector('#proxy-form');
 		const SERVICE = document.querySelector('#service-form');
 		const SLA = document.querySelector('#sla-form');
@@ -890,9 +890,10 @@ class FiltersTabIndicatorItem extends TabIndicatorItem {
 	}
 
 	getValue() {
-		return document
-			.querySelectorAll('#conditions tbody .form_row > td > input.macro:not(:placeholder-shown):not([readonly])')
-			.length;
+		const form_rows = document
+			.querySelectorAll('#conditions tbody .form_row > td > input.macro:not(:placeholder-shown)');
+
+		return [...form_rows].filter((row) => !row.readOnly || row.dataset.discovered).length;
 	}
 
 	initObserver() {

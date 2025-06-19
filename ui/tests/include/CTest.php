@@ -27,6 +27,7 @@ require_once __DIR__.'/helpers/CExceptionHelper.php';
 require_once __DIR__.'/helpers/CTestArrayHelper.php';
 require_once __DIR__.'/helpers/CDateTimeHelper.php';
 require_once __DIR__.'/helpers/CTestDBSettingsHelper.php';
+require_once __DIR__.'/helpers/CMfaTotpHelper.php';
 
 define('USER_ACTION_ADD', 'add');
 define('USER_ACTION_UPDATE', 'update');
@@ -42,6 +43,7 @@ define('STRING_512', substr(STRING_6000, 0, 512));
 define('STRING_255', substr(STRING_6000, 0, 255));
 define('STRING_128', substr(STRING_6000, 0, 128));
 define('STRING_64', substr(STRING_6000, 0, 64));
+define('STRING_32', substr(STRING_6000, 0, 32));
 
 /**
  * Base class of php unit tests.

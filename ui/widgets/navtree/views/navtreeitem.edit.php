@@ -24,8 +24,8 @@
 use Widgets\NavTree\Widget;
 
 $form = (new CForm('post'))
-	->setId('widget-dialogue-form')
-	->setName('widget_dialogue_form');
+	->setId('widget-item-form')
+	->setName('widget_item_form');
 
 // Enable form submitting on Enter.
 $form->addItem((new CSubmitButton())->addClass(ZBX_STYLE_FORM_SUBMIT_HIDDEN));

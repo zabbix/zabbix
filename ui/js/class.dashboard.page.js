@@ -22,7 +22,8 @@ const DASHBOARD_PAGE_EVENT_EDIT = 'dashboard-page-edit';
 const DASHBOARD_PAGE_EVENT_WIDGET_ADD = 'dashboard-page-widget-add';
 const DASHBOARD_PAGE_EVENT_WIDGET_ADD_NEW = 'dashboard-page-widget-add-new';
 const DASHBOARD_PAGE_EVENT_WIDGET_DELETE = 'dashboard-page-widget-delete';
-const DASHBOARD_PAGE_EVENT_WIDGET_POSITION = 'dashboard-page-widget-position';
+const DASHBOARD_PAGE_EVENT_WIDGET_RESIZE = 'dashboard-page-widget-resize';
+const DASHBOARD_PAGE_EVENT_WIDGET_DRAG = 'dashboard-page-widget-drag';
 const DASHBOARD_PAGE_EVENT_WIDGET_EDIT = 'dashboard-page-widget-edit';
 const DASHBOARD_PAGE_EVENT_WIDGET_ACTIONS = 'dashboard-page-widget-actions';
 const DASHBOARD_PAGE_EVENT_WIDGET_COPY = 'dashboard-page-widget-copy';
@@ -43,6 +44,8 @@ class CDashboardPage {
 	// Minimum distance of mouse movement in pixels to assume that user is interacting intentionally.
 	static PLACEHOLDER_RESIZE_TRIGGER_DISTANCE = 25;
 
+	#is_widget_editing = false;
+
 	constructor(target, {
 		data,
 		dashboard,
@@ -50,7 +53,6 @@ class CDashboardPage {
 		cell_height,
 		max_columns,
 		max_rows,
-		widget_defaults,
 		is_editable,
 		is_edit_mode,
 		csrf_token = null,
@@ -75,7 +77,6 @@ class CDashboardPage {
 		this._cell_height = cell_height;
 		this._max_columns = max_columns;
 		this._max_rows = max_rows;
-		this._widget_defaults = widget_defaults;
 		this._is_editable = is_editable;
 		this._is_edit_mode = is_edit_mode;
 		this._csrf_token = csrf_token;
@@ -243,6 +244,44 @@ class CDashboardPage {
 		}
 	}
 
+	/**
+	 * Is framework in widget editing state?
+	 *
+	 * @returns {boolean}
+	 */
+	#isWidgetEditing() {
+		return this.#is_widget_editing;
+	}
+
+	/**
+	 * Enter widget editing state.
+	 *
+	 * @param {CWidget} for_widget    Widget, which is about to be edited.
+	 * @param {boolean} is_exclusive  Whether to prevent switching to editing another widgets.
+	 */
+	enterWidgetEditing(for_widget, {is_exclusive = false} = {}) {
+		this.#is_widget_editing = true;
+
+		for (const widget of this._widgets.keys()) {
+			widget.enterWidgetEditing(widget === for_widget, {is_exclusive});
+		}
+
+		this.resetWidgetPlaceholder();
+	}
+
+	/**
+	 * Leave widget editing state.
+	 */
+	leaveWidgetEditing() {
+		this.#is_widget_editing = false;
+
+		for (const widget of this._widgets.keys()) {
+			widget.leaveWidgetEditing();
+		}
+
+		this.resetWidgetPlaceholder();
+	}
+
 	isUserInteracting() {
 		for (const widget of this._widgets.keys()) {
 			if (widget.isUserInteracting()) {
@@ -338,7 +377,7 @@ class CDashboardPage {
 	replaceWidget(old_widget, new_widget) {
 		this.deleteWidget(old_widget, {is_batch_mode: true});
 
-		return this.addWidget(new_widget);
+		this.addWidget(new_widget);
 	}
 
 	getDataCopy() {
@@ -379,6 +418,104 @@ class CDashboardPage {
 
 	// Dashboard page view methods.
 
+	findFreePosAll() {
+		const occupied = [];
+
+		for (let y = 0; y < this._max_rows; y++) {
+			occupied[y] = new Array(this._max_columns);
+			occupied[y].fill(false);
+		}
+
+		for (const widget of this._widgets.keys()) {
+			const pos = widget.getPos();
+
+			for (let y = pos.y; y < pos.y + pos.height; y++) {
+				occupied[y].fill(true, pos.x, pos.x + pos.width);
+			}
+		}
+
+		const x_free = [];
+
+		for (let y = 0; y < this._max_rows; y++) {
+			x_free[y] = new Array(this._max_columns);
+
+			for (let acc = 0, x = this._max_columns - 1; x >= 0; x--) {
+				if (occupied[y][x]) {
+					acc = 0;
+				}
+				else {
+					acc++;
+				}
+
+				x_free[y][x] = acc;
+			}
+		}
+
+		const found_areas = new Map();
+
+		for (let y = 0; y < this._max_rows; y++) {
+			for (let x = 0; x < this._max_columns; x++) {
+				if (x !== 0 && x_free[y][x - 1] !== 0 || x_free[y][x] === 0) {
+					continue;
+				}
+
+				let y1 = y;
+				let y1_width = x_free[y][x];
+				let y2 = y;
+				let y2_width = x_free[y][x];
+
+				do {
+					if (y1_width > 0 && y1_width >= y2_width) {
+						while (y1 >= 0 && x_free[y1][x] >= y1_width) {
+							y1--;
+						}
+					}
+
+					if (y2_width > 0 && y2_width >= y1_width) {
+						while (y2 < this._max_rows && x_free[y2][x] >= y2_width) {
+							y2++;
+						}
+					}
+
+					const pos = {
+						x: x,
+						y: y1 + 1,
+						width: Math.max(y1_width, y2_width),
+						height: y2 - y1 - 1
+					};
+
+					const pos_key = `${pos.x}:${pos.y}`;
+					const size_key = `${pos.width}:${pos.height}`;
+
+					if (!found_areas.has(pos_key)) {
+						found_areas.set(pos_key, {
+							x: pos.x,
+							y: pos.y,
+							sizes: new Map()
+						});
+					}
+
+					found_areas.get(pos_key).sizes.set(size_key, {
+						width: pos.width,
+						height: pos.height
+					});
+
+					y1_width = y1 >= 0 ? x_free[y1][x] : 0;
+					y2_width = y2 < this._max_rows ? x_free[y2][x] : 0;
+				}
+				while (y1_width > 0 || y2_width > 0);
+			}
+		}
+
+		const result = [];
+
+		for (const {x, y, sizes} of found_areas.values()) {
+			result.push({x, y, sizes: [...sizes.values()]});
+		}
+
+		return result;
+	}
+
 	findFreePos({width, height}) {
 		const pos = {x: 0, y: 0, width, height};
 
@@ -402,25 +539,25 @@ class CDashboardPage {
 		return pos;
 	}
 
-	accommodatePos(pos, {reverse_x = false, reverse_y = false} = {}) {
+	accommodatePos(pos, {reverse_x = false, reverse_y = false, except_widgets = null} = {}) {
 		let pos_variants = [];
 
 		let pos_x = this._accommodatePosX({
 			...pos,
 			y: reverse_y ? pos.y + pos.height - 1 : pos.y,
 			height: 1
-		}, {reverse: reverse_x});
+		}, {reverse: reverse_x, except_widgets});
 
 		pos_x = {...pos_x, y: pos.y, height: pos.height};
 
 		if (reverse_x) {
 			for (let x = pos_x.x, width = pos_x.width; width >= 1; x++, width--) {
-				pos_variants.push(this._accommodatePosY({...pos_x, x, width}, {reverse: reverse_y}));
+				pos_variants.push(this._accommodatePosY({...pos_x, x, width}, {reverse: reverse_y, except_widgets}));
 			}
 		}
 		else {
 			for (let width = pos_x.width; width >= 1; width--) {
-				pos_variants.push(this._accommodatePosY({...pos_x, width}, {reverse: reverse_y}));
+				pos_variants.push(this._accommodatePosY({...pos_x, width}, {reverse: reverse_y, except_widgets}));
 			}
 		}
 
@@ -443,12 +580,12 @@ class CDashboardPage {
 		return pos_best;
 	}
 
-	_accommodatePosX(pos, {reverse = false} = {}) {
+	_accommodatePosX(pos, {reverse = false, except_widgets = null} = {}) {
 		const max_pos = {...pos};
 
 		if (reverse) {
 			for (let x = pos.x + pos.width - 1, width = 1; x >= pos.x; x--, width++) {
-				if (!this._isPosFree({...max_pos, x, width})) {
+				if (!this._isPosFree({...max_pos, x, width}, {except_widgets})) {
 					break;
 				}
 
@@ -458,7 +595,7 @@ class CDashboardPage {
 		}
 		else {
 			for (let width = 1; width <= pos.width; width++) {
-				if (!this._isPosFree({...max_pos, width})) {
+				if (!this._isPosFree({...max_pos, width}, {except_widgets})) {
 					break;
 				}
 
@@ -469,12 +606,12 @@ class CDashboardPage {
 		return max_pos;
 	}
 
-	_accommodatePosY(pos, {reverse = false} = {}) {
+	_accommodatePosY(pos, {reverse = false, except_widgets = null} = {}) {
 		const max_pos = {...pos};
 
 		if (reverse) {
 			for (let y = pos.y + pos.height - 1, height = 1; y >= pos.y; y--, height++) {
-				if (!this._isPosFree({...max_pos, y, height})) {
+				if (!this._isPosFree({...max_pos, y, height}, {except_widgets})) {
 					break;
 				}
 
@@ -484,7 +621,7 @@ class CDashboardPage {
 		}
 		else {
 			for (let height = 1; height <= pos.height; height++) {
-				if (!this._isPosFree({...max_pos, height})) {
+				if (!this._isPosFree({...max_pos, height}, {except_widgets})) {
 					break;
 				}
 
@@ -558,8 +695,12 @@ class CDashboardPage {
 			&& pos_1.y < pos_2.y + pos_2.height && pos_1.y + pos_1.height > pos_2.y;
 	}
 
-	_isPosFree(pos) {
+	_isPosFree(pos, {except_widgets = null} = {}) {
 		for (const widget of this._widgets.keys()) {
+			if (except_widgets !== null && except_widgets.has(widget)) {
+				continue;
+			}
+
 			if (this._isPosOverlapping(pos, widget.getPos())) {
 				return false;
 			}
@@ -906,6 +1047,12 @@ class CDashboardPage {
 	}
 
 	resetWidgetPlaceholder() {
+		if (this.#isWidgetEditing()) {
+			this._deactivateWidgetPlaceholder();
+
+			return;
+		}
+
 		if (this._widget_placeholder_is_active && this._widget_placeholder_is_edit_mode !== this._is_edit_mode) {
 			this._deactivateWidgetPlaceholder();
 		}
@@ -1154,9 +1301,12 @@ class CDashboardPage {
 
 				for (const widget of this._widgets.keys()) {
 					const widget_view = widget.getView();
+					const widget_view_header = widget_view.querySelector(`.${widget.getCssClass('header')}`);
+					const widget_view_actions = widget_view.querySelector(`.${widget.getCssClass('actions')}`);
+					const widget_view_controls = widget_view.querySelector(`.${widget.getCssClass('controls')}`);
 
-					if (widget_view.querySelector(`.${widget.getCssClass('header')}`).contains(e.target)
-							&& !widget_view.querySelector(`.${widget.getCssClass('actions')}`).contains(e.target)) {
+					if (widget_view_header.contains(e.target) && !widget_view_actions.contains(e.target)
+							&& (widget_view_controls === null || !widget_view_controls.contains(e.target))) {
 						drag_widget = widget;
 						break;
 					}
@@ -1190,7 +1340,7 @@ class CDashboardPage {
 
 				this._is_unsaved = true;
 
-				this.fire(DASHBOARD_PAGE_EVENT_WIDGET_POSITION);
+				this.fire(DASHBOARD_PAGE_EVENT_WIDGET_DRAG, {widget: drag_widget});
 			},
 
 			mouseUp: () => {
@@ -1730,7 +1880,7 @@ class CDashboardPage {
 
 				this._is_unsaved = true;
 
-				this.fire(DASHBOARD_PAGE_EVENT_WIDGET_POSITION);
+				this.fire(DASHBOARD_PAGE_EVENT_WIDGET_RESIZE, {widget: resize_widget});
 			},
 
 			mouseUp: () => {

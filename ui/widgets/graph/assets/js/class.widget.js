@@ -145,7 +145,9 @@ class CWidgetGraph extends CWidget {
 					.getDashboardPage(this._dashboard_page.unique_id)
 					.getWidget(descriptor.sender_unique_id);
 
-				has_custom_time_period = graph_prototype_widget.hasCustomTimePeriod();
+				if (!(graph_prototype_widget instanceof CWidgetMisconfigured)) {
+					has_custom_time_period = graph_prototype_widget.hasCustomTimePeriod();
+				}
 			}
 			else {
 				has_custom_time_period = false;

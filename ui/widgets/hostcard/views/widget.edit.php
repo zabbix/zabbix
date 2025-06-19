@@ -39,5 +39,5 @@ use Widgets\HostCard\Includes\CWidgetFieldHostSectionsView;
 			->addRowClass('js-row-inventory-fields')
 	)
 	->includeJsFile('widget.edit.js.php')
-	->addJavaScript('widget_hostcard_form.init();')
+	->initFormJs('widget_form.init();')
 	->show();

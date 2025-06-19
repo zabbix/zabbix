@@ -216,7 +216,7 @@ int	zbx_http_prepare_auth(CURL *easyhandle, unsigned char authtype, const char *
 			curlauth = CURLAUTH_DIGEST;
 			break;
 		case HTTPTEST_AUTH_BEARER:
-			if (SUCCEED != zbx_curl_has_bearer(error))
+			if (SUCCEED != zbx_curl_has_http_bearer(error))
 				return FAIL;
 
 			curlauth = CURLAUTH_BEARER;

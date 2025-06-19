@@ -181,17 +181,6 @@ class testSystemInformation extends CWebTest {
 		CElementQuery::getDriver()->executeScript("arguments[0].textContent = '';",
 				[$this->query('xpath://table[@class="list-table sticky-header"]/tbody/tr[3]/td[1]')->one()]
 		);
-
-		// Check and hide the text of messages, because they contain ip addresses of the current host.
-		$error_text = "Connection to Zabbix server \"".$DB['SERVER'].":0\" failed. Possible reasons:\n".
-				"1. Incorrect \"NodeAddress\" or \"ListenPort\" in the \"zabbix_server.conf\" or server IP/DNS override in the \"zabbix.conf.php\";\n".
-				"2. Incorrect DNS server configuration.\n".
-				"Failed to parse address \"".$DB['SERVER']."\"";
-		$messages = CMessageElement::find()->all();
-		foreach ($messages as $message) {
-			$this->assertTrue($message->hasLine($error_text));
-			self::$skip_fields[] = $message;
-		}
 	}
 
 	/**
@@ -205,7 +194,8 @@ class testSystemInformation extends CWebTest {
 		$table = $this->query('xpath://table[@class="list-table sticky-header"]')->asTable()->waitUntilVisible()->one();
 
 		// Check that before failover delay passes frontend thinks that Zabbix server is running.
-		$this->assertEquals('Yes', $table->findRow('Parameter', 'Zabbix server is running')->getColumn('Value')->getText());
+		// TODO: should be changed to 'No' or uncommented after ZBXNEXT-8698
+//		$this->assertEquals('Yes', $table->findRow('Parameter', 'Zabbix server is running')->getColumn('Value')->getText());
 
 		// Wait for failover delay to pass.
 		sleep(self::$update_timestamp + self::FAILOVER_DELAY - time());

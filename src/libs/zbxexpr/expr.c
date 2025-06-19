@@ -25,7 +25,7 @@
  *           !!! Don't forget to sync the code with PHP !!!                   *
  *                                                                            *
  ******************************************************************************/
-int	zbx_is_key_char(unsigned char c)
+int	zbx_is_key_char(int c)
 {
 	if (0 != isalnum(c))
 		return SUCCEED;

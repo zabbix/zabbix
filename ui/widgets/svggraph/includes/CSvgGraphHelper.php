@@ -18,6 +18,7 @@ namespace Widgets\SvgGraph\Includes;
 
 use API,
 	CArrayHelper,
+	CColorPicker,
 	CHousekeepingHelper,
 	CItemHelper,
 	CMacrosResolverHelper,
@@ -225,7 +226,9 @@ class CSvgGraphHelper {
 				? (int)timeUnitToSeconds($data_set['timeshift'])
 				: 0;
 
-			$colors = getColorVariations('#' . $data_set['color'], count($items));
+			$colors = array_key_exists('color', $data_set)
+				? CColorPicker::getColorVariations($data_set['color'], count($items))
+				: CColorPicker::getPaletteColors($data_set['color_palette'], count($items));
 
 			foreach ($items as $item) {
 				$data_set['color'] = array_shift($colors);
@@ -289,18 +292,17 @@ class CSvgGraphHelper {
 						]
 					]);
 
-					if ($items) {
-						$data_set['itemids'] = [];
-
-						foreach ($items as $item) {
-							$data_set['itemids'][$keys_index[$item['key_']]] = $item['itemid'];
-						}
-
-						ksort($data_set['itemids']);
+					if (!$items) {
+						continue;
 					}
-					else {
-						$data_set['itemids'] = null;
+
+					$data_set['itemids'] = [];
+
+					foreach ($items as $item) {
+						$data_set['itemids'][$keys_index[$item['key_']]] = $item['itemid'];
 					}
+
+					ksort($data_set['itemids']);
 				}
 			}
 
@@ -441,8 +443,10 @@ class CSvgGraphHelper {
 
 			// Apply override options to matching metrics.
 			if ($metrics_matched) {
-				$colors = (array_key_exists('color', $override) && $override['color'] !== '')
-					? getColorVariations('#'.$override['color'], count($metrics_matched))
+				$colors = (array_key_exists('color', $override) || array_key_exists('color_palette', $override))
+					? (array_key_exists('color', $override)
+						? CColorPicker::getColorVariations($override['color'], count($metrics_matched))
+						: CColorPicker::getPaletteColors($override['color_palette'], count($metrics_matched)))
 					: null;
 
 				if (array_key_exists('transparency', $override)) {

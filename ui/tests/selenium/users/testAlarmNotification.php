@@ -39,7 +39,7 @@ class testAlarmNotification extends CWebTest {
 	protected static $maintenanceid;
 	protected static $eventids;
 	protected static $hostid;
-	const DEFAULT_COLORPICKER = 'xpath:./following::div[@class="color-picker"]';
+	const DEFAULT_COLORPICKER = 'xpath:./following::z-color-picker';
 
 	/**
 	 * Trigger names.
@@ -626,7 +626,7 @@ class testAlarmNotification extends CWebTest {
 			self::$eventids = CDBHelper::setTriggerProblem(self::ALL_TRIGGERS);
 		}
 
-		$this->page->login()->open('zabbix.php?action=problem.view&acknowledgement_status=1&show_suppressed=1&sort=name&sortorder=ASC&hostids%5B%5D='.
+		$this->page->open('zabbix.php?action=problem.view&acknowledgement_status=1&show_suppressed=1&sort=name&sortorder=ASC&hostids%5B%5D='.
 				self::$hostid[self::HOST_NAME].'&hostids%5B%5D='.self::$hostid['Host for maintenance alarm'])->waitUntilReady();
 
 		// Check that problems displayed in table.

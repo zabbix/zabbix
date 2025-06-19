@@ -111,7 +111,7 @@ func (c *client) addRequest(p *pluginAgent, r *Request, timeout int, sink plugin
 	}
 
 	// list of created tasks to be queued
-	tasks := make([]performer, 0, 6)
+	tasks := make([]Performer, 0, 6)
 
 	// handle Collector interface
 	if col, ok := p.impl.(plugin.Collector); ok {

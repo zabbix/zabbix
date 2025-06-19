@@ -287,7 +287,7 @@ class testDocumentationLinks extends CWebTest {
 			[
 				[
 					'url' => 'zabbix.php?action=host.dashboard.view&hostid=10084',
-					'doc_link' => '/en/manual/config/visualization/host_screens'
+					'doc_link' => '/en/manual/web_interface/frontend_sections/monitoring/hosts/dashboards'
 				]
 			],
 			// #16 Latest data view.
@@ -616,6 +616,7 @@ class testDocumentationLinks extends CWebTest {
 							'element' => 'button:Test'
 						]
 					],
+					'second_dialog' => true,
 					'doc_link' => '/en/manual/config/items/item#testing'
 				]
 			],
@@ -668,21 +669,21 @@ class testDocumentationLinks extends CWebTest {
 			// #62 Template graph list view.
 			[
 				[
-					'url' => 'graphs.php?context=template',
+					'url' => 'zabbix.php?action=graph.list&context=template',
 					'doc_link' => '/en/manual/web_interface/frontend_sections/data_collection/templates/graphs'
 				]
 			],
 			// #63 Template graph create form.
 			[
 				[
-					'url' => 'graphs.php?hostid=15000&form=create&context=template',
+					'url' => 'zabbix.php?action=popup&popup=graph.edit&context=template&hostid=15000',
 					'doc_link' => '/en/manual/config/visualization/graphs/custom#configuring-custom-graphs'
 				]
 			],
 			// #64 Template graph update form.
 			[
 				[
-					'url' => 'graphs.php?form=update&graphid=15000&context=template&filter_hostids%5B0%5D=15000',
+					'url' => 'zabbix.php?action=popup&popup=graph.edit&context=template&graphid=15000',
 					'doc_link' => '/en/manual/config/visualization/graphs/custom#configuring-custom-graphs'
 				]
 			],
@@ -690,7 +691,7 @@ class testDocumentationLinks extends CWebTest {
 			[
 				[
 					'url' => 'zabbix.php?action=template.dashboard.list&templateid=10076&context=template',
-					'doc_link' => '/en/manual/config/visualization/host_screens'
+					'doc_link' => '/en/manual/web_interface/frontend_sections/monitoring/hosts/dashboards'
 				]
 			],
 			// #66 Template dashboard create popup.
@@ -793,8 +794,8 @@ class testDocumentationLinks extends CWebTest {
 			// #75 Template LLD item prototype create form.
 			[
 				[
-					// Discovery rule => Mounted filesystem discovery.
-					'url' => 'zabbix.php?action=popup&popup=item.prototype.edit&context=template&parent_discoveryid=22947',
+					// AIX by Zabbix agent, Discovery rule => Mounted filesystem discovery.
+					'url' => 'zabbix.php?action=popup&popup=item.prototype.edit&context=template&parent_discoveryid=57057',
 					'doc_link' => '/en/manual/discovery/low_level_discovery/item_prototypes'
 				]
 			],
@@ -802,7 +803,7 @@ class testDocumentationLinks extends CWebTest {
 			[
 				[
 					// Item prototype => FS [{#FSNAME}]: Get data.
-					'url' => 'zabbix.php?action=popup&popup=item.prototype.edit&itemid=44428&parent_discoveryid=22947&context=template',
+					'url' => 'zabbix.php?action=popup&popup=item.prototype.edit&itemid=57060&parent_discoveryid=57057&context=template',
 					'doc_link' => '/en/manual/discovery/low_level_discovery/item_prototypes'
 				]
 			],
@@ -820,6 +821,7 @@ class testDocumentationLinks extends CWebTest {
 							'element' => 'button:Test'
 						]
 					],
+					'second_dialog' => true,
 					'doc_link' => '/en/manual/config/items/item#testing'
 				]
 			],
@@ -846,7 +848,7 @@ class testDocumentationLinks extends CWebTest {
 			[
 				[
 					// Discovery rule => Mounted filesystem discovery.
-					'url' => 'zabbix.php?action=popup&popup=trigger.prototype.edit&parent_discoveryid=22947',
+					'url' => 'zabbix.php?action=popup&popup=trigger.prototype.edit&parent_discoveryid=57057&context=template',
 					'doc_link' => '/en/manual/discovery/low_level_discovery/trigger_prototypes'
 				]
 			],
@@ -854,7 +856,7 @@ class testDocumentationLinks extends CWebTest {
 			[
 				[
 					// Trigger => AIX: FS [{#FSNAME}]: Space is low.
-					'url' => 'zabbix.php?action=popup&popup=trigger.prototype.edit&parent_discoveryid=22947&triggerid=17114',
+					'url' => 'zabbix.php?action=popup&popup=trigger.prototype.edit&parent_discoveryid=57057&triggerid=27498&context=template',
 					'doc_link' => '/en/manual/discovery/low_level_discovery/trigger_prototypes'
 				]
 			],
@@ -873,21 +875,21 @@ class testDocumentationLinks extends CWebTest {
 			// #83 Template LLD graph prototype list view.
 			[
 				[
-					'url' => 'graphs.php?parent_discoveryid=15011&context=template',
+					'url' => 'zabbix.php?action=graph.prototype.list&parent_discoveryid=15011&context=template',
 					'doc_link' => '/en/manual/web_interface/frontend_sections/data_collection/templates/discovery/graph_prototypes'
 				]
 			],
 			// #84 Template LLD graph prototype create form.
 			[
 				[
-					'url' => 'graphs.php?form=create&parent_discoveryid=15011&context=template',
+					'url' => 'zabbix.php?action=popup&popup=graph.prototype.edit&context=template&parent_discoveryid=15011',
 					'doc_link' => '/en/manual/discovery/low_level_discovery/graph_prototypes'
 				]
 			],
 			// #85 Template LLD graph prototype edit form.
 			[
 				[
-					'url' => 'graphs.php?form=update&parent_discoveryid=15011&graphid=15008&context=template',
+					'url' => 'zabbix.php?action=popup&popup=graph.prototype.edit&context=template&parent_discoveryid=15011&graphid=15008',
 					'doc_link' => '/en/manual/discovery/low_level_discovery/graph_prototypes'
 				]
 			],
@@ -1032,6 +1034,7 @@ class testDocumentationLinks extends CWebTest {
 							'element' => 'button:Test'
 						]
 					],
+					'second_dialog' => true,
 					'doc_link' => '/en/manual/config/items/item#testing'
 				]
 			],
@@ -1064,7 +1067,7 @@ class testDocumentationLinks extends CWebTest {
 			// #105 Host trigger update form.
 			[
 				[
-					'url' => 'zabbix.php?action=popup&popup=trigger.edit&triggerid=99251', // Test trigger with tag.
+					'url' => 'zabbix.php?action=popup&popup=trigger.edit&triggerid=99251&context=host&hostid=10084', // Test trigger with tag.
 					'doc_link' => '/en/manual/config/triggers/trigger#configuration'
 				]
 			],
@@ -1083,21 +1086,21 @@ class testDocumentationLinks extends CWebTest {
 			// #107 Host graph list view.
 			[
 				[
-					'url' => 'graphs.php?context=host',
+					'url' => 'zabbix.php?action=graph.list&context=host&filter_set=1',
 					'doc_link' => '/en/manual/web_interface/frontend_sections/data_collection/hosts/graphs'
 				]
 			],
 			// #108 Host graph create form.
 			[
 				[
-					'url' => 'graphs.php?hostid=40001&form=create&context=host',
+					'url' => 'zabbix.php?action=popup&popup=graph.edit&context=host&hostid=40001',
 					'doc_link' => '/en/manual/config/visualization/graphs/custom#configuring-custom-graphs'
 				]
 			],
 			// #109 Host graph update form.
 			[
 				[
-					'url' => 'graphs.php?form=update&graphid=300000&context=host&filter_hostids%5B0%5D=40001',
+					'url' => 'zabbix.php?action=popup&popup=graph.edit&graphid=300000&context=host',
 					'doc_link' => '/en/manual/config/visualization/graphs/custom#configuring-custom-graphs'
 				]
 			],
@@ -1165,6 +1168,7 @@ class testDocumentationLinks extends CWebTest {
 							'element' => 'button:Test'
 						]
 					],
+					'second_dialog' => true,
 					'doc_link' => '/en/manual/config/items/item#testing'
 				]
 			],
@@ -1191,7 +1195,7 @@ class testDocumentationLinks extends CWebTest {
 			[
 				[
 					// Discovery rule => testFormDiscoveryRule.
-					'url' => 'zabbix.php?action=popup&popup=trigger.prototype.edit&parent_discoveryid=133800',
+					'url' => 'zabbix.php?action=popup&popup=trigger.prototype.edit&parent_discoveryid=133800&context=host',
 					'doc_link' => '/en/manual/discovery/low_level_discovery/trigger_prototypes'
 				]
 			],
@@ -1199,7 +1203,7 @@ class testDocumentationLinks extends CWebTest {
 			[
 				[
 					// Trigger name => testFormTriggerPrototype1.
-					'url' => 'zabbix.php?action=popup&popup=trigger.prototype.edit&parent_discoveryid=133800&triggerid=99518',
+					'url' => 'zabbix.php?action=popup&popup=trigger.prototype.edit&parent_discoveryid=133800&triggerid=99518&context=host',
 					'doc_link' => '/en/manual/discovery/low_level_discovery/trigger_prototypes'
 				]
 			],
@@ -1218,21 +1222,21 @@ class testDocumentationLinks extends CWebTest {
 			// #122 Host LLD graph prototype list view.
 			[
 				[
-					'url' => 'graphs.php?parent_discoveryid=133800&context=host',
+					'url' => 'zabbix.php?action=graph.prototype.list&parent_discoveryid=133800&context=host',
 					'doc_link' => '/en/manual/web_interface/frontend_sections/data_collection/hosts/discovery/graph_prototypes'
 				]
 			],
 			// #123 Host LLD graph prototype create form.
 			[
 				[
-					'url' => 'graphs.php?form=create&parent_discoveryid=133800&context=host',
+					'url' => 'zabbix.php?action=popup&popup=graph.prototype.edit&context=host&parent_discoveryid=133800',
 					'doc_link' => '/en/manual/discovery/low_level_discovery/graph_prototypes'
 				]
 			],
 			// #124 Host LLD graph prototype edit form.
 			[
 				[
-					'url' => 'graphs.php?form=update&parent_discoveryid=133800&graphid=600000&context=host',
+					'url' => 'zabbix.php?action=popup&popup=graph.prototype.edit&context=host&parent_discoveryid=133800&graphid=600000',
 					'doc_link' => '/en/manual/discovery/low_level_discovery/graph_prototypes'
 				]
 			],
@@ -2441,12 +2445,29 @@ class testDocumentationLinks extends CWebTest {
 		// Execute the corresponding callback function to open the form with doc link.
 		if (array_key_exists('actions', $data)) {
 			foreach ($data['actions'] as $action) {
-				call_user_func_array([$this, $action['callback']], [CTestArrayHelper::get($action, 'element', null)]);
+				$element = CTestArrayHelper::get($action, 'element', null);
+				call_user_func_array([$this, $action['callback']], [$element]);
+
+				// $dialog->isValid() can be false for $location variable if the widget is added too quickly.
+				if ($element === 'id:dashboard-add-widget') {
+					COverlayDialogElement::get('Add widget')->waitUntilReady();
+				}
 			}
 		}
 
 		$dialog = COverlayDialogElement::find()->one(false);
-		$location = ($dialog->isValid()) ? COverlayDialogElement::find()->all()->last()->waitUntilReady() : $this;
+		if ($dialog->isValid()) {
+			/*
+			 * Due to inline validation in some forms the 2nd order dialog takes longer to be generated. Therefore, in
+			 * these forms we need to look specifically for the 2nd dialog, otherwise the link is taken from the 1st dialog.
+			 */
+			$location = (CTestArrayHelper::get($data, 'second_dialog'))
+				? COverlayDialogElement::find(1)->waitUntilPresent()->one()->waitUntilReady()
+				: COverlayDialogElement::find()->all()->waitUntilReady()->last();
+		}
+		else {
+			$location = $this;
+		}
 
 		// Check all widget documentation links.
 		if (array_key_exists('widget_type', $data)) {

@@ -5,7 +5,8 @@ noinst_PROGRAMS = \
 	DBadd_condition_alloc \
 	zbx_merge_tags \
 	zbx_del_tags \
-	zbx_add_tags
+	zbx_add_tags \
+	zbx_sync_rowset_merge
 else
 if PROXY
 noinst_PROGRAMS = \
@@ -76,6 +77,20 @@ zbx_add_tags_LDFLAGS = @SERVER_LDFLAGS@ $(CMOCKA_LDFLAGS) $(YAML_LDFLAGS)
 
 zbx_add_tags_CFLAGS = $(COMMON_FLAGS)
 
+
+zbx_sync_rowset_merge_SOURCES = \
+	zbx_sync_rowset_merge.c \
+	$(top_srcdir)/tests/zbxmockprimitive.c \
+	$(top_srcdir)/tests/zbxmockprimitive.h 
+
+zbx_sync_rowset_merge_CFLAGS = \
+	-I@top_srcdir@/tests \
+	$(COMMON_COMPILER_FLAGS)
+
+zbx_sync_rowset_merge_LDADD =  $(DBHIGH_LIBS) @SERVER_LIBS@ $(TEST_LIBS) $(CMOCKA_LIBS) $(YAML_LIBS) $(TLS_LIBS)
+
+zbx_sync_rowset_merge_LDFLAGS = @SERVER_LDFLAGS@ $(CMOCKA_LDFLAGS) $(YAML_LDFLAGS) $(TLS_LDFLAGS)
+
 else
 if PROXY
 
@@ -94,3 +109,5 @@ DBadd_condition_alloc_CFLAGS = $(COMMON_FLAGS)
 
 endif
 endif
+
+

@@ -37,14 +37,18 @@ class testCalculatedFormula extends CWebTest {
 				[
 					'expected' => TEST_BAD,
 					'formula' => '',
-					'error' => 'Invalid parameter "/1/params": cannot be empty.'
+					'inline_error' => [
+						'Formula' => 'This field cannot be empty.'
+					]
 				]
 			],
 			[
 				[
 					'expected' => TEST_BAD,
 					'formula' => 'something',
-					'error' => 'Invalid parameter "/1/params": incorrect expression starting from "something".'
+					'inline_error' => [
+						'Formula' => 'Incorrect expression starting from "something".'
+					]
 				]
 			],
 			// abs() function.
@@ -55,19 +59,19 @@ class testCalculatedFormula extends CWebTest {
 			],
 			[
 				[
-					'formula' => "abs(change(//trap[1]))"
+					'formula' => 'abs(change(//trap[1]))'
 				]
 			],
 			// acos() function.
 			[
 				[
-					'formula' => "acos(last(//trap))"
+					'formula' => 'acos(last(//trap))'
 				]
 			],
 			// asin() function.
 			[
 				[
-					'formula' => "asin(last(//trap))"
+					'formula' => 'asin(last(//trap))'
 				]
 			],
 			// avg() function.
@@ -88,13 +92,13 @@ class testCalculatedFormula extends CWebTest {
 			],
 			[
 				[
-					'formula' => "avg(//trap,19)"
+					'formula' => 'avg(//trap,19)'
 				]
 			],
 			// atan() function.
 			[
 				[
-					'formula' => "atan(last(//trap))"
+					'formula' => 'atan(last(//trap))'
 				]
 			],
 			// baselinedev() function.
@@ -162,7 +166,7 @@ class testCalculatedFormula extends CWebTest {
 			// bitand() function.
 			[
 				[
-					'formula' => "bitand(last(//key,#5:now-24h),123)"
+					'formula' => 'bitand(last(//key,#5:now-24h),123)'
 				]
 			],
 			[
@@ -179,19 +183,19 @@ class testCalculatedFormula extends CWebTest {
 			// cbrt() function.
 			[
 				[
-					'formula' => "cbrt(last(//trap, {\$USERMACRO}))"
+					'formula' => 'cbrt(last(//trap, {$USERMACRO}))'
 				]
 			],
 			// ceil() function.
 			[
 				[
-					'formula' => "ceil(last(//trap,{\$USERMACRO}))"
+					'formula' => 'ceil(last(//trap,{$USERMACRO}))'
 				]
 			],
 			// change() function.
 			[
 				[
-					'formula' => "change(//trap[1])"
+					'formula' => 'change(//trap[1])'
 				]
 			],
 			// changecount() function.
@@ -350,25 +354,25 @@ class testCalculatedFormula extends CWebTest {
 			// cos() function.
 			[
 				[
-					'formula' => "cos(last(//trap,{\$USERMACRO}))"
+					'formula' => 'cos(last(//trap,{$USERMACRO}))'
 				]
 			],
 			// cosh() function.
 			[
 				[
-					'formula' => "cosh(last(//trap))"
+					'formula' => 'cosh(last(//trap))'
 				]
 			],
 			// cot() function.
 			[
 				[
-					'formula' => "cot(last(//trap))"
+					'formula' => 'cot(last(//trap))'
 				]
 			],
 			// degrees() function.
 			[
 				[
-					'formula' => "degrees(last(//trap))"
+					'formula' => 'degrees(last(//trap))'
 				]
 			],
 			// time and date functions.
@@ -401,13 +405,13 @@ class testCalculatedFormula extends CWebTest {
 			// exp() function.
 			[
 				[
-					'formula' => "exp(last(//trap))"
+					'formula' => 'exp(last(//trap))'
 				]
 			],
 			// expm1() function.
 			[
 				[
-					'formula' => "expm1(last(//trap,{\$USERMACRO}))"
+					'formula' => 'expm1(last(//trap,{$USERMACRO}))'
 				]
 			],
 			// find() function.
@@ -464,7 +468,7 @@ class testCalculatedFormula extends CWebTest {
 			// floor() function.
 			[
 				[
-					'formula' => "floor(last(//trap,{\$USERMACRO}))"
+					'formula' => 'floor(last(//trap,{$USERMACRO}))'
 				]
 			],
 			// forecast() function.
@@ -515,7 +519,7 @@ class testCalculatedFormula extends CWebTest {
 			],
 			[
 				[
-					'formula' => "forecast(//trap,#1,0)"
+					'formula' => 'forecast(//trap,#1,0)'
 				]
 			],
 			// fuzzytime() function.
@@ -542,7 +546,7 @@ class testCalculatedFormula extends CWebTest {
 			],
 			[
 				[
-					'formula' => "histogram_quantile(0.3,1.0,last(//trap[1.0]),7.5,last(//trap[7.5]),\"+Inf\",last(//trap[Inf]))"
+					'formula' => 'histogram_quantile(0.3,1.0,last(//trap[1.0]),7.5,last(//trap[7.5]),"+Inf",last(//trap[Inf]))'
 				]
 			],
 			// last() function.
@@ -564,13 +568,13 @@ class testCalculatedFormula extends CWebTest {
 			// log() function.
 			[
 				[
-					'formula' => "log(last(//trap))"
+					'formula' => 'log(last(//trap))'
 				]
 			],
 			// log10() function.
 			[
 				[
-					'formula' => "log10(last(//trap,{\$USERMACRO}))"
+					'formula' => 'log10(last(//trap,{$USERMACRO}))'
 				]
 			],
 			// length() function
@@ -616,13 +620,13 @@ class testCalculatedFormula extends CWebTest {
 			// min() function.
 			[
 				[
-					'formula' => "min(//trap,\"#4:now-{\$USERMACRO}m\")"
+					'formula' => 'min(//trap,"#4:now-{$USERMACRO}m")'
 				]
 			],
 			// mod() function.
 			[
 				[
-					'formula' => "mod(last(//trap),2s)"
+					'formula' => 'mod(last(//trap),2s)'
 				]
 			],
 			// monoinc() function.
@@ -709,7 +713,7 @@ class testCalculatedFormula extends CWebTest {
 			// power() function.
 			[
 				[
-					'formula' => "power(last(//trap,#1),2)"
+					'formula' => 'power(last(//trap,#1),2)'
 				]
 			],
 			// rand()function.
@@ -721,7 +725,7 @@ class testCalculatedFormula extends CWebTest {
 			// radians()function.
 			[
 				[
-					'formula' => "radians(last(//trap))"
+					'formula' => 'radians(last(//trap))'
 				]
 			],
 			// rate() function.
@@ -732,13 +736,13 @@ class testCalculatedFormula extends CWebTest {
 			],
 			[
 				[
-					'formula' => "rate(//trap,50m)"
+					'formula' => 'rate(//trap,50m)'
 				]
 			],
 			// round()function.
 			[
 				[
-					'formula' => "round(last(//trap),2)"
+					'formula' => 'round(last(//trap),2)'
 				]
 			],
 			// sum() function.
@@ -760,31 +764,31 @@ class testCalculatedFormula extends CWebTest {
 			// signum()function.
 			[
 				[
-					'formula' => "signum(last(//trap,{\$USERMACRO}))"
+					'formula' => 'signum(last(//trap,{$USERMACRO}))'
 				]
 			],
 			// sin()function.
 			[
 				[
-					'formula' => "sin(last(//trap))"
+					'formula' => 'sin(last(//trap))'
 				]
 			],
 			// sinh()function.
 			[
 				[
-					'formula' => "sinh(last(//trap))"
+					'formula' => 'sinh(last(//trap))'
 				]
 			],
 			// sqrt()function.
 			[
 				[
-					'formula' => "sqrt(last(//trap,{\$USERMACRO}))"
+					'formula' => 'sqrt(last(//trap,{$USERMACRO}))'
 				]
 			],
 			// tan()function.
 			[
 				[
-					'formula' => "tan(last(//trap,{\$USERMACRO}))"
+					'formula' => 'tan(last(//trap,{$USERMACRO}))'
 				]
 			],
 			// timeleft() function.
@@ -811,7 +815,7 @@ class testCalculatedFormula extends CWebTest {
 			// truncate() function
 			[
 				[
-					'formula' => "truncate(last(//trap),6)"
+					'formula' => 'truncate(last(//trap),6)'
 				]
 			],
 			// trendavg() function.
@@ -1006,36 +1010,46 @@ class testCalculatedFormula extends CWebTest {
 				[
 					'expected' => TEST_BAD,
 					'formula' => 'abs',
-					'error' => 'Invalid parameter "/1/params": incorrect expression starting from "abs".'
+					'inline_error' => [
+						'Formula' => 'Incorrect expression starting from "abs".'
+					]
 				]
 			],
 			[
 				[
 					'expected' => TEST_BAD,
-					'formula' => "Abs(change(/Trapper/trap[1]))",
-					'error' => 'Invalid parameter "/1/params": incorrect expression starting from "Abs(change(/Trapper/trap[1]))".'
+					'formula' => 'Abs(change(/Trapper/trap[1]))',
+					'inline_error' => [
+						'Formula' => 'Incorrect expression starting from "Abs(change(/Trapper/trap[1]))".'
+					]
 				]
 			],
 			[
 				[
 					'expected' => TEST_BAD,
 					'formula' => 'abs(/test/key)',
-					'error' => 'Invalid parameter "/1/params": incorrect usage of function "abs".'
+					'inline_error' => [
+						'Formula' => 'Incorrect usage of function "abs".'
+					]
 				]
 			],
 			[
 				[
 					'expected' => TEST_BAD,
-					'formula' => "abs(change(//trap[1]),1h:now/h)",
-					'error' => "Invalid parameter \"/1/params\": incorrect expression starting from \"abs(change(//trap[1]),1h:now/h)\"."
+					'formula' => 'abs(change(//trap[1]),1h:now/h)',
+					'inline_error' => [
+						'Formula' => 'Incorrect expression starting from "abs(change(//trap[1]),1h:now/h)".'
+					]
 				]
 			],
 			// acos() function validation.
 			[
 				[
 					'expected' => TEST_BAD,
-					'formula' => "Acos(last(//trap))",
-					'error' => 'Invalid parameter "/1/params": incorrect expression starting from "Acos(last(//trap))".'
+					'formula' => 'Acos(last(//trap))',
+					'inline_error' => [
+						'Formula' => 'Incorrect expression starting from "Acos(last(//trap))".'
+					]
 				]
 			],
 			// avg() function validation.
@@ -1043,28 +1057,36 @@ class testCalculatedFormula extends CWebTest {
 				[
 					'expected' => TEST_BAD,
 					'formula' => 'avg()',
-					'error' => 'Invalid parameter "/1/params": invalid number of parameters in function "avg".'
+					'inline_error' => [
+						'Formula' => 'Invalid number of parameters in function "avg".'
+					]
 				]
 			],
 			[
 				[
 					'expected' => TEST_BAD,
 					'formula' => 'avg(/host/trap,{#LLD}h)',
-					'error' => 'Invalid parameter "/1/params": incorrect expression starting from "avg(/host/trap,{#LLD}h)".'
+					'inline_error' => [
+						'Formula' => 'Incorrect expression starting from "avg(/host/trap,{#LLD}h)".'
+					]
 				]
 			],
 			[
 				[
 					'expected' => TEST_BAD,
 					'formula' => 'avg(/host/trap,"30")',
-					'error' => 'Invalid parameter "/1/params": invalid second parameter in function "avg".'
+					'inline_error' => [
+						'Formula' => 'Invalid second parameter in function "avg".'
+					]
 				]
 			],
 			[
 				[
 					'expected' => TEST_BAD,
 					'formula' => 'avg(/host/trap,"30s")',
-					'error' => 'Invalid parameter "/1/params": invalid second parameter in function "avg".'
+					'inline_error' => [
+						'Formula' => 'Invalid second parameter in function "avg".'
+					]
 				]
 			],
 			// baselinedev() function validation.
@@ -1072,98 +1094,126 @@ class testCalculatedFormula extends CWebTest {
 				[
 					'expected' => TEST_BAD,
 					'formula' => 'baselinedev(/test/trap,1d:now/d-1d,,3)',
-					'error' => 'Invalid parameter "/1/params": invalid third parameter in function "baselinedev".'
+					'inline_error' => [
+						'Formula' => 'Invalid third parameter in function "baselinedev".'
+					]
 				]
 			],
 			[
 				[
 					'expected' => TEST_BAD,
 					'formula' => 'baselinedev(/test/trap,1d:now/d-1d,"d")',
-					'error' => 'Invalid parameter "/1/params": mandatory parameter is missing in function "baselinedev".'
+					'inline_error' => [
+						'Formula' => 'Mandatory parameter is missing in function "baselinedev".'
+					]
 				]
 			],
 			[
 				[
 					'expected' => TEST_BAD,
 					'formula' => 'baselinedev(/test/trap,1d:now/d-1d,"d",0)',
-					'error' => 'Invalid parameter "/1/params": invalid fourth parameter in function "baselinedev".'
+					'inline_error' => [
+						'Formula' => 'Invalid fourth parameter in function "baselinedev".'
+					]
 				]
 			],
 			[
 				[
 					'expected' => TEST_BAD,
 					'formula' => 'baselinedev(/test/trap,1m:now/m-1m,"d",3)',
-					'error' => 'Invalid parameter "/1/params": invalid second parameter in function "baselinedev".'
+					'inline_error' => [
+						'Formula' => 'Invalid second parameter in function "baselinedev".'
+					]
 				]
 			],
 			[
 				[
 					'expected' => TEST_BAD,
 					'formula' => 'baselinedev(/test/trap,1s:now/s,"h",3)',
-					'error' => 'Invalid parameter "/1/params": incorrect expression starting from "baselinedev(/test/trap,1s:now/s,"h",3)".'
+					'inline_error' => [
+						'Formula' => 'Incorrect expression starting from "baselinedev(/test/trap,1s:now/s,"h",3)".'
+					]
 				]
 			],
 			[
 				[
 					'expected' => TEST_BAD,
 					'formula' => 'baselinedev(/test/trap,1h:now/h,"m",3)',
-					'error' => 'Invalid parameter "/1/params": invalid third parameter in function "baselinedev".'
+					'inline_error' => [
+						'Formula' => 'Invalid third parameter in function "baselinedev".'
+					]
 				]
 			],
 			[
 				[
 					'expected' => TEST_BAD,
 					'formula' => 'baselinedev(/test/trap,1h:now/h,"s",3)',
-					'error' => 'Invalid parameter "/1/params": invalid third parameter in function "baselinedev".'
+					'inline_error' => [
+						'Formula' => 'Invalid third parameter in function "baselinedev".'
+					]
 				]
 			],
 			[
 				[
 					'expected' => TEST_BAD,
 					'formula' => 'baselinedev(/test/trap,1h,"h",3)',
-					'error' => 'Invalid parameter "/1/params": invalid second parameter in function "baselinedev".'
+					'inline_error' => [
+						'Formula' => 'Invalid second parameter in function "baselinedev".'
+					]
 				]
 			],
 			[
 				[
 					'expected' => TEST_BAD,
 					'formula' => 'baselinedev(/test/trap,1h:now/h,"h",3.6)',
-					'error' => 'Invalid parameter "/1/params": invalid fourth parameter in function "baselinedev".'
+					'inline_error' => [
+						'Formula' => 'Invalid fourth parameter in function "baselinedev".'
+					]
 				]
 			],
 			[
 				[
 					'expected' => TEST_BAD,
 					'formula' => 'baselinedev(/test/trap,1h:now/h,"m",120)',
-					'error' => 'Invalid parameter "/1/params": invalid third parameter in function "baselinedev".'
+					'inline_error' => [
+						'Formula' => 'Invalid third parameter in function "baselinedev".'
+					]
 				]
 			],
 			[
 				[
 					'expected' => TEST_BAD,
 					'formula' => 'baselinedev(/test/trap,1h:now/h,"s",120)',
-					'error' => 'Invalid parameter "/1/params": invalid third parameter in function "baselinedev".'
+					'inline_error' => [
+						'Formula' => 'Invalid third parameter in function "baselinedev".'
+					]
 				]
 			],
 			[
 				[
 					'expected' => TEST_BAD,
 					'formula' => 'baselinedev(/test/trap,150m:now/h,"h",12)',
-					'error' => 'Invalid parameter "/1/params": invalid second parameter in function "baselinedev".'
+					'inline_error' => [
+						'Formula' => 'Invalid second parameter in function "baselinedev".'
+					]
 				]
 			],
 			[
 				[
 					'expected' => TEST_BAD,
 					'formula' => 'baselinedev(/test/trap,1h:now/m,"h",12)',
-					'error' => 'Invalid parameter "/1/params": invalid second parameter in function "baselinedev".'
+					'inline_error' => [
+						'Formula' => 'Invalid second parameter in function "baselinedev".'
+					]
 				]
 			],
 			[
 				[
 					'expected' => TEST_BAD,
 					'formula' => 'baselinedev(/host/key,1d:now/d-1d,"d",2,)',
-					'error' => 'Invalid parameter "/1/params": invalid number of parameters in function "baselinedev".'
+					'inline_error' => [
+						'Formula' => 'Invalid number of parameters in function "baselinedev".'
+					]
 				]
 			],
 			// baselinewma() function validation.
@@ -1171,98 +1221,126 @@ class testCalculatedFormula extends CWebTest {
 				[
 					'expected' => TEST_BAD,
 					'formula' => 'baselinewma(/test/trap,1d:now/d-1d,,3)',
-					'error' => 'Invalid parameter "/1/params": invalid third parameter in function "baselinewma".'
+					'inline_error' => [
+						'Formula' => 'Invalid third parameter in function "baselinewma".'
+					]
 				]
 			],
 			[
 				[
 					'expected' => TEST_BAD,
 					'formula' => 'baselinewma(/test/trap,1d:now/d-1d,"d")',
-					'error' => 'Invalid parameter "/1/params": mandatory parameter is missing in function "baselinewma".'
+					'inline_error' => [
+						'Formula' => 'Mandatory parameter is missing in function "baselinewma".'
+					]
 				]
 			],
 			[
 				[
 					'expected' => TEST_BAD,
 					'formula' => 'baselinewma(/test/trap,1d:now/d-1d,"d",0)',
-					'error' => 'Invalid parameter "/1/params": invalid fourth parameter in function "baselinewma".'
+					'inline_error' => [
+						'Formula' => 'Invalid fourth parameter in function "baselinewma".'
+					]
 				]
 			],
 			[
 				[
 					'expected' => TEST_BAD,
 					'formula' => 'baselinewma(/test/trap,1m:now/m-1m,"d",3)',
-					'error' => 'Invalid parameter "/1/params": invalid second parameter in function "baselinewma".'
+					'inline_error' => [
+						'Formula' => 'Invalid second parameter in function "baselinewma".'
+					]
 				]
 			],
 			[
 				[
 					'expected' => TEST_BAD,
 					'formula' => 'baselinewma(/test/trap,1s:now/s,"h",3)',
-					'error' => 'Invalid parameter "/1/params": incorrect expression starting from "baselinewma(/test/trap,1s:now/s,"h",3)".'
+					'inline_error' => [
+						'Formula' => 'Incorrect expression starting from "baselinewma(/test/trap,1s:now/s,"h",3)".'
+					]
 				]
 			],
 			[
 				[
 					'expected' => TEST_BAD,
 					'formula' => 'baselinewma(/test/trap,1h:now/h,"m",3)',
-					'error' => 'Invalid parameter "/1/params": invalid third parameter in function "baselinewma".'
+					'inline_error' => [
+						'Formula' => 'Invalid third parameter in function "baselinewma".'
+					]
 				]
 			],
 			[
 				[
 					'expected' => TEST_BAD,
 					'formula' => 'baselinewma(/test/trap,1h:now/h,"s",3)',
-					'error' => 'Invalid parameter "/1/params": invalid third parameter in function "baselinewma".'
+					'inline_error' => [
+						'Formula' => 'Invalid third parameter in function "baselinewma".'
+					]
 				]
 			],
 			[
 				[
 					'expected' => TEST_BAD,
 					'formula' => 'baselinewma(/test/trap,1h,"h",3)',
-					'error' => 'Invalid parameter "/1/params": invalid second parameter in function "baselinewma".'
+					'inline_error' => [
+						'Formula' => 'Invalid second parameter in function "baselinewma".'
+					]
 				]
 			],
 			[
 				[
 					'expected' => TEST_BAD,
 					'formula' => 'baselinewma(/test/trap,1h:now/h,"h",3.6)',
-					'error' => 'Invalid parameter "/1/params": invalid fourth parameter in function "baselinewma".'
+					'inline_error' => [
+						'Formula' => 'Invalid fourth parameter in function "baselinewma".'
+					]
 				]
 			],
 			[
 				[
 					'expected' => TEST_BAD,
 					'formula' => 'baselinewma(/test/trap,1h:now/h,"m",120)',
-					'error' => 'Invalid parameter "/1/params": invalid third parameter in function "baselinewma".'
+					'inline_error' => [
+						'Formula' => 'Invalid third parameter in function "baselinewma".'
+					]
 				]
 			],
 			[
 				[
 					'expected' => TEST_BAD,
 					'formula' => 'baselinewma(/test/trap,1h:now/h,"s",120)',
-					'error' => 'Invalid parameter "/1/params": invalid third parameter in function "baselinewma".'
+					'inline_error' => [
+						'Formula' => 'Invalid third parameter in function "baselinewma".'
+					]
 				]
 			],
 			[
 				[
 					'expected' => TEST_BAD,
 					'formula' => 'baselinewma(/test/trap,150m:now/h,"h",12)',
-					'error' => 'Invalid parameter "/1/params": invalid second parameter in function "baselinewma".'
+					'inline_error' => [
+						'Formula' => 'Invalid second parameter in function "baselinewma".'
+					]
 				]
 			],
 			[
 				[
 					'expected' => TEST_BAD,
 					'formula' => 'baselinewma(/test/trap,1h:now/m,"h",12)',
-					'error' => 'Invalid parameter "/1/params": invalid second parameter in function "baselinewma".'
+					'inline_error' => [
+						'Formula' => 'Invalid second parameter in function "baselinewma".'
+					]
 				]
 			],
 			[
 				[
 					'expected' => TEST_BAD,
 					'formula' => 'baselinewma(/host/key,1d:now/d-1d,"d",2,)',
-					'error' => 'Invalid parameter "/1/params": invalid number of parameters in function "baselinewma".'
+					'inline_error' => [
+						'Formula' => 'Invalid number of parameters in function "baselinewma".'
+					]
 				]
 			],
 			// bitand() function validation.
@@ -1270,28 +1348,36 @@ class testCalculatedFormula extends CWebTest {
 				[
 					'expected' => TEST_BAD,
 					'formula' => 'bitand(last(/*/key,1h:now/h))',
-					'error' => 'Invalid parameter "/1/params": invalid number of parameters in function "bitand".'
+					'inline_error' => [
+						'Formula' => 'Invalid number of parameters in function "bitand".'
+					]
 				]
 			],
 			[
 				[
 					'expected' => TEST_BAD,
-					'formula' => "bitand(last(/host/key,#5:now-#5),123)",
-					'error' => 'Invalid parameter "/1/params": incorrect expression starting from "bitand(last(/host/key,#5:now-#5),123)".'
+					'formula' => 'bitand(last(/host/key,#5:now-#5),123)',
+					'inline_error' => [
+						'Formula' => 'Incorrect expression starting from "bitand(last(/host/key,#5:now-#5),123)".'
+					]
 				]
 			],
 			[
 				[
 					'expected' => TEST_BAD,
-					'formula' => "bitand(last(//key,:now-24h),123)",
-					'error' => 'Invalid parameter "/1/params": incorrect expression starting from "bitand(last(//key,:now-24h),123)".'
+					'formula' => 'bitand(last(//key,:now-24h),123)',
+					'inline_error' => [
+						'Formula' => 'Incorrect expression starting from "bitand(last(//key,:now-24h),123)".'
+					]
 				]
 			],
 			[
 				[
 					'expected' => TEST_BAD,
 					'formula' => 'bitand(/*/key,1h:now/h,123)',
-					'error' => 'Invalid parameter "/1/params": incorrect usage of function "bitand".'
+					'inline_error' => [
+						'Formula' => 'Incorrect usage of function "bitand".'
+					]
 				]
 			],
 			// bucket_percentile() function validation.
@@ -1299,35 +1385,45 @@ class testCalculatedFormula extends CWebTest {
 				[
 					'expected' => TEST_BAD,
 					'formula' => 'bucket_percentile(/host/trap[*],30m,123)',
-					'error' => 'Invalid parameter "/1/params": invalid third parameter in function "bucket_percentile".'
+					'inline_error' => [
+						'Formula' => 'Invalid third parameter in function "bucket_percentile".'
+					]
 				]
 			],
 			[
 				[
 					'expected' => TEST_BAD,
-					'formula' => "bucket_percentile(//trap[*],#4,10)",
-					'error' => 'Invalid parameter "/1/params": invalid second parameter in function "bucket_percentile".'
+					'formula' => 'bucket_percentile(//trap[*],#4,10)',
+					'inline_error' => [
+						'Formula' => 'Invalid second parameter in function "bucket_percentile".'
+					]
 				]
 			],
 			[
 				[
 					'expected' => TEST_BAD,
 					'formula' => 'bucket_percentile(host/trap[*],30m,45)',
-					'error' => 'Invalid parameter "/1/params": incorrect expression starting from "bucket_percentile(host/trap[*],30m,45)".'
+					'inline_error' => [
+						'Formula' => 'Incorrect expression starting from "bucket_percentile(host/trap[*],30m,45)".'
+					]
 				]
 			],
 			[
 				[
 					'expected' => TEST_BAD,
 					'formula' => 'bucket_percentile(/host/trap[*],3h)',
-					'error' => 'Invalid parameter "/1/params": mandatory parameter is missing in function "bucket_percentile".'
+					'inline_error' => [
+						'Formula' => 'Mandatory parameter is missing in function "bucket_percentile".'
+					]
 				]
 			],
 			[
 				[
 					'expected' => TEST_BAD,
 					'formula' => 'bucket_percentile(3h,30)',
-					'error' => 'Invalid parameter "/1/params": incorrect usage of function "bucket_percentile".'
+					'inline_error' => [
+						'Formula' => 'Incorrect usage of function "bucket_percentile".'
+					]
 				]
 			],
 			// change() function validation.
@@ -1335,7 +1431,9 @@ class testCalculatedFormula extends CWebTest {
 				[
 					'expected' => TEST_BAD,
 					'formula' => 'change(/Trapper/trap[1],,)',
-					'error' => 'Invalid parameter "/1/params": invalid number of parameters in function "change".'
+					'inline_error' => [
+						'Formula' => 'Invalid number of parameters in function "change".'
+					]
 				]
 			],
 			// changecount() function validation.
@@ -1343,56 +1441,72 @@ class testCalculatedFormula extends CWebTest {
 				[
 					'expected' => TEST_BAD,
 					'formula' => 'changecount(/host/key,#5,"")',
-					'error' => 'Invalid parameter "/1/params": invalid third parameter in function "changecount".'
+					'inline_error' => [
+						'Formula' => 'Invalid third parameter in function "changecount".'
+					]
 				]
 			],
 			[
 				[
 					'expected' => TEST_BAD,
 					'formula' => 'changecount(/host/key,#5,"something")',
-					'error' => 'Invalid parameter "/1/params": invalid third parameter in function "changecount".'
+					'inline_error' => [
+						'Formula' => 'Invalid third parameter in function "changecount".'
+					]
 				]
 			],
 			[
 				[
 					'expected' => TEST_BAD,
 					'formula' => 'changecount(/host/key,#5,"all",)',
-					'error' => 'Invalid parameter "/1/params": invalid number of parameters in function "changecount".'
+					'inline_error' => [
+						'Formula' => 'Invalid number of parameters in function "changecount".'
+					]
 				]
 			],
 			[
 				[
 					'expected' => TEST_BAD,
 					'formula' => 'changecount(/host/key,7,all)',
-					'error' => 'Invalid parameter "/1/params": incorrect expression starting from "changecount(/host/key,7,all)".'
+					'inline_error' => [
+						'Formula' => 'Incorrect expression starting from "changecount(/host/key,7,all)".'
+					]
 				]
 			],
 			[
 				[
 					'expected' => TEST_BAD,
 					'formula' => 'changecount(/host/key,5M)',
-					'error' => 'Invalid parameter "/1/params": invalid second parameter in function "changecount".'
+					'inline_error' => [
+						'Formula' => 'Invalid second parameter in function "changecount".'
+					]
 				]
 			],
 			[
 				[
 					'expected' => TEST_BAD,
 					'formula' => 'changecount(/host/key,5y)',
-					'error' => 'Invalid parameter "/1/params": invalid second parameter in function "changecount".'
+					'inline_error' => [
+						'Formula' => 'Invalid second parameter in function "changecount".'
+					]
 				]
 			],
 			[
 				[
 					'expected' => TEST_BAD,
 					'formula' => 'changecount(5w)',
-					'error' => 'Invalid parameter "/1/params": incorrect usage of function "changecount".'
+					'inline_error' => [
+						'Formula' => 'Incorrect usage of function "changecount".'
+					]
 				]
 			],
 			[
 				[
 					'expected' => TEST_BAD,
 					'formula' => 'changecount(,5w)',
-					'error' => 'Invalid parameter "/1/params": incorrect expression starting from "changecount(,5w)".'
+					'inline_error' => [
+						'Formula' => 'Incorrect expression starting from "changecount(,5w)".'
+					]
 				]
 			],
 			// count() function validation.
@@ -1400,49 +1514,63 @@ class testCalculatedFormula extends CWebTest {
 				[
 					'expected' => TEST_BAD,
 					'formula' => 'count(/host/trap,999999999999999)',
-					'error' => 'Invalid parameter "/1/params": invalid second parameter in function "count".'
+					'inline_error' => [
+						'Formula' => 'Invalid second parameter in function "count".'
+					]
 				]
 			],
 			[
 				[
 					'expected' => TEST_BAD,
 					'formula' => 'count(/host/trap,"99m")',
-					'error' => 'Invalid parameter "/1/params": invalid second parameter in function "count".'
+					'inline_error' => [
+						'Formula' => 'Invalid second parameter in function "count".'
+					]
 				]
 			],
 			[
 				[
 					'expected' => TEST_BAD,
 					'formula' => 'count(/host/key,"3600:now-3600")',
-					'error' => 'Invalid parameter "/1/params": invalid second parameter in function "count".'
+					'inline_error' => [
+						'Formula' => 'Invalid second parameter in function "count".'
+					]
 				]
 			],
 			[
 				[
 					'expected' => TEST_BAD,
 					'formula' => 'count(/host/trap,:now/d)',
-					'error' => 'Invalid parameter "/1/params": incorrect expression starting from "count(/host/trap,:now/d)".'
+					'inline_error' => [
+						'Formula' => 'Incorrect expression starting from "count(/host/trap,:now/d)".'
+					]
 				]
 			],
 			[
 				[
 					'expected' => TEST_BAD,
 					'formula' => 'count(/host/trap,:now-5h,"eq")',
-					'error' => 'Invalid parameter "/1/params": incorrect expression starting from "count(/host/trap,:now-5h,"eq")".'
+					'inline_error' => [
+						'Formula' => 'Incorrect expression starting from "count(/host/trap,:now-5h,"eq")".'
+					]
 				]
 			],
 			[
 				[
 					'expected' => TEST_BAD,
 					'formula' => 'count(/host/trap,#4:now-5h,"1","eq")',
-					'error' => 'Invalid parameter "/1/params": invalid third parameter in function "count".'
+					'inline_error' => [
+						'Formula' => 'Invalid third parameter in function "count".'
+					]
 				]
 			],
 			[
 				[
 					'expected' => TEST_BAD,
 					'formula' => 'count(1)',
-					'error' => 'Invalid parameter "/1/params": incorrect usage of function "count".'
+					'inline_error' => [
+						'Formula' => 'Incorrect usage of function "count".'
+					]
 				]
 			],
 			// count() function with foreach aggregated functions validation
@@ -1450,21 +1578,27 @@ class testCalculatedFormula extends CWebTest {
 				[
 					'expected' => TEST_BAD,
 					'formula' => 'count(exists_foreach(/host/trap,1,1))',
-					'error' => 'Invalid parameter "/1/params": invalid number of parameters in function "exists_foreach".'
+					'inline_error' => [
+						'Formula' => 'Invalid number of parameters in function "exists_foreach".'
+					]
 				]
 			],
 			[
 				[
 					'expected' => TEST_BAD,
 					'formula' => 'count(exists_foreach(/host/trap,eg))',
-					'error' => 'Invalid parameter "/1/params": incorrect expression starting from "count(exists_foreach(/host/trap,eg))".'
+					'inline_error' => [
+						'Formula' => 'Incorrect expression starting from "count(exists_foreach(/host/trap,eg))".'
+					]
 				]
 			],
 			[
 				[
 					'expected' => TEST_BAD,
 					'formula' => 'count(exists_foreach(/host/trap,#7,eg))',
-					'error' => 'Invalid parameter "/1/params": incorrect expression starting from "count(exists_foreach(/host/trap,#7,eg))".'
+					'inline_error' => [
+						'Formula' => 'Incorrect expression starting from "count(exists_foreach(/host/trap,#7,eg))".'
+					]
 				]
 			],
 			// Unsupported operator.
@@ -1472,14 +1606,18 @@ class testCalculatedFormula extends CWebTest {
 				[
 					'expected' => TEST_BAD,
 					'formula' => 'count(max_foreach(/host/trap,1h),1)',
-					'error' => 'Invalid parameter "/1/params": incorrect usage of function "count".'
+					'inline_error' => [
+						'Formula' => 'Incorrect usage of function "count".'
+					]
 				]
 			],
 			[
 				[
 					'expected' => TEST_BAD,
 					'formula' => 'count(max_foreach(/host/trap,1h),"x","2")',
-					'error' => 'Invalid parameter "/1/params": incorrect usage of function "count".'
+					'inline_error' => [
+						'Formula' => 'Incorrect usage of function "count".'
+					]
 				]
 			],
 			// Pattern not provided with operator.
@@ -1487,65 +1625,83 @@ class testCalculatedFormula extends CWebTest {
 				[
 					'expected' => TEST_BAD,
 					'formula' => 'count(max_foreach(/host/trap,1h),"like", )',
-					'error' => 'Invalid parameter "/1/params": incorrect expression starting from "count(max_foreach(/host/trap,1h),"like", )".'
+					'inline_error' => [
+						'Formula' => 'Incorrect expression starting from "count(max_foreach(/host/trap,1h),"like", )".'
+					]
 				]
 			],
 			[
 				[
 					'expected' => TEST_BAD,
 					'formula' => 'count(max_foreach(/host/trap,1h),)',
-					'error' => 'Invalid parameter "/1/params": incorrect expression starting from "count(max_foreach(/host/trap,1h),)".'
+					'inline_error' => [
+						'Formula' => 'Incorrect expression starting from "count(max_foreach(/host/trap,1h),)".'
+					]
 				]
 			],
 			[
 				[
 					'expected' => TEST_BAD,
 					'formula' => 'count(max_foreach(/host/trap,1h),,)',
-					'error' => 'Invalid parameter "/1/params": incorrect expression starting from "count(max_foreach(/host/trap,1h),,)".'
+					'inline_error' => [
+						'Formula' => 'Incorrect expression starting from "count(max_foreach(/host/trap,1h),,)".'
+					]
 				]
 			],
 			[
 				[
 					'expected' => TEST_BAD,
 					'formula' => 'count(max_foreach(/host/trap,1h), ,)',
-					'error' => 'Invalid parameter "/1/params": incorrect expression starting from "count(max_foreach(/host/trap,1h), ,)".'
+					'inline_error' => [
+						'Formula' => 'Incorrect expression starting from "count(max_foreach(/host/trap,1h), ,)".'
+					]
 				]
 			],
 			[
 				[
 					'expected' => TEST_BAD,
 					'formula' => 'item_count(/host/trap,1,eg)',
-					'error' => 'Invalid parameter "/1/params": incorrect expression starting from "item_count(/host/trap,1,eg)".'
+					'inline_error' => [
+						'Formula' => 'Incorrect expression starting from "item_count(/host/trap,1,eg)".'
+					]
 				]
 			],
 			[
 				[
 					'expected' => TEST_BAD,
 					'formula' => 'item_count(/host/trap,#1,1,eg)',
-					'error' => 'Invalid parameter "/1/params": incorrect expression starting from "item_count(/host/trap,#1,1,eg)".'
+					'inline_error' => [
+						'Formula' => 'Incorrect expression starting from "item_count(/host/trap,#1,1,eg)".'
+					]
 				]
 			],
 			[
 				[
 					'expected' => TEST_BAD,
 					'formula' => 'item_count(1)',
-					'error' => 'Invalid parameter "/1/params": incorrect usage of function "item_count".'
+					'inline_error' => [
+						'Formula' => 'Incorrect usage of function "item_count".'
+					]
 				]
 			],
 			// cot() function validation.
 			[
 				[
 					'expected' => TEST_BAD,
-					'formula' => "coT(last(//trap))",
-					'error' => "Invalid parameter \"/1/params\": incorrect expression starting from \"coT(last(//trap))\"."
+					'formula' => 'coT(last(//trap))',
+					'inline_error' => [
+						'Formula' => 'Incorrect expression starting from "coT(last(//trap))".'
+					]
 				]
 			],
 			// degrees() function validation.
 			[
 				[
 					'expected' => TEST_BAD,
-					'formula' => "Degrees(last(//trap))",
-					'error' => 'Invalid parameter "/1/params": incorrect expression starting from "Degrees(last(//trap))".'
+					'formula' => 'Degrees(last(//trap))',
+					'inline_error' => [
+						'Formula' => 'Incorrect expression starting from "Degrees(last(//trap))".'
+					]
 				]
 			],
 			// date() function validation.
@@ -1553,7 +1709,9 @@ class testCalculatedFormula extends CWebTest {
 				[
 					'expected' => TEST_BAD,
 					'formula' => 'date(/host/trap)',
-					'error' => 'Invalid parameter "/1/params": incorrect usage of function "date".'
+					'inline_error' => [
+						'Formula' => 'Incorrect usage of function "date".'
+					]
 				]
 			],
 			// dayofmonth() function validation.
@@ -1561,7 +1719,9 @@ class testCalculatedFormula extends CWebTest {
 				[
 					'expected' => TEST_BAD,
 					'formula' => 'dayofmonth(1)',
-					'error' => 'Invalid parameter "/1/params": invalid number of parameters in function "dayofmonth".'
+					'inline_error' => [
+						'Formula' => 'Invalid number of parameters in function "dayofmonth".'
+					]
 				]
 			],
 			// dayofweek() function validation.
@@ -1569,7 +1729,9 @@ class testCalculatedFormula extends CWebTest {
 				[
 					'expected' => TEST_BAD,
 					'formula' => 'dayofweek',
-					'error' => 'Invalid parameter "/1/params": incorrect expression starting from "dayofweek".'
+					'inline_error' => [
+						'Formula' => 'Incorrect expression starting from "dayofweek".'
+					]
 				]
 			],
 			// find() function validation.
@@ -1577,28 +1739,36 @@ class testCalculatedFormula extends CWebTest {
 				[
 					'expected' => TEST_BAD,
 					'formula' => 'find(/host/trap,1M)',
-					'error' => 'Invalid parameter "/1/params": invalid second parameter in function "find".'
+					'inline_error' => [
+						'Formula' => 'Invalid second parameter in function "find".'
+					]
 				]
 			],
 			[
 				[
 					'expected' => TEST_BAD,
 					'formula' => 'FIND(/host/trap,#10,"le","5")',
-					'error' => 'Invalid parameter "/1/params": incorrect expression starting from "FIND(/host/trap,#10,"le","5")".'
+					'inline_error' => [
+						'Formula' => 'Incorrect expression starting from "FIND(/host/trap,#10,"le","5")".'
+					]
 				]
 			],
 			[
 				[
 					'expected' => TEST_BAD,
 					'formula' => 'find(/host/trap,#4:now-5h,eq,1)',
-					'error' => 'Invalid parameter "/1/params": incorrect expression starting from "find(/host/trap,#4:now-5h,eq,1)".'
+					'inline_error' => [
+						'Formula' => 'Incorrect expression starting from "find(/host/trap,#4:now-5h,eq,1)".'
+					]
 				]
 			],
 			[
 				[
 					'expected' => TEST_BAD,
 					'formula' => 'find(/host/trap,#4:now-5h,"test",1)',
-					'error' => 'Invalid parameter "/1/params": invalid third parameter in function "find".'
+					'inline_error' => [
+						'Formula' => 'Invalid third parameter in function "find".'
+					]
 				]
 			],
 			// forecast() function validation.
@@ -1606,91 +1776,117 @@ class testCalculatedFormula extends CWebTest {
 				[
 					'expected' => TEST_BAD,
 					'formula' => 'forecast(/host/trap,#77)',
-					'error' => 'Invalid parameter "/1/params": mandatory parameter is missing in function "forecast".'
+					'inline_error' => [
+						'Formula' => 'Mandatory parameter is missing in function "forecast".'
+					]
 				]
 			],
 			[
 				[
 					'expected' => TEST_BAD,
 					'formula' => 'forecast(/host/trap,:now/d,25h,"logarithmic","min")',
-					'error' => 'Invalid parameter "/1/params": incorrect expression starting from "forecast(/host/trap,:now/d,25h,"logarithmic","min")".'
+					'inline_error' => [
+						'Formula' => 'Incorrect expression starting from "forecast(/host/trap,:now/d,25h,"logarithmic","min")".'
+					]
 				]
 			],
 			[
 				[
 					'expected' => TEST_BAD,
 					'formula' => 'forecast(/host/trap,":now/d",25h,"logarithmic","min")',
-					'error' => 'Invalid parameter "/1/params": invalid second parameter in function "forecast".'
+					'inline_error' => [
+						'Formula' => 'Invalid second parameter in function "forecast".'
+					]
 				]
 			],
 			[
 				[
 					'expected' => TEST_BAD,
 					'formula' => 'forecast(/host/trap,#7,,)',
-					'error' => 'Invalid parameter "/1/params": invalid third parameter in function "forecast".'
+					'inline_error' => [
+						'Formula' => 'Invalid third parameter in function "forecast".'
+					]
 				]
 			],
 			[
 				[
 					'expected' => TEST_BAD,
 					'formula' => 'forecast(/host/trap,0)',
-					'error' => 'Invalid parameter "/1/params": invalid second parameter in function "forecast".'
+					'inline_error' => [
+						'Formula' => 'Invalid second parameter in function "forecast".'
+					]
 				]
 			],
 			[
 				[
 					'expected' => TEST_BAD,
 					'formula' => 'forecast(/host/trap,#1,"test")',
-					'error' => 'Invalid parameter "/1/params": invalid third parameter in function "forecast".'
+					'inline_error' => [
+						'Formula' => 'Invalid third parameter in function "forecast".'
+					]
 				]
 			],
 			[
 				[
 					'expected' => TEST_BAD,
 					'formula' => 'forecast(/host/trap,#5,25h,"")',
-					'error' => 'Invalid parameter "/1/params": invalid fourth parameter in function "forecast".'
+					'inline_error' => [
+						'Formula' => 'Invalid fourth parameter in function "forecast".'
+					]
 				]
 			],
 			[
 				[
 					'expected' => TEST_BAD,
 					'formula' => 'forecast(/host/trap,#5,25h,"polynomial7")',
-					'error' => 'Invalid parameter "/1/params": invalid fourth parameter in function "forecast".'
+					'inline_error' => [
+						'Formula' => 'Invalid fourth parameter in function "forecast".'
+					]
 				]
 			],
 			[
 				[
 					'expected' => TEST_BAD,
 					'formula' => 'forecast(/host/trap,#5,25h,"polynomial1","test")',
-					'error' => 'Invalid parameter "/1/params": invalid fifth parameter in function "forecast".'
+					'inline_error' => [
+						'Formula' => 'Invalid fifth parameter in function "forecast".'
+					]
 				]
 			],
 			[
 				[
 					'expected' => TEST_BAD,
 					'formula' => 'forecast(/host/trap,#5,25h,"polynomial1","")',
-					'error' => 'Invalid parameter "/1/params": invalid fifth parameter in function "forecast".'
+					'inline_error' => [
+						'Formula' => 'Invalid fifth parameter in function "forecast".'
+					]
 				]
 			],
 			[
 				[
 					'expected' => TEST_BAD,
 					'formula' => 'forecast(/*/trap,#1,0)',
-					'error' => 'Invalid parameter "/1/params": invalid first parameter in function "forecast".'
+					'inline_error' => [
+						'Formula' => 'Invalid first parameter in function "forecast".'
+					]
 				]
 			],
 			[
 				[
 					'expected' => TEST_BAD,
 					'formula' => 'forecast(/host/trap,"#4:now-5h",25h)',
-					'error' => 'Invalid parameter "/1/params": invalid second parameter in function "forecast".'
+					'inline_error' => [
+						'Formula' => 'Invalid second parameter in function "forecast".'
+					]
 				]
 			],
 			[
 				[
 					'expected' => TEST_BAD,
 					'formula' => 'forecast(/host/trap,"5:now/d","25h")',
-					'error' => 'Invalid parameter "/1/params": invalid second parameter in function "forecast".'
+					'inline_error' => [
+						'Formula' => 'Invalid second parameter in function "forecast".'
+					]
 				]
 			],
 			// fuzzytime() function validation.
@@ -1698,21 +1894,27 @@ class testCalculatedFormula extends CWebTest {
 				[
 					'expected' => TEST_BAD,
 					'formula' => 'fuzzytime(/host/trap)',
-					'error' => 'Invalid parameter "/1/params": mandatory parameter is missing in function "fuzzytime".'
+					'inline_error' => [
+						'Formula' => 'Mandatory parameter is missing in function "fuzzytime".'
+					]
 				]
 			],
 			[
 				[
 					'expected' => TEST_BAD,
 					'formula' => 'fuzzytime(/host/trap,test)',
-					'error' => 'Invalid parameter "/1/params": incorrect expression starting from "fuzzytime(/host/trap,test)".'
+					'inline_error' => [
+						'Formula' => 'Incorrect expression starting from "fuzzytime(/host/trap,test)".'
+					]
 				]
 			],
 			[
 				[
 					'expected' => TEST_BAD,
 					'formula' => 'fuzzytime(/*/trap,65w)',
-					'error' => 'Invalid parameter "/1/params": invalid first parameter in function "fuzzytime".'
+					'inline_error' => [
+						'Formula' => 'Invalid first parameter in function "fuzzytime".'
+					]
 				]
 			],
 			// histogram_quantile() function validation.
@@ -1720,49 +1922,71 @@ class testCalculatedFormula extends CWebTest {
 				[
 					'expected' => TEST_BAD,
 					'formula' => 'histogram_quantile(0.7,bucket_rate_foreach(/host/trap[*]))',
-					'error' => 'Invalid parameter "/1/params": mandatory parameter is missing in function "bucket_rate_foreach".'
+					'inline_error' => [
+						'Formula' => 'Mandatory parameter is missing in function "bucket_rate_foreach".'
+					]
 				]
 			],
 			[
 				[
 					'expected' => TEST_BAD,
 					'formula' => 'histogram_quantile(0.7,bucket_rate_foreach(host/trap[*],30m))',
-					'error' => 'Invalid parameter "/1/params": incorrect expression starting from "histogram_quantile(0.7,bucket_rate_foreach(host/trap[*],30m))".'
+					'inline_error' => [
+						'Formula' => 'Incorrect expression starting from "histogram_quantile(0.7,'.
+								'bucket_rate_foreach(host/trap[*],30m))".'
+					]
 				]
 			],
 			[
 				[
 					'expected' => TEST_BAD,
-					'formula' => "histogram_quantile(test,bucket_rate_foreach(//trap[*],3h))",
-					'error' => 'Invalid parameter "/1/params": incorrect expression starting from "histogram_quantile(test,bucket_rate_foreach(//trap[*],3h))".'
+					'formula' => 'histogram_quantile(test,bucket_rate_foreach(//trap[*],3h))',
+					'inline_error' => [
+						'Formula' => 'Incorrect expression starting from "histogram_quantile(test,'.
+								'bucket_rate_foreach(//trap[*],3h))".'
+					]
 				]
 			],
 			[
 				[
 					'expected' => TEST_BAD,
-					'formula' => 'histogram_quantile(test,1.0,last(/host/trap[1.0]),7.5,last(/host/trap[7.5]),"+Inf",last(/host/trap[Inf]))',
-					'error' => 'Invalid parameter "/1/params": incorrect expression starting from "histogram_quantile(test,1.0,last(/host/trap[1.0]),7.5,last(/host/trap[7.5]),"+Inf",last(/host/trap[Inf]))".'
+					'formula' => 'histogram_quantile(test,1.0,last(/host/trap[1.0]),7.5,last(/host/trap[7.5]),'.
+							'"+Inf",last(/host/trap[Inf]))',
+					'inline_error' => [
+						'Formula' => 'Incorrect expression starting from "histogram_quantile(test,1.0,'.
+								'last(/host/trap[1.0]),7.5,last(/host/trap[7.5]),"+Inf",last(/host/trap[Inf]))".'
+					]
 				]
 			],
 			[
 				[
 					'expected' => TEST_BAD,
-					'formula' => 'histogram_quantile(0.7,test,last(/host/trap[1.0]),7.5,last(/host/trap[7.5]),"+Inf",last(/host/trap[Inf]))',
-					'error' => 'Invalid parameter "/1/params": incorrect expression starting from "histogram_quantile(0.7,test,last(/host/trap[1.0]),7.5,last(/host/trap[7.5]),"+Inf",last(/host/trap[Inf]))".'
+					'formula' => 'histogram_quantile(0.7,test,last(/host/trap[1.0]),7.5,last(/host/trap[7.5]),'.
+							'"+Inf",last(/host/trap[Inf]))',
+					'inline_error' => [
+						'Formula' => 'Incorrect expression starting from "histogram_quantile(0.7,test,'.
+								'last(/host/trap[1.0]),7.5,last(/host/trap[7.5]),"+Inf",last(/host/trap[Inf]))".'
+					]
 				]
 			],
 			[
 				[
 					'expected' => TEST_BAD,
-					'formula' => "histogram_quantile(0.7,1.0,last(/host/trap[1.0]))",
-					'error' => 'Invalid parameter "/1/params": invalid number of parameters in function "histogram_quantile".'
+					'formula' => 'histogram_quantile(0.7,1.0,last(/host/trap[1.0]))',
+					'inline_error' => [
+						'Formula' => 'Invalid number of parameters in function "histogram_quantile".'
+					]
 				]
 			],
 			[
 				[
 					'expected' => TEST_BAD,
-					'formula' => 'histogram_quantile(0.7,1.0,last(/host/trap[1.0]),7.5,(/host/trap[7.5]),"+Inf",last(/host/trap[Inf]))',
-					'error' => 'Invalid parameter "/1/params": incorrect expression starting from "histogram_quantile(0.7,1.0,last(/host/trap[1.0]),7.5,(/host/trap[7.5]),"+Inf",last(/host/trap[Inf]))".'
+					'formula' => 'histogram_quantile(0.7,1.0,last(/host/trap[1.0]),7.5,(/host/trap[7.5]),'.
+							'"+Inf",last(/host/trap[Inf]))',
+					'inline_error' => [
+						'Formula' => 'Incorrect expression starting from "histogram_quantile(0.7,1.0,'.
+								'last(/host/trap[1.0]),7.5,(/host/trap[7.5]),"+Inf",last(/host/trap[Inf]))".'
+					]
 				]
 			],
 			// last() function validation.
@@ -1770,49 +1994,63 @@ class testCalculatedFormula extends CWebTest {
 				[
 					'expected' => TEST_BAD,
 					'formula' => 'last()',
-					'error' => 'Invalid parameter "/1/params": incorrect usage of function "last".'
+					'inline_error' => [
+						'Formula' => 'Incorrect usage of function "last".'
+					]
 				]
 			],
 			[
 				[
 					'expected' => TEST_BAD,
 					'formula' => 'last(/host/trap,7)',
-					'error' => 'Invalid parameter "/1/params": invalid second parameter in function "last".'
+					'inline_error' => [
+						'Formula' => 'Invalid second parameter in function "last".'
+					]
 				]
 			],
 			[
 				[
 					'expected' => TEST_BAD,
 					'formula' => 'last(/host/trap,7s)',
-					'error' => 'Invalid parameter "/1/params": invalid second parameter in function "last".'
+					'inline_error' => [
+						'Formula' => 'Invalid second parameter in function "last".'
+					]
 				]
 			],
 			[
 				[
 					'expected' => TEST_BAD,
 					'formula' => 'last(/host/trap,"#3")',
-					'error' => 'Invalid parameter "/1/params": invalid second parameter in function "last".'
+					'inline_error' => [
+						'Formula' => 'Invalid second parameter in function "last".'
+					]
 				]
 			],
 			[
 				[
 					'expected' => TEST_BAD,
 					'formula' => 'last(/*/trap,#3:now-1d)',
-					'error' => 'Invalid parameter "/1/params": invalid first parameter in function "last".'
+					'inline_error' => [
+						'Formula' => 'Invalid first parameter in function "last".'
+					]
 				]
 			],
 			[
 				[
 					'expected' => TEST_BAD,
 					'formula' => 'last(/host/trap,,)',
-					'error' => 'Invalid parameter "/1/params": invalid number of parameters in function "last".'
+					'inline_error' => [
+						'Formula' => 'Invalid number of parameters in function "last".'
+					]
 				]
 			],
 			[
 				[
 					'expected' => TEST_BAD,
 					'formula' => 'last(/*/trap,#3:now-1d)',
-					'error' => 'Invalid parameter "/1/params": invalid first parameter in function "last".'
+					'inline_error' => [
+						'Formula' => 'Invalid first parameter in function "last".'
+					]
 				]
 			],
 			// length() function validation.
@@ -1820,21 +2058,27 @@ class testCalculatedFormula extends CWebTest {
 				[
 					'expected' => TEST_BAD,
 					'formula' => 'length(/host/trap)',
-					'error' => 'Invalid parameter "/1/params": incorrect usage of function "length".'
+					'inline_error' => [
+						'Formula' => 'Incorrect usage of function "length".'
+					]
 				]
 			],
 			[
 				[
 					'expected' => TEST_BAD,
 					'formula' => 'length(/host/trap,7d)',
-					'error' => 'Invalid parameter "/1/params": incorrect usage of function "length".'
+					'inline_error' => [
+						'Formula' => 'Incorrect usage of function "length".'
+					]
 				]
 			],
 			[
 				[
 					'expected' => TEST_BAD,
 					'formula' => 'length(last(/host/trap,7s))',
-					'error' => 'Invalid parameter "/1/params": invalid second parameter in function "last".'
+					'inline_error' => [
+						'Formula' => 'Invalid second parameter in function "last".'
+					]
 				]
 			],
 			// logeventid() function validation.
@@ -1842,21 +2086,27 @@ class testCalculatedFormula extends CWebTest {
 				[
 					'expected' => TEST_BAD,
 					'formula' => 'logeventid(/Trapper/trap[4],^error)',
-					'error' => 'Invalid parameter "/1/params": incorrect expression starting from "logeventid(/Trapper/trap[4],^error)".'
+					'inline_error' => [
+						'Formula' => 'Incorrect expression starting from "logeventid(/Trapper/trap[4],^error)".'
+					]
 				]
 			],
 			[
 				[
 					'expected' => TEST_BAD,
 					'formula' => 'logeventid(/Trapper/trap[4],1)',
-					'error' => 'Invalid parameter "/1/params": invalid second parameter in function "logeventid".'
+					'inline_error' => [
+						'Formula' => 'Invalid second parameter in function "logeventid".'
+					]
 				]
 			],
 			[
 				[
 					'expected' => TEST_BAD,
 					'formula' => 'logeventid(/*/trap)',
-					'error' => 'Invalid parameter "/1/params": invalid first parameter in function "logeventid".'
+					'inline_error' => [
+						'Formula' => 'Invalid first parameter in function "logeventid".'
+					]
 				]
 			],
 			// logseverity() function validation.
@@ -1864,42 +2114,54 @@ class testCalculatedFormula extends CWebTest {
 				[
 					'expected' => TEST_BAD,
 					'formula' => 'logseverity(/host/key,123)',
-					'error' => 'Invalid parameter "/1/params": invalid second parameter in function "logseverity".'
+					'inline_error' => [
+						'Formula' => 'Invalid second parameter in function "logseverity".'
+					]
 				]
 			],
 			[
 				[
 					'expected' => TEST_BAD,
 					'formula' => 'logseverity(/Trapper/trap[4],^error)',
-					'error' => 'Invalid parameter "/1/params": incorrect expression starting from "logseverity(/Trapper/trap[4],^error)".'
+					'inline_error' => [
+						'Formula' => 'Incorrect expression starting from "logseverity(/Trapper/trap[4],^error)".'
+					]
 				]
 			],
 			[
 				[
 					'expected' => TEST_BAD,
 					'formula' => 'logseverity(/Trapper/trap[4],,"^error")',
-					'error' => 'Invalid parameter "/1/params": invalid number of parameters in function "logseverity".'
+					'inline_error' => [
+						'Formula' => 'Invalid number of parameters in function "logseverity".'
+					]
 				]
 			],
 			[
 				[
 					'expected' => TEST_BAD,
 					'formula' => 'logseverity(/Trapper/trap[4],1)',
-					'error' => 'Invalid parameter "/1/params": invalid second parameter in function "logseverity".'
+					'inline_error' => [
+						'Formula' => 'Invalid second parameter in function "logseverity".'
+					]
 				]
 			],
 			[
 				[
 					'expected' => TEST_BAD,
 					'formula' => 'logseverity(/*/key)',
-					'error' => 'Invalid parameter "/1/params": invalid first parameter in function "logseverity".'
+					'inline_error' => [
+						'Formula' => 'Invalid first parameter in function "logseverity".'
+					]
 				]
 			],
 			[
 				[
 					'expected' => TEST_BAD,
 					'formula' => 'logseverity(/Trapper/trap[4],"High")',
-					'error' => 'Invalid parameter "/1/params": invalid second parameter in function "logseverity".'
+					'inline_error' => [
+						'Formula' => 'Invalid second parameter in function "logseverity".'
+					]
 				]
 			],
 			// logsource() function validation.
@@ -1907,28 +2169,36 @@ class testCalculatedFormula extends CWebTest {
 				[
 					'expected' => TEST_BAD,
 					'formula' => 'logsource(/*/trap)',
-					'error' => 'Invalid parameter "/1/params": invalid first parameter in function "logsource".'
+					'inline_error' => [
+						'Formula' => 'Invalid first parameter in function "logsource".'
+					]
 				]
 			],
 			[
 				[
 					'expected' => TEST_BAD,
 					'formula' => 'logsource(/Trapper/trap[4],#3:now-#3,"^error")',
-					'error' => 'Invalid parameter "/1/params": incorrect expression starting from "logsource(/Trapper/trap[4],#3:now-#3,"^error")".'
+					'inline_error' => [
+						'Formula' => 'Incorrect expression starting from "logsource(/Trapper/trap[4],#3:now-#3,"^error")".'
+					]
 				]
 			],
 			[
 				[
 					'expected' => TEST_BAD,
 					'formula' => 'logsource(/Trapper/trap[4],^error)',
-					'error' => 'Invalid parameter "/1/params": incorrect expression starting from "logsource(/Trapper/trap[4],^error)".'
+					'inline_error' => [
+						'Formula' => 'Incorrect expression starting from "logsource(/Trapper/trap[4],^error)".'
+					]
 				]
 			],
 			[
 				[
 					'expected' => TEST_BAD,
 					'formula' => 'logsource(/Trapper/trap[4],#2,^error)',
-					'error' => 'Invalid parameter "/1/params": incorrect expression starting from "logsource(/Trapper/trap[4],#2,^error)".'
+					'inline_error' => [
+						'Formula' => 'Incorrect expression starting from "logsource(/Trapper/trap[4],#2,^error)".'
+					]
 				]
 			],
 			// max() function validation.
@@ -1936,28 +2206,36 @@ class testCalculatedFormula extends CWebTest {
 				[
 					'expected' => TEST_BAD,
 					'formula' => 'max(/host/trap,,)',
-					'error' => 'Invalid parameter "/1/params": invalid number of parameters in function "max".'
+					'inline_error' => [
+						'Formula' => 'Invalid number of parameters in function "max".'
+					]
 				]
 			],
 			[
 				[
 					'expected' => TEST_BAD,
 					'formula' => 'max(/host/trap,#3d:now-d)',
-					'error' => 'Invalid parameter "/1/params": incorrect expression starting from "max(/host/trap,#3d:now-d)".'
+					'inline_error' => [
+						'Formula' => 'Incorrect expression starting from "max(/host/trap,#3d:now-d)".'
+					]
 				]
 			],
 			[
 				[
 					'expected' => TEST_BAD,
 					'formula' => 'max(/host/trap,#3d:now-{$USERMACRO})',
-					'error' => 'Invalid parameter "/1/params": incorrect expression starting from "max(/host/trap,#3d:now-{$USERMACRO})".'
+					'inline_error' => [
+						'Formula' => 'Incorrect expression starting from "max(/host/trap,#3d:now-{$USERMACRO})".'
+					]
 				]
 			],
 			[
 				[
 					'expected' => TEST_BAD,
 					'formula' => 'max(/host/trap,#3d:now-{#LLD})',
-					'error' => 'Invalid parameter "/1/params": incorrect expression starting from "max(/host/trap,#3d:now-{#LLD})".'
+					'inline_error' => [
+						'Formula' => 'Incorrect expression starting from "max(/host/trap,#3d:now-{#LLD})".'
+					]
 				]
 			],
 			// min() function validation.
@@ -1965,14 +2243,18 @@ class testCalculatedFormula extends CWebTest {
 				[
 					'expected' => TEST_BAD,
 					'formula' => 'min(/host/trap,1M)',
-					'error' => 'Invalid parameter "/1/params": invalid second parameter in function "min".'
+					'inline_error' => [
+						'Formula' => 'Invalid second parameter in function "min".'
+					]
 				]
 			],
 			[
 				[
 					'expected' => TEST_BAD,
 					'formula' => 'min(/*/trap,#4:now-1m)',
-					'error' => 'Invalid parameter "/1/params": invalid first parameter in function "min".'
+					'inline_error' => [
+						'Formula' => 'Invalid first parameter in function "min".'
+					]
 				]
 			],
 			// monoinc() function validation.
@@ -1980,42 +2262,54 @@ class testCalculatedFormula extends CWebTest {
 				[
 					'expected' => TEST_BAD,
 					'formula' => 'monoinc(/*/trap[1],#5:now-1h)',
-					'error' => 'Invalid parameter "/1/params": invalid first parameter in function "monoinc".'
+					'inline_error' => [
+						'Formula' => 'Invalid first parameter in function "monoinc".'
+					]
 				]
 			],
 			[
 				[
 					'expected' => TEST_BAD,
 					'formula' => 'monoinc(/host/*,#5:now-1h)',
-					'error' => 'Invalid parameter "/1/params": invalid first parameter in function "monoinc".'
+					'inline_error' => [
+						'Formula' => 'Invalid first parameter in function "monoinc".'
+					]
 				]
 			],
 			[
 				[
 					'expected' => TEST_BAD,
 					'formula' => 'monoinc(/host/trap,#5:now-1h,weak)',
-					'error' => 'Invalid parameter "/1/params": incorrect expression starting from "monoinc(/host/trap,#5:now-1h,weak)".'
+					'inline_error' => [
+						'Formula' => 'Incorrect expression starting from "monoinc(/host/trap,#5:now-1h,weak)".'
+					]
 				]
 			],
 			[
 				[
 					'expected' => TEST_BAD,
 					'formula' => 'monoinc(/host/trap,#5:now-1h,"strict",1)',
-					'error' => 'Invalid parameter "/1/params": invalid number of parameters in function "monoinc".'
+					'inline_error' => [
+						'Formula' => 'Invalid number of parameters in function "monoinc".'
+					]
 				]
 			],
 			[
 				[
 					'expected' => TEST_BAD,
 					'formula' => 'monoinc(/host/trap,#5:now-1h,"test")',
-					'error' => 'Invalid parameter "/1/params": invalid third parameter in function "monoinc".'
+					'inline_error' => [
+						'Formula' => 'Invalid third parameter in function "monoinc".'
+					]
 				]
 			],
 			[
 				[
 					'expected' => TEST_BAD,
 					'formula' => 'monoinc(/host/trap,now-1h,"weak")',
-					'error' => 'Invalid parameter "/1/params": incorrect expression starting from "monoinc(/host/trap,now-1h,"weak")".'
+					'inline_error' => [
+						'Formula' => 'Incorrect expression starting from "monoinc(/host/trap,now-1h,"weak")".'
+					]
 				]
 			],
 			// monodec() function validation.
@@ -2023,42 +2317,54 @@ class testCalculatedFormula extends CWebTest {
 				[
 					'expected' => TEST_BAD,
 					'formula' => 'monodec(/*/trap[1],#5:now-1h)',
-					'error' => 'Invalid parameter "/1/params": invalid first parameter in function "monodec".'
+					'inline_error' => [
+						'Formula' => 'Invalid first parameter in function "monodec".'
+					]
 				]
 			],
 			[
 				[
 					'expected' => TEST_BAD,
 					'formula' => 'monodec(/host/*,#5:now-1h)',
-					'error' => 'Invalid parameter "/1/params": invalid first parameter in function "monodec".'
+					'inline_error' => [
+						'Formula' => 'Invalid first parameter in function "monodec".'
+					]
 				]
 			],
 			[
 				[
 					'expected' => TEST_BAD,
 					'formula' => 'monodec(/host/trap,#5:now-1h,weak)',
-					'error' => 'Invalid parameter "/1/params": incorrect expression starting from "monodec(/host/trap,#5:now-1h,weak)".'
+					'inline_error' => [
+						'Formula' => 'Incorrect expression starting from "monodec(/host/trap,#5:now-1h,weak)".'
+					]
 				]
 			],
 			[
 				[
 					'expected' => TEST_BAD,
 					'formula' => 'monodec(/host/trap,#5:now-1h,"strict",1)',
-					'error' => 'Invalid parameter "/1/params": invalid number of parameters in function "monodec".'
+					'inline_error' => [
+						'Formula' => 'Invalid number of parameters in function "monodec".'
+					]
 				]
 			],
 			[
 				[
 					'expected' => TEST_BAD,
 					'formula' => 'monodec(/host/trap,#5:now-1h,"test")',
-					'error' => 'Invalid parameter "/1/params": invalid third parameter in function "monodec".'
+					'inline_error' => [
+						'Formula' => 'Invalid third parameter in function "monodec".'
+					]
 				]
 			],
 			[
 				[
 					'expected' => TEST_BAD,
 					'formula' => 'monodec(/host/trap,now-1h,"weak")',
-					'error' => 'Invalid parameter "/1/params": incorrect expression starting from "monodec(/host/trap,now-1h,"weak")".'
+					'inline_error' => [
+						'Formula' => 'Incorrect expression starting from "monodec(/host/trap,now-1h,"weak")".'
+					]
 				]
 			],
 			// nodata() function validation.
@@ -2066,28 +2372,36 @@ class testCalculatedFormula extends CWebTest {
 				[
 					'expected' => TEST_BAD,
 					'formula' => 'nodata',
-					'error' => 'Invalid parameter "/1/params": incorrect expression starting from "nodata".'
+					'inline_error' => [
+						'Formula' => 'Incorrect expression starting from "nodata".'
+					]
 				]
 			],
 			[
 				[
 					'expected' => TEST_BAD,
 					'formula' => 'nodata()',
-					'error' => 'Invalid parameter "/1/params": incorrect usage of function "nodata".'
+					'inline_error' => [
+						'Formula' => 'Incorrect usage of function "nodata".'
+					]
 				]
 			],
 			[
 				[
 					'expected' => TEST_BAD,
 					'formula' => 'nodata(/host/trap,0s)',
-					'error' => 'Invalid parameter "/1/params": invalid second parameter in function "nodata".'
+					'inline_error' => [
+						'Formula' => 'Invalid second parameter in function "nodata".'
+					]
 				]
 			],
 			[
 				[
 					'expected' => TEST_BAD,
 					'formula' => 'nodata(/*/trap,30)',
-					'error' => 'Invalid parameter "/1/params": invalid first parameter in function "nodata".'
+					'inline_error' => [
+						'Formula' => 'Invalid first parameter in function "nodata".'
+					]
 				]
 			],
 			// now() function validation.
@@ -2095,14 +2409,18 @@ class testCalculatedFormula extends CWebTest {
 				[
 					'expected' => TEST_BAD,
 					'formula' => 'now',
-					'error' => 'Invalid parameter "/1/params": incorrect expression starting from "now".'
+					'inline_error' => [
+						'Formula' => 'Incorrect expression starting from "now".'
+					]
 				]
 			],
 			[
 				[
 					'expected' => TEST_BAD,
 					'formula' => 'now(/host/trap)',
-					'error' => 'Invalid parameter "/1/params": incorrect usage of function "now".'
+					'inline_error' => [
+						'Formula' => 'Incorrect usage of function "now".'
+					]
 				]
 			],
 			// percentile() function validation.
@@ -2110,21 +2428,27 @@ class testCalculatedFormula extends CWebTest {
 				[
 					'expected' => TEST_BAD,
 					'formula' => 'percentile(/host/trap,,5)',
-					'error' => 'Invalid parameter "/1/params": invalid second parameter in function "percentile".'
+					'inline_error' => [
+						'Formula' => 'Invalid second parameter in function "percentile".'
+					]
 				]
 			],
 			[
 				[
 					'expected' => TEST_BAD,
 					'formula' => 'percentile(/host/trap,test,test)',
-					'error' => 'Invalid parameter "/1/params": incorrect expression starting from "percentile(/host/trap,test,test)".'
+					'inline_error' => [
+						'Formula' => 'Incorrect expression starting from "percentile(/host/trap,test,test)".'
+					]
 				]
 			],
 			[
 				[
 					'expected' => TEST_BAD,
 					'formula' => 'percentile(/*/trap,#5,100)',
-					'error' => 'Invalid parameter "/1/params": invalid first parameter in function "percentile".'
+					'inline_error' => [
+						'Formula' => 'Invalid first parameter in function "percentile".'
+					]
 				]
 			],
 			// sum() function validation.
@@ -2132,56 +2456,72 @@ class testCalculatedFormula extends CWebTest {
 				[
 					'expected' => TEST_BAD,
 					'formula' => 'sum(/host/trap)',
-					'error' => 'Invalid parameter "/1/params": mandatory parameter is missing in function "sum".'
+					'inline_error' => [
+						'Formula' => 'Mandatory parameter is missing in function "sum".'
+					]
 				]
 			],
 			[
 				[
 					'expected' => TEST_BAD,
 					'formula' => 'sum(/host/trap,":now/d")',
-					'error' => 'Invalid parameter "/1/params": invalid second parameter in function "sum".'
+					'inline_error' => [
+						'Formula' => 'Invalid second parameter in function "sum".'
+					]
 				]
 			],
 			[
 				[
 					'expected' => TEST_BAD,
 					'formula' => 'sum(/host/trap,:now/d)',
-					'error' => 'Invalid parameter "/1/params": incorrect expression starting from "sum(/host/trap,:now/d)".'
+					'inline_error' => [
+						'Formula' => 'Incorrect expression starting from "sum(/host/trap,:now/d)".'
+					]
 				]
 			],
 			[
 				[
 					'expected' => TEST_BAD,
 					'formula' => 'sum(/host/trap,,)',
-					'error' => 'Invalid parameter "/1/params": invalid number of parameters in function "sum".'
+					'inline_error' => [
+						'Formula' => 'Invalid number of parameters in function "sum".'
+					]
 				]
 			],
 			[
 				[
 					'expected' => TEST_BAD,
 					'formula' => 'sum(/host/trap,#3d:now-d)',
-					'error' => 'Invalid parameter "/1/params": incorrect expression starting from "sum(/host/trap,#3d:now-d)".'
+					'inline_error' => [
+						'Formula' => 'Incorrect expression starting from "sum(/host/trap,#3d:now-d)".'
+					]
 				]
 			],
 			[
 				[
 					'expected' => TEST_BAD,
 					'formula' => 'sum(/host/trap,60:now/60)',
-					'error' => 'Invalid parameter "/1/params": incorrect expression starting from "sum(/host/trap,60:now/60)".'
+					'inline_error' => [
+						'Formula' => 'Incorrect expression starting from "sum(/host/trap,60:now/60)".'
+					]
 				]
 			],
 			[
 				[
 					'expected' => TEST_BAD,
 					'formula' => 'sum(/host/trap,a)',
-					'error' => 'Invalid parameter "/1/params": incorrect expression starting from "sum(/host/trap,a)".'
+					'inline_error' => [
+						'Formula' => 'Incorrect expression starting from "sum(/host/trap,a)".'
+					]
 				]
 			],
 			[
 				[
 					'expected' => TEST_BAD,
 					'formula' => 'sum(/host/trap,1Y)',
-					'error' => 'Invalid parameter "/1/params": incorrect expression starting from "sum(/host/trap,1Y)".'
+					'inline_error' => [
+						'Formula' => 'Incorrect expression starting from "sum(/host/trap,1Y)".'
+					]
 				]
 			],
 			// time() function validation.
@@ -2189,21 +2529,27 @@ class testCalculatedFormula extends CWebTest {
 				[
 					'expected' => TEST_BAD,
 					'formula' => 'Date()',
-					'error' => 'Invalid parameter "/1/params": incorrect expression starting from "Date()".'
+					'inline_error' => [
+						'Formula' => 'Incorrect expression starting from "Date()".'
+					]
 				]
 			],
 			[
 				[
 					'expected' => TEST_BAD,
 					'formula' => 'Dayofweek()',
-					'error' => 'Invalid parameter "/1/params": incorrect expression starting from "Dayofweek()".'
+					'inline_error' => [
+						'Formula' => 'Incorrect expression starting from "Dayofweek()".'
+					]
 				]
 			],
 			[
 				[
 					'expected' => TEST_BAD,
 					'formula' => 'time(/host/trap)',
-					'error' => 'Invalid parameter "/1/params": incorrect usage of function "time".'
+					'inline_error' => [
+						'Formula' => 'Incorrect usage of function "time".'
+					]
 				]
 			],
 			// timeleft() function validation.
@@ -2211,35 +2557,45 @@ class testCalculatedFormula extends CWebTest {
 				[
 					'expected' => TEST_BAD,
 					'formula' => 'timeleft(/host/trap,5,,"logarithmic")',
-					'error' => 'Invalid parameter "/1/params": invalid third parameter in function "timeleft".'
+					'inline_error' => [
+						'Formula' => 'Invalid third parameter in function "timeleft".'
+					]
 				]
 			],
 			[
 				[
 					'expected' => TEST_BAD,
 					'formula' => 'timeleft(/host/trap,,20G,"power")',
-					'error' => 'Invalid parameter "/1/params": invalid second parameter in function "timeleft".'
+					'inline_error' => [
+						'Formula' => 'Invalid second parameter in function "timeleft".'
+					]
 				]
 			],
 			[
 				[
 					'expected' => TEST_BAD,
 					'formula' => 'timeleft(/host/trap,5M,"20G","power")',
-					'error' => 'Invalid parameter "/1/params": invalid second parameter in function "timeleft".'
+					'inline_error' => [
+						'Formula' => 'Invalid second parameter in function "timeleft".'
+					]
 				]
 			],
 			[
 				[
 					'expected' => TEST_BAD,
 					'formula' => 'timeleft(/host/trap,5,20G,"test")',
-					'error' => 'Invalid parameter "/1/params": invalid fourth parameter in function "timeleft".'
+					'inline_error' => [
+						'Formula' => 'Invalid fourth parameter in function "timeleft".'
+					]
 				]
 			],
 			[
 				[
 					'expected' => TEST_BAD,
 					'formula' => 'timeleft(/*/trap,#100,1M)',
-					'error' => 'Invalid parameter "/1/params": invalid first parameter in function "timeleft".'
+					'inline_error' => [
+						'Formula' => 'Invalid first parameter in function "timeleft".'
+					]
 				]
 			],
 			// trendavg() function validation.
@@ -2247,49 +2603,63 @@ class testCalculatedFormula extends CWebTest {
 				[
 					'expected' => TEST_BAD,
 					'formula' => 'trendavg(/host/item)',
-					'error' => 'Invalid parameter "/1/params": mandatory parameter is missing in function "trendavg".'
+					'inline_error' => [
+						'Formula' => 'Mandatory parameter is missing in function "trendavg".'
+					]
 				]
 			],
 			[
 				[
 					'expected' => TEST_BAD,
 					'formula' => 'trendavg(/host/key,:now-3600)',
-					'error' => 'Invalid parameter "/1/params": incorrect expression starting from "trendavg(/host/key,:now-3600)".'
+					'inline_error' => [
+						'Formula' => 'Incorrect expression starting from "trendavg(/host/key,:now-3600)".'
+					]
 				]
 			],
 			[
 				[
 					'expected' => TEST_BAD,
 					'formula' => 'trendavg(/host/key,":now-3600")',
-					'error' => 'Invalid parameter "/1/params": invalid second parameter in function "trendavg".'
+					'inline_error' => [
+						'Formula' => 'Invalid second parameter in function "trendavg".'
+					]
 				]
 			],
 			[
 				[
 					'expected' => TEST_BAD,
 					'formula' => 'trendavg(/host/key,30m:now-30m)',
-					'error' => 'Invalid parameter "/1/params": invalid second parameter in function "trendavg".'
+					'inline_error' => [
+						'Formula' => 'Invalid second parameter in function "trendavg".'
+					]
 				]
 			],
 			[
 				[
 					'expected' => TEST_BAD,
 					'formula' => 'trendavg(/host/item,,)',
-					'error' => 'Invalid parameter "/1/params": invalid number of parameters in function "trendavg".'
+					'inline_error' => [
+						'Formula' => 'Invalid number of parameters in function "trendavg".'
+					]
 				]
 			],
 			[
 				[
 					'expected' => TEST_BAD,
 					'formula' => 'trendavg(/host/item,0)',
-					'error' => 'Invalid parameter "/1/params": invalid second parameter in function "trendavg".'
+					'inline_error' => [
+						'Formula' => 'Invalid second parameter in function "trendavg".'
+					]
 				]
 			],
 			[
 				[
 					'expected' => TEST_BAD,
 					'formula' => 'trendavg(/host/item,-1h)',
-					'error' => 'Invalid parameter "/1/params": incorrect expression starting from "trendavg(/host/item,-1h)".'
+					'inline_error' => [
+						'Formula' => 'Incorrect expression starting from "trendavg(/host/item,-1h)".'
+					]
 				]
 			],
 			// trendcount() function validation.
@@ -2297,35 +2667,45 @@ class testCalculatedFormula extends CWebTest {
 				[
 					'expected' => TEST_BAD,
 					'formula' => 'trendcount(/host/item)',
-					'error' => 'Invalid parameter "/1/params": mandatory parameter is missing in function "trendcount".'
+					'inline_error' => [
+						'Formula' => 'Mandatory parameter is missing in function "trendcount".'
+					]
 				]
 			],
 			[
 				[
 					'expected' => TEST_BAD,
 					'formula' => 'trendcount(/host/key,30:now-30)',
-					'error' => 'Invalid parameter "/1/params": invalid second parameter in function "trendcount".'
+					'inline_error' => [
+						'Formula' => 'Invalid second parameter in function "trendcount".'
+					]
 				]
 			],
 			[
 				[
 					'expected' => TEST_BAD,
 					'formula' => 'trendcount(/host/key,0:now-0h)',
-					'error' => 'Invalid parameter "/1/params": invalid second parameter in function "trendcount".'
+					'inline_error' => [
+						'Formula' => 'Invalid second parameter in function "trendcount".'
+					]
 				]
 			],
 			[
 				[
 					'expected' => TEST_BAD,
 					'formula' => 'trendcount(/host/item,0)',
-					'error' => 'Invalid parameter "/1/params": invalid second parameter in function "trendcount".'
+					'inline_error' => [
+						'Formula' => 'Invalid second parameter in function "trendcount".'
+					]
 				]
 			],
 			[
 				[
 					'expected' => TEST_BAD,
 					'formula' => 'trendcount(/host/item,-1h)',
-					'error' => 'Invalid parameter "/1/params": incorrect expression starting from "trendcount(/host/item,-1h)".'
+					'inline_error' => [
+						'Formula' => 'Incorrect expression starting from "trendcount(/host/item,-1h)".'
+					]
 				]
 			],
 			// trendmax() function validation.
@@ -2333,21 +2713,27 @@ class testCalculatedFormula extends CWebTest {
 				[
 					'expected' => TEST_BAD,
 					'formula' => 'trendmax(/host/item,1h)',
-					'error' => 'Invalid parameter "/1/params": invalid second parameter in function "trendmax".'
+					'inline_error' => [
+						'Formula' => 'Invalid second parameter in function "trendmax".'
+					]
 				]
 			],
 			[
 				[
 					'expected' => TEST_BAD,
 					'formula' => 'trendmax(/host/key,30s:now-30s)',
-					'error' => 'Invalid parameter "/1/params": invalid second parameter in function "trendmax".'
+					'inline_error' => [
+						'Formula' => 'Invalid second parameter in function "trendmax".'
+					]
 				]
 			],
 			[
 				[
 					'expected' => TEST_BAD,
 					'formula' => 'trendmax(/host/item,:now/w)',
-					'error' => 'Invalid parameter "/1/params": incorrect expression starting from "trendmax(/host/item,:now/w)".'
+					'inline_error' => [
+						'Formula' => 'Incorrect expression starting from "trendmax(/host/item,:now/w)".'
+					]
 				]
 			],
 
@@ -2355,14 +2741,18 @@ class testCalculatedFormula extends CWebTest {
 				[
 					'expected' => TEST_BAD,
 					'formula' => 'trendmax(/host/item,0d:now/d)',
-					'error' => 'Invalid parameter "/1/params": invalid second parameter in function "trendmax".'
+					'inline_error' => [
+						'Formula' => 'Invalid second parameter in function "trendmax".'
+					]
 				]
 			],
 			[
 				[
 					'expected' => TEST_BAD,
 					'formula' => 'trendmax(/host/item,0)',
-					'error' => 'Invalid parameter "/1/params": invalid second parameter in function "trendmax".'
+					'inline_error' => [
+						'Formula' => 'Invalid second parameter in function "trendmax".'
+					]
 				]
 			],
 			// trendmin() function validation.
@@ -2370,49 +2760,63 @@ class testCalculatedFormula extends CWebTest {
 				[
 					'expected' => TEST_BAD,
 					'formula' => 'trendmin(/host/item)',
-					'error' => 'Invalid parameter "/1/params": mandatory parameter is missing in function "trendmin".'
+					'inline_error' => [
+						'Formula' => 'Mandatory parameter is missing in function "trendmin".'
+					]
 				]
 			],
 			[
 				[
 					'expected' => TEST_BAD,
 					'formula' => 'trendmin(/host/key,59m:now-59m)',
-					'error' => 'Invalid parameter "/1/params": invalid second parameter in function "trendmin".'
+					'inline_error' => [
+						'Formula' => 'Invalid second parameter in function "trendmin".'
+					]
 				]
 			],
 			[
 				[
 					'expected' => TEST_BAD,
 					'formula' => 'trendmin(/host/key,now/d-2d)',
-					'error' => 'Invalid parameter "/1/params": incorrect expression starting from "trendmin(/host/key,now/d-2d)".'
+					'inline_error' => [
+						'Formula' => 'Incorrect expression starting from "trendmin(/host/key,now/d-2d)".'
+					]
 				]
 			],
 			[
 				[
 					'expected' => TEST_BAD,
 					'formula' => 'trendmin(/host/item,,)',
-					'error' => 'Invalid parameter "/1/params": invalid number of parameters in function "trendmin".'
+					'inline_error' => [
+						'Formula' => 'Invalid number of parameters in function "trendmin".'
+					]
 				]
 			],
 			[
 				[
 					'expected' => TEST_BAD,
 					'formula' => 'trendmin(/host/item,1h)',
-					'error' => 'Invalid parameter "/1/params": invalid second parameter in function "trendmin".'
+					'inline_error' => [
+						'Formula' => 'Invalid second parameter in function "trendmin".'
+					]
 				]
 			],
 			[
 				[
 					'expected' => TEST_BAD,
 					'formula' => 'trendmin(/host/item,0)',
-					'error' => 'Invalid parameter "/1/params": invalid second parameter in function "trendmin".'
+					'inline_error' => [
+						'Formula' => 'Invalid second parameter in function "trendmin".'
+					]
 				]
 			],
 			[
 				[
 					'expected' => TEST_BAD,
 					'formula' => 'trendmin(/host/item,-1h)',
-					'error' => 'Invalid parameter "/1/params": incorrect expression starting from "trendmin(/host/item,-1h)".'
+					'inline_error' => [
+						'Formula' => 'Incorrect expression starting from "trendmin(/host/item,-1h)".'
+					]
 				]
 			],
 			// trendstl() function validation.
@@ -2420,154 +2824,198 @@ class testCalculatedFormula extends CWebTest {
 				[
 					'expected' => TEST_BAD,
 					'formula' => 'trendstl(/host/item)',
-					'error' => 'Invalid parameter "/1/params": mandatory parameter is missing in function "trendstl".'
+					'inline_error' => [
+						'Formula' => 'Mandatory parameter is missing in function "trendstl".'
+					]
 				]
 			],
 			[
 				[
 					'expected' => TEST_BAD,
 					'formula' => 'trendstl(/host/item,20h)',
-					'error' => 'Invalid parameter "/1/params": invalid second parameter in function "trendstl".'
+					'inline_error' => [
+						'Formula' => 'Invalid second parameter in function "trendstl".'
+					]
 				]
 			],
 			[
 				[
 					'expected' => TEST_BAD,
 					'formula' => 'trendstl(/host/item,:now/h,20h,12h,2)',
-					'error' => 'Invalid parameter "/1/params": incorrect expression starting from "trendstl(/host/item,:now/h,20h,12h,2)".'
+					'inline_error' => [
+						'Formula' => 'Incorrect expression starting from "trendstl(/host/item,:now/h,20h,12h,2)".'
+					]
 				]
 			],
 			[
 				[
 					'expected' => TEST_BAD,
 					'formula' => 'trendstl(/host/item,20h:now/h,20.15h,12h,2)',
-					'error' => 'Invalid parameter "/1/params": invalid third parameter in function "trendstl".'
+					'inline_error' => [
+						'Formula' => 'Invalid third parameter in function "trendstl".'
+					]
 				]
 			],
 			[
 				[
 					'expected' => TEST_BAD,
 					'formula' => 'trendstl(/host/item,347h:now/h,5m,3h)',
-					'error' => 'Invalid parameter "/1/params": invalid third parameter in function "trendstl".'
+					'inline_error' => [
+						'Formula' => 'Invalid third parameter in function "trendstl".'
+					]
 				]
 			],
 			[
 				[
 					'expected' => TEST_BAD,
 					'formula' => 'trendstl(/host/item,347h:now/h,70s,3h)',
-					'error' => 'Invalid parameter "/1/params": invalid third parameter in function "trendstl".'
+					'inline_error' => [
+						'Formula' => 'Invalid third parameter in function "trendstl".'
+					]
 				]
 			],
 			[
 				[
 					'expected' => TEST_BAD,
 					'formula' => 'trendstl(/host/item,20h:now/h,20M,12h,2)',
-					'error' => 'Invalid parameter "/1/params": invalid third parameter in function "trendstl".'
+					'inline_error' => [
+						'Formula' => 'Invalid third parameter in function "trendstl".'
+					]
 				]
 			],
 			[
 				[
 					'expected' => TEST_BAD,
 					'formula' => 'trendstl(/host/item,20h:now/h,20y,12h,2)',
-					'error' => 'Invalid parameter "/1/params": invalid third parameter in function "trendstl".'
+					'inline_error' => [
+						'Formula' => 'Invalid third parameter in function "trendstl".'
+					]
 				]
 			],
 			[
 				[
 					'expected' => TEST_BAD,
 					'formula' => 'trendstl(/host/item,347h:now/h,20h,3m)',
-					'error' => 'Invalid parameter "/1/params": invalid fourth parameter in function "trendstl".'
+					'inline_error' => [
+						'Formula' => 'Invalid fourth parameter in function "trendstl".'
+					]
 				]
 			],
 			[
 				[
 					'expected' => TEST_BAD,
 					'formula' => 'trendstl(/host/item,347h:now/h,20h,58s)',
-					'error' => 'Invalid parameter "/1/params": invalid fourth parameter in function "trendstl".'
+					'inline_error' => [
+						'Formula' => 'Invalid fourth parameter in function "trendstl".'
+					]
 				]
 			],
 			[
 				[
 					'expected' => TEST_BAD,
 					'formula' => 'trendstl(/host/item,20h:now/h,20h,12.23h,2)',
-					'error' => 'Invalid parameter "/1/params": invalid fourth parameter in function "trendstl".'
+					'inline_error' => [
+						'Formula' => 'Invalid fourth parameter in function "trendstl".'
+					]
 				]
 			],
 			[
 				[
 					'expected' => TEST_BAD,
 					'formula' => 'trendstl(/host/item,20h:now/h,20h,1h)',
-					'error' => 'Invalid parameter "/1/params": invalid fourth parameter in function "trendstl".'
+					'inline_error' => [
+						'Formula' => 'Invalid fourth parameter in function "trendstl".'
+					]
 				]
 			],
 			[
 				[
 					'expected' => TEST_BAD,
 					'formula' => 'trendstl(/host/item,20h:now/h,20h,12M,2)',
-					'error' => 'Invalid parameter "/1/params": invalid fourth parameter in function "trendstl".'
+					'inline_error' => [
+						'Formula' => 'Invalid fourth parameter in function "trendstl".'
+					]
 				]
 			],
 			[
 				[
 					'expected' => TEST_BAD,
 					'formula' => 'trendstl(/host/item,20h:now/h,20h,12y,2)',
-					'error' => 'Invalid parameter "/1/params": invalid fourth parameter in function "trendstl".'
+					'inline_error' => [
+						'Formula' => 'Invalid fourth parameter in function "trendstl".'
+					]
 				]
 			],
 			[
 				[
 					'expected' => TEST_BAD,
 					'formula' => 'trendstl(/host/item,20h:now/h,20h,12w,0.5)',
-					'error' => 'Invalid parameter "/1/params": invalid fifth parameter in function "trendstl".'
+					'inline_error' => [
+						'Formula' => 'Invalid fifth parameter in function "trendstl".'
+					]
 				]
 			],
 			[
 				[
 					'expected' => TEST_BAD,
 					'formula' => 'trendstl(/host/item,20h:now/h,20h,12w,2.12345)',
-					'error' => 'Invalid parameter "/1/params": invalid fifth parameter in function "trendstl".'
+					'inline_error' => [
+						'Formula' => 'Invalid fifth parameter in function "trendstl".'
+					]
 				]
 			],
 			[
 				[
 					'expected' => TEST_BAD,
 					'formula' => 'trendstl(/host/item,20h:now/h,20h,12h,0)',
-					'error' => 'Invalid parameter "/1/params": invalid fifth parameter in function "trendstl".'
+					'inline_error' => [
+						'Formula' => 'Invalid fifth parameter in function "trendstl".'
+					]
 				]
 			],
 			[
 				[
 					'expected' => TEST_BAD,
 					'formula' => 'trendstl(/host/item,20h:now/h,20h,12h,-3)',
-					'error' => 'Invalid parameter "/1/params": invalid fifth parameter in function "trendstl".'
+					'inline_error' => [
+						'Formula' => 'Invalid fifth parameter in function "trendstl".'
+					]
 				]
 			],
 			[
 				[
 					'expected' => TEST_BAD,
 					'formula' => 'trendstl(/host/item,20h:now/h,20h,12w,2,"")',
-					'error' => 'Invalid parameter "/1/params": invalid sixth parameter in function "trendstl".'
+					'inline_error' => [
+						'Formula' => 'Invalid sixth parameter in function "trendstl".'
+					]
 				]
 			],
 			[
 				[
 					'expected' => TEST_BAD,
 					'formula' => 'trendstl(/host/item,20h:now/h,20h,12h,2,"bad")',
-					'error' => 'Invalid parameter "/1/params": invalid sixth parameter in function "trendstl".'
+					'inline_error' => [
+						'Formula' => 'Invalid sixth parameter in function "trendstl".'
+					]
 				]
 			],
 			[
 				[
 					'expected' => TEST_BAD,
 					'formula' => 'trendstl(/host/item,20h:now/h,20h,12w,2,"mad)',
-					'error' => 'Invalid parameter "/1/params": incorrect expression starting from "trendstl(/host/item,20h:now/h,20h,12w,2,"mad)".'
+					'inline_error' => [
+						'Formula' => 'Incorrect expression starting from "trendstl(/host/item,20h:now/h,20h,12w,2,"mad)".'
+					]
 				]
 			],
 			[
 				[
 					'expected' => TEST_BAD,
 					'formula' => 'trendstl(/host/item,20h:now/h,20h,12w,2,"mad",3)',
-					'error' => 'Invalid parameter "/1/params": invalid seventh parameter in function "trendstl".'
+					'inline_error' => [
+						'Formula' => 'Invalid seventh parameter in function "trendstl".'
+					]
 				]
 			],
 			// trendsum() function validation.
@@ -2575,35 +3023,45 @@ class testCalculatedFormula extends CWebTest {
 				[
 					'expected' => TEST_BAD,
 					'formula' => 'trendsum(/host/item)',
-					'error' => 'Invalid parameter "/1/params": mandatory parameter is missing in function "trendsum".'
+					'inline_error' => [
+						'Formula' => 'Mandatory parameter is missing in function "trendsum".'
+					]
 				]
 			],
 			[
 				[
 					'expected' => TEST_BAD,
 					'formula' => 'trendsum(/host/key,59:now-59)',
-					'error' => 'Invalid parameter "/1/params": invalid second parameter in function "trendsum".'
+					'inline_error' => [
+						'Formula' => 'Invalid second parameter in function "trendsum".'
+					]
 				]
 			],
 			[
 				[
 					'expected' => TEST_BAD,
 					'formula' => 'trendsum(/host/key,:now/d-2d)',
-					'error' => 'Invalid parameter "/1/params": incorrect expression starting from "trendsum(/host/key,:now/d-2d)".'
+					'inline_error' => [
+						'Formula' => 'Incorrect expression starting from "trendsum(/host/key,:now/d-2d)".'
+					]
 				]
 			],
 			[
 				[
 					'expected' => TEST_BAD,
 					'formula' => 'trendsum(/host/item,,)',
-					'error' => 'Invalid parameter "/1/params": invalid number of parameters in function "trendsum".'
+					'inline_error' => [
+						'Formula' => 'Invalid number of parameters in function "trendsum".'
+					]
 				]
 			],
 			[
 				[
 					'expected' => TEST_BAD,
 					'formula' => 'trendsum(/host/item,1h)',
-					'error' => 'Invalid parameter "/1/params": invalid second parameter in function "trendsum".'
+					'inline_error' => [
+						'Formula' => 'Invalid second parameter in function "trendsum".'
+					]
 				]
 			],
 			// rate() function validation.
@@ -2611,141 +3069,181 @@ class testCalculatedFormula extends CWebTest {
 				[
 					'expected' => TEST_BAD,
 					'formula' => 'rate(/host/item,test)',
-					'error' => 'Invalid parameter "/1/params": incorrect expression starting from "rate(/host/item,test)".'
+					'inline_error' => [
+						'Formula' => 'Incorrect expression starting from "rate(/host/item,test)".'
+					]
 				]
 			],
 			[
 				[
 					'expected' => TEST_BAD,
-					'formula' => "rate(//item,,)",
-					'error' => 'Invalid parameter "/1/params": invalid number of parameters in function "rate".'
+					'formula' => 'rate(//item,,)',
+					'inline_error' => [
+						'Formula' => 'Invalid number of parameters in function "rate".'
+					]
 				]
 			],
 			[
 				[
 					'expected' => TEST_BAD,
 					'formula' => 'rate(/host/item,)',
-					'error' => 'Invalid parameter "/1/params": invalid second parameter in function "rate".'
+					'inline_error' => [
+						'Formula' => 'Invalid second parameter in function "rate".'
+					]
 				]
 			],
 			[
 				[
 					'expected' => TEST_BAD,
 					'formula' => 'rate(/item,1h:now-30m)',
-					'error' => 'Invalid parameter "/1/params": incorrect expression starting from "rate(/item,1h:now-30m)".'
+					'inline_error' => [
+						'Formula' => 'Incorrect expression starting from "rate(/item,1h:now-30m)".'
+					]
 				]
 			],
 			[
 				[
 					'expected' => TEST_BAD,
-					'formula' => "rate(//4321)",
-					'error' => 'Invalid parameter "/1/params": mandatory parameter is missing in function "rate".'
+					'formula' => 'rate(//4321)',
+					'inline_error' => [
+						'Formula' => 'Mandatory parameter is missing in function "rate".'
+					]
 				]
 			],
 			[
 				[
 					'expected' => TEST_BAD,
 					'formula' => 'rate(10h)',
-					'error' => 'Invalid parameter "/1/params": incorrect usage of function "rate".'
+					'inline_error' => [
+						'Formula' => 'Incorrect usage of function "rate".'
+					]
 				]
 			],
 			// Deprecated functions validation.
 			[
 				[
 					'expected' => TEST_BAD,
-					'formula' => "abschange(//trap)",
-					'error' => 'Invalid parameter "/1/params": unknown function "abschange".'
+					'formula' => 'abschange(//trap)',
+					'inline_error' => [
+						'Formula' => 'Unknown function "abschange".'
+					]
 				]
 			],
 			[
 				[
 					'expected' => TEST_BAD,
 					'formula' => 'regexp(/*/trap,"test")',
-					'error' => 'Invalid parameter "/1/params": unknown function "regexp".'
+					'inline_error' => [
+						'Formula' => 'Unknown function "regexp".'
+					]
 				]
 			],
 			[
 				[
 					'expected' => TEST_BAD,
 					'formula' => 'regexp(/*/trap)',
-					'error' => 'Invalid parameter "/1/params": unknown function "regexp".'
+					'inline_error' => [
+						'Formula' => 'Unknown function "regexp".'
+					]
 				]
 			],
 			[
 				[
 					'expected' => TEST_BAD,
 					'formula' => 'iregexp(/*/trap,"test")',
-					'error' => 'Invalid parameter "/1/params": unknown function "iregexp".'
+					'inline_error' => [
+						'Formula' => 'Unknown function "iregexp".'
+					]
 				]
 			],
 			[
 				[
 					'expected' => TEST_BAD,
 					'formula' => 'iregexp(/*/trap)',
-					'error' => 'Invalid parameter "/1/params": unknown function "iregexp".'
+					'inline_error' => [
+						'Formula' => 'Unknown function "iregexp".'
+					]
 				]
 			],
 			[
 				[
 					'expected' => TEST_BAD,
 					'formula' => 'prev(/*/trap)',
-					'error' => 'Invalid parameter "/1/params": unknown function "prev".'
+					'inline_error' => [
+						'Formula' => 'Unknown function "prev".'
+					]
 				]
 			],
 			[
 				[
 					'expected' => TEST_BAD,
 					'formula' => 'regexp(/*/trap)',
-					'error' => 'Invalid parameter "/1/params": unknown function "regexp".'
+					'inline_error' => [
+						'Formula' => 'Unknown function "regexp".'
+					]
 				]
 			],
 			[
 				[
 					'expected' => TEST_BAD,
 					'formula' => 'regexp(/*/trap,"pattern",50s)',
-					'error' => 'Invalid parameter "/1/params": unknown function "regexp".'
+					'inline_error' => [
+						'Formula' => 'Unknown function "regexp".'
+					]
 				]
 			],
 			[
 				[
 					'expected' => TEST_BAD,
 					'formula' => 'str(/*/trap)',
-					'error' => 'Invalid parameter "/1/params": unknown function "str".'
+					'inline_error' => [
+						'Formula' => 'Unknown function "str".'
+					]
 				]
 			],
 			[
 				[
 					'expected' => TEST_BAD,
 					'formula' => 'str(/*/trap,"pattern",50s)',
-					'error' => 'Invalid parameter "/1/params": unknown function "str".'
+					'inline_error' => [
+						'Formula' => 'Unknown function "str".'
+					]
 				]
 			],
 			[
 				[
 					'expected' => TEST_BAD,
 					'formula' => 'strlen(/*/trap)',
-					'error' => 'Invalid parameter "/1/params": unknown function "strlen".'
+					'inline_error' => [
+						'Formula' => 'Unknown function "strlen".'
+					]
 				]
 			],
 			[
 				[
 					'expected' => TEST_BAD,
 					'formula' => 'strlen(/*/trap,"pattern",#5)',
-					'error' => 'Invalid parameter "/1/params": incorrect expression starting from "strlen(/*/trap,"pattern",#5)".'
+					'inline_error' => [
+						'Formula' => 'Incorrect expression starting from "strlen(/*/trap,"pattern",#5)".'
+					]
 				]
 			],
 			[
 				[
 					'expected' => TEST_BAD,
 					'formula' => 'trenddelta(/*/trap)',
-					'error' => 'Invalid parameter "/1/params": unknown function "trenddelta".'
+					'inline_error' => [
+						'Formula' => 'Unknown function "trenddelta".'
+					]
 				]
 			],
 			[
 				[
 					'expected' => TEST_BAD,
 					'formula' => 'trenddelta(/*/trap,1h,now/h)',
-					'error' => 'Invalid parameter "/1/params": incorrect expression starting from "trenddelta(/*/trap,1h,now/h)".'
+					'inline_error' => [
+						'Formula' => 'Incorrect expression starting from "trenddelta(/*/trap,1h,now/h)".'
+					]
 				]
 			],
 			// foreach() aggregated functions.
@@ -2789,63 +3287,81 @@ class testCalculatedFormula extends CWebTest {
 				[
 					'expected' => TEST_BAD,
 					'formula' => 'last_foreach(/*/trap)',
-					'error' => 'Invalid parameter "/1/params": incorrect usage of function "last_foreach".'
+					'inline_error' => [
+						'Formula' => 'Incorrect usage of function "last_foreach".'
+					]
 				]
 			],
 			[
 				[
 					'expected' => TEST_BAD,
 					'formula' => 'sum_foreach(/*/trap,20s)',
-					'error' => 'Invalid parameter "/1/params": incorrect usage of function "sum_foreach".'
+					'inline_error' => [
+						'Formula' => 'Incorrect usage of function "sum_foreach".'
+					]
 				]
 			],
 			[
 				[
 					'expected' => TEST_BAD,
 					'formula' => 'avg_foreach(/host/key[*,param],19)',
-					'error' => 'Invalid parameter "/1/params": incorrect usage of function "avg_foreach".'
+					'inline_error' => [
+						'Formula' => 'Incorrect usage of function "avg_foreach".'
+					]
 				]
 			],
 			[
 				[
 					'expected' => TEST_BAD,
 					'formula' => 'min(Avg_foreach(/host/key[*,param],{$USERMACRO}))',
-					'error' => 'Invalid parameter "/1/params": incorrect expression starting from "min(Avg_foreach(/host/key[*,param],{$USERMACRO}))".'
+					'inline_error' => [
+						'Formula' => 'Incorrect expression starting from "min(Avg_foreach(/host/key[*,param],{$USERMACRO}))".'
+					]
 				]
 			],
 			[
 				[
 					'expected' => TEST_BAD,
 					'formula' => 'count_foreach(/*/trap?[tag="tag1"],99h)',
-					'error' => 'Invalid parameter "/1/params": incorrect usage of function "count_foreach".'
+					'inline_error' => [
+						'Formula' => 'Incorrect usage of function "count_foreach".'
+					]
 				]
 			],
 			[
 				[
 					'expected' => TEST_BAD,
 					'formula' => 'min_foreach(/*/trap?[group="Servers"],6)',
-					'error' => 'Invalid parameter "/1/params": incorrect usage of function "min_foreach".'
+					'inline_error' => [
+						'Formula' => 'Incorrect usage of function "min_foreach".'
+					]
 				]
 			],
 			[
 				[
 					'expected' => TEST_BAD,
 					'formula' => 'max_foreach(/*/trap,20s)',
-					'error' => 'Invalid parameter "/1/params": incorrect usage of function "max_foreach".'
+					'inline_error' => [
+						'Formula' => 'Incorrect usage of function "max_foreach".'
+					]
 				]
 			],
 			[
 				[
 					'expected' => TEST_BAD,
 					'formula' => 'last_foreach(/host/key,{$PERIOD}:now-1d)',
-					'error' => 'Invalid parameter "/1/params": invalid second parameter in function "last_foreach".'
+					'inline_error' => [
+						'Formula' => 'Invalid second parameter in function "last_foreach".'
+					]
 				]
 			],
 			[
 				[
 					'expected' => TEST_BAD,
 					'formula' => 'last_foreach(/host/key,"{$PERIOD}:now-1d")',
-					'error' => 'Invalid parameter "/1/params": incorrect usage of function "last_foreach".'
+					'inline_error' => [
+						'Formula' => 'Incorrect usage of function "last_foreach".'
+					]
 				]
 			],
 			// Aggregated math functions.
@@ -2866,435 +3382,515 @@ class testCalculatedFormula extends CWebTest {
 			],
 			[
 				[
-					'formula' => "first(//trap,60)"
+					'formula' => 'first(//trap,60)'
 				]
 			],
 			[
 				[
-					'formula' => "kurtosis(//trap,60d)"
+					'formula' => 'kurtosis(//trap,60d)'
 				]
 			],
 			[
 				[
-					'formula' => "mad(//trap,60w)"
+					'formula' => 'mad(//trap,60w)'
 				]
 			],
 			[
 				[
-					'formula' => "skewness(//trap,60h)"
+					'formula' => 'skewness(//trap,60h)'
 				]
 			],
 			[
 				[
-					'formula' => "stddevpop(//trap,{\$USERMACRO})"
+					'formula' => 'stddevpop(//trap,{$USERMACRO})'
 				]
 			],
 			[
 				[
-					'formula' => "stddevsamp(//trap,{\$USERMACRO})"
+					'formula' => 'stddevsamp(//trap,{$USERMACRO})'
 				]
 			],
 			[
 				[
-					'formula' => "sumofsquares(//trap,#6)"
+					'formula' => 'sumofsquares(//trap,#6)'
 				]
 			],
 			[
 				[
-					'formula' => "varpop(//trap,#1:now-1d)"
+					'formula' => 'varpop(//trap,#1:now-1d)'
 				]
 			],
 			[
 				[
-					'formula' => "varsamp(//trap,{\$USERMACRO})"
+					'formula' => 'varsamp(//trap,{$USERMACRO})'
 				]
 			],
 			// Aggregated math functions validation.
 			[
 				[
 					'expected' => TEST_BAD,
-					'formula' => "countunique(//trap)",
-					'error' => 'Invalid parameter "/1/params": mandatory parameter is missing in function "countunique".'
+					'formula' => 'countunique(//trap)',
+					'inline_error' => [
+						'Formula' => 'Mandatory parameter is missing in function "countunique".'
+					]
 				]
 			],
 			[
 				[
 					'expected' => TEST_BAD,
 					'formula' => 'countunique(/host/trap,60s,"test",1)',
-					'error' => 'Invalid parameter "/1/params": invalid third parameter in function "countunique".'
+					'inline_error' => [
+						'Formula' => 'Invalid third parameter in function "countunique".'
+					]
 				]
 			],
 			[
 				[
 					'expected' => TEST_BAD,
 					'formula' => 'countunique(/host/trap,60s,like,1)',
-					'error' => 'Invalid parameter "/1/params": incorrect expression starting from "countunique(/host/trap,60s,like,1)".'
+					'inline_error' => [
+						'Formula' => 'Incorrect expression starting from "countunique(/host/trap,60s,like,1)".'
+					]
 				]
 			],
 			[
 				[
 					'expected' => TEST_BAD,
-					'formula' => "first(//trap,60s,)",
-					'error' => 'Invalid parameter "/1/params": invalid number of parameters in function "first".'
+					'formula' => 'first(//trap,60s,)',
+					'inline_error' => [
+						'Formula' => 'Invalid number of parameters in function "first".'
+					]
 				]
 			],
 			[
 				[
 					'expected' => TEST_BAD,
-					'formula' => "Kurtosis(//trap,60d)",
-					'error' => 'Invalid parameter "/1/params": incorrect expression starting from "Kurtosis(//trap,60d)".'
+					'formula' => 'Kurtosis(//trap,60d)',
+					'inline_error' => [
+						'Formula' => 'Incorrect expression starting from "Kurtosis(//trap,60d)".'
+					]
 				]
 			],
 			[
 				[
 					'expected' => TEST_BAD,
 					'formula' => 'kurtosis(/*/trap,60s)',
-					'error' => 'Invalid parameter "/1/params": invalid first parameter in function "kurtosis".'
+					'inline_error' => [
+						'Formula' => 'Invalid first parameter in function "kurtosis".'
+					]
 				]
 			],
 			[
 				[
 					'expected' => TEST_BAD,
 					'formula' => 'mad()',
-					'error' => 'Invalid parameter "/1/params": invalid number of parameters in function "mad".'
+					'inline_error' => [
+						'Formula' => 'Invalid number of parameters in function "mad".'
+					]
 				]
 			],
 			[
 				[
 					'expected' => TEST_BAD,
-					'formula' => "Mad(//trap,60w)",
-					'error' => 'Invalid parameter "/1/params": incorrect expression starting from "Mad(//trap,60w)".'
+					'formula' => 'Mad(//trap,60w)',
+					'inline_error' => [
+						'Formula' => 'Incorrect expression starting from "Mad(//trap,60w)".'
+					]
 				]
 			],
 			[
 				[
 					'expected' => TEST_BAD,
 					'formula' => 'skewness(/trap)',
-					'error' => 'Invalid parameter "/1/params": incorrect expression starting from "skewness(/trap)".'
+					'inline_error' => [
+						'Formula' => 'Incorrect expression starting from "skewness(/trap)".'
+					]
 				]
 			],
 			[
 				[
 					'expected' => TEST_BAD,
 					'formula' => 'stddevpop(trap)',
-					'error' => 'Invalid parameter "/1/params": incorrect expression starting from "stddevpop(trap)".'
+					'inline_error' => [
+						'Formula' => 'Incorrect expression starting from "stddevpop(trap)".'
+					]
 				]
 			],
 			[
 				[
 					'expected' => TEST_BAD,
-					'formula' => "sumofsquares(//trap,{TEST})",
-					'error' => "Invalid parameter \"/1/params\": incorrect expression starting from \"sumofsquares(//trap,{TEST})\"."
+					'formula' => 'sumofsquares(//trap,{TEST})',
+					'inline_error' => [
+						'Formula' => 'Incorrect expression starting from "sumofsquares(//trap,{TEST})".'
+					]
 				]
 			],
 			[
 				[
 					'expected' => TEST_BAD,
-					'formula' => "varpop(//trap,1M:now/M-1y)",
-					'error' => 'Invalid parameter "/1/params": invalid second parameter in function "varpop".'
+					'formula' => 'varpop(//trap,1M:now/M-1y)',
+					'inline_error' => [
+						'Formula' => 'Invalid second parameter in function "varpop".'
+					]
 				]
 			],
 			[
 				[
 					'expected' => TEST_BAD,
-					'formula' => "varpop(//trap,#1:now-#1)",
-					'error' => 'Invalid parameter "/1/params": incorrect expression starting from "varpop(//trap,#1:now-#1)".'
+					'formula' => 'varpop(//trap,#1:now-#1)',
+					'inline_error' => [
+						'Formula' => 'Incorrect expression starting from "varpop(//trap,#1:now-#1)".'
+					]
 				]
 			],
 			[
 				[
 					'expected' => TEST_BAD,
-					'formula' => "varsamp(//trap,{TEST})",
-					'error' => "Invalid parameter \"/1/params\": incorrect expression starting from \"varsamp(//trap,{TEST})\"."
+					'formula' => 'varsamp(//trap,{TEST})',
+					'inline_error' => [
+						'Formula' => 'Incorrect expression starting from "varsamp(//trap,{TEST})".'
+					]
 				]
 			],
 			[
 				[
 					'expected' => TEST_BAD,
-					'formula' => "varsamp(//trap)",
-					'error' => 'Invalid parameter "/1/params": mandatory parameter is missing in function "varsamp".'
+					'formula' => 'varsamp(//trap)',
+					'inline_error' => [
+						'Formula' => 'Mandatory parameter is missing in function "varsamp".'
+					]
 				]
 			],
 			// String  functions.
 			[
 				[
-					'formula' => "ascii(last(//trap_text))"
+					'formula' => 'ascii(last(//trap_text))'
 				]
 			],
 			[
 				[
-					'formula' => "bitlength(last(//trap_text))"
+					'formula' => 'bitlength(last(//trap_text))'
 				]
 			],
 			[
 				[
-					'formula' => "char(last(//trap))=\"d\""
+					'formula' => 'char(last(//trap))="d"'
 				]
 			],
 			[
 				[
-					'formula' => "concat(last(//trap_text),\"test\")=\"testtest\""
+					'formula' => 'concat(last(//trap_text),"test")="testtest"'
 				]
 			],
 			[
 				[
-					'formula' => "concat(last(//trap_text),123)=\"test123\""
+					'formula' => 'concat(last(//trap_text),123)="test123"'
 				]
 			],
 			[
 				[
-					'formula' => "concat(last(//trap_text),\"#1\")=\"test123\""
+					'formula' => 'concat(last(//trap_text),"#1")="test123"'
 				]
 			],
 			[
 				[
-					'formula' => "concat(\"Last value: \", last(//trap_text), \"Average value: \", avg(//trap_text,1h))"
+					'formula' => 'concat("Last value: ", last(//trap_text), "Average value: ", avg(//trap_text,1h))'
 				]
 			],
 			[
 				[
-					'formula' => "insert(last(//trap_text),2,1,\"ab\")=\"Zabbix\""
+					'formula' => 'insert(last(//trap_text),2,1,"ab")="Zabbix"'
 				]
 			],
 			[
 				[
-					'formula' => "left(last(//trap_text),3)=\"Zab\""
+					'formula' => 'left(last(//trap_text),3)="Zab"'
 				]
 			],
 			[
 				[
-					'formula' => "ltrim(last(//trap_text),\"T\")=\"Zabbix\""
+					'formula' => 'ltrim(last(//trap_text),"T")="Zabbix"'
 				]
 			],
 			[
 				[
-					'formula' => "ltrim(last(//trap_text))=\"Zabbix\""
+					'formula' => 'ltrim(last(//trap_text))="Zabbix"'
 				]
 			],
 			[
 				[
-					'formula' => "bytelength(last(//trap_text))"
+					'formula' => 'bytelength(last(//trap_text))'
 				]
 			],
 			[
 				[
-					'formula' => "repeat(last(//trap_text),2)=\"ZabbixZabbix\""
+					'formula' => 'repeat(last(//trap_text),2)="ZabbixZabbix"'
 				]
 			],
 			[
 				[
-					'formula' => "replace(last(//trap_text),\"ix\",\"aaah\")=\"Zabbaaah\""
+					'formula' => 'replace(last(//trap_text),"ix","aaah")="Zabbaaah"'
 				]
 			],
 			[
 				[
-					'formula' => "replace(last(//trap_text),\"\",\"\")=\"Zabbaaah\""
+					'formula' => 'replace(last(//trap_text),"","")="Zabbaaah"'
 				]
 			],
 			[
 				[
-					'formula' => "right(last(//trap_text),3)=\"bix\""
+					'formula' => 'right(last(//trap_text),3)="bix"'
 				]
 			],
 			[
 				[
-					'formula' => "rtrim(last(//trap_text),\"z\")=\"Test\""
+					'formula' => 'rtrim(last(//trap_text),"z")="Test"'
 				]
 			],
 			[
 				[
-					'formula' => "rtrim(last(//trap_text))=\"Test\""
+					'formula' => 'rtrim(last(//trap_text))="Test"'
 				]
 			],
 			[
 				[
-					'formula' => "mid(last(//trap_text),2,4)=\"abbi\""
+					'formula' => 'mid(last(//trap_text),2,4)="abbi"'
 				]
 			],
 			[
 				[
-					'formula' => "trim(last(//trap_text))=\"Zabbix\""
+					'formula' => 'trim(last(//trap_text))="Zabbix"'
 				]
 			],
 			[
 				[
-					'formula' => "trim(last(//trap_text),\"t\")=\"Zabbix\""
+					'formula' => 'trim(last(//trap_text),"t")="Zabbix"'
 				]
 			],
-			// String  functions validation.
-			[
-				[
-					'expected' => TEST_BAD,
-					'formula' => "ascii(//trap_text)",
-					'error' => 'Invalid parameter "/1/params": incorrect usage of function "ascii".'
-				]
-			],
+			// String functions validation.
 			[
 				[
 					'expected' => TEST_BAD,
-					'formula' => "ASCII(//trap_text)",
-					'error' => 'Invalid parameter "/1/params": incorrect expression starting from "ASCII(//trap_text)".'
+					'formula' => 'ascii(//trap_text)',
+					'inline_error' => [
+						'Formula' => 'Incorrect usage of function "ascii".'
+					]
 				]
 			],
 			[
 				[
 					'expected' => TEST_BAD,
-					'formula' => "bitlength(//trap_text)",
-					'error' => 'Invalid parameter "/1/params": incorrect usage of function "bitlength".'
+					'formula' => 'ASCII(//trap_text)',
+					'inline_error' => [
+						'Formula' => 'Incorrect expression starting from "ASCII(//trap_text)".'
+					]
 				]
 			],
 			[
 				[
 					'expected' => TEST_BAD,
-					'formula' => "char(//trap)=\"d\"",
-					'error' => 'Invalid parameter "/1/params": incorrect usage of function "char".'
+					'formula' => 'bitlength(//trap_text)',
+					'inline_error' => [
+						'Formula' => 'Incorrect usage of function "bitlength".'
+					]
 				]
 			],
 			[
 				[
 					'expected' => TEST_BAD,
-					'formula' => "concat(last(//trap_text))=\"testtest\"",
-					'error' => 'Invalid parameter "/1/params": invalid number of parameters in function "concat".'
+					'formula' => 'char(//trap)="d"',
+					'inline_error' => [
+						'Formula' => 'Incorrect usage of function "char".'
+					]
 				]
 			],
 			[
 				[
 					'expected' => TEST_BAD,
-					'formula' => "concat(last(//trap_text),#1)=\"testtest\"",
-					'error' => "Invalid parameter \"/1/params\": incorrect expression starting from \"concat(last(//trap_text),#1)=\"testtest\"\"."
+					'formula' => 'concat(last(//trap_text))="testtest"',
+					'inline_error' => [
+						'Formula' => 'Invalid number of parameters in function "concat".'
+					]
 				]
 			],
 			[
 				[
 					'expected' => TEST_BAD,
-					'formula' => "insert(last(//trap_text),2)=\"Zabbix\"",
-					'error' => 'Invalid parameter "/1/params": invalid number of parameters in function "insert".'
+					'formula' => 'concat(last(//trap_text),#1)="testtest"',
+					'inline_error' => [
+						'Formula' => 'Incorrect expression starting from "concat(last(//trap_text),#1)="testtest"".'
+					]
 				]
 			],
 			[
 				[
 					'expected' => TEST_BAD,
-					'formula' => "insert(last(//trap_text),2,1)=\"Zabbix\"",
-					'error' => 'Invalid parameter "/1/params": invalid number of parameters in function "insert".'
+					'formula' => 'insert(last(//trap_text),2)="Zabbix"',
+					'inline_error' => [
+						'Formula' => 'Invalid number of parameters in function "insert".'
+					]
 				]
 			],
 			[
 				[
 					'expected' => TEST_BAD,
-					'formula' => "insert(last(//trap_text),2,1,test)=\"Zabbix\"",
-					'error' => "Invalid parameter \"/1/params\": incorrect expression starting from \"insert(last(//trap_text),2,1,test)=\"Zabbix\"\"."
+					'formula' => 'insert(last(//trap_text),2,1)="Zabbix"',
+					'inline_error' => [
+						'Formula' => 'Invalid number of parameters in function "insert".'
+					]
 				]
 			],
 			[
 				[
 					'expected' => TEST_BAD,
-					'formula' => "insert(last(//trap_text),,,\"test\")=\"Zabbix\"",
-					'error' => "Invalid parameter \"/1/params\": incorrect expression starting from \"insert(last(//trap_text),,,\"test\")=\"Zabbix\"\"."
+					'formula' => 'insert(last(//trap_text),2,1,test)="Zabbix"',
+					'inline_error' => [
+						'Formula' => 'Incorrect expression starting from "insert(last(//trap_text),2,1,test)="Zabbix"".'
+					]
 				]
 			],
 			[
 				[
 					'expected' => TEST_BAD,
-					'formula' => "Insert(last(//trap_text),2,1,\"ab\")=\"Zabbix\"",
-					'error' => "Invalid parameter \"/1/params\": incorrect expression starting from \"Insert(last(//trap_text),2,1,\"ab\")=\"Zabbix\"\"."
+					'formula' => 'insert(last(//trap_text),,,"test")="Zabbix"',
+					'inline_error' => [
+						'Formula' => 'Incorrect expression starting from "insert(last(//trap_text),,,"test")="Zabbix"".'
+					]
 				]
 			],
 			[
 				[
 					'expected' => TEST_BAD,
-					'formula' => "left(last(//trap_text))=\"Zab\"",
-					'error' => 'Invalid parameter "/1/params": invalid number of parameters in function "left".'
+					'formula' => 'Insert(last(//trap_text),2,1,"ab")="Zabbix"',
+					'inline_error' => [
+						'Formula' => 'Incorrect expression starting from "Insert(last(//trap_text),2,1,"ab")="Zabbix"".'
+					]
 				]
 			],
 			[
 				[
 					'expected' => TEST_BAD,
-					'formula' => "left(last(//trap_text),test)=\"Zab\"",
-					'error' => "Invalid parameter \"/1/params\": incorrect expression starting from \"left(last(//trap_text),test)=\"Zab\"\"."
+					'formula' => 'left(last(//trap_text))="Zab"',
+					'inline_error' => [
+						'Formula' => 'Invalid number of parameters in function "left".'
+					]
 				]
 			],
 			[
 				[
 					'expected' => TEST_BAD,
-					'formula' => "left(last(//trap_text),#1)=\"Zab\"",
-					'error' => "Invalid parameter \"/1/params\": incorrect expression starting from \"left(last(//trap_text),#1)=\"Zab\"\"."
+					'formula' => 'left(last(//trap_text),test)="Zab"',
+					'inline_error' => [
+						'Formula' => 'Incorrect expression starting from "left(last(//trap_text),test)="Zab"".'
+					]
 				]
 			],
 			[
 				[
 					'expected' => TEST_BAD,
-					'formula' => "ltrim(last(//trap_text),test)=\"Zabbix\"",
-					'error' => "Invalid parameter \"/1/params\": incorrect expression starting from \"ltrim(last(//trap_text),test)=\"Zabbix\"\"."
+					'formula' => 'left(last(//trap_text),#1)="Zab"',
+					'inline_error' => [
+						'Formula' => 'Incorrect expression starting from "left(last(//trap_text),#1)="Zab"".'
+					]
 				]
 			],
 			[
 				[
 					'expected' => TEST_BAD,
-					'formula' => "bytelength(//trap_text)",
-					'error' => 'Invalid parameter "/1/params": incorrect usage of function "bytelength".'
+					'formula' => 'ltrim(last(//trap_text),test)="Zabbix"',
+					'inline_error' => [
+						'Formula' => 'Incorrect expression starting from "ltrim(last(//trap_text),test)="Zabbix"".'
+					]
 				]
 			],
 			[
 				[
 					'expected' => TEST_BAD,
-					'formula' => "repeat(last(//trap_text))=\"ZabbixZabbix\"",
-					'error' => 'Invalid parameter "/1/params": invalid number of parameters in function "repeat".'
+					'formula' => 'bytelength(//trap_text)',
+					'inline_error' => [
+						'Formula' => 'Incorrect usage of function "bytelength".'
+					]
 				]
 			],
 			[
 				[
 					'expected' => TEST_BAD,
-					'formula' => "replace(last(//trap_text))=\"Zabbaaah\"",
-					'error' => 'Invalid parameter "/1/params": invalid number of parameters in function "replace".'
+					'formula' => 'repeat(last(//trap_text))="ZabbixZabbix"',
+					'inline_error' => [
+						'Formula' => 'Invalid number of parameters in function "repeat".'
+					]
 				]
 			],
 			[
 				[
 					'expected' => TEST_BAD,
-					'formula' => "replace(last(//trap_text),\"Zab\")=\"Zabbaaah\"",
-					'error' => 'Invalid parameter "/1/params": invalid number of parameters in function "replace".'
+					'formula' => 'replace(last(//trap_text))="Zabbaaah"',
+					'inline_error' => [
+						'Formula' => 'Invalid number of parameters in function "replace".'
+					]
 				]
 			],
 			[
 				[
 					'expected' => TEST_BAD,
-					'formula' => "replace(last(//trap_text),,\"Zab\")=\"Zabbaaah\"",
-					'error' => "Invalid parameter \"/1/params\": incorrect expression starting from \"replace(last(//trap_text),,\"Zab\")=\"Zabbaaah\"\"."
+					'formula' => 'replace(last(//trap_text),"Zab")="Zabbaaah"',
+					'inline_error' => [
+						'Formula' => 'Invalid number of parameters in function "replace".'
+					]
 				]
 			],
 			[
 				[
 					'expected' => TEST_BAD,
-					'formula' => "right(last(//trap_text))=\"bix\"",
-					'error' => 'Invalid parameter "/1/params": invalid number of parameters in function "right".'
+					'formula' => 'replace(last(//trap_text),,"Zab")="Zabbaaah"',
+					'inline_error' => [
+						'Formula' => 'Incorrect expression starting from "replace(last(//trap_text),,"Zab")="Zabbaaah"".'
+					]
 				]
 			],
 			[
 				[
 					'expected' => TEST_BAD,
-					'formula' => "rtrim(//trap_text)=\"bix\"",
-					'error' => 'Invalid parameter "/1/params": incorrect usage of function "rtrim".'
+					'formula' => 'right(last(//trap_text))="bix"',
+					'inline_error' => [
+						'Formula' => 'Invalid number of parameters in function "right".'
+					]
 				]
 			],
 			[
 				[
 					'expected' => TEST_BAD,
-					'formula' => "mid(last(//trap_text),\"1\",\"2\",\"3\")=\"bix\"",
-					'error' => 'Invalid parameter "/1/params": invalid number of parameters in function "mid".'
+					'formula' => 'rtrim(//trap_text)="bix"',
+					'inline_error' => [
+						'Formula' => 'Incorrect usage of function "rtrim".'
+					]
 				]
 			],
 			[
 				[
 					'expected' => TEST_BAD,
-					'formula' => "mid(last(//trap_text),,)=\"bix\"",
-					'error' => "Invalid parameter \"/1/params\": incorrect expression starting from \"mid(last(//trap_text),,)=\"bix\"\"."
+					'formula' => 'mid(last(//trap_text),"1","2","3")="bix"',
+					'inline_error' => [
+						'Formula' => 'Invalid number of parameters in function "mid".'
+					]
 				]
 			],
 			[
 				[
 					'expected' => TEST_BAD,
-					'formula' => "trim(last(//trap_text),\"1\",\"2\")=\"bix\"",
-					'error' => 'Invalid parameter "/1/params": invalid number of parameters in function "trim".'
+					'formula' => 'mid(last(//trap_text),,)="bix"',
+					'inline_error' => [
+						'Formula' => 'Incorrect expression starting from "mid(last(//trap_text),,)="bix"".'
+					]
+				]
+			],
+			[
+				[
+					'expected' => TEST_BAD,
+					'formula' => 'trim(last(//trap_text),"1","2")="bix"',
+					'inline_error' => [
+						'Formula' => 'Invalid number of parameters in function "trim".'
+					]
 				]
 			],
 			// Operator functions.
@@ -3312,36 +3908,46 @@ class testCalculatedFormula extends CWebTest {
 			[
 				[
 					'expected' => TEST_BAD,
-					'formula' => "between(5,(last(//trap)),10,1)",
-					'error' => 'Invalid parameter "/1/params": invalid number of parameters in function "between".'
+					'formula' => 'between(5,(last(//trap)),10,1)',
+					'inline_error' => [
+						'Formula' => 'Invalid number of parameters in function "between".'
+					]
 				]
 			],
 			[
 				[
 					'expected' => TEST_BAD,
-					'formula' => "between(5,(last(//trap)))",
-					'error' => 'Invalid parameter "/1/params": invalid number of parameters in function "between".'
+					'formula' => 'between(5,(last(//trap)))',
+					'inline_error' => [
+						'Formula' => 'Invalid number of parameters in function "between".'
+					]
 				]
 			],
 			[
 				[
 					'expected' => TEST_BAD,
-					'formula' => "in(last(//trap))",
-					'error' => 'Invalid parameter "/1/params": invalid number of parameters in function "in".'
+					'formula' => 'in(last(//trap))',
+					'inline_error' => [
+						'Formula' => 'Invalid number of parameters in function "in".'
+					]
 				]
 			],
 			[
 				[
 					'expected' => TEST_BAD,
 					'formula' => 'in(5,(last(/host/trap)),,6,10)',
-					'error' => 'Invalid parameter "/1/params": incorrect expression starting from "in(5,(last(/host/trap)),,6,10)".'
+					'inline_error' => [
+						'Formula' => 'Incorrect expression starting from "in(5,(last(/host/trap)),,6,10)".'
+					]
 				]
 			],
 			[
 				[
 					'expected' => TEST_BAD,
 					'formula' => 'In(5,(last(/host/trap)),{$USERMACRO},5,10)',
-					'error' => 'Invalid parameter "/1/params": incorrect expression starting from "In(5,(last(/host/trap)),{$USERMACRO},5,10)".'
+					'inline_error' => [
+						'Formula' => 'Incorrect expression starting from "In(5,(last(/host/trap)),{$USERMACRO},5,10)".'
+					]
 				]
 			],
 			// Bitwise functions.
@@ -3369,50 +3975,64 @@ class testCalculatedFormula extends CWebTest {
 			[
 				[
 					'expected' => TEST_BAD,
-					'formula' => "bitor(last(//trap))",
-					'error' => 'Invalid parameter "/1/params": invalid number of parameters in function "bitor".'
+					'formula' => 'bitor(last(//trap))',
+					'inline_error' => [
+						'Formula' => 'Invalid number of parameters in function "bitor".'
+					]
 				]
 			],
 			[
 				[
 					'expected' => TEST_BAD,
 					'formula' => 'BITOR(last(/host/trap),7)',
-					'error' => 'Invalid parameter "/1/params": incorrect expression starting from "BITOR(last(/host/trap),7)".'
+					'inline_error' => [
+						'Formula' => 'Incorrect expression starting from "BITOR(last(/host/trap),7)".'
+					]
 				]
 			],
 			[
 				[
 					'expected' => TEST_BAD,
-					'formula' => "bitxor(last(//trap),7,9)",
-					'error' => 'Invalid parameter "/1/params": invalid number of parameters in function "bitxor".'
+					'formula' => 'bitxor(last(//trap),7,9)',
+					'inline_error' => [
+						'Formula' => 'Invalid number of parameters in function "bitxor".'
+					]
 				]
 			],
 			[
 				[
 					'expected' => TEST_BAD,
-					'formula' => "bitnot(last(//trap),1)",
-					'error' => 'Invalid parameter "/1/params": invalid number of parameters in function "bitnot".'
+					'formula' => 'bitnot(last(//trap),1)',
+					'inline_error' => [
+						'Formula' => 'Invalid number of parameters in function "bitnot".'
+					]
 				]
 			],
 			[
 				[
 					'expected' => TEST_BAD,
 					'formula' => 'Bitnot(last(/host/trap))',
-					'error' => 'Invalid parameter "/1/params": incorrect expression starting from "Bitnot(last(/host/trap))".'
+					'inline_error' => [
+						'Formula' => 'Incorrect expression starting from "Bitnot(last(/host/trap))".'
+					]
 				]
 			],
 			[
 				[
 					'expected' => TEST_BAD,
 					'formula' => 'bitlshift()',
-					'error' => 'Invalid parameter "/1/params": invalid number of parameters in function "bitlshift".'
+					'inline_error' => [
+						'Formula' => 'Invalid number of parameters in function "bitlshift".'
+					]
 				]
 			],
 			[
 				[
 					'expected' => TEST_BAD,
 					'formula' => 'bitrshift(last(/*/trap),1)',
-					'error' => 'Invalid parameter "/1/params": invalid first parameter in function "last".'
+					'inline_error' => [
+						'Formula' => 'Invalid first parameter in function "last".'
+					]
 				]
 			],
 			// Complex calculations.
@@ -3435,8 +4055,9 @@ class testCalculatedFormula extends CWebTest {
 			],
 			[
 				[
-					'formula' => "max(min_foreach(/*/trap?[group=\"Servers\"],{\$USERMACRO}))+avg(count_foreach(/*/trap?[tag=\"tag1\"],\"{\$USERMACRO}h\"))-bitrshift".
-							"(last(//trap),1)/between(5,(last(//trap)),10)*fuzzytime(/host/trap,60)>=trendsum(/host/item,\"{\$USERMACRO}:now/h\")"
+					'formula' => 'max(min_foreach(/*/trap?[group="Servers"],{$USERMACRO}))+avg(count_foreach(/*/trap?'.
+							'[tag="tag1"],"{$USERMACRO}h"))-bitrshift(last(//trap),1)/between(5,(last(//trap)),10)*'.
+							'fuzzytime(/host/trap,60)>=trendsum(/host/item,"{$USERMACRO}:now/h")'
 				]
 			],
 			[
@@ -3453,25 +4074,34 @@ class testCalculatedFormula extends CWebTest {
 			[
 				[
 					'expected' => TEST_BAD,
-					'formula' => "max(min_foreach(/*/trap?[group=\"Servers\"],6))+avg(count_foreach(/*/trap?[tag=\"tag1\"],99h))-".
-							"bitrshift(last(/*/trap),1)/between(5,(last(//trap)),10)*fuzzytime(/host/trap,60)>=trendsum(/host/item,60m:now/h)",
-					'error' => 'Invalid parameter "/1/params": invalid first parameter in function "last".'
+					'formula' => 'max(min_foreach(/*/trap?[group="Servers"],6))+avg(count_foreach(/*/trap?[tag="tag1"],'.
+							'99h))-bitrshift(last(/*/trap),1)/between(5,(last(//trap)),10)*fuzzytime(/host/trap,60)>='.
+							'trendsum(/host/item,60m:now/h)',
+					'inline_error' => [
+						'Formula' => 'Invalid first parameter in function "last".'
+					]
 				]
 			],
 			[
 				[
 					'expected' => TEST_BAD,
-					'formula' => "min_foreach(/*/trap?[group=\"Servers\"],6)+avg(count_foreach(/*/trap?[tag=\"tag1\"],99h))-bitrshift(last(//trap),1)".
-							"/between(5,(last(//trap)),10)*fuzzytime(/host/trap,60)>=trendsum(/host/item,60m:now/h)",
-					'error' => 'Invalid parameter "/1/params": incorrect usage of function "min_foreach".'
+					'formula' => 'min_foreach(/*/trap?[group="Servers"],6)+avg(count_foreach(/*/trap?[tag="tag1"],99h))'.
+							'-bitrshift(last(//trap),1)/between(5,(last(//trap)),10)*fuzzytime(/host/trap,60)'.
+							'>=trendsum(/host/item,60m:now/h)',
+					'inline_error' => [
+						'Formula' => 'Incorrect usage of function "min_foreach".'
+					]
 				]
 			],
 			[
 				[
 					'expected' => TEST_BAD,
-					'formula' => "max(min_foreach(/*/trap?[group=\"Servers\"],6))+avg(count_foreach(/*/trap?[tag=\"tag1\"],99h))-bitrshift(last(//trap),1)".
-							"/between(5,(last(//trap)),10)*fuzzytime(/host/trap,60)=>trendsum(/host/item,60m:now/h)",
-					'error' => 'Invalid parameter "/1/params": incorrect expression starting from ">trendsum(/host/item,60m:now/h)".'
+					'formula' => 'max(min_foreach(/*/trap?[group="Servers"],6))+avg(count_foreach(/*/trap?[tag="tag1"],'.
+							'99h))-bitrshift(last(//trap),1)/between(5,(last(//trap)),10)*fuzzytime(/host/trap,60)=>'.
+							'trendsum(/host/item,60m:now/h)',
+					'inline_error' => [
+						'Formula' => 'Incorrect expression starting from ">trendsum(/host/item,60m:now/h)".'
+					]
 				]
 			],
 			// jsonpath() function
@@ -3494,21 +4124,28 @@ class testCalculatedFormula extends CWebTest {
 				[
 					'expected' => TEST_BAD,
 					'formula' => 'jsonpath(last(/Simple form test host/test-item-form4,#1:now-5m))',
-					'error' => 'Invalid parameter "/1/params": invalid number of parameters in function "jsonpath".'
+					'inline_error' => [
+						'Formula' => 'Invalid number of parameters in function "jsonpath".'
+					]
 				]
 			],
 			[
 				[
 					'expected' => TEST_BAD,
 					'formula' => 'jsonpath(last(/Simple form test host/test-item-form4,20),"$.[0].last_name")',
-					'error' => 'Invalid parameter "/1/params": invalid second parameter in function "last".'
+					'inline_error' => [
+						'Formula' => 'Invalid second parameter in function "last".'
+					]
 				]
 			],
 			[
 				[
 					'expected' => TEST_BAD,
 					'formula' => 'jsonpath(last(/Simple form test host/test-item-form4,#5-now),"$.[0].last_name","last")',
-					'error' => 'Invalid parameter "/1/params": incorrect expression starting from "jsonpath(last(/Simple form test host/test-item-form4,#5-now),"$.[0].last_name","last")".'
+					'inline_error' => [
+						'Formula' => 'Incorrect expression starting from "jsonpath(last(/Simple form test'.
+								' host/test-item-form4,#5-now),"$.[0].last_name","last")".'
+					]
 				]
 			],
 			// xmlxpath() function
@@ -3526,22 +4163,28 @@ class testCalculatedFormula extends CWebTest {
 				[
 					'expected' => TEST_BAD,
 					'formula' => 'xmlxpath(min(/Simple form test host/test-item-form4,#4:now-1m),"/zabbix_export/version/text()',
-					'error' => 'Invalid parameter "/1/params": incorrect expression starting from '.
-							'"xmlxpath(min(/Simple form test host/test-item-form4,#4:now-1m),"/zabbix_export/version/text()".'
+					'inline_error' => [
+						'Formula' => 'Incorrect expression starting from "xmlxpath(min(/Simple form test'.
+								' host/test-item-form4,#4:now-1m),"/zabbix_export/version/text()".'
+					]
 				]
 			],
 			[
 				[
 					'expected' => TEST_BAD,
 					'formula' => 'xmlxpath(last(/Simple form test host/test-item-form4,#1:now-5m))',
-					'error' => 'Invalid parameter "/1/params": invalid number of parameters in function "xmlxpath".'
+					'inline_error' => [
+						'Formula' => 'Invalid number of parameters in function "xmlxpath".'
+					]
 				]
 			],
 			[
 				[
 					'expected' => TEST_BAD,
 					'formula' => 'xmlxpath(last(/Simple form test host/test-item-form4,4),5.0)',
-					'error' => 'Invalid parameter "/1/params": invalid second parameter in function "last".'
+					'inline_error' => [
+						'Formula' => 'Invalid second parameter in function "last".'
+					]
 				]
 			]
 		];
@@ -3573,8 +4216,8 @@ class testCalculatedFormula extends CWebTest {
 		$form->submit();
 
 		if (CTestArrayHelper::get($data, 'expected', TEST_GOOD) === TEST_BAD) {
-			$title = $prototype  ? 'Cannot add item prototype' : 'Cannot add item';
-			$this->assertMessage(TEST_BAD, $title, $data['error']);
+			$this->assertInlineError($form, $data['inline_error']);
+
 			$this->assertEquals(0, CDBHelper::getCount('SELECT * FROM items WHERE key_='.zbx_dbstr($key)));
 			$this->assertEquals($old_hash, CDBHelper::getHash('SELECT * FROM items ORDER BY itemid'));
 

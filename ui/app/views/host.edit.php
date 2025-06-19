@@ -47,7 +47,7 @@ if ($host_is_discovered) {
 				(new CUrl('host_prototypes.php'))
 					->setArgument('form', 'update')
 					->setArgument('parent_discoveryid', $data['host']['discoveryRule']['itemid'])
-					->setArgument('hostid', $data['host']['hostDiscovery']['parent_hostid'])
+					->setArgument('hostid', $data['host']['discoveryData']['parent_hostid'])
 					->setArgument('context', 'host')
 			))->setAttribute('target', '_blank');
 		}
@@ -177,8 +177,8 @@ $templates_field_items[] = (new CMultiSelect([
 ]))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH);
 
 $disabled_by_lld_icon = $data['host']['status'] == HOST_STATUS_NOT_MONITORED
-		&& array_key_exists('hostDiscovery', $data['host']) && $data['host']['hostDiscovery']
-		&& $data['host']['hostDiscovery']['disable_source'] == ZBX_DISABLE_SOURCE_LLD
+		&& array_key_exists('discoveryData', $data['host']) && $data['host']['discoveryData']
+		&& $data['host']['discoveryData']['disable_source'] == ZBX_DISABLE_SOURCE_LLD
 	? makeWarningIcon(_('Disabled automatically by an LLD rule.'))
 	: null;
 

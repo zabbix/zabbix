@@ -37,7 +37,7 @@ class CExpressionParser extends CParser {
 	 *
 	 * @var string
 	 */
-	private $error = '';
+	protected $error = '';
 
 	/**
 	 * An options array.
@@ -56,7 +56,7 @@ class CExpressionParser extends CParser {
 	 *
 	 * @var array
 	 */
-	private $options = [
+	protected $options = [
 		'usermacros' => false,
 		'lldmacros' => false,
 		'collapsed_expression' => false,

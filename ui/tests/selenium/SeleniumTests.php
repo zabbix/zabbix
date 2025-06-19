@@ -42,6 +42,7 @@ require_once __DIR__.'/authentication/testUsersAuthentication.php';
 require_once __DIR__.'/authentication/testUsersAuthenticationHttp.php';
 require_once __DIR__.'/authentication/testUsersAuthenticationLdap.php';
 require_once __DIR__.'/authentication/testUsersAuthenticationSaml.php';
+require_once __DIR__.'/authentication/testUsersAuthenticationMfa.php';
 require_once __DIR__.'/authentication/testUsersPasswordComplexity.php';
 
 // Connectors.
@@ -186,6 +187,10 @@ require_once __DIR__.'/mediaTypes/testFormAdministrationMediaTypes.php';
 require_once __DIR__.'/mediaTypes/testFormAdministrationMediaTypeMessageTemplates.php';
 require_once __DIR__.'/mediaTypes/testFormAdministrationMediaTypeWebhook.php';
 require_once __DIR__.'/mediaTypes/testPageAdministrationMediaTypes.php';
+
+// MFA.
+require_once __DIR__.'/mfa/testFormTotpEnroll.php';
+require_once __DIR__.'/mfa/testFormTotpValidate.php';
 
 // Multiselects.
 require_once __DIR__.'/multiselects/testMultiselects.php';
@@ -381,6 +386,7 @@ class SeleniumTests {
 		$suite->addTestSuite('testUsersAuthenticationHttp');
 		$suite->addTestSuite('testUsersAuthenticationLdap');
 		$suite->addTestSuite('testUsersAuthenticationSaml');
+		$suite->addTestSuite('testUsersAuthenticationMfa');
 		$suite->addTestSuite('testUsersPasswordComplexity');
 
 		// Connectors.
@@ -525,6 +531,10 @@ class SeleniumTests {
 		$suite->addTestSuite('testFormAdministrationMediaTypes');
 		$suite->addTestSuite('testFormAdministrationMediaTypeWebhook');
 		$suite->addTestSuite('testPageAdministrationMediaTypes');
+
+		// MFA.
+		$suite->addTestSuite('testFormTotpEnroll');
+		$suite->addTestSuite('testFormTotpValidate');
 
 		// Multiselects.
 		$suite->addTestSuite('testMultiselects');

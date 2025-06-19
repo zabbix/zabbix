@@ -148,7 +148,9 @@ class testFormulaCalculatedItemPrototype extends testCalculatedFormula {
 				[
 					'expected' => TEST_BAD,
 					'formula' => 'bitand(last(/host/key,{#LLD}:now-24h),123)',
-					'error' => 'Invalid parameter "/1/params": invalid second parameter in function "last".'
+					'inline_error' => [
+						'Formula' => 'Invalid second parameter in function "last".'
+					]
 				]
 			],
 			[

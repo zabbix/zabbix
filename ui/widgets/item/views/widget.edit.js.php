@@ -18,7 +18,7 @@ use Widgets\Item\Widget;
 
 ?>
 
-window.widget_item_form = new class {
+window.widget_form = new class extends CWidgetForm {
 
 	#is_item_numeric = false;
 
@@ -28,7 +28,7 @@ window.widget_item_form = new class {
 	#form;
 
 	init({thresholds_colors}) {
-		this.#form = document.getElementById('widget-dialogue-form');
+		this.#form = this.getForm();
 
 		this._show_description = document.getElementById(`show_${<?= Widget::SHOW_DESCRIPTION ?>}`);
 		this._show_value = document.getElementById(`show_${<?= Widget::SHOW_VALUE ?>}`);
@@ -48,19 +48,6 @@ window.widget_item_form = new class {
 				});
 		});
 
-		const colorpickers = this.#form
-			.querySelectorAll('.<?= ZBX_STYLE_COLOR_PICKER ?> input:not([name="sparkline[color]"])');
-
-		for (const colorpicker of colorpickers) {
-			$(colorpicker).colorpicker({
-				appendTo: ".overlay-dialogue-body",
-				use_default: !colorpicker.name.includes('thresholds'),
-				onUpdate: ['up_color', 'down_color', 'updown_color'].includes(colorpicker.name)
-					? (color) => this.setIndicatorColor(colorpicker.name, color)
-					: null
-			});
-		}
-
 		const show = [this._show_description, this._show_value, this._show_time, this._show_change_indicator,
 			this._show_sparkline
 		];
@@ -73,6 +60,11 @@ window.widget_item_form = new class {
 		document.getElementById('aggregate_function').addEventListener('change', () => this.updateForm());
 		document.getElementById('history').addEventListener('change', () => this.updateForm());
 
+		for (const change_indicator of ['up_color', 'down_color', 'updown_color']) {
+			this.#form.querySelector(`.${ZBX_STYLE_COLOR_PICKER}[color-field-name="${change_indicator}"]`)
+				?.addEventListener('change', e => this.setIndicatorColor(change_indicator, e.target.color));
+		}
+
 		colorPalette.setThemeColors(thresholds_colors);
 
 		this.updateForm();
@@ -83,7 +75,8 @@ window.widget_item_form = new class {
 					this.#is_item_numeric = type !== null && this.#isItemValueTypeNumeric(type);
 					this.updateForm();
 				}
-			});
+			})
+			.finally(() => this.ready());
 	}
 
 	updateForm() {
@@ -105,7 +98,9 @@ window.widget_item_form = new class {
 			}
 		}
 
-		for (const element of document.querySelectorAll('#units, #units_pos, #units_size, #units_bold, #units_color')) {
+		for (const element of this.#form.querySelectorAll(`#units, #units_pos, #units_size, #units_bold,
+			.${ZBX_STYLE_COLOR_PICKER}[color-field-name="units_color"]`
+		)) {
 			element.disabled = !this._show_value.checked || !document.getElementById('units_show').checked;
 		}
 
@@ -133,9 +128,9 @@ window.widget_item_form = new class {
 			}
 		}
 
-		this.#form.fields['sparkline[time_period]'].disabled = !this._show_sparkline.checked;
+		this.getField('sparkline[time_period]').disabled = !this._show_sparkline.checked;
 
-		this.#form.fields.time_period.hidden = aggregate_function.value == <?= AGGREGATE_NONE ?>;
+		this.getField('time_period').hidden = aggregate_function.value == <?= AGGREGATE_NONE ?>;
 
 		const aggregate_warning_functions = [<?= AGGREGATE_AVG ?>, <?= AGGREGATE_MIN ?>, <?= AGGREGATE_MAX ?>,
 			<?= AGGREGATE_SUM ?>

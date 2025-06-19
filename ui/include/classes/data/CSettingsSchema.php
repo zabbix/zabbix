@@ -205,7 +205,7 @@ final class CSettingsSchema {
 		],
 		'hk_sessions' => [
 			'column' => 'value_str',
-			'default' => '365d',
+			'default' => '31d',
 			'length' => 32
 		],
 		'hk_trends_global' => [

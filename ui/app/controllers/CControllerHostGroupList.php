@@ -104,7 +104,7 @@ class CControllerHostGroupList extends CController {
 		$data['groups'] = API::HostGroup()->get([
 			'output' => ['groupid', 'name', 'flags'],
 			'selectHosts' => ['hostid', 'name', 'status'],
-			'selectGroupDiscoveries' => ['ts_delete', 'status'],
+			'selectDiscoveryData' => ['ts_delete', 'status'],
 			'selectDiscoveryRules' => ['itemid', 'name'],
 			'selectHostPrototypes' => ['hostid'],
 			'groupids' => $groupids,

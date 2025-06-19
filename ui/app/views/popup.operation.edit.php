@@ -162,7 +162,7 @@ array_unshift($data['mediatype_options'], ['name' => _('All available'), 'mediat
 $mediatypes = [];
 foreach ($data['mediatype_options'] as $mediatype) {
 	$mediatypes[] = (new CSelectOption($mediatype['mediatypeid'], $mediatype['name']))
-		->addClass($mediatype['status'] == MEDIA_TYPE_STATUS_DISABLED ? ZBX_STYLE_RED : null);
+		->addClass($mediatype['status'] == MEDIA_TYPE_STATUS_DISABLED ? ZBX_STYLE_COLOR_NEGATIVE : null);
 }
 
 // Operation message media type row.

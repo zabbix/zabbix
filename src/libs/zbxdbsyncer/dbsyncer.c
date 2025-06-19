@@ -28,6 +28,7 @@
 #include "zbxrtc.h"
 #include "zbx_rtc_constants.h"
 #include "zbxipcservice.h"
+#include "zbxlog.h"
 
 static sigset_t			orig_mask;
 
@@ -160,7 +161,10 @@ ZBX_THREAD_ENTRY(zbx_dbsyncer_thread, args)
 		zabbix_report_log_level_change();
 
 		if (0 != sleeptime)
+		{
+			zbx_handle_log();
 			zbx_setproctitle("%s #%d [%s, syncing history]", process_name, process_num, stats);
+		}
 
 		/* clear timer trigger queue to avoid processing time triggers at exit */
 		if (!ZBX_IS_RUNNING())

@@ -1,0 +1,37 @@
+# Only generate mocks for packages listed below
+all: false
+
+# Output mocks to a `mock/` subdir inside the interface's directory
+dir: '{{.InterfaceDir}}/mocks'
+
+# Use 'mock<original package name>' as the generated package name
+pkgname: 'mock{{.SrcPackageName}}'
+
+# Name the generated struct like Mock{MyInterface}
+structname: '{{.InterfaceName}}'
+
+# One file per interface, named after the interface
+filename: 'mock_{{.InterfaceName}}.go'
+
+# Custom file heading – this text will be prepended to each generated file.
+template-data:
+  boilerplate-file: "./fileheader.txt"
+
+# Use the built-in Testify mocking template
+template: testify
+
+# Auto-format generated files using goimports
+formatter: goimports
+
+# Overwrite files without asking
+force-file-write: true
+
+# Only generate for specific packages
+packages:
+  golang.zabbix.com/agent2/internal/agent/scheduler:
+      interfaces: 
+        Scheduler:
+      
+  golang.zabbix.com/agent2/pkg/zbxcomms:
+      interfaces: 
+        ConnectionInterface:

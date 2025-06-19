@@ -31,7 +31,7 @@ class CFieldTextBox extends CField {
 			return null;
 		}
 
-		return this._field.value;
+		return this._field.value.replace(/\r?\n/g, '\r\n');
 	}
 
 	getValueTrimmed() {

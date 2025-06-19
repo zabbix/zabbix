@@ -648,7 +648,8 @@ switch ($data['popup_type']) {
 				}
 				else {
 					$host_names = array_column($graph['hosts'], 'name', 'hostid');
-					$host_name = $host_names[$graph['discoveryRule']['hostid']];
+					$parent_lld = $graph['discoveryRule'] ?: $graph['discoveryRulePrototype'];
+					$host_name = $host_names[$parent_lld['hostid']];
 				}
 
 				$graph_name = $host_name.NAME_DELIMITER.$graph['name'];

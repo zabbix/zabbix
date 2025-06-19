@@ -330,7 +330,7 @@ static zbx_uint64_t	add_discovered_host(const zbx_db_event *event, int *status, 
 						" where h.hostid=i.hostid"
 							" and i.ip=ds.ip"
 							" and h.status in (%d,%d)"
-							" and h.flags<>%d"
+							" and h.flags&%d=0"
 							" and h.monitored_by=%u"
 							" and ds.dhostid=" ZBX_FS_UI64,
 							HOST_STATUS_MONITORED, HOST_STATUS_NOT_MONITORED,
@@ -606,7 +606,7 @@ static zbx_uint64_t	add_discovered_host(const zbx_db_event *event, int *status, 
 					"select hostid,proxyid,name,status,proxy_groupid,monitored_by"
 					" from hosts"
 					" where host='%s'"
-						" and flags<>%d"
+						" and flags&%d=0"
 						" and status in (%d,%d)"
 					" order by hostid",
 					host_esc, ZBX_FLAG_DISCOVERY_PROTOTYPE,
@@ -1013,7 +1013,7 @@ void	op_host_del(const zbx_db_event *event)
 	zbx_vector_str_create(&hostnames);
 	zbx_vector_str_append(&hostnames, zbx_strdup(NULL, hostname));
 
-	zbx_db_delete_hosts_with_prototypes(&hostids, &hostnames, zbx_map_db_event_to_audit_context(event));
+	zbx_db_delete_hosts(&hostids, &hostnames, zbx_map_db_event_to_audit_context(event));
 	hostname_esc = zbx_db_dyn_escape_string(hostname);
 	zbx_db_execute("delete from autoreg_host where host='%s'", hostname_esc);
 
@@ -1395,13 +1395,25 @@ void	op_add_del_tags(const zbx_db_event *event, zbx_config_t *cfg, zbx_vector_ui
 		discovered_host_tags_add_del(ZBX_OP_HOST_TAGS_ADD, new_optagids, &host_tags);
 
 	if (0 != del_optagids->values_num)
+	{
+		/* If we need to delete tags, and there are no new tags, then add_discovered_host() was not run */
+		/* so audit entry was not created for the host. That is why we need to manually create it here. */
+
+		if (0 == new_optagids->values_num)
+		{
+			zbx_audit_host_create_entry(zbx_map_db_event_to_audit_context(event), ZBX_AUDIT_ACTION_UPDATE,
+					hostid, hostname);
+		}
+
 		discovered_host_tags_add_del(ZBX_OP_HOST_TAGS_DEL, del_optagids, &host_tags);
+	}
 
 	discovered_host_tags_save(hostid, &host_tags, event);
 
 	zbx_vector_db_tag_ptr_clear_ext(&host_tags, zbx_db_tag_free);
 	zbx_vector_db_tag_ptr_destroy(&host_tags);
 out:
+	zbx_free(hostname);
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 }
 

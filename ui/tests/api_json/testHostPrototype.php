@@ -654,10 +654,10 @@ class testHostPrototype extends CAPITest {
 					);
 				}
 
-				$db_result = DBSelect('SELECT parent_itemid FROM host_discovery WHERE hostid='.zbx_dbstr($id));
+				$db_result = DBSelect('SELECT lldruleid FROM host_discovery WHERE hostid='.zbx_dbstr($id));
 				$db_row = DBFetch($db_result);
 
-				$this->assertEquals($request[$key]['ruleid'], $db_row['parent_itemid'],
+				$this->assertEquals($request[$key]['ruleid'], $db_row['lldruleid'],
 					'Failed check for link with discovery rule'
 				);
 

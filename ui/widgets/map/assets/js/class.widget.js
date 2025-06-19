@@ -82,6 +82,7 @@ class CWidgetMap extends CWidget {
 			.then(response => {
 				if (response.mapid != 0) {
 					this.#map_svg.selected_element_id = this.#selected_element_id;
+					response.caller = 'widget';
 					this.#map_svg.update(response);
 				}
 				else {
@@ -156,7 +157,8 @@ class CWidgetMap extends CWidget {
 	}
 
 	onReferredUpdate() {
-		if (Object.keys(this.#map_svg.elements).length === 0 || this.#selected_element_id !== null) {
+		if (this.#map_svg === null || Object.keys(this.#map_svg.elements).length === 0
+				|| this.#selected_element_id !== null) {
 			return;
 		}
 
@@ -200,7 +202,7 @@ class CWidgetMap extends CWidget {
 	}
 
 	#activateContentEvents() {
-		this.#map_svg?.container.addEventListener(this.#map_svg.EVENT_ELEMENT_SELECT, this.#event_handlers.select);
+		this.#map_svg?.container.addEventListener(SVGMap.EVENT_ELEMENT_SELECT, this.#event_handlers.select);
 
 		this._target.querySelectorAll('.js-previous-map').forEach((link) => {
 			link.addEventListener('click', this.#event_handlers.back);
@@ -208,7 +210,7 @@ class CWidgetMap extends CWidget {
 	}
 
 	#deactivateContentEvents() {
-		this.#map_svg?.container.removeEventListener(this.#map_svg.EVENT_ELEMENT_SELECT, this.#event_handlers.select);
+		this.#map_svg?.container.removeEventListener(SVGMap.EVENT_ELEMENT_SELECT, this.#event_handlers.select);
 
 		this._target.querySelectorAll('.js-previous-map').forEach((link) => {
 			link.removeEventListener('click', this.#event_handlers.back);

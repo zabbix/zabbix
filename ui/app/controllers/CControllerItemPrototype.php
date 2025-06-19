@@ -100,12 +100,11 @@ abstract class CControllerItemPrototype extends CController {
 		];
 	}
 
-	/**
-	 * Additional validation for user input consumed by create and update actions.
-	 *
-	 * @return bool
-	 */
-	protected function validateInputEx(): bool {
+	protected function validateInputExtended(): bool {
+		if (!$this->validateInputPreprocessing($this->getInput('preprocessing', []))) {
+			return false;
+		}
+
 		$ret = true;
 		$type = $this->getInput('type', -1);
 		$fields = array_fill_keys(['name', 'key'], '');
@@ -155,6 +154,68 @@ abstract class CControllerItemPrototype extends CController {
 		return $ret && $this->validateReferredObjects();
 	}
 
+	protected function validateInputPreprocessing(array $steps): bool {
+		$has_delta_step = false;
+		$has_any_error_step = false;
+		$has_discard_value_step = false;
+		$has_prometheus_step = false;
+
+		foreach ($steps as $index => $step) {
+			switch ($step['type']) {
+				case ZBX_PREPROC_DELTA_SPEED:
+				case ZBX_PREPROC_DELTA_VALUE:
+					$has_delta_step && $this->addFormError("/preprocessing/$index/type",
+						_('One "Change" step allowed per item.'), CFormValidator::ERROR_LEVEL_UNIQ
+					);
+					$has_delta_step = true;
+					break;
+
+				case ZBX_PREPROC_THROTTLE_VALUE:
+				case ZBX_PREPROC_THROTTLE_TIMED_VALUE:
+					$has_discard_value_step && $this->addFormError("/preprocessing/$index/type",
+						_('One "Throttling" step allowed per item.'), CFormValidator::ERROR_LEVEL_UNIQ
+					);
+					$has_discard_value_step = true;
+					break;
+
+				case ZBX_PREPROC_PROMETHEUS_PATTERN:
+				case ZBX_PREPROC_PROMETHEUS_TO_JSON:
+					$has_prometheus_step && $this->addFormError("/preprocessing/$index/type",
+						_('One "Prometheus" step allowed per item.'), CFormValidator::ERROR_LEVEL_UNIQ
+					);
+					$has_prometheus_step = true;
+					break;
+
+				case ZBX_PREPROC_VALIDATE_NOT_SUPPORTED:
+					if ($step['params_0_not_supported'] == ZBX_PREPROC_MATCH_ERROR_ANY) {
+						$has_any_error_step && $this->addFormError("/preprocessing/$index/type",
+							_('Preprocessing step with such Name and Parameters combination already exists.'),
+							CFormValidator::ERROR_LEVEL_UNIQ
+						);
+						$has_any_error_step = true;
+					}
+					break;
+
+				case ZBX_PREPROC_VALIDATE_RANGE:
+					$min = $step['params_0'];
+					$max = $step['params_1'];
+
+					if ($min !== '' && $max !== '') {
+						$has_macro = substr($min, 0, 1) === '{' || substr($max, 0, 1) === '{';
+
+						if (!$has_macro && floatval($min) >= floatval($max)) {
+							$this->addFormError("/preprocessing/$index/params_1",
+								_('Cannot be less than or equal to "Min".'), CFormValidator::ERROR_LEVEL_PRIMARY
+							);
+						}
+					}
+					break;
+			}
+		}
+
+		return !$this->getValidationError();
+	}
+
 	/**
 	 * Validate for referred objects exists and user have access.
 	 *
@@ -164,24 +225,33 @@ abstract class CControllerItemPrototype extends CController {
 		$ret = true;
 
 		if ($this->hasInput('itemid')) {
-			$ret = (bool) API::ItemPrototype()->get([
+			$options = [
 				'output' => ['itemid'],
 				'itemids' => [$this->getInput('itemid')],
 				'editable' => true
-			]);
+			];
+
+			if ($this->hasInput('parent_discoveryid')) {
+				$options['discoveryids'] = $this->getInput('parent_discoveryid');
+			}
+
+			$ret = (bool) API::ItemPrototype()->get($options);
 		}
 
 		if ($ret && $this->hasInput('parent_discoveryid')) {
-			$lld = API::DiscoveryRule()->get([
+			$options = [
 				'output' => ['itemid'],
 				'selectHosts' => ['status'],
 				'itemids' => [$this->getInput('parent_discoveryid')]
-			]);
-			$ret = (bool) $lld;
+			];
+
+			$parent_discovery = API::DiscoveryRule()->get($options) ?: API::DiscoveryRulePrototype()->get($options);
+
+			$ret = (bool) $parent_discovery;
 
 			if ($ret) {
 				$context = $this->getInput('context');
-				$is_template_lld = $lld[0]['hosts'][0]['status'] == HOST_STATUS_TEMPLATE;
+				$is_template_lld = $parent_discovery[0]['hosts'][0]['status'] == HOST_STATUS_TEMPLATE;
 				$ret = ($context === 'template' && $is_template_lld) || ($context === 'host' && !$is_template_lld);
 			}
 		}

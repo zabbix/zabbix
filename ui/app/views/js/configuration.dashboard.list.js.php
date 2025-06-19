@@ -36,7 +36,7 @@
 				callback: ({data, event}) => {
 					uncheckTableRows(this.checkbox_hash);
 
-					if (data.submit.success.action === 'delete') {
+					if (data.submit.success?.action === 'delete') {
 						const url = new URL('zabbix.php', location.href);
 
 						url.searchParams.set('action', 'template.list');

@@ -145,6 +145,14 @@
 		},
 
 		initEvents() {
+			document.querySelector('.js-host-wizard').addEventListener('click', () => {
+				ZABBIX.PopupManager.open('host.wizard.edit');
+			});
+
+			document.querySelector('.js-create-host').addEventListener('click', () => {
+				ZABBIX.PopupManager.open('host.edit', {groupids: this.applied_filter_groupids});
+			});
+
 			const form = document.forms['hosts'];
 
 			form.addEventListener('click', e => {
@@ -192,10 +200,6 @@
 			form.querySelector('.js-massdelete-host').addEventListener('click', e => {
 				this.massDeleteHosts(e.target);
 			});
-
-			document.querySelector('.js-create-host').addEventListener('click', () => {
-				ZABBIX.PopupManager.open('host.edit', {groupids: this.applied_filter_groupids});
-			});
 		},
 
 		initPopupListeners() {
@@ -205,6 +209,25 @@
 					event: CPopupManagerEvent.EVENT_SUBMIT
 				},
 				callback: () => uncheckTableRows('hosts')
+			});
+
+			ZABBIX.EventHub.subscribe({
+				require: {
+					context: CPopupManager.EVENT_CONTEXT,
+					event: CPopupManagerEvent.EVENT_SUBMIT,
+					action: 'host.wizard.edit'
+				},
+				callback: ({data, event}) => {
+					if (data.submit.redirect_latest) {
+						const url = new URL('zabbix.php', location.href);
+
+						url.searchParams.set('action', 'latest.view');
+						url.searchParams.set('hostids[]', data.submit.hostid);
+						url.searchParams.set('filter_set', '1');
+
+						event.setRedirectUrl(url.href);
+					}
+				}
 			});
 		},
 

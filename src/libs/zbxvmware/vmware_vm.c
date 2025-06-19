@@ -60,8 +60,6 @@ static zbx_vmware_propmap_t	vm_propmap[] = {
 	{"layoutEx</ns0:pathSet><ns0:pathSet>snapshot",		/* ZBX_VMWARE_VMPROP_SNAPSHOT */
 			ZBX_XPATH_PROP_OBJECT(ZBX_VMWARE_SOAP_VM) ZBX_XPATH_PROP_NAME_NODE("snapshot"),
 			vmware_service_get_vm_snapshot, 0},
-	{"datastore", ZBX_XPATH_PROP_OBJECT(ZBX_VMWARE_SOAP_VM)/* ZBX_VMWARE_VMPROP_DATASTOREID */
-			ZBX_XPATH_PROP_NAME_NODE("datastore") ZBX_XPATH_LN("ManagedObjectReference"), NULL, 0},
 	ZBX_VMPROPMAP("summary.runtime.consolidationNeeded"),	/* ZBX_VMWARE_VMPROP_CONSOLIDATION_NEEDED */
 	ZBX_VMPROPMAP("resourcePool"),				/* ZBX_VMWARE_VMPROP_RESOURCEPOOL */
 	ZBX_VMPROPMAP("guest.toolsVersion"),			/* ZBX_VMWARE_VMPROP_TOOLS_VERSION */
@@ -102,6 +100,9 @@ void	vmware_vm_shared_free(zbx_vmware_vm_t *vm)
 
 	zbx_vector_str_clear_ext(&vm->alarm_ids, vmware_shared_strfree);
 	zbx_vector_str_destroy(&vm->alarm_ids);
+
+	zbx_vector_str_clear_ext(&vm->ds_ids, vmware_shared_strfree);
+	zbx_vector_str_destroy(&vm->ds_ids);
 
 	if (NULL != vm->uuid)
 		vmware_shared_strfree(vm->uuid);
@@ -176,6 +177,9 @@ void	vmware_vm_free(zbx_vmware_vm_t *vm)
 
 	zbx_vector_str_clear_ext(&vm->alarm_ids, zbx_str_free);
 	zbx_vector_str_destroy(&vm->alarm_ids);
+
+	zbx_vector_str_clear_ext(&vm->ds_ids, zbx_str_free);
+	zbx_vector_str_destroy(&vm->ds_ids);
 
 	zbx_free(vm->uuid);
 	zbx_free(vm->id);
@@ -627,6 +631,7 @@ static int	vmware_service_get_vm_data(zbx_vmware_service_t *service, CURL *easyh
 					"<ns0:pathSet>availableField</ns0:pathSet>"	\
 					"<ns0:pathSet>triggeredAlarmState</ns0:pathSet>"\
 					"<ns0:pathSet>guest.net</ns0:pathSet>"		\
+					"<ns0:pathSet>datastore</ns0:pathSet>"		\
 					"%s"						\
 					"%s"						\
 				"</ns0:propSet>"					\
@@ -1052,6 +1057,9 @@ zbx_vmware_vm_t	*vmware_service_create_vm(zbx_vmware_service_t *service, CURL *e
 	zbx_vector_vmware_fs_ptr_create(&vm->file_systems);
 	zbx_vector_vmware_custom_attr_ptr_create(&vm->custom_attrs);
 	zbx_vector_cq_value_ptr_create(&cqvs);
+	zbx_vector_str_create(&vm->alarm_ids);
+	zbx_vector_str_create(&vm->ds_ids);
+
 	cq_prop = vmware_cq_prop_soap_request(cq_values, ZBX_VMWARE_SOAP_VM, id, &cqvs);
 	ret = vmware_service_get_vm_data(service, easyhandle, id, vm_propmap, ZBX_VMWARE_VMPROPS_NUM, cq_prop,
 			&details, error);
@@ -1115,11 +1123,12 @@ zbx_vmware_vm_t	*vmware_service_create_vm(zbx_vmware_service_t *service, CURL *e
 	vmware_vm_get_disk_devices(vm, details);
 	vmware_vm_get_file_systems(vm, details);
 	vmware_vm_get_custom_attrs(vm, details);
+	zbx_xml_read_values(details, ZBX_XPATH_PROP_OBJECT(ZBX_VMWARE_SOAP_VM) ZBX_XPATH_PROP_NAME_NODE("datastore")
+			ZBX_XPATH_LN("ManagedObjectReference"), &vm->ds_ids);
 
 	if (0 != cqvs.values_num)
 		vmware_service_cq_prop_value(__func__, details, &cqvs);
 
-	zbx_vector_str_create(&vm->alarm_ids);
 	ret = vmware_service_get_alarms_data(__func__, service, easyhandle, details, NULL, &vm->alarm_ids, alarms_data,
 			error);
 out:

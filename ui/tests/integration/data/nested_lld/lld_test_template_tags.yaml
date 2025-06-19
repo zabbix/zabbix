@@ -1,0 +1,39 @@
+zabbix_export:
+  version: '7.4'
+  template_groups:
+    - uuid: d37f71c7e3f7469bab645852a69a2018
+      name: 'Templates/Video surveillance'
+  templates:
+    - uuid: 89c4cef3a76d41f9899f93ab2191b136
+      template: lld_test_template_tags
+      name: lld_test_template_tags
+      groups:
+        - name: 'Templates/Video surveillance'
+      discovery_rules:
+        - uuid: b2cd286bdd0c498db6618d1396ef244e
+          name: main_drule
+          type: TRAP
+          key: main_drule
+        - uuid: 578f53af6ebd4274b54b90e75078eafe
+          name: 'nested[{#PARENTNAME}]'
+          type: NESTED
+          key: 'nested[{#PARENTNAME}]'
+          item_prototypes:
+            - uuid: 3ae9329570d34f8382bbef190d0b5262
+              name: 'item[{#PARENTNAME},{#NAME}]'
+              type: TRAP
+              key: 'item[{#PARENTNAME},{#NAME}]'
+              trigger_prototypes:
+                - uuid: f2470989e05545e9a8767ca66c5b42ab
+                  expression: 'last(/lld_test_template_tags/item[{#PARENTNAME},{#NAME}])>0'
+                  name: 'tagtrig[{#PARENTNAME},{#NAME}]'
+                  priority: WARNING
+          parent_discovery_rule:
+            key: main_drule
+          preprocessing:
+            - type: JSONPATH
+              parameters:
+                - $.nested
+      tags:
+        - tag: xxx
+          value: yyy

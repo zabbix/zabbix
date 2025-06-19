@@ -310,7 +310,7 @@ static int	rw_begin_report(zbx_ipc_message_t *msg, zbx_alerter_dispatch_t *dispa
 	report_destroy_params(&params);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s report_size:" ZBX_FS_SIZE_T, __func__, zbx_result_string(ret),
-			report_size);
+			(zbx_fs_size_t)report_size);
 
 	return ret;
 }

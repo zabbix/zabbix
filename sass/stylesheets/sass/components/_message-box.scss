@@ -151,6 +151,14 @@ output {
 		}
 	}
 
+	&.msg-info {
+		border-color: $msg-info-color;
+
+		&::before {
+			content: $zi-circle-info-filled;
+		}
+	}
+
 	&.msg-warning {
 		border-color: $msg-warning-color;
 

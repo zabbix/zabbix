@@ -516,17 +516,18 @@ class CMacrosResolver extends CMacrosResolverGeneral {
 				// Selecting items.
 				if ($itemids) {
 					if ($options['html']) {
-						$sql = 'SELECT i.itemid,i.hostid,i.key_,i.type,i.flags,i.status,ir.state,id.parent_itemid'.
+						$sql = 'SELECT i.itemid,i.hostid,i.key_,i.type,i.flags,i.status,ir.state,id.lldruleid'.
 							' FROM items i'.
 								' LEFT JOIN item_rtdata ir ON i.itemid=ir.itemid'.
 								' LEFT JOIN item_discovery id ON i.itemid=id.itemid'.
-							' WHERE '.dbConditionInt('i.itemid', array_keys($itemids));
+							' WHERE '.dbConditionId('i.itemid', array_keys($itemids));
 					}
 					else {
 						$sql = 'SELECT i.itemid,i.hostid,i.key_'.
 							' FROM items i'.
-							' WHERE '.dbConditionInt('i.itemid', array_keys($itemids));
+							' WHERE '.dbConditionId('i.itemid', array_keys($itemids));
 					}
+
 					$result = DBselect($sql);
 
 					while ($row = DBfetch($result)) {
@@ -571,12 +572,13 @@ class CMacrosResolver extends CMacrosResolverGeneral {
 					$function['hostid'] = $item['hostid'];
 					$function['host'] = $host['host'];
 					$function['key_'] = $item['key_'];
+
 					if ($options['html']) {
 						$function['type'] = $item['type'];
 						$function['flags'] = $item['flags'];
 						$function['status'] = $item['status'];
 						$function['state'] = $item['state'];
-						$function['parent_itemid'] = $item['parent_itemid'];
+						$function['lldruleid'] = $item['lldruleid'];
 					}
 				}
 				unset($function);
@@ -598,13 +600,13 @@ class CMacrosResolver extends CMacrosResolverGeneral {
 								if ($function['type'] == ITEM_TYPE_HTTPTEST) {
 									$link = (new CSpan('/'.$function['host'].'/'.$function['key_']))->addClass($style);
 								}
-								elseif ($function['flags'] == ZBX_FLAG_DISCOVERY_PROTOTYPE) {
+								elseif ($function['flags'] & ZBX_FLAG_DISCOVERY_PROTOTYPE) {
 									$item_url = (new CUrl('zabbix.php'))
 										->setArgument('action', 'popup')
 										->setArgument('popup', 'item.prototype.edit')
 										->setArgument('context', $options['context'])
 										->setArgument('itemid', $function['itemid'])
-										->setArgument('parent_discoveryid', $function['parent_itemid'])
+										->setArgument('parent_discoveryid', $function['lldruleid'])
 										->getUrl();
 
 									$link = CWebUser::checkAccess(CRoleHelper::UI_CONFIGURATION_HOSTS)

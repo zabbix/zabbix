@@ -17,8 +17,36 @@ section {
 			color: lighten($font-color, 15%);
 		}
 
-		.section-toggle {
+		.toggle {
 			max-height: 24px;
+
+			padding: 0 5px 0 10px;
+			border: none;
+			background-color: transparent;
+
+			&::before {
+				margin-right: 8px;
+				color: $btn-icon-color;
+			}
+
+			&:hover {
+				&::before {
+					color: $btn-icon-hover-color;
+				}
+			}
+
+			&:active,
+			&:focus {
+				&::before {
+					color: $btn-icon-focus-color;
+				}
+			}
+
+			h4 {
+				padding: 0;
+				font-weight: normal;
+				color: $font-color;
+			}
 		}
 	}
 
@@ -32,7 +60,7 @@ section {
 	&.collapsed {
 		.section-body,
 		.section-foot {
-			display: none;
+			display: none !important;
 		}
 	}
 

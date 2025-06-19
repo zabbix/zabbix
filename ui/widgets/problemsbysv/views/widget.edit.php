@@ -76,5 +76,5 @@ $groupids = array_key_exists('groupids', $data['fields'])
 		new CWidgetFieldCheckBoxView($data['fields']['show_timeline'])
 	)
 	->includeJsFile('widget.edit.js.php')
-	->addJavaScript('widget_problemsbysv_form.init();')
+	->initFormJs('widget_form.init();')
 	->show();

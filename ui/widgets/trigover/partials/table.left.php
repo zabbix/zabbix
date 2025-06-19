@@ -26,9 +26,7 @@ $table = (new CTableInfo())->setHeadingColumn(0);
 $header[] = $data['is_template_dashboard'] ? _('Host') : _('Hosts');
 
 foreach ($data['triggers_by_name'] as $trigname => $host_to_trig) {
-	$header[] = (new CSpan($trigname))
-		->addClass(ZBX_STYLE_TEXT_VERTICAL)
-		->setTitle($trigname);
+	$header[] = (new CVertical($trigname))->setTitle($trigname);
 }
 
 $table->setHeader($header);

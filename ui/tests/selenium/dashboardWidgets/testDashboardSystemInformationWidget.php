@@ -246,6 +246,7 @@ class testDashboardSystemInformationWidget extends testSystemInformation {
 			}
 			$form->fill($widget_data['fields']);
 			$form->submit();
+			COverlayDialogElement::ensureNotPresent();
 		}
 		// Save the dashboard and check info displayed by the widgets.
 		$dashboard->save();
@@ -292,6 +293,7 @@ class testDashboardSystemInformationWidget extends testSystemInformation {
 			if ($action === 'update' && CTestArrayHelper::get($widget_data, 'not_last')) {
 				$this->query('xpath://span[@title='.zbx_dbstr($page_name).']')->waitUntilClickable()->one()->click();
 			}
+			$dashboard->waitUntilReady();
 		}
 	}
 }

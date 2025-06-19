@@ -53,12 +53,14 @@ class CWidgetFieldItemGroupingView extends CWidgetFieldView {
 
 	public function getJavaScript(): string {
 		return '
-			document.forms["'.$this->form_name.'"].fields["'.$this->field->getName().'"] =
-				new CWidgetFieldItemGrouping('.json_encode([
-				'field_name' => $this->field->getName(),
-				'field_value' => $this->field->getValue(),
-				'max_rows' => CWidgetFieldItemGrouping::MAX_ROWS
-			]).');
+			CWidgetForm.addField(
+				new ItemNavigator_CWidgetFieldItemGrouping('.json_encode([
+					'name' => $this->field->getName(),
+					'form_name' => $this->form_name,
+					'value' => $this->field->getValue(),
+					'max_rows' => CWidgetFieldItemGrouping::MAX_ROWS
+				]).')
+			);
 		';
 	}
 

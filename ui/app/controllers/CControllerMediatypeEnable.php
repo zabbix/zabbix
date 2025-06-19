@@ -53,6 +53,7 @@ class CControllerMediatypeEnable extends CController {
 			'filter' => [
 				'type' => MEDIA_TYPE_EMAIL,
 				'provider' => [CMediatypeHelper::EMAIL_PROVIDER_GMAIL, CMediatypeHelper::EMAIL_PROVIDER_OFFICE365],
+				'smtp_authentication' => SMTP_AUTHENTICATION_PASSWORD,
 				'status' => MEDIA_TYPE_STATUS_DISABLED
 			],
 			'preservekeys' => true

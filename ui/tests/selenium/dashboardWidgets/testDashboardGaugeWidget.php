@@ -210,9 +210,9 @@ class testDashboardGaugeWidget extends testWidgets {
 			'Max' => ['value' => 100, 'maxlength' => 255, 'enabled' => true, 'visible' => true],
 
 			// Colors.
-			'xpath:.//input[@id="value_arc_color"]/..' => ['color' => '', 'enabled' => true, 'visible' => true],
-			'xpath:.//input[@id="empty_color"]/..' => ['color' => '', 'enabled' => true, 'visible' => true],
-			'xpath:.//input[@id="bg_color"]/..' => ['color' => '', 'enabled' => true, 'visible' => true],
+			self::PATH_TO_COLOR_PICKER.'"value_arc_color"]' => ['color' => '', 'enabled' => true, 'visible' => true],
+			self::PATH_TO_COLOR_PICKER.'"empty_color"]' => ['color' => '', 'enabled' => true, 'visible' => true],
+			self::PATH_TO_COLOR_PICKER.'"bg_color"]' => ['color' => '', 'enabled' => true, 'visible' => true],
 
 			// Show.
 			'id:show_1' => ['value' => true, 'enabled' => true, 'visible' => true], // Show Description.
@@ -228,13 +228,13 @@ class testDashboardGaugeWidget extends testWidgets {
 			'id:desc_size' => ['value' => '15', 'maxlength' => 3, 'enabled' => true, 'visible' => false],
 			'id:desc_v_pos' => ['value' => 'Bottom', 'enabled' => true, 'labels' => ['Top', 'Bottom'], 'visible' => false],
 			'id:desc_bold' => ['value' => false, 'enabled' => true, 'visible' => false],
-			'xpath:.//input[@id="desc_color"]/..' =>  ['color' => '', 'enabled' => true, 'visible' => false],
+			self::PATH_TO_COLOR_PICKER.'"desc_color"]' =>  ['color' => '', 'enabled' => true, 'visible' => false],
 
 			// Value.
 			'id:decimal_places' => ['value' => 2, 'maxlength' => 2, 'enabled' => true, 'visible' => false],
 			'id:value_bold' => ['value' => false, 'enabled' => true, 'visible' => false],
 			'id:value_size' => ['value' => 25, 'maxlength' => 3, 'enabled' => true, 'visible' => false],
-			'xpath:.//input[@id="value_color"]/..' => ['color' => '', 'enabled' => true, 'visible' => false],
+			self::PATH_TO_COLOR_PICKER.'"value_color"]' => ['color' => '', 'enabled' => true, 'visible' => false],
 
 			// Value arc.
 			'id:value_arc_size' => ['value' => 20, 'maxlength' => 3, 'enabled' => true, 'visible' => false],
@@ -245,10 +245,10 @@ class testDashboardGaugeWidget extends testWidgets {
 			'id:units_size' => ['value' => 25, 'maxlength' => 3, 'enabled' => true, 'visible' => false],
 			'id:units_pos' => ['value' => 'After value', 'enabled' => true, 'visible' => false],
 			'id:units_bold' => ['value' => false, 'enabled' => true, 'visible' => false],
-			'xpath:.//input[@id="units_color"]/..'=> ['color' => '', 'enabled' => true, 'visible' => false],
+			self::PATH_TO_COLOR_PICKER.'"units_color"]'=> ['color' => '', 'enabled' => true, 'visible' => false],
 
 			// Needle.
-			'xpath:.//input[@id="needle_color"]/..' => ['color' => '', 'enabled' => false, 'visible' => false],
+			self::PATH_TO_COLOR_PICKER.'"needle_color"]' => ['color' => '', 'enabled' => false, 'visible' => false],
 
 			// Scale.
 			'id:scale_show_units' => ['value' => true, 'enabled' => true, 'visible' => false],
@@ -292,7 +292,7 @@ class testDashboardGaugeWidget extends testWidgets {
 			}
 
 			// Show Needle is unchecked and Needle color remains invisible by default.
-			if ($attributes['visible'] === false && $label !== 'xpath:.//input[@id="needle_color"]/..') {
+			if ($attributes['visible'] === false && $label !== self::PATH_TO_COLOR_PICKER.'"needle_color"]') {
 				$not_visible[] = $label;
 			}
 		}
@@ -335,7 +335,7 @@ class testDashboardGaugeWidget extends testWidgets {
 		$threshold_input ='id:thresholds_0_threshold';
 
 		$inputs = [
-			'xpath:.//input[@id="thresholds_0_color"]/..',
+			self::PATH_TO_COLOR_PICKER.'"thresholds[0][color]"]',
 			$threshold_input,
 			'button:Add',
 			'button:Remove'
@@ -381,7 +381,7 @@ class testDashboardGaugeWidget extends testWidgets {
 						'id:units_size',
 						'id:units_pos',
 						'id:units_bold',
-						'xpath:.//input[@id="units_color"]/..',
+						self::PATH_TO_COLOR_PICKER.'"units_color"]',
 						'id:scale_show_units'
 					]
 				]
@@ -394,7 +394,7 @@ class testDashboardGaugeWidget extends testWidgets {
 							'id:description',
 							'id:desc_size', 'id:desc_v_pos',
 							'id:desc_bold',
-							'xpath:.//input[@id="desc_color"]/..'
+							self::PATH_TO_COLOR_PICKER.'"desc_color"]'
 						]
 					]
 			],
@@ -405,19 +405,19 @@ class testDashboardGaugeWidget extends testWidgets {
 						'id:decimal_places',
 						'id:value_bold',
 						'id:value_size',
-						'xpath:.//input[@id="value_color"]/..',
+						self::PATH_TO_COLOR_PICKER.'"value_color"]',
 						'id:units_show',
 						'id:units',
 						'id:units_size',
 						'id:units_pos', 'id:units_bold',
-						'xpath:.//input[@id="value_color"]/..'
+						self::PATH_TO_COLOR_PICKER.'"value_color"]'
 					]
 				]
 			],
 			'id:show_3' => [ // Show Needle.
 				'status' => true,
 				'depending' => [
-					'visible' => ['xpath:.//input[@id="needle_color"]/..']
+					'visible' => [self::PATH_TO_COLOR_PICKER.'"needle_color"]']
 				]
 			],
 			'id:show_4' => [ // Show Scale.
@@ -669,9 +669,9 @@ class testDashboardGaugeWidget extends testWidgets {
 					],
 					'error' => [
 						'Invalid parameter "Min": a number is expected.',
-						'Invalid parameter "Max": a number is expected.',
-						'Invalid parameter "Thresholds/1/color": a hexadecimal colour code (6 symbols) is expected.'
-					]
+						'Invalid parameter "Max": a number is expected.'
+					],
+					'invalid_color' => true
 				]
 			],
 			// #8 2-bytes special characters.
@@ -794,32 +794,32 @@ class testDashboardGaugeWidget extends testWidgets {
 			[
 				[
 					'fields' => [
-						'Name' => '😁🙂𒀐',
+						'Name' => '😁🙂🌤',
 						'Item' => self::GAUGE_ITEM,
 						'Min' => 99,
 						'Max' => 88888,
-						'xpath:.//input[@id="value_arc_color"]/..' => '64B5F6',
-						'xpath:.//input[@id="empty_color"]/..' => 'FFBF00',
-						'xpath:.//input[@id="bg_color"]/..' => 'BA68C8',
+						self::PATH_TO_COLOR_PICKER.'"value_arc_color"]' => '64B5F6',
+						self::PATH_TO_COLOR_PICKER.'"empty_color"]' => 'FFBF00',
+						self::PATH_TO_COLOR_PICKER.'"bg_color"]' => 'BA68C8',
 						'Angle' => '270°',
-						'id:description' => '𒀐 New test Description 😁🙂😁🙂',
+						'id:description' => '🌤 New test Description 😁🙂😁🙂',
 						'id:desc_size' => 30,
 						'id:desc_bold' => true,
 						'id:desc_v_pos' => 'Top',
-						'xpath:.//input[@id="desc_color"]/..' => 'FFB300',
+						self::PATH_TO_COLOR_PICKER.'"desc_color"]' => 'FFB300',
 						'id:decimal_places' => 10,
 						'id:value_size' => 50,
 						'id:value_bold' => true,
-						'xpath:.//input[@id="value_color"]/..' => '283593',
+						self::PATH_TO_COLOR_PICKER.'"value_color"]' => '283593',
 						'id:show_5' => true, // Show Value arc.
 						'id:value_arc_size' => 12,
-						'id:units' => 'Bytes 𒀐  😁',
+						'id:units' => 'Bytes 🌤  😁',
 						'id:units_size' => 27,
 						'id:units_bold' => true,
 						'id:units_pos' => 'Above value',
-						'xpath:.//input[@id="units_color"]/..' => '4E342E',
+						self::PATH_TO_COLOR_PICKER.'"units_color"]' => '4E342E',
 						'id:show_3' => true, // Show Needle.
-						'xpath:.//input[@id="needle_color"]/..' => '4DD0E1',
+						self::PATH_TO_COLOR_PICKER.'"needle_color"]' => '4DD0E1',
 						'id:scale_size' => 33,
 						'id:scale_decimal_places' => 8,
 						'id:th_show_arc' => true,
@@ -964,6 +964,7 @@ class testDashboardGaugeWidget extends testWidgets {
 			}
 
 			$this->getThresholdsTable()->fill($data['Thresholds']);
+			$this->checkColorPickerState($data);
 		}
 
 		$form->fill($data['fields']);
@@ -1215,28 +1216,28 @@ class testDashboardGaugeWidget extends testWidgets {
 						'Item' => self::GAUGE_ITEM,
 						'Min' => 20,
 						'Max' => 300,
-						'xpath:.//input[@id="value_arc_color"]/..' => 'FFCDD2',
-						'xpath:.//input[@id="empty_color"]/..' => '26C6DA',
-						'xpath:.//input[@id="bg_color"]/..' => 'FFF9C4',
+						self::PATH_TO_COLOR_PICKER.'"value_arc_color"]' => 'FFCDD2',
+						self::PATH_TO_COLOR_PICKER.'"empty_color"]' => '26C6DA',
+						self::PATH_TO_COLOR_PICKER.'"bg_color"]' => 'FFF9C4',
 						'Angle' => '270°',
 						'id:description' => 'Screenshot Description 😁🙂😁🙂',
 						'id:desc_size' => 8,
 						'id:desc_bold' => true,
 						'id:desc_v_pos' => 'Top',
-						'xpath:.//input[@id="desc_color"]/..' => '303F9F',
+						self::PATH_TO_COLOR_PICKER.'"desc_color"]' => '303F9F',
 						'id:decimal_places' => 3,
 						'id:value_size' => 17,
 						'id:value_bold' => true,
-						'xpath:.//input[@id="value_color"]/..' => '00796B',
+						self::PATH_TO_COLOR_PICKER.'"value_color"]' => '00796B',
 						'id:show_5' => true, // Show Value arc.
 						'id:value_arc_size' => 35,
 						'id:units' => 'Bytes 😁',
 						'id:units_size' => 12,
 						'id:units_bold' => true,
 						'id:units_pos' => 'Below value',
-						'xpath:.//input[@id="units_color"]/..' => '6D4C41',
+						self::PATH_TO_COLOR_PICKER.'"units_color"]' => '6D4C41',
 						'id:show_3' => true,
-						'xpath:.//input[@id="needle_color"]/..' => 'FF0000',
+						self::PATH_TO_COLOR_PICKER.'"needle_color"]' => 'FF0000',
 						'id:scale_size' => 11,
 						'id:scale_decimal_places' => 2,
 						'id:th_show_arc' => true,
@@ -1325,13 +1326,14 @@ class testDashboardGaugeWidget extends testWidgets {
 			: self::HOST.': '.$data['fields']['Item'];
 
 		// Wait until widget with header appears on the Dashboard.
-		$dashboard->save();
-		$widget = $dashboard->waitUntilReady()->getWidget($header);
-		// Without scroll down on Jenkins error - requested image region is invalid.
+		$dashboard->save()->waitUntilReady();
+		$this->assertMessage(TEST_GOOD, 'Dashboard updated');
+		// Without scrollDown on Jenkins error - requested image region is invalid.
 		$this->page->scrollDown();
 
 		// Wait until the gauge is animated.
 		$this->query('xpath://div['.CXPathHelper::fromClass('is-ready').']')->waitUntilVisible();
+		$widget = $dashboard->getWidget($header);
 		$this->assertScreenshot($widget->query('class:dashboard-grid-widget-container')->one(), $data['screenshot_id']);
 	}
 

@@ -41,8 +41,8 @@ For example, for clusters created with `kubeadm` it can be set in the following 
 
 |Name|Description|Default|
 |----|-----------|-------|
-|{$KUBE.SCHEDULER.SERVER.URL}|<p>Kubernetes Scheduler metrics endpoint URL.</p>|`https://localhost:10259/metrics`|
 |{$KUBE.API.TOKEN}|<p>API Authorization Token.</p>||
+|{$KUBE.SCHEDULER.SERVER.URL}|<p>Kubernetes Scheduler metrics endpoint URL.</p>|`https://localhost:10259/metrics`|
 |{$KUBE.SCHEDULER.HTTP.CLIENT.ERROR}|<p>Maximum number of HTTP client requests failures used for trigger.</p>|`2`|
 |{$KUBE.SCHEDULER.UNSCHEDULABLE}|<p>Maximum number of scheduling failures with 'unschedulable' used for trigger.</p>|`2`|
 |{$KUBE.SCHEDULER.ERROR}|<p>Maximum number of scheduling failures with 'error' used for trigger.</p>|`2`|

@@ -18,24 +18,16 @@ use Widgets\Clock\Widget;
 
 ?>
 
-window.widget_clock_form = new class {
+window.widget_form = new class extends CWidgetForm {
 
 	init() {
-		this._form = document.getElementById('widget-dialogue-form');
+		this._form = this.getForm();
 		this._time_type = document.getElementById('time_type');
 		this._clock_type = document.getElementById('clock_type');
 
 		this._show_date = document.getElementById('show_1');
 		this._show_time = document.getElementById('show_2');
 		this._show_tzone = document.getElementById('show_3');
-
-		for (const colorpicker of this._form.querySelectorAll('.<?= ZBX_STYLE_COLOR_PICKER ?> input')) {
-			$(colorpicker).colorpicker({
-				appendTo: '.overlay-dialogue-body',
-				use_default: true,
-				onUpdate: window.setIndicatorColor
-			});
-		}
 
 		this._time_type.addEventListener('change', () => this.updateForm());
 
@@ -48,6 +40,7 @@ window.widget_clock_form = new class {
 		}
 
 		this.updateForm();
+		this.ready();
 	}
 
 	updateForm() {

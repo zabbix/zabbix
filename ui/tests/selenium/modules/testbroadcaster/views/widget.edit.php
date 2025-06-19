@@ -50,8 +50,8 @@ $service_field_view = new CWidgetFieldMultiSelectServiceView($data['fields']['se
 		new CWidgetFieldMultiSelectSlaView($data['fields']['slaids'])
 	)
 	->includeJsFile('widget.edit.js.php')
-	->addJavaScript('
-		widget_testbroadcaster_form.init('.json_encode([
+	->initFormJs('
+		widget_form.init('.json_encode([
 			'serviceid_field_id' => $service_field_view->getId()
 		]).');
 	')

@@ -217,6 +217,18 @@ function getMenuPopupHost(options, trigger_element) {
 
 		// Configuration
 		if (options.allowed_ui_conf_hosts) {
+			// host wizard
+			url = new Curl('zabbix.php');
+			url.setArgument('action', 'popup');
+			url.setArgument('popup', 'host.wizard.edit');
+			url.setArgument('hostid', options.hostid);
+
+			configuration.push({
+				label: t('Host Wizard'),
+				disabled: !options.isWriteable || options.isDiscovered,
+				url: url.getUrl()
+			});
+
 			// host
 			url = new Curl('zabbix.php');
 			url.setArgument('action', 'popup');
@@ -256,7 +268,8 @@ function getMenuPopupHost(options, trigger_element) {
 			});
 
 			// graphs
-			url = new Curl('graphs.php');
+			url = new Curl('zabbix.php');
+			url.setArgument('action', 'graph.list');
 			url.setArgument('filter_set', '1');
 			url.setArgument('filter_hostids[]', options.hostid);
 			url.setArgument('context', 'host');
@@ -1270,7 +1283,8 @@ function getMenuPopupItemPrototype(options) {
 
 	config_urls.push({
 		label: t('Create trigger prototype'),
-		clickCallback: function() {
+		disabled: options.is_binary_value_type || options.is_discovered_prototype,
+		clickCallback: () => {
 			ZABBIX.PopupManager.open('trigger.prototype.edit', {
 				parent_discoveryid: options.parent_discoveryid,
 				name: options.name,
@@ -1283,6 +1297,7 @@ function getMenuPopupItemPrototype(options) {
 
 	config_urls.push({
 		label: t('Create dependent item'),
+		disabled: options.is_discovered_prototype,
 		clickCallback: () => {
 			ZABBIX.PopupManager.open('item.prototype.edit', {
 				context: options.context,

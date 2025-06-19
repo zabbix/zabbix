@@ -1,0 +1,31 @@
+zabbix_export:
+  version: '7.4'
+  host_groups:
+    - uuid: f2481361f99448eea617b7b1d4765566
+      name: 'Discovered hosts'
+  hosts:
+    - host: lld_test_multilevel
+      name: lld_test_multilevel
+      groups:
+        - name: 'Discovered hosts'
+      discovery_rules:
+        - name: main_drule
+          type: TRAP
+          key: main_drule
+          lifetime_type: DELETE_IMMEDIATELY
+        - name: 'nested[{#PARENTNAME},{#NAME},{#TEST}]'
+          type: NESTED
+          key: 'nested[{#PARENTNAME},{#NAME},{#TEST}]'
+          lifetime_type: DELETE_IMMEDIATELY
+          parent_discovery_rule:
+            key: 'nested[{#PARENTNAME}]'
+        - name: 'nested[{#PARENTNAME}]'
+          type: NESTED
+          key: 'nested[{#PARENTNAME}]'
+          lifetime_type: DELETE_IMMEDIATELY
+          parent_discovery_rule:
+            key: main_drule
+          preprocessing:
+            - type: JSONPATH
+              parameters:
+                - $.nested

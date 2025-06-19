@@ -243,7 +243,7 @@ int	zbx_dbsync_compare_connector_tags(zbx_dbsync_t *sync);
 
 int	zbx_dbsync_compare_proxies(zbx_dbsync_t *sync);
 
-void	dc_sync_settings(zbx_dbsync_t *sync, zbx_uint64_t revision);
+void	dc_sync_settings(zbx_dbsync_t *sync, zbx_uint64_t revision, unsigned char program_type);
 
 int	zbx_dbsync_prepare_proxy_group(zbx_dbsync_t *sync);
 int	zbx_dbsync_prepare_host_proxy(zbx_dbsync_t *sync);

@@ -99,11 +99,11 @@ class DiscoveredHosts {
 		);
 
 		// Emulate host discovery in DB.
-		DBexecute("INSERT INTO hosts (hostid, host, name, status, flags, description) VALUES (".zbx_dbstr(self::DISCOVERED_HOSTID).
-				",".zbx_dbstr(self::DISCOVERED_HOST).",".zbx_dbstr(self::DISCOVERED_HOST).", 0, 4, '')"
+		DBexecute("INSERT INTO hosts (hostid, host, name, status, flags, description, readme) VALUES (".zbx_dbstr(self::DISCOVERED_HOSTID).
+				",".zbx_dbstr(self::DISCOVERED_HOST).",".zbx_dbstr(self::DISCOVERED_HOST).", 0, 4, '', '')"
 		);
-		DBexecute("INSERT INTO hosts (hostid, host, name, status, flags, description) VALUES (".zbx_dbstr(self::DISCOVERED_HOSTID2).
-				",".zbx_dbstr(self::DISCOVERED_HOST2).",".zbx_dbstr(self::DISCOVERED_HOST2).", 0, 4, '')"
+		DBexecute("INSERT INTO hosts (hostid, host, name, status, flags, description, readme) VALUES (".zbx_dbstr(self::DISCOVERED_HOSTID2).
+				",".zbx_dbstr(self::DISCOVERED_HOST2).",".zbx_dbstr(self::DISCOVERED_HOST2).", 0, 4, '', '')"
 		);
 		DBexecute("INSERT INTO host_discovery (hostid, parent_hostid) VALUES (".zbx_dbstr(self::DISCOVERED_HOSTID).", ".
 				zbx_dbstr($host_prototypeid).")"

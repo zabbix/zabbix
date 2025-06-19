@@ -101,7 +101,7 @@ class testDiscoveryRule extends CAPITest {
 					ITEM_TYPE_ZABBIX, ITEM_TYPE_TRAPPER, ITEM_TYPE_SIMPLE, ITEM_TYPE_INTERNAL, ITEM_TYPE_ZABBIX_ACTIVE,
 					ITEM_TYPE_EXTERNAL, ITEM_TYPE_DB_MONITOR, ITEM_TYPE_IPMI, ITEM_TYPE_SSH, ITEM_TYPE_TELNET,
 					ITEM_TYPE_JMX, ITEM_TYPE_DEPENDENT, ITEM_TYPE_HTTPAGENT, ITEM_TYPE_SNMP, ITEM_TYPE_SCRIPT,
-					ITEM_TYPE_BROWSER
+					ITEM_TYPE_BROWSER, ITEM_TYPE_NESTED
 				]).'.'
 			],
 			'Test invalid lifetime_type value' => [
@@ -115,7 +115,7 @@ class testDiscoveryRule extends CAPITest {
 				],
 				'expected_error' => 'Invalid parameter "/1/lifetime_type": value must be one of '.implode(', ', [ZBX_LLD_DELETE_AFTER, ZBX_LLD_DELETE_NEVER, ZBX_LLD_DELETE_IMMEDIATELY]).'.'
 			],
-			'Test invalid lifetime value when deletin immediately' => [
+			'Test invalid lifetime value when deleting immediately' => [
 				'discoveryrule' => [
 					'name' => 'API LLD rule delete immediately',
 					'key_' => 'apillddeletenow',
@@ -125,7 +125,7 @@ class testDiscoveryRule extends CAPITest {
 					'lifetime_type' => ZBX_LLD_DELETE_IMMEDIATELY,
 					'lifetime' => '14d'
 				],
-				'expected_error' => 'Invalid parameter "/1/lifetime": value must be 0.'
+				'expected_error' => 'Invalid parameter "/1/lifetime": value must be "0".'
 			],
 			'Test invalid lifetime value' => [
 				'discoveryrule' => [
@@ -197,7 +197,7 @@ class testDiscoveryRule extends CAPITest {
 					'enabled_lifetime_type' => ZBX_LLD_DISABLE_NEVER,
 					'enabled_lifetime' => '24h'
 				],
-				'expected_error' => 'Invalid parameter "/1/enabled_lifetime": value must be 0.'
+				'expected_error' => 'Invalid parameter "/1/enabled_lifetime": value must be "0".'
 			],
 			'Test invalid enabled_lifetime parameter with disable immediately' => [
 				'discoveryrule' => [
@@ -209,7 +209,7 @@ class testDiscoveryRule extends CAPITest {
 					'enabled_lifetime_type' => ZBX_LLD_DISABLE_IMMEDIATELY,
 					'enabled_lifetime' => '24h'
 				],
-				'expected_error' => 'Invalid parameter "/1/enabled_lifetime": value must be 0.'
+				'expected_error' => 'Invalid parameter "/1/enabled_lifetime": value must be "0".'
 			],
 			'Test invalid lifetime and enabled_lifetime values' => [
 				'discoveryrule' => [
@@ -3279,13 +3279,13 @@ class testDiscoveryRule extends CAPITest {
 							'step' => 1,
 							'operations' => [
 								[
-									'operationobject' => 4
+									'operationobject' => OPERATION_OBJECT_LLD_RULE_PROTOTYPE + 1
 								]
 							]
 						]
 					])
 				],
-				'expected_error' => 'Invalid parameter "/1/overrides/1/operations/1/operationobject": value must be one of '.implode(', ', [OPERATION_OBJECT_ITEM_PROTOTYPE, OPERATION_OBJECT_TRIGGER_PROTOTYPE, OPERATION_OBJECT_GRAPH_PROTOTYPE, OPERATION_OBJECT_HOST_PROTOTYPE]).'.'
+				'expected_error' => 'Invalid parameter "/1/overrides/1/operations/1/operationobject": value must be one of '.implode(', ', [OPERATION_OBJECT_ITEM_PROTOTYPE, OPERATION_OBJECT_TRIGGER_PROTOTYPE, OPERATION_OBJECT_GRAPH_PROTOTYPE, OPERATION_OBJECT_HOST_PROTOTYPE, OPERATION_OBJECT_LLD_RULE_PROTOTYPE]).'.'
 			],
 			'Test /1/overrides/1/operations/1/operator type is validated.' => [
 				'discoveryrules' => [

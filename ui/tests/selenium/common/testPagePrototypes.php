@@ -115,7 +115,8 @@ class testPagePrototypes extends CWebTest {
 			'Item prototypes',
 			'Trigger prototypes',
 			'Graph prototypes',
-			'Host prototypes'
+			'Host prototypes',
+			'Discovery prototypes'
 		];
 		$this->assertEquals(array_merge($links, $breadcrumbs),
 				$this->query('xpath://div[@class="header-navigation"]//a')->all()->asText()

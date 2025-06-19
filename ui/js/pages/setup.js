@@ -58,7 +58,15 @@ const view = new class {
 				break;
 
 			case STEP_SETTINGS:
-				document.getElementById('default-theme').addEventListener('change', () => form.submit())
+				document.getElementById('default-theme').addEventListener('change', () => form.submit());
+				document.getElementById('zbx_server_tls').addEventListener('change', () =>
+					this._updateEncryptionFields()
+				);
+				document.getElementById('zbx_server_tls_certificate_check').addEventListener('change', () =>
+					this._updateEncryptionFields()
+				);
+
+				this._updateEncryptionFields();
 				break;
 		}
 	}
@@ -152,6 +160,27 @@ const view = new class {
 		}
 		else if (encryption_customizable) {
 			verify_host.removeAttribute('disabled');
+		}
+	}
+
+	_updateEncryptionFields() {
+		const encryption_enabled = document.getElementById('zbx_server_tls').checked;
+		const server_verification_enabled = document.getElementById('zbx_server_tls_certificate_check').checked;
+
+		const rows = {
+			'zbx_server_tls_ca_file': encryption_enabled,
+			'zbx_server_tls_key_file': encryption_enabled,
+			'zbx_server_tls_cert_file': encryption_enabled,
+			'zbx_server_tls_certificate_check': encryption_enabled,
+			'zbx_server_tls_certificate_issuer': encryption_enabled && server_verification_enabled,
+			'zbx_server_tls_certificate_subject': encryption_enabled && server_verification_enabled
+		}
+
+		for (let id in rows) {
+			const input = document.getElementById(id);
+
+			input.parentElement.classList.toggle(ZBX_STYLE_DISPLAY_NONE, !rows[id]);
+			input.parentElement.previousElementSibling.classList.toggle(ZBX_STYLE_DISPLAY_NONE, !rows[id]);
 		}
 	}
 };

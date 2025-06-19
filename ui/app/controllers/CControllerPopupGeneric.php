@@ -742,6 +742,13 @@ class CControllerPopupGeneric extends CController {
 			]);
 
 			if (!$lld_rules) {
+				$lld_rules = API::DiscoveryRulePrototype()->get([
+					'output' => [],
+					'itemids' => $this->getInput('parent_discoveryid')
+				]);
+			}
+
+			if (!$lld_rules) {
 				return false;
 			}
 		}
@@ -1320,6 +1327,10 @@ class CControllerPopupGeneric extends CController {
 					];
 				}
 
+				if ($this->hasInput('normal_only')) {
+					$options['filter']['flags'] = ZBX_FLAG_DISCOVERY_NORMAL;
+				}
+
 				$records = (!$this->group_preselect_required || $this->groupids)
 					? API::Host()->get($options)
 					: [];
@@ -1592,6 +1603,7 @@ class CControllerPopupGeneric extends CController {
 
 				if ($this->source_table === 'graph_prototypes') {
 					$options['selectDiscoveryRule'] = ['hostid'];
+					$options['selectDiscoveryRulePrototype'] = ['hostid'];
 
 					$records = (!$this->host_preselect_required || $this->hostids)
 						? API::GraphPrototype()->get($options)

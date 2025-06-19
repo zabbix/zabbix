@@ -246,7 +246,7 @@ class CConfiguration extends CApiService {
 		$import_validator_factory = new CImportValidatorFactory($params['format']);
 		$import_converter_factory = new CImportConverterFactory();
 
-		$validator = new CXmlValidator($import_validator_factory, $params['format']);
+		$validator = new CImportXmlValidator($import_validator_factory, $params['format']);
 
 		$data = $validator
 			->setStrict(true)
@@ -312,7 +312,7 @@ class CConfiguration extends CApiService {
 		$import_validator_factory = new CImportValidatorFactory($params['format']);
 		$import_converter_factory = new CImportConverterFactory();
 
-		$validator = new CXmlValidator($import_validator_factory, $params['format']);
+		$validator = new CImportXmlValidator($import_validator_factory, $params['format']);
 
 		$data = $validator
 			->setStrict(true)

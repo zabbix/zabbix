@@ -1385,7 +1385,7 @@ function getMapLabels($map, $map_info) {
  *
  * @return array
  */
-function getMapHighligts(array $map, array $map_info) {
+function getMapHighlights(array $map, array $map_info) {
 	$highlights = [];
 
 	foreach ($map['selements'] as $id => $selement) {

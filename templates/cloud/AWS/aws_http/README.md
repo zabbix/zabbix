@@ -4,6 +4,19 @@
 ## Overview
 
 This template is designed for the effortless deployment of AWS monitoring by Zabbix via HTTP and doesn't require any external scripts.
+- Currently, the template supports the discovery of EC2 and RDS instances, ECS clusters, ELB, Lambda and S3 buckets.
+
+## Included Monitoring Templates
+
+- *AWS EC2 by HTTP*
+- *AWS ECS Cluster by HTTP*
+- *AWS ECS Serverless Cluster by HTTP*
+- *AWS ELB Application Load Balancer by HTTP*
+- *AWS ELB Network Load Balancer by HTTP*
+- *AWS Lambda by HTTP*
+- *AWS RDS instance by HTTP*
+- *AWS S3 bucket by HTTP*
+- *AWS Cost Explorer by HTTP*
 
 ## Requirements
 
@@ -22,7 +35,9 @@ This template has been tested on:
 
 Before using the template, you need to create an IAM policy for the Zabbix role in your AWS account with the necessary permissions.
 
+### Required Permissions
 Add the following required permissions to your Zabbix IAM policy in order to collect metrics.
+
 ```json
 {
     "Version": "2012-10-17",
@@ -54,7 +69,19 @@ Add the following required permissions to your Zabbix IAM policy in order to col
     ]
 }
 ```
+
+### Access Key Authorization
+
+If you are using access key authorization, you need to generate an access key and secret key for an IAM user with the necessary permissions:
+
+1. Create an IAM user with programmatic access.
+2. Attach the required policy to the IAM user.
+3. Generate an access key and secret key.
+4. Use the generated credentials in the macros `{$AWS.ACCESS.KEY.ID}` and `{$AWS.SECRET.ACCESS.KEY}`.
+
+### Assume Role Authorization
 For using assume role authorization, add the appropriate permissions to the role you are using:
+
 ```json
 {
     "Version": "2012-10-17",
@@ -93,7 +120,10 @@ For using assume role authorization, add the appropriate permissions to the role
     ]
 }
 ```
+
+#### Trust Relationships for Assume Role Authorization
 Next, add a principal to the trust relationships of the role you are using:
+
 ```json
 {
   "Version": "2012-10-17",
@@ -108,7 +138,11 @@ Next, add a principal to the trust relationships of the role you are using:
   ]
 }
 ```
+Set the following macros: `{$AWS.ACCESS.KEY.ID}`, `{$AWS.SECRET.ACCESS.KEY}`, `{$AWS.STS.REGION}`, `{$AWS.ASSUME.ROLE.ARN}`.
+
+### Role-Based Authorization
 If you are using role-based authorization, add the appropriate permissions:
+
 ```json
 {
     "Version": "2012-10-17",
@@ -147,7 +181,10 @@ If you are using role-based authorization, add the appropriate permissions:
     ]
 }
 ```
+
+#### Trust Relationships for Role-Based Authorization
 Next, add a principal to the trust relationships of the role you are using:
+
 ```json
 {
     "Version": "2012-10-17",
@@ -166,15 +203,12 @@ Next, add a principal to the trust relationships of the role you are using:
     ]
 }
 ```
-**Note**, Using role-based authorization is only possible when you use a Zabbix server or proxy inside AWS.
+
+**Note**: Using role-based authorization is only possible when you use a Zabbix server or proxy inside AWS.
 
 To gather Request metrics, enable [Requests metrics](https://docs.aws.amazon.com/AmazonS3/latest/userguide/cloudwatch-monitoring.html) on your Amazon S3 buckets from the AWS console.
 
 Set the macros: `{$AWS.AUTH_TYPE}`. Possible values: `access_key`, `assume_role`, `role_base`.
-
-If you are using access key-based authorization, set the following macros: `{$AWS.ACCESS.KEY.ID}`, `{$AWS.SECRET.ACCESS.KEY}`.
-
-If you are using access assume role authorization, set the following macros: `{$AWS.ACCESS.KEY.ID}`, `{$AWS.SECRET.ACCESS.KEY}`, `{$AWS.STS.REGION}`, `{$AWS.ASSUME.ROLE.ARN}`.
 
 For more information about managing access keys, see [official documentation](https://docs.aws.amazon.com/general/latest/gr/aws-sec-cred-types.html#access-keys-and-secret-access-keys).
 
@@ -190,7 +224,6 @@ Additional information about the metrics and used API methods:
 * [Full metrics list related to ELB ALB](https://docs.aws.amazon.com/elasticloadbalancing/latest/application/load-balancer-cloudwatch-metrics.html)
 * [DescribeAlarms API method](https://docs.aws.amazon.com/AmazonCloudWatch/latest/APIReference/API_DescribeAlarms.html)
 * [DescribeVolumes API method](https://docs.aws.amazon.com/AWSEC2/latest/APIReference/API_DescribeVolumes.html)
-* [DescribeAlarms API method](https://docs.aws.amazon.com/AmazonCloudWatch/latest/APIReference/API_DescribeAlarms.html)
 * [DescribeLoadBalancers API method](https://docs.aws.amazon.com/elasticloadbalancing/latest/APIReference/API_DescribeLoadBalancers.html)
 
 
@@ -198,15 +231,15 @@ Additional information about the metrics and used API methods:
 
 |Name|Description|Default|
 |----|-----------|-------|
-|{$AWS.DATA.TIMEOUT}|<p>A response timeout for an API.</p>|`60s`|
-|{$AWS.PROXY}|<p>Sets HTTP proxy value. If this macro is empty then no proxy is used.</p>||
+|{$AWS.AUTH_TYPE}|<p>Authorization method. Possible values: `access_key`, `assume_role`, `role_base`.</p>|`access_key`|
 |{$AWS.ACCESS.KEY.ID}|<p>Access key ID.</p>||
 |{$AWS.SECRET.ACCESS.KEY}|<p>Secret access key.</p>||
-|{$AWS.AUTH_TYPE}|<p>Authorization method. Possible values: `access_key`, `assume_role`, `role_base`.</p>|`access_key`|
+|{$AWS.ASSUME.ROLE.ARN}|<p>ARN assume role; add when using the `assume_role` authorization method.</p>||
+|{$AWS.PROXY}|<p>Sets HTTP proxy value. If this macro is empty then no proxy is used.</p>||
 |{$AWS.REQUEST.REGION}|<p>Region used in GET request `ListBuckets`.</p>|`us-east-1`|
 |{$AWS.DESCRIBE.REGION}|<p>Region used in POST request `DescribeRegions`.</p>|`us-east-1`|
 |{$AWS.STS.REGION}|<p>Region used in assume role request.</p>|`us-east-1`|
-|{$AWS.ASSUME.ROLE.ARN}|<p>ARN assume role; add when using the `assume_role` authorization method.</p>||
+|{$AWS.DATA.TIMEOUT}|<p>A response timeout for an API.</p>|`60s`|
 |{$AWS.EC2.LLD.FILTER.NAME.MATCHES}|<p>Filter of discoverable EC2 instances by namespace.</p>|`.*`|
 |{$AWS.EC2.LLD.FILTER.NAME.NOT_MATCHES}|<p>Filter to exclude discovered EC2 instances by namespace.</p>|`CHANGE_IF_NEEDED`|
 |{$AWS.EC2.LLD.FILTER.REGION.MATCHES}|<p>Filter of discoverable EC2 instances by region.</p>|`.*`|
@@ -308,7 +341,9 @@ The template get AWS EC2 and attached AWS EBS volumes metrics and uses the scrip
 
 Before using the template, you need to create an IAM policy with the necessary permissions for the Zabbix role in your AWS account.
 
+### Required Permissions
 Add the following required permissions to your Zabbix IAM policy in order to collect Amazon EC2 metrics.
+
 ```json
 {
     "Version":"2012-10-17",
@@ -324,8 +359,20 @@ Add the following required permissions to your Zabbix IAM policy in order to col
         }
     ]
   }
-  ```
+```
+
+### Access Key Authorization
+
+If you are using access key authorization, you need to generate an access key and secret key for an IAM user with the necessary permissions:
+
+1. Create an IAM user with programmatic access.
+2. Attach the required policy to the IAM user.
+3. Generate an access key and secret key.
+4. Use the generated credentials in the macros `{$AWS.ACCESS.KEY.ID}` and `{$AWS.SECRET.ACCESS.KEY}`.
+
+### Assume Role Authorization
 For using assume role authorization, add the appropriate permissions to the role you are using:
+
 ```json
 {
     "Version": "2012-10-17",
@@ -347,7 +394,10 @@ For using assume role authorization, add the appropriate permissions to the role
     ]
 }
 ```
+
+#### Trust Relationships for Assume Role Authorization
 Next, add a principal to the trust relationships of the role you are using:
+
 ```json
 {
   "Version": "2012-10-17",
@@ -362,7 +412,11 @@ Next, add a principal to the trust relationships of the role you are using:
   ]
 }
 ```
+Set the following macros: `{$AWS.ACCESS.KEY.ID}`, `{$AWS.SECRET.ACCESS.KEY}`, `{$AWS.STS.REGION}`, `{$AWS.ASSUME.ROLE.ARN}`.
+
+### Role-Based Authorization
 If you are using role-based authorization, set the appropriate permissions:
+
 ```json
 {
     "Version": "2012-10-17",
@@ -387,7 +441,10 @@ If you are using role-based authorization, set the appropriate permissions:
     ]
 }
 ```
+
+#### Trust Relationships for Role-Based Authorization
 Next, add a principal to the trust relationships of the role you are using:
+
 ```json
 {
     "Version": "2012-10-17",
@@ -406,15 +463,12 @@ Next, add a principal to the trust relationships of the role you are using:
     ]
 }
 ```
-**Note**, Using role-based authorization is only possible when you use a Zabbix server or proxy inside AWS.
+
+**Note**: Using role-based authorization is only possible when you use a Zabbix server or proxy inside AWS.
 
 For more information, see the [EC2 policies](https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/security-iam.html) on the AWS website.
 
 Set the macros: `{$AWS.AUTH_TYPE}`, `{$AWS.REGION}`, `{$AWS.EC2.INSTANCE.ID}`.
-
-If you are using access key-based authorization, set the following macros: `{$AWS.ACCESS.KEY.ID}`, `{$AWS.SECRET.ACCESS.KEY}`.
-
-If you are using access assume role authorization, set the following macros: `{$AWS.ACCESS.KEY.ID}`, `{$AWS.SECRET.ACCESS.KEY}`, `{$AWS.STS.REGION}`, `{$AWS.ASSUME.ROLE.ARN}`.
 
 For more information about manage access keys, see [official documentation](https://docs.aws.amazon.com/general/latest/gr/aws-sec-cred-types.html#access-keys-and-secret-access-keys)
 
@@ -425,13 +479,13 @@ Also, see the Macros section for a list of macros used for LLD filters.
 
 |Name|Description|Default|
 |----|-----------|-------|
-|{$AWS.PROXY}|<p>Sets HTTP proxy value. If this macro is empty then no proxy is used.</p>||
+|{$AWS.AUTH_TYPE}|<p>Authorization method. Possible values: `access_key`, `assume_role`, `role_base`.</p>|`access_key`|
 |{$AWS.ACCESS.KEY.ID}|<p>Access key ID.</p>||
 |{$AWS.SECRET.ACCESS.KEY}|<p>Secret access key.</p>||
-|{$AWS.REGION}|<p>Amazon EC2 Region code.</p>|`us-west-1`|
-|{$AWS.AUTH_TYPE}|<p>Authorization method. Possible values: `access_key`, `assume_role`, `role_base`.</p>|`access_key`|
-|{$AWS.STS.REGION}|<p>Region used in assume role request.</p>|`us-east-1`|
 |{$AWS.ASSUME.ROLE.ARN}|<p>ARN assume role; add when using the `assume_role` authorization method.</p>||
+|{$AWS.REGION}|<p>Amazon EC2 Region code.</p>|`us-west-1`|
+|{$AWS.STS.REGION}|<p>Region used in assume role request.</p>|`us-east-1`|
+|{$AWS.PROXY}|<p>Sets HTTP proxy value. If this macro is empty then no proxy is used.</p>||
 |{$AWS.EC2.INSTANCE.ID}|<p>EC2 instance ID.</p>||
 |{$AWS.EC2.LLD.FILTER.VOLUME_TYPE.MATCHES}|<p>Filter of discoverable volumes by type.</p>|`.*`|
 |{$AWS.EC2.LLD.FILTER.VOLUME_TYPE.NOT_MATCHES}|<p>Filter to exclude discovered volumes by type.</p>|`CHANGE_IF_NEEDED`|
@@ -588,7 +642,9 @@ The template get AWS RDS instance metrics and uses the script item to make HTTP 
 
 Before using the template, you need to create an IAM policy with the necessary permissions for the Zabbix role in your AWS account.
 
+### Required Permissions
 Add the following required permissions to your Zabbix IAM policy in order to collect Amazon RDS metrics.
+
 ```json
 {
     "Version":"2012-10-17",
@@ -606,7 +662,19 @@ Add the following required permissions to your Zabbix IAM policy in order to col
     ]
   }
 ```
+
+### Access Key Authorization
+
+If you are using access key authorization, you need to generate an access key and secret key for an IAM user with the necessary permissions:
+
+1. Create an IAM user with programmatic access.
+2. Attach the required policy to the IAM user.
+3. Generate an access key and secret key.
+4. Use the generated credentials in the macros `{$AWS.ACCESS.KEY.ID}` and `{$AWS.SECRET.ACCESS.KEY}`.
+
+### Assume Role Authorization
 For using assume role authorization, add the appropriate permissions to the role you are using:
+
 ```json
 {
     "Version": "2012-10-17",
@@ -629,7 +697,10 @@ For using assume role authorization, add the appropriate permissions to the role
     ]
 }
 ```
+
+#### Trust Relationships for Assume Role Authorization
 Next, add a principal to the trust relationships of the role you are using:
+
 ```json
 {
   "Version": "2012-10-17",
@@ -644,7 +715,11 @@ Next, add a principal to the trust relationships of the role you are using:
   ]
 }
 ```
+Set the following macros: `{$AWS.ACCESS.KEY.ID}`, `{$AWS.SECRET.ACCESS.KEY}`, `{$AWS.STS.REGION}`, `{$AWS.ASSUME.ROLE.ARN}`.
+
+### Role-Based Authorization
 If you are using role-based authorization, set the appropriate permissions:
+
 ```json
 {
     "Version": "2012-10-17",
@@ -670,7 +745,10 @@ If you are using role-based authorization, set the appropriate permissions:
     ]
 }
 ```
+
+#### Trust Relationships for Role-Based Authorization
 Next, add a principal to the trust relationships of the role you are using:
+
 ```json
 {
     "Version": "2012-10-17",
@@ -689,13 +767,10 @@ Next, add a principal to the trust relationships of the role you are using:
     ]
 }
 ```
-**Note**, Using role-based authorization is only possible when you use a Zabbix server or proxy inside AWS.
+
+**Note**: Using role-based authorization is only possible when you use a Zabbix server or proxy inside AWS.
 
 Set the macros: `{$AWS.AUTH_TYPE}`, `{$AWS.REGION}`, `{$AWS.RDS.INSTANCE.ID}`.
-
-If you are using access key-based authorization, set the following macros: `{$AWS.ACCESS.KEY.ID}`, `{$AWS.SECRET.ACCESS.KEY}`.
-
-If you are using access assume role authorization, set the following macros: `{$AWS.ACCESS.KEY.ID}`, `{$AWS.SECRET.ACCESS.KEY}`, `{$AWS.STS.REGION}`, `{$AWS.ASSUME.ROLE.ARN}`.
 
 For more information about manage access keys, see [official documentation](https://docs.aws.amazon.com/general/latest/gr/aws-sec-cred-types.html#access-keys-and-secret-access-keys)
 
@@ -706,13 +781,13 @@ Also, see the Macros section for a list of macros used for LLD filters.
 
 |Name|Description|Default|
 |----|-----------|-------|
-|{$AWS.PROXY}|<p>Sets HTTP proxy value. If this macro is empty then no proxy is used.</p>||
+|{$AWS.AUTH_TYPE}|<p>Authorization method. Possible values: `access_key`, `assume_role`, `role_base`.</p>|`access_key`|
 |{$AWS.ACCESS.KEY.ID}|<p>Access key ID.</p>||
 |{$AWS.SECRET.ACCESS.KEY}|<p>Secret access key.</p>||
-|{$AWS.REGION}|<p>Amazon RDS Region code.</p>|`us-west-1`|
-|{$AWS.AUTH_TYPE}|<p>Authorization method. Possible values: `access_key`, `assume_role`, `role_base`.</p>|`access_key`|
-|{$AWS.STS.REGION}|<p>Region used in assume role request.</p>|`us-east-1`|
 |{$AWS.ASSUME.ROLE.ARN}|<p>ARN assume role; add when using the `assume_role` authorization method.</p>||
+|{$AWS.REGION}|<p>Amazon RDS Region code.</p>|`us-west-1`|
+|{$AWS.STS.REGION}|<p>Region used in assume role request.</p>|`us-east-1`|
+|{$AWS.PROXY}|<p>Sets HTTP proxy value. If this macro is empty then no proxy is used.</p>||
 |{$AWS.RDS.INSTANCE.ID}|<p>RDS DB Instance identifier.</p>||
 |{$AWS.RDS.LLD.FILTER.ALARM_SERVICE_NAMESPACE.MATCHES}|<p>Filter of discoverable alarms by namespace.</p>|`.*`|
 |{$AWS.RDS.LLD.FILTER.ALARM_SERVICE_NAMESPACE.NOT_MATCHES}|<p>Filter to exclude discovered alarms by namespace.</p>|`CHANGE_IF_NEEDED`|
@@ -921,7 +996,9 @@ The template gets AWS S3 metrics and uses the script item to make HTTP requests 
 
 Before using the template, you need to create an IAM policy for the Zabbix role in your AWS account with the necessary permissions.
 
+### Required Permissions
 Add the following required permissions to your Zabbix IAM policy in order to collect Amazon S3 metrics.
+
 ```json
 {
     "Version":"2012-10-17",
@@ -938,7 +1015,19 @@ Add the following required permissions to your Zabbix IAM policy in order to col
     ]
   }
 ```
+
+### Access Key Authorization
+
+If you are using access key authorization, you need to generate an access key and secret key for an IAM user with the necessary permissions:
+
+1. Create an IAM user with programmatic access.
+2. Attach the required policy to the IAM user.
+3. Generate an access key and secret key.
+4. Use the generated credentials in the macros `{$AWS.ACCESS.KEY.ID}` and `{$AWS.SECRET.ACCESS.KEY}`.
+
+### Assume role authorization
 For using assume role authorization, add the appropriate permissions to the role you are using:
+
 ```json
 {
     "Version": "2012-10-17",
@@ -960,7 +1049,10 @@ For using assume role authorization, add the appropriate permissions to the role
     ]
 }
 ```
+
+#### Trust Relationships for Assume Role Authorization
 Next, add a principal to the trust relationships of the role you are using:
+
 ```json
 {
   "Version": "2012-10-17",
@@ -975,7 +1067,11 @@ Next, add a principal to the trust relationships of the role you are using:
   ]
 }
 ```
+Set the following macros: `{$AWS.ACCESS.KEY.ID}`, `{$AWS.SECRET.ACCESS.KEY}`, `{$AWS.STS.REGION}`, `{$AWS.ASSUME.ROLE.ARN}`.
+
+### Role-Based Authorization
 If you are using role-based authorization, set the appropriate permissions:
+
 ```json
 {
     "Version": "2012-10-17",
@@ -1000,7 +1096,10 @@ If you are using role-based authorization, set the appropriate permissions:
     ]
 }
 ```
+
+#### Trust Relationships for Role-Based Authorization
 Next, add a principal to the trust relationships of the role you are using:
+
 ```json
 {
     "Version": "2012-10-17",
@@ -1019,17 +1118,14 @@ Next, add a principal to the trust relationships of the role you are using:
     ]
 }
 ```
-**Note**, Using role-based authorization is only possible when you use a Zabbix server or proxy inside AWS.
+
+**Note**: Using role-based authorization is only possible when you use a Zabbix server or proxy inside AWS.
 
 To gather Request metrics, [enable Requests metrics](https://docs.aws.amazon.com/AmazonS3/latest/userguide/cloudwatch-monitoring.html) on your Amazon S3 buckets from the AWS console.
 
 You can also define a filter for the Request metrics using a shared prefix, object tag, or access point.
 
 Set the macros: `{$AWS.AUTH_TYPE}`, `{$AWS.S3.BUCKET.NAME}`.
-
-If you are using access key-based authorization, set the following macros: `{$AWS.ACCESS.KEY.ID}`, `{$AWS.SECRET.ACCESS.KEY}`.
-
-If you are using access assume role authorization, set the following macros: `{$AWS.ACCESS.KEY.ID}`, `{$AWS.SECRET.ACCESS.KEY}`, `{$AWS.STS.REGION}`, `{$AWS.ASSUME.ROLE.ARN}`.
 
 For more information about manage access keys, see [official documentation](https://docs.aws.amazon.com/general/latest/gr/aws-sec-cred-types.html#access-keys-and-secret-access-keys)
 
@@ -1039,13 +1135,13 @@ Also, see the Macros section for a list of macros used for LLD filters.
 
 |Name|Description|Default|
 |----|-----------|-------|
-|{$AWS.PROXY}|<p>Sets HTTP proxy value. If this macro is empty then no proxy is used.</p>||
+|{$AWS.AUTH_TYPE}|<p>Authorization method. Possible values: `access_key`, `assume_role`, `role_base`.</p>|`access_key`|
 |{$AWS.ACCESS.KEY.ID}|<p>Access key ID.</p>||
 |{$AWS.SECRET.ACCESS.KEY}|<p>Secret access key.</p>||
-|{$AWS.AUTH_TYPE}|<p>Authorization method. Possible values: `access_key`, `assume_role`, `role_base`.</p>|`access_key`|
+|{$AWS.ASSUME.ROLE.ARN}|<p>ARN assume role; add when using the `assume_role` authorization method.</p>||
 |{$AWS.REQUEST.REGION}|<p>Region used in GET request `ListBuckets`.</p>|`us-east-1`|
 |{$AWS.STS.REGION}|<p>Region used in assume role request.</p>|`us-east-1`|
-|{$AWS.ASSUME.ROLE.ARN}|<p>ARN assume role; add when using the `assume_role` authorization method.</p>||
+|{$AWS.PROXY}|<p>Sets HTTP proxy value. If this macro is empty then no proxy is used.</p>||
 |{$AWS.S3.BUCKET.NAME}|<p>S3 bucket name.</p>||
 |{$AWS.S3.LLD.FILTER.ALARM_NAME.MATCHES}|<p>Filter of discoverable alarms by name.</p>|`.*`|
 |{$AWS.S3.LLD.FILTER.ALARM_NAME.NOT_MATCHES}|<p>Filter to exclude discovered alarms by name.</p>|`CHANGE_IF_NEEDED`|
@@ -1158,7 +1254,9 @@ The template gets AWS ECS metrics and uses the script item to make HTTP requests
 
 Before using the template, you need to create an IAM policy for the Zabbix role in your AWS account with the necessary permissions.
 
+### Required Permissions
 Add the following required permissions to your Zabbix IAM policy in order to collect Amazon ECS metrics.
+
 ```json
 {
     "Version":"2012-10-17",
@@ -1175,7 +1273,19 @@ Add the following required permissions to your Zabbix IAM policy in order to col
     ]
   }
 ```
+
+### Access Key Authorization
+
+If you are using access key authorization, you need to generate an access key and secret key for an IAM user with the necessary permissions:
+
+1. Create an IAM user with programmatic access.
+2. Attach the required policy to the IAM user.
+3. Generate an access key and secret key.
+4. Use the generated credentials in the macros `{$AWS.ACCESS.KEY.ID}` and `{$AWS.SECRET.ACCESS.KEY}`.
+
+### Assume role authorization
 For using assume role authorization, add the appropriate permissions to the role you are using:
+
 ```json
 {
     "Version": "2012-10-17",
@@ -1197,7 +1307,10 @@ For using assume role authorization, add the appropriate permissions to the role
     ]
 }
 ```
+
+#### Trust Relationships for Assume Role Authorization
 Next, add a principal to the trust relationships of the role you are using:
+
 ```json
 {
   "Version": "2012-10-17",
@@ -1212,7 +1325,11 @@ Next, add a principal to the trust relationships of the role you are using:
   ]
 }
 ```
+Set the following macros: `{$AWS.ACCESS.KEY.ID}`, `{$AWS.SECRET.ACCESS.KEY}`, `{$AWS.STS.REGION}`, `{$AWS.ASSUME.ROLE.ARN}`.
+
+### Role-Based Authorization
 If you are using role-based authorization, set the appropriate permissions:
+
 ```json
 {
     "Version": "2012-10-17",
@@ -1237,7 +1354,9 @@ If you are using role-based authorization, set the appropriate permissions:
     ]
 }
 ```
+#### Trust Relationships for Role-Based Authorization
 Next, add a principal to the trust relationships of the role you are using:
+
 ```json
 {
     "Version": "2012-10-17",
@@ -1256,13 +1375,10 @@ Next, add a principal to the trust relationships of the role you are using:
     ]
 }
 ```
-**Note**, Using role-based authorization is only possible when you use a Zabbix server or proxy inside AWS.
+
+**Note**: Using role-based authorization is only possible when you use a Zabbix server or proxy inside AWS.
 
 Set the following macros `{$AWS.AUTH_TYPE}`, `{$AWS.REGION}`, `{$AWS.ECS.CLUSTER.NAME}`.
-
-If you are using access key-based authorization, set the following macros: `{$AWS.ACCESS.KEY.ID}`, `{$AWS.SECRET.ACCESS.KEY}`.
-
-If you are using access assume role authorization, set the following macros: `{$AWS.ACCESS.KEY.ID}`, `{$AWS.SECRET.ACCESS.KEY}`, `{$AWS.STS.REGION}`, `{$AWS.ASSUME.ROLE.ARN}`.
 
 For more information about managing access keys, see [official documentation](https://docs.aws.amazon.com/general/latest/gr/aws-sec-cred-types.html#access-keys-and-secret-access-keys)
 
@@ -1272,13 +1388,13 @@ Refer to the Macros section for a list of macros used for LLD filters.
 
 |Name|Description|Default|
 |----|-----------|-------|
-|{$AWS.PROXY}|<p>Sets HTTP proxy value. If this macro is empty then no proxy is used.</p>||
+|{$AWS.AUTH_TYPE}|<p>Authorization method. Possible values: `access_key`, `assume_role`, `role_base`.</p>|`access_key`|
 |{$AWS.ACCESS.KEY.ID}|<p>Access key ID.</p>||
 |{$AWS.SECRET.ACCESS.KEY}|<p>Secret access key.</p>||
-|{$AWS.REGION}|<p>Amazon ECS Region code.</p>|`us-west-1`|
-|{$AWS.AUTH_TYPE}|<p>Authorization method. Possible values: `access_key`, `assume_role`, `role_base`.</p>|`access_key`|
-|{$AWS.STS.REGION}|<p>Region used in assume role request.</p>|`us-east-1`|
 |{$AWS.ASSUME.ROLE.ARN}|<p>ARN assume role; add when using the `assume_role` authorization method.</p>||
+|{$AWS.REGION}|<p>Amazon ECS Region code.</p>|`us-west-1`|
+|{$AWS.STS.REGION}|<p>Region used in assume role request.</p>|`us-east-1`|
+|{$AWS.PROXY}|<p>Sets HTTP proxy value. If this macro is empty then no proxy is used.</p>||
 |{$AWS.ECS.CLUSTER.NAME}|<p>ECS cluster name.</p>||
 |{$AWS.ECS.LLD.FILTER.ALARM_NAME.MATCHES}|<p>Filter of discoverable alarms by name.</p>|`.*`|
 |{$AWS.ECS.LLD.FILTER.ALARM_NAME.NOT_MATCHES}|<p>Filter to exclude discovered alarms by name.</p>|`CHANGE_IF_NEEDED`|
@@ -1409,7 +1525,9 @@ The template gets AWS ECS metrics and uses the script item to make HTTP requests
 
 Before using the template, you need to create an IAM policy for the Zabbix role in your AWS account with the necessary permissions.
 
+### Required Permissions
 Add the following required permissions to your Zabbix IAM policy in order to collect Amazon ECS metrics.
+
 ```json
 {
     "Version":"2012-10-17",
@@ -1426,7 +1544,19 @@ Add the following required permissions to your Zabbix IAM policy in order to col
     ]
   }
 ```
+
+### Access Key Authorization
+
+If you are using access key authorization, you need to generate an access key and secret key for an IAM user with the necessary permissions:
+
+1. Create an IAM user with programmatic access.
+2. Attach the required policy to the IAM user.
+3. Generate an access key and secret key.
+4. Use the generated credentials in the macros `{$AWS.ACCESS.KEY.ID}` and `{$AWS.SECRET.ACCESS.KEY}`.
+
+### Assume role authorization
 For using assume role authorization, add the appropriate permissions to the role you are using:
+
 ```json
 {
     "Version": "2012-10-17",
@@ -1448,7 +1578,10 @@ For using assume role authorization, add the appropriate permissions to the role
     ]
 }
 ```
+
+#### Trust Relationships for Assume Role Authorization
 Next, add a principal to the trust relationships of the role you are using:
+
 ```json
 {
   "Version": "2012-10-17",
@@ -1463,7 +1596,11 @@ Next, add a principal to the trust relationships of the role you are using:
   ]
 }
 ```
+Set the following macros: `{$AWS.ACCESS.KEY.ID}`, `{$AWS.SECRET.ACCESS.KEY}`, `{$AWS.STS.REGION}`, `{$AWS.ASSUME.ROLE.ARN}`.
+
+### Role-Based Authorization
 If you are using role-based authorization, set the appropriate permissions:
+
 ```json
 {
     "Version": "2012-10-17",
@@ -1488,7 +1625,10 @@ If you are using role-based authorization, set the appropriate permissions:
     ]
 }
 ```
+
+#### Trust Relationships for Role-Based Authorization
 Next, add a principal to the trust relationships of the role you are using:
+
 ```json
 {
     "Version": "2012-10-17",
@@ -1507,13 +1647,10 @@ Next, add a principal to the trust relationships of the role you are using:
     ]
 }
 ```
-**Note**, Using role-based authorization is only possible when you use a Zabbix server or proxy inside AWS.
+
+**Note**: Using role-based authorization is only possible when you use a Zabbix server or proxy inside AWS.
 
 Set the following macros `{$AWS.AUTH_TYPE}`, `{$AWS.REGION}`, `{$AWS.ECS.CLUSTER.NAME}`.
-
-If you are using access key-based authorization, set the following macros: `{$AWS.ACCESS.KEY.ID}`, `{$AWS.SECRET.ACCESS.KEY}`.
-
-If you are using access assume role authorization, set the following macros: `{$AWS.ACCESS.KEY.ID}`, `{$AWS.SECRET.ACCESS.KEY}`, `{$AWS.STS.REGION}`, `{$AWS.ASSUME.ROLE.ARN}`.
 
 For more information about managing access keys, see [official documentation](https://docs.aws.amazon.com/general/latest/gr/aws-sec-cred-types.html#access-keys-and-secret-access-keys)
 
@@ -1523,13 +1660,13 @@ Refer to the Macros section for a list of macros used for LLD filters.
 
 |Name|Description|Default|
 |----|-----------|-------|
-|{$AWS.PROXY}|<p>Sets HTTP proxy value. If this macro is empty then no proxy is used.</p>||
+|{$AWS.AUTH_TYPE}|<p>Authorization method. Possible values: `access_key`, `assume_role`, `role_base`.</p>|`access_key`|
 |{$AWS.ACCESS.KEY.ID}|<p>Access key ID.</p>||
 |{$AWS.SECRET.ACCESS.KEY}|<p>Secret access key.</p>||
-|{$AWS.REGION}|<p>Amazon ECS Region code.</p>|`us-west-1`|
-|{$AWS.AUTH_TYPE}|<p>Authorization method. Possible values: `access_key`, `assume_role`, `role_base`.</p>|`access_key`|
-|{$AWS.STS.REGION}|<p>Region used in assume role request.</p>|`us-east-1`|
 |{$AWS.ASSUME.ROLE.ARN}|<p>ARN assume role; add when using the `assume_role` authorization method.</p>||
+|{$AWS.REGION}|<p>Amazon ECS Region code.</p>|`us-west-1`|
+|{$AWS.STS.REGION}|<p>Region used in assume role request.</p>|`us-east-1`|
+|{$AWS.PROXY}|<p>Sets HTTP proxy value. If this macro is empty then no proxy is used.</p>||
 |{$AWS.ECS.CLUSTER.NAME}|<p>ECS cluster name.</p>||
 |{$AWS.ECS.LLD.FILTER.ALARM_NAME.MATCHES}|<p>Filter of discoverable alarms by name.</p>|`.*`|
 |{$AWS.ECS.LLD.FILTER.ALARM_NAME.NOT_MATCHES}|<p>Filter to exclude discovered alarms by name.</p>|`CHANGE_IF_NEEDED`|
@@ -1657,7 +1794,9 @@ The template gets AWS ELB Application Load Balancer metrics and uses the script 
 
 Before using the template, you need to create an IAM policy with the necessary permissions for the Zabbix role in your AWS account. For more information, visit the [ELB policies page](https://docs.aws.amazon.com/elasticloadbalancing/latest/userguide/elb-api-permissions.html) on the AWS website.
 
+### Required Permissions
 Add the following required permissions to your Zabbix IAM policy in order to collect AWS ELB Application Load Balancer metrics.
+
 ```json
 {
     "Version":"2012-10-17",
@@ -1674,7 +1813,19 @@ Add the following required permissions to your Zabbix IAM policy in order to col
     ]
   }
 ```
+
+### Access Key Authorization
+
+If you are using access key authorization, you need to generate an access key and secret key for an IAM user with the necessary permissions:
+
+1. Create an IAM user with programmatic access.
+2. Attach the required policy to the IAM user.
+3. Generate an access key and secret key.
+4. Use the generated credentials in the macros `{$AWS.ACCESS.KEY.ID}` and `{$AWS.SECRET.ACCESS.KEY}`.
+
+### Assume role authorization
 For using assume role authorization, add the appropriate permissions to the role you are using:
+
 ```json
 {
     "Version": "2012-10-17",
@@ -1696,7 +1847,10 @@ For using assume role authorization, add the appropriate permissions to the role
     ]
 }
 ```
+
+#### Trust Relationships for Assume Role Authorization
 Next, add a principal to the trust relationships of the role you are using:
+
 ```json
 {
   "Version": "2012-10-17",
@@ -1711,7 +1865,11 @@ Next, add a principal to the trust relationships of the role you are using:
   ]
 }
 ```
+Set the following macros: `{$AWS.ACCESS.KEY.ID}`, `{$AWS.SECRET.ACCESS.KEY}`, `{$AWS.STS.REGION}`, `{$AWS.ASSUME.ROLE.ARN}`.
+
+### Role-Based Authorization
 If you are using role-based authorization, set the appropriate permissions:
+
 ```json
 {
     "Version": "2012-10-17",
@@ -1736,7 +1894,10 @@ If you are using role-based authorization, set the appropriate permissions:
     ]
 }
 ```
+
+#### Trust Relationships for Role-Based Authorization
 Next, add a principal to the trust relationships of the role you are using:
+
 ```json
 {
     "Version": "2012-10-17",
@@ -1755,13 +1916,10 @@ Next, add a principal to the trust relationships of the role you are using:
     ]
 }
 ```
-**Note**, Using role-based authorization is only possible when you use a Zabbix server or proxy inside AWS.
+
+**Note**: Using role-based authorization is only possible when you use a Zabbix server or proxy inside AWS.
 
 Set the macros: `{$AWS.AUTH_TYPE}`, `{$AWS.REGION}`, and `{$AWS.ELB.ARN}`.
-
-If you are using access key-based authorization, set the macros `{$AWS.ACCESS.KEY.ID}` and `{$AWS.SECRET.ACCESS.KEY}`.
-
-If you are using access assume role authorization, set the following macros: `{$AWS.ACCESS.KEY.ID}`, `{$AWS.SECRET.ACCESS.KEY}`, `{$AWS.STS.REGION}`, `{$AWS.ASSUME.ROLE.ARN}`.
 
 For more information about managing access keys, see [official AWS documentation](https://docs.aws.amazon.com/general/latest/gr/aws-sec-cred-types.html#access-keys-and-secret-access-keys).
 
@@ -1772,14 +1930,14 @@ See the section below for a list of macros used for LLD filters.
 
 |Name|Description|Default|
 |----|-----------|-------|
-|{$AWS.DATA.TIMEOUT}|<p>API response timeout.</p>|`60s`|
-|{$AWS.PROXY}|<p>Sets the HTTP proxy value. If this macro is empty, no proxy is used.</p>||
+|{$AWS.AUTH_TYPE}|<p>Authorization method. Possible values: `access_key`, `assume_role`, `role_base`.</p>|`access_key`|
 |{$AWS.ACCESS.KEY.ID}|<p>Access key ID.</p>||
 |{$AWS.SECRET.ACCESS.KEY}|<p>Secret access key.</p>||
-|{$AWS.REGION}|<p>AWS Application Load Balancer region code.</p>|`us-west-1`|
-|{$AWS.AUTH_TYPE}|<p>Authorization method. Possible values: `access_key`, `assume_role`, `role_base`.</p>|`access_key`|
-|{$AWS.STS.REGION}|<p>Region used in assume role request.</p>|`us-east-1`|
 |{$AWS.ASSUME.ROLE.ARN}|<p>ARN assume role; add when using the `assume_role` authorization method.</p>||
+|{$AWS.REGION}|<p>AWS Application Load Balancer region code.</p>|`us-west-1`|
+|{$AWS.DATA.TIMEOUT}|<p>API response timeout.</p>|`60s`|
+|{$AWS.PROXY}|<p>Sets the HTTP proxy value. If this macro is empty, no proxy is used.</p>||
+|{$AWS.STS.REGION}|<p>Region used in assume role request.</p>|`us-east-1`|
 |{$AWS.ELB.ARN}|<p>Amazon Resource Names (ARN) of the load balancer.</p>||
 |{$AWS.HTTP.4XX.FAIL.MAX.WARN}|<p>Maximum number of HTTP request failures for a trigger expression.</p>|`5`|
 |{$AWS.HTTP.5XX.FAIL.MAX.WARN}|<p>Maximum number of HTTP request failures for a trigger expression.</p>|`5`|
@@ -1918,7 +2076,9 @@ The template gets AWS ELB Network Load Balancer metrics and uses the script item
 
 Before using the template, you need to create an IAM policy with the necessary permissions for the Zabbix role in your AWS account. For more information, visit the [ELB policies page](https://docs.aws.amazon.com/elasticloadbalancing/latest/userguide/elb-api-permissions.html) on the AWS website.
 
+### Required Permissions
 Add the following required permissions to your Zabbix IAM policy in order to collect AWS ELB Network Load Balancer metrics.
+
 ```json
 {
     "Version":"2012-10-17",
@@ -1935,7 +2095,19 @@ Add the following required permissions to your Zabbix IAM policy in order to col
     ]
   }
 ```
+
+### Access Key Authorization
+
+If you are using access key authorization, you need to generate an access key and secret key for an IAM user with the necessary permissions:
+
+1. Create an IAM user with programmatic access.
+2. Attach the required policy to the IAM user.
+3. Generate an access key and secret key.
+4. Use the generated credentials in the macros `{$AWS.ACCESS.KEY.ID}` and `{$AWS.SECRET.ACCESS.KEY}`.
+
+### Assume role authorization
 For using assume role authorization, add the appropriate permissions to the role you are using:
+
 ```json
 {
     "Version": "2012-10-17",
@@ -1957,7 +2129,10 @@ For using assume role authorization, add the appropriate permissions to the role
     ]
 }
 ```
+
+#### Trust Relationships for Assume Role Authorization
 Next, add a principal to the trust relationships of the role you are using:
+
 ```json
 {
   "Version": "2012-10-17",
@@ -1972,7 +2147,11 @@ Next, add a principal to the trust relationships of the role you are using:
   ]
 }
 ```
+Set the following macros: `{$AWS.ACCESS.KEY.ID}`, `{$AWS.SECRET.ACCESS.KEY}`, `{$AWS.STS.REGION}`, `{$AWS.ASSUME.ROLE.ARN}`.
+
+### Role-Based Authorization
 If you are using role-based authorization, set the appropriate permissions:
+
 ```json
 {
     "Version": "2012-10-17",
@@ -1997,7 +2176,10 @@ If you are using role-based authorization, set the appropriate permissions:
     ]
 }
 ```
+
+#### Trust Relationships for Role-Based Authorization
 Next, add a principal to the trust relationships of the role you are using:
+
 ```json
 {
     "Version": "2012-10-17",
@@ -2016,13 +2198,10 @@ Next, add a principal to the trust relationships of the role you are using:
     ]
 }
 ```
-**Note**, Using role-based authorization is only possible when you use a Zabbix server or proxy inside AWS.
+
+**Note**: Using role-based authorization is only possible when you use a Zabbix server or proxy inside AWS.
 
 Set the macros: `{$AWS.AUTH_TYPE}`, `{$AWS.REGION}`, and `{$AWS.ELB.ARN}`.
-
-If you are using access key-based authorization, set the macros `{$AWS.ACCESS.KEY.ID}` and `{$AWS.SECRET.ACCESS.KEY}`.
-
-If you are using access assume role authorization, set the following macros: `{$AWS.ACCESS.KEY.ID}`, `{$AWS.SECRET.ACCESS.KEY}`, `{$AWS.STS.REGION}`, `{$AWS.ASSUME.ROLE.ARN}`.
 
 For more information about managing access keys, see [official AWS documentation](https://docs.aws.amazon.com/general/latest/gr/aws-sec-cred-types.html#access-keys-and-secret-access-keys).
 
@@ -2033,14 +2212,14 @@ See the section below for a list of macros used for LLD filters.
 
 |Name|Description|Default|
 |----|-----------|-------|
-|{$AWS.DATA.TIMEOUT}|<p>API response timeout.</p>|`60s`|
-|{$AWS.PROXY}|<p>Sets the HTTP proxy value. If this macro is empty, no proxy is used.</p>||
+|{$AWS.AUTH_TYPE}|<p>Authorization method. Possible values: `access_key`, `assume_role`, `role_base`.</p>|`access_key`|
 |{$AWS.ACCESS.KEY.ID}|<p>Access key ID.</p>||
 |{$AWS.SECRET.ACCESS.KEY}|<p>Secret access key.</p>||
-|{$AWS.REGION}|<p>AWS Network Load Balancer region code.</p>|`us-west-1`|
-|{$AWS.AUTH_TYPE}|<p>Authorization method. Possible values: `access_key`, `assume_role`, `role_base`.</p>|`access_key`|
-|{$AWS.STS.REGION}|<p>Region used in assume role request.</p>|`us-east-1`|
 |{$AWS.ASSUME.ROLE.ARN}|<p>ARN assume role; add when using the `assume_role` authorization method.</p>||
+|{$AWS.REGION}|<p>AWS Application Load Balancer region code.</p>|`us-west-1`|
+|{$AWS.PROXY}|<p>Sets the HTTP proxy value. If this macro is empty, no proxy is used.</p>||
+|{$AWS.STS.REGION}|<p>Region used in assume role request.</p>|`us-east-1`|
+|{$AWS.DATA.TIMEOUT}|<p>API response timeout.</p>|`60s`|
 |{$AWS.ELB.ARN}|<p>Amazon Resource Names (ARN) of the load balancer.</p>||
 |{$AWS.ELB.LLD.FILTER.TARGET.GROUP.MATCHES}|<p>Filter of discoverable target groups by name.</p>|`.*`|
 |{$AWS.ELB.LLD.FILTER.TARGET.GROUP.NOT_MATCHES}|<p>Filter to exclude discovered target groups by name.</p>|`CHANGE_IF_NEEDED`|
@@ -2171,7 +2350,9 @@ The template gets AWS Lambda metrics and uses the script item to make HTTP reque
 
 Before using the template, you need to create an IAM policy with the necessary permissions for the Zabbix role in your AWS account. For more information, visit the [Lambda permissions page](https://docs.aws.amazon.com/lambda/latest/dg/lambda-permissions.html) on the AWS website.
 
+### Required Permissions
 Add the following required permissions to your Zabbix IAM policy in order to collect AWS Lambda metrics.
+
 ```json
 {
     "Version":"2012-10-17",
@@ -2187,7 +2368,19 @@ Add the following required permissions to your Zabbix IAM policy in order to col
     ]
   }
 ```
+
+### Access Key Authorization
+
+If you are using access key authorization, you need to generate an access key and secret key for an IAM user with the necessary permissions:
+
+1. Create an IAM user with programmatic access.
+2. Attach the required policy to the IAM user.
+3. Generate an access key and secret key.
+4. Use the generated credentials in the macros `{$AWS.ACCESS.KEY.ID}` and `{$AWS.SECRET.ACCESS.KEY}`.
+
+### Assume role authorization
 For using assume role authorization, add the appropriate permissions to the role you are using:
+
 ```json
 {
     "Version": "2012-10-17",
@@ -2208,7 +2401,10 @@ For using assume role authorization, add the appropriate permissions to the role
     ]
 }
 ```
+
+#### Trust Relationships for Assume Role Authorization
 Next, add a principal to the trust relationships of the role you are using:
+
 ```json
 {
   "Version": "2012-10-17",
@@ -2223,7 +2419,11 @@ Next, add a principal to the trust relationships of the role you are using:
   ]
 }
 ```
+Set the following macros: `{$AWS.ACCESS.KEY.ID}`, `{$AWS.SECRET.ACCESS.KEY}`, `{$AWS.STS.REGION}`, `{$AWS.ASSUME.ROLE.ARN}`.
+
+### Role-Based Authorization
 If you are using role-based authorization, set the appropriate permissions:
+
 ```json
 {
     "Version": "2012-10-17",
@@ -2247,7 +2447,9 @@ If you are using role-based authorization, set the appropriate permissions:
     ]
 }
 ```
+#### Trust Relationships for Role-Based Authorization
 Next, add a principal to the trust relationships of the role you are using:
+
 ```json
 {
     "Version": "2012-10-17",
@@ -2266,13 +2468,10 @@ Next, add a principal to the trust relationships of the role you are using:
     ]
 }
 ```
-**Note**, Using role-based authorization is only possible when you use a Zabbix server or proxy inside AWS.
+
+**Note**: Using role-based authorization is only possible when you use a Zabbix server or proxy inside AWS.
 
 Set the macros: `{$AWS.AUTH_TYPE}`, `{$AWS.REGION}`, and `{$AWS.LAMBDA.ARN}`.
-
-If you are using access key-based authorization, set the macros `{$AWS.ACCESS.KEY.ID}` and `{$AWS.SECRET.ACCESS.KEY}`.
-
-If you are using access assume role authorization, set the following macros: `{$AWS.ACCESS.KEY.ID}`, `{$AWS.SECRET.ACCESS.KEY}`, `{$AWS.STS.REGION}`, `{$AWS.ASSUME.ROLE.ARN}`.
 
 For more information about managing access keys, see the [official AWS documentation](https://docs.aws.amazon.com/general/latest/gr/aws-sec-cred-types.html#access-keys-and-secret-access-keys).
 
@@ -2283,14 +2482,14 @@ See the section below for a list of macros used for LLD filters.
 
 |Name|Description|Default|
 |----|-----------|-------|
-|{$AWS.DATA.TIMEOUT}|<p>API response timeout.</p>|`60s`|
-|{$AWS.PROXY}|<p>Sets the HTTP proxy value. If this macro is empty, no proxy is used.</p>||
+|{$AWS.AUTH_TYPE}|<p>Authorization method. Possible values: `access_key`, `assume_role`, `role_base`.</p>|`access_key`|
 |{$AWS.ACCESS.KEY.ID}|<p>Access key ID.</p>||
 |{$AWS.SECRET.ACCESS.KEY}|<p>Secret access key.</p>||
-|{$AWS.REGION}|<p>AWS Lambda function region code.</p>|`us-west-1`|
-|{$AWS.AUTH_TYPE}|<p>Authorization method. Possible values: `access_key`, `assume_role`, `role_base`.</p>|`access_key`|
-|{$AWS.STS.REGION}|<p>Region used in assume role request.</p>|`us-east-1`|
 |{$AWS.ASSUME.ROLE.ARN}|<p>ARN assume role; add when using the `assume_role` authorization method.</p>||
+|{$AWS.REGION}|<p>AWS Lambda function region code.</p>|`us-west-1`|
+|{$AWS.PROXY}|<p>Sets the HTTP proxy value. If this macro is empty, no proxy is used.</p>||
+|{$AWS.STS.REGION}|<p>Region used in assume role request.</p>|`us-east-1`|
+|{$AWS.DATA.TIMEOUT}|<p>API response timeout.</p>|`60s`|
 |{$AWS.LAMBDA.ARN}|<p>The Amazon Resource Names (ARN) of the Lambda function.</p>||
 |{$AWS.LAMBDA.LLD.FILTER.ALARM_SERVICE_NAMESPACE.MATCHES}|<p>Filter of discoverable alarms by namespace.</p>|`.*`|
 |{$AWS.LAMBDA.LLD.FILTER.ALARM_SERVICE_NAMESPACE.NOT_MATCHES}|<p>Filter to exclude discovered alarms by namespace.</p>|`CHANGE_IF_NEEDED`|
@@ -2374,7 +2573,9 @@ Before using the template, you need to create an IAM policy for the Zabbix role 
 
 * [IAM policies for AWS Cost Management](https://docs.aws.amazon.com/cost-management/latest/userguide/billing-permissions-ref.html)
 
+### Required Permissions
 Add the following required permissions to your Zabbix IAM policy in order to collect metrics.
+
 ```json
 {
     "Version": "2012-10-17",
@@ -2390,7 +2591,19 @@ Add the following required permissions to your Zabbix IAM policy in order to col
     ]
 }
 ```
+
+### Access Key Authorization
+
+If you are using access key authorization, you need to generate an access key and secret key for an IAM user with the necessary permissions:
+
+1. Create an IAM user with programmatic access.
+2. Attach the required policy to the IAM user.
+3. Generate an access key and secret key.
+4. Use the generated credentials in the macros `{$AWS.ACCESS.KEY.ID}` and `{$AWS.SECRET.ACCESS.KEY}`.
+
+### Assume Role Authorization
 For using assume role authorization, add the appropriate permissions to the role you are using:
+
 ```json
 {
     "Version": "2012-10-17",
@@ -2411,7 +2624,10 @@ For using assume role authorization, add the appropriate permissions to the role
     ]
 }
 ```
+
+#### Trust Relationships for Assume Role Authorization
 Next, add a principal to the trust relationships of the role you are using:
+
 ```json
 {
   "Version": "2012-10-17",
@@ -2426,7 +2642,11 @@ Next, add a principal to the trust relationships of the role you are using:
   ]
 }
 ```
+Set the following macros: `{$AWS.ACCESS.KEY.ID}`, `{$AWS.SECRET.ACCESS.KEY}`, `{$AWS.STS.REGION}`, `{$AWS.ASSUME.ROLE.ARN}`.
+
+### Role-Based Authorization
 If you are using role-based authorization, add the appropriate permissions:
+
 ```json
 {
     "Version": "2012-10-17",
@@ -2449,7 +2669,10 @@ If you are using role-based authorization, add the appropriate permissions:
     ]
 }
 ```
+
+#### Trust Relationships for Role-Based Authorization
 Next, add a principal to the trust relationships of the role you are using:
+
 ```json
 {
     "Version": "2012-10-17",
@@ -2468,13 +2691,10 @@ Next, add a principal to the trust relationships of the role you are using:
     ]
 }
 ```
-**Note**, Using role-based authorization is only possible when you use a Zabbix server or proxy inside AWS.
+
+**Note**: Using role-based authorization is only possible when you use a Zabbix server or proxy inside AWS.
 
 Set the macros: `{$AWS.AUTH_TYPE}`. Possible values: `access_key`, `assume_role`, `role_base`.
-
-If you are using access key-based authorization, set the following macros: `{$AWS.ACCESS.KEY.ID}`, `{$AWS.SECRET.ACCESS.KEY}`.
-
-If you are using access assume role authorization, set the following macros: `{$AWS.ACCESS.KEY.ID}`, `{$AWS.SECRET.ACCESS.KEY}`, `{$AWS.STS.REGION}`, `{$AWS.ASSUME.ROLE.ARN}`.
 
 For more information about managing access keys, see the [official documentation](https://docs.aws.amazon.com/general/latest/gr/aws-sec-cred-types.html#access-keys-and-secret-access-keys).
 
@@ -2489,13 +2709,13 @@ Additional information about metrics and used API methods:
 
 |Name|Description|Default|
 |----|-----------|-------|
-|{$AWS.PROXY}|<p>Sets HTTP proxy value. If this macro is empty, then no proxy is used.</p>||
+|{$AWS.AUTH_TYPE}|<p>Authorization method. Possible values: `access_key`, `assume_role`, `role_base`.</p>|`access_key`|
 |{$AWS.ACCESS.KEY.ID}|<p>Access key ID.</p>||
 |{$AWS.SECRET.ACCESS.KEY}|<p>Secret access key.</p>||
-|{$AWS.BILLING.REGION}|<p>Amazon Billing region code.</p>|`us-east-1`|
-|{$AWS.AUTH_TYPE}|<p>Authorization method. Possible values: `access_key`, `assume_role`, `role_base`.</p>|`access_key`|
-|{$AWS.STS.REGION}|<p>Region used in assume role request.</p>|`us-east-1`|
 |{$AWS.ASSUME.ROLE.ARN}|<p>ARN assume role; add when using the `assume_role` authorization method.</p>||
+|{$AWS.PROXY}|<p>Sets HTTP proxy value. If this macro is empty, then no proxy is used.</p>||
+|{$AWS.STS.REGION}|<p>Region used in assume role request.</p>|`us-east-1`|
+|{$AWS.BILLING.REGION}|<p>Amazon Billing region code.</p>|`us-east-1`|
 |{$AWS.BILLING.MONTH}|<p>Months to get historical data from AWS Cost Explore API, no more than 12 months.</p>|`11`|
 |{$AWS.BILLING.LLD.FILTER.SERVICE.MATCHES}|<p>Filter of discoverable discovered billing service by name.</p>|`.*`|
 |{$AWS.BILLING.LLD.FILTER.SERVICE.NOT_MATCHES}|<p>Filter to exclude discovered billing service by name.</p>|`CHANGE_IF_NEEDED`|

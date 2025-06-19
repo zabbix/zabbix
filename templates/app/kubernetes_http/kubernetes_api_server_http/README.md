@@ -35,8 +35,8 @@ Also, see the Macros section for a list of macros used to set trigger values.
 
 |Name|Description|Default|
 |----|-----------|-------|
-|{$KUBE.API.SERVER.URL}|<p>Kubernetes API server metrics endpoint URL.</p>|`https://localhost:6443/metrics`|
 |{$KUBE.API.TOKEN}|<p>API Authorization Token.</p>||
+|{$KUBE.API.SERVER.URL}|<p>Kubernetes API server metrics endpoint URL.</p>|`https://localhost:6443/metrics`|
 |{$KUBE.API.CERT.EXPIRATION}|<p>Number of days for alert of client certificate used for trigger.</p>|`7`|
 |{$KUBE.API.HTTP.CLIENT.ERROR}|<p>Maximum number of HTTP client requests failures used for trigger.</p>|`2`|
 |{$KUBE.API.HTTP.SERVER.ERROR}|<p>Maximum number of HTTP server requests failures used for trigger.</p>|`2`|

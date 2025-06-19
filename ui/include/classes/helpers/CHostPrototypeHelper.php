@@ -35,9 +35,11 @@ class CHostPrototypeHelper {
 
 		foreach ($dst_hostids as $dst_hostid) {
 			foreach ($src_host_prototypes as $src_host_prototype) {
-				$dst_host_prototype =
-					['ruleid' => $dst_ruleids[$src_host_prototype['discoveryRule']['itemid']][$dst_hostid]]
-					+ array_diff_key($src_host_prototype, array_flip(['hostid', 'discoveryRule']));
+				$parent_lld = $src_host_prototype['discoveryRule'] ?: $src_host_prototype['discoveryRulePrototype'];
+				$dst_host_prototype = ['ruleid' => $dst_ruleids[$parent_lld['itemid']][$dst_hostid]]
+					+ array_diff_key($src_host_prototype,
+						array_flip(['hostid', 'discoveryRule', 'discoveryRulePrototype'])
+					);
 
 				foreach ($dst_host_prototype['macros'] as &$macro) {
 					if ($macro['type'] == ZBX_MACRO_TYPE_SECRET) {
@@ -70,6 +72,10 @@ class CHostPrototypeHelper {
 			'selectTags' => ['tag', 'value'],
 			'selectMacros' => ['macro', 'type', 'value', 'description'],
 			'selectDiscoveryRule' => ['itemid'],
+			'selectDiscoveryRulePrototype' => ['itemid'],
+			'filter' => [
+				'flags' => [ZBX_FLAG_DISCOVERY_PROTOTYPE]
+			],
 			'preservekeys' => true
 		] + $src_options);
 	}

@@ -1,0 +1,127 @@
+---
+test case: No macros in parameters
+in:
+  key: item[abc]
+out:
+  return: SUCCEED
+  result: item[abc]
+  func_hit: 2
+  no_macros: 2
+---
+test case: Simple key (item1)
+in:
+  key: item1
+out:
+  return: SUCCEED
+  result: item1
+  func_hit: 1
+---
+test case: No key
+in:
+  key: ''
+out:
+  return: FAIL
+  error: Invalid SNMP OID at position 0
+---
+test case: Open key parameters
+in:
+  key: item[
+out:
+  return: FAIL
+  error: Invalid SNMP OID at position 5
+---
+test case: Space in parameter
+in:
+  key: "item[ ]"
+out:
+  return: SUCCEED
+  result: item[ ]
+  no_macros: 2
+  func_hit: 2
+---
+test case: Multiple parameters
+in:
+  key: item[a,b,c]
+out:
+  return: SUCCEED
+  result: item[a,b,c]
+  func_hit: 4
+  no_macros: 4
+---
+test case: Multi-level parameter
+in:
+  key: item[item2[]]
+out:
+  return: FAIL
+  error: Invalid SNMP OID at position 12
+---
+test case: Quoted parameter
+in:
+  key: item["","abc",""]
+out:
+  return: SUCCEED
+  result: item["","abc",""]
+  func_hit: 4
+  quoted: 3
+---
+test case: Space after end of parameters
+in:
+  key: "item[abc] "
+out:
+  return: SUCCEED
+  result: "item[abc] "
+  func_hit: 2
+---
+test case: Data after parameters
+in:
+  key: "item[abc] def"
+out:
+  return: FAIL
+  error: Invalid SNMP OID at position 10
+---
+test case: Comma after end of parameters
+in:
+  key: "item[abc],"
+out:
+  return: SUCCEED   # This is incorrect FIXME later
+  result: item[abc],
+---
+test case: Redundant ']'
+in:
+  key: item[]]
+out:
+  return: FAIL
+  error: Invalid SNMP OID at position 6
+---
+test case: Escaped quote in quoted parameter
+in:
+  key: item["abc","ab\"c","\"\""]
+out:
+  return: SUCCEED
+  result: item["abc","ab\"c","\"\""]
+  func_hit: 4
+  quoted: 3
+---
+test case: Double quotes
+in:
+  key: item[,""""]
+out:
+  return: FAIL
+  error: Invalid SNMP OID at position 8
+---
+test case: Macro test for key 'ifInOctets.{$MACRO}' with macro '1'
+in:
+  key: 'ifInOctets.{$MACRO}'
+  macro: 1
+out:
+  return: SUCCEED
+  result: ifInOctets.1
+---
+test case: Macro in SNMP OID key
+in:
+  key: '{$MACRO}.1'
+  macro: 'ifInOctets'
+out:
+  return: SUCCEED
+  result: ifInOctets.1
+...

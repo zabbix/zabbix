@@ -31,6 +31,14 @@ GRANT REPLICATION CLIENT,PROCESS,SHOW DATABASES,SHOW VIEW ON *.* TO 'zbx_monitor
 
 For more information, please see MySQL documentation https://dev.mysql.com/doc/refman/8.0/en/grant.html
 
+**NOTE:** In order to collect replication metrics, MariaDB Enterprise Server 10.5.8-5 and above and MariaDB Community Server 10.5.9 and above require the `SLAVE MONITOR` privilege to be set for the monitoring user:
+
+```text
+GRANT REPLICATION CLIENT,PROCESS,SHOW DATABASES,SHOW VIEW,SLAVE MONITOR ON *.* TO 'zbx_monitor'@'%';
+```
+
+For more information please read the MariaDB documentation https://mariadb.com/docs/server/ref/mdb/privileges/SLAVE_MONITOR/
+
 2. Set in the {$MYSQL.DSN} macro the data source name of the MySQL instance either session name from Zabbix agent 2 configuration file or URI.
 **Examples:** MySQL1, tcp://localhost:3306, tcp://172.16.0.10, unix:/var/run/mysql.sock
 For more information about MySQL Unix socket file, see the MySQL documentation https://dev.mysql.com/doc/refman/8.0/en/problems-with-mysql-sock.html.
@@ -43,13 +51,13 @@ For more information about configuring the Zabbix MySQL plugin, see the document
 
 |Name|Description|Default|
 |----|-----------|-------|
+|{$MYSQL.DSN}|<p>System data source name such as <tcp://host:port or unix:/path/to/socket)/>.</p>||
 |{$MYSQL.USER}|<p>MySQL user name.</p>||
 |{$MYSQL.PASSWORD}|<p>MySQL user password.</p>||
 |{$MYSQL.ABORTED_CONN.MAX.WARN}|<p>Number of failed attempts to connect to the MySQL server for trigger expressions.</p>|`3`|
 |{$MYSQL.REPL_LAG.MAX.WARN}|<p>Amount of time the slave is behind the master for trigger expressions.</p>|`30m`|
 |{$MYSQL.SLOW_QUERIES.MAX.WARN}|<p>Number of slow queries for trigger expressions.</p>|`3`|
 |{$MYSQL.BUFF_UTIL.MIN.WARN}|<p>The minimum buffer pool utilization in percentage for trigger expressions.</p>|`50`|
-|{$MYSQL.DSN}|<p>System data source name such as <tcp://host:port or unix:/path/to/socket)/>.</p>|`<Put your DSN>`|
 |{$MYSQL.CREATED_TMP_TABLES.MAX.WARN}|<p>The maximum number of temporary tables created in memory per second for trigger expressions.</p>|`30`|
 |{$MYSQL.CREATED_TMP_DISK_TABLES.MAX.WARN}|<p>The maximum number of temporary tables created on a disk per second for trigger expressions.</p>|`10`|
 |{$MYSQL.CREATED_TMP_FILES.MAX.WARN}|<p>The maximum number of temporary files created on a disk per second for trigger expressions.</p>|`10`|

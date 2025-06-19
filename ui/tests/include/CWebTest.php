@@ -403,6 +403,8 @@ class CWebTest extends CTest {
 
 		$script = 'var tag = document.createElement("style");tag.setAttribute("id", "selenium-injected-style");'.
 				'tag.textContent = "* {text-rendering: geometricPrecision; image-rendering: pixelated}'.
+				' .sysmap-scroll-container line, .sysmap-scroll-container circle, .sysmap-scroll-container ellipse {shape-rendering: crispedges;}'.
+				' .sysmap-widget-container line, .sysmap-widget-container circle, .sysmap-widget-container ellipse {shape-rendering: crispedges;}'.
 				' .selenium-hide {opacity: 0 !important;transition: opacity 0s !important;}'.
 				' #selenium-injected-pixel {position:absolute;right:0;bottom:0;width:1px;height:1px;opacity:0}";'.
 				'(document.head||document.documentElement).appendChild(tag);'.

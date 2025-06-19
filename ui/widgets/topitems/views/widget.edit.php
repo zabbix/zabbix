@@ -101,7 +101,7 @@ $form
 			)
 	)
 	->includeJsFile('widget.edit.js.php')
-	->addJavaScript('widget_topitems_form.init('.json_encode([
+	->initFormJs('widget_form.init('.json_encode([
 		'templateid' => $data['templateid']
 	], JSON_THROW_ON_ERROR).');')
 	->show();

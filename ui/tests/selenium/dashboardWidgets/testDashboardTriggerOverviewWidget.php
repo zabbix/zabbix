@@ -625,22 +625,18 @@ class testDashboardTriggerOverviewWidget extends CWebTest {
 		}
 		else {
 			$form = $dashboard->addWidget()->asForm();
-
-			if ($form->getField('Type')->getValue() !== 'Trigger overview') {
-				$form->getField('Type')->fill('Trigger overview');
-				$form->invalidate();
-			}
+			$form->fill(['Type' => CFormElement::RELOADABLE_FILL('Trigger overview')]);
 		}
 
 		$form->fill([
-			'Name' => $new_name,
 			'Refresh interval' => '10 minutes',
 			'Show' => 'Any',
 			'Host groups' => ['Another group to check Overview'],
 			'Hosts' => ['4_Host_to_check_Monitoring_Overview'],
 			'Problem tags' => 'Or',
 			'Show suppressed problems' => 'true',
-			'Layout' => 'Vertical'
+			'Layout' => 'Vertical',
+			'Name' => $new_name
 		]);
 
 		$this->setTags([['name' => 'webhook', 'operator' => 'Equals', 'value' => '1']]);
@@ -653,9 +649,9 @@ class testDashboardTriggerOverviewWidget extends CWebTest {
 			$this->assertTrue($dashboard->getWidget($new_name)->isValid());
 		}
 		else {
+			$dashboard->getWidget($new_name);
 			$dialog = COverlayDialogElement::find()->one();
-			$dialog->query('button:Cancel')->one()->click();
-			$dialog->ensureNotPresent();
+			$dialog->close(true);
 
 			if (CTestArrayHelper::get($data, 'update', false)) {
 				foreach ([self::$update_widget => true, $new_name => false] as $name => $valid) {

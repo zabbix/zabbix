@@ -386,6 +386,10 @@ class ZBase {
 		};
 	}
 
+	public static function getConfig(): array {
+		return self::getInstance()->config;
+	}
+
 	/**
 	 * Check if maintenance mode is enabled.
 	 *
@@ -410,6 +414,7 @@ class ZBase {
 		$config = new CConfigFile($configFile);
 
 		$this->config = $config->load();
+		$this->component_registry->config = $config;
 	}
 
 	/**

@@ -244,26 +244,41 @@ class CControllerHostList extends CController {
 				'details'
 			],
 			'selectItems' => API_OUTPUT_COUNT,
-			'selectDiscoveries' => API_OUTPUT_COUNT,
+			'selectDiscoveryRules' => API_OUTPUT_COUNT,
 			'selectTriggers' => API_OUTPUT_COUNT,
 			'selectGraphs' => API_OUTPUT_COUNT,
 			'selectHttpTests' => API_OUTPUT_COUNT,
 			'selectDiscoveryRule' => ['itemid', 'name', 'lifetime_type', 'enabled_lifetime_type'],
-			'selectHostDiscovery' => ['parent_hostid', 'status', 'ts_delete', 'ts_disable', 'disable_source'],
+			'selectDiscoveryData' => ['parent_hostid', 'status', 'ts_delete', 'ts_disable', 'disable_source'],
 			'selectTags' => ['tag', 'value'],
 			'hostids' => array_column($hosts, 'hostid'),
 			'preservekeys' => true
 		]);
 
-		foreach ($hosts as &$host) {
-			$host['is_discovery_rule_editable'] = $host['discoveryRule']
-				&& API::DiscoveryRule()->get([
-					'output' => [],
-					'itemids' => $host['discoveryRule']['itemid'],
-					'editable' => true
-				]);
+		$lld_parentids = [];
+
+		foreach ($hosts as $host) {
+			if ($host['discoveryRule']) {
+				$lld_parentids[$host['discoveryRule']['itemid']] = true;
+			}
 		}
-		unset($host);
+
+		if ($lld_parentids) {
+			$editable_lld_parents = API::DiscoveryRule()->get([
+				'output' => [],
+				'itemids' => array_keys($lld_parentids),
+				'editable' => true,
+				'preservekeys' => true
+			]);
+
+			foreach ($hosts as &$host) {
+				if ($host['discoveryRule']) {
+					$host['is_discovery_rule_editable'] =
+						array_key_exists($host['discoveryRule']['itemid'], $editable_lld_parents);
+				}
+			}
+			unset($host);
+		}
 
 		order_result($hosts, $sort_field, $sort_order);
 

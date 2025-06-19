@@ -16,7 +16,7 @@
 
 ?>
 
-window.widget_host_availability_form = new class {
+window.widget_form = new class extends CWidgetForm {
 
 	init() {
 		for (const element of document.querySelectorAll('[name="interface_type[]"]')) {
@@ -24,6 +24,7 @@ window.widget_host_availability_form = new class {
 		}
 
 		this.#updateForm();
+		this.ready();
 	}
 
 	#updateForm() {

@@ -16,11 +16,10 @@
 #define ZABBIX_AUDIT_SERVER_H
 
 #include "zbxtypes.h"
+#include "audit/zbxaudit.h"
 
 void	zbx_audit_proxy_config_reload(int audit_context_mode, zbx_uint64_t proxyid, const char *name);
 
-void	zbx_audit_settings_create_entry(int audit_context_mode, int audit_action);
-void	zbx_audit_settings_update_field_str(int audit_context_mode, const char *key, const char *old_value,
-		const char *new_value);
+zbx_audit_entry_t	*zbx_audit_settings_create_entry(int audit_context_mode, int audit_action);
 
 #endif

@@ -144,3 +144,66 @@ int	zbx_check_hostname(const char *hostname, char **error)
 
 	return SUCCEED;
 }
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: checks byte stream for valid prototype hostname                   *
+ *                                                                            *
+ * Parameters: hostname - [IN]  pointer to first char of hostname             *
+ *             error    - [OUT] pointer to error message                      *
+ *                                                                            *
+ * Return value: SUCCEED - hostname is valid                                  *
+ *               FAIL -    hostname contains invalid chars outside LLD macros *
+ *                                                                            *
+ ******************************************************************************/
+int	zbx_check_prototype_hostname(const char *hostname, char **error)
+{
+	zbx_token_t	token;
+	size_t		pos = 0, macro_len = 0;
+
+	while (SUCCEED == zbx_token_find(hostname, (int)pos, &token, ZBX_TOKEN_SEARCH_BASIC))
+	{
+		if (ZBX_TOKEN_LLD_MACRO == token.type || ZBX_TOKEN_LLD_FUNC_MACRO == token.type)
+		{
+			for (;pos < token.loc.l; pos++)
+			{
+				if (FAIL == zbx_is_hostname_char(hostname[pos]))
+					break;
+			}
+
+			pos = token.loc.r + 1;
+			macro_len += pos - token.loc.l;
+			continue;
+		}
+
+		if (FAIL == zbx_is_hostname_char(hostname[pos]))
+			break;
+
+		pos++;
+	}
+
+	for (; '\0' != hostname[pos]; pos++)
+	{
+		if (FAIL == zbx_is_hostname_char(hostname[pos]))
+		{
+			*error = zbx_dsprintf(NULL, "name contains invalid character '%c'", hostname[pos]);
+			return FAIL;
+		}
+	}
+
+	if (0 == pos)
+	{
+		*error = zbx_strdup(NULL, "name is empty");
+		return FAIL;
+	}
+
+	if (ZBX_MAX_HOSTNAME_LEN < pos - macro_len)
+	{
+		*error = zbx_dsprintf(NULL, "name is too long (max %d characters)", ZBX_MAX_HOSTNAME_LEN);
+		return FAIL;
+	}
+
+	return SUCCEED;
+}
+
+

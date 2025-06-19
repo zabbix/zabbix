@@ -2050,7 +2050,7 @@ class testScripts extends CAPITest {
 					'command' => 'reboot server',
 					'port' => 'abc'
 				],
-				'expected_error' => 'Invalid parameter "/1/port": an integer is expected.'
+				'expected_error' => 'Invalid parameter "/1/port": a port number is expected.'
 			],
 			'Test script.create invalid port' => [
 				'script' => [
@@ -2060,7 +2060,7 @@ class testScripts extends CAPITest {
 					'command' => 'reboot server',
 					'port' => 999999
 				],
-				'expected_error' => 'Invalid parameter "/1/port": value must be one of 0-65535.'
+				'expected_error' => 'Invalid parameter "/1/port": a port number is expected.'
 			],
 
 			// Check script auth type.
@@ -5308,21 +5308,21 @@ class testScripts extends CAPITest {
 					'scriptid' => 'update_ssh_pwd',
 					'port' => 'abc'
 				],
-				'expected_error' => 'Invalid parameter "/1/port": an integer is expected.'
+				'expected_error' => 'Invalid parameter "/1/port": a port number is expected.'
 			],
 			'Test script.update invalid port (not macro)' => [
 				'script' => [
 					'scriptid' => 'update_ssh_pwd',
 					'port' => '{$NOT_MACRO'
 				],
-				'expected_error' => 'Invalid parameter "/1/port": an integer is expected.'
+				'expected_error' => 'Invalid parameter "/1/port": a port number is expected.'
 			],
 			'Test script.update invalid port' => [
 				'script' => [
 					'scriptid' => 'update_ssh_pwd',
 					'port' => 999999
 				],
-				'expected_error' => 'Invalid parameter "/1/port": value must be one of 0-65535.'
+				'expected_error' => 'Invalid parameter "/1/port": a port number is expected.'
 			],
 			'Test script.update unexpected port field for custom script type (string)' => [
 				'script' => [

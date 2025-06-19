@@ -48,8 +48,8 @@ z-select {
 			box-shadow: none;
 		}
 
-		&.red {
-			color: $red;
+		&.color-negative {
+			color: $negative-color;
 
 			&::after {
 				color: $font-color;
@@ -90,8 +90,8 @@ z-select {
 				background-color: $action-hover-color;
 			}
 
-			&.red {
-				color: $red;
+			&.color-negative {
+				color: $negative-color;
 			}
 
 			&[disabled] {

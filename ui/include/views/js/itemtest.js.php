@@ -43,26 +43,22 @@
 			};
 
 			if (type == <?= ZBX_PREPROC_SNMP_WALK_TO_JSON ?>) {
-				const inputs = document.querySelectorAll(`.group-json-mapping[data-index="${num}"] input`);
+				const inputs = $preprocessing[0]
+					.querySelectorAll(`input[name^="preprocessing[${num}][params_set_snmp]"]`);
 
 				[...inputs].map((input) => params.push(input.value));
-			} else {
-				if (jQuery('[name="preprocessing[' + num + '][params][0]"]', $preprocessing).length) {
-					params.push(jQuery('[name="preprocessing[' + num + '][params][0]"]', $preprocessing).val());
-				}
-				if (jQuery('[name="preprocessing[' + num + '][params][1]"]', $preprocessing).length) {
-					params.push(jQuery('[name="preprocessing[' + num + '][params][1]"]', $preprocessing).val());
-				}
-				if (jQuery('[name="preprocessing[' + num + '][params][2]"]:not(:disabled)', $preprocessing).length) {
-					if (type == <?= ZBX_PREPROC_CSV_TO_JSON ?>) {
-						if (jQuery('[name="preprocessing[' + num + '][params][2]"]', $preprocessing).is(':checked')) {
-							params.push(jQuery('[name="preprocessing[' + num + '][params][2]"]', $preprocessing).val());
-						}
-					}
-					else {
-						params.push(jQuery('[name="preprocessing[' + num + '][params][2]"]', $preprocessing).val());
-					}
-				}
+			}
+			else if (type == <?= ZBX_PREPROC_VALIDATE_NOT_SUPPORTED ?>) {
+				['params_0_not_supported', 'params_1_not_supported'].forEach(function(name) {
+					const node = $preprocessing[0].querySelector(`input[name^="preprocessing[${num}][${name}]"]`);
+					node && params.push(node.value);
+				});
+			}
+			else {
+				['params_0', 'params_1', 'params_2'].forEach(function(name) {
+					const node = $preprocessing[0].querySelector(`input[name^="preprocessing[${num}][${name}]"]`);
+					node && !node.disabled && params.push(node.value);
+				});
 			}
 
 			steps.push(jQuery.extend({

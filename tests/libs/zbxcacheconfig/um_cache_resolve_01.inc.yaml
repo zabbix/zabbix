@@ -1,0 +1,32 @@
+---
+hosts:
+  - hostid: 1
+    macros:
+    - macroid: 1
+      macro: "{$HOST_VALUE}"
+      value: "Host 1 value"
+    templates: []
+  - hostid: 2
+    macros:
+    - macroid: 2
+      macro: "{$HOST_VALUE}"
+      value: "Host 2 value"
+    templates: []
+  - hostid: 3
+    macros:
+    - macroid: 3
+      macro: "{$HOST_VALUE}"
+      value: "Host 3 value"
+    templates: []
+  - hostid: 4
+    macros:
+    - macroid: 3
+      macro: "{$HOST_VALUE}"
+      value: "Host 4 value"
+    templates: [3, 2, 1]
+vault:
+  - path: a/b/c
+    values:
+    - key: k1
+      value: v1
+...

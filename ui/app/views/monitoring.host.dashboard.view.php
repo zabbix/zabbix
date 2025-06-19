@@ -28,7 +28,11 @@ $this->addJsFile('class.widget.js');
 $this->addJsFile('class.widget.inaccessible.js');
 $this->addJsFile('class.widget.iterator.js');
 $this->addJsFile('class.widget.misconfigured.js');
-$this->addJsFile('class.widget.paste-placeholder.js');
+$this->addJsFile('class.widget.create-placeholder.js');
+$this->addJsFile('class.widget-field.js');
+$this->addJsFile('class.widget-field-event.js');
+$this->addJsFile('class.widget-form.js');
+$this->addJsFile('class.widget-form-event.js');
 
 if (array_key_exists('error', $data)) {
 	show_error_message($data['error']);
@@ -45,8 +49,14 @@ if (array_key_exists('no_data', $data)) {
 }
 
 $this->addJsFile('class.csvggraph.js');
-$this->addJsFile('class.svg.canvas.js');
-$this->addJsFile('class.svg.map.js');
+$this->addJsFile('class.imagecache.js');
+$this->addJsFile('class.svgcanvas.js');
+$this->addJsFile('class.svgtextarea.js');
+$this->addJsFile('class.svgelement.js');
+$this->addJsFile('class.svgmap.js');
+$this->addJsFile('class.svgmapelement.js');
+$this->addJsFile('class.svgmaplink.js');
+$this->addJsFile('class.svgmapshape.js');
 $this->addJsFile('d3.js');
 $this->addJsFile('flickerfreescreen.js');
 $this->addJsFile('gtlc.js');

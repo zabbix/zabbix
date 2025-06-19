@@ -42,6 +42,7 @@ class testPageProblems extends CWebTest {
 		];
 	}
 
+	const URL = 'zabbix.php?action=problem.view&filter_reset=1';
 	protected static $time;
 
 	public function prepareProblemsData() {
@@ -111,7 +112,7 @@ class testPageProblems extends CWebTest {
 				'description' => 'Filled opdata with macros',
 				'expression' => 'last(/Host for Problems Page/trap)=0',
 				'priority' => TRIGGER_SEVERITY_AVERAGE,
-				'opdata' => 'Operational data - {ITEM.LASTVALUE}, {ITEM.LASTVALUE1}, {ITEM.LASTVALUE2}'
+				'opdata' => 'Operational data - ({ITEM.LASTVALUE}),{ITEM.LASTVALUE1}, [{ITEM.LASTVALUE2}]'
 			],
 			[
 				'description' => 'Symbols in Item metric',
@@ -200,7 +201,7 @@ class testPageProblems extends CWebTest {
 	}
 
 	public function testPageProblems_Layout() {
-		$this->page->login()->open('zabbix.php?action=problem.view&filter_reset=1');
+		$this->page->login()->open(self::URL);
 		$this->page->assertTitle('Problems');
 		$this->page->assertHeader('Problems');
 
@@ -1809,7 +1810,8 @@ class testPageProblems extends CWebTest {
 			],
 			'Macro expansion and operational text' => [
 				[
-					'custom data' => 'Operational data - 150, 150, *UNKNOWN*',
+					'custom data' => 'Operational data - (150),150, [*UNKNOWN*]',
+					'screen_name' => 'operational data separately',
 					'filter' => [
 						'Problem' => 'Filled opdata with macros',
 						'Show operational data' => 'Separately'
@@ -1901,10 +1903,11 @@ class testPageProblems extends CWebTest {
 			],
 			'Filled opdata with macros' => [
 				[
-					'custom data' => 'Operational data - 150, 150, *UNKNOWN*',
+					'custom data' => 'Operational data - (150),150, [*UNKNOWN*]',
+					'screen_name' => 'operational data with problem name',
 					'filter' => [
 						'Problem' => 'Filled opdata with macros',
-						'Show operational data' => 'Separately'
+						'Show operational data' => 'With problem name'
 					],
 					'popup rows' => [
 						[
@@ -1916,8 +1919,19 @@ class testPageProblems extends CWebTest {
 					]
 				]
 			],
-			'Operational data with problem name, no popup' => [
+			'Problem name contains operational data, no popup' => [
 				[
+					'custom data' => 'No popup "],*,a[x=": "],*,a[x="/\|\'/æ㓴🍭🍭',
+					'filter' => [
+						'Problem' => 'No operational data popup',
+						'Show operational data' => 'With problem name'
+					],
+					'popup rows' => []
+				]
+			],
+			'Problem name without operational data, no popup' => [
+				[
+					'custom data' => '',
 					'filter' => [
 						'Problem' => 'Two trigger expressions',
 						'Show operational data' => 'With problem name'
@@ -1942,7 +1956,7 @@ class testPageProblems extends CWebTest {
 	 * @dataProvider getFilterForOperationalData
 	 */
 	public function testPageProblems_OperationalData($data){
-		$this->page->login()->open('zabbix.php?action=problem.view&filter_reset=1&sort=clock&sortorder=ASC');
+		$this->page->login()->open(self::URL.'&sort=clock&sortorder=ASC');
 		$form = CFilterElement::find()->one()->getForm();
 		$table = $this->query('class:list-table')->asTable()->waitUntilPresent()->one();
 
@@ -1950,8 +1964,10 @@ class testPageProblems extends CWebTest {
 		$table->waitUntilReloaded();
 
 		$column = ($data['filter']['Show operational data'] === 'With problem name') ? 'Problem' : 'Operational data';
-		$opdata_column = $table->findRow('Problem', CTestArrayHelper::get($data, 'Problem',
-				$data['filter']['Problem']))->getColumn($column);
+		$problem_name = ($data['filter']['Show operational data'] === 'With problem name' && $data['custom data'] !== '')
+			? $data['filter']['Problem'].' ('.$data['custom data'].')'
+			: $data['filter']['Problem'];
+		$opdata_column = $table->findRow('Problem', $problem_name)->getColumn($column);
 
 		// Collect metrics from all items in trigger expression.
 		$metrics = [];
@@ -1963,10 +1979,16 @@ class testPageProblems extends CWebTest {
 		$data_in_column = CTestArrayHelper::get($data, 'custom data', implode(', ', $metrics));
 		if ($data['filter']['Show operational data'] === 'With problem name') {
 			$data_in_column = ($data_in_column === '')
-					? $data['filter']['Problem']
-					: $data['filter']['Problem'].' ('.$data_in_column.')';
+				? $data['filter']['Problem']
+				: $data['filter']['Problem'].' ('.$data_in_column.')';
 		}
+
 		$this->assertEquals($data_in_column, $opdata_column->getText());
+
+		// TODO: uncomment the lines below and add new screenshot references after ZBX-25103 is fixed.
+//		if (array_key_exists('screen_name', $data)) {
+//			$this->assertScreenshot($opdata_column, $data['screen_name']);
+//		}
 
 		// Check data in popup.
 		foreach ($data['popup rows'] as $i => $popup_row) {
@@ -1974,6 +1996,7 @@ class testPageProblems extends CWebTest {
 			$opdata_column->query('link', $metric_in_column)->waitUntilClickable()->one()->click();
 			$popup = $this->query('css:.overlay-dialogue.wordbreak')->asOverlayDialog()->one()->waitUntilVisible();
 			$popup_table = $popup->asTable();
+
 			// Check expected popup rows number.
 			$this->assertEquals(count($data['popup rows']), $popup_table->getRows()->count());
 
@@ -1991,7 +2014,7 @@ class testPageProblems extends CWebTest {
 	}
 
 	public function testPageProblems_ResetButton() {
-		$this->page->login()->open('zabbix.php?action=problem.view&filter_reset=1');
+		$this->page->login()->open(self::URL);
 		$form = $this->query('name:zbx_filter')->asForm()->waitUntilVisible()->one();
 		$table = $this->query('class:list-table')->asTable()->one();
 

@@ -46,4 +46,16 @@ in:
 out:
   result: "text value ****** ******"
   return: SUCCEED
+---
+test case: User macros should not use index
+include:
+  - &include01 zbx_substitute_macros_um_01.inc.yaml
+in:
+  config: *include01
+  hostid: 0
+  user_macro: 1
+  expression: "{{$TEST_1}.fmtnum(2)} {$TEST_1} {{$TEST}.fmtnum(2)} {$TEST}"
+out:
+  result: "2.56 2.56 3.37 3.365"
+  return: SUCCEED
 ...

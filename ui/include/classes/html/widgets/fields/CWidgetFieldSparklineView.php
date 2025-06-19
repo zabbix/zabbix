@@ -99,16 +99,6 @@ class CWidgetFieldSparklineView extends CWidgetFieldView {
 			}
 		}
 
-		/** @var Zabbix\Widgets\Fields\CWidgetFieldColor $color */
-		$color_field = $this->field->getFields()['color'];
-		/** @var CWidgetFieldColorView $color_view */
-		$color_view = $this->fields_view['color'];
-
-		$js[] = 'jQuery("[name=\"'.$color_view->getName().'\"]").colorpicker({'.
-			'appendTo: jQuery("[name=\"'.$color_view->getName().'\"]").closest(".overlay-dialogue-body"),'.
-			'use_default: '.json_encode($color_field->hasAllowInherited()).
-		'})';
-
 		return implode(';', $js);
 	}
 }

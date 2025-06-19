@@ -90,7 +90,7 @@ int	zbx_event_db_get_host(const zbx_db_event *event, zbx_dc_host_t *host, char *
 					" where " ZBX_SQL_NULLCMP("a.proxyid", "h.proxyid")
 						" and a.host=h.host"
 						" and h.status=%d"
-						" and h.flags<>%d"
+						" and h.flags&%d=0"
 						" and a.autoreg_hostid=" ZBX_FS_UI64,
 					HOST_STATUS_MONITORED, ZBX_FLAG_DISCOVERY_PROTOTYPE, event->objectid);
 			break;

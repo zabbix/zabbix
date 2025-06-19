@@ -98,4 +98,12 @@ class CVar {
 
 		return $this;
 	}
+
+	public function setAttribute(string $name, string $value) {
+		foreach ($this->var_container as $item) {
+			$item->setAttribute($name, $value);
+		}
+
+		return $this;
+	}
 }

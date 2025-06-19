@@ -83,8 +83,9 @@ class CWidgetSelectPopup {
 				cancel: true,
 				class: ZBX_STYLE_BTN_ALT,
 				action: () => {}
-			}],
-			element: document.activeElement ?? undefined
+			}]
+		}, {
+			trigger_element: document.activeElement
 		});
 	}
 

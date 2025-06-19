@@ -28,7 +28,7 @@ This template has been tested on:
 
 ## Setup
 
-Install the [Zabbix Helm Chart](https://git.zabbix.com/projects/ZT/repos/kubernetes-helm/browse?at=refs%2Fheads%2Frelease%2F7.4) in your Kubernetes cluster.
+Install the [Zabbix Helm Chart](https://git.zabbix.com/projects/ZT/repos/kubernetes-helm/browse?at=refs%2Fheads%2Fmaster) in your Kubernetes cluster.
 Internal service metrics are collected from kube-state-metrics endpoint.
 
 Template needs to use authorization via API token.
@@ -108,11 +108,11 @@ You can also set up evaluation periods for replica mismatch triggers (Deployment
 
 |Name|Description|Default|
 |----|-----------|-------|
+|{$KUBE.API.TOKEN}|<p>Service account bearer token.</p>||
 |{$KUBE.API.URL}|<p>Kubernetes API endpoint URL in the format <scheme>://<host>:<port></p>|`https://kubernetes.default.svc.cluster.local:443`|
-|{$KUBE.API.READYZ.ENDPOINT}|<p>Kubernetes API readyz endpoint /readyz</p>|`/readyz`|
 |{$KUBE.API.LIVEZ.ENDPOINT}|<p>Kubernetes API livez endpoint /livez</p>|`/livez`|
 |{$KUBE.API.COMPONENTSTATUSES.ENDPOINT}|<p>Kubernetes API componentstatuses endpoint /api/v1/componentstatuses</p>|`/api/v1/componentstatuses`|
-|{$KUBE.API.TOKEN}|<p>Service account bearer token.</p>||
+|{$KUBE.API.READYZ.ENDPOINT}|<p>Kubernetes API readyz endpoint /readyz</p>|`/readyz`|
 |{$KUBE.HTTP.PROXY}|<p>Sets the HTTP proxy to `http_proxy` value. If this parameter is empty, then no proxy is used.</p>||
 |{$KUBE.STATE.ENDPOINT.NAME}|<p>Kubernetes state endpoint name.</p>|`zabbix-kube-state-metrics`|
 |{$OPENSHIFT.STATE.ENDPOINT.NAME}|<p>OpenShift state endpoint name.</p>|`openshift-state-metrics`|

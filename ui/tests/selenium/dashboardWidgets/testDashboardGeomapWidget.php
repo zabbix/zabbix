@@ -22,7 +22,7 @@ require_once __DIR__.'/../behaviors/CMessageBehavior.php';
  *
  * @onBefore prepareDashboardData
  */
-class testDashboardGeomapWidget extends CWebTest {
+class testDashboardGeomapWidget extends testWidgets {
 
 	/**
 	 * Id of the dashboard where geomap widget is created and updated.

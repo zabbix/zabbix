@@ -108,6 +108,9 @@ void	zbx_determine_items_in_expressions(zbx_vector_dc_trigger_t *trigger_order, 
 
 	zbx_link_triggers_with_functions(&triggers_func_pos, &functionids, trigger_order);
 
+	if (0 == functionids.values_num)
+		goto out;
+
 	functions = (zbx_dc_function_t *)zbx_malloc(functions, sizeof(zbx_dc_function_t) * functionids.values_num);
 	errcodes = (int *)zbx_malloc(errcodes, sizeof(int) * functionids.values_num);
 
@@ -132,7 +135,7 @@ void	zbx_determine_items_in_expressions(zbx_vector_dc_trigger_t *trigger_order, 
 	zbx_dc_config_clean_functions(functions, errcodes, functionids.values_num);
 	zbx_free(errcodes);
 	zbx_free(functions);
-
+out:
 	zbx_vector_trigger_func_position_clear_ext(&triggers_func_pos,
 			(zbx_trigger_func_position_free_func_t)zbx_ptr_free);
 	zbx_vector_trigger_func_position_destroy(&triggers_func_pos);

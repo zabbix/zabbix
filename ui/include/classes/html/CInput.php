@@ -75,7 +75,7 @@ class CInput extends CTag {
 	 *
 	 * @param string|null $container_id    ID of form element where to display field errors.
 	 *
-	 * @return self
+	 * @return static
 	 */
 	public function setErrorContainer(?string $container_id): self {
 		$this->setAttribute('data-error-container', $container_id);
@@ -88,7 +88,7 @@ class CInput extends CTag {
 	 *
 	 * @param string|null $label    Field label used in error message.
 	 *
-	 * @return self
+	 * @return static
 	 */
 	public function setErrorLabel(?string $label): self {
 		$this->setAttribute('data-error-label', $label);

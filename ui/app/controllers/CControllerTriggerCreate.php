@@ -17,42 +17,72 @@
 class CControllerTriggerCreate extends CController {
 
 	protected function init(): void {
+		$this->setInputValidationMethod(self::INPUT_VALIDATION_FORM);
 		$this->setPostContentType(self::POST_CONTENT_TYPE_JSON);
 	}
 
-	protected function checkInput(): bool {
-		$fields = [
-			'name' =>					'required|db triggers.description|not_empty',
-			'event_name' =>				'db triggers.event_name',
-			'opdata' =>					'db triggers.opdata',
-			'priority' =>				'db triggers.priority|in 0,1,2,3,4,5',
-			'expression' =>				'required|string|not_empty',
-			'recovery_mode' =>			'db triggers.recovery_mode|in '.implode(',', [ZBX_RECOVERY_MODE_EXPRESSION, ZBX_RECOVERY_MODE_RECOVERY_EXPRESSION, ZBX_RECOVERY_MODE_NONE]),
-			'recovery_expression' =>	'string',
-			'type' =>					'db triggers.type|in 0,1',
-			'correlation_mode' =>		'db triggers.correlation_mode|in '.implode(',', [ZBX_TRIGGER_CORRELATION_NONE, ZBX_TRIGGER_CORRELATION_TAG]),
-			'correlation_tag' =>		'db triggers.correlation_tag',
-			'manual_close' =>			'db triggers.manual_close|in '.implode(',',[ZBX_TRIGGER_MANUAL_CLOSE_NOT_ALLOWED, ZBX_TRIGGER_MANUAL_CLOSE_ALLOWED]),
-			'url_name' =>				'db triggers.url_name',
-			'url' =>					'db triggers.url',
-			'description' =>			'db triggers.comments',
-			'status' =>					'db triggers.status|in '.implode(',', [TRIGGER_STATUS_ENABLED, TRIGGER_STATUS_DISABLED]),
-			'tags' =>					'array',
-			'dependencies' =>			'array',
-			'hostid' =>					'db hosts.hostid',
-			'context' =>				'in '.implode(',', ['host', 'template'])
-		];
+	public static function getValidationRules(): array {
+		return ['object', 'fields' => [
+			'name' => ['db triggers.description', 'required', 'not_empty'],
+			'event_name' => ['db triggers.event_name'],
+			'opdata' => ['db triggers.opdata'],
+			'priority' => ['db triggers.priority', 'required', 'in' => [TRIGGER_SEVERITY_NOT_CLASSIFIED,
+				TRIGGER_SEVERITY_INFORMATION, TRIGGER_SEVERITY_WARNING, TRIGGER_SEVERITY_AVERAGE, TRIGGER_SEVERITY_HIGH,
+				TRIGGER_SEVERITY_DISASTER
+			]],
+			'expression' => ['string', 'required', 'not_empty',
+				'use' => [CTriggerExpressionParser::class, ['usermacros' => true, 'lldmacros' => false]]
+			],
+			'recovery_mode' => ['db triggers.recovery_mode', 'in' => [ZBX_RECOVERY_MODE_EXPRESSION,
+				ZBX_RECOVERY_MODE_RECOVERY_EXPRESSION, ZBX_RECOVERY_MODE_NONE
+			]],
+			'recovery_expression' => ['string', 'required', 'not_empty',
+				'use' => [CTriggerExpressionParser::class, ['usermacros' => true, 'lldmacros' => false]],
+				'when' => [
+					['recovery_mode', 'in' => [ZBX_RECOVERY_MODE_RECOVERY_EXPRESSION]]
+				]
+			],
+			'type' => ['db triggers.type', 'in' => [TRIGGER_MULT_EVENT_DISABLED, TRIGGER_MULT_EVENT_ENABLED]],
+			'correlation_mode' => ['db triggers.correlation_mode', 'in' => [ZBX_TRIGGER_CORRELATION_NONE,
+				ZBX_TRIGGER_CORRELATION_TAG
+			]],
+			'correlation_tag' => ['db triggers.correlation_tag', 'required', 'not_empty', 'when' => [
+				['correlation_mode', 'in' => [ZBX_TRIGGER_CORRELATION_TAG]]
+			]],
+			'manual_close' => ['db triggers.manual_close', 'in' => [ZBX_TRIGGER_MANUAL_CLOSE_NOT_ALLOWED,
+				ZBX_TRIGGER_MANUAL_CLOSE_ALLOWED
+			]],
+			'url_name' => ['db triggers.url_name'],
+			'url' => ['db triggers.url', 'use' => [CUrlValidator::class, []]],
+			'description' => ['db triggers.comments'],
+			'status' => ['db triggers.status', 'in' => [TRIGGER_STATUS_ENABLED, TRIGGER_STATUS_DISABLED]],
+			'tags' => ['objects', 'uniq' => ['tag', 'value'],
+				'messages' => ['uniq' => _('Tag name and value combination is not unique.')],
+				'fields' => [
+					'value' => ['db trigger_tag.value'],
+					'tag' => ['db trigger_tag.tag', 'required', 'not_empty', 'when' => ['value', 'not_empty']]
+				]
+			],
+			'dependencies' => ['array', 'field' => ['db triggers.triggerid']],
+			'hostid' => ['db hosts.hostid'],
+			'context' => ['string', 'in' => ['host', 'template']]
+		]];
+	}
 
-		$ret = $this->validateInput($fields);
+	protected function checkInput(): bool {
+		$ret = $this->validateInput(self::getValidationRules());
 
 		if (!$ret) {
+			$form_errors = $this->getValidationError();
+			$response = $form_errors
+				? ['form_errors' => $form_errors]
+				: ['error' => [
+					'title' => _('Cannot add trigger'),
+					'messages' => array_column(get_and_clear_messages(), 'message')
+				]];
+
 			$this->setResponse(
-				(new CControllerResponseData(['main_block' => json_encode([
-					'error' => [
-						'title' => _('Cannot add trigger'),
-						'messages' => array_column(get_and_clear_messages(), 'message')
-					]
-				])]))->disableView()
+				new CControllerResponseData(['main_block' => json_encode($response)])
 			);
 		}
 

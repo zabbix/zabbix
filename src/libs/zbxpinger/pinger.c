@@ -13,7 +13,6 @@
 **/
 
 #include "zbxpinger.h"
-#include "zbxexpression.h"
 
 #include "zbxlog.h"
 #include "zbxcacheconfig.h"
@@ -30,6 +29,7 @@
 #include "zbxthreads.h"
 #include "zbxtimekeeper.h"
 #include "zbxalgo.h"
+#include "zbxexpr.h"
 
 typedef struct
 {
@@ -492,7 +492,7 @@ static void	get_pinger_hosts(zbx_hashset_t *pinger_items, int config_timeout)
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
-	um_handle = zbx_dc_open_user_macros();
+	um_handle = zbx_dc_open_user_macros_masked();
 
 	items = &item;
 	num = zbx_dc_config_get_poller_items(ZBX_POLLER_TYPE_PINGER, config_timeout, 0, 0, &items);
@@ -502,8 +502,8 @@ static void	get_pinger_hosts(zbx_hashset_t *pinger_items, int config_timeout)
 		zbx_pinger_t	pinger_local;
 
 		ZBX_STRDUP(items[i].key, items[i].key_orig);
-		int	rc = zbx_substitute_key_macros(&items[i].key, NULL, &items[i], NULL, NULL,
-				ZBX_MACRO_TYPE_ITEM_KEY, error, sizeof(error));
+		int	rc = zbx_substitute_item_key_params(&items[i].key, error, sizeof(error),
+				zbx_item_key_subst_cb, um_handle, &items[i]);
 
 		if (SUCCEED == rc)
 		{

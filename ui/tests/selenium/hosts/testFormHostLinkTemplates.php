@@ -100,7 +100,7 @@ class testFormHostLinkTemplates extends CLegacyWebTest {
 		// using "host navigation bar" at the top of entity list
 		$this->zbxTestHrefClickWait('zabbix.php?action=trigger.list&filter_set=1&filter_hostids%5B0%5D='.self::$hostid);
 		$this->zbxTestTextNotPresent(self::LINKED_TEMPLATE.':');
-		$this->zbxTestHrefClickWait('graphs.php?filter_set=1&filter_hostids%5B0%5D='.self::$hostid);
+		$this->zbxTestHrefClickWait('zabbix.php?action=graph.list&filter_set=1&filter_hostids%5B0%5D='.self::$hostid.'&context=host');
 		$this->zbxTestTextNotPresent(self::LINKED_TEMPLATE.':');
 	}
 
@@ -146,7 +146,7 @@ class testFormHostLinkTemplates extends CLegacyWebTest {
 
 		$this->zbxTestHrefClickWait('zabbix.php?action=trigger.list&filter_set=1&filter_hostids%5B0%5D='.self::$hostid);
 		$this->zbxTestTextNotPresent(self::LINKED_TEMPLATE.':');
-		$this->zbxTestHrefClickWait('graphs.php?filter_set=1&filter_hostids%5B0%5D='.self::$hostid);
+		$this->zbxTestHrefClickWait('zabbix.php?action=graph.list&filter_set=1&filter_hostids%5B0%5D='.self::$hostid.'&context=host');
 		$this->zbxTestTextNotPresent(self::LINKED_TEMPLATE.':');
 	}
 
@@ -192,6 +192,7 @@ class testFormHostLinkTemplates extends CLegacyWebTest {
 			$this->assertEquals(self::LINKED_TEMPLATE, $form->query('class:subfilter-enabled')->one()->getText());
 			$form->submit();
 			$this->assertMessage(TEST_GOOD, $entity.' updated');
+			CMessageElement::find()->one()->close();
 
 			$this->openConfigurationForm($data);
 			$form->invalidate();
@@ -232,6 +233,11 @@ class testFormHostLinkTemplates extends CLegacyWebTest {
 			}
 		}
 		else {
+			if (!$this->query('link', self::TEMPLATE)->exists()) {
+				$this->query('name:zbx_filter')->asForm()->one()->fill(['Name' => self::TEMPLATE])->submit();
+				$this->page->waitUntilReady();
+			}
+
 			$this->query('link', self::TEMPLATE)->waitUntilVisible()->one()->click();
 		}
 	}

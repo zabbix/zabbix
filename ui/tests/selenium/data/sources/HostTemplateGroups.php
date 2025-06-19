@@ -262,9 +262,9 @@ class HostTemplateGroups {
 
 			// Insert a discovered host the ID of which is by 1000 more than of the corresponding host prototype.
 			$discovered_hostids[$i] = $host_prototypeid + 1000;
-			DBexecute('INSERT INTO hosts (hostid, host, name, status, flags, description) VALUES ('.
+			DBexecute('INSERT INTO hosts (hostid, host, name, status, flags, description, readme) VALUES ('.
 					zbx_dbstr($discovered_hostids[$i]).','.zbx_dbstr('KEY host prototype number '.$i).','.
-					zbx_dbstr('KEY host prototype number '.$i).', 0, 4, \'\')'
+					zbx_dbstr('KEY host prototype number '.$i).', 0, 4, \'\', \'\')'
 			);
 
 			DBexecute('INSERT INTO host_discovery (hostid, parent_hostid) VALUES ('.zbx_dbstr($discovered_hostids[$i]).

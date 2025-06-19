@@ -659,7 +659,7 @@ class testDashboardsPages extends CWebTest {
 			$properties = COverlayDialogElement::find()->waitUntilReady()->one();
 			$properties->query('name:dashboard_properties_form')->asForm()->one()->fill(['Default page display period' => $default]);
 			$properties->query('button:Apply')->one()->click();
-			COverlayDialogElement::ensureNotPresent();
+			$properties->ensureNotPresent();
 			$dashboard->waitUntilReady();
 
 			// Check that default time for page changed in edit mode and after dashboard save.

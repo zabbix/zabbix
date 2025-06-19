@@ -87,7 +87,7 @@ class CConfigurationExport {
 			$unlink_templates_entities = API::Template()->get([
 				'output' => [],
 				'selectItems' => ['itemid'],
-				'selectDiscoveries' => ['itemid'],
+				'selectDiscoveryRules' => ['itemid'],
 				'selectHttpTests' => ['httptestid'],
 				'selectGraphs' => ['graphid'],
 				'selectTriggers' => ['triggerid'],
@@ -102,7 +102,7 @@ class CConfigurationExport {
 							array_column($template_entity['items'], 'itemid')
 						);
 						$template_data['unlink_discoveries'] = array_merge($template_data['unlink_discoveries'],
-							array_column($template_entity['discoveries'], 'itemid')
+							array_column($template_entity['discoveryRules'], 'itemid')
 						);
 						$template_data['unlink_httptests'] = array_merge($template_data['unlink_httptests'],
 							array_column($template_entity['httpTests'], 'httptestid')
@@ -151,11 +151,11 @@ class CConfigurationExport {
 				'output_format', 'ssl_cert_file', 'ssl_key_file', 'ssl_key_password', 'verify_peer', 'verify_host',
 				'allow_traps', 'parameters', 'uuid'
 			],
-			'item_prototype' => ['hostid', 'type', 'snmp_oid', 'name', 'key_', 'delay', 'history', 'trends', 'status',
-				'value_type', 'trapper_hosts', 'units', 'valuemapid', 'params', 'ipmi_sensor', 'authtype', 'username',
-				'password', 'publickey', 'privatekey', 'interfaceid', 'description', 'inventory_link', 'flags',
-				'logtimefmt', 'jmx_endpoint', 'master_itemid', 'timeout', 'url', 'query_fields', 'parameters', 'posts',
-				'status_codes', 'follow_redirects', 'post_type', 'http_proxy', 'headers', 'retrieve_mode',
+			'item_prototype' => ['itemid', 'hostid', 'type', 'snmp_oid', 'name', 'key_', 'delay', 'history', 'trends',
+				'status', 'value_type', 'trapper_hosts', 'units', 'valuemapid', 'params', 'ipmi_sensor', 'authtype',
+				'username', 'password', 'publickey', 'privatekey', 'interfaceid', 'description', 'inventory_link',
+				'flags', 'logtimefmt', 'jmx_endpoint', 'master_itemid', 'timeout', 'url', 'query_fields', 'parameters',
+				'posts', 'status_codes', 'follow_redirects', 'post_type', 'http_proxy', 'headers', 'retrieve_mode',
 				'request_method', 'output_format', 'ssl_cert_file', 'ssl_key_file', 'ssl_key_password', 'verify_peer',
 				'verify_host', 'allow_traps', 'discover', 'uuid'
 			],
@@ -389,7 +389,9 @@ class CConfigurationExport {
 	 */
 	protected function gatherTemplates(array $templateids) {
 		$templates = API::Template()->get([
-			'output' => ['host', 'name', 'description', 'uuid', 'vendor_name', 'vendor_version'],
+			'output' => ['host', 'name', 'description', 'uuid', 'vendor_name', 'vendor_version', 'wizard_ready',
+				'readme'
+			],
 			'selectTemplateGroups' => ['groupid', 'name', 'uuid'],
 			'selectParentTemplates' => API_OUTPUT_EXTEND,
 			'selectMacros' => API_OUTPUT_EXTEND,
@@ -851,6 +853,7 @@ class CConfigurationExport {
 		$options += [
 			'output' => $this->dataFields['drule'],
 			'hostids' => array_keys($hosts),
+			'filter' => ['flags' => ZBX_FLAG_DISCOVERY_RULE],
 			'inherited' => false
 		];
 
@@ -865,10 +868,7 @@ class CConfigurationExport {
 			}
 		}
 
-		$discovery_rules = $this->prepareDiscoveryRules($discovery_rules);
-
-		// Discovery rules may use web items as master items.
-		foreach ($discovery_rules as $discovery_rule) {
+		foreach ($discovery_rules as &$discovery_rule) {
 			if ($discovery_rule['type'] == ITEM_TYPE_DEPENDENT) {
 				$master_itemid = $discovery_rule['master_itemid'];
 
@@ -876,11 +876,12 @@ class CConfigurationExport {
 					$discovery_rule['master_item'] = ['key_' => $itemids[$master_itemid]];
 				}
 			}
+		}
+		unset($discovery_rule);
 
-			foreach ($discovery_rule['itemPrototypes'] as $itemid => $item_prototype) {
-				$discovery_rule['itemPrototypes'][$itemid]['host'] = $hosts[$discovery_rule['hostid']]['host'];
-			}
+		$this->prepareDiscoveryRules($discovery_rules);
 
+		foreach ($discovery_rules as $discovery_rule) {
 			$hosts[$discovery_rule['hostid']]['discoveryRules'][] = $discovery_rule;
 		}
 
@@ -894,7 +895,7 @@ class CConfigurationExport {
 	 *
 	 * @return array
 	 */
-	protected function prepareDiscoveryRules(array $items) {
+	protected function prepareDiscoveryRules(array &$items, bool $is_lld_rule_prototype = false): void {
 		$templateids = [];
 
 		foreach ($items as &$item) {
@@ -992,13 +993,14 @@ class CConfigurationExport {
 		$options = [
 			'output' => $this->dataFields['item_prototype'],
 			'selectDiscoveryRule' => ['itemid'],
+			'selectDiscoveryRulePrototype' => ['itemid'],
 			'selectPreprocessing' => ['type', 'params', 'error_handler', 'error_handler_params'],
 			'selectTags' => ['tag', 'value'],
 			'discoveryids' => array_column($items, 'itemid'),
 			'preservekeys' => true
 		];
 
-		$options +=  $this->unlink_templates_data ? ['templated' => true] : ['inherited' => false];
+		$options += $this->unlink_templates_data ? ['templated' => true] : ['inherited' => false];
 
 		$item_prototypes = API::ItemPrototype()->get($options);
 
@@ -1059,32 +1061,38 @@ class CConfigurationExport {
 				$item_prototype['valuemap']['name'] = $db_valuemaps[$item_prototype['valuemapid']]['name'];
 			}
 
-			$items[$item_prototype['discoveryRule']['itemid']]['itemPrototypes'][] = $item_prototype;
+			$parent_lld = $item_prototype['discoveryRule'] ?: $item_prototype['discoveryRulePrototype'];
+
+			$items[$parent_lld['itemid']]['itemPrototypes'][] = $item_prototype;
 		}
 
 		// gather graph prototypes
 		$options = [
 			'output' => API_OUTPUT_EXTEND,
 			'discoveryids' => array_column($items, 'itemid'),
-			'selectDiscoveryRule' => API_OUTPUT_EXTEND,
+			'selectDiscoveryRule' => ['itemid'],
+			'selectDiscoveryRulePrototype' => ['itemid'],
 			'selectGraphItems' => API_OUTPUT_EXTEND,
 			'preservekeys' => true
 		];
 
-		$options +=  $this->unlink_templates_data ? ['templated' => true] : ['inherited' => false];
+		$options += $this->unlink_templates_data ? ['templated' => true] : ['inherited' => false];
 
 		$graphs = API::GraphPrototype()->get($options);
 
 		$graphs = $this->prepareGraphs($graphs);
 
 		foreach ($graphs as $graph) {
-			$items[$graph['discoveryRule']['itemid']]['graphPrototypes'][] = $graph;
+			$parent_lld = $graph['discoveryRule'] ?: $graph['discoveryRulePrototype'];
+
+			$items[$parent_lld['itemid']]['graphPrototypes'][] = $graph;
 		}
 
 		// gather trigger prototypes
 		$options = [
 			'output' => $this->dataFields['trigger_prototype'],
-			'selectDiscoveryRule' => API_OUTPUT_EXTEND,
+			'selectDiscoveryRule' => ['itemid'],
+			'selectDiscoveryRulePrototype' => ['itemid'],
 			'selectDependencies' => ['expression', 'description', 'recovery_expression'],
 			'selectHosts' => ['status'],
 			'selectItems' => ['itemid', 'flags', 'type'],
@@ -1093,14 +1101,16 @@ class CConfigurationExport {
 			'preservekeys' => true
 		];
 
-		$options +=  $this->unlink_templates_data ? ['templated' => true] : ['inherited' => false];
+		$options += $this->unlink_templates_data ? ['templated' => true] : ['inherited' => false];
 
 		$triggers = API::TriggerPrototype()->get($options);
 
 		$triggers = $this->prepareTriggers($triggers);
 
 		foreach ($triggers as $trigger) {
-			$items[$trigger['discoveryRule']['itemid']]['triggerPrototypes'][] = $trigger;
+			$parent_lld = $trigger['discoveryRule'] ?: $trigger['discoveryRulePrototype'];
+
+			$items[$parent_lld['itemid']]['triggerPrototypes'][] = $trigger;
 		}
 
 		// gather host prototypes
@@ -1109,7 +1119,8 @@ class CConfigurationExport {
 			'output' => API_OUTPUT_EXTEND,
 			'selectGroupLinks' => ['groupid'],
 			'selectGroupPrototypes' => ['name'],
-			'selectDiscoveryRule' => API_OUTPUT_EXTEND,
+			'selectDiscoveryRule' => ['itemid'],
+			'selectDiscoveryRulePrototype' => ['itemid'],
 			'selectTemplates' => API_OUTPUT_EXTEND,
 			'selectMacros' => API_OUTPUT_EXTEND,
 			'selectTags' => ['tag', 'value'],
@@ -1141,10 +1152,83 @@ class CConfigurationExport {
 			}
 			unset($group_link);
 
-			$items[$host_prototype['discoveryRule']['itemid']]['hostPrototypes'][] = $host_prototype;
+			$parent_lld = $host_prototype['discoveryRule'] ?: $host_prototype['discoveryRulePrototype'];
+
+			$items[$parent_lld['itemid']]['hostPrototypes'][] = $host_prototype;
 		}
 
-		return $items;
+		$this->gatherDiscoveryRulePrototypes($items, $is_lld_rule_prototype);
+	}
+
+	private function gatherDiscoveryRulePrototypes(array &$lld_rules, bool $is_lld_rule_prototype = false): void {
+		$options = [
+			'output' => CDiscoveryRulePrototype::OUTPUT_FIELDS,
+			'selectFilter' => ['evaltype', 'formula', 'conditions'],
+			'selectLLDMacroPaths' => ['lld_macro', 'path'],
+			'selectPreprocessing' => ['type', 'params', 'error_handler', 'error_handler_params'],
+			'selectOverrides' => ['name', 'step', 'stop', 'filter', 'operations'],
+			'discoveryids' => array_keys($lld_rules),
+			'preservekeys' => true
+		];
+
+		$options += $this->unlink_templates_data ? ['templated' => true] : ['inherited' => false];
+		$options += $is_lld_rule_prototype
+			? ['selectDiscoveryRulePrototype' => ['itemid', 'key_']]
+			: ['selectDiscoveryRule' => ['itemid', 'key_']];
+
+		$lld_rule_prototypes = API::DiscoveryRulePrototype()->get($options);
+
+		$item_prototypeids = [];
+
+		foreach ($lld_rules as $lld_rule) {
+			foreach ($lld_rule['itemPrototypes'] as $item_prototype) {
+				$item_prototypeids[$item_prototype['itemid']] = $item_prototype['key_'];
+			}
+		}
+
+		$unresolved_master_itemids = [];
+
+		foreach ($lld_rule_prototypes as $lld_rule_prototype) {
+			if ($lld_rule_prototype['type'] == ITEM_TYPE_DEPENDENT
+					&& !array_key_exists($lld_rule_prototype['master_itemid'], $item_prototypeids)) {
+				$unresolved_master_itemids[$lld_rule_prototype['master_itemid']] = true;
+			}
+		}
+
+		if ($unresolved_master_itemids) {
+			$master_items = API::Item()->get([
+				'output' => ['itemid', 'key_'],
+				'itemids' => array_keys($unresolved_master_itemids),
+				'filter' => ['flags' => ZBX_FLAG_DISCOVERY_NORMAL],
+				'webitems' => true,
+				'preservekeys' => true
+			]);
+		}
+
+		foreach ($lld_rule_prototypes as &$lld_rule_prototype) {
+			$lld_rule_prototype = [
+				'parent_discovery_rule' => $is_lld_rule_prototype
+					? ['key' => $lld_rule_prototype['discoveryRulePrototype']['key_']]
+					: ['key' => $lld_rule_prototype['discoveryRule']['key_']]
+			] + $lld_rule_prototype;
+
+			if ($lld_rule_prototype['type'] == ITEM_TYPE_DEPENDENT) {
+				$master_itemid = $lld_rule_prototype['master_itemid'];
+
+				if (array_key_exists($master_itemid, $item_prototypeids)) {
+					$lld_rule_prototype['master_item'] = ['key_' => $item_prototypeids[$master_itemid]];
+				}
+				else {
+					$lld_rule_prototype['master_item'] = ['key_' => $master_items[$master_itemid]['key_']];
+				}
+			}
+		}
+		unset($lld_rule_prototype);
+
+		if ($lld_rule_prototypes) {
+			$this->prepareDiscoveryRules($lld_rule_prototypes, true);
+			$lld_rules += $lld_rule_prototypes;
+		}
 	}
 
 	/**
@@ -1428,7 +1512,7 @@ class CConfigurationExport {
 			unset($trigger['hosts']);
 
 			foreach ($trigger['items'] as $item) {
-				if ($item['flags'] == ZBX_FLAG_DISCOVERY_CREATED) {
+				if ($item['flags'] & ZBX_FLAG_DISCOVERY_CREATED) {
 					unset($triggers[$idx]);
 					continue 2;
 				}
@@ -1490,7 +1574,8 @@ class CConfigurationExport {
 				'smtp_verify_peer', 'smtp_verify_host', 'smtp_authentication', 'username', 'passwd', 'message_format',
 				'exec_path', 'gsm_modem', 'status', 'maxsessions', 'maxattempts', 'attempt_interval', 'script',
 				'timeout', 'process_tags', 'show_event_menu', 'event_menu_url', 'event_menu_name', 'description',
-				'parameters', 'provider'
+				'parameters', 'provider', 'redirection_url', 'client_id', 'client_secret', 'authorization_url',
+				'token_url'
 			],
 			'selectMessageTemplates' => ['eventsource', 'recovery', 'subject', 'message'],
 			'mediatypeids' => $mediatypeids,

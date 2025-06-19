@@ -27,4 +27,15 @@ class CWidgetFieldUrlView extends CWidgetFieldView {
 			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 			->setAriaRequired($this->isRequired());
 	}
+
+	public function getJavaScript(): string {
+		return '
+			CWidgetForm.addField(
+				new CWidgetFieldUrl('.json_encode([
+					'name' => $this->field->getName(),
+					'form_name' => $this->form_name
+				]).')
+			);
+		';
+	}
 }

@@ -1,5 +1,4 @@
 //go:build !linux
-// +build !linux
 
 /*
 ** Copyright (C) 2001-2025 Zabbix SIA

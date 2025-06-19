@@ -132,7 +132,7 @@
 				callback: ({data, event}) => {
 					uncheckTableRows(chkbxRange.prefix);
 
-					if (data.submit.success.action === 'delete'
+					if (data.submit.success?.action === 'delete'
 							&& data.action_parameters.serviceid === this.serviceid) {
 						event.setRedirectUrl(this.parent_url);
 					}

@@ -633,7 +633,8 @@ class CMap extends CMapElement {
 			'show_link_label' =>	['type' => API_INT32, 'in' => implode(',', [MAP_SHOW_LABEL_AUTO_HIDE, MAP_SHOW_LABEL_ALWAYS])],
 			'selements' =>			['type' => API_OBJECTS, 'flags' => API_NORMALIZE | API_ALLOW_UNEXPECTED, 'uniq' => [['selementid']], 'fields' => [
 				'selementid' =>			['type' => API_SELEMENTID],
-				'show_label' =>			['type' => API_INT32, 'in' => implode(',', [MAP_SHOW_LABEL_DEFAULT, MAP_SHOW_LABEL_AUTO_HIDE, MAP_SHOW_LABEL_ALWAYS])]
+				'show_label' =>			['type' => API_INT32, 'in' => implode(',', [MAP_SHOW_LABEL_DEFAULT, MAP_SHOW_LABEL_AUTO_HIDE, MAP_SHOW_LABEL_ALWAYS])],
+				'zindex' =>				['type' => API_INT32]
 			]],
 			'links' =>				['type' => API_OBJECTS, 'flags' => API_NORMALIZE | API_ALLOW_UNEXPECTED, 'fields' => [
 				'linkid' =>				['type' => API_UNEXPECTED],
@@ -1098,7 +1099,8 @@ class CMap extends CMapElement {
 			'show_link_label' =>	['type' => API_INT32, 'in' => implode(',', [MAP_SHOW_LABEL_AUTO_HIDE, MAP_SHOW_LABEL_ALWAYS])],
 			'selements' =>			['type' => API_OBJECTS, 'flags' => API_NORMALIZE | API_ALLOW_UNEXPECTED, 'uniq' => [['selementid']], 'fields' => [
 				'selementid' =>			['type' => API_SELEMENTID],
-				'show_label' =>			['type' => API_INT32, 'in' => implode(',', [MAP_SHOW_LABEL_DEFAULT, MAP_SHOW_LABEL_AUTO_HIDE, MAP_SHOW_LABEL_ALWAYS])]
+				'show_label' =>			['type' => API_INT32, 'in' => implode(',', [MAP_SHOW_LABEL_DEFAULT, MAP_SHOW_LABEL_AUTO_HIDE, MAP_SHOW_LABEL_ALWAYS])],
+				'zindex' =>				['type' => API_INT32]
 			]],
 			'links' =>				['type' => API_OBJECTS, 'flags' => API_NORMALIZE | API_ALLOW_UNEXPECTED, 'uniq' => [['linkid']], 'fields' => [
 				'linkid' =>				['type' => API_ID],

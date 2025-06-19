@@ -19,8 +19,8 @@ import (
 	"time"
 )
 
-// performer interface provides common access to plugin tasks
-type performer interface {
+// Performer interface provides common access to plugin tasks.
+type Performer interface {
 	// returns the task plugin
 	getPlugin() *pluginAgent
 	// sets the task plugin
@@ -48,7 +48,7 @@ type performer interface {
 }
 
 // performerHeap -
-type performerHeap []performer
+type performerHeap []Performer
 
 func (h performerHeap) Len() int {
 	return len(h)
@@ -68,7 +68,7 @@ func (h performerHeap) Swap(i, j int) {
 func (h *performerHeap) Push(x interface{}) {
 	// Push and Pop use pointer receivers because they modify the slice's length,
 	// not just its contents.
-	p := x.(performer)
+	p := x.(Performer)
 	p.setIndex(len(*h))
 	*h = append(*h, p)
 }
@@ -86,14 +86,14 @@ func (h *performerHeap) Pop() interface{} {
 }
 
 // Peek -
-func (h *performerHeap) Peek() performer {
+func (h *performerHeap) Peek() Performer {
 	if len(*h) == 0 {
 		return nil
 	}
 	return (*h)[0]
 }
 
-func (h *performerHeap) Update(p performer) {
+func (h *performerHeap) Update(p Performer) {
 	if p.getIndex() != -1 {
 		heap.Fix(h, p.getIndex())
 	}

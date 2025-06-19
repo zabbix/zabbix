@@ -16,6 +16,7 @@
 require_once 'vendor/autoload.php';
 
 require_once dirname(__FILE__).'/../../include/defines.inc.php';
+require_once dirname(__FILE__).'/../../include/classes/core/ZBase.php';
 require_once dirname(__FILE__).'/../../include/classes/server/CZabbixServer.php';
 
 /**
@@ -26,7 +27,7 @@ class CZabbixClient extends CZabbixServer {
 	/**
 	 * @inheritdoc
 	 */
-	protected function normalizeResponse(array &$response) {
+	protected function normalizeResponse(array &$response): bool {
 		// Response for item data requests contain success status without data.
 		if (array_key_exists('response', $response) && $response['response'] === self::RESPONSE_SUCCESS
 				&& !array_key_exists('data', $response) && array_key_exists('info', $response)) {

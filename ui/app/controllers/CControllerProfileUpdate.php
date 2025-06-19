@@ -41,11 +41,12 @@ class CControllerProfileUpdate extends CController {
 				case 'web.dashboard.last_widget_type':
 				case 'web.discovery.filter.active':
 				case 'web.discoveryconf.filter.active':
+				case 'web.host.wizard.show.welcome':
 				case 'web.hostgroups.filter.active':
 				case 'web.hostinventories.filter.active':
 				case 'web.hostinventoriesoverview.filter.active':
 				case 'web.hosts.filter.active':
-				case 'web.hosts.graphs.filter.active':
+				case 'web.hosts.graph.list.filter.active':
 				case 'web.hosts.host_discovery.filter.active':
 				case 'web.hosts.httpconf.filter.active':
 				case 'web.hosts.items.list.filter.active':
@@ -73,7 +74,7 @@ class CControllerProfileUpdate extends CController {
 				case 'web.sysmapconf.filter.active':
 				case 'web.templategroups.filter.active':
 				case 'web.templates.filter.active':
-				case 'web.templates.graphs.filter.active':
+				case 'web.templates.graph.list.filter.active':
 				case 'web.templates.host_discovery.filter.active':
 				case 'web.templates.httpconf.filter.active':
 				case 'web.templates.items.list.filter.active':

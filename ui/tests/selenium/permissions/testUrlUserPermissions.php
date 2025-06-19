@@ -362,7 +362,7 @@ class testUrlUserPermissions extends CLegacyWebTest {
 			]],
 			// #28.
 			[[
-				'url' => 'graphs.php?context=host',
+				'url' => 'zabbix.php?action=graph.list&context=host',
 				'title' =>	'Configuration of graphs',
 				'header' => 'Graphs',
 				'users' => [

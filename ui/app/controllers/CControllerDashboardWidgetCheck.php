@@ -78,16 +78,13 @@ class CControllerDashboardWidgetCheck extends CController {
 
 		$output = [];
 
-		if ($errors = $form->validate(true)) {
-			foreach ($errors as $error) {
-				error($error);
-			}
+		$messages = $form->validate(true);
 
-			$output['error']['messages'] = array_column(get_and_clear_messages(), 'message');
+		if ($messages) {
+			$output['messages'] = $messages;
 		}
-		else {
-			$output['fields'] = $form->getFieldsValues();
-		}
+
+		$output['fields'] = $form->getFieldsValues();
 
 		$this->setResponse(new CControllerResponseData(['main_block' => json_encode($output)]));
 	}

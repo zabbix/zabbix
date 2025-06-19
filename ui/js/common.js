@@ -297,15 +297,17 @@ function getPosition(obj) {
 }
 
 /**
- * Opens popup content in overlay dialogue.
+ * Preload and display popup dialogue.
  *
- * @param {string}           action              Popup controller related action.
- * @param {Array|Object}     parameters          Array with key/value pairs that will be used as query for popup
- *                                               request.
- *
+ * @param {string}           action              Popup action (controller).
+ * @param {Array|Object}     parameters          Popup action (controller) parameters.
+ * @param {string|null}      dialogueid          Dialogue overlay ID.
  * @param {string}           dialogue_class      CSS class, usually based on .modal-popup and .modal-popup-{size}.
- * @param {string|null}      dialogueid          ID of overlay dialogue.
- * @param {HTMLElement|null} trigger_element     UI element which was clicked to open overlay dialogue.
+ * @param {boolean}	         is_modal            Whether to prevent interaction with background objects.
+ * @param {boolean}	         is_draggable        Whether to allow dragging the form around.
+ * @param {string|undefined} position            Positioning strategy (Overlay.prototype.POSITION_*).
+ * @param {Object|null}      position_fix        Specific position, if not null.
+ * @param {HTMLElement|null} trigger_element     DOM element which triggered opening overlay dialogue.
  * @param {boolean}          prevent_navigation  Show warning when navigating away from an active dialogue.
  *
  * @returns {Overlay}
@@ -313,6 +315,10 @@ function getPosition(obj) {
 function PopUp(action, parameters, {
 	dialogueid = null,
 	dialogue_class = '',
+	is_modal = true,
+	is_draggable = false,
+	position = undefined,
+	position_fix = null,
 	trigger_element = document.activeElement,
 	prevent_navigation = false
 } = {}) {
@@ -322,16 +328,25 @@ function PopUp(action, parameters, {
 
 	if (!overlay) {
 		overlay = overlayDialogue({
-			dialogueid,
 			title: '',
 			doc_url: '',
 			content: jQuery('<div>', {'height': '68px', 'width': '105px', class: 'is-loading'}),
-			class: 'modal-popup ' + dialogue_class,
+			class: `modal-popup ${dialogue_class}`,
 			buttons: [],
-			element: trigger_element,
-			type: 'popup',
 			prevent_navigation
+		}, {
+			type: 'popup',
+			dialogueid,
+			is_modal,
+			is_draggable,
+			position,
+			position_fix,
+			trigger_element
 		});
+	}
+	else {
+		// Throw reload event for dialogs to shut down scripting properly.
+		overlay.$dialogue[0].dispatchEvent(new CustomEvent('dialogue.reload'));
 	}
 
 	overlay
@@ -381,7 +396,7 @@ function PopUp(action, parameters, {
 					doc_url: resp.doc_url,
 					content: resp.body,
 					controls: resp.controls,
-					class: 'modal-popup ' + resp.dialogue_class ?? dialogue_class,
+					class: `modal-popup ${resp.dialogue_class ?? dialogue_class}`,
 					buttons,
 					debug: resp.debug,
 					script_inline: resp.script_inline,
@@ -485,7 +500,14 @@ function closeDialogHandler(event) {
 			switch (overlay.type) {
 				// Close overlay popup.
 				case 'popup':
-					overlayDialogueDestroy(overlay.dialogueid, Overlay.prototype.CLOSE_BY_USER);
+					if (overlay.has_custom_cancel) {
+						overlay.$dialogue[0].dispatchEvent(new CustomEvent('dialogue.cancel', {detail: {
+							dialogueid: overlay.dialogueid
+						}}));
+					}
+					else {
+						overlayDialogueDestroy(overlay.dialogueid, Overlay.prototype.CLOSE_BY_USER);
+					}
 					break;
 
 				// Close overlay hintbox.
@@ -513,11 +535,6 @@ function closeDialogHandler(event) {
 					jQuery(ZBX_MESSAGES).each(function(i, msg) {
 						msg.closeAllMessages();
 					});
-					break;
-
-				// Close overlay color picker.
-				case 'color_picker':
-					jQuery.colorpicker('hide');
 					break;
 
 				// Close map/shape overlay.
@@ -700,6 +717,10 @@ function validate_trigger_expression(overlay) {
 			overlayDialogueDestroy(overlay.dialogueid);
 
 			obj.dispatchEvent(new Event('change'));
+
+			if (window.trigger_edit_popup) {
+				window.trigger_edit_popup.form.validateChanges(['expression', 'recovery_expression']);
+			}
 		},
 		dataType: 'json',
 		type: 'POST'
@@ -853,7 +874,7 @@ function showHideVisible(obj) {
 /**
  * Check if element is visible.
  *
- * @param {object} element
+ * @param {Element} element
  *
  * @return {boolean}
  */

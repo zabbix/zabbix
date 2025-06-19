@@ -56,15 +56,30 @@ class CTriggerPrototypeManager {
 			' FOR UPDATE'
 		);
 
-		// Deleting discovered triggers.
-		$del_discovered_triggerids = DBfetchColumn(DBselect(
+		// Deleting discovered trigger prototypes.
+		$db_triggerids = DBfetchColumn(DBselect(
 			'SELECT td.triggerid'.
 			' FROM trigger_discovery td'.
-			' WHERE '.dbConditionInt('td.parent_triggerid', $del_triggerids)
+			' JOIN triggers t ON td.triggerid=t.triggerid'.
+			' WHERE '.dbConditionId('td.parent_triggerid', $del_triggerids).
+				' AND '.dbConditionInt('t.flags', [ZBX_FLAG_DISCOVERY_PROTOTYPE_CREATED])
 		), 'triggerid');
 
-		if ($del_discovered_triggerids) {
-			CTriggerManager::delete($del_discovered_triggerids);
+		if ($db_triggerids) {
+			self::delete($db_triggerids);
+		}
+
+		// Deleting discovered triggers.
+		$db_triggerids = DBfetchColumn(DBselect(
+			'SELECT td.triggerid'.
+			' FROM trigger_discovery td'.
+			' JOIN triggers t ON td.triggerid=t.triggerid'.
+			' WHERE '.dbConditionId('td.parent_triggerid', $del_triggerids).
+				' AND '.dbConditionInt('t.flags', [ZBX_FLAG_DISCOVERY_CREATED])
+		), 'triggerid');
+
+		if ($db_triggerids) {
+			CTriggerManager::delete($db_triggerids);
 		}
 
 		DB::delete('functions', ['triggerid' => $del_triggerids]);

@@ -110,7 +110,7 @@ class CPopupMenuElement extends CElement {
 		$element = $this->getItem(array_shift($items));
 
 		if ($items) {
-			$parents = $element->parents('tag:li')->one()->hover();
+			$parents = $element->parents('tag:li')->one()->hoverMouse();
 			$parents->query('class:menu-popup')->asPopupMenu()->waitUntilVisible()->one()->select($items);
 		}
 		else {

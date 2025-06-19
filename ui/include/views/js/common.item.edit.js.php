@@ -271,12 +271,12 @@
 			}
 			else {
 				overlayDialogue({
-					'title': <?= json_encode(_('Error')); ?>,
-					'class': 'modal-popup position-middle',
-					'content': $('<span>').html(<?=
+					title: <?= json_encode(_('Error')); ?>,
+					class: 'modal-popup',
+					content: $('<span>').html(<?=
 						json_encode(_('Failed to parse URL.').'<br><br>'._('URL is not properly encoded.'));
 					?>),
-					'buttons': [
+					buttons: [
 						{
 							title: <?= json_encode(_('Ok')); ?>,
 							class: 'btn-alt',
@@ -284,7 +284,10 @@
 							action: function() {}
 						}
 					]
-				}, e.target);
+				}, {
+					position: Overlay.prototype.POSITION_CENTER,
+					trigger_element: e.target
+				});
 			}
 		});
 

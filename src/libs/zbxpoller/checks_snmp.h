@@ -28,7 +28,7 @@
 #define ZBX_SNMP_STR_ASCII	5
 #define ZBX_SNMP_STR_UNDEFINED	255
 
-#define ZBX_SNMP_DEFAULT_NUMBER_OF_RETRIES 1
+#define ZBX_SNMP_DEFAULT_NUMBER_OF_RETRIES 5
 
 void	get_values_snmp(zbx_dc_item_t *items, AGENT_RESULT *results, int *errcodes, int num,
 		unsigned char poller_type, const char *config_source_ip, const int config_timeout,

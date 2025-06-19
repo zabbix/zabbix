@@ -4138,6 +4138,52 @@ in:
 out:
   return: FAIL
 ---
+test case: SNMP walk to JSON - wrong type warning
+in:
+  value:
+    value_type: ITEM_VALUE_TYPE_STR
+    time: 2017-10-29 03:15:00 +03:00
+    data: |
+      .1.3.6.1.1 = STRING: "xxx"
+      .1.3.6.1.2 = STRING: "yyy"
+      .1.3.6.2.1 = STRING: "aaa"
+      .1.3.6.2.2 = Wrong Type (should be Gauge32 or Unsigned32): Counter32: 123
+  step:
+    type: ZBX_PREPROC_SNMP_WALK_TO_JSON
+    params: |-
+      MACRO1
+      1.3.6.1.
+      0
+      MACRO2
+      1.3.6.2
+      0
+out:
+  return: SUCCEED
+  value: '[{"{#SNMPINDEX}":"2","MACRO1":"yyy","MACRO2":"123"},{"{#SNMPINDEX}":"1","MACRO1":"xxx","MACRO2":"aaa"}]'
+---
+test case: SNMP walk to JSON - wrong type warning invalid format
+in:
+  value:
+    value_type: ITEM_VALUE_TYPE_STR
+    time: 2017-10-29 03:15:00 +03:00
+    data: |
+      .1.3.6.1.1 = STRING: "xxx"
+      .1.3.6.1.2 = STRING: "yyy"
+      .1.3.6.2.1 = STRING: "aaa"
+      .1.3.6.2.2 = Wrong Type (should be Gauge32 or Unsigned32): Counter32 123
+      .1.3.6.2.3 = STRING: "bbb"
+  step:
+    type: ZBX_PREPROC_SNMP_WALK_TO_JSON
+    params: |-
+      MACRO1
+      1.3.6.1.
+      0
+      MACRO2
+      1.3.6.2
+      0
+out:
+  return: FAIL
+---
 test case: HMAC in JavaScript - Invalid algorithm
 in:
   value:

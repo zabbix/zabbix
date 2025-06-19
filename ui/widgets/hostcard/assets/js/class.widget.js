@@ -22,8 +22,6 @@ class CWidgetHostCard extends CWidget {
 	}
 
 	onResize() {
-		super.onResize();
-
 		this.#adjustSections();
 	}
 

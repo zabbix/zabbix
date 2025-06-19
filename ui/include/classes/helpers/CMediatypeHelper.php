@@ -39,6 +39,14 @@ class CMediatypeHelper {
 	public const EMAIL_PROVIDER_OFFICE365 = 3;
 	public const EMAIL_PROVIDER_OFFICE365_RELAY = 4;
 
+	public const EMAIL_PROVIDER_AUTHENTICATIONS = [
+		CMediatypeHelper::EMAIL_PROVIDER_SMTP => [SMTP_AUTHENTICATION_NONE, SMTP_AUTHENTICATION_PASSWORD, SMTP_AUTHENTICATION_OAUTH],
+		CMediatypeHelper::EMAIL_PROVIDER_GMAIL => [SMTP_AUTHENTICATION_PASSWORD, SMTP_AUTHENTICATION_OAUTH],
+		CMediatypeHelper::EMAIL_PROVIDER_GMAIL_RELAY => [SMTP_AUTHENTICATION_NONE, SMTP_AUTHENTICATION_PASSWORD, SMTP_AUTHENTICATION_OAUTH],
+		CMediatypeHelper::EMAIL_PROVIDER_OFFICE365 => [SMTP_AUTHENTICATION_PASSWORD, SMTP_AUTHENTICATION_OAUTH],
+		CMediatypeHelper::EMAIL_PROVIDER_OFFICE365_RELAY => [SMTP_AUTHENTICATION_NONE, SMTP_AUTHENTICATION_PASSWORD]
+	];
+
 	/**
 	 * Returns an array of Email providers default settings.
 	 *
@@ -63,7 +71,7 @@ class CMediatypeHelper {
 				'smtp_email' => 'zabbix@example.com',
 				'smtp_port' => 587,
 				'smtp_security' => SMTP_SECURITY_STARTTLS,
-				'smtp_authentication' => SMTP_AUTHENTICATION_NORMAL,
+				'smtp_authentication' => SMTP_AUTHENTICATION_PASSWORD,
 				'smtp_verify_host' => ZBX_HTTP_VERIFY_HOST_OFF,
 				'smtp_verify_peer' => ZBX_HTTP_VERIFY_PEER_OFF,
 				'message_format' => ZBX_MEDIA_MESSAGE_FORMAT_HTML
@@ -85,7 +93,7 @@ class CMediatypeHelper {
 				'smtp_email' => 'zabbix@example.com',
 				'smtp_port' => 587,
 				'smtp_security' => SMTP_SECURITY_STARTTLS,
-				'smtp_authentication' => SMTP_AUTHENTICATION_NORMAL,
+				'smtp_authentication' => SMTP_AUTHENTICATION_PASSWORD,
 				'smtp_verify_host' => ZBX_HTTP_VERIFY_HOST_OFF,
 				'smtp_verify_peer' => ZBX_HTTP_VERIFY_PEER_OFF,
 				'message_format' => ZBX_MEDIA_MESSAGE_FORMAT_HTML
@@ -403,6 +411,43 @@ class CMediatypeHelper {
 		return [
 			'subject' => $message_templates[$message_type]['template']['subject'],
 			'message' => $message_templates[$message_type]['template']['text']
+		];
+	}
+
+	/**
+	 * Get OAuth defaults as array with provider as a key and oauth defaults as value.
+	 *
+	 * @return array
+	 */
+	public static function getOauthDefaultsByProvider(): array {
+		$redirection_url = '';
+		$base_url = rtrim(CSettingsHelper::get(CSettingsHelper::URL), '/');
+
+		if ($base_url !== '') {
+			$url = new CUrl($base_url.'/zabbix.php');
+			$url->setArgument('action', 'oauth.authorize');
+			$redirection_url = $url->getUrl();
+		}
+
+		return [
+			self::EMAIL_PROVIDER_SMTP => [
+				'redirection_url' => $redirection_url
+			],
+			self::EMAIL_PROVIDER_GMAIL => [
+				'redirection_url' => $redirection_url,
+				'authorization_url' => 'https://accounts.google.com/o/oauth2/v2/auth?response_type=code&scope=https://mail.google.com/&prompt=consent&access_type=offline',
+				'token_url' => 'https://oauth2.googleapis.com/token?grant_type=authorization_code'
+			],
+			self::EMAIL_PROVIDER_GMAIL_RELAY => [
+				'redirection_url' => $redirection_url,
+				'authorization_url' => 'https://accounts.google.com/o/oauth2/v2/auth?response_type=code&scope=https://mail.google.com/&prompt=consent&access_type=offline',
+				'token_url' => 'https://oauth2.googleapis.com/token?grant_type=authorization_code'
+			],
+			self::EMAIL_PROVIDER_OFFICE365 => [
+				'redirection_url' => $redirection_url,
+				'authorization_url' => 'https://login.microsoftonline.com/common/oauth2/v2.0/authorize?response_type=code&scope=https://outlook.office.com/SMTP.Send offline_access',
+				'token_url' => 'https://login.microsoftonline.com/common/oauth2/v2.0/token?grant_type=authorization_code'
+			]
 		];
 	}
 }

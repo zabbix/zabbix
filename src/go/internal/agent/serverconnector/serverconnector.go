@@ -21,7 +21,6 @@ import (
 	"encoding/json"
 	"fmt"
 	"net"
-	"net/url"
 	"reflect"
 	"strings"
 	"time"
@@ -93,58 +92,6 @@ type heartbeatMessage struct {
 	HeartbeatFrequency int    `json:"heartbeat_freq"`
 	Version            string `json:"version"`
 	Variant            int    `json:"variant"`
-}
-
-// ParseServerActive validates address list of zabbix Server or Proxy for ActiveCheck
-func ParseServerActive() ([][]string, error) {
-
-	if 0 == len(strings.TrimSpace(agent.Options.ServerActive)) {
-		return [][]string{}, nil
-	}
-
-	var checkAddr string
-	clusters := strings.Split(agent.Options.ServerActive, ",")
-
-	addrs := make([][]string, len(clusters))
-
-	for i := 0; i < len(clusters); i++ {
-		addresses := strings.Split(clusters[i], ";")
-
-		for j := 0; j < len(addresses); j++ {
-			addresses[j] = strings.TrimSpace(addresses[j])
-			u := url.URL{Host: addresses[j]}
-			ip := net.ParseIP(addresses[j])
-			if nil == ip && 0 == len(strings.TrimSpace(u.Hostname())) {
-				return nil, fmt.Errorf("address \"%s\": empty value", addresses[j])
-			}
-
-			if nil != ip {
-				checkAddr = net.JoinHostPort(addresses[j], "10051")
-			} else if 0 == len(u.Port()) {
-				checkAddr = net.JoinHostPort(u.Hostname(), "10051")
-			} else {
-				checkAddr = addresses[j]
-			}
-
-			if h, p, err := net.SplitHostPort(checkAddr); err != nil {
-				return nil, fmt.Errorf("address \"%s\": %s", addresses[j], err)
-			} else {
-				addresses[j] = net.JoinHostPort(strings.TrimSpace(h), strings.TrimSpace(p))
-			}
-
-			for k := 0; k < len(addrs); k++ {
-				for l := 0; l < len(addrs[k]); l++ {
-					if addrs[k][l] == addresses[j] {
-						return nil, fmt.Errorf("address \"%s\" specified more than once", addresses[j])
-					}
-				}
-			}
-
-			addrs[i] = append(addrs[i], addresses[j])
-		}
-	}
-
-	return addrs, nil
 }
 
 //nolint:gocognit,gocyclo,cyclop,maintidx

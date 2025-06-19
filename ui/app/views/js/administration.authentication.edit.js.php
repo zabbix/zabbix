@@ -75,17 +75,16 @@
 
 						const http_auth_enabled = document.getElementById('http_auth_enabled');
 						overlayDialogue({
-							'title': <?= json_encode(_('Confirm changes')) ?>,
-							'class': 'position-middle',
-							'content': document.createElement('span').innerText = <?= json_encode(
+							title: <?= json_encode(_('Confirm changes')) ?>,
+							content: document.createElement('span').innerText = <?= json_encode(
 								_('Enable HTTP authentication for all users.')
 							) ?>,
-							'buttons': [
+							buttons: [
 								{
-									'title': <?= json_encode(_('Cancel')) ?>,
-									'cancel': true,
-									'class': '<?= ZBX_STYLE_BTN_ALT ?>',
-									'action': function () {
+									title: <?= json_encode(_('Cancel')) ?>,
+									cancel: true,
+									class: '<?= ZBX_STYLE_BTN_ALT ?>',
+									action: function () {
 										for (const form_field of form_fields) {
 											if (form_field !== http_auth_enabled) {
 												form_field.disabled = true;
@@ -97,12 +96,15 @@
 									}
 								},
 								{
-									'title': <?= json_encode(_('Ok')) ?>,
-									'focused': true,
-									'action': function () {}
+									title: <?= json_encode(_('Ok')) ?>,
+									focused: true,
+									action: function () {}
 								}
 							]
-						}, e.target);
+						}, {
+							position: Overlay.prototype.POSITION_CENTER,
+							trigger_element: e.target
+						});
 					}
 				});
 			}

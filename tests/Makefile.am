@@ -38,7 +38,9 @@ libzbxmockdata_a_SOURCES = \
 	zbxmockhelper.c \
 	zbxmockhelper.h \
 	zbxmockjson.c \
-	zbxmockjson.h
+	zbxmockjson.h \
+	zbxmockprimitive.c \
+	zbxmockprimitive.h
 
 libzbxmockdummy_a_CFLAGS = \
 	$(CMOCKA_CFLAGS) \

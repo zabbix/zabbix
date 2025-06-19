@@ -1,0 +1,291 @@
+---
+test case: Empty set
+in:
+  dst: 
+    rows: []
+    cols_num: 2
+  src: 
+    rows: []
+    cols_num: 2
+out: 
+  dst: 
+    rows: []
+    cols_num: 2
+---
+test case: Add row
+in:
+  dst: 
+    rows: []
+    cols_num: 2
+  src: 
+    rows:
+    - rowid: 0
+      flags: 0
+      cols: ["1", "2"]
+    - rowid: 0
+      flags: 0
+      cols: ["3", "4"]
+    - rowid: 0
+      flags: 0
+      cols: ["5", "6"]
+    cols_num: 2
+out: 
+  dst: 
+    rows:
+    - rowid: 0
+      flags: 0x40000000
+      cols: ["1", "2"]
+    - rowid: 0
+      flags: 0x40000000
+      cols: ["3", "4"]
+    - rowid: 0
+      flags: 0x40000000
+      cols: ["5", "6"]
+    cols_num: 2
+---
+test case: Remove row
+in:
+  dst: 
+    rows:
+    - rowid: 1
+      flags: 0
+      cols: ["1", "2"]
+    cols_num: 2
+  src: 
+    rows: []
+    cols_num: 2
+out: 
+  dst: 
+    rows:
+    - rowid: 1
+      flags: 0x80000000
+      cols: ["1", "2"]
+    cols_num: 2
+---
+test case: Match rows
+in:
+  dst: 
+    rows:
+    - rowid: 1
+      flags: 0
+      cols: ["1", "2"]
+    - rowid: 2
+      flags: 0
+      cols: ["3", "4"]
+    - rowid: 3
+      flags: 0
+      cols: ["5", "6"]
+    cols_num: 2
+  src: 
+    rows:
+    - rowid: 0
+      flags: 0
+      cols: ["1", "2"]
+    - rowid: 0
+      flags: 0
+      cols: ["3", "4"]
+    - rowid: 0
+      flags: 0
+      cols: ["5", "6"]
+    cols_num: 2
+out: 
+  dst: 
+    rows:
+    - rowid: 1
+      flags: 0
+      cols: ["1", "2"]
+    - rowid: 2
+      flags: 0
+      cols: ["3", "4"]
+    - rowid: 3
+      flags: 0
+      cols: ["5", "6"]
+    cols_num: 2
+---
+test case: Update rows (1)
+in:
+  dst: 
+    rows:
+    - rowid: 1
+      flags: 0
+      cols: ["1", "2"]
+    - rowid: 2
+      flags: 0
+      cols: ["3", "4"]
+    - rowid: 3
+      flags: 0
+      cols: ["5", "6"]
+    cols_num: 2
+  src: 
+    rows:
+    - rowid: 0
+      flags: 0
+      cols: ["1", "2"]
+    - rowid: 0
+      flags: 0
+      cols: ["3", "5"]
+    - rowid: 0
+      flags: 0
+      cols: ["7", "8"]
+    cols_num: 2
+out: 
+  dst: 
+    rows:
+    - rowid: 1
+      flags: 0
+      cols: ["1", "2"]
+    - rowid: 2
+      flags: 0x00000002
+      cols: ["3", "5"]
+    - rowid: 3
+      flags: 0x00000003
+      cols: ["7", "8"]
+    cols_num: 2
+---
+test case: Update rows (2)
+in:
+  dst: 
+    rows:
+    - rowid: 1
+      flags: 0
+      cols: ["1", "1", "1"]
+    - rowid: 2
+      flags: 0
+      cols: ["1", "1", "2"]
+    - rowid: 3
+      flags: 0
+      cols: ["1", "1", "3"]
+    - rowid: 4
+      flags: 0
+      cols: ["1", "1", "4"]
+    cols_num: 3
+  src: 
+    rows:
+    - rowid: 0
+      flags: 0
+      cols: ["1", "1", "5"]
+    - rowid: 0
+      flags: 0
+      cols: ["1", "1", "6"]
+    - rowid: 0
+      flags: 0
+      cols: ["1", "1", "7"]
+    - rowid: 0
+      flags: 0
+      cols: ["1", "1", "8"]
+    cols_num: 3
+out: 
+  dst: 
+    rows:
+    - rowid: 1
+      flags: 0x00000004
+      cols: ["1", "1", "8"]
+    - rowid: 2
+      flags: 0x00000004
+      cols: ["1", "1", "7"]
+    - rowid: 3
+      flags: 0x00000004
+      cols: ["1", "1", "6"]
+    - rowid: 4
+      flags: 0x00000004
+      cols: ["1", "1", "5"]
+    cols_num: 3
+---
+test case: Update rows (3)
+in:
+  dst: 
+    rows:
+    - rowid: 1
+      flags: 0
+      cols: ["1", "1", "1"]
+    - rowid: 2
+      flags: 0
+      cols: ["1", "1", "2"]
+    - rowid: 3
+      flags: 0
+      cols: ["1", "1", "3"]
+    - rowid: 4
+      flags: 0
+      cols: ["1", "1", "4"]
+    cols_num: 3
+  src: 
+    rows:
+    - rowid: 0
+      flags: 0
+      cols: ["1", "1", "5"]
+    - rowid: 0
+      flags: 0
+      cols: ["1", "2", "2"]
+    - rowid: 0
+      flags: 0
+      cols: ["1", "2", "3"]
+    - rowid: 0
+      flags: 0
+      cols: ["1", "1", "8"]
+    cols_num: 3
+out: 
+  dst: 
+    rows:
+    - rowid: 1
+      flags: 0x00000006
+      cols: ["1", "2", "3"]
+    - rowid: 2
+      flags: 0x00000002
+      cols: ["1", "2", "2"]
+    - rowid: 3
+      flags: 0x00000004
+      cols: ["1", "1", "8"]
+    - rowid: 4
+      flags: 0x00000004
+      cols: ["1", "1", "5"]
+    cols_num: 3
+---
+test case: Update rows (4)
+in:
+  dst: 
+    rows:
+    - rowid: 1
+      flags: 0
+      cols: ["1", "1", "1"]
+    - rowid: 2
+      flags: 0
+      cols: ["1", "2", "1"]
+    - rowid: 3
+      flags: 0
+      cols: ["1", "2", "2"]
+    - rowid: 4
+      flags: 0
+      cols: ["1", "3", "1"]
+    cols_num: 3
+  src: 
+    rows:
+    - rowid: 0
+      flags: 0
+      cols: ["1", "1", "1"]
+    - rowid: 0
+      flags: 0
+      cols: ["1", "2", "3"]
+    - rowid: 0
+      flags: 0
+      cols: ["1", "2", "2"]
+    - rowid: 0
+      flags: 0
+      cols: ["1", "3", "1"]
+    cols_num: 3
+out: 
+  dst: 
+    rows:
+    - rowid: 1
+      flags: 0
+      cols: ["1", "1", "1"]
+    - rowid: 2
+      flags: 0x00000004
+      cols: ["1", "2", "3"]
+    - rowid: 3
+      flags: 0
+      cols: ["1", "2", "2"]
+    - rowid: 4
+      flags: 0
+      cols: ["1", "3", "1"]
+    cols_num: 3
+...

@@ -103,27 +103,28 @@ JAVASCRIPT;
 		];
 	}
 	/**
-	 * Add inherited from host and template tags to item tags.
+	 * Add tags inherited from host and template to item tags. An additional property 'type' is set for each returned
+	 * tag.
 	 *
-	 * @param int   $item_tags['itemid']
-	 * @param int   $item_tags['hostid']
-	 * @param int   $item_tags['templateid']
-	 * @param array $item_tags['discoveryRule']
-	 * @param int   $item_tags['discoveryRule']['templateid']
-	 * @param int   $item_tags['discoveryRule']['itemid']
-	 * @param array $item_tags
+	 * @param string $item['itemid']
+	 * @param string $item['hostid']
+	 * @param string $item['templateid']
+	 * @param array  $item['parent_lld'] 				(optional) Parent LLD for discovered item prototype.
+	 * @param string $item['parent_lld']['itemid']
+	 * @param string $item['parent_lld']['templateid']
+	 * @param int    $item['parent_lld']['flags']
+	 * @param array  $item_tags
 	 *
-	 * @return array of tags with inherited and additional property 'type' set for each tag.
+	 * @return array
 	 */
 	public static function addInheritedTags(array $item, array $item_tags): array {
+		self::findParentLldTemplateid($item);
+
 		$tags = [];
 
-		if (array_key_exists('discoveryRule', $item)) {
-			$parent_templates = getItemParentTemplates([$item['discoveryRule']], ZBX_FLAG_DISCOVERY_RULE)['templates'];
-		}
-		else {
-			$parent_templates = getItemParentTemplates([$item], ZBX_FLAG_DISCOVERY_NORMAL)['templates'];
-		}
+		$parent_templates = array_key_exists('parent_lld', $item)
+			? getItemParentTemplates([$item['parent_lld']], $item['parent_lld']['flags'])['templates']
+			: getItemParentTemplates([$item], ZBX_FLAG_DISCOVERY_NORMAL)['templates'];
 		unset($parent_templates[0]);
 
 		$db_templates = $parent_templates
@@ -173,6 +174,8 @@ JAVASCRIPT;
 			}
 		}
 
+		$item_tags_uniqe = [];
+
 		// Overwrite and attach item's own tags.
 		foreach ($item_tags as $tag) {
 			if (array_key_exists($tag['tag'], $inherited_tags)
@@ -180,11 +183,15 @@ JAVASCRIPT;
 				$inherited_tags[$tag['tag']][$tag['value']]['type'] = ZBX_PROPERTY_BOTH;
 			}
 			else {
-				$inherited_tags[$tag['tag']][$tag['value']] = $tag + ['type' => ZBX_PROPERTY_OWN];
+				$item_tags_uniqe[$tag['tag']][$tag['value']] = $tag + ['type' => ZBX_PROPERTY_OWN];
 			}
 		}
 
 		foreach ($inherited_tags as $tag) {
+			$tags = array_merge($tags, array_values($tag));
+		}
+
+		foreach ($item_tags_uniqe as $tag) {
 			$tags = array_merge($tags, array_values($tag));
 		}
 
@@ -213,7 +220,7 @@ JAVASCRIPT;
 			'valuemap' => [],
 			'master_item' => [],
 			'templated' => (bool) $item['templateid'],
-			'discovered' => $item['flags'] == ZBX_FLAG_DISCOVERY_CREATED,
+			'discovered' => $item['flags'] & ZBX_FLAG_DISCOVERY_CREATED,
 			'http_authtype' => ZBX_HTTP_AUTH_NONE,
 			'http_username' => '',
 			'http_password' => '',
@@ -330,6 +337,164 @@ JAVASCRIPT;
 		return $item;
 	}
 
+	public static function getPreprocessingValidationRules(bool $allow_lld_macro): array {
+		return ['objects', 'fields' => [
+			// Control parameters.
+			'on_fail' => ['integer', 'in' => ['1']],
+			'sortorder' => ['integer'],
+
+			// Fields.
+			'type' => ['integer', 'required', 'in' => CItem::SUPPORTED_PREPROCESSING_TYPES],
+			'params_1' => [
+				['db item_preproc.params', 'required', 'not_empty',
+					'when' => ['type', 'in' => [ZBX_PREPROC_REGSUB]]
+				],
+				['db item_preproc.params',
+					'when' => ['type', 'in' => [ZBX_PREPROC_STR_REPLACE]]
+				],
+				['db item_preproc.params', 'required',
+					'use' => [CNumberParser::class, ['usermacros' => true, 'lldmacros' => $allow_lld_macro]],
+					'messages' => ['use' => _('A floating point value is expected.')],
+					'when' => ['type', 'in' => [ZBX_PREPROC_VALIDATE_RANGE]]
+				],
+				['db item_preproc.params', 'required', 'not_empty', 'when' => ['type', 'in' => [
+					ZBX_PREPROC_ERROR_FIELD_REGEX
+				]]],
+				['db item_preproc.params', 'required', 'not_empty',
+					'in' => [ZBX_PREPROC_PROMETHEUS_VALUE, ZBX_PREPROC_PROMETHEUS_LABEL, ZBX_PREPROC_PROMETHEUS_SUM,
+						ZBX_PREPROC_PROMETHEUS_MIN, ZBX_PREPROC_PROMETHEUS_MAX, ZBX_PREPROC_PROMETHEUS_AVG,
+						ZBX_PREPROC_PROMETHEUS_COUNT
+					],
+					'when' => ['type', 'in' => [ZBX_PREPROC_PROMETHEUS_PATTERN]]
+				]
+			],
+			'params_0' => [
+				['db item_preproc.params', 'required', 'not_empty', 'allow_macro',
+					'use' => [CRegexValidator::class, []],
+					'when' => ['type', 'in' => [ZBX_PREPROC_REGSUB]]
+				],
+				['db item_preproc.params', 'required', 'not_empty',
+					'when' => ['type', 'in' => [ZBX_PREPROC_STR_REPLACE]]
+				],
+				['db item_preproc.params', 'required', 'not_empty', 'when' => ['type', 'in' => [ZBX_PREPROC_TRIM]]],
+				['db item_preproc.params', 'required', 'not_empty', 'when' => ['type', 'in' => [ZBX_PREPROC_LTRIM]]],
+				['db item_preproc.params', 'required', 'not_empty', 'when' => ['type', 'in' => [ZBX_PREPROC_RTRIM]]],
+				['db item_preproc.params', 'required', 'not_empty',
+					'when' => ['type', 'in' => [ZBX_PREPROC_XPATH]]
+				],
+				['db item_preproc.params', 'required', 'not_empty',
+					'when' => ['type', 'in' => [ZBX_PREPROC_JSONPATH]]
+				],
+				['db item_preproc.params', 'when' => ['type', 'in' => [ZBX_PREPROC_CSV_TO_JSON]]],
+				['db item_preproc.params', 'required', 'not_empty',
+					'when' => ['type', 'in' => [ZBX_PREPROC_SNMP_WALK_VALUE]]
+				],
+				['db item_preproc.params', 'required', 'not_empty',
+					'in' => [(string) ZBX_PREPROC_SNMP_UTF8_FROM_HEX, (string) ZBX_PREPROC_SNMP_MAC_FROM_HEX,
+						(string) ZBX_PREPROC_SNMP_INT_FROM_BITS
+					],
+					'when' => ['type', 'in' => [ZBX_PREPROC_SNMP_GET_VALUE]]
+				],
+				['db item_preproc.params', 'required', 'not_empty',
+					'use' => [CNumberParser::class, ['usermacros' => true, 'lldmacros' => $allow_lld_macro]],
+					'messages' => ['use' => _('A floating point value is expected.')],
+					'when' => ['type', 'in' => [ZBX_PREPROC_MULTIPLIER]]
+				],
+				['db item_preproc.params','required', 'not_empty',
+					'when' => ['type', 'in' => [ZBX_PREPROC_SCRIPT]]
+				],
+				['db item_preproc.params',
+					'use' => [CNumberParser::class, ['usermacros' => true, 'lldmacros' => $allow_lld_macro]],
+					'messages' => ['use' => _('A floating point value is expected.')],
+					'when' => ['type', 'in' => [ZBX_PREPROC_VALIDATE_RANGE]]
+				],
+				['db item_preproc.params', 'required', 'not_empty',
+					'messages' => ['not_empty' => _('At least one of "min" or "max" parameters should be specified.')],
+					'when' => [
+						['type', 'in' => [ZBX_PREPROC_VALIDATE_RANGE]],
+						['params_1', 'in' => ['']]
+					]
+				],
+				['db item_preproc.params', 'required', 'not_empty', 'allow_macro',
+					'use' => [CRegexValidator::class, []],
+					'when' => ['type', 'in' => [ZBX_PREPROC_VALIDATE_REGEX]]
+				],
+				['db item_preproc.params', 'required', 'not_empty', 'allow_macro', 'use' => [
+						CRegexValidator::class, []
+					], 'when' => ['type', 'in' => [ZBX_PREPROC_VALIDATE_NOT_REGEX]]
+				],
+				['db item_preproc.params', 'required', 'not_empty',
+					'when' => ['type', 'in' => [ZBX_PREPROC_ERROR_FIELD_JSON]]
+				],
+				['db item_preproc.params', 'required', 'not_empty', 'when' => ['type', 'in' => [
+							ZBX_PREPROC_ERROR_FIELD_XML
+				]]],
+				['db item_preproc.params', 'required', 'not_empty', 'allow_macro', 'use' => [
+						CRegexValidator::class, []
+					], 'when' => ['type', 'in' => [ZBX_PREPROC_ERROR_FIELD_REGEX]]
+				],
+				['db item_preproc.params', 'required', 'not_empty',
+					'use' => [CTimeUnitValidator::class, ['min' => 1, 'max' => 25 * SEC_PER_YEAR, 'usermacros' => true, 'lldmacros' => $allow_lld_macro]],
+					'when' => ['type', 'in' => [ZBX_PREPROC_THROTTLE_TIMED_VALUE]]
+				],
+				['db item_preproc.params', 'required', 'not_empty',
+					'use' => [CPrometheusPatternParser::class, ['usermacros' => true, 'lldmacros' => $allow_lld_macro]],
+					'messages' => ['use' => _('Invalid Prometheus pattern.')],
+					'when' => ['type', 'in' => [ZBX_PREPROC_PROMETHEUS_PATTERN]]
+				],
+				['db item_preproc.params',
+					'use' => [CPrometheusPatternParser::class, ['usermacros' => true, 'lldmacros' => $allow_lld_macro]],
+					'messages' => ['use' => _('Invalid Prometheus pattern.')],
+					'when' => ['type', 'in' => [ZBX_PREPROC_PROMETHEUS_TO_JSON]]
+				]
+			],
+			'params_2' => [
+				['integer', 'in' => [ZBX_PREPROC_CSV_NO_HEADER, ZBX_PREPROC_CSV_HEADER],
+					'when' => ['type', 'in' => [ZBX_PREPROC_CSV_TO_JSON]]
+				],
+				['string', 'required', 'not_empty',
+					'use' => [CPrometheusOutputParser::class, ['usermacros' => true, 'lldmacros' => $allow_lld_macro]],
+					'messages' => ['use' => _('Invalid Prometheus label.')],
+					'when' => [
+						['type', 'in' => [ZBX_PREPROC_PROMETHEUS_PATTERN]],
+						['params_1', 'in' => [ZBX_PREPROC_PROMETHEUS_LABEL]]
+					]
+				]
+			],
+			'params_set_snmp' => ['objects', 'fields' => [
+					'name' => ['string', 'required', 'not_empty'],
+					'oid_prefix' => ['string', 'required', 'not_empty'],
+					'format' => ['integer', 'in' => [
+						ZBX_PREPROC_SNMP_UNCHANGED, ZBX_PREPROC_SNMP_UTF8_FROM_HEX, ZBX_PREPROC_SNMP_MAC_FROM_HEX,
+						ZBX_PREPROC_SNMP_INT_FROM_BITS
+					]]
+				], 'when' => ['type', 'in' => [ZBX_PREPROC_SNMP_WALK_TO_JSON]]
+			],
+			'params_0_not_supported' => ['integer', 'required',
+				'in' => [ZBX_PREPROC_MATCH_ERROR_ANY, ZBX_PREPROC_MATCH_ERROR_REGEX, ZBX_PREPROC_MATCH_ERROR_NOT_REGEX],
+				'when' => ['type', 'in' => [ZBX_PREPROC_VALIDATE_NOT_SUPPORTED]]
+			],
+			'params_1_not_supported' => ['db item_preproc.params', 'required', 'not_empty', 'allow_macro',
+				'use' => [CRegexValidator::class, []],
+				'when' => [
+					['type', 'in' => [ZBX_PREPROC_VALIDATE_NOT_SUPPORTED]],
+					['params_0_not_supported', 'in' => [ZBX_PREPROC_MATCH_ERROR_REGEX, ZBX_PREPROC_MATCH_ERROR_NOT_REGEX]]
+				]
+			],
+			'error_handler' => ['integer',
+				'in' => [ZBX_PREPROC_FAIL_DEFAULT, ZBX_PREPROC_FAIL_DISCARD_VALUE, ZBX_PREPROC_FAIL_SET_VALUE,
+					ZBX_PREPROC_FAIL_SET_ERROR
+				]
+			],
+			'error_handler_params' => [
+				['string', 'required', 'not_empty', 'when' => [
+					['error_handler', 'in' => [ZBX_PREPROC_FAIL_SET_ERROR]],
+					['on_fail', 'in' => ['1']]
+				]]
+			]
+		]];
+	}
+
 	/**
 	 * Convert form submitted data to be ready to send to API for update or create operation.
 	 *
@@ -409,6 +574,11 @@ JAVASCRIPT;
 	 * @return array normalized form data.
 	 */
 	public static function normalizeFormData(array $input): array {
+		foreach ($input['preprocessing'] as &$step) {
+			$step = self::normalizeFormDataPreprocessingStep($step);
+		}
+		unset($step);
+
 		$tags = [];
 
 		foreach ($input['tags'] as $tag) {
@@ -479,6 +649,48 @@ JAVASCRIPT;
 		$input['preprocessing'] = array_values($input['preprocessing']);
 
 		return $input;
+	}
+
+	public static function normalizeFormDataPreprocessingStep(array $step): array {
+		if (array_key_exists('params', $step)) {
+			return $step;
+		}
+
+		$step['params'] = [];
+
+		if (array_key_exists('params_set_snmp', $step)) {
+			foreach ($step['params_set_snmp'] as $param) {
+				$step['params'][] = $param['name'];
+				$step['params'][] = $param['oid_prefix'];
+				$step['params'][] = $param['format'];
+			}
+
+			unset($step['params_set_snmp']);
+		}
+
+		foreach (['params_0', 'params_1', 'params_2'] as $key) {
+			if (array_key_exists($key, $step)) {
+				if ($step[$key] === null) {
+					$step[$key] = '';
+				}
+
+				$step['params'][] = $step[$key];
+				unset($step[$key]);
+			}
+		}
+
+		foreach (['params_0_not_supported', 'params_1_not_supported'] as $key) {
+			if (array_key_exists($key, $step)) {
+				if ($step[$key] === null) {
+					$step[$key] = '';
+				}
+
+				$step['params'][] = $step[$key];
+				unset($step[$key]);
+			}
+		}
+
+		return $step;
 	}
 
 	/**
@@ -704,12 +916,13 @@ JAVASCRIPT;
 	/**
 	 * @param array  $src_items
 	 * @param array  $dst_hosts
+	 * @param int    $flags
 	 *
 	 * @return array
 	 *
 	 * @throws Exception
 	 */
-	protected static function getDestinationMasterItems(array $src_items, array $dst_hosts): array {
+	protected static function getDestinationMasterItems(array $src_items, array $dst_hosts, int $flags): array {
 		$dst_hostids = array_keys($dst_hosts);
 		$item_indexes = [];
 		$dst_master_itemids = [];
@@ -755,13 +968,57 @@ JAVASCRIPT;
 			}
 		}
 
+		$src_master_itemprototypes = [];
+		$dst_master_itemprototypes = [];
+
+		if ($flags == ZBX_FLAG_DISCOVERY_RULE_PROTOTYPE) {
+			$src_master_itemprototypes = API::ItemPrototype()->get([
+				'output' => ['itemid', 'key_'],
+				'itemids' => array_keys($item_indexes),
+				'preservekeys' => true
+			]);
+			$dst_master_itemprototypes = API::ItemPrototype()->get([
+				'output' => ['itemid', 'hostid', 'key_'],
+				'filter' => ['key_' => array_unique(array_column($src_master_itemprototypes, 'key_'))]
+			] + $host_filter);
+
+			foreach ($dst_master_itemprototypes as $dst_master_item) {
+				$_dst_master_itemids[$dst_master_item['key_']][$dst_master_item['hostid']] = $dst_master_item['itemid'];
+			}
+
+			foreach ($src_master_itemprototypes as $src_master_item) {
+				if (array_key_exists($src_master_item['key_'], $_dst_master_itemids)) {
+					foreach ($_dst_master_itemids[$src_master_item['key_']] as $dst_hostid => $dst_master_itemid) {
+						foreach ($item_indexes[$src_master_item['itemid']] as $src_itemid) {
+							$dst_master_itemids[$src_itemid][$dst_hostid] = $dst_master_itemid;
+						}
+					}
+				}
+			}
+		}
+
+		$missing_master_item = [
+			ZBX_FLAG_DISCOVERY_NORMAL => _('Cannot copy item with key "%1$s" without its master item with key "%2$s".'),
+			ZBX_FLAG_DISCOVERY_PROTOTYPE => _('Cannot copy item prototype with key "%1$s" without its master item with key "%2$s".'),
+			ZBX_FLAG_DISCOVERY_RULE => _('Cannot copy LLD rule with key "%1$s" without its master item with key "%2$s".'),
+			ZBX_FLAG_DISCOVERY_RULE_PROTOTYPE => _('Cannot copy LLD rule prototype with key "%1$s" without its master item with key "%2$s".')
+		];
+
 		foreach ($dst_master_itemids as $src_itemid => $dst_host_master_itemids) {
 			foreach ($dst_host_master_itemids as $dst_hostid => $dst_master_itemid) {
 				if ($dst_master_itemid == 0) {
-					error(_s('Cannot copy item with key "%1$s" without its master item with key "%2$s".',
-						$src_items[$src_itemid]['key_'],
-						$src_master_items[$src_items[$src_itemid]['master_itemid']]['key_']
-					));
+					$src_item = $src_items[$src_itemid];
+					$error = array_key_exists($src_item['master_itemid'], $src_master_items)
+						? sprintf($missing_master_item[$src_item['flags']],
+							$src_item['key_'],
+							$src_master_items[$src_item['master_itemid']]['key_']
+						)
+						: _s('Cannot copy LLD rule prototype with key "%1$s" without its master item prototype with key "%2$s".',
+							$src_item['key_'],
+							$src_master_itemprototypes[$src_item['master_itemid']]['key_']
+						);
+
+					error($error);
 
 					throw new Exception();
 				}
@@ -769,5 +1026,35 @@ JAVASCRIPT;
 		}
 
 		return $dst_master_itemids;
+	}
+
+	public static function findParentLldTemplateid(array &$data): void {
+		if (!array_key_exists('parent_lld', $data)) {
+			return;
+		}
+
+		$lldruleid = $data['parent_lld']['itemid'];
+
+		while ($data['parent_lld']['templateid'] == 0) {
+			$options = [
+				'output' => ['itemid', 'templateid', 'flags'],
+				'selectDiscoveryRule' => ['itemid'],
+				'itemids' => $lldruleid,
+				'nopermissions' => true
+			];
+
+			$db_source = API::DiscoveryRule()->get($options)
+				?: API::DiscoveryRulePrototype()->get($options + ['selectDiscoveryRulePrototype' => ['itemid']]);
+
+			$data['parent_lld'] = reset($db_source) + ['discoveryRulePrototype' => []];
+
+			$parent_lld = $data['parent_lld']['discoveryRule'] ?: $data['parent_lld']['discoveryRulePrototype'];
+
+			if (!$parent_lld) {
+				break;
+			}
+
+			$lldruleid = $parent_lld['itemid'];
+		}
 	}
 }

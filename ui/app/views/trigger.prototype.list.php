@@ -33,7 +33,11 @@ $html_page = (new CHtmlPage())
 	))
 	->setControls(
 		(new CTag('nav', true,
-			(new CList())->addItem((new CButton('create_trigger', _('Create trigger prototype')))->setId('js-create'))
+			(new CList())->addItem(
+				(new CButton('create_trigger', _('Create trigger prototype')))
+					->setId('js-create')
+					->setEnabled(!$data['is_parent_discovered'])
+			)
 		))->setAttribute('aria-label', _('Content controls'))
 	)
 	->setNavigation(getHostNavigation('triggers', $this->data['hostid'], $this->data['parent_discoveryid']));
@@ -81,6 +85,22 @@ foreach ($data['triggers'] as $trigger) {
 		ZBX_FLAG_DISCOVERY_PROTOTYPE, $data['allowed_ui_conf_templates']
 	);
 
+	if ($trigger['flags'] & ZBX_FLAG_DISCOVERY_CREATED) {
+		$description[] = (new CLink($data['source_link_data']['name'],
+			(new CUrl('zabbix.php'))
+				->setArgument('action', 'popup')
+				->setArgument('popup', 'trigger.prototype.edit')
+				->setArgument('parent_discoveryid', $data['source_link_data']['parent_itemid'])
+				->setArgument('triggerid', $trigger['discoveryData']['parent_triggerid'])
+				->setArgument('context', 'host')
+				->getUrl()
+		))
+			->addClass(ZBX_STYLE_LINK_ALT)
+			->addClass(ZBX_STYLE_ORANGE);
+
+		$description[] = NAME_DELIMITER;
+	}
+
 	$trigger_url = (new CUrl('zabbix.php'))
 		->setArgument('action', 'popup')
 		->setArgument('popup', 'trigger.prototype.edit')
@@ -100,7 +120,7 @@ foreach ($data['triggers'] as $trigger) {
 			$dep_trigger_description =
 				implode(', ', array_column($dep_trigger['hosts'], 'name')).NAME_DELIMITER.$dep_trigger['description'];
 
-			if ($dep_trigger['flags'] == ZBX_FLAG_DISCOVERY_PROTOTYPE) {
+			if ($dep_trigger['flags'] & ZBX_FLAG_DISCOVERY_PROTOTYPE) {
 				$dep_trigger_prototype_url = (new CUrl('zabbix.php'))
 					->setArgument('action', 'popup')
 					->setArgument('popup', 'trigger.prototype.edit')
@@ -133,24 +153,23 @@ foreach ($data['triggers'] as $trigger) {
 		$description = array_merge($description, [(new CDiv($trigger_dependencies))->addClass('dependencies')]);
 	}
 
-	$status = (new CLink(
-		($trigger['status'] == TRIGGER_STATUS_DISABLED) ? _('No') : _('Yes')))
+	$status_disabled = $trigger['status'] == TRIGGER_STATUS_DISABLED;
+	$status_toggle = $data['is_parent_discovered']
+		? (new CSpan($status_disabled ? _('No') : _('Yes')))
+		: (new CLink($status_disabled ? _('No') : _('Yes')))
 			->setAttribute('data-triggerid', $triggerid)
-			->setAttribute('data-status', ($trigger['status'] == TRIGGER_STATUS_DISABLED)
-				? TRIGGER_STATUS_ENABLED
-				: TRIGGER_STATUS_DISABLED
-			)
-			->addClass(($trigger['status'] == TRIGGER_STATUS_DISABLED) ? 'js-enable-trigger' : 'js-disable-trigger')
-			->addClass(ZBX_STYLE_LINK_ACTION)
-			->addClass(triggerIndicatorStyle($trigger['status']));
+			->setAttribute('data-status', $status_disabled ? TRIGGER_STATUS_ENABLED : TRIGGER_STATUS_DISABLED)
+			->addClass($status_disabled ? 'js-enable-trigger' : 'js-disable-trigger')
+			->addClass(ZBX_STYLE_LINK_ACTION);
 
-	$nodiscover = ($trigger['discover'] == ZBX_PROTOTYPE_NO_DISCOVER);
-	$discover = (new CLink($nodiscover ? _('No') : _('Yes')))
-		->setAttribute('data-triggerid', $triggerid)
-		->setAttribute('data-discover', $nodiscover ? ZBX_PROTOTYPE_DISCOVER : ZBX_PROTOTYPE_NO_DISCOVER)
-		->addClass($nodiscover ? 'js-enable-trigger' : 'js-disable-trigger')
-		->addClass(ZBX_STYLE_LINK_ACTION)
-		->addClass($nodiscover ? ZBX_STYLE_RED : ZBX_STYLE_GREEN);
+	$no_discover = ($trigger['discover'] == ZBX_PROTOTYPE_NO_DISCOVER);
+	$discover_toggle = $data['is_parent_discovered']
+		? (new CSpan($no_discover ? _('No') : _('Yes')))
+		: (new CLink($no_discover ? _('No') : _('Yes')))
+			->setAttribute('data-triggerid', $triggerid)
+			->setAttribute('data-discover', $no_discover ? ZBX_PROTOTYPE_DISCOVER : ZBX_PROTOTYPE_NO_DISCOVER)
+			->addClass($no_discover ? 'js-enable-trigger' : 'js-disable-trigger')
+			->addClass(ZBX_STYLE_LINK_ACTION);
 
 	if ($trigger['recovery_mode'] == ZBX_RECOVERY_MODE_RECOVERY_EXPRESSION) {
 		$expression = [
@@ -170,45 +189,54 @@ foreach ($data['triggers'] as $trigger) {
 		(new CCol($description))->addClass(ZBX_STYLE_WORDBREAK),
 		(new CCol($trigger['opdata']))->addClass(ZBX_STYLE_WORDBREAK),
 		(new CDiv($expression))->addClass(ZBX_STYLE_WORDBREAK),
-		$status,
-		$discover,
+		$status_toggle->addClass(triggerIndicatorStyle($trigger['status'])),
+		$discover_toggle->addClass($no_discover ? ZBX_STYLE_RED : ZBX_STYLE_GREEN),
 		$data['tags'][$triggerid]
 	]);
 }
 
+$buttons = [
+	'trigger.prototype.massenable' => [
+		'content' => (new CSimpleButton(_('Create enabled')))
+			->setAttribute('data-status', TRIGGER_STATUS_ENABLED)
+			->addClass(ZBX_STYLE_BTN_ALT)
+			->addClass('js-no-chkbxrange')
+			->setId('js-massenable-trigger')
+	],
+	'trigger.prototype.massdisable' => [
+		'content' => (new CSimpleButton(_('Create disabled')))
+			->setAttribute('data-status', TRIGGER_STATUS_DISABLED)
+			->addClass(ZBX_STYLE_BTN_ALT)
+			->addClass('js-no-chkbxrange')
+			->setId('js-massdisable-trigger')
+	],
+	'trigger.prototype.massupdate' => [
+		'content' => (new CSimpleButton(_('Mass update')))
+			->addClass(ZBX_STYLE_BTN_ALT)
+			->setId('js-massupdate-trigger')
+	]
+];
+
+if ($data['is_parent_discovered']) {
+	foreach ($buttons as &$button) {
+		$button['content']
+			->setEnabled(false)
+			->setAttribute('data-disabled', $data['is_parent_discovered']);
+	}
+	unset($button);
+}
+
+$buttons['trigger.prototype.massdelete'] = [
+	'content' => (new CSimpleButton(_('Delete')))
+		->addClass(ZBX_STYLE_BTN_ALT)
+		->addClass('js-no-chkbxrange')
+		->setId('js-massdelete-trigger')
+];
+
 // append table to form
 $trigger_form->addItem([
 	$trigger_table,
-	new CActionButtonList('action', 'g_triggerid',
-		[
-			'trigger.prototype.massenable' => [
-				'content' => (new CSimpleButton(_('Create enabled')))
-					->setAttribute('data-status', TRIGGER_STATUS_ENABLED)
-					->addClass(ZBX_STYLE_BTN_ALT)
-					->addClass('js-no-chkbxrange')
-					->setId('js-massenable-trigger')
-			],
-			'trigger.prototype.massdisable' => [
-				'content' => (new CSimpleButton(_('Create disabled')))
-					->setAttribute('data-status', TRIGGER_STATUS_DISABLED)
-					->addClass(ZBX_STYLE_BTN_ALT)
-					->addClass('js-no-chkbxrange')
-					->setId('js-massdisable-trigger')
-			],
-			'trigger.prototype.massupdate' => [
-				'content' => (new CSimpleButton(_('Mass update')))
-					->addClass(ZBX_STYLE_BTN_ALT)
-					->setId('js-massupdate-trigger')
-			],
-			'trigger.prototype.massdelete' => [
-				'content' => (new CSimpleButton(_('Delete')))
-					->addClass(ZBX_STYLE_BTN_ALT)
-					->addClass('js-no-chkbxrange')
-					->setId('js-massdelete-trigger')
-			]
-		],
-		'trigger_prototypes_'.$this->data['parent_discoveryid']
-	)
+	new CActionButtonList('action', 'g_triggerid', $buttons, 'trigger_prototypes_'.$this->data['parent_discoveryid'])
 ]);
 
 $html_page

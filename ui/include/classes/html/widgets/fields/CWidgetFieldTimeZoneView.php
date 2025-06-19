@@ -24,19 +24,13 @@ class CWidgetFieldTimeZoneView extends CWidgetFieldSelectView {
 
 	public function getJavaScript(): string {
 		return '
-			var timezone_select = document.getElementById("'.$this->field->getName().'");
-			var timezone_from_list = timezone_select.getOptionByValue(Intl.DateTimeFormat().resolvedOptions().timeZone);
-			var local_list_item = timezone_select.getOptionByValue("'.TIMEZONE_DEFAULT_LOCAL.'");
-
-			if (timezone_from_list && local_list_item) {
-				const title = `${local_list_item.label}: ${timezone_from_list.label}`;
-				local_list_item.label = title;
-				local_list_item._node.innerText = title;
-
-				if (timezone_select.selectedIndex === local_list_item._index) {
-					timezone_select._preselect(timezone_select.selectedIndex);
-				}
-			}
+			CWidgetForm.addField(
+				new CWidgetFieldTimeZone('.json_encode([
+					'name' => $this->field->getName(),
+					'form_name' => $this->form_name,
+					'timezone_default_local' => TIMEZONE_DEFAULT_LOCAL
+				]).')
+			);
 		';
 	}
 }

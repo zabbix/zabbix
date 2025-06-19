@@ -4,6 +4,10 @@
 	vertical-align: top;
 	white-space: nowrap;
 
+	.multiselect {
+		min-width: 0;
+	}
+
 	.btn-split {
 		margin-right: 0;
 

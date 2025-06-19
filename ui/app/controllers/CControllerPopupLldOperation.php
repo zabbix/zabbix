@@ -25,8 +25,8 @@ class CControllerPopupLldOperation extends CController {
 	protected function checkInput() {
 		$fields = [
 			'no' =>					'int32',
-			'templated' =>			'in 0,1',
-			'operationobject' =>	'in '.implode(',', [OPERATION_OBJECT_ITEM_PROTOTYPE, OPERATION_OBJECT_TRIGGER_PROTOTYPE, OPERATION_OBJECT_GRAPH_PROTOTYPE, OPERATION_OBJECT_HOST_PROTOTYPE]),
+			'readonly' =>			'in 0,1',
+			'operationobject' =>	'in '.implode(',', [OPERATION_OBJECT_ITEM_PROTOTYPE, OPERATION_OBJECT_TRIGGER_PROTOTYPE, OPERATION_OBJECT_GRAPH_PROTOTYPE, OPERATION_OBJECT_HOST_PROTOTYPE, OPERATION_OBJECT_LLD_RULE_PROTOTYPE]),
 			'operator' =>			'in '.implode(',', [CONDITION_OPERATOR_EQUAL, CONDITION_OPERATOR_NOT_EQUAL, CONDITION_OPERATOR_LIKE, CONDITION_OPERATOR_NOT_LIKE, CONDITION_OPERATOR_REGEXP, CONDITION_OPERATOR_NOT_REGEXP]),
 			'value' =>				'string',
 			'opstatus' =>			'array',
@@ -93,7 +93,7 @@ class CControllerPopupLldOperation extends CController {
 
 		$page_options = [
 			'no' => $this->getInput('no', -1),
-			'templated' => $this->getInput('templated', 0),
+			'readonly' => $this->getInput('readonly', 0),
 			'operationobject' => $this->getInput('operationobject', OPERATION_OBJECT_ITEM_PROTOTYPE),
 			'operator' => $this->getInput('operator', CONDITION_OPERATOR_EQUAL),
 			'value' => $this->getInput('value', '')

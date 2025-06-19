@@ -135,9 +135,9 @@ class CControllerHostEdit extends CController {
 						'ipmi_password', 'tls_connect', 'tls_accept', 'tls_issuer', 'tls_subject', 'flags',
 						'inventory_mode'
 					],
-					'selectDiscoveryRule' => ['itemid', 'name', 'parent_hostid'],
+					'selectDiscoveryRule' => ['itemid', 'name'],
 					'selectHostGroups' => ['groupid'],
-					'selectHostDiscovery' => ['parent_hostid', 'disable_source'],
+					'selectDiscoveryData' => ['parent_hostid', 'disable_source'],
 					'selectInterfaces' => ['interfaceid', 'type', 'main', 'available', 'error', 'details', 'ip', 'dns',
 						'port', 'useip'
 					],

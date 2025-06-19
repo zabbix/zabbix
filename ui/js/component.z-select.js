@@ -72,6 +72,7 @@ class ZSelect extends HTMLElement {
 					if (option && !option.disabled) {
 						this._input.value = option.value;
 						this.dispatchEvent(new Event('change', {bubbles: true}));
+						this.dispatchEvent(new Event('input', {bubbles: true}));
 					}
 					else {
 						this._input.value = null;

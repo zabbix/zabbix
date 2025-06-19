@@ -5,7 +5,7 @@
 
 The template to monitor Kubernetes nodes that work without any external scripts.
 It works without external scripts and uses the script item to make HTTP requests to the Kubernetes API.
-Install the Zabbix Helm Chart (https://git.zabbix.com/projects/ZT/repos/kubernetes-helm/browse?at=refs%2Fheads%2Frelease%2F7.4) in your Kubernetes cluster.
+Install the Zabbix Helm Chart (https://git.zabbix.com/projects/ZT/repos/kubernetes-helm/browse?at=refs%2Fheads%2Fmaster) in your Kubernetes cluster.
 
 Change the values according to the environment in the file $HOME/zabbix_values.yaml.
 
@@ -40,7 +40,7 @@ This template has been tested on:
 
 ## Setup
 
-Install the [Zabbix Helm Chart](https://git.zabbix.com/projects/ZT/repos/kubernetes-helm/browse?at=refs%2Fheads%2Frelease%2F7.4) in your Kubernetes cluster.
+Install the [Zabbix Helm Chart](https://git.zabbix.com/projects/ZT/repos/kubernetes-helm/browse?at=refs%2Fheads%2Fmaster) in your Kubernetes cluster.
 
 Set the `{$KUBE.API.URL}` such as `<scheme>://<host>:<port>`.
 
@@ -90,8 +90,8 @@ See the Kubernetes documentation for details about labels and annotations:
 
 |Name|Description|Default|
 |----|-----------|-------|
-|{$KUBE.API.URL}|<p>Kubernetes API endpoint URL in the format <scheme>://<host>:<port></p>|`https://kubernetes.default.svc.cluster.local:443`|
 |{$KUBE.API.TOKEN}|<p>Service account bearer token.</p>||
+|{$KUBE.API.URL}|<p>Kubernetes API endpoint URL in the format <scheme>://<host>:<port></p>|`https://kubernetes.default.svc.cluster.local:443`|
 |{$KUBE.HTTP.PROXY}|<p>Sets the HTTP proxy to `http_proxy` value. If this parameter is empty, then no proxy is used.</p>||
 |{$KUBE.NODES.ENDPOINT.NAME}|<p>Kubernetes nodes endpoint name. See "kubectl -n monitoring get ep".</p>|`zabbix-zabbix-helm-chrt-agent`|
 |{$KUBE.LLD.FILTER.NODE.MATCHES}|<p>Filter of discoverable nodes.</p>|`.*`|
@@ -174,7 +174,7 @@ See the Kubernetes documentation for details about labels and annotations:
 |Kubernetes nodes: Node [{#NAME}] Requests: Total CPU requests are too high||`last(/Kubernetes nodes by HTTP/kube.node.requests.cpu[{#NAME}]) / last(/Kubernetes nodes by HTTP/kube.node.allocatable.cpu[{#NAME}]) > 0.8`|Average||
 |Kubernetes nodes: Node [{#NAME}] Requests: Total memory requests are too high||`last(/Kubernetes nodes by HTTP/kube.node.requests.memory[{#NAME}]) / last(/Kubernetes nodes by HTTP/kube.node.allocatable.memory[{#NAME}]) > 0.5`|Warning|**Depends on**:<br><ul><li>Kubernetes nodes: Node [{#NAME}] Requests: Total memory requests are too high</li></ul>|
 |Kubernetes nodes: Node [{#NAME}] Requests: Total memory requests are too high||`last(/Kubernetes nodes by HTTP/kube.node.requests.memory[{#NAME}]) / last(/Kubernetes nodes by HTTP/kube.node.allocatable.memory[{#NAME}]) > 0.8`|Average||
-|Kubernetes nodes: Node [{#NAME}]: Has been restarted|<p>Uptime is less than 10 minutes.</p>|`last(/Kubernetes nodes by HTTP/kube.node.uptime[{#NAME}])<10`|Info||
+|Kubernetes nodes: Node [{#NAME}] has been restarted|<p>Uptime is less than 10 minutes.</p>|`last(/Kubernetes nodes by HTTP/kube.node.uptime[{#NAME}])<10`|Info||
 |Kubernetes nodes: Node [{#NAME}] Used: Kubelet too many pods|<p>Kubelet is running at capacity.</p>|`last(/Kubernetes nodes by HTTP/kube.node.used.pods[{#NAME}])/ last(/Kubernetes nodes by HTTP/kube.node.capacity.pods[{#NAME}]) > 0.9`|Warning||
 
 ### LLD rule Pod discovery

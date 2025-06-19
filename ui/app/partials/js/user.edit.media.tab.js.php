@@ -17,7 +17,12 @@
 
 <script>
 	const media_tab = new class {
-		init({medias}) {
+
+		#userid;
+
+		init({userid, medias}) {
+			this.#userid = userid;
+
 			this.#initMedias(medias);
 			this.#initActions();
 		}
@@ -39,7 +44,7 @@
 				else if (e.target.classList.contains('js-remove')) {
 					e.target.closest('tr').remove();
 				}
-				else if (e.target.classList.contains('js-status')) {
+				else if (e.target.tagName === 'BUTTON' && e.target.classList.contains('js-status')) {
 					this.#changeStatus(e.target.closest('tr'));
 				}
 			});
@@ -56,10 +61,18 @@
 					row_index,
 					mediatypeid: row.querySelector(`[name="medias[${row_index}][mediatypeid]"`).value,
 					period: row.querySelector(`[name="medias[${row_index}][period]"`).value,
-					severity: row.querySelector(`[name="medias[${row_index}][severity]"`).value,
+					severities: [],
 					active: row.querySelector(`[name="medias[${row_index}][active]"`).value,
 					provisioned: row.querySelector(`[name="medias[${row_index}][provisioned]"`).value
 				};
+
+				const severity = row.querySelector(`[name="medias[${row_index}][severity]"`).value;
+
+				for (let i = <?= TRIGGER_SEVERITY_NOT_CLASSIFIED ?>; i < <?= TRIGGER_SEVERITY_COUNT ?>; i++) {
+					if (severity & (1 << i)) {
+						popup_params.severities.push(i);
+					}
+				}
 
 				const mediaid_input = row.querySelector(`[name$="medias[${row_index}][mediaid]"`);
 				if (mediaid_input !== null) {
@@ -87,8 +100,8 @@
 				popup_params = {row_index};
 			}
 
-			const overlay = PopUp('popup.media', popup_params, {
-				dialogueid: 'user-media-edit',
+			const overlay = PopUp('popup.media.edit', {...popup_params, userid: this.#userid}, {
+				dialogueid: 'media-edit',
 				dialogue_class: 'modal-popup-generic'
 			});
 
@@ -183,6 +196,10 @@
 				row.querySelector('.js-status').remove();
 			}
 
+			if (media.provisioned == <?= CUser::PROVISION_STATUS_YES ?>) {
+				row.querySelector('.js-remove').setAttribute('disabled', 'disabled');
+			}
+
 			this.#evaluateSeverity(media, row);
 
 			return row.outerHTML;
@@ -225,8 +242,8 @@
 			const status_button = row.querySelector('.js-status');
 
 			status_input.value = '0';
-			status_button.classList.replace('<?= ZBX_STYLE_RED ?>', '<?= ZBX_STYLE_GREEN ?>');
-			status_button.textContent = t('Enabled');
+			status_button.classList.replace('<?= ZBX_STYLE_COLOR_NEGATIVE ?>', '<?= ZBX_STYLE_COLOR_POSITIVE ?>');
+			status_button.textContent = <?= json_encode(_('Enabled')) ?>;
 		}
 
 		#disableMedia(row) {
@@ -234,8 +251,8 @@
 			const status_button = row.querySelector('.js-status');
 
 			status_input.value = '1';
-			status_button.classList.replace('<?= ZBX_STYLE_GREEN ?>', '<?= ZBX_STYLE_RED ?>');
-			status_button.textContent = t('Disabled');
+			status_button.classList.replace('<?= ZBX_STYLE_COLOR_POSITIVE ?>', '<?= ZBX_STYLE_COLOR_NEGATIVE ?>');
+			status_button.textContent = <?= json_encode(_('Disabled')) ?>;
 		}
 	}
 </script>

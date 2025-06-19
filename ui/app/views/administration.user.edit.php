@@ -302,16 +302,22 @@ $user_form_list
 
 $tabs->addTab('userTab', _('User'), $user_form_list);
 
+$is_own_user = $data['userid'] != 0 && bccomp(CWebUser::$data['userid'], $data['userid']) == 0;
+
 // Media tab.
-if (CWebUser::$data['type'] > USER_TYPE_ZABBIX_USER) {
-	$media = new CPartial('user.edit.media.tab', ['form' => $user_form] + $data);
-	$tabs->addTab('mediaTab', _('Media'), $media, TAB_INDICATOR_MEDIA);
-}
+$media = new CPartial('user.edit.media.tab', [
+	'form' => $user_form,
+	'can_edit_media' => $is_own_user
+		? CWebUser::checkAccess(CRoleHelper::ACTIONS_EDIT_OWN_MEDIA)
+		: CWebUser::checkAccess(CRoleHelper::ACTIONS_EDIT_USER_MEDIA)
+] + $data);
+
+$tabs->addTab('mediaTab', _('Media'), $media, TAB_INDICATOR_MEDIA);
 
 // Permissions tab.
 $permissions_form_list = new CFormList('permissionsFormList');
 
-$role_disabled = $data['userid'] != 0 && bccomp(CWebUser::$data['userid'], $data['userid']) == 0;
+$role_disabled = $is_own_user;
 $role_disabled |= $data['readonly'];
 
 $role_multiselect = (new CMultiSelect([

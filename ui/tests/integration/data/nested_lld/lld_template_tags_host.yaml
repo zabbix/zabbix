@@ -1,0 +1,12 @@
+zabbix_export:
+  version: '7.4'
+  host_groups:
+    - uuid: f2481361f99448eea617b7b1d4765566
+      name: 'Discovered hosts'
+  hosts:
+    - host: lld_template_tags_host
+      name: lld_template_tags_host
+      templates:
+        - name: lld_test_template_tags
+      groups:
+        - name: 'Discovered hosts'

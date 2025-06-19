@@ -34,7 +34,8 @@ class testFormWebScenarioStep extends CWebTest {
 	const TEMPLATE_SCENARIO = 'Template_Web_scenario';
 	const UPDATE_SCENARIO = 'Scenario for Clone';
 	const CREATE_SCENARIO = 'Scenario for Update';
-	const SQL = 'SELECT * FROM httpstep hs INNER JOIN httpstep_field hsf ON hsf.httpstepid = hs.httpstepid';
+	const SQL = 'SELECT * FROM httpstep hs INNER JOIN httpstep_field hsf ON hsf.httpstepid = hs.httpstepid'.
+			' ORDER BY hsf.httpstepid, hsf.name';
 
 	/**
 	 * Attach MessageBehavior to the test.

@@ -404,6 +404,7 @@ typedef struct
 	const char	*name;
 	int		maintenance_from;
 	int		data_expected_from;
+	zbx_uint64_t	flags;
 	zbx_uint64_t	revision;
 
 	unsigned char	maintenance_status;
@@ -543,6 +544,7 @@ zbx_dc_kv_t;
 typedef struct
 {
 	const char	*path;
+	const char	*last_error;
 	zbx_hashset_t	kvs;
 }
 zbx_dc_kvs_path_t;

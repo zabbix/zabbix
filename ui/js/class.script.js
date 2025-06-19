@@ -217,7 +217,8 @@ class Script {
 			confirmation
 		}, {
 			dialogueid: 'script-userinput-form',
-			dialogue_class: 'modal-popup-small position-middle',
+			dialogue_class: 'modal-popup-small',
+			position: Overlay.prototype.POSITION_CENTER,
 			trigger_element
 		});
 
@@ -319,7 +320,7 @@ class Script {
 			overlayDialogue({
 				title: dialogue_title,
 				content: content.outerHTML,
-				class: 'modal-popup modal-popup-small position-middle',
+				class: 'modal-popup modal-popup-small',
 				buttons: [
 					{
 						title: t('Cancel'),
@@ -335,7 +336,10 @@ class Script {
 						action: resolve
 					}
 				]
-			}, trigger_element);
+			}, {
+				position: Overlay.prototype.POSITION_CENTER,
+				trigger_element
+			});
 		});
 	}
 

@@ -29,7 +29,8 @@ typedef int	(*zbx_trapper_process_request_func_t)(const char *request, zbx_socke
 		const struct zbx_json_parse *jp, const zbx_timespec_t *ts, const zbx_config_comms_args_t *config_comms,
 		const zbx_config_vault_t *config_vault, int proxydata_frequency,
 		zbx_get_program_type_f get_program_type_cb, const zbx_events_funcs_t *events_cbs,
-		zbx_get_config_forks_f get_config_forks);
+		zbx_get_config_forks_f get_config_forks, const zbx_config_tls_t *config_tls,
+		const char *config_frontend_allowed_ip);
 
 typedef struct
 {
@@ -43,6 +44,7 @@ typedef struct
 	int					proxydata_frequency;
 	zbx_get_config_forks_f			get_process_forks_cb_arg;
 	const char				*config_stats_allowed_ip;
+	const char				*config_frontend_allowed_ip;
 	const char				*config_java_gateway;
 	int					config_java_gateway_port;
 	const char				*config_externalscripts;
@@ -71,5 +73,6 @@ int	zbx_trapper_preproc_test_run(const struct zbx_json_parse *jp_item, const str
 		char **error);
 
 void	zbx_trapper_item_test_add_value(struct zbx_json *json, int ret, const char *info);
-
+int	zbx_check_frontend_conn_accept(zbx_socket_t *sock, const zbx_config_tls_t *config_tls,
+		const char *config_frontend_allowed_ip);
 #endif

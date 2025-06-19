@@ -224,6 +224,7 @@ class CControllerAuditLogList extends CController {
 			CAudit::RESOURCE_ITEM => _('Item'),
 			CAudit::RESOURCE_ITEM_PROTOTYPE => _('Item prototype'),
 			CAudit::RESOURCE_LLD_RULE => _('LLD rule'),
+			CAudit::RESOURCE_LLD_RULE_PROTOTYPE => _('LLD rule prototype'),
 			CAudit::RESOURCE_MACRO => _('Macro'),
 			CAudit::RESOURCE_MAINTENANCE => _('Maintenance'),
 			CAudit::RESOURCE_MAP => _('Map'),

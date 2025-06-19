@@ -76,7 +76,6 @@ $token_from_grid->addItem([
 		new CLabel(_('Description'), 'description'),
 		new CFormField(
 			(new CTextArea('description', $data['description']))
-				->addClass(ZBX_STYLE_MONOSPACE_FONT)
 				->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 				->setMaxLength(DB::getFieldLength('token', 'description'))
 				->setAriaRequired()

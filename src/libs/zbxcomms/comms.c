@@ -74,6 +74,11 @@ zbx_config_tls_t	*zbx_config_tls_new(void)
 	config_tls->cipher_all		= NULL;
 	config_tls->cipher_cmd13	= NULL;
 	config_tls->cipher_cmd		= NULL;
+	config_tls->tls_listen		= NULL;
+	config_tls->frontend_accept	= NULL;
+	config_tls->frontend_cert_issuer	= NULL;
+	config_tls->frontend_cert_subject	= NULL;
+	config_tls->frontend_accept_modes	= ZBX_TCP_SEC_UNENCRYPTED;
 
 	return config_tls;
 }
@@ -98,6 +103,10 @@ void	zbx_config_tls_free(zbx_config_tls_t *config_tls)
 	zbx_free(config_tls->cipher_all);
 	zbx_free(config_tls->cipher_cmd13);
 	zbx_free(config_tls->cipher_cmd);
+	zbx_free(config_tls->frontend_accept);
+	zbx_free(config_tls->tls_listen);
+	zbx_free(config_tls->frontend_cert_issuer);
+	zbx_free(config_tls->frontend_cert_subject);
 
 	zbx_free(config_tls);
 }
@@ -1582,14 +1591,17 @@ void	zbx_tcp_unlisten(zbx_socket_t *s)
  * Parameters: s              - [IN/OUT] socket to listen                     *
  *             tls_accept     - [IN] TLS configuration                        *
  *             poll_timeout   - [IN] milliseconds to wait for connection      *
- *                                  (0 - don't wait, -1 - wait forever        *
+ *                                  0 - don't wait, -1 - wait forever         *
+ *             tls_listen     - [IN] allow unencrypted inbound                *
+ *             unencrypted_allowed_ip - [IN]                                  *
  *                                                                            *
  * Return value: SUCCEED       - success                                      *
  *               FAIL          - an error occurred                            *
  *               TIMEOUT_ERROR - no connections for the timeout period        *
  *                                                                            *
  ******************************************************************************/
-int	zbx_tcp_accept(zbx_socket_t *s, unsigned int tls_accept, int poll_timeout)
+int	zbx_tcp_accept(zbx_socket_t *s, unsigned int tls_accept, int poll_timeout, char *tls_listen,
+		const char *unencrypted_allowed_ip)
 {
 	ZBX_SOCKADDR	serv_addr;
 	ZBX_SOCKET	accepted_socket;
@@ -1721,6 +1733,23 @@ int	zbx_tcp_accept(zbx_socket_t *s, unsigned int tls_accept, int poll_timeout)
 		}
 
 		s->connection_type = ZBX_TCP_SEC_UNENCRYPTED;
+	}
+
+	s->max_len_limit = 0;
+
+	if (ZBX_TCP_SEC_UNENCRYPTED == s->connection_type && NULL != tls_listen)
+	{
+		if (NULL == unencrypted_allowed_ip || SUCCEED != zbx_tcp_check_allowed_peers(s, unencrypted_allowed_ip))
+		{
+			zbx_set_socket_strerror("from %s: unencrypted connections are not allowed", s->peer);
+			zbx_tcp_unaccept(s);
+			goto out;
+		}
+		else
+		{
+			/* stats request allowed exception when unencrypted connection not allowed */
+			s->max_len_limit = ZBX_MAX_RECV_2KB_DATA_SIZE;
+		}
 	}
 
 	zbx_socket_set_deadline(s, 0);
@@ -2004,8 +2033,18 @@ void	zbx_tcp_recv_context_init(zbx_socket_t *s, zbx_tcp_recv_context_t *tcp_recv
 #if defined(_WINDOWS)
 	tcp_recv_context->max_len = ZBX_MAX_RECV_DATA_SIZE;
 #else
-	tcp_recv_context->max_len = 0 != (flags & ZBX_TCP_LARGE) ? ZBX_MAX_RECV_LARGE_DATA_SIZE :
-			ZBX_MAX_RECV_DATA_SIZE;
+	if (0 != s->max_len_limit)
+	{
+		tcp_recv_context->max_len = s->max_len_limit;
+	}
+	else if (0 != (flags & ZBX_TCP_LARGE))
+	{
+		tcp_recv_context->max_len = ZBX_MAX_RECV_LARGE_DATA_SIZE;
+	}
+	else
+	{
+		tcp_recv_context->max_len = ZBX_MAX_RECV_DATA_SIZE;
+	}
 #endif
 	zbx_socket_free(s);
 	tcp_recv_context->allocated = 0;

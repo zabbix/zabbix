@@ -17,6 +17,8 @@ require_once 'vendor/autoload.php';
 
 require_once __DIR__.'/../CElement.php';
 
+use Facebook\WebDriver\WebDriverKeys;
+
 /**
  * Color picker element.
  */
@@ -46,10 +48,47 @@ class CColorPickerElement extends CElement {
 			$overlay->query('button:Use default')->one()->click();
 		}
 		else {
-			$overlay->query('xpath:.//div[@class="color-picker-input"]/input')->one()->overwrite($color);
+			$overlay->asColorPicker()->selectTab('Solid color');
+			$overlay->query('class:color-picker-input')->waitUntilVisible()->one()->overwrite($color);
 		}
 
-		$overlay->query('class:btn-overlay-close')->one()->click()->waitUntilNotVisible();
+		$apply_button = $overlay->query('button:Apply');
+
+		if (preg_match('/^[a-fA-F0-9]+$/', $color) === 1 && strlen($color) === 6) {
+			CElementQuery::getPage()->pressKey(WebDriverKeys::ENTER);
+			$overlay->waitUntilNotVisible();
+		}
+		else {
+			if (!$apply_button->one()->isAttributePresent('disabled')) {
+				throw new \Exception('Passes value is not a valid hexadecimal value, but Apply button is not disabled.');
+			}
+		}
+
+		return $this;
+	}
+
+	/**
+	 * Get text of selected color-picker tab.
+	 *
+	 * @return string
+	 */
+	public function getSelectedTab() {
+		return $this->query('xpath:.//ul[@class="color-picker-tabs"]'.
+			'//li[contains(@class, "color-picker-tab-selected")]/label')->waitUntilPresent()->one()->getText();
+	}
+
+	/**
+	 * Switch color-picker tab by its name.
+	 *
+	 * @return $this
+	 */
+	public function selectTab($name) {
+		$selector = 'xpath:.//label[text()='.CXPathHelper::escapeQuotes($name).']';
+
+		if ($this->getSelectedTab() !== $name) {
+			$this->query($selector)->waitUntilPresent()->one()->click();
+			$this->query($selector.'/..')->waitUntilClassesPresent('color-picker-tab-selected');
+		}
 
 		return $this;
 	}
@@ -79,12 +118,13 @@ class CColorPickerElement extends CElement {
 	}
 
 	/**
-	 * Close color pick overlay dialog.
+	 * Close color picker overlay dialog.
 	 *
 	 * @return $this
 	 */
 	public function close() {
-		$this->query('class:btn-overlay-close')->one()->click()->waitUntilNotVisible();
+		CElementQuery::getPage()->pressKey(WebDriverKeys::ESCAPE);
+		(new CElementQuery('id:color_picker'))->waitUntilNotVisible();
 	}
 
 	/**
@@ -94,5 +134,22 @@ class CColorPickerElement extends CElement {
 	 */
 	public function fill($color) {
 		$this->overwrite($color);
+	}
+
+	/**
+	 * Check if color-picker dialog can be submitted
+	 *
+	 * @param boolean	$submitable		should dialog submission be disabled or not
+	 *
+	 * @return type
+	 */
+	public function isSubmittionDisabled($submitable = false) {
+		$dialog = (new CElementQuery('id:color_picker'))->one();
+		$clickable = $dialog->query('button:Apply')->one()->isClickable();
+
+		CElementQuery::getPage()->pressKey(WebDriverKeys::ENTER);
+		$displayed = $dialog->isDisplayed();
+
+		return ($clickable === $submitable && $displayed === !$submitable);
 	}
 }

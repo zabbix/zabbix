@@ -98,6 +98,37 @@ class testGoAgentDataCollection extends CIntegrationTest {
 			'valueType' => ITEM_VALUE_TYPE_TEXT
 		],
 		[
+			'key' => 'proc.num[apache2,www-data]',
+			'type' => ITEM_TYPE_ZABBIX_ACTIVE,
+			'valueType' => ITEM_VALUE_TYPE_TEXT
+		],
+		[
+			'key' => 'proc.num[NONEXISTING_PROCESS,]',
+			'type' => ITEM_TYPE_ZABBIX_ACTIVE,
+			'valueType' => ITEM_VALUE_TYPE_TEXT
+		],
+		[
+			'key' => 'proc.num[zabbix_server,]',
+			'type' => ITEM_TYPE_ZABBIX_ACTIVE,
+			'valueType' => ITEM_VALUE_TYPE_TEXT
+		],
+		[
+			'key' => 'proc.num[zabbix_server,NONEXISTING_USER]',
+			'type' => ITEM_TYPE_ZABBIX_ACTIVE,
+			'valueType' => ITEM_VALUE_TYPE_TEXT
+		],
+		[
+			'key' => 'proc.num[NONEXISTING_PROCESS,NONEXISTING_USER]',
+			'type' => ITEM_TYPE_ZABBIX_ACTIVE,
+			'valueType' => ITEM_VALUE_TYPE_TEXT
+		],
+		[
+			'key' => 'proc.get[apache2,www-data]',
+			'type' => ITEM_TYPE_ZABBIX_ACTIVE,
+			'valueType' => ITEM_VALUE_TYPE_TEXT,
+			'do_not_compare' => '1'
+		],
+		[
 			'key' => 'system.cpu.discovery',
 			'type' => ITEM_TYPE_ZABBIX_ACTIVE,
 			'valueType' => ITEM_VALUE_TYPE_TEXT
@@ -253,6 +284,27 @@ class testGoAgentDataCollection extends CIntegrationTest {
 			'valueType' => ITEM_VALUE_TYPE_TEXT
 		],
 		[
+			'key' => 'proc.cpu.util[apache2,www-data,,,]',
+			'type' => ITEM_TYPE_ZABBIX,
+			'valueType' => ITEM_VALUE_TYPE_FLOAT,
+			'threshold' => 90.0,
+			'compareType' => self::COMPARE_AVERAGE
+		],
+		[
+			'key' => 'proc.cpu.util[apache2,NONEXISTING_USER,,,]',
+			'type' => ITEM_TYPE_ZABBIX,
+			'valueType' => ITEM_VALUE_TYPE_FLOAT,
+			'threshold' => 90.0,
+			'compareType' => self::COMPARE_AVERAGE
+		],
+		[
+			'key' => 'proc.cpu.util[NONEXISTING_PROCESS,,,,]',
+			'type' => ITEM_TYPE_ZABBIX,
+			'valueType' => ITEM_VALUE_TYPE_FLOAT,
+			'threshold' => 90.0,
+			'compareType' => self::COMPARE_AVERAGE
+		],
+		[
 			'key' => 'proc.cpu.util[,,,,avg1]',
 			'type' => ITEM_TYPE_ZABBIX,
 			'valueType' => ITEM_VALUE_TYPE_FLOAT,
@@ -272,6 +324,12 @@ class testGoAgentDataCollection extends CIntegrationTest {
 			'valueType' => ITEM_VALUE_TYPE_UINT64,
 			'threshold' => 10000,
 			'compareType' => self::COMPARE_AVERAGE
+		],
+		[
+			'key' => 'proc.mem[apache2,www-data,]',
+			'type' => ITEM_TYPE_ZABBIX,
+			'valueType' => ITEM_VALUE_TYPE_FLOAT,
+			'threshold' => 10000.0
 		],
 		[
 			'key' => 'proc.mem[zabbix_server,zabbix,avg]',

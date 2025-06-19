@@ -18,7 +18,8 @@
 #include "zbxcomms.h"
 #include "zbxjson.h"
 
-int	zbx_trapper_expressions_evaluate(zbx_socket_t *sock, const struct zbx_json_parse *jp, int config_timeout);
+int	zbx_trapper_expressions_evaluate(zbx_socket_t *sock, const struct zbx_json_parse *jp, int config_timeout,
+		const zbx_config_tls_t *config_tls, const char *config_frontend_allowed_ip);
 int	zbx_trapper_expressions_evaluate_run(const struct zbx_json_parse *jp, struct zbx_json *json, char **error);
 
 #endif

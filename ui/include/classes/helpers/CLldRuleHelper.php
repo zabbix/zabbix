@@ -23,7 +23,7 @@ class CLldRuleHelper extends CItemGeneralHelper {
 	 * @return bool
 	 */
 	public static function cloneTemplateItems(string $src_templateid, array $dst_host): bool {
-		$src_items = self::getSourceLldRules([
+		$src_items = self::getSourceLldRules(false, [
 			'templateids' => $src_templateid,
 			'inherited' => false
 		]);
@@ -40,7 +40,7 @@ class CLldRuleHelper extends CItemGeneralHelper {
 	 * @return bool
 	 */
 	public static function cloneHostItems(string $src_hostid, array $dst_host): bool {
-		$src_items = self::getSourceLldRules([
+		$src_items = self::getSourceLldRules(false, [
 			'hostids' => $src_hostid,
 			'inherited' => false
 		]);
@@ -59,7 +59,7 @@ class CLldRuleHelper extends CItemGeneralHelper {
 	private static function copy(array $src_items, array $dst_hosts): bool {
 		try {
 			$dst_interfaceids = self::getDestinationHostInterfaces($src_items, $dst_hosts);
-			$dst_master_itemids = self::getDestinationMasterItems($src_items, $dst_hosts);
+			$dst_master_itemids = self::getDestinationMasterItems($src_items, $dst_hosts, ZBX_FLAG_DISCOVERY_RULE);
 		}
 		catch (Exception $e) {
 			return false;
@@ -109,7 +109,8 @@ class CLldRuleHelper extends CItemGeneralHelper {
 		return CItemPrototypeHelper::copy($dst_itemids, $dst_hosts)
 			&& CTriggerPrototypeHelper::copy($src_options, $dst_options)
 			&& CGraphPrototypeHelper::copy($src_options, $dst_options)
-			&& CHostPrototypeHelper::copy($src_options, $dst_options, $dst_itemids);
+			&& CHostPrototypeHelper::copy($src_options, $dst_options, $dst_itemids)
+			&& CLldRulePrototypeHelper::copy($src_options, $dst_hosts, $dst_itemids);
 	}
 
 	/**
@@ -117,45 +118,65 @@ class CLldRuleHelper extends CItemGeneralHelper {
 	 *
 	 * @return array
 	 */
-	private static function getSourceLldRules(array $src_options): array {
-		$src_items = API::DiscoveryRule()->get([
-			'output' => ['itemid', 'name', 'type', 'key_', 'lifetime_type', 'lifetime', 'enabled_lifetime_type',
-				'enabled_lifetime', 'description', 'status',
+	public static function getSourceLldRules(bool $is_lld_prototype, array $src_options): array {
+		$output_fields = ['itemid', 'name', 'type', 'key_', 'lifetime_type', 'lifetime', 'enabled_lifetime_type',
+			'enabled_lifetime', 'description', 'status',
 
-				// Type fields.
-				// The fields used for multiple item types.
-				'interfaceid', 'authtype', 'username', 'password', 'params', 'timeout', 'delay', 'trapper_hosts',
+			// Type fields.
+			// The fields used for multiple item types.
+			'interfaceid', 'authtype', 'username', 'password', 'params', 'timeout', 'delay', 'trapper_hosts',
 
-				// Dependent item type specific fields.
-				'master_itemid',
+			// Dependent item type specific fields.
+			'master_itemid',
 
-				// HTTP Agent item type specific fields.
-				'url', 'query_fields', 'request_method', 'post_type', 'posts',
-				'headers', 'status_codes', 'follow_redirects', 'retrieve_mode', 'output_format', 'http_proxy',
-				'verify_peer', 'verify_host', 'ssl_cert_file', 'ssl_key_file', 'ssl_key_password', 'allow_traps',
+			// HTTP Agent item type specific fields.
+			'url', 'query_fields', 'request_method', 'post_type', 'posts',
+			'headers', 'status_codes', 'follow_redirects', 'retrieve_mode', 'output_format', 'http_proxy',
+			'verify_peer', 'verify_host', 'ssl_cert_file', 'ssl_key_file', 'ssl_key_password', 'allow_traps',
 
-				// IPMI item type specific fields.
-				'ipmi_sensor',
+			// IPMI item type specific fields.
+			'ipmi_sensor',
 
-				// JMX item type specific fields.
-				'jmx_endpoint',
+			// JMX item type specific fields.
+			'jmx_endpoint',
 
-				// Script item type specific fields.
-				'parameters',
+			// Script item type specific fields.
+			'parameters',
 
-				// SNMP item type specific fields.
-				'snmp_oid',
+			// SNMP item type specific fields.
+			'snmp_oid',
 
-				// SSH item type specific fields.
-				'publickey', 'privatekey'
-			],
+			// SSH item type specific fields.
+			'publickey', 'privatekey'
+		];
+
+		if ($is_lld_prototype) {
+			$output_fields[] = 'discover';
+		}
+
+		$options = [
+			'output' => $output_fields,
 			'selectPreprocessing' => ['type', 'params', 'error_handler', 'error_handler_params'],
 			'selectLLDMacroPaths' => ['lld_macro', 'path'],
 			'selectFilter' => ['evaltype', 'formula', 'conditions'],
 			'selectOverrides' => ['name', 'step', 'stop', 'filter', 'operations'],
 			'selectHosts' => ['status'],
 			'preservekeys' => true
-		] + $src_options);
+		] + $src_options;
+
+		$src_items = $is_lld_prototype
+			? API::DiscoveryRulePrototype()->get($options + [
+				'selectDiscoveryRule' => ['itemid'],
+				'selectDiscoveryRulePrototype' => ['itemid'],
+				'filter' => [
+					'flags' => [ZBX_FLAG_DISCOVERY_RULE_PROTOTYPE]
+				]
+			])
+			: API::DiscoveryRule()->get($options + [
+				'filter' => [
+					'flags' => [ZBX_FLAG_DISCOVERY_RULE]
+				]
+			]);
 
 		foreach ($src_items as &$src_item) {
 			foreach ($src_item['filter']['conditions'] as &$condition) {

@@ -113,7 +113,7 @@ class CControllerItemExecuteNow extends CController {
 					// In case items (dependent or master) are not allowed, store the error message.
 					if (!$errors) {
 						// If no errors exist yet, set the first error message.
-						$msg_part = ($item['flags'] == ZBX_FLAG_DISCOVERY_RULE)
+						$msg_part = in_array($item['flags'], [ZBX_FLAG_DISCOVERY_RULE, ZBX_FLAG_DISCOVERY_RULE_CREATED])
 							? _('wrong discovery rule type')
 							: _('wrong item type');
 						$errors = [_s('Cannot send request: %1$s.', $msg_part)];
@@ -129,7 +129,7 @@ class CControllerItemExecuteNow extends CController {
 
 					if (!$errors) {
 						// If no errors exist yet, set the first error message.
-						$msg_part = ($item['flags'] == ZBX_FLAG_DISCOVERY_RULE)
+						$msg_part = in_array($item['flags'], [ZBX_FLAG_DISCOVERY_RULE, ZBX_FLAG_DISCOVERY_RULE_CREATED])
 							? _s('discovery rule "%1$s" on host "%2$s" is not monitored', $item['name'], $host_name)
 							: _s('item "%1$s" on host "%2$s" is not monitored', $item['name'], $host_name);
 						$errors = [_s('Cannot send request: %1$s.', $msg_part)];

@@ -15,7 +15,7 @@
 ?>
 
 
-window.widget_problems_form = new class {
+window.widget_form = new class extends CWidgetForm {
 
 	init({sort_with_enabled_show_timeline}) {
 		this._sort_with_enabled_show_timeline = sort_with_enabled_show_timeline;
@@ -33,6 +33,7 @@ window.widget_problems_form = new class {
 		this._acknowledge_status.addEventListener('change', () => this.updateForm());
 
 		this.updateForm();
+		this.ready();
 	}
 
 	updateForm() {

@@ -1665,6 +1665,10 @@ class CFormValidator {
 			}
 		}
 
+		if (!array_key_exists('fields', $rules)) {
+			return;
+		}
+
 		foreach ($rules['fields'] as $field => $rule_sets) {
 			$field_data = array_key_exists($field, $data) ? $data[$field] : null;
 

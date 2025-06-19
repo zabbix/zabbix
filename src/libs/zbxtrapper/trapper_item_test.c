@@ -45,7 +45,7 @@ static void	dump_item(const zbx_dc_item_t *item)
 		zbx_log_handle(LOG_LEVEL_TRACE, "  value_type: %u", item->value_type);
 		zbx_log_handle(LOG_LEVEL_TRACE, "  snmpv3_securitylevel: %u", item->snmpv3_securitylevel);
 		zbx_log_handle(LOG_LEVEL_TRACE, "  authtype: %u", item->authtype);
-		zbx_log_handle(LOG_LEVEL_TRACE, "  flags: %u", item->flags);
+		zbx_log_handle(LOG_LEVEL_TRACE, "  flags: %x", item->flags);
 		zbx_log_handle(LOG_LEVEL_TRACE, "  snmpv3_authprotocol: %u", item->snmpv3_authprotocol);
 		zbx_log_handle(LOG_LEVEL_TRACE, "  snmpv3_privprotocol: %u", item->snmpv3_privprotocol);
 		zbx_log_handle(LOG_LEVEL_TRACE, "  follow_redirects: %u", item->follow_redirects);
@@ -676,13 +676,17 @@ void	zbx_trapper_item_test(zbx_socket_t *sock, const struct zbx_json_parse *jp,
 		const char *progname, zbx_get_config_forks_f get_config_forks, const char *config_java_gateway,
 		int config_java_gateway_port, const char *config_externalscripts,
 		zbx_get_value_internal_ext_f get_value_internal_ext_cb, const char *config_ssh_key_location,
-		const char *config_webdriver_url)
+		const char *config_webdriver_url, const zbx_config_tls_t *config_tls,
+		const char *config_frontend_allowed_ip)
 {
 	struct zbx_json	json;
 	int		ret;
 	char		*error = NULL;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
+
+	if (SUCCEED != zbx_check_frontend_conn_accept(sock, config_tls, config_frontend_allowed_ip))
+		goto out;
 
 	zbx_json_init(&json, 1024);
 
@@ -702,5 +706,6 @@ void	zbx_trapper_item_test(zbx_socket_t *sock, const struct zbx_json_parse *jp,
 	}
 
 	zbx_json_free(&json);
+out:
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 }

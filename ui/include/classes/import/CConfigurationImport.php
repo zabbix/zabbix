@@ -1012,6 +1012,8 @@ class CConfigurationImport {
 			return;
 		}
 
+		$this->reorganizeDiscoveryRulePrototypes($discovery_rules_by_hosts);
+
 		// Unset rules that are related to hosts we did not process.
 		foreach ($discovery_rules_by_hosts as $host => $discovery_rules) {
 			$hostid = $this->referencer->findTemplateidOrHostidByHost($host);
@@ -1029,7 +1031,6 @@ class CConfigurationImport {
 
 		$discovery_rules_to_create = [];
 		$discovery_rules_to_update = [];
-		$upd_discovery_rule_hostids = [];
 
 		/*
 		 * It's possible that some LLD rules use master items which are web items. They don't reside in item
@@ -1048,12 +1049,6 @@ class CConfigurationImport {
 
 			foreach ($discovery_rules as $discovery_rule) {
 				if ($discovery_rule['type'] == ITEM_TYPE_DEPENDENT) {
-					if (!array_key_exists('key', $discovery_rule[$master_item_key])) {
-						throw new Exception( _s('Incorrect value for field "%1$s": %2$s.', 'master_itemid',
-							_('cannot be empty')
-						));
-					}
-
 					// if key cannot be resolved
 					if ($this->referencer->findItemidByKey($hostid,
 							$discovery_rule[$master_item_key]['key']) === null) {
@@ -1079,9 +1074,7 @@ class CConfigurationImport {
 		foreach ($discovery_rules_by_hosts as $host => $discovery_rules) {
 			$hostid = $this->referencer->findTemplateidOrHostidByHost($host);
 
-			foreach ($discovery_rules as $discovery_rule) {
-				$discovery_rule['hostid'] = $hostid;
-
+			foreach ($discovery_rules as $key => $discovery_rule) {
 				$itemid = null;
 
 				if (array_key_exists('uuid', $discovery_rule)) {
@@ -1092,136 +1085,106 @@ class CConfigurationImport {
 					$itemid = $this->referencer->findItemidByKey($hostid, $discovery_rule['key_']);
 				}
 
-				unset($discovery_rule['item_prototypes'], $discovery_rule['trigger_prototypes'],
-					$discovery_rule['graph_prototypes'], $discovery_rule['host_prototypes']
-				);
+				if (($itemid !== null && !$this->options['discoveryRules']['updateExisting'])
+						|| ($itemid === null && !$this->options['discoveryRules']['createMissing'])) {
+					unset($discovery_rules_by_hosts[$host][$key]);
 
-				if (array_key_exists('interface_ref', $discovery_rule) && $discovery_rule['interface_ref']) {
-					$interfaceid = $this->referencer->findInterfaceidByRef($hostid, $discovery_rule['interface_ref']);
-
-					if ($interfaceid === null) {
-						throw new Exception(_s('Cannot find interface "%1$s" used for discovery rule "%2$s" on "%3$s".',
-							$discovery_rule['interface_ref'], $discovery_rule['name'], $host
-						));
+					if (!$discovery_rules_by_hosts[$host]) {
+						unset($discovery_rules_by_hosts[$host]);
 					}
 
-					$discovery_rule['interfaceid'] = $interfaceid;
-				}
-				unset($discovery_rule['interface_ref']);
-
-				if ($discovery_rule['type'] == ITEM_TYPE_DEPENDENT) {
-					if (!array_key_exists('key', $discovery_rule[$master_item_key])) {
-						throw new Exception( _s('Incorrect value for field "%1$s": %2$s.', 'master_itemid',
-							_('cannot be empty')
-						));
-					}
-
-					$discovery_rule['master_itemid'] = $this->referencer->findItemidByKey($hostid,
-						$discovery_rule[$master_item_key]['key'], true
-					);
+					continue;
 				}
 
-				unset($discovery_rule[$master_item_key]);
-
-				if ($discovery_rule['overrides']) {
-					foreach ($discovery_rule['overrides'] as &$override) {
-						foreach ($override['operations'] as &$operation) {
-							if ($operation['operationobject'] == OPERATION_OBJECT_HOST_PROTOTYPE
-									&& array_key_exists('optemplate', $operation)) {
-								foreach ($operation['optemplate'] as &$template) {
-									$templateid = $this->referencer->findTemplateidByHost($template['name']);
-
-									if ($templateid === null) {
-										throw new Exception(_s(
-											'Cannot find template "%1$s" for override "%2$s" of discovery rule "%3$s" on "%4$s".',
-											$template['name'],
-											$override['name'],
-											$discovery_rule['name'],
-											$host
-										));
-									}
-
-									$template['templateid'] = $templateid;
-									unset($template['name']);
-								}
-								unset($template);
-							}
-						}
-						unset($operation);
-					}
-					unset($override);
-				}
-
-				foreach ($discovery_rule['preprocessing'] as &$preprocessing_step) {
-					if (array_key_exists('parameters', $preprocessing_step)) {
-						$preprocessing_step['params'] = implode("\n", $preprocessing_step['parameters']);
-
-						unset($preprocessing_step['parameters']);
-					}
-				}
-				unset($preprocessing_step);
+				$this->prepareDiscoveryRuleForApi($host, $discovery_rule);
 
 				if ($itemid !== null) {
 					$discovery_rule['itemid'] = $itemid;
-					$discovery_rules_to_update[] = array_diff_key($discovery_rule, array_flip(['hostid']));
-					$upd_discovery_rule_hostids[] = $discovery_rule['hostid'];
+
+					$discovery_rules_to_update[] = $discovery_rule;
 				}
 				else {
-					/*
-					 * The array key "lld_macro_paths" must exist at this point. It is processed by chain conversion.
-					 * Unlike discoveryrule.update method, discoveryrule.create does not allow "lld_macro_paths"
-					 * to be empty.
-					 */
-					if (!$discovery_rule['lld_macro_paths']) {
-						unset($discovery_rule['lld_macro_paths']);
-					}
+					$discovery_rule['hostid'] = $hostid;
+
 					$discovery_rules_to_create[] = $discovery_rule;
 				}
 			}
 		}
 
-		$processed_discovery_rules = [];
-
-		if ($this->options['discoveryRules']['createMissing'] && $discovery_rules_to_create) {
-			API::DiscoveryRule()->create($discovery_rules_to_create);
-
-			foreach ($discovery_rules_to_create as $discovery_rule) {
-				$processed_discovery_rules[$discovery_rule['hostid']][$discovery_rule['key_']] = 1;
-			}
+		if (!$discovery_rules_by_hosts) {
+			return;
 		}
 
-		if ($this->options['discoveryRules']['updateExisting'] && $discovery_rules_to_update) {
+		if ($discovery_rules_to_update) {
 			API::DiscoveryRule()->update($discovery_rules_to_update);
+		}
 
-			foreach ($discovery_rules_to_update as $discovery_rule) {
-				$hostid = array_shift($upd_discovery_rule_hostids);
-
-				$processed_discovery_rules[$hostid][$discovery_rule['key_']] = 1;
-			}
+		if ($discovery_rules_to_create) {
+			API::DiscoveryRule()->create($discovery_rules_to_create);
 		}
 
 		// Refresh discovery rules because templated ones can be inherited to host and used for prototypes.
 		$this->referencer->refreshItems();
 
-		$order_tree = $this->getDiscoveryRulesItemsOrder($master_item_key);
+		$this->processChildPrototypes($discovery_rules_by_hosts);
+	}
+
+	/**
+	 * Separate LLD rules from prototypes. Move LLD rule prototypes to their parent's 'discovery_prototypes' array.
+	 *
+	 * @throws Exception
+	 */
+	private function reorganizeDiscoveryRulePrototypes(array &$discovery_rules_by_hosts): void {
+		$lldrule_links = [];
+
+		foreach ($discovery_rules_by_hosts as $host => &$discovery_rules) {
+			foreach ($discovery_rules as &$discovery_rule) {
+				$discovery_rule['discovery_prototypes'] = [];
+				$lldrule_links[$host][$discovery_rule['key_']] = &$discovery_rule;
+			}
+			unset($discovery_rule);
+		}
+		unset($discovery_rules);
+
+		foreach ($discovery_rules_by_hosts as $host => &$discovery_rules) {
+			foreach ($discovery_rules as $key => $discovery_rule) {
+				if (!array_key_exists('parent_discovery_rule', $discovery_rule)) {
+					continue;
+				}
+
+				$parent_key = $discovery_rule['parent_discovery_rule']['key'];
+
+				if (!array_key_exists($parent_key, $lldrule_links[$host])) {
+					throw new Exception(_s(
+						'Cannot find "parent_discovery_rule" with key "%1$s" used for LLD rule prototype with key "%2$s" on "%3$s".',
+						$parent_key, $key, $host
+					));
+				}
+
+				$lldrule_links[$host][$parent_key]['discovery_prototypes'][$key] = $discovery_rule;
+				unset($discovery_rules_by_hosts[$host][$key]);
+
+				$lldrule_links[$host][$key] = &$lldrule_links[$host][$parent_key]['discovery_prototypes'][$key];
+			}
+		}
+		unset($discovery_rules);
+	}
+
+	private function processChildPrototypes(array $discovery_rules_by_hosts): void {
+		$order_tree = $this->getOrderedItemPrototypes($discovery_rules_by_hosts);
 
 		// process prototypes
 		$item_prototypes_to_update = [];
 		$item_prototypes_to_create = [];
 		$host_prototypes_to_update = [];
 		$host_prototypes_to_create = [];
+
 		$levels = [];
 
 		foreach ($discovery_rules_by_hosts as $host => $discovery_rules) {
 			$hostid = $this->referencer->findTemplateidOrHostidByHost($host);
 
 			foreach ($discovery_rules as $discovery_rule) {
-				// if rule was not processed we should not create/update any of its prototypes
-				if (!array_key_exists($hostid, $processed_discovery_rules)
-						|| !array_key_exists($discovery_rule['key_'], $processed_discovery_rules[$hostid])) {
-					continue;
-				}
-
 				$itemid = $this->referencer->findItemidByKey($hostid, $discovery_rule['key_']);
 
 				// prototypes
@@ -1253,8 +1216,12 @@ class CConfigurationImport {
 							$item_prototype['interfaceid'] = $interfaceid;
 						}
 						else {
-							throw new Exception(_s(
-								'Cannot find interface "%1$s" used for item prototype "%2$s" of discovery rule "%3$s" on "%4$s".',
+							$error = array_key_exists('parent_discovery_rule', $discovery_rule)
+								? _('Cannot find interface "%1$s" used for item prototype "%2$s" of discovery rule prototype "%3$s" on "%4$s".')
+								: _('Cannot find interface "%1$s" used for item prototype "%2$s" of discovery rule "%3$s" on "%4$s".');
+
+							throw new Exception(sprintf(
+								$error,
 								$item_prototype['interface_ref'],
 								$item_prototype['name'],
 								$discovery_rule['name'],
@@ -1272,8 +1239,12 @@ class CConfigurationImport {
 						);
 
 						if ($valuemapid === null) {
-							throw new Exception(_s(
-								'Cannot find value map "%1$s" used for item prototype "%2$s" of discovery rule "%3$s" on "%4$s".',
+							$error = array_key_exists('parent_discovery_rule', $discovery_rule)
+								? _('Cannot find value map "%1$s" used for item prototype "%2$s" of discovery rule prototype "%3$s" on "%4$s".')
+								: _('Cannot find value map "%1$s" used for item prototype "%2$s" of discovery rule "%3$s" on "%4$s".');
+
+							throw new Exception(sprintf(
+								$error,
 								$item_prototype['valuemap']['name'],
 								$item_prototype['name'],
 								$discovery_rule['name'],
@@ -1286,23 +1257,23 @@ class CConfigurationImport {
 					unset($item_prototype['valuemap']);
 
 					if ($item_prototype['type'] == ITEM_TYPE_DEPENDENT) {
-						if (!array_key_exists('key', $item_prototype[$master_item_key])) {
+						if (!array_key_exists('key', $item_prototype['master_item'])) {
 							throw new Exception( _s('Incorrect value for field "%1$s": %2$s.', 'master_itemid',
 								_('cannot be empty')
 							));
 						}
 
 						$master_item_prototypeid = $this->referencer->findItemidByKey($hostid,
-							$item_prototype[$master_item_key]['key'], true
+							$item_prototype['master_item']['key'], true
 						);
 
 						if ($master_item_prototypeid !== null) {
 							$item_prototype['master_itemid'] = $master_item_prototypeid;
-							unset($item_prototype[$master_item_key]);
+							unset($item_prototype['master_item']);
 						}
 					}
 					else {
-						unset($item_prototype[$master_item_key]);
+						unset($item_prototype['master_item']);
 					}
 
 					$item_prototypeid = null;
@@ -1351,8 +1322,12 @@ class CConfigurationImport {
 						$groupid = $this->referencer->findHostGroupidByName($group_link['group']['name']);
 
 						if ($groupid === null) {
-							throw new Exception(_s(
-								'Cannot find host group "%1$s" for host prototype "%2$s" of discovery rule "%3$s" on "%4$s".',
+							$error = array_key_exists('parent_discovery_rule', $discovery_rule)
+								? _('Cannot find host group "%1$s" for host prototype "%2$s" of discovery rule prototype "%3$s" on "%4$s".')
+								: _('Cannot find host group "%1$s" for host prototype "%2$s" of discovery rule "%3$s" on "%4$s".');
+
+							throw new Exception(sprintf(
+								$error,
 								$group_link['group']['name'],
 								$host_prototype['name'],
 								$discovery_rule['name'],
@@ -1374,8 +1349,12 @@ class CConfigurationImport {
 						$templateid = $this->referencer->findTemplateidByHost($template['name']);
 
 						if ($templateid === null) {
-							throw new Exception(_s(
-								'Cannot find template "%1$s" for host prototype "%2$s" of discovery rule "%3$s" on "%4$s".',
+							$error = array_key_exists('parent_discovery_rule', $discovery_rule)
+								? _('Cannot find template "%1$s" for host prototype "%2$s" of discovery rule prototype "%3$s" on "%4$s".')
+								: _('Cannot find template "%1$s" for host prototype "%2$s" of discovery rule "%3$s" on "%4$s".');
+
+							throw new Exception(sprintf(
+								$error,
 								$template['name'],
 								$host_prototype['name'],
 								$discovery_rule['name'],
@@ -1437,12 +1416,12 @@ class CConfigurationImport {
 		ksort($levels);
 		foreach (array_keys($levels) as $level) {
 			if (array_key_exists($level, $item_prototypes_to_update) && $item_prototypes_to_update[$level]) {
-				$this->updateItemsWithDependency([$item_prototypes_to_update[$level]], $master_item_key,
+				$this->updateItemsWithDependency([$item_prototypes_to_update[$level]], 'master_item',
 					API::ItemPrototype()
 				);
 			}
 			if (array_key_exists($level, $item_prototypes_to_create) && $item_prototypes_to_create[$level]) {
-				$this->createItemsWithDependency([$item_prototypes_to_create[$level]], $master_item_key,
+				$this->createItemsWithDependency([$item_prototypes_to_create[$level]], 'master_item',
 					API::ItemPrototype()
 				);
 			}
@@ -1473,12 +1452,6 @@ class CConfigurationImport {
 			$hostid = $this->referencer->findTemplateidOrHostidByHost($host);
 
 			foreach ($discovery_rules as $discovery_rule) {
-				// If rule was not processed we should not create/update any of its prototypes.
-				if (!array_key_exists($hostid, $processed_discovery_rules)
-						|| !array_key_exists($discovery_rule['key_'], $processed_discovery_rules[$hostid])) {
-					continue;
-				}
-
 				foreach ($discovery_rule['trigger_prototypes'] as $trigger) {
 					$triggerid = null;
 
@@ -1513,8 +1486,12 @@ class CConfigurationImport {
 							: null;
 
 						if ($itemid === null) {
-							throw new Exception(_s(
-								'Cannot find item "%1$s" on "%2$s" used as the Y axis MIN value for graph prototype "%3$s" of discovery rule "%4$s" on "%5$s".',
+							$error = array_key_exists('parent_discovery_rule', $discovery_rule)
+								? _('Cannot find item "%1$s" on "%2$s" used as the Y axis MIN value for graph prototype "%3$s" of discovery rule prototype "%4$s" on "%5$s".')
+								: _('Cannot find item "%1$s" on "%2$s" used as the Y axis MIN value for graph prototype "%3$s" of discovery rule "%4$s" on "%5$s".');
+
+							throw new Exception(sprintf(
+								$error,
 								$graph['ymin_item_1']['key'],
 								$graph['ymin_item_1']['host'],
 								$graph['name'],
@@ -1534,8 +1511,12 @@ class CConfigurationImport {
 							: null;
 
 						if ($itemid === null) {
-							throw new Exception(_s(
-								'Cannot find item "%1$s" on "%2$s" used as the Y axis MAX value for graph prototype "%3$s" of discovery rule "%4$s" on "%5$s".',
+							$error = array_key_exists('parent_discovery_rule', $discovery_rule)
+								? _('Cannot find item "%1$s" on "%2$s" used as the Y axis MAX value for graph prototype "%3$s" of discovery rule prototype "%4$s" on "%5$s".')
+								: _('Cannot find item "%1$s" on "%2$s" used as the Y axis MAX value for graph prototype "%3$s" of discovery rule "%4$s" on "%5$s".');
+
+							throw new Exception(sprintf(
+								$error,
 								$graph['ymax_item_1']['key'],
 								$graph['ymax_item_1']['host'],
 								$graph['name'],
@@ -1555,8 +1536,12 @@ class CConfigurationImport {
 							: null;
 
 						if ($item['itemid'] === null) {
-							throw new Exception(_s(
-								'Cannot find item "%1$s" on "%2$s" used in graph prototype "%3$s" of discovery rule "%4$s" on "%5$s".',
+							$error = array_key_exists('parent_discovery_rule', $discovery_rule)
+								? _('Cannot find item "%1$s" on "%2$s" used in graph prototype "%3$s" of discovery rule prototype "%4$s" on "%5$s".')
+								: _('Cannot find item "%1$s" on "%2$s" used in graph prototype "%3$s" of discovery rule "%4$s" on "%5$s".');
+
+							throw new Exception(sprintf(
+								$error,
 								$item['item']['key'],
 								$item['item']['host'],
 								$graph['name'],
@@ -1606,6 +1591,8 @@ class CConfigurationImport {
 			}
 		}
 
+		$this->processTriggerPrototypeDependencies($triggers);
+
 		if ($graphs_to_update) {
 			API::GraphPrototype()->update($graphs_to_update);
 			$this->referencer->refreshGraphs();
@@ -1616,7 +1603,141 @@ class CConfigurationImport {
 			$this->referencer->refreshGraphs();
 		}
 
-		$this->processTriggerPrototypeDependencies($triggers);
+		$this->processDiscoveryRulePrototypes($discovery_rules_by_hosts);
+	}
+
+	private function processDiscoveryRulePrototypes(array $discovery_rules_by_hosts): void {
+		$discovery_prototypes_to_create = [];
+		$discovery_prototypes_to_update = [];
+
+		$discovery_prototypes_by_hosts = [];
+
+		foreach ($discovery_rules_by_hosts as $host => $discovery_rules) {
+			$hostid = $this->referencer->findTemplateidOrHostidByHost($host);
+
+			foreach ($discovery_rules as $discovery_rule) {
+				foreach ($discovery_rule['discovery_prototypes'] as $discovery_prototype) {
+					$discovery_prototypes_by_hosts[$host][$discovery_prototype['key_']] = $discovery_prototype;
+
+					$itemid = null;
+
+					if (array_key_exists('uuid', $discovery_prototype)) {
+						$itemid = $this->referencer->findItemidByUuid($discovery_prototype['uuid']);
+					}
+
+					if ($itemid === null) {
+						$itemid = $this->referencer->findItemidByKey($hostid, $discovery_prototype['key_']);
+					}
+
+					$this->prepareDiscoveryRuleForApi($host, $discovery_prototype);
+
+					if ($itemid !== null) {
+						$discovery_prototype['itemid'] = $itemid;
+
+						unset($discovery_prototype['parent_discovery_rule']);
+
+						$discovery_prototypes_to_update[] = $discovery_prototype;
+					}
+					else {
+						$discovery_prototype['hostid'] = $hostid;
+						$discovery_prototype['ruleid'] = $this->referencer->findItemidByKey($hostid,
+							$discovery_prototype['parent_discovery_rule']['key']
+						);
+
+						unset($discovery_prototype['parent_discovery_rule']);
+
+						$discovery_prototypes_to_create[] = $discovery_prototype;
+					}
+				}
+			}
+		}
+
+		if ($discovery_prototypes_to_update) {
+			API::DiscoveryRulePrototype()->update($discovery_prototypes_to_update);
+		}
+
+		if ($discovery_prototypes_to_create) {
+			API::DiscoveryRulePrototype()->create($discovery_prototypes_to_create);
+		}
+
+		if ($discovery_prototypes_by_hosts && $this->options['discoveryRules']['updateExisting']) {
+			$this->deleteMissingPrototypes($discovery_prototypes_by_hosts);
+		}
+
+		$this->referencer->refreshItems();
+
+		if ($discovery_prototypes_by_hosts) {
+			$this->processChildPrototypes($discovery_prototypes_by_hosts);
+		}
+	}
+
+	private function prepareDiscoveryRuleForApi(string $host, array &$discovery_rule): void {
+		unset($discovery_rule['item_prototypes'], $discovery_rule['trigger_prototypes'],
+			$discovery_rule['graph_prototypes'], $discovery_rule['host_prototypes'],
+			$discovery_rule['discovery_prototypes']
+		);
+
+		$hostid = $this->referencer->findTemplateidOrHostidByHost($host);
+
+		if (array_key_exists('interface_ref', $discovery_rule) && $discovery_rule['interface_ref']) {
+			$interfaceid = $this->referencer->findInterfaceidByRef($hostid, $discovery_rule['interface_ref']);
+
+			if ($interfaceid === null) {
+				throw new Exception(_s('Cannot find interface "%1$s" used for discovery rule "%2$s" on "%3$s".',
+					$discovery_rule['interface_ref'], $discovery_rule['name'], $host
+				));
+			}
+
+			$discovery_rule['interfaceid'] = $interfaceid;
+		}
+		unset($discovery_rule['interface_ref']);
+
+		if ($discovery_rule['type'] == ITEM_TYPE_DEPENDENT) {
+			$discovery_rule['master_itemid'] = $this->referencer->findItemidByKey($hostid,
+				$discovery_rule['master_item']['key'], true
+			);
+		}
+
+		unset($discovery_rule['master_item']);
+
+		if ($discovery_rule['overrides']) {
+			foreach ($discovery_rule['overrides'] as &$override) {
+				foreach ($override['operations'] as &$operation) {
+					if ($operation['operationobject'] == OPERATION_OBJECT_HOST_PROTOTYPE
+							&& array_key_exists('optemplate', $operation)) {
+						foreach ($operation['optemplate'] as &$template) {
+							$templateid = $this->referencer->findTemplateidByHost($template['name']);
+
+							if ($templateid === null) {
+								throw new Exception(_s(
+									'Cannot find template "%1$s" for override "%2$s" of discovery rule "%3$s" on "%4$s".',
+									$template['name'],
+									$override['name'],
+									$discovery_rule['name'],
+									$host
+								));
+							}
+
+							$template['templateid'] = $templateid;
+							unset($template['name']);
+						}
+						unset($template);
+					}
+				}
+				unset($operation);
+			}
+			unset($override);
+		}
+
+		foreach ($discovery_rule['preprocessing'] as &$preprocessing_step) {
+			if (array_key_exists('parameters', $preprocessing_step)) {
+				$preprocessing_step['params'] = implode("\n", $preprocessing_step['parameters']);
+
+				unset($preprocessing_step['parameters']);
+			}
+		}
+		unset($preprocessing_step);
+
 	}
 
 	/**
@@ -2361,6 +2482,7 @@ class CConfigurationImport {
 		$trigger_prototypeids = [];
 		$graph_prototypeids = [];
 		$item_prototypeids = [];
+		$discovery_prototypeids = [];
 
 		foreach ($discovery_rules_by_hosts as $host => $discovery_rules) {
 			$hostid = $this->referencer->findTemplateidOrHostidByHost($host);
@@ -2396,7 +2518,7 @@ class CConfigurationImport {
 					}
 
 					if ($host_prototypeid !== null) {
-						$host_prototypeids[$host_prototypeid] = [];
+						$host_prototypeids[$host_prototypeid] = true;
 					}
 				}
 
@@ -2414,7 +2536,7 @@ class CConfigurationImport {
 					}
 
 					if ($trigger_prototypeid !== null) {
-						$trigger_prototypeids[$trigger_prototypeid] = [];
+						$trigger_prototypeids[$trigger_prototypeid] = true;
 					}
 				}
 
@@ -2430,7 +2552,7 @@ class CConfigurationImport {
 					}
 
 					if ($graph_prototypeid !== null) {
-						$graph_prototypeids[$graph_prototypeid] = [];
+						$graph_prototypeids[$graph_prototypeid] = true;
 					}
 				}
 
@@ -2446,7 +2568,25 @@ class CConfigurationImport {
 					}
 
 					if ($item_prototypeid !== null) {
-						$item_prototypeids[$item_prototypeid] = [];
+						$item_prototypeids[$item_prototypeid] = true;
+					}
+				}
+
+				foreach ($discovery_rule['discovery_prototypes'] as $discovery_prototype) {
+					$discovery_prototypeid = null;
+
+					if (array_key_exists('uuid', $discovery_prototype)) {
+						$discovery_prototypeid = $this->referencer->findItemidByUuid($discovery_prototype['uuid']);
+					}
+
+					if ($discovery_prototypeid === null) {
+						$discovery_prototypeid = $this->referencer->findItemidByKey($hostid,
+							$discovery_prototype['key_']
+						);
+					}
+
+					if ($discovery_prototypeid !== null) {
+						$discovery_prototypeids[$discovery_prototypeid] = true;
 					}
 				}
 			}
@@ -2512,6 +2652,18 @@ class CConfigurationImport {
 
 		if ($item_prototypes_to_delete) {
 			API::ItemPrototype()->delete(array_keys($item_prototypes_to_delete));
+		}
+
+		$del_discoveryids = array_diff_key(API::DiscoveryRulePrototype()->get([
+			'output' => [],
+			'discoveryids' => array_keys($discovery_ruleids),
+			'preservekeys' => true,
+			'nopermissions' => true,
+			'inherited' => false
+		]), $discovery_prototypeids);
+
+		if ($del_discoveryids) {
+			API::DiscoveryRulePrototype()->delete(array_keys($del_discoveryids));
 		}
 
 		$this->referencer->refreshItems();
@@ -2595,7 +2747,7 @@ class CConfigurationImport {
 	}
 
 	/**
-	 * Deletes discovery rules from DB that are missing in import file.
+	 * Deletes discovery rules and rule prototypes from DB that are missing in import file.
 	 */
 	protected function deleteMissingDiscoveryRules(): void {
 		if (!$this->options['discoveryRules']['deleteMissing']) {
@@ -2621,6 +2773,10 @@ class CConfigurationImport {
 			}
 
 			foreach ($discovery_rules as $discovery_rule) {
+				if (!array_key_exists('parent_discovery_rule', $discovery_rule)) {
+					continue;
+				}
+
 				$discovery_ruleid = null;
 
 				if (array_key_exists('uuid', $discovery_rule)) {
@@ -2632,23 +2788,21 @@ class CConfigurationImport {
 				}
 
 				if ($discovery_ruleid !== null) {
-					$discovery_ruleids[$discovery_ruleid] = [];
+					$discovery_ruleids[$discovery_ruleid] = true;
 				}
 			}
 		}
 
-		$db_discovery_ruleids = API::DiscoveryRule()->get([
+		$del_ruleids = array_diff_key(API::DiscoveryRule()->get([
 			'output' => ['itemid'],
 			'hostids' => $processed_hostids,
 			'inherited' => false,
 			'preservekeys' => true,
 			'nopermissions' => true
-		]);
+		]), $discovery_ruleids);
 
-		$discovery_ruleids_to_delete = array_diff_key($db_discovery_ruleids, $discovery_ruleids);
-
-		if ($discovery_ruleids_to_delete) {
-			API::DiscoveryRule()->delete(array_keys($discovery_ruleids_to_delete));
+		if ($del_ruleids) {
+			API::DiscoveryRule()->delete(array_keys($del_ruleids));
 		}
 
 		$this->referencer->refreshItems();
@@ -2857,33 +3011,24 @@ class CConfigurationImport {
 	 * before any of it dependent item. Returns associative array where key is item prototype index and value is item
 	 * prototype dependency level.
 	 *
-	 * @param string $master_item_key  String containing master key name used to identify item master.
+	 * @param array  $discovery_rules_by_hosts
 	 *
 	 * @return array
-	 *
-	 * @throws Exception
 	 */
-	protected function getDiscoveryRulesItemsOrder(string $master_item_key): array {
-		$discovery_rules_by_hosts = $this->getFormattedDiscoveryRules();
-		$entities_order = [];
+	protected function getOrderedItemPrototypes(array $discovery_rules_by_hosts): array {
+		$ordered_item_prototypes = [];
 
 		foreach ($discovery_rules_by_hosts as $host => $discovery_rules) {
-			$hostid = $this->referencer->findTemplateidOrHostidByHost($host);
-
-			if ($hostid === null) {
-				continue;
-			}
-
 			foreach ($discovery_rules as $discovery_rule) {
 				if ($discovery_rule['item_prototypes']) {
 					$item_prototypes = [$host => $discovery_rule['item_prototypes']];
-					$item_prototypes = $this->getEntitiesOrder($item_prototypes, $master_item_key, true);
-					$entities_order[$host][$discovery_rule['key_']] = $item_prototypes[$host];
+					$item_prototypes = $this->getEntitiesOrder($item_prototypes, 'master_item', true);
+					$ordered_item_prototypes[$host][$discovery_rule['key_']] = $item_prototypes[$host];
 				}
 			}
 		}
 
-		return $entities_order;
+		return $ordered_item_prototypes;
 	}
 
 	/**
@@ -2893,7 +3038,6 @@ class CConfigurationImport {
 	 * dependency level.
 	 *
 	 * @param array  $items_by_hosts   Associative array of host key and host items.
-	 * @param string $master_item_key  String containing master key name to identify item master.
 	 * @param bool   $get_prototypes   Option to get also master item prototypes not found in supplied input.
 	 *
 	 * @return array

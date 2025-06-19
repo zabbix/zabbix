@@ -53,6 +53,14 @@ textarea.has-error {
 	}
 }
 
+.multilineinput-control {
+	&.has-error {
+		> input[readonly][type="text"] {
+			border: 1px solid $error;
+		}
+	}
+}
+
 div[data-field-type="set"] {
 	&.has-error {
 		padding-left: 5px;
@@ -101,7 +109,7 @@ div[data-field-type="set"] {
 	}
 
 	.has-error {
-		& + .btn-und,
+		& + .btn-undo,
 		&:focus + .btn-undo,
 		& + .btn-undo:focus {
 			border-color: $error;

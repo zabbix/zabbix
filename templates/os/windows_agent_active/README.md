@@ -29,36 +29,36 @@ Install Zabbix agent on Windows OS according to Zabbix documentation.
 |----|-----------|-------|
 |{$AGENT.NODATA_TIMEOUT}|<p>No data timeout for active agents. Consider to keep it relatively high.</p>|`30m`|
 |{$AGENT.TIMEOUT}|<p>Timeout after which agent is considered unavailable.</p>|`5m`|
+|{$CPU.UTIL.CRIT}|<p>The critical threshold of the CPU utilization expressed in %.</p>|`90`|
 |{$CPU.INTERRUPT.CRIT.MAX}|<p>The critical threshold of the % Interrupt Time counter.</p>|`50`|
 |{$CPU.PRIV.CRIT.MAX}|<p>The threshold of the % Privileged Time counter.</p>|`30`|
 |{$CPU.QUEUE.CRIT.MAX}|<p>The threshold of the Processor Queue Length counter.</p>|`3`|
-|{$CPU.UTIL.CRIT}|<p>The critical threshold of the CPU utilization expressed in %.</p>|`90`|
-|{$MEM.PAGE_TABLE_CRIT.MIN}|<p>The warning threshold of the Free System Page Table Entries counter.</p>|`5000`|
-|{$MEM.PAGE_SEC.CRIT.MAX}|<p>The warning threshold of the Memory Pages/sec counter.</p>|`1000`|
 |{$MEMORY.UTIL.MAX}|<p>The warning threshold of the Memory util item.</p>|`90`|
 |{$SWAP.PFREE.MIN.WARN}|<p>The warning threshold of the minimum free swap.</p>|`20`|
+|{$MEM.PAGE_TABLE_CRIT.MIN}|<p>The warning threshold of the Free System Page Table Entries counter.</p>|`5000`|
+|{$MEM.PAGE_SEC.CRIT.MAX}|<p>The warning threshold of the Memory Pages/sec counter.</p>|`1000`|
+|{$VFS.FS.PUSED.MAX.WARN}|<p>The warning threshold of the filesystem utilization.</p>|`80`|
+|{$VFS.FS.PUSED.MAX.CRIT}|<p>The critical threshold of the filesystem utilization.</p>|`90`|
 |{$VFS.FS.FSNAME.MATCHES}|<p>Used in filesystem discovery. Can be overridden on the host or linked template level.</p>|`.*`|
 |{$VFS.FS.FSNAME.NOT_MATCHES}|<p>Used in filesystem discovery. Can be overridden on the host or linked template level.</p>|`^(?:/dev\|/sys\|/run\|/proc\|.+/shm$)`|
 |{$VFS.FS.FSTYPE.MATCHES}|<p>Used in filesystem discovery. Can be overridden on the host or linked template level.</p>|`.*`|
 |{$VFS.FS.FSTYPE.NOT_MATCHES}|<p>Used in filesystem discovery. Can be overridden on the host or linked template level.</p>|`^\s$`|
 |{$VFS.FS.FSDRIVETYPE.MATCHES}|<p>Used in filesystem discovery. Can be overridden on the host or linked template level.</p>|`fixed`|
 |{$VFS.FS.FSDRIVETYPE.NOT_MATCHES}|<p>Used in filesystem discovery. Can be overridden on the host or linked template level.</p>|`^\s$`|
-|{$VFS.FS.PUSED.MAX.CRIT}|<p>The critical threshold of the filesystem utilization.</p>|`90`|
-|{$VFS.FS.PUSED.MAX.WARN}|<p>The warning threshold of the filesystem utilization.</p>|`80`|
-|{$VFS.DEV.DEVNAME.MATCHES}|<p>Used in physical disk discovery. Can be overridden on the host or linked template level.</p>|`.*`|
-|{$VFS.DEV.DEVNAME.NOT_MATCHES}|<p>Used in physical disk discovery. Can be overridden on the host or linked template level.</p>|`_Total`|
 |{$VFS.DEV.UTIL.MAX.WARN}|<p>The warning threshold of disk time utilization in percent.</p>|`95`|
 |{$VFS.DEV.READ.AWAIT.WARN}|<p>Disk read average response time (in s) before the trigger fires.</p>|`0.02`|
 |{$VFS.DEV.WRITE.AWAIT.WARN}|<p>Disk write average response time (in s) before the trigger fires.</p>|`0.02`|
+|{$VFS.DEV.DEVNAME.MATCHES}|<p>Used in physical disk discovery. Can be overridden on the host or linked template level.</p>|`.*`|
+|{$VFS.DEV.DEVNAME.NOT_MATCHES}|<p>Used in physical disk discovery. Can be overridden on the host or linked template level.</p>|`_Total`|
 |{$IFCONTROL}|<p>Macro for the interface operational state for the "link down" trigger. Can be used with interface name as context.</p>|`1`|
+|{$IF.UTIL.MAX}|<p>Used as a threshold in the interface utilization trigger.</p>|`90`|
+|{$IF.ERRORS.WARN}|<p>Warning threshold of error packet rate. Can be used with interface name as context.</p>|`2`|
 |{$NET.IF.IFNAME.MATCHES}|<p>Used in Network interface discovery. Can be overridden on the host or linked template level.</p>|`.*`|
 |{$NET.IF.IFNAME.NOT_MATCHES}|<p>Used in Network interface discovery. Can be overridden on the host or linked template level.</p>|`Macro too long. Please see the template.`|
 |{$NET.IF.IFALIAS.MATCHES}|<p>Used in Network interface discovery. Can be overridden on the host or linked template level.</p>|`.*`|
 |{$NET.IF.IFALIAS.NOT_MATCHES}|<p>Used in Network interface discovery. Can be overridden on the host or linked template level.</p>|`CHANGE_THIS`|
 |{$NET.IF.IFDESCR.MATCHES}|<p>Used in Network interface discovery. Can be overridden on the host or linked template level.</p>|`.*`|
 |{$NET.IF.IFDESCR.NOT_MATCHES}|<p>Used in Network interface discovery. Can be overridden on the host or linked template level.</p>|`CHANGE_THIS`|
-|{$IF.UTIL.MAX}|<p>Used as a threshold in the interface utilization trigger.</p>|`90`|
-|{$IF.ERRORS.WARN}|<p>Warning threshold of error packet rate. Can be used with interface name as context.</p>|`2`|
 |{$SERVICE.NAME.MATCHES}|<p>Used in Service discovery. Can be overridden on the host or linked template level.</p>|`^.*$`|
 |{$SERVICE.NAME.NOT_MATCHES}|<p>Used in Service discovery. Can be overridden on the host or linked template level.</p>|`Macro too long. Please see the template.`|
 |{$SERVICE.STARTUPNAME.MATCHES}|<p>Used in Service discovery. Can be overridden on the host or linked template level.</p>|`^(?:automatic\|automatic delayed)$`|

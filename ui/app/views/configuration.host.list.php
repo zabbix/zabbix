@@ -28,24 +28,28 @@ if ($data['uncheck']) {
 $html_page = (new CHtmlPage())
 	->setTitle(_('Hosts'))
 	->setDocUrl(CDocHelper::getUrl(CDocHelper::DATA_COLLECTION_HOST_LIST))
-	->setControls((new CTag('nav', true, (new CList())
-			->addItem(
-				(new CSimpleButton(_('Create host')))
-					->addClass('js-create-host')
-			)
-			->addItem(
-				(new CButton('form', _('Import')))
-					->onClick(
-						'return PopUp("popup.import", {
-							rules_preset: "host", '.
-							CSRF_TOKEN_NAME.': "'.CCsrfTokenHelper::get('import').
-						'"}, {
-							dialogueid: "popup_import",
-							dialogue_class: "modal-popup-generic"
-						});'
-					)
-					->removeId()
-			)
+	->setControls(
+		(new CTag('nav', true,
+			(new CList())
+				->addItem(
+					(new CSimpleButton(_('Host Wizard')))->addClass('js-host-wizard')
+				)
+				->addItem(
+					(new CSimpleButton(_('Create host')))->addClass('js-create-host')
+				)
+				->addItem(
+					(new CButton('form', _('Import')))
+						->onClick(
+							'return PopUp("popup.import", {
+								rules_preset: "host", '.
+								CSRF_TOKEN_NAME.': "'.CCsrfTokenHelper::get('import').
+							'"}, {
+								dialogueid: "popup_import",
+								dialogue_class: "modal-popup-generic"
+							});'
+						)
+						->removeId()
+				)
 		))->setAttribute('aria-label', _('Content controls'))
 	);
 
@@ -213,6 +217,7 @@ $header_sortable_status = make_sorting_header(_('Status'), 'status', $data['sort
 $table = (new CTableInfo())
 	->setHeader([
 		(new CColHeader($header_checkbox))->addClass(ZBX_STYLE_CELL_WIDTH),
+		'',
 		$header_sortable_name,
 		_('Items'),
 		_('Triggers'),
@@ -260,7 +265,7 @@ foreach ($data['hosts'] as $host) {
 					(new CUrl('host_prototypes.php'))
 						->setArgument('form', 'update')
 						->setArgument('parent_discoveryid', $host['discoveryRule']['itemid'])
-						->setArgument('hostid', $host['hostDiscovery']['parent_hostid'])
+						->setArgument('hostid', $host['discoveryData']['parent_hostid'])
 						->setArgument('context', 'host')
 				))
 					->addClass(ZBX_STYLE_LINK_ALT)
@@ -390,13 +395,13 @@ foreach ($data['hosts'] as $host) {
 
 	$info_icons = [];
 
-	$disable_source = $host['status'] == HOST_STATUS_NOT_MONITORED && $host['hostDiscovery']
-		? $host['hostDiscovery']['disable_source']
+	$disable_source = $host['status'] == HOST_STATUS_NOT_MONITORED && $host['discoveryData']
+		? $host['discoveryData']['disable_source']
 		: '';
 
-	if ($host['flags'] == ZBX_FLAG_DISCOVERY_CREATED && $host['hostDiscovery']['status'] == ZBX_LLD_STATUS_LOST) {
-		$info_icons[] = getLldLostEntityIndicator($current_time, $host['hostDiscovery']['ts_delete'],
-			$host['hostDiscovery']['ts_disable'], $disable_source, $host['status'] == HOST_STATUS_NOT_MONITORED,
+	if ($host['flags'] == ZBX_FLAG_DISCOVERY_CREATED && $host['discoveryData']['status'] == ZBX_LLD_STATUS_LOST) {
+		$info_icons[] = getLldLostEntityIndicator($current_time, $host['discoveryData']['ts_delete'],
+			$host['discoveryData']['ts_disable'], $disable_source, $host['status'] == HOST_STATUS_NOT_MONITORED,
 			_('host')
 		);
 	}
@@ -495,6 +500,10 @@ foreach ($data['hosts'] as $host) {
 
 	$table->addRow([
 		new CCheckBox('hostids['.$host['hostid'].']', $host['hostid']),
+		(new CButtonIcon(ZBX_ICON_MORE))
+			->setMenuPopup(
+				CMenuPopupHelper::getHost($host['hostid'])
+			),
 		(new CCol($description))->addClass(ZBX_STYLE_NOWRAP),
 		[
 			new CLink(_('Items'),
@@ -518,7 +527,8 @@ foreach ($data['hosts'] as $host) {
 		],
 		[
 			new CLink(_('Graphs'),
-				(new CUrl('graphs.php'))
+				(new CUrl('zabbix.php'))
+					->setArgument('action', 'graph.list')
 					->setArgument('filter_set', '1')
 					->setArgument('filter_hostids', [$host['hostid']])
 					->setArgument('context', 'host')
@@ -532,7 +542,7 @@ foreach ($data['hosts'] as $host) {
 					->setArgument('filter_hostids', [$host['hostid']])
 					->setArgument('context', 'host')
 			),
-			CViewHelper::showNum($host['discoveries'])
+			CViewHelper::showNum($host['discoveryRules'])
 		],
 		[
 			new CLink(_('Web'),

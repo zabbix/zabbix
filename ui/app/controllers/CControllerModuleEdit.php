@@ -19,15 +19,14 @@ class CControllerModuleEdit extends CController {
 	private array $module = [];
 
 	protected function init(): void {
+		$this->setInputValidationMethod(self::INPUT_VALIDATION_FORM);
 		$this->disableCsrfValidation();
 	}
 
 	protected function checkInput(): bool {
-		$fields = [
-			'moduleid' => 'required|db module.moduleid'
-		];
-
-		$ret = $this->validateInput($fields);
+		$ret = $this->validateInput(['object', 'fields' => [
+			'moduleid' => ['db module.moduleid', 'required']
+		]]);
 
 		if (!$ret) {
 			$this->setResponse(
@@ -85,7 +84,10 @@ class CControllerModuleEdit extends CController {
 				'status' => $this->module['status'],
 				'user' => [
 					'debug_mode' => $this->getDebugMode()
-				]
+				],
+				'js_validation_rules' => (new CFormValidator(
+					CControllerModuleUpdate::getValidationRules()
+				))->getRules()
 			];
 
 			$response = new CControllerResponseData($data);

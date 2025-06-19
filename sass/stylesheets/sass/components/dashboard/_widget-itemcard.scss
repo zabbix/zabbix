@@ -1,0 +1,241 @@
+// Widget view.
+
+div.dashboard-widget-itemcard {
+	.item-card {
+		min-width: 300px;
+
+		.sections-header {
+			display: flex;
+			flex-direction: column;
+			justify-content: space-evenly;
+			height: 53px;
+			padding: 0 10px;
+			border-bottom: 1px solid $table-border-color;
+
+			.section-item {
+				display: grid;
+				grid-template-columns: 1fr max-content;
+
+				.item-name {
+					display: flex;
+					gap: 4px;
+					min-width: 0;
+					line-height: 18px;
+
+					.link-action {
+						@extend %overflow-ellipsis;
+
+						height: 17px;
+					}
+
+					.btn-icon {
+						align-self: center;
+						min-width: 16px;
+						height: 16px;
+					}
+				}
+
+				.problem-icon-link {
+					margin-left: 5px;
+				}
+			}
+
+			.section-path {
+				@extend %overflow-ellipsis;
+
+				display: flex;
+				gap: 5px;
+				height: 17px;
+				line-height: 17px;
+
+				.path-element {
+					@extend %overflow-ellipsis;
+
+					flex: 1 1 0;
+					max-width: fit-content;
+				}
+			}
+		}
+
+		.sections {
+			display: grid;
+			grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+			grid-auto-rows: minmax(54px, auto);
+			margin-left: -1px;
+			overflow: hidden;
+
+			.section {
+				display: grid;
+				position: relative;
+				grid-template-columns: auto 1fr;
+				grid-row: span var(--span, 1);
+				column-gap: 10px;
+				align-items: center;
+				padding: 0 10px;
+				margin-right: -1px;
+				border-right: 1px solid $table-border-color;
+				border-bottom: 1px solid $table-border-color;
+				border-left: 1px solid $table-border-color;
+				line-height: 18px;
+
+				.section-name {
+					@extend %overflow-ellipsis;
+				}
+
+				.section-body {
+					text-align: right;
+				}
+
+				&.section-description {
+					grid-template-columns: 1fr;
+					word-break: break-word;
+					--line-clamp: 2;
+				}
+
+				&.section-error {
+					grid-template-columns: 1fr;
+					word-break: break-word;
+					--line-clamp: 2;
+				}
+
+				&.section-metrics, &.section-latest-data {
+					grid-template-columns: repeat(3, 1fr);
+					column-gap: 10px;
+
+					.center-column {
+						@extend %overflow-ellipsis;
+
+						display: flex;
+						justify-content: center;
+					}
+
+					.column, .right-column {
+						@extend %overflow-ellipsis;
+
+						display: flex;
+						flex-direction: column;
+						gap: 5px;
+
+						.column-header:not(a) {
+							color: $font-alt-color;
+						}
+
+						.column-header, .column-value {
+							@extend %overflow-ellipsis;
+
+							display: block;
+							position: relative;
+							height: 17px;
+							line-height: 17px;
+							box-sizing: border-box;
+						}
+
+						.column-value {
+							.btn-icon {
+								height: 14px;
+								margin-top: 2px;
+							}
+
+							z-sparkline {
+								position: absolute;
+								top: 0;
+								right: 0;
+								left: 0;
+								height: 17px;
+							}
+						}
+					}
+
+					.right-column {
+						align-items: flex-end;
+						text-align: right;
+
+						.column-header, .column-value {
+							width: 100%;
+						}
+
+						.btn-thumbnail {
+							overflow: hidden;
+
+							&:not(.btn-link) {
+								width: 100px;
+								height: 53px;
+								background: transparent var(--thumbnail) no-repeat center;
+								background-size: cover;
+								border-color: transparent;
+								text-indent: -9999px;
+
+								&:not(.is-loading) {
+									border: 1px solid $ui-border-color;
+									border-radius: 3px;
+								}
+							}
+						}
+					}
+				}
+
+				&.section-triggers {
+
+					.triggers {
+						max-height: 36px;
+						overflow: hidden;
+
+						.trigger {
+							display: inline-block;
+							max-width: 100%;
+
+							&:not(:first-of-type) {
+								margin-left: 4px;
+							}
+
+							.trigger-name {
+								@extend %overflow-ellipsis;
+
+								max-width: 100%;
+							}
+
+							.trigger-name,
+							.delimiter {
+								display: inline-block;
+								vertical-align: top;
+							}
+						}
+
+						.link-alt {
+							margin-left: 5px;
+						}
+
+						&.has-ellipsis {
+
+							.trigger-name {
+								max-width: 75px;
+							}
+						}
+					}
+				}
+
+				&.section-single-parameter {
+					grid-template-columns: 1fr 1fr;
+
+					.section-body {
+						@extend %overflow-ellipsis;
+					}
+				}
+
+				&.section-tags {
+					grid-template-columns: 1fr;
+
+					.tags {
+						max-height: 38px;
+						overflow: hidden;
+
+						.btn-icon {
+							height: 14px;
+							margin-top: 2px;
+						}
+					}
+				}
+			}
+		}
+	}
+}

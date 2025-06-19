@@ -71,9 +71,11 @@ Additional information about metrics and used API methods:
 |{$GCP.CLIENT.EMAIL}|<p>Service account client e-mail.</p>||
 |{$GCP.PRIVATE.KEY.ID}|<p>Service account private key id.</p>||
 |{$GCP.PRIVATE.KEY}|<p>Service account private key data.</p>||
-|{$GCP.PROXY}|<p>Sets HTTP proxy value. If this macro is empty then no proxy is used.</p>||
-|{$GCP.DATA.TIMEOUT}|<p>A response timeout for an API.</p>|`15s`|
 |{$GCP.AUTH.FREQUENCY}|<p>The update interval for the GCP Authorization item, which also equals to the access token regeneration request frequency.</p><p>Check the template documentation notes carefully for more details.</p>|`45m`|
+|{$GCP.GCE.QUOTA.PUSED.MIN.WARN}|<p>GCP Compute Engine project quota warning utilization threshold.</p>|`80`|
+|{$GCP.GCE.QUOTA.PUSED.MIN.CRIT}|<p>GCP Compute Engine project quota critical quota utilization threshold.</p>|`95`|
+|{$GCP.DATA.TIMEOUT}|<p>A response timeout for an API.</p>|`15s`|
+|{$GCP.PROXY}|<p>Sets HTTP proxy value. If this macro is empty then no proxy is used.</p>||
 |{$GCP.GCE.INST.NAME.MATCHES}|<p>The filter to include GCP Compute Engine instances by namespace.</p>|`.*`|
 |{$GCP.GCE.INST.NAME.NOT_MATCHES}|<p>The filter to exclude GCP Compute Engine instances by namespace.</p>|`CHANGE_IF_NEEDED`|
 |{$GCP.GCE.ZONE.MATCHES}|<p>The filter to include GCP Compute Engine instances by zone.</p>|`.*`|
@@ -98,8 +100,6 @@ Additional information about metrics and used API methods:
 |{$GCP.MSSQL.INST.TYPE.NOT_MATCHES}|<p>The filter to exclude GCP Cloud SQL MSSQL instances by type (standalone/replica).</p><p>Set a macro value 'CLOUD_SQL_INSTANCE' to exclude standalone Instances or 'READ_REPLICA_INSTANCE' to exclude read-only Replicas.</p>|`CHANGE_IF_NEEDED`|
 |{$GCP.GCE.QUOTA.MATCHES}|<p>The filter to include GCP Compute Engine project quotas by namespace.</p>|`.*`|
 |{$GCP.GCE.QUOTA.NOT_MATCHES}|<p>The filter to exclude GCP Compute Engine project quotas by namespace.</p>|`CHANGE_IF_NEEDED`|
-|{$GCP.GCE.QUOTA.PUSED.MIN.WARN}|<p>GCP Compute Engine project quota warning utilization threshold.</p>|`80`|
-|{$GCP.GCE.QUOTA.PUSED.MIN.CRIT}|<p>GCP Compute Engine project quota critical quota utilization threshold.</p>|`95`|
 
 ### Items
 

@@ -706,7 +706,7 @@ static void	procstat_get_monitored_pids(zbx_vector_uint64_t *pids, const zbx_vec
 	{
 		zbx_procstat_query_data_t	*qdata = (zbx_procstat_query_data_t *)queries->values[i];
 
-		if (SUCCEED != qdata->error)
+		if (SUCCEED != qdata->error || 0 == qdata->pids.values_num)
 			continue;
 
 		memcpy(pids->values + pids->values_num, qdata->pids.values,
