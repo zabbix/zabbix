@@ -6,7 +6,6 @@
 Ciena’s 3906 Platform is a compact, smart CPE that delivers gigabit Ethernet service capability with virtual network function integration.
 Learn more about Ciena 3906 Platform: https://www.ciena.com/products/3906
 
-
 ## Requirements
 
 Zabbix version: 7.4 and higher.
@@ -33,21 +32,21 @@ Refer to the vendor documentation.
 |{$SNMP.TIMEOUT}|<p>Time interval for the SNMP availability trigger.</p>|`5m`|
 |{$ICMP_LOSS_WARN}|<p>Warning threshold of ICMP packet loss in %.</p>|`20`|
 |{$ICMP_RESPONSE_TIME_WARN}|<p>Warning threshold of the average ICMP response time in seconds.</p>|`0.15`|
-|{$IFCONTROL}||`1`|
-|{$IF.UTIL.MAX}||`95`|
-|{$NET.IF.IFNAME.MATCHES}||`^.*$`|
-|{$NET.IF.IFNAME.NOT_MATCHES}|<p>Filter out loopbacks, nulls, docker veth links and docker0 bridge by default</p>|`Macro too long. Please see the template.`|
-|{$NET.IF.IFOPERSTATUS.MATCHES}||`^.*$`|
-|{$NET.IF.IFOPERSTATUS.NOT_MATCHES}|<p>Ignore notPresent(6)</p>|`^6$`|
-|{$NET.IF.IFADMINSTATUS.MATCHES}||`^.*`|
-|{$NET.IF.IFADMINSTATUS.NOT_MATCHES}|<p>Ignore down(2) administrative status</p>|`^2$`|
-|{$NET.IF.IFDESCR.MATCHES}||`.*`|
-|{$NET.IF.IFDESCR.NOT_MATCHES}||`CHANGE_IF_NEEDED`|
-|{$NET.IF.IFTYPE.MATCHES}||`.*`|
-|{$NET.IF.IFTYPE.NOT_MATCHES}||`CHANGE_IF_NEEDED`|
-|{$NET.IF.IFALIAS.MATCHES}||`.*`|
-|{$NET.IF.IFALIAS.NOT_MATCHES}||`CHANGE_IF_NEEDED`|
+|{$IFCONTROL}|<p>Link status trigger will be fired only for interfaces where the context macro equals "1".</p>|`1`|
+|{$IF.UTIL.MAX}|<p>Used as a threshold in the interface utilization trigger.</p>|`90`|
 |{$IF.ERRORS.WARN}|<p>Warning threshold of error packet rate. Can be used with interface name as context.</p>|`2`|
+|{$NET.IF.IFNAME.MATCHES}|<p>Used for network interface discovery. Can be overridden on the host or linked template level.</p>|`^.*$`|
+|{$NET.IF.IFNAME.NOT_MATCHES}|<p>Filters out `loopbacks`, `nulls`, docker `veth` links and `docker0 bridge` by default.</p>|`Macro too long. Please see the template.`|
+|{$NET.IF.IFOPERSTATUS.MATCHES}|<p>Used for network interface discovery. Can be overridden on the host or linked template level.</p>|`^.*$`|
+|{$NET.IF.IFOPERSTATUS.NOT_MATCHES}|<p>Ignore `notPresent(6)`</p>|`^6$`|
+|{$NET.IF.IFADMINSTATUS.MATCHES}|<p>Used in network interface discovery rule filters.</p>|`^.*`|
+|{$NET.IF.IFADMINSTATUS.NOT_MATCHES}|<p>Ignore `down(2)` administrative status</p>|`^2$`|
+|{$NET.IF.IFDESCR.MATCHES}|<p>Used in network interface discovery rule filters.</p>|`.*`|
+|{$NET.IF.IFDESCR.NOT_MATCHES}|<p>Used in network interface discovery rule filters.</p>|`CHANGE_IF_NEEDED`|
+|{$NET.IF.IFALIAS.MATCHES}|<p>Used in network interface discovery rule filters.</p>|`.*`|
+|{$NET.IF.IFALIAS.NOT_MATCHES}|<p>Used in network interface discovery rule filters.</p>|`CHANGE_IF_NEEDED`|
+|{$NET.IF.IFTYPE.MATCHES}|<p>Used in network interface discovery rule filters.</p>|`.*`|
+|{$NET.IF.IFTYPE.NOT_MATCHES}|<p>Used in network interface discovery rule filters.</p>|`CHANGE_IF_NEEDED`|
 
 ### Items
 
@@ -56,11 +55,13 @@ Refer to the vendor documentation.
 |Hardware model name|<p>MIB: WWP-LEOS-BLADE-MIB</p><p>The hardware version of the product.</p>|SNMP agent|system.hw.model<p>**Preprocessing**</p><ul><li><p>Discard unchanged with heartbeat: `1d`</p></li></ul>|
 |Hardware serial number|<p>MIB: WWP-LEOS-BLADE-MIB</p><p>The Serial number of the product.</p>|SNMP agent|system.hw.serialnumber<p>**Preprocessing**</p><ul><li><p>Discard unchanged with heartbeat: `1d`</p></li></ul>|
 |Hardware version (revision)|<p>MIB: WWP-LEOS-BLADE-MIB</p><p>The hardware version of the product.</p>|SNMP agent|system.hw.version<p>**Preprocessing**</p><ul><li><p>Discard unchanged with heartbeat: `1d`</p></li></ul>|
-|SNMP walk system CPUs|<p>MIB: WWP-LEOS-SYSTEM-CONFIG-MIB</p><p>Discovering system CPUs.</p>|SNMP agent|system.cpu.walk|
-|SNMP walk memory|<p>MIB: WWP-LEOS-SYSTEM-CONFIG-MIB</p><p>Discovering system memory.</p>|SNMP agent|system.memory.walk|
-|SNMP walk sensors|<p>MIB: WWP-LEOS-CHASSIS-MIB</p><p>Discovering system sensors.</p>|SNMP agent|system.sensor.walk|
+|CPU utilization|<p>MIB: WWP-LEOS-SYSTEM-CONFIG-MIB</p><p>The 60 seconds CPU usage state.</p>|SNMP agent|ciena.cpu.utilization|
+|Memory available|<p>MIB: WWP-LEOS-SYSTEM-CONFIG-MIB</p><p>Current number of available memory in bytes.</p>|SNMP agent|ciena.memory.available<p>**Preprocessing**</p><ul><li><p>Custom multiplier: `1024`</p></li><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
+|Memory used|<p>MIB: WWP-LEOS-SYSTEM-CONFIG-MIB</p><p>Current number of used memory in bytes.</p>|SNMP agent|ciena.memory.used<p>**Preprocessing**</p><ul><li><p>Custom multiplier: `1024`</p></li><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
+|Memory utilization|<p>Current memory utilization in percent.</p>|Calculated|ciena.memory.utilization|
+|SNMP walk temperature sensors|<p>MIB: WWP-LEOS-CHASSIS-MIB</p><p>Discovering system temperature sensors.</p>|SNMP agent|system.temperature.sensor.walk|
 |SNMP walk fan|<p>MIB: WWP-LEOS-CHASSIS-MIB</p><p>Discovering system fans.</p>|SNMP agent|system.fan.walk|
-|SNMP walk psu|<p>MIB: WWP-LEOS-CHASSIS-MIB</p><p>Discovering system power supply.</p>|SNMP agent|system.psu.walk|
+|SNMP walk PSU|<p>MIB: WWP-LEOS-CHASSIS-MIB</p><p>Discovering system power supply.</p>|SNMP agent|system.psu.walk|
 |Uptime (network)|<p>MIB: SNMPv2-MIB</p><p>Time (in hundredths of a second) since the network management portion of the system was last re-initialized.</p>|SNMP agent|system.net.uptime[sysUpTime.0]<p>**Preprocessing**</p><ul><li><p>Custom multiplier: `0.01`</p></li></ul>|
 |Uptime (hardware)|<p>MIB: HOST-RESOURCES-MIB</p><p>The amount of time since this host was last initialized. Note that this is different from sysUpTime in the SNMPv2-MIB [RFC1907] because sysUpTime is the uptime of the network management portion of the system.</p>|SNMP agent|system.hw.uptime[hrSystemUptime.0]<p>**Preprocessing**</p><ul><li><p>Check for not supported value: `any error`</p><p>⛔️Custom on fail: Set value to: `0`</p></li><li><p>Custom multiplier: `0.01`</p></li></ul>|
 |SNMP traps (fallback)|<p>The item is used to collect all SNMP traps unmatched by other snmptrap items</p>|SNMP trap|snmptrap.fallback|
@@ -80,6 +81,8 @@ Refer to the vendor documentation.
 |Name|Description|Expression|Severity|Dependencies and additional info|
 |----|-----------|----------|--------|--------------------------------|
 |Ciena: Device has been replaced|<p>Ciena serial number has changed. Acknowledge to close the problem manually.</p>|`last(/Ciena 3906 by SNMP/system.hw.serialnumber,#1)<>last(/Ciena 3906 by SNMP/system.hw.serialnumber,#2) and length(last(/Ciena 3906 by SNMP/system.hw.serialnumber))>0`|Info|**Manual close**: Yes|
+|Ciena: High CPU utilization|<p>The CPU utilization is too high. The system might be slow to respond.</p>|`min(/Ciena 3906 by SNMP/ciena.cpu.utilization,5m)>{$CIENA.CPU.UTIL.CRIT}`|Warning||
+|Ciena: High memory utilization|<p>The system is running out of free memory.</p>|`min(/Ciena 3906 by SNMP/ciena.memory.utilization,5m)>{$CIENA.MEMORY.UTIL.MAX}`|Average||
 |Ciena: Host has been restarted|<p>Uptime is less than 10 minutes.</p>|`(last(/Ciena 3906 by SNMP/system.hw.uptime[hrSystemUptime.0])>0 and last(/Ciena 3906 by SNMP/system.hw.uptime[hrSystemUptime.0])<10m) or (last(/Ciena 3906 by SNMP/system.hw.uptime[hrSystemUptime.0])=0 and last(/Ciena 3906 by SNMP/system.net.uptime[sysUpTime.0])<10m)`|Warning|**Manual close**: Yes<br>**Depends on**:<br><ul><li>Ciena: No SNMP data collection</li></ul>|
 |Ciena: System name has changed|<p>The name of the system has changed. Acknowledge to close the problem manually.</p>|`last(/Ciena 3906 by SNMP/system.name,#1)<>last(/Ciena 3906 by SNMP/system.name,#2) and length(last(/Ciena 3906 by SNMP/system.name))>0`|Info|**Manual close**: Yes|
 |Ciena: No SNMP data collection|<p>SNMP is not available for polling. Please check device connectivity and SNMP settings.</p>|`max(/Ciena 3906 by SNMP/zabbix[host,snmp,available],{$SNMP.TIMEOUT})=0`|Warning|**Depends on**:<br><ul><li>Ciena: Unavailable by ICMP ping</li></ul>|
@@ -87,64 +90,24 @@ Refer to the vendor documentation.
 |Ciena: High ICMP ping loss||`min(/Ciena 3906 by SNMP/icmppingloss,5m)>{$ICMP_LOSS_WARN} and min(/Ciena 3906 by SNMP/icmppingloss,5m)<100`|Warning|**Depends on**:<br><ul><li>Ciena: Unavailable by ICMP ping</li></ul>|
 |Ciena: High ICMP ping response time|<p>Average ICMP response time is too high.</p>|`avg(/Ciena 3906 by SNMP/icmppingsec,5m)>{$ICMP_RESPONSE_TIME_WARN}`|Warning|**Depends on**:<br><ul><li>Ciena: High ICMP ping loss</li><li>Ciena: Unavailable by ICMP ping</li></ul>|
 
-### LLD rule CPU Discovery
+### LLD rule Temperature sensor Discovery
 
 |Name|Description|Type|Key and additional info|
 |----|-----------|----|-----------------------|
-|CPU Discovery|<p>Discovering CPUs from WWP-LEOS-SYSTEM-CONFIG-MIB.</p>|Dependent item|ciena.cpu.discovery<p>**Preprocessing**</p><ul><li><p>SNMP walk to JSON</p><p>⛔️Custom on fail: Discard value</p></li><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
+|Temperature sensor Discovery|<p>Discovering temperature sensors from WWP-LEOS-CHASSIS-MIB.</p>|Dependent item|ciena.temperature.sensor.discovery<p>**Preprocessing**</p><ul><li><p>SNMP walk to JSON</p><p>⛔️Custom on fail: Discard value</p></li><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
 
-### Item prototypes for CPU Discovery
+### Item prototypes for Temperature sensor Discovery
 
 |Name|Description|Type|Key and additional info|
 |----|-----------|----|-----------------------|
-|CPU [{#SNMPINDEX}]: Utilization|<p>MIB: WWP-LEOS-SYSTEM-CONFIG-MIB</p><p>The 60 seconds CPU usage state.</p>|Dependent item|ciena.cpu.util[CpuUtilizationLast60Seconds.{#SNMPINDEX}]<p>**Preprocessing**</p><ul><li><p>SNMP walk value: `1.3.6.1.4.1.6141.2.60.12.1.11.9.{#SNMPINDEX}`</p></li></ul>|
+|Sensor [{#SNMPVALUE}]: Temperature|<p>MIB: WWP-LEOS-CHASSIS-MIB</p><p>The value of temperature measured by the sensor inside the device in degrees C.</p>|Dependent item|ciena.temperature.sensors.temp[ChassisTempSensorValue.{#SNMPINDEX}]<p>**Preprocessing**</p><ul><li><p>SNMP walk value: `1.3.6.1.4.1.6141.2.60.11.1.1.5.1.1.2.{#SNMPINDEX}`</p></li><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
 
-### Trigger prototypes for CPU Discovery
+### Trigger prototypes for Temperature sensor Discovery
 
 |Name|Description|Expression|Severity|Dependencies and additional info|
 |----|-----------|----------|--------|--------------------------------|
-|Ciena: CPU [{#SNMPINDEX}]: High CPU utilization|<p>The CPU utilization is too high. The system might be slow to respond.</p>|`min(/Ciena 3906 by SNMP/ciena.cpu.util[CpuUtilizationLast60Seconds.{#SNMPINDEX}],5m)>{$CIENA.CPU.UTIL.CRIT}`|Warning||
-
-### LLD rule Memory Discovery
-
-|Name|Description|Type|Key and additional info|
-|----|-----------|----|-----------------------|
-|Memory Discovery|<p>Discovering memory from WWP-LEOS-SYSTEM-CONFIG-MIB.</p>|Dependent item|ciena.memory.discovery<p>**Preprocessing**</p><ul><li><p>SNMP walk to JSON</p><p>⛔️Custom on fail: Discard value</p></li><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
-
-### Item prototypes for Memory Discovery
-
-|Name|Description|Type|Key and additional info|
-|----|-----------|----|-----------------------|
-|Memory [{#SNMPINDEX}]: Available|<p>MIB: WWP-LEOS-SYSTEM-CONFIG-MIB</p><p>Current number of available memory in bytes.</p>|Dependent item|ciena.memory.util[MemoryUtilizationAvailableMemoryCurrent.{#SNMPINDEX}]<p>**Preprocessing**</p><ul><li><p>SNMP walk value: `1.3.6.1.4.1.6141.2.60.12.1.13.4.{#SNMPINDEX}`</p></li><li><p>Custom multiplier: `1024`</p></li><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
-|Memory [{#SNMPINDEX}]: Used|<p>MIB: WWP-LEOS-SYSTEM-CONFIG-MIB</p><p>Current number of used memory in bytes.</p>|Dependent item|ciena.memory.util[MemoryUtilizationUsedMemoryCurrent.{#SNMPINDEX}]<p>**Preprocessing**</p><ul><li><p>SNMP walk value: `1.3.6.1.4.1.6141.2.60.12.1.13.1.{#SNMPINDEX}`</p></li><li><p>Custom multiplier: `1024`</p></li><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
-|Memory [{#SNMPINDEX}]: Utilization|<p>Current memory utilization in percent.</p>|Calculated|ciena.memory.utilization[{#SNMPINDEX}]|
-
-### Trigger prototypes for Memory Discovery
-
-|Name|Description|Expression|Severity|Dependencies and additional info|
-|----|-----------|----------|--------|--------------------------------|
-|Ciena: Memory [{#SNMPINDEX}]: High memory utilization|<p>The system is running out of free memory.</p>|`min(/Ciena 3906 by SNMP/ciena.memory.utilization[{#SNMPINDEX}],5m)>{$CIENA.MEMORY.UTIL.MAX}`|Average||
-
-### LLD rule Sensor Discovery
-
-|Name|Description|Type|Key and additional info|
-|----|-----------|----|-----------------------|
-|Sensor Discovery|<p>Discovering sensors from WWP-LEOS-CHASSIS-MIB.</p>|Dependent item|ciena.sensor.discovery<p>**Preprocessing**</p><ul><li><p>SNMP walk to JSON</p><p>⛔️Custom on fail: Discard value</p></li><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
-
-### Item prototypes for Sensor Discovery
-
-|Name|Description|Type|Key and additional info|
-|----|-----------|----|-----------------------|
-|Sensor [{#SNMPVALUE}]: Temperature|<p>MIB: WWP-LEOS-CHASSIS-MIB</p><p>The value of temperature measured by the sensor inside the device in degrees C.</p>|Dependent item|ciena.sensors.util[ChassisTempSensorValue.{#SNMPINDEX}]<p>**Preprocessing**</p><ul><li><p>SNMP walk value: `1.3.6.1.4.1.6141.2.60.11.1.1.5.1.1.2.{#SNMPINDEX}`</p></li><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
-|Sensor [{#SNMPVALUE}]: High temperature threshold|<p>MIB: WWP-LEOS-CHASSIS-MIB</p><p>The highest value that the object wwpLeosChassisTempSensorValue may obtain.</p>|Dependent item|ciena.sensors.threshold[ChassisTempSensorHighThreshold.{#SNMPINDEX}]<p>**Preprocessing**</p><ul><li><p>SNMP walk value: `1.3.6.1.4.1.6141.2.60.11.1.1.5.1.1.3.{#SNMPINDEX}`</p></li><li><p>Discard unchanged with heartbeat: `1d`</p></li></ul>|
-|Sensor [{#SNMPVALUE}]: Low temperature threshold|<p>MIB: WWP-LEOS-CHASSIS-MIB</p><p>The Lowest value that the object wwpLeosChassisTempSensorValue may obtain.</p>|Dependent item|ciena.sensors.threshold[ChassisTempSensorLowThreshold.{#SNMPINDEX}]<p>**Preprocessing**</p><ul><li><p>SNMP walk value: `1.3.6.1.4.1.6141.2.60.11.1.1.5.1.1.4.{#SNMPINDEX}`</p></li><li><p>Discard unchanged with heartbeat: `1d`</p></li></ul>|
-
-### Trigger prototypes for Sensor Discovery
-
-|Name|Description|Expression|Severity|Dependencies and additional info|
-|----|-----------|----------|--------|--------------------------------|
-|Ciena: Sensor [{#SNMPVALUE}]: High chassis temperature|<p>The current temp is greater than the threshold state.</p>|`min(/Ciena 3906 by SNMP/ciena.sensors.util[ChassisTempSensorValue.{#SNMPINDEX}],5m)>last(/Ciena 3906 by SNMP/ciena.sensors.threshold[ChassisTempSensorHighThreshold.{#SNMPINDEX}])`|Average||
-|Ciena: Sensor [{#SNMPVALUE}]: Low chassis temperature|<p>The current temp is less than the threshold state.</p>|`max(/Ciena 3906 by SNMP/ciena.sensors.util[ChassisTempSensorValue.{#SNMPINDEX}],5m)<last(/Ciena 3906 by SNMP/ciena.sensors.threshold[ChassisTempSensorLowThreshold.{#SNMPINDEX}])`|Average||
+|Ciena: Sensor [{#SNMPVALUE}]: High chassis temperature|<p>The current temp is greater than the threshold state.</p>|`min(/Ciena 3906 by SNMP/ciena.temperature.sensors.temp[ChassisTempSensorValue.{#SNMPINDEX}],5m)>{#CIENA.TEMPERATURE.HIGH}`|Average||
+|Ciena: Sensor [{#SNMPVALUE}]: Low chassis temperature|<p>The current temp is less than the threshold state.</p>|`max(/Ciena 3906 by SNMP/ciena.temperature.sensors.temp[ChassisTempSensorValue.{#SNMPINDEX}],5m)<{#CIENA.TEMPERATURE.LOW}`|Average||
 
 ### LLD rule Fan Discovery
 
@@ -187,30 +150,30 @@ Refer to the vendor documentation.
 
 |Name|Description|Type|Key and additional info|
 |----|-----------|----|-----------------------|
-|Network interfaces discovery|<p>Discovering interfaces from IF-MIB.</p>|Dependent item|net.if.discovery<p>**Preprocessing**</p><ul><li><p>SNMP walk to JSON</p><p>⛔️Custom on fail: Discard value</p></li><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
+|Network interfaces discovery|<p>Discovering interfaces from IF-MIB.</p>|Dependent item|net.if.discovery<p>**Preprocessing**</p><ul><li><p>SNMP walk to JSON</p></li><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
 
 ### Item prototypes for Network interfaces discovery
 
 |Name|Description|Type|Key and additional info|
 |----|-----------|----|-----------------------|
 |Interface {#IFNAME}({#IFALIAS}): Operational status|<p>MIB: IF-MIB</p><p>The current operational state of the interface.</p><p>- The testing(3) state indicates that no operational packet scan be passed</p><p>- If ifAdminStatus is down(2) then ifOperStatus should be down(2)</p><p>- If ifAdminStatus is changed to up(1) then ifOperStatus should change to up(1) if the interface is ready to transmit and receive network traffic</p><p>- It should change todormant(5) if the interface is waiting for external actions (such as a serial line waiting for an incoming connection)</p><p>- It should remain in the down(2) state if and only if there is a fault that prevents it from going to the up(1) state</p><p>- It should remain in the notPresent(6) state if the interface has missing(typically, hardware) components.</p>|Dependent item|net.if.status[ifOperStatus.{#SNMPINDEX}]<p>**Preprocessing**</p><ul><li><p>SNMP walk value: `1.3.6.1.2.1.2.2.1.8.{#SNMPINDEX}`</p></li></ul>|
-|Interface {#IFNAME}({#IFALIAS}): Bits received|<p>MIB: IF-MIB</p><p>The total number of octets received on the interface,including framing characters. Discontinuities in the value of this counter can occur at re-initialization of the management system, and another times as indicated by the value of ifCounterDiscontinuityTime.</p>|Dependent item|net.if.in[ifInOctets.{#SNMPINDEX}]<p>**Preprocessing**</p><ul><li><p>SNMP walk value: `1.3.6.1.2.1.2.2.1.10.{#SNMPINDEX}`</p></li><li>Change per second</li><li><p>Custom multiplier: `8`</p></li></ul>|
-|Interface {#IFNAME}({#IFALIAS}): Bits sent|<p>MIB: IF-MIB</p><p>The total number of octets transmitted out of the interface, including framing characters. Discontinuities in the value of this counter can occur at re-initialization of the management system, and at other times as indicated by the value of ifCounterDiscontinuityTime.</p>|Dependent item|net.if.out[ifOutOctets.{#SNMPINDEX}]<p>**Preprocessing**</p><ul><li><p>SNMP walk value: `1.3.6.1.2.1.2.2.1.16.{#SNMPINDEX}`</p></li><li>Change per second</li><li><p>Custom multiplier: `8`</p></li></ul>|
+|Interface {#IFNAME}({#IFALIAS}): Bits received|<p>MIB: IF-MIB</p><p>The total number of octets received on the interface, including framing characters. This object is a 64-bit version of ifInOctets. Discontinuities in the value of this counter can occur at re-initialization of the management system, and at other times as indicated by the value of ifCounterDiscontinuityTime.</p>|Dependent item|net.if.in[ifHCInOctets.{#SNMPINDEX}]<p>**Preprocessing**</p><ul><li><p>SNMP walk value: `1.3.6.1.2.1.31.1.1.1.6.{#SNMPINDEX}`</p></li><li>Change per second</li><li><p>Custom multiplier: `8`</p></li></ul>|
+|Interface {#IFNAME}({#IFALIAS}): Bits sent|<p>MIB: IF-MIB</p><p>The total number of octets transmitted out of the interface, including framing characters. This object is a 64-bit version of ifOutOctets.Discontinuities in the value of this counter can occur at re-initialization of the management system, and at other times as indicated by the value of ifCounterDiscontinuityTime.</p>|Dependent item|net.if.out[ifHCOutOctets.{#SNMPINDEX}]<p>**Preprocessing**</p><ul><li><p>SNMP walk value: `1.3.6.1.2.1.31.1.1.1.10.{#SNMPINDEX}`</p></li><li>Change per second</li><li><p>Custom multiplier: `8`</p></li></ul>|
 |Interface {#IFNAME}({#IFALIAS}): Inbound packets with errors|<p>MIB: IF-MIB</p><p>For packet-oriented interfaces, the number of inbound packets that contained errors preventing them from being deliverable to a higher-layer protocol.  For character-oriented or fixed-length interfaces, the number of inbound transmission units that contained errors preventing them from being deliverable to a higher-layer protocol. Discontinuities in the value of this counter can occur at re-initialization of the management system, and at other times as indicated by the value of ifCounterDiscontinuityTime.</p>|Dependent item|net.if.in.errors[ifInErrors.{#SNMPINDEX}]<p>**Preprocessing**</p><ul><li><p>SNMP walk value: `1.3.6.1.2.1.2.2.1.14.{#SNMPINDEX}`</p></li><li>Change per second</li><li><p>Discard unchanged with heartbeat: `3m`</p></li></ul>|
 |Interface {#IFNAME}({#IFALIAS}): Outbound packets with errors|<p>MIB: IF-MIB</p><p>For packet-oriented interfaces, the number of outbound packets that contained errors preventing them from being deliverable to a higher-layer protocol.  For character-oriented or fixed-length interfaces, the number of outbound transmission units that contained errors preventing them from being deliverable to a higher-layer protocol. Discontinuities in the value of this counter can occur at re-initialization of the management system, and at other times as indicated by the value of ifCounterDiscontinuityTime.</p>|Dependent item|net.if.out.errors[ifOutErrors.{#SNMPINDEX}]<p>**Preprocessing**</p><ul><li><p>SNMP walk value: `1.3.6.1.2.1.2.2.1.20.{#SNMPINDEX}`</p></li><li>Change per second</li><li><p>Discard unchanged with heartbeat: `3m`</p></li></ul>|
 |Interface {#IFNAME}({#IFALIAS}): Outbound packets discarded|<p>MIB: IF-MIB</p><p>The number of outbound packets which were chosen to be discarded</p><p>even though no errors had been detected to prevent their being deliverable to a higher-layer protocol.</p><p>One possible reason for discarding such a packet could be to free up buffer space.</p><p>Discontinuities in the value of this counter can occur at re-initialization of the management system,</p><p>and at other times as indicated by the value of ifCounterDiscontinuityTime.</p>|Dependent item|net.if.out.discards[ifOutDiscards.{#SNMPINDEX}]<p>**Preprocessing**</p><ul><li><p>SNMP walk value: `1.3.6.1.2.1.2.2.1.19.{#SNMPINDEX}`</p></li><li>Change per second</li><li><p>Discard unchanged with heartbeat: `3m`</p></li></ul>|
 |Interface {#IFNAME}({#IFALIAS}): Inbound packets discarded|<p>MIB: IF-MIB</p><p>The number of inbound packets which were chosen to be discarded</p><p>even though no errors had been detected to prevent their being deliverable to a higher-layer protocol.</p><p>One possible reason for discarding such a packet could be to free up buffer space.</p><p>Discontinuities in the value of this counter can occur at re-initialization of the management system,</p><p>and at other times as indicated by the value of ifCounterDiscontinuityTime.</p>|Dependent item|net.if.in.discards[ifInDiscards.{#SNMPINDEX}]<p>**Preprocessing**</p><ul><li><p>SNMP walk value: `1.3.6.1.2.1.2.2.1.13.{#SNMPINDEX}`</p></li><li>Change per second</li><li><p>Discard unchanged with heartbeat: `3m`</p></li></ul>|
 |Interface {#IFNAME}({#IFALIAS}): Interface type|<p>MIB: IF-MIB</p><p>The type of interface.</p><p>Additional values for ifType are assigned by the Internet Assigned Numbers Authority (IANA),</p><p>through updating the syntax of the IANAifType textual convention.</p>|Dependent item|net.if.type[ifType.{#SNMPINDEX}]<p>**Preprocessing**</p><ul><li><p>SNMP walk value: `1.3.6.1.2.1.2.2.1.3.{#SNMPINDEX}`</p></li><li><p>Discard unchanged with heartbeat: `1d`</p></li></ul>|
-|Interface {#IFNAME}({#IFALIAS}): Speed|<p>MIB: IF-MIB</p><p>An estimate of the interface's current bandwidth in bits per second.</p><p>For interfaces which do not vary in bandwidth or for those where no accurate estimation can be made,</p><p>this object should contain the nominal bandwidth.</p><p>If the bandwidth of the interface is greater than the maximum value reportable by this object then</p><p>this object should report its maximum value (4,294,967,295) and ifHighSpeed must be used to report the interface's speed.</p><p>For a sub-layer which has no concept of bandwidth, this object should be zero.</p>|Dependent item|net.if.speed[ifSpeed.{#SNMPINDEX}]<p>**Preprocessing**</p><ul><li><p>SNMP walk value: `1.3.6.1.2.1.2.2.1.5.{#SNMPINDEX}`</p></li><li><p>Discard unchanged with heartbeat: `5m`</p></li></ul>|
+|Interface {#IFNAME}({#IFALIAS}): Speed|<p>MIB: IF-MIB</p><p>An estimate of the interface's current bandwidth in units of 1,000,000 bits per second. If this object reports a value of `n`, then the speed of the interface is somewhere in the range of `n-500,000` to `n+499,999`.</p><p>For interfaces which do not vary in bandwidth or for those where no accurate estimation can be made, this object should contain the nominal bandwidth.</p><p>For a sub-layer which has no concept of bandwidth, this object should be zero.</p>|Dependent item|net.if.speed[ifHighSpeed.{#SNMPINDEX}]<p>**Preprocessing**</p><ul><li><p>SNMP walk value: `1.3.6.1.2.1.31.1.1.1.15.{#SNMPINDEX}`</p></li><li><p>Custom multiplier: `1000000`</p></li><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
 
 ### Trigger prototypes for Network interfaces discovery
 
 |Name|Description|Expression|Severity|Dependencies and additional info|
 |----|-----------|----------|--------|--------------------------------|
 |Ciena: Interface {#IFNAME}({#IFALIAS}): Link down|<p>This trigger expression works as follows:<br>1. It can be triggered if the operations status is down.<br>2. `{$IFCONTROL:"{#IFNAME}"}=1` - a user can redefine the context macro to "0", marking this interface as not important. No new trigger will be fired if this interface is down.<br>3. `last(/TEMPLATE_NAME/METRIC,#1)<>last(/TEMPLATE_NAME/METRIC,#2)` - the trigger fires only if the operational status was up to (1) sometime before (so, does not fire for "eternal off" interfaces.)<br><br>WARNING: if closed manually - it will not fire again on the next poll, because of .diff.</p>|`{$IFCONTROL:"{#IFNAME}"}=1 and last(/Ciena 3906 by SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}])=2 and (last(/Ciena 3906 by SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}],#1)<>last(/Ciena 3906 by SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}],#2))`|Average|**Manual close**: Yes|
-|Ciena: Interface {#IFNAME}({#IFALIAS}): High bandwidth usage|<p>The utilization of the network interface is close to its estimated maximum bandwidth.</p>|`(avg(/Ciena 3906 by SNMP/net.if.in[ifInOctets.{#SNMPINDEX}],15m)>({$IF.UTIL.MAX:"{#IFNAME}"}/100)*last(/Ciena 3906 by SNMP/net.if.speed[ifSpeed.{#SNMPINDEX}]) or avg(/Ciena 3906 by SNMP/net.if.out[ifOutOctets.{#SNMPINDEX}],15m)>({$IF.UTIL.MAX:"{#IFNAME}"}/100)*last(/Ciena 3906 by SNMP/net.if.speed[ifSpeed.{#SNMPINDEX}])) and last(/Ciena 3906 by SNMP/net.if.speed[ifSpeed.{#SNMPINDEX}])>0`|Warning|**Manual close**: Yes<br>**Depends on**:<br><ul><li>Ciena: Interface {#IFNAME}({#IFALIAS}): Link down</li></ul>|
+|Ciena: Interface {#IFNAME}({#IFALIAS}): High bandwidth usage|<p>The utilization of the network interface is close to its estimated maximum bandwidth.</p>|`(avg(/Ciena 3906 by SNMP/net.if.in[ifHCInOctets.{#SNMPINDEX}],15m)>({$IF.UTIL.MAX:"{#IFNAME}"}/100)*last(/Ciena 3906 by SNMP/net.if.speed[ifHighSpeed.{#SNMPINDEX}]) or avg(/Ciena 3906 by SNMP/net.if.out[ifHCOutOctets.{#SNMPINDEX}],15m)>({$IF.UTIL.MAX:"{#IFNAME}"}/100)*last(/Ciena 3906 by SNMP/net.if.speed[ifHighSpeed.{#SNMPINDEX}])) and last(/Ciena 3906 by SNMP/net.if.speed[ifHighSpeed.{#SNMPINDEX}])>0`|Warning|**Manual close**: Yes<br>**Depends on**:<br><ul><li>Ciena: Interface {#IFNAME}({#IFALIAS}): Link down</li></ul>|
 |Ciena: Interface {#IFNAME}({#IFALIAS}): High error rate|<p>It recovers when it is below 80% of the `{$IF.ERRORS.WARN:"{#IFNAME}"}` threshold.</p>|`min(/Ciena 3906 by SNMP/net.if.in.errors[ifInErrors.{#SNMPINDEX}],5m)>{$IF.ERRORS.WARN:"{#IFNAME}"} or min(/Ciena 3906 by SNMP/net.if.out.errors[ifOutErrors.{#SNMPINDEX}],5m)>{$IF.ERRORS.WARN:"{#IFNAME}"}`|Warning|**Manual close**: Yes<br>**Depends on**:<br><ul><li>Ciena: Interface {#IFNAME}({#IFALIAS}): Link down</li></ul>|
-|Ciena: Interface {#IFNAME}({#IFALIAS}): Ethernet has changed to lower speed than it was before|<p>This Ethernet connection has transitioned down from its known maximum speed. This might be a sign of autonegotiation issues. Acknowledge to close the problem manually.</p>|`change(/Ciena 3906 by SNMP/net.if.speed[ifSpeed.{#SNMPINDEX}])<0 and last(/Ciena 3906 by SNMP/net.if.speed[ifSpeed.{#SNMPINDEX}])>0 and ( last(/Ciena 3906 by SNMP/net.if.type[ifType.{#SNMPINDEX}])=6 or last(/Ciena 3906 by SNMP/net.if.type[ifType.{#SNMPINDEX}])=7 or last(/Ciena 3906 by SNMP/net.if.type[ifType.{#SNMPINDEX}])=11 or last(/Ciena 3906 by SNMP/net.if.type[ifType.{#SNMPINDEX}])=62 or last(/Ciena 3906 by SNMP/net.if.type[ifType.{#SNMPINDEX}])=69 or last(/Ciena 3906 by SNMP/net.if.type[ifType.{#SNMPINDEX}])=117 ) and (last(/Ciena 3906 by SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}])<>2)`|Info|**Manual close**: Yes<br>**Depends on**:<br><ul><li>Ciena: Interface {#IFNAME}({#IFALIAS}): Link down</li></ul>|
+|Ciena: Interface {#IFNAME}({#IFALIAS}): Ethernet has changed to lower speed than it was before|<p>This Ethernet connection has transitioned down from its known maximum speed. This might be a sign of autonegotiation issues. Acknowledge to close the problem manually.</p>|`change(/Ciena 3906 by SNMP/net.if.speed[ifHighSpeed.{#SNMPINDEX}])<0 and last(/Ciena 3906 by SNMP/net.if.speed[ifHighSpeed.{#SNMPINDEX}])>0 and ( last(/Ciena 3906 by SNMP/net.if.type[ifType.{#SNMPINDEX}])=6 or last(/Ciena 3906 by SNMP/net.if.type[ifType.{#SNMPINDEX}])=7 or last(/Ciena 3906 by SNMP/net.if.type[ifType.{#SNMPINDEX}])=11 or last(/Ciena 3906 by SNMP/net.if.type[ifType.{#SNMPINDEX}])=62 or last(/Ciena 3906 by SNMP/net.if.type[ifType.{#SNMPINDEX}])=69 or last(/Ciena 3906 by SNMP/net.if.type[ifType.{#SNMPINDEX}])=117 ) and (last(/Ciena 3906 by SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}])<>2)`|Info|**Manual close**: Yes<br>**Depends on**:<br><ul><li>Ciena: Interface {#IFNAME}({#IFALIAS}): Link down</li></ul>|
 
 ## Feedback
 

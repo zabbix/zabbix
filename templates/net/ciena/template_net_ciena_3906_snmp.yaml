@@ -28,6 +28,94 @@ zabbix_export:
       groups:
         - name: 'Templates/Network devices'
       items:
+        - uuid: df073cbb8335403b826eb05b70c8571e
+          name: 'CPU utilization'
+          type: SNMP_AGENT
+          snmp_oid: 'get[1.3.6.1.4.1.6141.2.60.12.1.11.9.0]'
+          key: ciena.cpu.utilization
+          value_type: FLOAT
+          units: '%'
+          description: |
+            MIB: WWP-LEOS-SYSTEM-CONFIG-MIB
+            The 60 seconds CPU usage state.
+          tags:
+            - tag: component
+              value: cpu
+          triggers:
+            - uuid: 9381eddcc6c14189b073fa7ec1627eb5
+              expression: 'min(/Ciena 3906 by SNMP/ciena.cpu.utilization,5m)>{$CIENA.CPU.UTIL.CRIT}'
+              name: 'Ciena: High CPU utilization'
+              event_name: 'Ciena: High CPU utilization (over {$CIENA.CPU.UTIL.CRIT}% for 5m)'
+              opdata: 'Current utilization: {ITEM.LASTVALUE1}'
+              priority: WARNING
+              description: 'The CPU utilization is too high. The system might be slow to respond.'
+              tags:
+                - tag: scope
+                  value: capacity
+                - tag: scope
+                  value: performance
+        - uuid: 5f452c7b72e54d59b20118fe2384a071
+          name: 'Memory available'
+          type: SNMP_AGENT
+          snmp_oid: 'get[1.3.6.1.4.1.6141.2.60.12.1.13.4.0]'
+          key: ciena.memory.available
+          units: B
+          description: |
+            MIB: WWP-LEOS-SYSTEM-CONFIG-MIB
+            Current number of available memory in bytes.
+          preprocessing:
+            - type: MULTIPLIER
+              parameters:
+                - '1024'
+            - type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 1h
+          tags:
+            - tag: component
+              value: memory
+        - uuid: 4a1490cfe12c41239a2979163f6d1d75
+          name: 'Memory used'
+          type: SNMP_AGENT
+          snmp_oid: 'get[1.3.6.1.4.1.6141.2.60.12.1.13.1.0]'
+          key: ciena.memory.used
+          units: B
+          description: |
+            MIB: WWP-LEOS-SYSTEM-CONFIG-MIB
+            Current number of used memory in bytes.
+          preprocessing:
+            - type: MULTIPLIER
+              parameters:
+                - '1024'
+            - type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 1h
+          tags:
+            - tag: component
+              value: memory
+        - uuid: a1c72b2649f04169b757ca1be27ae328
+          name: 'Memory utilization'
+          type: CALCULATED
+          key: ciena.memory.utilization
+          value_type: FLOAT
+          units: '%'
+          params: 'last(//ciena.memory.used) * 100 / (last(//ciena.memory.used) + last(//ciena.memory.available))'
+          description: 'Current memory utilization in percent.'
+          tags:
+            - tag: component
+              value: memory
+          triggers:
+            - uuid: f4a8c13d12cd4800a0a7adbb07345167
+              expression: 'min(/Ciena 3906 by SNMP/ciena.memory.utilization,5m)>{$CIENA.MEMORY.UTIL.MAX}'
+              name: 'Ciena: High memory utilization'
+              event_name: 'Ciena: High memory utilization (>{$CIENA.MEMORY.UTIL.MAX}% for 5m)'
+              opdata: 'Current utilization: {ITEM.LASTVALUE1}'
+              priority: AVERAGE
+              description: 'The system is running out of free memory.'
+              tags:
+                - tag: scope
+                  value: capacity
+                - tag: scope
+                  value: performance
         - uuid: 6cc4a72569f64f79ae10e552c2fdbd58
           name: 'ICMP ping'
           type: SIMPLE
@@ -101,10 +189,10 @@ zabbix_export:
                   value: availability
                 - tag: scope
                   value: performance
-        - uuid: cc361346cbb9471780b41dc0cb6ada19
+        - uuid: 5c3f8f0ae5ed4226916d0edb195535fc
           name: 'SNMP walk network interfaces'
           type: SNMP_AGENT
-          snmp_oid: 'walk[1.3.6.1.2.1.2.2.1.8,1.3.6.1.2.1.2.2.1.7,1.3.6.1.2.1.31.1.1.1.18,1.3.6.1.2.1.31.1.1.1.1,1.3.6.1.2.1.2.2.1.2,1.3.6.1.2.1.2.2.1.3,1.3.6.1.2.1.2.2.1.10,1.3.6.1.2.1.2.2.1.16,1.3.6.1.2.1.2.2.1.14,1.3.6.1.2.1.2.2.1.20,1.3.6.1.2.1.2.2.1.19,1.3.6.1.2.1.2.2.1.13,1.3.6.1.2.1.2.2.1.5]'
+          snmp_oid: 'walk[1.3.6.1.2.1.2.2.1.8,1.3.6.1.2.1.2.2.1.7,1.3.6.1.2.1.31.1.1.1.18,1.3.6.1.2.1.31.1.1.1.1,1.3.6.1.2.1.2.2.1.2,1.3.6.1.2.1.2.2.1.3,1.3.6.1.2.1.31.1.1.1.6,1.3.6.1.2.1.31.1.1.1.10,1.3.6.1.2.1.2.2.1.14,1.3.6.1.2.1.2.2.1.20,1.3.6.1.2.1.2.2.1.19,1.3.6.1.2.1.2.2.1.13,1.3.6.1.2.1.31.1.1.1.15]'
           key: net.if.walk
           history: '0'
           value_type: TEXT
@@ -140,19 +228,6 @@ zabbix_export:
           tags:
             - tag: component
               value: system
-        - uuid: 44716393d6c241fd9f8ccca3df248ba0
-          name: 'SNMP walk system CPUs'
-          type: SNMP_AGENT
-          snmp_oid: 'walk[1.3.6.1.4.1.6141.2.60.12.1.7,1.3.6.1.4.1.6141.2.60.12.1.11]'
-          key: system.cpu.walk
-          history: '0'
-          value_type: TEXT
-          description: |
-            MIB: WWP-LEOS-SYSTEM-CONFIG-MIB
-            Discovering system CPUs.
-          tags:
-            - tag: component
-              value: raw
         - uuid: 5ad8efff2bb8429ab122b97e834cce38
           name: 'System description'
           type: SNMP_AGENT
@@ -188,7 +263,7 @@ zabbix_export:
         - uuid: 487b6faac2b94edbb7109b35b6cffe48
           name: 'Hardware model name'
           type: SNMP_AGENT
-          snmp_oid: 1.3.6.1.4.1.6141.2.60.1.1.1.2.1.7.1
+          snmp_oid: 'get[1.3.6.1.4.1.6141.2.60.1.1.1.2.1.7.1]'
           key: system.hw.model
           delay: 1h
           value_type: CHAR
@@ -205,7 +280,7 @@ zabbix_export:
         - uuid: 349aa5e2814644499e1391ffd5e2ffdf
           name: 'Hardware serial number'
           type: SNMP_AGENT
-          snmp_oid: 1.3.6.1.4.1.6141.2.60.1.1.1.2.1.2.1
+          snmp_oid: 'get[1.3.6.1.4.1.6141.2.60.1.1.1.2.1.2.1]'
           key: system.hw.serialnumber
           delay: 1h
           value_type: CHAR
@@ -256,7 +331,7 @@ zabbix_export:
         - uuid: 0cdb06e8f6ac4b33a47bdce499465efa
           name: 'Hardware version (revision)'
           type: SNMP_AGENT
-          snmp_oid: 1.3.6.1.4.1.6141.2.60.1.1.1.2.1.3.1
+          snmp_oid: 'get[1.3.6.1.4.1.6141.2.60.1.1.1.2.1.3.1]'
           key: system.hw.version
           delay: 1h
           value_type: CHAR
@@ -288,19 +363,6 @@ zabbix_export:
           tags:
             - tag: component
               value: system
-        - uuid: 8d78fa5bfdbd4e239160ac1fae0a201a
-          name: 'SNMP walk memory'
-          type: SNMP_AGENT
-          snmp_oid: 'walk[1.3.6.1.4.1.6141.2.60.12.1.13]'
-          key: system.memory.walk
-          history: '0'
-          value_type: TEXT
-          description: |
-            MIB: WWP-LEOS-SYSTEM-CONFIG-MIB
-            Discovering system memory.
-          tags:
-            - tag: component
-              value: raw
         - uuid: cb271362beb143ec866e7cb0d58a27ca
           name: 'System name'
           type: SNMP_AGENT
@@ -368,7 +430,7 @@ zabbix_export:
             - tag: component
               value: system
         - uuid: 6ff62d92f45f48bdbd901276795b0bbc
-          name: 'SNMP walk psu'
+          name: 'SNMP walk PSU'
           type: SNMP_AGENT
           snmp_oid: 'walk[1.3.6.1.4.1.6141.2.60.11.1.1.3.1.1]'
           key: system.psu.walk
@@ -381,15 +443,15 @@ zabbix_export:
             - tag: component
               value: raw
         - uuid: e06e318827b048b7970f6107adc3b68d
-          name: 'SNMP walk sensors'
+          name: 'SNMP walk temperature sensors'
           type: SNMP_AGENT
           snmp_oid: 'walk[1.3.6.1.4.1.6141.2.60.11.1.1.5.1.1]'
-          key: system.sensor.walk
+          key: system.temperature.sensor.walk
           history: '0'
           value_type: TEXT
           description: |
             MIB: WWP-LEOS-CHASSIS-MIB
-            Discovering system sensors.
+            Discovering system temperature sensors.
           tags:
             - tag: component
               value: raw
@@ -424,67 +486,6 @@ zabbix_export:
                 - tag: scope
                   value: availability
       discovery_rules:
-        - uuid: 7c6dfd799e2445f78bb6d840ac62de8d
-          name: 'CPU Discovery'
-          type: DEPENDENT
-          key: ciena.cpu.discovery
-          description: 'Discovering CPUs from WWP-LEOS-SYSTEM-CONFIG-MIB.'
-          item_prototypes:
-            - uuid: df073cbb8335403b826eb05b70c8571e
-              name: 'CPU [{#SNMPINDEX}]: Utilization'
-              type: DEPENDENT
-              key: 'ciena.cpu.util[CpuUtilizationLast60Seconds.{#SNMPINDEX}]'
-              value_type: FLOAT
-              units: '%'
-              description: |
-                MIB: WWP-LEOS-SYSTEM-CONFIG-MIB
-                The 60 seconds CPU usage state.
-              preprocessing:
-                - type: SNMP_WALK_VALUE
-                  parameters:
-                    - '1.3.6.1.4.1.6141.2.60.12.1.11.9.{#SNMPINDEX}'
-                    - '0'
-              master_item:
-                key: system.cpu.walk
-              tags:
-                - tag: component
-                  value: cpu
-              trigger_prototypes:
-                - uuid: 9381eddcc6c14189b073fa7ec1627eb5
-                  expression: 'min(/Ciena 3906 by SNMP/ciena.cpu.util[CpuUtilizationLast60Seconds.{#SNMPINDEX}],5m)>{$CIENA.CPU.UTIL.CRIT}'
-                  name: 'Ciena: CPU [{#SNMPINDEX}]: High CPU utilization'
-                  event_name: 'Ciena: CPU [{#SNMPINDEX}]: High CPU utilization (over {$CIENA.CPU.UTIL.CRIT}% for 5m)'
-                  opdata: 'Current utilization: {ITEM.LASTVALUE1}'
-                  priority: WARNING
-                  description: 'The CPU utilization is too high. The system might be slow to respond.'
-                  tags:
-                    - tag: scope
-                      value: capacity
-                    - tag: scope
-                      value: performance
-          graph_prototypes:
-            - uuid: 652efbd1e8d44865acfc633866116b5a
-              name: 'Ciena: CPU [{#SNMPINDEX}]: Utilization'
-              ymin_type_1: FIXED
-              ymax_type_1: FIXED
-              graph_items:
-                - drawtype: GRADIENT_LINE
-                  color: 199C0D
-                  item:
-                    host: 'Ciena 3906 by SNMP'
-                    key: 'ciena.cpu.util[CpuUtilizationLast60Seconds.{#SNMPINDEX}]'
-          master_item:
-            key: system.cpu.walk
-          preprocessing:
-            - type: SNMP_WALK_TO_JSON
-              parameters:
-                - '{#SNMPVALUE}'
-                - 1.3.6.1.4.1.6141.2.60.12.1.7.7
-                - '0'
-              error_handler: DISCARD_VALUE
-            - type: DISCARD_UNCHANGED_HEARTBEAT
-              parameters:
-                - 1h
         - uuid: 33cb92289fcf4e34ba1c5f4d21b9aee4
           name: 'Fan Discovery'
           type: DEPENDENT
@@ -524,7 +525,7 @@ zabbix_export:
                 2 - 'pending' means fan is installed but statistics are not yet available;
                 3 - 'failure' means fan is not working.
               valuemap:
-                name: 'Fan status'
+                name: 'WWP-LEOS-CHASSIS-MIB::wwpLeosChassisFanModuleStatus'
               preprocessing:
                 - type: SNMP_WALK_VALUE
                   parameters:
@@ -562,107 +563,6 @@ zabbix_export:
             - type: DISCARD_UNCHANGED_HEARTBEAT
               parameters:
                 - 1h
-        - uuid: bd354dda05fb48beab9034c8ea4f66f5
-          name: 'Memory Discovery'
-          type: DEPENDENT
-          key: ciena.memory.discovery
-          description: 'Discovering memory from WWP-LEOS-SYSTEM-CONFIG-MIB.'
-          item_prototypes:
-            - uuid: a1c72b2649f04169b757ca1be27ae328
-              name: 'Memory [{#SNMPINDEX}]: Utilization'
-              type: CALCULATED
-              key: 'ciena.memory.utilization[{#SNMPINDEX}]'
-              value_type: FLOAT
-              units: '%'
-              params: 'last(//ciena.memory.util[MemoryUtilizationUsedMemoryCurrent.{#SNMPINDEX}]) * 100 / (last(//ciena.memory.util[MemoryUtilizationUsedMemoryCurrent.{#SNMPINDEX}]) + last(//ciena.memory.util[MemoryUtilizationAvailableMemoryCurrent.{#SNMPINDEX}]))'
-              description: 'Current memory utilization in percent.'
-              tags:
-                - tag: component
-                  value: memory
-              trigger_prototypes:
-                - uuid: f4a8c13d12cd4800a0a7adbb07345167
-                  expression: 'min(/Ciena 3906 by SNMP/ciena.memory.utilization[{#SNMPINDEX}],5m)>{$CIENA.MEMORY.UTIL.MAX}'
-                  name: 'Ciena: Memory [{#SNMPINDEX}]: High memory utilization'
-                  event_name: 'Ciena: Memory [{#SNMPINDEX}]: High memory utilization (>{$CIENA.MEMORY.UTIL.MAX}% for 5m)'
-                  opdata: 'Current utilization: {ITEM.LASTVALUE1}'
-                  priority: AVERAGE
-                  description: 'The system is running out of free memory.'
-                  tags:
-                    - tag: scope
-                      value: capacity
-                    - tag: scope
-                      value: performance
-            - uuid: 5f452c7b72e54d59b20118fe2384a071
-              name: 'Memory [{#SNMPINDEX}]: Available'
-              type: DEPENDENT
-              key: 'ciena.memory.util[MemoryUtilizationAvailableMemoryCurrent.{#SNMPINDEX}]'
-              units: B
-              description: |
-                MIB: WWP-LEOS-SYSTEM-CONFIG-MIB
-                Current number of available memory in bytes.
-              preprocessing:
-                - type: SNMP_WALK_VALUE
-                  parameters:
-                    - '1.3.6.1.4.1.6141.2.60.12.1.13.4.{#SNMPINDEX}'
-                    - '0'
-                - type: MULTIPLIER
-                  parameters:
-                    - '1024'
-                - type: DISCARD_UNCHANGED_HEARTBEAT
-                  parameters:
-                    - 1h
-              master_item:
-                key: system.memory.walk
-              tags:
-                - tag: component
-                  value: memory
-            - uuid: 4a1490cfe12c41239a2979163f6d1d75
-              name: 'Memory [{#SNMPINDEX}]: Used'
-              type: DEPENDENT
-              key: 'ciena.memory.util[MemoryUtilizationUsedMemoryCurrent.{#SNMPINDEX}]'
-              units: B
-              description: |
-                MIB: WWP-LEOS-SYSTEM-CONFIG-MIB
-                Current number of used memory in bytes.
-              preprocessing:
-                - type: SNMP_WALK_VALUE
-                  parameters:
-                    - '1.3.6.1.4.1.6141.2.60.12.1.13.1.{#SNMPINDEX}'
-                    - '0'
-                - type: MULTIPLIER
-                  parameters:
-                    - '1024'
-                - type: DISCARD_UNCHANGED_HEARTBEAT
-                  parameters:
-                    - 1h
-              master_item:
-                key: system.memory.walk
-              tags:
-                - tag: component
-                  value: memory
-          graph_prototypes:
-            - uuid: 376c15f14b414caab715650ce9c86e0f
-              name: 'Ciena: Memory [{#SNMPINDEX}]: Utilization'
-              ymin_type_1: FIXED
-              ymax_type_1: FIXED
-              graph_items:
-                - drawtype: GRADIENT_LINE
-                  color: 199C0D
-                  item:
-                    host: 'Ciena 3906 by SNMP'
-                    key: 'ciena.memory.utilization[{#SNMPINDEX}]'
-          master_item:
-            key: system.memory.walk
-          preprocessing:
-            - type: SNMP_WALK_TO_JSON
-              parameters:
-                - '{#SNMPVALUE}'
-                - 1.3.6.1.4.1.6141.2.60.12.1.13.7
-                - '0'
-              error_handler: DISCARD_VALUE
-            - type: DISCARD_UNCHANGED_HEARTBEAT
-              parameters:
-                - 1h
         - uuid: b6301c49acbc4b8cb73737ddea2af97a
           name: 'PSU Discovery'
           type: DEPENDENT
@@ -681,7 +581,7 @@ zabbix_export:
                 2 - offline;
                 3 - faulted.
               valuemap:
-                name: 'Power supply status'
+                name: 'WWP-LEOS-CHASSIS-MIB::wwpLeosChassisPowerSupplyState'
               preprocessing:
                 - type: SNMP_WALK_VALUE
                   parameters:
@@ -718,57 +618,15 @@ zabbix_export:
               parameters:
                 - 1h
         - uuid: bc76e20f951648a49459b4541f812183
-          name: 'Sensor Discovery'
+          name: 'Temperature sensor Discovery'
           type: DEPENDENT
-          key: ciena.sensor.discovery
-          description: 'Discovering sensors from WWP-LEOS-CHASSIS-MIB.'
+          key: ciena.temperature.sensor.discovery
+          description: 'Discovering temperature sensors from WWP-LEOS-CHASSIS-MIB.'
           item_prototypes:
-            - uuid: 186687a522644063b7313ac75b3a03f3
-              name: 'Sensor [{#SNMPVALUE}]: High temperature threshold'
-              type: DEPENDENT
-              key: 'ciena.sensors.threshold[ChassisTempSensorHighThreshold.{#SNMPINDEX}]'
-              units: °C
-              description: |
-                MIB: WWP-LEOS-CHASSIS-MIB
-                The highest value that the object wwpLeosChassisTempSensorValue may obtain.
-              preprocessing:
-                - type: SNMP_WALK_VALUE
-                  parameters:
-                    - '1.3.6.1.4.1.6141.2.60.11.1.1.5.1.1.3.{#SNMPINDEX}'
-                    - '0'
-                - type: DISCARD_UNCHANGED_HEARTBEAT
-                  parameters:
-                    - 1d
-              master_item:
-                key: system.sensor.walk
-              tags:
-                - tag: component
-                  value: sensor
-            - uuid: e7ff28ae938f43dd920d6f0f286906f8
-              name: 'Sensor [{#SNMPVALUE}]: Low temperature threshold'
-              type: DEPENDENT
-              key: 'ciena.sensors.threshold[ChassisTempSensorLowThreshold.{#SNMPINDEX}]'
-              units: °C
-              description: |
-                MIB: WWP-LEOS-CHASSIS-MIB
-                The Lowest value that the object wwpLeosChassisTempSensorValue may obtain.
-              preprocessing:
-                - type: SNMP_WALK_VALUE
-                  parameters:
-                    - '1.3.6.1.4.1.6141.2.60.11.1.1.5.1.1.4.{#SNMPINDEX}'
-                    - '0'
-                - type: DISCARD_UNCHANGED_HEARTBEAT
-                  parameters:
-                    - 1d
-              master_item:
-                key: system.sensor.walk
-              tags:
-                - tag: component
-                  value: sensor
             - uuid: 83c809987bd84bc7bfd74ea25644706a
               name: 'Sensor [{#SNMPVALUE}]: Temperature'
               type: DEPENDENT
-              key: 'ciena.sensors.util[ChassisTempSensorValue.{#SNMPINDEX}]'
+              key: 'ciena.temperature.sensors.temp[ChassisTempSensorValue.{#SNMPINDEX}]'
               units: °C
               description: |
                 MIB: WWP-LEOS-CHASSIS-MIB
@@ -782,33 +640,33 @@ zabbix_export:
                   parameters:
                     - 1h
               master_item:
-                key: system.sensor.walk
+                key: system.temperature.sensor.walk
               tags:
                 - tag: component
                   value: sensor
-          trigger_prototypes:
-            - uuid: a53a816efa4c49e08ccc18ea7bcd7046
-              expression: 'min(/Ciena 3906 by SNMP/ciena.sensors.util[ChassisTempSensorValue.{#SNMPINDEX}],5m)>last(/Ciena 3906 by SNMP/ciena.sensors.threshold[ChassisTempSensorHighThreshold.{#SNMPINDEX}])'
-              name: 'Ciena: Sensor [{#SNMPVALUE}]: High chassis temperature'
-              event_name: 'Ciena: Sensor [{#SNMPVALUE}]: High chassis temperature (>{ITEM.LASTVALUE2} °C)'
-              priority: AVERAGE
-              description: 'The current temp is greater than the threshold state.'
-              tags:
-                - tag: scope
-                  value: availability
-                - tag: scope
-                  value: performance
-            - uuid: a484e0bb091c4abea5db311d91083d0f
-              expression: 'max(/Ciena 3906 by SNMP/ciena.sensors.util[ChassisTempSensorValue.{#SNMPINDEX}],5m)<last(/Ciena 3906 by SNMP/ciena.sensors.threshold[ChassisTempSensorLowThreshold.{#SNMPINDEX}])'
-              name: 'Ciena: Sensor [{#SNMPVALUE}]: Low chassis temperature'
-              event_name: 'Ciena: Sensor [{#SNMPVALUE}]: Low chassis temperature (<{ITEM.LASTVALUE2} °C)'
-              priority: AVERAGE
-              description: 'The current temp is less than the threshold state.'
-              tags:
-                - tag: scope
-                  value: availability
-                - tag: scope
-                  value: performance
+              trigger_prototypes:
+                - uuid: a53a816efa4c49e08ccc18ea7bcd7046
+                  expression: 'min(/Ciena 3906 by SNMP/ciena.temperature.sensors.temp[ChassisTempSensorValue.{#SNMPINDEX}],5m)>{#CIENA.TEMPERATURE.HIGH}'
+                  name: 'Ciena: Sensor [{#SNMPVALUE}]: High chassis temperature'
+                  event_name: 'Ciena: Sensor [{#SNMPVALUE}]: High chassis temperature (>{#CIENA.TEMPERATURE.HIGH} °C)'
+                  priority: AVERAGE
+                  description: 'The current temp is greater than the threshold state.'
+                  tags:
+                    - tag: scope
+                      value: availability
+                    - tag: scope
+                      value: performance
+                - uuid: a484e0bb091c4abea5db311d91083d0f
+                  expression: 'max(/Ciena 3906 by SNMP/ciena.temperature.sensors.temp[ChassisTempSensorValue.{#SNMPINDEX}],5m)<{#CIENA.TEMPERATURE.LOW}'
+                  name: 'Ciena: Sensor [{#SNMPVALUE}]: Low chassis temperature'
+                  event_name: 'Ciena: Sensor [{#SNMPVALUE}]: Low chassis temperature (<{#CIENA.TEMPERATURE.LOW} °C)'
+                  priority: AVERAGE
+                  description: 'The current temp is less than the threshold state.'
+                  tags:
+                    - tag: scope
+                      value: availability
+                    - tag: scope
+                      value: performance
           graph_prototypes:
             - uuid: f90cac3fc8964b9e874d0fc160ac0304
               name: 'Ciena: Sensor [{#SNMPVALUE}]: Temperature'
@@ -819,20 +677,26 @@ zabbix_export:
                   color: 199C0D
                   item:
                     host: 'Ciena 3906 by SNMP'
-                    key: 'ciena.sensors.util[ChassisTempSensorValue.{#SNMPINDEX}]'
+                    key: 'ciena.temperature.sensors.temp[ChassisTempSensorValue.{#SNMPINDEX}]'
           master_item:
-            key: system.sensor.walk
+            key: system.temperature.sensor.walk
           preprocessing:
             - type: SNMP_WALK_TO_JSON
               parameters:
                 - '{#SNMPVALUE}'
                 - 1.3.6.1.4.1.6141.2.60.11.1.1.5.1.1.1
                 - '0'
+                - '{#CIENA.TEMPERATURE.HIGH}'
+                - 1.3.6.1.4.1.6141.2.60.11.1.1.5.1.1.3
+                - '0'
+                - '{#CIENA.TEMPERATURE.LOW}'
+                - 1.3.6.1.4.1.6141.2.60.11.1.1.5.1.1.4
+                - '0'
               error_handler: DISCARD_VALUE
             - type: DISCARD_UNCHANGED_HEARTBEAT
               parameters:
                 - 1h
-        - uuid: 9b60982f1cff4c14959e77935f8a3db6
+        - uuid: f62c23005aa7433ea0af5ae1052253c6
           name: 'Network interfaces discovery'
           type: DEPENDENT
           key: net.if.discovery
@@ -871,7 +735,7 @@ zabbix_export:
                 operator: NOT_MATCHES_REGEX
           description: 'Discovering interfaces from IF-MIB.'
           item_prototypes:
-            - uuid: 5724fac071b740a8b5ba79d1a1feabfc
+            - uuid: a86af1fb203c437ab9532549faf513af
               name: 'Interface {#IFNAME}({#IFALIAS}): Inbound packets discarded'
               type: DEPENDENT
               key: 'net.if.in.discards[ifInDiscards.{#SNMPINDEX}]'
@@ -900,7 +764,7 @@ zabbix_export:
                   value: '{#IFALIAS}'
                 - tag: interface
                   value: '{#IFNAME}'
-            - uuid: 2387db5cfc764a7fb84fa116feea97ac
+            - uuid: 9bfbcb75f0f647ed8b6119ebb51655d1
               name: 'Interface {#IFNAME}({#IFALIAS}): Inbound packets with errors'
               type: DEPENDENT
               key: 'net.if.in.errors[ifInErrors.{#SNMPINDEX}]'
@@ -925,18 +789,18 @@ zabbix_export:
                   value: '{#IFALIAS}'
                 - tag: interface
                   value: '{#IFNAME}'
-            - uuid: 4fbcd7076dd14b3fafc8b07240ac4a4a
+            - uuid: 9c9b04b35d3d473f9e72f94306323ebc
               name: 'Interface {#IFNAME}({#IFALIAS}): Bits received'
               type: DEPENDENT
-              key: 'net.if.in[ifInOctets.{#SNMPINDEX}]'
+              key: 'net.if.in[ifHCInOctets.{#SNMPINDEX}]'
               units: bps
               description: |
                 MIB: IF-MIB
-                The total number of octets received on the interface,including framing characters. Discontinuities in the value of this counter can occur at re-initialization of the management system, and another times as indicated by the value of ifCounterDiscontinuityTime.
+                The total number of octets received on the interface, including framing characters. This object is a 64-bit version of ifInOctets. Discontinuities in the value of this counter can occur at re-initialization of the management system, and at other times as indicated by the value of ifCounterDiscontinuityTime.
               preprocessing:
                 - type: SNMP_WALK_VALUE
                   parameters:
-                    - '1.3.6.1.2.1.2.2.1.10.{#SNMPINDEX}'
+                    - '1.3.6.1.2.1.31.1.1.1.6.{#SNMPINDEX}'
                     - '0'
                 - type: CHANGE_PER_SECOND
                 - type: MULTIPLIER
@@ -951,7 +815,7 @@ zabbix_export:
                   value: '{#IFALIAS}'
                 - tag: interface
                   value: '{#IFNAME}'
-            - uuid: cfa6cbf851fe408a8f046709f341c53c
+            - uuid: 8e3439988f19469bbbf0e13bfc867271
               name: 'Interface {#IFNAME}({#IFALIAS}): Outbound packets discarded'
               type: DEPENDENT
               key: 'net.if.out.discards[ifOutDiscards.{#SNMPINDEX}]'
@@ -980,7 +844,7 @@ zabbix_export:
                   value: '{#IFALIAS}'
                 - tag: interface
                   value: '{#IFNAME}'
-            - uuid: b12efc5e671d406496fc937b58bcb951
+            - uuid: 50ef325793684f419620c521187fd8f3
               name: 'Interface {#IFNAME}({#IFALIAS}): Outbound packets with errors'
               type: DEPENDENT
               key: 'net.if.out.errors[ifOutErrors.{#SNMPINDEX}]'
@@ -1005,18 +869,18 @@ zabbix_export:
                   value: '{#IFALIAS}'
                 - tag: interface
                   value: '{#IFNAME}'
-            - uuid: 96ca8ccf99194fbb9da37c53a5dd3278
+            - uuid: 1223311e9fc04cb4b42e43e3c0800a66
               name: 'Interface {#IFNAME}({#IFALIAS}): Bits sent'
               type: DEPENDENT
-              key: 'net.if.out[ifOutOctets.{#SNMPINDEX}]'
+              key: 'net.if.out[ifHCOutOctets.{#SNMPINDEX}]'
               units: bps
               description: |
                 MIB: IF-MIB
-                The total number of octets transmitted out of the interface, including framing characters. Discontinuities in the value of this counter can occur at re-initialization of the management system, and at other times as indicated by the value of ifCounterDiscontinuityTime.
+                The total number of octets transmitted out of the interface, including framing characters. This object is a 64-bit version of ifOutOctets.Discontinuities in the value of this counter can occur at re-initialization of the management system, and at other times as indicated by the value of ifCounterDiscontinuityTime.
               preprocessing:
                 - type: SNMP_WALK_VALUE
                   parameters:
-                    - '1.3.6.1.2.1.2.2.1.16.{#SNMPINDEX}'
+                    - '1.3.6.1.2.1.31.1.1.1.10.{#SNMPINDEX}'
                     - '0'
                 - type: CHANGE_PER_SECOND
                 - type: MULTIPLIER
@@ -1031,28 +895,28 @@ zabbix_export:
                   value: '{#IFALIAS}'
                 - tag: interface
                   value: '{#IFNAME}'
-            - uuid: 43c579d4021947b8856c1c9a3decb5df
+            - uuid: 1ad0ee1ee6f74cad90307a7ff2879e00
               name: 'Interface {#IFNAME}({#IFALIAS}): Speed'
               type: DEPENDENT
-              key: 'net.if.speed[ifSpeed.{#SNMPINDEX}]'
+              key: 'net.if.speed[ifHighSpeed.{#SNMPINDEX}]'
               trends: '0'
               units: bps
               description: |
                 MIB: IF-MIB
-                An estimate of the interface's current bandwidth in bits per second.
-                For interfaces which do not vary in bandwidth or for those where no accurate estimation can be made,
-                this object should contain the nominal bandwidth.
-                If the bandwidth of the interface is greater than the maximum value reportable by this object then
-                this object should report its maximum value (4,294,967,295) and ifHighSpeed must be used to report the interface's speed.
+                An estimate of the interface's current bandwidth in units of 1,000,000 bits per second. If this object reports a value of `n`, then the speed of the interface is somewhere in the range of `n-500,000` to `n+499,999`.
+                For interfaces which do not vary in bandwidth or for those where no accurate estimation can be made, this object should contain the nominal bandwidth.
                 For a sub-layer which has no concept of bandwidth, this object should be zero.
               preprocessing:
                 - type: SNMP_WALK_VALUE
                   parameters:
-                    - '1.3.6.1.2.1.2.2.1.5.{#SNMPINDEX}'
+                    - '1.3.6.1.2.1.31.1.1.1.15.{#SNMPINDEX}'
                     - '0'
+                - type: MULTIPLIER
+                  parameters:
+                    - '1000000'
                 - type: DISCARD_UNCHANGED_HEARTBEAT
                   parameters:
-                    - 5m
+                    - 1h
               master_item:
                 key: net.if.walk
               tags:
@@ -1062,7 +926,7 @@ zabbix_export:
                   value: '{#IFALIAS}'
                 - tag: interface
                   value: '{#IFNAME}'
-            - uuid: d9761e7a44294ca59a2d69a43ea1463b
+            - uuid: b4835bb2c7204531b073e1cece6c211e
               name: 'Interface {#IFNAME}({#IFALIAS}): Operational status'
               type: DEPENDENT
               key: 'net.if.status[ifOperStatus.{#SNMPINDEX}]'
@@ -1093,7 +957,7 @@ zabbix_export:
                 - tag: interface
                   value: '{#IFNAME}'
               trigger_prototypes:
-                - uuid: 37deff7c8a0c4a35ab7c48ff00f410b3
+                - uuid: 6553917026ab486cb92e418c1a0c66a3
                   expression: '{$IFCONTROL:"{#IFNAME}"}=1 and last(/Ciena 3906 by SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}])=2 and (last(/Ciena 3906 by SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}],#1)<>last(/Ciena 3906 by SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}],#2))'
                   recovery_mode: RECOVERY_EXPRESSION
                   recovery_expression: 'last(/Ciena 3906 by SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}])<>2 or {$IFCONTROL:"{#IFNAME}"}=0'
@@ -1111,7 +975,7 @@ zabbix_export:
                   tags:
                     - tag: scope
                       value: availability
-            - uuid: 44950151f6ee45f6a3cc01ac1b10f28c
+            - uuid: 1969604952c44b2ba87bea8193c39ba7
               name: 'Interface {#IFNAME}({#IFALIAS}): Interface type'
               type: DEPENDENT
               key: 'net.if.type[ifType.{#SNMPINDEX}]'
@@ -1141,9 +1005,9 @@ zabbix_export:
                 - tag: interface
                   value: '{#IFNAME}'
           trigger_prototypes:
-            - uuid: bdc1e463dc49419f9fee1233da12b2c7
+            - uuid: b8635b85feb247f59c7997ea4ca4b96a
               expression: |
-                change(/Ciena 3906 by SNMP/net.if.speed[ifSpeed.{#SNMPINDEX}])<0 and last(/Ciena 3906 by SNMP/net.if.speed[ifSpeed.{#SNMPINDEX}])>0
+                change(/Ciena 3906 by SNMP/net.if.speed[ifHighSpeed.{#SNMPINDEX}])<0 and last(/Ciena 3906 by SNMP/net.if.speed[ifHighSpeed.{#SNMPINDEX}])>0
                 and (
                 last(/Ciena 3906 by SNMP/net.if.type[ifType.{#SNMPINDEX}])=6 or
                 last(/Ciena 3906 by SNMP/net.if.type[ifType.{#SNMPINDEX}])=7 or
@@ -1156,7 +1020,7 @@ zabbix_export:
                 (last(/Ciena 3906 by SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}])<>2)
               recovery_mode: RECOVERY_EXPRESSION
               recovery_expression: |
-                (change(/Ciena 3906 by SNMP/net.if.speed[ifSpeed.{#SNMPINDEX}])>0 and last(/Ciena 3906 by SNMP/net.if.speed[ifSpeed.{#SNMPINDEX}],#2)>0) or
+                (change(/Ciena 3906 by SNMP/net.if.speed[ifHighSpeed.{#SNMPINDEX}])>0 and last(/Ciena 3906 by SNMP/net.if.speed[ifHighSpeed.{#SNMPINDEX}],#2)>0) or
                 (last(/Ciena 3906 by SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}])=2)
               name: 'Ciena: Interface {#IFNAME}({#IFALIAS}): Ethernet has changed to lower speed than it was before'
               opdata: 'Current reported speed: {ITEM.LASTVALUE1}'
@@ -1170,15 +1034,15 @@ zabbix_export:
               tags:
                 - tag: scope
                   value: performance
-            - uuid: 21bbba82432f4820b2c86e25f5b0a367
+            - uuid: 411150c8856242228b8092595808f10c
               expression: |
-                (avg(/Ciena 3906 by SNMP/net.if.in[ifInOctets.{#SNMPINDEX}],15m)>({$IF.UTIL.MAX:"{#IFNAME}"}/100)*last(/Ciena 3906 by SNMP/net.if.speed[ifSpeed.{#SNMPINDEX}]) or
-                avg(/Ciena 3906 by SNMP/net.if.out[ifOutOctets.{#SNMPINDEX}],15m)>({$IF.UTIL.MAX:"{#IFNAME}"}/100)*last(/Ciena 3906 by SNMP/net.if.speed[ifSpeed.{#SNMPINDEX}])) and
-                last(/Ciena 3906 by SNMP/net.if.speed[ifSpeed.{#SNMPINDEX}])>0
+                (avg(/Ciena 3906 by SNMP/net.if.in[ifHCInOctets.{#SNMPINDEX}],15m)>({$IF.UTIL.MAX:"{#IFNAME}"}/100)*last(/Ciena 3906 by SNMP/net.if.speed[ifHighSpeed.{#SNMPINDEX}]) or
+                avg(/Ciena 3906 by SNMP/net.if.out[ifHCOutOctets.{#SNMPINDEX}],15m)>({$IF.UTIL.MAX:"{#IFNAME}"}/100)*last(/Ciena 3906 by SNMP/net.if.speed[ifHighSpeed.{#SNMPINDEX}])) and
+                last(/Ciena 3906 by SNMP/net.if.speed[ifHighSpeed.{#SNMPINDEX}])>0
               recovery_mode: RECOVERY_EXPRESSION
               recovery_expression: |
-                avg(/Ciena 3906 by SNMP/net.if.in[ifInOctets.{#SNMPINDEX}],15m)<(({$IF.UTIL.MAX:"{#IFNAME}"}-3)/100)*last(/Ciena 3906 by SNMP/net.if.speed[ifSpeed.{#SNMPINDEX}]) and
-                avg(/Ciena 3906 by SNMP/net.if.out[ifOutOctets.{#SNMPINDEX}],15m)<(({$IF.UTIL.MAX:"{#IFNAME}"}-3)/100)*last(/Ciena 3906 by SNMP/net.if.speed[ifSpeed.{#SNMPINDEX}])
+                avg(/Ciena 3906 by SNMP/net.if.in[ifHCInOctets.{#SNMPINDEX}],15m)<(({$IF.UTIL.MAX:"{#IFNAME}"}-3)/100)*last(/Ciena 3906 by SNMP/net.if.speed[ifHighSpeed.{#SNMPINDEX}]) and
+                avg(/Ciena 3906 by SNMP/net.if.out[ifHCOutOctets.{#SNMPINDEX}],15m)<(({$IF.UTIL.MAX:"{#IFNAME}"}-3)/100)*last(/Ciena 3906 by SNMP/net.if.speed[ifHighSpeed.{#SNMPINDEX}])
               name: 'Ciena: Interface {#IFNAME}({#IFALIAS}): High bandwidth usage'
               event_name: 'Ciena: Interface {#IFNAME}({#IFALIAS}): High bandwidth usage (>{$IF.UTIL.MAX:"{#IFNAME}"}%)'
               opdata: 'In: {ITEM.LASTVALUE1}, out: {ITEM.LASTVALUE3}, speed: {ITEM.LASTVALUE2}'
@@ -1192,7 +1056,7 @@ zabbix_export:
               tags:
                 - tag: scope
                   value: performance
-            - uuid: 1a5574545e32410cb9781325c13c78a2
+            - uuid: 86121173a53e471a9c22876b4c808e23
               expression: |
                 min(/Ciena 3906 by SNMP/net.if.in.errors[ifInErrors.{#SNMPINDEX}],5m)>{$IF.ERRORS.WARN:"{#IFNAME}"}
                 or min(/Ciena 3906 by SNMP/net.if.out.errors[ifOutErrors.{#SNMPINDEX}],5m)>{$IF.ERRORS.WARN:"{#IFNAME}"}
@@ -1212,22 +1076,24 @@ zabbix_export:
                   recovery_expression: 'last(/Ciena 3906 by SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}])<>2 or {$IFCONTROL:"{#IFNAME}"}=0'
               tags:
                 - tag: scope
+                  value: availability
+                - tag: scope
                   value: performance
           graph_prototypes:
-            - uuid: cd57a050f02d4922aee14a5024cc7804
+            - uuid: 0b365ca9e76b4329ab68e567ddc1ca17
               name: 'Interface {#IFNAME}({#IFALIAS}): Network traffic'
               graph_items:
                 - drawtype: GRADIENT_LINE
                   color: 199C0D
                   item:
                     host: 'Ciena 3906 by SNMP'
-                    key: 'net.if.in[ifInOctets.{#SNMPINDEX}]'
+                    key: 'net.if.in[ifHCInOctets.{#SNMPINDEX}]'
                 - sortorder: '1'
                   drawtype: BOLD_LINE
                   color: F63100
                   item:
                     host: 'Ciena 3906 by SNMP'
-                    key: 'net.if.out[ifOutOctets.{#SNMPINDEX}]'
+                    key: 'net.if.out[ifHCOutOctets.{#SNMPINDEX}]'
                 - sortorder: '2'
                   color: 00611C
                   yaxisside: RIGHT
@@ -1275,7 +1141,6 @@ zabbix_export:
                 - '{#IFTYPE}'
                 - 1.3.6.1.2.1.2.2.1.3
                 - '0'
-              error_handler: DISCARD_VALUE
             - type: DISCARD_UNCHANGED_HEARTBEAT
               parameters:
                 - 1h
@@ -1330,37 +1195,142 @@ zabbix_export:
         - macro: '{$IF.ERRORS.WARN}'
           value: '2'
           description: 'Warning threshold of error packet rate. Can be used with interface name as context.'
+          config:
+            type: TEXT
+            priority: '8'
+            section_name: Thresholds
+            label: 'Threshold of error packet rate'
+            description: 'Warning threshold of error packet rate. No less than 0.'
+            regex: '^-?([0-9]+|(([0-9]+)\.([0-9]+)))$'
         - macro: '{$IF.UTIL.MAX}'
-          value: '95'
+          value: '90'
+          description: 'Used as a threshold in the interface utilization trigger.'
+          config:
+            type: TEXT
+            priority: '7'
+            section_name: Thresholds
+            label: 'The threshold in the interface utilization'
+            description: 'Used as a threshold in the interface utilization trigger. In the range from 0 to 100 inclusive.'
+            regex: '^-?([0-9]+|(([0-9]+)\.([0-9]+)))$'
         - macro: '{$IFCONTROL}'
           value: '1'
+          description: 'Link status trigger will be fired only for interfaces where the context macro equals "1".'
+          config:
+            type: CHECKBOX
+            priority: '6'
+            label: 'Interfaces control'
+            description: 'Fire a trigger when the interface operational status changes to "Link down".'
+            options:
+              - checked: '1'
+                unchecked: '0'
         - macro: '{$NET.IF.IFADMINSTATUS.MATCHES}'
           value: '^.*'
+          description: 'Used in network interface discovery rule filters.'
+          config:
+            type: TEXT
+            priority: '13'
+            section_name: Filters
+            label: 'Filter network interface by adminstatus'
+            description: 'Regex string to include discovered interface by adminstatus.'
         - macro: '{$NET.IF.IFADMINSTATUS.NOT_MATCHES}'
           value: ^2$
-          description: 'Ignore down(2) administrative status'
+          description: 'Ignore `down(2)` administrative status'
+          config:
+            type: TEXT
+            priority: '14'
+            section_name: Filters
+            label: 'Filter network interface by adminstatus (exclude)'
+            description: 'Regex string to exclude discovered interface by adminstatus.'
         - macro: '{$NET.IF.IFALIAS.MATCHES}'
           value: '.*'
+          description: 'Used in network interface discovery rule filters.'
+          config:
+            type: TEXT
+            priority: '17'
+            section_name: Filters
+            label: 'Filter network interface by alias'
+            description: 'Regex string to include discovered interface by alias.'
         - macro: '{$NET.IF.IFALIAS.NOT_MATCHES}'
           value: CHANGE_IF_NEEDED
+          description: 'Used in network interface discovery rule filters.'
+          config:
+            type: TEXT
+            priority: '18'
+            section_name: Filters
+            label: 'Filter network interface by alias (exclude)'
+            description: 'Regex string to exclude discovered interface by alias.'
         - macro: '{$NET.IF.IFDESCR.MATCHES}'
           value: '.*'
+          description: 'Used in network interface discovery rule filters.'
+          config:
+            type: TEXT
+            priority: '15'
+            section_name: Filters
+            label: 'Filter network interface by description'
+            description: 'Regex string to include discovered interface by description.'
         - macro: '{$NET.IF.IFDESCR.NOT_MATCHES}'
           value: CHANGE_IF_NEEDED
+          description: 'Used in network interface discovery rule filters.'
+          config:
+            type: TEXT
+            priority: '16'
+            section_name: Filters
+            label: 'Filter network interface by description (exclude)'
+            description: 'Regex string to exclude discovered interface by description.'
         - macro: '{$NET.IF.IFNAME.MATCHES}'
           value: '^.*$'
+          description: 'Used for network interface discovery. Can be overridden on the host or linked template level.'
+          config:
+            type: TEXT
+            priority: '9'
+            section_name: Filters
+            label: 'Filter for network interface by name'
+            description: 'Regex string to include discovered interface by name.'
         - macro: '{$NET.IF.IFNAME.NOT_MATCHES}'
           value: '(^Software Loopback Interface|^NULL[0-9.]*$|^[Ll]o[0-9.]*$|^[Ss]ystem$|^Nu[0-9.]*$|^veth[0-9a-z]+$|docker[0-9]+|br-[a-z0-9]{12})'
-          description: 'Filter out loopbacks, nulls, docker veth links and docker0 bridge by default'
+          description: 'Filters out `loopbacks`, `nulls`, docker `veth` links and `docker0 bridge` by default.'
+          config:
+            type: TEXT
+            priority: '10'
+            section_name: Filters
+            label: 'Filter for network interface by name (exclude)'
+            description: 'Filters out `loopbacks`, `nulls`, docker `veth` links and `docker0` bridge by default.'
         - macro: '{$NET.IF.IFOPERSTATUS.MATCHES}'
           value: '^.*$'
+          description: 'Used for network interface discovery. Can be overridden on the host or linked template level.'
+          config:
+            type: TEXT
+            priority: '11'
+            section_name: Filters
+            label: 'Filter network interface by status'
+            description: 'Regex string to include discovered interface by status.'
         - macro: '{$NET.IF.IFOPERSTATUS.NOT_MATCHES}'
           value: ^6$
-          description: 'Ignore notPresent(6)'
+          description: 'Ignore `notPresent(6)`'
+          config:
+            type: TEXT
+            priority: '12'
+            section_name: Filters
+            label: 'Filter network interface by status (exclude)'
+            description: 'Regex string to exclude discovered interface by status.'
         - macro: '{$NET.IF.IFTYPE.MATCHES}'
           value: '.*'
+          description: 'Used in network interface discovery rule filters.'
+          config:
+            type: TEXT
+            priority: '19'
+            section_name: Filters
+            label: 'Filter network interface by type'
+            description: 'Regex string to include discovered interface by type.'
         - macro: '{$NET.IF.IFTYPE.NOT_MATCHES}'
           value: CHANGE_IF_NEEDED
+          description: 'Used in network interface discovery rule filters.'
+          config:
+            type: TEXT
+            priority: '20'
+            section_name: Filters
+            label: 'Filter network interface by type (exclude)'
+            description: 'Regex string to exclude discovered interface by type.'
         - macro: '{$SNMP.TIMEOUT}'
           value: 5m
           description: 'Time interval for the SNMP availability trigger.'
@@ -1433,26 +1403,44 @@ zabbix_export:
                     - type: STRING
                       name: reference
                       value: AAAAA
-                - type: graphprototype
+                - type: svggraph
                   name: 'CPU utilization'
                   'y': '7'
                   width: '24'
                   height: '5'
                   fields:
+                    - type: STRING
+                      name: ds.0.color.0
+                      value: FF465C
                     - type: INTEGER
-                      name: columns
-                      value: '1'
-                    - type: ITEM_PROTOTYPE
-                      name: itemid.0
+                      name: ds.0.dataset_type
+                      value: '0'
+                    - type: INTEGER
+                      name: ds.0.fill
+                      value: '5'
+                    - type: ITEM
+                      name: ds.0.itemids.0
                       value:
                         host: 'Ciena 3906 by SNMP'
-                        key: 'ciena.cpu.util[CpuUtilizationLast60Seconds.{#SNMPINDEX}]'
+                        key: ciena.cpu.utilization
+                    - type: STRING
+                      name: lefty_max
+                      value: '100'
+                    - type: STRING
+                      name: lefty_min
+                      value: '0'
+                    - type: INTEGER
+                      name: legend_columns
+                      value: '1'
+                    - type: INTEGER
+                      name: legend_statistic
+                      value: '1'
                     - type: STRING
                       name: reference
                       value: AAAAD
                     - type: INTEGER
-                      name: source_type
-                      value: '3'
+                      name: righty
+                      value: '0'
                 - type: item
                   name: 'System name'
                   x: '12'
@@ -1479,27 +1467,45 @@ zabbix_export:
                     - type: INTEGER
                       name: value_size
                       value: '30'
-                - type: graphprototype
+                - type: svggraph
                   name: 'Memory utilization'
                   x: '24'
                   'y': '7'
                   width: '24'
                   height: '5'
                   fields:
+                    - type: STRING
+                      name: ds.0.color.0
+                      value: FF465C
                     - type: INTEGER
-                      name: columns
-                      value: '1'
-                    - type: ITEM_PROTOTYPE
-                      name: itemid.0
+                      name: ds.0.dataset_type
+                      value: '0'
+                    - type: INTEGER
+                      name: ds.0.fill
+                      value: '5'
+                    - type: ITEM
+                      name: ds.0.itemids.0
                       value:
                         host: 'Ciena 3906 by SNMP'
-                        key: 'ciena.memory.utilization[{#SNMPINDEX}]'
+                        key: ciena.memory.utilization
+                    - type: STRING
+                      name: lefty_max
+                      value: '100'
+                    - type: STRING
+                      name: lefty_min
+                      value: '0'
+                    - type: INTEGER
+                      name: legend_columns
+                      value: '1'
+                    - type: INTEGER
+                      name: legend_statistic
+                      value: '1'
                     - type: STRING
                       name: reference
                       value: AAAAE
                     - type: INTEGER
-                      name: source_type
-                      value: '3'
+                      name: righty
+                      value: '0'
                 - type: item
                   name: 'System location'
                   x: '27'
@@ -1757,16 +1763,7 @@ zabbix_export:
                       name: value_size
                       value: '20'
       valuemaps:
-        - uuid: 62614cd4421b45bbbe2e2b06679af929
-          name: 'Fan status'
-          mappings:
-            - value: '1'
-              newvalue: OK
-            - value: '2'
-              newvalue: Pending
-            - value: '3'
-              newvalue: Failure
-        - uuid: b43597069a3f40069074a6166eff90a4
+        - uuid: 0148dfb2980a443dbe2646757115ba4a
           name: 'IF-MIB::ifOperStatus'
           mappings:
             - value: '1'
@@ -1781,7 +1778,7 @@ zabbix_export:
               newvalue: notPresent
             - value: '7'
               newvalue: lowerLayerDown
-        - uuid: a10b1ce90aab4242adad05d11cef23a1
+        - uuid: ce6e6488447a415a8c09869bead48038
           name: 'IF-MIB::ifType'
           mappings:
             - value: '1'
@@ -2356,15 +2353,6 @@ zabbix_export:
               newvalue: ptm
             - value: '290'
               newvalue: ghn
-        - uuid: 37ba73ce2d34442b93cb781eea12b6e0
-          name: 'Power supply status'
-          mappings:
-            - value: '1'
-              newvalue: Online
-            - value: '2'
-              newvalue: Offline
-            - value: '3'
-              newvalue: Faulted
         - uuid: 8de09e0fdf2845799e387d182da139c7
           name: 'Service state'
           mappings:
@@ -2372,6 +2360,24 @@ zabbix_export:
               newvalue: Down
             - value: '1'
               newvalue: Up
+        - uuid: 62614cd4421b45bbbe2e2b06679af929
+          name: 'WWP-LEOS-CHASSIS-MIB::wwpLeosChassisFanModuleStatus'
+          mappings:
+            - value: '1'
+              newvalue: OK
+            - value: '2'
+              newvalue: Pending
+            - value: '3'
+              newvalue: Failure
+        - uuid: 37ba73ce2d34442b93cb781eea12b6e0
+          name: 'WWP-LEOS-CHASSIS-MIB::wwpLeosChassisPowerSupplyState'
+          mappings:
+            - value: '1'
+              newvalue: Online
+            - value: '2'
+              newvalue: Offline
+            - value: '3'
+              newvalue: Faulted
         - uuid: e8261a3a0c2f4d69b5be9b070abf9ce9
           name: zabbix.host.available
           mappings:
@@ -2395,3 +2401,24 @@ zabbix_export:
       tags:
         - tag: scope
           value: notice
+  graphs:
+    - uuid: 652efbd1e8d44865acfc633866116b5a
+      name: 'Ciena: CPU utilization'
+      ymin_type_1: FIXED
+      ymax_type_1: FIXED
+      graph_items:
+        - drawtype: GRADIENT_LINE
+          color: 199C0D
+          item:
+            host: 'Ciena 3906 by SNMP'
+            key: ciena.cpu.utilization
+    - uuid: 376c15f14b414caab715650ce9c86e0f
+      name: 'Ciena: Memory utilization'
+      ymin_type_1: FIXED
+      ymax_type_1: FIXED
+      graph_items:
+        - drawtype: GRADIENT_LINE
+          color: 199C0D
+          item:
+            host: 'Ciena 3906 by SNMP'
+            key: ciena.memory.utilization
