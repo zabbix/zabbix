@@ -337,7 +337,9 @@ class CFormValidator {
 			$result['in'] = [1];
 
 			if (!array_key_exists('messages', $result) || !array_key_exists('in', $result['messages'])) {
-				$result['messages']['in'] = _('Must be selected.');
+				$result['messages']['in'] = array_key_exists('required', $result['messages'])
+					? $result['messages']['required']
+					: _('Must be selected.');
 			}
 		}
 
