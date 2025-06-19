@@ -420,7 +420,7 @@ class CIntegrationTest extends CAPITest {
 			return;
 		}
 
-		$log = CLogHelper::readLog(self::getLogPath($component), false);
+		$log = CLogHelper::readLog(self::getLogPath($component), false, true);
 
 		throw new Exception('Multiple child processes for component "'.$component.'" did not stop gracefully:'."\n".
 			implode(', ', $failed_pids)."\n".
@@ -1051,10 +1051,10 @@ class CIntegrationTest extends CAPITest {
 			$description = 'line "'.$lines.'"';
 		}
 
-		$c = CLogHelper::readLog(self::getLogPath($component), false);
+		$c = CLogHelper::readLog(self::getLogPath($component), false, true);
 
 		if (file_exists(self::getLogPath(self::COMPONENT_AGENT))) {
-			$c2 = @CLogHelper::readLog(self::getLogPath(self::COMPONENT_AGENT), false);
+			$c2 = @CLogHelper::readLog(self::getLogPath(self::COMPONENT_AGENT), false, true);
 		}
 		else {
 			$c2 = '';
