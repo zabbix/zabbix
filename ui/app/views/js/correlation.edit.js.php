@@ -45,6 +45,11 @@ window.correlation_edit_popup = new class {
 					this.#addConditionRow(e.detail);
 					this.#processTypeOfCalculation();
 				});
+				overlay.$dialogue[0].addEventListener('dialogue.close', ({detail: {close_by}}) => {
+					if (close_by === 'close-by-user') {
+						this.form.validateFieldsForAction(['conditions']);
+					}
+				});
 			}
 			else if (e.target.classList.contains('js-condition-remove')) {
 				e.target.closest('tr').remove();
