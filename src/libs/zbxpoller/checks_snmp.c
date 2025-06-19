@@ -299,29 +299,25 @@ void	zbx_destroy_snmp_engineid_cache(void)
 	zbx_hashset_destroy(&engineid_cache);
 }
 
-static void	snmp_remove_user_by_engineid(const zbx_snmp_engineid_record_t	*ptr)
+static void	snmp_remove_user_by_engineid(const zbx_snmp_engineid_record_t *target_engineid)
 {
-	struct usmUser	*user;
+	struct usmUser	*current_user;
 
-	user = usm_get_userList();
+	current_user = usm_get_userList();
 
-	while (NULL != user)
+	while (NULL != current_user)
 	{
-		if (ptr->engineid_len == user->engineIDLen &&
-				0 == memcmp(ptr->engineid, user->engineID,  user->engineIDLen))
+		if (target_engineid->engineid_len == current_user->engineIDLen &&
+				0 == memcmp(target_engineid->engineid, current_user->engineID, current_user->engineIDLen))
 		{
-			struct usmUser	*tmp_user = user;
+			struct usmUser	*user_to_remove = current_user;
 
-			user = tmp_user->next;
-			usm_remove_user(tmp_user);
-
-			if (NULL != tmp_user->engineID)
-				free_enginetime(tmp_user->engineID, tmp_user->engineIDLen);
-
-			usm_free_user(tmp_user);
+			current_user = user_to_remove->next;
+			usm_remove_user(user_to_remove);
+			free_enginetime(user_to_remove->engineID, user_to_remove->engineIDLen);
 		}
 		else
-			user = user->next;
+			current_user = current_user->next;
 	}
 }
 
