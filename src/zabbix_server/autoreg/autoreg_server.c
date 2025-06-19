@@ -321,8 +321,10 @@ void	zbx_autoreg_flush_hosts_server(zbx_vector_autoreg_host_ptr_t *autoreg_hosts
 	{
 		autoreg_host = autoreg_hosts->values[i];
 
-		if (NULL == autoreg_host->ip || '\0' == *autoreg_host->ip)
+		if (0 == autoreg_host->autoreg_hostid || NULL == autoreg_host->ip || '\0' == *autoreg_host->ip)
+		{
 			continue;
+		}
 
 		if (autoreg_host->connection_type == ZBX_CONN_IP)
 		{
