@@ -240,7 +240,7 @@ class testDashboardWebMonitoringWidget extends testWidgets {
 
 	public static function getWidgetData() {
 		return [
-			// #0 Empty massive.
+			// #0 Case with no changes.
 			[
 				[
 					'fields' => []
@@ -252,15 +252,15 @@ class testDashboardWebMonitoringWidget extends testWidgets {
 					'fields' => [
 						'Show header' => true,
 						'Name' => 'Name and show header name',
-						'Refresh interval' => '10 seconds'
+						'Refresh interval' => 'No refresh'
 					]
 				]
 			],
-			// #2 Empty fields and refresh interval.
+			// #2 Custom refresh interval.
 			[
 				[
 					'fields' => [
-						'Refresh interval' => '15 minutes'
+						'Refresh interval' => '10 seconds'
 					]
 				]
 			],
@@ -270,7 +270,7 @@ class testDashboardWebMonitoringWidget extends testWidgets {
 					'fields' => [
 						'Name' => 'Hello  World',
 						'Scenario tags' => 'Or',
-						'Refresh interval' => '2 minutes'
+						'Refresh interval' => '30 seconds'
 					]
 				]
 			],
@@ -280,7 +280,7 @@ class testDashboardWebMonitoringWidget extends testWidgets {
 					'fields' => [
 						'Show header' => false,
 						'Name' => '   Happy case   ',
-						'Refresh interval' => '10 minutes',
+						'Refresh interval' => '1 minute',
 						'Show hosts in maintenance' => true,
 						'Scenario tags' => 'And/Or'
 					],
@@ -299,21 +299,12 @@ class testDashboardWebMonitoringWidget extends testWidgets {
 				[
 					'fields' => [
 						'Name' => '🙂,кириллица, 2-4-8 bytes symbols, "],*,a[x=": "],*,a[x="/\|',
-						'Refresh interval' => '1 minute',
+						'Refresh interval' => '2 minutes',
 						'Show hosts in maintenance' => false
 					]
 				]
 			],
-			// #6 No refresh.
-			[
-				[
-					'fields' => [
-						'Show header' => false,
-						'Refresh interval' => 'No refresh'
-					]
-				]
-			],
-			// #7 Host groups.
+			// #6 Host groups.
 			[
 				[
 					'fields' => [
@@ -321,21 +312,21 @@ class testDashboardWebMonitoringWidget extends testWidgets {
 							'First Group for Web Monitoring check',
 							'Second Group for Web Monitoring check'
 						],
-						'Refresh interval' => '30 seconds'
+						'Refresh interval' => '10 minutes'
 					]
 				]
 			],
-			// #8 Host group and exclude host group.
+			// #7 Host group and exclude host group.
 			[
 				[
 					'fields' => [
 						'Host groups' => 'First Group for Web Monitoring check',
 						'Exclude host groups' => 'Second Group for Web Monitoring check',
-						'Refresh interval' => '2 minutes'
+						'Refresh interval' => '15 minutes'
 					]
 				]
 			],
-			// #9 Hosts.
+			// #8 Hosts.
 			[
 				[
 					'fields' => [
@@ -343,11 +334,11 @@ class testDashboardWebMonitoringWidget extends testWidgets {
 							'First host for Web Monitoring widget',
 							'Second host for Web Monitoring widget'
 						],
-						'Refresh interval' => '15 minutes'
+						'Refresh interval' => 'Default (1 minute)'
 					]
 				]
 			],
-			// #10 Hosts and host groups.
+			// #9 Hosts and host groups.
 			[
 				[
 					'fields' => [
@@ -360,17 +351,15 @@ class testDashboardWebMonitoringWidget extends testWidgets {
 						'Hosts' => [
 							'First host for Web Monitoring widget',
 							'Second host for Web Monitoring widget'
-						],
-						'Refresh interval' => '10 minutes'
+						]
 					]
 				]
 			],
-			// #11 Tags.
+			// #10 Tags.
 			[
 				[
 					'fields' => [
-						'Name' => 'Check tags table',
-						'Refresh interval' => 'Default (1 minute)'
+						'Name' => 'Check tags table'
 					],
 					'tags' => [
 						['name' => 'empty value', 'operator' => 'Equals', 'value' => ''],
