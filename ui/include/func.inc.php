@@ -1324,6 +1324,14 @@ function make_sorting_header($obj, $tabfield, $sortField, $sortOrder, $link = nu
  * @return string
  */
 function formatFloat(float $number, array $options = []): string {
+	if ($number == INF) {
+		return _('Infinity');
+	}
+
+	if ($number == -INF) {
+		return '-'._('Infinity');
+	}
+
 	$defaults = [
 		'precision' => ZBX_FLOAT_DIG,
 		'decimals' => 0,
@@ -1340,14 +1348,8 @@ function formatFloat(float $number, array $options = []): string {
 		'zero_as_zero' => $zero_as_zero
 	] = $options + $defaults;
 
-	if ($number == 0 && $zero_as_zero) {
+	if ($zero_as_zero && $number == 0) {
 		return '0';
-	}
-	elseif ($number == INF) {
-		return _('Infinity');
-	}
-	elseif ($number == -INF) {
-		return '-'._('Infinity');
 	}
 
 	$number_original = $number;
@@ -1394,14 +1396,8 @@ function formatFloat(float $number, array $options = []): string {
 		$digits = $precision == 1 ? 1 : strlen(rtrim(explode('E', $number)[0], '0')) - ($number[0] === '-' ? 2 : 1);
 	}
 
-	if ($number == 0 && $zero_as_zero) {
+	if ($zero_as_zero && $number == 0) {
 		return '0';
-	}
-	elseif ($number == INF) {
-		return _('Infinity');
-	}
-	elseif ($number == -INF) {
-		return '-'._('Infinity');
 	}
 
 	$exponent = (int) explode('E', sprintf('%.'.($precision - 1).'E', $number))[1];
