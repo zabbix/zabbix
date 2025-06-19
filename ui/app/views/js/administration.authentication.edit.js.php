@@ -252,21 +252,21 @@
 					textarea.classList.remove('has-error');
 					old_error.remove();
 				}
-			
+
 				const file = e.target.files && e.target.files[0] ? e.target.files[0] : null;
-				
+
 				if (file) {
 					if (file.size > 10000) {
 						const error_span = document.createElement('span');
 						error_span.className = 'error';
 						error_span.textContent = <?= json_encode(_s('File is too big, max upload size is %1$s bytes.', 10000)) ?>;
 						wrapper.append(error_span);
-						
+
 						textarea.classList.add('has-error');
 						textarea.value = '';
 						return;
 					}
-					
+
 					const reader = new FileReader();
 
 					reader.onload = function(e) {
