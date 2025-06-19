@@ -9,6 +9,8 @@ The template is developed to monitor a single DBMS Oracle Database instance with
 
 Oracle Database 12c2 and newer.
 
+**Important! This integration queries the `V$ACTIVE_SESSION_HISTORY` dynamic performance view which is part of the Oracle Diagnostics Pack. Please make sure that you have the licence required for using this management pack.**
+
 ## Requirements
 
 Zabbix version: 7.4 and higher.
@@ -209,11 +211,11 @@ This template has been tested on:
 
 |Name|Description|Default|
 |----|-----------|-------|
-|{$ORACLE.DRIVER}|<p>Oracle driver path. For example: `/usr/lib/oracle/21/client64/lib/libsqora.so.21.1`</p>|`<Put path to oracle driver here>`|
-|{$ORACLE.SERVICE}|<p>Oracle Service Name.</p>|`<Put oracle service name here>`|
-|{$ORACLE.USER}|<p>Oracle username.</p>|`<Put your username here>`|
-|{$ORACLE.PASSWORD}|<p>Oracle user's password.</p>|`<Put your password here>`|
-|{$ORACLE.HOST}|<p>The hostname or IP address of the Oracle DB instance.</p>|`<Put oracle host here>`|
+|{$ORACLE.DRIVER}|<p>Oracle driver path. For example: `/usr/lib/oracle/21/client64/lib/libsqora.so.21.1`</p>||
+|{$ORACLE.SERVICE}|<p>Oracle Service Name.</p>||
+|{$ORACLE.USER}|<p>Oracle username.</p>||
+|{$ORACLE.PASSWORD}|<p>Oracle user's password.</p>||
+|{$ORACLE.HOST}|<p>The hostname or IP address of the Oracle DB instance.</p>||
 |{$ORACLE.PORT}|<p>Oracle Database TCP port.</p>|`1521`|
 |{$ORACLE.DBNAME.MATCHES}|<p>Used in database discovery. It can be overridden on the host or linked template level.</p>|`.*`|
 |{$ORACLE.DBNAME.NOT_MATCHES}|<p>Used in database discovery. It can be overridden on the host or linked template level.</p>|`PDB\$SEED`|
@@ -376,15 +378,15 @@ This template has been tested on:
 
 |Name|Description|Type|Key and additional info|
 |----|-----------|----|-----------------------|
-|Database '{#DBNAME}': Get PDB info|<p>Gets the information about the PDB database on an instance.</p>|Database monitor|db.odbc.get[get_pdb_{#DBNAME}_info,,"Driver={$ORACLE.DRIVER};DBQ=//{$ORACLE.HOST}:{$ORACLE.PORT}/{$ORACLE.SERVICE};"]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.first()`</p><p>⛔️Custom on fail: Discard value</p></li></ul>|
-|Database '{#DBNAME}': Open status|<p>1 - MOUNTED;</p><p>2 - READ WRITE;</p><p>3 - READ ONLY;</p><p>4 - READ ONLY WITH APPLY (a physical standby database is open in real-time query mode).</p>|Dependent item|oracle.pdb_open_mode["{#DBNAME}"]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.OPEN_MODE`</p></li><li><p>Discard unchanged with heartbeat: `15m`</p></li></ul>|
+|Database '{#DBNAME}': Get PDB info|<p>Gets the information about the PDB database on an instance.</p>|Database monitor|db.odbc.get[get_pdb_{#CON_ID}_info,,"Driver={$ORACLE.DRIVER};DBQ=//{$ORACLE.HOST}:{$ORACLE.PORT}/{$ORACLE.SERVICE};"]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.first()`</p><p>⛔️Custom on fail: Discard value</p></li></ul>|
+|Database '{#DBNAME}': Open status|<p>1 - MOUNTED;</p><p>2 - READ WRITE;</p><p>3 - READ ONLY;</p><p>4 - READ ONLY WITH APPLY (a physical standby database is open in real-time query mode).</p>|Dependent item|oracle.pdb_open_mode["{#CON_ID}"]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.OPEN_MODE`</p></li><li><p>Discard unchanged with heartbeat: `15m`</p></li></ul>|
 
 ### Trigger prototypes for PDB discovery
 
 |Name|Description|Expression|Severity|Dependencies and additional info|
 |----|-----------|----------|--------|--------------------------------|
-|Oracle: Database '{#DBNAME}': Open status in mount mode|<p>The Oracle Database is in a mounted state.</p>|`last(/Oracle by ODBC/oracle.pdb_open_mode["{#DBNAME}"])=1`|Warning||
-|Oracle: Database '{#DBNAME}': Open status has changed|<p>The Oracle Database open status has changed. Acknowledge to close the problem manually.</p>|`last(/Oracle by ODBC/oracle.pdb_open_mode["{#DBNAME}"],#1)<>last(/Oracle by ODBC/oracle.pdb_open_mode["{#DBNAME}"],#2)`|Info|**Manual close**: Yes|
+|Oracle: Database '{#DBNAME}': Open status in mount mode|<p>The Oracle Database is in a mounted state.</p>|`last(/Oracle by ODBC/oracle.pdb_open_mode["{#CON_ID}"])=1`|Warning||
+|Oracle: Database '{#DBNAME}': Open status has changed|<p>The Oracle Database open status has changed. Acknowledge to close the problem manually.</p>|`last(/Oracle by ODBC/oracle.pdb_open_mode["{#CON_ID}"],#1)<>last(/Oracle by ODBC/oracle.pdb_open_mode["{#CON_ID}"],#2)`|Info|**Manual close**: Yes|
 
 ### LLD rule Tablespace discovery
 
@@ -396,28 +398,28 @@ This template has been tested on:
 
 |Name|Description|Type|Key and additional info|
 |----|-----------|----|-----------------------|
-|'{#CON_NAME}' TBS '{#TABLESPACE}': Get tablespaces stats|<p>Gets the statistics of the tablespace.</p>|Database monitor|db.odbc.get[get_{#CON_NAME}_tablespace_{#TABLESPACE}_stats,,"Driver={$ORACLE.DRIVER};DBQ=//{$ORACLE.HOST}:{$ORACLE.PORT}/{$ORACLE.SERVICE};"]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.first()`</p><p>⛔️Custom on fail: Discard value</p></li></ul>|
-|'{#CON_NAME}' TBS '{#TABLESPACE}': Tablespace allocated, bytes|<p>Currently allocated bytes for the tablespace (sum of the current size of datafiles).</p>|Dependent item|oracle.tbs_alloc_bytes["{#CON_NAME}","{#TABLESPACE}"]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.FILE_BYTES`</p></li></ul>|
-|'{#CON_NAME}' TBS '{#TABLESPACE}': Tablespace MAX size, bytes|<p>The maximum size of the tablespace.</p>|Dependent item|oracle.tbs_max_bytes["{#CON_NAME}","{#TABLESPACE}"]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.MAX_BYTES`</p></li></ul>|
-|'{#CON_NAME}' TBS '{#TABLESPACE}': Tablespace used, bytes|<p>Currently used bytes for the tablespace (current size of datafiles minus the free space).</p>|Dependent item|oracle.tbs_used_bytes["{#CON_NAME}","{#TABLESPACE}"]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.USED_BYTES`</p></li></ul>|
-|'{#CON_NAME}' TBS '{#TABLESPACE}': Tablespace free, bytes|<p>Free bytes of the allocated space.</p>|Dependent item|oracle.tbs_free_bytes["{#CON_NAME}","{#TABLESPACE}"]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.FREE_BYTES`</p></li></ul>|
-|'{#CON_NAME}' TBS '{#TABLESPACE}': Tablespace allocated, percent|<p>Allocated bytes/max bytes*100.</p>|Dependent item|oracle.tbs_used_pct["{#CON_NAME}","{#TABLESPACE}"]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.USED_PCT_MAX`</p></li></ul>|
-|'{#CON_NAME}' TBS '{#TABLESPACE}': Tablespace usage, percent|<p>Used bytes/allocated bytes*100.</p>|Dependent item|oracle.tbs_used_file_pct["{#CON_NAME}","{#TABLESPACE}"]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.USED_FILE_PCT`</p></li></ul>|
-|'{#CON_NAME}' TBS '{#TABLESPACE}': Tablespace usage from MAX, percent|<p>Used bytes/max bytes*100.</p>|Dependent item|oracle.tbs_used_from_max_pct["{#CON_NAME}","{#TABLESPACE}"]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.USED_FROM_MAX_PCT`</p></li></ul>|
-|'{#CON_NAME}' TBS '{#TABLESPACE}': Open status|<p>The tablespace status where:</p><p>1 - ONLINE;</p><p>2 - OFFLINE;</p><p>3 - READ ONLY.</p>|Dependent item|oracle.tbs_status["{#CON_NAME}","{#TABLESPACE}"]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.STATUS`</p></li></ul>|
+|'{#CON_NAME}' TBS '{#TABLESPACE}': Get tablespaces stats|<p>Gets the statistics of the tablespace.</p>|Database monitor|db.odbc.get[get_{#CON_ID}_tablespace_{#TABLESPACE}_stats,,"Driver={$ORACLE.DRIVER};DBQ=//{$ORACLE.HOST}:{$ORACLE.PORT}/{$ORACLE.SERVICE};"]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.first()`</p><p>⛔️Custom on fail: Discard value</p></li></ul>|
+|'{#CON_NAME}' TBS '{#TABLESPACE}': Tablespace allocated, bytes|<p>Currently allocated bytes for the tablespace (sum of the current size of datafiles).</p>|Dependent item|oracle.tbs_alloc_bytes["{#CON_ID}","{#TABLESPACE}"]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.FILE_BYTES`</p></li></ul>|
+|'{#CON_NAME}' TBS '{#TABLESPACE}': Tablespace MAX size, bytes|<p>The maximum size of the tablespace.</p>|Dependent item|oracle.tbs_max_bytes["{#CON_ID}","{#TABLESPACE}"]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.MAX_BYTES`</p></li></ul>|
+|'{#CON_NAME}' TBS '{#TABLESPACE}': Tablespace used, bytes|<p>Currently used bytes for the tablespace (current size of datafiles minus the free space).</p>|Dependent item|oracle.tbs_used_bytes["{#CON_ID}","{#TABLESPACE}"]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.USED_BYTES`</p></li></ul>|
+|'{#CON_NAME}' TBS '{#TABLESPACE}': Tablespace free, bytes|<p>Free bytes of the allocated space.</p>|Dependent item|oracle.tbs_free_bytes["{#CON_ID}","{#TABLESPACE}"]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.FREE_BYTES`</p></li></ul>|
+|'{#CON_NAME}' TBS '{#TABLESPACE}': Tablespace allocated, percent|<p>Allocated bytes/max bytes*100.</p>|Dependent item|oracle.tbs_used_pct["{#CON_ID}","{#TABLESPACE}"]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.USED_PCT_MAX`</p></li></ul>|
+|'{#CON_NAME}' TBS '{#TABLESPACE}': Tablespace usage, percent|<p>Used bytes/allocated bytes*100.</p>|Dependent item|oracle.tbs_used_file_pct["{#CON_ID}","{#TABLESPACE}"]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.USED_FILE_PCT`</p></li></ul>|
+|'{#CON_NAME}' TBS '{#TABLESPACE}': Tablespace usage from MAX, percent|<p>Used bytes/max bytes*100.</p>|Dependent item|oracle.tbs_used_from_max_pct["{#CON_ID}","{#TABLESPACE}"]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.USED_FROM_MAX_PCT`</p></li></ul>|
+|'{#CON_NAME}' TBS '{#TABLESPACE}': Open status|<p>The tablespace status where:</p><p>1 - ONLINE;</p><p>2 - OFFLINE;</p><p>3 - READ ONLY.</p>|Dependent item|oracle.tbs_status["{#CON_ID}","{#TABLESPACE}"]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.STATUS`</p></li></ul>|
 
 ### Trigger prototypes for Tablespace discovery
 
 |Name|Description|Expression|Severity|Dependencies and additional info|
 |----|-----------|----------|--------|--------------------------------|
-|Oracle: '{#CON_NAME}' TBS '{#TABLESPACE}': Tablespace utilization is too high|<p>The utilization of the tablespace `{#TABLESPACE}` exceeds `{$ORACLE.TBS.UTIL.PCT.MAX.WARN}`%</p>|`min(/Oracle by ODBC/oracle.tbs_used_pct["{#CON_NAME}","{#TABLESPACE}"],5m)>{$ORACLE.TBS.UTIL.PCT.MAX.WARN}`|Warning|**Depends on**:<br><ul><li>Oracle: '{#CON_NAME}' TBS '{#TABLESPACE}': Tablespace utilization is too high</li></ul>|
-|Oracle: '{#CON_NAME}' TBS '{#TABLESPACE}': Tablespace utilization is too high|<p>The utilization of the tablespace `{#TABLESPACE}` exceeds `{$ORACLE.TBS.UTIL.PCT.MAX.HIGH}`%</p>|`min(/Oracle by ODBC/oracle.tbs_used_pct["{#CON_NAME}","{#TABLESPACE}"],5m)>{$ORACLE.TBS.UTIL.PCT.MAX.HIGH}`|High||
-|Oracle: '{#CON_NAME}' TBS '{#TABLESPACE}': Tablespace usage is too high|<p>The usage of the tablespace `{#TABLESPACE}` exceeds `{$ORACLE.TBS.USED.PCT.MAX.WARN}`%</p>|`min(/Oracle by ODBC/oracle.tbs_used_file_pct["{#CON_NAME}","{#TABLESPACE}"],5m)>{$ORACLE.TBS.USED.PCT.MAX.WARN}`|Warning|**Depends on**:<br><ul><li>Oracle: '{#CON_NAME}' TBS '{#TABLESPACE}': Tablespace usage is too high</li></ul>|
-|Oracle: '{#CON_NAME}' TBS '{#TABLESPACE}': Tablespace usage is too high|<p>The usage of the tablespace `{#TABLESPACE}` exceeds `{$ORACLE.TBS.USED.PCT.MAX.HIGH}`%</p>|`min(/Oracle by ODBC/oracle.tbs_used_file_pct["{#CON_NAME}","{#TABLESPACE}"],5m)>{$ORACLE.TBS.USED.PCT.MAX.HIGH}`|High||
-|Oracle: '{#CON_NAME}' TBS '{#TABLESPACE}': Tablespace usage from MAX is too high|<p>The usage of the tablespace `{#TABLESPACE}` from MAX exceeds `{$ORACLE.TBS.USED.PCT.FROM.MAX.WARN}`%</p>|`min(/Oracle by ODBC/oracle.tbs_used_from_max_pct["{#CON_NAME}","{#TABLESPACE}"],5m)>{$ORACLE.TBS.USED.PCT.FROM.MAX.WARN}`|Warning|**Depends on**:<br><ul><li>Oracle: '{#CON_NAME}' TBS '{#TABLESPACE}': Tablespace usage from MAX is too high</li></ul>|
-|Oracle: '{#CON_NAME}' TBS '{#TABLESPACE}': Tablespace usage from MAX is too high|<p>The usage of the tablespace `{#TABLESPACE}` from MAX exceeds `{$ORACLE.TBS.USED.PCT.FROM.MAX.HIGH}`%</p>|`min(/Oracle by ODBC/oracle.tbs_used_from_max_pct["{#CON_NAME}","{#TABLESPACE}"],5m)>{$ORACLE.TBS.USED.PCT.FROM.MAX.HIGH}`|High||
-|Oracle: '{#CON_NAME}' TBS '{#TABLESPACE}': Tablespace is OFFLINE|<p>The tablespace is in the offline state.</p>|`last(/Oracle by ODBC/oracle.tbs_status["{#CON_NAME}","{#TABLESPACE}"])=2`|Warning||
-|Oracle: '{#CON_NAME}' TBS '{#TABLESPACE}': Tablespace status has changed|<p>Oracle tablespace status has changed. Acknowledge to close the problem manually.</p>|`last(/Oracle by ODBC/oracle.tbs_status["{#CON_NAME}","{#TABLESPACE}"],#1)<>last(/Oracle by ODBC/oracle.tbs_status["{#CON_NAME}","{#TABLESPACE}"],#2)`|Info|**Manual close**: Yes<br>**Depends on**:<br><ul><li>Oracle: '{#CON_NAME}' TBS '{#TABLESPACE}': Tablespace is OFFLINE</li></ul>|
+|Oracle: '{#CON_NAME}' TBS '{#TABLESPACE}': Tablespace utilization is too high|<p>The utilization of the tablespace `{#TABLESPACE}` exceeds `{$ORACLE.TBS.UTIL.PCT.MAX.WARN}`%</p>|`min(/Oracle by ODBC/oracle.tbs_used_pct["{#CON_ID}","{#TABLESPACE}"],5m)>{$ORACLE.TBS.UTIL.PCT.MAX.WARN}`|Warning|**Depends on**:<br><ul><li>Oracle: '{#CON_NAME}' TBS '{#TABLESPACE}': Tablespace utilization is too high</li></ul>|
+|Oracle: '{#CON_NAME}' TBS '{#TABLESPACE}': Tablespace utilization is too high|<p>The utilization of the tablespace `{#TABLESPACE}` exceeds `{$ORACLE.TBS.UTIL.PCT.MAX.HIGH}`%</p>|`min(/Oracle by ODBC/oracle.tbs_used_pct["{#CON_ID}","{#TABLESPACE}"],5m)>{$ORACLE.TBS.UTIL.PCT.MAX.HIGH}`|High||
+|Oracle: '{#CON_NAME}' TBS '{#TABLESPACE}': Tablespace usage is too high|<p>The usage of the tablespace `{#TABLESPACE}` exceeds `{$ORACLE.TBS.USED.PCT.MAX.WARN}`%</p>|`min(/Oracle by ODBC/oracle.tbs_used_file_pct["{#CON_ID}","{#TABLESPACE}"],5m)>{$ORACLE.TBS.USED.PCT.MAX.WARN}`|Warning|**Depends on**:<br><ul><li>Oracle: '{#CON_NAME}' TBS '{#TABLESPACE}': Tablespace usage is too high</li></ul>|
+|Oracle: '{#CON_NAME}' TBS '{#TABLESPACE}': Tablespace usage is too high|<p>The usage of the tablespace `{#TABLESPACE}` exceeds `{$ORACLE.TBS.USED.PCT.MAX.HIGH}`%</p>|`min(/Oracle by ODBC/oracle.tbs_used_file_pct["{#CON_ID}","{#TABLESPACE}"],5m)>{$ORACLE.TBS.USED.PCT.MAX.HIGH}`|High||
+|Oracle: '{#CON_NAME}' TBS '{#TABLESPACE}': Tablespace usage from MAX is too high|<p>The usage of the tablespace `{#TABLESPACE}` from MAX exceeds `{$ORACLE.TBS.USED.PCT.FROM.MAX.WARN}`%</p>|`min(/Oracle by ODBC/oracle.tbs_used_from_max_pct["{#CON_ID}","{#TABLESPACE}"],5m)>{$ORACLE.TBS.USED.PCT.FROM.MAX.WARN}`|Warning|**Depends on**:<br><ul><li>Oracle: '{#CON_NAME}' TBS '{#TABLESPACE}': Tablespace usage from MAX is too high</li></ul>|
+|Oracle: '{#CON_NAME}' TBS '{#TABLESPACE}': Tablespace usage from MAX is too high|<p>The usage of the tablespace `{#TABLESPACE}` from MAX exceeds `{$ORACLE.TBS.USED.PCT.FROM.MAX.HIGH}`%</p>|`min(/Oracle by ODBC/oracle.tbs_used_from_max_pct["{#CON_ID}","{#TABLESPACE}"],5m)>{$ORACLE.TBS.USED.PCT.FROM.MAX.HIGH}`|High||
+|Oracle: '{#CON_NAME}' TBS '{#TABLESPACE}': Tablespace is OFFLINE|<p>The tablespace is in the offline state.</p>|`last(/Oracle by ODBC/oracle.tbs_status["{#CON_ID}","{#TABLESPACE}"])=2`|Warning||
+|Oracle: '{#CON_NAME}' TBS '{#TABLESPACE}': Tablespace status has changed|<p>Oracle tablespace status has changed. Acknowledge to close the problem manually.</p>|`last(/Oracle by ODBC/oracle.tbs_status["{#CON_ID}","{#TABLESPACE}"],#1)<>last(/Oracle by ODBC/oracle.tbs_status["{#CON_ID}","{#TABLESPACE}"],#2)`|Info|**Manual close**: Yes<br>**Depends on**:<br><ul><li>Oracle: '{#CON_NAME}' TBS '{#TABLESPACE}': Tablespace is OFFLINE</li></ul>|
 
 ### LLD rule Archive log discovery
 

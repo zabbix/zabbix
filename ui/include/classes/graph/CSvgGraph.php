@@ -1062,10 +1062,6 @@ class CSvgGraph extends CSvg {
 			$values = $this->getValuesGridWithPosition(GRAPH_YAXIS_SIDE_RIGHT, $this->right_y_empty);
 
 			if ($values) {
-				if (array_key_exists(0, $values)) {
-					unset($values[0]);
-				}
-
 				$approx_width = 0;
 
 				foreach ($values as $value) {
@@ -1536,11 +1532,6 @@ class CSvgGraph extends CSvg {
 
 		if ($this->show_right_y_axis) {
 			$grid_values = $this->getValuesGridWithPosition(GRAPH_YAXIS_SIDE_RIGHT, $this->right_y_empty);
-
-			// Do not draw label at the bottom of right Y axis to avoid label overlapping with horizontal axis arrow.
-			if (array_key_exists(0, $grid_values)) {
-				unset($grid_values[0]);
-			}
 
 			$this->addItem(
 				(new CSvgGraphAxis($grid_values, GRAPH_YAXIS_SIDE_RIGHT))

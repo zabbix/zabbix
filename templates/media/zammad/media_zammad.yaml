@@ -40,6 +40,7 @@ zabbix_export:
           value: Users
         - name: zammad_url
           value: '<PUT YOUR ZAMMAD URL>'
+      status: DISABLED
       script: |
         const CLogger = function(serviceName) {
         	this.serviceName = serviceName;

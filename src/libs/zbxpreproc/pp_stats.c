@@ -16,10 +16,15 @@
 
 #include "zbxjson.h"
 
-void zbx_preproc_stats_ext_get(struct zbx_json *json, const void *arg)
+void zbx_preproc_stats_ext_get_data(struct zbx_json *json, const void *arg)
 {
 	ZBX_UNUSED(arg);
 
 	/* zabbix[preprocessing_queue] */
 	zbx_json_adduint64(json, "preprocessing_queue", zbx_preprocessor_get_queue_size());
+
+	/* zabbix[preprocessing] */
+	zbx_json_addobject(json, "preprocessing");
+	zbx_preprocessor_get_size(json);
+	zbx_json_close(json);
 }

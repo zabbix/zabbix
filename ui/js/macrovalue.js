@@ -102,6 +102,8 @@
 			return false;
 		}
 
+		this.dispatchEvent(new Event('input', {bubbles: true}));
+
 		if (curr_value_type == ZBX_MACRO_TYPE_SECRET) {
 			$container.removeClass(ZBX_STYLE_MACRO_VALUE_SECRET);
 
@@ -120,27 +122,29 @@
 		if (value_type == ZBX_MACRO_TYPE_SECRET) {
 			$container.addClass(ZBX_STYLE_MACRO_VALUE_SECRET);
 
+			const $input_secret = $('<input>')
+				.attr({
+					id: $input.attr('id'),
+					name: $input.attr('name'),
+					type: 'password',
+					value: $input.val(),
+					placeholder: t('value'),
+					maxlength: $input.attr('maxlength'),
+					autocomplete: 'off',
+					style: 'width: 100%;',
+					'data-field-type': 'text-box',
+					'data-error-container': $input.attr('data-error-container'),
+					'data-error-label': $input.attr('data-error-label')
+				})
+				.on('focus blur', btnUndoFocusEventHandle)
+
 			$curr_control.replaceWith($('<div>')
 				.addClass('input-secret')
-				.append(
-					$('<input>')
-						.attr({
-							id: $input.attr('id'),
-							name: $input.attr('name'),
-							type: 'password',
-							value: $input.val(),
-							placeholder: t('value'),
-							maxlength: $input.attr('maxlength'),
-							autocomplete: 'off',
-							style: 'width: 100%;',
-							'data-field-type': 'text-box',
-							'data-error-container': $input.attr('data-error-container'),
-							'data-error-label': $input.attr('data-error-label')
-						})
-						.on('focus blur', btnUndoFocusEventHandle)
-				)
+				.append($input_secret)
 				.inputSecret()
 			);
+
+			$input_secret[0].dispatchEvent(new Event('input', {bubbles: true}));
 		}
 		else {
 			$container.addClass((value_type == ZBX_MACRO_TYPE_VAULT)
@@ -153,7 +157,7 @@
 				$curr_control.data('is-activated', true);
 			}
 
-			$curr_control.replaceWith($('<textarea>')
+			const $textarea = $('<textarea>')
 				.addClass('textarea-flexible')
 				.attr({
 					id: $input.attr('id'),
@@ -167,7 +171,10 @@
 				})
 				.text($input.is(':disabled') ? '' : $input.val())
 				.on('focus blur', btnUndoFocusEventHandle)
-			);
+
+			$curr_control.replaceWith($textarea);
+
+			$textarea[0].dispatchEvent(new Event('input', {bubbles: true}));
 
 			$('.textarea-flexible', $container).textareaFlexible();
 		}

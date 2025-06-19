@@ -248,6 +248,8 @@ class testFormTags extends CWebTest {
 	public function checkTagsCreate($data, $object, $expression = null) {
 		$sql = null;
 		$old_hash = null;
+		$expected = CTestArrayHelper::get($data, 'expected', TEST_GOOD);
+		$inline_validation = in_array($object, ['host', 'template', 'trigger', 'trigger prototype', 'item', 'item prototype']);
 
 		switch ($object) {
 			case 'trigger':
@@ -286,7 +288,7 @@ class testFormTags extends CWebTest {
 				$fields = [ucfirst($object).' name' => $data['name'], $group_field => $group_name];
 		}
 
-		if (CTestArrayHelper::get($data, 'expected', TEST_GOOD) === TEST_BAD) {
+		if ($expected === TEST_BAD) {
 			$old_hash = CDBHelper::getHash($sql);
 		}
 
@@ -340,7 +342,7 @@ class testFormTags extends CWebTest {
 			$this->assertScreenshot($screenshot_area, $data['name'].' '.$screen_object);
 		}
 
-		if ($object === 'host' && CTestArrayHelper::get($data, 'expected') === TEST_BAD) {
+		if ($inline_validation && $expected === TEST_BAD) {
 			$this->page->removeFocus();
 		}
 		else {
@@ -348,7 +350,7 @@ class testFormTags extends CWebTest {
 			$this->page->waitUntilReady();
 		}
 
-		$this->checkResult($data, $object, $form, 'add', $sql, $old_hash);
+		$this->checkResult($data, $object, $form, 'add', $sql, $old_hash, $inline_validation);
 
 		return $form;
 
@@ -479,6 +481,8 @@ class testFormTags extends CWebTest {
 	public function checkTagsUpdate($data, $object) {
 		$sql = null;
 		$old_hash = null;
+		$expected = CTestArrayHelper::get($data, 'expected', TEST_GOOD);
+		$inline_validation = in_array($object, ['host', 'template', 'trigger', 'trigger prototype', 'item', 'item prototype']);
 
 		switch ($object) {
 			case 'trigger':
@@ -511,7 +515,7 @@ class testFormTags extends CWebTest {
 				$locator = ($object === 'host prototype') ? 'name:hostPrototypeForm' : null;
 		}
 
-		if (CTestArrayHelper::get($data, 'expected', TEST_GOOD) === TEST_BAD) {
+		if ($expected === TEST_BAD) {
 			$old_hash = CDBHelper::getHash($sql);
 		}
 
@@ -543,7 +547,7 @@ class testFormTags extends CWebTest {
 
 		$this->query($this->tags_table)->asMultifieldTable()->waitUntilPresent()->one()->fill($data['tags']);
 
-		if ($object === 'host' && CTestArrayHelper::get($data, 'expected') === TEST_BAD) {
+		if ($inline_validation && $expected === TEST_BAD) {
 			$this->page->removeFocus();
 		}
 		else {
@@ -556,22 +560,23 @@ class testFormTags extends CWebTest {
 			$data['tags'] = array_merge($data['existing_tags'], $data['tags']);
 		}
 
-		$this->checkResult($data, $object, $form, 'update', $sql, $old_hash);
+		$this->checkResult($data, $object, $form, 'update', $sql, $old_hash, $inline_validation);
 	}
 
 	/**
 	 * Check result after creating or updating object with tags.
 	 *
-	 * @param array     $data        data provider
-	 * @param string    $object      host, template, trigger, item or prototype
-	 * @param element   $form        object configuration form
-	 * @param string    $action      create or update object
-	 * @param string    $sql         selected table from db
-	 * @param string    $old_hash    db hash before changes
+	 * @param array     $data               data provider
+	 * @param string    $object             host, template, trigger, item or prototype
+	 * @param element   $form               object configuration form
+	 * @param string    $action             create or update object
+	 * @param string    $sql                selected table from db
+	 * @param string    $old_hash           db hash before changes
+	 * @param bool      $inline_validation  flag that determines if inline validation is enabled in the form
 	 */
-	private function checkResult($data, $object, $form, $action, $sql = null, $old_hash = null) {
+	private function checkResult($data, $object, $form, $action, $sql = null, $old_hash = null, $inline_validation = false) {
 		if (CTestArrayHelper::get($data, 'expected', TEST_GOOD) === TEST_BAD) {
-			if ($object === 'host') {
+			if ($inline_validation) {
 				$inline_error = [];
 				$key = array_key_first($data['inline_error']);
 
@@ -597,7 +602,7 @@ class testFormTags extends CWebTest {
 					: 'Cannot update '.$object;
 			}
 
-			if ($object !== 'host') {
+			if (!$inline_validation) {
 				$this->assertMessage(TEST_BAD, $title, CTestArrayHelper::get($data, 'error_details'));
 			}
 

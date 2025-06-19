@@ -48,6 +48,7 @@ int	item_preproc_script(zbx_es_t *es, zbx_variant_t *value, const char *params, 
 int	item_preproc_csv_to_json(zbx_variant_t *value, const char *params, char **errmsg);
 int	item_preproc_xml_to_json(zbx_variant_t *value, char **errmsg);
 int	item_preproc_str_replace(zbx_variant_t *value, const char *params, char **errmsg);
-int	item_preproc_check_error_regex(const zbx_variant_t *value, const char *params, char **error);
+int	item_preproc_check_error_regex(const zbx_variant_t *value, const char *params, const char *output_template,
+		char **error);
 
 #endif

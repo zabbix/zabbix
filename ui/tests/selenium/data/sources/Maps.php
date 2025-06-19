@@ -90,7 +90,8 @@ class Maps {
 						'iconid_off' => 7,
 						'label' => 'Test phone icon',
 						'x' => 151,
-						'y' => 101
+						'y' => 101,
+						'zindex' => 0
 					],
 					// Map (Cloud symbol small).
 					[
@@ -101,7 +102,8 @@ class Maps {
 						'x' => 401,
 						'y' => 101,
 						'elements' => [['sysmapid' => 1]],
-						'urls' => [['name' => 'Zabbix home', 'url' => 'http://www.zabbix.com']]
+						'urls' => [['name' => 'Zabbix home', 'url' => 'http://www.zabbix.com']],
+						'zindex' => 1
 					],
 					// Trigger (Crypto-router symbol big).
 					[
@@ -112,7 +114,8 @@ class Maps {
 						'x' => 101,
 						'y' => 301,
 						'elements' => [['triggerid' => $map_links_triggerid]],
-						'urls' => [['name' => 'blog.zabbix.com', 'url' => 'https://blog.zabbix.com/']]
+						'urls' => [['name' => 'blog.zabbix.com', 'url' => 'https://blog.zabbix.com/']],
+						'zindex' => 2
 					],
 					// Host group (Cloud symbol big).
 					[
@@ -122,7 +125,8 @@ class Maps {
 						'label' => 'Host group element (Linux servers)',
 						'x' => 301,
 						'y' => 351,
-						'elements' => [['groupid' => 4]] // Zabbix servers.
+						'elements' => [['groupid' => 4]], // Zabbix servers.
+						'zindex' => 3
 					],
 					// Host (Disk array symbol).
 					[
@@ -132,7 +136,8 @@ class Maps {
 						'label' => 'Host element (Zabbix Server)',
 						'x' => 501,
 						'y' => 301,
-						'elements' => [['hostid' => $result['hostids']['Host for map with links']]]
+						'elements' => [['hostid' => $result['hostids']['Host for map with links']]],
+						'zindex' => 4
 					]
 				],
 				'shapes' => [
@@ -234,7 +239,8 @@ class Maps {
 						'elementtype' => SYSMAP_ELEMENT_TYPE_HOST,
 						'iconid_off' => 186,
 						'x' => 139,
-						'y' => 27
+						'y' => 27,
+						'zindex' => 0
 					],
 					// Image.
 					[
@@ -242,7 +248,8 @@ class Maps {
 						'elementtype' => SYSMAP_ELEMENT_TYPE_IMAGE,
 						'iconid_off' => 6,
 						'x' => 250,
-						'y' => 350
+						'y' => 350,
+						'zindex' => 1
 					],
 					// Trigger.
 					[
@@ -251,7 +258,8 @@ class Maps {
 						'iconid_off' => 146,
 						'elements' => [['triggerid' => $map_form_triggerid]],
 						'x' => 350,
-						'y' => 200
+						'y' => 200,
+						'zindex' => 2
 					]
 				],
 				'links' => [
@@ -275,7 +283,8 @@ class Maps {
 						'elementtype' => SYSMAP_ELEMENT_TYPE_HOST,
 						'iconid_off' => 186,
 						'x' => 139,
-						'y' => 27
+						'y' => 27,
+						'zindex' => 0
 					],
 					// Host 2.
 					[
@@ -284,7 +293,8 @@ class Maps {
 						'elementtype' => SYSMAP_ELEMENT_TYPE_HOST,
 						'iconid_off' => 151,
 						'x' => 89,
-						'y' => 377
+						'y' => 377,
+						'zindex' => 1
 					],
 					// Image.
 					[
@@ -292,7 +302,8 @@ class Maps {
 						'elementtype' => SYSMAP_ELEMENT_TYPE_IMAGE,
 						'iconid_off' => 6,
 						'x' => 250,
-						'y' => 350
+						'y' => 350,
+						'zindex' => 2
 					]
 				],
 				'links' => [

@@ -124,11 +124,11 @@ function drawValueCell(array $cell_data): array {
 	if (array_key_exists('units', $cell_data['parts'])) {
 		$units_div = (new CDiv())->addClass('units');
 		$units_div = addTextFormatting($units_div, $cell_data['parts']['units']);
-	}
 
-	// Units ABOVE value.
-	if (array_key_exists('units', $cell_data['parts']) && $cell_data['units_pos'] == Widget::POSITION_ABOVE) {
-		$item_cell[] = $units_div;
+		// Units ABOVE value.
+		if ($cell_data['units_pos'] == Widget::POSITION_ABOVE) {
+			$item_cell[] = $units_div;
+		}
 	}
 
 	$item_content_div = (new CDiv())->addClass('item-value-content');
@@ -138,15 +138,17 @@ function drawValueCell(array $cell_data): array {
 		$item_content_div->addItem($units_div);
 	}
 
-	$item_value_div = (new CDiv())->addClass('value');
+	if (array_key_exists('value', $cell_data['parts'])) {
+		$item_value_div = (new CDiv())->addClass('value');
 
-	if ($cell_data['parts']['value']['text'] === null) {
-		$cell_data['parts']['value']['text'] = _('No data');
-		$item_value_div->addClass('item-value-no-data');
+		if ($cell_data['parts']['value']['text'] === null) {
+			$cell_data['parts']['value']['text'] = _('No data');
+			$item_value_div->addClass('item-value-no-data');
+		}
+
+		$item_value_div = addTextFormatting($item_value_div, $cell_data['parts']['value']);
+		$item_content_div->addItem($item_value_div);
 	}
-
-	$item_value_div = addTextFormatting($item_value_div, $cell_data['parts']['value']);
-	$item_content_div->addItem($item_value_div);
 
 	if (array_key_exists('decimals', $cell_data['parts'])) {
 		$item_decimals_div = (new CDiv())->addClass('decimals');

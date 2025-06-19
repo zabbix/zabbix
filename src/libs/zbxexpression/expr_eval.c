@@ -2094,17 +2094,13 @@ void	zbx_expression_eval_resolve_item_hosts(zbx_expression_eval_t *eval, const z
  ******************************************************************************/
 void	zbx_expression_eval_resolve_filter_macros(zbx_expression_eval_t *eval, const zbx_dc_item_t *item)
 {
-	int			i;
-	zbx_dc_um_handle_t	*um_handle;
+	zbx_dc_um_handle_t	*um_handle = zbx_dc_open_user_macros();
 
-	um_handle = zbx_dc_open_user_macros();
-
-	for (i = 0; i < eval->queries.values_num; i++)
+	for (int i = 0; i < eval->queries.values_num; i++)
 	{
 		zbx_expression_query_t	*query = eval->queries.values[i];
 
-		zbx_substitute_simple_macros(NULL, NULL, NULL, NULL, NULL, NULL, item, NULL, NULL, NULL, NULL, NULL,
-				&query->ref.filter, ZBX_MACRO_TYPE_QUERY_FILTER, NULL, 0);
+		zbx_substitute_macros(&query->ref.filter, NULL, 0, zbx_macro_query_filter_resolv, item);
 	}
 
 	zbx_dc_close_user_macros(um_handle);
@@ -2216,7 +2212,7 @@ void	zbx_expression_eval_resolve_trigger_hosts_items(zbx_expression_eval_t *eval
 		if (0 != (ZBX_ITEM_QUERY_KEY_ONE & query->flags) &&
 				-1 != (func_num = zbx_expr_macro_index(query->ref.key)))
 		{
-			resolve_expression_query_macro(trigger, &expr_get_item_key, "item key", func_num, query,
+			resolve_expression_query_macro(trigger, &zbx_dc_get_item_key, "item key", func_num, query,
 					&query->ref.key, &item_keys);
 		}
 	}

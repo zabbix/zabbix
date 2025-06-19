@@ -60,11 +60,16 @@ switch ($data['method']) {
 		break;
 
 	case 'zabbix.status':
-		if (!CSessionHelper::has('serverCheckResult')
-				|| (CSessionHelper::get('serverCheckTime') + SERVER_CHECK_INTERVAL) <= time()) {
+		$message = '';
+		$status = true;
+		$tls_error = false;
+
+		if (!CSessionHelper::has('serverCheckResult') || !CSessionHelper::has('serverCheckTime')
+				|| ((int) CSessionHelper::get('serverCheckTime') + SERVER_CHECK_INTERVAL) <= time()) {
 
 			if ($ZBX_SERVER === null && $ZBX_SERVER_PORT === null) {
-				$is_running = false;
+				$status = false;
+				$message = _('Zabbix server is not running: the information displayed may not be current.');
 			}
 			else {
 				$zabbix_server = new CZabbixServer($ZBX_SERVER, $ZBX_SERVER_PORT,
@@ -72,18 +77,37 @@ switch ($data['method']) {
 					timeUnitToSeconds(CSettingsHelper::get(CSettingsHelper::SOCKET_TIMEOUT)), 0
 				);
 
-				$is_running = $zabbix_server->isRunning(CSessionHelper::getId());
+				$is_running = $zabbix_server->isRunning();
+				$can_connect = $zabbix_server->canConnect(CSessionHelper::getId());
+				$status = $is_running && $can_connect;
+				$tls_error = $zabbix_server->getErrorCode() === CZabbixServer::ERROR_CODE_TLS;
+
+				if (!$can_connect && $tls_error) {
+					$message = _('Unable to connect to the Zabbix server due to TLS settings. Some functions are unavailable.');
+				}
+				elseif (!$status) {
+					$message = _('Zabbix server is not running: the information displayed may not be current.');
+				}
 			}
 
-			CSessionHelper::set('serverCheckResult', $is_running);
+			CSessionHelper::set('serverCheckResult', $status);
+			CSessionHelper::set('serverCheckResultTlsError', $tls_error);
 			CSessionHelper::set('serverCheckTime', time());
+		}
+		else {
+			$status = (bool) CSessionHelper::get('serverCheckResult');
+
+			if (CSessionHelper::get('serverCheckResultTlsError') === true) {
+				$message = _('Unable to connect to the Zabbix server due to TLS settings. Some functions are unavailable.');
+			}
+			elseif (!$status) {
+				$message = _('Zabbix server is not running: the information displayed may not be current.');
+			}
 		}
 
 		$result = [
-			'result' => (bool) CSessionHelper::get('serverCheckResult'),
-			'message' => CSessionHelper::get('serverCheckResult')
-				? ''
-				: _('Zabbix server is not running: the information displayed may not be current.')
+			'result' => $status,
+			'message' => $message
 		];
 		break;
 
@@ -171,6 +195,7 @@ switch ($data['method']) {
 					'with_httptests' => array_key_exists('with_httptests', $data) ? $data['with_httptests'] : null,
 					'with_triggers' => array_key_exists('with_triggers', $data) ? $data['with_triggers'] : null,
 					'search' => array_key_exists('search', $data) ? ['name' => $data['search']] : null,
+					'filter' => array_key_exists('filter', $data) ? $data['filter'] : null,
 					'editable' => array_key_exists('editable', $data) ? $data['editable'] : false,
 					'limit' => $limit
 				];
@@ -270,6 +295,7 @@ switch ($data['method']) {
 
 				if ($data['object_name'] === 'graph_prototypes') {
 					$options['selectDiscoveryRule'] = ['hostid'];
+					$options['selectDiscoveryRulePrototype'] = ['hostid'];
 
 					$records = API::GraphPrototype()->get($options);
 				}
@@ -289,7 +315,8 @@ switch ($data['method']) {
 					}
 					else {
 						$host_names = array_column($record['hosts'], 'name', 'hostid');
-						$host_name = $host_names[$record['discoveryRule']['hostid']];
+						$parent_lld = $record['discoveryRule'] ?: $record['discoveryRulePrototype'];
+						$host_name = $host_names[$parent_lld['hostid']];
 					}
 
 					$result[] = [
@@ -948,6 +975,25 @@ switch ($data['method']) {
 				$result = $scripts[$data['eventid']][0];
 			}
 		}
+		break;
+
+	case 'link_thresholds.validate':
+		$result = [];
+
+		if (array_key_exists('thresholds', $data)) {
+			$validation_rules = ['type' => API_OBJECTS, 'fields' => [
+				'threshold' => ['type' => API_NUMERIC]
+			]];
+
+			CApiInputValidator::validate($validation_rules, $data['thresholds'], 'thresholds', $error);
+
+			if ($error !== '') {
+				$result = [
+					'error' => $error
+				];
+			}
+		}
+
 		break;
 
 	default:

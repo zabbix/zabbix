@@ -95,8 +95,6 @@
 	white-space: pre;
 
 	.svg-pie-chart-hintbox-color {
-		width: 10px;
-		height: 10px;
-		margin-right: 10px;
+		@extend %indicator-color-box;
 	}
 }

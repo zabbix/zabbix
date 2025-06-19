@@ -321,9 +321,9 @@ class testLowLevelDiscoveryDisabledObjects extends CWebTest {
 
 		// Emulate host discovery in DB.
 		foreach ($discovered_hosts as $discovered_host) {
-			DBexecute('INSERT INTO hosts (hostid, host, name, status, flags, description) VALUES ('.
+			DBexecute('INSERT INTO hosts (hostid, host, name, status, flags, description, readme) VALUES ('.
 					zbx_dbstr($discovered_host['hostid']).', '.zbx_dbstr($discovered_host['discovered_host_name']).
-					', '.zbx_dbstr($discovered_host['discovered_host_name']).', '.$discovered_host['status'].', 4, \'\')'
+					', '.zbx_dbstr($discovered_host['discovered_host_name']).', '.$discovered_host['status'].', 4, \'\', \'\')'
 			);
 			DBexecute('INSERT INTO host_discovery (hostid, parent_hostid, lastcheck, ts_delete, disable_source, ts_disable, status)'.
 					' VALUES ('.zbx_dbstr($discovered_host['hostid']).', '.zbx_dbstr($discovered_host['host_prototypeid']).', '.
@@ -363,7 +363,7 @@ class testLowLevelDiscoveryDisabledObjects extends CWebTest {
 			[
 				[
 					'object' => 'graph',
-					'url' => 'graphs.php?filter_set=1&context=host&filter_hostids%5B0%5D='
+					'url' => 'zabbix.php?action=graph.list&context=host&filter_set=1&filter_hostids%5B%5D='
 				]
 			]
 		];

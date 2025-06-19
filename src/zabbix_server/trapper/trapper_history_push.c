@@ -21,7 +21,6 @@
 #include "zbxcacheconfig.h"
 #include "zbx_host_constants.h"
 #include "zbx_item_constants.h"
-#include "zbxexpression.h"
 #include "zbxdbwrap.h"
 #include "zbxpreproc.h"
 #include "audit/zbxaudit.h"
@@ -30,6 +29,7 @@
 #include "zbxdbhigh.h"
 #include "zbxnum.h"
 #include "zbxtime.h"
+#include "zbxexpr.h"
 
 #define INVALID_ITEM_OR_NO_PERMISSION_ERROR	"No permissions to referred object or it does not exist."
 
@@ -279,11 +279,14 @@ static int	validate_item_config(ZBX_SOCKADDR *peer_addr, ZBX_SOCKADDR *client_ad
 
 	if ('\0' != *item->trapper_hosts)
 	{
-		char	*allowed_peers;
-		int	ret = FAIL;
+		char			*allowed_peers;
+		int			ret = FAIL;
+		zbx_dc_um_handle_t	*um_handle = zbx_dc_open_user_macros();
 
 		allowed_peers = zbx_strdup(NULL, item->trapper_hosts);
-		zbx_substitute_simple_macros_allowed_hosts(item, &allowed_peers);
+		zbx_substitute_macros(&allowed_peers, NULL, 0, zbx_macro_allowed_hosts_resolv, um_handle, item);
+
+		zbx_dc_close_user_macros(um_handle);
 
 		if (SUCCEED == (ret = zbx_tcp_check_allowed_peers_info(peer_addr, allowed_peers)))
 		{
@@ -604,7 +607,7 @@ static void	process_item_values(const zbx_user_t *user, ZBX_SOCKADDR *peer_addr,
  *                FAIL    - otherwise                                         *
  *                                                                            *
  ******************************************************************************/
-static int	check_user_role_permmissions(const zbx_user_t *user)
+static int	check_user_role_permissions(const zbx_user_t *user)
 {
 #define API_METHOD		"api.method."
 
@@ -707,7 +710,7 @@ static int	process_history_push(zbx_socket_t *sock, const struct zbx_json_parse 
 
 	if (FAIL == zbx_get_user_from_json(jp, &user, NULL) ||
 			SUCCEED != zbx_db_check_user_perm2system(user.userid) ||
-			SUCCEED != check_user_role_permmissions(&user))
+			SUCCEED != check_user_role_permissions(&user))
 	{
 		*error = zbx_strdup(NULL, "Permission denied.");
 		goto out;
@@ -778,21 +781,27 @@ out:
  *                                                                            *
  * Purpose: processes history push request                                    *
  *                                                                            *
- * Parameters: sock    - [IN] client socket                                   *
- *             jp      - [IN] history push request in json format             *
- *             timeout - [IN] communication timeout                           *
+ * Parameters: sock       - [IN] client socket                                *
+ *             jp         - [IN] history push request in json format          *
+ *             timeout    - [IN] communication timeout                        *
+ *             config_tls - [IN]                                              *
+ *             config_frontend_allowed_ip - [IN]                              *
  *                                                                            *
  * Return value: SUCCEED - values were pushed to history                      *
  *               FAIL    - parsing/authentication failure                     *
  *                                                                            *
  ******************************************************************************/
-int	trapper_process_history_push(zbx_socket_t *sock, const struct zbx_json_parse *jp, int timeout)
+int	trapper_process_history_push(zbx_socket_t *sock, const struct zbx_json_parse *jp, int timeout,
+		const zbx_config_tls_t *config_tls, const char *config_frontend_allowed_ip)
 {
 	char		*error = NULL;
-	int		ret;
+	int		ret = FAIL;
 	struct zbx_json	j;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
+
+	if (SUCCEED != zbx_check_frontend_conn_accept(sock, config_tls, config_frontend_allowed_ip))
+		goto out;
 
 	zbx_json_init(&j, 1024);
 
@@ -805,7 +814,7 @@ int	trapper_process_history_push(zbx_socket_t *sock, const struct zbx_json_parse
 		zbx_tcp_send(sock, j.buffer);
 
 	zbx_json_clean(&j);
-
+out:
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __func__, zbx_result_string(ret));
 
 	return ret;

@@ -36,14 +36,14 @@ class CPreprocessingBehavior extends CBehavior {
 			[
 				'name'		=> 'parameter_1',
 				'selector'	=> 'xpath:.//input[contains(@id, "_params_0")]|.//div[contains(@id, "_params_0")]|'.
-						'.//z-select[contains(@name, "[params][0]")]',
+						'.//z-select[contains(@name, "params_0")]',
 				'detect'	=> true,
 				'value'		=> ['getValue']
 			],
 			[
 				'name'		=> 'parameter_2',
-				'selector'	=> 'xpath:.//input[contains(@id, "_params_1")]|.//z-select[contains(@name, "[params][1]")]|'.
-						'.//input[contains(@name, "[params][1]")]',
+				'selector'	=> 'xpath:.//input[contains(@id, "_params_1")]|.//z-select[contains(@name, "params_1")]|'.
+						'.//input[contains(@name, "params_1")]',
 				'detect'	=> true,
 				'value'		=> ['getValue']
 			],
@@ -130,7 +130,7 @@ class CPreprocessingBehavior extends CBehavior {
 				$add->click();
 			}
 
-			$container = $this->test->query('xpath://li[contains(@class, "preprocessing-list-item") and @data-step="'.$rows - 1 .'"]')
+			$container = $this->test->query('xpath://li[contains(@class, "preprocessing-list-item")]['.$rows.']')
 					->waitUntilPresent()->one();
 
 			foreach ($fields as $field) {

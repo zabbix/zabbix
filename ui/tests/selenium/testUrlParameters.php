@@ -355,26 +355,21 @@ class testUrlParameters extends CLegacyWebTest {
 					]
 				]
 			],
-			// TODO: uncomment after ZBX-25928 fix.
-//			[
-//				'title' => 'Fatal error, please report to the Zabbix team',
-//				'check_server_name' => true,
-//				'server_name_on_page' => false,
-//				'test_cases' => [
-//					[
-//						'url' => self::POPUP.'item.edit&context=host&itemid=46050',
-//						'text_not_present' => 'Item',
-//						'fatal_error' => true,
-//						'text_present' => [
-//							'Incorrect value "host" for "context" field.',
-//							'Controller: popup',
-//							'action: popup',
-//							'context: host',
-//							'popup: item.edit'
-//						]
-//					]
-//				]
-//			],
+			[
+				'title' => 'Fatal error, please report to the Zabbix team',
+				'check_server_name' => true,
+				'server_name_on_page' => false,
+				'test_cases' => [
+					[
+						'url' => self::POPUP.'item.edit&context=host&itemid=46050',
+						'text_not_present' => 'Item',
+						'access_denied' => true,
+						'text_present' => [
+							'You are logged in as "Admin". You have no permissions to access this page.'
+						]
+					]
+				]
+			],
 			[
 				'title' => 'Item prototype edit',
 				'check_server_name' => true,
@@ -382,11 +377,12 @@ class testUrlParameters extends CLegacyWebTest {
 				'test_cases' => [
 					// context=template.
 					[
-						'url' => self::POPUP.'item.prototype.edit&context=template&itemid=46067&parent_discoveryid=46063',
+						// Acronis Cyber Protect Cloud MSP by HTTP -> Get devices: Acronis CPC: Device discovery -> Device [{#NAME}]:[{#ID}]: Agent enabled
+						'url' => self::POPUP.'item.prototype.edit&context=template&itemid=50089&parent_discoveryid=50085',
 						'text_present' => 'Item prototype'
 					],
 					[
-						'url' => self::POPUP.'item.prototype.edit&context=template&itemid=1&parent_discoveryid=46063',
+						'url' => self::POPUP.'item.prototype.edit&context=template&itemid=1&parent_discoveryid=50085',
 						'text_not_present' => 'Item prototype',
 						'access_denied' => true,
 						'text_present' => [
@@ -408,38 +404,38 @@ class testUrlParameters extends CLegacyWebTest {
 					]
 				]
 			],
-			// TODO: uncomment after ZBX-25928 fix.
-//			[
-//				'title' => 'Fatal error, please report to the Zabbix team',
-//				'check_server_name' => true,
-//				'server_name_on_page' => false,
-//				'test_cases' => [
-//					[
-//						'url' => self::POPUP.'item.prototype.edit&context=template&itemid=46067',
-//						'text_not_present' => 'Item prototype',
-//						'fatal_error' => true,
-//						'text_present' => [
-//							'Incorrect value "" for "parent_discoveryid" field.',
-//							'Controller: popup',
-//							'action: popup',
-//							'context: template',
-//							'popup: item.prototype.edit'
-//						]
-//					],
-//					[
-//						'url' => self::POPUP.'item.prototype.edit&item.prototype.edit&itemid=400610&context=host',
-//						'text_not_present' => 'Item',
-//						'fatal_error' => true,
-//						'text_present' => [
-//							'Incorrect value "" for "parent_discoveryid" field.',
-//							'Controller: popup',
-//							'action: popup',
-//							'context: host',
-//							'popup: item.prototype.edit'
-//						]
-//					]
-//				]
-//			],
+			[
+				'title' => 'Fatal error, please report to the Zabbix team',
+				'check_server_name' => true,
+				'server_name_on_page' => false,
+				'test_cases' => [
+					[
+						'url' => self::POPUP.'item.prototype.edit&context=template&itemid=50085',
+						'text_not_present' => 'Item prototype',
+						'fatal_error' => true,
+						'text_present' => [
+							'Controller: popup',
+							'action: popup',
+							'context: template',
+							'itemid: 50085',
+							'popup: item.prototype.edit'
+						]
+					],
+					[
+						'url' => self::POPUP.'item.prototype.edit&item.prototype.edit&itemid=400610&context=host',
+						'text_not_present' => 'Item',
+						'fatal_error' => true,
+						'text_present' => [
+							'Controller: popup',
+							'action: popup',
+							'context: host',
+							'item_prototype_edit:',
+							'itemid: 400610',
+							'popup: item.prototype.edit'
+						]
+					]
+				]
+			],
 			[
 				'title' => 'Configuration of network maps',
 				'check_server_name' => true,
@@ -1088,7 +1084,7 @@ class testUrlParameters extends CLegacyWebTest {
 	 */
 	public function testUrlParameters_UrlLoad($title, $check_server_name, $server_name_on_page, $test_cases) {
 		foreach ($test_cases as $test_case) {
-			$this->zbxTestLogin($test_case['url'], $server_name_on_page);
+			$this->page->login()->open($test_case['url'], $server_name_on_page)->waitUntilReady();
 			if (array_key_exists('fatal_error', $test_case)) {
 				$this->zbxTestCheckTitle('Fatal error, please report to the Zabbix team', false);
 			}

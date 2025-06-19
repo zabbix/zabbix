@@ -19,6 +19,8 @@ import (
 	"fmt"
 	"net"
 	"net/http"
+	"strconv"
+	"strings"
 	"time"
 
 	"golang.zabbix.com/agent2/internal/agent"
@@ -30,13 +32,21 @@ import (
 
 var srv http.Server
 
-func getConf(confFilePath string) (s string) {
-	s = fmt.Sprintf("Zabbix Agent 2 [%s]. (%s)\n"+
-		"using configuration file: %s\nServerActive: %s\nListenPort: %d\n\n",
-		agent.Options.Hostname, version.Long(),
-		confFilePath, agent.Options.ServerActive, agent.Options.ListenPort)
+func getConf(confFilePath string) string {
+	var listenPort string
+	if agent.Options.Server != "" {
+		listenPort = strconv.Itoa(agent.Options.ListenPort)
+	}
 
-	return
+	var sb strings.Builder
+
+	sb.WriteString(fmt.Sprintf("Zabbix Agent 2 [%s]. (%s)\n", agent.Options.Hostname, version.Long()))
+	sb.WriteString(fmt.Sprintf("using configuration file: %s\n", confFilePath))
+	sb.WriteString(fmt.Sprintf("ServerActive: %s\n", agent.Options.ServerActive))
+	sb.WriteString(fmt.Sprintf("ListenPort: %s\n", listenPort))
+	sb.WriteString("\n")
+
+	return sb.String()
 }
 
 func Start(taskManager scheduler.Scheduler, confFilePath string) (err error) {

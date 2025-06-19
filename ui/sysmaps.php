@@ -32,6 +32,7 @@ $fields = [
 	'width' =>					[T_ZBX_INT, O_OPT, null,	BETWEEN(0, 65535), 'isset({add}) || isset({update})', _('Width')],
 	'height' =>					[T_ZBX_INT, O_OPT, null,	BETWEEN(0, 65535), 'isset({add}) || isset({update})', _('Height')],
 	'backgroundid' =>			[T_ZBX_INT, O_OPT, null,	DB_ID,			'isset({add}) || isset({update})'],
+	'background_scale' =>		[T_ZBX_INT, O_OPT, null,	BETWEEN(0, 1),	'isset({add}) || isset({update})'],
 	'iconmapid' =>				[T_ZBX_INT, O_OPT, null,	DB_ID,			'isset({add}) || isset({update})'],
 	'expandproblem' =>			[T_ZBX_INT, O_OPT, null,
 		IN([SYSMAP_PROBLEMS_NUMBER, SYSMAP_SINGLE_PROBLEM, SYSMAP_PROBLEMS_NUMBER_CRITICAL]),	null
@@ -52,6 +53,8 @@ $fields = [
 	'label_string_image' =>		[T_ZBX_STR, O_OPT, null,	null,			'isset({add}) || isset({update})'],
 	'label_type' =>				[T_ZBX_INT, O_OPT, null,	BETWEEN(MAP_LABEL_TYPE_LABEL,MAP_LABEL_TYPE_CUSTOM), 'isset({add}) || isset({update})'],
 	'label_location' =>			[T_ZBX_INT, O_OPT, null,	BETWEEN(0, 3),	'isset({add}) || isset({update})'],
+	'show_element_label' =>		[T_ZBX_INT, O_OPT, null,	BETWEEN(0, 1),	'isset({add}) || isset({update})'],
+	'show_link_label' =>		[T_ZBX_INT, O_OPT, null,	BETWEEN(0, 1),	'isset({add}) || isset({update})'],
 	'urls' =>					[T_ZBX_STR, O_OPT, P_ONLY_TD_ARRAY,	null,	null],
 	'severity_min' =>			[T_ZBX_INT, O_OPT, null,	IN('0,1,2,3,4,5'), null],
 	'show_suppressed' =>		[T_ZBX_INT, O_OPT, null,	BETWEEN(0, 1),	null],
@@ -123,6 +126,7 @@ if (hasRequest('add') || hasRequest('update')) {
 		'width' => getRequest('width'),
 		'height' => getRequest('height'),
 		'backgroundid' => getRequest('backgroundid'),
+		'background_scale' => getRequest('background_scale'),
 		'iconmapid' => getRequest('iconmapid'),
 		'highlight' => getRequest('highlight', 0),
 		'markelements' => getRequest('markelements', 0),
@@ -140,6 +144,8 @@ if (hasRequest('add') || hasRequest('update')) {
 		'label_string_image' => getRequest('label_string_image', ''),
 		'label_type' => getRequest('label_type'),
 		'label_location' => getRequest('label_location'),
+		'show_element_label' => getRequest('show_element_label'),
+		'show_link_label' => getRequest('show_link_label'),
 		'show_unack' => getRequest('show_unack', 0),
 		'severity_min' => getRequest('severity_min', TRIGGER_SEVERITY_NOT_CLASSIFIED),
 		'show_suppressed' => getRequest('show_suppressed', 0),
@@ -188,15 +194,17 @@ if (hasRequest('add') || hasRequest('update')) {
 			$maps = API::Map()->get([
 				'output' => [],
 				'selectSelements' => ['selementid', 'elements', 'elementtype', 'iconid_off', 'iconid_on', 'label',
-					'label_location', 'x', 'y', 'iconid_disabled', 'iconid_maintenance', 'elementsubtype', 'areatype',
-					'width', 'height', 'viewtype', 'use_iconmap', 'urls', 'tags', 'evaltype'
+					'label_location', 'show_label', 'x', 'y', 'iconid_disabled', 'iconid_maintenance', 'elementsubtype',
+					'areatype', 'width', 'height', 'viewtype', 'use_iconmap', 'urls', 'tags', 'evaltype', 'zindex'
 				],
 				'selectShapes' => ['type', 'x', 'y', 'width', 'height', 'text', 'font', 'font_size', 'font_color',
 					'text_halign', 'text_valign', 'border_type', 'border_width', 'border_color', 'background_color',
 					'zindex'
 				],
 				'selectLines' => ['x1', 'y1', 'x2', 'y2', 'line_type', 'line_width', 'line_color', 'zindex'],
-				'selectLinks' => ['selementid1', 'selementid2', 'drawtype', 'color', 'label', 'linktriggers'],
+				'selectLinks' => ['selementid1', 'selementid2', 'drawtype', 'color', 'label', 'show_label',
+					'indicator_type', 'linktriggers', 'itemid', 'thresholds', 'highlights'
+				],
 				'sysmapids' => $sysmap['sysmapid']
 			]);
 
@@ -316,6 +324,7 @@ if (hasRequest('form')) {
 			'width' => getRequest('width', 800),
 			'height' => getRequest('height', 600),
 			'backgroundid' => getRequest('backgroundid', 0),
+			'background_scale' => getRequest('background_scale', SYSMAP_BACKGROUND_SCALE_COVER),
 			'iconmapid' => getRequest('iconmapid', 0),
 			'label_format' => getRequest('label_format', 0),
 			'label_type_host' => getRequest('label_type_host', 2),
@@ -330,6 +339,8 @@ if (hasRequest('form')) {
 			'label_string_image' => getRequest('label_string_image', ''),
 			'label_type' => getRequest('label_type', 0),
 			'label_location' => getRequest('label_location', 0),
+			'show_element_label' => getRequest('show_element_label', 1),
+			'show_link_label' => getRequest('show_link_label', 1),
 			'highlight' => getRequest('highlight', 0),
 			'markelements' => getRequest('markelements', 0),
 			'expandproblem' => getRequest('expandproblem', DB::getDefault('sysmaps', 'expandproblem')),
