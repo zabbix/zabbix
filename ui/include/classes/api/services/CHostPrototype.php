@@ -157,7 +157,7 @@ class CHostPrototype extends CHostBase {
 
 		if (self::$userData['type'] != USER_TYPE_SUPER_ADMIN && !$options['nopermissions']) {
 			if (self::$userData['ugsetid'] == 0) {
-				$sql_parts['where'][] = '1=0';
+				$sqlParts['where'][] = '1=0';
 			}
 			else {
 				$sqlParts['from'][] = 'host_hgset hh';
