@@ -66,10 +66,16 @@
 			if (clone) {
 				clone.addEventListener('click', () => this.#clone());
 			}
+
+			const delete_btn = document.getElementById('delete');
+
+			if (delete_btn) {
+				delete_btn.addEventListener('click', () => this.#setLoadingStatus(['delete']));
+			}
 		}
 
 		submit() {
-			this.#setLoadingStatus();
+			this.#setLoadingStatus(['add', 'update']);
 			clearMessages();
 
 			const fields = this.form.getAllValues();
@@ -132,6 +138,7 @@
 		}
 
 		#clone() {
+			this.#setLoadingStatus(['clone']);
 			const curl = new Curl(this.form_element.getAttribute('action')),
 				{name, expressions, test_string} = this.form.getAllValues();
 
@@ -194,7 +201,7 @@
 				.finally(() => this.#unsetTestLoadingStatus());
 		}
 
-		#setLoadingStatus() {
+		#setLoadingStatus(loading_ids) {
 			[
 				document.getElementById('add'),
 				document.getElementById('clone'),
@@ -204,7 +211,7 @@
 				if (button) {
 					button.setAttribute('disabled', true);
 
-					if (button.id === 'add' || button.id === 'update') {
+					if (loading_ids.includes(button.id)) {
 						button.classList.add('is-loading');
 					}
 				}
