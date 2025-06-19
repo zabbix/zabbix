@@ -182,6 +182,7 @@
 
 			this.#setTestLoadingStatus();
 
+			clearMessages();
 			fetch(curl.getUrl(), {
 				method: 'POST',
 				headers: {'Content-Type': 'application/json'},
