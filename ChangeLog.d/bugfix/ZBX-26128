@@ -1,0 +1,1 @@
+A.F....... [ZBX-26128] changed acknowledgement sorting to timestamp and id for more consistent ordering. Updated event suppression logic to treat events as suppressed when suppression data is not yet processed but the last user action was suppression. (rgontarski)
