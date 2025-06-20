@@ -214,14 +214,8 @@ A.F....PS. [ZBXNEXT-9564] implemented vault macro resolution on proxies (esekace
 --------------------------------------------------------------------------------
 Changes for 7.2.9
 
-7.2.9rc1 was released as 7.2.9 without any changes
-
---------------------------------------------------------------------------------
-Changes for 7.2.9rc1
-
-New features:
-
 Bug fixes:
+.......PS. [ZBX-26588] fixed finished tasks queue size tracking which caused high cpu utilization by preprocessing manager (wiper)
 
 --------------------------------------------------------------------------------
 Changes for 7.2.8
@@ -736,14 +730,8 @@ A.F....... [ZBX-23227] fixed issue where using an empty array or string value fo
 --------------------------------------------------------------------------------
 Changes for 7.0.15
 
-7.0.15rc1 was released as 7.0.15 without any changes
-
---------------------------------------------------------------------------------
-Changes for 7.0.15rc1
-
-New features:
-
 Bug fixes:
+.......PS. [ZBX-26588] fixed finished tasks queue size tracking which caused high cpu utilization by preprocessing manager (wiper)
 
 --------------------------------------------------------------------------------
 Changes for 7.0.14
