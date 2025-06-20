@@ -729,6 +729,11 @@ A.F....... [ZBX-23227] fixed issue where using an empty array or string value fo
 ....I..... [ZBX-23881] dropped preference list when searching for compiler (jxl)
 
 --------------------------------------------------------------------------------
+Changes for 7.0.15
+
+7.0.15rc1 was released as 7.0.15 without any changes
+
+--------------------------------------------------------------------------------
 Changes for 7.0.15rc1
 
 New features:
