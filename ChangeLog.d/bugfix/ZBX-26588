@@ -1,1 +1,0 @@
-.......PS. [ZBX-26588] fixed finished tasks queue size tracking which caused high cpu utilization by preprocessing manager (wiper)
