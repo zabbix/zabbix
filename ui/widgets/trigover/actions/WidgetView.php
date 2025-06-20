@@ -52,6 +52,7 @@ class WidgetView extends CControllerDashboardWidgetView {
 			$trigger_options = [
 				'skipDependent' => ($this->fields_values['show'] == TRIGGERS_OPTION_ALL) ? null : true,
 				'only_true' => $this->fields_values['show'] == TRIGGERS_OPTION_RECENT_PROBLEM ? true : null,
+				'tags' => (array_key_exists('tags', $this->fields_values) && $this->fields_values['tags']) ? $this->fields_values['tags'] : null,
 				'filter' => [
 					'value' => $this->fields_values['show'] == TRIGGERS_OPTION_IN_PROBLEM ? TRIGGER_VALUE_TRUE : null
 				]
