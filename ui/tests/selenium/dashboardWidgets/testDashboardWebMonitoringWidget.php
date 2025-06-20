@@ -202,8 +202,7 @@ class testDashboardWebMonitoringWidget extends testWidgets {
 
 				if ($title === 'Dashboard') {
 					$form->checkValue([$label => 'Dashboard']);
-					$this->assertTrue($selector->query
-							('xpath:.//span[@data-hintbox-contents="Dashboard is used as data source."]')
+					$this->assertTrue($selector->query('xpath:.//span[@data-hintbox-contents="Dashboard is used as data source."]')
 							->one()->isVisible()
 					);
 				}

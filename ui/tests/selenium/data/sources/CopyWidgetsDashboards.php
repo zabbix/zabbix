@@ -2406,14 +2406,6 @@ class CopyWidgetsDashboards {
 								'height' => 4
 							],
 							[
-								'type' => 'discovery',
-								'name' => 'Discovery status widget',
-								'x' => 5,
-								'y' => 10,
-								'width' => 12,
-								'height' => 4
-							],
-							[
 								'type' => 'graph',
 								'name' => 'Graph (classic) widget',
 								'x' => 19,
@@ -2984,12 +2976,20 @@ class CopyWidgetsDashboards {
 								]
 							],
 							[
+								'type' => 'discovery',
+								'name' => 'Discovery status widget',
+								'x' => 19,
+								'y' => 8,
+								'width' => 13,
+								'height' => 4
+							],
+							[
 								'type' => 'honeycomb',
 								'name' => 'Honeycomb widget',
-								'x' => 17,
-								'y' => 10,
-								'width' => 5,
-								'height' => 5,
+								'x' => 32,
+								'y' => 8,
+								'width' => 12,
+								'height' => 4,
 								'view_mode' => 0,
 								'fields' => [
 									[
@@ -3092,9 +3092,9 @@ class CopyWidgetsDashboards {
 							[
 								'name' => 'Web monitoring widget',
 								'type' => 'web',
-								'x' => 24,
-								'y' => 10,
-								'width' => 10,
+								'x' => 44,
+								'y' => 8,
+								'width' => 12,
 								'height' => 4,
 								'view_mode' => 0,
 								'fields' => [
