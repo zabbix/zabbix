@@ -172,6 +172,7 @@ ZBX_THREAD_ENTRY(dbconfig_thread, args)
 	}
 stop:
 	zbx_ipc_async_socket_close(&rtc);
+	zbx_db_close();
 
 	zbx_setproctitle("%s #%d [terminated]", get_process_type_string(process_type), process_num);
 

@@ -3857,6 +3857,7 @@ out:
 	zbx_ipc_async_socket_close(&rtc);
 	zbx_vector_uint64_destroy(&escalationids);
 	notify_alerter(ALERTER_CLOSE);
+	zbx_db_close();
 
 	zbx_setproctitle("%s #%d [terminated]", get_process_type_string(process_type), process_num);
 
