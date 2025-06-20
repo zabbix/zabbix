@@ -389,7 +389,10 @@ void	pp_task_queue_push_finished(zbx_pp_queue_t *queue, zbx_pp_task_t *task)
 		zbx_hashset_remove_direct(&queue->tasks, item_tasks);
 	}
 	else
+	{
 		(void)zbx_list_append(&queue->finished, task, NULL);
+		queue->finished_num++;
+	}
 }
 
 /******************************************************************************
