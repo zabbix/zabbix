@@ -1704,6 +1704,7 @@ ZBX_THREAD_ENTRY(taskmanager_thread, args)
 		zbx_export_deinit(problems_export);
 
 	zbx_ipc_async_socket_close(&rtc);
+	zbx_db_close();
 
 	zbx_setproctitle("%s #%d [terminated]", get_process_type_string(process_type), process_num);
 

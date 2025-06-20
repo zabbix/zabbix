@@ -1864,6 +1864,7 @@ ZBX_THREAD_ENTRY(zbx_discoverer_thread, args)
 	zbx_hashset_destroy(&incomplete_druleids);
 	discoverer_manager_free(&dmanager);
 	zbx_ipc_service_close(&ipc_service);
+	zbx_db_close();
 
 	zbx_setproctitle("%s #%d [terminated]", get_process_type_string(info->process_type), info->process_num);
 
