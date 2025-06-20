@@ -42,6 +42,59 @@ svg *:focus {
   outline: none; }
 
 @font-face {
+  font-family: 'Inter';
+  src: url("../fonts/InterVariable.woff2?t=1749715841257") format("woff2");
+  font-weight: 100 900;
+  font-style: normal;
+  font-display: swap; }
+@font-face {
+  font-family: 'Inter';
+  src: url("../fonts/InterVariable-Italic.woff2?t=1749715841257") format("woff2");
+  font-weight: 100 900;
+  font-style: italic;
+  font-display: swap; }
+@font-face {
+  font-family: 'Noto Sans Georgian';
+  src: url("../fonts/NotoSansGeorgian-VariableFont.woff2?t=1749715841257") format("woff2");
+  font-weight: 100 900;
+  font-style: normal;
+  font-display: swap;
+  unicode-range: U+10A0-10FF; }
+@font-face {
+  font-family: 'Noto Sans Hebrew';
+  src: url("../fonts/NotoSansHebrew-VariableFont.woff2?t=1749715841257") format("woff2");
+  font-weight: 100 900;
+  font-style: normal;
+  font-display: swap;
+  unicode-range: U+0590-05FF; }
+@font-face {
+  font-family: 'Noto Sans JP';
+  src: url("../fonts/NotoSansJP-VariableFont.woff2?t=1749715841257") format("woff2");
+  font-weight: 100 900;
+  font-style: normal;
+  font-display: swap;
+  unicode-range: U+3040-309F, U+30A0-30FF, U+4E00-9FFF; }
+@font-face {
+  font-family: 'Noto Sans KR';
+  src: url("../fonts/NotoSansKR-VariableFont.woff2?t=1749715841257") format("woff2");
+  font-weight: 100 900;
+  font-style: normal;
+  font-display: swap;
+  unicode-range: U+AC00-D7A3; }
+@font-face {
+  font-family: 'Noto Sans SC';
+  src: url("../fonts/NotoSansSC-VariableFont.woff2?t=1749715841257") format("woff2");
+  font-weight: 100 900;
+  font-style: normal;
+  font-display: swap;
+  unicode-range: U+4E00-9FFF; }
+:root {
+  --font-stack: Inter, "Noto Sans Georgian", "Noto Sans Hebrew", "Noto Sans JP", "Noto Sans KR", "Noto Sans SC", "Apple SD Gothic Neo", "Arial Hebrew", Arial, "DejaVu Sans", Helvetica, "Hiragino Sans", "Liberation Sans", "Malgun Gothic", Meiryo, "Microsoft YaHei", "PingFang SC", Roboto, Sylfaen, sans-serif; }
+
+html[lang="zh"] {
+  --font-stack: Inter, "Noto Sans Georgian", "Noto Sans Hebrew", "Noto Sans KR", "Noto Sans SC", "Noto Sans JP", "Apple SD Gothic Neo", "Arial Hebrew", Arial, "DejaVu Sans", Helvetica, "Hiragino Sans", "Liberation Sans", "Malgun Gothic", Meiryo, "Microsoft YaHei", "PingFang SC", Roboto, Sylfaen, sans-serif; }
+
+@font-face {
   font-family: "zabbix-icons";
   src: url("../fonts/zabbix-icons.woff2?t=1728543869077") format("woff2"), url("../fonts/zabbix-icons.woff?t=1728543869077") format("woff"), url("../fonts/zabbix-icons.ttf?t=1728543869077") format("truetype"), url("../fonts/zabbix-icons.svg?t=1728543869077#zabbix-icons") format("svg"); }
 [class^="zi-"]::before, [class*=" zi-"]::before, .btn-overlay-close::before, .dashboard-widget-placeholder .dashboard-widget-placeholder-label::before, .menu-main .has-submenu > a::after, .menu-user .has-submenu > a::after, output::before, .color-picker-no-color::after, .z-select .focusable::after,
@@ -445,7 +498,7 @@ body {
   position: relative;
   background-color: #111111;
   font-size: 75%;
-  font-family: Arial, Tahoma, Verdana, sans-serif;
+  font-family: var(--font-stack);
   line-height: 1.4em;
   color: #ffffff; }
 
@@ -1220,7 +1273,7 @@ button, .btn, .btn-alt, .btn-grey, .btn-icon, .btn-grey-icon, .btn-link, .btn-ov
   min-width: 24px;
   height: 24px;
   padding: 0 11px;
-  font-family: Arial, Tahoma, Verdana, sans-serif;
+  font-family: var(--font-stack);
   font-size: 1em;
   line-height: 22px;
   text-align: center;
@@ -6647,7 +6700,7 @@ label input[type="radio"] {
   margin-right: 3px; }
 
 input {
-  font-family: Arial, Tahoma, Verdana, sans-serif;
+  font-family: var(--font-stack);
   font-size: 1em; }
   input[type="file"] {
     padding: 1px; }
@@ -6656,7 +6709,7 @@ textarea {
   margin: 0;
   padding: 4px 5px;
   overflow: auto;
-  font-family: Arial, Tahoma, Verdana, sans-serif;
+  font-family: var(--font-stack);
   font-size: 1em;
   line-height: normal;
   vertical-align: top; }
@@ -6664,7 +6717,7 @@ textarea {
     border-color: #bbbbbb; }
 
 select {
-  font-family: Arial, Tahoma, Verdana, sans-serif;
+  font-family: var(--font-stack);
   font-size: 1em;
   height: 24px;
   padding: 3px 3px 3px 0;

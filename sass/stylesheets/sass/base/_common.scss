@@ -3,7 +3,7 @@ body {
 	background-color: $body-bg-color;
 	font: {
 		size: $font-body-size;
-		family: $font-stack;
+		family: var(--font-stack);
 	}
 	line-height: $body-line-height;
 	color: $font-color;

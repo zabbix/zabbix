@@ -1,0 +1,8 @@
+$theme-name: 'dark-classic';
+
+@import 'dark-theme.scss';
+
+:root,
+html[lang="zh"] {
+	--font-stack: Arial, Tahoma, Verdana, sans-serif;
+}

@@ -1,0 +1,8 @@
+$theme-name: 'blue-classic';
+
+@import 'screen.scss';
+
+:root,
+html[lang="zh"] {
+	--font-stack: Arial, Tahoma, Verdana, sans-serif;
+}

@@ -943,7 +943,7 @@ label {
 
 input {
 	font: {
-		family: $font-stack;
+		family: var(--font-stack);
 		size: $font-form-size;
 	}
 
@@ -1000,7 +1000,7 @@ textarea {
 	padding: 4px 5px;
 	overflow: auto;
 	font: {
-		family: $font-stack;
+		family: var(--font-stack);
 		size: $font-form-size;
 	}
 	line-height: normal;
@@ -1024,7 +1024,7 @@ textarea {
 
 select {
 	font: {
-		family: $font-stack;
+		family: var(--font-stack);
 		size: $font-form-size;
 	}
 
