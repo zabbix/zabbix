@@ -242,7 +242,7 @@ class CScreenProblem extends CScreenBase {
 				$options['tags'] = $filter['tags'];
 			}
 			if (array_key_exists('show_suppressed', $filter) && $filter['show_suppressed']) {
-				unset($options['suppressed']);
+				$options['suppressed'] = true;
 			}
 
 			// Show both cause and symptom problems or only cause problems depending on filter setting in view/widget.

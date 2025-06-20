@@ -749,6 +749,12 @@ class CEvent extends CApiService {
 			}
 
 			$relation_map = $this->createRelationMap($db_acknowledges, 'eventid', 'acknowledgeid');
+
+			CArrayHelper::sort($db_acknowledges, [
+				['field' => 'clock', 'order' => ZBX_SORT_DOWN],
+				['field' => 'acknowledgeid', 'order' => ZBX_SORT_DOWN]
+			]);
+
 			$db_acknowledges = $this->unsetExtraFields($db_acknowledges, ['eventid', 'acknowledgeid', 'userid'],
 				$output
 			);
@@ -1726,6 +1732,12 @@ class CEvent extends CApiService {
 	 * @return bool
 	 */
 	protected function isEventSuppressed(array $event): bool {
+		if (count($event['suppression_data']) === 0 && count($event['acknowledges']) !== 0
+				&& end($event['acknowledges'])['action'] !== ZBX_PROBLEM_UPDATE_UNSUPPRESS) {
+
+			return true;
+		}
+
 		foreach ($event['suppression_data'] as $suppression) {
 			if ($suppression['maintenanceid'] == 0) {
 				return true;
