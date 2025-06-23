@@ -104,16 +104,16 @@
 		});
 	});
 
-	function showPasswordField(e) {
-		const target = e?.target || document.getElementById('bind-password-btn');
+	function showPasswordField() {
+		const button = document.getElementById('bind-password-btn');
 
-		const form_field = target.parentNode;
+		const form_field = button.parentNode;
 		const password_field = form_field.querySelector('[name="ldap_bind_password"]');
 
 		password_field.disabled = false;
 		password_field.classList.remove('<?= ZBX_STYLE_DISPLAY_NONE ?>');
 
-		form_field.removeChild(target);
+		form_field.removeChild(button);
 
 		document.getElementById('change_bind_password').value = 1;
 	}
@@ -124,9 +124,7 @@
 		if (form_field){
 			showPasswordField();
 
-			const warning_icon = document.querySelector('.js-bind-password-warning');
-
-			warning_icon.style.display = ''
+			document.querySelector('.js-bind-password-warning').style.display = '';
 		}
 	}
 </script>

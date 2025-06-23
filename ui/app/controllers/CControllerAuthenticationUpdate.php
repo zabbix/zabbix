@@ -376,16 +376,9 @@ class CControllerAuthenticationUpdate extends CController {
 			$data['passwd_check_rules'] |= $rule;
 		}
 
-		$data_before_diff = $data;
 		$data = array_diff_assoc($data, $auth);
 
 		if (array_key_exists('ldap_bind_dn', $data) && trim($data['ldap_bind_dn']) === '') {
-			$data['ldap_bind_password'] = '';
-		}
-
-		if (array_key_exists('ldap_bind_password', $auth) && trim($auth['ldap_bind_password']) === ''
-				&& array_key_exists('ldap_bind_password', $data_before_diff)
-				&& trim($data_before_diff['ldap_bind_password']) === '') {
 			$data['ldap_bind_password'] = '';
 		}
 

@@ -172,25 +172,19 @@ class CAuthentication extends CApiService {
 
 		$db_auth = DB::select('config', ['output' => $output_fields])[0];
 
-		$this->checkLdapHostChanged($auth, $db_auth);
+		self::checkLdapHostChanged($auth, $db_auth);
 
 		return $db_auth;
-	}
 
-	/**
-	 * @param array $auth
-	 * @param array $db_auth
-	 *
-	 * @throws APIException if the input is invalid.
-	 */
-	protected function checkLdapHostChanged(array $auth, array $db_auth): void {
-		if(array_key_exists('ldap_host', $auth) && !array_key_exists('ldap_bind_password', $auth)){
-			if($auth['ldap_host'] !== $db_auth['ldap_host']){
-				$error = _s('Invalid parameter "%1$s": %2$s.', 'ldap_bind_password',
-					_s('the parameter "%1$s" is missing', 'ldap_bind_password')
-				);
-				self::exception(ZBX_API_ERROR_PARAMETERS, $error);
-			}
+
+	private static function checkLdapHostChanged(array $auth, array $db_auth): void {
+		if(array_key_exists('ldap_host', $auth) && $auth['ldap_host'] !== $db_auth['ldap_host']
+				&& !array_key_exists('ldap_bind_password', $auth) && $db_auth['ldap_bind_password'] !== ''){
+			$error = _s('Invalid parameter "%1$s": %2$s.', 'ldap_bind_password',
+				_s('the parameter "%1$s" is missing', 'ldap_bind_password')
+			);
+
+			self::exception(ZBX_API_ERROR_PARAMETERS, $error);
 		}
 	}
 }
