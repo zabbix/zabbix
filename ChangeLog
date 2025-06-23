@@ -212,6 +212,17 @@ A.F....PS. [ZBXNEXT-9564] implemented vault macro resolution on proxies (esekace
 ...G...... [ZBXNEXT-9508] added custom query path to MySQL and Oracle plugins for Zabbix agent 2 (esneiders)
 
 --------------------------------------------------------------------------------
+Changes for 7.2.9
+
+Bug fixes:
+.......PS. [ZBX-26588] fixed finished tasks queue size tracking which caused high cpu utilization by preprocessing manager (wiper)
+
+--------------------------------------------------------------------------------
+Changes for 7.2.8
+
+7.2.8rc1 was released as 7.2.8 without any changes
+
+--------------------------------------------------------------------------------
 Changes for 7.2.8rc1
 
 New features:
@@ -715,6 +726,17 @@ A.F....... [ZBX-23227] fixed issue where using an empty array or string value fo
 ...GI..PS. [ZBX-25140] updated configure to reject TLS-unaware compilers (jxl)
 ...G...... [ZBX-25149] fixed Zabbix agent build on AIX and Solaris (arimdjonoks)
 ....I..... [ZBX-23881] dropped preference list when searching for compiler (jxl)
+
+--------------------------------------------------------------------------------
+Changes for 7.0.15
+
+Bug fixes:
+.......PS. [ZBX-26588] fixed finished tasks queue size tracking which caused high cpu utilization by preprocessing manager (wiper)
+
+--------------------------------------------------------------------------------
+Changes for 7.0.14
+
+7.0.14rc1 was released as 7.0.14 without any changes
 
 --------------------------------------------------------------------------------
 Changes for 7.0.14rc1
