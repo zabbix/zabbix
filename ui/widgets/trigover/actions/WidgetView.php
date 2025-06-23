@@ -52,22 +52,22 @@ class WidgetView extends CControllerDashboardWidgetView {
 			$trigger_options = [
 				'skipDependent' => ($this->fields_values['show'] == TRIGGERS_OPTION_ALL) ? null : true,
 				'only_true' => $this->fields_values['show'] == TRIGGERS_OPTION_RECENT_PROBLEM ? true : null,
-				'tags' => (array_key_exists('tags', $this->fields_values) && $this->fields_values['tags']) ? $this->fields_values['tags'] : null,
 				'filter' => [
-					'value' => $this->fields_values['show'] == TRIGGERS_OPTION_IN_PROBLEM ? TRIGGER_VALUE_TRUE : null
+				    'value' => $this->fields_values['show'] == TRIGGERS_OPTION_IN_PROBLEM ? TRIGGER_VALUE_TRUE : null
 				]
 			];
 
 			$problem_options = [
 				'show_suppressed' => $this->fields_values['show_suppressed'],
 				'show_recent' => $this->fields_values['show'] == TRIGGERS_OPTION_RECENT_PROBLEM ? true : null,
-				'tags' => array_key_exists('tags', $this->fields_values) && $this->fields_values['tags']
-					? $this->fields_values['tags']
-					: null,
-				'evaltype' => array_key_exists('evaltype', $this->fields_values)
-					? $this->fields_values['evaltype']
-					: TAG_EVAL_TYPE_AND_OR
 			];
+
+			if (array_key_exists('tags', $this->fields_values) && $this->fields_values['tags']) {
+				$trigger_options['tags'] = $this->fields_values['tags'];
+				$trigger_options['evaltype'] = array_key_exists('evaltype', $this->fields_values)
+					? $this->fields_values['evaltype']
+					: TAG_EVAL_TYPE_AND_OR;
+			}
 
 			if ($this->isTemplateDashboard()) {
 				$groupids = [];
