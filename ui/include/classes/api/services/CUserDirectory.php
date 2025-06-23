@@ -949,16 +949,13 @@ class CUserDirectory extends CApiService {
 	private static function checkLdapHostChanged(array $userdirectories, array $db_userdirectories): void {
 		foreach ($userdirectories as $userdirectory) {
 			$db_userdirectory = $db_userdirectories[$userdirectory['userdirectoryid']];
-			if(array_key_exists('host', $userdirectory) && !array_key_exists('bind_password', $userdirectory)){
-				if($userdirectory['host'] !== $db_userdirectory['host']){
-					$error = _s('Invalid parameter "%1$s": %2$s.', 'bind_password',
-						_s('the parameter "%1$s" is missing', 'bind_password')
-					);
-					self::exception(ZBX_API_ERROR_PARAMETERS, $error);
-				}
+			if(array_key_exists('host', $userdirectory) && $userdirectory['host'] !== $db_userdirectory['host']
+					&& !array_key_exists('bind_password', $userdirectory)){
+				self::exception(ZBX_API_ERROR_PARAMETERS, _s('Invalid parameter "%1$s": %2$s.', 'bind_password',
+					_s('the parameter "%1$s" is missing', 'bind_password')
+				));
 			}
 		}
-
 	}
 
 	private static function addFieldDefaultsByType(array &$userdirectories, array $db_userdirectories): void {

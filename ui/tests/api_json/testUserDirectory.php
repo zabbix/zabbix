@@ -470,7 +470,7 @@ class testUserDirectory extends CAPITest {
 		return [
 			'Test host update' => [
 				'userdirectories' => [
-					['userdirectoryid' => 'LDAP #1', 'host' => 'localhost', 'bind_password' => 'new_password']
+					['userdirectoryid' => 'LDAP #4', 'host' => 'localhost', 'bind_password' => 'new_password']
 				],
 				'expected_error' => null
 			],
@@ -578,7 +578,7 @@ class testUserDirectory extends CAPITest {
 			],
 			'Test update host requires bind_password' => [
 				'userdirectories' => [
-					['userdirectoryid' => 'LDAP #1', 'host' => 'test.host.com']
+					['userdirectoryid' => 'LDAP #4', 'host' => 'test.host.com']
 				],
 				'expected_error' => 'Invalid parameter "bind_password": the parameter "bind_password" is missing.'
 			],
@@ -1023,6 +1023,15 @@ class testUserDirectory extends CAPITest {
 						]
 					]
 				]
+			],
+			[
+				'name' => 'API LDAP #4',
+				'idp_type' => IDP_TYPE_LDAP,
+				'host' => 'ldap.forumsys.com',
+				'port' => 389,
+				'base_dn' => 'dc=example,dc=com',
+				'search_attribute' => 'uid',
+				'ldap_bind_password' => 'test_password'
 			],
 			[
 				'name' => 'API SAML',

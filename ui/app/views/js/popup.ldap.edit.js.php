@@ -111,10 +111,10 @@ window.ldap_edit_popup = new class {
 		}
 	}
 
-	showPasswordField(e) {
-		const target = e?.target || document.getElementById('bind-password-btn');
+	showPasswordField() {
+		const button = document.getElementById('bind-password-btn');
 
-		const form_field = target.parentNode;
+		const form_field = button.parentNode;
 		const password_field = form_field.querySelector('[name="bind_password"][type="password"]');
 		const password_var = form_field.querySelector('[name="bind_password"][type="hidden"]');
 
@@ -124,7 +124,7 @@ window.ldap_edit_popup = new class {
 		if (password_var !== null) {
 			form_field.removeChild(password_var);
 		}
-		form_field.removeChild(target);
+		form_field.removeChild(button);
 	}
 
 	showPasswordFieldWithWarning() {
@@ -133,9 +133,7 @@ window.ldap_edit_popup = new class {
 		if (form_field){
 			this.showPasswordField();
 
-			const warning_icon = document.querySelector('.js-bind-password-warning');
-
-			warning_icon.style.display = ''
+			document.querySelector('.js-bind-password-warning').style.display = ''
 		}
 	}
 
