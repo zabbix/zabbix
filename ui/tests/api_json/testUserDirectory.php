@@ -1031,7 +1031,7 @@ class testUserDirectory extends CAPITest {
 				'port' => 389,
 				'base_dn' => 'dc=example,dc=com',
 				'search_attribute' => 'uid',
-				'ldap_bind_password' => 'test_password'
+				'bind_password' => 'test_password'
 			],
 			[
 				'name' => 'API SAML',
