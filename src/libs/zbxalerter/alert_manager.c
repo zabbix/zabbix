@@ -1325,7 +1325,7 @@ static void	am_sync_watchdog(zbx_am_t *manager, zbx_am_media_t **medias, int med
 
 		zbx_am_mediatype_t	*mediatype = am_get_mediatype(manager, media->mediatypeid);
 
-		if (SMTP_AUTHENTICATION_OAUTH == mediatype->smtp_authentication)
+		if (NULL != mediatype && SMTP_AUTHENTICATION_OAUTH == mediatype->smtp_authentication)
 		{
 			/* make sure that in case of database down we will have valid OAuth bearer */
 			zbx_free(mediatype->error);
