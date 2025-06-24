@@ -23,9 +23,9 @@ zabbix_export:
         - name: 'Templates/Network devices'
       items:
         - uuid: 72082a30d426460e8d30219584bc8479
-          name: 'CPU usage, %'
+          name: 'CPU usage'
           type: DEPENDENT
-          key: cisco.ftd.cpu.usage
+          key: cisco.ftd.cpu.utilization
           delay: '0'
           value_type: FLOAT
           units: '%'
@@ -35,14 +35,14 @@ zabbix_export:
               parameters:
                 - $.cpu.items..avgUsage.first()
           master_item:
-            key: cisco.ftd.get.device.metrics
+            key: cisco.ftd.device.metrics.get
           tags:
             - tag: component
               value: cpu
           triggers:
             - uuid: e54b01b249ea43978267ca1b053732e7
-              expression: 'min(/Cisco Secure Firewall Threat Defense by HTTP/cisco.ftd.cpu.usage,15m)>{$CISCO.FTD.CPU.UTIL.WARN}'
-              name: 'High CPU utilization'
+              expression: 'min(/Cisco Secure Firewall Threat Defense by HTTP/cisco.ftd.cpu.utilization,15m)>{$CISCO.FTD.CPU.UTIL.WARN}'
+              name: 'Cisco Secure FTD: High CPU utilization'
               event_name: 'High CPU utilization (over {$CISCO.FTD.CPU.UTIL.WARN}% for 15m)'
               opdata: 'Current utilization: {ITEM.LASTVALUE1}'
               priority: WARNING
@@ -52,90 +52,10 @@ zabbix_export:
                   value: capacity
                 - tag: scope
                   value: performance
-        - uuid: 431375cc8501476d8fde2f5ad2e66b2f
-          name: 'Disc space: Total'
-          type: DEPENDENT
-          key: cisco.ftd.disk.total.size
-          delay: '0'
-          units: B
-          description: 'Disk total size in bytes.'
-          preprocessing:
-            - type: JSONPATH
-              parameters:
-                - '$[?(@.name == "disk_stats.total.size")].value.first()'
-              error_handler: DISCARD_VALUE
-            - type: DISCARD_UNCHANGED_HEARTBEAT
-              parameters:
-                - 1h
-          master_item:
-            key: cisco.ftd.get.operational.metrics
-          tags:
-            - tag: component
-              value: disk
-        - uuid: d5072e8701674e23a38c3feb4a66c844
-          name: 'Disc space: Used'
-          type: DEPENDENT
-          key: cisco.ftd.disk.total.used
-          delay: '0'
-          units: B
-          description: 'Disk total used in bytes.'
-          preprocessing:
-            - type: JSONPATH
-              parameters:
-                - '$[?(@.name == "disk_stats.total.used")].value.first()'
-              error_handler: DISCARD_VALUE
-            - type: DISCARD_UNCHANGED_HEARTBEAT
-              parameters:
-                - 1h
-          master_item:
-            key: cisco.ftd.get.operational.metrics
-          tags:
-            - tag: component
-              value: disk
-        - uuid: cde9728d17f34719ba7751826c7cc93f
-          name: 'Disc space: Utilization'
-          type: DEPENDENT
-          key: cisco.ftd.disk.total.util
-          delay: '0'
-          units: '%'
-          description: 'Disk total usage percentage.'
-          preprocessing:
-            - type: JSONPATH
-              parameters:
-                - '$[?(@.name == "disk_stats.total.used_percentage")].value.first()'
-              error_handler: DISCARD_VALUE
-            - type: DISCARD_UNCHANGED_HEARTBEAT
-              parameters:
-                - 1h
-          master_item:
-            key: cisco.ftd.get.operational.metrics
-          tags:
-            - tag: component
-              value: disk
-        - uuid: ce9ae0fb00f94233950d400af207ceff
-          name: 'Events per second'
-          type: DEPENDENT
-          key: cisco.ftd.eps.rate
-          delay: '0'
-          value_type: FLOAT
-          units: '!events'
-          description: 'Average events per second.'
-          preprocessing:
-            - type: JSONPATH
-              parameters:
-                - $.eps.items..avgEps.first()
-            - type: CHANGE_PER_SECOND
-              parameters:
-                - ''
-          master_item:
-            key: cisco.ftd.get.device.metrics
-          tags:
-            - tag: component
-              value: system
         - uuid: 6c8d958d050b42c68519b763dbbd2b4b
           name: 'Get device metrics'
           type: DEPENDENT
-          key: cisco.ftd.get.device.metrics
+          key: cisco.ftd.device.metrics.get
           delay: '0'
           history: '0'
           value_type: TEXT
@@ -225,14 +145,14 @@ zabbix_export:
                   	return JSON.stringify({ 'error': error });
                   }
           master_item:
-            key: cisco.ftd.get.token
+            key: cisco.ftd.token.get
           tags:
             - tag: component
               value: raw
         - uuid: 201207d071834816bfc41f08c2cadff2
           name: 'Device metrics item errors'
           type: DEPENDENT
-          key: cisco.ftd.get.device.metrics.errors
+          key: cisco.ftd.device.metrics.get.errors
           delay: '0'
           history: 1h
           value_type: TEXT
@@ -247,23 +167,152 @@ zabbix_export:
               parameters:
                 - 1h
           master_item:
-            key: cisco.ftd.get.device.metrics
+            key: cisco.ftd.device.metrics.get
           tags:
             - tag: component
               value: error
           triggers:
             - uuid: 64081e3e64264352a1075dcdc16d8b7a
-              expression: 'length(last(/Cisco Secure Firewall Threat Defense by HTTP/cisco.ftd.get.device.metrics.errors))>0'
-              name: 'There are errors in the ''Get device metrics'' metric'
+              expression: 'length(last(/Cisco Secure Firewall Threat Defense by HTTP/cisco.ftd.device.metrics.get.errors))>0'
+              name: 'Cisco Secure FTD: There are errors in the ''Get device metrics'' metric'
               priority: WARNING
               description: 'An error occurred when trying to get device metrics from the Cisco Secure FTD API.'
               tags:
                 - tag: scope
                   value: availability
+        - uuid: 431375cc8501476d8fde2f5ad2e66b2f
+          name: 'Disc space: Total'
+          type: DEPENDENT
+          key: cisco.ftd.disk.total.size
+          delay: '0'
+          units: B
+          description: 'Disk total size in bytes.'
+          preprocessing:
+            - type: JSONPATH
+              parameters:
+                - '$[?(@.name == "disk_stats.total.size")].value.first()'
+              error_handler: DISCARD_VALUE
+            - type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 1h
+          master_item:
+            key: cisco.ftd.operational.metrics.get
+          tags:
+            - tag: component
+              value: disk
+        - uuid: d5072e8701674e23a38c3feb4a66c844
+          name: 'Disc space: Used'
+          type: DEPENDENT
+          key: cisco.ftd.disk.total.used
+          delay: '0'
+          units: B
+          description: 'Disk total used in bytes.'
+          preprocessing:
+            - type: JSONPATH
+              parameters:
+                - '$[?(@.name == "disk_stats.total.used")].value.first()'
+              error_handler: DISCARD_VALUE
+            - type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 1h
+          master_item:
+            key: cisco.ftd.operational.metrics.get
+          tags:
+            - tag: component
+              value: disk
+        - uuid: cde9728d17f34719ba7751826c7cc93f
+          name: 'Disc space: Utilization'
+          type: DEPENDENT
+          key: cisco.ftd.disk.total.utilization
+          delay: '0'
+          units: '%'
+          description: 'Disk total usage percentage.'
+          preprocessing:
+            - type: JSONPATH
+              parameters:
+                - '$[?(@.name == "disk_stats.total.used_percentage")].value.first()'
+              error_handler: DISCARD_VALUE
+            - type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 1h
+          master_item:
+            key: cisco.ftd.operational.metrics.get
+          tags:
+            - tag: component
+              value: disk
+        - uuid: ce9ae0fb00f94233950d400af207ceff
+          name: 'Events per second'
+          type: DEPENDENT
+          key: cisco.ftd.events.rate
+          delay: '0'
+          value_type: FLOAT
+          units: '!events'
+          description: 'Average events per second.'
+          preprocessing:
+            - type: JSONPATH
+              parameters:
+                - $.eps.items..avgEps.first()
+            - type: CHANGE_PER_SECOND
+              parameters:
+                - ''
+          master_item:
+            key: cisco.ftd.device.metrics.get
+          tags:
+            - tag: component
+              value: system
+        - uuid: a5e0330248284d24a8754e6c04539517
+          name: 'Memory usage'
+          type: DEPENDENT
+          key: cisco.ftd.memory.utilization
+          delay: '0'
+          value_type: FLOAT
+          units: '%'
+          description: 'Memory usage percentage.'
+          preprocessing:
+            - type: JSONPATH
+              parameters:
+                - $.memory.items..avgUsage.first()
+              error_handler: DISCARD_VALUE
+          master_item:
+            key: cisco.ftd.device.metrics.get
+          tags:
+            - tag: component
+              value: memory
+          triggers:
+            - uuid: 3d5da93aed4343dc8b7e20628a37d20a
+              expression: 'min(/Cisco Secure Firewall Threat Defense by HTTP/cisco.ftd.memory.utilization,15m) >= {$CISCO.FTD.MEMORY.UTIL.WARN}'
+              name: 'Cisco Secure FTD: High memory utilization'
+              event_name: 'High memory utilization (over {$CISCO.FTD.MEMORY.UTIL.WARN}% for 15m)'
+              opdata: 'Current utilization: {ITEM.LASTVALUE1}'
+              priority: AVERAGE
+              description: 'RAM utilization is too high. The system might be slow to respond.'
+              tags:
+                - tag: scope
+                  value: performance
+        - uuid: ecc462ed67024602af0a8b026583a64d
+          name: 'Platform Model'
+          type: DEPENDENT
+          key: cisco.ftd.model
+          delay: '0'
+          value_type: CHAR
+          trends: '0'
+          description: 'The platform model of the Cisco Secure FTD.'
+          preprocessing:
+            - type: JSONPATH
+              parameters:
+                - $.systeminfo.platformModel
+            - type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 12h
+          master_item:
+            key: cisco.ftd.device.metrics.get
+          tags:
+            - tag: component
+              value: system
         - uuid: 5eae7fb2030e44bb8afa8b65c53c5d39
           name: 'Get operational metrics'
           type: DEPENDENT
-          key: cisco.ftd.get.operational.metrics
+          key: cisco.ftd.operational.metrics.get
           delay: '0'
           history: '0'
           value_type: TEXT
@@ -374,14 +423,14 @@ zabbix_export:
                   	return JSON.stringify({ 'error': error });
                   }
           master_item:
-            key: cisco.ftd.get.token
+            key: cisco.ftd.token.get
           tags:
             - tag: component
               value: raw
         - uuid: b2b4d9d4afad426483283cc9c23dcbc7
           name: 'Operational metrics item errors'
           type: DEPENDENT
-          key: cisco.ftd.get.operational.metrics.errors
+          key: cisco.ftd.operational.metrics.get.errors
           delay: '0'
           history: 1h
           value_type: TEXT
@@ -396,88 +445,19 @@ zabbix_export:
               parameters:
                 - 1h
           master_item:
-            key: cisco.ftd.get.operational.metrics
+            key: cisco.ftd.operational.metrics.get
           tags:
             - tag: component
               value: error
           triggers:
             - uuid: d955d3cd1f5f4263ac37a004e047e5d5
-              expression: 'length(last(/Cisco Secure Firewall Threat Defense by HTTP/cisco.ftd.get.operational.metrics.errors))>0'
-              name: 'There are errors in the ''Get operational metrics'' metric'
+              expression: 'length(last(/Cisco Secure Firewall Threat Defense by HTTP/cisco.ftd.operational.metrics.get.errors))>0'
+              name: 'Cisco Secure FTD: There are errors in the ''Get operational metrics'' metric'
               priority: WARNING
               description: 'An error occurred when trying to get operational metrics from the Cisco Secure FTD API.'
               tags:
                 - tag: scope
                   value: availability
-        - uuid: fe265c79580b4da99b9a83f23739fae5
-          name: 'Get token'
-          type: HTTP_AGENT
-          key: cisco.ftd.get.token
-          history: '0'
-          value_type: TEXT
-          trends: '0'
-          description: 'The token request. Using grant_type `password` - to obtain an access token using a username and password.'
-          timeout: '{$CISCO.FTD.DATA.TIMEOUT}'
-          url: '{$CISCO.FTD.API.URL}/fdm/token'
-          posts: '{ "grant_type": "password", "username": "{$CISCO.FTD.API.USERNAME}", "password": "{$CISCO.FTD.API.PASSWORD}" }'
-          http_proxy: '{$CISCO.FTD.HTTP_PROXY}'
-          headers:
-            - name: Content-Type
-              value: application/json
-            - name: Accept
-              value: application/json
-          request_method: POST
-          tags:
-            - tag: component
-              value: raw
-        - uuid: a5e0330248284d24a8754e6c04539517
-          name: 'Memory usage, %'
-          type: DEPENDENT
-          key: cisco.ftd.memory.usage.percent
-          delay: '0'
-          value_type: FLOAT
-          units: '%'
-          description: 'Memory usage percentage.'
-          preprocessing:
-            - type: JSONPATH
-              parameters:
-                - $.memory.items..avgUsage.first()
-              error_handler: DISCARD_VALUE
-          master_item:
-            key: cisco.ftd.get.device.metrics
-          tags:
-            - tag: component
-              value: memory
-          triggers:
-            - uuid: 3d5da93aed4343dc8b7e20628a37d20a
-              expression: 'min(/Cisco Secure Firewall Threat Defense by HTTP/cisco.ftd.memory.usage.percent,15m) >= {$CISCO.FTD.MEMORY.UTIL.WARN}'
-              name: 'High memory utilization'
-              event_name: 'High memory utilization (over {$CISCO.FTD.MEMORY.UTIL.WARN}% for 15m)'
-              priority: AVERAGE
-              description: 'RAM utilization is too high. The system might be slow to respond.'
-              tags:
-                - tag: scope
-                  value: performance
-        - uuid: ecc462ed67024602af0a8b026583a64d
-          name: 'Platform Model'
-          type: DEPENDENT
-          key: cisco.ftd.model
-          delay: '0'
-          value_type: CHAR
-          trends: '0'
-          description: 'The platform model of the Cisco Secure FTD.'
-          preprocessing:
-            - type: JSONPATH
-              parameters:
-                - $.systeminfo.platformModel
-            - type: DISCARD_UNCHANGED_HEARTBEAT
-              parameters:
-                - 12h
-          master_item:
-            key: cisco.ftd.get.device.metrics
-          tags:
-            - tag: component
-              value: system
         - uuid: 0668f90812a94797a0b5194ffb2870d2
           name: 'Serial number'
           type: DEPENDENT
@@ -494,7 +474,7 @@ zabbix_export:
               parameters:
                 - 24h
           master_item:
-            key: cisco.ftd.get.device.metrics
+            key: cisco.ftd.device.metrics.get
           tags:
             - tag: component
               value: system
@@ -525,7 +505,7 @@ zabbix_export:
               parameters:
                 - 12h
           master_item:
-            key: cisco.ftd.get.device.metrics
+            key: cisco.ftd.device.metrics.get
           tags:
             - tag: component
               value: system
@@ -548,7 +528,7 @@ zabbix_export:
               parameters:
                 - 1h
           master_item:
-            key: cisco.ftd.get.device.metrics
+            key: cisco.ftd.device.metrics.get
           tags:
             - tag: component
               value: storage
@@ -571,7 +551,7 @@ zabbix_export:
               parameters:
                 - 1h
           master_item:
-            key: cisco.ftd.get.device.metrics
+            key: cisco.ftd.device.metrics.get
           tags:
             - tag: component
               value: storage
@@ -594,10 +574,31 @@ zabbix_export:
               parameters:
                 - 1h
           master_item:
-            key: cisco.ftd.get.device.metrics
+            key: cisco.ftd.device.metrics.get
           tags:
             - tag: component
               value: storage
+        - uuid: fe265c79580b4da99b9a83f23739fae5
+          name: 'Get token'
+          type: HTTP_AGENT
+          key: cisco.ftd.token.get
+          history: '0'
+          value_type: TEXT
+          trends: '0'
+          description: 'The token request. Using grant_type `password` - to obtain an access token using a username and password.'
+          timeout: '{$CISCO.FTD.DATA.TIMEOUT}'
+          url: '{$CISCO.FTD.API.URL}/fdm/token'
+          posts: '{ "grant_type": "password", "username": "{$CISCO.FTD.API.USERNAME}", "password": "{$CISCO.FTD.API.PASSWORD}" }'
+          http_proxy: '{$CISCO.FTD.HTTP_PROXY}'
+          headers:
+            - name: Content-Type
+              value: application/json
+            - name: Accept
+              value: application/json
+          request_method: POST
+          tags:
+            - tag: component
+              value: raw
         - uuid: d03f7e217c704bbc934a6045cbbec48d
           name: 'System uptime'
           type: DEPENDENT
@@ -613,14 +614,14 @@ zabbix_export:
               parameters:
                 - 'return (Math.floor(Date.now()/1000)-Math.floor(Number(value)/1000));'
           master_item:
-            key: cisco.ftd.get.device.metrics
+            key: cisco.ftd.device.metrics.get
           tags:
             - tag: component
               value: system
           triggers:
             - uuid: 887632676fba481db8dd93a977a8d256
               expression: 'last(/Cisco Secure Firewall Threat Defense by HTTP/cisco.ftd.uptime)<10m'
-              name: 'Device has been restarted'
+              name: 'Cisco Secure FTD: Device has been restarted'
               event_name: '{HOST.NAME} has been restarted (uptime < 10m)'
               priority: INFO
               description: 'The host uptime is less than 10 minutes'
@@ -661,16 +662,14 @@ zabbix_export:
                   parameters:
                     - ''
               master_item:
-                key: cisco.ftd.get.operational.metrics
+                key: cisco.ftd.operational.metrics.get
               tags:
                 - tag: asp
                   value: '{#ID}'
                 - tag: component
                   value: asp
-                - tag: component
-                  value: raw
           master_item:
-            key: cisco.ftd.get.operational.metrics
+            key: cisco.ftd.operational.metrics.get
           preprocessing:
             - type: JAVASCRIPT
               parameters:
@@ -722,16 +721,14 @@ zabbix_export:
                     - '$[?(@.id == "{#NAME}" && @.metric == "{#METRIC}")].value.first()'
                   error_handler: DISCARD_VALUE
               master_item:
-                key: cisco.ftd.get.operational.metrics
+                key: cisco.ftd.operational.metrics.get
               tags:
                 - tag: component
                   value: connection
-                - tag: component
-                  value: raw
                 - tag: connection
                   value: '{#NAME}'
           master_item:
-            key: cisco.ftd.get.operational.metrics
+            key: cisco.ftd.operational.metrics.get
           preprocessing:
             - type: JAVASCRIPT
               parameters:
@@ -782,18 +779,16 @@ zabbix_export:
                   parameters:
                     - '$[?(@.name == "{#NAME}")].value.first()'
               master_item:
-                key: cisco.ftd.get.operational.metrics
+                key: cisco.ftd.operational.metrics.get
               tags:
                 - tag: component
                   value: cpu
-                - tag: component
-                  value: raw
                 - tag: cpu
                   value: '{#METRIC}'
               trigger_prototypes:
                 - uuid: 1c5f0b2d3e4f4a6b8c9d0e1f2a3b4c5d
                   expression: 'min(/Cisco Secure Firewall Threat Defense by HTTP/cisco.ftd.cpu.util["{#NAME}"],15m)>{$CISCO.FTD.CPU.UTIL.WARN:"{#NAME}"}'
-                  name: 'CPU [{#METRIC}] utilization: High CPU utilization'
+                  name: 'Cisco Secure FTD: High CPU [{#METRIC}] utilization'
                   event_name: 'High CPU utilization (over {$CISCO.FTD.CPU.UTIL.WARN:"{#NAME}"}% for 15m)'
                   opdata: 'Current utilization: {ITEM.LASTVALUE1}'
                   priority: WARNING
@@ -804,7 +799,7 @@ zabbix_export:
                     - tag: scope
                       value: performance
           master_item:
-            key: cisco.ftd.get.operational.metrics
+            key: cisco.ftd.operational.metrics.get
           preprocessing:
             - type: JAVASCRIPT
               parameters:
@@ -854,7 +849,7 @@ zabbix_export:
                     - '$[?(@.id == "{#ID}" && @.metric == "restart_count")].value.first()'
                   error_handler: DISCARD_VALUE
               master_item:
-                key: cisco.ftd.get.operational.metrics
+                key: cisco.ftd.operational.metrics.get
               tags:
                 - tag: component
                   value: process
@@ -886,7 +881,7 @@ zabbix_export:
                       
                       return typeof idx[value] === 'undefined' ? 0 : idx[value];
               master_item:
-                key: cisco.ftd.get.operational.metrics
+                key: cisco.ftd.operational.metrics.get
               tags:
                 - tag: component
                   value: process
@@ -896,7 +891,7 @@ zabbix_export:
                 - uuid: 9ef40026c8fe4dd389b43fa2e012ce0e
                   expression: 'last(/Cisco Secure Firewall Threat Defense by HTTP/cisco.ftd.critical_process.status["{#ID}"])=3'
                   name: 'Cisco Secure FTD: Process [{#ID}]: Status failed'
-                  event_name: 'Cisco Secure FTD: Process [{#ID}]: Status failed'
+                  opdata: 'Current state: {ITEM.LASTVALUE1}'
                   priority: AVERAGE
                   description: 'The process ''{#ID}'' in the `failed` status.'
                   tags:
@@ -907,7 +902,7 @@ zabbix_export:
                 - uuid: 7737377bce104953b8e80c2700492c5d
                   expression: 'last(/Cisco Secure Firewall Threat Defense by HTTP/cisco.ftd.critical_process.status["{#ID}"])=1'
                   name: 'Cisco Secure FTD: Process [{#ID}]: Status stopped'
-                  event_name: 'Cisco Secure FTD: Process [{#ID}]: Status fialed'
+                  opdata: 'Current state: {ITEM.LASTVALUE1}'
                   priority: AVERAGE
                   description: 'The process ''{#ID}'' in the `stopped` status.'
                   tags:
@@ -929,14 +924,14 @@ zabbix_export:
                     - '$[?(@.id == "{#ID}" && @.metric == "uptime")].value.first()'
                   error_handler: DISCARD_VALUE
               master_item:
-                key: cisco.ftd.get.operational.metrics
+                key: cisco.ftd.operational.metrics.get
               tags:
                 - tag: component
                   value: process
                 - tag: process
                   value: '{#ID}'
           master_item:
-            key: cisco.ftd.get.operational.metrics
+            key: cisco.ftd.operational.metrics.get
           preprocessing:
             - type: JAVASCRIPT
               parameters:
@@ -973,19 +968,20 @@ zabbix_export:
               delay: '0'
               value_type: FLOAT
               units: '!rpm'
+              description: 'FAN ''{#SENSOR}'' speed in RPM.'
               preprocessing:
                 - type: JSONPATH
                   parameters:
                     - '$[?(@.metric == ''{#SENSOR}'')].value.first()'
               master_item:
-                key: cisco.ftd.get.operational.metrics
+                key: cisco.ftd.operational.metrics.get
               tags:
                 - tag: component
                   value: fan
                 - tag: fan
                   value: '{#NAME}'
           master_item:
-            key: cisco.ftd.get.operational.metrics
+            key: cisco.ftd.operational.metrics.get
           preprocessing:
             - type: JAVASCRIPT
               parameters:
@@ -1061,13 +1057,13 @@ zabbix_export:
               history: '0'
               value_type: TEXT
               trends: '0'
-              description: 'Gets data from the interface ''[{#NAME}]''.'
+              description: 'Gets data from the interface ''{#NAME}''.'
               preprocessing:
                 - type: JSONPATH
                   parameters:
                     - '$[?(@.id == "{#NAME}")]'
               master_item:
-                key: cisco.ftd.get.operational.metrics
+                key: cisco.ftd.operational.metrics.get
               tags:
                 - tag: component
                   value: network
@@ -1102,13 +1098,13 @@ zabbix_export:
                   expression: 'min(/Cisco Secure Firewall Threat Defense by HTTP/cisco.ftd.interface.input.errors["{#NAME}"],5m)>{$CISCO.FTD.IF.ERRORS.WARN:"{#IFNAME}"}'
                   recovery_mode: RECOVERY_EXPRESSION
                   recovery_expression: 'max(/Cisco Secure Firewall Threat Defense by HTTP/cisco.ftd.interface.input.errors["{#NAME}"],5m)<{$CISCO.FTD.IF.ERRORS.WARN:"{#NAME}"}*0.8'
-                  name: 'Interface [{#NAME}][{#DESCR}]: High input error rate'
+                  name: 'Cisco Secure FTD: Interface [{#NAME}][{#DESCR}]: High input error rate'
                   event_name: 'Interface [{#NAME}][{#DESCR}]: High input error rate ( > {$CISCO.FTD.IF.ERRORS.WARN:"{#NAME}"} for 5m)'
-                  opdata: 'errors in: {ITEM.LASTVALUE1}'
+                  opdata: 'Errors in: {ITEM.LASTVALUE1}'
                   priority: WARNING
                   description: 'It recovers when it is below 80% of the `{$CISCO.FTD.IF.ERRORS.WARN:"{#NAME}"}` threshold.'
                   dependencies:
-                    - name: 'Interface [{#NAME}][{#DESCR}]: Link down'
+                    - name: 'Cisco Secure FTD: Interface [{#NAME}][{#DESCR}]: Link down'
                       expression: '{$CISCO.FTD.IF.CONTROL:"{#IFNAME}"}=1 and (last(/Cisco Secure Firewall Threat Defense by HTTP/cisco.ftd.interface.status["{#NAME}"])=0)'
                   tags:
                     - tag: scope
@@ -1187,13 +1183,13 @@ zabbix_export:
                   expression: 'min(/Cisco Secure Firewall Threat Defense by HTTP/cisco.ftd.interface.output.errors["{#NAME}"],5m)>{$CISCO.FTD.IF.ERRORS.WARN:"{#IFNAME}"}'
                   recovery_mode: RECOVERY_EXPRESSION
                   recovery_expression: 'max(/Cisco Secure Firewall Threat Defense by HTTP/cisco.ftd.interface.output.errors["{#NAME}"],5m)<{$CISCO.FTD.IF.ERRORS.WARN:"{#NAME}"}*0.8'
-                  name: 'Interface [{#NAME}][{#DESCR}]: High output error rate'
+                  name: 'Cisco Secure FTD: Interface [{#NAME}][{#DESCR}]: High output error rate'
                   event_name: 'Interface [{#NAME}][{#DESCR}]: High output error rate ( > {$CISCO.FTD.IF.ERRORS.WARN:"{#NAME}"} for 5m)'
-                  opdata: 'errors in: {ITEM.LASTVALUE1}'
+                  opdata: 'Errors in: {ITEM.LASTVALUE1}'
                   priority: WARNING
                   description: 'It recovers when it is below 80% of the `{$CISCO.FTD.IF.ERRORS.WARN:"{#NAME}"}` threshold.'
                   dependencies:
-                    - name: 'Interface [{#NAME}][{#DESCR}]: Link down'
+                    - name: 'Cisco Secure FTD: Interface [{#NAME}][{#DESCR}]: Link down'
                       expression: '{$CISCO.FTD.IF.CONTROL:"{#IFNAME}"}=1 and (last(/Cisco Secure Firewall Threat Defense by HTTP/cisco.ftd.interface.status["{#NAME}"])=0)'
                   tags:
                     - tag: scope
@@ -1244,7 +1240,7 @@ zabbix_export:
               trigger_prototypes:
                 - uuid: a7b1dd7b06654adaa9781efb2e5b5d42
                   expression: '{$CISCO.FTD.IF.CONTROL:"{#IFNAME}"}=1 and (last(/Cisco Secure Firewall Threat Defense by HTTP/cisco.ftd.interface.status["{#NAME}"])=0)'
-                  name: 'Interface [{#NAME}][{#DESCR}]: Link down'
+                  name: 'Cisco Secure FTD: Interface [{#NAME}][{#DESCR}]: Link down'
                   opdata: 'Current state: {ITEM.LASTVALUE1}'
                   priority: AVERAGE
                   description: |
@@ -1280,7 +1276,7 @@ zabbix_export:
                 - tag: interface
                   value: '{#NAME}'
           master_item:
-            key: cisco.ftd.get.operational.metrics
+            key: cisco.ftd.operational.metrics.get
           preprocessing:
             - type: JAVASCRIPT
               parameters:
@@ -1324,7 +1320,7 @@ zabbix_export:
                   parameters:
                     - '$[?(@.name == "{#NAME}")].value.first()'
               master_item:
-                key: cisco.ftd.get.operational.metrics
+                key: cisco.ftd.operational.metrics.get
               tags:
                 - tag: component
                   value: memory
@@ -1333,7 +1329,7 @@ zabbix_export:
                 - tag: memory
                   value: '{#METRIC}'
           master_item:
-            key: cisco.ftd.get.operational.metrics
+            key: cisco.ftd.operational.metrics.get
           preprocessing:
             - type: JAVASCRIPT
               parameters:
@@ -1384,7 +1380,7 @@ zabbix_export:
                   parameters:
                     - '$[?(@.name == "{#NAME}")].value.first()'
               master_item:
-                key: cisco.ftd.get.operational.metrics
+                key: cisco.ftd.operational.metrics.get
               tags:
                 - tag: component
                   value: memory
@@ -1395,7 +1391,7 @@ zabbix_export:
               trigger_prototypes:
                 - uuid: 4891c9022137417996978480d3b8b58d
                   expression: 'min(/Cisco Secure Firewall Threat Defense by HTTP/cisco.ftd.memory.util["{#NAME}"],15m)>{$CISCO.FTD.MEMORY.UTIL.WARN:"{#NAME}"}'
-                  name: 'Memory [{#METRIC}] utilization: High memory utilization'
+                  name: 'Cisco Secure FTD: High Memory [{#METRIC}] utilization'
                   event_name: 'Memory [{#METRIC}] utilization: High memory utilization (over {$CISCO.FTD.MEMORY.UTIL.WARN:"{#NAME}"}% for 15m)'
                   opdata: 'Current utilization: {ITEM.LASTVALUE1}'
                   priority: WARNING
@@ -1406,7 +1402,7 @@ zabbix_export:
                     - tag: scope
                       value: performance
           master_item:
-            key: cisco.ftd.get.operational.metrics
+            key: cisco.ftd.operational.metrics.get
           preprocessing:
             - type: JAVASCRIPT
               parameters:
@@ -1451,19 +1447,20 @@ zabbix_export:
               delay: '0'
               value_type: FLOAT
               units: '!W'
+              description: 'Power supply unit ''{#SENSOR}'' power consumption in watts.'
               preprocessing:
                 - type: JSONPATH
                   parameters:
                     - '$[?(@.metric == ''{#SENSOR}'')].value.first()'
               master_item:
-                key: cisco.ftd.get.operational.metrics
+                key: cisco.ftd.operational.metrics.get
               tags:
                 - tag: component
                   value: power
                 - tag: psu
                   value: '{#SENSOR}'
           master_item:
-            key: cisco.ftd.get.operational.metrics
+            key: cisco.ftd.operational.metrics.get
           preprocessing:
             - type: JAVASCRIPT
               parameters:
@@ -1507,22 +1504,20 @@ zabbix_export:
               key: 'cisco.ftd.snort["{#ID}"]'
               delay: '0'
               value_type: FLOAT
-              description: 'Snort ''[{#NAME}]'' statistic of ''[{#METRIC}]''.'
+              description: 'Snort ''{#NAME}'' statistic of ''{#METRIC}''.'
               preprocessing:
                 - type: JSONPATH
                   parameters:
                     - '$[?(@.name == "{#ID}")].value.first()'
               master_item:
-                key: cisco.ftd.get.operational.metrics
+                key: cisco.ftd.operational.metrics.get
               tags:
-                - tag: component
-                  value: raw
                 - tag: component
                   value: snort
                 - tag: snort
                   value: '{#NAME}'
           master_item:
-            key: cisco.ftd.get.operational.metrics
+            key: cisco.ftd.operational.metrics.get
           preprocessing:
             - type: JAVASCRIPT
               parameters:
@@ -1578,7 +1573,7 @@ zabbix_export:
                   parameters:
                     - '$[?(@.metric == "{#SENSOR}")].value.first()'
               master_item:
-                key: cisco.ftd.get.operational.metrics
+                key: cisco.ftd.operational.metrics.get
               tags:
                 - tag: component
                   value: temperature
@@ -1618,7 +1613,7 @@ zabbix_export:
                     - tag: scope
                       value: performance
           master_item:
-            key: cisco.ftd.get.operational.metrics
+            key: cisco.ftd.operational.metrics.get
           preprocessing:
             - type: JAVASCRIPT
               parameters:
@@ -1673,14 +1668,14 @@ zabbix_export:
                   parameters:
                     - '8'
               master_item:
-                key: cisco.ftd.get.device.metrics
+                key: cisco.ftd.device.metrics.get
               tags:
                 - tag: component
                   value: network
                 - tag: interface
                   value: '{#NAME}'
           master_item:
-            key: cisco.ftd.get.device.metrics
+            key: cisco.ftd.device.metrics.get
           preprocessing:
             - type: JSONPATH
               parameters:
@@ -1731,7 +1726,7 @@ zabbix_export:
           description: 'The discovery of mounted filesystems from the Cisco Secure FTD API.'
           item_prototypes:
             - uuid: 89ccc9c43d084d5d84cac0118a0e205b
-              name: 'FS [{#FSNAME}][{#FSMOUNT}]: Space used, in %'
+              name: 'FS [{#FSNAME}][{#FSMOUNT}]: Space utilization'
               type: DEPENDENT
               key: 'cisco.ftd.fs.pused["{#FSNAME}","{#FSMOUNT}"]'
               delay: '0'
@@ -1743,7 +1738,7 @@ zabbix_export:
                   parameters:
                     - '$[?(@.name == "{#NAME}" && @.mounted_on == "{#FSMOUNT}")].value.first()'
               master_item:
-                key: cisco.ftd.get.operational.metrics
+                key: cisco.ftd.operational.metrics.get
               tags:
                 - tag: component
                   value: storage
@@ -1752,7 +1747,7 @@ zabbix_export:
               trigger_prototypes:
                 - uuid: 687ebffa0c14403398cde19620cc6627
                   expression: 'min(/Cisco Secure Firewall Threat Defense by HTTP/cisco.ftd.fs.pused["{#FSNAME}","{#FSMOUNT}"],15m)>{$CISCO.FTD.FS.PUSED.WARN:"{#FSNAME}"}'
-                  name: 'FS [{#FSNAME}][{#FSMOUNT}]: Space is low'
+                  name: 'Cisco Secure FTD: FS [{#FSNAME}][{#FSMOUNT}]: Space is low'
                   event_name: 'FS [{#FSNAME}][{#FSMOUNT}]: Space is low (over {$CISCO.FTD.FS.PUSED.WARN:"{#FSNAME}"}% for 15m)'
                   opdata: 'Current utilization: {ITEM.LASTVALUE1}'
                   priority: WARNING
@@ -1763,7 +1758,7 @@ zabbix_export:
                     - tag: scope
                       value: performance
           master_item:
-            key: cisco.ftd.get.operational.metrics
+            key: cisco.ftd.operational.metrics.get
           preprocessing:
             - type: JAVASCRIPT
               parameters:
@@ -1798,21 +1793,21 @@ zabbix_export:
           type: SECRET_TEXT
           description: 'Cisco Secure Firewall Threat Defense REST API password.'
         - macro: '{$CISCO.FTD.API.URL}'
-          description: 'Cisco Secure Firewall Threat Defense REST API URL. Format example `https://ftd.example.com/api/fdm/latest`'
+          description: 'Cisco Secure Firewall Threat Defense REST API URL. Format example: `https://ftd.example.com/api/fdm/latest`'
         - macro: '{$CISCO.FTD.API.USERNAME}'
           description: 'Cisco Secure Firewall Threat Defense REST API username.'
         - macro: '{$CISCO.FTD.CPU.UTIL.WARN}'
           value: '80'
-          description: 'The warning threshold of the FTD CPU utilization expressed in %.'
+          description: 'The warning threshold for FTD CPU utilization, expressed as a percentage.'
         - macro: '{$CISCO.FTD.DATA.INTERVAL}'
           value: 1m
-          description: 'The update interval for the http item that retrieve data from the API. Can be used with context if needed (check the context values in relevant items).'
+          description: 'The update interval for the HTTP item that retrieves data from the API. Can be used with context if needed (check the context values in relevant items).'
         - macro: '{$CISCO.FTD.DATA.TIMEOUT}'
           value: 15s
           description: 'Response timeout for the Cisco Secure Firewall Threat Defense REST API.'
         - macro: '{$CISCO.FTD.FS.PUSED.WARN}'
           value: '80'
-          description: 'Threshold of the filesystem utilization for trigger. Can be used with filesystem name as context.'
+          description: 'Threshold for filesystem utilization trigger. Can be used with filesystem name as context.'
         - macro: '{$CISCO.FTD.HTTP_PROXY}'
           description: 'HTTP proxy for API requests. You can specify it using the format [protocol://][username[:password]@]proxy.example.com[:port]. For more details, see the documentation at https://www.zabbix.com/documentation/7.0/manual/config/items/itemtypes/http'
         - macro: '{$CISCO.FTD.IF.CONTROL}'
@@ -1820,82 +1815,82 @@ zabbix_export:
           description: 'Macro for operational state of the interface for link down trigger. Can be used with interface name as context.'
         - macro: '{$CISCO.FTD.IF.ERRORS.WARN}'
           value: '2'
-          description: 'Threshold of error packets rate for warning trigger. Can be used with interface name as context.'
+          description: 'Threshold for error packet rate warning trigger. Can be used with interface name as context.'
         - macro: '{$CISCO.FTD.LLD.FILTER.ASP.STATS.NAME.MATCHES}'
           value: '.*'
-          description: 'Filter by discoverable accelerated security path dropped packets or connections by name.'
+          description: 'Filter for discoverable accelerated security path dropped packets or connections by name.'
         - macro: '{$CISCO.FTD.LLD.FILTER.ASP.STATS.NAME.NOT_MATCHES}'
           value: CHANGE_IF_NEEDED
           description: 'Filter to exclude discovered accelerated security path dropped packets or connections by name.'
         - macro: '{$CISCO.FTD.LLD.FILTER.CONN.STATS.NAME.MATCHES}'
           value: '.*'
-          description: 'Filter by discoverable connections by name.'
+          description: 'Filter for discoverable connections by name.'
         - macro: '{$CISCO.FTD.LLD.FILTER.CONN.STATS.NAME.NOT_MATCHES}'
           value: CHANGE_IF_NEEDED
           description: 'Filter to exclude discovered connections by name.'
         - macro: '{$CISCO.FTD.LLD.FILTER.CPU.NAME.MATCHES}'
           value: '.*'
-          description: 'Filter by discoverable CPU by name.'
+          description: 'Filter for discoverable CPUs by name.'
         - macro: '{$CISCO.FTD.LLD.FILTER.CPU.NAME.NOT_MATCHES}'
           value: CHANGE_IF_NEEDED
-          description: 'Filter to exclude discovered CPU by name.'
+          description: 'Filter to exclude discovered CPUs by name.'
         - macro: '{$CISCO.FTD.LLD.FILTER.FSMOUNT.MATCHES}'
           value: '.*'
-          description: 'Filter by discoverable filesystem by mounted on.'
+          description: 'Filter for discoverable filesystems by mount point.'
         - macro: '{$CISCO.FTD.LLD.FILTER.FSMOUNT.NOT_MATCHES}'
           value: CHANGE_IF_NEEDED
-          description: 'Filter to exclude discovered filesystem by mounted on.'
+          description: 'Filter to exclude discovered filesystems by mount point.'
         - macro: '{$CISCO.FTD.LLD.FILTER.FSNAME.MATCHES}'
           value: '.*'
-          description: 'Filter by discoverable filesystem by name.'
+          description: 'Filter for discoverable filesystems by name.'
         - macro: '{$CISCO.FTD.LLD.FILTER.FSNAME.NOT_MATCHES}'
           value: CHANGE_IF_NEEDED
-          description: 'Filter to exclude discovered filesystem by name.'
+          description: 'Filter to exclude discovered filesystems by name.'
         - macro: '{$CISCO.FTD.LLD.FILTER.IF.DESCR.MATCHES}'
           value: '.*'
-          description: 'Filter by discoverable interface description.'
+          description: 'Filter for discoverable interface descriptions.'
         - macro: '{$CISCO.FTD.LLD.FILTER.IF.DESCR.NOT_MATCHES}'
           value: CHANGE_IF_NEEDED
-          description: 'Filter to exclude discovered connections by name.'
+          description: 'Filter to exclude discovered interfaces by description.'
         - macro: '{$CISCO.FTD.LLD.FILTER.IF.NAME.MATCHES}'
           value: '.*'
-          description: 'Filter by discoverable interface names.'
+          description: 'Filter for discoverable interface names.'
         - macro: '{$CISCO.FTD.LLD.FILTER.IF.NAME.NOT_MATCHES}'
           value: CHANGE_IF_NEEDED
           description: 'Filter to exclude discovered interfaces by name.'
         - macro: '{$CISCO.FTD.LLD.FILTER.PROCESS.NAME.MATCHES}'
           value: '.*'
-          description: 'Filter by discoverable process by name.'
+          description: 'Filter for discoverable processes by name.'
         - macro: '{$CISCO.FTD.LLD.FILTER.PROCESS.NAME.NOT_MATCHES}'
           value: CHANGE_IF_NEEDED
-          description: 'Filter to exclude discovered process by name.'
+          description: 'Filter to exclude discovered processes by name.'
         - macro: '{$CISCO.FTD.LLD.FILTER.SENSOR.NAME.MATCHES}'
           value: '.*'
-          description: 'Filter by discoverable temperature sensor by name.'
+          description: 'Filter for discoverable temperature sensors by name.'
         - macro: '{$CISCO.FTD.LLD.FILTER.SENSOR.NAME.NOT_MATCHES}'
           value: CHANGE_IF_NEEDED
-          description: 'Filter to exclude discovered temperature sensor by name.'
+          description: 'Filter to exclude discovered temperature sensors by name.'
         - macro: '{$CISCO.FTD.LLD.FILTER.SNORT.ID.MATCHES}'
           value: '.*'
-          description: 'Filter by discoverable snort and IDS/IPS statistic by name.'
+          description: 'Filter for discoverable Snort and IDS/IPS statistics by name.'
         - macro: '{$CISCO.FTD.LLD.FILTER.SNORT.ID.NOT_MATCHES}'
           value: CHANGE_IF_NEEDED
-          description: 'Filter to exclude discovered snort and IDS/IPS statistic by name.'
+          description: 'Filter to exclude discovered Snort and IDS/IPS statistics by name.'
         - macro: '{$CISCO.FTD.LLD.FILTER.THROUGHPUT.INTERFACE.NAME.MATCHES}'
           value: '.*'
-          description: 'Filter of discoverable throughput interfaces by name.'
+          description: 'Filter for discoverable throughput interfaces by name.'
         - macro: '{$CISCO.FTD.LLD.FILTER.THROUGHPUT.INTERFACE.NAME.NOT_MATCHES}'
           value: CHANGE_IF_NEEDED
           description: 'Filter to exclude discoverable throughput interfaces by name.'
         - macro: '{$CISCO.FTD.MEMORY.UTIL.WARN}'
           value: '80'
-          description: 'The warning threshold of the FTD memory utilization expressed in %.'
+          description: 'The warning threshold for FTD memory utilization, expressed as a percentage.'
         - macro: '{$CISCO.FTD.TEMP.CRIT}'
           value: '60'
-          description: 'Threshold of temperature sensor for trigger. Can be used with interface name as context.'
+          description: 'Threshold for temperature sensor critical trigger. Can be used with interface name as context.'
         - macro: '{$CISCO.FTD.TEMP.WARN}'
           value: '50'
-          description: 'Threshold of temperature sensor for trigger. Can be used with interface name as context.'
+          description: 'Threshold for temperature sensor warning trigger. Can be used with interface name as context.'
       dashboards:
         - uuid: 2433c7593dee4824b3f5ce1209bc5311
           name: 'Cisco Secure FTD: General'
@@ -1951,7 +1946,7 @@ zabbix_export:
                       name: ds.0.itemids.0
                       value:
                         host: 'Cisco Secure Firewall Threat Defense by HTTP'
-                        key: cisco.ftd.eps.rate
+                        key: cisco.ftd.events.rate
                     - type: INTEGER
                       name: lefty
                       value: '0'
@@ -1972,7 +1967,7 @@ zabbix_export:
                       name: itemid.0
                       value:
                         host: 'Cisco Secure Firewall Threat Defense by HTTP'
-                        key: cisco.ftd.cpu.usage
+                        key: cisco.ftd.cpu.utilization
                     - type: INTEGER
                       name: show.0
                       value: '2'
@@ -2045,7 +2040,7 @@ zabbix_export:
                       name: itemid.0
                       value:
                         host: 'Cisco Secure Firewall Threat Defense by HTTP'
-                        key: cisco.ftd.memory.usage.percent
+                        key: cisco.ftd.memory.utilization
                     - type: INTEGER
                       name: show.0
                       value: '2'
@@ -2910,10 +2905,10 @@ zabbix_export:
               newvalue: RESTARTING
   graphs:
     - uuid: 63c998c8625c45ac8e29802bfa83f4e1
-      name: 'CPU Utilization'
+      name: 'Cisco Secure FTD: CPU Utilization'
       graph_items:
         - drawtype: GRADIENT_LINE
           color: 2196F3
           item:
             host: 'Cisco Secure Firewall Threat Defense by HTTP'
-            key: cisco.ftd.cpu.usage
+            key: cisco.ftd.cpu.utilization

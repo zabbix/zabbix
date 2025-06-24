@@ -33,54 +33,54 @@ You must set the following macros in the template or host configuration:
 |Name|Description|Default|
 |----|-----------|-------|
 |{$CISCO.FTD.HTTP_PROXY}|<p>HTTP proxy for API requests. You can specify it using the format [protocol://][username[:password]@]proxy.example.com[:port]. For more details, see the documentation at https://www.zabbix.com/documentation/7.0/manual/config/items/itemtypes/http</p>||
-|{$CISCO.FTD.API.URL}|<p>Cisco Secure Firewall Threat Defense REST API URL. Format example `https://ftd.example.com/api/fdm/latest`</p>||
+|{$CISCO.FTD.API.URL}|<p>Cisco Secure Firewall Threat Defense REST API URL. Format example: `https://ftd.example.com/api/fdm/latest`</p>||
 |{$CISCO.FTD.API.USERNAME}|<p>Cisco Secure Firewall Threat Defense REST API username.</p>||
 |{$CISCO.FTD.API.PASSWORD}|<p>Cisco Secure Firewall Threat Defense REST API password.</p>||
 |{$CISCO.FTD.DATA.TIMEOUT}|<p>Response timeout for the Cisco Secure Firewall Threat Defense REST API.</p>|`15s`|
-|{$CISCO.FTD.DATA.INTERVAL}|<p>The update interval for the http item that retrieve data from the API. Can be used with context if needed (check the context values in relevant items).</p>|`1m`|
-|{$CISCO.FTD.CPU.UTIL.WARN}|<p>The warning threshold of the FTD CPU utilization expressed in %.</p>|`80`|
-|{$CISCO.FTD.MEMORY.UTIL.WARN}|<p>The warning threshold of the FTD memory utilization expressed in %.</p>|`80`|
-|{$CISCO.FTD.LLD.FILTER.THROUGHPUT.INTERFACE.NAME.MATCHES}|<p>Filter of discoverable throughput interfaces by name.</p>|`.*`|
+|{$CISCO.FTD.DATA.INTERVAL}|<p>The update interval for the HTTP item that retrieves data from the API. Can be used with context if needed (check the context values in relevant items).</p>|`1m`|
+|{$CISCO.FTD.CPU.UTIL.WARN}|<p>The warning threshold for FTD CPU utilization, expressed as a percentage.</p>|`80`|
+|{$CISCO.FTD.MEMORY.UTIL.WARN}|<p>The warning threshold for FTD memory utilization, expressed as a percentage.</p>|`80`|
+|{$CISCO.FTD.LLD.FILTER.THROUGHPUT.INTERFACE.NAME.MATCHES}|<p>Filter for discoverable throughput interfaces by name.</p>|`.*`|
 |{$CISCO.FTD.LLD.FILTER.THROUGHPUT.INTERFACE.NAME.NOT_MATCHES}|<p>Filter to exclude discoverable throughput interfaces by name.</p>|`CHANGE_IF_NEEDED`|
-|{$CISCO.FTD.LLD.FILTER.IF.NAME.MATCHES}|<p>Filter by discoverable interface names.</p>|`.*`|
+|{$CISCO.FTD.LLD.FILTER.IF.NAME.MATCHES}|<p>Filter for discoverable interface names.</p>|`.*`|
 |{$CISCO.FTD.LLD.FILTER.IF.NAME.NOT_MATCHES}|<p>Filter to exclude discovered interfaces by name.</p>|`CHANGE_IF_NEEDED`|
-|{$CISCO.FTD.LLD.FILTER.IF.DESCR.MATCHES}|<p>Filter by discoverable interface description.</p>|`.*`|
-|{$CISCO.FTD.LLD.FILTER.IF.DESCR.NOT_MATCHES}|<p>Filter to exclude discovered connections by name.</p>|`CHANGE_IF_NEEDED`|
-|{$CISCO.FTD.LLD.FILTER.CONN.STATS.NAME.MATCHES}|<p>Filter by discoverable connections by name.</p>|`.*`|
+|{$CISCO.FTD.LLD.FILTER.IF.DESCR.MATCHES}|<p>Filter for discoverable interface descriptions.</p>|`.*`|
+|{$CISCO.FTD.LLD.FILTER.IF.DESCR.NOT_MATCHES}|<p>Filter to exclude discovered interfaces by description.</p>|`CHANGE_IF_NEEDED`|
+|{$CISCO.FTD.LLD.FILTER.CONN.STATS.NAME.MATCHES}|<p>Filter for discoverable connections by name.</p>|`.*`|
 |{$CISCO.FTD.LLD.FILTER.CONN.STATS.NAME.NOT_MATCHES}|<p>Filter to exclude discovered connections by name.</p>|`CHANGE_IF_NEEDED`|
-|{$CISCO.FTD.LLD.FILTER.ASP.STATS.NAME.MATCHES}|<p>Filter by discoverable accelerated security path dropped packets or connections by name.</p>|`.*`|
+|{$CISCO.FTD.LLD.FILTER.ASP.STATS.NAME.MATCHES}|<p>Filter for discoverable accelerated security path dropped packets or connections by name.</p>|`.*`|
 |{$CISCO.FTD.LLD.FILTER.ASP.STATS.NAME.NOT_MATCHES}|<p>Filter to exclude discovered accelerated security path dropped packets or connections by name.</p>|`CHANGE_IF_NEEDED`|
-|{$CISCO.FTD.LLD.FILTER.SNORT.ID.MATCHES}|<p>Filter by discoverable snort and IDS/IPS statistic by name.</p>|`.*`|
-|{$CISCO.FTD.LLD.FILTER.SNORT.ID.NOT_MATCHES}|<p>Filter to exclude discovered snort and IDS/IPS statistic by name.</p>|`CHANGE_IF_NEEDED`|
-|{$CISCO.FTD.LLD.FILTER.CPU.NAME.MATCHES}|<p>Filter by discoverable CPU by name.</p>|`.*`|
-|{$CISCO.FTD.LLD.FILTER.CPU.NAME.NOT_MATCHES}|<p>Filter to exclude discovered CPU by name.</p>|`CHANGE_IF_NEEDED`|
-|{$CISCO.FTD.LLD.FILTER.PROCESS.NAME.MATCHES}|<p>Filter by discoverable process by name.</p>|`.*`|
-|{$CISCO.FTD.LLD.FILTER.PROCESS.NAME.NOT_MATCHES}|<p>Filter to exclude discovered process by name.</p>|`CHANGE_IF_NEEDED`|
-|{$CISCO.FTD.LLD.FILTER.SENSOR.NAME.MATCHES}|<p>Filter by discoverable temperature sensor by name.</p>|`.*`|
-|{$CISCO.FTD.LLD.FILTER.SENSOR.NAME.NOT_MATCHES}|<p>Filter to exclude discovered temperature sensor by name.</p>|`CHANGE_IF_NEEDED`|
-|{$CISCO.FTD.LLD.FILTER.FSNAME.MATCHES}|<p>Filter by discoverable filesystem by name.</p>|`.*`|
-|{$CISCO.FTD.LLD.FILTER.FSNAME.NOT_MATCHES}|<p>Filter to exclude discovered filesystem by name.</p>|`CHANGE_IF_NEEDED`|
-|{$CISCO.FTD.LLD.FILTER.FSMOUNT.MATCHES}|<p>Filter by discoverable filesystem by mounted on.</p>|`.*`|
-|{$CISCO.FTD.LLD.FILTER.FSMOUNT.NOT_MATCHES}|<p>Filter to exclude discovered filesystem by mounted on.</p>|`CHANGE_IF_NEEDED`|
-|{$CISCO.FTD.TEMP.CRIT}|<p>Threshold of temperature sensor for trigger. Can be used with interface name as context.</p>|`60`|
-|{$CISCO.FTD.TEMP.WARN}|<p>Threshold of temperature sensor for trigger. Can be used with interface name as context.</p>|`50`|
-|{$CISCO.FTD.FS.PUSED.WARN}|<p>Threshold of the filesystem utilization for trigger. Can be used with filesystem name as context.</p>|`80`|
-|{$CISCO.FTD.IF.ERRORS.WARN}|<p>Threshold of error packets rate for warning trigger. Can be used with interface name as context.</p>|`2`|
+|{$CISCO.FTD.LLD.FILTER.SNORT.ID.MATCHES}|<p>Filter for discoverable Snort and IDS/IPS statistics by name.</p>|`.*`|
+|{$CISCO.FTD.LLD.FILTER.SNORT.ID.NOT_MATCHES}|<p>Filter to exclude discovered Snort and IDS/IPS statistics by name.</p>|`CHANGE_IF_NEEDED`|
+|{$CISCO.FTD.LLD.FILTER.CPU.NAME.MATCHES}|<p>Filter for discoverable CPUs by name.</p>|`.*`|
+|{$CISCO.FTD.LLD.FILTER.CPU.NAME.NOT_MATCHES}|<p>Filter to exclude discovered CPUs by name.</p>|`CHANGE_IF_NEEDED`|
+|{$CISCO.FTD.LLD.FILTER.PROCESS.NAME.MATCHES}|<p>Filter for discoverable processes by name.</p>|`.*`|
+|{$CISCO.FTD.LLD.FILTER.PROCESS.NAME.NOT_MATCHES}|<p>Filter to exclude discovered processes by name.</p>|`CHANGE_IF_NEEDED`|
+|{$CISCO.FTD.LLD.FILTER.SENSOR.NAME.MATCHES}|<p>Filter for discoverable temperature sensors by name.</p>|`.*`|
+|{$CISCO.FTD.LLD.FILTER.SENSOR.NAME.NOT_MATCHES}|<p>Filter to exclude discovered temperature sensors by name.</p>|`CHANGE_IF_NEEDED`|
+|{$CISCO.FTD.LLD.FILTER.FSNAME.MATCHES}|<p>Filter for discoverable filesystems by name.</p>|`.*`|
+|{$CISCO.FTD.LLD.FILTER.FSNAME.NOT_MATCHES}|<p>Filter to exclude discovered filesystems by name.</p>|`CHANGE_IF_NEEDED`|
+|{$CISCO.FTD.LLD.FILTER.FSMOUNT.MATCHES}|<p>Filter for discoverable filesystems by mount point.</p>|`.*`|
+|{$CISCO.FTD.LLD.FILTER.FSMOUNT.NOT_MATCHES}|<p>Filter to exclude discovered filesystems by mount point.</p>|`CHANGE_IF_NEEDED`|
+|{$CISCO.FTD.TEMP.CRIT}|<p>Threshold for temperature sensor critical trigger. Can be used with interface name as context.</p>|`60`|
+|{$CISCO.FTD.TEMP.WARN}|<p>Threshold for temperature sensor warning trigger. Can be used with interface name as context.</p>|`50`|
+|{$CISCO.FTD.FS.PUSED.WARN}|<p>Threshold for filesystem utilization trigger. Can be used with filesystem name as context.</p>|`80`|
+|{$CISCO.FTD.IF.ERRORS.WARN}|<p>Threshold for error packet rate warning trigger. Can be used with interface name as context.</p>|`2`|
 |{$CISCO.FTD.IF.CONTROL}|<p>Macro for operational state of the interface for link down trigger. Can be used with interface name as context.</p>|`1`|
 
 ### Items
 
 |Name|Description|Type|Key and additional info|
 |----|-----------|----|-----------------------|
-|Get token|<p>The token request. Using grant_type `password` - to obtain an access token using a username and password.</p>|HTTP agent|cisco.ftd.get.token|
-|Get device metrics|<p>Collects device metrics from the Cisco Secure FTD API.</p>|Dependent item|cisco.ftd.get.device.metrics<p>**Preprocessing**</p><ul><li><p>JavaScript: `The text is too long. Please see the template.`</p></li></ul>|
-|Device metrics item errors|<p>Collects errors from device metrics.</p>|Dependent item|cisco.ftd.get.device.metrics.errors<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.error`</p><p>⛔️Custom on fail: Set value to</p></li><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
-|Get operational metrics|<p>Collects device metrics from the Cisco Secure FTD API.</p>|Dependent item|cisco.ftd.get.operational.metrics<p>**Preprocessing**</p><ul><li><p>JavaScript: `The text is too long. Please see the template.`</p></li></ul>|
-|Operational metrics item errors|<p>Collects errors from operational metrics.</p>|Dependent item|cisco.ftd.get.operational.metrics.errors<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.error`</p><p>⛔️Custom on fail: Set value to</p></li><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
-|CPU usage, %|<p>Average CPU utilization.</p>|Dependent item|cisco.ftd.cpu.usage<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.cpu.items..avgUsage.first()`</p></li></ul>|
-|Memory usage, %|<p>Memory usage percentage.</p>|Dependent item|cisco.ftd.memory.usage.percent<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.memory.items..avgUsage.first()`</p><p>⛔️Custom on fail: Discard value</p></li></ul>|
-|Events per second|<p>Average events per second.</p>|Dependent item|cisco.ftd.eps.rate<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.eps.items..avgEps.first()`</p></li><li>Change per second</li></ul>|
-|Disc space: Utilization|<p>Disk total usage percentage.</p>|Dependent item|cisco.ftd.disk.total.util<p>**Preprocessing**</p><ul><li><p>JSON Path: `The text is too long. Please see the template.`</p><p>⛔️Custom on fail: Discard value</p></li><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
+|Get token|<p>The token request. Using grant_type `password` - to obtain an access token using a username and password.</p>|HTTP agent|cisco.ftd.token.get|
+|Get device metrics|<p>Collects device metrics from the Cisco Secure FTD API.</p>|Dependent item|cisco.ftd.device.metrics.get<p>**Preprocessing**</p><ul><li><p>JavaScript: `The text is too long. Please see the template.`</p></li></ul>|
+|Device metrics item errors|<p>Collects errors from device metrics.</p>|Dependent item|cisco.ftd.device.metrics.get.errors<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.error`</p><p>⛔️Custom on fail: Set value to</p></li><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
+|Get operational metrics|<p>Collects device metrics from the Cisco Secure FTD API.</p>|Dependent item|cisco.ftd.operational.metrics.get<p>**Preprocessing**</p><ul><li><p>JavaScript: `The text is too long. Please see the template.`</p></li></ul>|
+|Operational metrics item errors|<p>Collects errors from operational metrics.</p>|Dependent item|cisco.ftd.operational.metrics.get.errors<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.error`</p><p>⛔️Custom on fail: Set value to</p></li><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
+|CPU usage|<p>Average CPU utilization.</p>|Dependent item|cisco.ftd.cpu.utilization<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.cpu.items..avgUsage.first()`</p></li></ul>|
+|Memory usage|<p>Memory usage percentage.</p>|Dependent item|cisco.ftd.memory.utilization<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.memory.items..avgUsage.first()`</p><p>⛔️Custom on fail: Discard value</p></li></ul>|
+|Events per second|<p>Average events per second.</p>|Dependent item|cisco.ftd.events.rate<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.eps.items..avgEps.first()`</p></li><li>Change per second</li></ul>|
+|Disc space: Utilization|<p>Disk total usage percentage.</p>|Dependent item|cisco.ftd.disk.total.utilization<p>**Preprocessing**</p><ul><li><p>JSON Path: `The text is too long. Please see the template.`</p><p>⛔️Custom on fail: Discard value</p></li><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
 |Disc space: Total|<p>Disk total size in bytes.</p>|Dependent item|cisco.ftd.disk.total.size<p>**Preprocessing**</p><ul><li><p>JSON Path: `$[?(@.name == "disk_stats.total.size")].value.first()`</p><p>⛔️Custom on fail: Discard value</p></li><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
 |Disc space: Used|<p>Disk total used in bytes.</p>|Dependent item|cisco.ftd.disk.total.used<p>**Preprocessing**</p><ul><li><p>JSON Path: `$[?(@.name == "disk_stats.total.used")].value.first()`</p><p>⛔️Custom on fail: Discard value</p></li><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
 |Storage: Used|<p>Amount of storage used.</p>|Dependent item|cisco.ftd.storage.usage<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.disk.used`</p><p>⛔️Custom on fail: Discard value</p></li><li><p>Custom multiplier: `1073741824`</p></li><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
@@ -95,12 +95,12 @@ You must set the following macros in the template or host configuration:
 
 |Name|Description|Expression|Severity|Dependencies and additional info|
 |----|-----------|----------|--------|--------------------------------|
-|There are errors in the 'Get device metrics' metric|<p>An error occurred when trying to get device metrics from the Cisco Secure FTD API.</p>|`length(last(/Cisco Secure Firewall Threat Defense by HTTP/cisco.ftd.get.device.metrics.errors))>0`|Warning||
-|There are errors in the 'Get operational metrics' metric|<p>An error occurred when trying to get operational metrics from the Cisco Secure FTD API.</p>|`length(last(/Cisco Secure Firewall Threat Defense by HTTP/cisco.ftd.get.operational.metrics.errors))>0`|Warning||
-|High CPU utilization|<p>The CPU utilization is too high. The system might be slow to respond.</p>|`min(/Cisco Secure Firewall Threat Defense by HTTP/cisco.ftd.cpu.usage,15m)>{$CISCO.FTD.CPU.UTIL.WARN}`|Warning||
-|High memory utilization|<p>RAM utilization is too high. The system might be slow to respond.</p>|`min(/Cisco Secure Firewall Threat Defense by HTTP/cisco.ftd.memory.usage.percent,15m) >= {$CISCO.FTD.MEMORY.UTIL.WARN}`|Average||
+|Cisco Secure FTD: There are errors in the 'Get device metrics' metric|<p>An error occurred when trying to get device metrics from the Cisco Secure FTD API.</p>|`length(last(/Cisco Secure Firewall Threat Defense by HTTP/cisco.ftd.device.metrics.get.errors))>0`|Warning||
+|Cisco Secure FTD: There are errors in the 'Get operational metrics' metric|<p>An error occurred when trying to get operational metrics from the Cisco Secure FTD API.</p>|`length(last(/Cisco Secure Firewall Threat Defense by HTTP/cisco.ftd.operational.metrics.get.errors))>0`|Warning||
+|Cisco Secure FTD: High CPU utilization|<p>The CPU utilization is too high. The system might be slow to respond.</p>|`min(/Cisco Secure Firewall Threat Defense by HTTP/cisco.ftd.cpu.utilization,15m)>{$CISCO.FTD.CPU.UTIL.WARN}`|Warning||
+|Cisco Secure FTD: High memory utilization|<p>RAM utilization is too high. The system might be slow to respond.</p>|`min(/Cisco Secure Firewall Threat Defense by HTTP/cisco.ftd.memory.utilization,15m) >= {$CISCO.FTD.MEMORY.UTIL.WARN}`|Average||
 |Cisco Secure FTD: Device has been replaced|<p>Device serial number has changed. Acknowledge to close the problem manually.</p>|`last(/Cisco Secure Firewall Threat Defense by HTTP/cisco.ftd.serialnumber,#1)<>last(/Cisco Secure Firewall Threat Defense by HTTP/cisco.ftd.serialnumber,#2) and length(last(/Cisco Secure Firewall Threat Defense by HTTP/cisco.ftd.serialnumber))>0`|Info|**Manual close**: Yes|
-|Device has been restarted|<p>The host uptime is less than 10 minutes</p>|`last(/Cisco Secure Firewall Threat Defense by HTTP/cisco.ftd.uptime)<10m`|Info|**Manual close**: Yes|
+|Cisco Secure FTD: Device has been restarted|<p>The host uptime is less than 10 minutes</p>|`last(/Cisco Secure Firewall Threat Defense by HTTP/cisco.ftd.uptime)<10m`|Info|**Manual close**: Yes|
 
 ### LLD rule Throughput discovery
 
@@ -124,7 +124,7 @@ You must set the following macros in the template or host configuration:
 
 |Name|Description|Type|Key and additional info|
 |----|-----------|----|-----------------------|
-|Interface [{#NAME}][{#DESCR}]: Get metrics data|<p>Gets data from the interface '[{#NAME}]'.</p>|Dependent item|cisco.ftd.interface.get["{#NAME}","{#DESCR}"]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$[?(@.id == "{#NAME}")]`</p></li></ul>|
+|Interface [{#NAME}][{#DESCR}]: Get metrics data|<p>Gets data from the interface '{#NAME}'.</p>|Dependent item|cisco.ftd.interface.get["{#NAME}","{#DESCR}"]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$[?(@.id == "{#NAME}")]`</p></li></ul>|
 |Interface [{#NAME}][{#DESCR}]: Incoming traffic|<p>Input traffic '{#NAME}' interface.</p>|Dependent item|cisco.ftd.net.if.in.traffic["{#NAME}"]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$[?(@.metric == "input_bytes")].value.first()`</p></li><li><p>Custom multiplier: `8`</p><p>⛔️Custom on fail: Discard value</p></li><li>Change per second</li></ul>|
 |Interface [{#NAME}][{#DESCR}]: Outgoing traffic|<p>Outgoing traffic '{#NAME}' interface.</p>|Dependent item|cisco.ftd.interface.out.traffic["{#NAME}"]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$[?(@.metric == "output_bytes")].value.first()`</p><p>⛔️Custom on fail: Discard value</p></li><li><p>Custom multiplier: `8`</p></li><li>Change per second</li></ul>|
 |Interface [{#NAME}][{#DESCR}]: Input packets|<p>Input packets '{#NAME}' interface.</p>|Dependent item|cisco.ftd.interface.input.packets["{#NAME}"]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$[?(@.metric == "input_packets")].value.first()`</p><p>⛔️Custom on fail: Discard value</p></li><li>Change per second</li></ul>|
@@ -138,9 +138,9 @@ You must set the following macros in the template or host configuration:
 
 |Name|Description|Expression|Severity|Dependencies and additional info|
 |----|-----------|----------|--------|--------------------------------|
-|Interface [{#NAME}][{#DESCR}]: High input error rate|<p>It recovers when it is below 80% of the `{$CISCO.FTD.IF.ERRORS.WARN:"{#NAME}"}` threshold.</p>|`min(/Cisco Secure Firewall Threat Defense by HTTP/cisco.ftd.interface.input.errors["{#NAME}"],5m)>{$CISCO.FTD.IF.ERRORS.WARN:"{#IFNAME}"}`|Warning|**Depends on**:<br><ul><li>Interface [{#NAME}][{#DESCR}]: Link down</li></ul>|
-|Interface [{#NAME}][{#DESCR}]: High output error rate|<p>It recovers when it is below 80% of the `{$CISCO.FTD.IF.ERRORS.WARN:"{#NAME}"}` threshold.</p>|`min(/Cisco Secure Firewall Threat Defense by HTTP/cisco.ftd.interface.output.errors["{#NAME}"],5m)>{$CISCO.FTD.IF.ERRORS.WARN:"{#IFNAME}"}`|Warning|**Depends on**:<br><ul><li>Interface [{#NAME}][{#DESCR}]: Link down</li></ul>|
-|Interface [{#NAME}][{#DESCR}]: Link down|<p>This trigger expression works as follows:<br>1. It can be triggered if the operations status is down.<br>2. `{$CISCO.FTD.IF.CONTROL:"{#IFNAME}"}=1` - a user can redefine context macro to value - 0. That marks this interface as not important. No new trigger will be fired if this interface is down.</p>|`{$CISCO.FTD.IF.CONTROL:"{#IFNAME}"}=1 and (last(/Cisco Secure Firewall Threat Defense by HTTP/cisco.ftd.interface.status["{#NAME}"])=0)`|Average||
+|Cisco Secure FTD: Interface [{#NAME}][{#DESCR}]: High input error rate|<p>It recovers when it is below 80% of the `{$CISCO.FTD.IF.ERRORS.WARN:"{#NAME}"}` threshold.</p>|`min(/Cisco Secure Firewall Threat Defense by HTTP/cisco.ftd.interface.input.errors["{#NAME}"],5m)>{$CISCO.FTD.IF.ERRORS.WARN:"{#IFNAME}"}`|Warning|**Depends on**:<br><ul><li>Cisco Secure FTD: Interface [{#NAME}][{#DESCR}]: Link down</li></ul>|
+|Cisco Secure FTD: Interface [{#NAME}][{#DESCR}]: High output error rate|<p>It recovers when it is below 80% of the `{$CISCO.FTD.IF.ERRORS.WARN:"{#NAME}"}` threshold.</p>|`min(/Cisco Secure Firewall Threat Defense by HTTP/cisco.ftd.interface.output.errors["{#NAME}"],5m)>{$CISCO.FTD.IF.ERRORS.WARN:"{#IFNAME}"}`|Warning|**Depends on**:<br><ul><li>Cisco Secure FTD: Interface [{#NAME}][{#DESCR}]: Link down</li></ul>|
+|Cisco Secure FTD: Interface [{#NAME}][{#DESCR}]: Link down|<p>This trigger expression works as follows:<br>1. It can be triggered if the operations status is down.<br>2. `{$CISCO.FTD.IF.CONTROL:"{#IFNAME}"}=1` - a user can redefine context macro to value - 0. That marks this interface as not important. No new trigger will be fired if this interface is down.</p>|`{$CISCO.FTD.IF.CONTROL:"{#IFNAME}"}=1 and (last(/Cisco Secure Firewall Threat Defense by HTTP/cisco.ftd.interface.status["{#NAME}"])=0)`|Average||
 
 ### LLD rule Connection discovery
 
@@ -176,7 +176,7 @@ You must set the following macros in the template or host configuration:
 
 |Name|Description|Type|Key and additional info|
 |----|-----------|----|-----------------------|
-|Statistic [{#NAME}][{#METRIC}]|<p>Snort '[{#NAME}]' statistic of '[{#METRIC}]'.</p>|Dependent item|cisco.ftd.snort["{#ID}"]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$[?(@.name == "{#ID}")].value.first()`</p></li></ul>|
+|Statistic [{#NAME}][{#METRIC}]|<p>Snort '{#NAME}' statistic of '{#METRIC}'.</p>|Dependent item|cisco.ftd.snort["{#ID}"]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$[?(@.name == "{#ID}")].value.first()`</p></li></ul>|
 
 ### LLD rule CPU discovery
 
@@ -194,7 +194,7 @@ You must set the following macros in the template or host configuration:
 
 |Name|Description|Expression|Severity|Dependencies and additional info|
 |----|-----------|----------|--------|--------------------------------|
-|CPU [{#METRIC}] utilization: High CPU utilization|<p>The CPU utilization is too high. The system might be slow to respond.</p>|`min(/Cisco Secure Firewall Threat Defense by HTTP/cisco.ftd.cpu.util["{#NAME}"],15m)>{$CISCO.FTD.CPU.UTIL.WARN:"{#NAME}"}`|Warning||
+|Cisco Secure FTD: High CPU [{#METRIC}] utilization|<p>The CPU utilization is too high. The system might be slow to respond.</p>|`min(/Cisco Secure Firewall Threat Defense by HTTP/cisco.ftd.cpu.util["{#NAME}"],15m)>{$CISCO.FTD.CPU.UTIL.WARN:"{#NAME}"}`|Warning||
 
 ### LLD rule Memory utilization discovery
 
@@ -212,7 +212,7 @@ You must set the following macros in the template or host configuration:
 
 |Name|Description|Expression|Severity|Dependencies and additional info|
 |----|-----------|----------|--------|--------------------------------|
-|Memory [{#METRIC}] utilization: High memory utilization|<p>The memory utilization is too high. The system might be slow to respond.</p>|`min(/Cisco Secure Firewall Threat Defense by HTTP/cisco.ftd.memory.util["{#NAME}"],15m)>{$CISCO.FTD.MEMORY.UTIL.WARN:"{#NAME}"}`|Warning||
+|Cisco Secure FTD: High Memory [{#METRIC}] utilization|<p>The memory utilization is too high. The system might be slow to respond.</p>|`min(/Cisco Secure Firewall Threat Defense by HTTP/cisco.ftd.memory.util["{#NAME}"],15m)>{$CISCO.FTD.MEMORY.UTIL.WARN:"{#NAME}"}`|Warning||
 
 ### LLD rule Memory discovery
 
@@ -236,13 +236,13 @@ You must set the following macros in the template or host configuration:
 
 |Name|Description|Type|Key and additional info|
 |----|-----------|----|-----------------------|
-|FS [{#FSNAME}][{#FSMOUNT}]: Space used, in %|<p>Calculated as the percentage of currently used space compared to the maximum available space.</p>|Dependent item|cisco.ftd.fs.pused["{#FSNAME}","{#FSMOUNT}"]<p>**Preprocessing**</p><ul><li><p>JSON Path: `The text is too long. Please see the template.`</p></li></ul>|
+|FS [{#FSNAME}][{#FSMOUNT}]: Space utilization|<p>Calculated as the percentage of currently used space compared to the maximum available space.</p>|Dependent item|cisco.ftd.fs.pused["{#FSNAME}","{#FSMOUNT}"]<p>**Preprocessing**</p><ul><li><p>JSON Path: `The text is too long. Please see the template.`</p></li></ul>|
 
 ### Trigger prototypes for Mounted filesystem discovery
 
 |Name|Description|Expression|Severity|Dependencies and additional info|
 |----|-----------|----------|--------|--------------------------------|
-|FS [{#FSNAME}][{#FSMOUNT}]: Space is low|<p>The trigger expression is based on the current used and maximum available spaces. The system might be slow to respond.</p>|`min(/Cisco Secure Firewall Threat Defense by HTTP/cisco.ftd.fs.pused["{#FSNAME}","{#FSMOUNT}"],15m)>{$CISCO.FTD.FS.PUSED.WARN:"{#FSNAME}"}`|Warning||
+|Cisco Secure FTD: FS [{#FSNAME}][{#FSMOUNT}]: Space is low|<p>The trigger expression is based on the current used and maximum available spaces. The system might be slow to respond.</p>|`min(/Cisco Secure Firewall Threat Defense by HTTP/cisco.ftd.fs.pused["{#FSNAME}","{#FSMOUNT}"],15m)>{$CISCO.FTD.FS.PUSED.WARN:"{#FSNAME}"}`|Warning||
 
 ### LLD rule Critical process discovery
 
@@ -294,7 +294,7 @@ You must set the following macros in the template or host configuration:
 
 |Name|Description|Type|Key and additional info|
 |----|-----------|----|-----------------------|
-|Power supply [{#SENSOR}]||Dependent item|cisco.ftd.sensor.psu.pwr[{#SENSOR}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$[?(@.metric == '{#SENSOR}')].value.first()`</p></li></ul>|
+|Power supply [{#SENSOR}]|<p>Power supply unit '{#SENSOR}' power consumption in watts.</p>|Dependent item|cisco.ftd.sensor.psu.pwr[{#SENSOR}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$[?(@.metric == '{#SENSOR}')].value.first()`</p></li></ul>|
 
 ### LLD rule FAN discovery
 
@@ -306,7 +306,7 @@ You must set the following macros in the template or host configuration:
 
 |Name|Description|Type|Key and additional info|
 |----|-----------|----|-----------------------|
-|Fan speed [{#NAME}]||Dependent item|cisco.ftd.sensor.fan.rpm[{#SENSOR}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$[?(@.metric == '{#SENSOR}')].value.first()`</p></li></ul>|
+|Fan speed [{#NAME}]|<p>FAN '{#SENSOR}' speed in RPM.</p>|Dependent item|cisco.ftd.sensor.fan.rpm[{#SENSOR}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$[?(@.metric == '{#SENSOR}')].value.first()`</p></li></ul>|
 
 ## Feedback
 
