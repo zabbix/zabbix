@@ -30,7 +30,7 @@ import (
 	"golang.zabbix.com/sdk/uri"
 )
 
-var errorQueryNotFound = "query %q not found"
+const errorQueryNotFound = "query %q not found"
 
 type OraClient interface {
 	Query(ctx context.Context, query string, args ...interface{}) (rows *sql.Rows, err error)
@@ -54,7 +54,7 @@ type OraConn struct {
 // ConnManager is thread-safe structure for manage connections.
 type ConnManager struct {
 	// cached connections
-	connections   map[connDetails]*OraConn
+	connections   map[*connDetails]*OraConn
 	connectionsMu sync.Mutex
 
 	keepAlive      time.Duration
@@ -144,7 +144,7 @@ func NewConnManager(keepAlive, connectTimeout, callTimeout,
 	ctx, cancel := context.WithCancel(context.Background())
 
 	connMgr := &ConnManager{
-		connections:    make(map[connDetails]*OraConn),
+		connections:    make(map[*connDetails]*OraConn),
 		keepAlive:      keepAlive,
 		connectTimeout: connectTimeout,
 		callTimeout:    callTimeout,
@@ -200,7 +200,7 @@ func (c *ConnManager) housekeeper(ctx context.Context, interval time.Duration) {
 }
 
 // create creates a new connection for given credentials.
-func (c *ConnManager) create(cd connDetails) (*OraConn, error) {
+func (c *ConnManager) create(cd *connDetails) (*OraConn, error) {
 	ctx := godror.ContextWithTraceTag(
 		context.Background(),
 		godror.TraceTag{
@@ -256,7 +256,7 @@ func (c *ConnManager) create(cd connDetails) (*OraConn, error) {
 //
 // Attempts to retrieve a connection from cache by its connDetails.
 // Returns nil if no connection associated with the given connDetails is found.
-func (c *ConnManager) getConn(cd connDetails) *OraConn {
+func (c *ConnManager) getConn(cd *connDetails) *OraConn {
 	c.connectionsMu.Lock()
 	defer c.connectionsMu.Unlock()
 
@@ -272,7 +272,7 @@ func (c *ConnManager) getConn(cd connDetails) *OraConn {
 //
 // Returns the cached connection. If the provider connection is already present
 // in cache, it is closed.
-func (c *ConnManager) setConn(cd connDetails, conn *OraConn) *OraConn {
+func (c *ConnManager) setConn(cd *connDetails, conn *OraConn) *OraConn {
 	c.connectionsMu.Lock()
 	defer c.connectionsMu.Unlock()
 
@@ -291,7 +291,7 @@ func (c *ConnManager) setConn(cd connDetails, conn *OraConn) *OraConn {
 }
 
 // getConnection returns an existing connection or creates a new one.
-func (c *ConnManager) getConnection(cd connDetails) (*OraConn, error) {
+func (c *ConnManager) getConnection(cd *connDetails) (*OraConn, error) {
 	conn := c.getConn(cd)
 	if conn != nil {
 		conn.updateLastAccessTime()

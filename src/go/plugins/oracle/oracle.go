@@ -17,7 +17,6 @@ package oracle
 import (
 	"context"
 	"errors"
-	"fmt"
 	"net/http"
 	"net/url"
 	"strings"
@@ -76,7 +75,7 @@ func (p *Plugin) Export(key string, rawParams []string, _ plugin.ContextProvider
 		return nil, zbxerr.ErrorUnsupportedMetric
 	}
 
-	conn, err := p.connMgr.getConnection(connDetails{*uri, adminRole})
+	conn, err := p.connMgr.getConnection(&connDetails{*uri, adminRole})
 	if err != nil {
 		// Special logic of processing connection errors should be used if oracle.ping is requested
 		// because it must return pingFailed if any error occurred.
@@ -181,7 +180,6 @@ func splitUserAndPrivilege(params map[string]string) (string, dsn.AdminRole, err
 	}
 
 	// All other formats (e.g., "user sysdba", "user as", "user as sysdba extra") are invalid.
-	return "", dsn.NoRole, errors.New(
-		fmt.Sprintf("invalid user format: expected 'user' or 'user as <privilege>', but got '%s'", userStr),
-	)
+	return "", dsn.NoRole,
+		errs.Wrap(errs.New("invalid user format: expected 'user' or 'user as <privilege>', but got :"), userStr)
 }

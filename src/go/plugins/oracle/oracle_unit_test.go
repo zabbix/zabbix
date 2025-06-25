@@ -22,6 +22,8 @@ import (
 
 // Test_splitUserAndPrivilege verifies the parsing of user strings with and without roles.
 func Test_splitUserAndPrivilege(t *testing.T) {
+	t.Parallel()
+
 	type args struct {
 		params map[string]string
 	}
@@ -124,6 +126,7 @@ func Test_splitUserAndPrivilege(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
+			t.Parallel()
 			// Assuming splitUserAndPrivilege is the function being tested
 			gotUser, gotPrivilege, err := splitUserAndPrivilege(tt.args.params)
 
