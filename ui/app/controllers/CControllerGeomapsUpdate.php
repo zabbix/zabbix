@@ -26,14 +26,10 @@ class CControllerGeomapsUpdate extends CController {
 
 	public static function getValidationRules(): array {
 		return ['object', 'fields' => [
-			'geomaps_tile_provider' => ['string', 'required',
-				'length' => CSettingsSchema::getFieldLength('geomaps_tile_provider')
-			],
-			'geomaps_tile_url' => ['string', 'required', 'not_empty',
-				'length' => CSettingsSchema::getFieldLength('geomaps_tile_url')
-			],
-			'geomaps_max_zoom' => ['integer', 'required', 'min' => 1, 'max' => ZBX_GEOMAP_MAX_ZOOM],
-			'geomaps_attribution' => ['string', 'length' => CSettingsSchema::getFieldLength('geomaps_attribution')]
+			'geomaps_tile_provider' => ['required', 'setting geomaps_tile_provider'],
+			'geomaps_tile_url' => ['required', 'not_empty', 'setting geomaps_tile_url'],
+			'geomaps_max_zoom' => ['setting geomaps_max_zoom', 'min' => 1, 'max' => ZBX_GEOMAP_MAX_ZOOM],
+			'geomaps_attribution' => ['setting geomaps_attribution']
 		]];
 	}
 

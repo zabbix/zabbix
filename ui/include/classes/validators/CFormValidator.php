@@ -101,6 +101,31 @@ class CFormValidator {
 					$result['type'] = 'integer';
 					$result['in'] = [0, 1];
 				}
+				elseif (strncmp($value, 'setting ', 8) === 0) {
+					if (array_key_exists('type', $result)) {
+						throw new Exception('[RULES ERROR] Rule "type" is specified multiple times (Path: '.$rule_path.')');
+					}
+
+					$db_field = substr($value, 8);
+
+					if (CSettingsSchema::getDbType($db_field) & (DB::FIELD_TYPE_CHAR | DB::FIELD_TYPE_TEXT)) {
+						if (array_key_exists('length', $result)) {
+							throw new Exception('[RULES ERROR] Rule "length" is specified multiple times (Path: '.$rule_path.')');
+						}
+
+						$result['type'] = 'string';
+						$result['length'] = CSettingsSchema::getFieldLength($db_field);
+					}
+					elseif (CSettingsSchema::getDbType($db_field) & (DB::FIELD_TYPE_ID)) {
+						$result['type'] = 'id';
+					}
+					elseif (CSettingsSchema::getDbType($db_field) & (DB::FIELD_TYPE_INT)) {
+						$result['type'] = 'integer';
+					}
+					else {
+						throw new Exception('[RULES ERROR] Unknown field type in db schema (Path: '.$rule_path.')');
+					}
+				}
 				elseif (strncmp($value, 'db ', 3) === 0) {
 					if (array_key_exists('type', $result)) {
 						throw new Exception('[RULES ERROR] Rule "type" is specified multiple times (Path: '.$rule_path.')');
