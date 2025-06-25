@@ -30,6 +30,7 @@ class HostMacrosManager {
 		this.$container = container;
 		this.readonly = readonly;
 		this.parent_hostid = parent_hostid ?? null;
+		this.load_request = null;
 	}
 
 	load(show_inherited_macros, templateids) {
@@ -47,7 +48,11 @@ class HostMacrosManager {
 			post_data.parent_hostid = this.parent_hostid;
 		}
 
-		$.ajax(url.getUrl(), {
+		if (this.load_request !== null) {
+			this.load_request.abort()
+		}
+
+		this.load_request = $.ajax(url.getUrl(), {
 			data: post_data,
 			dataType: 'json',
 			method: 'POST',
@@ -86,6 +91,7 @@ class HostMacrosManager {
 				}
 			})
 			.always(() => {
+				this.load_request = null;
 				this.loaderStop();
 			});
 	}
