@@ -75,6 +75,7 @@ require_once __DIR__.'/dashboardWidgets/testDashboardGraphWidgetSelectedHosts.ph
 require_once __DIR__.'/dashboardWidgets/testDashboardHoneycombWidget.php';
 require_once __DIR__.'/dashboardWidgets/testDashboardHostAvailabilityWidget.php';
 require_once __DIR__.'/dashboardWidgets/testDashboardHostNavigatorWidget.php';
+require_once __DIR__.'/dashboardWidgets/testDashboardItemCardWidget.php';
 require_once __DIR__.'/dashboardWidgets/testDashboardItemHistoryWidget.php';
 require_once __DIR__.'/dashboardWidgets/testDashboardItemNavigatorWidget.php';
 require_once __DIR__.'/dashboardWidgets/testDashboardItemValueWidget.php';
@@ -419,6 +420,7 @@ class SeleniumTests {
 		$suite->addTestSuite('testDashboardHoneycombWidget');
 		$suite->addTestSuite('testDashboardHostAvailabilityWidget');
 		$suite->addTestSuite('testDashboardHostNavigatorWidget');
+		$suite->addTestSuite('testDashboardItemCardWidget');
 		$suite->addTestSuite('testDashboardItemHistoryWidget');
 		$suite->addTestSuite('testDashboardItemNavigatorWidget');
 		$suite->addTestSuite('testDashboardItemValueWidget');
