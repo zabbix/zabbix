@@ -258,4 +258,16 @@ in:
 out:
   result: "{{MACRO}.btoa()} function"
   return: SUCCEED
+---
+test case: "User macros should not be indexed"
+in:
+  expression: "{{$MACRO_1}.fmtnum(2)} function"
+  resolve:
+    return: SUCCEED
+    data:
+      - name: "{$MACRO_1}"
+        value: 2.56
+out:
+  result: "2.56 function"
+  return: SUCCEED
 ...

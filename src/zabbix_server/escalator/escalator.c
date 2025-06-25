@@ -1738,8 +1738,9 @@ static void	add_message_alert(const zbx_db_event *event, const zbx_db_event *r_e
 		period = zbx_strdup(period, row[3]);
 		type = atoi(row[6]);
 
-		zbx_substitute_simple_macros(NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL,
-				&period, ZBX_MACRO_TYPE_COMMON, NULL, 0);
+		zbx_dc_um_handle_t	*um_handle = zbx_dc_open_user_macros();
+		zbx_dc_expand_user_and_func_macros(um_handle, &period, NULL, 0, NULL);
+		zbx_dc_close_user_macros(um_handle);
 
 		zabbix_log(LOG_LEVEL_DEBUG, "severity:%d, media severity:%d, period:'%s', userid:" ZBX_FS_UI64,
 				priority, severity, period, userid);
@@ -1981,8 +1982,10 @@ static void	escalation_execute_operations(zbx_db_escalation *escalation, zbx_db_
 		ZBX_STR2UINT64(operationid, row[0]);
 
 		tmp = zbx_strdup(NULL, row[2]);
-		zbx_substitute_simple_macros(NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL,
-				&tmp, ZBX_MACRO_TYPE_COMMON, NULL, 0);
+
+		zbx_dc_um_handle_t	*um_handle = zbx_dc_open_user_macros();
+		zbx_dc_expand_user_and_func_macros(um_handle, &tmp, NULL, 0, NULL);
+		zbx_dc_close_user_macros(um_handle);
 
 		if (SUCCEED != zbx_is_time_suffix(tmp, &esc_period, ZBX_LENGTH_UNLIMITED))
 		{
@@ -2890,7 +2893,10 @@ static void	get_services_rootcause_eventids(const zbx_vector_uint64_t *serviceid
 
 	zbx_ipc_message_init(&response);
 	zbx_service_send(ZBX_IPC_SERVICE_SERVICE_ROOTCAUSE, data, (zbx_uint32_t)data_offset, &response);
-	zbx_service_deserialize_rootcause(response.data, (zbx_uint32_t)response.size, services);
+
+	if (NULL != response.data)
+		zbx_service_deserialize_rootcause(response.data, (zbx_uint32_t)response.size, services);
+
 	zbx_ipc_message_clean(&response);
 
 	zbx_free(data);

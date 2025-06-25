@@ -19,7 +19,6 @@
 #include "graph_linking.h"
 
 #include "zbxcacheconfig.h"
-#include "zbxexpression.h"
 #include "audit/zbxaudit_host.h"
 #include "audit/zbxaudit_item.h"
 #include "audit/zbxaudit_trigger.h"
@@ -49,19 +48,24 @@ zbx_sysmap_element_types_t;
 
 typedef struct
 {
-	zbx_uint64_t	id;
-	char		*name;
-}
-zbx_id_name_pair_t;
-
-typedef struct
-{
 	zbx_uint64_t	ugsetid;
 	int		permission;
 } zbx_hgset_permission_t;
 
 ZBX_VECTOR_DECL(hgset_permission, zbx_hgset_permission_t)
 ZBX_VECTOR_IMPL(hgset_permission, zbx_hgset_permission_t)
+
+ZBX_VECTOR_IMPL(id_name_pair, zbx_id_name_pair_t)
+
+static int	id_name_pair_compare(const void *d1, const void *d2)
+{
+	const zbx_id_name_pair_t	*p1 = (const zbx_id_name_pair_t *)d1;
+	const zbx_id_name_pair_t	*p2 = (const zbx_id_name_pair_t *)d2;
+
+	ZBX_RETURN_IF_NOT_EQUAL(p1->id, p2->id);
+
+	return 0;
+}
 
 static zbx_hash_t	zbx_ids_names_hash_func(const void *data)
 {
@@ -816,6 +820,58 @@ static void	zbx_graph_valid_free(zbx_template_graph_valid_t *graph)
 
 /******************************************************************************
  *                                                                            *
+ * Purpose: check that host is either created by LLD or that templates do not *
+ *          have LLD rules of nested type                                     *
+ *                                                                            *
+ * Parameters: hostid      - [IN] host identifier                             *
+ *             templateids - [IN] template IDs                                *
+ *             error       - [OUT] error message                              *
+ *             max_error_len - [IN] maximum error message length              *
+ *                                                                            *
+ * Return value: SUCCEED - validation passed                                  *
+ *               FAIL    - otherwise                                          *
+ *                                                                            *
+ ******************************************************************************/
+static int	validate_nested_lldrules(zbx_uint64_t hostid, const zbx_vector_uint64_t *templateids,
+		char *error, size_t max_error_len)
+{
+	zbx_db_result_t	result;
+	zbx_db_row_t	row;
+	int		ret = SUCCEED;
+	char		*sql = NULL;
+	size_t		sql_alloc = 0, sql_offset = 0;
+
+	result = zbx_db_select("select flags from hosts where hostid=" ZBX_FS_UI64, hostid);
+
+	if (NULL == (row = zbx_db_fetch(result)))
+		goto out;
+
+	if (0 != (atoi(row[0]) & ZBX_FLAG_DISCOVERY_CREATED))
+		goto out;
+
+	zbx_db_free_result(result);
+
+	zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "select itemid from items where type=%d and flags&%d=0 and",
+			ITEM_TYPE_NESTED_LLD, ZBX_FLAG_DISCOVERY_PROTOTYPE);
+	zbx_db_add_condition_alloc(&sql, &sql_alloc, &sql_offset, "hostid", templateids->values,
+			templateids->values_num);
+
+	result = zbx_db_select("%s", sql);
+	zbx_free(sql);
+
+	if (NULL != (row = zbx_db_fetch(result)))
+	{
+		zbx_strlcpy(error, "nested LLD rules are supported only on hosts created by LLD", max_error_len);
+		ret = FAIL;
+	}
+out:
+	zbx_db_free_result(result);
+
+	return ret;
+}
+
+/******************************************************************************
+ *                                                                            *
  * Description: Check collisions between host and linked template             *
  *                                                                            *
  * Parameters: hostid      - [IN] host identifier from database               *
@@ -845,6 +901,9 @@ static int	validate_host(zbx_uint64_t hostid, zbx_vector_uint64_t *templateids, 
 		goto out;
 
 	if (SUCCEED != (ret = validate_httptests(hostid, templateids, error, max_error_len)))
+		goto out;
+
+	if (SUCCEED != (ret = validate_nested_lldrules(hostid, templateids, error, max_error_len)))
 		goto out;
 
 	zbx_vector_graph_valid_ptr_create(&graphs);
@@ -1015,10 +1074,10 @@ static int	validate_host(zbx_uint64_t hostid, zbx_vector_uint64_t *templateids, 
 				"select i.key_"
 				" from items i,items t"
 				" where i.key_=t.key_"
-					" and i.flags<>t.flags"
+					" and i.flags&%d<>t.flags&%d"
 					" and i.hostid=" ZBX_FS_UI64
 					" and",
-				hostid);
+				ZBX_FLAG_DISCOVERY_PROTOTYPE, ZBX_FLAG_DISCOVERY_PROTOTYPE, hostid);
 		zbx_db_add_condition_alloc(&sql, &sql_alloc, &sql_offset, "t.hostid",
 				templateids->values, templateids->values_num);
 
@@ -1059,12 +1118,12 @@ static int	validate_host(zbx_uint64_t hostid, zbx_vector_uint64_t *templateids, 
 		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
 				"select distinct type"
 				" from items"
-				" where type not in (%d,%d,%d,%d,%d,%d,%d,%d,%d,%d)"
+				" where type not in (%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d)"
 					" and",
 				/* item types with interface types INTERFACE_TYPE_OPT or INTERFACE_TYPE_UNKNOWN */
 				ITEM_TYPE_TRAPPER, ITEM_TYPE_INTERNAL, ITEM_TYPE_ZABBIX_ACTIVE,
 				ITEM_TYPE_HTTPTEST, ITEM_TYPE_DB_MONITOR, ITEM_TYPE_CALCULATED, ITEM_TYPE_DEPENDENT,
-				ITEM_TYPE_HTTPAGENT, ITEM_TYPE_SCRIPT, ITEM_TYPE_BROWSER);
+				ITEM_TYPE_HTTPAGENT, ITEM_TYPE_SCRIPT, ITEM_TYPE_BROWSER, ITEM_TYPE_NESTED_LLD);
 		zbx_db_add_condition_alloc(&sql, &sql_alloc, &sql_offset, "hostid",
 				templateids->values, templateids->values_num);
 
@@ -1198,6 +1257,7 @@ void	zbx_db_delete_triggers(zbx_vector_uint64_t *triggerids, int audit_context_m
 
 	zbx_db_execute_multiple_query("delete from trigger_tag where", "triggerid", triggerids);
 	zbx_db_execute_multiple_query("delete from functions where", "triggerid", triggerids);
+	zbx_db_execute_multiple_query("delete from trigger_discovery where", "triggerid", triggerids);
 	zbx_db_execute_multiple_query("delete from triggers where", "triggerid", triggerids);
 
 	if (0 != selementids.values_num)
@@ -1260,12 +1320,16 @@ static void	DBdelete_trigger_hierarchy(zbx_vector_uint64_t *triggerids, int audi
 	}
 	zbx_db_large_query_clear(&query);
 
-	zbx_vector_uint64_sort(&children_triggerids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
-	zbx_vector_uint64_uniq(&children_triggerids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
+	if (0 != children_triggerids.values_num)
+	{
+		zbx_vector_uint64_sort(&children_triggerids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
+		zbx_vector_uint64_uniq(&children_triggerids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
 
-	zbx_vector_uint64_setdiff(triggerids, &children_triggerids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
+		zbx_vector_uint64_setdiff(triggerids, &children_triggerids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
 
-	zbx_db_delete_triggers(&children_triggerids, audit_context_mode);
+		DBdelete_trigger_hierarchy(&children_triggerids, audit_context_mode);
+	}
+
 	zbx_db_delete_triggers(triggerids, audit_context_mode);
 
 	zbx_vector_uint64_destroy(&children_triggerids);
@@ -1354,6 +1418,7 @@ void	zbx_db_delete_graphs(zbx_vector_uint64_t *graphids, int audit_context_mode)
 	zbx_audit_graph_delete(audit_context_mode, graphids);
 
 	/* delete from graphs */
+	zbx_db_execute_multiple_query("delete from graph_discovery where", "graphid", graphids);
 	zbx_db_execute_multiple_query("delete from graphs where", "graphid", graphids);
 
 	zbx_vector_uint64_destroy(&profileids);
@@ -1405,7 +1470,9 @@ static void	DBdelete_graph_hierarchy(zbx_vector_uint64_t *graphids, int audit_co
 		zbx_vector_uint64_uniq(&children_graphids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
 
 		zbx_vector_uint64_setdiff(graphids, &children_graphids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
-		zbx_db_delete_graphs(&children_graphids, audit_context_mode);
+
+
+		DBdelete_graph_hierarchy(&children_graphids, audit_context_mode);
 	}
 
 	zbx_db_delete_graphs(graphids, audit_context_mode);
@@ -1522,7 +1589,8 @@ out:
  * Purpose: gets linked (discovered, dependent, etc) items                    *
  *                                                                            *
  ******************************************************************************/
-static void	db_get_linked_items(zbx_vector_uint64_t *itemids, const char *filter, const char *field)
+static void	db_get_linked_items(const zbx_vector_uint64_t *itemids, const char *filter, const char *field,
+		zbx_vector_uint64_t *itemids_linked)
 {
 	char			*sql = NULL;
 	size_t			sql_alloc = 256, sql_offset = 0;
@@ -1539,14 +1607,51 @@ static void	db_get_linked_items(zbx_vector_uint64_t *itemids, const char *filter
 	while (NULL != (row = zbx_db_large_query_fetch(&query)))
 	{
 		ZBX_STR2UINT64(itemid, row[0]);
-		zbx_vector_uint64_append(itemids, itemid);
+		zbx_vector_uint64_append(itemids_linked, itemid);
 
 	}
 	zbx_db_large_query_clear(&query);
-	zbx_free(sql);
 
-	zbx_vector_uint64_sort(itemids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
-	zbx_vector_uint64_uniq(itemids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
+	zbx_free(sql);
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: gets linked (discovered, dependent, etc) items                    *
+ *                                                                            *
+ ******************************************************************************/
+static void	db_get_item_prototypes(const zbx_vector_uint64_t *itemids, zbx_vector_uint64_t *proto_itemids,
+		zbx_vector_uint64_t *proto_lldruleids)
+{
+	char			*sql = NULL;
+	size_t			sql_alloc = 256, sql_offset = 0;
+	zbx_db_large_query_t	query;
+	zbx_db_row_t		row;
+	zbx_uint64_t		itemid;
+
+	sql = (char *)zbx_malloc(sql, sql_alloc);
+
+	zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset,
+			"select id.itemid,i.flags"
+			" from items i,item_discovery id"
+			" where id.itemid=i.itemid"
+				" and");
+
+	zbx_db_large_query_prepare_uint(&query, &sql, &sql_alloc, &sql_offset, "id.lldruleid", itemids);
+	while (NULL != (row = zbx_db_large_query_fetch(&query)))
+	{
+		unsigned char	flags;
+
+		ZBX_STR2UINT64(itemid, row[0]);
+		ZBX_STR2UCHAR(flags, row[1]);
+
+		if (0 == (flags & ZBX_FLAG_DISCOVERY_RULE))
+			zbx_vector_uint64_append(proto_itemids, itemid);
+		else
+			zbx_vector_uint64_append(proto_lldruleids, itemid);
+
+	}
+	zbx_db_large_query_clear(&query);
 
 	zbx_free(sql);
 }
@@ -1567,18 +1672,42 @@ void	zbx_db_delete_items(zbx_vector_uint64_t *itemids, int audit_context_mode)
 	const char		*profile_idx = "web.favorite.graphids";
 	int			history_mode, trends_mode;
 	zbx_vector_str_t	hk_history;
+	zbx_vector_uint64_t	itemids_linked, linked_llruleids;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() values_num:%d", __func__, itemids->values_num);
 
 	if (0 == itemids->values_num)
 		goto out;
 
-	db_get_linked_items(itemids, "item_discovery i where", "i.parent_itemid");
-	db_get_linked_items(itemids, "items i where", "i.master_itemid");
+	zbx_vector_uint64_create(&itemids_linked);
+	zbx_vector_uint64_create(&linked_llruleids);
+
+	db_get_item_prototypes(itemids, &itemids_linked, &linked_llruleids);
+	db_get_linked_items(itemids, "items i where", "i.master_itemid", &itemids_linked);
+
+	if (0 != itemids_linked.values_num)
+	{
+		zbx_vector_uint64_append_array(itemids, itemids_linked.values, itemids_linked.values_num);
+		zbx_vector_uint64_clear(&itemids_linked);
+
+		zbx_vector_uint64_sort(itemids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
+		zbx_vector_uint64_uniq(itemids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
+	}
+
+	/* recursively delete lld rule prototypes and discovered items/lld rules */
+	zbx_vector_uint64_append_array(&itemids_linked, linked_llruleids.values, linked_llruleids.values_num);
+	db_get_linked_items(itemids, "item_discovery i where", "i.parent_itemid", &itemids_linked);
+	if (0 != itemids_linked.values_num)
+		zbx_db_delete_items(&itemids_linked, audit_context_mode);
+
+	zbx_vector_uint64_destroy(&linked_llruleids);
+	zbx_vector_uint64_destroy(&itemids_linked);
 
 	zbx_db_update_item_map_links(itemids);
 
 	zbx_audit_item_delete(audit_context_mode, itemids);
+
+	zbx_delete_lld_rule_host_prototypes(itemids, ZBX_AUDIT_LLD_CONTEXT);
 
 	zbx_vector_uint64_create(&profileids);
 
@@ -1624,6 +1753,7 @@ void	zbx_db_delete_items(zbx_vector_uint64_t *itemids, int audit_context_mode)
 	zbx_db_execute_multiple_query("delete from functions where", "itemid", itemids);
 	zbx_db_execute_multiple_query("update items set master_itemid=null where master_itemid is not null and",
 			"itemid", itemids);
+	zbx_db_execute_multiple_query("delete from item_discovery where", "lldruleid", itemids);
 	zbx_db_execute_multiple_query("delete from items where", "itemid", itemids);
 
 	zbx_vector_uint64_destroy(&profileids);
@@ -1767,6 +1897,18 @@ static void	DBgroup_prototypes_delete(const zbx_vector_uint64_t *del_group_proto
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 }
 
+static void	id_name_pair_vector_split(zbx_vector_id_name_pair_t *pairs, zbx_vector_uint64_t *hostids,
+		zbx_vector_str_t *hostnames)
+{
+	zbx_vector_id_name_pair_sort(pairs, id_name_pair_compare);
+
+	for (int i = 0; i < pairs->values_num; i++)
+	{
+		zbx_vector_uint64_append(hostids, pairs->values[i].id);
+		zbx_vector_str_append(hostnames, pairs->values[i].name);
+	}
+}
+
 /******************************************************************************
  *                                                                            *
  * Purpose: deletes host prototypes from database                             *
@@ -1777,18 +1919,24 @@ static void	DBgroup_prototypes_delete(const zbx_vector_uint64_t *del_group_proto
  *             audit_context_mode   - [IN]                                    *
  *                                                                            *
  ******************************************************************************/
-static void	DBdelete_host_prototypes(const zbx_vector_uint64_t *host_prototype_ids,
+void	zbx_db_delete_host_prototypes(const zbx_vector_uint64_t *host_prototype_ids,
 		const zbx_vector_str_t *host_prototype_names, int audit_context_mode)
 {
-	char			*sql = NULL;
-	size_t			sql_alloc = 0, sql_offset;
-	zbx_vector_uint64_t	hostids, group_prototype_ids;
-	zbx_vector_str_t	hostnames;
+	char				*sql = NULL;
+	size_t				sql_alloc = 0, sql_offset;
+	zbx_vector_uint64_t		hostids, group_prototype_ids;
+	zbx_vector_str_t		hostnames;
+	zbx_vector_id_name_pair_t	hosts, protos;
+	zbx_db_result_t			result;
+	zbx_db_row_t			row;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
 	if (0 == host_prototype_ids->values_num)
 		goto out;
+
+	zbx_vector_id_name_pair_create(&hosts);
+	zbx_vector_id_name_pair_create(&protos);
 
 	/* delete discovered hosts */
 
@@ -1797,16 +1945,42 @@ static void	DBdelete_host_prototypes(const zbx_vector_uint64_t *host_prototype_i
 	zbx_vector_uint64_create(&group_prototype_ids);
 
 	sql_offset = 0;
-	zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, "select hd.hostid,h.name from host_discovery hd,hosts h "
-			"where hd.hostid=h.hostid and");
+	zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, "select hd.hostid,h.name,h.flags from host_discovery hd,hosts h"
+			" where hd.hostid=h.hostid and");
 	zbx_db_add_condition_alloc(&sql, &sql_alloc, &sql_offset, "parent_hostid",
 			host_prototype_ids->values, host_prototype_ids->values_num);
 
-	if (FAIL == DBselect_ids_names(sql, &hostids, &hostnames))
-		goto clean;
+	result = zbx_db_select("%s", sql);
 
-	if (0 != hostids.values_num)
+	while (NULL != (row = zbx_db_fetch(result)))
+	{
+		zbx_id_name_pair_t	pair;
+
+		ZBX_STR2UINT64(pair.id, row[0]);
+		pair.name = zbx_strdup(NULL, row[1]);
+
+		if (0 == (atoi(row[2]) & ZBX_FLAG_DISCOVERY_PROTOTYPE))
+			zbx_vector_id_name_pair_append(&hosts, pair);
+		else
+			zbx_vector_id_name_pair_append(&protos, pair);
+	}
+	zbx_db_free_result(result);
+
+	/* delete discovered host prototypes */
+	if (0 != protos.values_num)
+	{
+		id_name_pair_vector_split(&protos, &hostids, &hostnames);
+		zbx_db_delete_host_prototypes(&hostids, &hostnames, audit_context_mode);
+		zbx_vector_uint64_clear(&hostids);
+		zbx_vector_str_clear(&hostnames);
+	}
+
+	/* delete discovered hosts */
+	if (0 != hosts.values_num)
+	{
+		id_name_pair_vector_split(&hosts, &hostids, &hostnames);
 		zbx_db_delete_hosts(&hostids, &hostnames, audit_context_mode);
+	}
 
 	/* delete group prototypes */
 
@@ -1839,11 +2013,19 @@ static void	DBdelete_host_prototypes(const zbx_vector_uint64_t *host_prototype_i
 		zbx_audit_host_prototype_del(audit_context_mode, host_prototype_ids->values[i],
 				host_prototype_names->values[i]);
 	}
-clean:
+
 	zbx_vector_uint64_destroy(&group_prototype_ids);
 	zbx_vector_uint64_destroy(&hostids);
-	zbx_vector_str_clear_ext(&hostnames, zbx_str_free);
 	zbx_vector_str_destroy(&hostnames);
+
+	for (int i = 0; i < hosts.values_num; i++)
+		zbx_free(hosts.values[i].name);
+	zbx_vector_id_name_pair_destroy(&hosts);
+
+	for (int i = 0; i < protos.values_num; i++)
+		zbx_free(protos.values[i].name);
+	zbx_vector_id_name_pair_destroy(&protos);
+
 	zbx_free(sql);
 out:
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
@@ -2036,10 +2218,10 @@ static void	DBdelete_template_host_prototypes(zbx_uint64_t hostid, const zbx_vec
 	zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
 			"select hp.hostid,hp.name"
 			" from items hi,host_discovery hhd,hosts hp,host_discovery thd,items ti"
-			" where hi.itemid=hhd.parent_itemid"
+			" where hi.itemid=hhd.lldruleid"
 				" and hhd.hostid=hp.hostid"
 				" and hp.templateid=thd.hostid"
-				" and thd.parent_itemid=ti.itemid"
+				" and thd.lldruleid=ti.itemid"
 				" and hi.hostid=" ZBX_FS_UI64
 				" and",
 			hostid);
@@ -2047,7 +2229,7 @@ static void	DBdelete_template_host_prototypes(zbx_uint64_t hostid, const zbx_vec
 			templateids->values_num);
 	if (FAIL == DBselect_ids_names(sql, &host_prototype_ids, &host_prototype_names))
 		goto clean;
-	DBdelete_host_prototypes(&host_prototype_ids, &host_prototype_names, audit_context_mode);
+	zbx_db_delete_host_prototypes(&host_prototype_ids, &host_prototype_names, audit_context_mode);
 clean:
 	zbx_free(sql);
 
@@ -2443,7 +2625,7 @@ static void	DBhost_prototypes_make(zbx_uint64_t hostid, zbx_vector_uint64_t *tem
 			" from items hi,items ti,host_discovery thd,hosts th"
 			" left join host_inventory hinv on hinv.hostid=th.hostid"
 			" where hi.templateid=ti.itemid"
-				" and ti.itemid=thd.parent_itemid"
+				" and ti.itemid=thd.lldruleid"
 				" and thd.hostid=th.hostid"
 				" and hi.hostid=" ZBX_FS_UI64
 				" and",
@@ -2507,7 +2689,7 @@ static void	DBhost_prototypes_make(zbx_uint64_t hostid, zbx_vector_uint64_t *tem
 					"h.templateid,hinv.inventory_mode"
 				" from items i,host_discovery hd,hosts h"
 				" left join host_inventory hinv on hinv.hostid=h.hostid"
-				" where i.itemid=hd.parent_itemid"
+				" where i.itemid=hd.lldruleid"
 					" and hd.hostid=h.hostid"
 					" and i.hostid=" ZBX_FS_UI64
 					" and",
@@ -3670,7 +3852,8 @@ static void	DBhost_prototypes_save(const zbx_vector_ptr_t *host_prototypes,
 		zbx_db_insert_prepare(&db_insert, "hosts", "hostid", "host", "name", "status", "flags", "templateid",
 				"discover", "custom_interfaces", (char *)NULL);
 
-		zbx_db_insert_prepare(&db_insert_hdiscovery, "host_discovery", "hostid", "parent_itemid", (char *)NULL);
+		zbx_db_insert_prepare(&db_insert_hdiscovery, "host_discovery", "hostid", "lldruleid",
+				(char *)NULL);
 	}
 
 	if (new_hosts != host_prototypes->values_num || 0 != upd_group_prototypes || 0 != upd_hostmacros ||
@@ -5591,6 +5774,75 @@ static void	DBcopy_template_httptests(zbx_uint64_t hostid, const zbx_vector_uint
 
 /******************************************************************************
  *                                                                            *
+ * Purpose: validate templates for linking by filtering out already linked    *
+ *          ones and checking for potential conflicts                         *
+ *                                                                            *
+ * Parameters:                                                                *
+ *    hostid          - [IN] host identifier                                  *
+ *    lnk_templateids - [IN] vector of template IDs to link                   *
+ *    error           - [OUT] error message                                   *
+ *                                                                            *
+ * Return value: SUCCEED - validation passed successfully                     *
+ *               FAIL    - validation failed                                  *
+ *                                                                            *
+ ******************************************************************************/
+int	zbx_check_missing_host_templates(zbx_uint64_t hostid, zbx_vector_uint64_t *lnk_templateids, char **error)
+{
+	zbx_vector_uint64_t	templateids;
+	char			err[MAX_STRING_LEN];
+	int			ret = FAIL;
+
+	zbx_vector_uint64_create(&templateids);
+
+	get_templates_by_hostid(hostid, &templateids);
+
+	for (int i = 0; i < lnk_templateids->values_num; i++)
+	{
+		if (FAIL != zbx_vector_uint64_search(&templateids, lnk_templateids->values[i],
+				ZBX_DEFAULT_UINT64_COMPARE_FUNC))
+		{
+			/* template already linked */
+			zbx_vector_uint64_remove(lnk_templateids, i--);
+		}
+		else
+			zbx_vector_uint64_append(&templateids, lnk_templateids->values[i]);
+	}
+
+	/* all templates already linked */
+	if (0 == lnk_templateids->values_num)
+		goto success;
+
+	zbx_vector_uint64_sort(&templateids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
+
+	if (SUCCEED != validate_linked_templates(&templateids, err, sizeof(err)))
+	{
+		char	*template_names = get_template_names(lnk_templateids);
+
+		*error = zbx_dsprintf(NULL, "%s to host \"%s\": %s", template_names, zbx_host_string(hostid), err);
+
+		zbx_free(template_names);
+		goto out;
+	}
+
+	if (SUCCEED != validate_host(hostid, lnk_templateids, err, sizeof(err)))
+	{
+		char	*template_names = get_template_names(lnk_templateids);
+
+		*error = zbx_dsprintf(NULL, "%s to host \"%s\": %s", template_names, zbx_host_string(hostid), err);
+
+		zbx_free(template_names);
+		goto out;
+	}
+success:
+	ret = SUCCEED;
+out:
+	zbx_vector_uint64_destroy(&templateids);
+
+	return ret;;
+}
+
+/******************************************************************************
+ *                                                                            *
  * Purpose: copies elements from specified template                           *
  *                                                                            *
  * Parameters:                                                                *
@@ -5606,55 +5858,17 @@ static void	DBcopy_template_httptests(zbx_uint64_t hostid, const zbx_vector_uint
 int	zbx_db_copy_template_elements(zbx_uint64_t hostid, zbx_vector_uint64_t *lnk_templateids,
 		zbx_host_template_link_type link_type, int audit_context_mode, char **error)
 {
-	zbx_vector_uint64_t	templateids;
-	zbx_uint64_t		hosttemplateid;
-	int			i, res = SUCCEED;
-	char			*template_names, err[MAX_STRING_LEN];
-	zbx_db_insert_t		*db_insert_htemplates;
+	zbx_uint64_t	hosttemplateid;
+	int		i, res = SUCCEED;
+	zbx_db_insert_t	*db_insert_htemplates;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
-	zbx_vector_uint64_create(&templateids);
+	if (SUCCEED != (res = zbx_check_missing_host_templates(hostid, lnk_templateids, error)))
+		goto clean;
 
-	get_templates_by_hostid(hostid, &templateids);
-
-	for (i = 0; i < lnk_templateids->values_num; i++)
-	{
-		if (FAIL != zbx_vector_uint64_search(&templateids, lnk_templateids->values[i],
-				ZBX_DEFAULT_UINT64_COMPARE_FUNC))
-		{
-			/* template already linked */
-			zbx_vector_uint64_remove(lnk_templateids, i--);
-		}
-		else
-			zbx_vector_uint64_append(&templateids, lnk_templateids->values[i]);
-	}
-
-	/* all templates already linked */
 	if (0 == lnk_templateids->values_num)
 		goto clean;
-
-	zbx_vector_uint64_sort(&templateids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
-
-	if (SUCCEED != (res = validate_linked_templates(&templateids, err, sizeof(err))))
-	{
-		template_names = get_template_names(lnk_templateids);
-
-		*error = zbx_dsprintf(NULL, "%s to host \"%s\": %s", template_names, zbx_host_string(hostid), err);
-
-		zbx_free(template_names);
-		goto clean;
-	}
-
-	if (SUCCEED != (res = validate_host(hostid, lnk_templateids, err, sizeof(err))))
-	{
-		template_names = get_template_names(lnk_templateids);
-
-		*error = zbx_dsprintf(NULL, "%s to host \"%s\": %s", template_names, zbx_host_string(hostid), err);
-
-		zbx_free(template_names);
-		goto clean;
-	}
 
 	hosttemplateid = zbx_db_get_maxid_num("hosts_templates", lnk_templateids->values_num);
 
@@ -5686,7 +5900,6 @@ int	zbx_db_copy_template_elements(zbx_uint64_t hostid, zbx_vector_uint64_t *lnk_
 		DBcopy_template_httptests(hostid, lnk_templateids, audit_context_mode);
 	}
 clean:
-	zbx_vector_uint64_destroy(&templateids);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __func__, zbx_result_string(res));
 
@@ -6084,19 +6297,21 @@ void	zbx_db_delete_hosts(const zbx_vector_uint64_t *hostids, const zbx_vector_st
 	zbx_vector_str_create(&host_prototype_names);
 
 	zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset,
-			"select hd.hostid,h.name"
-			" from items i,host_discovery hd, hosts h"
-			" where hd.hostid=h.hostid and i.itemid=hd.parent_itemid"
-				" and");
-	zbx_db_add_condition_alloc(&sql, &sql_alloc, &sql_offset, "i.hostid", hostids->values, hostids->values_num);
+		"select hd.hostid,h.name"
+		" from items i,host_discovery hd, hosts h"
+		" where hd.hostid=h.hostid and i.itemid=hd.lldruleid"
+			" and");
+	zbx_db_add_condition_alloc(&sql, &sql_alloc, &sql_offset, "i.hostid", hostids->values,
+			hostids->values_num);
 
-	if (FAIL == DBselect_ids_names(sql, &host_prototype_ids, &host_prototype_names))
-		goto clean;
-
-	DBdelete_host_prototypes(&host_prototype_ids, &host_prototype_names, audit_context_mode);
+	if (FAIL != DBselect_ids_names(sql, &host_prototype_ids, &host_prototype_names) &&
+			0 != host_prototype_ids.values_num)
+	{
+		zbx_db_delete_host_prototypes(&host_prototype_ids, &host_prototype_names, audit_context_mode);
+	}
 
 	db_delete_hosts(hostids, hostnames, audit_context_mode);
-clean:
+
 	zbx_free(sql);
 	zbx_vector_uint64_destroy(&host_prototype_ids);
 	zbx_vector_str_clear_ext(&host_prototype_names, zbx_str_free);
@@ -6166,8 +6381,7 @@ zbx_uint64_t	zbx_db_add_interface(zbx_uint64_t hostid, unsigned char type, unsig
 
 			zbx_free(tmp);
 			tmp = strdup(row[4]);
-			zbx_substitute_simple_macros(NULL, NULL, NULL, NULL, &hostid, NULL, NULL, NULL, NULL, NULL,
-					NULL, NULL, &tmp, ZBX_MACRO_TYPE_COMMON, NULL, 0);
+			zbx_dc_expand_user_and_func_macros(um_handle, &tmp, &hostid, 1, NULL);
 			if (FAIL == zbx_is_ushort(tmp, &db_port) || db_port != port)
 				continue;
 
@@ -7081,4 +7295,46 @@ void	zbx_hgset_hash_calculate(zbx_vector_uint64_t *groupids, char *hash_str, siz
 
 	zbx_sha256_finish(&ctx, hash);
 	(void)zbx_bin2hex((const unsigned char *)hash, sizeof(hash), hash_str, hash_len);
+}
+
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: deletes host prototypes defined for specified LLD rules           *
+ *                                                                            *
+ * Parameters:                                                                *
+ *             lldruleids    - [IN]                                      *
+ *             audit_context_mode - [IN]                                      *
+ *                                                                            *
+ ******************************************************************************/
+void	zbx_delete_lld_rule_host_prototypes(zbx_vector_uint64_t *lldruleids, int audit_context_mode)
+{
+	char			*sql = NULL;
+	size_t			sql_alloc = 0, sql_offset = 0;
+	zbx_vector_uint64_t	host_prototype_ids;
+	zbx_vector_str_t	host_prototype_names;
+
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
+
+	zbx_vector_uint64_create(&host_prototype_ids);
+	zbx_vector_str_create(&host_prototype_names);
+
+	zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset,
+			"select h.hostid,h.name"
+			" from host_discovery hd,hosts h"
+			" where hd.hostid=h.hostid"
+				" and");
+	zbx_db_add_condition_alloc(&sql, &sql_alloc, &sql_offset, "hd.lldruleid", lldruleids->values,
+			lldruleids->values_num);
+	if (FAIL == DBselect_ids_names(sql, &host_prototype_ids, &host_prototype_names))
+		goto clean;
+	zbx_db_delete_host_prototypes(&host_prototype_ids, &host_prototype_names, audit_context_mode);
+clean:
+	zbx_free(sql);
+
+	zbx_vector_uint64_destroy(&host_prototype_ids);
+	zbx_vector_str_clear_ext(&host_prototype_names, zbx_str_free);
+	zbx_vector_str_destroy(&host_prototype_names);
+
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 }

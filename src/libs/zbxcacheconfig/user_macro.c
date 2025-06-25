@@ -1003,7 +1003,11 @@ static int	um_cache_get_host_macro(const zbx_um_cache_t *cache, const zbx_uint64
 	}
 
 	if (0 != templateids.values_num)
+	{
+		/* Sort templates by id so the import order precedences over the linking order. */
+		zbx_vector_uint64_sort(&templateids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
 		ret = um_cache_get_host_macro(cache, templateids.values, templateids.values_num, name, context, macro);
+	}
 	else
 		ret = FAIL;
 out:
@@ -1125,7 +1129,7 @@ void	um_cache_resolve(const zbx_um_cache_t *cache, const zbx_uint64_t *hostids, 
 			if (ZBX_MACRO_VALUE_TEXT == um_macro->type)
 				out = um_macro->value;
 			else
-				out = (NULL == um_macro->value ? ZBX_MACRO_SECRET_MASK : ZBX_MACRO_NO_KVS_VALUE);
+				out = (NULL != um_macro->value ? ZBX_MACRO_SECRET_MASK : ZBX_MACRO_NO_KVS_VALUE);
 		}
 
 		zabbix_log(LOG_LEVEL_DEBUG, "End of %s(): %s", __func__, ZBX_NULL2EMPTY_STR(out));

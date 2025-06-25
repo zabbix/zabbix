@@ -139,7 +139,7 @@ class CControllerDashboardWidgetsValidate extends CController {
 
 			$output['widgets'][$index] = [
 				'fields' => $fields,
-				'messages' => $messages
+				'is_configured' => !$messages
 			];
 		}
 

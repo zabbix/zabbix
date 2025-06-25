@@ -1,0 +1,35 @@
+zabbix_export:
+  version: '7.4'
+  template_groups:
+    - uuid: d37f71c7e3f7469bab645852a69a2018
+      name: 'Templates/Video surveillance'
+  host_groups:
+    - uuid: f2481361f99448eea617b7b1d4765566
+      name: 'Discovered hosts'
+  templates:
+    - uuid: 1af9bb8c239f4c5a82bb596f7c0c4b34
+      template: lld_test_autoreg_main_template
+      name: lld_test_autoreg_main_template
+      groups:
+        - name: 'Templates/Video surveillance'
+      discovery_rules:
+        - uuid: 2a80e40c9b064d329d5cd1f31fdcc7ea
+          name: 'Discover databases and tablespaces'
+          type: TRAP
+          key: main_drule
+          lifetime_type: DELETE_IMMEDIATELY
+          host_prototypes:
+            - uuid: ad74f72ee3ee4f9c96e41e1ea44e2f85
+              host: 'Host for database {#DB}'
+              name: 'Host for database {#DB}'
+              group_links:
+                - group:
+                    name: 'Discovered hosts'
+              templates:
+                - name: lld_test_dbs_template
+              macros:
+                - macro: '{$DB}'
+                  value: '{#DB}'
+          lld_macro_paths:
+            - lld_macro: '{#DB}'
+              path: $.database

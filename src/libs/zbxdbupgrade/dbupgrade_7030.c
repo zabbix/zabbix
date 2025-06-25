@@ -453,6 +453,175 @@ static int	DBpatch_7030032(void)
 	return SUCCEED;
 }
 
+static int	DBpatch_7030033(void)
+{
+	/* 2 - ZBX_FLAG_DISCOVERY_PROTOTYPE */
+	if (ZBX_DB_OK > zbx_db_execute("delete from item_rtdata"
+			" where exists ("
+				"select null from items i where item_rtdata.itemid=i.itemid and i.flags=2"
+			")"))
+	{
+		return FAIL;
+	}
+
+	return SUCCEED;
+}
+
+static int	DBpatch_7030034(void)
+{
+	const zbx_db_table_t	table =
+			{"media_type_oauth", "mediatypeid", 0,
+				{
+					{"mediatypeid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, ZBX_NOTNULL, 0},
+					{"redirection_url", "", NULL, NULL, 2048, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0},
+					{"client_id", "", NULL, NULL, 255, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0},
+					{"client_secret", "", NULL, NULL, 255, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0},
+					{"authorization_url", "", NULL, NULL, 2048, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0},
+					{"tokens_status", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0},
+					{"access_token", "", NULL, NULL, 0, ZBX_TYPE_TEXT, ZBX_NOTNULL, 0},
+					{"access_token_updated", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0},
+					{"access_expires_in", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0},
+					{"refresh_token", "", NULL, NULL, 0, ZBX_TYPE_TEXT, ZBX_NOTNULL, 0},
+					{"token_url", "", NULL, NULL, 2048, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0},
+					{0}
+				},
+				NULL
+			};
+
+	return DBcreate_table(&table);
+}
+
+static int	DBpatch_7030035(void)
+{
+	const zbx_db_field_t	field = {"mediatypeid", NULL, "media_type", "mediatypeid", 0, ZBX_TYPE_ID, 0,
+						ZBX_FK_CASCADE_DELETE};
+
+	return DBadd_foreign_key("media_type_oauth", 1, &field);
+}
+
+static int	DBpatch_7030036(void)
+{
+	const zbx_db_table_t	table =
+			{"lld_macro_export", "lld_macro_exportid", 0,
+				{
+					{"lld_macro_exportid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, 0, 0},
+					{"itemid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, ZBX_NOTNULL, 0},
+					{"lld_macro", "", NULL, NULL, 255, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0},
+					{"value", "", NULL, NULL, 0, ZBX_TYPE_TEXT, ZBX_NOTNULL, 0},
+					{0}
+				},
+				NULL
+			};
+
+	return DBcreate_table(&table);
+}
+
+static int	DBpatch_7030037(void)
+{
+	return DBcreate_index("lld_macro_export", "lld_macro_export_1", "itemid", 0);
+}
+
+static int	DBpatch_7030038(void)
+{
+	const zbx_db_field_t	field = {"itemid", NULL, "items", "itemid", 0, ZBX_TYPE_ID, ZBX_NOTNULL,
+			ZBX_FK_CASCADE_DELETE};
+
+	return DBadd_foreign_key("lld_macro_export", 1, &field);
+}
+
+static int	DBpatch_7030039(void)
+{
+	const zbx_db_field_t	field = {"lldruleid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, 0, 0};
+
+	return DBadd_field("item_discovery", &field);
+}
+
+static int	DBpatch_7030040(void)
+{
+	return DBcreate_index("item_discovery", "item_discovery_3", "lldruleid", 0);
+}
+
+static int	DBpatch_7030041(void)
+{
+	const zbx_db_field_t	field = {"lldruleid", NULL, "items", "itemid", 0, ZBX_TYPE_ID, 0, 0};
+
+	return DBadd_foreign_key("item_discovery", 3, &field);
+}
+
+static int	DBpatch_7030042(void)
+{
+	const zbx_db_field_t	field = {"parent_itemid", NULL, "items", "itemid", 0, ZBX_TYPE_ID, 0, 0};
+
+	return DBdrop_not_null("item_discovery", &field);
+}
+
+static int	DBpatch_7030043(void)
+{
+	if (ZBX_DB_OK > zbx_db_execute("update item_discovery id"
+					" set lldruleid=parent_itemid,parent_itemid=NULL"
+					" where exists ("
+						"select null from items i"
+						" where i.itemid=id.itemid"
+							" and i.flags&%d<>0"
+					");", ZBX_FLAG_DISCOVERY_PROTOTYPE))
+	{
+		return FAIL;
+	}
+
+	return SUCCEED;
+}
+
+static int	DBpatch_7030044(void)
+{
+	const zbx_db_field_t	field = {"lldruleid", NULL, "items", "itemid", 0, ZBX_TYPE_ID, 0, 0};
+
+	return DBrename_field("host_discovery", "parent_itemid", &field);
+}
+
+
+static int	DBpatch_7030045(void)
+{
+	const zbx_db_field_t	field = {"wizard_ready", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0};
+
+	return DBadd_field("hosts", &field);
+}
+
+static int	DBpatch_7030046(void)
+{
+	const zbx_db_field_t	field = {"readme", "", NULL, NULL, 0, ZBX_TYPE_TEXT, ZBX_NOTNULL, 0};
+
+	return DBadd_field("hosts", &field);
+}
+
+static int	DBpatch_7030047(void)
+{
+	const zbx_db_table_t	table =
+			{"hostmacro_config", "hostmacroid", 0,
+				{
+					{"hostmacroid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, ZBX_NOTNULL, 0},
+					{"type", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0},
+					{"priority", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0},
+					{"section_name", "", NULL, NULL, 255, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0},
+					{"label", "", NULL, NULL, 255, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0},
+					{"description", "", NULL, NULL, 0, ZBX_TYPE_TEXT, ZBX_NOTNULL, 0},
+					{"required", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0},
+					{"regex", "", NULL, NULL, 255, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0},
+					{"options", "", NULL, NULL, 0, ZBX_TYPE_TEXT, ZBX_NOTNULL, 0},
+					{0}
+				},
+				NULL
+			};
+
+	return DBcreate_table(&table);
+}
+
+static int	DBpatch_7030048(void)
+{
+	const zbx_db_field_t	field = {"hostmacroid", NULL, "hostmacro", "hostmacroid", 0, 0, 0,
+			ZBX_FK_CASCADE_DELETE};
+
+	return DBadd_foreign_key("hostmacro_config", 1, &field);
+}
 #endif
 
 DBPATCH_START(7030)
@@ -492,5 +661,21 @@ DBPATCH_ADD(7030029, 0, 1)
 DBPATCH_ADD(7030030, 0, 1)
 DBPATCH_ADD(7030031, 0, 1)
 DBPATCH_ADD(7030032, 0, 1)
+DBPATCH_ADD(7030033, 0, 1)
+DBPATCH_ADD(7030034, 0, 1)
+DBPATCH_ADD(7030035, 0, 1)
+DBPATCH_ADD(7030036, 0, 1)
+DBPATCH_ADD(7030037, 0, 1)
+DBPATCH_ADD(7030038, 0, 1)
+DBPATCH_ADD(7030039, 0, 1)
+DBPATCH_ADD(7030040, 0, 1)
+DBPATCH_ADD(7030041, 0, 1)
+DBPATCH_ADD(7030042, 0, 1)
+DBPATCH_ADD(7030043, 0, 1)
+DBPATCH_ADD(7030044, 0, 1)
+DBPATCH_ADD(7030045, 0, 1)
+DBPATCH_ADD(7030046, 0, 1)
+DBPATCH_ADD(7030047, 0, 1)
+DBPATCH_ADD(7030048, 0, 1)
 
 DBPATCH_END()

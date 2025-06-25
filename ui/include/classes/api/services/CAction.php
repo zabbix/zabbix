@@ -2727,7 +2727,7 @@ class CAction extends CApiService {
 			if (array_key_exists('conditions', $action['filter'])) {
 				foreach ($action['filter']['conditions'] as $j => $condition) {
 					if ($condition['conditiontype'] == ZBX_CONDITION_TYPE_DHOST_IP) {
-						if (!$ip_range_parser->parse($condition['value'])) {
+						if ($ip_range_parser->parse($condition['value']) != CParser::PARSE_SUCCESS) {
 							self::exception(ZBX_API_ERROR_PARAMETERS, _s('Invalid parameter "%1$s": %2$s.',
 								$path.'/conditions/'.($j + 1).'/value', $ip_range_parser->getError()
 							));
