@@ -75,7 +75,7 @@ class testPageLowLevelDiscoveryPrototypes extends testLowLevelDiscoveryPrototype
 	}
 
 	/**
-	 * Graph prototype delete.
+	 * Discovery rule prototype delete.
 	 */
 	public static function getPrototypePrefixesData() {
 		return [
@@ -151,7 +151,7 @@ class testPageLowLevelDiscoveryPrototypes extends testLowLevelDiscoveryPrototype
 				'name' => self::PROTOTYPE_WITH_PROTOTYPES,
 				'url' => 'host_discovery_prototypes.php?form=update&parent_discoveryid='.
 						self::$ids['lldid_for_prototypes'][$data['context']].'&itemid='.
-						self::$ids['protorypeid_for_prototype_discovery'].'&context='.$data['context'],
+						self::$ids['protorypeid_for_prototype_discovery'][$data['context']].'&context='.$data['context'],
 				'class' => 'orange',
 				'prototype_name' => self::PROTOTYPE_NAME_FOR_DISCOVERY
 			]
@@ -195,6 +195,111 @@ class testPageLowLevelDiscoveryPrototypes extends testLowLevelDiscoveryPrototype
 				break;
 
 		}
+	}
+
+	/**
+	 * Navigation through LLD related part of breadcrumbs.
+	 */
+	public static function getDiscoveryPrototypeNavigationData() {
+		return [
+			// #0 Navigate to discovery list on host.
+			[
+				[
+					'link' => 'Discovery list',
+					'context' => 'host'
+				]
+			],
+			// #1 Navigate to discovery list on template.
+			[
+				[
+					'link' => 'Discovery list',
+					'context' => 'template'
+				]
+			],
+			// #2 Navigate to parent LLD configuration on host.
+			[
+				[
+					'link' => self::PROTOTYPE_NAME_FOR_DISCOVERY,
+					'context' => 'host'
+				]
+			],
+			// #3 Navigate to parent LLD configuration on template.
+			[
+				[
+					'link' => self::PROTOTYPE_NAME_FOR_DISCOVERY,
+					'context' => 'template'
+				]
+			],
+			// #4 Navigate to ancestor LLD configuration on host.
+			[
+				[
+					'link' => self::PROTOTYPE_WITH_PROTOTYPES,
+					'context' => 'host',
+					'hidden' => true
+				]
+			],
+			// #5 Navigate to ancestor LLD configuration on template.
+			[
+				[
+					'link' => self::PROTOTYPE_WITH_PROTOTYPES,
+					'context' => 'template',
+					'hidden' => true
+				]
+			],
+			// #6 Navigate to the list of prototypes of the parent LLD tule on host.
+			[
+				[
+					'link' => self::ROOT_LLD_NAME,
+					'context' => 'host',
+					'hidden' => true
+				]
+			],
+			// #7 Navigate to the list of prototypes of the parent LLD tule on template.
+			[
+				[
+					'link' => self::ROOT_LLD_NAME,
+					'context' => 'template',
+					'hidden' => true
+				]
+			]
+		];
+	}
+
+	/**
+	 * @dataProvider getDiscoveryPrototypeNavigationData
+	 */
+	public function testPageLowLevelDiscoveryPrototypes_Navigation($data) {
+		$urls = [
+			'Discovery list' => 'host_discovery.php?filter_set=1&filter_hostids%5B0%5D='.self::$ids[$data['context']].
+					'&context='.$data['context'],
+			self::PROTOTYPE_NAME_FOR_DISCOVERY => 'host_discovery_prototypes.php?form=update&itemid='.
+					self::$ids['protorypeid_for_prototype_discovery'][$data['context']].'&parent_discoveryid='.
+					self::$ids['lldid_for_prototypes'][$data['context']].'&context='.$data['context'],
+			self::PROTOTYPE_WITH_PROTOTYPES => self::COMMON_URL.self::$ids['lldid_for_prototypes'][$data['context']].
+					'&context='.$data['context'],
+			self::ROOT_LLD_NAME => self::COMMON_URL.self::$ids['parent_lldid'][$data['context']].'&context='.$data['context']
+		];
+
+		$this->page->login()->open(self::COMMON_URL.self::$ids['protorypeid_for_prototype_discovery'][$data['context']].
+				'&context='.$data['context']
+		)->waitUntilReady();
+
+		$lld_navigation = $this->query('xpath:(//ul[@class="breadcrumbs"])[2]')->waitUntilVisible()->one();
+
+		if (CTestArrayHelper::get($data, 'hidden')) {
+			$lld_navigation->query('class:btn-icon')->one()->click();
+			$popup = $this->query('xpath://div[@class="overlay-dialogue wordbreak"]')->waitUntilVisible()->one();
+			$popup->query('link', $data['link'])->waitUntilClickable()->one()->click();
+		}
+		else {
+			$lld_navigation->query('link', $data['link'])->waitUntilClickable()->one()->click();
+		}
+
+		$this->page->waitUntilReady();
+
+		// Check that the user was redirected to correct URL and that there are no error messages on the page.
+		$this->assertStringContainsString($urls[$data['link']], $this->page->getCurrentUrl());
+		$this->assertFalse($this->query('class:msg-bad')->one(false)->isValid());
 	}
 
 	/**

@@ -280,7 +280,7 @@ class testLowLevelDiscoveryPrototypes extends testPagePrototypes {
 			]);
 
 			// Create an LLD rule prototype under LLD rule prototype, to create a discovered LLD rule prototype afterwards.
-			$protorypeid_for_prototype_discovery = CDataHelper::call('discoveryruleprototype.create', [
+			self::$ids['protorypeid_for_prototype_discovery'][$context] = CDataHelper::call('discoveryruleprototype.create', [
 				[
 					'hostid' => self::$ids[$context],
 					'ruleid' => self::$ids['lldid_for_prototypes'][$context],
@@ -291,8 +291,6 @@ class testLowLevelDiscoveryPrototypes extends testPagePrototypes {
 			])['itemids'][0];
 
 			if ($context === 'host') {
-				self::$ids['protorypeid_for_prototype_discovery'] = $protorypeid_for_prototype_discovery;
-
 				// Create discovered LLD and LLD prototype.
 				$prototype_for_discovery_id = CDBHelper::getValue('SELECT itemid FROM items WHERE name='.
 						zbx_dbstr(self::PROTOTYPE_WITH_PROTOTYPES).' AND hostid='.self::$ids[$context]
@@ -324,7 +322,7 @@ class testLowLevelDiscoveryPrototypes extends testPagePrototypes {
 
 				// Make previously created LLD rule prototype a discovered LLD rule prototype.
 				DBExecute('UPDATE items SET flags=7 WHERE itemid='.$discovered_prototype_responce['itemids'][0]);
-				DBExecute('UPDATE item_discovery SET parent_itemid='.self::$ids['protorypeid_for_prototype_discovery'].
+				DBExecute('UPDATE item_discovery SET parent_itemid='.self::$ids['protorypeid_for_prototype_discovery'][$context].
 						' WHERE itemid='.$discovered_prototype_responce['itemids'][0]
 				);
 
