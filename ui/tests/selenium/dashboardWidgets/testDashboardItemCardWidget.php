@@ -188,7 +188,7 @@ class testDashboardItemCardWidget extends testWidgets {
 		DBexecute('UPDATE item_rtdata SET state = 1, error = '.zbx_dbstr('Value of type "string" is not suitable for '.
 				'value type "Numeric (unsigned)". Value "hahah"').'WHERE itemid ='.zbx_dbstr(self::$itemids['Master item']));
 
-		
+
 
 		// Create trigger based on item.
 		CDataHelper::call('trigger.create', [
