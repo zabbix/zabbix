@@ -15,82 +15,134 @@
 package oracle
 
 import (
-	"reflect"
 	"testing"
 
-	"github.com/godror/godror"
+	"github.com/godror/godror/dsn"
 )
 
-func Test_getConnParams(t *testing.T) {
-	type args struct {
-		privilege string
-	}
-	tests := []struct {
-		name    string
-		args    args
-		wantOut godror.ConnParams
-		wantErr bool
-	}{
-		{"no privilege", args{}, godror.ConnParams{}, false},
-		{"sysdba", args{"sysdba"}, godror.ConnParams{IsSysDBA: true}, false},
-		{"sysoper", args{"sysoper"}, godror.ConnParams{IsSysOper: true}, false},
-		{"sysasm", args{"sysasm"}, godror.ConnParams{IsSysASM: true}, false},
-		{"empty_privilege", args{""}, godror.ConnParams{}, false},
-		{"incorrect_privilege", args{"foobar"}, godror.ConnParams{}, true},
-	}
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			gotOut, err := getConnParams(tt.args.privilege)
-			if (err != nil) != tt.wantErr {
-				t.Errorf("getConnParams() error = %v, wantErr %v", err, tt.wantErr)
-
-				return
-			}
-			if !reflect.DeepEqual(gotOut, tt.wantOut) {
-				t.Errorf("getConnParams() = %v, want %v", gotOut, tt.wantOut)
-			}
-		})
-	}
-}
-
-func Test_splitUserPrivilege(t *testing.T) {
+// Test_splitUserAndPrivilege verifies the parsing of user strings with and without roles.
+func Test_splitUserAndPrivilege(t *testing.T) {
 	type args struct {
 		params map[string]string
 	}
+
 	tests := []struct {
 		name          string
 		args          args
 		wantUser      string
-		wantPrivilege string
+		wantPrivilege dsn.AdminRole
 		wantErr       bool
 	}{
-		{"only_user", args{map[string]string{"User": "foobar"}}, "foobar", "", false},
-		{"sysdba_privilege_lowercase", args{map[string]string{"User": "foobar as sysdba"}}, "foobar", "sysdba", false},
-		{"sysdba_privilege_uppercase", args{map[string]string{"User": "foobar AS SYSDBA"}}, "foobar", "sysdba", false},
-		{"sysdba_privilege_mix", args{map[string]string{"User": "foobar AS sySdBa"}}, "foobar", "sysdba", false},
-		{"sysoper_privilege_lowercase", args{map[string]string{"User": "foobar as sysoper"}}, "foobar", "sysoper", false},
-		{"sysoper_privilege_uppercase", args{map[string]string{"User": "foobar AS SYSOPER"}}, "foobar", "sysoper", false},
-		{"sysoper_privilege_mix", args{map[string]string{"User": "foobar AS sysOpEr"}}, "foobar", "sysoper", false},
-		{"sysasm_privilege_lowercase", args{map[string]string{"User": "foobar as sysasm"}}, "foobar", "sysasm", false},
-		{"sysasm_privilege_uppercase", args{map[string]string{"User": "foobar AS SYSASM"}}, "foobar", "sysasm", false},
-		{"sysasm_privilege_mix", args{map[string]string{"User": "foobar AS sysAsM"}}, "foobar", "sysasm", false},
-		{"incorrect_privilege", args{map[string]string{"User": "foobar as barfoo"}}, "foobar as barfoo", "", false},
-		{"empty_user", args{map[string]string{"User": ""}}, "", "", false},
-		{"no_user", args{map[string]string{}}, "", "", true},
+		// --- Valid Scenarios (wantErr: false) ---
+		{
+			name:          "simple username",
+			args:          args{params: map[string]string{"User": "foobar"}},
+			wantUser:      "foobar",
+			wantPrivilege: dsn.NoRole,
+			wantErr:       false,
+		},
+		{
+			name:          "SYSDBA privilege with mixed case",
+			args:          args{params: map[string]string{"User": "foobar AS sySdBa"}},
+			wantUser:      "foobar",
+			wantPrivilege: dsn.SysDBA,
+			wantErr:       false,
+		},
+		{
+			name:          "SYSOPER privilege with extra spaces",
+			args:          args{params: map[string]string{"User": "foobar   as   sysoper"}},
+			wantUser:      "foobar",
+			wantPrivilege: dsn.SysOPER,
+			wantErr:       false,
+		},
+		{
+			name:          "SYSASM privilege uppercase",
+			args:          args{params: map[string]string{"User": "god AS SYSASM"}},
+			wantUser:      "god",
+			wantPrivilege: dsn.SysASM,
+			wantErr:       false,
+		},
+		{
+			name:          "SYSBACKUP privilege to test another role",
+			args:          args{params: map[string]string{"User": "backup_user as sysbackup"}},
+			wantUser:      "backup_user",
+			wantPrivilege: dsn.SysBACKUP,
+			wantErr:       false,
+		},
+		{
+			name:          "SYSDG privilege for Data Guard",
+			args:          args{params: map[string]string{"User": "dg_admin as sysdg"}},
+			wantUser:      "dg_admin",
+			wantPrivilege: dsn.SysDG,
+			wantErr:       false,
+		},
+		{
+			name:          "SYSKM privilege for Keystore Management",
+			args:          args{params: map[string]string{"User": "key_mgr AS SYSKM"}},
+			wantUser:      "key_mgr",
+			wantPrivilege: dsn.SysKM,
+			wantErr:       false,
+		},
+		{
+			name:          "SYSRAC privilege for RAC Admin",
+			args:          args{params: map[string]string{"User": "rac_user As SysRac"}},
+			wantUser:      "rac_user",
+			wantPrivilege: dsn.SysRAC,
+			wantErr:       false,
+		},
+
+		// --- Error Scenarios (wantErr: true) ---
+		{
+			name:          "missing user key in params",
+			args:          args{params: map[string]string{}},
+			wantUser:      "",
+			wantPrivilege: dsn.NoRole,
+			wantErr:       true,
+		},
+		{
+			name:          "user string is empty",
+			args:          args{params: map[string]string{"User": ""}},
+			wantUser:      "",
+			wantPrivilege: dsn.NoRole,
+			wantErr:       false,
+		},
+		{
+			name:          "unknown privilege",
+			args:          args{params: map[string]string{"User": "foobar as barfoo"}},
+			wantUser:      "foobar as barfoo",
+			wantPrivilege: dsn.NoRole,
+			wantErr:       false,
+		},
+		{
+			name:          "invalid format with too many parts",
+			args:          args{params: map[string]string{"User": "foobar as sysdba extra"}},
+			wantUser:      "",
+			wantPrivilege: dsn.NoRole,
+			wantErr:       true,
+		},
 	}
+
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			gotUser, gotPrivilege, err := splitUserPrivilege(tt.args.params)
+			// Assuming splitUserAndPrivilege is the function being tested
+			gotUser, gotPrivilege, err := splitUserAndPrivilege(tt.args.params)
+
 			if (err != nil) != tt.wantErr {
-				t.Errorf("splitUserPrivilege() error = %v, wantErr %v", err, tt.wantErr)
+				t.Errorf("splitUserAndPrivilege() error = %v, wantErr %v", err, tt.wantErr)
 
 				return
 			}
-			if gotUser != tt.wantUser {
-				t.Errorf("splitUserPrivilege() gotUser = %v, want %v", gotUser, tt.wantUser)
+
+			if tt.wantErr {
+				return
 			}
+
+			if gotUser != tt.wantUser {
+				t.Errorf("splitUserAndPrivilege() gotUser = %v, want %v", gotUser, tt.wantUser)
+			}
+
 			if gotPrivilege != tt.wantPrivilege {
-				t.Errorf("splitUserPrivilege() gotPrivilege = %v, want %v", gotPrivilege, tt.wantPrivilege)
+				t.Errorf("splitUserAndPrivilege() gotPrivilege = %v, want %v", gotPrivilege, tt.wantPrivilege)
 			}
 		})
 	}
