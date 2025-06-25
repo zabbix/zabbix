@@ -132,6 +132,9 @@ class testPageLowLevelDiscoveryPrototypes extends testLowLevelDiscoveryPrototype
 
 	/**
 	 * @dataProvider getPrototypePrefixesData
+	 *
+	 * @ignoreBrowserErrors
+	 * TODO: Remove the above annotation when DEV-4233 is fixed.
 	 */
 	public function testPageLowLevelDiscoveryPrototypes_CheckPrefixes($data) {
 		$prefixes = [
