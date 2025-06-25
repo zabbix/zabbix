@@ -1,0 +1,1 @@
+..F....... [ZBX-26472] fixed when there is no background image or icon map in the imported file, the elements will be cleared (rgontarski)
