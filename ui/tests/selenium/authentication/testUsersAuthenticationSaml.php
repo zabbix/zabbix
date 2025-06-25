@@ -28,6 +28,7 @@ class testUsersAuthenticationSaml extends testFormAuthentication {
 	}
 
 	public function testUsersAuthenticationSaml_Layout() {
+		$this->changeSamlCertificatesStorage('database');
 		$saml_form = $this->openFormAndCheckBasics('SAML');
 
 		// Check SAML form default values.
@@ -41,6 +42,12 @@ class testUsersAuthenticationSaml extends testFormAuthentication {
 			'SP name ID format' => ['value' => '', 'visible' => true, 'maxlength' => 2048,
 					'placeholder' => 'urn:oasis:names:tc:SAML:2.0:nameid-format:transient'
 			],
+			'id:idp_certificate' => ['value' => '', 'visible' => true, 'placeholder' => 'PEM-encoded IdP certificate'],
+			'id:idp_certificate_file' => ['visible' => true],
+			'id:sp_private_key' => ['value' => '', 'visible' => true, 'placeholder' => 'PEM-encoded SP private key'],
+			'id:sp_private_key_file' => ['visible' => true],
+			'id:sp_certificate' => ['value' => '', 'visible' => true, 'placeholder' => 'PEM-encoded SP certificate'],
+			'id:sp_certificate_file' => ['visible' => true],
 			'id:sign_messages' => ['value' => false, 'visible' => true],
 			'id:sign_assertions' => ['value' => false, 'visible' => true],
 			'id:sign_authn_requests' => ['value' => false, 'visible' => true],
@@ -93,7 +100,7 @@ class testUsersAuthenticationSaml extends testFormAuthentication {
 		}
 
 		// Check that JIT fields remain invisible and depend on "Configure JIT" checkbox.
-		$jit_fields = array_slice($saml_fields, 16);
+		$jit_fields = array_slice($saml_fields, 22);
 
 		foreach ([false, true] as $jit_status) {
 			$saml_form->fill(['Configure JIT provisioning' => $jit_status]);
@@ -121,6 +128,7 @@ class testUsersAuthenticationSaml extends testFormAuthentication {
 		];
 
 		$this->checkFormHintsAndMapping($saml_form, $hintboxes, $mapping_tables, 'SAML');
+		$this->changeSamlCertificatesStorage('file');
 	}
 
 	public function getConfigureValidationData() {
@@ -823,5 +831,16 @@ class testUsersAuthenticationSaml extends testFormAuthentication {
 
 		$form->submit();
 		$this->page->waitUntilReady();
+	}
+
+	private function changeSamlCertificatesStorage($type) {
+		// Update Zabbix frontend config.
+		$file_path = __DIR__.'/../../../conf/zabbix.conf.php';
+		$pattern = array('/\$SSO\[\'CERT_STORAGE\']	= \'file\';/', '/\$SSO\[\'CERT_STORAGE\'] = \'database\';/');
+		$content = preg_replace($pattern, "\$SSO['CERT_STORAGE'] = '$type';", file_get_contents($file_path), 1);
+		file_put_contents($file_path, $content);
+
+		// Wait for frontend to get the new config from updated zabbix.conf.php file.
+		sleep((int)ini_get('opcache.revalidate_freq') + 1);
 	}
 }
