@@ -973,6 +973,7 @@ class testFormValueMappings extends CWebTest {
 		$dialog = COverlayDialogElement::find()->asForm()->waitUntilVisible()->all()->last();
 		$dialog->submit()->waitUntilNotVisible();
 		$this->query('button:Update')->one()->click();
+		$this->assertMessage(TEST_GOOD, ucfirst($source).' updated');
 
 		// Check that no changes occurred in the database.
 		$this->assertEquals($old_hash, CDBHelper::getHash($sql));

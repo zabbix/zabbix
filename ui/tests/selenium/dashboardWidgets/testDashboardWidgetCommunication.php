@@ -1714,7 +1714,9 @@ class testDashboardWidgetCommunication extends testWidgetCommunication {
 			$this->checkDataOnListener($data['expected']);
 		}
 
-		$dashboard->cancelEditing();
+		// Change dashboard from cancelEditing() to save() to check js 32739:4 Uncaught error.
+		$dashboard->save();
+		$this->assertMessage(TEST_GOOD, 'Dashboard updated');
 	}
 
 	/**
