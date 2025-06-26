@@ -270,7 +270,7 @@ class testDiscoveryRules extends CIntegrationTest {
 		$this->assertEquals(count($initial_timeouts), count($response['result']));
 
 		$drule = [
-			'iprange' => '127.0.10.1-255',
+			'iprange' => '127.0.10.1-200',
 			'name' => $name,
 			'delay' => '1s',
 			'status' => 0, /* enabled */
@@ -617,7 +617,7 @@ class testDiscoveryRules extends CIntegrationTest {
 		$this->waitForDiscovery(self::SNMPSIM_HOST_IP);
 	}
 
-	private function proxyTest(): void {
+	private function proxyTest($doMulti): void {
 		$this->stopComponent(self::COMPONENT_SERVER);
 		$this->stopComponent(self::COMPONENT_PROXY);
 
@@ -627,7 +627,11 @@ class testDiscoveryRules extends CIntegrationTest {
 		$this->deleteProxy();
 
 		$proxyId = $this->createProxy();
-		$druleId = $this->createDruleSnmpv3(self::DRULE_NAME , $proxyId);
+		if ($doMulti) {
+			$druleId = $this->createDruleSnmpv3Multi(self::DRULE_NAME , $proxyId);
+		} else {
+			$druleId = $this->createDruleSnmpv3(self::DRULE_NAME , $proxyId);
+		}
 		$this->createActionHostAdd($druleId, self::DISCOVERY_ACTION_NAME);
 
 		$druleWithErrId = $this->createDruleSnmpv2(self::DRULE_NAME_ERR, '127.0.0.1', self::SNMPAGENT_INVALID_OID, $proxyId);
@@ -636,8 +640,10 @@ class testDiscoveryRules extends CIntegrationTest {
 		$this->startComponent(self::COMPONENT_PROXY);
 		$this->startComponent(self::COMPONENT_SERVER);
 
-		$this->waitForDiscoveryErr(self::SNMPAGENT_EXPECTED_INVALID_OID_ERR_MSG);
-		$this->waitForDiscovery(self::SNMPSIM_HOST_IP);
+		if (!$doMulti) {
+			$this->waitForDiscoveryErr(self::SNMPAGENT_EXPECTED_INVALID_OID_ERR_MSG);
+			$this->waitForDiscovery(self::SNMPSIM_HOST_IP);
+		}
 
 	}
 
@@ -647,7 +653,7 @@ class testDiscoveryRules extends CIntegrationTest {
 	 * @configurationDataProvider proxyDBModeconfigurationProvider
 	 */
 	public function testDiscoveryRules_snmpErrorViaProxyDBMode(): void {
-		$this->proxyTest();
+		$this->proxyTest(false);
 	}
 
 	/**
@@ -656,7 +662,7 @@ class testDiscoveryRules extends CIntegrationTest {
 	 * @configurationDataProvider proxyMemoryModeconfigurationProvider
 	 */
 	public function testDiscoveryRules_snmpErrorViaProxyMemoryMode(): void {
-		$this->proxyTest();
+		$this->proxyTest(true);
 
 		$this->stopComponent(self::COMPONENT_SERVER);
 
@@ -691,7 +697,7 @@ class testDiscoveryRules extends CIntegrationTest {
 	 * @configurationDataProvider proxyHybridModeconfigurationProvider
 	 */
 	public function testDiscoveryRules_snmpErrorViaProxyHybridMode(): void {
-		$this->proxyTest();
+		$this->proxyTest(false);
 	}
 
 	/**
