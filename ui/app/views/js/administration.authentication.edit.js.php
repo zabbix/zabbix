@@ -246,24 +246,34 @@
 
 			input.type = 'file';
 			input.accept = extension_filter;
+
+			textarea.addEventListener('input', e => {
+				wrapper.querySelector('.error')?.remove();
+				textarea.classList.remove('has-error');
+			});
+
 			input.addEventListener('change', e => {
-				const old_error = wrapper.querySelector('.error');
-				if (old_error)  {
-					textarea.classList.remove('has-error');
-					old_error.remove();
-				}
+				wrapper.querySelector('.error')?.remove();
+				textarea.classList.remove('has-error');
 
 				const file = e.target.files && e.target.files[0] ? e.target.files[0] : null;
 
 				if (file) {
-					if (file.size > 10000) {
+					const max_filesize = textarea.id === 'sp_private_key'
+						? <?= CApiInputValidator::SSL_PRIVATE_KEY_MAX_LENGTH ?>
+						: <?= CApiInputValidator::SSL_CERTIFICATE_MAX_LENGTH ?>;
+
+					if (file.size > max_filesize) {
 						const error_span = document.createElement('span');
 						error_span.className = 'error';
-						error_span.textContent = <?= json_encode(_s('File is too big, max upload size is %1$s bytes.', 10000)) ?>;
-						wrapper.append(error_span);
 
+						error_span.textContent = <?= json_encode(_('File is too big, max upload size is %1$s bytes.')) ?>
+							.replace('%1$s', max_filesize);
+
+						wrapper.append(error_span);
 						textarea.classList.add('has-error');
 						textarea.value = '';
+
 						return;
 					}
 
