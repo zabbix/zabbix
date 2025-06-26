@@ -69,14 +69,12 @@ class testDashboardItemCardWidget extends testWidgets {
 						'name' => 'Master item from template',
 						'key_' => 'custom_item',
 						'type' => ITEM_TYPE_TRAPPER,
-						'value_type' => ITEM_VALUE_TYPE_STR,
-						'status' => 1
+						'value_type' => ITEM_VALUE_TYPE_STR
 					]
 				]
 			]
 		]);
 		self::$template_items = CDataHelper::getIds('name');
-		echo self::$template_items['Master item from template'][0];
 
 		$hosts = CDataHelper::createHosts([
 			[
@@ -135,7 +133,8 @@ class testDashboardItemCardWidget extends testWidgets {
 						'history' => '17d',
 						'trends' => '17d',
 						'inventory_link' => 6,
-						'description' => STRING_6000
+						'description' => STRING_6000,
+						'status' => 1
 					],
 					[
 						'name' => 'Item with text datatype',
@@ -216,7 +215,7 @@ class testDashboardItemCardWidget extends testWidgets {
 
 		CDataHelper::call('dashboard.create', [
 			[
-				'name' => 'Dashboard for creating ItemCard widgets',
+				'name' => 'Dashboard for creating Item Card widgets',
 				'pages' => [[]]
 			],
 			[
@@ -576,7 +575,7 @@ class testDashboardItemCardWidget extends testWidgets {
 									[
 										'type' => 4,
 										'name' => 'itemid.0',
-										'value' => self::$template_items['Master item from template'][0]
+										'value' => self::$template_items['Master item from template']+1
 									],
 									[
 										'type' => 0,
@@ -658,12 +657,278 @@ class testDashboardItemCardWidget extends testWidgets {
 		self::$dashboardid = CDataHelper::getIds('name');
 	}
 
-	public function testDashboardItemCardWidget_Layout() {
+	public function testDashboardHostCardWidget_Layout() {
+		$this->page->login()->open('zabbix.php?action=dashboard.view&dashboardid='.
+				self::$dashboardid['Dashboard for creating Item Card widgets'])->waitUntilReady();
+		$dashboard = CDashboardElement::find()->waitUntilReady()->one();
+		$form = $dashboard->edit()->addWidget()->asForm();
+		$form->fill(['Type' => CFormElement::RELOADABLE_FILL('Item card')]);
 
+		// Check name field maxlength.
+		$this->assertEquals(255, $form->getField('Name')->getAttribute('maxlength'));
+
+		foreach (['Type', 'Show header', 'Name', 'Refresh interval', 'Item', 'Show', 'Override host'] as $lable) {
+			$this->assertTrue($form->getField($lable)->isVisible(true));
+		}
+
+		$this->assertEquals(['Item'], $form->getRequiredLabels());
+
+		// Check fields "Refresh interval" values.
+		$this->assertEquals(['Default (1 minute)',  'No refresh', '10 seconds', '30 seconds', '1 minute', '2 minutes', '10 minutes',  '15 minutes'],
+				$form->getField('Refresh interval')->getOptions()->asText()
+		);
+
+		// Check default values.
+		$default_values = [
+			'Name' => '',
+			'Refresh interval' => 'Default (1 minute)',
+			'Item' => '',
+			'Show header' => true,
+			'Override host' => ''
+		];
+
+		$form->checkValue($default_values);
+		$label = $form->getField('Item');
+
+		// Check Select dropdown menu button.
+		$menu_button = $label->query('xpath:.//button[contains(@class, "zi-chevron-down")]')->asPopupButton()->one();
+		$this->assertEquals(['Item', 'Widget'], $menu_button->getMenu()->getItems()->asText());
+
+		// After selecting Widget from dropdown menu, check overlay dialog appearance and title.
+		$menu_button->select('Widget');
+		$dialogs = COverlayDialogElement::find()->all();
+		$this->assertEquals('Widget', $dialogs->last()->waitUntilReady()->getTitle());
+		$dialogs->last()->close(true);
+
+		// After clicking on Select button, check overlay dialog appearance and title.
+		$label->query('button:Select')->waitUntilCLickable()->one()->click();
+		$dialogs = COverlayDialogElement::find()->all();
+		$this->assertEquals('Items', $dialogs->last()->waitUntilReady()->getTitle());
+		$dialogs->last()->close(true);
+
+		// Check default and available options in 'Show' section.
+		$show_form = $form->getFieldContainer('Show')->asMultifieldTable(['mapping' => ['' => 'section']]);
+		$show_form->checkValue([
+			['section' => 'Metrics'],
+			['section' => 'Type of information'],
+			['section' => 'Host interface'],
+			['section' => 'Type']
+		]);
+
+		// Clear all default options
+		$show_form->query('button:Remove')->all()->click();
+
+		$show_options = ['Description', 'Error text', 'Metrics', 'Latest data', 'Type of information', 'Triggers',
+				'Host interface', 'Type', 'Host inventory', 'Tags'];
+		$disabled_result = [];
+		foreach ($show_options as $i => $option) {
+			$show_form->query('button:Add')->one()->click();
+
+			// Check that added correct option by default.
+			$select = $show_form->query('id', 'sections_'.$i)->one()->asDropdown();
+			$this->assertEquals($option, $select->getText());
+
+			// Check that added options are disabled in dropdown menu.
+			$disabled = $select->getOptions()->filter(CElementFilter::DISABLED)->asText();
+			$this->assertEquals($disabled_result, $disabled);
+			$disabled_result[] = $option;
+		}
+
+		// Check that Add button became disabled.
+		$this->assertFalse($show_form->query('button:Add')->one()->isEnabled());
+
+		// If the 'Latest data' option was selected, the Sparkline becomes visible.
+		$show_form->query('button:Remove')->all()->click();
+		$show_form->query('button:Add')->one()->click();
+
+		$sparkline = $form->getFieldContainer('Sparkline');
+		foreach ($show_options as $option) {
+			$show_form->query('id:sections_0')->one()->asDropdown()->select($option);
+
+			if ($option === 'Latest data') {
+				$this->assertTrue($sparkline->isVisible(true));
+
+				// Check sparkline default values.
+				$sparkline_default_values = [
+					'id:sparkline_width' => 1,
+					'id:sparkline_fill' => 3,
+					'id:sparkline_time_period_data_source' => 'Custom',
+					'id:sparkline_time_period_from' => 'now-1h',
+					'id:sparkline_time_period_to' => 'now',
+					'id:sparkline_history' => 'Auto'
+				];
+				foreach ($sparkline_default_values as $field => $value) {
+					$this->assertEquals($value, $form->getField($field)->getValue());
+					$this->assertTrue($form->getField($field)->isVisible(true));
+				}
+
+				// Check default color code.
+				$this->assertEquals('#42A5F5', $form->getField('id:lbl_sparkline_color')->getAttribute('title'));
+
+				// Check radio button options.
+				$radio_buttons = [
+					'id:sparkline_time_period_data_source' => ['Dashboard', 'Widget', 'Custom'],
+					'id:sparkline_history' => ['Auto', 'History', 'Trends']
+				];
+				foreach ($radio_buttons as $locator => $labels) {
+					foreach ($labels as $option) {
+						$form->getField($locator)->asSegmentedRadio()->select($option);
+					}
+					$this->assertEquals($labels, $form->getField($locator)->getLabels()->asText());
+				}
+
+				// Check that user may open a calendar.
+				foreach (['from', 'to'] as $type) {
+					$icon = $form->query('id', 'sparkline_time_period_'.$type.'_calendar')->one();
+					$icon->click();
+					$calendar = COverlayDialogElement::find()->all()->last()->waitUntilReady();
+					$this->assertTrue($calendar->isVisible());
+					$icon->click();
+				}
+
+				// Check color-picker form is opened.
+				$icon = $form->query('class', 'color-picker-box')->one()->click();
+				$colorpicker = $this->query('id', 'color_picker')->one()->waitUntilReady();
+				$this->assertTrue($colorpicker->isVisible(true));
+				$colorpicker->query('button:Apply')->one()->click();
+				$this->assertTrue(!$colorpicker->isVisible());
+
+				/* Needs work
+				// Check required fields.
+				$required_fields = ['Item', 'id:sparkline_time_period_from', 'id:sparkline_time_period_to',
+						'id:sparkline_time_period_reference_ms'];
+				foreach ($required_fields as $field ) {
+					if($field === 'Widget'){
+						$form->fill(['id:sparkline_time_period_reference_ms' => 'Widget']);
+					}
+					$this->assertTrue($form->isRequired($field));
+				}
+				 */
+			}
+			else {
+				$this->assertTrue($sparkline->isVisible(false));
+			}
+		}
+
+		$label = $form->getField('Override host');
+
+		// Check Select dropdown menu button.
+		$menu_button = $label->query('xpath:.//button[contains(@class, "zi-chevron-down")]')->asPopupButton()->one();
+		$this->assertEquals(['Widget', 'Dashboard'], $menu_button->getMenu()->getItems()->asText());
+
+		// After selecting Widget from dropdown menu, check overlay dialog appearance and title.
+		$menu_button->select('Widget');
+		$dialogs = COverlayDialogElement::find()->all();
+		$this->assertEquals('Widget', $dialogs->last()->waitUntilReady()->getTitle());
+		$dialogs->last()->close(true);
+
+		// After selecting Dashboard from dropdown menu, check hint and field value.
+		$menu_button->select('Dashboard');
+		$form->checkValue(['Override host' => 'Dashboard']);
+		$this->assertTrue($label->query('xpath', './/span[@data-hintbox-contents="Dashboard is used as data source."]')
+				->one()->isVisible()
+		);
+
+		// After clicking on Select button, check overlay dialog appearance and title.
+		$label->query('button:Select')->waitUntilCLickable()->one()->click();
+		$dialogs = COverlayDialogElement::find()->all();
+		$this->assertEquals('Widget', $dialogs->last()->waitUntilReady()->getTitle());
+		$dialogs->last()->close(true);
 	}
 
 	public static function getCreateData() {
-
+		return [
+			// #0.
+			[
+				[
+					'expected' => TEST_BAD,
+					'fields' => [
+						'Name' => 'Item is not selected',
+						'Item' => ''
+					],
+					'error_message' => [
+						'Invalid parameter "Item": cannot be empty.'
+					]
+				]
+			],
+			// #1.
+			[
+				[
+					'expected' => TEST_BAD,
+					'fields' => [
+						'Item' => 'Master item'
+					],
+					'Show' => [
+						['action' => USER_ACTION_UPDATE, 'index' => 0, 'section' => 'Latest data'],
+						['action' => USER_ACTION_REMOVE, 'index' => 1],
+						['action' => USER_ACTION_REMOVE, 'index' => 1],
+						['action' => USER_ACTION_REMOVE, 'index' => 1]
+					],
+					'Sparkline' => [
+						'id:sparkline_width' => 5,
+						'id:sparkline_fill' => 5,
+						'id:sparkline_time_period_data_source' => 'Custom',
+						'id:sparkline_time_period_from' => '',
+						'id:sparkline_time_period_to' => '',
+						'color-picker-box' => 'CDDC39'
+					],
+					'error_message' => [
+						'Invalid parameter "Sparkline: Time period/From": cannot be empty.',
+						'Invalid parameter "Sparkline: Time period/To": cannot be empty.'
+					]
+				]
+			],
+			// #2.
+			[
+				[
+					'expected' => TEST_BAD,
+					'fields' => [
+						'Name' => 'Item is not selected',
+						'Item' => 'Master item'
+					],
+					'Show' => [
+						['action' => USER_ACTION_UPDATE, 'index' => 0, 'section' => 'Latest data'],
+						['action' => USER_ACTION_REMOVE, 'index' => 1],
+						['action' => USER_ACTION_REMOVE, 'index' => 1],
+						['action' => USER_ACTION_REMOVE, 'index' => 1]
+					],
+					'Sparkline' => [
+						'id:sparkline_width' => 5,
+						'id:sparkline_fill' => 5,
+						'id:sparkline_time_period_data_source' => 'Custom',
+						'id:sparkline_time_period_from' => 'now-1000d',
+						'id:sparkline_time_period_to' => 'now+999d'
+					],
+					'error_message' => [
+						'Maximum time period to display is 731 days.'
+					]
+				]
+			],
+			// #3.
+			[
+				[
+					'expected' => TEST_BAD,
+					'fields' => [
+						'Name' => 'Item is not selected',
+						'Item' => 'Master item'
+					],
+					'Show' => [
+						['action' => USER_ACTION_UPDATE, 'index' => 0, 'section' => 'Latest data'],
+						['action' => USER_ACTION_REMOVE, 'index' => 1],
+						['action' => USER_ACTION_REMOVE, 'index' => 1],
+						['action' => USER_ACTION_REMOVE, 'index' => 1]
+					],
+					'Sparkline' => [
+						'id:sparkline_width' => 5,
+						'id:sparkline_fill' => 5,
+						'id:sparkline_time_period_data_source' => 'Widget'
+					],
+					'error_message' => [
+						'Invalid parameter "Sparkline: Time period/Widget": cannot be empty.'
+					]
+				]
+			]
+		];
 	}
 
 	/**
@@ -672,7 +937,21 @@ class testDashboardItemCardWidget extends testWidgets {
 	 * @dataProvider getCreateData
 	 */
 	public function testDashboardItemCardWidget_Create($data) {
+		$this->page->login()->open('zabbix.php?action=dashboard.view&dashboardid='.
+				self::$dashboardid['Dashboard for creating Item Card widgets'])->waitUntilReady();
 
+		// Get hash if expected is TEST_BAD.
+		if (CTestArrayHelper::get($data, 'expected', TEST_GOOD) === TEST_BAD) {
+			// Hash before update.
+			self::$old_hash = CDBHelper::getHash(self::SQL);
+		}
+		else {
+			self::$old_widget_count = CDashboardElement::find()->waitUntilReady()->one()->getWidgets()->count();
+		}
+
+		$dashboard = CDashboardElement::find()->waitUntilReady()->one();
+		$this->fillWidgetForm($data, 'create', $dashboard);
+		$this->checkWidgetForm($data, 'create', $dashboard);
 	}
 
 	/**
@@ -709,7 +988,25 @@ class testDashboardItemCardWidget extends testWidgets {
 	 * Delete Host Card widget.
 	 */
 	public function testDashboardItemCardWidget_Delete() {
+		$widget_name = 'DeleteItemCardWidget';
+		$this->page->login()->open('zabbix.php?action=dashboard.view&dashboardid='.
+				self::$dashboardid['Dashboard for deleting Item Card widget'])->waitUntilReady();
+		$dashboard = CDashboardElement::find()->one()->waitUntilReady()->edit();
+		$widget = $dashboard->getWidget($widget_name);
+		$this->assertTrue($widget->isEditable());
+		$dashboard->deleteWidget($widget_name);
+		$widget->waitUntilNotPresent();
+		$dashboard->save();
+		$this->page->waitUntilReady();
+		$this->assertMessage(TEST_GOOD, 'Dashboard updated');
 
+		// Check that widget is not present on dashboard and in DB.
+		$this->assertFalse($dashboard->getWidget($widget_name, false)->isValid());
+		$this->assertEquals(0, CDBHelper::getCount('SELECT * FROM widget_field wf'.
+				' LEFT JOIN widget w'.
+				' ON w.widgetid=wf.widgetid'.
+				' WHERE w.name='.zbx_dbstr($widget_name)
+		));
 	}
 
 	public static function getDisplayData() {
@@ -731,7 +1028,45 @@ class testDashboardItemCardWidget extends testWidgets {
 	 * @param array $data	data provider with fields values
 	 */
 	protected function checkContextMenuLinks($data, $hostid) {
+		$popup = CPopupMenuElement::find()->waitUntilVisible()->one();
+		$this->assertTrue($popup->hasTitles(array_keys($data)));
 
+		$menu_level1_items = [];
+		foreach (array_values($data) as $menu_items) {
+			foreach ($menu_items as $menu_level1 => $link) {
+				$menu_level1_items[] = $menu_level1;
+
+				if (is_array($link)) {
+					foreach ($link as $menu_level2 => $attribute) {
+						// Check 2-level menu links.
+						$item_link = $popup->getItem($menu_level1)->query('xpath:./../ul//a')->one();
+
+						if (str_contains($attribute, 'menu-popup-item')) {
+							$this->assertEquals($attribute, $item_link->getAttribute('class'));
+						}
+						else {
+							$this->assertEquals($menu_level2, $item_link->getText());
+							$this->assertStringContainsString($attribute, $item_link->getAttribute('href'));
+						}
+					}
+				}
+				else {
+					// Check 1-level menu links.
+					if (str_contains($link, 'menu-popup-item')) {
+						$this->assertEquals($link, $popup->getItem($menu_level1)->getAttribute('class'));
+					}
+					else {
+						$link = str_replace('{hostid}', $hostid, $link);
+						$this->assertTrue($popup->query("xpath:.//a[text()=".CXPathHelper::escapeQuotes($menu_level1).
+								" and contains(@href, ".CXPathHelper::escapeQuotes($link).")]")->exists()
+						);
+					}
+				}
+			}
+		}
+
+		$this->assertTrue($popup->hasItems($menu_level1_items));
+		$popup->close();
 	}
 
 	public static function getLinkData() {
@@ -855,17 +1190,17 @@ class testDashboardItemCardWidget extends testWidgets {
 		return [
 			[
 				[
-					'Name' => 'Fully filled host card widget'
+					'Name' => 'Master item from host'
 				]
 			],
 			[
 				[
-					'Name' => 'Host card'
+					'Name' => 'Dependent Item from host'
 				]
 			],
 			[
 				[
-					'Name' => 'Default host card widget'
+					'Name' => 'Item card'
 				]
 			]
 		];
