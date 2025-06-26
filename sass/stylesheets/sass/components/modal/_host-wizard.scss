@@ -85,6 +85,13 @@
 					margin-top: 16px;
 				}
 			}
+
+			.toggle {
+				grid-column: 1 / -1;
+				justify-self: start;
+				min-width: 0;
+				max-width: 100%;
+			}
 		}
 
 		&.grid-columns {
@@ -127,6 +134,8 @@
 		--counter-width: 2ch;
 
 		.ordered-list-item {
+			gap: 12px 48px;
+
 			.formated-text,
 			.form-field {
 				&:not(:first-child) {
@@ -446,7 +455,7 @@
 			text-overflow: ellipsis;
 			line-clamp: 2;
 			white-space: normal;
-			word-break: break-all;
+			word-break: break-word;
 			-webkit-line-clamp: 2;
 			-webkit-box-orient: vertical;
 		}

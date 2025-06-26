@@ -198,7 +198,7 @@ class testFormTabIndicators extends CWebTest {
 			[
 				[
 					// Zabbix server, Discovery rule => Block devices discovery
-					'url' => 'host_prototypes.php?form=create&parent_discoveryid=57096&context=host',
+					'url' => 'host_prototypes.php?form=create&parent_discoveryid=66355&context=host',
 					'form' => 'name:hostPrototypeForm',
 					'tabs' => [
 						[
@@ -275,7 +275,7 @@ class testFormTabIndicators extends CWebTest {
 			[
 				[
 					// Zabbix server, Discovery rule => Block devices discovery
-					'url' => 'zabbix.php?action=item.prototype.list&parent_discoveryid=57096&context=host',
+					'url' => 'zabbix.php?action=item.prototype.list&parent_discoveryid=66355&context=host',
 					'create_button' => 'Create item prototype',
 					'form' => 'name:itemForm',
 					'close_dialog' => true,

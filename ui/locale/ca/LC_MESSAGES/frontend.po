@@ -4,7 +4,7 @@ msgstr ""
 "Project-Id-Version: Zabbix 6.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2023-10-19 13:48+0300\n"
-"PO-Revision-Date: 2025-06-08 07:21+0000\n"
+"PO-Revision-Date: 2025-06-12 18:49+0000\n"
 "Last-Translator: Xevi Noè i Nogueiras <xevi.noe@gmail.com>\n"
 "Language-Team: none\n"
 "Language: ca\n"
@@ -61,6 +61,10 @@ msgstr "\"%1$s\" ha de ser una cadena buida o superior a \"%2$s\"."
 #: include/classes/import/validators/C10XmlValidator.php:404
 msgid "\"host:key\" pair is expected"
 msgstr "S'espera la parella \"equip:clau\"."
+
+#: app/views/host.wizard.edit.php:1024
+msgid "#{section_name}"
+msgstr ""
 
 #: include/forms.inc.php:1330
 #: include/views/configuration.host.discovery.edit.php:932
@@ -2230,6 +2234,10 @@ msgstr "A baix"
 #: widgets/tophosts/includes/WidgetForm.php:146
 msgid "Bottom N"
 msgstr "A baix N"
+
+#: app/views/host.wizard.edit.php:429
+msgid "Brackets to specify IPv6 addresses"
+msgstr ""
 
 #: jsLoader.php:266
 msgid "Bring forward"
@@ -5040,6 +5048,10 @@ msgstr "Plegar"
 msgid "Collapse sidebar"
 msgstr "Plega la barra lateral"
 
+#: app/views/host.wizard.edit.php:426
+msgid "Colon to separate IP/DNS address from port"
+msgstr ""
+
 #: include/views/configuration.graph.edit.php:398
 #: include/views/js/monitoring.sysmaps.js.php:383
 #: include/views/js/monitoring.sysmaps.js.php:404
@@ -5093,6 +5105,10 @@ msgstr "Resultat combinat"
 msgid "Comma separated center coordinates and zoom level to display when the widget is initially loaded."
 msgstr "Es mostren les coordenades centrals separades per comes i el nivell de zoom quan el giny es carregui inicialment."
 
+#: app/views/host.wizard.edit.php:427
+msgid "Comma to separate multiple Zabbix servers, proxies, or clusters"
+msgstr ""
+
 #: app/views/administration.script.edit.php:199
 #: app/views/reports.actionlog.list.csv.php:45
 #: app/views/reports.actionlog.list.php:140 include/actions.inc.php:1864
@@ -5114,7 +5130,7 @@ msgstr "La comunicació entre l'agent Zabbix i el servidor/proxy és protegida a
 
 #: app/views/host.wizard.edit.php:414
 msgid "Communication between Zabbix agent and server/proxy is secured with the pre-shared key (PSK) encryption method."
-msgstr ""
+msgstr "La comunicació entre l'agent Zabbix i el servidor/proxy és protegida amb el mètode de xifrat de clau precompartida (PSK)."
 
 #: include/items.inc.php:946
 msgctxt "SNMP Community"
@@ -6153,7 +6169,7 @@ msgstr "Mida personalitzada"
 
 #: app/views/host.wizard.edit.php:138
 msgid "Custom templates are not supported."
-msgstr ""
+msgstr "No s'admeten plantilles personalitzades."
 
 #: app/views/administration.miscconfig.edit.php:103
 #: include/classes/setup/CSetupWizard.php:561
@@ -6325,7 +6341,7 @@ msgstr "Dades de %1$s. Generat en %2$s segons."
 
 #: app/views/host.wizard.edit.php:168
 msgid "Data is collected by Zabbix agent, a lightweight software `component installed on your monitoring target."
-msgstr ""
+msgstr "Les dades les recull l'agent Zabbix, un component de programari lleuger instal·lat a l'equip a monitorar."
 
 #: app/views/js/host.wizard.edit.js.php:89
 msgid "Data is collected by Zabbix agent, a lightweight software component installed on your monitoring target."
@@ -8538,6 +8554,10 @@ msgstr "Entreu l'adreça IP/DNS i el port de l'equip a monitorar habilitat per a
 msgid "Enter the IP/DNS address and port of your JMX-enabled monitoring target."
 msgstr "Entreu l'adreça IP/DNS i el port de l'equip a monitorar habilitat per a JMX."
 
+#: app/views/host.wizard.edit.php:412
+msgid "Enter the IP/DNS address and port of your Zabbix server, proxy, or cluster configuration."
+msgstr ""
+
 #: app/views/host.wizard.edit.php:642
 msgid "Enter the IP/DNS address, port, and authentication details of your SNMP-enabled monitoring target."
 msgstr "Entreu l'adreça IP/DNS, el port i els detalls d'autenticació de l'equip a monitorar amb SNMP activat."
@@ -8741,6 +8761,10 @@ msgstr "Cada setmana(es)"
 #: app/views/administration.geomaps.edit.php:33
 msgid "Example"
 msgstr "Exemple"
+
+#: app/views/host.wizard.edit.php:417
+msgid "Example:"
+msgstr ""
 
 #: app/views/administration.miscconfig.edit.php:38
 msgid "Example: https://localhost/zabbix/ui/"
@@ -12041,7 +12065,7 @@ msgstr "Instal·leu l'agent 2 de Zabbix i els seus complements a l'equip a monit
 
 #: app/views/host.wizard.edit.php:551 app/views/host.wizard.edit.php:574
 msgid "Install Zabbix agent and its plugins on your monitoring target by following the installation instructions below."
-msgstr ""
+msgstr "Instal·leu l'agent de Zabbix i els seus complements a l'equip a monitorar seguint les instruccions d'instal·lació següents."
 
 #: setup.php:163
 msgid "Installation"
@@ -19599,7 +19623,7 @@ msgstr "Nom de seguretat"
 
 #: app/views/host.wizard.edit.php:132
 msgid "See"
-msgstr ""
+msgstr "Veure"
 
 #: app/views/popup.condition.edit.php:402 app/views/popup.generic.php:874
 #: app/views/popup.massupdate.item.php:440 app/views/popup.services.php:92
@@ -19669,6 +19693,10 @@ msgstr "Triat, %1$s a la posició %2$d de %3$d"
 msgctxt "screen reader"
 msgid "Selected, %1$s, read only, in position %2$d of %3$d"
 msgstr "Triat, %1$s, només lectura, a la posició %2$d de %3$d"
+
+#: app/views/host.wizard.edit.php:428
+msgid "Semicolon to separate clusters (one or more server addresses)"
+msgstr ""
 
 #: jsLoader.php:267
 msgid "Send backward"
@@ -20502,7 +20530,7 @@ msgstr "Algunes plantilles (%1$s) són amagades. No s'admeten pas plantilles per
 #: app/views/host.wizard.edit.php:130
 #, c-format
 msgid "Some templates (%1$s) are incompatible with the Host Wizard."
-msgstr ""
+msgstr "Algunes plantilles (%1$s) són incompatibles amb l'Auxiliar d'equips."
 
 #: widgets/actionlog/includes/WidgetForm.php:79
 #: widgets/problems/includes/WidgetForm.php:145
@@ -20561,7 +20589,7 @@ msgstr "Especifiqueu alguna condició de filtre per veure els valors."
 
 #: app/views/host.wizard.edit.php:365
 msgid "Specifying new or existing host groups will add the host to these groups without removing it from any current groups."
-msgstr ""
+msgstr "Si especifiqueu grups d'equips nous o existents, l'equip s'afegirà a aquests grups sense esborrar-lo dels grups actuals."
 
 #: httpdetails.php:107 include/classes/screens/CScreenHttpTestDetails.php:82
 msgid "Speed"
@@ -21818,7 +21846,7 @@ msgstr[1] "Aquesta comprovació no es pot eliminar, ja que s'empra com a condici
 
 #: app/views/host.wizard.edit.php:384
 msgid "This configuration will overwrite all existing encryption settings on the host."
-msgstr ""
+msgstr "Aquesta configuració sobreescriurà tots els paràmetres de xifrat existents a l'equip."
 
 #: include/func.inc.php:2566
 msgid "This day last week"
@@ -23488,6 +23516,10 @@ msgstr "Emprar el tipus de lletra monoespai"
 msgid "Use the filter to display results"
 msgstr "Emprar el filtre per veure els resultats"
 
+#: app/views/host.wizard.edit.php:424
+msgid "Use:"
+msgstr ""
+
 #: app/views/administration.script.list.php:93 app/views/mediatype.list.php:98
 msgid "Used in actions"
 msgstr "S'empra en accions"
@@ -24562,6 +24594,10 @@ msgstr "Detallar"
 msgid "Verification code"
 msgstr "Codi de verificació"
 
+#: app/views/host.wizard.edit.php:407
+msgid "Verify Zabbix server, proxy, or cluster address"
+msgstr ""
+
 #: include/classes/setup/CSetupWizard.php:655
 msgid "Verify database certificate"
 msgstr "Verificar el certificat de la base de dades"
@@ -25283,6 +25319,10 @@ msgstr "Agent de Zabbix (validacions passives)"
 #: app/views/js/host.wizard.edit.js.php:91
 msgid "Zabbix agent initiates connections to Zabbix server or proxy to send data. Recommended for monitoring targets behind a firewall."
 msgstr "L'agent Zabbix inicia connexions al servidor o proxy Zabbix per enviar dades. Recomanat per monitorar equips darrere d'un tallafocs."
+
+#: app/views/host.wizard.edit.php:422
+msgid "Zabbix agent must be able to connect to the specified address or list of addresses."
+msgstr ""
 
 #: app/views/host.wizard.edit.php:863
 msgid "Zabbix documentation"
@@ -26499,7 +26539,7 @@ msgstr "S'espera l'ID del trigger d'equip"
 
 #: app/views/host.wizard.edit.php:134
 msgid "how to update them"
-msgstr ""
+msgstr "com actualitzar-los"
 
 #: include/classes/api/services/CMap.php:844
 #: include/classes/api/services/CMap.php:1311
@@ -26867,7 +26907,7 @@ msgstr "m-d H:i"
 
 #: app/views/host.wizard.edit.php:589
 msgid "macOS"
-msgstr ""
+msgstr "macOS"
 
 #: include/classes/parsers/CUserMacroParser.php:37
 msgid "macro is empty"

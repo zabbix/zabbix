@@ -63,6 +63,10 @@ msgstr "\"%1$s\" muss ein leerer String oder größer als \"%2$s\" sein."
 msgid "\"host:key\" pair is expected"
 msgstr "\"host:key\" Paar wird erwartet"
 
+#: app/views/host.wizard.edit.php:1024
+msgid "#{section_name}"
+msgstr ""
+
 #: include/forms.inc.php:1330
 #: include/views/configuration.host.discovery.edit.php:932
 #: include/views/js/configuration.host.discovery.edit.js.php:87
@@ -2234,6 +2238,10 @@ msgstr "Unten"
 #: widgets/tophosts/includes/WidgetForm.php:146
 msgid "Bottom N"
 msgstr "Untere N"
+
+#: app/views/host.wizard.edit.php:429
+msgid "Brackets to specify IPv6 addresses"
+msgstr ""
 
 #: jsLoader.php:266
 msgid "Bring forward"
@@ -5056,6 +5064,10 @@ msgstr "Einklappen"
 msgid "Collapse sidebar"
 msgstr "Seitenbereich einklappen"
 
+#: app/views/host.wizard.edit.php:426
+msgid "Colon to separate IP/DNS address from port"
+msgstr ""
+
 #: include/views/configuration.graph.edit.php:398
 #: include/views/js/monitoring.sysmaps.js.php:383
 #: include/views/js/monitoring.sysmaps.js.php:404
@@ -5108,6 +5120,10 @@ msgstr "Kombiniertes Ergebnis"
 #: include/classes/html/widgets/fields/CWidgetFieldLatLngView.php:35
 msgid "Comma separated center coordinates and zoom level to display when the widget is initially loaded."
 msgstr "Durch Komma getrennte Zentrumskoordinaten und Zoomstufe, die angezeigt werden, wenn das Widget zum ersten Mal geladen wird."
+
+#: app/views/host.wizard.edit.php:427
+msgid "Comma to separate multiple Zabbix servers, proxies, or clusters"
+msgstr ""
 
 #: app/views/administration.script.edit.php:199
 #: app/views/reports.actionlog.list.csv.php:45
@@ -8563,6 +8579,10 @@ msgstr ""
 msgid "Enter the IP/DNS address and port of your JMX-enabled monitoring target."
 msgstr ""
 
+#: app/views/host.wizard.edit.php:412
+msgid "Enter the IP/DNS address and port of your Zabbix server, proxy, or cluster configuration."
+msgstr ""
+
 #: app/views/host.wizard.edit.php:642
 msgid "Enter the IP/DNS address, port, and authentication details of your SNMP-enabled monitoring target."
 msgstr ""
@@ -8766,6 +8786,10 @@ msgstr "Jede Woche(n)"
 #: app/views/administration.geomaps.edit.php:33
 msgid "Example"
 msgstr "Beispiel"
+
+#: app/views/host.wizard.edit.php:417
+msgid "Example:"
+msgstr ""
 
 #: app/views/administration.miscconfig.edit.php:38
 msgid "Example: https://localhost/zabbix/ui/"
@@ -19719,6 +19743,10 @@ msgctxt "screen reader"
 msgid "Selected, %1$s, read only, in position %2$d of %3$d"
 msgstr "Ausgewählt, %1$s, schreibgeschützt, an Position %2$d von %3$d"
 
+#: app/views/host.wizard.edit.php:428
+msgid "Semicolon to separate clusters (one or more server addresses)"
+msgstr ""
+
 #: jsLoader.php:267
 msgid "Send backward"
 msgstr "Nach hinten senden"
@@ -23546,6 +23574,10 @@ msgstr ""
 msgid "Use the filter to display results"
 msgstr ""
 
+#: app/views/host.wizard.edit.php:424
+msgid "Use:"
+msgstr ""
+
 #: app/views/administration.script.list.php:93 app/views/mediatype.list.php:98
 msgid "Used in actions"
 msgstr "Benutzt in Aktion"
@@ -24620,6 +24652,10 @@ msgstr "Ausführlich"
 msgid "Verification code"
 msgstr ""
 
+#: app/views/host.wizard.edit.php:407
+msgid "Verify Zabbix server, proxy, or cluster address"
+msgstr ""
+
 #: include/classes/setup/CSetupWizard.php:655
 msgid "Verify database certificate"
 msgstr ""
@@ -25342,6 +25378,10 @@ msgstr ""
 
 #: app/views/js/host.wizard.edit.js.php:91
 msgid "Zabbix agent initiates connections to Zabbix server or proxy to send data. Recommended for monitoring targets behind a firewall."
+msgstr ""
+
+#: app/views/host.wizard.edit.php:422
+msgid "Zabbix agent must be able to connect to the specified address or list of addresses."
 msgstr ""
 
 #: app/views/host.wizard.edit.php:863

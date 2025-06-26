@@ -63,6 +63,10 @@ msgstr "\"%1$s\"는 빈 문자열이거나 \"%2$s\"보다 커야 합니다."
 msgid "\"host:key\" pair is expected"
 msgstr "\"host:key\"의 페어로 지정해 주십시오"
 
+#: app/views/host.wizard.edit.php:1024
+msgid "#{section_name}"
+msgstr ""
+
 #: include/forms.inc.php:1330
 #: include/views/configuration.host.discovery.edit.php:932
 #: include/views/js/configuration.host.discovery.edit.js.php:87
@@ -2206,6 +2210,10 @@ msgstr "아래쪽"
 #: widgets/tophosts/includes/WidgetForm.php:146
 msgid "Bottom N"
 msgstr "하단 N"
+
+#: app/views/host.wizard.edit.php:429
+msgid "Brackets to specify IPv6 addresses"
+msgstr ""
 
 #: jsLoader.php:266
 msgid "Bring forward"
@@ -4935,6 +4943,10 @@ msgstr "축소"
 msgid "Collapse sidebar"
 msgstr "사이드바 접기"
 
+#: app/views/host.wizard.edit.php:426
+msgid "Colon to separate IP/DNS address from port"
+msgstr ""
+
 #: include/views/configuration.graph.edit.php:398
 #: include/views/js/monitoring.sysmaps.js.php:383
 #: include/views/js/monitoring.sysmaps.js.php:404
@@ -4987,6 +4999,10 @@ msgstr "최종결과"
 #: include/classes/html/widgets/fields/CWidgetFieldLatLngView.php:35
 msgid "Comma separated center coordinates and zoom level to display when the widget is initially loaded."
 msgstr "위젯이 처음 로드될 때 표시할 쉼표로 구분된 중심 좌표 및 확대/축소 수준입니다."
+
+#: app/views/host.wizard.edit.php:427
+msgid "Comma to separate multiple Zabbix servers, proxies, or clusters"
+msgstr ""
 
 #: app/views/administration.script.edit.php:199
 #: app/views/reports.actionlog.list.csv.php:45
@@ -8421,6 +8437,10 @@ msgstr ""
 msgid "Enter the IP/DNS address and port of your JMX-enabled monitoring target."
 msgstr ""
 
+#: app/views/host.wizard.edit.php:412
+msgid "Enter the IP/DNS address and port of your Zabbix server, proxy, or cluster configuration."
+msgstr ""
+
 #: app/views/host.wizard.edit.php:642
 msgid "Enter the IP/DNS address, port, and authentication details of your SNMP-enabled monitoring target."
 msgstr ""
@@ -8620,6 +8640,10 @@ msgstr "반복 기간(주)"
 #: app/views/administration.geomaps.edit.php:33
 msgid "Example"
 msgstr "예시"
+
+#: app/views/host.wizard.edit.php:417
+msgid "Example:"
+msgstr ""
 
 #: app/views/administration.miscconfig.edit.php:38
 msgid "Example: https://localhost/zabbix/ui/"
@@ -19501,6 +19525,10 @@ msgctxt "screen reader"
 msgid "Selected, %1$s, read only, in position %2$d of %3$d"
 msgstr "%3$d의 %2$d 위치에 있는 읽기 전용 %1$s를 선택하였습니다"
 
+#: app/views/host.wizard.edit.php:428
+msgid "Semicolon to separate clusters (one or more server addresses)"
+msgstr ""
+
 #: jsLoader.php:267
 msgid "Send backward"
 msgstr "뒤로 보내기"
@@ -23301,6 +23329,10 @@ msgstr "고정 폭 글꼴 사용"
 msgid "Use the filter to display results"
 msgstr "필터를 사용하여 결과 표시"
 
+#: app/views/host.wizard.edit.php:424
+msgid "Use:"
+msgstr ""
+
 #: app/views/administration.script.list.php:93 app/views/mediatype.list.php:98
 msgid "Used in actions"
 msgstr "액션에서 사용"
@@ -24370,6 +24402,10 @@ msgstr "Verbose"
 msgid "Verification code"
 msgstr "확인 코드"
 
+#: app/views/host.wizard.edit.php:407
+msgid "Verify Zabbix server, proxy, or cluster address"
+msgstr ""
+
 #: include/classes/setup/CSetupWizard.php:655
 msgid "Verify database certificate"
 msgstr "데이터베이스 인증서 확인"
@@ -25087,6 +25123,10 @@ msgstr "Zabbix 에이전트(패시브 검사)"
 
 #: app/views/js/host.wizard.edit.js.php:91
 msgid "Zabbix agent initiates connections to Zabbix server or proxy to send data. Recommended for monitoring targets behind a firewall."
+msgstr ""
+
+#: app/views/host.wizard.edit.php:422
+msgid "Zabbix agent must be able to connect to the specified address or list of addresses."
 msgstr ""
 
 #: app/views/host.wizard.edit.php:863

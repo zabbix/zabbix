@@ -609,7 +609,7 @@ class CAudit {
 		'sla.excluded_downtimes' => 'sla_excluded_downtimeid',
 		'template.groups' => 'hostgroupid',
 		'template.macros' => 'hostmacroid',
-		'template.macros.config.options' => 'index',
+		'template.macros.config.options' => null,
 		'template.tags' => 'hosttagid',
 		'template.templates' => 'hosttemplateid',
 		'template.templates_clear' => 'hosttemplateid',
@@ -817,61 +817,49 @@ class CAudit {
 				return self::handleAdd($resource, $details);
 
 			case self::ACTION_UPDATE:
-				$db_details = self::convertKeysToPaths($api_name,
-					self::intersectObjects($api_name, $db_object, $object)
-				);
+				self::intersectObjectFields($api_name, $db_object, $object);
+
+				$db_details = self::convertKeysToPaths($api_name, $db_object);
 
 				return self::handleUpdate($resource, $details, $db_details);
 		}
 	}
 
-	/**
-	 * Computes the intersection of $db_object and $object using keys for comparison.
-	 * Recursively removes $db_object properties if they are not present in $object.
-	 *
-	 * @param string $path
-	 * @param array  $db_object
-	 * @param array  $object
-	 *
-	 * @return array
-	 */
-	private static function intersectObjects(string $path, array $db_object, array $object): array {
-		foreach ($db_object as $db_key => &$db_value) {
-			if (is_string($db_key) && !array_key_exists($db_key, $object)) {
-				unset($db_object[$db_key]);
+	private static function intersectObjectFields(string $path, array &$db_object, array $object): void {
+		foreach ($db_object as $field => &$db_value) {
+			if (!array_key_exists($field, $object)) {
+				unset($db_object[$field]);
+
 				continue;
 			}
 
-			if (!is_array($db_value)) {
-				continue;
+			if (is_array($db_value) && $db_value) {
+				ctype_digit((string) key($db_value))
+					? self::intersectNestedObjects($path.'.'.$field, $db_value, $object[$field])
+					: self::intersectObjectFields($path.'.'.$field, $db_value, $object[$field]);
 			}
-
-			$key = $db_key;
-			$subpath = $path.'.'.$db_key;
-
-			if (is_int($db_key)) {
-				$key = null;
-
-				$pk = self::NESTED_OBJECTS_ID_FIELD_NAMES[$path];
-
-				foreach ($object as $i => $nested_object) {
-					if (bccomp($nested_object[$pk], $db_key) == 0) {
-						$key = $i;
-						$subpath = $path;
-						break;
-					}
-				}
-
-				if ($key === null) {
-					continue;
-				}
-			}
-
-			$db_value = self::intersectObjects($subpath, $db_value, $object[$key]);
 		}
 		unset($db_value);
+	}
 
-		return $db_object;
+	private static function intersectNestedObjects(string $path, array &$db_objects, array $objects): void {
+		$id_field_name = self::NESTED_OBJECTS_ID_FIELD_NAMES[$path];
+
+		if ($id_field_name === null) {
+			foreach ($db_objects as $i => &$db_object) {
+				if (array_key_exists($i, $objects)) {
+					self::intersectObjectFields($path, $db_object, $objects[$i]);
+				}
+			}
+			unset($db_object);
+		}
+		else {
+			foreach ($objects as $object) {
+				if (array_key_exists($object[$id_field_name], $db_objects)) {
+					self::intersectObjectFields($path, $db_objects[$object[$id_field_name]], $object);
+				}
+			}
+		}
 	}
 
 	/**
@@ -956,41 +944,40 @@ class CAudit {
 	private static function convertKeysToPaths(string $path, array $object): array {
 		$result = [];
 
-		$is_field_of_another_object = strpos($path, '.') !== false && !preg_match('/\[[0-9]+\]$/', $path);
-		$is_array_of_objects = false;
+		$is_nested_object_field = strpos($path, '.') !== false && !preg_match('/\[[0-9]+\]$/', $path);
 
-		if ($is_field_of_another_object) {
+		if ($is_nested_object_field) {
 			$abstract_path = self::getAbstractPath($path);
 			$is_array_of_objects = array_key_exists($abstract_path, self::NESTED_OBJECTS_ID_FIELD_NAMES);
 
 			if ($is_array_of_objects) {
+				$objects = $object;
 				$id_field_name = self::NESTED_OBJECTS_ID_FIELD_NAMES[$abstract_path];
+
+				foreach ($objects as $i => $object) {
+					$path_to_object = $id_field_name === null
+						? $path.'['.$i.']'
+						: $path.'['.$object[$id_field_name].']';
+
+					$result += self::convertKeysToPaths($path_to_object, $object);
+				}
+
+				return $result;
 			}
 		}
 
-		if ($is_array_of_objects) {
-			$objects = $object;
+		foreach ($object as $field => $value) {
+			$path_to_field = $path.'.'.$field;
 
-			foreach ($objects as $object) {
-				$path_to_object = $path.'['.$object[$id_field_name].']';
-
-				$result += self::convertKeysToPaths($path_to_object, $object);
+			if (in_array(self::getAbstractPath($path_to_field), self::SKIP_FIELDS)) {
+				continue;
 			}
-		}
-		else {
-			foreach ($object as $field => $value) {
-				$path_to_field = $path.'.'.$field;
 
-				if (in_array(self::getAbstractPath($path_to_field), self::SKIP_FIELDS)) {
-					continue;
-				}
-
-				if (is_array($value)) {
-					$result += self::convertKeysToPaths($path_to_field, $value);
-				}
-				else {
-					$result[$path_to_field] = (string) $value;
-				}
+			if (is_array($value)) {
+				$result += self::convertKeysToPaths($path_to_field, $value);
+			}
+			else {
+				$result[$path_to_field] = (string) $value;
 			}
 		}
 

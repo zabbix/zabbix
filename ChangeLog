@@ -3,6 +3,12 @@ Changes for 7.4.0rc2
 New features:
 
 Bug fixes:
+..F....... [ZBX-26564] fixed rare case when modified widget configuration is not applied (averza)
+..F....... [ZBX-26527] fixed access to server status information for users of non-super admin roles (talbergs)
+..F....... [ZBX-26517] disabled discovered item prototype's popup menu entries for creating trigger or dependent item prototype (wczerneha)
+..F....... [ZBX-26523] added support for mass update of trigger prototypes with LLD rule prototype as parent (wczerneha)
+..F....... [ZBX-26512] removed unnecessary button from the discovery prototype form (wczerneha)
+..F....... [ZBX-26530] fixed notices when accessing prototype pages while not logged in (jfreibergs)
 
 --------------------------------------------------------------------------------
 Changes for 7.4.0rc1
@@ -204,6 +210,17 @@ A.F....PS. [ZBXNEXT-9564] implemented vault macro resolution on proxies (esekace
 ........S. [ZBXNEXT-9582] added discarding of queued duplicate LLD rule values based on embedded and LLD macros (wiper)
 ..F....... [ZBXNEXT-9614] implemented scrolling down to bottom in Item history widget when New values parameter is set to "Bottom" (dfofanovs)
 ...G...... [ZBXNEXT-9508] added custom query path to MySQL and Oracle plugins for Zabbix agent 2 (esneiders)
+
+--------------------------------------------------------------------------------
+Changes for 7.2.9
+
+Bug fixes:
+.......PS. [ZBX-26588] fixed finished tasks queue size tracking which caused high cpu utilization by preprocessing manager (wiper)
+
+--------------------------------------------------------------------------------
+Changes for 7.2.8
+
+7.2.8rc1 was released as 7.2.8 without any changes
 
 --------------------------------------------------------------------------------
 Changes for 7.2.8rc1
@@ -709,6 +726,17 @@ A.F....... [ZBX-23227] fixed issue where using an empty array or string value fo
 ...GI..PS. [ZBX-25140] updated configure to reject TLS-unaware compilers (jxl)
 ...G...... [ZBX-25149] fixed Zabbix agent build on AIX and Solaris (arimdjonoks)
 ....I..... [ZBX-23881] dropped preference list when searching for compiler (jxl)
+
+--------------------------------------------------------------------------------
+Changes for 7.0.15
+
+Bug fixes:
+.......PS. [ZBX-26588] fixed finished tasks queue size tracking which caused high cpu utilization by preprocessing manager (wiper)
+
+--------------------------------------------------------------------------------
+Changes for 7.0.14
+
+7.0.14rc1 was released as 7.0.14 without any changes
 
 --------------------------------------------------------------------------------
 Changes for 7.0.14rc1

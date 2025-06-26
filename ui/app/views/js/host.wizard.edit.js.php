@@ -64,7 +64,6 @@ window.host_wizard_edit = new class {
 	/** @type {Map<number, object>} */
 	#templates;
 	#linked_templates;
-	#agent_script_server_host;
 
 	#source_host = null;
 	#host = null;
@@ -152,6 +151,7 @@ window.host_wizard_edit = new class {
 		groups: [],
 		groups_new: [],
 		templates: [],
+		agent_script_server_host: null,
 		tls_psk: null,
 		tls_psk_identity: null,
 		ipmi_authtype: null,
@@ -232,8 +232,8 @@ window.host_wizard_edit = new class {
 		this.#linked_templates = linked_templates;
 		this.#data.do_not_show_welcome = wizard_show_welcome === 1 ? 0 : 1;
 		this.#source_host = source_host;
-		this.#agent_script_server_host = agent_script_server_host;
 		this.#csrf_token = csrf_token;
+		this.#data.agent_script_server_host = agent_script_server_host;
 
 		this.#initViewTemplates();
 
@@ -367,6 +367,8 @@ window.host_wizard_edit = new class {
 			step_add_host_interface_jmx: tmpl('host-wizard-step-add-host-interface-jmx'),
 			step_readme: tmpl('host-wizard-step-readme'),
 			step_configure_host: tmpl('host-wizard-step-configure-host'),
+			step_configure_host_macros_section: tmpl('host-wizard-step-configure-host-macros-section'),
+			step_configure_host_macros_collapsible_section: tmpl('host-wizard-step-configure-host-macros-collapsible-section'),
 			step_configuration_finish: tmpl('host-wizard-step-configuration-finish'),
 			step_complete: tmpl('host-wizard-step-complete'),
 			cancel_screen: tmpl('host-wizard-cancel-screen'),
@@ -654,12 +656,25 @@ window.host_wizard_edit = new class {
 		const view = this.#view_templates.step_configure_host.evaluateToElement();
 		const substep_counter = this.#steps_queue.includes(this.STEP_README)
 			&& this.#steps_queue.includes(this.STEP_CONFIGURE_HOST);
-		const macros_list = view.querySelector('.host-macro-list');
+
+		const sections = new Map([['', this.#view_templates.step_configure_host_macros_section.evaluateToElement()]]);
 
 		view.querySelector('.sub-step-counter').style.display = substep_counter ? '' : 'none';
 
 		Object.entries(this.#data.macros).forEach(([row_index, macro]) => {
-			const {field, description} = this.#makeMacroField(macro, row_index);
+			const {config} = this.#template.macros.find(({macro: macro_object}) => macro_object === macro.macro);
+			const {field, description} = this.#makeMacroField(macro, config, row_index);
+
+			if (!sections.has(config.section_name)) {
+				sections.set(config.section_name,
+					this.#view_templates.step_configure_host_macros_collapsible_section.evaluateToElement({
+						section_name: config.section_name
+					})
+				);
+			}
+
+			const section = sections.get(config.section_name);
+			const macros_list = section.querySelector('.host-macro-list');
 
 			if (field !== null) {
 				macros_list.appendChild(field);
@@ -669,6 +684,10 @@ window.host_wizard_edit = new class {
 					macros_list.appendChild(description);
 				}
 			}
+		});
+
+		sections.forEach(section => {
+			view.appendChild(section)
 		});
 
 		this.#dialogue.querySelector('.step-form-body').replaceWith(view);
@@ -1236,14 +1255,17 @@ window.host_wizard_edit = new class {
 					}
 				})();
 
+				let hostname = '';
+				let server_host = '';
 				let psk_identity = '';
 				let psk = '';
-				let server_host = '';
 
 				if (this.#data.monitoring_os === 'linux') {
-					server_host = this.#agent_script_server_host !== ''
-						? `--server-host ${this.#agent_script_server_host}`
+					server_host = this.#data.agent_script_server_host !== ''
+						? `--server-host '${this.#data.agent_script_server_host}'`
 						: `--server-host-stdin`;
+
+					hostname = `--hostname '${this.#data.host_new.id}'`;
 
 					psk_identity = this.#data.tls_psk_identity !== ''
 						? `--psk-identity '${this.#data.tls_psk_identity.replace(/'/g, `\\'`)}'`
@@ -1255,9 +1277,11 @@ window.host_wizard_edit = new class {
 				}
 
 				if (this.#data.monitoring_os === 'windows') {
-					server_host = this.#agent_script_server_host !== ''
-						? `-serverHost ${this.#agent_script_server_host}`
+					server_host = this.#data.agent_script_server_host !== ''
+						? `-serverHost '${this.#data.agent_script_server_host}'`
 						: `-serverHostSTDIN`;
+
+					hostname = `-hostName '${this.#data.host_new.id}'`;
 
 					psk_identity = this.#data.tls_psk_identity !== ''
 						? `-pskIdentity '${this.#data.tls_psk_identity.replace(/'/g, `\\'`)}'`
@@ -1270,6 +1294,7 @@ window.host_wizard_edit = new class {
 
 				this.#dialogue.querySelector('.js-install-agent-readme').innerHTML = readme_template.evaluate({
 					server_host,
+					hostname,
 					psk_identity,
 					psk
 				});
@@ -1338,6 +1363,26 @@ window.host_wizard_edit = new class {
 					this.#updateFieldMessages(this.#pathToInputName(path), 'warning', []);
 
 					delete this.#macro_reset_list[path];
+				}
+
+				if (step_init && this.#hasErrors()) {
+					for (const [path, error] of Object.entries(this.#validation_errors[step] || {})) {
+						if (error === null) {
+							continue;
+						}
+
+						const input = this.#dialogue.querySelector(`[name="${this.#pathToInputName(path)}"]`);
+
+						if (input === null) {
+							continue;
+						}
+
+						const section = input.closest(`.${ZBX_STYLE_COLLAPSIBLE}`);
+
+						if (section !== null && section.classList.contains(ZBX_STYLE_COLLAPSED)) {
+							toggleSection(section.querySelector(`.${ZBX_STYLE_TOGGLE}`));
+						}
+					}
 				}
 				break;
 		}
@@ -1795,9 +1840,7 @@ window.host_wizard_edit = new class {
 		return card;
 	}
 
-	#makeMacroField(macro, row_index) {
-		const {config} = this.#template.macros.find(({macro: macro_object}) => macro_object === macro.macro);
-
+	#makeMacroField(macro, config, row_index) {
 		const field_view = (() => {
 			switch (Number(config.type)) {
 				case <?= ZBX_WIZARD_FIELD_TEXT ?>:
