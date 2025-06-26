@@ -25,7 +25,7 @@
 		init({ldap_servers, ldap_default_row_index, db_authentication_type, saml_provision_groups,
 				saml_provision_media, templates, mfa_methods, mfa_default_row_index, is_http_auth_allowed,
 				saml_idp_certificate_exists, saml_sp_certificate_exists, saml_sp_private_key_exists,
-				saml_certificate_max_filesize, saml_private_key_max_filesize
+				saml_certificate_max_filesize, saml_private_key_max_filesize, saml_filesize_error_message
 		}) {
 			this.form = document.getElementById('authentication-form');
 			this.db_authentication_type = db_authentication_type;
@@ -47,6 +47,7 @@
 			this.saml_sp_private_key_exists = saml_sp_private_key_exists;
 			this.saml_certificate_max_filesize = saml_certificate_max_filesize;
 			this.saml_private_key_max_filesize = saml_private_key_max_filesize;
+			this.saml_filesize_error_message = saml_filesize_error_message;
 			const saml_readonly = !this.form.querySelector('[type="checkbox"][name="saml_auth_enabled"]').checked;
 			const ldap_disabled = this.ldap_auth_enabled === null || !this.ldap_auth_enabled.checked;
 			const mfa_readonly = !this.form.querySelector('[type="checkbox"][name="mfa_status"]').checked;
@@ -272,11 +273,9 @@
 				if (file.size > max_filesize) {
 					const error_span = document.createElement('span');
 					error_span.className = 'error';
-
-					error_span.textContent = <?= json_encode(_('File is too big, max upload size is %1$s bytes.')) ?>
-						.replace('%1$s', max_filesize);
-
+					error_span.textContent = sprintf(t(this.saml_filesize_error_message), max_filesize);
 					wrapper.append(error_span);
+
 					textarea.classList.add('has-error');
 					textarea.value = '';
 
