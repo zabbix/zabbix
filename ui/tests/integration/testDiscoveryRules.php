@@ -647,11 +647,11 @@ class testDiscoveryRules extends CIntegrationTest {
 	 * @configurationDataProvider proxyDBModeconfigurationProvider
 	 */
 	public function testDiscoveryRules_snmpErrorViaProxyDBMode(): void {
-		//$this->proxyTest();
+		$this->proxyTest();
 	}
 
 	/**
-	 * @depends testDiscoveryRules_snmpErrorViaProxyDBMode
+	 * @depends testDiscoveryRules_snmpErrorViaProxyHybridMode
 	 * @required-components server,proxy
 	 * @configurationDataProvider proxyMemoryModeconfigurationProvider
 	 */
@@ -686,7 +686,7 @@ class testDiscoveryRules extends CIntegrationTest {
 	}
 
 	/**
-	 * @depends testDiscoveryRules_snmpErrorViaProxyMemoryMode
+	 * @depends testDiscoveryRules_snmpErrorViaProxyDBMode
 	 * @required-components server,proxy
 	 * @configurationDataProvider proxyHybridModeconfigurationProvider
 	 */
