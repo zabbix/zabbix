@@ -17,6 +17,9 @@
 require_once __DIR__.'/../common/testFormAuthentication.php';
 
 /**
+ * @onBefore getConfFileContent, setSamlCertificatesStorage
+ * @onAfter revertConfFile
+ *
  * @backup settings
  */
 class testUsersAuthenticationSaml extends testFormAuthentication {
@@ -27,9 +30,36 @@ class testUsersAuthenticationSaml extends testFormAuthentication {
 		}
 	}
 
+	const CONF_PATH = __DIR__.'/../../../conf/zabbix.conf.php';
+	protected static $conf_file_content;
+
+	/**
+	 * The original contents of frontend configuration file before test.
+	 */
+	protected function getConfFileContent() {
+		self::$conf_file_content = file_get_contents(self::CONF_PATH);
+	}
+
+	/**
+	 * @onAfter setSamlCertificatesStorage
+	 */
 	public function testUsersAuthenticationSaml_Layout() {
-		$this->changeSamlCertificatesStorage('database');
 		$saml_form = $this->openFormAndCheckBasics('SAML');
+
+		// Check that private key and certificates fields ar not visible if set 'file' in conf file.
+		$storage_fields = ['id:idp_certificate', 'id:idp_certificate_file',	'id:sp_private_key', 'id:sp_private_key_file',
+			'id:sp_certificate', 'id:sp_certificate_file'];
+		foreach ($storage_fields as $field) {
+			$this->assertTrue($saml_form->query($field)->one(false)->isVisible(false),
+					'Field id '.$field.' is visible on page.'
+			);
+		}
+
+		// Change storage to 'database' in frontend configuration file.
+		$this->setSamlCertificatesStorage('database');
+		$this->page->refresh()->waitUntilReady();
+		$saml_form->invalidate()->selectTab('SAML settings');
+		$saml_form->getField('Enable SAML authentication');
 
 		// Check SAML form default values.
 		$saml_fields = [
@@ -128,7 +158,6 @@ class testUsersAuthenticationSaml extends testFormAuthentication {
 		];
 
 		$this->checkFormHintsAndMapping($saml_form, $hintboxes, $mapping_tables, 'SAML');
-		$this->changeSamlCertificatesStorage('file');
 	}
 
 	public function getConfigureValidationData() {
@@ -833,12 +862,23 @@ class testUsersAuthenticationSaml extends testFormAuthentication {
 		$this->page->waitUntilReady();
 	}
 
-	private function changeSamlCertificatesStorage($type) {
-		// Update Zabbix frontend config.
-		$file_path = __DIR__.'/../../../conf/zabbix.conf.php';
-		$pattern = array('/\$SSO\[\'CERT_STORAGE\']	= \'file\';/', '/\$SSO\[\'CERT_STORAGE\'] = \'database\';/');
-		$content = preg_replace($pattern, "\$SSO['CERT_STORAGE'] = '$type';", file_get_contents($file_path), 1);
-		file_put_contents($file_path, $content);
+	/**
+	 * Set CERT_STORAGE variable to frontend configuration file.
+	 *
+	 * @param string $type	file or database
+	 */
+	public function setSamlCertificatesStorage($type = 'file') {
+		file_put_contents(self::CONF_PATH, '$SSO[\'CERT_STORAGE\']	= \''.$type.'\';'."\n", FILE_APPEND);
+
+		// Wait for frontend to get the new config from updated zabbix.conf.php file.
+		sleep((int)ini_get('opcache.revalidate_freq') + 1);
+	}
+
+	/**
+	 * After test, revert frontend configuration file to its original state.
+	 */
+	public static function revertConfFile() {
+		file_put_contents(self::CONF_PATH, self::$conf_file_content);
 
 		// Wait for frontend to get the new config from updated zabbix.conf.php file.
 		sleep((int)ini_get('opcache.revalidate_freq') + 1);

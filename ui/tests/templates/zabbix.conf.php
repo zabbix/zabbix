@@ -19,9 +19,6 @@ $DB['CA_FILE']			= '';
 $DB['VERIFY_HOST']		= false;
 $DB['CIPHER_LIST']		= '';
 
-// Used for SAML authentication.
-$SSO['CERT_STORAGE']	= 'file';
-
 $ZBX_SERVER				= 'localhost';
 $ZBX_SERVER_PORT		= '{SERVER_PORT}';
 $ZBX_SERVER_NAME		= 'TEST_SERVER_NAME';
