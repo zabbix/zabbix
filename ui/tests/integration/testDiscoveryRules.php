@@ -627,10 +627,7 @@ class testDiscoveryRules extends CIntegrationTest {
 		$this->deleteProxy();
 
 		$proxyId = $this->createProxy();
-		if (is_null($proxyId)) {
-			$proxyId = end(self::$proxies);
-		}
-		$druleId = $this->createDruleSnmpv3Multi(self::DRULE_NAME . '3', $proxyId);
+		$druleId = $this->createDruleSnmpv3(self::DRULE_NAME , $proxyId);
 		$this->createActionHostAdd($druleId, self::DISCOVERY_ACTION_NAME);
 
 		$druleWithErrId = $this->createDruleSnmpv2(self::DRULE_NAME_ERR, '127.0.0.1', self::SNMPAGENT_INVALID_OID, $proxyId);
