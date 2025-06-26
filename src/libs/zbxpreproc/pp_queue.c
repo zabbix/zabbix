@@ -205,6 +205,29 @@ static zbx_pp_task_t	*pp_task_queue_add_sequence(zbx_pp_queue_t *queue, zbx_pp_t
 
 /******************************************************************************
  *                                                                            *
+ * Purpose: track items value task creation order                             *
+ *                                                                            *
+ * Parameters: queue - [IN] task queue                                        *
+ *             task  - [IN] task to track                                     *
+ *                                                                            *
+ ******************************************************************************/
+static void	pp_track_value_task(zbx_pp_queue_t *queue, zbx_pp_task_t *task)
+{
+	zbx_pp_item_tasks_t	item_tasks_local, *item_tasks;
+	int			tasks_num = queue->tasks.num_data;
+
+	item_tasks_local.itemid = task->itemid;
+	item_tasks = (zbx_pp_item_tasks_t *)zbx_hashset_insert(&queue->tasks, &item_tasks_local,
+			sizeof(item_tasks_local));
+
+	if (tasks_num != queue->tasks.num_data)
+		zbx_list_create(&item_tasks->tasks);
+
+	zbx_list_append(&item_tasks->tasks, task, NULL);
+}
+
+/******************************************************************************
+ *                                                                            *
  * Purpose: queue task to be processed before normal tasks                    *
  *                                                                            *
  * Parameters: queue - [IN] task queue                                        *
@@ -225,6 +248,10 @@ void	pp_task_queue_push_immediate(zbx_pp_queue_t *queue, zbx_pp_task_t *task)
 			/* sequence task is just a container for other tasks - it does not affect statistics, */
 			/* so there is no need to increment queue->pending_num                                */
 			break;
+		case ZBX_PP_TASK_VALUE:
+			/* track input value order to have the same output order for non sequential tasks */
+			pp_track_value_task(queue, task);
+			ZBX_FALLTHROUGH;
 		default:
 			queue->pending_num++;
 			break;
@@ -278,19 +305,7 @@ void	pp_task_queue_push(zbx_pp_queue_t *queue, zbx_pp_task_t *task)
 
 	/* track input value order to have the same output order for non sequential tasks */
 	if (ZBX_PP_TASK_VALUE == task->type)
-	{
-		zbx_pp_item_tasks_t	item_tasks_local, *item_tasks;
-		int			tasks_num = queue->tasks.num_data;
-
-		item_tasks_local.itemid = task->itemid;
-		item_tasks = (zbx_pp_item_tasks_t *)zbx_hashset_insert(&queue->tasks, &item_tasks_local,
-				sizeof(item_tasks_local));
-
-		if (tasks_num != queue->tasks.num_data)
-			zbx_list_create(&item_tasks->tasks);
-
-		zbx_list_append(&item_tasks->tasks, task, NULL);
-	}
+		pp_track_value_task(queue, task);
 
 	if (ITEM_TYPE_INTERNAL != d->preproc->type)
 	{
@@ -373,7 +388,8 @@ void	pp_task_queue_push_finished(zbx_pp_queue_t *queue, zbx_pp_task_t *task)
 	queue->processing_num--;
 	task->state = ZBX_PP_TASK_FINISHED;
 
-	if (NULL != (item_tasks = (zbx_pp_item_tasks_t *)zbx_hashset_search(&queue->tasks, &task->itemid)))
+	if (ZBX_PP_TASK_VALUE == task->type &&
+			NULL != (item_tasks = (zbx_pp_item_tasks_t *)zbx_hashset_search(&queue->tasks, &task->itemid)))
 	{
 		while (SUCCEED == zbx_list_peek(&item_tasks->tasks, (void **)&task))
 		{
