@@ -813,7 +813,9 @@ $templates['mfa_methods_row'] = (string) (new CRow([
 		'is_http_auth_allowed' => $data['is_http_auth_allowed'],
 		'saml_idp_certificate_exists' => $data['saml_certs_editable'] && $data['idp_certificate_hash'] !== '',
 		'saml_sp_certificate_exists' => $data['saml_certs_editable'] && $data['sp_certificate_hash'] !== '',
-		'saml_sp_private_key_exists' => $data['saml_certs_editable'] && $data['sp_private_key_hash'] !== ''
+		'saml_sp_private_key_exists' => $data['saml_certs_editable'] && $data['sp_private_key_hash'] !== '',
+		'saml_certificate_max_filesize' => CApiInputValidator::SSL_CERTIFICATE_MAX_LENGTH,
+		'saml_private_key_max_filesize' => CApiInputValidator::SSL_PRIVATE_KEY_MAX_LENGTH
 	]).');'
 ))
 	->setOnDocumentReady()

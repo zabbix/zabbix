@@ -24,7 +24,8 @@
 
 		init({ldap_servers, ldap_default_row_index, db_authentication_type, saml_provision_groups,
 				saml_provision_media, templates, mfa_methods, mfa_default_row_index, is_http_auth_allowed,
-				saml_idp_certificate_exists, saml_sp_certificate_exists, saml_sp_private_key_exists
+				saml_idp_certificate_exists, saml_sp_certificate_exists, saml_sp_private_key_exists,
+				saml_certificate_max_filesize, saml_private_key_max_filesize
 		}) {
 			this.form = document.getElementById('authentication-form');
 			this.db_authentication_type = db_authentication_type;
@@ -44,6 +45,8 @@
 			this.saml_idp_certificate_exists = saml_idp_certificate_exists;
 			this.saml_sp_certificate_exists = saml_sp_certificate_exists;
 			this.saml_sp_private_key_exists = saml_sp_private_key_exists;
+			this.saml_certificate_max_filesize = saml_certificate_max_filesize;
+			this.saml_private_key_max_filesize = saml_private_key_max_filesize;
 			const saml_readonly = !this.form.querySelector('[type="checkbox"][name="saml_auth_enabled"]').checked;
 			const ldap_disabled = this.ldap_auth_enabled === null || !this.ldap_auth_enabled.checked;
 			const mfa_readonly = !this.form.querySelector('[type="checkbox"][name="mfa_status"]').checked;
@@ -260,8 +263,8 @@
 
 				if (file) {
 					const max_filesize = textarea.id === 'sp_private_key'
-						? <?= CApiInputValidator::SSL_PRIVATE_KEY_MAX_LENGTH ?>
-						: <?= CApiInputValidator::SSL_CERTIFICATE_MAX_LENGTH ?>;
+						? this.saml_private_key_max_filesize 
+						: this.saml_certificate_max_filesize;
 
 					if (file.size > max_filesize) {
 						const error_span = document.createElement('span');
@@ -355,8 +358,8 @@
 			let warnings = [];
 
 			const auth_type = document.querySelector('[name=authentication_type]:checked').value;
-				if (auth_type != this.db_authentication_type) {
-					warnings.push(<?= json_encode(
+			if (auth_type != this.db_authentication_type) {
+				warnings.push(<?= json_encode(
 					_('Changing the authentication method will reset all sessions, except the current one.')
 				) ?>);
 			}
