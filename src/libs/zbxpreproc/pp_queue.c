@@ -251,7 +251,7 @@ void	pp_task_queue_push_immediate(zbx_pp_queue_t *queue, zbx_pp_task_t *task)
 		case ZBX_PP_TASK_VALUE:
 			/* track input value order to have the same output order for non sequential tasks */
 			pp_track_value_task(queue, task);
-			break;
+			ZBX_FALLTHROUGH;
 		default:
 			queue->pending_num++;
 			break;
