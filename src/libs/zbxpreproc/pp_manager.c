@@ -451,7 +451,7 @@ static void	pp_manager_queue_value_task_result(zbx_pp_manager_t *manager, zbx_pp
 		zbx_pp_task_t	*dep_task;
 		zbx_variant_t	value;
 
-		dep_task = pp_task_dependent_create(task->itemid, d->preproc);
+		dep_task = pp_task_dependent_create(item->itemid, d->preproc);
 		zbx_pp_task_dependent_t	*d_dep = (zbx_pp_task_dependent_t *)PP_TASK_DATA(dep_task);
 
 		d_dep->cache = pp_cache_create(item->preproc, &d->result);
