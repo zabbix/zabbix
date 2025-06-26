@@ -261,33 +261,35 @@
 
 				const file = e.target.files && e.target.files[0] ? e.target.files[0] : null;
 
-				if (file) {
-					const max_filesize = textarea.id === 'sp_private_key'
-						? this.saml_private_key_max_filesize
-						: this.saml_certificate_max_filesize;
-
-					if (file.size > max_filesize) {
-						const error_span = document.createElement('span');
-						error_span.className = 'error';
-
-						error_span.textContent = <?= json_encode(_('File is too big, max upload size is %1$s bytes.')) ?>
-							.replace('%1$s', max_filesize);
-
-						wrapper.append(error_span);
-						textarea.classList.add('has-error');
-						textarea.value = '';
-
-						return;
-					}
-
-					const reader = new FileReader();
-
-					reader.onload = function(e) {
-						textarea.value = e.target.result;
-					};
-
-					reader.readAsText(file);
+				if (!file) {
+					return;
 				}
+
+				const max_filesize = textarea.id === 'sp_private_key'
+					? this.saml_private_key_max_filesize
+					: this.saml_certificate_max_filesize;
+
+				if (file.size > max_filesize) {
+					const error_span = document.createElement('span');
+					error_span.className = 'error';
+
+					error_span.textContent = <?= json_encode(_('File is too big, max upload size is %1$s bytes.')) ?>
+						.replace('%1$s', max_filesize);
+
+					wrapper.append(error_span);
+					textarea.classList.add('has-error');
+					textarea.value = '';
+
+					return;
+				}
+
+				const reader = new FileReader();
+
+				reader.onload = function(e) {
+					textarea.value = e.target.result;
+				};
+
+				reader.readAsText(file);
 			});
 			input.dispatchEvent(new MouseEvent('click'));
 		}
