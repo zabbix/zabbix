@@ -244,14 +244,20 @@ func (h *handler) report(w http.ResponseWriter, r *http.Request) {
 			Name:     cookie.Name,
 			Value:    cookie.Value,
 			URL:      req.URL,
-			Domain:   u.Hostname(),
 			SameSite: network.CookieSameSiteStrict,
 			HTTPOnly: true,
+		}
+		
+		host := u.Hostname()
+		if net.ParseIP(host) == nil {
+			cookieParam.Domain = host
+		} else {
+			log.Debugf("Skipping setting cookie Domain (IP detected): %s", host)
 		}
 
 		cookieParams = append(cookieParams, &cookieParam)
 	}
-
+	
 	cdpReqParams := reportReqParams{
 		cookieParams: cookieParams,
 		size: reportSize{
