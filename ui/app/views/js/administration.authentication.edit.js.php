@@ -263,7 +263,7 @@
 
 				if (file) {
 					const max_filesize = textarea.id === 'sp_private_key'
-						? this.saml_private_key_max_filesize 
+						? this.saml_private_key_max_filesize
 						: this.saml_certificate_max_filesize;
 
 					if (file.size > max_filesize) {
