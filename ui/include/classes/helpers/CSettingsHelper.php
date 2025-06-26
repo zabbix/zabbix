@@ -205,15 +205,4 @@ class CSettingsHelper {
 	public static function isSoftwareUpdateCheckEnabled(): bool {
 		return !CWebUser::isGuest() && self::getServerStatus()['configuration']['allow_software_update_check'];
 	}
-
-	public static function convertToMajorVersion(string $version): string {
-		if (preg_match('/^(\d+)\.(\d+)/', $version, $matches)) {
-			$major = $matches[1];
-			$minor = $matches[2] ?? '0';
-
-			return $major.'.'.$minor;
-		}
-
-		return '0.0';
-	}
 }

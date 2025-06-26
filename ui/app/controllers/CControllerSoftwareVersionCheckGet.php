@@ -39,7 +39,7 @@ class CControllerSoftwareVersionCheckGet extends CController {
 				'lastcheck' => 0,
 				'lastcheck_success' => 0,
 				'nextcheck' => 0,
-				'lastcheck_success_version' => 0,
+				'lastcheck_success_version' => ZABBIX_VERSION,
 				'versions' => []
 			];
 
