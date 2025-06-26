@@ -1231,6 +1231,10 @@ static int	proxyconfig_get_tables(zbx_dc_proxy_t *proxy, zbx_uint64_t proxy_conf
 	zbx_vector_uint64_create(&del_macro_hostids);
 	zbx_vector_keys_path_ptr_create(&keys_paths);
 
+	zabbix_log(LOG_LEVEL_DEBUG, "'%s' config:" ZBX_FS_UI64" proxy_config_revision:" ZBX_FS_UI64
+			" proxy_revision:" ZBX_FS_UI64 " proxy_macro_revision:" ZBX_FS_UI64, proxy->name,
+			dc_revision->config, proxy_config_revision, proxy_revision, macro_revision);
+
 	if (proxy_config_revision < proxy_revision || proxy_config_revision < macro_revision)
 	{
 		zbx_vector_uint64_reserve(&hostids, 1000);
