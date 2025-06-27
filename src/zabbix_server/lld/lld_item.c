@@ -311,6 +311,9 @@ static void	update_item_template_cache(zbx_vector_uint64_t *in_itemids)
 	zbx_vector_uint64_t	itc_itemids, itc_link_hostids;
 	zbx_db_insert_t		db_insert;
 
+	if (0 == in_itemids->values_num)
+		return;
+
 	sql = (char *)zbx_malloc(sql, sql_alloc);
 	template_names = (char *)zbx_malloc(template_names, tmp_alloc);
 
