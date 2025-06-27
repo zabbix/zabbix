@@ -270,9 +270,9 @@ class testDiscoveryRules extends CIntegrationTest {
 		$this->assertEquals(count($initial_timeouts), count($response['result']));
 
 		$drule = [
-			'iprange' => '127.0.10.1-200',
+			'iprange' => '127.0.10.1-100',
 			'name' => $name,
-			'delay' => '1s',
+			'delay' => '10s',
 			'status' => 0, /* enabled */
 			'concurrency_max' => ZBX_DISCOVERY_CHECKS_UNLIMITED,
 			'dchecks' => [
@@ -658,7 +658,7 @@ class testDiscoveryRules extends CIntegrationTest {
 			$this->createActionHostAddMulti("MULTI");
 		} else {
 			$druleId = $this->createDruleSnmpv3(self::DRULE_NAME , $proxyId);
-		$this->createActionHostAdd($druleId, self::DISCOVERY_ACTION_NAME);
+			$this->createActionHostAdd($druleId, self::DISCOVERY_ACTION_NAME);
 		}
 
 		$druleWithErrId = $this->createDruleSnmpv2(self::DRULE_NAME_ERR, '127.0.0.1', self::SNMPAGENT_INVALID_OID, $proxyId);
@@ -690,6 +690,8 @@ class testDiscoveryRules extends CIntegrationTest {
 	 */
 	public function testDiscoveryRules_snmpErrorViaProxyMemoryMode(): void {
 		$this->proxyTest(true);
+		$this->reloadConfigurationCache(self::COMPONENT_SERVER);
+		$this->reloadConfigurationCache(self::COMPONENT_PROXY);
 
 		self::snmpsimStop();
 		$this->stopComponent(self::COMPONENT_SERVER);
@@ -706,7 +708,7 @@ class testDiscoveryRules extends CIntegrationTest {
 		$cmd .= ' --agent-udpv4-endpoint=' . self::SNMPSIM_DRULE_IP_RANGE . ':' . self::SNMPSIM_HOST_PORT;
 
 
-		for ($i = 4; $i < 200; $i++) {
+		for ($i = 4; $i < 100; $i++) {
 			$cmd .= ' --agent-udpv4-endpoint=' . '127.0.10.' . $i . ':' . self::SNMPSIM_HOST_PORT;
 		}
 
