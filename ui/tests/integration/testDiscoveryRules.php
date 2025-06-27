@@ -344,6 +344,28 @@ class testDiscoveryRules extends CIntegrationTest {
 		return $response['result']['actionids'][0];
 	}
 
+
+	private function createActionHostAddMulti($actionName): string {
+		$response = $this->call('action.create', [
+			'name' => $actionName,
+			'eventsource' => EVENT_SOURCE_DISCOVERY,
+			'status' => ACTION_STATUS_ENABLED,
+			'operations' => [
+				[
+					'operationtype' => OPERATION_TYPE_HOST_ADD
+				]
+			]
+		]);
+		$this->assertArrayHasKey('result', $response, 'Failed to create a discovery action "' . $actionName . '"');
+		$this->assertArrayHasKey('actionids', $response['result'], 'Failed to create a discovery action "' . $actionName . '"');
+		$this->assertCount(1, $response['result']['actionids'], 'Failed to create a discovery action "' . $actionName . '"');
+
+		array_push(self::$discoveryActions, $response['result']['actionids'][0]);
+
+		return $response['result']['actionids'][0];
+	}
+
+
 	private function createProxy(): void {
 		$response = $this->call('proxy.create', [
 			'name' => self::PROXY_NAME,
@@ -632,10 +654,12 @@ class testDiscoveryRules extends CIntegrationTest {
 				$proxyId = end(self::$proxies);
 			}
 			$druleId = $this->createDruleSnmpv3Multi(self::DRULE_NAME , $proxyId);
+
+			$this->createActionHostAddMulti("MULTI");
 		} else {
 			$druleId = $this->createDruleSnmpv3(self::DRULE_NAME , $proxyId);
-		}
 		$this->createActionHostAdd($druleId, self::DISCOVERY_ACTION_NAME);
+		}
 
 		$druleWithErrId = $this->createDruleSnmpv2(self::DRULE_NAME_ERR, '127.0.0.1', self::SNMPAGENT_INVALID_OID, $proxyId);
 		$this->createActionHostAdd($druleWithErrId, self::DISCOVERY_ACTION_NAME_ERR);
