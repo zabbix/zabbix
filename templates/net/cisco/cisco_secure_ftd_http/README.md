@@ -212,7 +212,7 @@ You must set the following macros in the template or host configuration:
 
 |Name|Description|Expression|Severity|Dependencies and additional info|
 |----|-----------|----------|--------|--------------------------------|
-|Cisco Secure FTD: High Memory [{#METRIC}] utilization|<p>The memory utilization is too high. The system might be slow to respond.</p>|`min(/Cisco Secure Firewall Threat Defense by HTTP/cisco.ftd.memory.util["{#NAME}"],15m)>{$CISCO.FTD.MEMORY.UTIL.WARN:"{#NAME}"}`|Warning||
+|Cisco Secure FTD: High memory utilization|<p>The memory utilization is too high. The system might be slow to respond.</p>|`min(/Cisco Secure Firewall Threat Defense by HTTP/cisco.ftd.memory.util["{#NAME}"],15m)>{$CISCO.FTD.MEMORY.UTIL.WARN:"{#NAME}"}`|Warning||
 
 ### LLD rule Memory discovery
 

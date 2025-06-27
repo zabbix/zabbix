@@ -43,7 +43,7 @@ zabbix_export:
             - uuid: e54b01b249ea43978267ca1b053732e7
               expression: 'min(/Cisco Secure Firewall Threat Defense by HTTP/cisco.ftd.cpu.utilization,15m)>{$CISCO.FTD.CPU.UTIL.WARN}'
               name: 'Cisco Secure FTD: High CPU utilization'
-              event_name: 'High CPU utilization (over {$CISCO.FTD.CPU.UTIL.WARN}% for 15m)'
+              event_name: 'Cisco Secure FTD: High CPU utilization (over {$CISCO.FTD.CPU.UTIL.WARN}% for 15m)'
               opdata: 'Current utilization: {ITEM.LASTVALUE1}'
               priority: WARNING
               description: 'The CPU utilization is too high. The system might be slow to respond.'
@@ -282,7 +282,7 @@ zabbix_export:
             - uuid: 3d5da93aed4343dc8b7e20628a37d20a
               expression: 'min(/Cisco Secure Firewall Threat Defense by HTTP/cisco.ftd.memory.utilization,15m) >= {$CISCO.FTD.MEMORY.UTIL.WARN}'
               name: 'Cisco Secure FTD: High memory utilization'
-              event_name: 'High memory utilization (over {$CISCO.FTD.MEMORY.UTIL.WARN}% for 15m)'
+              event_name: 'Cisco Secure FTD: High memory utilization (over {$CISCO.FTD.MEMORY.UTIL.WARN}% for 15m)'
               opdata: 'Current utilization: {ITEM.LASTVALUE1}'
               priority: AVERAGE
               description: 'RAM utilization is too high. The system might be slow to respond.'
@@ -622,7 +622,7 @@ zabbix_export:
             - uuid: 887632676fba481db8dd93a977a8d256
               expression: 'last(/Cisco Secure Firewall Threat Defense by HTTP/cisco.ftd.uptime)<10m'
               name: 'Cisco Secure FTD: Device has been restarted'
-              event_name: '{HOST.NAME} has been restarted (uptime < 10m)'
+              event_name: 'Cisco Secure FTD: {HOST.NAME} has been restarted (uptime < 10m)'
               priority: INFO
               description: 'The host uptime is less than 10 minutes'
               manual_close: 'YES'
@@ -789,7 +789,7 @@ zabbix_export:
                 - uuid: 1c5f0b2d3e4f4a6b8c9d0e1f2a3b4c5d
                   expression: 'min(/Cisco Secure Firewall Threat Defense by HTTP/cisco.ftd.cpu.util["{#NAME}"],15m)>{$CISCO.FTD.CPU.UTIL.WARN:"{#NAME}"}'
                   name: 'Cisco Secure FTD: High CPU [{#METRIC}] utilization'
-                  event_name: 'High CPU utilization (over {$CISCO.FTD.CPU.UTIL.WARN:"{#NAME}"}% for 15m)'
+                  event_name: 'Cisco Secure FTD: High CPU utilization (over {$CISCO.FTD.CPU.UTIL.WARN:"{#NAME}"}% for 15m)'
                   opdata: 'Current utilization: {ITEM.LASTVALUE1}'
                   priority: WARNING
                   description: 'The CPU utilization is too high. The system might be slow to respond.'
@@ -1099,7 +1099,7 @@ zabbix_export:
                   recovery_mode: RECOVERY_EXPRESSION
                   recovery_expression: 'max(/Cisco Secure Firewall Threat Defense by HTTP/cisco.ftd.interface.input.errors["{#NAME}"],5m)<{$CISCO.FTD.IF.ERRORS.WARN:"{#NAME}"}*0.8'
                   name: 'Cisco Secure FTD: Interface [{#NAME}][{#DESCR}]: High input error rate'
-                  event_name: 'Interface [{#NAME}][{#DESCR}]: High input error rate ( > {$CISCO.FTD.IF.ERRORS.WARN:"{#NAME}"} for 5m)'
+                  event_name: 'Cisco Secure FTD: Interface [{#NAME}][{#DESCR}]: High input error rate ( > {$CISCO.FTD.IF.ERRORS.WARN:"{#NAME}"} for 5m)'
                   opdata: 'Errors in: {ITEM.LASTVALUE1}'
                   priority: WARNING
                   description: 'It recovers when it is below 80% of the `{$CISCO.FTD.IF.ERRORS.WARN:"{#NAME}"}` threshold.'
@@ -1184,7 +1184,7 @@ zabbix_export:
                   recovery_mode: RECOVERY_EXPRESSION
                   recovery_expression: 'max(/Cisco Secure Firewall Threat Defense by HTTP/cisco.ftd.interface.output.errors["{#NAME}"],5m)<{$CISCO.FTD.IF.ERRORS.WARN:"{#NAME}"}*0.8'
                   name: 'Cisco Secure FTD: Interface [{#NAME}][{#DESCR}]: High output error rate'
-                  event_name: 'Interface [{#NAME}][{#DESCR}]: High output error rate ( > {$CISCO.FTD.IF.ERRORS.WARN:"{#NAME}"} for 5m)'
+                  event_name: 'Cisco Secure FTD: Interface [{#NAME}][{#DESCR}]: High output error rate ( > {$CISCO.FTD.IF.ERRORS.WARN:"{#NAME}"} for 5m)'
                   opdata: 'Errors in: {ITEM.LASTVALUE1}'
                   priority: WARNING
                   description: 'It recovers when it is below 80% of the `{$CISCO.FTD.IF.ERRORS.WARN:"{#NAME}"}` threshold.'
@@ -1391,8 +1391,8 @@ zabbix_export:
               trigger_prototypes:
                 - uuid: 4891c9022137417996978480d3b8b58d
                   expression: 'min(/Cisco Secure Firewall Threat Defense by HTTP/cisco.ftd.memory.util["{#NAME}"],15m)>{$CISCO.FTD.MEMORY.UTIL.WARN:"{#NAME}"}'
-                  name: 'Cisco Secure FTD: High Memory [{#METRIC}] utilization'
-                  event_name: 'Memory [{#METRIC}] utilization: High memory utilization (over {$CISCO.FTD.MEMORY.UTIL.WARN:"{#NAME}"}% for 15m)'
+                  name: 'Cisco Secure FTD: High memory utilization'
+                  event_name: 'Cisco Secure FTD: High memory utilization (over {$CISCO.FTD.MEMORY.UTIL.WARN:"{#NAME}"}% for 15m)'
                   opdata: 'Current utilization: {ITEM.LASTVALUE1}'
                   priority: WARNING
                   description: 'The memory utilization is too high. The system might be slow to respond.'
@@ -1748,7 +1748,7 @@ zabbix_export:
                 - uuid: 687ebffa0c14403398cde19620cc6627
                   expression: 'min(/Cisco Secure Firewall Threat Defense by HTTP/cisco.ftd.fs.pused["{#FSNAME}","{#FSMOUNT}"],15m)>{$CISCO.FTD.FS.PUSED.WARN:"{#FSNAME}"}'
                   name: 'Cisco Secure FTD: FS [{#FSNAME}][{#FSMOUNT}]: Space is low'
-                  event_name: 'FS [{#FSNAME}][{#FSMOUNT}]: Space is low (over {$CISCO.FTD.FS.PUSED.WARN:"{#FSNAME}"}% for 15m)'
+                  event_name: 'Cisco Secure FTD: FS [{#FSNAME}][{#FSMOUNT}]: Space is low (over {$CISCO.FTD.FS.PUSED.WARN:"{#FSNAME}"}% for 15m)'
                   opdata: 'Current utilization: {ITEM.LASTVALUE1}'
                   priority: WARNING
                   description: 'The trigger expression is based on the current used and maximum available spaces. The system might be slow to respond.'
