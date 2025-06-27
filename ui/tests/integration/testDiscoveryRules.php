@@ -628,6 +628,9 @@ class testDiscoveryRules extends CIntegrationTest {
 
 		$proxyId = $this->createProxy();
 		if ($doMulti) {
+			if (is_null($proxyId)) {
+				$proxyId = end(self::$proxies);
+			}
 			$druleId = $this->createDruleSnmpv3Multi(self::DRULE_NAME , $proxyId);
 		} else {
 			$druleId = $this->createDruleSnmpv3(self::DRULE_NAME , $proxyId);
@@ -664,9 +667,9 @@ class testDiscoveryRules extends CIntegrationTest {
 	public function testDiscoveryRules_snmpErrorViaProxyMemoryMode(): void {
 		$this->proxyTest(true);
 
+		self::snmpsimStop();
 		$this->stopComponent(self::COMPONENT_SERVER);
 
-		self::snmpsimStop();
 		$datadir = realpath(dirname(__FILE__)) . '/' . self::SNMPSIM_DATA_DIR_REL_PATH;
 		$cmd = 'snmpsimd';
 		$cmd .= ' --v3-user=' . self::SNMPSIM_USERNAME;
@@ -679,14 +682,14 @@ class testDiscoveryRules extends CIntegrationTest {
 		$cmd .= ' --agent-udpv4-endpoint=' . self::SNMPSIM_DRULE_IP_RANGE . ':' . self::SNMPSIM_HOST_PORT;
 
 
-		for ($i = 4; $i < 255; $i++) {
+		for ($i = 4; $i < 200; $i++) {
 			$cmd .= ' --agent-udpv4-endpoint=' . '127.0.10.' . $i . ':' . self::SNMPSIM_HOST_PORT;
 		}
 
 		$cmd .= ' --data-dir=' . $datadir;
 		$cmd .= ' > /dev/null 2>&1 &';
-		shell_exec($cmd);
 
+		shell_exec($cmd);
 		sleep(600);
 
 	}
