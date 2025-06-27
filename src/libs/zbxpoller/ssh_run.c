@@ -229,7 +229,6 @@ int	ssh_run(zbx_dc_item_t *item, AGENT_RESULT *result, const char *encoding, con
 		goto tcp_session_free;
 	}
 
-	/* set blocking mode on session */
 	ssh_set_blocking(session, 0);
 
 	if (0 < strlen(options))
