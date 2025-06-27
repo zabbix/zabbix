@@ -1,9 +1,7 @@
 Changes for 7.0.16
 
-New features:
-
 Bug fixes:
-.......PS. [ZBX-26589] fixed DNS queries being performed for IP address when not recent c-ares library is used (vso)
+.......PS. [ZBX-26589] fixed DNS queries being performed for IP addresses when using older c-ares library (vso)
 .......PS. [ZBX-26610] fixed some tasks being stuck in preprocessing queue (wiper)
 
 --------------------------------------------------------------------------------
