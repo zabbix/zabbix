@@ -296,7 +296,7 @@ zabbix_export:
             - tag: component
               value: raw
         - uuid: 4bf53a35af804262a4e0250a01d6c962
-          name: 'Backup jobs, count'
+          name: 'Jobs: Backup'
           type: DEPENDENT
           key: aws.backup_vault.job.backup.count
           delay: '0'
@@ -314,7 +314,7 @@ zabbix_export:
             - tag: component
               value: backup_vault
         - uuid: b1e841181aac401e927b27dc6bca6736
-          name: 'Failed backup jobs, count'
+          name: 'Jobs: Failed backup'
           type: DEPENDENT
           key: aws.backup_vault.job.backup.failed.count
           delay: '0'
@@ -332,7 +332,7 @@ zabbix_export:
             - tag: component
               value: backup_vault
         - uuid: d8ea077804634388bcb15bc99ad9839e
-          name: 'Copy jobs, count'
+          name: 'Jobs: Copy'
           type: DEPENDENT
           key: aws.backup_vault.job.copy.count
           delay: '0'
@@ -362,7 +362,7 @@ zabbix_export:
                 - tag: scope
                   value: notice
         - uuid: a2a8734311c84c05b72738ce0d8192f5
-          name: 'Failed copy jobs, count'
+          name: 'Jobs: Failed copy'
           type: DEPENDENT
           key: aws.backup_vault.job.copy.failed.count
           delay: '0'
@@ -610,11 +610,10 @@ zabbix_export:
             						}
             						result.BackupJobs.forEach(function (job) {
             							lld_array.push({
-            								jod_id: AWS.getField(job, 'BackupJobId'),
+            								job_id: AWS.getField(job, 'BackupJobId'),
             								job_type: job_type,
             								resource_type: AWS.getField(job, 'ResourceType'),
             								resource_name: AWS.getField(job, 'ResourceName'),
-            								percent_done: AWS.getField(job, 'PercentDone'),
             								job_state: AWS.getField(job, 'State'),
             								job_size: AWS.getField(job, 'BackupSizeInBytes')
             							});
@@ -627,7 +626,7 @@ zabbix_export:
             						}
             						result.CopyJobs.forEach(function (job) {
             							lld_array.push({
-            								jod_id: AWS.getField(job, 'CopyJobId'),
+            								job_id: AWS.getField(job, 'CopyJobId'),
             								job_type: job_type,
             								resource_type: AWS.getField(job, 'ResourceType'),
             								resource_name: AWS.getField(job, 'ResourceName'),
@@ -643,10 +642,10 @@ zabbix_export:
             						}
             						result.RestoreJobs.forEach(function (job) {
             							lld_array.push({
-            								jod_id: AWS.getField(job, 'RestoreJobId'),
+            								job_id: AWS.getField(job, 'RestoreJobId'),
             								job_type: job_type,
             								resource_type: AWS.getField(job, 'ResourceType'),
-            								percent_done: parseFloat(AWS.getField(job, 'PercentDone').replace("%", "")),
+            								resource_name: null,
             								job_state: AWS.getField(job, 'Status'),
             								job_size: AWS.getField(job, 'BackupSizeInBytes')
             							});
@@ -695,7 +694,7 @@ zabbix_export:
             - tag: component
               value: raw
         - uuid: fa781abfaa014fcdab62321fc9940ac7
-          name: 'Restore jobs, count'
+          name: 'Jobs: Restore'
           type: DEPENDENT
           key: aws.backup_vault.job.restore.count
           delay: '0'
@@ -725,11 +724,11 @@ zabbix_export:
                 - tag: scope
                   value: notice
         - uuid: acae9cf0a32c42dead1651fc911afc3b
-          name: 'Failed restore jobs, count'
+          name: 'Jobs: Failed restore'
           type: DEPENDENT
           key: aws.backup_vault.job.restore.failed.count
           delay: '0'
-          description: 'The number of failed backup jobs in the vault over the ''{$AWS.BACKUP_JOB.PERIOD}'' day(s).'
+          description: 'The number of failed restore jobs in the vault over the ''{$AWS.BACKUP_JOB.PERIOD}'' day(s).'
           preprocessing:
             - type: JSONPATH
               parameters:
@@ -743,7 +742,7 @@ zabbix_export:
             - tag: component
               value: backup_vault
         - uuid: 5a9a604c70844ab8bffe4bf96ceeb761
-          name: 'Job size, average'
+          name: 'Jobs: Size, avg'
           type: DEPENDENT
           key: aws.backup_vault.job.size.avg
           delay: '0'
@@ -768,7 +767,7 @@ zabbix_export:
             - tag: component
               value: backup_vault
         - uuid: 90600e647d2a40ccbe1ced317c03abb4
-          name: 'Job size, maximum'
+          name: 'Jobs: Size, max'
           type: DEPENDENT
           key: aws.backup_vault.job.size.max
           delay: '0'
@@ -793,13 +792,13 @@ zabbix_export:
             - tag: component
               value: backup_vault
         - uuid: 0ad8090097e64cf3bf28710f423a6164
-          name: 'Job size, minimum'
+          name: 'Jobs: Size, min'
           type: DEPENDENT
           key: aws.backup_vault.job.size.min
           delay: '0'
           units: B
           description: |
-            The maximum size, in bytes, of a backup (recovery point).
+            The minimum size, in bytes, of a backup (recovery point).
             
             This value can render differently depending on the resource type as AWS Backup pulls
             in data information from other AWS services. For example, the value returned may
@@ -809,6 +808,24 @@ zabbix_export:
               parameters:
                 - '$[?(@.job_size > 0)].job_size.min()'
               error_handler: DISCARD_VALUE
+            - type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 1h
+          master_item:
+            key: aws.backup_vault.job.get
+          tags:
+            - tag: component
+              value: backup_vault
+        - uuid: 886b2b55cfbf42d58f01cfad66cc1ad5
+          name: 'Jobs: Total'
+          type: DEPENDENT
+          key: aws.backup_vault.job.total.count
+          delay: '0'
+          description: 'The total number of jobs in the vault over the ''{$AWS.BACKUP_JOB.PERIOD}'' day(s).'
+          preprocessing:
+            - type: JSONPATH
+              parameters:
+                - $.length()
             - type: DISCARD_UNCHANGED_HEARTBEAT
               parameters:
                 - 1h
@@ -1043,7 +1060,7 @@ zabbix_export:
               preprocessing:
                 - type: JSONPATH
                   parameters:
-                    - '$.[?(@.jod_id == "{#AWS.BACKUP_JOB.ID}")].job_state.first()'
+                    - '$.[?(@.job_id == "{#AWS.BACKUP_JOB.ID}")].job_state.first()'
                   error_handler: DISCARD_VALUE
                 - type: JAVASCRIPT
                   parameters:
@@ -1124,7 +1141,7 @@ zabbix_export:
             key: aws.backup_vault.job.get
           lld_macro_paths:
             - lld_macro: '{#AWS.BACKUP_JOB.ID}'
-              path: $.jod_id
+              path: $.job_id
             - lld_macro: '{#AWS.BACKUP_JOB.RESOURCE_NAME}'
               path: $.resource_name
             - lld_macro: '{#AWS.BACKUP_JOB.RESOURCE_TYPE}'
@@ -1133,6 +1150,10 @@ zabbix_export:
               path: $.job_state
             - lld_macro: '{#AWS.BACKUP_JOB.TYPE}'
               path: $.job_type
+          preprocessing:
+            - type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 1h
           overrides:
             - name: 'Copy job excludes'
               step: '1'
@@ -1245,7 +1266,7 @@ zabbix_export:
                 - type: item
                   name: 'Backup jobs'
                   'y': '2'
-                  width: '14'
+                  width: '13'
                   fields:
                     - type: INTEGER
                       name: decimal_places
@@ -1264,31 +1285,9 @@ zabbix_export:
                     - type: INTEGER
                       name: value_size
                       value: '60'
-                - type: item
-                  name: 'Failed backup jobs'
-                  'y': '4'
-                  width: '14'
-                  fields:
-                    - type: INTEGER
-                      name: decimal_places
-                      value: '0'
-                    - type: ITEM
-                      name: itemid.0
-                      value:
-                        host: 'AWS Backup vault by HTTP'
-                        key: aws.backup_vault.job.backup.failed.count
-                    - type: INTEGER
-                      name: show.0
-                      value: '2'
-                    - type: INTEGER
-                      name: show.1
-                      value: '4'
-                    - type: INTEGER
-                      name: value_size
-                      value: '60'
                 - type: itemnavigator
                   name: 'Jobs grouped'
-                  'y': '6'
+                  'y': '4'
                   width: '28'
                   height: '8'
                   fields:
@@ -1315,7 +1314,7 @@ zabbix_export:
                       value: '300'
                 - type: item
                   name: 'Selected job'
-                  'y': '14'
+                  'y': '12'
                   width: '28'
                   height: '1'
                   hide_header: 'YES'
@@ -1349,9 +1348,9 @@ zabbix_export:
                       value: '60'
                 - type: item
                   name: 'Restore jobs'
-                  x: '14'
+                  x: '13'
                   'y': '2'
-                  width: '14'
+                  width: '13'
                   fields:
                     - type: INTEGER
                       name: decimal_places
@@ -1371,32 +1370,9 @@ zabbix_export:
                       name: value_size
                       value: '60'
                 - type: item
-                  name: 'Failed restore jobs'
-                  x: '14'
-                  'y': '4'
-                  width: '14'
-                  fields:
-                    - type: INTEGER
-                      name: decimal_places
-                      value: '0'
-                    - type: ITEM
-                      name: itemid.0
-                      value:
-                        host: 'AWS Backup vault by HTTP'
-                        key: aws.backup_vault.job.restore.failed.count
-                    - type: INTEGER
-                      name: show.0
-                      value: '2'
-                    - type: INTEGER
-                      name: show.1
-                      value: '4'
-                    - type: INTEGER
-                      name: value_size
-                      value: '60'
-                - type: item
-                  name: 'Restore points'
+                  name: 'Recovery points'
                   x: '26'
-                  width: '15'
+                  width: '13'
                   fields:
                     - type: INTEGER
                       name: decimal_places
@@ -1417,7 +1393,7 @@ zabbix_export:
                       value: '60'
                 - type: item
                   name: 'Copy jobs'
-                  x: '28'
+                  x: '26'
                   'y': '2'
                   width: '13'
                   fields:
@@ -1438,33 +1414,10 @@ zabbix_export:
                     - type: INTEGER
                       name: value_size
                       value: '60'
-                - type: item
-                  name: 'Failed copy jobs'
-                  x: '28'
-                  'y': '4'
-                  width: '13'
-                  fields:
-                    - type: INTEGER
-                      name: decimal_places
-                      value: '0'
-                    - type: ITEM
-                      name: itemid.0
-                      value:
-                        host: 'AWS Backup vault by HTTP'
-                        key: aws.backup_vault.job.copy.failed.count
-                    - type: INTEGER
-                      name: show.0
-                      value: '2'
-                    - type: INTEGER
-                      name: show.1
-                      value: '4'
-                    - type: INTEGER
-                      name: value_size
-                      value: '60'
                 - type: honeycomb
                   name: Jobs
                   x: '28'
-                  'y': '6'
+                  'y': '4'
                   width: '44'
                   height: '8'
                   fields:
@@ -1537,7 +1490,7 @@ zabbix_export:
                 - type: item
                   name: 'Selected job'
                   x: '28'
-                  'y': '14'
+                  'y': '12'
                   width: '44'
                   height: '1'
                   hide_header: 'YES'
@@ -1571,7 +1524,7 @@ zabbix_export:
                       value: '60'
                 - type: item
                   name: 'Average size'
-                  x: '41'
+                  x: '39'
                   width: '13'
                   fields:
                     - type: INTEGER
@@ -1592,10 +1545,10 @@ zabbix_export:
                       name: value_size
                       value: '60'
                 - type: item
-                  name: 'Lock date'
-                  x: '41'
+                  name: 'Total jobs'
+                  x: '39'
                   'y': '2'
-                  width: '31'
+                  width: '13'
                   fields:
                     - type: INTEGER
                       name: decimal_places
@@ -1604,37 +1557,20 @@ zabbix_export:
                       name: itemid.0
                       value:
                         host: 'AWS Backup vault by HTTP'
-                        key: aws.backup_vault.lock.date
+                        key: aws.backup_vault.job.total.count
                     - type: INTEGER
                       name: show.0
                       value: '2'
                     - type: INTEGER
-                      name: value_size
-                      value: '60'
-                - type: item
-                  name: 'Lock time remain'
-                  x: '41'
-                  'y': '4'
-                  width: '31'
-                  fields:
-                    - type: INTEGER
-                      name: decimal_places
-                      value: '0'
-                    - type: ITEM
-                      name: itemid.0
-                      value:
-                        host: 'AWS Backup vault by HTTP'
-                        key: aws.backup_vault.lock.time_left
-                    - type: INTEGER
-                      name: show.0
-                      value: '2'
+                      name: show.1
+                      value: '4'
                     - type: INTEGER
                       name: value_size
                       value: '60'
                 - type: item
                   name: 'Lock status'
-                  x: '54'
-                  width: '18'
+                  x: '52'
+                  width: '20'
                   fields:
                     - type: INTEGER
                       name: decimal_places
@@ -1650,6 +1586,26 @@ zabbix_export:
                     - type: INTEGER
                       name: show.1
                       value: '4'
+                    - type: INTEGER
+                      name: value_size
+                      value: '60'
+                - type: item
+                  name: 'Vault state'
+                  x: '52'
+                  'y': '2'
+                  width: '20'
+                  fields:
+                    - type: INTEGER
+                      name: decimal_places
+                      value: '0'
+                    - type: ITEM
+                      name: itemid.0
+                      value:
+                        host: 'AWS Backup vault by HTTP'
+                        key: aws.backup_vault.state
+                    - type: INTEGER
+                      name: show.0
+                      value: '2'
                     - type: INTEGER
                       name: value_size
                       value: '60'
@@ -1699,7 +1655,7 @@ zabbix_export:
       template: 'AWS by HTTP'
       name: 'AWS by HTTP'
       description: |
-        Get AWS EC2, RDS and S3 instances, AWS ECS clusters, AWS Elastic Load Balancing. Don't forget to read the README.md for the correct setup of the template.
+        Get AWS EC2, RDS and S3 instances, AWS ECS clusters, AWS Elastic Load Balancing, Backup vaults. Don't forget to read the README.md for the correct setup of the template.
         
         You can discuss this template or leave feedback on our forum https://www.zabbix.com/forum/zabbix-suggestions-and-feedback
         

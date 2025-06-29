@@ -4,7 +4,7 @@
 ## Overview
 
 This template is designed for the effortless deployment of AWS monitoring by Zabbix via HTTP and doesn't require any external scripts.
-- Currently, the template supports the discovery of EC2 and RDS instances, ECS clusters, ELB, Lambda and S3 buckets.
+- Currently, the template supports the discovery of EC2 and RDS instances, ECS clusters, ELB, Lambda, S3 buckets and Backup vaults.
 
 ## Included Monitoring Templates
 
@@ -17,7 +17,7 @@ This template is designed for the effortless deployment of AWS monitoring by Zab
 - *AWS RDS instance by HTTP*
 - *AWS S3 bucket by HTTP*
 - *AWS Cost Explorer by HTTP*
-- *AWS Backup Vault by HTTP*
+- *AWS Backup vault by HTTP*
 
 ## Requirements
 
@@ -2766,15 +2766,16 @@ See the section below for a list of macros used for LLD filters.
 |Lock time remain|<p>The remaining time before AWS Backup vault lock configuration becomes immutable, meaning it cannot be changed or deleted.</p>|Dependent item|aws.backup_vault.lock.time_left<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.LockDate`</p></li><li><p>Does not match regular expression: `null`</p><p>⛔️Custom on fail: Set error to: `Either the vault is not locked, or the lock date is not specified.`</p></li><li><p>JavaScript: `The text is too long. Please see the template.`</p></li></ul>|
 |Lock date|<p>The date and time when AWS Backup vault lock configuration becomes immutable, meaning it cannot be changed or deleted.</p>|Dependent item|aws.backup_vault.lock.date<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.LockDate`</p></li><li><p>Does not match regular expression: `null`</p><p>⛔️Custom on fail: Set error to: `Either the vault is not locked, or the lock date is not specified.`</p></li></ul>|
 |State|<p>The current state of the vault.</p><p>Possible values are:</p><p>- Unknown</p><p>- Creating</p><p>- Available</p><p>- Failed</p>|Dependent item|aws.backup_vault.state<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.VaultState`</p></li><li><p>JavaScript: `The text is too long. Please see the template.`</p></li></ul>|
-|Job size, average|<p>The average size, in bytes, of a backup (recovery point).</p><p></p><p>This value can render differently depending on the resource type as AWS Backup pulls</p><p>in data information from other AWS services. For example, the value returned may</p><p>show a value of 0, which may differ from the anticipated value.</p>|Dependent item|aws.backup_vault.job.size.avg<p>**Preprocessing**</p><ul><li><p>JSON Path: `$[?(@.job_size > 0)].job_size.avg()`</p><p>⛔️Custom on fail: Discard value</p></li><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
-|Job size, maximum|<p>The maximum size, in bytes, of a backup (recovery point).</p><p></p><p>This value can render differently depending on the resource type as AWS Backup pulls</p><p>in data information from other AWS services. For example, the value returned may</p><p>show a value of 0, which may differ from the anticipated value.</p>|Dependent item|aws.backup_vault.job.size.max<p>**Preprocessing**</p><ul><li><p>JSON Path: `$[?(@.job_size > 0)].job_size.max()`</p><p>⛔️Custom on fail: Discard value</p></li><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
-|Job size, minimum|<p>The maximum size, in bytes, of a backup (recovery point).</p><p></p><p>This value can render differently depending on the resource type as AWS Backup pulls</p><p>in data information from other AWS services. For example, the value returned may</p><p>show a value of 0, which may differ from the anticipated value.</p>|Dependent item|aws.backup_vault.job.size.min<p>**Preprocessing**</p><ul><li><p>JSON Path: `$[?(@.job_size > 0)].job_size.min()`</p><p>⛔️Custom on fail: Discard value</p></li><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
-|Backup jobs, count|<p>The number of backup jobs in the vault over the '{$AWS.BACKUP_JOB.PERIOD}' day(s).</p>|Dependent item|aws.backup_vault.job.backup.count<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.[?(@.job_type == "backup-job")].length()`</p></li><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
-|Restore jobs, count|<p>The number of restore jobs in the vault over the '{$AWS.BACKUP_JOB.PERIOD}' day(s).</p>|Dependent item|aws.backup_vault.job.restore.count<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.[?(@.job_type == "restore-job")].length()`</p></li><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
-|Copy jobs, count|<p>The number of copy jobs in the vault over the '{$AWS.BACKUP_JOB.PERIOD}' day(s).</p>|Dependent item|aws.backup_vault.job.copy.count<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.[?(@.job_type == "copy-job")].length()`</p></li><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
-|Failed backup jobs, count|<p>The number of failed backup jobs in the vault over the '{$AWS.BACKUP_JOB.PERIOD}' day(s).</p>|Dependent item|aws.backup_vault.job.backup.failed.count<p>**Preprocessing**</p><ul><li><p>JSON Path: `The text is too long. Please see the template.`</p></li><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
-|Failed restore jobs, count|<p>The number of failed backup jobs in the vault over the '{$AWS.BACKUP_JOB.PERIOD}' day(s).</p>|Dependent item|aws.backup_vault.job.restore.failed.count<p>**Preprocessing**</p><ul><li><p>JSON Path: `The text is too long. Please see the template.`</p></li><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
-|Failed copy jobs, count|<p>The number of failed copy jobs in the vault over the '{$AWS.BACKUP_JOB.PERIOD}' day(s).</p>|Dependent item|aws.backup_vault.job.copy.failed.count<p>**Preprocessing**</p><ul><li><p>JSON Path: `The text is too long. Please see the template.`</p></li><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
+|Jobs: Size, avg|<p>The average size, in bytes, of a backup (recovery point).</p><p></p><p>This value can render differently depending on the resource type as AWS Backup pulls</p><p>in data information from other AWS services. For example, the value returned may</p><p>show a value of 0, which may differ from the anticipated value.</p>|Dependent item|aws.backup_vault.job.size.avg<p>**Preprocessing**</p><ul><li><p>JSON Path: `$[?(@.job_size > 0)].job_size.avg()`</p><p>⛔️Custom on fail: Discard value</p></li><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
+|Jobs: Size, max|<p>The maximum size, in bytes, of a backup (recovery point).</p><p></p><p>This value can render differently depending on the resource type as AWS Backup pulls</p><p>in data information from other AWS services. For example, the value returned may</p><p>show a value of 0, which may differ from the anticipated value.</p>|Dependent item|aws.backup_vault.job.size.max<p>**Preprocessing**</p><ul><li><p>JSON Path: `$[?(@.job_size > 0)].job_size.max()`</p><p>⛔️Custom on fail: Discard value</p></li><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
+|Jobs: Size, min|<p>The minimum size, in bytes, of a backup (recovery point).</p><p></p><p>This value can render differently depending on the resource type as AWS Backup pulls</p><p>in data information from other AWS services. For example, the value returned may</p><p>show a value of 0, which may differ from the anticipated value.</p>|Dependent item|aws.backup_vault.job.size.min<p>**Preprocessing**</p><ul><li><p>JSON Path: `$[?(@.job_size > 0)].job_size.min()`</p><p>⛔️Custom on fail: Discard value</p></li><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
+|Jobs: Backup|<p>The number of backup jobs in the vault over the '{$AWS.BACKUP_JOB.PERIOD}' day(s).</p>|Dependent item|aws.backup_vault.job.backup.count<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.[?(@.job_type == "backup-job")].length()`</p></li><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
+|Jobs: Restore|<p>The number of restore jobs in the vault over the '{$AWS.BACKUP_JOB.PERIOD}' day(s).</p>|Dependent item|aws.backup_vault.job.restore.count<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.[?(@.job_type == "restore-job")].length()`</p></li><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
+|Jobs: Copy|<p>The number of copy jobs in the vault over the '{$AWS.BACKUP_JOB.PERIOD}' day(s).</p>|Dependent item|aws.backup_vault.job.copy.count<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.[?(@.job_type == "copy-job")].length()`</p></li><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
+|Jobs: Total|<p>The total number of jobs in the vault over the '{$AWS.BACKUP_JOB.PERIOD}' day(s).</p>|Dependent item|aws.backup_vault.job.total.count<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.length()`</p></li><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
+|Jobs: Failed backup|<p>The number of failed backup jobs in the vault over the '{$AWS.BACKUP_JOB.PERIOD}' day(s).</p>|Dependent item|aws.backup_vault.job.backup.failed.count<p>**Preprocessing**</p><ul><li><p>JSON Path: `The text is too long. Please see the template.`</p></li><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
+|Jobs: Failed restore|<p>The number of failed restore jobs in the vault over the '{$AWS.BACKUP_JOB.PERIOD}' day(s).</p>|Dependent item|aws.backup_vault.job.restore.failed.count<p>**Preprocessing**</p><ul><li><p>JSON Path: `The text is too long. Please see the template.`</p></li><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
+|Jobs: Failed copy|<p>The number of failed copy jobs in the vault over the '{$AWS.BACKUP_JOB.PERIOD}' day(s).</p>|Dependent item|aws.backup_vault.job.copy.failed.count<p>**Preprocessing**</p><ul><li><p>JSON Path: `The text is too long. Please see the template.`</p></li><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
 
 ### Triggers
 
@@ -2787,13 +2788,13 @@ See the section below for a list of macros used for LLD filters.
 
 |Name|Description|Type|Key and additional info|
 |----|-----------|----|-----------------------|
-|AWS Backup jobs discovery|<p>AWS Backup jobs discovery.</p>|Dependent item|aws.backup_vault.job.discovery|
+|AWS Backup jobs discovery|<p>AWS Backup jobs discovery.</p>|Dependent item|aws.backup_vault.job.discovery<p>**Preprocessing**</p><ul><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
 
 ### Item prototypes for AWS Backup jobs discovery
 
 |Name|Description|Type|Key and additional info|
 |----|-----------|----|-----------------------|
-|Job state [{#AWS.BACKUP_JOB.RESOURCE_NAME}, {#AWS.BACKUP_JOB.ID}]|<p>The state of the job.</p><p>Possible values are:</p><p>- Unknown</p><p>- Created</p><p>- Pending</p><p>- Running</p><p>- Aborting</p><p>- Aborted</p><p>- Completed</p><p>- Failed</p><p>- Expired</p><p>- Partial</p>|Dependent item|aws.backup_vault.job.state["{#AWS.BACKUP_JOB.ID}"]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.[?(@.jod_id == "{#AWS.BACKUP_JOB.ID}")].job_state.first()`</p><p>⛔️Custom on fail: Discard value</p></li><li><p>JavaScript: `The text is too long. Please see the template.`</p></li><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
+|Job state [{#AWS.BACKUP_JOB.RESOURCE_NAME}, {#AWS.BACKUP_JOB.ID}]|<p>The state of the job.</p><p>Possible values are:</p><p>- Unknown</p><p>- Created</p><p>- Pending</p><p>- Running</p><p>- Aborting</p><p>- Aborted</p><p>- Completed</p><p>- Failed</p><p>- Expired</p><p>- Partial</p>|Dependent item|aws.backup_vault.job.state["{#AWS.BACKUP_JOB.ID}"]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.[?(@.job_id == "{#AWS.BACKUP_JOB.ID}")].job_state.first()`</p><p>⛔️Custom on fail: Discard value</p></li><li><p>JavaScript: `The text is too long. Please see the template.`</p></li><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
 
 ### Trigger prototypes for AWS Backup jobs discovery
 
