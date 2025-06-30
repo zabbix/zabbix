@@ -272,7 +272,7 @@
 
 				if (file.size > max_filesize) {
 					const error_span = document.createElement('span');
-					
+
 					error_span.className = 'error';
 					error_span.textContent = this.saml_filesize_error_message.replace('%1$s', max_filesize);
 					wrapper.append(error_span);
