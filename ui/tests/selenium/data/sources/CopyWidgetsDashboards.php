@@ -1586,7 +1586,7 @@ class CopyWidgetsDashboards {
 									[
 										'type' => ZBX_WIDGET_FIELD_TYPE_STR,
 										'name' => 'columns.0.max',
-										'value' =>  '50'
+										'value' => '50'
 									],
 									[
 										'type' => ZBX_WIDGET_FIELD_TYPE_INT32,

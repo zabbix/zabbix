@@ -739,7 +739,7 @@ class testDashboardItemCardWidget extends testWidgets {
 		$this->assertEquals(['Item'], $form->getRequiredLabels());
 
 		// Check fields "Refresh interval" values.
-		$this->assertEquals(['Default (1 minute)',  'No refresh', '10 seconds', '30 seconds', '1 minute', '2 minutes', '10 minutes',  '15 minutes'],
+		$this->assertEquals(['Default (1 minute)', 'No refresh', '10 seconds', '30 seconds', '1 minute', '2 minutes', '10 minutes', '15 minutes'],
 				$form->getField('Refresh interval')->getOptions()->asText()
 		);
 
