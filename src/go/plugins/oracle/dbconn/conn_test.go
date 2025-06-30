@@ -403,7 +403,7 @@ func TestConnManager_closeAll(t *testing.T) { //nolint:tparallel
 
 				if err != nil || conn == nil {
 					t.Fatalf(
-						"ConnManager.closeUnused(): ConnManager.create() should create a connection, but got error: %s",
+						"ConnManager.closeUnused(): ConnManager.createConn() should create a connection, but got error: %s",
 						err.Error(),
 					)
 				}

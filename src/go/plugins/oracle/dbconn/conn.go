@@ -122,7 +122,7 @@ func (c *ConnManager) GetConnection(cd ConnDetails) (*OraConn, error) { //nolint
 		return conn, nil
 	}
 
-	conn, err := c.create(&cd)
+	conn, err := c.createConn(&cd)
 	if err != nil {
 		return nil, err
 	}
@@ -180,8 +180,8 @@ func (c *ConnManager) housekeeper(ctx context.Context) {
 	}
 }
 
-// create creates a new connection for given credentials in cd.
-func (c *ConnManager) create(cd *ConnDetails) (*OraConn, error) {
+// createConn creates a new connection for given credentials in cd.
+func (c *ConnManager) createConn(cd *ConnDetails) (*OraConn, error) {
 	ctx := godror.ContextWithTraceTag(
 		context.Background(),
 		godror.TraceTag{
@@ -190,7 +190,7 @@ func (c *ConnManager) create(cd *ConnDetails) (*OraConn, error) {
 		},
 	)
 
-	connector, err := createConnector(cd, c.opt.ConnectTimeout)
+	connector, err := createDBConnector(cd, c.opt.ConnectTimeout)
 	if err != nil {
 		return nil, err
 	}
@@ -274,7 +274,7 @@ func setCustomQuery(logr log.Logger, enabled bool, path string) yarn.Yarn { //no
 	queryStorage, err := yarn.New(http.Dir(path), "*"+sqlExt)
 	if err != nil {
 		logr.Errf(err.Error())
-		// create empty storage if error occurred
+		// createConn empty storage if error occurred
 		return yarn.NewFromMap(map[string]string{})
 	}
 

@@ -206,8 +206,8 @@ func (conn *OraConn) closeWithLog() {
 	}
 }
 
-// createConnector function creates a connection string and godror connection by ConnDetails.
-func createConnector(cd *ConnDetails, connectTimeout time.Duration) (driver.Connector, error) {
+// createDBConnector function creates a connection string and godror connection by ConnDetails.
+func createDBConnector(cd *ConnDetails, connectTimeout time.Duration) (driver.Connector, error) {
 	service, err := url.QueryUnescape(cd.Uri.GetParam("service"))
 
 	if err != nil {
