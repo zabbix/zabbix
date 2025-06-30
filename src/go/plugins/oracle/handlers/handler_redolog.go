@@ -12,16 +12,19 @@
 ** If not, see <https://www.gnu.org/licenses/>.
 **/
 
-package oracle
+package handlers
 
 import (
 	"context"
 
+	"golang.zabbix.com/agent2/plugins/oracle/dbconn"
+	"golang.zabbix.com/sdk/errs"
 	"golang.zabbix.com/sdk/zbxerr"
 )
 
-func redoLogHandler(ctx context.Context, conn OraClient, params map[string]string, _ ...string) (interface{}, error) {
-	var redolog string
+// RedoLogHandler function works with log file information from the control file.
+func RedoLogHandler(ctx context.Context, conn dbconn.OraClient, _ map[string]string, _ ...string) (any, error) {
+	var redoLog string
 
 	row, err := conn.QueryRow(ctx, `
 		SELECT
@@ -32,13 +35,13 @@ func redoLogHandler(ctx context.Context, conn OraClient, params map[string]strin
 			STATUS IN ('INACTIVE', 'UNUSED')
 	`)
 	if err != nil {
-		return nil, zbxerr.ErrorCannotFetchData.Wrap(err)
+		return nil, errs.WrapConst(err, zbxerr.ErrorCannotFetchData) //nolint:wrapcheck
 	}
 
-	err = row.Scan(&redolog)
+	err = row.Scan(&redoLog)
 	if err != nil {
-		return nil, zbxerr.ErrorCannotFetchData.Wrap(err)
+		return nil, errs.WrapConst(err, zbxerr.ErrorCannotFetchData) //nolint:wrapcheck
 	}
 
-	return redolog, nil
+	return redoLog, nil
 }

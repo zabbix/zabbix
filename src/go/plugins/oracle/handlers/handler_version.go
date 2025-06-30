@@ -12,44 +12,38 @@
 ** If not, see <https://www.gnu.org/licenses/>.
 **/
 
-package oracle
+package handlers
 
 import (
 	"context"
 
+	"golang.zabbix.com/agent2/plugins/oracle/dbconn"
+	"golang.zabbix.com/sdk/errs"
 	"golang.zabbix.com/sdk/zbxerr"
 )
 
-func archiveDiscoveryHandler(ctx context.Context, conn OraClient, params map[string]string,
-	_ ...string) (interface{}, error) {
-	var lld string
+// VersionHandler queries the db server for version.
+func VersionHandler(
+	ctx context.Context, conn dbconn.OraClient, _ map[string]string, _ ...string,
+) (any, error) {
+	const query = `SELECT VERSION_FULL FROM V$INSTANCE`
 
-	row, err := conn.QueryRow(ctx, `
-		SELECT
-			JSON_ARRAYAGG(
-				JSON_OBJECT(
-					'{#DEST_NAME}' VALUE d.DEST_NAME
-				) RETURNING CLOB 
-			) LLD
-		FROM
-			V$ARCHIVE_DEST d,
-			V$DATABASE db
-		WHERE
-			d.STATUS != 'INACTIVE'
-			AND db.LOG_MODE = 'ARCHIVELOG'
-	`)
+	row, err := conn.QueryRow(ctx, query)
 	if err != nil {
-		return nil, zbxerr.ErrorCannotFetchData.Wrap(err)
+		return nil, errs.Wrap(err, "failed to query version")
 	}
 
-	err = row.Scan(&lld)
+	var version string
+
+	err = row.Scan(&version)
 	if err != nil {
-		return nil, zbxerr.ErrorCannotFetchData.Wrap(err)
+		return nil, errs.WrapConst(err, zbxerr.ErrorCannotFetchData) //nolint:wrapcheck
 	}
 
-	if lld == "" {
-		lld = "[]"
+	err = row.Err()
+	if err != nil {
+		return nil, errs.Wrap(err, "failed to get version")
 	}
 
-	return lld, nil
+	return version, nil
 }

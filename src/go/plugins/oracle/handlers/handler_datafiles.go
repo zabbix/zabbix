@@ -12,31 +12,34 @@
 ** If not, see <https://www.gnu.org/licenses/>.
 **/
 
-package oracle
+package handlers
 
 import (
 	"context"
 
+	"golang.zabbix.com/agent2/plugins/oracle/dbconn"
+	"golang.zabbix.com/sdk/errs"
 	"golang.zabbix.com/sdk/zbxerr"
 )
 
-func procHandler(ctx context.Context, conn OraClient, params map[string]string, _ ...string) (interface{}, error) {
-	var proc string
+// DataFileHandler function works with data files statistics.
+func DataFileHandler(ctx context.Context, conn dbconn.OraClient, _ map[string]string, _ ...string) (any, error) {
+	var datafiles string
 
 	row, err := conn.QueryRow(ctx, `
 		SELECT
-			JSON_OBJECT('proc_num' VALUE COUNT(*))
+			JSON_OBJECT('datafile_num' VALUE COUNT(*))
 		FROM
-			V$PROCESS
+			V$DATAFILE
 	`)
 	if err != nil {
-		return nil, zbxerr.ErrorCannotFetchData.Wrap(err)
+		return nil, errs.WrapConst(err, zbxerr.ErrorCannotFetchData) //nolint:wrapcheck
 	}
 
-	err = row.Scan(&proc)
+	err = row.Scan(&datafiles)
 	if err != nil {
-		return nil, zbxerr.ErrorCannotFetchData.Wrap(err)
+		return nil, errs.WrapConst(err, zbxerr.ErrorCannotFetchData) //nolint:wrapcheck
 	}
 
-	return proc, nil
+	return datafiles, nil
 }

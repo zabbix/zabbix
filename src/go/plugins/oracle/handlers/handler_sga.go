@@ -12,17 +12,21 @@
 ** If not, see <https://www.gnu.org/licenses/>.
 **/
 
-package oracle
+package handlers
 
 import (
 	"context"
 
+	"golang.zabbix.com/agent2/plugins/oracle/dbconn"
+	"golang.zabbix.com/sdk/errs"
 	"golang.zabbix.com/sdk/zbxerr"
 )
 
-func sgaHandler(ctx context.Context, conn OraClient, params map[string]string, _ ...string) (interface{}, error) {
-	var SGA string
+// SgaHandler function works with System Global Area (SGA) statistics.
+func SgaHandler(ctx context.Context, conn dbconn.OraClient, _ map[string]string, _ ...string) (any, error) {
+	var sga string
 
+	//nolint:lll
 	row, err := conn.QueryRow(ctx, `
 		SELECT
 			JSON_OBJECTAGG(v.POOL VALUE v.BYTES)
@@ -89,13 +93,13 @@ func sgaHandler(ctx context.Context, conn OraClient, params map[string]string, _
 			) v
 	`)
 	if err != nil {
-		return nil, zbxerr.ErrorCannotFetchData.Wrap(err)
+		return nil, errs.WrapConst(err, zbxerr.ErrorCannotFetchData) //nolint:wrapcheck
 	}
 
-	err = row.Scan(&SGA)
+	err = row.Scan(&sga)
 	if err != nil {
-		return nil, zbxerr.ErrorCannotFetchData.Wrap(err)
+		return nil, errs.WrapConst(err, zbxerr.ErrorCannotFetchData) //nolint:wrapcheck
 	}
 
-	return SGA, nil
+	return sga, nil
 }

@@ -12,16 +12,19 @@
 ** If not, see <https://www.gnu.org/licenses/>.
 **/
 
-package oracle
+package handlers
 
 import (
 	"context"
 
+	"golang.zabbix.com/agent2/plugins/oracle/dbconn"
+	"golang.zabbix.com/sdk/errs"
 	"golang.zabbix.com/sdk/zbxerr"
 )
 
-func sysParamsHandler(ctx context.Context, conn OraClient, params map[string]string, _ ...string) (interface{}, error) {
-	var sysparams string
+// SysParamsHandler function works with system parameter values.
+func SysParamsHandler(ctx context.Context, conn dbconn.OraClient, _ map[string]string, _ ...string) (any, error) {
+	var sysParams string
 
 	row, err := conn.QueryRow(ctx, `
 		SELECT
@@ -32,13 +35,13 @@ func sysParamsHandler(ctx context.Context, conn OraClient, params map[string]str
 			NAME IN ('sessions', 'processes', 'db_files')
 	`)
 	if err != nil {
-		return nil, zbxerr.ErrorCannotFetchData.Wrap(err)
+		return nil, errs.WrapConst(err, zbxerr.ErrorCannotFetchData) //nolint:wrapcheck
 	}
 
-	err = row.Scan(&sysparams)
+	err = row.Scan(&sysParams)
 	if err != nil {
-		return nil, zbxerr.ErrorCannotFetchData.Wrap(err)
+		return nil, errs.WrapConst(err, zbxerr.ErrorCannotFetchData) //nolint:wrapcheck
 	}
 
-	return sysparams, nil
+	return sysParams, nil
 }

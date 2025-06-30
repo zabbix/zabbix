@@ -12,51 +12,52 @@
 ** If not, see <https://www.gnu.org/licenses/>.
 **/
 
-package oracle
+package handlers
 
 import (
+	"context"
 	"fmt"
 	"strings"
-	"context"
 
+	"golang.zabbix.com/agent2/plugins/oracle/dbconn"
 	"golang.zabbix.com/sdk/errs"
 	"golang.zabbix.com/sdk/zbxerr"
 )
 
-func pdbHandler(ctx context.Context, conn OraClient, params map[string]string, _ ...string) (interface{}, error) {
-	var PDBInfo string
+// PdbHandler function works with Pluggable Databases (PDBs) information.
+func PdbHandler(ctx context.Context, conn dbconn.OraClient, params map[string]string, _ ...string) (any, error) {
+	var pdbInfo string
 
-	connname := params["Database"]
+	connName := params["Database"]
 
-	// Check if first character is numeric
-	var conntype string
-	if connname != "" && strings.ToUpper(connname)[0] < 65 {
-		conntype = "CON_ID"
+	// Check if the first character is numeric
+	var connType string
+	if connName != "" && strings.ToUpper(connName)[0] < 65 {
+		connType = "CON_ID"
 	} else {
-		conntype = "NAME"
+		connType = "NAME"
 	}
 
-	query, args := getPDBQuery(conntype, connname)
+	query, args := getPDBQuery(connType, connName)
 
 	row, err := conn.QueryRow(ctx, query, args...)
 	if err != nil {
-		return nil, errs.WrapConst(err, zbxerr.ErrorCannotFetchData)
-
+		return nil, errs.WrapConst(err, zbxerr.ErrorCannotFetchData) //nolint:wrapcheck
 	}
 
-	err = row.Scan(&PDBInfo)
+	err = row.Scan(&pdbInfo)
 	if err != nil {
-		return nil, errs.WrapConst(err, zbxerr.ErrorCannotFetchData)
+		return nil, errs.WrapConst(err, zbxerr.ErrorCannotFetchData) //nolint:wrapcheck
 	}
 
-	if PDBInfo == "" {
-		PDBInfo = "[]"
+	if pdbInfo == "" {
+		pdbInfo = "[]"
 	}
 
-	return PDBInfo, nil
+	return pdbInfo, nil
 }
 
-func getPDBQuery(conntype, name string) (string, []any) {
+func getPDBQuery(connType, name string) (string, []any) {
 	const query = `
 	SELECT
 		JSON_ARRAYAGG(
@@ -83,7 +84,7 @@ func getPDBQuery(conntype, name string) (string, []any) {
 			V$PDBS`
 
 	if name != "" {
-		return fmt.Sprintf(`%s WHERE %s = :1`, query, conntype), []any{name}
+		return fmt.Sprintf(`%s WHERE %s = :1`, query, connType), []any{name}
 	}
 
 	return query, nil

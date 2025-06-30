@@ -12,13 +12,14 @@
 ** If not, see <https://www.gnu.org/licenses/>.
 **/
 
-package oracle
+package handlers
 
 import (
 	"context"
 	"fmt"
 	"strings"
 
+	"golang.zabbix.com/agent2/plugins/oracle/dbconn"
 	"golang.zabbix.com/sdk/errs"
 	"golang.zabbix.com/sdk/zbxerr"
 )
@@ -31,9 +32,10 @@ const (
 	defaultTEMPTS = "TEMP"
 )
 
-func tablespacesHandler(ctx context.Context, conn OraClient, params map[string]string,
-	_ ...string) (interface{}, error) {
-	var tablespaces string
+// TablespacesHandler function works with tablespace statistics.
+func TablespacesHandler(ctx context.Context, conn dbconn.OraClient, params map[string]string,
+	_ ...string) (any, error) {
+	var tableSpaces string
 
 	query, args, err := getTablespacesQuery(params)
 	if err != nil {
@@ -42,59 +44,61 @@ func tablespacesHandler(ctx context.Context, conn OraClient, params map[string]s
 
 	row, err := conn.QueryRow(ctx, query, args...)
 	if err != nil {
-		return nil, errs.WrapConst(err, zbxerr.ErrorCannotFetchData)
+		return nil, errs.WrapConst(err, zbxerr.ErrorCannotFetchData) //nolint:wrapcheck
 	}
 
-	err = row.Scan(&tablespaces)
+	err = row.Scan(&tableSpaces)
 	if err != nil {
-		return nil, errs.WrapConst(err, zbxerr.ErrorCannotFetchData)
+		return nil, errs.WrapConst(err, zbxerr.ErrorCannotFetchData) //nolint:wrapcheck
 	}
 
 	// Add leading zeros for floats: ".03" -> "0.03".
 	// Oracle JSON functions are not RFC 4627 compliant.
 	// There should be a better way to do that, but I haven't come up with it ¯\_(ツ)_/¯
-	tablespaces = strings.ReplaceAll(tablespaces, "\":.", "\":0.")
+	tableSpaces = strings.ReplaceAll(tableSpaces, "\":.", "\":0.")
 
-	return tablespaces, nil
+	return tableSpaces, nil
 }
 
+//nolint:gocyclo,cyclop
 func getTablespacesQuery(params map[string]string) (string, []any, error) {
 	ts := params["Tablespace"]
 	t := params["Type"]
-	conn := params["Conname"]
+	connName := params["Conname"]
 
-	// Check if first character is numeric
-	var conntype string
-	if conn != "" && strings.ToUpper(conn)[0] < 65 {
-		conntype = "CON_ID"
+	// Check if the first character is numeric
+	var connType string
+	if connName != "" && strings.ToUpper(connName)[0] < 65 {
+		connType = "CON_ID"
 	} else {
-		conntype = "CON$NAME"
+		connType = "CON$NAME"
 	}
 
 	if ts == "" && t == "" {
-		if conn == "" {
+		if connName == "" {
 			return getFullQuery(), nil, nil
 		}
 
-		return getFullQueryConn(conntype), []any{conn, conn}, nil
+		return getFullQueryConn(connType), []any{connName, connName}, nil
 	}
 
 	var err error
 	ts, t, err = prepValues(ts, t)
+
 	if err != nil {
-		return "", nil, errs.WrapConst(err, zbxerr.ErrorInvalidParams)
+		return "", nil, errs.WrapConst(err, zbxerr.ErrorInvalidParams) //nolint:wrapcheck
 	}
 
 	switch t {
 	case perm, undo:
-		if conn != "" {
-			return getPermQueryConnPart(conntype), []any{conn, ts}, nil
+		if connName != "" {
+			return getPermQueryConnPart(connType), []any{connName, ts}, nil
 		}
 
 		return getPermQueryPart(), []any{ts}, nil
 	case temp:
-		if conn != "" {
-			return getTempQueryConnPart(conntype), []any{conn, ts}, nil
+		if connName != "" {
+			return getTempQueryConnPart(connType), []any{connName, ts}, nil
 		}
 
 		return getTempQueryPart(), []any{ts}, nil
@@ -103,24 +107,24 @@ func getTablespacesQuery(params map[string]string) (string, []any, error) {
 	}
 }
 
-func prepValues(ts, t string) (outTableSpace string, outType string, err error) {
-	if ts != "" && t != "" {
-		return ts, t, nil
+func prepValues(tableSpace, tableType string) (string, string, error) {
+	if tableSpace != "" && tableType != "" {
+		return tableSpace, tableType, nil
 	}
 
-	if ts == "" {
-		if t == perm {
-			return defaultPERMTS, t, nil
+	if tableSpace == "" {
+		if tableType == perm {
+			return defaultPERMTS, tableType, nil
 		}
 
-		if t == temp {
-			return defaultTEMPTS, t, nil
+		if tableType == temp {
+			return defaultTEMPTS, tableType, nil
 		}
 
-		return "", "", errs.Errorf("incorrect type %s", t)
+		return "", "", errs.Errorf("incorrect type %s", tableType)
 	}
 
-	return ts, perm, nil
+	return tableSpace, perm, nil
 }
 
 func getFullQuery() string {
@@ -258,7 +262,7 @@ FROM (SELECT df.CON_NAME,
 GROUP BY CON_NAME`
 }
 
-func getFullQueryConn(conntype string) string {
+func getFullQueryConn(connType string) string {
 	return fmt.Sprintf(`
 SELECT JSON_ARRAYAGG(
                JSON_OBJECT(TABLESPACE_NAME VALUE
@@ -385,7 +389,7 @@ FROM (SELECT df.TABLESPACE_NAME                  AS TABLESPACE_NAME,
       GROUP BY Y.CON_NAME,
                Y.NAME,
                Y.CONTENTS,
-               Y.STATUS)`, conntype, conntype)
+               Y.STATUS)`, connType, connType)
 }
 
 func getPermQueryPart() string {
@@ -545,7 +549,7 @@ FROM (SELECT Y.CON_NAME,
 GROUP BY CON_NAME`
 }
 
-func getPermQueryConnPart(conntype string) string {
+func getPermQueryConnPart(connType string) string {
 	return fmt.Sprintf(`
 SELECT JSON_ARRAYAGG(
                JSON_OBJECT(
@@ -608,10 +612,10 @@ FROM (SELECT df.TABLESPACE_NAME                  AS TABLESPACE_NAME,
       GROUP BY df.CON_NAME,
                df.TABLESPACE_NAME,
                df.CONTENTS,
-               df.STATUS)`, conntype)
+               df.STATUS)`, connType)
 }
 
-func getTempQueryConnPart(conntype string) string {
+func getTempQueryConnPart(connType string) string {
 	return fmt.Sprintf(`
 SELECT JSON_ARRAYAGG(
                JSON_OBJECT(
@@ -689,5 +693,5 @@ FROM (SELECT Y.NAME                                   AS TABLESPACE_NAME,
               AND ctf.CON_ID = ct.CON_ID
               AND (ct.%s = :1 or (ct.CON$NAME is null and ct.CON_ID = 0))
               AND ctf.TABLESPACE_NAME = :2) Y
-      GROUP BY Y.CON_NAME, Y.NAME, Y.CONTENTS, Y.STATUS)`, conntype)
+      GROUP BY Y.CON_NAME, Y.NAME, Y.CONTENTS, Y.STATUS)`, connType)
 }

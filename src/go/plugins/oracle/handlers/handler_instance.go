@@ -12,15 +12,18 @@
 ** If not, see <https://www.gnu.org/licenses/>.
 **/
 
-package oracle
+package handlers
 
 import (
 	"context"
 
+	"golang.zabbix.com/agent2/plugins/oracle/dbconn"
+	"golang.zabbix.com/sdk/errs"
 	"golang.zabbix.com/sdk/zbxerr"
 )
 
-func instanceHandler(ctx context.Context, conn OraClient, params map[string]string, _ ...string) (interface{}, error) {
+// InstanceHandler function works with instance statistics.
+func InstanceHandler(ctx context.Context, conn dbconn.OraClient, _ map[string]string, _ ...string) (any, error) {
 	var instanceStats string
 
 	row, err := conn.QueryRow(ctx, `
@@ -38,12 +41,12 @@ func instanceHandler(ctx context.Context, conn OraClient, params map[string]stri
 			V$INSTANCE
 	`)
 	if err != nil {
-		return nil, zbxerr.ErrorCannotFetchData.Wrap(err)
+		return nil, errs.WrapConst(err, zbxerr.ErrorCannotFetchData) //nolint:wrapcheck
 	}
 
 	err = row.Scan(&instanceStats)
 	if err != nil {
-		return nil, zbxerr.ErrorCannotFetchData.Wrap(err)
+		return nil, errs.WrapConst(err, zbxerr.ErrorCannotFetchData) //nolint:wrapcheck
 	}
 
 	return instanceStats, nil

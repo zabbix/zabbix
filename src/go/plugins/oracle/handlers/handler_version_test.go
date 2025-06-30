@@ -12,7 +12,7 @@
 ** If not, see <https://www.gnu.org/licenses/>.
 **/
 
-package oracle
+package handlers
 
 import (
 	"context"
@@ -22,18 +22,19 @@ import (
 
 	"github.com/DATA-DOG/go-sqlmock"
 	"github.com/google/go-cmp/cmp"
+	"golang.zabbix.com/agent2/plugins/oracle/dbconn"
 )
 
-var _ OraClient = (*mockOraClient)(nil)
+var _ dbconn.OraClient = (*mockOraClient)(nil)
 
 type mockOraClient struct {
-	OraClient
+	dbconn.OraClient
 	db  *sql.DB
 	err error
 }
 
 func (m *mockOraClient) QueryRow(
-	ctx context.Context, query string, args ...interface{},
+	ctx context.Context, query string, args ...any,
 ) (*sql.Row, error) {
 	if m.err != nil {
 		return nil, m.err
@@ -54,7 +55,7 @@ func Test_versionHandler(t *testing.T) {
 	tests := []struct {
 		name    string
 		db      db
-		want    interface{}
+		want    any
 		wantErr bool
 	}{
 		{
@@ -103,15 +104,15 @@ func Test_versionHandler(t *testing.T) {
 				).
 				WillReturnError(tt.db.err)
 
-			got, err := versionHandler(context.Background(), mockClient, nil)
+			got, err := VersionHandler(context.Background(), mockClient, nil)
 			if (err != nil) != tt.wantErr {
 				t.Fatalf(
-					"versionHandler() error = %v, wantErr %v", err, tt.wantErr,
+					"VersionHandler() error = %v, wantErr %v", err, tt.wantErr,
 				)
 			}
 
 			if diff := cmp.Diff(tt.want, got); diff != "" {
-				t.Fatalf("versionHandler() = %s", diff)
+				t.Fatalf("VersionHandler() = %s", diff)
 			}
 
 			if err := m.ExpectationsWereMet(); err != nil {

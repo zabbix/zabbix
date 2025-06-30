@@ -12,17 +12,21 @@
 ** If not, see <https://www.gnu.org/licenses/>.
 **/
 
-package oracle
+package handlers
 
 import (
 	"context"
 
+	"golang.zabbix.com/agent2/plugins/oracle/dbconn"
+	"golang.zabbix.com/sdk/errs"
 	"golang.zabbix.com/sdk/zbxerr"
 )
 
-func fraHandler(ctx context.Context, conn OraClient, params map[string]string, _ ...string) (interface{}, error) {
-	var FRA string
+// FraHandler function works with Fast Recovery Area (FRA) statistics.
+func FraHandler(ctx context.Context, conn dbconn.OraClient, _ map[string]string, _ ...string) (any, error) {
+	var fra string
 
+	//nolint:lll
 	row, err := conn.QueryRow(ctx, `
 		SELECT
 			JSON_OBJECTAGG(v.METRIC VALUE v.VALUE)
@@ -92,13 +96,13 @@ func fraHandler(ctx context.Context, conn OraClient, params map[string]string, _
 			) v
 	`)
 	if err != nil {
-		return nil, zbxerr.ErrorCannotFetchData.Wrap(err)
+		return nil, errs.WrapConst(err, zbxerr.ErrorCannotFetchData) //nolint:wrapcheck
 	}
 
-	err = row.Scan(&FRA)
+	err = row.Scan(&fra)
 	if err != nil {
-		return nil, zbxerr.ErrorCannotFetchData.Wrap(err)
+		return nil, errs.WrapConst(err, zbxerr.ErrorCannotFetchData) //nolint:wrapcheck
 	}
 
-	return FRA, nil
+	return fra, nil
 }

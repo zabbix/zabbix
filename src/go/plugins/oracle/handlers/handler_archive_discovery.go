@@ -12,38 +12,46 @@
 ** If not, see <https://www.gnu.org/licenses/>.
 **/
 
-package oracle
+package handlers
 
 import (
 	"context"
 
+	"golang.zabbix.com/agent2/plugins/oracle/dbconn"
+	"golang.zabbix.com/sdk/errs"
 	"golang.zabbix.com/sdk/zbxerr"
 )
 
-func tablespacesDiscoveryHandler(ctx context.Context, conn OraClient, params map[string]string,
-	_ ...string) (interface{}, error) {
+// ArchiveDiscoveryHandler function works with an archive logs list.
+func ArchiveDiscoveryHandler(ctx context.Context, conn dbconn.OraClient, _ map[string]string,
+	_ ...string) (any, error) {
 	var lld string
 
 	row, err := conn.QueryRow(ctx, `
 		SELECT
 			JSON_ARRAYAGG(
 				JSON_OBJECT(
-					'{#TABLESPACE}' VALUE TABLESPACE_NAME, 
-					'{#CONTENTS}'   VALUE CONTENTS,
-					'{#CON_NAME}' 	VALUE NVL(CON$NAME, 'DB'),
-					'{#CON_ID}'		VALUE CON_ID
+					'{#DEST_NAME}' VALUE d.DEST_NAME
 				) RETURNING CLOB 
 			) LLD
 		FROM
-			CDB_TABLESPACES
+			V$ARCHIVE_DEST d,
+			V$DATABASE db
+		WHERE
+			d.STATUS != 'INACTIVE'
+			AND db.LOG_MODE = 'ARCHIVELOG'
 	`)
 	if err != nil {
-		return nil, zbxerr.ErrorCannotFetchData.Wrap(err)
+		return nil, errs.WrapConst(err, zbxerr.ErrorCannotFetchData) //nolint:wrapcheck
 	}
 
 	err = row.Scan(&lld)
 	if err != nil {
-		return nil, zbxerr.ErrorCannotFetchData.Wrap(err)
+		return nil, errs.WrapConst(err, zbxerr.ErrorCannotFetchData) //nolint:wrapcheck
+	}
+
+	if lld == "" {
+		lld = "[]"
 	}
 
 	return lld, nil

@@ -12,32 +12,36 @@
 ** If not, see <https://www.gnu.org/licenses/>.
 **/
 
-package oracle
+package handlers
 
 import (
 	"context"
 	"fmt"
+
+	"golang.zabbix.com/agent2/plugins/oracle/dbconn"
 )
 
 const (
-	pingFailed = 0
-	pingOk     = 1
+	// PingFailed means that server is not reachable. this value is returned on eny error.
+	PingFailed = 0
+	// PingOk means that server is reachable.
+	PingOk = 1
 )
 
-// pingHandler queries 'SELECT 1 FROM DUAL' and returns pingOk if a connection is alive or pingFailed otherwise.
-func pingHandler(ctx context.Context, conn OraClient, params map[string]string, _ ...string) (interface{}, error) {
+// PingHandler runs 'SELECT 1 FROM DUAL' and returns PingOk if a connection is alive or PingFailed otherwise.
+func PingHandler(ctx context.Context, conn dbconn.OraClient, _ map[string]string, _ ...string) (any, error) {
 	var res int
 
-	row, err := conn.QueryRow(ctx, fmt.Sprintf("SELECT %d FROM DUAL", pingOk))
+	row, err := conn.QueryRow(ctx, fmt.Sprintf("SELECT %d FROM DUAL", PingOk))
 	if err != nil {
-		return pingFailed, nil
+		return PingFailed, nil //nolint:nilerr
 	}
 
 	err = row.Scan(&res)
 
-	if err != nil || res != pingOk {
-		return pingFailed, nil
+	if err != nil || res != PingOk {
+		return PingFailed, nil //nolint:nilerr
 	}
 
-	return pingOk, nil
+	return PingOk, nil
 }

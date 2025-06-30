@@ -12,20 +12,24 @@
 ** If not, see <https://www.gnu.org/licenses/>.
 **/
 
-package oracle
+package handlers
 
 import (
 	"context"
 
+	"golang.zabbix.com/agent2/plugins/oracle/dbconn"
+	"golang.zabbix.com/sdk/errs"
 	"golang.zabbix.com/sdk/zbxerr"
 )
 
-func sessionsHandler(ctx context.Context, conn OraClient, params map[string]string, _ ...string) (interface{}, error) {
+// SessionsHandler function works with sessions' statistics.
+func SessionsHandler(ctx context.Context, conn dbconn.OraClient, params map[string]string, _ ...string) (any, error) {
 	var (
 		sessions string
 		err      error
 	)
 
+	//nolint:lll
 	row, err := conn.QueryRow(ctx, `
 		SELECT
 			JSON_OBJECTAGG(v.METRIC VALUE v.VALUE)
@@ -119,12 +123,12 @@ func sessionsHandler(ctx context.Context, conn OraClient, params map[string]stri
 			) v
 	`, params["LockMaxTime"])
 	if err != nil {
-		return nil, zbxerr.ErrorCannotFetchData.Wrap(err)
+		return nil, errs.WrapConst(err, zbxerr.ErrorCannotFetchData) //nolint:wrapcheck
 	}
 
 	err = row.Scan(&sessions)
 	if err != nil {
-		return nil, zbxerr.ErrorCannotFetchData.Wrap(err)
+		return nil, errs.WrapConst(err, zbxerr.ErrorCannotFetchData) //nolint:wrapcheck
 	}
 
 	return sessions, nil

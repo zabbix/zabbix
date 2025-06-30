@@ -12,45 +12,44 @@
 ** If not, see <https://www.gnu.org/licenses/>.
 **/
 
-package oracle
+package handlers
 
 import (
 	"context"
-	"database/sql"
 
+	"golang.zabbix.com/agent2/plugins/oracle/dbconn"
+	"golang.zabbix.com/sdk/errs"
 	"golang.zabbix.com/sdk/zbxerr"
 )
 
-func userHandler(ctx context.Context, conn OraClient, params map[string]string, _ ...string) (interface{}, error) {
-	var userinfo string
-
-	username := conn.WhoAmI()
-	if params["Username"] != "" {
-		username = params["Username"]
-	}
+// DatabasesDiscoveryHandler function works with a list of databases.
+func DatabasesDiscoveryHandler(ctx context.Context, conn dbconn.OraClient, _ map[string]string,
+	_ ...string) (any, error) {
+	var lld string
 
 	row, err := conn.QueryRow(ctx, `
 		SELECT
-			JSON_OBJECT('exp_passwd_days_before' VALUE 
-				ROUND(DECODE(SIGN(NVL(EXPIRY_DATE, SYSDATE + 999) - SYSDATE), -1, 0, NVL(EXPIRY_DATE, SYSDATE + 999) - SYSDATE))
-			)
+			JSON_ARRAYAGG(
+				JSON_OBJECT(
+					'{#DBNAME}' VALUE NAME, 
+					'{#TYPE}'   VALUE DECODE(CDB, 'YES', 'CDB', 'No-CDB')
+				)
+			) LLD
 		FROM
-			DBA_USERS	
-		WHERE 
-			USERNAME = UPPER(:1)
-	`, username)
+			V$DATABASE
+	`)
 	if err != nil {
-		return nil, zbxerr.ErrorCannotFetchData.Wrap(err)
+		return nil, errs.WrapConst(err, zbxerr.ErrorCannotFetchData) //nolint:wrapcheck
 	}
 
-	err = row.Scan(&userinfo)
+	err = row.Scan(&lld)
 	if err != nil {
-		if err == sql.ErrNoRows {
-			return nil, zbxerr.ErrorEmptyResult.Wrap(err)
-		}
-
-		return nil, zbxerr.ErrorCannotFetchData.Wrap(err)
+		return nil, errs.WrapConst(err, zbxerr.ErrorCannotFetchData) //nolint:wrapcheck
 	}
 
-	return userinfo, nil
+	if lld == "" {
+		lld = "[]"
+	}
+
+	return lld, nil
 }

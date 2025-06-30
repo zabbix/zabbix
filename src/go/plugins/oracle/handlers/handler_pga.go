@@ -12,41 +12,34 @@
 ** If not, see <https://www.gnu.org/licenses/>.
 **/
 
-package oracle
+package handlers
 
 import (
 	"context"
 
+	"golang.zabbix.com/agent2/plugins/oracle/dbconn"
+	"golang.zabbix.com/sdk/errs"
 	"golang.zabbix.com/sdk/zbxerr"
 )
 
-func pdbDiscoveryHandler(ctx context.Context, conn OraClient, params map[string]string,
-	_ ...string) (interface{}, error) {
-	var lld string
+// PgaHandler function works with Program Global Area (PGA) statistics.
+func PgaHandler(ctx context.Context, conn dbconn.OraClient, _ map[string]string, _ ...string) (any, error) {
+	var pga string
 
 	row, err := conn.QueryRow(ctx, `
 		SELECT
-			JSON_ARRAYAGG(
-				JSON_OBJECT(
-					'{#DBNAME}' VALUE NAME,
-					'{#CON_ID}' VALUE CON_ID
-				)
-			) LLD
+			JSON_OBJECTAGG(v.NAME VALUE v.VALUE)
 		FROM
-			V$PDBS
+			V$PGASTAT v
 	`)
 	if err != nil {
-		return nil, zbxerr.ErrorCannotFetchData.Wrap(err)
+		return nil, errs.WrapConst(err, zbxerr.ErrorCannotFetchData) //nolint:wrapcheck
 	}
 
-	err = row.Scan(&lld)
+	err = row.Scan(&pga)
 	if err != nil {
-		return nil, zbxerr.ErrorCannotFetchData.Wrap(err)
+		return nil, errs.WrapConst(err, zbxerr.ErrorCannotFetchData) //nolint:wrapcheck
 	}
 
-	if lld == "" {
-		lld = "[]"
-	}
-
-	return lld, nil
+	return pga, nil
 }

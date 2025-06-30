@@ -12,29 +12,31 @@
 ** If not, see <https://www.gnu.org/licenses/>.
 **/
 
-package oracle
+package handlers
 
 import (
 	"context"
 
+	"golang.zabbix.com/agent2/plugins/oracle/dbconn"
 	"golang.zabbix.com/sdk/errs"
 	"golang.zabbix.com/sdk/zbxerr"
 )
 
-func asmDiskGroupsHandler(ctx context.Context, conn OraClient, params map[string]string,
-	_ ...string) (interface{}, error) {
+// AsmDiskGroupsHandler function works with  Automatic Storage Management statistics.
+func AsmDiskGroupsHandler(ctx context.Context, conn dbconn.OraClient, params map[string]string,
+	_ ...string) (any, error) {
 	var diskGroups string
 
-	query, args := getDiskGRoupQuery(params["Diskgroup"])
+	query, args := getDiskGroupQuery(params["Diskgroup"])
 
 	row, err := conn.QueryRow(ctx, query, args...)
 	if err != nil {
-		return nil, errs.WrapConst(err, zbxerr.ErrorCannotFetchData)
+		return nil, errs.WrapConst(err, zbxerr.ErrorCannotFetchData) //nolint:wrapcheck
 	}
 
 	err = row.Scan(&diskGroups)
 	if err != nil {
-		return nil, errs.WrapConst(err, zbxerr.ErrorCannotFetchData)
+		return nil, errs.WrapConst(err, zbxerr.ErrorCannotFetchData) //nolint:wrapcheck
 	}
 
 	if diskGroups == "" {
@@ -44,7 +46,7 @@ func asmDiskGroupsHandler(ctx context.Context, conn OraClient, params map[string
 	return diskGroups, nil
 }
 
-func getDiskGRoupQuery(name string) (string, []any) {
+func getDiskGroupQuery(name string) (string, []any) {
 	const query = `
 	SELECT
 		JSON_ARRAYAGG(

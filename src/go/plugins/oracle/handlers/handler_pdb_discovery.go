@@ -12,31 +12,44 @@
 ** If not, see <https://www.gnu.org/licenses/>.
 **/
 
-package oracle
+package handlers
 
 import (
 	"context"
 
+	"golang.zabbix.com/agent2/plugins/oracle/dbconn"
+	"golang.zabbix.com/sdk/errs"
 	"golang.zabbix.com/sdk/zbxerr"
 )
 
-func pgaHandler(ctx context.Context, conn OraClient, params map[string]string, _ ...string) (interface{}, error) {
-	var PGA string
+// PdbDiscoveryHandler function works with Pluggable Databases (PDBs) list.
+func PdbDiscoveryHandler(ctx context.Context, conn dbconn.OraClient, _ map[string]string,
+	_ ...string) (any, error) {
+	var lld string
 
 	row, err := conn.QueryRow(ctx, `
 		SELECT
-			JSON_OBJECTAGG(v.NAME VALUE v.VALUE)
+			JSON_ARRAYAGG(
+				JSON_OBJECT(
+					'{#DBNAME}' VALUE NAME,
+					'{#CON_ID}' VALUE CON_ID
+				)
+			) LLD
 		FROM
-			V$PGASTAT v
+			V$PDBS
 	`)
 	if err != nil {
-		return nil, zbxerr.ErrorCannotFetchData.Wrap(err)
+		return nil, errs.WrapConst(err, zbxerr.ErrorCannotFetchData) //nolint:wrapcheck
 	}
 
-	err = row.Scan(&PGA)
+	err = row.Scan(&lld)
 	if err != nil {
-		return nil, zbxerr.ErrorCannotFetchData.Wrap(err)
+		return nil, errs.WrapConst(err, zbxerr.ErrorCannotFetchData) //nolint:wrapcheck
 	}
 
-	return PGA, nil
+	if lld == "" {
+		lld = "[]"
+	}
+
+	return lld, nil
 }

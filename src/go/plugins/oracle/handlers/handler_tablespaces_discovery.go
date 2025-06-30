@@ -12,39 +12,41 @@
 ** If not, see <https://www.gnu.org/licenses/>.
 **/
 
-package oracle
+package handlers
 
 import (
 	"context"
 
+	"golang.zabbix.com/agent2/plugins/oracle/dbconn"
+	"golang.zabbix.com/sdk/errs"
 	"golang.zabbix.com/sdk/zbxerr"
 )
 
-func asmDiskGroupsDiscovery(ctx context.Context, conn OraClient, params map[string]string,
-	_ ...string) (interface{}, error) {
+// TablespacesDiscoveryHandler function works with a tablespaces list.
+func TablespacesDiscoveryHandler(ctx context.Context, conn dbconn.OraClient, _ map[string]string,
+	_ ...string) (any, error) {
 	var lld string
 
 	row, err := conn.QueryRow(ctx, `
 		SELECT
 			JSON_ARRAYAGG(
 				JSON_OBJECT(
-					'{#DGNAME}' VALUE NAME
+					'{#TABLESPACE}' VALUE TABLESPACE_NAME, 
+					'{#CONTENTS}'   VALUE CONTENTS,
+					'{#CON_NAME}' 	VALUE NVL(CON$NAME, 'DB'),
+					'{#CON_ID}'		VALUE CON_ID
 				) RETURNING CLOB 
 			) LLD
 		FROM
-			V$ASM_DISKGROUP
+			CDB_TABLESPACES
 	`)
 	if err != nil {
-		return nil, zbxerr.ErrorCannotFetchData.Wrap(err)
+		return nil, errs.WrapConst(err, zbxerr.ErrorCannotFetchData) //nolint:wrapcheck
 	}
 
 	err = row.Scan(&lld)
 	if err != nil {
-		return nil, zbxerr.ErrorCannotFetchData.Wrap(err)
-	}
-
-	if lld == "" {
-		lld = "[]"
+		return nil, errs.WrapConst(err, zbxerr.ErrorCannotFetchData) //nolint:wrapcheck
 	}
 
 	return lld, nil

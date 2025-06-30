@@ -12,12 +12,14 @@
 ** If not, see <https://www.gnu.org/licenses/>.
 **/
 
-package oracle
+package handlers
 
 import (
 	"context"
 	"strings"
 
+	"golang.zabbix.com/agent2/plugins/oracle/dbconn"
+	"golang.zabbix.com/sdk/errs"
 	"golang.zabbix.com/sdk/zbxerr"
 )
 
@@ -26,11 +28,12 @@ const (
 	duration15sec = "3"
 )
 
-func sysMetricsHandler(ctx context.Context, conn OraClient, params map[string]string,
-	_ ...string) (interface{}, error) {
+// SysMetricsHandler function works with system metric values.
+func SysMetricsHandler(ctx context.Context, conn dbconn.OraClient, params map[string]string,
+	_ ...string) (any, error) {
 	var (
-		sysmetrics string
-		groupID    = duration60sec
+		sysMetrics string
+		groupID    string
 	)
 
 	switch params["Duration"] {
@@ -51,18 +54,18 @@ func sysMetricsHandler(ctx context.Context, conn OraClient, params map[string]st
 			GROUP_ID = :1
 	`, groupID)
 	if err != nil {
-		return nil, zbxerr.ErrorCannotFetchData.Wrap(err)
+		return nil, errs.WrapConst(err, zbxerr.ErrorCannotFetchData) //nolint:wrapcheck
 	}
 
-	err = row.Scan(&sysmetrics)
+	err = row.Scan(&sysMetrics)
 	if err != nil {
-		return nil, zbxerr.ErrorCannotFetchData.Wrap(err)
+		return nil, errs.WrapConst(err, zbxerr.ErrorCannotFetchData) //nolint:wrapcheck
 	}
 
 	// Add leading zeros for floats: ".03" -> "0.03".
 	// Oracle JSON functions are not RFC 4627 compliant.
 	// There should be a better way to do that, but I haven't come up with it ¯\_(ツ)_/¯
-	sysmetrics = strings.ReplaceAll(sysmetrics, "\":.", "\":0.")
+	sysMetrics = strings.ReplaceAll(sysMetrics, "\":.", "\":0.")
 
-	return sysmetrics, nil
+	return sysMetrics, nil
 }

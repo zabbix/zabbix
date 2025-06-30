@@ -12,36 +12,43 @@
 ** If not, see <https://www.gnu.org/licenses/>.
 **/
 
-package oracle
+package handlers
 
 import (
 	"context"
 
+	"golang.zabbix.com/agent2/plugins/oracle/dbconn"
+	"golang.zabbix.com/sdk/errs"
 	"golang.zabbix.com/sdk/zbxerr"
 )
 
-// versionHandler queries the db server for version.
-func versionHandler(
-	ctx context.Context, conn OraClient, _ map[string]string, _ ...string,
-) (any, error) {
-	const query = `SELECT VERSION_FULL FROM V$INSTANCE`
+// AsmDiskGroupsDiscovery function works with  Automatic Storage Management list.
+func AsmDiskGroupsDiscovery(ctx context.Context, conn dbconn.OraClient, _ map[string]string,
+	_ ...string) (any, error) {
+	var lld string
 
-	row, err := conn.QueryRow(ctx, query)
+	row, err := conn.QueryRow(ctx, `
+		SELECT
+			JSON_ARRAYAGG(
+				JSON_OBJECT(
+					'{#DGNAME}' VALUE NAME
+				) RETURNING CLOB 
+			) LLD
+		FROM
+			V$ASM_DISKGROUP
+	`)
 	if err != nil {
-		return nil, zbxerr.New("failed to query version").Wrap(err)
+		return nil, errs.WrapConst(err, zbxerr.ErrorCannotFetchData) //nolint:wrapcheck
 	}
 
-	var version string
-
-	err = row.Scan(&version)
+	err = row.Scan(&lld)
 	if err != nil {
-		return nil, zbxerr.New("failed scan version").Wrap(err)
+		return nil, errs.WrapConst(err, zbxerr.ErrorCannotFetchData) //nolint:wrapcheck
 	}
 
-	err = row.Err()
-	if err != nil {
-		return nil, zbxerr.New("failed to get version").Wrap(err)
+	if lld == "" {
+		lld = "[]"
 	}
 
-	return version, nil
+	return lld, nil
 }

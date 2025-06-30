@@ -12,35 +12,37 @@
 ** If not, see <https://www.gnu.org/licenses/>.
 **/
 
-package oracle
+package handlers
 
 import (
 	"context"
 
+	"golang.zabbix.com/agent2/plugins/oracle/dbconn"
 	"golang.zabbix.com/sdk/errs"
 	"golang.zabbix.com/sdk/zbxerr"
 )
 
-func cdbHandler(ctx context.Context, conn OraClient, params map[string]string, _ ...string) (interface{}, error) {
-	var CDBInfo string
+// CdbHandler function works with Container Databases (CDBs) info.
+func CdbHandler(ctx context.Context, conn dbconn.OraClient, params map[string]string, _ ...string) (any, error) {
+	var cdbInfo string
 
 	query, args := getCDBQuery(params["Database"])
 
 	row, err := conn.QueryRow(ctx, query, args...)
 	if err != nil {
-		return nil, errs.WrapConst(err, zbxerr.ErrorCannotFetchData)
+		return nil, errs.WrapConst(err, zbxerr.ErrorCannotFetchData) //nolint:wrapcheck
 	}
 
-	err = row.Scan(&CDBInfo)
+	err = row.Scan(&cdbInfo)
 	if err != nil {
-		return nil, errs.WrapConst(err, zbxerr.ErrorCannotFetchData)
+		return nil, errs.WrapConst(err, zbxerr.ErrorCannotFetchData) //nolint:wrapcheck
 	}
 
-	if CDBInfo == "" {
-		CDBInfo = "[]"
+	if cdbInfo == "" {
+		cdbInfo = "[]"
 	}
 
-	return CDBInfo, nil
+	return cdbInfo, nil
 }
 
 func getCDBQuery(name string) (string, []any) {
