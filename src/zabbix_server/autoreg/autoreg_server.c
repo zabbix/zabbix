@@ -312,52 +312,6 @@ void	zbx_autoreg_flush_hosts_server(zbx_vector_autoreg_host_ptr_t *autoreg_hosts
 	{
 		zbx_db_execute("%s", sql);
 		zbx_free(sql);
-		sql_alloc = 256;
-		sql_offset = 0;
-		sql = (char *)zbx_malloc(sql, sql_alloc);
-	}
-
-	for (int i = 0; i < autoreg_hosts->values_num; i++)
-	{
-		autoreg_host = autoreg_hosts->values[i];
-
-		if (0 == autoreg_host->autoreg_hostid || NULL == autoreg_host->ip || '\0' == *autoreg_host->ip)
-		{
-			continue;
-		}
-
-		if (autoreg_host->connection_type == ZBX_CONN_IP)
-		{
-			ip_esc = zbx_db_dyn_escape_string(autoreg_host->ip);
-
-			zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
-				"UPDATE interface "
-				"SET ip='%s', useip=%d, type=%u "
-				"WHERE hostid=" ZBX_FS_UI64 " AND port=%hu;\n",
-				ip_esc, 1, autoreg_host->connection_type,
-				autoreg_host->hostid, autoreg_host->port);
-
-			zbx_free(ip_esc);
-		}
-		else if (autoreg_host->connection_type == ZBX_CONN_DNS)
-		{
-			dns_esc = zbx_db_dyn_escape_string(autoreg_host->dns);
-
-			zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
-				"UPDATE interface "
-				"SET dns='%s', useip=%d, type=%u "
-				"WHERE hostid=" ZBX_FS_UI64 " AND port=%hu;\n",
-				dns_esc, 0, autoreg_host->connection_type,
-				autoreg_host->hostid, autoreg_host->port);
-
-			zbx_free(dns_esc);
-		}
-	}
-
-	if (0 < sql_offset)
-	{
-		zbx_db_execute("%s", sql);
-		zbx_free(sql);
 	}
 
 	zbx_vector_autoreg_host_ptr_sort(autoreg_hosts, compare_autoreg_host_by_hostid);
