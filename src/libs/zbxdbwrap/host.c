@@ -6020,7 +6020,7 @@ clean:
 
 /******************************************************************************
  *                                                                            *
- * Purpose: adds new interface to specified host                              *
+ * Purpose: adds new or updates interface to specified host                   *
  *                                                                            *
  * Parameters:                                                                *
  *             hostid             - [IN] host id from database                *
