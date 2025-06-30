@@ -56,7 +56,17 @@ class testDashboardItemCardWidget extends testWidgets {
 	* @var integer
 	*/
 	protected static $old_widget_count;
+	/**
+	* List of created items.
+	*
+	* @var array
+	*/
 	protected static $itemids;
+	/**
+	* List of created from template items.
+	*
+	* @var integer
+	*/
 	protected static $template_items;
 
 	public static function prepareItemCardWidgetData() {
@@ -123,7 +133,7 @@ class testDashboardItemCardWidget extends testWidgets {
 				'templates' => [['templateid' => $template['templateids']['Template for item card widget']]],
 				'items' => [
 					[
-						'name' => 'Master item',
+						'name' => STRING_255,
 						'key_' => 'master',
 						'type' => ITEM_TYPE_ZABBIX,
 						'value_type' => ITEM_VALUE_TYPE_UINT64,
@@ -135,6 +145,22 @@ class testDashboardItemCardWidget extends testWidgets {
 						'inventory_link' => 6,
 						'description' => STRING_6000,
 						'status' => 1
+					],
+					[
+						'name' => '<img src=\"x\" onerror=\"alert("ERROR");\"/>',
+						'key_' => 'xxs',
+						'type' => ITEM_TYPE_ZABBIX,
+						'value_type' => ITEM_VALUE_TYPE_TEXT,
+						'description' => '<img src=\"x\" onerror=\"alert("ERROR");\"/>',
+						'delay' => '13m'
+					],
+					[
+						'name' => '105\'; --DROP TABLE Users',
+						'key_' => 'sql_injection',
+						'type' => ITEM_TYPE_ZABBIX,
+						'value_type' => ITEM_VALUE_TYPE_TEXT,
+						'description' => '105\'; --DROP TABLE Users',
+						'delay' => '13m'
 					],
 					[
 						'name' => 'Item with text datatype',
@@ -166,14 +192,14 @@ class testDashboardItemCardWidget extends testWidgets {
 				[
 					'name' => 'Dependent item 1',
 					'key_' => 'dependent_item_1',
-					'master_itemid' => self::$itemids['Master item'],
+					'master_itemid' => self::$itemids[STRING_255],
 					'type' => ITEM_TYPE_DEPENDENT,
 					'value_type' => ITEM_VALUE_TYPE_FLOAT
 				],
 				[
 					'name' => 'Dependent item 2',
 					'key_' => 'dependent_item_2',
-					'master_itemid' => self::$itemids['Master item'],
+					'master_itemid' => self::$itemids[STRING_255],
 					'type' => ITEM_TYPE_DEPENDENT,
 					'value_type' => ITEM_VALUE_TYPE_BINARY
 				]
@@ -182,10 +208,10 @@ class testDashboardItemCardWidget extends testWidgets {
 		CDataHelper::createItems('item', $items, $hosts['hostids']);
 		$depend_items= CDataHelper::getIds('name');
 
-		// Add some metrics to 'Master item', to get Graph image and error notification.
-		CDataHelper::addItemData(self::$itemids['Master item'], [10000, 200, 30000, 400, 50000, 600, 70000, 800, 9000]);
+		// Add some metrics to STRING_255 item, to get Graph image and error notification.
+		CDataHelper::addItemData(self::$itemids[STRING_255], [10000, 200, 30000, 400, 50000, 600, 70000, 800, 9000]);
 		DBexecute('UPDATE item_rtdata SET state = 1, error = '.zbx_dbstr('Value of type "string" is not suitable for '.
-				'value type "Numeric (unsigned)". Value "hahah"').'WHERE itemid ='.zbx_dbstr(self::$itemids['Master item']));
+				'value type "Numeric (unsigned)". Value "hahah"').'WHERE itemid ='.zbx_dbstr(self::$itemids[STRING_255]));
 
 
 
@@ -216,75 +242,114 @@ class testDashboardItemCardWidget extends testWidgets {
 		CDataHelper::call('dashboard.create', [
 			[
 				'name' => 'Dashboard for creating Item Card widgets',
-				'pages' => [[]]
-			],
-			[
-				'name' => 'Dashboard for Item Card widget update',
+				'display_period' => 1800,
 				'pages' => [
 					[
 						'widgets' => [
 							[
+								'type' => 'geomap',
+								'x' => 0,
+								'y' => 0,
+								'width' => 13,
+								'height' => 5
+							],
+							[
+								'type' => 'svggraph',
+								'x' => 13,
+								'y' => 0,
+								'width' => 16,
+								'height' => 5,
+								'fields' => [
+									[
+										'type' => 1,
+										'name' => 'ds.0.hosts.0',
+										'value' => 'Host for Item Card widget'
+									],
+									[
+										'type' => 1,
+										'name' => 'ds.0.items.0',
+										'value' => STRING_255
+									]
+								]
+							]
+						]
+					]
+				]
+			],
+			[
+				'name' => 'Dashboard for Item Card widget update',
+				'display_period' => 1800,
+				'pages' => [
+					[
+						'widgets' => [
+							[
+								'type' => 'geomap',
+								'x' => 0,
+								'y' => 0,
+								'width' => 14,
+								'height' => 5
+							],
+							[
+								'type' => 'svggraph',
+								'x' => 14,
+								'y' => 0,
+								'width' => 14,
+								'height' => 5,
+								'fields' => [
+									[
+										'type' => 1,
+										'name' => 'ds.0.hosts.0',
+										'value' => 'Host for Item Card widget'
+									],
+									[
+										'type' => 1,
+										'name' => 'ds.0.items.0',
+										'value' => STRING_255
+									],
+									[
+										'type'=> '1',
+										'name'=> 'time_period.from',
+										'value'=> 'now-1h'
+									],
+									[
+										'type'=> '1',
+										'name'=> 'time_period.to',
+										'value'=> 'now'
+									]
+								]
+							],
+							[
 								'type' => 'itemcard',
 								'name' => 'Item card',
-								'x' => 0,
+								'x' => 28,
 								'y' => 0,
 								'width' => 19,
 								'height' => 10,
 								'fields' => [
 									[
-										'type' => 0,
-										'name' => 'sections.0',
-										'value' => 2
-									],
-									[
-										'type' => 0,
-										'name' => 'sections.1',
-										'value' => 4
-									],
-									[
-										'type' => 0,
-										'name' => 'sections.2',
-										'value' => 6
-									],
-									[
-										'type' => 0,
-										'name' => 'sections.3',
-										'value' => 7
-									],
-									[
-										'type' => 0,
-										'name' => 'sections.4',
-										'value' => 0
-									],
-									[
-										'type' => 0,
-										'name' => 'sections.5',
-										'value' => 1
-									],
-									[
-										'type' => 0,
-										'name' => 'sections.6',
-										'value' => 3
-									],
-									[
-										'type' => 0,
-										'name' => 'sections.7',
-										'value' => 5
-									],
-									[
-										'type' => 0,
-										'name' => 'sections.8',
-										'value' => 8
-									],
-									[
-										'type' => 0,
-										'name' => 'sections.9',
-										'value' => 9
-									],
-									[
 										'type' => 4,
 										'name' => 'itemid.0',
-										'value' => self::$itemids['Master item']
+										'value' => self::$itemids[STRING_255]
+									],
+									[
+										'type'=> '0',
+										'name'=> 'sections.0',
+										'value'=> '2'
+									],
+									[
+										'type'=> '0',
+										'name'=> 'sections.1',
+										'value'=> '4'
+									],
+									[
+										'type'=> '0',
+										'name'=> 'sections.2',
+										'value'=> '6'
+									],
+									[
+										'type'=> '0',
+										'name'=> 'sections.3',
+										'value'=> '7'
 									]
 								]
 							]
@@ -358,7 +423,7 @@ class testDashboardItemCardWidget extends testWidgets {
 									[
 										'type' => 4,
 										'name' => 'itemid.0',
-										'value' => self::$itemids['Master item']
+										'value' => self::$itemids[STRING_255]
 									]
 								]
 							]
@@ -382,7 +447,7 @@ class testDashboardItemCardWidget extends testWidgets {
 									[
 										'type' => 4,
 										'name' => 'itemid.0',
-										'value' => self::$itemids['Master item']
+										'value' => self::$itemids[STRING_255]
 									]
 								]
 							]
@@ -406,7 +471,7 @@ class testDashboardItemCardWidget extends testWidgets {
 									[
 										'type' => 4,
 										'name' => 'itemid.0',
-										'value' => self::$itemids['Master item']
+										'value' => self::$itemids[STRING_255]
 									],
 									[
 										'type' => 0,
@@ -792,18 +857,6 @@ class testDashboardItemCardWidget extends testWidgets {
 				$this->assertTrue($colorpicker->isVisible(true));
 				$colorpicker->query('button:Apply')->one()->click();
 				$this->assertTrue(!$colorpicker->isVisible());
-
-				/* Needs work
-				// Check required fields.
-				$required_fields = ['Item', 'id:sparkline_time_period_from', 'id:sparkline_time_period_to',
-						'id:sparkline_time_period_reference_ms'];
-				foreach ($required_fields as $field ) {
-					if($field === 'Widget'){
-						$form->fill(['id:sparkline_time_period_reference_ms' => 'Widget']);
-					}
-					$this->assertTrue($form->isRequired($field));
-				}
-				 */
 			}
 			else {
 				$this->assertTrue($sparkline->isVisible(false));
@@ -856,7 +909,7 @@ class testDashboardItemCardWidget extends testWidgets {
 				[
 					'expected' => TEST_BAD,
 					'fields' => [
-						'Item' => 'Master item'
+						'Item' => STRING_255
 					],
 					'Show' => [
 						['action' => USER_ACTION_UPDATE, 'index' => 0, 'section' => 'Latest data'],
@@ -870,7 +923,7 @@ class testDashboardItemCardWidget extends testWidgets {
 						'id:sparkline_time_period_data_source' => 'Custom',
 						'id:sparkline_time_period_from' => '',
 						'id:sparkline_time_period_to' => '',
-						'color-picker-box' => 'CDDC39'
+						'color' => 'CDDC39'
 					],
 					'error_message' => [
 						'Invalid parameter "Sparkline: Time period/From": cannot be empty.',
@@ -883,8 +936,8 @@ class testDashboardItemCardWidget extends testWidgets {
 				[
 					'expected' => TEST_BAD,
 					'fields' => [
-						'Name' => 'Item is not selected',
-						'Item' => 'Master item'
+						'Name' => 'Selected more than 731 day for graph filter.',
+						'Item' => STRING_255
 					],
 					'Show' => [
 						['action' => USER_ACTION_UPDATE, 'index' => 0, 'section' => 'Latest data'],
@@ -897,7 +950,7 @@ class testDashboardItemCardWidget extends testWidgets {
 						'id:sparkline_fill' => 5,
 						'id:sparkline_time_period_data_source' => 'Custom',
 						'id:sparkline_time_period_from' => 'now-1000d',
-						'id:sparkline_time_period_to' => 'now+999d'
+						'id:sparkline_time_period_to' => 'now'
 					],
 					'error_message' => [
 						'Maximum time period to display is 731 days.'
@@ -909,8 +962,8 @@ class testDashboardItemCardWidget extends testWidgets {
 				[
 					'expected' => TEST_BAD,
 					'fields' => [
-						'Name' => 'Item is not selected',
-						'Item' => 'Master item'
+						'Name' => 'Empty widget value',
+						'Item' => STRING_255
 					],
 					'Show' => [
 						['action' => USER_ACTION_UPDATE, 'index' => 0, 'section' => 'Latest data'],
@@ -925,6 +978,238 @@ class testDashboardItemCardWidget extends testWidgets {
 					],
 					'error_message' => [
 						'Invalid parameter "Sparkline: Time period/Widget": cannot be empty.'
+					]
+				]
+			],
+			// #4.
+			[
+				[
+					'expected' => TEST_BAD,
+					'fields' => [
+						'Show header' => false,
+						'Name' => 'Incorrect number for sparkline parameters',
+						'Refresh interval' => 'No refresh',
+						'Item' => STRING_255
+					],
+					'Show' => [
+						['action' => USER_ACTION_UPDATE, 'index' => 0, 'section' => 'Latest data'],
+						['action' => USER_ACTION_REMOVE, 'index' => 1],
+						['action' => USER_ACTION_REMOVE, 'index' => 1],
+						['action' => USER_ACTION_REMOVE, 'index' => 1],
+						['section' => 'Metrics'],
+						['section' => 'Error text'],
+						['section' => 'Description'],
+						['section' => 'Tags'],
+						['section' => 'Triggers'],
+						['section' => 'Host inventory']
+					],
+					'Sparkline' => [
+						'id:sparkline_width' => 5000,
+						'id:sparkline_fill' => -5,
+						'id:sparkline_time_period_data_source' => 'Dashboard',
+						'color' => '44F44A'
+					],
+					'error_message' => [
+						'Invalid parameter "Sparkline: Width": value must be one of 0-10.',
+						'Invalid parameter "Sparkline: Fill": value must be one of 0-10.'
+					]
+				]
+			],
+			// #5.
+			[
+				[
+					'expected' => TEST_BAD,
+					'fields' => [
+						'Name' => 'A time is expected',
+						'Item' => STRING_255
+					],
+					'Show' => [
+						['action' => USER_ACTION_UPDATE, 'index' => 0, 'section' => 'Latest data'],
+						['action' => USER_ACTION_REMOVE, 'index' => 1],
+						['action' => USER_ACTION_REMOVE, 'index' => 1],
+						['action' => USER_ACTION_REMOVE, 'index' => 1]
+					],
+					'Sparkline' => [
+						'id:sparkline_width' => 5,
+						'id:sparkline_fill' => 5,
+						'id:sparkline_time_period_data_source' => 'Custom',
+						'id:sparkline_time_period_from' => 'dsa',
+						'id:sparkline_time_period_to' => '321',
+					],
+					'error_message' => [
+						'Invalid parameter "Sparkline: Time period/From": a time is expected.',
+						'Invalid parameter "Sparkline: Time period/To": a time is expected.'
+					]
+				]
+			],
+			// #6.
+			[
+				[
+					'expected' => TEST_GOOD,
+					'fields' => [
+						'Show header' => false,
+						'Name' => '  Trimmed name_3  ',
+						'Refresh interval' => 'No refresh',
+						'Item' => STRING_255
+					],
+					'Show' => [
+						['action' => USER_ACTION_REMOVE, 'index' => 0],
+						['action' => USER_ACTION_REMOVE, 'index' => 0],
+						['action' => USER_ACTION_REMOVE, 'index' => 0],
+						['action' => USER_ACTION_UPDATE, 'index' => 0, 'section' => 'Description'],
+					],
+					'trim' => true
+				]
+			],
+			// #7.
+			[
+				[
+					'expected' => TEST_GOOD,
+					'fields' => [
+						'Show header' => true,
+						'Name' => 'кирилица, ñ ç ö ø, 🙂🙂🙂🙂, みけめ, "],*,a[x=": "],*,a[x="/\|',
+						'Refresh interval' => '10 seconds',
+						'Item' => STRING_255
+					],
+					'Show' => [
+						['action' => USER_ACTION_REMOVE, 'index' => 0],
+						['action' => USER_ACTION_REMOVE, 'index' => 0],
+						['action' => USER_ACTION_REMOVE, 'index' => 0],
+						['action' => USER_ACTION_REMOVE, 'index' => 0]
+					],
+					'trim' => true
+				]
+			],
+			// #8.
+			[
+				[
+					'expected' => TEST_GOOD,
+					'fields' => [
+						'Name' => '<img src=\"x\" onerror=\"alert("ERROR");\"/>',
+						'Refresh interval' => '30 seconds',
+						'Item' => '<img src=\"x\" onerror=\"alert("ERROR");\"/>'
+					],
+					'Show' => [
+						['action' => USER_ACTION_UPDATE, 'index' => 0, 'section' => 'Description'],
+						['action' => USER_ACTION_REMOVE, 'index' => 1],
+						['action' => USER_ACTION_REMOVE, 'index' => 1],
+						['action' => USER_ACTION_REMOVE, 'index' => 1]
+					],
+					'trim' => true
+				]
+			],
+			// #9.
+			[
+				[
+					'expected' => TEST_GOOD,
+					'fields' => [
+						'Name' => '105\'; --DROP TABLE Users',
+						'Refresh interval' => '1 minute',
+						'Item' => '105\'; --DROP TABLE Users',
+					],
+					'Show' => [
+						['action' => USER_ACTION_UPDATE, 'index' => 0, 'section' => 'Description'],
+						['action' => USER_ACTION_REMOVE, 'index' => 1],
+						['action' => USER_ACTION_REMOVE, 'index' => 1],
+						['action' => USER_ACTION_REMOVE, 'index' => 1]
+					],
+					'trim' => true
+				]
+			],
+			// #10.
+			[
+				[
+					'expected' => TEST_GOOD,
+					'fields' => [
+						'Name' => 'Update then remove one Show option',
+						'Refresh interval' => '2 minutes',
+						'Item' => STRING_255,
+					],
+					'Show' => [
+						['action' => USER_ACTION_UPDATE, 'index' => 0, 'section' => 'Tags'],
+						['action' => USER_ACTION_REMOVE, 'index' => 2],
+						['action' => USER_ACTION_REMOVE, 'index' => 2],
+						['action' => USER_ACTION_UPDATE, 'index' => 1, 'section' => 'Host inventory'],
+						['action' => USER_ACTION_REMOVE, 'index' => 1]
+					],
+					'trim' => true
+				]
+			],
+			// #11.
+			[
+				[
+					'expected' => TEST_GOOD,
+					'fields' => [
+						'Name' => 'Dashboard souce for override host field',
+						'Refresh interval' => '10 minutes',
+						'Item' => STRING_255,
+						'Override host' => 'Dashboard'
+					],
+					'Show' => [
+						['section' => 'Description'],
+						['section' => 'Error text'],
+						['section' => 'Latest data'],
+						['section' => 'Triggers'],
+						['section' => 'Host inventory'],
+						['section' => 'Tags']
+					],
+					'Sparkline' => [
+						'id:sparkline_width' => 5,
+						'id:sparkline_fill' => 3,
+						'id:sparkline_time_period_data_source' => 'Dashboard',
+						'id:sparkline_history' => 'History',
+						'color' => 'F48FB1'
+					],
+					'trim' => true
+				]
+			],
+			// #12.
+			[
+				[
+					'expected' => TEST_GOOD,
+					'fields' => [
+						'Name' => 'Other widget as the souce for override host field',
+						'Refresh interval' => '15 minutes',
+						'Item' => STRING_255,
+						'Override host' => 'Geomap'
+					],
+					'Show' => [
+						['section' => 'Description'],
+						['section' => 'Error text'],
+						['section' => 'Latest data'],
+						['section' => 'Triggers'],
+						['section' => 'Host inventory'],
+						['section' => 'Tags']
+					],
+					'Sparkline' => [
+						'id:sparkline_width' => 5,
+						'id:sparkline_fill' => 3,
+						'id:sparkline_time_period_data_source' => 'Widget',
+						'id:sparkline_history' => 'Trends',
+						'color' => '9A34A1',
+						'widget' => 'Graph'
+					],
+					'trim' => true
+				]
+			],
+			// #13.
+			[
+				[
+					'expected' => TEST_GOOD,
+					'fields' => [
+						'Name' => 'User changing Show options',
+						'Item' => STRING_255
+					],
+					'Show' => [
+						['action' => USER_ACTION_UPDATE, 'index' => 0, 'section' => 'Description'],
+						['section' => 'Latest data'],
+						['action' => USER_ACTION_UPDATE, 'index' => 1, 'section' => 'Error text'],
+						['action' => USER_ACTION_REMOVE, 'index' => 2],
+						['section' => 'Triggers'],
+						['action' => USER_ACTION_UPDATE, 'index' => 2, 'section' => 'Type of information'],
+						['section' => 'Tags'],
+						['section' => 'Host interface'],
+						['action' => USER_ACTION_UPDATE, 'index' => 4, 'section' => 'Type']
 					]
 				]
 			]
@@ -981,7 +1266,21 @@ class testDashboardItemCardWidget extends testWidgets {
 	 * @dataProvider getCreateData
 	 */
 	public function testDashboardItemCardWidget_Update($data) {
+		$this->page->login()->open('zabbix.php?action=dashboard.view&dashboardid='.
+				self::$dashboardid['Dashboard for Item Card widget update'])->waitUntilReady();
 
+		// Get hash if expected is TEST_BAD.
+		if (CTestArrayHelper::get($data, 'expected', TEST_GOOD) === TEST_BAD) {
+			// Hash before update.
+			self::$old_hash = CDBHelper::getHash(self::SQL);
+		}
+		else {
+			self::$old_widget_count = CDashboardElement::find()->waitUntilReady()->one()->getWidgets()->count();
+		}
+
+		$dashboard = CDashboardElement::find()->waitUntilReady()->one();
+		$this->fillWidgetForm($data, 'update', $dashboard);
+		$this->checkWidgetForm($data, 'update', $dashboard);
 	}
 
 	/**
@@ -1142,7 +1441,7 @@ class testDashboardItemCardWidget extends testWidgets {
 		$form->fill([
 			'Name' => $new_name,
 			'Refresh interval' => '15 minutes',
-			'Item' => 'Master item'
+			'Item' => STRING_255
 		]);
 
 		$data = [
@@ -1227,22 +1526,38 @@ class testDashboardItemCardWidget extends testWidgets {
 	protected function fillWidgetForm($data, $action, $dashboard) {
 		$form = ($action === 'create')
 			? $dashboard->edit()->addWidget()->asForm()
-			: $dashboard->getWidget('Host card')->edit();
+			: $dashboard->getWidget('Item card')->edit();
 
 		$form->fill(['Type' => CFormElement::RELOADABLE_FILL('Item card')]);
 		$form->fill($data['fields']);
 
 		if (array_key_exists('Show', $data)) {
 			$this->getShowTable()->fill($data['Show']);
+		}
 
-			if (array_key_exists('Inventory', $data)) {
-				$form->getField('Inventory fields')->fill($data['Inventory']);
+		if (array_key_exists('Sparkline', $data)) {
+			foreach ($data['Sparkline'] as $field => $value){
+				if ($field === 'color') {
+					$form->query('class', 'color-picker-box')->one()->click();
+					$colorpicker = $this->query('id', 'color_picker')->one()->waitUntilReady();
+					$colorpicker->query('class','color-picker-input')->one()->fill($value);
+					$colorpicker->query('button:Apply')->one()->click();
+				}
+				else if ($field === 'widget') {
+					$sparkline = $form->query('class', 'widget-field-sparkline')->one()->waitUntilReady();
+					$sparkline->query('button', 'Select')->one()->waitUntilClickable()->click();
+					$dialog = COverlayDialogElement::find()->all()->last()->waitUntilReady();
+					$dialog->query('link', $value)->one()->click();
+				}
+				else {
+					$form->getField($field)->fill($value);
+				}
 			}
 		}
 
 		if (array_key_exists('Screenshot', $data) && $action === 'create') {
 			$this->assertScreenshot($form->query('class:table-forms-separator')->waitUntilPresent()->one(),
-					'Full list of show options'.$data['fields']['Host']
+					'Full list of show options'.$data['fields']['Item']
 			);
 		}
 
@@ -1280,14 +1595,13 @@ class testDashboardItemCardWidget extends testWidgets {
 			$dashboard->save();
 			$this->assertMessage(TEST_GOOD, 'Dashboard updated');
 
+			echo '+-- Old hash: '.self::$old_hash.' --+';
+			echo '+-- Old hash: '.CDBHelper::getHash(self::SQL).' --+';
 			// Compare old hash and new one.
 			$this->assertEquals(self::$old_hash, CDBHelper::getHash(self::SQL));
 		}
 		else {
-			// Trim leading and trailing spaces from expected results if necessary.
-			if (array_key_exists('trim', $data)) {
-				$data['fields']['Name'] = trim($data['fields']['Name']);
-			}
+			$data['fields']['Item'] = 'Visible host name for Item Card widget: '.trim($data['fields']['Item'], 255);
 
 			// Make sure that the widget is present before saving the dashboard.
 			$header = (array_key_exists('Name', $data['fields']))
@@ -1318,9 +1632,10 @@ class testDashboardItemCardWidget extends testWidgets {
 	 */
 	protected function calculateShowResult($rows) {
 		$result = [
-			['section' => 'Monitoring'],
-			['section' => 'Availability'],
-			['section' => 'Monitored by']
+			['section' => 'Metrics'],
+			['section' => 'Type of information'],
+			['section' => 'Host interface'],
+			['section' => 'Type']
 		];
 
 		foreach ($rows as $row) {

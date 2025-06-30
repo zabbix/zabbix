@@ -365,9 +365,45 @@ class testDashboardsTemplatedDashboardForm extends CWebTest {
 								]
 							],
 							[
+							   'type'=> 'itemcard',
+							   'name'=> 'Item card widget',
+							   'x'=> 48,
+							   'y'=> 8,
+							   'width'=> 12,
+							   'height'=> 4,
+							   'view_mode'=> '0',
+							   'fields'=> [
+								   [
+									   'type'=> ZBX_WIDGET_FIELD_TYPE_ITEM,
+									   'name'=> 'itemid.0',
+									   'value'=> self::$template_itemid
+								   ],
+								   [
+									   'type'=> 0,
+									   'name'=> 'sections.0',
+									   'value'=> 2
+								   ],
+								   [
+									   'type'=> '0',
+									   'name'=> 'sections.1',
+									   'value'=> 4
+								   ],
+								   [
+									   'type'=> 0,
+									   'name'=> 'sections.2',
+									   'value'=> 6
+								   ],
+								   [
+									   'type'=> 0,
+									   'name'=> 'sections.3',
+									   'value'=> 7
+								   ]
+							   ]
+							],
+							[
 								'type' => 'problemhosts',
 								'name' => 'Problem hosts widget',
-								'x' => 48,
+								'x' => 60,
 								'y' => 8,
 								'width' => 12,
 								'height' => 4
@@ -375,15 +411,15 @@ class testDashboardsTemplatedDashboardForm extends CWebTest {
 							[
 								'type' => 'problems',
 								'name' => 'Problems widget',
-								'x' => 60,
-								'y' => 8,
+								'x' => 0,
+								'y' => 12,
 								'width' => 12,
 								'height' => 4
 							],
 							[
 								'type' => 'problemsbysv',
 								'name' => 'Problems by severity widget',
-								'x' => 0,
+								'x' => 12,
 								'y' => 12,
 								'width' => 12,
 								'height' => 4
@@ -391,7 +427,7 @@ class testDashboardsTemplatedDashboardForm extends CWebTest {
 							[
 								'type' => 'slareport',
 								'name' => 'SLA report widget',
-								'x' => 12,
+								'x' => 24,
 								'y' => 12,
 								'width' => 12,
 								'height' => 4,
@@ -411,7 +447,7 @@ class testDashboardsTemplatedDashboardForm extends CWebTest {
 							[
 								'type' => 'systeminfo',
 								'name' => 'System info details widget',
-								'x' => 24,
+								'x' => 36,
 								'y' => 12,
 								'width' => 12,
 								'height' => 4
@@ -419,7 +455,7 @@ class testDashboardsTemplatedDashboardForm extends CWebTest {
 							[
 								'type' => 'systeminfo',
 								'name' => 'System info HA nodes widget',
-								'x' => 36,
+								'x' => 48,
 								'y' => 12,
 								'width' => 12,
 								'height' => 4,
@@ -434,7 +470,7 @@ class testDashboardsTemplatedDashboardForm extends CWebTest {
 							[
 								'type' => 'tophosts',
 								'name' => 'Top hosts widget',
-								'x' => 48,
+								'x' => 60,
 								'y' => 12,
 								'width' => 12,
 								'height' => 4,
@@ -484,15 +520,15 @@ class testDashboardsTemplatedDashboardForm extends CWebTest {
 							[
 								'type' => 'toptriggers',
 								'name' => 'Top triggers widget',
-								'x' => 60,
-								'y' => 12,
+								'x' => 0,
+								'y' => 16,
 								'width' => 12,
 								'height' => 4
 							],
 							[
 								'type' => 'trigover',
 								'name' => 'Trigger overview widget',
-								'x' => 0,
+								'x' => 12,
 								'y' => 16,
 								'width' => 12,
 								'height' => 4
@@ -500,7 +536,7 @@ class testDashboardsTemplatedDashboardForm extends CWebTest {
 							[
 								'type' => 'url',
 								'name' => 'URL widget',
-								'x' => 12,
+								'x' => 24,
 								'y' => 16,
 								'width' => 12,
 								'height' => 4,
@@ -515,7 +551,7 @@ class testDashboardsTemplatedDashboardForm extends CWebTest {
 							[
 								'type' => 'web',
 								'name' => 'Web monitoring widget',
-								'x' => 24,
+								'x' => 36,
 								'y' => 16,
 								'width' => 12,
 								'height' => 4
@@ -523,7 +559,7 @@ class testDashboardsTemplatedDashboardForm extends CWebTest {
 							[
 								'type' => 'topitems',
 								'name' => 'Top items widget',
-								'x' => 36,
+								'x' => 48,
 								'y' => 16,
 								'width' => 12,
 								'height' => 4,
@@ -538,7 +574,7 @@ class testDashboardsTemplatedDashboardForm extends CWebTest {
 							[
 								'type' => 'honeycomb',
 								'name' => 'Honeycomb widget',
-								'x' => 48,
+								'x' => 60,
 								'y' => 16,
 								'width' => 12,
 								'height' => 4,
