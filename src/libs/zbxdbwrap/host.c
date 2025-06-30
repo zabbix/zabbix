@@ -6322,7 +6322,7 @@ void	zbx_db_delete_hosts(const zbx_vector_uint64_t *hostids, const zbx_vector_st
 
 /******************************************************************************
  *                                                                            *
- * Purpose: adds new interface to specified host                              *
+ * Purpose: adds new or updates interface to specified host                   *
  *                                                                            *
  * Parameters:                                                                *
  *             hostid             - [IN] host id from database                *
