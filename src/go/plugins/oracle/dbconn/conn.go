@@ -48,6 +48,7 @@ type Options struct {
 	CallTimeout          time.Duration
 	CustomQueriesEnabled bool
 	CustomQueriesPath    string
+	ResolveTNS           bool
 }
 
 // ConnManager is the thread-safe structure for managing connections.
@@ -81,6 +82,7 @@ func NewOptions(
 	callTimeout time.Duration,
 	customQueriesEnabled bool,
 	customQueriesPath string,
+	resolveTNS bool,
 ) Options {
 	return Options{
 		KeepAlive:            keepAlive,
@@ -88,6 +90,7 @@ func NewOptions(
 		CallTimeout:          callTimeout,
 		CustomQueriesEnabled: customQueriesEnabled,
 		CustomQueriesPath:    customQueriesPath,
+		ResolveTNS:           resolveTNS,
 	}
 }
 

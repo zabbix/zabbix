@@ -109,6 +109,7 @@ func (p *Plugin) Start() {
 		time.Duration(p.options.CallTimeout)*time.Second,
 		p.options.CustomQueriesEnabled,
 		p.options.CustomQueriesPath,
+		p.options.ResolveTNS,
 	)
 	p.connMgr = dbconn.NewConnManager(
 		p.Logger,
