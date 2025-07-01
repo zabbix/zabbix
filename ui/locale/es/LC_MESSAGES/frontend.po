@@ -4,7 +4,7 @@ msgstr ""
 "Project-Id-Version: Zabbix 6.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2023-10-19 13:48+0300\n"
-"PO-Revision-Date: 2025-06-16 20:18+0000\n"
+"PO-Revision-Date: 2025-06-25 20:44+0000\n"
 "Last-Translator: Vicente Salvador <vicentesalvadorcubedo@gmail.com>\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
 "Language: es\n"
@@ -65,7 +65,7 @@ msgstr "Se espera un par \"equipo:clave\""
 
 #: app/views/host.wizard.edit.php:1024
 msgid "#{section_name}"
-msgstr ""
+msgstr "#{section_name}"
 
 #: include/forms.inc.php:1330
 #: include/views/configuration.host.discovery.edit.php:932
@@ -2238,7 +2238,7 @@ msgstr "N inferior"
 
 #: app/views/host.wizard.edit.php:429
 msgid "Brackets to specify IPv6 addresses"
-msgstr ""
+msgstr "Corchetes para especificar direcciones IPv6"
 
 #: jsLoader.php:266
 msgid "Bring forward"
@@ -3688,7 +3688,7 @@ msgstr "No se pueden heredar los prototipos de reglas LLD con la clave \"%1$s\" 
 #: include/classes/api/services/CItemGeneral.php:718
 #, c-format
 msgid "Cannot inherit LLD rule prototypes with key \"%1$s\" of both \"%2$s\" and \"%3$s\" templates, because the key must be unique on template \"%4$s\"."
-msgstr ""
+msgstr "No se pueden heredar prototipos de reglas LLD con la clave \"%1$s\" de las plantillas \"%2$s\" y \"%3$s\", porque la clave debe ser única en la plantilla \"%4$s\"."
 
 #: include/classes/api/services/CItemGeneral.php:819
 #, c-format
@@ -3703,7 +3703,7 @@ msgstr "No se puede heredar la regla LLD con la clave \"%1$s\" de la plantilla \
 #: include/classes/api/services/CItemGeneral.php:897
 #, c-format
 msgid "Cannot inherit LLD rule with key \"%1$s\" of template \"%2$s\" to host \"%3$s\", because an LLD rule prototype with the same key already exists."
-msgstr ""
+msgstr "No se puede heredar la regla LLD con la clave \"%1$s\" de la plantilla \"%2$s\" en el equipo \"%3$s\", porque ya existe un prototipo de regla LLD con la misma clave."
 
 #: include/classes/api/services/CItemGeneral.php:874
 #, c-format
@@ -3728,7 +3728,7 @@ msgstr "No se puede heredar la regla LLD con la clave \"%1$s\" de la plantilla \
 #: include/classes/api/services/CItemGeneral.php:898
 #, c-format
 msgid "Cannot inherit LLD rule with key \"%1$s\" of template \"%2$s\" to template \"%3$s\", because an LLD rule prototype with the same key already exists."
-msgstr ""
+msgstr "No se puede heredar la regla LLD con la clave \"%1$s\" de la plantilla \"%2$s\" a la plantilla \"%3$s\", porque ya existe un prototipo de regla LLD con la misma clave."
 
 #: include/classes/api/services/CItemGeneral.php:875
 #, c-format
@@ -3768,7 +3768,7 @@ msgstr "No se puede heredar el prototipo de métrica con la clave \"%1$s\" de la
 #: include/classes/api/services/CItemGeneral.php:856
 #, c-format
 msgid "Cannot inherit item prototype with key \"%1$s\" of template \"%2$s\" to host \"%3$s\", because a discovered item prototype with the same key already exists."
-msgstr ""
+msgstr "No se puede heredar el prototipo de métrica con la clave \"%1$s\" de la plantilla \"%2$s\" en el equipo \"%3$s\", porque ya existe un prototipo de métrica descubierto con la misma clave."
 
 #: include/classes/api/services/CItemGeneral.php:841
 #, c-format
@@ -3783,7 +3783,7 @@ msgstr "No se puede heredar el prototipo de métrica con la clave \"%1$s\" de la
 #: include/classes/api/services/CItemGeneral.php:869
 #, c-format
 msgid "Cannot inherit item prototype with key \"%1$s\" of template \"%2$s\" to host \"%3$s\", because an LLD rule prototype with the same key already exists."
-msgstr ""
+msgstr "No se puede heredar el prototipo de métrica con la clave \"%1$s\" de la plantilla \"%2$s\" en el equipo \"%3$s\", porque ya existe un prototipo de regla LLD con la misma clave."
 
 #: include/classes/api/services/CItemGeneral.php:835
 #, c-format
@@ -3808,7 +3808,7 @@ msgstr "No se puede heredar el prototipo de métrica con la clave \"%1$s\" de la
 #: include/classes/api/services/CItemGeneral.php:870
 #, c-format
 msgid "Cannot inherit item prototype with key \"%1$s\" of template \"%2$s\" to template \"%3$s\", because an LLD rule prototype with the same key already exists."
-msgstr ""
+msgstr "No se puede heredar el prototipo de métrica con la clave \"%1$s\" de la plantilla \"%2$s\" a la plantilla \"%3$s\", porque ya existe un prototipo de regla LLD con la misma clave."
 
 #: include/classes/api/services/CItemGeneral.php:836
 #, c-format
@@ -3848,7 +3848,7 @@ msgstr "No se puede heredar la métrica con clave \"%1$s\" de la plantilla \"%2$
 #: include/classes/api/services/CItemGeneral.php:891
 #, c-format
 msgid "Cannot inherit item with key \"%1$s\" of template \"%2$s\" to host \"%3$s\", because a discovered LLD rule with the same key already exists."
-msgstr ""
+msgstr "No se puede heredar la métrica con la clave \"%1$s\" de la plantilla \"%2$s\" al equipo \"%3$s\", porque ya existe una regla LLD descubierta con la misma clave."
 
 #: include/classes/api/services/CItemGeneral.php:797
 #, c-format
@@ -3863,7 +3863,7 @@ msgstr "No se puede heredar la métrica con la clave \"%1$s\" de la plantilla \"
 #: include/classes/api/services/CItemGeneral.php:841
 #, c-format
 msgid "Cannot inherit item with key \"%1$s\" of template \"%2$s\" to host \"%3$s\", because an LLD rule prototype with the same key already exists."
-msgstr ""
+msgstr "No se puede heredar la métrica con la clave \"%1$s\" de la plantilla \"%2$s\" al equipo \"%3$s\", porque ya existe un prototipo de regla LLD con la misma clave."
 
 #: include/classes/api/services/CItemGeneral.php:785
 #, c-format
@@ -3893,7 +3893,7 @@ msgstr "No se puede heredar la métrica con la clave \"%1$s\" de la plantilla \"
 #: include/classes/api/services/CItemGeneral.php:842
 #, c-format
 msgid "Cannot inherit item with key \"%1$s\" of template \"%2$s\" to template \"%3$s\", because an LLD rule prototype with the same key already exists."
-msgstr ""
+msgstr "No se puede heredar la métrica con la clave \"%1$s\" de la plantilla \"%2$s\" a la plantilla \"%3$s\", porque ya existe un prototipo de regla LLD con la misma clave."
 
 #: include/classes/api/services/CItemGeneral.php:786
 #, c-format
@@ -5051,7 +5051,7 @@ msgstr "Contraer la barra lateral"
 
 #: app/views/host.wizard.edit.php:426
 msgid "Colon to separate IP/DNS address from port"
-msgstr ""
+msgstr "Dos puntos para separar la dirección IP/DNS del puerto"
 
 #: include/views/configuration.graph.edit.php:398
 #: include/views/js/monitoring.sysmaps.js.php:383
@@ -5108,7 +5108,7 @@ msgstr "Coordenadas centrales separadas por comas y nivel de zoom a mostrar cuan
 
 #: app/views/host.wizard.edit.php:427
 msgid "Comma to separate multiple Zabbix servers, proxies, or clusters"
-msgstr ""
+msgstr "Coma para separar varios servidores, proxies o clústeres Zabbix"
 
 #: app/views/administration.script.edit.php:199
 #: app/views/reports.actionlog.list.csv.php:45
@@ -5127,11 +5127,11 @@ msgstr "Comunicación"
 
 #: app/views/host.wizard.edit.php:375
 msgid "Communication between Zabbix agent and server/proxy is secured with a unique user-defined pre-shared key identity and a secret pre-shared key linked to it."
-msgstr ""
+msgstr "La comunicación entre el agente Zabbix y el servidor/proxy está protegida mediante una identidad de clave precompartida única definida por el usuario y una clave precompartida secreta vinculada a ella."
 
 #: app/views/host.wizard.edit.php:414
 msgid "Communication between Zabbix agent and server/proxy is secured with the pre-shared key (PSK) encryption method."
-msgstr ""
+msgstr "La comunicación entre el agente Zabbix y el servidor/proxy está protegida con el método de cifrado de clave precompartida (PSK)."
 
 #: include/items.inc.php:946
 msgctxt "SNMP Community"
@@ -6342,15 +6342,15 @@ msgstr "Datos de %1$s. Generados en %2$s segundos."
 
 #: app/views/host.wizard.edit.php:168
 msgid "Data is collected by Zabbix agent, a lightweight software `component installed on your monitoring target."
-msgstr ""
+msgstr "Los datos son recopilados por el agente Zabbix, un componente de software liviano instalado en su objetivo de monitoreo."
 
 #: app/views/js/host.wizard.edit.js.php:89
 msgid "Data is collected by Zabbix agent, a lightweight software component installed on your monitoring target."
-msgstr ""
+msgstr "Los datos son recopilados por el agente Zabbix, un componente de software liviano instalado en su objetivo de monitoreo."
 
 #: app/views/js/host.wizard.edit.js.php:90
 msgid "Data is collected by Zabbix server or proxy using standard protocols (e.g., SNMP, ICMP) or remote access methods (e.g., SSH)."
-msgstr ""
+msgstr "Los datos se recopilan mediante un servidor o proxy Zabbix utilizando protocolos estándar (por ejemplo, SNMP, ICMP) o métodos de acceso remoto (por ejemplo, SSH)."
 
 #: app/views/js/webscenario.step.edit.js.php:297
 msgid "Data is not properly encoded."
@@ -6868,11 +6868,11 @@ msgstr "¿Borrar los tableros seleccionados?"
 
 #: include/views/configuration.host.discovery.prototype.list.php:280
 msgid "Delete selected discovery prototype?"
-msgstr ""
+msgstr "¿Eliminar el prototipo de descubrimiento seleccionado?"
 
 #: include/views/configuration.host.discovery.prototype.list.php:281
 msgid "Delete selected discovery prototypes?"
-msgstr ""
+msgstr "¿Eliminar prototipos de descubrimiento seleccionados?"
 
 #: app/views/js/configuration.discovery.list.js.php:113
 #: include/views/configuration.host.discovery.list.php:370
@@ -7414,11 +7414,11 @@ msgstr "¿Desactivar los conectores seleccionados?"
 
 #: include/views/configuration.host.discovery.prototype.list.php:265
 msgid "Disable selected discovery prototype?"
-msgstr ""
+msgstr "¿Deshabilitar el prototipo de descubrimiento seleccionado?"
 
 #: include/views/configuration.host.discovery.prototype.list.php:266
 msgid "Disable selected discovery prototypes?"
-msgstr ""
+msgstr "¿Deshabilitar los prototipos de descubrimiento seleccionados?"
 
 #: app/views/js/configuration.discovery.list.js.php:97
 #: include/views/configuration.host.discovery.list.php:349
@@ -8545,23 +8545,23 @@ msgstr "Introduzca una cadena de identidad de clave precompartida no secreta. Ev
 
 #: app/views/host.wizard.edit.php:609
 msgid "Enter the IP/DNS address and port of the Zabbix agent installed on your monitoring target."
-msgstr ""
+msgstr "Ingrese la dirección IP/DNS y el puerto del agente Zabbix instalado en su objetivo de monitoreo."
 
 #: app/views/host.wizard.edit.php:771
 msgid "Enter the IP/DNS address and port of your IPMI-enabled monitoring target."
-msgstr ""
+msgstr "Introduzca la dirección IP/DNS y el puerto de su objetivo de monitoreo habilitado para IPMI."
 
 #: app/views/host.wizard.edit.php:847
 msgid "Enter the IP/DNS address and port of your JMX-enabled monitoring target."
-msgstr ""
+msgstr "Introduzca la dirección IP/DNS y el puerto de su objetivo de monitoreo habilitado para JMX."
 
 #: app/views/host.wizard.edit.php:412
 msgid "Enter the IP/DNS address and port of your Zabbix server, proxy, or cluster configuration."
-msgstr ""
+msgstr "Introduzca la dirección IP/DNS y el puerto de su servidor Zabbix, proxy o configuración de clúster."
 
 #: app/views/host.wizard.edit.php:642
 msgid "Enter the IP/DNS address, port, and authentication details of your SNMP-enabled monitoring target."
-msgstr ""
+msgstr "Introduzca la dirección IP/DNS, el puerto y los detalles de autenticación de su objetivo de monitoreo habilitado para SNMP."
 
 #: include/classes/validators/CFormValidator.php:1192 jsLoader.php:435
 #, c-format
@@ -8765,7 +8765,7 @@ msgstr "Ejemplo"
 
 #: app/views/host.wizard.edit.php:417
 msgid "Example:"
-msgstr ""
+msgstr "Ejemplo:"
 
 #: app/views/administration.miscconfig.edit.php:38
 msgid "Example: https://localhost/zabbix/ui/"
@@ -12066,7 +12066,7 @@ msgstr "Instale el agente Zabbix 2 y sus complementos en su objetivo de monitore
 
 #: app/views/host.wizard.edit.php:551 app/views/host.wizard.edit.php:574
 msgid "Install Zabbix agent and its plugins on your monitoring target by following the installation instructions below."
-msgstr ""
+msgstr "Instale el agente Zabbix y sus complementos en su objetivo de monitoreo siguiendo las instrucciones de instalación a continuación."
 
 #: setup.php:163
 msgid "Installation"
@@ -14061,7 +14061,7 @@ msgstr "Asignación"
 #: app/controllers/CControllerTemplateCreate.php:82
 #: app/controllers/CControllerTemplateUpdate.php:84
 msgid "Mapping type and value combination is not unique."
-msgstr ""
+msgstr "La combinación de tipo y valor de mapeo no es única."
 
 #: app/controllers/CControllerPopupValueMapUpdate.php:147
 #: app/views/administration.iconmap.edit.php:126
@@ -15982,12 +15982,12 @@ msgstr "Tenga en cuenta que %1$s o %2$s se considerarán nombres de equipo si se
 
 #: app/views/host.wizard.edit.php:518 app/views/host.wizard.edit.php:541
 msgid "Note that during agent installation, you will need to configure both the PSK identity and PSK. Make sure they match the PSK identity and PSK set in step 1."
-msgstr ""
+msgstr "Tenga en cuenta que, durante la instalación del agente, deberá configurar tanto la identidad PSK como el PSK. Asegúrese de que coincidan con la identidad PSK y el PSK configurados en el paso 1."
 
 #: app/views/host.wizard.edit.php:578
 #, c-format
 msgid "Note: %1$s must be configured and enabled on your monitoring target."
-msgstr ""
+msgstr "Nota: %1$s debe estar configurado y habilitado en su objetivo de monitoreo."
 
 #: include/hosts.inc.php:229
 msgid "Notes"
@@ -16350,7 +16350,7 @@ msgstr "Se permite un paso \"Prometheus\" por métrica."
 #: app/controllers/CControllerItem.php:174
 #: app/controllers/CControllerItemPrototype.php:176
 msgid "One \"Throttling\" step allowed per item."
-msgstr ""
+msgstr "Se permite un paso de \"Limitación\" por métrica."
 
 #: app/views/maintenance.timeperiod.edit.php:79
 #: include/classes/helpers/CMaintenanceHelper.php:29
@@ -16963,17 +16963,17 @@ msgstr "Identidad PSK"
 #: app/controllers/CControllerHostCreate.php:162
 #: app/controllers/CControllerHostUpdate.php:167
 msgid "PSK must be an even number of characters."
-msgstr ""
+msgstr "PSK debe tener un número par de caracteres."
 
 #: app/controllers/CControllerHostCreate.php:166
 #: app/controllers/CControllerHostUpdate.php:171
 msgid "PSK must be at least 32 characters long."
-msgstr ""
+msgstr "PSK debe tener al menos 32 caracteres."
 
 #: app/controllers/CControllerHostCreate.php:170
 #: app/controllers/CControllerHostUpdate.php:175
 msgid "PSK must contain only hexadecimal characters."
-msgstr ""
+msgstr "PSK debe contener sólo caracteres hexadecimales."
 
 #: jsLoader.php:146
 #, c-format
@@ -17044,7 +17044,7 @@ msgstr "Los parámetros \"esc_step_from\" y \"esc_step_to\" deben configurarse j
 
 #: include/views/configuration.host.discovery.prototype.edit.php:66
 msgid "Parent discovery prototypes"
-msgstr ""
+msgstr "Prototipos de descubrimiento de padres"
 
 #: include/views/configuration.host.discovery.edit.php:56
 #: include/views/configuration.host.prototype.edit.php:66
@@ -17443,11 +17443,11 @@ msgstr "Resumen de preinstalación"
 
 #: app/views/host.wizard.edit.php:405
 msgid "Pre-shared key"
-msgstr ""
+msgstr "Clave precompartida"
 
 #: app/views/host.wizard.edit.php:394
 msgid "Pre-shared key identity"
-msgstr ""
+msgstr "Identidad de clave precompartida"
 
 #: app/views/popup.triggerexpr.php:132
 msgid "Prediction functions"
@@ -17469,7 +17469,7 @@ msgstr "El preprocesamiento es una transformación antes de guardar el valor en 
 #: app/controllers/CControllerItem.php:190
 #: app/controllers/CControllerItemPrototype.php:192
 msgid "Preprocessing step with such Name and Parameters combination already exists."
-msgstr ""
+msgstr "El paso de preprocesamiento con dicha combinación de nombre y parámetros ya existe."
 
 #: app/views/popup.itemtestedit.view.php:375
 #: app/views/popup.massupdate.item.php:203
@@ -17966,7 +17966,7 @@ msgstr "Empujar"
 
 #: include/views/js/item.preprocessing.js.php:208
 msgid "Qualifier"
-msgstr ""
+msgstr "Calificador"
 
 #: include/classes/helpers/CSlaHelper.php:64
 msgid "Quarter"
@@ -19697,7 +19697,7 @@ msgstr "Seleccionado, %1$s, solo lectura, en la posición %2$d de %3$d"
 
 #: app/views/host.wizard.edit.php:428
 msgid "Semicolon to separate clusters (one or more server addresses)"
-msgstr ""
+msgstr "Punto y coma para separar clústeres (una o más direcciones de servidor)"
 
 #: jsLoader.php:267
 msgid "Send backward"
