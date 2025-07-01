@@ -177,11 +177,11 @@ class WidgetView extends CControllerDashboardWidgetView {
 			$this->getItemValue($item);
 		}
 
-		if (in_array(CWidgetFieldItemSections::SECTION_METRICS, $this->fields_values['sections'])) {
+		if (in_array(CWidgetFieldItemSections::SECTION_INTERVAL_AND_STORAGE, $this->fields_values['sections'])) {
 			$this->prepareItemDelay($item);
 		}
 
-		if (in_array(CWidgetFieldItemSections::SECTION_METRICS, $this->fields_values['sections'])
+		if (in_array(CWidgetFieldItemSections::SECTION_INTERVAL_AND_STORAGE, $this->fields_values['sections'])
 				|| in_array(CWidgetFieldItemSections::SECTION_LATEST_DATA, $this->fields_values['sections'])) {
 			$this->prepareItemHistoryAndTrends($item);
 		}

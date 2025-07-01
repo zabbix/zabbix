@@ -41,7 +41,7 @@ elseif ($data['item']) {
 				$sections[] = makeSectionError($item['error']);
 				break;
 
-			case CWidgetFieldItemSections::SECTION_METRICS:
+			case CWidgetFieldItemSections::SECTION_INTERVAL_AND_STORAGE:
 				$sections[] = makeSectionMetrics($item);
 				break;
 

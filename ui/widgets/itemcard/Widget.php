@@ -35,7 +35,7 @@ class Widget extends CWidget {
 	public function getInitialFieldsValues(): array {
 		return [
 			'sections' => [
-				CWidgetFieldItemSections::SECTION_METRICS,
+				CWidgetFieldItemSections::SECTION_INTERVAL_AND_STORAGE,
 				CWidgetFieldItemSections::SECTION_TYPE_OF_INFORMATION,
 				CWidgetFieldItemSections::SECTION_HOST_INTERFACE,
 				CWidgetFieldItemSections::SECTION_TYPE
