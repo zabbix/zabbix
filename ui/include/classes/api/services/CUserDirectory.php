@@ -368,7 +368,15 @@ class CUserDirectory extends CApiService {
 			}
 
 			if ($userdirectory['idp_type'] == IDP_TYPE_SAML) {
-				$saml_output = CArrayHelper::renameKeys(array_flip(self::SAML_OUTPUT_FIELDS), self::SAML_HASH_FIELDS);
+				$auth = API::Authentication()->get([
+					'output' => ['saml_auth_enabled']
+				]);
+
+				$saml_output = CArrayHelper::renameKeys(array_flip(self::SAML_OUTPUT_FIELDS),self::SAML_HASH_FIELDS);
+
+				if ($auth['saml_auth_enabled'] == ZBX_AUTH_SAML_DISABLED) {
+					unset($saml_output['idp_certificate'], $saml_output['sp_certificate'], $saml_output['sp_private_key']);
+				}
 
 				$ins_userdirectories_saml[] = array_intersect_key($userdirectory,
 					$saml_output + array_flip(['userdirectoryid'])
@@ -513,11 +521,20 @@ class CUserDirectory extends CApiService {
 			}
 
 			if ($userdirectory['idp_type'] == IDP_TYPE_SAML) {
+				$auth = API::Authentication()->get([
+					'output' => ['saml_auth_enabled']
+				]);
+
 				$saml_output = CArrayHelper::renameKeys(array_flip(self::SAML_OUTPUT_FIELDS), self::SAML_HASH_FIELDS);
 
 				$upd_userdirectory_saml = DB::getUpdatedValues('userdirectory_saml',
 					array_intersect_key($userdirectory, $saml_output), $db_userdirectory
 				);
+
+				if ($auth['saml_auth_enabled'] == ZBX_AUTH_SAML_DISABLED) {
+					unset($upd_userdirectory_saml['idp_certificate'], $upd_userdirectory_saml['sp_certificate'],
+						$upd_userdirectory_saml['sp_private_key']);
+				}
 
 				if ($upd_userdirectory_saml) {
 					$upd_userdirectories_saml[] = [
@@ -613,6 +630,22 @@ class CUserDirectory extends CApiService {
 		self::checkDuplicates($userdirectories, $db_userdirectories);
 		self::checkProvisionGroups($userdirectories, $db_userdirectories);
 		self::checkMediaTypes($userdirectories, $db_userdirectories);
+	}
+
+	public static function deleteSamlCerts(): void {
+		if (CAuthenticationHelper::isSamlCertsStorageDatabase()) {
+			$db_saml = API::UserDirectory()->get([
+				'output' => ['userdirectoryid'],
+				'filter' => ['idp_type' => IDP_TYPE_SAML]
+			]);
+
+			if ($db_saml) {
+				DB::update('userdirectory_saml', [
+					'values' => ['idp_certificate' => '', 'sp_certificate' => '', 'sp_private_key' => ''],
+					'where' => ['userdirectoryid' => $db_saml[0]['userdirectoryid']]
+				]);
+			}
+		}
 	}
 
 	private static function checkSamlRequirements(array $userdirectories): void {

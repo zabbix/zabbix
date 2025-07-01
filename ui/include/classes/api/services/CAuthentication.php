@@ -84,6 +84,10 @@ class CAuthentication extends CApiService {
 
 		self::addAuditLog(CAudit::ACTION_UPDATE, CAudit::RESOURCE_AUTHENTICATION, [$auth], [$db_auth]);
 
+		if ($auth['saml_auth_enabled'] == ZBX_AUTH_SAML_DISABLED) {
+			CUserDirectory::deleteSamlCerts();
+		}
+
 		return array_keys($auth);
 	}
 

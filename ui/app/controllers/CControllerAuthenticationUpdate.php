@@ -538,6 +538,7 @@ class CControllerAuthenticationUpdate extends CController {
 	 */
 	private function processSamlConfiguration(): bool {
 		if ($this->getInput('saml_auth_enabled', ZBX_AUTH_SAML_DISABLED) != ZBX_AUTH_SAML_ENABLED) {
+			CUserDirectory::deleteSamlCerts();
 			return true;
 		}
 
