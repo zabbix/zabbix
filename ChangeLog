@@ -5,8 +5,6 @@ Changes for 7.4.0
 --------------------------------------------------------------------------------
 Changes for 7.4.0rc2
 
-New features:
-
 Bug fixes:
 ..F....... [ZBX-26564] fixed rare case when modified widget configuration is not applied (averza)
 ..F....... [ZBX-26527] fixed access to server status information for users of non-super admin roles (talbergs)
