@@ -253,7 +253,7 @@
 					default_index_hidden.value = default_index.value;
 				}
 			});
-			
+
 			Object.values(this.saml_certs_mandatory_checkboxes).forEach(checkbox => {
 				checkbox.addEventListener('change', (e) => {
 					const sp_certificate_label = this.form.querySelector('label[for="sp_certificate"]');
