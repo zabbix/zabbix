@@ -272,6 +272,63 @@ button {
 		background-color: transparent;
 		border-style: dotted;
 	}
+
+	&[class^="zi-"], &[class*=" zi-"] {
+		height: 18px;
+		border: none;
+
+		&:not(:empty)::before {
+			margin-left: 0;
+			color: $btn-icon-color;
+
+			@if $ui-transitions {
+				transition: color $ui-controls-transition-duration ease-out;
+			}
+		}
+
+		span {
+			border-width: 0 0 1px;
+			border-style: dotted;
+		}
+
+		&:active,
+		&:focus,
+		&:hover {
+			&::before {
+				color: $btn-icon-hover-color;
+			}
+
+			span {
+				border-style: solid;
+				box-shadow: none;
+			}
+		}
+
+		&:active,
+		&:focus {
+			margin-bottom: 0;
+
+			&::before {
+				color: $btn-icon-focus-color;
+			}
+
+			span {
+				margin-bottom: -1px;
+				border-bottom-width: 2px;
+			}
+		}
+
+		&[disabled] {
+			&::before {
+				color: $btn-icon-disabled-color
+			}
+
+			span {
+				background-color: transparent;
+				border-style: dotted;
+			}
+		}
+	}
 }
 
 .btn-tag {

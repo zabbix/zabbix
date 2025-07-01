@@ -279,7 +279,7 @@ foreach ($data['templates'] as $template) {
 					->setArgument('filter_hostids', [$template['templateid']])
 					->setArgument('context', 'template')
 			),
-			CViewHelper::showNum($template['discoveries'])
+			CViewHelper::showNum($template['discoveryRules'])
 		],
 		[
 			new CLink(_('Web'),

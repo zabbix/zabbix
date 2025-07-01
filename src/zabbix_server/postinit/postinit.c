@@ -460,7 +460,7 @@ static void	copy_nested_host_prototypes(void)
 				" where h.flags=4"
 					" and exists (select null from items i,host_discovery hd"
 							" where i.hostid=ht.templateid"
-								" and hd.parent_itemid=i.itemid)"
+								" and hd.lldruleid=i.itemid)"
 				" order by hostid");
 
 	while (NULL != (row = zbx_db_fetch(result)))

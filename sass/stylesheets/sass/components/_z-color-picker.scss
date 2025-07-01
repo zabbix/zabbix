@@ -1,0 +1,263 @@
+z-color-picker {
+	display: inline-block;
+	line-height: 24px;
+
+	&[readonly] {
+		.color-picker-box {
+			cursor: default;
+		}
+	}
+
+	.color-picker-box {
+		position: relative;
+		vertical-align: top;
+		width: 24px;
+		height: 24px;
+		padding: 0;
+		color: $font-color;
+		background: #ffffff;
+		border: 1px solid $form-border-color;
+
+		&:disabled {
+			background: $form-disabled-font-color !important;
+			border-color: $form-disabled-font-color;
+			opacity: .35;
+		}
+
+		.color-picker-palette-icon {
+			display: none;
+		}
+	}
+}
+
+.color-picker-dialog {
+	.color-picker-tabs {
+		display: flex;
+		width: fit-content;
+		height: 30px;
+		margin-bottom: 10px;
+		line-height: 30px;
+		border-bottom: 1px solid $table-border-color;
+
+		.color-picker-tab {
+			&.color-picker-tab-selected {
+				input {
+					&:focus + label {
+						box-shadow: 0 0 0 2px $btn-focus-outline-color;
+					}
+				}
+
+				label {
+					padding-bottom: 6px;
+					color: $font-color;
+					background: transparent;
+					border-bottom: 3px solid $ui-tab-bg-selected-color;
+					cursor: default;
+
+					&:hover,
+					&:focus,
+					&:active {
+						background: transparent;
+					}
+				}
+			}
+
+			input {
+				position: absolute;
+				top: auto;
+				width: 1px;
+				height: 1px;
+				opacity: 0;
+			}
+
+			label {
+				padding: 8px 10px;
+				color: $link-color;
+				outline: none;
+				cursor: pointer;
+
+				@if $ui-transitions {
+					transition: background $ui-controls-transition-duration ease-out;
+				}
+
+				&:hover,
+				&:focus,
+				&:active {
+					background: $ui-hover-bg-color;
+				}
+			}
+		}
+	}
+
+	.color-picker-contents {
+		.color-picker-content {
+			display: none;
+
+			&.color-picker-content-selected {
+				display: block;
+			}
+		}
+	}
+
+	.color-picker-colors {
+		div {
+			display: flex;
+
+			.color-picker-color {
+				vertical-align: middle;
+				min-width: 20px;
+				height: 20px;
+				padding: 0;
+				border: 1px solid $ui-bg-color;
+				border-radius: 0;
+				transition: none;
+
+				&:hover,
+				&:focus,
+				&.color-picker-color-selected {
+					border-color: $form-focus-border-color;
+					box-shadow: inset 0 0 0 1px $ui-bg-color;
+				}
+
+				&:active {
+					box-shadow: inset 0 0 0 2px $ui-bg-color;
+				}
+			}
+		}
+	}
+
+	.color-picker-content-palette {
+		.color-picker-colors {
+			label {
+				display: flex;
+				align-items: center;
+
+				div {
+					vertical-align: middle;
+					box-sizing: border-box;
+					min-width: 20px;
+					height: 20px;
+					padding: 0;
+					border: 1px solid $ui-bg-color;
+					border-radius: 0;
+					transition: none;
+				}
+			}
+		}
+	}
+
+	.color-picker-controls {
+		margin-top: 10px;
+
+		.color-picker-input-wrap {
+			position: relative;
+			display: inline-block;
+			margin-right: 3px;
+
+			.color-picker-input {
+				width: 96px;
+				padding-left: 25px;
+			}
+
+			.color-picker-preview {
+				position: absolute;
+				top: 2px;
+				left: 2px;
+				width: 18px;
+				height: 18px;
+				color: $font-color;
+				border: 1px solid $form-border-color;
+
+				&::after {
+					line-height: 14px;
+				}
+
+				&.color-picker-no-color {
+					background: #ffffff;
+
+					&::after {
+						font-size: $icon-default-size;
+					}
+				}
+			}
+		}
+	}
+}
+
+.color-picker-preview {
+	&::after {
+		position: absolute;
+		top: 2px;
+		right: 2px;
+		bottom: 2px;
+		left: 2px;
+	}
+}
+
+.color-picker-default-color {
+	background: transparent !important;
+
+	&::after {
+		content: attr(data-default-symbol);
+		line-height: 18px;
+		text-align: center;
+	}
+}
+
+.color-picker-no-color {
+	&::after {
+		@extend %icon-position;
+		@extend %icons-font;
+		content: $zi-slash;
+		font-size: 20px;
+		color: $colorpicker-empty-color;
+		justify-content: center;
+	}
+}
+
+.color-picker-is-palette {
+	background: transparent !important;
+
+	.color-picker-palette-icon {
+		position: relative;
+		left: 1px;
+		display: flex !important;
+		gap: 1px;
+		width: calc(100% - 2px);
+		height: calc(100% - 2px);
+
+		.color-picker-palette-icon-part {
+			flex-grow: 1;
+			height: 100%;
+			background: var(--color);
+
+			@if $ui-transitions {
+				transition: background $ui-controls-transition-duration ease-out;
+			}
+
+			&:first-of-type {
+				border-top-left-radius: 1px;
+				border-bottom-left-radius: 1px;
+			}
+
+			&:last-of-type {
+				border-top-right-radius: 1px;
+				border-bottom-right-radius: 1px;
+			}
+		}
+	}
+}
+
+// Modifications by themes.
+
+@if $theme-name == 'blue' or $theme-name == 'dark' {
+	z-color-picker {
+		&[readonly] {
+			.color-picker-box {
+				&:focus {
+					box-shadow: none;
+				}
+			}
+		}
+	}
+}

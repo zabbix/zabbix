@@ -19,6 +19,8 @@
  * @var array $data
  */
 
+$data += ['is_discovered_prototype' => false];
+
 $graph_tab = new CFormGrid();
 
 if ($data['is_templated']) {
@@ -28,16 +30,18 @@ if ($data['is_templated']) {
 	]);
 }
 
-if ($data['discovered_graph']) {
+if ($data['discovered']) {
+	$parent_lld = $data['discoveryRule'] ?: $data['discoveryRulePrototype'];
+
 	$graph_tab->addItem([
 		new CLabel(_('Discovered by')),
 		new CFormField(
-			new CLink($data['discoveryRule']['name'],
+			new CLink($parent_lld['name'],
 				(new CUrl('zabbix.php'))
 					->setArgument('action', 'popup')
 					->setArgument('popup', 'graph.prototype.edit')
-					->setArgument('parent_discoveryid', $data['discoveryRule']['itemid'])
-					->setArgument('graphid', $data['graphDiscovery']['parent_graphid'])
+					->setArgument('parent_discoveryid', $data['discoveryData']['lldruleid'])
+					->setArgument('graphid', $data['discoveryData']['parent_graphid'])
 					->setArgument('context', $data['context'])
 			)
 		)
@@ -381,7 +385,9 @@ if (array_key_exists('parent_discoveryid', $data)) {
 	$graph_tab->addItem([
 		new CLabel(_('Discover')),
 		new CFormField(
-			(new CCheckBox('discover', ZBX_PROTOTYPE_DISCOVER))->setChecked($data['discover'] == ZBX_PROTOTYPE_DISCOVER)
+			(new CCheckBox('discover', ZBX_PROTOTYPE_DISCOVER))
+				->setChecked($data['discover'] == ZBX_PROTOTYPE_DISCOVER)
+				->setReadonly($data['is_discovered_prototype'])
 		)
 	]);
 }

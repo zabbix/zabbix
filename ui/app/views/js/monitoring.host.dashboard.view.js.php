@@ -385,7 +385,7 @@
 						postMessageDetails('error', data.submit.error.messages);
 					}
 
-					if (data.submit.success.action === 'delete') {
+					if (data.submit.success?.action === 'delete') {
 						const url = new URL('zabbix.php', location.href);
 
 						url.searchParams.set('action', 'host.view');

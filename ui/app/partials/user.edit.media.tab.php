@@ -71,7 +71,7 @@ $media_table_info_template = new CTemplateTag('media-row-tmpl',
 				->setEnabled($data['can_edit_media'])
 				->addClass('js-edit'),
 			(new CButtonLink(_('Remove')))
-				->setEnabled(!$data['readonly'] && $data['can_edit_media'])
+				->setEnabled($data['can_edit_media'])
 				->addClass('js-remove'),
 			(new CDiv([
 				new CInput('hidden', 'medias[#{row_index}][mediaid]', '#{mediaid}'),
