@@ -632,7 +632,7 @@ class CUserDirectory extends CApiService {
 			if ($userdirectory['idp_type'] != IDP_TYPE_SAML) {
 				continue;
 			}
-			
+
 			$trigger_checkboxes = [
 				$userdirectory['sign_messages'],
 				$userdirectory['sign_assertions'],
@@ -642,16 +642,16 @@ class CUserDirectory extends CApiService {
 				$userdirectory['encrypt_nameid'],
 				$userdirectory['encrypt_assertions']
 			];
-			
+
 			if (in_array('1', $trigger_checkboxes, true)) {
 				$db_userdirectory = $db_userdirectories[$userdirectory['userdirectoryid']];
-			
+
 				if (array_key_exists('sp_certificate', $userdirectory)
 						&& ($userdirectory['sp_certificate'] === ''
 							|| $userdirectory['sp_certificate'] != $db_userdirectory['sp_certificate'])) {
 					$api_input_rules['fields']['sp_certificate']['rules'][0]['flags'] = API_REQUIRED | API_NOT_EMPTY;
 				}
-				
+
 				if (array_key_exists('sp_private_key', $userdirectory)
 						&& ($userdirectory['sp_private_key'] === ''
 							|| $userdirectory['sp_private_key'] !== $db_userdirectory['sp_private_key'])) {
@@ -667,7 +667,7 @@ class CUserDirectory extends CApiService {
 					unset($api_input_rules['fields']['sp_private_key']['rules'][0]['flags']);
 				}
 			}
-			
+
 			unset($trigger_checkboxes);
 		}
 	}
