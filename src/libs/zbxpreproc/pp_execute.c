@@ -344,14 +344,17 @@ static int	pp_excute_jsonpath_query(zbx_pp_cache_t *cache, zbx_variant_t *value,
  ******************************************************************************/
 static int	pp_execute_jsonpath(zbx_pp_cache_t *cache, zbx_variant_t *value, const char *params)
 {
-	char	*errmsg = NULL;
+	char	*errmsg = NULL, *error = NULL;
+	size_t	error_alloc = 0, error_offset = 0;
 
 	if (SUCCEED == pp_excute_jsonpath_query(cache, value, params, &errmsg))
 		return SUCCEED;
 
 	zbx_variant_clear(value);
-	zbx_variant_set_error(value, zbx_dsprintf(NULL, "cannot extract value from json by path \"%s\": %s", params,
-			errmsg));
+	zbx_snprintf_alloc(&error, &error_alloc, &error_offset, "cannot extract value from json by path \"%s\": %s",
+			params, errmsg);
+
+	zbx_variant_set_error(value, error);
 
 	zbx_free(errmsg);
 

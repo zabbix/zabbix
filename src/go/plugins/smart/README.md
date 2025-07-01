@@ -4,12 +4,8 @@
 
 The Zabbix SMART plugin for `zabbix_agent2` provides monitoring of storage devices' health and performance. It utilizes the `smartctl` utility to collect and report SMART metrics, helping to identify potential hardware issues before they result in failures.
 
-## Requirements
-
-The following requirements must be met:
-
+## Supported versions
 - **Smartmontools**: Version 7.1 or later is required to provide the `smartctl` utility for SMART data retrieval.
-- **Golang**: Version 1.21 or higher is required only when building the plugin from source.
 
 ## Configuration
 
