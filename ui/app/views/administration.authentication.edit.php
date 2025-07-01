@@ -308,7 +308,7 @@ $saml_tab = (new CFormGrid())
 if ($data['saml_certs_editable']) {
 	$saml_tab
 		->addItem([
-			new CLabel(_('IdP certificate'), 'idp_certificate'),
+			(new CLabel(_('IdP certificate'), 'idp_certificate'))->setAsteriskMark(),
 			(new CFormField([
 				$data['show_idp_certificate_input']
 					? null
@@ -331,7 +331,7 @@ if ($data['saml_certs_editable']) {
 				]))
 					->addClass('js-saml-cert-input')
 					->addStyle($data['show_idp_certificate_input'] ? '' : 'display: none')
-			]))
+			]))->setAriaRequired()
 		])
 		->addItem([
 			new CLabel(_('SP private key'), 'sp_private_key'),

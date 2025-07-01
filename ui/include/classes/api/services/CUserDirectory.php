@@ -600,6 +600,7 @@ class CUserDirectory extends CApiService {
 		self::addRequiredFieldsByType($userdirectories, $db_userdirectories);
 
 		$api_input_rules = self::getValidationRules(true);
+		self::setSamlCertsMandatoryFields($userdirectories, $db_userdirectories, $api_input_rules);
 
 		if (!CApiInputValidator::validate($api_input_rules, $userdirectories, '/', $error)) {
 			self::exception(ZBX_API_ERROR_PARAMETERS, $error);
@@ -623,6 +624,51 @@ class CUserDirectory extends CApiService {
 					self::exception(ZBX_API_ERROR_INTERNAL, $openssl_status['error']);
 				}
 			}
+		}
+	}
+
+	private static function setSamlCertsMandatoryFields(array $userdirectories, array $db_userdirectories, array &$api_input_rules): void {
+		foreach ($userdirectories as $userdirectory) {
+			if ($userdirectory['idp_type'] != IDP_TYPE_SAML) {
+				continue;
+			}
+			
+			$trigger_checkboxes = [
+				$userdirectory['sign_messages'],
+				$userdirectory['sign_assertions'],
+				$userdirectory['sign_authn_requests'],
+				$userdirectory['sign_logout_requests'],
+				$userdirectory['sign_logout_responses'],
+				$userdirectory['encrypt_nameid'],
+				$userdirectory['encrypt_assertions']
+			];
+			
+			if (in_array('1', $trigger_checkboxes, true)) {
+				$db_userdirectory = $db_userdirectories[$userdirectory['userdirectoryid']];
+			
+				if (array_key_exists('sp_certificate', $userdirectory)
+						&& ($userdirectory['sp_certificate'] === ''
+							|| $userdirectory['sp_certificate'] != $db_userdirectory['sp_certificate'])) {
+					$api_input_rules['fields']['sp_certificate']['rules'][0]['flags'] = API_REQUIRED | API_NOT_EMPTY;
+				}
+				
+				if (array_key_exists('sp_private_key', $userdirectory)
+						&& ($userdirectory['sp_private_key'] === ''
+							|| $userdirectory['sp_private_key'] !== $db_userdirectory['sp_private_key'])) {
+					$api_input_rules['fields']['sp_private_key']['rules'][0]['flags'] = API_REQUIRED | API_NOT_EMPTY;
+				}
+			}
+			else {
+				if (array_key_exists('flags', $api_input_rules['fields']['sp_certificate']['rules'][0])) {
+					unset($api_input_rules['fields']['sp_certificate']['rules'][0]['flags']);
+				}
+
+				if (array_key_exists('flags', $api_input_rules['fields']['sp_private_key']['rules'][0])) {
+					unset($api_input_rules['fields']['sp_private_key']['rules'][0]['flags']);
+				}
+			}
+			
+			unset($trigger_checkboxes);
 		}
 	}
 
@@ -1633,7 +1679,7 @@ class CUserDirectory extends CApiService {
 										['else' => true, 'type' => API_UNEXPECTED]
 			]],
 			'idp_certificate' =>	['type' => API_MULTIPLE, 'rules' => [
-										['if' => ['field' => 'idp_type', 'in' => IDP_TYPE_SAML], 'type' => API_SSL_CERTIFICATE],
+										['if' => ['field' => 'idp_type', 'in' => IDP_TYPE_SAML], 'type' => API_SSL_CERTIFICATE, 'flags' => $api_required | API_NOT_EMPTY],
 										['else' => true, 'type' => API_STRING_UTF8, 'in' => DB::getDefault('userdirectory_saml', 'idp_certificate')]
 			]],
 			'sp_certificate' =>		['type' => API_MULTIPLE, 'rules' => [
