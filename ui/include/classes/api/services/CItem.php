@@ -907,7 +907,7 @@ class CItem extends CItemGeneral {
 			DB::update('item_discovery', [
 				'values' => ['disable_source' => ZBX_DISABLE_DEFAULT],
 				'where' => ['itemid' => $upd_item_discoveries]
-			], true);
+			]);
 		}
 
 		self::updateTags($items, $db_items, $upd_itemids);
@@ -1923,12 +1923,12 @@ class CItem extends CItemGeneral {
 
 		self::clearHistoryAndTrends($del_itemids);
 
-		DB::delete('item_preproc', ['itemid' => $del_itemids], true);
-		DB::delete('item_tag', ['itemid' => $del_itemids], true);
+		DB::delete('item_preproc', ['itemid' => $del_itemids]);
+		DB::delete('item_tag', ['itemid' => $del_itemids]);
 		DB::update('items', [
 			'values' => ['templateid' => 0, 'master_itemid' => 0],
 			'where' => ['itemid' => $del_itemids]
-		], true);
+		]);
 		DB::delete('items', ['itemid' => $del_itemids]);
 
 		self::addAuditLog(CAudit::ACTION_DELETE, CAudit::RESOURCE_ITEM, $db_items);
@@ -2011,7 +2011,7 @@ class CItem extends CItemGeneral {
 			'idx' => 'web.favorite.graphids',
 			'source' => 'itemid',
 			'value_id' => $del_itemids
-		], true);
+		]);
 	}
 
 	/**

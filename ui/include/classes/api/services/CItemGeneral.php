@@ -2702,7 +2702,7 @@ abstract class CItemGeneral extends CApiService {
 				'ymin_itemid' => null
 			],
 			'where' => ['ymin_itemid' => $del_itemids]
-		], true);
+		]);
 
 		DB::update('graphs', [
 			'values' => [
@@ -2710,7 +2710,7 @@ abstract class CItemGeneral extends CApiService {
 				'ymax_itemid' => null
 			],
 			'where' => ['ymax_itemid' => $del_itemids]
-		], true);
+		]);
 	}
 
 	/**

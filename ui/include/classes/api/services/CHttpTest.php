@@ -685,11 +685,11 @@ class CHttpTest extends CApiService {
 		self::deleteAffectedItems($del_httptestids);
 		self::deleteAffectedSteps($del_httptestids);
 
-		DB::delete('httptest_field', ['httptestid' => $del_httptestids], true);
+		DB::delete('httptest_field', ['httptestid' => $del_httptestids]);
 		DB::update('httptest', [
 			'values' => ['templateid' => 0],
 			'where' => ['httptestid' => $del_httptestids]
-		], true);
+		]);
 		DB::delete('httptest', ['httptestid' => $del_httptestids]);
 
 		self::addAuditLog(CAudit::ACTION_DELETE, CAudit::RESOURCE_SCENARIO, $db_httptests);
@@ -736,7 +736,7 @@ class CHttpTest extends CApiService {
 		), 'itemid');
 
 		CItem::addInheritedItems($db_items);
-		DB::delete('httptestitem', ['itemid' => array_keys($db_items)], true);
+		DB::delete('httptestitem', ['itemid' => array_keys($db_items)]);
 		CItem::deleteForce($db_items);
 	}
 
@@ -753,7 +753,7 @@ class CHttpTest extends CApiService {
 
 		self::deleteAffectedStepItems($del_stepids);
 
-		DB::delete('httpstep_field', ['httpstepid' => $del_stepids], true);
+		DB::delete('httpstep_field', ['httpstepid' => $del_stepids]);
 		DB::delete('httpstep', ['httpstepid' => $del_stepids]);
 	}
 
@@ -771,7 +771,7 @@ class CHttpTest extends CApiService {
 		), 'itemid');
 
 		CItem::addInheritedItems($db_items);
-		DB::delete('httpstepitem', ['itemid' => array_keys($db_items)], true);
+		DB::delete('httpstepitem', ['itemid' => array_keys($db_items)]);
 		CItem::deleteForce($db_items);
 	}
 
