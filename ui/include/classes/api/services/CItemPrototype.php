@@ -1527,7 +1527,7 @@ class CItemPrototype extends CItemGeneral {
 		DB::update('items', [
 			'values' => ['templateid' => 0, 'master_itemid' => 0],
 			'where' => ['itemid' => $del_itemids]
-		]);
+		], true);
 		DB::delete('items', ['itemid' => $del_itemids]);
 
 		self::addAuditLog(CAudit::ACTION_DELETE, CAudit::RESOURCE_ITEM_PROTOTYPE, $db_items);

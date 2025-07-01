@@ -2530,7 +2530,7 @@ class CHostPrototype extends CHostBase {
 		DB::update('hosts', [
 			'values' => ['templateid' => 0],
 			'where' => ['hostid' => $hostids]
-		]);
+		], true);
 		DB::delete('hosts', ['hostid' => $hostids]);
 
 		self::addAuditLog(CAudit::ACTION_DELETE, CAudit::RESOURCE_HOST_PROTOTYPE, $db_hosts);
@@ -2570,7 +2570,7 @@ class CHostPrototype extends CHostBase {
 		DB::update('group_prototype', [
 			'values' => ['templateid' => 0],
 			'where' => ['templateid' => $del_group_prototypeids]
-		]);
+		], true);
 		DB::delete('group_prototype', ['group_prototypeid' => $del_group_prototypeids]);
 	}
 

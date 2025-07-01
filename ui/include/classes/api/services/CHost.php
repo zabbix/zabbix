@@ -1754,10 +1754,6 @@ class CHost extends CHostGeneral {
 		// delete host
 		DB::delete('host_proxy', ['hostid' => $hostids], true);
 		DB::delete('host_tag', ['hostid' => $hostids], true);
-		DB::update('hosts', [
-			'values' => ['templateid' => 0],
-			'where' => ['hostid' => $hostids, 'flags' => ZBX_FLAG_DISCOVERY_PROTOTYPE]
-		]);
 		DB::delete('hosts', ['hostid' => $hostids]);
 
 		self::addAuditLog(CAudit::ACTION_DELETE, CAudit::RESOURCE_HOST, $db_hosts);

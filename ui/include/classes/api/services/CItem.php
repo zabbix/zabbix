@@ -903,7 +903,7 @@ class CItem extends CItemGeneral {
 			DB::update('item_discovery', [
 				'values' => ['disable_source' => ZBX_DISABLE_DEFAULT],
 				'where' => ['itemid' => $upd_item_discoveries]
-			]);
+			], true);
 		}
 
 		self::updateTags($items, $db_items, $upd_itemids);
@@ -1951,7 +1951,7 @@ class CItem extends CItemGeneral {
 		DB::update('items', [
 			'values' => ['templateid' => 0, 'master_itemid' => 0],
 			'where' => ['itemid' => $del_itemids]
-		]);
+		], true);
 		DB::delete('items', ['itemid' => $del_itemids]);
 
 		self::addAuditLog(CAudit::ACTION_DELETE, CAudit::RESOURCE_ITEM, $db_items);

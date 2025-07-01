@@ -2483,17 +2483,6 @@ class CDiscoveryRule extends CItemGeneral {
 	}
 
 	/**
-	 * @param array $del_operationids
-	 */
-	private static function deleteOverrideOperations(array $del_operationids): void {
-		foreach (self::OPERATION_FIELDS as $optable => $foo) {
-			DB::delete($optable, ['lld_override_operationid' => $del_operationids]);
-		}
-
-		DB::delete('lld_override_operation', ['lld_override_operationid' => $del_operationids]);
-	}
-
-	/**
 	 * @param array      $operations
 	 * @param array|null $upd_operationids
 	 */
@@ -3106,7 +3095,7 @@ class CDiscoveryRule extends CItemGeneral {
 		DB::update('items', [
 			'values' => ['templateid' => 0],
 			'where' => ['itemid' => $del_itemids]
-		]);
+		], true);
 		DB::delete('items', ['itemid' => $del_itemids]);
 
 		$ins_housekeeper = [];
