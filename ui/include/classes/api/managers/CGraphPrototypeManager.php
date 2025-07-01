@@ -54,13 +54,30 @@ class CGraphPrototypeManager {
 			' FOR UPDATE'
 		);
 
-		// Deleting discovered graphs.
-		$del_discovered_graphids = DBfetchColumn(DBselect(
-			'SELECT gd.graphid FROM graph_discovery gd WHERE '.dbConditionInt('gd.parent_graphid', $del_graphids)
+		// Deleting discovered graph prototypes.
+		$db_graphids = DBfetchColumn(DBselect(
+			'SELECT gd.graphid'.
+			' FROM graph_discovery gd'.
+			' JOIN graphs g ON gd.graphid=g.graphid'.
+			' WHERE '.dbConditionId('gd.parent_graphid', $del_graphids).
+				' AND '.dbConditionInt('g.flags', [ZBX_FLAG_DISCOVERY_PROTOTYPE_CREATED])
 		), 'graphid');
 
-		if ($del_discovered_graphids) {
-			CGraphManager::delete($del_discovered_graphids);
+		if ($db_graphids) {
+			self::delete($db_graphids);
+		}
+
+		// Deleting discovered graphs.
+		$db_graphids = DBfetchColumn(DBselect(
+			'SELECT gd.graphid'.
+			' FROM graph_discovery gd'.
+			' JOIN graphs g ON gd.graphid=g.graphid'.
+			' WHERE '.dbConditionId('gd.parent_graphid', $del_graphids).
+				' AND '.dbConditionInt('g.flags', [ZBX_FLAG_DISCOVERY_CREATED])
+		), 'graphid');
+
+		if ($db_graphids) {
+			CGraphManager::delete($db_graphids);
 		}
 
 		DB::delete('graphs', ['graphid' => $del_graphids]);

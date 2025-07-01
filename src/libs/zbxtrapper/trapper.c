@@ -120,6 +120,58 @@ zbx_status_section_t;
 
 /******************************************************************************
  *                                                                            *
+ * Purpose: Check frontend connection allowed according to configuration      *
+ *          TLSFrontendAccept, FrontendAllowedIP, TLSFrontendCertIssuer and   *
+ *          TLSFrontendCertSubject                                            *
+ *                                                                            *
+ * Parameters:  sock           - [IN] request socket                          *
+ *              config_tls     - [IN]                                         *
+ *              config_frontend_allowed_ip - [IN]                             *
+ *                                                                            *
+ * Return value:  SUCCEED - connection allowed                                *
+ *                FAIL - not allowed                                          *
+ *                                                                            *
+ ******************************************************************************/
+int	zbx_check_frontend_conn_accept(zbx_socket_t *sock, const zbx_config_tls_t *config_tls,
+		const char *config_frontend_allowed_ip)
+{
+	if (NULL != config_frontend_allowed_ip &&
+		SUCCEED != zbx_tcp_check_allowed_peers_info(&sock->peer_info, config_frontend_allowed_ip))
+	{
+		zabbix_log(LOG_LEVEL_DEBUG, "frontend connection from \"%s\" is not allowed by FrontendAllowedIP",
+			sock->peer);
+
+		return FAIL;
+	}
+
+	if (0 == (config_tls->frontend_accept_modes & sock->connection_type))
+	{
+		zabbix_log(LOG_LEVEL_DEBUG, "frontend connection of type \"%s\" is not allowed by TLSFrontendAccept",
+				zbx_tcp_connection_type_name(sock->connection_type));
+
+		return FAIL;
+	}
+
+#if defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
+	char	*msg = NULL;
+
+	if (ZBX_TCP_SEC_TLS_CERT == sock->connection_type && SUCCEED != zbx_check_server_issuer_subject(sock,
+		config_tls->frontend_cert_issuer,
+		config_tls->frontend_cert_subject,
+		&msg))
+	{
+		zabbix_log(LOG_LEVEL_DEBUG, "frontend connection from \"%s\" is not allowed: %s", sock->peer, msg);
+		zbx_free(msg);
+
+		return FAIL;
+	}
+#endif
+
+	return SUCCEED;
+}
+
+/******************************************************************************
+ *                                                                            *
  * Purpose: processes received values from active agents                      *
  *                                                                            *
  ******************************************************************************/
@@ -330,12 +382,15 @@ static int	queue_compare_by_nextcheck_asc(zbx_queue_item_t **d1, zbx_queue_item_
  * Parameters:  sock           - [IN] request socket                          *
  *              jp             - [IN] request data                            *
  *              config_timeout - [IN]                                         *
+ *              config_tls     - [IN]                                         *
+ *              config_frontend_allowed_ip - [IN]                             *
  *                                                                            *
  * Return value:  SUCCEED - processed successfully                            *
  *                FAIL - error occurred                                       *
  *                                                                            *
  ******************************************************************************/
-static int	recv_getqueue(zbx_socket_t *sock, struct zbx_json_parse *jp, int config_timeout)
+static int	recv_getqueue(zbx_socket_t *sock, struct zbx_json_parse *jp, int config_timeout,
+	const zbx_config_tls_t *config_tls, const char *config_frontend_allowed_ip)
 {
 	int				ret = FAIL, request_type = ZBX_GET_QUEUE_UNKNOWN, now, limit;
 	char				type[MAX_STRING_LEN], limit_str[MAX_STRING_LEN];
@@ -348,6 +403,11 @@ static int	recv_getqueue(zbx_socket_t *sock, struct zbx_json_parse *jp, int conf
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
 	zbx_user_init(&user);
+
+	if (SUCCEED != zbx_check_frontend_conn_accept(sock, config_tls, config_frontend_allowed_ip))
+	{
+		goto out;
+	}
 
 	if (FAIL == zbx_get_user_from_json(jp, &user, NULL) || USER_TYPE_SUPER_ADMIN > user.type)
 	{
@@ -819,12 +879,15 @@ static void	status_stats_export(struct zbx_json *json)
  * Parameters:  sock           - [IN] request socket                          *
  *              jp             - [IN] request data                            *
  *              config_timeout - [IN]                                         *
+ *              config_tls     - [IN]                                         *
+ *              config_frontend_allowed_ip - [IN]                             *
  *                                                                            *
  * Return value:  SUCCEED - processed successfully                            *
  *                FAIL - error occurred                                       *
  *                                                                            *
  ******************************************************************************/
-static int	recv_getstatus(zbx_socket_t *sock, struct zbx_json_parse *jp, int config_timeout)
+static int	recv_getstatus(zbx_socket_t *sock, struct zbx_json_parse *jp, int config_timeout,
+				const zbx_config_tls_t *config_tls, const char *config_frontend_allowed_ip)
 {
 #define ZBX_GET_STATUS_UNKNOWN	-1
 #define ZBX_GET_STATUS_PING	0
@@ -838,6 +901,9 @@ static int	recv_getstatus(zbx_socket_t *sock, struct zbx_json_parse *jp, int con
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
 	zbx_user_init(&user);
+
+	if (SUCCEED != zbx_check_frontend_conn_accept(sock, config_tls, config_frontend_allowed_ip))
+		goto out;
 
 	if (FAIL == zbx_get_user_from_json(jp, &user, NULL))
 	{
@@ -1143,7 +1209,7 @@ static int	process_trap(zbx_socket_t *sock, char *s, zbx_timespec_t *ts,
 		int config_enable_global_scripts, zbx_get_value_internal_ext_f zbx_get_value_internal_ext_cb,
 		const char *config_ssh_key_location, const char *config_webdriver_url,
 		zbx_trapper_process_request_func_t trapper_process_request_cb,
-		zbx_autoreg_update_host_func_t autoreg_update_host_cb)
+		zbx_autoreg_update_host_func_t autoreg_update_host_cb, const char *config_frontend_allowed_ip)
 {
 	int	ret = SUCCEED;
 
@@ -1166,6 +1232,21 @@ static int	process_trap(zbx_socket_t *sock, char *s, zbx_timespec_t *ts,
 
 		if (SUCCEED != zbx_json_value_by_name(&jp, ZBX_PROTO_TAG_REQUEST, value, sizeof(value), NULL))
 			return FAIL;
+
+		if (0 == strcmp(value, ZBX_PROTO_VALUE_ZABBIX_STATS))
+		{
+			ret = send_internal_stats_json(sock, &jp, config_comms, config_startup_time,
+					config_stats_allowed_ip);
+		}
+
+		if (ZBX_TCP_SEC_UNENCRYPTED == sock->connection_type &&
+			NULL != config_comms->config_tls->tls_listen)
+		{
+			zabbix_log(LOG_LEVEL_WARNING,
+				"from %s: unencrypted connection not allowed for non-stat requests", sock->peer);
+
+			return FAIL;
+		}
 
 		if (0 == strcmp(value, ZBX_PROTO_VALUE_AGENT_DATA))
 		{
@@ -1197,22 +1278,24 @@ static int	process_trap(zbx_socket_t *sock, char *s, zbx_timespec_t *ts,
 		else if (0 == strcmp(value, ZBX_PROTO_VALUE_GET_QUEUE))
 		{
 			if (0 != (zbx_get_program_type_cb() & ZBX_PROGRAM_TYPE_SERVER))
-				ret = recv_getqueue(sock, &jp, config_comms->config_timeout);
+			{
+				ret = recv_getqueue(sock, &jp, config_comms->config_timeout, config_comms->config_tls,
+					config_frontend_allowed_ip);
+			}
 		}
 		else if (0 == strcmp(value, ZBX_PROTO_VALUE_GET_STATUS))
 		{
 			if (0 != (zbx_get_program_type_cb() & ZBX_PROGRAM_TYPE_SERVER))
-				ret = recv_getstatus(sock, &jp, config_comms->config_timeout);
-		}
-		else if (0 == strcmp(value, ZBX_PROTO_VALUE_ZABBIX_STATS))
-		{
-			ret = send_internal_stats_json(sock, &jp, config_comms, config_startup_time,
-					config_stats_allowed_ip);
+			{
+				ret = recv_getstatus(sock, &jp, config_comms->config_timeout, config_comms->config_tls,
+					config_frontend_allowed_ip);
+			}
 		}
 		else if (0 == strcmp(value, ZBX_PROTO_VALUE_EXPRESSIONS_EVALUATE))
 		{
 			if (0 != (zbx_get_program_type_cb() & ZBX_PROGRAM_TYPE_SERVER))
-				ret = zbx_trapper_expressions_evaluate(sock, &jp, config_comms->config_timeout);
+				ret = zbx_trapper_expressions_evaluate(sock, &jp, config_comms->config_timeout,
+					config_comms->config_tls, config_frontend_allowed_ip);
 		}
 		else if (0 == strcmp(value, ZBX_PROTO_VALUE_ZABBIX_ITEM_TEST))
 		{
@@ -1222,7 +1305,8 @@ static int	process_trap(zbx_socket_t *sock, char *s, zbx_timespec_t *ts,
 						zbx_get_program_type_cb(), progname, get_config_forks,
 						config_java_gateway, config_java_gateway_port, config_externalscripts,
 						zbx_get_value_internal_ext_cb, config_ssh_key_location,
-						config_webdriver_url);
+						config_webdriver_url, config_comms->config_tls,
+						config_frontend_allowed_ip);
 			}
 		}
 		else if (0 == strcmp(value, ZBX_PROTO_VALUE_ACTIVE_CHECK_HEARTBEAT))
@@ -1230,7 +1314,8 @@ static int	process_trap(zbx_socket_t *sock, char *s, zbx_timespec_t *ts,
 			ret = process_active_check_heartbeat(sock, &jp, config_comms->config_timeout);
 		}
 		else if (SUCCEED != trapper_process_request_cb(value, sock, &jp, ts, config_comms, config_vault,
-				proxydata_frequency, zbx_get_program_type_cb, events_cbs, get_config_forks))
+				proxydata_frequency, zbx_get_program_type_cb, events_cbs, get_config_forks,
+				config_comms->config_tls, config_frontend_allowed_ip))
 		{
 			zabbix_log(LOG_LEVEL_WARNING, "unknown request received from \"%s\": [%s]", sock->peer,
 				value);
@@ -1320,7 +1405,7 @@ static void	process_trapper_child(zbx_socket_t *sock, zbx_timespec_t *ts,
 		int config_enable_global_scripts, zbx_get_value_internal_ext_f zbx_get_value_internal_ext_cb,
 		const char *config_ssh_key_location, const char *config_webdriver_url,
 		zbx_trapper_process_request_func_t trapper_process_request_cb,
-		zbx_autoreg_update_host_func_t autoreg_update_host_cb)
+		zbx_autoreg_update_host_func_t autoreg_update_host_cb, const char *config_frontend_allowed_ip)
 {
 	if (FAIL == zbx_tcp_recv_to(sock, config_comms->config_trapper_timeout))
 		return;
@@ -1329,7 +1414,8 @@ static void	process_trapper_child(zbx_socket_t *sock, zbx_timespec_t *ts,
 			events_cbs, proxydata_frequency, get_config_forks, config_stats_allowed_ip, progname,
 			config_java_gateway, config_java_gateway_port, config_externalscripts,
 			config_enable_global_scripts, zbx_get_value_internal_ext_cb, config_ssh_key_location,
-			config_webdriver_url, trapper_process_request_cb, autoreg_update_host_cb);
+			config_webdriver_url, trapper_process_request_cb, autoreg_update_host_cb,
+			config_frontend_allowed_ip);
 }
 
 ZBX_THREAD_ENTRY(zbx_trapper_thread, args)
@@ -1391,7 +1477,8 @@ ZBX_THREAD_ENTRY(zbx_trapper_thread, args)
 		/* Only after receiving data it is known who has sent them and one can decide to accept or discard */
 		/* the data. */
 		ret = zbx_tcp_accept(&s, ZBX_TCP_SEC_TLS_CERT | ZBX_TCP_SEC_TLS_PSK | ZBX_TCP_SEC_UNENCRYPTED,
-				POLL_TIMEOUT);
+				POLL_TIMEOUT, trapper_args_in->config_comms->config_tls->tls_listen,
+				trapper_args_in->config_stats_allowed_ip);
 		zbx_update_env(get_process_type_string(process_type), zbx_time());
 
 		if (TIMEOUT_ERROR == ret)
@@ -1439,7 +1526,8 @@ ZBX_THREAD_ENTRY(zbx_trapper_thread, args)
 					trapper_args_in->config_ssh_key_location,
 					trapper_args_in->config_webdriver_url,
 					trapper_args_in->trapper_process_request_func_cb,
-					trapper_args_in->autoreg_update_host_cb);
+					trapper_args_in->autoreg_update_host_cb,
+					trapper_args_in->config_frontend_allowed_ip);
 			sec = zbx_time() - sec;
 
 			zbx_tcp_unaccept(&s);

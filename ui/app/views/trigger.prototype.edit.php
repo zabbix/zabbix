@@ -19,6 +19,8 @@
  * @var array $data
  */
 
+$readonly = $data['limited'] || $data['is_discovered_prototype'];
+
 $trigger_form = (new CForm())
 	->addItem((new CVar(CSRF_TOKEN_NAME, CCsrfTokenHelper::get('trigger')))->removeId())
 	->setId('trigger-prototype-form')
@@ -45,13 +47,12 @@ if ($data['limited']) {
 		->addItem((new CVar('manual_close', $data['manual_close']))->removeId());
 }
 
+$data['form_name'] = $trigger_form->getName();
+
 // Append tabs to form.
 $triggers_tab = (new CTabView())
 	->addTab('triggersTab',_('Trigger prototype'),
-		new CPartial('trigger.edit.trigger.tab', $data += [
-			'readonly' => $data['limited'],
-			'form_name' => $trigger_form->getName()
-		])
+		new CPartial('trigger.edit.trigger.tab', $data + ['readonly' => $readonly])
 	)
 	->addTab('tags-tab', _('Tags'),
 		new CPartial('configuration.tags.tab', [
@@ -60,10 +61,12 @@ $triggers_tab = (new CTabView())
 			'show_inherited_tags' => $data['show_inherited_tags'],
 			'tabs_id' => 'tabs',
 			'tags_tab_id' => 'tags-tab',
-			'has_inline_validation' => true
+			'has_inline_validation' => true,
+			'readonly' => $data['is_discovered_prototype']
 		]), TAB_INDICATOR_TAGS
 	)
-	->addTab('dependenciesTab', _('Dependencies'), new CPartial('trigger.edit.dependencies.tab', $data),
+	->addTab('dependenciesTab', _('Dependencies'),
+		new CPartial('trigger.edit.dependencies.tab', $data + ['readonly' => $data['is_discovered_prototype']]),
 		TAB_INDICATOR_DEPENDENCY
 	);
 
@@ -87,7 +90,8 @@ else {
 			'title' => _('Update'),
 			'keepOpen' => true,
 			'isSubmit' => true,
-			'action' => 'trigger_edit_popup.submit();'
+			'action' => 'trigger_edit_popup.submit();',
+			'enabled' => !$data['is_discovered_prototype']
 		],
 		[
 			'title' => _('Clone'),
@@ -112,7 +116,8 @@ else {
 					]
 				],
 				'rules' => (new CFormValidator(CControllerTriggerPrototypeCreate::getValidationRules()))->getRules()
-			]).');'
+			]).');',
+			'enabled' => !$data['is_discovered_prototype']
 		],
 		[
 			'title' => _('Delete'),
@@ -151,7 +156,7 @@ $trigger_form
 			'rules' => $data['js_validation_rules'],
 			'triggerid' => $data['triggerid'],
 			'expression_popup_parameters' => $popup_parameters,
-			'readonly' => $data['limited'],
+			'readonly' => $readonly,
 			'dependencies' => $data['db_dependencies'],
 			'action' => 'trigger.prototype.edit',
 			'context' => $data['context'],

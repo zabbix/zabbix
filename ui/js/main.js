@@ -798,20 +798,20 @@ function ApiCall(method, params, id = 1) {
 /**
  * Section collapse toggle.
  *
- * @param {string}      id
- * @param {string|null} profile_idx  If not null, stores state in profile.
+ * @param {HTMLButtonElement} toggle
+ * @param {string} profile_idx  If not null, stores state in profile.
  */
-function toggleSection(id, profile_idx) {
-	const section = document.getElementById(id);
-	const toggle = section.querySelector('.section-toggle');
-
-	let is_collapsed = section.classList.contains(ZBX_STYLE_COLLAPSED);
+function toggleSection(toggle, profile_idx = '') {
+	const section = toggle.closest(`.${ZBX_STYLE_COLLAPSIBLE}`);
+	const is_collapsed = section.classList.contains(ZBX_STYLE_COLLAPSED);
 
 	section.classList.toggle(ZBX_STYLE_COLLAPSED, !is_collapsed);
 
 	toggle.classList.toggle(ZBX_ICON_CHEVRON_DOWN, !is_collapsed);
 	toggle.classList.toggle(ZBX_ICON_CHEVRON_UP, is_collapsed);
 	toggle.setAttribute('title', is_collapsed ? t('S_COLLAPSE') : t('S_EXPAND'));
+
+	section.dispatchEvent(new CustomEvent(!is_collapsed ? 'collapse' : 'expand'));
 
 	if (profile_idx !== '') {
 		updateUserProfile(profile_idx, is_collapsed ? '1' : '0', []);

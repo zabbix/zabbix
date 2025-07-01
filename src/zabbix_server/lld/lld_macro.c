@@ -93,6 +93,17 @@ int	zbx_lld_macro_paths_get(zbx_uint64_t lld_ruleid, zbx_vector_lld_macro_path_p
 	return ret;
 }
 
+zbx_lld_macro_path_t	*lld_macro_path_create(const char *lld_macro, const char *path)
+{
+	zbx_lld_macro_path_t        *lld_macro_path;
+
+	lld_macro_path = (zbx_lld_macro_path_t *)zbx_malloc(NULL, sizeof(zbx_lld_macro_path_t));
+	lld_macro_path->lld_macro = zbx_strdup(NULL, lld_macro);
+	lld_macro_path->path = zbx_strdup(NULL, path);
+
+	return lld_macro_path;
+}
+
 /******************************************************************************
  *                                                                            *
  * Purpose: release resources allocated by lld macro path                     *
@@ -142,7 +153,7 @@ static void	process_lld_macro_token(char **data, zbx_token_t *token, int flags, 
 
 	if (SUCCEED != lld_macro_value_by_name(lld_obj, *data + l, &replace_to))
 	{
-		zabbix_log(LOG_LEVEL_DEBUG, "cannot substitute macro \"%s\": not found in value set", *data + l);
+		zabbix_log(LOG_LEVEL_TRACE, "cannot substitute macro \"%s\": not found in value set", *data + l);
 
 		(*data)[r + 1] = c;
 		zbx_free(replace_to);

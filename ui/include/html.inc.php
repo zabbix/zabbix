@@ -214,7 +214,7 @@ function getHostNavigation(string $current_element, $hostid, $lld_ruleid = 0): ?
 		'output' => [
 			'hostid', 'status', 'name', 'maintenance_status', 'flags', 'active_available'
 		],
-		'selectHostDiscovery' => ['status', 'ts_delete', 'ts_disable', 'disable_source'],
+		'selectDiscoveryData' => ['status', 'ts_delete', 'ts_disable', 'disable_source'],
 		'selectDiscoveryRule' => ['lifetime_type', 'enabled_lifetime_type'],
 		'selectInterfaces' => ['interfaceid', 'type', 'useip', 'ip', 'dns', 'port', 'version', 'details', 'available',
 			'error'
@@ -222,11 +222,12 @@ function getHostNavigation(string $current_element, $hostid, $lld_ruleid = 0): ?
 		'hostids' => [$hostid],
 		'editable' => true
 	];
+
 	if ($lld_ruleid == 0) {
 		$options['selectItems'] = API_OUTPUT_COUNT;
 		$options['selectTriggers'] = API_OUTPUT_COUNT;
 		$options['selectGraphs'] = API_OUTPUT_COUNT;
-		$options['selectDiscoveries'] = API_OUTPUT_COUNT;
+		$options['selectDiscoveryRules'] = API_OUTPUT_COUNT;
 		$options['selectHttpTests'] = API_OUTPUT_COUNT;
 	}
 
@@ -239,12 +240,13 @@ function getHostNavigation(string $current_element, $hostid, $lld_ruleid = 0): ?
 			'templateids' => [$hostid],
 			'editable' => true
 		];
+
 		if ($lld_ruleid == 0) {
 			$options['selectItems'] = API_OUTPUT_COUNT;
 			$options['selectTriggers'] = API_OUTPUT_COUNT;
 			$options['selectGraphs'] = API_OUTPUT_COUNT;
 			$options['selectDashboards'] = API_OUTPUT_COUNT;
-			$options['selectDiscoveries'] = API_OUTPUT_COUNT;
+			$options['selectDiscoveryRules'] = API_OUTPUT_COUNT;
 			$options['selectHttpTests'] = API_OUTPUT_COUNT;
 		}
 
@@ -288,18 +290,63 @@ function getHostNavigation(string $current_element, $hostid, $lld_ruleid = 0): ?
 		}
 	}
 
+	$db_lld_prototype_parents = [];
+	$prototype_parents_breadcrumbs = null;
+
 	// get lld-rules
 	if ($lld_ruleid != 0) {
 		$db_discovery_rule = API::DiscoveryRule()->get([
-			'output' => ['name'],
+			'output' => ['itemid', 'name'],
+			'itemids' => [$lld_ruleid],
 			'selectItems' => API_OUTPUT_COUNT,
 			'selectTriggers' => API_OUTPUT_COUNT,
 			'selectGraphs' => API_OUTPUT_COUNT,
 			'selectHostPrototypes' => API_OUTPUT_COUNT,
-			'itemids' => [$lld_ruleid],
+			'selectDiscoveryRulePrototypes' => API_OUTPUT_COUNT,
 			'editable' => true
 		]);
+
 		$db_discovery_rule = reset($db_discovery_rule);
+
+		if (!$db_discovery_rule) {
+			// Collect the parents of the current discovery prototype
+			$db_discovery_rule = API::DiscoveryRulePrototype()->get([
+				'output' => ['itemid', 'name'],
+				'itemids' => [$lld_ruleid],
+				'selectItems' => API_OUTPUT_COUNT,
+				'selectTriggers' => API_OUTPUT_COUNT,
+				'selectGraphs' => API_OUTPUT_COUNT,
+				'selectHostPrototypes' => API_OUTPUT_COUNT,
+				'selectDiscoveryRulePrototypes' => API_OUTPUT_COUNT,
+				'selectDiscoveryRule' => ['itemid', 'name'],
+				'selectDiscoveryRulePrototype' => ['itemid', 'name'],
+				'editable' => true
+			]);
+
+			$db_discovery_rule = reset($db_discovery_rule);
+
+			$discovery_parent = $db_discovery_rule['discoveryRule'] ?: $db_discovery_rule['discoveryRulePrototype'];
+			$db_lld_prototype_parents[] = $discovery_parent;
+
+			$db_current_discovery = $db_discovery_rule;
+			$parent = $discovery_parent;
+
+			while (!$db_current_discovery['discoveryRule']) {
+				$db_current_discovery = API::DiscoveryRulePrototype()->get([
+					'output' => ['itemid', 'name'],
+					'itemids' => [$parent['itemid']],
+					'selectDiscoveryRule' => ['itemid', 'name'],
+					'selectDiscoveryRulePrototype' => ['itemid', 'name'],
+					'editable' => true
+				])[0];
+
+				$parent = $db_current_discovery['discoveryRule'] ?: $db_current_discovery['discoveryRulePrototype'];
+				$db_lld_prototype_parents[] = $parent;
+			}
+			unset($parent);
+
+			$db_lld_prototype_parents = array_reverse($db_lld_prototype_parents);
+		}
 	}
 
 	$list = new CList();
@@ -311,7 +358,7 @@ function getHostNavigation(string $current_element, $hostid, $lld_ruleid = 0): ?
 			->setArgument('templateid', $db_host['templateid'])
 			->getUrl();
 
-		$template = new CSpan((new CLink($db_host['name'], $template_url)));
+		$template = (new CSpan((new CLink($db_host['name'], $template_url))))->setTitle($db_host['name']);
 
 		if ($current_element === '') {
 			$template->addClass(ZBX_STYLE_SELECTED);
@@ -348,7 +395,7 @@ function getHostNavigation(string $current_element, $hostid, $lld_ruleid = 0): ?
 			->setArgument('hostid', $db_host['hostid'])
 			->getUrl();
 
-		$host = new CSpan((new CLink($db_host['name'], $host_url)));
+		$host = (new CSpan((new CLink($db_host['name'], $host_url))))->setTitle($db_host['name']);
 
 		if ($current_element === '') {
 			$host->addClass(ZBX_STYLE_SELECTED);
@@ -361,14 +408,14 @@ function getHostNavigation(string $current_element, $hostid, $lld_ruleid = 0): ?
 			->addItem($status)
 			->addItem(getHostAvailabilityTable($db_host['interfaces']));
 
-		$disable_source = $db_host['status'] == HOST_STATUS_NOT_MONITORED && $db_host['hostDiscovery']
-			? $db_host['hostDiscovery']['disable_source']
+		$disable_source = $db_host['status'] == HOST_STATUS_NOT_MONITORED && $db_host['discoveryData']
+			? $db_host['discoveryData']['disable_source']
 			: '';
 
 		if ($db_host['flags'] == ZBX_FLAG_DISCOVERY_CREATED
-				&& $db_host['hostDiscovery']['status'] == ZBX_LLD_STATUS_LOST) {
-			$info_icons = [getLldLostEntityIndicator(time(), $db_host['hostDiscovery']['ts_delete'],
-				$db_host['hostDiscovery']['ts_disable'], $disable_source,
+				&& $db_host['discoveryData']['status'] == ZBX_LLD_STATUS_LOST) {
+			$info_icons = [getLldLostEntityIndicator(time(), $db_host['discoveryData']['ts_delete'],
+				$db_host['discoveryData']['ts_disable'], $disable_source,
 				$db_host['status'] == HOST_STATUS_NOT_MONITORED, _('host')
 			)];
 
@@ -457,7 +504,7 @@ function getHostNavigation(string $current_element, $hostid, $lld_ruleid = 0): ?
 				->setArgument('filter_hostids', [$db_host['hostid']])
 				->setArgument('context', $context)
 			),
-			CViewHelper::showNum($db_host['discoveries'])
+			CViewHelper::showNum($db_host['discoveryRules'])
 		]);
 		if ($current_element === 'discoveries') {
 			$lld_rules->addClass(ZBX_STYLE_SELECTED);
@@ -483,12 +530,39 @@ function getHostNavigation(string $current_element, $hostid, $lld_ruleid = 0): ?
 		$discovery_rule = (new CSpan())->addItem(
 			new CLink(
 				$db_discovery_rule['name'],
-				(new CUrl('host_discovery.php'))
-					->setArgument('form', 'update')
-					->setArgument('itemid', $db_discovery_rule['itemid'])
-					->setArgument('context', $context)
+				$db_lld_prototype_parents
+					? (new CUrl('host_discovery_prototypes.php'))
+						->setArgument('form', 'update')
+						->setArgument('itemid', $db_discovery_rule['itemid'])
+						->setArgument('parent_discoveryid', $discovery_parent['itemid'])
+						->setArgument('context', $context)
+					: (new CUrl('host_discovery.php'))
+						->setArgument('form', 'update')
+						->setArgument('itemid', $db_discovery_rule['itemid'])
+						->setArgument('context', $context)
 			)
 		);
+		$discovery_rule->setTitle($db_discovery_rule['name']);
+
+		if ($db_lld_prototype_parents) {
+			// Create the new breadcrumb's element /.../ contains the all parents of the current discovery prototype
+			$parents_breadcrumbs_data = [];
+
+			foreach ($db_lld_prototype_parents as $parent) {
+				$parent_url = (new CUrl('host_discovery_prototypes.php'))
+					->setArgument('parent_discoveryid', $parent['itemid'])
+					->setArgument('context', $context)
+					->getUrl();
+
+				$parents_breadcrumbs_data[] = (new CLink($parent['name'], $parent_url))->addClass(ZBX_STYLE_NOWRAP);
+				$parents_breadcrumbs_data[] = new CSpan(' / ');
+			}
+
+			array_pop($parents_breadcrumbs_data);
+
+			$prototype_parents_breadcrumbs = (new CButtonIcon(ZBX_ICON_MORE))
+				->setHint((new CDiv($parents_breadcrumbs_data)));
+		}
 
 		if ($current_element === 'discoveries') {
 			$discovery_rule->addClass(ZBX_STYLE_SELECTED);
@@ -501,6 +575,7 @@ function getHostNavigation(string $current_element, $hostid, $lld_ruleid = 0): ?
 					->setArgument('filter_hostids', [$db_host['hostid']])
 					->setArgument('context', $context)
 			)),
+			$prototype_parents_breadcrumbs,
 			$discovery_rule
 		]));
 
@@ -558,10 +633,28 @@ function getHostNavigation(string $current_element, $hostid, $lld_ruleid = 0): ?
 			),
 			CViewHelper::showNum($db_discovery_rule['hostPrototypes'])
 		]);
+
 		if ($current_element === 'hosts') {
 			$host_prototypes->addClass(ZBX_STYLE_SELECTED);
 		}
+
 		$content_menu->addItem($host_prototypes);
+
+		// Discovery prototypes
+		$item_prototypes = new CSpan([
+			new CLink(_('Discovery prototypes'),
+				(new CUrl('host_discovery_prototypes.php'))
+					->setArgument('parent_discoveryid', $db_discovery_rule['itemid'])
+					->setArgument('context', $context)
+			),
+			CViewHelper::showNum($db_discovery_rule['discoveryRulePrototypes'])
+		]);
+
+		if ($current_element === 'lld_prototypes') {
+			$item_prototypes->addClass(ZBX_STYLE_SELECTED);
+		}
+
+		$content_menu->addItem($item_prototypes);
 	}
 
 	$list->addItem($content_menu);
