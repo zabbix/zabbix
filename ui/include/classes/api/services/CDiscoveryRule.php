@@ -3091,11 +3091,11 @@ class CDiscoveryRule extends CItemGeneral {
 		self::deleteAffectedItemPrototypes($del_itemids);
 		self::deleteAffectedHostPrototypes($del_itemids);
 
-		DB::delete('item_preproc', ['itemid' => $del_itemids], true);
+		DB::delete('item_preproc', ['itemid' => $del_itemids]);
 		DB::update('items', [
 			'values' => ['templateid' => 0],
 			'where' => ['itemid' => $del_itemids]
-		], true);
+		]);
 		DB::delete('items', ['itemid' => $del_itemids]);
 
 		$ins_housekeeper = [];

@@ -691,14 +691,9 @@ class testHost extends CAPITest {
 		// Since insertBatch() parameter $getids is false, it will use existing IDs. Thus it will return empty array.
 		$this->assertSame([], $ids);
 
-		$res = DB::update('hosts', $upd_hosts);
-		$this->assertSame(true, $res);
-
-		$res = DB::update('hosts_templates', $upd_hosts_templates);
-		$this->assertSame(true, $res);
-
-		$res = DB::update('hostmacro', $upd_hostmacro);
-		$this->assertSame(true, $res);
+		DB::update('hosts', $upd_hosts);
+		DB::update('hosts_templates', $upd_hosts_templates);
+		DB::update('hostmacro', $upd_hostmacro);
 
 		// Add hostmacroid references using the macro name as key: {$MACRO_NAME} => macro_name.
 		foreach ($upd_hostmacro as $hostmacro) {

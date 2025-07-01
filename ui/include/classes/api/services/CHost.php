@@ -1747,13 +1747,13 @@ class CHost extends CHostGeneral {
 		DB::delete('sysmaps_elements', [
 			'elementtype' => SYSMAP_ELEMENT_TYPE_HOST,
 			'elementid' => $hostids
-		], true);
+		]);
 
 		self::deleteHgSets($db_hosts);
 
 		// delete host
-		DB::delete('host_proxy', ['hostid' => $hostids], true);
-		DB::delete('host_tag', ['hostid' => $hostids], true);
+		DB::delete('host_proxy', ['hostid' => $hostids]);
+		DB::delete('host_tag', ['hostid' => $hostids]);
 		DB::delete('hosts', ['hostid' => $hostids]);
 
 		self::addAuditLog(CAudit::ACTION_DELETE, CAudit::RESOURCE_HOST, $db_hosts);
