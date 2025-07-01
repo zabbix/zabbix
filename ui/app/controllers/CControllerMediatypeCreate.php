@@ -123,7 +123,7 @@ class CControllerMediatypeCreate extends CController {
 					}
 
 					if ($mediatype['provider'] == CMediatypeHelper::EMAIL_PROVIDER_OFFICE365_RELAY) {
-						$formatted_domain = substr_replace($domain, '-', strrpos($domain, '.'), 1);
+						$formatted_domain = str_replace('.', '-', $domain);
 						$static_part = CMediatypeHelper::getEmailProviders($mediatype['provider'])['smtp_server'];
 
 						$mediatype['smtp_server'] = $formatted_domain.$static_part;
