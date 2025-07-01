@@ -14,13 +14,9 @@
 
 #include "dbupgrade.h"
 
-#include "zbxcacheconfig.h"
 #include "zbxdb.h"
 #include "zbxdbschema.h"
-#include "zbxalgo.h"
-#include "zbxnum.h"
 #include "dbupgrade_common.h"
-#include "zbxtasks.h"
 
 /*
  * 8.0 development database patches
