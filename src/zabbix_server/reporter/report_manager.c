@@ -872,18 +872,18 @@ static void	rm_update_cache_settings(zbx_rm_t *manager)
  * Purpose: checks if report is active based on specified time                *
  *                                                                            *
  * Parameters: report - [IN]                                                  *
- *             now    - [IN] current  time                                    *
+ *             when   - [IN] next check time                                  *
  *                                                                            *
  * Return value: SUCCEED - report is active                                   *
  *               FAIL    - otherwise                                          *
  *                                                                            *
  ******************************************************************************/
-static int	rm_is_report_active(const zbx_rm_report_t *report, int now)
+static int	rm_is_report_active(const zbx_rm_report_t *report, int when)
 {
-	if (0 != report->active_since && now < report->active_since)
+	if (0 != report->active_since && when < report->active_since)
 		return FAIL;
 
-	if (0 != report->active_till && now >= report->active_till)
+	if (0 != report->active_till && when >= report->active_till)
 		return FAIL;
 
 	return SUCCEED;
@@ -1027,7 +1027,7 @@ static void	rm_update_cache_reports(zbx_rm_t *manager, int now)
 		{
 			if (nextcheck != report->nextcheck)
 			{
-				if (SUCCEED == rm_is_report_active(report, now))
+				if (SUCCEED == rm_is_report_active(report, nextcheck))
 				{
 					zbx_binary_heap_elem_t	elem = {report->reportid, (void *)report};
 					int			nextcheck_old = report->nextcheck;
@@ -1881,7 +1881,7 @@ static int	rm_schedule_jobs(zbx_rm_t *manager, int now)
 		{
 			if (-1 != (nextcheck = rm_report_calc_nextcheck(report, now, &error)))
 			{
-				if (SUCCEED == rm_is_report_active(report, now))
+				if (SUCCEED == rm_is_report_active(report, nextcheck))
 				{
 					zbx_binary_heap_elem_t	elem_new = {report->reportid, report};
 

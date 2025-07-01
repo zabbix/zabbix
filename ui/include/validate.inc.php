@@ -60,21 +60,6 @@ function HEX($var = null) {
 	return 'preg_match("/^([a-zA-Z0-9]+)$/",{'.$var.'})&&';
 }
 
-function validate_port_list($str) {
-	foreach (explode(',', $str) as $port_range) {
-		$port_range = explode('-', $port_range);
-		if (count($port_range) > 2) {
-			return false;
-		}
-		foreach ($port_range as $port) {
-			if (!validatePortNumber($port)) {
-				return false;
-			}
-		}
-	}
-	return true;
-}
-
 function calc_exp($fields, $field, $expression) {
 	if (strpos($expression, '{}') !== false) {
 		if (!isset($_REQUEST[$field])) {
@@ -501,35 +486,6 @@ function validateTimeSelectorPeriod($from, $to) {
 
 		invalid_url();
 	}
-}
-
-function validatePortNumberOrMacro($port) {
-	return (validatePortNumber($port) || validateUserMacro($port));
-}
-
-function validatePortNumber($port) {
-	return validateNumber($port, ZBX_MIN_PORT_NUMBER, ZBX_MAX_PORT_NUMBER);
-}
-
-function validateNumber($value, $min = null, $max = null) {
-	if (!zbx_is_int($value)) {
-		return false;
-	}
-
-	if ($min !== null && $value < $min) {
-		return false;
-	}
-
-	if ($max !== null && $value > $max) {
-		return false;
-	}
-
-	return true;
-}
-
-function validateUserMacro($value) {
-	return (new CUserMacroParser())->parse($value) == CParser::PARSE_SUCCESS
-		|| (new CUserMacroFunctionParser())->parse($value) == CParser::PARSE_SUCCESS;
 }
 
 /**

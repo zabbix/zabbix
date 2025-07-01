@@ -386,22 +386,6 @@ window.graph_edit_popup = new class {
 		PopUp('popup.generic', parameters, {dialogue_class: "modal-popup-generic", trigger_element: target});
 	}
 
-	#toggleColorPickerStatus() {
-		const size = document.querySelectorAll('#items-table tbody tr.graph-item').length;
-
-		for (let i = 0; i < size; i++) {
-			const color_element = document.getElementById('items_' + i + '_color');
-
-			color_element.removeAttribute('onchange');
-			color_element.readOnly = true;
-
-			const lbl_color_elem = document.getElementById('lbl_items_' + i + '_color');
-
-			lbl_color_elem.removeAttribute('onclick');
-			lbl_color_elem.readOnly = true;
-		}
-	}
-
 	#removeItem(target) {
 		const number = target.dataset.remove;
 
@@ -442,7 +426,6 @@ window.graph_edit_popup = new class {
 
 			const $row = $(new_row);
 			$row.find('#items_' + index + '_calc_fnc').val('<?= CALC_FNC_AVG ?>');
-			$(`#items_${index}_color`).colorpicker();
 		});
 	}
 
@@ -450,11 +433,6 @@ window.graph_edit_popup = new class {
 		const $row = $(template.evaluate(item));
 
 		$('#item-buttons-row').before($row);
-		$row.find(`.${ZBX_STYLE_COLOR_PICKER} input`).colorpicker();
-
-		if (this.readonly) {
-			this.#toggleColorPickerStatus();
-		}
 	}
 
 	#openItemSelectPopup() {
@@ -533,9 +511,9 @@ window.graph_edit_popup = new class {
 		for (let i = 0; i < list.length; i++) {
 			const used_colors = [];
 
-			for (const color of this.form.querySelectorAll(`.${ZBX_STYLE_COLOR_PICKER} input`)) {
-				if (color.value !== '') {
-					used_colors.push(color.value);
+			for (const color_picker of this.form.querySelectorAll(`.${ZBX_STYLE_COLOR_PICKER}`)) {
+				if (color_picker.color !== '') {
+					used_colors.push(color_picker.color);
 				}
 			}
 
@@ -560,7 +538,6 @@ window.graph_edit_popup = new class {
 
 			$('#item-buttons-row').before($row);
 			$row.find('#items_' + number + '_calc_fnc').val('<?= CALC_FNC_AVG ?>');
-			$(`#items_${number}_color`).colorpicker();
 		}
 	}
 

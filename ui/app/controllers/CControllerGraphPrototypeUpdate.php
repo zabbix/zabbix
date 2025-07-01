@@ -87,6 +87,14 @@ class CControllerGraphPrototypeUpdate extends CController {
 		]);
 
 		if (!$discovery_rule) {
+			$discovery_rule = API::DiscoveryRulePrototype()->get([
+				'output' => ['itemid', 'hostid'],
+				'itemids' => $this->getInput('parent_discoveryid'),
+				'editable' => true
+			]);
+		}
+
+		if (!$discovery_rule) {
 			return false;
 		}
 

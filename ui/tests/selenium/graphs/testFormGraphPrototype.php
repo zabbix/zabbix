@@ -139,24 +139,6 @@ class testFormGraphPrototype extends testFormGraphs {
 			],
 			[
 				[
-					'expected' => TEST_BAD,
-					'fields' => [
-						'Name' => 'Empty color in item prototype {#KEY}'
-					],
-					'items' => [
-						[
-							'prototype' => true,
-							'item' => 'testFormItemPrototype1',
-							'color' => ''
-						]
-					],
-					'details' => [
-						'Empty colour.'
-					]
-				]
-			],
-			[
-				[
 					'fields' => [
 						'Name' => 'Normal graph prototype without LLD macro'
 					],

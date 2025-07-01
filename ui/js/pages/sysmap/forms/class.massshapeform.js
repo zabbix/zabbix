@@ -27,13 +27,13 @@ class MassShapeForm {
 				chkboxText: '#mass_text',
 				chkboxFont: '#mass_font',
 				chkboxFontSize: '#mass_font_size',
-				chkboxFontColor: '#mass_font_color',
+				chkboxFontColor: `.${ZBX_STYLE_COLOR_PICKER}[color-field-name="mass_font_color"]`,
 				chkboxTextHalign: '#mass_text_halign',
 				chkboxTextValign: '#mass_text_valign',
-				chkboxBackground: '#mass_background_color',
+				chkboxBackground: `.${ZBX_STYLE_COLOR_PICKER}[color-field-name="mass_background_color"]`,
 				chkboxBorderType: '#mass_border_type',
 				chkboxBorderWidth: '#mass_border_width',
-				chkboxBorderColor: '#mass_border_color'
+				chkboxBorderColor: `.${ZBX_STYLE_COLOR_PICKER}[color-field-name="mass_border_color"]`
 			};
 
 		Object.keys(mapping).forEach((key) => form_actions.push({
@@ -48,7 +48,6 @@ class MassShapeForm {
 		this.domNode = $(new Template(document.getElementById('mapMassShapeFormTpl').innerHTML).evaluate())
 			.appendTo(form_container);
 
-		this.domNode.find('.color-picker input').colorpicker();
 		this.actionProcessor = new ActionProcessor(form_actions);
 		this.actionProcessor.process();
 	}
@@ -93,7 +92,7 @@ class MassShapeForm {
 				$(this).val('');
 			}
 		});
-		$('.color-picker input', this.domNode).change();
+
 		this.actionProcessor.process();
 
 		removeFromOverlaysStack('map-window');

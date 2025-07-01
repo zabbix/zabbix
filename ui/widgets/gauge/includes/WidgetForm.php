@@ -218,7 +218,7 @@ class WidgetForm extends CWidgetForm {
 				]))->setDefault(Widget::DESC_V_POSITION_BOTTOM)
 			)
 			->addField(
-				new CWidgetFieldColor('desc_color', _('Color'))
+				(new CWidgetFieldColor('desc_color', _('Color')))->allowInherited()
 			)
 			->addField(
 				(new CWidgetFieldIntegerBox('decimal_places', _('Decimal places'),
@@ -236,7 +236,7 @@ class WidgetForm extends CWidgetForm {
 					->setDefault(self::DEFAULT_VALUE_SIZE_PERCENT)
 			)
 			->addField(
-				new CWidgetFieldColor('value_color', _('Color'))
+				(new CWidgetFieldColor('value_color', _('Color')))->allowInherited()
 			)
 			->addField(
 				(new CWidgetFieldIntegerBox('value_arc_size', _('Size'),
@@ -246,13 +246,13 @@ class WidgetForm extends CWidgetForm {
 					->setDefault(self::DEFAULT_VALUE_ARC_SIZE_PERCENT)
 			)
 			->addField(
-				new CWidgetFieldColor('value_arc_color', _('Value arc'))
+				(new CWidgetFieldColor('value_arc_color', _('Value arc')))->allowInherited()
 			)
 			->addField(
-				new CWidgetFieldColor('empty_color', _('Arc background'))
+				(new CWidgetFieldColor('empty_color', _('Arc background')))->allowInherited()
 			)
 			->addField(
-				new CWidgetFieldColor('bg_color', _('Background'))
+				(new CWidgetFieldColor('bg_color', _('Background')))->allowInherited()
 			)
 			->addField(
 				(new CWidgetFieldCheckBox('units_show', _('Units')))->setDefault(self::DEFAULT_UNITS_SHOW)
@@ -277,10 +277,10 @@ class WidgetForm extends CWidgetForm {
 				(new CWidgetFieldCheckBox('units_bold', _('Bold')))->setDefault(self::DEFAULT_UNITS_BOLD)
 			)
 			->addField(
-				new CWidgetFieldColor('units_color', _('Color'))
+				(new CWidgetFieldColor('units_color', _('Color')))->allowInherited()
 			)
 			->addField(
-				new CWidgetFieldColor('needle_color', _('Color'))
+				(new CWidgetFieldColor('needle_color', _('Color')))->allowInherited()
 			)
 			->addField(
 				(new CWidgetFieldIntegerBox('scale_decimal_places', _('Decimal places'),
