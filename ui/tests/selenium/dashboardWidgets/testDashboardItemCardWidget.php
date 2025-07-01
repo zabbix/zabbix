@@ -39,7 +39,7 @@ class testDashboardItemCardWidget extends testWidgets {
 	}
 
 	/**
-	* Ids of created Dashboards for Host Card widget check.
+	* Ids of created Dashboards for Item Card widget check.
 	*
 	* @var array
 	*/
@@ -144,7 +144,7 @@ class testDashboardItemCardWidget extends testWidgets {
 						'trends' => '17d',
 						'inventory_link' => 6,
 						'description' => STRING_6000,
-						'status' => 1
+						'status' => 0
 					],
 					[
 						'name' => '<img src=\"x\" onerror=\"alert("ERROR");\"/>',
@@ -152,7 +152,8 @@ class testDashboardItemCardWidget extends testWidgets {
 						'type' => ITEM_TYPE_ZABBIX,
 						'value_type' => ITEM_VALUE_TYPE_TEXT,
 						'description' => '<img src=\"x\" onerror=\"alert("ERROR");\"/>',
-						'delay' => '13m'
+						'delay' => '13m',
+						'status' => 1
 					],
 					[
 						'name' => '105\'; --DROP TABLE Users',
@@ -194,7 +195,8 @@ class testDashboardItemCardWidget extends testWidgets {
 					'key_' => 'dependent_item_1',
 					'master_itemid' => self::$itemids[STRING_255],
 					'type' => ITEM_TYPE_DEPENDENT,
-					'value_type' => ITEM_VALUE_TYPE_FLOAT
+					'value_type' => ITEM_VALUE_TYPE_FLOAT,
+					'description' => 'simple description'
 				],
 				[
 					'name' => 'Dependent item 2',
@@ -208,41 +210,68 @@ class testDashboardItemCardWidget extends testWidgets {
 		CDataHelper::createItems('item', $items, $hosts['hostids']);
 		$depend_items= CDataHelper::getIds('name');
 
-		// Add some metrics to STRING_255 item, to get Graph image and error notification.
-		CDataHelper::addItemData(self::$itemids[STRING_255], [10000, 200, 30000, 400, 50000, 600, 70000, 800, 9000]);
-		DBexecute('UPDATE item_rtdata SET state = 1, error = '.zbx_dbstr('Value of type "string" is not suitable for '.
-				'value type "Numeric (unsigned)". Value "hahah"').'WHERE itemid ='.zbx_dbstr(self::$itemids[STRING_255]));
-
-
-
 		// Create trigger based on item.
 		CDataHelper::call('trigger.create', [
 			[
-				'description' => 'Cannot get any metric in last 5 iterations',
-				'expression' => 'last(/Host for Item Card widget/master,#5)=0',
+				'description' => 'Not classidied trigger',
+				'expression' => 'last(/Host for Item Card widget/master)>100',
+				'priority' => TRIGGER_SEVERITY_NOT_CLASSIFIED
+			],
+			[
+				'description' => 'Information trigger',
+				'expression' => 'last(/Host for Item Card widget/master)>200',
+				'priority' => TRIGGER_SEVERITY_INFORMATION
+			],
+			[
+				'description' => 'Warning trigger',
+				'expression' => 'last(/Host for Item Card widget/master)>300',
 				'priority' => TRIGGER_SEVERITY_WARNING
 			],
 			[
-				'description' => 'Cannot get any metric in last 10 iterations',
-				'expression' => 'last(/Host for Item Card widget/master,#10)=0',
+				'description' => 'Average trigger',
+				'expression' => 'last(/Host for Item Card widget/master)>400',
 				'priority' => TRIGGER_SEVERITY_AVERAGE
 			],
 			[
-				'description' => 'Cannot get any metric in last 15 iterations',
-				'expression' => 'last(/Host for Item Card widget/master,#15)=0',
+				'description' => 'High trigger',
+				'expression' => 'last(/Host for Item Card widget/master)>500',
 				'priority' => TRIGGER_SEVERITY_HIGH
 			],
 			[
-				'description' => 'Cannot get any metric in last 20 iterations',
-				'expression' => 'last(/Host for Item Card widget/master,#20)=0',
+				'description' => 'Disaster trigger',
+				'expression' => 'last(/Host for Item Card widget/master)>600',
+				'priority' => TRIGGER_SEVERITY_DISASTER
+			],
+			[
+				'description' => 'Trigger 1',
+				'expression' => 'last(/Host for Item Card widget/datatype_text)>100',
+				'priority' => TRIGGER_SEVERITY_NOT_CLASSIFIED
+			],
+			[
+				'description' => 'Trigger 2',
+				'expression' => 'last(/Host for Item Card widget/datatype_text)>100',
 				'priority' => TRIGGER_SEVERITY_DISASTER
 			]
 		]);
 
+		// Add some metrics to STRING_255 item, to get Graph image and error notification.
+		foreach ([STRING_255, 'Item with text datatype'] as $item) {
+			CDataHelper::addItemData(self::$itemids[$item], [10000, 200, 30000, 400, 50000, 600, 70000, 800, 9000]);
+		}
+
+		$trigger_names = ['Not classidied trigger', 'Information trigger', 'Warning trigger', 'Average trigger',
+			'High trigger', 'Disaster trigger', 'Disaster trigger', 'Trigger 1', 'Trigger 2'];
+		CDBHelper::setTriggerProblem($trigger_names, TRIGGER_VALUE_TRUE);
+
+		// Add red error message.
+		DBexecute('UPDATE item_rtdata SET state = 1, error = '.zbx_dbstr('Value of type "string" is not suitable for '.
+				'value type "Numeric (unsigned)". Value "hahah"').'WHERE itemid ='.zbx_dbstr(self::$itemids[STRING_255]));
+
 		CDataHelper::call('dashboard.create', [
 			[
 				'name' => 'Dashboard for creating Item Card widgets',
-				'display_period' => 1800,
+				'private' => PUBLIC_SHARING,
+				'auto_start' => 0,
 				'pages' => [
 					[
 						'widgets' => [
@@ -251,24 +280,31 @@ class testDashboardItemCardWidget extends testWidgets {
 								'x' => 0,
 								'y' => 0,
 								'width' => 13,
-								'height' => 5
+								'height' => 5,
+								'fields' => [
+									[
+										'type' => ZBX_WIDGET_FIELD_TYPE_STR,
+										'name' => 'reference',
+										'value' => 'EKBHK'
+									]
+								]
 							],
 							[
-								'type' => 'svggraph',
+								'type' => 'graph',
 								'x' => 13,
 								'y' => 0,
 								'width' => 16,
 								'height' => 5,
 								'fields' => [
 									[
-										'type' => 1,
-										'name' => 'ds.0.hosts.0',
-										'value' => 'Host for Item Card widget'
+										'type' => 6,
+										'name' => 'graphid.0',
+										'value' => 2232 // Linux: CPU utilization.
 									],
 									[
-										'type' => 1,
-										'name' => 'ds.0.items.0',
-										'value' => STRING_255
+										'type'=> 1,
+										'name'=> 'reference',
+										'value'=> 'XIBBD'
 									]
 								]
 							]
@@ -290,31 +326,21 @@ class testDashboardItemCardWidget extends testWidgets {
 								'height' => 5
 							],
 							[
-								'type' => 'svggraph',
+								'type' => 'graph',
 								'x' => 14,
 								'y' => 0,
 								'width' => 14,
 								'height' => 5,
 								'fields' => [
 									[
-										'type' => 1,
-										'name' => 'ds.0.hosts.0',
-										'value' => 'Host for Item Card widget'
+										'type' => 6,
+										'name' => 'graphid.0',
+										'value' => 2232 // Linux: CPU utilization.
 									],
 									[
-										'type' => 1,
-										'name' => 'ds.0.items.0',
-										'value' => STRING_255
-									],
-									[
-										'type'=> '1',
-										'name'=> 'time_period.from',
-										'value'=> 'now-1h'
-									],
-									[
-										'type'=> '1',
-										'name'=> 'time_period.to',
-										'value'=> 'now'
+										'type'=> 1,
+										'name'=> 'reference',
+										'value'=> 'XIBBD'
 									]
 								]
 							],
@@ -364,7 +390,7 @@ class testDashboardItemCardWidget extends testWidgets {
 						'widgets' => [
 							[
 								'type' => 'itemcard',
-								'name' => 'Item Card widget cancel scenario',
+								'name' => 'CancelItemCardWidget',
 								'x' => 0,
 								'y' => 0,
 								'width' => 19,
@@ -1187,7 +1213,7 @@ class testDashboardItemCardWidget extends testWidgets {
 						'id:sparkline_time_period_data_source' => 'Widget',
 						'id:sparkline_history' => 'Trends',
 						'color' => '9A34A1',
-						'widget' => 'Graph'
+						'widget' => 'ЗАББИКС Сервер: Linux: CPU utilization'
 					],
 					'trim' => true
 				]
@@ -1284,7 +1310,7 @@ class testDashboardItemCardWidget extends testWidgets {
 	}
 
 	/**
-	 * Delete Host Card widget.
+	 * Delete Item Card widget.
 	 */
 	public function testDashboardItemCardWidget_Delete() {
 		$widget_name = 'DeleteItemCardWidget';
@@ -1313,7 +1339,7 @@ class testDashboardItemCardWidget extends testWidgets {
 	}
 
 	/**
-	 * Check different data display on Host Card widget.
+	 * Check different data display on Item Card widget.
 	 *
 	 * @dataProvider getDisplayData
 	 */
@@ -1373,7 +1399,7 @@ class testDashboardItemCardWidget extends testWidgets {
 	}
 
 	/**
-	 * Check correct links in Host Card widget.
+	 * Check correct links in Item Card widget.
 	 *
 	 * @dataProvider getLinkData
 	 */
@@ -1415,7 +1441,7 @@ class testDashboardItemCardWidget extends testWidgets {
 	}
 
 	/**
-	 * Check cancel scenarios for Host Card widget.
+	 * Check cancel scenarios for Item Card widget.
 	 *
 	 * @dataProvider getCancelData
 	 */
@@ -1431,7 +1457,7 @@ class testDashboardItemCardWidget extends testWidgets {
 
 		// Start updating or creating a widget.
 		if (CTestArrayHelper::get($data, 'update', false)) {
-			$form = $dashboard->getWidget('Item Card widget cancel scenario')->edit();
+			$form = $dashboard->getWidget('CancelItemCardWidget')->edit();
 		}
 		else {
 			$form = $dashboard->addWidget()->asForm();
@@ -1467,7 +1493,7 @@ class testDashboardItemCardWidget extends testWidgets {
 			$dialog->ensureNotPresent();
 
 			if (CTestArrayHelper::get($data, 'update', false)) {
-				foreach (['CancelHostCardWidget' => true, $new_name => false] as $name => $valid) {
+				foreach (['CancelItemCardWidget' => true, $new_name => false] as $name => $valid) {
 					$this->assertTrue($dashboard->getWidget($name, $valid)->isValid($valid));
 				}
 			}
@@ -1506,21 +1532,21 @@ class testDashboardItemCardWidget extends testWidgets {
 	}
 
 	/**
-	 * Check different compositions for Host Card widget.
+	 * Check different compositions for Item Card widget.
 	 *
 	 * @dataProvider getWidgetName
 	 */
 	public function testDashboardItemCardWidget_Screenshots($data) {
 		$this->page->login()->open('zabbix.php?action=dashboard.view&dashboardid='.
-				self::$dashboardid['Dashboard for HostCard widget display check'])->waitUntilReady();
+				self::$dashboardid['Dashboard for Item Card widget display check'])->waitUntilReady();
 		$this->assertScreenshot(CDashboardElement::find()->one()->getWidget($data['Name']), 'itemcard_'.$data['Name']);
 	}
 
 	/**
-	 * Create or update Host Card widget.
+	 * Create or update Item Card widget.
 	 *
 	 * @param array             $data         data provider
-	 * @param string            $action       create/update HostCard widget
+	 * @param string            $action       create/update item card widget
 	 * @param CDashboardElement $dashboard    given dashboard
 	 */
 	protected function fillWidgetForm($data, $action, $dashboard) {
@@ -1582,10 +1608,10 @@ class testDashboardItemCardWidget extends testWidgets {
 	}
 
 	/**
-	 * Check created or updated Host Card widget.
+	 * Check created or updated Item Card widget.
 	 *
 	 * @param array             $data         data provider
-	 * @param string            $action       create/update HostCard widget
+	 * @param string            $action       create/update item card widget
 	 * @param CDashboardElement $dashboard    given dashboard
 	 */
 	protected function checkWidgetForm($data, $action, $dashboard) {
@@ -1594,19 +1620,21 @@ class testDashboardItemCardWidget extends testWidgets {
 			COverlayDialogElement::find()->one()->close();
 			$dashboard->save();
 			$this->assertMessage(TEST_GOOD, 'Dashboard updated');
-
-			echo '+-- Old hash: '.self::$old_hash.' --+';
-			echo '+-- Old hash: '.CDBHelper::getHash(self::SQL).' --+';
 			// Compare old hash and new one.
 			$this->assertEquals(self::$old_hash, CDBHelper::getHash(self::SQL));
+
 		}
 		else {
+			// Trim leading and trailing spaces from expected results if necessary.
+			if (array_key_exists('trim', $data)) {
+				$data['fields']['Name'] = trim($data['fields']['Name']);
+			}
 			$data['fields']['Item'] = 'Visible host name for Item Card widget: '.trim($data['fields']['Item'], 255);
 
 			// Make sure that the widget is present before saving the dashboard.
 			$header = (array_key_exists('Name', $data['fields']))
-				? (($data['fields']['Name'] === '') ? 'Host card' : $data['fields']['Name'])
-				: 'Host card';
+				? (($data['fields']['Name'] === '') ? 'Item card' : $data['fields']['Name'])
+				: 'Item card';
 
 			$dashboard->getWidget($header);
 			$dashboard->save();
