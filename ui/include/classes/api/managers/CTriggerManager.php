@@ -101,7 +101,7 @@ class CTriggerManager {
 		DB::update('triggers', [
 			'values' => ['templateid' => 0],
 			'where' => ['triggerid' => $del_triggerids]
-		]);
+		], true);
 		DB::delete('triggers', ['triggerid' => $del_triggerids]);
 	}
 
