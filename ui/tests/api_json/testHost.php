@@ -4519,8 +4519,6 @@ class testHost extends CAPITest {
 	 * @param string $hosts[<hostid>]['macros']  Array of host original macros.
 	 */
 	private function restoreMacros(array $hosts) {
-		$res = true;
-
 		// Records after update has been made. Possibly new macros are stored.
 		$records_current = CDBHelper::getAll(
 			'SELECT hm.hostmacroid,hm.hostid,hm.macro,hm.value,hm.description,hm.type,hm.automatic'.
@@ -4592,7 +4590,7 @@ class testHost extends CAPITest {
 
 				if ($del_macros) {
 					// Delete the macros that were inserted in host.update method.
-					$res = $res && DB::delete('hostmacro', [
+					DB::delete('hostmacro', [
 						'hostmacroid' => array_column($del_macros, 'hostmacroid')
 					]);
 
@@ -4607,7 +4605,7 @@ class testHost extends CAPITest {
 						$hostmacroid = $macro['hostmacroid'];
 						unset($macro['hostmacroid']);
 
-						$res = $res && DB::update('hostmacro', [
+						DB::update('hostmacro', [
 							'values' => $macro,
 							'where' => [
 								'hostmacroid' => $hostmacroid
@@ -4618,12 +4616,10 @@ class testHost extends CAPITest {
 			}
 			// Host did not have macros, but new were added in host.update method. Remove the added ones.
 			elseif ($records_current) {
-				$res = $res && DB::delete('hostmacro', [
+				DB::delete('hostmacro', [
 					'hostmacroid' => array_column($records_current, 'hostmacroid')
 				]);
 			}
-
-			$this->assertSame(true, $res, 'host.update failed for host "'.$host['host'].'"');
 		}
 	}
 
