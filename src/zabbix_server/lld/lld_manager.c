@@ -24,6 +24,8 @@
 #include "zbxipcservice.h"
 #include "zbxstr.h"
 #include "zbxtime.h"
+#include "zbx_rtc_constants.h"
+#include "zbxrtc.h"
 
 /*
  * The LLD queue is organized as a queue (rule_queue binary heap) of LLD rules,
@@ -622,6 +624,8 @@ ZBX_THREAD_ENTRY(lld_manager_thread, args)
 		exit(EXIT_FAILURE);
 	}
 
+	zbx_rtc_subscribe_service(ZBX_PROCESS_TYPE_LLDMANAGER, 0, NULL, 0, SEC_PER_MIN, ZBX_IPC_SERVICE_LLD);
+
 	lld_manager_init(&manager, args_in->get_process_forks_cb_arg);
 
 	/* initialize statistics */
@@ -633,6 +637,8 @@ ZBX_THREAD_ENTRY(lld_manager_thread, args)
 
 	while (ZBX_IS_RUNNING())
 	{
+		int	shutdown = 0;
+
 		time_now = zbx_time();
 
 		if (STAT_INTERVAL < time_now - time_stat)
@@ -685,6 +691,10 @@ ZBX_THREAD_ENTRY(lld_manager_thread, args)
 				case ZBX_IPC_LLD_TOP_ITEMS:
 					lld_process_top_items(&manager, client, message);
 					break;
+				case ZBX_RTC_SHUTDOWN:
+					zabbix_log(LOG_LEVEL_DEBUG, "shutdown message received, terminating...");
+					shutdown = 1;
+					break;
 			}
 
 			zbx_ipc_message_free(message);
@@ -692,6 +702,9 @@ ZBX_THREAD_ENTRY(lld_manager_thread, args)
 
 		if (NULL != client)
 			zbx_ipc_client_release(client);
+
+		if (1 == shutdown)
+			break;
 	}
 
 	zbx_ipc_service_close(&lld_service);
