@@ -1732,16 +1732,12 @@ out:
  ******************************************************************************/
 void	zbx_ipc_client_close(zbx_ipc_client_t *client)
 {
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s() clientid:" ZBX_FS_UI64, __func__, client->id);
-
 	ipc_client_free_events(client);
 	zbx_ipc_socket_close(&client->csocket);
 
 	ipc_service_remove_client(client->service, client);
 	zbx_queue_ptr_remove_value(&client->service->clients_recv, client);
 	zbx_ipc_client_release(client);
-
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 }
 
 int	zbx_ipc_client_get_fd(zbx_ipc_client_t *client)
