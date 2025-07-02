@@ -530,7 +530,7 @@ static void	ipc_client_free(zbx_ipc_client_t *client)
 {
 	zbx_ipc_message_t	*message;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s() clientid:" ZBX_FS_UI64, __func__, client->id);
+	zabbix_log(LOG_LEVEL_TRACE, "In %s() clientid:" ZBX_FS_UI64, __func__, client->id);
 
 	ipc_client_free_events(client);
 	zbx_ipc_socket_close(&client->csocket);
@@ -551,7 +551,7 @@ static void	ipc_client_free(zbx_ipc_client_t *client)
 
 	zbx_free(client);
 
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
+	zabbix_log(LOG_LEVEL_TRACE, "End of %s()", __func__);
 }
 
 /******************************************************************************
