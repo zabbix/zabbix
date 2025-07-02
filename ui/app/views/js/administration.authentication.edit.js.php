@@ -139,7 +139,7 @@
 			for (const button of this.form.querySelectorAll('.js-saml-cert-change-button')) {
 				button.addEventListener('click', e => {
 					const container = button.nextElementSibling.classList.contains('js-saml-cert-input') ? button.nextElementSibling : null;
-					
+
 					if (container) {
 						const textarea = container.querySelector('textarea');
 						container.style.display = '';
