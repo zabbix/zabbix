@@ -623,7 +623,7 @@ class DB {
 			}
 
 			$values = zbx_toArray($values);
-			sort($values); // Sorting ids to prevent deadlocks when two transactions depend on each other.
+			sort($values); // Sorting IDs to prevent deadlocks when two transactions depend on each other.
 		}
 		unset($values);
 	}
@@ -650,7 +650,7 @@ class DB {
 
 		$chunkids = [];
 
-		foreach ($upd_request[$pk_field_name] as $id) {
+		foreach ($upd_request['where'][$pk_field_name] as $id) {
 			$chunkids[] = $id;
 
 			if (count($chunkids) == self::CHUNK_SIZE) {
@@ -846,7 +846,7 @@ class DB {
 	 *
 	 * Example:
 	 * DB::delete('items', ['itemid' => [1, 8, 6]]);
-	 * DELETE FROM items WHERE itemid IN (1, 8, 6)
+	 * DELETE FROM items WHERE itemid IN (1,8,6)
 	 *
 	 * DB::delete('items', ['itemid' => [1], 'templateid' => [10, 21]]);
 	 * DELETE FROM items WHERE itemid=1 AND templateid IN (10,21)
@@ -886,7 +886,7 @@ class DB {
 			}
 
 			$values = zbx_toArray($values);
-			sort($values); // Sorting ids to prevent deadlocks when two transactions depends from each other.
+			sort($values); // Sorting IDs to prevent deadlocks when two transactions depend on each other.
 		}
 		unset($values);
 	}
