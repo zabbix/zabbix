@@ -6067,49 +6067,19 @@ zbx_uint64_t	zbx_db_add_interface(zbx_uint64_t hostid, unsigned char type, unsig
 		if (1 == db_main)
 			main_ = 0;
 
-		if (ZBX_CONN_DEFAULT == flags)
+		if (db_useip == useip && (useip && 0 == strcmp(db_ip, ip) || !useip && 0 == strcmp(db_dns, dns)))
 		{
-			if (1 == db_main)
-			{
-				char	*update = NULL;
-				size_t	update_alloc = 0, update_offset = 0;
-
-				ZBX_STR2UINT64(interfaceid, row[0]);
-
-				zbx_snprintf_alloc(&update, &update_alloc, &update_offset,
-						"update interface set useip=%d, ip='%s', dns='%s', port=%d"
-						" where interfaceid=" ZBX_FS_UI64,
-						useip, ip, dns, port, interfaceid);
-
-				if (0 != update_alloc)
-				{
-					zbx_db_execute("%s", update);
-					zbx_free(update);
-				}
-				break;
-			}
-
-			if (db_useip != useip)
-				continue;
-			if (useip && 0 != strcmp(db_ip, ip))
-				continue;
-
-			if (!useip && 0 != strcmp(db_dns, dns))
-				continue;
-
 			zbx_free(tmp);
 			tmp = strdup(row[4]);
 			zbx_substitute_simple_macros(NULL, NULL, NULL, NULL, &hostid, NULL, NULL, NULL, NULL, NULL,
 					NULL, NULL, &tmp, ZBX_MACRO_TYPE_COMMON, NULL, 0);
-			if (FAIL == zbx_is_ushort(tmp, &db_port) || db_port != port)
-				continue;
+			if (SUCCEED == zbx_is_ushort(tmp, &db_port) && db_port == port)
+				ZBX_STR2UINT64(interfaceid, row[0]);
 
-			ZBX_STR2UINT64(interfaceid, row[0]);
-			break;
+			continue;
 		}
-
-		/* update main interface if explicit connection flags were passed (flags != ZBX_CONN_DEFAULT) */
-		if (1 == db_main)
+		/* update main interface if explicit connection */
+		else if (1 == db_main)
 		{
 			char	*update = NULL, delim = ' ';
 			size_t	update_alloc = 0, update_offset = 0;
@@ -6157,8 +6127,8 @@ zbx_uint64_t	zbx_db_add_interface(zbx_uint64_t hostid, unsigned char type, unsig
 				zbx_db_execute("update interface set%s where interfaceid=" ZBX_FS_UI64, update,
 						interfaceid);
 				zbx_free(update);
+				break;
 			}
-			break;
 		}
 	}
 	zbx_db_free_result(result);
