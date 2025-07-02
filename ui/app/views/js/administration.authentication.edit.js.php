@@ -52,16 +52,6 @@
 			const ldap_disabled = this.ldap_auth_enabled === null || !this.ldap_auth_enabled.checked;
 			const mfa_readonly = !this.form.querySelector('[type="checkbox"][name="mfa_status"]').checked;
 
-			this.saml_certs_mandatory_checkboxes = {
-				sign_messages: this.form.querySelector('[type="checkbox"][name="sign_messages"]'),
-				sign_assertions: this.form.querySelector('[type="checkbox"][name="sign_assertions"]'),
-				sign_authn_requests: this.form.querySelector('[type="checkbox"][name="sign_authn_requests"]'),
-				sign_logout_requests: this.form.querySelector('[type="checkbox"][name="sign_logout_requests"]'),
-				sign_logout_responses: this.form.querySelector('[type="checkbox"][name="sign_logout_responses"]'),
-				encrypt_nameid: this.form.querySelector('[type="checkbox"][name="encrypt_nameid"]'),
-				encrypt_assertions: this.form.querySelector('[type="checkbox"][name="encrypt_assertions"]'),
-			};
-
 			this._addEventListeners();
 			this._addLdapServers(ldap_servers, ldap_default_row_index);
 			this.#setTableVisiblityState(this.ldap_servers_table, ldap_disabled);
@@ -73,9 +63,9 @@
 			this.#addMfaMethods(mfa_methods, mfa_default_row_index);
 			this.#setTableVisiblityState(this.mfa_table, mfa_readonly);
 			this.#disableRemoveLinksWithUserGroups(this.mfa_table);
+			this.#updateSpCertificateRequiredState();
 
 			this.form.querySelector('[type="checkbox"][name="saml_auth_enabled"]').dispatchEvent(new Event('change'));
-			this.saml_certs_mandatory_checkboxes.sign_messages.dispatchEvent(new Event('change'));
 		}
 
 		_addEventListeners() {
@@ -148,13 +138,15 @@
 
 			for (const button of this.form.querySelectorAll('.js-saml-cert-change-button')) {
 				button.addEventListener('click', e => {
-					const container = e.target.parentNode.querySelector('.js-saml-cert-input');
-					const textarea = container.querySelector('textarea');
-
-					container.style.display = '';
-					textarea.classList.add('saml-enabled');
-					textarea.removeAttribute('disabled');
-					e.target.remove();
+					const container = button.nextElementSibling.classList.contains('js-saml-cert-input') ? button.nextElementSibling : null;
+					
+					if (container) {
+						const textarea = container.querySelector('textarea');
+						container.style.display = '';
+						textarea.classList.add('saml-enabled');
+						textarea.removeAttribute('disabled');
+						button.remove();
+					}
 				});
 			}
 
@@ -254,33 +246,33 @@
 				}
 			});
 
-			Object.values(this.saml_certs_mandatory_checkboxes).forEach(checkbox => {
-				checkbox.addEventListener('change', (e) => {
-					const sp_certificate_label = this.form.querySelector('label[for="sp_certificate"]');
-					const sp_certificate_next_div = sp_certificate_label.nextElementSibling;
-
-					const sp_private_key_label = this.form.querySelector('label[for="sp_private_key"]');
-					const sp_private_key_next_div = sp_private_key_label.nextElementSibling;
-
-					const any_checked = [e.target, ...Object.values(this.saml_certs_mandatory_checkboxes)]
-						.some(checkbox => checkbox && checkbox.checked);
-
-					if (any_checked) {
-						sp_certificate_label.classList.add('form-label-asterisk');
-						sp_certificate_next_div.setAttribute('aria-required', 'true');
-
-						sp_private_key_label.classList.add('form-label-asterisk');
-						sp_private_key_next_div.setAttribute('aria-required', 'true');
-					}
-					else {
-						sp_certificate_label.classList.remove('form-label-asterisk');
-						sp_certificate_next_div.removeAttribute('aria-required');
-
-						sp_private_key_label.classList.remove('form-label-asterisk');
-						sp_private_key_next_div.removeAttribute('aria-required');
-					}
-				});
+			this.form.querySelectorAll('ul.list-check-radio').forEach(checkbox => {
+				checkbox.addEventListener('change', () => {
+					this.#updateSpCertificateRequiredState();
+				})
 			});
+		}
+
+		#isSpCertificateRequired() {
+			const selector = [
+				'sign_messages', 'sign_assertions', 'sign_authn_requests', 'sign_logout_requests',
+				'sign_logout_responses', 'encrypt_nameid', 'encrypt_assertions'
+			].map(n => `[name="${n}"]:checked`).join(',');
+
+			return this.form.querySelector(selector) !== null;
+		}
+
+		#updateSpCertificateRequiredState() {
+			const required = this.#isSpCertificateRequired();
+
+			this.form.querySelector('label[for="sp_private_key"]')
+				.classList.toggle(ZBX_STYLE_FIELD_LABEL_ASTERISK, required);
+			this.form.querySelector('textarea[name="sp_private_key"]')
+				.toggleAttribute('aria-required', ZBX_STYLE_FIELD_LABEL_ASTERISK, required);
+			this.form.querySelector('label[for="sp_certificate"]')
+				.classList.toggle(ZBX_STYLE_FIELD_LABEL_ASTERISK, required);
+			this.form.querySelector('textarea[name="sp_certificate"]')
+				.toggleAttribute('aria-required', ZBX_STYLE_FIELD_LABEL_ASTERISK, required);
 		}
 
 		#setSelectedFileContentTo(textarea, extension_filter) {
