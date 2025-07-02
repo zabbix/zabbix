@@ -13,11 +13,11 @@
 ** If not, see <https://www.gnu.org/licenses/>.
 **/
 
-define('ZABBIX_VERSION',		'7.4.0rc2');
+define('ZABBIX_VERSION',		'7.4.0');
 define('ZABBIX_API_VERSION',	'7.4.0');
-define('ZABBIX_EXPORT_VERSION',	'7.4');
+define('ZABBIX_EXPORT_VERSION',	'8.0');
 
-define('ZABBIX_DB_VERSION',		7030048);
+define('ZABBIX_DB_VERSION',		7040000);
 
 define('DB_VERSION_SUPPORTED',						0);
 define('DB_VERSION_LOWER_THAN_MINIMUM',				1);
@@ -2391,6 +2391,7 @@ define('ZBX_ICON_CHEVRON_LEFT', 'zi-chevron-left');
 define('ZBX_ICON_CHEVRON_RIGHT', 'zi-chevron-right');
 define('ZBX_ICON_CHEVRON_UP', 'zi-chevron-up');
 define('ZBX_ICON_CIRCLE_INFO', 'zi-circle-info');
+define('ZBX_ICON_CIRCLE_QUESTION', 'zi-circle-question');
 define('ZBX_ICON_CIRCLE_QUESTION_FILLED', 'zi-circle-question-filled');
 define('ZBX_ICON_CLOCK', 'zi-clock');
 define('ZBX_ICON_COG_FILLED', 'zi-cog-filled');

@@ -2670,15 +2670,22 @@ div[data-field-type="set"].has-error {
     font-size: 12px;
     font-weight: 700;
     line-height: 18px; }
-  .markdown h1:not(:first-child), .modal-popup-host-wizard .formated-text h1:not(:first-child), .markdown h2:not(:first-child), .modal-popup-host-wizard .formated-text h2:not(:first-child), .markdown h3:not(:first-child), .modal-popup-host-wizard .formated-text h3:not(:first-child), .markdown h4:not(:first-child), .modal-popup-host-wizard .formated-text h4:not(:first-child) {
+  .markdown h5, .modal-popup-host-wizard .formated-text h5 {
+    font-size: 12px;
+    line-height: 18px; }
+  .markdown h1:not(:first-child), .modal-popup-host-wizard .formated-text h1:not(:first-child), .markdown h2:not(:first-child), .modal-popup-host-wizard .formated-text h2:not(:first-child), .markdown h3:not(:first-child), .modal-popup-host-wizard .formated-text h3:not(:first-child), .markdown h4:not(:first-child), .modal-popup-host-wizard .formated-text h4:not(:first-child), .markdown h5:not(:first-child), .modal-popup-host-wizard .formated-text h5:not(:first-child) {
     margin-top: 24px; }
-  .markdown ol, .modal-popup-host-wizard .formated-text ol, .markdown ul, .modal-popup-host-wizard .formated-text ul, .markdown p, .modal-popup-host-wizard .formated-text p, .markdown pre, .modal-popup-host-wizard .formated-text pre, .markdown li, .modal-popup-host-wizard .formated-text li {
+  .markdown ol, .modal-popup-host-wizard .formated-text ol, .markdown ul, .modal-popup-host-wizard .formated-text ul, .markdown p, .modal-popup-host-wizard .formated-text p, .markdown pre, .modal-popup-host-wizard .formated-text pre {
+    margin-top: 16px;
     margin-bottom: 0; }
-    .markdown ol:not(:first-child), .modal-popup-host-wizard .formated-text ol:not(:first-child), .markdown ul:not(:first-child), .modal-popup-host-wizard .formated-text ul:not(:first-child), .markdown p:not(:first-child), .modal-popup-host-wizard .formated-text p:not(:first-child), .markdown pre:not(:first-child), .modal-popup-host-wizard .formated-text pre:not(:first-child), .markdown li:not(:first-child), .modal-popup-host-wizard .formated-text li:not(:first-child) {
-      margin-top: 16px; }
+    .markdown ol:first-child, .modal-popup-host-wizard .formated-text ol:first-child, .markdown ul:first-child, .modal-popup-host-wizard .formated-text ul:first-child, .markdown p:first-child, .modal-popup-host-wizard .formated-text p:first-child, .markdown pre:first-child, .modal-popup-host-wizard .formated-text pre:first-child {
+      margin-top: 0; }
+  .markdown h5 + *, .modal-popup-host-wizard .formated-text h5 + * {
+    margin-top: 0; }
   .markdown ol, .modal-popup-host-wizard .formated-text ol, .markdown ul, .modal-popup-host-wizard .formated-text ul {
+    list-style-type: initial;
     list-style-position: outside;
-    padding-left: 1.5em; }
+    padding-left: 2em; }
     .markdown ol li, .modal-popup-host-wizard .formated-text ol li, .markdown ul li, .modal-popup-host-wizard .formated-text ul li {
       padding-bottom: 0; }
   .markdown p, .modal-popup-host-wizard .formated-text p, .markdown pre, .modal-popup-host-wizard .formated-text pre {
@@ -3299,6 +3306,7 @@ output {
     padding: 16px;
     border: 1px solid #888888;
     border-radius: 2px;
+    min-width: 0;
     white-space: normal; }
     .radio-card-list .radio-card:has(input[type="radio"]:checked) {
       border-color: #000000; }
@@ -5891,6 +5899,11 @@ div.dashboard-widget-web .list-table tr[data-hostgroupid] {
       margin-top: 16px; }
       .modal-popup-host-wizard section.collapsible .section-body > div:not(:first-child) {
         margin-top: 16px; }
+    .modal-popup-host-wizard section.collapsible .toggle {
+      grid-column: 1 / -1;
+      justify-self: start;
+      min-width: 0;
+      max-width: 100%; }
     .modal-popup-host-wizard section.grid-columns {
       gap: 12px 48px; }
       .modal-popup-host-wizard section.grid-columns .section-head,
@@ -5911,15 +5924,17 @@ div.dashboard-widget-web .list-table tr[data-hostgroupid] {
     color: #222222; }
   .modal-popup-host-wizard .ordered-list {
     --counter-width: 2ch; }
-    .modal-popup-host-wizard .ordered-list .ordered-list-item .formated-text:not(:first-child),
-    .modal-popup-host-wizard .ordered-list .ordered-list-item .form-field:not(:first-child) {
-      margin-top: 8px; }
-    .modal-popup-host-wizard .ordered-list .ordered-list-item .formated-text + .form-field {
-      margin-top: 16px; }
-    .modal-popup-host-wizard .ordered-list .ordered-list-item .formated-group + .form-field {
-      margin-top: 16px; }
-    .modal-popup-host-wizard .ordered-list .ordered-list-item:not(:first-child) {
-      margin-top: 24px; }
+    .modal-popup-host-wizard .ordered-list .ordered-list-item {
+      gap: 12px 48px; }
+      .modal-popup-host-wizard .ordered-list .ordered-list-item .formated-text:not(:first-child),
+      .modal-popup-host-wizard .ordered-list .ordered-list-item .form-field:not(:first-child) {
+        margin-top: 8px; }
+      .modal-popup-host-wizard .ordered-list .ordered-list-item .formated-text + .form-field {
+        margin-top: 16px; }
+      .modal-popup-host-wizard .ordered-list .ordered-list-item .formated-group + .form-field {
+        margin-top: 16px; }
+      .modal-popup-host-wizard .ordered-list .ordered-list-item:not(:first-child) {
+        margin-top: 24px; }
   .modal-popup-host-wizard .progress {
     display: grid;
     grid-auto-flow: column;
@@ -6051,6 +6066,10 @@ div.dashboard-widget-web .list-table tr[data-hostgroupid] {
       width: 0;
       border-left: 4px solid #000000;
       border-radius: 2px; }
+    .modal-popup-host-wizard .form-description.field-baseline {
+      margin-top: 16px; }
+  .modal-popup-host-wizard .zi-circle-question::before {
+    font-size: 16px; }
   .modal-popup-host-wizard .pre-shared-key-field {
     display: grid;
     grid-template-columns: 1fr max-content;
@@ -6061,7 +6080,10 @@ div.dashboard-widget-web .list-table tr[data-hostgroupid] {
     flex-wrap: wrap; }
     .modal-popup-host-wizard .template-subfilter .template-subfilter-item {
       padding: 0 4px;
+      min-width: 0;
       height: 22px;
+      overflow: hidden;
+      text-overflow: ellipsis;
       border: 0;
       background: transparent;
       color: #333333;
@@ -6070,12 +6092,29 @@ div.dashboard-widget-web .list-table tr[data-hostgroupid] {
         background: #333333;
         color: #fff; }
   .modal-popup-host-wizard .templates-card-list .radio-card {
-    grid-template-rows: repeat(2, max-content) 1fr;
+    display: flex;
+    flex-direction: column;
     gap: 16px;
     max-height: 360px; }
+  .modal-popup-host-wizard .templates-card-list .radio-card-label,
+  .modal-popup-host-wizard .templates-card-list .template-tag,
+  .modal-popup-host-wizard .templates-card-list .template-info-toggle-container {
+    flex: 0 0 auto; }
+  .modal-popup-host-wizard .templates-card-list .template-info {
+    flex: 1 1 auto;
+    overflow-x: hidden;
+    overflow-y: auto; }
   .modal-popup-host-wizard .templates-card-list .radio-card-label {
+    display: -webkit-box;
     font-size: 14px;
-    line-height: 21px; }
+    line-height: 21px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    line-clamp: 2;
+    white-space: normal;
+    word-break: break-word;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical; }
   .modal-popup-host-wizard .templates-card-list .template-tags label {
     color: #333333; }
   .modal-popup-host-wizard .templates-card-list .template-tags .tags-list {
@@ -6093,8 +6132,6 @@ div.dashboard-widget-web .list-table tr[data-hostgroupid] {
     .modal-popup-host-wizard .templates-card-list .template-tags .btn-icon::before {
       font-size: 16px; }
   .modal-popup-host-wizard .templates-card-list .template-info {
-    overflow-x: hidden;
-    overflow-y: auto;
     line-height: 1.5; }
   .modal-popup-host-wizard .templates-card-list .template-info-item .title {
     color: #333333; }
@@ -6106,7 +6143,7 @@ div.dashboard-widget-web .list-table tr[data-hostgroupid] {
   .modal-popup-host-wizard .templates-card-list .template-info-item:not(:first-child) {
     margin-top: 1.5em; }
   .modal-popup-host-wizard .templates-card-list .template-info-toggle-container {
-    align-self: end; }
+    margin-top: auto; }
     .modal-popup-host-wizard .templates-card-list .template-info-toggle-container .btn-link {
       float: right;
       color: #000000; }
