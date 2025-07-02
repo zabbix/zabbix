@@ -1957,7 +1957,7 @@ zabbix_export:
                       name: righty
                       value: '0'
                 - type: gauge
-                  name: '🪨 CPU usage'
+                  name: 'CPU usage'
                   x: '18'
                   'y': '8'
                   width: '19'
@@ -2030,7 +2030,7 @@ zabbix_export:
                       name: value_size
                       value: '20'
                 - type: gauge
-                  name: '🧠 Memory usage'
+                  name: 'Memory usage'
                   x: '37'
                   'y': '8'
                   width: '18'
@@ -2724,7 +2724,7 @@ zabbix_export:
                       value: '270'
                     - type: STRING
                       name: description
-                      value: '🌡 {ITEM.VALUE}'
+                      value: '{ITEM.VALUE}'
                     - type: STRING
                       name: itemid._reference
                       value: PSLAX._itemid
@@ -2813,7 +2813,7 @@ zabbix_export:
                       value: '270'
                     - type: STRING
                       name: description
-                      value: '⚡️ {ITEM.VALUE}'
+                      value: '{ITEM.VALUE}'
                     - type: STRING
                       name: itemid._reference
                       value: ZSYHY._itemid
@@ -2857,7 +2857,7 @@ zabbix_export:
                       value: '270'
                     - type: STRING
                       name: description
-                      value: '💨 {ITEM.VALUE}'
+                      value: '{ITEM.VALUE}'
                     - type: STRING
                       name: itemid._reference
                       value: YMRVB._itemid
