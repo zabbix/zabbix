@@ -71,7 +71,7 @@ class CApiSettingsHelper {
 			if ($name == 'saml_auth_enabled') {
 				$saml_auth_enabled = $value;
 			}
-			
+
 			$upd_settings[] = [
 				'values' => [$column => $value],
 				'where' => ['name' => $name]
@@ -80,7 +80,7 @@ class CApiSettingsHelper {
 
 		if ($upd_settings) {
 			$result = DB::update('settings', $upd_settings);
-			
+
 			if ($result && $saml_auth_enabled == ZBX_AUTH_SAML_DISABLED) {
 				$db_saml = API::UserDirectory()->get([
 					'output' => ['userdirectoryid'],

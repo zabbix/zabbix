@@ -541,11 +541,11 @@ class CControllerAuthenticationUpdate extends CController {
 			'output' => ['userdirectoryid'],
 			'filter' => ['idp_type' => IDP_TYPE_SAML]
 		]);
-	
+
 		if ($this->getInput('saml_auth_enabled', ZBX_AUTH_SAML_DISABLED) != ZBX_AUTH_SAML_ENABLED) {
-			API::UserDirectory()->update(['userdirectoryid' => $db_saml[0]['userdirectoryid'], 'idp_certificate' => '', 
+			API::UserDirectory()->update(['userdirectoryid' => $db_saml[0]['userdirectoryid'], 'idp_certificate' => '',
 					'sp_certificate' => '', 'sp_private_key' => '']);
-			
+
 			return true;
 		}
 
