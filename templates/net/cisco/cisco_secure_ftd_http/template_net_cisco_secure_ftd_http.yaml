@@ -1748,7 +1748,7 @@ zabbix_export:
                 - uuid: 687ebffa0c14403398cde19620cc6627
                   expression: 'min(/Cisco Secure Firewall Threat Defense by HTTP/cisco.ftd.fs.pused["{#FSNAME}","{#FSMOUNT}"],15m)>{$CISCO.FTD.FS.PUSED.WARN:"{#FSNAME}"}'
                   name: 'Cisco Secure FTD: FS [{#FSNAME}][{#FSMOUNT}]: Space is low'
-                  event_name: 'Cisco Secure FTD: FS [{#FSNAME}][{#FSMOUNT}]: Space is low (over {$CISCO.FTD.FS.PUSED.WARN:"{#FSNAME}"}% for 15m)'
+                  event_name: 'Cisco Secure FTD: FS [{#FSNAME}][{#FSMOUNT}]: Space is low (utilization is over {$CISCO.FTD.FS.PUSED.WARN:"{#FSNAME}"}% for 15m)'
                   opdata: 'Current utilization: {ITEM.LASTVALUE1}'
                   priority: WARNING
                   description: 'The trigger expression is based on the current used and maximum available spaces. The system might be slow to respond.'
