@@ -665,12 +665,7 @@ class DB {
 				self::updateByConditions($table_name, $upd_request);
 			}
 			elseif (count($upd_request['where']) == 1 && array_key_exists($table_schema['key'], $upd_request['where'])) {
-				if (count($upd_request['where'][$table_schema['key']]) == 1) {
-					self::updateByConditions($table_name, $upd_request);
-				}
-				else {
-					self::updateByPkIds($table_name, $upd_request);
-				}
+				self::updateByPkIds($table_name, $upd_request);
 			}
 			else {
 				self::updateExistingRowsByPkIds($table_name, $upd_request, $table_schema['key']);
