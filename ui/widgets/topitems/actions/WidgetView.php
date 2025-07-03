@@ -51,11 +51,11 @@ class WidgetView extends CControllerDashboardWidgetView {
 	protected function doAction(): void {
 		$data = [
 			'name' => $this->getInput('name', $this->widget->getDefaultName()),
-			'user' => [
-				'debug_mode' => $this->getDebugMode()
-			],
 			'layout' => $this->fields_values['layout'],
 			'show_column_header' => $this->fields_values['show_column_header'],
+			'user' => [
+				'debug_mode' => $this->getDebugMode()
+			]
 		];
 
 		// Editing template dashboard?
