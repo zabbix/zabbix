@@ -119,12 +119,11 @@
 	}
 
 	function showPasswordFieldWithWarning() {
-		const form_field = document.getElementById('bind-password-btn');
-
-		if (form_field) {
-			showPasswordField();
-
-			document.querySelector('.js-bind-password-warning').style.display = '';
+		if (document.getElementById('bind-password-btn') === null) {
+			return;
 		}
+
+		showPasswordField();
+		document.querySelector('.js-bind-password-warning').style.display = '';
 	}
 </script>
