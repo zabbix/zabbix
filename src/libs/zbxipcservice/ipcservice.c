@@ -529,6 +529,8 @@ static void	ipc_client_free(zbx_ipc_client_t *client)
 {
 	zbx_ipc_message_t	*message;
 
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s() clientid:" ZBX_FS_UI64, __func__, client->id);
+
 	ipc_client_free_events(client);
 	zbx_ipc_socket_close(&client->csocket);
 
@@ -547,6 +549,8 @@ static void	ipc_client_free(zbx_ipc_client_t *client)
 	ipc_client_free_events(client);
 
 	zbx_free(client);
+
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 }
 
 /******************************************************************************
@@ -1546,6 +1550,8 @@ out:
  ******************************************************************************/
 void	zbx_ipc_service_close(zbx_ipc_service_t *service)
 {
+	zbx_ipc_client_t	*client = NULL;
+
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() path:%s", __func__, service->path);
 
 	if (0 != close(service->fd))
@@ -1556,6 +1562,9 @@ void	zbx_ipc_service_close(zbx_ipc_service_t *service)
 
 	for (int i = 0; i < service->clients.values_num; i++)
 		ipc_client_free(service->clients.values[i]);
+
+	while (NULL != (client = (zbx_ipc_client_t *)zbx_queue_ptr_pop(&service->clients_recv)))
+		ipc_client_free(client);
 
 	zbx_free(service->path);
 
@@ -1719,7 +1728,7 @@ out:
  ******************************************************************************/
 void	zbx_ipc_client_close(zbx_ipc_client_t *client)
 {
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s() clientid:" ZBX_FS_UI64, __func__, client->id);
 
 	ipc_client_free_events(client);
 	zbx_ipc_socket_close(&client->csocket);
@@ -1820,7 +1829,9 @@ int	zbx_ipc_async_socket_open(zbx_ipc_async_socket_t *asocket, const char *servi
 
 	ret = SUCCEED;
 out:
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __func__, zbx_result_string(ret));
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s() clientid:" ZBX_FS_UI64 " ret:%s", __func__, asocket->client->id,
+			zbx_result_string(ret));
+
 	return ret;
 }
 

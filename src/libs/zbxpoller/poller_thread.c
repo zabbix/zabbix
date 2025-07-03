@@ -953,6 +953,8 @@ ZBX_THREAD_ENTRY(zbx_poller_thread, args)
 #endif
 	}
 
+	zbx_ipc_async_socket_close(&rtc);
+
 	scriptitem_es_engine_destroy();
 
 	zbx_setproctitle("%s #%d [terminated]", get_process_type_string(process_type), process_num);

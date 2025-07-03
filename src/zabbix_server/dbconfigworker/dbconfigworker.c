@@ -225,6 +225,8 @@ ZBX_THREAD_ENTRY(zbx_dbconfig_worker_thread, args)
 	zbx_vector_uint64_destroy(&hostids);
 	zbx_ipc_service_close(&service);
 
+	zbx_setproctitle("%s #%d [terminated]", get_process_type_string(process_type), process_num);
+
 	exit(EXIT_SUCCESS);
 #undef ZBX_DBCONFIG_WORKER_DELAY
 }
