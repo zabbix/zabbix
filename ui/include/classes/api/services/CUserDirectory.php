@@ -596,7 +596,6 @@ class CUserDirectory extends CApiService {
 		self::checkSamlRequirements($userdirectories);
 
 		self::addSamlWriteOnlyDbFields($userdirectories, $db_userdirectories);
-
 		self::addRequiredFieldsByType($userdirectories, $db_userdirectories);
 
 		$api_input_rules = self::getValidationRules(true);
@@ -616,13 +615,13 @@ class CUserDirectory extends CApiService {
 	}
 
 	private static function checkSamlRequirements(array $userdirectories): void {
-		foreach ($userdirectories as $userdirectory) {
-			if ($userdirectory['idp_type'] == IDP_TYPE_SAML) {
-				$openssl_status = (new CFrontendSetup())->checkPhpOpenSsl();
+		$is_ssl_required = (bool) array_keys(array_column($userdirectories, 'idp_type'), IDP_TYPE_LDAP);
 
-				if ($openssl_status['result'] != CFrontendSetup::CHECK_OK) {
-					self::exception(ZBX_API_ERROR_INTERNAL, $openssl_status['error']);
-				}
+		if ($is_ssl_required) {
+			$openssl_status = (new CFrontendSetup())->checkPhpOpenSsl();
+
+			if ($openssl_status['result'] != CFrontendSetup::CHECK_OK) {
+				self::exception(ZBX_API_ERROR_INTERNAL, $openssl_status['error']);
 			}
 		}
 	}

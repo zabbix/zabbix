@@ -397,7 +397,7 @@
 				) ?>);
 			}
 
-			if (!Object.values(this.saml_certs_mandatory_checkboxes).some(checkbox => checkbox && checkbox.checked)) {
+			if (!this.#isSpCertificateRequired()) {
 				const sp_certificate_input = document.getElementById('sp_certificate');
 				const sp_private_key_input = document.getElementById('sp_private_key');
 
