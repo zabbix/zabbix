@@ -121,7 +121,7 @@
 	function showPasswordFieldWithWarning() {
 		const form_field = document.getElementById('bind-password-btn');
 
-		if (form_field){
+		if (form_field) {
 			showPasswordField();
 
 			document.querySelector('.js-bind-password-warning').style.display = '';
