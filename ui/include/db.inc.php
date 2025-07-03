@@ -551,8 +551,20 @@ function dbConditionInt($field_name, array $values, $not_in = false, $zero_to_nu
  *
  * @return string
  */
-function dbConditionId($fieldName, array $values, $notIn = false) {
-	return dbConditionInt($fieldName, $values, $notIn, true);
+function dbConditionId(string $sql_field_name, array $values, bool $not_in = false,
+		?string $table_name = null): string {
+	if ($table_name === null) {
+		return dbConditionInt($sql_field_name, $values, $not_in, true);
+	}
+
+	$delimiter_pos = strpos($sql_field_name, '.');
+	$field_name = ($delimiter_pos !== false) ? substr($sql_field_name, $delimiter_pos + 1) : $sql_field_name;
+
+	$field_schema = DB::getSchema($table_name)['fields'][$field_name];
+
+	return dbConditionInt($sql_field_name, $values, $not_in,
+		(!$field_schema['null'] && array_key_exists('default', $field_schema)) ? false : true
+	);
 }
 
 /**
