@@ -1500,7 +1500,7 @@ int	zbx_proxyconfig_get_data(zbx_dc_proxy_t *proxy, const struct zbx_json_parse 
 {
 	int			ret = FAIL;
 	char			token[ZBX_SESSION_TOKEN_SIZE + 1], tmp[ZBX_MAX_UINT64_LEN + 1], *failover_delay = NULL;
-	zbx_uint64_t		proxy_config_revision, proxy_hostmap_revision, hostmap_revision, proxy_secrets_provider, 
+	zbx_uint64_t		proxy_config_revision, proxy_hostmap_revision, hostmap_revision, proxy_secrets_provider,
 				proxy_revision, macro_revision;
 	zbx_dc_revision_t	dc_revision;
 	zbx_vector_uint64_t	del_hostproxyids;
