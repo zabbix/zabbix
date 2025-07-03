@@ -580,7 +580,7 @@ class testUserDirectory extends CAPITest {
 				'userdirectories' => [
 					['userdirectoryid' => 'LDAP #4', 'host' => 'test.host.com']
 				],
-				'expected_error' => 'Invalid parameter "bind_password": the parameter "bind_password" is missing.'
+				'expected_error' => 'Invalid parameter "/1": the parameter "bind_password" is missing.'
 			],
 			'Test idp_type change' => [
 				'userdirectories' => [
