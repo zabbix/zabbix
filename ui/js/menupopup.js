@@ -1280,6 +1280,7 @@ function getMenuPopupItemPrototype(options) {
 
 	config_urls.push({
 		label: t('Create trigger prototype'),
+		disabled: options.is_binary_value_type,
 		clickCallback: function(e) {
 			e.preventDefault();
 			jQuery(this).closest('.menu-popup').menuPopup('close', null);

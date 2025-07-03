@@ -246,6 +246,7 @@ class testDashboardSystemInformationWidget extends testSystemInformation {
 			}
 			$form->fill($widget_data['fields']);
 			$form->submit();
+			COverlayDialogElement::ensureNotPresent();
 		}
 		// Save the dashboard and check info displayed by the widgets.
 		$dashboard->save();

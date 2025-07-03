@@ -31,23 +31,19 @@ class CControllerItemPrototypeList extends CControllerItemPrototype {
 
 		$ret = $this->validateInput($fields);
 
-		if ($ret) {
-			$ret = (bool) API::DiscoveryRule()->get([
-				'output' => ['itemid'],
-				'itemids' => $this->getInput('parent_discoveryid'),
-				'editable' => true
-			]);
-
-			if (!$ret) {
-				error(_s('Incorrect value for "%1$s" field.', 'parent_discoveryid'));
-			}
-		}
-
 		if (!$ret) {
 			$this->setResponse(new CControllerResponseFatal());
 		}
 
 		return $ret;
+	}
+
+	protected function checkPermissions(): bool {
+		return parent::checkPermissions() && (bool) API::DiscoveryRule()->get([
+			'output' => [],
+			'itemids' => $this->getInput('parent_discoveryid'),
+			'editable' => true
+		]);
 	}
 
 	public function doAction() {
