@@ -955,7 +955,7 @@ class CUserDirectory extends CApiService {
 				continue;
 			}
 
-			if($userdirectory['host'] !== $db_userdirectories[$userdirectory['userdirectoryid']]['host']){
+			if ($userdirectory['host'] !== $db_userdirectories[$userdirectory['userdirectoryid']]['host']) {
 				self::exception(ZBX_API_ERROR_PARAMETERS, _s('Invalid parameter "%1$s": %2$s.', '/'.($i + 1),
 					_s('the parameter "%1$s" is missing', 'bind_password')
 				));

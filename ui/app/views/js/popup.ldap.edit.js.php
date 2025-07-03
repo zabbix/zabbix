@@ -128,13 +128,8 @@ window.ldap_edit_popup = new class {
 	}
 
 	showPasswordFieldWithWarning() {
-		const form_field = document.getElementById('bind-password-btn');
-
-		if (form_field){
-			this.showPasswordField();
-
-			document.querySelector('.js-bind-password-warning').style.display = ''
-		}
+		this.showPasswordField();
+		document.querySelector('.js-bind-password-warning').style.display = '';
 	}
 
 	openTestPopup() {
