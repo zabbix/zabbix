@@ -12,11 +12,11 @@ zabbix_export:
         
         Setup:
         
-        1. Deploy Zabbix agent 2 with the MSSQL plugin. You can use this template starting with version 7.4.0 of both Zabbix and the MSSQL plugin.
+        1. Deploy Zabbix agent 2 with the MSSQL plugin.
         
           For more information, see MSSQL plugin documentation: https://git.zabbix.com/projects/AP/repos/mssql/browse
         
-          Important! Starting with version 7.4-1 of this template, the MSSQL plugin must be updated to a version equal to or above 7.4.0. (You can check the version of the template in its YAML file under the "vendor" section.)
+          The MSSQL plugin must be updated to a version equal to or above 7.4.0
         
           Loadable plugin requires installation of one of the following:
         
