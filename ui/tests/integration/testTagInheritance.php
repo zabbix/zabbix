@@ -448,7 +448,7 @@ class testTagInheritance extends CIntegrationTest {
 						['tag' => 'OS', 'operator' => TAG_OPERATOR_EXISTS],
 						['tag' => self::TEMPLATE_TAG_NAME_PREFIX . '1', 'operator' => TAG_OPERATOR_EXISTS],
 						['tag' => self::TEMPLATE_TAG_NAME_PREFIX . '2', 'operator' => TAG_OPERATOR_EXISTS]
-					]
+					],
 				],
 				'expected' => [
 					'strataX_trigger_description_tag_inheritance_0',
@@ -460,7 +460,7 @@ class testTagInheritance extends CIntegrationTest {
 					'evaltype' => TAG_EVAL_TYPE_AND_OR,
 					'tags' => [
 						['tag' => 'tag2', 'operator' => TAG_OPERATOR_EQUAL, 'value' => '6']
-					]
+					],
 				],
 				'expected' => [
 					'strataX_trigger_description_tag_inheritance_2'
@@ -472,7 +472,7 @@ class testTagInheritance extends CIntegrationTest {
 					'tags' => [
 						['tag' => 'tag1', 'operator' => TAG_OPERATOR_EQUAL, 'value' => 'value1'],
 						['tag' => 'tag1', 'operator' => TAG_OPERATOR_EQUAL, 'value' => 'value5']
-					]
+					],
 				],
 				'expected' => [
 					'strataX_trigger_description_tag_inheritance_1',
@@ -486,7 +486,7 @@ class testTagInheritance extends CIntegrationTest {
 					'tags' => [
 						['tag' => 'tag2', 'operator' => TAG_OPERATOR_EQUAL, 'value' => 'value6'],
 						['tag' => 'tag2', 'operator' => TAG_OPERATOR_EQUAL, 'value' => '']
-					]
+					],
 				],
 				'expected' => [
 					'strataX_trigger_description_tag_inheritance_2',
@@ -498,7 +498,7 @@ class testTagInheritance extends CIntegrationTest {
 					'evaltype' => TAG_EVAL_TYPE_AND_OR,
 					'tags' => [
 						['tag' => 'tag3', 'operator' => TAG_OPERATOR_LIKE, 'value' => 'value']
-					]
+					],
 				],
 				'expected' => [
 					'strataX_trigger_description_tag_inheritance_3'
@@ -510,7 +510,7 @@ class testTagInheritance extends CIntegrationTest {
 					'tags' => [
 						['tag' => 'tag1', 'operator' => TAG_OPERATOR_LIKE, 'value' => 'value'],
 						['tag' => 'OS', 'operator' => TAG_OPERATOR_LIKE, 'value' => 'OS']
-					]
+					],
 				],
 				'expected' => [
 					'strataX_trigger_description_tag_inheritance_1',
@@ -523,7 +523,7 @@ class testTagInheritance extends CIntegrationTest {
 					'evaltype' => TAG_EVAL_TYPE_AND_OR,
 					'tags' => [
 						['tag' => 'tag2', 'operator' => TAG_OPERATOR_NOT_EXISTS]
-					]
+					],
 				],
 				'expected' => [
 					'host_trigger_description_tag_inheritance',
@@ -540,7 +540,7 @@ class testTagInheritance extends CIntegrationTest {
 					'evaltype' => TAG_EVAL_TYPE_AND_OR,
 					'tags' => [
 						['tag' => 'tag2', 'operator' => TAG_OPERATOR_NOT_EQUAL, 'value' => '']
-					]
+					],
 				],
 				'expected' => [
 					'host_trigger_description_tag_inheritance',
@@ -559,7 +559,7 @@ class testTagInheritance extends CIntegrationTest {
 					'tags' => [
 						['tag' => 'tag2', 'operator' => TAG_OPERATOR_NOT_EQUAL, 'value' => ''],
 						['tag' => 'tag1', 'operator' => TAG_OPERATOR_NOT_EQUAL, 'value' => 'value5']
-					]
+					],
 				],
 				'expected' => [
 					'host_trigger_description_tag_inheritance',
@@ -576,7 +576,7 @@ class testTagInheritance extends CIntegrationTest {
 					'evaltype' => TAG_EVAL_TYPE_AND_OR,
 					'tags' => [
 						['tag' => 'tag1', 'operator' => TAG_OPERATOR_NOT_LIKE, 'value' => 'value']
-					]
+					],
 				],
 				'expected' => [
 					'host_trigger_description_tag_inheritance',
@@ -595,7 +595,7 @@ class testTagInheritance extends CIntegrationTest {
 					'tags' => [
 						['tag' => 'tag2', 'operator' => TAG_OPERATOR_EXISTS],
 						['tag' => 'tag3', 'operator' => TAG_OPERATOR_EXISTS]
-					]
+					],
 				],
 				'expected' => [
 					'strataX_trigger_description_tag_inheritance_2',
@@ -609,7 +609,7 @@ class testTagInheritance extends CIntegrationTest {
 					'tags' => [
 						['tag' => 'tag2', 'operator' => TAG_OPERATOR_LIKE, 'value' => ''],
 						['tag' => 'tag3', 'operator' => TAG_OPERATOR_EXISTS]
-					]
+					],
 				],
 				'expected' => [
 					'strataX_trigger_description_tag_inheritance_2',
@@ -623,7 +623,7 @@ class testTagInheritance extends CIntegrationTest {
 					'tags' => [
 						['tag' => 'tag1', 'operator' => TAG_OPERATOR_LIKE, 'value' => '5'],
 						['tag' => 'tag1', 'operator' => TAG_OPERATOR_LIKE, 'value' => '7']
-					]
+					],
 				],
 				'expected' => [
 					'strataX_trigger_description_tag_inheritance_5'
@@ -635,7 +635,7 @@ class testTagInheritance extends CIntegrationTest {
 					'tags' => [
 						['tag' => 'tag1', 'operator' => TAG_OPERATOR_NOT_EXISTS],
 						['tag' => 'tag2', 'operator' => TAG_OPERATOR_NOT_EXISTS]
-					]
+					],
 				],
 				'expected' => [
 					'host_trigger_description_tag_inheritance',
@@ -658,7 +658,7 @@ class testTagInheritance extends CIntegrationTest {
 							'operator' => TAG_OPERATOR_NOT_EQUAL
 						],
 						['tag' => 'OS', 'operator' => TAG_OPERATOR_NOT_EQUAL, 'value' => 'OS']
-					]
+					],
 				],
 				'expected' => [
 					'host_trigger_description_tag_inheritance',
@@ -677,7 +677,7 @@ class testTagInheritance extends CIntegrationTest {
 					'tags' => [
 						['tag' => 'tag2', 'operator' => TAG_OPERATOR_NOT_LIKE, 'value' => '6'],
 						['tag' => 'OS', 'operator' => TAG_OPERATOR_NOT_LIKE, 'value' => 'OS']
-					]
+					],
 				],
 				'expected' => [
 					'host_trigger_description_tag_inheritance',
@@ -694,7 +694,7 @@ class testTagInheritance extends CIntegrationTest {
 				'filter' => [
 					'evaltype' => TAG_EVAL_TYPE_OR,
 					'tags' => [
-					]
+					],
 				],
 				'expected' => [
 				]
@@ -724,7 +724,8 @@ class testTagInheritance extends CIntegrationTest {
 
 		$request = [
 			'output' => ['name'],
-			'groupids' => 4 // Zabbx servers
+			'groupids' => 4, // Zabbx servers
+			'hostids' => [self::$host_id]
 		] + $filter;
 
 		['result' => $result] = $this->call('event.get', $request);
