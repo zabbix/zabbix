@@ -7,7 +7,7 @@ msgstr ""
 "Project-Id-Version: Zabbix 6.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2024-04-02 17:26+0300\n"
-"PO-Revision-Date: 2024-06-27 02:38+0000\n"
+"PO-Revision-Date: 2025-07-02 10:06+0000\n"
 "Last-Translator: NoYoWiFi <1284524409@qq.com>\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
 "Language: zh_CN\n"
@@ -988,11 +988,11 @@ msgstr "后值"
 
 #: include/events.inc.php:288
 msgid "Age"
-msgstr "持续时间"
+msgstr "总时长"
 
 #: app/partials/monitoring.problem.filter.php:119
 msgid "Age less than"
-msgstr "持续时间小于"
+msgstr "总时长小于"
 
 #: app/views/administration.script.list.php:163 include/hosts.inc.php:1191
 #: include/items.inc.php:348 include/views/configuration.httpconf.edit.php:95
@@ -6665,7 +6665,7 @@ msgstr "过期时间小于"
 
 #: app/views/popup.generic.php:479 include/graphs.inc.php:27
 msgid "Exploded"
-msgstr "爆发的"
+msgstr "爆炸饼图"
 
 #: include/classes/html/CButtonExport.php:32
 msgid "Export"
@@ -11724,7 +11724,7 @@ msgstr "周一"
 
 #: app/views/configuration.host.list.php:128
 msgid "Monitored by"
-msgstr "要监控什么"
+msgstr "从哪监控"
 
 #: app/partials/configuration.host.edit.html.php:290
 #: app/views/popup.massupdate.host.php:118
@@ -13946,7 +13946,7 @@ msgstr "波斯语 (fa_IR)"
 
 #: app/views/popup.generic.php:476 include/graphs.inc.php:26
 msgid "Pie"
-msgstr "Pie"
+msgstr "饼图"
 
 #: include/views/js/monitoring.sysmaps.js.php:129
 msgid "Placing algorithm"
@@ -14239,7 +14239,7 @@ msgstr "问题显示"
 #: include/triggers.inc.php:984
 #: include/views/js/configuration.triggers.edit.js.php:70
 msgid "Problem expression"
-msgstr "问题表现形式"
+msgstr "问题表达式"
 
 #: include/classes/widgets/CWidgetConfig.php:66
 #: include/classes/widgets/forms/CWidgetFormSvgGraph.php:335
@@ -16590,7 +16590,7 @@ msgstr "速度"
 #: app/views/popup.generic.php:473 include/graphs.inc.php:25
 #: include/views/monitoring.history.php:257
 msgid "Stacked"
-msgstr "层积的"
+msgstr "堆叠图"
 
 #: include/classes/widgets/CWidgetHelper.php:946
 #: include/classes/widgets/CWidgetHelper.php:989
