@@ -12395,9 +12395,6 @@ static void	DCget_proxy(zbx_dc_proxy_t *dst_proxy, const ZBX_DC_PROXY *src_proxy
 	dst_proxy->lastaccess = src_proxy->lastaccess;
 	dst_proxy->last_version_error_time = src_proxy->last_version_error_time;
 
-	dst_proxy->revision = src_proxy->revision;
-	dst_proxy->macro_revision = config->um_cache->revision;
-
 	zbx_strscpy(dst_proxy->name, src_proxy->name);
 	zbx_strscpy(dst_proxy->allowed_addresses, src_proxy->allowed_addresses);
 
@@ -15164,8 +15161,9 @@ zbx_session_t	*zbx_dc_get_or_create_session(zbx_uint64_t hostid, const char *tok
  * Return value: The number of created sessions                               *
  *                                                                            *
  ******************************************************************************/
-int	zbx_dc_register_config_session(zbx_uint64_t hostid, const char *token, zbx_uint64_t session_config_revision,
-		zbx_dc_revision_t *dc_revision)
+int	zbx_dc_register_proxy_config_session(zbx_uint64_t hostid, const char *token,
+		zbx_uint64_t session_config_revision, zbx_dc_revision_t *dc_revision,
+		zbx_uint64_t *proxy_revision, zbx_uint64_t *macro_revision)
 {
 	zbx_session_t	*session, session_local;
 	time_t		now;
@@ -15184,6 +15182,16 @@ int	zbx_dc_register_config_session(zbx_uint64_t hostid, const char *token, zbx_u
 		session->lastaccess = now;
 	}
 	*dc_revision = config->revision;
+
+	*macro_revision = config->um_cache->revision;
+
+	ZBX_DC_PROXY	*dc_proxy;
+
+	if (NULL != (dc_proxy = (ZBX_DC_PROXY *)zbx_hashset_search(&config->proxies, &hostid)))
+		*proxy_revision = dc_proxy->revision;
+	else
+		*proxy_revision = 0;
+
 	UNLOCK_CACHE;
 
 	if (NULL != session)
