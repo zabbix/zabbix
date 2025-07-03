@@ -287,7 +287,6 @@ void	pp_task_queue_push_test(zbx_pp_queue_t *queue, zbx_pp_task_t *task)
 	(void)zbx_list_append(&queue->immediate, task, NULL);
 }
 
-
 /******************************************************************************
  *                                                                            *
  * Purpose: queue normal task to be processed                                 *
