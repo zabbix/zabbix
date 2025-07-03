@@ -37,7 +37,6 @@ class testFormMapProperties extends CWebTest {
 		];
 	}
 
-	protected static $map_update = 'Map for update test';
 	const MAP_UPDATE = 'Map for simple update and update test';
 	const MAP_CLONE = 'Map for clone and delete test';
 	const CLONED_MAP = 'Cloned map';
@@ -45,6 +44,8 @@ class testFormMapProperties extends CWebTest {
 	const ICON_MAPPING = 'Icon mapping for map properties';
 	const XSS_EXAMPLE = '<script>alert(\'XSS\');</script>';
 	const BACKGROUND_IMAGE = 'Background image for map properties';
+
+	protected static $map_update = 'Map for update test';
 
 	public function prepareMapsData() {
 		CDataHelper::call('iconmap.create', [
@@ -66,6 +67,8 @@ class testFormMapProperties extends CWebTest {
 			]
 		]);
 
+		$mapping_ids = CDataHelper::getIds('name');
+
 		CDataHelper::call('image.create', [
 			[
 				'name' => self::BACKGROUND_IMAGE,
@@ -77,8 +80,7 @@ class testFormMapProperties extends CWebTest {
 			]
 		]);
 
-		$id_mapping = CDBHelper::getValue('SELECT iconmapid FROM icon_map WHERE name='.zbx_dbstr(self::ICON_MAPPING));
-		$id_background = CDBHelper::getValue('SELECT imageid FROM images WHERE name='.zbx_dbstr(self::BACKGROUND_IMAGE));
+		$background_ids = CDataHelper::getIds('name');
 
 		CDataHelper::call('map.create', [
 			[
@@ -92,7 +94,7 @@ class testFormMapProperties extends CWebTest {
 				'name' => self::MAP_UPDATE,
 				'width' => 10000,
 				'height' => 9000,
-				'iconmapid' => $id_mapping,
+				'iconmapid' => $mapping_ids[self::ICON_MAPPING],
 				'markelements' => 1,
 				'highlight' => 1,
 				'expandproblem' => 2,
@@ -139,8 +141,8 @@ class testFormMapProperties extends CWebTest {
 				'name' => self::MAP_CLONE,
 				'width' => 1000,
 				'height' => 1000,
-				'backgroundid' => $id_background,
-				'iconmapid' => $id_mapping,
+				'backgroundid' => $background_ids[self::BACKGROUND_IMAGE],
+				'iconmapid' => $mapping_ids[self::ICON_MAPPING],
 				'markelements' => 1,
 				'highlight' => 1,
 				'expandproblem' => 2,
@@ -236,121 +238,167 @@ class testFormMapProperties extends CWebTest {
 			'URLs'
 		];
 
-		$this->assertEquals($map_labels, array_values($form->getLabels()->filter(CElementFilter::VISIBLE)->asText()));
-		$this->assertEquals($hidden_map_labels, array_values($form->getLabels()
-				->filter(CElementFilter::NOT_VISIBLE)->asText())
-		);
+		$this->assertEquals($map_labels, array_values($form->getLabels(CElementFilter::VISIBLE)->asText()));
+		$this->assertEquals($hidden_map_labels, array_values($form->getLabels(CElementFilter::NOT_VISIBLE)->asText()));
 
-		// Check all the fields of the Map form.
+		// Check the required fields of the Map form.
 		$this->assertEquals(['Owner', 'Name', 'Width', 'Height'], $form->getRequiredLabels());
-		$this->assertEquals(['Admin (Zabbix Administrator)'], $form->getField('Owner')->getValue());
-		$this->assertTrue($form->query('button:Select')->one()->isClickable());
 
-		$name_field = $form->getField('Name');
-		$this->assertEquals(128, $name_field->getAttribute('maxlength'));
-		$this->assertEquals('', $name_field->getText());
+		// Check the default values of the fields.
+		$default_values = [
+			'Owner' => 'Admin (Zabbix Administrator)',
+			'Name' => '',
+			'Width' => '800',
+			'Height' => '600',
+			'Background image' => 'No image',
+			'Background scale' => 'Proportionally',
+			'Automatic icon mapping' => '<manual>',
+			'Icon highlight' => false,
+			'Mark elements on trigger status change' => false,
+			'Display problems' => 'Expand single problem',
+			'Advanced labels' => false,
+			'Map element label type' => 'Label',
+			'Map element label location' => 'Bottom',
+			'Show map element labels' => 'Always',
+			'Show link labels' => 'Always',
+			'Problem display' => 'All',
+			'Minimum severity' => 'Not classified',
+			'Show suppressed problems' => false,
+			'id:urls_0_name' => '',
+			'id:urls_0_url' => '',
+			'xpath://input[@name="urls[0][elementtype]"]' => '0'
+		];
+		$form->checkValue($default_values);
 
-		foreach (['Width', 'Height'] as $field) {
-			$form_field = $form->getField($field);
-			$this->assertEquals(5, $form_field->getAttribute('maxlength'));
-			$this->assertEquals(($field == 'Width') ? 800 : 600, $form_field->getValue());
+		// Check attributes.
+		$form->fill(['Owner' => '']);
+		$inputs = [
+			'id:userid_ms' => [
+				'placeholder' => 'type here to search'
+			],
+			'Name' => [
+				'maxlength' => '128'
+			],
+			'Width' => [
+				'maxlength' => '5'
+			],
+			'Height' => [
+				'maxlength' => '5'
+			],
+			'id:urls_0_name' => [
+				'maxlength' => '255'
+			],
+			'id:urls_0_url' => [
+				'maxlength' => '2048'
+			]
+		];
+
+		foreach ($inputs as $field => $attributes) {
+			$this->assertTrue($form->getField($field)->isAttributePresent($attributes));
 		}
 
-		$image_field = $form->getField('Background image');
-		$this->assertEquals('No image', $image_field->getValue());
-		$this->assertEquals(['No image', self::BACKGROUND_IMAGE], $image_field->getOptions()->asText());
+		$this->assertTrue($form->query('button:Select')->one()->isClickable());
 
-		$background_scale = $form->getField('Background scale');
-		$this->assertEquals('Proportionally', $background_scale->getText());
-		$this->assertEquals(['None', 'Proportionally'], $background_scale->getLabels()->asText());
-
-		$mapping_field = $form->getField('Automatic icon mapping');
-		$mappings = [
-			'<manual>',
-			self::ICON_MAPPING,
-			'Icon mapping for update',
-			'Icon mapping one',
-			'Icon mapping testForm update expression',
-			'Icon mapping to check clone functionality',
-			'Icon mapping to check delete functionality',
-			'used_by_map'
+		// Check dropdown values.
+		$dropdowns = [
+			'Background image' => ['No image', self::BACKGROUND_IMAGE],
+			'Automatic icon mapping' => [
+				'<manual>',
+				self::ICON_MAPPING,
+				'Icon mapping for update',
+				'Icon mapping one',
+				'Icon mapping testForm update expression',
+				'Icon mapping to check clone functionality',
+				'Icon mapping to check delete functionality',
+				'used_by_map'
+			],
+			'Map element label type' => ['Label', 'IP address', 'Element name', 'Status only', 'Nothing'],
+			'Map element label location' => ['Bottom', 'Left', 'Right', 'Top'],
+			'Problem display' => ['All', 'Separated', 'Unacknowledged only'],
+			'xpath://z-select[@name="urls[0][elementtype]"]' => ['Host', 'Host group', 'Image', 'Map', 'Trigger']
 		];
-		$this->assertEquals('<manual>', $mapping_field->getValue());
-		$this->assertEquals($mappings, $mapping_field->getOptions()->asText());
 
+		$dropdowns_advanced_labels = [
+			'Host group label type' => ['Label', 'Element name', 'Status only', 'Nothing', 'Custom label'],
+			'Host label type' => ['Label', 'IP address', 'Element name', 'Status only', 'Nothing', 'Custom label'],
+			'Trigger label type' => ['Label', 'Element name', 'Status only', 'Nothing', 'Custom label'],
+			'Map label type' => ['Label', 'Element name', 'Status only', 'Nothing', 'Custom label'],
+			'Image label type' => ['Label', 'Element name', 'Nothing', 'Custom label']
+		];
+
+		foreach ($dropdowns as $field => $options) {
+			($field == 'xpath://z-select[@name="urls[0][elementtype]"]')
+				? $this->assertEquals($options, $form->getField($field)->asDropdown()->getOptions()->asText())
+				: $this->assertEquals($options, $form->getField($field)->getOptions()->asText());
+		}
+
+		$form->getField('Advanced labels')->check();
+
+		foreach ($dropdowns_advanced_labels as $field => $options) {
+			$this->assertEquals($options, $form->getField($field)->getOptions()->asText());
+		}
+
+		// Check custom label attributes and values.
+		$form->fill([
+			'Host group label type' => 'Custom label',
+			'Host label type' => 'Custom label',
+			'Trigger label type'=> 'Custom label',
+			'Map label type' => 'Custom label',
+			'Image label type' => 'Custom label'
+		]);
+
+		$custom_label_xpath = [
+			'xpath://textarea[@name="label_string_hostgroup"]',
+			'xpath://textarea[@name="label_string_host"]',
+			'xpath://textarea[@name="label_string_trigger"]',
+			'xpath://textarea[@name="label_string_map"]',
+			'xpath://textarea[@name="label_string_image"]'
+		];
+
+		foreach($custom_label_xpath as $xpath) {
+			$field = $form->getField($xpath);
+			$this->assertEquals('', $field->getValue());
+			$this->assertEquals('false', $field->getAttribute('spellcheck'));
+			// TODO: When ZBX-26089 is merged, uncomment maxlength attribute check.
+//			$this->assertEquals(255, $field->getAttribute('maxlength'));
+		}
+
+		// Check radio buttons.
+		$radiobuttons = [
+			'Background scale' => ['None', 'Proportionally'],
+			'Display problems' => [
+				'Expand single problem',
+				'Number of problems',
+				'Number of problems and expand most critical one'
+			],
+			'Show map element labels' => ['Always', 'Auto hide'],
+			'Show link labels' => ['Always', 'Auto hide'],
+			'Minimum severity' => ['Not classified', 'Information', 'Warning', 'Average', 'High', 'Disaster']
+		];
+
+		foreach ($radiobuttons as $field => $options) {
+			$this->assertEquals($options, $form->getField($field)->getLabels()->asText());
+		}
+
+		// Check custom label attributes and values.
+		$form->fill([
+			'Host group label type' => 'Custom label',
+			'Host label type' => 'Custom label',
+			'Trigger label type' => 'Custom label',
+			'Map label type' => 'Custom label',
+			'Image label type' => 'Custom label'
+			]
+		);
+
+		// Check link to mappings.
 		$mappings_url = $form->query('link:show icon mappings')->one();
 		$this->assertTrue($mappings_url->isClickable());
 		$this->assertEquals('zabbix.php?action=iconmap.list', $mappings_url->getAttribute('href'));
+		$mappings_url->click();
+		$this->page->switchBrowserWindow(1)->assertHeader('Icon mapping');
+		$this->page->switchBrowserWindow(0);
 
-		$this->assertFalse($form->getField('Icon highlight')->isChecked());
-		$this->assertFalse($form->getField('Mark elements on trigger status change')->isChecked());
-
-		$display_problems = $form->getField('Display problems');
-		$this->assertEquals(['Expand single problem', 'Number of problems', 'Number of problems and expand most critical one'],
-				$display_problems->getLabels()->asText()
-		);
-		$this->assertEquals('Expand single problem', $display_problems->getText());
-		$advanced_labels = $form->getField('Advanced labels');
-		$this->assertFalse($advanced_labels->isChecked());
-
-		$label_options_map = ['Label', 'IP address', 'Element name', 'Status only', 'Nothing'];
-		$label_options = ['Label', 'Element name', 'Status only', 'Nothing', 'Custom label'];
-		$label_options_host = ['Label', 'IP address', 'Element name', 'Status only', 'Nothing', 'Custom label'];
-		$label_options_image = ['Label', 'Element name', 'Nothing', 'Custom label'];
-		$map_element_label_type = $form->getField('Map element label type');
-		$this->assertEquals($label_options_map, $map_element_label_type->getOptions()->asText());
-		$this->assertEquals('Label', $map_element_label_type->getText());
-
-		// Expand the advanced labels options, check that label type dropdown is hidden and new fields are present.
-		$advanced_labels->check();
-		$this->assertFalse($map_element_label_type->isVisible());
-		$label_types = [
-			'Host group label type' => 'label_string_hostgroup',
-			'Host label type' => 'label_string_host',
-			'Trigger label type' => 'label_string_trigger',
-			'Map label type' => 'label_string_map',
-			'Image label type' => 'label_string_image'
-		];
-
-		foreach ($label_types as $type => $id) {
-			$field = $form->getField($type);
-			$options = ($type !== 'Host label type' && $type !== 'Image label type')
-				? $label_options
-				: (($type == 'Host label type')
-				? $label_options_host
-				: $label_options_image);
-			$this->assertEquals($options, $field->getOptions()->asText());
-			$this->assertEquals('Element name', $field->getText());
-
-			// Check that text area appears on custom label option.
-			$field->select('Custom label');
-			$text_area = $form->query('id:'.$id)->one();
-			$this->assertTrue($text_area->isVisible());
-			$this->assertEquals('false', $text_area->getAttribute('spellcheck'));
-		}
-
-		$label_location = $form->getField('Map element label location');
-		$this->assertEquals(['Bottom', 'Left', 'Right', 'Top'], $label_location->getOptions()->asText());
-		$this->assertEquals('Bottom', $label_location->getText());
-
-		foreach (['Show map element labels', 'Show link labels'] as $field_name) {
-			$show_label = $form->getField($field_name);
-			$this->assertEquals('Always', $show_label->getText());
-			$this->assertEquals(['Always', 'Auto hide'], $show_label->getLabels()->asText());
-		}
-
-		$problem_display = $form->getField('Problem display');
-		$this->assertEquals(['All', 'Separated', 'Unacknowledged only'], $problem_display->getOptions()->asText());
-		$this->assertEquals('All', $problem_display->getText());
-
-		$problem_severity = $form->getField('Minimum severity');
-		$this->assertEquals(['Not classified', 'Information', 'Warning', 'Average', 'High', 'Disaster'],
-				$problem_severity->getLabels()->asText()
-		);
-		$this->assertEquals('Not classified', $problem_severity->getText());
-
-		$this->assertFalse($form->getField('Show suppressed problems')->isChecked());
-
+		// Check URL table.
 		$url_table = $form->getField('URLs')->asTable();
 		$this->assertEquals(['Name', 'URL', 'Element', ''], $url_table->getHeadersText());
 
@@ -358,39 +406,41 @@ class testFormMapProperties extends CWebTest {
 			$this->assertTrue($url_table->query('button:'.$button)->one()->isClickable());
 		}
 
-		foreach (['urls_0_name', 'urls_0_url'] as $id) {
-			$url_field = $url_table->query('id:'.$id)->one();
-			$this->assertEquals(($id == 'urls_0_name') ? 255 : 2048, $url_field->getAttribute('maxlength'));
-			$this->assertEquals('', $url_field->getValue());
-		}
-
-		$type = $url_table->query('name:urls[0][elementtype]')->asDropdown()->one();
-		$this->assertEquals(['Host', 'Host group', 'Image', 'Map', 'Trigger'], $type->getOptions()->asText());
-		$this->assertEquals('Host', $type->getText());
-
 		foreach (['id:add', 'id:cancel'] as $button) {
 			$this->assertTrue($form->query($button)->one()->isClickable());
 		}
 
 		// Switch tab to Sharing, and check the form fields.
 		$form->selectTab('Sharing');
-		$this->assertEquals($sharing_labels, array_values($form->getLabels()->filter(CElementFilter::VISIBLE)->asText()));
+		$this->assertEquals($sharing_labels, array_values($form->getLabels(CElementFilter::VISIBLE)->asText()));
 
 		$sharing_type = $form->getField('Type');
 		$this->assertEquals(['Private', 'Public'], $sharing_type->getLabels()->asText());
 		$this->assertEquals('Private', $sharing_type->getValue());
 
-		$user_group_shares = $form->getField('List of user group shares')->asTable();
-		$user_shares = $form->getField('List of user shares')->asTable();
+		$tables = [
+			'List of user group shares' => ['User groups', 'Permissions', 'Action'],
+			'List of user shares' => ['Users', 'Permissions', 'Action']
+		];
+		foreach ($tables as $label => $expected_headers) {
+			$table_element = $form->getField($label)->asTable();
+			$this->assertEquals($expected_headers, $table_element->getHeadersText());
+			$button_add = $table_element->query('button:Add')->one();
+			$this->assertTrue($button_add->isClickable());
 
-		foreach([$user_group_shares, $user_shares] as $table) {
-			$this->assertEquals([($table = $user_group_shares) ? 'User groups' : 'Users', 'Permissions', 'Action'],
-					$table->getHeadersText()
-			);
-			$this->assertTrue($table->query('button:Add')->one()->isClickable());
+			// Add user group / user to check remove and hidden radio buttons.
+			$button_add->click();
+			$name = ($label === 'List of user group shares') ? 'Internal' : 'Admin';
+			COverlayDialogElement::find()->one()->waitUntilReady()->query('link:'.$name)->one()->click();
+			COverlayDialogElement::ensureNotPresent();
+
+			$this->assertTrue($table_element->query('button:Remove')->one()->isClickable());
+			$permissions_radio_button = $table_element->query('class:radio-list-control')->one()->asSegmentedRadio();
+			$this->assertEquals(['Read-only', 'Read-write'], $permissions_radio_button->getLabels()->asText());
+			$this->assertEquals('Read-only', $permissions_radio_button->getText());
 		}
 
-		// Re-check the pressence of the Add and Cancel buttons.
+		// Re-check the presence of the Add and Cancel buttons.
 		foreach (['id:add', 'id:cancel'] as $button) {
 			$this->assertTrue($form->query($button)->one()->isClickable());
 		}
