@@ -947,15 +947,18 @@ class CUserDirectory extends CApiService {
 
 	private static function checkLdapHostChangeRequiresPassword(array $userdirectories, array $db_userdirectories): void {
 		foreach ($userdirectories as $i => $userdirectory) {
+			if ($userdirectory['idp_type'] != IDP_TYPE_LDAP) {
+				continue;
+			}
+
 			if (!array_key_exists('host', $userdirectory) || array_key_exists('bind_password', $userdirectory)) {
 				continue;
 			}
 
 			if($userdirectory['host'] !== $db_userdirectories[$userdirectory['userdirectoryid']]['host']){
-				$error = _s('Invalid parameter "%1$s": %2$s.', '/'.($i + 1),
+				self::exception(ZBX_API_ERROR_PARAMETERS, _s('Invalid parameter "%1$s": %2$s.', '/'.($i + 1),
 					_s('the parameter "%1$s" is missing', 'bind_password')
-				);
-				self::exception(ZBX_API_ERROR_PARAMETERS, $error);
+				));
 			}
 		}
 	}
