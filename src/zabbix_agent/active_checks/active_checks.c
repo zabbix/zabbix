@@ -967,8 +967,13 @@ static int	refresh_active_checks(zbx_vector_addr_ptr_t *addrs, const zbx_config_
 		}
 	}
 
-	if (SUCCEED != ret && SUCCEED == last_ret)
-		zabbix_log(LOG_LEVEL_WARNING, "Active check configuration update started to fail");
+	if (SUCCEED != ret)
+	{
+		history_upload = ZBX_HISTORY_UPLOAD_DISABLED;
+
+		if (SUCCEED == last_ret)
+			zabbix_log(LOG_LEVEL_WARNING, "Active check configuration update started to fail");
+	}
 
 	if (SUCCEED == ret && SUCCEED != last_ret)
 	{
@@ -1024,7 +1029,6 @@ static int	check_response(const char *response)
 	}
 	else
 		history_upload = ZBX_HISTORY_UPLOAD_ENABLED;
-
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __func__, zbx_result_string(ret));
 
@@ -1265,6 +1269,10 @@ static int	send_buffer(zbx_vector_addr_ptr_t *addrs, zbx_vector_pre_persistent_t
 			zabbix_log(LOG_LEVEL_DEBUG, "OK");
 
 		zbx_free(data);
+	}
+	else
+	{
+		history_upload = ZBX_HISTORY_UPLOAD_DISABLED;
 	}
 
 	if (SUCCEED == ret_metrics)
