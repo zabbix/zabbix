@@ -633,7 +633,7 @@ class CUserDirectory extends CApiService {
 				continue;
 			}
 
-			$trigger_checkboxes = [
+			$security_options = [
 				$userdirectory['sign_messages'],
 				$userdirectory['sign_assertions'],
 				$userdirectory['sign_authn_requests'],
@@ -643,7 +643,7 @@ class CUserDirectory extends CApiService {
 				$userdirectory['encrypt_assertions']
 			];
 
-			if (in_array(1, $trigger_checkboxes, true)) {
+			if (in_array(1, $security_options, true)) {
 				if (array_key_exists('sp_certificate', $userdirectory) && $userdirectory['sp_certificate'] === '') {
 					self::exception(ZBX_API_ERROR_PARAMETERS,
 						_s('Invalid parameter "%1$s": %2$s.', '/'.($i + 1).'/sp_certificate', _('cannot be empty'))
@@ -657,7 +657,7 @@ class CUserDirectory extends CApiService {
 				}
 			}
 
-			unset($trigger_checkboxes);
+			unset($security_options);
 		}
 	}
 
