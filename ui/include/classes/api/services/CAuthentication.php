@@ -178,8 +178,8 @@ class CAuthentication extends CApiService {
 	}
 
 	private static function checkLdapHostChangeRequiresPassword(array $auth, array $db_auth): void {
-		if(array_key_exists('ldap_host', $auth) && $auth['ldap_host'] !== $db_auth['ldap_host']
-				&& !array_key_exists('ldap_bind_password', $auth) && $db_auth['ldap_bind_password'] !== ''){
+		if (array_key_exists('ldap_host', $auth) && $auth['ldap_host'] !== $db_auth['ldap_host']
+				&& !array_key_exists('ldap_bind_password', $auth) && $db_auth['ldap_bind_password'] !== '') {
 			$error = _s('Invalid parameter "%1$s": %2$s.', 'ldap_bind_password',
 				_s('the parameter "%1$s" is missing', 'ldap_bind_password')
 			);
