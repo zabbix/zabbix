@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types = 0);
 /*
 ** Copyright (C) 2001-2025 Zabbix SIA
 **
@@ -14,23 +14,21 @@
 **/
 
 
-require_once dirname(__FILE__).'/../include/CAPITest.php';
+/**
+ * Converter for converting import data from 7.4 to 8.0.
+ */
+class C74ImportConverter extends CConverter {
 
-class testAPIInfo extends CAPITest {
-	public function testAPIInfo_VersionWithAuth() {
-		$error = [
-			'code' => -32602,
-			'message' => 'Invalid params.',
-			'data' => 'The "apiinfo.version" method must be called without authorization header.'
-		];
+	/**
+	 * Convert import data from 7.4 to 8.0 version.
+	 *
+	 * @param array $data
+	 *
+	 * @return array
+	 */
+	public function convert(array $data): array {
+		$data['zabbix_export']['version'] = '8.0';
 
-		$this->call('apiinfo.version', [], $error);
-	}
-
-	public function testAPIInfo_VersionWithoutAuth() {
-		$this->disableAuthorization();
-		$result = $this->call('apiinfo.version', []);
-
-		$this->assertSame('8.0.0', $result['result']);
+		return $data;
 	}
 }
