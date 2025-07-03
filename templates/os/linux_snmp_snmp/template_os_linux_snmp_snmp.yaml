@@ -1,5 +1,5 @@
 zabbix_export:
-  version: '7.4'
+  version: '8.0'
   template_groups:
     - uuid: 846977d1dfed4968bc5f8bdb363285bc
       name: 'Templates/Operating systems'
@@ -65,7 +65,7 @@ zabbix_export:
         http://www.net-snmp.org/wiki/index.php/TUT:snmpd_configuration
       vendor:
         name: Zabbix
-        version: 7.4-3
+        version: 8.0-0
       groups:
         - name: 'Templates/Operating systems'
       items:

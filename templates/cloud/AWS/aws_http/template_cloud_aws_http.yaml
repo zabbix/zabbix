@@ -1,5 +1,5 @@
 zabbix_export:
-  version: '7.4'
+  version: '8.0'
   template_groups:
     - uuid: c2c162144c2d4c5491c8801193af4945
       name: Templates/Cloud
@@ -223,7 +223,7 @@ zabbix_export:
         * [DescribeLoadBalancers API method](https://docs.aws.amazon.com/elasticloadbalancing/latest/APIReference/API_DescribeLoadBalancers.html)
       vendor:
         name: Zabbix
-        version: 7.4-2
+        version: 8.0-0
       groups:
         - name: Templates/Cloud
       discovery_rules:
@@ -2788,7 +2788,7 @@ zabbix_export:
         * [Describe AWS Cost Explore API actions](https://docs.aws.amazon.com/aws-cost-management/latest/APIReference/API_Operations.html)
       vendor:
         name: Zabbix
-        version: 7.4-2
+        version: 8.0-0
       groups:
         - name: Templates/Cloud
       items:
@@ -3858,7 +3858,7 @@ zabbix_export:
         Also, see the Macros section for a list of macros used for LLD filters.
       vendor:
         name: Zabbix
-        version: 7.4-2
+        version: 8.0-0
       groups:
         - name: Templates/Cloud
       items:
@@ -6798,7 +6798,7 @@ zabbix_export:
         Refer to the Macros section for a list of macros used for LLD filters.
       vendor:
         name: Zabbix
-        version: 7.4-2
+        version: 8.0-0
       groups:
         - name: Templates/Cloud
       items:
@@ -9239,7 +9239,7 @@ zabbix_export:
         Refer to the Macros section for a list of macros used for LLD filters.
       vendor:
         name: Zabbix
-        version: 7.4-2
+        version: 8.0-0
       groups:
         - name: Templates/Cloud
       items:
@@ -11835,7 +11835,7 @@ zabbix_export:
         See the section below for a list of macros used for LLD filters.
       vendor:
         name: Zabbix
-        version: 7.4-2
+        version: 8.0-0
       groups:
         - name: Templates/Cloud
       items:
@@ -14794,7 +14794,7 @@ zabbix_export:
         See the section below for a list of macros used for LLD filters.
       vendor:
         name: Zabbix
-        version: 7.4-2
+        version: 8.0-0
       groups:
         - name: Templates/Cloud
       items:
@@ -17364,7 +17364,7 @@ zabbix_export:
         See the section below for a list of macros used for LLD filters.
       vendor:
         name: Zabbix
-        version: 7.4-2
+        version: 8.0-0
       groups:
         - name: Templates/Cloud
       items:
@@ -18712,7 +18712,7 @@ zabbix_export:
         Also, see the Macros section for a list of macros used for LLD filters.
       vendor:
         name: Zabbix
-        version: 7.4-2
+        version: 8.0-0
       groups:
         - name: Templates/Cloud
       items:
@@ -22221,7 +22221,7 @@ zabbix_export:
         Also, see the Macros section for a list of macros used for LLD filters.
       vendor:
         name: Zabbix
-        version: 7.4-2
+        version: 8.0-0
       groups:
         - name: Templates/Cloud
       items:
