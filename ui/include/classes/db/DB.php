@@ -1399,7 +1399,9 @@ class DB {
 			}
 
 			if ($field_schema['type'] & self::FIELD_TYPE_ID) {
-				$filter[] = dbConditionId(self::fieldId($field_name, $table_alias), $value);
+				$filter[] = (!$field_schema['null'] && array_key_exists('default', $field_schema))
+					? dbConditionInt(self::fieldId($field_name, $table_alias), $value)
+					: dbConditionId(self::fieldId($field_name, $table_alias), $value);
 			}
 			elseif ($field_schema['type'] & (self::FIELD_TYPE_INT | self::FIELD_TYPE_UINT)) {
 				$filter[] = dbConditionInt(self::fieldId($field_name, $table_alias), $value);
