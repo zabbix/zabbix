@@ -600,7 +600,6 @@ class CUserDirectory extends CApiService {
 		self::addRequiredFieldsByType($userdirectories, $db_userdirectories);
 
 		$api_input_rules = self::getValidationRules(true);
-		self::setSamlCertsMandatoryFields($userdirectories, $db_userdirectories, $api_input_rules);
 
 		if (!CApiInputValidator::validate($api_input_rules, $userdirectories, '/', $error)) {
 			self::exception(ZBX_API_ERROR_PARAMETERS, $error);
@@ -609,6 +608,7 @@ class CUserDirectory extends CApiService {
 		self::addAffectedObjects($userdirectories, $db_userdirectories);
 
 		self::validateProvisionMedias($userdirectories, $db_userdirectories);
+		self::validateSpCertificateWhenHasSecurityOptions($userdirectories);
 
 		self::checkDuplicates($userdirectories, $db_userdirectories);
 		self::checkProvisionGroups($userdirectories, $db_userdirectories);
@@ -627,8 +627,8 @@ class CUserDirectory extends CApiService {
 		}
 	}
 
-	private static function setSamlCertsMandatoryFields(array $userdirectories, array $db_userdirectories, array &$api_input_rules): void {
-		foreach ($userdirectories as $userdirectory) {
+	private static function validateSpCertificateWhenHasSecurityOptions(array $userdirectories): void {
+		foreach ($userdirectories as $i => $userdirectory) {
 			if ($userdirectory['idp_type'] != IDP_TYPE_SAML) {
 				continue;
 			}
@@ -643,28 +643,17 @@ class CUserDirectory extends CApiService {
 				$userdirectory['encrypt_assertions']
 			];
 
-			if (in_array('1', $trigger_checkboxes, true)) {
-				$db_userdirectory = $db_userdirectories[$userdirectory['userdirectoryid']];
-
-				if (array_key_exists('sp_certificate', $userdirectory)
-						&& ($userdirectory['sp_certificate'] === ''
-							|| $userdirectory['sp_certificate'] != $db_userdirectory['sp_certificate'])) {
-					$api_input_rules['fields']['sp_certificate']['rules'][0]['flags'] = API_REQUIRED | API_NOT_EMPTY;
+			if (in_array(1, $trigger_checkboxes, true)) {
+				if (array_key_exists('sp_certificate', $userdirectory) && $userdirectory['sp_certificate'] === '') {
+					self::exception(ZBX_API_ERROR_PARAMETERS,
+						_s('Invalid parameter "%1$s": %2$s.', '/'.($i + 1).'/sp_certificate', _('cannot be empty'))
+					);
 				}
 
-				if (array_key_exists('sp_private_key', $userdirectory)
-						&& ($userdirectory['sp_private_key'] === ''
-							|| $userdirectory['sp_private_key'] !== $db_userdirectory['sp_private_key'])) {
-					$api_input_rules['fields']['sp_private_key']['rules'][0]['flags'] = API_REQUIRED | API_NOT_EMPTY;
-				}
-			}
-			else {
-				if (array_key_exists('flags', $api_input_rules['fields']['sp_certificate']['rules'][0])) {
-					unset($api_input_rules['fields']['sp_certificate']['rules'][0]['flags']);
-				}
-
-				if (array_key_exists('flags', $api_input_rules['fields']['sp_private_key']['rules'][0])) {
-					unset($api_input_rules['fields']['sp_private_key']['rules'][0]['flags']);
+				if (array_key_exists('sp_private_key', $userdirectory) && $userdirectory['sp_private_key'] === '') {
+					self::exception(ZBX_API_ERROR_PARAMETERS,
+						_s('Invalid parameter "%1$s": %2$s.', '/'.($i + 1).'/sp_private_key', _('cannot be empty'))
+					);
 				}
 			}
 

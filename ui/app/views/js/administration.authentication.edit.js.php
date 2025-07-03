@@ -309,6 +309,8 @@
 					wrapper.append(error_span);
 
 					textarea.classList.add('has-error');
+					textarea.value = '';
+
 					return;
 				}
 
