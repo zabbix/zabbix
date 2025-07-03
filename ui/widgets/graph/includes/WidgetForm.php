@@ -37,26 +37,6 @@ use CWidgetsData;
  */
 class WidgetForm extends CWidgetForm {
 
-	public function validate(bool $strict = false): array {
-		$errors = parent::validate($strict);
-
-		if ($errors) {
-			return $errors;
-		}
-
-		if ($this->getFieldValue('source_type') == ZBX_WIDGET_FIELD_RESOURCE_SIMPLE_GRAPH
-				&& !$this->getFieldValue('itemid')) {
-			$errors[] = _s('Invalid parameter "%1$s": %2$s.', _('Item'), _('cannot be empty'));
-		}
-
-		if ($this->getFieldValue('source_type') == ZBX_WIDGET_FIELD_RESOURCE_GRAPH
-				&& !$this->getFieldValue('graphid')) {
-			$errors[] = _s('Invalid parameter "%1$s": %2$s.', _('Graph'), _('cannot be empty'));
-		}
-
-		return $errors;
-	}
-
 	public function addFields(): self {
 		return $this
 			->addField(
