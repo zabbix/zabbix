@@ -53,9 +53,17 @@ typedef enum
 }
 zbx_pp_task_type_t;
 
+typedef enum
+{
+	ZBX_PP_TASK_PENDING,
+	ZBX_PP_TASK_FINISHED,
+}
+zbx_pp_task_state_t;
+
 typedef struct
 {
 	zbx_pp_task_type_t	type;
+	zbx_pp_task_state_t	state;
 	zbx_uint64_t		itemid;
 	zbx_uint64_t		hostid;
 	void			*data;
