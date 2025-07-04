@@ -2085,7 +2085,8 @@ button {
     background-color: #020202; }
 .dashboard.dashboard-is-edit-mode .highlight {
   position: absolute;
-  z-index: 10; }
+  z-index: 10;
+  will-change: transform; }
   .dashboard.dashboard-is-edit-mode .highlight.highlight-n {
     border-bottom: 3px solid #bbbbbb;
     top: calc(.25rem - 1px);
