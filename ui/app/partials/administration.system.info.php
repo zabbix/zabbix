@@ -203,19 +203,39 @@ if ($data['user_type'] == USER_TYPE_SUPER_ADMIN) {
 
 	// Check DB version.
 	foreach ($data['system_info']['dbversion_status'] as $dbversion) {
+		if ($dbversion['database'] === ZBX_DB_EXTENSION_TIMESCALEDB) {
+			$timescaledb_error = _('Unsupported TimescaleDB time-series database extension for PostgreSQL is used.');
+		}
+
 		switch ($dbversion['flag']) {
 			case DB_VERSION_LOWER_THAN_MINIMUM:
-				$error = _s('Error! Unable to start Zabbix server.').' '.
-					_s('Minimum required %1$s database version is %2$s.', $dbversion['database'],
+				$error = _s('Error! Unable to start Zabbix server.').' ';
+
+				if ($dbversion['database'] === ZBX_DB_EXTENSION_TIMESCALEDB) {
+					$error .= _s('%1$s Minimum required version is %2$s.', $timescaledb_error,
 						$dbversion['min_version']
 					);
+				}
+				else {
+					$error .= _s('Minimum required %1$s database version is %2$s.', $dbversion['database'],
+						$dbversion['min_version']
+					);
+				}
 				break;
 
 			case DB_VERSION_HIGHER_THAN_MAXIMUM:
-				$error = _s('Error! Unable to start Zabbix server.').' '.
-					_s('Maximum required %1$s database version is %2$s.', $dbversion['database'],
+				$error = _s('Error! Unable to start Zabbix server.').' ';
+
+				if ($dbversion['database'] === ZBX_DB_EXTENSION_TIMESCALEDB) {
+					$error .= _s('%1$s Maximum required version is %2$s.', $timescaledb_error,
 						$dbversion['max_version']
 					);
+				}
+				else {
+					$error .= _s('Maximum required %1$s database version is %2$s.', $dbversion['database'],
+						$dbversion['max_version']
+					);
+				}
 				break;
 
 			case DB_VERSION_FAILED_TO_RETRIEVE:
@@ -224,29 +244,59 @@ if ($data['user_type'] == USER_TYPE_SUPER_ADMIN) {
 				break;
 
 			case DB_VERSION_NOT_SUPPORTED_ERROR:
-				$error = _s('Error! Unable to start Zabbix server.').' '.
-					_s('Unsupported %1$s database server version. Must be at least %2$s.', $dbversion['database'],
+				$error = _s('Error! Unable to start Zabbix server.').' ';
+
+				if ($dbversion['database'] === ZBX_DB_EXTENSION_TIMESCALEDB) {
+					$error .= _s('%1$s Must be at least %2$s.', $timescaledb_error,
 						$dbversion['min_supported_version']
 					);
+				}
+				else {
+					$error .= _s('Unsupported %1$s database server version. Must be at least %2$s.',
+						$dbversion['database'], $dbversion['min_supported_version']
+					);
+				}
 				break;
 
 			case DB_VERSION_NOT_SUPPORTED_WARNING:
-				$error = _s('Warning! Unsupported %1$s database server version. Should be at least %2$s.',
-					$dbversion['database'], $dbversion['min_supported_version']
-				);
+				if ($dbversion['database'] === ZBX_DB_EXTENSION_TIMESCALEDB) {
+					$error = _s('Warning! $1%s Should be at least %2$s.', $timescaledb_error,
+						$dbversion['min_supported_version']
+					);
+				}
+				else {
+					$error = _s('Warning! Unsupported %1$s database server version. Should be at least %2$s.',
+						$dbversion['database'], $dbversion['min_supported_version']
+					);
+				}
 				break;
 
 			case DB_VERSION_HIGHER_THAN_MAXIMUM_ERROR:
-				$error = _s('Error! Unable to start Zabbix server.').' '.
-					_s('Unsupported %1$s database server version. Must not be higher than %2$s.',
+				$error = _s('Error! Unable to start Zabbix server.').' ';
+
+				if ($dbversion['database'] === ZBX_DB_EXTENSION_TIMESCALEDB) {
+					$error = _s('$1%s Must not be higher than %2$s.', $timescaledb_error,
+						$dbversion['max_version']
+					);
+				}
+				else {
+					$error = _s('Unsupported %1$s database server version. Must not be higher than %2$s.',
 						$dbversion['database'], $dbversion['max_version']
 					);
+				}
 				break;
 
 			case DB_VERSION_HIGHER_THAN_MAXIMUM_WARNING:
-				$error = _s('Warning! Unsupported %1$s database server version. Should not be higher than %2$s.',
-					$dbversion['database'], $dbversion['max_version']
-				);
+				if ($dbversion['database'] === ZBX_DB_EXTENSION_TIMESCALEDB) {
+					$error = _s('Warning! $1%s Should not be higher than %2$s.', $timescaledb_error,
+						$dbversion['max_version']
+					);
+				}
+				else {
+					$error = _s('Warning! Unsupported %1$s database server version. Should not be higher than %2$s.',
+						$dbversion['database'], $dbversion['max_version']
+					);
+				}
 				break;
 
 			case DB_VERSION_SUPPORTED:
