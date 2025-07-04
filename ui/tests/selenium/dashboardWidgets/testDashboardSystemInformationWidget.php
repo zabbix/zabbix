@@ -13,15 +13,15 @@
 ** If not, see <https://www.gnu.org/licenses/>.
 **/
 
+
 require_once __DIR__.'/../common/testSystemInformation.php';
-require_once __DIR__.'/../behaviors/CMessageBehavior.php';
 
 /**
- * @backup dashboard, ha_node, settings
+ * @backup ha_node, profiles
  *
  * @backupConfig
  *
- * @onBefore prepareDashboardData
+ * @onBefore prepareDashboardData, prepareUsersData
  */
 class testDashboardSystemInformationWidget extends testSystemInformation {
 
@@ -29,10 +29,13 @@ class testDashboardSystemInformationWidget extends testSystemInformation {
 	public static $widgets_dashboardid;		// Dashboard for checking creation and update of system information widgets.
 
 	/**
-	 * Attach MessageBehavior to the test.
+	 * Attach MessageBehavior and CTableBehavior to the test.
 	 */
 	public function getBehaviors() {
-		return [CMessageBehavior::class];
+		return [
+			CMessageBehavior::class,
+			CTableBehavior::class
+		];
 	}
 
 	/**
@@ -109,7 +112,6 @@ class testDashboardSystemInformationWidget extends testSystemInformation {
 				]
 			]
 		]);
-
 		self::$dashboardid = $response['dashboardids'][0];
 		self::$widgets_dashboardid = $response['dashboardids'][1];
 	}
@@ -117,6 +119,7 @@ class testDashboardSystemInformationWidget extends testSystemInformation {
 	public function testDashboardSystemInformationWidget_checkDisabledHA() {
 		$this->page->login()->open('zabbix.php?action=dashboard.view&dashboardid='.self::$dashboardid)->waitUntilReady();
 		$dashboard = CDashboardElement::find()->one()->waitUntilReady();
+
 		// Remove zabbix version due to unstable screenshot which depends on column width with different version length.
 		CElementQuery::getDriver()->executeScript("arguments[0].textContent = '';",
 				[$this->query('xpath://table[@class="list-table sticky-header"]/tbody/tr[3]/td[1]')->one()]
@@ -162,6 +165,134 @@ class testDashboardSystemInformationWidget extends testSystemInformation {
 		$this->executeWidgetAction($widgets, 'update');
 	}
 
+	public static function getSystemInformationData() {
+		return [
+			// #0.
+			[
+				[
+					'available_fields' => [
+						[
+							'Parameter' => 'Zabbix server is running',
+							'Value' => 'No',
+							'Details' => 'localhost:10051'
+						],
+						[
+							'Parameter' => 'Zabbix server version',
+							'Value' => '',
+							'Details' => ''
+						],
+						[
+							'Parameter' => 'Zabbix frontend version',
+							'Value' => ZABBIX_VERSION,
+							'Details' => ''
+						],
+						[
+							'Parameter' => 'Number of hosts (enabled/disabled)',
+							'Value' => '',
+							'Details' => ''
+						],
+						[
+							'Parameter' => 'Number of templates',
+							'Value' => '',
+							'Details' => ''
+						],
+						[
+							'Parameter' => 'Number of items (enabled/disabled/not supported)',
+							'Value' => '',
+							'Details' => ''
+						],
+						[
+							'Parameter' => 'Number of triggers (enabled/disabled [problem/ok])',
+							'Value' => '',
+							'Details' => ''
+						],
+						[
+							'Parameter' => 'Number of users (online)',
+							'Value' => '',
+							'Details' => ''
+						],
+						[
+							'Parameter' => 'Required server performance, new values per second',
+							'Value' => '',
+							'Details' => ''
+						],
+						[
+							'Parameter' => 'High availability cluster',
+							'Value' => 'Disabled',
+							'Details' => ''
+						]
+					]
+				]
+			],
+			// #1.
+			[
+				[
+					'user' => 'admin for system information test',
+					'password' => 'z@$$ix!#%1',
+					'available_fields' => [
+						[
+							'Parameter' => 'Zabbix server is running',
+							'Value' => 'No',
+							'Details' => ''
+						],
+						[
+							'Parameter' => 'Zabbix frontend version',
+							'Value' => ZABBIX_VERSION,
+							'Details' => ''
+						]
+					]
+				]
+			],
+			// #2.
+			[
+				[
+					'user' => 'user for system information test',
+					'password' => 'z@$$ix!#%2',
+					'available_fields' => [
+						[
+							'Parameter' => 'Zabbix server is running',
+							'Value' => 'No',
+							'Details' => ''
+						],
+						[
+							'Parameter' => 'Zabbix frontend version',
+							'Value' => ZABBIX_VERSION,
+							'Details' => ''
+						]
+					]
+				]
+			],
+			// #3.
+			[
+				[
+					'guest' => true,
+					'available_fields' => [
+						[
+							'Parameter' => 'Zabbix server is running',
+							'Value' => 'No',
+							'Details' => ''
+						],
+						[
+							'Parameter' => 'Zabbix frontend version',
+							'Value' => ZABBIX_VERSION,
+							'Details' => ''
+						]
+					]
+				]
+			]
+		];
+	}
+
+	/**
+	 * Function checks which information users see on system information widget.
+	 * Note: in this case data is checked without running server.
+	 *
+	 * @dataProvider getSystemInformationData
+	 */
+	public function testDashboardSystemInformationWidget_checkAvailableDataByUserRole($data) {
+		$this->assertAvailableDataByUserRole($data, self::$dashboardid);
+	}
+
 	/**
 	 * @onBefore prepareHANodeData
 	 */
@@ -185,14 +316,14 @@ class testDashboardSystemInformationWidget extends testSystemInformation {
 		return [
 			[
 				[
-					'user' => 'admin-zabbix',
-					'password' => 'zabbix'
+					'user' => 'admin for system information test',
+					'password' => 'z@$$ix!#%1'
 				]
 			],
 			[
 				[
-					'user' => 'user-zabbix',
-					'password' => 'zabbix'
+					'user' => 'user for system information test',
+					'password' => 'z@$$ix!#%2'
 				]
 			]
 		];
@@ -211,6 +342,7 @@ class testDashboardSystemInformationWidget extends testSystemInformation {
 
 		$dashboard = CDashboardElement::find()->waitUntilReady()->one();
 		$nodes_table = $dashboard->getWidget('High availability nodes view')->query('xpath:.//table')->asTable()->one();
+
 		// No content of the widget in High availability nodes view should be visible to User and Admin user roles.
 		$this->assertEquals('No permissions to referred object or it does not exist!', $nodes_table->getText());
 
@@ -230,6 +362,7 @@ class testDashboardSystemInformationWidget extends testSystemInformation {
 		$this->page->login()->open('zabbix.php?action=dashboard.view&dashboardid='.self::$widgets_dashboardid);
 		$dashboard = CDashboardElement::find()->one();
 		$dashboard->waitUntilReady()->edit();
+
 		// Open the corresponding dashboard page in case of update.
 		if ($action === 'update') {
 			$this->query('xpath://span[@title='.zbx_dbstr($page_name).']')->one()->click();
@@ -244,15 +377,19 @@ class testDashboardSystemInformationWidget extends testSystemInformation {
 				$form = $dashboard->addWidget()->asForm();
 				$form->fill(['Type' => CFormElement::RELOADABLE_FILL('System information')]);
 			}
+
 			$form->fill($widget_data['fields']);
 			$form->submit();
 			COverlayDialogElement::ensureNotPresent();
 		}
+
 		// Save the dashboard and check info displayed by the widgets.
 		$dashboard->save();
+
 		if ($action === 'update') {
 			$this->query('xpath://span[@title='.CXPathHelper::escapeQuotes($page_name).']')->waitUntilClickable()->one()->click();
 		}
+
 		$this->page->waitUntilReady();
 		$this->assertMessage(TEST_GOOD, 'Dashboard updated');
 		$dashboard->waitUntilReady();
