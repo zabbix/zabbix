@@ -1,5 +1,5 @@
 zabbix_export:
-  version: '7.4'
+  version: '8.0'
   template_groups:
     - uuid: c2c162144c2d4c5491c8801193af4945
       name: Templates/Cloud
@@ -47,7 +47,7 @@ zabbix_export:
         3. Configure the macros: `Azure App ID`, `Azure password`, `Azure tenant ID`, `Azure subscription ID`, `Azure Vault ID` and `Backup jobs period`.
       vendor:
         name: Zabbix
-        version: 7.4-1
+        version: 8.0-0
       groups:
         - name: Templates/Cloud
       items:
@@ -1300,7 +1300,7 @@ zabbix_export:
         3. Configure the macros: `Azure App ID`, `Azure password`, `Azure tenant ID`, `Azure subscription ID`.
       vendor:
         name: Zabbix
-        version: 7.4-4
+        version: 8.0-0
       groups:
         - name: Templates/Cloud
       items:
@@ -4280,7 +4280,7 @@ zabbix_export:
         3. Configure the macros: `Azure App ID`, `Azure password`, `Azure tenant ID`, `Azure subscription ID`, and `Azure Cosmos DB ID`.
       vendor:
         name: Zabbix
-        version: 7.4-1
+        version: 8.0-0
       groups:
         - name: Templates/Cloud
       items:
@@ -5020,7 +5020,7 @@ zabbix_export:
         3. Configure the macros: `Azure App ID`, `Azure password`, `Azure tenant ID`, `Azure subscription ID`.
       vendor:
         name: Zabbix
-        version: 7.4-2
+        version: 8.0-0
       groups:
         - name: Templates/Cloud
       items:
@@ -6174,7 +6174,7 @@ zabbix_export:
         3. Configure the macros: `Azure App ID`, `Azure password`, `Azure tenant ID`, `Azure subscription ID`, and `Azure MSSQL database ID`.
       vendor:
         name: Zabbix
-        version: 7.4-1
+        version: 8.0-0
       groups:
         - name: Templates/Cloud
       items:
@@ -7420,7 +7420,7 @@ zabbix_export:
         3. Configure the macros: `Azure App ID`, `Azure password`, `Azure tenant ID`, `Azure subscription ID` and `Azure SQL DTU-based database ID`.
       vendor:
         name: Zabbix
-        version: 7.4-1
+        version: 8.0-0
       groups:
         - name: Templates/Cloud
       items:
@@ -8637,7 +8637,7 @@ zabbix_export:
         3. Configure the macros: `Azure App ID`, `Azure password`, `Azure tenant ID`, `Azure subscription ID`, and `Azure MSSQL database ID`.
       vendor:
         name: Zabbix
-        version: 7.4-1
+        version: 8.0-0
       groups:
         - name: Templates/Cloud
       items:
@@ -9849,7 +9849,7 @@ zabbix_export:
         3. Configure the macros: `Azure App ID`, `Azure password`, `Azure tenant ID`, `Azure subscription ID`, and `Azure MySQL server ID.`.
       vendor:
         name: Zabbix
-        version: 7.4-1
+        version: 8.0-0
       groups:
         - name: Templates/Cloud
       items:
@@ -10948,7 +10948,7 @@ zabbix_export:
         3. Configure the macros: `Azure App ID`, `Azure password`, `Azure tenant ID`, `Azure subscription ID`, and `Azure MySQL server ID`.
       vendor:
         name: Zabbix
-        version: 7.4-1
+        version: 8.0-0
       groups:
         - name: Templates/Cloud
       items:
@@ -11995,7 +11995,7 @@ zabbix_export:
         3. Configure the macros: `Azure App ID`, `Azure password`, `Azure tenant ID`, `Azure subscription ID`, and `Azure PostgreSQL server ID`.
       vendor:
         name: Zabbix
-        version: 7.4-1
+        version: 8.0-0
       groups:
         - name: Templates/Cloud
       items:
@@ -13189,7 +13189,7 @@ zabbix_export:
         3. Configure the macros: `Azure App ID`, `Azure password`, `Azure tenant ID`, `Azure subscription ID`, and `Azure PostgreSQL server ID`.
       vendor:
         name: Zabbix
-        version: 7.4-1
+        version: 8.0-0
       groups:
         - name: Templates/Cloud
       items:
@@ -14234,7 +14234,7 @@ zabbix_export:
         3. Configure the macros: `Azure App ID`, `Azure password`, `Azure tenant ID`, `Azure subscription ID`, and `Azure SQL managed instance ID`.
       vendor:
         name: Zabbix
-        version: 7.4-2
+        version: 8.0-0
       groups:
         - name: Templates/Cloud
       items:
@@ -15287,7 +15287,7 @@ zabbix_export:
         3. Configure the macros: `Azure App ID`, `Azure password`, `Azure tenant ID`, `Azure subscription ID`, and `Azure virtual machine ID`.
       vendor:
         name: Zabbix
-        version: 7.4-1
+        version: 8.0-0
       groups:
         - name: Templates/Cloud
       items:
@@ -17008,7 +17008,7 @@ zabbix_export:
         3. Configure the macros: `Azure App ID`, `Azure password`, `Azure tenant ID`, `Azure subscription ID`, and `Azure scale set ID`.
       vendor:
         name: Zabbix
-        version: 7.4-1
+        version: 8.0-0
       groups:
         - name: Templates/Cloud
       items:

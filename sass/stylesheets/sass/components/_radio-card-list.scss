@@ -8,6 +8,7 @@
 		padding: 16px;
 		border: 1px solid $form-border-color;
 		border-radius: 2px;
+		min-width: 0;
 		white-space: normal;
 
 		&:has(input[type="radio"]:checked) {

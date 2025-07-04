@@ -82,13 +82,13 @@ class CControllerGraphPrototypeEdit extends CController {
 			'editable' => true
 		];
 
-		$this->parent_discovery = API::DiscoveryRule()->get($options) ?: API::DiscoveryRulePrototype()->get($options);
+		$parent_discovery = API::DiscoveryRule()->get($options) ?: API::DiscoveryRulePrototype()->get($options);
 
-		if (!$this->parent_discovery) {
+		if (!$parent_discovery) {
 			return false;
 		}
 
-		$this->parent_discovery = reset($this->parent_discovery);
+		$this->parent_discovery = reset($parent_discovery);
 
 		if ($this->hasInput('graphid')) {
 			$graphid = $this->getInput('graphid');

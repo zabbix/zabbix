@@ -137,12 +137,13 @@ static char	*generate_data_source(const char *sql)
 zbx_db_result_t	__wrap_zbx_db_vselect(const char *fmt, va_list args)
 {
 	char			*sql = NULL, *data_source = NULL;
+	size_t			sql_len = 0, sql_offset = 0;
 	zbx_mock_error_t	error;
 	zbx_mock_handle_t	rows;
 	zbx_mockdb_query_t	*query, query_local;
 	zbx_db_result_t		result = NULL;
 
-	sql = zbx_dvsprintf(sql, fmt, args);
+	zbx_vsnprintf_alloc(&sql, &sql_len, &sql_offset, fmt, args);
 	printf("\tSQL: %s\n", sql);
 
 	if (NULL == (query_local.data_source = generate_data_source(sql)))

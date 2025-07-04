@@ -753,6 +753,7 @@ static int	dbconn_vexecute(zbx_dbconn_t *db, const char *fmt, va_list args)
 	char		*sql = NULL, *sql_printable = NULL;
 	int		ret = ZBX_DB_OK;
 	double		sec = 0;
+	size_t		sql_alloc = 0, sql_offset = 0;
 #if defined(HAVE_POSTGRESQL)
 	PGresult	*result;
 	char		*error = NULL;
@@ -764,7 +765,7 @@ static int	dbconn_vexecute(zbx_dbconn_t *db, const char *fmt, va_list args)
 	if (0 != db->config->log_slow_queries)
 		sec = zbx_time();
 
-	sql = zbx_dvsprintf(sql, fmt, args);
+	zbx_vsnprintf_alloc(&sql, &sql_alloc, &sql_offset, fmt, args);
 
 	if (0 == db->txn_level)
 		zabbix_log(LOG_LEVEL_DEBUG, "query without transaction detected");
@@ -1075,6 +1076,7 @@ static zbx_db_result_t	dbconn_vselect(zbx_dbconn_t *db, const char *fmt, va_list
 	char		*sql = NULL;
 	zbx_db_result_t	result = NULL;
 	double		sec = 0;
+	size_t		sql_alloc = 0, sql_offset = 0;
 #if defined(HAVE_POSTGRESQL)
 	char		*error = NULL;
 #elif defined(HAVE_SQLITE3)
@@ -1085,7 +1087,7 @@ static zbx_db_result_t	dbconn_vselect(zbx_dbconn_t *db, const char *fmt, va_list
 	if (0 != db->config->log_slow_queries)
 		sec = zbx_time();
 
-	sql = zbx_dvsprintf(sql, fmt, args);
+	zbx_vsnprintf_alloc(&sql, &sql_alloc, &sql_offset, fmt, args);
 
 	if (ZBX_DB_OK != db->txn_error)
 	{

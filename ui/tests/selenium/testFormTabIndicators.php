@@ -197,7 +197,8 @@ class testFormTabIndicators extends CWebTest {
 			// #2 Host prototype configuration form tab data.
 			[
 				[
-					'url' => 'host_prototypes.php?form=create&parent_discoveryid=42275&context=host',
+					// Zabbix server, Discovery rule => Block devices discovery
+					'url' => 'host_prototypes.php?form=create&parent_discoveryid=66355&context=host',
 					'form' => 'name:hostPrototypeForm',
 					'tabs' => [
 						[
@@ -273,7 +274,8 @@ class testFormTabIndicators extends CWebTest {
 			// #4 Item prototype configuration form tab data.
 			[
 				[
-					'url' => 'zabbix.php?action=item.prototype.list&parent_discoveryid=42275&context=host',
+					// Zabbix server, Discovery rule => Block devices discovery
+					'url' => 'zabbix.php?action=item.prototype.list&parent_discoveryid=66355&context=host',
 					'create_button' => 'Create item prototype',
 					'form' => 'name:itemForm',
 					'close_dialog' => true,
@@ -521,6 +523,15 @@ class testFormTabIndicators extends CWebTest {
 							'name' => 'SAML settings',
 							'entries' => [
 								'selector' => 'id:saml_auth_enabled',
+								'value' => true,
+								'old_value' => false
+							],
+							'field_type' => 'general_field'
+						],
+						[
+							'name' => 'MFA settings',
+							'entries' => [
+								'selector' => 'id:mfa_status',
 								'value' => true,
 								'old_value' => false
 							],

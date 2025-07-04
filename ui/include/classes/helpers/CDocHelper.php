@@ -156,6 +156,7 @@ class CDocHelper {
 	const SERVICES_SLA_LIST =									'web_interface/frontend_sections/services/sla#overview';
 	const SERVICES_SLAREPORT_LIST =								'web_interface/frontend_sections/services/sla_report#overview';
 	const TR_EVENTS =											'web_interface/frontend_sections/monitoring/problems#viewing-details';
+	const TEMPLATES_OUT_OF_THE_BOX =							'config/templates_out_of_the_box#template-upgrade';
 	const USERS_AUTHENTICATION_EDIT =							'web_interface/frontend_sections/users/authentication';
 	const USERS_TOKEN_LIST =									'web_interface/frontend_sections/users/api_tokens';
 	const USERS_USER_EDIT =										'config/users_and_usergroups/user';
