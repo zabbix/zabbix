@@ -1,1 +1,0 @@
-.......PS. [ZBX-26589] fixed DNS queries being performed for IP address when not recent c-ares library is used (vso)
