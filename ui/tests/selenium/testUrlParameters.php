@@ -378,7 +378,7 @@ class testUrlParameters extends CLegacyWebTest {
 					// context=template.
 					[
 						// Acronis Cyber Protect Cloud MSP by HTTP -> Get devices: Acronis CPC: Device discovery -> Device [{#NAME}]:[{#ID}]: Agent enabled
-						'url' => self::POPUP.'item.prototype.edit&context=template&itemid=50089&parent_discoveryid=50085',
+						'url' => self::POPUP.'item.prototype.edit&context=template&itemid=59371&parent_discoveryid=59367',
 						'text_present' => 'Item prototype'
 					],
 					[
