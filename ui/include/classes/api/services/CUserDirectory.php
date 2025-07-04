@@ -617,12 +617,14 @@ class CUserDirectory extends CApiService {
 	private static function checkSamlRequirements(array $userdirectories): void {
 		$is_ssl_required = (bool) array_keys(array_column($userdirectories, 'idp_type'), IDP_TYPE_LDAP);
 
-		if ($is_ssl_required) {
-			$openssl_status = (new CFrontendSetup())->checkPhpOpenSsl();
+		if (!$is_ssl_required) {
+			return;
+		}
 
-			if ($openssl_status['result'] != CFrontendSetup::CHECK_OK) {
-				self::exception(ZBX_API_ERROR_INTERNAL, $openssl_status['error']);
-			}
+		$openssl_status = (new CFrontendSetup())->checkPhpOpenSsl();
+
+		if ($openssl_status['result'] != CFrontendSetup::CHECK_OK) {
+			self::exception(ZBX_API_ERROR_INTERNAL, $openssl_status['error']);
 		}
 	}
 
