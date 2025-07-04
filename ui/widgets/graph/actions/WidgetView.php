@@ -349,13 +349,6 @@ class WidgetView extends CControllerDashboardWidgetView {
 		return $info;
 	}
 
-	/**
-	 * If all items are from one host we change them, or set calculated if not exist on that host.
-	 *
-	 * @param array $graph
-	 * @param string $axis
-	 * @return array
-	 */
 	private function setAxisItem(array $graph, string $axis): array {
 		$type_key = "{$axis}_type";
 		$itemid_key = "{$axis}_itemid";
@@ -381,11 +374,6 @@ class WidgetView extends CControllerDashboardWidgetView {
 		return $graph;
 	}
 
-	/**
-	 * @param array $graph
-	 * @param array $host
-	 * @return CUrl
-	 */
 	private function prepareGraphSrc(array $graph, array $host): CUrl {
 		if ($graph['graphtype'] == GRAPH_TYPE_PIE || $graph['graphtype'] == GRAPH_TYPE_EXPLODED) {
 			$graph_src = (new CUrl('chart7.php'))
@@ -423,14 +411,9 @@ class WidgetView extends CControllerDashboardWidgetView {
 		return $graph_src;
 	}
 
-	/**
-	 * @param array $graph
-	 * @param string|null $resourceid
-	 * @return CUrl|null
-	 */
 	private function prepareGraphUrl(array $graph, string $resourceid = null): ?CUrl {
 		if ($this->isEditMode() || empty($graph)
-			|| ($this->isTemplateDashboard() && !$this->fields_values['override_hostid'])) {
+				|| ($this->isTemplateDashboard() && !$this->fields_values['override_hostid'])) {
 			return null;
 		}
 
