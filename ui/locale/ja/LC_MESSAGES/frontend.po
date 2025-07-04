@@ -4,8 +4,8 @@ msgstr ""
 "Project-Id-Version: Zabbix 6.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2023-10-19 13:48+0300\n"
-"PO-Revision-Date: 2025-06-06 02:58+0000\n"
-"Last-Translator: Akira <g42getd@gmail.com>\n"
+"PO-Revision-Date: 2025-07-02 08:09+0000\n"
+"Last-Translator: Eiji Kawakita <age@cyber.email.ne.jp>\n"
 "Language-Team: Zabbix\n"
 "Language: ja\n"
 "MIME-Version: 1.0\n"
@@ -80,7 +80,7 @@ msgstr[0] "%1$d 日"
 #, c-format
 msgctxt "screen reader"
 msgid "%1$d matches for %2$s found"
-msgstr "%2$sの%1$d件が見つかりました"
+msgstr "%2$sに一致する%1$d件が見つかりました。"
 
 #: widgets/hostnavigator/Widget.php:39
 #, c-format
@@ -1586,7 +1586,7 @@ msgstr[0] ""
 #: include/classes/helpers/CMaintenanceHelper.php:114
 #, c-format
 msgid "At %1$s on %2$s %3$s of every %4$s"
-msgstr ""
+msgstr "毎%4$s %2$s %3$s %1$s"
 
 #: include/classes/helpers/CMaintenanceHelper.php:119
 #, c-format
@@ -23853,15 +23853,15 @@ msgstr "すべてのメディア"
 #: include/classes/screens/CScreenDiscovery.php:207
 #: include/discovery.inc.php:84
 msgid "allow redirect"
-msgstr ""
+msgstr "リダイレクトを許可"
 
 #: include/classes/api/services/CItemGeneral.php:2114
 msgid "allowed count of dependency levels would be exceeded"
-msgstr ""
+msgstr "許容される依存レベルの数を越えています。"
 
 #: include/classes/api/services/CItemGeneral.php:2125
 msgid "allowed count of dependent items would be exceeded"
-msgstr ""
+msgstr "依存アイテムの許容数を越えています"
 
 #: include/classes/validators/CApiInputValidator.php:2660
 msgid "an IP address is expected"
@@ -23959,7 +23959,7 @@ msgstr "と"
 #: include/classes/api/helpers/CApiPskHelper.php:160
 #: include/classes/api/helpers/CApiPskHelper.php:176
 msgid "another tls_psk value is already associated with given tls_psk_identity"
-msgstr ""
+msgstr "指定されたtls_psk_identityには別のtls_psk値がすでに関連付けられています。"
 
 #: include/forms.inc.php:1450 include/views/js/item.preprocessing.js.php:237
 msgid "any error"
@@ -24007,7 +24007,7 @@ msgstr "少なくとも1つの曜日を選択する必要があります"
 #: widgets/gauge/includes/WidgetForm.php:137
 #: widgets/item/includes/WidgetForm.php:90
 msgid "at least one option must be selected"
-msgstr ""
+msgstr "少なくとも1つのオプションが選択されている必要があります"
 
 #: widgets/svggraph/includes/CWidgetFieldOverride.php:87
 msgid "at least one override option must be specified"
@@ -24106,7 +24106,7 @@ msgstr "ユーザー名とパスワードの両方を指定するか空である
 
 #: include/classes/api/services/CTemplate.php:589
 msgid "both vendor_name and vendor_version should be either present or empty"
-msgstr ""
+msgstr "vendor_name と vendor_version の両方を指定するか空である必要があります。"
 
 #: app/controllers/CControllerPopupTriggerExpr.php:484
 msgid "bytelength() - Returns the length in bytes"
@@ -24316,7 +24316,7 @@ msgstr "継承されたオブジェクトの読み込み専用パラメータ\"%
 #: include/classes/api/services/CUser.php:1066
 #, c-format
 msgid "cannot update readonly parameter \"%1$s\" of provisioned user"
-msgstr ""
+msgstr "プロビジョニングされたユーザーの読み取り専用パラメータ \"%1$s\" を更新できません"
 
 #: app/controllers/CControllerPopupTriggerExpr.php:491
 msgid "cbrt() - Cube root"
@@ -24557,7 +24557,7 @@ msgstr "エラーテキスト"
 
 #: include/forms.inc.php:1454 include/views/js/item.preprocessing.js.php:241
 msgid "error-matching"
-msgstr ""
+msgstr "エラーマッチング"
 
 #: app/views/popup.lldoverride.php:104
 #: include/views/configuration.host.discovery.edit.php:820
@@ -24648,7 +24648,7 @@ msgstr "同じUUIDのグラフがすでに存在します"
 #: app/views/popup.usergroupmapping.edit.php:79
 #, c-format
 msgid "group name must match %1$s group name"
-msgstr ""
+msgstr "グループ名は %1$s のグループ名と一致する必要があります。"
 
 #: include/func.inc.php:568 include/func.inc.php:635 jsLoader.php:211
 msgctxt "hour short"
@@ -24743,7 +24743,7 @@ msgstr "サブグループを含む"
 #: include/classes/parsers/CIPRangeParser.php:148
 #, c-format
 msgid "incorrect address starting from \"%1$s\""
-msgstr ""
+msgstr "\"%1$s\" で始まるアドレスが正しくありません"
 
 #: include/classes/parsers/C10TriggerExpression.php:525
 msgid "incorrect calculated item formula"
@@ -24791,7 +24791,7 @@ msgstr "関数\"%1$s\"の使い方が正しくありません"
 #: include/classes/api/services/CScript.php:517
 #, c-format
 msgid "input does not match the provided pattern: %1$s"
-msgstr ""
+msgstr "入力は指定されたパターンと一致しません: %1$s"
 
 #: app/controllers/CControllerPopupTriggerExpr.php:665
 msgid "insert() - Inserts specified characters or spaces into a character string, beginning at a specified position in the string"
@@ -25164,7 +25164,7 @@ msgstr "%1$s文字以上で指定してください"
 #: include/classes/api/services/CDiscoveryRule.php:1638
 #, c-format
 msgid "missing filter condition \"%1$s\""
-msgstr ""
+msgstr "フィルター条件\"%1$s\"がありません。"
 
 #: app/controllers/CControllerPopupTriggerExpr.php:838
 msgid "mod() - Division remainder"
@@ -25221,11 +25221,11 @@ msgstr "少なくとも特殊記号を1文字含めるようにしてくださ�
 
 #: include/classes/validators/CApiInputValidator.php:3918
 msgid "must have a polling interval not blocked by non-active interval periods"
-msgstr ""
+msgstr "非アクティブな間隔期間によってブロックされないポーリング間隔の設定が必要です"
 
 #: include/classes/validators/CApiInputValidator.php:3753
 msgid "must have at least one interval greater than 0"
-msgstr ""
+msgstr "少なくとも0より大きな1つの間隔が必要です。"
 
 #: app/views/administration.authentication.edit.php:136
 #: app/views/administration.user.edit.php:157
@@ -25329,7 +25329,7 @@ msgstr "nodata() - 期間Tの間取得データなし (1 - 取得データなし
 
 #: include/classes/validators/CApiInputValidator.php:3781
 msgid "non-active intervals cannot fill the entire time"
-msgstr ""
+msgstr "全ての期間に対して非アクティブな間隔を指定することは出来ません。"
 
 #: include/graphs.inc.php:74 widgets/piechart/actions/WidgetView.php:656
 #: widgets/piechart/includes/CWidgetFieldDataSetView.php:387
@@ -25354,7 +25354,7 @@ msgstr "選択されていません"
 
 #: include/classes/helpers/CItemHelper.php:261
 msgid "not used"
-msgstr ""
+msgstr "使用されていない"
 
 #: app/controllers/CControllerPopupTriggerExpr.php:872
 msgid "now() - Number of seconds since the Epoch"
@@ -25442,7 +25442,7 @@ msgstr "on"
 #: include/classes/validators/CApiInputValidator.php:2420
 #, c-format
 msgid "only one object can exist within the combinations of %1$s"
-msgstr ""
+msgstr "%1$s の組み合わせ内に存在可能なオブジェクトは 1 つだけです。"
 
 #: app/controllers/CControllerPopupItemTestSend.php:202
 msgid "only one time unit is allowed"
@@ -25595,7 +25595,7 @@ msgstr "right() - 右端の文字を返す"
 
 #: widgets/navtree/Widget.php:41
 msgid "root"
-msgstr ""
+msgstr "root"
 
 #: app/controllers/CControllerPopupTriggerExpr.php:966
 msgid "round() - Rounds a value to decimal places"
@@ -25863,13 +25863,13 @@ msgstr "プロキシとサーバーのバージョンが一致しないため、
 #: include/views/configuration.item.edit.php:643
 #: include/views/configuration.item.prototype.edit.php:614
 msgid "to retrieve a single value"
-msgstr ""
+msgstr "単一の値を取得する"
 
 #: include/views/configuration.host.discovery.edit.php:548
 #: include/views/configuration.item.edit.php:638
 #: include/views/configuration.item.prototype.edit.php:609
 msgid "to retrieve a subtree"
-msgstr ""
+msgstr "サブツリーを取得する"
 
 #: app/controllers/CControllerPopupTriggerExpr.php:1075
 msgid "trendavg() - Average value of a period T with exact period shift"
@@ -26019,7 +26019,7 @@ msgstr "サポートされていないバージョン番号です"
 #: include/classes/validators/CApiInputValidator.php:3726
 #, c-format
 msgid "update interval \"%1$s\" is longer than period \"%2$s\""
-msgstr ""
+msgstr "更新間隔 \"%1$s\" は期間 \"%2$s\"より長期です"
 
 #: include/classes/validators/CApiInputValidator.php:596
 msgid "uppercase identifier expected"
@@ -26102,7 +26102,7 @@ msgstr "値%1$sはすでにあります"
 #: include/classes/parsers/CEscapedStringParser.php:72
 #, c-format
 msgid "value contains unescaped character at position %1$d"
-msgstr ""
+msgstr "値の %1$d の位置にエスケープされていない文字が含まれています"
 
 #: app/controllers/CControllerUsergroupTagFilterCheck.php:101
 #: app/controllers/CControllerUsergroupTagFilterCheck.php:107
@@ -26185,7 +26185,7 @@ msgstr[0] "値は空か%1$sを指定してください"
 #: widgets/gauge/includes/WidgetForm.php:133
 #, c-format
 msgid "value must be greater than \"%1$s\""
-msgstr ""
+msgstr "指定する値は\"%1$s\"以上にしてください。"
 
 #: app/controllers/CControllerPopupItemTest.php:1342
 #: include/classes/validators/CNewValidator.php:220

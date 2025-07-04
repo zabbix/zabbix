@@ -1,3 +1,17 @@
+Changes for 7.0.17rc1
+
+New features:
+
+Bug fixes:
+
+--------------------------------------------------------------------------------
+Changes for 7.0.16
+
+Bug fixes:
+.......PS. [ZBX-26589] fixed DNS queries being performed for IP addresses when using older c-ares library (vso)
+.......PS. [ZBX-26610] fixed some tasks being stuck in preprocessing queue (wiper)
+
+--------------------------------------------------------------------------------
 Changes for 7.0.15
 
 Bug fixes:
