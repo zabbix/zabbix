@@ -26,7 +26,6 @@ class testSystemInformation extends CWebTest {
 	public static $standby_lastaccess;
 	public static $stopped_lastaccess;
 	public static $unavailable_lastaccess;
-
 	public static $skip_fields;
 
 	/**
@@ -246,13 +245,11 @@ class testSystemInformation extends CWebTest {
 			$this->query('button:Login')->one()->click();
 			$this->query('link:sign in as guest')->one()->click();
 		}
+		elseif (array_key_exists('user', $data)) {
+			$this->page->userLogin($data['user'], $data['password'])->open($url)->waitUntilReady();
+		}
 		else {
-			if (!array_key_exists('user', $data)) {
-				$this->page->Login()->open($url)->waitUntilReady();
-			}
-			else {
-				$this->page->userLogin($data['user'], $data['password'])->open($url)->waitUntilReady();
-			}
+			$this->page->Login()->open($url)->waitUntilReady();
 		}
 
 		if (!$dashboardid) {
