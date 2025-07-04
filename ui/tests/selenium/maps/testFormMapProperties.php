@@ -72,7 +72,7 @@ class testFormMapProperties extends CWebTest {
 		CDataHelper::call('image.create', [
 			[
 				'name' => self::BACKGROUND_IMAGE,
-				'imagetype' => 2,
+				'imagetype' => IMAGE_TYPE_BACKGROUND,
 				'image' => 'iVBORw0KGgoAAAANSUhEUgAAAGkAAAA6CAIAAAA8+uA0AAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAJ'.
 					'cEhZcwAAEnQAABJ0Ad5mH3gAAACPSURBVHhe7dChDQAwDMCwft7Xy4emYBsGZpZq3sA37zrvOu867zrvOu867zrvOu867zr'.
 					'vOu867zrvOu867zrvOu867zrvOu867zrvOu867zrvOu867zrvOu867zrvOu867zrvOu867zrvOu867zrvOu867zrvOu867z'.
@@ -87,8 +87,8 @@ class testFormMapProperties extends CWebTest {
 				'name' => self::$map_update,
 				'width' => 800,
 				'height' => 600,
-				'highlight' => 0,
-				'label_type' => 0
+				'highlight' => SYSMAP_HIGHLIGHT_OFF,
+				'label_type' => MAP_LABEL_TYPE_LABEL
 			],
 			[
 				'name' => self::MAP_UPDATE,
@@ -96,44 +96,44 @@ class testFormMapProperties extends CWebTest {
 				'height' => 9000,
 				'iconmapid' => $mapping_ids[self::ICON_MAPPING],
 				'markelements' => 1,
-				'highlight' => 1,
-				'expandproblem' => 2,
-				'label_format' => 1,
-				'label_location' => 2,
-				'label_type_host' => 5,
+				'highlight' => SYSMAP_HIGHLIGHT_ON,
+				'expandproblem' => SYSMAP_PROBLEMS_NUMBER_CRITICAL,
+				'label_format' => SYSMAP_LABEL_ADVANCED_ON,
+				'label_location' => MAP_LABEL_LOC_RIGHT,
+				'label_type_host' => MAP_LABEL_TYPE_CUSTOM,
 				'label_string_host' => 'Host label 📰📰📰',
-				'label_type_hostgroup' => 4,
-				'label_type_image' => 0,
-				'label_type_map' => 3,
-				'label_type_trigger' => 2,
-				'severity_min' => 5,
+				'label_type_hostgroup' => MAP_LABEL_TYPE_NOTHING,
+				'label_type_image' => MAP_LABEL_TYPE_LABEL,
+				'label_type_map' => MAP_LABEL_TYPE_STATUS,
+				'label_type_trigger' => MAP_LABEL_TYPE_NAME,
+				'severity_min' => TRIGGER_SEVERITY_DISASTER,
 				'show_unack' => 2,
 				'show_suppressed' => 1,
 				'urls' => [
 					[
 						'name' => '1 Host URL',
 						'url' => 'test',
-						'elementtype' => 0
+						'elementtype' => SYSMAP_ELEMENT_TYPE_HOST
 					],
 					[
 						'name' => '2 Host group URL',
 						'url' => 'test',
-						'elementtype' => 3
+						'elementtype' => SYSMAP_ELEMENT_TYPE_HOST_GROUP
 					],
 					[
 						'name' => '3 Map URL',
 						'url' => 'test',
-						'elementtype' => 1
+						'elementtype' => SYSMAP_ELEMENT_TYPE_MAP
 					],
 					[
 						'name' => '5 Trigger URL',
 						'url' => 'test',
-						'elementtype' => 2
+						'elementtype' => SYSMAP_ELEMENT_TYPE_TRIGGER
 					],
 					[
 						'name' => '4 Image URL',
 						'url' => 'test',
-						'elementtype' => 4
+						'elementtype' => SYSMAP_ELEMENT_TYPE_IMAGE
 					]
 				]
 			],
@@ -144,45 +144,45 @@ class testFormMapProperties extends CWebTest {
 				'backgroundid' => $background_ids[self::BACKGROUND_IMAGE],
 				'iconmapid' => $mapping_ids[self::ICON_MAPPING],
 				'markelements' => 1,
-				'highlight' => 1,
-				'expandproblem' => 2,
-				'label_format' => 1,
-				'label_location' => 3,
-				'label_type_host' => 5,
-				'label_type_hostgroup' => 5,
+				'highlight' => SYSMAP_HIGHLIGHT_ON,
+				'expandproblem' => SYSMAP_PROBLEMS_NUMBER_CRITICAL,
+				'label_format' => SYSMAP_LABEL_ADVANCED_ON,
+				'label_location' => MAP_LABEL_LOC_TOP,
+				'label_type_host' => MAP_LABEL_TYPE_CUSTOM,
+				'label_type_hostgroup' => MAP_LABEL_TYPE_CUSTOM,
 				'label_string_host' => STRING_255,
 				'label_string_hostgroup' => 'Host group label 📰📰📰',
-				'label_type_image' => 0,
-				'label_type_map' => 2,
-				'label_type_trigger' => 3,
-				'severity_min' => 4,
+				'label_type_image' => MAP_LABEL_TYPE_LABEL,
+				'label_type_map' => MAP_LABEL_TYPE_NAME,
+				'label_type_trigger' => MAP_LABEL_TYPE_STATUS,
+				'severity_min' => TRIGGER_SEVERITY_HIGH,
 				'show_unack' => 2,
 				'show_suppressed' => 1,
 				'urls' => [
 					[
 						'name' => '1 Host URL 📰📰📰',
 						'url' => 'test 📰📰📰',
-						'elementtype' => 0
+						'elementtype' => SYSMAP_ELEMENT_TYPE_HOST
 					],
 					[
 						'name' => STRING_255,
 						'url' => STRING_2048,
-						'elementtype' => 1
+						'elementtype' => SYSMAP_ELEMENT_TYPE_MAP
 					],
 					[
 						'name' => '4 Host group - xss',
 						'url' => self::XSS_EXAMPLE,
-						'elementtype' => 3
+						'elementtype' => SYSMAP_ELEMENT_TYPE_HOST_GROUP
 					],
 					[
 						'name' => '3 Trigger URL',
 						'url' => 'test',
-						'elementtype' => 2
+						'elementtype' => SYSMAP_ELEMENT_TYPE_TRIGGER
 					],
 					[
 						'name' => '2 Image URL',
 						'url' => 'test',
-						'elementtype' => 4
+						'elementtype' => SYSMAP_ELEMENT_TYPE_IMAGE
 					]
 				]
 			]
@@ -448,7 +448,7 @@ class testFormMapProperties extends CWebTest {
 
 	public function getMapValidationData() {
 		return [
-			// #0 Missing madatory parameter - Name.
+			// #0 Missing mandatory parameter - Name.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -655,9 +655,9 @@ class testFormMapProperties extends CWebTest {
 					],
 					'urls' => [
 						[
-						'id' => 0,
-						'Name' => 'TEST',
-						'URL' => ''
+							'id' => 0,
+							'Name' => 'TEST',
+							'URL' => ''
 						]
 					],
 					'error_details' => 'URL should have both "name" and "url" fields for map "Empty URL".'
@@ -712,11 +712,11 @@ class testFormMapProperties extends CWebTest {
 				[
 					'expected' => TEST_GOOD,
 					'map_properties' => [
-						'Name' => 'Map create with mandaroty fields'
+						'Name' => 'Map create with mandatory fields'
 					],
 					'result' => [
 						'Owner' => ['Admin (Zabbix Administrator)'],
-						'Name' => 'Map create with mandaroty fields',
+						'Name' => 'Map create with mandatory fields',
 						'Width' => '800',
 						'Height' => '600',
 						'Background image' => 'No image',
@@ -2142,7 +2142,6 @@ class testFormMapProperties extends CWebTest {
 						'Automatic icon mapping' => '<manual>',
 						'Icon highlight' => false,
 						'Mark elements on trigger status change' => false,
-						'Display problems' => 'Number of problems',
 						'Advanced labels' => false,
 						'Map element label type' => 'Element name',
 						'Map element label location' => 'Left',
