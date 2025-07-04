@@ -274,9 +274,9 @@ class CUserDirectory extends CApiService {
 		]);
 		$requested_output = array_flip($options['selectProvisionMedia']);
 
-		foreach ($db_provisioning_media as $db_provisioning_media_items) {
-			$result[$db_provisioning_media_items['userdirectoryid']]['provision_media'][]
-				= array_intersect_key($db_provisioning_media_items, $requested_output);
+		foreach ($db_provisioning_media as $db_provisioning_medias) {
+			$result[$db_provisioning_medias['userdirectoryid']]['provision_media'][]
+				= array_intersect_key($db_provisioning_medias, $requested_output);
 		}
 	}
 
