@@ -3,6 +3,26 @@ Changes for 7.4.1rc1
 New features:
 
 Bug fixes:
+..F....... [ZBX-26422] added missing translation string for "Tags" label in "Tags" tab in configuration forms (solonkins)
+.........T [ZBX-26567] added new inventory items to the Cisco Meraki device by HTTP template (aiantsen)
+.........T [ZBX-26604] fixed JavaScript in AWS Cost Explorer by HTTP template due to syntax changes in GetCostAndUsage API request (egordymov)
+..F....... [ZBX-26481] fixed parameter trimming in item preprocessing steps (apoga)
+..F....... [ZBX-26249] added the correct message for the Top items and Top triggers widgets when there are no data (msnihach)
+..F....... [ZBX-26300] updates for showing correct element's edit form when right click on the sysmap (msnihach)
+.......P.. [ZBX-25499] fixed vault secrets resolution on Zabbix proxy (sboidenko)
+.......PS. [ZBX-26529] fixed memory leak when global variables are used in javascript preprocessing (vso)
+..F....... [ZBX-26516] fixed incorrect page loading when clicking on linked template from Graph prototype page (isharha)
+...G...... [ZBX-26143] fixed duplicated address issue after redirection and disabled history upload on Agent connection failure until the connection is re-established (sboidenko)
+.......PS. [ZBX-26589] fixed DNS queries being performed for IP address when not recent c-ares library is used (vso)
+.......PS. [ZBX-26426] fixed preprocessing to flush values for an item in the same order they were sent to preprocessing (wiper)
+..F....... [ZBX-24047] fixed updating value mapping error when mapping name contains quotes (isharha)
+..F....... [ZBX-26123] added hostid parameter validation in web scenario configuration form (msnihach)
+..F....... [ZBX-26454] set a readonly property for the "Allowed Hosts" input for discovered items (msnihach)
+..F....... [ZBX-25913] fixed Gauge widget description not updating on refresh (apoga)
+.......PS. [ZBX-26537] fixed memory over-allocation in preprocessing manager (vso)
+..F....... [ZBX-26518] fixed visual artifacts on webkit-based browsers when scrolling the page while editing a widget (averza)
+........S. [ZBX-25413] fixed race condition that could lead to user macro changes not to be synced to Zabbix proxy (vso)
+...G...... [ZBX-26187] fixed response to wmi.getall from Zabbix agent 2 does not return array-type values (mprihodko)
 
 --------------------------------------------------------------------------------
 Changes for 7.4.0
@@ -227,6 +247,15 @@ Changes for 7.2.11rc1
 New features:
 
 Bug fixes:
+.........T [ZBX-26604] fixed JavaScript in AWS Cost Explorer by HTTP template due to syntax changes in GetCostAndUsage API request (egordymov)
+..F....... [ZBX-26481] fixed parameter trimming in item preprocessing steps (apoga)
+..F....... [ZBX-26249] added the correct message for the Top items and Top triggers widgets when there are no data (msnihach)
+..F....... [ZBX-26300] updates for showing correct element's edit form when right click on the sysmap (msnihach)
+.......P.. [ZBX-25499] fixed vault secrets resolution on Zabbix proxy (sboidenko)
+..F....... [ZBX-25913] fixed Gauge widget description not updating on refresh (apoga)
+..F....... [ZBX-24047] fixed updating value mapping error when mapping name contains quotes (isharha)
+..F....... [ZBX-26454] set a readonly property for the "Allowed Hosts" input for discovered items (msnihach)
+........S. [ZBX-25413] fixed race condition that could lead to user macro changes not to be synced to Zabbix proxy (vso)
 
 --------------------------------------------------------------------------------
 Changes for 7.2.10
@@ -757,6 +786,17 @@ Changes for 7.0.17rc1
 New features:
 
 Bug fixes:
+.........T [ZBX-26567] added new inventory items to the Cisco Meraki device by HTTP template (aiantsen)
+.........T [ZBX-26604] fixed JavaScript in AWS Cost Explorer by HTTP template due to syntax changes in GetCostAndUsage API request (egordymov)
+..F....... [ZBX-26481] fixed parameter trimming in item preprocessing steps (apoga)
+..F....... [ZBX-26300] updates for showing correct element's edit form when right click on the sysmap (msnihach)
+.......P.. [ZBX-25499] fixed vault secrets resolution on Zabbix proxy (sboidenko)
+...G...... [ZBX-26143] fixed duplicated address issue after redirection and disabled history upload on Agent connection failure until the connection is re-established (sboidenko)
+..F....... [ZBX-25913] fixed Gauge widget description not updating on refresh (apoga)
+..F....... [ZBX-24047] fixed updating value mapping error when mapping name contains quotes (isharha)
+..F....... [ZBX-26454] set a readonly property for the "Allowed Hosts" input for discovered items (msnihach)
+........S. [ZBX-26486] fixed errors in Zabbix server log on second and subsequent server starts with TimescaleDB (mprihodko)
+........S. [ZBX-25413] fixed race condition that could lead to user macro changes not to be synced to Zabbix proxy (vso)
 
 --------------------------------------------------------------------------------
 Changes for 7.0.16
@@ -4349,6 +4389,7 @@ New features:
 ........S. [ZBXNEXT-9905] updated max supported TimescaleDB version to 2.19 (mprihodko)
 
 Bug fixes:
+.......PS. [ZBX-26529] fixed memory leak when global variables are used in javascript preprocessing (vso)
 ...G...... [ZBX-26344] refactored zbxcmd execute to avoid windows syscalls in Zabbix agent 2 (esneiders)
 .......PS. [ZBX-26433] fixed values outside of history storage period causing trigger to cache all values in storage period (vso)
 ...G...... [ZBX-26244] fixed Zabbix agent 2 memory leak related to traffic compression (MVekslers)
