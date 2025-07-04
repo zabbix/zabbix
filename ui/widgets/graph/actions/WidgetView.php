@@ -162,8 +162,8 @@ class WidgetView extends CControllerDashboardWidgetView {
 				$graph = reset($graph);
 
 				if ($graph && count($graph['hosts']) == 1) {
-					$graph = $this->setAxiosItem($graph, 'ymax');
-					$graph = $this->setAxiosItem($graph, 'ymin');
+					$graph = $this->setAxisItem($graph, 'ymax');
+					$graph = $this->setAxisItem($graph, 'ymin');
 				}
 
 				if ($graph) {
@@ -356,7 +356,7 @@ class WidgetView extends CControllerDashboardWidgetView {
 	 * @param string $axis
 	 * @return array
 	 */
-	private function setAxiosItem(array $graph, string $axis): array {
+	private function setAxisItem(array $graph, string $axis): array {
 		$type_key = "{$axis}_type";
 		$itemid_key = "{$axis}_itemid";
 
