@@ -281,6 +281,8 @@ ZBX_THREAD_ENTRY(zbx_dbsyncer_thread, args)
 	if (SUCCEED == zbx_is_export_enabled(ZBX_FLAG_EXPTYPE_EVENTS))
 		zbx_export_deinit(problems_export);
 
+	zbx_ipc_async_socket_close(&rtc);
+
 	zbx_free(stats);
 
 	exit(EXIT_SUCCESS);
