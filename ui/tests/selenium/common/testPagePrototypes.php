@@ -1189,7 +1189,7 @@ class testPagePrototypes extends CWebTest {
 				[
 					'expected' => TEST_BAD,
 					'name' => [
-						'Linked template for LLD prototypes test: {#KEY} inherited LLD prototype',
+						'Linked template for LLD prototypes test: {#KEY} inherited LLD prototype'
 					],
 					'error_title' => 'Cannot delete discovery prototype',
 					'error' => 'Invalid parameter "/1": cannot delete inherited LLD rule prototype.'
@@ -1201,7 +1201,7 @@ class testPagePrototypes extends CWebTest {
 					'expected' => TEST_BAD,
 					'name' => [
 						'LLD prototype with its own prototypes',
-						'Linked template for LLD prototypes test: {#KEY} inherited LLD prototype',
+						'Linked template for LLD prototypes test: {#KEY} inherited LLD prototype'
 					],
 					'error_title' => 'Cannot delete discovery prototypes',
 					'error' => 'Invalid parameter "/1": cannot delete inherited LLD rule prototype.'
