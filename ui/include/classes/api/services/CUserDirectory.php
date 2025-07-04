@@ -631,7 +631,7 @@ class CUserDirectory extends CApiService {
 
 		$security_keys = ['sign_messages', 'sign_assertions', 'sign_authn_requests', 'sign_logout_requests',
 			'sign_logout_responses', 'encrypt_nameid', 'encrypt_assertions'];
-		
+
 		foreach ($userdirectories as $i => $userdirectory) {
 			if ($userdirectory['idp_type'] != IDP_TYPE_SAML) {
 				continue;
