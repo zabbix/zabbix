@@ -458,4 +458,6 @@ void	pg_service_destroy(zbx_pg_service_t *pgs)
 	void	*retval;
 
 	pthread_join(pgs->thread, &retval);
+
+	zbx_ipc_service_close(&pgs->service);
 }
