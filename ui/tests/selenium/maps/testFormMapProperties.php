@@ -655,7 +655,8 @@ class testFormMapProperties extends CWebTest {
 					],
 					'urls' => [
 						[
-							'id' => 0,
+							'action' => USER_ACTION_UPDATE,
+							'index' => 0,
 							'Name' => 'TEST',
 							'URL' => ''
 						]
@@ -672,7 +673,8 @@ class testFormMapProperties extends CWebTest {
 					],
 					'urls' => [
 						[
-							'id' => 0,
+							'action' => USER_ACTION_UPDATE,
+							'index' => 0,
 							'Name' => '',
 							'URL' => 'TEST'
 						]
@@ -689,12 +691,13 @@ class testFormMapProperties extends CWebTest {
 					],
 					'urls' => [
 						[
-							'id' => 0,
+							'action' => USER_ACTION_UPDATE,
+							'index' => 0,
 							'Name' => 'TEST',
 							'URL' => 'URL-1'
 						],
 						[
-							'id' => 1,
+							'action' => USER_ACTION_ADD,
 							'Name' => 'TEST',
 							'URL' => 'URL-2'
 						]
@@ -707,7 +710,7 @@ class testFormMapProperties extends CWebTest {
 
 	public function getMapCreateData() {
 		return [
-			// #0 Create with mandatory fields.
+			// #20 Create with mandatory fields.
 			[
 				[
 					'expected' => TEST_GOOD,
@@ -733,11 +736,17 @@ class testFormMapProperties extends CWebTest {
 						'Problem display' => 'All',
 						'Minimum severity' => 'Not classified',
 						'Show suppressed problems' => false,
-						'URLs' => []
+						'URLs' => [
+							[
+								'Name' => '',
+								'URL' => '',
+								'Element' => 'Host'
+							]
+						]
 					]
 				]
 			],
-			// #1 Create with leading and trailing spaces.
+			// #21 Create with leading and trailing spaces.
 			[
 				[
 					'expected' => TEST_GOOD,
@@ -759,9 +768,11 @@ class testFormMapProperties extends CWebTest {
 					],
 					'urls' => [
 						[
-							'id' => 0,
+							'action' => USER_ACTION_UPDATE,
+							'index' => 0,
 							'Name' => '  Test url ',
-							'URL' => '  Test url '
+							'URL' => '  Test url ',
+							'Element' => 'Host group'
 						]
 					],
 					'result' => [
@@ -776,7 +787,11 @@ class testFormMapProperties extends CWebTest {
 						'Mark elements on trigger status change' => false,
 						'Display problems' => 'Expand single problem',
 						'Advanced labels' => true,
-						'' => 'Test image custom label',
+						'id:label_string_hostgroup' => 'Test host group custom label',
+						'id:label_string_host' => 'Test host custom label',
+						'id:label_string_trigger' => 'Test trigger custom label',
+						'id:label_string_map' => 'Test map custom label',
+						'id:label_string_image' => 'Test image custom label',
 						'Host group label type' => 'Custom label',
 						'Host label type' => 'Custom label',
 						'Trigger label type' => 'Custom label',
@@ -788,26 +803,17 @@ class testFormMapProperties extends CWebTest {
 						'Problem display' => 'All',
 						'Minimum severity' => 'Not classified',
 						'Show suppressed problems' => false,
-						'URLs' => []
-					],
-					'expected_urls' => [
-						[
-							'id' => 0,
-							'name' => 'Test url',
-							'url' => 'Test url',
-							'element_type' => 0
+						'URLs' => [
+							[
+								'Name' => 'Test url',
+								'URL' => 'Test url',
+								'Element' => 'Host group'
+							]
 						]
-					],
-					'custom_labels' => [
-						'id:label_string_hostgroup' => 'Test host group custom label',
-						'id:label_string_host' => 'Test host custom label',
-						'id:label_string_trigger' => 'Test trigger custom label',
-						'id:label_string_map' => 'Test map custom label',
-						'id:label_string_image' => 'Test image custom label'
 					]
 				]
 			],
-			// #2 Create with maximum string length.
+			// #22 Create with maximum string length.
 			[
 				[
 					'expected' => TEST_GOOD,
@@ -830,9 +836,11 @@ class testFormMapProperties extends CWebTest {
 					],
 					'urls' => [
 						[
-							'id' => 0,
+							'action' => USER_ACTION_UPDATE,
+							'index' => 0,
 							'Name' => STRING_255,
-							'URL' => STRING_2048
+							'URL' => STRING_2048,
+							'Element' => 'Host'
 						]
 					],
 					'result' => [
@@ -847,7 +855,11 @@ class testFormMapProperties extends CWebTest {
 						'Mark elements on trigger status change' => false,
 						'Display problems' => 'Number of problems',
 						'Advanced labels' => true,
-						'' => STRING_255,
+						'id:label_string_hostgroup' => STRING_255,
+						'id:label_string_host' => STRING_255,
+						'id:label_string_trigger' => STRING_255,
+						'id:label_string_map' => STRING_255,
+						'id:label_string_image' => STRING_255,
 						'Host group label type' => 'Custom label',
 						'Host label type' => 'Custom label',
 						'Trigger label type' => 'Custom label',
@@ -859,23 +871,13 @@ class testFormMapProperties extends CWebTest {
 						'Problem display' => 'All',
 						'Minimum severity' => 'Not classified',
 						'Show suppressed problems' => false,
-						'URLs' => []
-					],
-					'expected_urls' => [
-						[
-							'id' => 0,
-							'name' => STRING_255,
-							'url' => STRING_2048,
-							'element_type' => 0
+						'URLs' => [
+							[
+								'Name' => STRING_255,
+								'URL' => STRING_2048,
+								'Element' => 'Host'
+							]
 						]
-
-					],
-					'custom_labels' => [
-						'id:label_string_hostgroup' => STRING_255,
-						'id:label_string_host' => STRING_255,
-						'id:label_string_trigger' => STRING_255,
-						'id:label_string_map' => STRING_255,
-						'id:label_string_image' => STRING_255
 					]
 				]
 			],
@@ -900,12 +902,11 @@ class testFormMapProperties extends CWebTest {
 						'id:label_string_map' => STRING_6000,
 						'Image label type' => 'Custom label',
 						'id:label_string_image' => STRING_6000,
-						'id:urls_0_name' => STRING_6000,
-						'id:urls_0_url' => STRING_6000
 					],
 					'urls' => [
 						[
-							'id' => 0,
+							'action' => USER_ACTION_UPDATE,
+							'index' => 0,
 							'Name' => STRING_6000,
 							'URL' => STRING_6000,
 							'Element' => 'Host'
@@ -923,7 +924,11 @@ class testFormMapProperties extends CWebTest {
 						'Mark elements on trigger status change' => false,
 						'Display problems' => 'Expand single problem',
 						'Advanced labels' => true,
-						'' => STRING_255,
+						'id:label_string_hostgroup' => STRING_255,
+						'id:label_string_host' => STRING_255,
+						'id:label_string_trigger' => STRING_255,
+						'id:label_string_map' => STRING_255,
+						'id:label_string_image' => STRING_255,
 						'Host group label type' => 'Custom label',
 						'Host label type' => 'Custom label',
 						'Trigger label type' => 'Custom label',
@@ -935,27 +940,18 @@ class testFormMapProperties extends CWebTest {
 						'Problem display' => 'All',
 						'Minimum severity' => 'Not classified',
 						'Show suppressed problems' => false,
-						'URLs' => []
-					],
-					'expected_urls' => [
-						[
-							'id' => 0,
-							'name' => STRING_255,
-							'url' => STRING_2048,
-							'element_type' => 0
+						'URLs' => [
+							[
+								'Name' => STRING_255,
+								'URL' => STRING_2048,
+								'Element' => 'Host'
+							]
 						]
-					],
-					'custom_labels' => [
-						'id:label_string_hostgroup' => STRING_255,
-						'id:label_string_host' => STRING_255,
-						'id:label_string_trigger' => STRING_255,
-						'id:label_string_map' => STRING_255,
-						'id:label_string_image' => STRING_255
 					]
 				]
-			]
+			],
 			 */
-			// #3 Create with non-default parameters #1.
+			// #23 Create with non-default parameters #1.
 			[
 				[
 					'expected' => TEST_GOOD,
@@ -997,11 +993,17 @@ class testFormMapProperties extends CWebTest {
 						'Problem display' => 'Unacknowledged only',
 						'Minimum severity' => 'Disaster',
 						'Show suppressed problems' => true,
-						'URLs' => []
+						'URLs' => [
+							[
+								'Name' => '',
+								'URL' => '',
+								'Element' => 'Host'
+							]
+						]
 					]
 				]
 			],
-			// #4 Create with non-default parameters #2.
+			// #24 Create with non-default parameters #2.
 			[
 				[
 					'expected' => TEST_GOOD,
@@ -1040,11 +1042,17 @@ class testFormMapProperties extends CWebTest {
 						'Problem display' => 'Separated',
 						'Minimum severity' => 'High',
 						'Show suppressed problems' => true,
-						'URLs' => []
+						'URLs' => [
+							[
+								'Name' => '',
+								'URL' => '',
+								'Element' => 'Host'
+							]
+						]
 					]
 				]
 			],
-			// #5 Create with non-default parameters #3.
+			// #25 Create with non-default parameters #3.
 			[
 				[
 					'expected' => TEST_GOOD,
@@ -1083,11 +1091,17 @@ class testFormMapProperties extends CWebTest {
 						'Problem display' => 'Separated',
 						'Minimum severity' => 'Average',
 						'Show suppressed problems' => true,
-						'URLs' => []
+						'URLs' => [
+							[
+								'Name' => '',
+								'URL' => '',
+								'Element' => 'Host'
+							]
+						]
 					]
 				]
 			],
-			// #6 Create with non-default parameters #4.
+			// #26 Create with non-default parameters #4.
 			[
 				[
 					'expected' => TEST_GOOD,
@@ -1124,16 +1138,22 @@ class testFormMapProperties extends CWebTest {
 						'Problem display' => 'Separated',
 						'Minimum severity' => 'Warning',
 						'Show suppressed problems' => true,
-						'URLs' => []
+						'URLs' => [
+							[
+								'Name' => '',
+								'URL' => '',
+								'Element' => 'Host'
+							]
+						]
 					]
 				]
 			],
-			// #7 Custom labels - Nothing.
+			// #27 Advanced labels - Nothing.
 			[
 				[
 					'expected' => TEST_GOOD,
 					'map_properties' => [
-						'Name' => 'Custom labels: Nothing',
+						'Name' => 'Advanced labels: Nothing',
 						'Advanced labels' => true,
 						'Host group label type' => 'Nothing',
 						'Host label type' => 'Nothing',
@@ -1144,7 +1164,7 @@ class testFormMapProperties extends CWebTest {
 					],
 					'result' => [
 						'Owner' => ['Admin (Zabbix Administrator)'],
-						'Name' => 'Custom labels: Nothing',
+						'Name' => 'Advanced labels: Nothing',
 						'Width' => '800',
 						'Height' => '600',
 						'Background image' => 'No image',
@@ -1165,16 +1185,22 @@ class testFormMapProperties extends CWebTest {
 						'Problem display' => 'All',
 						'Minimum severity' => 'Information',
 						'Show suppressed problems' => false,
-						'URLs' => []
+						'URLs' => [
+							[
+								'Name' => '',
+								'URL' => '',
+								'Element' => 'Host'
+							]
+						]
 					]
 				]
 			],
-			// #8 Custom labels - Element name.
+			// #8 Advanced labels - Element name.
 			[
 				[
 					'expected' => TEST_GOOD,
 					'map_properties' => [
-						'Name' => 'Custom labels: Element name',
+						'Name' => 'Advanced labels: Element name',
 						'Advanced labels' => true,
 						'Host group label type' => 'Element name',
 						'Host label type' => 'Element name',
@@ -1184,7 +1210,7 @@ class testFormMapProperties extends CWebTest {
 					],
 					'result' => [
 						'Owner' => ['Admin (Zabbix Administrator)'],
-						'Name' => 'Custom labels: Element name',
+						'Name' => 'Advanced labels: Element name',
 						'Width' => '800',
 						'Height' => '600',
 						'Background image' => 'No image',
@@ -1205,16 +1231,22 @@ class testFormMapProperties extends CWebTest {
 						'Problem display' => 'All',
 						'Minimum severity' => 'Not classified',
 						'Show suppressed problems' => false,
-						'URLs' => []
+						'URLs' => [
+							[
+								'Name' => '',
+								'URL' => '',
+								'Element' => 'Host'
+							]
+						]
 					]
 				]
 			],
-			// #9 Custom labels - Status only.
+			// #9 Advanced labels - Status only.
 			[
 				[
 					'expected' => TEST_GOOD,
 					'map_properties' => [
-						'Name' => 'Custom labels: Status only',
+						'Name' => 'Advanced labels: Status only',
 						'Advanced labels' => true,
 						'Host group label type' => 'Status only',
 						'Host label type' => 'Status only',
@@ -1224,7 +1256,7 @@ class testFormMapProperties extends CWebTest {
 					],
 					'result' => [
 						'Owner' => ['Admin (Zabbix Administrator)'],
-						'Name' => 'Custom labels: Status only',
+						'Name' => 'Advanced labels: Status only',
 						'Width' => '800',
 						'Height' => '600',
 						'Background image' => 'No image',
@@ -1245,16 +1277,22 @@ class testFormMapProperties extends CWebTest {
 						'Problem display' => 'All',
 						'Minimum severity' => 'Not classified',
 						'Show suppressed problems' => false,
-						'URLs' => []
+						'URLs' => [
+							[
+								'Name' => '',
+								'URL' => '',
+								'Element' => 'Host'
+							]
+						]
 					]
 				]
 			],
-			// #10 Custom labels - Label.
+			// #10 Advanced labels - Label.
 			[
 				[
 					'expected' => TEST_GOOD,
 					'map_properties' => [
-						'Name' => 'Custom labels: Label',
+						'Name' => 'Advanced labels: Label',
 						'Advanced labels' => true,
 						'Host group label type' => 'Label',
 						'Host label type' => 'Label',
@@ -1264,7 +1302,7 @@ class testFormMapProperties extends CWebTest {
 					],
 					'result' => [
 						'Owner' => ['Admin (Zabbix Administrator)'],
-						'Name' => 'Custom labels: Label',
+						'Name' => 'Advanced labels: Label',
 						'Width' => '800',
 						'Height' => '600',
 						'Background image' => 'No image',
@@ -1285,16 +1323,22 @@ class testFormMapProperties extends CWebTest {
 						'Problem display' => 'All',
 						'Minimum severity' => 'Not classified',
 						'Show suppressed problems' => false,
-						'URLs' => []
+						'URLs' => [
+							[
+								'Name' => '',
+								'URL' => '',
+								'Element' => 'Host'
+							]
+						]
 					]
 				]
 			],
-			// #11 Custom labels - different label types.
+			// #11 Advanced labels - different label types.
 			[
 				[
 					'expected' => TEST_GOOD,
 					'map_properties' => [
-						'Name' => 'Custom labels: different options',
+						'Name' => 'Advanced labels: different options',
 						'Advanced labels' => true,
 						'Host group label type' => 'Label',
 						'Host label type' => 'IP address',
@@ -1305,7 +1349,7 @@ class testFormMapProperties extends CWebTest {
 					],
 					'result' => [
 						'Owner' => ['Admin (Zabbix Administrator)'],
-						'Name' => 'Custom labels: different options',
+						'Name' => 'Advanced labels: different options',
 						'Width' => '800',
 						'Height' => '600',
 						'Background image' => 'No image',
@@ -1320,17 +1364,20 @@ class testFormMapProperties extends CWebTest {
 						'Trigger label type' => 'Element name',
 						'Map label type' => 'Status only',
 						'Image label type' => 'Custom label',
-						'' => 'Image custom label',
+						'id:label_string_image' => 'Image custom label',
 						'Map element label location' => 'Bottom',
 						'Show map element labels' => 'Always',
 						'Show link labels' => 'Always',
 						'Problem display' => 'All',
 						'Minimum severity' => 'Not classified',
 						'Show suppressed problems' => false,
-						'URLs' => []
-					],
-					'custom_labels' => [
-						'id:label_string_image' => 'Image custom label'
+						'URLs' => [
+							[
+								'Name' => '',
+								'URL' => '',
+								'Element' => 'Host'
+							]
+						]
 					]
 				]
 			],
@@ -1343,30 +1390,31 @@ class testFormMapProperties extends CWebTest {
 					],
 					'urls' => [
 						[
-							'id' => 0,
+							'action' => USER_ACTION_UPDATE,
+							'index' => 0,
 							'Name' => '1 Host URL',
 							'URL' => 'http://test1-url@zabbix.com'
 						],
 						[
-							'id' => 1,
+							'action' => USER_ACTION_ADD,
 							'Name' => '2 Group URL',
 							'URL' => 'http://test2-url@zabbix.com',
 							'Element' => 'Host group'
 						],
 						[
-							'id' => 2,
+							'action' => USER_ACTION_ADD,
 							'Name' => '3 Image URL',
 							'URL' => 'http://test3-url@zabbix.com',
 							'Element' => 'Image'
 						],
 						[
-							'id' => 3,
+							'action' => USER_ACTION_ADD,
 							'Name' => '4 Map URL',
 							'URL' => 'http://test4-url@zabbix.com',
 							'Element' => 'Map'
 						],
 						[
-							'id' => 4,
+							'action' => USER_ACTION_ADD,
 							'Name' => '5 Trigger URL',
 							'URL' => 'http://test5-url@zabbix.com',
 							'Element' => 'Trigger'
@@ -1391,38 +1439,32 @@ class testFormMapProperties extends CWebTest {
 						'Problem display' => 'All',
 						'Minimum severity' => 'Not classified',
 						'Show suppressed problems' => false,
-						'URLs' => []
-					],
-					'expected_urls' => [
-						[
-							'id' => 0,
-							'name' => '1 Host URL',
-							'url' => 'http://test1-url@zabbix.com',
-							'element_type' => 0
-						],
-						[
-							'id' => 1,
-							'name' => '2 Group URL',
-							'url' => 'http://test2-url@zabbix.com',
-							'element_type' => 3
-						],
-						[
-							'id' => 2,
-							'name' => '3 Image URL',
-							'url' => 'http://test3-url@zabbix.com',
-							'element_type' => 4
-						],
-						[
-							'id' => 3,
-							'name' => '4 Map URL',
-							'url' => 'http://test4-url@zabbix.com',
-							'element_type' => 1
-						],
-						[
-							'id' => 4,
-							'name' => '5 Trigger URL',
-							'url' => 'http://test5-url@zabbix.com',
-							'element_type' => 2
+						'URLs' => [
+							[
+								'Name' => '1 Host URL',
+								'URL' => 'http://test1-url@zabbix.com',
+								'Element' => 'Host'
+							],
+							[
+								'Name' => '2 Group URL',
+								'URL' => 'http://test2-url@zabbix.com',
+								'Element' => 'Host group'
+							],
+							[
+								'Name' => '3 Image URL',
+								'URL' => 'http://test3-url@zabbix.com',
+								'Element' => 'Image'
+							],
+							[
+								'Name' => '4 Map URL',
+								'URL' => 'http://test4-url@zabbix.com',
+								'Element' => 'Map'
+							],
+							[
+								'Name' => '5 Trigger URL',
+								'URL' => 'http://test5-url@zabbix.com',
+								'Element' => 'Trigger'
+							]
 						]
 					]
 				]
@@ -1436,27 +1478,28 @@ class testFormMapProperties extends CWebTest {
 					],
 					'urls' => [
 						[
-							'id' => 0,
+							'action' => USER_ACTION_UPDATE,
+							'index' => 0,
 							'Name' => 'Zabbix sysmap',
 							'URL' => 'test'
 						],
 						[
-							'id' => 1,
+							'action' => USER_ACTION_ADD,
 							'Name' => '012345',
-							'URL' => 'test'
+							'URL' => 'test',
 						],
 						[
-							'id' => 2,
+							'action' => USER_ACTION_ADD,
 							'Name' => '9 sysmap',
 							'URL' => 'test'
 						],
 						[
-							'id' => 3,
+							'action' => USER_ACTION_ADD,
 							'Name' => 'Administration map',
 							'URL' => 'test'
 						],
 						[
-							'id' => 4,
+							'action' => USER_ACTION_ADD,
 							'Name' => '02223',
 							'URL' => 'test'
 						]
@@ -1480,38 +1523,32 @@ class testFormMapProperties extends CWebTest {
 						'Problem display' => 'All',
 						'Minimum severity' => 'Not classified',
 						'Show suppressed problems' => false,
-						'URLs' => []
-					],
-					'expected_urls' => [
-						[
-							'id' => 0,
-							'name' => '012345',
-							'url' => 'test',
-							'element_type' => 0
-						],
-						[
-							'id' => 1,
-							'name' => '02223',
-							'url' => 'test',
-							'element_type' => 0
-						],
-						[
-							'id' => 2,
-							'name' => '9 sysmap',
-							'url' => 'test',
-							'element_type' => 0
-						],
-						[
-							'id' => 3,
-							'name' => 'Administration map',
-							'url' => 'test',
-							'element_type' => 0
-						],
-						[
-							'id' => 4,
-							'name' => 'Zabbix sysmap',
-							'url' => 'test',
-							'element_type' => 0
+						'URLs' => [
+							[
+								'Name' => '012345',
+								'URL' => 'test',
+								'Element' => 'Host'
+							],
+							[
+								'Name' => '02223',
+								'URL' => 'test',
+								'Element' => 'Host'
+							],
+							[
+								'Name' => '9 sysmap',
+								'URL' => 'test',
+								'Element' => 'Host'
+							],
+							[
+								'Name' => 'Administration map',
+								'URL' => 'test',
+								'Element' => 'Host'
+							],
+							[
+								'Name' => 'Zabbix sysmap',
+								'URL' => 'test',
+								'Element' => 'Host'
+							]
 						]
 					]
 				]
@@ -1532,23 +1569,8 @@ class testFormMapProperties extends CWebTest {
 		$form = $this->query('id:sysmap-form')->waitUntilPresent()->asForm()->one();
 		$form->fill($data['map_properties']);
 
-		// Add URLS.
-		if (array_key_exists('urls', $data)) {
-			foreach ($data['urls'] as $url) {
-
-				// Click add link button.
-				if ($url['id'] !== 0) {
-					$this->query('id:add-url')->one()->click();
-				}
-
-				// Add URL data.
-				$form->query('id:urls_'.$url['id'].'_name')->one()->fill($url['Name']);
-				$form->query('id:urls_'.$url['id'].'_url')->one()->fill($url['URL']);
-				$form->getField('name:urls['.$url['id'].'][elementtype]')->select((array_key_exists('Element', $url))
-						? $url['Element']
-						: 'Host'
-				);
-			}
+		if(array_key_exists('urls', $data)) {
+			$form->query('class:table-forms-separator')->asMultifieldTable()->one()->fill($data['urls']);
 		}
 
 		$form->submit();
@@ -1568,29 +1590,7 @@ class testFormMapProperties extends CWebTest {
 			$this->assertMessage(TEST_GOOD, 'Network map added');
 			$table = $this->query('class:list-table')->asTable()->one();
 			$table->findRow('Name', $data['result']['Name'])->query('link:Properties')->one()->click();
-			$this->assertEquals($data['result'], $form->getFields()->filter(CElementFilter::VISIBLE)->asValues());
-
-			// Check map URLs.
-			if (array_key_exists('expected_urls', $data)) {
-				foreach ($data['expected_urls'] as $expected_url) {
-					$this->assertEquals($expected_url['name'], $form->query('id:urls_'.$expected_url['id'].'_name')
-							->one()->getValue()
-					);
-					$this->assertEquals($expected_url['url'], $form->query('id:urls_'.$expected_url['id'].'_url')
-							->one()->getValue()
-					);
-					$this->assertEquals($expected_url['element_type'],
-							$form->query('name:urls['.$expected_url['id'].'][elementtype]')->one()->getValue()
-					);
-				}
-			}
-
-			// Check custom labels.
-			if (array_key_exists('custom_labels', $data)) {
-				foreach ($data['custom_labels'] as $id => $value) {
-					$this->assertEquals($value, $form->query($id)->one()->getValue());
-				}
-			}
+			$this->query('id:sysmap-form')->waitUntilPresent()->asForm()->one()->checkValue($data['result']);
 		}
 	}
 
