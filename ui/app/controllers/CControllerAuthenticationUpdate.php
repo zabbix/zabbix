@@ -537,11 +537,6 @@ class CControllerAuthenticationUpdate extends CController {
 	 * @return bool
 	 */
 	private function processSamlConfiguration(): bool {
-		$db_saml = API::UserDirectory()->get([
-			'output' => ['userdirectoryid'],
-			'filter' => ['idp_type' => IDP_TYPE_SAML]
-		]);
-
 		if ($this->getInput('saml_auth_enabled', ZBX_AUTH_SAML_DISABLED) != ZBX_AUTH_SAML_ENABLED) {
 			return true;
 		}
@@ -593,6 +588,11 @@ class CControllerAuthenticationUpdate extends CController {
 			]);
 			$saml_data = array_merge($saml_data, $provisioning_fields);
 		}
+
+		$db_saml = API::UserDirectory()->get([
+			'output' => ['userdirectoryid'],
+			'filter' => ['idp_type' => IDP_TYPE_SAML]
+		]);
 
 		if ($db_saml) {
 			$result = API::UserDirectory()->update(['userdirectoryid' => $db_saml[0]['userdirectoryid']] + $saml_data);
