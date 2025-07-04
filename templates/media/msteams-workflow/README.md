@@ -9,7 +9,7 @@ This integration is supported only on **Teams** as part of Office 365. Note that
 
 ## Requirements
 
-Zabbix version: 7.4 and higher.
+Zabbix version: 8.0 and higher.
 
 ## Parameters
 
@@ -122,7 +122,7 @@ Note: If you want to remove the footer message "USERNAME used a Workflow to send
 
 [![](images/th.8.png?raw=true)](images/8.png)
 
-For more information, see [Zabbix Documentation](https://www.zabbix.com/documentation/7.4/manual/config/notifications) and [MS Teams Workflow Documentation](https://support.microsoft.com/en-gb/office/browse-and-add-workflows-in-microsoft-teams-4998095c-8b72-4b0e-984c-f2ad39e6ba9a).
+For more information, see [Zabbix Documentation](https://www.zabbix.com/documentation/8.0/manual/config/notifications) and [MS Teams Workflow Documentation](https://support.microsoft.com/en-gb/office/browse-and-add-workflows-in-microsoft-teams-4998095c-8b72-4b0e-984c-f2ad39e6ba9a).
 
 ## Feedback
 

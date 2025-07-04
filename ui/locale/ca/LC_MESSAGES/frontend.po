@@ -4,7 +4,7 @@ msgstr ""
 "Project-Id-Version: Zabbix 6.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2023-10-19 13:48+0300\n"
-"PO-Revision-Date: 2025-06-12 18:49+0000\n"
+"PO-Revision-Date: 2025-06-18 11:38+0000\n"
 "Last-Translator: Xevi Noè i Nogueiras <xevi.noe@gmail.com>\n"
 "Language-Team: none\n"
 "Language: ca\n"
@@ -64,7 +64,7 @@ msgstr "S'espera la parella \"equip:clau\"."
 
 #: app/views/host.wizard.edit.php:1024
 msgid "#{section_name}"
-msgstr ""
+msgstr "#{nom_de_la_secció}"
 
 #: include/forms.inc.php:1330
 #: include/views/configuration.host.discovery.edit.php:932
@@ -2237,7 +2237,7 @@ msgstr "A baix N"
 
 #: app/views/host.wizard.edit.php:429
 msgid "Brackets to specify IPv6 addresses"
-msgstr ""
+msgstr "Parèntesis per especificar adreces IPv6"
 
 #: jsLoader.php:266
 msgid "Bring forward"
@@ -5050,7 +5050,7 @@ msgstr "Plega la barra lateral"
 
 #: app/views/host.wizard.edit.php:426
 msgid "Colon to separate IP/DNS address from port"
-msgstr ""
+msgstr "Dos punts per separar l'adreça IP/DNS del port"
 
 #: include/views/configuration.graph.edit.php:398
 #: include/views/js/monitoring.sysmaps.js.php:383
@@ -5107,7 +5107,7 @@ msgstr "Es mostren les coordenades centrals separades per comes i el nivell de z
 
 #: app/views/host.wizard.edit.php:427
 msgid "Comma to separate multiple Zabbix servers, proxies, or clusters"
-msgstr ""
+msgstr "Coma per separar diversos servidors, proxys o clústers Zabbix"
 
 #: app/views/administration.script.edit.php:199
 #: app/views/reports.actionlog.list.csv.php:45
@@ -8556,7 +8556,7 @@ msgstr "Entreu l'adreça IP/DNS i el port de l'equip a monitorar habilitat per a
 
 #: app/views/host.wizard.edit.php:412
 msgid "Enter the IP/DNS address and port of your Zabbix server, proxy, or cluster configuration."
-msgstr ""
+msgstr "Introduïu l'adreça IP/DNS i el port de la configuració del servidor, proxy o clúster Zabbix."
 
 #: app/views/host.wizard.edit.php:642
 msgid "Enter the IP/DNS address, port, and authentication details of your SNMP-enabled monitoring target."
@@ -8764,7 +8764,7 @@ msgstr "Exemple"
 
 #: app/views/host.wizard.edit.php:417
 msgid "Example:"
-msgstr ""
+msgstr "Exemple:"
 
 #: app/views/administration.miscconfig.edit.php:38
 msgid "Example: https://localhost/zabbix/ui/"
@@ -19696,7 +19696,7 @@ msgstr "Triat, %1$s, només lectura, a la posició %2$d de %3$d"
 
 #: app/views/host.wizard.edit.php:428
 msgid "Semicolon to separate clusters (one or more server addresses)"
-msgstr ""
+msgstr "Punt i coma per separar clústers (una o més adreces de servidor)"
 
 #: jsLoader.php:267
 msgid "Send backward"
@@ -23518,7 +23518,7 @@ msgstr "Emprar el filtre per veure els resultats"
 
 #: app/views/host.wizard.edit.php:424
 msgid "Use:"
-msgstr ""
+msgstr "Ús:"
 
 #: app/views/administration.script.list.php:93 app/views/mediatype.list.php:98
 msgid "Used in actions"
@@ -24596,7 +24596,7 @@ msgstr "Codi de verificació"
 
 #: app/views/host.wizard.edit.php:407
 msgid "Verify Zabbix server, proxy, or cluster address"
-msgstr ""
+msgstr "Verificar l'adreça del servidor, proxy o clúster Zabbix"
 
 #: include/classes/setup/CSetupWizard.php:655
 msgid "Verify database certificate"
@@ -25322,7 +25322,7 @@ msgstr "L'agent Zabbix inicia connexions al servidor o proxy Zabbix per enviar d
 
 #: app/views/host.wizard.edit.php:422
 msgid "Zabbix agent must be able to connect to the specified address or list of addresses."
-msgstr ""
+msgstr "L'agent Zabbix ha de poder connectar-se a l'adreça o llista d'adreces especificada."
 
 #: app/views/host.wizard.edit.php:863
 msgid "Zabbix documentation"
