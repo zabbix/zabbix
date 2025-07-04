@@ -1697,7 +1697,7 @@ class testNestedLLD extends CIntegrationTest{
 				]
 			];
 
-			$this->assertEquals($expected_items, $host['items']);
+			$this->assertEqualsCanonicalizing($expected_items, $host['items']);
 		}
 	}
 
