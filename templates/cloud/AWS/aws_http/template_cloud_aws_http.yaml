@@ -2969,7 +2969,7 @@ zabbix_export:
         * [Describe AWS Cost Explore API actions](https://docs.aws.amazon.com/aws-cost-management/latest/APIReference/API_Operations.html)
       vendor:
         name: Zabbix
-        version: 7.4-2
+        version: 7.4-3
       groups:
         - name: Templates/Cloud
       items:
