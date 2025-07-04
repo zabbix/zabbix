@@ -607,7 +607,7 @@ class CUserDirectory extends CApiService {
 		self::addAffectedObjects($userdirectories, $db_userdirectories);
 
 		self::validateProvisionMedias($userdirectories, $db_userdirectories);
-		self::validateSpCertificateWhenHasSecurityOptions($userdirectories);
+		self::validateSpCertificateWithSecurityOptions($userdirectories, $db_userdirectories);
 
 		self::checkDuplicates($userdirectories, $db_userdirectories);
 		self::checkProvisionGroups($userdirectories, $db_userdirectories);
@@ -626,33 +626,34 @@ class CUserDirectory extends CApiService {
 		}
 	}
 
-	private static function validateSpCertificateWhenHasSecurityOptions(array $userdirectories): void {
+	private static function validateSpCertificateWithSecurityOptions(array $userdirectories, array $db_userdirectories): void {
+		$sp_certificate_items = ['sp_certificate', 'sp_private_key'];
+
+		$security_keys = ['sign_messages', 'sign_assertions', 'sign_authn_requests', 'sign_logout_requests',
+			'sign_logout_responses', 'encrypt_nameid', 'encrypt_assertions'];
+		
 		foreach ($userdirectories as $i => $userdirectory) {
 			if ($userdirectory['idp_type'] != IDP_TYPE_SAML) {
 				continue;
 			}
 
-			$security_options = [
-				$userdirectory['sign_messages'],
-				$userdirectory['sign_assertions'],
-				$userdirectory['sign_authn_requests'],
-				$userdirectory['sign_logout_requests'],
-				$userdirectory['sign_logout_responses'],
-				$userdirectory['encrypt_nameid'],
-				$userdirectory['encrypt_assertions']
-			];
+			$db_userdirectory = $db_userdirectories[$userdirectory['userdirectoryid']];
 
-			if (in_array(1, $security_options, true)) {
-				if (array_key_exists('sp_certificate', $userdirectory) && $userdirectory['sp_certificate'] === '') {
-					self::exception(ZBX_API_ERROR_PARAMETERS,
-						_s('Invalid parameter "%1$s": %2$s.', '/'.($i + 1).'/sp_certificate', _('cannot be empty'))
-					);
-				}
+			$security_options = array_merge(
+				array_intersect_key($db_userdirectory, array_flip($security_keys)),
+				array_intersect_key($userdirectory, array_flip($security_keys))
+			);
 
-				if (array_key_exists('sp_private_key', $userdirectory) && $userdirectory['sp_private_key'] === '') {
-					self::exception(ZBX_API_ERROR_PARAMETERS,
-						_s('Invalid parameter "%1$s": %2$s.', '/'.($i + 1).'/sp_private_key', _('cannot be empty'))
-					);
+
+			if (in_array(1, $security_options)) {
+				foreach ($sp_certificate_items as $sp_certificate_item) {
+					$path = '/'.($i + 1).'/'.$sp_certificate_item;
+
+					if (array_key_exists($sp_certificate_item, $userdirectory) && $userdirectory[$sp_certificate_item] === '') {
+						self::exception(ZBX_API_ERROR_PARAMETERS,
+							_s('Invalid parameter "%1$s": %2$s.', $path, _('cannot be empty'))
+						);
+					}
 				}
 			}
 
