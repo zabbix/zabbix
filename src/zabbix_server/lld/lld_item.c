@@ -1062,12 +1062,13 @@ static char	*lld_item_description(int item_flags)
  ******************************************************************************/
 static void	lld_item_add_error(const zbx_lld_item_full_t *item, char **error, const char *format, ...)
 {
-	char		*message, key[ZBX_ITEM_KEY_LEN * ZBX_MAX_BYTES_IN_UTF8_CHAR + 1], *desc;
+	char		key[ZBX_ITEM_KEY_LEN * ZBX_MAX_BYTES_IN_UTF8_CHAR + 1], *desc, *msg = NULL;
 	const char	*pkey;
+	size_t		msg_len = 0, msg_offset = 0;
 	va_list	args;
 
 	va_start(args, format);
-	message = zbx_dvsprintf(NULL, format, args);
+	zbx_vsnprintf_alloc(&msg, &msg_len, &msg_offset, format, args);
 	va_end(args);
 
 	if (ZBX_ITEM_NAME_LEN < zbx_strlen_utf8(item->name))
@@ -1080,10 +1081,10 @@ static void	lld_item_add_error(const zbx_lld_item_full_t *item, char **error, co
 
 	desc = lld_item_description(item->item_flags);
 	*error = zbx_strdcatf(*error, "Cannot %s %s \"%s\": %s.\n", (0 != item->itemid ? "update" : "create"),
-			desc, pkey, message);
+			desc, pkey, msg);
 
 	zbx_free(desc);
-	zbx_free(message);
+	zbx_free(msg);
 }
 
 static void	lld_validate_item_field(zbx_lld_item_full_t *item, char **field, char **field_orig, zbx_uint64_t flag,
