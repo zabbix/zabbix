@@ -69,6 +69,7 @@ static char		*last_db_strerror = NULL;	/* last database error message */
 static int		config_log_slow_queries;
 
 static int		db_auto_increment;
+static unsigned char	program_type;
 
 #if defined(HAVE_MYSQL)
 static MYSQL			*conn = NULL;
@@ -838,45 +839,48 @@ int	zbx_db_connect_basic(const zbx_config_dbhigh_t *cfg)
 
 	zbx_db_free_result(result);
 
-	result = zbx_db_select_basic("show default_transaction_read_only");
-
-	if ((zbx_db_result_t)ZBX_DB_DOWN == result || NULL == result)
+	if (0 != (program_type & ZBX_PROGRAM_TYPE_SERVER))
 	{
-		ret = (NULL == result) ? ZBX_DB_FAIL : ZBX_DB_DOWN;
-		goto out;
-	}
+		result = zbx_db_select_basic("show default_transaction_read_only");
 
-	if (NULL != (row = zbx_db_fetch_basic(result)))
-	{
-		if (0 == strcmp(row[0], "on"))
+		if ((zbx_db_result_t)ZBX_DB_DOWN == result || NULL == result)
 		{
-			zbx_db_free_result(result);
-			ret = ZBX_DB_RONLY;
+			ret = (NULL == result) ? ZBX_DB_FAIL : ZBX_DB_DOWN;
 			goto out;
 		}
-	}
 
-	zbx_db_free_result(result);
-
-	result = zbx_db_select_basic("select pg_is_in_recovery();");
-
-	if ((zbx_db_result_t)ZBX_DB_DOWN == result || NULL == result)
-	{
-		ret = (NULL == result) ? ZBX_DB_FAIL : ZBX_DB_DOWN;
-		goto out;
-	}
-
-	if (NULL != (row = zbx_db_fetch_basic(result)))
-	{
-		if (0 == strcmp(row[0], "t"))
+		if (NULL != (row = zbx_db_fetch_basic(result)))
 		{
-			zbx_db_free_result(result);
-			ret = ZBX_DB_RONLY;
+			if (0 == strcmp(row[0], "on"))
+			{
+				zbx_db_free_result(result);
+				ret = ZBX_DB_RONLY;
+				goto out;
+			}
+		}
+
+		zbx_db_free_result(result);
+
+		result = zbx_db_select_basic("select pg_is_in_recovery();");
+
+		if ((zbx_db_result_t)ZBX_DB_DOWN == result || NULL == result)
+		{
+			ret = (NULL == result) ? ZBX_DB_FAIL : ZBX_DB_DOWN;
 			goto out;
 		}
-	}
 
-	zbx_db_free_result(result);
+		if (NULL != (row = zbx_db_fetch_basic(result)))
+		{
+			if (0 == strcmp(row[0], "t"))
+			{
+				zbx_db_free_result(result);
+				ret = ZBX_DB_RONLY;
+				goto out;
+			}
+		}
+
+		zbx_db_free_result(result);
+	}
 
 	if (90000 <= ZBX_PG_SVERSION)
 	{
@@ -942,12 +946,14 @@ out:
 	return ret;
 }
 
-int	zbx_db_init_basic(const char *dbname, const char *const dbschema, int log_slow_queries, char **error)
+int	zbx_db_init_basic(const char *dbname, const char *const dbschema, int log_slow_queries, char **error,
+		unsigned char pg_type)
 {
 #ifdef HAVE_SQLITE3
 	zbx_stat_t	buf;
 #endif
 	config_log_slow_queries = log_slow_queries;
+	program_type = pg_type;
 #ifdef HAVE_SQLITE3
 	if (0 != zbx_stat(dbname, &buf))
 	{

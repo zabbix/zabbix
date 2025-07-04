@@ -2270,7 +2270,7 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 		exit(EXIT_FAILURE);
 	}
 
-	if (SUCCEED != zbx_db_init(zbx_dc_get_nextid, config_log_slow_queries, &error))
+	if (SUCCEED != zbx_db_init(zbx_dc_get_nextid, config_log_slow_queries, &error, zbx_program_type))
 	{
 		zabbix_log(LOG_LEVEL_CRIT, "cannot initialize database: %s", error);
 		zbx_free(error);
