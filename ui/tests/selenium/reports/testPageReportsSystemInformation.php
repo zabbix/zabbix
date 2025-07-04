@@ -13,17 +13,90 @@
 ** If not, see <https://www.gnu.org/licenses/>.
 **/
 
+
 require_once __DIR__.'/../common/testSystemInformation.php';
 
 /**
- * @backup ha_node, config
+ * @backup ha_node, profiles
  *
  * @backupConfig
+ *
+ * @onBefore prepareUsersData
  */
 class testPageReportsSystemInformation extends testSystemInformation {
 
+	/**
+	 * Attach CTableBehavior to the test.
+	 */
+	public function getBehaviors() {
+		return [CTableBehavior::class];
+	}
+
+	/**
+	 * Function checks which information users see on system information page.
+	 * Note: in this case data is checked without running server.
+	 */
+	public function testPageReportsSystemInformation_checkAvailableDataByUserRole() {
+		$data = [
+			'available_fields' => [
+				[
+					'Parameter' => 'Zabbix server is running',
+					'Value' => 'No',
+					'Details' => 'localhost:10051'
+				],
+				[
+					'Parameter' => 'Zabbix server version',
+					'Value' => '',
+					'Details' => ''
+				],
+				[
+					'Parameter' => 'Zabbix frontend version',
+					'Value' => ZABBIX_VERSION,
+					'Details' => ''
+				],
+				[
+					'Parameter' => 'Number of hosts (enabled/disabled)',
+					'Value' => '',
+					'Details' => ''
+				],
+				[
+					'Parameter' => 'Number of templates',
+					'Value' => '',
+					'Details' => ''
+				],
+				[
+					'Parameter' => 'Number of items (enabled/disabled/not supported)',
+					'Value' => '',
+					'Details' => ''
+				],
+				[
+					'Parameter' => 'Number of triggers (enabled/disabled [problem/ok])',
+					'Value' => '',
+					'Details' => ''
+				],
+				[
+					'Parameter' => 'Number of users (online)',
+					'Value' => '',
+					'Details' => ''
+				],
+				[
+					'Parameter' => 'Required server performance, new values per second',
+					'Value' => '',
+					'Details' => ''
+				],
+				[
+					'Parameter' => 'High availability cluster',
+					'Value' => 'Disabled',
+					'Details' => ''
+				]
+			]
+		];
+		$this->assertAvailableDataByUserRole($data);
+	}
+
 	public function testPageReportsSystemInformation_checkDisabledHA() {
 		$this->page->login()->open('zabbix.php?action=report.status')->waitUntilReady();
+
 		// Remove zabbix version due to unstable screenshot which depends on column width with different version length.
 		CElementQuery::getDriver()->executeScript("arguments[0].textContent = '';",
 				[$this->query('xpath://table[@class="list-table sticky-header"]/tbody/tr[3]/td[1]')->one()]

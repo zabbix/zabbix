@@ -13,6 +13,7 @@
 ** If not, see <https://www.gnu.org/licenses/>.
 **/
 
+
 require_once __DIR__.'/../../include/CWebTest.php';
 require_once __DIR__.'/../../include/helpers/CDataHelper.php';
 
@@ -96,6 +97,37 @@ class testSystemInformation extends CWebTest {
 		self::$update_timestamp = time();
 	}
 
+	public function prepareUsersData() {
+		CDataHelper::call('user.create', [
+			[
+				'username' => 'admin for system information test',
+				'passwd' => 'z@$$ix!#%1',
+				'roleid' => USER_TYPE_ZABBIX_ADMIN,
+				'usrgrps' => [
+					['usrgrpid' => 7] // Zabbix administrators.
+				]
+			],
+			[
+				'username' => 'user for system information test',
+				'passwd' => 'z@$$ix!#%2',
+				'roleid' => USER_TYPE_ZABBIX_USER,
+				'usrgrps' => [
+					['usrgrpid' => 7] // Zabbix administrators.
+				]
+			]
+		]);
+
+		// Enable guest role for system information permissions test.
+		CDataHelper::call('user.update', [
+			[
+				'userid' => 2, // guest.
+				'usrgrps' => [
+					['usrgrpid' => 8] // Guests.
+				]
+			]
+		]);
+	}
+
 	// Change failover delay not to wait too long for server to update its status.
 	public static function changeFailoverDelay() {
 		DBexecute('UPDATE config SET ha_failover_delay='.self::FAILOVER_DELAY);
@@ -110,6 +142,7 @@ class testSystemInformation extends CWebTest {
 		global $DB;
 		self::$skip_fields = [];
 		$url = (!$dashboardid) ? 'zabbix.php?action=report.status' : 'zabbix.php?action=dashboard.view&dashboardid='.$dashboardid;
+
 		// Wait for frontend to get the new config from updated zabbix.conf.php file.
 		sleep((int) ini_get('opcache.revalidate_freq') + 1);
 
@@ -213,5 +246,32 @@ class testSystemInformation extends CWebTest {
 		// Check that after failover delay passes frontend re-validates Zabbix server status.
 		$this->page->refresh();
 		$this->assertEquals('No', $table->findRow('Parameter', 'Zabbix server is running')->getColumn('Value')->getText());
+	}
+
+	public function assertAvailableDataByUserRole($data , $dashboardid = null) {
+		$url = (!$dashboardid) ? 'zabbix.php?action=report.status' : 'zabbix.php?action=dashboard.view&dashboardid='.$dashboardid;
+
+		if (array_key_exists('guest', $data)) {
+			$this->page->open($url)->waitUntilReady();
+			$this->query('button:Login')->one()->click();
+			$this->query('link:sign in as guest')->one()->click();
+		}
+		else {
+			if (!array_key_exists('user', $data)) {
+				$this->page->Login()->open($url)->waitUntilReady();
+			}
+			else {
+				$this->page->userLogin($data['user'], $data['password'])->open($url)->waitUntilReady();
+			}
+		}
+
+		if (!$dashboardid) {
+			$this->page->waitUntilReady();
+		}
+		else {
+			CDashboardElement::find()->one()->waitUntilReady();
+		}
+
+		$this->assertTableData($data['available_fields']);
 	}
 }
