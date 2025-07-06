@@ -101,7 +101,7 @@ class testAutoregistrationPSK extends CIntegrationTest {
 			throw new Exception('Failed to create metadata_file');
 		}
 
-		$this->killComponent(self::COMPONENT_AGENT2);
+		$this->stopComponent(self::COMPONENT_AGENT2);
 		$this->killComponent(self::COMPONENT_AGENT);
 		$this->killComponent(self::COMPONENT_SERVER);
 
