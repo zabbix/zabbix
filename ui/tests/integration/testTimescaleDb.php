@@ -198,9 +198,9 @@ class testTimescaleDb extends CIntegrationTest {
 
 		self::waitForLogLineToBePresent(self::COMPONENT_SERVER, 'trapper got');
 		self::waitForLogLineToBePresent(self::COMPONENT_SERVER, 'End of zbx_send_response_json():SUCCEED', true, 5);
-		$this->reloadConfigurationCache();
-		sleep(10);
-
+		//$this->reloadConfigurationCache();
+		$this->stopComponent(self::COMPONENT_SERVER);
+		$this->startComponent(self::COMPONENT_SERVER);
 		$count_end = $this->getHistoryCount();
 		$this->assertNotEquals(-1, $count_end);
 		$this->assertEquals($count_end - $count_start, self::HIST_COUNT);
@@ -224,7 +224,8 @@ class testTimescaleDb extends CIntegrationTest {
 		$this->assertEquals(self::$db_extension, ZBX_DB_EXTENSION_TIMESCALEDB);
 
 		$this->executeHousekeeper();
-
+		$this->stopComponent(self::COMPONENT_SERVER);
+		$this->startComponent(self::COMPONENT_SERVER);
 		$this->getCheckCompression();
 	}
 }
