@@ -153,8 +153,7 @@ class testTimescaleDb extends CIntegrationTest {
 		$req = DBselect('SELECT number_compressed_chunks FROM hypertable_compression_stats(\''.self::TABLENAME.'\')');
 		$compress = DBfetch($req);
 		$this->assertNotEquals($compress, null);
-		$this->assertEquals(json_encode($compress), "{\"number_compressed_chunks\":\"0\"}");
-		//$this->assertArrayHasKey('number_compressed_chunks', $compress, json_encode($compress));
+		$this->assertArrayHasKey('number_compressed_chunks', $compress, json_encode($compress));
 		if ($compress['number_compressed_chunks'] == 0) {
 
 			$res = DBfetch(DBselect('SELECT show_chunks(\''.self::TABLENAME.'\')'));
