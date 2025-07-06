@@ -102,8 +102,8 @@ class testAutoregistrationPSK extends CIntegrationTest {
 		}
 
 		$this->stopComponent(self::COMPONENT_AGENT2);
-		$this->killComponent(self::COMPONENT_AGENT);
-		$this->killComponent(self::COMPONENT_SERVER);
+		$this->stopComponent(self::COMPONENT_AGENT);
+		$this->stopComponent(self::COMPONENT_SERVER);
 
 		$this->updateAutoregistrationWithUpperCasePSK();
 		$this->startComponent(self::COMPONENT_SERVER);
@@ -112,7 +112,7 @@ class testAutoregistrationPSK extends CIntegrationTest {
 
 		$this->startComponent(self::COMPONENT_AGENT);
 		$this->waitForLogLineToBePresent(self::COMPONENT_SERVER, 'End of db_register_host()', true, 120);
-		$this->killComponent(self::COMPONENT_AGENT);
+		$this->stopComponent(self::COMPONENT_AGENT);
 		$this->stopComponent(self::COMPONENT_SERVER);
 
 		$response = $this->call('action.create', [
@@ -186,7 +186,7 @@ class testAutoregistrationPSK extends CIntegrationTest {
 		$this->assertArrayHasKey('actionids', $response['result']);
 		$this->assertEquals(1, count($response['result']['actionids']));
 
-		$this->killComponent(self::COMPONENT_AGENT2);
+		$this->stopComponent(self::COMPONENT_AGENT2);
 		$this->stopComponent(self::COMPONENT_SERVER);
 
 		if (file_put_contents(self::METADATA_FILE, "\\".time()) === false) {
@@ -357,9 +357,9 @@ class testAutoregistrationPSK extends CIntegrationTest {
 	 */
 	public function testAutoregistration_secondTimeWrongPSK()
 	{
-		$this->killComponent(self::COMPONENT_AGENT2);
-		$this->killComponent(self::COMPONENT_AGENT);
-		$this->killComponent(self::COMPONENT_SERVER);
+		$this->stopComponent(self::COMPONENT_AGENT2);
+		$this->stopComponent(self::COMPONENT_AGENT);
+		$this->stopComponent(self::COMPONENT_SERVER);
 
 		$this->updateAutoregistrationWithUpperCasePSK();
 
@@ -369,7 +369,7 @@ class testAutoregistrationPSK extends CIntegrationTest {
 
 		$this->startComponent(self::COMPONENT_AGENT);
 		$this->waitForLogLineToBePresent(self::COMPONENT_SERVER, 'End of db_register_host()', true, 120);
-		$this->killComponent(self::COMPONENT_AGENT);
+		$this->stopComponent(self::COMPONENT_AGENT);
 		$this->stopComponent(self::COMPONENT_SERVER);
 
 		$response = $this->call('action.create', [
