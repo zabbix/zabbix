@@ -152,7 +152,7 @@ class testTimescaleDb extends CIntegrationTest {
 	public function getCheckCompression() {
 		$req = DBselect('SELECT number_compressed_chunks FROM hypertable_compression_stats(\''.self::TABLENAME.'\')');
 		$compress = DBfetch($req);
-		$this->assertArrayHasKey('number_compressed_chunks', $compress);
+		$this->assertArrayHasKey('number_compressed_chunks', $compress, json_encode($compress));
 		if ($compress['number_compressed_chunks'] == 0) {
 
 			$res = DBfetch(DBselect('SELECT show_chunks(\''.self::TABLENAME.'\')'));
@@ -197,7 +197,7 @@ class testTimescaleDb extends CIntegrationTest {
 		self::waitForLogLineToBePresent(self::COMPONENT_SERVER, 'trapper got');
 		self::waitForLogLineToBePresent(self::COMPONENT_SERVER, 'End of zbx_send_response_json():SUCCEED', true, 5);
 		$this->reloadConfigurationCache();
-		sleep(1);
+		sleep(10);
 
 		$count_end = $this->getHistoryCount();
 		$this->assertNotEquals(-1, $count_end);

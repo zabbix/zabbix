@@ -105,10 +105,12 @@ class testAutoregistrationPSK extends CIntegrationTest {
 		$this->stopComponent(self::COMPONENT_AGENT);
 		$this->stopComponent(self::COMPONENT_SERVER);
 
+		$this->waitForLogLineToBePresent(self::COMPONENT_SERVER, 'Zabbix Server stopped', true, 120);
 		$this->updateAutoregistrationWithUpperCasePSK();
+
 		$this->startComponent(self::COMPONENT_SERVER);
 
-		sleep(1);
+		sleep(5);
 
 		$this->startComponent(self::COMPONENT_AGENT);
 		$this->waitForLogLineToBePresent(self::COMPONENT_SERVER, 'End of db_register_host()', true, 120);
@@ -253,7 +255,7 @@ class testAutoregistrationPSK extends CIntegrationTest {
 	}
 
 	/**
-	 * @required-components agent,agent2,server
+	 * @required-components server,agent,agent2
 	 *
 	 * @backup actions,hosts,host_tag,autoreg_host
 	 *
