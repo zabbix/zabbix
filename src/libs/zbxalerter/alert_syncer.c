@@ -447,8 +447,7 @@ static void	am_db_update_mediatypes(zbx_am_db_t *amdb, const zbx_uint64_t *media
 			zbx_vector_am_db_mediatype_ptr_append(mediatypes, mediatype);
 
 		if (NULL != auth_email_mediatypeids && MEDIA_TYPE_EMAIL == type &&
-				(SMTP_AUTHENTICATION_PASSWORD == smtp_authentication ||
-				SMTP_AUTHENTICATION_OAUTH == smtp_authentication))
+				SMTP_AUTHENTICATION_PASSWORD == smtp_authentication)
 		{
 			zbx_vector_uint64_append(auth_email_mediatypeids, mediatypeid);
 		}
@@ -1049,8 +1048,8 @@ ZBX_THREAD_ENTRY(zbx_alert_syncer_thread, args)
 
 	sleeptime = ZBX_POLL_INTERVAL;
 
-	if (ZBX_WATCHDOG_ALERT_FREQUENCY < (freq_watchdog = alert_syncer_args_in->confsyncer_frequency))
-		freq_watchdog = ZBX_WATCHDOG_ALERT_FREQUENCY;
+	if (ZBX_WATCHDOG_ALERT_PERIOD < (freq_watchdog = alert_syncer_args_in->confsyncer_frequency))
+		freq_watchdog = ZBX_WATCHDOG_ALERT_PERIOD;
 
 	zbx_setproctitle("%s [queuing alerts]", get_process_type_string(process_type));
 
@@ -1070,6 +1069,8 @@ ZBX_THREAD_ENTRY(zbx_alert_syncer_thread, args)
 		if (SUCCEED != zbx_ipc_async_socket_recv(&amdb.am, sleeptime, &message))
 		{
 			zabbix_log(LOG_LEVEL_CRIT, "cannot read alert syncer request");
+			am_db_clear(&amdb);
+			zbx_db_close();
 			exit(EXIT_FAILURE);
 		}
 		zbx_update_selfmon_counter(info, ZBX_PROCESS_STATE_BUSY);
@@ -1133,6 +1134,7 @@ ZBX_THREAD_ENTRY(zbx_alert_syncer_thread, args)
 	}
 
 	am_db_clear(&amdb);
+	zbx_db_close();
 
 	zbx_setproctitle("%s #%d [terminated]", get_process_type_string(process_type), process_num);
 

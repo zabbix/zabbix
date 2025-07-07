@@ -10,7 +10,7 @@ Disk discovery LLD rule finds all HDD, SSD, NVMe disks with S.M.A.R.T. enabled. 
 
 ## Requirements
 
-Zabbix version: 7.4 and higher.
+Zabbix version: 8.0 and higher.
 
 ## Tested versions
 
@@ -19,7 +19,7 @@ This template has been tested on:
 
 ## Configuration
 
-> Zabbix should be configured according to the instructions in the [Templates out of the box](https://www.zabbix.com/documentation/7.4/manual/config/templates_out_of_the_box) section.
+> Zabbix should be configured according to the instructions in the [Templates out of the box](https://www.zabbix.com/documentation/8.0/manual/config/templates_out_of_the_box) section.
 
 ## Setup
 
@@ -45,7 +45,7 @@ Example for Windows:
 
 `zabbix ALL=(ALL) NOPASSWD:/usr/sbin/smartctl`
 
-Plugin [parameters list](https://www.zabbix.com/documentation/7.4/manual/appendix/config/zabbix_agent2_plugins/smart_plugin).
+Plugin [parameters list](https://www.zabbix.com/documentation/8.0/manual/appendix/config/zabbix_agent2_plugins/smart_plugin).
 
 ### Macros used
 
