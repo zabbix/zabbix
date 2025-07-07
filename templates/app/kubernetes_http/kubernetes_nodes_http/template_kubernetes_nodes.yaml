@@ -46,7 +46,7 @@ zabbix_export:
         
         ## Setup
         
-        Install the [Zabbix Helm Chart](https://git.zabbix.com/projects/ZT/repos/kubernetes-helm/browse?at=refs%2Fheads%2Fmaster) in your Kubernetes cluster.
+        Install the [Zabbix Helm Chart](https://git.zabbix.com/projects/ZT/repos/kubernetes-helm/browse?at=refs%2Fheads%2Frelease/7.4) in your Kubernetes cluster.
         
         Set the following fields: `Kubernetes API URL` such as `<scheme>://<host>:<port>`.
         
@@ -92,7 +92,7 @@ zabbix_export:
         **Note**, the discovered nodes will be created as separate hosts in Zabbix with the Linux template automatically assigned to them.
       vendor:
         name: Zabbix
-        version: 7.4-3
+        version: 7.4-4
       groups:
         - name: Templates/Applications
       items:

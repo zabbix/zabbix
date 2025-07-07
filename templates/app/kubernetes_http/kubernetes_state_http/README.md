@@ -28,7 +28,7 @@ This template has been tested on:
 
 ## Setup
 
-Install the [Zabbix Helm Chart](https://git.zabbix.com/projects/ZT/repos/kubernetes-helm/browse?at=refs%2Fheads%2Fmaster) in your Kubernetes cluster.
+Install the [Zabbix Helm Chart](https://git.zabbix.com/projects/ZT/repos/kubernetes-helm/browse?at=refs%2Fheads%2Frelease/7.4) in your Kubernetes cluster.
 Internal service metrics are collected from kube-state-metrics endpoint.
 
 Template needs to use authorization via API token.
