@@ -604,6 +604,7 @@ class CUserDirectory extends CApiService {
 		unset($userdirectory);
 
 		self::addRequiredFieldsByType($userdirectories, $db_userdirectories);
+		self::addBindPassword($db_userdirectories);
 
 		$api_input_rules = self::getValidationRules(true);
 
@@ -946,20 +947,6 @@ class CUserDirectory extends CApiService {
 	}
 
 	private static function checkLdapBindPassword(array $userdirectories, array $db_userdirectories): void {
-		$db_bind_passwords = DB::select('userdirectory_ldap', [
-			'output' => ['bind_password'],
-			'filter' => ['userdirectoryid' => array_keys($db_userdirectories)],
-			'preservekeys' => true
-		]);
-
-		if (!$db_bind_passwords) {
-			return;
-		}
-
-		foreach ($db_bind_passwords as $db_userdirectoryid => $db_bind_password) {
-			$db_userdirectories[$db_userdirectoryid] += $db_bind_password;
-		}
-
 		foreach ($userdirectories as $i => $userdirectory) {
 			if ($userdirectory['idp_type'] != IDP_TYPE_LDAP) {
 				continue;
@@ -974,6 +961,18 @@ class CUserDirectory extends CApiService {
 					_s('the parameter "%1$s" is missing', 'bind_password')
 				));
 			}
+		}
+	}
+
+	private static function addBindPassword(array &$db_userdirectories): void {
+		$db_bind_passwords = DB::select('userdirectory_ldap', [
+			'output' => ['bind_password'],
+			'filter' => ['userdirectoryid' => array_keys($db_userdirectories)],
+			'preservekeys' => true
+		]);
+
+		foreach ($db_bind_passwords as $db_userdirectoryid => $db_bind_password) {
+			$db_userdirectories[$db_userdirectoryid] += $db_bind_password;
 		}
 	}
 
