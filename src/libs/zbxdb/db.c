@@ -69,7 +69,6 @@ static char		*last_db_strerror = NULL;	/* last database error message */
 static int		config_log_slow_queries;
 
 static int		db_auto_increment;
-static unsigned char	program_type;
 
 #if defined(HAVE_MYSQL)
 static MYSQL			*conn = NULL;
@@ -839,7 +838,7 @@ int	zbx_db_connect_basic(const zbx_config_dbhigh_t *cfg)
 
 	zbx_db_free_result(result);
 
-	if (0 != (program_type & ZBX_PROGRAM_TYPE_SERVER))
+	if (0 == cfg->read_only_recoverable)
 	{
 		result = zbx_db_select_basic("show default_transaction_read_only");
 
@@ -946,14 +945,12 @@ out:
 	return ret;
 }
 
-int	zbx_db_init_basic(const char *dbname, const char *const dbschema, int log_slow_queries, char **error,
-		unsigned char pg_type)
+int	zbx_db_init_basic(const char *dbname, const char *const dbschema, int log_slow_queries, char **error)
 {
 #ifdef HAVE_SQLITE3
 	zbx_stat_t	buf;
 #endif
 	config_log_slow_queries = log_slow_queries;
-	program_type = pg_type;
 #ifdef HAVE_SQLITE3
 	if (0 != zbx_stat(dbname, &buf))
 	{

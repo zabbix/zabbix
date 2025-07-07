@@ -318,12 +318,11 @@ int	zbx_db_connect(int flag)
 #undef ZBX_DB_WAIT_RETRY_COUNT
 }
 
-int	zbx_db_init(zbx_dc_get_nextid_func_t cb_nextid, int log_slow_queries, char **error, unsigned char program_type)
+int	zbx_db_init(zbx_dc_get_nextid_func_t cb_nextid, int log_slow_queries, char **error)
 {
 	zbx_cb_nextid = cb_nextid;
 
-	return zbx_db_init_basic(zbx_cfg_dbhigh->config_dbname, zbx_dbschema_get_schema(), log_slow_queries, error,
-			program_type);
+	return zbx_db_init_basic(zbx_cfg_dbhigh->config_dbname, zbx_dbschema_get_schema(), log_slow_queries, error);
 }
 
 void	zbx_db_deinit(void)

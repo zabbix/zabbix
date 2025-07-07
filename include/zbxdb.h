@@ -72,8 +72,7 @@ zbx_config_dbhigh_t;
 #	define ZBX_FOR_UPDATE	" for update"
 #endif
 
-int	zbx_db_init_basic(const char *dbname, const char *const dbschema, int log_slow_queries, char **error,
-		unsigned char pg_type);
+int	zbx_db_init_basic(const char *dbname, const char *const dbschema, int log_slow_queries, char **error);
 void	zbx_db_deinit_basic(void);
 
 void	zbx_db_init_autoincrement_options_basic(void);
