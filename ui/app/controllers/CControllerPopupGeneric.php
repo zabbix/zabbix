@@ -562,6 +562,8 @@ class CControllerPopupGeneric extends CController {
 			'real_hosts' =>							'in 1',
 			'normal_only' =>						'in 1',
 			'with_graphs' =>						'in 1',
+			'with_hosts' =>							'in 1',
+			'with_templates' =>						'in 1',
 			'with_graph_prototypes' =>				'in 1',
 			'with_items' =>							'in 1',
 			'with_simple_graph_items' =>			'in 1',
@@ -1345,6 +1347,10 @@ class CControllerPopupGeneric extends CController {
 					$options['with_httptests'] = true;
 				}
 
+				if ($this->hasInput('with_hosts')) {
+					$options['with_hosts'] = true;
+				}
+
 				if ($this->hasInput('with_items')) {
 					$options['with_items'] = true;
 				}
@@ -1382,6 +1388,10 @@ class CControllerPopupGeneric extends CController {
 
 				if ($this->hasInput('with_items')) {
 					$options['with_items'] = true;
+				}
+
+				if ($this->hasInput('with_templates')) {
+					$options['with_templates'] = true;
 				}
 
 				$records = API::TemplateGroup()->get($options);
