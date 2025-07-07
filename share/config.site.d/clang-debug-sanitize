@@ -46,6 +46,7 @@ then
 	# flags for clang sanitizers
 	CFLAGS+=" -fsanitize=leak,address,undefined"
 	CFLAGS+=" -fsanitize-address-use-after-scope"
+	CFLAGS+=" -fno-omit-frame-pointer"
 fi
 
 
@@ -53,4 +54,5 @@ if [ -z "$LDFLAGS" ]
 then
 	LDFLAGS="-fsanitize=leak,address,undefined"
 	LDFLAGS+=" -fsanitize-address-use-after-scope"
+	LDFLAGS+=" -fno-omit-frame-pointer"
 fi
