@@ -838,48 +838,45 @@ int	zbx_db_connect_basic(const zbx_config_dbhigh_t *cfg)
 
 	zbx_db_free_result(result);
 
-	if (0 == cfg->read_only_recoverable)
+	result = zbx_db_select_basic("show default_transaction_read_only");
+
+	if ((zbx_db_result_t)ZBX_DB_DOWN == result || NULL == result)
 	{
-		result = zbx_db_select_basic("show default_transaction_read_only");
-
-		if ((zbx_db_result_t)ZBX_DB_DOWN == result || NULL == result)
-		{
-			ret = (NULL == result) ? ZBX_DB_FAIL : ZBX_DB_DOWN;
-			goto out;
-		}
-
-		if (NULL != (row = zbx_db_fetch_basic(result)))
-		{
-			if (0 == strcmp(row[0], "on"))
-			{
-				zbx_db_free_result(result);
-				ret = ZBX_DB_RONLY;
-				goto out;
-			}
-		}
-
-		zbx_db_free_result(result);
-
-		result = zbx_db_select_basic("select pg_is_in_recovery();");
-
-		if ((zbx_db_result_t)ZBX_DB_DOWN == result || NULL == result)
-		{
-			ret = (NULL == result) ? ZBX_DB_FAIL : ZBX_DB_DOWN;
-			goto out;
-		}
-
-		if (NULL != (row = zbx_db_fetch_basic(result)))
-		{
-			if (0 == strcmp(row[0], "t"))
-			{
-				zbx_db_free_result(result);
-				ret = ZBX_DB_RONLY;
-				goto out;
-			}
-		}
-
-		zbx_db_free_result(result);
+		ret = (NULL == result) ? ZBX_DB_FAIL : ZBX_DB_DOWN;
+		goto out;
 	}
+
+	if (NULL != (row = zbx_db_fetch_basic(result)))
+	{
+		if (0 == strcmp(row[0], "on"))
+		{
+			zbx_db_free_result(result);
+			ret = ZBX_DB_RONLY;
+			goto out;
+		}
+	}
+
+	zbx_db_free_result(result);
+
+	result = zbx_db_select_basic("select pg_is_in_recovery();");
+
+	if ((zbx_db_result_t)ZBX_DB_DOWN == result || NULL == result)
+	{
+		ret = (NULL == result) ? ZBX_DB_FAIL : ZBX_DB_DOWN;
+		goto out;
+	}
+
+	if (NULL != (row = zbx_db_fetch_basic(result)))
+	{
+		if (0 == strcmp(row[0], "t"))
+		{
+			zbx_db_free_result(result);
+			ret = ZBX_DB_RONLY;
+			goto out;
+		}
+	}
+
+	zbx_db_free_result(result);
 
 	if (90000 <= ZBX_PG_SVERSION)
 	{
