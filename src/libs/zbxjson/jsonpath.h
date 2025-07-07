@@ -71,7 +71,7 @@ typedef struct zbx_jsonpath_list_item
 	struct zbx_jsonpath_list_item	*next;
 	/* the structure is always over-allocated so that either int */
 	/* or a zero terminated string can be stored in data         */
-	char				data[];
+	char				data[1];
 }
 zbx_jsonpath_list_node_t;
 
