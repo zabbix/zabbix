@@ -1513,7 +1513,7 @@ class testFormMapProperties extends CWebTest {
 						[
 							'action' => USER_ACTION_ADD,
 							'Name' => '012345',
-							'URL' => 'test',
+							'URL' => 'test'
 						],
 						[
 							'action' => USER_ACTION_ADD,
