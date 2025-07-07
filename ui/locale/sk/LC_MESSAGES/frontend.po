@@ -4,7 +4,7 @@ msgstr ""
 "Project-Id-Version: Zabbix 6.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2023-10-19 13:48+0300\n"
-"PO-Revision-Date: 2025-06-03 10:57+0000\n"
+"PO-Revision-Date: 2025-06-19 07:06+0000\n"
 "Last-Translator: Tomáš Heřmánek <tomas.hermanek@initmax.cz>\n"
 "Language-Team: Zabbix translation team\n"
 "Language: sk\n"
@@ -63,6 +63,10 @@ msgstr "\"%1$s\" musí byť prázdny reťazec alebo musí byť väčší ako \"%
 #: include/classes/import/validators/C10XmlValidator.php:404
 msgid "\"host:key\" pair is expected"
 msgstr "\"host:key\" dvojica je očakávaná"
+
+#: app/views/host.wizard.edit.php:1024
+msgid "#{section_name}"
+msgstr "#{názov_sekcie}"
 
 #: include/forms.inc.php:1330
 #: include/views/configuration.host.discovery.edit.php:932
@@ -2257,6 +2261,10 @@ msgstr "Dole"
 #: widgets/tophosts/includes/WidgetForm.php:146
 msgid "Bottom N"
 msgstr "Spodné N"
+
+#: app/views/host.wizard.edit.php:429
+msgid "Brackets to specify IPv6 addresses"
+msgstr "Zátvorky na určenie IPv6 adries"
 
 #: jsLoader.php:266
 msgid "Bring forward"
@@ -5148,6 +5156,10 @@ msgstr "Zavrieť"
 msgid "Collapse sidebar"
 msgstr "Zbaliť bočný panel"
 
+#: app/views/host.wizard.edit.php:426
+msgid "Colon to separate IP/DNS address from port"
+msgstr "Dvojbodka na oddelenie IP/DNS adresy od portu"
+
 #: include/views/configuration.graph.edit.php:398
 #: include/views/js/monitoring.sysmaps.js.php:383
 #: include/views/js/monitoring.sysmaps.js.php:404
@@ -5201,6 +5213,10 @@ msgstr "Kombinovaný výsledok"
 msgid "Comma separated center coordinates and zoom level to display when the widget is initially loaded."
 msgstr "Stredové súradnice oddelené čiarkami a úroveň priblíženia sa zobrazia pri prvom načítaní widgetu."
 
+#: app/views/host.wizard.edit.php:427
+msgid "Comma to separate multiple Zabbix servers, proxies, or clusters"
+msgstr "Čiarka na oddelenie viacerých serverov, proxy alebo klastrov Zabbix"
+
 #: app/views/administration.script.edit.php:199
 #: app/views/reports.actionlog.list.csv.php:45
 #: app/views/reports.actionlog.list.php:140 include/actions.inc.php:1864
@@ -5222,7 +5238,7 @@ msgstr "Komunikácia medzi agentom Zabbix a serverom/proxy je zabezpečená jedi
 
 #: app/views/host.wizard.edit.php:414
 msgid "Communication between Zabbix agent and server/proxy is secured with the pre-shared key (PSK) encryption method."
-msgstr ""
+msgstr "Komunikácia medzi agentom Zabbix a serverom/proxy je zabezpečená metódou šifrovania s predzdieľaným kľúčom (PSK)."
 
 #: include/items.inc.php:946
 msgctxt "SNMP Community"
@@ -6267,7 +6283,7 @@ msgstr "Vlastná veľkosť"
 
 #: app/views/host.wizard.edit.php:138
 msgid "Custom templates are not supported."
-msgstr ""
+msgstr "Vlastné šablóny nie sú podporované."
 
 #: app/views/administration.miscconfig.edit.php:103
 #: include/classes/setup/CSetupWizard.php:561
@@ -6440,7 +6456,7 @@ msgstr "Údaje z %1$s. Vygenerované za %2$s sek."
 
 #: app/views/host.wizard.edit.php:168
 msgid "Data is collected by Zabbix agent, a lightweight software `component installed on your monitoring target."
-msgstr ""
+msgstr "Dáta zhromažďuje agent Zabbix, ľahký softvérový komponent nainštalovaný na vašom monitorovacom cieli."
 
 #: app/views/js/host.wizard.edit.js.php:89
 msgid "Data is collected by Zabbix agent, a lightweight software component installed on your monitoring target."
@@ -8659,6 +8675,10 @@ msgstr "Zadajte IP/DNS adresu a port vášho monitorovacieho cieľa s povoleným
 msgid "Enter the IP/DNS address and port of your JMX-enabled monitoring target."
 msgstr "Zadajte IP/DNS adresu a port vášho monitorovacieho cieľa s povoleným JMX."
 
+#: app/views/host.wizard.edit.php:412
+msgid "Enter the IP/DNS address and port of your Zabbix server, proxy, or cluster configuration."
+msgstr "Zadajte IP/DNS adresu a port vášho Zabbix servera, proxy servera alebo konfigurácie klastra."
+
 #: app/views/host.wizard.edit.php:642
 msgid "Enter the IP/DNS address, port, and authentication details of your SNMP-enabled monitoring target."
 msgstr "Zadajte IP/DNS adresu, port a overovacie údaje vášho cieľa monitorovania s povoleným protokolom SNMP."
@@ -8866,6 +8886,10 @@ msgstr "Každý týždeň(e)"
 #: app/views/administration.geomaps.edit.php:33
 msgid "Example"
 msgstr "Príklad"
+
+#: app/views/host.wizard.edit.php:417
+msgid "Example:"
+msgstr "Príklad:"
 
 #: app/views/administration.miscconfig.edit.php:38
 msgid "Example: https://localhost/zabbix/ui/"
@@ -12179,7 +12203,7 @@ msgstr "Nainštalujte si Zabbix agenta 2 a jeho pluginy na váš monitorovací c
 
 #: app/views/host.wizard.edit.php:551 app/views/host.wizard.edit.php:574
 msgid "Install Zabbix agent and its plugins on your monitoring target by following the installation instructions below."
-msgstr ""
+msgstr "Nainštalujte agenta Zabbix a jeho pluginy na váš monitorovací cieľ podľa pokynov na inštaláciu uvedených nižšie."
 
 #: setup.php:163
 msgid "Installation"
@@ -19772,7 +19796,7 @@ msgstr "Bezpečnostné meno"
 
 #: app/views/host.wizard.edit.php:132
 msgid "See"
-msgstr ""
+msgstr "Pozri"
 
 #: app/views/popup.condition.edit.php:402 app/views/popup.generic.php:874
 #: app/views/popup.massupdate.item.php:440 app/views/popup.services.php:92
@@ -19842,6 +19866,10 @@ msgstr "Vybraté, %1$s na pozícii %2$d z %3$d"
 msgctxt "screen reader"
 msgid "Selected, %1$s, read only, in position %2$d of %3$d"
 msgstr "Vybraté, %1$s, len na čítanie, na pozícii %2$d z %3$d"
+
+#: app/views/host.wizard.edit.php:428
+msgid "Semicolon to separate clusters (one or more server addresses)"
+msgstr "Bodkočiarka na oddelenie klastrov (jedna alebo viac adries serverov)"
 
 #: jsLoader.php:267
 msgid "Send backward"
@@ -20676,7 +20704,7 @@ msgstr "Niektoré šablóny (%1$s) sú skryté. Vlastné šablóny nie sú podpo
 #: app/views/host.wizard.edit.php:130
 #, c-format
 msgid "Some templates (%1$s) are incompatible with the Host Wizard."
-msgstr ""
+msgstr "Niektoré šablóny (%1$s) nie sú kompatibilné so Sprievodcom pridávania hostov."
 
 #: widgets/actionlog/includes/WidgetForm.php:79
 #: widgets/problems/includes/WidgetForm.php:145
@@ -20735,7 +20763,7 @@ msgstr "Špecifikujte podmienky vyhľadávania pre zobrazenie hodnôt."
 
 #: app/views/host.wizard.edit.php:365
 msgid "Specifying new or existing host groups will add the host to these groups without removing it from any current groups."
-msgstr ""
+msgstr "Zadaním nových alebo existujúcich skupín hostov sa host pridá do týchto skupín, bez jeho odstránenia z akýchkoľvek aktuálnych skupín."
 
 #: httpdetails.php:107 include/classes/screens/CScreenHttpTestDetails.php:82
 msgid "Speed"
@@ -21998,7 +22026,7 @@ msgstr[2] "Nie je možné odstrániť túto položku, pretože sa používa ako 
 
 #: app/views/host.wizard.edit.php:384
 msgid "This configuration will overwrite all existing encryption settings on the host."
-msgstr ""
+msgstr "Táto konfigurácia prepíše všetky existujúce nastavenia šifrovania na hostovi."
 
 #: include/func.inc.php:2566
 msgid "This day last week"
@@ -23679,6 +23707,10 @@ msgstr "Použite monospace písmo"
 msgid "Use the filter to display results"
 msgstr "Na zobrazenie výsledkov použite filter"
 
+#: app/views/host.wizard.edit.php:424
+msgid "Use:"
+msgstr "Použitie:"
+
 #: app/views/administration.script.list.php:93 app/views/mediatype.list.php:98
 msgid "Used in actions"
 msgstr "Používané v akciách"
@@ -24758,6 +24790,10 @@ msgstr "Rozvláčny"
 msgid "Verification code"
 msgstr "Overovací kód"
 
+#: app/views/host.wizard.edit.php:407
+msgid "Verify Zabbix server, proxy, or cluster address"
+msgstr "Over adresu servera, proxy alebo klastra Zabbix"
+
 #: include/classes/setup/CSetupWizard.php:655
 msgid "Verify database certificate"
 msgstr "Overte certifikát databázy"
@@ -25482,6 +25518,10 @@ msgstr "Agent Zabbix (pasívne kontroly)"
 #: app/views/js/host.wizard.edit.js.php:91
 msgid "Zabbix agent initiates connections to Zabbix server or proxy to send data. Recommended for monitoring targets behind a firewall."
 msgstr "Agent Zabbix iniciuje pripojenia k serveru Zabbix alebo proxy serveru na odosielanie údajov. Odporúča sa na monitorovanie cieľov za firewallom."
+
+#: app/views/host.wizard.edit.php:422
+msgid "Zabbix agent must be able to connect to the specified address or list of addresses."
+msgstr "Agent Zabbix sa musí byť schopný pripojiť k zadanej adrese alebo zoznamu adries."
 
 #: app/views/host.wizard.edit.php:863
 msgid "Zabbix documentation"
@@ -26698,7 +26738,7 @@ msgstr "očakáva sa ID host spúšťača"
 
 #: app/views/host.wizard.edit.php:134
 msgid "how to update them"
-msgstr ""
+msgstr "ako ich aktualizovať"
 
 #: include/classes/api/services/CMap.php:844
 #: include/classes/api/services/CMap.php:1311
@@ -27066,7 +27106,7 @@ msgstr "d-m H:i"
 
 #: app/views/host.wizard.edit.php:589
 msgid "macOS"
-msgstr ""
+msgstr "macOS"
 
 #: include/classes/parsers/CUserMacroParser.php:37
 msgid "macro is empty"

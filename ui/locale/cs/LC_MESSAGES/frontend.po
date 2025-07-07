@@ -4,8 +4,8 @@ msgstr ""
 "Project-Id-Version: Zabbix 6.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2023-10-19 13:48+0300\n"
-"PO-Revision-Date: 2025-05-12 08:11+0000\n"
-"Last-Translator: Tomáš Heřmánek <tomas.hermanek@initmax.cz>\n"
+"PO-Revision-Date: 2025-06-26 08:06+0000\n"
+"Last-Translator: Tomáš Skočdopole <tomas.skocdopole@initmax.cz>\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
 "Language: cs\n"
 "MIME-Version: 1.0\n"
@@ -19,7 +19,7 @@ msgstr ""
 #: include/classes/validators/CFormValidator.php:1397
 #: include/classes/validators/CFormValidator.php:1442 jsLoader.php:439
 msgid " or "
-msgstr ""
+msgstr "nebo"
 
 #: app/controllers/CControllerSlaReportList.php:182
 #, c-format
@@ -62,6 +62,10 @@ msgstr "\"%1$s\" musí být prázdný text nebo vyšší než \"%2$s\"."
 #: include/classes/import/validators/C10XmlValidator.php:404
 msgid "\"host:key\" pair is expected"
 msgstr "\"host:key\" dvojice je očekávaná"
+
+#: app/views/host.wizard.edit.php:1024
+msgid "#{section_name}"
+msgstr "#{název_sekce}"
 
 #: include/forms.inc.php:1330
 #: include/views/configuration.host.discovery.edit.php:932
@@ -392,7 +396,7 @@ msgstr "1 minuta"
 
 #: app/views/host.wizard.edit.php:861
 msgid "1. Install Java Gateway on the same machine running Zabbix server by following the instructions in"
-msgstr ""
+msgstr "1. Nainstalujte Java Gateway na stejný počítač se serverem Zabbix podle pokynů v"
 
 #: app/views/administration.queue.overview.php:48
 #: app/views/administration.queue.overview.proxy.php:48
@@ -406,7 +410,7 @@ msgstr "12-hodin"
 
 #: app/views/host.wizard.edit.php:867
 msgid "2. Configure your Java application to support remote JMX monitoring. For example:"
-msgstr ""
+msgstr "2. Nakonfigurujte svou aplikaci Java tak, aby podporovala vzdálené monitorování JMX. Například:"
 
 #: tests/selenium/modules/clock32/includes/WidgetForm.php:115
 #: widgets/clock/includes/WidgetForm.php:115
@@ -471,17 +475,17 @@ msgstr "A"
 
 #: app/views/js/host.wizard.edit.js.php:1143
 msgid "A few more steps"
-msgstr ""
+msgstr "Ještě pár kroků"
 
 #: include/classes/helpers/CItemGeneralHelper.php:356
 #: include/classes/helpers/CItemGeneralHelper.php:399
 #: include/classes/helpers/CItemGeneralHelper.php:407
 msgid "A floating point value is expected."
-msgstr ""
+msgstr "Očekává se hodnota s plovoucí desetinnou čárkou."
 
 #: app/views/host.wizard.edit.php:139
 msgid "A template is a set of predefined configurations (metrics to be collected, conditions for generating alerts, etc.) designed for your monitoring target."
-msgstr ""
+msgstr "Šablona je sada předdefinovaných konfigurací (shromažďované metriky, podmínky pro generování upozornění atd.) určených pro váš cíl monitorování."
 
 #: widgets/svggraph/includes/CWidgetFieldOverrideView.php:199
 msgid "ADD OVERRIDE"
@@ -1039,7 +1043,7 @@ msgstr "Přidat hostitele"
 
 #: app/views/host.wizard.edit.php:571 app/views/js/host.wizard.edit.js.php:1133
 msgid "Add host interface"
-msgstr ""
+msgstr "Přidat rozhraní hosta"
 
 #: include/actions.inc.php:653 include/actions.inc.php:871
 msgid "Add host tags"
@@ -1159,7 +1163,7 @@ msgstr "Další pravidla"
 
 #: app/views/host.wizard.edit.php:521 app/views/host.wizard.edit.php:544
 msgid "Additionally, make sure to complete the agent installation as described in this step, then return to this screen to continue to the next step."
-msgstr ""
+msgstr "Dále se ujistěte, že jste dokončili instalaci agenta, jak je popsáno v tomto kroku, a poté se vraťte na tuto obrazovku a pokračujte k dalšímu kroku."
 
 #: app/controllers/CControllerProxyCreate.php:82
 #: app/controllers/CControllerProxyUpdate.php:76
@@ -1241,7 +1245,7 @@ msgstr "Agent (pasivní)"
 
 #: app/views/host.wizard.edit.php:597
 msgid "Agent address"
-msgstr ""
+msgstr "Adresa agenta"
 
 #: include/classes/data/CItemData.php:911
 msgid "Agent availability check. Returns nothing - unavailable; 1 - available"
@@ -1261,7 +1265,7 @@ msgstr "Jméno hosta. Vrátí řetězec"
 
 #: app/views/js/host.wizard.edit.js.php:96
 msgid "Agent interface"
-msgstr ""
+msgstr "Rozhraní agenta"
 
 #: include/views/inventory.host.view.php:64
 msgid "Agent interfaces"
@@ -1269,11 +1273,11 @@ msgstr "Rozhraní agenta"
 
 #: app/views/host.wizard.edit.php:163 app/views/js/host.wizard.edit.js.php:1788
 msgid "Agent mode"
-msgstr ""
+msgstr "Režim agenta"
 
 #: app/views/host.wizard.edit.php:603
 msgid "Agent port"
-msgstr ""
+msgstr "Port agenta"
 
 #: include/classes/data/CItemData.php:919
 msgid "Agent variant check. Returns 1 - for Zabbix agent; 2 - for Zabbix agent 2"
@@ -1281,11 +1285,11 @@ msgstr "Kontrola varianty agenta. Vrací 1 - pro Zabbix agenta; 2 - pro Zabbix a
 
 #: app/views/host.wizard.edit.php:158 app/views/js/host.wizard.edit.js.php:1781
 msgid "Agent-based"
-msgstr ""
+msgstr "Založený na agentovi"
 
 #: app/views/host.wizard.edit.php:159 app/views/js/host.wizard.edit.js.php:1782
 msgid "Agentless"
-msgstr ""
+msgstr "Bez agenta"
 
 #: widgets/svggraph/includes/CWidgetFieldDataSetView.php:417
 msgid "Aggregate"
@@ -1477,12 +1481,12 @@ msgstr "Množství fyzické paměti hostitele spotřebované pro zálohování s
 #: include/classes/api/services/CItemGeneral.php:1913
 #, c-format
 msgid "An LLD rule prototype with key \"%1$s\" already exists on the host \"%2$s\"."
-msgstr ""
+msgstr "Prototyp pravidla LLD s klíčem \"%1$s\" již na hostovi \"%2$s\" existuje."
 
 #: include/classes/api/services/CItemGeneral.php:1912
 #, c-format
 msgid "An LLD rule prototype with key \"%1$s\" already exists on the template \"%2$s\"."
-msgstr ""
+msgstr "Prototyp pravidla LLD s klíčem \"%1$s\" již v šabloně \"%2$s\" existuje."
 
 #: include/classes/api/services/CItemGeneral.php:1781
 #, c-format
@@ -1498,7 +1502,7 @@ msgstr "Pravidlo LLD s klíčem \"%1$s\" již v šabloně \"%2$s\" existuje."
 #: include/classes/validators/CFormValidator.php:1103
 #: include/classes/validators/CFormValidator.php:1150 jsLoader.php:419
 msgid "An array is expected."
-msgstr ""
+msgstr "Očekává se pole."
 
 #: include/classes/api/services/CItemGeneral.php:1775
 #, c-format
@@ -1608,7 +1612,7 @@ msgstr "Všechny existující entity šablon, které se nejsou zahrnuty v import
 
 #: app/views/host.wizard.edit.php:148
 msgid "Apache, AWS, MySQL, etc."
-msgstr ""
+msgstr "Apache, AWS, MySQL atd."
 
 #: include/classes/core/CJsonRpc.php:225
 msgid "Application error."
@@ -1779,7 +1783,7 @@ msgstr "Minimálně jedna skupina hostů musí být vybrána."
 
 #: include/classes/helpers/CItemGeneralHelper.php:411
 msgid "At least one of \"min\" or \"max\" parameters should be specified."
-msgstr ""
+msgstr "Měl by být zadán alespoň jeden z parametrů \"min\" nebo \"max\"."
 
 #: include/classes/setup/CFrontendSetup.php:252
 msgid "At least one of MySQL or PostgreSQL should be supported."
@@ -1934,23 +1938,23 @@ msgstr "Autentizace"
 
 #: app/views/oauth.edit.php:167 app/views/oauth.edit.php:182
 msgid "Authorization code"
-msgstr ""
+msgstr "Autorizační kód"
 
 #: app/views/oauth.edit.php:136
 msgid "Authorization endpoint"
-msgstr ""
+msgstr "Koncový bod autorizace"
 
 #: app/views/oauth.edit.php:148
 msgid "Authorization parameters"
-msgstr ""
+msgstr "Autorizační parametry"
 
 #: app/views/oauth.edit.php:137
 msgid "Authorization server URL for requesting user authorization."
-msgstr ""
+msgstr "URL autorizačního serveru pro vyžádání autorizace uživatele."
 
 #: app/views/oauth.edit.php:189
 msgid "Authorization server URL to exchange the authorization code for an access token."
-msgstr ""
+msgstr "URL autorizačního serveru pro výměnu autorizačního kódu za přístupový token."
 
 #: widgets/piechart/includes/WidgetForm.php:154
 #: widgets/tophosts/views/column.edit.php:204
@@ -2257,6 +2261,10 @@ msgstr "Dole"
 msgid "Bottom N"
 msgstr "Spodní N"
 
+#: app/views/host.wizard.edit.php:429
+msgid "Brackets to specify IPv6 addresses"
+msgstr "Závorky pro určení adres IPv6"
+
 #: jsLoader.php:266
 msgid "Bring forward"
 msgstr "Předložit"
@@ -2358,7 +2366,7 @@ msgstr "Očekává se CUID"
 
 #: app/controllers/CControllerOauthAuthorize.php:135
 msgid "CURL Error"
-msgstr ""
+msgstr "Chyba CURL"
 
 #: include/items.inc.php:100 include/views/configuration.graph.edit.php:180
 #: include/views/configuration.graph.edit.php:275
@@ -2415,7 +2423,7 @@ msgstr "Zrušit"
 
 #: app/views/host.wizard.edit.php:1042
 msgid "Cancel Host Wizard?"
-msgstr ""
+msgstr "Zrušit Průvodce hostem?"
 
 #: app/controllers/CControllerTokenCreate.php:65
 #: app/controllers/CControllerTokenCreate.php:135
@@ -2446,7 +2454,7 @@ msgstr "Nelze přidat stránku dashboard panelu: byl přidán maximální počet
 
 #: host_discovery_prototypes.php:518
 msgid "Cannot add discovery prototype"
-msgstr ""
+msgstr "Nelze přidat prototyp objevování"
 
 #: host_discovery.php:540
 msgid "Cannot add discovery rule"
@@ -2607,7 +2615,7 @@ msgstr "Nelže přiřadit pole inventáře \"%1$s\" k itemu s klíčem \"%2$s\" 
 #: app/controllers/CControllerItem.php:206
 #: app/controllers/CControllerItemPrototype.php:208
 msgid "Cannot be less than or equal to \"Min\"."
-msgstr ""
+msgstr "Nemůže být menší nebo rovno \"Min\"."
 
 #: jsLoader.php:336
 msgctxt "screen reader"
@@ -2666,17 +2674,17 @@ msgstr "Nelze převést POST data:"
 #: include/classes/helpers/CItemGeneralHelper.php:1016
 #, c-format
 msgid "Cannot copy LLD rule prototype with key \"%1$s\" without its master item prototype with key \"%2$s\"."
-msgstr ""
+msgstr "Nelze kopírovat prototyp pravidla LLD s klíčem \"%1$s\" bez jeho hlavního prototypu itemu s klíčem \"%2$s\"."
 
 #: include/classes/helpers/CItemGeneralHelper.php:1004
 #, c-format
 msgid "Cannot copy LLD rule prototype with key \"%1$s\" without its master item with key \"%2$s\"."
-msgstr ""
+msgstr "Nelze kopírovat prototyp pravidla LLD s klíčem \"%1$s\" bez jeho hlavního itemu s klíčem \"%2$s\"."
 
 #: include/classes/helpers/CItemGeneralHelper.php:1003
 #, c-format
 msgid "Cannot copy LLD rule with key \"%1$s\" without its master item with key \"%2$s\"."
-msgstr ""
+msgstr "Nelze zkopírovat LLD pravidlo s klíčem \"%1$s\" bez jeho hlavního itemu s klíčem \"%2$s\"."
 
 #: app/controllers/CControllerCopyCreate.php:183
 msgid "Cannot copy graph"
@@ -2893,9 +2901,9 @@ msgstr "Nelze odstranit kontrolu objevováni „%1$s“ v pravidle objevováni \
 #: host_discovery_prototypes.php:313 host_discovery_prototypes.php:605
 msgid "Cannot delete discovery prototype"
 msgid_plural "Cannot delete discovery prototypes"
-msgstr[0] ""
-msgstr[1] ""
-msgstr[2] ""
+msgstr[0] "Nelze smazat prototyp objevování"
+msgstr[1] "Nelze smazat prototypy objevování"
+msgstr[2] "Nelze smazat prototypy objevování"
 
 #: app/controllers/CControllerDiscoveryDelete.php:68 host_discovery.php:390
 #: host_discovery.php:597
@@ -3253,9 +3261,9 @@ msgstr[2] "Nelze zakázat konektory"
 #: host_discovery_prototypes.php:586
 msgid "Cannot disable discovery prototype"
 msgid_plural "Cannot disable discovery prototypes"
-msgstr[0] ""
-msgstr[1] ""
-msgstr[2] ""
+msgstr[0] "Nelze zakázat prototyp objevování"
+msgstr[1] "Nelze zakázat prototypy objevování"
+msgstr[2] "Nelze zakázat prototypy objevování"
 
 #: app/controllers/CControllerDiscoveryDisable.php:76 host_discovery.php:584
 msgid "Cannot disable discovery rule"
@@ -3363,9 +3371,9 @@ msgstr[2] "Nelze povolit konektory"
 #: host_discovery_prototypes.php:585
 msgid "Cannot enable discovery prototype"
 msgid_plural "Cannot enable discovery prototypes"
-msgstr[0] ""
-msgstr[1] ""
-msgstr[2] ""
+msgstr[0] "Nelze povolit prototyp zjišťování"
+msgstr[1] "Nelze povolit prototypy zjišťování"
+msgstr[2] "Nelze povolit prototypy zjišťování"
 
 #: app/controllers/CControllerDiscoveryEnable.php:76 host_discovery.php:583
 msgid "Cannot enable discovery rule"
@@ -3456,7 +3464,7 @@ msgstr "Nelze rozšířit makra."
 #: include/classes/import/CConfigurationImport.php:1159
 #, c-format
 msgid "Cannot find \"parent_discovery_rule\" with key \"%1$s\" used for LLD rule prototype with key \"%2$s\" on \"%3$s\"."
-msgstr ""
+msgstr "Nelze najít „parent_discovery_rule“ s klíčem \"%1$s\" použitý pro prototyp pravidla LLD s klíčem \"%2$s\" na \"%3$s\"."
 
 #: include/classes/import/importers/CTemplateDashboardImporter.php:217
 #, c-format
@@ -3501,7 +3509,7 @@ msgstr "Nelze najít skupinu \"%1$s\" pro prototyp hosta \"%2$s\" zjišťovacíh
 #: include/classes/import/CConfigurationImport.php:1326
 #, c-format
 msgid "Cannot find host group \"%1$s\" for host prototype \"%2$s\" of discovery rule prototype \"%3$s\" on \"%4$s\"."
-msgstr ""
+msgstr "Nelze najít skupinu hostů \"%1$s\" pro prototyp hosta \"%2$s\" z prototypu pravidla objevování \"%3$s\" na \"%4$s\"."
 
 #: include/classes/api/services/CDiscoveryRule.php:3350
 #, c-format
@@ -3546,7 +3554,7 @@ msgstr "Nelze najít rozhraní \"%1$s\" použité pro prototyp položky \"%2$s\"
 #: include/classes/import/CConfigurationImport.php:1220
 #, c-format
 msgid "Cannot find interface \"%1$s\" used for item prototype \"%2$s\" of discovery rule prototype \"%3$s\" on \"%4$s\"."
-msgstr ""
+msgstr "Nelze najít rozhraní \"%1$s\" použité pro prototyp itemu \"%2$s\" z pravidla prototypu objevování \"%3$s\" na \"%4$s\"."
 
 #: include/classes/import/CConfigurationImport.php:1852
 #, c-format
@@ -3561,7 +3569,7 @@ msgstr "Nejde nalézt položku \"%1$s\" na \"%2$s\" použitou jako maximální h
 #: include/classes/import/CConfigurationImport.php:1515
 #, c-format
 msgid "Cannot find item \"%1$s\" on \"%2$s\" used as the Y axis MAX value for graph prototype \"%3$s\" of discovery rule prototype \"%4$s\" on \"%5$s\"."
-msgstr ""
+msgstr "Nelze najít item \"%1$s\" na \"%2$s\" použitý pro MAX hodnotu osy Y pro prototyp grafu \"%3$s\" prototypu pravidla objevování \"%4$s\" na \"%5$s\"."
 
 #: include/classes/import/CConfigurationImport.php:1834
 #, c-format
@@ -3576,7 +3584,7 @@ msgstr "Nejde nalézt položku \"%1$s\" na \"%2$s\" použitou jako minimální h
 #: include/classes/import/CConfigurationImport.php:1490
 #, c-format
 msgid "Cannot find item \"%1$s\" on \"%2$s\" used as the Y axis MIN value for graph prototype \"%3$s\" of discovery rule prototype \"%4$s\" on \"%5$s\"."
-msgstr ""
+msgstr "Nelze najít item \"%1$s\" na \"%2$s\" použitou pro MIN hodnotu osy Y pro prototyp grafu \"%3$s\" k prototypu pravidla objevení \"%4$s\" na \"%5$s\"."
 
 #: include/classes/import/importers/CMapImporter.php:244
 #, c-format
@@ -3596,7 +3604,7 @@ msgstr "Nemohu nalézt položku \"%1$s\" na \"%2$s\" použitou v prototypu grafu
 #: include/classes/import/CConfigurationImport.php:1540
 #, c-format
 msgid "Cannot find item \"%1$s\" on \"%2$s\" used in graph prototype \"%3$s\" of discovery rule prototype \"%4$s\" on \"%5$s\"."
-msgstr ""
+msgstr "Nelze najít item \"%1$s\" na \"%2$s\" použitou v prototypu grafu \"%3$s\" prototypu pravidla objevení \"%4$s\" na \"%5$s\"."
 
 #: include/classes/import/importers/CTemplateDashboardImporter.php:166
 #, c-format
@@ -3631,7 +3639,7 @@ msgstr "Nelze nalézt šablonu \"%1$s\" pro prototyp hosta \"%2$s\" objevovacíh
 #: include/classes/import/CConfigurationImport.php:1353
 #, c-format
 msgid "Cannot find template \"%1$s\" for host prototype \"%2$s\" of discovery rule prototype \"%3$s\" on \"%4$s\"."
-msgstr ""
+msgstr "Nelze najít šablonu \"%1$s\" pro prototyp hosta \"%2$s\" prototypu pravidla objevení \"%3$s\" na \"%4$s\"."
 
 #: include/classes/import/CConfigurationImport.php:1182
 #, c-format
@@ -3666,11 +3674,11 @@ msgstr "Nelze nalézt mapu hodnot \"%1$s\" použitou pro prototyp položky \"%2$
 #: include/classes/import/CConfigurationImport.php:1243
 #, c-format
 msgid "Cannot find value map \"%1$s\" used for item prototype \"%2$s\" of discovery rule prototype \"%3$s\" on \"%4$s\"."
-msgstr ""
+msgstr "Nelze najít mapu hodnot \"%1$s\" použitou pro prototyp itemu \"%2$s\" prototypu pravidla vyhledávání \"%3$s\" na \"%4$s\"."
 
 #: app/views/oauth.edit.php:230
 msgid "Cannot get authorization code."
-msgstr ""
+msgstr "Nelze získat autorizační kód."
 
 #: include/classes/api/services/CRole.php:583
 #: include/classes/api/services/CRole.php:600
@@ -3708,17 +3716,17 @@ msgstr "Nelze zdědit LLD pravidla s klíčem \"%1$s\" z obou šablon \"%2$s\" a
 #: include/classes/api/services/CItemGeneral.php:1000
 #, c-format
 msgid "Cannot inherit LLD rule prototype with key \"%1$s\" of template \"%2$s\" and LLD rule \"%3$s\" to host \"%4$s\", because an LLD rule prototype with the same key already belongs to LLD rule \"%5$s\"."
-msgstr ""
+msgstr "Nelze zdědit prototyp pravidla LLD s klíčem \"%1$s\" ze šablony \"%2$s\" a pravidlo LLD \"%3$s\" pro hosta \"%4$s\", protože prototyp pravidla LLD se stejným klíčem již patří k pravidlu LLD \"%5$s\"."
 
 #: include/classes/api/services/CItemGeneral.php:1001
 #, c-format
 msgid "Cannot inherit LLD rule prototype with key \"%1$s\" of template \"%2$s\" and LLD rule \"%3$s\" to template \"%4$s\", because an LLD rule prototype with the same key already belongs to LLD rule \"%5$s\"."
-msgstr ""
+msgstr "Nelze zdědit prototyp pravidla LLD s klíčem \"%1$s\" ze šablony \"%2$s\" a pravidlo LLD \"%3$s\" pro šablonu \"%4$s\", protože prototyp pravidla LLD se stejným klíčem již patří k pravidlu LLD \"%5$s\"."
 
 #: include/classes/api/services/CItemGeneral.php:926
 #, c-format
 msgid "Cannot inherit LLD rule prototype with key \"%1$s\" of template \"%2$s\" to host \"%3$s\", because a discovered LLD rule prototype with the same key already exists."
-msgstr ""
+msgstr "Nelze zdědit prototyp pravidla LLD s klíčem \"%1$s\" ze šablony \"%2$s\" pro hosta \"%3$s\", protože již existuje nalezený prototyp pravidla LLD se stejným klíčem."
 
 #: include/classes/api/services/CItemGeneral.php:1358
 #, c-format
@@ -3978,7 +3986,7 @@ msgstr "Nelze zdědit item s klíčem \"%1$s\" ze šablony \"%2$s\" na šablonu 
 #: include/classes/api/services/CItemGeneral.php:842
 #, c-format
 msgid "Cannot inherit item with key \"%1$s\" of template \"%2$s\" to template \"%3$s\", because an LLD rule prototype with the same key already exists."
-msgstr ""
+msgstr "Nelze zdědit item s klíčem \"%1$s\" ze šablony \"%2$s\" na šablonu \"%3$s\", protože prototyp pravidla LLD se stejným klíčem již existuje."
 
 #: include/classes/api/services/CItemGeneral.php:786
 #, c-format
@@ -4152,7 +4160,7 @@ msgstr "Nelze otevřít URL"
 
 #: app/views/oauth.edit.php:229
 msgid "Cannot open authorization popup window."
-msgstr ""
+msgstr "Nelze otevřít popup okno pro autorizaci."
 
 #: include/classes/api/services/CHostBase.php:1561
 #, c-format
@@ -4480,7 +4488,7 @@ msgstr "Nelze aktualizovat konektor"
 
 #: host_discovery_prototypes.php:526 host_discovery_prototypes.php:550
 msgid "Cannot update discovery prototype"
-msgstr ""
+msgstr "Nelze aktualizovat prototyp objevování"
 
 #: app/controllers/CControllerDiscoveryUpdate.php:48
 #: app/controllers/CControllerDiscoveryUpdate.php:96 host_discovery.php:548
@@ -4822,7 +4830,7 @@ msgstr "Změna za sekundu"
 
 #: app/views/host.wizard.edit.php:386
 msgid "Change pre-shared key"
-msgstr ""
+msgstr "Změnit předsdílený klíč"
 
 #: include/classes/helpers/CRoleHelper.php:561
 msgid "Change problem ranking"
@@ -4987,7 +4995,7 @@ msgstr "Třída %1$s nebyla nalezena pro akci %2$s."
 
 #: jsLoader.php:551
 msgid "Clear"
-msgstr ""
+msgstr "Vyčistit"
 
 #: include/views/configuration.httpconf.edit.php:398
 #: include/views/configuration.httpconf.list.php:237
@@ -5020,16 +5028,16 @@ msgstr "Pročistit při odpojování"
 #: app/views/host.wizard.edit.php:1007
 #, c-format
 msgid "Click %1$s to complete the setup."
-msgstr ""
+msgstr "Kliknutím na %1$s dokončete nastavení."
 
 #: app/views/js/host.wizard.edit.js.php:771
 msgid "Click Finish to close the Host wizard."
-msgstr ""
+msgstr "Kliknutím na tlačítko Dokončit zavřete průvodce hostitelem."
 
 #: app/views/js/host.wizard.edit.js.php:770
 #, c-format
 msgid "Click Finish to navigate to the Latest data section and view the most recent data for your host (%1$s)."
-msgstr ""
+msgstr "Kliknutím na tlačítko Dokončit přejděte do sekce Nejnovější data, kde si můžete prohlédnout nejnovější data pro váš hostitel (%1$s)."
 
 #: jsLoader.php:157
 msgid "Click and drag to desired size."
@@ -5147,6 +5155,10 @@ msgstr "Zhroucení"
 msgid "Collapse sidebar"
 msgstr "Sbalit postranní panel"
 
+#: app/views/host.wizard.edit.php:426
+msgid "Colon to separate IP/DNS address from port"
+msgstr "Dvojtečka pro oddělení IP/DNS adresy od portu"
+
 #: include/views/configuration.graph.edit.php:398
 #: include/views/js/monitoring.sysmaps.js.php:383
 #: include/views/js/monitoring.sysmaps.js.php:404
@@ -5200,6 +5212,10 @@ msgstr "Kombinovaný výsledek"
 msgid "Comma separated center coordinates and zoom level to display when the widget is initially loaded."
 msgstr "Středové souřadnice oddělené čárkami a úroveň přiblížení, které se zobrazí při prvním načtení widgetu."
 
+#: app/views/host.wizard.edit.php:427
+msgid "Comma to separate multiple Zabbix servers, proxies, or clusters"
+msgstr "Čárka pro oddělení více Zabbix serverů, proxy nebo clusterů"
+
 #: app/views/administration.script.edit.php:199
 #: app/views/reports.actionlog.list.csv.php:45
 #: app/views/reports.actionlog.list.php:140 include/actions.inc.php:1864
@@ -5217,11 +5233,11 @@ msgstr "Komunikace"
 
 #: app/views/host.wizard.edit.php:375
 msgid "Communication between Zabbix agent and server/proxy is secured with a unique user-defined pre-shared key identity and a secret pre-shared key linked to it."
-msgstr ""
+msgstr "Komunikace mezi agentem Zabbix a serverem/proxy je zabezpečena unikátní, uživatelem definovanou identitou předsdíleného klíče a tajným předsdíleným klíčem, který je s ní propojen."
 
 #: app/views/host.wizard.edit.php:414
 msgid "Communication between Zabbix agent and server/proxy is secured with the pre-shared key (PSK) encryption method."
-msgstr ""
+msgstr "Komunikace mezi Zabbix agentem a serverem/proxy je zabezpečena metodou šifrování s předsdíleným klíčem (PSK)."
 
 #: include/items.inc.php:946
 msgctxt "SNMP Community"
@@ -5234,7 +5250,7 @@ msgstr "Celkový pohled"
 
 #: app/views/oauth.edit.php:228
 msgid "Complete authentication to get tokens."
-msgstr ""
+msgstr "Pro získání tokenů dokončete ověření."
 
 #: include/classes/core/CComponentRegistry.php:53
 #, c-format
@@ -5286,7 +5302,7 @@ msgstr "Nastavení cache statistik. Cache - buffer (mod: pfree, total, used, fre
 
 #: app/views/host.wizard.edit.php:1024
 msgid "Configuration complete"
-msgstr ""
+msgstr "Konfigurace dokončena"
 
 #: include/classes/setup/CSetupWizard.php:1061
 #, c-format
@@ -5316,7 +5332,7 @@ msgstr "Nastavení dashboardů"
 
 #: host_discovery_prototypes.php:22
 msgid "Configuration of discovery prototypes"
-msgstr ""
+msgstr "Konfigurace prototypů pro objevování"
 
 #: app/controllers/CControllerDiscoveryEdit.php:144
 #: app/controllers/CControllerDiscoveryList.php:143 host_discovery.php:27
@@ -5472,7 +5488,7 @@ msgstr "Nastavení bylo aktualizováno"
 
 #: app/views/mediatype.edit.php:184
 msgid "Configure"
-msgstr ""
+msgstr "Konfigurovat"
 
 #: include/classes/setup/CSetupWizard.php:60
 #: include/classes/setup/CSetupWizard.php:696
@@ -5486,19 +5502,19 @@ msgstr "Konfigurovat poskytování JIT"
 
 #: app/views/host.wizard.edit.php:368
 msgid "Configure encryption"
-msgstr ""
+msgstr "Konfigurace šifrování"
 
 #: app/views/host.wizard.edit.php:895 app/views/host.wizard.edit.php:926
 #: app/views/host.wizard.edit.php:1006
 #: app/views/js/host.wizard.edit.js.php:1138
 msgid "Configure host"
-msgstr ""
+msgstr "Konfigurace hosta"
 
 #: app/controllers/CControllerOauthAuthorize.php:166
 #: app/views/mediatype.edit.php:155
 #, c-format
 msgid "Configured %1$s ago"
-msgstr ""
+msgstr "Nakonfigurováno před %1$s"
 
 #: app/views/js/administration.authentication.edit.js.php:143
 msgid "Confirm changes"
@@ -5855,7 +5871,7 @@ msgstr "Počet hodnot zařazených do fronty předběžného zpracování."
 #: app/views/js/host.wizard.edit.js.php:761
 #: app/views/js/host.wizard.edit.js.php:1441
 msgid "Create"
-msgstr ""
+msgstr "Vytvořit"
 
 #: app/views/administration.token.list.php:109
 #: app/views/administration.user.token.list.php:76
@@ -5919,7 +5935,7 @@ msgstr "Vytváření zakázáno"
 
 #: include/views/configuration.host.discovery.prototype.list.php:34
 msgid "Create discovery prototype"
-msgstr ""
+msgstr "Vytvořit prototyp zjišťování"
 
 #: app/views/configuration.discovery.list.php:35
 #: include/views/configuration.host.discovery.list.php:39
@@ -6059,7 +6075,7 @@ msgstr "Vytvořit nový report"
 
 #: app/views/host.wizard.edit.php:273 app/views/js/host.wizard.edit.js.php:1122
 msgid "Create or select a host"
-msgstr ""
+msgstr "Vytvořte nebo vyberte hosta"
 
 #: app/views/administration.proxy.list.php:239
 msgid "Create proxy"
@@ -6266,7 +6282,7 @@ msgstr "Vlastní velikost"
 
 #: app/views/host.wizard.edit.php:138
 msgid "Custom templates are not supported."
-msgstr ""
+msgstr "Vlastní šablony nejsou podporovány."
 
 #: app/views/administration.miscconfig.edit.php:103
 #: include/classes/setup/CSetupWizard.php:561
@@ -6439,15 +6455,15 @@ msgstr "Údaje z %1$s. Vygenerované za %2$s sek."
 
 #: app/views/host.wizard.edit.php:168
 msgid "Data is collected by Zabbix agent, a lightweight software `component installed on your monitoring target."
-msgstr ""
+msgstr "Data shromažďuje Zabbix Agent, což je lehká softwarová komponenta instalovaná na vašem monitorovacím cíli."
 
 #: app/views/js/host.wizard.edit.js.php:89
 msgid "Data is collected by Zabbix agent, a lightweight software component installed on your monitoring target."
-msgstr ""
+msgstr "Data shromažďuje Zabbix Agent, což je lehká softwarová komponenta nainstalovaná na vašem monitorovacím cíli."
 
 #: app/views/js/host.wizard.edit.js.php:90
 msgid "Data is collected by Zabbix server or proxy using standard protocols (e.g., SNMP, ICMP) or remote access methods (e.g., SSH)."
-msgstr ""
+msgstr "Data jsou shromažďována Zabbix serverem nebo proxy pomocí standardních protokolů (např. SNMP, ICMP) nebo metod vzdáleného přístupu (např. SSH)."
 
 #: app/views/js/webscenario.step.edit.js.php:297
 msgid "Data is not properly encoded."
@@ -6860,7 +6876,7 @@ msgstr "Smazat dashboard?"
 
 #: include/views/configuration.host.discovery.prototype.edit.php:1086
 msgid "Delete discovery prototype?"
-msgstr ""
+msgstr "Smazat prototyp zjišťování?"
 
 #: app/views/configuration.discovery.edit.php:264
 #: include/views/configuration.host.discovery.edit.php:1032
@@ -6965,11 +6981,11 @@ msgstr "Odstranit vybrané dashboardy?"
 
 #: include/views/configuration.host.discovery.prototype.list.php:280
 msgid "Delete selected discovery prototype?"
-msgstr ""
+msgstr "Smazat vybraný prototyp objevování?"
 
 #: include/views/configuration.host.discovery.prototype.list.php:281
 msgid "Delete selected discovery prototypes?"
-msgstr ""
+msgstr "Smazat vybrané prototypy pro objevování?"
 
 #: app/views/js/configuration.discovery.list.js.php:113
 #: include/views/configuration.host.discovery.list.php:370
@@ -7357,7 +7373,7 @@ msgstr "Velikost popisu"
 
 #: app/views/oauth.edit.php:46
 msgid "Destination URL where successful authorization redirects."
-msgstr ""
+msgstr "Cílová URL adresa, kam přesměruje úspěšná autorizace."
 
 #: include/classes/data/CItemData.php:1503
 msgid "Detailed listing of installed packages. Returns text in JSON format"
@@ -7511,11 +7527,11 @@ msgstr "Zakázat označené konektory?"
 
 #: include/views/configuration.host.discovery.prototype.list.php:265
 msgid "Disable selected discovery prototype?"
-msgstr ""
+msgstr "Zakázat vybraný prototyp objevování?"
 
 #: include/views/configuration.host.discovery.prototype.list.php:266
 msgid "Disable selected discovery prototypes?"
-msgstr ""
+msgstr "Zakázat vybrané prototypy pro objevování?"
 
 #: app/views/js/configuration.discovery.list.js.php:97
 #: include/views/configuration.host.discovery.list.php:349
@@ -7790,36 +7806,36 @@ msgstr "Zjištění virtuálních strojů VMware, \"url\" – URL služby VMware
 #: include/views/configuration.host.discovery.prototype.edit.php:1051
 #: include/views/js/configuration.host.discovery.edit.overr.js.php:156
 msgid "Discovery prototype"
-msgstr ""
+msgstr "Prototyp objevování"
 
 #: host_discovery_prototypes.php:515
 msgid "Discovery prototype created"
-msgstr ""
+msgstr "Prototyp objevování vytvořen"
 
 #: host_discovery_prototypes.php:313 host_discovery_prototypes.php:604
 msgid "Discovery prototype deleted"
 msgid_plural "Discovery prototypes deleted"
-msgstr[0] ""
-msgstr[1] ""
-msgstr[2] ""
+msgstr[0] "Prototyp objevování smazán"
+msgstr[1] "Prototypy objevování smazány"
+msgstr[2] "Prototypy objevování smazány"
 
 #: host_discovery_prototypes.php:579
 msgid "Discovery prototype disabled"
 msgid_plural "Discovery prototypes disabled"
-msgstr[0] ""
-msgstr[1] ""
-msgstr[2] ""
+msgstr[0] "Prototyp objevování zakázán"
+msgstr[1] "Prototypy objevování zakázány"
+msgstr[2] "Prototypy objevování zakázány"
 
 #: host_discovery_prototypes.php:578
 msgid "Discovery prototype enabled"
 msgid_plural "Discovery prototypes enabled"
-msgstr[0] ""
-msgstr[1] ""
-msgstr[2] ""
+msgstr[0] "Prototyp objevování povolen"
+msgstr[1] "Prototypy objevování povoleny"
+msgstr[2] "Prototypy objevování povoleny"
 
 #: host_discovery_prototypes.php:523 host_discovery_prototypes.php:547
 msgid "Discovery prototype updated"
-msgstr ""
+msgstr "Prototyp objevování aktualizován"
 
 #: include/html.inc.php:645
 #: include/views/configuration.host.discovery.list.php:389
@@ -7827,7 +7843,7 @@ msgstr ""
 #: include/views/configuration.host.discovery.prototype.list.php:25
 #: include/views/configuration.host.discovery.prototype.list.php:241
 msgid "Discovery prototypes"
-msgstr ""
+msgstr "Prototypy zjišťování"
 
 #: app/controllers/CControllerAuditLogList.php:228
 #: app/views/configuration.discovery.edit.php:285
@@ -7997,7 +8013,7 @@ msgstr "Jmenovatel dělitele"
 
 #: app/views/host.wizard.edit.php:114
 msgid "Do not show welcome screen"
-msgstr ""
+msgstr "Nezobrazovat uvítací obrazovku"
 
 #: app/views/popup.lldoperation.php:188 app/views/popup.lldoperation.php:209
 #: app/views/popup.massupdate.item.php:315
@@ -8339,7 +8355,7 @@ msgstr "Povolit HTTP autentizaci pro všechny uživatele."
 
 #: app/views/host.wizard.edit.php:811
 msgid "Enable IPMI checks on Zabbix server"
-msgstr ""
+msgstr "Povolit kontroly IPMI na Zabbix serveru"
 
 #: app/views/administration.authentication.edit.php:209
 #: app/views/administration.authentication.edit.php:281
@@ -8418,7 +8434,7 @@ msgstr "Povolit vícefaktorové ověřování"
 
 #: app/views/host.wizard.edit.php:859
 msgid "Enable remote JMX monitoring"
-msgstr ""
+msgstr "Povolit vzdálené monitorování JMX"
 
 #: app/views/administration.token.list.php:205
 #: app/views/administration.user.token.list.php:158
@@ -8456,11 +8472,11 @@ msgstr "Povolit vybrané konektory?"
 
 #: include/views/configuration.host.discovery.prototype.list.php:259
 msgid "Enable selected discovery prototype?"
-msgstr ""
+msgstr "Povolit vybrané prototypy pro objevení?"
 
 #: include/views/configuration.host.discovery.prototype.list.php:260
 msgid "Enable selected discovery prototypes?"
-msgstr ""
+msgstr "Povolit vybrané prototypy pro objevování?"
 
 #: app/views/js/configuration.discovery.list.js.php:81
 #: include/views/configuration.host.discovery.list.php:343
@@ -8613,7 +8629,7 @@ msgstr "Šifrovat"
 #: include/classes/setup/CSetupWizard.php:846
 #: include/classes/setup/CSetupWizard.php:1075
 msgid "Encrypt connections from Web interface"
-msgstr ""
+msgstr "Šifrování připojení z webového rozhraní"
 
 #: app/partials/configuration.host.edit.html.php:513
 #: app/views/administration.proxy.list.php:88
@@ -8644,28 +8660,32 @@ msgstr "Anglicky (en_US)"
 
 #: app/views/host.wizard.edit.php:399
 msgid "Enter a non-secret pre-shared key identity string. Avoid including sensitive data."
-msgstr ""
+msgstr "Zadejte řetězec identity sdíleného klíče, který není tajný. Nevkládejte citlivá data."
 
 #: app/views/host.wizard.edit.php:609
 msgid "Enter the IP/DNS address and port of the Zabbix agent installed on your monitoring target."
-msgstr ""
+msgstr "Zadejte IP/DNS adresu a port Zabbix agenta nainstalovaného na vašem cílovém zařízení k monitoringu."
 
 #: app/views/host.wizard.edit.php:771
 msgid "Enter the IP/DNS address and port of your IPMI-enabled monitoring target."
-msgstr ""
+msgstr "Zadejte IP/DNS adresu a port cílového zařízení pro monitoring s povoleným IPMI."
 
 #: app/views/host.wizard.edit.php:847
 msgid "Enter the IP/DNS address and port of your JMX-enabled monitoring target."
-msgstr ""
+msgstr "Zadejte IP/DNS adresu a port cílového zařízení pro monitoring s povoleným JMX."
+
+#: app/views/host.wizard.edit.php:412
+msgid "Enter the IP/DNS address and port of your Zabbix server, proxy, or cluster configuration."
+msgstr "Zadejte IP/DNS adresu a port vašeho Zabbix serveru, proxy nebo konfiguraci clusteru."
 
 #: app/views/host.wizard.edit.php:642
 msgid "Enter the IP/DNS address, port, and authentication details of your SNMP-enabled monitoring target."
-msgstr ""
+msgstr "Zadejte IP/DNS adresu, port a ověřovací údaje cíle monitorování s povoleným protokolem SNMP."
 
 #: include/classes/validators/CFormValidator.php:1192 jsLoader.php:435
 #, c-format
 msgid "Entry \"%1$s\" is not unique."
-msgstr ""
+msgstr "Záznam „%1$s“ není jedinečný."
 
 #: app/partials/monitoring.host.filter.php:51
 #: app/partials/monitoring.host.filter.php:202
@@ -8866,6 +8886,10 @@ msgstr "Každý týden(ů)"
 msgid "Example"
 msgstr "Příklad"
 
+#: app/views/host.wizard.edit.php:417
+msgid "Example:"
+msgstr "Příklad:"
+
 #: app/views/administration.miscconfig.edit.php:38
 msgid "Example: https://localhost/zabbix/ui/"
 msgstr "Příklad: https://localhost/zabbix/ui/"
@@ -8986,7 +9010,7 @@ msgstr "Rozvést jeden problém"
 #: app/controllers/CControllerTemplateCreate.php:69
 #: app/controllers/CControllerTemplateUpdate.php:71
 msgid "Expected user macro format is \"{$MACRO}\"."
-msgstr ""
+msgstr "Očekávaný formát uživatelského makra je \"{$MACRO}\"."
 
 #: app/partials/scheduledreport.table.html.php:93
 #: app/views/reports.scheduledreport.list.php:65
@@ -9447,7 +9471,7 @@ msgstr "Velikost písma"
 
 #: app/views/host.wizard.edit.php:816 app/views/host.wizard.edit.php:873
 msgid "For more details, see"
-msgstr ""
+msgstr "Pro více informací se podívejte"
 
 #: app/views/webscenario.step.edit.php:106
 msgid "Form data"
@@ -9552,11 +9576,11 @@ msgstr "Obecné"
 
 #: app/views/host.wizard.edit.php:417
 msgid "Generate a secret pre-shared key hexadecimal string."
-msgstr ""
+msgstr "Vygenerujte hexadecimální řetězec tajného předsdíleného klíče."
 
 #: app/views/host.wizard.edit.php:411
 msgid "Generate new"
-msgstr ""
+msgstr "Generovat nové"
 
 #: app/partials/scheduledreport.subscription.php:34
 #: app/views/popup.scheduledreport.subscription.php:98
@@ -9613,7 +9637,7 @@ msgstr "Zadaný výraz není makro"
 #: app/controllers/CControllerValueMapEdit.php:95
 #: app/controllers/CControllerValueMapEdit.php:109
 msgid "Given valuemap name is already taken."
-msgstr ""
+msgstr "Daný název mapy hodnot je již obsazen."
 
 #: app/views/popup.massupdate.item.php:298 app/views/popup.proxy.edit.php:194
 #: include/views/configuration.host.discovery.edit.php:734
@@ -10325,7 +10349,7 @@ msgstr "IP hostitele"
 #: app/controllers/CControllerPopup.php:49
 #: app/views/configuration.host.list.php:35
 msgid "Host Wizard"
-msgstr ""
+msgstr "Průvodce hostem"
 
 #: app/views/administration.script.list.php:99
 msgid "Host access"
@@ -10337,7 +10361,7 @@ msgstr "Host byl přidán"
 
 #: app/controllers/CControllerHostWizardCreate.php:142
 msgid "Host added successfully"
-msgstr ""
+msgstr "Host byl úspěšně přidán"
 
 #: app/controllers/CControllerPopupItemTest.php:1351
 #: app/views/popup.itemtestedit.view.php:99
@@ -10705,7 +10729,7 @@ msgstr[2] "Hosté byly aktualizováni"
 
 #: app/controllers/CControllerHostWizardUpdate.php:147
 msgid "Host updated successfully"
-msgstr ""
+msgstr "Host byl úspěšně aktualizován"
 
 #: include/classes/api/services/CDashboardGeneral.php:583
 #, c-format
@@ -10884,7 +10908,7 @@ msgstr "IPMI"
 
 #: app/views/host.wizard.edit.php:759
 msgid "IPMI address"
-msgstr ""
+msgstr "Adresa IPMI"
 
 #: include/items.inc.php:96
 msgid "IPMI agent"
@@ -10892,7 +10916,7 @@ msgstr "IPMI agent"
 
 #: app/views/host.wizard.edit.php:818
 msgid "IPMI checks"
-msgstr ""
+msgstr "Kontroly IPMI"
 
 #: include/views/inventory.host.view.php:67
 msgid "IPMI interfaces"
@@ -10900,7 +10924,7 @@ msgstr "IPMI rozhraní"
 
 #: app/views/host.wizard.edit.php:765
 msgid "IPMI port"
-msgstr ""
+msgstr "Port IPMI"
 
 #: disc_prototypes.php:116 host_discovery.php:106
 #: include/views/configuration.host.discovery.edit.php:569
@@ -11073,7 +11097,7 @@ msgstr "Pokud je váha podřízených služeb ve stavu %1$s nížším nebo ales
 
 #: app/views/host.wizard.edit.php:380
 msgid "If you do not know your PSK or would like to change it, click the button below. Note that changing the PSK may impact existing configurations."
-msgstr ""
+msgstr "Pokud neznáte svůj PSK nebo jej chcete změnit, klikněte na tlačítko níže. Upozorňujeme, že změna PSK může ovlivnit stávající konfigurace."
 
 #: include/classes/core/ZBase.php:767 include/func.inc.php:1688
 #: include/func.inc.php:1710
@@ -11188,7 +11212,7 @@ msgstr "V rozsahu"
 
 #: app/views/host.wizard.edit.php:813
 msgid "In the Zabbix server configuration file (zabbix_server.conf), set the StartIPMIPollers parameter to a non-zero value."
-msgstr ""
+msgstr "V konfiguračním souboru Zabbix serveru (zabbix_server.conf) nastavte parametr StartIPMIPollers na nenulovou hodnotu."
 
 #: include/classes/widgets/fields/CWidgetFieldMultiSelectSla.php:31
 msgid "Inaccessible SLA"
@@ -11390,7 +11414,7 @@ msgstr "Neplatné API \"%1$s\"."
 #: app/controllers/CControllerHostCreate.php:65
 #: app/controllers/CControllerHostUpdate.php:69
 msgid "Incorrect DNS provided."
-msgstr ""
+msgstr "Zadán nesprávný DNS."
 
 #: include/classes/api/services/CDRule.php:602
 msgid "Incorrect SNMP OID."
@@ -11534,12 +11558,12 @@ msgstr "Nesprávné znaky použité pro jméno hosta \"%s\"."
 #: app/controllers/CControllerHostCreate.php:39
 #: app/controllers/CControllerHostUpdate.php:42
 msgid "Incorrect characters used for host name."
-msgstr ""
+msgstr "Pro název hosta byly použity nesprávné znaky."
 
 #: app/controllers/CControllerTemplateCreate.php:35
 #: app/controllers/CControllerTemplateUpdate.php:36
 msgid "Incorrect characters used for template name."
-msgstr ""
+msgstr "V názvu šablony byly použity nesprávné znaky."
 
 #: include/classes/api/services/CUser.php:482
 msgid "Incorrect current password."
@@ -11653,7 +11677,7 @@ msgstr "Neplatný rozsah portů."
 #: app/controllers/CControllerHostCreate.php:71
 #: app/controllers/CControllerHostUpdate.php:75
 msgid "Incorrect port."
-msgstr ""
+msgstr "Nesprávný port."
 
 #: app/controllers/CControllerRegExTest.php:77
 #, c-format
@@ -12021,7 +12045,7 @@ msgstr "Neplatná hodnota pro pole \"%1$s\": %2$s."
 #: app/controllers/CControllerHostWizardUpdateGeneral.php:107
 #, c-format
 msgid "Incorrect value for macro \"%1$s\": %2$s."
-msgstr ""
+msgstr "Nesprávná hodnota pro makro \"%1$s\": %2$s."
 
 #: include/classes/helpers/CServiceHelper.php:149
 msgid "Increase by"
@@ -12082,7 +12106,7 @@ msgstr "Informace o interních discích hypervisoru vyžadovaných pro vmware.da
 
 #: include/func.inc.php:1610
 msgid "Info message"
-msgstr ""
+msgstr "Informační zpráva"
 
 #: app/views/administration.trigdisplay.edit.php:110 include/items.inc.php:31
 #: widgets/geomap/Widget.php:40
@@ -12170,15 +12194,15 @@ msgstr "Instalovat"
 
 #: app/views/host.wizard.edit.php:351 app/views/js/host.wizard.edit.js.php:1128
 msgid "Install Zabbix agent"
-msgstr ""
+msgstr "Instalace Zabbix agenta"
 
 #: app/views/host.wizard.edit.php:512 app/views/host.wizard.edit.php:535
 msgid "Install Zabbix agent 2 and its plugins on your monitoring target by following the installation instructions below."
-msgstr ""
+msgstr "Nainstalujte Zabbix agenta 2 a jeho pluginy na váš monitorovací cíl podle níže uvedených pokynů k instalaci."
 
 #: app/views/host.wizard.edit.php:551 app/views/host.wizard.edit.php:574
 msgid "Install Zabbix agent and its plugins on your monitoring target by following the installation instructions below."
-msgstr ""
+msgstr "Nainstalujte Zabbix agenta a jeho pluginy na váš monitorovací cíl podle níže uvedených pokynů k instalaci."
 
 #: setup.php:163
 msgid "Installation"
@@ -12202,7 +12226,7 @@ msgstr "Integrace"
 
 #: app/views/js/host.wizard.edit.js.php:98
 msgid "Intelligent Platform Management Interface (IPMI)"
-msgstr ""
+msgstr "Rozhraní pro inteligentní správu platformy (IPMI)"
 
 #: app/partials/monitoring.host.view.html.php:36
 #: app/views/configuration.host.list.php:208 app/views/popup.proxy.edit.php:68
@@ -12318,7 +12342,7 @@ msgstr "Neplatná IP adresa \"%1$s\"."
 #: app/controllers/CControllerHostCreate.php:57
 #: app/controllers/CControllerHostUpdate.php:61
 msgid "Invalid IP address."
-msgstr ""
+msgstr "Neplatná IP adresa."
 
 #: include/classes/core/CJsonRpc.php:201
 msgid "Invalid JSON. An error occurred on the server while parsing the JSON text."
@@ -12347,16 +12371,16 @@ msgstr "Neplatná konfigurace MFA"
 #: app/controllers/CControllerOauthCheck.php:44
 #: app/controllers/CControllerOauthEdit.php:43
 msgid "Invalid OAuth configuration"
-msgstr ""
+msgstr "Neplatná konfigurace OAuth"
 
 #: include/classes/helpers/CItemGeneralHelper.php:456
 msgid "Invalid Prometheus label."
-msgstr ""
+msgstr "Neplatný popisek Prometheus."
 
 #: include/classes/helpers/CItemGeneralHelper.php:441
 #: include/classes/helpers/CItemGeneralHelper.php:446
 msgid "Invalid Prometheus pattern."
-msgstr ""
+msgstr "Neplatný vzor Prometheus."
 
 #: app/controllers/CControllerAuthenticationUpdate.php:208
 msgid "Invalid SAML JIT provisioning media type mapping configuration."
@@ -12421,7 +12445,7 @@ msgstr "Neplatný interval \"%1$s\"."
 #: app/controllers/CControllerItemUpdate.php:212
 #: app/controllers/CControllerItemUpdate.php:217
 msgid "Invalid interval."
-msgstr ""
+msgstr "Neplatný interval."
 
 #: app/controllers/CControllerDiscoveryCheckCheck.php:64
 #: include/classes/api/services/CDRule.php:586
@@ -12705,21 +12729,21 @@ msgstr "Neplatný parametr."
 #: app/controllers/CControllerItemPrototypeUpdate.php:222
 #: app/controllers/CControllerItemUpdate.php:222
 msgid "Invalid period."
-msgstr ""
+msgstr "Neplatné období."
 
 #: app/controllers/CControllerItemCreate.php:167
 #: app/controllers/CControllerItemPrototypeCreate.php:171
 #: app/controllers/CControllerItemPrototypeUpdate.php:155
 #: app/controllers/CControllerItemUpdate.php:154
 msgid "Invalid range expression."
-msgstr ""
+msgstr "Neplatný výraz rozsahu."
 
 #: app/controllers/CControllerHostCreate.php:228
 #: app/controllers/CControllerHostUpdate.php:233
 #: app/controllers/CControllerTemplateCreate.php:102
 #: app/controllers/CControllerTemplateUpdate.php:104
 msgid "Invalid range."
-msgstr ""
+msgstr "Neplatný rozsah."
 
 #: include/classes/core/CJsonRpc.php:205
 msgid "Invalid request."
@@ -12734,7 +12758,7 @@ msgstr "Neplatný návratový kód \"%1$s\"."
 #: include/classes/validators/CFormValidator.php:1001
 #: include/classes/validators/CFormValidator.php:1007
 msgid "Invalid string."
-msgstr ""
+msgstr "Neplatný řetězec."
 
 #: include/classes/export/CConfigurationExportBuilder.php:82
 #: include/classes/export/CConfigurationExportBuilder.php:105
@@ -13103,7 +13127,7 @@ msgstr "JMX"
 
 #: app/views/host.wizard.edit.php:835
 msgid "JMX address"
-msgstr ""
+msgstr "Adresa JMX"
 
 #: include/items.inc.php:99
 msgid "JMX agent"
@@ -13122,11 +13146,11 @@ msgstr "JMX rozhraní"
 
 #: app/views/host.wizard.edit.php:874
 msgid "JMX monitoring"
-msgstr ""
+msgstr "Monitorování JMX"
 
 #: app/views/host.wizard.edit.php:841
 msgid "JMX port"
-msgstr ""
+msgstr "Port JMX"
 
 #: include/classes/html/CButtonExport.php:79
 msgid "JSON"
@@ -13149,7 +13173,7 @@ msgstr "Je očekáván JSON"
 
 #: include/forms.inc.php:466 include/views/js/item.preprocessing.js.php:135
 msgid "JSON path"
-msgstr ""
+msgstr "Cesta JSON"
 
 #: include/classes/validators/CNewValidator.php:113
 msgid "JSON string is expected"
@@ -13180,7 +13204,7 @@ msgstr "Japonsky (ja_JP)"
 
 #: app/views/js/host.wizard.edit.js.php:99
 msgid "Java Management Extensions (JMX) interface"
-msgstr ""
+msgstr "Rozhraní JMX (Java Management Extensions)"
 
 #: app/views/administration.mediatype.edit.php:235
 #: app/views/administration.script.edit.php:241
@@ -13306,11 +13330,11 @@ msgstr "pravidlo LLD"
 
 #: app/controllers/CControllerAuditLogList.php:227
 msgid "LLD rule prototype"
-msgstr ""
+msgstr "Prototyp pravidla LLD"
 
 #: include/classes/api/services/CItemGeneral.php:566
 msgid "LLD rule prototype with the same UUID already exists"
-msgstr ""
+msgstr "Prototyp pravidla LLD se stejným UUID již existuje"
 
 #: include/classes/api/services/CItemGeneral.php:539
 msgid "LLD rule with the same UUID already exists"
@@ -13612,7 +13636,7 @@ msgstr "Připojit šablony"
 
 #: app/views/host.wizard.edit.php:174
 msgid "Linked"
-msgstr ""
+msgstr "Propojeno"
 
 #: widgets/navtree/views/navtreeitem.edit.php:65
 msgid "Linked map"
@@ -13633,7 +13657,7 @@ msgstr "Propojení"
 
 #: app/views/host.wizard.edit.php:431
 msgid "Linux"
-msgstr ""
+msgstr "Linux"
 
 #: include/classes/html/CList.php:39
 msgid "List is empty"
@@ -13669,7 +13693,7 @@ msgstr "Seznam blokových zařízení a jejich typ. Vrátí JSON"
 
 #: include/forms.inc.php:448 include/views/js/item.preprocessing.js.php:111
 msgid "List of characters"
-msgstr ""
+msgstr "Seznam znaků"
 
 #: include/classes/data/CItemData.php:1359
 msgid "List of detected CPUs/CPU cores. Returns JSON"
@@ -13904,7 +13928,7 @@ msgstr "Nastavení MFA"
 
 #: app/views/host.wizard.edit.php:550
 msgid "Mac OS"
-msgstr ""
+msgstr "Mac OS"
 
 #: app/controllers/CControllerAuditLogList.php:243
 #: app/partials/hostmacros.inherited.list.html.php:49
@@ -13931,14 +13955,14 @@ msgstr "Makro \"%1$s\" již existuje."
 #: app/controllers/CControllerHostWizardUpdateGeneral.php:63
 #, c-format
 msgid "Macro \"%1$s\" is missing."
-msgstr ""
+msgstr "Makro \"%1$s\" chybí."
 
 #: app/controllers/CControllerHostCreate.php:180
 #: app/controllers/CControllerHostUpdate.php:185
 #: app/controllers/CControllerTemplateCreate.php:54
 #: app/controllers/CControllerTemplateUpdate.php:56
 msgid "Macro name is not unique."
-msgstr ""
+msgstr "Název makra není jedinečný."
 
 #: app/partials/configuration.host.edit.html.php:511
 #: app/partials/massupdate.macros.tab.php:121
@@ -14187,7 +14211,7 @@ msgstr "Mapování"
 #: app/controllers/CControllerTemplateCreate.php:82
 #: app/controllers/CControllerTemplateUpdate.php:84
 msgid "Mapping type and value combination is not unique."
-msgstr ""
+msgstr "Kombinace typu mapování a hodnoty není jedinečná."
 
 #: app/controllers/CControllerPopupValueMapUpdate.php:147
 #: app/views/administration.iconmap.edit.php:126
@@ -14943,7 +14967,7 @@ msgstr "Multiple PROBLEM události"
 
 #: include/classes/validators/CFormValidator.php:340
 msgid "Must be selected."
-msgstr ""
+msgstr "Musí být vybráno."
 
 #: jsLoader.php:284
 msgid "Mute"
@@ -15206,7 +15230,7 @@ msgstr "Rafička"
 
 #: include/items.inc.php:100
 msgid "Nested"
-msgstr ""
+msgstr "Vnořené"
 
 #: app/views/administration.housekeeping.edit.php:77
 msgid "Network discovery data storage period"
@@ -15371,7 +15395,7 @@ msgstr "Nové mapování typů médií"
 
 #: app/views/oauth.edit.php:237
 msgid "New oauth"
-msgstr ""
+msgstr "Nový OAuth"
 
 #: app/controllers/CControllerPopupLldOperation.php:350
 msgid "New operation"
@@ -15447,7 +15471,7 @@ msgstr "Nové hodnoty"
 
 #: app/views/host.wizard.edit.php:59 app/views/js/host.wizard.edit.js.php:1450
 msgid "Next"
-msgstr ""
+msgstr "Další"
 
 #: app/views/monitoring.host.dashboard.view.php:146
 msgid "Next dashboard"
@@ -15514,7 +15538,7 @@ msgstr "Žádné změny."
 
 #: jsLoader.php:553
 msgid "No color"
-msgstr ""
+msgstr "Bez barvy"
 
 #: jsLoader.php:194
 msgid "No compatible widgets."
@@ -16100,7 +16124,7 @@ msgstr "Žádné zděděné položky"
 
 #: app/views/host.wizard.edit.php:175
 msgid "Not linked"
-msgstr ""
+msgstr "Není propojeno"
 
 #: app/controllers/CControllerLatest.php:546
 #: app/partials/configuration.filter.items.php:184
@@ -16118,12 +16142,12 @@ msgstr "Pamatujte, že %1$s nebo %2$s budou považovány za názvy hostitelů, p
 
 #: app/views/host.wizard.edit.php:518 app/views/host.wizard.edit.php:541
 msgid "Note that during agent installation, you will need to configure both the PSK identity and PSK. Make sure they match the PSK identity and PSK set in step 1."
-msgstr ""
+msgstr "Upozorňujeme, že během instalace agenta budete muset nakonfigurovat jak identitu PSK, tak i PSK. Ujistěte se, že se shodují s identitou PSK a PSK nastavenými v kroku 1."
 
 #: app/views/host.wizard.edit.php:578
 #, c-format
 msgid "Note: %1$s must be configured and enabled on your monitoring target."
-msgstr ""
+msgstr "Poznámka: %1$s musí být nakonfigurováno a povoleno na vašem monitorovacím cíli."
 
 #: include/hosts.inc.php:229
 msgid "Notes"
@@ -16161,7 +16185,7 @@ msgstr "Listopad"
 
 #: include/forms.inc.php:437 include/views/js/item.preprocessing.js.php:96
 msgid "Number"
-msgstr ""
+msgstr "Číslo"
 
 #: include/classes/data/CItemData.php:1383
 msgid "Number of CPUs. Returns integer"
@@ -16322,15 +16346,15 @@ msgstr "Číslo (unsigned)"
 
 #: app/views/mediatype.edit.php:127 app/views/oauth.edit.php:237
 msgid "OAuth"
-msgstr ""
+msgstr "OAuth"
 
 #: app/controllers/CControllerOauthAuthorize.php:155
 msgid "OAuth response missing mandatory fields."
-msgstr ""
+msgstr "V odpovědi OAuth chybí povinná pole."
 
 #: app/views/mediatype.edit.php:177
 msgid "OAuth tokens"
-msgstr ""
+msgstr "Tokeny OAuth"
 
 #: include/hosts.inc.php:36 include/hosts.inc.php:64
 msgid "OEM"
@@ -16452,7 +16476,7 @@ msgstr "Starý název značky"
 
 #: app/views/host.wizard.edit.php:454
 msgid "Older version"
-msgstr ""
+msgstr "Starší verze"
 
 #: include/views/monitoring.sysmap.constructor.php:51
 #: include/views/monitoring.sysmap.constructor.php:61 jsLoader.php:251
@@ -16476,17 +16500,17 @@ msgstr "Jedna"
 #: app/controllers/CControllerItem.php:166
 #: app/controllers/CControllerItemPrototype.php:168
 msgid "One \"Change\" step allowed per item."
-msgstr ""
+msgstr "Je povolen jeden krok \"Změna\" pro item."
 
 #: app/controllers/CControllerItem.php:182
 #: app/controllers/CControllerItemPrototype.php:184
 msgid "One \"Prometheus\" step allowed per item."
-msgstr ""
+msgstr "Je povolen jeden krok \"Prometheus\" pro item."
 
 #: app/controllers/CControllerItem.php:174
 #: app/controllers/CControllerItemPrototype.php:176
 msgid "One \"Throttling\" step allowed per item."
-msgstr ""
+msgstr "Je povolen jeden krok \"Omezení\" pro item."
 
 #: app/views/maintenance.timeperiod.edit.php:79
 #: include/classes/helpers/CMaintenanceHelper.php:29
@@ -16580,7 +16604,7 @@ msgstr "Otevřít v novém okně"
 #: app/views/host.wizard.edit.php:524 app/views/host.wizard.edit.php:547
 #: app/views/host.wizard.edit.php:553
 msgid "Open installation instructions"
-msgstr ""
+msgstr "Otevřít pokyny k instalaci"
 
 #: app/views/mediatype.test.edit.php:101 app/views/popup.scriptexec.php:41
 msgid "Open log"
@@ -16588,7 +16612,7 @@ msgstr "Otevřít log"
 
 #: include/classes/server/CZabbixServer.php:627
 msgid "OpenSSL extension is not available."
-msgstr ""
+msgstr "Rozšíření OpenSSL není k dispozici."
 
 #: include/httptest.inc.php:414
 msgid "Opera"
@@ -16791,7 +16815,7 @@ msgstr "Další"
 
 #: app/views/host.wizard.edit.php:556
 msgid "Other OS"
-msgstr ""
+msgstr "Jiný operační systém"
 
 #: app/controllers/CControllerMiscConfigEdit.php:112
 #: app/views/administration.miscconfig.edit.php:30
@@ -17100,17 +17124,17 @@ msgstr "PSK identita"
 #: app/controllers/CControllerHostCreate.php:162
 #: app/controllers/CControllerHostUpdate.php:167
 msgid "PSK must be an even number of characters."
-msgstr ""
+msgstr "PSK musí mít sudý počet znaků."
 
 #: app/controllers/CControllerHostCreate.php:166
 #: app/controllers/CControllerHostUpdate.php:171
 msgid "PSK must be at least 32 characters long."
-msgstr ""
+msgstr "PSK musí mít délku alespoň 32 znaků."
 
 #: app/controllers/CControllerHostCreate.php:170
 #: app/controllers/CControllerHostUpdate.php:175
 msgid "PSK must contain only hexadecimal characters."
-msgstr ""
+msgstr "PSK musí obsahovat pouze hexadecimální znaky."
 
 #: jsLoader.php:146
 #, c-format
@@ -17137,12 +17161,12 @@ msgstr "Pager"
 
 #: jsLoader.php:554
 msgid "Palette"
-msgstr ""
+msgstr "Paleta"
 
 #: jsLoader.php:555
 #, c-format
 msgid "Palette %1$d"
-msgstr ""
+msgstr "Paleta %1$d"
 
 #: app/partials/administration.system.info.php:30
 msgid "Parameter"
@@ -17181,7 +17205,7 @@ msgstr "Parametry \"esc_step_from\" a \"esc_step_to\" musí být nastaveny spole
 
 #: include/views/configuration.host.discovery.prototype.edit.php:66
 msgid "Parent discovery prototypes"
-msgstr ""
+msgstr "Nadřazený prototyp objevování"
 
 #: include/views/configuration.host.discovery.edit.php:56
 #: include/views/configuration.host.prototype.edit.php:66
@@ -17580,11 +17604,11 @@ msgstr "Shrnutí před instalací"
 
 #: app/views/host.wizard.edit.php:405
 msgid "Pre-shared key"
-msgstr ""
+msgstr "Předsdílený klíč"
 
 #: app/views/host.wizard.edit.php:394
 msgid "Pre-shared key identity"
-msgstr ""
+msgstr "Identita předsdíleného klíče"
 
 #: app/views/popup.triggerexpr.php:132
 msgid "Prediction functions"
@@ -17606,7 +17630,7 @@ msgstr "Předzpracování je transformace před uložením hodnoty do databáze.
 #: app/controllers/CControllerItem.php:190
 #: app/controllers/CControllerItemPrototype.php:192
 msgid "Preprocessing step with such Name and Parameters combination already exists."
-msgstr ""
+msgstr "Krok předzpracování s takovou kombinací názvu a parametrů již existuje."
 
 #: app/views/popup.itemtestedit.view.php:375
 #: app/views/popup.massupdate.item.php:203
@@ -18105,7 +18129,7 @@ msgstr "Push"
 
 #: include/views/js/item.preprocessing.js.php:208
 msgid "Qualifier"
-msgstr ""
+msgstr "Kvalifikátor"
 
 #: include/classes/helpers/CSlaHelper.php:64
 msgid "Quarter"
@@ -18333,7 +18357,7 @@ msgstr "Obdélník"
 
 #: app/views/oauth.edit.php:44
 msgid "Redirection endpoint"
-msgstr ""
+msgstr "Koncový bod přesměrování"
 
 #: app/views/popup.ldap.edit.php:172
 msgid "Reference attribute"
@@ -18372,7 +18396,7 @@ msgstr "Interval obnovy"
 
 #: app/views/mediatype.edit.php:163
 msgid "Refresh token is invalid or outdated."
-msgstr ""
+msgstr "Token pro obnovení je neplatný nebo zastaralý."
 
 #: app/views/popup.token.edit.php:129
 msgid "Regenerate"
@@ -18757,7 +18781,7 @@ msgstr "Vyžadováno"
 
 #: include/classes/validators/CFormValidator.php:652 jsLoader.php:420
 msgid "Required field is missing."
-msgstr ""
+msgstr "Chybí povinné pole."
 
 #: app/views/administration.script.edit.php:314
 msgid "Required host permissions"
@@ -19280,7 +19304,7 @@ msgstr "SNMP OID"
 
 #: app/views/host.wizard.edit.php:630
 msgid "SNMP address"
-msgstr ""
+msgstr "SNMP adresa"
 
 #: app/views/administration.timeouts.edit.php:65
 #: app/views/popup.proxy.edit.php:228 include/items.inc.php:89
@@ -19304,7 +19328,7 @@ msgstr "SNMP rozhraní"
 
 #: app/views/host.wizard.edit.php:636
 msgid "SNMP port"
-msgstr ""
+msgstr "SNMP port"
 
 #: include/items.inc.php:90
 msgid "SNMP trap"
@@ -19771,7 +19795,7 @@ msgstr "Bezpečnostní jméno"
 
 #: app/views/host.wizard.edit.php:132
 msgid "See"
-msgstr ""
+msgstr "Prohlédnout"
 
 #: app/views/popup.condition.edit.php:402 app/views/popup.generic.php:874
 #: app/views/popup.massupdate.item.php:440 app/views/popup.services.php:92
@@ -19788,7 +19812,7 @@ msgstr "Vyberte SLA pro zobrazení SLA reportu."
 
 #: app/views/host.wizard.edit.php:137 app/views/js/host.wizard.edit.js.php:1116
 msgid "Select a template"
-msgstr ""
+msgstr "Vyberte šablonu"
 
 #: app/views/popup.massupdate.item.php:458 app/views/popup.triggerexpr.php:95
 #: include/views/configuration.graph.edit.php:242
@@ -19799,15 +19823,15 @@ msgstr "Označ prototyp"
 
 #: app/views/oauth.edit.php:171
 msgid "Select retrieval method: automatically through a redirection page or manually if automatic retrieval fails."
-msgstr ""
+msgstr "Vyberte metodu načtení: automaticky přes přesměrovací stránku nebo ručně, pokud automatické načtení selže."
 
 #: app/views/host.wizard.edit.php:447
 msgid "Select the OS distribution"
-msgstr ""
+msgstr "Vyberte distribuci operačního systému"
 
 #: app/views/host.wizard.edit.php:424
 msgid "Select the OS of your monitoring target"
-msgstr ""
+msgstr "Vyberte operační systém cíle monitorování"
 
 #: app/views/administration.script.edit.php:283
 #: include/views/monitoring.history.php:185
@@ -19824,7 +19848,7 @@ msgstr "Označené elementy"
 
 #: app/views/js/host.wizard.edit.js.php:1110
 msgid "Selected host"
-msgstr ""
+msgstr "Vybraný host"
 
 #: widgets/svggraph/includes/WidgetForm.php:380
 msgid "Selected items only"
@@ -19841,6 +19865,10 @@ msgstr "Vybrané, %1$s v pozici %2$d z %3$d"
 msgctxt "screen reader"
 msgid "Selected, %1$s, read only, in position %2$d of %3$d"
 msgstr "Vybrané, %1$s, pouze ke čtení, v pozici %2$d of %3$d"
+
+#: app/views/host.wizard.edit.php:428
+msgid "Semicolon to separate clusters (one or more server addresses)"
+msgstr "Středník pro oddělení clusterů (jedné nebo více adres serverů)"
 
 #: jsLoader.php:267
 msgid "Send backward"
@@ -19940,17 +19968,17 @@ msgstr "Server (proxy)"
 
 #: include/classes/setup/CSetupWizard.php:1081
 msgid "Server TLS CA file"
-msgstr ""
+msgstr "Soubor certifikační autority serveru TLS"
 
 #: include/classes/setup/CSetupWizard.php:890
 #: include/classes/setup/CSetupWizard.php:1095
 msgid "Server TLS certificate issuer"
-msgstr ""
+msgstr "Vydavatel certifikátu TLS serveru"
 
 #: include/classes/setup/CSetupWizard.php:899
 #: include/classes/setup/CSetupWizard.php:1099
 msgid "Server TLS certificate subject"
-msgstr ""
+msgstr "Předmět certifikátu TLS serveru"
 
 #: tests/selenium/modules/clock32/includes/WidgetForm.php:62
 #: widgets/clock/includes/WidgetForm.php:62
@@ -20139,11 +20167,11 @@ msgstr "Nastavit toto zobrazení jako výchozí"
 
 #: app/views/host.wizard.edit.php:493
 msgid "Set up Zabbix agent on your monitoring target by executing the following PowerShell script [with administrator permissions]:"
-msgstr ""
+msgstr "Nastavte Zabbix agenta na cíli monitorování spuštěním následujícího skriptu PowerShellu [s oprávněními správce]:"
 
 #: app/views/host.wizard.edit.php:477
 msgid "Set up Zabbix agent on your monitoring target by executing the following script [bash under root]:"
-msgstr ""
+msgstr "Nastavte Zabbix agenta na cíli monitorování spuštěním následujícího skriptu [bash pod rootem]:"
 
 #: app/views/js/popup.itemtestedit.view.js.php:383 include/forms.inc.php:1599
 #: include/views/js/item.preprocessing.js.php:67
@@ -20329,7 +20357,7 @@ msgstr "Zobrazit legendu"
 
 #: app/views/js/host.wizard.edit.js.php:1507
 msgid "Show less"
-msgstr ""
+msgstr "Zobrazit méně"
 
 #: widgets/actionlog/includes/WidgetForm.php:91
 #: widgets/plaintext/includes/WidgetForm.php:55
@@ -20347,7 +20375,7 @@ msgstr "Zobrazit popisky prvků mapy"
 
 #: app/views/host.wizard.edit.php:247 app/views/js/host.wizard.edit.js.php:1508
 msgid "Show more"
-msgstr ""
+msgstr "Zobrazit více"
 
 #: app/views/popup.tabfilter.edit.php:34
 msgid "Show number of records"
@@ -20413,7 +20441,7 @@ msgstr "Zobrazit technické chyby"
 
 #: app/views/host.wizard.edit.php:171
 msgid "Show templates"
-msgstr ""
+msgstr "Zobrazit šablony"
 
 #: widgets/plaintext/includes/WidgetForm.php:62
 msgid "Show text as HTML"
@@ -20505,7 +20533,7 @@ msgstr "Jednoduchý"
 
 #: app/views/js/host.wizard.edit.js.php:97
 msgid "Simple Network Management Protocol (SNMP) interface"
-msgstr ""
+msgstr "Rozhraní SNMP (Simple Network Management Protocol)"
 
 #: include/items.inc.php:1578
 msgid "Simple change"
@@ -20608,7 +20636,7 @@ msgstr "Velikost odpovědi přijaté od Zabbix serveru \"%1$s\" dosáhla povolen
 
 #: app/views/host.wizard.edit.php:355
 msgid "Skip OS selection if you already have Zabbix agent installed."
-msgstr ""
+msgstr "Pokud již máte nainstalovaného Zabbix agenta, přeskočte výběr operačního systému."
 
 #: include/locales.inc.php:61
 msgid "Slovak (sk_SK)"
@@ -20661,7 +20689,7 @@ msgstr "Poslední kontrola aktualizace softwaru"
 
 #: jsLoader.php:556
 msgid "Solid color"
-msgstr ""
+msgstr "Jednobarevné"
 
 #: include/classes/api/managers/CHistoryManager.php:1343
 msgid "Some of the history for this item may be compressed, deletion is not available."
@@ -20670,12 +20698,12 @@ msgstr "Část historie této položky může být komprimována, odstranění n
 #: app/views/host.wizard.edit.php:129
 #, c-format
 msgid "Some templates (%1$s) are hidden. Custom templates are not supported."
-msgstr ""
+msgstr "Některé šablony (%1$s) jsou skryté. Vlastní šablony nejsou podporovány."
 
 #: app/views/host.wizard.edit.php:130
 #, c-format
 msgid "Some templates (%1$s) are incompatible with the Host Wizard."
-msgstr ""
+msgstr "Některé šablony (%1$s) nejsou kompatibilní s Průvodcem hostem."
 
 #: widgets/actionlog/includes/WidgetForm.php:79
 #: widgets/problems/includes/WidgetForm.php:145
@@ -20734,7 +20762,7 @@ msgstr "Nenalezené žádné hodnoty."
 
 #: app/views/host.wizard.edit.php:365
 msgid "Specifying new or existing host groups will add the host to these groups without removing it from any current groups."
-msgstr ""
+msgstr "Zadáním nových nebo existujících skupin hostů se hostitel přidá do těchto skupin, aniž by byl odebrán ze stávajících skupin."
 
 #: httpdetails.php:107 include/classes/screens/CScreenHttpTestDetails.php:82
 msgid "Speed"
@@ -20802,11 +20830,11 @@ msgstr "Čas začátku musí bát menší než čas konce pro odebrané odstávk
 
 #: app/views/host.wizard.edit.php:310
 msgid "Start typing or click Select to choose an existing host, or enter a new host name."
-msgstr ""
+msgstr "Začněte psát nebo klikněte na tlačítko Vybrat a vyberte existujícího hosta, případně zadejte název nového hosta."
 
 #: app/views/host.wizard.edit.php:334
 msgid "Start typing or click Select to choose existing host groups, or enter a new host group name."
-msgstr ""
+msgstr "Začněte psát nebo klikněte na Vybrat a vyberte existující skupiny hostů, případně zadejte název nové skupiny hostů."
 
 #: app/views/popup.ldap.edit.php:287
 msgid "StartTLS"
@@ -21276,22 +21304,22 @@ msgstr "TELNET agent"
 
 #: include/classes/setup/CSetupWizard.php:855
 msgid "TLS CA file"
-msgstr ""
+msgstr "Soubor CA TLS"
 
 #: include/classes/setup/CSetupWizard.php:873
 msgid "TLS certificate file"
-msgstr ""
+msgstr "Soubor certifikátu TLS"
 
 #: include/classes/server/CZabbixServer.php:634
 #: include/classes/server/CZabbixServer.php:641
 #: include/classes/server/CZabbixServer.php:648
 #: include/classes/setup/CSetupWizard.php:911
 msgid "TLS fields are misconfigured or the files are not accessible."
-msgstr ""
+msgstr "Pole TLS jsou špatně nakonfigurována nebo soubory nejsou přístupné."
 
 #: include/classes/setup/CSetupWizard.php:865
 msgid "TLS key file"
-msgstr ""
+msgstr "Soubor klíčů TLS"
 
 #: include/classes/screens/CScreenHttpTestDetails.php:190
 msgid "TOTAL"
@@ -21379,7 +21407,7 @@ msgstr "Jméno značky"
 #: app/controllers/CControllerTriggerPrototypeUpdate.php:61
 #: app/controllers/CControllerTriggerUpdate.php:61
 msgid "Tag name and value combination is not unique."
-msgstr ""
+msgstr "Kombinace názvu a hodnoty tagu není jedinečná."
 
 #: include/actions.inc.php:68
 msgid "Tag value"
@@ -21664,7 +21692,7 @@ msgstr "Šablony napojené prostřednictvím objevování hostů nemohou být od
 
 #: app/views/oauth.edit.php:169
 msgid "Temporary token to exchange for an access token."
-msgstr ""
+msgstr "Dočasný token, který se má vyměnit za přístupový token."
 
 #: app/controllers/CControllerPopupTestTriggerExpr.php:211
 #: app/partials/scheduledreport.formgrid.html.php:211
@@ -21787,11 +21815,11 @@ msgstr "%1$s již není objeven a %2$s."
 
 #: app/views/host.wizard.edit.php:101
 msgid "The Host Wizard will help you set up your monitoring target (device, application, service, etc.) in Zabbix."
-msgstr ""
+msgstr "Průvodce hostem vám pomůže nastavit cíl monitorování (zařízení, aplikaci, službu atd.) v Zabbixu."
 
 #: app/views/oauth.edit.php:48
 msgid "The URL must comply with the OAuth provider's policy."
-msgstr ""
+msgstr "URL adresa musí být v souladu se zásadami poskytovatele OAuth."
 
 #: app/views/administration.geomaps.edit.php:30
 msgid "The URL template is used to load and display the tile layer on geographical maps."
@@ -21812,11 +21840,11 @@ msgstr "Průměrný čas zápisu z virtuálního disku, \"url\" - URL služby VM
 
 #: app/views/oauth.edit.php:70
 msgid "The client identifier registered within the authorization server."
-msgstr ""
+msgstr "Identifikátor klienta registrovaný v rámci autorizačního serveru."
 
 #: app/views/oauth.edit.php:110
 msgid "The client secret registered within the authorization server."
-msgstr ""
+msgstr "Tajný klíč klienta registrovaný na autorizačním serveru."
 
 #: app/controllers/CControllerHostEdit.php:282
 msgid "The cloned host contains user defined macros with type \"Secret text\". The value and type of these macros were reset."
@@ -21902,7 +21930,7 @@ msgstr "Maximální úroveň přiblížení je \"%1$s\"."
 #: include/classes/api/services/CDiscoveryRule.php:962
 #, c-format
 msgid "The nested LLD rule with key \"%1$s\" of the template \"%2$s\" cannot be inherited to non-discovered host \"%3$s\"."
-msgstr ""
+msgstr "Vnořené pravidlo LLD s klíčem \"%1$s\" šablony \"%2$s\" nelze zdědit na neobjeveného hosta \"%3$s\"."
 
 #: include/classes/data/CItemData.php:1281
 msgid "The number of processes. Returns integer"
@@ -21928,22 +21956,22 @@ msgstr "Klonovaná šablona patří do skupiny šablon, do které nemáte opráv
 #: app/views/host.wizard.edit.php:275
 #, c-format
 msgid "The template you selected (%1$s) must be linked to a host - an entity in Zabbix that represents your monitoring target."
-msgstr ""
+msgstr "Vybraná šablona (%1$s) musí být propojena s hostem – entitou v Zabbixu, která představuje váš cíl monitorování."
 
 #: app/views/host.wizard.edit.php:353
 #, c-format
 msgid "The template you selected (%1$s) requires Zabbix agent to be installed and running on your monitoring target."
-msgstr ""
+msgstr "Vybraná šablona (%1$s) vyžaduje, aby byl na vašem cílovém monitorovacím zařízení nainstalován a spuštěn Zabbix agent."
 
 #: app/views/host.wizard.edit.php:899
 #, c-format
 msgid "The template you selected (%1$s) requires additional configuration."
-msgstr ""
+msgstr "Vybraná šablona (%1$s) vyžaduje další konfiguraci."
 
 #: app/views/host.wizard.edit.php:573
 #, c-format
 msgid "The template you selected (%1$s) requires the %2$s to be added to the host (%3$s)."
-msgstr ""
+msgstr "Vybraná šablona (%1$s) vyžaduje přidání %2$s k hostovi (%3$s)."
 
 #: app/views/popup.token.view.php:62
 msgid "The token has expired. Please update the expiry date to use the token."
@@ -21960,7 +21988,7 @@ msgstr "Trigger již není objevován a bude smazán při dalším objevování.
 
 #: app/views/js/host.wizard.edit.js.php:722
 msgid "The value does not match the existing value on the selected host."
-msgstr ""
+msgstr "Hodnota neodpovídá existující hodnotě na vybraném hostovi."
 
 #: include/views/configuration.host.discovery.edit.php:712
 msgid "The value should be greater than LLD rule update interval."
@@ -21997,7 +22025,7 @@ msgstr[2] "Tuto kontrolu nelze odstranit, protože se používá jako podmínka 
 
 #: app/views/host.wizard.edit.php:384
 msgid "This configuration will overwrite all existing encryption settings on the host."
-msgstr ""
+msgstr "Tato konfigurace přepíše všechna existující nastavení šifrování na hostovi."
 
 #: include/func.inc.php:2566
 msgid "This day last week"
@@ -22007,14 +22035,14 @@ msgstr "Tento den v minulém týdnu"
 #: include/classes/validators/CFormValidator.php:1109
 #: include/classes/validators/CFormValidator.php:1158 jsLoader.php:427
 msgid "This field cannot be empty."
-msgstr ""
+msgstr "Toto pole nemůže být prázdné."
 
 #: app/controllers/CControllerItemCreate.php:263
 #: app/controllers/CControllerItemPrototypeCreate.php:271
 #: app/controllers/CControllerItemPrototypeUpdate.php:228
 #: app/controllers/CControllerItemUpdate.php:228
 msgid "This field cannot be set to \"0\" without defining custom intervals."
-msgstr ""
+msgstr "Toto pole nelze nastavit na hodnotu \"0\" bez definování vlastních intervalů."
 
 #: app/partials/configuration.host.edit.html.php:383
 #, c-format
@@ -22023,7 +22051,7 @@ msgstr "Toto pole je automaticky vyplněné položkou \"%1$s\"."
 
 #: include/classes/validators/CItemKeyValidator.php:42
 msgid "This field must contain at least one low-level discovery macro."
-msgstr ""
+msgstr "Toto pole musí obsahovat alespoň jedno nízkoúrovňové objevové makro."
 
 #: app/controllers/CControllerMediatypeTestEdit.php:86
 msgid "This is the test message from Zabbix"
@@ -22039,7 +22067,7 @@ msgstr "Prozatím tento měsíc"
 
 #: include/classes/validators/CFormValidator.php:1260 jsLoader.php:425
 msgid "This object already exists."
-msgstr ""
+msgstr "Tento objekt již existuje."
 
 #: widgets/item/views/widget.edit.php:229
 msgid "This setting applies only to numeric data."
@@ -22081,68 +22109,68 @@ msgstr "Tento uživatel je poskytovaný idP. Manuální změny v poskytovaných 
 #, c-format
 msgid "This value cannot be %1$s."
 msgid_plural "This value cannot be one of %1$s."
-msgstr[0] ""
-msgstr[1] ""
-msgstr[2] ""
+msgstr[0] "Tato hodnota nemůže být %1$s."
+msgstr[1] "Tato hodnota nemůže být %1$s."
+msgstr[2] "Tato hodnota nemůže být %1$s."
 
 #: jsLoader.php:429
 #, c-format
 msgid "This value cannot be one of %1$s."
-msgstr ""
+msgstr "Tato hodnota nemůže být jedna z %1$s."
 
 #: include/classes/validators/CFormValidator.php:946 jsLoader.php:421
 msgid "This value does not match pattern."
-msgstr ""
+msgstr "Tato hodnota neodpovídá vzoru."
 
 #: include/classes/validators/CFormValidator.php:874 jsLoader.php:424
 msgid "This value is not a valid floating-point value."
-msgstr ""
+msgstr "Tato hodnota není platná hodnota s plovoucí desetinnou čárkou."
 
 #: include/classes/validators/CFormValidator.php:790 jsLoader.php:422
 msgid "This value is not a valid identifier."
-msgstr ""
+msgstr "Tato hodnota není platný identifikátor."
 
 #: include/classes/validators/CFormValidator.php:823 jsLoader.php:423
 msgid "This value is not a valid integer."
-msgstr ""
+msgstr "Tato hodnota není platné celé číslo."
 
 #: include/classes/validators/CFormValidator.php:923 jsLoader.php:426
 msgid "This value is not a valid string."
-msgstr ""
+msgstr "Tato hodnota není platný řetězec."
 
 #: include/classes/validators/CFormValidator.php:940 jsLoader.php:428
 msgid "This value is too long."
-msgstr ""
+msgstr "Tato hodnota je příliš dlouhá."
 
 #: app/views/js/host.wizard.edit.js.php:2045
 msgid "This value is too short."
-msgstr ""
+msgstr "Tato hodnota je příliš krátká."
 
 #: include/classes/validators/CFormValidator.php:1397
 #: include/classes/validators/CFormValidator.php:1461 jsLoader.php:431
 #, c-format
 msgid "This value must be %1$s."
 msgid_plural "This value must be one of %1$s."
-msgstr[0] ""
-msgstr[1] ""
-msgstr[2] ""
+msgstr[0] "Tato hodnota musí být %1$s."
+msgstr[1] "Tato hodnota musí být jedna z %1$s."
+msgstr[2] "Tato hodnota musí být jedna z %1$s."
 
 #: include/classes/validators/CFormValidator.php:847
 #: include/classes/validators/CFormValidator.php:898 jsLoader.php:433
 #, c-format
 msgid "This value must be no greater than \"%1$s\"."
-msgstr ""
+msgstr "Tato hodnota nesmí být větší než \"%1$s\"."
 
 #: include/classes/validators/CFormValidator.php:841
 #: include/classes/validators/CFormValidator.php:892 jsLoader.php:432
 #, c-format
 msgid "This value must be no less than \"%1$s\"."
-msgstr ""
+msgstr "Tato hodnota nesmí být menší než \"%1$s\"."
 
 #: jsLoader.php:434
 #, c-format
 msgid "This value must be one of %1$s."
-msgstr ""
+msgstr "Tato hodnota musí být jedna z %1$s."
 
 #: include/func.inc.php:2572
 msgid "This week"
@@ -22365,7 +22393,7 @@ msgstr "Do"
 
 #: app/views/host.wizard.edit.php:930
 msgid "To complete the setup, configure the following variables (host macros)."
-msgstr ""
+msgstr "Pro dokončení nastavení nakonfigurujte následující proměnné (host makra)."
 
 #: jsLoader.php:398
 msgid "To set a host interface select a single item type for all items"
@@ -22385,11 +22413,11 @@ msgstr "Úprava tokenu"
 
 #: app/views/oauth.edit.php:188
 msgid "Token endpoint"
-msgstr ""
+msgstr "Koncový bod tokenu"
 
 #: app/views/oauth.edit.php:201
 msgid "Token parameters"
-msgstr ""
+msgstr "Parametry tokenu"
 
 #: include/views/js/monitoring.sysmaps.js.php:40
 #: include/views/js/monitoring.sysmaps.js.php:159
@@ -22948,7 +22976,7 @@ msgstr "Typ (OK)"
 
 #: app/views/host.wizard.edit.php:149
 msgid "Type a keyword to search for templates."
-msgstr ""
+msgstr "Zadejte klíčové slovo pro vyhledávání šablon."
 
 #: app/views/correlation.edit.php:195 app/views/popup.action.edit.php:125
 #: app/views/popup.lldoverride.php:77 app/views/popup.operation.edit.php:423
@@ -23076,7 +23104,7 @@ msgstr "Nelze změnit oprávnění konfiguračního souboru na 0600."
 #: include/classes/server/CZabbixServer.php:673
 #: include/classes/server/CZabbixServer.php:681 jsrpc.php:86 jsrpc.php:101
 msgid "Unable to connect to the Zabbix server due to TLS settings. Some functions are unavailable."
-msgstr ""
+msgstr "Nelze se připojit k serveru Zabbix kvůli nastavení TLS. Některé funkce nejsou k dispozici."
 
 #: include/classes/core/CConfigFile.php:237
 msgid "Unable to create the configuration file."
@@ -23197,15 +23225,15 @@ msgstr "Vrátit zpět odsouhlasení problému."
 
 #: app/controllers/CControllerOauthAuthorize.php:146
 msgid "Unexpected HTTP response status code."
-msgstr ""
+msgstr "Neočekávaný stavový kód odpovědi HTTP."
 
 #: app/controllers/CControllerHostWizardUpdateGeneral.php:119
 #, c-format
 msgid "Unexpected macro \"%1$s\""
 msgid_plural "Unexpected macros \"%1$s\""
-msgstr[0] ""
-msgstr[1] ""
-msgstr[2] ""
+msgstr[0] "Neočekávané makro \"%1$s\""
+msgstr[1] "Neočekávané makra \"%1$s\""
+msgstr[2] "Neočekávané makra \"%1$s\""
 
 #: include/classes/core/ZBase.php:679
 #, c-format
@@ -23678,6 +23706,10 @@ msgstr "Použijte neproporcionální písmo"
 msgid "Use the filter to display results"
 msgstr "K zobrazení výsledků použijte filtr"
 
+#: app/views/host.wizard.edit.php:424
+msgid "Use:"
+msgstr "Použití:"
+
 #: app/views/administration.script.list.php:93 app/views/mediatype.list.php:98
 msgid "Used in actions"
 msgstr "Používané v akcích"
@@ -24102,7 +24134,7 @@ msgstr "Uživatelé"
 
 #: include/locales.inc.php:62
 msgid "Uzbek (uz_UZ)"
-msgstr ""
+msgstr "Uzbečtina (uz_UZ)"
 
 #: include/classes/data/CItemData.php:1876
 msgid "VMware Distributed Virtual Switch, \"url\" - VMware service URL. Returns JSON"
@@ -24625,13 +24657,13 @@ msgstr "Mapování hodnot"
 #: include/classes/validators/CFormValidator.php:1038
 #, c-format
 msgid "Value must be greater than %1$s."
-msgstr ""
+msgstr "Hodnota musí být větší než %1$s."
 
 #: include/classes/validators/CFormValidator.php:1033
 #: include/classes/validators/CFormValidator.php:1042
 #, c-format
 msgid "Value must be smaller than %1$s."
-msgstr ""
+msgstr "Hodnota musí být menší než %1$s."
 
 #: include/classes/data/CItemData.php:1078
 msgid "Value of MQTT topic. Format of returned data depends on the topic content. If wildcards are used, returns topic values in JSON"
@@ -24757,13 +24789,17 @@ msgstr "Upovídaný"
 msgid "Verification code"
 msgstr "Ověřovací kód"
 
+#: app/views/host.wizard.edit.php:407
+msgid "Verify Zabbix server, proxy, or cluster address"
+msgstr "Ověření adresy serveru Zabbix, proxy nebo clusteru"
+
 #: include/classes/setup/CSetupWizard.php:655
 msgid "Verify database certificate"
 msgstr "Ověřte certifikát databáze"
 
 #: include/classes/setup/CSetupWizard.php:881
 msgid "Verify server certificate issuer and subject"
-msgstr ""
+msgstr "Ověření vydavatele a předmětu certifikátu serveru"
 
 #: app/views/administration.proxy.list.php:62
 #: app/views/administration.proxy.list.php:89 app/views/module.edit.php:40
@@ -24901,11 +24937,11 @@ msgstr "Web"
 
 #: include/classes/setup/CSetupWizard.php:1089
 msgid "Web interface TLS certificate file"
-msgstr ""
+msgstr "Soubor certifikátu TLS webového rozhraní"
 
 #: include/classes/setup/CSetupWizard.php:1085
 msgid "Web interface TLS key file"
-msgstr ""
+msgstr "Soubor klíče TLS webového rozhraní"
 
 #: app/controllers/CControllerWebView.php:163
 #: app/views/monitoring.web.view.php:37 include/items.inc.php:101
@@ -25013,7 +25049,7 @@ msgstr "Vítejte v"
 
 #: app/views/host.wizard.edit.php:99
 msgid "Welcome to the Host Wizard"
-msgstr ""
+msgstr "Vítejte v Průvodci hostem"
 
 #: app/views/administration.user.edit.php:334 app/views/popup.media.php:96
 msgid "When active"
@@ -25073,11 +25109,11 @@ msgstr "Šířka"
 
 #: app/views/host.wizard.edit.php:435
 msgid "Windows"
-msgstr ""
+msgstr "Windows"
 
 #: app/views/host.wizard.edit.php:450
 msgid "Windows 10/Server 2016 or later"
-msgstr ""
+msgstr "Windows 10/Server 2016 nebo novější"
 
 #: app/controllers/CControllerLatest.php:554
 msgid "With data"
@@ -25397,7 +25433,7 @@ msgstr "Nejste přihlášen"
 
 #: app/views/host.wizard.edit.php:103
 msgid "You can always access Host Wizard from Data collection > Hosts."
-msgstr ""
+msgstr "Průvodce hostem můžete kdykoli otevřít v nabídce Sběr dat > Hosté."
 
 #: app/views/popup.generic.php:74
 msgid "You cannot switch hosts for current selection."
@@ -25441,7 +25477,7 @@ msgstr "Vaše databáze nefunguje správně. Počkejte prosím několik minut a 
 
 #: app/views/host.wizard.edit.php:1044
 msgid "Your progress will be discarded and you will exit the Host Wizard. Are you sure you want to cancel?"
-msgstr ""
+msgstr "Váš postup bude zahozen a Průvodce hostem bude ukončen. Opravdu chcete zrušit?"
 
 #: include/page_header.php:122
 msgid "Zabbix"
@@ -25480,11 +25516,15 @@ msgstr "Agent Zabbix (pasivní kontroly)"
 
 #: app/views/js/host.wizard.edit.js.php:91
 msgid "Zabbix agent initiates connections to Zabbix server or proxy to send data. Recommended for monitoring targets behind a firewall."
-msgstr ""
+msgstr "Zabbix agent inicializuje připojení k Zabbix serveru nebo proxy serveru pro odesílání dat. Doporučuje se pro monitorování cílů za firewallem."
+
+#: app/views/host.wizard.edit.php:422
+msgid "Zabbix agent must be able to connect to the specified address or list of addresses."
+msgstr "Zabbix agent se musí být schopen připojit k zadané adrese nebo seznamu adres."
 
 #: app/views/host.wizard.edit.php:863
 msgid "Zabbix documentation"
-msgstr ""
+msgstr "Dokumentace k Zabbixu"
 
 #: app/partials/administration.system.info.php:45
 msgid "Zabbix frontend version"
@@ -25552,7 +25592,7 @@ msgstr "Zabbix server jméno"
 
 #: app/views/js/host.wizard.edit.js.php:92
 msgid "Zabbix server or proxy initiates connections to Zabbix agent to request data. Recommended for networks without a firewall or with open firewall ports."
-msgstr ""
+msgstr "Zabbix server nebo proxy inicializuje připojení k Zabbix agentovi za účelem vyžádání dat. Doporučeno pro sítě bez firewallu nebo s otevřenými porty firewallu."
 
 #: app/partials/administration.system.info.php:40
 msgid "Zabbix server version"
@@ -25671,7 +25711,7 @@ msgstr "očekává se číselná hodnota"
 
 #: include/classes/validators/CApiInputValidator.php:2884
 msgid "a port number is expected"
-msgstr ""
+msgstr "očekává se číslo portu"
 
 #: app/controllers/CControllerPopupItemTestSend.php:193
 #: app/controllers/CControllerPopupItemTestSend.php:207
@@ -26697,7 +26737,7 @@ msgstr "Očekává se ID spouštěče hostitele"
 
 #: app/views/host.wizard.edit.php:134
 msgid "how to update them"
-msgstr ""
+msgstr "jak je aktualizovat"
 
 #: include/classes/api/services/CMap.php:844
 #: include/classes/api/services/CMap.php:1311
@@ -27065,7 +27105,7 @@ msgstr "m-d H:i"
 
 #: app/views/host.wizard.edit.php:589
 msgid "macOS"
-msgstr ""
+msgstr "macOS"
 
 #: include/classes/parsers/CUserMacroParser.php:37
 msgid "macro is empty"
@@ -27472,7 +27512,7 @@ msgstr "na"
 #: include/classes/validators/CFormValidator.php:1433 jsLoader.php:438
 #, c-format
 msgid "one of %1$s"
-msgstr ""
+msgstr "jeden z %1$s"
 
 #: include/classes/validators/CApiInputValidator.php:2420
 #, c-format
@@ -28347,13 +28387,13 @@ msgstr "nebude deaktivován"
 #: include/classes/validators/CFormValidator.php:1438 jsLoader.php:436
 #, c-format
 msgid "within range %1$s"
-msgstr ""
+msgstr "v rozsahu %1$s"
 
 #: include/classes/validators/CFormValidator.php:1394
 #: include/classes/validators/CFormValidator.php:1439 jsLoader.php:437
 #, c-format
 msgid "within ranges %1$s"
-msgstr ""
+msgstr "v rozsazích %1$s"
 
 #: app/controllers/CControllerItemMassCheckNow.php:122
 #: include/classes/api/services/CTask.php:553

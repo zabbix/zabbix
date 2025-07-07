@@ -27,7 +27,7 @@ Due to the specifics of the webhook, the number of retries is, by default, set t
 
 ## Requirements
 
-Zabbix version: 7.4 and higher.
+Zabbix version: 8.0 and higher.
 
 ## Parameters
 
@@ -85,18 +85,18 @@ The global macro can also be used, for example, to populate a custom field in Ji
 
 [![](images/thumb.1.png?raw=true)](images/1.png)
 
-2\. [Import](https://www.zabbix.com/documentation/7.4/manual/web_interface/frontend_sections/administration/mediatypes) the GLPi media type from the file [`media_glpi.yaml`](media_glpi.yaml).
+2\. [Import](https://www.zabbix.com/documentation/8.0/manual/web_interface/frontend_sections/administration/mediatypes) the GLPi media type from the file [`media_glpi.yaml`](media_glpi.yaml).
 
 3\. In the imported media, change the values of the variable `glpi_token` and `glpi_url`.
 
-For more information about Zabbix webhook configuration, please see [Zabbix documentation](https://www.zabbix.com/documentation/7.4/manual/config/notifications/media/webhook).
+For more information about Zabbix webhook configuration, please see [Zabbix documentation](https://www.zabbix.com/documentation/8.0/manual/config/notifications/media/webhook).
 
 4\. Create a Zabbix user and add **Media** with the **GLPi** media type.
 Though the *Send to* field is not used in the GLPi webhook, it cannot be left empty. To comply with frontend requirements, enter any symbol in the field.
 
 Make sure the user you created has access to all the hosts for which you would like Zabbix problem notifications to be converted into GLPi problems.
 
-For more information, please see [Zabbix](https://www.zabbix.com/documentation/7.4/manual/config/notifications) and [GLPi](https://glpi-user-documentation.readthedocs.io/fr/latest/) documentation.
+For more information, please see [Zabbix](https://www.zabbix.com/documentation/8.0/manual/config/notifications) and [GLPi](https://glpi-user-documentation.readthedocs.io/fr/latest/) documentation.
 
 ## Feedback
 
