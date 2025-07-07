@@ -184,6 +184,9 @@ unsigned char	zbx_mock_str_to_value_type(const char *str)
 	if (0 == strcmp(str, "ITEM_VALUE_TYPE_BIN"))
 		return ITEM_VALUE_TYPE_BIN;
 
+	if (0 == strcmp(str, "ITEM_VALUE_TYPE_JSON"))
+		return ITEM_VALUE_TYPE_JSON;
+
 	fail_msg("Unknown value type \"%s\"", str);
 
 	return ITEM_VALUE_TYPE_NONE;

@@ -48,6 +48,7 @@
 #	define ZBX_TYPE_UINT_STR		"bigint unsigned"
 #	define ZBX_TYPE_LONGTEXT_STR		"longtext"
 #	define ZBX_TYPE_BLOB_STR		"longblob"
+#	define ZBX_TYPE_JSON_STR		"json"
 #	define ZBX_TYPE_SERIAL_STR		"bigint unsigned"
 #	define ZBX_TYPE_SERIAL_SUFFIX_STR	"auto_increment"
 #elif defined(HAVE_POSTGRESQL)
@@ -56,6 +57,7 @@
 #	define ZBX_TYPE_UINT_STR		"numeric(20)"
 #	define ZBX_TYPE_LONGTEXT_STR		"text"
 #	define ZBX_TYPE_BLOB_STR		"bytea"
+#	define ZBX_TYPE_JSON_STR		"bjson"
 #	define ZBX_TYPE_SERIAL_STR		"bigserial"
 #	define ZBX_TYPE_SERIAL_SUFFIX_STR	""
 #endif
@@ -95,6 +97,9 @@ static void	DBfield_type_string(char **sql, size_t *sql_alloc, size_t *sql_offse
 		case ZBX_TYPE_BLOB:
 			zbx_strcpy_alloc(sql, sql_alloc, sql_offset, ZBX_TYPE_BLOB_STR);
 			break;
+		case ZBX_TYPE_JSON:
+			zbx_strcpy_alloc(sql, sql_alloc, sql_offset, ZBX_TYPE_JSON_STR);
+			break;
 		case ZBX_TYPE_CUID:
 			zbx_snprintf_alloc(sql, sql_alloc, sql_offset, "%s(%d)", ZBX_TYPE_CHAR_STR, CUID_LEN - 1);
 			break;
@@ -120,6 +125,7 @@ static void	DBfield_type_suffix_string(char **sql, size_t *sql_alloc, size_t *sq
 		case ZBX_TYPE_LONGTEXT:
 		case ZBX_TYPE_TEXT:
 		case ZBX_TYPE_BLOB:
+		case ZBX_TYPE_JSON:
 		case ZBX_TYPE_CUID:
 			return;
 		case ZBX_TYPE_SERIAL:
@@ -144,9 +150,10 @@ static void	DBfield_definition_string(char **sql, size_t *sql_alloc, size_t *sql
 		switch (field->type)
 		{
 			case ZBX_TYPE_BLOB:
+			case ZBX_TYPE_JSON:
 			case ZBX_TYPE_TEXT:
 			case ZBX_TYPE_LONGTEXT:
-				/* MySQL: BLOB and TEXT columns cannot be assigned a default value */
+				/* MySQL: JSON, BLOB and TEXT columns cannot be assigned a default value */
 				break;
 			default:
 #endif
@@ -731,7 +738,7 @@ DBPATCHES_ARRAY_DECL(7010);
 DBPATCHES_ARRAY_DECL(7020);
 DBPATCHES_ARRAY_DECL(7030);
 DBPATCHES_ARRAY_DECL(7040);
-/*DBPATCHES_ARRAY_DECL(7050);*/
+DBPATCHES_ARRAY_DECL(7050);
 
 static zbx_dbpatch_t *dbversions[] = {
 	DBPATCH_VERSION(2010), /* 2.2 development */
@@ -768,7 +775,7 @@ static zbx_dbpatch_t *dbversions[] = {
 	DBPATCH_VERSION(7020), /* 7.2 maintenance */
 	DBPATCH_VERSION(7030), /* 7.4 development */
 	DBPATCH_VERSION(7040), /* 7.4 maintenance */
-/*	DBPATCH_VERSION(7050),*/ /* 8.0 development */
+	DBPATCH_VERSION(7050), /* 8.0 development */
 	NULL
 };
 

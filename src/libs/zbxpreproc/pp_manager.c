@@ -817,6 +817,11 @@ static void	preproc_item_value_extract_data(zbx_preproc_item_value_t *value, zbx
 		THIS_SHOULD_NEVER_HAPPEN;
 		exit(EXIT_FAILURE);
 	}
+	else if (ZBX_ISSET_JSON(value->result))
+	{
+		THIS_SHOULD_NEVER_HAPPEN;
+		exit(EXIT_FAILURE);
+	}
 	else
 		zbx_variant_set_none(var);
 

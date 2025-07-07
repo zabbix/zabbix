@@ -149,6 +149,7 @@ static void	zbx_vcmock_read_history_value(zbx_mock_handle_t hvalue, unsigned cha
 			case ITEM_VALUE_TYPE_STR:
 			case ITEM_VALUE_TYPE_TEXT:
 			case ITEM_VALUE_TYPE_BIN:
+			case ITEM_VALUE_TYPE_JSON:
 				value->str = zbx_strdup(NULL, data);
 				break;
 			case ITEM_VALUE_TYPE_UINT64:
@@ -252,6 +253,7 @@ void	zbx_vcmock_check_records(const char *prefix, unsigned char value_type,
 			case ITEM_VALUE_TYPE_STR:
 			case ITEM_VALUE_TYPE_TEXT:
 			case ITEM_VALUE_TYPE_BIN:
+			case ITEM_VALUE_TYPE_JSON:
 				zbx_mock_assert_str_eq(prefix, expected->value.str, returned->value.str);
 				break;
 			case ITEM_VALUE_TYPE_UINT64:

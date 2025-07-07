@@ -321,6 +321,9 @@ static int	preprocessor_unpack_variant(const unsigned char *data, zbx_variant_t 
 		case ZBX_VARIANT_BIN:
 			offset += zbx_deserialize_bin(offset, &value->data.bin, value_len);
 			break;
+		case ZBX_VARIANT_JSON:
+			offset += zbx_deserialize_json(offset, &value->data.bin, value_len);
+			break;
 		case ZBX_VARIANT_NONE:
 		case ZBX_VARIANT_VECTOR:
 			break;
@@ -970,6 +973,12 @@ void	zbx_preprocess_item_value(zbx_uint64_t itemid, zbx_uint64_t hostid, unsigne
 		}
 
 		if (0 != ZBX_ISSET_BIN(result))
+		{
+			THIS_SHOULD_NEVER_HAPPEN;
+			exit(EXIT_FAILURE);
+		}
+
+		if (0 != ZBX_ISSET_JSON(result))
 		{
 			THIS_SHOULD_NEVER_HAPPEN;
 			exit(EXIT_FAILURE);

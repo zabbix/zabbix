@@ -185,6 +185,8 @@ const char	*zbx_item_value_type_string(zbx_item_value_type_t value_type)
 			return "Text";
 		case ITEM_VALUE_TYPE_BIN:
 			return "Binary";
+		case ITEM_VALUE_TYPE_JSON:
+			return "JSON";
 		case ITEM_VALUE_TYPE_NONE:
 			return "None";
 		default:

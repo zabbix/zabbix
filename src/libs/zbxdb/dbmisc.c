@@ -605,6 +605,7 @@ static size_t	get_string_field_size(const zbx_db_field_t *field)
 {
 	switch (field->type)
 	{
+		case ZBX_TYPE_JSON:
 		case ZBX_TYPE_BLOB:
 		case ZBX_TYPE_LONGTEXT:
 			return 4294967295ul;
@@ -622,12 +623,19 @@ static size_t	get_string_field_size(const zbx_db_field_t *field)
 
 static size_t	get_string_field_chars(const zbx_db_field_t *field)
 {
-	if ((ZBX_TYPE_LONGTEXT == field->type || ZBX_TYPE_BLOB == field->type) && 0 == field->length)
+	if ((ZBX_TYPE_LONGTEXT == field->type || ZBX_TYPE_BLOB == field->type || ZBX_TYPE_JSON == field->type) &&
+			0 == field->length)
+	{
 		return ZBX_SIZE_T_MAX;
+	}
 	else if (ZBX_TYPE_CUID == field->type)
+	{
 		return CUID_LEN - 1;
+	}
 	else
+	{
 		return field->length;
+	}
 }
 
 int	zbx_db_validate_field_size(const char *tablename, const char *fieldname, const char *str)

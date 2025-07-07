@@ -1726,6 +1726,7 @@ void	zbx_db_delete_items(zbx_vector_uint64_t *itemids, int audit_context_mode)
 		zbx_vector_str_append(&hk_history, "history_log");
 		zbx_vector_str_append(&hk_history, "history_text");
 		zbx_vector_str_append(&hk_history, "history_bin");
+		zbx_vector_str_append(&hk_history, "history_json");
 	}
 
 	if (ZBX_HK_MODE_REGULAR == trends_mode)

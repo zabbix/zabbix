@@ -45,6 +45,7 @@ static void	db_insert_clear_rows(zbx_db_insert_t *db_insert)
 				case ZBX_TYPE_LONGTEXT:
 				case ZBX_TYPE_CUID:
 				case ZBX_TYPE_BLOB:
+				case ZBX_TYPE_JSON:
 					zbx_free(row[j].str);
 					break;
 			}
@@ -220,6 +221,7 @@ void	zbx_db_insert_add_values_dyn(zbx_db_insert_t *db_insert, zbx_db_value_t **v
 			case ZBX_TYPE_TEXT:
 			case ZBX_TYPE_CUID:
 			case ZBX_TYPE_BLOB:
+			case ZBX_TYPE_JSON:
 				row[i].str = db_dyn_escape_field_len(field, value->str, ESCAPE_SEQUENCE_ON);
 				break;
 			case ZBX_TYPE_INT:
@@ -276,6 +278,7 @@ void	zbx_db_insert_add_values(zbx_db_insert_t *db_insert, ...)
 			case ZBX_TYPE_LONGTEXT:
 			case ZBX_TYPE_CUID:
 			case ZBX_TYPE_BLOB:
+			case ZBX_TYPE_JSON:
 				value->str = va_arg(args, char *);
 				break;
 			case ZBX_TYPE_INT:
@@ -437,6 +440,7 @@ int	zbx_db_insert_execute(zbx_db_insert_t *db_insert)
 		switch (field->type)
 		{
 			case ZBX_TYPE_BLOB:
+			case ZBX_TYPE_JSON:
 			case ZBX_TYPE_TEXT:
 			case ZBX_TYPE_LONGTEXT:
 			case ZBX_TYPE_CUID:
@@ -496,6 +500,7 @@ int	zbx_db_insert_execute(zbx_db_insert_t *db_insert)
 						zbx_chrcpy_alloc(&sql, &sql_alloc, &sql_offset, '\'');
 					break;
 				case ZBX_TYPE_BLOB:
+				case ZBX_TYPE_JSON:
 					zbx_chrcpy_alloc(&sql, &sql_alloc, &sql_offset, '\'');
 					if (NULL != value->str)
 						decode_and_escape_binary_value_for_sql(db_insert->db, &(value->str));

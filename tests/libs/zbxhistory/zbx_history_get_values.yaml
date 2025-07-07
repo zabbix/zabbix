@@ -453,4 +453,16 @@ db data:
   - [1484035210, 0, '🌭🌭']
   - [1484035209, 500000000, 'YQo=']
   - [1484035209, 0, '🌭Cg==']
+---
+test case: Test JSON value type empty
+in:
+    itemid: 28244
+    value type: ITEM_VALUE_TYPE_JSON
+    seconds: 10
+    count: 10
+    end: 2017-01-10 09:00:00.000000000 +02:00
+out:
+  values: []
+db data:
+  history_json: [] 
 ...

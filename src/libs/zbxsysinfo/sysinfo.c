@@ -1336,6 +1336,7 @@ int	zbx_set_agent_result_type(AGENT_RESULT *result, int value_type, char *c)
 			ret = SUCCEED;
 			break;
 		case ITEM_VALUE_TYPE_BIN:
+		case ITEM_VALUE_TYPE_JSON:
 		case ITEM_VALUE_TYPE_NONE:
 		default:
 			THIS_SHOULD_NEVER_HAPPEN;

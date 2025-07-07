@@ -65,6 +65,9 @@ void	zbx_variant_clear(zbx_variant_t *value)
 		case ZBX_VARIANT_BIN:
 			zbx_free(value->data.bin);
 			break;
+		case ZBX_VARIANT_JSON:
+			zbx_free(value->data.json);
+			break;
 		case ZBX_VARIANT_ERR:
 			zbx_free(value->data.err);
 			break;

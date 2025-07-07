@@ -129,6 +129,15 @@
 		value_len + sizeof(zbx_uint32_t)					\
 	)
 
+/* length prefixed JSON data */
+#define zbx_deserialize_json(buffer, value, value_len)					\
+	(										\
+		memcpy(&value_len, buffer, sizeof(zbx_uint32_t)),			\
+		*value = (void *)zbx_malloc(NULL, value_len + sizeof(zbx_uint32_t)),	\
+		memcpy(*(value), buffer, value_len + sizeof(zbx_uint32_t)),		\
+		value_len + sizeof(zbx_uint32_t)					\
+	)
+
 /* complex serialization/deserialization functions */
 
 zbx_uint32_t	zbx_serialize_uint31_compact(unsigned char *ptr, zbx_uint32_t value);

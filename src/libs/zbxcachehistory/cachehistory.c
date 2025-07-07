@@ -316,6 +316,10 @@ void	*zbx_dc_get_stats(int request)
 			value_uint = cache->stats.history_bin_counter;
 			ret = (void *)&value_uint;
 			break;
+		case ZBX_STATS_HISTORY_JSON_COUNTER:
+			value_uint = cache->stats.history_json_counter;
+			ret = (void *)&value_uint;
+			break;
 		default:
 			ret = NULL;
 	}
@@ -1387,7 +1391,8 @@ static void	DCexport_history(const zbx_dc_history_t *history, int history_num, z
 		}
 
 		if (0 == connector_object.ids.values_num &&
-				(FAIL == history_export_enabled || ITEM_VALUE_TYPE_BIN == h->value_type))
+				(FAIL == history_export_enabled || ITEM_VALUE_TYPE_BIN == h->value_type ||
+				ITEM_VALUE_TYPE_JSON == h->value_type))
 		{
 			continue;
 		}
@@ -1438,6 +1443,7 @@ static void	DCexport_history(const zbx_dc_history_t *history, int history_num, z
 			case ITEM_VALUE_TYPE_STR:
 			case ITEM_VALUE_TYPE_TEXT:
 			case ITEM_VALUE_TYPE_BIN:
+			case ITEM_VALUE_TYPE_JSON:
 				zbx_json_addstring(&json, ZBX_PROTO_TAG_VALUE, h->value.str, ZBX_JSON_TYPE_STRING);
 				break;
 			case ITEM_VALUE_TYPE_LOG:
@@ -1468,8 +1474,11 @@ static void	DCexport_history(const zbx_dc_history_t *history, int history_num, z
 			zbx_vector_uint64_clear(&connector_object.ids);
 		}
 
-		if (SUCCEED == history_export_enabled && ITEM_VALUE_TYPE_BIN != h->value_type)
+		if (SUCCEED == history_export_enabled && ITEM_VALUE_TYPE_BIN != h->value_type &&
+				ITEM_VALUE_TYPE_JSON != h->value_type)
+		{
 			zbx_history_export_write(json.buffer, json.buffer_size);
+		}
 	}
 
 	if (SUCCEED == history_export_enabled)

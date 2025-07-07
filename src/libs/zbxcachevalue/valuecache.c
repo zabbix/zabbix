@@ -635,6 +635,7 @@ static void	vc_history_record_vector_clean(zbx_vector_history_record_t *vector, 
 		case ITEM_VALUE_TYPE_FLOAT:
 			break;
 		case ITEM_VALUE_TYPE_BIN:
+		case ITEM_VALUE_TYPE_JSON:
 		case ITEM_VALUE_TYPE_NONE:
 		default:
 			THIS_SHOULD_NEVER_HAPPEN;
@@ -1167,6 +1168,7 @@ static size_t	vc_item_free_values(zbx_vc_item_t *item, zbx_history_record_t *val
 		case ITEM_VALUE_TYPE_FLOAT:
 			break;
 		case ITEM_VALUE_TYPE_BIN:
+		case ITEM_VALUE_TYPE_JSON:
 		case ITEM_VALUE_TYPE_NONE:
 		default:
 			THIS_SHOULD_NEVER_HAPPEN;

@@ -41,6 +41,9 @@ typedef union
 
 	/* null terminated error message */
 	char			*err;
+
+	char			*json;
+
 }
 zbx_variant_data_t;
 
@@ -57,6 +60,7 @@ struct zbx_variant
 #define ZBX_VARIANT_BIN		4
 #define ZBX_VARIANT_VECTOR	5
 #define ZBX_VARIANT_ERR		6
+#define ZBX_VARIANT_JSON	7
 
 void		zbx_variant_clear(zbx_variant_t *value);
 void		zbx_variant_set_none(zbx_variant_t *value);
