@@ -197,7 +197,6 @@ class testTimescaleDb extends CIntegrationTest {
 
 		self::waitForLogLineToBePresent(self::COMPONENT_SERVER, 'trapper got');
 		self::waitForLogLineToBePresent(self::COMPONENT_SERVER, 'End of zbx_send_response_json():SUCCEED', true, 5);
-		//$this->reloadConfigurationCache();
 		$this->stopComponent(self::COMPONENT_SERVER);
 		$this->startComponent(self::COMPONENT_SERVER);
 		$count_end = $this->getHistoryCount();
