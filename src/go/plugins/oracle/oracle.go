@@ -37,6 +37,8 @@ const (
 	sqlExt     = ".sql"
 )
 
+var errInvalidPrivilege = errs.New("invalid connection privilege")
+
 var validAdminRoles = map[dsn.AdminRole]bool{
 	dsn.SysDBA:    true,
 	dsn.SysOPER:   true,
@@ -178,7 +180,7 @@ func splitUserAndPrivilege(params map[string]string) (string, dsn.AdminRole, err
 			return parts[0], role, nil
 		}
 
-		return userStr, dsn.NoRole, nil // returning given string and no error to keep backwards compatible code
+		return "", dsn.NoRole, errInvalidPrivilege
 	}
 
 	// All other formats (e.g., "user sysdba", "user as", "user as sysdba extra") are invalid.
