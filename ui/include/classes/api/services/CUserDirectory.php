@@ -412,6 +412,7 @@ class CUserDirectory extends CApiService {
 		}
 
 		self::checkSamlRequirements($userdirectories);
+		self::checkSamlExists($userdirectories);
 
 		$api_input_rules = self::getValidationRules();
 
@@ -422,7 +423,6 @@ class CUserDirectory extends CApiService {
 		self::checkDuplicates($userdirectories);
 		self::checkProvisionGroups($userdirectories);
 		self::checkMediaTypes($userdirectories);
-		self::checkSamlExists($userdirectories);
 	}
 
 	/**

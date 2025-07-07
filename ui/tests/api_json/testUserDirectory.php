@@ -799,7 +799,7 @@ uwMrOBKatg7CZ1Uenv1K3ioD5w==
 				],
 				'expected_error' => 'Invalid parameter "/1/nameid_format": a character string is expected.'
 			],
-			'Test SAML IdP certificate required' => [
+			'Test SAML IdP certificate is required' => [
 				'userdirectories' => [
 					['userdirectoryid' => 'API SAML', 'idp_certificate' => '']
 				],
