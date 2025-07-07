@@ -656,10 +656,12 @@ function dbConditionInt($field_name, array $values, $not_in = false, $zero_inclu
 
 	$values = array_flip($values);
 
-	$include_null_for_zero = $zero_includes_null && array_key_exists(0, $values);
+	$condition = '';
+	$multiple_conditions = false;
 
-	if ($include_null_for_zero) {
-		unset($values[0]);
+	if ($zero_includes_null && array_key_exists(0, $values)) {
+		$condition .= $field_name.($not_in ? ' IS NOT NULL' : ' IS NULL');
+		$multiple_conditions = true;
 	}
 
 	$values = array_keys($values);
@@ -698,13 +700,12 @@ function dbConditionInt($field_name, array $values, $not_in = false, $zero_inclu
 		}, $values);
 	}
 
-	$condition = '';
-
 	// Process intervals.
 
 	foreach ($intervals as $interval) {
 		if ($condition !== '') {
 			$condition .= $not_in ? ' AND ' : ' OR ';
+			$multiple_conditions = true;
 		}
 
 		$condition .= ($not_in ? 'NOT ' : '').$field_name.' BETWEEN '.$interval[0].' AND '.$interval[1];
@@ -717,6 +718,7 @@ function dbConditionInt($field_name, array $values, $not_in = false, $zero_inclu
 	foreach ($single_chunks as $chunk) {
 		if ($condition !== '') {
 			$condition .= $not_in ? ' AND ' : ' OR ';
+			$multiple_conditions = true;
 		}
 
 		if (count($chunk) == 1) {
@@ -727,27 +729,8 @@ function dbConditionInt($field_name, array $values, $not_in = false, $zero_inclu
 		}
 	}
 
-	if ($include_null_for_zero) {
-		if ($condition !== '') {
-			$condition .= $not_in ? ' AND ' : ' OR ';
-		}
-
-		if ($not_in) {
-			$condition .= $field_name.' IS NOT NULL'.
-				' AND '.$field_name.'!=0';
-		}
-		else {
-			$condition .= '('.
-				$field_name.' IS NULL'.
-				' OR '.$field_name.'=0'.
-			')';
-		}
-	}
-
-	if (!$not_in) {
-		if ((int) $include_null_for_zero + count($intervals) + count($single_chunks) > 1) {
-			$condition = '('.$condition.')';
-		}
+	if (!$not_in && $multiple_conditions) {
+		$condition = '('.$condition.')';
 	}
 
 	return $condition;
