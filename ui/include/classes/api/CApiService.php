@@ -1015,7 +1015,7 @@ class CApiService {
 
 			$fieldName = $this->fieldId($field, $tableShort);
 			if ($tableSchema['fields'][$field]['type'] & DB::FIELD_TYPE_ID) {
-				$filter[$field] = dbConditionId($fieldName, $values, false, $table);
+				$filter[$field] = dbConditionId($fieldName, $values);
 			}
 			elseif ($tableSchema['fields'][$field]['type'] & (DB::FIELD_TYPE_INT | DB::FIELD_TYPE_UINT)) {
 				$filter[$field] = dbConditionInt($fieldName, $values);
