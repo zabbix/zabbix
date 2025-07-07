@@ -284,7 +284,7 @@ int	zbx_db_connect(int flag)
 #if defined(HAVE_POSTGRESQL)
 		if (ZBX_DB_RONLY == err)
 		{
-			if (0 == zbx_cfg_dbhigh->read_only_recoverable && 0 >= retries--)
+			if (0 >= retries--)
 			{
 				zabbix_log(LOG_LEVEL_ERR, "database is read-only: Exiting...");
 				exit(EXIT_FAILURE);
