@@ -7,7 +7,7 @@ This guide describes how to integrate your Zabbix installation with Zammad using
 
 ## Requirements
 
-Zabbix version: 7.4 and higher.
+Zabbix version: 8.0 and higher.
 
 ## Parameters
 
@@ -106,7 +106,7 @@ Internal parameters are reserved for predefined macros that are not meant to be 
 
 6. Done! You can now start using this media type in actions and create tickets.
 
-For more information, please see [Zabbix](https://www.zabbix.com/documentation/7.4/manual/config/notifications) and [Zammad](https://zammad.org/documentation) documentation.
+For more information, please see [Zabbix](https://www.zabbix.com/documentation/8.0/manual/config/notifications) and [Zammad](https://zammad.org/documentation) documentation.
 
 ## Feedback
 

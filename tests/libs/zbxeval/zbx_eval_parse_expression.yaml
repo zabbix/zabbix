@@ -1893,4 +1893,108 @@ out:
   - {type: ZBX_EVAL_TOKEN_VAR_STR, token: '"rfsdg"', opt: 0}
   - {type: ZBX_EVAL_TOKEN_HIST_FUNCTION, token: 'count', opt: 4}
   result: SUCCEED
+---
+test case: 'Aggregation test with foreach function ''kurtosis(avg_foreach(/*/some.zabbix.key[{#LLDMACRO}]?[group="{HOSTGROUPLLD}"],1d))'''
+in:
+  rules:
+  - ZBX_EVAL_PARSE_CALC_EXPRESSION
+  expression: 'kurtosis(avg_foreach(/*/some.zabbix.key[{#LLDMACRO}]?[group="{HOSTGROUPLLD}"],1d))'
+out:
+  stack:
+  - {type: ZBX_EVAL_TOKEN_ARG_QUERY, token: '/*/some.zabbix.key[{#LLDMACRO}]?[group="{HOSTGROUPLLD}"]', opt: 0}
+  - {type: ZBX_EVAL_TOKEN_ARG_PERIOD, token: '1d', opt: 0}
+  - {type: ZBX_EVAL_TOKEN_HIST_FUNCTION, token: 'avg_foreach', opt: 2}
+  - {type: ZBX_EVAL_TOKEN_FUNCTION, token: 'kurtosis', opt: 1}
+  result: SUCCEED
+---
+test case: 'Aggregation test with foreach function ''mad(bucket_rate_foreach(/*/some.zabbix.key[{#LLDMACRO}]?[group="{HOSTGROUPLLD}"],1d))'''
+in:
+  rules:
+  - ZBX_EVAL_PARSE_CALC_EXPRESSION
+  expression: 'mad(bucket_rate_foreach(/*/some.zabbix.key[{#LLDMACRO}]?[group="{HOSTGROUPLLD}"],1d))'
+out:
+  stack:
+  - {type: ZBX_EVAL_TOKEN_ARG_QUERY, token: '/*/some.zabbix.key[{#LLDMACRO}]?[group="{HOSTGROUPLLD}"]', opt: 0}
+  - {type: ZBX_EVAL_TOKEN_ARG_PERIOD, token: '1d', opt: 0}
+  - {type: ZBX_EVAL_TOKEN_HIST_FUNCTION, token: 'bucket_rate_foreach', opt: 2}
+  - {type: ZBX_EVAL_TOKEN_FUNCTION, token: 'mad', opt: 1}
+  result: SUCCEED
+---
+test case: 'Aggregation test with foreach function ''skewness(count_foreach(/*/some.zabbix.key[{#LLDMACRO}]?[group="{HOSTGROUPLLD}"],1d))'''
+in:
+  rules:
+  - ZBX_EVAL_PARSE_CALC_EXPRESSION
+  expression: 'skewness(count_foreach(/*/some.zabbix.key[{#LLDMACRO}]?[group="{HOSTGROUPLLD}"],1d))'
+out:
+  stack:
+  - {type: ZBX_EVAL_TOKEN_ARG_QUERY, token: '/*/some.zabbix.key[{#LLDMACRO}]?[group="{HOSTGROUPLLD}"]', opt: 0}
+  - {type: ZBX_EVAL_TOKEN_ARG_PERIOD, token: '1d', opt: 0}
+  - {type: ZBX_EVAL_TOKEN_HIST_FUNCTION, token: 'count_foreach', opt: 2}
+  - {type: ZBX_EVAL_TOKEN_FUNCTION, token: 'skewness', opt: 1}
+  result: SUCCEED
+---
+test case: 'Aggregation test with foreach function ''stddevpop(exists_foreach(/*/some.zabbix.key[{#LLDMACRO}]?[group="{HOSTGROUPLLD}"],1d))'''
+in:
+  rules:
+  - ZBX_EVAL_PARSE_CALC_EXPRESSION
+  expression: 'stddevpop(exists_foreach(/*/some.zabbix.key[{#LLDMACRO}]?[group="{HOSTGROUPLLD}"],1d))'
+out:
+  stack:
+  - {type: ZBX_EVAL_TOKEN_ARG_QUERY, token: '/*/some.zabbix.key[{#LLDMACRO}]?[group="{HOSTGROUPLLD}"]', opt: 0}
+  - {type: ZBX_EVAL_TOKEN_ARG_PERIOD, token: '1d', opt: 0}
+  - {type: ZBX_EVAL_TOKEN_HIST_FUNCTION, token: 'exists_foreach', opt: 2}
+  - {type: ZBX_EVAL_TOKEN_FUNCTION, token: 'stddevpop', opt: 1}
+  result: SUCCEED
+---
+test case: 'Aggregation test with foreach function ''stddevsamp(last_foreach(/*/some.zabbix.key[{#LLDMACRO}]?[group="{HOSTGROUPLLD}"],1d))'''
+in:
+  rules:
+  - ZBX_EVAL_PARSE_CALC_EXPRESSION
+  expression: 'stddevsamp(last_foreach(/*/some.zabbix.key[{#LLDMACRO}]?[group="{HOSTGROUPLLD}"],1d))'
+out:
+  stack:
+  - {type: ZBX_EVAL_TOKEN_ARG_QUERY, token: '/*/some.zabbix.key[{#LLDMACRO}]?[group="{HOSTGROUPLLD}"]', opt: 0}
+  - {type: ZBX_EVAL_TOKEN_ARG_PERIOD, token: '1d', opt: 0}
+  - {type: ZBX_EVAL_TOKEN_HIST_FUNCTION, token: 'last_foreach', opt: 2}
+  - {type: ZBX_EVAL_TOKEN_FUNCTION, token: 'stddevsamp', opt: 1}
+  result: SUCCEED
+---
+test case: 'Aggregation test with foreach function ''sumofsquares(max_foreach(/*/some.zabbix.key[{#LLDMACRO}]?[group="{HOSTGROUPLLD}"],1d))'''
+in:
+  rules:
+  - ZBX_EVAL_PARSE_CALC_EXPRESSION
+  expression: 'sumofsquares(max_foreach(/*/some.zabbix.key[{#LLDMACRO}]?[group="{HOSTGROUPLLD}"],1d))'
+out:
+  stack:
+  - {type: ZBX_EVAL_TOKEN_ARG_QUERY, token: '/*/some.zabbix.key[{#LLDMACRO}]?[group="{HOSTGROUPLLD}"]', opt: 0}
+  - {type: ZBX_EVAL_TOKEN_ARG_PERIOD, token: '1d', opt: 0}
+  - {type: ZBX_EVAL_TOKEN_HIST_FUNCTION, token: 'max_foreach', opt: 2}
+  - {type: ZBX_EVAL_TOKEN_FUNCTION, token: 'sumofsquares', opt: 1}
+  result: SUCCEED
+---
+test case: 'Aggregation test with foreach function ''varpop(min_foreach(/*/some.zabbix.key[{#LLDMACRO}]?[group="{HOSTGROUPLLD}"],1d))'''
+in:
+  rules:
+  - ZBX_EVAL_PARSE_CALC_EXPRESSION
+  expression: 'varpop(min_foreach(/*/some.zabbix.key[{#LLDMACRO}]?[group="{HOSTGROUPLLD}"],1d))'
+out:
+  stack:
+  - {type: ZBX_EVAL_TOKEN_ARG_QUERY, token: '/*/some.zabbix.key[{#LLDMACRO}]?[group="{HOSTGROUPLLD}"]', opt: 0}
+  - {type: ZBX_EVAL_TOKEN_ARG_PERIOD, token: '1d', opt: 0}
+  - {type: ZBX_EVAL_TOKEN_HIST_FUNCTION, token: 'min_foreach', opt: 2}
+  - {type: ZBX_EVAL_TOKEN_FUNCTION, token: 'varpop', opt: 1}
+  result: SUCCEED
+---
+test case: 'Aggregation test with foreach function ''varsamp(sum_foreach(/*/some.zabbix.key[{#LLDMACRO}]?[group="{HOSTGROUPLLD}"],1d))'''
+in:
+  rules:
+  - ZBX_EVAL_PARSE_CALC_EXPRESSION
+  expression: 'varsamp(sum_foreach(/*/some.zabbix.key[{#LLDMACRO}]?[group="{HOSTGROUPLLD}"],1d))'
+out:
+  stack:
+  - {type: ZBX_EVAL_TOKEN_ARG_QUERY, token: '/*/some.zabbix.key[{#LLDMACRO}]?[group="{HOSTGROUPLLD}"]', opt: 0}
+  - {type: ZBX_EVAL_TOKEN_ARG_PERIOD, token: '1d', opt: 0}
+  - {type: ZBX_EVAL_TOKEN_HIST_FUNCTION, token: 'sum_foreach', opt: 2}
+  - {type: ZBX_EVAL_TOKEN_FUNCTION, token: 'varsamp', opt: 1}
+  result: SUCCEED
 ...
