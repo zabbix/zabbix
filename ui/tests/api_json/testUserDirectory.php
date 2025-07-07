@@ -615,13 +615,13 @@ uwMrOBKatg7CZ1Uenv1K3ioD5w==
 			],
 			'Test valid SAML SP certificate' => [
 				'userdirectories' => [
-					['userdirectoryid' => 'API SAML', 'sp_certificate' =>  self::SSL_CERTIFICATE]
+					['userdirectoryid' => 'API SAML', 'sp_certificate' => self::SSL_CERTIFICATE]
 				],
 				'expected_error' => null
 			],
 			'Test valid SAML SP private key' => [
 				'userdirectories' => [
-					['userdirectoryid' => 'API SAML', 'sp_private_key' =>  self::SSL_PRIVATE_KEY]
+					['userdirectoryid' => 'API SAML', 'sp_private_key' => self::SSL_PRIVATE_KEY]
 				],
 				'expected_error' => null
 			]
@@ -799,23 +799,20 @@ uwMrOBKatg7CZ1Uenv1K3ioD5w==
 				],
 				'expected_error' => 'Invalid parameter "/1/nameid_format": a character string is expected.'
 			],
+			'Test SAML IdP certificate required' => [
+				'userdirectories' => [
+					['userdirectoryid' => 'API SAML', 'idp_certificate' => '']
+				],
+				'expected_error' => 'Invalid parameter "/1/idp_certificate": cannot be empty.'
+			],
 			'Test invalid SAML IdP certificate format' => [
 				'userdirectories' => [
-					['userdirectoryid' => 'API SAML', 'idp_certificate' => 'lorem ipsum dolor sit amet, consectetur adipiscing elit']
+					[
+						'userdirectoryid' => 'API SAML',
+						'idp_certificate' => 'lorem ipsum dolor sit amet, consectetur adipiscing elit'
+					]
 				],
 				'expected_error' => 'Invalid parameter "/1/idp_certificate": a PEM-encoded certificate is expected.'
-			],
-			'Test invalid SAML SP certificate format' => [
-				'userdirectories' => [
-					['userdirectoryid' => 'API SAML', 'sp_certificate' => 'lorem ipsum dolor sit amet, consectetur adipiscing elit']
-				],
-				'expected_error' => 'Invalid parameter "/1/sp_certificate": a PEM-encoded certificate is expected.'
-			],
-			'Test invalid SAML SP private key format' => [
-				'userdirectories' => [
-					['userdirectoryid' => 'API SAML', 'sp_private_key' => 'lorem ipsum dolor sit amet, consectetur adipiscing elit']
-				],
-				'expected_error' => 'Invalid parameter "/1/sp_private_key": a PEM-encoded private key is expected.'
 			],
 			'Test SAML IdP certificate string format' => [
 				'userdirectories' => [
@@ -823,29 +820,95 @@ uwMrOBKatg7CZ1Uenv1K3ioD5w==
 				],
 				'expected_error' => 'Invalid parameter "/1/idp_certificate": a character string is expected.'
 			],
-			'Test SAML SP certificate string format' => [
-				'userdirectories' => [
-					['userdirectoryid' => 'API SAML', 'sp_certificate' => 123]
-				],
-				'expected_error' => 'Invalid parameter "/1/sp_certificate": a character string is expected.'
-			],
-			'Test SAML SP private key string format' => [
-				'userdirectories' => [
-					['userdirectoryid' => 'API SAML', 'sp_private_key' => 123]
-				],
-				'expected_error' => 'Invalid parameter "/1/sp_private_key": a character string is expected.'
-			],
 			'Test invalid SAML IdP certificate length' => [
 				'userdirectories' => [
 					['userdirectoryid' => 'API SAML', 'idp_certificate' => str_repeat('abc123 ', 1429)]
 				],
 				'expected_error' => 'Invalid parameter "/1/idp_certificate": value is too long.'
 			],
+			'Test SAML SP certificate is required if Encrypt name ID equals to 1' => [
+				'userdirectories' => [
+					['userdirectoryid' => 'API SAML', 'sp_certificate' => '', 'encrypt_nameid' => 1]
+				],
+				'expected_error' => 'Invalid parameter "/1/sp_certificate": cannot be empty.'
+			],
+			'Test SAML SP certificate is required if Sign assertions equals to 1' => [
+				'userdirectories' => [
+					['userdirectoryid' => 'API SAML', 'sp_certificate' => '', 'sign_assertions' => 1]
+				],
+				'expected_error' => 'Invalid parameter "/1/sp_certificate": cannot be empty.'
+			],
+			'Test SAML SP certificate is required if Encrypt name ID, Sign assertions and Sign AuthN requests equals to 1' => [
+				'userdirectories' => [
+					[
+						'userdirectoryid' => 'API SAML',
+						'sp_certificate' => '',
+						'encrypt_nameid' => 1,
+						'sign_assertions' => 1,
+						'sign_authn_requests' => 1
+					]
+				],
+				'expected_error' => 'Invalid parameter "/1/sp_certificate": cannot be empty.'
+			],
+			'Test invalid SAML SP certificate format' => [
+				'userdirectories' => [
+					[
+						'userdirectoryid' => 'API SAML',
+						'sp_certificate' => 'lorem ipsum dolor sit amet, consectetur adipiscing elit'
+					]
+				],
+				'expected_error' => 'Invalid parameter "/1/sp_certificate": a PEM-encoded certificate is expected.'
+			],
+			'Test SAML SP certificate string format' => [
+				'userdirectories' => [
+					['userdirectoryid' => 'API SAML', 'sp_certificate' => 123]
+				],
+				'expected_error' => 'Invalid parameter "/1/sp_certificate": a character string is expected.'
+			],
 			'Test invalid SAML SP certificate length' => [
 				'userdirectories' => [
 					['userdirectoryid' => 'API SAML', 'sp_certificate' => str_repeat('abc123 ', 1429)]
 				],
 				'expected_error' => 'Invalid parameter "/1/sp_certificate": value is too long.'
+			],
+			'Test SAML SP private key is required if Encrypt name ID equals to 1' => [
+				'userdirectories' => [
+					['userdirectoryid' => 'API SAML', 'sp_private_key' => '', 'encrypt_nameid' => 1]
+				],
+				'expected_error' => 'Invalid parameter "/1/sp_private_key": cannot be empty.'
+			],
+			'Test SAML SP private key is required if Sign assertions equals to 1' => [
+				'userdirectories' => [
+					['userdirectoryid' => 'API SAML', 'sp_private_key' => '', 'sign_assertions' => 1]
+				],
+				'expected_error' => 'Invalid parameter "/1/sp_private_key": cannot be empty.'
+			],
+			'Test SAML SP private key is required if Encrypt name ID, Sign assertions and Sign AuthN requests equals to 1' => [
+				'userdirectories' => [
+					[
+						'userdirectoryid' => 'API SAML',
+						'sp_private_key' => '',
+						'encrypt_nameid' => 1,
+						'sign_assertions' => 1,
+						'sign_authn_requests' => 1
+					]
+				],
+				'expected_error' => 'Invalid parameter "/1/sp_private_key": cannot be empty.'
+			],
+			'Test invalid SAML SP private key format' => [
+				'userdirectories' => [
+					[
+						'userdirectoryid' => 'API SAML',
+						'sp_private_key' => 'lorem ipsum dolor sit amet, consectetur adipiscing elit'
+					]
+				],
+				'expected_error' => 'Invalid parameter "/1/sp_private_key": a PEM-encoded private key is expected.'
+			],
+			'Test SAML SP private key string format' => [
+				'userdirectories' => [
+					['userdirectoryid' => 'API SAML', 'sp_private_key' => 123]
+				],
+				'expected_error' => 'Invalid parameter "/1/sp_private_key": a character string is expected.'
 			],
 			'Test invalid SAML SP private key length' => [
 				'userdirectories' => [

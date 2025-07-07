@@ -43,7 +43,7 @@ XlyFUVaZU/mT+orYNshgWEjBR2Mra1m0MKC1yWLG/eS7OUdzYLTyl0rClB5M0YFe
 pYDypczpOVk8mPLcZg==
 -----END CERTIFICATE-----';
 
-const SSL_PRIVATE_KEY = '-----BEGIN PRIVATE KEY-----
+	const SSL_PRIVATE_KEY = '-----BEGIN PRIVATE KEY-----
 MIIEvwIBADANBgkqhkiG9w0BAQEFAASCBKkwggSlAgEAAoIBAQC8fA/Dy3nAHp7v
 dyIAnouscVIpGOAxCUY/fVKS7+DylMDx0VtuUGP/Jco+TKquc7US8GhkHffQepGe
 Vqteyy0IVwLwRJD4TOUHTvft1zSMN3JYPcyw3b5hlGKwq1oXB2zCdh3bcPgDrKYR
@@ -9004,7 +9004,7 @@ uwMrOBKatg7CZ1Uenv1K3ioD5w==
 				['type' => API_SSL_CERTIFICATE],
 				'',
 				'/1/idp_certificate',
-				''
+				'Invalid parameter "/1/idp_certificate": cannot be empty.'
 			],
 			[
 				['type' => API_SSL_CERTIFICATE],
