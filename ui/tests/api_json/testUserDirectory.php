@@ -470,7 +470,7 @@ class testUserDirectory extends CAPITest {
 		return [
 			'Test host update' => [
 				'userdirectories' => [
-					['userdirectoryid' => 'LDAP #4', 'host' => 'localhost', 'bind_password' => 'new_password']
+					['userdirectoryid' => 'LDAP #1', 'host' => 'localhost']
 				],
 				'expected_error' => null
 			],
@@ -576,9 +576,9 @@ class testUserDirectory extends CAPITest {
 				],
 				'expected_error' => 'No permissions to referred object or it does not exist!'
 			],
-			'Test update host requires bind_password' => [
+			'Test host changes requires bind_password when db bind_password is not empty' => [
 				'userdirectories' => [
-					['userdirectoryid' => 'LDAP #4', 'host' => 'test.host.com']
+					['userdirectoryid' => 'API LDAP #4', 'host' => 'test.host.com']
 				],
 				'expected_error' => 'Invalid parameter "/1": the parameter "bind_password" is missing.'
 			],
