@@ -1406,7 +1406,9 @@ function formatFloat(float $number, array $options = []): string {
 		);
 	}
 	else {
-		return $format_fn($sign, '0', $digits_dec !== '' ? str_repeat('0', -$exponent_dec - 1).$digits_dec : '');
+		return $digits_dec !== ''
+			? $format_fn($sign, '0', str_repeat('0', -$exponent_dec - 1).$digits_dec)
+			: $format_fn('', '0', '');
 	}
 }
 
