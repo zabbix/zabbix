@@ -496,10 +496,12 @@ function dbConditionInt($field_name, array $values, $not_in = false, $zero_inclu
 
 	$values = array_flip($values);
 
-	$include_null_for_zero = $zero_includes_null && array_key_exists(0, $values);
+	$condition = '';
+	$multiple_conditions = false;
 
-	if ($include_null_for_zero) {
-		unset($values[0]);
+	if ($zero_includes_null && array_key_exists(0, $values)) {
+		$condition .= $field_name.($not_in ? ' IS NOT NULL' : ' IS NULL');
+		$multiple_conditions = true;
 	}
 
 	$values = array_keys($values);
@@ -510,14 +512,13 @@ function dbConditionInt($field_name, array $values, $not_in = false, $zero_inclu
 		return dbQuoteInt($value);
 	}, $values);
 
-	$condition = '';
-
 	// Limit maximum number of values for using in "IN (<id1>,<id2>,...,<idN>)".
 	$single_chunks = array_chunk($singles, 950);
 
 	foreach ($single_chunks as $chunk) {
 		if ($condition !== '') {
 			$condition .= $not_in ? ' AND ' : ' OR ';
+			$multiple_conditions = true;
 		}
 
 		$condition .= count($chunk) == 1
@@ -525,27 +526,8 @@ function dbConditionInt($field_name, array $values, $not_in = false, $zero_inclu
 			: $field_name.($not_in ? ' NOT' : '').' IN ('.implode(',', $chunk).')';
 	}
 
-	if ($include_null_for_zero) {
-		if ($condition !== '') {
-			$condition .= $not_in ? ' AND ' : ' OR ';
-		}
-
-		if ($not_in) {
-			$condition .= $field_name.' IS NOT NULL'.
-				' AND '.$field_name.'!=0';
-		}
-		else {
-			$condition .= '('.
-				$field_name.' IS NULL'.
-				' OR '.$field_name.'=0'.
-			')';
-		}
-	}
-
-	if (!$not_in) {
-		if ((int) $include_null_for_zero + count($single_chunks) > 1) {
-			$condition = '('.$condition.')';
-		}
+	if (!$not_in && $multiple_conditions) {
+		$condition = '('.$condition.')';
 	}
 
 	return $condition;
