@@ -1,5 +1,5 @@
 zabbix_export:
-  version: '7.4'
+  version: '8.0'
   template_groups:
     - uuid: 748ad4d098d447d492bb935c907f652f
       name: Templates/Databases
@@ -12,11 +12,11 @@ zabbix_export:
         
         Setup:
         
-        1. Deploy Zabbix agent 2 with the MSSQL plugin. You can use this template starting with version 7.4.0 of both Zabbix and the MSSQL plugin.
+        1. Deploy Zabbix agent 2 with the MSSQL plugin.
         
           For more information, see MSSQL plugin documentation: https://git.zabbix.com/projects/AP/repos/mssql/browse
         
-          Important! Starting with version 7.4-1 of this template, the MSSQL plugin must be updated to a version equal to or above 7.4.0. (You can check the version of the template in its YAML file under the "vendor" section.)
+          The MSSQL plugin must be updated to a version equal to or above 7.4.0
         
           Loadable plugin requires installation of one of the following:
         
@@ -24,7 +24,7 @@ zabbix_export:
           
           - Binary file
           
-          - Compilation from sources: https://www.zabbix.com/documentation/7.4/manual/extensions/plugins/build
+          - Compilation from sources: https://www.zabbix.com/documentation/8.0/manual/extensions/plugins/build
         
         2. Create an MSSQL user for monitoring.
         
@@ -87,7 +87,7 @@ zabbix_export:
         Note: Since version 7.2.0, you can also connect to the MSSQL instance using its name. To do this, set the connection string in the `MSSQL URI` host wizard configuration field as `<protocol://host/instance_name>`.
       vendor:
         name: Zabbix
-        version: 7.4-2
+        version: 8.0-0
       groups:
         - name: Templates/Databases
       items:

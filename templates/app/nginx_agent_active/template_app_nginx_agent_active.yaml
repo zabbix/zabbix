@@ -1,5 +1,5 @@
 zabbix_export:
-  version: '7.4'
+  version: '8.0'
   template_groups:
     - uuid: a571c0d144b14fd4a87a9d9b2aa9fcd6
       name: Templates/Applications
@@ -63,7 +63,7 @@ zabbix_export:
         Note that this template doesn't support https and redirects (limitations of web.page.get).
       vendor:
         name: Zabbix
-        version: 7.4-1
+        version: 8.0-0
       groups:
         - name: Templates/Applications
       items:
