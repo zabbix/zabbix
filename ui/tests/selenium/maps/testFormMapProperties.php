@@ -88,7 +88,34 @@ class testFormMapProperties extends CWebTest {
 				'width' => 800,
 				'height' => 600,
 				'highlight' => SYSMAP_HIGHLIGHT_OFF,
-				'label_type' => MAP_LABEL_TYPE_LABEL
+				'label_type' => MAP_LABEL_TYPE_LABEL,
+			'urls' => [
+					[
+						'name' => '1 Host URL',
+						'url' => 'test',
+						'elementtype' => SYSMAP_ELEMENT_TYPE_HOST
+					],
+					[
+						'name' => '2 Host group URL',
+						'url' => 'test',
+						'elementtype' => SYSMAP_ELEMENT_TYPE_HOST_GROUP
+					],
+					[
+						'name' => '3 Map URL',
+						'url' => 'test',
+						'elementtype' => SYSMAP_ELEMENT_TYPE_MAP
+					],
+					[
+						'name' => '5 Trigger URL',
+						'url' => 'test',
+						'elementtype' => SYSMAP_ELEMENT_TYPE_TRIGGER
+					],
+					[
+						'name' => '4 Image URL',
+						'url' => 'test',
+						'elementtype' => SYSMAP_ELEMENT_TYPE_IMAGE
+					]
+				]
 			],
 			[
 				'name' => self::MAP_UPDATE,
@@ -1195,7 +1222,7 @@ class testFormMapProperties extends CWebTest {
 					]
 				]
 			],
-			// #8 Advanced labels - Element name.
+			// #28 Advanced labels - Element name.
 			[
 				[
 					'expected' => TEST_GOOD,
@@ -1241,7 +1268,7 @@ class testFormMapProperties extends CWebTest {
 					]
 				]
 			],
-			// #9 Advanced labels - Status only.
+			// #29 Advanced labels - Status only.
 			[
 				[
 					'expected' => TEST_GOOD,
@@ -1287,7 +1314,7 @@ class testFormMapProperties extends CWebTest {
 					]
 				]
 			],
-			// #10 Advanced labels - Label.
+			// #30 Advanced labels - Label.
 			[
 				[
 					'expected' => TEST_GOOD,
@@ -1333,7 +1360,7 @@ class testFormMapProperties extends CWebTest {
 					]
 				]
 			],
-			// #11 Advanced labels - different label types.
+			// #31 Advanced labels - different label types.
 			[
 				[
 					'expected' => TEST_GOOD,
@@ -1381,7 +1408,7 @@ class testFormMapProperties extends CWebTest {
 					]
 				]
 			],
-			// #12 Check creation of different type URLs.
+			// #32 Check creation of different type URLs.
 			[
 				[
 					'expected' => TEST_GOOD,
@@ -1469,7 +1496,7 @@ class testFormMapProperties extends CWebTest {
 					]
 				]
 			],
-			// #13 Check sorting by name of URLs.
+			// #33 Check sorting by name of URLs.
 			[
 				[
 					'expected' => TEST_GOOD,
@@ -1607,7 +1634,7 @@ class testFormMapProperties extends CWebTest {
 
 	public function getMapUpdateData() {
 		return [
-			// #0 Update to check trailing of spaces and different symbols of input type text fields.
+			// #20 Update to check trailing of spaces and different symbols of input type text fields.
 			[
 				[
 					'expected' => TEST_GOOD,
@@ -1629,31 +1656,36 @@ class testFormMapProperties extends CWebTest {
 					],
 					'urls' => [
 						[
-							'id' => 0,
+							'action' => USER_ACTION_UPDATE,
+							'index' => 0,
 							'Name' => ' URL ₥₳₽1 name 📡 ',
 							'URL' => ' URL ₥₳₽1 📡 ',
 							'Element' => 'Host'
 						],
 						[
-							'id' => 1,
+							'action' => USER_ACTION_UPDATE,
+							'index' => 1,
 							'Name' => ' URL ₥₳₽2 name 📡 ',
 							'URL' => ' URL ₥₳₽2 📡 ',
 							'Element' => 'Host group'
 						],
 						[
-							'id' => 2,
+							'action' => USER_ACTION_UPDATE,
+							'index' => 2,
 							'Name' => ' URL ₥₳₽3 name 📡 ',
 							'URL' => ' URL ₥₳₽3 📡 ',
 							'Element' => 'Image'
 						],
 						[
-							'id' => 3,
+							'action' => USER_ACTION_UPDATE,
+							'index' => 3,
 							'Name' => ' URL ₥₳₽4 name 📡 ',
 							'URL' => ' URL ₥₳₽4 📡 ',
 							'Element' => 'Map'
 						],
 						[
-							'id' => 4,
+							'action' => USER_ACTION_UPDATE,
+							'index' => 4,
 							'Name' => ' URL ₥₳₽5 name 📡 ',
 							'URL' => ' URL ₥₳₽5 📡 ',
 							'Element' => 'Trigger'
@@ -1671,62 +1703,53 @@ class testFormMapProperties extends CWebTest {
 						'Mark elements on trigger status change' => false,
 						'Display problems' => 'Expand single problem',
 						'Advanced labels' => true,
-						'' => 'Label: 🌑🌑🌑1234ĀāŅņШщЙй㐤㐃',
 						'Host group label type' => 'Custom label',
 						'Host label type' => 'Custom label',
 						'Trigger label type' => 'Custom label',
 						'Map label type' => 'Custom label',
 						'Image label type' => 'Custom label',
+						'id:label_string_hostgroup' => 'Label: 🌑🌑🌑1234ĀāŅņШщЙй㐤㐃',
+						'id:label_string_host' => 'Label: 🌑🌑🌑1234ĀāŅņШщЙй㐤㐃',
+						'id:label_string_trigger' => 'Label: 🌑🌑🌑1234ĀāŅņШщЙй㐤㐃',
+						'id:label_string_map' => 'Label: 🌑🌑🌑1234ĀāŅņШщЙй㐤㐃',
+						'id:label_string_image' => 'Label: 🌑🌑🌑1234ĀāŅņШщЙй㐤㐃',
 						'Map element label location' => 'Bottom',
 						'Show map element labels' => 'Always',
 						'Show link labels' => 'Always',
 						'Problem display' => 'All',
 						'Minimum severity' => 'Not classified',
 						'Show suppressed problems' => false,
-						'URLs' => []
-					],
-					'expected_urls' => [
-						[
-							'id' => 0,
-							'name' => 'URL ₥₳₽1 name 📡',
-							'url' => 'URL ₥₳₽1 📡',
-							'element_type' => 0
-						],
-						[
-							'id' => 1,
-							'name' => 'URL ₥₳₽2 name 📡',
-							'url' => 'URL ₥₳₽2 📡',
-							'element_type' => 3
-						],
-						[
-							'id' => 2,
-							'name' => 'URL ₥₳₽3 name 📡',
-							'url' => 'URL ₥₳₽3 📡',
-							'element_type' => 4
-						],
-						[
-							'id' => 3,
-							'name' => 'URL ₥₳₽4 name 📡',
-							'url' => 'URL ₥₳₽4 📡',
-							'element_type' => 1
-						],
-						[
-							'id' => 4,
-							'name' => 'URL ₥₳₽5 name 📡',
-							'url' => 'URL ₥₳₽5 📡',
-							'element_type' => 2
+						'URLs' => [
+							[
+								'Name' => 'URL ₥₳₽1 name 📡',
+								'URL' => 'URL ₥₳₽1 📡',
+								'Element' => 'Host'
+							],
+							[
+								'Name' => 'URL ₥₳₽2 name 📡',
+								'URL' => 'URL ₥₳₽2 📡',
+								'Element' => 'Host group'
+							],
+							[
+								'Name' => 'URL ₥₳₽3 name 📡',
+								'URL' => 'URL ₥₳₽3 📡',
+								'Element' => 'Image'
+							],
+							[
+								'Name' => 'URL ₥₳₽4 name 📡',
+								'URL' => 'URL ₥₳₽4 📡',
+								'Element' => 'Map'
+							],
+							[
+								'Name' => 'URL ₥₳₽5 name 📡',
+								'URL' => 'URL ₥₳₽5 📡',
+								'Element' => 'Trigger'
+							]
 						]
-					],
-					'custom_labels' => [
-						'id:label_string_hostgroup' => 'Label: 🌑🌑🌑1234ĀāŅņШщЙй㐤㐃',
-						'id:label_string_host' => 'Label: 🌑🌑🌑1234ĀāŅņШщЙй㐤㐃',
-						'id:label_string_trigger' => 'Label: 🌑🌑🌑1234ĀāŅņШщЙй㐤㐃',
-						'id:label_string_map' => 'Label: 🌑🌑🌑1234ĀāŅņШщЙй㐤㐃',
-						'id:label_string_image' => 'Label: 🌑🌑🌑1234ĀāŅņШщЙй㐤㐃'
 					]
 				]
 			],
-			// #1 Update with maximum string length, width, height values.
+			// #21 Update with maximum string length, width, height values.
 			[
 				[
 					'expected' => TEST_GOOD,
@@ -1749,37 +1772,37 @@ class testFormMapProperties extends CWebTest {
 					],
 					'urls' => [
 						[
-							'id' => 0,
-							'Name' => STRING_64.'Update: maximum possible urlname length 255 characters test 1 :'
-								.STRING_128,
+							'action' => USER_ACTION_UPDATE,
+							'index' => 0,
+							'Name' => STRING_64.'Update: maximum possible urlname length 255 characters test 1 :'.STRING_128,
 							'URL' => STRING_2048,
 							'Element' => 'Host'
 						],
 						[
-							'id' => 1,
-							'Name' => STRING_64.'Update: maximum possible urlname length 255 characters test 2 :'
-								.STRING_128,
+							'action' => USER_ACTION_UPDATE,
+							'index' => 1,
+							'Name' => STRING_64.'Update: maximum possible urlname length 255 characters test 2 :'.STRING_128,
 							'URL' => STRING_2048,
 							'Element' => 'Host group'
 						],
 						[
-							'id' => 2,
-							'Name' => STRING_64.'Update: maximum possible urlname length 255 characters test 3 :'
-								.STRING_128,
+							'action' => USER_ACTION_UPDATE,
+							'index' => 2,
+							'Name' => STRING_64.'Update: maximum possible urlname length 255 characters test 3 :'.STRING_128,
 							'URL' => STRING_2048,
 							'Element' => 'Image'
 						],
 						[
-							'id' => 3,
-							'Name' => STRING_64.'Update: maximum possible urlname length 255 characters test 4 :'
-								.STRING_128,
+							'action' => USER_ACTION_UPDATE,
+							'index' => 3,
+							'Name' => STRING_64.'Update: maximum possible urlname length 255 characters test 4 :'.STRING_128,
 							'URL' => STRING_2048,
 							'Element' => 'Map'
 						],
 						[
-							'id' => 4,
-							'Name' => STRING_64.'Update: maximum possible urlname length 255 characters test 5 :'
-								.STRING_128,
+							'action' => USER_ACTION_UPDATE,
+							'index' => 4,
+							'Name' => STRING_64.'Update: maximum possible urlname length 255 characters test 5 :'.STRING_128,
 							'URL' => STRING_2048,
 							'Element' => 'Trigger'
 						]
@@ -1796,67 +1819,58 @@ class testFormMapProperties extends CWebTest {
 						'Mark elements on trigger status change' => false,
 						'Display problems' => 'Number of problems',
 						'Advanced labels' => true,
-						'' => STRING_255,
 						'Host group label type' => 'Custom label',
 						'Host label type' => 'Custom label',
 						'Trigger label type' => 'Custom label',
 						'Map label type' => 'Custom label',
 						'Image label type' => 'Custom label',
+						'id:label_string_hostgroup' => STRING_255,
+						'id:label_string_host' => STRING_255,
+						'id:label_string_trigger' => STRING_255,
+						'id:label_string_map' => STRING_255,
+						'id:label_string_image' => STRING_255,
 						'Map element label location' => 'Bottom',
 						'Show map element labels' => 'Always',
 						'Show link labels' => 'Always',
 						'Problem display' => 'All',
 						'Minimum severity' => 'Not classified',
 						'Show suppressed problems' => false,
-						'URLs' => []
-					],
-					'expected_urls' => [
-						[
-							'id' => 0,
-							'name' => STRING_64.'Update: maximum possible urlname length 255 characters test 1 :'
-								.STRING_128,
-							'url' => STRING_2048,
-							'element_type' => 0
-						],
-						[
-							'id' => 1,
-							'name' => STRING_64.'Update: maximum possible urlname length 255 characters test 2 :'
-								.STRING_128,
-							'url' => STRING_2048,
-							'element_type' => 3
-						],
-						[
-							'id' => 2,
-							'name' => STRING_64.'Update: maximum possible urlname length 255 characters test 3 :'
-								.STRING_128,
-							'url' => STRING_2048,
-							'element_type' => 4
-						],
-						[
-							'id' => 3,
-							'name' => STRING_64.'Update: maximum possible urlname length 255 characters test 4 :'
-								.STRING_128,
-							'url' => STRING_2048,
-							'element_type' => 1
-						],
-						[
-							'id' => 4,
-							'name' => STRING_64.'Update: maximum possible urlname length 255 characters test 5 :'
-								.STRING_128,
-							'url' => STRING_2048,
-							'element_type' => 2
+						'URLs' => [
+							[
+								'Name' => STRING_64.'Update: maximum possible urlname length 255 characters test 1 :'.
+									STRING_128,
+								'URL' => STRING_2048,
+								'Element' => 'Host'
+							],
+							[
+								'Name' => STRING_64.'Update: maximum possible urlname length 255 characters test 2 :'.
+									STRING_128,
+								'URL' => STRING_2048,
+								'Element' => 'Host group'
+							],
+							[
+								'Name' => STRING_64.'Update: maximum possible urlname length 255 characters test 3 :'.
+									STRING_128,
+								'URL' => STRING_2048,
+								'Element' => 'Image'
+							],
+							[
+								'Name' => STRING_64.'Update: maximum possible urlname length 255 characters test 4 :'.
+									STRING_128,
+								'URL' => STRING_2048,
+								'Element' => 'Map'
+							],
+							[
+								'Name' => STRING_64.'Update: maximum possible urlname length 255 characters test 5 :'.
+									STRING_128,
+								'URL' => STRING_2048,
+								'Element' => 'Trigger'
+							]
 						]
-					],
-					'custom_labels' => [
-						'id:label_string_hostgroup' => STRING_255,
-						'id:label_string_host' => STRING_255,
-						'id:label_string_trigger' => STRING_255,
-						'id:label_string_map' => STRING_255,
-						'id:label_string_image' => STRING_255
 					]
 				]
 			],
-			// #2 Update with XSS imitation text.
+			// #22 Update with XSS imitation text.
 			[
 				[
 					'expected' => TEST_GOOD,
@@ -1879,31 +1893,36 @@ class testFormMapProperties extends CWebTest {
 					],
 					'urls' => [
 						[
-							'id' => 0,
+							'action' => USER_ACTION_UPDATE,
+							'index' => 0,
 							'Name' => self::XSS_EXAMPLE,
 							'URL' => self::XSS_EXAMPLE,
 							'Element' => 'Host'
 						],
 						[
-							'id' => 1,
+							'action' => USER_ACTION_UPDATE,
+							'index' => 1,
 							'Name' => self::XSS_EXAMPLE.' 1',
 							'URL' => self::XSS_EXAMPLE,
 							'Element' => 'Host group'
 						],
 						[
-							'id' => 2,
+							'action' => USER_ACTION_UPDATE,
+							'index' => 2,
 							'Name' => self::XSS_EXAMPLE.' 2',
 							'URL' => self::XSS_EXAMPLE,
 							'Element' => 'Image'
 						],
 						[
-							'id' => 3,
+							'action' => USER_ACTION_UPDATE,
+							'index' => 3,
 							'Name' => self::XSS_EXAMPLE.' 3',
 							'URL' => self::XSS_EXAMPLE,
 							'Element' => 'Map'
 						],
 						[
-							'id' => 4,
+							'action' => USER_ACTION_UPDATE,
+							'index' => 4,
 							'Name' => self::XSS_EXAMPLE.' 4',
 							'URL' => self::XSS_EXAMPLE,
 							'Element' => 'Trigger'
@@ -1921,58 +1940,49 @@ class testFormMapProperties extends CWebTest {
 						'Mark elements on trigger status change' => false,
 						'Display problems' => 'Number of problems',
 						'Advanced labels' => true,
-						'' => '<script>alert(\'XSS\');</script>',
 						'Host group label type' => 'Custom label',
 						'Host label type' => 'Custom label',
 						'Trigger label type' => 'Custom label',
 						'Map label type' => 'Custom label',
 						'Image label type' => 'Custom label',
+						'id:label_string_hostgroup' => self::XSS_EXAMPLE,
+						'id:label_string_host' => self::XSS_EXAMPLE,
+						'id:label_string_trigger' => self::XSS_EXAMPLE,
+						'id:label_string_map' => self::XSS_EXAMPLE,
+						'id:label_string_image' => self::XSS_EXAMPLE,
 						'Map element label location' => 'Bottom',
 						'Show map element labels' => 'Always',
 						'Show link labels' => 'Always',
 						'Problem display' => 'All',
 						'Minimum severity' => 'Not classified',
 						'Show suppressed problems' => false,
-						'URLs' => []
-					],
-					'expected_urls' => [
-						[
-							'id' => 0,
-							'name' => self::XSS_EXAMPLE,
-							'url' => self::XSS_EXAMPLE,
-							'element_type' => 0
-						],
-						[
-							'id' => 1,
-							'name' => self::XSS_EXAMPLE.' 1',
-							'url' => self::XSS_EXAMPLE,
-							'element_type' => 3
-						],
-						[
-							'id' => 2,
-							'name' => self::XSS_EXAMPLE.' 2',
-							'url' => self::XSS_EXAMPLE,
-							'element_type' => 4
-						],
-						[
-							'id' => 3,
-							'name' => self::XSS_EXAMPLE.' 3',
-							'url' => self::XSS_EXAMPLE,
-							'element_type' => 1
-						],
-						[
-							'id' => 4,
-							'name' => self::XSS_EXAMPLE.' 4',
-							'url' => self::XSS_EXAMPLE,
-							'element_type' => 2
+						'URLs' => [
+							[
+								'Name' => self::XSS_EXAMPLE,
+								'URL' => self::XSS_EXAMPLE,
+								'Element' => 'Host'
+							],
+							[
+								'Name' => self::XSS_EXAMPLE.' 1',
+								'URL' => self::XSS_EXAMPLE,
+								'Element' => 'Host group'
+							],
+							[
+								'Name' => self::XSS_EXAMPLE.' 2',
+								'URL' => self::XSS_EXAMPLE,
+								'Element' => 'Image'
+							],
+							[
+								'Name' => self::XSS_EXAMPLE.' 3',
+								'URL' => self::XSS_EXAMPLE,
+								'Element' => 'Map'
+							],
+							[
+								'Name' => self::XSS_EXAMPLE.' 4',
+								'URL' => self::XSS_EXAMPLE,
+								'Element' => 'Trigger'
+							]
 						]
-					],
-					'custom_labels' => [
-						'id:label_string_hostgroup' => self::XSS_EXAMPLE,
-						'id:label_string_host' => self::XSS_EXAMPLE,
-						'id:label_string_trigger' => self::XSS_EXAMPLE,
-						'id:label_string_map' => self::XSS_EXAMPLE,
-						'id:label_string_image' => self::XSS_EXAMPLE
 					]
 				]
 			],
@@ -2002,10 +2012,39 @@ class testFormMapProperties extends CWebTest {
 					],
 					'urls' => [
 						[
-							'id' => 0,
+							'action' => USER_ACTION_UPDATE,
+							'index' => 0,
 							'Name' => STRING_6000,
 							'URL' => STRING_6000,
 							'Element' => 'Host'
+						],
+						[
+							'action' => USER_ACTION_UPDATE,
+							'index' => 0,
+							'Name' => STRING_6000,
+							'URL' => STRING_6000,
+							'Element' => 'Host group'
+						],
+						[
+							'action' => USER_ACTION_UPDATE,
+							'index' => 0,
+							'Name' => STRING_6000,
+							'URL' => STRING_6000,
+							'Element' => 'Image'
+						],
+						[
+							'action' => USER_ACTION_UPDATE,
+							'index' => 0,
+							'Name' => STRING_6000,
+							'URL' => STRING_6000,
+							'Element' => 'Map'
+						],
+						[
+							'action' => USER_ACTION_UPDATE,
+							'index' => 0,
+							'Name' => STRING_6000,
+							'URL' => STRING_6000,
+							'Element' => 'Trigger'
 						]
 					],
 					'result' => [
@@ -2020,39 +2059,54 @@ class testFormMapProperties extends CWebTest {
 						'Mark elements on trigger status change' => false,
 						'Display problems' => 'Expand single problem',
 						'Advanced labels' => true,
-						'' => STRING_255,
 						'Host group label type' => 'Custom label',
 						'Host label type' => 'Custom label',
 						'Trigger label type' => 'Custom label',
 						'Map label type' => 'Custom label',
 						'Image label type' => 'Custom label',
+						'id:label_string_hostgroup' => STRING_255,
+						'id:label_string_host' => STRING_255,
+						'id:label_string_trigger' => STRING_255,
+						'id:label_string_map' => STRING_255,
+						'id:label_string_image' => STRING_255,
 						'Map element label location' => 'Bottom',
 						'Show map element labels' => 'Always',
 						'Show link labels' => 'Always',
 						'Problem display' => 'All',
 						'Minimum severity' => 'Not classified',
 						'Show suppressed problems' => false,
-						'URLs' => []
-					],
-					'expected_urls' => [
-						[
-							'id' => 0,
-							'name' => STRING_255,
-							'url' => STRING_2048,
-							'element_type' => 0
+						'URLs' => [
+							[
+								'Name' => STRING_255,
+								'URL' => STRING_2048,
+								'Element' => 'Host'
+							],
+							[
+								'Name' => STRING_255,
+								'URL' => STRING_2048,
+								'Element' => 'Host group'
+							],
+							[
+								'Name' => STRING_255,
+								'URL' => STRING_2048,
+								'Element' => 'Image'
+							],
+							[
+								'Name' => STRING_255,
+								'URL' => STRING_2048,
+								'Element' => 'Map'
+							],
+							[
+								'Name' => STRING_255,
+								'URL' => STRING_2048,
+								'Element' => 'Trigger'
+							]
 						]
-					],
-					'custom_labels' => [
-						'id:label_string_hostgroup' => STRING_255,
-						'id:label_string_host' => STRING_255,
-						'id:label_string_trigger' => STRING_255,
-						'id:label_string_map' => STRING_255,
-						'id:label_string_image' => STRING_255
 					]
 				]
-			]
+			],
 			 */
-			// #3 Update - change advanced label fields of existing map.
+			// #23 Update - change advanced label fields of existing map.
 			[
 				[
 					'expected' => TEST_GOOD,
@@ -2077,54 +2131,45 @@ class testFormMapProperties extends CWebTest {
 						'Mark elements on trigger status change' => true,
 						'Display problems' => 'Number of problems and expand most critical one',
 						'Advanced labels' => true,
-						'' => 'Update labels check',
 						'Host group label type' => 'Label',
 						'Host label type' => 'IP address',
 						'Trigger label type' => 'Status only',
 						'Map label type' => 'Nothing',
 						'Image label type' => 'Custom label',
+						'id:label_string_image' => 'Update labels check',
 						'Map element label location' => 'Right',
 						'Show map element labels' => 'Always',
 						'Show link labels' => 'Always',
 						'Problem display' => 'Separated',
 						'Minimum severity' => 'Disaster',
 						'Show suppressed problems' => true,
-						'URLs' => []
-					],
-					'expected_urls' => [
-						[
-							'id' => 1,
-							'name' => '2 Host group URL',
-							'url' => 'test',
-							'element_type' => 3
-						],
-						[
-							'id' => 0,
-							'name' => '1 Host URL',
-							'url' => 'test',
-							'element_type' => 0
-						],
-						[
-							'id' => 3,
-							'name' => '4 Image URL',
-							'url' => 'test',
-							'element_type' => 4
-						],
-						[
-							'id' => 2,
-							'name' => '3 Map URL',
-							'url' => 'test',
-							'element_type' => 1
-						],
-						[
-							'id' => 4,
-							'name' => '5 Trigger URL',
-							'url' => 'test',
-							'element_type' => 2
+						'URLs' => [
+							[
+								'Name' => '1 Host URL',
+								'URL' => 'test',
+								'Element' => 'Host'
+							],
+							[
+								'Name' => '2 Host group URL',
+								'URL' => 'test',
+								'Element' => 'Host group'
+							],
+							[
+								'Name' => '3 Map URL',
+								'URL' => 'test',
+								'Element' => 'Map'
+							],
+							[
+								'Name' => '4 Image URL',
+								'URL' => 'test',
+								'Element' => 'Image'
+							],
+							[
+								'Name' => '5 Trigger URL',
+								'URL' => 'test',
+								'Element' => 'Trigger'
+							]
 						]
-					],
-					'custom_labels' => [
-						'id:label_string_image' => 'Update labels check'
 					]
 				]
 			],
@@ -2151,6 +2196,28 @@ class testFormMapProperties extends CWebTest {
 						'Minimum severity' => 'Information',
 						'Show suppressed problems' => false
 					],
+					'urls' => [
+						[
+							'action' => USER_ACTION_REMOVE,
+							'index' => 0
+						],
+						[
+							'action' => USER_ACTION_REMOVE,
+							'index' => 0
+						],
+						[
+							'action' => USER_ACTION_REMOVE,
+							'index' => 0
+						],
+						[
+							'action' => USER_ACTION_REMOVE,
+							'index' => 0
+						],
+						[
+							'action' => USER_ACTION_REMOVE,
+							'index' => 0
+						]
+					],
 					'result' => [
 						'Owner' => ['guest'],
 						'Name' => self::MAP_UPDATE,
@@ -2170,38 +2237,12 @@ class testFormMapProperties extends CWebTest {
 						'Problem display' => 'Unacknowledged only',
 						'Minimum severity' => 'Information',
 						'Show suppressed problems' => false,
-						'URLs' => []
-					],
-					'expected_urls' => [
-						[
-							'id' => 1,
-							'name' => '2 Host group URL',
-							'url' => 'test',
-							'element_type' => 3
-						],
-						[
-							'id' => 0,
-							'name' => '1 Host URL',
-							'url' => 'test',
-							'element_type' => 0
-						],
-						[
-							'id' => 3,
-							'name' => '4 Image URL',
-							'url' => 'test',
-							'element_type' => 4
-						],
-						[
-							'id' => 2,
-							'name' => '3 Map URL',
-							'url' => 'test',
-							'element_type' => 1
-						],
-						[
-							'id' => 4,
-							'name' => '5 Trigger URL',
-							'url' => 'test',
-							'element_type' => 2
+						'URLs' => [
+							[
+								'Name' => '',
+								'URL' => '',
+								'Element' => 'Host'
+							]
 						]
 					]
 				]
@@ -2224,34 +2265,9 @@ class testFormMapProperties extends CWebTest {
 				->query('link:Properties')->one()->click();
 		$form = $this->query('id:sysmap-form')->waitUntilPresent()->asForm()->one();
 		$form->fill($data['map_properties']);
-		$url_count = $form->query('button:Remove')->count();
 
-		// Add URLs.
-		if (array_key_exists('urls', $data)) {
-			foreach ($data['urls'] as $url) {
-
-				// Click add link button.
-				if ($url['id'] !== 0 && $url_count === 1) {
-					$this->query('id:add-url')->one()->click();
-				}
-
-				// Add URL data.
-				$form->query('id:urls_'.$url['id'].'_name')->one()->fill($url['Name']);
-				$form->query('id:urls_'.$url['id'].'_url')->one()->fill($url['URL']);
-				$form->getField('name:urls['.$url['id'].'][elementtype]')->select((array_key_exists('Element', $url))
-						? $url['Element']
-						: 'Host'
-				);
-			}
-		}
-
-		// Remove URLs.
-		if (array_key_exists('remove_urls', $data)) {
-			foreach ($data['expected_urls'] as $url) {
-				$table = $this->query('class:table-forms-separator')->asTable()->one();
-				$row = $table->query('id:url-row-'.$url['id'])->one();
-				$row->query('button:Remove')->one()->click();
-			}
+		if(array_key_exists('urls', $data)) {
+			$form->query('class:table-forms-separator')->asMultifieldTable()->one()->fill($data['urls']);
 		}
 
 		$form->submit();
@@ -2271,46 +2287,9 @@ class testFormMapProperties extends CWebTest {
 			$this->assertMessage(TEST_GOOD, 'Network map updated');
 			$table = $this->query('class:list-table')->asTable()->one();
 			$table->findRow('Name', $data['result']['Name'])->query('link:Properties')->one()->click();
-			$this->assertEquals($data['result'], $form->getFields()->filter(CElementFilter::VISIBLE)->asValues());
-
-			// Check map URLs.
-			if (array_key_exists('expected_urls', $data) && array_key_exists('remove_urls', $data) === false) {
-				foreach ($data['expected_urls'] as $expected_url) {
-					$this->assertEquals($expected_url['name'], $form->query('id:urls_'.$expected_url['id'].'_name')
-							->one()->getValue()
-					);
-					$this->assertEquals($expected_url['url'], $form->query('id:urls_'.$expected_url['id'].'_url')
-							->one()->getValue()
-					);
-					$this->assertEquals($expected_url['element_type'],
-							$form->query('name:urls['.$expected_url['id'].'][elementtype]')->one()->getValue()
-					);
-				}
-			}
-
-			// Check that only one empty URL row is present, in case if all URLs were removed.
-			if (array_key_exists('remove_urls', $data)) {
-				$url_table = $form->getField('URLs')->asTable();
-				$this->assertEquals(1, $url_table->query('button:Remove')->count());
-				$this->assertEquals('Host', $url_table->query('name:urls[0][elementtype]')->asDropdown()->one()
-						->getText()
-				);
-
-				foreach (['urls_0_name', 'urls_0_url'] as $id) {
-					$url_field = $url_table->query('id:'.$id)->one();
-					$this->assertEquals('', $url_field->getValue());
-				}
-			}
-
-			// Check custom labels.
-			if (array_key_exists('custom_labels', $data)) {
-				foreach ($data['custom_labels'] as $id => $value) {
-					$this->assertEquals($value, $form->query($id)->one()->getValue());
-				}
-			}
-
-		self::$map_update = $form->getField('Name')->getValue();
-
+			$this->query('id:sysmap-form')->waitUntilPresent()->asForm()->one()->checkValue($data['result']);
+			self::$map_update = $this->query('id:sysmap-form')->waitUntilPresent()->asForm()->one()->getField('Name')
+					->getValue();
 		}
 	}
 
@@ -2348,49 +2327,41 @@ class testFormMapProperties extends CWebTest {
 				'Trigger label type' => 'Status only',
 				'Map label type' => 'Element name',
 				'Image label type' => 'Label',
+				'id:label_string_host' => STRING_255,
+				'id:label_string_hostgroup' => 'Host group label 📰📰📰',
 				'Map element label location' => 'Top',
 				'Show map element labels' => 'Always',
 				'Show link labels' => 'Always',
 				'Problem display' => 'Separated',
 				'Minimum severity' => 'High',
 				'Show suppressed problems' => true,
-				'URLs' => []
-			],
-			'expected_urls' => [
-				[
-					'id' => 4,
-					'name' => STRING_255,
-					'url' => STRING_2048,
-					'element_type' => 1
-				],
-				[
-					'id' => 0,
-					'name' => '1 Host URL 📰📰📰',
-					'url' => 'test 📰📰📰',
-					'element_type' => 0
-				],
-				[
-					'id' => 1,
-					'name' => '2 Image URL',
-					'url' => 'test',
-					'element_type' => 4
-				],
-				[
-					'id' => 3,
-					'name' => '4 Host group - xss',
-					'url' => self::XSS_EXAMPLE,
-					'element_type' => 3
-				],
-				[
-					'id' => 2,
-					'name' => '3 Trigger URL',
-					'url' => 'test',
-					'element_type' => 2
+				'URLs' => [
+					[
+						'Name' => '1 Host URL 📰📰📰',
+						'URL' => 'test 📰📰📰',
+						'Element' => 'Host'
+					],
+					[
+						'Name' => '2 Image URL',
+						'URL' => 'test',
+						'Element' => 'Image'
+					],
+					[
+						'Name' => '3 Trigger URL',
+						'URL' => 'test',
+						'Element' => 'Trigger'
+					],
+					[
+						'Name' => '4 Host group - xss',
+						'URL' => self::XSS_EXAMPLE,
+						'Element' => 'Host group'
+					],
+					[
+						'Name' => STRING_255,
+						'URL' => STRING_2048,
+						'Element' => 'Map'
+					]
 				]
-			],
-			'custom_labels' => [
-				'id:label_string_host' => STRING_255,
-				'id:label_string_hostgroup' => 'Host group label 📰📰📰'
 			]
 		];
 
@@ -2406,24 +2377,7 @@ class testFormMapProperties extends CWebTest {
 
 		// Re-open cloned map and check configuration.
 		$table->findRow('Name', self::CLONED_MAP)->query('link:Properties')->one()->click();
-		$this->assertEquals($data['result'], $form->getFields()->filter(CElementFilter::VISIBLE)->asValues());
-
-		// Check map URLs.
-		foreach ($data['expected_urls'] as $expected_url) {
-			$this->assertEquals($expected_url['name'], $form->query('id:urls_'.$expected_url['id'].'_name')
-					->one()->getValue()
-			);
-			$this->assertEquals($expected_url['url'], $form->query('id:urls_'.$expected_url['id'].'_url')
-					->one()->getValue()
-			);
-			$this->assertEquals($expected_url['element_type'],
-					$form->query('name:urls['.$expected_url['id'].'][elementtype]')->one()->getValue()
-			);
-		}
-
-		foreach ($data['custom_labels'] as $id => $value) {
-			$this->assertEquals($value, $form->query($id)->one()->getValue());
-		}
+		$this->query('id:sysmap-form')->waitUntilPresent()->asForm()->one()->checkValue($data['result']);
 
 		// Check that cloned map is present in the database.
 		$this->assertEquals(1, CDBHelper::getCount('SELECT sysmapid FROM sysmaps WHERE name=\''.self::CLONED_MAP.'\''));
