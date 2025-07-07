@@ -113,7 +113,7 @@ func Test_splitUserAndPrivilege(t *testing.T) {
 			args:          args{params: map[string]string{"User": "foobar as barfoo"}},
 			wantUser:      "foobar as barfoo",
 			wantPrivilege: dsn.NoRole,
-			wantErr:       false,
+			wantErr:       true,
 		},
 		{
 			name:          "invalid format with too many parts",
