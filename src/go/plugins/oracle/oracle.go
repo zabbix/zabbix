@@ -37,6 +37,17 @@ const (
 	sqlExt     = ".sql"
 )
 
+var validAdminRoles = map[dsn.AdminRole]bool{
+	dsn.SysDBA:    true,
+	dsn.SysOPER:   true,
+	dsn.SysBACKUP: true,
+	dsn.SysDG:     true,
+	dsn.SysKM:     true,
+	dsn.SysRAC:    true,
+	dsn.SysASM:    true,
+	dsn.NoRole:    true,
+}
+
 // Plugin inherits plugin.Base and store plugin-specific data.
 type Plugin struct {
 	plugin.Base
@@ -142,16 +153,6 @@ func (p *Plugin) Stop() {
 // It returns the clean username, a validated dsn.AdminRole, and an error if the
 // format is invalid or the role is unknown.
 func splitUserAndPrivilege(params map[string]string) (string, dsn.AdminRole, error) {
-	var validAdminRoles = map[dsn.AdminRole]bool{
-		dsn.SysDBA:    true,
-		dsn.SysOPER:   true,
-		dsn.SysBACKUP: true,
-		dsn.SysDG:     true,
-		dsn.SysKM:     true,
-		dsn.SysRAC:    true,
-		dsn.SysASM:    true,
-	}
-
 	userStr, ok := params["User"]
 	if !ok {
 		// No 'User' parameter provided.
