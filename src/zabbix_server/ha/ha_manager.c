@@ -1215,15 +1215,14 @@ static int	ha_db_get_nodes_json(zbx_ha_info_t *info, char **nodes_json, char **e
 
 		for (int i = 0; i < nodes.values_num; i++)
 		{
-			zbx_snprintf(address, sizeof(address), "%s:%hu", nodes.values[i]->address,
-					nodes.values[i]->port);
 			zbx_json_addobject(&j, NULL);
 
 			zbx_json_addstring(&j, ZBX_PROTO_TAG_ID, nodes.values[i]->ha_nodeid.str, ZBX_JSON_TYPE_STRING);
 			zbx_json_addstring(&j, ZBX_PROTO_TAG_NAME, nodes.values[i]->name, ZBX_JSON_TYPE_STRING);
 			zbx_json_addint64(&j, ZBX_PROTO_TAG_STATUS, (zbx_int64_t)nodes.values[i]->status);
 			zbx_json_addint64(&j, ZBX_PROTO_TAG_LASTACCESS, (zbx_int64_t)nodes.values[i]->lastaccess);
-			zbx_json_addstring(&j, ZBX_PROTO_TAG_ADDRESS, address, ZBX_JSON_TYPE_STRING);
+			zbx_json_addstring(&j, ZBX_PROTO_TAG_ADDRESS, zbx_join_hostport(address, sizeof(address),
+					nodes.values[i]->address, nodes.values[i]->port), ZBX_JSON_TYPE_STRING);
 			zbx_json_addint64(&j, ZBX_PROTO_TAG_DB_TIMESTAMP, (zbx_int64_t)db_time);
 			zbx_json_addint64(&j, ZBX_PROTO_TAG_LASTACCESS_AGE,
 					(zbx_int64_t)(db_time -nodes.values[i]->lastaccess));
