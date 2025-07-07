@@ -8,11 +8,11 @@ This template set is designed for the effortless deployment of VMware vCenter an
 - The template "VMware Guest" is used in discovery and normally should not be manually linked to a host.
 - The template "VMware Hypervisor" can be used in discovery as well as manually linked to a host.
 
-For additional information, please see [Zabbix documentation on VM monitoring](https://www.zabbix.com/documentation/7.4/manual/vm_monitoring).
+For additional information, please see [Zabbix documentation on VM monitoring](https://www.zabbix.com/documentation/8.0/manual/vm_monitoring).
 
 ## Requirements
 
-Zabbix version: 7.4 and higher.
+Zabbix version: 8.0 and higher.
 
 ## Tested versions
 
@@ -21,7 +21,7 @@ This template has been tested on:
 
 ## Configuration
 
-> Zabbix should be configured according to the instructions in the [Templates out of the box](https://www.zabbix.com/documentation/7.4/manual/config/templates_out_of_the_box) section.
+> Zabbix should be configured according to the instructions in the [Templates out of the box](https://www.zabbix.com/documentation/8.0/manual/config/templates_out_of_the_box) section.
 
 ## Setup
 
@@ -40,8 +40,8 @@ Set the host macros (on the host or template level) required for VMware authenti
 Note: To enable discovery of hardware sensors of VMware hypervisors, set the macro `{$VMWARE.HV.SENSOR.DISCOVERY}` to the value `true` on the discovered host level.
 
 Additional resources:
-- How to [create a custom performance counter](https://www.zabbix.com/documentation/7.4/manual/vm_monitoring/vmware_keys#footnotes)
-- How to get all supported counters and [generate a path for the custom performance counter](https://www.zabbix.com/documentation/7.4/manual/appendix/items/perf_counters)
+- How to [create a custom performance counter](https://www.zabbix.com/documentation/8.0/manual/vm_monitoring/vmware_keys#footnotes)
+- How to get all supported counters and [generate a path for the custom performance counter](https://www.zabbix.com/documentation/8.0/manual/appendix/items/perf_counters)
 
 ### Macros used
 
@@ -63,7 +63,7 @@ Additional resources:
 |Name|Description|Type|Key and additional info|
 |----|-----------|----|-----------------------|
 |Get alarms|<p>Get alarm status.</p>|Simple check|vmware.alarms.get[{$VMWARE.URL}]|
-|Event log|<p>Collect VMware event log. See also: https://www.zabbix.com/documentation/7.4/manual/config/items/preprocessing/examples#filtering_vmware_event_log_records</p>|Simple check|vmware.eventlog[{$VMWARE.URL},skip]|
+|Event log|<p>Collect VMware event log. See also: https://www.zabbix.com/documentation/8.0/manual/config/items/preprocessing/examples#filtering_vmware_event_log_records</p>|Simple check|vmware.eventlog[{$VMWARE.URL},skip]|
 |Full name|<p>VMware service full name.</p>|Simple check|vmware.fullname[{$VMWARE.URL}]<p>**Preprocessing**</p><ul><li><p>Discard unchanged with heartbeat: `1d`</p></li></ul>|
 |Version|<p>VMware service version.</p>|Simple check|vmware.version[{$VMWARE.URL}]<p>**Preprocessing**</p><ul><li><p>Discard unchanged with heartbeat: `1d`</p></li></ul>|
 |Get Overall Health VC State|<p>Gets overall health of the system. This item works only with VMware vCenter versions above 6.5.</p>|Script|vmware.health.get|
@@ -279,13 +279,13 @@ This template is designed for the effortless deployment of VMware ESX hypervisor
 
 This template can be used in discovery as well as manually linked to a host.
 
-For additional information, please see [Zabbix documentation on VM monitoring](https://www.zabbix.com/documentation/7.4/manual/vm_monitoring).
+For additional information, please see [Zabbix documentation on VM monitoring](https://www.zabbix.com/documentation/8.0/manual/vm_monitoring).
 
 To use this template as manually linked to a host, attach it to the host and manually set the value of the `{$VMWARE.HV.UUID}` macro.
 
 ## Requirements
 
-Zabbix version: 7.4 and higher.
+Zabbix version: 8.0 and higher.
 
 ## Tested versions
 
@@ -294,7 +294,7 @@ This template has been tested on:
 
 ## Configuration
 
-> Zabbix should be configured according to the instructions in the [Templates out of the box](https://www.zabbix.com/documentation/7.4/manual/config/templates_out_of_the_box) section.
+> Zabbix should be configured according to the instructions in the [Templates out of the box](https://www.zabbix.com/documentation/8.0/manual/config/templates_out_of_the_box) section.
 
 ## Setup
 

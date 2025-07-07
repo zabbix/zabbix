@@ -13,8 +13,8 @@
 ** If not, see <https://www.gnu.org/licenses/>.
 **/
 
-define('ZABBIX_VERSION',		'7.4.0');
-define('ZABBIX_API_VERSION',	'7.4.0');
+define('ZABBIX_VERSION',		'8.0.0alpha1');
+define('ZABBIX_API_VERSION',	'8.0.0');
 define('ZABBIX_EXPORT_VERSION',	'8.0');
 
 define('ZABBIX_DB_VERSION',		7040000);

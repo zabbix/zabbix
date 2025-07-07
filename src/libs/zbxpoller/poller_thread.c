@@ -1145,6 +1145,10 @@ ZBX_THREAD_ENTRY(zbx_poller_thread, args)
 #endif
 	}
 
+	zbx_ipc_async_socket_close(&rtc);
+	if (ZBX_POLLER_TYPE_HISTORY == poller_type)
+		zbx_db_close();
+
 	scriptitem_es_engine_destroy();
 
 	zbx_setproctitle("%s #%d [terminated]", get_process_type_string(process_type), process_num);

@@ -34,6 +34,7 @@
 #include "zbxalgo.h"
 #include "zbxparam.h"
 #include "zbxexpr.h"
+#include "zbxip.h"
 
 #if defined(ZABBIX_SERVICE)
 #	include "zbxwinservice.h"
@@ -466,8 +467,10 @@ static int	parse_list_of_checks(char *str, const char *host, unsigned short port
 	{
 		if (SUCCEED == zbx_json_value_by_name(&jp, ZBX_PROTO_TAG_ERROR, tmp, sizeof(tmp), NULL))
 		{
-			zabbix_log(LOG_LEVEL_ERR, "cannot parse list of active checks from [%s:%hu]: %s", host, port,
-					tmp);
+			char	host_port[MAX_STRING_LEN];
+
+			zabbix_log(LOG_LEVEL_ERR, "cannot parse list of active checks from [%s]: %s",
+					zbx_join_hostport(host_port, sizeof(host_port), host, port), tmp);
 		}
 		else
 		{
@@ -481,7 +484,12 @@ static int	parse_list_of_checks(char *str, const char *host, unsigned short port
 	if (0 != strcmp(tmp, ZBX_PROTO_VALUE_SUCCESS))
 	{
 		if (SUCCEED == zbx_json_value_by_name(&jp, ZBX_PROTO_TAG_INFO, tmp, sizeof(tmp), NULL))
-			zabbix_log(level_error, "no active checks on server [%s:%hu]: %s", host, port, tmp);
+		{
+			char	host_port[MAX_STRING_LEN];
+
+			zabbix_log(level_error, "no active checks on server [%s]: %s",
+					zbx_join_hostport(host_port, sizeof(host_port), host, port), tmp);
+		}
 		else
 			zabbix_log(level_error, "no active checks on server");
 
@@ -967,14 +975,21 @@ static int	refresh_active_checks(zbx_vector_addr_ptr_t *addrs, const zbx_config_
 		}
 	}
 
-	if (SUCCEED != ret && SUCCEED == last_ret)
-		zabbix_log(LOG_LEVEL_WARNING, "Active check configuration update started to fail");
+	if (SUCCEED != ret)
+	{
+		history_upload = ZBX_HISTORY_UPLOAD_DISABLED;
+
+		if (SUCCEED == last_ret)
+			zabbix_log(LOG_LEVEL_WARNING, "Active check configuration update started to fail");
+	}
 
 	if (SUCCEED == ret && SUCCEED != last_ret)
 	{
-		zabbix_log(LOG_LEVEL_WARNING, "Active check configuration update from [%s:%hu]"
-				" is working again", ((zbx_addr_t *)addrs->values[0])->ip,
-				((zbx_addr_t *)addrs->values[0])->port);
+		char	ip_port[MAX_STRING_LEN];
+
+		zabbix_log(LOG_LEVEL_WARNING, "Active check configuration update from [%s] is working again",
+			zbx_join_hostport(ip_port, sizeof(ip_port), ((zbx_addr_t *)addrs->values[0])->ip,
+			((zbx_addr_t *)addrs->values[0])->port));
 	}
 
 	last_ret = ret;
@@ -1024,7 +1039,6 @@ static int	check_response(const char *response)
 	}
 	else
 		history_upload = ZBX_HISTORY_UPLOAD_ENABLED;
-
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __func__, zbx_result_string(ret));
 
@@ -1169,8 +1183,11 @@ static void	clear_metric_results(zbx_vector_addr_ptr_t *addrs, zbx_vector_pre_pe
 
 		if (0 != buffer.first_error)
 		{
-			zabbix_log(LOG_LEVEL_WARNING, "active check data upload to [%s:%hu] is working again",
-					((zbx_addr_t *)addrs->values[0])->ip, ((zbx_addr_t *)addrs->values[0])->port);
+			char	ip_port[MAX_STRING_LEN];
+
+			zabbix_log(LOG_LEVEL_WARNING, "active check data upload to [%s] is working again",
+					zbx_join_hostport(ip_port, sizeof(ip_port),
+					((zbx_addr_t *)addrs->values[0])->ip, ((zbx_addr_t *)addrs->values[0])->port));
 			buffer.first_error = 0;
 		}
 	}
@@ -1265,6 +1282,10 @@ static int	send_buffer(zbx_vector_addr_ptr_t *addrs, zbx_vector_pre_persistent_t
 			zabbix_log(LOG_LEVEL_DEBUG, "OK");
 
 		zbx_free(data);
+	}
+	else
+	{
+		history_upload = ZBX_HISTORY_UPLOAD_DISABLED;
 	}
 
 	if (SUCCEED == ret_metrics)

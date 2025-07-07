@@ -7,7 +7,7 @@ This template is designed for the effortless deployment of Cisco SD-WAN monitori
 
 ## Requirements
 
-Zabbix version: 7.4 and higher.
+Zabbix version: 8.0 and higher.
 
 ## Tested versions
 
@@ -16,7 +16,7 @@ This template has been tested on:
 
 ## Configuration
 
-> Zabbix should be configured according to the instructions in the [Templates out of the box](https://www.zabbix.com/documentation/7.4/manual/config/templates_out_of_the_box) section.
+> Zabbix should be configured according to the instructions in the [Templates out of the box](https://www.zabbix.com/documentation/8.0/manual/config/templates_out_of_the_box) section.
 
 ## Setup
 
@@ -48,7 +48,7 @@ This template has been tested on:
 |{$SDWAN.DATA.TIMEOUT}|<p>A response timeout for an API.</p>|`15s`|
 |{$SDWAN.DEVICE.NAME.MATCHES}|<p>This macro is used in device discovery. Can be overridden on the host or linked template level.</p>|`.*`|
 |{$SDWAN.DEVICE.NAME.NOT_MATCHES}|<p>This macro is used in device discovery. Can be overridden on the host or linked template level.</p>|`CHANGE_IF_NEEDED`|
-|{$SDWAN.HTTP_PROXY}|<p>HTTP proxy for API requests. You can specify it using the format [protocol://][username[:password]@]proxy.example.com[:port]. See the documentation at https://www.zabbix.com/documentation/7.4/manual/config/items/itemtypes/http</p>||
+|{$SDWAN.HTTP_PROXY}|<p>HTTP proxy for API requests. You can specify it using the format [protocol://][username[:password]@]proxy.example.com[:port]. See the documentation at https://www.zabbix.com/documentation/8.0/manual/config/items/itemtypes/http</p>||
 
 ### Items
 
@@ -99,7 +99,7 @@ This template has been tested on:
 |{$SDWAN.LLD.FILTER.FSNAME.NOT_MATCHES}|<p>Filter to exclude discoverable filesystems by name.</p>|`CHANGE_IF_NEEDED`|
 |{$SDWAN.LLD.FILTER.IFNAME.MATCHES}|<p>Filter of discoverable interfaces by name.</p>|`.*`|
 |{$SDWAN.LLD.FILTER.IFNAME.NOT_MATCHES}|<p>Filter to exclude discoverable interfaces by name.</p>|`CHANGE_IF_NEEDED`|
-|{$SDWAN.HTTP_PROXY}|<p>HTTP proxy for API requests. You can specify it using the format [protocol://][username[:password]@]proxy.example.com[:port]. See the documentation at https://www.zabbix.com/documentation/7.4/manual/config/items/itemtypes/http</p>||
+|{$SDWAN.HTTP_PROXY}|<p>HTTP proxy for API requests. You can specify it using the format [protocol://][username[:password]@]proxy.example.com[:port]. See the documentation at https://www.zabbix.com/documentation/8.0/manual/config/items/itemtypes/http</p>||
 |{$IFCONTROL}|<p>Macro for operational state of the interface for the link down trigger. Can be used with the interface name as context.</p>|`1`|
 |{$SDWAN.ROUTES.FREQUENCY}|<p>Update interval for the Routes item, expressed in hours.</p>|`1h`|
 
