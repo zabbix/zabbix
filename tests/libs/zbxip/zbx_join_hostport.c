@@ -12,17 +12,23 @@
 ** If not, see <https://www.gnu.org/licenses/>.
 **/
 
-package com.zabbix.gateway;
+#include "zbxmocktest.h"
+#include "zbxmockdata.h"
+#include "zbxmockutil.h"
+#include "zbxmockassert.h"
 
-class GeneralInformation
+#include "zbxip.h"
+
+void	zbx_mock_test_entry(void **state)
 {
-	static final String APPLICATION_NAME = "Zabbix Java Gateway";
-	static final String REVISION_DATE = "27 June 2025";
-	static final String REVISION = "{ZABBIX_REVISION}";
-	static final String VERSION = "7.0.17rc1";
+	const char	*host = zbx_mock_get_parameter_string("in.host");
+	unsigned int	port = zbx_mock_get_parameter_uint32("in.port");
+	const char	*expected = zbx_mock_get_parameter_string("out.hostport");
+	char		result[MAX_STRING_LEN];
 
-	static void printVersion()
-	{
-		System.out.println(String.format("%s v%s (revision %s) (%s)", APPLICATION_NAME, VERSION, REVISION, REVISION_DATE));
-	}
+	ZBX_UNUSED(state);
+
+	zbx_join_hostport(result, sizeof(result), host, (unsigned short)port);
+
+	zbx_mock_assert_str_eq("joined hostport", expected, result);
 }
