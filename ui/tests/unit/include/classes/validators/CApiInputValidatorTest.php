@@ -9004,6 +9004,12 @@ uwMrOBKatg7CZ1Uenv1K3ioD5w==
 				['type' => API_SSL_CERTIFICATE],
 				'',
 				'/1/idp_certificate',
+				''
+			],
+			[
+				['type' => API_SSL_CERTIFICATE, 'flags' => $api_required | API_NOT_EMPTY],
+				'',
+				'/1/idp_certificate',
 				'Invalid parameter "/1/idp_certificate": cannot be empty.'
 			],
 			[
