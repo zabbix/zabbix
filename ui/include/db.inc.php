@@ -638,12 +638,13 @@ function check_db_fields($dbFields, &$args) {
  *
  * @param string $field_name
  * @param array  $values
- * @param bool   $not_in        Create inverse condition.
- * @param bool   $zero_to_null  Cast zero to null.
+ * @param bool   $not_in              Create inverse condition.
+ * @param bool   $zero_includes_null  ID fields may have default DB column value either null or 0. Consider them
+ *                                    equivalent for 0 in the given values.
  *
  * @return string
  */
-function dbConditionInt($field_name, array $values, $not_in = false, $zero_to_null = false) {
+function dbConditionInt($field_name, array $values, $not_in = false, $zero_includes_null = false) {
 	global $DB;
 
 	$MIN_NUM_BETWEEN = 4; // Minimum number of consecutive values for using "BETWEEN <id1> AND <idN>".
@@ -655,10 +656,9 @@ function dbConditionInt($field_name, array $values, $not_in = false, $zero_to_nu
 
 	$values = array_flip($values);
 
-	$has_zero = false;
+	$include_null_for_zero = $zero_includes_null && array_key_exists(0, $values);
 
-	if ($zero_to_null && array_key_exists(0, $values)) {
-		$has_zero = true;
+	if ($include_null_for_zero) {
 		unset($values[0]);
 	}
 
@@ -727,16 +727,25 @@ function dbConditionInt($field_name, array $values, $not_in = false, $zero_to_nu
 		}
 	}
 
-	if ($has_zero) {
+	if ($include_null_for_zero) {
 		if ($condition !== '') {
 			$condition .= $not_in ? ' AND ' : ' OR ';
 		}
 
-		$condition .= $field_name.($not_in ? ' IS NOT NULL' : ' IS NULL');
+		if ($not_in) {
+			$condition .= $field_name.' IS NOT NULL'.
+				' AND '.$field_name.'!=0';
+		}
+		else {
+			$condition .= '('.
+				$field_name.' IS NULL'.
+				' OR '.$field_name.'=0'.
+			')';
+		}
 	}
 
 	if (!$not_in) {
-		if ((int) $has_zero + count($intervals) + count($single_chunks) > 1) {
+		if ((int) $include_null_for_zero + count($intervals) + count($single_chunks) > 1) {
 			$condition = '('.$condition.')';
 		}
 	}
@@ -753,20 +762,8 @@ function dbConditionInt($field_name, array $values, $not_in = false, $zero_to_nu
  *
  * @return string
  */
-function dbConditionId(string $sql_field_name, array $values, bool $not_in = false,
-		?string $table_name = null): string {
-	if ($table_name === null) {
-		return dbConditionInt($sql_field_name, $values, $not_in, true);
-	}
-
-	$delimiter_pos = strpos($sql_field_name, '.');
-	$field_name = ($delimiter_pos !== false) ? substr($sql_field_name, $delimiter_pos + 1) : $sql_field_name;
-
-	$field_schema = DB::getSchema($table_name)['fields'][$field_name];
-
-	return dbConditionInt($sql_field_name, $values, $not_in,
-		(!$field_schema['null'] && array_key_exists('default', $field_schema)) ? false : true
-	);
+function dbConditionId(string $sql_field_name, array $values, bool $not_in = false): string {
+	return dbConditionInt($sql_field_name, $values, $not_in, true);
 }
 
 /**
