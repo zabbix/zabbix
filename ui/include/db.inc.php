@@ -560,8 +560,8 @@ function dbConditionInt($field_name, array $values, $not_in = false, $zero_inclu
  *
  * @return string
  */
-function dbConditionId(string $sql_field_name, array $values, bool $not_in = false): string {
-	return dbConditionInt($sql_field_name, $values, $not_in, true);
+function dbConditionId($fieldName, array $values, $notIn = false) {
+	return dbConditionInt($fieldName, $values, $notIn, true);
 }
 
 /**
