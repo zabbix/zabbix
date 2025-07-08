@@ -826,26 +826,23 @@ uwMrOBKatg7CZ1Uenv1K3ioD5w==
 				],
 				'expected_error' => 'Invalid parameter "/1/idp_certificate": value is too long.'
 			],
-			'Test SAML SP certificate is required if Encrypt name ID equals to 1' => [
-				'userdirectories' => [
-					['userdirectoryid' => 'API SAML', 'sp_certificate' => '', 'encrypt_nameid' => 1]
-				],
-				'expected_error' => 'Invalid parameter "/1/sp_certificate": cannot be empty.'
-			],
-			'Test SAML SP certificate is required if Sign assertions equals to 1' => [
-				'userdirectories' => [
-					['userdirectoryid' => 'API SAML', 'sp_certificate' => '', 'sign_assertions' => 1]
-				],
-				'expected_error' => 'Invalid parameter "/1/sp_certificate": cannot be empty.'
-			],
-			'Test SAML SP certificate is required if Encrypt name ID, Sign assertions and Sign AuthN requests equals to 1' => [
+			'Test SAML SP certificate is required when one of sign_* options is enabled' => [
 				'userdirectories' => [
 					[
 						'userdirectoryid' => 'API SAML',
 						'sp_certificate' => '',
-						'encrypt_nameid' => 1,
 						'sign_assertions' => 1,
 						'sign_authn_requests' => 1
+					]
+				],
+				'expected_error' => 'Invalid parameter "/1/sp_certificate": cannot be empty.'
+			],
+			'Test SAML SP certificate is required when one of encrypt_* options is enabled' => [
+				'userdirectories' => [
+					[
+						'userdirectoryid' => 'API SAML',
+						'sp_certificate' => '',
+						'encrypt_nameid' => 1
 					]
 				],
 				'expected_error' => 'Invalid parameter "/1/sp_certificate": cannot be empty.'
@@ -871,26 +868,23 @@ uwMrOBKatg7CZ1Uenv1K3ioD5w==
 				],
 				'expected_error' => 'Invalid parameter "/1/sp_certificate": value is too long.'
 			],
-			'Test SAML SP private key is required if Encrypt name ID equals to 1' => [
-				'userdirectories' => [
-					['userdirectoryid' => 'API SAML', 'sp_private_key' => '', 'encrypt_nameid' => 1]
-				],
-				'expected_error' => 'Invalid parameter "/1/sp_private_key": cannot be empty.'
-			],
-			'Test SAML SP private key is required if Sign assertions equals to 1' => [
-				'userdirectories' => [
-					['userdirectoryid' => 'API SAML', 'sp_private_key' => '', 'sign_assertions' => 1]
-				],
-				'expected_error' => 'Invalid parameter "/1/sp_private_key": cannot be empty.'
-			],
-			'Test SAML SP private key is required if Encrypt name ID, Sign assertions and Sign AuthN requests equals to 1' => [
+			'Test SAML SP private key is required when one of sign_* options is enabled' => [
 				'userdirectories' => [
 					[
 						'userdirectoryid' => 'API SAML',
 						'sp_private_key' => '',
-						'encrypt_nameid' => 1,
 						'sign_assertions' => 1,
 						'sign_authn_requests' => 1
+					]
+				],
+				'expected_error' => 'Invalid parameter "/1/sp_private_key": cannot be empty.'
+			],
+			'SAML SP private key is required when one of encrypt_* options is enabled' => [
+				'userdirectories' => [
+					[
+						'userdirectoryid' => 'API SAML',
+						'sp_private_key' => '',
+						'encrypt_nameid' => 1
 					]
 				],
 				'expected_error' => 'Invalid parameter "/1/sp_private_key": cannot be empty.'
