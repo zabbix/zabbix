@@ -366,6 +366,135 @@ class testFormAdministrationMediaTypes extends CWebTest {
 					$this->checkTabFields($form, $auth['password']);
 				}
 
+				// Check OAuth form layout.
+				$oauth_fields = [
+					'generic_smtp' => [
+						'defaults' => [
+							'Redirection endpoint' => '',
+							'Client ID' => '',
+							'Client secret' => '',
+							'Authorization endpoint' => '',
+							'name:authorization_url_parameters[0][name]' => '',
+							'name:authorization_url_parameters[0][value]' => '',
+							'id:authorization_mode_0' => 'Automatic',
+							'id:code' => '',
+							'Token endpoint' => '',
+							'name:token_url_parameters[0][name]' => '',
+							'name:token_url_parameters[0][value]' => ''
+						],
+						'maxlength' => [
+							'Redirection endpoint' => 2048,
+							'Client ID' => 255,
+							'Client secret' => 255,
+							'Authorization endpoint' => 2048,
+							'name:authorization_url_parameters[0][name]' => 255,
+							'name:authorization_url_parameters[0][value]' => 255,
+							'id:code' => 255,
+							'Token endpoint' => 2048,
+							'name:token_url_parameters[0][name]' => 255,
+							'name:token_url_parameters[0][value]' => 255
+						],
+						'mandatory' => ['Redirection endpoint', 'Client ID', 'Client secret', 'Authorization endpoint', 'Token endpoint']
+					],
+					'other' => [
+						'defaults' => [
+							'Redirection endpoint' => '',
+							'Client ID' => '',
+							'Client secret' => '',
+						],
+						'maxlength' => [
+							'Redirection endpoint' => 2048,
+							'Client ID' => 255,
+							'Client secret' => 255
+						],
+						'mandatory' => ['Redirection endpoint', 'Client ID', 'Client secret']
+					]
+				];
+
+				foreach (['Generic SMTP', 'Gmail', 'Gmail relay', 'Office365'] as $email_provider) {
+					$form->fill(['Email provider' => $email_provider, 'Authentication' => 'OAuth']);
+
+					// Verify oauth fields are displayed.
+					$this->assertTrue($form->getLabel('OAuth tokens')->isDisplayed());
+					$this->assertTrue($form->isRequired('OAuth tokens'));
+					$this->assertTrue($form->query('button:Configure')->one()->isDisplayed());
+
+					// Open oauth form.
+					$form->query('button:Configure')->one()->click();
+					$oauth_overlay = COverlayDialogElement::find()->all()->last()->waitUntilReady();
+					$oauth_form = $oauth_overlay->asForm();
+					$this->assertEquals('New oauth', $oauth_overlay->getTitle());
+
+					// Check that "Copy" button is enabled and displayed.
+					$this->assertTrue($oauth_form->query('xpath:.//button[contains(@class, "zi-copy")]')->one()->isClickable());
+
+					// Check fields attributes.
+					$oauth_provider = ($email_provider == 'Generic SMTP') ? $oauth_fields['generic_smtp'] : $oauth_fields['other'];
+					$this->checkFieldsAttributes($oauth_form, $oauth_provider);
+
+					// Check "Authorization code" related fields.
+					if ($email_provider == 'Generic SMTP') {
+						$this->assertEquals('Authorization code', $oauth_form->getField('id:code')->getAttribute('placeholder'));
+						$this->assertFalse($oauth_form->getField('id:code')->isEnabled());
+						$oauth_form->fill(['id:authorization_mode' => 'Manual']);
+						$this->assertTrue($oauth_form->getField('id:code')->isEnabled());
+					}
+
+					$hints_data = [
+						'common' => [
+							[
+								'label' => 'Redirection endpoint',
+								'text' => "Destination URL where successful authorization redirects.\n".
+								'The URL must comply with the OAuth provider\'s policy.'
+							],
+							[
+								'label' => 'Client ID',
+								'text' => 'The client identifier registered within the authorization server.'
+							],
+							[
+								'label' => 'Client secret',
+								'text' => 'The client secret registered within the authorization server.'
+							]
+						],
+						'generic' => [
+							[
+								'label' => 'Authorization endpoint',
+								'text' => 'Authorization server URL for requesting user authorization.'
+							],
+							[
+								'label' => 'Authorization code',
+								'text' => "Temporary token to exchange for an access token.\n".
+									"Select retrieval method: automatically through a redirection page or manually if automatic retrieval fails."
+							],
+							[
+								'label' => 'Token endpoint',
+								'text' => 'Authorization server URL to exchange the authorization code for an access token.'
+							]
+						]
+					];
+					$hints = ($email_provider == 'Generic SMTP')
+						? array_merge($hints_data['common'], $hints_data['generic'])
+						: $hints_data['common'];
+					foreach ($hints as $hint) {
+						$this->checkHint($oauth_form, $hint['label'], $hint['text']);
+					}
+
+					// Check buttons related to 'Authorization parameters' and 'Token parameters' tables.
+					if ($email_provider == 'Generic SMTP') {
+						foreach (['id:oauth-auth-parameters-table', 'id:oauth-token-parameters-table'] as $locator) {
+							$this->assertEquals(2, $oauth_form->query($locator)->one()->query('button', ['Add', 'Remove'])->all()
+									->filter((CElementFilter::CLICKABLE))->count()
+							);
+						}
+					}
+
+					// Check if footer buttons present and clickable.
+					$this->assertEquals(['Add', 'Cancel'], $oauth_overlay->getFooter()->query('button')->all()
+							->filter(CElementFilter::CLICKABLE)->asText()
+					);
+
+					$oauth_overlay->close();
+				}
 				break;
 
 			case 'SMS':
@@ -459,7 +588,7 @@ class testFormAdministrationMediaTypes extends CWebTest {
 	}
 
 	/**
-	 * Check attributes of provided fields.
+	 * Check fields attributes in particular tab.
 	 *
 	 * @param CFormElement	$form			form that contains the fields to be checked
 	 * @param array			$parameters		field names, their attributes and attribute values
@@ -469,6 +598,16 @@ class testFormAdministrationMediaTypes extends CWebTest {
 			$form->selectTab($parameters['tab name']);
 		}
 
+		$this->checkFieldsAttributes($form, $parameters);
+	}
+
+	/**
+	 * Check attributes of provided fields.
+	 *
+	 * @param CFormElement	$form			form that contains the fields to be checked
+	 * @param array			$parameters		field names, their attributes and attribute values
+	 */
+	protected function checkFieldsAttributes($form, $parameters) {
 		// Check field default values.
 		$form->checkValue($parameters['defaults']);
 
@@ -481,6 +620,21 @@ class testFormAdministrationMediaTypes extends CWebTest {
 		foreach ($parameters['mandatory'] as $field) {
 			$this->assertTrue($form->isRequired($field));
 		}
+	}
+
+	/**
+	 * Check field's hint text.
+	 *
+	 * @param CFormElement $form         given form
+	 * @param string       $label        checked field's label
+	 * @param string       $hint_text    text of the hint
+	 */
+	protected function checkHint($form, $label, $hint_text) {
+		$form->getLabel($label)->query('xpath:./button[contains(@class, "zi-help-filled-small")]')->one()->click();
+		$hint = $this->query('xpath://div[@data-hintboxid]')->waitUntilVisible();
+		$this->assertEquals($hint_text, $hint->one()->getText());
+		$hint->one()->query('xpath:.//button[@class="btn-overlay-close"]')->one()->click();
+		$hint->waitUntilNotPresent();
 	}
 
 	public function getMediaTypeData() {
@@ -899,7 +1053,7 @@ class testFormAdministrationMediaTypes extends CWebTest {
 					]
 				]
 			],
-			// Offise365 relay email with all possible parameters defined.
+			// Office365 relay email with all possible parameters defined.
 			[
 				[
 					'mediatype_tab' => [
