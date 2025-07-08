@@ -2256,7 +2256,7 @@ See the section below for a list of macros used for LLD filters.
 |{$AWS.ACCESS.KEY.ID}|<p>Access key ID.</p>||
 |{$AWS.SECRET.ACCESS.KEY}|<p>Secret access key.</p>||
 |{$AWS.ASSUME.ROLE.ARN}|<p>ARN assume role; add when using the `assume_role` authorization method.</p>||
-|{$AWS.REGION}|<p>AWS Application Load Balancer region code.</p>|`us-west-1`|
+|{$AWS.REGION}|<p>AWS Network Load Balancer region code.</p>|`us-west-1`|
 |{$AWS.PROXY}|<p>Sets the HTTP proxy value. If this macro is empty, no proxy is used.</p>||
 |{$AWS.STS.REGION}|<p>Region used in assume role request.</p>|`us-east-1`|
 |{$AWS.DATA.TIMEOUT}|<p>API response timeout.</p>|`60s`|
