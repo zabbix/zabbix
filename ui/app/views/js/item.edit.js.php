@@ -58,7 +58,7 @@ window.item_edit_form = new class {
 		this.type_interfaceids = {};
 		this.type_with_key_select = type_with_key_select;
 		this.value_type_keys = value_type_keys;
-		this.last_inferred_type = '';
+		this.last_inferred_type = null;
 
 		for (const type in interface_types) {
 			if (interface_types[type] == INTERFACE_TYPE_OPT) {
@@ -185,6 +185,9 @@ window.item_edit_form = new class {
 				passphrase.value = password.value;
 			}
 		});
+
+		// Initialising last_inferred_type start value
+		this.last_inferred_type = this.#getInferredValueType(this.field.key.value);
 	}
 
 	initItemPrototypeForm() {
@@ -297,9 +300,6 @@ window.item_edit_form = new class {
 				this.updateFieldsVisibility();
 			}
 		});
-
-		// Initialising last_inferred_type start value
-		this.last_inferred_type = this.#getInferredValueType(this.field.key.value);
 	}
 
 	initItemPrototypeEvents() {
