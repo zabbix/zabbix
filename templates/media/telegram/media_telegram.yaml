@@ -446,11 +446,17 @@ zabbix_export:
         		{
         			api_token: {type: 'string'},
         			api_chat_id: {type: 'string'},
-        			alert_message: {type: 'string'},
-        			event_tags: {type: 'array', tags: true, default: {}}
+        			alert_message: {type: 'string'}
         		},
         		this.params
         	);
+        
+        	if (CParamValidator.inArray(this.params.event_source, ['0', '3', '4'])) {
+        		CParamValidator.validate({
+        			event_tags: {type: 'array', macro: 'EVENT.TAGSJSON', tags: true, default: {}}
+        		}, this.params);
+        	}
+        
         	this.params.url = 'https://api.telegram.org/bot';
         	this.data = {
         		disable_web_page_preview: true,
