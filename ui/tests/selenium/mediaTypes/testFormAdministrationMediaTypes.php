@@ -400,7 +400,7 @@ class testFormAdministrationMediaTypes extends CWebTest {
 						'defaults' => [
 							'Redirection endpoint' => '',
 							'Client ID' => '',
-							'Client secret' => '',
+							'Client secret' => ''
 						],
 						'maxlength' => [
 							'Redirection endpoint' => 2048,
