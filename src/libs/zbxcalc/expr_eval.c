@@ -2170,9 +2170,6 @@ static int	resolve_expression_query_macro(const zbx_db_trigger *trigger, resolv_
 	return SUCCEED;
 }
 
-/* macros that are supported in expression macro */
-static const char	*expr_macros[] = {MVAR_HOST_HOST, MVAR_HOSTNAME, MVAR_ITEM_KEY, NULL};
-
 /******************************************************************************
  *                                                                            *
  * Purpose: extract index from valid indexed host or item key macro.          *
@@ -2183,6 +2180,9 @@ static const char	*expr_macros[] = {MVAR_HOST_HOST, MVAR_HOSTNAME, MVAR_ITEM_KEY
  ******************************************************************************/
 static int	expr_macro_index(const char *macro)
 {
+	/* macros that are supported in expression macro */
+	static const char	*expr_macros[] = {MVAR_HOST_HOST, MVAR_HOSTNAME, MVAR_ITEM_KEY, NULL};
+
 	zbx_strloc_t	loc;
 	int		func_num;
 
