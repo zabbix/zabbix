@@ -657,11 +657,9 @@ function dbConditionInt($field_name, array $values, $not_in = false, $zero_inclu
 	$values = array_flip($values);
 
 	$condition = '';
-	$multiple_conditions = false;
 
 	if ($zero_includes_null && array_key_exists(0, $values)) {
 		$condition .= $field_name.($not_in ? ' IS NOT NULL' : ' IS NULL');
-		$multiple_conditions = true;
 	}
 
 	$values = array_keys($values);
@@ -699,6 +697,8 @@ function dbConditionInt($field_name, array $values, $not_in = false, $zero_inclu
 			return dbQuoteInt($value);
 		}, $values);
 	}
+
+	$multiple_conditions = false;
 
 	// Process intervals.
 
