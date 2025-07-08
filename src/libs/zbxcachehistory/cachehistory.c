@@ -1819,6 +1819,7 @@ void	zbx_dc_history_clean_value(zbx_dc_history_t *history)
 			zbx_free(history->value.log->source);
 			zbx_free(history->value.log);
 			break;
+		case ITEM_VALUE_TYPE_JSON:
 		case ITEM_VALUE_TYPE_BIN:
 		case ITEM_VALUE_TYPE_STR:
 		case ITEM_VALUE_TYPE_TEXT:
@@ -2204,6 +2205,41 @@ static void	dc_local_add_history_text_bin_helper(unsigned char value_type, zbx_u
 		item_value->value.value_str.len = 0;
 }
 
+static void	dc_local_add_history_text_json_helper(unsigned char value_type, zbx_uint64_t itemid,
+		unsigned char item_value_type, const zbx_timespec_t *ts, const char *value_orig,
+		zbx_uint64_t lastlogsize, int mtime, unsigned char flags)
+{
+	dc_item_value_t	*item_value = dc_local_get_history_slot();
+
+	item_value->itemid = itemid;
+	item_value->ts = *ts;
+	item_value->item_value_type = item_value_type;
+	item_value->value_type = value_type;
+	item_value->state = ITEM_STATE_NORMAL;
+	item_value->flags = flags;
+
+	if (0 != (item_value->flags & ZBX_DC_FLAG_META))
+	{
+		item_value->lastlogsize = lastlogsize;
+		item_value->mtime = mtime;
+	}
+
+	if (0 == (item_value->flags & ZBX_DC_FLAG_NOVALUE))
+	{
+		size_t	maxlen = (ITEM_VALUE_TYPE_JSON == item_value_type ? ZBX_HISTORY_JSON_VALUE_LEN :
+				ZBX_HISTORY_VALUE_LEN);
+
+		item_value->value.value_str.len = zbx_db_strlen_n(value_orig, maxlen) + 1;
+		dc_string_buffer_realloc(item_value->value.value_str.len);
+
+		item_value->value.value_str.pvalue = string_values_offset;
+		memcpy(&string_values[string_values_offset], value_orig, item_value->value.value_str.len);
+		string_values_offset += item_value->value.value_str.len;
+	}
+	else
+		item_value->value.value_str.len = 0;
+}
+
 static void	dc_local_add_history_text(zbx_uint64_t itemid, unsigned char item_value_type, const zbx_timespec_t *ts,
 		const char *value_orig, zbx_uint64_t lastlogsize, int mtime, unsigned char flags)
 {
@@ -2215,6 +2251,13 @@ static void	dc_local_add_history_bin(zbx_uint64_t itemid, unsigned char item_val
 		const char *value_orig, zbx_uint64_t lastlogsize, int mtime, unsigned char flags)
 {
 	dc_local_add_history_text_bin_helper(ITEM_VALUE_TYPE_BIN, itemid, item_value_type, ts, value_orig,
+			lastlogsize, mtime, flags);
+}
+
+static void	dc_local_add_history_json(zbx_uint64_t itemid, unsigned char item_value_type, const zbx_timespec_t *ts,
+		const char *value_orig, zbx_uint64_t lastlogsize, int mtime, unsigned char flags)
+{
+	dc_local_add_history_text_json_helper(ITEM_VALUE_TYPE_BIN, itemid, item_value_type, ts, value_orig,
 			lastlogsize, mtime, flags);
 }
 
@@ -2437,6 +2480,11 @@ void	zbx_dc_add_history(zbx_uint64_t itemid, unsigned char item_value_type, unsi
 		else if (ZBX_ISSET_BIN(result))
 		{
 			dc_local_add_history_bin(itemid, item_value_type, ts, result->bin, result->lastlogsize,
+					result->mtime, value_flags);
+		}
+		else if (ZBX_ISSET_JSON(result))
+		{
+			dc_local_add_history_json(itemid, item_value_type, ts, result->bin, result->lastlogsize,
 					result->mtime, value_flags);
 		}
 		else
@@ -2976,6 +3024,9 @@ static int	hc_clone_history_data(zbx_hc_data_t **data, const dc_item_value_t *it
 			case ITEM_VALUE_TYPE_BIN:
 				cache->stats.history_bin_counter++;
 				break;
+			case ITEM_VALUE_TYPE_JSON:
+				cache->stats.history_json_counter++;
+				break;
 			case ITEM_VALUE_TYPE_NONE:
 			default:
 				THIS_SHOULD_NEVER_HAPPEN;
@@ -3168,6 +3219,7 @@ static void	hc_copy_history_data(zbx_dc_history_t *history, zbx_uint64_t itemid,
 			case ITEM_VALUE_TYPE_STR:
 			case ITEM_VALUE_TYPE_TEXT:
 			case ITEM_VALUE_TYPE_BIN:
+			case ITEM_VALUE_TYPE_JSON:
 				history->value.str = zbx_strdup(NULL, data->value.str);
 				break;
 			case ITEM_VALUE_TYPE_LOG:

@@ -386,6 +386,7 @@ static void	DCinventory_value_add(zbx_vector_inventory_value_ptr_t *inventory_va
 			break;
 		case ITEM_VALUE_TYPE_LOG:
 		case ITEM_VALUE_TYPE_BIN:
+		case ITEM_VALUE_TYPE_JSON:
 		case ITEM_VALUE_TYPE_NONE:
 		default:
 			return;
@@ -472,6 +473,11 @@ static void	dc_history_set_value(zbx_dc_history_t *hdata, unsigned char value_ty
 			hdata->value.str = value->data.str;
 			hdata->value.str[zbx_db_strlen_n(hdata->value.str, ZBX_HISTORY_BIN_VALUE_LEN)] = '\0';
 			break;
+		case ITEM_VALUE_TYPE_JSON:
+			zbx_dc_history_clean_value(hdata);
+			hdata->value.str = value->data.str;
+			hdata->value.str[zbx_db_strlen_n(hdata->value.str, ZBX_HISTORY_JSON_VALUE_LEN)] = '\0';
+			break;
 		case ITEM_VALUE_TYPE_LOG:
 			if (ITEM_VALUE_TYPE_LOG != hdata->value_type)
 			{
@@ -531,7 +537,8 @@ static void	normalize_item_value(const zbx_history_sync_item_t *item, zbx_dc_his
 				logvalue[zbx_db_strlen_n(logvalue, ZBX_HISTORY_LOG_VALUE_LEN)] = '\0';
 				break;
 			case ITEM_VALUE_TYPE_BIN:
-				/* in history cache binary values are stored as ITEM_VALUE_TYPE_STR */
+			case ITEM_VALUE_TYPE_JSON:
+				/* in history cache binary values and JSON values are stored as ITEM_VALUE_TYPE_STR */
 				THIS_SHOULD_NEVER_HAPPEN;
 				break;
 			case ITEM_VALUE_TYPE_FLOAT:
@@ -753,7 +760,9 @@ static void	remove_history_duplicates(zbx_vector_dc_history_ptr_t *history)
 					select_str = {.table_name = "history_str"},
 					select_log = {.table_name = "history_log"},
 					select_text = {.table_name = "history_text"},
-					select_bin = {.table_name = "history_bin"};
+					select_bin = {.table_name = "history_bin"},
+					select_json = {.table_name = "history_json"};
+
 	zbx_vector_dc_history_ptr_t	duplicates, history_index;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
@@ -782,6 +791,8 @@ static void	remove_history_duplicates(zbx_vector_dc_history_ptr_t *history)
 			select_ptr = &select_text;
 		else if (h->value_type == ITEM_VALUE_TYPE_BIN)
 			select_ptr = &select_bin;
+		else if (h->value_type == ITEM_VALUE_TYPE_JSON)
+			select_ptr = &select_json;
 		else
 			continue;
 
@@ -805,6 +816,7 @@ static void	remove_history_duplicates(zbx_vector_dc_history_ptr_t *history)
 	db_fetch_duplicates(&select_log, ITEM_VALUE_TYPE_LOG, &duplicates);
 	db_fetch_duplicates(&select_text, ITEM_VALUE_TYPE_TEXT, &duplicates);
 	db_fetch_duplicates(&select_bin, ITEM_VALUE_TYPE_BIN, &duplicates);
+	db_fetch_duplicates(&select_json, ITEM_VALUE_TYPE_JSON, &duplicates);
 
 	vc_flag_duplicates(&history_index, &duplicates);
 
@@ -1111,6 +1123,7 @@ static void	DCmodule_prepare_history(zbx_dc_history_t *history, int history_num,
 				h_log->severity = log->severity;
 				break;
 			case ITEM_VALUE_TYPE_BIN:
+			case ITEM_VALUE_TYPE_JSON:
 			case ITEM_VALUE_TYPE_NONE:
 			default:
 				THIS_SHOULD_NEVER_HAPPEN;
