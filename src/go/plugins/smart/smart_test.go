@@ -732,7 +732,6 @@ func Test_validateParams(t *testing.T) {
 	}
 
 	for _, tt := range tests {
-		tt := tt
 		t.Run(tt.name, func(t *testing.T) {
 			t.Parallel()
 
@@ -815,7 +814,6 @@ func Test_validateExport(t *testing.T) {
 	}
 
 	for _, tt := range tests {
-		tt := tt
 		t.Run(tt.name, func(t *testing.T) {
 			lastVerCheck = tt.fields.lastVerCheck
 

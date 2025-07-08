@@ -158,15 +158,15 @@ static int	discoverer_drule_check(zbx_hashset_t *check_counts, zbx_uint64_t drul
 	return discoverer_check_count_decrease(check_counts, druleid, ip, 0);
 }
 
-static int	dcheck_get_timeout(unsigned char type, int *timeout_sec, char *error_val, size_t error_len)
+static int	dcheck_get_timeout(unsigned char type, int *timeout_sec, zbx_dc_um_handle_t *um_handle,
+		char *error_val, size_t error_len)
 {
 	char	*tmt;
 	int	ret;
 
 	tmt = zbx_dc_get_global_item_type_timeout(type);
 
-	zbx_substitute_simple_macros(NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL,
-			NULL, NULL, &tmt, ZBX_MACRO_TYPE_COMMON, NULL, 0);
+	zbx_dc_expand_user_and_func_macros(um_handle, &tmt, NULL, 0, NULL);
 
 	ret = zbx_validate_item_timeout(tmt, timeout_sec, error_val, error_len);
 	zbx_free(tmt);
@@ -665,13 +665,12 @@ static void	process_job_finalize(zbx_vector_uint64_t *del_jobs, zbx_vector_disco
 	discovery_close_cb(handle);
 }
 
-static int	drule_delay_get(const char *delay, char **delay_resolved, int *delay_int)
+static int	drule_delay_get(const char *delay, char **delay_resolved, int *delay_int, zbx_dc_um_handle_t *um_handle)
 {
 	int	ret;
 
 	*delay_resolved = zbx_strdup(*delay_resolved, delay);
-	zbx_substitute_simple_macros(NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL,
-			delay_resolved, ZBX_MACRO_TYPE_COMMON, NULL, 0);
+	zbx_dc_expand_user_and_func_macros(um_handle, delay_resolved, NULL, 0, NULL);
 
 	if (SUCCEED != (ret = zbx_is_time_suffix(*delay_resolved, delay_int, ZBX_LENGTH_UNLIMITED)))
 		*delay_int = ZBX_DEFAULT_INTERVAL;
@@ -720,11 +719,11 @@ static int	process_discovery(int *nextcheck, zbx_hashset_t *incomplete_druleids,
 
 		if (FAIL != i || NULL != zbx_hashset_search(incomplete_druleids, &drule->druleid))
 		{
-			(void)drule_delay_get(drule->delay_str, &delay_str, &delay);
+			(void)drule_delay_get(drule->delay_str, &delay_str, &delay, um_handle);
 			goto next;
 		}
 
-		if (SUCCEED != drule_delay_get(drule->delay_str, &delay_str, &delay))
+		if (SUCCEED != drule_delay_get(drule->delay_str, &delay_str, &delay, um_handle))
 		{
 			zbx_snprintf(error, sizeof(error), "Invalid update interval \"%s\".", delay_str);
 			discoverer_queue_append_error(drule_errors, drule->druleid, error);
@@ -740,7 +739,7 @@ static int	process_discovery(int *nextcheck, zbx_hashset_t *incomplete_druleids,
 			if (SVC_AGENT == dcheck->type)
 			{
 				if (0 == tmt_agent && FAIL == dcheck_get_timeout(ITEM_TYPE_ZABBIX, &tmt_agent,
-						err, sizeof(err)))
+						um_handle, err, sizeof(err)))
 				{
 					zbx_snprintf(error, sizeof(error), "Invalid global timeout for Zabbix Agent"
 							" checks: \"%s\"", err);
@@ -755,7 +754,7 @@ static int	process_discovery(int *nextcheck, zbx_hashset_t *incomplete_druleids,
 					SVC_SNMPv3 == dcheck->type)
 			{
 				if (0 == tmt_snmp && FAIL == dcheck_get_timeout(ITEM_TYPE_SNMP, &tmt_snmp,
-						err, sizeof(err)))
+						um_handle, err, sizeof(err)))
 				{
 					zbx_snprintf(error, sizeof(error), "Invalid global timeout for SNMP checks"
 							": \"%s\"", err);
@@ -769,7 +768,7 @@ static int	process_discovery(int *nextcheck, zbx_hashset_t *incomplete_druleids,
 			else
 			{
 				if (0 == tmt_simple && FAIL == dcheck_get_timeout(ITEM_TYPE_SIMPLE, &tmt_simple,
-						err, sizeof(err)))
+						um_handle, err, sizeof(err)))
 				{
 					zbx_snprintf(error, sizeof(error), "Invalid global timeout for simple checks"
 							": \"%s\"", err);
@@ -1684,7 +1683,7 @@ ZBX_THREAD_ENTRY(zbx_discoverer_thread, args)
 
 	while (ZBX_IS_RUNNING())
 	{
-		int		processing_rules_num, more_results, is_drules_rev_updated;
+		int		shutdown = 0, processing_rules_num, more_results, is_drules_rev_updated;
 		zbx_uint64_t	unsaved_checks;
 
 		sec = zbx_time();
@@ -1839,7 +1838,8 @@ ZBX_THREAD_ENTRY(zbx_discoverer_thread, args)
 #endif
 				case ZBX_RTC_SHUTDOWN:
 					zabbix_log(LOG_LEVEL_DEBUG, "shutdown message received, terminating...");
-					goto out;
+					shutdown = 1;
+					break;
 			}
 
 			zbx_ipc_message_free(message);
@@ -1848,9 +1848,12 @@ ZBX_THREAD_ENTRY(zbx_discoverer_thread, args)
 		if (NULL != client)
 			zbx_ipc_client_release(client);
 
+		if (1 == shutdown)
+			break;
+
 		zbx_timekeeper_collect(dmanager.timekeeper);
 	}
-out:
+
 	zbx_setproctitle("%s #%d [terminating]", get_process_type_string(info->process_type), info->process_num);
 
 	zbx_vector_uint64_pair_destroy(&revisions);
@@ -1861,6 +1864,9 @@ out:
 	zbx_hashset_destroy(&incomplete_druleids);
 	discoverer_manager_free(&dmanager);
 	zbx_ipc_service_close(&ipc_service);
+	zbx_db_close();
+
+	zbx_setproctitle("%s #%d [terminated]", get_process_type_string(info->process_type), info->process_num);
 
 	exit(EXIT_SUCCESS);
 }

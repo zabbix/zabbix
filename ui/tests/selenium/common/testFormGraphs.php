@@ -745,7 +745,7 @@ class testFormGraphs extends CWebTest {
 					'details' => ['Y axis MAX value must be greater than Y axis MIN value.']
 				]
 			],
-			// #16
+			// #16.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -898,7 +898,7 @@ class testFormGraphs extends CWebTest {
 
 				// Add line color.
 				if (array_key_exists('color', $item)) {
-					$item_row->query('xpath:.//div[@class="color-picker"]')->asColorPicker()->one()->fill($item['color']);
+					$item_row->query('xpath:.//z-color-picker')->asColorPicker()->one()->fill($item['color']);
 				}
 			}
 		}
@@ -973,7 +973,7 @@ class testFormGraphs extends CWebTest {
 				// Check lines color.
 				if (array_key_exists('color', $item)) {
 					$this->assertEquals($item['color'],
-							$item_row->query('xpath:.//div[@class="color-picker"]')->asColorPicker()->one()->getValue()
+							$item_row->query('xpath:.//z-color-picker')->asColorPicker()->one()->getValue()
 					);
 				}
 			}
@@ -1085,7 +1085,7 @@ class testFormGraphs extends CWebTest {
 			}
 
 			// Add line color.
-			$item_row->query('xpath:.//div[@class="color-picker"]')->asColorPicker()->one()->fill($data['items'][0]['color']);
+			$item_row->query('xpath:.//z-color-picker')->asColorPicker()->one()->fill($data['items'][0]['color']);
 		}
 
 		$form->submit();
@@ -1123,7 +1123,7 @@ class testFormGraphs extends CWebTest {
 
 			// Check lines color.
 			$this->assertEquals($data['items'][0]['color'],
-					$item_row->query('xpath:.//div[@class="color-picker"]')->asColorPicker()->one()->getValue()
+					$item_row->query('xpath:.//z-color-picker')->asColorPicker()->one()->getValue()
 			);
 		}
 	}
@@ -1206,7 +1206,8 @@ class testFormGraphs extends CWebTest {
 		$this->page->login()->open($this->url)->waitUntilReady();
 		$this->query('link:Graph for items change')->waitUntilClickable()->one()->click();
 		$item_number = $this->prototype ? 1 : 0;
-		$form = $this->query('id', $this->formid)->waitUntilVisible()->asForm()->one();
+		$dialog = COverlayDialogElement::find()->waitUntilReady()->one();
+		$form = $dialog->query('id', $this->formid)->waitUntilVisible()->asForm()->one();
 		$item_row = $form->getFieldContainer('Items')->query('xpath:.//tr[@id="items_'.$item_number.'"]')
 				->one()->waitUntilPresent();
 
@@ -1220,7 +1221,7 @@ class testFormGraphs extends CWebTest {
 
 		// Change line color.
 		if (array_key_exists('color', $data['change'])) {
-			$item_row->query('xpath:.//div[@class="color-picker"]')->asColorPicker()->one()->fill($data['change']['color']);
+			$item_row->query('xpath:.//z-color-picker')->asColorPicker()->one()->fill($data['change']['color']);
 		}
 
 		$form->submit();
@@ -1238,7 +1239,7 @@ class testFormGraphs extends CWebTest {
 		}
 
 		$this->assertEquals($data['expected']['color'],
-				$item_row->query('xpath:.//div[@class="color-picker"]')->asColorPicker()->one()->getValue()
+				$item_row->query('xpath:.//z-color-picker')->asColorPicker()->one()->getValue()
 		);
 	}
 

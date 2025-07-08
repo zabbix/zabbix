@@ -35,6 +35,7 @@ class CWidgetFieldOverride extends CWidgetField {
 				'hosts'				=> ['type' => API_STRINGS_UTF8, 'flags' => API_REQUIRED],
 				'items'				=> ['type' => API_STRINGS_UTF8, 'flags' => API_REQUIRED],
 				'color'				=> ['type' => API_COLOR],
+				'color_palette'		=> ['type' => API_INT32],
 				'type'				=> ['type' => API_INT32, 'in' => implode(',', [SVG_GRAPH_TYPE_LINE, SVG_GRAPH_TYPE_POINTS, SVG_GRAPH_TYPE_STAIRCASE, SVG_GRAPH_TYPE_BAR])],
 				'width'				=> ['type' => API_INT32, 'in' => implode(',', range(0, 10))],
 				'pointsize'			=> ['type' => API_INT32, 'in' => implode(',', range(1, 10))],
@@ -47,7 +48,7 @@ class CWidgetFieldOverride extends CWidgetField {
 	}
 
 	public function getOverrideOptions(): array {
-		return ['color', 'width', 'type', 'transparency', 'fill', 'pointsize', 'missingdatafunc', 'axisy', 'timeshift'];
+		return ['color', 'color_palette', 'width', 'type', 'transparency', 'fill', 'pointsize', 'missingdatafunc', 'axisy', 'timeshift'];
 	}
 
 	public function setValue($value): self {
@@ -131,6 +132,7 @@ class CWidgetFieldOverride extends CWidgetField {
 
 			self::setValidationRuleFlag($validation_rules['fields']['items'], API_NOT_EMPTY);
 			self::setValidationRuleFlag($validation_rules['fields']['color'], API_NOT_EMPTY);
+			self::setValidationRuleFlag($validation_rules['fields']['color_palette'], API_NOT_EMPTY);
 			self::setValidationRuleFlag($validation_rules['fields']['timeshift'], API_NOT_EMPTY);
 		}
 

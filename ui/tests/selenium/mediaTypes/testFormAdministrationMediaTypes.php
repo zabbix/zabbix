@@ -335,7 +335,11 @@ class testFormAdministrationMediaTypes extends CWebTest {
 
 					// Check that certain fields are not displayed depending on email provider.
 					$hidden_fields = ['SMTP server', 'SMTP server port', 'SMTP helo', 'Connection security'];
-					$hidden_fields[] = (in_array($email_provider, ['Gmail', 'Office365'])) ? 'Authentication' : 'Password';
+
+					if (in_array($email_provider, ['Gmail', 'Office365'])) {
+						$hidden_fields[] = implode(['Authentication', 'Password']);
+					}
+
 					$this->assertEquals([], array_intersect($hidden_fields, $form->getLabels()
 							->filter(new CElementFilter(CElementFilter::VISIBLE))->asText())
 					);
@@ -344,7 +348,7 @@ class testFormAdministrationMediaTypes extends CWebTest {
 						$this->checkTabFields($form, $auth['none']);
 
 						$auth_field = $form->getField('Authentication');
-						$this->assertEquals(['None', 'Email and password'], $auth_field->getLabels()->asText());
+						$this->assertEquals(['None', 'Email and password', 'OAuth'], $auth_field->getLabels()->asText());
 						$auth_field->fill('Email and password');
 					}
 

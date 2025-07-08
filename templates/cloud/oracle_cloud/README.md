@@ -25,7 +25,7 @@ HTTP request body for queries.
 
 ## Requirements
 
-Zabbix version: 7.4 and higher.
+Zabbix version: 8.0 and higher.
 
 ## Tested versions
 
@@ -34,7 +34,7 @@ This template has been tested on:
 
 ## Configuration
 
-> Zabbix should be configured according to the instructions in the [Templates out of the box](https://www.zabbix.com/documentation/7.4/manual/config/templates_out_of_the_box) section.
+> Zabbix should be configured according to the instructions in the [Templates out of the box](https://www.zabbix.com/documentation/8.0/manual/config/templates_out_of_the_box) section.
 
 ## Setup
 
@@ -205,8 +205,8 @@ LLD filter values and trigger threshold values can be changed with the respectiv
 |{$OCI.VOLUME.BOOT.DISCOVERY.STATE.NOT_MATCHES}|<p>Sets the regex string of boot volume states to ignore in discovery.</p>|`CHANGE_IF_NEEDED`|
 |{$OCI.VOLUME.BOOT.DISCOVERY.NAME.MATCHES}|<p>Sets the regex string of boot volume names to allow in discovery.</p>|`.*`|
 |{$OCI.VOLUME.BOOT.DISCOVERY.NAME.NOT_MATCHES}|<p>Sets the regex string of boot volume names to ignore in discovery.</p>|`CHANGE_IF_NEEDED`|
-|{$OCI.OBJECT.STORAGE.DISCOVERY.NAME.MATCHES}|<p>Set an HTTP proxy for OCI API requests if needed.</p>|`.*`|
-|{$OCI.OBJECT.STORAGE.DISCOVERY.NAME.NOT_MATCHES}|<p>Set an HTTP proxy for OCI API requests if needed.</p>|`CHANGE_IF_NEEDED`|
+|{$OCI.OBJECT.STORAGE.DISCOVERY.NAME.MATCHES}|<p>Sets the regex string of storage names to allow in discovery.</p>|`.*`|
+|{$OCI.OBJECT.STORAGE.DISCOVERY.NAME.NOT_MATCHES}|<p>Sets the regex string of storage names to ignore in discovery.</p>|`CHANGE_IF_NEEDED`|
 |{$OCI.AUTONOMOUS.DB.DISCOVERY.STATE.MATCHES}|<p>Sets the regex string of autonomous database states to allow in discovery.</p>|`.*`|
 |{$OCI.AUTONOMOUS.DB.DISCOVERY.STATE.NOT_MATCHES}|<p>Sets the regex string of autonomous database states to ignore in discovery.</p>|`CHANGE_IF_NEEDED`|
 |{$OCI.AUTONOMOUS.DB.DISCOVERY.NAME.MATCHES}|<p>Sets the regex string of autonomous database names to allow in discovery.</p>|`.*`|
@@ -267,7 +267,7 @@ the HTTP request body for queries.
 
 ## Requirements
 
-Zabbix version: 7.4 and higher.
+Zabbix version: 8.0 and higher.
 
 ## Tested versions
 
@@ -276,7 +276,7 @@ This template has been tested on:
 
 ## Configuration
 
-> Zabbix should be configured according to the instructions in the [Templates out of the box](https://www.zabbix.com/documentation/7.4/manual/config/templates_out_of_the_box) section.
+> Zabbix should be configured according to the instructions in the [Templates out of the box](https://www.zabbix.com/documentation/8.0/manual/config/templates_out_of_the_box) section.
 
 ## Setup
 
@@ -392,7 +392,7 @@ HTTP request body for queries.
 
 ## Requirements
 
-Zabbix version: 7.4 and higher.
+Zabbix version: 8.0 and higher.
 
 ## Tested versions
 
@@ -401,7 +401,7 @@ This template has been tested on:
 
 ## Configuration
 
-> Zabbix should be configured according to the instructions in the [Templates out of the box](https://www.zabbix.com/documentation/7.4/manual/config/templates_out_of_the_box) section.
+> Zabbix should be configured according to the instructions in the [Templates out of the box](https://www.zabbix.com/documentation/8.0/manual/config/templates_out_of_the_box) section.
 
 ## Setup
 
@@ -464,7 +464,7 @@ the HTTP request body for queries.
 
 ## Requirements
 
-Zabbix version: 7.4 and higher.
+Zabbix version: 8.0 and higher.
 
 ## Tested versions
 
@@ -473,7 +473,7 @@ This template has been tested on:
 
 ## Configuration
 
-> Zabbix should be configured according to the instructions in the [Templates out of the box](https://www.zabbix.com/documentation/7.4/manual/config/templates_out_of_the_box) section.
+> Zabbix should be configured according to the instructions in the [Templates out of the box](https://www.zabbix.com/documentation/8.0/manual/config/templates_out_of_the_box) section.
 
 ## Setup
 
@@ -577,7 +577,7 @@ HTTP request body for queries.
 
 ## Requirements
 
-Zabbix version: 7.4 and higher.
+Zabbix version: 8.0 and higher.
 
 ## Tested versions
 
@@ -586,7 +586,7 @@ This template has been tested on:
 
 ## Configuration
 
-> Zabbix should be configured according to the instructions in the [Templates out of the box](https://www.zabbix.com/documentation/7.4/manual/config/templates_out_of_the_box) section.
+> Zabbix should be configured according to the instructions in the [Templates out of the box](https://www.zabbix.com/documentation/8.0/manual/config/templates_out_of_the_box) section.
 
 ## Setup
 
@@ -648,7 +648,7 @@ HTTP request body for queries.
 
 ## Requirements
 
-Zabbix version: 7.4 and higher.
+Zabbix version: 8.0 and higher.
 
 ## Tested versions
 
@@ -657,7 +657,7 @@ This template has been tested on:
 
 ## Configuration
 
-> Zabbix should be configured according to the instructions in the [Templates out of the box](https://www.zabbix.com/documentation/7.4/manual/config/templates_out_of_the_box) section.
+> Zabbix should be configured according to the instructions in the [Templates out of the box](https://www.zabbix.com/documentation/8.0/manual/config/templates_out_of_the_box) section.
 
 ## Setup
 
@@ -718,7 +718,7 @@ For communication with OCI, this template utilizes script items which execute HT
 
 ## Requirements
 
-Zabbix version: 7.4 and higher.
+Zabbix version: 8.0 and higher.
 
 ## Tested versions
 
@@ -727,7 +727,7 @@ This template has been tested on:
 
 ## Configuration
 
-> Zabbix should be configured according to the instructions in the [Templates out of the box](https://www.zabbix.com/documentation/7.4/manual/config/templates_out_of_the_box) section.
+> Zabbix should be configured according to the instructions in the [Templates out of the box](https://www.zabbix.com/documentation/8.0/manual/config/templates_out_of_the_box) section.
 
 ## Setup
 

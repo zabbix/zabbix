@@ -1,6 +1,6 @@
 ## Process this file with automake to produce Makefile.in
 
-noinst_LIBRARIES = libzbxdbupgrade.a
+noinst_LIBRARIES = libzbxdbupgrade.a 
 
 libzbxdbupgrade_a_SOURCES = \
 	dbupgrade.c \
@@ -37,6 +37,8 @@ libzbxdbupgrade_a_SOURCES = \
 	dbupgrade_7010.c \
 	dbupgrade_7020.c \
 	dbupgrade_7030.c \
+	dbupgrade_7040.c \
+	dbupgrade_7050.c \
 	dbupgrade_macros.c \
 	dbupgrade_macros.h \
 	dbupgrade_common.c \

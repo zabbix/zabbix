@@ -19,7 +19,10 @@ import (
 	"errors"
 	"fmt"
 	"io"
+	"net"
+	"net/url"
 	"os"
+	"regexp"
 	"slices"
 	"strings"
 	"unicode"
@@ -30,6 +33,7 @@ import (
 	"golang.zabbix.com/sdk/errs"
 	"golang.zabbix.com/sdk/log"
 	"golang.zabbix.com/sdk/plugin"
+	"golang.zabbix.com/sdk/zbxnet"
 )
 
 var Options AgentOptions
@@ -43,6 +47,9 @@ const (
 )
 
 var (
+	hostnameRegex *regexp.Regexp = regexp.MustCompile(
+		`^([a-zA-Z0-9_]{1}[a-zA-Z0-9_-]{0,62}){1}(\.[a-zA-Z0-9_]{1}[a-zA-Z0-9_-]{0,62})*[\._]?$`)
+
 	errInvalidTLSConnect = errors.New("invalid TLSConnect configuration parameter")
 	errInvalidTLSAccept  = errors.New("invalid TLSAccept configuration parameter")
 	errCipherCertAndAll  = errors.New(`TLSCipherCert configuration parameter cannot be used when the combined list` +
@@ -357,6 +364,118 @@ func GlobalOptions(all *AgentOptions) (options *plugin.GlobalOptions) {
 	return
 }
 
+func isValidHostname(hostname string) bool {
+	isValid := hostnameRegex.MatchString(hostname)
+
+	return isValid
+}
+
+func validateHost(host string) error {
+	host = strings.TrimSpace(host)
+
+	if net.ParseIP(host) != nil || isValidHostname(host) {
+		return nil
+	}
+
+	return errs.Errorf("failed to validate host: %q", host)
+}
+
+func elementsUnique(array [][]string) (bool, string) {
+	seen := make(map[string]struct{})
+
+	for _, row := range array {
+		for _, element := range row {
+			_, exists := seen[element]
+			if exists {
+				return false, element
+			}
+
+			seen[element] = struct{}{}
+		}
+	}
+
+	return true, ""
+}
+
+func normalizeAddress(address string) (string, error) {
+	address = strings.TrimSpace(address)
+	u := url.URL{Host: address}
+	ip := net.ParseIP(address)
+
+	if ip == nil && strings.TrimSpace(u.Hostname()) == "" {
+		return "", errs.Errorf("failed to parse address %q: empty value", address)
+	}
+
+	var checkAddr string
+
+	switch {
+	case ip != nil:
+		checkAddr = net.JoinHostPort(address, "10051")
+	case u.Port() == "":
+		checkAddr = net.JoinHostPort(u.Hostname(), "10051")
+	default:
+		checkAddr = address
+	}
+
+	h, p, err := net.SplitHostPort(checkAddr)
+	if err != nil {
+		return "", errs.Wrapf(err, "failed to parse address %q", address)
+	}
+
+	err = validateHost(h)
+	if err != nil {
+		return "", err
+	}
+
+	return net.JoinHostPort(strings.TrimSpace(h), strings.TrimSpace(p)), nil
+}
+
+func clusterToAddresses(cluster string) ([]string, error) {
+	rawAddresses := strings.Split(cluster, ";")
+
+	parsedAddresses := make([]string, len(rawAddresses)) //nolint:makezero
+
+	for i, rawAddress := range rawAddresses {
+		address, err := normalizeAddress(rawAddress)
+
+		if err != nil {
+			return nil, err
+		}
+
+		parsedAddresses[i] = address
+	}
+
+	return parsedAddresses, nil
+}
+
+// ParseServerActive validates address list of zabbix Server or Proxy for ActiveCheck.
+func ParseServerActive(optionServerActive string) ([][]string, error) {
+	if strings.TrimSpace(optionServerActive) == "" {
+		return [][]string{}, nil
+	}
+
+	clusters := strings.Split(optionServerActive, ",")
+
+	resultAddresses := make([][]string, len(clusters)) //nolint:makezero
+
+	for i, cluster := range clusters {
+		clusterAddresses, err := clusterToAddresses(cluster)
+		if err != nil {
+			return nil, err
+		}
+
+		resultAddresses[i] = clusterAddresses
+	}
+
+	elementsUniqueRes, duplicateElement := elementsUnique(resultAddresses)
+
+	if !elementsUniqueRes {
+		return nil, errs.Errorf("address %q specified more than once", duplicateElement)
+	}
+
+	return resultAddresses, nil
+}
+
 func ValidateOptions(options *AgentOptions) error {
 	var err error
 	var maxLen int
@@ -380,6 +499,16 @@ func ValidateOptions(options *AgentOptions) error {
 	if utf8.RuneCountInString(options.HostInterface) > HostInterfaceLen {
 		return fmt.Errorf("the value of \"HostInterface\" configuration parameter cannot be longer than %d"+
 			" characters", HostInterfaceLen)
+	}
+
+	_, err = zbxnet.GetAllowedPeers(options.Server)
+	if err != nil {
+		return errs.Wrap(err, `failed to validate "Server" configuration parameter`)
+	}
+
+	_, err = ParseServerActive(options.ServerActive)
+	if err != nil {
+		return errs.Wrap(err, `failed to validate "ServerActive" configuration parameter`)
 	}
 
 	return nil

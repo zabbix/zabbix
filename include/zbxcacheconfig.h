@@ -379,9 +379,6 @@ typedef struct
 	char				tls_psk_identity[HOST_TLS_PSK_IDENTITY_LEN_MAX];
 	char				tls_psk[HOST_TLS_PSK_LEN_MAX];
 #endif
-	zbx_uint64_t			revision;
-	zbx_uint64_t			macro_revision;
-
 	char				allowed_addresses[ZBX_HOST_PROXY_ADDRESS_LEN_MAX];
 	time_t				last_version_error_time;
 }
@@ -843,6 +840,7 @@ zbx_expr_db_item_value_property_t;
 
 int	zbx_dc_get_history_log_value(zbx_uint64_t itemid, char **replace_to, int request, int clock, int ns,
 		const char *tz);
+int	zbx_dc_get_item_key(zbx_uint64_t itemid, char **replace_to);
 
 int	zbx_dc_get_host_host(zbx_uint64_t itemid, char **replace_to);
 void	zbx_dc_config_get_hosts_by_itemids(zbx_dc_host_t *hosts, const zbx_uint64_t *itemids, int *errcodes, size_t num);
@@ -1164,8 +1162,9 @@ zbx_dc_revision_t;
 const char	*zbx_dc_get_session_token(void);
 zbx_session_t	*zbx_dc_get_or_create_session(zbx_uint64_t hostid, const char *token, zbx_session_type_t session_type);
 
-int	zbx_dc_register_config_session(zbx_uint64_t hostid, const char *token, zbx_uint64_t session_config_revision,
-		zbx_dc_revision_t *dc_revision);
+int	zbx_dc_register_proxy_config_session(zbx_uint64_t hostid, const char *token,
+		zbx_uint64_t session_config_revision, zbx_dc_revision_t *dc_revision, zbx_uint64_t *proxy_revision,
+		zbx_uint64_t *macro_revision);
 
 void		zbx_dc_cleanup_sessions(void);
 
@@ -1287,8 +1286,8 @@ void	zbx_dc_get_user_macro(const zbx_dc_um_handle_t *um_handle, const char *macr
 int	zbx_dc_expand_user_and_func_macros(const zbx_dc_um_handle_t *um_handle, char **text,
 		const zbx_uint64_t *hostids, int hostids_num, char **error);
 int	zbx_dc_expand_user_and_func_macros_itemid(zbx_uint64_t itemid, char **replace_to);
-int	zbx_dc_expand_user_and_func_macros_from_cache(zbx_um_cache_t *um_cache, char **text,
-		const zbx_uint64_t *hostids, int hostids_num, unsigned char env, char **error);
+void	zbx_dc_expand_user_and_func_macros_from_cache(zbx_um_cache_t *um_cache, char **text,
+		const zbx_uint64_t *hostids, int hostids_num, unsigned char env);
 
 char	*zbx_dc_expand_user_macros_in_func_params(const char *params, zbx_uint64_t hostid);
 
@@ -1576,5 +1575,17 @@ int	zbx_dc_sync_lock(void);
 void	zbx_dc_sync_unlock(void);
 
 int	zbx_dc_get_proxy_version(zbx_uint64_t proxyid);
+
+int	zbx_macro_field_params_resolv(zbx_macro_resolv_data_t *p, va_list args, char **replace_to, char **data,
+		char *error, size_t maxerrlen);
+int	zbx_macro_allowed_hosts_resolv(zbx_macro_resolv_data_t *p, va_list args, char **replace_to, char **data,
+		char *error, size_t maxerrlen);
+int	zbx_macro_script_params_field_resolv(zbx_macro_resolv_data_t *p, va_list args, char **replace_to, char **data,
+		char *error, size_t maxerrlen);
+int	zbx_macro_query_filter_resolv(zbx_macro_resolv_data_t *p, va_list args, char **replace_to, char **data,
+		char *error, size_t maxerrlen);
+
+int	zbx_item_key_subst_cb(const char *data, int level, int num, int quoted, char **param, va_list args);
+int	zbx_snmp_oid_subst_cb(const char *data, int level, int num, int quoted, char **param, va_list args);
 
 #endif

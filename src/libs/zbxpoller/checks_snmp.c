@@ -150,6 +150,7 @@ typedef struct
 	void			*arg;
 	char			*error;
 	netsnmp_large_fd_set	fdset;
+	char			*error_msgget;
 }
 zbx_bulkwalk_context_t;
 
@@ -305,7 +306,7 @@ static int	zbx_snmp_cache_handle_engineid(netsnmp_session *session, zbx_dc_item_
 		ret = FAIL;
 		item_context->ret = NOTSUPPORTED;
 		SET_MSG_RESULT(&item_context->result, zbx_dsprintf(NULL, "Invalid SNMP engineId length "
-				"\"" ZBX_FS_UI64 "\"", session->securityEngineIDLen));
+				"\"" ZBX_FS_SIZE_T "\"", (zbx_fs_size_t)session->securityEngineIDLen));
 
 		goto out;
 	}
@@ -771,7 +772,7 @@ static int	zbx_get_snmp_response_error(const zbx_snmp_sess_t ssp, const zbx_dc_i
 	}
 	else if (STAT_ERROR == status)
 	{
-		char	*tmp_err_str;
+		char	*tmp_err_str, addr_port[MAX_STRING_LEN];
 		int	snmp_err;
 
 		snmp_sess_error(ssp, NULL, &snmp_err, &tmp_err_str);
@@ -782,23 +783,28 @@ static int	zbx_get_snmp_response_error(const zbx_snmp_sess_t ssp, const zbx_dc_i
 					"key or duplicate engineID)");
 		}
 
-		zbx_snprintf(error, max_error_len, "Cannot connect to \"%s:%hu\": %s.",
-				interface->addr, interface->port, tmp_err_str);
+		zbx_snprintf(error, max_error_len, "Cannot connect to \"%s\": %s.",
+				zbx_join_hostport(addr_port, sizeof(addr_port), interface->addr, interface->port),
+				tmp_err_str);
 		zbx_free(tmp_err_str);
 		ret = NETWORK_ERROR;
 	}
 	else if (STAT_TIMEOUT == status)
 	{
+		char	addr_port[MAX_STRING_LEN];
+
 		if (0 == got_vars)
 		{
-			zbx_snprintf(error, max_error_len, "Timeout while connecting to \"%s:%hu\".",
-					interface->addr, interface->port);
+			zbx_snprintf(error, max_error_len, "Timeout while connecting to \"%s\".",
+					zbx_join_hostport(addr_port, sizeof(addr_port), interface->addr,
+					interface->port));
 			ret = NETWORK_ERROR;
 		}
 		else
 		{
-			zbx_snprintf(error, max_error_len, "Timeout while retrieving data from \"%s:%hu\".",
-					interface->addr, interface->port);
+			zbx_snprintf(error, max_error_len, "Timeout while retrieving data from \"%s\".",
+					zbx_join_hostport(addr_port, sizeof(addr_port), interface->addr,
+					interface->port));
 			ret = NOTSUPPORTED;
 		}
 	}
@@ -2240,7 +2246,7 @@ static int	zbx_snmp_process_discovery(zbx_snmp_sess_t ssp, const zbx_dc_item_t *
 		int *errcode, char *error, size_t max_error_len, int *max_succeed, int *min_fail, int max_vars,
 		int bulk)
 {
-	int			ret;
+	int			ret, walk_ret = SUCCEED, succeed_count = 0;
 	char			oid_translated[ZBX_ITEM_SNMP_OID_LEN_MAX];
 	struct zbx_json		js;
 	zbx_snmp_ddata_t	data;
@@ -2255,11 +2261,28 @@ static int	zbx_snmp_process_discovery(zbx_snmp_sess_t ssp, const zbx_dc_item_t *
 	{
 		zbx_snmp_translate(oid_translated, data.request.params[data.num * 2 + 1], sizeof(oid_translated));
 
-		if (SUCCEED != (ret = zbx_snmp_walk(ssp, item, oid_translated, error, max_error_len,
-				max_succeed, min_fail, max_vars, bulk, zbx_snmp_walk_discovery_cb, (void *)&data)))
+		walk_ret = zbx_snmp_walk(ssp, item, oid_translated, error, max_error_len,
+				max_succeed, min_fail, max_vars, bulk, zbx_snmp_walk_discovery_cb, (void *)&data);
+
+		switch (walk_ret)
 		{
-			goto clean;
+			case NOTSUPPORTED:
+				zabbix_log(LOG_LEVEL_DEBUG, "itemid:" ZBX_FS_UI64 " SNMP walk failed for OID "
+						"'%s': '%s'", item->itemid, oid_translated, error);
+				break;
+			case SUCCEED:
+				succeed_count++;
+				break;
+			default:
+				ret = walk_ret;
+				goto clean;
 		}
+	}
+
+	if (0 == succeed_count)
+	{
+		ret = walk_ret;
+		goto clean;
 	}
 
 	zbx_json_initarray(&js, ZBX_JSON_STAT_BUF_LEN);
@@ -2416,7 +2439,7 @@ static int	snmp_get_value_from_var(struct variable_list *var, char **results, si
 		if (ZBX_ISSET_TEXT(&result) && ZBX_SNMP_STR_HEX == val_type)
 			zbx_remove_chars(result.text, "\r\n");
 
-		str_res = ZBX_GET_STR_RESULT(&result);
+		str_res = ZBX_GET_TEXT_RESULT(&result);
 	}
 
 	if (NULL == str_res)
@@ -2750,15 +2773,19 @@ static int	snmp_bulkwalk_handle_response(int status, struct snmp_pdu *response,
 		}
 		else
 		{
+			char	*errmsg = zbx_get_snmp_type_error(var->type);
+
 			if (SUCCEED == ZBX_CHECK_LOG_LEVEL(LOG_LEVEL_DEBUG))
 			{
-				char	*errmsg = zbx_get_snmp_type_error(var->type);
 
 				zabbix_log(LOG_LEVEL_DEBUG, "itemid:" ZBX_FS_UI64 " cannot retrieve OID: %s",
 						itemid, errmsg);
-				zbx_free(errmsg);
 			}
 
+			if (bulkwalk_context->pdu_type == SNMP_MSG_GET)
+				bulkwalk_context->error_msgget = zbx_strdup(NULL, errmsg);
+
+			zbx_free(errmsg);
 			bulkwalk_context->running = 0;
 			break;
 		}
@@ -2909,6 +2936,7 @@ static zbx_bulkwalk_context_t	*snmp_bulkwalk_context_create(zbx_snmp_context_t *
 	bulkwalk_context->vars_num = 0;
 	bulkwalk_context->arg = snmp_context;
 	bulkwalk_context->error = NULL;
+	bulkwalk_context->error_msgget = NULL;
 
 	netsnmp_large_fd_set_init(&bulkwalk_context->fdset, FD_SETSIZE);
 
@@ -2918,6 +2946,7 @@ static zbx_bulkwalk_context_t	*snmp_bulkwalk_context_create(zbx_snmp_context_t *
 static void	snmp_bulkwalk_context_free(zbx_bulkwalk_context_t *bulkwalk_context)
 {
 	netsnmp_large_fd_set_cleanup(&bulkwalk_context->fdset);
+	zbx_free(bulkwalk_context->error_msgget);
 	zbx_free(bulkwalk_context->error);
 	zbx_free(bulkwalk_context);
 }
@@ -3059,6 +3088,23 @@ void	zbx_unset_snmp_bulkwalk_options(void)
 
 	zbx_snmp_init_bulkwalk_done = 0;
 	snmp_bulkwalk_set_options(&default_opts);
+}
+
+static char	*snmp_bulkwalk_get_getrequest_errors(zbx_snmp_context_t *snmp_context)
+{
+	char	*error = NULL;
+
+	for (int i = 0; i < snmp_context->bulkwalk_contexts.values_num; i++)
+	{
+		zbx_bulkwalk_context_t	*bulkwalk_context = snmp_context->bulkwalk_contexts.values[i];
+
+		if (NULL != bulkwalk_context->error_msgget)
+		{
+			error = zbx_strdcatf(error, "%s\n", bulkwalk_context->error_msgget);
+		}
+	}
+
+	return error;
 }
 
 static int	async_task_process_task_snmp_cb(short event, void *data, int *fd, zbx_vector_address_t *addresses,
@@ -3247,7 +3293,22 @@ static int	async_task_process_task_snmp_cb(short event, void *data, int *fd, zbx
 				if (snmp_context->i >= snmp_context->bulkwalk_contexts.values_num)
 				{
 					if (NULL == snmp_context->results)
-						SET_TEXT_RESULT(&snmp_context->item.result, zbx_strdup(NULL, ""));
+					{
+						char	*getrequest_err;
+
+						if (NULL != (getrequest_err =
+								snmp_bulkwalk_get_getrequest_errors(snmp_context)))
+						{
+							snmp_context->item.ret = NOTSUPPORTED;
+							SET_MSG_RESULT(&snmp_context->item.result, getrequest_err);
+							goto stop;
+						}
+						else
+						{
+							SET_TEXT_RESULT(&snmp_context->item.result,
+									zbx_strdup(NULL, ""));
+						}
+					}
 					else
 						SET_TEXT_RESULT(&snmp_context->item.result, snmp_context->results);
 
@@ -3304,7 +3365,7 @@ stop:
 		zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s itemid:" ZBX_FS_UI64 " %s event:%d fd:%d size:"
 				ZBX_FS_SIZE_T " error:%s",
 				__func__, zbx_result_string(snmp_context->item.ret), snmp_context->item.itemid,
-				zbx_get_event_string(event), event, *fd, snmp_context->results_offset,
+				zbx_get_event_string(event), event, *fd, (zbx_fs_size_t)snmp_context->results_offset,
 				snmp_context->item.result.msg);
 	}
 	else
@@ -3312,7 +3373,7 @@ stop:
 		zabbix_log(LOG_LEVEL_DEBUG, "End of %s() itemid:" ZBX_FS_UI64 " %s event:%d fd:%d size:" ZBX_FS_SIZE_T
 				" state:%s",
 				__func__, snmp_context->item.itemid, zbx_get_event_string(event), event, *fd,
-				snmp_context->results_offset, zbx_task_state_to_str(task_ret));
+				(zbx_fs_size_t)snmp_context->results_offset, zbx_task_state_to_str(task_ret));
 	}
 
 	return task_ret;

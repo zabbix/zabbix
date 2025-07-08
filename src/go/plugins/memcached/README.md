@@ -6,10 +6,6 @@ congestion, latency, CPU and memory usage. Best for use in conjunction with the 
 [Memcached template.](https://git.zabbix.com/projects/ZBX/repos/zabbix/browse/templates/app/memcached)
 You can extend it or create your template for your specific needs. 
 
-## Requirements
-* Zabbix Agent 2
-* Go >= 1.21 (required only to build from source)
-
 ## Supported versions
 * Memcached, version 1.4+
 

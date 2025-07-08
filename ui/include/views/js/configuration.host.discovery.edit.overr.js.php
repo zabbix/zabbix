@@ -18,7 +18,7 @@
  * @var CView $this
  */
 ?>
-<script type="text/x-jquery-tmpl" id="lldoverride-row-templated">
+<script type="text/x-jquery-tmpl" id="lldoverride-row-readonly">
 	<?= (new CRow([
 			'',
 			(new CSpan('1:'))->setAttribute('data-row-num', ''),
@@ -89,7 +89,7 @@
 			->toString()
 	?>
 </script>
-<script type="text/x-jquery-tmpl" id="lldoverride-operation-row-templated">
+<script type="text/x-jquery-tmpl" id="lldoverride-operation-row-readonly">
 	<?= (new CRow([
 			['#{condition_object} #{condition_operator} ', italic('#{value}')],
 			(new CCol(
@@ -135,13 +135,17 @@
 			->toString()
 	?>
 </script>
-<script type="text/x-jquery-tmpl" id="lldoverride-tag-row">
-	<?= renderTagTableRow('#{rowNum}', ['tag' => '', 'value' => ''], ['field_name' => 'optag', 'add_post_js' => false]) ?>
-</script>
+
+<?php
+(new CTemplateTag('lldoverride-tag-row',
+	renderTagTableRow('#{rowNum}', ['tag' => '', 'value' => ''], ['field_name' => 'optag', 'add_post_js' => false])
+))->show();
+?>
+
 <script type="text/javascript">
 	jQuery(function($) {
 		window.lldoverrides = {
-			templated:                      <?= $data['limited'] ? 1 : 0 ?>,
+			readonly:                      <?= $data['limited'] || $data['discovered_lld'] ? 1 : 0 ?>,
 			msg: {
 				yes:                        <?= json_encode(_('Yes')) ?>,
 				no:                         <?= json_encode(_('No')) ?>,
@@ -149,6 +153,7 @@
 				trigger_prototype:          <?= json_encode(_('Trigger prototype')) ?>,
 				graph_prototype:            <?= json_encode(_('Graph prototype')) ?>,
 				host_prototype:             <?= json_encode(_('Host prototype')) ?>,
+				discovery_prototype:        <?= json_encode(_('Discovery prototype')) ?>,
 				equals:                     <?= json_encode(_('equals')) ?>,
 				does_not_equal:             <?= json_encode(_('does not equal')) ?>,
 				contains:                   <?= json_encode(_('contains')) ?>,
@@ -158,13 +163,13 @@
 			}
 		};
 
-		window.lldoverrides.override_row_template = new Template(jQuery(lldoverrides.templated
-			? '#lldoverride-row-templated'
+		window.lldoverrides.override_row_template = new Template(jQuery(lldoverrides.readonly
+			? '#lldoverride-row-readonly'
 			: '#lldoverride-row'
 		).html());
 
-		window.lldoverrides.operations_row_template = new Template(jQuery(lldoverrides.templated
-			? '#lldoverride-operation-row-templated'
+		window.lldoverrides.operations_row_template = new Template(jQuery(lldoverrides.readonly
+			? '#lldoverride-operation-row-readonly'
 			: '#lldoverride-operation-row'
 		).html());
 
@@ -432,7 +437,7 @@
 			template: lldoverrides.override_row_template
 		});
 
-		if (!lldoverrides.templated) {
+		if (!lldoverrides.readonly) {
 			this.$container.on('dynamic_rows.afterremove', function(e, dynamic_rows) {
 				delete this.data[e.data_index];
 				this.onSortOrderChange();
@@ -659,7 +664,7 @@
 	Override.prototype.open = function(no, trigger_element) {
 		return PopUp('popup.lldoverride', {
 			no:                 no,
-			templated:          lldoverrides.templated,
+			readonly:           lldoverrides.readonly,
 			name:               this.data.name,
 			old_name:           this.data.name,
 			stop:               this.data.stop,
@@ -738,7 +743,7 @@
 			})
 			.ready(function() {
 				jQuery('#overrideRow').toggle(jQuery('.form_row', jQuery('#overrides_filters')).length > 1);
-				overlays_stack.end().centerDialog();
+				overlays_stack.end().fixPosition();
 			});
 
 		jQuery('#overrides-evaltype').change(function() {
@@ -750,7 +755,7 @@
 				that.updateExpression();
 			}
 
-			overlays_stack.end().centerDialog();
+			overlays_stack.end().fixPosition();
 		});
 
 		jQuery('#overrides-evaltype').trigger('change');
@@ -849,7 +854,7 @@
 			template: lldoverrides.operations_row_template
 		});
 
-		if (!lldoverrides.templated) {
+		if (!lldoverrides.readonly) {
 			this.$container.on('dynamic_rows.afterremove', function(e, dynamic_rows) {
 				delete this.data[e.data_index];
 
@@ -883,6 +888,9 @@
 		}
 		else if (operationobject === '<?= OPERATION_OBJECT_HOST_PROTOTYPE ?>') {
 			operationobject_name = window.lldoverrides.msg.host_prototype;
+		}
+		else if (operationobject === '<?= OPERATION_OBJECT_LLD_RULE_PROTOTYPE ?>') {
+			operationobject_name = window.lldoverrides.msg.discovery_prototype;
 		}
 
 		return operationobject_name;
@@ -972,7 +980,7 @@
 	Operation.prototype.open = function(no, trigger_element) {
 		var parameters = {
 			no:                 no,
-			templated:          lldoverrides.templated,
+			readonly:           lldoverrides.readonly,
 			operationobject:    this.data.operationobject,
 			operator:           this.data.operator,
 			value:              this.data.value
@@ -1052,7 +1060,8 @@
 														'optag'],
 			'<?= OPERATION_OBJECT_TRIGGER_PROTOTYPE ?>': ['opstatus', 'opdiscover', 'opseverity', 'optag'],
 			'<?= OPERATION_OBJECT_GRAPH_PROTOTYPE ?>': ['opdiscover'],
-			'<?= OPERATION_OBJECT_HOST_PROTOTYPE ?>': ['opstatus', 'opdiscover', 'optemplate', 'optag', 'opinventory']
+			'<?= OPERATION_OBJECT_HOST_PROTOTYPE ?>': ['opstatus', 'opdiscover', 'optemplate', 'optag', 'opinventory'],
+			'<?= OPERATION_OBJECT_LLD_RULE_PROTOTYPE ?>': ['opstatus', 'opdiscover', 'opperiod']
 		};
 
 		jQuery('#operationobject', this.$form)

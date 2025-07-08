@@ -42,21 +42,24 @@ $browser-sprite: '../img/browser-sprite.png?20220722';
 @import "components/buttons";
 @import "components/icons-extended";
 @import "components/checkbox-list";
-@import "components/color-picker";
 @import "components/columns-wrapper";
 @import "components/dashboard/dashboard";
 @import "components/diff";
 @import "components/entity-count";
 @import "components/expandable-subfilter";
 @import "components/form-search";
+@import "components/form-errors";
 @import "components/inline-filter";
 @import "components/list-table";
 @import "components/no-data-message";
+@import "components/markdown";
 @import "components/menu-main";
 @import "components/menu-user";
 @import "components/message-box";
 @import "components/multiselect";
 @import "components/navigationtree";
+@import "components/ordered-list";
+@import "components/radio-card-list";
 @import "components/radio-list-control";
 @import "components/range-control";
 @import "components/section";
@@ -71,6 +74,7 @@ $browser-sprite: '../img/browser-sprite.png?20220722';
 @import "components/tabs";
 @import "components/toc";
 @import "components/z-bar-gauge";
+@import "components/z-color-picker";
 @import "components/z-select";
 @import "components/z-sparkline";
 
@@ -85,6 +89,7 @@ $browser-sprite: '../img/browser-sprite.png?20220722';
 @import "components/dashboard/widget-hostcard";
 @import "components/dashboard/widget-inaccessible";
 @import "components/dashboard/widget-item";
+@import "components/dashboard/widget-itemcard";
 @import "components/dashboard/widget-itemhistory";
 @import "components/dashboard/widget-itemnavigator";
 @import "components/dashboard/widget-map";
@@ -98,6 +103,8 @@ $browser-sprite: '../img/browser-sprite.png?20220722';
 @import "components/dashboard/widget-topitems";
 @import "components/dashboard/widget-url";
 @import "components/dashboard/widget-web";
+
+@import "components/modal/host-wizard";
 
 .link-action {
 	@extend %link-action-style;
@@ -166,9 +173,9 @@ $browser-sprite: '../img/browser-sprite.png?20220722';
 		@extend %icons-font;
 
 		content: $zi-link-external-small;
-		position: absolute;
+		position: relative;
 		bottom: 1px;
-		right: calc(-#{$icon-small-size} - 2px);
+		margin-left: 2px;
 		font-size: $icon-small-size;
 	}
 }
@@ -793,6 +800,11 @@ form {
 			&.disaster-bg {
 				padding-left: 5px;
 			}
+
+			&.error-container {
+				padding-top: 0;
+				padding-bottom: 0;
+			}
 		}
 
 		table {
@@ -1167,7 +1179,7 @@ div {
 				height: 8px;
 				top: 3px;
 				left: 3px;
-				background-color: $btn-bg-color;
+				background-color: $form-radio-selected-color;
 				border-radius: 50%;
 			}
 		}
@@ -1900,40 +1912,45 @@ div {
 		}
 	}
 
+	// Modal sizes:
+	//   modal-popup-medium: 450px - max-content
+	//   modal-popup-generic: 650px - max-content
+	//   modal-popup-small: max-content - 450px
+	//   modal-popup-static: max-content - 700px
+	//   modal-popup-preprocessing: max-content - 900px
+	//   modal-popup-large: max-content - 1024px
+	//   modal-popup-fullscreen: (full_width-40px)
 	&.modal-popup {
 		top: 50px;
-		max-width: 1024px;
-
-		&.modal-popup-small {
-			max-width: 450px;
-			width: 100%;
-		}
+		width: var(--modal-width, 100%);
+		max-width: var(--modal-max-width, 1024px);
+		min-width: var(--modal-min-width, auto);
 
 		&.modal-popup-medium {
-			min-width: 450px;
-		}
-
-		&.modal-popup-large {
-			width: 100%;
+			--modal-width: auto;
+			--modal-min-width: 450px;
 		}
 
 		&.modal-popup-generic {
-			min-width: 650px;
+			--modal-width: auto;
+			--modal-min-width: 650px;
+		}
+
+		&.modal-popup-small {
+			--modal-max-width: 450px;
 		}
 
 		&.modal-popup-static {
-			max-width: 700px;
-			width: 100%;
+			--modal-max-width: 700px;
 		}
 
 		&.modal-popup-preprocessing {
-			max-width: 900px;
-			width: 100%;
+			--modal-max-width: 900px;
 		}
 
 		&.modal-popup-fullscreen {
-			width: calc(100vw - 40px);
-			max-width: calc(100vw - 40px);
+			--modal-width: calc(100vw - 40px);
+			--modal-max-width: calc(100vw - 40px);
 		}
 	}
 
@@ -2184,7 +2201,9 @@ div {
 	text-align: right;
 
 	button {
-		margin: 0 0 0 10px;
+		&:not(:first-of-type) {
+			margin-left: 10px;
+		}
 	}
 }
 
@@ -2844,6 +2863,10 @@ span {
 .overlay-dialogue.modal .overlay-dialogue-body {
 	&.is-loading {
 		overflow: hidden;
+
+		label {
+			transition: none;
+		}
 	}
 }
 
@@ -3753,7 +3776,7 @@ svg {
 
 .interfaces {
 	display: grid;
-	grid-template-columns: 26px repeat(7, max-content);
+	grid-template-columns: 26px repeat(7, min-content);
 	margin-bottom: 5px;
 	line-height: 24px;
 
@@ -3822,6 +3845,16 @@ svg {
 	.no-interface {
 		grid-column: 1 / -1;
 		color: $font-alt-color;
+		width: 441px;
+	}
+
+	.error-container {
+		grid-column: 3 / -1;
+		margin-bottom: 5px;
+
+		.errors-list {
+			margin-top: 0;
+		}
 	}
 }
 

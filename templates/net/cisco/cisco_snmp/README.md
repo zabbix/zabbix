@@ -11,7 +11,7 @@ Device: C2911, C7600
 
 ## Requirements
 
-Zabbix version: 7.4 and higher.
+Zabbix version: 8.0 and higher.
 
 ## Tested versions
 
@@ -20,7 +20,7 @@ This template has been tested on:
 
 ## Configuration
 
-> Zabbix should be configured according to the instructions in the [Templates out of the box](https://www.zabbix.com/documentation/7.4/manual/config/templates_out_of_the_box) section.
+> Zabbix should be configured according to the instructions in the [Templates out of the box](https://www.zabbix.com/documentation/8.0/manual/config/templates_out_of_the_box) section.
 
 ## Setup
 
@@ -32,28 +32,28 @@ Refer to the vendor documentation.
 |----|-----------|-------|
 |{$MEMORY.UTIL.MAX}||`90`|
 |{$CPU.UTIL.CRIT}||`90`|
-|{$TEMP_CRIT}||`60`|
 |{$TEMP_CRIT_LOW}||`5`|
 |{$TEMP_WARN}||`50`|
-|{$TEMP_CRIT:"CPU"}||`75`|
+|{$TEMP_CRIT}||`60`|
 |{$TEMP_WARN:"CPU"}||`70`|
+|{$TEMP_CRIT:"CPU"}||`75`|
 |{$TEMP_WARN_STATUS}||`2`|
 |{$TEMP_CRIT_STATUS}||`3`|
 |{$TEMP_DISASTER_STATUS}||`4`|
+|{$PSU_WARN_STATUS:"warning"}||`2`|
 |{$PSU_CRIT_STATUS:"critical"}||`3`|
 |{$PSU_CRIT_STATUS:"shutdown"}||`4`|
-|{$PSU_WARN_STATUS:"warning"}||`2`|
 |{$PSU_WARN_STATUS:"notFunctioning"}||`6`|
+|{$FAN_WARN_STATUS:"warning"}||`2`|
 |{$FAN_CRIT_STATUS:"critical"}||`3`|
 |{$FAN_CRIT_STATUS:"shutdown"}||`4`|
-|{$FAN_WARN_STATUS:"warning"}||`2`|
 |{$FAN_WARN_STATUS:"notFunctioning"}||`6`|
 |{$SNMP.TIMEOUT}|<p>Time interval for the SNMP availability trigger.</p>|`5m`|
 |{$ICMP_LOSS_WARN}|<p>Warning threshold of ICMP packet loss in %.</p>|`20`|
 |{$ICMP_RESPONSE_TIME_WARN}|<p>Warning threshold of the average ICMP response time in seconds.</p>|`0.15`|
-|{$IF.ERRORS.WARN}|<p>Warning threshold of error packet rate. Can be used with interface name as context.</p>|`2`|
-|{$IF.UTIL.MAX}|<p>Used as a threshold in the interface utilization trigger.</p>|`90`|
 |{$IFCONTROL}|<p>Link status trigger will be fired only for interfaces where the context macro equals "1".</p>|`1`|
+|{$IF.UTIL.MAX}|<p>Used as a threshold in the interface utilization trigger.</p>|`90`|
+|{$IF.ERRORS.WARN}|<p>Warning threshold of error packet rate. Can be used with interface name as context.</p>|`2`|
 |{$NET.IF.IFNAME.MATCHES}|<p>Used for network interface discovery. Can be overridden on the host or linked template level.</p>|`^.*$`|
 |{$NET.IF.IFNAME.NOT_MATCHES}|<p>Filters out `loopbacks`, `nulls`, docker `veth` links and `docker0 bridge` by default.</p>|`Macro too long. Please see the template.`|
 |{$NET.IF.IFOPERSTATUS.MATCHES}|<p>Used for network interface discovery. Can be overridden on the host or linked template level.</p>|`^.*$`|
@@ -278,7 +278,7 @@ This template is designed for the effortless deployment of Cisco IOS versions 12
 
 ## Requirements
 
-Zabbix version: 7.4 and higher.
+Zabbix version: 8.0 and higher.
 
 ## Tested versions
 
@@ -287,7 +287,7 @@ This template has been tested on:
 
 ## Configuration
 
-> Zabbix should be configured according to the instructions in the [Templates out of the box](https://www.zabbix.com/documentation/7.4/manual/config/templates_out_of_the_box) section.
+> Zabbix should be configured according to the instructions in the [Templates out of the box](https://www.zabbix.com/documentation/8.0/manual/config/templates_out_of_the_box) section.
 
 ## Setup
 
@@ -299,28 +299,28 @@ Refer to the vendor documentation.
 |----|-----------|-------|
 |{$MEMORY.UTIL.MAX}||`90`|
 |{$CPU.UTIL.CRIT}||`90`|
-|{$TEMP_CRIT}||`60`|
 |{$TEMP_CRIT_LOW}||`5`|
 |{$TEMP_WARN}||`50`|
-|{$TEMP_CRIT:"CPU"}||`75`|
+|{$TEMP_CRIT}||`60`|
 |{$TEMP_WARN:"CPU"}||`70`|
+|{$TEMP_CRIT:"CPU"}||`75`|
 |{$TEMP_WARN_STATUS}||`2`|
 |{$TEMP_CRIT_STATUS}||`3`|
 |{$TEMP_DISASTER_STATUS}||`4`|
+|{$PSU_WARN_STATUS:"warning"}||`2`|
 |{$PSU_CRIT_STATUS:"critical"}||`3`|
 |{$PSU_CRIT_STATUS:"shutdown"}||`4`|
-|{$PSU_WARN_STATUS:"warning"}||`2`|
 |{$PSU_WARN_STATUS:"notFunctioning"}||`6`|
+|{$FAN_WARN_STATUS:"warning"}||`2`|
 |{$FAN_CRIT_STATUS:"critical"}||`3`|
 |{$FAN_CRIT_STATUS:"shutdown"}||`4`|
-|{$FAN_WARN_STATUS:"warning"}||`2`|
 |{$FAN_WARN_STATUS:"notFunctioning"}||`6`|
 |{$SNMP.TIMEOUT}|<p>Time interval for the SNMP availability trigger.</p>|`5m`|
 |{$ICMP_LOSS_WARN}|<p>Warning threshold of ICMP packet loss in %.</p>|`20`|
 |{$ICMP_RESPONSE_TIME_WARN}|<p>Warning threshold of the average ICMP response time in seconds.</p>|`0.15`|
-|{$IF.ERRORS.WARN}|<p>Warning threshold of error packet rate. Can be used with interface name as context.</p>|`2`|
-|{$IF.UTIL.MAX}|<p>Used as a threshold in the interface utilization trigger.</p>|`90`|
 |{$IFCONTROL}|<p>Link status trigger will be fired only for interfaces where the context macro equals "1".</p>|`1`|
+|{$IF.UTIL.MAX}|<p>Used as a threshold in the interface utilization trigger.</p>|`90`|
+|{$IF.ERRORS.WARN}|<p>Warning threshold of error packet rate. Can be used with interface name as context.</p>|`2`|
 |{$NET.IF.IFNAME.MATCHES}|<p>Used for network interface discovery. Can be overridden on the host or linked template level.</p>|`^.*$`|
 |{$NET.IF.IFNAME.NOT_MATCHES}|<p>Filters out `loopbacks`, `nulls`, docker `veth` links and `docker0 bridge` by default.</p>|`Macro too long. Please see the template.`|
 |{$NET.IF.IFOPERSTATUS.MATCHES}|<p>Used for network interface discovery. Can be overridden on the host or linked template level.</p>|`^.*$`|
@@ -526,7 +526,7 @@ This template is designed for the effortless deployment of Cisco IOS prior to 12
 
 ## Requirements
 
-Zabbix version: 7.4 and higher.
+Zabbix version: 8.0 and higher.
 
 ## Tested versions
 
@@ -535,7 +535,7 @@ This template has been tested on:
 
 ## Configuration
 
-> Zabbix should be configured according to the instructions in the [Templates out of the box](https://www.zabbix.com/documentation/7.4/manual/config/templates_out_of_the_box) section.
+> Zabbix should be configured according to the instructions in the [Templates out of the box](https://www.zabbix.com/documentation/8.0/manual/config/templates_out_of_the_box) section.
 
 ## Setup
 
@@ -547,21 +547,21 @@ Refer to the vendor documentation.
 |----|-----------|-------|
 |{$MEMORY.UTIL.MAX}||`90`|
 |{$CPU.UTIL.CRIT}||`90`|
-|{$TEMP_CRIT}||`60`|
 |{$TEMP_CRIT_LOW}||`5`|
 |{$TEMP_WARN}||`50`|
-|{$TEMP_CRIT:"CPU"}||`75`|
+|{$TEMP_CRIT}||`60`|
 |{$TEMP_WARN:"CPU"}||`70`|
+|{$TEMP_CRIT:"CPU"}||`75`|
 |{$TEMP_WARN_STATUS}||`2`|
 |{$TEMP_CRIT_STATUS}||`3`|
 |{$TEMP_DISASTER_STATUS}||`4`|
+|{$PSU_WARN_STATUS:"warning"}||`2`|
 |{$PSU_CRIT_STATUS:"critical"}||`3`|
 |{$PSU_CRIT_STATUS:"shutdown"}||`4`|
-|{$PSU_WARN_STATUS:"warning"}||`2`|
 |{$PSU_WARN_STATUS:"notFunctioning"}||`6`|
+|{$FAN_WARN_STATUS:"warning"}||`2`|
 |{$FAN_CRIT_STATUS:"critical"}||`3`|
 |{$FAN_CRIT_STATUS:"shutdown"}||`4`|
-|{$FAN_WARN_STATUS:"warning"}||`2`|
 |{$FAN_WARN_STATUS:"notFunctioning"}||`6`|
 |{$SNMP.TIMEOUT}|<p>Time interval for the SNMP availability trigger.</p>|`5m`|
 |{$ICMP_LOSS_WARN}|<p>Warning threshold of ICMP packet loss in %.</p>|`20`|

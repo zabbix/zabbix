@@ -124,11 +124,11 @@
 		}
 
 		overlayDialogue({
-			'title': obj.options.title,
-			'class': 'modal-popup multilineinput-modal',
-			'content': $content,
-			'footer': $footer,
-			'buttons': [
+			title: obj.options.title,
+			class: 'modal-popup multilineinput-modal',
+			content: $content,
+			footer: $footer,
+			buttons: [
 				{
 					title: t('S_APPLY'),
 					action: function() {
@@ -142,7 +142,9 @@
 					action: function() {}
 				}
 			]
-		}, obj.$button);
+		}, {
+			trigger_element: obj.$button
+		});
 
 		if (obj.options.label_before.length) {
 			height_offset += $('<div>', {class: 'multilineinput-label' + monospace_font})
