@@ -826,7 +826,7 @@ uwMrOBKatg7CZ1Uenv1K3ioD5w==
 				],
 				'expected_error' => 'Invalid parameter "/1/idp_certificate": value is too long.'
 			],
-			'Test SAML SP certificate is required when one of sign_* options is enabled' => [
+			'Test SAML SP certificate is required when sign_* options are enabled' => [
 				'userdirectories' => [
 					[
 						'userdirectoryid' => 'API SAML',
@@ -868,7 +868,7 @@ uwMrOBKatg7CZ1Uenv1K3ioD5w==
 				],
 				'expected_error' => 'Invalid parameter "/1/sp_certificate": value is too long.'
 			],
-			'Test SAML SP private key is required when one of sign_* options is enabled' => [
+			'Test SAML SP private key is required when sign_* options are enabled' => [
 				'userdirectories' => [
 					[
 						'userdirectoryid' => 'API SAML',
