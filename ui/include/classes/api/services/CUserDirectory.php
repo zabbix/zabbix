@@ -588,6 +588,8 @@ class CUserDirectory extends CApiService {
 			self::exception(ZBX_API_ERROR_PERMISSIONS, _('No permissions to referred object or it does not exist!'));
 		}
 
+		self::addBindPassword($db_userdirectories);
+
 		foreach ($userdirectories as $i => &$userdirectory) {
 			$db_userdirectory = $db_userdirectories[$userdirectory['userdirectoryid']];
 			$userdirectory += [
@@ -604,7 +606,6 @@ class CUserDirectory extends CApiService {
 		unset($userdirectory);
 
 		self::addRequiredFieldsByType($userdirectories, $db_userdirectories);
-		self::addBindPassword($db_userdirectories);
 
 		$api_input_rules = self::getValidationRules(true);
 
@@ -620,6 +621,18 @@ class CUserDirectory extends CApiService {
 		self::checkProvisionGroups($userdirectories, $db_userdirectories);
 		self::checkMediaTypes($userdirectories, $db_userdirectories);
 		self::checkLdapBindPassword($userdirectories, $db_userdirectories);
+	}
+
+	private static function addBindPassword(array &$db_userdirectories): void {
+		$db_bind_passwords = DB::select('userdirectory_ldap', [
+			'output' => ['bind_password'],
+			'filter' => ['userdirectoryid' => array_keys($db_userdirectories)],
+			'preservekeys' => true
+		]);
+
+		foreach ($db_bind_passwords as $db_userdirectoryid => $db_bind_password) {
+			$db_userdirectories[$db_userdirectoryid] += $db_bind_password;
+		}
 	}
 
 	private static function addRequiredFieldsByType(array &$userdirectories, array $db_userdirectories): void {
@@ -961,18 +974,6 @@ class CUserDirectory extends CApiService {
 					_s('the parameter "%1$s" is missing', 'bind_password')
 				));
 			}
-		}
-	}
-
-	private static function addBindPassword(array &$db_userdirectories): void {
-		$db_bind_passwords = DB::select('userdirectory_ldap', [
-			'output' => ['bind_password'],
-			'filter' => ['userdirectoryid' => array_keys($db_userdirectories)],
-			'preservekeys' => true
-		]);
-
-		foreach ($db_bind_passwords as $db_userdirectoryid => $db_bind_password) {
-			$db_userdirectories[$db_userdirectoryid] += $db_bind_password;
 		}
 	}
 
