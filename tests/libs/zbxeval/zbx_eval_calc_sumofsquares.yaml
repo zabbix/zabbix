@@ -1,0 +1,42 @@
+---
+test case: "values: 1, 2, 3"
+in:
+  values: [1, 2, 3]
+out:
+  return: SUCCEED
+  result: 14
+---
+test case: "values: 0, 2, 3"
+in:
+  values: [0, 2, 3]
+out:
+  return: SUCCEED
+  result: 13
+---
+test case: "values: -1, -2, -3"
+in:
+  values: [-1, -2, -3]
+out:
+  return: SUCCEED
+  result: 14
+---
+test case: "values: 10"
+in:
+  values: [10]
+out:
+  return: SUCCEED
+  result: 100
+---
+test case: "values: 1.5, 2.5"
+in:
+  values: [1.5, 2.5]
+out:
+  return: SUCCEED
+  result: 8.5
+---
+test case: "values: 1.7976931348623157e+308, 1.7976931348623157e+308"
+in:
+  values: [1.7976931348623157e+308, 1.7976931348623157e+308]
+out:
+  return: FAIL
+...

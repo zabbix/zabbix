@@ -23,35 +23,26 @@
 
 void	zbx_mock_test_entry(void **state)
 {
-	int			returned_ret;
-	zbx_eval_context_t	ctx, dst;
+	double			function_result, exp_function_result;
+	zbx_vector_dbl_t	values;
 	char			*error = NULL;
-	zbx_uint64_t		rules;
-	const char		*expression;
+	int			result;
 
 	ZBX_UNUSED(state);
 
-	expression = zbx_mock_get_parameter_string("in.expression");
-	rules = mock_eval_read_rules("in.rules");
-	returned_ret = zbx_eval_parse_expression(&ctx, expression, rules, &error);
+	zbx_vector_dbl_create(&values);
+	extract_yaml_values_dbl(zbx_mock_get_parameter_handle("in.values"), &values);
+	result = zbx_eval_calc_sum(&values, &function_result, &error);
 
-	if (SUCCEED != returned_ret)
-		printf("ERROR: %s\n", error);
-	else
-		mock_dump_stack(&ctx);
+	zbx_mock_assert_int_eq("return value", result,
+			zbx_mock_str_to_return_code(zbx_mock_get_parameter_string("out.return")));
 
-	if (SUCCEED == zbx_mock_parameter_exists("in.variant"))
+	if (SUCCEED == result)
 	{
-		for (int i = 0; i < ctx.stack.values_num; i++)			{
-				zbx_variant_set_str(&ctx.stack.values[i].value, zbx_strdup(NULL,
-						zbx_mock_get_parameter_string("in.variant")));
-		}
+		exp_function_result = zbx_mock_get_parameter_float("out.result");
+		zbx_mock_assert_double_eq("return function value", exp_function_result, function_result);
 	}
 
-	zbx_eval_copy(&dst, &ctx, expression);
-
-	zbx_mock_assert_int_eq("return value:", SUCCEED, compare_ctx(&ctx, &dst));
-	zbx_eval_clear(&ctx);
-	zbx_eval_clear(&dst);
+	zbx_vector_dbl_destroy(&values);
 	zbx_free(error);
 }
