@@ -1,15 +1,20 @@
 /*
+** Zabbix
 ** Copyright (C) 2001-2025 Zabbix SIA
 **
-** This program is free software: you can redistribute it and/or modify it under the terms of
-** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
+** This program is free software; you can redistribute it and/or modify
+** it under the terms of the GNU General Public License as published by
+** the Free Software Foundation; either version 2 of the License, or
+** (at your option) any later version.
 **
-** This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
-** without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
-** See the GNU Affero General Public License for more details.
+** This program is distributed in the hope that it will be useful,
+** but WITHOUT ANY WARRANTY; without even the implied warranty of
+** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+** GNU General Public License for more details.
 **
-** You should have received a copy of the GNU Affero General Public License along with this program.
-** If not, see <https://www.gnu.org/licenses/>.
+** You should have received a copy of the GNU General Public License
+** along with this program; if not, write to the Free Software
+** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
 package dbconn
@@ -85,13 +90,13 @@ func newConnDet(t *testing.T, username, privilege string) ConnDetails {
 		"zabbix",
 		URIDefaults)
 
-	return ConnDetails{Uri: *u, Privilege: privilege}
+	return ConnDetails{*u, privilege, false, false}
 }
 
-// newConnDet function the same as newConnDet, except NoVersionCheck makes true to switch
+// newConnDetNoVersCheck function the same as newConnDet, except NoVersionCheck makes true to switch
 // off server version check request at the connection creation to avoid real connection to
 // the server.
-func newConnDetNoCheck(t *testing.T, username, privilege string) ConnDetails {
+func newConnDetNoVersCheck(t *testing.T, username, privilege string) ConnDetails {
 	t.Helper()
 
 	u, _ := uri.NewWithCreds( //nolint:errcheck
@@ -100,5 +105,17 @@ func newConnDetNoCheck(t *testing.T, username, privilege string) ConnDetails {
 		"zabbix",
 		URIDefaults)
 
-	return ConnDetails{*u, privilege, true}
+	return ConnDetails{*u, privilege, true, true}
+}
+
+func newConnDetHostname(t *testing.T, hostname, service string) *ConnDetails {
+	t.Helper()
+
+	u, _ := uri.NewWithCreds( //nolint:errcheck
+		hostname+"?service="+service,
+		"any_username",
+		"any_password",
+		nil)
+
+	return &ConnDetails{*u, "", false, true}
 }

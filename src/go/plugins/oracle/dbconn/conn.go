@@ -19,6 +19,8 @@ import (
 	"database/sql"
 	"errors"
 	"net/http"
+	"net/url"
+	"strings"
 	"sync"
 	"time"
 
@@ -27,6 +29,7 @@ import (
 	"golang.zabbix.com/sdk/errs"
 	"golang.zabbix.com/sdk/log"
 	"golang.zabbix.com/sdk/uri"
+	"golang.zabbix.com/sdk/zbxerr"
 )
 
 const (
@@ -39,6 +42,7 @@ var (
 	URIDefaults = &uri.Defaults{Scheme: "tcp", Port: "1521"} //nolint:gochecknoglobals
 
 	ErrCannotSetConnection = errors.New("cannot set connection")
+	ErrNewConnDetails      = errors.New("cannot create connection details")
 )
 
 // Options contains parameters for ConnManager.
@@ -54,7 +58,7 @@ type Options struct {
 // ConnManager is the thread-safe structure for managing connections.
 type ConnManager struct {
 	logr log.Logger
-	opt  Options
+	Opt  *Options
 
 	// cached connections
 	Connections   map[ConnDetails]*OraConn
@@ -70,37 +74,46 @@ type ConnDetails struct {
 	Uri       uri.URI //nolint:revive
 	Privilege string
 
+	// OnlyHostname is used to distinguish the case when a user wants to connect by URI or by TNS names key.
+	// If true - no schema and/or port was specified and, in case if the option ResolveTNS=true, we treat
+	// it as hostname and prepare the appropriate connect-string.
+	// If false - and ResolveTNS=true we treat it as tns and prepare tns-like connect-string.
+	OnlyHostname bool
 	// NoVersionCheck field turns off server version check on connection creation to avoid real connection
 	// to the server. Always use value false (default), only unittests can use true.
 	NoVersionCheck bool
 }
 
-// NewOptions function creates Options struct.
-func NewOptions(
-	keepAlive time.Duration,
-	connectTimeout time.Duration,
-	callTimeout time.Duration,
-	customQueriesEnabled bool,
-	customQueriesPath string,
-	resolveTNS bool,
-) Options {
-	return Options{
-		KeepAlive:            keepAlive,
-		ConnectTimeout:       connectTimeout,
-		CallTimeout:          callTimeout,
-		CustomQueriesEnabled: customQueriesEnabled,
-		CustomQueriesPath:    customQueriesPath,
-		ResolveTNS:           resolveTNS,
+// NewConnDetails function creates a ConnDetails instance for connectin to Oracle.
+func NewConnDetails(uriStr, user, pwd, service string) (*ConnDetails, error) {
+	userSplit, privilegeSplit, err := splitUserPrivilege(user)
+	if err != nil {
+		return nil, errs.WrapConst(err, ErrNewConnDetails) //nolint:wrapcheck
 	}
+
+	service = url.QueryEscape(service)
+
+	onlyHostname, err := containsOnlyHostname(uriStr)
+	if err != nil {
+		return nil, errs.WrapConst(err, ErrNewConnDetails) //nolint:wrapcheck
+	}
+
+	// Create uri with attrinutes as well as default values
+	u, err := uri.NewWithCreds(uriStr+"?service="+service, userSplit, pwd, URIDefaults)
+	if err != nil {
+		return nil, errs.WrapConst(err, ErrNewConnDetails) //nolint:wrapcheck
+	}
+
+	return &ConnDetails{Uri: *u, Privilege: privilegeSplit, OnlyHostname: onlyHostname}, nil
 }
 
 // NewConnManager initializes connManager structure and runs goroutine that watches for unused connections.
-func NewConnManager(logr log.Logger, opt Options) *ConnManager {
+func NewConnManager(logr log.Logger, opt *Options) *ConnManager {
 	ctx, cancel := context.WithCancel(context.Background())
 
 	connMgr := &ConnManager{
 		logr: logr,
-		opt:  opt,
+		Opt:  opt,
 
 		Connections: make(map[ConnDetails]*OraConn),
 
@@ -141,7 +154,7 @@ func (c *ConnManager) closeUnused() {
 	defer c.connectionsMu.Unlock()
 
 	for cd, conn := range c.Connections {
-		if time.Since(conn.getLastAccessTime()) > c.opt.KeepAlive {
+		if time.Since(conn.getLastAccessTime()) > c.Opt.KeepAlive {
 			conn.closeWithLog()
 
 			delete(c.Connections, cd)
@@ -190,7 +203,7 @@ func (c *ConnManager) createConn(cd *ConnDetails) (*OraConn, error) {
 		},
 	)
 
-	connector, err := createDBConnector(cd, c.opt.ConnectTimeout)
+	connector, err := createDBConnector(cd, c.Opt.ConnectTimeout, c.Opt.ResolveTNS)
 	if err != nil {
 		return nil, err
 	}
@@ -212,7 +225,7 @@ func (c *ConnManager) createConn(cd *ConnDetails) (*OraConn, error) {
 
 	return &OraConn{
 		Client:         client,
-		callTimeout:    c.opt.CallTimeout,
+		callTimeout:    c.Opt.CallTimeout,
 		version:        serverVersion,
 		lastAccessTime: time.Now(),
 		ctx:            ctx,
@@ -265,8 +278,36 @@ func (c *ConnManager) setConn(cd ConnDetails, conn *OraConn) (*OraConn, error) {
 	return conn, nil
 }
 
+// splitUserPrivilege function splits userWithPrivilege into user and privilege.
+func splitUserPrivilege(userWithPrivilege string) (user, privilege string, err error) { //nolint:nonamedreturns
+	userWithPrivilege = normalizeSpaces(userWithPrivilege)
+	if userWithPrivilege == "" {
+		return "", "", errs.WrapConst(zbxerr.ErrorTooFewParameters, ErrMissingParamUser) //nolint:wrapcheck
+	}
+
+	var extension string
+
+	switch {
+	case strings.HasSuffix(strings.ToLower(userWithPrivilege), sysdbaExtension):
+		privilege = sysdbaPrivilege
+		extension = sysdbaExtension
+	case strings.HasSuffix(strings.ToLower(userWithPrivilege), sysoperExtension):
+		privilege = sysoperPrivilege
+		extension = sysoperExtension
+	case strings.HasSuffix(strings.ToLower(userWithPrivilege), sysasmExtension):
+		privilege = sysasmPrivilege
+		extension = sysasmExtension
+	}
+
+	user = userWithPrivilege[:len(userWithPrivilege)-len(extension)]
+
+	return user, privilege, nil
+}
+
 // setCustomQuery function if enabled, reads the SQLs from a file by path.
-func setCustomQuery(logr log.Logger, enabled bool, path string) yarn.Yarn { //nolint:ireturn
+//
+//nolint:ireturn
+func setCustomQuery(logr log.Logger, enabled bool, path string) yarn.Yarn {
 	if !enabled {
 		return yarn.NewFromMap(map[string]string{})
 	}
@@ -274,9 +315,33 @@ func setCustomQuery(logr log.Logger, enabled bool, path string) yarn.Yarn { //no
 	queryStorage, err := yarn.New(http.Dir(path), "*"+sqlExt)
 	if err != nil {
 		logr.Errf(err.Error())
+
 		// createConn empty storage if error occurred
 		return yarn.NewFromMap(map[string]string{})
 	}
 
 	return queryStorage
+}
+
+// containsOnlyHostname function returns true if a user has a schema, port (or both) specified.
+// Returns:
+// - true: if no schema and port in rawURIstr.
+// - false: if it contains at least one of the above.
+func containsOnlyHostname(rawURIstr string) (bool, error) {
+	rawURI, err := uri.New(rawURIstr, nil)
+	if err != nil {
+		return false, errs.Wrap(err, "uri creation failed")
+	}
+
+	rawURIstr = strings.TrimSpace(rawURIstr)
+
+	if strings.HasPrefix(rawURIstr, rawURI.Scheme()+"://") {
+		return true, nil
+	}
+
+	if rawURI.Port() != "" {
+		return true, nil
+	}
+
+	return false, nil
 }

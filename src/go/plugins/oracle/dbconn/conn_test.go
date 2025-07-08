@@ -23,6 +23,81 @@ import (
 	"github.com/google/go-cmp/cmp"
 )
 
+func Test_splitUserPrivilege(t *testing.T) {
+	t.Parallel()
+
+	type args struct {
+		userWithPrivilege string
+	}
+
+	tests := []struct {
+		name          string
+		args          args
+		wantUser      string
+		wantPrivilege string
+		wantErr       bool
+	}{
+		{"+only_user",
+			args{"foobar"},
+			"foobar", "", false},
+		{"+sysdba_privilege_lowercase",
+			args{"foobar as sysdba"},
+			"foobar", "sysdba", false},
+		{"+sysdba_privilege_uppercase",
+			args{"foobar AS SYSDBA"},
+			"foobar", "sysdba", false},
+		{"+sysdba_privilege_mix",
+			args{"foobar AS sySdBa"},
+			"foobar", "sysdba", false},
+		{"+sysoper_privilege_lowercase",
+			args{"foobar as sysoper"},
+			"foobar", "sysoper", false},
+		{"+sysoper_privilege_uppercase",
+			args{"foobar AS SYSOPER"},
+			"foobar", "sysoper", false},
+		{"+sysoper_privilege_mix",
+			args{"foobar AS sysOpEr"},
+			"foobar", "sysoper", false},
+		{"+sysasm_privilege_lowercase",
+			args{"foobar as sysasm"},
+			"foobar", "sysasm", false},
+		{"+sysasm_privilege_uppercase",
+			args{"foobar AS SYSASM"},
+			"foobar", "sysasm", false},
+		{"+sysasm_privilege_mix",
+			args{"foobar AS sysAsM"},
+			"foobar", "sysasm", false},
+		{"+incorrect_privilege",
+			args{"foobar as barfoo"},
+			"foobar as barfoo", "", false},
+		{"-empty_user",
+			args{""},
+			"", "", true},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			t.Parallel()
+
+			gotUser, gotPrivilege, err := splitUserPrivilege(tt.args.userWithPrivilege)
+
+			if (err != nil) != tt.wantErr {
+				t.Errorf("splitUserPrivilege() error = %v, wantErr %v", err, tt.wantErr)
+
+				return
+			}
+
+			if gotUser != tt.wantUser {
+				t.Errorf("splitUserPrivilege() gotUser = %v, want %v", gotUser, tt.wantUser)
+			}
+
+			if gotPrivilege != tt.wantPrivilege {
+				t.Errorf("splitUserPrivilege() gotPrivilege = %v, want %v", gotPrivilege, tt.wantPrivilege)
+			}
+		})
+	}
+}
+
 func Test_setCustomQuery(t *testing.T) { //nolint:tparallel
 	t.Parallel()
 
@@ -188,7 +263,7 @@ func TestConnManager_setConn(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			t.Parallel()
 
-			connMgr := NewConnManager(&mockLogger{}, opt)
+			connMgr := NewConnManager(&mockLogger{}, &opt)
 			defer connMgr.Destroy()
 
 			for _, ff := range tt.fields {
@@ -279,7 +354,7 @@ func TestConnManager_getConn(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			t.Parallel()
 
-			connMgr := NewConnManager(&mockLogger{}, opt)
+			connMgr := NewConnManager(&mockLogger{}, &opt)
 			defer connMgr.Destroy()
 
 			for _, ff := range tt.fields {
@@ -335,11 +410,11 @@ func TestConnManager_closeUnused(t *testing.T) {
 				CustomQueriesPath:    "",
 			}
 
-			connMgr := NewConnManager(&mockLogger{}, opt)
+			connMgr := NewConnManager(&mockLogger{}, &opt)
 			defer connMgr.Destroy()
 
 			conn, err := connMgr.GetConnection(
-				newConnDetNoCheck(t, "zabbix_mon", ""),
+				newConnDetNoVersCheck(t, "zabbix_mon", ""),
 			)
 
 			if err != nil || conn == nil {
@@ -371,7 +446,7 @@ func TestConnManager_closeAll(t *testing.T) { //nolint:tparallel
 		CustomQueriesPath:    "",
 	}
 
-	connMgr := NewConnManager(&mockLogger{}, opt)
+	connMgr := NewConnManager(&mockLogger{}, &opt)
 	defer connMgr.Destroy()
 
 	type fields struct {
@@ -385,8 +460,8 @@ func TestConnManager_closeAll(t *testing.T) { //nolint:tparallel
 		{
 			"+close",
 			fields{[]ConnDetails{
-				newConnDetNoCheck(t, "zabbix_mon", ""),
-				newConnDetNoCheck(t, "sys", "sysdba"),
+				newConnDetNoVersCheck(t, "zabbix_mon", ""),
+				newConnDetNoVersCheck(t, "sys", "sysdba"),
 			},
 			},
 		},
@@ -403,7 +478,8 @@ func TestConnManager_closeAll(t *testing.T) { //nolint:tparallel
 
 				if err != nil || conn == nil {
 					t.Fatalf(
-						"ConnManager.closeUnused(): ConnManager.createConn() should create a connection, but got error: %s",
+						"ConnManager.closeUnused(): ConnManager.createConn() should create a connection, but "+
+							"got the error: %s",
 						err.Error(),
 					)
 				}
@@ -452,21 +528,21 @@ func TestConnManager_GetConnection(t *testing.T) {
 			"+returnExisting",
 			fields{
 				[]ConnDetails{
-					newConnDetNoCheck(t, "zabbix_mon", ""),
-					newConnDetNoCheck(t, "sys", "sysdba"),
+					newConnDetNoVersCheck(t, "zabbix_mon", ""),
+					newConnDetNoVersCheck(t, "sys", "sysdba"),
 				},
 			},
-			args{newConnDetNoCheck(t, "zabbix_mon", "")},
+			args{newConnDetNoVersCheck(t, "zabbix_mon", "")},
 			want{"zabbix_mon", 2},
 		},
 		{
 			"+createNew",
 			fields{
 				[]ConnDetails{
-					newConnDetNoCheck(t, "sys", "sysdba"),
+					newConnDetNoVersCheck(t, "sys", "sysdba"),
 				},
 			},
-			args{newConnDetNoCheck(t, "zabbix_mon", "")},
+			args{newConnDetNoVersCheck(t, "zabbix_mon", "")},
 			want{"zabbix_mon", 2},
 		},
 	}
@@ -475,7 +551,7 @@ func TestConnManager_GetConnection(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			t.Parallel()
 
-			connMgr := NewConnManager(&mockLogger{}, opt)
+			connMgr := NewConnManager(&mockLogger{}, &opt)
 			defer connMgr.Destroy()
 
 			for _, v := range tt.fields.conDet {
@@ -503,6 +579,115 @@ func TestConnManager_GetConnection(t *testing.T) {
 
 			if diff := cmp.Diff(tt.want.count, len(connMgr.Connections)); diff != "" {
 				t.Errorf("ConnManager.GetConnection(): connection count mismatch = %s", diff)
+			}
+		})
+	}
+}
+
+func Test_containsOnlyHostname(t *testing.T) { //nolint:tparallel
+	t.Parallel()
+
+	type args struct {
+		rawURI string
+	}
+
+	type want struct {
+		isURI   bool
+		wantErr bool
+	}
+
+	tests := []struct {
+		name string
+		args args
+		want want
+	}{
+		{
+			"+isUriWithPort",
+			args{"zbx_next:1599"},
+			want{true, false},
+		},
+		{
+			"+partlyPort",
+			args{"zbx_next:"},
+			want{false, false},
+		},
+		{
+			"+isUriWithSchema",
+			args{"tcp://zbx_next"},
+			want{true, false},
+		},
+		{
+			"+isUriWithSchemaPort",
+			args{"tcp://zbx_next:1599"},
+			want{true, false},
+		},
+		{
+			"+isUriWithSchemaHttp",
+			args{"http://zbx_next"},
+			want{true, false},
+		},
+		{
+			"+notIsUri",
+			args{"zbx_next"},
+			want{false, false},
+		},
+		{
+			"+notIsUriWithMockedDefaultSchema",
+			args{"tcpzbx_next"},
+			want{false, false},
+		},
+		{
+			"+startingWithBreakspacesNoSchema",
+			args{"   zbx_next"},
+			want{false, false},
+		},
+		{
+			"+startingWithBreakspaces",
+			args{"   tcp://zbx_next"},
+			want{true, false},
+		},
+		{
+			"+partlySchemaSlashes",
+			args{"tcp//zbx_next"},
+			want{false, false},
+		},
+		{
+			"+partlySchemaSemicol",
+			args{"tcp:zbx_next"},
+			want{false, true},
+		},
+		{
+			"+partlyOnlySlashes",
+			args{"tcp//zbx_next"},
+			want{false, false},
+		},
+		{
+			"-notHostnameFormat",
+			args{"+%%%::&&"},
+			want{false, true},
+		},
+		{
+			"-Empty",
+			args{""},
+			want{false, true},
+		},
+		{
+			"-Whitespaces",
+			args{"       "},
+			want{false, true},
+		},
+	}
+
+	for _, tt := range tests { //nolint:paralleltest
+		t.Run(tt.name, func(t *testing.T) {
+			isURI, err := containsOnlyHostname(tt.args.rawURI)
+
+			if err != nil && !tt.want.wantErr {
+				t.Errorf("containsOnlyHostname() error = %v, want nil", err)
+			}
+
+			if isURI != tt.want.isURI {
+				t.Errorf("containsOnlyHostname() isURI = %t, want %t", isURI, tt.want.isURI)
 			}
 		})
 	}

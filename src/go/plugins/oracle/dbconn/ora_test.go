@@ -28,59 +28,7 @@ import (
 	"github.com/google/go-cmp/cmp"
 )
 
-func Test_SplitUserPrivilege(t *testing.T) {
-	t.Parallel()
-
-	type args struct {
-		params map[string]string
-	}
-
-	tests := []struct {
-		name          string
-		args          args
-		wantUser      string
-		wantPrivilege string
-		wantErr       bool
-	}{
-		{"only_user", args{map[string]string{"User": "foobar"}}, "foobar", "", false},
-		{"sysdba_privilege_lowercase", args{map[string]string{"User": "foobar as sysdba"}}, "foobar", "sysdba", false},
-		{"sysdba_privilege_uppercase", args{map[string]string{"User": "foobar AS SYSDBA"}}, "foobar", "sysdba", false},
-		{"sysdba_privilege_mix", args{map[string]string{"User": "foobar AS sySdBa"}}, "foobar", "sysdba", false},
-		{"sysoper_privilege_lowercase", args{map[string]string{"User": "foobar as sysoper"}}, "foobar", "sysoper", false}, //nolint:lll
-		{"sysoper_privilege_uppercase", args{map[string]string{"User": "foobar AS SYSOPER"}}, "foobar", "sysoper", false}, //nolint:lll
-		{"sysoper_privilege_mix", args{map[string]string{"User": "foobar AS sysOpEr"}}, "foobar", "sysoper", false},
-		{"sysasm_privilege_lowercase", args{map[string]string{"User": "foobar as sysasm"}}, "foobar", "sysasm", false},
-		{"sysasm_privilege_uppercase", args{map[string]string{"User": "foobar AS SYSASM"}}, "foobar", "sysasm", false},
-		{"sysasm_privilege_mix", args{map[string]string{"User": "foobar AS sysAsM"}}, "foobar", "sysasm", false},
-		{"incorrect_privilege", args{map[string]string{"User": "foobar as barfoo"}}, "foobar as barfoo", "", false},
-		{"empty_user", args{map[string]string{"User": ""}}, "", "", false},
-		{"no_user", args{map[string]string{}}, "", "", true},
-	}
-
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			t.Parallel()
-
-			gotUser, gotPrivilege, err := SplitUserPrivilege(tt.args.params)
-
-			if (err != nil) != tt.wantErr {
-				t.Errorf("splitUserPrivilege() error = %v, wantErr %v", err, tt.wantErr)
-
-				return
-			}
-
-			if gotUser != tt.wantUser {
-				t.Errorf("splitUserPrivilege() gotUser = %v, want %v", gotUser, tt.wantUser)
-			}
-
-			if gotPrivilege != tt.wantPrivilege {
-				t.Errorf("splitUserPrivilege() gotPrivilege = %v, want %v", gotPrivilege, tt.wantPrivilege)
-			}
-		})
-	}
-}
-
-func Test_GetConnParams(t *testing.T) {
+func Test_getDriverConnParams(t *testing.T) {
 	t.Parallel()
 
 	type args struct {
@@ -93,28 +41,29 @@ func Test_GetConnParams(t *testing.T) {
 		wantOut godror.ConnParams
 		wantErr bool
 	}{
-		{"no privilege", args{}, godror.ConnParams{}, false},
-		{"sysdba", args{"sysdba"}, godror.ConnParams{IsSysDBA: true}, false},
-		{"sysoper", args{"sysoper"}, godror.ConnParams{IsSysOper: true}, false},
-		{"sysasm", args{"sysasm"}, godror.ConnParams{IsSysASM: true}, false},
-		{"empty_privilege", args{""}, godror.ConnParams{}, false},
-		{"incorrect_privilege", args{"foobar"}, godror.ConnParams{}, true},
+		{"+noPrivilege", args{}, godror.ConnParams{}, false},
+		{"+sysdba", args{"sysdba"}, godror.ConnParams{IsSysDBA: true}, false},
+		{"+sysoperCapital", args{"SYSOPER"}, godror.ConnParams{IsSysOper: true}, false},
+		{"+sysoper", args{"sysoper"}, godror.ConnParams{IsSysOper: true}, false},
+		{"+sysasm", args{"sysasm"}, godror.ConnParams{IsSysASM: true}, false},
+		{"+empty_privilege", args{""}, godror.ConnParams{}, false},
+		{"-incorrect_privilege", args{"foobar"}, godror.ConnParams{}, true},
 	}
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			t.Parallel()
 
-			gotOut, err := GetConnParams(tt.args.privilege)
+			gotOut, err := getDriverConnParams(tt.args.privilege)
 
 			if (err != nil) != tt.wantErr {
-				t.Errorf("getConnParams() error = %v, wantErr %v", err, tt.wantErr)
+				t.Errorf("getDriverConnParams() error = %v, wantErr %v", err, tt.wantErr)
 
 				return
 			}
 
 			if !reflect.DeepEqual(gotOut, tt.wantOut) {
-				t.Errorf("getConnParams() = %v, want %v", gotOut, tt.wantOut)
+				t.Errorf("getDriverConnParams() = %v, want %v", gotOut, tt.wantOut)
 			}
 		})
 	}
@@ -210,6 +159,170 @@ func TestOraConn_getLastAccessTime(t *testing.T) {
 
 			if diff := cmp.Diff(tt.args.accessTime, gotCon.getLastAccessTime()); diff != "" {
 				t.Errorf("OraConn.updateLastAccessTime(): %s", diff)
+			}
+		})
+	}
+}
+
+func Test_getTNSType(t *testing.T) {
+	t.Parallel()
+
+	type args = struct {
+		host         string
+		onlyHostname bool
+		resolveTNS   bool
+	}
+
+	type want struct {
+		result TNSNameType
+	}
+
+	tests := []struct {
+		name string
+		args args
+		want want
+	}{
+		{
+			"+tnsValue",
+			args{"(DESCR...)", true, true}, //the last two can be any
+			want{tnsValue},
+		},
+		{
+			"+tnsValueOptionalParam",
+			args{"(DESCR...)", false, false},
+			want{tnsValue},
+		},
+		{
+			"+tnsKey",
+			args{"no_tns_value", false, true},
+			want{tnsKey},
+		},
+		{
+			"+tnsNoneOnlyHostnameTrue",
+			args{"no_tns_value", true, true},
+			want{tnsNone},
+		},
+		{
+			"+tnsNoneOnlyHostnameFalse",
+			args{"no_tns_value", false, false},
+			want{tnsNone},
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			t.Parallel()
+
+			gotResult := getTNSType(tt.args.host, tt.args.onlyHostname, tt.args.resolveTNS)
+
+			if diff := cmp.Diff(tt.want.result, gotResult); diff != "" {
+				t.Errorf("OraConn.updateLastAccessTime(): %s", diff)
+			}
+		})
+	}
+}
+func Test_prepareConnectString(t *testing.T) {
+	t.Parallel()
+
+	type args = struct {
+		tnsType        TNSNameType
+		cd             *ConnDetails
+		connectTimeout time.Duration
+	}
+
+	type want struct {
+		result  string
+		wantErr bool
+	}
+
+	tests := []struct {
+		name string
+		args args
+		want want
+	}{
+		{
+			"+tnsKey",
+			args{
+				tnsKey,
+				newConnDetHostname(t, "zbx_tns", "XE"), //hostname any
+				1,                                      //any
+			},
+			want{"zbx_tns", false},
+		},
+		{
+			"+tnsKey",
+			args{
+				tnsValue,
+				newConnDetHostname(t, "(DESCRIPTION=..", "XE"),
+				1, //any
+			},
+			want{"(DESCRIPTION=..", false},
+		},
+		{
+			"+tnsNone",
+			args{
+				tnsNone,
+				newConnDetHostname(t, "tcp://myhost:1521", "XE"),
+				1000000000, //any
+			},
+			want{
+				`(DESCRIPTION=(ADDRESS=(PROTOCOL=tcp)(HOST=myhost)(PORT=1521))` +
+					`(CONNECT_DATA=(SERVICE_NAME="XE"))(CONNECT_TIMEOUT=1)(RETRY_COUNT=0))`,
+				false,
+			},
+		},
+		{
+			"+tnsEmptyPortService",
+			args{
+				tnsNone,
+				newConnDetHostname(t, "localhost", ""), //hostname any
+				1,
+			},
+			want{
+				`(DESCRIPTION=(ADDRESS=(PROTOCOL=tcp)(HOST=localhost)(PORT=))` +
+					`(CONNECT_DATA=(SERVICE_NAME=""))(CONNECT_TIMEOUT=0)(RETRY_COUNT=0))`,
+				false,
+			},
+		},
+		{
+			"+tnsServiceDecodeOk",
+			args{
+				tnsNone,
+				newConnDetHostname(t, "localhost", "XE%23"),
+				1,
+			},
+			want{
+				`(DESCRIPTION=(ADDRESS=(PROTOCOL=tcp)(HOST=localhost)(PORT=))` +
+					`(CONNECT_DATA=(SERVICE_NAME="XE#"))(CONNECT_TIMEOUT=0)(RETRY_COUNT=0))`,
+				false,
+			},
+		},
+		{
+			"+tnsServiceDecodeFail",
+			args{
+				tnsNone,
+				newConnDetHostname(t, "localhost", "XE%ZZ"),
+				1, //any
+			},
+			want{
+				"",
+				true,
+			},
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			t.Parallel()
+
+			gotResult, err := prepareConnectString(tt.args.tnsType, tt.args.cd, tt.args.connectTimeout)
+
+			if err != nil && !tt.want.wantErr {
+				t.Fatalf("prepareConnectString() unwanted error = %v", err)
+			}
+
+			if diff := cmp.Diff(tt.want.result, gotResult); diff != "" {
+				t.Errorf("prepareConnectString(: %s", diff)
 			}
 		})
 	}

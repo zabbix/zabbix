@@ -23,8 +23,10 @@ import (
 	"context"
 	"database/sql"
 	"database/sql/driver"
+	"errors"
 	"fmt"
 	"net/url"
+	"regexp"
 	"strings"
 	"sync"
 	"time"
@@ -46,13 +48,28 @@ const (
 	sysoperPrivilege = "sysasm"
 )
 
+const (
+	// tnsNone - the plugin won't interpret connString as TNS name.
+	tnsNone TNSNameType = iota
+	// tnsKey - the plugin will interpret connString as the key of TNS name (if ResolveTNS=true).
+	tnsKey
+	// tnsValue - the plugin will interpret connString as the value of TNS name.
+	tnsValue
+)
+
 var (
 	_ OraClient = (*OraConn)(nil)
 
 	errInvalidPrivilege = errs.New("invalid connection privilege")
+	ErrMissingParamUser = errors.New("missing parameter User") //nolint:revive
+	errorQueryNotFound  = "query %q not found"                 //nolint:gochecknoglobals
 
-	errorQueryNotFound = "query %q not found" //nolint:gochecknoglobals
+	userNameRx = regexp.MustCompile(`\s+`)
 )
+
+// TNSNameType enumerates different ways to compose connection string depending on the content of ResolveTNS and
+// conString.
+type TNSNameType int
 
 // OraClient interface specifies functions to be called to Oracle service. Different implementations
 // for plugin and testing functions.
@@ -74,52 +91,6 @@ type OraConn struct {
 	ctx              context.Context //nolint:containedctx
 	queryStorage     *yarn.Yarn
 	username         string
-}
-
-// GetConnParams function creates godror connection params and assigns privilege by string passed as arg.
-func GetConnParams(privilege string) (godror.ConnParams, error) {
-	var out godror.ConnParams
-
-	switch privilege {
-	case "sysdba":
-		out.IsSysDBA = true
-	case "sysoper":
-		out.IsSysOper = true
-	case "sysasm":
-		out.IsSysASM = true
-	case "":
-	default:
-		return godror.ConnParams{},
-			errs.Wrapf(errInvalidPrivilege, "unknown Privilege %s", privilege)
-	}
-
-	return out, nil
-}
-
-// SplitUserPrivilege function gets the user and privilege from the params and splits.
-func SplitUserPrivilege(params map[string]string) (user, privilege string, err error) { //nolint:nonamedreturns
-	var ok bool
-
-	user, ok = params["User"]
-	if !ok {
-		return "", "", errs.Wrap(zbxerr.ErrorTooFewParameters, "missing parameter User")
-	}
-
-	var extension string
-
-	switch {
-	case strings.HasSuffix(strings.ToLower(user), sysdbaExtension):
-		privilege = sysdbaPrivilege
-		extension = sysdbaExtension
-	case strings.HasSuffix(strings.ToLower(user), sysoperExtension):
-		privilege = sysoperPrivilege
-		extension = sysoperExtension
-	case strings.HasSuffix(strings.ToLower(user), sysasmExtension):
-		privilege = sysasmPrivilege
-		extension = sysasmExtension
-	}
-
-	return user[:len(user)-len(extension)], privilege, nil
 }
 
 // Query wraps DB.QueryContext.
@@ -180,6 +151,14 @@ func (conn *OraConn) WhoAmI() string {
 	return conn.username
 }
 
+// normalizeSpaces function replaces all whitespace from a username with one whitespace, if any, and
+// trims a username.
+func normalizeSpaces(s string) string {
+	s = strings.TrimSpace(s)
+
+	return userNameRx.ReplaceAllString(s, " ")
+}
+
 // updateAccessTime updates the last time a connection was accessed.
 func (conn *OraConn) updateLastAccessTime(accessTime time.Time) {
 	conn.lastAccessTimeMu.Lock()
@@ -206,24 +185,42 @@ func (conn *OraConn) closeWithLog() {
 	}
 }
 
-// createDBConnector function creates a connection string and godror connection by ConnDetails.
-func createDBConnector(cd *ConnDetails, connectTimeout time.Duration) (driver.Connector, error) {
-	service, err := url.QueryUnescape(cd.Uri.GetParam("service"))
+// getDriverConnParams function creates godror connection params and assigns privilege by string passed as arg.
+func getDriverConnParams(privilege string) (godror.ConnParams, error) {
+	var out godror.ConnParams
 
+	privilege = strings.ToLower(privilege)
+	switch privilege {
+	case "sysdba":
+		out.IsSysDBA = true
+	case "sysoper":
+		out.IsSysOper = true
+	case "sysasm":
+		out.IsSysASM = true
+	case "":
+	default:
+		return godror.ConnParams{},
+			errs.Wrapf(errInvalidPrivilege, "unknown Privilege %s", privilege)
+	}
+
+	return out, nil
+}
+
+// createDBConnector function creates a connection string and godror connection by ConnDetails.
+func createDBConnector(cd *ConnDetails, connectTimeout time.Duration, resolveTNS bool) (driver.Connector, error) {
+	tnsInterpretationType := getTNSType(cd.Uri.Host(), cd.OnlyHostname, resolveTNS)
+
+	connectString, err := prepareConnectString(tnsInterpretationType, cd, connectTimeout)
 	if err != nil {
 		return nil, errs.WrapConst(err, zbxerr.ErrorInvalidParams) //nolint:wrapcheck
 	}
 
-	connectString := fmt.Sprintf(
-		`(DESCRIPTION=(ADDRESS=(PROTOCOL=tcp)(HOST=%s)(PORT=%s))`+
-			`(CONNECT_DATA=(SERVICE_NAME="%s"))(CONNECT_TIMEOUT=%d)(RETRY_COUNT=0))`,
-		cd.Uri.Host(),
-		cd.Uri.Port(),
-		service,
-		connectTimeout/time.Second,
-	)
+	return createDriverConnector(connectString, cd.Uri.User(), cd.Uri.Password(), cd.Privilege)
+}
 
-	connParams, err := GetConnParams(cd.Privilege)
+// createDriverConnector function creates a driver.Connector to be used with sql.OpenDB.
+func createDriverConnector(hostOrTNS, user, pwd, privilege string) (driver.Connector, error) {
+	connParams, err := getDriverConnParams(privilege)
 	if err != nil {
 		return nil, errs.WrapConst(err, zbxerr.ErrorInvalidParams) //nolint:wrapcheck
 	}
@@ -232,13 +229,53 @@ func createDBConnector(cd *ConnDetails, connectTimeout time.Duration) (driver.Co
 		godror.ConnectionParams{
 			StandaloneConnection: true,
 			CommonParams: godror.CommonParams{
-				Username:      cd.Uri.User(),
-				ConnectString: connectString,
-				Password:      godror.NewPassword(cd.Uri.Password()),
+				Username:      user,
+				ConnectString: hostOrTNS,
+				Password:      godror.NewPassword(pwd),
 			},
 			ConnParams: connParams,
 		},
 	)
 
 	return connector, nil
+}
+
+// getTNSType returns TNSNameType for a host by parameters onlyHostname & resolveTNS.
+func getTNSType(host string, onlyHostname, resolveTNS bool) TNSNameType {
+	if strings.HasPrefix(strings.TrimSpace(host), "(") {
+		return tnsValue
+	}
+
+	if !onlyHostname && resolveTNS {
+		return tnsKey
+	}
+
+	return tnsNone
+}
+
+func prepareConnectString(tnsType TNSNameType, cd *ConnDetails, connectTimeout time.Duration) (string, error) {
+	service, err := url.QueryUnescape(cd.Uri.GetParam("service"))
+	if err != nil {
+		return "", err //nolint:wrapcheck
+	}
+
+	var connectString string
+
+	switch tnsType {
+	case tnsKey, tnsValue:
+		connectString = cd.Uri.Host()
+	case tnsNone:
+		connectString = fmt.Sprintf(
+			`(DESCRIPTION=(ADDRESS=(PROTOCOL=tcp)(HOST=%s)(PORT=%s))`+
+				`(CONNECT_DATA=(SERVICE_NAME="%s"))(CONNECT_TIMEOUT=%d)(RETRY_COUNT=0))`,
+			cd.Uri.Host(),
+			cd.Uri.Port(),
+			service,
+			connectTimeout/time.Second,
+		)
+	default:
+		panic(fmt.Sprintf("unknown TNS interpretation type %d", tnsType))
+	}
+
+	return connectString, nil
 }

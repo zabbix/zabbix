@@ -69,7 +69,7 @@ func TestOraConn_Query(t *testing.T) { //nolint:tparallel
 		CustomQueriesPath:    "",
 	}
 
-	connMgr := NewConnManager(&mockLogger{}, opt)
+	connMgr := NewConnManager(&mockLogger{}, &opt)
 	defer connMgr.Destroy()
 
 	oraCon, err := connMgr.GetConnection(newConnDet(t, "zabbix_mon", ""))
@@ -197,7 +197,7 @@ func TestOraConn_QueryByName(t *testing.T) { //nolint:tparallel,gocyclo,cyclop
 		t.Fatalf("OraConn_Query: failed to write file: %v", err)
 	}
 
-	connMgr := NewConnManager(&mockLogger{}, opt)
+	connMgr := NewConnManager(&mockLogger{}, &opt)
 	defer connMgr.Destroy()
 
 	oraCon, err := connMgr.GetConnection(newConnDet(t, "zabbix_mon", ""))
@@ -284,7 +284,7 @@ func TestOraConn_QueryRow(t *testing.T) { //nolint:tparallel
 		CustomQueriesPath:    "",
 	}
 
-	connMgr := NewConnManager(&mockLogger{}, opt)
+	connMgr := NewConnManager(&mockLogger{}, &opt)
 	defer connMgr.Destroy()
 
 	oraCon, err := connMgr.GetConnection(newConnDet(t, "zabbix_mon", ""))
@@ -379,7 +379,7 @@ func TestOraConn_QueryRowByName(t *testing.T) { //nolint:tparallel
 		t.Fatalf("OraConn_QueryRow: failed to write file: %v", err)
 	}
 
-	connMgr := NewConnManager(&mockLogger{}, opt)
+	connMgr := NewConnManager(&mockLogger{}, &opt)
 	defer connMgr.Destroy()
 
 	oraCon, err := connMgr.GetConnection(newConnDet(t, "zabbix_mon", ""))

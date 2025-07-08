@@ -15,7 +15,7 @@
 package oracle
 
 import (
-	"net/url"
+	"strings"
 	"time"
 
 	"golang.zabbix.com/agent2/plugins/oracle/dbconn"
@@ -23,7 +23,6 @@ import (
 	"golang.zabbix.com/sdk/errs"
 	"golang.zabbix.com/sdk/metric"
 	"golang.zabbix.com/sdk/plugin"
-	"golang.zabbix.com/sdk/uri"
 	"golang.zabbix.com/sdk/zbxerr"
 )
 
@@ -49,6 +48,10 @@ func (p *Plugin) Export(key string, rawParams []string, _ plugin.ContextProvider
 		return nil, errs.Errorf("key %q is disabled", keyCustomQuery)
 	}
 
+	if strings.TrimSpace(key) == "" {
+		return nil, errs.Errorf("key cannot be empty")
+	}
+
 	params, extraParams, hardcodedParams, err := metrics[key].EvalParams(rawParams, p.options.Sessions)
 	if err != nil {
 		return nil, errs.WrapConst(err, zbxerr.ErrorInvalidParams) //nolint:wrapcheck
@@ -59,26 +62,19 @@ func (p *Plugin) Export(key string, rawParams []string, _ plugin.ContextProvider
 		return nil, errs.WrapConst(err, zbxerr.ErrorInvalidParams) //nolint:wrapcheck
 	}
 
-	service := url.QueryEscape(params["Service"])
-
-	user, privilege, err := dbconn.SplitUserPrivilege(params)
-	if err != nil {
-		return nil, errs.WrapConst(err, zbxerr.ErrorInvalidParams) //nolint:wrapcheck
-	}
-
-	u, err := uri.NewWithCreds(params["URI"]+"?service="+service, user, params["Password"], dbconn.URIDefaults)
-	if err != nil {
-		return nil, errs.WrapConst(err, zbxerr.ErrorInvalidParams) //nolint:wrapcheck
-	}
-
 	handleMetric := metricsMeta[key]
 	if handleMetric == nil {
 		return nil, zbxerr.ErrorUnsupportedMetric
 	}
 
-	conn, err := p.connMgr.GetConnection(dbconn.ConnDetails{Uri: *u, Privilege: privilege})
+	connDetails, err := dbconn.NewConnDetails(params["URI"], params["User"], params["Password"], params["Service"])
 	if err != nil {
-		// Special logic of processing connection errors should be used if oracle.ping is requested
+		return nil, errs.WrapConst(err, zbxerr.ErrorInvalidParams) //nolint:wrapcheck
+	}
+
+	conn, err := p.connMgr.GetConnection(*connDetails)
+	if err != nil {
+		// Special logic of processing connection errors should be used if oracle.ping is requested,
 		// because it must return pingFailed if any error occurred.
 		if key == keyPing {
 			return handlers.PingFailed, nil
@@ -103,14 +99,14 @@ func (p *Plugin) Export(key string, rawParams []string, _ plugin.ContextProvider
 
 // Start implements the Runner interface and performs an initialization when the plugin is activated.
 func (p *Plugin) Start() {
-	opt := dbconn.NewOptions(
-		time.Duration(p.options.KeepAlive)*time.Second,
-		time.Duration(p.options.ConnectTimeout)*time.Second,
-		time.Duration(p.options.CallTimeout)*time.Second,
-		p.options.CustomQueriesEnabled,
-		p.options.CustomQueriesPath,
-		p.options.ResolveTNS,
-	)
+	opt := &dbconn.Options{
+		KeepAlive:            time.Duration(p.options.KeepAlive) * time.Second,
+		ConnectTimeout:       time.Duration(p.options.ConnectTimeout) * time.Second,
+		CallTimeout:          time.Duration(p.options.CallTimeout) * time.Second,
+		CustomQueriesEnabled: p.options.CustomQueriesEnabled,
+		CustomQueriesPath:    p.options.CustomQueriesPath,
+		ResolveTNS:           p.options.ResolveTNS,
+	}
 	p.connMgr = dbconn.NewConnManager(
 		p.Logger,
 		opt,
