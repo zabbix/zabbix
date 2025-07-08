@@ -97,7 +97,7 @@ int	zbx_evaluate_unknown(const char *expression, double *value, char *error, siz
 int	zbx_evaluate_function(zbx_variant_t *value, const zbx_dc_evaluate_item_t *item, const char *function,
 		const char *parameter, const zbx_timespec_t *ts, char **error);
 
-int	zbx_evaluatable_for_notsupported(const char *fn);
+int	zbx_evaluable_for_notsupported(const char *fn);
 
 
 void	zbx_format_value(char *value, size_t max_len, zbx_uint64_t valuemapid, const char *units,
