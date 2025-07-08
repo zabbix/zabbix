@@ -1,5 +1,5 @@
 zabbix_export:
-  version: '7.4'
+  version: '8.0'
   template_groups:
     - uuid: 748ad4d098d447d492bb935c907f652f
       name: Templates/Databases
@@ -59,7 +59,7 @@ zabbix_export:
         
         For more information please read the PostgreSQL documentation `https://www.postgresql.org/docs/current/auth-pg-hba-conf.html`.
         
-        3. Install the PostgreSQL ODBC driver. Check the [`Zabbix documentation`](https://www.zabbix.com/documentation/7.4/manual/config/items/itemtypes/odbc_checks/) for details about ODBC checks and [`recommended parameters page`](https://www.zabbix.com/documentation/7.4/manual/config/items/itemtypes/odbc_checks/unixodbc_postgresql).
+        3. Install the PostgreSQL ODBC driver. Check the [`Zabbix documentation`](https://www.zabbix.com/documentation/8.0/manual/config/items/itemtypes/odbc_checks/) for details about ODBC checks and [`recommended parameters page`](https://www.zabbix.com/documentation/8.0/manual/config/items/itemtypes/odbc_checks/unixodbc_postgresql).
         
         4. Set up the connection string in the `PostgreSQL connection string` host wizard configuration field. The minimum required parameters are:
         
@@ -80,7 +80,7 @@ zabbix_export:
         5. Set the password that you specified in step 1 in the `PostgreSQL user password` field.
       vendor:
         name: Zabbix
-        version: 7.4-2
+        version: 8.0-0
       groups:
         - name: Templates/Databases
       items:

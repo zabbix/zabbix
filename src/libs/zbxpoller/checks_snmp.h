@@ -37,7 +37,7 @@ void	get_values_snmp(zbx_dc_item_t *items, AGENT_RESULT *results, int *errcodes,
 
 void	zbx_unset_snmp_bulkwalk_options(void);
 void	zbx_init_snmp_engineid_cache(void);
-void	zbx_clear_snmp_engineid_cache(void);
+int	zbx_clear_snmp_engineid_cache(void);
 void	zbx_destroy_snmp_engineid_cache(void);
 void	zbx_housekeep_snmp_engineid_cache(void);
 

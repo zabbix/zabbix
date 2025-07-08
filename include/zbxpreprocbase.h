@@ -97,6 +97,9 @@ typedef struct
 	zbx_pp_process_mode_t	mode;
 	int			history_num;	/* the number of preprocessing steps requiring history */
 	zbx_pp_history_cache_t	*history_cache;	/* the preprocessing history */
+
+	zbx_uint64_t		values_num;
+	zbx_uint64_t		values_sz;
 }
 zbx_pp_item_preproc_t;
 
