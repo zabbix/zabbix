@@ -131,6 +131,12 @@ class testDashboardItemCardWidget extends testWidgets {
 					]
 				],
 				'templates' => [['templateid' => $template['templateids']['Template for item card widget']]],
+				'tags' => [
+					[
+						'tag' => 'tagFromHost',
+						'value' => 'tagFromHost'
+					]
+				],
 				'items' => [
 					[
 						'name' => STRING_255,
@@ -144,13 +150,40 @@ class testDashboardItemCardWidget extends testWidgets {
 						'trends' => '17d',
 						'inventory_link' => 6,
 						'description' => STRING_6000,
-						'status' => 0
+						'status' => 0,
+						'tags' => [
+							[
+								'tag' => 'numeric',
+								'value' => '10'
+							],
+							[
+								'tag' => 'long_text',
+								'value' => STRING_128
+							],
+							[
+								'tag' => 'ItemCardTag',
+								'value' => 'ItemCardTag'
+							],
+							[
+								'tag' => 'target',
+								'value' => 'zabbix'
+							],
+							[
+								'tag' => 'target',
+								'value' => 'linux'
+							],
+							[
+								'tag' => 'target',
+								'value' => 'postgresql'
+							]
+						]
 					],
 					[
 						'name' => '<img src=\"x\" onerror=\"alert("ERROR");\"/>',
 						'key_' => 'xxs',
-						'type' => ITEM_TYPE_ZABBIX,
+						'type' => ITEM_TYPE_JMX,
 						'value_type' => ITEM_VALUE_TYPE_TEXT,
+						'jmx_endpoint' => 'service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi',
 						'description' => '<img src=\"x\" onerror=\"alert("ERROR");\"/>',
 						'delay' => '13m',
 						'status' => 1
@@ -248,9 +281,10 @@ class testDashboardItemCardWidget extends testWidgets {
 				'priority' => TRIGGER_SEVERITY_NOT_CLASSIFIED
 			],
 			[
-				'description' => 'Trigger 2',
-				'expression' => 'last(/Host for Item Card widget/datatype_text)>100',
-				'priority' => TRIGGER_SEVERITY_DISASTER
+				'description' => 'Disabled trigger',
+				'expression' => 'last(/Host for Item Card widget/dependent_item_1)<>0',
+				'priority' => TRIGGER_SEVERITY_DISASTER,
+				'status' => 0
 			]
 		]);
 
@@ -491,8 +525,8 @@ class testDashboardItemCardWidget extends testWidgets {
 								'name' => 'Master item from host',
 								'x' => 0,
 								'y' => 0,
-								'width' => 16,
-								'height' => 9,
+								'width' => 18,
+								'height' => 10,
 								'fields' => [
 									[
 										'type' => 4,
@@ -574,10 +608,10 @@ class testDashboardItemCardWidget extends testWidgets {
 							[
 								'type' => 'itemcard',
 								'name' => 'Dependent Item from host',
-								'x' => 16,
+								'x' => 18,
 								'y' => 0,
-								'width' => 15,
-								'height' => 9,
+								'width' => 18,
+								'height' => 10,
 								'fields' => [
 									[
 										'type' => 4,
@@ -658,10 +692,10 @@ class testDashboardItemCardWidget extends testWidgets {
 							],
 							[
 								'type' => 'itemcard',
-								'x' => 31,
+								'x' => 36,
 								'y' => 0,
 								'width' => 18,
-								'height' => 9,
+								'height' => 10,
 								'fields' => [
 									[
 										'type' => 4,
@@ -737,6 +771,76 @@ class testDashboardItemCardWidget extends testWidgets {
 										'type' => 1,
 										'name' => 'sparkline.time_period.to',
 										'value' => 'now+1d'
+									]
+								]
+							],
+							[
+								'type' => 'itemcard',
+								'name' => 'Disabled Item',
+								'x' => 54,
+								'y' => 0,
+								'width' => 18,
+								'height' => 5,
+								'fields' => [
+									[
+										'type' => 4,
+										'name' => 'itemid.0',
+										'value' => self::$itemids['<img src=\"x\" onerror=\"alert("ERROR");\"/>']
+									],
+									[
+										'type' => 0,
+										'name' => 'sections.0',
+										'value' => 2
+									],
+									[
+										'type' => 0,
+										'name' => 'sections.1',
+										'value' => 4
+									],
+									[
+										'type' => 0,
+										'name' => 'sections.2',
+										'value' => 6
+									],
+									[
+										'type' => 0,
+										'name' => 'sections.3',
+										'value' => 7
+									]
+								]
+							],
+							[
+								'type' => 'itemcard',
+								'name' => 'Binary data type',
+								'x' => 54,
+								'y' => 5,
+								'width' => 18,
+								'height' => 5,
+								'fields' => [
+									[
+										'type' => 4,
+										'name' => 'itemid.0',
+										'value' => $depend_items['Dependent item 2']
+									],
+									[
+										'type' => 0,
+										'name' => 'sections.0',
+										'value' => 2
+									],
+									[
+										'type' => 0,
+										'name' => 'sections.1',
+										'value' => 4
+									],
+									[
+										'type' => 0,
+										'name' => 'sections.2',
+										'value' => 6
+									],
+									[
+										'type' => 0,
+										'name' => 'sections.3',
+										'value' => 7
 									]
 								]
 							]
@@ -1250,7 +1354,7 @@ class testDashboardItemCardWidget extends testWidgets {
 	public function testDashboardItemCardWidget_Create($data) {
 		$this->page->login()->open('zabbix.php?action=dashboard.view&dashboardid='.
 				self::$dashboardid['Dashboard for creating Item Card widgets'])->waitUntilReady();
-
+		sleep(150);
 		// Get hash if expected is TEST_BAD.
 		if (CTestArrayHelper::get($data, 'expected', TEST_GOOD) === TEST_BAD) {
 			// Hash before update.
@@ -1335,7 +1439,223 @@ class testDashboardItemCardWidget extends testWidgets {
 	}
 
 	public static function getDisplayData() {
-
+		return [
+			// #0.
+			[
+				[
+					'Header' => 'Master item from host',
+					'Item' => STRING_255,
+					'Host' => 'Visible host name for Item Card widget',
+					'Severity' => [
+						'Not classified' => 1,
+						'Information' => 1,
+						'Warning' => 1,
+						'Average' => 1,
+						'High' => 1,
+						'Disaster' => 2
+					],
+					'Metrics' => [
+						'Interval' => '100m',
+						'History' => '17d',
+						'Trends' => '17d'
+					],
+					'Type of information' => 'Numeric (unsigned)',
+					'Host interface' => 'zabbixzabbixzabbix.com:10050',
+					'Type' => '',
+					'Description' => STRING_6000,
+					'Error text' => 'Value of type "string" is not suitable for value type "Numeric (unsigned)". Value "hahah"',
+					'Latest data' => [
+						'Last check' => '',
+						'Last value' => '',
+						'Link' =>  'Graph'
+					],
+					'Triggers' => [
+						[
+							'Severity' => 'Not classified',
+							'Name' => 'Not classidied trigger',
+							'Expression' => 'last(/Host for Item Card widget/master)>100',
+							'Status' => 'Enabled'
+						],
+						[
+							'Severity' => 'Information',
+							'Name' => 'Information trigger',
+							'Expression' => 'last(/Host for Item Card widget/master)>200',
+							'Status' => 'Enabled'
+						],
+						[
+							'Severity' => 'Warning',
+							'Name' => 'Warning trigger',
+							'Expression' => 'last(/Host for Item Card widget/master)>300',
+							'Status' => 'Enabled'
+						],
+						[
+							'Severity' => 'Average',
+							'Name' => 'Average trigger',
+							'Expression' => 'last(/Host for Item Card widget/master)>400',
+							'Status' => 'Enabled'
+						],
+						[
+							'Severity' => 'High',
+							'Name' => 'High trigger',
+							'Expression' => 'last(/Host for Item Card widget/master)>500',
+							'Status' => 'Enabled'
+						],
+						[
+							'Severity' => 'Disaster',
+							'Name' => 'Disaster trigger',
+							'Expression' => 'last(/Host for Item Card widget/master)>600',
+							'Status' => 'Enabled'
+						],
+					],
+					'Host inventory' => 'OS (Full details)',
+					'Tags' => ['ItemCardTag: ItemCardTag', 'long_text: long_string_long_string_long_string_long_string'.
+							'_long_string_long_string_long_string_long_string_long_string_long_string_long_str',
+							'numeric: 10', 'tagFromHost: tagFromHost', 'target: linux', 'target: postgresql', 
+							'target: zabbix'
+					],
+					'Context menu' => [
+						'VIEW' => [
+							'Dashboards' => 'zabbix.php?action=host.dashboard.view&hostid={hostid}',
+							'Problems' => 'zabbix.php?action=problem.view&hostids%5B%5D={hostid}&filter_set=1',
+							'Latest data' => 'zabbix.php?action=latest.view&hostids%5B%5D={hostid}&filter_set=1',
+							'Graphs' => 'zabbix.php?action=charts.view&filter_hostids%5B%5D={hostid}&filter_set=1',
+							'Web' => 'zabbix.php?action=web.view&filter_hostids%5B%5D={hostid}&filter_set=1',
+							'Inventory' => 'hostinventories.php?hostid={hostid}'
+						],
+						'CONFIGURATION' => [
+							'Host' => 'zabbix.php?action=popup&popup=host.edit&hostid={hostid}',
+							'Items' => 'zabbix.php?action=item.list&filter_set=1&filter_hostids%5B%5D={hostid}&context=host',
+							'Triggers' => 'zabbix.php?action=trigger.list&filter_set=1&filter_hostids%5B%5D={hostid}&context=host',
+							'Graphs' => 'zabbix.php?action=graph.list&filter_set=1&filter_hostids%5B%5D={hostid}&context=host',
+							'Discovery' => 'host_discovery.php?filter_set=1&filter_hostids%5B%5D={hostid}&context=host',
+							'Web' => 'httpconf.php?filter_set=1&filter_hostids%5B%5D={hostid}&context=host'
+						],
+						'SCRIPTS' => [
+							'Detect operating system' => 'menu-popup-item',
+							'Ping' => 'menu-popup-item',
+							'Traceroute' => 'menu-popup-item'
+						]
+					]
+				]
+			],
+			// #1.
+			[
+				[
+					'Header' => 'Dependent Item from host',
+					'Item' => 'Dependent item 1',
+					'Host' => 'Visible host name for Item Card widget',
+					'Master item' => STRING_255,
+					'Metrics' => [
+						'Interval' => '',
+						'History' => '31d',
+						'Trends' => '365d'
+					],
+					'Type of information' => 'Numeric (float)',
+					'Host interface' => 'No data',
+					'Type' => 'Dependent item',
+					'Description' => 'simple description',
+					'Error text' => '',
+					'Latest data' => [
+						'Last check' => '',
+						'Last value' => '',
+						'Link' =>  'Graph'
+					],
+					'Triggers' => [
+						[
+							'Severity' => 'Not classified',
+							'Name' => 'Disabled trigger',
+							'Expression' => 'last(/Host for Item Card widget/dependent_item_1)<>0',
+							'Status' => 'Disabled'
+						]
+					],
+					'Host inventory' => 'OS (Full details)',
+					'Tags' => ['tagFromHost: tagFromHost']
+				]
+			],
+			// #2.
+			[
+				[
+					'Header' => 'Empty host card widget',
+					'Host' => 'Empty filled host',
+					'Availability' => [],
+					'Monitored by' => [
+						'Proxy group' => 'Proxy group'
+					],
+					'Monitoring' => [
+						'Dashboards' => 0,
+						'Latest data' => 0,
+						'Graphs' => 0,
+						'Web' => 0
+					],
+					'Templates' => [],
+					'Tags' => [],
+					'Description' => '',
+					'Host groups' => ['Zabbix servers'],
+					'Inventory' => [],
+					'Context menu' => [
+						'VIEW' => [
+							'Dashboards' => 'menu-popup-item disabled',
+							'Problems' => 'zabbix.php?action=problem.view&hostids%5B%5D={hostid}&filter_set=1',
+							'Latest data' => 'zabbix.php?action=latest.view&hostids%5B%5D={hostid}&filter_set=1',
+							'Graphs' => 'menu-popup-item disabled',
+							'Web' => 'menu-popup-item disabled',
+							'Inventory' => 'hostinventories.php?hostid={hostid}'
+						],
+						'CONFIGURATION' => [
+							'Host' => 'zabbix.php?action=popup&popup=host.edit&hostid={hostid}',
+							'Items' => 'zabbix.php?action=item.list&filter_set=1&filter_hostids%5B%5D={hostid}&context=host',
+							'Triggers' => 'zabbix.php?action=trigger.list&filter_set=1&filter_hostids%5B%5D={hostid}&context=host',
+							'Graphs' => 'zabbix.php?action=graph.list&filter_set=1&filter_hostids%5B%5D={hostid}&context=host',
+							'Discovery' => 'host_discovery.php?filter_set=1&filter_hostids%5B%5D={hostid}&context=host',
+							'Web' => 'httpconf.php?filter_set=1&filter_hostids%5B%5D={hostid}&context=host'
+						],
+						'SCRIPTS' => [
+							'Detect operating system' => 'menu-popup-item',
+							'Ping' => 'menu-popup-item',
+							'Traceroute' => 'menu-popup-item'
+						]
+					]
+				]
+			],
+			// #3.
+			[
+				[
+					'Header' => 'Default host card widget',
+					'Host' => 'Host ZBX6663',
+					'Availability' => ['ZBX'],
+					'Monitored by' => [
+						'Server' => 'Zabbix server'
+					],
+					'Monitoring' => [
+						'Dashboards' => 0,
+						'Latest data' => 14,
+						'Graphs' => 2,
+						'Web' => 2
+					]
+				]
+			],
+			// #4.
+			[
+				[
+					'Header' => 'Do not show suppressed problems + incomplete inventory list',
+					'Host' => 'Fully filled host card widget with long name to be truncated should see tree dots in host name widget',
+					'Inventory' => [
+						'Type' => '',
+						'Tag' => 'Critical',
+						'Location latitude' => '37.7749',
+						'Location longitude' => '-122.4194'
+					],
+					'Severity' => [
+						'Not classified' => 1,
+						'Information' => 1,
+						'Warning' => 1,
+						'Average' => 1,
+						'High' => 1,
+						'Disaster' => 1
+					]
+				]
+			]
+		];
 	}
 
 	/**
