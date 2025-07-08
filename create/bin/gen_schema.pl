@@ -660,7 +660,7 @@ EOF
 
 	my $flags = "migrate_data => true, if_not_exists => true";
 
-	for ("history", "history_uint", "history_log", "history_text", "history_str", "history_bin")
+	for ("history", "history_uint", "history_log", "history_text", "history_str", "history_bin", "history_json")
 	{
 		print<<EOF
 	PERFORM create_hypertable('$_', 'clock', chunk_time_interval => 86400, $flags);

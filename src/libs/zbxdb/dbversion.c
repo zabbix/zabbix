@@ -308,7 +308,7 @@ out:
 
 void	zbx_dbconn_tsdb_extract_compressed_chunk_flags(zbx_dbconn_t *db, struct zbx_db_version_info_t *version_info)
 {
-#define ZBX_TSDB_HISTORY_TABLES "'history_uint','history_log','history_str','history_text','history'"
+#define ZBX_TSDB_HISTORY_TABLES "'history_uint','history_log','history_str','history_text','history','history_json'"
 #define ZBX_TSDB_TRENDS_TABLES "'history_bin','trends','trends_uint'"
 
 	version_info->history_compressed_chunks =
