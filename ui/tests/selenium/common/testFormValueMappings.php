@@ -1160,12 +1160,12 @@ class testFormValueMappings extends CWebTest {
 		$this->page->waitUntilReady();
 
 		if ($source === 'host') {
-			$this->assertEquals('Host', $form->getSelectedTab());
 			$errors = [
 				'Host name' => 'This object already exists.',
 				'Host groups' => 'This field cannot be empty.'
 			];
 			$this->assertInlineError($form, $errors);
+			$this->assertEquals('Host', $form->getSelectedTab());
 			$form->selectTab('Value mapping');
 		}
 		else {

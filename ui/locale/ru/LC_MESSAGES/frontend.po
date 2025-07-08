@@ -63,6 +63,10 @@ msgstr "\"%1$s\" должно быть пустой строкой или бол
 msgid "\"host:key\" pair is expected"
 msgstr "ожидается пара \"узел сети:ключ\""
 
+#: app/views/host.wizard.edit.php:1024
+msgid "#{section_name}"
+msgstr ""
+
 #: include/forms.inc.php:1330
 #: include/views/configuration.host.discovery.edit.php:932
 #: include/views/js/configuration.host.discovery.edit.js.php:87
@@ -2256,6 +2260,10 @@ msgstr "По нижнему краю"
 #: widgets/tophosts/includes/WidgetForm.php:146
 msgid "Bottom N"
 msgstr "Последние N"
+
+#: app/views/host.wizard.edit.php:429
+msgid "Brackets to specify IPv6 addresses"
+msgstr ""
 
 #: jsLoader.php:266
 msgid "Bring forward"
@@ -5147,6 +5155,10 @@ msgstr "Свернуть"
 msgid "Collapse sidebar"
 msgstr "Свернуть боковую панель"
 
+#: app/views/host.wizard.edit.php:426
+msgid "Colon to separate IP/DNS address from port"
+msgstr ""
+
 #: include/views/configuration.graph.edit.php:398
 #: include/views/js/monitoring.sysmaps.js.php:383
 #: include/views/js/monitoring.sysmaps.js.php:404
@@ -5200,6 +5212,10 @@ msgstr "Комбинированный результат"
 msgid "Comma separated center coordinates and zoom level to display when the widget is initially loaded."
 msgstr "Координаты центра и уровень масштаба разделенные запятой отображаемые, когда виджет загружается в первый раз."
 
+#: app/views/host.wizard.edit.php:427
+msgid "Comma to separate multiple Zabbix servers, proxies, or clusters"
+msgstr ""
+
 #: app/views/administration.script.edit.php:199
 #: app/views/reports.actionlog.list.csv.php:45
 #: app/views/reports.actionlog.list.php:140 include/actions.inc.php:1864
@@ -5217,6 +5233,10 @@ msgstr "Взаимодействие"
 
 #: app/views/host.wizard.edit.php:375
 msgid "Communication between Zabbix agent and server/proxy is secured with a unique user-defined pre-shared key identity and a secret pre-shared key linked to it."
+msgstr ""
+
+#: app/views/host.wizard.edit.php:414
+msgid "Communication between Zabbix agent and server/proxy is secured with the pre-shared key (PSK) encryption method."
 msgstr ""
 
 #: include/items.inc.php:946
@@ -6260,6 +6280,10 @@ msgstr "Имена пользовательских важностей влия�
 msgid "Custom size"
 msgstr "Пользовательский размер"
 
+#: app/views/host.wizard.edit.php:138
+msgid "Custom templates are not supported."
+msgstr ""
+
 #: app/views/administration.miscconfig.edit.php:103
 #: include/classes/setup/CSetupWizard.php:561
 msgid "CyberArk Vault"
@@ -6428,6 +6452,10 @@ msgstr "Сбор данных"
 #, c-format
 msgid "Data from %1$s. Generated in %2$s sec."
 msgstr "Данные из %1$s. Сгенерировано за %2$s сек."
+
+#: app/views/host.wizard.edit.php:168
+msgid "Data is collected by Zabbix agent, a lightweight software `component installed on your monitoring target."
+msgstr ""
 
 #: app/views/js/host.wizard.edit.js.php:89
 msgid "Data is collected by Zabbix agent, a lightweight software component installed on your monitoring target."
@@ -8646,6 +8674,10 @@ msgstr ""
 msgid "Enter the IP/DNS address and port of your JMX-enabled monitoring target."
 msgstr ""
 
+#: app/views/host.wizard.edit.php:412
+msgid "Enter the IP/DNS address and port of your Zabbix server, proxy, or cluster configuration."
+msgstr ""
+
 #: app/views/host.wizard.edit.php:642
 msgid "Enter the IP/DNS address, port, and authentication details of your SNMP-enabled monitoring target."
 msgstr ""
@@ -8853,6 +8885,10 @@ msgstr "Каждую неделю(и)"
 #: app/views/administration.geomaps.edit.php:33
 msgid "Example"
 msgstr "Например"
+
+#: app/views/host.wizard.edit.php:417
+msgid "Example:"
+msgstr ""
 
 #: app/views/administration.miscconfig.edit.php:38
 msgid "Example: https://localhost/zabbix/ui/"
@@ -12162,6 +12198,10 @@ msgstr ""
 
 #: app/views/host.wizard.edit.php:512 app/views/host.wizard.edit.php:535
 msgid "Install Zabbix agent 2 and its plugins on your monitoring target by following the installation instructions below."
+msgstr ""
+
+#: app/views/host.wizard.edit.php:551 app/views/host.wizard.edit.php:574
+msgid "Install Zabbix agent and its plugins on your monitoring target by following the installation instructions below."
 msgstr ""
 
 #: setup.php:163
@@ -19753,6 +19793,10 @@ msgstr "Уровень безопасности"
 msgid "Security name"
 msgstr "Имя безопасности"
 
+#: app/views/host.wizard.edit.php:132
+msgid "See"
+msgstr ""
+
 #: app/views/popup.condition.edit.php:402 app/views/popup.generic.php:874
 #: app/views/popup.massupdate.item.php:440 app/views/popup.services.php:92
 #: app/views/popup.triggerexpr.php:88 include/classes/html/CMultiSelect.php:70
@@ -19821,6 +19865,10 @@ msgstr "Выбран, %1$s в позиции %2$d из %3$d"
 msgctxt "screen reader"
 msgid "Selected, %1$s, read only, in position %2$d of %3$d"
 msgstr "Выбран, %1$s, только чтение, в позиции %2$d из %3$d"
+
+#: app/views/host.wizard.edit.php:428
+msgid "Semicolon to separate clusters (one or more server addresses)"
+msgstr ""
 
 #: jsLoader.php:267
 msgid "Send backward"
@@ -20652,6 +20700,11 @@ msgstr "Некоторые данные истории этого элемент
 msgid "Some templates (%1$s) are hidden. Custom templates are not supported."
 msgstr ""
 
+#: app/views/host.wizard.edit.php:130
+#, c-format
+msgid "Some templates (%1$s) are incompatible with the Host Wizard."
+msgstr ""
+
 #: widgets/actionlog/includes/WidgetForm.php:79
 #: widgets/problems/includes/WidgetForm.php:145
 msgid "Sort entries by"
@@ -20706,6 +20759,10 @@ msgstr "Укажите узел сети, чтобы увидеть график
 #: app/views/popup.generic.php:180 include/views/monitoring.history.php:293
 msgid "Specify some filter condition to see the values."
 msgstr "Укажите какое-нибудь условие в фильтре для просмотра значений."
+
+#: app/views/host.wizard.edit.php:365
+msgid "Specifying new or existing host groups will add the host to these groups without removing it from any current groups."
+msgstr ""
 
 #: httpdetails.php:107 include/classes/screens/CScreenHttpTestDetails.php:82
 msgid "Speed"
@@ -21965,6 +22022,10 @@ msgid_plural "This check cannot be removed, as it is used as a condition in %1$s
 msgstr[0] "Эту проверку нельзя удалить, так как она используется как условие в действии обнаружения %1$s."
 msgstr[1] "Эту проверку нельзя удалить, так как она используется как условие в действии обнаружения %1$s."
 msgstr[2] "Эту проверку нельзя удалить, так как она используется как условие в действии обнаружения %1$s."
+
+#: app/views/host.wizard.edit.php:384
+msgid "This configuration will overwrite all existing encryption settings on the host."
+msgstr ""
 
 #: include/func.inc.php:2566
 msgid "This day last week"
@@ -23645,6 +23706,10 @@ msgstr "Моноширинный шрифт"
 msgid "Use the filter to display results"
 msgstr "Используйте фильтр для просмотра результатов"
 
+#: app/views/host.wizard.edit.php:424
+msgid "Use:"
+msgstr ""
+
 #: app/views/administration.script.list.php:93 app/views/mediatype.list.php:98
 msgid "Used in actions"
 msgstr "Использование в действиях"
@@ -24724,6 +24789,10 @@ msgstr "Подробно"
 msgid "Verification code"
 msgstr "Проверочный код"
 
+#: app/views/host.wizard.edit.php:407
+msgid "Verify Zabbix server, proxy, or cluster address"
+msgstr ""
+
 #: include/classes/setup/CSetupWizard.php:655
 msgid "Verify database certificate"
 msgstr "Удостоверять сертификат базы данных"
@@ -25447,6 +25516,10 @@ msgstr "Zabbix агент (пассивные проверки)"
 
 #: app/views/js/host.wizard.edit.js.php:91
 msgid "Zabbix agent initiates connections to Zabbix server or proxy to send data. Recommended for monitoring targets behind a firewall."
+msgstr ""
+
+#: app/views/host.wizard.edit.php:422
+msgid "Zabbix agent must be able to connect to the specified address or list of addresses."
 msgstr ""
 
 #: app/views/host.wizard.edit.php:863
@@ -26662,6 +26735,10 @@ msgstr "прототип узлов сети с таким UUID уже суще�
 msgid "host trigger ID is expected"
 msgstr "Ожидается идентификатор триггера хоста"
 
+#: app/views/host.wizard.edit.php:134
+msgid "how to update them"
+msgstr ""
+
 #: include/classes/api/services/CMap.php:844
 #: include/classes/api/services/CMap.php:1311
 msgid "icon"
@@ -27025,6 +27102,10 @@ msgstr "m-d"
 #: include/translateDefines.inc.php:33
 msgid "m-d h:i A"
 msgstr "m-d H:i"
+
+#: app/views/host.wizard.edit.php:589
+msgid "macOS"
+msgstr ""
 
 #: include/classes/parsers/CUserMacroParser.php:37
 msgid "macro is empty"

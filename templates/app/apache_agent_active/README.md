@@ -51,7 +51,7 @@ It also uses Zabbix agent to collect `Apache` Linux process statistics such as C
 
 ## Requirements
 
-Zabbix version: 7.4 and higher.
+Zabbix version: 8.0 and higher.
 
 ## Tested versions
 
@@ -60,7 +60,7 @@ This template has been tested on:
 
 ## Configuration
 
-> Zabbix should be configured according to the instructions in the [Templates out of the box](https://www.zabbix.com/documentation/7.4/manual/config/templates_out_of_the_box) section.
+> Zabbix should be configured according to the instructions in the [Templates out of the box](https://www.zabbix.com/documentation/8.0/manual/config/templates_out_of_the_box) section.
 
 ## Setup
 
@@ -78,7 +78,7 @@ This is an example configuration of the Apache web server:
 ```
 
 If you use another path, then do not forget to change the `{$APACHE.STATUS.PATH}` macro.
-Install and setup [Zabbix agent](https://www.zabbix.com/documentation/7.4/manual/installation/install_from_packages).
+Install and setup [Zabbix agent](https://www.zabbix.com/documentation/8.0/manual/installation/install_from_packages).
 
 ### Macros used
 
