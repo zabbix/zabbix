@@ -2646,7 +2646,7 @@ int	zbx_vc_get_values(zbx_uint64_t itemid, unsigned char value_type, zbx_vector_
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() itemid:" ZBX_FS_UI64 " value_type:%d count:%d period:%d end_timestamp"
 			" '%s'", __func__, itemid, value_type, count, seconds, zbx_timespec_str(ts));
 
-	if (ITEM_VALUE_TYPE_BIN == value_type)
+	if (ITEM_VALUE_TYPE_BIN == value_type || ITEM_VALUE_TYPE_JSON == value_type)
 		return FAIL;
 
 	RDLOCK_CACHE;

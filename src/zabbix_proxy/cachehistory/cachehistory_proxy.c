@@ -249,6 +249,7 @@ static void	DBmass_proxy_add_history(zbx_dc_history_t *history, int history_num)
 				dc_add_proxy_history(handle, h, now);
 				break;
 			case ITEM_VALUE_TYPE_BIN:
+			case ITEM_VALUE_TYPE_JSON:
 			default:
 				THIS_SHOULD_NEVER_HAPPEN;
 		}

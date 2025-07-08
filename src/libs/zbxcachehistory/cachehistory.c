@@ -2257,7 +2257,7 @@ static void	dc_local_add_history_bin(zbx_uint64_t itemid, unsigned char item_val
 static void	dc_local_add_history_json(zbx_uint64_t itemid, unsigned char item_value_type, const zbx_timespec_t *ts,
 		const char *value_orig, zbx_uint64_t lastlogsize, int mtime, unsigned char flags)
 {
-	dc_local_add_history_text_json_helper(ITEM_VALUE_TYPE_BIN, itemid, item_value_type, ts, value_orig,
+	dc_local_add_history_text_json_helper(ITEM_VALUE_TYPE_JSON, itemid, item_value_type, ts, value_orig,
 			lastlogsize, mtime, flags);
 }
 
@@ -2624,12 +2624,26 @@ void	zbx_dc_add_history_variant(zbx_uint64_t itemid, unsigned char value_type, u
 						value_flags);
 				return;
 			}
+			else if (ITEM_VALUE_TYPE_JSON == value_type)
+			{
+				struct zbx_json_parse   jp;
+
+				if (FAIL == zbx_json_open(value->data.str, &jp))
+				{
+
+					dc_local_add_history_notsupported(itemid, &ts,
+							"JSON type requires valid JSON. ", lastlogsize, mtime,
+							value_flags);
+					return;
+				}
+			}
 
 			dc_local_add_history_text(itemid, value_type, &ts, value->data.str, lastlogsize, mtime,
 					value_flags);
 			break;
 		case ZBX_VARIANT_NONE:
 		case ZBX_VARIANT_BIN:
+		case ZBX_VARIANT_JSON:
 		case ZBX_VARIANT_VECTOR:
 		case ZBX_VARIANT_ERR:
 		default:
@@ -2713,6 +2727,7 @@ static void	hc_free_data(zbx_hc_data_t *data)
 				case ITEM_VALUE_TYPE_STR:
 				case ITEM_VALUE_TYPE_TEXT:
 				case ITEM_VALUE_TYPE_BIN:
+				case ITEM_VALUE_TYPE_JSON:
 					__hc_shmem_free_func(data->value.str);
 					break;
 				case ITEM_VALUE_TYPE_LOG:
@@ -2988,6 +3003,7 @@ static int	hc_clone_history_data(zbx_hc_data_t **data, const dc_item_value_t *it
 			case ITEM_VALUE_TYPE_STR:
 			case ITEM_VALUE_TYPE_TEXT:
 			case ITEM_VALUE_TYPE_BIN:
+			case ITEM_VALUE_TYPE_JSON:
 				if (SUCCEED != hc_clone_history_str_data(&(*data)->value.str,
 						&item_value->value.value_str))
 				{

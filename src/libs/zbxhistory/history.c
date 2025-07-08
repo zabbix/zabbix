@@ -118,7 +118,7 @@ int	zbx_history_add_values(const zbx_vector_dc_history_ptr_t *history, int *ret_
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
-	for (int i = 0; i <= ITEM_VALUE_TYPE_BIN; i++)
+	for (int i = 0; i <= ITEM_VALUE_TYPE_JSON; i++)
 	{
 		zbx_history_iface_t	*writer = &history_ifaces[i];
 

@@ -128,6 +128,8 @@ function itemValueTypeString($value_type): string {
 			return _('Text');
 		case ITEM_VALUE_TYPE_BINARY:
 			return _('Binary');
+		case ITEM_VALUE_TYPE_JSON:
+			return _('JSON');
 	}
 
 	return _('Unknown');
@@ -853,6 +855,7 @@ function formatAggregatedHistoryValueRaw($value, array $item, int $function, boo
 			case ITEM_VALUE_TYPE_STR:
 			case ITEM_VALUE_TYPE_TEXT:
 			case ITEM_VALUE_TYPE_LOG:
+			case ITEM_VALUE_TYPE_JSON:
 				$display_value = $trim && mb_strlen($value) > 20 ? mb_substr($value, 0, 20).'...' : $value;
 				break;
 
