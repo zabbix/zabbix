@@ -9796,9 +9796,10 @@ void	zbx_dc_config_get_items_by_itemids(zbx_dc_item_t *items, const zbx_uint64_t
 
 /******************************************************************************
  *                                                                            *
- * Purpose: cache host identifier referenced by an item or a lld-rule.        *
+ * Purpose: find host identifier referenced by item or lld-rule.              *
  *                                                                            *
- * Parameters: hostids - [OUT] host identifier cache                          *
+ * Parameters: hostids - [OUT] vector with found host identifier. Caller      *
+ *                             should pass empty vector.                      *
  *             itemid  - [IN]  item identifier                                *
  *                                                                            *
  ******************************************************************************/
