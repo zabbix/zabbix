@@ -1886,7 +1886,7 @@ int	zbx_macro_message_common_resolv(zbx_macro_resolv_data_t *p, zbx_dc_um_handle
 	{
 		if (SUCCEED == zbx_token_is_user_macro(p->macro, &p->token))
 		{
-			zbx_dc_cache_item_hostid(item_hosts, c_event->objectid);
+			zbx_dc_config_get_hostid_by_itemid(item_hosts, c_event->objectid);
 			zbx_dc_get_user_macro(um_handle, p->macro, item_hosts->values, item_hosts->values_num,
 					replace_to);
 			p->pos = p->token.loc.r;
@@ -2039,7 +2039,7 @@ int	zbx_macro_message_common_resolv(zbx_macro_resolv_data_t *p, zbx_dc_um_handle
 	{
 		if (SUCCEED == zbx_token_is_user_macro(p->macro, &p->token))
 		{
-			zbx_dc_cache_item_hostid(item_hosts, c_event->objectid);
+			zbx_dc_config_get_hostid_by_itemid(item_hosts, c_event->objectid);
 			zbx_dc_get_user_macro(um_handle, p->macro, item_hosts->values, item_hosts->values_num,
 					replace_to);
 			p->pos = p->token.loc.r;

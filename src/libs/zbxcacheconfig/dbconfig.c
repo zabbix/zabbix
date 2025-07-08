@@ -9803,19 +9803,18 @@ void	zbx_dc_config_get_items_by_itemids(zbx_dc_item_t *items, const zbx_uint64_t
  *             itemid  - [IN]  item identifier                                *
  *                                                                            *
  ******************************************************************************/
-void	zbx_dc_cache_item_hostid(zbx_vector_uint64_t *hostids, zbx_uint64_t itemid)
+void	zbx_dc_config_get_hostid_by_itemid(zbx_vector_uint64_t *hostids, zbx_uint64_t itemid)
 {
 	if (0 == hostids->values_num)
 	{
-		zbx_dc_item_t	item;
-		int		errcode;
+		const ZBX_DC_ITEM	*dc_item;
 
-		zbx_dc_config_get_items_by_itemids(&item, &itemid, &errcode, 1);
+		RDLOCK_CACHE;
 
-		if (SUCCEED == errcode)
-			zbx_vector_uint64_append(hostids, item.host.hostid);
+		if (NULL != (dc_item = (ZBX_DC_ITEM *)zbx_hashset_search(&config->items, &itemid)))
+			zbx_vector_uint64_append(hostids, dc_item->hostid);
 
-		zbx_dc_config_clean_items(&item, &errcode, 1);
+		UNLOCK_CACHE;
 	}
 }
 

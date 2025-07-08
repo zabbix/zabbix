@@ -181,7 +181,7 @@ static int	macro_alert_email_resolv(zbx_macro_resolv_data_t *p, va_list args, ch
 
 			zbx_vector_uint64_create(&hostids);
 
-			zbx_dc_cache_item_hostid(&hostids, event->objectid);
+			zbx_dc_config_get_hostid_by_itemid(&hostids, event->objectid);
 			zbx_dc_get_user_macro(um_handle, p->macro, hostids.values, hostids.values_num, replace_to);
 
 			zbx_vector_uint64_destroy(&hostids);
