@@ -1510,7 +1510,7 @@ class testDashboardItemCardWidget extends testWidgets {
 					'Host inventory' => 'OS (Full details)',
 					'Tags' => ['ItemCardTag: ItemCardTag', 'long_text: long_string_long_string_long_string_long_string'.
 							'_long_string_long_string_long_string_long_string_long_string_long_string_long_str',
-							'numeric: 10', 'tagFromHost: tagFromHost', 'target: linux', 'target: postgresql', 
+							'numeric: 10', 'tagFromHost: tagFromHost', 'target: linux', 'target: postgresql',
 							'target: zabbix'
 					],
 					'Context menu' => [
