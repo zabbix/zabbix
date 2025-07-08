@@ -4654,7 +4654,7 @@ return [
 				'null' => false,
 				'type' => DB::FIELD_TYPE_JSON,
 				'length' => 2048,
-				'default' => ''
+				'default' => '{}'::jsonb
 			]
 		]
 	],
