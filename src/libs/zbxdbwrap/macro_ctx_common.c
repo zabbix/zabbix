@@ -50,7 +50,8 @@ static int	expr_db_get_action_value(const char *macro, zbx_uint64_t actionid, ch
 		zbx_db_result_t	result;
 		zbx_db_row_t	row;
 
-		result = zbx_db_select("select name from actions where actionid=" ZBX_FS_UI64, actionid);
+		if (NULL == (result = zbx_db_select("select name from actions where actionid=" ZBX_FS_UI64, actionid)))
+			return FAIL;
 
 		if (NULL != (row = zbx_db_fetch(result)))
 			*replace_to = zbx_strdup(*replace_to, row[0]);
