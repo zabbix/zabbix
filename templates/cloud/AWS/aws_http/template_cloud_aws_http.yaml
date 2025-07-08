@@ -17763,12 +17763,12 @@ zabbix_export:
             description: 'HTTP proxy to use for requests.'
         - macro: '{$AWS.REGION}'
           value: us-west-1
-          description: 'AWS Application Load Balancer region code.'
+          description: 'AWS Network Load Balancer region code.'
           config:
             type: TEXT
             priority: '6'
             label: 'AWS Region'
-            description: 'The AWS region for the Application Load Balancer.'
+            description: 'The AWS region for the Network Load Balancer.'
         - macro: '{$AWS.SECRET.ACCESS.KEY}'
           type: SECRET_TEXT
           description: 'Secret access key.'
