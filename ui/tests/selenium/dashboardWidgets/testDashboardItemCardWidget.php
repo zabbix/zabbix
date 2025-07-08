@@ -78,8 +78,10 @@ class testDashboardItemCardWidget extends testWidgets {
 					[
 						'name' => 'Master item from template',
 						'key_' => 'custom_item',
-						'type' => ITEM_TYPE_TRAPPER,
-						'value_type' => ITEM_VALUE_TYPE_STR
+						'type' => ITEM_TYPE_IPMI,
+						'ipmi_sensor' => 'test',
+						'value_type' => ITEM_VALUE_TYPE_STR,
+						'delay' => '50m'
 					]
 				]
 			]
@@ -199,10 +201,12 @@ class testDashboardItemCardWidget extends testWidgets {
 					[
 						'name' => 'Item with text datatype',
 						'key_' => 'datatype_text',
-						'type' => ITEM_TYPE_JMX,
-						'value_type' => ITEM_VALUE_TYPE_TEXT,
-						'jmx_endpoint' => 'service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi',
-						'delay' => '15m'
+						'type' => ITEM_TYPE_SNMP,
+						'value_type' => ITEM_VALUE_TYPE_LOG,
+						'snmp_oid' => 'walk[222]',
+						'delay' => '15m',
+						'history' => 0,
+						'trends' => 0
 					],
 					[
 						'name' => 'Item with log datatype',
@@ -236,7 +240,8 @@ class testDashboardItemCardWidget extends testWidgets {
 					'key_' => 'dependent_item_2',
 					'master_itemid' => self::$itemids[STRING_255],
 					'type' => ITEM_TYPE_DEPENDENT,
-					'value_type' => ITEM_VALUE_TYPE_BINARY
+					'value_type' => ITEM_VALUE_TYPE_BINARY,
+					'history' => '0d'
 				]
 			]
 		];
@@ -284,7 +289,7 @@ class testDashboardItemCardWidget extends testWidgets {
 				'description' => 'Disabled trigger',
 				'expression' => 'last(/Host for Item Card widget/dependent_item_1)<>0',
 				'priority' => TRIGGER_SEVERITY_DISASTER,
-				'status' => 0
+				'status' => 1
 			]
 		]);
 
@@ -297,9 +302,12 @@ class testDashboardItemCardWidget extends testWidgets {
 			'High trigger', 'Disaster trigger', 'Disaster trigger', 'Trigger 1', 'Trigger 2'];
 		CDBHelper::setTriggerProblem($trigger_names, TRIGGER_VALUE_TRUE);
 
-		// Add red error message.
+		// Add red error messages.
 		DBexecute('UPDATE item_rtdata SET state = 1, error = '.zbx_dbstr('Value of type "string" is not suitable for '.
 				'value type "Numeric (unsigned)". Value "hahah"').'WHERE itemid ='.zbx_dbstr(self::$itemids[STRING_255]));
+		DBexecute('UPDATE item_rtdata SET state = 1, error = '.zbx_dbstr('Unsupported item key.').
+				'WHERE itemid ='.zbx_dbstr($depend_items['Dependent item 1']));
+
 
 		CDataHelper::call('dashboard.create', [
 			[
@@ -811,7 +819,7 @@ class testDashboardItemCardWidget extends testWidgets {
 							],
 							[
 								'type' => 'itemcard',
-								'name' => 'Binary data type',
+								'name' => 'SNMP interface',
 								'x' => 54,
 								'y' => 5,
 								'width' => 18,
@@ -820,7 +828,7 @@ class testDashboardItemCardWidget extends testWidgets {
 									[
 										'type' => 4,
 										'name' => 'itemid.0',
-										'value' => $depend_items['Dependent item 2']
+										'value' => self::$itemids['Item with text datatype']
 									],
 									[
 										'type' => 0,
@@ -1455,19 +1463,19 @@ class testDashboardItemCardWidget extends testWidgets {
 						'Disaster' => 2
 					],
 					'Metrics' => [
-						'Interval' => '100m',
-						'History' => '17d',
-						'Trends' => '17d'
+						'column' => '100m',
+						'center-column' => '17d',
+						'right-column' => '17d'
 					],
 					'Type of information' => 'Numeric (unsigned)',
 					'Host interface' => 'zabbixzabbixzabbix.com:10050',
-					'Type' => '',
+					'Type' => 'Zabbix agent',
 					'Description' => STRING_6000,
 					'Error text' => 'Value of type "string" is not suitable for value type "Numeric (unsigned)". Value "hahah"',
 					'Latest data' => [
-						'Last check' => '',
-						'Last value' => '',
-						'Link' =>  'Graph'
+						'column' => '37m 8s',
+						'center-column' => '9000 %',
+						'right-column' =>  'Graph'
 					],
 					'Triggers' => [
 						[
@@ -1544,21 +1552,21 @@ class testDashboardItemCardWidget extends testWidgets {
 					'Header' => 'Dependent Item from host',
 					'Item' => 'Dependent item 1',
 					'Host' => 'Visible host name for Item Card widget',
-					'Master item' => STRING_255,
+					'Depended entity' => STRING_255,
 					'Metrics' => [
-						'Interval' => '',
-						'History' => '31d',
-						'Trends' => '365d'
+						'column' => '37m 8s',
+						'center-column' => '9000 %',
+						'right-column' =>  'Graph'
 					],
 					'Type of information' => 'Numeric (float)',
 					'Host interface' => 'No data',
 					'Type' => 'Dependent item',
 					'Description' => 'simple description',
-					'Error text' => '',
+					'Error text' => 'Unsupported item key.',
 					'Latest data' => [
-						'Last check' => '',
-						'Last value' => '',
-						'Link' =>  'Graph'
+						'column' => '',
+						'center-column' => '',
+						'right-column' =>  'Graph'
 					],
 					'Triggers' => [
 						[
@@ -1568,91 +1576,72 @@ class testDashboardItemCardWidget extends testWidgets {
 							'Status' => 'Disabled'
 						]
 					],
-					'Host inventory' => 'OS (Full details)',
+					'Host inventory' => '',
 					'Tags' => ['tagFromHost: tagFromHost']
 				]
 			],
 			// #2.
 			[
 				[
-					'Header' => 'Empty host card widget',
-					'Host' => 'Empty filled host',
-					'Availability' => [],
-					'Monitored by' => [
-						'Proxy group' => 'Proxy group'
+					'Header' => 'Item card',
+					'Item' => 'Master item from template',
+					'Host' => 'Visible host name for Item Card widget',
+					'Depended entity' => 'Template for item card widget',
+					'Metrics' => [
+						'column' => '50m',
+						'center-column' => '31d',
+						'right-column' => ''
 					],
-					'Monitoring' => [
-						'Dashboards' => 0,
-						'Latest data' => 0,
-						'Graphs' => 0,
-						'Web' => 0
-					],
-					'Templates' => [],
-					'Tags' => [],
+					'Type of information' => 'Character',
+					'Host interface' => 'selenium.test:30053',
+					'Type' => 'IPMI agent',
 					'Description' => '',
-					'Host groups' => ['Zabbix servers'],
-					'Inventory' => [],
-					'Context menu' => [
-						'VIEW' => [
-							'Dashboards' => 'menu-popup-item disabled',
-							'Problems' => 'zabbix.php?action=problem.view&hostids%5B%5D={hostid}&filter_set=1',
-							'Latest data' => 'zabbix.php?action=latest.view&hostids%5B%5D={hostid}&filter_set=1',
-							'Graphs' => 'menu-popup-item disabled',
-							'Web' => 'menu-popup-item disabled',
-							'Inventory' => 'hostinventories.php?hostid={hostid}'
-						],
-						'CONFIGURATION' => [
-							'Host' => 'zabbix.php?action=popup&popup=host.edit&hostid={hostid}',
-							'Items' => 'zabbix.php?action=item.list&filter_set=1&filter_hostids%5B%5D={hostid}&context=host',
-							'Triggers' => 'zabbix.php?action=trigger.list&filter_set=1&filter_hostids%5B%5D={hostid}&context=host',
-							'Graphs' => 'zabbix.php?action=graph.list&filter_set=1&filter_hostids%5B%5D={hostid}&context=host',
-							'Discovery' => 'host_discovery.php?filter_set=1&filter_hostids%5B%5D={hostid}&context=host',
-							'Web' => 'httpconf.php?filter_set=1&filter_hostids%5B%5D={hostid}&context=host'
-						],
-						'SCRIPTS' => [
-							'Detect operating system' => 'menu-popup-item',
-							'Ping' => 'menu-popup-item',
-							'Traceroute' => 'menu-popup-item'
-						]
-					]
+					'Error text' => '',
+					'Latest data' => [
+						'column' => '',
+						'center-column' => '',
+						'right-column' =>  'History'
+					],
+					'Triggers' => [],
+					'Host inventory' => '',
+					'Tags' => ['tagFromHost: tagFromHost']
 				]
 			],
 			// #3.
 			[
 				[
-					'Header' => 'Default host card widget',
-					'Host' => 'Host ZBX6663',
-					'Availability' => ['ZBX'],
-					'Monitored by' => [
-						'Server' => 'Zabbix server'
+					'Header' => 'Disabled Item',
+					'Item' => '<img src=\"x\" onerror=\"alert("ERROR");\"/>',
+					'Host' => 'Visible host name for Item Card widget',
+					'Disabled' => true,
+					'Metrics' => [
+						'column' => '13m',
+						'center-column' => '31d',
+						'right-column' => ''
 					],
-					'Monitoring' => [
-						'Dashboards' => 0,
-						'Latest data' => 14,
-						'Graphs' => 2,
-						'Web' => 2
-					]
+					'Type of information' => 'Text',
+					'Host interface' => '127.4.4.4:426',
+					'Type' => 'JMX agent'
 				]
 			],
 			// #4.
 			[
 				[
-					'Header' => 'Do not show suppressed problems + incomplete inventory list',
-					'Host' => 'Fully filled host card widget with long name to be truncated should see tree dots in host name widget',
-					'Inventory' => [
-						'Type' => '',
-						'Tag' => 'Critical',
-						'Location latitude' => '37.7749',
-						'Location longitude' => '-122.4194'
-					],
+					'Header' => 'SNMP interface',
+					'Item' => 'Item with text datatype',
 					'Severity' => [
-						'Not classified' => 1,
-						'Information' => 1,
-						'Warning' => 1,
-						'Average' => 1,
-						'High' => 1,
-						'Disaster' => 1
-					]
+						'Not classified' => 1
+					],
+					'Host' => 'Visible host name for Item Card widget',
+					'Disabled' => true,
+					'Metrics' => [
+						'column' => '15m',
+						'center-column' => '',
+						'right-column' => ''
+					],
+					'Type of information' => 'Log',
+					'Host interface' => '127.2.2.2:122',
+					'Type' => 'SNMP agent'
 				]
 			]
 		];
@@ -1664,7 +1653,130 @@ class testDashboardItemCardWidget extends testWidgets {
 	 * @dataProvider getDisplayData
 	 */
 	public function testDashboardItemCardWidget_Display($data) {
+		$this->page->login()->open('zabbix.php?action=dashboard.view&dashboardid='.
+				self::$dashboardid['Dashboard for Item Card widget display check'])->waitUntilReady();
+		$dashboard = CDashboardElement::find()->one();
+		$widget = $dashboard::find()->one()->getWidget($data['Header']);
 
+		// Check item name.
+		$item = CTestArrayHelper::get($data, 'Disabled') ? $data['Item']."\n".'Disabled' : $data['Item'];
+		$item_selector = $widget->query('class:item-name')->one();
+		$this->assertEquals($item, $item_selector->getText());
+
+		// Check error text.
+		if (array_key_exists('Error text', $data)) {
+			$item_selector->query('class:zi-i-negative')->one()->click();;
+			$hint = $this->query('xpath://div[@class="overlay-dialogue wordbreak"]')->asOverlayDialog()->waitUntilPresent()->one();
+			$this->assertEquals($data['Error text'], $hint->getText());
+			$hint->close();
+			$this->assertEquals($data['Error text'], $widget->query('class:section-error')->one()->getText());
+		}
+
+		// Check disable state if exist.
+		if (array_key_exists('Disabled', $data)) {
+			$status = $widget->query('class:color-negative')->one();
+			$this->assertTrue($status->isVisible());
+			$this->assertEquals(trim($status->getText()), 'Disabled');
+		}
+
+		if (array_key_exists('Severity', $data)) {
+			foreach($data['Severity'] as $severity => $value) {
+				$this->assertEquals($value, $widget
+						->query('xpath:.//span[@title='.CXPathHelper::escapeQuotes($severity).']')->one()->getText()
+				);
+			}
+		}
+
+		if (array_key_exists('Host', $data)) {
+			$widget->query('class', 'sections-header')->query('class', 'section-path')->query('link', $data['Host'])
+					->one()->click();
+			$host_overlay = COverlayDialogElement::find()->waitUntilReady()->one();
+			$this->assertEquals($data['Host'], $host_overlay->asForm()->getField('Visible name')->getValue());
+			$host_overlay->close();
+		}
+
+		// Check metric section.
+		if (array_key_exists('Metrics', $data)) {
+			foreach($data['Metrics'] as $section => $value){
+				$this->assertEquals($value, $widget->query('class:section-metrics')->query('class:'.$section)
+						->query('class:column-value')->one()->getText()
+				);
+			}
+		}
+
+		// Check type of information.
+		if (array_key_exists('Type of information', $data)) {
+			$this->asssertSectionValue($widget, 'Type of information', $data['Type of information']);
+		}
+
+		// Check host interface.
+		if (array_key_exists('Host interface', $data)) {
+			$this->asssertSectionValue($widget, 'Host interface', $data['Host interface']);
+		}
+
+		// Check item type.
+		if (array_key_exists('Type', $data)) {
+			$this->asssertSectionValue($widget, 'Type', $data['Type']);
+		}
+
+		// Check description text.
+		if (array_key_exists('Description', $data)) {
+			$this->assertEquals($data['Description'], $widget->query('class:section-description')
+					->one()->getText()
+			);
+		}
+
+		// Check latest data.
+		if (array_key_exists('Latest data', $data)) {
+			foreach($data['Latest data'] as $section => $value){
+				if($section === 'column'){
+					$this->assertTrue($widget->query('class:section-latest-data')->query('class:'.$section)
+						->query('class:column-value')->one()->isVisible()
+					);
+				}
+				else if ($section === 'right-column') {
+					$link = $widget->query('class:section-latest-data')->query('class:'.$section)->query('class:column-value')->one();
+					$this->assertTrue($link->isClickable());
+				}
+				else {
+					$this->assertEquals($value, $widget->query('class:section-latest-data')->query('class:'.$section)
+						->query('class:column-value')->one()->getText()
+					);
+				}
+			}
+		}
+
+		// Check trigger section.
+		if (array_key_exists('Triggers', $data)) {
+			// Check list of triggers.
+			$triggers = $widget->query('class:section-triggers')->query('class:triggers')->query('class:trigger')->all();
+			$actualNames = array_map('trim', str_replace(',', '', $triggers->asText()));
+			$this->assertEquals(array_column($data['Triggers'], 'Name'), $actualNames);
+
+			// Check trigger counter.
+			$this->assertEquals(count($data['Triggers']), $widget->query('class:section-triggers')
+					->query('class:section-name')->query('xpath', './sup')->one()->getText()
+			);
+
+			// Check table pop-up with trigger data.
+			$widget->query('class:section-triggers')->query('link', 'Triggers')->one()->click();
+			$dialog = COverlayDialogElement::find()->one();
+			$table = $dialog->query('class:list-table')->asTable()->one();
+
+			$this->assertEquals(['Severity', 'Name', 'Expression', 'Status'],$table->getHeadersText());
+			$dialog->close();
+		}
+
+		// Check description text.
+		if (array_key_exists('Host inventory', $data)) {
+			$this->asssertSectionValue($widget, 'Host inventory', $data['Host inventory']);
+		}
+
+		// Check tags section.
+		if (array_key_exists('Tags', $data)) {
+			$tags = $widget->query('class:section section-tags')->query('class:tags')->query('class:tag')->all();
+			$this->assertEquals($data['Tags'], $tags->asText());
+		}
 	}
 
 	/**
@@ -2002,5 +2114,11 @@ class testDashboardItemCardWidget extends testWidgets {
 		}
 
 		return array_values($result);
+	}
+
+	protected function asssertSectionValue($widget, $section_name, $section_value){
+		$row = $widget->query('xpath://div[@class="section-name" and text()='.CXPathHelper::escapeQuotes($section_name).']')->one();
+		$value =  $row->query('xpath:./following-sibling::div[1]')->one()->getText();
+		$this->assertEquals($section_value, $value);
 	}
 }
