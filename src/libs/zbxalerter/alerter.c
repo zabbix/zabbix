@@ -189,7 +189,7 @@ static int	macro_alert_email_resolv(zbx_macro_resolv_data_t *p, va_list args, ch
 		else
 			zbx_dc_get_user_macro(um_handle, p->macro, NULL, 0, replace_to);
 
-		p->pos = p->token.loc.r;
+		p->pos = (int)p->token.loc.r;
 	}
 
 	return ret;
