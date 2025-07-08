@@ -7,7 +7,7 @@ The template to monitor IIS (Internet Information Services) by Zabbix that works
 
 ## Requirements
 
-Zabbix version: 7.4 and higher.
+Zabbix version: 8.0 and higher.
 
 ## Tested versions
 
@@ -16,7 +16,7 @@ This template has been tested on:
 
 ## Configuration
 
-> Zabbix should be configured according to the instructions in the [Templates out of the box](https://www.zabbix.com/documentation/7.4/manual/config/templates_out_of_the_box) section.
+> Zabbix should be configured according to the instructions in the [Templates out of the box](https://www.zabbix.com/documentation/8.0/manual/config/templates_out_of_the_box) section.
 
 ## Setup
 
@@ -38,7 +38,7 @@ You can also add additional context macro {$IIS.APPPOOL.MONITORED:<AppPoolName>}
 |Name|Description|Default|
 |----|-----------|-------|
 |{$IIS.PORT}|<p>Listening port.</p>|`80`|
-|{$IIS.SERVICE}|<p>The service (http/https/etc) for port check. See "net.tcp.service" documentation page for more information: https://www.zabbix.com/documentation/7.4/manual/config/items/itemtypes/simple_checks</p>|`http`|
+|{$IIS.SERVICE}|<p>The service (http/https/etc) for port check. See "net.tcp.service" documentation page for more information: https://www.zabbix.com/documentation/8.0/manual/config/items/itemtypes/simple_checks</p>|`http`|
 |{$IIS.QUEUE.MAX.WARN}|<p>Maximum application pool's request queue length for trigger expression.</p>||
 |{$IIS.QUEUE.MAX.TIME}|<p>The time during which the queue length may exceed the threshold.</p>|`5m`|
 |{$IIS.APPPOOL.NOT_MATCHES}|<p>This macro is used in application pools discovery. Can be overridden on the host or linked template level.</p>|`<CHANGE_IF_NEEDED>`|
@@ -96,7 +96,7 @@ You can also add additional context macro {$IIS.APPPOOL.MONITORED:<AppPoolName>}
 |IIS: The World Wide Web Publishing Service (W3SVC) is not running|<p>The World Wide Web Publishing Service (W3SVC) is not in the running state. IIS cannot start.</p>|`last(/IIS by Zabbix agent active/service.info[W3SVC])<>0`|High|**Depends on**:<br><ul><li>IIS: Windows process Activation Service (WAS) is not running</li></ul>|
 |IIS: Windows process Activation Service (WAS) is not running|<p>Windows Process Activation Service (WAS) is not in the running state. IIS cannot start.</p>|`last(/IIS by Zabbix agent active/service.info[WAS])<>0`|High||
 |IIS: Port {$IIS.PORT} is down||`last(/IIS by Zabbix agent active/net.tcp.service[{$IIS.SERVICE},,{$IIS.PORT}])=0`|Average|**Manual close**: Yes<br>**Depends on**:<br><ul><li>IIS: The World Wide Web Publishing Service (W3SVC) is not running</li></ul>|
-|IIS: has been restarted|<p>Uptime is less than 10 minutes.</p>|`last(/IIS by Zabbix agent active/perf_counter_en["\Web Service(_Total)\Service Uptime"])<10m`|Info|**Manual close**: Yes|
+|IIS: Service has been restarted|<p>Uptime is less than 10 minutes.</p>|`last(/IIS by Zabbix agent active/perf_counter_en["\Web Service(_Total)\Service Uptime"])<10m`|Info|**Manual close**: Yes|
 |IIS: Active checks are not available|<p>Active checks are considered unavailable. Agent is not sending heartbeat for prolonged time.</p>|`min(/IIS by Zabbix agent active/zabbix[host,active_agent,available],{$AGENT.TIMEOUT})=2`|High||
 
 ### LLD rule Application pools discovery

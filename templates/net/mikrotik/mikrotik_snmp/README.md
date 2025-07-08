@@ -14,7 +14,7 @@
 
 ## Requirements
 
-Zabbix version: 7.4 and higher.
+Zabbix version: 8.0 and higher.
 
 ## Tested versions
 
@@ -23,7 +23,7 @@ This template has been tested on:
 
 ## Configuration
 
-> Zabbix should be configured according to the instructions in the [Templates out of the box](https://www.zabbix.com/documentation/7.4/manual/config/templates_out_of_the_box) section.
+> Zabbix should be configured according to the instructions in the [Templates out of the box](https://www.zabbix.com/documentation/8.0/manual/config/templates_out_of_the_box) section.
 
 ## Setup
 
@@ -33,27 +33,27 @@ Refer to the vendor documentation.
 
 |Name|Description|Default|
 |----|-----------|-------|
-|{$VFS.FS.PUSED.MAX.CRIT}||`90`|
-|{$VFS.FS.PUSED.MAX.WARN}||`80`|
 |{$CPU.UTIL.CRIT}||`90`|
-|{$TEMP_CRIT}||`60`|
+|{$MEMORY.UTIL.MAX}||`90`|
 |{$TEMP_CRIT_LOW}||`5`|
 |{$TEMP_WARN}||`50`|
-|{$TEMP_CRIT:"CPU"}||`75`|
+|{$TEMP_CRIT}||`60`|
 |{$TEMP_WARN:"CPU"}||`70`|
-|{$MEMORY.UTIL.MAX}||`90`|
-|{$IFNAME.WIFI.MATCHES}|<p>This macro is used in CAPsMAN AP channel discovery. It can be overridden on the host level.</p>|`WIFI`|
-|{$IFNAME.LTEMODEM.MATCHES}|<p>This macro is used in LTE modem discovery. It can be overridden on the host.</p>|`^lte`|
+|{$TEMP_CRIT:"CPU"}||`75`|
+|{$VFS.FS.PUSED.MAX.WARN}||`80`|
+|{$VFS.FS.PUSED.MAX.CRIT}||`90`|
 |{$LTEMODEM.RSSI.MIN.WARN}|<p>The LTE modem RSSI minimum value for warning trigger expression.</p>|`-100`|
 |{$LTEMODEM.RSRP.MIN.WARN}|<p>The LTE modem RSRP minimum value for warning trigger expression.</p>|`-100`|
 |{$LTEMODEM.RSRQ.MIN.WARN}|<p>The LTE modem RSRQ minimum value for warning trigger expression.</p>|`-20`|
 |{$LTEMODEM.SINR.MIN.WARN}|<p>The LTE modem SINR minimum value for warning trigger expression.</p>|`0`|
+|{$IFNAME.LTEMODEM.MATCHES}|<p>This macro is used in LTE modem discovery. It can be overridden on the host.</p>|`^lte`|
+|{$IFNAME.WIFI.MATCHES}|<p>This macro is used in CAPsMAN AP channel discovery. It can be overridden on the host level.</p>|`WIFI`|
 |{$SNMP.TIMEOUT}|<p>Time interval for the SNMP availability trigger.</p>|`5m`|
 |{$ICMP_LOSS_WARN}|<p>Warning threshold of ICMP packet loss in %.</p>|`20`|
 |{$ICMP_RESPONSE_TIME_WARN}|<p>Warning threshold of the average ICMP response time in seconds.</p>|`0.15`|
-|{$IF.ERRORS.WARN}|<p>Warning threshold of error packet rate. Can be used with interface name as context.</p>|`2`|
-|{$IF.UTIL.MAX}|<p>Used as a threshold in the interface utilization trigger.</p>|`90`|
 |{$IFCONTROL}|<p>Link status trigger will be fired only for interfaces where the context macro equals "1".</p>|`1`|
+|{$IF.UTIL.MAX}|<p>Used as a threshold in the interface utilization trigger.</p>|`90`|
+|{$IF.ERRORS.WARN}|<p>Warning threshold of error packet rate. Can be used with interface name as context.</p>|`2`|
 |{$NET.IF.IFNAME.MATCHES}|<p>Used for network interface discovery. Can be overridden on the host or linked template level.</p>|`^.*$`|
 |{$NET.IF.IFNAME.NOT_MATCHES}|<p>Filters out `loopbacks`, `nulls`, docker `veth` links and `docker0 bridge` by default.</p>|`Macro too long. Please see the template.`|
 |{$NET.IF.IFOPERSTATUS.MATCHES}|<p>Used for network interface discovery. Can be overridden on the host or linked template level.</p>|`^.*$`|

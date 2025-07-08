@@ -89,7 +89,7 @@ class testTriggerPrototypes extends CAPITest {
 
 	public static function triggerprototype_get_data() {
 		$host = 'with_lld_discovery';
-		$triggerids = ['30001', '30003'];
+		$triggerids = ['300001', '300003'];
 
 		return [
 			'Basic filter by ID' => [

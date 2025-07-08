@@ -10,7 +10,7 @@ Template `Kubernetes API server by HTTP` - collects metrics by HTTP agent from A
 
 ## Requirements
 
-Zabbix version: 7.4 and higher.
+Zabbix version: 8.0 and higher.
 
 ## Tested versions
 
@@ -19,7 +19,7 @@ This template has been tested on:
 
 ## Configuration
 
-> Zabbix should be configured according to the instructions in the [Templates out of the box](https://www.zabbix.com/documentation/7.4/manual/config/templates_out_of_the_box) section.
+> Zabbix should be configured according to the instructions in the [Templates out of the box](https://www.zabbix.com/documentation/8.0/manual/config/templates_out_of_the_box) section.
 
 ## Setup
 
@@ -35,8 +35,8 @@ Also, see the Macros section for a list of macros used to set trigger values.
 
 |Name|Description|Default|
 |----|-----------|-------|
-|{$KUBE.API.SERVER.URL}|<p>Kubernetes API server metrics endpoint URL.</p>|`https://localhost:6443/metrics`|
 |{$KUBE.API.TOKEN}|<p>API Authorization Token.</p>||
+|{$KUBE.API.SERVER.URL}|<p>Kubernetes API server metrics endpoint URL.</p>|`https://localhost:6443/metrics`|
 |{$KUBE.API.CERT.EXPIRATION}|<p>Number of days for alert of client certificate used for trigger.</p>|`7`|
 |{$KUBE.API.HTTP.CLIENT.ERROR}|<p>Maximum number of HTTP client requests failures used for trigger.</p>|`2`|
 |{$KUBE.API.HTTP.SERVER.ERROR}|<p>Maximum number of HTTP server requests failures used for trigger.</p>|`2`|

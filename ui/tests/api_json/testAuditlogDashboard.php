@@ -147,6 +147,9 @@ class testAuditlogDashboard extends testAuditlogCommon {
 	}
 
 	public function testAuditlogDashboard_Update() {
+		$pageid_initial = CDBHelper::getValue('SELECT dashboard_pageid FROM dashboard_page WHERE dashboardid='.
+				zbx_dbstr(self::DASHBOARDID)
+		);
 		$this->call('dashboard.update', [
 			[
 				'dashboardid' => self::DASHBOARDID,
@@ -186,7 +189,7 @@ class testAuditlogDashboard extends testAuditlogCommon {
 		);
 
 		$updated = json_encode([
-			'dashboard.pages[1]' => ['delete'],
+			'dashboard.pages['.$pageid_initial.']' => ['delete'],
 			'dashboard.pages['.$pageid['dashboard_pageid'].'].widgets['.$widgetid['widgetid'].']' => ['add'],
 			'dashboard.pages['.$pageid['dashboard_pageid'].']' => ['add'],
 			'dashboard.userGroups['.$dashboard_usrgrpid['dashboard_usrgrpid'].']' => ['add'],

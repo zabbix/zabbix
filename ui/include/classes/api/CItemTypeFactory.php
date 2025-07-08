@@ -88,6 +88,9 @@ final class CItemTypeFactory {
 
 			case ITEM_TYPE_BROWSER:
 				return self::$instances[$type] = new CItemTypeBrowser();
+
+			case ITEM_TYPE_NESTED:
+				return self::$instances[$type] = new CItemTypeNested();
 		}
 
 		throw new APIException(ZBX_API_ERROR_INTERNAL, 'Incorrect item type.');

@@ -574,6 +574,8 @@ class CControllerPopupGeneric extends CController {
 			'real_hosts' =>							'in 1',
 			'normal_only' =>						'in 1',
 			'with_graphs' =>						'in 1',
+			'with_hosts' =>							'in 1',
+			'with_templates' =>						'in 1',
 			'with_graph_prototypes' =>				'in 1',
 			'with_items' =>							'in 1',
 			'with_simple_graph_items' =>			'in 1',
@@ -740,6 +742,13 @@ class CControllerPopupGeneric extends CController {
 				'output' => [],
 				'itemids' => $this->getInput('parent_discoveryid')
 			]);
+
+			if (!$lld_rules) {
+				$lld_rules = API::DiscoveryRulePrototype()->get([
+					'output' => [],
+					'itemids' => $this->getInput('parent_discoveryid')
+				]);
+			}
 
 			if (!$lld_rules) {
 				return false;
@@ -1320,6 +1329,10 @@ class CControllerPopupGeneric extends CController {
 					];
 				}
 
+				if ($this->hasInput('normal_only')) {
+					$options['filter']['flags'] = ZBX_FLAG_DISCOVERY_NORMAL;
+				}
+
 				$records = (!$this->group_preselect_required || $this->groupids)
 					? API::Host()->get($options)
 					: [];
@@ -1355,6 +1368,10 @@ class CControllerPopupGeneric extends CController {
 
 				if ($this->hasInput('with_httptests')) {
 					$options['with_httptests'] = true;
+				}
+
+				if ($this->hasInput('with_hosts')) {
+					$options['with_hosts'] = true;
 				}
 
 				if ($this->hasInput('with_items')) {
@@ -1394,6 +1411,10 @@ class CControllerPopupGeneric extends CController {
 
 				if ($this->hasInput('with_items')) {
 					$options['with_items'] = true;
+				}
+
+				if ($this->hasInput('with_templates')) {
+					$options['with_templates'] = true;
 				}
 
 				$records = API::TemplateGroup()->get($options);
@@ -1592,6 +1613,7 @@ class CControllerPopupGeneric extends CController {
 
 				if ($this->source_table === 'graph_prototypes') {
 					$options['selectDiscoveryRule'] = ['hostid'];
+					$options['selectDiscoveryRulePrototype'] = ['hostid'];
 
 					$records = (!$this->host_preselect_required || $this->hostids)
 						? API::GraphPrototype()->get($options)

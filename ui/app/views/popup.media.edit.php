@@ -25,6 +25,7 @@ $form = (new CForm())
 	->addVar('edit', $data['is_edit'] ? '1' : null)
 	->addVar('row_index', $data['row_index'])
 	->addVar('userid', $data['userid'])
+	->addVar('provisioned', $data['provisioned'])
 	->addStyle('display: none;')
 	->addItem(getMessages());
 

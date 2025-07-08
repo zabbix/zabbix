@@ -4,6 +4,9 @@ $theme-name: 'dark';
 $red: #e45959;
 $lighter-red: #433131;
 
+$error: #ff5555;
+$error-focus: #ff9b9b;
+
 $dark-yellow: #e99003;
 $yellow: #a78820;
 $lighter-yellow: #2f280a;
@@ -16,6 +19,10 @@ $blue: #429ae3;
 $disabled-bg-color: #2b2b2b;
 $disabled-item-color: #808080;
 $disabled-item-bg-color: #383838;
+
+$progress-complete-color: #69818d;
+$progress-current-color: #4f4f4f;
+$progress-default-color: #3d3d3d;
 
 // Layout
 $header-bg-color: #2b2b2b;
@@ -69,9 +76,14 @@ $ui-tab-bg-selected-color: #69808d;
 // Forms
 $form-font-color: #e1e3ed;
 $form-bg-color: #383838;
+$form-dark-bg-color: #383838;
+$form-darker-bg-color: #383838;
 $form-border-color: #4f4f4f;
 $form-focus-border-color: #768d99;
 $form-fields-group-border-color: #383838;
+$form-field-hint-color: #737373;
+$form-radio-selected-color: #69818d;
+$form-description-border-color: #69818d;
 
 $form-disabled-font-color: #525252;
 $form-disabled-bg-color: #2b2b2b;
@@ -83,6 +95,8 @@ $scrollbar-track-color: #1f1f1f;
 $scrollbar-thumb-color: #383838;
 
 $input-disabled-placeholder-color: #404040;
+
+$form-radio-list-checked-color: $action-hover-color;
 
 // Search form
 $form-search-bg-color: #191919;
