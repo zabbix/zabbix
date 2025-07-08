@@ -483,6 +483,7 @@ int	zbx_db_insert_execute(zbx_db_insert_t *db_insert)
 				case ZBX_TYPE_TEXT:
 				case ZBX_TYPE_LONGTEXT:
 				case ZBX_TYPE_CUID:
+				case ZBX_TYPE_JSON:
 					if (0 != (field->flags & ZBX_UPPER))
 					{
 						zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, "upper(\'");
@@ -500,7 +501,6 @@ int	zbx_db_insert_execute(zbx_db_insert_t *db_insert)
 						zbx_chrcpy_alloc(&sql, &sql_alloc, &sql_offset, '\'');
 					break;
 				case ZBX_TYPE_BLOB:
-				case ZBX_TYPE_JSON:
 					zbx_chrcpy_alloc(&sql, &sql_alloc, &sql_offset, '\'');
 					if (NULL != value->str)
 						decode_and_escape_binary_value_for_sql(db_insert->db, &(value->str));
