@@ -497,11 +497,9 @@ function dbConditionInt($field_name, array $values, $not_in = false, $zero_inclu
 	$values = array_flip($values);
 
 	$condition = '';
-	$multiple_conditions = false;
 
 	if ($zero_includes_null && array_key_exists(0, $values)) {
 		$condition .= $field_name.($not_in ? ' IS NOT NULL' : ' IS NULL');
-		$multiple_conditions = true;
 	}
 
 	$values = array_keys($values);
@@ -514,6 +512,7 @@ function dbConditionInt($field_name, array $values, $not_in = false, $zero_inclu
 
 	// Limit maximum number of values for using in "IN (<id1>,<id2>,...,<idN>)".
 	$single_chunks = array_chunk($singles, 950);
+	$multiple_conditions = false;
 
 	foreach ($single_chunks as $chunk) {
 		if ($condition !== '') {
