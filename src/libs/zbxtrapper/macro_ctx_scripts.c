@@ -303,7 +303,10 @@ int	substitute_script_macros(char **data, char *error, int maxerrlen, int script
 	zbx_vector_uint64_destroy(&item_hosts);
 
 	if (NULL != user_names)
+	{
 		zbx_user_names_free(user_names);
+		zbx_free(user_names);
+	}
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 
