@@ -1492,7 +1492,8 @@ class CMacrosResolverGeneral {
 
 					foreach ($db_items as $db_item) {
 						foreach ($keys[$db_item['key_']] as $macro_data) {
-							if ($db_item['lastclock'] && $db_item['value_type'] != ITEM_VALUE_TYPE_BINARY) {
+							if ($db_item['lastclock'] && $db_item['value_type'] != ITEM_VALUE_TYPE_BINARY
+									&& $db_item['value_type'] != ITEM_VALUE_TYPE_JSON) {
 								$macro_values[$macro_data['macro']] = array_key_exists('macrofunc', $macro_data)
 									? CMacroFunction::calcMacrofunc($db_item['lastvalue'], $macro_data['macrofunc'])
 									: formatHistoryValue($db_item['lastvalue'], $db_item);

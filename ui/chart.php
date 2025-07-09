@@ -126,7 +126,7 @@ if (getRequest('widget_view') === '1') {
 }
 
 foreach ($items as $item) {
-	if ($item['value_type'] != ITEM_VALUE_TYPE_BINARY) {
+	if ($item['value_type'] != ITEM_VALUE_TYPE_BINARY && $item['value_type'] != ITEM_VALUE_TYPE_JSON) {
 		$graph->addItem($item + [
 			'color' => rgb2hex(get_next_color(1)),
 			'yaxisside' => GRAPH_YAXIS_SIDE_DEFAULT,

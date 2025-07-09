@@ -1590,7 +1590,8 @@ class CHistoryManager {
 			ITEM_VALUE_TYPE_LOG => 'log',
 			ITEM_VALUE_TYPE_UINT64 => 'uint',
 			ITEM_VALUE_TYPE_TEXT => 'text',
-			ITEM_VALUE_TYPE_BINARY => 'binary'
+			ITEM_VALUE_TYPE_BINARY => 'binary',
+			ITEM_VALUE_TYPE_JSON => 'json'
 		];
 
 		if (array_key_exists($value_type, $mapping)) {
@@ -1615,7 +1616,8 @@ class CHistoryManager {
 			'log' => ITEM_VALUE_TYPE_LOG,
 			'uint' => ITEM_VALUE_TYPE_UINT64,
 			'text' => ITEM_VALUE_TYPE_TEXT,
-			'binary' => ITEM_VALUE_TYPE_BINARY
+			'binary' => ITEM_VALUE_TYPE_BINARY,
+			'json' => ITEM_VALUE_TYPE_JSON
 		];
 
 		if (array_key_exists($type_name, $mapping)) {

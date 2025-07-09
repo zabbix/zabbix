@@ -261,6 +261,7 @@ function makeValueCell(array $column, array $item_value, bool $text_wordbreak = 
 		case ITEM_VALUE_TYPE_LOG:
 		case ITEM_VALUE_TYPE_STR:
 		case ITEM_VALUE_TYPE_TEXT:
+		case ITEM_VALUE_TYPE_JSON:
 			if (array_key_exists('highlights', $column)) {
 				foreach ($column['highlights'] as $highlight) {
 					if (@preg_match('('.$highlight['pattern'].')', $item_value['value'])) {

@@ -82,7 +82,7 @@ class CHistory extends CApiService {
 	 */
 	public function get($options = []) {
 		$value_types = [ITEM_VALUE_TYPE_FLOAT, ITEM_VALUE_TYPE_STR, ITEM_VALUE_TYPE_LOG, ITEM_VALUE_TYPE_UINT64,
-			ITEM_VALUE_TYPE_TEXT, ITEM_VALUE_TYPE_BINARY
+			ITEM_VALUE_TYPE_TEXT, ITEM_VALUE_TYPE_BINARY, ITEM_VALUE_TYPE_JSON
 		];
 
 		$api_input_rules = ['type' => API_OBJECT, 'fields' => [

@@ -395,7 +395,7 @@ class WidgetView extends CControllerDashboardWidgetView {
 		foreach ($db_items as $itemid => $db_item) {
 			$value_type_group = match ((int) $db_item['value_type']) {
 				ITEM_VALUE_TYPE_UINT64, ITEM_VALUE_TYPE_FLOAT => 'numeric',
-				ITEM_VALUE_TYPE_TEXT, ITEM_VALUE_TYPE_STR, ITEM_VALUE_TYPE_LOG => 'text',
+				ITEM_VALUE_TYPE_TEXT, ITEM_VALUE_TYPE_STR, ITEM_VALUE_TYPE_LOG, ITEM_VALUE_TYPE_JSON => 'text',
 				ITEM_VALUE_TYPE_BINARY => 'binary'
 			};
 

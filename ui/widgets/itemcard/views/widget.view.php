@@ -52,7 +52,8 @@ elseif ($data['item']) {
 					ITEM_VALUE_TYPE_STR => _('Character'),
 					ITEM_VALUE_TYPE_LOG => _('Log'),
 					ITEM_VALUE_TYPE_TEXT => _('Text'),
-					ITEM_VALUE_TYPE_BINARY => _('Binary')
+					ITEM_VALUE_TYPE_BINARY => _('Binary'),
+					ITEM_VALUE_TYPE_JSON => _('JSON')
 				];
 
 				$sections[] = makeSectionSingleParameter(_('Type of information'), $value_types[$item['value_type']]);
