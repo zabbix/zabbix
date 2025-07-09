@@ -292,6 +292,8 @@ class testDashboardSystemInformationWidget extends testSystemInformation {
 	}
 
 	public static function getSystemInformationDataForRunningServer() {
+		global $DB;
+
 		return [
 			// #0 Verify widget data that is available for user with super admin role.
 			[
@@ -300,7 +302,7 @@ class testDashboardSystemInformationWidget extends testSystemInformation {
 						[
 							'Parameter' => 'Zabbix server is running',
 							'Value' => 'Yes',
-							'Details' => 'localhost:0'
+							'Details' => $DB['SERVER'].':0'
 						],
 						[
 							'Parameter' => 'Zabbix server version',

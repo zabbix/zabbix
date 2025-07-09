@@ -114,12 +114,14 @@ class testPageReportsSystemInformation extends testSystemInformation {
 	 * @depends testPageReportsSystemInformation_checkEnabledHA
 	 */
 	public function testPageReportsSystemInformation_checkDataByRoleWithRunningServer() {
+		global $DB;
+
 		$data = [
 			'available_fields' => [
 				[
 					'Parameter' => 'Zabbix server is running',
 					'Value' => 'Yes',
-					'Details' => 'localhost:0'
+					'Details' => $DB['SERVER'].':0'
 				],
 				[
 					'Parameter' => 'Zabbix server version',
