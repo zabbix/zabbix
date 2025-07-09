@@ -1135,13 +1135,8 @@ abstract class testFormPreprocessing extends CWebTest {
 						['type' => 'Right trim', 'parameter_1' => '    22   '],
 						['type' => 'Left trim', 'parameter_1' => '   33  '],
 						['type' => 'Trim', 'parameter_1' => '   0    '],
-						['type' => 'XML XPath', 'parameter_1' => '   number(/values/Item)    '],
-						['type' => 'JSONPath', 'parameter_1' => '    $.data.key    '],
 						['type' => 'Matches regular expression', 'parameter_1' => '  expression    '],
 						['type' => 'Does not match regular expression', 'parameter_1' => '   not_expression   '],
-						['type' => 'JavaScript', 'parameter_1' => "   Test line 1  \n   Test line 2 \n   Test line  3   \n   \n "],
-						['type' => 'Check for error in JSON', 'parameter_1' => '   $.error     '],
-						['type' => 'Check for error in XML', 'parameter_1' => '   /tmp/path/   '],
 						['type' => 'Check for error using regular expression', 'parameter_1' => '   expression    ', 'parameter_2' => '    0      ']
 					]
 				]
@@ -1304,6 +1299,32 @@ abstract class testFormPreprocessing extends CWebTest {
 					],
 					'preprocessing' => [
 						['type' => 'JavaScript']
+					],
+					'error' => 'Invalid parameter "/1/preprocessing/1/params/1": cannot be empty.'
+				]
+			],
+			[
+				[
+					'expected' => TEST_BAD,
+					'fields' => [
+						'Name' => 'JavaScript with whitespaces',
+						'Key' => 'javascript-with-whitespaces[{#KEY}]'
+					],
+					'preprocessing' => [
+						['type' => 'JavaScript', 'parameter_1' => '         ']
+					],
+					'error' => 'Invalid parameter "/1/preprocessing/1/params/1": cannot be empty.'
+				]
+			],
+			[
+				[
+					'expected' => TEST_BAD,
+					'fields' => [
+						'Name' => 'JavaScript with linefeed',
+						'Key' => 'javascript-with-linefeed[{#KEY}]'
+					],
+					'preprocessing' => [
+						['type' => 'JavaScript', 'parameter_1' => "   \n   \n   "]
 					],
 					'error' => 'Invalid parameter "/1/preprocessing/1/params/1": cannot be empty.'
 				]
@@ -2970,6 +2991,61 @@ abstract class testFormPreprocessing extends CWebTest {
 						['type' => 'Prometheus to JSON', 'parameter_1' => '  metric  ']
 					]
 				]
+			],
+			[
+				[
+					'fields' => [
+						'Name' => 'XML XPath trailing spaces',
+						'Key' => 'xml-xpath-space-in-parameter[{#KEY}]'
+					],
+					'preprocessing' => [
+						['type' => 'XML XPath', 'parameter_1' => '   number(/values/Item)    ']
+					]
+				]
+			],
+			[
+				[
+					'fields' => [
+						'Name' => 'JSONPath trailing spaces',
+						'Key' => 'json-path-space-in-parameter[{#KEY}]'
+					],
+					'preprocessing' => [
+						['type' => 'JSONPath', 'parameter_1' => '    $.data.key    ']
+					]
+				]
+			],
+			[
+				[
+					'fields' => [
+						'Name' => 'Javascript trailing spaces',
+						'Key' => 'javascript-space-in-parameter[{#KEY}]'
+					],
+					'preprocessing' => [
+						['type' => 'JavaScript', 'parameter_1' => "  Test line 1 \n  Test line 2 \n  Test line  3  \n \n "]
+					]
+				]
+			],
+			[
+				[
+					'fields' => [
+						'Name' => 'Check for error in JSON trailing spaces',
+						'Key' => 'check-for-error-in-json-space-in-parameter[{#KEY}]'
+					],
+					'preprocessing' => [
+						['type' => 'Check for error in JSON', 'parameter_1' => '   $.error     ']
+					]
+				]
+			],
+			[
+				[
+					'fields' => [
+						'Name' => 'Check for error in XML trailing spaces',
+						'Key' => 'check-for-error-in-xml-space-in-parameter[{#KEY}]'
+					],
+					'preprocessing' => [
+						['type' => 'Check for error in XML', 'parameter_1' => '   /tmp/path/   ']
+					]
+				]
 			]
 		];
 	}
@@ -3500,7 +3576,7 @@ abstract class testFormPreprocessing extends CWebTest {
 						],
 						[
 							'type' => 'JavaScript',
-							'parameter_1' => "  Test line 1\n  Test line 2\nTest line 3  "
+							'parameter_1' => "Test line 1\n  Test line 2\nTest line 3"
 						]
 					]
 				]

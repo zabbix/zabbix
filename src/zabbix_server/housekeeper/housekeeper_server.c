@@ -1539,6 +1539,8 @@ ZBX_THREAD_ENTRY(housekeeper_thread, args)
 				d_sessions, d_services, d_audit, d_autoreg_host, records, sec, sleeptext);
 	}
 out:
+	zbx_ipc_async_socket_close(&rtc);
+
 	zbx_setproctitle("%s #%d [terminated]", get_process_type_string(process_type), process_num);
 
 	while (1)
