@@ -36,6 +36,7 @@
 #define ZBX_IPC_PREPROCESSOR_SIZE			10011
 #define ZBX_IPC_PREPROCESSOR_TOP_VALUES_NUM		10012
 #define ZBX_IPC_PREPROCESSOR_TOP_VALUES_SZ		10013
+#define ZBX_IPC_PREPROCESSOR_TOP_ELAPSED		10014
 
 /* item value data used in preprocessing manager */
 typedef struct

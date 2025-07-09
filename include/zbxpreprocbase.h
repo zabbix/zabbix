@@ -100,6 +100,7 @@ typedef struct
 
 	zbx_uint64_t		values_num;
 	zbx_uint64_t		values_sz;
+	zbx_uint64_t		elapsed;
 }
 zbx_pp_item_preproc_t;
 

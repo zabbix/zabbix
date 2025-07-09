@@ -161,7 +161,7 @@ static void	*pp_worker_entry(void *args)
 					break;
 			}
 
-			zbx_timekeeper_update(worker->timekeeper, worker->id - 1, ZBX_PROCESS_STATE_IDLE);
+			in->elapsed = zbx_timekeeper_update(worker->timekeeper, worker->id - 1, ZBX_PROCESS_STATE_IDLE);
 
 			pp_task_queue_lock(queue);
 			pp_task_queue_push_finished(queue, in);

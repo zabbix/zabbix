@@ -1288,6 +1288,16 @@ int	zbx_preprocessor_get_top_values_size(int limit, zbx_vector_pp_top_stats_ptr_
 
 /******************************************************************************
  *                                                                            *
+ * Purpose: get the top N items by the elapsed time                           *
+ *                                                                            *
+ ******************************************************************************/
+int	zbx_preprocessor_get_top_elapsed(int limit, zbx_vector_pp_top_stats_ptr_t *stats, char **error)
+{
+	return preprocessor_get_top_view(limit, stats, error, ZBX_IPC_PREPROCESSOR_TOP_ELAPSED);
+}
+
+/******************************************************************************
+ *                                                                            *
  * Purpose: get preprocessing manager diagnostic statistics                   *
  *                                                                            *
  ******************************************************************************/

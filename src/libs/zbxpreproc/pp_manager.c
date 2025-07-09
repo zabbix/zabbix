@@ -439,6 +439,8 @@ static void	pp_manager_queue_value_task_result(zbx_pp_manager_t *manager, zbx_pp
 	zbx_pp_task_value_t	*d = (zbx_pp_task_value_t *)PP_TASK_DATA(task);
 	zbx_pp_item_t		*item;
 
+	d->preproc->elapsed = task->elapsed;
+
 	if (ZBX_VARIANT_NONE == d->result.type)
 		return;
 
@@ -480,6 +482,8 @@ static zbx_pp_task_t	*pp_manager_queue_dependent_task_result(zbx_pp_manager_t *m
 	zbx_pp_task_t		*task_value = d->primary;
 	zbx_pp_task_value_t	*dp = (zbx_pp_task_value_t *)PP_TASK_DATA(task_value);
 
+	d->primary->elapsed = task->elapsed;
+
 	pp_manager_queue_value_task_result(manager, d->primary);
 	pp_manager_queue_dependents(manager, d->preproc, dp->um_handle, task_value->itemid, &dp->result, dp->ts, d->cache);
 
@@ -506,6 +510,8 @@ static zbx_pp_task_t	*pp_manager_requeue_next_sequence_task(zbx_pp_manager_t *ma
 
 	if (SUCCEED == zbx_list_pop(&d_seq->tasks, (void **)&task))
 	{
+		task->elapsed = task_seq->elapsed;
+
 		switch (task->type)
 		{
 			case ZBX_PP_TASK_VALUE:
@@ -677,7 +683,7 @@ static void	zbx_pp_manager_get_sequence_stats(zbx_pp_manager_t *manager, zbx_vec
 	pp_task_queue_get_sequence_stats(&manager->queue, stats);
 }
 
-static void	zbx_pp_manager_get_values_stats(zbx_pp_manager_t *manager, int is_num,
+static void	zbx_pp_manager_get_num_stats(zbx_pp_manager_t *manager, int request,
 		zbx_vector_pp_top_stats_ptr_t *stats)
 {
 	zbx_hashset_iter_t	iter;
@@ -693,7 +699,17 @@ static void	zbx_pp_manager_get_values_stats(zbx_pp_manager_t *manager, int is_nu
 		if (NULL ==  item->preproc)
 			continue;
 
-		num = 0 == is_num ? (zbx_int64_t)item->preproc->values_sz : (zbx_int64_t)item->preproc->values_num;
+		switch (request)
+		{
+			case ZBX_IPC_PREPROCESSOR_TOP_VALUES_NUM:
+				num =  (zbx_int64_t)item->preproc->values_num;
+				break;
+			case ZBX_IPC_PREPROCESSOR_TOP_VALUES_SZ:
+				num = (zbx_int64_t)item->preproc->values_sz;
+				break;
+			default:
+				num = (zbx_int64_t)(item->preproc->elapsed);
+		}
 
 		if (0 == num)
 			continue;
@@ -1174,12 +1190,10 @@ static void	preprocessor_reply_top_stats(zbx_pp_manager_t *manager, zbx_ipc_clie
 
 	if (ZBX_IPC_PREPROCESSOR_TOP_SEQUENCES == code)
 		zbx_pp_manager_get_sequence_stats(manager, &stats);
-	else if (ZBX_IPC_PREPROCESSOR_TOP_VALUES_NUM == code)
-		zbx_pp_manager_get_values_stats(manager, 1, &stats);
-	else if (ZBX_IPC_PREPROCESSOR_TOP_VALUES_SZ == code)
-		zbx_pp_manager_get_values_stats(manager, 0, &stats);
-	else
+	else if (ZBX_IPC_PREPROCESSOR_TOP_PEAK == code)
 		zbx_pp_manager_items_preproc_peak(manager, &stats);
+	else
+		zbx_pp_manager_get_num_stats(manager, code, &stats);
 
 	if (limit > stats.values_num)
 		limit = stats.values_num;
@@ -1413,6 +1427,7 @@ ZBX_THREAD_ENTRY(zbx_pp_manager_thread, args)
 				case ZBX_IPC_PREPROCESSOR_TOP_PEAK:
 				case ZBX_IPC_PREPROCESSOR_TOP_VALUES_NUM:
 				case ZBX_IPC_PREPROCESSOR_TOP_VALUES_SZ:
+				case ZBX_IPC_PREPROCESSOR_TOP_ELAPSED:
 					preprocessor_reply_top_stats(manager, client, message, message->code);
 					break;
 				case ZBX_IPC_PREPROCESSOR_USAGE_STATS:

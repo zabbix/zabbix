@@ -66,6 +66,7 @@ typedef struct
 	zbx_pp_task_state_t	state;
 	zbx_uint64_t		itemid;
 	zbx_uint64_t		hostid;
+	zbx_uint64_t		elapsed;
 	void			*data;
 }
 zbx_pp_task_t;
@@ -123,6 +124,7 @@ int	zbx_preprocessor_get_top_sequences(int limit, zbx_vector_pp_top_stats_ptr_t 
 int	zbx_preprocessor_get_top_peak(int limit, zbx_vector_pp_top_stats_ptr_t *stats, char **error);
 int	zbx_preprocessor_get_top_values_num(int limit, zbx_vector_pp_top_stats_ptr_t *stats, char **error);
 int	zbx_preprocessor_get_top_values_size(int limit, zbx_vector_pp_top_stats_ptr_t *stats, char **error);
+int	zbx_preprocessor_get_top_elapsed(int limit, zbx_vector_pp_top_stats_ptr_t *stats, char **error);
 int	zbx_preprocessor_test(unsigned char value_type, const char *value, const zbx_timespec_t *ts,
 		unsigned char state, const zbx_vector_pp_step_ptr_t *steps, zbx_vector_pp_result_ptr_t *results,
 		zbx_pp_history_t *history, char **error);
