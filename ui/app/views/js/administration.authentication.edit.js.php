@@ -265,7 +265,7 @@
 				'sign_messages', 'sign_assertions', 'sign_authn_requests', 'sign_logout_requests',
 				'sign_logout_responses', 'encrypt_nameid', 'encrypt_assertions'
 			].map(n => `[name="${n}"]`).join(',');
-		
+
 			return this.form.querySelectorAll(selector);
 		}
 
