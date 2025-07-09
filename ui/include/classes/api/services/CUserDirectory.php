@@ -607,7 +607,10 @@ class CUserDirectory extends CApiService {
 		self::addAffectedObjects($userdirectories, $db_userdirectories);
 
 		self::validateProvisionMedias($userdirectories, $db_userdirectories);
-		self::validateSpCertificateWithSecurityOptions($userdirectories, $db_userdirectories);
+
+		if (CAuthenticationHelper::isSamlCertsStorageDatabase()) {
+			self::validateSpCertificateWithSecurityOptions($userdirectories, $db_userdirectories);
+		}
 
 		self::checkDuplicates($userdirectories, $db_userdirectories);
 		self::checkProvisionGroups($userdirectories, $db_userdirectories);
@@ -1670,15 +1673,24 @@ class CUserDirectory extends CApiService {
 										['else' => true, 'type' => API_UNEXPECTED]
 			]],
 			'idp_certificate' =>	['type' => API_MULTIPLE, 'rules' => [
-										['if' => ['field' => 'idp_type', 'in' => IDP_TYPE_SAML], 'type' => API_SSL_CERTIFICATE, 'flags' => $api_required | API_NOT_EMPTY],
+										['if' => static fn(): bool => CAuthenticationHelper::isSamlCertsStorageDatabase(), 'type' => API_MULTIPLE, 'rules' => [
+											['if' => ['field' => 'idp_type', 'in' => IDP_TYPE_SAML], 'type' => API_SSL_CERTIFICATE, 'flags' => $api_required | API_NOT_EMPTY],
+											['else' => true, 'type' => API_STRING_UTF8, 'in' => DB::getDefault('userdirectory_saml', 'idp_certificate')]
+										]],
 										['else' => true, 'type' => API_STRING_UTF8, 'in' => DB::getDefault('userdirectory_saml', 'idp_certificate')]
 			]],
 			'sp_certificate' =>		['type' => API_MULTIPLE, 'rules' => [
-										['if' => ['field' => 'idp_type', 'in' => IDP_TYPE_SAML], 'type' => API_SSL_CERTIFICATE],
+										['if' => static fn(): bool => CAuthenticationHelper::isSamlCertsStorageDatabase(), 'type' => API_MULTIPLE, 'rules' => [
+											['if' => ['field' => 'idp_type', 'in' => IDP_TYPE_SAML], 'type' => API_SSL_CERTIFICATE],
+											['else' => true, 'type' => API_STRING_UTF8, 'in' => DB::getDefault('userdirectory_saml', 'sp_certificate')]
+										]],
 										['else' => true, 'type' => API_STRING_UTF8, 'in' => DB::getDefault('userdirectory_saml', 'sp_certificate')]
 			]],
 			'sp_private_key' =>		['type' => API_MULTIPLE, 'rules' => [
-										['if' => ['field' => 'idp_type', 'in' => IDP_TYPE_SAML], 'type' => API_SSL_PRIVATE_KEY],
+										['if' => static fn(): bool => CAuthenticationHelper::isSamlCertsStorageDatabase(), 'type' => API_MULTIPLE, 'rules' => [
+											['if' => ['field' => 'idp_type', 'in' => IDP_TYPE_SAML], 'type' => API_SSL_PRIVATE_KEY],
+											['else' => true, 'type' => API_STRING_UTF8, 'in' => DB::getDefault('userdirectory_saml', 'sp_private_key')]
+										]],
 										['else' => true, 'type' => API_STRING_UTF8, 'in' => DB::getDefault('userdirectory_saml', 'sp_private_key')]
 			]],
 			'provision_groups' =>	['type' => API_MULTIPLE, 'rules' => [
