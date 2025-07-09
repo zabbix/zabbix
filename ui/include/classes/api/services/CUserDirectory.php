@@ -92,8 +92,11 @@ class CUserDirectory extends CApiService {
 
 			$ldap_output = array_intersect($request_output, self::LDAP_OUTPUT_FIELDS);
 			$saml_output = array_intersect($request_output, self::SAML_OUTPUT_FIELDS);
-		}
 
+			if (!CAuthenticationHelper::isSamlCertsStorageDatabase()) {
+				$saml_output = array_diff($saml_output, array_keys(self::SAML_HASH_FIELDS));
+			}
+		}
 
 		$result = DBselect($this->createSelectQuery($this->tableName, $options), $options['limit']);
 		while ($row = DBfetch($result)) {
