@@ -252,7 +252,7 @@
 			});
 
 			if (this.saml_certs_editable) {
-				this.form.querySelectorAll('ul.list-check-radio').forEach(checkbox => {
+				[... this.#getSpCertificateCheckboxes()].forEach(checkbox => {
 					checkbox.addEventListener('change', () => {
 						this.#updateSpCertificateRequiredState();
 					})
@@ -260,13 +260,19 @@
 			}
 		}
 
-		#isSpCertificateRequired() {
+		#getSpCertificateCheckboxes() {
 			const selector = [
 				'sign_messages', 'sign_assertions', 'sign_authn_requests', 'sign_logout_requests',
 				'sign_logout_responses', 'encrypt_nameid', 'encrypt_assertions'
-			].map(n => `[name="${n}"]:checked`).join(',');
+			].map(n => `[name="${n}"]`).join(',');
+		
+			return this.form.querySelectorAll(selector);
+		}
 
-			return this.form.querySelector(selector) !== null;
+		#isSpCertificateRequired() {
+			const checked = [... this.#getSpCertificateCheckboxes()].filter(checkbox => checkbox.checked);
+
+			return checked.length > 0;
 		}
 
 		#updateSpCertificateRequiredState() {
