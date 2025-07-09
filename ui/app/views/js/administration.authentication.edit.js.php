@@ -252,7 +252,7 @@
 			});
 
 			if (this.saml_certs_editable) {
-				[... this.#getSpCertificateCheckboxes()].forEach(checkbox => {
+				[...this.#getSpCertificateCheckboxes()].forEach(checkbox => {
 					checkbox.addEventListener('change', () => {
 						this.#updateSpCertificateRequiredState();
 					})
@@ -270,7 +270,7 @@
 		}
 
 		#isSpCertificateRequired() {
-			const checked = [... this.#getSpCertificateCheckboxes()].filter(checkbox => checkbox.checked);
+			const checked = [...this.#getSpCertificateCheckboxes()].filter(checkbox => checkbox.checked);
 
 			return checked.length > 0;
 		}
