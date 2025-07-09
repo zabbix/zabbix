@@ -494,6 +494,8 @@ static void	proxyconfig_add_default_tables(zbx_vector_table_data_ptr_t *config_t
 	}
 }
 
+#ifdef ZBX_DEBUG
+
 /******************************************************************************
  *                                                                            *
  * Purpose: dump table data object contents                                   *
@@ -555,6 +557,7 @@ static void	proxyconfig_dump_data(const zbx_vector_table_data_ptr_t *config_tabl
 	for (i = 0; i < config_tables->values_num; i++)
 		proxyconfig_dump_table(config_tables->values[i]);
 }
+#endif
 
 /******************************************************************************
  *                                                                            *
@@ -2176,8 +2179,10 @@ int	zbx_proxyconfig_process(const char *addr, struct zbx_json_parse *jp, zbx_pro
 		if (SUCCEED != (ret = proxyconfig_parse_data(&jp_data, &config_tables, error)))
 			goto clean;
 
+#ifdef ZBX_DEBUG
 		if (SUCCEED == ZBX_CHECK_LOG_LEVEL(LOG_LEVEL_TRACE))
 			proxyconfig_dump_data(&config_tables);
+#endif
 
 		proxyconfig_add_default_tables(&config_tables);
 	}
