@@ -1147,7 +1147,9 @@ static int	process_trap(zbx_socket_t *sock, char *s, zbx_timespec_t *ts,
 
 	zbx_rtrim(s, " \r\n");
 
+#ifdef ZBX_DEBUG
 	zabbix_log(LOG_LEVEL_DEBUG, "trapper got '%s'", s);
+#endif
 
 	if ('{' == *s)	/* JSON protocol */
 	{
@@ -1164,6 +1166,8 @@ static int	process_trap(zbx_socket_t *sock, char *s, zbx_timespec_t *ts,
 
 		if (SUCCEED != zbx_json_value_by_name(&jp, ZBX_PROTO_TAG_REQUEST, value, sizeof(value), NULL))
 			return FAIL;
+
+		zabbix_log(LOG_LEVEL_DEBUG, "trapper received '%s' request", value);
 
 		if (0 == strcmp(value, ZBX_PROTO_VALUE_AGENT_DATA))
 		{
@@ -1236,6 +1240,7 @@ static int	process_trap(zbx_socket_t *sock, char *s, zbx_timespec_t *ts,
 	}
 	else if (0 == strncmp(s, "ZBX_GET_ACTIVE_CHECKS", 21))	/* request for list of active checks */
 	{
+		zabbix_log(LOG_LEVEL_DEBUG, "trapper received request for list of active checks");
 		ret = send_list_of_active_checks(sock, s, events_cbs, config_comms->config_timeout,
 				autoreg_update_host_cb);
 	}
@@ -1249,6 +1254,8 @@ static int	process_trap(zbx_socket_t *sock, char *s, zbx_timespec_t *ts,
 		zbx_host_key_t		hk = {host, key};
 		zbx_history_recv_item_t	item;
 		int			errcode;
+
+		zabbix_log(LOG_LEVEL_DEBUG, "trapper received request for history data");
 
 		if (SUCCEED == zbx_vps_monitor_capped())
 		{
