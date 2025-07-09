@@ -2895,7 +2895,14 @@ int	substitute_simple_macros_impl(const zbx_uint64_t *actionid, const zbx_db_eve
 	if (NULL != cause_recovery_event)
 		zbx_db_free_event(cause_recovery_event);
 out:
+#ifdef ZBX_DEBUG
+	if (ZBX_MACRO_ENV_SECURE == um_handle->macro_env)
+		zabbix_log(LOG_LEVEL_DEBUG, "End %s()", __func__);
+	else
+		zabbix_log(LOG_LEVEL_DEBUG, "End %s() data:'%s'", __func__, *data);
+#else
 	zabbix_log(LOG_LEVEL_DEBUG, "End %s() data:'%s'", __func__, *data);
+#endif
 
 	return res;
 }
