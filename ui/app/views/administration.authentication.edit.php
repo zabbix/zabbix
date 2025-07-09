@@ -814,7 +814,8 @@ $templates['mfa_methods_row'] = (string) (new CRow([
 		'saml_sp_private_key_exists' => $data['saml_certs_editable'] && $data['sp_private_key_hash'] !== '',
 		'saml_certificate_max_filesize' => CApiInputValidator::SSL_CERTIFICATE_MAX_LENGTH,
 		'saml_private_key_max_filesize' => CApiInputValidator::SSL_PRIVATE_KEY_MAX_LENGTH,
-		'saml_filesize_error_message' => _('File is too big, max upload size is %1$s bytes.')
+		'saml_filesize_error_message' => _('File is too big, max upload size is %1$s bytes.'),
+		'saml_certs_editable' => $data['saml_certs_editable']
 	]).');'
 ))
 	->setOnDocumentReady()

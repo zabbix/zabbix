@@ -25,7 +25,8 @@
 		init({ldap_servers, ldap_default_row_index, db_authentication_type, saml_provision_groups,
 				saml_provision_media, templates, mfa_methods, mfa_default_row_index, is_http_auth_allowed,
 				saml_idp_certificate_exists, saml_sp_certificate_exists, saml_sp_private_key_exists,
-				saml_certificate_max_filesize, saml_private_key_max_filesize, saml_filesize_error_message
+				saml_certificate_max_filesize, saml_private_key_max_filesize, saml_filesize_error_message,
+				saml_certs_editable
 		}) {
 			this.form = document.getElementById('authentication-form');
 			this.db_authentication_type = db_authentication_type;
@@ -48,6 +49,7 @@
 			this.saml_certificate_max_filesize = saml_certificate_max_filesize;
 			this.saml_private_key_max_filesize = saml_private_key_max_filesize;
 			this.saml_filesize_error_message = saml_filesize_error_message;
+			this.saml_certs_editable = saml_certs_editable;
 			const saml_readonly = !this.form.querySelector('[type="checkbox"][name="saml_auth_enabled"]').checked;
 			const ldap_disabled = this.ldap_auth_enabled === null || !this.ldap_auth_enabled.checked;
 			const mfa_readonly = !this.form.querySelector('[type="checkbox"][name="mfa_status"]').checked;
@@ -63,7 +65,10 @@
 			this.#addMfaMethods(mfa_methods, mfa_default_row_index);
 			this.#setTableVisiblityState(this.mfa_table, mfa_readonly);
 			this.#disableRemoveLinksWithUserGroups(this.mfa_table);
-			this.#updateSpCertificateRequiredState();
+
+			if (this.saml_certs_editable) {
+				this.#updateSpCertificateRequiredState();
+			}
 
 			this.form.querySelector('[type="checkbox"][name="saml_auth_enabled"]').dispatchEvent(new Event('change'));
 		}
@@ -246,11 +251,13 @@
 				}
 			});
 
-			this.form.querySelectorAll('ul.list-check-radio').forEach(checkbox => {
-				checkbox.addEventListener('change', () => {
-					this.#updateSpCertificateRequiredState();
-				})
-			});
+			if (this.saml_certs_editable) {
+				this.form.querySelectorAll('ul.list-check-radio').forEach(checkbox => {
+					checkbox.addEventListener('change', () => {
+						this.#updateSpCertificateRequiredState();
+					})
+				});
+			}
 		}
 
 		#isSpCertificateRequired() {
