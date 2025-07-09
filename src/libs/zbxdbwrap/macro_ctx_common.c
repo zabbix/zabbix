@@ -544,14 +544,18 @@ fail:
 
 static int	expr_db_get_event_symptoms(const zbx_db_event *event, char **replace_to)
 {
-	int			i, ret = FAIL;
+	int			ret = FAIL;
 	zbx_db_row_t		row;
 	zbx_db_result_t		result;
 	zbx_vector_uint64_t	symptom_eventids;
 
-	zbx_vector_uint64_create(&symptom_eventids);
+	if (NULL == (result = zbx_db_select("select eventid from event_symptom where cause_eventid=" ZBX_FS_UI64,
+			event->eventid)))
+	{
+		return FAIL;
+	}
 
-	result = zbx_db_select("select eventid from event_symptom where cause_eventid=" ZBX_FS_UI64, event->eventid);
+	zbx_vector_uint64_create(&symptom_eventids);
 
 	while (NULL != (row = zbx_db_fetch(result)))
 	{
@@ -575,7 +579,7 @@ static int	expr_db_get_event_symptoms(const zbx_db_event *event, char **replace_
 		zbx_vector_eventdata_sort(&symptoms, (zbx_compare_func_t)zbx_eventdata_compare);
 		ret = zbx_eventdata_to_str(&symptoms, replace_to);
 
-		for (i = 0; i < symptoms.values_num; i++)
+		for (int i = 0; i < symptoms.values_num; i++)
 			zbx_eventdata_free(&symptoms.values[i]);
 
 		zbx_vector_eventdata_destroy(&symptoms);
@@ -952,7 +956,6 @@ static int	resolve_host_target_macros(const char *m, const zbx_dc_host_t *dc_hos
  ******************************************************************************/
 static void	expr_db_get_rootcause(const zbx_db_service *service, char **replace_to)
 {
-	int			i;
 	zbx_vector_eventdata_t	rootcauses;
 
 	zbx_vector_eventdata_create(&rootcauses);
@@ -961,7 +964,7 @@ static void	expr_db_get_rootcause(const zbx_db_service *service, char **replace_
 	zbx_vector_eventdata_sort(&rootcauses, (zbx_compare_func_t)zbx_eventdata_compare);
 	zbx_eventdata_to_str(&rootcauses, replace_to);
 
-	for (i = 0; i < rootcauses.values_num; i++)
+	for (int i = 0; i < rootcauses.values_num; i++)
 		zbx_eventdata_free(&rootcauses.values[i]);
 
 	zbx_vector_eventdata_destroy(&rootcauses);
