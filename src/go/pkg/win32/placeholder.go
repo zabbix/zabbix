@@ -1,5 +1,4 @@
 //go:build !windows
-// +build !windows
 
 /*
 ** Copyright (C) 2001-2025 Zabbix SIA

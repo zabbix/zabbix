@@ -4,7 +4,7 @@ msgstr ""
 "Project-Id-Version: Zabbix 6.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2023-10-19 13:48+0300\n"
-"PO-Revision-Date: 2025-06-04 08:01+0000\n"
+"PO-Revision-Date: 2025-06-06 02:58+0000\n"
 "Last-Translator: Akira <g42getd@gmail.com>\n"
 "Language-Team: Zabbix\n"
 "Language: ja\n"
@@ -21306,7 +21306,7 @@ msgstr "TimescaleDBのバージョンを取得できません。"
 #: include/views/mfa.login.php:65
 #, c-format
 msgid "Unable to scan? You can use %1$s secret key to manually configure your authenticator app:"
-msgstr "スキャンできませんか？%1$s の秘密鍵を使用して認証アプリを手動で設定できます:"
+msgstr "スキャンできませんか？%1$sの秘密鍵を使用して認証アプリを手動で設定できます:"
 
 #: include/classes/db/DbBackend.php:147
 msgid "Unable to select configuration."
@@ -23205,16 +23205,16 @@ msgstr "障害あり"
 
 #: widgets/tophosts/views/column.edit.php:130
 msgid "With this setting only numeric data will be displayed."
-msgstr ""
+msgstr "この設定では数値データのみが表示されます。"
 
 #: widgets/tophosts/views/column.edit.php:135
 msgid "With this setting only numeric items will be displayed in this column."
-msgstr "この設定では、数値アイテムだけがこの列内に表示されます。"
+msgstr "この設定では数値アイテムのみがこの列に表示されます。"
 
 #: widgets/item/views/widget.edit.php:70
 #: widgets/tophosts/views/column.edit.php:225
 msgid "With this setting only numeric items will be displayed."
-msgstr ""
+msgstr "この設定では数値アイテムのみが表示されます。"
 
 #: include/forms.inc.php:339 include/forms.inc.php:557
 msgid "With triggers"
@@ -23798,37 +23798,37 @@ msgstr "acos() - 角度の値のアークコサイン、ラジアンで示す"
 #: include/classes/api/services/CDRule.php:774
 #, c-format
 msgid "action \"%1$s\" uses this discovery check"
-msgstr ""
+msgstr "アクション\"%1$s\"はこのディスカバリチェックを使用します"
 
 #: include/classes/api/services/CDRule.php:981
 #, c-format
 msgid "action \"%1$s\" uses this discovery rule"
-msgstr ""
+msgstr "アクション\"%1$s\"はこのディスカバリルールを使用します"
 
 #: include/classes/api/services/CHost.php:1637
 #, c-format
 msgid "action \"%1$s\" uses this host"
-msgstr ""
+msgstr "アクション\"%1$s\"はこのホストを使用します"
 
 #: include/classes/api/services/CHostGroup.php:770
 #, c-format
 msgid "action \"%1$s\" uses this host group"
-msgstr ""
+msgstr "アクション\"%1$s\"はこのホストグループを使用します"
 
 #: include/classes/api/services/CService.php:487
 #, c-format
 msgid "action \"%1$s\" uses this service"
-msgstr ""
+msgstr "アクション\"%1$s\"はこのサービスを使用します"
 
 #: include/classes/api/services/CTemplate.php:810
 #, c-format
 msgid "action \"%1$s\" uses this template"
-msgstr ""
+msgstr "アクション\"%1$s\"はこのテンプレートを使用します"
 
 #: include/classes/api/managers/CTriggerManager.php:127
 #, c-format
 msgid "action \"%1$s\" uses this trigger"
-msgstr ""
+msgstr "アクション\"%1$s\"はこのトリガーを使用します"
 
 #: app/partials/monitoring.charts.subfilter.php:182
 #: app/partials/monitoring.latest.subfilter.php:186 include/forms.inc.php:144
@@ -24490,11 +24490,11 @@ msgstr "すべてのアクションを表示"
 
 #: app/views/mediatype.list.php:80
 msgid "display only actions where All available media types are used in action operation"
-msgstr ""
+msgstr "アクション操作で利用可能なメディアタイプすべてが使用されているアクションのみを表示します"
 
 #: app/views/mediatype.list.php:84
 msgid "display only actions where specific media type is used in action operation"
-msgstr ""
+msgstr "アクション操作で特定のメディアタイプが使用されているアクションのみを表示します"
 
 #: app/views/popup.lldoperation.php:65 include/actions.inc.php:27
 #: include/classes/helpers/CCorrelationHelper.php:37
@@ -24665,11 +24665,11 @@ msgstr "H:i:s"
 
 #: include/html.inc.php:709 include/html.inc.php:714 include/html.inc.php:719
 msgid "has been disabled"
-msgstr ""
+msgstr "無効化されました"
 
 #: include/html.inc.php:725
 msgid "has been manually disabled"
-msgstr ""
+msgstr "手動で無効化されました"
 
 #: include/classes/import/validators/C10XmlValidator.php:340
 msgctxt "XML time format"
@@ -25858,7 +25858,7 @@ msgstr "timeleft() - 期間Tに基づく閾値に達するまでの時間"
 
 #: include/classes/api/services/CProxy.php:835
 msgid "timeouts are disabled because the proxy and server versions do not match"
-msgstr ""
+msgstr "プロキシとサーバーのバージョンが一致しないため、タイムアウトは無効になっています。"
 
 #: include/views/configuration.item.edit.php:643
 #: include/views/configuration.item.prototype.edit.php:614
@@ -26267,30 +26267,30 @@ msgstr "「*」を利用したワイルドカード指定が可能です"
 #: include/html.inc.php:806
 #, c-format
 msgid "will be deleted in %1$s"
-msgstr ""
+msgstr "%1$sで削除されます"
 
 #: include/html.inc.php:679 include/html.inc.php:720 include/html.inc.php:735
 #: include/html.inc.php:801
 msgid "will be deleted the next time discovery rule is processed"
-msgstr "次のディスカバリルールの処理時に削除されます。"
+msgstr "次のディスカバリルールの処理時に削除されます"
 
 #: include/html.inc.php:747 include/html.inc.php:770
 #, c-format
 msgid "will be disabled in %1$s"
-msgstr ""
+msgstr "%1$sで無効化されます"
 
 #: include/html.inc.php:753 include/html.inc.php:764
 msgid "will be disabled the next time discovery rule is processed"
-msgstr "次のディスカバリルールの処理時に無効になります。"
+msgstr "次のディスカバリルールの処理時に無効化されます"
 
 #: include/html.inc.php:715 include/html.inc.php:726 include/html.inc.php:759
 #: include/html.inc.php:796
 msgid "will not be deleted"
-msgstr ""
+msgstr "削除されません"
 
 #: include/html.inc.php:741 include/html.inc.php:776
 msgid "will not be disabled"
-msgstr ""
+msgstr "無効化されません"
 
 #: app/controllers/CControllerItemMassCheckNow.php:122
 #: include/classes/api/services/CTask.php:553
