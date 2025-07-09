@@ -29,16 +29,6 @@ class testDashboardSystemInformationWidget extends testSystemInformation {
 	public static $widgets_dashboardid;		// Dashboard for checking creation and update of system information widgets.
 
 	/**
-	 * Attach MessageBehavior and CTableBehavior to the test.
-	 */
-	public function getBehaviors() {
-		return [
-			CMessageBehavior::class,
-			CTableBehavior::class
-		];
-	}
-
-	/**
 	 * Function creates dashboards with widgets for test and defines the corresponding dashboard IDs.
 	 */
 	public static function prepareDashboardData() {
@@ -167,7 +157,7 @@ class testDashboardSystemInformationWidget extends testSystemInformation {
 
 	public static function getSystemInformationData() {
 		return [
-			// #0.
+			// #0 Verify widget data that is available for user with super admin role.
 			[
 				[
 					'available_fields' => [
@@ -224,7 +214,7 @@ class testDashboardSystemInformationWidget extends testSystemInformation {
 					]
 				]
 			],
-			// #1.
+			// #1 Verify widget data that is available for user with admin role.
 			[
 				[
 					'user' => 'admin for system information test',
@@ -243,7 +233,7 @@ class testDashboardSystemInformationWidget extends testSystemInformation {
 					]
 				]
 			],
-			// #2.
+			// #2 Verify widget data that is available for user with user role.
 			[
 				[
 					'user' => 'user for system information test',
@@ -262,7 +252,7 @@ class testDashboardSystemInformationWidget extends testSystemInformation {
 					]
 				]
 			],
-			// #3.
+			// #3 Verify widget data that is available for guest role.
 			[
 				[
 					'guest' => true,
@@ -289,7 +279,7 @@ class testDashboardSystemInformationWidget extends testSystemInformation {
 	 *
 	 * @dataProvider getSystemInformationData
 	 */
-	public function testDashboardSystemInformationWidget_checkAvailableDataByUserRole($data) {
+	public function testDashboardSystemInformationWidget_checkDataByRoleWithoutRunningServer($data) {
 		$this->assertAvailableDataByUserRole($data, self::$dashboardid);
 	}
 
@@ -299,6 +289,138 @@ class testDashboardSystemInformationWidget extends testSystemInformation {
 	public function testDashboardSystemInformationWidget_checkEnabledHA() {
 		$this->assertEnabledHACluster(self::$dashboardid);
 		$this->assertScreenshotExcept(CDashboardElement::find()->one(), self::$skip_fields, 'widgets_with_ha');
+	}
+
+	public static function getSystemInformationDataForRunningServer() {
+		global $DB;
+
+		return [
+			// #0 Verify widget data that is available for user with super admin role.
+			[
+				[
+					'available_fields' => [
+						[
+							'Parameter' => 'Zabbix server is running',
+							'Value' => 'Yes',
+							'Details' => $DB['SERVER'].':0'
+						],
+						[
+							'Parameter' => 'Zabbix server version',
+							'Value' => '',
+							'Details' => ''
+						],
+						[
+							'Parameter' => 'Zabbix frontend version',
+							'Value' => ZABBIX_VERSION,
+							'Details' => ''
+						],
+						[
+							'Parameter' => 'Number of hosts (enabled/disabled)',
+							'Value' => '',
+							'Details' => ''
+						],
+						[
+							'Parameter' => 'Number of templates',
+							'Value' => '',
+							'Details' => ''
+						],
+						[
+							'Parameter' => 'Number of items (enabled/disabled/not supported)',
+							'Value' => '',
+							'Details' => ''
+						],
+						[
+							'Parameter' => 'Number of triggers (enabled/disabled [problem/ok])',
+							'Value' => '',
+							'Details' => ''
+						],
+						[
+							'Parameter' => 'Number of users (online)',
+							'Value' => '',
+							'Details' => ''
+						],
+						[
+							'Parameter' => 'Required server performance, new values per second',
+							'Value' => '',
+							'Details' => ''
+						],
+						[
+							'Parameter' => 'High availability cluster',
+							'Value' => 'Enabled',
+							'Details' => 'Fail-over delay: 1 minute'
+						]
+					]
+				]
+			],
+			// #1 Verify widget data that is available for user with admin role.
+			[
+				[
+					'user' => 'admin for system information test',
+					'password' => 'z@$$ix!#%1',
+					'available_fields' => [
+						[
+							'Parameter' => 'Zabbix server is running',
+							'Value' => 'Yes',
+							'Details' => ''
+						],
+						[
+							'Parameter' => 'Zabbix frontend version',
+							'Value' => ZABBIX_VERSION,
+							'Details' => ''
+						]
+					]
+				]
+			],
+			// #2 Verify widget data that is available for user with user role.
+			[
+				[
+					'user' => 'user for system information test',
+					'password' => 'z@$$ix!#%2',
+					'available_fields' => [
+						[
+							'Parameter' => 'Zabbix server is running',
+							'Value' => 'Yes',
+							'Details' => ''
+						],
+						[
+							'Parameter' => 'Zabbix frontend version',
+							'Value' => ZABBIX_VERSION,
+							'Details' => ''
+						]
+					]
+				]
+			],
+			// #3 Verify widget data that is available for user with guest role.
+			[
+				[
+					'guest' => true,
+					'available_fields' => [
+						[
+							'Parameter' => 'Zabbix server is running',
+							'Value' => 'Yes',
+							'Details' => ''
+						],
+						[
+							'Parameter' => 'Zabbix frontend version',
+							'Value' => ZABBIX_VERSION,
+							'Details' => ''
+						]
+					]
+				]
+			]
+		];
+	}
+
+	/**
+	 * Function checks which information users see on system information widget.
+	 * Note: in this case data is checked with running server.
+	 *
+	 * @depends testDashboardSystemInformationWidget_checkEnabledHA
+	 *
+	 * @dataProvider getSystemInformationDataForRunningServer
+	 */
+	public function testDashboardSystemInformationWidget_checkDataByRoleWithRunningServer($data) {
+		$this->assertAvailableDataByUserRole($data, self::$dashboardid);
 	}
 
 	/**

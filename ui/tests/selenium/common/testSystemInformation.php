@@ -19,6 +19,16 @@ require_once __DIR__.'/../../include/helpers/CDataHelper.php';
 
 class testSystemInformation extends CWebTest {
 
+	/**
+	 * Attach MessageBehavior and CTableBehavior to the test.
+	 */
+	public function getBehaviors() {
+		return [
+			CMessageBehavior::class,
+			CTableBehavior::class
+		];
+	}
+
 	const FAILOVER_DELAY = 20;
 
 	public static $active_lastaccess;
@@ -249,7 +259,7 @@ class testSystemInformation extends CWebTest {
 			$this->page->userLogin($data['user'], $data['password'])->open($url)->waitUntilReady();
 		}
 		else {
-			$this->page->Login()->open($url)->waitUntilReady();
+			$this->page->login()->open($url)->waitUntilReady();
 		}
 
 		if (!$dashboardid) {
