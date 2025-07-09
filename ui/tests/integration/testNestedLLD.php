@@ -1671,7 +1671,6 @@ class testNestedLLD extends CIntegrationTest{
 		], 60, 1);
 		$this->assertCount(count($dbs), $response['result'], 'expected host(s) was not discovered');
 
-
 		for ($i = 0; $i < count($dbs); $i++) {
 			$db = $dbs[$i];
 			$host = $response['result'][$i];
