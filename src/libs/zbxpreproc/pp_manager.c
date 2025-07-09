@@ -448,7 +448,7 @@ static void	pp_manager_queue_value_task_result(zbx_pp_manager_t *manager, zbx_pp
 		zbx_pp_task_t	*dep_task;
 		zbx_variant_t	value;
 
-		dep_task = pp_task_dependent_create(task->itemid, d->preproc);
+		dep_task = pp_task_dependent_create(item->itemid, d->preproc);
 		zbx_pp_task_dependent_t	*d_dep = (zbx_pp_task_dependent_t *)PP_TASK_DATA(dep_task);
 
 		d_dep->cache = pp_cache_create(item->preproc, &d->result);
@@ -1349,6 +1349,7 @@ ZBX_THREAD_ENTRY(zbx_pp_manager_thread, args)
 
 	while (ZBX_IS_RUNNING())
 	{
+		int		shutdown = 0;
 		double		time_now = zbx_time();
 		zbx_uint64_t	direct_num = 0;
 
@@ -1425,7 +1426,8 @@ ZBX_THREAD_ENTRY(zbx_pp_manager_thread, args)
 					break;
 				case ZBX_RTC_SHUTDOWN:
 					zabbix_log(LOG_LEVEL_DEBUG, "shutdown message received, terminating...");
-					goto out;
+					shutdown = 1;
+					break;
 			}
 
 			zbx_ipc_message_free(message);
@@ -1433,6 +1435,9 @@ ZBX_THREAD_ENTRY(zbx_pp_manager_thread, args)
 
 		if (NULL != client)
 			zbx_ipc_client_release(client);
+
+		if (1 == shutdown)
+			break;
 
 		zbx_pp_manager_process_finished(manager, &tasks, &pending_num, &processing_num, &finished_num);
 
@@ -1484,13 +1489,15 @@ ZBX_THREAD_ENTRY(zbx_pp_manager_thread, args)
 			time_trim = sec;
 		}
 	}
-out:
+
 	zbx_setproctitle("%s #%d [terminating]", get_process_type_string(process_type), process_num);
 
 	zbx_vector_pp_task_ptr_destroy(&tasks);
 	zbx_pp_manager_free(manager);
 
 	zbx_ipc_service_close(&service);
+
+	zbx_setproctitle("%s #%d [terminated]", get_process_type_string(process_type), process_num);
 
 	exit(EXIT_SUCCESS);
 #undef STAT_INTERVAL

@@ -838,6 +838,7 @@ ZBX_THREAD_ENTRY(zbx_async_poller_thread, args)
 	if (ZBX_POLLER_TYPE_SNMP == poller_type)
 		zbx_destroy_snmp_engineid_cache();
 #endif
+	zbx_ipc_async_socket_close(&rtc);
 
 	zbx_setproctitle("%s #%d [terminated]", get_process_type_string(process_type), process_num);
 
