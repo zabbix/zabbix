@@ -30,7 +30,7 @@ static int	DBpatch_7050000(void)
 					{"itemid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, ZBX_NOTNULL, 0},
 					{"clock", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0},
 					{"ns", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0},
-					{"value", "{}", NULL, NULL, 0, ZBX_TYPE_JSON, ZBX_NOTNULL, 0},
+					{"value", NULL, NULL, NULL, 0, ZBX_TYPE_JSON, ZBX_NOTNULL, 0},
 					{0}
 				},
 				NULL
