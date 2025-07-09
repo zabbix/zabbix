@@ -120,7 +120,8 @@ class testPageReportsSystemInformation extends testSystemInformation {
 			'available_fields' => [
 				[
 					'Parameter' => 'Zabbix server is running',
-					'Value' => 'Yes',
+					// TODO: should be changed to 'Yes' if ZBX-26532 will be fixed.
+					'Value' => 'No',
 					'Details' => $DB['SERVER'].':0'
 				],
 				[
