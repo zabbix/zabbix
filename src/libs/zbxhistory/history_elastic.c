@@ -35,7 +35,7 @@
 #define		ZBX_IDX_JSON_ALLOCATE		256
 #define		ZBX_JSON_ALLOCATE		2048
 
-const char	*value_type_str[] = {"dbl", "str", "log", "uint", "text"};
+const char	*value_type_str[] = {"dbl", "str", "log", "uint", "text", "json"};
 
 static zbx_uint32_t	ZBX_ELASTIC_SVERSION = ZBX_DBVERSION_UNDEFINED;
 
@@ -102,6 +102,7 @@ static zbx_history_value_t	history_str2value(char *str, unsigned char value_type
 			break;
 		case ITEM_VALUE_TYPE_STR:
 		case ITEM_VALUE_TYPE_TEXT:
+		case ITEM_VALUE_TYPE_JSON:
 			value.str = zbx_strdup(NULL, str);
 			break;
 		case ITEM_VALUE_TYPE_FLOAT:
@@ -111,7 +112,6 @@ static zbx_history_value_t	history_str2value(char *str, unsigned char value_type
 			ZBX_STR2UINT64(value.ui64, str);
 			break;
 		case ITEM_VALUE_TYPE_BIN:
-		case ITEM_VALUE_TYPE_JSON:
 		case ITEM_VALUE_TYPE_NONE:
 		default:
 			THIS_SHOULD_NEVER_HAPPEN;
@@ -129,6 +129,7 @@ static const char	*history_value2str(const zbx_dc_history_t *h)
 	{
 		case ITEM_VALUE_TYPE_STR:
 		case ITEM_VALUE_TYPE_TEXT:
+		case ITEM_VALUE_TYPE_JSON:
 			return h->value.str;
 		case ITEM_VALUE_TYPE_LOG:
 			return h->value.log->value;
@@ -139,7 +140,6 @@ static const char	*history_value2str(const zbx_dc_history_t *h)
 			zbx_snprintf(buffer, sizeof(buffer), ZBX_FS_UI64, h->value.ui64);
 			break;
 		case ITEM_VALUE_TYPE_BIN:
-		case ITEM_VALUE_TYPE_JSON:
 		case ITEM_VALUE_TYPE_NONE:
 		default:
 			THIS_SHOULD_NEVER_HAPPEN;
