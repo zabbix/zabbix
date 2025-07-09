@@ -630,22 +630,22 @@ class CZabbixServer {
 			return null;
 		}
 
-		if (!self::checkTLSFile($this->tls_config['CA_FILE'])) {
-			$this->error = _('TLS fields are misconfigured or the files are not accessible.');
+		if ($error_message = self::checkTLSFile('CA_FILE', $this->tls_config['CA_FILE'])) {
+			$this->error = $error_message;
 			$this->error_code = self::ERROR_CODE_TLS;
 
 			return null;
 		}
 
-		if (!self::checkTLSFile($this->tls_config['KEY_FILE'])) {
-			$this->error = _('TLS fields are misconfigured or the files are not accessible.');
+		if ($error_message = self::checkTLSFile('KEY_FILE', $this->tls_config['KEY_FILE'])) {
+			$this->error = $error_message;
 			$this->error_code = self::ERROR_CODE_TLS;
 
 			return null;
 		}
 
-		if (!self::checkTLSFile($this->tls_config['CERT_FILE'])) {
-			$this->error = _('TLS fields are misconfigured or the files are not accessible.');
+		if ($error_message = self::checkTLSFile('CERT_FILE', $this->tls_config['CERT_FILE'])) {
+			$this->error = $error_message;
 			$this->error_code = self::ERROR_CODE_TLS;
 
 			return null;
@@ -723,12 +723,33 @@ class CZabbixServer {
 		);
 	}
 
-	protected static function checkTLSFile(string $file_path): bool {
-		if ($file_path === '' || !file_exists($file_path) || !is_readable($file_path)) {
-			return false;
+	protected static function checkTLSFile(string $type, string $path): ?string {
+		$configFields = [
+			'CA_FILE' => _('TLS CA file'),
+			'KEY_FILE' => _('TLS key file'),
+			'CERT_FILE' => _('TLS certificate file')
+		];
+		$error_message = null;
+
+		if ($path === '') {
+			$error_message = _s('%1$s: %2$s.', $configFields[$type], _('cannot be empty'));
+		}
+		elseif (!file_exists($path)) {
+			$error_message = _s('%1$s: invalid path or file not found.', $configFields[$type]);
+		}
+		elseif (!is_readable($path)) {
+			$error_message = _s('%1$s: file is not readable.', $configFields[$type]);
 		}
 
-		return true;
+		if ($error_message !== null) {
+			CMessageHelper::addMessage([
+				'type' => CMessageHelper::MESSAGE_TYPE_ERROR,
+				'message' => $error_message,
+				'is_technical_error' => false
+			]);
+		}
+
+		return $error_message;
 	}
 
 	/**

@@ -1445,21 +1445,42 @@ class CSetupWizard extends CForm {
 		return $result;
 	}
 
-	private function checkServerTLSConfiguration() {
+	private function checkServerTLSConfiguration(): bool {
 		if ($this->getConfig('ZBX_SERVER_TLS') == 0) {
 			return true;
 		}
 
-		$configFields = ['ZBX_SERVER_TLS_CA_FILE', 'ZBX_SERVER_TLS_KEY_FILE', 'ZBX_SERVER_TLS_CERT_FILE'];
+		$configFields = [
+			'ZBX_SERVER_TLS_CA_FILE' => _('TLS CA file'),
+			'ZBX_SERVER_TLS_KEY_FILE' => _('TLS key file'),
+			'ZBX_SERVER_TLS_CERT_FILE' => _('TLS certificate file')
+		];
+		$has_error = false;
 
-		foreach ($configFields as $field) {
+		foreach ($configFields as $field => $field_label) {
 			$path = $this->getConfig($field, '');
+			$error_message = null;
 
-			if ($path === '' || !file_exists($path) || !is_readable($path)) {
-				return false;
+			if ($path === '') {
+				$error_message = _s('%1$s: %2$s.', $field_label, _('cannot be empty'));
+			}
+			elseif (!file_exists($path)) {
+				$error_message = _s('%1$s: invalid path or file not found.', $field_label);
+			}
+			elseif (!is_readable($path)) {
+				$error_message = _s('%1$s: file is not readable.', $field_label);
+			}
+
+			if ($error_message !== null) {
+				$has_error = true;
+				CMessageHelper::addMessage([
+					'type' => CMessageHelper::MESSAGE_TYPE_ERROR,
+					'message' => $error_message,
+					'is_technical_error' => false
+				]);
 			}
 		}
 
-		return true;
+		return !$has_error;
 	}
 }
