@@ -137,6 +137,11 @@ int	zbx_diag_add_preproc_info(const struct zbx_json_parse *jp, struct zbx_json *
 					zbx_get_top_cb = zbx_preprocessor_get_top_elapsed;
 					name = "elapsed";
 				}
+				else if (0 == strcmp(map->name, "elapsed_cumulative"))
+				{
+					zbx_get_top_cb = zbx_preprocessor_get_top_elapsed_cumulative;
+					name = "elapsed_cumulative";
+				}
 				else
 				{
 					*error = zbx_dsprintf(*error, "Unsupported top field: %s", map->name);

@@ -1298,6 +1298,16 @@ int	zbx_preprocessor_get_top_elapsed(int limit, zbx_vector_pp_top_stats_ptr_t *s
 
 /******************************************************************************
  *                                                                            *
+ * Purpose: get the top N items by the total elapsed time                     *
+ *                                                                            *
+ ******************************************************************************/
+int	zbx_preprocessor_get_top_elapsed_cumulative(int limit, zbx_vector_pp_top_stats_ptr_t *stats, char **error)
+{
+	return preprocessor_get_top_view(limit, stats, error, ZBX_IPC_PREPROCESSOR_TOP_ELAPSED_CUMULATIVE);
+}
+
+/******************************************************************************
+ *                                                                            *
  * Purpose: get preprocessing manager diagnostic statistics                   *
  *                                                                            *
  ******************************************************************************/
