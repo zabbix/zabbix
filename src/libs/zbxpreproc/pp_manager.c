@@ -1089,6 +1089,25 @@ static void	preprocessor_flush_tasks(zbx_pp_manager_t *manager, zbx_vector_pp_ta
 	}
 }
 
+static zbx_uint64_t	zbx_pp_manager_items_history_size(zbx_pp_manager_t *manager)
+{
+	zbx_hashset_iter_t	iter;
+	zbx_pp_item_t		*item;
+	zbx_uint64_t		history_size = 0;
+
+	zbx_hashset_iter_reset(&manager->items, &iter);
+
+	while (NULL != (item = (zbx_pp_item_t *)zbx_hashset_iter_next(&iter)))
+	{
+		if (NULL ==  item->preproc)
+			continue;
+
+		history_size += zbx_pp_history_cache_history_size(item->preproc->history_cache);
+	}
+
+	return history_size;
+}
+
 /******************************************************************************
  *                                                                            *
  * Purpose: respond to diagnostic information request                         *
@@ -1097,13 +1116,14 @@ static void	preprocessor_flush_tasks(zbx_pp_manager_t *manager, zbx_vector_pp_ta
 static void	preprocessor_reply_diag_info(zbx_pp_manager_t *manager, zbx_ipc_client_t *client,
 		zbx_uint64_t queued_num, zbx_uint64_t queued_sz, zbx_uint64_t direct_num, zbx_uint64_t direct_sz)
 {
-	zbx_uint64_t	preproc_num, pending_num, finished_num, sequences_num;
+	zbx_uint64_t	preproc_num, pending_num, finished_num, sequences_num, history_sz;
 	unsigned char	*data;
 	zbx_uint32_t	data_len;
 
+	history_sz = zbx_pp_manager_items_history_size(manager);
 	zbx_pp_manager_get_diag_stats(manager, &preproc_num, &pending_num, &finished_num, &sequences_num);
 	data_len = zbx_preprocessor_pack_diag_stats(&data, preproc_num, pending_num, finished_num, sequences_num,
-			queued_num, queued_sz, direct_num, direct_sz);
+			queued_num, queued_sz, direct_num, direct_sz, history_sz);
 
 	zbx_ipc_client_send(client, ZBX_IPC_PREPROCESSOR_DIAG_STATS_RESULT, data, data_len);
 

@@ -119,7 +119,8 @@ void	zbx_preprocess_item_value(zbx_uint64_t itemid, zbx_uint64_t hostid, unsigne
 void	zbx_preprocessor_flush(void);
 int	zbx_preprocessor_get_diag_stats(zbx_uint64_t *preproc_num, zbx_uint64_t *pending_num,
 		zbx_uint64_t *finished_num, zbx_uint64_t *sequences_num, zbx_uint64_t *queued_num,
-		zbx_uint64_t *queued_sz, zbx_uint64_t *direct_num, zbx_uint64_t *direct_sz, char **error);
+		zbx_uint64_t *queued_sz, zbx_uint64_t *direct_num, zbx_uint64_t *direct_sz, zbx_uint64_t *history_sz,
+		char **error);
 int	zbx_preprocessor_get_top_sequences(int limit, zbx_vector_pp_top_stats_ptr_t *stats, char **error);
 int	zbx_preprocessor_get_top_peak(int limit, zbx_vector_pp_top_stats_ptr_t *stats, char **error);
 int	zbx_preprocessor_get_top_values_num(int limit, zbx_vector_pp_top_stats_ptr_t *stats, char **error);

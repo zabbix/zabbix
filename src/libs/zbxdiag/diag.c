@@ -750,7 +750,7 @@ static void	diag_log_preprocessing(struct zbx_json_parse *jp, char **out, size_t
 	diag_log_top_view(jp, "top.peak", "$.top.peak", out, out_alloc, out_offset);
 	diag_log_top_view(jp, "top.values_num", "$.top.values_num", out, out_alloc, out_offset);
 	diag_log_top_view(jp, "top.values_sz", "$.top.values_sz", out, out_alloc, out_offset);
-	diag_log_top_view(jp, "top.elapsed_ms", "$.top.elapsed", out, out_alloc, out_offset);
+	diag_log_top_view(jp, "top.elapsed_ms", "$.top.elapsed_ms", out, out_alloc, out_offset);
 	diag_log_top_view(jp, "top.elapsed_cumulative_ms", "$.top.elapsed_cumulative", out, out_alloc, out_offset);
 
 	zbx_strlog_alloc(LOG_LEVEL_INFORMATION, out, out_alloc, out_offset, "==");
