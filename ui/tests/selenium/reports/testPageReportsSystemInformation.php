@@ -26,17 +26,11 @@ require_once __DIR__.'/../common/testSystemInformation.php';
 class testPageReportsSystemInformation extends testSystemInformation {
 
 	/**
-	 * Attach CTableBehavior to the test.
-	 */
-	public function getBehaviors() {
-		return [CTableBehavior::class];
-	}
-
-	/**
-	 * Function checks which information users see on system information page.
+	 * Function checks which information Super admin users see on system information page.
+	 * Other roles are not checked since they don't have permissions to view this page.
 	 * Note: in this case data is checked without running server.
 	 */
-	public function testPageReportsSystemInformation_checkAvailableDataByUserRole() {
+	public function testPageReportsSystemInformation_checkDataByRoleWithoutRunningServer() {
 		$data = [
 			'available_fields' => [
 				[
@@ -110,6 +104,71 @@ class testPageReportsSystemInformation extends testSystemInformation {
 	public function testPageReportsSystemInformation_checkEnabledHA() {
 		$this->assertEnabledHACluster();
 		$this->assertScreenshotExcept(null, self::$skip_fields, 'report_with_ha');
+	}
+
+	/**
+	 * Function checks which information Super admin users see on system information page.
+	 * Other roles are not checked since they don't have permissions to view this page.
+	 * Note: in this case data is checked with running server.
+	 *
+	 * @depends testPageReportsSystemInformation_checkEnabledHA
+	 */
+	public function testPageReportsSystemInformation_checkDataByRoleWithRunningServer() {
+		$data = [
+			'available_fields' => [
+				[
+					'Parameter' => 'Zabbix server is running',
+					'Value' => 'Yes',
+					'Details' => 'localhost:0'
+				],
+				[
+					'Parameter' => 'Zabbix server version',
+					'Value' => '',
+					'Details' => ''
+				],
+				[
+					'Parameter' => 'Zabbix frontend version',
+					'Value' => ZABBIX_VERSION,
+					'Details' => ''
+				],
+				[
+					'Parameter' => 'Number of hosts (enabled/disabled)',
+					'Value' => '',
+					'Details' => ''
+				],
+				[
+					'Parameter' => 'Number of templates',
+					'Value' => '',
+					'Details' => ''
+				],
+				[
+					'Parameter' => 'Number of items (enabled/disabled/not supported)',
+					'Value' => '',
+					'Details' => ''
+				],
+				[
+					'Parameter' => 'Number of triggers (enabled/disabled [problem/ok])',
+					'Value' => '',
+					'Details' => ''
+				],
+				[
+					'Parameter' => 'Number of users (online)',
+					'Value' => '',
+					'Details' => ''
+				],
+				[
+					'Parameter' => 'Required server performance, new values per second',
+					'Value' => '',
+					'Details' => ''
+				],
+				[
+					'Parameter' => 'High availability cluster',
+					'Value' => 'Enabled',
+					'Details' => 'Fail-over delay: 1 minute'
+				]
+			]
+		];
+		$this->assertAvailableDataByUserRole($data);
 	}
 
 	/**
