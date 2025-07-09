@@ -220,7 +220,6 @@ void	zbx_pp_history_cache_history_set_and_release(zbx_pp_history_cache_t *histor
 	pthread_mutex_unlock(&history_cache->lock);
 }
 
-
 zbx_uint64_t	zbx_pp_history_cache_history_size(zbx_pp_history_cache_t *history_cache)
 {
 	zbx_uint64_t		history_size = 0;
