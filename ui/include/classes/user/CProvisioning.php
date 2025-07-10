@@ -75,27 +75,25 @@ class CProvisioning {
 		]);
 		$userdirectory = reset($userdirectories);
 
-		if ($userdirectory['idp_type'] == IDP_TYPE_SAML && CAuthenticationHelper::isSamlCertsStorageDatabase()) {
-			$userdirectory += DB::select('userdirectory_saml', [
-				'output' => CUserDirectory::SAML_HASH_FIELDS,
-				'filter' => ['userdirectoryid' => $userdirectoryid]
-			])[0];
-		}
+		switch ($userdirectory['idp_type']) {
+			case IDP_TYPE_LDAP:
+				$userdirectory += DB::select('userdirectory_ldap', [
+					'output' => ['bind_password'],
+					'filter' => ['userdirectoryid' => $userdirectoryid]
+				])[0];
+				break;
 
-		if (!$userdirectory || $userdirectory['provision_status'] == JIT_PROVISIONING_DISABLED) {
-			return new self($userdirectory, []);
-		}
-
-		if ($userdirectory['idp_type'] == IDP_TYPE_LDAP) {
-			$userdirectory += DB::select('userdirectory_ldap', [
-				'output' => ['bind_password'],
-				'filter' => ['userdirectoryid' => $userdirectoryid]
-			])[0];
+			case IDP_TYPE_SAML:
+				$userdirectory += DB::select('userdirectory_saml', [
+					'output' => CUserDirectory::SAML_HASH_FIELDS,
+					'filter' => ['userdirectoryid' => $userdirectoryid]
+				])[0];
+				break;
 		}
 
 		$mapping_roles = [];
 
-		if ($userdirectory['provision_groups']) {
+		if ($userdirectory['provision_status'] == JIT_PROVISIONING_ENABLED) {
 			$mapping_roles = DB::select('role', [
 				'output' => ['roleid', 'name', 'type'],
 				'roleids' => array_column($userdirectory['provision_groups'], 'roleid', 'roleid'),
