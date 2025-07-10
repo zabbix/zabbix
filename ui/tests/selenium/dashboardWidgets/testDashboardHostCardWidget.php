@@ -44,18 +44,21 @@ class testDashboardHostCardWidget extends testWidgets {
 	* @var array
 	*/
 	protected static $dashboardid;
+
 	/**
 	* Dashboard hash before update.
 	*
 	* @var string
 	*/
 	protected static $old_hash;
+
 	/**
 	* Widget counter.
 	*
 	* @var integer
 	*/
 	protected static $old_widget_count;
+
 	/**
 	* Id of host 'Fully filled host card widget'.
 	*
@@ -66,8 +69,7 @@ class testDashboardHostCardWidget extends testWidgets {
 	public static function prepareHostCardWidgetData() {
 		$templateids = [];
 		$template_names = ['Apache by Zabbix agent', 'Docker by Zabbix agent 2', 'Linux by Zabbix agent',
-				'PostgreSQL by Zabbix agent', 'Zabbix server health',
-				'Ceph by Zabbix agent 2'
+				'PostgreSQL by Zabbix agent', 'Zabbix server health', 'Ceph by Zabbix agent 2'
 		];
 
 		foreach ($template_names as $template_name) {
@@ -1311,8 +1313,8 @@ class testDashboardHostCardWidget extends testWidgets {
 		if (array_key_exists('Severity', $data)) {
 			$section = $widget->query('class:problem-icon-link')->waitUntilvisible();
 			foreach($data['Severity'] as $severity => $value) {
-				$this->assertEquals($value, $widget
-						->query('xpath:.//span[@title='.CXPathHelper::escapeQuotes($severity).']')->one()->getText()
+				$this->assertEquals($value, $widget->query('xpath:.//span[@title='.
+						CXPathHelper::escapeQuotes($severity).']')->one()->getText()
 				);
 			}
 		}
@@ -1355,7 +1357,7 @@ class testDashboardHostCardWidget extends testWidgets {
 			foreach ($monitoring->query('class:monitoring-item')->all() as $item) {
 				$name = $item->query('class:monitoring-item-name')->one();
 				$count = $item->query('class:entity-count')->one()->getText();
-				$target = ($count != 0) ? 'a' : 'span';
+				$target = ($count === '0') ? 'span' : 'a';
 				$this->assertEquals($target, $name->getTagName());
 				$get_monitoring[$name->getText()] = $count;
 			}
@@ -1424,8 +1426,8 @@ class testDashboardHostCardWidget extends testWidgets {
 					}
 					else {
 						$link = str_replace('{hostid}', $hostid, $link);
-						$this->assertTrue($popup->query("xpath:.//a[text()=".CXPathHelper::escapeQuotes($menu_level1).
-								" and contains(@href, ".CXPathHelper::escapeQuotes($link).")]")->exists()
+						$this->assertTrue($popup->query('xpath:.//a[text()='.CXPathHelper::escapeQuotes($menu_level1).
+								' and contains(@href, '.CXPathHelper::escapeQuotes($link).')]')->exists()
 						);
 					}
 				}
