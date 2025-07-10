@@ -1109,7 +1109,7 @@ class testDashboardHostCardWidget extends testWidgets {
 					],
 					'Monitoring' => [
 						'Dashboards' => 8,
-						'Latest data' => 286,
+						'Latest data' => 288,
 						'Graphs' => 29,
 						'Web' => 1
 					],
@@ -1181,8 +1181,8 @@ class testDashboardHostCardWidget extends testWidgets {
 						'Web' => 0
 					],
 					'Templates' => ['Linux by Zabbix agent', 'Zabbix server health'],
-					'Tags' => ['class: os', 'subclass: logging', 'subclass: monitoring', 'target: linux',
-							'target: server', 'target: zabbix'
+					'Tags' => ['class: os', 'class: software', 'subclass: logging', 'subclass: monitoring',
+							'target: linux', 'target: server', 'target: zabbix'
 					],
 					'Description' => 'Short description',
 					'Host groups' => ['Linux servers', 'Virtual machines'],
