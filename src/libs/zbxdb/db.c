@@ -880,25 +880,25 @@ int	zbx_db_connect(char *host, char *user, char *password, char *dbname, char *d
 
 	DBfree_result(result);
 
-	result = zbx_db_select_basic("select pg_is_in_recovery();");
+	result = zbx_db_select("select pg_is_in_recovery();");
 
-	if ((zbx_db_result_t)ZBX_DB_DOWN == result || NULL == result)
+	if ((DB_RESULT)ZBX_DB_DOWN == result || NULL == result)
 	{
 		ret = (NULL == result) ? ZBX_DB_FAIL : ZBX_DB_DOWN;
 		goto out;
 	}
 
-	if (NULL != (row = zbx_db_fetch_basic(result)))
+	if (NULL != (row = zbx_db_fetch(result)))
 	{
 		if (0 == strcmp(row[0], "t"))
 		{
-			zbx_db_free_result(result);
+			DBfree_result(result);
 			ret = ZBX_DB_RONLY;
 			goto out;
 		}
 	}
 
-	zbx_db_free_result(result);
+	DBfree_result(result);
 
 	if (90000 <= ZBX_PG_SVERSION)
 	{
