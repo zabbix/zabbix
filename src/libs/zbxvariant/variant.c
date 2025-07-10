@@ -445,7 +445,7 @@ zbx_uint64_t	zbx_variant_size(const zbx_variant_t *value)
 			if (NULL != value->data.vector)
 			{
 				for (int i = 0; i < value->data.vector->values_num; i++)
-					zbx_variant_size(&value->data.vector->values[i]);
+					size += zbx_variant_size(&value->data.vector->values[i]);
 			}
 			break;
 		default:
