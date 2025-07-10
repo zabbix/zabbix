@@ -107,6 +107,9 @@ static int	zbx_odbc_diag(SQLSMALLINT h_type, SQLHANDLE h, SQLRETURN rc, char **d
 		{
 			char	*err_msg;
 
+			if (1 < rec_nr)
+				zbx_chrcpy_alloc(&buffer, &alloc, &offset, '\n');
+
 			err_msg = zbx_malloc(NULL, msg_len + 1);
 
 			zbx_chrcpy_alloc(&buffer, &alloc, &offset, (NULL == buffer ? ':' : '|'));
