@@ -101,12 +101,23 @@ window.templategroup_edit_popup = new class {
 					this.dialogue.dispatchEvent(new CustomEvent('dialogue.submit', {detail: response}));
 				}
 			})
-			.catch((exception) => {
-				this.form_element.parentElement.querySelectorAll('.msg-good, .msg-bad, .msg-warning')
-					.forEach(node => node.remove());
-				this.form_element.insertAdjacentElement('beforebegin',
-					makeMessageBox('bad', exception.error.title, exception.error.messages).get(0)
-				);
-			})
+			.catch(this.#ajaxExceptionHandler.bind(this))
+	}
+
+	#ajaxExceptionHandler(exception) {
+		this.form_element.parentElement.querySelectorAll('.msg-good, .msg-bad, .msg-warning')
+			.forEach(node => node.remove());
+
+		let title, messages;
+
+		if (typeof exception === 'object' && 'error' in exception) {
+			title = exception.error.title;
+			messages = exception.error.messages;
+		}
+		else {
+			messages = [<?= json_encode(_('Unexpected server error.')) ?>];
+		}
+
+		this.form_element.insertAdjacentElement('beforebegin', makeMessageBox('bad', messages, title).get(0));
 	}
 }
