@@ -9640,6 +9640,17 @@ void	DCget_interface(zbx_dc_interface_t *dst_interface, const ZBX_DC_INTERFACE *
 	dst_interface->port = 0;
 }
 
+unsigned char	zbx_dc_item_preprocessable(const ZBX_DC_ITEM *src_item)
+{
+	if (ITEM_TYPE_DEPENDENT == src_item->type || NULL != src_item->preproc_item || NULL != src_item->master_item ||
+		0 != (ZBX_FLAG_DISCOVERY_RULE & src_item->flags))
+	{
+		return 1;
+	}
+
+	return 0;
+}
+
 static void	DCget_item(zbx_dc_item_t *dst_item, const ZBX_DC_ITEM *src_item)
 {
 	const ZBX_DC_LOGITEM		*logitem;
@@ -9648,6 +9659,7 @@ static void	DCget_item(zbx_dc_item_t *dst_item, const ZBX_DC_ITEM *src_item)
 	const ZBX_DC_INTERFACE		*dc_interface;
 	int				i;
 
+	dst_item->preprocessable = zbx_dc_item_preprocessable(src_item);
 	dst_item->type = src_item->type;
 	dst_item->value_type = src_item->value_type;
 

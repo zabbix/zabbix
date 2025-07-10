@@ -165,7 +165,8 @@ next:
 				}
 
 				items[i].state = ITEM_STATE_NORMAL;
-				zbx_preprocess_item_value(items[i].itemid, items[i].host.hostid, items[i].value_type,
+				zbx_preprocess_item_value(items[i].preprocessable, items[i].itemid,
+						items[i].host.hostid, items[i].value_type,
 						items[i].flags, &results[i], ts, items[i].state, NULL);
 
 				itemids[i] = items[i].itemid;
@@ -173,8 +174,9 @@ next:
 				break;
 			case NOTSUPPORTED:
 				items[i].state = ITEM_STATE_NOTSUPPORTED;
-				zbx_preprocess_item_value(items[i].itemid, items[i].host.hostid, items[i].value_type,
-						items[i].flags, NULL, ts, items[i].state, results[i].msg);
+				zbx_preprocess_item_value(items[i].preprocessable, items[i].itemid,
+						items[i].host.hostid, items[i].value_type, items[i].flags, NULL, ts,
+						items[i].state, results[i].msg);
 
 				itemids[i] = items[i].itemid;
 				lastclocks[i] = ts->sec;

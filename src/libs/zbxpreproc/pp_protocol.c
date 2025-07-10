@@ -942,8 +942,9 @@ static void	preprocessor_send(zbx_uint32_t code, unsigned char *data, zbx_uint32
  *                               ITEM_STATE_NOTSUPPORTED                      *
  *                                                                            *
  ******************************************************************************/
-void	zbx_preprocess_item_value(zbx_uint64_t itemid, zbx_uint64_t hostid, unsigned char item_value_type,
-		unsigned char item_flags, AGENT_RESULT *result, zbx_timespec_t *ts, unsigned char state, char *error)
+void	zbx_preprocess_item_value(unsigned char preprocessable, zbx_uint64_t itemid, zbx_uint64_t hostid,
+		unsigned char item_value_type, unsigned char item_flags, AGENT_RESULT *result, zbx_timespec_t *ts,
+		unsigned char state, char *error)
 {
 	zbx_preproc_item_value_t	value = {.itemid = itemid, .hostid = hostid, .item_value_type = item_value_type,
 					.error = error, .item_flags = item_flags, .state = state, .ts = ts,
@@ -983,14 +984,22 @@ void	zbx_preprocess_item_value(zbx_uint64_t itemid, zbx_uint64_t hostid, unsigne
 		}
 	}
 
-	if (0 == preprocessor_pack_value(&cached_message, &value))
+	if (0 == preprocessable)
 	{
-		zbx_preprocessor_flush();
-		preprocessor_pack_value(&cached_message, &value);
+		zbx_dc_add_history(value.itemid, value.item_value_type, value.item_flags, value.result, value.ts,
+				value.state, value.error);
 	}
+	else
+	{
+		if (0 == preprocessor_pack_value(&cached_message, &value))
+		{
+			zbx_preprocessor_flush();
+			preprocessor_pack_value(&cached_message, &value);
+		}
 
-	if (ZBX_PREPROCESSING_BATCH_SIZE < ++cached_values)
-		zbx_preprocessor_flush();
+		if (ZBX_PREPROCESSING_BATCH_SIZE < ++cached_values)
+			zbx_preprocessor_flush();
+	}
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 }
@@ -1010,6 +1019,8 @@ void	zbx_preprocessor_flush(void)
 		zbx_ipc_message_init(&cached_message);
 		cached_values = 0;
 	}
+
+	zbx_dc_flush_history();
 }
 
 /******************************************************************************
