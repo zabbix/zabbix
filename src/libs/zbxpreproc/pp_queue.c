@@ -521,7 +521,7 @@ void	pp_task_queue_get_sequence_stats(zbx_pp_queue_t *queue, zbx_vector_pp_top_s
 	while (NULL != (sequence = (zbx_pp_item_task_sequence_t *)zbx_hashset_iter_next(&iter)))
 	{
 		stat = (zbx_pp_top_stats_t *)zbx_malloc(NULL, sizeof(zbx_pp_top_stats_t));
-		stat->tasks_num = 0;
+		stat->num = 0;
 		stat->itemid = sequence->itemid;
 
 		zbx_pp_task_sequence_t	*d_seq = (zbx_pp_task_sequence_t *)PP_TASK_DATA(sequence->task);
@@ -532,7 +532,7 @@ void	pp_task_queue_get_sequence_stats(zbx_pp_queue_t *queue, zbx_vector_pp_top_s
 
 			do
 			{
-				stat->tasks_num++;
+				stat->num++;
 			}
 			while (SUCCEED == zbx_list_iterator_next(&li));
 		}
@@ -541,5 +541,4 @@ void	pp_task_queue_get_sequence_stats(zbx_pp_queue_t *queue, zbx_vector_pp_top_s
 	}
 
 	pp_task_queue_unlock(queue);
-
 }
