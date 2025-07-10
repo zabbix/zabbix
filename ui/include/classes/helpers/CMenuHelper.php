@@ -70,6 +70,7 @@ class CMenuHelper {
 				(new CMenuItem(_('Monitoring')))
 					->setId('view')
 					->setIcon(ZBX_ICON_MONITORING)
+					->setAttribute('aria-expanded', 'false')
 					->setSubMenu(new CMenu($submenu_monitoring))
 			);
 		}
@@ -97,6 +98,7 @@ class CMenuHelper {
 				(new CMenuItem(_('Services')))
 					->setId('services')
 					->setIcon(ZBX_ICON_SERVICES)
+					->setAttribute('aria-expanded', 'false')
 					->setSubMenu(new CMenu($submenu_services))
 			);
 		}
@@ -117,6 +119,7 @@ class CMenuHelper {
 				(new CMenuItem(_('Inventory')))
 					->setId('cm')
 					->setIcon(ZBX_ICON_INVENTORY)
+					->setAttribute('aria-expanded', 'false')
 					->setSubMenu(new CMenu($submenu_inventory))
 			);
 		}
@@ -155,6 +158,7 @@ class CMenuHelper {
 				(new CMenuItem(_('Reports')))
 					->setId('reports')
 					->setIcon(ZBX_ICON_REPORTS)
+					->setAttribute('aria-expanded', 'false')
 					->setSubMenu(new CMenu($submenu_reports))
 			);
 		}
@@ -210,6 +214,7 @@ class CMenuHelper {
 				(new CMenuItem(_('Data collection')))
 					->setId('config')
 					->setIcon(ZBX_ICON_DATA_COLLECTION)
+					->setAttribute('aria-expanded', 'false')
 					->setSubMenu(new CMenu($submenu_data_collection))
 			);
 		}
@@ -287,6 +292,7 @@ class CMenuHelper {
 				(new CMenuItem(_('Alerts')))
 					->setId('alerts')
 					->setIcon(ZBX_ICON_ALERTS)
+					->setAttribute('aria-expanded', 'false')
 					->setSubMenu(new CMenu($submenu_alerts))
 			);
 		}
@@ -324,6 +330,7 @@ class CMenuHelper {
 				(new CMenuItem(_('Users')))
 					->setId('users-menu')
 					->setIcon(ZBX_ICON_USERS)
+					->setAttribute('aria-expanded', 'false')
 					->setSubMenu(new CMenu($submenu_users))
 			);
 		}
@@ -402,6 +409,7 @@ class CMenuHelper {
 				(new CMenuItem(_('Administration')))
 					->setId('admin')
 					->setIcon(ZBX_ICON_ADMINISTRATION)
+					->setAttribute('aria-expanded', 'false')
 					->setSubMenu(new CMenu($submenu_administration))
 			);
 		}

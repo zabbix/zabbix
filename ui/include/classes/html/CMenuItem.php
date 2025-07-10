@@ -233,6 +233,7 @@ class CMenuItem extends CTag {
 	public function setSubMenu(CMenu $sub_menu): self {
 		$this->sub_menu = $sub_menu->addClass('submenu');
 		$this->addClass('has-submenu');
+		$this->setAttribute('aria-expanded', 'false');
 
 		return $this;
 	}

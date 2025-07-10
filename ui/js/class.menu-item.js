@@ -68,6 +68,7 @@ class CMenuItem extends CBaseComponent {
 	expandSubmenu() {
 		if (!this._is_expanded && this.hasSubmenu()) {
 			this.addClass('is-expanded');
+			this.setAttr('aria-expanded', 'true');
 			this._is_expanded = true;
 			this._submenu.updateHeight();
 
@@ -80,6 +81,7 @@ class CMenuItem extends CBaseComponent {
 	collapseSubmenu(from_level) {
 		if (this._is_expanded && this.hasSubmenu() && this._submenu.collapseExpanded(from_level)) {
 			this.removeClass('is-expanded');
+			this.setAttr('aria-expanded', 'false');
 			this._is_expanded = false;
 			this.fire(MENUITEM_EVENT_COLLAPSE);
 
