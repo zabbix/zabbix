@@ -106,6 +106,7 @@ typedef struct
 	int			ret;
 	int			version;
 	AGENT_RESULT		result;
+	unsigned char		preprocessable;
 }
 zbx_dc_item_context_t;
 

@@ -354,6 +354,7 @@ int	zbx_async_check_agent(zbx_dc_item_t *item, AGENT_RESULT *result,  zbx_async_
 	agent_context->item.interface.addr = (item->interface.addr == item->interface.dns_orig ?
 			agent_context->item.interface.dns_orig : agent_context->item.interface.ip_orig);
 	agent_context->item.key_orig = zbx_strdup(NULL, item->key_orig);
+	agent_context->item.preprocessable = item->preprocessable;
 
 	if (item->key != item->key_orig)
 	{
