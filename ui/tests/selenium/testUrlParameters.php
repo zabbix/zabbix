@@ -25,7 +25,7 @@ class testUrlParameters extends CLegacyWebTest {
 
 	const POPUP = 'zabbix.php?action=popup&popup=';
 
-	protected static $ids;
+	protected static $ids; // Contains all required ids of created test data entities both for host and template.
 
 	public function prepareLLDPrototypeData() {
 		// Create host with LLD prototype.
@@ -87,7 +87,6 @@ class testUrlParameters extends CLegacyWebTest {
 			]
 		])['itemids'][0];
 	}
-
 
 	public static function data() {
 		return [
@@ -1430,7 +1429,7 @@ class testUrlParameters extends CLegacyWebTest {
 		foreach ($data['test_cases'] as $test_case) {
 			if (CTestArrayHelper::get($data, 'substitute_ids')) {
 				foreach (['host_lldid', 'host_lld_prototypeid', 'template_lldid', 'template_lld_prototypeid'] as $id) {
-					if (strpos($test_case['url'], $id) !== false) {
+					if (strpos($test_case['url'], $id)) {
 						$test_case['url'] = str_replace('{'.$id.'}', self::$ids[$id], $test_case['url']);
 					}
 				}

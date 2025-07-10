@@ -218,6 +218,7 @@ class testPagePrototypes extends CWebTest {
 					'Hosts' => 'Host prototypes 1',
 					'Discovery rules' => 'Discovery prototypes 1',
 					'Key' => 'with_prototypes[{#KEY}]',
+					'Interval' => '',
 					'Type' => 'Nested',
 					'Create enabled' => 'Yes',
 					'Discover' => 'Yes'
@@ -237,7 +238,7 @@ class testPagePrototypes extends CWebTest {
 				break;
 		}
 
-		// Check tags (Graph prototypes doesn't have any tags).
+		// Check tags (Graph prototypes and Discovery prototypes do not have tags).
 		if (!in_array($this->source, ['graph', 'discovery'])) {
 			$tags = $table->findRow('Name', $this->tag)->getColumn('Tags')->query('class:tag')->all();
 			$this->assertEquals(['name_1: value_1', 'name_2: value_2'], $tags->asText());
@@ -623,7 +624,7 @@ class testPagePrototypes extends CWebTest {
 					]
 				]
 			],
-			// #5 Sort by Discover.
+			// #5 Sort by Discover column.
 			[
 				[
 					'sort_by' => 'Discover',
@@ -1037,9 +1038,13 @@ class testPagePrototypes extends CWebTest {
 			$this->page->waitUntilReady();
 		}
 
-		$message = (array_key_exists('message', $data))
-				? $data['message']
-				: ucfirst($this->source).((array_key_exists('name', $data)) ? ' prototype updated' : ' prototypes updated');
+		if (array_key_exists('message', $data)) {
+			$message = $data['message'];
+		}
+		else {
+			$message = ucfirst($this->source).((array_key_exists('name', $data)) ? ' prototype updated' : ' prototypes updated');
+		}
+
 		$this->assertMessage(TEST_GOOD, $message);
 
 		// Check column value for one or for all prototypes.
@@ -1180,11 +1185,11 @@ class testPagePrototypes extends CWebTest {
 	}
 
 	/**
-	 * Item prototype delete.
+	 * Discovery prototype delete.
 	 */
 	public static function getDiscoveryPrototypesDeleteData() {
 		return [
-			// #0 Attempt to deletean inherited LLD prototype.
+			// #0 Attempt to delete an inherited LLD prototype.
 			[
 				[
 					'expected' => TEST_BAD,

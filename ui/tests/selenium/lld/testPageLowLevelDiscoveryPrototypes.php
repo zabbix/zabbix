@@ -192,11 +192,11 @@ class testPageLowLevelDiscoveryPrototypes extends testPagePrototypes {
 			];
 			foreach ($prototypeids_sql as $prototype_info) {
 				// Add template name or master item name to prototype name as prefix for inherited and dependent ptorotypes.
-				$protoype_name = (in_array($prototype_info['name'], array_keys($name_prefixes)))
+				$prototype_name = (in_array($prototype_info['name'], array_keys($name_prefixes)))
 					? $name_prefixes[$prototype_info['name']].': '.$prototype_info['name']
 					: $prototype_info['name'];
 
-				self::$ids['child_lldids'][$context][$protoype_name] = $prototype_info['itemid'];
+				self::$ids['child_lldids'][$context][$prototype_name] = $prototype_info['itemid'];
 			}
 
 			self::$entity_count = count($prototypeids_sql);
@@ -303,17 +303,17 @@ class testPageLowLevelDiscoveryPrototypes extends testPagePrototypes {
 						zbx_dbstr(self::PROTOTYPE_WITH_PROTOTYPES).' AND hostid='.self::$ids[$context]
 				);
 
-				$discovered_lld_responce = CDataHelper::call('discoveryrule.create', [
+				$discovered_lld_response = CDataHelper::call('discoveryrule.create', [
 					'name' => self::PROTOTYPE_WITH_PROTOTYPES,
 					'key_' => 'with_prototypes[Discovered]',
 					'hostid' => self::$ids[$context],
 					'type' => ITEM_TYPE_TRAPPER
 				]);
 
-				$discovered_prototype_responce = CDataHelper::call('discoveryruleprototype.create', [
+				$discovered_prototype_response = CDataHelper::call('discoveryruleprototype.create', [
 					[
 						'hostid' => self::$ids[$context],
-						'ruleid' => $discovered_lld_responce['itemids'][0],
+						'ruleid' => $discovered_lld_response['itemids'][0],
 						'name' => 'Discovered prototype',
 						'key_' => 'discovered_prototype[Discovered, {#KEY2}]',
 						'type' => ITEM_TYPE_NESTED
@@ -321,19 +321,19 @@ class testPageLowLevelDiscoveryPrototypes extends testPagePrototypes {
 				]);
 
 				// Make previously created LLD rule a discovered LLD rule.
-				DBExecute('UPDATE items SET flags=5 WHERE itemid='.$discovered_lld_responce['itemids'][0]);
+				DBExecute('UPDATE items SET flags=5 WHERE itemid='.$discovered_lld_response['itemids'][0]);
 				DBexecute('INSERT INTO item_discovery (itemdiscoveryid, itemid, parent_itemid) values ('.
-						$discovered_lld_responce['itemids'][0].', '.$discovered_lld_responce['itemids'][0].
+						$discovered_lld_response['itemids'][0].', '.$discovered_lld_response['itemids'][0].
 						', '.$prototype_for_discovery_id.');'
 				);
 
 				// Make previously created LLD rule prototype a discovered LLD rule prototype.
-				DBExecute('UPDATE items SET flags=7 WHERE itemid='.$discovered_prototype_responce['itemids'][0]);
+				DBExecute('UPDATE items SET flags=7 WHERE itemid='.$discovered_prototype_response['itemids'][0]);
 				DBExecute('UPDATE item_discovery SET parent_itemid='.self::$ids['protorypeid_for_prototype_discovery'][$context].
-						' WHERE itemid='.$discovered_prototype_responce['itemids'][0]
+						' WHERE itemid='.$discovered_prototype_response['itemids'][0]
 				);
 
-				self::$ids['discovered_parent_lldid'][$context] = $discovered_lld_responce['itemids'][0];
+				self::$ids['discovered_parent_lldid'][$context] = $discovered_lld_response['itemids'][0];
 			}
 		}
 	}
@@ -387,7 +387,7 @@ class testPageLowLevelDiscoveryPrototypes extends testPagePrototypes {
 	}
 
 	/**
-	 * Discovery rule prototype delete.
+	 * Discovery rule prototype prefixes data.
 	 */
 	public static function getPrototypePrefixesData() {
 		return [
@@ -443,6 +443,9 @@ class testPageLowLevelDiscoveryPrototypes extends testPagePrototypes {
 	}
 
 	/**
+	 * Check the link, the color (class) and the actual URL where the link prefixes (parent template, master item and parent
+	 * discovery prototype) lead in discovery prototype names.
+	 *
 	 * @dataProvider getPrototypePrefixesData
 	 *
 	 * @ignoreBrowserErrors
@@ -478,8 +481,7 @@ class testPageLowLevelDiscoveryPrototypes extends testPagePrototypes {
 				$data['context']
 		)->waitUntilReady();
 
-		$table = $this->query('class:list-table')->asTable()->one();
-		$name = $table->findRow('Name', $data['name'], true)->getColumn('Name');
+		$name = $this->query('class:list-table')->asTable()->one()->findRow('Name', $data['name'], true)->getColumn('Name');
 		$this->assertEquals($expected_prefix['name'].': '.$data['name'], $name->getText());
 
 		$prefix_link = $name->query('link', $expected_prefix['name'])->one();
@@ -561,7 +563,7 @@ class testPageLowLevelDiscoveryPrototypes extends testPagePrototypes {
 					'hidden' => true
 				]
 			],
-			// #6 Navigate to the list of prototypes of the parent LLD tule on host.
+			// #6 Navigate to the list of prototypes of the parent LLD rule on host.
 			[
 				[
 					'link' => self::ROOT_LLD_NAME,
@@ -569,7 +571,7 @@ class testPageLowLevelDiscoveryPrototypes extends testPagePrototypes {
 					'hidden' => true
 				]
 			],
-			// #7 Navigate to the list of prototypes of the parent LLD tule on template.
+			// #7 Navigate to the list of prototypes of the parent LLD rule on template.
 			[
 				[
 					'link' => self::ROOT_LLD_NAME,
@@ -621,7 +623,8 @@ class testPageLowLevelDiscoveryPrototypes extends testPagePrototypes {
 	 * @dataProvider getDiscoveryPrototypesDeleteData
 	 */
 	public function testPageLowLevelDiscoveryPrototypes_DeleteHost($data) {
-		$this->page->login()->open(self::COMMON_URL.self::$ids['parent_lldid']['host'].'&context=host')->waitUntilReady();
+		$this->page->login()->open(self::COMMON_URL.self::$ids['parent_lldid']['host'].'&context=host&sort=name&sortorder=DESC')
+				->waitUntilReady();
 
 		$ids = [];
 		foreach ($data['name'] as $name) {
@@ -635,7 +638,7 @@ class testPageLowLevelDiscoveryPrototypes extends testPagePrototypes {
 	 * @dataProvider getDiscoveryPrototypesDeleteData
 	 */
 	public function testPageLowLevelDiscoveryPrototypes_DeleteTemplate($data) {
-		$this->page->login()->open(self::COMMON_URL.self::$ids['parent_lldid']['template'].'&context=template')
+		$this->page->login()->open(self::COMMON_URL.self::$ids['parent_lldid']['template'].'&context=template&sort=name&sortorder=DESC')
 				->waitUntilReady();
 
 		$ids = [];
