@@ -331,3 +331,4 @@ void	zbx_jsonobj_remove_value(zbx_jsonobj_t *obj, const char *name)
 	jsonobj_el_clear(el);
 	zbx_hashset_remove_direct(&obj->data.object, el);
 }
+

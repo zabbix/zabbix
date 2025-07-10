@@ -738,3 +738,4 @@ char	*zbx_sanitize_proxyconfig_json(char *jbuffer)
 
 	return NULL;
 }
+

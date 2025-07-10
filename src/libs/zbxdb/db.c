@@ -1786,7 +1786,8 @@ zbx_db_result_t	zbx_db_vselect(const char *fmt, va_list args)
 
 	if (ZBX_DB_OK != txn_error)
 	{
-		zabbix_log(LOG_LEVEL_DEBUG, "ignoring query [txnlev:%d] [%s] within failed transaction", txn_level, sql_log);
+		zabbix_log(LOG_LEVEL_DEBUG, "ignoring query [txnlev:%d] [%s] within failed transaction", txn_level,
+				sql_log);
 		goto clean;
 	}
 
@@ -3180,3 +3181,4 @@ void	zbx_db_set_log_masked_values(int flag)
 	db_log_masked_values = flag;
 #endif
 }
+
