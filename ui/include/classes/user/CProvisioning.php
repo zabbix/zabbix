@@ -75,6 +75,13 @@ class CProvisioning {
 		]);
 		$userdirectory = reset($userdirectories);
 
+		if ($userdirectory['idp_type'] == IDP_TYPE_SAML && CAuthenticationHelper::isSamlCertsStorageDatabase()) {
+			$userdirectory += DB::select('userdirectory_saml', [
+				'output' => CUserDirectory::SAML_HASH_FIELDS,
+				'filter' => ['userdirectoryid' => $userdirectoryid]
+			])[0];
+		}
+
 		if (!$userdirectory || $userdirectory['provision_status'] == JIT_PROVISIONING_DISABLED) {
 			return new self($userdirectory, []);
 		}
@@ -82,12 +89,6 @@ class CProvisioning {
 		if ($userdirectory['idp_type'] == IDP_TYPE_LDAP) {
 			$userdirectory += DB::select('userdirectory_ldap', [
 				'output' => ['bind_password'],
-				'filter' => ['userdirectoryid' => $userdirectoryid]
-			])[0];
-		}
-		elseif ($userdirectory['idp_type'] == IDP_TYPE_SAML) {
-			$userdirectory += DB::select('userdirectory_saml', [
-				'output' => CUserDirectory::SAML_HASH_FIELDS,
 				'filter' => ['userdirectoryid' => $userdirectoryid]
 			])[0];
 		}
