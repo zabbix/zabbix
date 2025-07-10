@@ -3981,8 +3981,8 @@ static void	lld_hosts_save(zbx_uint64_t parent_hostid, zbx_vector_lld_host_ptr_t
 
 					zbx_audit_host_update_json_update_ipmi_password(ZBX_AUDIT_LLD_CONTEXT,
 							host->hostid, (0 == strcmp("", host->ipmi_password_orig) ?
-							"" : ZBX_MACRO_SECRET_MASK),
-							(0 == strcmp("", ipmi_password) ? "" : ZBX_MACRO_SECRET_MASK));
+							"" : ZBX_SECRET_MASK),
+							(0 == strcmp("", ipmi_password) ? "" : ZBX_SECRET_MASK));
 
 					zbx_free(value_esc);
 				}
@@ -4041,9 +4041,9 @@ static void	lld_hosts_save(zbx_uint64_t parent_hostid, zbx_vector_lld_host_ptr_t
 
 					zbx_audit_host_update_json_update_tls_psk_identity(ZBX_AUDIT_LLD_CONTEXT,
 							host->hostid, (0 == strcmp("", host->tls_psk_identity_orig) ?
-							"" : ZBX_MACRO_SECRET_MASK),
+							"" : ZBX_SECRET_MASK),
 							(0 == strcmp("", tls_psk_identity) ?
-							"" : ZBX_MACRO_SECRET_MASK));
+							"" : ZBX_SECRET_MASK));
 				}
 				if (0 != (host->flags & ZBX_FLAG_LLD_HOST_UPDATE_TLS_PSK))
 				{
@@ -4056,8 +4056,8 @@ static void	lld_hosts_save(zbx_uint64_t parent_hostid, zbx_vector_lld_host_ptr_t
 
 					zbx_audit_host_update_json_update_tls_psk(ZBX_AUDIT_LLD_CONTEXT, host->hostid,
 							(0 == strcmp("", host->tls_psk_orig) ?
-							"" : ZBX_MACRO_SECRET_MASK),
-							(0 == strcmp("", tls_psk) ? "" : ZBX_MACRO_SECRET_MASK));
+							"" : ZBX_SECRET_MASK),
+							(0 == strcmp("", tls_psk) ? "" : ZBX_SECRET_MASK));
 				}
 				if (0 != (host->flags & ZBX_FLAG_LLD_HOST_UPDATE_CUSTOM_INTERFACES))
 				{
@@ -4251,7 +4251,7 @@ static void	lld_hosts_save(zbx_uint64_t parent_hostid, zbx_vector_lld_host_ptr_t
 						(int)hostmacro->type, (int)hostmacro->automatic);
 				zbx_audit_host_update_json_add_hostmacro(ZBX_AUDIT_LLD_CONTEXT, host->hostid,
 						hostmacroid, hostmacro->macro, (ZBX_MACRO_VALUE_SECRET ==
-						(int)hostmacro->type) ? ZBX_MACRO_SECRET_MASK : hostmacro->value,
+						(int)hostmacro->type) ? ZBX_SECRET_MASK : hostmacro->value,
 						hostmacro->description, (int)hostmacro->type,
 						(int)hostmacro->automatic);
 				hostmacroid++;
@@ -4278,9 +4278,9 @@ static void	lld_hosts_save(zbx_uint64_t parent_hostid, zbx_vector_lld_host_ptr_t
 							ZBX_MACRO_VALUE_SECRET == (int)hostmacro->type_orig) ||
 							(0 == (hostmacro->flags & ZBX_FLAG_LLD_HMACRO_UPDATE_TYPE) &&
 							ZBX_MACRO_VALUE_SECRET == (int)hostmacro->type)) ?
-							ZBX_MACRO_SECRET_MASK : hostmacro->value_orig,
+							ZBX_SECRET_MASK : hostmacro->value_orig,
 							(ZBX_MACRO_VALUE_SECRET == (int)hostmacro->type) ?
-							ZBX_MACRO_SECRET_MASK : hostmacro->value);
+							ZBX_SECRET_MASK : hostmacro->value);
 				}
 				if (0 != (hostmacro->flags & ZBX_FLAG_LLD_HMACRO_UPDATE_DESCRIPTION))
 				{

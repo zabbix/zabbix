@@ -938,14 +938,6 @@ void	zbx_dc_get_autoregistration_psk(char *psk_identity_buf, size_t psk_identity
 #define ZBX_MACRO_VALUE_SECRET	1
 #define ZBX_MACRO_VALUE_VAULT	2
 
-#define ZBX_MACRO_SECRET_MASK	"******"
-
-#if defined(ZBX_DEBUG)
-#	define ZBX_STRMASK(x)	x
-#else
-#	define ZBX_STRMASK(x)	ZBX_MACRO_SECRET_MASK
-#endif
-
 int	zbx_dc_interface_activate(zbx_uint64_t interfaceid, const zbx_timespec_t *ts, zbx_agent_availability_t *in,
 		zbx_agent_availability_t *out);
 
