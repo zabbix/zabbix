@@ -420,23 +420,17 @@ const char	*zbx_variant_type_desc(const zbx_variant_t *value)
 
 zbx_uint64_t	zbx_variant_size(const zbx_variant_t *value)
 {
-	zbx_uint32_t	size = 0;
+	zbx_uint64_t	size = 0;
+	zbx_uint32_t	size32;
 
 	switch (value->type)
 	{
-		case ZBX_VARIANT_DBL:
-			size = sizeof(double);
-			break;
-		case ZBX_VARIANT_UI64:
-			size = sizeof(zbx_uint64_t);
-			break;
 		case ZBX_VARIANT_STR:
-			size = strlen(value->data.str);
-			break;
-		case ZBX_VARIANT_NONE:
+			size = strlen(value->data.str) + 1;
 			break;
 		case ZBX_VARIANT_BIN:
-			memcpy(&size, value->data.bin, sizeof(size));
+			memcpy(&size32, value->data.bin, sizeof(size32));
+			size = size32;
 			break;
 		case ZBX_VARIANT_ERR:
 			size = strlen(value->data.err);
@@ -444,16 +438,20 @@ zbx_uint64_t	zbx_variant_size(const zbx_variant_t *value)
 		case ZBX_VARIANT_VECTOR:
 			if (NULL != value->data.vector)
 			{
-				for (int i = 0; i < value->data.vector->values_num; i++)
+				int	i;
+
+				size += sizeof(zbx_vector_var_t);
+				for (i = 0; i < value->data.vector->values_num; i++)
 					size += zbx_variant_size(&value->data.vector->values[i]);
+
+				size += sizeof(zbx_variant_t) * (value->data.vector->values_alloc - i);
 			}
 			break;
 		default:
-			THIS_SHOULD_NEVER_HAPPEN;
 			break;
 	}
 
-	return size + offsetof(zbx_variant_t, data);
+	return size + sizeof(zbx_variant_t);
 }
 
 /******************************************************************************
