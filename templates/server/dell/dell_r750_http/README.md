@@ -7,7 +7,7 @@ This is a template for monitoring DELL PowerEdge R750 servers with iDRAC 8/9 fir
 
 ## Requirements
 
-Zabbix version: 7.4 and higher.
+Zabbix version: 8.0 and higher.
 
 ## Tested versions
 
@@ -16,7 +16,7 @@ This template has been tested on:
 
 ## Configuration
 
-> Zabbix should be configured according to the instructions in the [Templates out of the box](https://www.zabbix.com/documentation/7.4/manual/config/templates_out_of_the_box) section.
+> Zabbix should be configured according to the instructions in the [Templates out of the box](https://www.zabbix.com/documentation/8.0/manual/config/templates_out_of_the_box) section.
 
 ## Setup
 
@@ -218,7 +218,7 @@ This template has been tested on:
 |----|-----------|----------|--------|--------------------------------|
 |Dell R750: Physical disk [{#DISK_NAME}]: Critical state|<p>Please check the device for faults.</p>|`last(/DELL PowerEdge R750 by HTTP/dell.server.hw.physicaldisk.status[{#DISK_NAME}],)=3`|Average||
 |Dell R750: Physical disk [{#DISK_NAME}]: Warning state|<p>Please check the device for warnings.</p>|`last(/DELL PowerEdge R750 by HTTP/dell.server.hw.physicaldisk.status[{#DISK_NAME}],)=2`|Warning|**Depends on**:<br><ul><li>Dell R750: Physical disk [{#DISK_NAME}]: Critical state</li></ul>|
-|Dell R750: Physical disk [{#DISK_NAME}]: Has been replaced|<p>[{#DISK_NAME}] serial number has changed. Acknowledge to close the problem manually.</p>|`last(/DELL PowerEdge R750 by HTTP/dell.server.hw.physicaldisk.serialnumber[{#DISK_NAME}],#1)<>last(/DELL PowerEdge R750 by HTTP/dell.server.hw.physicaldisk.serialnumber[{#DISK_NAME}],#2) and length(last(/DELL PowerEdge R750 by HTTP/dell.server.hw.physicaldisk.serialnumber[{#DISK_NAME}]))>0`|Info|**Manual close**: Yes|
+|Dell R750: Physical disk [{#DISK_NAME}] has been replaced|<p>[{#DISK_NAME}] serial number has changed. Acknowledge to close the problem manually.</p>|`last(/DELL PowerEdge R750 by HTTP/dell.server.hw.physicaldisk.serialnumber[{#DISK_NAME}],#1)<>last(/DELL PowerEdge R750 by HTTP/dell.server.hw.physicaldisk.serialnumber[{#DISK_NAME}],#2) and length(last(/DELL PowerEdge R750 by HTTP/dell.server.hw.physicaldisk.serialnumber[{#DISK_NAME}]))>0`|Info|**Manual close**: Yes|
 
 ### LLD rule Virtual disk discovery
 

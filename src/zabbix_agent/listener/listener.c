@@ -142,7 +142,6 @@ fail:
 	return ret;
 }
 
-
 static void	process_listener(zbx_socket_t *s, int config_timeout)
 {
 	int	ret;
@@ -263,7 +262,7 @@ ZBX_THREAD_ENTRY(listener_thread, args)
 #endif
 
 		zbx_setproctitle("listener #%d [waiting for connection]", process_num);
-		ret = zbx_tcp_accept(&s, init_child_args_in->zbx_config_tls->accept_modes, POLL_TIMEOUT);
+		ret = zbx_tcp_accept(&s, init_child_args_in->zbx_config_tls->accept_modes, POLL_TIMEOUT, 0, NULL);
 		zbx_update_env(get_process_type_string(process_type), zbx_time());
 
 		if (TIMEOUT_ERROR == ret)

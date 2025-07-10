@@ -141,7 +141,7 @@ foreach ($data['hosts'] as $hostid => $host) {
 		), $graph_count]
 		: _('Graphs');
 
-	$discovery_count = CViewHelper::showNum($host['discoveries']);
+	$discovery_count = CViewHelper::showNum($host['discoveryRules']);
 	$discovery_link = ($host['editable'] && $data['allowed_ui_conf_hosts'])
 		? [new CLink(_('Discovery'), (new CUrl('host_discovery.php'))
 			->setArgument('filter_set', '1')
@@ -288,7 +288,7 @@ if ($data['admin']) {
 		$trigger_count = CViewHelper::showNum($template['triggers']);
 		$graph_count = CViewHelper::showNum($template['graphs']);
 		$dashboard_count = CViewHelper::showNum($template['dashboards']);
-		$discovery_count = CViewHelper::showNum($template['discoveries']);
+		$discovery_count = CViewHelper::showNum($template['discoveryRules']);
 		$httptest_count = CViewHelper::showNum($template['httpTests']);
 
 		$template_url = (new CUrl('zabbix.php'))

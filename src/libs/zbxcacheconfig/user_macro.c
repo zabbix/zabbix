@@ -1003,7 +1003,11 @@ static int	um_cache_get_host_macro(const zbx_um_cache_t *cache, const zbx_uint64
 	}
 
 	if (0 != templateids.values_num)
+	{
+		/* Sort templates by id so the import order precedences over the linking order. */
+		zbx_vector_uint64_sort(&templateids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
 		ret = um_cache_get_host_macro(cache, templateids.values, templateids.values_num, name, context, macro);
+	}
 	else
 		ret = FAIL;
 out:
@@ -1345,6 +1349,44 @@ void	um_cache_get_macro_updates(const zbx_um_cache_t *cache, const zbx_uint64_t 
 
 	zbx_vector_um_host_destroy(&hosts);
 }
+
+/*********************************************************************************
+ *                                                                               *
+ * Purpose: check if there are any macro updates for the specified hosts since   *
+ *          the given revision                                                   *
+ *                                                                               *
+ * Parameters: cache       - [IN] user macro cache                               *
+ *             hostids     - [IN] identifiers of the hosts to check              *
+ *             hostids_num - [IN] number of hosts to check                       *
+ *             revision    - [IN]                                                *
+ *                                                                               *
+ * Return value: SUCCEED - at least one host has updates since the revision      *
+ *               FAIL    - no updates found                                      *
+ *                                                                               *
+ *********************************************************************************/
+int	um_cache_check_macro_updates(const zbx_um_cache_t *cache, const zbx_uint64_t *hostids, int hostids_num,
+		zbx_uint64_t revision)
+{
+	int			ret = SUCCEED;
+	zbx_vector_um_host_t	hosts;
+
+	zbx_vector_um_host_create(&hosts);
+
+	for (int i = 0; i < hostids_num; i++)
+	{
+		um_cache_get_hosts(cache, &hostids[i], revision, &hosts);
+
+		if (0 != hosts.values_num)
+			goto out;
+	}
+
+	ret = FAIL;
+out:
+	zbx_vector_um_host_destroy(&hosts);
+
+	return ret;
+}
+
 
 /*********************************************************************************
  *                                                                               *

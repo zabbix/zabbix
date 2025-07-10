@@ -104,7 +104,8 @@
 			this.macros_manager = new HostMacrosManager({
 				container: $('#macros_container .table-forms-td-right'),
 				readonly: this.readonly,
-				parent_hostid: this.parent_hostid
+				parent_hostid: this.parent_hostid,
+				source: 'host_prototype'
 			});
 
 			const show_inherited_macros_element = document.getElementById('show_inherited_macros');
@@ -209,7 +210,7 @@
 					event: CPopupManagerEvent.EVENT_SUBMIT
 				},
 				callback: ({data, event}) => {
-					if (data.submit.success.action === 'delete') {
+					if (data.submit.success?.action === 'delete') {
 						const url = new URL('host_discovery.php', location.href);
 
 						url.searchParams.set('context', 'template');
@@ -324,9 +325,10 @@
 		initInherit() {
 			const form = document.getElementById('host-prototype-form');
 			const host_interface_row_tmpl = form.querySelector('#host-interface-row-tmpl').innerHTML;
+			const host_interface_row_snmp_tmpl = form.querySelector('#host-interface-row-snmp-tmpl').innerHTML;
 
 			const hostInterfaceManagerInherit = new HostInterfaceManager(this._data.inherited_interfaces,
-				host_interface_row_tmpl
+				host_interface_row_tmpl, host_interface_row_snmp_tmpl
 			);
 			hostInterfaceManagerInherit.setAllowEmptyMessage(!this._data.parent_is_template);
 			hostInterfaceManagerInherit.render();
@@ -336,10 +338,11 @@
 		initCustom() {
 			const form = document.getElementById('host-prototype-form');
 			const host_interface_row_tmpl = form.querySelector('#host-interface-row-tmpl').innerHTML;
+			const host_interface_row_snmp_tmpl = form.querySelector('#host-interface-row-snmp-tmpl').innerHTML;
 
 			// This is in global space, as Add functions uses it.
 			window.hostInterfaceManager = new HostInterfaceManager(this._data.custom_interfaces,
-				host_interface_row_tmpl
+				host_interface_row_tmpl, host_interface_row_snmp_tmpl
 			);
 			hostInterfaceManager.render();
 

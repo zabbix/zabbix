@@ -910,6 +910,9 @@ final class CItemData {
 					'js-item-timeout-field',
 					['id' => 'key', 'defaultValue' => ''],
 					['id' => 'value_type', 'defaultValue' => '']
+				],
+				ITEM_TYPE_NESTED => [
+					['id' => 'key', 'defaultValue' => '']
 				]
 			],
 			// Ids to toggle when the field 'authtype' is changed.

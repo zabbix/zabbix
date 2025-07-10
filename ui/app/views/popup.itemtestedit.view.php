@@ -134,6 +134,7 @@ if ($data['is_item_testable']) {
 						SNMP_V2C => _('SNMPv2'),
 						SNMP_V3 => _('SNMPv3')
 					]))
+					->setAttribute('data-prevent-validation-on-change', 1)
 			))
 				->addClass(CFormField::ZBX_STYLE_FORM_FIELD_FLUID)
 				->addClass('js-popup-row-snmp-version'),

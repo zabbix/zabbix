@@ -219,9 +219,9 @@ class testDashboardPieChartWidget extends testWidgets {
 
 		// Check Data set - Item pattern.
 		$expected_values = [
-			'xpath:.//input[@id="ds_0_color"]/..' => 'FF465C', // data set color
-			'xpath:.//div[@id="ds_0_hosts_"]/..' => '',        // host pattern
-			'xpath:.//div[@id="ds_0_items_"]/..' => '',        // item pattern
+			'xpath:.//z-color-picker[@color-field-name="ds[0][color]"]' => 0,	// data set color
+			'xpath:.//div[@id="ds_0_hosts_"]/..' => '',							// host pattern
+			'xpath:.//div[@id="ds_0_items_"]/..' => '',							// item pattern
 			'Aggregation function' => 'last',
 			'Data set aggregation' => 'not used',
 			'Data set label' => ''
@@ -231,6 +231,14 @@ class testDashboardPieChartWidget extends testWidgets {
 		$data_set_tab = $form->query('id:data_set')->one();
 		$this->assertAllVisibleLabels($data_set_tab, $expected_labels);
 		$this->validateDataSetHintboxes($form);
+
+		// Check Data set color picker default palette colors setup.
+		$color_picker = $form->getField('xpath:.//z-color-picker[@color-field-name="ds[0][color]"]');
+		$pallete_colors = [];
+		foreach ($color_picker->query('class:color-picker-palette-icon-part')->all() as $part) {
+			$pallete_colors[] = $part->getCSSValue('background-color');
+		}
+		$this->assertEquals(['rgba(244, 132, 133, 1)', 'rgba(122, 217, 204, 1)', 'rgba(126, 126, 126, 1)'], $pallete_colors);
 
 		$buttons = [
 			'id:ds_0_hosts_',                                      // host multiselect
@@ -293,9 +301,9 @@ class testDashboardPieChartWidget extends testWidgets {
 			'History data selection' => 'Auto',
 			'Draw' => 'Pie',
 			'Space between sectors' => '1',
-			'id:merge' => false,         // 'Merge sectors smaller than' checkbox
-			'id:merge_percent' => '1',   // 'Merge sectors smaller than' input
-			'id:merge_color' => '768D99' // 'Merge sectors smaller than' color picker
+			'id:merge' => false,           // 'Merge sectors smaller than' checkbox
+			'id:merge_percent' => '1',     // 'Merge sectors smaller than' input
+			'name:merge_color' => '768D99' // 'Merge sectors smaller than' color picker
 		];
 		$form->checkValue($expected_values);
 		$expected_labels = ['History data selection', 'Draw', 'Space between sectors', 'Merge sectors smaller than'];
@@ -315,7 +323,7 @@ class testDashboardPieChartWidget extends testWidgets {
 			$form->fill(['id:merge' => $state]);
 			$form->invalidate();
 			$this->assertTrue($form->query('id:merge_percent')->one()->isEnabled($state));
-			$this->assertTrue($form->query('id:merge_color')->one()->isEnabled($state));
+			$this->assertTrue($form->query('name:merge_color')->one()->isEnabled($state));
 		}
 
 		$form->fill(['Draw' => 'Doughnut']);
@@ -328,10 +336,9 @@ class testDashboardPieChartWidget extends testWidgets {
 			'Size' => false,
 			'Decimal places' => false,
 			'Units' => false,
-			'Bold' => false,
-			'Colour' => false
+			'Bold' => false
 		];
-		$expected_labels = array_merge($expected_labels, array_keys($inputs_enabled));
+		$expected_labels = array_merge($expected_labels, array_keys($inputs_enabled), ['Colour']);
 		$this->assertAllVisibleLabels($displaying_options_tab, $expected_labels);
 		$this->assertRangeSliderParameters($form, 'Width', ['min' => '20', 'max' => '50', 'step' => '10']);
 		$this->assertRangeSliderParameters($form, 'Stroke width', ['min' => '0', 'max' => '10', 'step' => '1']);
@@ -350,6 +357,9 @@ class testDashboardPieChartWidget extends testWidgets {
 		foreach ($inputs_enabled as $label => $enabled) {
 			$this->assertEquals($enabled, $form->getField($label)->isEnabled());
 		}
+
+		// Check that total value color picker element is disabled.
+		$this->assertFalse($form->query('xpath:.//z-color-picker[@color-field-name="value_color"]')->one()->isEnabled());
 
 		$field_maxlengths = [
 			'id:space' => 2,
@@ -520,7 +530,7 @@ class testDashboardPieChartWidget extends testWidgets {
 							'Space between sectors' => '2',
 							'id:merge' => true,
 							'id:merge_percent' => '10',
-							'xpath:.//input[@id="merge_color"]/..' => 'EEFF22',
+							'xpath:.//z-color-picker[@color-field-name="merge_color"]' => 'EEFF22',
 							'Show total value' => true,
 							'id:value_size_type' => 'Custom',
 							'id:value_size_custom_input' => '25',
@@ -757,29 +767,50 @@ class testDashboardPieChartWidget extends testWidgets {
 					]
 				]
 			],
-			// Bad color values.
+			// Bad color value in data set.
 			[
 				[
-					'expected' => TEST_BAD,
 					'fields' => [
 						'Data set' => [
 							'host' => 'Host*',
 							'item' => 'Item*',
 							'color' => 'FFFFFG'
+						]
+					],
+					'invalid_color' => true
+				]
+			],
+			// Bad value in "Merge sectors smaller than" color.
+			[
+				[
+					'fields' => [
+						'Data set' => [
+							'host' => 'Host*',
+							'item' => 'Item*'
 						],
 						'Displaying options' => [
 							'id:merge' => true,
-							'xpath:.//input[@id="merge_color"]/..' => 'FFFFFG',
+							'xpath:.//z-color-picker[@color-field-name="merge_color"]' => 'FFFFFG'
+						]
+					],
+					'invalid_color' => true
+				]
+			],
+			// Bad value in total value color.
+			[
+				[
+					'fields' => [
+						'Data set' => [
+							'host' => 'Host*',
+							'item' => 'Item*'
+						],
+						'Displaying options' => [
 							'Draw' => 'Doughnut',
 							'Show total value' => true,
 							'Colour' => 'FFFFFG'
 						]
 					],
-					'error' => [
-						'Invalid parameter "Data set/1/color": a hexadecimal colour code (6 symbols) is expected.',
-						'Invalid parameter "merge_color": a hexadecimal colour code (6 symbols) is expected.',
-						'Invalid parameter "Colour": a hexadecimal colour code (6 symbols) is expected.'
-					]
+					'invalid_color' => true
 				]
 			]
 		];
@@ -902,9 +933,9 @@ class testDashboardPieChartWidget extends testWidgets {
 
 		// Transform input data to expected data. The colors are expected to change.
 		$fields['Data set'][1] = $fields['Data set'][0];
-		$fields['Data set'][1]['color'] = 'FF465C';
+		$fields['Data set'][1]['color'] = 'FFD54F';
 		$fields['Data set'][3] = $fields['Data set'][2];
-		$fields['Data set'][3]['items'][0]['il_color'] = 'FFD54F';
+		$fields['Data set'][3]['items'][0]['il_color'] = '0EC9AC';
 
 		// Assert the result.
 		$this->assertEditFormAfterSave($dashboard, ['fields' => $fields]);
@@ -1107,7 +1138,7 @@ class testDashboardPieChartWidget extends testWidgets {
 					],
 					'expected_dataset_name' => 'TEST SET ☺',
 					'expected_sectors' => [
-						'item-1' => ['value' => '99', 'color' => '255, 70, 92']
+						'item-1' => ['value' => '99', 'color' => '244, 132, 133']
 					]
 				]
 			],
@@ -1128,8 +1159,8 @@ class testDashboardPieChartWidget extends testWidgets {
 					],
 					'expected_legend_function' => 'max',
 					'expected_sectors' => [
-						'item-3' => ['value' => '3E-17', 'color' => '255, 70, 92'],
-						'item-4' => ['value' => '2E-17', 'color' => '255, 197, 219']
+						'item-3' => ['value' => '3E-17', 'color' => '244, 132, 133'],
+						'item-4' => ['value' => '2E-17', 'color' => '202, 118, 190']
 					]
 				]
 			],
@@ -1312,14 +1343,27 @@ class testDashboardPieChartWidget extends testWidgets {
 			? $dashboard->edit()->getWidget($update_widget_name)->edit()
 			: $dashboard->edit()->addWidget()->asForm();
 		$this->fillForm($form, $data['fields'], $update_widget_name !== null);
-		$form->submit();
 
-		// Assert the result.
-		$this->assertEditFormAfterSave($dashboard, $data, isset($update_widget_name));
+		// Verify that it is not possible to submit color-picker dialog with invalid color or proceed with form submission.
+		if (CTestArrayHelper::get($data, 'invalid_color')) {
+			$color_picker_dialog = $this->query('class:color-picker-dialog')->one()->asColorPicker();
+			$this->assertTrue($color_picker_dialog->isSubmittionDisabled());
 
-		// Check total Widget count.
-		$count_added = (!$update_widget_name && CTestArrayHelper::get($data, 'expected', TEST_GOOD) === TEST_GOOD) ? 1 : 0;
-		$this->assertEquals($old_widget_count + $count_added, $dashboard->getWidgets()->count());
+			$color_picker_dialog->close();
+			COverlayDialogElement::find()->one()->close();
+		}
+		else {
+			$form->submit();
+
+			// Assert the result.
+			$this->assertEditFormAfterSave($dashboard, $data, isset($update_widget_name));
+
+			// Check total Widget count.
+			$count_added = (!$update_widget_name && CTestArrayHelper::get($data, 'expected', TEST_GOOD) === TEST_GOOD)
+				? 1
+				: 0;
+			$this->assertEquals($old_widget_count + $count_added, $dashboard->getWidgets()->count());
+		}
 	}
 
 	/**
@@ -1424,7 +1468,6 @@ class testDashboardPieChartWidget extends testWidgets {
 		}
 		else {
 			// When error expected.
-
 			$this->assertMessage(TEST_BAD, null, $data['error']);
 			$this->assertEquals(0, CDBHelper::getCount($count_sql));
 		}
@@ -1567,8 +1610,8 @@ class testDashboardPieChartWidget extends testWidgets {
 		$mapping = [
 			'host' => 'xpath:.//div[@id="ds_'.$number.'_hosts_"]/..',
 			'item' => 'xpath:.//div[@id="ds_'.$number.'_items_"]/..',
-			'color' => 'xpath:.//input[@id="ds_'.$number.'_color"]/..',
-			'il_color' => 'xpath:.//input[@id="items_'.$number.'_{id}_color"]/..',
+			'color' => 'xpath:.//z-color-picker[@color-field-name="ds['.$number.'][color]"]',
+			'il_color' => 'xpath:.//z-color-picker[@color-field-name="ds['.$number.'][color][]"]',
 			'il_type' => 'xpath:.//z-select[@id="items_'.$number.'_{id}_type"]'
 		];
 

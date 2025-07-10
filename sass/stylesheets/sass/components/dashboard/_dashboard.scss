@@ -982,6 +982,9 @@
 		position: absolute;
 		z-index: 10;
 
+		// Fix visual artifacts on webkit-based browsers when scrolling the page while editing a widget.
+		will-change: transform;
+
 		&.highlight-n {
 			border-bottom: 3px solid $form-focus-border-color;
 			top: calc(.25rem - 1px);
@@ -1089,9 +1092,11 @@
 }
 
 .overlay-dialogue {
-	&.modal-popup.modal-widget-configuration {
-		max-width: calc(100vw - 20px);
-		min-width: 650px;
+	&.modal-widget-configuration {
+		--modal-width: auto;
+		--modal-max-width: calc(100vw - 20px);
+		--modal-min-width: 650px;
+
 		box-sizing: border-box;
 
 		.overlay-dialogue-body {
