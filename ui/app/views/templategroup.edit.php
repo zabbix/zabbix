@@ -120,7 +120,8 @@ $output = [
 		$this->readJsFile('templategroup.edit.js.php').
 		'templategroup_edit_popup.init('.json_encode([
 			'groupid' => $data['groupid'],
-			'name' => $data['name']
+			'name' => $data['name'],
+			'rules' => $data['js_validation_rules']
 		]).');',
 	'dialogue_class' => 'modal-popup-static'
 ];

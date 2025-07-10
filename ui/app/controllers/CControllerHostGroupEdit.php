@@ -17,17 +17,21 @@
 class CControllerHostGroupEdit extends CController{
 
 	protected function init(): void {
+		$this->setInputValidationMethod(self::INPUT_VALIDATION_FORM);
+		$this->setPostContentType(self::POST_CONTENT_TYPE_JSON);
 		$this->disableCsrfValidation();
 	}
 
-	protected function checkInput(): bool {
-		$fields = [
-			'groupid' =>	'db hstgrp.groupid',
-			'name' =>		'string',
-			'subgroups' =>	'in 0,1'
-		];
+	public static function getValidationRules(): array {
+		return ['object', 'fields' => [
+			'groupid' => [],
+			'name' => [],
+			'subgroups' => []
+		]];
+	}
 
-		$ret = $this->validateInput($fields);
+	protected function checkInput(): bool {
+		$ret = $this->validateInput(self::getValidationRules());
 
 		if (!$ret) {
 			$this->setResponse(new CControllerResponseFatal());
@@ -53,10 +57,15 @@ class CControllerHostGroupEdit extends CController{
 	}
 
 	protected function doAction(): void {
+		$js_validation_rules = $this->hasInput('groupid')
+			? CControllerHostGroupUpdate::getValidationRules()
+			: CControllerHostGroupCreate::getValidationRules();
+
 		$data = [
 			'groupid' => null,
 			'name' => '',
-			'subgroups' => 0
+			'subgroups' => 0,
+			'js_validation_rules' => (new CFormValidator($js_validation_rules))->getRules()
 		];
 
 		if ($this->getInput('groupid', 0)) {
