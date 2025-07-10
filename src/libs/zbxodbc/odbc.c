@@ -109,13 +109,14 @@ static int	zbx_odbc_diag(SQLSMALLINT h_type, SQLHANDLE h, SQLRETURN rc, char **d
 
 			err_msg = zbx_malloc(NULL, msg_len + 1);
 
+			zbx_chrcpy_alloc(&buffer, &alloc, &offset, (NULL == buffer ? ':' : '|'));
+			zbx_snprintf_alloc(&buffer, &alloc, &offset, "[%s][%ld]", sql_state, (long)err_code);
+
 			if (0 != SQL_SUCCEEDED(SQLGetDiagRec(h_type, h, rec_nr, sql_state, &err_code,
 					(SQLCHAR *)err_msg, msg_len + 1, NULL)))
 			{
-				zbx_chrcpy_alloc(&buffer, &alloc, &offset, (NULL == buffer ? ':' : '|'));
 				zbx_replace_invalid_utf8((char *)err_msg);
-				zbx_snprintf_alloc(&buffer, &alloc, &offset, "[%s][%ld][%s]", sql_state,
-					(long)err_code, err_msg);
+				zbx_snprintf_alloc(&buffer, &alloc, &offset, "[%s]", err_msg);
 			}
 
 			zbx_free(err_msg);
