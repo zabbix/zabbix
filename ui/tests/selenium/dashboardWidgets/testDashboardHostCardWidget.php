@@ -1116,7 +1116,8 @@ class testDashboardHostCardWidget extends testWidgets {
 					'Templates' => ['Apache by Zabbix agent', 'Ceph by Zabbix agent 2', 'Docker by Zabbix agent 2',
 							'Linux by Zabbix agent', 'PostgreSQL by Zabbix agent', 'Zabbix server health'
 					],
-					'Tags' => ['class: application', 'class: database', 'class: os', 'class: software', 'target: apache',
+					'Tags' => ['class: database', 'class: os', 'class: software', 'subclass: logging',
+							'subclass: monitoring', 'subclass: sql', 'subclass: webserver', 'target: apache',
 							'target: ceph', 'target: docker', 'target: linux', 'target: postgresql', 'target: server',
 							'target: zabbix'
 					],
@@ -1180,7 +1181,9 @@ class testDashboardHostCardWidget extends testWidgets {
 						'Web' => 0
 					],
 					'Templates' => ['Linux by Zabbix agent', 'Zabbix server health'],
-					'Tags' => ['class: os','class: software', 'target: linux','target: server', 'target: zabbix'],
+					'Tags' => ['class: os', 'subclass: logging', 'subclass: monitoring', 'target: linux',
+							'target: server', 'target: zabbix'
+					],
 					'Description' => 'Short description',
 					'Host groups' => ['Linux servers', 'Virtual machines'],
 					'Inventory' => [
@@ -1244,7 +1247,7 @@ class testDashboardHostCardWidget extends testWidgets {
 					],
 					'Monitoring' => [
 						'Dashboards' => 4,
-						'Latest data' => 116,
+						'Latest data' => 118,
 						'Graphs' => 8,
 						'Web' => 0
 					]
