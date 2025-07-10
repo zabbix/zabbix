@@ -175,8 +175,9 @@ static void	process_httpagent_result(CURL *easy_handle, CURLcode err, void *arg)
 		out = NULL;
 		if (ZBX_IS_RUNNING())
 		{
-			zbx_preprocess_item_value(1, item_context->itemid, item_context->hostid,item_context->value_type,
-					item_context->flags, &result, &timespec, ITEM_STATE_NORMAL, NULL);
+			zbx_preprocess_item_value(1, item_context->itemid,
+					item_context->hostid,item_context->value_type, item_context->flags, &result,
+					&timespec, ITEM_STATE_NORMAL, NULL);
 		}
 	}
 	else
@@ -184,8 +185,9 @@ static void	process_httpagent_result(CURL *easy_handle, CURLcode err, void *arg)
 		SET_MSG_RESULT(&result, error);
 		if (ZBX_IS_RUNNING())
 		{
-			zbx_preprocess_item_value(1, item_context->itemid, item_context->hostid, item_context->value_type,
-					item_context->flags, NULL, &timespec, ITEM_STATE_NOTSUPPORTED, result.msg);
+			zbx_preprocess_item_value(1, item_context->itemid, item_context->hostid,
+					item_context->value_type, item_context->flags, NULL, &timespec,
+					ITEM_STATE_NOTSUPPORTED, result.msg);
 		}
 	}
 
