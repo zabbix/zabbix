@@ -32,6 +32,8 @@
 #include "zbxtypes.h"
 #include "zbxxml.h"
 #include "zbxjson.h"
+#include "zbx_rtc_constants.h"
+#include "zbxrtc.h"
 
 #define ZBX_AM_LOCATION_NOWHERE			0
 #define ZBX_AM_LOCATION_QUEUE			1
@@ -1162,6 +1164,8 @@ static int	am_init(zbx_am_t *manager, zbx_get_config_forks_f get_forks_cb, char 
 	if (FAIL == (ret = zbx_ipc_service_start(&manager->ipc, ZBX_IPC_SERVICE_ALERTER, error)))
 		goto out;
 
+	zbx_rtc_subscribe_service(ZBX_PROCESS_TYPE_ALERTMANAGER, 0, NULL, 0, SEC_PER_MIN, ZBX_IPC_SERVICE_ALERTER);
+
 	manager->alerts_num = 0;
 	zbx_vector_am_alerter_ptr_create(&manager->alerters);
 	zbx_queue_ptr_create(&manager->free_alerters);
@@ -1190,6 +1194,26 @@ out:
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 
 	return ret;
+}
+
+static void	am_deinit(zbx_am_t *manager)
+{
+	zabbix_log(LOG_LEVEL_DEBUG, "In of %s()", __func__);
+
+	for (int i = 0; i < manager->alerters.values_num; i++)
+	{
+		zbx_am_alerter_t	*alerter = manager->alerters.values[i];
+
+		if (NULL != alerter->client)
+			zbx_ipc_client_close(alerter->client);
+	}
+
+	if (NULL != manager->syncer_client)
+		zbx_ipc_client_close(manager->syncer_client);
+
+	zbx_ipc_service_close(&manager->ipc);
+
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 }
 
 /******************************************************************************
@@ -2350,7 +2374,7 @@ ZBX_THREAD_ENTRY(zbx_alert_manager_thread, args)
 		zbx_ipc_client_t	*client;
 		zbx_ipc_message_t	*message;
 		zbx_am_alerter_t	*alerter;
-		int			ret, sent_num = 0, failed_num = 0, now;
+		int			ret, sent_num = 0, failed_num = 0, now, shutdown = 0;
 		double			time_now, sec;
 
 		zbx_timespec_t		timeout = {1, 0};
@@ -2492,6 +2516,10 @@ ZBX_THREAD_ENTRY(zbx_alert_manager_thread, args)
 				case ZBX_IPC_ALERTER_END_DISPATCH:
 					am_process_end_dispatch(client);
 					break;
+				case ZBX_RTC_SHUTDOWN:
+					zabbix_log(LOG_LEVEL_DEBUG, "shutdown message received, terminating...");
+					shutdown = 1;
+					break;
 			}
 
 			zbx_ipc_message_free(message);
@@ -2499,7 +2527,12 @@ ZBX_THREAD_ENTRY(zbx_alert_manager_thread, args)
 
 		if (NULL != client)
 			zbx_ipc_client_release(client);
+
+		if (1 == shutdown)
+			break;
 	}
+
+	am_deinit(&manager);
 
 	zbx_setproctitle("%s #%d [terminated]", get_process_type_string(process_type), process_num);
 

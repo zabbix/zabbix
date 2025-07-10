@@ -627,7 +627,7 @@ zbx_uint32_t	zbx_preprocessor_pack_top_stats_result(unsigned char **data, zbx_ve
 	if (0 != stats_num)
 	{
 		zbx_serialize_prepare_value(stat_len, stats->values[0]->itemid);
-		zbx_serialize_prepare_value(stat_len, stats->values[0]->tasks_num);
+		zbx_serialize_prepare_value(stat_len, stats->values[0]->num);
 	}
 
 	zbx_serialize_prepare_value(data_len, stats_num);
@@ -640,7 +640,7 @@ zbx_uint32_t	zbx_preprocessor_pack_top_stats_result(unsigned char **data, zbx_ve
 	for (int i = 0; i < stats_num; i++)
 	{
 		ptr += zbx_serialize_value(ptr, stats->values[i]->itemid);
-		ptr += zbx_serialize_value(ptr, stats->values[i]->tasks_num);
+		ptr += zbx_serialize_value(ptr, stats->values[i]->num);
 	}
 
 	return data_len;
@@ -882,7 +882,7 @@ void	zbx_preprocessor_unpack_top_stats_result(zbx_vector_pp_top_stats_ptr_t *sta
 
 			stat = (zbx_pp_top_stats_t *)zbx_malloc(NULL, sizeof(zbx_pp_top_stats_t));
 			data += zbx_deserialize_value(data, &stat->itemid);
-			data += zbx_deserialize_value(data, &stat->tasks_num);
+			data += zbx_deserialize_value(data, &stat->num);
 			zbx_vector_pp_top_stats_ptr_append(stats, stat);
 		}
 	}
@@ -1264,6 +1264,26 @@ int	zbx_preprocessor_get_top_sequences(int limit, zbx_vector_pp_top_stats_ptr_t 
 int	zbx_preprocessor_get_top_peak(int limit, zbx_vector_pp_top_stats_ptr_t *stats, char **error)
 {
 	return preprocessor_get_top_view(limit, stats, error, ZBX_IPC_PREPROCESSOR_TOP_PEAK);
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: get the top N items by the number of received values              *
+ *                                                                            *
+ ******************************************************************************/
+int	zbx_preprocessor_get_top_values_num(int limit, zbx_vector_pp_top_stats_ptr_t *stats, char **error)
+{
+	return preprocessor_get_top_view(limit, stats, error, ZBX_IPC_PREPROCESSOR_TOP_VALUES_NUM);
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: get the top N items by the size of received values                *
+ *                                                                            *
+ ******************************************************************************/
+int	zbx_preprocessor_get_top_values_size(int limit, zbx_vector_pp_top_stats_ptr_t *stats, char **error)
+{
+	return preprocessor_get_top_view(limit, stats, error, ZBX_IPC_PREPROCESSOR_TOP_VALUES_SZ);
 }
 
 /******************************************************************************
