@@ -1038,7 +1038,7 @@ zabbix_export:
           description: 'AWS Backup jobs discovery.'
           item_prototypes:
             - uuid: cc978e4977c94e0ca743757d9d254f14
-              name: 'Job state [{#AWS.BACKUP_JOB.RESOURCE_NAME}, {#AWS.BACKUP_JOB.ID}]'
+              name: 'Job state [{#AWS.BACKUP_JOB.RESOURCE_NAME}][{#AWS.BACKUP_JOB.ID}]'
               type: DEPENDENT
               key: 'aws.backup_vault.job.state["{#AWS.BACKUP_JOB.ID}"]'
               delay: '0'
@@ -1093,17 +1093,6 @@ zabbix_export:
                 - tag: resource_type
                   value: '{#AWS.BACKUP_JOB.RESOURCE_TYPE}'
               trigger_prototypes:
-                - uuid: 06182df42e5d4777b8506726c2793dee
-                  expression: 'last(/AWS Backup vault by HTTP/aws.backup_vault.job.state["{#AWS.BACKUP_JOB.ID}"])=5'
-                  name: 'AWS Backup vault: Job aborted [{#AWS.BACKUP_JOB.ID}]'
-                  event_name: 'AWS Backup vault: Job type [{#AWS.BACKUP_JOB.TYPE}] for [{#AWS.BACKUP_JOB.RESOURCE_NAME}] with ID [{#AWS.BACKUP_JOB.ID}] has cancelled.'
-                  opdata: 'Current status: {ITEM.LASTVALUE1}'
-                  priority: AVERAGE
-                  description: 'Job has cancelled.'
-                  manual_close: 'YES'
-                  tags:
-                    - tag: scope
-                      value: notice
                 - uuid: e1fb82528ca34849b75200b417036037
                   expression: 'last(/AWS Backup vault by HTTP/aws.backup_vault.job.state["{#AWS.BACKUP_JOB.ID}"])=8'
                   name: 'AWS Backup vault: Job expired [{#AWS.BACKUP_JOB.ID}]'
@@ -1126,13 +1115,24 @@ zabbix_export:
                   tags:
                     - tag: scope
                       value: notice
+                - uuid: 06182df42e5d4777b8506726c2793dee
+                  expression: 'last(/AWS Backup vault by HTTP/aws.backup_vault.job.state["{#AWS.BACKUP_JOB.ID}"])=5'
+                  name: 'AWS Backup vault: Job has been aborted [{#AWS.BACKUP_JOB.ID}]'
+                  event_name: 'AWS Backup vault: Job type [{#AWS.BACKUP_JOB.TYPE}] for [{#AWS.BACKUP_JOB.RESOURCE_NAME}] with ID [{#AWS.BACKUP_JOB.ID}] has been aborted.'
+                  opdata: 'Current status: {ITEM.LASTVALUE1}'
+                  priority: AVERAGE
+                  description: 'Job has been aborted.'
+                  manual_close: 'YES'
+                  tags:
+                    - tag: scope
+                      value: notice
                 - uuid: e449b1999f09469bbf71e531afebc26b
                   expression: 'last(/AWS Backup vault by HTTP/aws.backup_vault.job.state["{#AWS.BACKUP_JOB.ID}"])=0'
-                  name: 'AWS Backup vault: Job state unknown [{#AWS.BACKUP_JOB.ID}]'
-                  event_name: 'AWS Backup vault: Job type [{#AWS.BACKUP_JOB.TYPE}] for [{#AWS.BACKUP_JOB.RESOURCE_NAME}] with ID [{#AWS.BACKUP_JOB.ID}] has unknown state.'
+                  name: 'AWS Backup vault: Job is in unknown state [{#AWS.BACKUP_JOB.ID}]'
+                  event_name: 'AWS Backup vault: Job type [{#AWS.BACKUP_JOB.TYPE}] for [{#AWS.BACKUP_JOB.RESOURCE_NAME}] with ID [{#AWS.BACKUP_JOB.ID}] is in unknown state.'
                   opdata: 'Current status: {ITEM.LASTVALUE1}'
                   priority: WARNING
-                  description: 'Job has unknown state.'
+                  description: 'Job is in unknown state.'
                   manual_close: 'YES'
                   tags:
                     - tag: scope
