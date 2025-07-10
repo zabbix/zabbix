@@ -361,7 +361,6 @@ class testDashboardHostCardWidget extends testWidgets {
 		);
 
 		$zabbix_server = CDBHelper::getValue('SELECT hostid FROM hosts WHERE name='.zbx_dbstr('ЗАББИКС Сервер'));
-		$default_server = CDBHelper::getValue('SELECT hostid FROM hosts WHERE name='.zbx_dbstr('Host ZBX6663'));
 
 		CDataHelper::call('dashboard.create', [
 			[
@@ -655,7 +654,7 @@ class testDashboardHostCardWidget extends testWidgets {
 									[
 										'type' => 3,
 										'name' => 'hostid.0',
-										'value' => $default_server
+										'value' => $zabbix_server
 									],
 									[
 										'type' => 0,
@@ -1238,16 +1237,16 @@ class testDashboardHostCardWidget extends testWidgets {
 			[
 				[
 					'Header' => 'Default host card widget',
-					'Host' => 'Host ZBX6663',
+					'Host' => 'ЗАББИКС Сервер',
 					'Availability' => ['ZBX'],
 					'Monitored by' => [
 						'Server' => 'Zabbix server'
 					],
 					'Monitoring' => [
-						'Dashboards' => 0,
-						'Latest data' => 14,
-						'Graphs' => 2,
-						'Web' => 2
+						'Dashboards' => 4,
+						'Latest data' => 116,
+						'Graphs' => 8,
+						'Web' => 0
 					]
 				]
 			],
