@@ -4,7 +4,7 @@ msgstr ""
 "Project-Id-Version: Zabbix 6.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2023-10-19 13:48+0300\n"
-"PO-Revision-Date: 2025-06-26 08:06+0000\n"
+"PO-Revision-Date: 2025-06-27 13:12+0000\n"
 "Last-Translator: Tomáš Skočdopole <tomas.skocdopole@initmax.cz>\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
 "Language: cs\n"
@@ -3731,57 +3731,57 @@ msgstr "Nelze zdědit prototyp pravidla LLD s klíčem \"%1$s\" ze šablony \"%2
 #: include/classes/api/services/CItemGeneral.php:1358
 #, c-format
 msgid "Cannot inherit LLD rule prototype with key \"%1$s\" of template \"%2$s\" to host \"%3$s\", because a host interface of type \"%4$s\" is required."
-msgstr ""
+msgstr "Nelze zdědit prototyp pravidla LLD s klíčem \"%1$s\" ze šablony \"%2$s\" na hosta \"%3$s\", protože je na hostovi požadováno rozhraní typu \"%4$s\"."
 
 #: include/classes/api/services/CItemGeneral.php:969
 #, c-format
 msgid "Cannot inherit LLD rule prototype with key \"%1$s\" of template \"%2$s\" to host \"%3$s\", because an LLD rule prototype with the same key is already inherited from template \"%4$s\"."
-msgstr ""
+msgstr "Nelze zdědit prototyp pravidla LLD s klíčem \"%1$s\" ze šablony \"%2$s\" na hosta \"%3$s\", protože LLD pravidlo se stejným klíčem je již zděděné ze šablony \"%4$s\"."
 
 #: include/classes/api/services/CItemGeneral.php:921
 #, c-format
 msgid "Cannot inherit LLD rule prototype with key \"%1$s\" of template \"%2$s\" to host \"%3$s\", because an LLD rule with the same key already exists."
-msgstr ""
+msgstr "Nelze zdědit prototyp pravidla LLD s klíčem \"%1$s\" ze šablony \"%2$s\" na hosta \"%3$s\", protože LLD pravidlo se stejným klíčem již existuje."
 
 #: include/classes/api/services/CItemGeneral.php:914
 #, c-format
 msgid "Cannot inherit LLD rule prototype with key \"%1$s\" of template \"%2$s\" to host \"%3$s\", because an item prototype with the same key already exists."
-msgstr ""
+msgstr "Nelze zdědit prototyp pravidla LLD s klíčem \"%1$s\" ze šablony \"%2$s\" na hosta \"%3$s\", protože prototyp itemu se stejným klíčem již existuje."
 
 #: include/classes/api/services/CItemGeneral.php:907
 #, c-format
 msgid "Cannot inherit LLD rule prototype with key \"%1$s\" of template \"%2$s\" to host \"%3$s\", because an item with the same key already exists."
-msgstr ""
+msgstr "Nelze zdědit prototyp pravidla LLD s klíčem \"%1$s\" ze šablony \"%2$s\" na hosta \"%3$s\", protože item se stejným klíčem již existuje."
 
 #: include/classes/api/services/CItemGeneral.php:970
 #, c-format
 msgid "Cannot inherit LLD rule prototype with key \"%1$s\" of template \"%2$s\" to template \"%3$s\", because an LLD rule prototype with the same key is already inherited from template \"%4$s\"."
-msgstr ""
+msgstr "Nelze zdědit prototyp pravidla LLD s klíčem \"%1$s\" ze šablony \"%2$s\" na šablonu \"%3$s\", protože LLD pravidlo se stejným klíčem je již zděděné ze šablony \"%4$s\"."
 
 #: include/classes/api/services/CItemGeneral.php:922
 #, c-format
 msgid "Cannot inherit LLD rule prototype with key \"%1$s\" of template \"%2$s\" to template \"%3$s\", because an LLD rule with the same key already exists."
-msgstr ""
+msgstr "Nelze zdědit prototyp pravidla LLD s klíčem \"%1$s\" ze šablony \"%2$s\" na šablonu \"%3$s\", protože LLD pravidlo se stejným klíčem již existuje."
 
 #: include/classes/api/services/CItemGeneral.php:915
 #, c-format
 msgid "Cannot inherit LLD rule prototype with key \"%1$s\" of template \"%2$s\" to template \"%3$s\", because an item prototype with the same key already exists."
-msgstr ""
+msgstr "Nelze zdědit prototyp pravidla LLD s klíčem \"%1$s\" ze šablony \"%2$s\" na šablonu \"%3$s\", protože prototyp itemu se stejným klíčem již existuje."
 
 #: include/classes/api/services/CItemGeneral.php:908
 #, c-format
 msgid "Cannot inherit LLD rule prototype with key \"%1$s\" of template \"%2$s\" to template \"%3$s\", because an item with the same key already exists."
-msgstr ""
+msgstr "Nelze zdědit prototyp pravidla LLD s klíčem \"%1$s\" ze šablony \"%2$s\" na šablonu \"%3$s\", protože item se stejným klíčem již existuje."
 
 #: include/classes/api/services/CItemGeneral.php:717
 #, c-format
 msgid "Cannot inherit LLD rule prototypes with key \"%1$s\" of both \"%2$s\" and \"%3$s\" templates, because the key must be unique on host \"%4$s\"."
-msgstr ""
+msgstr "Nelze zdědit prototyp LLD pravidla s klíčem \"%1$s\" z obou šablon \"%2$s\" a \"%3$s\", protože klíč musí být unikátní na hostu \"%4$s\"."
 
 #: include/classes/api/services/CItemGeneral.php:718
 #, c-format
 msgid "Cannot inherit LLD rule prototypes with key \"%1$s\" of both \"%2$s\" and \"%3$s\" templates, because the key must be unique on template \"%4$s\"."
-msgstr ""
+msgstr "Nelze zdědit prototyp LLD pravidla s klíčem \"%1$s\" z obou šablon \"%2$s\" a \"%3$s\", protože klíč musí být unikátní na šabloně \"%4$s\"."
 
 #: include/classes/api/services/CItemGeneral.php:819
 #, c-format
@@ -3796,7 +3796,7 @@ msgstr "Nelze zdědit pravidlo LLD s klíčem \"%1$s\" ze šablony \"%2$s\" na h
 #: include/classes/api/services/CItemGeneral.php:897
 #, c-format
 msgid "Cannot inherit LLD rule with key \"%1$s\" of template \"%2$s\" to host \"%3$s\", because an LLD rule prototype with the same key already exists."
-msgstr ""
+msgstr "Nelze zdědit pravidlo LLD s klíčem \"%1$s\" ze šablony \"%2$s\" na hosta \"%3$s\", protože prototyp LLD pravidla se stejným klíčem již existuje."
 
 #: include/classes/api/services/CItemGeneral.php:874
 #, c-format
@@ -3821,7 +3821,7 @@ msgstr "Nelze zdědit pravidlo LLD s klíčem \"%1$s\" ze šablony \"%2$s\" na �
 #: include/classes/api/services/CItemGeneral.php:898
 #, c-format
 msgid "Cannot inherit LLD rule with key \"%1$s\" of template \"%2$s\" to template \"%3$s\", because an LLD rule prototype with the same key already exists."
-msgstr ""
+msgstr "Nelze zdědit pravidlo LLD s klíčem \"%1$s\" ze šablony \"%2$s\" na šablonu \"%3$s\", protože prototyp LLD pravidla se stejným klíčem již existuje."
 
 #: include/classes/api/services/CItemGeneral.php:875
 #, c-format
@@ -3861,7 +3861,7 @@ msgstr "Nelze zdědit prototyp itemu s klíčem \"%1$s\" ze šablony \"%2$s\" a 
 #: include/classes/api/services/CItemGeneral.php:856
 #, c-format
 msgid "Cannot inherit item prototype with key \"%1$s\" of template \"%2$s\" to host \"%3$s\", because a discovered item prototype with the same key already exists."
-msgstr ""
+msgstr "Nelze zdědit prototyp itemu s klíčem \"%1$s\" ze šablony \"%2$s\" na hosta \"%3$s\", protože objevený prototyp itemu se stejným klíčem již existuje."
 
 #: include/classes/api/services/CItemGeneral.php:841
 #, c-format
@@ -3876,7 +3876,7 @@ msgstr "Nelze zdědit prototyp itemu s klíčem \"%1$s\" ze šablony \"%2$s\" na
 #: include/classes/api/services/CItemGeneral.php:869
 #, c-format
 msgid "Cannot inherit item prototype with key \"%1$s\" of template \"%2$s\" to host \"%3$s\", because an LLD rule prototype with the same key already exists."
-msgstr ""
+msgstr "Nelze zdědit prototyp itemu s klíčem \"%1$s\" ze šablony \"%2$s\" na hosta \"%3$s\", protože prototyp LLD pravidla se stejným klíčem již existuje."
 
 #: include/classes/api/services/CItemGeneral.php:835
 #, c-format
@@ -3901,7 +3901,7 @@ msgstr "Nelze zdědit prototyp itemu s klíčem \"%1$s\" ze šablony \"%2$s\" na
 #: include/classes/api/services/CItemGeneral.php:870
 #, c-format
 msgid "Cannot inherit item prototype with key \"%1$s\" of template \"%2$s\" to template \"%3$s\", because an LLD rule prototype with the same key already exists."
-msgstr ""
+msgstr "Nelze zdědit prototyp itemu s klíčem \"%1$s\" ze šablony \"%2$s\" na šablonu \"%3$s\", protože prototyp LLD pravidla se stejným klíčem již existuje."
 
 #: include/classes/api/services/CItemGeneral.php:836
 #, c-format
@@ -3941,7 +3941,7 @@ msgstr "Nelze zdědit item s klíčem \"%1$s\" ze šablony \"%2$s\" a item s kl�
 #: include/classes/api/services/CItemGeneral.php:891
 #, c-format
 msgid "Cannot inherit item with key \"%1$s\" of template \"%2$s\" to host \"%3$s\", because a discovered LLD rule with the same key already exists."
-msgstr ""
+msgstr "Nelze zdědit item s klíčem \"%1$s\" ze šablony \"%2$s\" na hosta \"%3$s\", protože objevené LLD pravidlo se stejným klíčem již existuje."
 
 #: include/classes/api/services/CItemGeneral.php:797
 #, c-format
@@ -3956,7 +3956,7 @@ msgstr "Nelze zdědit item s klíčem \"%1$s\" ze šablony \"%2$s\" na hosta \"%
 #: include/classes/api/services/CItemGeneral.php:841
 #, c-format
 msgid "Cannot inherit item with key \"%1$s\" of template \"%2$s\" to host \"%3$s\", because an LLD rule prototype with the same key already exists."
-msgstr ""
+msgstr "Nelze zdědit item s klíčem \"%1$s\" ze šablony \"%2$s\" na hosta \"%3$s\", protože prototyp LLD pravidla se stejným klíčem již existuje."
 
 #: include/classes/api/services/CItemGeneral.php:785
 #, c-format
@@ -9815,7 +9815,7 @@ msgstr "Prototyp grafu"
 #: include/classes/api/services/CGraphGeneral.php:1354
 #, c-format
 msgid "Graph prototype \"%1$s\" already exists on \"%2$s\" as a discovered graph prototype."
-msgstr ""
+msgstr "Prototyp grafu \"%1$s\" již existuje na \"%2$s\" jako objevený prototyp grafu."
 
 #: include/classes/api/services/CGraphPrototype.php:470
 #, c-format
@@ -10806,7 +10806,7 @@ msgstr "Hosté"
 
 #: app/views/host.wizard.edit.php:278
 msgid "Hosts are organized into host groups for easier management and access control."
-msgstr ""
+msgstr "Hosté jsou pro snazší správu a řízení přístupu uspořádáni do skupin hostů."
 
 #: widgets/dataover/includes/WidgetForm.php:65
 #: widgets/trigover/includes/WidgetForm.php:72
@@ -26097,11 +26097,11 @@ msgstr "blikající"
 
 #: include/classes/api/services/CMediatype.php:680
 msgid "both \"access_token\" and \"access_expires_in\" must be specified when marking access token valid"
-msgstr ""
+msgstr "Při označování platného přístupového tokenu je nutné zadat parametry \"access_token\" a \"access_expires_in\""
 
 #: include/classes/api/services/CMediatype.php:695
 msgid "both \"access_token\" and \"access_expires_in\" should be either present or absent"
-msgstr ""
+msgstr "Hodnoty \"access_token\" a \"access_expires_in\" musí být buď obě současně zadány, nebo obě současně nezadány"
 
 #: include/classes/api/services/CItemGeneral.php:265
 msgid "both username and password should be either present or empty"
@@ -26284,7 +26284,7 @@ msgstr "nelze odstranit zděděné pravidlo LLD"
 
 #: include/classes/api/services/CDiscoveryRulePrototype.php:1231
 msgid "cannot delete inherited LLD rule prototype"
-msgstr ""
+msgstr "nelze odstranit zděděný prototyp pravidla LLD"
 
 #: include/classes/api/services/CItem.php:909
 msgid "cannot delete inherited item"
@@ -26300,7 +26300,7 @@ msgstr "Nelze odstranit prototyp šablony hosta."
 
 #: include/classes/api/services/CDiscoveryRule.php:726
 msgid "cannot have a nested LLD rule on a non-discovered host"
-msgstr ""
+msgstr "Nelze mít vnořené pravidlo LLD na neobjeveném hostovi"
 
 #: include/classes/api/services/CHostPrototype.php:1411
 msgid "cannot have more than one default interface of the same type"
@@ -26825,7 +26825,7 @@ msgstr "nesprávné použití funkce \"%1$s\""
 #: app/controllers/CControllerHostWizardUpdateGeneral.php:88
 #, c-format
 msgid "input does not match the pattern: %1$s"
-msgstr ""
+msgstr "vstup neodpovídá vzoru: %1$s"
 
 #: app/controllers/CControllerScriptUserInputCheck.php:111
 #: include/classes/api/services/CScript.php:517
@@ -27850,7 +27850,7 @@ msgstr "šablona se stejným UUID již existuje"
 
 #: include/classes/api/services/CMediatype.php:688
 msgid "the \"refresh_token\" parameter must be specified when marking refresh token valid"
-msgstr ""
+msgstr "Při označování platného tokenu obnovení je nutné zadat parametr \"refresh_token\""
 
 #: include/classes/api/services/CItemGeneral.php:1814
 #: include/classes/api/services/CItemGeneral.php:1831
