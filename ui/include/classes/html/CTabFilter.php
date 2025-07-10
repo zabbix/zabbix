@@ -167,7 +167,8 @@ class CTabFilter extends CDiv {
 			if ($tab_index == 0) {
 				$label = (new CLink(''))
 					->setAttribute('aria-label', _('Home'))
-					->addClass(ZBX_ICON_FILTER);
+					->addClass(ZBX_ICON_FILTER)
+					->setAttribute('aria-label', _('Default filter tab'));
 				$data += [
 					'filter_sortable' => false,
 					'filter_configurable' => false
@@ -375,8 +376,10 @@ class CTabFilter extends CDiv {
 		array_unshift($sortable, array_shift($static));
 
 		$nav_list = new CList([
-			(new CButtonIcon(ZBX_ICON_CHEVRON_DOWN))->setAttribute('data-action', 'toggleTabsList'),
+			(new CButtonIcon(ZBX_ICON_CHEVRON_DOWN))->setAttribute('data-action', 'toggleTabsList')
+				->setAttribute('aria-label', _('Tabs list')),
 			(new CButtonIcon(ZBX_ICON_CHEVRON_RIGHT))->setAttribute('data-action', 'selectNextTab')
+				->setAttribute('aria-label', _('Next tab'))
 		]);
 
 		if (array_key_exists('timeselector', $this->options)) {
@@ -387,7 +390,8 @@ class CTabFilter extends CDiv {
 
 		return new CTag('nav', true,
 			new CList([
-				(new CButtonIcon(ZBX_ICON_CHEVRON_LEFT))->setAttribute('data-action', 'selectPrevTab'),
+				(new CButtonIcon(ZBX_ICON_CHEVRON_LEFT))->setAttribute('data-action', 'selectPrevTab')
+					->setAttribute('aria-label', _('Previous tab')),
 				$sortable ? (new CList($sortable))->addClass(static::CSS_TABS) : null,
 				$static ?: null,
 				$nav_list

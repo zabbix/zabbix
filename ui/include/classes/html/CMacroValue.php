@@ -117,6 +117,7 @@ class CMacroValue extends CInput {
 		$value_type = $this->getAttribute('type');
 		$value = $this->getAttribute('value');
 		$readonly = (bool) $this->getAttribute('readonly');
+		$aria_label = _('Text macro');
 		$elements = [];
 
 		if ($value_type == ZBX_MACRO_TYPE_TEXT) {
@@ -132,6 +133,7 @@ class CMacroValue extends CInput {
 		elseif ($value_type == ZBX_MACRO_TYPE_VAULT) {
 			$wrapper_class = self::ZBX_STYLE_MACRO_INPUT_GROUP.' '.self::ZBX_STYLE_MACRO_VALUE_VAULT;
 			$dropdown_btn_class = ZBX_ICON_LOCK;
+			$aria_label = _('Secret text macro');
 
 			$elements[] = (new CTextAreaFlexible($name.'[value]', $value, ['add_post_js' => $this->add_post_js]))
 				->setMaxlength($this->maxlength)
@@ -142,6 +144,7 @@ class CMacroValue extends CInput {
 		else {
 			$wrapper_class = self::ZBX_STYLE_MACRO_INPUT_GROUP.' '.self::ZBX_STYLE_MACRO_VALUE_SECRET;
 			$dropdown_btn_class = ZBX_ICON_EYE_OFF;
+			$aria_label = _('Vault secret macro');
 
 			$elements[] = (new CInputSecret($name.'[value]', $value, $this->add_post_js))
 				->setAttribute('maxlength', $this->maxlength)
@@ -160,7 +163,7 @@ class CMacroValue extends CInput {
 		]))
 			->addClass($dropdown_btn_class)
 			->setAttribute('disabled', $readonly ? 'disabled' : null)
-			->setAttribute('aria-label', _('Change type'));
+			->setAttribute('aria-label', $aria_label.'. '._('Change type'));
 
 		$node = (new CDiv())
 			->addClass($wrapper_class)

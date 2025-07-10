@@ -110,7 +110,7 @@ class CHtmlPage {
 					->addItem($this->kiosk_mode_controls)
 					->addItem(
 						get_icon('kioskmode', ['mode' => ZBX_LAYOUT_KIOSKMODE])
-							->setAttribute('aria-label', _('Content controls'))
+							->setAttribute('aria-label', _('Leave kiosk mode'))
 					)
 			);
 		}
@@ -140,7 +140,7 @@ class CHtmlPage {
 			))
 				->addClass('sidebar-nav-toggle')
 				->setAttribute('role', 'navigation')
-				->setAttribute('aria-label', _('Sidebar control'))
+				->setAttribute('aria-label', _('Show main menu'))
 		];
 
 		if ($this->title !== '') {
@@ -170,6 +170,7 @@ class CHtmlPage {
 					->addClass(ZBX_ICON_HELP)
 					->setTitle(_('Help'))
 					->setTarget('_blank')
+					->setAttribute('aria-label', _('Help'))
 			))->addClass(self::ZBX_STYLE_HEADER_DOC_LINK);
 		}
 

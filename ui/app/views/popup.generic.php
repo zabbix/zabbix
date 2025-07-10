@@ -436,7 +436,8 @@ switch ($data['popup_type']) {
 				->addClass(ZBX_STYLE_BTN_ICON)
 				->addClass(ZBX_ICON_HELP)
 				->setTitle(_('Help'))
-				->setTarget('_blank');
+				->setTarget('_blank')
+				->setAttribute('aria-label', _('Help'));
 
 			$table->addRow([$name, $item['description'], $documentation_link]);
 		}

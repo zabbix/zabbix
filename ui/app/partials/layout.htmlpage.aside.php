@@ -34,16 +34,20 @@ $header = (new CDiv())
 		(new CDiv([
 			(new CButtonIcon(ZBX_ICON_CHEVRON_DOUBLE_LEFT, _('Collapse sidebar')))
 				->addClass('js-sidebar-mode')
-				->addClass('button-compact'),
+				->addClass('button-compact')
+				->setAttribute('aria-label', _('Collapse main menu')),
 			(new CButtonIcon(ZBX_ICON_CHEVRON_DOUBLE_RIGHT, _('Expand sidebar')))
 				->addClass('js-sidebar-mode')
-				->addClass('button-expand'),
+				->addClass('button-expand')
+				->setAttribute('aria-label', _('Expand main menu')),
 			(new CButtonIcon(ZBX_ICON_COLLAPSE, _('Hide sidebar')))
 				->addClass('js-sidebar-mode')
-				->addClass('button-hide'),
+				->addClass('button-hide')
+				->setAttribute('aria-label', _('Hide main menu')),
 			(new CButtonIcon(ZBX_ICON_EXPAND, _('Show sidebar')))
 				->addClass('js-sidebar-mode')
 				->addClass('button-show')
+				->setAttribute('aria-label', _('Show main menu'))
 		]))->addClass('sidebar-header-buttons')
 	);
 

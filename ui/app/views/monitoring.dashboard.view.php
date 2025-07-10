@@ -119,6 +119,7 @@ $html_page = (new CHtmlPage())
 							->setTitle(_('Actions'))
 							->setEnabled($data['dashboard']['can_edit_dashboards'] || $data['can_view_reports'])
 							->setAttribute('aria-haspopup', true)
+							->setAttribute('aria-label', _('Dashboard actions'))
 							->setMenuPopup(CMenuPopupHelper::getDashboard($data['dashboard']['dashboardid'],
 								$data['dashboard']['editable'], $data['has_related_reports'],
 								$data['dashboard']['can_edit_dashboards'], $data['can_view_reports'],

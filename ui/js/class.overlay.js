@@ -49,7 +49,7 @@ function Overlay(type, dialogueid) {
 	}).click(function(e) {
 		overlayDialogueDestroy(this.dialogueid);
 		e.preventDefault();
-	}.bind(this));
+	}.bind(this)).attr('aria-label', t('S_CLOSE'));
 
 	this.$dialogue.$controls = jQuery('<div>', {class: 'overlay-dialogue-controls'});
 	this.$dialogue.$head = jQuery('<div>', {class: 'overlay-dialogue-header'});
@@ -509,7 +509,7 @@ Overlay.prototype.setProperties = function(obj) {
 			case 'doc_url':
 				this.unsetProperty(key);
 				this.$dialogue.$header[0].insertAdjacentHTML('afterend', `
-					<a class="${ZBX_STYLE_BTN_ICON} ${ZBX_ICON_HELP_SMALL}" target="_blank" title="${t('Help')}" href="${obj[key]}"></a>
+					<a class="${ZBX_STYLE_BTN_ICON} ${ZBX_ICON_HELP_SMALL}" target="_blank" title="${t('Help')}" aria-label="${t('Help')}" href="${obj[key]}"></a>
 				`);
 				break;
 
