@@ -1519,7 +1519,7 @@ static void	db_mask_select_query(char *sql_in, char **sql_out)
 
 static void	db_mask_printable_sql_values(char **sql)
 {
-	char	*p, *end, *new;
+	char	*p, *end;
 
 	if (0 == strncmp(*sql, "insert into", ZBX_CONST_STRLEN("insert into")))
 	{
