@@ -9640,17 +9640,6 @@ void	DCget_interface(zbx_dc_interface_t *dst_interface, const ZBX_DC_INTERFACE *
 	dst_interface->port = 0;
 }
 
-unsigned char	zbx_dc_item_preprocessable(const ZBX_DC_ITEM *src_item)
-{
-	if (ITEM_TYPE_DEPENDENT == src_item->type || NULL != src_item->preproc_item || NULL != src_item->master_item ||
-		0 != (ZBX_FLAG_DISCOVERY_RULE & src_item->flags))
-	{
-		return 1;
-	}
-
-	return 0;
-}
-
 static void	DCget_item(zbx_dc_item_t *dst_item, const ZBX_DC_ITEM *src_item)
 {
 	const ZBX_DC_LOGITEM		*logitem;
@@ -10326,6 +10315,21 @@ static int	dc_preproc_item_changed(ZBX_DC_ITEM *dc_item, zbx_pp_item_t *pp_item)
 	return FAIL;
 }
 
+unsigned char	zbx_dc_item_preprocessable(const ZBX_DC_ITEM *dc_item)
+{
+	if (ITEM_STATUS_ACTIVE != dc_item->status || ITEM_TYPE_DEPENDENT == dc_item->type)
+		return 0;
+
+	if (NULL == dc_item->preproc_item && NULL == dc_item->master_item &&
+			ITEM_TYPE_INTERNAL != dc_item->type &&
+			ZBX_FLAG_DISCOVERY_RULE != dc_item->flags)
+	{
+		return 0;
+	}
+
+	return 1;
+}
+
 /******************************************************************************
  *                                                                            *
  * Purpose: get preprocessable items:                                         *
@@ -10368,15 +10372,8 @@ void	zbx_dc_config_get_preprocessable_items(zbx_hashset_t *items, zbx_dc_um_shar
 		{
 			ZBX_DC_ITEM	*dc_item = dc_host->items.values[i];
 
-			if (ITEM_STATUS_ACTIVE != dc_item->status || ITEM_TYPE_DEPENDENT == dc_item->type)
+			if (0 == zbx_dc_item_preprocessable(dc_item))
 				continue;
-
-			if (NULL == dc_item->preproc_item && NULL == dc_item->master_item &&
-					ITEM_TYPE_INTERNAL != dc_item->type &&
-					ZBX_FLAG_DISCOVERY_RULE != dc_item->flags)
-			{
-				continue;
-			}
 
 			if (HOST_MONITORED_BY_SERVER == dc_host->monitored_by ||
 					SUCCEED == zbx_is_item_processed_by_server(dc_item->type, dc_item->key) ||
