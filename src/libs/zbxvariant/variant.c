@@ -442,6 +442,11 @@ zbx_uint64_t	zbx_variant_size(const zbx_variant_t *value)
 			size = strlen(value->data.err);
 			break;
 		case ZBX_VARIANT_VECTOR:
+			if (NULL != value->data.vector)
+			{
+				for (int i = 0; i < value->data.vector->values_num; i++)
+					zbx_variant_size(&value->data.vector->values[i]);
+			}
 			break;
 		default:
 			THIS_SHOULD_NEVER_HAPPEN;
