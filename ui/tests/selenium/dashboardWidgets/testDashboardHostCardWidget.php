@@ -1319,9 +1319,18 @@ class testDashboardHostCardWidget extends testWidgets {
 		}
 
 		if (array_key_exists('Availability', $data)) {
-			$availability = $widget->query('class:section-availability')->query('class:status-container')
-					->query('xpath:.//span')->all()->asText();
-			$this->assertEquals($data['Availability'], $availability);
+			$availabilities = $widget->query('class:section-availability')->query('class:status-container')
+					->query('xpath:.//span')->all();
+			$this->assertEquals($data['Availability'], $availabilities->asText());
+
+
+			foreach ($availabilities as $availability) {
+				$availability->click();
+				$dialog = $this->query('xpath://div[@class="overlay-dialogue wordbreak"]')->asOverlayDialog()
+						->waitUntilPresent()->one();
+				$this->assertTrue($dialog->isVisible());
+				$dialog->close();
+			}
 		}
 
 		if (array_key_exists('Monitored by', $data)) {
@@ -1346,8 +1355,17 @@ class testDashboardHostCardWidget extends testWidgets {
 		}
 
 		if (array_key_exists('Tags', $data)) {
-			$tags = $widget->query('class:section section-tags')->query('class:tags')->query('class:tag')->all();
+			$tags = $widget->query('class:section-tags')->query('class:tags')->query('class:tag')->all();
 			$this->assertEquals($data['Tags'], $tags->asText());
+
+			foreach ($tags as $tag) {
+				if($tag->isClickable()){
+					$tag->click();
+					$hint = $this->query('xpath://div[@data-hintboxid]')->asOverlayDialog()->waitUntilPresent()->all()->last();
+					$this->assertEquals($tag->getText(), $hint->getText());
+					$hint->close();
+				}
+			}
 		}
 
 		if (array_key_exists('Monitoring', $data)) {
