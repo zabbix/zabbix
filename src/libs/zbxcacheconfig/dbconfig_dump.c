@@ -417,8 +417,8 @@ static void	DCdump_interfaces(void)
 				zbx_snprintf_alloc(&if_msg, &alloc, &offset," snmpv3:["
 					"securityname:'%s' securitylevel:%u authprotocol:%u privprotocol:%u"
 					" contextname:'%s']",
-					ZBX_STRMASK(snmp->securityname), ZBX_STRMASK(snmp->securitylevel),
-					snmp->authprotocol, snmp->privprotocol, ZBX_STRMASK(snmp->contextname));
+					ZBX_STRMASK(snmp->securityname), snmp->securitylevel, snmp->authprotocol,
+					snmp->privprotocol, ZBX_STRMASK(snmp->contextname));
 			}
 		}
 
@@ -538,6 +538,9 @@ static void	DCdump_telnetitem(const ZBX_DC_TELNETITEM *telnetitem)
 
 static void	DCdump_simpleitem(const ZBX_DC_SIMPLEITEM *simpleitem)
 {
+#ifndef ZBX_DEBUG
+	ZBX_UNUSED(simpleitem);
+#endif
 	zabbix_log(LOG_LEVEL_TRACE, "  simple:[username:'%s' password:'%s']", ZBX_STRMASK(simpleitem->username),
 			ZBX_STRMASK(simpleitem->password));
 }
