@@ -53,4 +53,6 @@ int	zbx_comms_exchange_with_redirect(const char *source_ip, zbx_vector_addr_ptr_
 
 void	zbx_addrs_failover(zbx_vector_addr_ptr_t *addrs);
 
+char	*zbx_sanitize_proxyconfig_json(char *jbuffer);
+
 #endif // ZABBIX_COMMSHIGH_H

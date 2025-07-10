@@ -940,6 +940,12 @@ void	zbx_dc_get_autoregistration_psk(char *psk_identity_buf, size_t psk_identity
 
 #define ZBX_MACRO_SECRET_MASK	"******"
 
+#if defined(ZBX_DEBUG)
+#	define ZBX_STRMASK(x)	x
+#else
+#	define ZBX_STRMASK(x)	ZBX_MACRO_SECRET_MASK
+#endif
+
 int	zbx_dc_interface_activate(zbx_uint64_t interfaceid, const zbx_timespec_t *ts, zbx_agent_availability_t *in,
 		zbx_agent_availability_t *out);
 
@@ -1221,6 +1227,8 @@ void	zbx_dc_close_user_macros(zbx_dc_um_handle_t *um_handle);
 
 void	zbx_dc_get_user_macro(const zbx_dc_um_handle_t *um_handle, const char *macro, const zbx_uint64_t *hostids,
 		int hostids_num, char **value);
+
+unsigned char	zbx_dc_get_user_macro_env(zbx_dc_um_handle_t *um_handle);
 
 int	zbx_dc_expand_user_and_func_macros(const zbx_dc_um_handle_t *um_handle, char **text,
 		const zbx_uint64_t *hostids, int hostids_num, char **error);

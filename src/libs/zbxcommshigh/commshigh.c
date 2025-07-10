@@ -173,7 +173,16 @@ int	zbx_get_data_from_server(zbx_socket_t *sock, char **buffer, size_t buffer_si
 				zbx_socket_strerror());
 	}
 
+#ifdef ZBX_DEBUG
 	zabbix_log(LOG_LEVEL_DEBUG, "Received [%s] from server", sock->buffer);
+#else
+	char	*log_json;
+
+	if (NULL != (log_json = zbx_sanitize_proxyconfig_json(sock->buffer)))
+		zabbix_log(LOG_LEVEL_TRACE, "%s() configuration: %s", __func__, log_json);
+	else
+		zabbix_log(LOG_LEVEL_TRACE, "%s() configuration: invalid JSON", __func__);
+#endif
 
 	ret = SUCCEED;
 exit:
@@ -696,4 +705,36 @@ out:
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __func__, zbx_result_string(ret));
 
 	return ret;
+}
+
+char	*zbx_sanitize_proxyconfig_json(char *jbuffer)
+{
+	zbx_jsonobj_t	jobj;
+
+	if (SUCCEED == zbx_jsonobj_open(jbuffer, &jobj))
+	{
+		char			*str = NULL;
+		size_t			str_alloc = 0, str_offset = 0;
+		zbx_jsonobj_el_t	*el;
+		zbx_hashset_iter_t	it;
+
+		zbx_hashset_iter_reset(&jobj.data.object, &it);
+		zbx_jsonobj_remove_value(&jobj, "macro.secrets");
+
+		while (NULL != (el = (zbx_jsonobj_el_t *)zbx_hashset_iter_next(&it)))
+		{
+			if (0 == strcmp(el->name, "data"))
+			{
+				zbx_jsonobj_remove_value(&el->value, "globalmacro");
+				break;
+			}
+		}
+
+		zbx_jsonobj_to_string(&str, &str_alloc, &str_offset, &jobj);
+		zbx_jsonobj_clear(&jobj);
+
+		return str;
+	}
+
+	return NULL;
 }

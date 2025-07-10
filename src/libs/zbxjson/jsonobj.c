@@ -315,3 +315,19 @@ void	jsonobj_clear_ref_vector(zbx_vector_jsonobj_ref_t *refs)
 	}
 	zbx_vector_jsonobj_ref_clear(refs);
 }
+
+void	zbx_jsonobj_remove_value(zbx_jsonobj_t *obj, const char *name)
+{
+	zbx_jsonobj_el_t	el_local, *el;
+
+	if (ZBX_JSON_TYPE_OBJECT != obj->type)
+		return;
+
+	el_local.name = (char *)name;
+
+	if (NULL == (el = (zbx_jsonobj_el_t *)zbx_hashset_search(&obj->data.object, &el_local)))
+		return;
+
+	jsonobj_el_clear(el);
+	zbx_hashset_remove_direct(&obj->data.object, el);
+}

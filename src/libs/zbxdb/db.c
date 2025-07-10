@@ -70,6 +70,8 @@ static int		config_log_slow_queries;
 
 static int		db_auto_increment;
 
+static int		db_log_masked_values = 0;
+
 #if defined(HAVE_MYSQL)
 static MYSQL			*conn = NULL;
 static int			mysql_err_cnt = 0;
@@ -1479,6 +1481,64 @@ void	zbx_postgresql_escape_bin(const char *src, char **dst, size_t size)
 }
 #endif
 
+static char	*mask_skip_whitespace(char *s)
+{
+	while (*s && 0 != isspace((unsigned char)*s))
+		s++;
+
+	return s;
+}
+
+static char	*mask_skip_tablename(char *s)
+{
+	while (*s && (0 != isalnum((unsigned char)*s) || '_' == *s || '.' == *s))
+		s++;
+
+	return s;
+}
+
+#define	DB_MASK	"..."
+static void	db_mask_select_query(char *sql_in, char **sql_out)
+{
+	char	*end;
+	char	*masked;
+
+	masked = zbx_strdup(NULL, sql_in);
+
+	if (NULL == (end = strstr(masked, "from")))
+	{
+		zbx_free(masked);
+		return;
+	}
+
+	end += ZBX_CONST_STRLEN("from") + 1;
+
+	*end = '\0';
+	*sql_out = zbx_strdcat(masked, DB_MASK);
+}
+
+static void	db_mask_printable_sql_values(char **sql)
+{
+	char	*p, *end, *new;
+
+	if (0 == strncmp(*sql, "insert into", ZBX_CONST_STRLEN("insert into")))
+	{
+		p = *sql + ZBX_CONST_STRLEN("insert into");
+	}
+	else if (0 == strncmp(*sql, "update", ZBX_CONST_STRLEN("update")))
+	{
+		p = *sql + ZBX_CONST_STRLEN("update");
+	}
+	else
+		return;
+
+	p = mask_skip_whitespace(p);
+	end = mask_skip_tablename(p);
+	*end = '\0';
+	*sql = zbx_strdcat(*sql, DB_MASK);
+}
+#undef DB_MASK
+
 static char	*db_replace_nonprintable_chars(const char *sql, char **sql_printable)
 {
 	if (NULL == *sql_printable)
@@ -1486,6 +1546,9 @@ static char	*db_replace_nonprintable_chars(const char *sql, char **sql_printable
 		*sql_printable = zbx_strdup(NULL, sql);
 		zbx_replace_invalid_utf8_and_nonprintable(*sql_printable);
 	}
+
+	if (1 == db_log_masked_values)
+		db_mask_printable_sql_values(sql_printable);
 
 	return *sql_printable;
 }
@@ -1696,7 +1759,7 @@ clean:
  ******************************************************************************/
 zbx_db_result_t	zbx_db_vselect(const char *fmt, va_list args)
 {
-	char		*sql = NULL;
+	char		*sql = NULL, *sql_log;
 	zbx_db_result_t	result = NULL;
 	double		sec = 0;
 #if defined(HAVE_ORACLE)
@@ -1716,13 +1779,18 @@ zbx_db_result_t	zbx_db_vselect(const char *fmt, va_list args)
 
 	sql = zbx_dvsprintf(sql, fmt, args);
 
+	if (1 == db_log_masked_values)
+		db_mask_select_query(sql, &sql_log);
+	else
+		sql_log = sql;
+
 	if (ZBX_DB_OK != txn_error)
 	{
-		zabbix_log(LOG_LEVEL_DEBUG, "ignoring query [txnlev:%d] [%s] within failed transaction", txn_level, sql);
+		zabbix_log(LOG_LEVEL_DEBUG, "ignoring query [txnlev:%d] [%s] within failed transaction", txn_level, sql_log);
 		goto clean;
 	}
 
-	zabbix_log(LOG_LEVEL_DEBUG, "query [txnlev:%d] [%s]", txn_level, sql);
+	zabbix_log(LOG_LEVEL_DEBUG, "query [txnlev:%d] [%s]", txn_level, sql_log);
 
 #if defined(HAVE_MYSQL)
 	result = (zbx_db_result_t)zbx_malloc(NULL, sizeof(struct zbx_db_result));
@@ -1744,7 +1812,7 @@ zbx_db_result_t	zbx_db_vselect(const char *fmt, va_list args)
 			mysql_err_cnt++;
 
 			if (FAIL == is_inhibited_mysql_error(err_no))
-				zbx_db_errlog(ERR_Z3005, err_no, mysql_error(conn), sql);
+				zbx_db_errlog(ERR_Z3005, err_no, mysql_error(conn), sql_log);
 
 			zbx_db_free_result(result);
 			result = (SUCCEED == is_recoverable_mysql_error(err_no) ? (zbx_db_result_t)ZBX_DB_DOWN : NULL);
@@ -1916,7 +1984,7 @@ error:
 	result->row_num = 0;
 
 	if (NULL == result->pg_result)
-		zbx_db_errlog(ERR_Z3005, 0, "result is NULL", sql);
+		zbx_db_errlog(ERR_Z3005, 0, "result is NULL", sql_log);
 
 	if (PGRES_TUPLES_OK != PQresultStatus(result->pg_result))
 	{
@@ -1928,7 +1996,7 @@ error:
 			errcode = ERR_Z3005;
 
 		zbx_postgresql_error(&error, result->pg_result);
-		zbx_db_errlog(errcode, 0, error, sql);
+		zbx_db_errlog(errcode, 0, error, sql_log);
 		zbx_free(error);
 
 		if (SUCCEED == is_recoverable_postgresql_error(conn, result->pg_result))
@@ -1983,15 +2051,18 @@ lbl_get_table:
 	{
 		sec = zbx_time() - sec;
 		if (sec > (double)config_log_slow_queries / 1000.0)
-			zabbix_log(LOG_LEVEL_WARNING, "slow query: " ZBX_FS_DBL " sec, \"%s\"", sec, sql);
+			zabbix_log(LOG_LEVEL_WARNING, "slow query: " ZBX_FS_DBL " sec, \"%s\"", sec, sql_log);
 	}
 
 	if (NULL == result && 0 < txn_level)
 	{
-		zabbix_log(LOG_LEVEL_DEBUG, "query [%s] failed, setting transaction as failed", sql);
+		zabbix_log(LOG_LEVEL_DEBUG, "query [%s] failed, setting transaction as failed", sql_log);
 		txn_error = ZBX_DB_FAIL;
 	}
 clean:
+	if (1 == db_log_masked_values)
+		zbx_free(sql_log);
+
 	zbx_free(sql);
 
 	return result;
@@ -3099,3 +3170,13 @@ void	zbx_db_clear_last_errcode(void)
 }
 
 #endif
+
+void	zbx_db_set_log_masked_values(int flag)
+{
+#ifdef ZBX_DEBUG
+	ZBX_UNUSED(flag);
+	return;
+#else
+	db_log_masked_values = flag;
+#endif
+}

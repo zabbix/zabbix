@@ -16264,6 +16264,14 @@ void	zbx_dc_close_user_macros(zbx_dc_um_handle_t *um_handle)
 	zbx_free(um_handle);
 }
 
+unsigned char	zbx_dc_get_user_macro_env(zbx_dc_um_handle_t *um_handle)
+{
+	if (NULL == um_handle)
+		return ZBX_MACRO_ENV_DEFAULT;
+
+	return um_handle->macro_env;
+}
+
 /******************************************************************************
  *                                                                            *
  * Purpose: get user macro using the specified hosts                          *

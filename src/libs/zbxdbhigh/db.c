@@ -15,6 +15,7 @@
 #include "zbxdbhigh.h"
 
 #include "zbxthreads.h"
+#include "zbxcacheconfig.h"
 #include "zbxcfg.h"
 #include "zbxcrypto.h"
 #include "zbxnum.h"
@@ -3604,7 +3605,7 @@ int	zbx_db_get_user_by_active_session(const char *sessionid, zbx_user_t *user)
 	zbx_db_result_t	result;
 	zbx_db_row_t	row;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s() sessionid:%s", __func__, sessionid);
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s() sessionid:%s", __func__, ZBX_STRMASK(sessionid));
 
 	sessionid_esc = zbx_db_dyn_escape_string(sessionid);
 
