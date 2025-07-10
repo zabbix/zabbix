@@ -2573,7 +2573,7 @@ See the section below for a list of macros used for LLD filters.
 ## Overview
 
 This template uses the AWS Backup API calls to list and retrieve metrics.
-For more information, please refer to the [AWS Backup API]https://docs.aws.amazon.com/aws-backup/latest/devguide/api-reference.html) page.
+For more information, please refer to the [AWS Backup API](https://docs.aws.amazon.com/aws-backup/latest/devguide/api-reference.html) page.
 
 Additional information about metrics and API methods used in the template:
 * [Metrics related to a Backup vault](https://docs.aws.amazon.com/aws-backup/latest/devguide/API_BackupVaultListMember.html)
@@ -2794,16 +2794,16 @@ See the section below for a list of macros used for LLD filters.
 
 |Name|Description|Type|Key and additional info|
 |----|-----------|----|-----------------------|
-|Job state [{#AWS.BACKUP_JOB.RESOURCE_NAME}, {#AWS.BACKUP_JOB.ID}]|<p>The state of the job.</p><p>Possible values are:</p><p>- Unknown</p><p>- Created</p><p>- Pending</p><p>- Running</p><p>- Aborting</p><p>- Aborted</p><p>- Completed</p><p>- Failed</p><p>- Expired</p><p>- Partial</p>|Dependent item|aws.backup_vault.job.state["{#AWS.BACKUP_JOB.ID}"]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.[?(@.job_id == "{#AWS.BACKUP_JOB.ID}")].job_state.first()`</p><p>⛔️Custom on fail: Discard value</p></li><li><p>JavaScript: `The text is too long. Please see the template.`</p></li><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
+|Job state [{#AWS.BACKUP_JOB.RESOURCE_NAME}][{#AWS.BACKUP_JOB.ID}]|<p>The state of the job.</p><p>Possible values are:</p><p>- Unknown</p><p>- Created</p><p>- Pending</p><p>- Running</p><p>- Aborting</p><p>- Aborted</p><p>- Completed</p><p>- Failed</p><p>- Expired</p><p>- Partial</p>|Dependent item|aws.backup_vault.job.state["{#AWS.BACKUP_JOB.ID}"]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.[?(@.job_id == "{#AWS.BACKUP_JOB.ID}")].job_state.first()`</p><p>⛔️Custom on fail: Discard value</p></li><li><p>JavaScript: `The text is too long. Please see the template.`</p></li><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
 
 ### Trigger prototypes for AWS Backup jobs discovery
 
 |Name|Description|Expression|Severity|Dependencies and additional info|
 |----|-----------|----------|--------|--------------------------------|
 |AWS Backup vault: Job failed [{#AWS.BACKUP_JOB.ID}]|<p>Job has failed.</p>|`last(/AWS Backup vault by HTTP/aws.backup_vault.job.state["{#AWS.BACKUP_JOB.ID}"])=7`|High|**Manual close**: Yes|
-|AWS Backup vault: Job aborted [{#AWS.BACKUP_JOB.ID}]|<p>Job has cancelled.</p>|`last(/AWS Backup vault by HTTP/aws.backup_vault.job.state["{#AWS.BACKUP_JOB.ID}"])=5`|Average|**Manual close**: Yes|
+|AWS Backup vault: Job has been aborted [{#AWS.BACKUP_JOB.ID}]|<p>Job has been aborted.</p>|`last(/AWS Backup vault by HTTP/aws.backup_vault.job.state["{#AWS.BACKUP_JOB.ID}"])=5`|Average|**Manual close**: Yes|
 |AWS Backup vault: Job expired [{#AWS.BACKUP_JOB.ID}]|<p>Job expired.</p>|`last(/AWS Backup vault by HTTP/aws.backup_vault.job.state["{#AWS.BACKUP_JOB.ID}"])=8`|Warning|**Manual close**: Yes|
-|AWS Backup vault: Job state unknown [{#AWS.BACKUP_JOB.ID}]|<p>Job has unknown state.</p>|`last(/AWS Backup vault by HTTP/aws.backup_vault.job.state["{#AWS.BACKUP_JOB.ID}"])=0`|Warning|**Manual close**: Yes|
+|AWS Backup vault: Job is in unknown state [{#AWS.BACKUP_JOB.ID}]|<p>Job is in unknown state.</p>|`last(/AWS Backup vault by HTTP/aws.backup_vault.job.state["{#AWS.BACKUP_JOB.ID}"])=0`|Warning|**Manual close**: Yes|
 
 # AWS Cost Explorer by HTTP
 
