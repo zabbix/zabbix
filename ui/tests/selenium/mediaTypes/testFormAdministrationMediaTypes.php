@@ -25,13 +25,13 @@ require_once __DIR__.'/../behaviors/CMessageBehavior.php';
 class testFormAdministrationMediaTypes extends CWebTest {
 
 	protected static $mediatype_sql = 'SELECT * FROM media_type ORDER BY mediatypeid';
-
 	protected static $update_mediatypes = [
 		'Email' => 'Email',
 		'SMS' => 'SMS',
 		'Script' => 'Test script'
 	];
 	protected static $delete_mediatype = 'Email (HTML)';
+	protected static $mediatypeids;
 
 	/**
 	 * Attach MessageBehavior to the test.
@@ -44,6 +44,78 @@ class testFormAdministrationMediaTypes extends CWebTest {
 
 	public function prepareData() {
 		CDataHelper::call('mediatype.create', [
+			[
+				'type' => MEDIA_TYPE_EMAIL,
+				'provider' => 0,
+				'name' => 'Generic SMTP OAuth',
+				'smtp_server' => 'test@test.com',
+				'smtp_email' => 'zabbix@example.com',
+				'smtp_authentication' => 2,
+				'redirection_url' => 'https://test/zabbix.php?action=oauth.authorize',
+				'client_id' => 'test',
+				'client_secret' => 'test',
+				'authorization_url' => 'https://test/oauth2/v2/auth?response_type=code&scope=https%3A%2F%2Fmail.google.com%2F&access_type=offline&prompt=consent"',
+				'token_url' => 'https://example.com/token?grant_type=authorization_code',
+				'tokens_status' => 3,
+				'access_token' => 'test',
+				'access_token_updated' => time(),
+				'access_expires_in' => '3599',
+				'refresh_token' => 'test'
+			],
+			[
+				'type' => MEDIA_TYPE_EMAIL,
+				'provider' => 1,
+				'name' => 'Gmail OAuth',
+				'smtp_server' => 'test@test.com',
+				'smtp_email' => 'zabbix@example.com',
+				'smtp_authentication' => 2,
+				'redirection_url' => 'https://test/zabbix.php?action=oauth.authorize',
+				'client_id' => 'test',
+				'client_secret' => 'test',
+				'authorization_url' => 'https://test/oauth2/v2/auth?response_type=code&scope=https%3A%2F%2Fmail.google.com%2F&access_type=offline&prompt=consent"',
+				'token_url' => 'https://example.com/token?grant_type=authorization_code',
+				'tokens_status' => 3,
+				'access_token' => 'test',
+				'access_token_updated' => time(),
+				'access_expires_in' => '3599',
+				'refresh_token' => 'test'
+			],
+			[
+				'type' => MEDIA_TYPE_EMAIL,
+				'provider' => 2,
+				'name' => 'Gmail relay OAuth',
+				'smtp_server' => 'test@test.com',
+				'smtp_email' => 'zabbix@example.com',
+				'smtp_authentication' => 2,
+				'redirection_url' => 'https://test/zabbix.php?action=oauth.authorize',
+				'client_id' => 'test',
+				'client_secret' => 'test',
+				'authorization_url' => 'https://test/oauth2/v2/auth?response_type=code&scope=https%3A%2F%2Fmail.google.com%2F&access_type=offline&prompt=consent"',
+				'token_url' => 'https://example.com/token?grant_type=authorization_code',
+				'tokens_status' => 3,
+				'access_token' => 'test',
+				'access_token_updated' => time(),
+				'access_expires_in' => '3599',
+				'refresh_token' => 'test'
+			],
+			[
+				'type' => MEDIA_TYPE_EMAIL,
+				'provider' => 3,
+				'name' => 'Office365 OAuth',
+				'smtp_server' => 'test@test.com',
+				'smtp_email' => 'zabbix@example.com',
+				'smtp_authentication' => 2,
+				'redirection_url' => 'https://test/zabbix.php?action=oauth.authorize',
+				'client_id' => 'test',
+				'client_secret' => 'test',
+				'authorization_url' => 'https://test/oauth2/v2/auth?response_type=code&scope=https%3A%2F%2Fmail.google.com%2F&access_type=offline&prompt=consent"',
+				'token_url' => 'https://example.com/token?grant_type=authorization_code',
+				'tokens_status' => 3,
+				'access_token' => 'test',
+				'access_token_updated' => time(),
+				'access_expires_in' => '3599',
+				'refresh_token' => 'test'
+			],
 			[
 				'type' => MEDIA_TYPE_WEBHOOK,
 				'name' => 'Switch webhook to script with no params',
@@ -122,6 +194,7 @@ class testFormAdministrationMediaTypes extends CWebTest {
 				]
 			]
 		]);
+		self::$mediatypeids = CDataHelper::getIds('name');
 	}
 
 	public function testFormAdministrationMediaTypes_GeneralLayout() {
@@ -141,7 +214,7 @@ class testFormAdministrationMediaTypes extends CWebTest {
 			[
 				'tab name' => 'Media type',
 				'defaults' => [
-					'Name' =>  '',
+					'Name' => '',
 					'Type' => 'Email',
 					'Description' => '',
 					'Enabled' => true
@@ -639,6 +712,180 @@ class testFormAdministrationMediaTypes extends CWebTest {
 
 	public function getMediaTypeData() {
 		return [
+			// Check that OAuth field is mandatory.
+			[
+				[
+					'expected' => TEST_BAD,
+					'mediatype_tab' => [
+						'Name' => 'Test',
+						'Authentication' => 'OAuth'
+					],
+					'error' => 'Field "oauth" is mandatory.'
+				]
+			],
+			// Check OAuth form validation using Generic SMTP provider.
+			[
+				[
+					'expected' => TEST_BAD,
+					'mediatype_tab' => [
+						'Email provider' => 'Generic SMTP',
+						'Authentication' => 'OAuth'
+					],
+					'oauth_form' => [
+						'Redirection endpoint' => '',
+						'Client ID' => '',
+						'Client secret' => '',
+						'Authorization endpoint' => '',
+						'Token endpoint' => '',
+						'id:authorization_mode' => 'Manual'
+					],
+					'error' => [
+						'Incorrect value for field "redirection_url": cannot be empty.',
+						'Incorrect value for field "client_id": cannot be empty.',
+						'Incorrect value for field "client_secret": cannot be empty.',
+						'Incorrect value for field "authorization_url": cannot be empty.',
+						'Incorrect value for field "token_url": cannot be empty.',
+						'Incorrect value for field "code": cannot be empty.'
+					]
+				]
+			],
+			// Check OAuth form validation using Gmail provider.
+			[
+				[
+					'expected' => TEST_BAD,
+					'mediatype_tab' => [
+						'Email provider' => 'Gmail',
+						'Authentication' => 'OAuth'
+					],
+					'oauth_form' => [
+						'Redirection endpoint' => '',
+						'Client ID' => '',
+						'Client secret' => ''
+					],
+					'error' => [
+						'Incorrect value for field "redirection_url": cannot be empty.',
+						'Incorrect value for field "client_id": cannot be empty.',
+						'Incorrect value for field "client_secret": cannot be empty.'
+					]
+				]
+			],
+			// Error message when redirection url is empty.
+			[
+				[
+					'expected' => TEST_BAD,
+					'mediatype_tab' => [
+						'Email provider' => 'Gmail relay',
+						'Authentication' => 'OAuth'
+					],
+					'oauth_form' => [
+						'Redirection endpoint' => '',
+						'Client ID' => 'test',
+						'Client secret' => 'test'
+					],
+					'error' => [
+						'Incorrect value for field "redirection_url": cannot be empty.'
+					]
+				]
+			],
+			// Error message when client ID is empty.
+			[
+				[
+					'expected' => TEST_BAD,
+					'mediatype_tab' => [
+						'Email provider' => 'Office365',
+						'Authentication' => 'OAuth'
+					],
+					'oauth_form' => [
+						'Redirection endpoint' => 'test',
+						'Client ID' => '',
+						'Client secret' => 'test'
+					],
+					'error' => [
+						'Incorrect value for field "client_id": cannot be empty.'
+					]
+				]
+			],
+			// Error message when client secret is empty.
+			[
+				[
+					'expected' => TEST_BAD,
+					'mediatype_tab' => [
+						'Email provider' => 'Generic SMTP',
+						'Authentication' => 'OAuth'
+					],
+					'oauth_form' => [
+						'Redirection endpoint' => 'test',
+						'Client ID' => 'test',
+						'Client secret' => '',
+						'Authorization endpoint' => 'test',
+						'Token endpoint' => 'test'
+					],
+					'error' => [
+						'Incorrect value for field "client_secret": cannot be empty.'
+					]
+				]
+			],
+			// Error message when authorization endpoint is empty.
+			[
+				[
+					'expected' => TEST_BAD,
+					'mediatype_tab' => [
+						'Email provider' => 'Generic SMTP',
+						'Authentication' => 'OAuth'
+					],
+					'oauth_form' => [
+						'Redirection endpoint' => 'test',
+						'Client ID' => 'test',
+						'Client secret' => 'test',
+						'Authorization endpoint' => '',
+						'Token endpoint' => 'test'
+					],
+					'error' => [
+						'Incorrect value for field "authorization_url": cannot be empty.'
+					]
+				]
+			],
+			// Error message when authorization endpoint is empty.
+			[
+				[
+					'expected' => TEST_BAD,
+					'mediatype_tab' => [
+						'Email provider' => 'Generic SMTP',
+						'Authentication' => 'OAuth'
+					],
+					'oauth_form' => [
+						'Redirection endpoint' => 'test',
+						'Client ID' => 'test',
+						'Client secret' => 'test',
+						'Authorization endpoint' => 'test',
+						'Token endpoint' => ''
+					],
+					'error' => [
+						'Incorrect value for field "token_url": cannot be empty.'
+					]
+				]
+			],
+			// Error message when authorization code is empty.
+			[
+				[
+					'expected' => TEST_BAD,
+					'mediatype_tab' => [
+						'Email provider' => 'Generic SMTP',
+						'Authentication' => 'OAuth'
+					],
+					'oauth_form' => [
+						'Redirection endpoint' => 'test',
+						'Client ID' => 'test',
+						'Client secret' => 'test',
+						'Authorization endpoint' => 'test',
+						'Token endpoint' => 'test',
+						'id:authorization_mode' => 'Manual'
+					],
+					'error' => [
+						'Incorrect value for field "code": cannot be empty.'
+					]
+				]
+			],
 			// Empty name.
 			[
 				[
@@ -646,7 +893,6 @@ class testFormAdministrationMediaTypes extends CWebTest {
 					'mediatype_tab' => [
 						'Name' => ''
 					],
-					'skip_prefix' => true,
 					'error' => 'Incorrect value for field "name": cannot be empty.'
 				]
 			],
@@ -657,7 +903,6 @@ class testFormAdministrationMediaTypes extends CWebTest {
 					'mediatype_tab' => [
 						'Name' => '   '
 					],
-					'skip_prefix' => true,
 					'error' => 'Incorrect value for field "name": cannot be empty.'
 				]
 			],
@@ -668,7 +913,6 @@ class testFormAdministrationMediaTypes extends CWebTest {
 					'mediatype_tab' => [
 						'Name' => 'Discord'
 					],
-					'skip_prefix' => true,
 					'error' => 'Media type "Discord" already exists.'
 				]
 			],
@@ -1428,7 +1672,13 @@ class testFormAdministrationMediaTypes extends CWebTest {
 		}
 		else {
 			$type = CTestArrayHelper::get($data['mediatype_tab'], 'Type', 'Email');
-			$this->query('link', self::$update_mediatypes[$type])->waitUntilClickable()->one()->click();
+
+			if (array_key_exists('oauth_form', $data)) {
+				$this->query('link', $data['mediatype_tab']['Email provider'].' OAuth')->waitUntilClickable()->one()->click();
+			}
+			else {
+				$this->query('link', self::$update_mediatypes[$type])->waitUntilClickable()->one()->click();
+			}
 
 			// Add prefix to mediatype new name for update scenarios to avoid issues with duplicate names.
 			if (CTestArrayHelper::get($data, 'expected', TEST_GOOD) === TEST_GOOD) {
@@ -1447,6 +1697,19 @@ class testFormAdministrationMediaTypes extends CWebTest {
 
 		$form->fill($data['mediatype_tab']);
 
+		if (array_key_exists('oauth_form', $data)) {
+			$form->query('button:Configure')->one()->click();
+			$oauth_overlay = COverlayDialogElement::find()->all()->last()->waitUntilReady();
+			$oauth_form = $oauth_overlay->asForm();
+
+			if ($oauth_form->query('button:Change client secret')->one(false)->isValid()
+					&& array_key_exists('Client secret', $data['oauth_form'])) {
+				$oauth_form->query('button:Change client secret')->one()->click();
+			}
+
+			$oauth_form->fill($data['oauth_form']);
+		}
+
 		if (array_key_exists('script_parameters', $data)) {
 			$form->getField('Script parameters')->asMultifieldTable()->fill($data['script_parameters']);
 		}
@@ -1456,13 +1719,24 @@ class testFormAdministrationMediaTypes extends CWebTest {
 			$form->fill($data['options_tab']);
 		}
 
-		$dialog->getFooter()->query('button', $create ? 'Add' : 'Update')->one()->click();
+		if (array_key_exists('oauth_form', $data)) {
+			$oauth_overlay->getFooter()->query('button', $create ? 'Add' : 'Update')->one()->click();
+		}
+		else {
+			$dialog->getFooter()->query('button', $create ? 'Add' : 'Update')->one()->click();
+		}
 		$this->page->waitUntilReady();
 
 		if (CTestArrayHelper::get($data, 'expected') === TEST_BAD) {
-			$title = ($create) ? 'Cannot add media type' : 'Cannot update media type';
+			$title = array_key_exists('oauth_form', $data)
+				? 'Invalid OAuth configuration'
+				: ($create ? 'Cannot add media type' : 'Cannot update media type');
 			$this->assertMessage(TEST_BAD, $title, $data['error']);
 			$this->assertEquals($old_hash, CDBHelper::getHash(self::$mediatype_sql));
+
+			if (array_key_exists('oauth_form', $data)) {
+				$oauth_overlay->close();
+			}
 		}
 		else {
 			$title = ($create) ? 'Media type added' : 'Media type updated';
