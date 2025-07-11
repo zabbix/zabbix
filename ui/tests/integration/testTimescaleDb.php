@@ -34,9 +34,8 @@ class testTimescaleDb extends CIntegrationTest {
 		and must be guaranteed to be compressed
 	*/
 	const COMPRESSION_OLDER_THAN = 20 * 24 * 3600;
-	private static $db_extension = null;
+	static $db_extension = '';
 	private static $itemid;
-	private static $tsdbVersion = null;
 
 	/**
 	 * Component configuration provider.
@@ -62,42 +61,15 @@ class testTimescaleDb extends CIntegrationTest {
 		if ($res) {
 			self::$db_extension = $res['value_str'];
 		}
-
-		return self::$db_extension;
 	}
 
 	/**
-	 * Clear all chunks in the table under test.
+	 * Test TimescaleDb extension.
 	 */
 	private function clearChunks() {
-		/* The interval is selected like so to make sure all chunks are deleted. */
-		$sql = "SELECT drop_chunks('".self::TABLENAME."', created_before => now() + interval '10 years')";
-		DBexecute($sql);
-	}
+		$sql = 'SELECT drop_chunks(\''.self::TABLENAME.'\', older_than => '.time().')';
 
-	/**
-	 * Get TimescaleDB version. For example, version "2.19.5" equals to 21905.
-	 *
-	 * @return int
-	 */
-	private static function getTimescaleDBVersion() {
-		if (self::$tsdbVersion == null) {
-			$sql = "SELECT extversion FROM pg_extension WHERE extname='timescaledb';";
-
-			$res = DBfetch(DBselect($sql));
-
-			if ($res) {
-				list($major, $minor, $patch) = explode('.', $res['extversion']);
-
-				$ver = $major * 10000;
-				$ver += $minor * 100;
-				$ver += $patch;
-
-				self::$tsdbVersion = $ver;
-			}
-		}
-
-		return self::$tsdbVersion;
+		$res = DBfetch(DBselect($sql));
 	}
 
 	/**
@@ -107,14 +79,9 @@ class testTimescaleDb extends CIntegrationTest {
 	 * @configurationDataProvider serverConfigurationProvider
 	 */
 	public function testTimescaleDb_checkServerUp() {
-		$db_ext = self::getDBExtension();
-		$this->assertNotNull($db_ext, "Failed to retrieve database extension");
-		$this->assertEquals(ZBX_DB_EXTENSION_TIMESCALEDB, $db_ext, "TimescaleDB extension is not available");
+		$this->assertEquals(self::$db_extension, ZBX_DB_EXTENSION_TIMESCALEDB);
 
-		$timescale_ver = $this->getTimescaleDBVersion();
-		$this->assertNotNull($timescale_ver, "Failed to get a valid TimescaleDB version");
-		self::waitForLogLineToBePresent(self::COMPONENT_SERVER,
-				sprintf("TimescaleDB version: [%d]", $timescale_ver));
+		self::waitForLogLineToBePresent(self::COMPONENT_SERVER, 'TimescaleDB version:');
 	}
 
 	/**
@@ -180,7 +147,7 @@ class testTimescaleDb extends CIntegrationTest {
 	}
 
 	/**
-	 * Check compression of the chunk. Deprecated since TimescaleDB 2.18.
+	 * Check compression of the chunk.
 	 */
 	public function getCheckCompression() {
 		$req = DBselect('SELECT number_compressed_chunks FROM hypertable_compression_stats(\''.self::TABLENAME.'\')');
@@ -212,6 +179,10 @@ class testTimescaleDb extends CIntegrationTest {
 	 * @configurationDataProvider serverConfigurationProvider
 	 */
 	public function testTimescaleDb_checkHistoryRecords() {
+		$this->assertEquals(self::$db_extension, ZBX_DB_EXTENSION_TIMESCALEDB);
+
+		$this->reloadConfigurationCache();
+
 		$count_start = $this->getHistoryCount();
 		$this->assertNotEquals(-1, $count_start);
 
@@ -237,38 +208,18 @@ class testTimescaleDb extends CIntegrationTest {
 		);
 		$this->assertArrayHasKey(0, $response['result']);
 		$this->assertEquals('compression_status', $response['result'][0]);
-		$this->reloadConfigurationCache(self::COMPONENT_SERVER);
+		$this->reloadConfigurationCache();
 		$this->executeHousekeeper();
-
-		$this->onAfterCheckHistoryRecords();
-	}
-
-	private function onAfterCheckHistoryRecords() {
-		/* There was no cleanup in the legacy test for TimescaleDB older than 2.18. */
-		if ($this->getTimescaleDBVersion() < 21800)
-			return;
-
-		/* Turn off compression policy and clear all chunks for the next tests. */
-		$response = $this->call('housekeeping.update',
-			['compression_status' => 0] // off
-		);
-		$this->assertArrayHasKey(0, $response['result']);
-		$this->assertEquals('compression_status', $response['result'][0]);
-
-		$this->clearChunks();
 	}
 
 	/**
-	 * Test compression of specific chunks by TimescaleDB.
+	 * Test compression TimescaleDb.
 	 *
 	 * @required-components server
 	 * @configurationDataProvider serverConfigurationProvider
 	 */
 	public function testTimescaleDb_checkCompression() {
-		/* The legacy test for TimescaleDB older than 2.18 */
-		if ($this->getTimescaleDBVersion() < 21800) {
-			$this->executeHousekeeper();
-			$this->getCheckCompression();
+		$this->assertEquals(self::$db_extension, ZBX_DB_EXTENSION_TIMESCALEDB);
 
 		$this->executeHousekeeper();
 		$this->stopComponent(self::COMPONENT_SERVER);
