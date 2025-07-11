@@ -691,14 +691,9 @@ class testHost extends CAPITest {
 		// Since insertBatch() parameter $getids is false, it will use existing IDs. Thus it will return empty array.
 		$this->assertSame([], $ids);
 
-		$res = DB::update('hosts', $upd_hosts);
-		$this->assertSame(true, $res);
-
-		$res = DB::update('hosts_templates', $upd_hosts_templates);
-		$this->assertSame(true, $res);
-
-		$res = DB::update('hostmacro', $upd_hostmacro);
-		$this->assertSame(true, $res);
+		DB::update('hosts', $upd_hosts);
+		DB::update('hosts_templates', $upd_hosts_templates);
+		DB::update('hostmacro', $upd_hostmacro);
 
 		// Add hostmacroid references using the macro name as key: {$MACRO_NAME} => macro_name.
 		foreach ($upd_hostmacro as $hostmacro) {
@@ -4475,8 +4470,6 @@ class testHost extends CAPITest {
 	 * @param string $hosts[<hostid>]['macros']  Array of host original macros.
 	 */
 	private function restoreMacros(array $hosts) {
-		$res = true;
-
 		// Records after update has been made. Possibly new macros are stored.
 		$records_current = CDBHelper::getAll(
 			'SELECT hm.hostmacroid,hm.hostid,hm.macro,hm.value,hm.description,hm.type,hm.automatic'.
@@ -4548,7 +4541,7 @@ class testHost extends CAPITest {
 
 				if ($del_macros) {
 					// Delete the macros that were inserted in host.update method.
-					$res = $res && DB::delete('hostmacro', [
+					DB::delete('hostmacro', [
 						'hostmacroid' => array_column($del_macros, 'hostmacroid')
 					]);
 
@@ -4563,7 +4556,7 @@ class testHost extends CAPITest {
 						$hostmacroid = $macro['hostmacroid'];
 						unset($macro['hostmacroid']);
 
-						$res = $res && DB::update('hostmacro', [
+						DB::update('hostmacro', [
 							'values' => $macro,
 							'where' => [
 								'hostmacroid' => $hostmacroid
@@ -4574,12 +4567,10 @@ class testHost extends CAPITest {
 			}
 			// Host did not have macros, but new were added in host.update method. Remove the added ones.
 			elseif ($records_current) {
-				$res = $res && DB::delete('hostmacro', [
+				DB::delete('hostmacro', [
 					'hostmacroid' => array_column($records_current, 'hostmacroid')
 				]);
 			}
-
-			$this->assertSame(true, $res, 'host.update failed for host "'.$host['host'].'"');
 		}
 	}
 
