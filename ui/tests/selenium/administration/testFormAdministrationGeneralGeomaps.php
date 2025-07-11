@@ -396,7 +396,6 @@ class testFormAdministrationGeneralGeomaps extends CWebTest {
 		$this->page->waitUntilReady();
 
 		if (CTestArrayHelper::get($data, 'expected', TEST_GOOD) === TEST_BAD) {
-			//$this->assertMessage(TEST_BAD, 'Cannot update configuration', $data['error']);
 			$this->assertInlineError($form, $data['errors']);
 
 			// Check that DB hash is not changed.
