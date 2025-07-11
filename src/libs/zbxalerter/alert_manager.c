@@ -1139,8 +1139,14 @@ static char	*am_substitute_mediatype_params(const char *mediatype_params, const 
 		char			*buf = NULL;
 		size_t			buf_alloc = 0;
 
+		if (SUCCEED != zbx_json_open(mediatype_params, &jp))
+		{
+			zabbix_log(LOG_LEVEL_DEBUG, "cannot parse mediatype parameters: %s", zbx_json_strerror());
+
+			return NULL;
+		}
+
 		zbx_json_initarray(&json, 1024);
-		zbx_json_open(mediatype_params, &jp);
 
 		for (p = NULL; NULL != (p = zbx_json_next_value_dyn(&jp, p, &buf, &buf_alloc, NULL));)
 		{
