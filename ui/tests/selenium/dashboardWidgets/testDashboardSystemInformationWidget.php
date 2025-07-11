@@ -157,58 +157,14 @@ class testDashboardSystemInformationWidget extends testSystemInformation {
 
 	public static function getSystemInformationData() {
 		return [
-			// #0 Verify widget data that is available for user with super admin role.
+			// #0 Verify user with super admin role. Check field that is not checked in screenshot with disabled HA.
 			[
 				[
+					'super_admin' => true,
 					'available_fields' => [
-						[
-							'Parameter' => 'Zabbix server is running',
-							'Value' => 'No',
-							'Details' => 'localhost:10051'
-						],
-						[
-							'Parameter' => 'Zabbix server version',
-							'Value' => '',
-							'Details' => ''
-						],
 						[
 							'Parameter' => 'Zabbix frontend version',
 							'Value' => ZABBIX_VERSION,
-							'Details' => ''
-						],
-						[
-							'Parameter' => 'Number of hosts (enabled/disabled)',
-							'Value' => '',
-							'Details' => ''
-						],
-						[
-							'Parameter' => 'Number of templates',
-							'Value' => '',
-							'Details' => ''
-						],
-						[
-							'Parameter' => 'Number of items (enabled/disabled/not supported)',
-							'Value' => '',
-							'Details' => ''
-						],
-						[
-							'Parameter' => 'Number of triggers (enabled/disabled [problem/ok])',
-							'Value' => '',
-							'Details' => ''
-						],
-						[
-							'Parameter' => 'Number of users (online)',
-							'Value' => '',
-							'Details' => ''
-						],
-						[
-							'Parameter' => 'Required server performance, new values per second',
-							'Value' => '',
-							'Details' => ''
-						],
-						[
-							'Parameter' => 'High availability cluster',
-							'Value' => 'Disabled',
 							'Details' => ''
 						]
 					]
@@ -295,9 +251,10 @@ class testDashboardSystemInformationWidget extends testSystemInformation {
 		global $DB;
 
 		return [
-			// #0 Verify widget data that is available for user with super admin role.
+			// #0 Verify user with super admin role. Check fields that are not checked in screenshot  with enabled HA.
 			[
 				[
+					'super_admin' => true,
 					'available_fields' => [
 						[
 							'Parameter' => 'Zabbix server is running',
@@ -305,49 +262,9 @@ class testDashboardSystemInformationWidget extends testSystemInformation {
 							'Details' => $DB['SERVER'].':0'
 						],
 						[
-							'Parameter' => 'Zabbix server version',
-							'Value' => '',
-							'Details' => ''
-						],
-						[
 							'Parameter' => 'Zabbix frontend version',
 							'Value' => ZABBIX_VERSION,
 							'Details' => ''
-						],
-						[
-							'Parameter' => 'Number of hosts (enabled/disabled)',
-							'Value' => '',
-							'Details' => ''
-						],
-						[
-							'Parameter' => 'Number of templates',
-							'Value' => '',
-							'Details' => ''
-						],
-						[
-							'Parameter' => 'Number of items (enabled/disabled/not supported)',
-							'Value' => '',
-							'Details' => ''
-						],
-						[
-							'Parameter' => 'Number of triggers (enabled/disabled [problem/ok])',
-							'Value' => '',
-							'Details' => ''
-						],
-						[
-							'Parameter' => 'Number of users (online)',
-							'Value' => '',
-							'Details' => ''
-						],
-						[
-							'Parameter' => 'Required server performance, new values per second',
-							'Value' => '',
-							'Details' => ''
-						],
-						[
-							'Parameter' => 'High availability cluster',
-							'Value' => 'Enabled',
-							'Details' => 'Fail-over delay: 1 minute'
 						]
 					]
 				]

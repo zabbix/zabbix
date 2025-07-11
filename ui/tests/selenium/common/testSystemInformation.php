@@ -279,6 +279,11 @@ class testSystemInformation extends CWebTest {
 			CDashboardElement::find()->one()->waitUntilReady();
 		}
 
-		$this->assertTableData($data['available_fields']);
+		if (array_key_exists('super_admin', $data)) {
+			$this->assertTableHasData($data['available_fields']);
+		}
+		else {
+			$this->assertTableData($data['available_fields']);
+		}
 	}
 }
