@@ -455,7 +455,7 @@ class testDashboardSystemInformationWidget extends testSystemInformation {
 	}
 
 	/**
-	 * Function performs widget data check.
+	 * Function performs widget data check for different user roles.
 	 *
 	 * @param array $data	widget available data
 	 */

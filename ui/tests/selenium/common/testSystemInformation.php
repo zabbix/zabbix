@@ -226,7 +226,7 @@ class testSystemInformation extends CWebTest {
 		 * Hide the active Zabbix server address in widget that is working in System stats mode or in the part
 		 * of the report that displays the overall system statistics.
 		 */
-		self::$skip_fields[] = $server_address->getText();
+		self::$skip_fields[] = $server_address;
 
 		// Hide the footer of the report as it contains Zabbix version.
 		if (!$dashboardid) {
