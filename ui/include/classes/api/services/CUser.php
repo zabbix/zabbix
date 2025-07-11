@@ -189,7 +189,8 @@ class CUser extends CApiService {
 		}
 
 		if ($options['filter'] !== null) {
-			if (array_key_exists('userid', $options['filter']) && !$options['searchByAny']) {
+			if (array_key_exists('userid', $options['filter']) && $options['filter']['userid'] !== null
+					&& !$options['searchByAny']) {
 				$sql_parts['where'][] = dbConditionId('u.userid', $options['filter']['userid']);
 
 				unset($options['filter']['userid']);
