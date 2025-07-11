@@ -113,7 +113,7 @@ class testUsersAuthenticationSaml extends testFormAuthentication {
 		}
 
 		// Check visible mandatory fields.
-		$this->assertEquals(['IdP entity ID', 'SSO service URL', 'Username attribute', 'SP entity ID'],
+		$this->assertEquals(['IdP entity ID', 'SSO service URL', 'Username attribute', 'SP entity ID', 'IdP certificate'],
 				$saml_form->getRequiredLabels()
 		);
 
@@ -127,6 +127,26 @@ class testUsersAuthenticationSaml extends testFormAuthentication {
 
 		foreach (array_keys($saml_fields) as $label) {
 			$this->assertTrue($saml_form->getField($label)->isEnabled());
+		}
+
+		// Check mandatory SP fields.
+		$sp_fields = ['SP private key', 'SP certificate'];
+
+		foreach (['id:sign_messages', 'id:sign_assertions', 'id:sign_authn_requests', 'id:sign_logout_requests',
+					 'id:sign_logout_responses', 'id:encrypt_nameid', 'id:encrypt_assertions'] as $checkbox) {
+
+			$saml_form->fill([$checkbox => true]);
+
+			foreach ($sp_fields as $sp_field) {
+				$this->assertTrue($saml_form->isRequired($sp_field), 'Field id '.$sp_field.' should be mandatory.');
+			}
+
+			$saml_form->fill([$checkbox => false]);
+
+			foreach ($sp_fields as $sp_field) {
+				$this->assertFalse($saml_form->isRequired($sp_field), 'Field id '.$sp_field.' should not be mandatory.');
+			}
+
 		}
 
 		// Check that JIT fields remain invisible and depend on "Configure JIT" checkbox.
