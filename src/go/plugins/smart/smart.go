@@ -291,7 +291,8 @@ func setSingleDiskFields(dev []byte) (map[string]any, error) {
 	}
 
 	out["error"] = strings.Join(errors, ", ")
-	out["self_test_passed"] = setSelfTest(&sd)
+	out["self_test_passed"] = selfTestPassed(&sd)
+	out["self_test_in_progress"] = selfTestInProgress(&sd)
 
 	if diskType == nvmeType {
 		out["temperature"] = sd.HealthLog.Temperature
@@ -318,10 +319,28 @@ func setSingleDiskFields(dev []byte) (map[string]any, error) {
 	return out, nil
 }
 
-// setSelfTest determines if device is self test capable and if the test is passed.
-func setSelfTest(sd *singleDevice) *bool {
+// selfTestPassed determines if self-test passed returning the values:
+// null:  device is not self-test capable | test is in progress;
+// true:   the test is passed;
+// false:  the test is passed | test is being interrupted.
+func selfTestPassed(sd *singleDevice) *bool {
+	inPr := selfTestInProgress(sd)
+	if inPr == nil || *inPr {
+		return nil
+	}
+
+	return &sd.Data.SelfTest.Status.Passed
+}
+
+// selfTestInProgress determines if self-test is in progress returning the values:
+// null:  device is not self-test capable;
+// true:   the test is in progress;
+// false:  the test is not in progress.
+func selfTestInProgress(sd *singleDevice) *bool {
 	if sd.Data.Capabilities.SelfTestsSupported {
-		return &sd.Data.SelfTest.Status.Passed
+		inPr := (sd.Data.SelfTest.Status.Value >> 4) == 0xf // all in progress values
+
+		return &inPr
 	}
 
 	return nil
