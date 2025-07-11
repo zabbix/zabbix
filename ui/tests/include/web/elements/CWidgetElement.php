@@ -96,22 +96,16 @@ class CWidgetElement extends CElement {
 	public function edit() {
 		$button = $this->query('xpath:.//button[contains(@class, "js-widget-edit")]')->waitUntilPresent()->one();
 
-		if ($button->isVisible(false)) {
-			$button->hoverMouse();
-		}
-
 		// Edit can sometimes fail, so we have to retry this operation.
-		for ($i = 0; $i < 4; $i++) {
-			// TODO: remove force: true parameter after DEV-2621 is fixed.
-			$button->click(true);
+		for ($i = 3; $i >= 0; $i--) {
+			$button->hoverMouse()->click();
 
 			try {
-				// TODO: fix formatting after git-hook improvements DEV-2396.
 				return $this->query('xpath://div[@data-dialogueid="widget_form"]//form')->waitUntilVisible()
 						->asForm()->one();
 			}
 			catch (\Exception $e) {
-				if ($i === 1) {
+				if ($i === 0) {
 					throw $e;
 				}
 			}
