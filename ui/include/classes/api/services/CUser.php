@@ -187,8 +187,8 @@ class CUser extends CApiService {
 
 		// filter
 		if (is_array($options['filter'])) {
-			if (array_key_exists('userid', $options['filter']) &&
-					($options['searchByAny'] === null || $options['searchByAny'] === false)) {
+			if (array_key_exists('userid', $options['filter']) && $options['filter']['userid'] !== null
+					&& ($options['searchByAny'] === null || $options['searchByAny'] === false)) {
 				zbx_value2array($options['filter']['userid']);
 
 				$sqlParts['where'][] = dbConditionId('u.userid', $options['filter']['userid']);
