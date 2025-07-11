@@ -622,27 +622,6 @@ static int	DBpatch_7030048(void)
 
 	return DBadd_foreign_key("hostmacro_config", 1, &field);
 }
-
-static int	DBpatch_7030049(void)
-{
-	const zbx_db_field_t	field = {"idp_certificate", "", NULL, NULL, 0, ZBX_TYPE_TEXT, ZBX_NOTNULL, 0};
-
-	return DBadd_field("userdirectory_saml", &field);
-}
-
-static int	DBpatch_7030050(void)
-{
-	const zbx_db_field_t	field = {"sp_certificate", "", NULL, NULL, 0, ZBX_TYPE_TEXT, ZBX_NOTNULL, 0};
-
-	return DBadd_field("userdirectory_saml", &field);
-}
-
-static int	DBpatch_7030051(void)
-{
-	const zbx_db_field_t	field = {"sp_private_key", "", NULL, NULL, 0, ZBX_TYPE_TEXT, ZBX_NOTNULL, 0};
-
-	return DBadd_field("userdirectory_saml", &field);
-}
 #endif
 
 DBPATCH_START(7030)
@@ -698,8 +677,5 @@ DBPATCH_ADD(7030045, 0, 1)
 DBPATCH_ADD(7030046, 0, 1)
 DBPATCH_ADD(7030047, 0, 1)
 DBPATCH_ADD(7030048, 0, 1)
-DBPATCH_ADD(7030049, 0, 1)
-DBPATCH_ADD(7030050, 0, 1)
-DBPATCH_ADD(7030051, 0, 1)
 
 DBPATCH_END()
