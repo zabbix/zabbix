@@ -86,9 +86,8 @@ static void	process_async_result(zbx_dc_item_context_t *item, zbx_poller_config_
 	{
 		if (ZBX_IS_RUNNING())
 		{
-			zbx_preprocess_item_value(item->preprocessing, item->itemid,
-				item->hostid, item->value_type,item->flags,
-				&item->result, &timespec, ITEM_STATE_NORMAL, NULL);
+			zbx_preprocess_item_value(item->preprocessing, item->itemid, item->hostid, item->value_type,
+				item->flags, &item->result, &timespec, ITEM_STATE_NORMAL, NULL);
 		}
 	}
 	else
