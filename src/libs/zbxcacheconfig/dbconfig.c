@@ -10317,9 +10317,6 @@ static int	dc_preproc_item_changed(ZBX_DC_ITEM *dc_item, zbx_pp_item_t *pp_item)
 
 unsigned char	zbx_dc_item_preprocessable(const ZBX_DC_ITEM *dc_item)
 {
-	if (ITEM_TYPE_DEPENDENT == dc_item->type)
-		return 1;
-
 	if (NULL == dc_item->preproc_item && NULL == dc_item->master_item &&
 			ITEM_TYPE_INTERNAL != dc_item->type &&
 			ZBX_FLAG_DISCOVERY_RULE != dc_item->flags)
