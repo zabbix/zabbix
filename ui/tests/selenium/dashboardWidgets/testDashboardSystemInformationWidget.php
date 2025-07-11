@@ -251,7 +251,7 @@ class testDashboardSystemInformationWidget extends testSystemInformation {
 		global $DB;
 
 		return [
-			// #0 Verify user with super admin role. Check fields that are not checked in screenshot  with enabled HA.
+			// #0 Verify user with super admin role. Check fields that are not checked in screenshot with enabled HA.
 			[
 				[
 					'super_admin' => true,
