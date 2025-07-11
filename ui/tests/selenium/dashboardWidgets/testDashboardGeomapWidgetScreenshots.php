@@ -293,7 +293,7 @@ class testDashboardGeomapWidgetScreenshots extends CWebTest {
 		$form->fill($data);
 		$form->submit();
 		$this->assertMessage(TEST_GOOD, 'Configuration updated');
-		
+
 		$this->page->open('zabbix.php?action=dashboard.view&dashboardid='.self::$zoom_dashboardid);
 		CDashboardElement::find()->waitUntilReady();
 
