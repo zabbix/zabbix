@@ -553,10 +553,10 @@ class testDashboardsTemplatedDashboardForm extends CWebTest {
 							[
 								'type' => 'hostcard',
 								'name' => 'Host card widget',
-								'x' => 0,
-								'y' => 20,
-								'width' => 20,
-								'height' => 5,
+								'x' => 60,
+								'y' => 16,
+								'width' => 12,
+								'height' => 4,
 								'fields' => [
 									[
 										'type' => 3,
