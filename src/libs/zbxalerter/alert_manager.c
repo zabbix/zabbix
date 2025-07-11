@@ -36,7 +36,6 @@
 #include "zbxjson.h"
 #include "audit/zbxaudit.h"
 #include "zbxexpr.h"
-#include "zbxcacheconfig.h"
 #include "zbx_expression_constants.h"
 #include "zbx_rtc_constants.h"
 #include "zbxrtc.h"
