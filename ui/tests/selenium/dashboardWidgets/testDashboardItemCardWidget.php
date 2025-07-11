@@ -44,30 +44,35 @@ class testDashboardItemCardWidget extends testWidgets {
 	* @var array
 	*/
 	protected static $dashboardid;
+
 	/**
 	* Dashboard hash before update.
 	*
 	* @var string
 	*/
 	protected static $old_hash;
+
 	/**
 	* Widget counter.
 	*
 	* @var integer
 	*/
 	protected static $old_widget_count;
+
 	/**
 	* List of created items.
 	*
 	* @var array
 	*/
 	protected static $itemids;
+
 	/**
 	* List of created from template items.
 	*
 	* @var integer
 	*/
 	protected static $template_items;
+
 	/**
 	* List of created trigger ID's.
 	*
@@ -1537,12 +1542,24 @@ class testDashboardItemCardWidget extends testWidgets {
 							'Item' => 'zabbix.php?action=popup&popup=item.edit&context=host&itemid={itemid}',
 							'Host' => 'zabbix.php?action=popup&popup=host.edit&hostid={hostid}',
 							'Triggers' => [
-
-							],
+								'Not classidied trigger' => 'zabbix.php?action=popup&popup=trigger.edit'.
+										'&triggerid={triggerid}&hostid={hostid}&context=host',
+								'Information trigger' => 'zabbix.php?action=popup&popup=trigger.edit'.
+										'&triggerid={triggerid}&hostid={hostid}&context=host',
+								'Warning trigger' => 'zabbix.php?action=popup&popup=trigger.edit'.
+										'&triggerid={triggerid}&hostid={hostid}&context=host',
+								'Average trigger' => 'zabbix.php?action=popup&popup=trigger.edit'.
+										'&triggerid={triggerid}&hostid={hostid}&context=host',
+								'High trigger' => 'zabbix.php?action=popup&popup=trigger.edit'.
+										'&triggerid={triggerid}&hostid={hostid}&context=host',
+								'Disaster trigger' => 'zabbix.php?action=popup&popup=trigger.edit'.
+										'&triggerid={triggerid}&hostid={hostid}&context=host'
+								],
 							'Create trigger' => 'menu-popup-item',
 							'Create dependent item' => 'menu-popup-item',
 							'Create dependent discovery rule' => 'host_discovery.php?form=create&hostid={hostid}&type=18'.
-								'&master_itemid={itemid}&backurl=zabbix.php%3Faction%3Dlatest.view%26context%3Dhost&context=host'
+									'&master_itemid={itemid}&backurl=zabbix.php%3Faction%3Dlatest.view%26context%3Dhost'.
+									'&context=host'
 						],
 						'ACTIONS' => [
 							'Execute now' => 'menu-popup-item'
@@ -1581,7 +1598,31 @@ class testDashboardItemCardWidget extends testWidgets {
 						]
 					],
 					'Host inventory' => '',
-					'Tags' => ['tagFromItem: 🙃zabbix🙃']
+					'Tags' => ['tagFromItem: 🙃zabbix🙃'],
+					'Context menu' => [
+						'VIEW' => [
+							'Latest data' => 'zabbix.php?action=latest.view&hostids%5B%5D={hostid}&name=Dependent%20item%201'.
+									'&filter_set=1',
+							'Graph' => 'history.php?action=showgraph&itemids%5B%5D={itemid}',
+							'Values' => 'history.php?action=showvalues&itemids%5B%5D={itemid}',
+							'500 latest values' => 'history.php?action=showlatest&itemids%5B%5D={itemid}'
+						],
+						'CONFIGURATION' => [
+							'Item' => 'zabbix.php?action=popup&popup=item.edit&context=host&itemid={itemid}',
+							'Host' => 'zabbix.php?action=popup&popup=host.edit&hostid={hostid}',
+							'Triggers' => [
+								'Disabled trigger' => 'zabbix.php?action=popup&popup=trigger.edit'.
+										'&triggerid={triggerid}&hostid={hostid}&context=host'
+								],
+							'Create trigger' => 'menu-popup-item',
+							'Create dependent item' => 'menu-popup-item',
+							'Create dependent discovery rule' => 'host_discovery.php?form=create&hostid={hostid}&type=18'.
+								'&master_itemid={itemid}&backurl=zabbix.php%3Faction%3Dlatest.view%26context%3Dhost&context=host'
+						],
+						'ACTIONS' => [
+							'Execute now' => 'menu-popup-item'
+						]
+					]
 				]
 			],
 			// #2.
@@ -1656,7 +1697,6 @@ class testDashboardItemCardWidget extends testWidgets {
 				self::$dashboardid['Dashboard for Item Card widget display check'])->waitUntilReady();
 		$dashboard = CDashboardElement::find()->one();
 		$widget = $dashboard::find()->one()->getWidget($data['Header']);
-		// sleep(300);
 
 		// Check item name.
 		$item = CTestArrayHelper::get($data, 'Disabled') ? $data['Item']."\n".'Disabled' : $data['Item'];
@@ -1688,8 +1728,8 @@ class testDashboardItemCardWidget extends testWidgets {
 
 		if (array_key_exists('Severity', $data)) {
 			foreach($data['Severity'] as $severity => $value) {
-				$this->assertEquals($value, $widget
-						->query('xpath:.//span[@title='.CXPathHelper::escapeQuotes($severity).']')->one()->getText()
+				$this->assertEquals($value, $widget->query('xpath:.//span[@title='.
+						CXPathHelper::escapeQuotes($severity).']')->one()->getText()
 				);
 			}
 		}
@@ -1741,7 +1781,8 @@ class testDashboardItemCardWidget extends testWidgets {
 					);
 				}
 				else if ($section === 'right-column') {
-					$link = $widget->query('class:section-latest-data')->query('class:'.$section)->query('class:column-value')->one();
+					$link = $widget->query('class:section-latest-data')->query('class:'.$section)
+							->query('class:column-value')->one();
 					$this->assertTrue($link->isClickable());
 				}
 				else {
@@ -1810,13 +1851,20 @@ class testDashboardItemCardWidget extends testWidgets {
 				if (is_array($link)) {
 					foreach ($link as $menu_level2 => $attribute) {
 						// Check 2-level menu links.
-
-						$item_link = $popup->getItem($menu_level1)->query('xpath:./../ul//a')->one();
+						$popup->getItem($menu_level1)->click();
+						$item_link = $popup->getItem($menu_level1)->query('xpath:./../ul//a[contains'.
+								'(@class, "menu-popup-item") and text()='.CXPathHelper::escapeQuotes($menu_level2).']')
+								->one();
 
 						if (str_contains($attribute, 'menu-popup-item')) {
 							$this->assertEquals($attribute, $item_link->getAttribute('class'));
 						}
 						else {
+							$triggerid = CDBHelper::getValue('SELECT triggerid FROM triggers WHERE description='.
+									zbx_dbstr($menu_level2)
+							);
+
+							$attribute = str_replace(['{triggerid}', '{hostid}'], [$triggerid, $hostid], $attribute);
 							$this->assertEquals($menu_level2, $item_link->getText());
 							$this->assertStringContainsString($attribute, $item_link->getAttribute('href'));
 						}
@@ -1828,10 +1876,9 @@ class testDashboardItemCardWidget extends testWidgets {
 						$this->assertEquals($link, $popup->getItem($menu_level1)->getAttribute('class'));
 					}
 					else {
-						$link = str_replace('{hostid}', $hostid, $link);
-						$link = str_replace('{itemid}', $itemid, $link);
-						$this->assertTrue($popup->query("xpath:.//a[text()=".CXPathHelper::escapeQuotes($menu_level1).
-								" and contains(@href, ".CXPathHelper::escapeQuotes($link).")]")->exists()
+						$link = str_replace(['{hostid}','{itemid}'], [$hostid, $itemid], $link);
+						$this->assertTrue($popup->query('xpath:.//a[text()='.CXPathHelper::escapeQuotes($menu_level1).
+								' and contains(@href, '.CXPathHelper::escapeQuotes($link).')]')->exists()
 						);
 					}
 				}
