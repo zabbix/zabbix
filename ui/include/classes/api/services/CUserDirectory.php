@@ -991,7 +991,7 @@ class CUserDirectory extends CApiService {
 		DB::update('users', [[
 			'values' => ['userdirectoryid' => 0],
 			'where' => ['userdirectoryid' => $userdirectoryids]
-		]], true);
+		]]);
 
 		self::deleteAffectedProvisionGroups($userdirectoryids);
 

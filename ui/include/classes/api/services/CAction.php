@@ -1431,6 +1431,8 @@ class CAction extends CApiService {
 
 		DB::delete('actions', ['actionid' => $actionids]);
 
+		DB::update('escalations', ['values' => ['actionid' => 0], 'where' => ['actionid' => $actionids]]);
+
 		self::addAuditLog(CAudit::ACTION_DELETE, CAudit::RESOURCE_ACTION, $db_actions);
 
 		return ['actionids' => $actionids];

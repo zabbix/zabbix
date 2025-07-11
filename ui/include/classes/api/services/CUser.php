@@ -1390,7 +1390,7 @@ class CUser extends CApiService {
 				DB::update('sessions', [
 					'values' => ['status' => ZBX_SESSION_PASSIVE],
 					'where' => ['userid' => $user['userid']]
-				], true);
+				]);
 			}
 		}
 	}
@@ -1899,18 +1899,11 @@ class CUser extends CApiService {
 		DB::update('token', [
 			'values' => ['creator_userid' => null],
 			'where' => ['creator_userid' => $userids]
-		], true);
+		]);
 		DB::update('event_suppress', [
 			'values' => ['userid' => null],
 			'where' => ['userid' => $userids]
 		]);
-
-		$tokenids = DB::select('token', [
-			'output' => [],
-			'filter' => ['userid' => $userids],
-			'preservekeys' => true
-		]);
-		CToken::deleteForce(array_keys($tokenids));
 
 		DB::delete('users', ['userid' => $userids]);
 

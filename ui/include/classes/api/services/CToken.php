@@ -368,7 +368,7 @@ class CToken extends CApiService {
 	 *
 	 * @param array $tokenids
 	 */
-	public static function deleteForce(array $tokenids): void {
+	private static function deleteForce(array $tokenids): void {
 		if (!$tokenids) {
 			return;
 		}
