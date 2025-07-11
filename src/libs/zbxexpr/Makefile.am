@@ -9,4 +9,5 @@ libzbxexpr_a_SOURCES = \
 	expr.c \
 	interval.c \
 	token.c \
-	urlencode.c
+	urlencode.c \
+	substitute.c
