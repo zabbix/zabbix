@@ -130,6 +130,8 @@ zbx_err_codes_t;
 
 #ifdef HAVE_POSTGRESQL
 int	zbx_tsdb_get_version(void);
+	/* check that TimescaleDB version is greater than or equal to 2.18 */
+#	define ZBX_DB_TSDB_GE_V2_18	(21800 <= zbx_tsdb_get_version())
 #endif
 
 #if defined (HAVE_MYSQL)
