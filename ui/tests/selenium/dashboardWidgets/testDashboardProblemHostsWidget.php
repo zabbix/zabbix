@@ -23,7 +23,6 @@ require_once dirname(__FILE__) . '/../../include/CWebTest.php';
  */
 class testDashboardProblemHostsWidget extends testWidgets {
 
-	const DEFAULT_DASHBOARD = 'Dashboard for Problem hosts widget test';
 	const DELETE_WIDGET = 'Delete Problem hosts';
 	const MAP_WIDGET = 'Map widget for broadcasting';
 	const HOSTGROUP_NAME = 'Host group for map widget';
@@ -47,64 +46,10 @@ class testDashboardProblemHostsWidget extends testWidgets {
 	}
 
 	public static function prepareData() {
-		// Insert host group to use in map.
-		CDataHelper::call('hostgroup.create', [
-			['name' => self::HOSTGROUP_NAME]
-		]);
-		$host_groupid = CDataHelper::getIds('name');
-
-		// Insert host to use in map.
-		$host_response = CDataHelper::createHosts([
-			[
-				'host' => self::HOST_NAME,
-				'groups' => [
-					'groupid' => $host_groupid[self::HOSTGROUP_NAME]
-				]
-			]
-		]);
-		$hostid = $host_response['hostids'];
-
-		// Create map to use for map widget.
-		$mapid = CDataHelper::call('map.create', [
-			[
-				'name' => self::MAP_WIDGET,
-				'height' => 400,
-				'width' => 500,
-				'selements' => [
-					[
-						'selementid' => 1,
-						'elementtype' => SYSMAP_ELEMENT_TYPE_HOST_GROUP,
-						'elements' => [
-							['groupid' => $host_groupid[self::HOSTGROUP_NAME]]
-						],
-						'label' => self::HOSTGROUP_NAME,
-						'iconid_off' => 136, // SAN_(96) element icon.
-						'x' => 50,
-						'y' => 30,
-						'width' => 200,
-						'heidght' => 200
-					],
-					[
-						'selementid' => 4,
-						'elementtype' => SYSMAP_ELEMENT_TYPE_HOST,
-						'elements' => [
-							['hostid' => $hostid[self::HOST_NAME]]
-						],
-						'label' => self::HOST_NAME,
-						'iconid_off' => 151, // Server_(96) element icon.
-						'x' => 50,
-						'y' => 180,
-						'width' => 200,
-						'heidght' => 200
-					]
-				]
-			]
-		])['sysmapids'][0];
-
 		// Create default problem hosts widgets and broadcaster map widget.
 		CDataHelper::call('dashboard.create', [
 			[
-				'name' => self::DEFAULT_DASHBOARD,
+				'name' => 'Dashboard for Problem hosts widget test',
 				'pages' => [
 					[
 						'name' => 'Page with default widgets',
@@ -142,7 +87,7 @@ class testDashboardProblemHostsWidget extends testWidgets {
 								'width' => 36,
 								'height' => 5,
 								'fields' => [
-									['type' => ZBX_WIDGET_FIELD_TYPE_MAP, 'name' => 'sysmapid', 'value' => $mapid],
+									['type' => ZBX_WIDGET_FIELD_TYPE_MAP, 'name' => 'sysmapid', 'value' => 1],
 									['type' => ZBX_WIDGET_FIELD_TYPE_STR, 'name' => 'reference', 'value' => 'CCCCC']
 								]
 							]
@@ -151,7 +96,7 @@ class testDashboardProblemHostsWidget extends testWidgets {
 				]
 			]
 		]);
-		self::$dashboardid = CDataHelper::getIds('name')[self::DEFAULT_DASHBOARD];
+		self::$dashboardid = CDataHelper::getIds('name')['Dashboard for Problem hosts widget test'];
 	}
 
 	public function testDashboardProblemHostsWidget_Layout() {
@@ -260,11 +205,11 @@ class testDashboardProblemHostsWidget extends testWidgets {
 			'Hosts' => ['Hosts', 'Widget', 'Dashboard']
 		];
 		foreach ($popup_options as $field => $popup_values) {
-			$popup_menu = $form->getField($field)->query('xpath:.//button[contains(@class, "zi-chevron-down")]')->one();
-			$this->assertTrue($popup_menu->isClickable());
+			$chevron = $form->getField($field)->query('xpath:.//button[contains(@class, "zi-chevron-down")]')->one();
+			$this->assertTrue($chevron->isClickable());
 
 			foreach ($popup_values as $title) {
-				$popup_menu->asPopupButton()->getMenu()->select($title);
+				$chevron->asPopupButton()->getMenu()->select($title);
 
 				if ($title !== 'Dashboard') {
 					$dialog = COverlayDialogElement::find()->waitUntilReady()->all()->last();
@@ -277,17 +222,6 @@ class testDashboardProblemHostsWidget extends testWidgets {
 			}
 		}
 		COverlayDialogElement::find()->one()->close();
-	}
-
-	public static function getCreateDefaultData() {
-		return [
-			// #14 Submitting empty form with default values.
-			[
-				[
-					'fields' => []
-				]
-			]
-		];
 	}
 
 	public static function getWidgetData() {
@@ -373,7 +307,7 @@ class testDashboardProblemHostsWidget extends testWidgets {
 						[
 							'tag' => '     trimmed tag     ',
 							'operator' => 'Equals',
-							'value' => '    trimmed value'
+							'value' => '    trimmed value     '
 						]
 					],
 					'trim' => ['Name', 'Problem', 'tag', 'value']
@@ -482,13 +416,7 @@ class testDashboardProblemHostsWidget extends testWidgets {
 					'fields' => [
 						'Name' => 'Delete existing tag'
 					],
-					'tags' => [
-						[
-							'tag' => '',
-							'operator' => 'Contains',
-							'value' => ''
-						]
-					]
+					'tags' => []
 				]
 			],
 			// #11
@@ -498,9 +426,9 @@ class testDashboardProblemHostsWidget extends testWidgets {
 						'Name' => 'Host group data source override with widget'
 					],
 					'chevron' => [
-							'field' => 'Host groups',
-							'override_with' => 'Widget',
-							'selection' => self::MAP_WIDGET
+						'field' => 'Host groups',
+						'override_with' => 'Widget',
+						'selection' => self::MAP_WIDGET
 					]
 				]
 			],
@@ -524,9 +452,20 @@ class testDashboardProblemHostsWidget extends testWidgets {
 						'Name' => 'Hosts data source override with dashboard'
 					],
 					'chevron' => [
-							'field' => 'Hosts',
-							'override_with' => 'Dashboard'
+						'field' => 'Hosts',
+						'override_with' => 'Dashboard'
 					]
+				]
+			]
+		];
+	}
+
+		public static function getCreateDefaultData() {
+		return [
+			// #14 Submitting empty form with default values.
+			[
+				[
+					'fields' => []
 				]
 			]
 		];
@@ -537,14 +476,14 @@ class testDashboardProblemHostsWidget extends testWidgets {
 	 * @dataProvider getCreateDefaultData
 	 */
 	public function testDashboardProblemHostsWidget_Create($data) {
-		$this->checkFormProblemHostsWidget($data);
+		$this->checkWidgetForm($data);
 	}
 
 	/**
 	 * @dataProvider getWidgetData
 	 */
 	public function testDashboardProblemHostsWidget_Update($data) {
-		$this->checkFormProblemHostsWidget($data, true);
+		$this->checkWidgetForm($data, true);
 	}
 
 	/**
@@ -553,7 +492,7 @@ class testDashboardProblemHostsWidget extends testWidgets {
 	 * @param array      $data      data provider
 	 * @param boolean    $update    true if update scenario, false if create
 	 */
-	protected function checkFormProblemHostsWidget($data, $update = false) {
+	protected function checkWidgetForm($data, $update = false) {
 		$this->page->login()->open('zabbix.php?action=dashboard.view&dashboardid='.self::$dashboardid)->waitUntilReady();
 		$dashboard = CDashboardElement::find()->one();
 		$old_widget_count = $dashboard->getWidgets()->count();
@@ -568,14 +507,14 @@ class testDashboardProblemHostsWidget extends testWidgets {
 		if ($update) {
 			$header = (array_key_exists('Name', $data['fields'])) ? $data['fields']['Name'] : self::$default_widget;
 			$form = $dashboard->getWidget(self::$default_widget)->edit();
-			COverlayDialogElement::find()->one()->waitUntilReady();
+			COverlayDialogElement::find()->waitUntilReady();
 
 			$unfilled_fields = $form->getValues();
 		}
 		else {
 			$header = (array_key_exists('Name', $data['fields'])) ? $data['fields']['Name'] : 'Problem hosts';
 			$form = $dashboard->edit()->addWidget()->asForm();
-			COverlayDialogElement::find()->one()->waitUntilReady();
+			COverlayDialogElement::find()->waitUntilReady();
 			$form->fill(['Type' => CFormElement::RELOADABLE_FILL('Problem hosts')]);
 
 			$unfilled_fields = [
@@ -598,7 +537,7 @@ class testDashboardProblemHostsWidget extends testWidgets {
 		$form->fill($data['fields']);
 
 		if (array_key_exists('chevron', $data)) {
-			$chevron = $form->getField($data['chevron']['field'])->query('xpath:.//button[contains(@class, "zi-chevron-down")]')->one();
+			$chevron = $form->getField($data['chevron']['field'])->query('class:zi-chevron-down-small')->one();
 
 			$menu = $chevron->asPopupButton()->getMenu();
 			$menu->select($data['chevron']['override_with']);
@@ -638,7 +577,8 @@ class testDashboardProblemHostsWidget extends testWidgets {
 				$chevron_fields = [
 					$data['chevron']['field'] => [$data['chevron']['selection']]
 				];
-			} else {
+			}
+			else {
 				$chevron_fields = [
 					$data['chevron']['field'] => ['Dashboard']
 				];
@@ -647,11 +587,9 @@ class testDashboardProblemHostsWidget extends testWidgets {
 		}
 		$this->assertEquals($expected_fields, $saved_form->getFields()->asValues());
 
-		if (array_key_exists('tags', $data)) {
-			$expected = $data['tags'];
-
+		if (!empty($data['tags'])) {
 			// Function asValues() does not get tags from the form, so we need to check them separately.
-			$this->query('id:tags_table_tags')->asMultifieldTable()->one()->checkValue($expected);
+			$this->query('id:tags_table_tags')->asMultifieldTable()->one()->checkValue($data['tags']);
 		}
 
 		// Close widget edit form and cancel editing.
@@ -708,7 +646,7 @@ class testDashboardProblemHostsWidget extends testWidgets {
 	}
 
 	/**
-	 * Function for checking cancelling form or submitting without any changes.
+	 * Check create and update form cancellation and form submission without applying any changes.
 	 *
 	 * @param boolean $cancel			true if cancel create/update form, false if form is submitted
 	 * @param boolean $create			true if create scenario, false if update
@@ -735,22 +673,22 @@ class testDashboardProblemHostsWidget extends testWidgets {
 
 		if ($cancel || !$save_dashboard) {
 			$form->fill([
-					'Name' => 'No save',
-					'Refresh interval' => '10 seconds',
-					'Host groups' => 'Empty group',
-					'Exclude host groups' => 'Group to copy graph',
-					'Hosts' => 'Available host',
-					'Problem' => 'Test problem',
-					'id:severities_3' => true,
-					'Show suppressed problems' => true,
-					'Problem display' => 'Unacknowledged only'
+				'Name' => 'No save',
+				'Refresh interval' => '10 seconds',
+				'Host groups' => 'Empty group',
+				'Exclude host groups' => 'Group to copy graph',
+				'Hosts' => 'Available host',
+				'Problem' => 'Test problem',
+				'id:severities_3' => true,
+				'Show suppressed problems' => true,
+				'Problem display' => 'Unacknowledged only'
 			]);
 			$tags_table = $form->getField('id:tags_table_tags')->asMultifieldTable();
 			$tags_table->clear();
 			$tags_table->fill([
-					'tag' => 'tag',
-					'operator' => 'Does not equal',
-					'value' => 'value'
+				'tag' => 'tag',
+				'operator' => 'Does not equal',
+				'value' => 'value'
 			]);
 		}
 
@@ -794,10 +732,8 @@ class testDashboardProblemHostsWidget extends testWidgets {
 
 		// Check that widget is not present on dashboard and in DB.
 		$this->assertFalse($dashboard->getWidget(self::DELETE_WIDGET, false)->isValid());
-		$this->assertEquals(0, CDBHelper::getCount('SELECT * FROM widget_field wf'.
-				' LEFT JOIN widget w'.
-					' ON w.widgetid=wf.widgetid'.
-					' WHERE w.name='.zbx_dbstr(self::DELETE_WIDGET)
+		$this->assertEquals(0, CDBHelper::getCount('SELECT * FROM widget_field wf LEFT JOIN widget w'.
+				' ON w.widgetid=wf.widgetid WHERE w.name='.zbx_dbstr(self::DELETE_WIDGET)
 		));
 	}
 }
