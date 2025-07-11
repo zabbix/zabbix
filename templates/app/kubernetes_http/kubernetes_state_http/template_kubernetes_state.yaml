@@ -93,7 +93,7 @@ zabbix_export:
         You can also set up evaluation periods for replica mismatch triggers (Deployments, ReplicaSets, StatefulSets) with the field `Replica Mismatch Evaluation Period`, which supports context and regular expressions.
       vendor:
         name: Zabbix
-        version: 8.0-0
+        version: 8.0-1
       groups:
         - name: Templates/Applications
       items:
@@ -2152,7 +2152,7 @@ zabbix_export:
               preprocessing:
                 - type: PROMETHEUS_PATTERN
                   parameters:
-                    - 'kube_pod_container_resource_limits{pod="{#NAME}", resource="cpu"}'
+                    - 'kube_pod_container_resource_limits{namespace="{#NAMESPACE}", pod="{#NAME}", resource="cpu"}'
                     - function
                     - sum
                   error_handler: DISCARD_VALUE
@@ -2177,7 +2177,7 @@ zabbix_export:
               preprocessing:
                 - type: PROMETHEUS_PATTERN
                   parameters:
-                    - 'kube_pod_container_resource_limits{pod="{#NAME}", resource="memory"}'
+                    - 'kube_pod_container_resource_limits{namespace="{#NAMESPACE}", pod="{#NAME}", resource="memory"}'
                     - function
                     - sum
                   error_handler: DISCARD_VALUE
@@ -2201,7 +2201,7 @@ zabbix_export:
               preprocessing:
                 - type: PROMETHEUS_PATTERN
                   parameters:
-                    - 'kube_pod_container_resource_requests{pod="{#NAME}", resource="cpu"}'
+                    - 'kube_pod_container_resource_requests{namespace="{#NAMESPACE}", pod="{#NAME}", resource="cpu"}'
                     - function
                     - sum
                   error_handler: DISCARD_VALUE
@@ -2226,7 +2226,7 @@ zabbix_export:
               preprocessing:
                 - type: PROMETHEUS_PATTERN
                   parameters:
-                    - 'kube_pod_container_resource_requests{pod="{#NAME}", resource="memory"}'
+                    - 'kube_pod_container_resource_requests{namespace="{#NAMESPACE}", pod="{#NAME}", resource="memory"}'
                     - function
                     - sum
                   error_handler: DISCARD_VALUE
@@ -2250,7 +2250,7 @@ zabbix_export:
               preprocessing:
                 - type: PROMETHEUS_PATTERN
                   parameters:
-                    - 'kube_pod_container_status_ready{pod="{#NAME}"}'
+                    - 'kube_pod_container_status_ready{namespace="{#NAMESPACE}", pod="{#NAME}"}'
                     - function
                     - sum
                   error_handler: DISCARD_VALUE
@@ -2274,7 +2274,7 @@ zabbix_export:
               preprocessing:
                 - type: PROMETHEUS_PATTERN
                   parameters:
-                    - 'kube_pod_container_status_restarts_total{pod="{#NAME}"}'
+                    - 'kube_pod_container_status_restarts_total{namespace="{#NAMESPACE}", pod="{#NAME}"}'
                     - function
                     - sum
                   error_handler: DISCARD_VALUE
@@ -2306,7 +2306,7 @@ zabbix_export:
               preprocessing:
                 - type: PROMETHEUS_PATTERN
                   parameters:
-                    - 'kube_pod_container_status_running{pod="{#NAME}"}'
+                    - 'kube_pod_container_status_running{namespace="{#NAMESPACE}", pod="{#NAME}"}'
                     - function
                     - sum
                   error_handler: DISCARD_VALUE
@@ -2330,7 +2330,7 @@ zabbix_export:
               preprocessing:
                 - type: PROMETHEUS_PATTERN
                   parameters:
-                    - 'kube_pod_container_status_terminated{pod="{#NAME}"}'
+                    - 'kube_pod_container_status_terminated{namespace="{#NAMESPACE}", pod="{#NAME}"}'
                     - function
                     - sum
                   error_handler: DISCARD_VALUE
@@ -2354,7 +2354,7 @@ zabbix_export:
               preprocessing:
                 - type: PROMETHEUS_PATTERN
                   parameters:
-                    - 'kube_pod_container_status_waiting{pod="{#NAME}"}'
+                    - 'kube_pod_container_status_waiting{namespace="{#NAMESPACE}", pod="{#NAME}"}'
                     - function
                     - sum
                   error_handler: DISCARD_VALUE
@@ -2378,7 +2378,7 @@ zabbix_export:
               preprocessing:
                 - type: PROMETHEUS_PATTERN
                   parameters:
-                    - 'kube_pod_status_phase{pod="{#NAME}", phase="Failed"}'
+                    - 'kube_pod_status_phase{namespace="{#NAMESPACE}", pod="{#NAME}", phase="Failed"}'
                     - value
                     - ''
                   error_handler: DISCARD_VALUE
@@ -2402,7 +2402,7 @@ zabbix_export:
               preprocessing:
                 - type: PROMETHEUS_PATTERN
                   parameters:
-                    - 'kube_pod_status_phase{pod="{#NAME}", phase="Pending"}'
+                    - 'kube_pod_status_phase{namespace="{#NAMESPACE}", pod="{#NAME}", phase="Pending"}'
                     - value
                     - ''
                   error_handler: DISCARD_VALUE
@@ -2426,7 +2426,7 @@ zabbix_export:
               preprocessing:
                 - type: PROMETHEUS_PATTERN
                   parameters:
-                    - 'kube_pod_status_phase{pod="{#NAME}", phase="Running"}'
+                    - 'kube_pod_status_phase{namespace="{#NAMESPACE}", pod="{#NAME}", phase="Running"}'
                     - value
                     - ''
                   error_handler: DISCARD_VALUE
@@ -2450,7 +2450,7 @@ zabbix_export:
               preprocessing:
                 - type: PROMETHEUS_PATTERN
                   parameters:
-                    - 'kube_pod_status_phase{pod="{#NAME}", phase="Succeeded"}'
+                    - 'kube_pod_status_phase{namespace="{#NAMESPACE}", pod="{#NAME}", phase="Succeeded"}'
                     - value
                     - ''
                   error_handler: DISCARD_VALUE
@@ -2474,7 +2474,7 @@ zabbix_export:
               preprocessing:
                 - type: PROMETHEUS_PATTERN
                   parameters:
-                    - 'kube_pod_status_phase{pod="{#NAME}", phase="Unknown"}'
+                    - 'kube_pod_status_phase{namespace="{#NAMESPACE}", pod="{#NAME}", phase="Unknown"}'
                     - value
                     - ''
                   error_handler: DISCARD_VALUE
@@ -2498,7 +2498,7 @@ zabbix_export:
               preprocessing:
                 - type: PROMETHEUS_PATTERN
                   parameters:
-                    - 'kube_pod_status_ready{pod="{#NAME}", condition="true"}'
+                    - 'kube_pod_status_ready{namespace="{#NAMESPACE}", pod="{#NAME}", condition="true"}'
                     - value
                     - ''
                   error_handler: DISCARD_VALUE
@@ -2522,7 +2522,7 @@ zabbix_export:
               preprocessing:
                 - type: PROMETHEUS_PATTERN
                   parameters:
-                    - 'kube_pod_status_scheduled{pod="{#NAME}", condition="true"}'
+                    - 'kube_pod_status_scheduled{namespace="{#NAMESPACE}", pod="{#NAME}", condition="true"}'
                     - value
                     - ''
                   error_handler: DISCARD_VALUE
@@ -2546,7 +2546,7 @@ zabbix_export:
               preprocessing:
                 - type: PROMETHEUS_PATTERN
                   parameters:
-                    - 'kube_pod_status_unschedulable{pod="{#NAME}"}'
+                    - 'kube_pod_status_unschedulable{namespace="{#NAMESPACE}", pod="{#NAME}"}'
                     - value
                     - ''
                   error_handler: DISCARD_VALUE
