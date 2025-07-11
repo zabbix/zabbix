@@ -38,7 +38,7 @@ typedef int (*zbx_trigger_func_t)(zbx_variant_t *, const zbx_dc_evaluate_item_t 
 		const zbx_timespec_t *, char **);
 typedef void (*zbx_lld_process_agent_result_func_t)(zbx_uint64_t itemid, zbx_uint64_t hostid, AGENT_RESULT *result,
 		zbx_timespec_t *ts, char *error);
-typedef void (*zbx_preprocess_item_value_func_t)(unsigned char preprocessable, zbx_uint64_t itemid, zbx_uint64_t hostid,
+typedef void (*zbx_preprocess_item_value_func_t)(unsigned char preprocessing, zbx_uint64_t itemid, zbx_uint64_t hostid,
 		unsigned char item_value_type, unsigned char item_flags, AGENT_RESULT *result, zbx_timespec_t *ts,
 		unsigned char state, char *error);
 typedef void (*zbx_preprocessor_flush_func_t)(void);

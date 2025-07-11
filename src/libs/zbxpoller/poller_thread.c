@@ -756,7 +756,7 @@ static int	get_values(unsigned char poller_type, int *nextcheck, const zbx_confi
 			if (0 == add_results.values_num)
 			{
 				items[i].state = ITEM_STATE_NORMAL;
-				zbx_preprocess_item_value(items[i].preprocessable, items[i].itemid,
+				zbx_preprocess_item_value(items[i].preprocessing, items[i].itemid,
 						items[i].host.hostid, items[i].value_type,
 						items[i].flags, &results[i], &timespec, items[i].state, NULL);
 			}
@@ -773,7 +773,7 @@ static int	get_values(unsigned char poller_type, int *nextcheck, const zbx_confi
 					if (ZBX_ISSET_MSG(add_result))
 					{
 						items[i].state = ITEM_STATE_NOTSUPPORTED;
-						zbx_preprocess_item_value(items[i].preprocessable, items[i].itemid,
+						zbx_preprocess_item_value(items[i].preprocessing, items[i].itemid,
 								items[i].host.hostid, items[i].value_type,
 								items[i].flags, NULL, &ts_tmp, items[i].state,
 								add_result->msg);
@@ -781,7 +781,7 @@ static int	get_values(unsigned char poller_type, int *nextcheck, const zbx_confi
 					else
 					{
 						items[i].state = ITEM_STATE_NORMAL;
-						zbx_preprocess_item_value(items[i].preprocessable, items[i].itemid,
+						zbx_preprocess_item_value(items[i].preprocessing, items[i].itemid,
 								items[i].host.hostid, items[i].value_type,
 								items[i].flags, add_result, &ts_tmp,
 								items[i].state, NULL);
@@ -799,7 +799,7 @@ static int	get_values(unsigned char poller_type, int *nextcheck, const zbx_confi
 		else if (NOTSUPPORTED == errcodes[i] || AGENT_ERROR == errcodes[i] || CONFIG_ERROR == errcodes[i])
 		{
 			items[i].state = ITEM_STATE_NOTSUPPORTED;
-			zbx_preprocess_item_value(items[i].preprocessable, items[i].itemid, items[i].host.hostid,
+			zbx_preprocess_item_value(items[i].preprocessing, items[i].itemid, items[i].host.hostid,
 					items[i].value_type, items[i].flags, NULL, &timespec,
 					items[i].state, results[i].msg);
 		}

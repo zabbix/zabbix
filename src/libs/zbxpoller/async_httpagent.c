@@ -47,7 +47,7 @@ int	zbx_async_check_httpagent(zbx_dc_item_t *item, AGENT_RESULT *result, const c
 	item->posts = NULL;
 	httpagent_context->item_context.status_codes = item->status_codes;
 	item->status_codes = NULL;
-	httpagent_context->item_context.preprocessable = item->preprocessable;
+	httpagent_context->item_context.preprocessing = item->preprocessing;
 
 	if (SUCCEED != zbx_http_request_prepare(&httpagent_context->http_context, item->request_method,
 			item->url, item->query_fields, item->headers, httpagent_context->item_context.posts,

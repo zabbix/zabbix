@@ -93,6 +93,9 @@ typedef struct
 }
 zbx_dc_interface2_t;
 
+#define ZBX_ITEM_REQUIRES_PREPROCESSING_NO	0
+#define ZBX_ITEM_REQUIRES_PREPROCESSING_YES	1
+
 typedef struct
 {
 	zbx_uint64_t		itemid;
@@ -106,7 +109,7 @@ typedef struct
 	int			ret;
 	int			version;
 	AGENT_RESULT		result;
-	unsigned char		preprocessable;
+	unsigned char		preprocessing;
 }
 zbx_dc_item_context_t;
 
@@ -203,7 +206,7 @@ typedef struct
 	char			*error;
 	unsigned char		*formula_bin;
 	int			snmp_max_repetitions;
-	unsigned char		preprocessable;
+	unsigned char		preprocessing;
 }
 zbx_dc_item_t;
 
@@ -281,7 +284,7 @@ typedef struct
 	char			key_orig[ZBX_ITEM_KEY_LEN * ZBX_MAX_BYTES_IN_UTF8_CHAR + 1], *key;
 	char			trapper_hosts[ZBX_ITEM_TRAPPER_HOSTS_LEN_MAX];
 	char			logtimefmt[ZBX_ITEM_LOGTIMEFMT_LEN_MAX];
-	unsigned char		preprocessable;
+	unsigned char		preprocessing;
 }
 zbx_history_recv_item_t;
 

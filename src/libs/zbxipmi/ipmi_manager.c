@@ -696,7 +696,7 @@ static int	ipmi_manager_schedule_requests(zbx_ipmi_manager_t *manager, int now, 
 			zbx_timespec_t		ts;
 
 			zbx_timespec(&ts);
-			zbx_preprocess_item_value(items[i].preprocessable, items[i].itemid, items[i].host.hostid,
+			zbx_preprocess_item_value(items[i].preprocessing, items[i].itemid, items[i].host.hostid,
 				items[i].value_type, items[i].flags, NULL, &ts, state, error);
 			zbx_dc_requeue_items(&items[i].itemid, &ts.sec, &errcode, 1);
 			zbx_free(error);
@@ -850,8 +850,9 @@ static void	ipmi_manager_process_value_result(zbx_ipmi_manager_t *manager, zbx_i
 				zbx_init_agent_result(&result);
 				SET_TEXT_RESULT(&result, value);
 				value = NULL;
-				zbx_preprocess_item_value(1, itemid, poller->request->hostid, ITEM_VALUE_TYPE_TEXT,
-					flags, &result, &ts, state, NULL);
+				zbx_preprocess_item_value(ZBX_ITEM_REQUIRES_PREPROCESSING_YES, itemid,
+						poller->request->hostid, ITEM_VALUE_TYPE_TEXT, flags, &result,
+						&ts, state, NULL);
 				zbx_free_agent_result(&result);
 			}
 			break;
@@ -860,8 +861,8 @@ static void	ipmi_manager_process_value_result(zbx_ipmi_manager_t *manager, zbx_i
 		case AGENT_ERROR:
 		case CONFIG_ERROR:
 			state = ITEM_STATE_NOTSUPPORTED;
-			zbx_preprocess_item_value(1, itemid, poller->request->hostid, ITEM_VALUE_TYPE_TEXT, flags, NULL,
-					&ts, state, value);
+			zbx_preprocess_item_value(ZBX_ITEM_REQUIRES_PREPROCESSING_YES, itemid, poller->request->hostid,
+					ITEM_VALUE_TYPE_TEXT, flags, NULL, &ts, state, value);
 			break;
 		default:
 			/* don't change item's state when network related error occurs */
