@@ -133,7 +133,7 @@ class testUsersAuthenticationSaml extends testFormAuthentication {
 		$sp_fields = ['SP private key', 'SP certificate'];
 
 		foreach (['id:sign_messages', 'id:sign_assertions', 'id:sign_authn_requests', 'id:sign_logout_requests',
-					 'id:sign_logout_responses', 'id:encrypt_nameid', 'id:encrypt_assertions'] as $checkbox) {
+					'id:sign_logout_responses', 'id:encrypt_nameid', 'id:encrypt_assertions'] as $checkbox) {
 
 			$saml_form->fill([$checkbox => true]);
 
