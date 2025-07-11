@@ -1,1 +1,0 @@
-A......... [ZBX-26436] prevented redundant row locks in the database when deleting hosts in parallel API requests (vmaksimovs)
