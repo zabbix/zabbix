@@ -10317,7 +10317,7 @@ static int	dc_preproc_item_changed(ZBX_DC_ITEM *dc_item, zbx_pp_item_t *pp_item)
 
 unsigned char	zbx_dc_item_preprocessable(const ZBX_DC_ITEM *dc_item)
 {
-	if (ITEM_STATUS_ACTIVE != dc_item->status || ITEM_TYPE_DEPENDENT == dc_item->type)
+	if (ITEM_TYPE_DEPENDENT == dc_item->type)
 		return 0;
 
 	if (NULL == dc_item->preproc_item && NULL == dc_item->master_item &&
@@ -10371,6 +10371,9 @@ void	zbx_dc_config_get_preprocessable_items(zbx_hashset_t *items, zbx_dc_um_shar
 		for (i = 0; i < dc_host->items.values_num; i++)
 		{
 			ZBX_DC_ITEM	*dc_item = dc_host->items.values[i];
+
+			if (ITEM_STATUS_ACTIVE != dc_item->status)
+				continue;
 
 			if (0 == zbx_dc_item_preprocessable(dc_item))
 				continue;
