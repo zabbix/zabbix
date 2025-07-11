@@ -734,18 +734,18 @@ zabbix_export:
               parameters:
                 - |
                   var data = JSON.parse(value),
-                  	conections = [];
+                  	connections = [];
                   
-                  data.forEach(function (conection) {
-                  	if (conection.type === 'conn_stats') {
-                  		conections.push({
-                  			'{#NAME}': conection.id,
-                  			'{#METRIC}': conection.metric
+                  data.forEach(function (connection) {
+                  	if (connection.type === 'conn_stats') {
+                  		connections.push({
+                  			'{#NAME}': connection.id,
+                  			'{#METRIC}': connection.metric
                   		});
                   	}
                   });
                   
-                  return JSON.stringify(conections);
+                  return JSON.stringify(connections);
             - type: DISCARD_UNCHANGED_HEARTBEAT
               parameters:
                 - 3h
