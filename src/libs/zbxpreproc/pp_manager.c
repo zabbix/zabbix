@@ -439,8 +439,8 @@ static void	pp_manager_queue_value_task_result(zbx_pp_manager_t *manager, zbx_pp
 	zbx_pp_task_value_t	*d = (zbx_pp_task_value_t *)PP_TASK_DATA(task);
 	zbx_pp_item_t		*item;
 
-	d->preproc->elapsed = task->elapsed;
-	d->preproc->elapsed_cumulative += task->elapsed;
+	d->preproc->time_ms = task->time_ms;
+	d->preproc->total_ms += task->time_ms;
 
 	if (ZBX_VARIANT_NONE == d->result.type)
 		return;
@@ -483,7 +483,7 @@ static zbx_pp_task_t	*pp_manager_queue_dependent_task_result(zbx_pp_manager_t *m
 	zbx_pp_task_t		*task_value = d->primary;
 	zbx_pp_task_value_t	*dp = (zbx_pp_task_value_t *)PP_TASK_DATA(task_value);
 
-	d->primary->elapsed = task->elapsed;
+	d->primary->time_ms = task->time_ms;
 
 	pp_manager_queue_value_task_result(manager, d->primary);
 	pp_manager_queue_dependents(manager, d->preproc, dp->um_handle, task_value->itemid, &dp->result, dp->ts, d->cache);
@@ -511,7 +511,7 @@ static zbx_pp_task_t	*pp_manager_requeue_next_sequence_task(zbx_pp_manager_t *ma
 
 	if (SUCCEED == zbx_list_pop(&d_seq->tasks, (void **)&task))
 	{
-		task->elapsed = task_seq->elapsed;
+		task->time_ms = task_seq->time_ms;
 
 		switch (task->type)
 		{
@@ -708,12 +708,12 @@ static void	zbx_pp_manager_get_num_stats(zbx_pp_manager_t *manager, int request,
 			case ZBX_IPC_PREPROCESSOR_TOP_VALUES_SZ:
 				num = (zbx_int64_t)item->preproc->values_sz;
 				break;
-			case ZBX_IPC_PREPROCESSOR_TOP_ELAPSED_CUMULATIVE:
-				num = (zbx_int64_t)(item->preproc->elapsed_cumulative);
+			case ZBX_IPC_PREPROCESSOR_TOP_TOTAL_MS:
+				num = (zbx_int64_t)(item->preproc->total_ms);
 				break;
-			case ZBX_IPC_PREPROCESSOR_TOP_ELAPSED:
+			case ZBX_IPC_PREPROCESSOR_TOP_TIME_MS:
 			default:
-				num = (zbx_int64_t)(item->preproc->elapsed);
+				num = (zbx_int64_t)(item->preproc->time_ms);
 		}
 
 		if (0 == num)
@@ -1189,7 +1189,7 @@ static void	zbx_pp_manager_items_preproc_values_stats_reset(zbx_pp_manager_t *ma
 
 		item->preproc->values_num = 0;
 		item->preproc->values_sz = 0;
-		item->preproc->elapsed_cumulative = 0;
+		item->preproc->total_ms = 0;
 	}
 }
 
@@ -1453,8 +1453,8 @@ ZBX_THREAD_ENTRY(zbx_pp_manager_thread, args)
 				case ZBX_IPC_PREPROCESSOR_TOP_PEAK:
 				case ZBX_IPC_PREPROCESSOR_TOP_VALUES_NUM:
 				case ZBX_IPC_PREPROCESSOR_TOP_VALUES_SZ:
-				case ZBX_IPC_PREPROCESSOR_TOP_ELAPSED:
-				case ZBX_IPC_PREPROCESSOR_TOP_ELAPSED_CUMULATIVE:
+				case ZBX_IPC_PREPROCESSOR_TOP_TIME_MS:
+				case ZBX_IPC_PREPROCESSOR_TOP_TOTAL_MS:
 					preprocessor_reply_top_stats(manager, client, message, message->code);
 					break;
 				case ZBX_IPC_PREPROCESSOR_USAGE_STATS:

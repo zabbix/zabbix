@@ -134,15 +134,15 @@ int	zbx_diag_add_preproc_info(const struct zbx_json_parse *jp, struct zbx_json *
 					zbx_get_top_cb = zbx_preprocessor_get_top_values_size;
 					name = "values_sz";
 				}
-				else if (0 == strcmp(map->name, "elapsed_ms"))
+				else if (0 == strcmp(map->name, "time_ms"))
 				{
-					zbx_get_top_cb = zbx_preprocessor_get_top_elapsed;
-					name = "elapsed_ms";
+					zbx_get_top_cb = zbx_preprocessor_get_top_time_ms;
+					name = "time_ms";
 				}
-				else if (0 == strcmp(map->name, "elapsed_cumulative_ms"))
+				else if (0 == strcmp(map->name, "total_ms"))
 				{
-					zbx_get_top_cb = zbx_preprocessor_get_top_elapsed_cumulative;
-					name = "elapsed_cumulative_ms";
+					zbx_get_top_cb = zbx_preprocessor_get_top_total_ms;
+					name = "total_ms";
 				}
 				else
 				{

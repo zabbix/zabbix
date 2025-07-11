@@ -1296,9 +1296,9 @@ int	zbx_preprocessor_get_top_values_size(int limit, zbx_vector_pp_top_stats_ptr_
  * Purpose: get the top N items by the elapsed time                           *
  *                                                                            *
  ******************************************************************************/
-int	zbx_preprocessor_get_top_elapsed(int limit, zbx_vector_pp_top_stats_ptr_t *stats, char **error)
+int	zbx_preprocessor_get_top_time_ms(int limit, zbx_vector_pp_top_stats_ptr_t *stats, char **error)
 {
-	return preprocessor_get_top_view(limit, stats, error, ZBX_IPC_PREPROCESSOR_TOP_ELAPSED);
+	return preprocessor_get_top_view(limit, stats, error, ZBX_IPC_PREPROCESSOR_TOP_TIME_MS);
 }
 
 /******************************************************************************
@@ -1306,9 +1306,9 @@ int	zbx_preprocessor_get_top_elapsed(int limit, zbx_vector_pp_top_stats_ptr_t *s
  * Purpose: get the top N items by the total elapsed time                     *
  *                                                                            *
  ******************************************************************************/
-int	zbx_preprocessor_get_top_elapsed_cumulative(int limit, zbx_vector_pp_top_stats_ptr_t *stats, char **error)
+int	zbx_preprocessor_get_top_total_ms(int limit, zbx_vector_pp_top_stats_ptr_t *stats, char **error)
 {
-	return preprocessor_get_top_view(limit, stats, error, ZBX_IPC_PREPROCESSOR_TOP_ELAPSED_CUMULATIVE);
+	return preprocessor_get_top_view(limit, stats, error, ZBX_IPC_PREPROCESSOR_TOP_TOTAL_MS);
 }
 
 /******************************************************************************

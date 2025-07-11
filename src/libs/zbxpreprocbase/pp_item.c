@@ -50,8 +50,8 @@ zbx_pp_item_preproc_t	*zbx_pp_item_preproc_create(zbx_uint64_t hostid, unsigned 
 
 	preproc->values_num = 0;
 	preproc->values_sz = 0;
-	preproc->elapsed = 0;
-	preproc->elapsed_cumulative = 0;
+	preproc->time_ms = 0;
+	preproc->total_ms = 0;
 
 	preproc->mode = ZBX_PP_PROCESS_PARALLEL;
 
