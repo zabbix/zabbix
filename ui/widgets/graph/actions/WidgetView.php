@@ -411,7 +411,7 @@ class WidgetView extends CControllerDashboardWidgetView {
 		return $graph_src;
 	}
 
-	private function prepareGraphUrl(array $graph, string $resourceid = null): ?CUrl {
+	private function prepareGraphUrl(array $graph, ?string $resourceid = null): ?CUrl {
 		if ($this->isEditMode() || empty($graph)
 				|| ($this->isTemplateDashboard() && !$this->fields_values['override_hostid'])) {
 			return null;
