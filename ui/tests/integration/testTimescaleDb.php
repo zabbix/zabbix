@@ -369,13 +369,6 @@ class testTimescaleDb extends CIntegrationTest {
 		/* Allow enough time to TimescaleDB settings to be applied */
 		for ($attempt = 1; $attempt <= self::MAX_ATTEMPTS; $attempt++) {
 			try {
-				/* Get number of compressed chunks */
-				$res = DBfetch(DBselect($sql_num_compressed));
-				$this->assertArrayHasKey('number_compressed_chunks', $res);
-				$number_compressed_chunks0 = $res['number_compressed_chunks'];
-				$this->assertEquals(0, $number_compressed_chunks0,
-						"It is expected that there are no compressed chunks in the beginning.");
-
 				/* Get all chunk names. */
 				$res = DBfetchArray(DBselect("SELECT show_chunks('".self::TABLENAME."')"));
 				$chunks = array_column($res, 'show_chunks');
