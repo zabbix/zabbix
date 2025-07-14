@@ -198,7 +198,7 @@ $toc-title-color: #f2f2f2;
 $toc-title-bg-color: #4f4f4f;
 
 // Important! @import string should come after variables
-@import 'screen.scss';
+@import 'screen';
 
 .sidebar {
 	&.is-compact:not(.is-opened) {

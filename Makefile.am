@@ -93,7 +93,7 @@ gettext:
 	ui/locale/make_mo.sh
 
 css_theme_blue:
-	sass --no-cache --sourcemap=none sass/stylesheets/sass/screen.scss ui/assets/styles/blue-theme.css
+	sass --no-cache --sourcemap=none sass/stylesheets/sass/blue-theme.scss ui/assets/styles/blue-theme.css
 
 css_theme_blue_classic:
 	sass --no-cache --sourcemap=none sass/stylesheets/sass/blue-classic-theme.scss ui/assets/styles/blue-classic-theme.css
