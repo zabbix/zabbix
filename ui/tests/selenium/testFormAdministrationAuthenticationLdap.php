@@ -176,4 +176,45 @@ class testFormAdministrationAuthenticationLdap extends CWebTest {
 			$this->assertEquals($data['db_check'], $result);
 		}
 	}
+
+	/**
+	 * Check that Bind password field clears itself after changing Host field.
+	 *
+	 * @depends testFormAdministrationAuthenticationLdap_CheckSettings
+	 */
+	public function testUsersAuthenticationLdap_BindPassword() {
+		$values = [
+			'Port' => '123',
+			'Base DN' => 'base_dn_1',
+			'Search attribute' => 'search_attribute_1',
+			'Bind DN' => 'bind_dn_1',
+			'Login' => 'Login_1',
+			'User password' => 'password_1',
+			'LDAP host' => 'host_created'
+		];
+
+		$this->page->login()->open('zabbix.php?action=authentication.edit');
+		$form = $this->query('name:form_auth')->asForm()->one();
+		$form->selectTab('LDAP settings');
+
+		// Change fields one by one and check that Bind password field cleared only after Host change.
+		foreach ($values as $field => $value) {
+			$form->fill([$field => $value]);
+			$this->page->removeFocus();
+
+			if ($field === 'LDAP host') {
+				$form->checkValue(['Bind password' => '']);
+				$form->getFieldContainer('Bind password')->query('xpath:./button[@data-hintbox]')->one()->click();
+				$hint = $this->query('xpath://div[@class="overlay-dialogue wordbreak"]')->waitUntilPresent()->all()->last();
+				$this->assertEquals('The previous password was cleared due to a host change. Please enter the new password.',
+						$hint->getText()
+				);
+			}
+			else {
+				$this->AssertTrue($form->getFieldContainer('Bind password')->query('button:Change password')->one()
+						->isClickable()
+				);
+			}
+		}
+	}
 }
