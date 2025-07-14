@@ -21,14 +21,15 @@ import (
 )
 
 type Session struct {
-	// URI is a connection string consisting of a network scheme, a "host:port" address or a path to a Unix-socket.
-	URI string `conf:"name=Uri,optional"`
-
-	// Password to send to a protected Redis server.
+	URI      string `conf:"name=Uri,optional"`
 	Password string `conf:"optional"`
+	User     string `conf:"optional"`
 
-	// User to send to a protected Redis server.
-	User string `conf:"optional"`
+	TLSConnect    string `conf:"name=TLSConnect,optional"`
+	TLSCAFile     string `conf:"name=TLSCAFile,optional"`
+	TLSServerName string `conf:"name=TLSServerName,optional"`
+	TLSCertFile   string `conf:"name=TLSCertFile,optional"`
+	TLSKeyFile    string `conf:"name=TLSKeyFile,optional"`
 }
 
 type PluginOptions struct {
