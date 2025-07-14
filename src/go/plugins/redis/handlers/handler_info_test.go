@@ -12,7 +12,7 @@
 ** If not, see <https://www.gnu.org/licenses/>.
 **/
 
-package redis
+package handlers
 
 import (
 	"errors"
@@ -20,6 +20,7 @@ import (
 	"testing"
 
 	"github.com/mediocregopher/radix/v3"
+	"golang.zabbix.com/agent2/plugins/redis/conn"
 )
 
 const (
@@ -189,12 +190,10 @@ func TestPlugin_infoHandler(t *testing.T) {
 
 	defer stubConn.Close()
 
-	conn := &RedisConn{
-		client: stubConn,
-	}
+	connection := conn.NewRedisConn(stubConn)
 
 	type args struct {
-		conn   redisClient
+		conn   conn.RedisClient
 		params map[string]string
 	}
 	tests := []struct {
@@ -205,38 +204,38 @@ func TestPlugin_infoHandler(t *testing.T) {
 	}{
 		{
 			"Default section should be used if it is not explicitly specified",
-			args{conn: conn, params: map[string]string{"Section": "default"}},
+			args{conn: connection, params: map[string]string{"Section": "default"}},
 			`{"DefaultSection":{"test":"111"}}`,
 			false,
 		},
 		{
 			"Should fetch specified section and return marshalled result",
-			args{conn: conn, params: map[string]string{"Section": "COMMONSECTION"}},
+			args{conn: connection, params: map[string]string{"Section": "COMMONSECTION"}},
 			`{"CommonSection":{"bar":"0.00","foo":"123"}}`,
 			false,
 		},
 		{
 			"Should fail if error occurred",
-			args{conn: conn, params: map[string]string{"Section": "WantErr"}},
+			args{conn: connection, params: map[string]string{"Section": "WantErr"}},
 			nil,
 			true,
 		},
 		{
 			"Should fail on malformed data",
-			args{conn: conn, params: map[string]string{"Section": "UnknownSection"}},
+			args{conn: connection, params: map[string]string{"Section": "UnknownSection"}},
 			nil,
 			true,
 		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			got, err := infoHandler(tt.args.conn, tt.args.params)
+			got, err := InfoHandler(tt.args.conn, tt.args.params)
 			if (err != nil) != tt.wantErr {
-				t.Errorf("Plugin.infoHandler() error = %v, wantErr %v", err, tt.wantErr)
+				t.Errorf("Plugin.InfoHandler() error = %v, wantErr %v", err, tt.wantErr)
 				return
 			}
 			if !reflect.DeepEqual(got, tt.want) {
-				t.Errorf("Plugin.infoHandler() = %v, want %v", got, tt.want)
+				t.Errorf("Plugin.InfoHandler() = %v, want %v", got, tt.want)
 			}
 		})
 	}

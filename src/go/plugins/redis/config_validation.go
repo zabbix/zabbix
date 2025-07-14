@@ -12,6 +12,7 @@ const (
 	fieldMustNotBeEmpty = false
 )
 
+// gives a map which describes what field combinations are allowed depending on TLSConnect value
 func getTLSValidationRules(tlsConnect string) map[string]bool {
 	switch tlsConnect {
 	case tlsconfig.NoTLS, tlsconfig.Insecure:
