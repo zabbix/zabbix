@@ -12,7 +12,7 @@
 ** If not, see <https://www.gnu.org/licenses/>.
 **/
 
-package redis
+package handlers
 
 import (
 	"fmt"
@@ -20,6 +20,8 @@ import (
 	"testing"
 
 	"github.com/mediocregopher/radix/v3"
+	"golang.zabbix.com/agent2/plugins/redis/conn"
+	"golang.zabbix.com/sdk/plugin/comms"
 )
 
 func TestPlugin_pingHandler(t *testing.T) {
@@ -28,30 +30,24 @@ func TestPlugin_pingHandler(t *testing.T) {
 	})
 	defer stubConn.Close()
 
-	conn := &RedisConn{
-		client: stubConn,
-	}
+	connection := conn.NewRedisConn(stubConn)
 
 	brokenStubConn := radix.Stub("", "", func(args []string) interface{} {
 		return ""
 	})
 	defer brokenStubConn.Close()
 
-	brokenConn := &RedisConn{
-		client: brokenStubConn,
-	}
+	brokenConn := conn.NewRedisConn(brokenStubConn)
 
 	closedStubConn := radix.Stub("", "", func(args []string) interface{} {
 		return ""
 	})
 	closedStubConn.Close()
 
-	closedConn := &RedisConn{
-		client: closedStubConn,
-	}
+	closedConn := conn.NewRedisConn(closedStubConn)
 
 	type args struct {
-		conn   redisClient
+		conn   conn.RedisClient
 		params map[string]string
 	}
 	tests := []struct {
@@ -61,33 +57,33 @@ func TestPlugin_pingHandler(t *testing.T) {
 		wantErr bool
 	}{
 		{
-			fmt.Sprintf("pingHandler should return %d if connection is ok", pingOk),
-			args{conn: conn},
-			pingOk,
+			fmt.Sprintf("PingHandler should return %d if connection is ok", comms.PingOk),
+			args{conn: connection},
+			comms.PingOk,
 			false,
 		},
 		{
-			fmt.Sprintf("pingHandler should return %d if PING answers wrong", pingFailed),
+			fmt.Sprintf("PingHandler should return %d if PING answers wrong", comms.PingFailed),
 			args{conn: brokenConn},
-			pingFailed,
+			comms.PingFailed,
 			false,
 		},
 		{
-			fmt.Sprintf("pingHandler should return %d if connection failed", pingFailed),
+			fmt.Sprintf("PingHandler should return %d if connection failed", comms.PingFailed),
 			args{conn: closedConn},
-			pingFailed,
+			comms.PingFailed,
 			false,
 		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			got, err := pingHandler(tt.args.conn, tt.args.params)
+			got, err := PingHandler(tt.args.conn, tt.args.params)
 			if (err != nil) != tt.wantErr {
-				t.Errorf("Plugin.pingHandler() error = %v, wantErr %v", err, tt.wantErr)
+				t.Errorf("Plugin.PingHandler() error = %v, wantErr %v", err, tt.wantErr)
 				return
 			}
 			if !reflect.DeepEqual(got, tt.want) {
-				t.Errorf("Plugin.pingHandler() = %v, want %v", got, tt.want)
+				t.Errorf("Plugin.PingHandler() = %v, want %v", got, tt.want)
 			}
 		})
 	}
