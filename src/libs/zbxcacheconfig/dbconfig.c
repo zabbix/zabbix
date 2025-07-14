@@ -10317,12 +10317,8 @@ static int	dc_preproc_item_changed(ZBX_DC_ITEM *dc_item, zbx_pp_item_t *pp_item)
 
 unsigned char	zbx_dc_item_requires_preprocessing(const ZBX_DC_ITEM *dc_item)
 {
-	if (NULL == dc_item->preproc_item && NULL == dc_item->master_item &&
-			ITEM_TYPE_INTERNAL != dc_item->type &&
-			ZBX_FLAG_DISCOVERY_RULE != dc_item->flags)
-	{
+	if (NULL == dc_item->preproc_item && NULL == dc_item->master_item && ZBX_FLAG_DISCOVERY_RULE != dc_item->flags)
 		return ZBX_ITEM_REQUIRES_PREPROCESSING_NO;
-	}
 
 	return ZBX_ITEM_REQUIRES_PREPROCESSING_YES;
 }
