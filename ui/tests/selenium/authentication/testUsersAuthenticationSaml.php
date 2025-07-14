@@ -138,7 +138,7 @@ class testUsersAuthenticationSaml extends testFormAuthentication {
 			$saml_form->fill([$checkbox => true]);
 
 			foreach ($sp_fields as $sp_field) {
-				$this->assertTrue($saml_form->isRequired($sp_field), 'Field id '.$sp_field.' should be mandatory.');
+				$this->assertTrue($saml_form->isRequired($sp_field), 'Field '.$sp_field.' should be mandatory when '$label' is checked.');
 			}
 
 			$saml_form->fill([$checkbox => false]);
