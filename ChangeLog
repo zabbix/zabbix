@@ -833,8 +833,8 @@ Changes for 7.0.17rc1
 New features:
 .........T [ZBXNEXT-9959] added Cisco Secure Firewall Threat Defense by HTTP template (egordymov)
 .........T [ZBXNEXT-9926] added a new self-test item and improved self-test trigger for both SMART by Zabbix agent 2 templates (knaglis)
-........S. [ZBXNEXT-10018] updated maximal supported TimescaleDB version to 2.20 (mprihodko)
-.........T [ZBXNEXT-9674] added assume role usage with metadata authentication for AWS templates (egordymov)
+........S. [ZBXNEXT-10018] updated maximum supported TimescaleDB version to 2.20 (mprihodko)
+.........T [ZBXNEXT-9674] added AssumeRole usage with metadata authentication for AWS templates (egordymov)
 
 Bug fixes:
 A......... [ZBX-26436] prevented redundant row locks in the database when deleting hosts in parallel API requests (vmaksimovs)
@@ -847,7 +847,7 @@ A......... [ZBX-26436] prevented redundant row locks in the database when deleti
 .........T [ZBX-24674] updated filesystem discovery low space trigger prototype override in F5 Big-IP by SNMP template (drasikhov)
 .........T [ZBX-26444] fixed swap utilization trigger recovery expression in F5 Big-IP by SNMP template (drasikhov)
 .........T [ZBX-23216] added application token support in GLPi media type, updated documentation; removed Zammad mentions from non-related media types (drasikhov)
-...G...... [ZBX-22770] added self_test_in_progress tag for Zabbix Agent 2 Smart plugin (lsurvilo)
+...G...... [ZBX-22770] added self_test_in_progress tag for Zabbix agent 2 S.M.A.R.T plugin (lsurvilo)
 .........T [ZBX-26484] fixed event tags verification in Telegram media type to be checked only for supported event sources (drasikhov)
 .........T [ZBX-22022] removed client certificate expiration histogram metrics from Kubernetes API server by HTTP template (drasikhov)
 .......PS. [ZBX-25545] fixed host interface duplication in autoregistration mode (vsmelovs)
@@ -859,19 +859,19 @@ A......... [ZBX-26436] prevented redundant row locks in the database when deleti
 ..F....... [ZBX-25956] removed excess suggestions from item copy target list (talbergs)
 ........S. [ZBX-26410] fixed split brain HA nodes after system pause (sboidenko)
 ..F....... [ZBX-25952] fixed inconsistent duo 'client secret' field validation (aluchko)
-.......PS. [ZBX-26571] added support of source ip for libssh based items (MVekslers)
+.......PS. [ZBX-26571] added support of source IP for libssh-based items (MVekslers)
 ..F....... [ZBX-26273] fixed inability to use LLD macro as update interval of item prototype (aluchko)
 .........T [ZBX-26567] added new inventory items to the Cisco Meraki device by HTTP template (aiantsen)
 .........T [ZBX-26604] fixed JavaScript in AWS Cost Explorer by HTTP template due to syntax changes in GetCostAndUsage API request (egordymov)
 ..F....... [ZBX-26481] fixed parameter trimming in item preprocessing steps (apoga)
-..F....... [ZBX-26300] updates for showing correct element's edit form when right click on the sysmap (msnihach)
+..F....... [ZBX-26300] fixed showing previous element edit form when right clicking on another map element (msnihach)
 .......P.. [ZBX-25499] fixed vault secrets resolution on Zabbix proxy (sboidenko)
 ...G...... [ZBX-26143] fixed duplicated address issue after redirection and disabled history upload on Agent connection failure until the connection is re-established (sboidenko)
 ..F....... [ZBX-25913] fixed Gauge widget description not updating on refresh (apoga)
-..F....... [ZBX-24047] fixed updating value mapping error when mapping name contains quotes (isharha)
+..F....... [ZBX-24047] fixed value mapping update error when mapping name contains quotes (isharha)
 ..F....... [ZBX-26454] set a readonly property for the "Allowed Hosts" input for discovered items (msnihach)
 ........S. [ZBX-26486] fixed errors in Zabbix server log on second and subsequent server starts with TimescaleDB (mprihodko)
-........S. [ZBX-25413] fixed race condition that could lead to user macro changes not to be synced to Zabbix proxy (vso)
+........S. [ZBX-25413] fixed race condition that could lead to user macro changes not be synced with Zabbix proxy (vso)
 
 --------------------------------------------------------------------------------
 Changes for 7.0.16
