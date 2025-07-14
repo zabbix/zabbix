@@ -15,10 +15,14 @@
 package redis
 
 import (
+	"fmt"
+
 	"golang.zabbix.com/sdk/conf"
 	"golang.zabbix.com/sdk/errs"
 	"golang.zabbix.com/sdk/plugin"
 )
+
+var _ plugin.Configurator = (*Plugin)(nil)
 
 type Session struct {
 	URI      string `conf:"name=Uri,optional"`
@@ -49,7 +53,8 @@ type PluginOptions struct {
 // Configure implements the Configurator interface.
 // Initializes configuration structures.
 func (p *Plugin) Configure(global *plugin.GlobalOptions, options interface{}) {
-	if err := conf.UnmarshalStrict(options, &p.options); err != nil {
+	err := conf.UnmarshalStrict(options, &p.options)
+	if err != nil {
 		p.Errf("cannot unmarshal configuration options: %s", err)
 	}
 
@@ -60,7 +65,7 @@ func (p *Plugin) Configure(global *plugin.GlobalOptions, options interface{}) {
 
 // Validate implements the Configurator interface.
 // Returns an error if validation of a plugin's configuration is failed.
-func (p *Plugin) Validate(options interface{}) error {
+func (p *Plugin) Validate(options any) error {
 	var (
 		opts PluginOptions
 		err  error
@@ -69,6 +74,19 @@ func (p *Plugin) Validate(options interface{}) error {
 	err = conf.UnmarshalStrict(options, &opts)
 	if err != nil {
 		return errs.Wrap(err, "plugin config validation failed")
+	}
+
+	//validating only TLS on default options
+	err = validateTLSConfiguration(opts.Default)
+	if err != nil {
+		return errs.Wrap(err, "plugin config validation failed on default TLS configuration")
+	}
+
+	for k, v := range opts.Sessions {
+		err = validateSession(v)
+		if err != nil {
+			return errs.Wrap(err, fmt.Sprintf("plugin config validation failed on session %s", k))
+		}
 	}
 
 	return err
