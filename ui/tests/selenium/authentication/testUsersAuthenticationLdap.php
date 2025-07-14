@@ -2884,6 +2884,58 @@ class testUsersAuthenticationLdap extends testFormAuthentication {
 	}
 
 	/**
+	 * Check that Bind password field clears itself after changing Host field.
+	 */
+	public function testUsersAuthenticationLdap_BindPassword() {
+		$values = [
+			'servers_settings' => [
+				[
+					'fields' => [
+						'Name' => 'name_created',
+						'Port' => '123',
+						'Base DN' => 'base_dn_created',
+						'Search attribute' => 'search_attribute_created',
+						'Bind DN' => 'bind_dn_created',
+						'Bind password' => 'bind_password',
+						'Host' => 'host_created'
+					]
+				]
+			]
+		];
+
+		$form = $this->openLdapForm();
+		$this->setLdap($values, 'button:Add');
+		$form->submit();
+		$form->selectTab('LDAP settings');
+		$form->query('link:name_created')->waitUntilClickable()->one()->click();
+
+		// Open newly created LDAP authentication for updates.
+		$dialog = COverlayDialogElement::find()->waitUntilReady()->one();
+		$ldap_form = $dialog->asForm();
+		unset($values['servers_settings'][0]['fields']['Bind password']);
+
+		// Change fields one by one and check that Bind password field cleared only after Host change.
+		foreach ($values['servers_settings'][0]['fields'] as $field => $value) {
+			$ldap_form->fill([$field => $value.'1']);
+			$ldap_form->query('id:description')->one()->click();
+
+			if ($field === 'Host') {
+				$ldap_form->checkValue(['Bind password' => '']);
+				$ldap_form->getFieldContainer('Bind password')->query('xpath:./button[@data-hintbox]')->one()->click();
+				$hint = $this->query('xpath://div[@class="overlay-dialogue wordbreak"]')->waitUntilPresent()->all()->last();
+				$this->assertEquals('The previous password was cleared due to a host change. Please enter the new password.',
+						$hint->getText()
+				);
+			}
+			else {
+				$this->AssertTrue($ldap_form->getFieldContainer('Bind password')->query('button:Change password')->one()
+						->isClickable()
+				);
+			}
+		}
+	}
+
+	/**
 	 * Function for opening LDAP configuration form.
 	 *
 	 * @param string $auth    default authentication field value
@@ -2935,8 +2987,11 @@ class testUsersAuthenticationLdap extends testFormAuthentication {
 			$ldap_form->fill($ldap['fields']);
 
 			if (array_key_exists('Bind password', $ldap)) {
-				$ldap_form->getFieldContainer('Bind password')->query('button:Change password')->waitUntilClickable()
-						->one()->click();
+				if (!array_key_exists('Host', $ldap['fields'])) {
+					$ldap_form->getFieldContainer('Bind password')->query('button:Change password')->waitUntilClickable()
+							->one()->click();
+				}
+
 				$ldap_form->query('id:bind_password')->one()->waitUntilVisible()->fill($ldap['Bind password']);
 			}
 
