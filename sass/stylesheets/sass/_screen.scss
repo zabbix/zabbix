@@ -2237,7 +2237,7 @@ div {
 		margin: 5px 0;
 
 		thead {
-			text-transform: $font-transform;
+			text-transform: uppercase;
 			color: $font-alt-color;
 		}
 
@@ -3017,7 +3017,7 @@ main {
 }
 
 .uppercase {
-	text-transform: $font-transform;
+	text-transform: uppercase;
 }
 
 .flickerfreescreen {
