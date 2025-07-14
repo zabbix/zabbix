@@ -176,7 +176,7 @@ static void	process_httpagent_result(CURL *easy_handle, CURLcode err, void *arg)
 		if (ZBX_IS_RUNNING())
 		{
 			zbx_preprocess_item_value(item_context->itemid, item_context->hostid, item_context->value_type,
-				 	item_context->flags, item_context->preprocessing, &result,
+					item_context->flags, item_context->preprocessing, &result,
 					&timespec, ITEM_STATE_NORMAL, NULL);
 		}
 	}

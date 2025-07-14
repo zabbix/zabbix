@@ -774,7 +774,7 @@ static int	get_values(unsigned char poller_type, int *nextcheck, const zbx_confi
 					{
 						items[i].state = ITEM_STATE_NOTSUPPORTED;
 						zbx_preprocess_item_value(items[i].itemid, items[i].host.hostid,
-							 	items[i].value_type, items[i].flags,
+								items[i].value_type, items[i].flags,
 								items[i].preprocessing, NULL, &ts_tmp, items[i].state,
 								add_result->msg);
 					}
