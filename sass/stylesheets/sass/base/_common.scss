@@ -1,10 +1,8 @@
 body {
 	position: relative;
 	background-color: $body-bg-color;
-	font: {
-		size: $font-body-size;
-		family: var(--font-stack);
-	}
+	font-family: var(--font-stack, var(--font-stack-default));
+	font-size: $font-body-size;
 	line-height: $body-line-height;
 	color: $font-color;
 }
@@ -64,10 +62,9 @@ p {
 }
 
 pre {
-	font: {
-		family: $font-stack-mono;
-		size: $font-mono-size;
-	}
+	font-family: var(--font-stack-mono, var(--font-stack-mono-default));
+	font-size: $font-mono-size;
+
 	@extend %space-pre-wrap;
 
 	a {
@@ -152,7 +149,7 @@ svg a {
 }
 
 .monospace-font {
-	font-family: $font-stack-mono;
+	font-family: var(--font-stack-mono, var(--font-stack-mono-default));
 }
 
 .float-left {

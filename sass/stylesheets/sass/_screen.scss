@@ -942,10 +942,8 @@ label {
 }
 
 input {
-	font: {
-		family: var(--font-stack);
-		size: $font-form-size;
-	}
+	font-family: var(--font-stack, var(--font-stack-default));
+	font-size: $font-form-size;
 
 	&[type="text"] {
 		@extend %form-input-height-padding;
@@ -999,10 +997,8 @@ textarea {
 	margin: 0;
 	padding: 4px 5px;
 	overflow: auto;
-	font: {
-		family: var(--font-stack);
-		size: $font-form-size;
-	}
+	font-family: var(--font-stack, var(--font-stack-default));
+	font-size: $font-form-size;
 	line-height: normal;
 	vertical-align: top;
 
@@ -1023,11 +1019,8 @@ textarea {
 }
 
 select {
-	font: {
-		family: var(--font-stack);
-		size: $font-form-size;
-	}
-
+	font-family: var(--font-stack, var(--font-stack-default));
+	font-size: $font-form-size;
 	height: 24px;
 	padding: 3px 3px 3px 0;
 	background-color: $form-bg-color;

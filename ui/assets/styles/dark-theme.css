@@ -94,10 +94,11 @@ svg *:focus {
   font-display: swap;
   unicode-range: U+4E00-9FFF; }
 :root {
-  --font-stack: Inter, "Noto Sans Georgian", "Noto Sans Hebrew", "Noto Sans JP", "Noto Sans KR", "Noto Sans SC", "Apple SD Gothic Neo", "Arial Hebrew", Arial, "DejaVu Sans", Helvetica, "Hiragino Sans", "Liberation Sans", "Malgun Gothic", Meiryo, "Microsoft YaHei", "PingFang SC", Roboto, Sylfaen, sans-serif; }
+  --font-stack-default: Inter, "Noto Sans Georgian", "Noto Sans Hebrew", "Noto Sans JP", "Noto Sans KR", "Noto Sans SC", "Apple SD Gothic Neo", "Arial Hebrew", Arial, "DejaVu Sans", Helvetica, "Hiragino Sans", "Liberation Sans", "Malgun Gothic", Meiryo, "Microsoft YaHei", "PingFang SC", Roboto, Sylfaen, sans-serif;
+  --font-stack-mono-default: "Courier New", Courier, monospace; }
 
 html[lang="zh"] {
-  --font-stack: Inter, "Noto Sans SC", "PingFang SC", "Microsoft YaHei", "Noto Sans KR", "Noto Sans JP", "Apple SD Gothic Neo", "Arial Hebrew", "Noto Sans Georgian", "Noto Sans Hebrew", Arial, "DejaVu Sans", Helvetica, "Hiragino Sans", "Liberation Sans", "Malgun Gothic", Meiryo, Roboto, Sylfaen, sans-serif; }
+  --font-stack-default: Inter, "Noto Sans SC", "PingFang SC", "Microsoft YaHei", "Noto Sans KR", "Noto Sans JP", "Apple SD Gothic Neo", "Arial Hebrew", Arial, "Noto Sans Georgian", "Noto Sans Hebrew", "DejaVu Sans", Helvetica, "Hiragino Sans", "Liberation Sans", "Malgun Gothic", Meiryo, Roboto, Sylfaen, sans-serif; }
 
 @font-face {
   font-family: "zabbix-icons";
@@ -501,8 +502,8 @@ div.zabbix-logo-sidebar-compact {
 body {
   position: relative;
   background-color: #0e1012;
+  font-family: var(--font-stack, var(--font-stack-default));
   font-size: 75%;
-  font-family: var(--font-stack);
   line-height: 1.4em;
   color: #f2f2f2; }
 
@@ -546,7 +547,7 @@ p {
   margin: 0 0 .7em; }
 
 pre {
-  font-family: "Courier New", Courier, monospace;
+  font-family: var(--font-stack-mono, var(--font-stack-mono-default));
   font-size: 1em; }
 
 a {
@@ -590,7 +591,7 @@ svg a {
     text-decoration: underline; }
 
 .monospace-font {
-  font-family: "Courier New", Courier, monospace; }
+  font-family: var(--font-stack-mono, var(--font-stack-mono-default)); }
 
 .float-left {
   float: left; }
@@ -1302,7 +1303,7 @@ button, .btn, .btn-alt, .btn-grey, .btn-icon, .btn-grey-icon, .btn-link, .btn-ov
   min-width: 24px;
   height: 24px;
   padding: 0 11px;
-  font-family: var(--font-stack);
+  font-family: var(--font-stack, var(--font-stack-default));
   font-size: 1em;
   line-height: 22px;
   text-align: center;
@@ -6793,7 +6794,7 @@ label input[type="radio"] {
   margin-right: 3px; }
 
 input {
-  font-family: var(--font-stack);
+  font-family: var(--font-stack, var(--font-stack-default));
   font-size: 1em; }
   input[type="file"] {
     padding: 1px; }
@@ -6802,7 +6803,7 @@ textarea {
   margin: 0;
   padding: 4px 5px;
   overflow: auto;
-  font-family: var(--font-stack);
+  font-family: var(--font-stack, var(--font-stack-default));
   font-size: 1em;
   line-height: normal;
   vertical-align: top; }
@@ -6810,7 +6811,7 @@ textarea {
     border-color: #768d99; }
 
 select {
-  font-family: var(--font-stack);
+  font-family: var(--font-stack, var(--font-stack-default));
   font-size: 1em;
   height: 24px;
   padding: 3px 3px 3px 0;
