@@ -97,56 +97,44 @@ class DB {
 	 *
 	 * @return string
 	 */
-	public static function reserveIds($table, $count) {
-		global $DB;
-
-		$tableSchema = self::getSchema($table);
-		$id_name = $tableSchema['key'];
+	public static function reserveIds(string $table, int $count): string {
+		$table_schema = self::getSchema($table);
+		$pk_field_name = $table_schema['key'];
 
 		$sql = 'SELECT nextid'.
-				' FROM ids'.
-				' WHERE table_name='.zbx_dbstr($table).
-					' AND field_name='.zbx_dbstr($id_name).
-				' FOR UPDATE';
+			' FROM ids'.
+			' WHERE table_name='.zbx_dbstr($table).
+				' AND field_name='.zbx_dbstr($pk_field_name).
+			' FOR UPDATE';
 
-		$res = DBfetch(DBselect($sql));
+		$resource = DBselect($sql);
 
-		if ($res) {
-			$maxNextId = bcadd($res['nextid'], $count, 0);
-
-			if (bccomp($maxNextId, ZBX_DB_MAX_ID) == 1) {
-				$nextid = self::refreshIds($table, $count);
-			}
-			else {
-				$sql = 'UPDATE ids'.
-						' SET nextid='.$maxNextId.
-						' WHERE table_name='.zbx_dbstr($table).
-							' AND field_name='.zbx_dbstr($id_name);
-
-				if (!DBexecute($sql)) {
-					self::exception(self::DBEXECUTE_ERROR, 'DBEXECUTE_ERROR');
-				}
-
-				$nextid = bcadd($res['nextid'], 1, 0);
-			}
+		if ($resource === false) {
+			self::exception(self::DBEXECUTE_ERROR, _('Database error occurred.'));
 		}
 
-		/*
-		 * Detect either the query is executable at all? If query is valid and schema is correct but query still cannot
-		 * be executed, then there is a good chance that previous transaction has left row level lock unreleased or it
-		 * is still running. In such a case execution must be stopped, otherwise it will call self::refreshIds method.
-		 */
-		elseif (!DBexecute($sql)) {
-			self::exception(self::DBEXECUTE_ERROR,
-				_('Your database is not working properly. Please wait a few minutes and try to repeat this action. If the problem still persists, please contact system administrator. The problem might be caused by long running transaction or row level lock accomplished by your database management system.')
-			);
-		}
-		// If query is executable, but still returns false, only then call refreshIds.
-		else {
-			$nextid = self::refreshIds($table, $count);
+		$res = DBfetch($resource);
+
+		if (!$res) {
+			return self::refreshIds($table, $count);
 		}
 
-		return $nextid;
+		$max_nextid = bcadd($res['nextid'], $count, 0);
+
+		if (bccomp($max_nextid, ZBX_DB_MAX_ID) == 1) {
+			return self::refreshIds($table, $count);
+		}
+
+		$sql = 'UPDATE ids'.
+			' SET nextid='.$max_nextid.
+			' WHERE table_name='.zbx_dbstr($table).
+				' AND field_name='.zbx_dbstr($pk_field_name);
+
+		if (!DBexecute($sql)) {
+			self::exception(self::DBEXECUTE_ERROR, _('Database error occurred.'));
+		}
+
+		return bcadd($res['nextid'], 1, 0);
 	}
 
 	/**
@@ -160,7 +148,7 @@ class DB {
 	 *
 	 * @return string
 	 */
-	public static function refreshIds($table, $count) {
+	public static function refreshIds(string $table, int $count): string {
 		$tableSchema = self::getSchema($table);
 		$id_name = $tableSchema['key'];
 
@@ -168,7 +156,7 @@ class DB {
 		$sql = 'DELETE FROM ids WHERE table_name='.zbx_dbstr($table).' AND field_name='.zbx_dbstr($id_name);
 
 		if (!DBexecute($sql)) {
-			self::exception(self::DBEXECUTE_ERROR, 'DBEXECUTE_ERROR');
+			self::exception(self::DBEXECUTE_ERROR, _('Database error occurred.'));
 		}
 
 		$row = DBfetch(DBselect('SELECT MAX('.$id_name.') AS id FROM '.$table));
@@ -187,7 +175,7 @@ class DB {
 				' VALUES ('.zbx_dbstr($table).','.zbx_dbstr($id_name).','.$maxNextId.')';
 
 		if (!DBexecute($sql)) {
-			self::exception(self::DBEXECUTE_ERROR, 'DBEXECUTE_ERROR');
+			self::exception(self::DBEXECUTE_ERROR, _('Database error occurred.'));
 		}
 
 		$nextid = bcadd($nextid, 1, 0);
