@@ -1391,6 +1391,8 @@ static void	proxy_db_init(void)
 	char		*error = NULL;
 	int		db_type, version_check;
 
+	zbx_db_config->read_only_recoverable = 1;
+
 	if (SUCCEED != zbx_db_init(&error))
 	{
 		zabbix_log(LOG_LEVEL_CRIT, "cannot initialize database: %s", error);

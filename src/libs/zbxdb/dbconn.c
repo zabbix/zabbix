@@ -54,7 +54,8 @@ static 	ZBX_THREAD_LOCAL char	ZBX_PG_ESCAPE_BACKSLASH = 1;
 static zbx_mutex_t		db_sqlite_access = ZBX_MUTEX_NULL;
 #endif
 
-#define ZBX_DB_WAIT_DOWN	10
+#define ZBX_DB_WAIT_DOWN		10
+#define ZBX_DB_WAIT_AFTER_RECONNECT	3
 
 static int	dbconn_execute(zbx_dbconn_t *db, const char *fmt, ...);
 static zbx_db_result_t	dbconn_select(zbx_dbconn_t *db, const char *fmt, ...);
@@ -652,6 +653,26 @@ static int	dbconn_open(zbx_dbconn_t *db)
 
 	zbx_db_free_result(result);
 
+	result = dbconn_select(db, "select pg_is_in_recovery();");
+
+	if ((zbx_db_result_t)ZBX_DB_DOWN == result || NULL == result)
+	{
+		ret = (NULL == result) ? ZBX_DB_FAIL : ZBX_DB_DOWN;
+		goto out;
+	}
+
+	if (NULL != (row = zbx_db_fetch(result)))
+	{
+		if (0 == strcmp(row[0], "t"))
+		{
+			zbx_db_free_result(result);
+			ret = ZBX_DB_RONLY;
+			goto out;
+		}
+	}
+
+	zbx_db_free_result(result);
+
 	if (90000 <= db_get_server_version())
 	{
 		/* change the output format for values of type bytea from hex (the default) to escape */
@@ -752,6 +773,7 @@ static int	dbconn_vexecute(zbx_dbconn_t *db, const char *fmt, va_list args)
 	char		*sql = NULL, *sql_printable = NULL;
 	int		ret = ZBX_DB_OK;
 	double		sec = 0;
+	size_t		sql_alloc = 0, sql_offset = 0;
 #if defined(HAVE_POSTGRESQL)
 	PGresult	*result;
 	char		*error = NULL;
@@ -763,7 +785,7 @@ static int	dbconn_vexecute(zbx_dbconn_t *db, const char *fmt, va_list args)
 	if (0 != db->config->log_slow_queries)
 		sec = zbx_time();
 
-	sql = zbx_dvsprintf(sql, fmt, args);
+	zbx_vsnprintf_alloc(&sql, &sql_alloc, &sql_offset, fmt, args);
 
 	if (0 == db->txn_level)
 		zabbix_log(LOG_LEVEL_DEBUG, "query without transaction detected");
@@ -1074,6 +1096,7 @@ static zbx_db_result_t	dbconn_vselect(zbx_dbconn_t *db, const char *fmt, va_list
 	char		*sql = NULL;
 	zbx_db_result_t	result = NULL;
 	double		sec = 0;
+	size_t		sql_alloc = 0, sql_offset = 0;
 #if defined(HAVE_POSTGRESQL)
 	char		*error = NULL;
 #elif defined(HAVE_SQLITE3)
@@ -1084,7 +1107,7 @@ static zbx_db_result_t	dbconn_vselect(zbx_dbconn_t *db, const char *fmt, va_list
 	if (0 != db->config->log_slow_queries)
 		sec = zbx_time();
 
-	sql = zbx_dvsprintf(sql, fmt, args);
+	zbx_vsnprintf_alloc(&sql, &sql_alloc, &sql_offset, fmt, args);
 
 	if (ZBX_DB_OK != db->txn_error)
 	{
@@ -1385,6 +1408,8 @@ int	zbx_dbconn_open(zbx_dbconn_t *db)
 
 	if (0 != db->connection_failure)
 	{
+		/* wait ZBX_DB_WAIT_AFTER_RECONNECT to allow HA manager recover */
+		zbx_sleep(ZBX_DB_WAIT_AFTER_RECONNECT);
 		zabbix_log(LOG_LEVEL_ERR, "database connection re-established");
 		db->connection_failure = 0;
 #if defined(HAVE_POSTGRESQL)
