@@ -197,6 +197,9 @@ window.host_wizard_edit = new class {
 			}
 		},
 		[this.STEP_INSTALL_AGENT]: {
+			agent_script_server_host: {
+				regex: /^[^`']*$/
+			},
 			tls_psk: {
 				required: () => this.#data.tls_required,
 				minlength: 32,
@@ -205,7 +208,8 @@ window.host_wizard_edit = new class {
 			},
 			tls_psk_identity: {
 				required: () => this.#data.tls_required,
-				maxlength: <?= DB::getFieldLength('hosts', 'tls_psk_identity') ?>
+				maxlength: <?= DB::getFieldLength('hosts', 'tls_psk_identity') ?>,
+				regex: /^[^`']*$/
 			}
 		},
 		[this.STEP_ADD_HOST_INTERFACE]: {},
@@ -1268,7 +1272,7 @@ window.host_wizard_edit = new class {
 					hostname = `--hostname '${this.#data.host_new.id}'`;
 
 					psk_identity = this.#data.tls_psk_identity !== ''
-						? `--psk-identity '${this.#data.tls_psk_identity.replace(/'/g, `\\'`)}'`
+						? `--psk-identity '${this.#data.tls_psk_identity}'`
 						: `--psk-identity-stdin`;
 
 					psk = this.#data.tls_psk !== ''
@@ -1284,7 +1288,7 @@ window.host_wizard_edit = new class {
 					hostname = `-hostName '${this.#data.host_new.id.replace(/ /g, `\` `)}'`;
 
 					psk_identity = this.#data.tls_psk_identity !== ''
-						? `-pskIdentity '${this.#data.tls_psk_identity.replace(/'/g, `\\'`).replace(/ /g, `\` `)}'`
+						? `-pskIdentity '${this.#data.tls_psk_identity.replace(/ /g, `\` `)}'`
 						: `-pskIdentitySTDIN`;
 
 					psk = this.#data.tls_psk !== ''
@@ -1439,7 +1443,7 @@ window.host_wizard_edit = new class {
 
 			input
 				.closest(`.${ZBX_STYLE_FORM_FIELD}`)
-				?.querySelector('label').classList.toggle(ZBX_STYLE_FIELD_LABEL_ASTERISK, !!set_asterisk);
+				?.querySelector('label')?.classList.toggle(ZBX_STYLE_FIELD_LABEL_ASTERISK, !!set_asterisk);
 		}
 	}
 
