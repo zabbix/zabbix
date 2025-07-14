@@ -964,7 +964,7 @@ class testUrlUserPermissions extends CLegacyWebTest {
 					$this->guestLogin();
 				}
 				$this->zbxTestCheckTitle($data['title']);
-				if (strpos($data['url'], 'action=popup') !== false) {
+				if (strpos($data['url'], 'action=popup')) {
 					$dialog = COverlayDialogElement::find()->waitUntilReady()->one();
 					$this->assertEquals($data['header'], $dialog->getTitle());
 					$dialog->close();
