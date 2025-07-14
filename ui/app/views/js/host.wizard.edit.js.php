@@ -1278,13 +1278,13 @@ window.host_wizard_edit = new class {
 
 				if (this.#data.monitoring_os === 'windows') {
 					server_host = this.#data.agent_script_server_host !== ''
-						? `-serverHost '${this.#data.agent_script_server_host}'`
+						? `-serverHost '${this.#data.agent_script_server_host.replace(/ /g, `\` `)}'`
 						: `-serverHostSTDIN`;
 
-					hostname = `-hostName '${this.#data.host_new.id}'`;
+					hostname = `-hostName '${this.#data.host_new.id.replace(/ /g, `\` `)}'`;
 
 					psk_identity = this.#data.tls_psk_identity !== ''
-						? `-pskIdentity '${this.#data.tls_psk_identity.replace(/'/g, `\\'`)}'`
+						? `-pskIdentity '${this.#data.tls_psk_identity.replace(/'/g, `\\'`).replace(/ /g, `\` `)}'`
 						: `-pskIdentitySTDIN`;
 
 					psk = this.#data.tls_psk !== ''
