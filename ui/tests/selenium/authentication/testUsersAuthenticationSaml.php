@@ -131,20 +131,26 @@ class testUsersAuthenticationSaml extends testFormAuthentication {
 
 		// Check mandatory SP fields.
 		$sp_fields = ['SP private key', 'SP certificate'];
+		$checkbox_groups = [
+			'Sign' => ['Messages', 'Assertions', 'AuthN requests', 'Logout requests', 'Logout responses'],
+			'Encrypt' => ['Name ID', 'Assertions']
+		];
 
-		foreach (['id:sign_messages', 'id:sign_assertions', 'id:sign_authn_requests', 'id:sign_logout_requests',
-					'id:sign_logout_responses', 'id:encrypt_nameid', 'id:encrypt_assertions'] as $checkbox) {
+		foreach ($checkbox_groups as $group => $checkboxes) {
+			foreach ($checkboxes as $label) {
+				$saml_form->getField($group)->check($label);
 
-			$saml_form->fill([$checkbox => true]);
+				foreach ($sp_fields as $sp_field) {
+					$this->assertTrue($saml_form->isRequired($sp_field), 'Field '.$sp_field.
+							' should be mandatory when '.$label.' is checked.');
+				}
 
-			foreach ($sp_fields as $sp_field) {
-				$this->assertTrue($saml_form->isRequired($sp_field), 'Field '.$sp_field.' should be mandatory when '$label' is checked.');
-			}
+				$saml_form->getField($group)->uncheck($label);
 
-			$saml_form->fill([$checkbox => false]);
+				foreach ($sp_fields as $sp_field) {
+					$this->assertFalse($saml_form->isRequired($sp_field), 'Field '.$sp_field.' should not be mandatory.');
+				}
 
-			foreach ($sp_fields as $sp_field) {
-				$this->assertFalse($saml_form->isRequired($sp_field), 'Field id '.$sp_field.' should not be mandatory.');
 			}
 
 		}
