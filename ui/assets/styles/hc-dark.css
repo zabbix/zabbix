@@ -1,4 +1,11 @@
 @charset "UTF-8";
+:root {
+  --font-stack: Inter, "Noto Sans Georgian", "Noto Sans Hebrew", "Noto Sans JP", "Noto Sans KR", "Noto Sans SC", "Apple SD Gothic Neo", "Arial Hebrew", Arial, "DejaVu Sans", Helvetica, "Hiragino Sans", "Liberation Sans", "Malgun Gothic", Meiryo, "Microsoft YaHei", "PingFang SC", Roboto, Sylfaen, sans-serif;
+  --font-stack-mono: "Courier New", Courier, monospace; }
+
+[lang="zh"] {
+  --font-stack: Inter, "Noto Sans SC", "PingFang SC", "Microsoft YaHei", "Noto Sans KR", "Noto Sans JP", "Apple SD Gothic Neo", "Arial Hebrew", Arial, "Noto Sans Georgian", "Noto Sans Hebrew", "DejaVu Sans", Helvetica, "Hiragino Sans", "Liberation Sans", "Malgun Gothic", Meiryo, Roboto, Sylfaen, sans-serif; }
+
 .sidebar .server-name, .dashboard-navigation-tabs .sortable li div span, .host-dashboard-header-navigation .host-dashboard-navigation .host-dashboard-navigation-tabs .sortable li div span, .dashboard-grid-widget-header h4, .dashboard-grid-iterator-header h4, .list-table .action-container .link-action, div.dashboard-widget-hostcard .host-card .sections-header .host-name .link-action, div.dashboard-widget-hostcard .host-card .sections .section .section-name, div.dashboard-widget-hostcard .host-card .sections .section.section-host-groups .host-groups .host-group .host-group-name, div.dashboard-widget-hostcard .host-card .sections .section.section-monitoring .monitoring .monitoring-item .monitoring-item-name, div.dashboard-widget-hostcard .host-card .sections .section.section-monitored-by .section-body, div.dashboard-widget-hostcard .host-card .sections .section.section-templates .templates .template .template-name, div.dashboard-widget-hostcard .host-card .sections .section.section-inventory .section-body .inventory-field-name,
 div.dashboard-widget-hostcard .host-card .sections .section.section-inventory .section-body .inventory-field-value, div.dashboard-widget-itemcard .item-card .sections-header .section-item .item-name .link-action, div.dashboard-widget-itemcard .item-card .sections-header .section-path, div.dashboard-widget-itemcard .item-card .sections-header .section-path .path-element, div.dashboard-widget-itemcard .item-card .sections .section .section-name, div.dashboard-widget-itemcard .item-card .sections .section.section-metrics .center-column, div.dashboard-widget-itemcard .item-card .sections .section.section-latest-data .center-column, div.dashboard-widget-itemcard .item-card .sections .section.section-metrics .column, div.dashboard-widget-itemcard .item-card .sections .section.section-metrics .right-column, div.dashboard-widget-itemcard .item-card .sections .section.section-latest-data .column, div.dashboard-widget-itemcard .item-card .sections .section.section-latest-data .right-column, div.dashboard-widget-itemcard .item-card .sections .section.section-metrics .column .column-header, div.dashboard-widget-itemcard .item-card .sections .section.section-metrics .column .column-value, div.dashboard-widget-itemcard .item-card .sections .section.section-metrics .right-column .column-header, div.dashboard-widget-itemcard .item-card .sections .section.section-metrics .right-column .column-value, div.dashboard-widget-itemcard .item-card .sections .section.section-latest-data .column .column-header, div.dashboard-widget-itemcard .item-card .sections .section.section-latest-data .column .column-value, div.dashboard-widget-itemcard .item-card .sections .section.section-latest-data .right-column .column-header, div.dashboard-widget-itemcard .item-card .sections .section.section-latest-data .right-column .column-value, div.dashboard-widget-itemcard .item-card .sections .section.section-triggers .triggers .trigger .trigger-name, div.dashboard-widget-itemcard .item-card .sections .section.section-single-parameter .section-body, div.dashboard-widget-map .btn-back-map-container a:focus .btn-back-map .btn-back-map-content, div.dashboard-widget-map .btn-back-map-container a:hover .btn-back-map .btn-back-map-content, form.dashboard-widget-tophosts #list_columns .text, form.dashboard-widget-topitems #list_columns .text, .menu-popup .menu-popup-item, .menu-popup h3, .notif-body h4, .overlay-descr-url, .tag, .overflow-ellipsis, .overflow-ellipsis td:not(.wordbreak, .wordwrap), .overflow-ellipsis th, .overflow-ellipsis th a, .preprocessing-list .preprocessing-list-head .step-on-fail, .totals-list.totals-list-horizontal .count,
 .totals-list.totals-list-horizontal .name {
@@ -88,13 +95,6 @@ svg *:focus {
   font-style: normal;
   font-display: swap;
   unicode-range: U+4E00-9FFF; }
-:root {
-  --font-stack-default: Inter, "Noto Sans Georgian", "Noto Sans Hebrew", "Noto Sans JP", "Noto Sans KR", "Noto Sans SC", "Apple SD Gothic Neo", "Arial Hebrew", Arial, "DejaVu Sans", Helvetica, "Hiragino Sans", "Liberation Sans", "Malgun Gothic", Meiryo, "Microsoft YaHei", "PingFang SC", Roboto, Sylfaen, sans-serif;
-  --font-stack-mono-default: "Courier New", Courier, monospace; }
-
-html[lang="zh"] {
-  --font-stack-default: Inter, "Noto Sans SC", "PingFang SC", "Microsoft YaHei", "Noto Sans KR", "Noto Sans JP", "Apple SD Gothic Neo", "Arial Hebrew", Arial, "Noto Sans Georgian", "Noto Sans Hebrew", "DejaVu Sans", Helvetica, "Hiragino Sans", "Liberation Sans", "Malgun Gothic", Meiryo, Roboto, Sylfaen, sans-serif; }
-
 @font-face {
   font-family: "zabbix-icons";
   src: url("../fonts/zabbix-icons.woff2?t=1728543869077") format("woff2"), url("../fonts/zabbix-icons.woff?t=1728543869077") format("woff"), url("../fonts/zabbix-icons.ttf?t=1728543869077") format("truetype"), url("../fonts/zabbix-icons.svg?t=1728543869077#zabbix-icons") format("svg"); }
@@ -498,7 +498,7 @@ div.zabbix-logo-sidebar-compact {
 body {
   position: relative;
   background-color: #111111;
-  font-family: var(--font-stack, var(--font-stack-default));
+  font-family: var(--font-stack);
   font-size: 75%;
   line-height: 1.4em;
   color: #ffffff; }
@@ -543,7 +543,7 @@ p {
   margin: 0 0 .7em; }
 
 pre {
-  font-family: var(--font-stack-mono, var(--font-stack-mono-default));
+  font-family: var(--font-stack-mono);
   font-size: 1em; }
 
 a {
@@ -586,7 +586,7 @@ svg a {
     text-decoration: underline; }
 
 .monospace-font {
-  font-family: var(--font-stack-mono, var(--font-stack-mono-default)); }
+  font-family: var(--font-stack-mono); }
 
 .float-left {
   float: left; }
@@ -1274,7 +1274,7 @@ button, .btn, .btn-alt, .btn-grey, .btn-icon, .btn-grey-icon, .btn-link, .btn-ov
   min-width: 24px;
   height: 24px;
   padding: 0 11px;
-  font-family: var(--font-stack, var(--font-stack-default));
+  font-family: var(--font-stack);
   font-size: 1em;
   line-height: 22px;
   text-align: center;
@@ -6739,7 +6739,7 @@ label input[type="radio"] {
   margin-right: 3px; }
 
 input {
-  font-family: var(--font-stack, var(--font-stack-default));
+  font-family: var(--font-stack);
   font-size: 1em; }
   input[type="file"] {
     padding: 1px; }
@@ -6748,7 +6748,7 @@ textarea {
   margin: 0;
   padding: 4px 5px;
   overflow: auto;
-  font-family: var(--font-stack, var(--font-stack-default));
+  font-family: var(--font-stack);
   font-size: 1em;
   line-height: normal;
   vertical-align: top; }
@@ -6756,7 +6756,7 @@ textarea {
     border-color: #bbbbbb; }
 
 select {
-  font-family: var(--font-stack, var(--font-stack-default));
+  font-family: var(--font-stack);
   font-size: 1em;
   height: 24px;
   padding: 3px 3px 3px 0;

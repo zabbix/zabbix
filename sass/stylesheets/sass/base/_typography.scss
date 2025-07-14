@@ -62,15 +62,6 @@ $fonts-path: '../fonts/' !default;
 	unicode-range: U+4E00-9FFF;
 }
 
-:root {
-	--font-stack-default: Inter, "Noto Sans Georgian", "Noto Sans Hebrew", "Noto Sans JP", "Noto Sans KR", "Noto Sans SC", "Apple SD Gothic Neo", "Arial Hebrew", Arial, "DejaVu Sans", Helvetica, "Hiragino Sans", "Liberation Sans", "Malgun Gothic", Meiryo, "Microsoft YaHei", "PingFang SC", Roboto, Sylfaen, sans-serif;
-	--font-stack-mono-default: "Courier New", Courier, monospace;
-}
-
-html[lang="zh"] {
-	--font-stack-default: Inter, "Noto Sans SC", "PingFang SC", "Microsoft YaHei", "Noto Sans KR", "Noto Sans JP", "Apple SD Gothic Neo", "Arial Hebrew", Arial, "Noto Sans Georgian", "Noto Sans Hebrew", "DejaVu Sans", Helvetica, "Hiragino Sans", "Liberation Sans", "Malgun Gothic", Meiryo, Roboto, Sylfaen, sans-serif;
-}
-
 $font-body-size: 75%; // Default 1em/12px
 $body-line-height: 1.4em;
 
