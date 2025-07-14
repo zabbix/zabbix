@@ -2917,7 +2917,7 @@ class testUsersAuthenticationLdap extends testFormAuthentication {
 		// Change fields one by one and check that Bind password field cleared only after Host change.
 		foreach ($values['servers_settings'][0]['fields'] as $field => $value) {
 			$ldap_form->fill([$field => $value.'1']);
-			$ldap_form->query('id:description')->one()->click();
+			$this->page->removeFocus();
 
 			if ($field === 'Host') {
 				$ldap_form->checkValue(['Bind password' => '']);
