@@ -1,5 +1,5 @@
 zabbix_export:
-  version: '7.4'
+  version: '8.0'
   template_groups:
     - uuid: 748ad4d098d447d492bb935c907f652f
       name: Templates/Databases
@@ -64,7 +64,7 @@ zabbix_export:
         For more information about configuring the Zabbix MySQL plugin, see the documentation https://git.zabbix.com/projects/ZBX/repos/zabbix/browse/src/go/plugins/mysql/README.md.
       vendor:
         name: Zabbix
-        version: 7.4-3
+        version: 8.0-0
       groups:
         - name: Templates/Databases
       items:

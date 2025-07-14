@@ -17,23 +17,34 @@
 		line-height: 18px;
 	}
 
-	h1, h2, h3, h4 {
+	h5 {
+		font-size: 12px;
+		line-height: 18px;
+	}
+
+	h1, h2, h3, h4, h5 {
 		&:not(:first-child) {
 			margin-top: 24px;
 		}
 	}
 
-	ol, ul, p, pre, li {
+	ol, ul, p, pre {
+		margin-top: 16px;
 		margin-bottom: 0;
 
-		&:not(:first-child) {
-			margin-top: 16px;
+		&:first-child {
+			margin-top: 0;
 		}
 	}
 
+	h5 + * {
+		margin-top: 0;
+	}
+
 	ol, ul {
+		list-style-type: initial;
 		list-style-position: outside;
-		padding-left: 1.5em;
+		padding-left: 2em;
 
 		li {
 			padding-bottom: 0;

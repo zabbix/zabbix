@@ -105,10 +105,11 @@ int	es_browser_init_errors(zbx_es_t *es, char **error)
 int	browser_push_error(duk_context *ctx, zbx_webdriver_t *wd, const char *format, ...)
 {
 	va_list	args;
-	char	*message;
+	char	*message = NULL;
+	size_t	msg_len = 0, msg_offset = 0;
 
 	va_start(args, format);
-	message = zbx_dvsprintf(NULL, format, args);
+	zbx_vsnprintf_alloc(&message, &msg_len, &msg_offset, format, args);
 	va_end(args);
 
 	if (NULL == wd || NULL == wd->error)

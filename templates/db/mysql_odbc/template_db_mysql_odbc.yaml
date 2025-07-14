@@ -1,5 +1,5 @@
 zabbix_export:
-  version: '7.4'
+  version: '8.0'
   template_groups:
     - uuid: 748ad4d098d447d492bb935c907f652f
       name: Templates/Databases
@@ -51,7 +51,7 @@ zabbix_export:
         2. Set the username and password in the `MySQL user` and `MySQL password` host wizard configuration fields.
       vendor:
         name: Zabbix
-        version: 7.4-3
+        version: 8.0-0
       groups:
         - name: Templates/Databases
       items:
