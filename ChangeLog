@@ -395,7 +395,6 @@ New features:
 Bug fixes:
 .......PS. [ZBX-26537] fixed memory over-allocation in preprocessing manager (vso)
 ..F....... [ZBX-26422] added missing translation string for "Tags" label in "Tags" tab in configuration forms (solonkins)
-.......PS. [ZBX-26294] improved logic of SNMP cache cleanup (dgoloscapov)
 ..F....... [ZBX-21087] fixed not all aggregation functions working with foreach functions (aluchko)
 A......... [ZBX-26191] fixed inconsistent API and frontend validation for maintenance period 'every' and 'period' fields (aluchko)
 A.F....... [ZBX-23167] fixed issues with Host dashboards not displaying widgets from inaccessible templates; added hostdashboard object API (jfreibergs, vmaksimovs)
