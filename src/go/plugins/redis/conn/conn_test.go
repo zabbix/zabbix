@@ -12,7 +12,7 @@
 ** If not, see <https://www.gnu.org/licenses/>.
 **/
 
-package redis
+package conn
 
 import (
 	"reflect"
@@ -24,7 +24,7 @@ import (
 )
 
 func TestConnManager_closeUnused(t *testing.T) {
-	connMgr := NewConnManager(1*time.Microsecond, 30*time.Second, hkInterval*time.Second)
+	connMgr := NewConnManager(1*time.Microsecond, 30*time.Second, HkInterval*time.Second)
 	defer connMgr.Destroy()
 
 	u, _ := uri.New("tcp://127.0.0.1", nil)
@@ -39,7 +39,7 @@ func TestConnManager_closeUnused(t *testing.T) {
 }
 
 func TestConnManager_closeAll(t *testing.T) {
-	connMgr := NewConnManager(300*time.Second, 30*time.Second, hkInterval*time.Second)
+	connMgr := NewConnManager(300*time.Second, 30*time.Second, HkInterval*time.Second)
 	defer connMgr.Destroy()
 
 	u, _ := uri.New("tcp://127.0.0.1", nil)
@@ -56,7 +56,7 @@ func TestConnManager_closeAll(t *testing.T) {
 func TestConnManager_create(t *testing.T) {
 	u, _ := uri.New("tcp://127.0.0.1", nil)
 
-	connMgr := NewConnManager(300*time.Second, 30*time.Second, hkInterval*time.Second)
+	connMgr := NewConnManager(300*time.Second, 30*time.Second, HkInterval*time.Second)
 	defer connMgr.Destroy()
 
 	connMgr.connections[*u] = &RedisConn{
@@ -113,7 +113,7 @@ func TestConnManager_create(t *testing.T) {
 func TestConnManager_get(t *testing.T) {
 	u, _ := uri.New("tcp://127.0.0.1", nil)
 
-	connMgr := NewConnManager(300*time.Second, 30*time.Second, hkInterval*time.Second)
+	connMgr := NewConnManager(300*time.Second, 30*time.Second, HkInterval*time.Second)
 	defer connMgr.Destroy()
 
 	t.Run("Should return nil if connection does not exist", func(t *testing.T) {

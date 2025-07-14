@@ -12,7 +12,7 @@
 ** If not, see <https://www.gnu.org/licenses/>.
 **/
 
-package redis
+package handlers
 
 import (
 	"errors"
@@ -20,6 +20,7 @@ import (
 	"testing"
 
 	"github.com/mediocregopher/radix/v3"
+	"golang.zabbix.com/agent2/plugins/redis/conn"
 )
 
 func Test_getLastSlowlogId(t *testing.T) {
@@ -90,12 +91,10 @@ func TestPlugin_slowlogHandler(t *testing.T) {
 
 	defer stubConn.Close()
 
-	conn := &RedisConn{
-		client: stubConn,
-	}
+	connection := conn.NewRedisConn(stubConn)
 
 	type args struct {
-		conn   redisClient
+		conn   conn.RedisClient
 		params map[string]string
 	}
 	tests := []struct {
@@ -106,20 +105,20 @@ func TestPlugin_slowlogHandler(t *testing.T) {
 	}{
 		{
 			"Should fail if error occurred",
-			args{conn: conn, params: map[string]string{}},
+			args{conn: connection, params: map[string]string{}},
 			nil,
 			true,
 		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			got, err := slowlogHandler(tt.args.conn, tt.args.params)
+			got, err := SlowlogHandler(tt.args.conn, tt.args.params)
 			if (err != nil) != tt.wantErr {
-				t.Errorf("Plugin.slowlogHandler() error = %v, wantErr %v", err, tt.wantErr)
+				t.Errorf("Plugin.SlowlogHandler() error = %v, wantErr %v", err, tt.wantErr)
 				return
 			}
 			if !reflect.DeepEqual(got, tt.want) {
-				t.Errorf("Plugin.slowlogHandler() = %v, want %v", got, tt.want)
+				t.Errorf("Plugin.SlowlogHandler() = %v, want %v", got, tt.want)
 			}
 		})
 	}

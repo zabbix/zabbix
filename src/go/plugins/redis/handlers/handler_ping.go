@@ -12,24 +12,21 @@
 ** If not, see <https://www.gnu.org/licenses/>.
 **/
 
-package redis
+package handlers
 
 import (
 	"github.com/mediocregopher/radix/v3"
+	"golang.zabbix.com/agent2/plugins/redis/conn"
+	"golang.zabbix.com/sdk/plugin/comms"
 )
 
-const (
-	pingFailed = 0
-	pingOk     = 1
-)
-
-// pingHandler executes 'PING' command and returns pingOk if a connection is alive or pingFailed otherwise.
-func pingHandler(conn redisClient, _ map[string]string) (interface{}, error) {
+// PingHandler executes 'PING' command and returns pingOk if a connection is alive or pingFailed otherwise.
+func PingHandler(conn conn.RedisClient, _ map[string]string) (interface{}, error) {
 	var res string
 
 	if _ = conn.Query(radix.Cmd(&res, "PING")); res != "PONG" {
-		return pingFailed, nil
+		return comms.PingFailed, nil
 	}
 
-	return pingOk, nil
+	return comms.PingOk, nil
 }

@@ -17,20 +17,23 @@ package redis
 import (
 	"time"
 
+	"golang.zabbix.com/agent2/plugins/redis/conn"
 	"golang.zabbix.com/sdk/metric"
 	"golang.zabbix.com/sdk/plugin"
+	"golang.zabbix.com/sdk/plugin/comms"
 	"golang.zabbix.com/sdk/uri"
 	"golang.zabbix.com/sdk/zbxerr"
 )
 
-const pluginName = "Redis"
-
 // Plugin inherits plugin.Base and store plugin-specific data.
 type Plugin struct {
 	plugin.Base
-	connMgr *ConnManager
+	connMgr *conn.ConnManager
 	options PluginOptions
 }
+
+var _ plugin.Runner = (*Plugin)(nil)
+var _ plugin.Exporter = (*Plugin)(nil)
 
 // impl is the pointer to the plugin implementation.
 var impl Plugin
@@ -62,7 +65,7 @@ func (p *Plugin) Export(key string, rawParams []string, ctx plugin.ContextProvid
 		// Special logic of processing connection errors is used if redis.ping is requested
 		// because it must return pingFailed if any error occurred.
 		if key == keyPing {
-			return pingFailed, nil
+			return comms.PingFailed, nil
 		}
 
 		p.Errf(err.Error())
@@ -80,10 +83,10 @@ func (p *Plugin) Export(key string, rawParams []string, ctx plugin.ContextProvid
 
 // Start implements the Runner interface and performs initialization when plugin is activated.
 func (p *Plugin) Start() {
-	p.connMgr = NewConnManager(
+	p.connMgr = conn.NewConnManager(
 		time.Duration(p.options.KeepAlive)*time.Second,
 		time.Duration(p.options.Timeout)*time.Second,
-		hkInterval*time.Second,
+		conn.HkInterval*time.Second,
 	)
 }
 

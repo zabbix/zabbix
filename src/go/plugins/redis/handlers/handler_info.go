@@ -12,7 +12,7 @@
 ** If not, see <https://www.gnu.org/licenses/>.
 **/
 
-package redis
+package handlers
 
 import (
 	"bufio"
@@ -21,6 +21,7 @@ import (
 	"strings"
 
 	"github.com/mediocregopher/radix/v3"
+	"golang.zabbix.com/agent2/plugins/redis/conn"
 	"golang.zabbix.com/sdk/zbxerr"
 )
 
@@ -92,7 +93,8 @@ func parseRedisInfo(info string) (res redisInfo, err error) {
 		res[section][key] = value
 	}
 
-	if err = scanner.Err(); err != nil {
+	err = scanner.Err()
+	if err != nil {
 		return nil, err
 	}
 
@@ -103,13 +105,14 @@ func parseRedisInfo(info string) (res redisInfo, err error) {
 	return res, nil
 }
 
-// infoHandler gets an output of 'INFO' command, parses it and returns it in JSON format.
-func infoHandler(conn redisClient, params map[string]string) (interface{}, error) {
+// InfoHandler gets an output of 'INFO' command, parses it and returns it in JSON format.
+func InfoHandler(conn conn.RedisClient, params map[string]string) (interface{}, error) {
 	var res string
 
 	section := infoSection(strings.ToLower(params["Section"]))
 
-	if err := conn.Query(radix.Cmd(&res, "INFO", string(section))); err != nil {
+	err := conn.Query(radix.Cmd(&res, "INFO", string(section)))
+	if err != nil {
 		return nil, zbxerr.ErrorCannotFetchData.Wrap(err)
 	}
 

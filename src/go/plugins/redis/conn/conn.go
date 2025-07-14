@@ -12,7 +12,7 @@
 ** If not, see <https://www.gnu.org/licenses/>.
 **/
 
-package redis
+package conn
 
 import (
 	"context"
@@ -21,17 +21,25 @@ import (
 	"time"
 
 	"github.com/mediocregopher/radix/v3"
+	"golang.zabbix.com/agent2/plugins/redis/info"
 	"golang.zabbix.com/sdk/log"
 	"golang.zabbix.com/sdk/uri"
 	"golang.zabbix.com/sdk/zbxerr"
 )
 
-const hkInterval = 10
+const HkInterval = 10
 
 var errMasterDown = errors.New("MASTERDOWN Link with MASTER is down and slave-serve-stale-data is set to 'no'.")
 
-type redisClient interface {
+type RedisClient interface {
 	Query(cmd radix.CmdAction) error
+}
+
+func NewRedisConn(client radix.Client) *RedisConn {
+	return &RedisConn{
+		client:         client,
+		lastTimeAccess: time.Now(),
+	}
 }
 
 type RedisConn struct {
@@ -82,11 +90,12 @@ func (c *ConnManager) closeUnused() {
 
 	for uri, conn := range c.connections {
 		if time.Since(conn.lastTimeAccess) > c.keepAlive {
-			if err := conn.client.Close(); err == nil {
+			err := conn.client.Close()
+			if err == nil {
 				delete(c.connections, uri)
-				log.Debugf("[%s] Closed unused connection: %s", pluginName, uri.Addr())
+				log.Debugf("[%s] Closed unused connection: %s", info.PluginName, uri.Addr())
 			} else {
-				log.Errf("[%s] Error occurred while closing connection: %s", pluginName, uri.Addr())
+				log.Errf("[%s] Error occurred while closing connection: %s", info.PluginName, uri.Addr())
 			}
 		}
 	}
@@ -96,10 +105,11 @@ func (c *ConnManager) closeUnused() {
 func (c *ConnManager) closeAll() {
 	c.connMutex.Lock()
 	for uri, conn := range c.connections {
-		if err := conn.client.Close(); err == nil {
+		err := conn.client.Close()
+		if err == nil {
 			delete(c.connections, uri)
 		} else {
-			log.Errf("[%s] Error occurred while closing connection: %s", pluginName, uri.Addr())
+			log.Errf("[%s] Error occurred while closing connection: %s", info.PluginName, uri.Addr())
 		}
 	}
 	c.connMutex.Unlock()
@@ -166,7 +176,7 @@ func (c *ConnManager) create(uri uri.URI) (*RedisConn, error) {
 		lastTimeAccess: time.Now(),
 	}
 
-	log.Debugf("[%s] Created new connection: %s", pluginName, uri.Addr())
+	log.Debugf("[%s] Created new connection: %s", info.PluginName, uri.Addr())
 
 	return c.connections[uri], nil
 }

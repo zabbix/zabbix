@@ -15,6 +15,9 @@
 package redis
 
 import (
+	"golang.zabbix.com/agent2/plugins/redis/conn"
+	"golang.zabbix.com/agent2/plugins/redis/handlers"
+	"golang.zabbix.com/agent2/plugins/redis/info"
 	"golang.zabbix.com/sdk/errs"
 	"golang.zabbix.com/sdk/metric"
 	"golang.zabbix.com/sdk/plugin"
@@ -74,10 +77,10 @@ var metrics = metric.MetricSet{
 }
 
 // handlerFunc defines an interface must be implemented by handlers.
-type handlerFunc func(conn redisClient, params map[string]string) (res interface{}, err error)
+type handlerFunc func(conn conn.RedisClient, params map[string]string) (res interface{}, err error)
 
 func init() {
-	err := plugin.RegisterMetrics(&impl, pluginName, metrics.List()...)
+	err := plugin.RegisterMetrics(&impl, info.PluginName, metrics.List()...)
 	if err != nil {
 		panic(errs.Wrap(err, "failed to register metrics"))
 	}
@@ -87,16 +90,13 @@ func init() {
 func getHandlerFunc(key string) handlerFunc {
 	switch key {
 	case keyConfig:
-		return configHandler
-
+		return handlers.ConfigHandler
 	case keyInfo:
-		return infoHandler
-
+		return handlers.InfoHandler
 	case keyPing:
-		return pingHandler
-
+		return handlers.PingHandler
 	case keySlowlog:
-		return slowlogHandler
+		return handlers.SlowlogHandler
 
 	default:
 		return nil

@@ -12,10 +12,11 @@
 ** If not, see <https://www.gnu.org/licenses/>.
 **/
 
-package redis
+package handlers
 
 import (
 	"github.com/mediocregopher/radix/v3"
+	"golang.zabbix.com/agent2/plugins/redis/conn"
 	"golang.zabbix.com/sdk/zbxerr"
 )
 
@@ -45,11 +46,12 @@ func getLastSlowlogID(sl slowlog) (int64, error) {
 	return id + 1, nil
 }
 
-// slowlogHandler gets an output of 'SLOWLOG GET 1' command and returns the last slowlog Id.
-func slowlogHandler(conn redisClient, _ map[string]string) (interface{}, error) {
+// SlowlogHandler gets an output of 'SLOWLOG GET 1' command and returns the last slowlog Id.
+func SlowlogHandler(conn conn.RedisClient, _ map[string]string) (interface{}, error) {
 	var res []interface{}
 
-	if err := conn.Query(radix.Cmd(&res, "SLOWLOG", "GET", "1")); err != nil {
+	err := conn.Query(radix.Cmd(&res, "SLOWLOG", "GET", "1"))
+	if err != nil {
 		return nil, zbxerr.ErrorCannotFetchData.Wrap(err)
 	}
 

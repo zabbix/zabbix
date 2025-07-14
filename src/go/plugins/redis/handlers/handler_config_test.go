@@ -12,7 +12,7 @@
 ** If not, see <https://www.gnu.org/licenses/>.
 **/
 
-package redis
+package handlers
 
 import (
 	"errors"
@@ -21,6 +21,7 @@ import (
 	"testing"
 
 	"github.com/mediocregopher/radix/v3"
+	"golang.zabbix.com/agent2/plugins/redis/conn"
 )
 
 func TestPlugin_configHandler(t *testing.T) {
@@ -42,12 +43,10 @@ func TestPlugin_configHandler(t *testing.T) {
 
 	defer stubConn.Close()
 
-	conn := &RedisConn{
-		client: stubConn,
-	}
+	connection := conn.NewRedisConn(stubConn)
 
 	type args struct {
-		conn   redisClient
+		conn   conn.RedisClient
 		params map[string]string
 	}
 	tests := []struct {
@@ -58,38 +57,38 @@ func TestPlugin_configHandler(t *testing.T) {
 	}{
 		{
 			"Pattern * should be used if it is not explicitly specified",
-			args{conn: conn, params: map[string]string{"Pattern": "*"}},
+			args{conn: connection, params: map[string]string{"Pattern": "*"}},
 			`{"param1":"foo","param2":"bar"}`,
 			false,
 		},
 		{
 			"Should fetch specified parameter and return its value",
-			args{conn: conn, params: map[string]string{"Pattern": "param1"}},
+			args{conn: connection, params: map[string]string{"Pattern": "param1"}},
 			`foo`,
 			false,
 		},
 		{
 			"Should fail if parameter not found",
-			args{conn: conn, params: map[string]string{"Pattern": "UnknownParam"}},
+			args{conn: connection, params: map[string]string{"Pattern": "UnknownParam"}},
 			nil,
 			true,
 		},
 		{
 			"Should fail if error occurred",
-			args{conn: conn, params: map[string]string{"Pattern": "WantErr"}},
+			args{conn: connection, params: map[string]string{"Pattern": "WantErr"}},
 			nil,
 			true,
 		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			got, err := configHandler(tt.args.conn, tt.args.params)
+			got, err := ConfigHandler(tt.args.conn, tt.args.params)
 			if (err != nil) != tt.wantErr {
-				t.Errorf("Plugin.configHandler() error = %v, wantErr %v", err, tt.wantErr)
+				t.Errorf("Plugin.ConfigHandler() error = %v, wantErr %v", err, tt.wantErr)
 				return
 			}
 			if !reflect.DeepEqual(got, tt.want) {
-				t.Errorf("Plugin.configHandler() = %v, want %v", got, tt.want)
+				t.Errorf("Plugin.ConfigHandler() = %v, want %v", got, tt.want)
 			}
 		})
 	}
