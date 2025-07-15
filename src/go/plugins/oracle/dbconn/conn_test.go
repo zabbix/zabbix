@@ -80,7 +80,6 @@ func Test_splitUserPrivilege(t *testing.T) {
 			t.Parallel()
 
 			gotUser, gotPrivilege, err := splitUserPrivilege(tt.args.userWithPrivilege)
-
 			if (err != nil) != tt.wantErr {
 				t.Errorf("splitUserPrivilege() error = %v, wantErr %v", err, tt.wantErr)
 
@@ -416,7 +415,6 @@ func TestConnManager_closeUnused(t *testing.T) {
 			conn, err := connMgr.GetConnection(
 				newConnDetNoVersCheck(t, "zabbix_mon", ""),
 			)
-
 			if err != nil || conn == nil {
 				t.Fatalf(
 					"ConnManager.closeUnused():should create a connection, but got error: %s",
@@ -475,7 +473,6 @@ func TestConnManager_closeAll(t *testing.T) { //nolint:tparallel
 		t.Run(tt.name, func(t *testing.T) {
 			for _, v := range tt.fields.conDet {
 				conn, err := connMgr.GetConnection(v)
-
 				if err != nil || conn == nil {
 					t.Fatalf(
 						"ConnManager.closeUnused(): ConnManager.createConn() should create a connection, but "+
@@ -556,7 +553,6 @@ func TestConnManager_GetConnection(t *testing.T) {
 
 			for _, v := range tt.fields.conDet {
 				conn, err := connMgr.GetConnection(v)
-
 				if err != nil || conn == nil {
 					t.Fatalf(
 						"ConnManager.GetConnection(): should create a connection, but got error: %s",
@@ -681,7 +677,6 @@ func Test_containsOnlyHostname(t *testing.T) { //nolint:tparallel
 	for _, tt := range tests { //nolint:paralleltest
 		t.Run(tt.name, func(t *testing.T) {
 			isURI, err := containsOnlyHostname(tt.args.rawURI)
-
 			if err != nil && !tt.want.wantErr {
 				t.Errorf("containsOnlyHostname() error = %v, want nil", err)
 			}

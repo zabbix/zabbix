@@ -50,7 +50,6 @@ func Test_getDriverConnParams(t *testing.T) {
 			t.Parallel()
 
 			gotOut, err := getDriverConnParams(tt.args.privilege)
-
 			if (err != nil) != tt.wantErr {
 				t.Errorf("getDriverConnParams() error = %v, wantErr %v", err, tt.wantErr)
 
@@ -311,7 +310,6 @@ func Test_prepareConnectString(t *testing.T) {
 			t.Parallel()
 
 			gotResult, err := prepareConnectString(tt.args.tnsType, tt.args.cd, tt.args.connectTimeout)
-
 			if err != nil && !tt.want.wantErr {
 				t.Fatalf("prepareConnectString() unwanted error = %v", err)
 			}

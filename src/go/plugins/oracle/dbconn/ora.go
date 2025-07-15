@@ -93,8 +93,9 @@ func (conn *OraConn) Query(
 	ctx context.Context, query string, args ...any,
 ) (*sql.Rows, error) {
 	rows, err := conn.Client.QueryContext(ctx, query, args...)
+	ctxErr := ctx.Err()
 
-	if ctxErr := ctx.Err(); ctxErr != nil {
+	if ctxErr != nil {
 		err = ctxErr
 	}
 
@@ -120,12 +121,12 @@ func (conn *OraConn) QueryRow(
 ) (*sql.Row, error) {
 	row := conn.Client.QueryRowContext(ctx, query, args...)
 
-	var err error
-	if ctxErr := ctx.Err(); ctxErr != nil {
-		err = ctxErr
+	err := ctx.Err()
+	if err != nil {
+		return nil, errs.Wrap(err, "query context error")
 	}
 
-	return row, err
+	return row, nil
 }
 
 // QueryRowByName executes a query from QueryStorage by its name and returns a single row.

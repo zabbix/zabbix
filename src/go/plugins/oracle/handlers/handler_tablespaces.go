@@ -83,8 +83,8 @@ func getTablespacesQuery(params map[string]string) (string, []any, error) {
 	}
 
 	var err error
-	ts, t, err = prepValues(ts, t)
 
+	ts, t, err = prepValues(ts, t)
 	if err != nil {
 		return "", nil, errs.WrapConst(err, zbxerr.ErrorInvalidParams) //nolint:wrapcheck
 	}

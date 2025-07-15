@@ -38,7 +38,6 @@ func TestHandlersExcessiveParams(t *testing.T) {
 					"excess_param", "excess_param", "excess_param",
 				},
 				nil)
-
 			if !errors.Is(err, zbxerr.ErrorTooManyParameters) {
 				t.Errorf("Plugin.%s() should fail if too many parameters passed", getHandlerName(t, tt.metric))
 			}

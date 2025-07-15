@@ -29,6 +29,7 @@ var _ dbconn.OraClient = (*mockOraClient)(nil)
 
 type mockOraClient struct {
 	dbconn.OraClient
+
 	db  *sql.DB
 	err error
 }

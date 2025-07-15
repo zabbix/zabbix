@@ -36,6 +36,7 @@ var impl Plugin //nolint:gochecknoglobals
 // Plugin inherits plugin.Base and store plugin-specific data.
 type Plugin struct {
 	plugin.Base
+
 	connMgr *dbconn.ConnManager
 	options PluginOptions
 }
