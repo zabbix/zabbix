@@ -350,14 +350,14 @@ A.F....PS. [ZBXNEXT-9564] implemented vault macro resolution on proxies (esekace
 Changes for 7.2.11rc1
 
 New features:
-........S. [ZBXNEXT-10018] updated maximal supported TimescaleDB version to 2.20 (mprihodko)
+........S. [ZBXNEXT-10018] updated maximum supported TimescaleDB version to 2.20 (mprihodko)
 
 Bug fixes:
 ...G...PS. [ZBX-26082] fixed agent2 and proxy redirection bug related to incorrect IPv6 string format (vsmelovs)
 ..F....... [ZBX-25958] fixed incorrect dependency hosts format in trigger form (esekace)
 .......PS. [ZBX-26528] fixed improper handling of long or corrupted ODBC error messages (dgoloscapov)
 ........S. [ZBX-26495] added parameter support for database down script media type (askolmeisters)
-........S. [ZBX-26370] fixed HA node recovery after standby, free id cache (sboidenko)
+........S. [ZBX-26370] fixed HA node recovery after standby, free ID cache (sboidenko)
 ........S. [ZBX-25859] fixed connection reuse for Elasticsearch (rtrizna)
 ........S. [ZBX-26591] fixed detection of read-only state in PostgreSQL replicated database (sboidenko)
 .......PS. [ZBX-25545] fixed host interface duplication in autoregistration mode (vsmelovs)
@@ -370,12 +370,12 @@ Bug fixes:
 .........T [ZBX-26604] fixed JavaScript in AWS Cost Explorer by HTTP template due to syntax changes in GetCostAndUsage API request (egordymov)
 ..F....... [ZBX-26481] fixed parameter trimming in item preprocessing steps (apoga)
 ..F....... [ZBX-26249] added the correct message for the Top items and Top triggers widgets when there are no data (msnihach)
-..F....... [ZBX-26300] updates for showing correct element's edit form when right click on the sysmap (msnihach)
+..F....... [ZBX-26300] fixed showing previous element edit form when right clicking on another map element (msnihach)
 .......P.. [ZBX-25499] fixed vault secrets resolution on Zabbix proxy (sboidenko)
 ..F....... [ZBX-25913] fixed Gauge widget description not updating on refresh (apoga)
-..F....... [ZBX-24047] fixed updating value mapping error when mapping name contains quotes (isharha)
+..F....... [ZBX-24047] fixed value mapping update error when mapping name contains quotes (isharha)
 ..F....... [ZBX-26454] set a readonly property for the "Allowed Hosts" input for discovered items (msnihach)
-........S. [ZBX-25413] fixed race condition that could lead to user macro changes not to be synced to Zabbix proxy (vso)
+........S. [ZBX-25413] fixed race condition that could lead to user macro changes not be synced with Zabbix proxy (vso)
 
 --------------------------------------------------------------------------------
 Changes for 7.2.10
