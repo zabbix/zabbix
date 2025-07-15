@@ -68,7 +68,7 @@ class CApiSettingsHelper {
 				continue;
 			}
 
-			if ($name == 'saml_auth_enabled') {
+			if ($name === 'saml_auth_enabled') {
 				$saml_auth_enabled = $value;
 			}
 
