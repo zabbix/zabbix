@@ -280,17 +280,13 @@ class CControllerPopupItemTestSend extends CControllerPopupItemTest {
 				'state' => self::SUPPORTED_STATE
 			]
 		];
+		$prev_value = $this->get_value_from_host ? $this->getInput('value', '') : $this->getInput('prev_value', '');
 
-		if ($this->use_prev_value) {
-			$prev_value = $this->get_value_from_host ? $this->getInput('value', '') : $this->getInput('prev_value', '');
-			$prev_time = $this->get_value_from_host ? $this->getPrevTime() : $this->getInput('prev_time', '');
-
-			if ($prev_value !== '' && $prev_time !== '') {
-				$data['options']['history'] = [
-					'value' => $prev_value,
-					'timestamp' => $prev_time
-				];
-			}
+		if ($this->use_prev_value && $prev_value !== '') {
+			$data['options']['history'] = [
+				'value' => $prev_value,
+				'timestamp' => $this->get_value_from_host ? $this->getPrevTime() : $this->getInput('prev_time')
+			];
 		}
 
 		if ($this->get_value_from_host) {
