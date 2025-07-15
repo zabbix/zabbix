@@ -1182,6 +1182,7 @@ static void	zbx_load_config(ZBX_TASK_EX *task)
 			ZBX_CFG_ENVVAR_USE);
 	zbx_set_defaults();
 config_log_level = 5;
+log_file_cfg.log_file_size = 0;
 	log_file_cfg.log_type = zbx_get_log_type(log_file_cfg.log_type_str);
 
 	zbx_validate_config(task);
