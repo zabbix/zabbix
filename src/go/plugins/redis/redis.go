@@ -25,18 +25,18 @@ import (
 	"golang.zabbix.com/sdk/zbxerr"
 )
 
+// impl is the pointer to the plugin implementation.
+var impl Plugin
+
+var _ plugin.Runner = (*Plugin)(nil)
+var _ plugin.Exporter = (*Plugin)(nil)
+
 // Plugin inherits plugin.Base and store plugin-specific data.
 type Plugin struct {
 	plugin.Base
 	connMgr *conn.ConnManager
 	options PluginOptions
 }
-
-var _ plugin.Runner = (*Plugin)(nil)
-var _ plugin.Exporter = (*Plugin)(nil)
-
-// impl is the pointer to the plugin implementation.
-var impl Plugin
 
 // Export implements the Exporter interface.
 func (p *Plugin) Export(key string, rawParams []string, ctx plugin.ContextProvider) (result interface{}, err error) {

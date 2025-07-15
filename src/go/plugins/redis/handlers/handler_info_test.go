@@ -150,8 +150,10 @@ func Test_parseRedisInfo(t *testing.T) {
 			gotRes, err := parseRedisInfo(tt.args.info)
 			if (err != nil) != tt.wantErr {
 				t.Errorf("parseRedisInfo() error = %#v, wantErr %#v", err, tt.wantErr)
+
 				return
 			}
+
 			if !reflect.DeepEqual(gotRes, tt.wantRes) {
 				t.Errorf("parseRedisInfo() = %#v, want %#v", gotRes, tt.wantRes)
 			}
@@ -196,6 +198,7 @@ func TestPlugin_infoHandler(t *testing.T) {
 		conn   conn.RedisClient
 		params map[string]string
 	}
+
 	tests := []struct {
 		name    string
 		args    args
@@ -232,8 +235,10 @@ func TestPlugin_infoHandler(t *testing.T) {
 			got, err := InfoHandler(tt.args.conn, tt.args.params)
 			if (err != nil) != tt.wantErr {
 				t.Errorf("Plugin.InfoHandler() error = %v, wantErr %v", err, tt.wantErr)
+
 				return
 			}
+
 			if !reflect.DeepEqual(got, tt.want) {
 				t.Errorf("Plugin.InfoHandler() = %v, want %v", got, tt.want)
 			}
