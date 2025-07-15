@@ -2912,6 +2912,7 @@ class testUsersAuthenticationLdap extends testFormAuthentication {
 		// Open newly created LDAP authentication for updates.
 		$dialog = COverlayDialogElement::find()->waitUntilReady()->one();
 		$ldap_form = $dialog->asForm();
+		$bind_password_field = $ldap_form->getFieldContainer('Bind password');
 		unset($values['servers_settings'][0]['fields']['Bind password']);
 
 		// Change fields one by one and check that Bind password field cleared only after Host change.
@@ -2921,26 +2922,20 @@ class testUsersAuthenticationLdap extends testFormAuthentication {
 
 			if ($field === 'Host') {
 				$ldap_form->checkValue(['Bind password' => '']);
-				$ldap_form->getFieldContainer('Bind password')->query('xpath:./button[@data-hintbox]')->one()->click();
+				$bind_password_field->query('xpath:./button[@data-hintbox]')->one()->click();
 				$hint = $this->query('xpath://div[@class="overlay-dialogue wordbreak"]')->waitUntilPresent()->one();
 				$this->assertEquals('The previous password was cleared due to a host change. Please enter the new password.',
 						$hint->getText()
 				);
 
 				// Check that Change password button is not available.
-				$this->assertFalse($ldap_form->getFieldContainer('Bind password')->query('button:Change password')
-						->one(false)->isClickable()
-				);
+				$this->assertFalse($bind_password_field->query('button:Change password')->one(false)->isClickable());
 			}
 			else {
-				$this->assertTrue($ldap_form->getFieldContainer('Bind password')->query('button:Change password')
-						->one()->isClickable()
-				);
+				$this->assertTrue($bind_password_field->query('button:Change password')->one()->isClickable());
 
 				// Check that hint is not visible.
-				$this->assertFalse($ldap_form->getFieldContainer('Bind password')->query('xpath:./button[@data-hintbox]')
-						->one()->isVisible()
-				);
+				$this->assertFalse($bind_password_field->query('xpath:./button[@data-hintbox]')->one()->isVisible());
 			}
 		}
 	}
