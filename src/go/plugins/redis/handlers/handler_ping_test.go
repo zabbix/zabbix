@@ -50,6 +50,7 @@ func TestPlugin_pingHandler(t *testing.T) {
 		conn   conn.RedisClient
 		params map[string]string
 	}
+
 	tests := []struct {
 		name    string
 		args    args
@@ -80,8 +81,10 @@ func TestPlugin_pingHandler(t *testing.T) {
 			got, err := PingHandler(tt.args.conn, tt.args.params)
 			if (err != nil) != tt.wantErr {
 				t.Errorf("Plugin.PingHandler() error = %v, wantErr %v", err, tt.wantErr)
+
 				return
 			}
+
 			if !reflect.DeepEqual(got, tt.want) {
 				t.Errorf("Plugin.PingHandler() = %v, want %v", got, tt.want)
 			}

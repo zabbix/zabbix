@@ -27,6 +27,7 @@ func Test_getLastSlowlogId(t *testing.T) {
 	type args struct {
 		slowlog slowlog
 	}
+
 	tests := []struct {
 		name    string
 		args    args
@@ -70,13 +71,16 @@ func Test_getLastSlowlogId(t *testing.T) {
 			true,
 		},
 	}
+
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			got, err := getLastSlowlogID(tt.args.slowlog)
 			if (err != nil) != tt.wantErr {
 				t.Errorf("getLastSlowlogID() error = %v, wantErr %v", err, tt.wantErr)
+
 				return
 			}
+
 			if got != tt.want {
 				t.Errorf("getLastSlowlogID() = %v, want %v", got, tt.want)
 			}
@@ -97,6 +101,7 @@ func TestPlugin_slowlogHandler(t *testing.T) {
 		conn   conn.RedisClient
 		params map[string]string
 	}
+
 	tests := []struct {
 		name    string
 		args    args
@@ -110,13 +115,16 @@ func TestPlugin_slowlogHandler(t *testing.T) {
 			true,
 		},
 	}
+
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			got, err := SlowlogHandler(tt.args.conn, tt.args.params)
 			if (err != nil) != tt.wantErr {
 				t.Errorf("Plugin.SlowlogHandler() error = %v, wantErr %v", err, tt.wantErr)
+
 				return
 			}
+
 			if !reflect.DeepEqual(got, tt.want) {
 				t.Errorf("Plugin.SlowlogHandler() = %v, want %v", got, tt.want)
 			}

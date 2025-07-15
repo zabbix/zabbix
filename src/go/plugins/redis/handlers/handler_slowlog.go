@@ -17,6 +17,7 @@ package handlers
 import (
 	"github.com/mediocregopher/radix/v3"
 	"golang.zabbix.com/agent2/plugins/redis/conn"
+	"golang.zabbix.com/sdk/errs"
 	"golang.zabbix.com/sdk/zbxerr"
 )
 
@@ -52,7 +53,7 @@ func SlowlogHandler(conn conn.RedisClient, _ map[string]string) (interface{}, er
 
 	err := conn.Query(radix.Cmd(&res, "SLOWLOG", "GET", "1"))
 	if err != nil {
-		return nil, zbxerr.ErrorCannotFetchData.Wrap(err)
+		return nil, errs.WrapConst(err, zbxerr.ErrorCannotFetchData)
 	}
 
 	lastID, err := getLastSlowlogID(slowlog(res))

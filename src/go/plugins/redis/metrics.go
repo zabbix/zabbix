@@ -70,15 +70,18 @@ var metrics = metric.MetricSet{
 		}, false),
 
 	keyPing: metric.New("Test if connection is alive or not.",
-		[]*metric.Param{paramURI, paramPassword, paramUser, paramTLSConnect, paramTLSCaFile, paramTLSServerName, paramTLSCertFile, paramTLSKeyFile}, false),
+		[]*metric.Param{paramURI, paramPassword, paramUser,
+			paramTLSConnect, paramTLSCaFile, paramTLSServerName, paramTLSCertFile, paramTLSKeyFile}, false),
 
 	keySlowlog: metric.New("Returns the number of slow log entries since Redis has been started.",
-		[]*metric.Param{paramURI, paramPassword, paramUser, paramTLSConnect, paramTLSCaFile, paramTLSServerName, paramTLSCertFile, paramTLSKeyFile}, false),
+		[]*metric.Param{paramURI, paramPassword, paramUser,
+			paramTLSConnect, paramTLSCaFile, paramTLSServerName, paramTLSCertFile, paramTLSKeyFile}, false),
 }
 
 // handlerFunc defines an interface must be implemented by handlers.
 type handlerFunc func(conn conn.RedisClient, params map[string]string) (res interface{}, err error)
 
+//nolint:gochecknoinits //legacy implementation
 func init() {
 	err := plugin.RegisterMetrics(&impl, info.PluginName, metrics.List()...)
 	if err != nil {

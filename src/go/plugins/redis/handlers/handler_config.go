@@ -21,6 +21,7 @@ import (
 
 	"github.com/mediocregopher/radix/v3"
 	"golang.zabbix.com/agent2/plugins/redis/conn"
+	"golang.zabbix.com/sdk/errs"
 	"golang.zabbix.com/sdk/zbxerr"
 )
 
@@ -32,7 +33,7 @@ func ConfigHandler(conn conn.RedisClient, params map[string]string) (interface{}
 
 	err := conn.Query(radix.Cmd(&res, "CONFIG", "GET", params["Pattern"]))
 	if err != nil {
-		return nil, zbxerr.ErrorCannotFetchData.Wrap(err)
+		return nil, errs.WrapConst(err, zbxerr.ErrorCannotFetchData)
 	}
 
 	if len(res) == 0 {
@@ -42,7 +43,7 @@ func ConfigHandler(conn conn.RedisClient, params map[string]string) (interface{}
 	if strings.ContainsAny(params["Pattern"], globChars) {
 		jsonRes, err := json.Marshal(res)
 		if err != nil {
-			return nil, zbxerr.ErrorCannotMarshalJSON.Wrap(err)
+			return nil, errs.WrapConst(err, zbxerr.ErrorCannotMarshalJSON)
 		}
 
 		return string(jsonRes), nil
