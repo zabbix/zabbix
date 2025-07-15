@@ -204,7 +204,7 @@ class testFormAdministrationAuthenticationLdap extends CWebTest {
 
 			if ($field === 'LDAP host') {
 				$form->checkValue(['Bind password' => '']);
-				$form->getFieldContainer('Bind password')->query('xpath:./button[@data-hintbox]')->one()->click();
+				$form->getFieldContainer('Bind password')->query('xpath:./a[@data-hintbox]')->one()->click();
 				$hint = $this->query('xpath://div[@class="overlay-dialogue wordbreak"]')->waitUntilPresent()->all()->last();
 				$this->assertEquals('The previous password was cleared due to a host change. Please enter the new password.',
 						$hint->getText()
