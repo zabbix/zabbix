@@ -68,6 +68,9 @@ static zbx_db_idcache_t	*idcache = NULL;
 
 int	zbx_db_init(char **error)
 {
+	if (NULL != idcache_mem)
+		return SUCCEED;
+
 	qsort(idcache_tables, ZBX_IDS_SIZE, sizeof(idcache_tables[0]), compare_table_names);
 
 	if (SUCCEED != dbconn_init(error))
@@ -76,11 +79,14 @@ int	zbx_db_init(char **error)
 	if (SUCCEED != zbx_mutex_create(&idcache_mutex, ZBX_MUTEX_CACHE_IDS, error))
 		return FAIL;
 
-	if (SUCCEED != zbx_shmem_create_min(&idcache_mem, sizeof(zbx_db_idcache_t), "table ids cache", NULL, 0, error))
+	if (SUCCEED != zbx_shmem_create_min(&idcache_mem, sizeof(zbx_db_idcache_t), "table ids cache", "TidsCache", 0,
+			error))
+	{
 		return FAIL;
+	}
 
-	idcache = idcache_mem->base;
-	memset(idcache, 0, sizeof(zbx_db_idcache_t));
+	idcache = zbx_shmem_malloc(idcache_mem, NULL, sizeof(zbx_db_idcache_t));
+	memset(idcache->lastids, 0, sizeof(idcache->lastids));
 
 	return SUCCEED;
 }

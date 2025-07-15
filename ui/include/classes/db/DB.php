@@ -37,6 +37,13 @@ class DB {
 		self::FIELD_TYPE_FLOAT | self::FIELD_TYPE_UINT | self::FIELD_TYPE_CUID;
 	const SUPPORTED_SEARCH_TYPES = self::FIELD_TYPE_CHAR | self::FIELD_TYPE_TEXT | self::FIELD_TYPE_CUID;
 
+	/**
+	 * Maximum number of IDs per SQL request.
+	 *
+	 * @var int
+	 */
+	private const CHUNK_SIZE = 1000;
+
 	private static $schema = null;
 
 	/**
@@ -556,63 +563,154 @@ class DB {
 	/**
 	 * Update data in DB.
 	 *
-	 * @param string $table
-	 * @param array $data
-	 * @param array $data[...]['values'] pair of fieldname => fieldvalue for SET clause
-	 * @param array $data[...]['where'] pair of fieldname => fieldvalue for WHERE clause
-	 *
-	 * @return array of ids
+	 * @param string $table_name
+	 * @param array  $upd_requests
+	 * @param array  $upd_requests[]['values']  Pair of fieldname => fieldvalue for SET clause.
+	 * @param array  $upd_requests[]['where']   Pair of fieldname => fieldvalue for WHERE clause.
 	 */
-	public static function update($table, $data) {
-		if (empty($data)) {
-			return true;
+	public static function update(string $table_name, array $upd_requests): void {
+		if (!$upd_requests) {
+			return;
 		}
 
-		$tableSchema = self::getSchema($table);
+		$table_schema = self::getSchema($table_name);
 
-		$data = zbx_toArray($data);
-		foreach ($data as $row) {
-			// check
-			self::checkValueTypes($tableSchema, $row['values']);
-			if (empty($row['values'])) {
-				self::exception(self::DBEXECUTE_ERROR, _s('Cannot perform update statement on table "%1$s" without values.', $table));
+		$upd_requests = zbx_toArray($upd_requests);
+
+		foreach ($upd_requests as $upd_request) {
+			self::validateUpdValues($table_name, $table_schema, $upd_request);
+			self::validateUpdConditions($table_name, $table_schema, $upd_request);
+
+			if (self::hasCompositePk($table_schema)) {
+				self::updateByConditions($table_name, $upd_request);
+			}
+			elseif (count($upd_request['where']) == 1 && array_key_exists($table_schema['key'], $upd_request['where'])) {
+				self::updateByPkIds($table_name, $upd_request);
+			}
+			else {
+				self::updateExistingRowsByPkIds($table_name, $upd_request, $table_schema['key']);
+			}
+		}
+	}
+
+	private static function validateUpdValues(string $table_name, array $table_schema, array &$upd_request): void {
+		if (!array_key_exists('values', $upd_request) || !$upd_request['values']) {
+			self::exception(self::DBEXECUTE_ERROR,
+				_s('Cannot perform update statement on table "%1$s" without values.', $table_name)
+			);
+		}
+
+		self::checkValueTypes($table_schema, $upd_request['values']);
+		self::uppercaseValues($table_name, $upd_request['values']);
+	}
+
+	private static function validateUpdConditions(string $table_name, array $table_schema, array &$upd_request): void {
+		if (!array_key_exists('where', $upd_request) || !$upd_request['where']) {
+			self::exception(self::DBEXECUTE_ERROR,
+				_s('Cannot perform update statement on table "%1$s" without where condition.', $table_name)
+			);
+		}
+
+		foreach ($upd_request['where'] as $field => &$values) {
+			if (!array_key_exists($field, $table_schema['fields']) || $values === null) {
+				self::exception(self::DBEXECUTE_ERROR,
+					_s('Incorrect field "%1$s" name or value in where statement for table "%2$s".', $field, $table_name)
+				);
 			}
 
-			self::uppercaseValues($table, $row['values']);
+			$values = zbx_toArray($values);
+			sort($values); // Sorting IDs to prevent deadlocks when two transactions depend on each other.
+		}
+		unset($values);
+	}
 
-			// set creation
-			$sqlSet = '';
-			foreach ($row['values'] as $field => $value) {
-				if ($sqlSet !== '') {
-					$sqlSet .= ',';
-				}
-				$sqlSet .= $field.'='.$value;
-			}
+	private static function updateByConditions(string $table_name, array $upd_request): void {
+		$sql_where = [];
 
-			if (!isset($row['where']) || empty($row['where']) || !is_array($row['where'])) {
-				self::exception(self::DBEXECUTE_ERROR, _s('Cannot perform update statement on table "%1$s" without where condition.', $table));
-			}
+		foreach ($upd_request['where'] as $field => $values) {
+			$sql_where[] = dbConditionString($field, $values);
+		}
 
-			// where condition processing
-			$sqlWhere = [];
-			foreach ($row['where'] as $field => $values) {
-				if (!isset($tableSchema['fields'][$field]) || is_null($values)) {
-					self::exception(self::DBEXECUTE_ERROR, _s('Incorrect field "%1$s" name or value in where statement for table "%2$s".', $field, $table));
-				}
-				$values = zbx_toArray($values);
-				sort($values); // sorting ids to prevent deadlocks when two transactions depend on each other
+		$sql = 'UPDATE '.$table_name.
+			' SET '.self::getUpdSqlValues($upd_request).
+			' WHERE '.implode(' AND ', $sql_where);
 
-				$sqlWhere[] = dbConditionString($field, $values);
-			}
+		if (!DBexecute($sql)) {
+			self::exception(self::DBEXECUTE_ERROR, _s('SQL statement execution has failed "%1$s".', $sql));
+		}
+	}
 
-			// sql execution
-			$sql = 'UPDATE '.$table.' SET '.$sqlSet.' WHERE '.implode(' AND ', $sqlWhere);
-			if (!DBexecute($sql)) {
-				self::exception(self::DBEXECUTE_ERROR, _s('SQL statement execution has failed "%1$s".', $sql));
+	private static function updateByPkIds(string $table_name, array $upd_request): void {
+		$sql_values = self::getUpdSqlValues($upd_request);
+		$pk_field_name = key($upd_request['where']);
+
+		$chunkids = [];
+
+		foreach ($upd_request['where'][$pk_field_name] as $id) {
+			$chunkids[] = $id;
+
+			if (count($chunkids) == self::CHUNK_SIZE) {
+				self::updateByIdField($table_name, $sql_values, $pk_field_name, $chunkids);
+
+				$chunkids = [];
 			}
 		}
 
-		return true;
+		if ($chunkids) {
+			self::updateByIdField($table_name, $sql_values, $pk_field_name, $chunkids);
+		}
+	}
+
+	private static function updateExistingRowsByPkIds(string $table_name, array $upd_request,
+			string $pk_field_name): void {
+		$options = [
+			'output' => [$pk_field_name],
+			'filter' => $upd_request['where'],
+			'sortfield' => [$pk_field_name]
+		];
+		$resource = DBselect(self::makeSql($table_name, $options));
+
+		$sql_values = self::getUpdSqlValues($upd_request);
+		$chunkids = [];
+
+		while ($pk_row = DBfetch($resource)) {
+			$chunkids[] = $pk_row[$pk_field_name];
+
+			if (count($chunkids) == self::CHUNK_SIZE) {
+				self::updateByIdField($table_name, $sql_values, $pk_field_name, $chunkids);
+
+				$chunkids = [];
+			}
+		}
+
+		if ($chunkids) {
+			self::updateByIdField($table_name, $sql_values, $pk_field_name, $chunkids);
+		}
+	}
+
+	private static function getUpdSqlValues(array $upd_request): string {
+		$sql_values = '';
+
+		foreach ($upd_request['values'] as $field_name => $value) {
+			if ($sql_values !== '') {
+				$sql_values .= ',';
+			}
+
+			$sql_values .= $field_name.'='.$value;
+		}
+
+		return $sql_values;
+	}
+
+	private static function updateByIdField(string $table_name, string $sql_values, string $id_field_name,
+			array $ids): void {
+		$sql = 'UPDATE '.$table_name.
+			' SET '.$sql_values.
+			' WHERE '.dbConditionId($id_field_name, $ids);
+
+		if (!DBexecute($sql)) {
+			self::exception(self::DBEXECUTE_ERROR, _s('SQL statement execution has failed "%1$s".', $sql));
+		}
 	}
 
 	/**
@@ -744,40 +842,123 @@ class DB {
 	 *
 	 * Example:
 	 * DB::delete('items', ['itemid' => [1, 8, 6]]);
-	 * DELETE FROM items WHERE itemid IN (1, 8, 6)
+	 * DELETE FROM items WHERE itemid IN (1,8,6)
 	 *
-	 * DB::delete('items', ['itemid' => [1], 'templateid' => [10]]);
-	 * DELETE FROM items WHERE itemid IN (1) AND templateid IN (10)
+	 * DB::delete('items', ['itemid' => [1], 'templateid' => [10, 21]]);
+	 * DELETE FROM items WHERE itemid=1 AND templateid IN (10,21)
 	 *
-	 * @param string $table
-	 * @param array  $wheres pair of fieldname => fieldvalues
-	 * @param bool   $use_or
-	 *
-	 * @return bool
+	 * @param string $table_name
+	 * @param array  $del_conditions
 	 */
-	public static function delete($table, $wheres, $use_or = false) {
-		if (empty($wheres) || !is_array($wheres)) {
-			self::exception(self::DBEXECUTE_ERROR, _s('Cannot perform delete statement on table "%1$s" without where condition.', $table));
-		}
-		$table_schema = self::getSchema($table);
+	public static function delete(string $table_name, array $del_conditions): void {
+		$table_schema = self::getSchema($table_name);
 
-		$sqlWhere = [];
-		foreach ($wheres as $field => $values) {
-			if (!isset($table_schema['fields'][$field]) || is_null($values)) {
-				self::exception(self::DBEXECUTE_ERROR, _s('Incorrect field "%1$s" name or value in where statement for table "%2$s".', $field, $table));
+		self::validateDelConditions($table_name, $table_schema, $del_conditions);
+
+		if (self::hasCompositePk($table_schema)) {
+			self::deleteByConditions($table_name, $del_conditions);
+		}
+		elseif (array_key_exists($table_schema['key'], $del_conditions) && count($del_conditions) == 1) {
+			self::deleteByPkIds($table_name, $del_conditions);
+		}
+		else {
+			self::deleteExistingRowsByPkIds($table_name, $del_conditions, $table_schema['key']);
+		}
+	}
+
+	private static function validateDelConditions(string $table_name, array $table_schema,
+			array &$del_conditions): void {
+		if (!$del_conditions) {
+			self::exception(self::DBEXECUTE_ERROR,
+				_s('Cannot perform delete statement on table "%1$s" without where condition.', $table_name)
+			);
+		}
+
+		foreach ($del_conditions as $field => &$values) {
+			if (!array_key_exists($field, $table_schema['fields']) || $values === null) {
+				self::exception(self::DBEXECUTE_ERROR,
+					_s('Incorrect field "%1$s" name or value in where statement for table "%2$s".', $field, $table_name)
+				);
 			}
-			$values = zbx_toArray($values);
-			sort($values); // sorting ids to prevent deadlocks when two transactions depends from each other
 
-			$sqlWhere[] = dbConditionString($field, $values);
+			$values = zbx_toArray($values);
+			sort($values); // Sorting IDs to prevent deadlocks when two transactions depend on each other.
+		}
+		unset($values);
+	}
+
+	private static function hasCompositePk(array $table_schema): bool {
+		return strpos($table_schema['key'], ',') !== false;
+	}
+
+	private static function deleteByConditions(string $table_name, array $del_conditions): void {
+		$sql_where = [];
+
+		foreach ($del_conditions as $field => $values) {
+			$sql_where[] = dbConditionString($field, $values);
 		}
 
-		$sql = 'DELETE FROM '.$table.' WHERE '.implode(($use_or ? ' OR ' : ' AND '), $sqlWhere);
+		$sql = 'DELETE FROM '.$table_name.
+			' WHERE '.implode(' AND ', $sql_where);
+
 		if (!DBexecute($sql)) {
 			self::exception(self::DBEXECUTE_ERROR, _s('SQL statement execution has failed "%1$s"', $sql));
 		}
+	}
 
-		return true;
+	private static function deleteByPkIds(string $table_name, array $del_conditions): void {
+		$pk_field_name = key($del_conditions);
+
+		$chunkids = [];
+
+		foreach ($del_conditions[$pk_field_name] as $id) {
+			$chunkids[] = $id;
+
+			if (count($chunkids) == self::CHUNK_SIZE) {
+				self::deleteByIdField($table_name, $pk_field_name, $chunkids);
+
+				$chunkids = [];
+			}
+		}
+
+		if ($chunkids) {
+			self::deleteByIdField($table_name, $pk_field_name, $chunkids);
+		}
+	}
+
+	private static function deleteExistingRowsByPkIds(string $table_name, array $del_conditions,
+			string $pk_field_name): void {
+		$options = [
+			'output' => [$pk_field_name],
+			'filter' => $del_conditions,
+			'sortfield' => [$pk_field_name]
+		];
+		$resource = DBselect(self::makeSql($table_name, $options));
+
+		$chunkids = [];
+
+		while ($row = DBfetch($resource)) {
+			$chunkids[] = $row[$pk_field_name];
+
+			if (count($chunkids) == self::CHUNK_SIZE) {
+				self::deleteByIdField($table_name, $pk_field_name, $chunkids);
+
+				$chunkids = [];
+			}
+		}
+
+		if ($chunkids) {
+			self::deleteByIdField($table_name, $pk_field_name, $chunkids);
+		}
+	}
+
+	private static function deleteByIdField(string $table_name, string $id_field_name, array $ids): void {
+		$sql = 'DELETE FROM '.$table_name.
+			' WHERE '.dbConditionId($id_field_name, $ids);
+
+		if (!DBexecute($sql)) {
+			self::exception(self::DBEXECUTE_ERROR, _s('SQL statement execution has failed "%1$s"', $sql));
+		}
 	}
 
 	/**
@@ -906,11 +1087,11 @@ class DB {
 	 * Convert field values to uppercase.
 	 *
 	 * @param string $table_name
-	 * @param array  $row
+	 * @param array  $values
 	 */
-	public static function uppercaseValues(string $table_name, array &$row): void {
-		if (array_key_exists('name_resolved', $row) && self::hasField($table_name, 'name_resolved_upper')) {
-			$row['name_resolved_upper'] = 'UPPER('.$row['name_resolved'].')';
+	public static function uppercaseValues(string $table_name, array &$values): void {
+		if (array_key_exists('name_resolved', $values) && self::hasField($table_name, 'name_resolved_upper')) {
+			$values['name_resolved_upper'] = 'UPPER('.$values['name_resolved'].')';
 		}
 	}
 
