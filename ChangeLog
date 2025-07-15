@@ -837,6 +837,7 @@ A.F....... [ZBX-23227] fixed issue where using an empty array or string value fo
 Changes for 7.0.17rc1
 
 New features:
+....I...S. [ZBXNEXT-9770] prepared for removal of TimescaleDB API calls deprecated since TimescaleDB 2.18.0 (mprihodko)
 .........T [ZBXNEXT-9959] added Cisco Secure Firewall Threat Defense by HTTP template (egordymov)
 .........T [ZBXNEXT-9926] added a new self-test item and improved self-test trigger for both SMART by Zabbix agent 2 templates (knaglis)
 ........S. [ZBXNEXT-10018] updated maximum supported TimescaleDB version to 2.20 (mprihodko)
