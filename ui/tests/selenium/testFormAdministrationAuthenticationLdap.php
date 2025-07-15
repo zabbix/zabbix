@@ -210,7 +210,7 @@ class testFormAdministrationAuthenticationLdap extends CWebTest {
 						$hint->getText()
 				);
 
-				// Check that Bind password is not available.
+				// Check that Change password button is not available.
 				$this->assertFalse($form->getFieldContainer('Bind password')->query('button:Change password')
 						->one(false)->isClickable()
 				);
