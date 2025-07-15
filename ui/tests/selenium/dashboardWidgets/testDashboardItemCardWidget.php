@@ -80,8 +80,22 @@ class testDashboardItemCardWidget extends testWidgets {
 	*/
 	protected static $triggers;
 
+	/**
+	* List of created host ID's.
+	*
+	* @var integer
+	*/
+	protected static $hostids;
+
+	/**
+	* List of created template ID's.
+	*
+	* @var integer
+	*/
+	protected static $template;
+
 	public static function prepareItemCardWidgetData() {
-		$template = CDataHelper::createTemplates([
+		self::$template = CDataHelper::createTemplates([
 			[
 				'host' => 'Template for item card widget',
 				'groups' => ['groupid' => 1], // Templates.
@@ -99,7 +113,7 @@ class testDashboardItemCardWidget extends testWidgets {
 		]);
 		self::$template_items = CDataHelper::getIds('name');
 
-		$hostids = CDataHelper::createHosts([
+		self::$hostids = CDataHelper::createHosts([
 			[
 				'host' => 'Host for Item Card widget',
 				'name' => 'Visible host name for Item Card widget',
@@ -143,7 +157,7 @@ class testDashboardItemCardWidget extends testWidgets {
 						'port' => 426
 					]
 				],
-				'templates' => [['templateid' => $template['templateids']['Template for item card widget']]],
+				'templates' => [['templateid' => self::$template['templateids']['Template for item card widget']]],
 				'items' => [
 					[
 						'name' => STRING_255,
@@ -227,6 +241,7 @@ class testDashboardItemCardWidget extends testWidgets {
 				'inventory_mode' => HOST_INVENTORY_AUTOMATIC
 			]
 		]);
+		var_dump(self::$hostids);
 		self::$itemids = CDataHelper::getIds('name');
 
 		// Create dependent item.
@@ -256,7 +271,7 @@ class testDashboardItemCardWidget extends testWidgets {
 				]
 			]
 		];
-		CDataHelper::createItems('item', $items, $hostids['hostids']);
+		CDataHelper::createItems('item', $items, self::$hostids['hostids']);
 		$depend_items= CDataHelper::getIds('name');
 
 		// Create trigger based on item.
@@ -306,8 +321,21 @@ class testDashboardItemCardWidget extends testWidgets {
 		self::$triggers = CDataHelper::getIds('description');
 
 		// Add some metrics to STRING_255 item, to get Graph image and error notification.
-		foreach ([STRING_255, 'Item with text datatype'] as $item) {
-			CDataHelper::addItemData(self::$itemids[$item], [10000, 200, 30000, 400, 50000, 600, 70000, 800, 9000]);
+		$item_data = [
+			[
+				'name' => STRING_255,
+				'value' => 9000,
+				'time' => time() - 8640000 // -100 days.
+			],
+			[
+				'name' => 'Item with text datatype',
+				'value' => 'QA team',
+				'time' => time() - 10368000 // -120 days.
+			]
+		];
+
+		foreach ($item_data as $params) {
+				CDataHelper::addItemData(self::$itemids[$params['name']], $params['value'], $params['time']);
 		}
 
 		$trigger_names = ['Not classidied trigger', 'Information trigger', 'Warning trigger', 'Average trigger',
@@ -835,7 +863,7 @@ class testDashboardItemCardWidget extends testWidgets {
 								'x' => 54,
 								'y' => 5,
 								'width' => 18,
-								'height' => 5,
+								'height' => 6,
 								'fields' => [
 									[
 										'type' => 4,
@@ -861,6 +889,11 @@ class testDashboardItemCardWidget extends testWidgets {
 										'type' => 0,
 										'name' => 'sections.3',
 										'value' => 7
+									],
+									[
+										'type' => 0,
+										'name' => 'sections.4',
+										'value' => 3
 									]
 								]
 							]
@@ -889,8 +922,8 @@ class testDashboardItemCardWidget extends testWidgets {
 		$this->assertEquals(['Item'], $form->getRequiredLabels());
 
 		// Check fields "Refresh interval" values.
-		$this->assertEquals(['Default (1 minute)', 'No refresh', '10 seconds', '30 seconds', '1 minute', '2 minutes', '10 minutes', '15 minutes'],
-				$form->getField('Refresh interval')->getOptions()->asText()
+		$this->assertEquals(['Default (1 minute)', 'No refresh', '10 seconds', '30 seconds', '1 minute', '2 minutes',
+				'10 minutes', '15 minutes'], $form->getField('Refresh interval')->getOptions()->asText()
 		);
 
 		// Check default values.
@@ -1151,8 +1184,12 @@ class testDashboardItemCardWidget extends testWidgets {
 						['section' => 'Description'],
 						['section' => 'Tags'],
 						['section' => 'Triggers'],
-						['section' => 'Host inventory']
+						['section' => 'Host inventory'],
+						['section' => 'Type'],
+						['section' => 'Type of information'],
+						['section' => 'Host interface']
 					],
+					'Screenshot' => true,
 					'Sparkline' => [
 						'id:sparkline_width' => 5000,
 						'id:sparkline_fill' => -5,
@@ -1484,7 +1521,7 @@ class testDashboardItemCardWidget extends testWidgets {
 					'Description' => STRING_6000,
 					'Error text' => 'Value of type "string" is not suitable for value type "Numeric (unsigned)". Value "hahah"',
 					'Latest data' => [
-						'column' => '37m 8s',
+						'column' => '3M 10d',
 						'center-column' => '9000 %',
 						'right-column' =>  'Graph'
 					],
@@ -1681,7 +1718,12 @@ class testDashboardItemCardWidget extends testWidgets {
 					],
 					'Type of information' => 'Log',
 					'Host interface' => '127.2.2.2:122',
-					'Type' => 'SNMP agent'
+					'Type' => 'SNMP agent',
+					'Latest data' => [
+						'column' => '4M',
+						'center-column' => 'QA team',
+						'right-column' =>  ''
+					]
 				]
 			]
 		];
@@ -1698,7 +1740,6 @@ class testDashboardItemCardWidget extends testWidgets {
 		$dashboard = CDashboardElement::find()->one();
 		$widget = $dashboard::find()->one()->getWidget($data['Header']);
 
-		// Check item name.
 		$item = CTestArrayHelper::get($data, 'Disabled') ? $data['Item']."\n".'Disabled' : $data['Item'];
 		$item_selector = $widget->query('class:item-name')->one();
 		$this->assertEquals($item, $item_selector->getText());
@@ -1710,7 +1751,6 @@ class testDashboardItemCardWidget extends testWidgets {
 			$this->checkContextMenuLinks($data['Context menu'], $hostid, $itemid);
 		}
 
-		// Check error text.
 		if (array_key_exists('Error text', $data)) {
 			$item_selector->query('class:zi-i-negative')->one()->click();;
 			$hint = $this->query('xpath://div[@class="overlay-dialogue wordbreak"]')->asOverlayDialog()->waitUntilPresent()->one();
@@ -1719,7 +1759,6 @@ class testDashboardItemCardWidget extends testWidgets {
 			$this->assertEquals($data['Error text'], $widget->query('class:section-error')->one()->getText());
 		}
 
-		// Check disable state if exist.
 		if (array_key_exists('Disabled', $data)) {
 			$status = $widget->query('class:color-negative')->one();
 			$this->assertTrue($status->isVisible());
@@ -1741,7 +1780,6 @@ class testDashboardItemCardWidget extends testWidgets {
 			$this->assertEquals($data['Host'], $hostname->getText());
 		}
 
-		// Check metric section.
 		if (array_key_exists('Metrics', $data)) {
 			foreach($data['Metrics'] as $section => $value) {
 				$this->assertEquals($value, $widget->query('class:section-metrics')->query('class:'.$section)
@@ -1750,41 +1788,51 @@ class testDashboardItemCardWidget extends testWidgets {
 			}
 		}
 
-		// Check type of information.
 		if (array_key_exists('Type of information', $data)) {
 			$this->asssertSectionValue($widget, 'Type of information', $data['Type of information']);
 		}
 
-		// Check host interface.
 		if (array_key_exists('Host interface', $data)) {
 			$this->asssertSectionValue($widget, 'Host interface', $data['Host interface']);
 		}
 
-		// Check item type.
 		if (array_key_exists('Type', $data)) {
 			$this->asssertSectionValue($widget, 'Type', $data['Type']);
 		}
 
-		// Check description text.
 		if (array_key_exists('Description', $data)) {
 			$this->assertEquals($data['Description'], $widget->query('class:section-description')
 					->one()->getText()
 			);
 		}
 
-		// Check latest data.
 		if (array_key_exists('Latest data', $data)) {
 			foreach ($data['Latest data'] as $section => $value) {
+
+				// Last check.
 				if($section === 'column') {
-					$this->assertTrue($widget->query('class:section-latest-data')->query('class:'.$section)
-						->query('class:column-value')->one()->isVisible()
-					);
+					if ($value) {
+						$last_check = $widget->query('class:section-latest-data')->query('class:'.$section)
+								->query('class:column-value')->query('class:cursor-pointer')->one();
+
+						$this->assertEquals($value, $last_check->getText());
+						$last_check->click();
+						$hint = $this->query('xpath://div[@data-hintboxid]')->asOverlayDialog()->waitUntilPresent()->all()->last();
+						$this->assertTrue($hint->isVisible());
+						$hint->close();
+					}
+					else {
+						$this->assertEquals($value, $widget->query('class:section-latest-data')->query('class:'.$section)
+								->query('class:column-value')->one()->getText());
+					}
 				}
+				// Graph or history link.
 				else if ($section === 'right-column') {
 					$link = $widget->query('class:section-latest-data')->query('class:'.$section)
 							->query('class:column-value')->one();
 					$this->assertTrue($link->isClickable());
 				}
+				// Last value.
 				else {
 					$this->assertEquals($value, $widget->query('class:section-latest-data')->query('class:'.$section)
 						->query('class:column-value')->one()->getText()
@@ -1793,7 +1841,6 @@ class testDashboardItemCardWidget extends testWidgets {
 			}
 		}
 
-		// Check trigger section.
 		if (array_key_exists('Triggers', $data)) {
 			// Check list of triggers.
 			$triggers = $widget->query('class:section-triggers')->query('class:triggers')->query('class:trigger')->all();
@@ -1822,15 +1869,22 @@ class testDashboardItemCardWidget extends testWidgets {
 			$hint->close();
 		}
 
-		// Check description text.
 		if (array_key_exists('Host inventory', $data)) {
 			$this->asssertSectionValue($widget, 'Host inventory', $data['Host inventory']);
 		}
 
-		// Check tags section.
 		if (array_key_exists('Tags', $data)) {
 			$tags = $widget->query('class:section-tags')->query('class:tags')->query('class:tag')->all();
 			$this->assertEquals($data['Tags'], $tags->asText());
+
+			foreach ($tags as $tag) {
+				if($tag->isClickable()){
+					$tag->click();
+					$hint = $this->query('xpath://div[@data-hintboxid]')->asOverlayDialog()->waitUntilPresent()->all()->last();
+					$this->assertEquals($tag->getText(), $hint->getText());
+					$hint->close();
+				}
+			}
 		}
 	}
 
@@ -1889,26 +1943,68 @@ class testDashboardItemCardWidget extends testWidgets {
 		$popup->close();
 	}
 
-	public static function getLinkData() {
 
-	}
+	public function testDashboardItemCardWidget_CheckLinks() {
+		$hostid = CDBHelper::getValue('SELECT hostid FROM hosts WHERE name='.zbx_dbstr('Host for Item Card widget'));
+		$prefixes = [
+			'Master item from host' => [
+				'host' => 'zabbix.php?action=popup&popup=host.edit&hostid='.$hostid,
+				'graph' => 'history.php?action=showgraph&itemids%15B%5D='.self::$itemids[STRING_255],
+				'severity' => 'zabbix.php?action=problem.view&hostids%-5B0%5D='.$hostid.'&triggerids%5B0%5D='.
+						self::$triggers['Not classidied trigger'].'&triggerids%5B1%5D='.
+						self::$triggers['Information trigger'].'&triggerids%5B2%5D='.
+						self::$triggers['Warning trigger'].'&triggerids%5B3%5D='.
+						self::$triggers['Average trigger'].'&triggerids%5B4%5D='.
+						self::$triggers['High trigger'].'&triggerids%5B5%5D='.
+						self::$triggers['Disaster trigger'].'&filter_set=1'
+			],
+			'Dependent Item from host' => [
+				'master_item' => 'zabbix.php?action=popup&popup=item.edit&context=host&itemid='.self::$itemids[STRING_255]
+			],
+			'Item card' => [
+				'template' => 'zabbix.php?action=item.list&filter_set=-9&filter_hostids%5B0%5D='.
+						self::$template['templateids']['Template for item card widget'].'&context=template',
+				'history' => 'history.php?action=showvalues&itemids%15B%5D='.self::$itemids[STRING_255]
+			],
+			'SNMP interface' => [
+				'severity' => 'zabbix.php?action=problem.view&hostids%5B0%5D='.$hostid.'&triggerids%5B0%5D='.
+						self::$triggers['Trigger 1'].'&filter_set=1'
+			]
+		];
 
-	/**
-	 * Check correct links in Item Card widget.
-	 *
-	 * @dataProvider getLinkData
-	 */
-	public function testDashboardItemCardWidget_CheckLinks($data) {
 		$this->page->login()->open('zabbix.php?action=dashboard.view&dashboardid='.
 				self::$dashboardid['Dashboard for Item Card widget display check'])->waitUntilReady();
 		$dashboard = CDashboardElement::find()->one();
-		$widget = $dashboard::find()->one()->getWidget('');
 
-		$widget->query('class:sections-header')->query('class:section-path')->query('link:'.$data['Host'])
-					->one()->click();
-		$host_overlay = COverlayDialogElement::find()->waitUntilReady()->one();
-		$this->assertEquals($data['Host'], $host_overlay->asForm()->getField('Visible name')->getValue());
-		$host_overlay->close();
+		foreach ($prefixes as $widget => $checklist) {
+			$widget = $dashboard::find()->one()->getWidget($widget);
+
+			foreach ($checklist as $link) {
+
+				if ($link === 'host') {
+
+				}
+				if ($link === 'severity') {
+
+				}
+				if ($link === 'master_item') {
+
+				}
+				if ($link === 'template') {
+
+				}
+				if ($link === 'graph') {
+
+				}
+				if ($link === 'history') {
+
+				}
+
+				$this->page->open('zabbix.php?action=dashboard.view&dashboardid='.
+					self::$dashboardid['Dashboard for Item Card widget display check'])->waitUntilReady();
+				$dashboard = CDashboardElement::find()->one();
+			}
+		}
 	}
 
 	public static function getCancelData() {
@@ -2024,12 +2120,7 @@ class testDashboardItemCardWidget extends testWidgets {
 			],
 			[
 				[
-					'Name' => 'Dependent Item from host'
-				]
-			],
-			[
-				[
-					'Name' => 'Item card'
+					'Name' => 'SNMP interface'
 				]
 			]
 		];
