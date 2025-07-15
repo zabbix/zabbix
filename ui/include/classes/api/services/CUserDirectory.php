@@ -269,7 +269,7 @@ class CUserDirectory extends CApiService {
 			$options['selectProvisionMedia'] = self::MEDIA_OUTPUT_FIELDS;
 		}
 
-		$db_provisioning_media = DB::select('userdirectory_media', [
+		$db_provisioning_medias = DB::select('userdirectory_media', [
 			'output' => array_merge($options['selectProvisionMedia'], ['userdirectoryid']),
 			'filter' => [
 				'userdirectoryid' => array_keys($result)
@@ -277,9 +277,9 @@ class CUserDirectory extends CApiService {
 		]);
 		$requested_output = array_flip($options['selectProvisionMedia']);
 
-		foreach ($db_provisioning_media as $db_provisioning_medium) {
-			$result[$db_provisioning_medium['userdirectoryid']]['provision_media'][]
-				= array_intersect_key($db_provisioning_medium, $requested_output);
+		foreach ($db_provisioning_medias as $db_provisioning_media) {
+			$result[$db_provisioning_media['userdirectoryid']]['provision_media'][]
+				= array_intersect_key($db_provisioning_media, $requested_output);
 		}
 	}
 
