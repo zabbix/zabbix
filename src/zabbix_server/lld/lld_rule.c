@@ -3053,6 +3053,8 @@ int	lld_rule_discover_prototypes(zbx_uint64_t hostid, const zbx_vector_lld_row_p
 		while (NULL != (row_ruleid = (zbx_lld_row_ruleid_t *)zbx_hashset_iter_next(&iter)))
 			zbx_vector_uint64_append(&ruleids, row_ruleid->ruleid);
 
+		zbx_vector_uint64_sort(&ruleids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
+
 		if (FAIL == lld_update_items(hostid, item_prototype->itemid,  &prules->lld_rows, error, &lifetime,
 				&enabled_lifetime, lastcheck, ZBX_FLAG_DISCOVERY_PROTOTYPE, &prules->rule_index,
 				&ruleids))
