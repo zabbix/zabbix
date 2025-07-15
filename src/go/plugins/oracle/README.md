@@ -1,7 +1,7 @@
 # Oracle Database plugin
 
 This plugin provides a native Zabbix solution to monitor Oracle Database (multi-model database management system).
-It can monitor several Oracle instances simultaneously; remote or local to Zabbix agent.
+It can monitor several Oracle instances simultaneously; remote or local to Zabbix agent 2.
 The plugin keeps connections in an open state to reduce network congestion, latency, CPU and
 memory usage. It is highly recommended to use it in conjunction with the official 
 [Oracle template.](https://git.zabbix.com/projects/ZBX/repos/zabbix/browse/templates/db/oracle_agent2) 
@@ -423,11 +423,11 @@ WHERE
 
 ## Troubleshooting
 
-The plugin uses logs of Zabbix Agent 2. You can increase the debugging level of Zabbix Agent 2 if you need more details about the current situation.
+The plugin uses logs of Zabbix agent 2. You can increase the debugging level of Zabbix agent 2 if you need more details about the current situation.
 The environment variable DPI_DEBUG_LEVEL can be used to selectively turn on the printing of various logging messages from Oracle Database Programming Interface for C (ODPI-C).
 See [ODPI-C Debugging](https://oracle.github.io/odpi/doc/user_guide/debugging.html) for details.
 
 ## Footnotes
-<a name="footnote-1">1</a>: Global timeout is defined in Zabbix Agent 2 configuration file zabbix_agent2.config the option Timeout.
+<a name="footnote-1">1</a>: Global timeout is defined in Zabbix agent 2 configuration file zabbix_agent2.config the option Timeout.
 
 <a name="footnote-2">2</a>: TNS or Transparent Network Substrate is a connection description format used by Oracle databases to manage communication between clients (like SQL*Plus, Oracle SQL Developer, etc.) and Oracle databases. TNS is part of Oracle Net Services, which is responsible for enabling communication between different systems in an Oracle environment.

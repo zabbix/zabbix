@@ -667,12 +667,12 @@ func Test_containsOnlyHostname(t *testing.T) { //nolint:tparallel
 			want{false, true},
 		},
 		{
-			"-Empty",
+			"-empty",
 			args{""},
 			want{false, true},
 		},
 		{
-			"-Whitespaces",
+			"-whitespaces",
 			args{"       "},
 			want{false, true},
 		},
