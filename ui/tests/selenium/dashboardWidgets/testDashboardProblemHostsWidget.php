@@ -25,8 +25,6 @@ class testDashboardProblemHostsWidget extends testWidgets {
 
 	const DELETE_WIDGET = 'Delete Problem hosts';
 	const MAP_WIDGET = 'Map widget for broadcasting';
-	const HOSTGROUP_NAME = 'Host group for map widget';
-	const HOST_NAME = 'Host for map widget';
 
 	protected static $default_widget = 'Update problem hosts';
 	protected static $dashboardid;
@@ -87,7 +85,7 @@ class testDashboardProblemHostsWidget extends testWidgets {
 								'width' => 36,
 								'height' => 5,
 								'fields' => [
-									['type' => ZBX_WIDGET_FIELD_TYPE_MAP, 'name' => 'sysmapid', 'value' => 1],
+									['type' => ZBX_WIDGET_FIELD_TYPE_MAP, 'name' => 'sysmapid', 'value' => 1], // Local network map.
 									['type' => ZBX_WIDGET_FIELD_TYPE_STR, 'name' => 'reference', 'value' => 'CCCCC']
 								]
 							]
@@ -460,7 +458,7 @@ class testDashboardProblemHostsWidget extends testWidgets {
 		];
 	}
 
-		public static function getCreateDefaultData() {
+	public static function getCreateDefaultData() {
 		return [
 			// #14 Submitting empty form with default values.
 			[
