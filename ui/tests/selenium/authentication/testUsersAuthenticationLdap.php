@@ -2927,7 +2927,7 @@ class testUsersAuthenticationLdap extends testFormAuthentication {
 						$hint->getText()
 				);
 
-				// Check that Bind password is not available.
+				// Check that Change password button is not available.
 				$this->assertFalse($ldap_form->getFieldContainer('Bind password')->query('button:Change password')
 						->one(false)->isClickable()
 				);
