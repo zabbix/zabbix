@@ -350,6 +350,7 @@ int	vfs_file_exists(AGENT_REQUEST *request, AGENT_RESULT *result)
 int	vfs_file_contents(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
 #define ZBX_MAX_VFS_FILE_SIZE	16 * ZBX_MEBIBYTE	/* file contents larger than 64 KB will be truncated in the database */
+#define ZBX_MAX_VFS_FILE_SIZE_JSON     255 * ZBX_MEBIBYTE
 	char		*filename, *tmp, encoding[32];
 	char		read_buf[MAX_BUFFER_LEN], *utf8, *contents = NULL;
 	size_t		contents_alloc = 0, contents_offset = 0;
@@ -395,7 +396,7 @@ int	vfs_file_contents(AGENT_REQUEST *request, AGENT_RESULT *result)
 		goto err;
 	}
 
-	if (ZBX_MAX_VFS_FILE_SIZE < stat_buf.st_size)
+	if (ZBX_MAX_VFS_FILE_SIZE_JSON < stat_buf.st_size)
 	{
 		SET_MSG_RESULT(result, zbx_strdup(NULL, "File is too large for this check."));
 		goto err;
@@ -418,7 +419,7 @@ int	vfs_file_contents(AGENT_REQUEST *request, AGENT_RESULT *result)
 			goto err;
 		}
 
-		if (ZBX_MAX_VFS_FILE_SIZE < (flen += nbytes))
+		if (ZBX_MAX_VFS_FILE_SIZE_JSON < (flen += nbytes))
 		{
 			SET_MSG_RESULT(result, zbx_strdup(NULL, "File is too large for this check."));
 			zbx_free(contents);

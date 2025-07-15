@@ -536,9 +536,12 @@ static void	normalize_item_value(const zbx_history_sync_item_t *item, zbx_dc_his
 				logvalue = hdata->value.log->value;
 				logvalue[zbx_db_strlen_n(logvalue, ZBX_HISTORY_LOG_VALUE_LEN)] = '\0';
 				break;
-			case ITEM_VALUE_TYPE_BIN:
 			case ITEM_VALUE_TYPE_JSON:
-				/* in history cache binary values and JSON values are stored as ITEM_VALUE_TYPE_STR */
+				/* JSON values do not need to be truncated since their sizes are already checked */
+				/* before inserting them into history cache. */
+				break;
+			case ITEM_VALUE_TYPE_BIN:
+				/* in history cache binary values are stored as ITEM_VALUE_TYPE_STR */
 				THIS_SHOULD_NEVER_HAPPEN;
 				break;
 			case ITEM_VALUE_TYPE_FLOAT:

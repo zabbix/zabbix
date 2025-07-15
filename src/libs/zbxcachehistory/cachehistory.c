@@ -2484,7 +2484,7 @@ void	zbx_dc_add_history(zbx_uint64_t itemid, unsigned char item_value_type, unsi
 		}
 		else if (ZBX_ISSET_JSON(result))
 		{
-			dc_local_add_history_json(itemid, item_value_type, ts, result->bin, result->lastlogsize,
+			dc_local_add_history_json(itemid, item_value_type, ts, result->tjson, result->lastlogsize,
 					result->mtime, value_flags);
 		}
 		else
@@ -2628,6 +2628,14 @@ void	zbx_dc_add_history_variant(zbx_uint64_t itemid, unsigned char value_type, u
 			{
 				struct zbx_json_parse   jp;
 
+				if (ZBX_HISTORY_JSON_VALUE_LEN < strlen(value->data.json))
+				{
+					dc_local_add_history_notsupported(itemid, &ts,
+							"JSON limit reached. ", lastlogsize, mtime,
+							value_flags);
+					return;
+				}
+
 				if (FAIL == zbx_json_open(value->data.str, &jp))
 				{
 
@@ -2636,10 +2644,15 @@ void	zbx_dc_add_history_variant(zbx_uint64_t itemid, unsigned char value_type, u
 							value_flags);
 					return;
 				}
-			}
 
-			dc_local_add_history_text(itemid, value_type, &ts, value->data.str, lastlogsize, mtime,
-					value_flags);
+				dc_local_add_history_json(itemid, value_type, &ts, value->data.json, lastlogsize, mtime,
+						value_flags);
+			}
+			else
+			{
+				dc_local_add_history_text(itemid, value_type, &ts, value->data.str, lastlogsize, mtime,
+						value_flags);
+			}
 			break;
 		case ZBX_VARIANT_NONE:
 		case ZBX_VARIANT_BIN:

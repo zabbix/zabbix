@@ -27,7 +27,8 @@
 #	include "zbx_dbversion_constants.h"
 #endif
 
-#define ZBX_MAX_SQL_SIZE	262144	/* 256KB */
+#define ZBX_MAX_SQL_SIZE	262144 * 1024	/* 256KB */
+
 #ifndef ZBX_MAX_OVERFLOW_SQL_SIZE
 #	define ZBX_MAX_OVERFLOW_SQL_SIZE	ZBX_MAX_SQL_SIZE
 #elif 0 != ZBX_MAX_OVERFLOW_SQL_SIZE && \
