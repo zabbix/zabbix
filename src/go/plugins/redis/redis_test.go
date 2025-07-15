@@ -24,6 +24,7 @@ import (
 func TestPlugin_Start(t *testing.T) {
 	t.Run("Connection manager must be initialized", func(t *testing.T) {
 		impl.Start()
+
 		if impl.connMgr == nil {
 			t.Error("Connection manager is not initialized")
 		}
@@ -66,8 +67,10 @@ func TestPlugin_Export(t *testing.T) {
 			gotResult, err := tt.p.Export(tt.args.key, tt.args.params, tt.args.ctx)
 			if (err != nil) != tt.wantErr {
 				t.Errorf("Plugin.Export() error = %v, wantErr %v", err, tt.wantErr)
+
 				return
 			}
+
 			if !reflect.DeepEqual(gotResult, tt.wantResult) {
 				t.Errorf("Plugin.Export() = %v, want %v", gotResult, tt.wantResult)
 			}
@@ -78,6 +81,7 @@ func TestPlugin_Export(t *testing.T) {
 func TestPlugin_Stop(t *testing.T) {
 	t.Run("Connection manager must be deinitialized", func(t *testing.T) {
 		impl.Stop()
+
 		if impl.connMgr != nil {
 			t.Error("Connection manager is not deinitialized")
 		}

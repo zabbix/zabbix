@@ -49,6 +49,7 @@ func TestPlugin_configHandler(t *testing.T) {
 		conn   conn.RedisClient
 		params map[string]string
 	}
+
 	tests := []struct {
 		name    string
 		args    args
@@ -85,8 +86,10 @@ func TestPlugin_configHandler(t *testing.T) {
 			got, err := ConfigHandler(tt.args.conn, tt.args.params)
 			if (err != nil) != tt.wantErr {
 				t.Errorf("Plugin.ConfigHandler() error = %v, wantErr %v", err, tt.wantErr)
+
 				return
 			}
+
 			if !reflect.DeepEqual(got, tt.want) {
 				t.Errorf("Plugin.ConfigHandler() = %v, want %v", got, tt.want)
 			}

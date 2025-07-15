@@ -22,6 +22,7 @@ import (
 
 	"github.com/mediocregopher/radix/v3"
 	"golang.zabbix.com/agent2/plugins/redis/info"
+	"golang.zabbix.com/sdk/errs"
 	"golang.zabbix.com/sdk/log"
 	"golang.zabbix.com/sdk/uri"
 	"golang.zabbix.com/sdk/zbxerr"
@@ -35,26 +36,9 @@ type RedisClient interface {
 	Query(cmd radix.CmdAction) error
 }
 
-func NewRedisConn(client radix.Client) *RedisConn {
-	return &RedisConn{
-		client:         client,
-		lastTimeAccess: time.Now(),
-	}
-}
-
 type RedisConn struct {
 	client         radix.Client
 	lastTimeAccess time.Time
-}
-
-// Query wraps the radix.Client.Do function.
-func (r *RedisConn) Query(cmd radix.CmdAction) error {
-	return r.client.Do(cmd)
-}
-
-// updateAccessTime updates the last time a connection was accessed.
-func (r *RedisConn) updateAccessTime() {
-	r.lastTimeAccess = time.Now()
 }
 
 // ConnManager is thread-safe structure for manage connections.
@@ -65,6 +49,13 @@ type ConnManager struct {
 	keepAlive   time.Duration
 	timeout     time.Duration
 	Destroy     context.CancelFunc
+}
+
+func NewRedisConn(client radix.Client) *RedisConn {
+	return &RedisConn{
+		client:         client,
+		lastTimeAccess: time.Now(),
+	}
 }
 
 // NewConnManager initializes ConnManager structure and runs Go Routine that watches for unused connections.
@@ -81,6 +72,34 @@ func NewConnManager(keepAlive, timeout, hkInterval time.Duration) *ConnManager {
 	go connMgr.housekeeper(ctx, hkInterval)
 
 	return connMgr
+}
+
+// Query wraps the radix.Client.Do function.
+func (r *RedisConn) Query(cmd radix.CmdAction) error {
+	return r.client.Do(cmd)
+}
+
+// GetConnection returns an existing connection or creates a new one.
+func (c *ConnManager) GetConnection(uri uri.URI) (conn *RedisConn, err error) {
+	c.Lock()
+	defer c.Unlock()
+
+	conn = c.get(uri)
+
+	if conn == nil {
+		conn, err = c.create(uri)
+	}
+
+	if err != nil {
+		err = errs.WrapConst(err, zbxerr.ErrorConnectionFailed)
+	}
+
+	return conn, err
+}
+
+// updateAccessTime updates the last time a connection was accessed.
+func (r *RedisConn) updateAccessTime() {
+	r.lastTimeAccess = time.Now()
 }
 
 // closeUnused closes each connection that has not been accessed at least within the keepalive interval.
@@ -188,26 +207,9 @@ func (c *ConnManager) get(uri uri.URI) *RedisConn {
 
 	if conn, ok := c.connections[uri]; ok {
 		conn.updateAccessTime()
+
 		return conn
 	}
 
 	return nil
-}
-
-// GetConnection returns an existing connection or creates a new one.
-func (c *ConnManager) GetConnection(uri uri.URI) (conn *RedisConn, err error) {
-	c.Lock()
-	defer c.Unlock()
-
-	conn = c.get(uri)
-
-	if conn == nil {
-		conn, err = c.create(uri)
-	}
-
-	if err != nil {
-		err = zbxerr.ErrorConnectionFailed.Wrap(err)
-	}
-
-	return conn, err
 }

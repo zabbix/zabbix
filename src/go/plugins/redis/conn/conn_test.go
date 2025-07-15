@@ -32,6 +32,7 @@ func TestConnManager_closeUnused(t *testing.T) {
 
 	t.Run("Unused connections should have been deleted", func(t *testing.T) {
 		connMgr.closeUnused()
+
 		if len(connMgr.connections) != 0 {
 			t.Errorf("connMgr.connections expected to be empty, but actual length is %d", len(connMgr.connections))
 		}
@@ -47,6 +48,7 @@ func TestConnManager_closeAll(t *testing.T) {
 
 	t.Run("All connections should have been deleted", func(t *testing.T) {
 		connMgr.closeAll()
+
 		if len(connMgr.connections) != 0 {
 			t.Errorf("connMgr.connections expected to be empty, but actual length is %d", len(connMgr.connections))
 		}
@@ -100,6 +102,7 @@ func TestConnManager_create(t *testing.T) {
 
 			if (err != nil) != tt.wantErr {
 				t.Errorf("ConnManager.create() error = %v, wantErr %v", err, tt.wantErr)
+
 				return
 			}
 
@@ -135,6 +138,7 @@ func TestConnManager_get(t *testing.T) {
 		if !reflect.DeepEqual(got, conn) {
 			t.Errorf("ConnManager.get() = %v, want %v", got, conn)
 		}
+
 		if lastTimeAccess == got.lastTimeAccess {
 			t.Error("conn.lastTimeAccess should be updated, but it's not")
 		}

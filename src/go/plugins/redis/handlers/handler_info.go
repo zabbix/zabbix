@@ -22,17 +22,19 @@ import (
 
 	"github.com/mediocregopher/radix/v3"
 	"golang.zabbix.com/agent2/plugins/redis/conn"
+	"golang.zabbix.com/sdk/errs"
 	"golang.zabbix.com/sdk/zbxerr"
 )
+
+var redisSlaveMetricRE = regexp.MustCompile(`^slave\d+`)
 
 type infoSection string
 type infoKey string
 type infoKeySpace map[infoKey]interface{}
 type infoExtKey string
 type infoExtKeySpace map[infoExtKey]string
-type redisInfo map[infoSection]infoKeySpace
 
-var redisSlaveMetricRE = regexp.MustCompile(`^slave\d+`)
+type redisInfo map[infoSection]infoKeySpace
 
 // parseRedisInfo parses an output of 'INFO' command.
 // https://redis.io/commands/info
@@ -113,7 +115,7 @@ func InfoHandler(conn conn.RedisClient, params map[string]string) (interface{}, 
 
 	err := conn.Query(radix.Cmd(&res, "INFO", string(section)))
 	if err != nil {
-		return nil, zbxerr.ErrorCannotFetchData.Wrap(err)
+		return nil, errs.WrapConst(err, zbxerr.ErrorCannotFetchData)
 	}
 
 	redisInfo, err := parseRedisInfo(res)
@@ -123,7 +125,7 @@ func InfoHandler(conn conn.RedisClient, params map[string]string) (interface{}, 
 
 	jsonRes, err := json.Marshal(redisInfo)
 	if err != nil {
-		return nil, zbxerr.ErrorCannotMarshalJSON.Wrap(err)
+		return nil, errs.WrapConst(err, zbxerr.ErrorCannotMarshalJSON)
 	}
 
 	return string(jsonRes), nil
