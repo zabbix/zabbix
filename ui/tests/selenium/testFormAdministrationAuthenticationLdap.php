@@ -196,6 +196,7 @@ class testFormAdministrationAuthenticationLdap extends CWebTest {
 		$this->page->login()->open('zabbix.php?action=authentication.edit');
 		$form = $this->query('name:form_auth')->asForm()->one();
 		$form->selectTab('LDAP settings');
+		$bind_password_field = $form->getFieldContainer('Bind password');
 
 		// Change fields one by one and check that Bind password field cleared only after Host change.
 		foreach ($values as $field => $value) {
@@ -204,26 +205,20 @@ class testFormAdministrationAuthenticationLdap extends CWebTest {
 
 			if ($field === 'LDAP host') {
 				$form->checkValue(['Bind password' => '']);
-				$form->getFieldContainer('Bind password')->query('xpath:./a[@data-hintbox]')->one()->click();
+				$bind_password_field->query('xpath:./a[@data-hintbox]')->one()->click();
 				$hint = $this->query('xpath://div[@class="overlay-dialogue wordbreak"]')->waitUntilPresent()->one();
 				$this->assertEquals('The previous password was cleared due to a host change. Please enter the new password.',
 						$hint->getText()
 				);
 
 				// Check that Change password button is not available.
-				$this->assertFalse($form->getFieldContainer('Bind password')->query('button:Change password')
-						->one(false)->isClickable()
-				);
+				$this->assertFalse($bind_password_field->query('button:Change password')->one(false)->isClickable());
 			}
 			else {
-				$this->assertTrue($form->getFieldContainer('Bind password')->query('button:Change password')
-						->one()->isClickable()
-				);
+				$this->assertTrue($bind_password_field->query('button:Change password')->one()->isClickable());
 
 				// Check that hint is not visible.
-				$this->assertFalse($form->getFieldContainer('Bind password')->query('xpath:./a[@data-hintbox]')
-						->one()->isVisible()
-				);
+				$this->assertFalse($bind_password_field->query('xpath:./a[@data-hintbox]')->one()->isVisible());
 			}
 		}
 	}
