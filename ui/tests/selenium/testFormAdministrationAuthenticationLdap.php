@@ -188,7 +188,7 @@ class testFormAdministrationAuthenticationLdap extends CWebTest {
 			'Base DN' => 'base_dn_1',
 			'Search attribute' => 'search_attribute_1',
 			'Bind DN' => 'bind_dn_1',
-			'Login' => 'Login_1',
+			'Login' => 'login_1',
 			'User password' => 'password_1',
 			'LDAP host' => 'host_created'
 		];
@@ -205,14 +205,24 @@ class testFormAdministrationAuthenticationLdap extends CWebTest {
 			if ($field === 'LDAP host') {
 				$form->checkValue(['Bind password' => '']);
 				$form->getFieldContainer('Bind password')->query('xpath:./a[@data-hintbox]')->one()->click();
-				$hint = $this->query('xpath://div[@class="overlay-dialogue wordbreak"]')->waitUntilPresent()->all()->last();
+				$hint = $this->query('xpath://div[@class="overlay-dialogue wordbreak"]')->waitUntilPresent()->one();
 				$this->assertEquals('The previous password was cleared due to a host change. Please enter the new password.',
 						$hint->getText()
 				);
+
+				// Check that Bind password is not available.
+				$this->assertFalse($form->getFieldContainer('Bind password')->query('button:Change password')
+						->one(false)->isClickable()
+				);
 			}
 			else {
-				$this->AssertTrue($form->getFieldContainer('Bind password')->query('button:Change password')->one()
-						->isClickable()
+				$this->assertTrue($form->getFieldContainer('Bind password')->query('button:Change password')
+						->one()->isClickable()
+				);
+
+				// Check that hint is not visible.
+				$this->assertFalse($form->getFieldContainer('Bind password')->query('xpath:./a[@data-hintbox]')
+						->one()->isVisible()
 				);
 			}
 		}
