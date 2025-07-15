@@ -2922,14 +2922,24 @@ class testUsersAuthenticationLdap extends testFormAuthentication {
 			if ($field === 'Host') {
 				$ldap_form->checkValue(['Bind password' => '']);
 				$ldap_form->getFieldContainer('Bind password')->query('xpath:./button[@data-hintbox]')->one()->click();
-				$hint = $this->query('xpath://div[@class="overlay-dialogue wordbreak"]')->waitUntilPresent()->all()->last();
+				$hint = $this->query('xpath://div[@class="overlay-dialogue wordbreak"]')->waitUntilPresent()->one();
 				$this->assertEquals('The previous password was cleared due to a host change. Please enter the new password.',
 						$hint->getText()
 				);
+
+				// Check that Bind password is not available.
+				$this->assertFalse($ldap_form->getFieldContainer('Bind password')->query('button:Change password')
+						->one(false)->isClickable()
+				);
 			}
 			else {
-				$this->AssertTrue($ldap_form->getFieldContainer('Bind password')->query('button:Change password')->one()
-						->isClickable()
+				$this->assertTrue($ldap_form->getFieldContainer('Bind password')->query('button:Change password')
+						->one()->isClickable()
+				);
+
+				// Check that hint is not visible.
+				$this->assertFalse($ldap_form->getFieldContainer('Bind password')->query('xpath:./button[@data-hintbox]')
+						->one()->isVisible()
 				);
 			}
 		}
