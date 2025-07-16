@@ -120,12 +120,12 @@ class WidgetView extends CControllerDashboardWidgetView {
 						'webitems' => true
 					]);
 
-					if (count($src_items) > 0) {
+					if ($src_items) {
 						$options['filter']['key_'] = $src_items[0]['key_'];
 					}
 				}
 
-				if ($this->isTemplateDashboard() || count($src_items) > 0) {
+				if ($this->isTemplateDashboard() || $src_items) {
 					$items = API::Item()->get($options);
 					$item = reset($items);
 
@@ -267,7 +267,7 @@ class WidgetView extends CControllerDashboardWidgetView {
 					: $graph['name'];
 
 				if ($this->fields_values['override_hostid'] && $resourceid
-					&& array_key_exists('name', $host) && !empty($graph)) {
+						&& array_key_exists('name', $host) && !empty($graph)) {
 					$graph_src = $this->prepareGraphSrc($graph, $host);
 				}
 
@@ -350,8 +350,8 @@ class WidgetView extends CControllerDashboardWidgetView {
 	}
 
 	private function setAxisItem(array $graph, string $axis): array {
-		$type_key = "{$axis}_type";
-		$itemid_key = "{$axis}_itemid";
+		$type_key = $axis . '_type';
+		$itemid_key = $axis . '_itemid';
 
 		if ($graph[$type_key] == GRAPH_YAXIS_TYPE_ITEM_VALUE && $graph[$itemid_key]) {
 			$item = ['itemid' => $graph[$itemid_key]];
