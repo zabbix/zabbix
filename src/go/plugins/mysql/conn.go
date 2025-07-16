@@ -25,6 +25,7 @@ import (
 
 	"github.com/go-sql-driver/mysql"
 	"github.com/omeid/go-yarn"
+	"golang.zabbix.com/sdk/errs"
 	"golang.zabbix.com/sdk/log"
 	"golang.zabbix.com/sdk/tlsconfig"
 	"golang.zabbix.com/sdk/uri"
@@ -106,6 +107,27 @@ func (conn *MyConn) QueryRow(ctx context.Context, query string, args ...interfac
 	return
 }
 
+// NewConnManager initializes connManager structure and runs Go Routine that watches for unused connections.
+func NewConnManager(
+	keepAlive, connectTimeout, callTimeout, hkInterval time.Duration, queryStorage yarn.Yarn, logger log.Logger,
+) *ConnManager {
+	ctx, cancel := context.WithCancel(context.Background())
+
+	connMgr := &ConnManager{
+		connections:    make(map[connKey]*MyConn),
+		keepAlive:      keepAlive,
+		connectTimeout: connectTimeout,
+		callTimeout:    callTimeout,
+		Destroy:        cancel, // Destroy stops originated goroutines and closes connections.
+		queryStorage:   queryStorage,
+		log:            logger,
+	}
+
+	go connMgr.housekeeper(ctx, hkInterval)
+
+	return connMgr
+}
+
 // GetConnection returns an existing connection or creates a new one.
 func (c *ConnManager) GetConnection(uri uri.URI, params map[string]string) (*MyConn, error) {
 	ck := createConnKey(uri, params)
@@ -127,27 +149,6 @@ func (c *ConnManager) GetConnection(uri uri.URI, params map[string]string) (*MyC
 	}
 
 	return c.setConn(ck, conn), nil
-}
-
-// NewConnManager initializes connManager structure and runs Go Routine that watches for unused connections.
-func NewConnManager(
-	keepAlive, connectTimeout, callTimeout, hkInterval time.Duration, queryStorage yarn.Yarn, logger log.Logger,
-) *ConnManager {
-	ctx, cancel := context.WithCancel(context.Background())
-
-	connMgr := &ConnManager{
-		connections:    make(map[connKey]*MyConn),
-		keepAlive:      keepAlive,
-		connectTimeout: connectTimeout,
-		callTimeout:    callTimeout,
-		Destroy:        cancel, // Destroy stops originated goroutines and closes connections.
-		queryStorage:   queryStorage,
-		log:            logger,
-	}
-
-	go connMgr.housekeeper(ctx, hkInterval)
-
-	return connMgr
 }
 
 // updateLastAccessTime updates the last time a connection was accessed.
@@ -307,17 +308,27 @@ func (c *ConnManager) getTLSConfig(details *tlsconfig.Details) (*tls.Config, err
 	case "required":
 		tlsConf, err = c.getRequiredTLSConfig(details)
 		if err != nil {
-			return nil, zbxerr.New("failed to get TLS config for required connection").Wrap(err)
+			return nil, errs.Wrap(err, "failed to get TLS config for required connection")
 		}
 	case "verify_ca":
-		tlsConf, err = details.GetTLSConfig(true)
+		details.Apply(tlsconfig.WithTlsSkipVerify(true), tlsconfig.WithTlsServerName(""))
+
+		tlsConf, err = details.GetTLSConfig()
 		if err != nil {
-			return nil, zbxerr.New("failed to get TLS config for verify_ca connection").Wrap(err)
+			return nil, errs.Wrap(err, "failed to get TLS config for verify_ca connectionn")
 		}
 
 		tlsConf.VerifyPeerCertificate = tlsconfig.VerifyPeerCertificateFunc("", tlsConf.RootCAs)
 	case "verify_full":
-		tlsConf, err = details.GetTLSConfig(false)
+		//moved from sdk workaround which leads to set ServerName to match the URI always
+		url, err := uri.New(details.RawUri, nil)
+		if err != nil {
+			return nil, errs.Wrap(err, "failed to parse uri")
+		}
+
+		details.Apply(tlsconfig.WithTlsSkipVerify(false), tlsconfig.WithTlsServerName(url.Host()))
+
+		tlsConf, err = details.GetTLSConfig()
 		if err != nil {
 			return nil, zbxerr.New("failed to get TLS config for verify_full connection").Wrap(err)
 		}
@@ -367,15 +378,17 @@ func getTLSDetails(ck connKey) (*tlsconfig.Details, error) {
 
 	details := tlsconfig.NewDetails(
 		"",
-		ck.tlsConnect,
-		ck.tlsCA,
-		ck.tlsCert,
-		ck.tlsKey,
 		ck.rawUri,
-		disable,
-		require,
-		verifyCa,
-		verifyFull,
+		tlsconfig.WithTlsCaFile(ck.tlsCA),
+		tlsconfig.WithTlsCertFile(ck.tlsCert),
+		tlsconfig.WithTlsKeyFile(ck.tlsKey),
+		tlsconfig.WithTlsConnect(ck.tlsConnect),
+		tlsconfig.WithAllowedConnections(
+			disable,
+			require,
+			verifyCa,
+			verifyFull,
+		),
 	)
 
 	if ck.tlsConnect == disable || ck.tlsConnect == require {
@@ -388,7 +401,7 @@ func getTLSDetails(ck connKey) (*tlsconfig.Details, error) {
 
 	err := details.Validate(validateCA, validateClient, validateClient)
 	if err != nil {
-		return nil, zbxerr.ErrorInvalidConfiguration.Wrap(err)
+		return nil, errs.WrapConst(err, zbxerr.ErrorInvalidConfiguration)
 	}
 
 	return &details, nil
