@@ -58,7 +58,6 @@ class CApiSettingsHelper {
 	 */
 	public static function updateParameters(array $settings, array $db_settings = []): void {
 		$upd_settings = [];
-		$saml_auth_enabled = null;
 
 		foreach ($settings as $name => $value) {
 			$column = CSettingsSchema::PARAMETERS[$name]['column'];
@@ -68,10 +67,6 @@ class CApiSettingsHelper {
 				continue;
 			}
 
-			if ($name === 'saml_auth_enabled') {
-				$saml_auth_enabled = $value;
-			}
-
 			$upd_settings[] = [
 				'values' => [$column => $value],
 				'where' => ['name' => $name]
@@ -79,21 +74,7 @@ class CApiSettingsHelper {
 		}
 
 		if ($upd_settings) {
-			$result = DB::update('settings', $upd_settings);
-
-			if ($result && $saml_auth_enabled == ZBX_AUTH_SAML_DISABLED) {
-				$db_saml = API::UserDirectory()->get([
-					'output' => ['userdirectoryid'],
-					'filter' => ['idp_type' => IDP_TYPE_SAML]
-				]);
-
-				if ($db_saml) {
-					DB::update('userdirectory_saml', [
-						'values' => ['idp_certificate' => '', 'sp_certificate' => '', 'sp_private_key' => ''],
-						'where' => ['userdirectoryid' => $db_saml[0]['userdirectoryid']]
-					]);
-				}
-			}
+			DB::update('settings', $upd_settings);
 		}
 	}
 

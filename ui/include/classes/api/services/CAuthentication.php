@@ -82,6 +82,22 @@ class CAuthentication extends CApiService {
 
 		CApiSettingsHelper::updateParameters($auth, $db_auth);
 
+		if ($auth['saml_auth_enabled'] != $db_auth['saml_auth_enabled']
+				&& $auth['saml_auth_enabled'] == ZBX_AUTH_SAML_DISABLED) {
+			$db_userdirectories = API::UserDirectory()->get([
+				'output' => [],
+				'filter' => ['idp_type' => IDP_TYPE_SAML],
+				'preservekeys' => true
+			]);
+
+			if ($db_userdirectories) {
+				DB::update('userdirectory_saml', [
+					'values' => ['idp_certificate' => '', 'sp_certificate' => '', 'sp_private_key' => ''],
+					'where' => ['userdirectoryid' => array_keys($db_userdirectories)]
+				]);
+			}
+		}
+
 		self::addAuditLog(CAudit::ACTION_UPDATE, CAudit::RESOURCE_AUTHENTICATION, [$auth], [$db_auth]);
 
 		return array_keys($auth);
