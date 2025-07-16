@@ -1016,8 +1016,8 @@ class testDashboardItemCardWidget extends testWidgets {
 		// Check name field maxlength.
 		$this->assertEquals(255, $form->getField('Name')->getAttribute('maxlength'));
 
-		foreach (['Type', 'Show header', 'Name', 'Refresh interval', 'Item', 'Show', 'Override host'] as $lable) {
-			$this->assertTrue($form->getField($lable)->isVisible(true));
+		foreach (['Type', 'Show header', 'Name', 'Refresh interval', 'Item', 'Show', 'Override host'] as $label) {
+			$this->assertTrue($form->getField($label)->isVisible(true));
 		}
 
 		$this->assertEquals(['Item'], $form->getRequiredLabels());
@@ -1428,7 +1428,7 @@ class testDashboardItemCardWidget extends testWidgets {
 				[
 					'expected' => TEST_GOOD,
 					'fields' => [
-						'Name' => 'Dashboard souce for override host field',
+						'Name' => 'Dashboard source for override host field',
 						'Refresh interval' => '10 minutes',
 						'Item' => STRING_255,
 						'Override host' => 'Dashboard'
@@ -1456,7 +1456,7 @@ class testDashboardItemCardWidget extends testWidgets {
 				[
 					'expected' => TEST_GOOD,
 					'fields' => [
-						'Name' => 'Other widget as the souce for override host field',
+						'Name' => 'Other widget as the source for override host field',
 						'Refresh interval' => '15 minutes',
 						'Item' => STRING_255,
 						'Override host' => 'Geomap'
