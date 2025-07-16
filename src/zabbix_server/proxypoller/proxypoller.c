@@ -624,8 +624,11 @@ static int	process_proxy(const zbx_config_vault_t *config_vault, int config_time
 
 				do
 				{
-					if (FAIL == zbx_hc_check_proxy(proxy.proxyid) ||
-							SUCCEED == zbx_vps_monitor_capped())
+					if (SUCCEED == zbx_vps_monitor_capped())
+						break;
+
+					if (FAIL == zbx_hc_check_proxy(proxy.proxyid) &&
+							ZBX_PROXY_LARGE_HISTORY_SET == proxy.large_history_data)
 					{
 						break;
 					}
@@ -635,6 +638,16 @@ static int	process_proxy(const zbx_config_vault_t *config_vault, int config_time
 							config_source_ip, &more)))
 					{
 						goto error;
+					}
+
+					if (ZBX_PROXY_DATA_MORE != more)
+					{
+						zbx_dc_update_proxy_large_history_flag(&proxy, ZBX_PROXY_LARGE_HISTORY_DEFAULT);
+					}
+					else if (FAIL == zbx_hc_check_proxy(proxy.proxyid))
+					{
+						zbx_dc_update_proxy_large_history_flag(&proxy, ZBX_PROXY_LARGE_HISTORY_SET);
+						break;
 					}
 
 					check_tasks = 0;

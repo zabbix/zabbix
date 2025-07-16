@@ -83,6 +83,27 @@ int	zbx_send_proxy_data_response(const zbx_dc_proxy_t *proxy, zbx_socket_t *sock
 
 /******************************************************************************
  *                                                                            *
+ * Purpose: checks if 'proxy data' packet has more flag                       *
+ *                                                                            *
+ * Return value: SUCCEED - 'proxy data' contains more flag                    *
+ *               FAIL    - otherwise                                          *
+ *                                                                            *
+ ******************************************************************************/
+static int	proxy_data_has_more_flag(const struct zbx_json_parse *jp)
+{
+	char	value[MAX_STRING_LEN];
+
+	if (SUCCEED == zbx_json_value_by_name(jp, ZBX_PROTO_TAG_MORE, value, sizeof(value), NULL) &&
+			1 == atoi(value))
+	{
+		return SUCCEED;
+	}
+
+	return FAIL;
+}
+
+/******************************************************************************
+ *                                                                            *
  * Purpose: checks if 'proxy data' packet has historical data                 *
  *                                                                            *
  * Return value: SUCCEED - 'proxy data' contains no historical records        *
@@ -153,13 +174,14 @@ void	recv_proxy_data(zbx_socket_t *sock, const struct zbx_json_parse *jp, const 
 		goto reply;
 	}
 
-	if (FAIL == (ret = zbx_hc_check_proxy(proxy.proxyid)) || SUCCEED == zbx_vps_monitor_capped())
+	upload_status = ZBX_PROXY_UPLOAD_ENABLED;
+
+	if (SUCCEED == zbx_vps_monitor_capped() ||
+		(FAIL == (ret = zbx_hc_check_proxy(proxy.proxyid)) && SUCCEED == proxy_data_has_more_flag(jp)))
 	{
 		upload_status = ZBX_PROXY_UPLOAD_DISABLED;
 		ret = proxy_data_no_history(jp);
 	}
-	else
-		upload_status = ZBX_PROXY_UPLOAD_ENABLED;
 
 	if (SUCCEED == ret)
 	{

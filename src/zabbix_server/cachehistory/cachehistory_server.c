@@ -1762,7 +1762,7 @@ int	zbx_hc_check_proxy(zbx_uint64_t proxyid)
 	{
 		zbx_hc_proxyqueue_enqueue(proxyid);
 
-		if (60 < hc_pused)
+		if (40 < hc_pused)
 		{
 			ret = FAIL;
 			goto out;
@@ -1772,7 +1772,7 @@ int	zbx_hc_check_proxy(zbx_uint64_t proxyid)
 	}
 	else
 	{
-		if (80 <= hc_pused)
+		if (60 <= hc_pused)
 		{
 			zbx_dbcache_setproxyqueue_state(ZBX_HC_PROXYQUEUE_STATE_WAIT);
 			zbx_hc_proxyqueue_enqueue(proxyid);

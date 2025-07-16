@@ -163,6 +163,8 @@ static int	proxy_data_sender(int *more, int now, int *hist_upload_state, const z
 			zbx_json_adduint64(&j, ZBX_PROTO_TAG_MORE, ZBX_PROXY_DATA_MORE);
 			*more = ZBX_PROXY_DATA_MORE;
 		}
+			zbx_json_adduint64(&j, ZBX_PROTO_TAG_MORE, ZBX_PROXY_DATA_MORE);
+			*more = ZBX_PROXY_DATA_MORE;
 
 		zbx_json_addstring(&j, ZBX_PROTO_TAG_VERSION, ZABBIX_VERSION, ZBX_JSON_TYPE_STRING);
 

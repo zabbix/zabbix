@@ -7327,6 +7327,7 @@ static void	DCsync_proxies(zbx_dbsync_t *sync, zbx_uint64_t revision, const zbx_
 			proxy->nodata_win.values_num = 0;
 			proxy->nodata_win.period_end = 0;
 			proxy->proxy_groupid = 0;
+			proxy->large_history_data = ZBX_PROXY_LARGE_HISTORY_DEFAULT;
 
 			zbx_vector_dc_host_ptr_create_ext(&proxy->hosts, __config_shmem_malloc_func,
 					__config_shmem_realloc_func, __config_shmem_free_func);
@@ -12393,6 +12394,7 @@ static void	DCget_proxy(zbx_dc_proxy_t *dst_proxy, const ZBX_DC_PROXY *src_proxy
 	dst_proxy->version_int = src_proxy->version_int;
 	dst_proxy->compatibility = src_proxy->compatibility;
 	dst_proxy->lastaccess = src_proxy->lastaccess;
+	dst_proxy->large_history_data = src_proxy->large_history_data;
 	dst_proxy->last_version_error_time = src_proxy->last_version_error_time;
 
 	zbx_strscpy(dst_proxy->name, src_proxy->name);
@@ -17174,6 +17176,21 @@ int	zbx_dc_get_proxy_version(zbx_uint64_t proxyid)
 	UNLOCK_CACHE;
 
 	return version;
+}
+
+void	zbx_dc_update_proxy_large_history_flag(zbx_dc_proxy_t *proxy, int flag)
+{
+	ZBX_DC_PROXY	*dc_proxy;
+
+	if (proxy->large_history_data == flag)
+		return;
+
+	WRLOCK_CACHE;
+
+	if (NULL != (dc_proxy = (ZBX_DC_PROXY *)zbx_hashset_search(&config->proxies, &proxy->proxyid)))
+		dc_proxy->large_history_data = flag;
+
+	UNLOCK_CACHE;
 }
 
 /******************************************************************************
