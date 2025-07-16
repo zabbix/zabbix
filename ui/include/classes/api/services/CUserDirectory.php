@@ -41,6 +41,10 @@ class CUserDirectory extends CApiService {
 		'idp_certificate_hash', 'sp_certificate_hash', 'sp_private_key_hash'
 	];
 
+	private const SAML_SP_CERTIFICATE_MARKERS = ['sign_messages', 'sign_assertions', 'sign_authn_requests',
+		'sign_logout_requests', 'sign_logout_responses', 'encrypt_nameid', 'encrypt_assertions'
+	];
+
 	public const SAML_HASH_FIELDS = [
 		'idp_certificate_hash' => 'idp_certificate',
 		'sp_certificate_hash' => 'sp_certificate',
@@ -598,6 +602,12 @@ class CUserDirectory extends CApiService {
 					_s('Invalid parameter "%1$s": %2$s.', '/'.($i + 1).'/idp_type', _('cannot be changed'))
 				);
 			}
+
+			if ($userdirectory['idp_type'] == IDP_TYPE_SAML && CAuthenticationHelper::isSamlCertsStorageDatabase()) {
+				$userdirectory += array_intersect_key($db_userdirectory,
+					array_flip(array_merge(self::SAML_SP_CERTIFICATE_MARKERS, ['sp_certificate', 'sp_private_key']))
+				);
+			}
 		}
 		unset($userdirectory);
 
@@ -619,10 +629,6 @@ class CUserDirectory extends CApiService {
 
 		self::validateProvisionMedias($userdirectories, $db_userdirectories);
 
-		if (CAuthenticationHelper::isSamlCertsStorageDatabase()) {
-			self::validateSpCertificateWithSecurityOptions($userdirectories, $db_userdirectories);
-		}
-
 		self::checkDuplicates($userdirectories, $db_userdirectories);
 		self::checkProvisionGroups($userdirectories, $db_userdirectories);
 		self::checkMediaTypes($userdirectories, $db_userdirectories);
@@ -642,42 +648,7 @@ class CUserDirectory extends CApiService {
 		}
 	}
 
-	private static function validateSpCertificateWithSecurityOptions(array $userdirectories, array $db_userdirectories): void {
-		$sp_certificate_items = ['sp_certificate', 'sp_private_key'];
-
-		$security_keys = ['sign_messages', 'sign_assertions', 'sign_authn_requests', 'sign_logout_requests',
-			'sign_logout_responses', 'encrypt_nameid', 'encrypt_assertions'];
-
-		foreach ($userdirectories as $i => $userdirectory) {
-			if ($userdirectory['idp_type'] != IDP_TYPE_SAML) {
-				continue;
-			}
-
-			$db_userdirectory = $db_userdirectories[$userdirectory['userdirectoryid']];
-
-			$security_options = array_merge(
-				array_intersect_key($db_userdirectory, array_flip($security_keys)),
-				array_intersect_key($userdirectory, array_flip($security_keys))
-			);
-
-
-			if (in_array(1, $security_options)) {
-				foreach ($sp_certificate_items as $sp_certificate_item) {
-					$path = '/'.($i + 1).'/'.$sp_certificate_item;
-
-					if (array_key_exists($sp_certificate_item, $userdirectory) && $userdirectory[$sp_certificate_item] === '') {
-						self::exception(ZBX_API_ERROR_PARAMETERS,
-							_s('Invalid parameter "%1$s": %2$s.', $path, _('cannot be empty'))
-						);
-					}
-				}
-			}
-
-			unset($security_options);
-		}
-	}
-
-	private static function addSamlWriteOnlyDbFields(array $userdirectories, array &$db_userdirectories): void {
+	private static function addSamlCertificateDbFields(array $userdirectories, array &$db_userdirectories): void {
 		$userdirectoryids = [];
 
 		foreach ($userdirectories as $userdirectory) {
@@ -1652,31 +1623,31 @@ class CUserDirectory extends CApiService {
 										['else' => true, 'type' => API_UNEXPECTED]
 			]],
 			'sign_messages' =>		['type' => API_MULTIPLE, 'rules' => [
-										['if' => ['field' => 'idp_type', 'in' => implode(',', [IDP_TYPE_SAML])], 'type' => API_INT32, 'in' => implode(',', ['0', '1'])],
+										['if' => ['field' => 'idp_type', 'in' => implode(',', [IDP_TYPE_SAML])], 'type' => API_INT32, 'in' => implode(',', ['0', '1'])] + ($is_update ? [] : ['default' => DB::getDefault('userdirectory', 'sign_messages')]),
 										['else' => true, 'type' => API_UNEXPECTED]
 			]],
 			'sign_assertions' =>	['type' => API_MULTIPLE, 'rules' => [
-										['if' => ['field' => 'idp_type', 'in' => implode(',', [IDP_TYPE_SAML])], 'type' => API_INT32, 'in' => implode(',', ['0', '1'])],
+										['if' => ['field' => 'idp_type', 'in' => implode(',', [IDP_TYPE_SAML])], 'type' => API_INT32, 'in' => implode(',', ['0', '1'])] + ($is_update ? [] : ['default' => DB::getDefault('userdirectory', 'sign_assertions')]),
 										['else' => true, 'type' => API_UNEXPECTED]
 			]],
 			'sign_authn_requests' => ['type' => API_MULTIPLE, 'rules' => [
-										['if' => ['field' => 'idp_type', 'in' => implode(',', [IDP_TYPE_SAML])], 'type' => API_INT32, 'in' => implode(',', ['0', '1'])],
+										['if' => ['field' => 'idp_type', 'in' => implode(',', [IDP_TYPE_SAML])], 'type' => API_INT32, 'in' => implode(',', ['0', '1'])] + ($is_update ? [] : ['default' => DB::getDefault('userdirectory', 'sign_authn_requests')]),
 										['else' => true, 'type' => API_UNEXPECTED]
 			]],
 			'sign_logout_requests' => ['type' => API_MULTIPLE, 'rules' => [
-										['if' => ['field' => 'idp_type', 'in' => implode(',', [IDP_TYPE_SAML])], 'type' => API_INT32, 'in' => implode(',', ['0', '1'])],
+										['if' => ['field' => 'idp_type', 'in' => implode(',', [IDP_TYPE_SAML])], 'type' => API_INT32, 'in' => implode(',', ['0', '1'])] + ($is_update ? [] : ['default' => DB::getDefault('userdirectory', 'sign_logout_requests')]),
 										['else' => true, 'type' => API_UNEXPECTED]
 			]],
 			'sign_logout_responses' => ['type' => API_MULTIPLE, 'rules' => [
-										['if' => ['field' => 'idp_type', 'in' => implode(',', [IDP_TYPE_SAML])], 'type' => API_INT32, 'in' => implode(',', ['0', '1'])],
+										['if' => ['field' => 'idp_type', 'in' => implode(',', [IDP_TYPE_SAML])], 'type' => API_INT32, 'in' => implode(',', ['0', '1'])] + ($is_update ? [] : ['default' => DB::getDefault('userdirectory', 'sign_logout_responses')]),
 										['else' => true, 'type' => API_UNEXPECTED]
 			]],
 			'encrypt_nameid' =>		['type' => API_MULTIPLE, 'rules' => [
-										['if' => ['field' => 'idp_type', 'in' => implode(',', [IDP_TYPE_SAML])], 'type' => API_INT32, 'in' => implode(',', ['0', '1'])],
+										['if' => ['field' => 'idp_type', 'in' => implode(',', [IDP_TYPE_SAML])], 'type' => API_INT32, 'in' => implode(',', ['0', '1'])] + ($is_update ? [] : ['default' => DB::getDefault('userdirectory', 'encrypt_nameid')]),
 										['else' => true, 'type' => API_UNEXPECTED]
 			]],
 			'encrypt_assertions' => ['type' => API_MULTIPLE, 'rules' => [
-										['if' => ['field' => 'idp_type', 'in' => implode(',', [IDP_TYPE_SAML])], 'type' => API_INT32, 'in' => implode(',', ['0', '1'])],
+										['if' => ['field' => 'idp_type', 'in' => implode(',', [IDP_TYPE_SAML])], 'type' => API_INT32, 'in' => implode(',', ['0', '1'])] + ($is_update ? [] : ['default' => DB::getDefault('userdirectory', 'encrypt_assertions')]),
 										['else' => true, 'type' => API_UNEXPECTED]
 			]],
 			'scim_status' =>		['type' => API_MULTIPLE, 'rules' => [
@@ -1685,21 +1656,27 @@ class CUserDirectory extends CApiService {
 			]],
 			'idp_certificate' =>	['type' => API_MULTIPLE, 'rules' => [
 										['if' => static fn(): bool => CAuthenticationHelper::isSamlCertsStorageDatabase(), 'type' => API_MULTIPLE, 'rules' => [
-											['if' => ['field' => 'idp_type', 'in' => IDP_TYPE_SAML], 'type' => API_SSL_CERTIFICATE, 'flags' => $api_required | API_NOT_EMPTY],
+											['if' => ['field' => 'idp_type', 'in' => implode(',', [IDP_TYPE_SAML])], 'type' => API_SSL_CERTIFICATE, 'flags' => $api_required | API_NOT_EMPTY],
 											['else' => true, 'type' => API_STRING_UTF8, 'in' => DB::getDefault('userdirectory_saml', 'idp_certificate')]
 										]],
 										['else' => true, 'type' => API_UNEXPECTED]
 			]],
 			'sp_certificate' =>		['type' => API_MULTIPLE, 'rules' => [
 										['if' => static fn(): bool => CAuthenticationHelper::isSamlCertsStorageDatabase(), 'type' => API_MULTIPLE, 'rules' => [
-											['if' => ['field' => 'idp_type', 'in' => IDP_TYPE_SAML], 'type' => API_SSL_CERTIFICATE],
+											['if' => ['field' => 'idp_type', 'in' => implode(',', [IDP_TYPE_SAML])], 'type' => API_MULTIPLE, 'rules' => [
+												['if' => static fn(array $data): bool => in_array(1, array_intersect_key($data, array_flip(self::SAML_SP_CERTIFICATE_MARKERS))), 'type' => API_SSL_CERTIFICATE, 'flags' => $api_required | API_NOT_EMPTY],
+												['else' => true, 'type' => API_SSL_CERTIFICATE]
+											]],
 											['else' => true, 'type' => API_STRING_UTF8, 'in' => DB::getDefault('userdirectory_saml', 'sp_certificate')]
 										]],
 										['else' => true, 'type' => API_UNEXPECTED]
 			]],
 			'sp_private_key' =>		['type' => API_MULTIPLE, 'rules' => [
 										['if' => static fn(): bool => CAuthenticationHelper::isSamlCertsStorageDatabase(), 'type' => API_MULTIPLE, 'rules' => [
-											['if' => ['field' => 'idp_type', 'in' => IDP_TYPE_SAML], 'type' => API_SSL_PRIVATE_KEY],
+											['if' => ['field' => 'idp_type', 'in' => implode(',', [IDP_TYPE_SAML])], 'type' => API_MULTIPLE, 'rules' => [
+												['if' => static fn(array $data): bool => in_array(1, array_intersect_key($data, array_flip(self::SAML_SP_CERTIFICATE_MARKERS))), 'type' => API_SSL_PRIVATE_KEY, 'flags' => $api_required | API_NOT_EMPTY],
+												['else' => true, 'type' => API_SSL_PRIVATE_KEY]
+											]],
 											['else' => true, 'type' => API_STRING_UTF8, 'in' => DB::getDefault('userdirectory_saml', 'sp_private_key')]
 										]],
 										['else' => true, 'type' => API_UNEXPECTED]
