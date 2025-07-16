@@ -15,6 +15,7 @@
 package smart
 
 import (
+	"encoding/json"
 	"fmt"
 	"reflect"
 	"testing"
@@ -22,6 +23,7 @@ import (
 
 	"github.com/google/go-cmp/cmp"
 	"golang.zabbix.com/agent2/plugins/smart/mock"
+	"golang.zabbix.com/sdk/errs"
 )
 
 const (
@@ -45,6 +47,29 @@ const (
 		  "percentage_used": 0,
 		  "power_on_hours": 2222,
 		  "media_errors": 0
+		}
+	  }`
+
+	nvmeMediaErrorOverflow = `{
+		"smartctl": {
+		  "exit_status": 0
+		},
+		"device": {
+		  "name": "/dev/nvme0",
+		  "type": "nvme"
+		},
+		"model_name": "INTEL SSDPEKNW512G8H",
+		"serial_number": "BTNH115603K7512A",
+		"firmware_version": "HPS1",
+		"smart_status": {
+		  "passed": true
+		},
+		"nvme_smart_health_information_log": {
+		  "critical_warning": 0,
+		  "temperature": 25,
+		  "percentage_used": 0,
+		  "power_on_hours": 2222,
+		  "media_errors": 12345678901234567890
 		}
 	  }`
 
@@ -572,6 +597,133 @@ func boolToPtr(v bool) *bool {
 	return &v
 }
 
+func Test_diskGetSingle(t *testing.T) {
+	t.Parallel()
+
+	type args struct {
+		path     string
+		raidType string
+	}
+
+	type fileds struct {
+		ctlOutput []byte
+		ctlErr    error
+	}
+
+	type want struct {
+		output  []byte
+		wantErr bool
+	}
+
+	tests := []struct {
+		name   string
+		args   args
+		fileds fileds
+		want   want
+	}{
+		{
+			"+normalValues",
+			args{
+				path:     "path",
+				raidType: "rt",
+			},
+			fileds{
+				ctlOutput: []byte(nvme),
+				ctlErr:    nil,
+			},
+			want{
+				output: []byte(
+					`{"critical_warning":0,"disk_type":"nvme","error":"","exit_status":0,"firmware_version":"HPS1",` +
+						`"media_errors":0,"model_name":"INTEL SSDPEKNW512G8H",` +
+						`"percentage_used":0,"power_on_time":2222,"self_test_in_progress":null,` +
+						`"self_test_passed":null,"serial_number":"BTNH115603K7512A","temperature":25}`,
+				),
+				wantErr: false,
+			},
+		},
+		{
+			"+valueOverflow",
+			args{
+				path:     "path",
+				raidType: "rt",
+			},
+			fileds{
+				ctlOutput: []byte(nvmeMediaErrorOverflow),
+				ctlErr:    nil,
+			},
+			want{
+				output: []byte(
+					`{"critical_warning":0,"disk_type":"nvme","error":"","exit_status":0,"firmware_version":"HPS1",` +
+						`"media_errors":12345678901234567890,"model_name":"INTEL SSDPEKNW512G8H",` +
+						`"percentage_used":0,"power_on_time":2222,"self_test_in_progress":null,` +
+						`"self_test_passed":null,"serial_number":"BTNH115603K7512A","temperature":25}`,
+				),
+				wantErr: false,
+			},
+		},
+		{
+			"-ctlError",
+			args{
+				path:     "path",
+				raidType: "rt",
+			},
+			fileds{
+				ctlOutput: []byte{},
+				ctlErr:    errs.New("test"),
+			},
+			want{
+				output:  []byte{},
+				wantErr: true,
+			},
+		},
+		{
+			"-jsonFormatError",
+			args{
+				path:     "path",
+				raidType: "rt",
+			},
+			fileds{
+				ctlOutput: []byte(`{abc`),
+				ctlErr:    nil,
+			},
+			want{
+				output:  []byte{},
+				wantErr: true,
+			},
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			t.Parallel()
+			mockCTL := mock.NewMockController(t)
+
+			mockCTL.
+				ExpectExecute().
+				WillReturnOutput(tt.fileds.ctlOutput).
+				WillReturnError(tt.fileds.ctlErr)
+
+			p := &Plugin{
+				ctl: mockCTL,
+			}
+
+			out, err := p.diskGetSingle(tt.args.path, tt.args.raidType)
+			if (err != nil) != tt.want.wantErr {
+				t.Errorf("diskGetSingle() wanted error to be %v, but got %q", tt.want.wantErr, err.Error())
+			}
+
+			if diff := cmp.Diff(string(out), string(tt.want.output)); diff != "" {
+				t.Errorf("diskGetSingle() output differs from expected %s", diff)
+			}
+
+			err = mockCTL.ExpectationsWhereMet()
+			if err != nil {
+				t.Errorf("Mock expectations were not met %q", err.Error())
+			}
+		})
+	}
+}
+
 func Test_setSingleDiskFields(t *testing.T) {
 	var nilReference *bool
 
@@ -593,7 +745,27 @@ func Test_setSingleDiskFields(t *testing.T) {
 				"error":                 "",
 				"exit_status":           0,
 				"firmware_version":      "HPS1",
-				"media_errors":          0,
+				"media_errors":          json.Number("0"),
+				"model_name":            "INTEL SSDPEKNW512G8H",
+				"percentage_used":       0,
+				"power_on_time":         2222,
+				"self_test_passed":      nilReference,
+				"self_test_in_progress": nilReference,
+				"serial_number":         "BTNH115603K7512A",
+				"temperature":           25,
+			},
+			false,
+		},
+		{
+			"mediaOverflow",
+			args{[]byte(nvmeMediaErrorOverflow)},
+			map[string]interface{}{
+				"critical_warning":      0,
+				"disk_type":             "nvme",
+				"error":                 "",
+				"exit_status":           0,
+				"firmware_version":      "HPS1",
+				"media_errors":          json.Number("12345678901234567890"),
 				"model_name":            "INTEL SSDPEKNW512G8H",
 				"percentage_used":       0,
 				"power_on_time":         2222,
@@ -607,13 +779,13 @@ func Test_setSingleDiskFields(t *testing.T) {
 		{
 			"hdd_device",
 			args{[]byte(hdd)},
-			map[string]interface{}{
+			map[string]any{
 				"critical_warning":      0,
 				"disk_type":             "hdd",
 				"error":                 "",
 				"exit_status":           0,
 				"firmware_version":      "CV26",
-				"media_errors":          0,
+				"media_errors":          json.Number("0"),
 				"model_name":            "ST1000VX000-1ES162",
 				"percentage_used":       0,
 				"power_on_time":         39153,
@@ -635,13 +807,13 @@ func Test_setSingleDiskFields(t *testing.T) {
 		{
 			"ssd_device",
 			args{[]byte(ssd)},
-			map[string]interface{}{
+			map[string]any{
 				"critical_warning":      0,
 				"disk_type":             "ssd",
 				"error":                 "",
 				"exit_status":           0,
 				"firmware_version":      "O1225G",
-				"media_errors":          0,
+				"media_errors":          json.Number("0"),
 				"model_name":            "TS128GMTS800",
 				"percentage_used":       0,
 				"power_on_time":         732,
@@ -675,7 +847,7 @@ func Test_setSingleDiskFields(t *testing.T) {
 				"error":                 "",
 				"exit_status":           0,
 				"firmware_version":      "O1225G",
-				"media_errors":          0,
+				"media_errors":          json.Number("0"),
 				"model_name":            "TS128GMTS800",
 				"percentage_used":       0,
 				"power_on_time":         732,
@@ -705,8 +877,8 @@ func Test_setSingleDiskFields(t *testing.T) {
 				return
 			}
 
-			if !reflect.DeepEqual(gotOut, tt.wantOut) {
-				t.Errorf("setSingleDiskFields() = %v, want %v", gotOut, tt.wantOut)
+			if diff := cmp.Diff(gotOut, tt.wantOut); diff != "" {
+				t.Errorf("setSingleDiskFields() = \n%v\n, want \n%v\n", gotOut, tt.wantOut)
 			}
 		})
 	}
@@ -736,7 +908,7 @@ func Test_setSingleDiskFieldsWithSelfTest(t *testing.T) {
 				"error":                 "",
 				"exit_status":           0,
 				"firmware_version":      "O1225G",
-				"media_errors":          0,
+				"media_errors":          json.Number("0"),
 				"model_name":            "TS128GMTS800",
 				"percentage_used":       0,
 				"power_on_time":         732,
@@ -770,7 +942,7 @@ func Test_setSingleDiskFieldsWithSelfTest(t *testing.T) {
 				"error":                 "",
 				"exit_status":           0,
 				"firmware_version":      "O1225G",
-				"media_errors":          0,
+				"media_errors":          json.Number("0"),
 				"model_name":            "TS128GMTS800",
 				"percentage_used":       0,
 				"power_on_time":         732,
@@ -804,7 +976,7 @@ func Test_setSingleDiskFieldsWithSelfTest(t *testing.T) {
 				"error":                 "",
 				"exit_status":           0,
 				"firmware_version":      "O1225G",
-				"media_errors":          0,
+				"media_errors":          json.Number("0"),
 				"model_name":            "TS128GMTS800",
 				"percentage_used":       0,
 				"power_on_time":         732,
@@ -838,7 +1010,7 @@ func Test_setSingleDiskFieldsWithSelfTest(t *testing.T) {
 				"error":                 "",
 				"exit_status":           0,
 				"firmware_version":      "O1225G",
-				"media_errors":          0,
+				"media_errors":          json.Number("0"),
 				"model_name":            "TS128GMTS800",
 				"percentage_used":       0,
 				"power_on_time":         732,

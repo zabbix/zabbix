@@ -124,11 +124,11 @@ type singleDevice struct {
 }
 
 type healthLog struct {
-	Temperature     int `json:"temperature"`
-	PowerOnTime     int `json:"power_on_hours"`
-	CriticalWarning int `json:"critical_warning"`
-	MediaErrors     int `json:"media_errors"`
-	PercentageUsed  int `json:"percentage_used"`
+	Temperature     int         `json:"temperature"`
+	PowerOnTime     int         `json:"power_on_hours"`
+	CriticalWarning int         `json:"critical_warning"`
+	MediaErrors     json.Number `json:"media_errors"`
+	PercentageUsed  int         `json:"percentage_used"`
 }
 
 type temperature struct {
