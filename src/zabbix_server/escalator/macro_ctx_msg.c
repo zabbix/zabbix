@@ -68,51 +68,6 @@ static int	macro_message_normal_resolv(zbx_macro_resolv_data_t *p, va_list args,
 	return ret;
 }
 
-static int	macro_message_recovery_resolv(zbx_macro_resolv_data_t *p, va_list args, char **replace_to,
-		char **data, char *error, size_t maxerrlen)
-{
-	int	ret;
-
-	/* Passed arguments */
-	zbx_dc_um_handle_t	*um_handle = va_arg(args, zbx_dc_um_handle_t *);
-
-	/* Passed arguments for common resolver */
-	const zbx_uint64_t		*actionid = va_arg(args, const zbx_uint64_t *);
-	const zbx_db_event		*event = va_arg(args, const zbx_db_event *);
-	const zbx_db_event		*r_event = va_arg(args, const zbx_db_event *);
-	const zbx_uint64_t		*userid = va_arg(args, const zbx_uint64_t *);
-	const zbx_dc_host_t		*dc_host = va_arg(args, const zbx_dc_host_t *);
-	const zbx_db_alert		*alert = va_arg(args, const zbx_db_alert *);
-	const zbx_service_alarm_t	*service_alarm = va_arg(args, const zbx_service_alarm_t *);
-	const zbx_db_service		*service = va_arg(args, const zbx_db_service *);
-	const char			*tz = va_arg(args, const char *);
-
-	/* Passed arguments holding cached data */
-	zbx_vector_uint64_t		*item_hosts = va_arg(args, zbx_vector_uint64_t *);
-	const zbx_vector_uint64_t	**trigger_hosts = va_arg(args, const zbx_vector_uint64_t **);
-	zbx_db_event			**cause_event = va_arg(args, zbx_db_event **);
-	zbx_db_event			**cause_recovery_event = va_arg(args, zbx_db_event **);
-
-	const zbx_db_event	*c_event = ((NULL != r_event) ? r_event : event);
-
-	ret = zbx_macro_message_common_resolv(p, um_handle, actionid, event, r_event, userid, dc_host, alert,
-			service_alarm, service, tz, item_hosts, trigger_hosts, cause_event, cause_recovery_event,
-			replace_to, data, error, maxerrlen);
-
-	if (SUCCEED == ret)
-	{
-		if (EVENT_SOURCE_TRIGGERS == c_event->source)
-		{
-			if (0 == strcmp(p->macro, MVAR_EVENT_UPDATE_STATUS))
-			{
-				*replace_to = zbx_strdup(*replace_to, "0");
-			}
-		}
-	}
-
-	return ret;
-}
-
 static int	macro_message_update_resolv(zbx_macro_resolv_data_t *p, va_list args, char **replace_to,
 		char **data, char *error, size_t maxerrlen)
 {
@@ -229,6 +184,7 @@ int	substitute_message_macros(char **data, char *error, int maxerrlen, int messa
 
 	switch (message_type)
 	{
+		case ZBX_MESSAGE_RECOVERY:
 		case ZBX_MESSAGE_NORMAL:
 			ret = zbx_substitute_spec_macros(token_search, data, error, maxerrlen,
 					&macro_message_normal_resolv, um_handle, actionid, event, r_event, userid,
@@ -239,12 +195,6 @@ int	substitute_message_macros(char **data, char *error, int maxerrlen, int messa
 			ret = zbx_substitute_spec_macros(token_search, data, error, maxerrlen,
 					&macro_message_update_resolv, um_handle, actionid, event, r_event, userid,
 					dc_host, alert, service_alarm, service, tz, ack, item_hosts, &trigger_hosts,
-					&cause_event, &cause_recovery_event);
-			break;
-		case ZBX_MESSAGE_RECOVERY:
-			ret = zbx_substitute_spec_macros(token_search, data, error, maxerrlen,
-					&macro_message_recovery_resolv, um_handle, actionid, event, r_event, userid,
-					dc_host, alert, service_alarm, service, tz, item_hosts, &trigger_hosts,
 					&cause_event, &cause_recovery_event);
 			break;
 	}
