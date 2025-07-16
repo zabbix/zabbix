@@ -6214,22 +6214,34 @@ static void	lld_group_prototype_prototypes_get(zbx_uint64_t parent_hostid, zbx_s
  *             hosts         - [IN/OUT] vector of discovered hosts            *
  *                                                                            *
  ******************************************************************************/
-static void	lld_host_group_prototypes_get(zbx_uint64_t parent_hostid, zbx_vector_lld_host_ptr_t *hosts)
+static void	lld_host_group_prototypes_get(zbx_uint64_t parent_hostid, const zbx_vector_uint64_t *ruleids,
+		zbx_vector_lld_host_ptr_t *hosts)
 {
-	zbx_db_result_t		result;
-	zbx_db_row_t		row;
+	zbx_db_result_t	result;
+	zbx_db_row_t	row;
+	char		*sql = NULL;
+	size_t		sql_alloc = 0, sql_offset = 0;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
 	zbx_vector_lld_host_ptr_sort(hosts, lld_host_compare_func);
 
-	result = zbx_db_select(
-			"select gp.group_prototypeid,gp.hostid,gp.name,gp.groupid"
+	zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "select gp.group_prototypeid,gp.hostid,gp.name,gp.groupid"
 			" from host_discovery hd"
 				" join group_prototype gp"
 				" on hd.hostid=gp.hostid"
 			" where hd.parent_hostid=" ZBX_FS_UI64,
 			parent_hostid);
+
+	if (NULL != ruleids)
+	{
+		zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, " and");
+		zbx_db_add_condition_alloc(&sql, &sql_alloc, &sql_offset, "hd.lldruleid", ruleids->values,
+				ruleids->values_num);
+	}
+
+	result = zbx_db_select("%s", sql);
+	zbx_free(sql);
 
 	while (NULL != (row = zbx_db_fetch(result)))
 	{
@@ -6588,7 +6600,7 @@ void	lld_update_hosts(zbx_uint64_t lld_ruleid, const zbx_vector_lld_row_ptr_t *l
 			zbx_sync_rowset_init(&group_proto_prototypes, LLD_GROUP_PROTOTYPE_COLS_NUM);
 
 			lld_group_prototype_prototypes_get(parent_hostid, &group_proto_prototypes);
-			lld_host_group_prototypes_get(parent_hostid, &hosts);
+			lld_host_group_prototypes_get(parent_hostid, ruleids, &hosts);
 		}
 
 		lld_hostmacros_get(parent_hostid, &masterhostmacros, &hostmacros);
