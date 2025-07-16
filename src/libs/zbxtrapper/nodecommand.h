@@ -21,8 +21,7 @@
 #include "zbxdbhigh.h"
 
 #define ZBX_SCRIPT_ON_HOST	1
-#define ZBX_SCRIPT_NORMAL	2
-#define ZBX_SCRIPT_RECOVERY	3
+#define ZBX_SCRIPT_ON_EVENT	2
 
 int	node_process_command(zbx_socket_t *sock, const char *data, const struct zbx_json_parse *jp,
 		int config_timeout, int config_trapper_timeout, const char *config_source_ip,

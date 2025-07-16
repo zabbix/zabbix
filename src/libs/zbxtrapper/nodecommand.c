@@ -576,7 +576,7 @@ static int	execute_script(zbx_uint64_t scriptid, zbx_uint64_t hostid, zbx_uint64
 	if (0 != hostid)	/* script on host */
 		macro_type = ZBX_SCRIPT_ON_HOST;
 	else
-		macro_type = (NULL != recovery_event) ? ZBX_SCRIPT_RECOVERY : ZBX_SCRIPT_NORMAL;
+		macro_type = ZBX_SCRIPT_ON_EVENT;
 
 	um_handle_masked = zbx_dc_open_user_macros_masked();
 	um_handle_unmasked = zbx_dc_open_user_macros_secure();

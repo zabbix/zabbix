@@ -239,8 +239,7 @@ int	substitute_script_macros(char **data, char *error, int maxerrlen, int script
 					userid, dc_host, &user_names_found, &user_names,
 					&item_hosts, &trigger_hosts, &cause_event, &cause_recovery_event);
 			break;
-		case ZBX_SCRIPT_NORMAL:
-		case ZBX_SCRIPT_RECOVERY:
+		case ZBX_SCRIPT_ON_EVENT:
 			ret = zbx_substitute_macros(data, error, maxerrlen, &macro_normal_script_resolv, um_handle,
 					event, r_event, userid, dc_host, tz, &user_names_found, &user_names,
 					&item_hosts, &trigger_hosts, &cause_event, &cause_recovery_event);
