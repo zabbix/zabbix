@@ -166,54 +166,6 @@ static int	macro_host_script_resolv(zbx_macro_resolv_data_t *p, va_list args, ch
 	return ret;
 }
 
-static int	macro_recovery_script_resolv(zbx_macro_resolv_data_t *p, va_list args, char **replace_to, char **data,
-		char *error, size_t maxerrlen)
-{
-	int	ret = SUCCEED;
-
-	/* Passed arguments */
-	zbx_dc_um_handle_t		*um_handle = va_arg(args, zbx_dc_um_handle_t *);
-
-	/* Passed arguments for common resolver */
-	const zbx_db_event		*event = va_arg(args, const zbx_db_event *);
-	const zbx_db_event		*r_event = va_arg(args, const zbx_db_event *);
-	const zbx_uint64_t		*userid = va_arg(args, const zbx_uint64_t *);
-	const zbx_dc_host_t		*dc_host = va_arg(args, const zbx_dc_host_t *);
-	const char			*tz = va_arg(args, const char *);
-
-	/* Passed arguments holding cached data */
-	int				*user_names_found = va_arg(args, int *);
-	zbx_user_names_t		**user_names = va_arg(args, zbx_user_names_t **);
-	zbx_vector_uint64_t		*item_hosts = va_arg(args, zbx_vector_uint64_t *);
-	const zbx_vector_uint64_t	**trigger_hosts = va_arg(args, const zbx_vector_uint64_t **);
-	zbx_db_event			**cause_event = va_arg(args, zbx_db_event **);
-	zbx_db_event			**cause_recovery_event = va_arg(args, zbx_db_event **);
-
-	ret = zbx_macro_message_common_resolv(p, um_handle, NULL, event, r_event, userid, dc_host, NULL, NULL, NULL,
-			tz, item_hosts, trigger_hosts, cause_event, cause_recovery_event, replace_to, data, error,
-			maxerrlen);
-
-	if (SUCCEED == ret)
-	{
-		const zbx_db_event	*c_event;
-
-		c_event = ((NULL != r_event) ? r_event : event);
-
-		if (EVENT_SOURCE_TRIGGERS == c_event->source && NULL != userid)
-		{
-			if (0 == strcmp(p->macro, MVAR_USER_USERNAME) || 0 == strcmp(p->macro, MVAR_USER_NAME) ||
-					0 == strcmp(p->macro, MVAR_USER_SURNAME) ||
-					0 == strcmp(p->macro, MVAR_USER_FULLNAME) ||
-					0 == strcmp(p->macro, MVAR_USER_ALIAS))
-			{
-				resolve_user_macros(*userid, p->macro, user_names, user_names_found, replace_to);
-			}
-		}
-	}
-
-	return ret;
-}
-
 static int	macro_normal_script_resolv(zbx_macro_resolv_data_t *p, va_list args, char **replace_to, char **data,
 		char *error, size_t maxerrlen)
 {
@@ -222,6 +174,7 @@ static int	macro_normal_script_resolv(zbx_macro_resolv_data_t *p, va_list args, 
 	/* Passed arguments */
 	zbx_dc_um_handle_t		*um_handle = va_arg(args, zbx_dc_um_handle_t *);
 
+	/* Passed arguments for common resolver */
 	const zbx_db_event		*event = va_arg(args, const zbx_db_event *);
 	const zbx_db_event		*r_event = va_arg(args, const zbx_db_event *);
 	const zbx_uint64_t		*userid = va_arg(args, const zbx_uint64_t *);
@@ -287,12 +240,8 @@ int	substitute_script_macros(char **data, char *error, int maxerrlen, int script
 					&item_hosts, &trigger_hosts, &cause_event, &cause_recovery_event);
 			break;
 		case ZBX_SCRIPT_NORMAL:
-			ret = zbx_substitute_macros(data, error, maxerrlen, &macro_normal_script_resolv, um_handle,
-					event, r_event, userid, dc_host, tz, &user_names_found, &user_names,
-					&item_hosts, &trigger_hosts, &cause_event, &cause_recovery_event);
-			break;
 		case ZBX_SCRIPT_RECOVERY:
-			ret = zbx_substitute_macros(data, error, maxerrlen, &macro_recovery_script_resolv, um_handle,
+			ret = zbx_substitute_macros(data, error, maxerrlen, &macro_normal_script_resolv, um_handle,
 					event, r_event, userid, dc_host, tz, &user_names_found, &user_names,
 					&item_hosts, &trigger_hosts, &cause_event, &cause_recovery_event);
 			break;
