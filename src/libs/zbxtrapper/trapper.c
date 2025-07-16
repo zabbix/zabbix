@@ -1168,15 +1168,21 @@ static int	process_trap(zbx_socket_t *sock, char *s, zbx_timespec_t *ts,
 			return FAIL;
 
 #ifndef ZBX_DEBUG
-		zabbix_log(LOG_LEVEL_DEBUG, "trapper got '%s' request", value);
+		zabbix_log(LOG_LEVEL_DEBUG, "trapper got request '%s'", value);
 #endif
 
 		if (0 == strcmp(value, ZBX_PROTO_VALUE_AGENT_DATA))
 		{
+#ifndef ZBX_DEBUG
+		zabbix_log(LOG_LEVEL_DEBUG, "trapper got '%s'", s);
+#endif
 			recv_agenthistory(sock, &jp, ts, config_comms->config_timeout);
 		}
 		else if (0 == strcmp(value, ZBX_PROTO_VALUE_SENDER_DATA))
 		{
+#ifndef ZBX_DEBUG
+		zabbix_log(LOG_LEVEL_DEBUG, "trapper got '%s'", s);
+#endif
 			recv_senderhistory(sock, &jp, ts, config_comms->config_timeout);
 		}
 		else if (0 == strcmp(value, ZBX_PROTO_VALUE_PROXY_HEARTBEAT))
@@ -1186,6 +1192,9 @@ static int	process_trap(zbx_socket_t *sock, char *s, zbx_timespec_t *ts,
 		}
 		else if (0 == strcmp(value, ZBX_PROTO_VALUE_GET_ACTIVE_CHECKS))
 		{
+#ifndef ZBX_DEBUG
+		zabbix_log(LOG_LEVEL_DEBUG, "trapper got '%s'", s);
+#endif
 			ret = send_list_of_active_checks_json(sock, &jp, events_cbs, config_comms->config_timeout,
 					autoreg_update_host_cb);
 		}
