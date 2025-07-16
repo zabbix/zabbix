@@ -96,7 +96,7 @@ static void	resolve_user_macros(zbx_uint64_t userid, const char *m, zbx_user_nam
 	else if (0 == strcmp(m, MVAR_USER_FULLNAME))
 	{
 		zbx_free(*replace_to);
-		*replace_to = format_user_fullname((*user_names)->username, (*user_names)->surname,
+		*replace_to = format_user_fullname((*user_names)->name, (*user_names)->surname,
 				(*user_names)->username);
 	}
 }
@@ -107,10 +107,10 @@ static int	macro_host_script_resolv(zbx_macro_resolv_data_t *p, va_list args, ch
 	int	ret = SUCCEED;
 
 	/* Passed arguments */
-	zbx_dc_um_handle_t		*um_handle = va_arg(args, zbx_dc_um_handle_t *);
+	zbx_dc_um_handle_t	*um_handle = va_arg(args, zbx_dc_um_handle_t *);
 
-	const zbx_uint64_t		*userid = va_arg(args, const zbx_uint64_t *);
-	const zbx_dc_host_t		*dc_host = va_arg(args, const zbx_dc_host_t *);
+	const zbx_uint64_t	*userid = va_arg(args, const zbx_uint64_t *);
+	const zbx_dc_host_t	*dc_host = va_arg(args, const zbx_dc_host_t *);
 
 	/* Passed arguments holding cached data */
 	int			*user_names_found = va_arg(args, int *);
