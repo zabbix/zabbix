@@ -301,7 +301,7 @@ class CControllerPopupItemTestSend extends CControllerPopupItemTest {
 			}
 		}
 
-		if ($this->use_prev_value) {
+		if ($this->use_prev_value && (!$this->get_value_from_host || $this->getInput('prev_time') !== '')) {
 			$data['options']['history'] = $history;
 		}
 
