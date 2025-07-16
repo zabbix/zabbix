@@ -332,3 +332,18 @@ void	zbx_jsonobj_remove_value(zbx_jsonobj_t *obj, const char *name)
 	zbx_hashset_remove_direct(&obj->data.object, el);
 }
 
+const zbx_jsonobj_el_t	*zbx_jsonobj_get_value(zbx_jsonobj_t *obj, const char *name)
+{
+	zbx_jsonobj_el_t	*el;
+	zbx_hashset_iter_t	it;
+
+	zbx_hashset_iter_reset(&obj->data.object, &it);
+
+	while (NULL != (el = (zbx_jsonobj_el_t *)zbx_hashset_iter_next(&it)))
+	{
+		if (0 == strcmp(el->name, name))
+			return el;
+	}
+
+	return NULL;
+}

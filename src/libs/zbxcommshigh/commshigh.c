@@ -718,19 +718,14 @@ char	*zbx_sanitize_proxyconfig_json(char *jbuffer)
 	{
 		char			*str = NULL;
 		size_t			str_alloc = 0, str_offset = 0;
-		zbx_jsonobj_el_t	*el;
-		zbx_hashset_iter_t	it;
+		const zbx_jsonobj_el_t	*data_obj;	
 
-		zbx_hashset_iter_reset(&jobj.data.object, &it);
 		zbx_jsonobj_remove_value(&jobj, "macro.secrets");
 
-		while (NULL != (el = (zbx_jsonobj_el_t *)zbx_hashset_iter_next(&it)))
+		if (NULL != (data_obj = zbx_jsonobj_get_value(&jobj, "data")))
 		{
-			if (0 == strcmp(el->name, "data"))
-			{
-				zbx_jsonobj_remove_value(&el->value, "globalmacro");
-				break;
-			}
+			zbx_jsonobj_remove_value(&data_obj->value, "globalmacro");
+			zbx_jsonobj_remove_value(&data_obj->value, "hostmacro");
 		}
 
 		zbx_jsonobj_to_string(&str, &str_alloc, &str_offset, &jobj);
