@@ -5955,6 +5955,23 @@ static int	DBpatch_5030192(void)
 		return ret;
 
 	result = zbx_db_select(
+			"explain select distinct t.triggerid,t.description,t.expression,t.recovery_expression"
+			" from triggers t"
+			" join functions f on f.triggerid=t.triggerid"
+			" join items i on i.itemid=f.itemid"
+			" join hosts h on h.hostid=i.hostid and h.status=%d"
+			" where t.templateid is null and t.flags=%d",
+			HOST_STATUS_TEMPLATE, ZBX_FLAG_DISCOVERY_NORMAL);
+	zabbix_log(LOG_LEVEL_INFORMATION, "BADGER XSTRATA 0");
+
+	while (NULL != (row = zbx_db_fetch(result)))
+	{
+	zabbix_log(LOG_LEVEL_INFORMATION ,"BADGER XSTRATA 1: %s | %s | %s | %s | %s | %s | %s | %s | %s | %s",
+				row[0],row[1],row[2],row[3],row[4],row[5],row[6],row[7],row[8],row[9]);
+	}
+	zbx_db_free_result(result);
+
+	result = zbx_db_select(
 			"select distinct t.triggerid,t.description,t.expression,t.recovery_expression"
 			" from triggers t"
 			" join functions f on f.triggerid=t.triggerid"
@@ -5962,9 +5979,11 @@ static int	DBpatch_5030192(void)
 			" join hosts h on h.hostid=i.hostid and h.status=%d"
 			" where t.templateid is null and t.flags=%d",
 			HOST_STATUS_TEMPLATE, ZBX_FLAG_DISCOVERY_NORMAL);
+	zabbix_log(LOG_LEVEL_INFORMATION, "BADGER XSTRATA 0");
 
 	while (NULL != (row = zbx_db_fetch(result)))
 	{
+	zabbix_log(LOG_LEVEL_INFORMATION, "BADGER XSTRATA");
 		char		*uuid, *seed = NULL;
 		char		*composed_expr[] = { NULL, NULL };
 		size_t		seed_alloc = 0, seed_offset = 0;
