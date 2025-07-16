@@ -3759,10 +3759,14 @@ static void	lld_hosts_save(zbx_uint64_t parent_hostid, zbx_vector_lld_host_ptr_t
 				(char *)NULL);
 	}
 
-	if (0 != upd_hosts || 0 != upd_interfaces || 0 != upd_snmp || 0 != upd_hostmacros || 0 != upd_tags ||
-			0 != upd_host_hgsets)
+	if (0 != upd_hosts || 0 != upd_interfaces || 0 != upd_snmp || 0 != upd_tags || 0 != upd_host_hgsets)
 	{
 		zbx_db_begin_multiple_update(&sql1, &sql1_alloc, &sql1_offset);
+	}
+
+	if (0 != upd_hostmacros)
+	{
+		zbx_db_begin_multiple_update(&sql2, &sql2_alloc, &sql2_offset);
 	}
 
 	if (0 != new_hostgroups)
@@ -4260,7 +4264,7 @@ static void	lld_hosts_save(zbx_uint64_t parent_hostid, zbx_vector_lld_host_ptr_t
 			{
 				const char	*d = "";
 
-				zbx_strcpy_alloc(&sql1, &sql1_alloc, &sql1_offset, "update hostmacro set ");
+				zbx_strcpy_alloc(&sql2, &sql2_alloc, &sql2_offset, "update hostmacro set ");
 
 				zbx_audit_host_update_json_update_hostmacro_create_entry(ZBX_AUDIT_LLD_CONTEXT,
 						host->hostid, hostmacro->hostmacroid);
@@ -4268,7 +4272,7 @@ static void	lld_hosts_save(zbx_uint64_t parent_hostid, zbx_vector_lld_host_ptr_t
 				if (0 != (hostmacro->flags & ZBX_FLAG_LLD_HMACRO_UPDATE_VALUE))
 				{
 					value_esc = zbx_db_dyn_escape_string(hostmacro->value);
-					zbx_snprintf_alloc(&sql1, &sql1_alloc, &sql1_offset, "value='%s'", value_esc);
+					zbx_snprintf_alloc(&sql2, &sql2_alloc, &sql2_offset, "value='%s'", value_esc);
 					zbx_free(value_esc);
 					d = ",";
 
@@ -4285,7 +4289,7 @@ static void	lld_hosts_save(zbx_uint64_t parent_hostid, zbx_vector_lld_host_ptr_t
 				if (0 != (hostmacro->flags & ZBX_FLAG_LLD_HMACRO_UPDATE_DESCRIPTION))
 				{
 					value_esc = zbx_db_dyn_escape_string(hostmacro->description);
-					zbx_snprintf_alloc(&sql1, &sql1_alloc, &sql1_offset, "%sdescription='%s'",
+					zbx_snprintf_alloc(&sql2, &sql2_alloc, &sql2_offset, "%sdescription='%s'",
 							d, value_esc);
 					zbx_free(value_esc);
 					d = ",";
@@ -4296,14 +4300,14 @@ static void	lld_hosts_save(zbx_uint64_t parent_hostid, zbx_vector_lld_host_ptr_t
 				}
 				if (0 != (hostmacro->flags & ZBX_FLAG_LLD_HMACRO_UPDATE_TYPE))
 				{
-					zbx_snprintf_alloc(&sql1, &sql1_alloc, &sql1_offset, "%stype=%d",
+					zbx_snprintf_alloc(&sql2, &sql2_alloc, &sql2_offset, "%stype=%d",
 							d, hostmacro->type);
 
 					zbx_audit_host_update_json_update_hostmacro_type(ZBX_AUDIT_LLD_CONTEXT,
 							host->hostid, hostmacro->hostmacroid,
 							hostmacro->type_orig, hostmacro->type);
 				}
-				zbx_snprintf_alloc(&sql1, &sql1_alloc, &sql1_offset,
+				zbx_snprintf_alloc(&sql2, &sql2_alloc, &sql2_offset,
 						" where hostmacroid=" ZBX_FS_UI64 ";\n", hostmacro->hostmacroid);
 			}
 		}
@@ -4415,8 +4419,10 @@ static void	lld_hosts_save(zbx_uint64_t parent_hostid, zbx_vector_lld_host_ptr_t
 
 	if (0 != new_hostmacros)
 	{
+		zbx_db_set_log_masked_values(1);
 		zbx_db_insert_execute(&db_insert_hmacro);
 		zbx_db_insert_clean(&db_insert_hmacro);
+		zbx_db_set_log_masked_values(0);
 	}
 
 	if (0 != new_interfaces)
@@ -4449,6 +4455,20 @@ static void	lld_hosts_save(zbx_uint64_t parent_hostid, zbx_vector_lld_host_ptr_t
 			zbx_db_execute("%s", sql1);
 
 		zbx_free(sql1);
+	}
+
+	if (NULL != sql2)
+	{
+		zbx_db_end_multiple_update(&sql2, &sql2_alloc, &sql2_offset);
+
+		zbx_db_set_log_masked_values(1);
+
+		if (16 < sql2_offset)
+			zbx_db_execute("%s", sql2);
+
+		zbx_db_set_log_masked_values(0);
+
+		zbx_free(sql2);
 	}
 
 	if (0 != del_hostgroupids->values_num || 0 != del_hostmacroids.values_num ||
