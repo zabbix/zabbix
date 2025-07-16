@@ -642,11 +642,13 @@ static int	process_proxy(const zbx_config_vault_t *config_vault, int config_time
 
 					if (ZBX_PROXY_DATA_MORE != more)
 					{
-						zbx_dc_update_proxy_large_history_flag(&proxy, ZBX_PROXY_LARGE_HISTORY_DEFAULT);
+						zbx_dc_update_proxy_large_history_flag(&proxy,
+								ZBX_PROXY_LARGE_HISTORY_DEFAULT);
 					}
 					else if (FAIL == zbx_hc_check_proxy(proxy.proxyid))
 					{
-						zbx_dc_update_proxy_large_history_flag(&proxy, ZBX_PROXY_LARGE_HISTORY_SET);
+						zbx_dc_update_proxy_large_history_flag(&proxy,
+								ZBX_PROXY_LARGE_HISTORY_SET);
 						break;
 					}
 
