@@ -521,7 +521,7 @@ typedef struct
 } zbx_user_names_t;
 
 int	zbx_db_get_user_names(zbx_uint64_t userid, zbx_user_names_t **names);
-void	zbx_user_names_free(zbx_user_names_t *names);
+void	zbx_user_names_clean(zbx_user_names_t *names);
 char	*zbx_db_get_unique_hostname_by_sample(const char *host_name_sample, const char *field_name);
 
 typedef enum

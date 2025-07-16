@@ -252,7 +252,7 @@ int	substitute_script_macros(char **data, char *error, int maxerrlen, int script
 
 	if (NULL != user_names)
 	{
-		zbx_user_names_free(user_names);
+		zbx_user_names_clean(user_names);
 		zbx_free(user_names);
 	}
 

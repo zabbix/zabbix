@@ -363,7 +363,7 @@ out:
 	return ret;
 }
 
-void	zbx_user_names_free(zbx_user_names_t *names)
+void	zbx_user_names_clean(zbx_user_names_t *names)
 {
 	zbx_free(names->name);
 	zbx_free(names->surname);
