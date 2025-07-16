@@ -77,7 +77,7 @@ Internal parameters are reserved for predefined macros that are not meant to be 
 [![](images/thumb.9.png?raw=true)](images/9.png)
 [![](images/thumb.10.png?raw=true)](images/10.png)
 
-4. Create a new agent. Depending on the ticket queue you want to use for tickets created by the webhook, set the `RW` permission for the group that this ticket queue belongs to. In the example below, if you want to use the `Misc` queue, you must set the the `RW` permission for the group `users`.
+4. Create a new agent. Depending on the ticket queue you want to use for tickets created by the webhook, set the `RW` permission for the group that this ticket queue belongs to. In the example below, if you want to use the `Misc` queue, you must set the `RW` permission for the group `users`.
 
 [![](images/thumb.11.png?raw=true)](images/11.png)
 [![](images/thumb.12.png?raw=true)](images/12.png)
@@ -115,7 +115,7 @@ Internal parameters are reserved for predefined macros that are not meant to be 
 [![](images/thumb.17.png?raw=true)](images/17.png)
 
 4. If you want to prioritize issues according to the severity values in Zabbix, you can define mapping parameters (create them as additional webhook parameters):
-  - `severity_<name>` - the **((OTRS)) CE** priority ID priority ID (`<name>` in the parameter name can be one of the following values: `not_classified`, `information`, `warning`, `average`, `high`, `disaster`)
+  - `severity_<name>` - the **((OTRS)) CE** priority ID (`<name>` in the parameter name can be one of the following values: `not_classified`, `information`, `warning`, `average`, `high`, `disaster`)
 
 [![](images/thumb.18.png?raw=true)](images/18.png)
 

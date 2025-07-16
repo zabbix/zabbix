@@ -113,6 +113,7 @@ func (c *Connection) write(w io.Writer, data []byte) (err error) {
 	if c.compress {
 		z := zlib.NewWriter(&buf)
 		if _, err = z.Write(data); err != nil {
+			z.Close()
 			return
 		}
 		z.Close()
@@ -452,7 +453,17 @@ func ExchangeWithRedirect(addrpool AddressSet, localAddr *net.Addr, timeout time
 retry:
 	retries++
 
-	b, errs, err := Exchange(addrpool, localAddr, timeout, connectTimeout, data, args...)
+	var exchangeAddrPool AddressSet
+
+	if retries > 1 {
+		// On retries, use a temporary addrpool with only the redirect address to skip failover
+		tempAddrs := []string{addrpool.Get()}
+		exchangeAddrPool = NewAddressPool(tempAddrs)
+	} else {
+		exchangeAddrPool = addrpool
+	}
+
+	b, errs, err := Exchange(exchangeAddrPool, localAddr, timeout, connectTimeout, data, args...)
 
 	if errs != nil {
 		return b, errs, err

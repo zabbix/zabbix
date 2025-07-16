@@ -621,7 +621,7 @@ zabbix_export:
       event_menu_url: '{EVENT.TAGS.__zbx_otrs_ticketlink}'
       event_menu_name: '((OTRS)) CE: ticket #{EVENT.TAGS.__zbx_otrs_ticket_id}'
       description: |
-        This media type integrates your Zabbix installation with your Zammad installation using the Zabbix webhook feature.
+        This media type integrates your Zabbix installation with your ((OTRS)) CE installation using the Zabbix webhook feature.
         
         ((OTRS)) CE configuration:
         
@@ -631,7 +631,7 @@ zabbix_export:
         
         3. Create a new customer user. Select the ID of the customer that you created in the previous step.
         
-        4. Create a new agent. Depending on the ticket queue you want to use for tickets created by the webhook, set the "RW" permission for the group that this ticket queue belongs to. In the example below, if you want to use the "Misc" queue, you must set the the "RW" permission for the group "users".
+        4. Create a new agent. Depending on the ticket queue you want to use for tickets created by the webhook, set the "RW" permission for the group that this ticket queue belongs to. In the example below, if you want to use the "Misc" queue, you must set the "RW" permission for the group "users".
         
         Zabbix configuration:
         
@@ -670,8 +670,8 @@ zabbix_export:
         
         8. Create a Zabbix user and add media:
         - To create a new user, go to the "Users" → "Users" section, click the "Create user" button in the top right corner. In the "User" tab, fill in all required fields (marked with red asterisks).
-        - In the "Media" tab, click "Add" and select the type "Zammad" from the drop-down list. Add any value in the "Send to" field: it is not used in the webhook, but is required.
-        - Make sure this user has access to all hosts for which you would like problem notifications to be sent to Zammad.
+        - In the "Media" tab, click "Add" and select the type "OTRS CE" from the drop-down list. Add any value in the "Send to" field: it is not used in the webhook, but is required.
+        - Make sure this user has access to all hosts for which you would like problem notifications to be sent to ((OTRS)) CE.
         
         9. Done! You can now start using this media type in actions and create tickets.
         
