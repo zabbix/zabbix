@@ -350,8 +350,8 @@ class WidgetView extends CControllerDashboardWidgetView {
 	}
 
 	private function setAxisItem(array $graph, string $axis): array {
-		$type_key = $axis . '_type';
-		$itemid_key = $axis . '_itemid';
+		$type_key = $axis.'_type';
+		$itemid_key = $axis.'_itemid';
 
 		if ($graph[$type_key] == GRAPH_YAXIS_TYPE_ITEM_VALUE && $graph[$itemid_key]) {
 			$item = ['itemid' => $graph[$itemid_key]];
