@@ -79,7 +79,7 @@ var metrics = metric.MetricSet{
 }
 
 // handlerFunc defines an interface must be implemented by handlers.
-type handlerFunc func(conn conn.RedisClient, params map[string]string) (res interface{}, err error)
+type handlerFunc func(conn conn.RedisClient, params map[string]string) (res any, err error)
 
 //nolint:gochecknoinits //legacy implementation
 func init() {

@@ -21,8 +21,8 @@ import (
 	"golang.zabbix.com/sdk/zbxerr"
 )
 
-type slowlog []interface{}
-type logItem = []interface{}
+type slowlog []any
+type logItem = []any
 
 // getLastSlowlogID gets the last log item ID from slowlog.
 func getLastSlowlogID(sl slowlog) (int64, error) {
@@ -48,8 +48,8 @@ func getLastSlowlogID(sl slowlog) (int64, error) {
 }
 
 // SlowlogHandler gets an output of 'SLOWLOG GET 1' command and returns the last slowlog Id.
-func SlowlogHandler(conn conn.RedisClient, _ map[string]string) (interface{}, error) {
-	var res []interface{}
+func SlowlogHandler(conn conn.RedisClient, _ map[string]string) (any, error) {
+	var res []any
 
 	err := conn.Query(radix.Cmd(&res, "SLOWLOG", "GET", "1"))
 	if err != nil {

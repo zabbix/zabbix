@@ -30,7 +30,7 @@ var redisSlaveMetricRE = regexp.MustCompile(`^slave\d+`)
 
 type infoSection string
 type infoKey string
-type infoKeySpace map[infoKey]interface{}
+type infoKeySpace map[infoKey]any
 type infoExtKey string
 type infoExtKeySpace map[infoExtKey]string
 
@@ -108,7 +108,7 @@ func parseRedisInfo(info string) (res redisInfo, err error) {
 }
 
 // InfoHandler gets an output of 'INFO' command, parses it and returns it in JSON format.
-func InfoHandler(conn conn.RedisClient, params map[string]string) (interface{}, error) {
+func InfoHandler(conn conn.RedisClient, params map[string]string) (any, error) {
 	var res string
 
 	section := infoSection(strings.ToLower(params["Section"]))
