@@ -264,23 +264,19 @@ window.drule_edit_popup = new class {
 
 		for (const [template_id, list_id, key, def] of Object.values(templates)) {
 			if (need_to_add_row) {
-				if (update === false) {
-					const template_html = document.getElementById(template_id).innerHTML;
+				const row = new Template(document.getElementById(template_id).innerHTML).evaluateToElement(input);
 
-					document.getElementById(list_id)
-						.insertAdjacentHTML('beforeend', new Template(template_html).evaluate(input));
+				if (update === false) {
+					document.getElementById(list_id).append(row);
 				}
 				else {
-					const template_html = document.getElementById(template_id).innerHTML;
-					const list_item = document.getElementById(`${key + input.dcheckid}`)?.closest('li');
+					const list_item = document.getElementById(`${key}${input.dcheckid}`)?.closest('li');
 
 					if (list_item) {
-						list_item.outerHTML = new Template(template_html).evaluate(input);
+						list_item.replaceWith(row);
 					}
 					else {
-						document.getElementById(list_id).insertAdjacentHTML('beforeend',
-							new Template(template_html).evaluate(input)
-						);
+						document.getElementById(list_id).append(row);
 					}
 				}
 			}
