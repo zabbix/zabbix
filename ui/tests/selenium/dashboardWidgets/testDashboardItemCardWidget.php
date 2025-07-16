@@ -997,7 +997,7 @@ class testDashboardItemCardWidget extends testWidgets {
 		self::$dashboardid = CDataHelper::getIds('name');
 	}
 
-	public function testDashboardHostCardWidget_Layout() {
+	public function testDashboardItemCardWidget_Layout() {
 		$this->page->login()->open('zabbix.php?action=dashboard.view&dashboardid='.
 				self::$dashboardid['Dashboard for creating Item Card widgets'])->waitUntilReady();
 		$dashboard = CDashboardElement::find()->waitUntilReady()->one();
