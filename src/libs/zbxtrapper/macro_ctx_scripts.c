@@ -220,7 +220,7 @@ int	substitute_script_macros(char **data, char *error, int maxerrlen, int script
 {
 	int	ret = SUCCEED;
 
-	/* Shared data */
+	/* Shared data between resolver calls */
 	int				user_names_found = 0;
 	zbx_user_names_t		*user_names = NULL;
 	zbx_vector_uint64_t		item_hosts;
@@ -257,7 +257,7 @@ int	substitute_script_macros(char **data, char *error, int maxerrlen, int script
 		zbx_free(user_names);
 	}
 
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __func__, zbx_result_string(ret));
 
 	return ret;
 }
