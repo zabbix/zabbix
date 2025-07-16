@@ -993,8 +993,6 @@ class CUserDirectory extends CApiService {
 			'where' => ['userdirectoryid' => $userdirectoryids]
 		]]);
 
-		self::deleteAffectedProvisionGroups($userdirectoryids);
-
 		DB::delete('userdirectory', ['userdirectoryid' => $userdirectoryids]);
 
 		self::addAuditLog(CAudit::ACTION_DELETE, CAudit::RESOURCE_USERDIRECTORY, $db_userdirectories);
@@ -1072,17 +1070,6 @@ class CUserDirectory extends CApiService {
 		if (in_array($auth['ldap_userdirectoryid'], $userdirectoryids)) {
 			// If last (default) is removed, reset default userdirectoryid to prevent from foreign key constraint.
 			API::Authentication()->update(['ldap_userdirectoryid' => 0]);
-		}
-	}
-
-	private static function deleteAffectedProvisionGroups(array $userdirectoryids): void {
-		$del_provision_groupids = array_keys(DB::select('userdirectory_idpgroup', [
-			'filter' => ['userdirectoryid' => $userdirectoryids],
-			'preservekeys' => true
-		]));
-
-		if ($del_provision_groupids) {
-			self::deleteProvisionGroups($del_provision_groupids);
 		}
 	}
 
@@ -1350,10 +1337,6 @@ class CUserDirectory extends CApiService {
 		}
 		unset($userdirectory);
 
-		if ($del_provision_groupids) {
-			self::deleteProvisionGroups($del_provision_groupids);
-		}
-
 		if ($upd_provision_groups) {
 			DB::update('userdirectory_idpgroup', $upd_provision_groups);
 		}
@@ -1397,11 +1380,6 @@ class CUserDirectory extends CApiService {
 		if ($provision_groups) {
 			self::updateProvisionGroupUserGroups($provision_groups, $db_provision_groups);
 		}
-	}
-
-	private static function deleteProvisionGroups(array $del_provision_groupids): void {
-		DB::delete('userdirectory_usrgrp', ['userdirectory_idpgroupid' => $del_provision_groupids]);
-		DB::delete('userdirectory_idpgroup', ['userdirectory_idpgroupid' => $del_provision_groupids]);
 	}
 
 	private static function updateProvisionGroupUserGroups(array &$provision_groups,

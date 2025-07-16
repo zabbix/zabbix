@@ -1429,9 +1429,9 @@ class CAction extends CApiService {
 	public function delete(array $actionids): array {
 		$this->validateDelete($actionids, $db_actions);
 
-		DB::delete('actions', ['actionid' => $actionids]);
+		DB::delete('escalations', ['actionid' => $actionids]);
 
-		DB::update('escalations', ['values' => ['actionid' => 0], 'where' => ['actionid' => $actionids]]);
+		DB::delete('actions', ['actionid' => $actionids]);
 
 		self::addAuditLog(CAudit::ACTION_DELETE, CAudit::RESOURCE_ACTION, $db_actions);
 

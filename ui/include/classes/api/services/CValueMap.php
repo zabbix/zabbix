@@ -301,7 +301,7 @@ class CValueMap extends CApiService {
 			'where' => ['valuemapid' => $valuemapids]
 		]]);
 
-		$this->deleteByIds($valuemapids);
+		DB::delete('valuemap', ['valuemapid' => $valuemapids]);
 
 		$this->addAuditBulk(CAudit::ACTION_DELETE, CAudit::RESOURCE_VALUE_MAP, $db_valuemaps);
 
