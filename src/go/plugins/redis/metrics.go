@@ -21,6 +21,7 @@ import (
 	"golang.zabbix.com/sdk/errs"
 	"golang.zabbix.com/sdk/metric"
 	"golang.zabbix.com/sdk/plugin"
+	"golang.zabbix.com/sdk/plugin/comms"
 	"golang.zabbix.com/sdk/uri"
 )
 
@@ -36,21 +37,39 @@ var (
 	uriDefaults    = &uri.Defaults{Scheme: "tcp", Port: "6379"}
 )
 
-// Common params: [URI|Session][,Password][,User]
-//
-//nolint:gochecknoglobals
+// Common params: [URI|Session][,Password][,User].
 var (
 	paramURI = metric.NewConnParam("URI", "URI to connect or session name.").
 			WithDefault(uriDefaults.Scheme + "://localhost:" + uriDefaults.Port).WithSession().
 			WithValidator(uri.URIValidator{Defaults: uriDefaults, AllowedSchemes: []string{"tcp", "unix"}})
 	paramPassword = metric.NewConnParam("Password", "Redis password.").WithDefault("").
 			WithValidator(metric.LenValidator{Max: &maxAuthPassLen})
-	paramUser          = metric.NewConnParam("User", "Redis user.").WithDefault("default")
-	paramTLSConnect    = metric.NewSessionOnlyParam("TLSConnect", "DB connection encryption type.").WithDefault("")
-	paramTLSCaFile     = metric.NewSessionOnlyParam("TLSCAFile", "TLS ca file path.").WithDefault("")
-	paramTLSServerName = metric.NewSessionOnlyParam("TLSServerName", "TLS server name.").WithDefault("")
-	paramTLSCertFile   = metric.NewSessionOnlyParam("TLSCertFile", "TLS cert file path.").WithDefault("")
-	paramTLSKeyFile    = metric.NewSessionOnlyParam("TLSKeyFile", "TLS key file path.").WithDefault("")
+	paramUser = metric.NewConnParam("User", "Redis user.").WithDefault("default")
+
+	paramTLSConnect = metric.NewSessionOnlyParam(
+		string(comms.TLSConnect),
+		"DB connection encryption type.").
+		WithDefault("")
+
+	paramTLSCaFile = metric.NewSessionOnlyParam(
+		string(comms.TLSCAFile),
+		"TLS ca file path.").
+		WithDefault("")
+
+	paramTLSServerName = metric.NewSessionOnlyParam(
+		string(comms.TLSServerName),
+		"TLS server name.").
+		WithDefault("")
+
+	paramTLSCertFile = metric.NewSessionOnlyParam(
+		string(comms.TLSCertFile),
+		"TLS cert file path.").
+		WithDefault("")
+
+	paramTLSKeyFile = metric.NewSessionOnlyParam(
+		string(comms.TLSKeyFile),
+		"TLS key file path.").
+		WithDefault("")
 )
 
 var metrics = metric.MetricSet{
