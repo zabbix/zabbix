@@ -3088,10 +3088,10 @@ int	lld_rule_discover_prototypes(zbx_uint64_t hostid, const zbx_vector_lld_row_p
 		zbx_vector_uint64_clear(&ruleids);
 	}
 
-	zbx_vector_uint64_destroy(&ruleids);
-
 	ret = SUCCEED;
 out:
+	zbx_vector_uint64_destroy(&ruleids);
+
 	zbx_hashset_destroy(&prototype_rules);
 	zbx_vector_lld_prototype_rules_ptr_destroy(&prototype_rules_sorted);
 
