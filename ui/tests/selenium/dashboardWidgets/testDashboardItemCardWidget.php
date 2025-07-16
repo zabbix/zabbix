@@ -94,6 +94,13 @@ class testDashboardItemCardWidget extends testWidgets {
 	*/
 	protected static $template;
 
+	/**
+	* Created LLD rule id.
+	*
+	* @var integer
+	*/
+	protected static $discovery_rule_id;
+
 	public static function prepareItemCardWidgetData() {
 		self::$template = CDataHelper::createTemplates([
 			[
@@ -241,7 +248,6 @@ class testDashboardItemCardWidget extends testWidgets {
 				'inventory_mode' => HOST_INVENTORY_AUTOMATIC
 			]
 		]);
-		var_dump(self::$hostids);
 		self::$itemids = CDataHelper::getIds('name');
 
 		// Create dependent item.
@@ -271,6 +277,65 @@ class testDashboardItemCardWidget extends testWidgets {
 				]
 			]
 		];
+
+		$interfaces = CDataHelper::getInterfaces([self::$hostids['hostids']['Host for Item Card widget']]);
+
+		// Create discovery rule.
+		$lld_result = CDataHelper::call('discoveryrule.create', [
+			'name' => 'LLD for discovered item',
+			'key_' => 'discoveryLLDrule',
+			'hostid' => self::$hostids['hostids']['Host for Item Card widget'],
+			'type' => ITEM_TYPE_ZABBIX,
+			'delay' => '500s',
+			'lifetime_type' => ZBX_LLD_DELETE_NEVER,
+			'enabled_lifetime_type' => ZBX_LLD_DISABLE_NEVER,
+			'interfaceid' => $interfaces['default_interfaces']['Host for Item Card widget'][1]
+		]);
+
+		self::$discovery_rule_id = $lld_result['itemids'][0];
+
+		// Create item prototype.
+		$item_prototype_result = CDataHelper::call('itemprototype.create', [
+			[
+				'hostid' => self::$hostids['hostids']['Host for Item Card widget'],
+				'ruleid' => self::$discovery_rule_id,
+				'name' => 'Item prototype {#KEY}',
+				'key_' => 'trap[{#KEY}]',
+				'type' => ITEM_TYPE_ZABBIX,
+				'value_type' => ITEM_VALUE_TYPE_UINT64,
+				'delay' => '500s',
+				'interfaceid' => $interfaces['default_interfaces']['Host for Item Card widget'][1]
+			]
+		]);
+
+		$item_prototype_id = $item_prototype_result['itemids'][0];
+
+		$discovered_item = [
+			'itemid' => 10090002,
+			'itemdiscoveryid' => 10090001,
+			'item_name' => 'Discovered Item KEY1',
+			'key_' => 'trapchik',
+			'hostid' => self::$hostids['hostids']['Host for Item Card widget'],
+			'status' => ITEM_STATE_NORMAL,
+			'item_prototypeid' => $item_prototype_id,
+			'ts_delete' => ZBX_LLD_DELETE_AFTER,
+			'disable_source' => ZBX_LLD_DISABLE_IMMEDIATELY,
+			'ts_disable' => ZBX_DISABLE_DEFAULT
+		];
+
+		// Emulate item discovery in DB.
+		DBexecute('INSERT INTO items (itemid, type, hostid, name, description, key_, interfaceid, flags, query_fields,'.
+				' params, posts, headers, status) VALUES ('.zbx_dbstr($discovered_item['itemid']).', 2, '.
+				zbx_dbstr(self::$hostids['hostids']['Host for Item Card widget']).', '.zbx_dbstr($discovered_item['item_name']).', \'\', '.
+				zbx_dbstr($discovered_item['key_']).', NULL, 4, \'\', \'\', \'\', \'\', '.zbx_dbstr($discovered_item['status']).')'
+		);
+		DBexecute('INSERT INTO item_discovery (itemdiscoveryid, itemid, parent_itemid, ts_delete, disable_source,'.
+				' ts_disable, status) VALUES ('.zbx_dbstr($discovered_item['itemdiscoveryid']).', '.
+				zbx_dbstr($discovered_item['itemid']).', '.zbx_dbstr($discovered_item['item_prototypeid']).', '.
+				zbx_dbstr($discovered_item['ts_delete']).', '.
+				zbx_dbstr($discovered_item['disable_source']).', '.zbx_dbstr($discovered_item['ts_disable']).', 1);'
+		);
+
 		CDataHelper::createItems('item', $items, self::$hostids['hostids']);
 		$depend_items= CDataHelper::getIds('name');
 
@@ -348,6 +413,7 @@ class testDashboardItemCardWidget extends testWidgets {
 		DBexecute('UPDATE item_rtdata SET state = 1, error = '.zbx_dbstr('Unsupported item key.').
 				'WHERE itemid ='.zbx_dbstr($depend_items['Dependent item 1']));
 
+		DBexecute('INSERT INTO item_rtdata (itemid, lastlogsize, state, mtime) VALUES (10090002, 0, 0, 0)');
 
 		CDataHelper::call('dashboard.create', [
 			[
@@ -894,6 +960,41 @@ class testDashboardItemCardWidget extends testWidgets {
 										'type' => 0,
 										'name' => 'sections.4',
 										'value' => 3
+									]
+								]
+							],
+							[
+								'type' => 'itemcard',
+								'name' => 'Link to LLD rule',
+								'x' => 0,
+								'y' => 10,
+								'width' => 18,
+								'height' => 5,
+								'fields' => [
+									[
+										'type' => 4,
+										'name' => 'itemid.0',
+										'value' => 10090002 // Discovered Item KEY1.
+									],
+									[
+										'type' => 0,
+										'name' => 'sections.0',
+										'value' => 2
+									],
+									[
+										'type' => 0,
+										'name' => 'sections.1',
+										'value' => 4
+									],
+									[
+										'type' => 0,
+										'name' => 'sections.2',
+										'value' => 6
+									],
+									[
+										'type' => 0,
+										'name' => 'sections.3',
+										'value' => 7
 									]
 								]
 							]
@@ -1725,6 +1826,22 @@ class testDashboardItemCardWidget extends testWidgets {
 						'right-column' =>  ''
 					]
 				]
+			],
+			// #5.
+			[
+				[
+					'Header' => 'Link to LLD rule',
+					'Host' => 'Visible host name for Item Card widget',
+					'Metrics' => [
+						'column' => '',
+						'center-column' => '31d',
+						'right-column' => '365d'
+					],
+					'Type of information' => 'Numeric (float)',
+					'Host interface' => 'No data',
+					'Type' => 'Zabbix trapper',
+					'Warning' => 'The item is not discovered anymore and will not be disabled, will not be deleted.'
+				]
 			]
 		];
 	}
@@ -1740,9 +1857,11 @@ class testDashboardItemCardWidget extends testWidgets {
 		$dashboard = CDashboardElement::find()->one();
 		$widget = $dashboard::find()->one()->getWidget($data['Header']);
 
-		$item = CTestArrayHelper::get($data, 'Disabled') ? $data['Item']."\n".'Disabled' : $data['Item'];
-		$item_selector = $widget->query('class:item-name')->one();
-		$this->assertEquals($item, $item_selector->getText());
+		if (array_key_exists('Item', $data)) {
+			$item = CTestArrayHelper::get($data, 'Disabled') ? $data['Item']."\n".'Disabled' : $data['Item'];
+			$item_selector = $widget->query('class:item-name')->one();
+			$this->assertEquals($item, $item_selector->getText());
+		}
 
 		if (array_key_exists('Context menu', $data)) {
 			$hostid = CDBHelper::getValue('SELECT hostid FROM hosts WHERE name='.zbx_dbstr($data['Host']));
@@ -1752,11 +1871,18 @@ class testDashboardItemCardWidget extends testWidgets {
 		}
 
 		if (array_key_exists('Error text', $data)) {
-			$item_selector->query('class:zi-i-negative')->one()->click();;
+			$item_selector->query('class:zi-i-negative')->one()->click();
 			$hint = $this->query('xpath://div[@class="overlay-dialogue wordbreak"]')->asOverlayDialog()->waitUntilPresent()->one();
 			$this->assertEquals($data['Error text'], $hint->getText());
 			$hint->close();
 			$this->assertEquals($data['Error text'], $widget->query('class:section-error')->one()->getText());
+		}
+
+		if (array_key_exists('Warning', $data)) {
+			$widget->query('class:item-name')->query('class:zi-i-warning')->one()->click();
+			$hint = $this->query('xpath://div[@class="overlay-dialogue wordbreak"]')->asOverlayDialog()->waitUntilPresent()->one();
+			$this->assertEquals($data['Warning'], $hint->getText());
+			$hint->close();
 		}
 
 		if (array_key_exists('Disabled', $data)) {
@@ -1943,14 +2069,15 @@ class testDashboardItemCardWidget extends testWidgets {
 		$popup->close();
 	}
 
-
+	/**
+	 * Check links in Item card widget.
+	 */
 	public function testDashboardItemCardWidget_CheckLinks() {
-		$hostid = CDBHelper::getValue('SELECT hostid FROM hosts WHERE name='.zbx_dbstr('Host for Item Card widget'));
 		$prefixes = [
 			'Master item from host' => [
-				'host' => 'zabbix.php?action=popup&popup=host.edit&hostid='.$hostid,
-				'graph' => 'history.php?action=showgraph&itemids%15B%5D='.self::$itemids[STRING_255],
-				'severity' => 'zabbix.php?action=problem.view&hostids%-5B0%5D='.$hostid.'&triggerids%5B0%5D='.
+				'Host' => 'zabbix.php?action=popup&popup=host.edit&hostid='.self::$hostids['hostids']['Host for Item Card widget'],
+				'Graph' => 'history.php?action=showgraph&itemids%5B%5D='.self::$itemids[STRING_255],
+				'Severity' => 'zabbix.php?action=problem.view&hostids%5B0%5D='.self::$hostids['hostids']['Host for Item Card widget'].'&triggerids%5B0%5D='.
 						self::$triggers['Not classidied trigger'].'&triggerids%5B1%5D='.
 						self::$triggers['Information trigger'].'&triggerids%5B2%5D='.
 						self::$triggers['Warning trigger'].'&triggerids%5B3%5D='.
@@ -1959,16 +2086,19 @@ class testDashboardItemCardWidget extends testWidgets {
 						self::$triggers['Disaster trigger'].'&filter_set=1'
 			],
 			'Dependent Item from host' => [
-				'master_item' => 'zabbix.php?action=popup&popup=item.edit&context=host&itemid='.self::$itemids[STRING_255]
+				'Master_item' => 'zabbix.php?action=popup&popup=item.edit&context=host&itemid='.self::$itemids[STRING_255]
 			],
 			'Item card' => [
-				'template' => 'zabbix.php?action=item.list&filter_set=-9&filter_hostids%5B0%5D='.
+				'Template' => 'zabbix.php?action=item.list&filter_set=1&filter_hostids%5B0%5D='.
 						self::$template['templateids']['Template for item card widget'].'&context=template',
-				'history' => 'history.php?action=showvalues&itemids%15B%5D='.self::$itemids[STRING_255]
+				'History' => 'history.php?action=showvalues&itemids%5B%5D='.self::$template_items['Master item from template']+1
 			],
 			'SNMP interface' => [
-				'severity' => 'zabbix.php?action=problem.view&hostids%5B0%5D='.$hostid.'&triggerids%5B0%5D='.
+				'Severity' => 'zabbix.php?action=problem.view&hostids%5B0%5D='.self::$hostids['hostids']['Host for Item Card widget'].'&triggerids%5B0%5D='.
 						self::$triggers['Trigger 1'].'&filter_set=1'
+			],
+			'Link to LLD rule' => [
+				'Lld_rule' => 'zabbix.php?action=item.prototype.list&parent_discoveryid='.self::$discovery_rule_id.'&context=host'
 			]
 		];
 
@@ -1976,28 +2106,56 @@ class testDashboardItemCardWidget extends testWidgets {
 				self::$dashboardid['Dashboard for Item Card widget display check'])->waitUntilReady();
 		$dashboard = CDashboardElement::find()->one();
 
-		foreach ($prefixes as $widget => $checklist) {
-			$widget = $dashboard::find()->one()->getWidget($widget);
+		foreach ($prefixes as $widget_name => $checklist) {
+			$widget = $dashboard::find()->one()->getWidget($widget_name);
 
-			foreach ($checklist as $link) {
-
+			foreach ($checklist as $link => $value) {
 				if ($link === 'host') {
-
+					$this->assertEquals($value, $widget->query('class:sections-header')
+							->query('class:section-path')->query('class:path-element')->one()->getAttribute('href')
+					);
 				}
-				if ($link === 'severity') {
 
+				if ($link === 'Severity') {
+					$this->assertEquals($value, $widget->query('class:sections-header')
+							->query('class:section-item')->query('class:problem-icon-link')->one()->getAttribute('href')
+					);
+					$widget->query('class:sections-header')->query('class:section-item')->query('class:problem-icon-link')
+							->one()->click();
+					$this->page->assertTitle('Problems');
 				}
-				if ($link === 'master_item') {
 
+				if ($link === 'Master_item') {
+					$this->assertEquals($value,$widget->query('class:sections-header')->query('class:section-path')
+							->query('class:teal')->one()->getAttribute('href')
+					);
+					$widget->query('class:sections-header')->query('class:section-path')->query('class:teal')
+							->one()->click();
+					$this->assertEquals(PHPUNIT_URL.$value, $this->page->getCurrentUrl());
 				}
-				if ($link === 'template') {
 
+				if ($link === 'Template') {
+					$this->assertEquals($value,$widget->query('class:sections-header')->query('class:section-path')
+							->query('class:link-alt')->one()->getAttribute('href')
+					);
+					$widget->query('class:sections-header')->query('class:section-path')->query('class:link-alt')
+							->one()->click();
+					$this->assertEquals(PHPUNIT_URL.$value, $this->page->getCurrentUrl());
 				}
-				if ($link === 'graph') {
 
+				if ($link === 'Graph' || $link === 'History') {
+					$widget->query('class:section-latest-data')->query('class:right-column')->query('link:'.$link)->one()->click();
+					$this->page->assertTitle('History [refreshed every 30 sec.]');
+					$this->assertEquals(PHPUNIT_URL.$value, $this->page->getCurrentUrl());
 				}
-				if ($link === 'history') {
 
+				if ($link == 'Lld_rule'){
+					$this->assertEquals($value, $widget->query('class:sections-header')->query('class:section-path')
+							->query('class:link-alt orange')->one()->getAttribute('href')
+					);
+					$widget->query('class:sections-header')->query('class:section-path')->query('class:link-alt orange')
+							->one()->click();
+					$this->assertEquals(PHPUNIT_URL.$value, $this->page->getCurrentUrl());
 				}
 
 				$this->page->open('zabbix.php?action=dashboard.view&dashboardid='.
