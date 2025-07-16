@@ -28,45 +28,19 @@ import (
 	"golang.zabbix.com/sdk/uri"
 )
 
-// RedisConfig encapsulates all parameters needed to create a connection.
-type RedisConfig struct {
-	URI               uri.URI
-	TLSConnectionType comms.TLSConnectionType
-	TLSCertFile       string
-	TLSServerName     string
-	TLSKeyFile        string
-	TLSCAFile         string
-}
-
-// NewConfig creates a RedisConfig from a map of parameters. No param validation is made.
-// It is responsible for parsing, validation, and URI creation.
-func NewConfig(redisURI *uri.URI, params map[string]string) RedisConfig {
-	var cfg RedisConfig
-
-	cfg.URI = *redisURI
-
+func getTlsConfig(redisURI *uri.URI, params map[string]string) (*tls.Config, error) {
 	tlsConnect := params[string(comms.TLSConnect)]
-	tlsConnectionType, _ := comms.NewTLSConnectionType(tlsConnect) //ignoring error because all wrong
-	// configurations were deleted at config validation moment
+	//ignoring error because all wrong options were eliminated at the validation
+	tlsConnectionType, _ := comms.NewTLSConnectionType(tlsConnect)
 
-	cfg.TLSConnectionType = tlsConnectionType
-	cfg.TLSCertFile = params[string(comms.TLSCertFile)]
-	cfg.TLSServerName = params[string(comms.TLSServerName)]
-	cfg.TLSKeyFile = params[string(comms.TLSKeyFile)]
-	cfg.TLSCAFile = params[string(comms.TLSCAFile)]
-
-	return cfg
-}
-
-func (cfg RedisConfig) GetTlsConfig() (*tls.Config, error) {
 	details := tlsconfig.NewDetails(
 		"",
-		cfg.URI.String(),
-		tlsconfig.WithTlsConnect(string(cfg.TLSConnectionType)),
-		tlsconfig.WithTlsCaFile(cfg.TLSCAFile),
-		//todo add servername
-		tlsconfig.WithTlsCertFile(cfg.TLSCertFile),
-		tlsconfig.WithTlsKeyFile(cfg.TLSKeyFile),
+		redisURI.String(),
+		tlsconfig.WithTlsConnect(string(tlsConnectionType)),
+		tlsconfig.WithTlsCaFile(params[string(comms.TLSCAFile)]),
+		tlsconfig.WithTlsServerName(params[string(comms.TLSServerName)]),
+		tlsconfig.WithTlsCertFile(params[string(comms.TLSCertFile)]),
+		tlsconfig.WithTlsKeyFile(params[string(comms.TLSKeyFile)]),
 		tlsconfig.WithAllowedConnections(
 			string(comms.NoTLS),
 			string(comms.Insecure),
@@ -75,13 +49,13 @@ func (cfg RedisConfig) GetTlsConfig() (*tls.Config, error) {
 		),
 	)
 
-	switch cfg.TLSConnectionType {
+	switch tlsConnectionType {
 	case comms.NoTLS:
 		return nil, nil
 	case comms.Insecure:
 		return &tls.Config{InsecureSkipVerify: true}, nil
 	case comms.VerifyCA:
-		tlsConfig, err := details.GetTLSConfig(false)
+		tlsConfig, err := details.GetTLSConfig()
 		if err != nil {
 			return nil, errs.Wrap(err, "failed to get tls config")
 		}
@@ -90,13 +64,15 @@ func (cfg RedisConfig) GetTlsConfig() (*tls.Config, error) {
 
 		return tlsConfig, nil
 	case comms.VerifyFull:
-		tlsConfig, err := details.GetTLSConfig(false)
+		tlsConfig, err := details.GetTLSConfig()
 		if err != nil {
 			return nil, errs.Wrap(err, "failed to get tls config")
 		}
 
+		tlsConfig.VerifyPeerCertificate = tlsconfig.VerifyPeerCertificateFunc(tlsConfig.ServerName, tlsConfig.RootCAs)
+
 		return tlsConfig, nil
 	default:
-		return nil, fmt.Errorf("unsupported TLS connection type: %s", cfg.TLSConnectionType)
+		return nil, fmt.Errorf("unsupported TLS connection type: %s", tlsConnectionType)
 	}
 }

@@ -4,37 +4,40 @@ import (
 	"fmt"
 
 	"golang.zabbix.com/sdk/errs"
-	"golang.zabbix.com/sdk/tlsconfig"
+	"golang.zabbix.com/sdk/plugin/comms"
 )
 
 const (
-	fieldMustBeEmpty    = true
-	fieldMustNotBeEmpty = false
+	Required FieldRequirement = iota
+	Forbidden
+	Optional
 )
 
+type FieldRequirement int
+
 // gives a map which describes what field combinations are allowed depending on TLSConnect value.
-func getTLSValidationRules(tlsConnect string) map[string]bool {
-	switch tlsConnect {
-	case tlsconfig.NoTLS, tlsconfig.Insecure:
-		return map[string]bool{
-			tlsconfig.FieldTLSCAFile:     fieldMustBeEmpty,
-			tlsconfig.FieldTLSServerName: fieldMustBeEmpty,
-			tlsconfig.FieldTLSCertFile:   fieldMustBeEmpty,
-			tlsconfig.FieldTLSKeyFile:    fieldMustBeEmpty,
+func getTLSValidationRules(tlsConnect string) map[comms.TLSConfigSetting]FieldRequirement {
+	switch comms.TLSConnectionType(tlsConnect) {
+	case comms.NoTLS, comms.Insecure:
+		return map[comms.TLSConfigSetting]FieldRequirement{
+			comms.TLSCAFile:     Forbidden,
+			comms.TLSServerName: Forbidden,
+			comms.TLSCertFile:   Forbidden,
+			comms.TLSKeyFile:    Forbidden,
 		}
-	case tlsconfig.VerifyCA:
-		return map[string]bool{
-			tlsconfig.FieldTLSCAFile:     fieldMustNotBeEmpty,
-			tlsconfig.FieldTLSServerName: fieldMustNotBeEmpty,
-			tlsconfig.FieldTLSCertFile:   fieldMustBeEmpty,
-			tlsconfig.FieldTLSKeyFile:    fieldMustBeEmpty,
+	case comms.VerifyCA:
+		return map[comms.TLSConfigSetting]FieldRequirement{
+			comms.TLSCAFile:     Required,
+			comms.TLSServerName: Required,
+			comms.TLSCertFile:   Forbidden,
+			comms.TLSKeyFile:    Forbidden,
 		}
-	case tlsconfig.VerifyFull:
-		return map[string]bool{
-			tlsconfig.FieldTLSCAFile:     fieldMustNotBeEmpty,
-			tlsconfig.FieldTLSServerName: fieldMustNotBeEmpty,
-			tlsconfig.FieldTLSCertFile:   fieldMustNotBeEmpty,
-			tlsconfig.FieldTLSKeyFile:    fieldMustNotBeEmpty,
+	case comms.VerifyFull:
+		return map[comms.TLSConfigSetting]FieldRequirement{
+			comms.TLSCAFile:     Required,
+			comms.TLSServerName: Required,
+			comms.TLSCertFile:   Required,
+			comms.TLSKeyFile:    Required,
 		}
 	default:
 		return nil
@@ -73,7 +76,7 @@ func validateSession(session Session) error {
 
 func validateTLSConfiguration(session Session) error {
 	if session.TLSConnect == "" {
-		session.TLSConnect = tlsconfig.NoTLS
+		session.TLSConnect = string(comms.NoTLS)
 	}
 
 	validationRules := getTLSValidationRules(session.TLSConnect)
@@ -84,29 +87,34 @@ func validateTLSConfiguration(session Session) error {
 	return validateTLSFieldsByRules(session, validationRules)
 }
 
-func validateTLSFieldsByRules(session Session, validationRules map[string]bool) error {
+func validateTLSFieldsByRules(session Session, validationRules map[comms.TLSConfigSetting]FieldRequirement) error {
 	tlsFields := getTLSFieldValues(session)
 
-	for fieldName, mustBeEmpty := range validationRules {
+	for fieldName, fieldRequirement := range validationRules {
 		fieldValue := tlsFields[fieldName]
 
-		if mustBeEmpty && fieldValue != "" {
-			return errs.New(fmt.Sprintf("%s must be empty for %s TLS mode", fieldName, session.TLSConnect))
-		}
-
-		if !mustBeEmpty && fieldValue == "" {
-			return errs.New(fmt.Sprintf("%s is required for %s TLS mode", fieldName, session.TLSConnect))
+		switch fieldRequirement {
+		case Required:
+			if fieldValue == "" {
+				return errs.New(fmt.Sprintf("%s is required", fieldName))
+			}
+		case Forbidden:
+			if fieldValue != "" {
+				return errs.New(fmt.Sprintf("%s is forbidden", fieldName))
+			}
+		case Optional: //no action.
+		default:
 		}
 	}
 
 	return nil
 }
 
-func getTLSFieldValues(session Session) map[string]string {
-	return map[string]string{
-		tlsconfig.FieldTLSCAFile:     session.TLSCAFile,
-		tlsconfig.FieldTLSServerName: session.TLSServerName,
-		tlsconfig.FieldTLSCertFile:   session.TLSCertFile,
-		tlsconfig.FieldTLSKeyFile:    session.TLSKeyFile,
+func getTLSFieldValues(session Session) map[comms.TLSConfigSetting]string {
+	return map[comms.TLSConfigSetting]string{
+		comms.TLSCAFile:     session.TLSCAFile,
+		comms.TLSServerName: session.TLSServerName,
+		comms.TLSCertFile:   session.TLSCertFile,
+		comms.TLSKeyFile:    session.TLSKeyFile,
 	}
 }
