@@ -1190,7 +1190,7 @@ static void	proxyconfig_prepare_table(zbx_table_data_t *td, const char *key_fiel
  *                                                                            *
  ******************************************************************************/
 static int	proxyconfig_sync_table(zbx_vector_table_data_ptr_t *config_tables, const char *table,
-		int mask_queries, char **error)
+		zbx_db_query_mask_t mask_queries, char **error)
 {
 	zbx_table_data_t	*td;
 	int			ret = SUCCEED;
@@ -1206,8 +1206,7 @@ static int	proxyconfig_sync_table(zbx_vector_table_data_ptr_t *config_tables, co
 	if (SUCCEED != proxyconfig_delete_rows(td, error))
 		return FAIL;
 
-	if (1 == mask_queries)
-		zbx_db_set_log_masked_values(1);
+	zbx_db_set_log_masked_values(mask_queries);
 
 	if (SUCCEED != proxyconfig_insert_rows(td, error))
 	{
@@ -1217,7 +1216,7 @@ static int	proxyconfig_sync_table(zbx_vector_table_data_ptr_t *config_tables, co
 
 	ret = proxyconfig_update_rows(td, error);
 out:
-	zbx_db_set_log_masked_values(0);
+	zbx_db_set_log_masked_values(ZBX_DB_DONT_MASK_QUERIES);
 
 	return ret;
 }
@@ -1250,7 +1249,7 @@ static int	proxyconfig_sync_network_discovery(zbx_vector_table_data_ptr_t *confi
 			return FAIL;
 	}
 
-	if (SUCCEED != proxyconfig_sync_table(config_tables, "drules", 0, error))
+	if (SUCCEED != proxyconfig_sync_table(config_tables, "drules", ZBX_DB_DONT_MASK_QUERIES, error))
 		return FAIL;
 
 	if (NULL == dchecks)
@@ -1290,7 +1289,7 @@ static int	proxyconfig_sync_regexps(zbx_vector_table_data_ptr_t *config_tables, 
 			return FAIL;
 	}
 
-	if (SUCCEED != proxyconfig_sync_table(config_tables, "regexps", 0, error))
+	if (SUCCEED != proxyconfig_sync_table(config_tables, "regexps", ZBX_DB_DONT_MASK_QUERIES, error))
 		return FAIL;
 
 	if (NULL == expressions)
@@ -1707,13 +1706,13 @@ static int	proxyconfig_sync_data(zbx_vector_table_data_ptr_t *config_tables, int
 
 	/* first sync isolated tables without relations to other tables */
 
-	if (SUCCEED != proxyconfig_sync_table(config_tables, "globalmacro", 1, error))
+	if (SUCCEED != proxyconfig_sync_table(config_tables, "globalmacro", ZBX_DB_MASK_QUERIES, error))
 		return FAIL;
 
-	if (SUCCEED != proxyconfig_sync_table(config_tables, "config_autoreg_tls", 0, error))
+	if (SUCCEED != proxyconfig_sync_table(config_tables, "config_autoreg_tls", ZBX_DB_DONT_MASK_QUERIES, error))
 		return FAIL;
 
-	if (SUCCEED != proxyconfig_sync_table(config_tables, "config", 0, error))
+	if (SUCCEED != proxyconfig_sync_table(config_tables, "config", ZBX_DB_DONT_MASK_QUERIES, error))
 		return FAIL;
 
 	/* process related tables by scope */
@@ -1732,23 +1731,23 @@ static int	proxyconfig_sync_data(zbx_vector_table_data_ptr_t *config_tables, int
 			return FAIL;
 		}
 
-		zbx_db_set_log_masked_values(1);
+		zbx_db_set_log_masked_values(ZBX_DB_MASK_QUERIES);
 
 		proxyconfig_prepare_hostmacros(hostmacro, hosts_templates, full_sync);
 
 		if (SUCCEED != proxyconfig_prepare_rows(hostmacro, error))
 		{
-			zbx_db_set_log_masked_values(0);
+			zbx_db_set_log_masked_values(ZBX_DB_DONT_MASK_QUERIES);
 			return FAIL;
 		}
 
 		if (SUCCEED != proxyconfig_delete_rows(hostmacro, error))
 		{
-			zbx_db_set_log_masked_values(0);
+			zbx_db_set_log_masked_values(ZBX_DB_DONT_MASK_QUERIES);
 			return FAIL;
 		}
 
-		zbx_db_set_log_masked_values(0);
+		zbx_db_set_log_masked_values(ZBX_DB_DONT_MASK_QUERIES);
 
 		if (SUCCEED != proxyconfig_prepare_rows(hosts_templates, error))
 			return FAIL;
@@ -2006,7 +2005,7 @@ static int	proxyconfig_sync_proxy_group(zbx_vector_table_data_ptr_t *config_tabl
 	zbx_table_data_t	*host_proxy, *proxy;
 
 	if (NULL == (host_proxy = proxyconfig_get_table(config_tables, "host_proxy")))
-		return proxyconfig_sync_table(config_tables, "proxy", 0, error);
+		return proxyconfig_sync_table(config_tables, "proxy", ZBX_DB_DONT_MASK_QUERIES, error);
 
 	if (NULL == (proxy = proxyconfig_get_table(config_tables, "proxy")))
 	{

@@ -70,7 +70,7 @@ static int		config_log_slow_queries;
 
 static int		db_auto_increment;
 
-static int		db_log_masked_values = 0;
+static zbx_db_query_mask_t	db_log_masked_values = 0;
 
 #if defined(HAVE_MYSQL)
 static MYSQL			*conn = NULL;
@@ -1547,7 +1547,7 @@ static char	*db_replace_nonprintable_chars(const char *sql, char **sql_printable
 		zbx_replace_invalid_utf8_and_nonprintable(*sql_printable);
 	}
 
-	if (1 == db_log_masked_values)
+	if (ZBX_DB_MASK_QUERIES == db_log_masked_values)
 		db_mask_printable_sql_values(sql_printable);
 
 	return *sql_printable;
@@ -1779,7 +1779,7 @@ zbx_db_result_t	zbx_db_vselect(const char *fmt, va_list args)
 
 	sql = zbx_dvsprintf(sql, fmt, args);
 
-	if (1 == db_log_masked_values)
+	if (ZBX_DB_MASK_QUERIES == db_log_masked_values)
 		db_mask_select_query(sql, &sql_log);
 	else
 		sql_log = sql;
@@ -2061,7 +2061,7 @@ lbl_get_table:
 		txn_error = ZBX_DB_FAIL;
 	}
 clean:
-	if (1 == db_log_masked_values)
+	if (ZBX_DB_MASK_QUERIES == db_log_masked_values)
 		zbx_free(sql_log);
 
 	zbx_free(sql);
@@ -3172,7 +3172,7 @@ void	zbx_db_clear_last_errcode(void)
 
 #endif
 
-void	zbx_db_set_log_masked_values(int flag)
+void	zbx_db_set_log_masked_values(zbx_db_query_mask_t flag)
 {
 #ifdef ZBX_DEBUG
 	ZBX_UNUSED(flag);

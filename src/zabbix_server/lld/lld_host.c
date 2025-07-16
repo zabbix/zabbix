@@ -4419,10 +4419,10 @@ static void	lld_hosts_save(zbx_uint64_t parent_hostid, zbx_vector_lld_host_ptr_t
 
 	if (0 != new_hostmacros)
 	{
-		zbx_db_set_log_masked_values(1);
+		zbx_db_set_log_masked_values(ZBX_DB_MASK_QUERIES);
 		zbx_db_insert_execute(&db_insert_hmacro);
 		zbx_db_insert_clean(&db_insert_hmacro);
-		zbx_db_set_log_masked_values(0);
+		zbx_db_set_log_masked_values(ZBX_DB_DONT_MASK_QUERIES);
 	}
 
 	if (0 != new_interfaces)
@@ -4461,12 +4461,12 @@ static void	lld_hosts_save(zbx_uint64_t parent_hostid, zbx_vector_lld_host_ptr_t
 	{
 		zbx_db_end_multiple_update(&sql2, &sql2_alloc, &sql2_offset);
 
-		zbx_db_set_log_masked_values(1);
+		zbx_db_set_log_masked_values(ZBX_DB_MASK_QUERIES);
 
 		if (16 < sql2_offset)
 			zbx_db_execute("%s", sql2);
 
-		zbx_db_set_log_masked_values(0);
+		zbx_db_set_log_masked_values(ZBX_DB_DONT_MASK_QUERIES);
 
 		zbx_free(sql2);
 	}
