@@ -1732,13 +1732,23 @@ static int	proxyconfig_sync_data(zbx_vector_table_data_ptr_t *config_tables, int
 			return FAIL;
 		}
 
+		zbx_db_set_log_masked_values(1);
+
 		proxyconfig_prepare_hostmacros(hostmacro, hosts_templates, full_sync);
 
 		if (SUCCEED != proxyconfig_prepare_rows(hostmacro, error))
+		{
+			zbx_db_set_log_masked_values(0);
 			return FAIL;
+		}
 
 		if (SUCCEED != proxyconfig_delete_rows(hostmacro, error))
+		{
+			zbx_db_set_log_masked_values(0);
 			return FAIL;
+		}
+
+		zbx_db_set_log_masked_values(0);
 
 		if (SUCCEED != proxyconfig_prepare_rows(hosts_templates, error))
 			return FAIL;
