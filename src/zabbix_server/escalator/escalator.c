@@ -627,13 +627,11 @@ static void	add_user_msg(zbx_uint64_t userid, zbx_uint64_t mediatypeid, zbx_user
 		int expand_macros, int macro_type, int err_type, const char *tz)
 {
 	zbx_user_msg_t	*p;
-	char		*subject, *message, *tz_tmp;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
-	subject = zbx_strdup(NULL, subj);
-	message = zbx_strdup(NULL, msg);
-	tz_tmp = zbx_strdup(NULL, tz);
+	char	*subject = zbx_strdup(NULL, subj);
+	char	*message = zbx_strdup(NULL, msg);
 
 	if (ZBX_MACRO_EXPAND_YES == expand_macros)
 	{
@@ -641,7 +639,7 @@ static void	add_user_msg(zbx_uint64_t userid, zbx_uint64_t mediatypeid, zbx_user
 
 		substitute_message_macros(&subject, NULL, 0, macro_type, um_handle, &actionid, event, r_event, &userid,
 				NULL, NULL, service_alarm, service, tz, ack);
-		substitute_message_macros(&subject, NULL, 0, macro_type, um_handle, &actionid, event, r_event, &userid,
+		substitute_message_macros(&message, NULL, 0, macro_type, um_handle, &actionid, event, r_event, &userid,
 				NULL, NULL, service_alarm, service, tz, ack);
 
 		zbx_dc_close_user_macros(um_handle);
@@ -687,7 +685,7 @@ static void	add_user_msg(zbx_uint64_t userid, zbx_uint64_t mediatypeid, zbx_user
 		p->err = err_type;
 		p->subject = subject;
 		p->message = message;
-		p->tz = tz_tmp;
+		p->tz = zbx_strdup(NULL, tz);
 		p->next = *user_msg;
 
 		*user_msg = p;
@@ -696,7 +694,6 @@ static void	add_user_msg(zbx_uint64_t userid, zbx_uint64_t mediatypeid, zbx_user
 	{
 		zbx_free(subject);
 		zbx_free(message);
-		zbx_free(tz_tmp);
 	}
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
@@ -905,16 +902,16 @@ static void	add_sentusers_msg(zbx_user_msg_t **user_msg, zbx_uint64_t actionid, 
 
 	if (NULL != r_event)
 	{
-		message_type = ZBX_MESSAGE_RECOVERY;
+		message_type = ZBX_MESSAGE_TYPE_RECOVERY;
 		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, " or eventid=" ZBX_FS_UI64, r_event->eventid);
 	}
 	else
-		message_type = ZBX_MESSAGE_NORMAL;
+		message_type = ZBX_MESSAGE_TYPE_NORMAL;
 
 	zbx_chrcpy_alloc(&sql, &sql_alloc, &sql_offset, ')');
 
 	if (NULL != ack)
-		message_type = ZBX_MESSAGE_UPDATE;
+		message_type = ZBX_MESSAGE_TYPE_UPDATE;
 
 	result = zbx_db_select("%s", sql);
 
@@ -1113,7 +1110,7 @@ static void	add_sentusers_ack_msg(zbx_user_msg_t **user_msg, zbx_uint64_t action
 			goto clean;
 
 		add_user_msgs(userid, operationid, 0, user_msg, actionid, event, r_event, ack, NULL, NULL,
-				ZBX_MESSAGE_UPDATE, evt_src, ZBX_OPERATION_MODE_UPDATE, default_timezone,
+				ZBX_MESSAGE_TYPE_UPDATE, evt_src, ZBX_OPERATION_MODE_UPDATE, default_timezone,
 				user_timezone);
 clean:
 		zbx_free(user_timezone);
@@ -1580,9 +1577,9 @@ static void	get_mediatype_params_object(const zbx_db_event *event, const zbx_db_
 	zbx_dc_um_handle_t	*um_handle, *um_handle_unmasked;
 
 	if (NULL != ack)
-		message_type = ZBX_MESSAGE_UPDATE;
+		message_type = ZBX_MESSAGE_TYPE_UPDATE;
 	else
-		message_type = (NULL != r_event ? ZBX_MESSAGE_RECOVERY : ZBX_MESSAGE_NORMAL);
+		message_type = (NULL != r_event ? ZBX_MESSAGE_TYPE_RECOVERY : ZBX_MESSAGE_TYPE_NORMAL);
 
 	zbx_json_init(&json, 1024);
 
@@ -1633,9 +1630,9 @@ static void	get_mediatype_params_array(const zbx_db_event *event, const zbx_db_e
 	zbx_dc_um_handle_t	*um_handle_unmasked;
 
 	if (NULL != ack)
-		message_type = ZBX_MESSAGE_UPDATE;
+		message_type = ZBX_MESSAGE_TYPE_UPDATE;
 	else
-		message_type = (NULL != r_event ? ZBX_MESSAGE_RECOVERY : ZBX_MESSAGE_NORMAL);
+		message_type = (NULL != r_event ? ZBX_MESSAGE_TYPE_RECOVERY : ZBX_MESSAGE_TYPE_NORMAL);
 
 	um_handle_unmasked = zbx_dc_open_user_macros_secure();
 
@@ -2017,14 +2014,14 @@ static void	escalation_execute_operations(zbx_db_escalation *escalation, zbx_db_
 			{
 				case ZBX_OPERATION_TYPE_MESSAGE:
 					add_object_msg(action->actionid, operationid, &user_msg, event, NULL, NULL,
-							NULL, service, ZBX_MESSAGE_NORMAL,
+							NULL, service, ZBX_MESSAGE_TYPE_NORMAL,
 							action->eventsource, ZBX_OPERATION_MODE_NORMAL,
 							default_timezone, roles);
 					break;
 				case ZBX_OPERATION_TYPE_COMMAND:
 					execute_commands(event, NULL, NULL, NULL, service, action->actionid,
 							operationid, escalation->esc_step,
-							ZBX_MESSAGE_NORMAL, default_timezone, config_timeout,
+							ZBX_MESSAGE_TYPE_NORMAL, default_timezone, config_timeout,
 							config_trapper_timeout, config_source_ip,
 							config_ssh_key_location, get_config_forks, config_enable_global_scripts, program_type);
 					break;
@@ -2128,7 +2125,7 @@ static void	escalation_execute_recovery_operations(zbx_db_event *event, const zb
 		{
 			case ZBX_OPERATION_TYPE_MESSAGE:
 				add_object_msg(action->actionid, operationid, &user_msg, event, r_event, NULL, NULL,
-						service, ZBX_MESSAGE_RECOVERY, action->eventsource,
+						service, ZBX_MESSAGE_TYPE_RECOVERY, action->eventsource,
 						ZBX_OPERATION_MODE_RECOVERY, default_timezone, roles);
 				break;
 			case ZBX_OPERATION_TYPE_RECOVERY_MESSAGE:
@@ -2138,7 +2135,7 @@ static void	escalation_execute_recovery_operations(zbx_db_event *event, const zb
 				break;
 			case ZBX_OPERATION_TYPE_COMMAND:
 				execute_commands(event, r_event, NULL, NULL, service, action->actionid, operationid, 1,
-						ZBX_MESSAGE_RECOVERY, default_timezone, config_timeout,
+						ZBX_MESSAGE_TYPE_RECOVERY, default_timezone, config_timeout,
 						config_trapper_timeout, config_source_ip, config_ssh_key_location,
 						get_config_forks, config_enable_global_scripts, program_type);
 				break;
@@ -2206,7 +2203,7 @@ static void	escalation_execute_update_operations(zbx_db_event *event, const zbx_
 		{
 			case ZBX_OPERATION_TYPE_MESSAGE:
 				add_object_msg(action->actionid, operationid, &user_msg, event, r_event, ack,
-						service_alarm, service, ZBX_MESSAGE_UPDATE, action->eventsource,
+						service_alarm, service, ZBX_MESSAGE_TYPE_UPDATE, action->eventsource,
 						ZBX_OPERATION_MODE_UPDATE, default_timezone, roles);
 				break;
 			case ZBX_OPERATION_TYPE_UPDATE_MESSAGE:
@@ -2222,9 +2219,10 @@ static void	escalation_execute_update_operations(zbx_db_event *event, const zbx_
 				break;
 			case ZBX_OPERATION_TYPE_COMMAND:
 				execute_commands(event, r_event, ack, service_alarm, service, action->actionid,
-						operationid, 1, ZBX_MESSAGE_UPDATE, default_timezone, config_timeout,
-						config_trapper_timeout, config_source_ip, config_ssh_key_location,
-						get_config_forks, config_enable_global_scripts, program_type);
+						operationid, 1, ZBX_MESSAGE_TYPE_UPDATE, default_timezone,
+						config_timeout, config_trapper_timeout, config_source_ip,
+						config_ssh_key_location, get_config_forks, config_enable_global_scripts,
+						program_type);
 				break;
 		}
 	}

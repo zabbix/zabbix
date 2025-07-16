@@ -167,7 +167,7 @@ int	substitute_message_macros(char **data, char *error, int maxerrlen, int messa
 	int	ret;
 	zbx_token_search_t	token_search = ZBX_TOKEN_SEARCH_BASIC;
 
-	/* Shared data */
+	/* Shared data between resolver calls */
 	zbx_vector_uint64_t		item_hosts;
 	const zbx_vector_uint64_t	*trigger_hosts = NULL;
 	zbx_db_event			*cause_event = NULL;
@@ -184,14 +184,14 @@ int	substitute_message_macros(char **data, char *error, int maxerrlen, int messa
 
 	switch (message_type)
 	{
-		case ZBX_MESSAGE_RECOVERY:
-		case ZBX_MESSAGE_NORMAL:
+		case ZBX_MESSAGE_TYPE_RECOVERY:
+		case ZBX_MESSAGE_TYPE_NORMAL:
 			ret = zbx_substitute_spec_macros(token_search, data, error, maxerrlen,
 					&macro_message_normal_resolv, um_handle, actionid, event, r_event, userid,
 					dc_host, alert, service_alarm, service, tz, item_hosts, &trigger_hosts,
 					&cause_event, &cause_recovery_event);
 			break;
-		case ZBX_MESSAGE_UPDATE:
+		case ZBX_MESSAGE_TYPE_UPDATE:
 			ret = zbx_substitute_spec_macros(token_search, data, error, maxerrlen,
 					&macro_message_update_resolv, um_handle, actionid, event, r_event, userid,
 					dc_host, alert, service_alarm, service, tz, ack, item_hosts, &trigger_hosts,
@@ -201,7 +201,7 @@ int	substitute_message_macros(char **data, char *error, int maxerrlen, int messa
 
 	zbx_vector_uint64_destroy(&item_hosts);
 
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __func__, zbx_result_string(ret));
 
 	return ret;
 }

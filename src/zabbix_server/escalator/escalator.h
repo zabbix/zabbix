@@ -20,9 +20,9 @@
 #include "zbxcacheconfig.h"
 #include "zbxdbhigh.h"
 
-#define ZBX_MESSAGE_NORMAL	1
-#define ZBX_MESSAGE_UPDATE	2
-#define ZBX_MESSAGE_RECOVERY	3
+#define ZBX_MESSAGE_TYPE_NORMAL		1
+#define ZBX_MESSAGE_TYPE_UPDATE		2
+#define ZBX_MESSAGE_TYPE_RECOVERY	3
 
 typedef struct
 {
