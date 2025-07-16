@@ -39,7 +39,7 @@ type Plugin struct {
 }
 
 // Export implements the Exporter interface.
-func (p *Plugin) Export(key string, rawParams []string, ctx plugin.ContextProvider) (result interface{}, err error) {
+func (p *Plugin) Export(key string, rawParams []string, ctx plugin.ContextProvider) (result any, err error) {
 	params, _, hc, err := metrics[key].EvalParams(rawParams, p.options.Sessions)
 	if err != nil {
 		return nil, err
@@ -60,7 +60,7 @@ func (p *Plugin) Export(key string, rawParams []string, ctx plugin.ContextProvid
 		return nil, zbxerr.ErrorUnsupportedMetric
 	}
 
-	conn, err := p.connMgr.GetConnection(*redisURI)
+	connection, err := p.connMgr.GetConnection(redisURI, params)
 	if err != nil {
 		// Special logic of processing connection errors is used if redis.ping is requested
 		// because it must return pingFailed if any error occurred.
@@ -73,7 +73,7 @@ func (p *Plugin) Export(key string, rawParams []string, ctx plugin.ContextProvid
 		return nil, err
 	}
 
-	result, err = handleMetric(conn, params)
+	result, err = handleMetric(connection, params)
 	if err != nil {
 		p.Errf(err.Error())
 	}
