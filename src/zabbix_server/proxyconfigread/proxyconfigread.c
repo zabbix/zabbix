@@ -1565,7 +1565,10 @@ int	zbx_proxyconfig_get_data(zbx_dc_proxy_t *proxy, const struct zbx_json_parse 
 		char	*log_json;
 
 		if (NULL != (log_json = zbx_sanitize_proxyconfig_json(j->buffer)))
+		{
 			zabbix_log(LOG_LEVEL_TRACE, "%s() configuration: %s", __func__, log_json);
+			zbx_free(log_json);
+		}
 		else
 			zabbix_log(LOG_LEVEL_TRACE, "%s() configuration: invalid JSON", __func__);
 #endif

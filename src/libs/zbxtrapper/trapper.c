@@ -1167,7 +1167,7 @@ static int	process_trap(zbx_socket_t *sock, char *s, zbx_timespec_t *ts,
 		if (SUCCEED != zbx_json_value_by_name(&jp, ZBX_PROTO_TAG_REQUEST, value, sizeof(value), NULL))
 			return FAIL;
 
-		zabbix_log(LOG_LEVEL_DEBUG, "trapper received '%s' request", value);
+		zabbix_log(LOG_LEVEL_DEBUG, "trapper got '%s' request", value);
 
 		if (0 == strcmp(value, ZBX_PROTO_VALUE_AGENT_DATA))
 		{

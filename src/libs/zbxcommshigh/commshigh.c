@@ -179,7 +179,10 @@ int	zbx_get_data_from_server(zbx_socket_t *sock, char **buffer, size_t buffer_si
 	char	*log_json;
 
 	if (NULL != (log_json = zbx_sanitize_proxyconfig_json(sock->buffer)))
+	{
 		zabbix_log(LOG_LEVEL_TRACE, "%s() configuration: %s", __func__, log_json);
+		zbx_free(log_json);
+	}
 	else
 		zabbix_log(LOG_LEVEL_TRACE, "%s() configuration: invalid JSON", __func__);
 #endif
