@@ -47,7 +47,7 @@ func Test_getLastSlowlogId(t *testing.T) {
 					int64(127),
 					int64(1571840072),
 					3,
-					[]interface{}{},
+					[]any{},
 				}}},
 			128,
 			false,
@@ -89,7 +89,7 @@ func Test_getLastSlowlogId(t *testing.T) {
 }
 
 func TestPlugin_slowlogHandler(t *testing.T) {
-	stubConn := radix.Stub("", "", func(args []string) interface{} {
+	stubConn := radix.Stub("", "", func(args []string) any {
 		return errors.New("cannot fetch data")
 	})
 
@@ -105,7 +105,7 @@ func TestPlugin_slowlogHandler(t *testing.T) {
 	tests := []struct {
 		name    string
 		args    args
-		want    interface{}
+		want    any
 		wantErr bool
 	}{
 		{

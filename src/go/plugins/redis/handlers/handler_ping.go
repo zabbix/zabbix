@@ -21,7 +21,7 @@ import (
 )
 
 // PingHandler executes 'PING' command and returns pingOk if a connection is alive or pingFailed otherwise.
-func PingHandler(conn conn.RedisClient, _ map[string]string) (interface{}, error) {
+func PingHandler(conn conn.RedisClient, _ map[string]string) (any, error) {
 	var res string
 
 	if _ = conn.Query(radix.Cmd(&res, "PING")); res != "PONG" {

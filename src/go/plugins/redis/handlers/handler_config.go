@@ -28,7 +28,7 @@ import (
 const globChars = "*?[]!"
 
 // ConfigHandler gets an output of 'CONFIG GET [pattern]' command and returns it in JSON format or as a single-value.
-func ConfigHandler(conn conn.RedisClient, params map[string]string) (interface{}, error) {
+func ConfigHandler(conn conn.RedisClient, params map[string]string) (any, error) {
 	var res map[string]string
 
 	err := conn.Query(radix.Cmd(&res, "CONFIG", "GET", params["Pattern"]))
