@@ -24,6 +24,7 @@ import (
 	"golang.zabbix.com/agent2/plugins/redis/info"
 	"golang.zabbix.com/sdk/errs"
 	"golang.zabbix.com/sdk/log"
+	"golang.zabbix.com/sdk/uri"
 	"golang.zabbix.com/sdk/zbxerr"
 )
 
@@ -44,7 +45,7 @@ type RedisConn struct {
 type ConnManager struct {
 	sync.Mutex
 	connMutex   sync.Mutex
-	connections map[RedisConfig]*RedisConn
+	connections map[*uri.URI]*RedisConn
 	keepAlive   time.Duration
 	timeout     time.Duration
 	Destroy     context.CancelFunc
@@ -62,7 +63,7 @@ func NewConnManager(keepAlive, timeout, hkInterval time.Duration) *ConnManager {
 	ctx, cancel := context.WithCancel(context.Background())
 
 	connMgr := &ConnManager{
-		connections: make(map[RedisConfig]*RedisConn),
+		connections: make(map[*uri.URI]*RedisConn),
 		keepAlive:   keepAlive,
 		timeout:     timeout,
 		Destroy:     cancel, // Destroy stops originated goroutines and close connections.
@@ -79,16 +80,16 @@ func (r *RedisConn) Query(cmd radix.CmdAction) error {
 }
 
 // GetConnection returns an existing connection or creates a new one.
-func (c *ConnManager) GetConnection(config RedisConfig) (*RedisConn, error) {
+func (c *ConnManager) GetConnection(uri *uri.URI, params map[string]string) (*RedisConn, error) {
 	c.Lock()
 	defer c.Unlock()
 
-	conn := c.get(config)
+	conn := c.get(uri)
 
 	if conn == nil {
 		var err error
 
-		conn, err = c.create(config)
+		conn, err = c.create(uri, params)
 		if err != nil {
 			return nil, errs.WrapConst(err, zbxerr.ErrorConnectionFailed)
 		}
@@ -107,14 +108,14 @@ func (c *ConnManager) closeUnused() {
 	c.connMutex.Lock()
 	defer c.connMutex.Unlock()
 
-	for config, conn := range c.connections {
+	for uri, conn := range c.connections {
 		if time.Since(conn.lastTimeAccess) > c.keepAlive {
 			err := conn.client.Close()
 			if err == nil {
-				delete(c.connections, config)
-				log.Debugf("[%s] Closed unused connection: %s", info.PluginName, config.URI.Addr())
+				delete(c.connections, uri)
+				log.Debugf("[%s] Closed unused connection: %s", info.PluginName, uri.Addr())
 			} else {
-				log.Errf("[%s] Error occurred while closing connection: %s", info.PluginName, config.URI.Addr())
+				log.Errf("[%s] Error occurred while closing connection: %s", info.PluginName, uri.Addr())
 			}
 		}
 	}
@@ -123,12 +124,12 @@ func (c *ConnManager) closeUnused() {
 // closeAll closes all existed connections.
 func (c *ConnManager) closeAll() {
 	c.connMutex.Lock()
-	for config, conn := range c.connections {
+	for uri, conn := range c.connections {
 		err := conn.client.Close()
 		if err == nil {
-			delete(c.connections, config)
+			delete(c.connections, uri)
 		} else {
-			log.Errf("[%s] Error occurred while closing connection: %s", info.PluginName, config.URI.Addr())
+			log.Errf("[%s] Error occurred while closing connection: %s", info.PluginName, uri.Addr())
 		}
 	}
 	c.connMutex.Unlock()
@@ -152,7 +153,7 @@ func (c *ConnManager) housekeeper(ctx context.Context, interval time.Duration) {
 }
 
 // create creates a new connection with given credentials.
-func (c *ConnManager) create(config RedisConfig) (*RedisConn, error) {
+func (c *ConnManager) create(uri *uri.URI, params map[string]string) (*RedisConn, error) {
 	const clientName = "zbx_monitor"
 
 	const poolSize = 1
@@ -160,12 +161,12 @@ func (c *ConnManager) create(config RedisConfig) (*RedisConn, error) {
 	c.connMutex.Lock()
 	defer c.connMutex.Unlock()
 
-	tlsConfig, err := config.GetTlsConfig()
+	tlsConfig, err := getTlsConfig(uri, params)
 	if err != nil {
-		return nil, errs.Wrap(err, "failed to get tls config")
+		return nil, errs.Wrap(err, "failed to get tls uri")
 	}
 
-	_, ok := c.connections[config]
+	_, ok := c.connections[uri]
 	if ok {
 		// Should never happen.
 		panic("connection already exists")
@@ -175,7 +176,7 @@ func (c *ConnManager) create(config RedisConfig) (*RedisConn, error) {
 	AuthConnFunc := func(scheme, addr string) (radix.Conn, error) {
 		dialOpts := []radix.DialOpt{
 			radix.DialTimeout(c.timeout),
-			radix.DialAuthUser(config.URI.User(), config.URI.Password()),
+			radix.DialAuthUser(uri.User(), uri.Password()),
 		}
 
 		if tlsConfig != nil {
@@ -205,27 +206,27 @@ func (c *ConnManager) create(config RedisConfig) (*RedisConn, error) {
 		return conn, nil
 	}
 
-	client, err := radix.NewPool(config.URI.Scheme(), config.URI.Addr(), poolSize, radix.PoolConnFunc(AuthConnFunc))
+	client, err := radix.NewPool(uri.Scheme(), uri.Addr(), poolSize, radix.PoolConnFunc(AuthConnFunc))
 	if err != nil {
 		return nil, err
 	}
 
-	c.connections[config] = &RedisConn{
+	c.connections[uri] = &RedisConn{
 		client:         client,
 		lastTimeAccess: time.Now(),
 	}
 
-	log.Debugf("[%s] Created new connection: %s", info.PluginName, config.URI.Addr())
+	log.Debugf("[%s] Created new connection: %s", info.PluginName, uri.Addr())
 
-	return c.connections[config], nil
+	return c.connections[uri], nil
 }
 
 // get returns a connection with given cid if it exists and also updates lastTimeAccess, otherwise returns nil.
-func (c *ConnManager) get(config RedisConfig) *RedisConn {
+func (c *ConnManager) get(uri *uri.URI) *RedisConn {
 	c.connMutex.Lock()
 	defer c.connMutex.Unlock()
 
-	conn, ok := c.connections[config]
+	conn, ok := c.connections[uri]
 	if ok {
 		conn.updateAccessTime()
 
