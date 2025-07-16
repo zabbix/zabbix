@@ -1483,7 +1483,7 @@ void	zbx_postgresql_escape_bin(const char *src, char **dst, size_t size)
 
 static char	*mask_skip_whitespace(char *s)
 {
-	while (*s && 0 != isspace((unsigned char)*s))
+	while ('\0' != *s && 0 != isspace((unsigned char)*s))
 		s++;
 
 	return s;
@@ -1491,7 +1491,7 @@ static char	*mask_skip_whitespace(char *s)
 
 static char	*mask_skip_tablename(char *s)
 {
-	while (*s && (0 != isalnum((unsigned char)*s) || '_' == *s || '.' == *s))
+	while ('\0' != *s && (0 != isalnum((unsigned char)*s) || '_' == *s || '.' == *s))
 		s++;
 
 	return s;
