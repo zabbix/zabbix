@@ -47,26 +47,39 @@ class CUserDirectory extends CApiService {
 		'sp_private_key_hash' => 'sp_private_key'
 	];
 
-	public const OUTPUT_FIELDS = [
-		// Common output fields.
-		'userdirectoryid', 'name', 'idp_type', 'provision_status', 'description',
-
-		// LDAP and SAML main fields.
-		'group_name', 'user_username', 'user_lastname',
-
-		// LDAP output fields.
-		'host', 'port', 'base_dn', 'search_attribute', 'bind_dn', 'start_tls', 'search_filter', 'group_basedn',
-		'group_member', 'group_filter', 'group_membership', 'user_ref_attr',
-
-		// SAML output fields.
-		'idp_entityid', 'sso_url', 'slo_url', 'username_attribute', 'sp_entityid', 'nameid_format', 'sign_messages',
-		'sign_assertions', 'sign_authn_requests', 'sign_logout_requests', 'sign_logout_responses', 'encrypt_nameid',
-		'encrypt_assertions', 'scim_status', 'idp_certificate_hash', 'sp_certificate_hash', 'sp_private_key_hash'
-	];
-
 	public const MEDIA_OUTPUT_FIELDS = [
 		'userdirectory_mediaid', 'mediatypeid', 'name', 'attribute', 'active', 'severity', 'period'
 	];
+
+	/**
+	 * Gets output fields based on if SAML certificates storage set to 'database' or not.
+	 *
+	 * @return array
+	 */
+	public static function getOutputFields(): array {
+		$output_fields = [
+			// Common output fields.
+			'userdirectoryid', 'name', 'idp_type', 'provision_status', 'description',
+
+			// LDAP and SAML main fields.
+			'group_name', 'user_username', 'user_lastname',
+
+			// LDAP output fields.
+			'host', 'port', 'base_dn', 'search_attribute', 'bind_dn', 'start_tls', 'search_filter', 'group_basedn',
+			'group_member', 'group_filter', 'group_membership', 'user_ref_attr',
+
+			// SAML output fields.
+			'idp_entityid', 'sso_url', 'slo_url', 'username_attribute', 'sp_entityid', 'nameid_format', 'sign_messages',
+			'sign_assertions', 'sign_authn_requests', 'sign_logout_requests', 'sign_logout_responses', 'encrypt_nameid',
+			'encrypt_assertions', 'scim_status'
+		];
+
+		$saml_cert_output_fields = ['idp_certificate_hash', 'sp_certificate_hash', 'sp_private_key_hash'];
+
+		return CAuthenticationHelper::isSamlCertsStorageDatabase()
+			? array_merge($output_fields, $saml_cert_output_fields)
+			: $output_fields;
+	}
 
 	/**
 	 * @param array $options
@@ -79,10 +92,6 @@ class CUserDirectory extends CApiService {
 		$this->validateGet($options);
 
 		if (!$options['countOutput']) {
-			if ($options['output'] === API_OUTPUT_EXTEND) {
-				$options['output'] = self::OUTPUT_FIELDS;
-			}
-
 			$request_output = $options['output'];
 			$db_userdirectories_by_type = [IDP_TYPE_LDAP => [], IDP_TYPE_SAML => []];
 			$db_userdirectories = [];
@@ -92,10 +101,6 @@ class CUserDirectory extends CApiService {
 
 			$ldap_output = array_intersect($request_output, self::LDAP_OUTPUT_FIELDS);
 			$saml_output = array_intersect($request_output, self::SAML_OUTPUT_FIELDS);
-
-			if (!CAuthenticationHelper::isSamlCertsStorageDatabase()) {
-				$saml_output = array_diff($saml_output, array_keys(self::SAML_HASH_FIELDS));
-			}
 		}
 
 		$result = DBselect($this->createSelectQuery($this->tableName, $options), $options['limit']);
@@ -171,7 +176,7 @@ class CUserDirectory extends CApiService {
 			'excludeSearch' =>				['type' => API_FLAG, 'default' => false],
 			'searchWildcardsEnabled' =>		['type' => API_BOOLEAN, 'default' => false],
 			// output
-			'output' =>						['type' => API_OUTPUT, 'in' => implode(',', self::OUTPUT_FIELDS), 'default' => API_OUTPUT_EXTEND],
+			'output' =>						['type' => API_OUTPUT, 'flags' => API_NORMALIZE, 'in' => implode(',', self::getOutputFields()), 'default' => self::getOutputFields()],
 			'countOutput' =>				['type' => API_FLAG, 'default' => false],
 			'selectUsrgrps' =>				['type' => API_OUTPUT, 'flags' => API_ALLOW_NULL | API_ALLOW_COUNT, 'in' => implode(',', CUserGroup::OUTPUT_FIELDS), 'default' => null],
 			'selectProvisionMedia' =>		['type' => API_OUTPUT, 'flags' => API_ALLOW_NULL, 'in' => implode(',', self::MEDIA_OUTPUT_FIELDS), 'default' => null],
@@ -572,7 +577,7 @@ class CUserDirectory extends CApiService {
 		}
 
 		$db_userdirectories = $this->get([
-			'output' => array_diff(self::OUTPUT_FIELDS, array_keys(self::SAML_HASH_FIELDS)),
+			'output' => array_diff(self::getOutputFields(), array_keys(self::SAML_HASH_FIELDS)),
 			'userdirectoryids' => array_column($userdirectories, 'userdirectoryid'),
 			'preservekeys' => true
 		]);
@@ -598,7 +603,10 @@ class CUserDirectory extends CApiService {
 
 		self::checkSamlRequirements($userdirectories);
 
-		self::addSamlWriteOnlyDbFields($userdirectories, $db_userdirectories);
+		if (CAuthenticationHelper::isSamlCertsStorageDatabase()) {
+			self::addSamlCertificateDbFields($userdirectories, $db_userdirectories);
+		}
+
 		self::addRequiredFieldsByType($userdirectories, $db_userdirectories);
 
 		$api_input_rules = self::getValidationRules(true);
@@ -1680,21 +1688,21 @@ class CUserDirectory extends CApiService {
 											['if' => ['field' => 'idp_type', 'in' => IDP_TYPE_SAML], 'type' => API_SSL_CERTIFICATE, 'flags' => $api_required | API_NOT_EMPTY],
 											['else' => true, 'type' => API_STRING_UTF8, 'in' => DB::getDefault('userdirectory_saml', 'idp_certificate')]
 										]],
-										['else' => true, 'type' => API_STRING_UTF8, 'in' => DB::getDefault('userdirectory_saml', 'idp_certificate')]
+										['else' => true, 'type' => API_UNEXPECTED]
 			]],
 			'sp_certificate' =>		['type' => API_MULTIPLE, 'rules' => [
 										['if' => static fn(): bool => CAuthenticationHelper::isSamlCertsStorageDatabase(), 'type' => API_MULTIPLE, 'rules' => [
 											['if' => ['field' => 'idp_type', 'in' => IDP_TYPE_SAML], 'type' => API_SSL_CERTIFICATE],
 											['else' => true, 'type' => API_STRING_UTF8, 'in' => DB::getDefault('userdirectory_saml', 'sp_certificate')]
 										]],
-										['else' => true, 'type' => API_STRING_UTF8, 'in' => DB::getDefault('userdirectory_saml', 'sp_certificate')]
+										['else' => true, 'type' => API_UNEXPECTED]
 			]],
 			'sp_private_key' =>		['type' => API_MULTIPLE, 'rules' => [
 										['if' => static fn(): bool => CAuthenticationHelper::isSamlCertsStorageDatabase(), 'type' => API_MULTIPLE, 'rules' => [
 											['if' => ['field' => 'idp_type', 'in' => IDP_TYPE_SAML], 'type' => API_SSL_PRIVATE_KEY],
 											['else' => true, 'type' => API_STRING_UTF8, 'in' => DB::getDefault('userdirectory_saml', 'sp_private_key')]
 										]],
-										['else' => true, 'type' => API_STRING_UTF8, 'in' => DB::getDefault('userdirectory_saml', 'sp_private_key')]
+										['else' => true, 'type' => API_UNEXPECTED]
 			]],
 			'provision_groups' =>	['type' => API_MULTIPLE, 'rules' => [
 										['if' => ['field' => 'provision_status', 'in' => implode(',', [JIT_PROVISIONING_ENABLED])], 'type' => API_OBJECTS, 'flags' => $api_required | API_NOT_EMPTY | API_NORMALIZE, 'uniq' => [['name']], 'fields' => [
