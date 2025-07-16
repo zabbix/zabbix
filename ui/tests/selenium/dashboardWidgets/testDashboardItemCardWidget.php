@@ -233,14 +233,6 @@ class testDashboardItemCardWidget extends testWidgets {
 						'delay' => '15m',
 						'history' => 0,
 						'trends' => 0
-					],
-					[
-						'name' => 'Item with log datatype',
-						'key_' => 'datatype_log',
-						'type' => ITEM_TYPE_IPMI,
-						'value_type' => ITEM_VALUE_TYPE_LOG,
-						'ipmi_sensor' => 'service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi',
-						'delay' => '15m'
 					]
 				],
 				'monitored_by' => ZBX_MONITORED_BY_SERVER,
@@ -326,8 +318,9 @@ class testDashboardItemCardWidget extends testWidgets {
 		// Emulate item discovery in DB.
 		DBexecute('INSERT INTO items (itemid, type, hostid, name, description, key_, interfaceid, flags, query_fields,'.
 				' params, posts, headers, status) VALUES ('.zbx_dbstr($discovered_item['itemid']).', 2, '.
-				zbx_dbstr(self::$hostids['hostids']['Host for Item Card widget']).', '.zbx_dbstr($discovered_item['item_name']).', \'\', '.
-				zbx_dbstr($discovered_item['key_']).', NULL, 4, \'\', \'\', \'\', \'\', '.zbx_dbstr($discovered_item['status']).')'
+				zbx_dbstr(self::$hostids['hostids']['Host for Item Card widget']).', '.
+				zbx_dbstr($discovered_item['item_name']).', \'\', '.zbx_dbstr($discovered_item['key_']).
+				', NULL, 4, \'\', \'\', \'\', \'\', '.zbx_dbstr($discovered_item['status']).')'
 		);
 		DBexecute('INSERT INTO item_discovery (itemdiscoveryid, itemid, parent_itemid, ts_delete, disable_source,'.
 				' ts_disable, status) VALUES ('.zbx_dbstr($discovered_item['itemdiscoveryid']).', '.
@@ -412,8 +405,6 @@ class testDashboardItemCardWidget extends testWidgets {
 				'value type "Numeric (unsigned)". Value "hahah"').'WHERE itemid ='.zbx_dbstr(self::$itemids[STRING_255]));
 		DBexecute('UPDATE item_rtdata SET state = 1, error = '.zbx_dbstr('Unsupported item key.').
 				'WHERE itemid ='.zbx_dbstr($depend_items['Dependent item 1']));
-
-		DBexecute('INSERT INTO item_rtdata (itemid, lastlogsize, state, mtime) VALUES (10090002, 0, 0, 0)');
 
 		CDataHelper::call('dashboard.create', [
 			[
@@ -1140,7 +1131,7 @@ class testDashboardItemCardWidget extends testWidgets {
 				$colorpicker = $this->query('id:color_picker')->one()->waitUntilReady();
 				$this->assertTrue($colorpicker->isVisible(true));
 				$colorpicker->query('button:Apply')->one()->click();
-				$this->assertTrue(!$colorpicker->isVisible());
+				$this->assertTrue($colorpicker->isVisible(false));
 			}
 			else {
 				$this->assertTrue($sparkline->isVisible(false));
@@ -1322,7 +1313,7 @@ class testDashboardItemCardWidget extends testWidgets {
 						'id:sparkline_fill' => 5,
 						'id:sparkline_time_period_data_source' => 'Custom',
 						'id:sparkline_time_period_from' => 'dsa',
-						'id:sparkline_time_period_to' => '321',
+						'id:sparkline_time_period_to' => '321'
 					],
 					'error_message' => [
 						'Invalid parameter "Sparkline: Time period/From": a time is expected.',
@@ -1344,7 +1335,7 @@ class testDashboardItemCardWidget extends testWidgets {
 						['action' => USER_ACTION_REMOVE, 'index' => 0],
 						['action' => USER_ACTION_REMOVE, 'index' => 0],
 						['action' => USER_ACTION_REMOVE, 'index' => 0],
-						['action' => USER_ACTION_UPDATE, 'index' => 0, 'section' => 'Description'],
+						['action' => USER_ACTION_UPDATE, 'index' => 0, 'section' => 'Description']
 					],
 					'trim' => true
 				]
@@ -1393,7 +1384,7 @@ class testDashboardItemCardWidget extends testWidgets {
 					'fields' => [
 						'Name' => '105\'; --DROP TABLE Users',
 						'Refresh interval' => '1 minute',
-						'Item' => '105\'; --DROP TABLE Users',
+						'Item' => '105\'; --DROP TABLE Users'
 					],
 					'Show' => [
 						['action' => USER_ACTION_UPDATE, 'index' => 0, 'section' => 'Description'],
@@ -1411,7 +1402,7 @@ class testDashboardItemCardWidget extends testWidgets {
 					'fields' => [
 						'Name' => 'Update then remove one Show option',
 						'Refresh interval' => '2 minutes',
-						'Item' => STRING_255,
+						'Item' => STRING_255
 					],
 					'Show' => [
 						['action' => USER_ACTION_UPDATE, 'index' => 0, 'section' => 'Tags'],
@@ -1662,7 +1653,7 @@ class testDashboardItemCardWidget extends testWidgets {
 							'Name' => 'Disaster trigger',
 							'Expression' => 'last(/Host for Item Card widget/master)>600',
 							'Status' => 'Enabled'
-						],
+						]
 					],
 					'Host inventory' => 'OS (Full details)',
 					'Tags' => ['ItemCardTag: ItemCardTag', 'long_text: long_string_long_string_long_string_long_string'.
@@ -1936,7 +1927,7 @@ class testDashboardItemCardWidget extends testWidgets {
 			foreach ($data['Latest data'] as $section => $value) {
 
 				// Last check.
-				if($section === 'column') {
+				if ($section === 'column') {
 					if ($value) {
 						$last_check = $widget->query('class:section-latest-data')->query('class:'.$section)
 								->query('class:column-value')->query('class:cursor-pointer')->one();
@@ -2004,7 +1995,7 @@ class testDashboardItemCardWidget extends testWidgets {
 			$this->assertEquals($data['Tags'], $tags->asText());
 
 			foreach ($tags as $tag) {
-				if($tag->isClickable()){
+				if ($tag->isClickable()) {
 					$tag->click();
 					$hint = $this->query('xpath://div[@data-hintboxid]')->asOverlayDialog()->waitUntilPresent()->all()->last();
 					$this->assertEquals($tag->getText(), $hint->getText());
@@ -2075,9 +2066,11 @@ class testDashboardItemCardWidget extends testWidgets {
 	public function testDashboardItemCardWidget_CheckLinks() {
 		$prefixes = [
 			'Master item from host' => [
-				'Host' => 'zabbix.php?action=popup&popup=host.edit&hostid='.self::$hostids['hostids']['Host for Item Card widget'],
+				'Host' => 'zabbix.php?action=popup&popup=host.edit&hostid='.self::$hostids['hostids']
+						['Host for Item Card widget'],
 				'Graph' => 'history.php?action=showgraph&itemids%5B%5D='.self::$itemids[STRING_255],
-				'Severity' => 'zabbix.php?action=problem.view&hostids%5B0%5D='.self::$hostids['hostids']['Host for Item Card widget'].'&triggerids%5B0%5D='.
+				'Severity' => 'zabbix.php?action=problem.view&hostids%5B0%5D='.self::$hostids['hostids']
+						['Host for Item Card widget'].'&triggerids%5B0%5D='.
 						self::$triggers['Not classidied trigger'].'&triggerids%5B1%5D='.
 						self::$triggers['Information trigger'].'&triggerids%5B2%5D='.
 						self::$triggers['Warning trigger'].'&triggerids%5B3%5D='.
@@ -2091,14 +2084,17 @@ class testDashboardItemCardWidget extends testWidgets {
 			'Item card' => [
 				'Template' => 'zabbix.php?action=item.list&filter_set=1&filter_hostids%5B0%5D='.
 						self::$template['templateids']['Template for item card widget'].'&context=template',
-				'History' => 'history.php?action=showvalues&itemids%5B%5D='.self::$template_items['Master item from template']+1
+				'History' => 'history.php?action=showvalues&itemids%5B%5D='.
+						self::$template_items['Master item from template']+1
 			],
 			'SNMP interface' => [
-				'Severity' => 'zabbix.php?action=problem.view&hostids%5B0%5D='.self::$hostids['hostids']['Host for Item Card widget'].'&triggerids%5B0%5D='.
+				'Severity' => 'zabbix.php?action=problem.view&hostids%5B0%5D='.
+						self::$hostids['hostids']['Host for Item Card widget'].'&triggerids%5B0%5D='.
 						self::$triggers['Trigger 1'].'&filter_set=1'
 			],
 			'Link to LLD rule' => [
-				'Lld_rule' => 'zabbix.php?action=item.prototype.list&parent_discoveryid='.self::$discovery_rule_id.'&context=host'
+				'Lld_rule' => 'zabbix.php?action=item.prototype.list&parent_discoveryid='.
+						self::$discovery_rule_id.'&context=host'
 			]
 		];
 
@@ -2144,12 +2140,13 @@ class testDashboardItemCardWidget extends testWidgets {
 				}
 
 				if ($link === 'Graph' || $link === 'History') {
-					$widget->query('class:section-latest-data')->query('class:right-column')->query('link:'.$link)->one()->click();
+					$widget->query('class:section-latest-data')->query('class:right-column')->query('link:'.$link)
+							->one()->click();
 					$this->page->assertTitle('History [refreshed every 30 sec.]');
 					$this->assertEquals(PHPUNIT_URL.$value, $this->page->getCurrentUrl());
 				}
 
-				if ($link == 'Lld_rule'){
+				if ($link == 'Lld_rule') {
 					$this->assertEquals($value, $widget->query('class:sections-header')->query('class:section-path')
 							->query('class:link-alt orange')->one()->getAttribute('href')
 					);
