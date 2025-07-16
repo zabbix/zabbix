@@ -25,7 +25,7 @@ import (
 )
 
 func TestPlugin_configHandler(t *testing.T) {
-	stubConn := radix.Stub("", "", func(args []string) interface{} {
+	stubConn := radix.Stub("", "", func(args []string) any {
 		switch strings.ToLower(args[2]) {
 		case "param1":
 			return map[string]string{"param1": "foo"}
@@ -53,7 +53,7 @@ func TestPlugin_configHandler(t *testing.T) {
 	tests := []struct {
 		name    string
 		args    args
-		want    interface{}
+		want    any
 		wantErr bool
 	}{
 		{

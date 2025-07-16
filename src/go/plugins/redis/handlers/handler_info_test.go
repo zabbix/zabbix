@@ -174,7 +174,7 @@ func Benchmark_parseRedisInfo_Extended(b *testing.B) {
 }
 
 func TestPlugin_infoHandler(t *testing.T) {
-	stubConn := radix.Stub("", "", func(args []string) interface{} {
+	stubConn := radix.Stub("", "", func(args []string) any {
 		switch args[1] {
 		case "commonsection":
 			return infoCommonSectionOutput
@@ -202,7 +202,7 @@ func TestPlugin_infoHandler(t *testing.T) {
 	tests := []struct {
 		name    string
 		args    args
-		want    interface{}
+		want    any
 		wantErr bool
 	}{
 		{
