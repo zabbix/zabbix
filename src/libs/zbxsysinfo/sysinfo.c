@@ -1330,13 +1330,17 @@ int	zbx_set_agent_result_type(AGENT_RESULT *result, int value_type, char *c)
 			SET_TEXT_RESULT(result, zbx_strdup(NULL, c));
 			ret = SUCCEED;
 			break;
+		case ITEM_VALUE_TYPE_JSON:
+			zbx_replace_invalid_utf8(c);
+			SET_JSON_RESULT(result, zbx_strdup(NULL, c));
+			ret = SUCCEED;
+			break;
 		case ITEM_VALUE_TYPE_LOG:
 			zbx_replace_invalid_utf8(c);
 			add_log_result(result, c);
 			ret = SUCCEED;
 			break;
 		case ITEM_VALUE_TYPE_BIN:
-		case ITEM_VALUE_TYPE_JSON:
 		case ITEM_VALUE_TYPE_NONE:
 		default:
 			THIS_SHOULD_NEVER_HAPPEN;
@@ -1567,6 +1571,7 @@ void	*get_result_value_by_type(AGENT_RESULT *result, int require_type)
 				return (void *)(&result->msg);
 			break;
 		default:
+			THIS_SHOULD_NEVER_HAPPEN;
 			break;
 	}
 

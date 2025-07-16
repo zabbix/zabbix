@@ -2546,7 +2546,9 @@ void	zbx_dc_add_history_variant(zbx_uint64_t itemid, unsigned char value_type, u
 	}
 
 	if (ZBX_VARIANT_NONE == value->type)
+	{
 		value_flags |= ZBX_DC_FLAG_NOVALUE;
+	}
 
 	/* Add data to the local history cache if:                                           */
 	/*   1) the NOVALUE flag is set (data contains either meta information or timestamp) */
@@ -3016,7 +3018,7 @@ static int	hc_clone_history_data(zbx_hc_data_t **data, const dc_item_value_t *it
 			case ITEM_VALUE_TYPE_STR:
 			case ITEM_VALUE_TYPE_TEXT:
 			case ITEM_VALUE_TYPE_BIN:
-			case ITEM_VALUE_TYPE_JSON:
+			case ITEM_VALUE_TYPE_JSON: // this seems to be correct
 				if (SUCCEED != hc_clone_history_str_data(&(*data)->value.str,
 						&item_value->value.value_str))
 				{

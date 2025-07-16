@@ -144,6 +144,13 @@ zbx_metric_t;
 )
 
 /* NOTE: always allocate new memory for val! DON'T USE STATIC OR STACK MEMORY!!! */
+#define SET_JSON_RESULT(res, val)		\
+(						\
+	(res)->type |= AR_JSON,			\
+	(res)->tjson = (char *)(val)		\
+)
+
+/* NOTE: always allocate new memory for val! DON'T USE STATIC OR STACK MEMORY!!! */
 #define SET_LOG_RESULT(res, val)		\
 (						\
 	(res)->type |= AR_LOG,			\
@@ -169,7 +176,7 @@ zbx_metric_t;
 #define ZBX_ISSET_BIN(res)	((res)->type & AR_BIN)
 #define ZBX_ISSET_JSON(res)	((res)->type & AR_JSON)
 
-#define ZBX_ISSET_VALUE(res)	((res)->type & (AR_UINT64 | AR_DOUBLE | AR_STRING | AR_TEXT | AR_LOG))
+#define ZBX_ISSET_VALUE(res)	((res)->type & (AR_UINT64 | AR_DOUBLE | AR_STRING | AR_TEXT | AR_LOG | AR_JSON))
 
 /* UNSET RESULT */
 
@@ -259,7 +266,7 @@ do									\
 {									\
 	if ((res)->type & AR_JSON)					\
 	{								\
-		zbx_free((res)->bin);					\
+		zbx_free((res)->tjson);					\
 		(res)->type &= ~AR_JSON	;				\
 	}								\
 }									\
