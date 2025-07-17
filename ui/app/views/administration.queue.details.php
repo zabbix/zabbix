@@ -44,7 +44,6 @@ $table = (new CTableInfo())->setHeader([
 	_('Host'),
 	_('Name'),
 	_('Proxy'),
-	_('Proxy group')
 ]);
 
 foreach ($data['queue_data'] as $itemid => $item_queue_data) {
@@ -55,17 +54,22 @@ foreach ($data['queue_data'] as $itemid => $item_queue_data) {
 	$item = $data['items'][$itemid];
 	$host = reset($item['hosts']);
 
+	if (array_key_exists($data['hosts'][$item['hostid']]['proxyid'], $data['proxies'])) {
+		$proxy = $data['proxies'][$data['hosts'][$item['hostid']]['proxyid']]['name'];
+	} else if ($data['hosts'][$item['hostid']]['proxy_groupid']) {
+		$proxy = $data['proxies'][$data['hosts'][$item['hostid']]['assigned_proxyid']]['name'];
+	} else {
+		$proxy =
+			(new CSpan(_('Proxy is not assigned yet.')))
+			->addClass(ZBX_STYLE_GREY);
+	}
+
 	$table->addRow([
 		zbx_date2str(DATE_TIME_FORMAT_SECONDS, $item_queue_data['nextcheck']),
 		zbx_date2age($item_queue_data['nextcheck']),
 		$host['name'],
 		$item['name'],
-		array_key_exists($data['hosts'][$item['hostid']]['proxyid'], $data['proxies'])
-			? $data['proxies'][$data['hosts'][$item['hostid']]['proxyid']]['name']
-			: '',
-		array_key_exists($data['hosts'][$item['hostid']]['proxy_groupid'], $data['proxy_groups'])
-			? $data['proxy_groups'][$data['hosts'][$item['hostid']]['proxy_groupid']]['name']
-			: ''
+		$proxy
 	]);
 }
 
