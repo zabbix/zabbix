@@ -1264,14 +1264,18 @@ window.host_wizard_edit = new class {
 				let psk_identity = '';
 				let psk = '';
 
+				const step_errors = this.#validation_errors[this.#getCurrentStep()];
+				const agent_script_has_error = step_errors['agent_script_server_host'] !== null;
+				const tls_psk_identity_has_error = step_errors['tls_psk_identity'] !== null;
+
 				if (this.#data.monitoring_os === 'linux') {
-					server_host = this.#data.agent_script_server_host !== ''
+					server_host = this.#data.agent_script_server_host !== '' && !agent_script_has_error
 						? `--server-host '${this.#data.agent_script_server_host}'`
 						: `--server-host-stdin`;
 
 					hostname = `--hostname '${this.#data.host_new.id}'`;
 
-					psk_identity = this.#data.tls_psk_identity !== ''
+					psk_identity = this.#data.tls_psk_identity !== '' && !tls_psk_identity_has_error
 						? `--psk-identity '${this.#data.tls_psk_identity}'`
 						: `--psk-identity-stdin`;
 
@@ -1281,13 +1285,13 @@ window.host_wizard_edit = new class {
 				}
 
 				if (this.#data.monitoring_os === 'windows') {
-					server_host = this.#data.agent_script_server_host !== ''
+					server_host = this.#data.agent_script_server_host !== '' && !tls_psk_identity_has_error
 						? `-serverHost '${this.#data.agent_script_server_host.replace(/ /g, `\` `)}'`
 						: `-serverHostSTDIN`;
 
 					hostname = `-hostName '${this.#data.host_new.id.replace(/ /g, `\` `)}'`;
 
-					psk_identity = this.#data.tls_psk_identity !== ''
+					psk_identity = this.#data.tls_psk_identity !== '' && !tls_psk_identity_has_error
 						? `-pskIdentity '${this.#data.tls_psk_identity.replace(/ /g, `\` `)}'`
 						: `-pskIdentitySTDIN`;
 
