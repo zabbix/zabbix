@@ -344,14 +344,17 @@ static int	pp_excute_jsonpath_query(zbx_pp_cache_t *cache, zbx_variant_t *value,
  ******************************************************************************/
 static int	pp_execute_jsonpath(zbx_pp_cache_t *cache, zbx_variant_t *value, const char *params)
 {
-	char	*errmsg = NULL;
+	char	*errmsg = NULL, *error = NULL;
+	size_t	error_alloc = 0, error_offset = 0;
 
 	if (SUCCEED == pp_excute_jsonpath_query(cache, value, params, &errmsg))
 		return SUCCEED;
 
 	zbx_variant_clear(value);
-	zbx_variant_set_error(value, zbx_dsprintf(NULL, "cannot extract value from json by path \"%s\": %s", params,
-			errmsg));
+	zbx_snprintf_alloc(&error, &error_alloc, &error_offset, "cannot extract value from json by path \"%s\": %s",
+			params, errmsg);
+
+	zbx_variant_set_error(value, error);
 
 	zbx_free(errmsg);
 
@@ -1073,17 +1076,10 @@ int	pp_execute_step(zbx_pp_context_t *ctx, zbx_pp_cache_t *cache, zbx_dc_um_shar
 	{
 		if (NULL != strstr(params, "{$"))
 		{
-			char		*error_resolve = NULL;
 			unsigned char	env = ZBX_PREPROC_SCRIPT == step->type ? ZBX_MACRO_ENV_SECURE :
 					ZBX_MACRO_ENV_NONSECURE;
 
-			if (SUCCEED != zbx_dc_expand_user_and_func_macros_from_cache(um_handle->um_cache, &params,
-					&hostid, 1, env, &error_resolve))
-			{
-				zabbix_log(LOG_LEVEL_DEBUG, "cannot resolve user macros: %s", error_resolve);
-				zbx_free(error_resolve);
-			}
-
+			zbx_dc_expand_user_and_func_macros_from_cache(um_handle->um_cache, &params, &hostid, 1, env);
 			user_macros = 1;
 		}
 	}

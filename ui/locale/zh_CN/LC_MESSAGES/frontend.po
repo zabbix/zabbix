@@ -7,7 +7,7 @@ msgstr ""
 "Project-Id-Version: Zabbix 6.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2023-10-19 13:48+0300\n"
-"PO-Revision-Date: 2025-04-16 12:07+0000\n"
+"PO-Revision-Date: 2025-07-02 10:07+0000\n"
 "Last-Translator: NoYoWiFi <1284524409@qq.com>\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
 "Language: zh_CN\n"
@@ -1092,7 +1092,7 @@ msgstr "地址"
 #: app/controllers/CControllerProxyUpdate.php:75
 #: app/views/popup.proxy.edit.php:90
 msgid "Address for active agents"
-msgstr "Proxy组VIP"
+msgstr "active agents地址"
 
 #: include/hosts.inc.php:63 include/users.inc.php:53
 msgid "Admin"
@@ -1137,11 +1137,11 @@ msgstr "后值"
 
 #: include/events.inc.php:339
 msgid "Age"
-msgstr "持续时间"
+msgstr "总时长"
 
 #: app/partials/monitoring.problem.filter.php:120
 msgid "Age less than"
-msgstr "持续时间小于"
+msgstr "总时长小于"
 
 #: app/views/administration.script.list.php:196 include/hosts.inc.php:1195
 #: include/items.inc.php:350 include/views/configuration.httpconf.edit.php:109
@@ -5837,7 +5837,7 @@ msgstr "数据库 TLS 密钥文件"
 #: include/classes/api/clients/CLocalApiClient.php:133
 #: include/classes/api/clients/CLocalApiClient.php:147
 msgid "Database error occurred."
-msgstr ""
+msgstr "数据库错误。"
 
 #: app/partials/administration.system.info.php:130
 msgid "Database history tables use primary key"
@@ -7036,6 +7036,10 @@ msgstr "自动发现对象"
 #: include/classes/data/CItemData.php:1764
 msgid "Discovery of VMware clusters, \"url\" - VMware service URL. Returns JSON"
 msgstr "VMware 发现的集群，“url”- VMware 服务 URL。返回 JSON"
+
+#: include/classes/data/CItemData.php:1931
+msgid "Discovery of VMware datastores, \"url\" - VMware service URL, \"filter_uuid\" - one hv uuid or vm uuid (empty by default). Returns JSON"
+msgstr "发现 VMware 数据存储，\"url\" - VMware 服务 URL，\"filter_uuid\" - 一个主机（HV）UUID 或虚拟机（VM）UUID（默认为空）。返回 JSON"
 
 #: include/classes/data/CItemData.php:1799
 msgid "Discovery of VMware datastores, \"url\" - VMware service URL. Returns JSON"
@@ -13609,7 +13613,7 @@ msgstr "周一"
 
 #: app/views/configuration.host.list.php:145
 msgid "Monitored by"
-msgstr "要监控什么"
+msgstr "从哪监控"
 
 #: app/partials/configuration.host.edit.html.php:255
 #: app/views/popup.massupdate.host.php:124
@@ -16397,7 +16401,7 @@ msgstr "问题显示"
 
 #: app/views/js/trigger.edit.js.php:268 include/triggers.inc.php:603
 msgid "Problem expression"
-msgstr "问题表现形式"
+msgstr "问题表达式"
 
 #: widgets/problemhosts/Widget.php:29
 #: widgets/svggraph/includes/WidgetForm.php:386
@@ -19282,7 +19286,7 @@ msgstr "代理内存缓冲区的统计信息和可用性。模式（模式：pfr
 
 #: include/classes/data/CItemData.php:2854
 msgid "Statistics of values received by the preprocessing manager."
-msgstr ""
+msgstr "preprocessing manager接收的值的统计信息。"
 
 #: app/controllers/CControllerPopupGeneric.php:237
 #: app/controllers/CControllerPopupGeneric.php:251
@@ -20315,7 +20319,7 @@ msgstr "由于先前删除的对象，此操作缺少条件或操作。"
 #, c-format
 msgid "This check cannot be removed, as it is used as a condition in %1$s discovery action."
 msgid_plural "This check cannot be removed, as it is used as a condition in %1$s discovery actions."
-msgstr[0] ""
+msgstr[0] "此检查无法删除，因为它在%1$s发现操作中被用作一个条件。"
 
 #: include/func.inc.php:2566
 msgid "This day last week"
@@ -23356,15 +23360,15 @@ msgstr "Y轴"
 
 #: include/translateDefines.inc.php:34
 msgid "Y-m-d"
-msgstr "Y/m/d"
+msgstr "Y-m-d"
 
 #: include/translateDefines.inc.php:32
 msgid "Y-m-d h:i A"
-msgstr "Y/m/d H:i:s"
+msgstr "Y-m-d h:i A"
 
 #: include/translateDefines.inc.php:31
 msgid "Y-m-d h:i:s A"
-msgstr "Y-m-d H:i:s"
+msgstr "Y-m-d h:i:s A"
 
 #: include/translateDefines.inc.php:40
 msgid "Y-n-d"
