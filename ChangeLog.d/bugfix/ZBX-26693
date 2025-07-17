@@ -1,0 +1,1 @@
+.......PS. [ZBX-26693] fixed high memory usage by excluding values without preprocessing from being sent to the preprocessing manager (vso)
