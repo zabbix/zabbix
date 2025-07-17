@@ -143,7 +143,7 @@ class CUser extends CApiService {
 				')';
 			}
 			else {
-				$sqlParts['where'][] = 'u.userid='.self::$userData['userid'];
+				$sqlParts['where']['userid'] = 'u.userid='.self::$userData['userid'];
 			}
 		}
 
@@ -207,6 +207,15 @@ class CUser extends CApiService {
 
 		// filter
 		if (is_array($options['filter'])) {
+			if (array_key_exists('userid', $options['filter']) && $options['filter']['userid'] !== null
+					&& ($options['searchByAny'] === null || $options['searchByAny'] === false)) {
+				zbx_value2array($options['filter']['userid']);
+
+				$sqlParts['where'][] = dbConditionId('u.userid', $options['filter']['userid']);
+
+				unset($options['filter']['userid']);
+			}
+
 			if (isset($options['filter']['passwd'])) {
 				self::exception(ZBX_API_ERROR_PARAMETERS, _('It is not possible to filter by user password.'));
 			}
@@ -305,7 +314,7 @@ class CUser extends CApiService {
 
 			zbx_db_search('users u', $options, $sqlParts);
 
-			if ($search_within_own_user && array_key_exists('filter', $sqlParts['where'])) {
+			if ($search_within_own_user && array_key_exists('search', $sqlParts['where'])) {
 				$sqlParts['where']['userid'] = 'u.userid='.self::$userData['userid'];
 			}
 		}
