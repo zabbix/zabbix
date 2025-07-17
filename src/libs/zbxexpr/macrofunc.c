@@ -11,22 +11,16 @@
 ** You should have received a copy of the GNU Affero General Public License along with this program.
 ** If not, see <https://www.gnu.org/licenses/>.
 **/
+
 /* strptime() on newer and older GNU/Linux systems */
 #define _GNU_SOURCE
-#include "macrofunc.h"
-#include "zbxexpression.h"
 
+#include "zbxexpr.h"
+
+#include "zbxtime.h"
 #include "zbxregexp.h"
 #include "zbxnum.h"
 #include "zbxstr.h"
-#include "zbxtime.h"
-
-typedef struct
-{
-	const char	*macro;
-	const char	*functions;
-}
-zbx_macro_functions_t;
 #include "zbxcrypto.h"
 
 #define ZBX_RULE_BUFF_LEN 512
@@ -78,6 +72,182 @@ static int	macrofunc_regsub(char **params, size_t nparam, char **out)
 
 	zbx_free(*out);
 	*out = value;
+
+	return SUCCEED;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: calculates case insensitive regular expression substitution.      *
+ *                                                                            *
+ * Parameters: params - [IN] function parameters                              *
+ *             nparam - [IN] function parameter count                         *
+ *             out    - [IN/OUT] input/output value                           *
+ *                                                                            *
+ * Return value: SUCCEED - function was calculated successfully               *
+ *               FAIL    - function calculation failed                        *
+ *                                                                            *
+ ******************************************************************************/
+static int	macrofunc_iregsub(char **params, size_t nparam, char **out)
+{
+	char	*value = NULL;
+
+	if (2 != nparam)
+	{
+		zabbix_log(LOG_LEVEL_DEBUG, "%s() invalid parameters number", __func__);
+		return FAIL;
+	}
+
+	if (FAIL == zbx_iregexp_sub(*out, params[0], params[1], &value))
+		return FAIL;
+
+	if (NULL == value)
+		value = zbx_strdup(NULL, "");
+
+	zbx_free(*out);
+	*out = value;
+
+	return SUCCEED;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: time formatting macro function.                                   *
+ *                                                                            *
+ * Parameters: params - [IN] function parameters                              *
+ *             nparam - [IN] function parameter count                         *
+ *             out    - [IN/OUT] input/output value                           *
+ *                                                                            *
+ * Return value: SUCCEED - the function was calculated successfully           *
+ *               FAIL    - the function calculation failed                    *
+ *                                                                            *
+ ******************************************************************************/
+static int	macrofunc_fmttime(char **params, size_t nparam, char **out)
+{
+	struct tm	local_time;
+	time_t		time_new;
+	char		*buf = NULL;
+
+	if (0 == nparam || 2 < nparam)
+	{
+		zabbix_log(LOG_LEVEL_DEBUG, "%s() invalid parameters number", __func__);
+		return FAIL;
+	}
+
+	time_new = time(&time_new);
+	localtime_r(&time_new, &local_time);
+
+	if (NULL == strptime(*out, "%H:%M:%S", &local_time) &&
+			NULL == strptime(*out, "%Y-%m-%dT%H:%M:%S", &local_time) &&
+			NULL == strptime(*out, "%Y-%m-%dT%H:%M:%S%z", &local_time))
+	{
+		if (0 == (time_new = atoi(*out)))
+			return FAIL;
+
+		localtime_r(&time_new, &local_time);
+	}
+
+	if (2 == nparam)
+	{
+		char	*p = params[1];
+		size_t	len;
+
+		while ('\0' != *p)
+		{
+			zbx_time_unit_t	unit;
+
+			if ('/' == *p)
+			{
+				if (ZBX_TIME_UNIT_UNKNOWN == (unit = zbx_tm_str_to_unit(++p)))
+				{
+					zabbix_log(LOG_LEVEL_DEBUG, "unexpected character starting with \"%s\"", p);
+					return FAIL;
+				}
+
+				zbx_tm_round_down(&local_time, unit);
+
+				p++;
+			}
+			else if ('+' == *p || '-' == *p)
+			{
+				int	num;
+				char	op, *error = NULL;
+
+				op = *(p++);
+
+				if (FAIL == zbx_tm_parse_period(p, &len, &num, &unit, &error))
+				{
+					zabbix_log(LOG_LEVEL_DEBUG, "failed to parse time period: %s", error);
+					zbx_free(error);
+					return FAIL;
+				}
+
+				if ('+' == op)
+					zbx_tm_add(&local_time, num, unit);
+				else
+					zbx_tm_sub(&local_time, num, unit);
+
+				p += len;
+			}
+			else
+			{
+				zabbix_log(LOG_LEVEL_DEBUG, "unexpected character starting with \"%s\"", p);
+				return FAIL;
+			}
+		}
+	}
+
+	buf = zbx_malloc(NULL, MAX_STRING_LEN);
+
+	if (0 == strftime(buf, MAX_STRING_LEN, params[0], &local_time))
+	{
+		zabbix_log(LOG_LEVEL_DEBUG, "invalid first parameter \"%s\"", params[0]);
+		zbx_free(buf);
+		return FAIL;
+	}
+
+	zbx_free(*out);
+	*out = buf;
+
+	return SUCCEED;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: number formatting macro function.                                 *
+ *                                                                            *
+ * Parameters: params - [IN] function data                                    *
+ *             nparam - [IN] parameter count                                  *
+ *             out    - [IN/OUT] input/output value                           *
+ *                                                                            *
+ * Return value: SUCCEED - function was calculated successfully               *
+ *               FAIL    - function calculation failed                        *
+ *                                                                            *
+ ******************************************************************************/
+static int	macrofunc_fmtnum(char **params, size_t nparam, char **out)
+{
+	double	value;
+	int	precision;
+
+	if (1 != nparam)
+		return FAIL;
+
+	if (SUCCEED == zbx_is_uint32(*out, &value))
+		return SUCCEED;
+
+	if (FAIL == zbx_is_double(*out, &value))
+	{
+		zabbix_log(LOG_LEVEL_DEBUG, "macro \"%s\" is not a number", *out);
+		return FAIL;
+	}
+
+	if (FAIL == zbx_is_uint_range(params[0], &precision, 0, 20))
+	{
+		zabbix_log(LOG_LEVEL_DEBUG, "invalid parameter \"%s\"", params[0]);
+		return FAIL;
+	}
+
+	*out = zbx_dsprintf(*out, "%.*f", precision, value);
 
 	return SUCCEED;
 }
@@ -503,221 +673,6 @@ static int	macrofunc_regrepl(char **params, size_t nparam, char **out)
 	}
 
 	return SUCCEED;
-}
-
-/******************************************************************************
- *                                                                            *
- * Purpose: calculates case insensitive regular expression substitution.      *
- *                                                                            *
- * Parameters: params - [IN] function parameters                              *
- *             nparam - [IN] function parameter count                         *
- *             out    - [IN/OUT] input/output value                           *
- *                                                                            *
- * Return value: SUCCEED - function was calculated successfully               *
- *               FAIL    - function calculation failed                        *
- *                                                                            *
- ******************************************************************************/
-static int	macrofunc_iregsub(char **params, size_t nparam, char **out)
-{
-	char	*value = NULL;
-
-	if (2 != nparam)
-	{
-		zabbix_log(LOG_LEVEL_DEBUG, "%s() invalid parameters number", __func__);
-		return FAIL;
-	}
-
-	if (FAIL == zbx_iregexp_sub(*out, params[0], params[1], &value))
-		return FAIL;
-
-	if (NULL == value)
-		value = zbx_strdup(NULL, "");
-
-	zbx_free(*out);
-	*out = value;
-
-	return SUCCEED;
-}
-
-/******************************************************************************
- *                                                                            *
- * Purpose: time formatting macro function.                                   *
- *                                                                            *
- * Parameters: params - [IN] function parameters                              *
- *             nparam - [IN] function parameter count                         *
- *             out    - [IN/OUT] input/output value                           *
- *                                                                            *
- * Return value: SUCCEED - the function was calculated successfully           *
- *               FAIL    - the function calculation failed                    *
- *                                                                            *
- ******************************************************************************/
-static int	macrofunc_fmttime(char **params, size_t nparam, char **out)
-{
-	struct tm	local_time;
-	time_t		time_new;
-	char		*buf = NULL;
-
-	if (0 == nparam || 2 < nparam)
-	{
-		zabbix_log(LOG_LEVEL_DEBUG, "%s() invalid parameters number", __func__);
-		return FAIL;
-	}
-
-	time_new = time(&time_new);
-	localtime_r(&time_new, &local_time);
-
-	if (NULL == strptime(*out, "%H:%M:%S", &local_time) &&
-			NULL == strptime(*out, "%Y-%m-%dT%H:%M:%S", &local_time) &&
-			NULL == strptime(*out, "%Y-%m-%dT%H:%M:%S%z", &local_time))
-	{
-		if (0 == (time_new = atoi(*out)))
-			return FAIL;
-
-		localtime_r(&time_new, &local_time);
-	}
-
-	if (2 == nparam)
-	{
-		char	*p = params[1];
-		size_t	len;
-
-		while ('\0' != *p)
-		{
-			zbx_time_unit_t	unit;
-
-			if ('/' == *p)
-			{
-				if (ZBX_TIME_UNIT_UNKNOWN == (unit = zbx_tm_str_to_unit(++p)))
-				{
-					zabbix_log(LOG_LEVEL_DEBUG, "unexpected character starting with \"%s\"", p);
-					return FAIL;
-				}
-
-				zbx_tm_round_down(&local_time, unit);
-
-				p++;
-			}
-			else if ('+' == *p || '-' == *p)
-			{
-				int	num;
-				char	op, *error = NULL;
-
-				op = *(p++);
-
-				if (FAIL == zbx_tm_parse_period(p, &len, &num, &unit, &error))
-				{
-					zabbix_log(LOG_LEVEL_DEBUG, "failed to parse time period: %s", error);
-					zbx_free(error);
-					return FAIL;
-				}
-
-				if ('+' == op)
-					zbx_tm_add(&local_time, num, unit);
-				else
-					zbx_tm_sub(&local_time, num, unit);
-
-				p += len;
-			}
-			else
-			{
-				zabbix_log(LOG_LEVEL_DEBUG, "unexpected character starting with \"%s\"", p);
-				return FAIL;
-			}
-		}
-	}
-
-	buf = zbx_malloc(NULL, MAX_STRING_LEN);
-
-	if (0 == strftime(buf, MAX_STRING_LEN, params[0], &local_time))
-	{
-		zabbix_log(LOG_LEVEL_DEBUG, "invalid first parameter \"%s\"", params[0]);
-		zbx_free(buf);
-		return FAIL;
-	}
-
-	zbx_free(*out);
-	*out = buf;
-
-	return SUCCEED;
-}
-
-/******************************************************************************
- *                                                                            *
- * Purpose: number formatting macro function.                                 *
- *                                                                            *
- * Parameters: params - [IN] function data                                    *
- *             nparam - [IN] parameter count                                  *
- *             out    - [IN/OUT] input/output value                           *
- *                                                                            *
- * Return value: SUCCEED - function was calculated successfully               *
- *               FAIL    - function calculation failed                        *
- *                                                                            *
- ******************************************************************************/
-static int	macrofunc_fmtnum(char **params, size_t nparam, char **out)
-{
-	double	value;
-	int	precision;
-
-	if (1 != nparam)
-		return FAIL;
-
-	if (SUCCEED == zbx_is_uint32(*out, &value))
-		return SUCCEED;
-
-	if (FAIL == zbx_is_double(*out, &value))
-	{
-		zabbix_log(LOG_LEVEL_DEBUG, "macro \"%s\" is not a number", *out);
-		return FAIL;
-	}
-
-	if (FAIL == zbx_is_uint_range(params[0], &precision, 0, 20))
-	{
-		zabbix_log(LOG_LEVEL_DEBUG, "invalid parameter \"%s\"", params[0]);
-		return FAIL;
-	}
-
-	*out = zbx_dsprintf(*out, "%.*f", precision, value);
-
-	return SUCCEED;
-}
-
-/******************************************************************************
- *                                                                            *
- * Purpose: gets macro from the macro function                                *
- *                                                                            *
- * Parameters: str          - [IN] string containing potential macro          *
- *             fm           - [IN] function macro to check                    *
- *             N_functionid - [OUT] index of the macro in string (if valid)   *
- *                                                                            *
- * Return value: unindexed macro  or NULL.                                    *
- * Comments: allocates memory                                                 *
- *                                                                            *
- ******************************************************************************/
-char	*func_get_macro_from_func(const char *str, zbx_token_func_macro_t *fm, int *N_functionid)
-{
-	const char	*ptr_l = str + fm->macro.l, *ptr_r;
-	char		*ptr = NULL;
-
-	if (NULL != (ptr_r = strchr(ptr_l, '}')))
-	{
-		size_t	len = (size_t)(ptr_r - ptr_l), fm_len = fm->macro.r - fm->macro.l + 1;
-
-		ptr = zbx_strdup(ptr, ptr_l);
-
-		/* Expression macro, user macros and LLD macros are not indexable */
-		if ('?' != ptr_l[1] && '$' != ptr_l[1] && '#' != ptr_l[1] && len != fm_len)
-		{
-			if (SUCCEED == zbx_is_uint_n_range(str + fm->macro.l + len - 1, fm_len - len, N_functionid,
-					sizeof(*N_functionid), 1, 9))
-			{
-				len--;
-				ptr[len] = '}';
-			}
-		}
-		ptr[len + 1] = '\0';
-	}
-
-	return ptr;
 }
 
 /******************************************************************************
