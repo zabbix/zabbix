@@ -4,7 +4,7 @@ msgstr ""
 "Project-Id-Version: Zabbix 6.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2023-10-19 13:48+0300\n"
-"PO-Revision-Date: 2025-07-11 05:10+0000\n"
+"PO-Revision-Date: 2025-07-14 08:34+0000\n"
 "Last-Translator: Alexey <alexey.pustovalov@zabbix.com>\n"
 "Language-Team: Zabbix translation team\n"
 "Language: ru\n"
@@ -1816,7 +1816,7 @@ msgstr "По крайней мере одна операция обновлен�
 
 #: app/views/popup.acknowledge.edit.php:147
 msgid "At least one update operation or message must exist."
-msgstr "Должна существовать по крайней мере одна операция обновления или сообщение."
+msgstr "Должна существовать по крайней мере одна операция обновления или сообщения об обновлении."
 
 #: app/views/popup.operation.edit.php:102
 msgid "At least one user or user group must be selected."
@@ -4839,7 +4839,7 @@ msgstr "Изменение ранга проблем"
 #: app/views/popup.acknowledge.edit.php:72
 #: include/classes/helpers/CRoleHelper.php:544
 msgid "Change severity"
-msgstr "Изменение важности"
+msgstr "Изменить важность"
 
 #: include/classes/html/CMacroValue.php:168
 msgid "Change type"
@@ -5214,7 +5214,7 @@ msgstr "Координаты центра и уровень масштаба р�
 
 #: app/views/host.wizard.edit.php:427
 msgid "Comma to separate multiple Zabbix servers, proxies, or clusters"
-msgstr "Запятая для разделения нескольких Zabbix серверов, прокси или кластеров"
+msgstr "Запятую для разделения нескольких Zabbix серверов, прокси или кластеров"
 
 #: app/views/administration.script.edit.php:199
 #: app/views/reports.actionlog.list.csv.php:45
@@ -5777,7 +5777,7 @@ msgstr "Конвертация в JSON"
 
 #: app/views/popup.acknowledge.edit.php:135
 msgid "Convert to cause"
-msgstr "Конвертация в причину"
+msgstr "Конвертировать в причину"
 
 #: app/views/popup.acknowledge.edit.php:136
 msgid "Converts a symptom event back to cause event"
@@ -19868,7 +19868,7 @@ msgstr "Выбран, %1$s, только чтение, в позиции %2$d и
 
 #: app/views/host.wizard.edit.php:428
 msgid "Semicolon to separate clusters (one or more server addresses)"
-msgstr "Точка с запятой для разделения кластеров (один или несколько адресов серверов)"
+msgstr "Точку с запятой для разделения кластеров (один или несколько адресов серверов)"
 
 #: jsLoader.php:267
 msgid "Send backward"
@@ -20499,7 +20499,7 @@ msgstr "Отображается именем аккаунта всем поль
 
 #: app/views/mfa.edit.php:67
 msgid "Shown as the label to all MFA users in authenticator apps."
-msgstr "Отображается в виде метки всем пользователям MFA в приложениях аутентификации."
+msgstr "Отобразится меткой у всех пользователей MFA в приложениях-аутентификаторах."
 
 #: include/classes/html/CHtmlPage.php:148
 msgid "Sidebar control"
@@ -21183,7 +21183,7 @@ msgstr "Поддерживаемые макросы:"
 #: app/controllers/CControllerPopupAcknowledgeCreate.php:118
 #: app/views/popup.acknowledge.edit.php:83
 msgid "Suppress"
-msgstr "Подавление"
+msgstr "Подавить"
 
 #: include/classes/helpers/CRoleHelper.php:546
 msgid "Suppress problems"
@@ -23477,7 +23477,7 @@ msgstr "Неподдерживаемая операция."
 
 #: app/views/popup.acknowledge.edit.php:103
 msgid "Unsuppress"
-msgstr "Отмена подавления"
+msgstr "Отменить подавление"
 
 #: include/actions.inc.php:1593 include/actions.inc.php:2023
 #: include/classes/screens/CScreenProblem.php:1253
@@ -25308,7 +25308,7 @@ msgstr "d.m.Y H:i:s"
 
 #: include/translateDefines.inc.php:40
 msgid "Y-n-d"
-msgstr "d-n-Y"
+msgstr "d.m.Y"
 
 #: include/views/js/monitoring.sysmaps.js.php:448
 msgid "Y1"
@@ -27302,11 +27302,11 @@ msgstr "не должен содержать имени, фамилии или �
 
 #: include/translateDefines.inc.php:41
 msgid "n-d"
-msgstr "d-n"
+msgstr "m.d"
 
 #: include/translateDefines.inc.php:39
 msgid "n-d h:i A"
-msgstr "d-n H:i"
+msgstr "m.d H:i"
 
 #: app/views/webscenario.step.edit.php:82
 #: app/views/webscenario.step.edit.php:131
