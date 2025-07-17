@@ -1497,31 +1497,10 @@ static char	*mask_skip_tablename(char *s)
 	return s;
 }
 
-#define	DB_MASK	"..."
-static void	db_mask_select_query(char *sql_in, char **sql_out)
-{
-	char	*end;
-	char	*masked;
-
-	masked = zbx_strdup(NULL, sql_in);
-
-	if (NULL == (end = strstr(masked, " from ")))
-	{
-		zbx_free(masked);
-		return;
-	}
-
-	end += ZBX_CONST_STRLEN(" from ") + 1;
-
-	*end = '\0';
-	*sql_out = zbx_strdcat(masked, DB_MASK);
-}
-
 static void	db_mask_printable_sql_values(char **sql)
 {
+#define	DB_MASK	"..."
 	char	*p, *end;
-
-	zabbix_log(1, "%s() '%s'", __func__, *sql);
 
 	if (0 == strncmp(*sql, "insert into", ZBX_CONST_STRLEN("insert into")))
 	{
@@ -1533,12 +1512,10 @@ static void	db_mask_printable_sql_values(char **sql)
 	}
 	else if (0 == strncmp(*sql, "select", ZBX_CONST_STRLEN("select")))
 	{
-		if (NULL != (p = strstr(*sql, " from ")))
-		{
-			*p = '\0';
-			zbx_strlcpy(p, DB_MASK, ZBX_CONST_STRLEN(DB_MASK));
+		if (NULL == (p = strstr(*sql, " from ")))
 			return;
-		}
+
+		p += ZBX_CONST_STRLEN(" from ");
 	}
 	else
 		return;
@@ -1547,9 +1524,9 @@ static void	db_mask_printable_sql_values(char **sql)
 	end = mask_skip_tablename(p);
 	*end = '\0';
 
-	zbx_strlcpy(end, DB_MASK, ZBX_CONST_STRLEN(DB_MASK));
-}
+	zbx_strlcpy(end, DB_MASK, ZBX_CONST_STRLEN(DB_MASK) + 1);
 #undef DB_MASK
+}
 
 static char	*db_replace_nonprintable_chars(const char *sql, char **sql_printable)
 {
