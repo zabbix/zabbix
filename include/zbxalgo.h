@@ -758,6 +758,8 @@ typedef struct list_item
 }
 zbx_list_item_t;
 
+typedef struct zbx_list_item_pool zbx_list_item_pool_t;
+
 /* list data */
 typedef struct
 {
@@ -766,6 +768,7 @@ typedef struct
 	zbx_mem_malloc_func_t	mem_malloc_func;
 	zbx_mem_realloc_func_t	mem_realloc_func;
 	zbx_mem_free_func_t	mem_free_func;
+	zbx_list_item_pool_t	*item_pool;
 }
 zbx_list_t;
 
@@ -782,6 +785,8 @@ void	zbx_list_create(zbx_list_t *list);
 void	zbx_list_create_ext(zbx_list_t *list, zbx_mem_malloc_func_t mem_malloc_func,
 		zbx_mem_free_func_t mem_free_func);
 void	zbx_list_destroy(zbx_list_t *list);
+void	zbx_list_init_pool(zbx_list_t *list, int slots_num);
+
 int	zbx_list_append(zbx_list_t *list, void *value, zbx_list_item_t **inserted);
 int	zbx_list_insert_after(zbx_list_t *list, zbx_list_item_t *after, void *value, zbx_list_item_t **inserted);
 int	zbx_list_prepend(zbx_list_t *list, void *value, zbx_list_item_t **inserted);
@@ -796,5 +801,4 @@ int	zbx_list_iterator_equal(const zbx_list_iterator_t *iterator1, const zbx_list
 int	zbx_list_iterator_isset(const zbx_list_iterator_t *iterator);
 void	zbx_list_iterator_update(zbx_list_iterator_t *iterator);
 void	*zbx_list_iterator_remove_next(zbx_list_iterator_t *iterator);
-
 #endif /* ZABBIX_ZBXALGO_H */

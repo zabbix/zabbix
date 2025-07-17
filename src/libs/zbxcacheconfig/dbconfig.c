@@ -17213,3 +17213,15 @@ int	zbx_dc_sync_lock(void)
 
 	return ret;
 }
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: get the number of items in configuration cache                    *
+ *                                                                            *
+ * Return value: number of items                                              *
+ *                                                                            *
+ ******************************************************************************/
+zbx_uint64_t	zbx_dc_get_cache_size(void)
+{
+	return config_mem->total_size;
+}
