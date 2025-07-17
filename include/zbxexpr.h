@@ -22,6 +22,7 @@ int	zbx_is_key_char(unsigned char c);
 int	zbx_is_function_char(unsigned char c);
 int	zbx_is_macro_char(unsigned char c);
 int	zbx_is_discovery_macro(const char *name);
+int	zbx_is_strict_macro(const char *macro);
 int	zbx_parse_key(const char **exp);
 int	zbx_parse_host_key(char *exp, char **host, char **key);
 void	zbx_make_hostname(char *host);
@@ -256,6 +257,33 @@ int	zbx_get_report_nextcheck(int now, unsigned char cycle, unsigned char weekday
 #define ZBX_CONDITION_OPERATOR_NOT_EXIST		13
 
 int	zbx_strloc_cmp(const char *src, const zbx_strloc_t *loc, const char *text, size_t text_len);
+
+typedef struct
+{
+	zbx_token_search_t	token_search;
+
+	zbx_token_t	token;			/* current token type */
+	zbx_token_t	inner_token;		/* inner token type */
+
+	const char	*macro;			/* normalized macro (without function id, index, etc.) */
+	int		pos;			/* macro position in input data string */
+
+	int	raw_value;			/* flag that resolver should resolve to raw value */
+	int	indexed;
+	int	index;
+	int	resolved;			/* flag that macro is fully resolved (special case) */
+}
+zbx_macro_resolv_data_t;
+
+typedef int (*zbx_macro_resolv_func_t)(zbx_macro_resolv_data_t *p, va_list args, char **replace_to,
+		char **data, char *error, size_t maxerrlen);
+
+int		zbx_is_indexed_macro(const char *str, const zbx_token_t *token);
+const char	*zbx_macro_in_list(const char *str, zbx_strloc_t strloc, const char **macros, int *N_functionid);
+char		*zbx_get_macro_from_func(const char *str, zbx_token_func_macro_t *fm, int *N_functionid);
+const char	**zbx_get_indexable_macros(void);
+
+int	zbx_substitute_macros(char **data, char *error, size_t maxerrlen, zbx_macro_resolv_func_t resolver, ...);
 
 void	zbx_url_encode(const char *source, char **result);
 int	zbx_url_decode(const char *source, char **result);

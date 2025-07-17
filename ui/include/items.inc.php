@@ -2015,20 +2015,20 @@ function normalizeItemPreprocessingSteps(array $preprocessing): array {
 		switch ($step['type']) {
 			case ZBX_PREPROC_MULTIPLIER:
 			case ZBX_PREPROC_PROMETHEUS_TO_JSON:
+			case ZBX_PREPROC_XPATH:
+			case ZBX_PREPROC_JSONPATH:
+			case ZBX_PREPROC_ERROR_FIELD_JSON:
+			case ZBX_PREPROC_ERROR_FIELD_XML:
+			case ZBX_PREPROC_THROTTLE_TIMED_VALUE:
+			case ZBX_PREPROC_SCRIPT:
 				$step['params'] = trim($step['params'][0]);
 				break;
 
 			case ZBX_PREPROC_RTRIM:
 			case ZBX_PREPROC_LTRIM:
 			case ZBX_PREPROC_TRIM:
-			case ZBX_PREPROC_XPATH:
-			case ZBX_PREPROC_JSONPATH:
 			case ZBX_PREPROC_VALIDATE_REGEX:
 			case ZBX_PREPROC_VALIDATE_NOT_REGEX:
-			case ZBX_PREPROC_ERROR_FIELD_JSON:
-			case ZBX_PREPROC_ERROR_FIELD_XML:
-			case ZBX_PREPROC_THROTTLE_TIMED_VALUE:
-			case ZBX_PREPROC_SCRIPT:
 			case ZBX_PREPROC_SNMP_GET_VALUE:
 				$step['params'] = $step['params'][0];
 				break;
