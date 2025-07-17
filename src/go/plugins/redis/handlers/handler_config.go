@@ -28,10 +28,10 @@ import (
 const globChars = "*?[]!"
 
 // ConfigHandler gets an output of 'CONFIG GET [pattern]' command and returns it in JSON format or as a single-value.
-func ConfigHandler(conn conn.RedisClient, params map[string]string) (any, error) {
+func ConfigHandler(redisClient conn.RedisClient, params map[string]string) (any, error) {
 	var res map[string]string
 
-	err := conn.Query(radix.Cmd(&res, "CONFIG", "GET", params["Pattern"]))
+	err := redisClient.Query(radix.Cmd(&res, "CONFIG", "GET", params["Pattern"]))
 	if err != nil {
 		return nil, errs.WrapConst(err, zbxerr.ErrorCannotFetchData)
 	}

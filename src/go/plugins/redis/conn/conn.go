@@ -24,18 +24,22 @@ import (
 	"golang.zabbix.com/agent2/plugins/redis/info"
 	"golang.zabbix.com/sdk/errs"
 	"golang.zabbix.com/sdk/log"
-	"golang.zabbix.com/sdk/uri"
+	sdkuri "golang.zabbix.com/sdk/uri"
 	"golang.zabbix.com/sdk/zbxerr"
 )
 
-const HkInterval = 10
+// HouseKeeperInterval is seconds of house keepers interval.
+const HouseKeeperInterval = 10
 
+//nolint:revive,staticcheck //this is a direct error from old redis
 var errMasterDown = errors.New("MASTERDOWN Link with MASTER is down and slave-serve-stale-data is set to 'no'.")
 
+// RedisClient defines an interface for a client that can execute Redis commands.
 type RedisClient interface {
 	Query(cmd radix.CmdAction) error
 }
 
+// RedisConn encapsulates a connection to a Redis client and tracks its last access time.
 type RedisConn struct {
 	client         radix.Client
 	lastTimeAccess time.Time
@@ -43,14 +47,15 @@ type RedisConn struct {
 
 // ConnManager is thread-safe structure for manage connections.
 type ConnManager struct {
-	sync.Mutex
-	connMutex   sync.Mutex
-	connections map[*uri.URI]*RedisConn
-	keepAlive   time.Duration
-	timeout     time.Duration
-	Destroy     context.CancelFunc
+	managerMutex sync.Mutex
+	connMutex    sync.Mutex
+	connections  map[*sdkuri.URI]*RedisConn
+	keepAlive    time.Duration
+	timeout      time.Duration
+	Destroy      context.CancelFunc
 }
 
+// NewRedisConn creates a new RedisConnection that keeps time of the last access.
 func NewRedisConn(client radix.Client) *RedisConn {
 	return &RedisConn{
 		client:         client,
@@ -63,7 +68,7 @@ func NewConnManager(keepAlive, timeout, hkInterval time.Duration) *ConnManager {
 	ctx, cancel := context.WithCancel(context.Background())
 
 	connMgr := &ConnManager{
-		connections: make(map[*uri.URI]*RedisConn),
+		connections: make(map[*sdkuri.URI]*RedisConn),
 		keepAlive:   keepAlive,
 		timeout:     timeout,
 		Destroy:     cancel, // Destroy stops originated goroutines and close connections.
@@ -76,13 +81,15 @@ func NewConnManager(keepAlive, timeout, hkInterval time.Duration) *ConnManager {
 
 // Query wraps the radix.Client.Do function.
 func (r *RedisConn) Query(cmd radix.CmdAction) error {
-	return r.client.Do(cmd)
+	err := r.client.Do(cmd)
+
+	return errs.Wrap(err, "query failed")
 }
 
 // GetConnection returns an existing connection or creates a new one.
-func (c *ConnManager) GetConnection(uri *uri.URI, params map[string]string) (*RedisConn, error) {
-	c.Lock()
-	defer c.Unlock()
+func (c *ConnManager) GetConnection(uri *sdkuri.URI, params map[string]string) (*RedisConn, error) {
+	c.managerMutex.Lock()
+	defer c.managerMutex.Unlock()
 
 	conn := c.get(uri)
 
@@ -124,12 +131,12 @@ func (c *ConnManager) closeUnused() {
 // closeAll closes all existed connections.
 func (c *ConnManager) closeAll() {
 	c.connMutex.Lock()
-	for uri, conn := range c.connections {
+	for u, conn := range c.connections {
 		err := conn.client.Close()
 		if err == nil {
-			delete(c.connections, uri)
+			delete(c.connections, u)
 		} else {
-			log.Errf("[%s] Error occurred while closing connection: %s", info.PluginName, uri.Addr())
+			log.Errf("[%s] Error occurred while closing connection: %s", info.PluginName, u.Addr())
 		}
 	}
 	c.connMutex.Unlock()
@@ -153,7 +160,7 @@ func (c *ConnManager) housekeeper(ctx context.Context, interval time.Duration) {
 }
 
 // create creates a new connection with given credentials.
-func (c *ConnManager) create(uri *uri.URI, params map[string]string) (*RedisConn, error) {
+func (c *ConnManager) create(uri *sdkuri.URI, params map[string]string) (*RedisConn, error) {
 	const clientName = "zbx_monitor"
 
 	const poolSize = 1
@@ -161,9 +168,12 @@ func (c *ConnManager) create(uri *uri.URI, params map[string]string) (*RedisConn
 	c.connMutex.Lock()
 	defer c.connMutex.Unlock()
 
-	tlsConfig, err := getTlsConfig(uri, params)
+	tlsConfig, err := getTLSConfig(uri, params)
 	if err != nil {
-		return nil, errs.Wrap(err, "failed to get tls uri")
+		if !errors.Is(err, errTLSDisabled) {
+			// If it's any other error, it's a real failure.
+			return nil, errs.Wrap(err, "failed to get tls config")
+		}
 	}
 
 	_, ok := c.connections[uri]
@@ -172,8 +182,8 @@ func (c *ConnManager) create(uri *uri.URI, params map[string]string) (*RedisConn
 		panic("connection already exists")
 	}
 
-	// AuthConnFunc is used as radix.ConnFunc to perform AUTH and set timeout.
-	AuthConnFunc := func(scheme, addr string) (radix.Conn, error) {
+	// authConnFunc is used as radix.ConnFunc to perform AUTH and set timeout.
+	authConnFunc := func(scheme, addr string) (radix.Conn, error) {
 		dialOpts := []radix.DialOpt{
 			radix.DialTimeout(c.timeout),
 			radix.DialAuthUser(uri.User(), uri.Password()),
@@ -183,32 +193,30 @@ func (c *ConnManager) create(uri *uri.URI, params map[string]string) (*RedisConn
 			dialOpts = append(dialOpts, radix.DialUseTLS(tlsConfig))
 		}
 
-		conn, err := radix.Dial(scheme, addr, dialOpts...)
-		if err != nil {
-			return nil, errs.Wrap(err, "failed to dial")
+		conn, dialErr := radix.Dial(scheme, addr, dialOpts...)
+		if dialErr != nil {
+			return nil, errs.Wrap(dialErr, "failed to dial")
 		}
 
 		// Set name for connection. It will be showed in "client list" output.
-		err = conn.Do(radix.Cmd(nil, "CLIENT", "SETNAME", clientName))
+		dialErr = conn.Do(radix.Cmd(nil, "CLIENT", "SETNAME", clientName))
 
 		// The MASTERDOWN error can be returned by older Redis versions on commands
 		// like CLIENT SETNAME even if the connection is usable.
 		// We compare the error message string, as the error instance from the driver
 		// will not be the same as our sentinel 'errMasterDown' variable.
-		if err != nil {
-			if err.Error() != errMasterDown.Error() && conn != nil {
-				return nil, err
+		if dialErr != nil {
+			if dialErr.Error() != errMasterDown.Error() || conn == nil {
+				return nil, errs.Wrap(dialErr, "failed to set master down")
 			}
-
-			return nil, err
 		}
 
 		return conn, nil
 	}
 
-	client, err := radix.NewPool(uri.Scheme(), uri.Addr(), poolSize, radix.PoolConnFunc(AuthConnFunc))
+	client, err := radix.NewPool(uri.Scheme(), uri.Addr(), poolSize, radix.PoolConnFunc(authConnFunc))
 	if err != nil {
-		return nil, err
+		return nil, errs.Wrap(err, "failed to create pool")
 	}
 
 	c.connections[uri] = &RedisConn{
@@ -222,7 +230,7 @@ func (c *ConnManager) create(uri *uri.URI, params map[string]string) (*RedisConn
 }
 
 // get returns a connection with given cid if it exists and also updates lastTimeAccess, otherwise returns nil.
-func (c *ConnManager) get(uri *uri.URI) *RedisConn {
+func (c *ConnManager) get(uri *sdkuri.URI) *RedisConn {
 	c.connMutex.Lock()
 	defer c.connMutex.Unlock()
 

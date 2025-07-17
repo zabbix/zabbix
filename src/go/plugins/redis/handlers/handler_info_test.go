@@ -61,7 +61,7 @@ func Test_parseRedisInfo(t *testing.T) {
 	tests := []struct {
 		name    string
 		args    args
-		wantRes redisInfo
+		wantRes redisInfoMap
 		wantErr bool
 	}{
 		{
@@ -85,7 +85,7 @@ func Test_parseRedisInfo(t *testing.T) {
 		{
 			`Parse of output of "info CommonSection" command`,
 			args{infoCommonSectionOutput},
-			redisInfo{
+			redisInfoMap{
 				"CommonSection": infoKeySpace{
 					"foo": "123", "bar": "0.00",
 				},
@@ -95,7 +95,7 @@ func Test_parseRedisInfo(t *testing.T) {
 		{
 			`Parse of output of "info Commandstats" command`,
 			args{infoExtendedSectionOutput},
-			redisInfo{
+			redisInfoMap{
 				"Commandstats": infoKeySpace{
 					"cmdstat_info": infoExtKeySpace{
 						"calls":         "11150",
@@ -114,7 +114,7 @@ func Test_parseRedisInfo(t *testing.T) {
 		{
 			`Parse of output of "info Replication" command for Master role`,
 			args{infoMasterReplicationOutput},
-			redisInfo{
+			redisInfoMap{
 				"Replication": infoKeySpace{
 					"role":             "master",
 					"connected_slaves": "1",
@@ -133,7 +133,7 @@ func Test_parseRedisInfo(t *testing.T) {
 		{
 			`Parse of output of "info Replication" command for Slave role`,
 			args{infoSlaveReplicationOutput},
-			redisInfo{
+			redisInfoMap{
 				"Replication": infoKeySpace{
 					"role":              "slave",
 					"master_host":       "redis-master",

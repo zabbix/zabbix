@@ -20,7 +20,6 @@ package conn
 
 import (
 	"crypto/tls"
-	"fmt"
 
 	"golang.zabbix.com/sdk/errs"
 	"golang.zabbix.com/sdk/plugin/comms"
@@ -28,19 +27,21 @@ import (
 	"golang.zabbix.com/sdk/uri"
 )
 
-func getTlsConfig(redisURI *uri.URI, params map[string]string) (*tls.Config, error) {
+var errTLSDisabled = errs.New("tls is disabled for this connection")
+
+func getTLSConfig(redisURI *uri.URI, params map[string]string) (*tls.Config, error) {
 	tlsConnect := params[string(comms.TLSConnect)]
-	//ignoring error because all wrong options were eliminated at the validation
+	//nolint:errcheck //ignoring error because all wrong options were eliminated at the validation.
 	tlsConnectionType, _ := comms.NewTLSConnectionType(tlsConnect)
 
 	details := tlsconfig.NewDetails(
 		"",
 		redisURI.String(),
-		tlsconfig.WithTlsConnect(string(tlsConnectionType)),
-		tlsconfig.WithTlsCaFile(params[string(comms.TLSCAFile)]),
-		tlsconfig.WithTlsServerName(params[string(comms.TLSServerName)]),
-		tlsconfig.WithTlsCertFile(params[string(comms.TLSCertFile)]),
-		tlsconfig.WithTlsKeyFile(params[string(comms.TLSKeyFile)]),
+		tlsconfig.WithTLSConnect(string(tlsConnectionType)),
+		tlsconfig.WithTLSCaFile(params[string(comms.TLSCAFile)]),
+		tlsconfig.WithTLSServerName(params[string(comms.TLSServerName)]),
+		tlsconfig.WithTLSCertFile(params[string(comms.TLSCertFile)]),
+		tlsconfig.WithTLSKeyFile(params[string(comms.TLSKeyFile)]),
 		tlsconfig.WithAllowedConnections(
 			string(comms.NoTLS),
 			string(comms.Insecure),
@@ -51,16 +52,14 @@ func getTlsConfig(redisURI *uri.URI, params map[string]string) (*tls.Config, err
 
 	switch tlsConnectionType {
 	case comms.NoTLS:
-		return nil, nil
+		return nil, errTLSDisabled
 	case comms.Insecure:
-		return &tls.Config{InsecureSkipVerify: true}, nil
+		return &tls.Config{InsecureSkipVerify: true}, nil //nolint:gosec //intended behavior
 	case comms.VerifyCA:
 		tlsConfig, err := details.GetTLSConfig()
 		if err != nil {
 			return nil, errs.Wrap(err, "failed to get tls config")
 		}
-
-		tlsConfig.VerifyPeerCertificate = tlsconfig.VerifyPeerCertificateFunc(tlsConfig.ServerName, tlsConfig.RootCAs)
 
 		return tlsConfig, nil
 	case comms.VerifyFull:
@@ -69,10 +68,8 @@ func getTlsConfig(redisURI *uri.URI, params map[string]string) (*tls.Config, err
 			return nil, errs.Wrap(err, "failed to get tls config")
 		}
 
-		tlsConfig.VerifyPeerCertificate = tlsconfig.VerifyPeerCertificateFunc(tlsConfig.ServerName, tlsConfig.RootCAs)
-
 		return tlsConfig, nil
 	default:
-		return nil, fmt.Errorf("unsupported TLS connection type: %s", tlsConnectionType)
+		return nil, errs.New("unsupported TLS connection type: " + string(tlsConnectionType))
 	}
 }
