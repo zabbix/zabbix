@@ -1630,7 +1630,9 @@ class testDashboardItemValueWidget extends testWidgets {
 
 			// Close widget window and cancel editing the dashboard.
 			COverlayDialogElement::find()->one()->close();
-			$dashboard->cancelEditing();
+			// Change dashboard from cancelEditing() to save() to check deadlock issue.
+			$dashboard->save();
+			$this->assertMessage(TEST_GOOD, 'Dashboard updated');
 
 			// Write new name to update widget for update scenario.
 			if ($update) {
@@ -4150,31 +4152,30 @@ class testDashboardItemValueWidget extends testWidgets {
 				[
 					'fields' => [
 						'Advanced configuration' => true,
-						'id:description' => '{'.self::USER_MACRO.'.regsub(^[0-9]+, Problem)}, '.
-							'{'.self::USER_MACRO.'.iregsub(^[0-9]+, Problem)}, '.
-							'{'.self::USER_SECRET_MACRO.'.regsub(^[0-9]+, Problem)}, '.
-							'{'.self::USER_SECRET_MACRO.'.iregsub(^[0-9]+, Problem)}, '.
+						'id:description' => '{'.self::USER_MACRO.'.regsub([0-9]+, Problem)}, '.
+							'{'.self::USER_MACRO.'.iregsub([0-9]+, Problem)}, '.
+							'{'.self::USER_SECRET_MACRO.'.regsub([0-9]+, Problem)}, '.
+							'{'.self::USER_SECRET_MACRO.'.iregsub([0-9]+, Problem)}, '.
 							'{{ITEM.NAME}.regsub(CPU, test)}, {{ITEM.NAME}.iregsub(CPU, test)}',
 						'id:desc_size' => 5
 					],
-					'result' => 'Problem, Problem, Problem, Problem, test, test'
+					'result' => 'Problem, Problem, , , test, test'
+				]
+			],
+			'Macro functions regsub(), iregsub() - empty value in case of no match' => [
+				[
+					'fields' => [
+						'Advanced configuration' => true,
+						'id:description' => '{'.self::USER_MACRO.'.regsub(0, Problem)}, '.
+							'{'.self::USER_MACRO.'.iregsub(0, Problem)}, '.
+							'{'.self::USER_SECRET_MACRO.'.regsub(0, Problem)}, '.
+							'{'.self::USER_SECRET_MACRO.'.iregsub(0, Problem)}, '.
+							'{{ITEM.NAME}.regsub(0, test)}, {{ITEM.NAME}.iregsub(0, test)}',
+						'id:desc_size' => 5
+					],
+					'result' => ', , , , ,'
 				]
 			]
-			// TODO: Uncomment and check the test case, after ZBX-25420 fix.
-//			'Macro functions regsub(), iregsub() - empty value in case of no match' => [
-//				[
-//					'fields' => [
-//						'Advanced configuration' => true,
-//						'id:description' => '{'.self::USER_MACRO.'.regsub(0, Problem)}, '.
-//							'{'.self::USER_MACRO.'.iregsub(0, Problem)}, '.
-//							'{'.self::USER_SECRET_MACRO.'.regsub(0, Problem)}, '.
-//							'{'.self::USER_SECRET_MACRO.'.iregsub(0, Problem)}, '.
-//							'{{ITEM.NAME}.regsub(0, test)}, {{ITEM.NAME}.iregsub(0, test)}',
-//						'id:desc_size' => 5
-//					],
-//					'result' => ', , , , ,'
-//				]
-//			]
 		];
 	}
 
