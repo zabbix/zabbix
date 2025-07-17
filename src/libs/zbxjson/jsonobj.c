@@ -347,3 +347,4 @@ const zbx_jsonobj_el_t	*zbx_jsonobj_get_value(zbx_jsonobj_t *obj, const char *na
 
 	return NULL;
 }
+
