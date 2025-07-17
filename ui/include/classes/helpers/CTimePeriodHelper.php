@@ -28,17 +28,18 @@ class CTimePeriodHelper {
 	/**
 	 * Get maximal supported time period.
 	 *
+	 * @param int $time
 	 * @param DateTimeZone|null $timezone
 	 *
 	 * @return int
 	 */
-	public static function getMaxPeriod(?DateTimeZone $timezone = null): int {
+	public static function getMaxPeriod(int $time, ?DateTimeZone $timezone = null): int {
 		static $max_period;
 
 		if ($max_period === null) {
 			$range_time_parser = new CRangeTimeParser();
 			$range_time_parser->parse('now-'.CSettingsHelper::get(CSettingsHelper::MAX_PERIOD));
-			$max_period = time() - $range_time_parser->getDateTime(true, $timezone)->getTimestamp();
+			$max_period = $time - $range_time_parser->getDateTime(true, $timezone, $time)->getTimestamp();
 		}
 
 		return $max_period;
@@ -88,12 +89,13 @@ class CTimePeriodHelper {
 	 * Zoom out the time period.
 	 *
 	 * @param array $time_period
+	 * @param int $time
 	 *        string $time_period['from']     Absolute or relative start date time.
 	 *        int    $time_period['from_ts']  Timestamp of the start date time.
 	 *        string $time_period['to']       Absolute or relative end date time.
 	 *        int    $time_period['to_ts']    Timestamp of the ending date time.
 	 */
-	public static function zoomOut(array &$time_period): void {
+	public static function zoomOut(array &$time_period, int $time): void {
 		$period = $time_period['to_ts'] - $time_period['from_ts'] + 1;
 
 		$to_offset = min((int) ($period / 2), time() - $time_period['to_ts']);
@@ -102,7 +104,7 @@ class CTimePeriodHelper {
 		$time_period['from_ts'] -= $from_offset;
 		$time_period['to_ts'] += $to_offset;
 
-		$max_period = self::getMaxPeriod();
+		$max_period = self::getMaxPeriod($time);
 
 		if ($time_period['to_ts'] - $time_period['from_ts'] + 1 > $max_period) {
 			$time_period['from_ts'] = $time_period['to_ts'] - $max_period;

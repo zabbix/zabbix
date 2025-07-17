@@ -477,14 +477,14 @@ function validateTimeSelectorPeriod($from, $to) {
 	foreach (['from' => $from, 'to' => $to] as $field => $value) {
 		$range_time_parser->parse($value);
 		$ts[$field] = $range_time_parser
-			->getDateTime($field === 'from')
+			->getDateTime($field === 'from',null, $ts['now'])
 			->getTimestamp();
 	}
 
 	$period = $ts['to'] - $ts['from'] + 1;
 	$range_time_parser->parse('now-'.CSettingsHelper::get(CSettingsHelper::MAX_PERIOD));
 	$max_period = 1 + $ts['now'] - $range_time_parser
-		->getDateTime(true)
+		->getDateTime(true, null, $ts['now'])
 		->getTimestamp();
 
 	if ($period < ZBX_MIN_PERIOD) {

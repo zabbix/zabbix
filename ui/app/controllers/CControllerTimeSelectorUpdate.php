@@ -75,6 +75,7 @@ class CControllerTimeSelectorUpdate extends CController {
 
 	protected function doAction() {
 		$range_time_parser = new CRangeTimeParser();
+		$time = time();
 
 		$time_period = [
 			'from' => $this->getInput('from'),
@@ -85,7 +86,7 @@ class CControllerTimeSelectorUpdate extends CController {
 
 		foreach (['from' => 'from_ts', 'to' => 'to_ts'] as $field => $field_ts) {
 			if ($range_time_parser->parse($time_period[$field]) == CParser::PARSE_SUCCESS) {
-				$time_period[$field_ts] = $range_time_parser->getDateTime($field === 'from')->getTimestamp();
+				$time_period[$field_ts] = $range_time_parser->getDateTime($field === 'from', null, $time)->getTimestamp();
 			}
 			else {
 				$fields_errors[$field] = _('Invalid date.');
@@ -103,7 +104,7 @@ class CControllerTimeSelectorUpdate extends CController {
 					break;
 
 				case 'zoomout':
-					CTimePeriodHelper::zoomOut($time_period);
+					CTimePeriodHelper::zoomOut($time_period, $time);
 					break;
 
 				case 'rangechange':
@@ -120,7 +121,7 @@ class CControllerTimeSelectorUpdate extends CController {
 			$period = $time_period['to_ts'] - $time_period['from_ts'] + 1;
 
 			$min_period = CTimePeriodHelper::getMinPeriod();
-			$max_period = CTimePeriodHelper::getMaxPeriod();
+			$max_period = CTimePeriodHelper::getMaxPeriod($time);
 
 			if ($period < $min_period) {
 				$fields_errors['from'] = _n('Minimum time period to display is %1$s minute.',
