@@ -1084,6 +1084,8 @@ int	zbx_db_check_version_and_upgrade(zbx_ha_mode_t ha_mode)
 			if (SUCCEED != ret)
 				break;
 
+			if (0==current % 20)
+				zbx_optimize();
 			current++;
 			completed = (int)(100.0 * current / total);
 

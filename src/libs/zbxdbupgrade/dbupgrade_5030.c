@@ -4828,6 +4828,8 @@ static int	DBpatch_5030165(void)
 	zbx_db_insert_t		db_insert_functions;
 	zbx_vector_ptr_t	functions;
 
+	zbx_optimize();
+
 	if (0 == (DBget_program_type() & ZBX_PROGRAM_TYPE_SERVER))
 		return SUCCEED;
 
@@ -4956,6 +4958,7 @@ static int	DBpatch_5030165(void)
 
 	zbx_vector_ptr_destroy(&functions);
 
+	zbx_optimize();
 	return ret;
 }
 
