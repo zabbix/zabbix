@@ -1410,4 +1410,26 @@ int	zbx_dbupgrade_drop_trigger_function_on_update(const char *table_name, const 
 {
 	return dbupgrade_drop_trigger_function(table_name, indexed_column_name, function);
 }
+
+int	zbx_optimize(void)
+{
+	zbx_db_row_t	row;
+	zbx_db_result_t	result;
+	int		ret = SUCCEED;
+
+	if (0 == (DBget_program_type() & ZBX_PROGRAM_TYPE_SERVER))
+		return SUCCEED;
+
+	result = zbx_db_select(
+			"optimize table functions, items,hosts,triggers,ids,item_preproc,host_hgset,hosts_groups,"
+			" valuemap_mapping,item_tag,widget_field,item_discovery,graphs,hostmacro");
+
+	while (NULL != (row = zbx_db_fetch(result)))
+	{}
+
+	zbx_db_free_result(result);
+
+	return SUCCEED;
+}
+
 #endif
