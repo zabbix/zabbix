@@ -26,6 +26,8 @@ import (
 )
 
 // impl is the pointer to the plugin implementation.
+//
+//nolint:gochecknoglobals // legacy implementation
 var impl Plugin
 
 var _ plugin.Runner = (*Plugin)(nil)
@@ -35,11 +37,11 @@ var _ plugin.Exporter = (*Plugin)(nil)
 type Plugin struct {
 	plugin.Base
 	connMgr *conn.ConnManager
-	options PluginOptions
+	options pluginOptions
 }
 
 // Export implements the Exporter interface.
-func (p *Plugin) Export(key string, rawParams []string, ctx plugin.ContextProvider) (result any, err error) {
+func (p *Plugin) Export(key string, rawParams []string, _ plugin.ContextProvider) (any, error) {
 	params, _, hc, err := metrics[key].EvalParams(rawParams, p.options.Sessions)
 	if err != nil {
 		return nil, err
@@ -73,7 +75,7 @@ func (p *Plugin) Export(key string, rawParams []string, ctx plugin.ContextProvid
 		return nil, err
 	}
 
-	result, err = handleMetric(connection, params)
+	result, err := handleMetric(connection, params)
 	if err != nil {
 		p.Errf(err.Error())
 	}
@@ -86,7 +88,7 @@ func (p *Plugin) Start() {
 	p.connMgr = conn.NewConnManager(
 		time.Duration(p.options.KeepAlive)*time.Second,
 		time.Duration(p.options.Timeout)*time.Second,
-		conn.HkInterval*time.Second,
+		conn.HouseKeeperInterval*time.Second,
 	)
 }
 

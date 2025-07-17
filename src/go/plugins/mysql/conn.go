@@ -28,7 +28,7 @@ import (
 	"golang.zabbix.com/sdk/errs"
 	"golang.zabbix.com/sdk/log"
 	"golang.zabbix.com/sdk/tlsconfig"
-	"golang.zabbix.com/sdk/uri"
+	sdkuri "golang.zabbix.com/sdk/uri"
 	"golang.zabbix.com/sdk/zbxerr"
 )
 
@@ -65,8 +65,17 @@ type ConnManager struct {
 	log            log.Logger
 }
 
+type connectionManagerOptions struct {
+	keepAlive      time.Duration
+	connectTimeout time.Duration
+	callTimeout    time.Duration
+	hkInterval     time.Duration
+	queryStorage   yarn.Yarn
+	logger         log.Logger
+}
+
 type connKey struct {
-	uri        uri.URI
+	uri        *sdkuri.URI
 	rawUri     string
 	tlsConnect string
 	tlsCA      string
@@ -97,30 +106,29 @@ func (conn *MyConn) QueryByName(ctx context.Context, name string, args ...interf
 }
 
 // QueryRow wraps DB.QueryRowContext.
-func (conn *MyConn) QueryRow(ctx context.Context, query string, args ...interface{}) (row *sql.Row, err error) {
-	row = conn.client.QueryRowContext(ctx, query, args...)
+func (conn *MyConn) QueryRow(ctx context.Context, query string, args ...any) (*sql.Row, error) {
+	row := conn.client.QueryRowContext(ctx, query, args...)
 
-	if ctxErr := ctx.Err(); ctxErr != nil {
-		err = ctxErr
+	err := ctx.Err()
+	if err != nil {
+		return nil, errs.Wrap(err, "context failed")
 	}
 
-	return
+	return row, nil
 }
 
 // NewConnManager initializes connManager structure and runs Go Routine that watches for unused connections.
-func NewConnManager(
-	keepAlive, connectTimeout, callTimeout, hkInterval time.Duration, queryStorage yarn.Yarn, logger log.Logger,
-) *ConnManager {
+func NewConnManager(options *connectionManagerOptions) *ConnManager {
 	ctx, cancel := context.WithCancel(context.Background())
 
 	connMgr := &ConnManager{
 		connections:    make(map[connKey]*MyConn),
-		keepAlive:      keepAlive,
-		connectTimeout: connectTimeout,
-		callTimeout:    callTimeout,
+		keepAlive:      options.keepAlive,
+		connectTimeout: options.connectTimeout,
+		callTimeout:    options.callTimeout,
 		Destroy:        cancel, // Destroy stops originated goroutines and closes connections.
-		queryStorage:   queryStorage,
-		log:            logger,
+		queryStorage:   options.queryStorage,
+		log:            options.logger,
 	}
 
 	go connMgr.housekeeper(ctx, hkInterval)
@@ -129,7 +137,7 @@ func NewConnManager(
 }
 
 // GetConnection returns an existing connection or creates a new one.
-func (c *ConnManager) GetConnection(uri uri.URI, params map[string]string) (*MyConn, error) {
+func (c *ConnManager) GetConnection(uri *sdkuri.URI, params map[string]string) (*MyConn, error) {
 	ck := createConnKey(uri, params)
 
 	conn := c.getConn(ck)
@@ -274,7 +282,12 @@ func (c *ConnManager) setConn(ck connKey, conn *MyConn) *MyConn {
 	return conn
 }
 
-func getMySQLConfig(uri uri.URI, tls *tls.Config, connectTimeout, callTimeout time.Duration) (*mysql.Config, error) {
+func getMySQLConfig(
+	uri *sdkuri.URI,
+	tlsConfig *tls.Config,
+	connectTimeout,
+	callTimeout time.Duration,
+) (*mysql.Config, error) {
 	config := mysql.NewConfig()
 	config.User = uri.User()
 	config.Passwd = uri.Password()
@@ -284,11 +297,11 @@ func getMySQLConfig(uri uri.URI, tls *tls.Config, connectTimeout, callTimeout ti
 	config.ReadTimeout = callTimeout
 	config.InterpolateParams = true
 
-	if tls == nil {
+	if tlsConfig == nil {
 		return config, nil
 	}
 
-	err := mysql.RegisterTLSConfig(uri.String(), tls)
+	err := mysql.RegisterTLSConfig(uri.String(), tlsConfig)
 	if err != nil {
 		return nil, zbxerr.New("failed to register TLS config").Wrap(err)
 	}
@@ -304,14 +317,14 @@ func (c *ConnManager) getTLSConfig(details *tlsconfig.Details) (*tls.Config, err
 		err     error
 	)
 
-	switch details.TlsConnect {
+	switch details.TLSConnect {
 	case "required":
 		tlsConf, err = c.getRequiredTLSConfig(details)
 		if err != nil {
 			return nil, errs.Wrap(err, "failed to get TLS config for required connection")
 		}
 	case "verify_ca":
-		details.Apply(tlsconfig.WithTlsSkipVerify(true), tlsconfig.WithTlsServerName(""))
+		details.Apply(tlsconfig.WithTLSSkipVerify(true), tlsconfig.WithTLSServerName(""))
 
 		tlsConf, err = details.GetTLSConfig()
 		if err != nil {
@@ -320,13 +333,13 @@ func (c *ConnManager) getTLSConfig(details *tlsconfig.Details) (*tls.Config, err
 
 		tlsConf.VerifyPeerCertificate = tlsconfig.VerifyPeerCertificateFunc("", tlsConf.RootCAs)
 	case "verify_full":
-		//moved from sdk workaround which leads to set ServerName to match the URI always
-		url, err := uri.New(details.RawUri, nil)
+		// moved from sdk workaround which leads to set ServerName to match the URI always.
+		url, err := sdkuri.New(details.RawURI, nil)
 		if err != nil {
 			return nil, errs.Wrap(err, "failed to parse uri")
 		}
 
-		details.Apply(tlsconfig.WithTlsSkipVerify(false), tlsconfig.WithTlsServerName(url.Host()))
+		details.Apply(tlsconfig.WithTLSSkipVerify(false), tlsconfig.WithTLSServerName(url.Host()))
 
 		tlsConf, err = details.GetTLSConfig()
 		if err != nil {
@@ -342,8 +355,8 @@ func (c *ConnManager) getTLSConfig(details *tlsconfig.Details) (*tls.Config, err
 }
 
 func (c *ConnManager) getRequiredTLSConfig(details *tlsconfig.Details) (*tls.Config, error) {
-	if details.TlsCaFile != "" {
-		c.log.Warningf("server CA will not be verified for %s", details.TlsConnect)
+	if details.TLSCaFile != "" {
+		c.log.Warningf("server CA will not be verified for %s", details.TLSConnect)
 	}
 
 	clientCerts, err := details.LoadCertificates()
@@ -354,7 +367,7 @@ func (c *ConnManager) getRequiredTLSConfig(details *tlsconfig.Details) (*tls.Con
 	return &tls.Config{Certificates: clientCerts, InsecureSkipVerify: true}, nil
 }
 
-func createConnKey(uri uri.URI, params map[string]string) connKey {
+func createConnKey(uri *sdkuri.URI, params map[string]string) connKey {
 	tlsType := params[tlsConnectParam]
 	if tlsType == "" {
 		tlsType = disable
@@ -379,10 +392,10 @@ func getTLSDetails(ck connKey) (*tlsconfig.Details, error) {
 	details := tlsconfig.NewDetails(
 		"",
 		ck.rawUri,
-		tlsconfig.WithTlsCaFile(ck.tlsCA),
-		tlsconfig.WithTlsCertFile(ck.tlsCert),
-		tlsconfig.WithTlsKeyFile(ck.tlsKey),
-		tlsconfig.WithTlsConnect(ck.tlsConnect),
+		tlsconfig.WithTLSCaFile(ck.tlsCA),
+		tlsconfig.WithTLSCertFile(ck.tlsCert),
+		tlsconfig.WithTLSKeyFile(ck.tlsKey),
+		tlsconfig.WithTLSConnect(ck.tlsConnect),
 		tlsconfig.WithAllowedConnections(
 			disable,
 			require,
@@ -395,7 +408,7 @@ func getTLSDetails(ck connKey) (*tlsconfig.Details, error) {
 		validateCA = false
 	}
 
-	if details.TlsKeyFile != "" || details.TlsCertFile != "" {
+	if details.TLSKeyFile != "" || details.TLSCertFile != "" {
 		validateClient = true
 	}
 

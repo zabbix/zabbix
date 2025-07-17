@@ -15,8 +15,6 @@
 package redis
 
 import (
-	"fmt"
-
 	"golang.zabbix.com/sdk/conf"
 	"golang.zabbix.com/sdk/errs"
 	"golang.zabbix.com/sdk/plugin"
@@ -24,7 +22,21 @@ import (
 
 var _ plugin.Configurator = (*Plugin)(nil)
 
-type Session struct {
+type pluginOptions struct {
+	// Timeout is the maximum time for waiting when a request has to be done. Default value equals the global timeout.
+	Timeout int `conf:"optional,range=1:30"`
+
+	// KeepAlive is a time to wait before unused connections will be closed.
+	KeepAlive int `conf:"optional,range=60:900,default=300"`
+
+	// Sessions stores pre-defined named sets of connections settings.
+	Sessions map[string]*session `conf:"optional"`
+
+	// Default stores default connection parameter values from configuration file
+	Default session `conf:"optional"`
+}
+
+type session struct {
 	URI      string `conf:"name=Uri,optional"`
 	Password string `conf:"optional"`
 	User     string `conf:"optional"`
@@ -34,20 +46,6 @@ type Session struct {
 	TLSServerName string `conf:"name=TLSServerName,optional"`
 	TLSCertFile   string `conf:"name=TLSCertFile,optional"`
 	TLSKeyFile    string `conf:"name=TLSKeyFile,optional"`
-}
-
-type PluginOptions struct {
-	// Timeout is the maximum time for waiting when a request has to be done. Default value equals the global timeout.
-	Timeout int `conf:"optional,range=1:30"`
-
-	// KeepAlive is a time to wait before unused connections will be closed.
-	KeepAlive int `conf:"optional,range=60:900,default=300"`
-
-	// Sessions stores pre-defined named sets of connections settings.
-	Sessions map[string]Session `conf:"optional"`
-
-	// Default stores default connection parameter values from configuration file
-	Default Session `conf:"optional"`
 }
 
 // Configure implements the Configurator interface.
@@ -65,9 +63,9 @@ func (p *Plugin) Configure(global *plugin.GlobalOptions, options any) {
 
 // Validate implements the Configurator interface.
 // Returns an error if validation of a plugin's configuration is failed.
-func (p *Plugin) Validate(options any) error {
+func (*Plugin) Validate(options any) error {
 	var (
-		opts PluginOptions
+		opts pluginOptions
 		err  error
 	)
 
@@ -76,8 +74,8 @@ func (p *Plugin) Validate(options any) error {
 		return errs.Wrap(err, "plugin config validation failed")
 	}
 
-	//validating only TLS on default options
-	err = validateTLSConfiguration(opts.Default)
+	// validating only TLS on default options.
+	err = validateTLSConfiguration(&opts.Default)
 	if err != nil {
 		return errs.Wrap(err, "plugin config validation failed on default TLS configuration")
 	}
@@ -85,7 +83,7 @@ func (p *Plugin) Validate(options any) error {
 	for k, v := range opts.Sessions {
 		err = validateSession(v)
 		if err != nil {
-			return errs.Wrap(err, fmt.Sprintf("plugin config validation failed on session %s", k))
+			return errs.Wrap(err, "plugin config validation failed on session "+k)
 		}
 	}
 

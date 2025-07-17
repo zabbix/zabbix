@@ -34,22 +34,24 @@ type infoKeySpace map[infoKey]any
 type infoExtKey string
 type infoExtKeySpace map[infoExtKey]string
 
-type redisInfo map[infoSection]infoKeySpace
+type redisInfoMap map[infoSection]infoKeySpace
 
 // parseRedisInfo parses an output of 'INFO' command.
 // https://redis.io/commands/info
-func parseRedisInfo(info string) (res redisInfo, err error) {
+//
+//nolint:gocyclo,cyclop // this is a parser.
+func parseRedisInfo(info string) (redisInfoMap, error) {
 	var (
 		section infoSection
 	)
 
 	scanner := bufio.NewScanner(strings.NewReader(info))
-	res = make(redisInfo)
+	res := make(redisInfoMap)
 
 	for scanner.Scan() {
 		line := scanner.Text()
 
-		if len(line) == 0 {
+		if line == "" {
 			continue
 		}
 
@@ -95,9 +97,9 @@ func parseRedisInfo(info string) (res redisInfo, err error) {
 		res[section][key] = value
 	}
 
-	err = scanner.Err()
+	err := scanner.Err()
 	if err != nil {
-		return nil, err
+		return nil, errs.Wrap(err, "failed to parse info")
 	}
 
 	if len(res) == 0 {
@@ -108,12 +110,12 @@ func parseRedisInfo(info string) (res redisInfo, err error) {
 }
 
 // InfoHandler gets an output of 'INFO' command, parses it and returns it in JSON format.
-func InfoHandler(conn conn.RedisClient, params map[string]string) (any, error) {
+func InfoHandler(redisClient conn.RedisClient, params map[string]string) (any, error) {
 	var res string
 
 	section := infoSection(strings.ToLower(params["Section"]))
 
-	err := conn.Query(radix.Cmd(&res, "INFO", string(section)))
+	err := redisClient.Query(radix.Cmd(&res, "INFO", string(section)))
 	if err != nil {
 		return nil, errs.WrapConst(err, zbxerr.ErrorCannotFetchData)
 	}
