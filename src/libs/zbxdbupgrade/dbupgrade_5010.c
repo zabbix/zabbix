@@ -1772,12 +1772,6 @@ static int	DBpatch_5010067(void)
 
 	return SUCCEED;
 }
-
-static int      DBpatch_5010068(void)
-{
-	return zbx_optimize();
-}
-
 #endif
 
 DBPATCH_START(5010)
@@ -1851,6 +1845,5 @@ DBPATCH_ADD(5010064, 0, 1)
 DBPATCH_ADD(5010065, 0, 1)
 DBPATCH_ADD(5010066, 0, 1)
 DBPATCH_ADD(5010067, 0, 1)
-DBPATCH_ADD(5010068, 0, 1)
 
 DBPATCH_END()

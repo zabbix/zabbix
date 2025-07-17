@@ -95,5 +95,4 @@ int	zbx_dbupgrade_drop_trigger_function_on_update(const char *table_name, const 
 unsigned char	DBget_program_type(void);
 int		DBget_config_timeout(void);
 
-int	zbx_optimize(void);
 #endif

@@ -1277,11 +1277,6 @@ static int	DBpatch_6010097(void)
 	return DBdrop_field("hosts", "lastaccess");
 }
 
-static int      DBpatch_6010098(void)
-{
-	return zbx_optimize();
-}
-
 #endif
 
 DBPATCH_START(6010)
@@ -1385,6 +1380,5 @@ DBPATCH_ADD(6010094, 0, 1)
 DBPATCH_ADD(6010095, 0, 1)
 DBPATCH_ADD(6010096, 0, 1)
 DBPATCH_ADD(6010097, 0, 1)
-DBPATCH_ADD(6010098, 0, 1)
 
 DBPATCH_END()

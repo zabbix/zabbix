@@ -489,11 +489,6 @@ static int	DBpatch_7010029(void)
 	return SUCCEED;
 }
 
-static int      DBpatch_7010030(void)
-{
-	return zbx_optimize();
-}
-
 #undef ZBX_WIDGET_FIELD_TYPE_INT32
 
 #endif
@@ -532,6 +527,5 @@ DBPATCH_ADD(7010026, 0, 1)
 DBPATCH_ADD(7010027, 0, 1)
 DBPATCH_ADD(7010028, 0, 1)
 DBPATCH_ADD(7010029, 0, 1)
-DBPATCH_ADD(7010030, 0, 1)
 
 DBPATCH_END()
