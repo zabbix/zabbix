@@ -33,45 +33,57 @@ const (
 )
 
 var (
+	//nolint:gochecknoglobals // just a runtime constant
 	maxAuthPassLen = 512
-	uriDefaults    = &uri.Defaults{Scheme: "tcp", Port: "6379"}
+	//nolint:gochecknoglobals // just a runtime constant
+	uriDefaults = &uri.Defaults{Scheme: "tcp", Port: "6379"}
 )
 
-// Common params: [URI|Session][,Password][,User].
+// Common params: [URI|session][,Password][,User].
 var (
+
+	//nolint:gochecknoglobals // just a runtime constant
 	paramURI = metric.NewConnParam("URI", "URI to connect or session name.").
 			WithDefault(uriDefaults.Scheme + "://localhost:" + uriDefaults.Port).WithSession().
 			WithValidator(uri.URIValidator{Defaults: uriDefaults, AllowedSchemes: []string{"tcp", "unix"}})
+	//nolint:gochecknoglobals // just a runtime constant
 	paramPassword = metric.NewConnParam("Password", "Redis password.").WithDefault("").
 			WithValidator(metric.LenValidator{Max: &maxAuthPassLen})
+	//nolint:gochecknoglobals // just a runtime constant
 	paramUser = metric.NewConnParam("User", "Redis user.").WithDefault("default")
 
+	//nolint:gochecknoglobals // just a runtime constant
 	paramTLSConnect = metric.NewSessionOnlyParam(
 		string(comms.TLSConnect),
 		"DB connection encryption type.").
 		WithDefault("")
 
+	//nolint:gochecknoglobals // just a runtime constant
 	paramTLSCaFile = metric.NewSessionOnlyParam(
 		string(comms.TLSCAFile),
 		"TLS ca file path.").
 		WithDefault("")
 
+	//nolint:gochecknoglobals // just a runtime constant
 	paramTLSServerName = metric.NewSessionOnlyParam(
 		string(comms.TLSServerName),
 		"TLS server name.").
 		WithDefault("")
 
+	//nolint:gochecknoglobals // just a runtime constant
 	paramTLSCertFile = metric.NewSessionOnlyParam(
 		string(comms.TLSCertFile),
 		"TLS cert file path.").
 		WithDefault("")
 
+	//nolint:gochecknoglobals // just a runtime constant
 	paramTLSKeyFile = metric.NewSessionOnlyParam(
 		string(comms.TLSKeyFile),
 		"TLS key file path.").
 		WithDefault("")
 )
 
+//nolint:gochecknoglobals // just a runtime constant
 var metrics = metric.MetricSet{
 	keyConfig: metric.NewUnordered("Returns configuration parameters of Redis server.",
 		[]*metric.Param{
@@ -98,7 +110,7 @@ var metrics = metric.MetricSet{
 }
 
 // handlerFunc defines an interface must be implemented by handlers.
-type handlerFunc func(conn conn.RedisClient, params map[string]string) (res any, err error)
+type handlerFunc func(redisClient conn.RedisClient, params map[string]string) (res any, err error)
 
 //nolint:gochecknoinits //legacy implementation
 func init() {

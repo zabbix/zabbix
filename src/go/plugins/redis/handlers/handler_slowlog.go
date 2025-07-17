@@ -48,10 +48,10 @@ func getLastSlowlogID(sl slowlog) (int64, error) {
 }
 
 // SlowlogHandler gets an output of 'SLOWLOG GET 1' command and returns the last slowlog Id.
-func SlowlogHandler(conn conn.RedisClient, _ map[string]string) (any, error) {
+func SlowlogHandler(redisClient conn.RedisClient, _ map[string]string) (any, error) {
 	var res []any
 
-	err := conn.Query(radix.Cmd(&res, "SLOWLOG", "GET", "1"))
+	err := redisClient.Query(radix.Cmd(&res, "SLOWLOG", "GET", "1"))
 	if err != nil {
 		return nil, errs.WrapConst(err, zbxerr.ErrorCannotFetchData)
 	}

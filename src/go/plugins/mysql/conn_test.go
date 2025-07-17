@@ -22,9 +22,12 @@ import (
 )
 
 func Test_getTLSDetails(t *testing.T) {
+	t.Parallel()
+
 	type args struct {
 		ck connKey
 	}
+
 	tests := []struct {
 		name    string
 		args    args
@@ -41,8 +44,8 @@ func Test_getTLSDetails(t *testing.T) {
 				},
 			},
 			&tlsconfig.Details{
-				TlsConnect:         "required",
-				RawUri:             "127.0.0.1",
+				TLSConnect:         "required",
+				RawURI:             "127.0.0.1",
 				AllowedConnections: map[string]bool{disable: true, require: true, verifyCa: true, verifyFull: true},
 			},
 			false,
@@ -57,9 +60,9 @@ func Test_getTLSDetails(t *testing.T) {
 				},
 			},
 			&tlsconfig.Details{
-				TlsConnect:         "verify_ca",
-				TlsCaFile:          "path/to/ca",
-				RawUri:             "127.0.0.1",
+				TLSConnect:         "verify_ca",
+				TLSCaFile:          "path/to/ca",
+				RawURI:             "127.0.0.1",
 				AllowedConnections: map[string]bool{disable: true, require: true, verifyCa: true, verifyFull: true},
 			},
 			false,
@@ -76,11 +79,11 @@ func Test_getTLSDetails(t *testing.T) {
 				},
 			},
 			&tlsconfig.Details{
-				TlsConnect:         "verify_ca",
-				TlsCaFile:          "path/to/ca",
-				TlsCertFile:        "path/to/cert",
-				TlsKeyFile:         "path/to/key",
-				RawUri:             "127.0.0.1",
+				TLSConnect:         "verify_ca",
+				TLSCaFile:          "path/to/ca",
+				TLSCertFile:        "path/to/cert",
+				TLSKeyFile:         "path/to/key",
+				RawURI:             "127.0.0.1",
 				AllowedConnections: map[string]bool{disable: true, require: true, verifyCa: true, verifyFull: true},
 			},
 			false,
@@ -125,12 +128,15 @@ func Test_getTLSDetails(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
+			t.Parallel()
+
 			got, err := getTLSDetails(tt.args.ck)
 			if (err != nil) != tt.wantErr {
 				t.Errorf("getTLSDetails() error = %v, wantErr %v", err, tt.wantErr)
 
 				return
 			}
+
 			if !reflect.DeepEqual(got, tt.want) {
 				t.Errorf("getTLSDetails() = %v, want %v", got, tt.want)
 			}
