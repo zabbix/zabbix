@@ -4,7 +4,7 @@ msgstr ""
 "Project-Id-Version: Zabbix 6.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2024-04-02 17:26+0300\n"
-"PO-Revision-Date: 2024-05-27 08:03+0000\n"
+"PO-Revision-Date: 2025-07-14 08:02+0000\n"
 "Last-Translator: Alexey <alexey.pustovalov@zabbix.com>\n"
 "Language-Team: Zabbix translation team\n"
 "Language: ru\n"
@@ -20354,7 +20354,7 @@ msgstr "d.m.Y H:i:s"
 
 #: include/translateDefines.inc.php:40
 msgid "Y-n-d"
-msgstr "d-n-Y"
+msgstr "d.m.Y"
 
 #: include/views/js/monitoring.sysmaps.js.php:435
 msgid "Y1"
