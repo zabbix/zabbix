@@ -1623,31 +1623,31 @@ class CUserDirectory extends CApiService {
 										['else' => true, 'type' => API_UNEXPECTED]
 			]],
 			'sign_messages' =>		['type' => API_MULTIPLE, 'rules' => [
-										['if' => ['field' => 'idp_type', 'in' => implode(',', [IDP_TYPE_SAML])], 'type' => API_INT32, 'in' => implode(',', ['0', '1'])] + ($is_update ? [] : ['default' => DB::getDefault('userdirectory', 'sign_messages')]),
+										['if' => ['field' => 'idp_type', 'in' => implode(',', [IDP_TYPE_SAML])], 'type' => API_INT32, 'in' => implode(',', ['0', '1'])] + ($is_update ? [] : ['default' => DB::getDefault('userdirectory_saml', 'sign_messages')]),
 										['else' => true, 'type' => API_UNEXPECTED]
 			]],
 			'sign_assertions' =>	['type' => API_MULTIPLE, 'rules' => [
-										['if' => ['field' => 'idp_type', 'in' => implode(',', [IDP_TYPE_SAML])], 'type' => API_INT32, 'in' => implode(',', ['0', '1'])] + ($is_update ? [] : ['default' => DB::getDefault('userdirectory', 'sign_assertions')]),
+										['if' => ['field' => 'idp_type', 'in' => implode(',', [IDP_TYPE_SAML])], 'type' => API_INT32, 'in' => implode(',', ['0', '1'])] + ($is_update ? [] : ['default' => DB::getDefault('userdirectory_saml', 'sign_assertions')]),
 										['else' => true, 'type' => API_UNEXPECTED]
 			]],
 			'sign_authn_requests' => ['type' => API_MULTIPLE, 'rules' => [
-										['if' => ['field' => 'idp_type', 'in' => implode(',', [IDP_TYPE_SAML])], 'type' => API_INT32, 'in' => implode(',', ['0', '1'])] + ($is_update ? [] : ['default' => DB::getDefault('userdirectory', 'sign_authn_requests')]),
+										['if' => ['field' => 'idp_type', 'in' => implode(',', [IDP_TYPE_SAML])], 'type' => API_INT32, 'in' => implode(',', ['0', '1'])] + ($is_update ? [] : ['default' => DB::getDefault('userdirectory_saml', 'sign_authn_requests')]),
 										['else' => true, 'type' => API_UNEXPECTED]
 			]],
 			'sign_logout_requests' => ['type' => API_MULTIPLE, 'rules' => [
-										['if' => ['field' => 'idp_type', 'in' => implode(',', [IDP_TYPE_SAML])], 'type' => API_INT32, 'in' => implode(',', ['0', '1'])] + ($is_update ? [] : ['default' => DB::getDefault('userdirectory', 'sign_logout_requests')]),
+										['if' => ['field' => 'idp_type', 'in' => implode(',', [IDP_TYPE_SAML])], 'type' => API_INT32, 'in' => implode(',', ['0', '1'])] + ($is_update ? [] : ['default' => DB::getDefault('userdirectory_saml', 'sign_logout_requests')]),
 										['else' => true, 'type' => API_UNEXPECTED]
 			]],
 			'sign_logout_responses' => ['type' => API_MULTIPLE, 'rules' => [
-										['if' => ['field' => 'idp_type', 'in' => implode(',', [IDP_TYPE_SAML])], 'type' => API_INT32, 'in' => implode(',', ['0', '1'])] + ($is_update ? [] : ['default' => DB::getDefault('userdirectory', 'sign_logout_responses')]),
+										['if' => ['field' => 'idp_type', 'in' => implode(',', [IDP_TYPE_SAML])], 'type' => API_INT32, 'in' => implode(',', ['0', '1'])] + ($is_update ? [] : ['default' => DB::getDefault('userdirectory_saml', 'sign_logout_responses')]),
 										['else' => true, 'type' => API_UNEXPECTED]
 			]],
 			'encrypt_nameid' =>		['type' => API_MULTIPLE, 'rules' => [
-										['if' => ['field' => 'idp_type', 'in' => implode(',', [IDP_TYPE_SAML])], 'type' => API_INT32, 'in' => implode(',', ['0', '1'])] + ($is_update ? [] : ['default' => DB::getDefault('userdirectory', 'encrypt_nameid')]),
+										['if' => ['field' => 'idp_type', 'in' => implode(',', [IDP_TYPE_SAML])], 'type' => API_INT32, 'in' => implode(',', ['0', '1'])] + ($is_update ? [] : ['default' => DB::getDefault('userdirectory_saml', 'encrypt_nameid')]),
 										['else' => true, 'type' => API_UNEXPECTED]
 			]],
 			'encrypt_assertions' => ['type' => API_MULTIPLE, 'rules' => [
-										['if' => ['field' => 'idp_type', 'in' => implode(',', [IDP_TYPE_SAML])], 'type' => API_INT32, 'in' => implode(',', ['0', '1'])] + ($is_update ? [] : ['default' => DB::getDefault('userdirectory', 'encrypt_assertions')]),
+										['if' => ['field' => 'idp_type', 'in' => implode(',', [IDP_TYPE_SAML])], 'type' => API_INT32, 'in' => implode(',', ['0', '1'])] + ($is_update ? [] : ['default' => DB::getDefault('userdirectory_saml', 'encrypt_assertions')]),
 										['else' => true, 'type' => API_UNEXPECTED]
 			]],
 			'scim_status' =>		['type' => API_MULTIPLE, 'rules' => [
