@@ -62,9 +62,10 @@ switch ($data['method']) {
 	case 'zabbix.status':
 		global $ZBX_SERVER, $ZBX_SERVER_PORT;
 
-		if (!CSessionHelper::has('serverCheckTime')
-				|| (int) CSessionHelper::get('serverCheckTime') + SERVER_CHECK_INTERVAL <= time()) {
+		$now = time();
+		$check_time = CSessionHelper::get('serverCheckTime') ?? 0;
 
+		if ($check_time + SERVER_CHECK_INTERVAL <= $now || $now < $check_time) {
 			$status = true;
 			$error_code = 0;
 
@@ -85,7 +86,7 @@ switch ($data['method']) {
 
 			CSessionHelper::set('serverCheckResult', $status);
 			CSessionHelper::set('serverCheckResultErrorCode', $error_code);
-			CSessionHelper::set('serverCheckTime', time());
+			CSessionHelper::set('serverCheckTime', $now);
 		}
 
 		$server_status = CSessionHelper::get('serverCheckResult');

@@ -151,7 +151,14 @@ class CSystemInfoHelper {
 
 		$status['is_running'] = $server->isRunning() || $server->canConnect(CSessionHelper::getId());
 
-		if ($status['is_running'] === false || CWebUser::getType() != USER_TYPE_SUPER_ADMIN) {
+		if (CWebUser::getType() != USER_TYPE_SUPER_ADMIN) {
+			return $status;
+		}
+
+		if ($status['is_running'] === false) {
+			if ($server->getErrorCode() === CZabbixServer::ERROR_CODE_TLS) {
+				error($server->getError());
+			}
 			return $status;
 		}
 
