@@ -329,7 +329,7 @@ zbx_uint64_t	zbx_timekeeper_update(zbx_timekeeper_t *timekeeper, int index, unsi
 	unit->cache.state = state;
 	unit->cache.ticks = ticks;
 
-	return (double)(elapsed * 1000) / (double)timekeeper->ticks_per_sec;
+	return  (zbx_uint64_t)((double)(elapsed * 1000) / (double)timekeeper->ticks_per_sec);
 }
 
 /******************************************************************************
