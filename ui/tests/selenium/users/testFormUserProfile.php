@@ -163,7 +163,7 @@ class testFormUserProfile extends CLegacyWebTest {
 		$oldHashUsers = CDBHelper::getHash($sqlHashUsers);
 
 		$this->page->login()->open('zabbix.php?action=userprofile.edit')->waitUntilReady();
-		$form = $this->query('name:userprofile_form')->asForm()->waitUntilVisible()->one();
+		$form = $this->query('name:user_form')->asForm()->waitUntilVisible()->one();
 		$form->fill(['Theme' => 'Blue'])->submit();
 		$this->page->waitUntilReady();
 		CDashboardElement::find()->waitUntilVisible()->waitUntilReady();
