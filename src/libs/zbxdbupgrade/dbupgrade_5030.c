@@ -5839,7 +5839,7 @@ static int	DBpatch_5030191(void)
 	if (0 == (DBget_program_type() & ZBX_PROGRAM_TYPE_SERVER))
 		return ret;
 
-	result = zbx_db_select("select i.itemid,i.key_,h.host"
+	result = zbx_db_select("explain select i.itemid,i.key_,h.host"
 			" from items i"
 			" join hosts h on h.hostid=i.hostid"
 			" where h.status=%d and i.flags in (%d,%d) and i.templateid is null",
