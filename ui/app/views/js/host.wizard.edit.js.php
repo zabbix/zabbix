@@ -1783,7 +1783,9 @@ window.host_wizard_edit = new class {
 				if (temp_tag_list.scrollHeight > temp_tag_list.clientHeight) {
 					const tags = temp_tag_list.querySelectorAll(`.${ZBX_STYLE_TAG}`);
 
-					temp_tag_list.removeChild(tags[tags.length - 1]);
+					if (tags.length) {
+						temp_tag_list.removeChild(tags[tags.length - 1]);
+					}
 				}
 			}
 
