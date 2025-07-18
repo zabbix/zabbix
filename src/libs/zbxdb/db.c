@@ -588,27 +588,11 @@ int	zbx_db_connect_basic(const zbx_config_dbhigh_t *cfg)
 		ret = ZBX_DB_FAIL;
 	}
 
-	if (ZBX_DB_OK == ret)
+	/* innodb_snapshot_isolation variable became ON by default in MariaDB 11.6.2, we need it to be OFF */
+	if (ZBX_DB_OK == ret && ON == ZBX_MARIADB_SFORK && 110602 <= ZBX_MYSQL_SVERSION)
 	{
-		/* innodb_snapshot_isolation variable became ON by default in MariaDB 11.6.2, we need it to be OFF */
-		zbx_db_result_t	result;
-		zbx_db_row_t	row;
-
-		result = zbx_db_select_basic("show variables like 'innodb_snapshot_isolation'");
-
-		if ((zbx_db_result_t)ZBX_DB_DOWN == result || NULL == result)
-		{
-			ret = (NULL == result) ? ZBX_DB_FAIL : ZBX_DB_DOWN;
-		}
-		else if (NULL != (row = zbx_db_fetch_basic(result)))
-		{
-			if (0 != strcmp("OFF", row[1]))
-			{
-				if (0 < (ret = zbx_db_execute_basic("set innodb_snapshot_isolation='OFF'")))
-					ret = ZBX_DB_OK;
-			}
-		}
-		zbx_db_free_result(result);
+		if (0 < (ret = zbx_db_execute_basic("set innodb_snapshot_isolation='OFF'")))
+			ret = ZBX_DB_OK;
 	}
 
 	if (ZBX_DB_OK == ret)
