@@ -1779,14 +1779,12 @@ window.host_wizard_edit = new class {
 				if (temp_tag_list.scrollHeight > tags_max_height) {
 					const tags = temp_tag_list.querySelectorAll(`.${ZBX_STYLE_TAG}`);
 
-					if (tags.length) {
-						temp_tag_list.removeChild(tags[tags.length - 1]);
-					}
+					temp_tag_list.removeChild(tags[tags.length - 1]);
 				}
 			}
 
 			tags_list.innerHTML = temp_tag_list.innerHTML;
-			//temp_tag_list.remove();
+			temp_tag_list.remove();
 		}
 		else {
 			card.querySelector('.template-tags').style.display = 'none';
