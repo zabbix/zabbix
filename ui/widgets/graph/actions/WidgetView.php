@@ -267,7 +267,7 @@ class WidgetView extends CControllerDashboardWidgetView {
 					: $graph['name'];
 
 				if ($this->fields_values['override_hostid'] && $resourceid
-						&& array_key_exists('name', $host) && !empty($graph)) {
+						&& array_key_exists('name', $host) && $graph) {
 					$graph_src = $this->prepareGraphSrc($graph, $host);
 				}
 
@@ -412,7 +412,7 @@ class WidgetView extends CControllerDashboardWidgetView {
 	}
 
 	private function prepareGraphUrl(array $graph, ?string $resourceid = null): ?CUrl {
-		if ($this->isEditMode() || empty($graph)
+		if ($this->isEditMode() || !$graph
 				|| ($this->isTemplateDashboard() && !$this->fields_values['override_hostid'])) {
 			return null;
 		}
