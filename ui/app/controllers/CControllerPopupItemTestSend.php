@@ -284,14 +284,14 @@ class CControllerPopupItemTestSend extends CControllerPopupItemTest {
 		if ($this->get_value_from_host) {
 			$history = [
 				'value' => $this->getInput('value', ''),
-				'timestamp' => $this->getPrevTime()
+				'timestamp' => $this->getInput('prev_time', '') === '' ? '' : $this->getPrevTime()
 			];
 			$data += $this->prepareTestData();
 		}
 		else {
 			$history = [
 				'value' => $this->getInput('prev_value', ''),
-				'timestamp' => $this->getInput('prev_time')
+				'timestamp' => $this->getInput('prev_time', '')
 			];
 			$data['item']['value'] = $this->getInput('value', '');
 			$data['options']['state'] = (int) $this->getInput('not_supported', self::SUPPORTED_STATE);
@@ -301,7 +301,7 @@ class CControllerPopupItemTestSend extends CControllerPopupItemTest {
 			}
 		}
 
-		if ($this->use_prev_value && (!$this->get_value_from_host || $this->getInput('prev_time') !== '')) {
+		if ($this->use_prev_value && $history['timestamp'] !== '') {
 			$data['options']['history'] = $history;
 		}
 
