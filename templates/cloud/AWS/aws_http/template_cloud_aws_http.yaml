@@ -51,7 +51,7 @@ zabbix_export:
                         "backup:ListBackupVaults",
                         "backup:ListBackupJobs",
                         "backup:ListCopyJobs",
-                        "backup:ListRestoreJobs
+                        "backup:ListRestoreJobs"
                     ],
                     "Effect":"Allow",
                     "Resource":"*"
@@ -86,7 +86,7 @@ zabbix_export:
                         "backup:ListBackupVaults",
                         "backup:ListBackupJobs",
                         "backup:ListCopyJobs",
-                        "backup:ListRestoreJobs
+                        "backup:ListRestoreJobs"
                     ],
                     "Resource": "*"
                 }
@@ -132,7 +132,7 @@ zabbix_export:
                         "backup:ListBackupVaults",
                         "backup:ListBackupJobs",
                         "backup:ListCopyJobs",
-                        "backup:ListRestoreJobs
+                        "backup:ListRestoreJobs"
                     ],
                     "Resource": "*"
                 }
@@ -218,65 +218,91 @@ zabbix_export:
             		return data;
             	},
             
+            	getRoleBaseCredentials: function () {
+            		AWS.params['auth_type'] = 'role_base';
+            		var request = new HttpRequest();
+            		if (typeof AWS.params.proxy !== 'undefined' && AWS.params.proxy !== '') {
+            			request.setProxy(AWS.params.proxy);
+            		}
+            		request.addHeader('X-aws-ec2-metadata-token-ttl-seconds: 21600');
+            		var token = request.put(AWS.metadata + 'api/token');
+            
+            		if (request.getStatus() !== 200 || token === null || token === '') {
+            			throw 'Error getting IMDSv2 session token.';
+            		}
+            		request.addHeader('X-aws-ec2-metadata-token: ' + token);
+            		var IamRoleName = request.get(AWS.metadata + 'meta-data/iam/security-credentials');
+            
+            		if (request.getStatus() !== 200 || IamRoleName === null || IamRoleName === '') {
+            			throw 'Error getting security credentials from instance metadata. Role not found.';
+            		}
+            
+            		credentials = request.get(AWS.metadata + 'meta-data/iam/security-credentials/' + encodeURI(IamRoleName));
+            
+            		if (request.getStatus() !== 200 || credentials === null || credentials === '') {
+            			throw 'Error getting security credentials from instance metadata.';
+            		}
+            
+            		try {
+            			credentials = JSON.parse(credentials);
+            		}
+            		catch (error) {
+            			throw 'Failed to parse response received from instance metadata. Check debug log for more information.';
+            		}
+            
+            		['AccessKeyId', 'SecretAccessKey', 'Token'].forEach(function (field) {
+            			if (typeof credentials !== 'object' || typeof credentials[field] === 'undefined' || credentials[field] === '') {
+            				throw 'Required credentials are not set: "' + field + '".';
+            			};
+            			AWS.params[field] = credentials[field];
+            		});
+            	},
+            
             	setParams: function (params) {
             		AWS.params['proxy'] = params.proxy;
             		switch (AWS.getField(params, 'auth_type')) {
             			case 'role_base':
-            				AWS.params['auth_type'] = 'role_base';
-            				var request = new HttpRequest();
-            				if (typeof AWS.params.proxy !== 'undefined' && AWS.params.proxy !== '') {
-            					request.setProxy(AWS.params.proxy);
-            				}
-            				request.addHeader('X-aws-ec2-metadata-token-ttl-seconds: 21600');
-            				var token = request.put(AWS.metadata + 'api/token');
-            
-            				if (request.getStatus() !== 200 || token === null || token === '') {
-            					throw 'Error getting IMDSv2 session token.';
-            				}
-            				request.addHeader('X-aws-ec2-metadata-token: ' + token);
-            				var IamRoleName = request.get(AWS.metadata + 'meta-data/iam/security-credentials');
-            
-            				if (request.getStatus() !== 200 || IamRoleName === null || IamRoleName === '') {
-            					throw 'Error getting security credentials from instance metadata. Role not found.';
-            				}
-            
-            				credentials = request.get(AWS.metadata + 'meta-data/iam/security-credentials/' + encodeURI(IamRoleName));
-            
-            				if (request.getStatus() !== 200 || credentials === null || credentials === '') {
-            					throw 'Error getting security credentials from instance metadata.';
-            				}
-            
-            				try {
-            					credentials = JSON.parse(credentials);
-            				}
-            				catch (error) {
-            					throw 'Failed to parse response received from instance metadata. Check debug log for more information.';
-            				}
-            
-            				['AccessKeyId', 'SecretAccessKey', 'Token'].forEach(function (field) {
-            					if (typeof credentials !== 'object' || typeof credentials[field] === 'undefined' || credentials[field] === '') {
-            						throw 'Required credentials are not set: "' + field + '".';
-            					};
-            					AWS.params[field] = credentials[field];
-            				});
+            				AWS.getRoleBaseCredentials();
             				break;
             			case 'assume_role':
-            				AWS.params['auth_type'] = 'assume_role';
+            				if (typeof params.metadata_auth === 'undefined' || params.metadata_auth === '' || (params.metadata_auth !== 'true' && params.metadata_auth !== 'false')) {
+            					throw 'Required param metadata_auth for assume_role is not set or has invalid value: "' + params.metadata_auth + '". Expected "true" or "false".';
+            				}
+            				if (params.metadata_auth === 'true') {
+            					AWS.getRoleBaseCredentials();
+            					AWS.params['SessionToken'] = AWS.params['Token'];
+            					AWS.params['auth_type'] = 'assume_role_metadata';
             
-            				['AccessKeyId', 'SecretAccessKey', 'sts_region', 'role_arn'].forEach(function (field) {
-            					if (typeof params !== 'object' || typeof params[field] === 'undefined' || params[field] === '') {
-            						throw 'Required param is not set: "' + field + '".';
-            					}
-            					AWS.params[field] = params[field];
-            				});
+            					['sts_region', 'role_arn'].forEach(function (field) {
+            						if (typeof params !== 'object' || typeof params[field] === 'undefined' || params[field] === '') {
+            							throw 'Required param is not set: "' + field + '".';
+            						}
+            						AWS.params[field] = params[field];
+            					});
+            				}
             
-            				role_arn_regex = /role\/(.+)$/;
+            				if (params.metadata_auth === 'false') {
+            					AWS.params['auth_type'] = 'assume_role';
             
-            				var payload = {
+            					['AccessKeyId', 'SecretAccessKey', 'sts_region', 'role_arn'].forEach(function (field) {
+            						if (typeof params !== 'object' || typeof params[field] === 'undefined' || params[field] === '') {
+            							throw 'Required param is not set: "' + field + '".';
+            						}
+            						AWS.params[field] = params[field];
+            					});
+            				}
+            
+            				const role_arn_regex = /role\/(.+)$/;
+            				const match = AWS.params.role_arn.match(role_arn_regex);
+            				if (!match) {
+            					throw 'Invalid role ARN format.';
+            				}
+            
+            				const payload = {
             					'Action': 'AssumeRole',
             					'Version': '2011-06-15',
             					'RoleArn': AWS.params.role_arn,
-            					'RoleSessionName': AWS.params.role_arn.match(role_arn_regex)[1] + 'Session',
+            					'RoleSessionName': match[1] + 'Session',
             				};
             
             				credentials = AWS.getField(AWS.request('GET', AWS.params.sts_region, 'sts', AWS.prepareParams(payload)), 'AssumeRoleResponse.AssumeRoleResult.Credentials');
@@ -366,7 +392,7 @@ zabbix_export:
             		request.addHeader('Content-Encoding: amz-1.0');
             		request.addHeader('Authorization: ' + 'AWS4-HMAC-SHA256 Credential=' + AWS.params.AccessKeyId + '/' + credential_scope + ', ' + 'SignedHeaders=' + signed_headers + ', ' + 'Signature=' + hmac('sha256', key, request_string));
             
-            		if (AWS.params.auth_type === 'role_base' || (AWS.params.auth_type === 'assume_role' & !params.includes('AssumeRole'))) {
+            		if (AWS.params.auth_type === 'role_base' || AWS.params.auth_type === 'assume_role_metadata' || (AWS.params.auth_type === 'assume_role' & !params.includes('AssumeRole'))) {
             			request.addHeader('X-Amz-Security-Token: ' + (AWS.params.auth_type === 'role_base' ? AWS.params.Token : AWS.params.SessionToken));
             		}
             
@@ -426,6 +452,8 @@ zabbix_export:
               value: '{$AWS.ACCESS.KEY.ID}'
             - name: auth_type
               value: '{$AWS.AUTH_TYPE}'
+            - name: metadata_auth
+              value: '{$AWS.ASSUME.ROLE.AUTH.METADATA}'
             - name: proxy
               value: '{$AWS.PROXY}'
             - name: region
@@ -546,65 +574,91 @@ zabbix_export:
             		return data;
             	},
             
+            	getRoleBaseCredentials: function () {
+            		AWS.params['auth_type'] = 'role_base';
+            		var request = new HttpRequest();
+            		if (typeof AWS.params.proxy !== 'undefined' && AWS.params.proxy !== '') {
+            			request.setProxy(AWS.params.proxy);
+            		}
+            		request.addHeader('X-aws-ec2-metadata-token-ttl-seconds: 21600');
+            		var token = request.put(AWS.metadata + 'api/token');
+            
+            		if (request.getStatus() !== 200 || token === null || token === '') {
+            			throw 'Error getting IMDSv2 session token.';
+            		}
+            		request.addHeader('X-aws-ec2-metadata-token: ' + token);
+            		var IamRoleName = request.get(AWS.metadata + 'meta-data/iam/security-credentials');
+            
+            		if (request.getStatus() !== 200 || IamRoleName === null || IamRoleName === '') {
+            			throw 'Error getting security credentials from instance metadata. Role not found.';
+            		}
+            
+            		credentials = request.get(AWS.metadata + 'meta-data/iam/security-credentials/' + encodeURI(IamRoleName));
+            
+            		if (request.getStatus() !== 200 || credentials === null || credentials === '') {
+            			throw 'Error getting security credentials from instance metadata.';
+            		}
+            
+            		try {
+            			credentials = JSON.parse(credentials);
+            		}
+            		catch (error) {
+            			throw 'Failed to parse response received from instance metadata. Check debug log for more information.';
+            		}
+            
+            		['AccessKeyId', 'SecretAccessKey', 'Token'].forEach(function (field) {
+            			if (typeof credentials !== 'object' || typeof credentials[field] === 'undefined' || credentials[field] === '') {
+            				throw 'Required credentials are not set: "' + field + '".';
+            			};
+            			AWS.params[field] = credentials[field];
+            		});
+            	},
+            
             	setParams: function (params) {
             		AWS.params['proxy'] = params.proxy;
             		switch (AWS.getField(params, 'auth_type')) {
             			case 'role_base':
-            				AWS.params['auth_type'] = 'role_base';
-            				var request = new HttpRequest();
-            				if (typeof AWS.params.proxy !== 'undefined' && AWS.params.proxy !== '') {
-            					request.setProxy(AWS.params.proxy);
-            				}
-            				request.addHeader('X-aws-ec2-metadata-token-ttl-seconds: 21600');
-            				var token = request.put(AWS.metadata + 'api/token');
-            
-            				if (request.getStatus() !== 200 || token === null || token === '') {
-            					throw 'Error getting IMDSv2 session token.';
-            				}
-            				request.addHeader('X-aws-ec2-metadata-token: ' + token);
-            				var IamRoleName = request.get(AWS.metadata + 'meta-data/iam/security-credentials');
-            
-            				if (request.getStatus() !== 200 || IamRoleName === null || IamRoleName === '') {
-            					throw 'Error getting security credentials from instance metadata. Role not found.';
-            				}
-            
-            				credentials = request.get(AWS.metadata + 'meta-data/iam/security-credentials/' + encodeURI(IamRoleName));
-            
-            				if (request.getStatus() !== 200 || credentials === null || credentials === '') {
-            					throw 'Error getting security credentials from instance metadata.';
-            				}
-            
-            				try {
-            					credentials = JSON.parse(credentials);
-            				}
-            				catch (error) {
-            					throw 'Failed to parse response received from instance metadata. Check debug log for more information.';
-            				}
-            
-            				['AccessKeyId', 'SecretAccessKey', 'Token'].forEach(function (field) {
-            					if (typeof credentials !== 'object' || typeof credentials[field] === 'undefined' || credentials[field] === '') {
-            						throw 'Required credentials are not set: "' + field + '".';
-            					};
-            					AWS.params[field] = credentials[field];
-            				});
+            				AWS.getRoleBaseCredentials();
             				break;
             			case 'assume_role':
-            				AWS.params['auth_type'] = 'assume_role';
+            				if (typeof params.metadata_auth === 'undefined' || params.metadata_auth === '' || (params.metadata_auth !== 'true' && params.metadata_auth !== 'false')) {
+            					throw 'Required param metadata_auth for assume_role is not set or has invalid value: "' + params.metadata_auth + '". Expected "true" or "false".';
+            				}
+            				if (params.metadata_auth === 'true') {
+            					AWS.getRoleBaseCredentials();
+            					AWS.params['SessionToken'] = AWS.params['Token'];
+            					AWS.params['auth_type'] = 'assume_role_metadata';
             
-            				['AccessKeyId', 'SecretAccessKey', 'sts_region', 'role_arn'].forEach(function (field) {
-            					if (typeof params !== 'object' || typeof params[field] === 'undefined' || params[field] === '') {
-            						throw 'Required param is not set: "' + field + '".';
-            					}
-            					AWS.params[field] = params[field];
-            				});
+            					['sts_region', 'role_arn'].forEach(function (field) {
+            						if (typeof params !== 'object' || typeof params[field] === 'undefined' || params[field] === '') {
+            							throw 'Required param is not set: "' + field + '".';
+            						}
+            						AWS.params[field] = params[field];
+            					});
+            				}
             
-            				role_arn_regex = /role\/(.+)$/;
+            				if (params.metadata_auth === 'false') {
+            					AWS.params['auth_type'] = 'assume_role';
             
-            				var payload = {
+            					['AccessKeyId', 'SecretAccessKey', 'sts_region', 'role_arn'].forEach(function (field) {
+            						if (typeof params !== 'object' || typeof params[field] === 'undefined' || params[field] === '') {
+            							throw 'Required param is not set: "' + field + '".';
+            						}
+            						AWS.params[field] = params[field];
+            					});
+            				}
+            
+            				const role_arn_regex = /role\/(.+)$/;
+            				const match = AWS.params.role_arn.match(role_arn_regex);
+            				if (!match) {
+            					throw 'Invalid role ARN format.';
+            				}
+            
+            				const payload = {
             					'Action': 'AssumeRole',
             					'Version': '2011-06-15',
             					'RoleArn': AWS.params.role_arn,
-            					'RoleSessionName': AWS.params.role_arn.match(role_arn_regex)[1] + 'Session',
+            					'RoleSessionName': match[1] + 'Session',
             				};
             
             				credentials = AWS.getField(AWS.request('GET', AWS.params.sts_region, 'sts', AWS.prepareParams(payload)), 'AssumeRoleResponse.AssumeRoleResult.Credentials');
@@ -694,7 +748,7 @@ zabbix_export:
             		request.addHeader('Content-Encoding: amz-1.0');
             		request.addHeader('Authorization: ' + 'AWS4-HMAC-SHA256 Credential=' + AWS.params.AccessKeyId + '/' + credential_scope + ', ' + 'SignedHeaders=' + signed_headers + ', ' + 'Signature=' + hmac('sha256', key, request_string));
             
-            		if (AWS.params.auth_type === 'role_base' || (AWS.params.auth_type === 'assume_role' & !params.includes('AssumeRole'))) {
+            		if (AWS.params.auth_type === 'role_base' || AWS.params.auth_type === 'assume_role_metadata' || (AWS.params.auth_type === 'assume_role' & !params.includes('AssumeRole'))) {
             			request.addHeader('X-Amz-Security-Token: ' + (AWS.params.auth_type === 'role_base' ? AWS.params.Token : AWS.params.SessionToken));
             		}
             
@@ -817,6 +871,8 @@ zabbix_export:
               value: '{$AWS.ACCESS.KEY.ID}'
             - name: auth_type
               value: '{$AWS.AUTH_TYPE}'
+            - name: metadata_auth
+              value: '{$AWS.ASSUME.ROLE.AUTH.METADATA}'
             - name: period
               value: '{$AWS.BACKUP_JOB.PERIOD}'
             - name: proxy
@@ -1315,9 +1371,22 @@ zabbix_export:
           description: 'ARN assume role; add when using the `assume_role` authorization method.'
           config:
             type: TEXT
-            priority: '8'
+            priority: '9'
             label: 'ARN assume role'
             description: 'The ARN of the role to assume when using the assume_role authorization method.'
+        - macro: '{$AWS.ASSUME.ROLE.AUTH.METADATA}'
+          value: 'false'
+          description: 'Add when using the `assume_role` through instance metadata or environment authorization method. Possible values: `false`, `true`.'
+          config:
+            type: LIST
+            priority: '7'
+            label: 'Assume Role Metadata Authorization'
+            description: 'Chose `True` when use instance metadata service to retrieve role credentials.'
+            options:
+              - value: 'false'
+                text: 'False'
+              - value: 'true'
+                text: 'True'
         - macro: '{$AWS.AUTH_TYPE}'
           value: access_key
           description: 'Authorization method. Possible values: `access_key`, `assume_role`, `role_base`.'
@@ -1338,7 +1407,7 @@ zabbix_export:
           description: 'The number of days over which to retrieve backup jobs.'
           config:
             type: TEXT
-            priority: '16'
+            priority: '17'
             label: 'Job discovery period'
             description: 'The number of days over which to retrieve backup jobs. No less than 1.'
             regex: '^-?([0-9]+|(([0-9]+)\.([0-9]+)))$'
@@ -1347,7 +1416,7 @@ zabbix_export:
           description: 'Filter of discoverable jobs by resource name.'
           config:
             type: TEXT
-            priority: '14'
+            priority: '15'
             section_name: Filters
             label: 'Job filter by resource name'
             description: 'Filter of discoverable jobs by resource name.'
@@ -1356,7 +1425,7 @@ zabbix_export:
           description: 'Filter to exclude discovered jobs by resource name.'
           config:
             type: TEXT
-            priority: '15'
+            priority: '16'
             section_name: Filters
             label: 'Job filter by resource name (exclude)'
             description: 'Filter to exclude discoverable jobs by resource name.'
@@ -1365,7 +1434,7 @@ zabbix_export:
           description: 'Filter of discoverable jobs by resource type.'
           config:
             type: TEXT
-            priority: '12'
+            priority: '13'
             section_name: Filters
             label: 'Job filter by resource type'
             description: 'Filter of discoverable jobs by resource type.'
@@ -1374,7 +1443,7 @@ zabbix_export:
           description: 'Filter to exclude discovered jobs by resource type.'
           config:
             type: TEXT
-            priority: '13'
+            priority: '14'
             section_name: Filters
             label: 'Job filter by resource type (exclude)'
             description: 'Filter to exclude discoverable jobs by resource type.'
@@ -1383,7 +1452,7 @@ zabbix_export:
           description: 'Filter of discoverable jobs by state.'
           config:
             type: TEXT
-            priority: '10'
+            priority: '11'
             section_name: Filters
             label: 'Job filter by state'
             description: 'Filter of discoverable jobs by state.'
@@ -1392,7 +1461,7 @@ zabbix_export:
           description: 'Filter to exclude discovered jobs by state.'
           config:
             type: TEXT
-            priority: '11'
+            priority: '12'
             section_name: Filters
             label: 'Job filter by state (exclude)'
             description: 'Filter to exclude discoverable jobs by state.'
@@ -1400,7 +1469,7 @@ zabbix_export:
           description: 'AWS Backup vault name.'
           config:
             type: TEXT
-            priority: '9'
+            priority: '10'
             label: 'Backup vault name'
             description: 'AWS Backup vault name.'
         - macro: '{$AWS.DATA.TIMEOUT}'
@@ -1422,12 +1491,12 @@ zabbix_export:
             description: 'HTTP proxy to use for requests.'
         - macro: '{$AWS.REGION}'
           value: us-west-1
-          description: 'Amazon EC2 Region code.'
+          description: 'Amazon backup vault region code.'
           config:
             type: TEXT
             priority: '5'
             label: 'AWS Region'
-            description: 'The AWS region where your EC2 instances are located.'
+            description: 'The AWS region where your backup vaults are located.'
         - macro: '{$AWS.SECRET.ACCESS.KEY}'
           type: SECRET_TEXT
           description: 'Secret access key.'
@@ -1441,7 +1510,7 @@ zabbix_export:
           description: 'Region used in assume role request.'
           config:
             type: TEXT
-            priority: '7'
+            priority: '8'
             label: 'STS Region'
             description: 'The AWS region for the assume role request.'
       dashboards:
@@ -2082,7 +2151,7 @@ zabbix_export:
         * [DescribeLoadBalancers API method](https://docs.aws.amazon.com/elasticloadbalancing/latest/APIReference/API_DescribeLoadBalancers.html)
       vendor:
         name: Zabbix
-        version: 7.4-3
+        version: 7.4-4
       groups:
         - name: Templates/Cloud
       discovery_rules:
@@ -2110,65 +2179,91 @@ zabbix_export:
             		return data;
             	},
             
+            	getRoleBaseCredentials: function () {
+            		AWS.params['auth_type'] = 'role_base';
+            		var request = new HttpRequest();
+            		if (typeof AWS.params.proxy !== 'undefined' && AWS.params.proxy !== '') {
+            			request.setProxy(AWS.params.proxy);
+            		}
+            		request.addHeader('X-aws-ec2-metadata-token-ttl-seconds: 21600');
+            		var token = request.put(AWS.metadata + 'api/token');
+            
+            		if (request.getStatus() !== 200 || token === null || token === '') {
+            			throw 'Error getting IMDSv2 session token.';
+            		}
+            		request.addHeader('X-aws-ec2-metadata-token: ' + token);
+            		var IamRoleName = request.get(AWS.metadata + 'meta-data/iam/security-credentials');
+            
+            		if (request.getStatus() !== 200 || IamRoleName === null || IamRoleName === '') {
+            			throw 'Error getting security credentials from instance metadata. Role not found.';
+            		}
+            
+            		credentials = request.get(AWS.metadata + 'meta-data/iam/security-credentials/' + encodeURI(IamRoleName));
+            
+            		if (request.getStatus() !== 200 || credentials === null || credentials === '') {
+            			throw 'Error getting security credentials from instance metadata.';
+            		}
+            
+            		try {
+            			credentials = JSON.parse(credentials);
+            		}
+            		catch (error) {
+            			throw 'Failed to parse response received from instance metadata. Check debug log for more information.';
+            		}
+            
+            		['AccessKeyId', 'SecretAccessKey', 'Token'].forEach(function (field) {
+            			if (typeof credentials !== 'object' || typeof credentials[field] === 'undefined' || credentials[field] === '') {
+            				throw 'Required credentials are not set: "' + field + '".';
+            			};
+            			AWS.params[field] = credentials[field];
+            		});
+            	},
+            
             	setParams: function (params) {
             		AWS.params['proxy'] = params.proxy;
             		switch (AWS.getField(params, 'auth_type')) {
             			case 'role_base':
-            				AWS.params['auth_type'] = 'role_base';
-            				var request = new HttpRequest();
-            				if (typeof AWS.params.proxy !== 'undefined' && AWS.params.proxy !== '') {
-            					request.setProxy(AWS.params.proxy);
-            				}
-            				request.addHeader('X-aws-ec2-metadata-token-ttl-seconds: 21600');
-            				var token = request.put(AWS.metadata + 'api/token');
-            
-            				if (request.getStatus() !== 200 || token === null || token === '') {
-            					throw 'Error getting IMDSv2 session token.';
-            				}
-            				request.addHeader('X-aws-ec2-metadata-token: ' + token);
-            				var IamRoleName = request.get(AWS.metadata + 'meta-data/iam/security-credentials');
-            
-            				if (request.getStatus() !== 200 || IamRoleName === null || IamRoleName === '') {
-            					throw 'Error getting security credentials from instance metadata. Role not found.';
-            				}
-            
-            				credentials = request.get(AWS.metadata + 'meta-data/iam/security-credentials/' + encodeURI(IamRoleName));
-            
-            				if (request.getStatus() !== 200 || credentials === null || credentials === '') {
-            					throw 'Error getting security credentials from instance metadata.';
-            				}
-            
-            				try {
-            					credentials = JSON.parse(credentials);
-            				}
-            				catch (error) {
-            					throw 'Failed to parse response received from instance metadata. Check debug log for more information.';
-            				}
-            
-            				['AccessKeyId', 'SecretAccessKey', 'Token'].forEach(function (field) {
-            					if (typeof credentials !== 'object' || typeof credentials[field] === 'undefined' || credentials[field] === '') {
-            						throw 'Required credentials are not set: "' + field + '".';
-            					};
-            					AWS.params[field] = credentials[field];
-            				});
+            				AWS.getRoleBaseCredentials();
             				break;
             			case 'assume_role':
-            				AWS.params['auth_type'] = 'assume_role';
+            				if (typeof params.metadata_auth === 'undefined' || params.metadata_auth === '' || (params.metadata_auth !== 'true' && params.metadata_auth !== 'false')) {
+            					throw 'Required param metadata_auth for assume_role is not set or has invalid value: "' + params.metadata_auth + '". Expected "true" or "false".';
+            				}
+            				if (params.metadata_auth === 'true') {
+            					AWS.getRoleBaseCredentials();
+            					AWS.params['SessionToken'] = AWS.params['Token'];
+            					AWS.params['auth_type'] = 'assume_role_metadata';
             
-            				['AccessKeyId', 'SecretAccessKey', 'sts_region', 'role_arn'].forEach(function (field) {
-            					if (typeof params !== 'object' || typeof params[field] === 'undefined' || params[field] === '') {
-            						throw 'Required param is not set: "' + field + '".';
-            					}
-            					AWS.params[field] = params[field];
-            				});
+            					['sts_region', 'role_arn'].forEach(function (field) {
+            						if (typeof params !== 'object' || typeof params[field] === 'undefined' || params[field] === '') {
+            							throw 'Required param is not set: "' + field + '".';
+            						}
+            						AWS.params[field] = params[field];
+            					});
+            				}
             
-            				role_arn_regex = /role\/(.+)$/;
+            				if (params.metadata_auth === 'false') {
+            					AWS.params['auth_type'] = 'assume_role';
             
-            				var payload = {
+            					['AccessKeyId', 'SecretAccessKey', 'sts_region', 'role_arn'].forEach(function (field) {
+            						if (typeof params !== 'object' || typeof params[field] === 'undefined' || params[field] === '') {
+            							throw 'Required param is not set: "' + field + '".';
+            						}
+            						AWS.params[field] = params[field];
+            					});
+            				}
+            
+            				const role_arn_regex = /role\/(.+)$/;
+            				const match = AWS.params.role_arn.match(role_arn_regex);
+            				if (!match) {
+            					throw 'Invalid role ARN format.';
+            				}
+            
+            				const payload = {
             					'Action': 'AssumeRole',
             					'Version': '2011-06-15',
             					'RoleArn': AWS.params.role_arn,
-            					'RoleSessionName': AWS.params.role_arn.match(role_arn_regex)[1] + 'Session',
+            					'RoleSessionName': match[1] + 'Session',
             				};
             
             				credentials = AWS.getField(AWS.request('GET', AWS.params.sts_region, 'sts', AWS.prepareParams(payload)), 'AssumeRoleResponse.AssumeRoleResult.Credentials');
@@ -2258,7 +2353,7 @@ zabbix_export:
             		request.addHeader('Content-Encoding: amz-1.0');
             		request.addHeader('Authorization: ' + 'AWS4-HMAC-SHA256 Credential=' + AWS.params.AccessKeyId + '/' + credential_scope + ', ' + 'SignedHeaders=' + signed_headers + ', ' + 'Signature=' + hmac('sha256', key, request_string));
             
-            		if (AWS.params.auth_type === 'role_base' || (AWS.params.auth_type === 'assume_role' & !params.includes('AssumeRole'))) {
+            		if (AWS.params.auth_type === 'role_base' || AWS.params.auth_type === 'assume_role_metadata' || (AWS.params.auth_type === 'assume_role' & !params.includes('AssumeRole'))) {
             			request.addHeader('X-Amz-Security-Token: ' + (AWS.params.auth_type === 'role_base' ? AWS.params.Token : AWS.params.SessionToken));
             		}
             

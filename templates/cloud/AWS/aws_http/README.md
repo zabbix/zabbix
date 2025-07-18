@@ -2656,7 +2656,7 @@ Add the following required permissions to your Zabbix IAM policy in order to col
               "backup:ListBackupVaults",
               "backup:ListBackupJobs",
               "backup:ListCopyJobs",
-              "backup:ListRestoreJobs
+              "backup:ListRestoreJobs"
           ],
           "Effect":"Allow",
           "Resource":"*"
@@ -2692,7 +2692,7 @@ For using Assume Role authorization, add the appropriate permissions to the role
                 "backup:ListBackupVaults",
                 "backup:ListBackupJobs",
                 "backup:ListCopyJobs",
-                "backup:ListRestoreJobs
+                "backup:ListRestoreJobs"
             ],
             "Resource": "*"
         }
@@ -2719,6 +2719,10 @@ Next, add a principal to the trust relationships of the role you are using:
 ```
 Set the following macros: `{$AWS.ACCESS.KEY.ID}`, `{$AWS.SECRET.ACCESS.KEY}`, `{$AWS.STS.REGION}`, `{$AWS.ASSUME.ROLE.ARN}`.
 
+**Note**: If you set the `{$AWS.ASSUME.ROLE.AUTH.METADATA}` macro to `true` and set the macros `{$AWS.STS.REGION}` and `{$AWS.ASSUME.ROLE.ARN}`, the Zabbix server or proxy will attempt to retrieve the role credentials from the instance metadata service.
+This means that the Zabbix server or proxy must be running on an AWS EC2 instance with an IAM role assigned that has the necessary permissions.
+This approach is recommended when running Zabbix inside an AWS EC2 instance with an IAM role assigned, as it simplifies credential management.
+
 ### Role-Based Authorization
 If you are using role-based authorization, set the appropriate permissions:
 
@@ -2738,7 +2742,7 @@ If you are using role-based authorization, set the appropriate permissions:
                 "backup:ListBackupVaults",
                 "backup:ListBackupJobs",
                 "backup:ListCopyJobs",
-                "backup:ListRestoreJobs
+                "backup:ListRestoreJobs"
             ],
             "Resource": "*"
         }
@@ -2784,8 +2788,9 @@ See the section below for a list of macros used for LLD filters.
 |{$AWS.PROXY}|<p>Sets HTTP proxy value. If this macro is empty then no proxy is used.</p>||
 |{$AWS.ACCESS.KEY.ID}|<p>Access key ID.</p>||
 |{$AWS.SECRET.ACCESS.KEY}|<p>Secret access key.</p>||
-|{$AWS.REGION}|<p>Amazon EC2 Region code.</p>|`us-west-1`|
+|{$AWS.REGION}|<p>Amazon backup vault region code.</p>|`us-west-1`|
 |{$AWS.AUTH_TYPE}|<p>Authorization method. Possible values: `access_key`, `assume_role`, `role_base`.</p>|`access_key`|
+|{$AWS.ASSUME.ROLE.AUTH.METADATA}|<p>Add when using the `assume_role` through instance metadata or environment authorization method. Possible values: `false`, `true`.</p>|`false`|
 |{$AWS.STS.REGION}|<p>Region used in assume role request.</p>|`us-east-1`|
 |{$AWS.ASSUME.ROLE.ARN}|<p>ARN assume role; add when using the `assume_role` authorization method.</p>||
 |{$AWS.BACKUP_VAULT.NAME}|<p>AWS Backup vault name.</p>||
