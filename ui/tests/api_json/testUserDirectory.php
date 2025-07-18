@@ -17,12 +17,15 @@
 require_once dirname(__FILE__).'/../include/CAPITest.php';
 
 /**
- * @onBefore  prepareTestData
+ * @onBefore getConfFileContent, setSamlCertificatesStorage, prepareTestData
  *
- * @onAfter cleanTestData
+ * @onAfter cleanTestData, revertConfFile
  * @backup userdirectory
  */
 class testUserDirectory extends CAPITest {
+
+	const CONF_PATH = __DIR__.'/../../conf/zabbix.conf.php';
+	protected static $conf_file_content;
 
 	const SSL_CERTIFICATE = '-----BEGIN CERTIFICATE-----
 MIID+TCCAuGgAwIBAgIUSpDnLjL2DVS0YTRGOQh+MMoUtDowDQYJKoZIhvcNAQEL
@@ -77,7 +80,6 @@ OzQ7joemEK5DIDRxryFxWnDXLrAZA1V+iUiKESIX1E8TGSAMymwUW2nWWCuhUps6
 pFw9z8Z3AaerRZA5fl655v500jUqziwBfifSimNL0hzmZfG6XUt6F7y4rxa2HFuu
 uwMrOBKatg7CZ1Uenv1K3ioD5w==
 -----END PRIVATE KEY-----';
-
 
 	public static $data = [
 		'usrgrpid' => [],
@@ -1290,5 +1292,31 @@ uwMrOBKatg7CZ1Uenv1K3ioD5w==
 		foreach ($api_ids as $api => $ids) {
 			CDataHelper::call($api, $ids);
 		}
+	}
+
+	/**
+	 * Set CERT_STORAGE variable to frontend configuration file.
+	 *
+	 * @param string $type	file or database
+	 */
+	public function setSamlCertificatesStorage($type = 'database') {
+		file_put_contents(self::CONF_PATH, '$SSO[\'CERT_STORAGE\']	= \''.$type.'\';'."\n", FILE_APPEND);
+
+		// Wait for frontend to get the new config from updated zabbix.conf.php file.
+		sleep((int)ini_get('opcache.revalidate_freq') + 1);
+	}
+
+	protected function getConfFileContent() {
+		self::$conf_file_content = file_get_contents(self::CONF_PATH);
+	}
+
+	/**
+	 * After test, revert frontend configuration file to its original state.
+	 */
+	public static function revertConfFile() {
+		file_put_contents(self::CONF_PATH, self::$conf_file_content);
+
+		// Wait for frontend to get the new config from updated zabbix.conf.php file.
+		sleep((int)ini_get('opcache.revalidate_freq') + 1);
 	}
 }
