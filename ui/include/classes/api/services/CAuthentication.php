@@ -82,7 +82,8 @@ class CAuthentication extends CApiService {
 
 		CApiSettingsHelper::updateParameters($auth, $db_auth);
 
-		if ($auth['saml_auth_enabled'] != $db_auth['saml_auth_enabled']
+		if (array_key_exists('saml_auth_enabled', $auth)
+				&& $auth['saml_auth_enabled'] != $db_auth['saml_auth_enabled']
 				&& $auth['saml_auth_enabled'] == ZBX_AUTH_SAML_DISABLED) {
 			$db_userdirectories = API::UserDirectory()->get([
 				'output' => [],
