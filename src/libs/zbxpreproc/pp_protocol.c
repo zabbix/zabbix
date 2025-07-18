@@ -180,7 +180,6 @@ static zbx_uint32_t	preprocessor_pack_value(zbx_ipc_message_t *message, zbx_prep
 			*offset++ = PACKED_FIELD(&value->result->log->severity, sizeof(int));
 			*offset++ = PACKED_FIELD(&value->result->log->logeventid, sizeof(int));
 		}
-
 	}
 
 	return message_pack_data(message, fields, (int)(offset - fields));
@@ -672,8 +671,6 @@ zbx_uint32_t	zbx_preprocessor_unpack_value(zbx_preproc_item_value_t *value, unsi
 	AGENT_RESULT	*agent_result = NULL;
 	zbx_log_t	*log = NULL;
 	unsigned char	*offset = data, ts_marker, result_marker, log_marker;
-
-
 
 	offset += zbx_deserialize_uint64(offset, &value->itemid);
 	offset += zbx_deserialize_uint64(offset, &value->hostid);
