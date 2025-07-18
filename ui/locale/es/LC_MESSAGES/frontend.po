@@ -4,7 +4,7 @@ msgstr ""
 "Project-Id-Version: Zabbix 6.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2023-10-19 13:48+0300\n"
-"PO-Revision-Date: 2025-06-25 20:44+0000\n"
+"PO-Revision-Date: 2025-07-17 17:53+0000\n"
 "Last-Translator: Vicente Salvador <vicentesalvadorcubedo@gmail.com>\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
 "Language: es\n"
@@ -15071,7 +15071,7 @@ msgstr "Aguja"
 
 #: include/items.inc.php:100
 msgid "Nested"
-msgstr ""
+msgstr "Anidado"
 
 #: app/views/administration.housekeeping.edit.php:77
 msgid "Network discovery data storage period"
@@ -19999,7 +19999,7 @@ msgstr "Configure el agente Zabbix en su objetivo de monitoreo ejecutando el sig
 
 #: app/views/host.wizard.edit.php:477
 msgid "Set up Zabbix agent on your monitoring target by executing the following script [bash under root]:"
-msgstr ""
+msgstr "Configure el agente Zabbix en su objetivo de monitoreo ejecutando el siguiente script [bash bajo root]:"
 
 #: app/views/js/popup.itemtestedit.view.js.php:383 include/forms.inc.php:1599
 #: include/views/js/item.preprocessing.js.php:67
@@ -20464,7 +20464,7 @@ msgstr "El tamaño de la respuesta recibida del servidor Zabbix \"%1$s\" excede 
 
 #: app/views/host.wizard.edit.php:355
 msgid "Skip OS selection if you already have Zabbix agent installed."
-msgstr ""
+msgstr "Omita la selección del sistema operativo si ya tiene instalado el agente Zabbix."
 
 #: include/locales.inc.php:61
 msgid "Slovak (sk_SK)"
@@ -21779,22 +21779,22 @@ msgstr "La plantilla que se está clonando pertenece a un grupo de plantillas pa
 #: app/views/host.wizard.edit.php:275
 #, c-format
 msgid "The template you selected (%1$s) must be linked to a host - an entity in Zabbix that represents your monitoring target."
-msgstr ""
+msgstr "La plantilla que seleccionó (%1$s) debe estar vinculada a un equipo: una entidad en Zabbix que representa su objetivo de monitoreo."
 
 #: app/views/host.wizard.edit.php:353
 #, c-format
 msgid "The template you selected (%1$s) requires Zabbix agent to be installed and running on your monitoring target."
-msgstr ""
+msgstr "La plantilla que seleccionó (%1$s) requiere que el agente Zabbix esté instalado y ejecutándose en su objetivo de monitoreo."
 
 #: app/views/host.wizard.edit.php:899
 #, c-format
 msgid "The template you selected (%1$s) requires additional configuration."
-msgstr ""
+msgstr "La plantilla que seleccionó (%1$s) requiere configuración adicional."
 
 #: app/views/host.wizard.edit.php:573
 #, c-format
 msgid "The template you selected (%1$s) requires the %2$s to be added to the host (%3$s)."
-msgstr ""
+msgstr "La plantilla que seleccionó (%1$s) requiere que %2$s se agregue al equipo (%3$s)."
 
 #: app/views/popup.token.view.php:62
 msgid "The token has expired. Please update the expiry date to use the token."
@@ -21811,7 +21811,7 @@ msgstr "El iniciador no fue descubierto nuevamente y será eliminado la próxima
 
 #: app/views/js/host.wizard.edit.js.php:722
 msgid "The value does not match the existing value on the selected host."
-msgstr ""
+msgstr "El valor no coincide con el valor existente en el equipo seleccionado."
 
 #: include/views/configuration.host.discovery.edit.php:712
 msgid "The value should be greater than LLD rule update interval."
@@ -21847,7 +21847,7 @@ msgstr[1] "Estas verificaciones no se pueden eliminar, ya que se utilizan como c
 
 #: app/views/host.wizard.edit.php:384
 msgid "This configuration will overwrite all existing encryption settings on the host."
-msgstr ""
+msgstr "Esta configuración sobrescribirá todas las configuraciones de cifrado existentes en el equipo."
 
 #: include/func.inc.php:2566
 msgid "This day last week"
@@ -23519,7 +23519,7 @@ msgstr "Utilizar el filtro para mostrar resultados"
 
 #: app/views/host.wizard.edit.php:424
 msgid "Use:"
-msgstr ""
+msgstr "Usar:"
 
 #: app/views/administration.script.list.php:93 app/views/mediatype.list.php:98
 msgid "Used in actions"
@@ -24597,7 +24597,7 @@ msgstr "Código de verificación"
 
 #: app/views/host.wizard.edit.php:407
 msgid "Verify Zabbix server, proxy, or cluster address"
-msgstr ""
+msgstr "Verificar la dirección del servidor, proxy o clúster de Zabbix"
 
 #: include/classes/setup/CSetupWizard.php:655
 msgid "Verify database certificate"
@@ -25323,7 +25323,7 @@ msgstr "El agente Zabbix inicia conexiones con el servidor o proxy Zabbix para e
 
 #: app/views/host.wizard.edit.php:422
 msgid "Zabbix agent must be able to connect to the specified address or list of addresses."
-msgstr ""
+msgstr "El agente Zabbix debe poder conectarse a la dirección o lista de direcciones especificada."
 
 #: app/views/host.wizard.edit.php:863
 msgid "Zabbix documentation"

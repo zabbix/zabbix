@@ -2134,7 +2134,8 @@ button {
     background-color: #010101; }
 .dashboard.dashboard-is-edit-mode .highlight {
   position: absolute;
-  z-index: 10; }
+  z-index: 10;
+  will-change: transform; }
   .dashboard.dashboard-is-edit-mode .highlight.highlight-n {
     border-bottom: 3px solid #768d99;
     top: calc(.25rem - 1px);
@@ -8611,6 +8612,9 @@ svg {
   margin-right: 3px; }
 #graph-tab .graph-items {
   max-width: 750px; }
+
+#graph-preview-tab {
+  overflow: auto; }
 
 .z-select.z-select-host-interface .description:not(:empty),
 z-select.z-select-host-interface .description:not(:empty) {
