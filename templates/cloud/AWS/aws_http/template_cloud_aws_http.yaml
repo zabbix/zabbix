@@ -12,8 +12,8 @@ zabbix_export:
       name: 'Virtual machines'
   templates:
     - uuid: 024cf4f0711c4c39a4e016858efc5e37
-      template: 'AWS Backup vault by HTTP'
-      name: 'AWS Backup vault by HTTP'
+      template: 'AWS Backup Vault by HTTP'
+      name: 'AWS Backup Vault by HTTP'
       description: |
         The template is designed to monitor AWS Backup vaults and jobs by HTTP via Zabbix, and it works without any external scripts.
         Don't forget to read the README.md for the correct setup of the template.
@@ -418,7 +418,7 @@ zabbix_export:
             	return JSON.stringify({ 'error': error });
             }
           description: |
-            Retrieve AWS Backup vault metrics.
+            Retrieve AWS backup vault metrics.
             More information here: https://docs.aws.amazon.com/aws-backup/latest/devguide/API_BackupVaultListMember.html
           timeout: '{$AWS.DATA.TIMEOUT}'
           parameters:
@@ -445,7 +445,7 @@ zabbix_export:
           name: 'Jobs: Backup'
           type: DEPENDENT
           key: aws.backup_vault.job.backup.count
-          description: 'The number of backup jobs in the vault over the ''{$AWS.BACKUP_JOB.PERIOD}'' day(s).'
+          description: 'The number of backup jobs in the vault over the last `{$AWS.BACKUP_JOB.PERIOD}` day(s).'
           preprocessing:
             - type: JSONPATH
               parameters:
@@ -462,7 +462,7 @@ zabbix_export:
           name: 'Jobs: Failed backup'
           type: DEPENDENT
           key: aws.backup_vault.job.backup.failed.count
-          description: 'The number of failed backup jobs in the vault over the ''{$AWS.BACKUP_JOB.PERIOD}'' day(s).'
+          description: 'The number of failed backup jobs in the vault over the last `{$AWS.BACKUP_JOB.PERIOD}` day(s).'
           preprocessing:
             - type: JSONPATH
               parameters:
@@ -479,7 +479,7 @@ zabbix_export:
           name: 'Jobs: Copy'
           type: DEPENDENT
           key: aws.backup_vault.job.copy.count
-          description: 'The number of copy jobs in the vault over the ''{$AWS.BACKUP_JOB.PERIOD}'' day(s).'
+          description: 'The number of copy jobs in the vault over the last `{$AWS.BACKUP_JOB.PERIOD}` day(s).'
           preprocessing:
             - type: JSONPATH
               parameters:
@@ -494,7 +494,7 @@ zabbix_export:
               value: backup_vault
           triggers:
             - uuid: 6a5ed839d0d049f58775e46ee86e83ee
-              expression: 'change(/AWS Backup vault by HTTP/aws.backup_vault.job.copy.count)>0'
+              expression: 'change(/AWS Backup Vault by HTTP/aws.backup_vault.job.copy.count)>0'
               recovery_mode: NONE
               name: 'AWS Backup vault: Copy job has appeared'
               opdata: 'Current amount: {ITEM.LASTVALUE1}'
@@ -508,7 +508,7 @@ zabbix_export:
           name: 'Jobs: Failed copy'
           type: DEPENDENT
           key: aws.backup_vault.job.copy.failed.count
-          description: 'The number of failed copy jobs in the vault over the ''{$AWS.BACKUP_JOB.PERIOD}'' day(s).'
+          description: 'The number of failed copy jobs in the vault over the last `{$AWS.BACKUP_JOB.PERIOD}` day(s).'
           preprocessing:
             - type: JSONPATH
               parameters:
@@ -810,7 +810,7 @@ zabbix_export:
             	Zabbix.log(3, '[ AWS Backup vault ] ERROR: ' + error);
             	return JSON.stringify({ 'error': error });
             }
-          description: 'Get list of jobs in the vault.'
+          description: 'Get a list of jobs in the vault.'
           timeout: '{$AWS.DATA.TIMEOUT}'
           parameters:
             - name: AccessKeyId
@@ -838,7 +838,7 @@ zabbix_export:
           name: 'Jobs: Restore'
           type: DEPENDENT
           key: aws.backup_vault.job.restore.count
-          description: 'The number of restore jobs in the vault over the ''{$AWS.BACKUP_JOB.PERIOD}'' day(s).'
+          description: 'The number of restore jobs in the vault over the last `{$AWS.BACKUP_JOB.PERIOD}` day(s).'
           preprocessing:
             - type: JSONPATH
               parameters:
@@ -853,7 +853,7 @@ zabbix_export:
               value: backup_vault
           triggers:
             - uuid: 31f7e20621f249138df7aea59df927dc
-              expression: 'change(/AWS Backup vault by HTTP/aws.backup_vault.job.restore.count)>0'
+              expression: 'change(/AWS Backup Vault by HTTP/aws.backup_vault.job.restore.count)>0'
               recovery_mode: NONE
               name: 'AWS Backup vault: Restore job has appeared'
               opdata: 'Current amount: {ITEM.LASTVALUE1}'
@@ -867,7 +867,7 @@ zabbix_export:
           name: 'Jobs: Failed restore'
           type: DEPENDENT
           key: aws.backup_vault.job.restore.failed.count
-          description: 'The number of failed restore jobs in the vault over the ''{$AWS.BACKUP_JOB.PERIOD}'' day(s).'
+          description: 'The number of failed restore jobs in the vault over the last `{$AWS.BACKUP_JOB.PERIOD}` day(s).'
           preprocessing:
             - type: JSONPATH
               parameters:
@@ -887,10 +887,7 @@ zabbix_export:
           units: B
           description: |
             The average size, in bytes, of a backup (recovery point).
-            
-            This value can render differently depending on the resource type as AWS Backup pulls
-            in data information from other AWS services. For example, the value returned may
-            show a value of 0, which may differ from the anticipated value.
+            This value can render differently depending on the resource type as AWS Backup pulls in data information from other AWS services. For example, the value returned may show a value of `0`, which may differ from the anticipated value.
           preprocessing:
             - type: JSONPATH
               parameters:
@@ -911,10 +908,7 @@ zabbix_export:
           units: B
           description: |
             The maximum size, in bytes, of a backup (recovery point).
-            
-            This value can render differently depending on the resource type as AWS Backup pulls
-            in data information from other AWS services. For example, the value returned may
-            show a value of 0, which may differ from the anticipated value.
+            This value can render differently depending on the resource type as AWS Backup pulls in data information from other AWS services. For example, the value returned may show a value of `0`, which may differ from the anticipated value.
           preprocessing:
             - type: JSONPATH
               parameters:
@@ -935,10 +929,7 @@ zabbix_export:
           units: B
           description: |
             The minimum size, in bytes, of a backup (recovery point).
-            
-            This value can render differently depending on the resource type as AWS Backup pulls
-            in data information from other AWS services. For example, the value returned may
-            show a value of 0, which may differ from the anticipated value.
+            This value can render differently depending on the resource type as AWS Backup pulls in data information from other AWS services. For example, the value returned may show a value of `0`, which may differ from the anticipated value.
           preprocessing:
             - type: JSONPATH
               parameters:
@@ -956,7 +947,7 @@ zabbix_export:
           name: 'Jobs: Total'
           type: DEPENDENT
           key: aws.backup_vault.job.total.count
-          description: 'The total number of jobs in the vault over the ''{$AWS.BACKUP_JOB.PERIOD}'' day(s).'
+          description: 'The total number of jobs in the vault over the last `{$AWS.BACKUP_JOB.PERIOD}` day(s).'
           preprocessing:
             - type: JSONPATH
               parameters:
@@ -974,7 +965,7 @@ zabbix_export:
           type: DEPENDENT
           key: aws.backup_vault.lock.date
           units: unixtime
-          description: 'The date and time when AWS Backup vault lock configuration becomes immutable, meaning it cannot be changed or deleted.'
+          description: 'The date and time when AWS Backup Vault Lock configuration becomes immutable, meaning it cannot be changed or deleted.'
           preprocessing:
             - type: JSONPATH
               parameters:
@@ -993,7 +984,7 @@ zabbix_export:
           name: 'Lock status'
           type: DEPENDENT
           key: aws.backup_vault.lock.status
-          description: 'Indicates whether AWS Backup vault lock applies to the selected backup vault. If locked, vault lock prevents delete and update operations on the recovery points in the selected vault.'
+          description: 'Indicates whether AWS Backup Vault Lock is applied to the selected backup vault. When the vault is locked, delete and update operations on recovery points in that vault are prevented.'
           valuemap:
             name: 'AWS Backup vault lock status'
           preprocessing:
@@ -1018,7 +1009,7 @@ zabbix_export:
           type: DEPENDENT
           key: aws.backup_vault.lock.time_left
           units: uptime
-          description: 'The remaining time before AWS Backup vault lock configuration becomes immutable, meaning it cannot be changed or deleted.'
+          description: 'The remaining time before AWS Backup Vault Lock configuration becomes immutable, meaning it cannot be changed or deleted.'
           preprocessing:
             - type: JSONPATH
               parameters:
@@ -1105,7 +1096,7 @@ zabbix_export:
           type: DEPENDENT
           key: aws.backup_vault.state
           description: |
-            The current state of the vault.
+            The current state of the backup vault.
             Possible values are:
             - Unknown
             - Creating
@@ -1134,7 +1125,7 @@ zabbix_export:
               value: backup_vault
       discovery_rules:
         - uuid: 1e96003b5bd949f08684cee42c1aa4d7
-          name: 'AWS Backup jobs discovery'
+          name: 'AWS Backup job discovery'
           type: DEPENDENT
           key: aws.backup_vault.job.discovery
           filter:
@@ -1156,7 +1147,7 @@ zabbix_export:
                 value: '{$AWS.BACKUP_JOB.STATE.NOT_MATCHES}'
                 operator: NOT_MATCHES_REGEX
           lifetime: '0'
-          description: 'AWS Backup jobs discovery.'
+          description: 'AWS Backup job discovery.'
           item_prototypes:
             - uuid: cc978e4977c94e0ca743757d9d254f14
               name: 'Job state [{#AWS.BACKUP_JOB.RESOURCE_NAME}][{#AWS.BACKUP_JOB.ID}]'
@@ -1213,19 +1204,8 @@ zabbix_export:
                 - tag: resource_type
                   value: '{#AWS.BACKUP_JOB.RESOURCE_TYPE}'
               trigger_prototypes:
-                - uuid: e1fb82528ca34849b75200b417036037
-                  expression: 'last(/AWS Backup vault by HTTP/aws.backup_vault.job.state["{#AWS.BACKUP_JOB.ID}"])=8'
-                  name: 'AWS Backup vault: Job expired [{#AWS.BACKUP_JOB.ID}]'
-                  event_name: 'AWS Backup vault: Job type [{#AWS.BACKUP_JOB.TYPE}] for [{#AWS.BACKUP_JOB.RESOURCE_NAME}] with ID [{#AWS.BACKUP_JOB.ID}] has expired.'
-                  opdata: 'Current status: {ITEM.LASTVALUE1}'
-                  priority: WARNING
-                  description: 'Job expired.'
-                  manual_close: 'YES'
-                  tags:
-                    - tag: scope
-                      value: notice
                 - uuid: d32bba2d26514a2381a18415f26c7591
-                  expression: 'last(/AWS Backup vault by HTTP/aws.backup_vault.job.state["{#AWS.BACKUP_JOB.ID}"])=7'
+                  expression: 'last(/AWS Backup Vault by HTTP/aws.backup_vault.job.state["{#AWS.BACKUP_JOB.ID}"])=7'
                   name: 'AWS Backup vault: Job failed [{#AWS.BACKUP_JOB.ID}]'
                   event_name: 'AWS Backup vault: Job type [{#AWS.BACKUP_JOB.TYPE}] for [{#AWS.BACKUP_JOB.RESOURCE_NAME}] with ID [{#AWS.BACKUP_JOB.ID}] has failed.'
                   opdata: 'Current status: {ITEM.LASTVALUE1}'
@@ -1236,7 +1216,7 @@ zabbix_export:
                     - tag: scope
                       value: notice
                 - uuid: 06182df42e5d4777b8506726c2793dee
-                  expression: 'last(/AWS Backup vault by HTTP/aws.backup_vault.job.state["{#AWS.BACKUP_JOB.ID}"])=5'
+                  expression: 'last(/AWS Backup Vault by HTTP/aws.backup_vault.job.state["{#AWS.BACKUP_JOB.ID}"])=5'
                   name: 'AWS Backup vault: Job has been aborted [{#AWS.BACKUP_JOB.ID}]'
                   event_name: 'AWS Backup vault: Job type [{#AWS.BACKUP_JOB.TYPE}] for [{#AWS.BACKUP_JOB.RESOURCE_NAME}] with ID [{#AWS.BACKUP_JOB.ID}] has been aborted.'
                   opdata: 'Current status: {ITEM.LASTVALUE1}'
@@ -1246,10 +1226,21 @@ zabbix_export:
                   tags:
                     - tag: scope
                       value: notice
+                - uuid: e1fb82528ca34849b75200b417036037
+                  expression: 'last(/AWS Backup Vault by HTTP/aws.backup_vault.job.state["{#AWS.BACKUP_JOB.ID}"])=8'
+                  name: 'AWS Backup vault: Job has expired [{#AWS.BACKUP_JOB.ID}]'
+                  event_name: 'AWS Backup vault: Job type [{#AWS.BACKUP_JOB.TYPE}] for [{#AWS.BACKUP_JOB.RESOURCE_NAME}] with ID [{#AWS.BACKUP_JOB.ID}] has expired.'
+                  opdata: 'Current status: {ITEM.LASTVALUE1}'
+                  priority: WARNING
+                  description: 'Job expired.'
+                  manual_close: 'YES'
+                  tags:
+                    - tag: scope
+                      value: notice
                 - uuid: e449b1999f09469bbf71e531afebc26b
-                  expression: 'last(/AWS Backup vault by HTTP/aws.backup_vault.job.state["{#AWS.BACKUP_JOB.ID}"])=0'
-                  name: 'AWS Backup vault: Job is in unknown state [{#AWS.BACKUP_JOB.ID}]'
-                  event_name: 'AWS Backup vault: Job type [{#AWS.BACKUP_JOB.TYPE}] for [{#AWS.BACKUP_JOB.RESOURCE_NAME}] with ID [{#AWS.BACKUP_JOB.ID}] is in unknown state.'
+                  expression: 'last(/AWS Backup Vault by HTTP/aws.backup_vault.job.state["{#AWS.BACKUP_JOB.ID}"])=0'
+                  name: 'AWS Backup vault: Job is in an unknown state [{#AWS.BACKUP_JOB.ID}]'
+                  event_name: 'AWS Backup vault: Job type [{#AWS.BACKUP_JOB.TYPE}] for [{#AWS.BACKUP_JOB.RESOURCE_NAME}] with ID [{#AWS.BACKUP_JOB.ID}] is in an unknown state.'
                   opdata: 'Current status: {ITEM.LASTVALUE1}'
                   priority: WARNING
                   description: 'Job is in unknown state.'
@@ -1469,7 +1460,7 @@ zabbix_export:
                     - type: ITEM
                       name: itemid.0
                       value:
-                        host: 'AWS Backup vault by HTTP'
+                        host: 'AWS Backup Vault by HTTP'
                         key: aws.backup_vault.age
                     - type: INTEGER
                       name: show.0
@@ -1488,7 +1479,7 @@ zabbix_export:
                     - type: ITEM
                       name: itemid.0
                       value:
-                        host: 'AWS Backup vault by HTTP'
+                        host: 'AWS Backup Vault by HTTP'
                         key: aws.backup_vault.job.backup.count
                     - type: INTEGER
                       name: show.0
@@ -1572,7 +1563,7 @@ zabbix_export:
                     - type: ITEM
                       name: itemid.0
                       value:
-                        host: 'AWS Backup vault by HTTP'
+                        host: 'AWS Backup Vault by HTTP'
                         key: aws.backup_vault.job.restore.count
                     - type: INTEGER
                       name: show.0
@@ -1594,7 +1585,7 @@ zabbix_export:
                     - type: ITEM
                       name: itemid.0
                       value:
-                        host: 'AWS Backup vault by HTTP'
+                        host: 'AWS Backup Vault by HTTP'
                         key: aws.backup_vault.recovery_points
                     - type: INTEGER
                       name: show.0
@@ -1617,7 +1608,7 @@ zabbix_export:
                     - type: ITEM
                       name: itemid.0
                       value:
-                        host: 'AWS Backup vault by HTTP'
+                        host: 'AWS Backup Vault by HTTP'
                         key: aws.backup_vault.job.copy.count
                     - type: INTEGER
                       name: show.0
@@ -1747,7 +1738,7 @@ zabbix_export:
                     - type: ITEM
                       name: itemid.0
                       value:
-                        host: 'AWS Backup vault by HTTP'
+                        host: 'AWS Backup Vault by HTTP'
                         key: aws.backup_vault.job.size.avg
                     - type: INTEGER
                       name: show.0
@@ -1770,7 +1761,7 @@ zabbix_export:
                     - type: ITEM
                       name: itemid.0
                       value:
-                        host: 'AWS Backup vault by HTTP'
+                        host: 'AWS Backup Vault by HTTP'
                         key: aws.backup_vault.job.total.count
                     - type: INTEGER
                       name: show.0
@@ -1792,7 +1783,7 @@ zabbix_export:
                     - type: ITEM
                       name: itemid.0
                       value:
-                        host: 'AWS Backup vault by HTTP'
+                        host: 'AWS Backup Vault by HTTP'
                         key: aws.backup_vault.lock.status
                     - type: INTEGER
                       name: show.0
@@ -1815,7 +1806,7 @@ zabbix_export:
                     - type: ITEM
                       name: itemid.0
                       value:
-                        host: 'AWS Backup vault by HTTP'
+                        host: 'AWS Backup Vault by HTTP'
                         key: aws.backup_vault.state
                     - type: INTEGER
                       name: show.0
@@ -2378,7 +2369,7 @@ zabbix_export:
                 - group:
                     name: Applications
               templates:
-                - name: 'AWS Backup vault by HTTP'
+                - name: 'AWS Backup Vault by HTTP'
               macros:
                 - macro: '{$AWS.BACKUP_VAULT.NAME}'
                   value: '{#AWS.BACKUP_VAULT.NAME}'
@@ -4704,7 +4695,7 @@ zabbix_export:
           description: 'Filter of discoverable backup vaults by name.'
           config:
             type: TEXT
-            priority: '38'
+            priority: '39'
             section_name: Filters
             label: 'Backup vault filter by name'
             description: 'Filter of discoverable backup vaults by name.'
@@ -4713,7 +4704,7 @@ zabbix_export:
           description: 'Filter to exclude discovered backup vaults by name.'
           config:
             type: TEXT
-            priority: '39'
+            priority: '40'
             section_name: Filters
             label: 'Backup vault filter by name (exclude)'
             description: 'Filter to exclude discovered backup vaults by name.'
@@ -4722,7 +4713,7 @@ zabbix_export:
           description: 'Filter of discoverable backup vaults by region.'
           config:
             type: TEXT
-            priority: '40'
+            priority: '41'
             section_name: Filters
             label: 'Backup vault filter by region'
             description: 'Filter of discoverable backup vaults by region.'
@@ -4731,7 +4722,7 @@ zabbix_export:
           description: 'Filter to exclude discovered backup vaults by region.'
           config:
             type: TEXT
-            priority: '41'
+            priority: '42'
             section_name: Filters
             label: 'Backup vault filter by region (exclude)'
             description: 'Filter to exclude discovered backup vaults by region.'
