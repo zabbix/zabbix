@@ -10,6 +10,7 @@ New features:
 .......PS. [ZBXNEXT-9931] added top items sorted by received values number and size to diaginfo preprocessing section (asestakovs)
 
 Bug fixes:
+A......... [ZBX-26651] fixed LLD rules getting recreated during import (jfreibergs)
 ........S. [ZBX-26661] fixed deadlock on autoreg_host table (vso)
 ..F....... [ZBX-26675] fixed validation for proxy field on discovered host (vmurzins)
 ..F....... [ZBX-26247] added rounding for Y axis min/max value (msnihach)
