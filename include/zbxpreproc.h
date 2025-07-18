@@ -115,7 +115,8 @@ zbx_uint64_t	zbx_preprocessor_get_queue_size(void);
 void	zbx_preprocessor_get_size(struct zbx_json *json);
 void	zbx_preprocessor_get_worker_info(zbx_process_info_t *info);
 void	zbx_preprocess_item_value(zbx_uint64_t itemid, zbx_uint64_t hostid, unsigned char item_value_type,
-		unsigned char item_flags, AGENT_RESULT *result, zbx_timespec_t *ts, unsigned char state, char *error);
+		unsigned char item_flags, unsigned char preprocessing, AGENT_RESULT *result,
+		zbx_timespec_t *ts, unsigned char state, char *error);
 void	zbx_preprocessor_flush(void);
 int	zbx_preprocessor_get_diag_stats(zbx_uint64_t *preproc_num, zbx_uint64_t *pending_num,
 		zbx_uint64_t *finished_num, zbx_uint64_t *sequences_num, zbx_uint64_t *queued_num,

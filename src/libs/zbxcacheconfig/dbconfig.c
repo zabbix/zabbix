@@ -9648,6 +9648,7 @@ static void	DCget_item(zbx_dc_item_t *dst_item, const ZBX_DC_ITEM *src_item)
 	const ZBX_DC_INTERFACE		*dc_interface;
 	int				i;
 
+	dst_item->preprocessing = zbx_dc_item_requires_preprocessing(src_item);
 	dst_item->type = src_item->type;
 	dst_item->value_type = src_item->value_type;
 
@@ -10314,6 +10315,14 @@ static int	dc_preproc_item_changed(ZBX_DC_ITEM *dc_item, zbx_pp_item_t *pp_item)
 	return FAIL;
 }
 
+unsigned char	zbx_dc_item_requires_preprocessing(const ZBX_DC_ITEM *dc_item)
+{
+	if (NULL == dc_item->preproc_item && NULL == dc_item->master_item && ZBX_FLAG_DISCOVERY_RULE != dc_item->flags)
+		return ZBX_ITEM_REQUIRES_PREPROCESSING_NO;
+
+	return ZBX_ITEM_REQUIRES_PREPROCESSING_YES;
+}
+
 /******************************************************************************
  *                                                                            *
  * Purpose: get preprocessable items:                                         *
@@ -10359,12 +10368,8 @@ void	zbx_dc_config_get_preprocessable_items(zbx_hashset_t *items, zbx_dc_um_shar
 			if (ITEM_STATUS_ACTIVE != dc_item->status || ITEM_TYPE_DEPENDENT == dc_item->type)
 				continue;
 
-			if (NULL == dc_item->preproc_item && NULL == dc_item->master_item &&
-					ITEM_TYPE_INTERNAL != dc_item->type &&
-					ZBX_FLAG_DISCOVERY_RULE != dc_item->flags)
-			{
+			if (ZBX_ITEM_REQUIRES_PREPROCESSING_NO == zbx_dc_item_requires_preprocessing(dc_item))
 				continue;
-			}
 
 			if (HOST_MONITORED_BY_SERVER == dc_host->monitored_by ||
 					SUCCEED == zbx_is_item_processed_by_server(dc_item->type, dc_item->key) ||
