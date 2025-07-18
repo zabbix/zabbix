@@ -245,25 +245,17 @@ class CApiTagHelper {
 				]);
 			}
 
-			$hostids_by_templates = DB::select('hosts_templates', [
-				'output' => ['hostid'],
-				'filter' => ['templateid' => array_keys($templateids_in)]
-			]);
-
-			$hostids_in = [];
-			foreach ($hostids_by_templates as $hst) {
-				$hostids_in[$hst['hostid']] = true;
-			}
-
 			$negated_where_conditions[] = '(NOT EXISTS ('.
 				'SELECT NULL'.
-				' FROM host_tag'.
+				' FROM host_tag, hosts_templates'.
 				' WHERE (h.hostid=host_tag.hostid'.
 					' AND host_tag.tag='.zbx_dbstr($tag).
 						($tag_where['values'] ? ' AND ('.implode(' OR ', $tag_where['values']).')' : '').
 					')'.
 					($templateids_in
-						? ' OR '.dbConditionInt('h.hostid', array_keys($hostids_in))
+						? ' OR (h.hostid=hosts_templates.hostid'.
+								' AND '.dbConditionInt('hosts_templates.templateid', array_keys($templateids_in)).
+							')'
 						: ''
 					).
 				')'.
@@ -318,16 +310,6 @@ class CApiTagHelper {
 				]);
 			}
 
-			$hostids_by_templates = DB::select('hosts_templates', [
-				'output' => ['hostid'],
-				'filter' => ['templateid' => array_keys($templateids_in)]
-			]);
-
-			$hostids_in = [];
-			foreach ($hostids_by_templates as $hst) {
-				$hostids_in[$hst['hostid']] = true;
-			}
-
 			$where_conditions[] = '(EXISTS ('.
 				'SELECT NULL'.
 				' FROM host_tag'.
@@ -336,7 +318,7 @@ class CApiTagHelper {
 					($values ? ' AND ('.implode(' OR ', $values).')' : '').
 				')'.
 				($templateids_in
-					? ' OR '.dbConditionInt('h.hostid', array_keys($hostids_in))
+					? ' OR '.dbConditionInt('ht2.templateid', array_keys($templateids_in))
 					: ''
 				).
 			')';
