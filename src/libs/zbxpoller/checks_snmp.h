@@ -27,7 +27,7 @@
 #define ZBX_SNMP_STR_ASCII	5
 #define ZBX_SNMP_STR_UNDEFINED	255
 
-#define ZBX_SNMP_DEFAULT_NUMBER_OF_RETRIES 1
+#define ZBX_SNMP_DEFAULT_NUMBER_OF_RETRIES 5
 
 typedef struct zbx_snmp_context	zbx_snmp_context_t;
 
@@ -47,7 +47,7 @@ void	zbx_async_check_snmp_clean(zbx_snmp_context_t *snmp_context);
 void	zbx_set_snmp_bulkwalk_options(const char *progname);
 void	zbx_unset_snmp_bulkwalk_options(void);
 void	zbx_init_snmp_engineid_cache(void);
-void	zbx_clear_snmp_engineid_cache(void);
+int	zbx_clear_snmp_engineid_cache(void);
 void	zbx_destroy_snmp_engineid_cache(void);
 void	zbx_housekeep_snmp_engineid_cache(void);
 

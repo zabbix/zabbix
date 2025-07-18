@@ -247,6 +247,14 @@ function itemCompleteTest(overlay) {
 		interface = (typeof form_data['interface'] !== 'undefined') ? form_data['interface'] : null,
 		url = new Curl('zabbix.php');
 
+	const macros = {};
+
+	if (form_data.macro_names !== undefined) {
+		for (const [macro_index, macro_name] of Object.entries(form_data.macro_names)) {
+			macros[macro_name] = form_data.macro_values[macro_index];
+		}
+	}
+
 	url.setArgument('action', 'popup.itemtest.send');
 	url.setArgument(CSRF_TOKEN_NAME, <?= json_encode(CCsrfTokenHelper::get('itemtest')) ?>);
 
@@ -260,7 +268,7 @@ function itemCompleteTest(overlay) {
 			useip: interface ? interface['useip'] : null,
 			details: interface ? interface['details'] : null
 		},
-		macros: form_data['macros'],
+		macros: JSON.stringify(macros),
 		test_with: form_data['test_with'],
 		proxyid: form_data['proxyid'],
 		show_final_result: <?= $data['show_final_result'] ? 1 : 0 ?>,
@@ -466,11 +474,13 @@ function saveItemTestInputs() {
 		});
 	<?php endif ?>
 
-	jQuery('[name^=macros]').each(function(i, macro) {
-		var name = macro.name.toString();
-		macros[name.substr(7, name.length - 8)] = macro.value;
-	});
-	input_values.macros = macros;
+	if (form_data.macro_names !== undefined) {
+		for (const [macro_index, macro_name] of Object.entries(form_data.macro_names)) {
+			macros[macro_name] = form_data.macro_values[macro_index];
+		}
+	}
+
+	input_values.macros = JSON.stringify(macros);
 
 	<?php if ($data['step_obj'] == -2): ?>
 		$test_obj = jQuery('.overlay-dialogue-footer');
