@@ -317,10 +317,7 @@ class CApiTagHelper {
 					' AND host_tag.tag='.zbx_dbstr($tag_name).
 					($values ? ' AND ('.implode(' OR ', $values).')' : '').
 				')'.
-				($templateids_in
-					? ' OR '.dbConditionInt('ht2.templateid', array_keys($templateids_in))
-					: ''
-				).
+				($templateids_in ? ' OR '.dbConditionInt('ht2.templateid', array_keys($templateids_in)) : '').
 			')';
 		}
 
