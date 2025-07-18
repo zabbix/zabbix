@@ -166,6 +166,7 @@ require_once __DIR__.'/lld/testFormTestLowLevelDiscovery.php';
 require_once __DIR__.'/lld/testInheritanceDiscoveryRule.php';
 require_once __DIR__.'/lld/testLowLevelDiscoveryDisabledObjects.php';
 require_once __DIR__.'/lld/testPageLowLevelDiscovery.php';
+require_once __DIR__.'/lld/testPageLowLevelDiscoveryPrototypes.php';
 
 // Macros.
 require_once __DIR__.'/macros/testFormMacrosAdministrationGeneral.php';
@@ -511,6 +512,7 @@ class SeleniumTests {
 		$suite->addTestSuite('testInheritanceDiscoveryRule');
 		$suite->addTestSuite('testLowLevelDiscoveryDisabledObjects');
 		$suite->addTestSuite('testPageLowLevelDiscovery');
+		$suite->addTestSuite('testPageLowLevelDiscoveryPrototypes');
 
 		// Macros.
 		$suite->addTestSuite('testFormMacrosAdministrationGeneral');
