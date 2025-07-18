@@ -848,8 +848,8 @@ static void	preproc_item_value_extract_data(zbx_preproc_item_value_t *value, zbx
 	}
 	else if (ZBX_ISSET_JSON(value->result))
 	{
-		THIS_SHOULD_NEVER_HAPPEN;
-		exit(EXIT_FAILURE);
+		zbx_variant_set_str(var, value->result->tjson);
+		value->result->tjson = NULL;
 	}
 	else
 		zbx_variant_set_none(var);
@@ -895,7 +895,6 @@ static zbx_uint64_t	preprocessor_add_request(zbx_pp_manager_t *manager, zbx_ipc_
 		zbx_timespec_t		ts;
 		zbx_pp_task_t		*task;
 		zbx_pp_item_t		*item;
-
 		offset += zbx_preprocessor_unpack_value(&value, message->data + offset);
 		sz = offset - offset_prev;
 		preproc_item_value_extract_data(&value, &var, &ts, &var_opt);

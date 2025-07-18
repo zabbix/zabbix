@@ -2638,7 +2638,7 @@ void	zbx_dc_add_history_variant(zbx_uint64_t itemid, unsigned char value_type, u
 					return;
 				}
 
-				if (FAIL == zbx_json_open(value->data.str, &jp))
+				if (FAIL == zbx_json_open(value->data.json, &jp))
 				{
 
 					dc_local_add_history_notsupported(itemid, &ts,

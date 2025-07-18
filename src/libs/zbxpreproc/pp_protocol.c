@@ -136,7 +136,7 @@ static zbx_uint32_t	message_pack_data(zbx_ipc_message_t *message, zbx_packed_fie
  ******************************************************************************/
 static zbx_uint32_t	preprocessor_pack_value(zbx_ipc_message_t *message, zbx_preproc_item_value_t *value)
 {
-	zbx_packed_field_t	fields[24], *offset = fields;	/* 24 - max field count */
+	zbx_packed_field_t	fields[25], *offset = fields;	/* 24 - max field count */
 	unsigned char		ts_marker, result_marker, log_marker;
 
 	ts_marker = (NULL != value->ts);
@@ -169,7 +169,7 @@ static zbx_uint32_t	preprocessor_pack_value(zbx_ipc_message_t *message, zbx_prep
 		*offset++ = PACKED_FIELD(value->result->msg, 0);
 		*offset++ = PACKED_FIELD(&value->result->type, sizeof(int));
 		*offset++ = PACKED_FIELD(&value->result->mtime, sizeof(int));
-
+		*offset++ = PACKED_FIELD(value->result->tjson, 0);
 		log_marker = (NULL != value->result->log);
 		*offset++ = PACKED_FIELD(&log_marker, sizeof(unsigned char));
 		if (NULL != value->result->log)
@@ -180,6 +180,7 @@ static zbx_uint32_t	preprocessor_pack_value(zbx_ipc_message_t *message, zbx_prep
 			*offset++ = PACKED_FIELD(&value->result->log->severity, sizeof(int));
 			*offset++ = PACKED_FIELD(&value->result->log->logeventid, sizeof(int));
 		}
+
 	}
 
 	return message_pack_data(message, fields, (int)(offset - fields));
@@ -225,6 +226,9 @@ static int	preprocessor_pack_variant(zbx_packed_field_t *fields, const zbx_varia
 			fields[offset++] = PACKED_FIELD(value->data.bin, sizeof(zbx_uint32_t) +
 					zbx_variant_data_bin_get(value->data.bin, NULL));
 			break;
+		default:
+			THIS_SHOULD_NEVER_HAPPEN;
+			exit(EXIT_FAILURE);
 	}
 
 	return offset;
@@ -322,7 +326,9 @@ static int	preprocessor_unpack_variant(const unsigned char *data, zbx_variant_t 
 			offset += zbx_deserialize_bin(offset, &value->data.bin, value_len);
 			break;
 		case ZBX_VARIANT_JSON:
-			offset += zbx_deserialize_json(offset, &value->data.bin, value_len);
+			offset += zbx_deserialize_str(offset, &value->data.json, value_len);
+			THIS_SHOULD_NEVER_HAPPEN;
+			exit(EXIT_FAILURE);
 			break;
 		case ZBX_VARIANT_NONE:
 		case ZBX_VARIANT_VECTOR:
@@ -667,6 +673,8 @@ zbx_uint32_t	zbx_preprocessor_unpack_value(zbx_preproc_item_value_t *value, unsi
 	zbx_log_t	*log = NULL;
 	unsigned char	*offset = data, ts_marker, result_marker, log_marker;
 
+
+
 	offset += zbx_deserialize_uint64(offset, &value->itemid);
 	offset += zbx_deserialize_uint64(offset, &value->hostid);
 	offset += zbx_deserialize_char(offset, &value->item_value_type);
@@ -699,6 +707,8 @@ zbx_uint32_t	zbx_preprocessor_unpack_value(zbx_preproc_item_value_t *value, unsi
 		offset += zbx_deserialize_int(offset, &agent_result->type);
 		offset += zbx_deserialize_int(offset, &agent_result->mtime);
 
+		offset += zbx_deserialize_str(offset, &agent_result->tjson, value_len);
+
 		offset += zbx_deserialize_char(offset, &log_marker);
 		if (0 != log_marker)
 		{
@@ -712,6 +722,8 @@ zbx_uint32_t	zbx_preprocessor_unpack_value(zbx_preproc_item_value_t *value, unsi
 		}
 
 		agent_result->log = log;
+
+
 	}
 
 	value->result = agent_result;
@@ -972,13 +984,14 @@ void	zbx_preprocess_item_value(zbx_uint64_t itemid, zbx_uint64_t hostid, unsigne
 				value_len = len;
 		}
 
-		if (0 != ZBX_ISSET_BIN(result))
+		if (0 != ZBX_ISSET_JSON(result))
 		{
-			THIS_SHOULD_NEVER_HAPPEN;
-			exit(EXIT_FAILURE);
+			if (value_len < (len = strlen(result->tjson)))
+				value_len = len;
+			zabbix_log(LOG_LEVEL_INFORMATION, "HUEVOS 1: %d", value_len);
 		}
 
-		if (0 != ZBX_ISSET_JSON(result))
+		if (0 != ZBX_ISSET_BIN(result))
 		{
 			THIS_SHOULD_NEVER_HAPPEN;
 			exit(EXIT_FAILURE);
