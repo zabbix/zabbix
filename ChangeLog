@@ -1,6 +1,8 @@
 Changes for 8.0.0alpha1
 
 New features:
+.......PS. [ZBXNEXT-10119] improved preprocessing diagnostics by highlighting top item IDs with the longest processing times (vso)
+.......PS. [ZBXNEXT-10080] updated minimal supported PostgreSQL version to 15 and TigerData (former TimescaleDB) version to 2.20 (mprihodko)
 ....I...S. [ZBXNEXT-9770] prepared for removal of TimescaleDB API calls deprecated since TimescaleDB 2.18.0 (mprihodko)
 .........T [ZBXNEXT-9959] added Cisco Secure Firewall Threat Defense by HTTP template (egordymov)
 .........T [ZBXNEXT-9926] added a new self-test item and improved self-test trigger for both SMART by Zabbix agent 2 templates (knaglis)
@@ -10,6 +12,11 @@ New features:
 .......PS. [ZBXNEXT-10079] updated minimal supported MySQL/Percona version to 8.4 (mprihodko)
 
 Bug fixes:
+........S. [ZBX-26661] fixed deadlock on autoreg_host table (vso)
+..F....... [ZBX-26675] fixed validation for proxy field on discovered host (vmurzins)
+..F....... [ZBX-26247] added rounding for Y axis min/max value (msnihach)
+.......PS. [ZBX-26524] fixed threads to terminate gracefully when child process exits unexpectedly to avoid deadlocks (vso)
+A......... [ZBX-26439] prevented data integrity loss caused by simultaneous API change request execution (vmaksimovs)
 ...G...PS. [ZBX-26082] fixed agent2 and proxy redirection bug related to incorrect IPv6 string format (vsmelovs)
 ........S. [ZBX-26486] fixed errors in Zabbix server log on second and subsequent server starts with TimescaleDB (mprihodko)
 ..F....... [ZBX-25958] fixed incorrect dependency hosts format in trigger form (esekace)
@@ -67,6 +74,7 @@ A......... [ZBX-26191] fixed inconsistent API and frontend validation for mainte
 Changes for 7.4.1rc1
 
 New features:
+.......PS. [ZBXNEXT-10119] improved preprocessing diagnostics by highlighting top item IDs with the longest processing times (vso)
 ....I...S. [ZBXNEXT-9770] prepared for removal of TimescaleDB API calls deprecated since TimescaleDB 2.18.0 (mprihodko)
 .........T [ZBXNEXT-9959] added Cisco Secure Firewall Threat Defense by HTTP template (egordymov)
 .........T [ZBXNEXT-9926] added a new self-test item and improved self-test trigger for both SMART by Zabbix agent 2 templates (knaglis)
@@ -75,6 +83,11 @@ New features:
 .......PS. [ZBXNEXT-9931] added top items sorted by received values number and size to diaginfo preprocessing section (asestakovs)
 
 Bug fixes:
+........S. [ZBX-26661] fixed deadlock on autoreg_host table (vso)
+..F....... [ZBX-26675] fixed validation for proxy field on discovered host (vmurzins)
+..F....... [ZBX-26247] added rounding for Y axis min/max value (msnihach)
+.......PS. [ZBX-26524] fixed threads to terminate gracefully when child process exits unexpectedly to avoid deadlocks (vso)
+A......... [ZBX-26439] prevented data integrity loss caused by simultaneous API change request execution (vmaksimovs)
 ...G...PS. [ZBX-26082] fixed agent2 and proxy redirection bug related to incorrect IPv6 string format (vsmelovs)
 ........S. [ZBX-26486] fixed errors in Zabbix server log on second and subsequent server starts with TimescaleDB (mprihodko)
 ..F....... [ZBX-25958] fixed incorrect dependency hosts format in trigger form (esekace)
@@ -903,8 +916,11 @@ A.F....... [ZBX-23227] fixed issue where using an empty array or string value fo
 Changes for 7.0.17rc2
 
 New features:
+.......PS. [ZBXNEXT-10119] improved preprocessing diagnostics by highlighting top item IDs with the longest processing times (vso)
 
 Bug fixes:
+.......PS. [ZBX-26693] fixed high memory usage by excluding values without preprocessing from being sent to the preprocessing manager (vso)
+........S. [ZBX-26661] fixed deadlock on autoreg_host table (vso)
 
 --------------------------------------------------------------------------------
 Changes for 7.0.17rc1
