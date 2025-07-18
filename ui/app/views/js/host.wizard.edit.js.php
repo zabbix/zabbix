@@ -1255,8 +1255,8 @@ window.host_wizard_edit = new class {
 					}
 				})();
 
-				let hostname = '';
 				let server_host = '';
+				let hostname = this.#data.host_new !== null ? this.#data.host_new.id : this.#data.host.name;
 				let psk_identity = '';
 				let psk = '';
 
@@ -1265,7 +1265,7 @@ window.host_wizard_edit = new class {
 						? `--server-host '${this.#data.agent_script_server_host}'`
 						: `--server-host-stdin`;
 
-					hostname = `--hostname '${this.#data.host_new.id}'`;
+					hostname = `--hostname '${hostname}'`;
 
 					psk_identity = this.#data.tls_psk_identity !== ''
 						? `--psk-identity '${this.#data.tls_psk_identity.replace(/'/g, `\\'`)}'`
@@ -1281,7 +1281,7 @@ window.host_wizard_edit = new class {
 						? `-serverHost '${this.#data.agent_script_server_host}'`
 						: `-serverHostSTDIN`;
 
-					hostname = `-hostName '${this.#data.host_new.id}'`;
+					hostname = `-hostName '${hostname}'`;
 
 					psk_identity = this.#data.tls_psk_identity !== ''
 						? `-pskIdentity '${this.#data.tls_psk_identity.replace(/'/g, `\\'`)}'`
