@@ -1747,17 +1747,13 @@ window.host_wizard_edit = new class {
 			const tag_value = [tag, value].filter(val => val !== '').join(': ');
 
 			return this.#view_templates.tag.evaluateToElement({tag_value, hint_tag_value: escapeHtml(tag_value)});
-		};
+		}
 
 		if (template.tags.length) {
+			const tags_max_height = 44;
 			const temp_tag_list = document.createElement('div');
 
-			//temp_tag_list.style.visibility = 'hidden';
-			temp_tag_list.style.position = 'absolute';
-			temp_tag_list.style.width = '195px';
-			temp_tag_list.style.maxHeight = '40px';
-			temp_tag_list.style.pointerEvents = 'none';
-			temp_tag_list.style.zIndex = '99999';
+			temp_tag_list.classList.add('temp-tags-list');
 
 			document.body.appendChild(temp_tag_list);
 
@@ -1767,8 +1763,8 @@ window.host_wizard_edit = new class {
 				const tag_element = tag(template.tags[i]);
 
 				temp_tag_list.appendChild(tag_element);
-				console.log('add tag', {scrollHeight: temp_tag_list.scrollHeight, clientHeight: temp_tag_list.clientHeight, rect: temp_tag_list.getBoundingClientRect()})
-				if (temp_tag_list.scrollHeight > temp_tag_list.clientHeight + 1) {
+
+				if (temp_tag_list.scrollHeight > tags_max_height) {
 					temp_tag_list.removeChild(tag_element);
 					all_fits = false;
 					break;
@@ -1779,8 +1775,8 @@ window.host_wizard_edit = new class {
 				temp_tag_list.appendChild(this.#view_templates.tags_more.evaluateToElement({
 					tag_values: template.tags.map(tag_value => tag(tag_value).outerHTML).join('')
 				}));
-				console.log('add show more', {scrollHeight: temp_tag_list.scrollHeight, clientHeight: temp_tag_list.clientHeight, rect: temp_tag_list.getBoundingClientRect()})
-				if (temp_tag_list.scrollHeight > temp_tag_list.clientHeight + 1) {
+
+				if (temp_tag_list.scrollHeight > tags_max_height) {
 					const tags = temp_tag_list.querySelectorAll(`.${ZBX_STYLE_TAG}`);
 
 					if (tags.length) {
