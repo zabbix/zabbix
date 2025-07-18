@@ -529,6 +529,8 @@ static void	ipc_client_free(zbx_ipc_client_t *client)
 {
 	zbx_ipc_message_t	*message;
 
+	zabbix_log(LOG_LEVEL_TRACE, "In %s() clientid:" ZBX_FS_UI64, __func__, client->id);
+
 	ipc_client_free_events(client);
 	zbx_ipc_socket_close(&client->csocket);
 
@@ -547,6 +549,8 @@ static void	ipc_client_free(zbx_ipc_client_t *client)
 	ipc_client_free_events(client);
 
 	zbx_free(client);
+
+	zabbix_log(LOG_LEVEL_TRACE, "End of %s()", __func__);
 }
 
 /******************************************************************************
@@ -1546,6 +1550,8 @@ out:
  ******************************************************************************/
 void	zbx_ipc_service_close(zbx_ipc_service_t *service)
 {
+	zbx_ipc_client_t	*client = NULL;
+
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() path:%s", __func__, service->path);
 
 	if (0 != close(service->fd))
@@ -1553,6 +1559,13 @@ void	zbx_ipc_service_close(zbx_ipc_service_t *service)
 
 	if (-1 == unlink(service->path))
 		zabbix_log(LOG_LEVEL_WARNING, "cannot remove socket at %s: %s.", service->path, zbx_strerror(errno));
+
+	/* remove received clients which are not registered */
+	while (NULL != (client = (zbx_ipc_client_t *)zbx_queue_ptr_pop(&service->clients_recv)))
+	{
+		if (FAIL == zbx_vector_ipc_client_ptr_search(&service->clients, client, ZBX_DEFAULT_PTR_COMPARE_FUNC))
+			ipc_client_free(client);
+	}
 
 	for (int i = 0; i < service->clients.values_num; i++)
 		ipc_client_free(service->clients.values[i]);
@@ -1719,16 +1732,12 @@ out:
  ******************************************************************************/
 void	zbx_ipc_client_close(zbx_ipc_client_t *client)
 {
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
-
 	ipc_client_free_events(client);
 	zbx_ipc_socket_close(&client->csocket);
 
 	ipc_service_remove_client(client->service, client);
 	zbx_queue_ptr_remove_value(&client->service->clients_recv, client);
 	zbx_ipc_client_release(client);
-
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 }
 
 int	zbx_ipc_client_get_fd(zbx_ipc_client_t *client)
@@ -1820,7 +1829,9 @@ int	zbx_ipc_async_socket_open(zbx_ipc_async_socket_t *asocket, const char *servi
 
 	ret = SUCCEED;
 out:
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __func__, zbx_result_string(ret));
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s() clientid:" ZBX_FS_UI64 " ret:%s", __func__, asocket->client->id,
+			zbx_result_string(ret));
+
 	return ret;
 }
 

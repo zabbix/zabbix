@@ -149,6 +149,10 @@ Next, add a principal to the trust relationships of the role you are using:
 ```
 Set the following macros: `{$AWS.ACCESS.KEY.ID}`, `{$AWS.SECRET.ACCESS.KEY}`, `{$AWS.STS.REGION}`, `{$AWS.ASSUME.ROLE.ARN}`.
 
+**Note**: If you set the `{$AWS.ASSUME.ROLE.AUTH.METADATA}` macro to `true` and set the macros `{$AWS.STS.REGION}` and `{$AWS.ASSUME.ROLE.ARN}`, the Zabbix server or proxy will attempt to retrieve the role credentials from the instance metadata service.
+This means that the Zabbix server or proxy must be running on an AWS EC2 instance with an IAM role assigned that has the necessary permissions.
+This approach is recommended when running Zabbix inside an AWS EC2 instance with an IAM role assigned, as it simplifies credential management.
+
 ### Role-Based Authorization
 If you are using role-based authorization, add the appropriate permissions:
 
@@ -255,6 +259,7 @@ Additional information about the metrics and used API methods:
 |{$AWS.DESCRIBE.REGION}|<p>Region used in POST request `DescribeRegions`.</p>|`us-east-1`|
 |{$AWS.STS.REGION}|<p>Region used in assume role request.</p>|`us-east-1`|
 |{$AWS.ASSUME.ROLE.ARN}|<p>ARN assume role; add when using the `assume_role` authorization method.</p>||
+|{$AWS.ASSUME.ROLE.AUTH.METADATA}|<p>Add when using the `assume_role` through instance metadata or environment authorization method. Possible values: `false`, `true`.</p>|`false`|
 |{$AWS.EC2.LLD.FILTER.NAME.MATCHES}|<p>Filter of discoverable EC2 instances by namespace.</p>|`.*`|
 |{$AWS.EC2.LLD.FILTER.NAME.NOT_MATCHES}|<p>Filter to exclude discovered EC2 instances by namespace.</p>|`CHANGE_IF_NEEDED`|
 |{$AWS.EC2.LLD.FILTER.REGION.MATCHES}|<p>Filter of discoverable EC2 instances by region.</p>|`.*`|
@@ -439,6 +444,10 @@ Next, add a principal to the trust relationships of the role you are using:
 ```
 Set the following macros: `{$AWS.ACCESS.KEY.ID}`, `{$AWS.SECRET.ACCESS.KEY}`, `{$AWS.STS.REGION}`, `{$AWS.ASSUME.ROLE.ARN}`.
 
+**Note**: If you set the `{$AWS.ASSUME.ROLE.AUTH.METADATA}` macro to `true` and set the macros `{$AWS.STS.REGION}` and `{$AWS.ASSUME.ROLE.ARN}`, the Zabbix server or proxy will attempt to retrieve the role credentials from the instance metadata service.
+This means that the Zabbix server or proxy must be running on an AWS EC2 instance with an IAM role assigned that has the necessary permissions.
+This approach is recommended when running Zabbix inside an AWS EC2 instance with an IAM role assigned, as it simplifies credential management.
+
 ### Role-Based Authorization
 If you are using role-based authorization, set the appropriate permissions:
 
@@ -511,6 +520,7 @@ Also, see the Macros section for a list of macros used for LLD filters.
 |{$AWS.AUTH_TYPE}|<p>Authorization method. Possible values: `access_key`, `assume_role`, `role_base`.</p>|`access_key`|
 |{$AWS.STS.REGION}|<p>Region used in assume role request.</p>|`us-east-1`|
 |{$AWS.ASSUME.ROLE.ARN}|<p>ARN assume role; add when using the `assume_role` authorization method.</p>||
+|{$AWS.ASSUME.ROLE.AUTH.METADATA}|<p>Add when using the `assume_role` through instance metadata or environment authorization method. Possible values: `false`, `true`.</p>|`false`|
 |{$AWS.EC2.INSTANCE.ID}|<p>EC2 instance ID.</p>||
 |{$AWS.EC2.LLD.FILTER.VOLUME_TYPE.MATCHES}|<p>Filter of discoverable volumes by type.</p>|`.*`|
 |{$AWS.EC2.LLD.FILTER.VOLUME_TYPE.NOT_MATCHES}|<p>Filter to exclude discovered volumes by type.</p>|`CHANGE_IF_NEEDED`|
@@ -742,6 +752,10 @@ Next, add a principal to the trust relationships of the role you are using:
 ```
 Set the following macros: `{$AWS.ACCESS.KEY.ID}`, `{$AWS.SECRET.ACCESS.KEY}`, `{$AWS.STS.REGION}`, `{$AWS.ASSUME.ROLE.ARN}`.
 
+**Note**: If you set the `{$AWS.ASSUME.ROLE.AUTH.METADATA}` macro to `true` and set the macros `{$AWS.STS.REGION}` and `{$AWS.ASSUME.ROLE.ARN}`, the Zabbix server or proxy will attempt to retrieve the role credentials from the instance metadata service.
+This means that the Zabbix server or proxy must be running on an AWS EC2 instance with an IAM role assigned that has the necessary permissions.
+This approach is recommended when running Zabbix inside an AWS EC2 instance with an IAM role assigned, as it simplifies credential management.
+
 ### Role-Based Authorization
 If you are using role-based authorization, set the appropriate permissions:
 
@@ -813,6 +827,7 @@ Also, see the Macros section for a list of macros used for LLD filters.
 |{$AWS.AUTH_TYPE}|<p>Authorization method. Possible values: `access_key`, `assume_role`, `role_base`.</p>|`access_key`|
 |{$AWS.STS.REGION}|<p>Region used in assume role request.</p>|`us-east-1`|
 |{$AWS.ASSUME.ROLE.ARN}|<p>ARN assume role; add when using the `assume_role` authorization method.</p>||
+|{$AWS.ASSUME.ROLE.AUTH.METADATA}|<p>Add when using the `assume_role` through instance metadata or environment authorization method. Possible values: `false`, `true`.</p>|`false`|
 |{$AWS.RDS.INSTANCE.ID}|<p>RDS DB Instance identifier.</p>||
 |{$AWS.RDS.LLD.FILTER.ALARM_SERVICE_NAMESPACE.MATCHES}|<p>Filter of discoverable alarms by namespace.</p>|`.*`|
 |{$AWS.RDS.LLD.FILTER.ALARM_SERVICE_NAMESPACE.NOT_MATCHES}|<p>Filter to exclude discovered alarms by namespace.</p>|`CHANGE_IF_NEEDED`|
@@ -1094,6 +1109,10 @@ Next, add a principal to the trust relationships of the role you are using:
 ```
 Set the following macros: `{$AWS.ACCESS.KEY.ID}`, `{$AWS.SECRET.ACCESS.KEY}`, `{$AWS.STS.REGION}`, `{$AWS.ASSUME.ROLE.ARN}`.
 
+**Note**: If you set the `{$AWS.ASSUME.ROLE.AUTH.METADATA}` macro to `true` and set the macros `{$AWS.STS.REGION}` and `{$AWS.ASSUME.ROLE.ARN}`, the Zabbix server or proxy will attempt to retrieve the role credentials from the instance metadata service.
+This means that the Zabbix server or proxy must be running on an AWS EC2 instance with an IAM role assigned that has the necessary permissions.
+This approach is recommended when running Zabbix inside an AWS EC2 instance with an IAM role assigned, as it simplifies credential management.
+
 ### Role-Based Authorization
 If you are using role-based authorization, set the appropriate permissions:
 
@@ -1167,6 +1186,7 @@ Also, see the Macros section for a list of macros used for LLD filters.
 |{$AWS.REQUEST.REGION}|<p>Region used in GET request `ListBuckets`.</p>|`us-east-1`|
 |{$AWS.STS.REGION}|<p>Region used in assume role request.</p>|`us-east-1`|
 |{$AWS.ASSUME.ROLE.ARN}|<p>ARN assume role; add when using the `assume_role` authorization method.</p>||
+|{$AWS.ASSUME.ROLE.AUTH.METADATA}|<p>Add when using the `assume_role` through instance metadata or environment authorization method. Possible values: `false`, `true`.</p>|`false`|
 |{$AWS.S3.BUCKET.NAME}|<p>S3 bucket name.</p>||
 |{$AWS.S3.LLD.FILTER.ALARM_NAME.MATCHES}|<p>Filter of discoverable alarms by name.</p>|`.*`|
 |{$AWS.S3.LLD.FILTER.ALARM_NAME.NOT_MATCHES}|<p>Filter to exclude discovered alarms by name.</p>|`CHANGE_IF_NEEDED`|
@@ -1352,6 +1372,10 @@ Next, add a principal to the trust relationships of the role you are using:
 ```
 Set the following macros: `{$AWS.ACCESS.KEY.ID}`, `{$AWS.SECRET.ACCESS.KEY}`, `{$AWS.STS.REGION}`, `{$AWS.ASSUME.ROLE.ARN}`.
 
+**Note**: If you set the `{$AWS.ASSUME.ROLE.AUTH.METADATA}` macro to `true` and set the macros `{$AWS.STS.REGION}` and `{$AWS.ASSUME.ROLE.ARN}`, the Zabbix server or proxy will attempt to retrieve the role credentials from the instance metadata service.
+This means that the Zabbix server or proxy must be running on an AWS EC2 instance with an IAM role assigned that has the necessary permissions.
+This approach is recommended when running Zabbix inside an AWS EC2 instance with an IAM role assigned, as it simplifies credential management.
+
 ### Role-Based Authorization
 If you are using role-based authorization, set the appropriate permissions:
 
@@ -1420,6 +1444,7 @@ Refer to the Macros section for a list of macros used for LLD filters.
 |{$AWS.AUTH_TYPE}|<p>Authorization method. Possible values: `access_key`, `assume_role`, `role_base`.</p>|`access_key`|
 |{$AWS.STS.REGION}|<p>Region used in assume role request.</p>|`us-east-1`|
 |{$AWS.ASSUME.ROLE.ARN}|<p>ARN assume role; add when using the `assume_role` authorization method.</p>||
+|{$AWS.ASSUME.ROLE.AUTH.METADATA}|<p>Add when using the `assume_role` through instance metadata or environment authorization method. Possible values: `false`, `true`.</p>|`false`|
 |{$AWS.ECS.CLUSTER.NAME}|<p>ECS cluster name.</p>||
 |{$AWS.ECS.LLD.FILTER.ALARM_NAME.MATCHES}|<p>Filter of discoverable alarms by name.</p>|`.*`|
 |{$AWS.ECS.LLD.FILTER.ALARM_NAME.NOT_MATCHES}|<p>Filter to exclude discovered alarms by name.</p>|`CHANGE_IF_NEEDED`|
@@ -1623,6 +1648,10 @@ Next, add a principal to the trust relationships of the role you are using:
 ```
 Set the following macros: `{$AWS.ACCESS.KEY.ID}`, `{$AWS.SECRET.ACCESS.KEY}`, `{$AWS.STS.REGION}`, `{$AWS.ASSUME.ROLE.ARN}`.
 
+**Note**: If you set the `{$AWS.ASSUME.ROLE.AUTH.METADATA}` macro to `true` and set the macros `{$AWS.STS.REGION}` and `{$AWS.ASSUME.ROLE.ARN}`, the Zabbix server or proxy will attempt to retrieve the role credentials from the instance metadata service.
+This means that the Zabbix server or proxy must be running on an AWS EC2 instance with an IAM role assigned that has the necessary permissions.
+This approach is recommended when running Zabbix inside an AWS EC2 instance with an IAM role assigned, as it simplifies credential management.
+
 ### Role-Based Authorization
 If you are using role-based authorization, set the appropriate permissions:
 
@@ -1692,6 +1721,7 @@ Refer to the Macros section for a list of macros used for LLD filters.
 |{$AWS.AUTH_TYPE}|<p>Authorization method. Possible values: `access_key`, `assume_role`, `role_base`.</p>|`access_key`|
 |{$AWS.STS.REGION}|<p>Region used in assume role request.</p>|`us-east-1`|
 |{$AWS.ASSUME.ROLE.ARN}|<p>ARN assume role; add when using the `assume_role` authorization method.</p>||
+|{$AWS.ASSUME.ROLE.AUTH.METADATA}|<p>Add when using the `assume_role` through instance metadata or environment authorization method. Possible values: `false`, `true`.</p>|`false`|
 |{$AWS.ECS.CLUSTER.NAME}|<p>ECS cluster name.</p>||
 |{$AWS.ECS.LLD.FILTER.ALARM_NAME.MATCHES}|<p>Filter of discoverable alarms by name.</p>|`.*`|
 |{$AWS.ECS.LLD.FILTER.ALARM_NAME.NOT_MATCHES}|<p>Filter to exclude discovered alarms by name.</p>|`CHANGE_IF_NEEDED`|
@@ -1892,6 +1922,10 @@ Next, add a principal to the trust relationships of the role you are using:
 ```
 Set the following macros: `{$AWS.ACCESS.KEY.ID}`, `{$AWS.SECRET.ACCESS.KEY}`, `{$AWS.STS.REGION}`, `{$AWS.ASSUME.ROLE.ARN}`.
 
+**Note**: If you set the `{$AWS.ASSUME.ROLE.AUTH.METADATA}` macro to `true` and set the macros `{$AWS.STS.REGION}` and `{$AWS.ASSUME.ROLE.ARN}`, the Zabbix server or proxy will attempt to retrieve the role credentials from the instance metadata service.
+This means that the Zabbix server or proxy must be running on an AWS EC2 instance with an IAM role assigned that has the necessary permissions.
+This approach is recommended when running Zabbix inside an AWS EC2 instance with an IAM role assigned, as it simplifies credential management.
+
 ### Role-Based Authorization
 If you are using role-based authorization, set the appropriate permissions:
 
@@ -1963,6 +1997,7 @@ See the section below for a list of macros used for LLD filters.
 |{$AWS.AUTH_TYPE}|<p>Authorization method. Possible values: `access_key`, `assume_role`, `role_base`.</p>|`access_key`|
 |{$AWS.STS.REGION}|<p>Region used in assume role request.</p>|`us-east-1`|
 |{$AWS.ASSUME.ROLE.ARN}|<p>ARN assume role; add when using the `assume_role` authorization method.</p>||
+|{$AWS.ASSUME.ROLE.AUTH.METADATA}|<p>Add when using the `assume_role` through instance metadata or environment authorization method. Possible values: `false`, `true`.</p>|`false`|
 |{$AWS.ELB.ARN}|<p>Amazon Resource Names (ARN) of the load balancer.</p>||
 |{$AWS.HTTP.4XX.FAIL.MAX.WARN}|<p>Maximum number of HTTP request failures for a trigger expression.</p>|`5`|
 |{$AWS.HTTP.5XX.FAIL.MAX.WARN}|<p>Maximum number of HTTP request failures for a trigger expression.</p>|`5`|
@@ -2174,6 +2209,10 @@ Next, add a principal to the trust relationships of the role you are using:
 ```
 Set the following macros: `{$AWS.ACCESS.KEY.ID}`, `{$AWS.SECRET.ACCESS.KEY}`, `{$AWS.STS.REGION}`, `{$AWS.ASSUME.ROLE.ARN}`.
 
+**Note**: If you set the `{$AWS.ASSUME.ROLE.AUTH.METADATA}` macro to `true` and set the macros `{$AWS.STS.REGION}` and `{$AWS.ASSUME.ROLE.ARN}`, the Zabbix server or proxy will attempt to retrieve the role credentials from the instance metadata service.
+This means that the Zabbix server or proxy must be running on an AWS EC2 instance with an IAM role assigned that has the necessary permissions.
+This approach is recommended when running Zabbix inside an AWS EC2 instance with an IAM role assigned, as it simplifies credential management.
+
 ### Role-Based Authorization
 If you are using role-based authorization, set the appropriate permissions:
 
@@ -2245,6 +2284,7 @@ See the section below for a list of macros used for LLD filters.
 |{$AWS.AUTH_TYPE}|<p>Authorization method. Possible values: `access_key`, `assume_role`, `role_base`.</p>|`access_key`|
 |{$AWS.STS.REGION}|<p>Region used in assume role request.</p>|`us-east-1`|
 |{$AWS.ASSUME.ROLE.ARN}|<p>ARN assume role; add when using the `assume_role` authorization method.</p>||
+|{$AWS.ASSUME.ROLE.AUTH.METADATA}|<p>Add when using the `assume_role` through instance metadata or environment authorization method. Possible values: `false`, `true`.</p>|`false`|
 |{$AWS.ELB.ARN}|<p>Amazon Resource Names (ARN) of the load balancer.</p>||
 |{$AWS.ELB.LLD.FILTER.TARGET.GROUP.MATCHES}|<p>Filter of discoverable target groups by name.</p>|`.*`|
 |{$AWS.ELB.LLD.FILTER.TARGET.GROUP.NOT_MATCHES}|<p>Filter to exclude discovered target groups by name.</p>|`CHANGE_IF_NEEDED`|
@@ -2446,6 +2486,10 @@ Next, add a principal to the trust relationships of the role you are using:
 ```
 Set the following macros: `{$AWS.ACCESS.KEY.ID}`, `{$AWS.SECRET.ACCESS.KEY}`, `{$AWS.STS.REGION}`, `{$AWS.ASSUME.ROLE.ARN}`.
 
+**Note**: If you set the `{$AWS.ASSUME.ROLE.AUTH.METADATA}` macro to `true` and set the macros `{$AWS.STS.REGION}` and `{$AWS.ASSUME.ROLE.ARN}`, the Zabbix server or proxy will attempt to retrieve the role credentials from the instance metadata service.
+This means that the Zabbix server or proxy must be running on an AWS EC2 instance with an IAM role assigned that has the necessary permissions.
+This approach is recommended when running Zabbix inside an AWS EC2 instance with an IAM role assigned, as it simplifies credential management.
+
 ### Role-Based Authorization
 If you are using role-based authorization, set the appropriate permissions:
 
@@ -2515,6 +2559,7 @@ See the section below for a list of macros used for LLD filters.
 |{$AWS.AUTH_TYPE}|<p>Authorization method. Possible values: `access_key`, `assume_role`, `role_base`.</p>|`access_key`|
 |{$AWS.STS.REGION}|<p>Region used in assume role request.</p>|`us-east-1`|
 |{$AWS.ASSUME.ROLE.ARN}|<p>ARN assume role; add when using the `assume_role` authorization method.</p>||
+|{$AWS.ASSUME.ROLE.AUTH.METADATA}|<p>Add when using the `assume_role` through instance metadata or environment authorization method. Possible values: `false`, `true`.</p>|`false`|
 |{$AWS.LAMBDA.ARN}|<p>The Amazon Resource Names (ARN) of the Lambda function.</p>||
 |{$AWS.LAMBDA.LLD.FILTER.ALARM_SERVICE_NAMESPACE.MATCHES}|<p>Filter of discoverable alarms by namespace.</p>|`.*`|
 |{$AWS.LAMBDA.LLD.FILTER.ALARM_SERVICE_NAMESPACE.NOT_MATCHES}|<p>Filter to exclude discovered alarms by namespace.</p>|`CHANGE_IF_NEEDED`|
@@ -2906,6 +2951,10 @@ Next, add a principal to the trust relationships of the role you are using:
 ```
 Set the following macros: `{$AWS.ACCESS.KEY.ID}`, `{$AWS.SECRET.ACCESS.KEY}`, `{$AWS.STS.REGION}`, `{$AWS.ASSUME.ROLE.ARN}`.
 
+**Note**: If you set the `{$AWS.ASSUME.ROLE.AUTH.METADATA}` macro to `true` and set the macros `{$AWS.STS.REGION}` and `{$AWS.ASSUME.ROLE.ARN}`, the Zabbix server or proxy will attempt to retrieve the role credentials from the instance metadata service.
+This means that the Zabbix server or proxy must be running on an AWS EC2 instance with an IAM role assigned that has the necessary permissions.
+This approach is recommended when running Zabbix inside an AWS EC2 instance with an IAM role assigned, as it simplifies credential management.
+
 ### Role-Based Authorization
 If you are using role-based authorization, add the appropriate permissions:
 
@@ -2978,6 +3027,7 @@ Additional information about metrics and used API methods:
 |{$AWS.AUTH_TYPE}|<p>Authorization method. Possible values: `access_key`, `assume_role`, `role_base`.</p>|`access_key`|
 |{$AWS.STS.REGION}|<p>Region used in assume role request.</p>|`us-east-1`|
 |{$AWS.ASSUME.ROLE.ARN}|<p>ARN assume role; add when using the `assume_role` authorization method.</p>||
+|{$AWS.ASSUME.ROLE.AUTH.METADATA}|<p>Add when using the `assume_role` through instance metadata or environment authorization method. Possible values: `false`, `true`.</p>|`false`|
 |{$AWS.BILLING.MONTH}|<p>Months to get historical data from AWS Cost Explore API, no more than 12 months.</p>|`11`|
 |{$AWS.BILLING.LLD.FILTER.SERVICE.MATCHES}|<p>Filter of discoverable discovered billing service by name.</p>|`.*`|
 |{$AWS.BILLING.LLD.FILTER.SERVICE.NOT_MATCHES}|<p>Filter to exclude discovered billing service by name.</p>|`CHANGE_IF_NEEDED`|
