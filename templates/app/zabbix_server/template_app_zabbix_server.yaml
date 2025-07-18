@@ -83,18 +83,81 @@ zabbix_export:
           tags:
             - tag: component
               value: system
-        - uuid: 2f59c93854b746229eea6362c45d2a59
-          name: 'Preprocessing throughput'
+        - uuid: 68411db7353c44e2baed0b9def5f9ac5
+          name: 'Preprocessing direct throughput'
           type: DEPENDENT
-          key: preprocessing_throughput
+          key: preprocessing_throughput_direct
           delay: '0'
           value_type: FLOAT
           units: Bps
-          description: 'Reflects the throughput of the preprocessing.'
+          description: 'Reflects the direct throughput of the preprocessing.'
+          preprocessing:
+            - type: JSONPATH
+              parameters:
+                - $.data.preprocessing.direct.size
+              error_handler: DISCARD_VALUE
+            - type: CHANGE_PER_SECOND
+              parameters:
+                - ''
+          master_item:
+            key: 'zabbix[stats,{$ZABBIX.SERVER.ADDRESS},{$ZABBIX.SERVER.PORT}]'
+          tags:
+            - tag: component
+              value: system
+        - uuid: 2f59c93854b746229eea6362c45d2a59
+          name: 'Preprocessing queued throughput'
+          type: DEPENDENT
+          key: preprocessing_throughput_queued
+          delay: '0'
+          value_type: FLOAT
+          units: Bps
+          description: 'Reflects the queued throughput of the preprocessing.'
           preprocessing:
             - type: JSONPATH
               parameters:
                 - $.data.preprocessing.queued.size
+              error_handler: DISCARD_VALUE
+            - type: CHANGE_PER_SECOND
+              parameters:
+                - ''
+          master_item:
+            key: 'zabbix[stats,{$ZABBIX.SERVER.ADDRESS},{$ZABBIX.SERVER.PORT}]'
+          tags:
+            - tag: component
+              value: system
+        - uuid: 8bcb650b956542b698b5a6cc9bb18e14
+          name: 'Preprocessing direct VPS'
+          type: DEPENDENT
+          key: preprocessing_vps_direct
+          delay: '0'
+          value_type: FLOAT
+          units: '!vps'
+          description: 'Reflects the count of direct preprocessing values per second.'
+          preprocessing:
+            - type: JSONPATH
+              parameters:
+                - $.data.preprocessing.direct.count
+              error_handler: DISCARD_VALUE
+            - type: CHANGE_PER_SECOND
+              parameters:
+                - ''
+          master_item:
+            key: 'zabbix[stats,{$ZABBIX.SERVER.ADDRESS},{$ZABBIX.SERVER.PORT}]'
+          tags:
+            - tag: component
+              value: system
+        - uuid: 394df7f1611949bba82b22416cf06f3e
+          name: 'Preprocessing queued VPS'
+          type: DEPENDENT
+          key: preprocessing_vps_queued
+          delay: '0'
+          value_type: FLOAT
+          units: '!vps'
+          description: 'Reflects the count of queued preprocessing values per second.'
+          preprocessing:
+            - type: JSONPATH
+              parameters:
+                - $.data.preprocessing.queued.count
               error_handler: DISCARD_VALUE
             - type: CHANGE_PER_SECOND
               parameters:
@@ -3476,12 +3539,15 @@ zabbix_export:
                 - type: svggraph
                   name: 'Preprocessing throughput'
                   'y': '46'
-                  width: '72'
+                  width: '36'
                   height: '5'
                   fields:
                     - type: STRING
                       name: ds.0.color.0
-                      value: '808000'
+                      value: ff465c
+                    - type: STRING
+                      name: ds.0.color.1
+                      value: ffdf00
                     - type: INTEGER
                       name: ds.0.dataset_type
                       value: '0'
@@ -3489,10 +3555,18 @@ zabbix_export:
                       name: ds.0.itemids.0
                       value:
                         host: 'Remote Zabbix server health'
-                        key: preprocessing_throughput
+                        key: preprocessing_throughput_queued
+                    - type: ITEM
+                      name: ds.0.itemids.1
+                      value:
+                        host: 'Remote Zabbix server health'
+                        key: preprocessing_throughput_direct
                     - type: STRING
                       name: lefty_min
                       value: '0'
+                    - type: INTEGER
+                      name: legend_lines
+                      value: '2'
                     - type: INTEGER
                       name: legend_statistic
                       value: '1'
@@ -3746,6 +3820,44 @@ zabbix_export:
                     - type: INTEGER
                       name: show_problems
                       value: '1'
+                - type: svggraph
+                  name: 'Preprocessing VPS'
+                  x: '36'
+                  'y': '46'
+                  width: '36'
+                  height: '5'
+                  fields:
+                    - type: STRING
+                      name: ds.0.color.0
+                      value: ff465c
+                    - type: STRING
+                      name: ds.0.color.1
+                      value: ffdf00
+                    - type: INTEGER
+                      name: ds.0.dataset_type
+                      value: '0'
+                    - type: ITEM
+                      name: ds.0.itemids.0
+                      value:
+                        host: 'Remote Zabbix server health'
+                        key: preprocessing_vps_queued
+                    - type: ITEM
+                      name: ds.0.itemids.1
+                      value:
+                        host: 'Remote Zabbix server health'
+                        key: preprocessing_vps_direct
+                    - type: STRING
+                      name: lefty_min
+                      value: '0'
+                    - type: INTEGER
+                      name: legend_lines
+                      value: '2'
+                    - type: INTEGER
+                      name: legend_statistic
+                      value: '1'
+                    - type: STRING
+                      name: reference
+                      value: AAABW
             - name: Statuses
               widgets:
                 - type: item
@@ -3891,7 +4003,7 @@ zabbix_export:
         Generated by official Zabbix template tool "Templator"
       vendor:
         name: Zabbix
-        version: 7.0-5
+        version: 7.0-6
       groups:
         - name: Templates/Applications
       items:
@@ -3956,18 +4068,78 @@ zabbix_export:
           tags:
             - tag: component
               value: system
-        - uuid: 4476af46c9114bec80cbc555cd81ee69
-          name: 'Preprocessing throughput'
+        - uuid: 3f584bc48eac4e64ae605334230c1107
+          name: 'Preprocessing direct throughput'
           type: DEPENDENT
-          key: 'zabbix[preprocessing_throughput]'
+          key: 'zabbix[preprocessing_throughput_direct]'
           delay: '0'
           value_type: FLOAT
           units: Bps
-          description: 'Reflects the throughput of the preprocessing.'
+          description: 'Reflects the direct throughput of the preprocessing.'
+          preprocessing:
+            - type: JSONPATH
+              parameters:
+                - $.data.direct.size
+            - type: CHANGE_PER_SECOND
+              parameters:
+                - ''
+          master_item:
+            key: 'zabbix[preprocessing]'
+          tags:
+            - tag: component
+              value: system
+        - uuid: 4476af46c9114bec80cbc555cd81ee69
+          name: 'Preprocessing queued throughput'
+          type: DEPENDENT
+          key: 'zabbix[preprocessing_throughput_queued]'
+          delay: '0'
+          value_type: FLOAT
+          units: Bps
+          description: 'Reflects the queued throughput of the preprocessing.'
           preprocessing:
             - type: JSONPATH
               parameters:
                 - $.data.queued.size
+            - type: CHANGE_PER_SECOND
+              parameters:
+                - ''
+          master_item:
+            key: 'zabbix[preprocessing]'
+          tags:
+            - tag: component
+              value: system
+        - uuid: 98117bb63066414b85281a39cd0482ac
+          name: 'Preprocessing direct VPS'
+          type: DEPENDENT
+          key: 'zabbix[preprocessing_vps_direct]'
+          delay: '0'
+          value_type: FLOAT
+          units: '!vps'
+          description: 'Reflects the count of direct preprocessing values per second.'
+          preprocessing:
+            - type: JSONPATH
+              parameters:
+                - $.data.direct.count
+            - type: CHANGE_PER_SECOND
+              parameters:
+                - ''
+          master_item:
+            key: 'zabbix[preprocessing]'
+          tags:
+            - tag: component
+              value: system
+        - uuid: 7b0dce0a5b0e4271940945d4d65bfd9c
+          name: 'Preprocessing queued VPS'
+          type: DEPENDENT
+          key: 'zabbix[preprocessing_vps_queued]'
+          delay: '0'
+          value_type: FLOAT
+          units: '!vps'
+          description: 'Reflects the count of queued preprocessing values per second.'
+          preprocessing:
+            - type: JSONPATH
+              parameters:
+                - $.data.queued.count
             - type: CHANGE_PER_SECOND
               parameters:
                 - ''
@@ -7061,12 +7233,15 @@ zabbix_export:
                 - type: svggraph
                   name: 'Preprocessing throughput'
                   'y': '46'
-                  width: '72'
+                  width: '36'
                   height: '5'
                   fields:
                     - type: STRING
                       name: ds.0.color.0
-                      value: '808000'
+                      value: ff465c
+                    - type: STRING
+                      name: ds.0.color.1
+                      value: ffdf00
                     - type: INTEGER
                       name: ds.0.dataset_type
                       value: '0'
@@ -7074,10 +7249,18 @@ zabbix_export:
                       name: ds.0.itemids.0
                       value:
                         host: 'Zabbix server health'
-                        key: 'zabbix[preprocessing_throughput]'
+                        key: 'zabbix[preprocessing_throughput_queued]'
+                    - type: ITEM
+                      name: ds.0.itemids.1
+                      value:
+                        host: 'Zabbix server health'
+                        key: 'zabbix[preprocessing_throughput_direct]'
                     - type: STRING
                       name: lefty_min
                       value: '0'
+                    - type: INTEGER
+                      name: legend_lines
+                      value: '2'
                     - type: INTEGER
                       name: legend_statistic
                       value: '1'
@@ -7331,6 +7514,44 @@ zabbix_export:
                     - type: INTEGER
                       name: show_problems
                       value: '1'
+                - type: svggraph
+                  name: 'Preprocessing VPS'
+                  x: '36'
+                  'y': '46'
+                  width: '36'
+                  height: '5'
+                  fields:
+                    - type: STRING
+                      name: ds.0.color.0
+                      value: ff465c
+                    - type: STRING
+                      name: ds.0.color.1
+                      value: ffdf00
+                    - type: INTEGER
+                      name: ds.0.dataset_type
+                      value: '0'
+                    - type: ITEM
+                      name: ds.0.itemids.0
+                      value:
+                        host: 'Zabbix server health'
+                        key: 'zabbix[preprocessing_vps_queued]'
+                    - type: ITEM
+                      name: ds.0.itemids.1
+                      value:
+                        host: 'Zabbix server health'
+                        key: 'zabbix[preprocessing_vps_direct]'
+                    - type: STRING
+                      name: lefty_min
+                      value: '0'
+                    - type: INTEGER
+                      name: legend_lines
+                      value: '2'
+                    - type: INTEGER
+                      name: legend_statistic
+                      value: '1'
+                    - type: STRING
+                      name: reference
+                      value: AAABW
             - name: Statuses
               widgets:
                 - type: item
@@ -7562,18 +7783,81 @@ zabbix_export:
           tags:
             - tag: component
               value: system
-        - uuid: 2d956b642f834e0894fe223113d2c4c3
-          name: 'Preprocessing throughput'
+        - uuid: fa0ff0c1292d4aa8b555c8d4589f0cf0
+          name: 'Preprocessing direct throughput'
           type: DEPENDENT
-          key: preprocessing_throughput
+          key: preprocessing_throughput_direct
           delay: '0'
           value_type: FLOAT
           units: Bps
-          description: 'Reflects the throughput of the preprocessing.'
+          description: 'Reflects the direct throughput of the preprocessing.'
+          preprocessing:
+            - type: JSONPATH
+              parameters:
+                - $.data.preprocessing.direct.size
+              error_handler: DISCARD_VALUE
+            - type: CHANGE_PER_SECOND
+              parameters:
+                - ''
+          master_item:
+            key: 'zabbix.stats[{$ZABBIX.SERVER.ADDRESS},{$ZABBIX.SERVER.PORT}]'
+          tags:
+            - tag: component
+              value: system
+        - uuid: 2d956b642f834e0894fe223113d2c4c3
+          name: 'Preprocessing queued throughput'
+          type: DEPENDENT
+          key: preprocessing_throughput_queued
+          delay: '0'
+          value_type: FLOAT
+          units: Bps
+          description: 'Reflects the queued throughput of the preprocessing.'
           preprocessing:
             - type: JSONPATH
               parameters:
                 - $.data.preprocessing.queued.size
+              error_handler: DISCARD_VALUE
+            - type: CHANGE_PER_SECOND
+              parameters:
+                - ''
+          master_item:
+            key: 'zabbix.stats[{$ZABBIX.SERVER.ADDRESS},{$ZABBIX.SERVER.PORT}]'
+          tags:
+            - tag: component
+              value: system
+        - uuid: 77bbca63827143a3b50fb9b88e6aadca
+          name: 'Preprocessing direct VPS'
+          type: DEPENDENT
+          key: preprocessing_vps_direct
+          delay: '0'
+          value_type: FLOAT
+          units: '!vps'
+          description: 'Reflects the count of direct preprocessing values per second.'
+          preprocessing:
+            - type: JSONPATH
+              parameters:
+                - $.data.preprocessing.direct.count
+              error_handler: DISCARD_VALUE
+            - type: CHANGE_PER_SECOND
+              parameters:
+                - ''
+          master_item:
+            key: 'zabbix.stats[{$ZABBIX.SERVER.ADDRESS},{$ZABBIX.SERVER.PORT}]'
+          tags:
+            - tag: component
+              value: system
+        - uuid: bc0f044ffadc4cf2b0aa537ad202796f
+          name: 'Preprocessing queued VPS'
+          type: DEPENDENT
+          key: preprocessing_vps_queued
+          delay: '0'
+          value_type: FLOAT
+          units: '!vps'
+          description: 'Reflects the count of queued preprocessing values per second.'
+          preprocessing:
+            - type: JSONPATH
+              parameters:
+                - $.data.preprocessing.queued.count
               error_handler: DISCARD_VALUE
             - type: CHANGE_PER_SECOND
               parameters:
@@ -10952,12 +11236,15 @@ zabbix_export:
                 - type: svggraph
                   name: 'Preprocessing throughput'
                   'y': '46'
-                  width: '72'
+                  width: '36'
                   height: '5'
                   fields:
                     - type: STRING
                       name: ds.0.color.0
-                      value: '808000'
+                      value: ff465c
+                    - type: STRING
+                      name: ds.0.color.1
+                      value: ffdf00
                     - type: INTEGER
                       name: ds.0.dataset_type
                       value: '0'
@@ -10965,10 +11252,18 @@ zabbix_export:
                       name: ds.0.itemids.0
                       value:
                         host: 'Zabbix server health by Zabbix agent'
-                        key: preprocessing_throughput
+                        key: preprocessing_throughput_queued
+                    - type: ITEM
+                      name: ds.0.itemids.1
+                      value:
+                        host: 'Zabbix server health by Zabbix agent'
+                        key: preprocessing_throughput_direct
                     - type: STRING
                       name: lefty_min
                       value: '0'
+                    - type: INTEGER
+                      name: legend_lines
+                      value: '2'
                     - type: INTEGER
                       name: legend_statistic
                       value: '1'
@@ -11222,6 +11517,44 @@ zabbix_export:
                     - type: INTEGER
                       name: show_problems
                       value: '1'
+                - type: svggraph
+                  name: 'Preprocessing VPS'
+                  x: '36'
+                  'y': '46'
+                  width: '36'
+                  height: '5'
+                  fields:
+                    - type: STRING
+                      name: ds.0.color.0
+                      value: ff465c
+                    - type: STRING
+                      name: ds.0.color.1
+                      value: ffdf00
+                    - type: INTEGER
+                      name: ds.0.dataset_type
+                      value: '0'
+                    - type: ITEM
+                      name: ds.0.itemids.0
+                      value:
+                        host: 'Zabbix server health by Zabbix agent'
+                        key: preprocessing_vps_queued
+                    - type: ITEM
+                      name: ds.0.itemids.1
+                      value:
+                        host: 'Zabbix server health by Zabbix agent'
+                        key: preprocessing_vps_direct
+                    - type: STRING
+                      name: lefty_min
+                      value: '0'
+                    - type: INTEGER
+                      name: legend_lines
+                      value: '2'
+                    - type: INTEGER
+                      name: legend_statistic
+                      value: '1'
+                    - type: STRING
+                      name: reference
+                      value: AAABW
             - name: Statuses
               widgets:
                 - type: item
@@ -11435,18 +11768,81 @@ zabbix_export:
           tags:
             - tag: component
               value: system
-        - uuid: 4ee40b08e9a44f448595fcbb0e8c9ece
-          name: 'Preprocessing throughput'
+        - uuid: ee855be0a5214ff288f1f4d053fb13d6
+          name: 'Preprocessing direct throughput'
           type: DEPENDENT
-          key: preprocessing_throughput
+          key: preprocessing_throughput_direct
           delay: '0'
           value_type: FLOAT
           units: Bps
-          description: 'Reflects the throughput of the preprocessing.'
+          description: 'Reflects the direct throughput of the preprocessing.'
+          preprocessing:
+            - type: JSONPATH
+              parameters:
+                - $.data.preprocessing.direct.size
+              error_handler: DISCARD_VALUE
+            - type: CHANGE_PER_SECOND
+              parameters:
+                - ''
+          master_item:
+            key: 'zabbix.stats[{$ZABBIX.SERVER.ADDRESS},{$ZABBIX.SERVER.PORT}]'
+          tags:
+            - tag: component
+              value: system
+        - uuid: 4ee40b08e9a44f448595fcbb0e8c9ece
+          name: 'Preprocessing queued throughput'
+          type: DEPENDENT
+          key: preprocessing_throughput_queued
+          delay: '0'
+          value_type: FLOAT
+          units: Bps
+          description: 'Reflects the queued throughput of the preprocessing.'
           preprocessing:
             - type: JSONPATH
               parameters:
                 - $.data.preprocessing.queued.size
+              error_handler: DISCARD_VALUE
+            - type: CHANGE_PER_SECOND
+              parameters:
+                - ''
+          master_item:
+            key: 'zabbix.stats[{$ZABBIX.SERVER.ADDRESS},{$ZABBIX.SERVER.PORT}]'
+          tags:
+            - tag: component
+              value: system
+        - uuid: bdf65137d0ce48ba9aff14984c84a072
+          name: 'Preprocessing direct VPS'
+          type: DEPENDENT
+          key: preprocessing_vps_direct
+          delay: '0'
+          value_type: FLOAT
+          units: '!vps'
+          description: 'Reflects the count of direct preprocessing values per second.'
+          preprocessing:
+            - type: JSONPATH
+              parameters:
+                - $.data.preprocessing.direct.count
+              error_handler: DISCARD_VALUE
+            - type: CHANGE_PER_SECOND
+              parameters:
+                - ''
+          master_item:
+            key: 'zabbix.stats[{$ZABBIX.SERVER.ADDRESS},{$ZABBIX.SERVER.PORT}]'
+          tags:
+            - tag: component
+              value: system
+        - uuid: cf136f14d2af413baf0c5f7cbe564b9e
+          name: 'Preprocessing queued VPS'
+          type: DEPENDENT
+          key: preprocessing_vps_queued
+          delay: '0'
+          value_type: FLOAT
+          units: '!vps'
+          description: 'Reflects the count of queued preprocessing values per second.'
+          preprocessing:
+            - type: JSONPATH
+              parameters:
+                - $.data.preprocessing.queued.count
               error_handler: DISCARD_VALUE
             - type: CHANGE_PER_SECOND
               parameters:
@@ -14828,12 +15224,15 @@ zabbix_export:
                 - type: svggraph
                   name: 'Preprocessing throughput'
                   'y': '46'
-                  width: '72'
+                  width: '36'
                   height: '5'
                   fields:
                     - type: STRING
                       name: ds.0.color.0
-                      value: '808000'
+                      value: ff465c
+                    - type: STRING
+                      name: ds.0.color.1
+                      value: ffdf00
                     - type: INTEGER
                       name: ds.0.dataset_type
                       value: '0'
@@ -14841,10 +15240,18 @@ zabbix_export:
                       name: ds.0.itemids.0
                       value:
                         host: 'Zabbix server health by Zabbix agent active'
-                        key: preprocessing_throughput
+                        key: preprocessing_throughput_queued
+                    - type: ITEM
+                      name: ds.0.itemids.1
+                      value:
+                        host: 'Zabbix server health by Zabbix agent active'
+                        key: preprocessing_throughput_direct
                     - type: STRING
                       name: lefty_min
                       value: '0'
+                    - type: INTEGER
+                      name: legend_lines
+                      value: '2'
                     - type: INTEGER
                       name: legend_statistic
                       value: '1'
@@ -15098,6 +15505,44 @@ zabbix_export:
                     - type: INTEGER
                       name: show_problems
                       value: '1'
+                - type: svggraph
+                  name: 'Preprocessing VPS'
+                  x: '36'
+                  'y': '46'
+                  width: '36'
+                  height: '5'
+                  fields:
+                    - type: STRING
+                      name: ds.0.color.0
+                      value: ff465c
+                    - type: STRING
+                      name: ds.0.color.1
+                      value: ffdf00
+                    - type: INTEGER
+                      name: ds.0.dataset_type
+                      value: '0'
+                    - type: ITEM
+                      name: ds.0.itemids.0
+                      value:
+                        host: 'Zabbix server health by Zabbix agent active'
+                        key: preprocessing_vps_queued
+                    - type: ITEM
+                      name: ds.0.itemids.1
+                      value:
+                        host: 'Zabbix server health by Zabbix agent active'
+                        key: preprocessing_vps_direct
+                    - type: STRING
+                      name: lefty_min
+                      value: '0'
+                    - type: INTEGER
+                      name: legend_lines
+                      value: '2'
+                    - type: INTEGER
+                      name: legend_statistic
+                      value: '1'
+                    - type: STRING
+                      name: reference
+                      value: AAABW
             - name: Statuses
               widgets:
                 - type: item
