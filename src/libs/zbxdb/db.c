@@ -590,6 +590,29 @@ int	zbx_db_connect_basic(const zbx_config_dbhigh_t *cfg)
 
 	if (ZBX_DB_OK == ret)
 	{
+		/* innodb_snapshot_isolation variable became ON by default in MariaDB 11.6.2, we need it to be OFF */
+		zbx_db_result_t	result;
+		zbx_db_row_t	row;
+
+		result = zbx_db_select_basic("show variables like 'innodb_snapshot_isolation'");
+
+		if ((zbx_db_result_t)ZBX_DB_DOWN == result || NULL == result)
+		{
+			ret = (NULL == result) ? ZBX_DB_FAIL : ZBX_DB_DOWN;
+		}
+		else if (NULL != (row = zbx_db_fetch_basic(result)))
+		{
+			if (0 != strcmp("OFF", row[1]))
+			{
+				if (0 < (ret = zbx_db_execute_basic("set innodb_snapshot_isolation='OFF'")))
+					ret = ZBX_DB_OK;
+			}
+		}
+		zbx_db_free_result(result);
+	}
+
+	if (ZBX_DB_OK == ret)
+	{
 		/* in contrast to "set names utf8" results of this call will survive auto-reconnects */
 		/* utf8mb3 is deprecated and it's superset utf8mb4 should be used instead if available */
 		if (0 != mysql_set_character_set(conn, ZBX_SUPPORTED_DB_CHARACTER_SET_UTF8MB4) &&
