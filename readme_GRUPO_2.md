@@ -1,1 +1,1 @@
-Hola mundo..
+Debido al gran desarrollo de las TI (Tecnologías de Información), procesamiento y almacenamiento de datos, los requerimientos de cómputo de las empresas y organizaciones han incrementado sustancialmente. Por esta razón, y con el propósito de cumplir con las necesidades de cómputo más exigentes ha surgido una nueva tecnología conocida hoy en día como computación en la nube (cloud computing).
