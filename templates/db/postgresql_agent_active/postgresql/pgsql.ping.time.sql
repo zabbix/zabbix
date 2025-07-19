@@ -1,2 +1,0 @@
-\timing
-SELECT 1;
