@@ -205,7 +205,7 @@ class testSystemInformation extends CWebTest {
 
 		$messages = $this->query('xpath://output[@class="msg-bad"]')->all();
 		foreach ($messages as $message) {
-			self::$skip_fields[] = $message->highlight();
+			self::$skip_fields[] = $message;
 		}
 	}
 
