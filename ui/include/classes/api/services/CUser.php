@@ -2938,6 +2938,10 @@ class CUser extends CApiService {
 		]);
 
 		if (!$db_sessions) {
+			if (array_key_exists('reconnect', $_REQUEST)) {
+				redirect('index.php');
+			}
+
 			self::exception(ZBX_API_ERROR_PARAMETERS, _('Session terminated, re-login, please.'));
 		}
 
