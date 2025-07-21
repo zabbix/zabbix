@@ -37,25 +37,28 @@ func getTLSConfig(redisURI *uri.URI, params map[string]string) (*tls.Config, err
 	details := tlsconfig.NewDetails(
 		"",
 		redisURI.String(),
+		tlsconfig.WithTLSServerName(redisURI.Host()),
 		tlsconfig.WithTLSConnect(string(tlsConnectionType)),
 		tlsconfig.WithTLSCaFile(params[string(comms.TLSCAFile)]),
-		tlsconfig.WithTLSServerName(params[string(comms.TLSServerName)]),
 		tlsconfig.WithTLSCertFile(params[string(comms.TLSCertFile)]),
 		tlsconfig.WithTLSKeyFile(params[string(comms.TLSKeyFile)]),
 		tlsconfig.WithAllowedConnections(
-			string(comms.NoTLS),
-			string(comms.Insecure),
+			string(comms.Disabled),
+			string(comms.Required),
 			string(comms.VerifyCA),
 			string(comms.VerifyFull),
 		),
 	)
 
 	switch tlsConnectionType {
-	case comms.NoTLS:
+	case comms.Disabled:
 		return nil, errTLSDisabled
-	case comms.Insecure:
+	case comms.Required:
 		return &tls.Config{InsecureSkipVerify: true}, nil //nolint:gosec //intended behavior
 	case comms.VerifyCA:
+		// in case if default values are set
+		details.Apply(tlsconfig.WithTLSCertFile(""), tlsconfig.WithTLSKeyFile(""))
+
 		tlsConfig, err := details.GetTLSConfig()
 		if err != nil {
 			return nil, errs.Wrap(err, "failed to get tls config")
