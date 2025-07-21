@@ -382,7 +382,7 @@ typedef struct
 	char				allowed_addresses[ZBX_HOST_PROXY_ADDRESS_LEN_MAX];
 	time_t				last_version_error_time;
 
-	int				large_history_data;
+	int				pending_history;
 }
 zbx_dc_proxy_t;
 

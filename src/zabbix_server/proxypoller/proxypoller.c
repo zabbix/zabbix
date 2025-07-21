@@ -628,7 +628,7 @@ static int	process_proxy(const zbx_config_vault_t *config_vault, int config_time
 						break;
 
 					if (FAIL == zbx_hc_check_proxy(proxy.proxyid) &&
-							ZBX_PROXY_LARGE_HISTORY_SET == proxy.large_history_data)
+							ZBX_PROXY_LARGE_HISTORY_SET == proxy.pending_history)
 					{
 						break;
 					}
