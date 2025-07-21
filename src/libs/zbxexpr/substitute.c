@@ -16,7 +16,6 @@
 
 #include "zbx_expression_constants.h"
 #include "zbxstr.h"
-#include "zbxexpression.h"
 
 /* macros that can be indexed */
 static const char	*ex_macros[] =
