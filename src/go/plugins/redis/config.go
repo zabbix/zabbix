@@ -30,22 +30,10 @@ type pluginOptions struct {
 	KeepAlive int `conf:"optional,range=60:900,default=300"`
 
 	// Sessions stores pre-defined named sets of connections settings.
-	Sessions map[string]*session `conf:"optional"`
+	Sessions map[string]session `conf:"optional"`
 
 	// Default stores default connection parameter values from configuration file
 	Default session `conf:"optional"`
-}
-
-type session struct {
-	URI      string `conf:"name=Uri,optional"`
-	Password string `conf:"optional"`
-	User     string `conf:"optional"`
-
-	TLSConnect    string `conf:"name=TLSConnect,optional"`
-	TLSCAFile     string `conf:"name=TLSCAFile,optional"`
-	TLSServerName string `conf:"name=TLSServerName,optional"`
-	TLSCertFile   string `conf:"name=TLSCertFile,optional"`
-	TLSKeyFile    string `conf:"name=TLSKeyFile,optional"`
 }
 
 // Configure implements the Configurator interface.
@@ -66,26 +54,19 @@ func (p *Plugin) Configure(global *plugin.GlobalOptions, options any) {
 func (*Plugin) Validate(options any) error {
 	var (
 		opts pluginOptions
-		err  error
 	)
 
-	err = conf.UnmarshalStrict(options, &opts)
+	err := conf.UnmarshalStrict(options, &opts)
 	if err != nil {
 		return errs.Wrap(err, "plugin config validation failed")
 	}
 
-	// validating only TLS on default options.
-	err = validateTLSConfiguration(&opts.Default)
-	if err != nil {
-		return errs.Wrap(err, "plugin config validation failed on default TLS configuration")
-	}
-
-	for k, v := range opts.Sessions {
-		err = validateSession(v)
+	for sessionName, s := range opts.Sessions {
+		err = s.validateSession(&opts.Default)
 		if err != nil {
-			return errs.Wrap(err, "plugin config validation failed on session "+k)
+			return errs.Wrap(err, "plugin config validation failed on session "+sessionName)
 		}
 	}
 
-	return err
+	return nil
 }
