@@ -250,7 +250,7 @@ func (h *handler) report(w http.ResponseWriter, r *http.Request) {
 
 		cookieParams = append(cookieParams, &cookieParam)
 	}
-	
+
 	cdpReqParams := reportReqParams{
 		cookieParams: cookieParams,
 		size: reportSize{
