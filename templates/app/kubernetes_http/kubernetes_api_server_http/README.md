@@ -10,7 +10,7 @@ Template `Kubernetes API server by HTTP` - collects metrics by HTTP agent from A
 
 ## Requirements
 
-Zabbix version: 7.4 and higher.
+Zabbix version: 8.0 and higher.
 
 ## Tested versions
 
@@ -19,7 +19,7 @@ This template has been tested on:
 
 ## Configuration
 
-> Zabbix should be configured according to the instructions in the [Templates out of the box](https://www.zabbix.com/documentation/7.4/manual/config/templates_out_of_the_box) section.
+> Zabbix should be configured according to the instructions in the [Templates out of the box](https://www.zabbix.com/documentation/8.0/manual/config/templates_out_of_the_box) section.
 
 ## Setup
 
@@ -35,9 +35,8 @@ Also, see the Macros section for a list of macros used to set trigger values.
 
 |Name|Description|Default|
 |----|-----------|-------|
-|{$KUBE.API.SERVER.URL}|<p>Kubernetes API server metrics endpoint URL.</p>|`https://localhost:6443/metrics`|
 |{$KUBE.API.TOKEN}|<p>API Authorization Token.</p>||
-|{$KUBE.API.CERT.EXPIRATION}|<p>Number of days for alert of client certificate used for trigger.</p>|`7`|
+|{$KUBE.API.SERVER.URL}|<p>Kubernetes API server metrics endpoint URL.</p>|`https://localhost:6443/metrics`|
 |{$KUBE.API.HTTP.CLIENT.ERROR}|<p>Maximum number of HTTP client requests failures used for trigger.</p>|`2`|
 |{$KUBE.API.HTTP.SERVER.ERROR}|<p>Maximum number of HTTP server requests failures used for trigger.</p>|`2`|
 
@@ -188,26 +187,6 @@ Also, see the Macros section for a list of macros used to set trigger values.
 |----|-----------|----|-----------------------|
 |["{#NAME}"] Workqueue depth|<p>Current depth of workqueue.</p>|Dependent item|kubernetes.api.workqueue_depth["{#NAME}"]<p>**Preprocessing**</p><ul><li><p>Prometheus pattern: `VALUE(workqueue_depth{name = "{#NAME}"})`</p><p>⛔️Custom on fail: Discard value</p></li></ul>|
 |["{#NAME}"] Workqueue adds total, rate|<p>Total number of adds handled by workqueue per second.</p>|Dependent item|kubernetes.api.workqueue_adds_total.rate["{#NAME}"]<p>**Preprocessing**</p><ul><li><p>Prometheus pattern: `VALUE(workqueue_adds_total{name = "{#NAME}"})`</p><p>⛔️Custom on fail: Discard value</p></li><li>Change per second</li></ul>|
-
-### LLD rule Client certificate expiration histogram
-
-|Name|Description|Type|Key and additional info|
-|----|-----------|----|-----------------------|
-|Client certificate expiration histogram|<p>Discovery raw data of client certificate expiration</p>|Dependent item|kubernetes.api.certificate_expiration.discovery<p>**Preprocessing**</p><ul><li><p>Prometheus to JSON: `The text is too long. Please see the template.`</p></li><li><p>JavaScript: `The text is too long. Please see the template.`</p></li><li><p>Discard unchanged with heartbeat: `3h`</p></li></ul>|
-
-### Item prototypes for Client certificate expiration histogram
-
-|Name|Description|Type|Key and additional info|
-|----|-----------|----|-----------------------|
-|Certificate expiration seconds bucket, {#LE}|<p>Distribution of the remaining lifetime on the certificate used to authenticate a request.</p>|Dependent item|kubernetes.api.client_certificate_expiration_seconds_bucket[{#LE}]<p>**Preprocessing**</p><ul><li><p>Prometheus pattern: `The text is too long. Please see the template.`</p><p>⛔️Custom on fail: Discard value</p></li></ul>|
-|Client certificate expiration, p1|<p>1 percentile of the remaining lifetime on the certificate used to authenticate a request.</p>|Calculated|kubernetes.api.client_certificate_expiration_p1[{#SINGLETON}]|
-
-### Trigger prototypes for Client certificate expiration histogram
-
-|Name|Description|Expression|Severity|Dependencies and additional info|
-|----|-----------|----------|--------|--------------------------------|
-|Kubernetes API server: Kubernetes client certificate is expiring|<p>A client certificate used to authenticate to the apiserver is expiring in {$KUBE.API.CERT.EXPIRATION} days.</p>|`last(/Kubernetes API server by HTTP/kubernetes.api.client_certificate_expiration_p1[{#SINGLETON}]) > 0 and last(/Kubernetes API server by HTTP/kubernetes.api.client_certificate_expiration_p1[{#SINGLETON}]) < {$KUBE.API.CERT.EXPIRATION}*24*60*60`|Warning|**Depends on**:<br><ul><li>Kubernetes API server: Kubernetes client certificate expires soon</li></ul>|
-|Kubernetes API server: Kubernetes client certificate expires soon|<p>A client certificate used to authenticate to the apiserver is expiring in less than 24.0 hours.</p>|`last(/Kubernetes API server by HTTP/kubernetes.api.client_certificate_expiration_p1[{#SINGLETON}]) > 0 and last(/Kubernetes API server by HTTP/kubernetes.api.client_certificate_expiration_p1[{#SINGLETON}]) < 24*60*60`|Warning||
 
 ## Feedback
 

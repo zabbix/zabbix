@@ -15,7 +15,7 @@ Also, see the Macros section for a list of macros used to set trigger values.
 
 ## Requirements
 
-Zabbix version: 7.4 and higher.
+Zabbix version: 8.0 and higher.
 
 ## Tested versions
 
@@ -24,11 +24,11 @@ This template has been tested on:
 
 ## Configuration
 
-> Zabbix should be configured according to the instructions in the [Templates out of the box](https://www.zabbix.com/documentation/7.4/manual/config/templates_out_of_the_box) section.
+> Zabbix should be configured according to the instructions in the [Templates out of the box](https://www.zabbix.com/documentation/8.0/manual/config/templates_out_of_the_box) section.
 
 ## Setup
 
-Install the [Zabbix Helm Chart](https://git.zabbix.com/projects/ZT/repos/kubernetes-helm/browse?at=refs%2Fheads%2Frelease%2F7.4) in your Kubernetes cluster.
+Install the [Zabbix Helm Chart](https://git.zabbix.com/projects/ZT/repos/kubernetes-helm/browse?at=refs%2Fheads%2Fmaster) in your Kubernetes cluster.
 Internal service metrics are collected from kube-state-metrics endpoint.
 
 Template needs to use authorization via API token.
@@ -102,17 +102,17 @@ You can also set up evaluation periods for replica mismatch triggers (Deployment
 
 `{$KUBE.REPLICA.MISMATCH.EVAL_PERIOD:regex:".*:default:.*"} = 15m`
 
-**Note** that different context macros with regular expressions matching the same string can be applied in an undefined order, and simple context macros (without regular expressions) have higher priority. Read the **Important notes** section in [`Zabbix documentation`](https://www.zabbix.com/documentation/7.4/manual/config/macros/user_macros_context) for details.
+**Note** that different context macros with regular expressions matching the same string can be applied in an undefined order, and simple context macros (without regular expressions) have higher priority. Read the **Important notes** section in [`Zabbix documentation`](https://www.zabbix.com/documentation/8.0/manual/config/macros/user_macros_context) for details.
 
 ### Macros used
 
 |Name|Description|Default|
 |----|-----------|-------|
+|{$KUBE.API.TOKEN}|<p>Service account bearer token.</p>||
 |{$KUBE.API.URL}|<p>Kubernetes API endpoint URL in the format <scheme>://<host>:<port></p>|`https://kubernetes.default.svc.cluster.local:443`|
-|{$KUBE.API.READYZ.ENDPOINT}|<p>Kubernetes API readyz endpoint /readyz</p>|`/readyz`|
 |{$KUBE.API.LIVEZ.ENDPOINT}|<p>Kubernetes API livez endpoint /livez</p>|`/livez`|
 |{$KUBE.API.COMPONENTSTATUSES.ENDPOINT}|<p>Kubernetes API componentstatuses endpoint /api/v1/componentstatuses</p>|`/api/v1/componentstatuses`|
-|{$KUBE.API.TOKEN}|<p>Service account bearer token.</p>||
+|{$KUBE.API.READYZ.ENDPOINT}|<p>Kubernetes API readyz endpoint /readyz</p>|`/readyz`|
 |{$KUBE.HTTP.PROXY}|<p>Sets the HTTP proxy to `http_proxy` value. If this parameter is empty, then no proxy is used.</p>||
 |{$KUBE.STATE.ENDPOINT.NAME}|<p>Kubernetes state endpoint name.</p>|`zabbix-kube-state-metrics`|
 |{$OPENSHIFT.STATE.ENDPOINT.NAME}|<p>OpenShift state endpoint name.</p>|`openshift-state-metrics`|
@@ -310,19 +310,19 @@ You can also set up evaluation periods for replica mismatch triggers (Deployment
 
 |Name|Description|Type|Key and additional info|
 |----|-----------|----|-----------------------|
-|Namespace [{#NAMESPACE}] Pod [{#NAME}] Phase: Pending|<p>Pod is in pending state.</p>|Dependent item|kube.pod.phase.pending[{#NAMESPACE}/{#NAME}]<p>**Preprocessing**</p><ul><li><p>Prometheus pattern: `VALUE(kube_pod_status_phase{pod="{#NAME}", phase="Pending"})`</p><p>⛔️Custom on fail: Discard value</p></li></ul>|
+|Namespace [{#NAMESPACE}] Pod [{#NAME}] Phase: Pending|<p>Pod is in pending state.</p>|Dependent item|kube.pod.phase.pending[{#NAMESPACE}/{#NAME}]<p>**Preprocessing**</p><ul><li><p>Prometheus pattern: `The text is too long. Please see the template.`</p><p>⛔️Custom on fail: Discard value</p></li></ul>|
 |Namespace [{#NAMESPACE}] Pod [{#NAME}] Phase: Succeeded|<p>Pod is in succeeded state.</p>|Dependent item|kube.pod.phase.succeeded[{#NAMESPACE}/{#NAME}]<p>**Preprocessing**</p><ul><li><p>Prometheus pattern: `The text is too long. Please see the template.`</p><p>⛔️Custom on fail: Discard value</p></li></ul>|
-|Namespace [{#NAMESPACE}] Pod [{#NAME}] Phase: Failed|<p>Pod is in failed state.</p>|Dependent item|kube.pod.phase.failed[{#NAMESPACE}/{#NAME}]<p>**Preprocessing**</p><ul><li><p>Prometheus pattern: `VALUE(kube_pod_status_phase{pod="{#NAME}", phase="Failed"})`</p><p>⛔️Custom on fail: Discard value</p></li></ul>|
-|Namespace [{#NAMESPACE}] Pod [{#NAME}] Phase: Unknown|<p>Pod is in unknown state.</p>|Dependent item|kube.pod.phase.unknown[{#NAMESPACE}/{#NAME}]<p>**Preprocessing**</p><ul><li><p>Prometheus pattern: `VALUE(kube_pod_status_phase{pod="{#NAME}", phase="Unknown"})`</p><p>⛔️Custom on fail: Discard value</p></li></ul>|
-|Namespace [{#NAMESPACE}] Pod [{#NAME}] Phase: Running|<p>Pod is in unknown state.</p>|Dependent item|kube.pod.phase.running[{#NAMESPACE}/{#NAME}]<p>**Preprocessing**</p><ul><li><p>Prometheus pattern: `VALUE(kube_pod_status_phase{pod="{#NAME}", phase="Running"})`</p><p>⛔️Custom on fail: Discard value</p></li></ul>|
-|Namespace [{#NAMESPACE}] Pod [{#NAME}]: Containers terminated|<p>Describes whether the container is currently in terminated state.</p>|Dependent item|kube.pod.containers_terminated[{#NAMESPACE}/{#NAME}]<p>**Preprocessing**</p><ul><li><p>Prometheus pattern: `SUM(kube_pod_container_status_terminated{pod="{#NAME}"})`</p><p>⛔️Custom on fail: Discard value</p></li></ul>|
-|Namespace [{#NAMESPACE}] Pod [{#NAME}]: Containers waiting|<p>Describes whether the container is currently in waiting state.</p>|Dependent item|kube.pod.containers_waiting[{#NAMESPACE}/{#NAME}]<p>**Preprocessing**</p><ul><li><p>Prometheus pattern: `SUM(kube_pod_container_status_waiting{pod="{#NAME}"})`</p><p>⛔️Custom on fail: Discard value</p></li></ul>|
-|Namespace [{#NAMESPACE}] Pod [{#NAME}]: Containers ready|<p>Describes whether the containers readiness check succeeded.</p>|Dependent item|kube.pod.containers_ready[{#NAMESPACE}/{#NAME}]<p>**Preprocessing**</p><ul><li><p>Prometheus pattern: `SUM(kube_pod_container_status_ready{pod="{#NAME}"})`</p><p>⛔️Custom on fail: Discard value</p></li></ul>|
-|Namespace [{#NAMESPACE}] Pod [{#NAME}]: Containers restarts|<p>The number of container restarts.</p>|Dependent item|kube.pod.containers_restarts[{#NAMESPACE}/{#NAME}]<p>**Preprocessing**</p><ul><li><p>Prometheus pattern: `SUM(kube_pod_container_status_restarts_total{pod="{#NAME}"})`</p><p>⛔️Custom on fail: Discard value</p></li></ul>|
-|Namespace [{#NAMESPACE}] Pod [{#NAME}]: Containers running|<p>Describes whether the container is currently in running state.</p>|Dependent item|kube.pod.containers_running[{#NAMESPACE}/{#NAME}]<p>**Preprocessing**</p><ul><li><p>Prometheus pattern: `SUM(kube_pod_container_status_running{pod="{#NAME}"})`</p><p>⛔️Custom on fail: Discard value</p></li></ul>|
+|Namespace [{#NAMESPACE}] Pod [{#NAME}] Phase: Failed|<p>Pod is in failed state.</p>|Dependent item|kube.pod.phase.failed[{#NAMESPACE}/{#NAME}]<p>**Preprocessing**</p><ul><li><p>Prometheus pattern: `The text is too long. Please see the template.`</p><p>⛔️Custom on fail: Discard value</p></li></ul>|
+|Namespace [{#NAMESPACE}] Pod [{#NAME}] Phase: Unknown|<p>Pod is in unknown state.</p>|Dependent item|kube.pod.phase.unknown[{#NAMESPACE}/{#NAME}]<p>**Preprocessing**</p><ul><li><p>Prometheus pattern: `The text is too long. Please see the template.`</p><p>⛔️Custom on fail: Discard value</p></li></ul>|
+|Namespace [{#NAMESPACE}] Pod [{#NAME}] Phase: Running|<p>Pod is in unknown state.</p>|Dependent item|kube.pod.phase.running[{#NAMESPACE}/{#NAME}]<p>**Preprocessing**</p><ul><li><p>Prometheus pattern: `The text is too long. Please see the template.`</p><p>⛔️Custom on fail: Discard value</p></li></ul>|
+|Namespace [{#NAMESPACE}] Pod [{#NAME}]: Containers terminated|<p>Describes whether the container is currently in terminated state.</p>|Dependent item|kube.pod.containers_terminated[{#NAMESPACE}/{#NAME}]<p>**Preprocessing**</p><ul><li><p>Prometheus pattern: `The text is too long. Please see the template.`</p><p>⛔️Custom on fail: Discard value</p></li></ul>|
+|Namespace [{#NAMESPACE}] Pod [{#NAME}]: Containers waiting|<p>Describes whether the container is currently in waiting state.</p>|Dependent item|kube.pod.containers_waiting[{#NAMESPACE}/{#NAME}]<p>**Preprocessing**</p><ul><li><p>Prometheus pattern: `The text is too long. Please see the template.`</p><p>⛔️Custom on fail: Discard value</p></li></ul>|
+|Namespace [{#NAMESPACE}] Pod [{#NAME}]: Containers ready|<p>Describes whether the containers readiness check succeeded.</p>|Dependent item|kube.pod.containers_ready[{#NAMESPACE}/{#NAME}]<p>**Preprocessing**</p><ul><li><p>Prometheus pattern: `The text is too long. Please see the template.`</p><p>⛔️Custom on fail: Discard value</p></li></ul>|
+|Namespace [{#NAMESPACE}] Pod [{#NAME}]: Containers restarts|<p>The number of container restarts.</p>|Dependent item|kube.pod.containers_restarts[{#NAMESPACE}/{#NAME}]<p>**Preprocessing**</p><ul><li><p>Prometheus pattern: `The text is too long. Please see the template.`</p><p>⛔️Custom on fail: Discard value</p></li></ul>|
+|Namespace [{#NAMESPACE}] Pod [{#NAME}]: Containers running|<p>Describes whether the container is currently in running state.</p>|Dependent item|kube.pod.containers_running[{#NAMESPACE}/{#NAME}]<p>**Preprocessing**</p><ul><li><p>Prometheus pattern: `The text is too long. Please see the template.`</p><p>⛔️Custom on fail: Discard value</p></li></ul>|
 |Namespace [{#NAMESPACE}] Pod [{#NAME}]: Ready|<p>Describes whether the pod is ready to serve requests.</p>|Dependent item|kube.pod.ready[{#NAMESPACE}/{#NAME}]<p>**Preprocessing**</p><ul><li><p>Prometheus pattern: `The text is too long. Please see the template.`</p><p>⛔️Custom on fail: Discard value</p></li></ul>|
 |Namespace [{#NAMESPACE}] Pod [{#NAME}]: Scheduled|<p>Describes the status of the scheduling process for the pod.</p>|Dependent item|kube.pod.scheduled[{#NAMESPACE}/{#NAME}]<p>**Preprocessing**</p><ul><li><p>Prometheus pattern: `The text is too long. Please see the template.`</p><p>⛔️Custom on fail: Discard value</p></li></ul>|
-|Namespace [{#NAMESPACE}] Pod [{#NAME}]: Unschedulable|<p>Describes the unschedulable status for the pod.</p>|Dependent item|kube.pod.unschedulable[{#NAMESPACE}/{#NAME}]<p>**Preprocessing**</p><ul><li><p>Prometheus pattern: `VALUE(kube_pod_status_unschedulable{pod="{#NAME}"})`</p><p>⛔️Custom on fail: Discard value</p></li></ul>|
+|Namespace [{#NAMESPACE}] Pod [{#NAME}]: Unschedulable|<p>Describes the unschedulable status for the pod.</p>|Dependent item|kube.pod.unschedulable[{#NAMESPACE}/{#NAME}]<p>**Preprocessing**</p><ul><li><p>Prometheus pattern: `The text is too long. Please see the template.`</p><p>⛔️Custom on fail: Discard value</p></li></ul>|
 |Namespace [{#NAMESPACE}] Pod [{#NAME}]: Containers CPU limits|<p>The limit on CPU cores to be used by a container.</p>|Dependent item|kube.pod.containers.limits.cpu[{#NAMESPACE}/{#NAME}]<p>**Preprocessing**</p><ul><li><p>Prometheus pattern: `The text is too long. Please see the template.`</p><p>⛔️Custom on fail: Discard value</p></li></ul>|
 |Namespace [{#NAMESPACE}] Pod [{#NAME}]: Containers memory limits|<p>The limit on memory to be used by a container.</p>|Dependent item|kube.pod.containers.limits.memory[{#NAMESPACE}/{#NAME}]<p>**Preprocessing**</p><ul><li><p>Prometheus pattern: `The text is too long. Please see the template.`</p><p>⛔️Custom on fail: Discard value</p></li></ul>|
 |Namespace [{#NAMESPACE}] Pod [{#NAME}]: Containers CPU requests|<p>The number of requested CPU cores by a container.</p>|Dependent item|kube.pod.containers.requests.cpu[{#NAMESPACE}/{#NAME}]<p>**Preprocessing**</p><ul><li><p>Prometheus pattern: `The text is too long. Please see the template.`</p><p>⛔️Custom on fail: Discard value</p></li></ul>|

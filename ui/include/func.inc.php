@@ -1596,19 +1596,20 @@ function detect_page_type($default = PAGE_TYPE_HTML) {
  *                                            ZBX_STYLE_MSG_GOOD, ZBX_STYLE_MSG_BAD, ZBX_STYLE_MSG_WARNING.
  * @param array       $messages               An array of messages.
  * @param string      $messages[]['message']  Message text.
- * @param string|null $title                  (optional) Message box title.
+ * @param mixed       $title                  (optional) Message box title.
  * @param bool        $show_close_box         (optional) Show or hide close button in error message box.
  * @param bool        $show_details           (optional) Show or hide message details.
  *
  * @return CTag
  */
-function makeMessageBox(string $class, array $messages, ?string $title = null, bool $show_close_box = true,
+function makeMessageBox(string $class, array $messages, mixed $title = null, bool $show_close_box = true,
 		bool $show_details = false): CTag {
 
 	$aria_labels = [
 		ZBX_STYLE_MSG_GOOD => _('Success message'),
-		ZBX_STYLE_MSG_BAD => _('Error message'),
-		ZBX_STYLE_MSG_WARNING => _('Warning message')
+		ZBX_STYLE_MSG_INFO => _('Info message'),
+		ZBX_STYLE_MSG_WARNING => _('Warning message'),
+		ZBX_STYLE_MSG_BAD => _('Error message')
 	];
 
 	$message_box = (new CTag('output', true))

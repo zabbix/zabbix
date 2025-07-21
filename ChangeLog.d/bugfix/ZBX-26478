@@ -1,1 +1,0 @@
-........S. [ZBX-26478] fixed Zabbix server crash when shutting down DB and sending alert using script media type with no parameters (askolmeisters)

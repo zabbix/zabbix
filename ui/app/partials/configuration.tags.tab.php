@@ -21,7 +21,7 @@
 
 $show_inherited_tags = array_key_exists('show_inherited_tags', $data) && $data['show_inherited_tags'];
 $with_automatic = array_key_exists('with_automatic', $data) && $data['with_automatic'];
-$data['readonly'] = array_key_exists('readonly', $data) ? $data['readonly'] : false;
+$data += ['readonly' => false];
 
 if (!$data['readonly']) {
 	$this->includeJsFile('configuration.tags.tab.js.php');
@@ -63,7 +63,7 @@ if (in_array($data['source'], ['trigger', 'trigger_prototype', 'item', 'httptest
 $table = new CPartial('tags.list.html', $data);
 
 $form_grid->addItem([
-	new CLabel('Tags'),
+	new CLabel(_('Tags')),
 	new CFormField((new CDiv($table))->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR))
 ]);
 
