@@ -130,7 +130,7 @@ static void     preprocessor_serialize_value(zbx_uint64_t itemid, unsigned char 
 		AGENT_RESULT *result, zbx_timespec_t *ts, unsigned char state, const char *error)
 {
 	zbx_uint32_t	data_len = 0, value_len, source_len;
-	unsigned char	var_type = ZBX_VARIANT_NONE, meta = 0;
+	unsigned char	var_type = ZBX_VARIANT_NONE, opt_flags = 0;
 	zbx_timespec_t	ts_local;
 	const char	*errmsg;
 
@@ -199,20 +199,22 @@ static void     preprocessor_serialize_value(zbx_uint64_t itemid, unsigned char 
 	zbx_serialize_prepare_value(data_len, ts->sec);
 	zbx_serialize_prepare_value(data_len, ts->ns);
 
+	zbx_serialize_prepare_value(data_len, opt_flags);
+
 	if (NULL != result && ZBX_ISSET_LOG(result))
 	{
+		opt_flags  |= ZBX_PP_VALUE_OPT_LOG;
 		zbx_serialize_prepare_str_len(data_len, result->log->source, source_len);
 		zbx_serialize_prepare_value(data_len, result->log->logeventid);
 		zbx_serialize_prepare_value(data_len, result->log->severity);
 		zbx_serialize_prepare_value(data_len, result->log->timestamp);
 	}
 
-	zbx_serialize_prepare_value(data_len, meta);
 	if (NULL != result && ZBX_ISSET_META(result))
 	{
+		opt_flags |= ZBX_PP_VALUE_OPT_META;
 		zbx_serialize_prepare_value(data_len, result->lastlogsize);
 		zbx_serialize_prepare_value(data_len, result->mtime);
-		meta = 1;
 	}
 
 	if (0 == preproc_alloc)
@@ -276,6 +278,8 @@ static void     preprocessor_serialize_value(zbx_uint64_t itemid, unsigned char 
 	ptr += zbx_serialize_value(ptr, ts->sec);
 	ptr += zbx_serialize_value(ptr, ts->ns);
 
+	ptr += zbx_serialize_value(ptr, opt_flags);
+
 	if (NULL != result && ZBX_ISSET_LOG(result))
 	{
 		ptr += zbx_serialize_str(ptr, result->log->source, source_len);
@@ -284,7 +288,6 @@ static void     preprocessor_serialize_value(zbx_uint64_t itemid, unsigned char 
 		ptr += zbx_serialize_value(ptr, result->log->timestamp);
 	}
 
-	ptr += zbx_serialize_value(ptr, meta);
 	if (NULL != result && ZBX_ISSET_META(result))
 	{
 		ptr += zbx_serialize_value(ptr, result->lastlogsize);
@@ -330,7 +333,7 @@ zbx_uint32_t    zbx_preprocessor_deserialize_value(const unsigned char *data, zb
 		zbx_pp_value_opt_t *opt)
 {
 	const unsigned char	*ptr = data;
-	unsigned char		meta;
+	unsigned char		opt_flags;
 
 	ptr += zbx_deserialize_value(ptr, itemid);
 	ptr += zbx_deserialize_value(ptr, value_type);
@@ -340,13 +343,12 @@ zbx_uint32_t    zbx_preprocessor_deserialize_value(const unsigned char *data, zb
 	ptr += zbx_deserialize_value(ptr, &ts->sec);
 	ptr += zbx_deserialize_value(ptr, &ts->ns);
 
-	opt->flags = ZBX_PP_VALUE_OPT_NONE;
+	ptr += zbx_deserialize_value(ptr, &opt_flags);
+	opt->flags = opt_flags;
 
-	if (ITEM_VALUE_TYPE_LOG == *value_type)
+	if (0 != (opt->flags & ZBX_PP_VALUE_OPT_LOG))
 	{
 		zbx_uint32_t	len;
-
-		opt->flags |= ZBX_PP_VALUE_OPT_LOG;
 
 		ptr += zbx_deserialize_str(ptr, &opt->source, len);
 		ptr += zbx_deserialize_value(ptr, &opt->logeventid);
@@ -354,10 +356,8 @@ zbx_uint32_t    zbx_preprocessor_deserialize_value(const unsigned char *data, zb
 		ptr += zbx_deserialize_value(ptr, &opt->timestamp);
 	}
 
-	ptr += zbx_deserialize_value(ptr, &meta);
-	if (0 != meta)
+	if (0 != (opt->flags & ZBX_PP_VALUE_OPT_META))
 	{
-		opt->flags |= ZBX_PP_VALUE_OPT_META;
 		ptr += zbx_deserialize_value(ptr, &opt->lastlogsize);
 		ptr += zbx_deserialize_value(ptr, &opt->mtime);
 	}
