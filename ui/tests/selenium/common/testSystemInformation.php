@@ -201,9 +201,12 @@ class testSystemInformation extends CWebTest {
 				"3. Zabbix server daemon not running;\n".
 				"4. Firewall is blocking TCP connection.\n".
 				"Connection refused";
-
 		$this->assertMessage(TEST_BAD, null, $error_text);
-		self::$skip_fields[] = $this->query('xpath://output[@class="msg-bad"]')->all();
+
+		$messages = $this->query('xpath://output[@class="msg-bad"]')->all();
+		foreach ($messages as $message) {
+			self::$skip_fields[] = $message->highlight();
+		}
 	}
 
 	/**
