@@ -132,10 +132,12 @@ class CApiTagHelper {
 	 * @param int    $tags[]['operator']
 	 * @param string $tags[]['value']
 	 * @param int    $evaltype
+	 * @param string $parent_alias
 	 *
 	 * @return string
 	 */
-	public static function addInheritedHostTagsWhereCondition(array $tags, int $evaltype): string {
+	public static function addInheritedHostTagsWhereCondition(array $tags, int $evaltype,
+			string $parent_alias): string {
 		// Swap tag operators to select templates normally should be excluded.
 		$swapped_filter = array_map(function ($tag) {
 			$swapping_map = [
@@ -242,18 +244,20 @@ class CApiTagHelper {
 
 			$negated_where_conditions[] = '(NOT EXISTS ('.
 				'SELECT NULL'.
-				' FROM host_tag, hosts_templates'.
-				' WHERE (h.hostid=host_tag.hostid'.
+				' FROM host_tag'.
+				' WHERE ('.$parent_alias.'.hostid=host_tag.hostid'.
 					' AND host_tag.tag='.zbx_dbstr($tag).
-						($tag_where['values'] ? ' AND ('.implode(' OR ', $tag_where['values']).')' : '').
-					')'.
-					($templateids_in
-						? ' OR (h.hostid=hosts_templates.hostid'.
-								' AND '.dbConditionInt('hosts_templates.templateid', array_keys($templateids_in)).
-							')'
-						: ''
-					).
+					($tag_where['values'] ? ' AND ('.implode(' OR ', $tag_where['values']).')' : '').
 				')'.
+			')'.
+			($templateids_in
+				? ' AND NOT EXISTS ('.
+					'SELECT NULL'.
+					' FROM hosts_templates'.
+					' WHERE '.$parent_alias.'.hostid=hosts_templates.hostid'.
+						' AND '.dbConditionInt('hosts_templates.templateid', array_keys($templateids_in)).
+				')'
+				: '').
 			')';
 		}
 
@@ -302,11 +306,18 @@ class CApiTagHelper {
 			$where_conditions[] = '(EXISTS ('.
 				'SELECT NULL'.
 				' FROM host_tag'.
-				' WHERE h.hostid=host_tag.hostid'.
+				' WHERE '.$parent_alias.'.hostid=host_tag.hostid'.
 					' AND host_tag.tag='.zbx_dbstr($tag_name).
 					($values ? ' AND ('.implode(' OR ', $values).')' : '').
 				')'.
-				($templateids_in ? ' OR '.dbConditionInt('ht2.templateid', array_keys($templateids_in)) : '').
+				($templateids_in
+					? ' OR EXISTS ('.
+						'SELECT NULL'.
+						' FROM hosts_templates'.
+						' WHERE '.$parent_alias.'.hostid=hosts_templates.hostid'.
+							' AND '.dbConditionInt('hosts_templates.templateid', array_keys($templateids_in)).
+					')'
+					: '').
 			')';
 		}
 
