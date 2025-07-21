@@ -21,6 +21,7 @@
 #include "zbxalgo.h"
 #include "zbxdbhigh.h"
 #include "zbxstr.h"
+#include "zbx_scripts_constants.h"
 
 /******************************************************************************
  *                                                                            *
@@ -234,12 +235,12 @@ int	substitute_script_macros(char **data, char *error, int maxerrlen, int script
 
 	switch (script_type)
 	{
-		case ZBX_SCRIPT_ON_HOST:
+		case ZBX_SCRIPT_SCOPE_HOST:
 			ret = zbx_substitute_macros(data, error, maxerrlen, &macro_host_script_resolv, um_handle,
 					userid, dc_host, &user_names_found, &user_names,
 					&item_hosts, &trigger_hosts, &cause_event, &cause_recovery_event);
 			break;
-		case ZBX_SCRIPT_ON_EVENT:
+		case ZBX_SCRIPT_SCOPE_EVENT:
 			ret = zbx_substitute_macros(data, error, maxerrlen, &macro_normal_script_resolv, um_handle,
 					event, r_event, userid, dc_host, tz, &user_names_found, &user_names,
 					&item_hosts, &trigger_hosts, &cause_event, &cause_recovery_event);
