@@ -1,1 +1,0 @@
-.......PS. [ZBX-26524] fixed threads to terminate gracefully when child process exits unexpectedly to avoid deadlocks (vso)

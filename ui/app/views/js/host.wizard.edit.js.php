@@ -1747,17 +1747,13 @@ window.host_wizard_edit = new class {
 			const tag_value = [tag, value].filter(val => val !== '').join(': ');
 
 			return this.#view_templates.tag.evaluateToElement({tag_value, hint_tag_value: escapeHtml(tag_value)});
-		};
+		}
 
 		if (template.tags.length) {
-			const temp_tag_list = tags_list.cloneNode(false);
+			const tags_max_height = 44;
+			const temp_tag_list = document.createElement('div');
 
-			temp_tag_list.style.visibility = 'hidden';
-			temp_tag_list.style.position = 'absolute';
-			temp_tag_list.style.width = '195px';
-			temp_tag_list.style.maxHeight = '40px';
-			temp_tag_list.style.pointerEvents = 'none';
-			temp_tag_list.style.zIndex = '-1';
+			temp_tag_list.classList.add('temp-tags-list');
 
 			document.body.appendChild(temp_tag_list);
 
@@ -1768,7 +1764,7 @@ window.host_wizard_edit = new class {
 
 				temp_tag_list.appendChild(tag_element);
 
-				if (temp_tag_list.scrollHeight > temp_tag_list.clientHeight) {
+				if (temp_tag_list.scrollHeight > tags_max_height) {
 					temp_tag_list.removeChild(tag_element);
 					all_fits = false;
 					break;
@@ -1780,7 +1776,7 @@ window.host_wizard_edit = new class {
 					tag_values: template.tags.map(tag_value => tag(tag_value).outerHTML).join('')
 				}));
 
-				if (temp_tag_list.scrollHeight > temp_tag_list.clientHeight) {
+				if (temp_tag_list.scrollHeight > tags_max_height) {
 					const tags = temp_tag_list.querySelectorAll(`.${ZBX_STYLE_TAG}`);
 
 					temp_tag_list.removeChild(tags[tags.length - 1]);
