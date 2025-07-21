@@ -928,12 +928,12 @@ uwMrOBKatg7CZ1Uenv1K3ioD5w==
 	 */
 	public function testUpdate(array $userdirectories, $expected_error) {
 		static $samlStorageInitialized = false;
-		
+
 		if (!$samlStorageInitialized) {
 			$this->setSamlCertificatesStorage('database');
 			$samlStorageInitialized = true;
 		}
-		
+
 		$userdirectories = self::resolveIds($userdirectories);
 		$this->call('userdirectory.update', $userdirectories, $expected_error);
 
