@@ -220,12 +220,7 @@ class CApiTagHelper {
 				foreach ($negated_tags[$tag_name] as $tag) {
 					$where['templateids'] += self::getMatchingTemplateids($tag, $db_template_tags);
 
-					if ($tag['operator'] == TAG_OPERATOR_NOT_EXISTS) {
-						$where['values'] = false;
-					}
-					elseif (is_array($where['values'])) {
-						$where['values'][] = self::makeTagWhereCondition($tag);
-					}
+					$where['values'][] = self::makeTagWhereCondition($tag);
 				}
 			}
 		});
@@ -281,20 +276,14 @@ class CApiTagHelper {
 			$values = [];
 
 			if ($tag_values === false) {
-				$templateids += self::getMatchingTemplateids(['tag' => $tag_name, 'operator' => TAG_OPERATOR_EXISTS],
-					$db_template_tags
-				);
+				$tag = ['tag' => $tag_name, 'operator' => TAG_OPERATOR_EXISTS];
+				$templateids += self::getMatchingTemplateids($tag, $db_template_tags);
 			}
 			else {
 				foreach ($tag_values as $tag) {
 					$templateids += self::getMatchingTemplateids($tag, $db_template_tags);
 
-					if ($tag['operator'] == TAG_OPERATOR_EXISTS) {
-						$values = false;
-					}
-					elseif (is_array($values)) {
-						$values[] = self::makeTagWhereCondition($tag);
-					}
+					$values[] = self::makeTagWhereCondition($tag);
 				}
 			}
 
