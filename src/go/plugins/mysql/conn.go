@@ -319,12 +319,16 @@ func (c *ConnManager) getTLSConfig(details *tlsconfig.Details) (*tls.Config, err
 
 	switch details.TLSConnect {
 	case "required":
-		tlsConf, err = c.getRequiredTLSConfig(details)
-		if err != nil {
-			return nil, errs.Wrap(err, "failed to get TLS config for required connection")
+		if details.TLSCaFile != "" {
+			c.log.Warningf("server CA will not be verified for %s", details.TLSConnect)
 		}
+
+		tlsConf = &tls.Config{InsecureSkipVerify: true} //nolint:gosec //intended behaviour
 	case "verify_ca":
-		details.Apply(tlsconfig.WithTLSSkipVerify(true), tlsconfig.WithTLSServerName(""))
+		details.Apply(
+			tlsconfig.WithTLSSkipVerify(true),
+			tlsconfig.WithTLSServerName(""),
+		)
 
 		tlsConf, err = details.GetTLSConfig()
 		if err != nil {
@@ -333,17 +337,9 @@ func (c *ConnManager) getTLSConfig(details *tlsconfig.Details) (*tls.Config, err
 
 		tlsConf.VerifyPeerCertificate = tlsconfig.VerifyPeerCertificateFunc("", tlsConf.RootCAs)
 	case "verify_full":
-		// moved from sdk workaround which leads to set ServerName to match the URI always.
-		url, err := sdkuri.New(details.RawURI, nil)
-		if err != nil {
-			return nil, errs.Wrap(err, "failed to parse uri")
-		}
-
-		details.Apply(tlsconfig.WithTLSSkipVerify(false), tlsconfig.WithTLSServerName(url.Host()))
-
 		tlsConf, err = details.GetTLSConfig()
 		if err != nil {
-			return nil, zbxerr.New("failed to get TLS config for verify_full connection").Wrap(err)
+			return nil, errs.Wrap(err, "failed to get TLS config for verify_full connection")
 		}
 
 		tlsConf.VerifyPeerCertificate = tlsconfig.VerifyPeerCertificateFunc(tlsConf.ServerName, tlsConf.RootCAs)
@@ -352,19 +348,6 @@ func (c *ConnManager) getTLSConfig(details *tlsconfig.Details) (*tls.Config, err
 	}
 
 	return tlsConf, nil
-}
-
-func (c *ConnManager) getRequiredTLSConfig(details *tlsconfig.Details) (*tls.Config, error) {
-	if details.TLSCaFile != "" {
-		c.log.Warningf("server CA will not be verified for %s", details.TLSConnect)
-	}
-
-	clientCerts, err := details.LoadCertificates()
-	if err != nil {
-		return nil, err
-	}
-
-	return &tls.Config{Certificates: clientCerts, InsecureSkipVerify: true}, nil
 }
 
 func createConnKey(uri *sdkuri.URI, params map[string]string) connKey {
@@ -392,6 +375,7 @@ func getTLSDetails(ck connKey) (*tlsconfig.Details, error) {
 	details := tlsconfig.NewDetails(
 		"",
 		ck.rawUri,
+		tlsconfig.WithTLSServerName(ck.uri.Host()),
 		tlsconfig.WithTLSCaFile(ck.tlsCA),
 		tlsconfig.WithTLSCertFile(ck.tlsCert),
 		tlsconfig.WithTLSKeyFile(ck.tlsKey),
