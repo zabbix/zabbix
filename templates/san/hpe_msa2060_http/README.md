@@ -31,7 +31,7 @@ This template has been tested on:
 |Name|Description|Default|
 |----|-----------|-------|
 |{$HPE.MSA.API.SCHEME}|<p>Connection scheme for API.</p>|`https`|
-|{$HPE.MSA.API.HOST}|<p>The hostname or IP address of the API host.</p>|`<SET API HOST>`|
+|{$HPE.MSA.API.HOST}|<p>The hostname or IP address of the API host.</p>||
 |{$HPE.MSA.API.PORT}|<p>Connection port for API.</p>|`443`|
 |{$HPE.MSA.DATA.TIMEOUT}|<p>Response timeout for API.</p>|`30s`|
 |{$HPE.MSA.API.USERNAME}|<p>Specify user name for API.</p>|`zabbix`|

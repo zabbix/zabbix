@@ -38,7 +38,7 @@ zabbix_export:
         >Refer to the [vendor documentation](https://cloud.google.com/iam/docs/creating-managing-service-account-keys).
         4. If you want to monitor Cloud SQL services - don't forget to activate the Cloud SQL Admin API.
         >Refer to the [vendor documentation](https://cloud.google.com/sql/docs/mysql/admin-api) for the details.
-        5. Copy the `project_id`, `private_key_id`, `private_key`, `client_email` from the JSON key file and add them to their corresponding macros `GCP project ID`, `Private key id`, `Private key data`, `Client e-mail` in host wizard configuration fields.
+        5. Copy the `project_id`, `private_key_id`, `private_key`, `client_email` from the JSON key file and add them to their corresponding host wizard configuration fields `GCP project ID`, `Private key id`, `Private key data`, `Client e-mail` in host wizard configuration fields.
         
         **Additional information**:
         
@@ -70,7 +70,7 @@ zabbix_export:
           [Cloud SQL](https://cloud.google.com/monitoring/api/metrics_gcp#gcp-cloudsql)
       vendor:
         name: Zabbix
-        version: 8.0-0
+        version: 8.0-1
       groups:
         - name: Templates/Cloud
       items:
