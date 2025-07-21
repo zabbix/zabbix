@@ -653,6 +653,26 @@ static int	dbconn_open(zbx_dbconn_t *db)
 
 	zbx_db_free_result(result);
 
+	result = dbconn_select(db, "select pg_is_in_recovery();");
+
+	if ((zbx_db_result_t)ZBX_DB_DOWN == result || NULL == result)
+	{
+		ret = (NULL == result) ? ZBX_DB_FAIL : ZBX_DB_DOWN;
+		goto out;
+	}
+
+	if (NULL != (row = zbx_db_fetch(result)))
+	{
+		if (0 == strcmp(row[0], "t"))
+		{
+			zbx_db_free_result(result);
+			ret = ZBX_DB_RONLY;
+			goto out;
+		}
+	}
+
+	zbx_db_free_result(result);
+
 	if (90000 <= db_get_server_version())
 	{
 		/* change the output format for values of type bytea from hex (the default) to escape */

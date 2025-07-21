@@ -280,7 +280,9 @@ ZBX_THREAD_ENTRY(zbx_dbsyncer_thread, args)
 
 	zbx_db_close();
 	zbx_unblock_signals(&orig_mask);
-	zbx_history_destroy();
+
+	if (0 != (info->program_type & ZBX_PROGRAM_TYPE_SERVER))
+		zbx_history_destroy();
 
 	if (SUCCEED != zbx_ipc_async_socket_flush(&rtc, dbsyncer_args->config_timeout))
 		zabbix_log(LOG_LEVEL_WARNING, "%s #%d cannot flush RTC socket", process_name, process_num);
