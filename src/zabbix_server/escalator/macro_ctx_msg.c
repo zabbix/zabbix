@@ -186,13 +186,13 @@ int	substitute_message_macros(char **data, char *error, int maxerrlen, int messa
 	{
 		case ZBX_MESSAGE_TYPE_RECOVERY:
 		case ZBX_MESSAGE_TYPE_NORMAL:
-			ret = zbx_substitute_spec_macros(token_search, data, error, maxerrlen,
+			ret = zbx_substitute_macros_ext_search(token_search, data, error, maxerrlen,
 					&macro_message_normal_resolv, um_handle, actionid, event, r_event, userid,
 					dc_host, alert, service_alarm, service, tz, item_hosts, &trigger_hosts,
 					&cause_event, &cause_recovery_event);
 			break;
 		case ZBX_MESSAGE_TYPE_UPDATE:
-			ret = zbx_substitute_spec_macros(token_search, data, error, maxerrlen,
+			ret = zbx_substitute_macros_ext_search(token_search, data, error, maxerrlen,
 					&macro_message_update_resolv, um_handle, actionid, event, r_event, userid,
 					dc_host, alert, service_alarm, service, tz, ack, item_hosts, &trigger_hosts,
 					&cause_event, &cause_recovery_event);

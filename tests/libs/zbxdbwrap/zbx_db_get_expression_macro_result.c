@@ -156,7 +156,7 @@ void	zbx_mock_test_entry(void **state)
 
 	um_handle = zbx_dc_open_user_macros();
 
-	returned_ret = zbx_substitute_spec_macros(ZBX_TOKEN_SEARCH_EXPRESSION_MACRO, &expression, NULL, 0,
+	returned_ret = zbx_substitute_macros_ext_search(ZBX_TOKEN_SEARCH_EXPRESSION_MACRO, &expression, NULL, 0,
 			&expression_resolv, um_handle, &event, &trigger_hosts);
 
 	zbx_dc_close_user_macros(um_handle);

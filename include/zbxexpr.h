@@ -286,7 +286,7 @@ char		*zbx_get_macro_from_func(const char *str, zbx_token_func_macro_t *fm, int 
 const char	**zbx_get_indexable_macros(void);
 
 int	zbx_substitute_macros(char **data, char *error, size_t maxerrlen, zbx_macro_resolv_func_t resolver, ...);
-int	zbx_substitute_spec_macros(zbx_token_search_t search, char **data, char *error, size_t maxerrlen,
+int	zbx_substitute_macros_ext_search(zbx_token_search_t search, char **data, char *error, size_t maxerrlen,
 		zbx_macro_resolv_func_t resolver, ...);
 
 /* macro function calculation */

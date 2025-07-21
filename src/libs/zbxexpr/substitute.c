@@ -294,7 +294,7 @@ int	zbx_substitute_macros(char **data, char *error, size_t maxerrlen, zbx_macro_
 	return ret;
 }
 
-int	zbx_substitute_spec_macros(zbx_token_search_t search, char **data, char *error, size_t maxerrlen,
+int	zbx_substitute_macros_ext_search(zbx_token_search_t search, char **data, char *error, size_t maxerrlen,
 		zbx_macro_resolv_func_t resolver, ...)
 {
 	int	ret;
