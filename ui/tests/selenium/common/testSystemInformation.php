@@ -18,6 +18,17 @@ require_once __DIR__.'/../../include/helpers/CDataHelper.php';
 
 class testSystemInformation extends CWebTest {
 
+	/**
+	 * Attach MessageBehavior to the test.
+	 *
+	 * @return array
+	 */
+	public function getBehaviors() {
+		return [
+			CMessageBehavior::class
+		];
+	}
+
 	const FAILOVER_DELAY = 60;
 
 	public static $active_lastaccess;
@@ -181,6 +192,7 @@ class testSystemInformation extends CWebTest {
 		CElementQuery::getDriver()->executeScript("arguments[0].textContent = '';",
 				[$this->query('xpath://table[@class="list-table sticky-header"]/tbody/tr[3]/td[1]')->one()]
 		);
+
 		// Check and hide the text of messages, because they contain ip addresses of the current host.
 		$error_text = "Connection to Zabbix server \"".$DB['SERVER'].":0\" refused. Possible reasons:\n".
 				"1. Incorrect \"NodeAddress\" or \"ListenPort\" in the \"zabbix_server.conf\" or server IP/DNS override".
@@ -189,11 +201,9 @@ class testSystemInformation extends CWebTest {
 				"3. Zabbix server daemon not running;\n".
 				"4. Firewall is blocking TCP connection.\n".
 				"Connection refused";
-		$messages = CMessageElement::find()->all();
-		foreach ($messages as $message) {
-			$this->assertTrue($message->hasLine($error_text));
-			self::$skip_fields[] = $message;
-		}
+
+		$this->assertMessage(TEST_BAD, null, $error_text);
+		self::$skip_fields[] = $this->query('xpath://output[@class="msg-bad"]')->all();
 	}
 
 	/**
