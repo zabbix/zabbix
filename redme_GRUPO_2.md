@@ -6,7 +6,11 @@ El grupo seleccionó este repositorio debido a su confiabilidad, documentación 
 
 Desde una perspectiva académica, esta elección se justifica por el principio de uso de fuentes confiables y verificables, promovido por las normas APA (American Psychological Association, 2020). Utilizar el repositorio oficial también evita el uso de versiones modificadas o no autorizadas que podrían comprometer la seguridad del sistema, lo cual es especialmente relevante en proyectos de ciberseguridad y monitoreo de redes.
 
+Así mismo, optar por el repositorio oficial permite el cumplimiento de buenas prácticas en la administración de sistemas, como la trazabilidad de los cambios y la auditoría del software instalado, aspectos esenciales en entornos corporativos o gubernamentales donde la transparencia y la rendición de cuentas son requerimientos normativos (Chapple, 2023).
+
 📚 Referencia en formato APA 7.ª edición
 Zabbix. (2025). Official Zabbix repository. https://www.zabbix.com/download
 
 American Psychological Association. (2020). Publication manual of the American Psychological Association (7.ª ed.). APA.
+
+Chapple, M. (2023). CompTIA Security+ Study Guide: Exam SY0-601 (8th ed.). Wiley.
