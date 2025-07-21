@@ -86,6 +86,13 @@ uwMrOBKatg7CZ1Uenv1K3ioD5w==
 		'userdirectoryid' => []
 	];
 
+	/**
+	 * The original contents of frontend configuration file before test.
+	 */
+	public function getConfFileContent() {
+		self::$conf_file_content = file_get_contents(self::CONF_PATH);
+	}
+
 	public static function createValidDataProvider() {
 		return [
 			'Create LDAP userdirectories' => [
@@ -920,6 +927,13 @@ uwMrOBKatg7CZ1Uenv1K3ioD5w==
 	 * @dataProvider updateValidDataProvider
 	 */
 	public function testUpdate(array $userdirectories, $expected_error) {
+		static $samlStorageInitialized = false;
+		
+		if (!$samlStorageInitialized) {
+			$this->setSamlCertificatesStorage('database');
+			$samlStorageInitialized = true;
+		}
+		
 		$userdirectories = self::resolveIds($userdirectories);
 		$this->call('userdirectory.update', $userdirectories, $expected_error);
 
@@ -1248,10 +1262,7 @@ uwMrOBKatg7CZ1Uenv1K3ioD5w==
 						]
 					]
 				],
-				'scim_status' => 1,
-				'idp_certificate' => self::SSL_CERTIFICATE,
-				'sp_certificate' => self::SSL_CERTIFICATE,
-				'sp_private_key' => self::SSL_PRIVATE_KEY
+				'scim_status' => 1
 			]
 		];
 		$response = CDataHelper::call('userdirectory.create', $data);
@@ -1299,15 +1310,11 @@ uwMrOBKatg7CZ1Uenv1K3ioD5w==
 	 *
 	 * @param string $type	file or database
 	 */
-	public function setSamlCertificatesStorage($type = 'database') {
+	public function setSamlCertificatesStorage($type = 'file') {
 		file_put_contents(self::CONF_PATH, '$SSO[\'CERT_STORAGE\']	= \''.$type.'\';'."\n", FILE_APPEND);
 
 		// Wait for frontend to get the new config from updated zabbix.conf.php file.
 		sleep((int)ini_get('opcache.revalidate_freq') + 1);
-	}
-
-	protected function getConfFileContent() {
-		self::$conf_file_content = file_get_contents(self::CONF_PATH);
 	}
 
 	/**
