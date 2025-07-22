@@ -102,8 +102,8 @@ int	zbx_diag_add_preproc_info(const struct zbx_json_parse *jp, struct zbx_json *
 				zbx_json_adduint64(json, "direct count", direct_num);
 				zbx_json_adduint64(json, "direct size", direct_sz);
 				zbx_json_adduint64(json, "history size", history_sz);
-				zbx_json_adduint64(json, "finished tasks peak", finished_peak_num);
 				zbx_json_adduint64(json, "pending tasks peak", pending_peak_num);
+				zbx_json_adduint64(json, "finished tasks peak", finished_peak_num);
 			}
 		}
 
