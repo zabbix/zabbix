@@ -65,7 +65,6 @@ typedef struct
 	zbx_pp_task_type_t	type;
 	zbx_pp_task_state_t	state;
 	zbx_uint64_t		itemid;
-	zbx_uint64_t		hostid;
 	zbx_uint64_t		time_ms;
 	void			*data;
 }
