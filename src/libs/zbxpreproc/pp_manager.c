@@ -150,7 +150,7 @@ static zbx_pp_manager_t	*zbx_pp_manager_create(int workers_num, zbx_pp_finished_
 	int	shift = 0;
 	zbx_uint64_t	config_cache_size = zbx_dc_get_cache_size();
 
-	while (ZBX_KIBIBYTE * 128 < config_cache_size && shift < ARRSIZE(slotmap) - 1)
+	while ((zbx_uint64_t)ZBX_KIBIBYTE * 128 < config_cache_size && (size_t)shift < ARRSIZE(slotmap) - 1)
 	{
 		config_cache_size >>= 1;
 		shift++;
@@ -954,7 +954,7 @@ static zbx_uint64_t	preprocessor_add_request(zbx_pp_manager_t *manager, zbx_ipc_
 	if (0 != tasks->values_num)
 		zbx_pp_manager_queue_value_preproc(manager, tasks);
 
-	queued_num = tasks->values_num;
+	queued_num = (zbx_uint64_t)tasks->values_num;
 	zbx_vector_pp_task_ptr_clear(tasks);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
@@ -1133,7 +1133,9 @@ static int	preprocessor_compare_top_stats(const void *d1, const void *d2)
 	const zbx_pp_top_stats_t *s1 = *(const zbx_pp_top_stats_t * const *)d1;
 	const zbx_pp_top_stats_t *s2 = *(const zbx_pp_top_stats_t * const *)d2;
 
-	return s2->num - s1->num;
+	ZBX_RETURN_IF_NOT_EQUAL(s2->num, s1->num);
+
+	return 0;
 }
 
 static void	zbx_pp_manager_items_preproc_peak(zbx_pp_manager_t *manager, zbx_vector_pp_top_stats_ptr_t *stats)
@@ -1217,7 +1219,7 @@ static void	preprocessor_reply_top_stats(zbx_pp_manager_t *manager, zbx_ipc_clie
 	else if (ZBX_IPC_PREPROCESSOR_TOP_PEAK == code)
 		zbx_pp_manager_items_preproc_peak(manager, &stats);
 	else
-		zbx_pp_manager_get_num_stats(manager, code, &stats);
+		zbx_pp_manager_get_num_stats(manager, (int)code, &stats);
 
 	if (limit > stats.values_num)
 		limit = stats.values_num;
