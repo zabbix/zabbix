@@ -14,3 +14,5 @@ Zabbix. (2025). Official Zabbix repository. https://www.zabbix.com/download
 American Psychological Association. (2020). Publication manual of the American Psychological Association (7.ª ed.). APA.
 
 Chapple, M. (2023). CompTIA Security+ Study Guide: Exam SY0-601 (8th ed.). Wiley.
+
+Prueba de conexión
