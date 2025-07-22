@@ -270,7 +270,8 @@ static int	query_xpath(zbx_variant_t *value, const char *params, int *is_empty, 
 	const xmlError	*pErr;
 	xmlBufferPtr	xmlBufferLocal;
 
-	if (NULL == (doc = xmlReadMemory(value->data.str, strlen(value->data.str), "noname.xml", NULL, 0)))
+	if (NULL == (doc = xmlReadMemory(value->data.str, strlen(value->data.str), "noname.xml", NULL,
+			XML_PARSE_NOERROR)))
 	{
 		if (NULL != (pErr = xmlGetLastError()))
 			*errmsg = zbx_dsprintf(*errmsg, "cannot parse xml value: %s", pErr->message);
