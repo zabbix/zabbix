@@ -2632,7 +2632,7 @@ Zabbix version: 7.4 and higher.
 ## Tested versions
 
 This template has been tested on:
-- AWS Backup vault service
+- AWS Backup Vault service
 
 ## Configuration
 
@@ -2784,16 +2784,16 @@ See the section below for a list of macros used for LLD filters.
 
 |Name|Description|Default|
 |----|-----------|-------|
-|{$AWS.DATA.TIMEOUT}|<p>API response timeout.</p>|`30s`|
-|{$AWS.PROXY}|<p>Sets HTTP proxy value. If this macro is empty then no proxy is used.</p>||
+|{$AWS.DATA.TIMEOUT}|<p>API response timeout.</p>|`60s`|
+|{$AWS.PROXY}|<p>Sets the HTTP proxy value. If this macro is empty, no proxy is used.</p>||
 |{$AWS.ACCESS.KEY.ID}|<p>Access key ID.</p>||
 |{$AWS.SECRET.ACCESS.KEY}|<p>Secret access key.</p>||
-|{$AWS.REGION}|<p>Amazon backup vault region code.</p>|`us-west-1`|
+|{$AWS.REGION}|<p>AWS backup vault region code.</p>|`us-west-1`|
 |{$AWS.AUTH_TYPE}|<p>Authorization method. Possible values: `access_key`, `assume_role`, `role_base`.</p>|`access_key`|
 |{$AWS.ASSUME.ROLE.AUTH.METADATA}|<p>Add when using the `assume_role` through instance metadata or environment authorization method. Possible values: `false`, `true`.</p>|`false`|
 |{$AWS.STS.REGION}|<p>Region used in assume role request.</p>|`us-east-1`|
 |{$AWS.ASSUME.ROLE.ARN}|<p>ARN assume role; add when using the `assume_role` authorization method.</p>||
-|{$AWS.BACKUP_VAULT.NAME}|<p>AWS Backup vault name.</p>||
+|{$AWS.BACKUP_VAULT.NAME}|<p>AWS backup vault name.</p>||
 |{$AWS.BACKUP_JOB.STATE.MATCHES}|<p>Filter of discoverable jobs by state.</p>|`.*`|
 |{$AWS.BACKUP_JOB.STATE.NOT_MATCHES}|<p>Filter to exclude discovered jobs by state.</p>|`CHANGE_IF_NEEDED`|
 |{$AWS.BACKUP_JOB.RESOURCE_TYPE.MATCHES}|<p>Filter of discoverable jobs by resource type.</p>|`.*`|
