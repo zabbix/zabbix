@@ -1,8 +1,0 @@
----
-test case: Dummy module
-in:
-  path: "../../../src/modules/dummy"
-  files:
-    - dummy.so
-out:
-  result: SUCCESS

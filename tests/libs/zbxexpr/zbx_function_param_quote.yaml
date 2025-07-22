@@ -1,9 +1,0 @@
----
-test case: Testing integer overflow
-in:
-  param: ""
-  forced: 1
-  escape: 0
-out:
-  result: SUCCEED
-...
