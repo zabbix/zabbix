@@ -1206,7 +1206,7 @@ void	pp_execute(zbx_pp_context_t *ctx, zbx_pp_item_preproc_t *preproc, zbx_pp_ca
 		const char *config_source_ip, zbx_variant_t *value_out, zbx_pp_result_t **results_out,
 		int *results_num_out)
 {
-	zbx_pp_result_t		*results;
+	zbx_pp_result_t		*results = NULL;
 	zbx_pp_history_t	*history_out, *history_in;
 	int			quote_error, results_num, action;
 	zbx_variant_t		value_raw;
@@ -1224,7 +1224,13 @@ void	pp_execute(zbx_pp_context_t *ctx, zbx_pp_item_preproc_t *preproc, zbx_pp_ca
 
 	if (NULL == cache)
 	{
-		zbx_variant_copy(value_out, value_in);
+		if (0 == preproc->dep_itemids_num)
+		{
+			*value_out = *value_in;
+			zbx_variant_set_none(value_in);
+		}
+		else
+			zbx_variant_copy(value_out, value_in);
 	}
 	else
 	{
@@ -1236,7 +1242,9 @@ void	pp_execute(zbx_pp_context_t *ctx, zbx_pp_item_preproc_t *preproc, zbx_pp_ca
 		value_in = &cache->value;
 	}
 
-	results = (zbx_pp_result_t *)zbx_malloc(NULL, sizeof(zbx_pp_result_t) * (size_t)preproc->steps_num);
+	if (NULL != results_out)
+		results = (zbx_pp_result_t *)zbx_malloc(NULL, sizeof(zbx_pp_result_t) * (size_t)preproc->steps_num);
+
 	if (NULL != preproc->history_cache)
 	{
 		history_out = zbx_pp_history_create(preproc->history_num);
@@ -1278,7 +1286,8 @@ void	pp_execute(zbx_pp_context_t *ctx, zbx_pp_item_preproc_t *preproc, zbx_pp_ca
 				ts, preproc->steps + i, history_value_in, &history_value_out, &history_ts,
 				config_source_ip, &error))
 		{
-			zbx_variant_copy(&value_raw, value_out);
+			if (NULL != results_out)
+				zbx_variant_copy(&value_raw, value_out);
 
 			if (ZBX_PREPROC_FAIL_DEFAULT == (action = pp_error_on_fail(um_handle, preproc->hostid,
 					value_out, error, preproc->steps + i)))
@@ -1294,7 +1303,8 @@ void	pp_execute(zbx_pp_context_t *ctx, zbx_pp_item_preproc_t *preproc, zbx_pp_ca
 
 		zbx_free(error);
 
-		pp_result_set(results + results_num++, value_out, action, &value_raw);
+		if (NULL != results_out)
+			pp_result_set(results + results_num++, value_out, action, &value_raw);
 
 		if (NULL != history_out && ZBX_VARIANT_NONE != history_value_out.type && ZBX_VARIANT_ERR != value_out->type)
 		{
@@ -1337,8 +1347,6 @@ void	pp_execute(zbx_pp_context_t *ctx, zbx_pp_item_preproc_t *preproc, zbx_pp_ca
 		*results_out = results;
 		*results_num_out = results_num;
 	}
-	else
-		pp_free_results(results, results_num);
 out:
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s(): value:'%.*s' type:%s", __func__, PP_VALUE_LOG_LIMIT,
 			zbx_variant_value_desc(value_out), zbx_variant_type_desc(value_out));
