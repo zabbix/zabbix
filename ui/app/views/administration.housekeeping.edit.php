@@ -179,12 +179,12 @@ $house_keeper_tab = (new CFormList())
 				break;
 
 			case ZBX_TIMESCALEDB_VERSION_LOWER_THAN_MINIMUM:
-				$timescaledb_error = _('Compression is not supported.').' '.
-					_s('%1$s Minimum required version is %2$s.', $timescaledb_label, $data['timescaledb_min_version']);
+				$timescaledb_error = _('Compression is not supported.').' '.$timescaledb_label.' '.
+					_s('Minimum required version is %1$s.', $data['timescaledb_min_version']);
 				break;
 
 			case ZBX_TIMESCALEDB_VERSION_NOT_SUPPORTED:
-				$timescaledb_error = _s('%1$s Should be at least %2$s.', $timescaledb_label,
+				$timescaledb_error = $timescaledb_label.' '._s('Should be at least %1$s.',
 					$data['timescaledb_min_supported_version']
 				);
 
@@ -194,15 +194,14 @@ $house_keeper_tab = (new CFormList())
 				break;
 
 			case ZBX_TIMESCALEDB_VERSION_HIGHER_THAN_MAXIMUM:
-				$timescaledb_error = _s('%1$s Should not be higher than %2$s.', $timescaledb_label,
+				$timescaledb_error = $timescaledb_label.' '._s('Should not be higher than %1$s.',
 					$data['timescaledb_max_version']
 				);
 				break;
 
 			case ZBX_TIMESCALEDB_LICENSE_NOT_COMMUNITY:
-				$timescaledb_error = _s('%1$s Detected license does not support compression. Compression is supported in TimescaleDB Community Edition.',
-					$timescaledb_label
-				);
+				$timescaledb_error = $timescaledb_label.' '.
+					_('Detected license does not support compression. Compression is supported in TimescaleDB Community Edition.');
 				break;
 
 			case ZBX_EXT_SUCCEED:
