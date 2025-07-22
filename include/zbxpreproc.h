@@ -53,11 +53,20 @@ typedef enum
 }
 zbx_pp_task_type_t;
 
+typedef enum
+{
+	ZBX_PP_TASK_PENDING,
+	ZBX_PP_TASK_FINISHED,
+}
+zbx_pp_task_state_t;
+
 typedef struct
 {
 	zbx_pp_task_type_t	type;
+	zbx_pp_task_state_t	state;
 	zbx_uint64_t		itemid;
 	zbx_uint64_t		hostid;
+	zbx_uint64_t		time_ms;
 	void			*data;
 }
 zbx_pp_task_t;
@@ -94,7 +103,7 @@ zbx_hashset_t	*zbx_pp_manager_items(zbx_pp_manager_t *manager);
 typedef struct
 {
 	zbx_uint64_t	itemid;
-	int		tasks_num;
+	zbx_int64_t	num;
 }
 zbx_pp_top_stats_t;
 
@@ -106,13 +115,19 @@ zbx_uint64_t	zbx_preprocessor_get_queue_size(void);
 void	zbx_preprocessor_get_size(struct zbx_json *json);
 void	zbx_preprocessor_get_worker_info(zbx_process_info_t *info);
 void	zbx_preprocess_item_value(zbx_uint64_t itemid, zbx_uint64_t hostid, unsigned char item_value_type,
-		unsigned char item_flags, AGENT_RESULT *result, zbx_timespec_t *ts, unsigned char state, char *error);
+		unsigned char item_flags, unsigned char preprocessing, AGENT_RESULT *result,
+		zbx_timespec_t *ts, unsigned char state, char *error);
 void	zbx_preprocessor_flush(void);
 int	zbx_preprocessor_get_diag_stats(zbx_uint64_t *preproc_num, zbx_uint64_t *pending_num,
 		zbx_uint64_t *finished_num, zbx_uint64_t *sequences_num, zbx_uint64_t *queued_num,
-		zbx_uint64_t *queued_sz, zbx_uint64_t *direct_num, zbx_uint64_t *direct_sz, char **error);
+		zbx_uint64_t *queued_sz, zbx_uint64_t *direct_num, zbx_uint64_t *direct_sz, zbx_uint64_t *history_sz,
+		char **error);
 int	zbx_preprocessor_get_top_sequences(int limit, zbx_vector_pp_top_stats_ptr_t *stats, char **error);
 int	zbx_preprocessor_get_top_peak(int limit, zbx_vector_pp_top_stats_ptr_t *stats, char **error);
+int	zbx_preprocessor_get_top_values_num(int limit, zbx_vector_pp_top_stats_ptr_t *stats, char **error);
+int	zbx_preprocessor_get_top_values_size(int limit, zbx_vector_pp_top_stats_ptr_t *stats, char **error);
+int	zbx_preprocessor_get_top_time_ms(int limit, zbx_vector_pp_top_stats_ptr_t *stats, char **error);
+int	zbx_preprocessor_get_top_total_ms(int limit, zbx_vector_pp_top_stats_ptr_t *stats, char **error);
 int	zbx_preprocessor_test(unsigned char value_type, const char *value, const zbx_timespec_t *ts,
 		unsigned char state, const zbx_vector_pp_step_ptr_t *steps, zbx_vector_pp_result_ptr_t *results,
 		zbx_pp_history_t *history, char **error);

@@ -20,6 +20,7 @@ import (
 	"testing"
 	"time"
 
+	"github.com/google/go-cmp/cmp"
 	"golang.zabbix.com/agent2/plugins/smart/mock"
 )
 
@@ -267,6 +268,293 @@ const (
 		}`
 )
 
+const (
+	ataSelfTestNotCapable = `
+	{
+		"json_format_version": [
+		  1,
+		  0
+		],
+		"smartctl": {
+		  "exit_status": 0
+		},
+		"device": {
+		  "name": "/dev/sda",
+		  "info_name": "/dev/sda",
+		  "type": "ata",
+		  "protocol": "ATA"
+		},
+		"model_name": "TS128GMTS800",
+		"serial_number": "D486530350",
+		"firmware_version": "O1225G",
+		"rotation_rate": 0,
+		"smart_status": {
+		  "passed": true
+		},
+		"ata_smart_data": {
+		  "capabilities": {
+			"values": [
+			  113,
+			  2
+			],
+			"self_tests_supported": false
+		  }
+		},
+		"ata_smart_attributes": {
+ 		  "table": [
+			{
+ 			  "name": "Raw_Read_Error_Rate",
+			  "value": 100,
+			  "raw": {
+				"value": 0,
+				"string": "0"
+			  }
+			},
+			{
+ 			  "name": "Reallocated_Sector_Ct",
+			  "raw": {
+				"value": 10,
+				"string": "10"
+			  }
+			},
+			{
+ 			  "name": "Zero_Norm_Value",
+			  "value": 0,
+			  "raw": {
+				"value": 15,
+				"string": "15"
+			  }
+			}			
+		  ]
+		},
+		"power_on_time": {
+		  "hours": 732
+		},
+ 		"temperature": {
+		  "current": 18
+		}
+	  }`
+
+	//nolint:gosec
+	ataSelfTestNotPassed = `
+	{
+		"json_format_version": [
+		  1,
+		  0
+		],
+		"smartctl": {
+		  "exit_status": 0
+		},
+		"device": {
+		  "name": "/dev/sda",
+		  "info_name": "/dev/sda",
+		  "type": "ata",
+		  "protocol": "ATA"
+		},
+		"model_name": "TS128GMTS800",
+		"serial_number": "D486530350",
+		"firmware_version": "O1225G",
+		"rotation_rate": 0,
+		"smart_status": {
+		  "passed": true
+		},
+		"ata_smart_data": {
+		  "self_test": {
+			"status": {
+			  "value": 80,
+			  "string": "completed with error (electrical test element)",
+			  "passed": false
+			}
+		  },
+		  "capabilities": {
+			"values": [
+			  113,
+			  2
+			],
+			"self_tests_supported": true
+		  }
+		},
+		"ata_smart_attributes": {
+ 		  "table": [
+			{
+ 			  "name": "Raw_Read_Error_Rate",
+			  "value": 100,
+			  "raw": {
+				"value": 0,
+				"string": "0"
+			  }
+			},
+			{
+ 			  "name": "Reallocated_Sector_Ct",
+			  "raw": {
+				"value": 10,
+				"string": "10"
+			  }
+			},
+			{
+ 			  "name": "Zero_Norm_Value",
+			  "value": 0,
+			  "raw": {
+				"value": 15,
+				"string": "15"
+			  }
+			}			
+		  ]
+		},
+		"power_on_time": {
+		  "hours": 732
+		},
+ 		"temperature": {
+		  "current": 18
+		}
+	  }`
+
+	ataSelfTestInProgress = `
+	{
+		"json_format_version": [
+		  1,
+		  0
+		],
+		"smartctl": {
+		  "exit_status": 0
+		},
+		"device": {
+		  "name": "/dev/sda",
+		  "info_name": "/dev/sda",
+		  "type": "ata",
+		  "protocol": "ATA"
+		},
+		"model_name": "TS128GMTS800",
+		"serial_number": "D486530350",
+		"firmware_version": "O1225G",
+		"rotation_rate": 0,
+		"smart_status": {
+		  "passed": true
+		},
+		"ata_smart_data": {
+		  "self_test": {
+			"status": {
+			  "value": 248,
+			   "string": "in progress, 80% remaining",
+               "remaining_percent": 80
+			}
+		  },
+		  "capabilities": {
+			"values": [
+			  113,
+			  2
+			],
+			"self_tests_supported": true
+		  }
+		},
+		"ata_smart_attributes": {
+ 		  "table": [
+			{
+ 			  "name": "Raw_Read_Error_Rate",
+			  "value": 100,
+			  "raw": {
+				"value": 0,
+				"string": "0"
+			  }
+			},
+			{
+ 			  "name": "Reallocated_Sector_Ct",
+			  "raw": {
+				"value": 10,
+				"string": "10"
+			  }
+			},
+			{
+ 			  "name": "Zero_Norm_Value",
+			  "value": 0,
+			  "raw": {
+				"value": 15,
+				"string": "15"
+			  }
+			}			
+		  ]
+		},
+		"power_on_time": {
+		  "hours": 732
+		},
+ 		"temperature": {
+		  "current": 18
+		}
+	  }`
+
+	ataSelfTestInterrupted = `
+	{
+		"json_format_version": [
+		  1,
+		  0
+		],
+		"smartctl": {
+		  "exit_status": 0
+		},
+		"device": {
+		  "name": "/dev/sda",
+		  "info_name": "/dev/sda",
+		  "type": "ata",
+		  "protocol": "ATA"
+		},
+		"model_name": "TS128GMTS800",
+		"serial_number": "D486530350",
+		"firmware_version": "O1225G",
+		"rotation_rate": 0,
+		"smart_status": {
+		  "passed": true
+		},
+		"ata_smart_data": {
+		  "self_test": {
+			"status": {
+			  "value": 16,
+			  "string": "was aborted by the host"
+			}
+		  },
+		  "capabilities": {
+			"values": [
+			  113,
+			  2
+			],
+			"self_tests_supported": true
+		  }
+		},
+		"ata_smart_attributes": {
+ 		  "table": [
+			{
+ 			  "name": "Raw_Read_Error_Rate",
+			  "value": 100,
+			  "raw": {
+				"value": 0,
+				"string": "0"
+			  }
+			},
+			{
+ 			  "name": "Reallocated_Sector_Ct",
+			  "raw": {
+				"value": 10,
+				"string": "10"
+			  }
+			},
+			{
+ 			  "name": "Zero_Norm_Value",
+			  "value": 0,
+			  "raw": {
+				"value": 15,
+				"string": "15"
+			  }
+			}			
+		  ]
+		},
+		"power_on_time": {
+		  "hours": 732
+		},
+ 		"temperature": {
+		  "current": 18
+		}
+	  }`
+)
+
 var (
 	table1    = table{"test1", 1, 11}
 	table2    = table{"test2", 2, 22}
@@ -280,10 +568,12 @@ func intToPtr(v int) *int {
 	return &v
 }
 
+func boolToPtr(v bool) *bool {
+	return &v
+}
+
 func Test_setSingleDiskFields(t *testing.T) {
 	var nilReference *bool
-
-	selftestSuccess := true
 
 	type args struct {
 		dev []byte
@@ -298,18 +588,19 @@ func Test_setSingleDiskFields(t *testing.T) {
 			"nvme_device",
 			args{[]byte(nvme)},
 			map[string]interface{}{
-				"critical_warning": 0,
-				"disk_type":        "nvme",
-				"error":            "",
-				"exit_status":      0,
-				"firmware_version": "HPS1",
-				"media_errors":     0,
-				"model_name":       "INTEL SSDPEKNW512G8H",
-				"percentage_used":  0,
-				"power_on_time":    2222,
-				"self_test_passed": nilReference,
-				"serial_number":    "BTNH115603K7512A",
-				"temperature":      25,
+				"critical_warning":      0,
+				"disk_type":             "nvme",
+				"error":                 "",
+				"exit_status":           0,
+				"firmware_version":      "HPS1",
+				"media_errors":          0,
+				"model_name":            "INTEL SSDPEKNW512G8H",
+				"percentage_used":       0,
+				"power_on_time":         2222,
+				"self_test_passed":      nilReference,
+				"self_test_in_progress": nilReference,
+				"serial_number":         "BTNH115603K7512A",
+				"temperature":           25,
 			},
 			false,
 		},
@@ -317,18 +608,19 @@ func Test_setSingleDiskFields(t *testing.T) {
 			"hdd_device",
 			args{[]byte(hdd)},
 			map[string]interface{}{
-				"critical_warning": 0,
-				"disk_type":        "hdd",
-				"error":            "",
-				"exit_status":      0,
-				"firmware_version": "CV26",
-				"media_errors":     0,
-				"model_name":       "ST1000VX000-1ES162",
-				"percentage_used":  0,
-				"power_on_time":    39153,
-				"self_test_passed": &selftestSuccess,
-				"serial_number":    "Z4Y7SJBD",
-				"temperature":      30,
+				"critical_warning":      0,
+				"disk_type":             "hdd",
+				"error":                 "",
+				"exit_status":           0,
+				"firmware_version":      "CV26",
+				"media_errors":          0,
+				"model_name":            "ST1000VX000-1ES162",
+				"percentage_used":       0,
+				"power_on_time":         39153,
+				"self_test_passed":      boolToPtr(true),
+				"self_test_in_progress": boolToPtr(false),
+				"serial_number":         "Z4Y7SJBD",
+				"temperature":           30,
 				"raw_read_error_rate": singleRequestAttribute{
 					Value: 182786912,
 					Raw:   "182786912",
@@ -344,18 +636,19 @@ func Test_setSingleDiskFields(t *testing.T) {
 			"ssd_device",
 			args{[]byte(ssd)},
 			map[string]interface{}{
-				"critical_warning": 0,
-				"disk_type":        "ssd",
-				"error":            "",
-				"exit_status":      0,
-				"firmware_version": "O1225G",
-				"media_errors":     0,
-				"model_name":       "TS128GMTS800",
-				"percentage_used":  0,
-				"power_on_time":    732,
-				"self_test_passed": &selftestSuccess,
-				"serial_number":    "D486530350",
-				"temperature":      18,
+				"critical_warning":      0,
+				"disk_type":             "ssd",
+				"error":                 "",
+				"exit_status":           0,
+				"firmware_version":      "O1225G",
+				"media_errors":          0,
+				"model_name":            "TS128GMTS800",
+				"percentage_used":       0,
+				"power_on_time":         732,
+				"self_test_passed":      boolToPtr(true),
+				"self_test_in_progress": boolToPtr(false),
+				"serial_number":         "D486530350",
+				"temperature":           18,
 				"raw_read_error_rate": singleRequestAttribute{
 					Value:           0,
 					Raw:             "0",
@@ -377,18 +670,19 @@ func Test_setSingleDiskFields(t *testing.T) {
 			"ssd_device_with_unknown_attribute",
 			args{[]byte(ssdUnknown)},
 			map[string]interface{}{
-				"critical_warning": 0,
-				"disk_type":        "ssd",
-				"error":            "",
-				"exit_status":      0,
-				"firmware_version": "O1225G",
-				"media_errors":     0,
-				"model_name":       "TS128GMTS800",
-				"percentage_used":  0,
-				"power_on_time":    732,
-				"self_test_passed": &selftestSuccess,
-				"serial_number":    "D486530350",
-				"temperature":      18,
+				"critical_warning":      0,
+				"disk_type":             "ssd",
+				"error":                 "",
+				"exit_status":           0,
+				"firmware_version":      "O1225G",
+				"media_errors":          0,
+				"model_name":            "TS128GMTS800",
+				"percentage_used":       0,
+				"power_on_time":         732,
+				"self_test_passed":      boolToPtr(true),
+				"self_test_in_progress": boolToPtr(false),
+				"serial_number":         "D486530350",
+				"temperature":           18,
 				"raw_read_error_rate": singleRequestAttribute{
 					Value:           0,
 					Raw:             "0",
@@ -413,6 +707,175 @@ func Test_setSingleDiskFields(t *testing.T) {
 
 			if !reflect.DeepEqual(gotOut, tt.wantOut) {
 				t.Errorf("setSingleDiskFields() = %v, want %v", gotOut, tt.wantOut)
+			}
+		})
+	}
+}
+
+func Test_setSingleDiskFieldsWithSelfTest(t *testing.T) {
+	t.Parallel()
+
+	var nilReference *bool
+
+	type args struct {
+		dev []byte
+	}
+
+	tests := []struct {
+		name    string
+		args    args
+		wantOut map[string]interface{}
+		wantErr bool
+	}{
+		{
+			"+valid", // self test in progress case
+			args{[]byte(ataSelfTestInProgress)},
+			map[string]interface{}{
+				"critical_warning":      0,
+				"disk_type":             "ssd",
+				"error":                 "",
+				"exit_status":           0,
+				"firmware_version":      "O1225G",
+				"media_errors":          0,
+				"model_name":            "TS128GMTS800",
+				"percentage_used":       0,
+				"power_on_time":         732,
+				"self_test_passed":      nilReference,
+				"self_test_in_progress": boolToPtr(true),
+				"serial_number":         "D486530350",
+				"temperature":           18,
+				"raw_read_error_rate": singleRequestAttribute{
+					Value:           0,
+					Raw:             "0",
+					NormalizedValue: intToPtr(100),
+				},
+				"reallocated_sector_ct": singleRequestAttribute{
+					Value: 10,
+					Raw:   "10",
+				},
+				"zero_norm_value": singleRequestAttribute{
+					Value:           15,
+					Raw:             "15",
+					NormalizedValue: intToPtr(0),
+				},
+			},
+			false,
+		},
+		{
+			"+ataSelfTestNotCapable",
+			args{[]byte(ataSelfTestNotCapable)},
+			map[string]interface{}{
+				"critical_warning":      0,
+				"disk_type":             "ssd",
+				"error":                 "",
+				"exit_status":           0,
+				"firmware_version":      "O1225G",
+				"media_errors":          0,
+				"model_name":            "TS128GMTS800",
+				"percentage_used":       0,
+				"power_on_time":         732,
+				"self_test_passed":      nilReference,
+				"self_test_in_progress": nilReference,
+				"serial_number":         "D486530350",
+				"temperature":           18,
+				"raw_read_error_rate": singleRequestAttribute{
+					Value:           0,
+					Raw:             "0",
+					NormalizedValue: intToPtr(100),
+				},
+				"reallocated_sector_ct": singleRequestAttribute{
+					Value: 10,
+					Raw:   "10",
+				},
+				"zero_norm_value": singleRequestAttribute{
+					Value:           15,
+					Raw:             "15",
+					NormalizedValue: intToPtr(0),
+				},
+			},
+			false,
+		},
+		{
+			"+ataSelfTestNotPassed",
+			args{[]byte(ataSelfTestNotPassed)},
+			map[string]interface{}{
+				"critical_warning":      0,
+				"disk_type":             "ssd",
+				"error":                 "",
+				"exit_status":           0,
+				"firmware_version":      "O1225G",
+				"media_errors":          0,
+				"model_name":            "TS128GMTS800",
+				"percentage_used":       0,
+				"power_on_time":         732,
+				"self_test_passed":      boolToPtr(false),
+				"self_test_in_progress": boolToPtr(false),
+				"serial_number":         "D486530350",
+				"temperature":           18,
+				"raw_read_error_rate": singleRequestAttribute{
+					Value:           0,
+					Raw:             "0",
+					NormalizedValue: intToPtr(100),
+				},
+				"reallocated_sector_ct": singleRequestAttribute{
+					Value: 10,
+					Raw:   "10",
+				},
+				"zero_norm_value": singleRequestAttribute{
+					Value:           15,
+					Raw:             "15",
+					NormalizedValue: intToPtr(0),
+				},
+			},
+			false,
+		},
+		{
+			"+ataSelfTestInterrupted",
+			args{[]byte(ataSelfTestInterrupted)},
+			map[string]interface{}{
+				"critical_warning":      0,
+				"disk_type":             "ssd",
+				"error":                 "",
+				"exit_status":           0,
+				"firmware_version":      "O1225G",
+				"media_errors":          0,
+				"model_name":            "TS128GMTS800",
+				"percentage_used":       0,
+				"power_on_time":         732,
+				"self_test_passed":      boolToPtr(false),
+				"self_test_in_progress": boolToPtr(false),
+				"serial_number":         "D486530350",
+				"temperature":           18,
+				"raw_read_error_rate": singleRequestAttribute{
+					Value:           0,
+					Raw:             "0",
+					NormalizedValue: intToPtr(100),
+				},
+				"reallocated_sector_ct": singleRequestAttribute{
+					Value: 10,
+					Raw:   "10",
+				},
+				"zero_norm_value": singleRequestAttribute{
+					Value:           15,
+					Raw:             "15",
+					NormalizedValue: intToPtr(0),
+				},
+			},
+			false,
+		},
+	}
+	for _, tt := range tests {
+		tt := tt
+		t.Run(tt.name, func(t *testing.T) {
+			t.Parallel()
+
+			gotOut, err := setSingleDiskFields(tt.args.dev)
+			if (err != nil) != tt.wantErr {
+				t.Fatalf("setSingleDiskFields() w/ self-test error = %s, wantErr %t", err.Error(), tt.wantErr)
+			}
+
+			if diff := cmp.Diff(tt.wantOut, gotOut); diff != "" {
+				t.Fatalf("setSingleDiskFields() %s", diff)
 			}
 		})
 	}
@@ -732,7 +1195,6 @@ func Test_validateParams(t *testing.T) {
 	}
 
 	for _, tt := range tests {
-		tt := tt
 		t.Run(tt.name, func(t *testing.T) {
 			t.Parallel()
 
@@ -815,7 +1277,6 @@ func Test_validateExport(t *testing.T) {
 	}
 
 	for _, tt := range tests {
-		tt := tt
 		t.Run(tt.name, func(t *testing.T) {
 			lastVerCheck = tt.fields.lastVerCheck
 
