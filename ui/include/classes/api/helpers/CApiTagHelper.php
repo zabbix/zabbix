@@ -227,7 +227,8 @@ class CApiTagHelper {
 			}
 		});
 
-		$negated_where_conditions = [];
+		$where_conditions = [];
+
 		foreach ($negated_conditions as $tag => $tag_where) {
 
 			$templateids_in = [];
@@ -242,7 +243,7 @@ class CApiTagHelper {
 				]);
 			}
 
-			$negated_where_conditions[] = '(NOT EXISTS ('.
+			$where_conditions[] = '(NOT EXISTS ('.
 				'SELECT NULL'.
 				' FROM host_tag'.
 				' WHERE ('.$parent_alias.'.hostid=host_tag.hostid'.
@@ -259,19 +260,6 @@ class CApiTagHelper {
 				')'
 				: '').
 			')';
-		}
-
-		$where_conditions = [];
-
-		if ($negated_where_conditions) {
-			if ($evaltype == TAG_EVAL_TYPE_AND_OR) {
-				$where_conditions[] = implode(' AND ', $negated_where_conditions);
-			}
-			else {
-				$where_conditions = array_map(function ($condition) {
-					return $condition;
-				}, $negated_where_conditions);
-			}
 		}
 
 		// Make 'where' conditions for inclusive filter tags.
