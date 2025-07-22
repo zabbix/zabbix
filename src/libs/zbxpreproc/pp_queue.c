@@ -61,9 +61,9 @@ int	pp_task_queue_init(zbx_pp_queue_t *queue, int slots_num, char **error)
 	zbx_list_create(&queue->pending);
 	zbx_list_init_pool(&queue->pending, slots_num);
 	zbx_list_create(&queue->immediate);
-	zbx_list_init_pool(&queue->immediate, slots_num);
+	zbx_list_init_pool(&queue->immediate, slots_num / 4);
 	zbx_list_create(&queue->finished);
-	zbx_list_init_pool(&queue->finished, slots_num);
+	zbx_list_init_pool(&queue->finished, slots_num / 2);
 
 	zbx_hashset_create(&queue->sequences, 100, ZBX_DEFAULT_UINT64_HASH_FUNC, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
 	zbx_hashset_create(&queue->tasks, 100, ZBX_DEFAULT_UINT64_HASH_FUNC, ZBX_DEFAULT_UINT64_COMPARE_FUNC);

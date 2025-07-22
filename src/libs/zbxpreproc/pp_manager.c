@@ -144,18 +144,19 @@ static zbx_pp_manager_t	*zbx_pp_manager_create(int workers_num, zbx_pp_finished_
 	manager = (zbx_pp_manager_t *)zbx_malloc(NULL, sizeof(zbx_pp_manager_t));
 	memset(manager, 0, sizeof(zbx_pp_manager_t));
 
-	/* calculate number of slots based on configuration cache size:                 */
-	/*   128KiB->128, 256KiB->128, 512KiB->256, 1MiB->256, 2MiB->512, 4MiB->512 ... */
-	int		slots_num = 128;
+	/* calculate number of slots based on configuration cache size: */
+	/*   128KiB->512 ... 32MiB->32KiB ... 32+GiB->512KiB            */
+	int	slotmap[] = {9, 10, 11, 12, 12, 13, 14, 14, 15, 15, 16, 16, 16, 17, 17, 18, 18, 18, 19};
+	int	shift = 0;
 	zbx_uint64_t	config_cache_size = zbx_dc_get_cache_size();
 
-	while (ZBX_KIBIBYTE * 256 < config_cache_size)
+	while (ZBX_KIBIBYTE * 128 < config_cache_size && shift < ARRSIZE(slotmap) - 1)
 	{
-		config_cache_size >>= 2;
-		slots_num <<= 1;
+		config_cache_size >>= 1;
+		shift++;
 	}
 
-	if (SUCCEED != pp_task_queue_init(&manager->queue, slots_num, error))
+	if (SUCCEED != pp_task_queue_init(&manager->queue, 1 << slotmap[shift], error))
 		goto out;
 
 	manager->timekeeper = zbx_timekeeper_create(workers_num, NULL);
