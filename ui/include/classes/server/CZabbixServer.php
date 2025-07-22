@@ -365,7 +365,7 @@ class CZabbixServer {
 	}
 
 	public function isRunning(): bool {
-		$active_node = API::HaNode()->get([
+		$active_node = API::getApiService('hanode')->get([
 			'output' => ['address', 'port', 'lastaccess'],
 			'filter' => ['status' => ZBX_NODE_STATUS_ACTIVE],
 			'sortfield' => 'lastaccess',
@@ -394,7 +394,9 @@ class CZabbixServer {
 			return false;
 		}
 
-		return true;
+		$api_input_rules = ['type' => API_OBJECT, 'fields' => []];
+
+		return CApiInputValidator::validate($api_input_rules, $response, '/', $this->error);
 	}
 
 	/**

@@ -212,17 +212,17 @@ class CControllerItemPrototypeUpdate extends CControllerItemPrototype {
 			'delay_flex' => ['objects', 'fields' => [
 				'type' => ['integer', 'in' => [ITEM_DELAY_FLEXIBLE, ITEM_DELAY_SCHEDULING]],
 				'schedule' => ['string', 'required', 'not_empty',
-					'use' => [CSchedulingIntervalParser::class, ['usermacros' => true]],
+					'use' => [CSchedulingIntervalParser::class, ['usermacros' => true, 'lldmacros' => true]],
 					'messages' => ['use' => _('Invalid interval.')],
 					'when' => ['type', 'in' => [ITEM_DELAY_SCHEDULING]]
 				],
 				'delay' => ['string', 'required', 'not_empty',
-					'use' => [CSimpleIntervalParser::class, ['usermacros' => true]],
+					'use' => [CSimpleIntervalParser::class, ['usermacros' => true, 'lldmacros' => true]],
 					'messages' => ['use' => _('Invalid interval.')],
 					'when' => ['type', 'in' => [ITEM_DELAY_FLEXIBLE]]
 				],
 				'period' => ['string', 'required', 'not_empty',
-					'use' => [CTimePeriodParser::class, ['usermacros' => true]],
+					'use' => [CTimePeriodParser::class, ['usermacros' => true, 'lldmacros' => true]],
 					'messages' => ['use' => _('Invalid period.')],
 					'when' => ['type', 'in' => [ITEM_DELAY_FLEXIBLE]]
 				]
