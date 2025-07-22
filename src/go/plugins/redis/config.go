@@ -61,6 +61,11 @@ func (*Plugin) Validate(options any) error {
 		return errs.Wrap(err, "plugin config validation failed")
 	}
 
+	err = opts.Default.runSourceConsistencyValidation()
+	if err != nil {
+		return errs.Wrap(err, "plugin config validation failed on default configuration")
+	}
+
 	for sessionName, s := range opts.Sessions {
 		err = s.validateSession(&opts.Default)
 		if err != nil {
