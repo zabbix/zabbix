@@ -235,8 +235,8 @@ zabbix_export:
             			request = new HttpRequest(),
             			url = 'https://' + host + canonical_uri + '?' + params;
             
-            		if (AWS.params.auth_type === 'role_base' || AWS.params.auth_type === 'assume_role_metadata' || (AWS.params.auth_type === 'assume_role' & !params.includes('AssumeRole'))) {
-            			request.addHeader('X-Amz-Security-Token: ' + (AWS.params.auth_type === 'role_base' ? AWS.params.Token : AWS.params.SessionToken));
+            		if (typeof AWS.params.proxy !== 'undefined' && AWS.params.proxy !== '') {
+            			request.setProxy(AWS.params.proxy);
             		}
             
             		request.addHeader('x-amz-date: ' + amzdate);
@@ -246,7 +246,7 @@ zabbix_export:
             		request.addHeader('Content-Encoding: amz-1.0');
             		request.addHeader('Authorization: ' + 'AWS4-HMAC-SHA256 Credential=' + AWS.params.AccessKeyId + '/' + credential_scope + ', ' + 'SignedHeaders=' + signed_headers + ', ' + 'Signature=' + hmac('sha256', key, request_string));
             
-            		if (AWS.params.auth_type === 'role_base' || (AWS.params.auth_type === 'assume_role' & !params.includes('AssumeRole'))) {
+            		if (AWS.params.auth_type === 'role_base' || AWS.params.auth_type === 'assume_role_metadata' || (AWS.params.auth_type === 'assume_role' & !params.includes('AssumeRole'))) {
             			request.addHeader('X-Amz-Security-Token: ' + (AWS.params.auth_type === 'role_base' ? AWS.params.Token : AWS.params.SessionToken));
             		}
             
