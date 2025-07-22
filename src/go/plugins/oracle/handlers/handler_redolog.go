@@ -35,12 +35,12 @@ func RedoLogHandler(ctx context.Context, conn dbconn.OraClient, _ map[string]str
 			STATUS IN ('INACTIVE', 'UNUSED')
 	`)
 	if err != nil {
-		return nil, errs.WrapConst(err, zbxerr.ErrorCannotFetchData) //nolint:wrapcheck
+		return nil, errs.WrapConst(err, zbxerr.ErrorCannotFetchData)
 	}
 
 	err = row.Scan(&redoLog)
 	if err != nil {
-		return nil, errs.WrapConst(err, zbxerr.ErrorCannotFetchData) //nolint:wrapcheck
+		return nil, errs.WrapConst(err, zbxerr.ErrorCannotFetchData)
 	}
 
 	return redoLog, nil

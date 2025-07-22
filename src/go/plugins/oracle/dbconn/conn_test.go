@@ -21,6 +21,7 @@ import (
 	"time"
 
 	"github.com/google/go-cmp/cmp"
+	"golang.zabbix.com/agent2/plugins/oracle/mock"
 )
 
 func Test_splitUserPrivilege(t *testing.T) {
@@ -180,7 +181,7 @@ func Test_setCustomQuery(t *testing.T) { //nolint:tparallel
 				}
 			}
 
-			gotYarn := setCustomQuery(&mockLogger{}, tt.args.enabled, tt.args.path)
+			gotYarn := setCustomQuery(&mock.MockLogger{}, tt.args.enabled, tt.args.path)
 			gotMap := gotYarn.All()
 
 			if cmp.Diff(gotMap, tt.want.wantOut) != "" {
@@ -262,7 +263,7 @@ func TestConnManager_setConn(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			t.Parallel()
 
-			connMgr := NewConnManager(&mockLogger{}, &opt)
+			connMgr := NewConnManager(&mock.MockLogger{}, &opt)
 			defer connMgr.Destroy()
 
 			for _, ff := range tt.fields {
@@ -353,7 +354,7 @@ func TestConnManager_getConn(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			t.Parallel()
 
-			connMgr := NewConnManager(&mockLogger{}, &opt)
+			connMgr := NewConnManager(&mock.MockLogger{}, &opt)
 			defer connMgr.Destroy()
 
 			for _, ff := range tt.fields {
@@ -409,7 +410,8 @@ func TestConnManager_closeUnused(t *testing.T) {
 				CustomQueriesPath:    "",
 			}
 
-			connMgr := NewConnManager(&mockLogger{}, &opt)
+			connMgr := NewConnManager(&mock.MockLogger{}, &opt)
+			connMgr.versionCheckF = mock.ServerVersionMock
 			defer connMgr.Destroy()
 
 			conn, err := connMgr.GetConnection(
@@ -444,7 +446,8 @@ func TestConnManager_closeAll(t *testing.T) { //nolint:tparallel
 		CustomQueriesPath:    "",
 	}
 
-	connMgr := NewConnManager(&mockLogger{}, &opt)
+	connMgr := NewConnManager(&mock.MockLogger{}, &opt)
+	connMgr.versionCheckF = mock.ServerVersionMock
 	defer connMgr.Destroy()
 
 	type fields struct {
@@ -491,6 +494,7 @@ func TestConnManager_closeAll(t *testing.T) { //nolint:tparallel
 	}
 }
 
+//nolint:gocyclo,cyclop
 func TestConnManager_GetConnection(t *testing.T) {
 	t.Parallel()
 
@@ -516,10 +520,11 @@ func TestConnManager_GetConnection(t *testing.T) {
 	}
 
 	tests := []struct {
-		name   string
-		fields fields
-		args   args
-		want   want
+		name    string
+		fields  fields
+		args    args
+		want    want
+		wantErr bool
 	}{
 		{
 			"+returnExisting",
@@ -531,6 +536,7 @@ func TestConnManager_GetConnection(t *testing.T) {
 			},
 			args{newConnDetNoVersCheck(t, "zabbix_mon", "")},
 			want{"zabbix_mon", 2},
+			false,
 		},
 		{
 			"+createNew",
@@ -541,6 +547,14 @@ func TestConnManager_GetConnection(t *testing.T) {
 			},
 			args{newConnDetNoVersCheck(t, "zabbix_mon", "")},
 			want{"zabbix_mon", 2},
+			false,
+		},
+		{
+			"-connErr",
+			fields{},
+			args{newConnDetNoVersCheck(t, "zabbix_mon", "err")},
+			want{},
+			true,
 		},
 	}
 
@@ -548,12 +562,13 @@ func TestConnManager_GetConnection(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			t.Parallel()
 
-			connMgr := NewConnManager(&mockLogger{}, &opt)
+			connMgr := NewConnManager(&mock.MockLogger{}, &opt)
+			connMgr.versionCheckF = mock.ServerVersionMock
 			defer connMgr.Destroy()
 
 			for _, v := range tt.fields.conDet {
 				conn, err := connMgr.GetConnection(v)
-				if err != nil || conn == nil {
+				if (err != nil || conn == nil) && !tt.wantErr {
 					t.Fatalf(
 						"ConnManager.GetConnection(): should create a connection, but got error: %s",
 						err.Error(),
@@ -568,13 +583,23 @@ func TestConnManager_GetConnection(t *testing.T) {
 				)
 			}
 
-			gotOraConn, _ := connMgr.GetConnection(tt.args.conDet)
+			gotOraConn, err := connMgr.GetConnection(tt.args.conDet)
+			if err != nil {
+				if !tt.wantErr {
+					t.Fatalf("ConnManager.GetConnection(): error = %v", err)
+				}
+
+				return
+			}
+
 			if diff := cmp.Diff(tt.want.username, gotOraConn.username); diff != "" {
 				t.Errorf("ConnManager.GetConnection(): returned connection mismatch = %s", diff)
 			}
 
 			if diff := cmp.Diff(tt.want.count, len(connMgr.Connections)); diff != "" {
-				t.Errorf("ConnManager.GetConnection(): connection count mismatch = %s", diff)
+				if !tt.wantErr {
+					t.Errorf("ConnManager.GetConnection(): connection count mismatch = %s", diff)
+				}
 			}
 		})
 	}

@@ -30,12 +30,12 @@ func CdbHandler(ctx context.Context, conn dbconn.OraClient, params map[string]st
 
 	row, err := conn.QueryRow(ctx, query, args...)
 	if err != nil {
-		return nil, errs.WrapConst(err, zbxerr.ErrorCannotFetchData) //nolint:wrapcheck
+		return nil, errs.WrapConst(err, zbxerr.ErrorCannotFetchData)
 	}
 
 	err = row.Scan(&cdbInfo)
 	if err != nil {
-		return nil, errs.WrapConst(err, zbxerr.ErrorCannotFetchData) //nolint:wrapcheck
+		return nil, errs.WrapConst(err, zbxerr.ErrorCannotFetchData)
 	}
 
 	if cdbInfo == "" {

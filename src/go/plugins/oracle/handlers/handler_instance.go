@@ -41,12 +41,12 @@ func InstanceHandler(ctx context.Context, conn dbconn.OraClient, _ map[string]st
 			V$INSTANCE
 	`)
 	if err != nil {
-		return nil, errs.WrapConst(err, zbxerr.ErrorCannotFetchData) //nolint:wrapcheck
+		return nil, errs.WrapConst(err, zbxerr.ErrorCannotFetchData)
 	}
 
 	err = row.Scan(&instanceStats)
 	if err != nil {
-		return nil, errs.WrapConst(err, zbxerr.ErrorCannotFetchData) //nolint:wrapcheck
+		return nil, errs.WrapConst(err, zbxerr.ErrorCannotFetchData)
 	}
 
 	return instanceStats, nil

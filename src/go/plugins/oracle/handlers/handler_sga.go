@@ -93,12 +93,12 @@ func SgaHandler(ctx context.Context, conn dbconn.OraClient, _ map[string]string,
 			) v
 	`)
 	if err != nil {
-		return nil, errs.WrapConst(err, zbxerr.ErrorCannotFetchData) //nolint:wrapcheck
+		return nil, errs.WrapConst(err, zbxerr.ErrorCannotFetchData)
 	}
 
 	err = row.Scan(&sga)
 	if err != nil {
-		return nil, errs.WrapConst(err, zbxerr.ErrorCannotFetchData) //nolint:wrapcheck
+		return nil, errs.WrapConst(err, zbxerr.ErrorCannotFetchData)
 	}
 
 	return sga, nil

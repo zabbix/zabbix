@@ -1,4 +1,4 @@
-//go:build oracle_tests
+//go:build integration_tests
 
 /*
 ** Copyright (C) 2001-2025 Zabbix SIA
@@ -25,6 +25,7 @@ import (
 	"time"
 
 	"github.com/google/go-cmp/cmp"
+	"golang.zabbix.com/agent2/plugins/oracle/mock"
 )
 
 var sqls = []struct { //nolint:gochecknoglobals
@@ -64,7 +65,7 @@ func TestOraConn_Query(t *testing.T) { //nolint:tparallel
 		CustomQueriesPath:    "",
 	}
 
-	connMgr := NewConnManager(&mockLogger{}, &opt)
+	connMgr := NewConnManager(&mock.MockLogger{}, &opt)
 	defer connMgr.Destroy()
 
 	oraCon, err := connMgr.GetConnection(newConnDet(t, "zabbix_mon", ""))
@@ -144,7 +145,7 @@ func TestOraConn_Query(t *testing.T) { //nolint:tparallel
 	for _, tt := range tests { //nolint:paralleltest
 		t.Run(tt.name, func(t *testing.T) {
 			rows, err := oraCon.Query(tt.args.ctx, tt.args.query, tt.args.params...) //nolint:sqlclosecheck
-			defer CloseRows(t, rows)
+			defer closeRows(t, rows)
 
 			if err != nil || rows == nil {
 				if tt.want.wantErr {
@@ -192,7 +193,7 @@ func TestOraConn_QueryByName(t *testing.T) { //nolint:tparallel,gocyclo,cyclop
 		t.Fatalf("OraConn_Query: failed to write file: %v", err)
 	}
 
-	connMgr := NewConnManager(&mockLogger{}, &opt)
+	connMgr := NewConnManager(&mock.MockLogger{}, &opt)
 	defer connMgr.Destroy()
 
 	oraCon, err := connMgr.GetConnection(newConnDet(t, "zabbix_mon", ""))
@@ -251,7 +252,7 @@ func TestOraConn_QueryByName(t *testing.T) { //nolint:tparallel,gocyclo,cyclop
 	for _, tt := range tests { //nolint:paralleltest
 		t.Run(tt.name, func(t *testing.T) {
 			rows, err := oraCon.QueryByName(ctx, tt.args.queryName) //nolint:sqlclosecheck
-			defer CloseRows(t, rows)
+			defer closeRows(t, rows)
 
 			if err != nil && !tt.want.wantErr {
 				t.Errorf("OraConn.Query(): query failed = %v", err)
@@ -279,7 +280,7 @@ func TestOraConn_QueryRow(t *testing.T) { //nolint:tparallel
 		CustomQueriesPath:    "",
 	}
 
-	connMgr := NewConnManager(&mockLogger{}, &opt)
+	connMgr := NewConnManager(&mock.MockLogger{}, &opt)
 	defer connMgr.Destroy()
 
 	oraCon, err := connMgr.GetConnection(newConnDet(t, "zabbix_mon", ""))
@@ -374,7 +375,7 @@ func TestOraConn_QueryRowByName(t *testing.T) { //nolint:tparallel
 		t.Fatalf("OraConn_QueryRow: failed to write file: %v", err)
 	}
 
-	connMgr := NewConnManager(&mockLogger{}, &opt)
+	connMgr := NewConnManager(&mock.MockLogger{}, &opt)
 	defer connMgr.Destroy()
 
 	oraCon, err := connMgr.GetConnection(newConnDet(t, "zabbix_mon", ""))

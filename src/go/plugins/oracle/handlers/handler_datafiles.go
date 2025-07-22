@@ -33,12 +33,12 @@ func DataFileHandler(ctx context.Context, conn dbconn.OraClient, _ map[string]st
 			V$DATAFILE
 	`)
 	if err != nil {
-		return nil, errs.WrapConst(err, zbxerr.ErrorCannotFetchData) //nolint:wrapcheck
+		return nil, errs.WrapConst(err, zbxerr.ErrorCannotFetchData)
 	}
 
 	err = row.Scan(&datafiles)
 	if err != nil {
-		return nil, errs.WrapConst(err, zbxerr.ErrorCannotFetchData) //nolint:wrapcheck
+		return nil, errs.WrapConst(err, zbxerr.ErrorCannotFetchData)
 	}
 
 	return datafiles, nil

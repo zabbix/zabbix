@@ -54,12 +54,12 @@ func SysMetricsHandler(ctx context.Context, conn dbconn.OraClient, params map[st
 			GROUP_ID = :1
 	`, groupID)
 	if err != nil {
-		return nil, errs.WrapConst(err, zbxerr.ErrorCannotFetchData) //nolint:wrapcheck
+		return nil, errs.WrapConst(err, zbxerr.ErrorCannotFetchData)
 	}
 
 	err = row.Scan(&sysMetrics)
 	if err != nil {
-		return nil, errs.WrapConst(err, zbxerr.ErrorCannotFetchData) //nolint:wrapcheck
+		return nil, errs.WrapConst(err, zbxerr.ErrorCannotFetchData)
 	}
 
 	// Add leading zeros for floats: ".03" -> "0.03".

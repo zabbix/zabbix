@@ -55,6 +55,8 @@ type Options struct {
 	ResolveTNS           bool
 }
 
+type versionCheckFunc func(context.Context, godror.Execer) (godror.VersionInfo, error)
+
 // ConnManager is the thread-safe structure for managing connections.
 type ConnManager struct {
 	logr log.Logger
@@ -66,6 +68,8 @@ type ConnManager struct {
 
 	QueryStorage yarn.Yarn
 	Destroy      context.CancelFunc
+
+	versionCheckF versionCheckFunc
 }
 
 // ConnDetails type holds connection parameters to be used as a key in ConnManager to find the connection
@@ -79,29 +83,26 @@ type ConnDetails struct {
 	// it as hostname and prepare the appropriate connect-string.
 	// If false - and ResolveTNS=true we treat it as tns and prepare tns-like connect-string.
 	OnlyHostname bool
-	// NoVersionCheck field turns off server version check on connection creation to avoid real connection
-	// to the server. Always use value false (default), only unittests can use true.
-	NoVersionCheck bool
 }
 
 // NewConnDetails function creates a ConnDetails instance for connectin to Oracle.
 func NewConnDetails(uriStr, user, pwd, service string) (*ConnDetails, error) {
 	userSplit, privilegeSplit, err := splitUserPrivilege(user)
 	if err != nil {
-		return nil, errs.WrapConst(err, ErrNewConnDetails) //nolint:wrapcheck
+		return nil, errs.WrapConst(err, ErrNewConnDetails)
 	}
 
 	service = url.QueryEscape(service)
 
 	onlyHostname, err := containsOnlyHostname(uriStr)
 	if err != nil {
-		return nil, errs.WrapConst(err, ErrNewConnDetails) //nolint:wrapcheck
+		return nil, errs.WrapConst(err, ErrNewConnDetails)
 	}
 
 	// Create uri with attrinutes as well as default values
 	u, err := uri.NewWithCreds(uriStr+"?service="+service, userSplit, pwd, URIDefaults)
 	if err != nil {
-		return nil, errs.WrapConst(err, ErrNewConnDetails) //nolint:wrapcheck
+		return nil, errs.WrapConst(err, ErrNewConnDetails)
 	}
 
 	return &ConnDetails{Uri: *u, Privilege: privilegeSplit, OnlyHostname: onlyHostname}, nil
@@ -117,8 +118,9 @@ func NewConnManager(logr log.Logger, opt *Options) *ConnManager {
 
 		Connections: make(map[ConnDetails]*OraConn),
 
-		QueryStorage: setCustomQuery(logr, opt.CustomQueriesEnabled, opt.CustomQueriesPath),
-		Destroy:      cancel, // Destroy stops originated goroutines and closes connections.
+		QueryStorage:  setCustomQuery(logr, opt.CustomQueriesEnabled, opt.CustomQueriesPath),
+		Destroy:       cancel, // Destroy stops originated goroutines and closes connections.
+		versionCheckF: godror.ServerVersion,
 	}
 
 	go connMgr.housekeeper(ctx)
@@ -214,11 +216,13 @@ func (c *ConnManager) createConn(cd *ConnDetails) (*OraConn, error) {
 
 	var errVer error
 
-	if !cd.NoVersionCheck {
-		serverVersion, errVer = godror.ServerVersion(ctx, client)
-		if errVer != nil {
-			return nil, errs.Wrap(errVer, "server version check failed")
-		}
+	if c.versionCheckF == nil {
+		panic("unassigned Oracle server version check function")
+	}
+
+	serverVersion, errVer = c.versionCheckF(ctx, client)
+	if errVer != nil {
+		return nil, errs.Wrap(errVer, "server version check failed")
 	}
 
 	log.Debugf("[Oracle] Created new connection: %s", cd.Uri.Addr())
@@ -282,7 +286,7 @@ func (c *ConnManager) setConn(cd ConnDetails, conn *OraConn) (*OraConn, error) {
 func splitUserPrivilege(userWithPrivilege string) (user, privilege string, err error) { //nolint:nonamedreturns
 	userWithPrivilege = normalizeSpaces(userWithPrivilege)
 	if userWithPrivilege == "" {
-		return "", "", errs.WrapConst(zbxerr.ErrorTooFewParameters, ErrMissingParamUser) //nolint:wrapcheck
+		return "", "", errs.WrapConst(zbxerr.ErrorTooFewParameters, ErrMissingParamUser)
 	}
 
 	var extension string
@@ -305,9 +309,7 @@ func splitUserPrivilege(userWithPrivilege string) (user, privilege string, err e
 }
 
 // setCustomQuery function if enabled, reads the SQLs from a file by path.
-//
-//nolint:ireturn
-func setCustomQuery(logr log.Logger, enabled bool, path string) yarn.Yarn {
+func setCustomQuery(logr log.Logger, enabled bool, path string) yarn.Yarn { //nolint:ireturn
 	if !enabled {
 		return yarn.NewFromMap(map[string]string{})
 	}

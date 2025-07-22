@@ -45,16 +45,16 @@ func UserHandler(ctx context.Context, conn dbconn.OraClient, params map[string]s
 			USERNAME = UPPER(:1)
 	`, username)
 	if err != nil {
-		return nil, errs.WrapConst(err, zbxerr.ErrorCannotFetchData) //nolint:wrapcheck
+		return nil, errs.WrapConst(err, zbxerr.ErrorCannotFetchData)
 	}
 
 	err = row.Scan(&userinfo)
 	if err != nil {
 		if errors.Is(err, sql.ErrNoRows) {
-			return nil, errs.WrapConst(err, zbxerr.ErrorEmptyResult) //nolint:wrapcheck
+			return nil, errs.WrapConst(err, zbxerr.ErrorEmptyResult)
 		}
 
-		return nil, errs.WrapConst(err, zbxerr.ErrorCannotFetchData) //nolint:wrapcheck
+		return nil, errs.WrapConst(err, zbxerr.ErrorCannotFetchData)
 	}
 
 	return userinfo, nil

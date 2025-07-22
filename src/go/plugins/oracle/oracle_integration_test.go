@@ -1,4 +1,4 @@
-//go:build oracle_tests
+//go:build integration_tests
 
 /*
 ** Copyright (C) 2001-2025 Zabbix SIA
@@ -29,24 +29,25 @@ import (
 
 	"golang.zabbix.com/agent2/plugins/oracle/dbconn"
 	"golang.zabbix.com/agent2/plugins/oracle/handlers"
+	"golang.zabbix.com/agent2/plugins/oracle/mock"
 	"golang.zabbix.com/sdk/plugin"
 	"golang.zabbix.com/sdk/zbxerr"
 )
 
 var (
-	config    dbconn.TestConfig //nolint:gochecknoglobals
-	OraVersRx = regexp.MustCompile(`^\d{2}\.\d+\.\d+\.\d+\.\d+$`)
+	testConfig mock.TestConfig //nolint:gochecknoglobals
+	OraVersRx  = regexp.MustCompile(`^\d{2}\.\d+\.\d+\.\d+\.\d+$`)
 )
 
 func TestMain(m *testing.M) {
-	config = dbconn.TestConfig{
+	testConfig = mock.TestConfig{
 		OraURI:  os.Getenv("ORA_URI"),
 		OraUser: os.Getenv("ORA_USER"),
 		OraPwd:  os.Getenv("ORA_PWD"),
 		OraSrv:  os.Getenv("ORA_SRV"),
 	}
 
-	if config.OraURI == "" || config.OraUser == "" || config.OraPwd == "" || config.OraSrv == "" {
+	if testConfig.OraURI == "" || testConfig.OraUser == "" || testConfig.OraPwd == "" || testConfig.OraSrv == "" {
 		fmt.Println( //nolint:forbidigo
 			"Environment variables ORA_URI, ORA_USER, ORA_PWD and ORA_SRV must be set to run tests",
 		)
@@ -93,6 +94,7 @@ func TestPlugin_Export_TNSDisabled(t *testing.T) {
 		args       args
 		wantResult any
 		wantErr    error
+		longTest   bool
 	}{
 		{
 			name:       "-noUser",
@@ -104,19 +106,21 @@ func TestPlugin_Export_TNSDisabled(t *testing.T) {
 		{
 			name:       "-unknownHostname",
 			p:          &impl,
-			args:       args{keyUser, []string{"fakeSession", config.OraUser}, nil},
+			args:       args{keyUser, []string{"fakeSession", testConfig.OraUser}, nil},
 			wantResult: nil,
 			wantErr:    errors.New("ORA-12545: Connect failed because target host or object does not exist"),
+			longTest:   true,
 		},
 		{
-			name: "-TNSKey", // the valid tns name description w/ the key 'zbx_tns' must be added to tnsnames.ora.
+			name: "-TNSKey", // valid tns name description w/ the key 'zbx_tns' must be added to tnsnames.ora.
 			p:    &impl,
 			args: args{keyPing,
-				[]string{"zbx_tns", config.OraUser, config.OraPwd, config.OraSrv},
+				[]string{"zbx_tns", testConfig.OraUser, testConfig.OraPwd, testConfig.OraSrv},
 				nil,
 			},
 			wantResult: handlers.PingFailed,
 			wantErr:    nil,
+			longTest:   true,
 		},
 		{
 			// Although ResolveTNS is false, the connection by TNS name value anyway should work.
@@ -125,9 +129,9 @@ func TestPlugin_Export_TNSDisabled(t *testing.T) {
 			args: args{keyPing,
 				[]string{
 					"(DESCRIPTION=(ADDRESS=(PROTOCOL=TCP)(HOST=localhost)(PORT=1521))(CONNECT_DATA=(SERVICE_NAME=xe)))",
-					config.OraUser,
-					config.OraPwd,
-					config.OraSrv,
+					testConfig.OraUser,
+					testConfig.OraPwd,
+					testConfig.OraSrv,
 				},
 				nil,
 			},
@@ -138,7 +142,7 @@ func TestPlugin_Export_TNSDisabled(t *testing.T) {
 			name: "+LocalhostOnly",
 			p:    &impl,
 			args: args{keyPing,
-				[]string{"localhost", config.OraUser, config.OraPwd, config.OraSrv},
+				[]string{"localhost", testConfig.OraUser, testConfig.OraPwd, testConfig.OraSrv},
 				nil,
 			},
 			wantResult: handlers.PingOk,
@@ -148,6 +152,10 @@ func TestPlugin_Export_TNSDisabled(t *testing.T) {
 
 	for _, tt := range tests { //nolint:paralleltest
 		t.Run(tt.name, func(t *testing.T) {
+			if testing.Short() && tt.longTest {
+				t.Skip("Skipping long test (short mode enabled)!")
+			}
+
 			impl.connMgr.Opt.ResolveTNS = false
 			impl.connMgr.Opt.ConnectTimeout = 5 * time.Second
 
@@ -196,12 +204,13 @@ func TestPlugin_Export_TNSEnabled(t *testing.T) {
 		args       args
 		wantResult any
 		wantErr    error
+		longTest   bool
 	}{
 		{
 			name: "+TNSKey", // the valid tns name description w/ the key 'zbx_tns' must be added to tnsnames.ora.
 			p:    &impl,
 			args: args{keyPing,
-				[]string{"zbx_tns", config.OraUser, config.OraPwd, config.OraSrv},
+				[]string{"zbx_tns", testConfig.OraUser, testConfig.OraPwd, testConfig.OraSrv},
 				nil,
 			},
 			wantResult: handlers.PingOk,
@@ -211,21 +220,23 @@ func TestPlugin_Export_TNSEnabled(t *testing.T) {
 			name: "-TNSKeyWithPort_TreatedAsHostname",
 			p:    &impl,
 			args: args{keyPing,
-				[]string{"zbx_tns:9999", config.OraUser, config.OraPwd, config.OraSrv},
+				[]string{"zbx_tns:9999", testConfig.OraUser, testConfig.OraPwd, testConfig.OraSrv},
 				nil,
 			},
 			wantResult: handlers.PingFailed,
 			wantErr:    nil,
+			longTest:   true,
 		},
 		{
 			name: "-TNSKeyWithSchema_TreatedAsHostname",
 			p:    &impl,
 			args: args{keyPing,
-				[]string{"tcp://zbx_tns", config.OraUser, config.OraPwd, config.OraSrv},
+				[]string{"tcp://zbx_tns", testConfig.OraUser, testConfig.OraPwd, testConfig.OraSrv},
 				nil,
 			},
 			wantResult: handlers.PingFailed,
 			wantErr:    nil,
+			longTest:   true,
 		},
 		{
 			name: "+TNSValue",
@@ -233,9 +244,9 @@ func TestPlugin_Export_TNSEnabled(t *testing.T) {
 			args: args{keyPing,
 				[]string{
 					"(DESCRIPTION=(ADDRESS=(PROTOCOL=TCP)(HOST=localhost)(PORT=1521))(CONNECT_DATA=(SERVICE_NAME=xe)))",
-					config.OraUser,
-					config.OraPwd,
-					config.OraSrv,
+					testConfig.OraUser,
+					testConfig.OraPwd,
+					testConfig.OraSrv,
 				},
 				nil,
 			},
@@ -248,9 +259,9 @@ func TestPlugin_Export_TNSEnabled(t *testing.T) {
 			args: args{keyPing,
 				[]string{
 					"(DESCRIPTION=(ADDRESS=(PROTOCOL=TCP)(HOST=localhost)(PORT=1521))(CONNECT_DATA=(SERVICE_NAME=xe___",
-					config.OraUser,
-					config.OraPwd,
-					config.OraSrv,
+					testConfig.OraUser,
+					testConfig.OraPwd,
+					testConfig.OraSrv,
 				},
 				nil,
 			},
@@ -261,7 +272,7 @@ func TestPlugin_Export_TNSEnabled(t *testing.T) {
 			name: "-TNSValueWrongFormat-Leading",
 			p:    &impl,
 			args: args{keyPing,
-				[]string{"(DESCRIPTION=", config.OraUser, config.OraPwd, config.OraSrv},
+				[]string{"(DESCRIPTION=", testConfig.OraUser, testConfig.OraPwd, testConfig.OraSrv},
 				nil,
 			},
 			wantResult: handlers.PingFailed,
@@ -272,7 +283,7 @@ func TestPlugin_Export_TNSEnabled(t *testing.T) {
 			name: "+LocalhostOnly",
 			p:    &impl,
 			args: args{keyPing,
-				[]string{"localhost", config.OraUser, config.OraPwd, config.OraSrv},
+				[]string{"localhost", testConfig.OraUser, testConfig.OraPwd, testConfig.OraSrv},
 				nil,
 			},
 			wantResult: handlers.PingOk,
@@ -282,7 +293,7 @@ func TestPlugin_Export_TNSEnabled(t *testing.T) {
 			name: "+LocalhostWithPort",
 			p:    &impl,
 			args: args{keyPing,
-				[]string{"localhost:1521", config.OraUser, config.OraPwd, config.OraSrv},
+				[]string{"localhost:1521", testConfig.OraUser, testConfig.OraPwd, testConfig.OraSrv},
 				nil,
 			},
 			wantResult: handlers.PingOk,
@@ -292,7 +303,7 @@ func TestPlugin_Export_TNSEnabled(t *testing.T) {
 			name: "+LocalhostWithSchema",
 			p:    &impl,
 			args: args{keyPing,
-				[]string{"tcp://localhost", config.OraUser, config.OraPwd, config.OraSrv},
+				[]string{"tcp://localhost", testConfig.OraUser, testConfig.OraPwd, testConfig.OraSrv},
 				nil,
 			},
 			wantResult: handlers.PingOk,
@@ -302,14 +313,19 @@ func TestPlugin_Export_TNSEnabled(t *testing.T) {
 			// It will work for a few minutes until reach oracle client timeouts. If so, then the test is successful.
 			name:       "-unknownHostnameAndTNS",
 			p:          &impl,
-			args:       args{keyUser, []string{"fakeSession", config.OraUser}, nil},
+			args:       args{keyUser, []string{"fakeSession", testConfig.OraUser}, nil},
 			wantResult: nil,
 			wantErr:    errors.New("ORA-12154: Cannot connect to database. Cannot find alias"),
+			longTest:   true,
 		},
 	}
 
 	for _, tt := range tests { //nolint:paralleltest
 		t.Run(tt.name, func(t *testing.T) {
+			if testing.Short() && tt.longTest {
+				t.Skip("Skipping long test (short mode enabled)!")
+			}
+
 			impl.connMgr.Opt.ResolveTNS = true
 			impl.connMgr.Opt.ConnectTimeout = 5 * time.Second
 
@@ -342,7 +358,7 @@ func Test_PingHandler(t *testing.T) {
 
 	metric := keyPing
 
-	got, err := impl.Export(metric, []string{config.OraURI, config.OraUser, config.OraPwd, config.OraSrv}, nil)
+	got, err := impl.Export(metric, []string{testConfig.OraURI, testConfig.OraUser, testConfig.OraPwd, testConfig.OraSrv}, nil)
 	if err != nil {
 		t.Fatalf("Plugin.%s() failed with error: %s", getHandlerName(t, metric), err.Error())
 	}
@@ -367,7 +383,7 @@ func Test_VersionHandler(t *testing.T) {
 
 	metric := keyVersion
 
-	got, err := impl.Export(metric, []string{config.OraURI, config.OraUser, config.OraPwd, config.OraSrv}, nil)
+	got, err := impl.Export(metric, []string{testConfig.OraURI, testConfig.OraUser, testConfig.OraPwd, testConfig.OraSrv}, nil)
 	if err != nil {
 		t.Fatalf("Plugin.%s() failed with error: %s", getHandlerName(t, metric), err.Error())
 	}
@@ -408,7 +424,7 @@ func Test_HandlerResultFormat(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			got, err := impl.Export(tt.metric, []string{config.OraURI, config.OraUser, config.OraPwd, config.OraSrv}, nil)
+			got, err := impl.Export(tt.metric, []string{testConfig.OraURI, testConfig.OraUser, testConfig.OraPwd, testConfig.OraSrv}, nil)
 			if err != nil {
 				t.Fatalf("Plugin.%s() failed with error: %s", getHandlerName(t, tt.metric), err.Error())
 			}
@@ -434,12 +450,11 @@ func Test_HandlersResultClosedDb(t *testing.T) {
 		impl.Start()
 		defer impl.Stop()
 	}
-	//config.OraURI, config.OraUser, config.OraPwd, config.OraSrv
 	connDetails, err := dbconn.NewConnDetails(
-		config.OraURI,
-		config.OraUser,
-		config.OraPwd,
-		config.OraSrv,
+		testConfig.OraURI,
+		testConfig.OraUser,
+		testConfig.OraPwd,
+		testConfig.OraSrv,
 	)
 	if err != nil {
 		t.Fatalf("Error creating connection details: %v", err)
@@ -473,7 +488,7 @@ func Test_HandlersResultClosedDb(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			_, err := impl.Export(tt.metric, []string{config.OraURI, config.OraUser, config.OraPwd, config.OraSrv}, nil)
+			_, err := impl.Export(tt.metric, []string{testConfig.OraURI, testConfig.OraUser, testConfig.OraPwd, testConfig.OraSrv}, nil)
 
 			if !errors.Is(err, zbxerr.ErrorCannotFetchData) {
 				t.Errorf("Plugin.%s() should return %q if server is not working, got: %q",

@@ -43,7 +43,7 @@ func CustomQueryHandler(ctx context.Context, conn dbconn.OraClient, //nolint:goc
 	defer closeRows(rows)
 
 	if err != nil {
-		return nil, errs.WrapConst(err, zbxerr.ErrorCannotFetchData) //nolint:wrapcheck
+		return nil, errs.WrapConst(err, zbxerr.ErrorCannotFetchData)
 	}
 
 	// JSON marshaling
@@ -51,7 +51,7 @@ func CustomQueryHandler(ctx context.Context, conn dbconn.OraClient, //nolint:goc
 
 	columns, err := rows.Columns()
 	if err != nil {
-		return nil, errs.WrapConst(err, zbxerr.ErrorCannotFetchData) //nolint:wrapcheck
+		return nil, errs.WrapConst(err, zbxerr.ErrorCannotFetchData)
 	}
 
 	values := make([]any, len(columns))       //nolint:makezero
@@ -67,10 +67,10 @@ func CustomQueryHandler(ctx context.Context, conn dbconn.OraClient, //nolint:goc
 		err = rows.Scan(valuePointers...)
 		if err != nil {
 			if errors.Is(err, sql.ErrNoRows) {
-				return nil, errs.WrapConst(err, zbxerr.ErrorEmptyResult) //nolint:wrapcheck
+				return nil, errs.WrapConst(err, zbxerr.ErrorEmptyResult)
 			}
 
-			return nil, errs.WrapConst(err, zbxerr.ErrorCannotFetchData) //nolint:wrapcheck
+			return nil, errs.WrapConst(err, zbxerr.ErrorCannotFetchData)
 		}
 
 		for i, value := range values {
@@ -79,7 +79,7 @@ func CustomQueryHandler(ctx context.Context, conn dbconn.OraClient, //nolint:goc
 
 		jsonRes, errMarshal := json.Marshal(results)
 		if errMarshal != nil {
-			return nil, errs.WrapConst(errMarshal, zbxerr.ErrorCannotMarshalJSON) //nolint:wrapcheck
+			return nil, errs.WrapConst(errMarshal, zbxerr.ErrorCannotMarshalJSON)
 		}
 
 		data = append(data, strings.TrimSpace(string(jsonRes)))

@@ -35,12 +35,12 @@ func SysParamsHandler(ctx context.Context, conn dbconn.OraClient, _ map[string]s
 			NAME IN ('sessions', 'processes', 'db_files')
 	`)
 	if err != nil {
-		return nil, errs.WrapConst(err, zbxerr.ErrorCannotFetchData) //nolint:wrapcheck
+		return nil, errs.WrapConst(err, zbxerr.ErrorCannotFetchData)
 	}
 
 	err = row.Scan(&sysParams)
 	if err != nil {
-		return nil, errs.WrapConst(err, zbxerr.ErrorCannotFetchData) //nolint:wrapcheck
+		return nil, errs.WrapConst(err, zbxerr.ErrorCannotFetchData)
 	}
 
 	return sysParams, nil

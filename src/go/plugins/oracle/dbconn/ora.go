@@ -208,7 +208,7 @@ func createDBConnector(cd *ConnDetails, connectTimeout time.Duration, resolveTNS
 
 	connectString, err := prepareConnectString(tnsInterpretationType, cd, connectTimeout)
 	if err != nil {
-		return nil, errs.WrapConst(err, zbxerr.ErrorInvalidParams) //nolint:wrapcheck
+		return nil, errs.WrapConst(err, zbxerr.ErrorInvalidParams)
 	}
 
 	return createDriverConnector(connectString, cd.Uri.User(), cd.Uri.Password(), cd.Privilege)
@@ -218,7 +218,7 @@ func createDBConnector(cd *ConnDetails, connectTimeout time.Duration, resolveTNS
 func createDriverConnector(hostOrTNS, user, pwd, privilege string) (driver.Connector, error) {
 	connParams, err := getDriverConnParams(privilege)
 	if err != nil {
-		return nil, errs.WrapConst(err, zbxerr.ErrorInvalidParams) //nolint:wrapcheck
+		return nil, errs.WrapConst(err, zbxerr.ErrorInvalidParams)
 	}
 
 	connector := godror.NewConnector(
@@ -270,7 +270,7 @@ func prepareConnectString(tnsType TNSNameType, cd *ConnDetails, connectTimeout t
 			connectTimeout/time.Second,
 		)
 	default:
-		panic(fmt.Sprintf("unknown TNS interpretation type %d", tnsType))
+		panic(fmt.Sprintf("unknown TNS interpretation type: %d", tnsType))
 	}
 
 	return connectString, nil

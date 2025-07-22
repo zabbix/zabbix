@@ -44,12 +44,12 @@ func TablespacesHandler(ctx context.Context, conn dbconn.OraClient, params map[s
 
 	row, err := conn.QueryRow(ctx, query, args...)
 	if err != nil {
-		return nil, errs.WrapConst(err, zbxerr.ErrorCannotFetchData) //nolint:wrapcheck
+		return nil, errs.WrapConst(err, zbxerr.ErrorCannotFetchData)
 	}
 
 	err = row.Scan(&tableSpaces)
 	if err != nil {
-		return nil, errs.WrapConst(err, zbxerr.ErrorCannotFetchData) //nolint:wrapcheck
+		return nil, errs.WrapConst(err, zbxerr.ErrorCannotFetchData)
 	}
 
 	// Add leading zeros for floats: ".03" -> "0.03".
@@ -86,7 +86,7 @@ func getTablespacesQuery(params map[string]string) (string, []any, error) {
 
 	ts, t, err = prepValues(ts, t)
 	if err != nil {
-		return "", nil, errs.WrapConst(err, zbxerr.ErrorInvalidParams) //nolint:wrapcheck
+		return "", nil, errs.WrapConst(err, zbxerr.ErrorInvalidParams)
 	}
 
 	switch t {

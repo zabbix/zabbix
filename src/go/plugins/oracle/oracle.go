@@ -55,12 +55,12 @@ func (p *Plugin) Export(key string, rawParams []string, _ plugin.ContextProvider
 
 	params, extraParams, hardcodedParams, err := metrics[key].EvalParams(rawParams, p.options.Sessions)
 	if err != nil {
-		return nil, errs.WrapConst(err, zbxerr.ErrorInvalidParams) //nolint:wrapcheck
+		return nil, errs.WrapConst(err, zbxerr.ErrorInvalidParams)
 	}
 
 	err = metric.SetDefaults(params, hardcodedParams, p.options.Default)
 	if err != nil {
-		return nil, errs.WrapConst(err, zbxerr.ErrorInvalidParams) //nolint:wrapcheck
+		return nil, errs.WrapConst(err, zbxerr.ErrorInvalidParams)
 	}
 
 	handleMetric := metricsMeta[key]
@@ -70,7 +70,7 @@ func (p *Plugin) Export(key string, rawParams []string, _ plugin.ContextProvider
 
 	connDetails, err := dbconn.NewConnDetails(params["URI"], params["User"], params["Password"], params["Service"])
 	if err != nil {
-		return nil, errs.WrapConst(err, zbxerr.ErrorInvalidParams) //nolint:wrapcheck
+		return nil, errs.WrapConst(err, zbxerr.ErrorInvalidParams)
 	}
 
 	conn, err := p.connMgr.GetConnection(*connDetails)

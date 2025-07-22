@@ -18,14 +18,12 @@ import (
 	"database/sql"
 	"testing"
 
-	zbxlog "golang.zabbix.com/sdk/log"
+	"golang.zabbix.com/agent2/plugins/oracle/mock"
 	"golang.zabbix.com/sdk/uri"
 )
 
 var (
-	_ zbxlog.Logger = (*mockLogger)(nil)
-
-	config = TestConfig{ //nolint:gochecknoglobals
+	testConfig = mock.TestConfig{ //nolint:gochecknoglobals
 		OraURI:  "localhost",
 		OraUser: "ZABBIX_MON",
 		OraPwd:  "zabbix",
@@ -33,38 +31,8 @@ var (
 	}
 )
 
-// TestConfig type contains a test Oracle server connection credentials.
-type TestConfig struct {
-	OraURI  string
-	OraUser string
-	OraPwd  string
-	OraSrv  string
-}
-
-// mockLogger type is empty zbxlog.Logger implementation for unittests.
-type mockLogger struct {
-}
-
-// Infof empty mock function.
-func (ml *mockLogger) Infof(_ string, _ ...any) {} //nolint:revive
-
-// Critf empty mock function.
-func (ml *mockLogger) Critf(_ string, _ ...any) {} //nolint:revive
-
-// Errf empty mock function.
-func (ml *mockLogger) Errf(_ string, _ ...any) {} //nolint:revive
-
-// Warningf mock function.
-func (ml *mockLogger) Warningf(_ string, _ ...any) {} //nolint:revive
-
-// Debugf mock function.
-func (ml *mockLogger) Debugf(_ string, _ ...any) {} //nolint:revive
-
-// Tracef empty mock function.
-func (ml *mockLogger) Tracef(_ string, _ ...any) {} //nolint:revive
-
-// CloseRows function closes rows if exits. In case of problem - returns an error to subtest.
-func CloseRows(t *testing.T, rows *sql.Rows) {
+// closeRows function closes rows if exits. In case of problem - returns an error to subtest.
+func closeRows(t *testing.T, rows *sql.Rows) { //nolint:unused
 	t.Helper()
 
 	if rows != nil {
@@ -80,12 +48,12 @@ func newConnDet(t *testing.T, username, privilege string) ConnDetails {
 	t.Helper()
 
 	u, _ := uri.NewWithCreds( //nolint:errcheck
-		config.OraURI+"?service="+config.OraSrv,
+		testConfig.OraURI+"?service="+testConfig.OraSrv,
 		username,
 		"zabbix",
 		URIDefaults)
 
-	return ConnDetails{*u, privilege, false, false}
+	return ConnDetails{*u, privilege, false}
 }
 
 // newConnDetNoVersCheck function the same as newConnDet, except NoVersionCheck makes true to switch
@@ -95,12 +63,12 @@ func newConnDetNoVersCheck(t *testing.T, username, privilege string) ConnDetails
 	t.Helper()
 
 	u, _ := uri.NewWithCreds( //nolint:errcheck
-		config.OraURI+"?service="+config.OraSrv,
+		testConfig.OraURI+"?service="+testConfig.OraSrv,
 		username,
 		"zabbix",
 		URIDefaults)
 
-	return ConnDetails{*u, privilege, true, true}
+	return ConnDetails{*u, privilege, true}
 }
 
 func newConnDetHostname(t *testing.T, hostname, service string) *ConnDetails {
@@ -112,5 +80,5 @@ func newConnDetHostname(t *testing.T, hostname, service string) *ConnDetails {
 		"any_password",
 		nil)
 
-	return &ConnDetails{*u, "", false, true}
+	return &ConnDetails{*u, "", false}
 }
