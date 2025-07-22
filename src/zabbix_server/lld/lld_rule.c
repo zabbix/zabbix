@@ -3124,8 +3124,8 @@ void	lld_rule_process_nested_rule(zbx_uint64_t hostid, zbx_uint64_t itemid, cons
 
 	zbx_timespec(&ts);
 
-	zbx_preprocess_item_value(itemid, hostid, ITEM_VALUE_TYPE_TEXT, ZBX_FLAG_DISCOVERY_RULE, &result, &ts,
-			ITEM_STATE_NORMAL, NULL);
+	zbx_preprocess_item_value(itemid, hostid, ITEM_VALUE_TYPE_TEXT, ZBX_FLAG_DISCOVERY_RULE,
+			ZBX_ITEM_REQUIRES_PREPROCESSING_YES, &result, &ts, ITEM_STATE_NORMAL, NULL);
 	zbx_preprocessor_flush();
 
 	zbx_free(value);
