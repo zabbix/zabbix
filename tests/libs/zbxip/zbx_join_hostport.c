@@ -12,11 +12,23 @@
 ** If not, see <https://www.gnu.org/licenses/>.
 **/
 
-#ifndef ZABBIX_MACROFUNC_H
-#define ZABBIX_MACROFUNC_H
+#include "zbxmocktest.h"
+#include "zbxmockdata.h"
+#include "zbxmockutil.h"
+#include "zbxmockassert.h"
 
-#include "zbxexpr.h"
+#include "zbxip.h"
 
-char	*func_get_macro_from_func(const char *str, zbx_token_func_macro_t *fm, int *N_functionid);
+void	zbx_mock_test_entry(void **state)
+{
+	const char	*host = zbx_mock_get_parameter_string("in.host");
+	unsigned int	port = zbx_mock_get_parameter_uint32("in.port");
+	const char	*expected = zbx_mock_get_parameter_string("out.hostport");
+	char		result[MAX_STRING_LEN];
 
-#endif
+	ZBX_UNUSED(state);
+
+	zbx_join_hostport(result, sizeof(result), host, (unsigned short)port);
+
+	zbx_mock_assert_str_eq("joined hostport", expected, result);
+}
