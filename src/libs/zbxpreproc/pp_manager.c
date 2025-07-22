@@ -1109,7 +1109,8 @@ static zbx_uint64_t	zbx_pp_manager_items_history_size(zbx_pp_manager_t *manager)
  *                                                                            *
  ******************************************************************************/
 static void	preprocessor_reply_diag_info(zbx_pp_manager_t *manager, zbx_ipc_client_t *client,
-		zbx_uint64_t queued_num, zbx_uint64_t queued_sz, zbx_uint64_t direct_num, zbx_uint64_t direct_sz)
+		zbx_uint64_t queued_num, zbx_uint64_t queued_sz, zbx_uint64_t direct_num, zbx_uint64_t direct_sz,
+		zbx_uint64_t finished_peak_num, zbx_uint64_t pending_peak_num)
 {
 	zbx_uint64_t	preproc_num, pending_num, finished_num, sequences_num, history_sz;
 	unsigned char	*data;
@@ -1118,7 +1119,8 @@ static void	preprocessor_reply_diag_info(zbx_pp_manager_t *manager, zbx_ipc_clie
 	history_sz = zbx_pp_manager_items_history_size(manager);
 	zbx_pp_manager_get_diag_stats(manager, &preproc_num, &pending_num, &finished_num, &sequences_num);
 	data_len = zbx_preprocessor_pack_diag_stats(&data, preproc_num, pending_num, finished_num, sequences_num,
-			queued_num, queued_sz, direct_num, direct_sz, history_sz);
+			queued_num, queued_sz, direct_num, direct_sz, history_sz, finished_peak_num,
+			pending_peak_num);
 
 	zbx_ipc_client_send(client, ZBX_IPC_PREPROCESSOR_DIAG_STATS_RESULT, data, data_len);
 
@@ -1324,7 +1326,8 @@ ZBX_THREAD_ENTRY(zbx_pp_manager_thread, args)
 	char					*error = NULL;
 	zbx_ipc_client_t			*client;
 	zbx_ipc_message_t			*message;
-	double					time_stat, time_idle = 0, time_flush, time_vps_update, time_trim;
+	double					time_stat, time_idle = 0, time_flush, time_vps_update, time_trim,
+						time_reset;
 	zbx_timespec_t				timeout = {PP_MANAGER_DELAY_SEC, PP_MANAGER_DELAY_NS};
 	const zbx_thread_info_t			*info = &((zbx_thread_args_t *)args)->info;
 	int					server_num = ((zbx_thread_args_t *)args)->info.server_num,
@@ -1336,7 +1339,8 @@ ZBX_THREAD_ENTRY(zbx_pp_manager_thread, args)
 	zbx_uint32_t				rtc_msgs[] = {ZBX_RTC_LOG_LEVEL_INCREASE, ZBX_RTC_LOG_LEVEL_DECREASE};
 	zbx_uint64_t				pending_num, finished_num, processed_num = 0, queued_num = 0,
 						processing_num = 0, counter_queued_num = 0, counter_queued_sz = 0,
-						counter_direct_num = 0, counter_direct_sz = 0;
+						counter_direct_num = 0, counter_direct_sz = 0, finished_peak_num = 0,
+						pending_peak_num =0;
 
 	const zbx_thread_pp_manager_args	*pp_manager_args_in = (const zbx_thread_pp_manager_args *)
 						(((zbx_thread_args_t *)args)->args);
@@ -1379,6 +1383,7 @@ ZBX_THREAD_ENTRY(zbx_pp_manager_thread, args)
 	time_flush = time_stat;
 	time_vps_update = time_stat;
 	time_trim = time_stat;
+	time_reset = time_stat;
 
 	zbx_setproctitle("%s #%d started", get_process_type_string(process_type), process_num);
 
@@ -1442,7 +1447,8 @@ ZBX_THREAD_ENTRY(zbx_pp_manager_thread, args)
 					break;
 				case ZBX_IPC_PREPROCESSOR_DIAG_STATS:
 					preprocessor_reply_diag_info(manager, client, counter_queued_num,
-							counter_queued_sz, counter_direct_num, counter_direct_sz);
+							counter_queued_sz, counter_direct_num, counter_direct_sz,
+							finished_peak_num, pending_peak_num);
 					break;
 				case ZBX_IPC_PREPROCESSOR_TOP_SEQUENCES:
 				case ZBX_IPC_PREPROCESSOR_TOP_PEAK:
@@ -1477,6 +1483,12 @@ ZBX_THREAD_ENTRY(zbx_pp_manager_thread, args)
 			break;
 
 		zbx_pp_manager_process_finished(manager, &tasks, &pending_num, &processing_num, &finished_num);
+
+		if (pending_peak_num < pending_num)
+			pending_peak_num = pending_num;
+
+		if (finished_peak_num < finished_num)
+			finished_peak_num = finished_num;
 
 		if (0 < tasks.values_num)
 		{
@@ -1514,15 +1526,20 @@ ZBX_THREAD_ENTRY(zbx_pp_manager_thread, args)
 			time_vps_update = sec;
 		}
 
+		if (SEC_PER_DAY <= sec - time_reset)
+		{
+			zbx_pp_manager_items_preproc_peak_reset(manager);
+			zbx_pp_manager_items_preproc_values_stats_reset(manager);
+			finished_peak_num = 0;
+			pending_peak_num = 0;
+			time_reset = sec;
+		}
 		/* release memory in case of peak periods */
 		if (SEC_PER_HOUR <= sec - time_trim)
 		{
 #ifdef	HAVE_MALLOC_TRIM
 			malloc_trim(128 * ZBX_MEBIBYTE);
 #endif
-			zbx_pp_manager_items_preproc_peak_reset(manager);
-			zbx_pp_manager_items_preproc_values_stats_reset(manager);
-
 			time_trim = sec;
 		}
 	}
