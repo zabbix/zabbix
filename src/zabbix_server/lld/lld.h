@@ -244,7 +244,7 @@ typedef struct
 	int					item_flags;
 
 	zbx_sync_rowset_t			macro_paths;
-	zbx_sync_rowset_t                       filters;
+	zbx_sync_rowset_t			filters;
 	zbx_sync_rowset_t			overrides;
 }
 zbx_lld_item_prototype_t;
