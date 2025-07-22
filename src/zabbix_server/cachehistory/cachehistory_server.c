@@ -1737,7 +1737,7 @@ void	zbx_sync_history_cache_server(const zbx_events_funcs_t *events_cbs, zbx_ipc
  *               FAIL    - proxy cannot be processed now, it got enqueued     *
  *                                                                            *
  ******************************************************************************/
-int	zbx_hc_check_proxy(zbx_uint64_t proxyid)
+int	zbx_hc_check_proxy(zbx_uint64_t proxyid, int pending_history)
 {
 	double	hc_pused;
 	int	ret;

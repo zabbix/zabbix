@@ -7327,7 +7327,7 @@ static void	DCsync_proxies(zbx_dbsync_t *sync, zbx_uint64_t revision, const zbx_
 			proxy->nodata_win.values_num = 0;
 			proxy->nodata_win.period_end = 0;
 			proxy->proxy_groupid = 0;
-			proxy->pending_history = ZBX_PROXY_LARGE_HISTORY_DEFAULT;
+			proxy->pending_history = ZBX_PROXY_PENDING_HISTORY_NO;
 
 			zbx_vector_dc_host_ptr_create_ext(&proxy->hosts, __config_shmem_malloc_func,
 					__config_shmem_realloc_func, __config_shmem_free_func);

@@ -1005,8 +1005,8 @@ size_t	zbx_dc_get_psk_by_identity(const unsigned char *psk_identity, unsigned ch
 void	zbx_dc_get_autoregistration_psk(char *psk_identity_buf, size_t psk_identity_buf_len,
 		unsigned char *psk_buf, size_t psk_buf_len);
 
-#define ZBX_PROXY_LARGE_HISTORY_DEFAULT	0
-#define ZBX_PROXY_LARGE_HISTORY_SET	1
+#define ZBX_PROXY_PENDING_HISTORY_NO	0
+#define ZBX_PROXY_PENDING_HISTORY_YES	1
 
 #define ZBX_MACRO_ENV_SECURE	0
 #define ZBX_MACRO_ENV_NONSECURE	1

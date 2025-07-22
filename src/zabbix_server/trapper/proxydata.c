@@ -89,17 +89,17 @@ int	zbx_send_proxy_data_response(const zbx_dc_proxy_t *proxy, zbx_socket_t *sock
  *               FAIL    - otherwise                                          *
  *                                                                            *
  ******************************************************************************/
-static int	proxy_data_has_more_flag(const struct zbx_json_parse *jp)
+static int	proxy_data_has_pending_history(const struct zbx_json_parse *jp)
 {
 	char	value[MAX_STRING_LEN];
 
 	if (SUCCEED == zbx_json_value_by_name(jp, ZBX_PROTO_TAG_MORE, value, sizeof(value), NULL) &&
 			1 == atoi(value))
 	{
-		return SUCCEED;
+		return ZBX_PROXY_PENDING_HISTORY_YES;
 	}
 
-	return FAIL;
+	return ZBX_PROXY_PENDING_HISTORY_NO;
 }
 
 /******************************************************************************
@@ -176,8 +176,8 @@ void	recv_proxy_data(zbx_socket_t *sock, const struct zbx_json_parse *jp, const 
 
 	upload_status = ZBX_PROXY_UPLOAD_ENABLED;
 
-	if (SUCCEED == zbx_vps_monitor_capped() ||
-		(FAIL == (ret = zbx_hc_check_proxy(proxy.proxyid)) && SUCCEED == proxy_data_has_more_flag(jp)))
+	if (FAIL == (ret = zbx_hc_check_proxy(proxy.proxyid, proxy_data_has_pending_history(jp)))
+			|| SUCCEED == zbx_vps_monitor_capped())
 	{
 		upload_status = ZBX_PROXY_UPLOAD_DISABLED;
 		ret = proxy_data_no_history(jp);
