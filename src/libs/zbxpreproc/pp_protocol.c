@@ -985,7 +985,6 @@ void	zbx_preprocess_item_value(zbx_uint64_t itemid, zbx_uint64_t hostid, unsigne
 		{
 			if (value_len < (len = strlen(result->tjson)))
 				value_len = len;
-			zabbix_log(LOG_LEVEL_INFORMATION, "HUEVOS 1: %d", value_len);
 		}
 
 		if (0 != ZBX_ISSET_BIN(result))

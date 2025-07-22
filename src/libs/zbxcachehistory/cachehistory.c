@@ -2170,7 +2170,7 @@ static void	dc_local_add_history_uint(zbx_uint64_t itemid, unsigned char item_va
 		item_value->value.value_uint = value_orig;
 }
 
-static void	dc_local_add_history_text_bin_helper(unsigned char value_type, zbx_uint64_t itemid,
+static void	dc_local_add_history_text_bin_json_helper(unsigned char value_type, zbx_uint64_t itemid,
 		unsigned char item_value_type, const zbx_timespec_t *ts, const char *value_orig,
 		zbx_uint64_t lastlogsize, int mtime, unsigned char flags)
 {
@@ -2191,43 +2191,28 @@ static void	dc_local_add_history_text_bin_helper(unsigned char value_type, zbx_u
 
 	if (0 == (item_value->flags & ZBX_DC_FLAG_NOVALUE))
 	{
-		size_t	maxlen = (ITEM_VALUE_TYPE_BIN == item_value_type ? ZBX_HISTORY_BIN_VALUE_LEN :
-				ZBX_HISTORY_VALUE_LEN);
+		size_t	maxlen;
 
-		item_value->value.value_str.len = zbx_db_strlen_n(value_orig, maxlen) + 1;
-		dc_string_buffer_realloc(item_value->value.value_str.len);
-
-		item_value->value.value_str.pvalue = string_values_offset;
-		memcpy(&string_values[string_values_offset], value_orig, item_value->value.value_str.len);
-		string_values_offset += item_value->value.value_str.len;
-	}
-	else
-		item_value->value.value_str.len = 0;
-}
-
-static void	dc_local_add_history_text_json_helper(unsigned char value_type, zbx_uint64_t itemid,
-		unsigned char item_value_type, const zbx_timespec_t *ts, const char *value_orig,
-		zbx_uint64_t lastlogsize, int mtime, unsigned char flags)
-{
-	dc_item_value_t	*item_value = dc_local_get_history_slot();
-
-	item_value->itemid = itemid;
-	item_value->ts = *ts;
-	item_value->item_value_type = item_value_type;
-	item_value->value_type = value_type;
-	item_value->state = ITEM_STATE_NORMAL;
-	item_value->flags = flags;
-
-	if (0 != (item_value->flags & ZBX_DC_FLAG_META))
-	{
-		item_value->lastlogsize = lastlogsize;
-		item_value->mtime = mtime;
-	}
-
-	if (0 == (item_value->flags & ZBX_DC_FLAG_NOVALUE))
-	{
-		size_t	maxlen = (ITEM_VALUE_TYPE_JSON == item_value_type ? ZBX_HISTORY_JSON_VALUE_LEN :
-				ZBX_HISTORY_VALUE_LEN);
+		switch (item_value_type)
+		{
+			case ITEM_VALUE_TYPE_JSON:
+				maxlen = ZBX_HISTORY_JSON_VALUE_LEN;
+				break;
+			case ITEM_VALUE_TYPE_BIN:
+				maxlen = ZBX_HISTORY_BIN_VALUE_LEN;
+				break;
+			case ITEM_VALUE_TYPE_FLOAT:
+			case ITEM_VALUE_TYPE_STR:
+			case ITEM_VALUE_TYPE_LOG:
+			case ITEM_VALUE_TYPE_UINT64:
+			case ITEM_VALUE_TYPE_TEXT:
+				maxlen = ZBX_HISTORY_VALUE_LEN;
+				break;
+			case ITEM_VALUE_TYPE_NONE:
+			default:
+				THIS_SHOULD_NEVER_HAPPEN;
+				exit(EXIT_FAILURE);
+		}
 
 		item_value->value.value_str.len = zbx_db_strlen_n(value_orig, maxlen) + 1;
 		dc_string_buffer_realloc(item_value->value.value_str.len);
@@ -2243,21 +2228,21 @@ static void	dc_local_add_history_text_json_helper(unsigned char value_type, zbx_
 static void	dc_local_add_history_text(zbx_uint64_t itemid, unsigned char item_value_type, const zbx_timespec_t *ts,
 		const char *value_orig, zbx_uint64_t lastlogsize, int mtime, unsigned char flags)
 {
-	dc_local_add_history_text_bin_helper(ITEM_VALUE_TYPE_TEXT, itemid, item_value_type, ts, value_orig,
+	dc_local_add_history_text_bin_json_helper(ITEM_VALUE_TYPE_TEXT, itemid, item_value_type, ts, value_orig,
 			lastlogsize, mtime, flags);
 }
 
 static void	dc_local_add_history_bin(zbx_uint64_t itemid, unsigned char item_value_type, const zbx_timespec_t *ts,
 		const char *value_orig, zbx_uint64_t lastlogsize, int mtime, unsigned char flags)
 {
-	dc_local_add_history_text_bin_helper(ITEM_VALUE_TYPE_BIN, itemid, item_value_type, ts, value_orig,
+	dc_local_add_history_text_bin_json_helper(ITEM_VALUE_TYPE_BIN, itemid, item_value_type, ts, value_orig,
 			lastlogsize, mtime, flags);
 }
 
 static void	dc_local_add_history_json(zbx_uint64_t itemid, unsigned char item_value_type, const zbx_timespec_t *ts,
 		const char *value_orig, zbx_uint64_t lastlogsize, int mtime, unsigned char flags)
 {
-	dc_local_add_history_text_json_helper(ITEM_VALUE_TYPE_JSON, itemid, item_value_type, ts, value_orig,
+	dc_local_add_history_text_bin_json_helper(ITEM_VALUE_TYPE_JSON, itemid, item_value_type, ts, value_orig,
 			lastlogsize, mtime, flags);
 }
 

@@ -37,13 +37,12 @@ typedef union
 	/* length prefixed (4 bytes) binary data */
 	void			*bin;
 
+	char			*json;
+
 	zbx_vector_var_t	*vector;
 
 	/* null terminated error message */
 	char			*err;
-
-	char			*json;
-
 }
 zbx_variant_data_t;
 
