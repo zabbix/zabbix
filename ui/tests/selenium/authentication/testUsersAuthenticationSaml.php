@@ -17,6 +17,9 @@
 require_once __DIR__.'/../common/testFormAuthentication.php';
 
 /**
+ * @onBefore getConfFileContent, setSamlCertificatesStorage
+ * @onAfter revertConfFile
+ *
  * @backup settings
  */
 class testUsersAuthenticationSaml extends testFormAuthentication {
@@ -27,8 +30,36 @@ class testUsersAuthenticationSaml extends testFormAuthentication {
 		}
 	}
 
+	const CONF_PATH = __DIR__.'/../../../conf/zabbix.conf.php';
+	protected static $conf_file_content;
+
+	/**
+	 * The original contents of frontend configuration file before test.
+	 */
+	protected function getConfFileContent() {
+		self::$conf_file_content = file_get_contents(self::CONF_PATH);
+	}
+
+	/**
+	 * @onAfter setSamlCertificatesStorage
+	 */
 	public function testUsersAuthenticationSaml_Layout() {
 		$saml_form = $this->openFormAndCheckBasics('SAML');
+
+		// Check that private key and certificates fields ar not visible if set 'file' in conf file.
+		$storage_fields = ['id:idp_certificate', 'id:idp_certificate_file',	'id:sp_private_key', 'id:sp_private_key_file',
+			'id:sp_certificate', 'id:sp_certificate_file'];
+		foreach ($storage_fields as $field) {
+			$this->assertTrue($saml_form->query($field)->one(false)->isVisible(false),
+					'Field id '.$field.' is visible on page.'
+			);
+		}
+
+		// Change storage to 'database' in frontend configuration file.
+		$this->setSamlCertificatesStorage('database');
+		$this->page->refresh()->waitUntilReady();
+		$saml_form->invalidate()->selectTab('SAML settings');
+		$saml_form->getField('Enable SAML authentication');
 
 		// Check SAML form default values.
 		$saml_fields = [
@@ -41,6 +72,12 @@ class testUsersAuthenticationSaml extends testFormAuthentication {
 			'SP name ID format' => ['value' => '', 'visible' => true, 'maxlength' => 2048,
 					'placeholder' => 'urn:oasis:names:tc:SAML:2.0:nameid-format:transient'
 			],
+			'id:idp_certificate' => ['value' => '', 'visible' => true, 'placeholder' => 'PEM-encoded IdP certificate'],
+			'id:idp_certificate_file' => ['visible' => true],
+			'id:sp_private_key' => ['value' => '', 'visible' => true, 'placeholder' => 'PEM-encoded SP private key'],
+			'id:sp_private_key_file' => ['visible' => true],
+			'id:sp_certificate' => ['value' => '', 'visible' => true, 'placeholder' => 'PEM-encoded SP certificate'],
+			'id:sp_certificate_file' => ['visible' => true],
 			'id:sign_messages' => ['value' => false, 'visible' => true],
 			'id:sign_assertions' => ['value' => false, 'visible' => true],
 			'id:sign_authn_requests' => ['value' => false, 'visible' => true],
@@ -76,7 +113,7 @@ class testUsersAuthenticationSaml extends testFormAuthentication {
 		}
 
 		// Check visible mandatory fields.
-		$this->assertEquals(['IdP entity ID', 'SSO service URL', 'Username attribute', 'SP entity ID'],
+		$this->assertEquals(['IdP entity ID', 'SSO service URL', 'Username attribute', 'SP entity ID', 'IdP certificate'],
 				$saml_form->getRequiredLabels()
 		);
 
@@ -92,8 +129,34 @@ class testUsersAuthenticationSaml extends testFormAuthentication {
 			$this->assertTrue($saml_form->getField($label)->isEnabled());
 		}
 
+		// Check mandatory SP fields.
+		$sp_fields = ['SP private key', 'SP certificate'];
+		$checkbox_groups = [
+			'Sign' => ['Messages', 'Assertions', 'AuthN requests', 'Logout requests', 'Logout responses'],
+			'Encrypt' => ['Name ID', 'Assertions']
+		];
+
+		foreach ($checkbox_groups as $group => $checkboxes) {
+			foreach ($checkboxes as $label) {
+				$saml_form->getField($group)->check($label);
+
+				foreach ($sp_fields as $sp_field) {
+					$this->assertTrue($saml_form->isRequired($sp_field), 'Field '.$sp_field.
+							' should be mandatory when '.$label.' is checked.');
+				}
+
+				$saml_form->getField($group)->uncheck($label);
+
+				foreach ($sp_fields as $sp_field) {
+					$this->assertFalse($saml_form->isRequired($sp_field), 'Field '.$sp_field.' should not be mandatory.');
+				}
+
+			}
+
+		}
+
 		// Check that JIT fields remain invisible and depend on "Configure JIT" checkbox.
-		$jit_fields = array_slice($saml_fields, 16);
+		$jit_fields = array_slice($saml_fields, 22);
 
 		foreach ([false, true] as $jit_status) {
 			$saml_form->fill(['Configure JIT provisioning' => $jit_status]);
@@ -823,5 +886,27 @@ class testUsersAuthenticationSaml extends testFormAuthentication {
 
 		$form->submit();
 		$this->page->waitUntilReady();
+	}
+
+	/**
+	 * Set CERT_STORAGE variable to frontend configuration file.
+	 *
+	 * @param string $type	file or database
+	 */
+	public function setSamlCertificatesStorage($type = 'file') {
+		file_put_contents(self::CONF_PATH, '$SSO[\'CERT_STORAGE\']	= \''.$type.'\';'."\n", FILE_APPEND);
+
+		// Wait for frontend to get the new config from updated zabbix.conf.php file.
+		sleep((int)ini_get('opcache.revalidate_freq') + 1);
+	}
+
+	/**
+	 * After test, revert frontend configuration file to its original state.
+	 */
+	public static function revertConfFile() {
+		file_put_contents(self::CONF_PATH, self::$conf_file_content);
+
+		// Wait for frontend to get the new config from updated zabbix.conf.php file.
+		sleep((int)ini_get('opcache.revalidate_freq') + 1);
 	}
 }
