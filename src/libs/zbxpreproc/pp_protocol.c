@@ -508,7 +508,7 @@ zbx_uint32_t	zbx_preprocessor_pack_diag_stats(unsigned char **data, zbx_uint64_t
 	zbx_serialize_prepare_value(data_len, history_sz);
 	zbx_serialize_prepare_value(data_len, finished_peak_num);
 	zbx_serialize_prepare_value(data_len, pending_peak_num);
-	
+
 	*data = (unsigned char *)zbx_malloc(NULL, data_len);
 
 	ptr = *data;
