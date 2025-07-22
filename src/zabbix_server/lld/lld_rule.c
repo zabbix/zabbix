@@ -30,6 +30,7 @@
 #include "zbxjson.h"
 #include "zbxtypes.h"
 #include "zbxexpr.h"
+#include "zbxexpression.h"
 
 /* lld_override table columns */
 #define LLD_OVERRIDE_COL_NAME			0
@@ -362,14 +363,13 @@ void	lld_rule_get_exported_macros(zbx_uint64_t ruleid, zbx_vector_lld_macro_t *m
  ******************************************************************************/
 void	lld_rule_macro_paths_make(zbx_vector_lld_item_full_ptr_t *items)
 {
-#define LLD_MACRO_PATH_PROTOTYPE_COL_PATH	1
-#define LLD_MACRO_PATH_PROTOTYPE_COLS_NUM	2
+#define LLD_PROTOTYPE_MACRO_PATH_COL_PATH	1
 
 	zbx_sync_rowset_t	macro_paths_subst;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
-	zbx_sync_rowset_init(&macro_paths_subst, LLD_MACRO_PATH_PROTOTYPE_COLS_NUM);
+	zbx_sync_rowset_init(&macro_paths_subst, ZBX_LLD_PROTOTYPE_MACRO_PATH_COLS_NUM);
 
 	for (int i = 0; i < items->values_num; i++)
 	{
@@ -387,7 +387,7 @@ void	lld_rule_macro_paths_make(zbx_vector_lld_item_full_ptr_t *items)
 		{
 			zbx_sync_row_t	*row = macro_paths_subst.rows.values[j];
 
-			zbx_substitute_lld_macros(&row->cols[LLD_MACRO_PATH_PROTOTYPE_COL_PATH], item->lld_row->data,
+			zbx_substitute_lld_macros(&row->cols[LLD_PROTOTYPE_MACRO_PATH_COL_PATH], item->lld_row->data,
 					ZBX_MACRO_ANY, NULL, 0);
 		}
 
@@ -398,8 +398,7 @@ void	lld_rule_macro_paths_make(zbx_vector_lld_item_full_ptr_t *items)
 	zbx_sync_rowset_clear(&macro_paths_subst);
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 
-#undef LLD_MACRO_PATH_PROTOTYPE_COL_PATH
-#undef LLD_MACRO_PATH_PROTOTYPE_COLS_NUM
+#undef LLD_PROTOTYPE_MACRO_PATH_COL_PATH
 }
 
 /******************************************************************************
@@ -761,14 +760,13 @@ static void	lld_rule_update_item_formula(zbx_vector_lld_item_full_ptr_t *items, 
  ******************************************************************************/
 void	lld_rule_filters_make(zbx_vector_lld_item_full_ptr_t *items, char **info)
 {
-#define LLD_FILTERS_PROTOTYPE_COL_VALUE	2
-#define LLD_FILTERS_PROTOTYPE_COLS_NUM	3
+#define LLD_PROTOTYPE_FILTERS_COL_VALUE	2
 
 	zbx_sync_rowset_t	filters_subst;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
-	zbx_sync_rowset_init(&filters_subst, LLD_FILTERS_PROTOTYPE_COLS_NUM);
+	zbx_sync_rowset_init(&filters_subst, ZBX_LLD_PROTOTYPE_FILTERS_COLS_NUM);
 
 	for (int i = 0; i < items->values_num; i++)
 	{
@@ -786,7 +784,7 @@ void	lld_rule_filters_make(zbx_vector_lld_item_full_ptr_t *items, char **info)
 		{
 			zbx_sync_row_t	*row = filters_subst.rows.values[j];
 
-			zbx_substitute_lld_macros(&row->cols[LLD_FILTERS_PROTOTYPE_COL_VALUE], item->lld_row->data,
+			zbx_substitute_lld_macros(&row->cols[LLD_PROTOTYPE_FILTERS_COL_VALUE], item->lld_row->data,
 					ZBX_MACRO_ANY, NULL, 0);
 		}
 
@@ -800,8 +798,7 @@ void	lld_rule_filters_make(zbx_vector_lld_item_full_ptr_t *items, char **info)
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 
-#undef LLD_FILTERS_PROTOTYPE_COL_VALUE
-#undef LLD_FILTERS_PROTOTYPE_COLS_NUM
+#undef LLD_PROTOTYPE_FILTERS_COL_VALUE
 }
 
 /******************************************************************************
