@@ -2756,6 +2756,9 @@ class CMap extends CMapElement {
 			$relation_map = $this->createRelationMap($links, 'sysmapid', 'sysmapurlid');
 
 			$links = $this->unsetExtraFields($links, ['sysmapid', 'sysmapurlid'], $options['selectUrls']);
+
+			CArrayHelper::sort($links, [['field' => 'name', 'order' => ZBX_SORT_UP]]);
+
 			$result = $relation_map->mapMany($result, $links, 'urls');
 		}
 
