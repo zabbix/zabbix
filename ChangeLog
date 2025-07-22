@@ -1,6 +1,8 @@
 Changes for 8.0.0alpha1
 
 New features:
+........S. [ZBXNEXT-10122] updated maximal supported TimescaleDB version to 2.21 (mprihodko)
+..F....... [ZBXNEXT-8793] implemented inline validation in auto-registration form (Ivo)
 .......PS. [ZBXNEXT-10119] improved preprocessing diagnostics by highlighting top item IDs with the longest processing times (vso)
 .......PS. [ZBXNEXT-10080] updated minimal supported PostgreSQL version to 15 and TigerData (former TimescaleDB) version to 2.20 (mprihodko)
 ....I...S. [ZBXNEXT-9770] prepared for removal of TimescaleDB API calls deprecated since TimescaleDB 2.18.0 (mprihodko)
@@ -12,6 +14,14 @@ New features:
 .......PS. [ZBXNEXT-10079] updated minimal supported MySQL/Percona version to 8.4 (mprihodko)
 
 Bug fixes:
+...G...... [ZBX-26697] fixed memory error in sender when trying to read invalid response (dgoloscapov)
+..F....... [ZBX-26717] fixed undefined index on agent installation step in Host Wizard (vmurzins)
+.......PS. [ZBX-26693] fixed item values without preprocessing to skip preprocessing manager (vso)
+........S. [ZBX-26645] fixed lost resource handling in LLD prototype discovery (wiper)
+..F....... [ZBX-26680] fixed space character escaping in agent installation script in Host Wizard (vmurzins)
+..F....... [ZBX-26625] fixed server status verification logic in system information and footer warning message (vmurzins)
+..F....... [ZBX-26614] fixed Host Wizard template selection step for safari (ashubin)
+..F....... [ZBX-26374] added updates for displaying the relevant monitoring data or "no permissions" notification for the Classic Graph widget (msnihach)
 A......... [ZBX-26651] fixed LLD rules getting recreated during import (jfreibergs)
 ........S. [ZBX-26661] fixed deadlock on autoreg_host table (vso)
 ..F....... [ZBX-26675] fixed validation for proxy field on discovered host (vmurzins)
@@ -75,6 +85,7 @@ A......... [ZBX-26191] fixed inconsistent API and frontend validation for mainte
 Changes for 7.4.1rc1
 
 New features:
+........S. [ZBXNEXT-10122] updated maximal supported TimescaleDB version to 2.21 (mprihodko)
 .......PS. [ZBXNEXT-10119] improved preprocessing diagnostics by highlighting top item IDs with the longest processing times (vso)
 ....I...S. [ZBXNEXT-9770] prepared for removal of TimescaleDB API calls deprecated since TimescaleDB 2.18.0 (mprihodko)
 .........T [ZBXNEXT-9959] added Cisco Secure Firewall Threat Defense by HTTP template (egordymov)
@@ -84,6 +95,14 @@ New features:
 .......PS. [ZBXNEXT-9931] added top items sorted by received values number and size to diaginfo preprocessing section (asestakovs)
 
 Bug fixes:
+...G...... [ZBX-26697] fixed memory error in sender when trying to read invalid response (dgoloscapov)
+..F....... [ZBX-26717] fixed undefined index on agent installation step in Host Wizard (vmurzins)
+........S. [ZBX-26645] fixed lost resource handling in LLD prototype discovery (wiper)
+.......PS. [ZBX-26693] fixed item values without preprocessing to skip preprocessing manager (vso)
+..F....... [ZBX-26680] fixed space character escaping in agent installation script in Host Wizard (vmurzins)
+..F....... [ZBX-26625] fixed server status verification logic in system information and footer warning message (vmurzins)
+..F....... [ZBX-26614] fixed Host Wizard template selection step for safari (ashubin)
+..F....... [ZBX-26374] added updates for displaying the relevant monitoring data or "no permissions" notification for the Classic Graph widget (msnihach)
 A......... [ZBX-26651] fixed LLD rules getting recreated during import (jfreibergs)
 ........S. [ZBX-26661] fixed deadlock on autoreg_host table (vso)
 ..F....... [ZBX-26675] fixed validation for proxy field on discovered host (vmurzins)
@@ -4567,6 +4586,7 @@ A.F....PS. [ZBXNEXT-7402,ZBXNEXT-7413] added support for CyberArk Vault (acikuns
 Changes for 6.0.41rc1
 
 New features:
+........S. [ZBXNEXT-10122] updated maximal supported TimescaleDB version to 2.21 (mprihodko)
 ........S. [ZBXNEXT-10018] updated maximal supported TimescaleDB version to 2.20 (mprihodko)
 ........S. [ZBXNEXT-9905] updated max supported TimescaleDB version to 2.19 (mprihodko)
 
