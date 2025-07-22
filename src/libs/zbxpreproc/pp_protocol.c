@@ -249,30 +249,15 @@ static void     preprocessor_serialize_value(zbx_uint64_t itemid, unsigned char 
 	else if (NULL != result)
 	{
 		if (ZBX_ISSET_LOG(result))
-		{
-			var_type = ZBX_VARIANT_STR;
 			ptr += zbx_serialize_str(ptr, result->log->value, value_len);
-		}
 		else if (ZBX_ISSET_UI64(result))
-		{
-			var_type = ZBX_VARIANT_UI64;
 			ptr += zbx_serialize_value(ptr, result->ui64);
-		}
 		else if (ZBX_ISSET_DBL(result))
-		{
-			var_type = ZBX_VARIANT_DBL;
 			ptr += zbx_serialize_value(ptr, result->dbl);
-		}
 		else if (ZBX_ISSET_STR(result))
-		{
-			var_type = ZBX_VARIANT_STR;
 			ptr += zbx_serialize_str(ptr, result->str, value_len);
-		}
 		else if (ZBX_ISSET_TEXT(result))
-		{
-			var_type = ZBX_VARIANT_STR;
 			ptr += zbx_serialize_str(ptr, result->text, value_len);
-		}
 	}
 
 	ptr += zbx_serialize_value(ptr, ts->sec);
