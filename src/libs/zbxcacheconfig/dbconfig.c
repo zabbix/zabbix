@@ -17178,7 +17178,7 @@ int	zbx_dc_get_proxy_version(zbx_uint64_t proxyid)
 	return version;
 }
 
-void	zbx_dc_update_proxy_large_history_flag(zbx_dc_proxy_t *proxy, int flag)
+void	zbx_dc_update_proxy_pending_history(zbx_dc_proxy_t *proxy, int flag)
 {
 	ZBX_DC_PROXY	*dc_proxy;
 

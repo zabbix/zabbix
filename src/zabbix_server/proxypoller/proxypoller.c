@@ -639,7 +639,7 @@ static int	process_proxy(const zbx_config_vault_t *config_vault, int config_time
 						goto error;
 					}
 
-					zbx_dc_update_proxy_large_history_flag(&proxy, (ZBX_PROXY_DATA_MORE == more ?
+					zbx_dc_update_proxy_pending_history(&proxy, (ZBX_PROXY_DATA_MORE == more ?
 							ZBX_PROXY_PENDING_HISTORY_YES : ZBX_PROXY_PENDING_HISTORY_NO));
 
 					check_tasks = 0;

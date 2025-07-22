@@ -1580,7 +1580,7 @@ int	zbx_dc_sync_lock(void);
 void	zbx_dc_sync_unlock(void);
 
 int	zbx_dc_get_proxy_version(zbx_uint64_t proxyid);
-void	zbx_dc_update_proxy_large_history_flag(zbx_dc_proxy_t *proxy, int flag);
+void	zbx_dc_update_proxy_pending_history(zbx_dc_proxy_t *proxy, int flag);
 
 int	zbx_macro_field_params_resolv(zbx_macro_resolv_data_t *p, va_list args, char **replace_to, char **data,
 		char *error, size_t maxerrlen);
