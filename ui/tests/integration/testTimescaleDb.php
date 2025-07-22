@@ -283,7 +283,7 @@ class testTimescaleDb extends CIntegrationTest {
 		$response = $this->call('host.create', [
 			[
 				'host' => self::HOSTNAME,
-				'groups' => [['groupid' => 4]],
+				'groups' => [['groupid' => 4]]
 			]
 		]);
 
