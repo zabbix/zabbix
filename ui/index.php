@@ -21,7 +21,7 @@ require_once dirname(__FILE__).'/include/forms.inc.php';
 
 $page['file'] = 'index.php';
 
-// Redirect to login page when logout with invalid token
+// Redirect to the login page when logging out with an invalid CSRF token.
 if (hasRequest('reconnect') && !CWebUser::isLoggedIn()) {
 	redirect('index.php');
 }
