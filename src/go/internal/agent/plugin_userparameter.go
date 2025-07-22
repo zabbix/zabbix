@@ -153,8 +153,8 @@ func InitUserParameterPlugin(
 
 	for _, userParam := range userParameterConfig {
 		// split by first comma.
-		parts := strings.SplitN(userParam, ",", 2) //nolint:gomnd
-		if len(parts) != 2 {                       //nolint:gomnd
+		parts := strings.SplitN(userParam, ",", 2) //nolint:mnd
+		if len(parts) != 2 {                       //nolint:mnd
 			return nil, fmt.Errorf(
 				"cannot add user parameter %q: not comma-separated", userParam,
 			)
