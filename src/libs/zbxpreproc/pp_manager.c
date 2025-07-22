@@ -1111,7 +1111,7 @@ static zbx_uint64_t	zbx_pp_manager_items_history_size(zbx_pp_manager_t *manager)
  ******************************************************************************/
 static void	preprocessor_reply_diag_info(zbx_pp_manager_t *manager, zbx_ipc_client_t *client,
 		zbx_uint64_t queued_num, zbx_uint64_t queued_sz, zbx_uint64_t direct_num, zbx_uint64_t direct_sz,
-		zbx_uint64_t finished_peak_num, zbx_uint64_t pending_peak_num)
+		zbx_uint64_t finished_peak_num, zbx_uint64_t pending_peak_num, zbx_uint64_t processed_num)
 {
 	zbx_uint64_t	preproc_num, pending_num, finished_num, sequences_num, history_sz;
 	unsigned char	*data;
@@ -1121,7 +1121,7 @@ static void	preprocessor_reply_diag_info(zbx_pp_manager_t *manager, zbx_ipc_clie
 	zbx_pp_manager_get_diag_stats(manager, &preproc_num, &pending_num, &finished_num, &sequences_num);
 	data_len = zbx_preprocessor_pack_diag_stats(&data, preproc_num, pending_num, finished_num, sequences_num,
 			queued_num, queued_sz, direct_num, direct_sz, history_sz, finished_peak_num,
-			pending_peak_num);
+			pending_peak_num, processed_num);
 
 	zbx_ipc_client_send(client, ZBX_IPC_PREPROCESSOR_DIAG_STATS_RESULT, data, data_len);
 
@@ -1343,7 +1343,7 @@ ZBX_THREAD_ENTRY(zbx_pp_manager_thread, args)
 	zbx_uint64_t				pending_num, finished_num, processed_num = 0, queued_num = 0,
 						processing_num = 0, counter_queued_num = 0, counter_queued_sz = 0,
 						counter_direct_num = 0, counter_direct_sz = 0, finished_peak_num = 0,
-						pending_peak_num = 0;
+						pending_peak_num = 0, counter_processed_num = 0;
 
 	const zbx_thread_pp_manager_args	*pp_manager_args_in = (const zbx_thread_pp_manager_args *)
 						(((zbx_thread_args_t *)args)->args);
@@ -1451,7 +1451,7 @@ ZBX_THREAD_ENTRY(zbx_pp_manager_thread, args)
 				case ZBX_IPC_PREPROCESSOR_DIAG_STATS:
 					preprocessor_reply_diag_info(manager, client, counter_queued_num,
 							counter_queued_sz, counter_direct_num, counter_direct_sz,
-							finished_peak_num, pending_peak_num);
+							finished_peak_num, pending_peak_num, counter_processed_num);
 					break;
 				case ZBX_IPC_PREPROCESSOR_TOP_SEQUENCES:
 				case ZBX_IPC_PREPROCESSOR_TOP_PEAK:
@@ -1496,6 +1496,7 @@ ZBX_THREAD_ENTRY(zbx_pp_manager_thread, args)
 		if (0 < tasks.values_num)
 		{
 			processed_num += (unsigned int)tasks.values_num;
+			counter_processed_num += tasks.values_num;
 			preprocessor_flush_tasks(manager, &tasks);
 			zbx_pp_tasks_clear(&tasks);
 		}
@@ -1535,6 +1536,7 @@ ZBX_THREAD_ENTRY(zbx_pp_manager_thread, args)
 			zbx_pp_manager_items_preproc_values_stats_reset(manager);
 			finished_peak_num = 0;
 			pending_peak_num = 0;
+			counter_processed_num = 0;
 			time_reset = sec;
 		}
 		/* release memory in case of peak periods */
