@@ -1341,7 +1341,7 @@ ZBX_THREAD_ENTRY(zbx_pp_manager_thread, args)
 	zbx_uint64_t				pending_num, finished_num, processed_num = 0, queued_num = 0,
 						processing_num = 0, counter_queued_num = 0, counter_queued_sz = 0,
 						counter_direct_num = 0, counter_direct_sz = 0, finished_peak_num = 0,
-						pending_peak_num =0;
+						pending_peak_num = 0;
 
 	const zbx_thread_pp_manager_args	*pp_manager_args_in = (const zbx_thread_pp_manager_args *)
 						(((zbx_thread_args_t *)args)->args);
