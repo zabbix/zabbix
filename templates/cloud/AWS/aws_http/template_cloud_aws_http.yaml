@@ -1466,14 +1466,14 @@ zabbix_export:
             label: 'Job filter by state (exclude)'
             description: 'Filter to exclude discoverable jobs by state.'
         - macro: '{$AWS.BACKUP_VAULT.NAME}'
-          description: 'AWS Backup vault name.'
+          description: 'AWS backup vault name.'
           config:
             type: TEXT
             priority: '10'
             label: 'Backup vault name'
             description: 'AWS Backup vault name.'
         - macro: '{$AWS.DATA.TIMEOUT}'
-          value: 30s
+          value: 60s
           description: 'API response timeout.'
           config:
             type: TEXT
@@ -1482,7 +1482,7 @@ zabbix_export:
             label: 'API response timeout'
             description: 'Timeout for API responses in seconds.'
         - macro: '{$AWS.PROXY}'
-          description: 'Sets HTTP proxy value. If this macro is empty then no proxy is used.'
+          description: 'Sets the HTTP proxy value. If this macro is empty, no proxy is used.'
           config:
             type: TEXT
             priority: '2'
@@ -1491,7 +1491,7 @@ zabbix_export:
             description: 'HTTP proxy to use for requests.'
         - macro: '{$AWS.REGION}'
           value: us-west-1
-          description: 'Amazon backup vault region code.'
+          description: 'AWS backup vault region code.'
           config:
             type: TEXT
             priority: '5'
@@ -1939,7 +1939,7 @@ zabbix_export:
         ## Overview
         
         This template is designed for the effortless deployment of AWS monitoring by Zabbix via HTTP and doesn't require any external scripts.
-        - Currently, the template supports the discovery of EC2 and RDS instances, ECS clusters, ELB, Lambda and S3 buckets.
+        - Currently, the template supports the discovery of EC2 and RDS instances, ECS clusters, ELB, Lambda, S3 buckets and Backup vaults.
         
         ## Setup
         
@@ -2144,6 +2144,8 @@ zabbix_export:
         * [Full metrics list related to S3](https://docs.aws.amazon.com/AmazonS3/latest/userguide/metrics-dimensions.html)
         * [Full metrics list related to ECS](https://docs.aws.amazon.com/AmazonECS/latest/developerguide/cloudwatch-metrics.html)
         * [Full metrics list related to ELB ALB](https://docs.aws.amazon.com/elasticloadbalancing/latest/application/load-balancer-cloudwatch-metrics.html)
+        * [Full metrics list related to Backup vault](https://docs.aws.amazon.com/aws-backup/latest/devguide/API_BackupVaultListMember.html)
+        * [Full metrics list related to Backup jobs](https://docs.aws.amazon.com/aws-backup/latest/devguide/API_BackupJob.html)
         * [DescribeAlarms API method](https://docs.aws.amazon.com/AmazonCloudWatch/latest/APIReference/API_DescribeAlarms.html)
         * [DescribeVolumes API method](https://docs.aws.amazon.com/AWSEC2/latest/APIReference/API_DescribeVolumes.html)
         * [DescribeLoadBalancers API method](https://docs.aws.amazon.com/elasticloadbalancing/latest/APIReference/API_DescribeLoadBalancers.html)
