@@ -32,10 +32,6 @@ class CCsrfTokenHelper {
 	 * @return string  Returns CSRF token in string format.
 	 */
 	public static function get(string $action): string {
-		if (!array_key_exists('secret', CWebUser::$data)) {
-			return false;
-		}
-
 		return CEncryptHelper::sign(CWebUser::$data['secret'].$action);
 	}
 
@@ -48,6 +44,10 @@ class CCsrfTokenHelper {
 	 * @return bool true if the token is correct.
 	 */
 	public static function check(string $csrf_token_form, string $action): bool {
+		if (!array_key_exists('secret', CWebUser::$data)) {
+			return false;
+		}
+
 		return CEncryptHelper::checkSign(self::get($action), $csrf_token_form);
 	}
 }
