@@ -36,6 +36,9 @@ static ZBX_THREAD_LOCAL int		preproc_values;
 
 ZBX_PTR_VECTOR_IMPL(ipcmsg, zbx_ipc_message_t *)
 
+static void	preprocessor_send(zbx_uint32_t code, unsigned char *data, zbx_uint32_t size,
+		zbx_ipc_message_t *response);
+
 static zbx_uint32_t	fields_calc_size(zbx_packed_field_t *fields, int fields_num)
 {
 	zbx_uint32_t	data_size = 0, field_size;
@@ -215,6 +218,19 @@ static void     preprocessor_serialize_value(zbx_uint64_t itemid, unsigned char 
 		opt_flags |= ZBX_PP_VALUE_OPT_META;
 		zbx_serialize_prepare_value(data_len, result->lastlogsize);
 		zbx_serialize_prepare_value(data_len, result->mtime);
+	}
+
+	if ((zbx_uint64_t)UINT32_MAX < (zbx_uint64_t)preproc_offset + data_len)
+	{
+		preprocessor_send(ZBX_IPC_PREPROCESSOR_REQUEST, preproc_data, preproc_offset, NULL);
+		preproc_offset = 0;
+		preproc_values = 0;
+	}
+
+	if ((zbx_uint64_t)UINT32_MAX < (zbx_uint64_t)preproc_offset + data_len)
+	{
+		THIS_SHOULD_NEVER_HAPPEN_MSG("Too large data for preprocessing");
+		return;
 	}
 
 	if (0 == preproc_alloc)
@@ -1079,6 +1095,7 @@ void	zbx_preprocess_item_value(zbx_uint64_t itemid, unsigned char item_value_typ
 	}
 
 	preprocessor_serialize_value(itemid, item_value_type, item_flags, result, ts, state, error);
+
 	if (ZBX_PREPROCESSING_BATCH_SIZE < ++preproc_values)
 		zbx_preprocessor_flush();
 
@@ -1096,7 +1113,9 @@ void	zbx_preprocessor_flush(void)
 	{
 		preprocessor_send(ZBX_IPC_PREPROCESSOR_REQUEST, preproc_data, preproc_offset, NULL);
 		preproc_offset = 0;
+		preproc_alloc = 0;
 		preproc_values = 0;
+		zbx_free(preproc_data);
 	}
 }
 
