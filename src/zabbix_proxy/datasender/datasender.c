@@ -158,7 +158,7 @@ static int	proxy_data_sender(int *more, int now, int *hist_upload_state, const z
 		time_t	time_connect;
 
 		if (ZBX_PROXY_DATA_MORE == more_history || ZBX_PROXY_DATA_MORE == more_discovery ||
-				ZBX_PROXY_DATA_MORE == more_areg)
+				ZBX_PROXY_DATA_MORE == more_areg || ZBX_PROXY_UPLOAD_DISABLED == *hist_upload_state)
 		{
 			zbx_json_adduint64(&j, ZBX_PROTO_TAG_MORE, ZBX_PROXY_DATA_MORE);
 			*more = ZBX_PROXY_DATA_MORE;
