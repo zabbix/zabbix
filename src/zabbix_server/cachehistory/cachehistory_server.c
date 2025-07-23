@@ -1742,7 +1742,8 @@ int	zbx_hc_check_proxy(zbx_uint64_t proxyid, int pending_history)
 	double	hc_pused;
 	int	ret;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s() proxyid:"ZBX_FS_UI64, __func__, proxyid);
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s() proxyid:"ZBX_FS_UI64" pending_history:%i",
+			__func__, proxyid, pending_history);
 
 	zbx_dbcache_lock();
 
@@ -1784,7 +1785,11 @@ int	zbx_hc_check_proxy(zbx_uint64_t proxyid, int pending_history)
 
 	if (0 == zbx_hc_proxyqueue_peek())
 	{
-		ret = SUCCEED;
+		if (60 < hc_pused && 0 != pending_history)
+			ret = FAIL;
+		else
+			ret = SUCCEED;
+
 		goto out;
 	}
 
