@@ -4,7 +4,7 @@ msgstr ""
 "Project-Id-Version: Zabbix 6.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2023-10-19 13:48+0300\n"
-"PO-Revision-Date: 2025-07-04 19:49+0000\n"
+"PO-Revision-Date: 2025-07-17 07:25+0000\n"
 "Last-Translator: Eiji Kawakita <age@cyber.email.ne.jp>\n"
 "Language-Team: Zabbix\n"
 "Language: ja\n"
@@ -1591,7 +1591,7 @@ msgstr "毎%4$s %2$s %3$s %1$s"
 #: include/classes/helpers/CMaintenanceHelper.php:119
 #, c-format
 msgid "At %1$s on day %2$s of every %3$s"
-msgstr ""
+msgstr "毎%3$s の %2$s日 %1$s に"
 
 #: app/views/maintenance.timeperiod.edit.php:189
 msgid "At (hour:minute)"

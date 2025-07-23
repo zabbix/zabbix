@@ -18,7 +18,6 @@
 #include "zbxmockutil.h"
 
 #include "zbxexpression.h"
-#include "macrofunc.h"
 #include "zbxlog.h"
 #include "zbxexpr.h"
 #include "zbxcachevalue.h"
