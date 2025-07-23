@@ -340,7 +340,8 @@ class CControllerMenuPopup extends CController {
 				'isWriteable' => $is_writable,
 				'allowed_ui_latest_data' => CWebUser::checkAccess(CRoleHelper::UI_MONITORING_LATEST_DATA),
 				'allowed_ui_conf_hosts' => CWebUser::checkAccess(CRoleHelper::UI_CONFIGURATION_HOSTS),
-				'binary_value_type' => $db_item['value_type'] == ITEM_VALUE_TYPE_BINARY
+				'is_trigger_supported' => $db_item['value_type'] != ITEM_VALUE_TYPE_BINARY
+					&& $db_item['value_type'] != ITEM_VALUE_TYPE_JSON
 			];
 		}
 
@@ -378,7 +379,8 @@ class CControllerMenuPopup extends CController {
 				'itemid' => $data['itemid'],
 				'name' => $db_item_prototype['name'],
 				'key' => $db_item_prototype['key_'],
-				'is_binary_value_type' => $db_item_prototype['value_type'] == ITEM_VALUE_TYPE_BINARY,
+				'is_trigger_supported' => $db_item_prototype['value_type'] != ITEM_VALUE_TYPE_BINARY
+					&& $db_item_prototype['value_type'] != ITEM_VALUE_TYPE_JSON,
 				'is_discovered_prototype' => $db_item_prototype['flags'] & ZBX_FLAG_DISCOVERY_CREATED,
 				'hostid' => $db_item_prototype['hosts'][0]['hostid'],
 				'host' => $db_item_prototype['hosts'][0]['host'],
