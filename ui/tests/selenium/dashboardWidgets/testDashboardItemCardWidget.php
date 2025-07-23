@@ -495,22 +495,22 @@ class testDashboardItemCardWidget extends testWidgets {
 										'value' => self::$itemids[STRING_255]
 									],
 									[
-										'type' => '0',
+										'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
 										'name' => 'sections.0',
 										'value' => '2'
 									],
 									[
-										'type' => '0',
+										'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
 										'name' => 'sections.1',
 										'value' => '4'
 									],
 									[
-										'type' => '0',
+										'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
 										'name' => 'sections.2',
 										'value' => '6'
 									],
 									[
-										'type' => '0',
+										'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
 										'name' => 'sections.3',
 										'value' => '7'
 									]
