@@ -28,7 +28,7 @@
 		}
 	}
 
-	ol, ul, p, pre {
+	ol, ul, p, pre, blockquote {
 		margin-top: 16px;
 		margin-bottom: 0;
 
@@ -41,8 +41,15 @@
 		margin-top: 0;
 	}
 
-	ol, ul {
+	ol {
+		list-style-type: decimal;
+	}
+
+	ul {
 		list-style-type: initial;
+	}
+
+	ol, ul {
 		list-style-position: outside;
 		padding-left: 2em;
 
@@ -60,6 +67,13 @@
 		background: $form-dark-bg-color;
 		border: 1px solid $form-border-color;
 		border-radius: 2px;
+	}
+
+	blockquote {
+		margin-block-start: 1em;
+		margin-block-end: 1em;
+		margin-inline-start: 40px;
+		margin-inline-end: 40px;
 	}
 
 	a {
