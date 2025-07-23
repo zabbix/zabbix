@@ -694,7 +694,7 @@ class testTagInheritance extends CIntegrationTest {
 				'filter' => [
 					'evaltype' => TAG_EVAL_TYPE_OR,
 					'tags' => [
-					],
+					]
 				],
 				'expected' => [
 				]
