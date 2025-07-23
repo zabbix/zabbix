@@ -4653,8 +4653,7 @@ return [
 			'value' => [
 				'null' => false,
 				'type' => DB::FIELD_TYPE_JSON,
-				'length' => 2048,
-				'default' => '{}'
+				'length' => 2048
 			]
 		]
 	],
