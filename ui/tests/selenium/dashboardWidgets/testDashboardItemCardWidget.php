@@ -17,7 +17,7 @@
 require_once __DIR__.'/../common/testWidgets.php';
 
 /**
- * @backup items, dashboard
+ * @backup dashboard
  *
  * @dataSource AllItemValueTypes
  *
@@ -335,7 +335,7 @@ class testDashboardItemCardWidget extends testWidgets {
 		// Create trigger based on item.
 		CDataHelper::call('trigger.create', [
 			[
-				'description' => 'Not classidied trigger',
+				'description' => 'Not classified trigger',
 				'expression' => 'last(/Host for Item Card widget/master)>100',
 				'priority' => TRIGGER_SEVERITY_NOT_CLASSIFIED
 			],
@@ -396,9 +396,9 @@ class testDashboardItemCardWidget extends testWidgets {
 				CDataHelper::addItemData(self::$itemids[$params['name']], $params['value'], $params['time']);
 		}
 
-		$trigger_names = ['Not classidied trigger', 'Information trigger', 'Warning trigger', 'Average trigger',
+		$trigger_names = ['Not classified trigger', 'Information trigger', 'Warning trigger', 'Average trigger',
 			'High trigger', 'Disaster trigger', 'Disaster trigger', 'Trigger 1', 'Trigger 2'];
-		CDBHelper::setTriggerProblem($trigger_names, TRIGGER_VALUE_TRUE);
+		CDBHelper::setTriggerProblem($trigger_names);
 
 		// Add red error messages.
 		DBexecute('UPDATE item_rtdata SET state = 1, error = '.zbx_dbstr('Value of type "string" is not suitable for '.
@@ -410,7 +410,6 @@ class testDashboardItemCardWidget extends testWidgets {
 			[
 				'name' => 'Dashboard for creating Item Card widgets',
 				'private' => PUBLIC_SHARING,
-				'auto_start' => 0,
 				'pages' => [
 					[
 						'widgets' => [
@@ -436,14 +435,14 @@ class testDashboardItemCardWidget extends testWidgets {
 								'height' => 5,
 								'fields' => [
 									[
-										'type' => 6,
+										'type' => ZBX_WIDGET_FIELD_TYPE_GRAPH,
 										'name' => 'graphid.0',
 										'value' => 2232 // Linux: CPU utilization.
 									],
 									[
-										'type'=> 1,
-										'name'=> 'reference',
-										'value'=> 'XIBBD'
+										'type' => ZBX_WIDGET_FIELD_TYPE_STR,
+										'name' => 'reference',
+										'value' => 'XIBBD'
 									]
 								]
 							]
@@ -453,7 +452,6 @@ class testDashboardItemCardWidget extends testWidgets {
 			],
 			[
 				'name' => 'Dashboard for Item Card widget update',
-				'display_period' => 1800,
 				'pages' => [
 					[
 						'widgets' => [
@@ -472,14 +470,14 @@ class testDashboardItemCardWidget extends testWidgets {
 								'height' => 5,
 								'fields' => [
 									[
-										'type' => 6,
+										'type' => ZBX_WIDGET_FIELD_TYPE_GRAPH,
 										'name' => 'graphid.0',
 										'value' => 2232 // Linux: CPU utilization.
 									],
 									[
-										'type'=> 1,
-										'name'=> 'reference',
-										'value'=> 'XIBBD'
+										'type' => ZBX_WIDGET_FIELD_TYPE_STR,
+										'name' => 'reference',
+										'value' => 'XIBBD'
 									]
 								]
 							],
@@ -492,29 +490,29 @@ class testDashboardItemCardWidget extends testWidgets {
 								'height' => 10,
 								'fields' => [
 									[
-										'type' => 4,
+										'type' => ZBX_WIDGET_FIELD_TYPE_ITEM,
 										'name' => 'itemid.0',
 										'value' => self::$itemids[STRING_255]
 									],
 									[
-										'type'=> '0',
-										'name'=> 'sections.0',
-										'value'=> '2'
+										'type' => '0',
+										'name' => 'sections.0',
+										'value' => '2'
 									],
 									[
-										'type'=> '0',
-										'name'=> 'sections.1',
-										'value'=> '4'
+										'type' => '0',
+										'name' => 'sections.1',
+										'value' => '4'
 									],
 									[
-										'type'=> '0',
-										'name'=> 'sections.2',
-										'value'=> '6'
+										'type' => '0',
+										'name' => 'sections.2',
+										'value' => '6'
 									],
 									[
-										'type'=> '0',
-										'name'=> 'sections.3',
-										'value'=> '7'
+										'type' => '0',
+										'name' => 'sections.3',
+										'value' => '7'
 									]
 								]
 							]
@@ -536,57 +534,57 @@ class testDashboardItemCardWidget extends testWidgets {
 								'height' => 10,
 								'fields' => [
 									[
-										'type' => 0,
+										'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
 										'name' => 'sections.0',
 										'value' => 2
 									],
 									[
-										'type' => 0,
+										'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
 										'name' => 'sections.1',
 										'value' => 4
 									],
 									[
-										'type' => 0,
+										'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
 										'name' => 'sections.2',
 										'value' => 6
 									],
 									[
-										'type' => 0,
+										'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
 										'name' => 'sections.3',
 										'value' => 7
 									],
 									[
-										'type' => 0,
+										'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
 										'name' => 'sections.4',
 										'value' => 0
 									],
 									[
-										'type' => 0,
+										'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
 										'name' => 'sections.5',
 										'value' => 1
 									],
 									[
-										'type' => 0,
+										'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
 										'name' => 'sections.6',
 										'value' => 3
 									],
 									[
-										'type' => 0,
+										'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
 										'name' => 'sections.7',
 										'value' => 5
 									],
 									[
-										'type' => 0,
+										'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
 										'name' => 'sections.8',
 										'value' => 8
 									],
 									[
-										'type' => 0,
+										'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
 										'name' => 'sections.9',
 										'value' => 9
 									],
 									[
-										'type' => 4,
+										'type' => ZBX_WIDGET_FIELD_TYPE_ITEM,
 										'name' => 'itemid.0',
 										'value' => self::$itemids[STRING_255]
 									]
@@ -610,7 +608,7 @@ class testDashboardItemCardWidget extends testWidgets {
 								'height' => 5,
 								'fields' => [
 									[
-										'type' => 4,
+										'type' => ZBX_WIDGET_FIELD_TYPE_ITEM,
 										'name' => 'itemid.0',
 										'value' => self::$itemids[STRING_255]
 									]
@@ -634,77 +632,77 @@ class testDashboardItemCardWidget extends testWidgets {
 								'height' => 10,
 								'fields' => [
 									[
-										'type' => 4,
+										'type' => ZBX_WIDGET_FIELD_TYPE_ITEM,
 										'name' => 'itemid.0',
 										'value' => self::$itemids[STRING_255]
 									],
 									[
-										'type' => 0,
+										'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
 										'name' => 'sections.0',
 										'value' => 2
 									],
 									[
-										'type' => 0,
+										'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
 										'name' => 'sections.1',
 										'value' => 4
 									],
 									[
-										'type' => 0,
+										'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
 										'name' => 'sections.2',
 										'value' => 6
 									],
 									[
-										'type' => 0,
+										'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
 										'name' => 'sections.3',
 										'value' => 7
 									],
 									[
-										'type' => 0,
+										'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
 										'name' => 'sections.4',
 										'value' => 0
 									],
 									[
-										'type' => 0,
+										'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
 										'name' => 'sections.5',
 										'value' => 1
 									],
 									[
-										'type' => 0,
+										'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
 										'name' => 'sections.6',
 										'value' => 3
 									],
 									[
-										'type' => 0,
+										'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
 										'name' => 'sections.7',
 										'value' => 5
 									],
 									[
-										'type' => 0,
+										'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
 										'name' => 'sections.8',
 										'value' => 8
 									],
 									[
-										'type' => 0,
+										'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
 										'name' => 'sections.9',
 										'value' => 9
 									],
 									[
-										'type' => 1,
+										'type'=> ZBX_WIDGET_FIELD_TYPE_STR,
 										'name' => 'sparkline.color',
 										'value' => 'FFC107'
 									],
 									[
-										'type' => 0,
+										'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
 										'name' => 'sparkline.fill',
 										'value' => 1
 									],
 									[
-										'type' => 1,
+										'type'=> ZBX_WIDGET_FIELD_TYPE_STR,
 										'name' => 'sparkline.time_period.from',
 										'value' => 'now-1d'
 									],
 									[
-										'type' => 1,
+										'type'=> ZBX_WIDGET_FIELD_TYPE_STR,
 										'name' => 'sparkline.time_period.to',
 										'value' => 'now+1d'
 									]
@@ -719,77 +717,77 @@ class testDashboardItemCardWidget extends testWidgets {
 								'height' => 10,
 								'fields' => [
 									[
-										'type' => 4,
+										'type' => ZBX_WIDGET_FIELD_TYPE_ITEM,
 										'name' => 'itemid.0',
 										'value' => $depend_items['Dependent item 1']
 									],
 									[
-										'type' => 0,
+										'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
 										'name' => 'sections.0',
 										'value' => 2
 									],
 									[
-										'type' => 0,
+										'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
 										'name' => 'sections.1',
 										'value' => 4
 									],
 									[
-										'type' => 0,
+										'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
 										'name' => 'sections.2',
 										'value' => 6
 									],
 									[
-										'type' => 0,
+										'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
 										'name' => 'sections.3',
 										'value' => 7
 									],
 									[
-										'type' => 0,
+										'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
 										'name' => 'sections.4',
 										'value' => 0
 									],
 									[
-										'type' => 0,
+										'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
 										'name' => 'sections.5',
 										'value' => 1
 									],
 									[
-										'type' => 0,
+										'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
 										'name' => 'sections.6',
 										'value' => 3
 									],
 									[
-										'type' => 0,
+										'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
 										'name' => 'sections.7',
 										'value' => 5
 									],
 									[
-										'type' => 0,
+										'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
 										'name' => 'sections.8',
 										'value' => 8
 									],
 									[
-										'type' => 0,
+										'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
 										'name' => 'sections.9',
 										'value' => 9
 									],
 									[
-										'type' => 1,
+										'type'=> ZBX_WIDGET_FIELD_TYPE_STR,
 										'name' => 'sparkline.color',
 										'value' => '42A5F5'
 									],
 									[
-										'type' => 0,
+										'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
 										'name' => 'sparkline.fill',
 										'value' => 1
 									],
 									[
-										'type' => 1,
+										'type'=> ZBX_WIDGET_FIELD_TYPE_STR,
 										'name' => 'sparkline.time_period.from',
 										'value' => 'now-1d'
 									],
 									[
-										'type' => 1,
+										'type'=> ZBX_WIDGET_FIELD_TYPE_STR,
 										'name' => 'sparkline.time_period.to',
 										'value' => 'now+1d'
 									]
@@ -803,77 +801,77 @@ class testDashboardItemCardWidget extends testWidgets {
 								'height' => 10,
 								'fields' => [
 									[
-										'type' => 4,
+										'type' => ZBX_WIDGET_FIELD_TYPE_ITEM,
 										'name' => 'itemid.0',
 										'value' => self::$template_items['Master item from template']+1
 									],
 									[
-										'type' => 0,
+										'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
 										'name' => 'sections.0',
 										'value' => 2
 									],
 									[
-										'type' => 0,
+										'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
 										'name' => 'sections.1',
 										'value' => 4
 									],
 									[
-										'type' => 0,
+										'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
 										'name' => 'sections.2',
 										'value' => 6
 									],
 									[
-										'type' => 0,
+										'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
 										'name' => 'sections.3',
 										'value' => 7
 									],
 									[
-										'type' => 0,
+										'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
 										'name' => 'sections.4',
 										'value' => 0
 									],
 									[
-										'type' => 0,
+										'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
 										'name' => 'sections.5',
 										'value' => 1
 									],
 									[
-										'type' => 0,
+										'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
 										'name' => 'sections.6',
 										'value' => 3
 									],
 									[
-										'type' => 0,
+										'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
 										'name' => 'sections.7',
 										'value' => 5
 									],
 									[
-										'type' => 0,
+										'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
 										'name' => 'sections.8',
 										'value' => 8
 									],
 									[
-										'type' => 0,
+										'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
 										'name' => 'sections.9',
 										'value' => 9
 									],
 									[
-										'type' => 1,
+										'type'=> ZBX_WIDGET_FIELD_TYPE_STR,
 										'name' => 'sparkline.color',
 										'value' => '42A5F5'
 									],
 									[
-										'type' => 0,
+										'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
 										'name' => 'sparkline.fill',
 										'value' => 1
 									],
 									[
-										'type' => 1,
+										'type'=> ZBX_WIDGET_FIELD_TYPE_STR,
 										'name' => 'sparkline.time_period.from',
 										'value' => 'now-1d'
 									],
 									[
-										'type' => 1,
+										'type'=> ZBX_WIDGET_FIELD_TYPE_STR,
 										'name' => 'sparkline.time_period.to',
 										'value' => 'now+1d'
 									]
@@ -888,27 +886,27 @@ class testDashboardItemCardWidget extends testWidgets {
 								'height' => 5,
 								'fields' => [
 									[
-										'type' => 4,
+										'type' => ZBX_WIDGET_FIELD_TYPE_ITEM,
 										'name' => 'itemid.0',
 										'value' => self::$itemids['<img src=\"x\" onerror=\"alert("ERROR");\"/>']
 									],
 									[
-										'type' => 0,
+										'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
 										'name' => 'sections.0',
 										'value' => 2
 									],
 									[
-										'type' => 0,
+										'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
 										'name' => 'sections.1',
 										'value' => 4
 									],
 									[
-										'type' => 0,
+										'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
 										'name' => 'sections.2',
 										'value' => 6
 									],
 									[
-										'type' => 0,
+										'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
 										'name' => 'sections.3',
 										'value' => 7
 									]
@@ -923,32 +921,32 @@ class testDashboardItemCardWidget extends testWidgets {
 								'height' => 6,
 								'fields' => [
 									[
-										'type' => 4,
+										'type' => ZBX_WIDGET_FIELD_TYPE_ITEM,
 										'name' => 'itemid.0',
 										'value' => self::$itemids['Item with text datatype']
 									],
 									[
-										'type' => 0,
+										'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
 										'name' => 'sections.0',
 										'value' => 2
 									],
 									[
-										'type' => 0,
+										'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
 										'name' => 'sections.1',
 										'value' => 4
 									],
 									[
-										'type' => 0,
+										'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
 										'name' => 'sections.2',
 										'value' => 6
 									],
 									[
-										'type' => 0,
+										'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
 										'name' => 'sections.3',
 										'value' => 7
 									],
 									[
-										'type' => 0,
+										'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
 										'name' => 'sections.4',
 										'value' => 3
 									]
@@ -963,27 +961,27 @@ class testDashboardItemCardWidget extends testWidgets {
 								'height' => 5,
 								'fields' => [
 									[
-										'type' => 4,
+										'type' => ZBX_WIDGET_FIELD_TYPE_ITEM,
 										'name' => 'itemid.0',
 										'value' => 10090002 // Discovered Item KEY1.
 									],
 									[
-										'type' => 0,
+										'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
 										'name' => 'sections.0',
 										'value' => 2
 									],
 									[
-										'type' => 0,
+										'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
 										'name' => 'sections.1',
 										'value' => 4
 									],
 									[
-										'type' => 0,
+										'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
 										'name' => 'sections.2',
 										'value' => 6
 									],
 									[
-										'type' => 0,
+										'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
 										'name' => 'sections.3',
 										'value' => 7
 									]
@@ -1036,15 +1034,15 @@ class testDashboardItemCardWidget extends testWidgets {
 
 		// After selecting Widget from dropdown menu, check overlay dialog appearance and title.
 		$menu_button->select('Widget');
-		$dialogs = COverlayDialogElement::find()->all();
-		$this->assertEquals('Widget', $dialogs->last()->waitUntilReady()->getTitle());
-		$dialogs->last()->close(true);
+		$dialog = COverlayDialogElement::find()->all()->last();
+		$this->assertEquals('Widget', $dialog->waitUntilReady()->getTitle());
+		$dialog->close(true);
 
 		// After clicking on Select button, check overlay dialog appearance and title.
 		$label->query('button:Select')->waitUntilCLickable()->one()->click();
-		$dialogs = COverlayDialogElement::find()->all();
-		$this->assertEquals('Items', $dialogs->last()->waitUntilReady()->getTitle());
-		$dialogs->last()->close(true);
+		$dialog = COverlayDialogElement::find()->all()->last();
+		$this->assertEquals('Items', $dialog->waitUntilReady()->getTitle());
+		$dialog->close(true);
 
 		// Check default and available options in 'Show' section.
 		$show_form = $form->getFieldContainer('Show')->asMultifieldTable(['mapping' => ['' => 'section']]);
@@ -1113,55 +1111,72 @@ class testDashboardItemCardWidget extends testWidgets {
 				foreach ($radio_buttons as $locator => $labels) {
 					foreach ($labels as $option) {
 						$form->getField($locator)->asSegmentedRadio()->select($option);
+						if ($option === 'Widget') {
+							$this->assertTrue($form->query('id:sparkline_time_period_reference_ms')
+									->one()->isVisible()
+							);
+							$this->assertTrue($form->query('class:js-sparkline_time_period-reference')
+									->query('button', 'Select')->one()->isClickable()
+							);
+						}
 					}
 					$this->assertEquals($labels, $form->getField($locator)->getLabels()->asText());
 				}
 
 				// Check that user may open a calendar.
 				foreach (['from', 'to'] as $type) {
-					$icon = $form->query('id:sparkline_time_period_'.$type.'_calendar')->one();
-					$icon->click();
-					$calendar = COverlayDialogElement::find()->all()->last()->waitUntilReady();
-					$this->assertTrue($calendar->isVisible());
-					$icon->click();
+					$calendar = $form->query('xpath:.//button[@id="sparkline_time_period_'.$type.'_calendar"]')->one();
+					$calendar->waitUntilClickable()->click();
+					$calendar_overlay = $this->query('xpath://div[@aria-label="Calendar"]');
+					$this->assertTrue($calendar_overlay->exists());
+					$calendar->click();
+					$this->assertFalse($calendar_overlay->exists());
 				}
 
 				// Check color-picker form is opened.
-				$icon = $form->query('class:color-picker-box')->one()->click();
-				$colorpicker = $this->query('id:color_picker')->one()->waitUntilReady();
-				$this->assertTrue($colorpicker->isVisible(true));
-				$colorpicker->query('button:Apply')->one()->click();
-				$this->assertTrue($colorpicker->isVisible(false));
+				$color_picker_dialog = $form->query('class:color-picker')->one()->asColorPicker();
+
+				// Check that apply button disabled if field is empty
+				$color_picker_dialog->fill('');
+				$this->assertTrue($color_picker_dialog->isSubmittionDisabled());
+				$color_picker_dialog->close();
 			}
 			else {
 				$this->assertTrue($sparkline->isVisible(false));
 			}
 		}
 
-		$label = $form->getField('Override host');
+		// Check dropdown/select for item and override.
+		foreach (['Item' => ['Item', 'Widget'], 'Override host' => ['Widget', 'Dashboard']] as $label => $menu_items) {
+			$field = $form->getField($label);
+			$menu_button = $field->query('xpath:.//button[contains(@class, "zi-chevron-down")]')->asPopupButton()->one();
+			$this->assertEquals($menu_items, $menu_button->getMenu()->getItems()->asText());
 
-		// Check Select dropdown menu button.
-		$menu_button = $label->query('xpath:.//button[contains(@class, "zi-chevron-down")]')->asPopupButton()->one();
-		$this->assertEquals(['Widget', 'Dashboard'], $menu_button->getMenu()->getItems()->asText());
+			// Check dropdown menus.
+			foreach ($menu_items as $item) {
+				$menu_button->select($item);
 
-		// After selecting Widget from dropdown menu, check overlay dialog appearance and title.
-		$menu_button->select('Widget');
-		$dialogs = COverlayDialogElement::find()->all();
-		$this->assertEquals('Widget', $dialogs->last()->waitUntilReady()->getTitle());
-		$dialogs->last()->close(true);
+				if ($item === 'Dashboard') {
+					$form->checkValue(['Override host' => 'Dashboard']);
+					$this->assertTrue($field->query('xpath', './/span[@data-hintbox-contents="Dashboard is used as data source."]')
+							->one()->isVisible()
+					);
+				}
+				else {
+					$dialog_title = ($item === 'Item') ? 'Items' : $item;
+					$dialogs = COverlayDialogElement::find()->all()->last();
+					$this->assertEquals($dialog_title, $dialogs->waitUntilReady()->getTitle());
+					$dialogs->close(true);
+				}
+			}
 
-		// After selecting Dashboard from dropdown menu, check hint and field value.
-		$menu_button->select('Dashboard');
-		$form->checkValue(['Override host' => 'Dashboard']);
-		$this->assertTrue($label->query('xpath', './/span[@data-hintbox-contents="Dashboard is used as data source."]')
-				->one()->isVisible()
-		);
-
-		// After clicking on Select button, check overlay dialog appearance and title.
-		$label->query('button:Select')->waitUntilCLickable()->one()->click();
-		$dialogs = COverlayDialogElement::find()->all();
-		$this->assertEquals('Widget', $dialogs->last()->waitUntilReady()->getTitle());
-		$dialogs->last()->close(true);
+			// Check select buttons.
+			$selector_title = ($label === 'Item') ? 'Items' : 'Widget';
+			$field->query('button:Select')->waitUntilCLickable()->one()->click();
+			$selector_dialog = COverlayDialogElement::find()->all()->last();
+			$this->assertEquals($selector_title, $selector_dialog->waitUntilReady()->getTitle());
+			$selector_dialog->close(true);
+		}
 	}
 
 	public static function getCreateData() {
@@ -1171,7 +1186,6 @@ class testDashboardItemCardWidget extends testWidgets {
 				[
 					'expected' => TEST_BAD,
 					'fields' => [
-						'Name' => 'Item is not selected',
 						'Item' => ''
 					],
 					'error_message' => [
@@ -1187,18 +1201,11 @@ class testDashboardItemCardWidget extends testWidgets {
 						'Item' => STRING_255
 					],
 					'Show' => [
-						['action' => USER_ACTION_UPDATE, 'index' => 0, 'section' => 'Latest data'],
-						['action' => USER_ACTION_REMOVE, 'index' => 1],
-						['action' => USER_ACTION_REMOVE, 'index' => 1],
-						['action' => USER_ACTION_REMOVE, 'index' => 1]
+						['action' => USER_ACTION_UPDATE, 'index' => 0, 'section' => 'Latest data']
 					],
 					'Sparkline' => [
-						'id:sparkline_width' => 5,
-						'id:sparkline_fill' => 5,
-						'id:sparkline_time_period_data_source' => 'Custom',
 						'id:sparkline_time_period_from' => '',
-						'id:sparkline_time_period_to' => '',
-						'color' => 'CDDC39'
+						'id:sparkline_time_period_to' => ''
 					],
 					'error_message' => [
 						'Invalid parameter "Sparkline: Time period/From": cannot be empty.',
@@ -1215,15 +1222,9 @@ class testDashboardItemCardWidget extends testWidgets {
 						'Item' => STRING_255
 					],
 					'Show' => [
-						['action' => USER_ACTION_UPDATE, 'index' => 0, 'section' => 'Latest data'],
-						['action' => USER_ACTION_REMOVE, 'index' => 1],
-						['action' => USER_ACTION_REMOVE, 'index' => 1],
-						['action' => USER_ACTION_REMOVE, 'index' => 1]
+						['action' => USER_ACTION_UPDATE, 'index' => 0, 'section' => 'Latest data']
 					],
 					'Sparkline' => [
-						'id:sparkline_width' => 5,
-						'id:sparkline_fill' => 5,
-						'id:sparkline_time_period_data_source' => 'Custom',
 						'id:sparkline_time_period_from' => 'now-1000d',
 						'id:sparkline_time_period_to' => 'now'
 					],
@@ -1241,14 +1242,9 @@ class testDashboardItemCardWidget extends testWidgets {
 						'Item' => STRING_255
 					],
 					'Show' => [
-						['action' => USER_ACTION_UPDATE, 'index' => 0, 'section' => 'Latest data'],
-						['action' => USER_ACTION_REMOVE, 'index' => 1],
-						['action' => USER_ACTION_REMOVE, 'index' => 1],
-						['action' => USER_ACTION_REMOVE, 'index' => 1]
+						['action' => USER_ACTION_UPDATE, 'index' => 0, 'section' => 'Latest data']
 					],
 					'Sparkline' => [
-						'id:sparkline_width' => 5,
-						'id:sparkline_fill' => 5,
 						'id:sparkline_time_period_data_source' => 'Widget'
 					],
 					'error_message' => [
@@ -1267,26 +1263,12 @@ class testDashboardItemCardWidget extends testWidgets {
 						'Item' => STRING_255
 					],
 					'Show' => [
-						['action' => USER_ACTION_UPDATE, 'index' => 0, 'section' => 'Latest data'],
-						['action' => USER_ACTION_REMOVE, 'index' => 1],
-						['action' => USER_ACTION_REMOVE, 'index' => 1],
-						['action' => USER_ACTION_REMOVE, 'index' => 1],
-						['section' => 'Metrics'],
-						['section' => 'Error text'],
-						['section' => 'Description'],
-						['section' => 'Tags'],
-						['section' => 'Triggers'],
-						['section' => 'Host inventory'],
-						['section' => 'Type'],
-						['section' => 'Type of information'],
-						['section' => 'Host interface']
+						['action' => USER_ACTION_UPDATE, 'index' => 0, 'section' => 'Latest data']
 					],
 					'Screenshot' => true,
 					'Sparkline' => [
 						'id:sparkline_width' => 5000,
-						'id:sparkline_fill' => -5,
-						'id:sparkline_time_period_data_source' => 'Dashboard',
-						'color' => '44F44A'
+						'id:sparkline_fill' => -5
 					],
 					'error_message' => [
 						'Invalid parameter "Sparkline: Width": value must be one of 0-10.',
@@ -1303,14 +1285,9 @@ class testDashboardItemCardWidget extends testWidgets {
 						'Item' => STRING_255
 					],
 					'Show' => [
-						['action' => USER_ACTION_UPDATE, 'index' => 0, 'section' => 'Latest data'],
-						['action' => USER_ACTION_REMOVE, 'index' => 1],
-						['action' => USER_ACTION_REMOVE, 'index' => 1],
-						['action' => USER_ACTION_REMOVE, 'index' => 1]
+						['action' => USER_ACTION_UPDATE, 'index' => 0, 'section' => 'Latest data']
 					],
 					'Sparkline' => [
-						'id:sparkline_width' => 5,
-						'id:sparkline_fill' => 5,
 						'id:sparkline_time_period_data_source' => 'Custom',
 						'id:sparkline_time_period_from' => 'dsa',
 						'id:sparkline_time_period_to' => '321'
@@ -1373,8 +1350,7 @@ class testDashboardItemCardWidget extends testWidgets {
 						['action' => USER_ACTION_REMOVE, 'index' => 1],
 						['action' => USER_ACTION_REMOVE, 'index' => 1],
 						['action' => USER_ACTION_REMOVE, 'index' => 1]
-					],
-					'trim' => true
+					]
 				]
 			],
 			// #9.
@@ -1391,8 +1367,7 @@ class testDashboardItemCardWidget extends testWidgets {
 						['action' => USER_ACTION_REMOVE, 'index' => 1],
 						['action' => USER_ACTION_REMOVE, 'index' => 1],
 						['action' => USER_ACTION_REMOVE, 'index' => 1]
-					],
-					'trim' => true
+					]
 				]
 			],
 			// #10.
@@ -1410,8 +1385,7 @@ class testDashboardItemCardWidget extends testWidgets {
 						['action' => USER_ACTION_REMOVE, 'index' => 2],
 						['action' => USER_ACTION_UPDATE, 'index' => 1, 'section' => 'Host inventory'],
 						['action' => USER_ACTION_REMOVE, 'index' => 1]
-					],
-					'trim' => true
+					]
 				]
 			],
 			// #11.
@@ -1438,8 +1412,7 @@ class testDashboardItemCardWidget extends testWidgets {
 						'id:sparkline_time_period_data_source' => 'Dashboard',
 						'id:sparkline_history' => 'History',
 						'color' => 'F48FB1'
-					],
-					'trim' => true
+					]
 				]
 			],
 			// #12.
@@ -1467,8 +1440,7 @@ class testDashboardItemCardWidget extends testWidgets {
 						'id:sparkline_history' => 'Trends',
 						'color' => '9A34A1',
 						'widget' => 'ЗАББИКС Сервер: Linux: CPU utilization'
-					],
-					'trim' => true
+					]
 				]
 			],
 			// #13.
@@ -1615,12 +1587,13 @@ class testDashboardItemCardWidget extends testWidgets {
 					'Latest data' => [
 						'column' => '3M 10d',
 						'center-column' => '9000 %',
-						'right-column' =>  'Graph'
+						'right-column' => 'Graph'
 					],
+					'Check last metric time' => true,
 					'Triggers' => [
 						[
 							'Severity' => 'Not classified',
-							'Name' => 'Not classidied trigger',
+							'Name' => 'Not classified trigger',
 							'Expression' => 'last(/Host for Item Card widget/master)>100',
 							'Status' => 'Enabled'
 						],
@@ -1671,7 +1644,7 @@ class testDashboardItemCardWidget extends testWidgets {
 							'Item' => 'zabbix.php?action=popup&popup=item.edit&context=host&itemid={itemid}',
 							'Host' => 'zabbix.php?action=popup&popup=host.edit&hostid={hostid}',
 							'Triggers' => [
-								'Not classidied trigger' => 'zabbix.php?action=popup&popup=trigger.edit'.
+								'Not classified trigger' => 'zabbix.php?action=popup&popup=trigger.edit'.
 										'&triggerid={triggerid}&hostid={hostid}&context=host',
 								'Information trigger' => 'zabbix.php?action=popup&popup=trigger.edit'.
 										'&triggerid={triggerid}&hostid={hostid}&context=host',
@@ -1706,7 +1679,7 @@ class testDashboardItemCardWidget extends testWidgets {
 					'Metrics' => [
 						'column' => '',
 						'center-column' => '31d',
-						'right-column' =>  '365d'
+						'right-column' => '365d'
 					],
 					'Type of information' => 'Numeric (float)',
 					'Host interface' => 'No data',
@@ -1716,7 +1689,7 @@ class testDashboardItemCardWidget extends testWidgets {
 					'Latest data' => [
 						'column' => '',
 						'center-column' => '',
-						'right-column' =>  'Graph'
+						'right-column' => 'Graph'
 					],
 					'Triggers' => [
 						[
@@ -1766,13 +1739,14 @@ class testDashboardItemCardWidget extends testWidgets {
 						'center-column' => '31d',
 						'right-column' => ''
 					],
+					'Check last metric time' => true,
 					'Type of information' => 'Character',
 					'Host interface' => 'selenium.test:30053',
 					'Type' => 'IPMI agent',
 					'Latest data' => [
 						'column' => '',
 						'center-column' => '',
-						'right-column' =>  'History'
+						'right-column' => 'History'
 					],
 					'Host inventory' => ''
 				]
@@ -1814,7 +1788,7 @@ class testDashboardItemCardWidget extends testWidgets {
 					'Latest data' => [
 						'column' => '4M',
 						'center-column' => 'QA team',
-						'right-column' =>  ''
+						'right-column' => ''
 					]
 				]
 			],
@@ -1823,14 +1797,6 @@ class testDashboardItemCardWidget extends testWidgets {
 				[
 					'Header' => 'Link to LLD rule',
 					'Host' => 'Visible host name for Item Card widget',
-					'Metrics' => [
-						'column' => '',
-						'center-column' => '31d',
-						'right-column' => '365d'
-					],
-					'Type of information' => 'Numeric (float)',
-					'Host interface' => 'No data',
-					'Type' => 'Zabbix trapper',
 					'Warning' => 'The item is not discovered anymore and will not be disabled, will not be deleted.'
 				]
 			]
@@ -1918,15 +1884,13 @@ class testDashboardItemCardWidget extends testWidgets {
 		}
 
 		if (array_key_exists('Description', $data)) {
-			$this->assertEquals($data['Description'], $widget->query('class:section-description')
-					->one()->getText()
-			);
+			$this->assertEquals($data['Description'], $widget->query('class:section-description')->one()->getText());
 		}
 
 		if (array_key_exists('Latest data', $data)) {
 			foreach ($data['Latest data'] as $section => $value) {
 
-				// Last check.
+				// Check value in Latest data section -> Last check column.
 				if ($section === 'column') {
 					if ($value) {
 						$last_check = $widget->query('class:section-latest-data')->query('class:'.$section)
@@ -1936,6 +1900,11 @@ class testDashboardItemCardWidget extends testWidgets {
 						$last_check->click();
 						$hint = $this->query('xpath://div[@data-hintboxid]')->asOverlayDialog()->waitUntilPresent()->all()->last();
 						$this->assertTrue($hint->isVisible());
+						if (array_key_exists('Check last metric time', $data)) {
+							$this->assertEquals($hint->getText(), date('Y-m-d H:i:s', CDBHelper::getValue('SELECT clock'.
+									' FROM history_uint WHERE itemid='.self::$itemids[STRING_255]))
+							);
+						}
 						$hint->close();
 					}
 					else {
@@ -1943,16 +1912,16 @@ class testDashboardItemCardWidget extends testWidgets {
 								->query('class:column-value')->one()->getText());
 					}
 				}
-				// Graph or history link.
+				// Check graph or history link in Latest data section.
 				else if ($section === 'right-column') {
-					$link = $widget->query('class:section-latest-data')->query('class:'.$section)
-							->query('class:column-value')->one();
-					$this->assertTrue($link->isClickable());
+					$this->assertTrue($widget->query('class:section-latest-data')->query('class:'.$section)
+							->query('class:column-value')->one()->isClickable()
+					);
 				}
-				// Last value.
+				// Check Last value column value in Latest data section.
 				else {
 					$this->assertEquals($value, $widget->query('class:section-latest-data')->query('class:'.$section)
-						->query('class:column-value')->one()->getText()
+							->query('class:column-value')->one()->getText()
 					);
 				}
 			}
@@ -1974,7 +1943,7 @@ class testDashboardItemCardWidget extends testWidgets {
 			$hint = $this->query('xpath://div[@class="overlay-dialogue wordbreak"]')->asOverlayDialog()->waitUntilPresent()->one();
 			$table = $hint->query('class:list-table')->asTable()->one();
 
-			$this->assertEquals(['Severity', 'Name', 'Expression', 'Status'],$table->getHeadersText());
+			$this->assertEquals(['Severity', 'Name', 'Expression', 'Status'], $table->getHeadersText());
 
 			foreach ($data['Triggers'] as $i => $trigger) {
 				$row = $table->getRow($i);
@@ -2071,7 +2040,7 @@ class testDashboardItemCardWidget extends testWidgets {
 				'Graph' => 'history.php?action=showgraph&itemids%5B%5D='.self::$itemids[STRING_255],
 				'Severity' => 'zabbix.php?action=problem.view&hostids%5B0%5D='.self::$hostids['hostids']
 						['Host for Item Card widget'].'&triggerids%5B0%5D='.
-						self::$triggers['Not classidied trigger'].'&triggerids%5B1%5D='.
+						self::$triggers['Not classified trigger'].'&triggerids%5B1%5D='.
 						self::$triggers['Information trigger'].'&triggerids%5B2%5D='.
 						self::$triggers['Warning trigger'].'&triggerids%5B3%5D='.
 						self::$triggers['Average trigger'].'&triggerids%5B4%5D='.
@@ -2314,10 +2283,8 @@ class testDashboardItemCardWidget extends testWidgets {
 		if (array_key_exists('Sparkline', $data)) {
 			foreach ($data['Sparkline'] as $field => $value) {
 				if ($field === 'color') {
-					$form->query('class:color-picker-box')->one()->click();
-					$colorpicker = $this->query('id:color_picker')->one()->waitUntilReady();
-					$colorpicker->query('class:color-picker-input')->one()->fill($value);
-					$colorpicker->query('button:Apply')->one()->click();
+					$color_picker_dialog = $form->query('class:color-picker')->one()->asColorPicker();
+					$color_picker_dialog->fill($value);
 				}
 				else if ($field === 'widget') {
 					$sparkline = $form->query('class:widget-field-sparkline')->one()->waitUntilReady();
@@ -2372,7 +2339,6 @@ class testDashboardItemCardWidget extends testWidgets {
 			$this->assertMessage(TEST_GOOD, 'Dashboard updated');
 			// Compare old hash and new one.
 			$this->assertEquals(self::$old_hash, CDBHelper::getHash(self::SQL));
-
 		}
 		else {
 			// Trim leading and trailing spaces from expected results if necessary.
@@ -2437,13 +2403,13 @@ class testDashboardItemCardWidget extends testWidgets {
 	/**
 	 * Find and check the value on the specific single-parameter section.
 	 *
-	 * @param CWidgetElement	$widget			given widget
-	 * @param string			$section_name	section label
-	 * @param string			$section_value	expected section value
+	 * @param CWidgetElement	$widget				given widget
+	 * @param string			$section_name		section label
+	 * @param string			$expected_value		expected section value
 	 */
 	protected function asssertSectionValue($widget, $section_name, $expected_value) {
 		$row = $widget->query('xpath:.//div[@class="section-name" and text()='.CXPathHelper::escapeQuotes($section_name).']')->one();
-		$value =  $row->query('xpath:./following-sibling::div[1]')->one()->getText();
+		$value = $row->query('xpath:./following-sibling::div[1]')->one()->getText();
 		$this->assertEquals($expected_value, $value);
 	}
 }
