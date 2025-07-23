@@ -221,10 +221,18 @@ static int	preprocessor_pack_variant(zbx_packed_field_t *fields, const zbx_varia
 			fields[offset++] = PACKED_FIELD(value->data.err, 0);
 			break;
 
+		case ZBX_VARIANT_JSON:
+			fields[offset++] = PACKED_FIELD(value->data.json, 0);
+			break;
+
 		case ZBX_VARIANT_BIN:
 			fields[offset++] = PACKED_FIELD(value->data.bin, sizeof(zbx_uint32_t) +
 					zbx_variant_data_bin_get(value->data.bin, NULL));
 			break;
+
+		case ZBX_VARIANT_NONE:
+			break;
+
 		default:
 			THIS_SHOULD_NEVER_HAPPEN;
 			exit(EXIT_FAILURE);
@@ -326,8 +334,6 @@ static int	preprocessor_unpack_variant(const unsigned char *data, zbx_variant_t 
 			break;
 		case ZBX_VARIANT_JSON:
 			offset += zbx_deserialize_str(offset, &value->data.json, value_len);
-			THIS_SHOULD_NEVER_HAPPEN;
-			exit(EXIT_FAILURE);
 			break;
 		case ZBX_VARIANT_NONE:
 		case ZBX_VARIANT_VECTOR:
