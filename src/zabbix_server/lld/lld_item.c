@@ -318,7 +318,7 @@ static void	update_item_template_cache(zbx_vector_uint64_t *in_itemids)
 	template_names = (char *)zbx_malloc(template_names, tmp_alloc);
 
 	zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset,
-			" select id.itemid,itc.link_hostid from item_template_cache itc"
+			"select id.itemid,itc.link_hostid from item_template_cache itc"
 			" join item_discovery id on itc.itemid=id.parent_itemid"
 			" where");
 
