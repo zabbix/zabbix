@@ -274,7 +274,6 @@ window.item_edit_form = new class {
 					this.field.url.value = url.url;
 
 					if (has_pairs) {
-						this.form.discoverAllFields();
 						setTimeout(() => {
 							const fields = this.form.findFieldByName('query_fields').getFields();
 							Object.values(fields).entries().forEach(([index, field]) => field.setChanged());
@@ -417,16 +416,17 @@ window.item_edit_form = new class {
 		for (const field of Object.values(this.form.findFieldByName('preprocessing').getFields())) {
 			field.setChanged();
 		}
-		this.form.validateFieldsForAction(['key', 'preprocessing', 'params_f'], rules).then((result) => {
-			this.overlay.unsetLoading();
-			this.#updateActionButtons();
+		this.form.validateFieldsForAction(['key', 'preprocessing', 'params_f'], rules)
+			.then((result) => {
+				this.overlay.unsetLoading();
+				this.#updateActionButtons();
 
-			if (!result) {
-				return;
-			}
+				if (!result) {
+					return;
+				}
 
-			this.#testDialog();
-		});
+				this.#testDialog();
+			});
 	}
 
 	delete() {
