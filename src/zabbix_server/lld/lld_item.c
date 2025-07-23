@@ -365,11 +365,13 @@ static void	update_item_template_cache(zbx_vector_uint64_t *in_itemids)
  * Purpose: Retrieves existing items for the specified item prototypes.       *
  *                                                                            *
  * Parameters: item_prototypes - [IN]                                         *
+ *             linked_ruleids  - [IN] discovery rule ids when discovering     *
+ *                                    prototypes (optional)                   *
  *             items           - [OUT]                                        *
  *                                                                            *
  ******************************************************************************/
 static void	lld_items_get(const zbx_vector_lld_item_prototype_ptr_t *item_prototypes,
-		zbx_vector_lld_item_full_ptr_t *items)
+		const zbx_vector_uint64_t *linked_ruleids, zbx_vector_lld_item_full_ptr_t *items)
 {
 	zbx_db_result_t			result;
 	zbx_db_row_t			row;
@@ -407,6 +409,14 @@ static void	lld_items_get(const zbx_vector_lld_item_prototype_ptr_t *item_protot
 
 	zbx_db_add_condition_alloc(&sql, &sql_alloc, &sql_offset, "parent_itemid", parent_itemids.values,
 			parent_itemids.values_num);
+
+	/* limit to prototypes belonging to the LLD rule prototypes being processed */
+	if (NULL != linked_ruleids)
+	{
+		zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, " and");
+		zbx_db_add_condition_alloc(&sql, &sql_alloc, &sql_offset, "lldruleid", linked_ruleids->values,
+				linked_ruleids->values_num);
+	}
 
 	result = zbx_db_select("%s", sql);
 
@@ -4833,7 +4843,7 @@ static void	lld_item_prototype_dump(zbx_lld_item_prototype_t *item_prototype)
  ******************************************************************************/
 int	lld_update_items(zbx_uint64_t hostid, zbx_uint64_t lld_ruleid, zbx_vector_lld_row_ptr_t *lld_rows, char **error,
 		const zbx_lld_lifetime_t *lifetime, const zbx_lld_lifetime_t *enabled_lifetime, int lastcheck,
-		int dflags, zbx_hashset_t *rule_index)
+		int dflags, zbx_hashset_t *rule_index, const zbx_vector_uint64_t *ruleids)
 {
 	zbx_vector_lld_item_prototype_ptr_t	item_prototypes;
 	zbx_hashset_t				items_index;
@@ -4859,7 +4869,7 @@ int	lld_update_items(zbx_uint64_t hostid, zbx_uint64_t lld_ruleid, zbx_vector_ll
 	zbx_hashset_create(&items_index, item_prototypes.values_num * lld_rows->values_num, lld_item_index_hash_func,
 			lld_item_index_compare_func);
 	zbx_db_begin();
-	lld_items_get(&item_prototypes, &items);
+	lld_items_get(&item_prototypes, ruleids, &items);
 	zbx_db_commit();
 
 	lld_items_make(&item_prototypes, lld_rows, &items, &items_index, lastcheck, error);

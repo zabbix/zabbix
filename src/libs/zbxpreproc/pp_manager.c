@@ -442,6 +442,9 @@ static void	pp_manager_queue_value_task_result(zbx_pp_manager_t *manager, zbx_pp
 	zbx_pp_task_value_t	*d = (zbx_pp_task_value_t *)PP_TASK_DATA(task);
 	zbx_pp_item_t		*item;
 
+	d->preproc->time_ms = task->time_ms;
+	d->preproc->total_ms += task->time_ms;
+
 	if (ZBX_VARIANT_NONE == d->result.type)
 		return;
 
@@ -483,6 +486,8 @@ static zbx_pp_task_t	*pp_manager_queue_dependent_task_result(zbx_pp_manager_t *m
 	zbx_pp_task_t		*task_value = d->primary;
 	zbx_pp_task_value_t	*dp = (zbx_pp_task_value_t *)PP_TASK_DATA(task_value);
 
+	d->primary->time_ms = task->time_ms;
+
 	pp_manager_queue_value_task_result(manager, d->primary);
 	pp_manager_queue_dependents(manager, d->preproc, dp->um_handle, task_value->itemid, &dp->result, dp->ts, d->cache);
 
@@ -509,6 +514,8 @@ static zbx_pp_task_t	*pp_manager_requeue_next_sequence_task(zbx_pp_manager_t *ma
 
 	if (SUCCEED == zbx_list_pop(&d_seq->tasks, (void **)&task))
 	{
+		task->time_ms = task_seq->time_ms;
+
 		switch (task->type)
 		{
 			case ZBX_PP_TASK_VALUE:
@@ -680,6 +687,49 @@ static void	zbx_pp_manager_get_sequence_stats(zbx_pp_manager_t *manager, zbx_vec
 	pp_task_queue_get_sequence_stats(&manager->queue, stats);
 }
 
+static void	zbx_pp_manager_get_num_stats(zbx_pp_manager_t *manager, int request,
+		zbx_vector_pp_top_stats_ptr_t *stats)
+{
+	zbx_hashset_iter_t	iter;
+	zbx_pp_item_t		*item;
+
+	zbx_hashset_iter_reset(&manager->items, &iter);
+
+	while (NULL != (item = (zbx_pp_item_t *)zbx_hashset_iter_next(&iter)))
+	{
+		zbx_int64_t		num;
+		zbx_pp_top_stats_t	*stat;
+
+		if (NULL ==  item->preproc)
+			continue;
+
+		switch (request)
+		{
+			case ZBX_IPC_PREPROCESSOR_TOP_VALUES_NUM:
+				num =  (zbx_int64_t)item->preproc->values_num;
+				break;
+			case ZBX_IPC_PREPROCESSOR_TOP_VALUES_SZ:
+				num = (zbx_int64_t)item->preproc->values_sz;
+				break;
+			case ZBX_IPC_PREPROCESSOR_TOP_TOTAL_MS:
+				num = (zbx_int64_t)(item->preproc->total_ms);
+				break;
+			case ZBX_IPC_PREPROCESSOR_TOP_TIME_MS:
+			default:
+				num = (zbx_int64_t)(item->preproc->time_ms);
+		}
+
+		if (0 == num)
+			continue;
+
+		stat = (zbx_pp_top_stats_t *)zbx_malloc(NULL, sizeof(zbx_pp_top_stats_t));
+		stat->itemid = item->itemid;
+		stat->num = num;
+
+		zbx_vector_pp_top_stats_ptr_append(stats, stat);
+	}
+}
+
 /******************************************************************************
  *                                                                            *
  * Purpose: get worker usage statistics                                       *
@@ -846,7 +896,7 @@ static zbx_uint64_t	preprocessor_add_request(zbx_pp_manager_t *manager, zbx_ipc_
 {
 	zbx_uint32_t			offset = 0;
 	zbx_preproc_item_value_t	value;
-	zbx_uint64_t			queued_num = 0;
+	zbx_uint64_t			queued_num;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
@@ -855,18 +905,21 @@ static zbx_uint64_t	preprocessor_add_request(zbx_pp_manager_t *manager, zbx_ipc_
 	while (offset < message->size)
 	{
 		zbx_uint32_t		offset_prev = offset;
+		zbx_uint64_t		sz;
 		zbx_variant_t		var;
 		zbx_pp_value_opt_t	var_opt;
 		zbx_timespec_t		ts;
 		zbx_pp_task_t		*task;
+		zbx_pp_item_t		*item;
 
 		offset += zbx_preprocessor_unpack_value(&value, message->data + offset);
+		sz = offset - offset_prev;
 		preproc_item_value_extract_data(&value, &var, &ts, &var_opt);
 
 		if (NULL == (task = zbx_pp_manager_create_task(manager, value.itemid, &var, ts, &var_opt)))
 		{
 			(*direct_num)++;
-			*direct_sz += offset - offset_prev;
+			*direct_sz += sz;
 			/* allow empty values */
 			preproc_flush_value_func_cb(manager, value.itemid, value.item_value_type, value.item_flags,
 					&var, ts, &var_opt);
@@ -876,6 +929,12 @@ static zbx_uint64_t	preprocessor_add_request(zbx_pp_manager_t *manager, zbx_ipc_
 		}
 		else
 			zbx_vector_pp_task_ptr_append(tasks, task);
+
+		if (NULL != (item = (zbx_pp_item_t *)zbx_hashset_search(&manager->items, &value.itemid)))
+		{
+			item->preproc->values_num++;
+			item->preproc->values_sz += sz;
+		}
 
 		preproc_item_value_clear(&value);
 	}
@@ -1014,6 +1073,25 @@ static void	preprocessor_flush_tasks(zbx_pp_manager_t *manager, zbx_vector_pp_ta
 	}
 }
 
+static zbx_uint64_t	zbx_pp_manager_items_history_size(zbx_pp_manager_t *manager)
+{
+	zbx_hashset_iter_t	iter;
+	zbx_pp_item_t		*item;
+	zbx_uint64_t		history_size = 0;
+
+	zbx_hashset_iter_reset(&manager->items, &iter);
+
+	while (NULL != (item = (zbx_pp_item_t *)zbx_hashset_iter_next(&iter)))
+	{
+		if (NULL ==  item->preproc)
+			continue;
+
+		history_size += zbx_pp_history_cache_history_size(item->preproc->history_cache);
+	}
+
+	return history_size;
+}
+
 /******************************************************************************
  *                                                                            *
  * Purpose: respond to diagnostic information request                         *
@@ -1022,13 +1100,14 @@ static void	preprocessor_flush_tasks(zbx_pp_manager_t *manager, zbx_vector_pp_ta
 static void	preprocessor_reply_diag_info(zbx_pp_manager_t *manager, zbx_ipc_client_t *client,
 		zbx_uint64_t queued_num, zbx_uint64_t queued_sz, zbx_uint64_t direct_num, zbx_uint64_t direct_sz)
 {
-	zbx_uint64_t	preproc_num, pending_num, finished_num, sequences_num;
+	zbx_uint64_t	preproc_num, pending_num, finished_num, sequences_num, history_sz;
 	unsigned char	*data;
 	zbx_uint32_t	data_len;
 
+	history_sz = zbx_pp_manager_items_history_size(manager);
 	zbx_pp_manager_get_diag_stats(manager, &preproc_num, &pending_num, &finished_num, &sequences_num);
 	data_len = zbx_preprocessor_pack_diag_stats(&data, preproc_num, pending_num, finished_num, sequences_num,
-			queued_num, queued_sz, direct_num, direct_sz);
+			queued_num, queued_sz, direct_num, direct_sz, history_sz);
 
 	zbx_ipc_client_send(client, ZBX_IPC_PREPROCESSOR_DIAG_STATS_RESULT, data, data_len);
 
@@ -1040,7 +1119,7 @@ static int	preprocessor_compare_top_stats(const void *d1, const void *d2)
 	const zbx_pp_top_stats_t *s1 = *(const zbx_pp_top_stats_t * const *)d1;
 	const zbx_pp_top_stats_t *s2 = *(const zbx_pp_top_stats_t * const *)d2;
 
-	return s2->tasks_num - s1->tasks_num;
+	return s2->num - s1->num;
 }
 
 static void	zbx_pp_manager_items_preproc_peak(zbx_pp_manager_t *manager, zbx_vector_pp_top_stats_ptr_t *stats)
@@ -1058,7 +1137,7 @@ static void	zbx_pp_manager_items_preproc_peak(zbx_pp_manager_t *manager, zbx_vec
 			continue;
 
 		stat = (zbx_pp_top_stats_t *)zbx_malloc(NULL, sizeof(zbx_pp_top_stats_t));
-		stat->tasks_num =  item->preproc->refcount_peak - 1;
+		stat->num =  item->preproc->refcount_peak - 1;
 		stat->itemid = item->itemid;
 		zbx_vector_pp_top_stats_ptr_append(stats, stat);
 	}
@@ -1077,6 +1156,24 @@ static void	zbx_pp_manager_items_preproc_peak_reset(zbx_pp_manager_t *manager)
 			continue;
 
 		item->preproc->refcount_peak = 1;
+	}
+}
+
+static void	zbx_pp_manager_items_preproc_values_stats_reset(zbx_pp_manager_t *manager)
+{
+	zbx_hashset_iter_t	iter;
+	zbx_pp_item_t		*item;
+
+	zbx_hashset_iter_reset(&manager->items, &iter);
+
+	while (NULL != (item = (zbx_pp_item_t *)zbx_hashset_iter_next(&iter)))
+	{
+		if (NULL ==  item->preproc)
+			continue;
+
+		item->preproc->values_num = 0;
+		item->preproc->values_sz = 0;
+		item->preproc->total_ms = 0;
 	}
 }
 
@@ -1103,8 +1200,10 @@ static void	preprocessor_reply_top_stats(zbx_pp_manager_t *manager, zbx_ipc_clie
 
 	if (ZBX_IPC_PREPROCESSOR_TOP_SEQUENCES == code)
 		zbx_pp_manager_get_sequence_stats(manager, &stats);
-	else
+	else if (ZBX_IPC_PREPROCESSOR_TOP_PEAK == code)
 		zbx_pp_manager_items_preproc_peak(manager, &stats);
+	else
+		zbx_pp_manager_get_num_stats(manager, code, &stats);
 
 	if (limit > stats.values_num)
 		limit = stats.values_num;
@@ -1274,6 +1373,7 @@ ZBX_THREAD_ENTRY(zbx_pp_manager_thread, args)
 
 	while (ZBX_IS_RUNNING())
 	{
+		int		shutdown = 0;
 		double		time_now = zbx_time();
 		zbx_uint64_t	direct_num = 0;
 
@@ -1335,6 +1435,10 @@ ZBX_THREAD_ENTRY(zbx_pp_manager_thread, args)
 					break;
 				case ZBX_IPC_PREPROCESSOR_TOP_SEQUENCES:
 				case ZBX_IPC_PREPROCESSOR_TOP_PEAK:
+				case ZBX_IPC_PREPROCESSOR_TOP_VALUES_NUM:
+				case ZBX_IPC_PREPROCESSOR_TOP_VALUES_SZ:
+				case ZBX_IPC_PREPROCESSOR_TOP_TIME_MS:
+				case ZBX_IPC_PREPROCESSOR_TOP_TOTAL_MS:
 					preprocessor_reply_top_stats(manager, client, message, message->code);
 					break;
 				case ZBX_IPC_PREPROCESSOR_USAGE_STATS:
@@ -1348,7 +1452,8 @@ ZBX_THREAD_ENTRY(zbx_pp_manager_thread, args)
 					break;
 				case ZBX_RTC_SHUTDOWN:
 					zabbix_log(LOG_LEVEL_DEBUG, "shutdown message received, terminating...");
-					goto out;
+					shutdown = 1;
+					break;
 			}
 
 			zbx_ipc_message_free(message);
@@ -1356,6 +1461,9 @@ ZBX_THREAD_ENTRY(zbx_pp_manager_thread, args)
 
 		if (NULL != client)
 			zbx_ipc_client_release(client);
+
+		if (1 == shutdown)
+			break;
 
 		zbx_pp_manager_process_finished(manager, &tasks, &pending_num, &processing_num, &finished_num);
 
@@ -1402,16 +1510,20 @@ ZBX_THREAD_ENTRY(zbx_pp_manager_thread, args)
 			malloc_trim(128 * ZBX_MEBIBYTE);
 #endif
 			zbx_pp_manager_items_preproc_peak_reset(manager);
+			zbx_pp_manager_items_preproc_values_stats_reset(manager);
+
 			time_trim = sec;
 		}
 	}
-out:
+
 	zbx_setproctitle("%s #%d [terminating]", get_process_type_string(process_type), process_num);
 
 	zbx_vector_pp_task_ptr_destroy(&tasks);
 	zbx_pp_manager_free(manager);
 
 	zbx_ipc_service_close(&service);
+
+	zbx_setproctitle("%s #%d [terminated]", get_process_type_string(process_type), process_num);
 
 	exit(EXIT_SUCCESS);
 #undef STAT_INTERVAL

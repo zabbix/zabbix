@@ -3930,6 +3930,10 @@ svg {
 	}
 }
 
+#graph-preview-tab {
+	overflow: auto;
+}
+
 .z-select,
 z-select {
 	&.z-select-host-interface {

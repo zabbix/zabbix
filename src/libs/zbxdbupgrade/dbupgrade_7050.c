@@ -13,6 +13,7 @@
 **/
 
 #include "dbupgrade.h"
+#include "zbxdbschema.h"
 
 #include "zbxdb.h"
 #include "zbxdbschema.h"
@@ -25,6 +26,27 @@
 #ifndef HAVE_SQLITE3
 
 static int	DBpatch_7050000(void)
+{
+	const zbx_db_field_t	field = {"idp_certificate", "", NULL, NULL, 0, ZBX_TYPE_TEXT, ZBX_NOTNULL, 0};
+
+	return DBadd_field("userdirectory_saml", &field);
+}
+
+static int	DBpatch_7050001(void)
+{
+	const zbx_db_field_t	field = {"sp_certificate", "", NULL, NULL, 0, ZBX_TYPE_TEXT, ZBX_NOTNULL, 0};
+
+	return DBadd_field("userdirectory_saml", &field);
+}
+
+static int	DBpatch_7050002(void)
+{
+	const zbx_db_field_t	field = {"sp_private_key", "", NULL, NULL, 0, ZBX_TYPE_TEXT, ZBX_NOTNULL, 0};
+
+	return DBadd_field("userdirectory_saml", &field);
+}
+
+static int	DBpatch_7050003(void)
 {
 	const zbx_db_table_t	table =
 			{"host_template_cache", "hostid, link_hostid", 0,
@@ -39,7 +61,7 @@ static int	DBpatch_7050000(void)
 	return DBcreate_table(&table);
 }
 
-static int	DBpatch_7050001(void)
+static int	DBpatch_7050004(void)
 {
 	const zbx_db_field_t	field = {"hostid", NULL, "hosts", "hostid", 0, 0, 0,
 			ZBX_FK_CASCADE_DELETE};
@@ -47,7 +69,7 @@ static int	DBpatch_7050001(void)
 	return DBadd_foreign_key("host_template_cache", 1, &field);
 }
 
-static int	DBpatch_7050002(void)
+static int	DBpatch_7050005(void)
 {
 	const zbx_db_field_t	field = {"link_hostid", NULL, "hosts", "hostid", 0, 0, 0,
 			ZBX_FK_CASCADE_DELETE};
@@ -55,12 +77,12 @@ static int	DBpatch_7050002(void)
 	return DBadd_foreign_key("host_template_cache", 2, &field);
 }
 
-static int	DBpatch_7050003(void)
+static int	DBpatch_7050006(void)
 {
 	return DBcreate_index("host_template_cache", "host_template_cache_1", "link_hostid", 0);
 }
 
-static int	DBpatch_7050004(void)
+static int	DBpatch_7050007(void)
 {
 	if (ZBX_DB_OK > zbx_db_execute(
 			"insert into host_template_cache ("
@@ -82,7 +104,7 @@ static int	DBpatch_7050004(void)
 	return SUCCEED;
 }
 
-static int	DBpatch_7050005(void)
+static int	DBpatch_7050008(void)
 {
 	const zbx_db_table_t	table =
 			{"item_template_cache", "itemid, link_hostid", 0,
@@ -97,7 +119,7 @@ static int	DBpatch_7050005(void)
 	return DBcreate_table(&table);
 }
 
-static int	DBpatch_7050006(void)
+static int	DBpatch_7050009(void)
 {
 	const zbx_db_field_t	field = {"itemid", NULL, "items", "itemid", 0, 0, 0,
 			ZBX_FK_CASCADE_DELETE};
@@ -105,7 +127,7 @@ static int	DBpatch_7050006(void)
 	return DBadd_foreign_key("item_template_cache", 1, &field);
 }
 
-static int	DBpatch_7050007(void)
+static int	DBpatch_7050010(void)
 {
 	const zbx_db_field_t	field = {"link_hostid", NULL, "hosts", "hostid", 0, 0, 0,
 			ZBX_FK_CASCADE_DELETE};
@@ -113,12 +135,12 @@ static int	DBpatch_7050007(void)
 	return DBadd_foreign_key("item_template_cache", 2, &field);
 }
 
-static int	DBpatch_7050008(void)
+static int	DBpatch_7050011(void)
 {
 	return DBcreate_index("item_template_cache", "item_template_cache_1", "link_hostid", 0);
 }
 
-static int	DBpatch_7050009(void)
+static int	DBpatch_7050012(void)
 {
 	/* 0 - ZBX_FLAG_DISCOVERY_NORMAL */
 	/* 2 - ZBX_FLAG_DISCOVERY_PROTOTYPE */
@@ -154,7 +176,7 @@ static int	DBpatch_7050009(void)
 	return SUCCEED;
 }
 
-static int	DBpatch_7050010(void)
+static int	DBpatch_7050013(void)
 {
 	const zbx_db_table_t	table =
 			{"httptest_template_cache", "httptestid, link_hostid", 0,
@@ -169,7 +191,7 @@ static int	DBpatch_7050010(void)
 	return DBcreate_table(&table);
 }
 
-static int	DBpatch_7050011(void)
+static int	DBpatch_7050014(void)
 {
 	const zbx_db_field_t	field = {"httptestid", NULL, "httptest", "httptestid", 0, 0, 0,
 			ZBX_FK_CASCADE_DELETE};
@@ -177,7 +199,7 @@ static int	DBpatch_7050011(void)
 	return DBadd_foreign_key("httptest_template_cache", 1, &field);
 }
 
-static int	DBpatch_7050012(void)
+static int	DBpatch_7050015(void)
 {
 	const zbx_db_field_t	field = {"link_hostid", NULL, "hosts", "hostid", 0, 0, 0,
 			ZBX_FK_CASCADE_DELETE};
@@ -185,12 +207,12 @@ static int	DBpatch_7050012(void)
 	return DBadd_foreign_key("httptest_template_cache", 2, &field);
 }
 
-static int	DBpatch_7050013(void)
+static int	DBpatch_7050016(void)
 {
 	return DBcreate_index("httptest_template_cache", "httptest_template_cache_1", "link_hostid", 0);
 }
 
-static int	DBpatch_7050014(void)
+static int	DBpatch_7050017(void)
 {
 	if (ZBX_DB_OK > zbx_db_execute(
 			"insert into httptest_template_cache ("
@@ -241,5 +263,8 @@ DBPATCH_ADD(7050011, 0, 1)
 DBPATCH_ADD(7050012, 0, 1)
 DBPATCH_ADD(7050013, 0, 1)
 DBPATCH_ADD(7050014, 0, 1)
+DBPATCH_ADD(7050015, 0, 1)
+DBPATCH_ADD(7050016, 0, 1)
+DBPATCH_ADD(7050017, 0, 1)
 
 DBPATCH_END()

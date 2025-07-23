@@ -267,7 +267,7 @@ class testFormPreprocessingLowLevelDiscovery extends testFormPreprocessing {
 						['type' => 'Replace', 'parameter_1' => '   test text  ', 'parameter_2' => '   replacement 1  '],
 						['type' => 'Regular expression', 'parameter_1' => '  pattern    ', 'parameter_2' => '   \1   '],
 						['type' => 'Matches regular expression', 'parameter_1' => '  expression    '],
-						['type' => 'Does not match regular expression', 'parameter_1' => '   not_expression   '],
+						['type' => 'Does not match regular expression', 'parameter_1' => '   not_expression   ']
 					]
 				]
 			]

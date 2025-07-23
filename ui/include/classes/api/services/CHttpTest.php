@@ -697,7 +697,6 @@ class CHttpTest extends CApiService {
 
 		DB::delete('httptest_field', ['httptestid' => $del_httptestids]);
 		DB::delete('httptest_template_cache', ['httptestid' => $del_httptestids]);
-		DB::delete('httptest_tag', ['httptestid' => $del_httptestids]);
 		DB::update('httptest', [
 			'values' => ['templateid' => 0],
 			'where' => ['httptestid' => $del_httptestids]
