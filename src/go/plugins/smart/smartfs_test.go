@@ -835,13 +835,13 @@ func TestPlugin_execute(t *testing.T) {
 					WillReturnError(e.err)
 			}
 
-			plugin := &Plugin{
+			p := &Plugin{
 				cpuCount: 1,
 				ctl:      m,
 				Base:     plugin.Base{Logger: log.New("test")},
 			}
 
-			r, err := plugin.execute(tt.args.jsonRunner)
+			r, err := p.execute(false, tt.args.jsonRunner)
 			if (err != nil) != tt.wantErr {
 				t.Fatalf("Plugin.execute() error = %v, wantErr %v", err, tt.wantErr)
 			}
@@ -2368,7 +2368,9 @@ func TestPlugin_getDevices(t *testing.T) {
 
 			p := &Plugin{ctl: m}
 
-			gotBasic, gotRaid, gotMegaraid, err := p.getDevices()
+			gotBasic, gotRaid, gotMegaraid, err := p.getDevices(
+				[]string{"--scan", "-j"}, []string{"--scan", "-d", "sat", "-j"},
+			)
 			if (err != nil) != tt.wantErr {
 				t.Fatalf(
 					"Plugin.getDevices() error = %v, wantErr %v",

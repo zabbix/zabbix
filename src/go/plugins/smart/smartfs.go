@@ -239,8 +239,10 @@ type runner struct {
 // If jsonRunner is 'false' the returned data is 'devices' field.
 // Currently looks for 5 raid types "3ware", "areca", "cciss", "megaraid", "sat".
 // It returns an error if there is an issue with getting or parsing results from smartctl.
-func (p *Plugin) execute(jsonRunner bool) (*runner, error) {
-	basicDev, raidDev, megaraidDev, err := p.getDevices()
+//
+//nolint:gocyclo,cyclop
+func (p *Plugin) execute(byID, jsonRunner bool) (*runner, error) {
+	basicDev, raidDev, megaraidDev, err := p.getOsDevices(byID)
 	if err != nil {
 		return nil, err
 	}
@@ -620,13 +622,13 @@ func (dp *deviceParser) checkErr() error {
 // getDevices returns a parsed slices of all devices returned by smartctl scan.
 // Returns a separate slice for basic, raid and megaraid devices. (in the described order)
 // It returns an error if there is an issue with getting or parsing results from smartctl.
-func (p *Plugin) getDevices() ([]deviceInfo, []deviceInfo, []deviceInfo, error) {
-	basicTmp, err := p.scanDevices("--scan", "-j")
+func (p *Plugin) getDevices(scanCMDArgs, raidScanCMDArgs []string) ([]deviceInfo, []deviceInfo, []deviceInfo, error) {
+	basicTmp, err := p.scanDevices(scanCMDArgs...)
 	if err != nil {
 		return nil, nil, nil, errs.Wrap(err, "failed to scan for devices")
 	}
 
-	raidTmp, err := p.scanDevices("--scan", "-d", "sat", "-j")
+	raidTmp, err := p.scanDevices(raidScanCMDArgs...)
 	if err != nil {
 		return nil, nil, nil, errs.Wrap(err, "failed to scan for sat devices")
 	}
