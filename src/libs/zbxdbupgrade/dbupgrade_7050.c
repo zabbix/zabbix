@@ -13,6 +13,7 @@
 **/
 
 #include "dbupgrade.h"
+#include "zbxdbschema.h"
 
 /*
  * 8.0 development database patches
