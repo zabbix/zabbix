@@ -1265,7 +1265,6 @@ class testDashboardItemCardWidget extends testWidgets {
 					'Show' => [
 						['action' => USER_ACTION_UPDATE, 'index' => 0, 'section' => 'Latest data']
 					],
-					'Screenshot' => true,
 					'Sparkline' => [
 						'id:sparkline_width' => 5000,
 						'id:sparkline_fill' => -5
@@ -1309,11 +1308,21 @@ class testDashboardItemCardWidget extends testWidgets {
 						'Item' => STRING_255
 					],
 					'Show' => [
-						['action' => USER_ACTION_REMOVE, 'index' => 0],
-						['action' => USER_ACTION_REMOVE, 'index' => 0],
-						['action' => USER_ACTION_REMOVE, 'index' => 0],
-						['action' => USER_ACTION_UPDATE, 'index' => 0, 'section' => 'Description']
+						['action' => USER_ACTION_UPDATE, 'index' => 0, 'section' => 'Latest data'],
+						['action' => USER_ACTION_REMOVE, 'index' => 1],
+						['action' => USER_ACTION_REMOVE, 'index' => 1],
+						['action' => USER_ACTION_REMOVE, 'index' => 1],
+						['section' => 'Metrics'],
+						['section' => 'Error text'],
+						['section' => 'Description'],
+						['section' => 'Tags'],
+						['section' => 'Triggers'],
+						['section' => 'Host inventory'],
+						['section' => 'Type'],
+						['section' => 'Type of information'],
+						['section' => 'Host interface']
 					],
+					'Screenshot' => true,
 					'trim' => true
 				]
 			],
