@@ -659,6 +659,7 @@ static int	pp_throttle_timed_value(zbx_variant_t *value, zbx_timespec_t ts, cons
  * Parameters: ctx               - [IN] worker specific execution context     *
  *             value             - [IN/OUT] input/output value                *
  *             params            - [IN] step parameters                       *
+ *             user_macros       - [IN] 1 if parameters contained user macros *
  *             history_value_in  - [IN] historical (previous) bytecode        *
  *             history_value_out - [OUT] historical (next) bytecode           *
  *             config_source_ip  - [IN]                                       *
@@ -667,12 +668,12 @@ static int	pp_throttle_timed_value(zbx_variant_t *value, zbx_timespec_t ts, cons
  *               FAIL    - otherwise. The error message is stored in value.   *
  *                                                                            *
  ******************************************************************************/
-static int	pp_execute_script(zbx_pp_context_t *ctx, zbx_variant_t *value, const char *params,
+static int	pp_execute_script(zbx_pp_context_t *ctx, zbx_variant_t *value, const char *params, int user_macros,
 		const zbx_variant_t *history_value_in, zbx_variant_t *history_value_out, const char *config_source_ip)
 {
 	char	*errmsg = NULL;
 
-	if (SUCCEED == item_preproc_script(pp_context_es_engine(ctx), value, params, history_value_in,
+	if (SUCCEED == item_preproc_script(pp_context_es_engine(ctx), value, params, user_macros, history_value_in,
 			history_value_out, config_source_ip, &errmsg))
 	{
 		return SUCCEED;
@@ -1058,6 +1059,12 @@ static int	pp_execute_snmp_get_to_value(zbx_variant_t *value, const char *params
  * Result value: SUCCEED - the preprocessing step was executed successfully.  *
  *               FAIL    - otherwise. The error message is stored in value.   *
  *                                                                            *
+ * Comments: If the history was not changed (for example pre-compiled JS      *
+ *           bytecode or unchanged value with throttling), then the output    *
+ *           history value can be assigned without copying its contents, for  *
+ *           example *history_value_out = *history_value_in. The contents     *
+ *           will be copied later if the output history needs to be updated.  *
+ *                                                                            *
  ******************************************************************************/
 int	pp_execute_step(zbx_pp_context_t *ctx, zbx_pp_cache_t *cache, zbx_dc_um_shared_handle_t *um_handle,
 		zbx_uint64_t hostid, unsigned char value_type, zbx_variant_t *value, zbx_timespec_t ts,
@@ -1141,10 +1148,8 @@ int	pp_execute_step(zbx_pp_context_t *ctx, zbx_pp_cache_t *cache, zbx_dc_um_shar
 			ret = pp_throttle_timed_value(value, ts, params, history_value_in, history_value_out, history_ts);
 			goto out;
 		case ZBX_PREPROC_SCRIPT:
-			ret = pp_execute_script(ctx, value, params, history_value_in, history_value_out, config_source_ip);
-			/* don't cache bytecode when user macros are present */
-			if (0 != user_macros)
-				zbx_variant_clear(history_value_out);
+			ret = pp_execute_script(ctx, value, params, user_macros, history_value_in, history_value_out,
+					config_source_ip);
 			goto out;
 		case ZBX_PREPROC_PROMETHEUS_PATTERN:
 			ret = pp_execute_prometheus_pattern(cache, value, params);
@@ -1306,7 +1311,8 @@ void	pp_execute(zbx_pp_context_t *ctx, zbx_pp_item_preproc_t *preproc, zbx_pp_ca
 		if (NULL != results_out)
 			pp_result_set(results + results_num++, value_out, action, &value_raw);
 
-		if (NULL != history_out && ZBX_VARIANT_NONE != history_value_out.type && ZBX_VARIANT_ERR != value_out->type)
+		if (NULL != history_out && ZBX_VARIANT_NONE != history_value_out.type &&
+				ZBX_VARIANT_ERR != value_out->type)
 		{
 			if (SUCCEED == zbx_pp_preproc_has_history(preproc->steps[i].type))
 				zbx_pp_history_add(history_out, i, &history_value_out, history_ts);
@@ -1322,10 +1328,10 @@ void	pp_execute(zbx_pp_context_t *ctx, zbx_pp_item_preproc_t *preproc, zbx_pp_ca
 
 	if (ZBX_VARIANT_ERR == value_out->type)
 	{
-		/* reset preprocessing history in the case of error */
+		/* discard new preprocessing history in the case of error */
 		if (NULL != history_out)
 		{
-			zbx_pp_history_release(history_out);
+			zbx_pp_history_free_unique(history_in, history_out);
 			history_out = NULL;
 		}
 
@@ -1339,7 +1345,6 @@ void	pp_execute(zbx_pp_context_t *ctx, zbx_pp_item_preproc_t *preproc, zbx_pp_ca
 		}
 	}
 
-	/* replace preprocessing history */
 	zbx_pp_history_cache_history_set_and_release(preproc->history_cache, history_in, history_out);
 
 	if (NULL != results_out)
