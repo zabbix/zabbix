@@ -623,67 +623,102 @@ func Test_containsOnlyHostname(t *testing.T) { //nolint:tparallel
 		want want
 	}{
 		{
-			"+isUriWithPort",
+			"+isNameWithPort",
 			args{"zbx_next:1599"},
 			want{true, false},
 		},
 		{
-			"+partlyPort",
+			"+namePartlyPort",
 			args{"zbx_next:"},
 			want{false, false},
 		},
 		{
-			"+isUriWithSchema",
+			"+isNameWithSchema",
 			args{"tcp://zbx_next"},
 			want{true, false},
 		},
 		{
-			"+isUriWithSchemaPort",
+			"+isNameWithSchemaPort",
 			args{"tcp://zbx_next:1599"},
 			want{true, false},
 		},
 		{
-			"+isUriWithSchemaHttp",
+			"+isNameWithSchemaHttp",
 			args{"http://zbx_next"},
 			want{true, false},
 		},
 		{
-			"+notIsUri",
+			"+notName",
 			args{"zbx_next"},
 			want{false, false},
 		},
 		{
-			"+notIsUriWithMockedDefaultSchema",
+			"+notNameWithMockedDefaultSchema",
 			args{"tcpzbx_next"},
 			want{false, false},
 		},
 		{
-			"+startingWithBreakspacesNoSchema",
+			"+nameStartingWithBreakspacesNoSchema",
 			args{"   zbx_next"},
 			want{false, false},
 		},
 		{
-			"+startingWithBreakspaces",
+			"+nameStartingWithBreakspaces",
 			args{"   tcp://zbx_next"},
 			want{true, false},
 		},
 		{
-			"+partlySchemaSlashes",
+			"+nameWithPartlySchemaSlashes",
 			args{"tcp//zbx_next"},
 			want{false, false},
 		},
 		{
-			"+partlySchemaSemicol",
+			"+nameWithPartlySchemaSemicol",
 			args{"tcp:zbx_next"},
 			want{false, true},
 		},
 		{
-			"+partlyOnlySlashes",
+			"+nameWithPartlyOnlySlashes",
 			args{"tcp//zbx_next"},
 			want{false, false},
 		},
 		{
-			"-notHostnameFormat",
+			"+IP",
+			args{"127.0.0.1"},
+			want{true, false},
+		},
+		{
+			"+IPWithPort",
+			args{"127.1.1.1:1599"},
+			want{true, false},
+		},
+		{
+			"+IPWithPartlyPort",
+			args{"127.1.1.1:"},
+			want{false, false},
+		},
+		{
+			"+IPWithSchema",
+			args{"tcp://127.1.1.1"},
+			want{true, false},
+		},
+		{
+			"+IPWithSchemaPort",
+			args{"tcp://127.1.1.1:1599"},
+			want{true, false},
+		},
+		{
+			"+IPWithSchemaHttp",
+			args{"http://127.1.1.1"},
+			want{true, false},
+		},
+		{
+			"+IPWithWithHostname",
+			args{"zbx_tns127.1.1.1"},
+			want{false, false},
+		},
+		{
+			"-notNameFormat",
 			args{"+%%%::&&"},
 			want{false, true},
 		},
@@ -701,13 +736,13 @@ func Test_containsOnlyHostname(t *testing.T) { //nolint:tparallel
 
 	for _, tt := range tests { //nolint:paralleltest
 		t.Run(tt.name, func(t *testing.T) {
-			isURI, err := containsOnlyHostname(tt.args.rawURI)
+			isURI, err := isOnlyHostnameOrIP(tt.args.rawURI)
 			if err != nil && !tt.want.wantErr {
-				t.Errorf("containsOnlyHostname() error = %v, want nil", err)
+				t.Errorf("isOnlyHostnameOrIP() error = %v, want nil", err)
 			}
 
 			if isURI != tt.want.isURI {
-				t.Errorf("containsOnlyHostname() isURI = %t, want %t", isURI, tt.want.isURI)
+				t.Errorf("isOnlyHostnameOrIP() isURI = %t, want %t", isURI, tt.want.isURI)
 			}
 		})
 	}

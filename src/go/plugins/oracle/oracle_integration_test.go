@@ -49,7 +49,18 @@ func TestMain(m *testing.M) {
 
 	if testConfig.OraURI == "" || testConfig.OraUser == "" || testConfig.OraPwd == "" || testConfig.OraSrv == "" {
 		fmt.Println( //nolint:forbidigo
-			"Environment variables ORA_URI, ORA_USER, ORA_PWD and ORA_SRV must be set to run tests",
+			"    ==SETUP NEEDED==\n" +
+				"1) Environment variables ORA_URI, ORA_USER, ORA_PWD and ORA_SRV must be set to run tests.\n" +
+				"2) The TNS value must be set in [mostly] in /opt/oracle/instantclient_23_7/network/admin/tnsnames.ora:\n" +
+				"zbx_tns = (DESCRIPTION=(ADDRESS=(PROTOCOL = TCP)(HOST = localhost)(PORT = 1521)) (CONNECT_DATA=\n" +
+				"(SERVICE_NAME=xe)))",
+		)
+		fmt.Println( //nolint:forbidigo
+			"    ==ADDITIONAL HINTS==\n" +
+				"Use -test.short to avoid long running tests (some negative tests run long because of Oracle client timeouts).\n" +
+				"Usage: \n" +
+				"CLI: go test -test.short <pckg>\n" +
+				"GoLAND: add -test.short to Run/Debug config field 'Program arguments'",
 		)
 
 		os.Exit(-1)
@@ -97,30 +108,14 @@ func TestPlugin_Export_TNSDisabled(t *testing.T) {
 		longTest   bool
 	}{
 		{
-			name:       "-noUser",
-			p:          &impl,
-			args:       args{keyPing, []string{"localhost"}, nil},
-			wantResult: handlers.PingFailed,
-			wantErr:    dbconn.ErrMissingParamUser,
-		},
-		{
-			name:       "-unknownHostname",
-			p:          &impl,
-			args:       args{keyUser, []string{"fakeSession", testConfig.OraUser}, nil},
-			wantResult: nil,
-			wantErr:    errors.New("ORA-12545: Connect failed because target host or object does not exist"),
-			longTest:   true,
-		},
-		{
-			name: "-TNSKey", // valid tns name description w/ the key 'zbx_tns' must be added to tnsnames.ora.
+			name: "+localhostOnly",
 			p:    &impl,
 			args: args{keyPing,
-				[]string{"zbx_tns", testConfig.OraUser, testConfig.OraPwd, testConfig.OraSrv},
+				[]string{"localhost", testConfig.OraUser, testConfig.OraPwd, testConfig.OraSrv},
 				nil,
 			},
-			wantResult: handlers.PingFailed,
+			wantResult: handlers.PingOk,
 			wantErr:    nil,
-			longTest:   true,
 		},
 		{
 			// Although ResolveTNS is false, the connection by TNS name value anyway should work.
@@ -139,13 +134,160 @@ func TestPlugin_Export_TNSDisabled(t *testing.T) {
 			wantErr:    nil,
 		},
 		{
-			name: "+LocalhostOnly",
+			name: "+localhostWithSchema",
 			p:    &impl,
 			args: args{keyPing,
-				[]string{"localhost", testConfig.OraUser, testConfig.OraPwd, testConfig.OraSrv},
+				[]string{"tcp://localhost", testConfig.OraUser, testConfig.OraPwd, testConfig.OraSrv},
 				nil,
 			},
 			wantResult: handlers.PingOk,
+			wantErr:    nil,
+		},
+		{
+			name: "+localhostWithPort",
+			p:    &impl,
+			args: args{keyPing,
+				[]string{"localhost:1521", testConfig.OraUser, testConfig.OraPwd, testConfig.OraSrv},
+				nil,
+			},
+			wantResult: handlers.PingOk,
+			wantErr:    nil,
+		},
+		{
+			name: "+localhostWithPortAndSchema",
+			p:    &impl,
+			args: args{keyPing,
+				[]string{"tcp://localhost:1521", testConfig.OraUser, testConfig.OraPwd, testConfig.OraSrv},
+				nil,
+			},
+			wantResult: handlers.PingOk,
+			wantErr:    nil,
+		},
+		{
+			name: "+IP",
+			p:    &impl,
+			args: args{keyPing,
+				[]string{"127.0.0.1", testConfig.OraUser, testConfig.OraPwd, testConfig.OraSrv},
+				nil,
+			},
+			wantResult: handlers.PingOk,
+			wantErr:    nil,
+		},
+		{
+			name: "+IPnoService",
+			p:    &impl,
+			args: args{keyPing,
+				[]string{"127.0.0.1", testConfig.OraUser, testConfig.OraPwd},
+				nil,
+			},
+			wantResult: handlers.PingOk,
+			wantErr:    nil,
+		},
+		{
+			name: "+IPwithSchema",
+			p:    &impl,
+			args: args{keyPing,
+				[]string{"tcp://127.0.0.1", testConfig.OraUser, testConfig.OraPwd, testConfig.OraSrv},
+				nil,
+			},
+			wantResult: handlers.PingOk,
+			wantErr:    nil,
+		},
+		{
+			name: "+IPwithSchemaPort",
+			p:    &impl,
+			args: args{keyPing,
+				[]string{"tcp://127.0.0.1:1521", testConfig.OraUser, testConfig.OraPwd, testConfig.OraSrv},
+				nil,
+			},
+			wantResult: handlers.PingOk,
+			wantErr:    nil,
+		},
+		{
+			name: "+IPpartial", //Ora client peculiarity
+			p:    &impl,
+			args: args{keyPing,
+				[]string{"127.0", testConfig.OraUser, testConfig.OraPwd, testConfig.OraSrv},
+				nil,
+			},
+			wantResult: handlers.PingOk,
+			wantErr:    nil,
+		},
+		{
+			name:       "-noUser",
+			p:          &impl,
+			args:       args{keyPing, []string{"localhost"}, nil},
+			wantResult: handlers.PingFailed,
+			wantErr:    dbconn.ErrMissingParamUser,
+		},
+		{
+			name:       "-unknownHostname",
+			p:          &impl,
+			args:       args{keyUser, []string{"fakeSession", testConfig.OraUser}, nil},
+			wantResult: nil,
+			wantErr:    errors.New("ORA-12545: Connect failed because target host or object does not exist"),
+			longTest:   true,
+		},
+		{
+			name: "-TNSKey",
+			p:    &impl,
+			args: args{keyPing,
+				[]string{"zbx_tns", testConfig.OraUser, testConfig.OraPwd, testConfig.OraSrv},
+				nil,
+			},
+			wantResult: handlers.PingFailed,
+			wantErr:    nil,
+			longTest:   true,
+		},
+		{
+			name: "-localhostNoPassword",
+			p:    &impl,
+			args: args{keyPing,
+				[]string{"zbx_tns", testConfig.OraUser, "", testConfig.OraSrv},
+				nil,
+			},
+			wantResult: handlers.PingFailed,
+			wantErr:    nil,
+			longTest:   true,
+		},
+		{
+			name: "-brokenTNSValue",
+			p:    &impl,
+			args: args{keyPing,
+				[]string{"DESCRIPTION=(AD..", testConfig.OraUser, testConfig.OraPwd},
+				nil,
+			},
+			wantResult: handlers.PingFailed,
+			wantErr:    nil,
+		},
+		{
+			name: "-IPonly",
+			p:    &impl,
+			args: args{keyPing,
+				[]string{"127.0.0.1"},
+				nil,
+			},
+			wantResult: handlers.PingFailed,
+			wantErr:    errors.New("Too few parameters"),
+		},
+		{
+			name: "-IPuser",
+			p:    &impl,
+			args: args{keyPing,
+				[]string{"127.0.0.1", testConfig.OraUser},
+				nil,
+			},
+			wantResult: handlers.PingFailed,
+			wantErr:    nil,
+		},
+		{
+			name: "-IPuserService",
+			p:    &impl,
+			args: args{keyPing,
+				[]string{"127.0.0.1", testConfig.OraUser, "", testConfig.OraSrv},
+				nil,
+			},
+			wantResult: handlers.PingFailed,
 			wantErr:    nil,
 		},
 	}
@@ -180,9 +322,6 @@ func TestPlugin_Export_TNSDisabled(t *testing.T) {
 
 //nolint:paralleltest
 func TestPlugin_Export_TNSEnabled(t *testing.T) {
-	//Notice, this test procedure has the prerequisite - TNS description in tnsnames.ora file:
-	//zbx_tns=(DESCRIPTION=(ADDRESS=(PROTOCOL=TCP)(HOST=localhost)(PORT=1521))(CONNECT_DATA=(SERVICE_NAME=xe)))
-
 	// Set here because the plugin's config file has not been loaded and default ResolveTNS=true
 	impl.options.ResolveTNS = false
 
@@ -217,6 +356,109 @@ func TestPlugin_Export_TNSEnabled(t *testing.T) {
 			wantErr:    nil,
 		},
 		{
+			name: "+TNSValue",
+			p:    &impl,
+			args: args{keyPing,
+				[]string{
+					"(DESCRIPTION=(ADDRESS=(PROTOCOL=TCP)(HOST=localhost)(PORT=1521))(CONNECT_DATA=(SERVICE_NAME=xe)))",
+					testConfig.OraUser,
+					testConfig.OraPwd,
+				},
+				nil,
+			},
+			wantResult: handlers.PingOk,
+			wantErr:    nil,
+		},
+		{
+			//Oracle client looks 'localhost' up in TNS - doesn't find it; tries as hostname - succeeds (godror functionality).
+			name: "+localhostOnly",
+			p:    &impl,
+			args: args{keyPing,
+				[]string{"localhost", testConfig.OraUser, testConfig.OraPwd, testConfig.OraSrv},
+				nil,
+			},
+			wantResult: handlers.PingOk,
+			wantErr:    nil,
+		},
+		{
+			name: "+localhostWithPort",
+			p:    &impl,
+			args: args{keyPing,
+				[]string{"localhost:1521", testConfig.OraUser, testConfig.OraPwd, testConfig.OraSrv},
+				nil,
+			},
+			wantResult: handlers.PingOk,
+			wantErr:    nil,
+		},
+		{
+			name: "+localhostWithSchema",
+			p:    &impl,
+			args: args{keyPing,
+				[]string{"tcp://localhost", testConfig.OraUser, testConfig.OraPwd, testConfig.OraSrv},
+				nil,
+			},
+			wantResult: handlers.PingOk,
+			wantErr:    nil,
+		},
+		{
+			name: "+localhostWithSchemaPort",
+			p:    &impl,
+			args: args{keyPing,
+				[]string{"tcp://localhost:1521", testConfig.OraUser, testConfig.OraPwd, testConfig.OraSrv},
+				nil,
+			},
+			wantResult: handlers.PingOk,
+			wantErr:    nil,
+		},
+		{
+			name: "+IP",
+			p:    &impl,
+			args: args{keyPing,
+				[]string{"127.0.0.1", testConfig.OraUser, testConfig.OraPwd, testConfig.OraSrv},
+				nil,
+			},
+			wantResult: handlers.PingOk,
+			wantErr:    nil,
+		},
+		{
+			name: "+IPWithSchemaAndPort",
+			p:    &impl,
+			args: args{keyPing,
+				[]string{"tcp://127.0.0.1:1521", testConfig.OraUser, testConfig.OraPwd, testConfig.OraSrv},
+				nil,
+			},
+			wantResult: handlers.PingOk,
+			wantErr:    nil,
+		},
+		{
+			name: "+IPinTNSValue",
+			p:    &impl,
+			args: args{keyPing,
+				[]string{
+					"(DESCRIPTION=(ADDRESS=(PROTOCOL=TCP)(HOST=127.0.0.1)(PORT=1521))(CONNECT_DATA=(SERVICE_NAME=xe)))",
+					testConfig.OraUser, testConfig.OraPwd, testConfig.OraSrv},
+				nil,
+			},
+			wantResult: handlers.PingOk,
+			wantErr:    nil,
+		},
+		{
+			// It will work for a few minutes until reach oracle client timeout. If so, then the test is successful.
+			name:       "-unknownTNSandHostname",
+			p:          &impl,
+			args:       args{keyUser, []string{"smth", testConfig.OraUser, testConfig.OraPwd, testConfig.OraSrv}, nil},
+			wantResult: nil,
+			wantErr:    errors.New("ORA-12154: Cannot connect to database. Cannot find alias"),
+			longTest:   true,
+		},
+		{
+			name:       "-localhostNoPwd",
+			p:          &impl,
+			args:       args{keyUser, []string{"localhost", testConfig.OraUser}, nil},
+			wantResult: nil,
+			wantErr:    errors.New("ORA-01005: Login denied due to invalid password"),
+		},
+		{
 			name: "-TNSKeyWithPort_TreatedAsHostname",
 			p:    &impl,
 			args: args{keyPing,
@@ -237,21 +479,6 @@ func TestPlugin_Export_TNSEnabled(t *testing.T) {
 			wantResult: handlers.PingFailed,
 			wantErr:    nil,
 			longTest:   true,
-		},
-		{
-			name: "+TNSValue",
-			p:    &impl,
-			args: args{keyPing,
-				[]string{
-					"(DESCRIPTION=(ADDRESS=(PROTOCOL=TCP)(HOST=localhost)(PORT=1521))(CONNECT_DATA=(SERVICE_NAME=xe)))",
-					testConfig.OraUser,
-					testConfig.OraPwd,
-					testConfig.OraSrv,
-				},
-				nil,
-			},
-			wantResult: handlers.PingOk,
-			wantErr:    nil,
 		},
 		{
 			name: "-TNSValueWrongFormat-Trailing",
@@ -279,44 +506,14 @@ func TestPlugin_Export_TNSEnabled(t *testing.T) {
 			wantErr:    nil,
 		},
 		{
-			//Oracle client looks 'localhost' up in TNS - doesn't find it; tries as hostname - succeeds (godror functionality).
-			name: "+LocalhostOnly",
+			name: "-IPnoPwd",
 			p:    &impl,
 			args: args{keyPing,
-				[]string{"localhost", testConfig.OraUser, testConfig.OraPwd, testConfig.OraSrv},
+				[]string{"127.0.0.1", testConfig.OraUser},
 				nil,
 			},
-			wantResult: handlers.PingOk,
+			wantResult: handlers.PingFailed,
 			wantErr:    nil,
-		},
-		{
-			name: "+LocalhostWithPort",
-			p:    &impl,
-			args: args{keyPing,
-				[]string{"localhost:1521", testConfig.OraUser, testConfig.OraPwd, testConfig.OraSrv},
-				nil,
-			},
-			wantResult: handlers.PingOk,
-			wantErr:    nil,
-		},
-		{
-			name: "+LocalhostWithSchema",
-			p:    &impl,
-			args: args{keyPing,
-				[]string{"tcp://localhost", testConfig.OraUser, testConfig.OraPwd, testConfig.OraSrv},
-				nil,
-			},
-			wantResult: handlers.PingOk,
-			wantErr:    nil,
-		},
-		{
-			// It will work for a few minutes until reach oracle client timeouts. If so, then the test is successful.
-			name:       "-unknownHostnameAndTNS",
-			p:          &impl,
-			args:       args{keyUser, []string{"fakeSession", testConfig.OraUser}, nil},
-			wantResult: nil,
-			wantErr:    errors.New("ORA-12154: Cannot connect to database. Cannot find alias"),
-			longTest:   true,
 		},
 	}
 

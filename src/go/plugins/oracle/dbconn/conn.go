@@ -18,6 +18,7 @@ import (
 	"context"
 	"database/sql"
 	"errors"
+	"net"
 	"net/http"
 	"net/url"
 	"strings"
@@ -81,7 +82,8 @@ type ConnDetails struct {
 	// OnlyHostname is used to distinguish the case when a user wants to connect by URI or by TNS names key.
 	// If true - no schema and/or port was specified and, in case if the option ResolveTNS=true, we treat
 	// it as hostname and prepare the appropriate connect-string.
-	// If false - and ResolveTNS=true we treat it as tns and prepare tns-like connect-string.
+	// If false - and ResolveTNS=true we treat it as tns and prepare tns-like connect-string. See the function
+	// isOnlyHostnameOrIP().
 	OnlyHostname bool
 }
 
@@ -94,7 +96,7 @@ func NewConnDetails(uriStr, user, pwd, service string) (*ConnDetails, error) {
 
 	service = url.QueryEscape(service)
 
-	onlyHostname, err := containsOnlyHostname(uriStr)
+	onlyHostname, err := isOnlyHostnameOrIP(uriStr)
 	if err != nil {
 		return nil, errs.WrapConst(err, ErrNewConnDetails)
 	}
@@ -325,11 +327,11 @@ func setCustomQuery(logr log.Logger, enabled bool, path string) yarn.Yarn { //no
 	return queryStorage
 }
 
-// containsOnlyHostname function returns true if a user has a schema, port (or both) specified.
+// isOnlyHostnameOrIP function returns true if a user has a schema, port, IP address (or all) specified.
 // Returns:
-// - true: if no schema and port in rawURIstr.
+// - true: if no schema and port in rawURIstr and not an IP address.
 // - false: if it contains at least one of the above.
-func containsOnlyHostname(rawURIstr string) (bool, error) {
+func isOnlyHostnameOrIP(rawURIstr string) (bool, error) {
 	rawURI, err := uri.New(rawURIstr, nil)
 	if err != nil {
 		return false, errs.Wrap(err, "uri creation failed")
@@ -342,6 +344,10 @@ func containsOnlyHostname(rawURIstr string) (bool, error) {
 	}
 
 	if rawURI.Port() != "" {
+		return true, nil
+	}
+
+	if net.ParseIP(rawURIstr) != nil {
 		return true, nil
 	}
 
