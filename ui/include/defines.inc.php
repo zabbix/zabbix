@@ -17,7 +17,7 @@ define('ZABBIX_VERSION',		'8.0.0alpha1');
 define('ZABBIX_API_VERSION',	'8.0.0');
 define('ZABBIX_EXPORT_VERSION',	'8.0');
 
-define('ZABBIX_DB_VERSION',		7050000);
+define('ZABBIX_DB_VERSION',		7050003);
 
 define('DB_VERSION_SUPPORTED',						0);
 define('DB_VERSION_LOWER_THAN_MINIMUM',				1);
@@ -1651,6 +1651,8 @@ define('API_HOST_ADDRESS',			69);
 define('API_ESCAPED_STRING_UTF8',	70);
 define('API_NUMBER',				71);
 define('API_SELEMENTID',			72);
+define('API_SSL_CERTIFICATE',		73);
+define('API_SSL_PRIVATE_KEY',		74);
 
 // flags
 define('API_REQUIRED',					0x00001);

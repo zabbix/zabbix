@@ -24,6 +24,27 @@
 
 static int	DBpatch_7050000(void)
 {
+	const zbx_db_field_t	field = {"idp_certificate", "", NULL, NULL, 0, ZBX_TYPE_TEXT, ZBX_NOTNULL, 0};
+
+	return DBadd_field("userdirectory_saml", &field);
+}
+
+static int	DBpatch_7050001(void)
+{
+	const zbx_db_field_t	field = {"sp_certificate", "", NULL, NULL, 0, ZBX_TYPE_TEXT, ZBX_NOTNULL, 0};
+
+	return DBadd_field("userdirectory_saml", &field);
+}
+
+static int	DBpatch_7050002(void)
+{
+	const zbx_db_field_t	field = {"sp_private_key", "", NULL, NULL, 0, ZBX_TYPE_TEXT, ZBX_NOTNULL, 0};
+
+	return DBadd_field("userdirectory_saml", &field);
+}
+
+static int	DBpatch_7050003(void)
+{
 	const zbx_db_table_t	table =
 			{"history_json", "itemid,clock,ns", 0,
 				{
@@ -38,7 +59,6 @@ static int	DBpatch_7050000(void)
 
 	return DBcreate_table(&table);
 }
-
 #endif
 
 DBPATCH_START(7050)
@@ -46,5 +66,8 @@ DBPATCH_START(7050)
 /* version, duplicates flag, mandatory flag */
 
 DBPATCH_ADD(7050000, 0, 1)
+DBPATCH_ADD(7050001, 0, 1)
+DBPATCH_ADD(7050002, 0, 1)
+DBPATCH_ADD(7050003, 0, 1)
 
 DBPATCH_END()

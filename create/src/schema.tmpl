@@ -2081,6 +2081,9 @@ FIELD		|group_name				|t_varchar(255)	|''		|NOT NULL	|0
 FIELD		|user_username			|t_varchar(255)	|''		|NOT NULL	|0
 FIELD		|user_lastname			|t_varchar(255)	|''		|NOT NULL	|0
 FIELD		|scim_status			|t_integer		|'0'	|NOT NULL	|0
+FIELD		|idp_certificate		|t_text			|''		|NOT NULL	|0
+FIELD		|sp_certificate			|t_text			|''		|NOT NULL	|0
+FIELD		|sp_private_key			|t_text			|''		|NOT NULL	|0
 
 TABLE|userdirectory_media|userdirectory_mediaid|0
 FIELD		|userdirectory_mediaid	|t_id			|	|NOT NULL	|0
@@ -2279,4 +2282,4 @@ TABLE|dbversion|dbversionid|
 FIELD		|dbversionid	|t_id		|	|NOT NULL	|0
 FIELD		|mandatory	|t_integer	|'0'	|NOT NULL	|
 FIELD		|optional	|t_integer	|'0'	|NOT NULL	|
-ROW		|1		|7050000	|7050000
+ROW		|1		|7050003	|7050003
