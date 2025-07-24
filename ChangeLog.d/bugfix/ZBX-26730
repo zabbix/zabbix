@@ -1,1 +1,1 @@
-.......PS. [ZBX-26730] suppressed read memory libxml error and added xml data length (vsmelovs)
+.......PS. [ZBX-26730] suppressed duplicated error in log from XML path preprocessing step and added length of XML data to error message (vsmelovs)
