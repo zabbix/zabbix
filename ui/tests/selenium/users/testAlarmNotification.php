@@ -600,6 +600,7 @@ class testAlarmNotification extends CWebTest {
 	 * Check notification display after changing user Frontend notification settings.
 	 *
 	 * @onBefore resetTriggerSeverities
+	 * @onAfter deleteEvents
 	 *
 	 * @dataProvider getNotificationSettingsData
 	 */
@@ -647,8 +648,15 @@ class testAlarmNotification extends CWebTest {
 			// Check close button.
 			$alarm_dialog->query('xpath:.//button[@title="Close"]')->one()->click()->waitUntilNotVisible();
 		}
+	}
 
-		// Delete the events so they don't appear in the next test case.
+	/**
+	 * Delete the events so they don't appear in the next test case.
+	 *
+	 * TODO: test fails on Jenkins with error "Failed to write session data".
+	 * Adding DB::delete in onAfter instead of at the end of the test might help.
+	 */
+	protected function deleteEvents() {
 		DB::delete('events', ['eventid' => self::$eventids]);
 	}
 
