@@ -166,6 +166,12 @@ function itemGetValueTest(overlay) {
 	url.setArgument('action', 'popup.itemtest.getvalue');
 	url.setArgument(CSRF_TOKEN_NAME, <?= json_encode(CCsrfTokenHelper::get('itemtest')) ?>);
 
+	const macros = Object.fromEntries(
+		Object.values(form_data['macro_names'] || []).map(
+			(key, i) => [key, Object.values(form_data['macro_values'] || []).at(i)]
+		)
+	);
+
 	post_data = jQuery.extend(post_data, {
 		interface: {
 			address: interface ? interface['address'].trim() : '',
@@ -174,7 +180,7 @@ function itemGetValueTest(overlay) {
 			useip: interface ? interface['useip'] : null,
 			details: interface ? interface['details'] : null
 		},
-		macros: form_data['macros'],
+		macros: JSON.stringify(macros),
 		test_with: form_data['test_with'],
 		proxyid: form_data['proxyid'],
 		test_type: <?= $data['test_type'] ?>,
