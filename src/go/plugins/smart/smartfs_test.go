@@ -60,6 +60,7 @@ func TestPlugin_execute(t *testing.T) {
 	)
 
 	type args struct {
+		byid       bool
 		jsonRunner bool
 	}
 
@@ -683,7 +684,7 @@ func TestPlugin_execute(t *testing.T) {
 		},
 		{
 			"-basicDeviceScanError",
-			args{false},
+			args{jsonRunner: false},
 			[]expectation{
 				{
 					args: []string{"--scan", "-j"},
@@ -696,7 +697,7 @@ func TestPlugin_execute(t *testing.T) {
 		},
 		{
 			"-basicSmartScanError",
-			args{false},
+			args{jsonRunner: false},
 			[]expectation{
 				{
 					args: []string{"--scan", "-j"},
@@ -719,7 +720,7 @@ func TestPlugin_execute(t *testing.T) {
 		},
 		{
 			"-basicDeviceNoSmart",
-			args{false},
+			args{jsonRunner: false},
 			[]expectation{
 				{
 					args: []string{"--scan", "-j"},
@@ -781,7 +782,7 @@ func TestPlugin_execute(t *testing.T) {
 		},
 		{
 			"-megaraidSmartScanError",
-			args{false},
+			args{jsonRunner: false},
 			[]expectation{
 				{
 					args: []string{"--scan", "-j"},
@@ -841,7 +842,7 @@ func TestPlugin_execute(t *testing.T) {
 				Base:     plugin.Base{Logger: log.New("test")},
 			}
 
-			r, err := p.execute(false, tt.args.jsonRunner)
+			r, err := p.execute(tt.args.byid, tt.args.jsonRunner)
 			if (err != nil) != tt.wantErr {
 				t.Fatalf("Plugin.execute() error = %v, wantErr %v", err, tt.wantErr)
 			}
@@ -2209,8 +2210,17 @@ func TestPlugin_getDevices(t *testing.T) {
 		raidScanErr error
 	}
 
+	type args struct {
+		scanCMD []string
+		raidCMD []string
+	}
+
+	defaultScan := []string{"--scan", "-j"}
+	defaultRaidScan := []string{"--scan", "-d", "sat", "-j"}
+
 	tests := []struct {
-		name         string
+		name string
+		args
 		expect       expect
 		fields       fields
 		wantBasic    []deviceInfo
@@ -2220,6 +2230,10 @@ func TestPlugin_getDevices(t *testing.T) {
 	}{
 		{
 			"+env1",
+			args{
+				scanCMD: defaultScan,
+				raidCMD: defaultRaidScan,
+			},
 			expect{true},
 			fields{
 				basicScanOut: mock.Outputs.Get("env_1").AllDevicesScan,
@@ -2259,6 +2273,10 @@ func TestPlugin_getDevices(t *testing.T) {
 		},
 		{
 			"+envMac",
+			args{
+				scanCMD: defaultScan,
+				raidCMD: defaultRaidScan,
+			},
 			expect{true},
 			fields{
 				basicScanOut: mock.OutputEnvMacScanBasic,
@@ -2277,6 +2295,10 @@ func TestPlugin_getDevices(t *testing.T) {
 		},
 		{
 			"+HBA_with_SAS_1",
+			args{
+				scanCMD: defaultScan,
+				raidCMD: defaultRaidScan,
+			},
 			expect{true},
 			fields{
 				basicScanOut: mock.Outputs.Get("HBA_with_SAS_1").AllDevicesScan,
@@ -2324,6 +2346,10 @@ func TestPlugin_getDevices(t *testing.T) {
 		},
 		{
 			"-basicScanErr",
+			args{
+				scanCMD: defaultScan,
+				raidCMD: defaultRaidScan,
+			},
 			expect{false},
 			fields{
 				basicScanOut: mock.OutputScan,
@@ -2336,6 +2362,10 @@ func TestPlugin_getDevices(t *testing.T) {
 		},
 		{
 			"-raidScanErr",
+			args{
+				scanCMD: defaultScan,
+				raidCMD: defaultRaidScan,
+			},
 			expect{true},
 			fields{
 				basicScanOut: mock.OutputScan,
@@ -2369,7 +2399,7 @@ func TestPlugin_getDevices(t *testing.T) {
 			p := &Plugin{ctl: m}
 
 			gotBasic, gotRaid, gotMegaraid, err := p.getDevices(
-				[]string{"--scan", "-j"}, []string{"--scan", "-d", "sat", "-j"},
+				tt.args.scanCMD, tt.args.raidCMD,
 			)
 			if (err != nil) != tt.wantErr {
 				t.Fatalf(
