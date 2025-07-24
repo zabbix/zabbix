@@ -22,21 +22,10 @@ import (
 	"golang.zabbix.com/sdk/zbxerr"
 )
 
-const (
-	twoParameters = 2
-	oneParameter  = 1
-	all           = 0
+const all = 0
 
-	firstParameter  = 0
-	secondParameter = 1
-
-	diskGet            = "smart.disk.get"
-	diskDiscovery      = "smart.disk.discovery"
-	attributeDiscovery = "smart.attribute.discovery"
-)
-
-func (p *Plugin) diskDiscovery(params []string) ([]byte, error) {
-	r, err := p.execute(discoverByID(params[0]), false)
+func (p *Plugin) diskDiscovery(params map[string]string) ([]byte, error) {
+	r, err := p.execute(discoverByID(params[typeParameterName]), false)
 	if err != nil {
 		return nil, err
 	}
@@ -62,17 +51,12 @@ func (p *Plugin) diskDiscovery(params []string) ([]byte, error) {
 	return jsonArray, nil
 }
 
-func (p *Plugin) diskGet(params []string) ([]byte, error) {
-	switch len(params) {
-	case twoParameters:
-		return p.diskGetSingle(params[firstParameter], params[secondParameter])
-	case oneParameter:
-		return p.diskGetSingle(params[firstParameter], "")
-	case all:
+func (p *Plugin) diskGet(params map[string]string) ([]byte, error) {
+	if params[pathParameterName] == "" && params[raidTypeParameterName] == "" {
 		return p.diskGetAll()
-	default:
-		return nil, zbxerr.ErrorTooManyParameters
 	}
+
+	return p.diskGetSingle(params[pathParameterName], params[raidTypeParameterName])
 }
 
 // diskGetSingle returns all SMART information about the device. Path to device, e.g., /dev/sda must be specified in
@@ -130,7 +114,7 @@ func (p *Plugin) diskGetAll() (jsonArray []byte, err error) {
 	return
 }
 
-func (p *Plugin) attributeDiscovery(_ []string) ([]byte, error) {
+func (p *Plugin) attributeDiscovery(_ map[string]string) ([]byte, error) {
 	r, err := p.execute(false, false)
 	if err != nil {
 		return nil, err

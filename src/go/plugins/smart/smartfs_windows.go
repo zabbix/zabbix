@@ -14,6 +14,8 @@
 
 package smart
 
+import "golang.zabbix.com/sdk/errs"
+
 func (p *Plugin) getOsDevices(byID bool) ([]deviceInfo, []deviceInfo, []deviceInfo, error) {
 	if byID {
 		return nil, nil, nil, errs.New("by id scan not supported on Windows")

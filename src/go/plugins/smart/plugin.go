@@ -108,8 +108,8 @@ func init() {
 }
 
 // Export is the main plugin call function that handles all items.
-func (p *Plugin) Export(key string, params []string, _ plugin.ContextProvider) (any, error) {
-	err := p.validateExport(params)
+func (p *Plugin) Export(key string, rawParams []string, _ plugin.ContextProvider) (any, error) {
+	err := p.validateExport(rawParams)
 	if err != nil {
 		return nil, errs.Wrap(err, "export validation failed")
 	}
@@ -119,7 +119,12 @@ func (p *Plugin) Export(key string, params []string, _ plugin.ContextProvider) (
 		return nil, zbxerr.ErrorUnsupportedMetric
 	}
 
-	out, err := m.handler(params)
+	metricParams, _, _, err := m.metric.EvalParams(rawParams, map[string]string{})
+	if err != nil {
+		return nil, errs.Wrap(err, "failed to evaluate metric parameters")
+	}
+
+	out, err := m.handler(metricParams)
 	if err != nil {
 		//nolint:wrapcheck // it is wrapped but with a constant
 		return nil, errs.WrapConst(err, zbxerr.ErrorCannotFetchData)

@@ -20,4 +20,4 @@ var (
 	_ handlerFunc = (*Plugin)(nil).attributeDiscovery
 )
 
-type handlerFunc func(params []string) ([]byte, error)
+type handlerFunc func(params map[string]string) ([]byte, error)
