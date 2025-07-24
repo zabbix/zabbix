@@ -87,6 +87,9 @@ class CWidgetForm {
 				this.#endScripting();
 			}
 		}, {signal});
+
+		const dialogue_body = dialogue.querySelector('.overlay-dialogue-body');
+		dialogue_body.style.setProperty('overflow-x', 'auto');
 	}
 
 	/**
