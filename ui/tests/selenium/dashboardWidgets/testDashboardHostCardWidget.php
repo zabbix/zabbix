@@ -1322,7 +1322,7 @@ class testDashboardHostCardWidget extends testWidgets {
 		}
 
 		if (array_key_exists('Availability', $data)) {
-			$availabilities = $widget->query('class:section-availability')->query('class:status-container')
+			$availabilities = $widget->query('class:section-availability')->query('class:status-container')->one()
 					->query('xpath:.//span')->all();
 			$this->assertEquals($data['Availability'], $availabilities->asText());
 
@@ -1358,16 +1358,29 @@ class testDashboardHostCardWidget extends testWidgets {
 		}
 
 		if (array_key_exists('Tags', $data)) {
-			$tags = $widget->query('class:section-tags')->query('class:tags')->query('class:tag')->all();
+			$section = $widget->query('class:section-tags')->query('class:tags')->one();
+			$tags = $section->query('class:tag')->all();
 			$this->assertEquals($data['Tags'], $tags->asText());
 
-			foreach ($tags as $tag) {
-				if($tag->isClickable()){
-					$tag->click();
-					$hint = $this->query('xpath://div[@data-hintboxid]')->asOverlayDialog()->waitUntilPresent()->all()->last();
-					$this->assertEquals($tag->getText(), $hint->getText());
-					$hint->close();
+			// Check all tags by clicking on the icon to show hidden tags that do not fit due to the widget width.
+			if (!empty($data['Tags'])) {
+				$section->query('tag:button')->one()->click();
+				$hint = $this->query('xpath://div[@data-hintboxid]')->asOverlayDialog()->waitUntilPresent()->one();
+				$this->assertEquals($data['Tags'], $hint->query('class:tag')->all()->asText());
+				$hint->close();
+			}
+
+			foreach ($data['Tags'] as $i => $tag) {
+				// Only the first 5 tags (0-4) are visible for these test cases due to the widget width.
+				if ($i >= 5) {
+					$this->assertTrue($tags->get($i)->isVisible(false));
+					continue;
 				}
+
+				$tags->get($i)->click();
+				$hint = $this->query('xpath://div[@data-hintboxid]')->asOverlayDialog()->waitUntilPresent()->one();
+				$this->assertEquals($tag, $hint->getText());
+				$hint->close();
 			}
 		}
 
@@ -1385,7 +1398,7 @@ class testDashboardHostCardWidget extends testWidgets {
 		}
 
 		if (array_key_exists('Templates', $data)) {
-			$template_elements = $widget->query('class:section-templates')->query('class:template-name')->all();
+			$template_elements = $widget->query('class:section-templates')->one()->query('class:template-name')->all();
 			$this->assertEquals($data['Templates'], $template_elements->asText());
 		}
 
