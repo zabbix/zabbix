@@ -273,13 +273,18 @@ static int	query_xpath(zbx_variant_t *value, const char *params, int *is_empty, 
 
 	if (NULL == (doc = xmlReadMemory(value->data.str, len, "noname.xml", NULL, XML_PARSE_NOERROR)))
 	{
-		if (NULL != (pErr = xmlGetLastError()) && 0 < len)
+		if (NULL != (pErr = xmlGetLastError()))
+		{
 			*errmsg = zbx_dsprintf(*errmsg, "cannot parse xml value from data of length " ZBX_FS_SIZE_T
 					": %s", len, pErr->message);
 
+			xmlResetLastError();
+		}
 		else
+		{
 			*errmsg = zbx_dsprintf(*errmsg, "cannot parse xml value from data of length " ZBX_FS_SIZE_T,
 					len);
+		}
 		return FAIL;
 	}
 
@@ -288,9 +293,15 @@ static int	query_xpath(zbx_variant_t *value, const char *params, int *is_empty, 
 	if (NULL == (xpathObj = xmlXPathEvalExpression((const xmlChar *)params, xpathCtx)))
 	{
 		if (NULL != (pErr = xmlGetLastError()))
+		{
 			*errmsg = zbx_dsprintf(*errmsg, "cannot parse xpath: %s", pErr->message);
+
+			xmlResetLastError();
+		}
 		else
+		{
 			*errmsg = zbx_strdup(*errmsg, "cannot parse xpath");
+		}
 		goto out;
 	}
 
