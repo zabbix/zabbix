@@ -6255,7 +6255,8 @@ z-select[disabled] .focusable, input[disabled], textarea[disabled], select optio
     max-width: 800px;
     overflow-wrap: break-word; }
   .overlay-dialogue .hintbox-wrap {
-    max-height: 240px; }
+    max-height: 240px;
+    white-space: pre-wrap; }
   .overlay-dialogue .msg-bad,
   .overlay-dialogue .msg-good,
   .overlay-dialogue .msg-warning {
