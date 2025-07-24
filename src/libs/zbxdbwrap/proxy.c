@@ -611,8 +611,8 @@ static void	process_item_value(const zbx_history_recv_item_t *item, AGENT_RESULT
 {
 	if (HOST_MONITORED_BY_SERVER == item->host.monitored_by)
 	{
-		preprocess_item_value_cb(item->itemid, item->host.hostid, item->value_type, item->flags, result, ts,
-				item->state, error);
+		preprocess_item_value_cb(item->itemid, item->host.hostid, item->value_type, item->flags,
+				item->preprocessing, result, ts, item->state, error);
 		*h_num = 0;
 	}
 	else
