@@ -745,7 +745,8 @@ class testTagInheritance extends CIntegrationTest {
 	public function testProblem_Get($filter, $expected) {
 		$request = [
 			'output' => ['name'],
-			'groupids' => 4 // Zabbix servers
+			'groupids' => 4, // Zabbix servers
+			'hostids' => [self::$host_id]
 		] + $filter;
 
 		['result' => $result] = $this->call('problem.get', $request);
