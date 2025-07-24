@@ -831,6 +831,7 @@ class CSetupWizard extends CForm {
 					->setValue($this->getConfig('default_timezone', ZBX_DEFAULT_TIMEZONE))
 					->addOptions(CSelect::createOptionsFromArray($timezones))
 					->setFocusableElementId('label-default-timezone')
+					->setWidth(ZBX_TEXTAREA_MEDIUM_WIDTH)
 					->setAttribute('autofocus', 'autofocus')
 			])
 			->addItem([
