@@ -433,8 +433,7 @@ static int	pp_execute_xpath_query(zbx_variant_t *value, const char *params, char
 	if (SUCCEED == zbx_query_xpath(value, params, &errmsg))
 		return SUCCEED;
 
-	*error = zbx_dsprintf(NULL, "cannot extract XML value with xpath \"%s\" from data of length " ZBX_FS_SIZE_T
-			": %s", params, (zbx_fs_size_t)strlen(value->data.str), errmsg);
+	*error = zbx_dsprintf(NULL, "cannot extract XML value with xpath \"%s\": %s", params, errmsg);
 	zbx_free(errmsg);
 
 	return FAIL;
