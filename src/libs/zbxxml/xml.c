@@ -269,14 +269,17 @@ static int	query_xpath(zbx_variant_t *value, const char *params, int *is_empty, 
 	xmlNodeSetPtr	nodeset;
 	const xmlError	*pErr;
 	xmlBufferPtr	xmlBufferLocal;
+	zbx_fs_size_t	len = strlen(value->data.str);
 
-	if (NULL == (doc = xmlReadMemory(value->data.str, strlen(value->data.str), "noname.xml", NULL,
-			XML_PARSE_NOERROR)))
+	if (NULL == (doc = xmlReadMemory(value->data.str, len, "noname.xml", NULL, XML_PARSE_NOERROR)))
 	{
-		if (NULL != (pErr = xmlGetLastError()))
-			*errmsg = zbx_dsprintf(*errmsg, "cannot parse xml value: %s", pErr->message);
+		if (NULL != (pErr = xmlGetLastError()) && 0 < len)
+			*errmsg = zbx_dsprintf(*errmsg, "cannot parse xml value from data of length " ZBX_FS_SIZE_T
+					": %s", len, pErr->message);
+
 		else
-			*errmsg = zbx_strdup(*errmsg, "cannot parse xml value");
+			*errmsg = zbx_dsprintf(*errmsg, "cannot parse xml value from data of length " ZBX_FS_SIZE_T,
+					len);
 		return FAIL;
 	}
 
