@@ -30,6 +30,7 @@ typedef struct
 	unsigned char	state;
 	char		*posts;
 	char		*status_codes;
+	unsigned char	preprocessing;
 }
 zbx_dc_httpitem_context_t;
 

@@ -22,6 +22,8 @@
 #include "zbxvariant.h"
 #include "zbxtime.h"
 #include "zbxstats.h"
+#include "zbxcacheconfig.h"
+#include "zbxcachehistory.h"
 
 #define PACKED_FIELD_RAW	0
 #define PACKED_FIELD_STRING	1
@@ -1057,7 +1059,8 @@ static void	preprocessor_send(zbx_uint32_t code, unsigned char *data, zbx_uint32
  *                                                                            *
  ******************************************************************************/
 void	zbx_preprocess_item_value(zbx_uint64_t itemid, unsigned char item_value_type, unsigned char item_flags,
-		AGENT_RESULT *result, zbx_timespec_t *ts, unsigned char state, char *error)
+		unsigned char preprocessing, AGENT_RESULT *result, zbx_timespec_t *ts, unsigned char state,
+		char *error)
 {
 	size_t	value_len = 0, len;
 
@@ -1094,10 +1097,17 @@ void	zbx_preprocess_item_value(zbx_uint64_t itemid, unsigned char item_value_typ
 		}
 	}
 
-	preprocessor_serialize_value(itemid, item_value_type, item_flags, result, ts, state, error);
+	if (ZBX_ITEM_REQUIRES_PREPROCESSING_YES == preprocessing)
+	{
+		preprocessor_serialize_value(itemid, item_value_type, item_flags, result, ts, state, error);
 
-	if (ZBX_PREPROCESSING_BATCH_SIZE < ++preproc_values)
-		zbx_preprocessor_flush();
+		if (ZBX_PREPROCESSING_BATCH_SIZE < ++preproc_values)
+			zbx_preprocessor_flush();
+	}
+	else
+	{
+		zbx_dc_add_history(itemid, item_value_type, item_flags, result, ts, state, error);
+	}
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 }
@@ -1117,6 +1127,8 @@ void	zbx_preprocessor_flush(void)
 		preproc_values = 0;
 		zbx_free(preproc_data);
 	}
+
+	zbx_dc_flush_history();
 }
 
 /******************************************************************************
