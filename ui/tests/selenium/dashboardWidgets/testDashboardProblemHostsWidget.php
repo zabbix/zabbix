@@ -81,7 +81,7 @@ class testDashboardProblemHostsWidget extends testWidgets {
 								'type' => 'map',
 								'name' => self::MAP_WIDGET,
 								'x' => 0,
-								'y' => 7,
+								'y' => 5,
 								'width' => 36,
 								'height' => 5,
 								'fields' => [
@@ -592,7 +592,7 @@ class testDashboardProblemHostsWidget extends testWidgets {
 
 		// Close widget edit form and cancel editing.
 		COverlayDialogElement::find()->one()->close();
-		$dashboard->cancelEditing();
+		$dashboard->waitUntilReady()->cancelEditing();
 	}
 
 	public function testDashboardProblemHostsWidget_SimpleUpdate() {
