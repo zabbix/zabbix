@@ -477,11 +477,14 @@ static void	lld_trigger_prototypes_get(zbx_uint64_t lld_ruleid, int dflags,
  *          prototypes.                                                       *
  *                                                                            *
  * Parameters: trigger_prototypes - [IN] sorted list of trigger prototypes    *
+ *             dflags             - [IN] discovery flags                      *
+ *             ruleids            - [IN] list of linked lld ids when          *
+ *                                       discovering prototypes               *
  *             triggers           - [OUT] sorted list of triggers             *
  *                                                                            *
  ******************************************************************************/
 static void	lld_triggers_get(const zbx_vector_lld_trigger_prototype_ptr_t *trigger_prototypes,
-		int dflags, zbx_vector_lld_trigger_ptr_t *triggers)
+		int dflags, const zbx_vector_uint64_t *ruleids, zbx_vector_lld_trigger_ptr_t *triggers)
 {
 	zbx_db_result_t		result;
 	zbx_db_row_t		row;
@@ -515,6 +518,20 @@ static void	lld_triggers_get(const zbx_vector_lld_trigger_prototype_ptr_t *trigg
 			parent_triggerids.values, parent_triggerids.values_num);
 
 	zbx_vector_uint64_destroy(&parent_triggerids);
+
+	if (NULL != ruleids)
+	{
+		zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, " and exists"
+				" (select null from functions f,item_discovery id"
+				" where t.triggerid=f.triggerid"
+					" and f.itemid=id.itemid"
+					" and");
+
+		zbx_db_add_condition_alloc(&sql, &sql_alloc, &sql_offset, "id.lldruleid", ruleids->values,
+				ruleids->values_num);
+
+		zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, ")");
+	}
 
 	result = zbx_db_select("%s", sql);
 
@@ -3884,7 +3901,7 @@ static void	lld_process_lost_triggers(zbx_vector_lld_trigger_ptr_t *triggers, co
  ******************************************************************************/
 int	lld_update_triggers(zbx_uint64_t hostid, zbx_uint64_t lld_ruleid, const zbx_vector_lld_row_ptr_t *lld_rows,
 		char **error, const zbx_lld_lifetime_t *lifetime, const zbx_lld_lifetime_t *enabled_lifetime,
-		int lastcheck, int dflags)
+		int lastcheck, int dflags, const zbx_vector_uint64_t *ruleids)
 {
 	zbx_vector_lld_trigger_prototype_ptr_t	trigger_prototypes;
 	zbx_vector_lld_trigger_ptr_t		triggers;
@@ -3906,7 +3923,7 @@ int	lld_update_triggers(zbx_uint64_t hostid, zbx_uint64_t lld_ruleid, const zbx_
 							/* updated by the trigger prototype */
 	zbx_vector_lld_item_ptr_create(&items);		/* list of items which are related to the trigger prototypes */
 
-	lld_triggers_get(&trigger_prototypes, dflags, &triggers);
+	lld_triggers_get(&trigger_prototypes, dflags, ruleids, &triggers);
 	lld_functions_get(&trigger_prototypes, &triggers);
 	lld_dependencies_get(&trigger_prototypes, &triggers);
 	lld_tags_get(&trigger_prototypes, &triggers);

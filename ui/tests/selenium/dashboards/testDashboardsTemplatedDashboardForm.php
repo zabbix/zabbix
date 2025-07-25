@@ -585,6 +585,21 @@ class testDashboardsTemplatedDashboardForm extends CWebTest {
 										'value' => 'Test dashboard honeycomb'
 									]
 								]
+							],
+							[
+								'type' => 'hostcard',
+								'name' => 'Host card widget',
+								'x' => 60,
+								'y' => 16,
+								'width' => 12,
+								'height' => 4,
+								'fields' => [
+									[
+										'type' => 3,
+										'name' => 'hostid.0',
+										'value' => 10084 // Zabbix server.
+									]
+								]
 							]
 						]
 					]

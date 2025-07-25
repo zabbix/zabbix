@@ -540,10 +540,10 @@ static int	check_response(char *response, const char *server, unsigned short por
 	unsigned char		redirect_reset;
 	zbx_uint64_t		redirect_revision;
 
-	ret = zbx_json_open(response, &jp);
+	if (FAIL == zbx_json_open(response, &jp))
+		return FAIL;
 
-	if (SUCCEED == ret)
-		ret = zbx_json_value_by_name(&jp, ZBX_PROTO_TAG_RESPONSE, value, sizeof(value), NULL);
+	ret = zbx_json_value_by_name(&jp, ZBX_PROTO_TAG_RESPONSE, value, sizeof(value), NULL);
 
 	if (SUCCEED == ret && 0 != strcmp(value, ZBX_PROTO_VALUE_SUCCESS))
 		ret = FAIL;

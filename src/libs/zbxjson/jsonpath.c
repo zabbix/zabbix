@@ -24,6 +24,8 @@
 #include "zbxalgo.h"
 #include "zbxstr.h"
 
+#define ZBX_VECTOR_ARRAY_RESERVE	3
+
 typedef struct
 {
 	zbx_jsonpath_token_group_t	group;
@@ -113,6 +115,7 @@ static void	zbx_vector_jsonobj_ref_add_object(zbx_vector_jsonobj_ref_t *refs, co
 	ref.name = zbx_strdup(NULL, name);
 	ref.internal = NULL;
 	ref.value = value;
+	zbx_vector_jsonobj_ref_reserve(refs, ZBX_VECTOR_ARRAY_RESERVE);
 	zbx_vector_jsonobj_ref_append(refs, ref);
 }
 
@@ -139,6 +142,7 @@ static void	zbx_vector_jsonobj_ref_add_string(zbx_vector_jsonobj_ref_t *refs, co
 	jsonobj_set_string(ref.internal, zbx_strdup(NULL, str));
 	ref.value = ref.internal;
 
+	zbx_vector_jsonobj_ref_reserve(refs, ZBX_VECTOR_ARRAY_RESERVE);
 	zbx_vector_jsonobj_ref_append(refs, ref);
 }
 
@@ -3019,6 +3023,7 @@ static void	jsonobj_index_add_element(zbx_hashset_t *index, const char *name, co
 	ref.name = zbx_strdup(NULL, name);
 	ref.value = obj;
 	ref.internal = NULL;
+	zbx_vector_jsonobj_ref_reserve(&el->objects, ZBX_VECTOR_ARRAY_RESERVE);
 	zbx_vector_jsonobj_ref_append(&el->objects, ref);
 }
 

@@ -1902,7 +1902,7 @@ class CopyWidgetsDashboards {
 									[
 										'type' => ZBX_WIDGET_FIELD_TYPE_HOST,
 										'name' => 'hostids',
-										'value' => 10084
+										'value' => 10084 // Zabbix server.
 									],
 									[
 										'type' => ZBX_WIDGET_FIELD_TYPE_STR,
@@ -2343,7 +2343,7 @@ class CopyWidgetsDashboards {
 									[
 										'type' => 3,
 										'name' => 'hostids.0',
-										'value' => 10084
+										'value' => 10084 // Zabbix server.
 									],
 									[
 										'type' => 1,
@@ -2454,6 +2454,21 @@ class CopyWidgetsDashboards {
 										'type' => 1,
 										'name' => 'reference',
 										'value' => 'ENJSC'
+									]
+								]
+							],
+							[
+								'type' => 'hostcard',
+								'name' => 'Host card widget',
+								'x' => 18,
+								'y' => 17,
+								'width' => 20,
+								'height' => 5,
+								'fields' => [
+									[
+										'type' => 3,
+										'name' => 'hostid.0',
+										'value' => 10084 // Zabbix server.
 									]
 								]
 							]
@@ -3198,6 +3213,21 @@ class CopyWidgetsDashboards {
 										'type' => 1,
 										'name' => 'reference',
 										'value' => 'FAXKO'
+									]
+								]
+							],
+							[
+								'type' => 'hostcard',
+								'name' => 'Host card widget',
+								'x' => 25,
+								'y' => 10,
+								'width' => 15,
+								'height' => 5,
+								'fields' => [
+									[
+										'type' => 3,
+										'name' => 'hostid.0',
+										'value' => 10084 // Zabbix server.
 									]
 								]
 							]
