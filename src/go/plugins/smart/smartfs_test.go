@@ -60,7 +60,7 @@ func TestPlugin_execute(t *testing.T) {
 	)
 
 	type args struct {
-		byid       bool
+		byID       bool
 		jsonRunner bool
 	}
 
@@ -170,6 +170,111 @@ func TestPlugin_execute(t *testing.T) {
 						},
 						SmartStatus:     &smartStatus{SerialNumber: true},
 						SmartAttributes: smartAttributes{},
+					},
+				},
+			},
+			false,
+		},
+		{
+			"+validByIDDevices",
+			args{
+				byID:       true,
+				jsonRunner: false,
+			},
+			[]expectation{
+				{
+					args: []string{"--scan", "-d", "by-id", "-j"},
+					err:  nil,
+					out: []byte(`{
+									  "json_format_version": [
+									    1,
+									    0
+									  ],
+									  "smartctl": {
+									    "version": [
+									      7,
+									      3
+									    ],
+									    "svn_revision": "5338",
+									    "platform_info": "x86_64-linux-6.1.0-32-amd64",
+									    "build_info": "(local build)",
+									    "argv": [
+									      "smartctl",
+									      "--scan",
+									      "-d",
+									      "by-id",
+									      "-j"
+									    ],
+									    "exit_status": 0
+									  },
+									  "devices": [
+									    {
+									      "name": "/dev/disk/by-id/ata-TOSHIBA_MQ01ABF050_X6GMTKX2T",
+									      "info_name": "/dev/disk/by-id/ata-TOSHIBA_MQ01ABF050_X6GMTKX2T",
+									      "type": "scsi",
+									      "protocol": "SCSI"
+									    }
+									  ]
+									}
+								`),
+				},
+				{
+					args: []string{"--scan", "-d", "by-id", "-d", "sat", "-j"},
+					err:  nil,
+					out:  []byte(`{}`),
+				},
+				{
+					args: []string{"-a", "/dev/disk/by-id/ata-TOSHIBA_MQ01ABF050_X6GMTKX2T", "-j"},
+					err:  nil,
+					out:  mock.OutputAllDiscInfoByID,
+				},
+			},
+			&runner{
+				jsonDevices: nil,
+				devices: map[string]deviceParser{
+					"/dev/disk/by-id/ata-TOSHIBA_MQ01ABF050_X6GMTKX2T": {
+						ModelName:    "TOSHIBA MQ01ABF050",
+						SerialNumber: "X6GMTKX2T",
+						RotationRate: 5400,
+						Info: deviceInfo{
+							Name:     "/dev/disk/by-id/ata-TOSHIBA_MQ01ABF050_X6GMTKX2T",
+							InfoName: "/dev/disk/by-id/ata-TOSHIBA_MQ01ABF050_X6GMTKX2T [SAT]",
+							DevType:  "sat",
+							name:     "/dev/disk/by-id/ata-TOSHIBA_MQ01ABF050_X6GMTKX2T",
+						},
+						Smartctl: smartctlField{
+							ExitStatus: 64,
+							Version:    []int{7, 3},
+						},
+						SmartStatus: &smartStatus{SerialNumber: true},
+						SmartAttributes: smartAttributes{
+							[]table{
+								{Attrname: "Raw_Read_Error_Rate", ID: 1, Thresh: 50},
+								{Attrname: "Throughput_Performance", ID: 2, Thresh: 50},
+								{Attrname: "Spin_Up_Time", ID: 3, Thresh: 1},
+								{Attrname: "Start_Stop_Count", ID: 4},
+								{Attrname: "Reallocated_Sector_Ct", ID: 5, Thresh: 50},
+								{Attrname: "Seek_Error_Rate", ID: 7, Thresh: 50},
+								{Attrname: "Seek_Time_Performance", ID: 8, Thresh: 50},
+								{Attrname: "Power_On_Hours", ID: 9},
+								{Attrname: "Spin_Retry_Count", ID: 10, Thresh: 30},
+								{Attrname: "Power_Cycle_Count", ID: 12},
+								{Attrname: "G-Sense_Error_Rate", ID: 191},
+								{Attrname: "Power-Off_Retract_Count", ID: 192},
+								{Attrname: "Load_Cycle_Count", ID: 193},
+								{Attrname: "Temperature_Celsius", ID: 194},
+								{Attrname: "Reallocated_Event_Count", ID: 196},
+								{Attrname: "Current_Pending_Sector", ID: 197},
+								{Attrname: "Offline_Uncorrectable", ID: 198},
+								{Attrname: "UDMA_CRC_Error_Count", ID: 199},
+								{Attrname: "Disk_Shift", ID: 220},
+								{Attrname: "Loaded_Hours", ID: 222},
+								{Attrname: "Load_Retry_Count", ID: 223},
+								{Attrname: "Load_Friction", ID: 224},
+								{Attrname: "Load-in_Time", ID: 226},
+								{Attrname: "Head_Flying_Hours", ID: 240, Thresh: 1},
+							},
+						},
 					},
 				},
 			},
@@ -842,7 +947,7 @@ func TestPlugin_execute(t *testing.T) {
 				Base:     plugin.Base{Logger: log.New("test")},
 			}
 
-			r, err := p.execute(tt.args.byid, tt.args.jsonRunner)
+			r, err := p.execute(tt.args.byID, tt.args.jsonRunner)
 			if (err != nil) != tt.wantErr {
 				t.Fatalf("Plugin.execute() error = %v, wantErr %v", err, tt.wantErr)
 			}
@@ -2200,6 +2305,8 @@ func TestPlugin_getDevices(t *testing.T) {
 
 	type expect struct {
 		raidScanExec bool
+		scanCMD      []string
+		raidCMD      []string
 	}
 
 	type fields struct {
@@ -2234,7 +2341,7 @@ func TestPlugin_getDevices(t *testing.T) {
 				scanCMD: defaultScan,
 				raidCMD: defaultRaidScan,
 			},
-			expect{true},
+			expect{raidScanExec: true, scanCMD: defaultScan, raidCMD: defaultRaidScan},
 			fields{
 				basicScanOut: mock.Outputs.Get("env_1").AllDevicesScan,
 				raidScanOut:  mock.Outputs.Get("env_1").RaidDevicesScan,
@@ -2277,7 +2384,7 @@ func TestPlugin_getDevices(t *testing.T) {
 				scanCMD: defaultScan,
 				raidCMD: defaultRaidScan,
 			},
-			expect{true},
+			expect{raidScanExec: true, scanCMD: defaultScan, raidCMD: defaultRaidScan},
 			fields{
 				basicScanOut: mock.OutputEnvMacScanBasic,
 				raidScanOut:  mock.OutputEnvMacScanRaid,
@@ -2299,7 +2406,7 @@ func TestPlugin_getDevices(t *testing.T) {
 				scanCMD: defaultScan,
 				raidCMD: defaultRaidScan,
 			},
-			expect{true},
+			expect{raidScanExec: true, scanCMD: defaultScan, raidCMD: defaultRaidScan},
 			fields{
 				basicScanOut: mock.Outputs.Get("HBA_with_SAS_1").AllDevicesScan,
 				raidScanOut: mock.Outputs.Get(
@@ -2345,12 +2452,102 @@ func TestPlugin_getDevices(t *testing.T) {
 			false,
 		},
 		{
+			"+byIDSCan",
+			args{
+				scanCMD: []string{"--scan", "-d", "by-id", "-j"},
+				raidCMD: []string{"--scan", "-d", "by-id", "-d", "sat", "-j"},
+			},
+			expect{
+				raidScanExec: true,
+				scanCMD:      []string{"--scan", "-d", "by-id", "-j"},
+				raidCMD:      []string{"--scan", "-d", "by-id", "-d", "sat", "-j"},
+			},
+			fields{
+				basicScanOut: []byte(`{
+									  "json_format_version": [
+									    1,
+									    0
+									  ],
+									  "smartctl": {
+									    "version": [
+									      7,
+									      3
+									    ],
+									    "svn_revision": "5338",
+									    "platform_info": "x86_64-linux-6.1.0-32-amd64",
+									    "build_info": "(local build)",
+									    "argv": [
+									      "smartctl",
+									      "--scan",
+									      "-d",
+									      "by-id",
+									      "-j"
+									    ],
+									    "exit_status": 0
+									  },
+									  "devices": [
+									    {
+									      "name": "/dev/disk/by-id/ata-TOSHIBA_MQ01ABF050_X6GMTKX2T",
+									      "info_name": "/dev/disk/by-id/ata-TOSHIBA_MQ01ABF050_X6GMTKX2T",
+									      "type": "scsi",
+									      "protocol": "SCSI"
+									    }
+									  ]
+									}
+								`),
+				raidScanOut: []byte(`{
+									  "json_format_version": [
+										1,
+										0
+									  ],
+									  "smartctl": {
+										"version": [
+										  7,
+										  3
+										],
+										"svn_revision": "5338",
+										"platform_info": "x86_64-linux-6.1.0-32-amd64",
+										"build_info": "(local build)",
+										"argv": [
+										  "smartctl",
+										  "--scan",
+										  "-d",
+										  "by-id",
+										  "-d",
+										  "sat",
+										  "-j"
+										],
+										"exit_status": 0
+									  },
+									  "devices": [
+										{
+										  "name": "/dev/disk/by-id/ata-TOSHIBA_MQ01ABF050_X6GMTKX2T",
+										  "info_name": "/dev/disk/by-id/ata-TOSHIBA_MQ01ABF050_X6GMTKX2T",
+										  "type": "scsi",
+										  "protocol": "SCSI"
+										}
+									  ]
+									}
+								`),
+			},
+			nil,
+			[]deviceInfo{
+				{
+					Name:     "/dev/disk/by-id/ata-TOSHIBA_MQ01ABF050_X6GMTKX2T",
+					InfoName: "/dev/disk/by-id/ata-TOSHIBA_MQ01ABF050_X6GMTKX2T",
+					DevType:  "scsi",
+				},
+			},
+			nil,
+			false,
+		},
+		{
 			"-basicScanErr",
 			args{
 				scanCMD: defaultScan,
 				raidCMD: defaultRaidScan,
 			},
-			expect{false},
+			expect{raidScanExec: false, scanCMD: defaultScan, raidCMD: defaultRaidScan},
 			fields{
 				basicScanOut: mock.OutputScan,
 				basicScanErr: errors.New("fail"),
@@ -2366,7 +2563,7 @@ func TestPlugin_getDevices(t *testing.T) {
 				scanCMD: defaultScan,
 				raidCMD: defaultRaidScan,
 			},
-			expect{true},
+			expect{raidScanExec: true, scanCMD: defaultScan, raidCMD: defaultRaidScan},
 			fields{
 				basicScanOut: mock.OutputScan,
 				raidScanOut:  mock.OutputScanTypeSAT,
@@ -2385,13 +2582,13 @@ func TestPlugin_getDevices(t *testing.T) {
 			m := &mock.MockController{}
 
 			m.ExpectExecute().
-				WithArgs("--scan", "-j").
+				WithArgs(tt.expect.scanCMD...).
 				WillReturnOutput(tt.fields.basicScanOut).
 				WillReturnError(tt.fields.basicScanErr)
 
 			if tt.expect.raidScanExec {
 				m.ExpectExecute().
-					WithArgs("--scan", "-d", "sat", "-j").
+					WithArgs(tt.expect.raidCMD...).
 					WillReturnOutput(tt.fields.raidScanOut).
 					WillReturnError(tt.fields.raidScanErr)
 			}

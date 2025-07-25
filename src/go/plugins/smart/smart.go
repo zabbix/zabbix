@@ -22,8 +22,6 @@ import (
 	"golang.zabbix.com/sdk/zbxerr"
 )
 
-const all = 0
-
 func (p *Plugin) diskDiscovery(params map[string]string) ([]byte, error) {
 	r, err := p.execute(discoverByID(params[typeParameterName]), false)
 	if err != nil {

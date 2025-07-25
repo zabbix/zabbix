@@ -146,7 +146,7 @@ func (p *Plugin) validateExport(params []string) error {
 // validateParams validates the key's params quantity aspect.
 func validateParams(params []string) error {
 	// No params - nothing to validate.
-	if len(params) == all {
+	if len(params) == 0 {
 		return nil
 	}
 
