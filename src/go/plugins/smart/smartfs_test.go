@@ -2326,8 +2326,8 @@ func TestPlugin_getDevices(t *testing.T) {
 	defaultRaidScan := []string{"--scan", "-d", "sat", "-j"}
 
 	tests := []struct {
-		name string
-		args
+		name         string
+		args         args
 		expect       expect
 		fields       fields
 		wantBasic    []deviceInfo
