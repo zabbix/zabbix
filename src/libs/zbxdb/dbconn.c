@@ -486,13 +486,6 @@ static int	dbconn_open(zbx_dbconn_t *db)
 		ret = ZBX_DB_FAIL;
 	}
 
-	/* innodb_snapshot_isolation variable became ON by default in MariaDB 11.6.2, we need it to be OFF */
-	if (ZBX_DB_OK == ret && ON == ZBX_MARIADB_SFORK && 110602 <= ZBX_MYSQL_SVERSION)
-	{
-		if (0 < (ret = zbx_db_execute_basic("set innodb_snapshot_isolation='OFF'")))
-			ret = ZBX_DB_OK;
-	}
-
 	if (ZBX_DB_OK == ret)
 	{
 		/* in contrast to "set names utf8" results of this call will survive auto-reconnects */
