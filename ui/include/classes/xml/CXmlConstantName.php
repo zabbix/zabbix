@@ -246,6 +246,7 @@ class CXmlConstantName {
 	const UNSIGNED = 'UNSIGNED';
 	const TEXT = 'TEXT';
 	const BINARY = 'BINARY';
+	// const JSON = 'JSON'; // Duplicate.
 
 	const ORIGINAL_ERROR = 'ORIGINAL_ERROR';
 	const DISCARD_VALUE = 'DISCARD_VALUE';
