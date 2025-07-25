@@ -201,6 +201,11 @@ class MysqlDbBackend extends DbBackend {
 	 * @return bool
 	 */
 	public function init() {
+		$db_innodb_snapshot_isolation = DBfetch(DBselect("SHOW VARIABLES LIKE 'innodb_snapshot_isolation'"));
+		if ($db_innodb_snapshot_isolation && $db_innodb_snapshot_isolation['Value'] !== 'OFF') {
+			DBexecute("SET innodb_snapshot_isolation='OFF'");
+		}
+
 		$db_encoding = DBselect("SHOW VARIABLES LIKE 'character_set_database'");
 		$charset = $db_encoding ? DBfetch($db_encoding) : false;
 		if ($charset && strtoupper($charset['Value']) === 'UTF8MB4') {
