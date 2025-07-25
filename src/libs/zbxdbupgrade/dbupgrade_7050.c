@@ -13,6 +13,7 @@
 **/
 
 #include "dbupgrade.h"
+#include "zbxdb.h"
 #include "zbxdbschema.h"
 
 /*
@@ -41,6 +42,31 @@ static int	DBpatch_7050002(void)
 	return DBadd_field("userdirectory_saml", &field);
 }
 
+static int	DBpatch_7050003(void)
+{
+	const zbx_db_field_t	field = {"automatic", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0};
+
+	return DBadd_field("trigger_tag", &field);
+
+}
+
+static int	DBpatch_7050004(void)
+{
+	if (ZBX_DB_OK > zbx_db_execute(
+			"update trigger_tag"
+			" set automatic=1"	/* ZBX_TAG_AUTOMATIC */
+			" where triggerid in ("
+				"select triggerid"
+				" from trigger_discovery"
+				" where parent_triggerid is not null"
+			")"))
+	{
+		return FAIL;
+	}
+
+	return SUCCEED;
+}
+
 #endif
 
 DBPATCH_START(7050)
@@ -50,5 +76,7 @@ DBPATCH_START(7050)
 DBPATCH_ADD(7050000, 0, 1)
 DBPATCH_ADD(7050001, 0, 1)
 DBPATCH_ADD(7050002, 0, 1)
+DBPATCH_ADD(7050003, 0, 1)
+DBPATCH_ADD(7050004, 0, 1)
 
 DBPATCH_END()
