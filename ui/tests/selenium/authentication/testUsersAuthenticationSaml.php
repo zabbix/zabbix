@@ -24,6 +24,60 @@ require_once __DIR__.'/../common/testFormAuthentication.php';
  */
 class testUsersAuthenticationSaml extends testFormAuthentication {
 
+	const SSL_CERTIFICATE = '-----BEGIN CERTIFICATE-----
+MIID+TCCAuGgAwIBAgIUSpDnLjL2DVS0YTRGOQh+MMoUtDowDQYJKoZIhvcNAQEL
+BQAwgYsxCzAJBgNVBAYTAlBMMQ0wCwYDVQQIDARXcm9jMRAwDgYDVQQHDAdXcm9j
+bGF3MQ8wDQYDVQQKDAZaYWJiaXgxCzAJBgNVBAsMAklUMRUwEwYDVQQDDAxJcnlu
+YSBTaGFyaGExJjAkBgkqhkiG9w0BCQEWF2lyeW5hLnNoYXJoYUB6YWJiaXguY29t
+MB4XDTI1MDQyNDE2NDE0M1oXDTI2MDQyNDE2NDE0M1owgYsxCzAJBgNVBAYTAlBM
+MQ0wCwYDVQQIDARXcm9jMRAwDgYDVQQHDAdXcm9jbGF3MQ8wDQYDVQQKDAZaYWJi
+aXgxCzAJBgNVBAsMAklUMRUwEwYDVQQDDAxJcnluYSBTaGFyaGExJjAkBgkqhkiG
+9w0BCQEWF2lyeW5hLnNoYXJoYUB6YWJiaXguY29tMIIBIjANBgkqhkiG9w0BAQEF
+AAOCAQ8AMIIBCgKCAQEAvHwPw8t5wB6e73ciAJ6LrHFSKRjgMQlGP31Sku/g8pTA
+8dFbblBj/yXKPkyqrnO1EvBoZB330HqRnlarXsstCFcC8ESQ+EzlB0737dc0jDdy
+WD3MsN2+YZRisKtaFwdswnYd23D4A6ymEYtjCAgKcpPJ4ciX+aZUkjS6BkMqyeGq
+zm0ig9GYwC8OsfG0ZxWV0s8m8MwC0DDPGnTSeFuCRwVftwqIjZOPocm2xpuWXQzF
+e2k4C5GofJ8BW0hNYeyzxnI+eOJHpgamtNlA5MeIcSTrtpGrqmm3XGz1H8F27kVi
+rrLVdfLcy1BYxb7I0eca4YjByvqqWrWukFq4Xs+/cQIDAQABo1MwUTAdBgNVHQ4E
+FgQUd9PRJ5ORONgZzkgVUE9SpCpeW9IwHwYDVR0jBBgwFoAUd9PRJ5ORONgZzkgV
+UE9SpCpeW9IwDwYDVR0TAQH/BAUwAwEB/zANBgkqhkiG9w0BAQsFAAOCAQEAV8dE
+Al+/w/8eOEqAlSeS9g2+g+4hvAAkTtp8HfWzMiqy56ZoAtzMOY4A/1QINZn4gvUk
+VW+SCr2X/AAqW7rIXFEbng7LyfwPUYJ++L1/aRqlEIuSvCmwa3Ypj6PqtN1RepEL
+jSXIQ/c5h+R+e4MUGU+mhS0evonfGaklB9xVz+amOMhU0Ag04Sp3HH+MayqWrkJP
+ntEXfn6G1X/mRSefF2k3UC5gZRYsWRybYtmtddrZcSApMedpx6YjtpFAd6+Z2UlL
+XlyFUVaZU/mT+orYNshgWEjBR2Mra1m0MKC1yWLG/eS7OUdzYLTyl0rClB5M0YFe
+pYDypczpOVk8mPLcZg==
+-----END CERTIFICATE-----';
+
+	const SSL_PRIVATE_KEY = '-----BEGIN PRIVATE KEY-----
+MIIEvwIBADANBgkqhkiG9w0BAQEFAASCBKkwggSlAgEAAoIBAQC8fA/Dy3nAHp7v
+dyIAnouscVIpGOAxCUY/fVKS7+DylMDx0VtuUGP/Jco+TKquc7US8GhkHffQepGe
+Vqteyy0IVwLwRJD4TOUHTvft1zSMN3JYPcyw3b5hlGKwq1oXB2zCdh3bcPgDrKYR
+i2MICApyk8nhyJf5plSSNLoGQyrJ4arObSKD0ZjALw6x8bRnFZXSzybwzALQMM8a
+dNJ4W4JHBV+3CoiNk4+hybbGm5ZdDMV7aTgLkah8nwFbSE1h7LPGcj544kemBqa0
+2UDkx4hxJOu2kauqabdcbPUfwXbuRWKustV18tzLUFjFvsjR5xrhiMHK+qpata6Q
+Wrhez79xAgMBAAECggEAANK9KIGvl4t57hWbTIex8amdpKrczfY2co+SMAgVtpe8
+UGfmgcOGMwLIweu1Tqb3p7QJTL7UigiM2bVWKe/Y9iVKsj1jcGouo7N5+zzTc7Je
+tclteBvu7j0j3g+l+DcIZWtIT+0EsUyO/8Fc/PEYTXGI9Kef86FEACIrN2DROnn2
+Ek4R1Lg/92dq10bpnYTMT8txctREQ2gQTXRuNUGIUACUzdoXARNqGth6+k9+gWYh
+IpXiCoBz5Sh8bS/QveehEZtdB/j+/iCcVBjuxwsxNcN7Iq9TKuPoC5/pOa+KoxXC
+kss1mU5A+boJMSL0lZHsFaaGJINliNBPqGZRkU2xxwKBgQD5XtqpYrWFRiYrX1YM
+nFfgIzl69h9EufI/DRHwFObFz7gvaDyQf0HMPT52YwEJiZSwaES+E4fFrmPxg53V
+VbdkBL3LsAXGZqJqQjHuWw0Lx756jd7mABAF4CIR2d9hk3YAA1+d8djsSLqN2xl4
+ptQoxehZLAQzCQkiMC0KxFSnowKBgQDBftXDnZWGUTlezunur/HBymiHdMzUTHsk
+7CgUEOEfaA6eu1yA7udyVsSbhss0AFZgqCevb90J8iBnLnQNqte+gY3qglY1L3od
+9Yv4kvDTGgdAesafiivo+TY3g6JD14M/2LbUutN6kWywLeJGSwgnJwAWSjznA6VM
+TW5+WOu92wKBgQC8//ZMYSLg0u0E/GnUfv5fQ3NCTZ4fUatXvEk3JDBQBoI7dA5L
+Ghg9esGHqrvThbHrDevkABtsaSMYnj+WvDOVm75ZzZxi5dD9JhR/6gR2RDqK2lHx
+EmUSfvBzhSS36LKLigMDS5S0aN7zuvaQKiksierzAthf8d45SjgpK+pZbwKBgQCT
+GPctNPldGRaCKs7Qc9VYO6XnhDXLFzFuylFVn9dk5thmd41FP1mYJLpmeby1FaSU
+6oDw8Bub2gQkLL5xPXWyEA9xPhCHckZlzCvSlvKZqWnl7PBejM4A2KQM4/dRl97h
+hMDJTBZFUZTNArTIN3ZFPXLlfx55iN36+cqMJtFgjQKBgQDcffg1rc/ayzuJd7Ym
+OzQ7joemEK5DIDRxryFxWnDXLrAZA1V+iUiKESIX1E8TGSAMymwUW2nWWCuhUps6
+pFw9z8Z3AaerRZA5fl655v500jUqziwBfifSimNL0hzmZfG6XUt6F7y4rxa2HFuu
+uwMrOBKatg7CZ1Uenv1K3ioD5w==
+-----END PRIVATE KEY-----';
+
 	protected function onBeforeTestSuite() {
 		if (!defined('PHPUNIT_SAML_TESTS_ENABLED') || !PHPUNIT_SAML_TESTS_ENABLED) {
 			self::markTestSuiteSkipped();
@@ -308,6 +362,165 @@ class testUsersAuthenticationSaml extends testFormAuthentication {
 						'Incorrect value for field "attribute": cannot be empty.'
 					],
 					'error' => 'Invalid parameter "/1/provision_groups": cannot be empty.'
+				]
+			],
+			// #8 IdP certificate form validation.
+			[
+				[
+					'expected' => TEST_BAD,
+					'storage' => 'database',
+					'fields' => [
+						'IdP entity ID' => 'IdP',
+						'SSO service URL' => 'SSO',
+						'Username attribute' => 'UA',
+						'SP entity ID' => 'SP'
+					],
+					'error' => 'Invalid parameter "/1/idp_certificate": cannot be empty.'
+				]
+			],
+			// #9 IdP certificate encoding validation.
+			[
+				[
+					'expected' => TEST_BAD,
+					'storage' => 'database',
+					'fields' => [
+						'IdP entity ID' => 'IdP',
+						'SSO service URL' => 'SSO',
+						'Username attribute' => 'UA',
+						'SP entity ID' => 'SP',
+						'IdP certificate' => STRING_32
+					],
+					'error' => 'Invalid parameter "/1/idp_certificate": a PEM-encoded certificate is expected.'
+				]
+			],
+			// #10 IdP certificate max length validation.
+			[
+				[
+					'expected' => TEST_BAD,
+					'storage' => 'database',
+					'fields' => [
+						'IdP entity ID' => 'IdP',
+						'SSO service URL' => 'SSO',
+						'Username attribute' => 'UA',
+						'SP entity ID' => 'SP',
+						'IdP certificate' => STRING_6000.STRING_6000
+					],
+					'error' => 'Invalid parameter "/1/idp_certificate": value is too long.'
+				]
+			],
+			// #11 SP private key form validation.
+			[
+				[
+					'expected' => TEST_BAD,
+					'storage' => 'database',
+					'fields' => [
+						'IdP entity ID' => 'IdP',
+						'SSO service URL' => 'SSO',
+						'Username attribute' => 'UA',
+						'SP entity ID' => 'SP',
+						'IdP certificate' => self::SSL_CERTIFICATE,
+						'SP certificate' => self::SSL_CERTIFICATE,
+						// Sign.
+						'id:sign_messages' => true
+
+					],
+					'error' => 'Invalid parameter "/1/sp_private_key": cannot be empty.'
+				]
+			],
+			// #12 SP private key encoding validation.
+			[
+				[
+					'expected' => TEST_BAD,
+					'storage' => 'database',
+					'fields' => [
+						'IdP entity ID' => 'IdP',
+						'SSO service URL' => 'SSO',
+						'Username attribute' => 'UA',
+						'SP entity ID' => 'SP',
+						'IdP certificate' => self::SSL_CERTIFICATE,
+						'SP private key' => STRING_32,
+						'SP certificate' => self::SSL_CERTIFICATE,
+						// Sign.
+						'id:sign_assertions' => true
+					],
+					'error' => 'Invalid parameter "/1/sp_private_key": a PEM-encoded private key is expected.'
+				]
+			],
+			// #13 SP private key max length validation.
+			[
+				[
+					'expected' => TEST_BAD,
+					'storage' => 'database',
+					'fields' => [
+						'IdP entity ID' => 'IdP',
+						'SSO service URL' => 'SSO',
+						'Username attribute' => 'UA',
+						'SP entity ID' => 'SP',
+						'IdP certificate' => self::SSL_CERTIFICATE,
+						'SP private key' => STRING_6000.STRING_6000,
+						'SP certificate' => self::SSL_CERTIFICATE,
+						// Sign.
+						'id:sign_authn_requests' => true
+					],
+					'error' => 'Invalid parameter "/1/sp_private_key": value is too long.'
+				]
+			],
+			// #14 SP certificate form validation.
+			[
+				[
+					'expected' => TEST_BAD,
+					'storage' => 'database',
+					'fields' => [
+						'IdP entity ID' => 'IdP',
+						'SSO service URL' => 'SSO',
+						'Username attribute' => 'UA',
+						'SP entity ID' => 'SP',
+						'IdP certificate' => self::SSL_CERTIFICATE,
+						'SP private key' => self::SSL_PRIVATE_KEY,
+						// Encrypt.
+						'id:encrypt_nameid' => true
+
+					],
+					'error' => 'Invalid parameter "/1/sp_certificate": cannot be empty.'
+				]
+			],
+			// #15 SP certificate encoding validation.
+			[
+				[
+					'expected' => TEST_BAD,
+					'storage' => 'database',
+					'fields' => [
+						'IdP entity ID' => 'IdP',
+						'SSO service URL' => 'SSO',
+						'Username attribute' => 'UA',
+						'SP entity ID' => 'SP',
+						'IdP certificate' => self::SSL_CERTIFICATE,
+						'SP private key' => self::SSL_PRIVATE_KEY,
+						'SP certificate' => STRING_32,
+						// Encrypt.
+						'id:encrypt_assertions' => true
+					],
+					'error' => 'Invalid parameter "/1/sp_certificate": a PEM-encoded certificate is expected.'
+				]
+			],
+			// #16 SP certificate max length validation.
+			[
+				[
+					'expected' => TEST_BAD,
+					'storage' => 'database',
+					'fields' => [
+						'IdP entity ID' => 'IdP',
+						'SSO service URL' => 'SSO',
+						'Username attribute' => 'UA',
+						'SP entity ID' => 'SP',
+						'IdP certificate' => self::SSL_CERTIFICATE,
+						'SP private key' => self::SSL_PRIVATE_KEY,
+						'SP certificate' => STRING_6000.STRING_6000,
+						// Sign.
+						'id:sign_logout_requests' => true,
+						'id:sign_logout_responses' => true
+					],
+					'error' => 'Invalid parameter "/1/sp_certificate": value is too long.'
 				]
 			]
 		];
@@ -604,12 +817,67 @@ class testUsersAuthenticationSaml extends testFormAuthentication {
 						]
 					]
 				]
+			],
+			// #5 Configure SAML SSO with IdP certificate field.
+			[
+				[
+					'storage' => 'database',
+					'fields' => [
+						'IdP entity ID' => 'IdP',
+						'SSO service URL' => 'SSO',
+						'Username attribute' => 'UA',
+						'SP entity ID' => 'SP',
+						'IdP certificate' => self::SSL_CERTIFICATE
+					],
+					'db_check' => [
+						'userdirectory_saml' => [
+							[
+								'idp_entityid' => 'IdP',
+								'sso_url' => 'SSO',
+								'username_attribute' => 'UA',
+								'sp_entityid' => 'SP',
+								'idp_certificate'=> str_replace("\n", "\r\n", self::SSL_CERTIFICATE)
+							]
+						]
+					]
+				]
+			],
+			// #6 Configure SAML SSO with all certificates.
+			[
+				[
+					'storage' => 'database',
+					'fields' => [
+						'IdP entity ID' => 'IdP',
+						'SSO service URL' => 'SSO',
+						'Username attribute' => 'UA',
+						'SP entity ID' => 'SP',
+						'IdP certificate' => self::SSL_CERTIFICATE,
+						'SP private key' => self::SSL_PRIVATE_KEY,
+						'SP certificate' => self::SSL_CERTIFICATE
+					],
+					'db_check' => [
+						'userdirectory_saml' => [
+							[
+								'idp_entityid' => 'IdP',
+								'sso_url' => 'SSO',
+								'username_attribute' => 'UA',
+								'sp_entityid' => 'SP',
+								'idp_certificate'=> str_replace("\n", "\r\n", self::SSL_CERTIFICATE),
+								'sp_private_key' => str_replace("\n", "\r\n", self::SSL_PRIVATE_KEY),
+								'sp_certificate' => str_replace("\n", "\r\n", self::SSL_CERTIFICATE)
+
+							]
+						]
+					]
+				]
 			]
 		];
 	}
 
 	/**
 	 * @dataProvider getConfigureValidationData
+	 *
+	 * @onAfter setSamlCertificatesStorage
 	 */
 	public function testUsersAuthenticationSaml_ConfigureValidation($data) {
 		$this->testSamlConfiguration($data);
@@ -619,6 +887,8 @@ class testUsersAuthenticationSaml extends testFormAuthentication {
 	 * @backup settings
 	 *
 	 * @dataProvider getConfigureData
+	 *
+	 * @onAfter setSamlCertificatesStorage
 	 */
 	public function testUsersAuthenticationSaml_Configure($data) {
 		$this->testSamlConfiguration($data);
@@ -627,6 +897,12 @@ class testUsersAuthenticationSaml extends testFormAuthentication {
 	private function testSamlConfiguration($data) {
 		$old_hash = CDBHelper::getHash('SELECT * FROM settings');
 		$this->page->login()->open('zabbix.php?action=authentication.edit');
+
+		// Change storage to 'database' in frontend configuration file.
+		if (array_key_exists('storage', $data)) {
+			$this->setSamlCertificatesStorage($data['storage']);
+			$this->page->refresh()->waitUntilReady();
+		}
 
 		// Check that SAML settings are disabled by default and configure SAML authentication.
 		$this->configureSamlAuthentication($data);
@@ -647,7 +923,25 @@ class testUsersAuthenticationSaml extends testFormAuthentication {
 				$data['fields'] = array_map('trim', $data['fields']);
 			}
 
-			$form->checkValue($data['fields']);
+			if (array_key_exists('storage', $data)) {
+				$certificates_fields = ['IdP certificate', 'SP private key', 'SP certificate'];
+				foreach ($certificates_fields as $field) {
+					if (array_key_exists($field, $data['fields'])) {
+						$this->assertTrue($form->query('button', 'Change '.$field)->one()->isClickable(),
+								'Button Change '.$field.' should be clickable.'
+						);
+					}
+					else {
+						$this->assertFalse($form->query('button', 'Change '.$field)->one(false)->isPresent(),
+								'Button Change '.$field.' should not exists.'
+						);
+					}
+				}
+
+			}
+			else {
+				$form->checkValue($data['fields']);
+			}
 
 			foreach ($data['db_check'] as $table => $rows) {
 				if ($table === 'settings') {
