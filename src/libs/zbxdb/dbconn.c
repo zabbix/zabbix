@@ -487,9 +487,9 @@ static int	dbconn_open(zbx_dbconn_t *db)
 	}
 
 	/* innodb_snapshot_isolation variable became ON by default in MariaDB 11.6.2, we need it to be OFF */
-	if (ZBX_DB_OK == ret && ON == ZBX_MARIADB_SFORK && 110602 <= ZBX_MYSQL_SVERSION)
+	if (ZBX_DB_OK == ret && ON == zbx_mariadb_fork_get() && 110602 <= db_get_server_version())
 	{
-		if (0 < (ret = zbx_db_execute_basic("set innodb_snapshot_isolation='OFF'")))
+		if (0 < (ret = dbconn_execute(db, "set innodb_snapshot_isolation='OFF'")))
 			ret = ZBX_DB_OK;
 	}
 
