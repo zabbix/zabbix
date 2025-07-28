@@ -24,33 +24,33 @@ class dbConditionIdTest extends CTest {
 		return [
 			[
 				['field', [0]],
-				"field IS NULL",
-				"field IS NULL"
+				"(field IS NULL OR field=0)",
+				"(field IS NULL OR field=0)"
 			],
 			[
 				['field', [0, 1]],
-				"(field=1 OR field IS NULL)",
-				"(field=1 OR field IS NULL)"
+				"(field IS NULL OR field IN (0,1))",
+				"(field IS NULL OR field IN (0,1))"
 			],
 			[
 				['field', [1, 0]],
-				"(field=1 OR field IS NULL)",
-				"(field=1 OR field IS NULL)"
+				"(field IS NULL OR field IN (0,1))",
+				"(field IS NULL OR field IN (0,1))"
 			],
 			[
 				['field', [0, 1, 2, 3]],
-				"(field IN (1,2,3) OR field IS NULL)",
-				"(field IN (1,2,3) OR field IS NULL)"
+				"(field IS NULL OR field IN (0,1,2,3))",
+				"(field IS NULL OR field IN (0,1,2,3))"
 			],
 			[
 				['field', [0, 1, 2, 3, 5, 6, 7, 8, 9, 10]],
-				"(field IN (1,2,3,5,6,7,8,9,10) OR field IS NULL)",
-				"(field BETWEEN 5 AND 10 OR field IN (1,2,3) OR field IS NULL)"
+				"(field IS NULL OR field IN (0,1,2,3,5,6,7,8,9,10))",
+				"(field IS NULL OR field BETWEEN 5 AND 10 OR field IN (0,1,2,3))"
 			],
 			[
 				['field', [0, 1, 2, 3, 5, 6, 7, 8, 9, 10], true],
-				"field NOT IN (1,2,3,5,6,7,8,9,10) AND field IS NOT NULL",
-				"NOT field BETWEEN 5 AND 10 AND field NOT IN (1,2,3) AND field IS NOT NULL"
+				"field IS NOT NULL AND field NOT IN (0,1,2,3,5,6,7,8,9,10)",
+				"field IS NOT NULL AND NOT field BETWEEN 5 AND 10 AND field NOT IN (0,1,2,3)"
 			]
 		];
 	}

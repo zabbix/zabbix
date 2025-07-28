@@ -16,18 +16,45 @@
 
 class CNumericBox extends CInput {
 
-	public function __construct($name = 'number', $value = '0', $maxlength = 15, $readonly = false, $allowempty = false,
-			$allownegative = true) {
+	private bool $allow_empty;
+	private bool $allow_negative;
+	private int $min_length = 0;
+
+	public function __construct($name = 'number', $value = '0', $maxlength = 20, $readonly = false,
+			$allow_empty = false, $allow_negative = true) {
 		parent::__construct('text', $name, $value);
+
 		$this->setReadonly($readonly);
 		$this->setAttribute('maxlength', $maxlength);
-		$this->onChange(
-			'validateNumericBox(this, '.($allowempty ? 'true' : 'false').', '.($allownegative ? 'true' : 'false').');'
-		);
+
+		$this->allow_empty = $allow_empty;
+		$this->allow_negative = $allow_negative;
 	}
 
 	public function setWidth($value) {
-		$this->addStyle('width: '.$value.'px;');
+		return $this->addStyle('width: '.$value.'px;');
+	}
+
+	/**
+	 * Pad number with zeroes to maintain min length.
+	 *
+	 * @param int $min_length
+	 *
+	 * @return CNumericBox
+	 */
+	public function padWithZeroes(int $min_length): self {
+		$this->min_length = $min_length;
+
 		return $this;
+	}
+
+	public function toString($destroy = true) {
+		$this->onChange('normalizeNumericBox(this, '.json_encode([
+			'allow_empty' => $this->allow_empty,
+			'allow_negative' => $this->allow_negative,
+			'min_length' => $this->min_length
+		]).');');
+
+		return parent::toString($destroy);
 	}
 }
