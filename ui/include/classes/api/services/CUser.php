@@ -1441,6 +1441,8 @@ class CUser extends CApiService {
 
 		if ($del_groupids) {
 			DB::delete('users_groups', ['id' => $del_groupids]);
+
+			self::deleteMfaTotpSecrets(array_column($users, null, 'userid'));
 		}
 
 		if ($ins_groups) {
@@ -1460,6 +1462,78 @@ class CUser extends CApiService {
 			unset($group);
 		}
 		unset($user);
+	}
+
+	private static function deleteMfaTotpSecrets(array $users): void {
+		$userids = [];
+		$groupids = [];
+
+		foreach ($users as $user) {
+			if (!array_key_exists('usrgrps', $user)) {
+				continue;
+			}
+
+			$userids[] = $user['userid'];
+
+			foreach ($user['usrgrps'] as $group) {
+				$groupids[$group['usrgrpid']] = true;
+			}
+		}
+
+		if (!$userids) {
+			return;
+		}
+
+		$db_mfa_totp_secrets = DB::select('mfa_totp_secret', [
+			'output' => ['mfaid', 'userid'],
+			'filter' => ['userid' => $userids],
+			'preservekeys' => true
+		]);
+
+		if (!$db_mfa_totp_secrets) {
+			return;
+		}
+
+		if (!$groupids) {
+			DB::delete('mfa_totp_secret', ['mfa_totp_secretid' => array_keys($db_mfa_totp_secrets)]);
+
+			return;
+		}
+
+		$mfa_totp_secretids = [];
+
+		foreach ($db_mfa_totp_secrets as $mfa_totp_secretid => $db_mfa_totp_secret) {
+			$mfa_totp_secretids[$db_mfa_totp_secret['userid']][$db_mfa_totp_secret['mfaid']] = $mfa_totp_secretid;
+		}
+
+		$db_usergroups = DB::select('usrgrp', [
+			'output' => ['mfaid', 'mfa_status'],
+			'usrgrpids' => array_keys($groupids),
+			'preservekeys' => true
+		]);
+		$default_mfaid = CAuthenticationHelper::getPublic(CAuthenticationHelper::MFAID);
+		$del_mfa_totp_secretids = [];
+
+		foreach ($mfa_totp_secretids as $userid => $mfaids) {$x = gettype($mfaids);
+			foreach ($users[$userid]['usrgrps'] as $group) {
+				$db_usergroup = $db_usergroups[$group['usrgrpid']];
+				$group_mfaid = $db_usergroup['mfa_status'] == GROUP_MFA_ENABLED && $db_usergroup['mfaid'] == 0
+					? $default_mfaid
+					: $db_usergroup['mfaid'];
+
+				if (array_key_exists($group_mfaid, $mfaids)) {
+					unset($mfaids[$group_mfaid]);
+				}
+			}
+
+			foreach ($mfaids as $mfa_totp_secretid) {
+				$del_mfa_totp_secretids[] = $mfa_totp_secretid;
+			}
+		}
+
+		if ($del_mfa_totp_secretids) {
+			DB::delete('mfa_totp_secret', ['mfa_totp_secretid' => $del_mfa_totp_secretids]);
+		}
 	}
 
 	private static function updateUgSets(array $users, ?array $db_users = null): void {
