@@ -644,8 +644,7 @@ class testPermissionsWithoutCSRF extends CWebTest {
 			[
 				[
 					'db' => 'SELECT * FROM settings',
-					'link' => 'zabbix.php?action=geomaps.edit',
-					'return_button' => true
+					'link' => 'zabbix.php?action=geomaps.edit'
 				]
 			],
 			// #68 Module update.
