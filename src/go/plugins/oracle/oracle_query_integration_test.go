@@ -14,10 +14,12 @@
 ** If not, see <https://www.gnu.org/licenses/>.
 **/
 
-package dbconn
+package oracle
 
 import (
 	"context"
+	"database/sql"
+	"fmt"
 	"log"
 	"os"
 	"path/filepath"
@@ -25,39 +27,15 @@ import (
 	"time"
 
 	"github.com/google/go-cmp/cmp"
+	"golang.zabbix.com/agent2/plugins/oracle/dbconn"
 	"golang.zabbix.com/agent2/plugins/oracle/mock"
+	"golang.zabbix.com/sdk/uri"
 )
-
-var sqls = []struct { //nolint:gochecknoglobals
-	fileName string
-	content  string
-}{
-	{
-		"good.sql",
-		"SELECT COUNT(*) FROM dba_users WHERE username = 'ZABBIX_MON'",
-	},
-	{
-		"semicol.sql",
-		"SELECT COUNT(*) FROM dba_users WHERE username = 'ZABBIX_MON';;",
-	},
-	{
-		"semicol_breakspace.sql",
-		"   SELECT COUNT(*) FROM dba_users WHERE username = 'ZABBIX_MON';;   ",
-	},
-	{
-		"breakspace.sql",
-		"   SELECT COUNT(*) FROM dba_users WHERE username = 'ZABBIX_MON'   ",
-	},
-	{
-		"only_semicol_breakspace.sql",
-		"   ;;   ",
-	},
-}
 
 func TestOraConn_Query(t *testing.T) { //nolint:tparallel
 	t.Parallel()
 
-	opt := Options{
+	opt := dbconn.Options{
 		KeepAlive:            100 * time.Second,
 		ConnectTimeout:       100 * time.Second,
 		CallTimeout:          100 * time.Second,
@@ -65,10 +43,10 @@ func TestOraConn_Query(t *testing.T) { //nolint:tparallel
 		CustomQueriesPath:    "",
 	}
 
-	connMgr := NewConnManager(&mock.MockLogger{}, &opt)
+	connMgr := dbconn.NewConnManager(&mock.MockLogger{}, &opt)
 	defer connMgr.Destroy()
 
-	oraCon, err := connMgr.GetConnection(newConnDet(t, "zabbix_mon", ""))
+	oraCon, err := connMgr.GetConnection(newConnDetDefault(t, testConfig))
 	if err != nil {
 		t.Fatalf("OraConn_Query: get connection fail: %v", err)
 	}
@@ -98,7 +76,7 @@ func TestOraConn_Query(t *testing.T) { //nolint:tparallel
 		{
 			"+withoutParams",
 			args{
-				"SELECT COUNT(*) FROM dba_users WHERE username = 'ZABBIX_MON'",
+				fmt.Sprintf("SELECT COUNT(*) FROM dba_users WHERE username = '%s'", testConfig.OraUser),
 				nil,
 				ctx,
 			},
@@ -108,7 +86,7 @@ func TestOraConn_Query(t *testing.T) { //nolint:tparallel
 			"+withParams",
 			args{
 				"SELECT COUNT(*) FROM dba_users WHERE username = :1",
-				[]any{"ZABBIX_MON"},
+				[]any{testConfig.OraUser},
 				ctx,
 			},
 			want{1, false},
@@ -134,7 +112,7 @@ func TestOraConn_Query(t *testing.T) { //nolint:tparallel
 		{
 			"withParamsWhenNoNeed",
 			args{
-				"SELECT COUNT(*) FROM dba_users WHERE username = 'ZABBIX_MON'",
+				fmt.Sprintf("SELECT COUNT(*) FROM dba_users WHERE username = '%s'", testConfig.OraUser),
 				[]any{"some param"},
 				ctx,
 			},
@@ -180,7 +158,7 @@ func TestOraConn_Query(t *testing.T) { //nolint:tparallel
 func TestOraConn_QueryByName(t *testing.T) { //nolint:tparallel,gocyclo,cyclop
 	t.Parallel()
 
-	opt := Options{
+	opt := dbconn.Options{
 		KeepAlive:            100 * time.Second,
 		ConnectTimeout:       100 * time.Second,
 		CallTimeout:          100 * time.Second,
@@ -193,10 +171,10 @@ func TestOraConn_QueryByName(t *testing.T) { //nolint:tparallel,gocyclo,cyclop
 		t.Fatalf("OraConn_Query: failed to write file: %v", err)
 	}
 
-	connMgr := NewConnManager(&mock.MockLogger{}, &opt)
+	connMgr := dbconn.NewConnManager(&mock.MockLogger{}, &opt)
 	defer connMgr.Destroy()
 
-	oraCon, err := connMgr.GetConnection(newConnDet(t, "zabbix_mon", ""))
+	oraCon, err := connMgr.GetConnection(newConnDetDefault(t, testConfig))
 	if err != nil {
 		t.Fatalf("OraConn_Query: get connection fail: %v", err)
 	}
@@ -272,7 +250,7 @@ func TestOraConn_QueryByName(t *testing.T) { //nolint:tparallel,gocyclo,cyclop
 func TestOraConn_QueryRow(t *testing.T) { //nolint:tparallel
 	t.Parallel()
 
-	opt := Options{
+	opt := dbconn.Options{
 		KeepAlive:            100 * time.Second,
 		ConnectTimeout:       100 * time.Second,
 		CallTimeout:          100 * time.Second,
@@ -280,10 +258,10 @@ func TestOraConn_QueryRow(t *testing.T) { //nolint:tparallel
 		CustomQueriesPath:    "",
 	}
 
-	connMgr := NewConnManager(&mock.MockLogger{}, &opt)
+	connMgr := dbconn.NewConnManager(&mock.MockLogger{}, &opt)
 	defer connMgr.Destroy()
 
-	oraCon, err := connMgr.GetConnection(newConnDet(t, "zabbix_mon", ""))
+	oraCon, err := connMgr.GetConnection(newConnDetDefault(t, testConfig))
 	if err != nil {
 		t.Fatalf("TestConnManager_Query: get connection fail: %v", err)
 	}
@@ -322,7 +300,7 @@ func TestOraConn_QueryRow(t *testing.T) { //nolint:tparallel
 			"+withParams",
 			args{
 				"SELECT username FROM dba_users WHERE username = :1",
-				[]any{"ZABBIX_MON"},
+				[]any{testConfig.OraUser},
 				ctx,
 			},
 			want{false},
@@ -362,7 +340,7 @@ func TestOraConn_QueryRow(t *testing.T) { //nolint:tparallel
 func TestOraConn_QueryRowByName(t *testing.T) { //nolint:tparallel
 	t.Parallel()
 
-	opt := Options{
+	opt := dbconn.Options{
 		KeepAlive:            100 * time.Second,
 		ConnectTimeout:       100 * time.Second,
 		CallTimeout:          100 * time.Second,
@@ -375,10 +353,10 @@ func TestOraConn_QueryRowByName(t *testing.T) { //nolint:tparallel
 		t.Fatalf("OraConn_QueryRow: failed to write file: %v", err)
 	}
 
-	connMgr := NewConnManager(&mock.MockLogger{}, &opt)
+	connMgr := dbconn.NewConnManager(&mock.MockLogger{}, &opt)
 	defer connMgr.Destroy()
 
-	oraCon, err := connMgr.GetConnection(newConnDet(t, "zabbix_mon", ""))
+	oraCon, err := connMgr.GetConnection(newConnDetDefault(t, testConfig))
 	if err != nil {
 		t.Fatalf("OraConn_Query: get connection fail: %v", err)
 	}
@@ -445,6 +423,32 @@ func TestOraConn_QueryRowByName(t *testing.T) { //nolint:tparallel
 }
 
 func seedWithSQL(customQueriesPath string) error {
+	var sqls = []struct { //nolint:gochecknoglobals
+		fileName string
+		content  string
+	}{
+		{
+			"good.sql",
+			fmt.Sprintf("SELECT COUNT(*) FROM dba_users WHERE username = '%s'", testConfig.OraUser),
+		},
+		{
+			"semicol.sql",
+			fmt.Sprintf("SELECT COUNT(*) FROM dba_users WHERE username = '%s';;", testConfig.OraUser),
+		},
+		{
+			"semicol_breakspace.sql",
+			fmt.Sprintf("   SELECT COUNT(*) FROM dba_users WHERE username = '%s';;   ", testConfig.OraUser),
+		},
+		{
+			"breakspace.sql",
+			fmt.Sprintf("   SELECT COUNT(*) FROM dba_users WHERE username = '%s'   ", testConfig.OraUser),
+		},
+		{
+			"only_semicol_breakspace.sql",
+			"   ;;   ",
+		},
+	}
+
 	for _, v := range sqls {
 		filePath := filepath.Join(customQueriesPath, v.fileName)
 
@@ -455,4 +459,29 @@ func seedWithSQL(customQueriesPath string) error {
 	}
 
 	return nil
+}
+
+// newConnDet function constructs ConnDetails with default values for testing.
+func newConnDetDefault(t *testing.T, c *mock.TestConfig) dbconn.ConnDetails {
+	t.Helper()
+
+	u, _ := uri.NewWithCreds( //nolint:errcheck
+		c.OraURI+"?service="+c.OraSrv,
+		c.OraUser,
+		c.OraPwd,
+		dbconn.URIDefaults)
+
+	return dbconn.ConnDetails{*u, "", false}
+}
+
+// closeRows function closes rows if exits. In case of problem - returns an error to subtest.
+func closeRows(t *testing.T, rows *sql.Rows) { //nolint:unused
+	t.Helper()
+
+	if rows != nil {
+		err := rows.Close()
+		if err != nil {
+			t.Errorf("rows.Close() error: %v", err)
+		}
+	}
 }

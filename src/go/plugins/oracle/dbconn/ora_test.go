@@ -16,7 +16,6 @@ package dbconn
 
 import (
 	"reflect"
-	"strings"
 	"testing"
 	"time"
 
@@ -227,9 +226,9 @@ func Test_prepareConnectString(t *testing.T) {
 	}
 
 	type want struct {
-		result   string
-		panicStr string
-		wantErr  bool
+		result    string
+		wantPanic bool
+		wantErr   bool
 	}
 
 	tests := []struct {
@@ -244,7 +243,7 @@ func Test_prepareConnectString(t *testing.T) {
 				newConnDetHostname(t, "zbx_tns", "XE"), //hostname any
 				1,                                      //any
 			},
-			want{"zbx_tns", "", false},
+			want{"zbx_tns", false, false},
 		},
 		{
 			"+tnsKey",
@@ -253,7 +252,7 @@ func Test_prepareConnectString(t *testing.T) {
 				newConnDetHostname(t, "(DESCRIPTION=..", "XE"),
 				1, //any
 			},
-			want{"(DESCRIPTION=..", "", false},
+			want{"(DESCRIPTION=..", false, false},
 		},
 		{
 			"+tnsNone",
@@ -265,7 +264,7 @@ func Test_prepareConnectString(t *testing.T) {
 			want{
 				`(DESCRIPTION=(ADDRESS=(PROTOCOL=tcp)(HOST=myhost)(PORT=1521))` +
 					`(CONNECT_DATA=(SERVICE_NAME="XE"))(CONNECT_TIMEOUT=1)(RETRY_COUNT=0))`,
-				"",
+				false,
 				false,
 			},
 		},
@@ -279,7 +278,7 @@ func Test_prepareConnectString(t *testing.T) {
 			want{
 				`(DESCRIPTION=(ADDRESS=(PROTOCOL=tcp)(HOST=localhost)(PORT=))` +
 					`(CONNECT_DATA=(SERVICE_NAME=""))(CONNECT_TIMEOUT=0)(RETRY_COUNT=0))`,
-				"",
+				false,
 				false,
 			},
 		},
@@ -293,7 +292,7 @@ func Test_prepareConnectString(t *testing.T) {
 			want{
 				`(DESCRIPTION=(ADDRESS=(PROTOCOL=tcp)(HOST=localhost)(PORT=))` +
 					`(CONNECT_DATA=(SERVICE_NAME="XE#"))(CONNECT_TIMEOUT=0)(RETRY_COUNT=0))`,
-				"",
+				false,
 				false,
 			},
 		},
@@ -306,12 +305,12 @@ func Test_prepareConnectString(t *testing.T) {
 			},
 			want{
 				"",
-				"",
+				false,
 				true,
 			},
 		},
 		{
-			"-UnknownTNSType",
+			"-unknownTNSType",
 			args{
 				TNSNameType(100),
 				newConnDetHostname(t, "any", "any"),
@@ -319,7 +318,7 @@ func Test_prepareConnectString(t *testing.T) {
 			},
 			want{
 				"",
-				"unknown TNS interpretation type",
+				true,
 				true,
 			},
 		},
@@ -329,7 +328,16 @@ func Test_prepareConnectString(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			t.Parallel()
 
-			defer processPanic(t, tt.want.wantErr, tt.want.panicStr)
+			defer func() {
+				r := recover()
+				if tt.want.wantPanic && r == nil {
+					t.Fatalf("prepareConnectString() expected panic did not occur")
+				}
+
+				if !tt.want.wantPanic && r != nil {
+					t.Fatalf("prepareConnectString() unexpected panic occurred")
+				}
+			}()
 
 			gotResult, err := prepareConnectString(tt.args.tnsType, tt.args.cd, tt.args.connectTimeout)
 			if err != nil && !tt.want.wantErr {
@@ -340,29 +348,5 @@ func Test_prepareConnectString(t *testing.T) {
 				t.Errorf("prepareConnectString(): %s", diff)
 			}
 		})
-	}
-}
-
-// processPanic function processes a panic situation both wanted and unwanted.
-func processPanic(t *testing.T, wantErr bool, panicStr string) {
-	t.Helper()
-
-	r := recover()
-
-	if r == nil {
-		return
-	}
-
-	if !wantErr || panicStr == "" {
-		panic(r)
-	}
-
-	gotErr, ok := r.(string)
-	if !ok {
-		t.Fatalf("unwanted panic type: %v", r)
-	}
-
-	if !strings.Contains(gotErr, panicStr) {
-		t.Fatalf("unwanted panic: %s", gotErr)
 	}
 }

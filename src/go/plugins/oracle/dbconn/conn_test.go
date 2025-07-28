@@ -415,7 +415,7 @@ func TestConnManager_closeUnused(t *testing.T) {
 			defer connMgr.Destroy()
 
 			conn, err := connMgr.GetConnection(
-				newConnDetNoVersCheck(t, "zabbix_mon", ""),
+				newConnDet(t, "zabbix_mon", ""),
 			)
 			if err != nil || conn == nil {
 				t.Fatalf(
@@ -461,8 +461,8 @@ func TestConnManager_closeAll(t *testing.T) { //nolint:tparallel
 		{
 			"+close",
 			fields{[]ConnDetails{
-				newConnDetNoVersCheck(t, "zabbix_mon", ""),
-				newConnDetNoVersCheck(t, "sys", "sysdba"),
+				newConnDet(t, "zabbix_mon", ""),
+				newConnDet(t, "sys", "sysdba"),
 			},
 			},
 		},
@@ -530,11 +530,11 @@ func TestConnManager_GetConnection(t *testing.T) {
 			"+returnExisting",
 			fields{
 				[]ConnDetails{
-					newConnDetNoVersCheck(t, "zabbix_mon", ""),
-					newConnDetNoVersCheck(t, "sys", "sysdba"),
+					newConnDet(t, "zabbix_mon", ""),
+					newConnDet(t, "sys", "sysdba"),
 				},
 			},
-			args{newConnDetNoVersCheck(t, "zabbix_mon", "")},
+			args{newConnDet(t, "zabbix_mon", "")},
 			want{"zabbix_mon", 2},
 			false,
 		},
@@ -542,17 +542,17 @@ func TestConnManager_GetConnection(t *testing.T) {
 			"+createNew",
 			fields{
 				[]ConnDetails{
-					newConnDetNoVersCheck(t, "sys", "sysdba"),
+					newConnDet(t, "sys", "sysdba"),
 				},
 			},
-			args{newConnDetNoVersCheck(t, "zabbix_mon", "")},
+			args{newConnDet(t, "zabbix_mon", "")},
 			want{"zabbix_mon", 2},
 			false,
 		},
 		{
 			"-connErr",
 			fields{},
-			args{newConnDetNoVersCheck(t, "zabbix_mon", "err")},
+			args{newConnDet(t, "zabbix_mon", "err")},
 			want{},
 			true,
 		},

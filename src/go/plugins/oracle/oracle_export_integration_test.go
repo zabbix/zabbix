@@ -35,12 +35,12 @@ import (
 )
 
 var (
-	testConfig mock.TestConfig //nolint:gochecknoglobals
+	testConfig *mock.TestConfig //nolint:gochecknoglobals
 	OraVersRx  = regexp.MustCompile(`^\d{2}\.\d+\.\d+\.\d+\.\d+$`)
 )
 
 func TestMain(m *testing.M) {
-	testConfig = mock.TestConfig{
+	testConfig = &mock.TestConfig{
 		OraURI:  os.Getenv("ORA_URI"),
 		OraUser: os.Getenv("ORA_USER"),
 		OraPwd:  os.Getenv("ORA_PWD"),
