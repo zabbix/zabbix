@@ -130,9 +130,7 @@ class CWidgetHostNavigator extends CWidget {
 	}
 
 	#hasSelectable() {
-		const hostids = this.#hosts.map(host => host.id);
-
-		return hostids.includes(this.#selected_hostid);
+		return this.#hosts.some(host => host.id === this.#selected_hostid);
 	}
 
 	onReferredUpdate() {

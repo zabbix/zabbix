@@ -129,9 +129,7 @@ class CWidgetGeoMap extends CWidget {
 	}
 
 	#hasSelectable() {
-		const hostids = this.#hosts.map(host => host.properties.hostid);
-
-		return hostids.includes(this.#selected_hostid);
+		return this.#hosts.some(host => host.properties.hostid === this.#selected_hostid);
 	}
 
 	onReferredUpdate() {
