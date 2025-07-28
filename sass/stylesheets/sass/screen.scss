@@ -2547,17 +2547,22 @@ div {
 	background-attachment: local, local, scroll, scroll;
 }
 
+.tags-wrapper {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 2px 3px;
+}
+
 .tag {
 	display: inline-block;
 	color: $font-selected-color;
 	background-color: $ui-bg-selected-color;
-	margin: 1px 3px 1px 0;
 	padding: 2px 3px;
 	line-height: 1em;
-	max-width: 133px;
 	vertical-align: middle;
 	@extend %overflow-ellipsis;
 	border-radius: 2px;
+	box-sizing: border-box;
 
 	a.link-action {
 		color: inherit !important;

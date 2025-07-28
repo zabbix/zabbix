@@ -6632,16 +6632,20 @@ z-select[disabled] .focusable, input[disabled], textarea[disabled], select optio
   background-size: 100% 40px, 100% 40px, 100% 4px, 100% 4px;
   background-attachment: local, local, scroll, scroll; }
 
+.tags-wrapper {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 2px 3px; }
+
 .tag {
   display: inline-block;
   color: #000000;
   background-color: #dddddd;
-  margin: 1px 3px 1px 0;
   padding: 2px 3px;
   line-height: 1em;
-  max-width: 133px;
   vertical-align: middle;
-  border-radius: 2px; }
+  border-radius: 2px;
+  box-sizing: border-box; }
   .tag a.link-action {
     color: inherit !important;
     border-bottom: none; }

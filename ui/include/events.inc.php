@@ -756,7 +756,7 @@ function makeTags(array $list, bool $html = true, string $key = 'eventid', int $
 				}
 
 				$tags[$element[$key]][] = (new CButtonIcon(ZBX_ICON_MORE))
-					->setHint($hint_content, ZBX_STYLE_HINTBOX_WRAP);
+					->setHint($hint_content, ZBX_STYLE_HINTBOX_WRAP . ' ' . ZBX_STYLE_TAGS_WRAPPER);
 			}
 		}
 		else {
