@@ -1204,7 +1204,9 @@ class CMacrosResolverGeneral {
 										)
 								)
 							]);
-						$macro_value = (new CLinkAction($macro_value))->setHint($hint_table);
+						$macro_value = (new CLinkAction($macro_value))
+							->addClass(ZBX_STYLE_NO_INDENT)
+							->setHint($hint_table);
 					}
 
 					$macro_values[$function['triggerid']][$token['token']] = $macro_value;
