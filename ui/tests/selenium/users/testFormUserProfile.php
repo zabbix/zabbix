@@ -164,6 +164,13 @@ class testFormUserProfile extends CLegacyWebTest {
 
 		$this->page->login()->open('zabbix.php?action=userprofile.edit')->waitUntilReady();
 		$form = $this->query('name:userprofile_form')->asForm()->waitUntilVisible()->one();
+		
+		// Check theme fields.
+		$this->assertEquals(
+			['System default', 'Blue', 'Blue (classic)', 'Dark', 'Dark (classic)', 'High-contrast light', 'High-contrast dark'],
+			$this->query('name:theme')->asDropdown()->waitUntilVisible()->one()->getOptions()->asText()
+		);
+		
 		$form->fill(['Theme' => 'Blue'])->submit();
 		$this->page->waitUntilReady();
 		CDashboardElement::find()->waitUntilVisible()->waitUntilReady();
