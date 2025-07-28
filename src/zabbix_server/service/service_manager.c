@@ -3753,6 +3753,8 @@ out:
 
 	zbx_db_close();
 
+	zbx_setproctitle("%s #%d [terminated]", get_process_type_string(process_type), process_num);
+
 	exit(EXIT_SUCCESS);
 #undef STAT_INTERVAL
 }

@@ -57,8 +57,8 @@ static void	process_value(zbx_uint64_t itemid, zbx_uint64_t *value_ui64, double 
 	if (NOTSUPPORTED == ping_result)
 	{
 		item.state = ITEM_STATE_NOTSUPPORTED;
-		zbx_preprocess_item_value(item.itemid, item.host.hostid, item.value_type, item.flags, NULL, ts,
-				item.state, error);
+		zbx_preprocess_item_value(item.itemid, item.host.hostid, item.value_type, item.flags,
+			item.preprocessing, NULL, ts, item.state, error);
 	}
 	else
 	{
@@ -72,8 +72,8 @@ static void	process_value(zbx_uint64_t itemid, zbx_uint64_t *value_ui64, double 
 			SET_DBL_RESULT(&value, *value_dbl);
 
 		item.state = ITEM_STATE_NORMAL;
-		zbx_preprocess_item_value(item.itemid, item.host.hostid, item.value_type, item.flags, &value, ts,
-				item.state, NULL);
+		zbx_preprocess_item_value(item.itemid, item.host.hostid, item.value_type, item.flags,
+				item.preprocessing, &value, ts, item.state, NULL);
 
 		zbx_free_agent_result(&value);
 	}
@@ -465,7 +465,7 @@ static void	get_pinger_hosts(icmpitem_t **icmp_items, int *icmp_items_alloc, int
 
 			items[i].state = ITEM_STATE_NOTSUPPORTED;
 			zbx_preprocess_item_value(items[i].itemid, items[i].host.hostid, items[i].value_type,
-					items[i].flags, NULL, &ts, items[i].state, error);
+					items[i].flags, items[i].preprocessing, NULL, &ts, items[i].state, error);
 
 			zbx_dc_requeue_items(&items[i].itemid, &ts.sec, &errcode, 1);
 		}
