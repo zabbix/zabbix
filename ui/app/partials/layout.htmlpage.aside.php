@@ -35,19 +35,27 @@ $header = (new CDiv())
 			(new CButtonIcon(ZBX_ICON_CHEVRON_DOUBLE_LEFT, _('Collapse sidebar')))
 				->addClass('js-sidebar-mode')
 				->addClass('button-compact')
-				->setAttribute('aria-label', _('Collapse main menu')),
+				->setAttribute('aria-label', _('Collapse main menu'))
+				->setAttribute('aria-expanded', 'true')
+				->setAttribute('aria-controls', 'sidebar'),
 			(new CButtonIcon(ZBX_ICON_CHEVRON_DOUBLE_RIGHT, _('Expand sidebar')))
 				->addClass('js-sidebar-mode')
 				->addClass('button-expand')
-				->setAttribute('aria-label', _('Expand main menu')),
+				->setAttribute('aria-label', _('Expand main menu'))
+				->setAttribute('aria-expanded', 'false')
+				->setAttribute('aria-controls', 'sidebar'),
 			(new CButtonIcon(ZBX_ICON_COLLAPSE, _('Hide sidebar')))
 				->addClass('js-sidebar-mode')
 				->addClass('button-hide')
-				->setAttribute('aria-label', _('Hide main menu')),
+				->setAttribute('aria-label', _('Hide main menu'))
+				->setAttribute('aria-expanded', 'true')
+				->setAttribute('aria-controls', 'sidebar'),
 			(new CButtonIcon(ZBX_ICON_EXPAND, _('Show sidebar')))
 				->addClass('js-sidebar-mode')
 				->addClass('button-show')
 				->setAttribute('aria-label', _('Show main menu'))
+				->setAttribute('aria-expanded', 'false')
+				->setAttribute('aria-controls', 'sidebar')
 		]))->addClass('sidebar-header-buttons')
 	);
 
@@ -77,6 +85,7 @@ $search = (new CForm('get', 'zabbix.php'))
 
 (new CTag('aside', true))
 	->addClass('sidebar')
+	->setId('sidebar')
 	->addClass(CViewHelper::loadSidebarMode() == ZBX_SIDEBAR_VIEW_MODE_COMPACT ? 'is-compact' : null)
 	->addClass(CViewHelper::loadSidebarMode() == ZBX_SIDEBAR_VIEW_MODE_HIDDEN ? 'is-hidden' : null)
 

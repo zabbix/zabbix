@@ -136,7 +136,11 @@ class CHtmlPage {
 	private function createTopHeader(): CTag {
 		$divs = [
 			(new CTag('nav', true,
-				(new CButtonIcon(ZBX_ICON_MENU, _('Show sidebar')))->setId('sidebar-button-toggle')
+				(new CButtonIcon(ZBX_ICON_MENU, _('Show sidebar')))
+					->setId('sidebar-button-toggle')
+					->setAttribute('aria-label', _('Show main menu'))
+					->setAttribute('aria-expanded', 'false')
+					->setAttribute('aria-controls', 'sidebar')
 			))
 				->addClass('sidebar-nav-toggle')
 				->setAttribute('role', 'navigation')
