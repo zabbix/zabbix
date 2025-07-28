@@ -21,14 +21,14 @@
  * @var array $data
  */
 
-$view = (new CWidgetView($data))
+$view = new CWidgetView($data);
+
+foreach ($data['vars'] as $name => $value) {
+	$view->setVar($name, $value);
+}
+
+$view
 	->addItem(
 		(new CDiv())->setId($data['unique_id'])
 	)
-	->setVar('hosts', $data['hosts']);
-
-if ($data['initial_load'] == 1) {
-	$view->setVar('config', $data['config']);
-}
-
-$view->show();
+	->show();

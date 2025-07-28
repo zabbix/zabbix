@@ -68,8 +68,8 @@ class CWidgetGeoMap extends CWidget {
 	getUpdateRequestData() {
 		return {
 			...super.getUpdateRequestData(),
-			initial_load: this._initial_load ? 1 : 0,
-			unique_id: this._unique_id
+			unique_id: this._unique_id,
+			with_config: this._initial_load ? 1 : undefined
 		};
 	}
 
