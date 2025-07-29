@@ -672,12 +672,12 @@ class CControllerItemList extends CControllerItem {
 			$subfilter_key = $subfilter['key'];
 			$values = [];
 
-			foreach ($items_values as $item) {
-				if (!isset($item[$subfilter_key]) || !is_array($item[$subfilter_key])) {
+			foreach ($items_values as $item_values) {
+				if (!array_key_exists($subfilter_key, $item_values)) {
 					continue;
 				}
 
-				foreach ($item[$subfilter_key] as $subfilter_value) {
+				foreach ($item_values[$subfilter_key] as $subfilter_value) {
 					$values[$subfilter_value] = 0;
 				}
 			}
