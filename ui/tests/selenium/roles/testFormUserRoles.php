@@ -866,10 +866,10 @@ class testFormUserRoles extends CWebTest {
 						'mediatype.get', 'module.get', 'problem.get', 'proxy.get', 'proxygroup.get', 'role.get',
 						'script.execute', 'script.get', 'script.getscriptsbyevents', 'script.getscriptsbyhosts',
 						'service.create', 'service.delete', 'service.get', 'service.update', 'settings.get', 'sla.get',
-						'sla.getsli', 'template.get', 'templatedashboard.get', 'templategroup.get', 'token.create',
-						'token.delete', 'token.generate', 'token.get', 'token.update', 'trend.get', 'trigger.get',
-						'triggerprototype.get', 'user.get', 'user.logout', 'user.update', 'usergroup.get', 'usermacro.get',
-						'valuemap.get'
+						'sla.getsli', 'task.create', 'template.get', 'templatedashboard.get', 'templategroup.get',
+						'token.create', 'token.delete', 'token.generate', 'token.get', 'token.update', 'trend.get',
+						'trigger.get', 'triggerprototype.get', 'user.get', 'user.logout', 'user.update', 'usergroup.get',
+						'usermacro.get', 'valuemap.get'
 					]
 				]
 			],
@@ -903,17 +903,17 @@ class testFormUserRoles extends CWebTest {
 						'proxygroup.get', 'report.create', 'report.delete', 'report.get', 'report.update', 'role.get',
 						'script.execute', 'script.get', 'script.getscriptsbyevents', 'script.getscriptsbyhosts',
 						'service.create', 'service.delete', 'service.get', 'service.update', 'settings.get', 'sla.create',
-						'sla.delete', 'sla.get', 'sla.getsli', 'sla.update', 'template.create', 'template.delete',
-						'template.get', 'template.massadd', 'template.massremove', 'template.massupdate', 'template.update',
-						'templatedashboard.create', 'templatedashboard.delete', 'templatedashboard.get',
-						'templatedashboard.update', 'templategroup.delete', 'templategroup.get', 'templategroup.massadd',
-						'templategroup.massremove', 'templategroup.massupdate', 'templategroup.update', 'token.create',
-						'token.delete', 'token.generate', 'token.get', 'token.update', 'trend.get', 'trigger.create',
-						'trigger.delete', 'trigger.get', 'trigger.update', 'triggerprototype.create',
-						'triggerprototype.delete', 'triggerprototype.get', 'triggerprototype.update', 'user.get',
-						'user.logout', 'user.update', 'usergroup.get', 'usermacro.create', 'usermacro.delete',
-						'usermacro.get', 'usermacro.update', 'valuemap.create', 'valuemap.delete', 'valuemap.get',
-						'valuemap.update'
+						'sla.delete', 'sla.get', 'sla.getsli', 'sla.update', 'task.create',  'template.create',
+						'template.delete', 'template.get', 'template.massadd', 'template.massremove',
+						'template.massupdate', 'template.update', 'templatedashboard.create', 'templatedashboard.delete',
+						'templatedashboard.get', 'templatedashboard.update', 'templategroup.delete', 'templategroup.get',
+						'templategroup.massadd', 'templategroup.massremove', 'templategroup.massupdate',
+						'templategroup.update', 'token.create', 'token.delete', 'token.generate', 'token.get',
+						'token.update', 'trend.get', 'trigger.create', 'trigger.delete', 'trigger.get', 'trigger.update',
+						'triggerprototype.create', 'triggerprototype.delete', 'triggerprototype.get',
+						'triggerprototype.update', 'user.get', 'user.logout', 'user.update', 'usergroup.get',
+						'usermacro.create', 'usermacro.delete', 'usermacro.get', 'usermacro.update', 'valuemap.create',
+						'valuemap.delete', 'valuemap.get', 'valuemap.update'
 					]
 				]
 			],
