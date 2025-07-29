@@ -1256,18 +1256,12 @@ class CSetupWizard extends CForm {
 
 		$error = false;
 
-		/*
-		 * Create session secret key for first installation. If installation already exists, don't make a new key
-		 * because that will terminate the existing session.
-		 */
-		$db_connected = $this->dbConnect($db_user, $db_password);
-		$is_superadmin = (CWebUser::$data && CWebUser::getType() == USER_TYPE_SUPER_ADMIN);
-
-		$session_key_update_failed = $db_connected && !$is_superadmin
-			? !CEncryptHelper::updateKey(CEncryptHelper::generateKey())
-			: false;
-
-		if (!$db_connected || $session_key_update_failed) {
+		if ($this->dbConnect($db_user, $db_password)) {
+			if (CWebUser::$data === null) {
+				CEncryptHelper::updateKey(CEncryptHelper::generateKey());
+			}
+		}
+		else {
 			$this->step_failed = true;
 			$this->setConfig('step', self::STAGE_DB_CONNECTION);
 

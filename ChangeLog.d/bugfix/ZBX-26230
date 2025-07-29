@@ -1,1 +1,0 @@
-.........T [ZBX-26230] added missing namespace filter to Prometheus preprocessing of pod metrics in Kubernetes cluster state by HTTP template (drasikhov)

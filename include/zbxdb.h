@@ -130,6 +130,8 @@ zbx_err_codes_t;
 
 #ifdef HAVE_POSTGRESQL
 int	zbx_tsdb_get_version(void);
+	/* check that TimescaleDB version is greater than or equal to 2.18 */
+#	define ZBX_DB_TSDB_GE_V2_18	(21800 <= zbx_tsdb_get_version())
 #endif
 
 #if defined (HAVE_MYSQL)
@@ -238,6 +240,8 @@ void	zbx_tsdb_info_extract(struct zbx_db_version_info_t *version_info);
 void	zbx_tsdb_set_compression_availability(int compression_availabile);
 int	zbx_tsdb_get_compression_availability(void);
 void	zbx_tsdb_extract_compressed_chunk_flags(struct zbx_db_version_info_t *version_info);
+#elif defined(HAVE_MYSQL)
+int	zbx_mariadb_fork_get(void);
 #endif
 
 int	zbx_db_version_check(const char *database, zbx_uint32_t current_version, zbx_uint32_t min_version,
