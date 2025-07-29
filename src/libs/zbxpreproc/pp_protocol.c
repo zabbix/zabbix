@@ -245,7 +245,12 @@ static void     preprocessor_serialize_value(zbx_uint64_t itemid, unsigned char 
 		zbx_uint32_t	old_alloc = preproc_alloc;
 
 		while (preproc_alloc - preproc_offset < data_len)
-			preproc_alloc *= 2;
+		{
+			if ((UINT32_MAX >> 1) > preproc_alloc)
+				preproc_alloc <<= 1;
+			else
+				preproc_alloc = UINT32_MAX;
+		}
 
 		if (old_alloc < preproc_alloc)
 			preproc_data = (unsigned char *)zbx_realloc(preproc_data, (size_t)preproc_alloc);
