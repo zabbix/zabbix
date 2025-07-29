@@ -92,6 +92,24 @@ abstract class CDashboardGeneral extends CApiService {
 			}
 		}
 
+		$db_dashboard_pages = DB::select('dashboard_page', [
+			'output' => [],
+			'filter' => ['dashboardid' => $dashboardids],
+			'preservekeys' => true
+		]);
+
+		if ($db_dashboard_pages) {
+			$db_widgets = DB::select('widget', [
+				'output' => [],
+				'filter' => ['dashboard_pageid' => array_keys($db_dashboard_pages)],
+				'preservekeys' => true
+			]);
+
+			if ($db_widgets) {
+				self::deleteWidgets(array_keys($db_widgets));
+			}
+		}
+
 		DB::delete('dashboard', ['dashboardid' => $dashboardids]);
 
 		$resource = ($this instanceof CDashboard) ? CAudit::RESOURCE_DASHBOARD : CAudit::RESOURCE_TEMPLATE_DASHBOARD;

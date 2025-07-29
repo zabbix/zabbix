@@ -1337,6 +1337,10 @@ class CUserDirectory extends CApiService {
 		}
 		unset($userdirectory);
 
+		if ($del_provision_groupids) {
+			DB::delete('userdirectory_idpgroup', ['userdirectory_idpgroupid' => $del_provision_groupids]);
+		}
+
 		if ($upd_provision_groups) {
 			DB::update('userdirectory_idpgroup', $upd_provision_groups);
 		}
