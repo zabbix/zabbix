@@ -68,21 +68,19 @@ class testDashboardWebMonitoringWidget extends testWidgets {
 								'x' => 0,
 								'y' => 0,
 								'width' => 18,
-								'height' => 4
+								'height' => 4,
+								'fields'
+									[
+										'type' => 2,
+										'name' => 'reference',
+										'value' => 'WBMNT'
+									]
 							],
 							[
 								'name' => 'WebMonitoring for delete',
 								'type' => 'web',
 								'x' => 18,
 								'y' => 0,
-								'width' => 18,
-								'height' => 4
-							],
-							[
-								'name' => 'reference',
-								'type' => 'web',
-								'x' => 18,
-								'y' => 4,
 								'width' => 18,
 								'height' => 4
 							]
@@ -456,8 +454,7 @@ class testDashboardWebMonitoringWidget extends testWidgets {
 		$saved_form = $widget->edit();
 		$this->assertEquals($values, $saved_form->getFields()->filter(CElementFilter::VISIBLE)->asValues());
 		$saved_form->checkValue($data['fields']);
-
-			if (array_key_exists('tags', $data)) {
+		if (array_key_exists('tags', $data)) {
 			$this->assertTags($data['tags']);
 			}
 
