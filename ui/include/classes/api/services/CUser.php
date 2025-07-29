@@ -1468,12 +1468,12 @@ class CUser extends CApiService {
 		$userids = [];
 		$groupids = [];
 
-		foreach ($users as $user) {
+		foreach ($users as $userid => $user) {
 			if (!array_key_exists('usrgrps', $user)) {
 				continue;
 			}
 
-			$userids[] = $user['userid'];
+			$userids[] = $userid;
 
 			foreach ($user['usrgrps'] as $group) {
 				$groupids[$group['usrgrpid']] = true;
@@ -1514,7 +1514,7 @@ class CUser extends CApiService {
 		$default_mfaid = CAuthenticationHelper::getPublic(CAuthenticationHelper::MFAID);
 		$del_mfa_totp_secretids = [];
 
-		foreach ($mfa_totp_secretids as $userid => $mfaids) {$x = gettype($mfaids);
+		foreach ($mfa_totp_secretids as $userid => $mfaids) {
 			foreach ($users[$userid]['usrgrps'] as $group) {
 				$db_usergroup = $db_usergroups[$group['usrgrpid']];
 				$group_mfaid = $db_usergroup['mfa_status'] == GROUP_MFA_ENABLED && $db_usergroup['mfaid'] == 0
