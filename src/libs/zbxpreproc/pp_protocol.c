@@ -222,14 +222,14 @@ static void     preprocessor_serialize_value(zbx_uint64_t itemid, unsigned char 
 		zbx_serialize_prepare_value(data_len, result->mtime);
 	}
 
-	if ((zbx_uint64_t)UINT32_MAX < (zbx_uint64_t)preproc_offset + data_len)
+	if ((zbx_uint64_t)UINT32_MAX < (zbx_uint64_t)preproc_offset + data_len + ZBX_IPC_HEADER_SIZE)
 	{
 		preprocessor_send(ZBX_IPC_PREPROCESSOR_REQUEST, preproc_data, preproc_offset, NULL);
 		preproc_offset = 0;
 		preproc_values = 0;
 	}
 
-	if ((zbx_uint64_t)UINT32_MAX < (zbx_uint64_t)preproc_offset + data_len)
+	if ((zbx_uint64_t)UINT32_MAX < (zbx_uint64_t)preproc_offset + data_len + ZBX_IPC_HEADER_SIZE)
 	{
 		THIS_SHOULD_NEVER_HAPPEN_MSG("Too large data for preprocessing");
 		return;
