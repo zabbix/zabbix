@@ -69,7 +69,7 @@ class testDashboardWebMonitoringWidget extends testWidgets {
 								'y' => 0,
 								'width' => 18,
 								'height' => 4,
-								'fields'
+								'fields' =>
 									[
 										'type' => 2,
 										'name' => 'reference',
