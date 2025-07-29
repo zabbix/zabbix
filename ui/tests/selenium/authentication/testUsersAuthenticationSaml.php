@@ -863,9 +863,8 @@ uwMrOBKatg7CZ1Uenv1K3ioD5w==
 								'username_attribute' => 'UA',
 								'sp_entityid' => 'SP',
 								'idp_certificate'=> str_replace("\n", "\r\n", self::SSL_CERTIFICATE),
-								'sp_private_key' => str_replace("\n", "\r\n", self::SSL_PRIVATE_KEY),
-								'sp_certificate' => str_replace("\n", "\r\n", self::SSL_CERTIFICATE)
-
+								'sp_private_key' => '',
+								'sp_certificate' => ''
 							]
 						]
 					]
@@ -925,7 +924,9 @@ uwMrOBKatg7CZ1Uenv1K3ioD5w==
 
 			if (array_key_exists('storage', $data)) {
 				$certificates_fields = ['IdP certificate', 'SP private key', 'SP certificate'];
+
 				foreach ($certificates_fields as $field) {
+
 					if (array_key_exists($field, $data['fields'])) {
 						$this->assertTrue($form->query('button', 'Change '.$field)->one()->isClickable(),
 								'Button Change '.$field.' should be clickable.'
@@ -936,6 +937,31 @@ uwMrOBKatg7CZ1Uenv1K3ioD5w==
 								'Button Change '.$field.' should not exists.'
 						);
 					}
+
+				}
+
+				$sp_buttons = $form->query('button', ['Change SP private key', 'Change SP certificate'])
+						->all()->asText();
+
+				foreach ($sp_buttons as $sp_button) {
+					$sp_id = strtolower(str_replace(['Change ',' '], ['','_'],	$sp_button));
+					$sp_label = str_replace('Change ', '', $sp_button);
+					$form->query('button:'.$sp_button)->one()->click();
+					$form->submit();
+					$this->assertEquals('Current '.$sp_label.' will be deleted.', $this->page->getAlertText());
+					$this->page->dismissAlert();
+					$this->assertEquals('', $form->getField('id:'.$sp_id)->getText());
+					$this->assertEquals(str_replace("\n", "\r\n", $data['fields'][$sp_label]),
+							CDBHelper::getValue('SELECT '.$sp_id.' FROM userdirectory_saml'));
+					$this->page->refresh()->waitUntilReady();
+					$form->selectTab('SAML settings');
+					$form->query('button:'.$sp_button)->one()->click();
+					$form->submit();
+					$this->assertEquals('Current '.$sp_label.' will be deleted.', $this->page->getAlertText());
+					$this->page->acceptAlert();$this->page->refresh()->waitUntilReady();
+					$this->assertMessage(TEST_GOOD, 'Authentication settings updated');
+					$form->selectTab('SAML settings');
+					$this->assertEquals('', $form->getField(strtolower('id:'.$sp_id))->getText());
 				}
 
 			}
