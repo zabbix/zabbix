@@ -53,6 +53,27 @@ class CSlaSchedulePeriodParserTest extends TestCase {
 				]
 			],
 			[
+				'8:00-17:00,7:00-18:00', 0,
+				[
+					'rc' => CParser::PARSE_SUCCESS,
+					'match' => '8:00-17:00,7:00-18:00'
+				]
+			],
+			[
+				'8:00-17:00,   7:00-18:00', 0,
+				[
+					'rc' => CParser::PARSE_SUCCESS,
+					'match' => '8:00-17:00,   7:00-18:00'
+				]
+			],
+			[
+				'  8:00-17:00  ,   7:00-18:00  ', 0,
+				[
+					'rc' => CParser::PARSE_SUCCESS,
+					'match' => '8:00-17:00  ,   7:00-18:00'
+				]
+			],
+			[
 				'8:00-17:00, 7:00-18:00, 6:15-18:15, 5:30-9:47', 0,
 				[
 					'rc' => CParser::PARSE_SUCCESS,
