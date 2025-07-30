@@ -958,8 +958,9 @@ uwMrOBKatg7CZ1Uenv1K3ioD5w==
 					$form->query('button:'.$sp_button)->one()->click();
 					$form->submit();
 					$this->assertEquals('Current '.$sp_label.' will be deleted.', $this->page->getAlertText());
-					$this->page->acceptAlert();$this->page->refresh()->waitUntilReady();
+					$this->page->acceptAlert();
 					$this->assertMessage(TEST_GOOD, 'Authentication settings updated');
+					$this->page->refresh()->waitUntilReady();
 					$form->selectTab('SAML settings');
 					$this->assertEquals('', $form->getField(strtolower('id:'.$sp_id))->getText());
 				}
