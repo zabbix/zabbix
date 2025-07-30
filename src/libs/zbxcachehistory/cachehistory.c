@@ -113,6 +113,7 @@ typedef struct
 	zbx_hc_proxyqueue_t	proxyqueue;
 	int			processing_num;
 	double			last_error_ts;
+	double			last_warning_ts;
 	int			refcount;
 }
 ZBX_DC_CACHE;
@@ -163,6 +164,13 @@ typedef struct
 	unsigned char	flags;		/* see ZBX_DC_FLAG_* above */
 }
 dc_item_value_t;
+
+typedef enum
+{
+	ZBX_HC_CACHE_FULL,
+	ZBX_HC_CACHE_PRESSURED
+}
+zbx_hc_usage_message_context_t;
 
 static char		*string_values = NULL;
 static size_t		string_values_alloc = 0, string_values_offset = 0;
@@ -3001,22 +3009,36 @@ static int	diag_compare_pair_second_desc(const void *d1, const void *d2)
  * Purpose: log history cache full message and top values                     *
  *                                                                            *
  ******************************************************************************/
-static void	hc_print_history_cache_full(zbx_vector_uint64_pair_t *items)
+static void	hc_log_history_cache_usage(zbx_vector_uint64_pair_t *items, zbx_hc_usage_message_context_t ctx)
 {
-	int	limit;
-	char	*str = NULL;
-	size_t	str_alloc = 0, str_offset = 0;
-	double	time_now = zbx_time();
+	int		limit;
+	char		*str = NULL;
+	const char	*log_msg;
+	size_t		str_alloc = 0, str_offset = 0;
+	double		*ts, time_now = zbx_time();
 
-	if (SEC_PER_MIN > time_now - cache->last_error_ts)
+	if (ZBX_HC_CACHE_FULL == ctx)
 	{
-		zabbix_log(LOG_LEVEL_DEBUG, "History cache is full. Sleeping for 1 second.");
+		log_msg = "History cache is full. Sleeping for 1 second.";
+		ts = &cache->last_error_ts;
+	}
+	else if (ZBX_HC_CACHE_PRESSURED == ctx)
+	{
+		log_msg = "Detected heavy usage of history cache (more than 60%%).";
+		ts = &cache->last_warning_ts;
+	}
+	else
+		return;
+
+	if (SEC_PER_MIN > time_now - *ts)
+	{
+		zabbix_log(LOG_LEVEL_DEBUG, log_msg);
 		return;
 	}
 
-	zabbix_log(LOG_LEVEL_WARNING, "History cache is full. Sleeping for 1 second.");
+	zabbix_log(LOG_LEVEL_WARNING, log_msg);
 
-	cache->last_error_ts = time_now;
+	*ts = time_now;
 
 	zbx_vector_uint64_pair_sort(items, diag_compare_pair_second_desc);
 
@@ -3034,6 +3056,23 @@ static void	hc_print_history_cache_full(zbx_vector_uint64_pair_t *items)
 
 	zbx_free(str);
 }
+
+void	zbx_hc_log_high_cache_usage(void)
+{
+	zbx_vector_uint64_pair_t	items;
+
+	zbx_vector_uint64_pair_create(&items);
+	hc_get_items(&items);
+
+	UNLOCK_CACHE;
+
+	hc_log_history_cache_usage(&items, ZBX_HC_CACHE_PRESSURED);
+
+	LOCK_CACHE;
+
+	zbx_vector_uint64_pair_destroy(&items);
+}
+
 
 /******************************************************************************
  *                                                                            *
@@ -3090,7 +3129,7 @@ static void	hc_add_item_values(dc_item_value_t *values, int values_num)
 
 				UNLOCK_CACHE;
 
-				hc_print_history_cache_full(&items);
+				hc_log_history_cache_usage(&items, ZBX_HC_CACHE_FULL);
 
 				zbx_vector_uint64_pair_destroy(&items);
 				sleep(1);
@@ -3457,6 +3496,7 @@ int	zbx_init_database_cache(zbx_get_program_type_f get_program_type,
 	cache->history_num_total = 0;
 	cache->history_progress_ts = 0;
 	cache->last_error_ts = 0;
+	cache->last_warning_ts = 0;
 	cache->trends_progress_ts = 0;
 
 	cache->db_trigger_queue_lock = 1;

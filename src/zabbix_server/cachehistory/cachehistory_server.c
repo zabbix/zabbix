@@ -1786,7 +1786,10 @@ int	zbx_hc_check_proxy(zbx_uint64_t proxyid, int pending_history)
 	if (0 == zbx_hc_proxyqueue_peek())
 	{
 		if (60 < hc_pused && 0 != pending_history)
+		{
+			zbx_hc_log_high_cache_usage();
 			ret = FAIL;
+		}
 		else
 			ret = SUCCEED;
 

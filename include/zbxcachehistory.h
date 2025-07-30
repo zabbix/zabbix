@@ -201,4 +201,6 @@ int	zbx_dbcache_getproxyqueue_state(void);
 void	zbx_hc_acquire(void);
 int	zbx_hc_release(void);
 int	zbx_hc_refcount_peek(void);
+
+void	zbx_hc_log_high_cache_usage(void);
 #endif
