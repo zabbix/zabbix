@@ -27,21 +27,6 @@ class CAbsoluteTimeParser extends CParser {
 	private string $error;
 
 	/**
-	 * Supported options:
-	 *   'min' => int  Min allowed UNIX timestamp;
-	 *   'max' => int  Max allowed UNIX timestamp;
-	 */
-	private array $options;
-
-
-	/**
-	 * @param array $options
-	 */
-	public function __construct(array $options = []) {
-		$this->options = $options;
-	}
-
-	/**
 	 * Parse the given period.
 	 *
 	 * @param string $source  Source string that needs to be parsed.
@@ -104,15 +89,6 @@ class CAbsoluteTimeParser extends CParser {
 		$datetime = date_create($date);
 
 		if ($datetime === false) {
-			return false;
-		}
-
-		$unix_time = strtotime($date);
-
-		if ((array_key_exists('max', $this->options) && $unix_time >= $this->options['max'])
-				|| (array_key_exists('min', $this->options) && $unix_time <= $this->options['min'])) {
-			$this->error = _('date is outside the allowed range');
-
 			return false;
 		}
 
