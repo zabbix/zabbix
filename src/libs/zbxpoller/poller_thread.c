@@ -949,7 +949,8 @@ static int	get_values(unsigned char poller_type, int *nextcheck, const zbx_confi
 			{
 				items[i].state = ITEM_STATE_NORMAL;
 				zbx_preprocess_item_value(items[i].itemid, items[i].host.hostid, items[i].value_type,
-						items[i].flags, &results[i], &timespec, items[i].state, NULL);
+						items[i].flags, items[i].preprocessing, &results[i], &timespec,
+						items[i].state, NULL);
 			}
 			else
 			{
@@ -965,15 +966,17 @@ static int	get_values(unsigned char poller_type, int *nextcheck, const zbx_confi
 					{
 						items[i].state = ITEM_STATE_NOTSUPPORTED;
 						zbx_preprocess_item_value(items[i].itemid, items[i].host.hostid,
-						items[i].value_type, items[i].flags, NULL, &ts_tmp, items[i].state,
+								items[i].value_type, items[i].flags,
+								items[i].preprocessing, NULL, &ts_tmp, items[i].state,
 								add_result->msg);
 					}
 					else
 					{
 						items[i].state = ITEM_STATE_NORMAL;
 						zbx_preprocess_item_value(items[i].itemid, items[i].host.hostid,
-								items[i].value_type, items[i].flags, add_result,
-								&ts_tmp, items[i].state, NULL);
+								items[i].value_type, items[i].flags,
+								items[i].preprocessing, add_result, &ts_tmp,
+								items[i].state, NULL);
 					}
 
 					/* ensure that every log item value timestamp is unique */
@@ -989,7 +992,8 @@ static int	get_values(unsigned char poller_type, int *nextcheck, const zbx_confi
 		{
 			items[i].state = ITEM_STATE_NOTSUPPORTED;
 			zbx_preprocess_item_value(items[i].itemid, items[i].host.hostid, items[i].value_type,
-					items[i].flags, NULL, &timespec, items[i].state, results[i].msg);
+					items[i].flags, items[i].preprocessing, NULL, &timespec,
+					items[i].state, results[i].msg);
 		}
 
 		zbx_dc_poller_requeue_items(&items[i].itemid, &timespec.sec, &errcodes[i], 1, poller_type,
@@ -1144,6 +1148,10 @@ ZBX_THREAD_ENTRY(zbx_poller_thread, args)
 #undef SNMP_ENGINEID_HK_INTERVAL
 #endif
 	}
+
+	zbx_ipc_async_socket_close(&rtc);
+	if (ZBX_POLLER_TYPE_HISTORY == poller_type)
+		zbx_db_close();
 
 	scriptitem_es_engine_destroy();
 

@@ -36,6 +36,10 @@ class testPermissionsWithoutCSRF extends CWebTest {
 		'details' => 'You are logged in as "Admin". You have no permissions to access this page.'
 	];
 
+	const ACCESS_DENIED_WITHOUT_HTML = '{"error":{"title":"Access denied","messages":["You are logged in as \"Admin\".'.
+			' You have no permissions to access this page.","If you think this message is wrong, please consult your'.
+			' administrators about getting the necessary permissions."]}}';
+
 	/**
 	 * Attach MessageBehavior to the test.
 	 *
@@ -337,8 +341,7 @@ class testPermissionsWithoutCSRF extends CWebTest {
 			[
 				[
 					'db' => 'SELECT * FROM autoreg_host',
-					'link' => 'zabbix.php?action=autoreg.edit',
-					'return_button' => true
+					'link' => 'zabbix.php?action=autoreg.edit'
 				]
 			],
 			// #30 Housekeeping update.
@@ -641,8 +644,7 @@ class testPermissionsWithoutCSRF extends CWebTest {
 			[
 				[
 					'db' => 'SELECT * FROM settings',
-					'link' => 'zabbix.php?action=geomaps.edit',
-					'return_button' => true
+					'link' => 'zabbix.php?action=geomaps.edit'
 				]
 			],
 			// #68 Module update.
@@ -824,8 +826,7 @@ class testPermissionsWithoutCSRF extends CWebTest {
 					'db' => 'SELECT * FROM settings',
 					'link' => 'zabbix.php?_csrf_token=12345abcd&tls_accept=1&tls_in_none=1&tls_psk_identity=&tls_psk='.
 							'&action=autoreg.update',
-					'error' => self::ACCESS_DENIED,
-					'return_button' => true
+					'error' => self::ACCESS_DENIED_WITHOUT_HTML
 				]
 			]
 		];
@@ -834,6 +835,10 @@ class testPermissionsWithoutCSRF extends CWebTest {
 	/**
 	 * Test function for checking the "GET" form (direct url), with the different types of CSRF tokens.
 	 *
+	 *  TODO: The ignoreBrowserErrors is added to ignore error in  #4 test case when opening page without html
+	 *  favicon.ico - Failed to load resource: the server responded with a status of 404 (Not Found)
+	 *
+	 * @ignoreBrowserErrors
 	 * @dataProvider getCheckTokenData
 	 */
 	public function testPermissionsWithoutCSRF_CheckToken($data) {
@@ -851,8 +856,13 @@ class testPermissionsWithoutCSRF extends CWebTest {
 		}
 
 		// Check the error message depending on case.
-		$this->assertMessage(TEST_BAD, $data['error']['message'], $data['error']['details']);
-		$this->checkReturnButton($data);
+		if ($data['error'] === self::ACCESS_DENIED_WITHOUT_HTML) {
+			$this->assertTrue(strstr($this->page->getSource(), $data['error']) !== false, '"'.$data['error'].'" must exist.');
+		}
+		else {
+			$this->assertMessage(TEST_BAD, $data['error']['message'], $data['error']['details']);
+			$this->checkReturnButton($data);
+		}
 
 		// Compare db hashes to check that form didn't make any changes.
 		$this->assertEquals($old_hash, CDBHelper::getHash($data['db']));
