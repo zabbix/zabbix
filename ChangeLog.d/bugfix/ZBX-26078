@@ -1,0 +1,1 @@
+A......... [ZBX-26078] fixed filtering by inherited tags with negative operators such as "Does not ..." in the Monitoring -> Hosts section (gcalenko, Sasha)
