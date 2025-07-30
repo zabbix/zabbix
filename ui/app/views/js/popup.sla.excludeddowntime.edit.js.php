@@ -27,8 +27,6 @@ window.sla_excluded_downtime_edit_popup = new class {
 	submit() {
 		const fields = this.form.getAllValues();
 
-		fields.name = fields.name.trim();
-
 		this.overlay.setLoading();
 
 		this.form.validateSubmit(fields)
