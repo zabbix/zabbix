@@ -908,7 +908,7 @@ uwMrOBKatg7CZ1Uenv1K3ioD5w==
 
 		// Check SAML settings update messages and, in case of successful update, check that field values were saved.
 		if (CTestArrayHelper::get($data, 'expected', TEST_GOOD) === TEST_BAD) {
-			$this->assertMessage(TEST_BAD, 'Cannot update authentication',  $data['error']);
+			$this->assertMessage(TEST_BAD, 'Cannot update authentication', $data['error']);
 			$this->assertEquals($old_hash, CDBHelper::getHash('SELECT * FROM settings'));
 		}
 		else {
@@ -944,7 +944,7 @@ uwMrOBKatg7CZ1Uenv1K3ioD5w==
 						->all()->asText();
 
 				foreach ($sp_buttons as $sp_button) {
-					$sp_id = strtolower(str_replace(['Change ',' '], ['','_'],	$sp_button));
+					$sp_id = strtolower(str_replace(['Change ', ' '], ['', '_'], $sp_button));
 					$sp_label = str_replace('Change ', '', $sp_button);
 					$form->query('button:'.$sp_button)->one()->click();
 					$form->submit();
