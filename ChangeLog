@@ -1,6 +1,9 @@
 Changes for 8.0.0alpha1
 
 New features:
+A......PS. [ZBXNEXT-10056] updated max supported MariaDB version to 11.8 (Sasha)
+..F....... [ZBXNEXT-9834] added possibility to store SAML certificates in database (isharha)
+.......PS. [ZBXNEXT-10078] updated minimal supported MariaDB version to 10.11 and Zabbix server/proxy would not start with MariaDB below 10.05 (mprihodko)
 ........S. [ZBXNEXT-10122] updated maximal supported TimescaleDB version to 2.21 (mprihodko)
 ..F....... [ZBXNEXT-8793] implemented inline validation in auto-registration form (Ivo)
 .......PS. [ZBXNEXT-10119] improved preprocessing diagnostics by highlighting top item IDs with the longest processing times (vso)
@@ -14,6 +17,7 @@ New features:
 .......PS. [ZBXNEXT-10079] updated minimal supported MySQL/Percona version to 8.4 (mprihodko)
 
 Bug fixes:
+.....J.... [ZBX-26220] fixed scheduled report creation with IPv6 address in Zabbix frontend URL (vsmelovs)
 ...G...... [ZBX-26697] fixed memory error in sender when trying to read invalid response (dgoloscapov)
 ..F....... [ZBX-26717] fixed undefined index on agent installation step in Host Wizard (vmurzins)
 .......PS. [ZBX-26693] fixed item values without preprocessing to skip preprocessing manager (vso)
@@ -384,8 +388,11 @@ A.F....PS. [ZBXNEXT-9564] implemented vault macro resolution on proxies (esekace
 Changes for 7.2.12rc1
 
 New features:
+A......PS. [ZBXNEXT-10056] updated max supported MariaDB version to 11.8 (Sasha)
+........S. [ZBXNEXT-10122] updated maximal supported TimescaleDB version to 2.21 (mprihodko)
 
 Bug fixes:
+........S. [ZBX-26661] fixed deadlock on autoreg_host table (vso)
 
 --------------------------------------------------------------------------------
 Changes for 7.2.11
@@ -949,8 +956,15 @@ A.F....... [ZBX-23227] fixed issue where using an empty array or string value fo
 Changes for 7.0.18rc1
 
 New features:
+.......PS. [ZBXNEXT-9090] improved SNMP agent walk[] and get[] to reload credentials when corresponding SNMPv3 interface is updated (vso)
+A......PS. [ZBXNEXT-10056] updated max supported MariaDB version to 11.8 (Sasha)
+........S. [ZBXNEXT-10122] updated maximal supported TimescaleDB version to 2.21 (mprihodko)
 
 Bug fixes:
+.......PS. [ZBX-26524] fixed threads to terminate gracefully when child process exits unexpectedly to avoid deadlocks (vso)
+..F....... [ZBX-26159] fixed log[] item with 'numeric' type of information unexpected changing to 'log' type (aluchko)
+..F....... [ZBX-26374] added updates for displaying the relevant monitoring data or "no permissions" notification for the Classic Graph widget (msnihach)
+.....J.... [ZBX-26220] fixed scheduled report creation with IPv6 address in Zabbix frontend URL (vsmelovs)
 
 --------------------------------------------------------------------------------
 Changes for 7.0.17
@@ -4605,6 +4619,7 @@ A.F....PS. [ZBXNEXT-7402,ZBXNEXT-7413] added support for CyberArk Vault (acikuns
 Changes for 6.0.41rc1
 
 New features:
+A......PS. [ZBXNEXT-10056] updated max supported MariaDB version to 11.8 (Sasha)
 ........S. [ZBXNEXT-10122] updated maximal supported TimescaleDB version to 2.21 (mprihodko)
 ........S. [ZBXNEXT-10018] updated maximal supported TimescaleDB version to 2.20 (mprihodko)
 ........S. [ZBXNEXT-9905] updated max supported TimescaleDB version to 2.19 (mprihodko)
