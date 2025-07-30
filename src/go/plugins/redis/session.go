@@ -53,7 +53,7 @@ func (s *session) validateSession(defaults *session) error {
 
 	err = s.runValidationRules(tlsConnect, defaults)
 	if err != nil {
-		return errs.Wrap(err, "base fields validation failed")
+		return errs.Wrap(err, "configuration field validation failed")
 	}
 
 	err = s.runSourceConsistencyValidation()
@@ -136,7 +136,7 @@ func (s *session) runSourceConsistencyValidation() error {
 			}
 		}
 
-		// Both counters > 0 = inconsistency
+		// Both counters > 0 = inconsistency.
 		if setCount > 0 && emptyCount > 0 {
 			return errs.New(fmt.Sprintf(
 				"all fields %s are required to be filled in the same source but not mixed. "+
@@ -150,7 +150,7 @@ func (s *session) runSourceConsistencyValidation() error {
 
 func validateRequiredField(name comms.ConfigSetting, value, defaultValue string) error {
 	if value == "" && defaultValue == "" {
-		return errs.New(fmt.Sprintf("%s is required", name))
+		return errs.New(fmt.Sprintf("%s is required but missing", name))
 	}
 
 	return nil
@@ -158,7 +158,7 @@ func validateRequiredField(name comms.ConfigSetting, value, defaultValue string)
 
 func validateForbiddenField(name comms.ConfigSetting, value string) error {
 	if value != "" {
-		return errs.New(fmt.Sprintf("%s is forbidden", name))
+		return errs.New(fmt.Sprintf("%s is forbidden but was provided", name))
 	}
 
 	return nil
