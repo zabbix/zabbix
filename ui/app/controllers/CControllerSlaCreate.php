@@ -112,15 +112,12 @@ class CControllerSlaCreate extends CController {
 		if (!$ret) {
 			$form_errors = $this->getValidationError();
 
-			$response = array_filter([
-				'form_errors' => $form_errors ?? null,
-				'error' => !$form_errors
-					? [
-						'title' => _('Cannot create SLA'),
-						'messages' => array_column(get_and_clear_messages(), 'message')
-					]
-					: null
-			]);
+			$response = $form_errors
+				? ['form_errors' => $form_errors]
+				: ['error' => [
+					'title' => _('Cannot create SLA'),
+					'messages' => array_column(get_and_clear_messages(), 'message')
+				]];
 
 			$this->setResponse(
 				new CControllerResponseData(['main_block' => json_encode($response, JSON_THROW_ON_ERROR)])
@@ -147,6 +144,7 @@ class CControllerSlaCreate extends CController {
 		$schedule = $this->getInput('schedule_mode') == CSlaHelper::SCHEDULE_MODE_CUSTOM
 			? CSlaHelper::prepareSchedulePeriods($this->getInput('schedule'))
 			: [];
+
 		$sla = [
 			'effective_date' => $effective_date,
 			'status' => $this->hasInput('status') ? ZBX_SLA_STATUS_ENABLED : ZBX_SLA_STATUS_DISABLED,
