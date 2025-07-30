@@ -28,7 +28,7 @@ import (
 	"golang.zabbix.com/sdk/errs"
 	"golang.zabbix.com/sdk/log"
 	"golang.zabbix.com/sdk/tlsconfig"
-	sdkuri "golang.zabbix.com/sdk/uri"
+	"golang.zabbix.com/sdk/uri"
 	"golang.zabbix.com/sdk/zbxerr"
 )
 
@@ -75,7 +75,7 @@ type connectionManagerOptions struct {
 }
 
 type connKey struct {
-	uri        *sdkuri.URI
+	uri        *uri.URI
 	rawUri     string
 	tlsConnect string
 	tlsCA      string
@@ -137,7 +137,7 @@ func NewConnManager(options *connectionManagerOptions) *ConnManager {
 }
 
 // GetConnection returns an existing connection or creates a new one.
-func (c *ConnManager) GetConnection(uri *sdkuri.URI, params map[string]string) (*MyConn, error) {
+func (c *ConnManager) GetConnection(uri *uri.URI, params map[string]string) (*MyConn, error) {
 	ck := createConnKey(uri, params)
 
 	conn := c.getConn(ck)
@@ -283,7 +283,7 @@ func (c *ConnManager) setConn(ck connKey, conn *MyConn) *MyConn {
 }
 
 func getMySQLConfig(
-	uri *sdkuri.URI,
+	uri *uri.URI,
 	tlsConfig *tls.Config,
 	connectTimeout,
 	callTimeout time.Duration,
@@ -350,7 +350,7 @@ func (c *ConnManager) getTLSConfig(details *tlsconfig.Details) (*tls.Config, err
 	return tlsConf, nil
 }
 
-func createConnKey(uri *sdkuri.URI, params map[string]string) connKey {
+func createConnKey(uri *uri.URI, params map[string]string) connKey {
 	tlsType := params[tlsConnectParam]
 	if tlsType == "" {
 		tlsType = disable

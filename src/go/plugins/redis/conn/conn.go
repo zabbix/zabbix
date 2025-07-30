@@ -21,10 +21,9 @@ import (
 	"time"
 
 	"github.com/mediocregopher/radix/v3"
-	"golang.zabbix.com/agent2/plugins/redis/info"
 	"golang.zabbix.com/sdk/errs"
 	"golang.zabbix.com/sdk/log"
-	sdkuri "golang.zabbix.com/sdk/uri"
+	"golang.zabbix.com/sdk/uri"
 	"golang.zabbix.com/sdk/zbxerr"
 )
 
@@ -45,11 +44,12 @@ type RedisConn struct {
 	lastTimeAccess time.Time
 }
 
-// ConnManager is thread-safe structure for manage connections.
-type ConnManager struct {
+// Manager is thread-safe structure for manage connections.
+type Manager struct {
+	log          log.Logger
 	managerMutex sync.Mutex
 	connMutex    sync.Mutex
-	connections  map[*sdkuri.URI]*RedisConn
+	connections  map[*uri.URI]*RedisConn
 	keepAlive    time.Duration
 	timeout      time.Duration
 	Destroy      context.CancelFunc
@@ -63,12 +63,13 @@ func NewRedisConn(client radix.Client) *RedisConn {
 	}
 }
 
-// NewConnManager initializes ConnManager structure and runs Go Routine that watches for unused connections.
-func NewConnManager(keepAlive, timeout, hkInterval time.Duration) *ConnManager {
+// NewManager initializes Manager structure and runs Go Routine that watches for unused connections.
+func NewManager(logger log.Logger, keepAlive, timeout, hkInterval time.Duration) *Manager {
 	ctx, cancel := context.WithCancel(context.Background())
 
-	connMgr := &ConnManager{
-		connections: make(map[*sdkuri.URI]*RedisConn),
+	connMgr := &Manager{
+		log:         logger,
+		connections: make(map[*uri.URI]*RedisConn),
 		keepAlive:   keepAlive,
 		timeout:     timeout,
 		Destroy:     cancel, // Destroy stops originated goroutines and close connections.
@@ -87,16 +88,16 @@ func (r *RedisConn) Query(cmd radix.CmdAction) error {
 }
 
 // GetConnection returns an existing connection or creates a new one.
-func (c *ConnManager) GetConnection(uri *sdkuri.URI, params map[string]string) (*RedisConn, error) {
-	c.managerMutex.Lock()
-	defer c.managerMutex.Unlock()
+func (m *Manager) GetConnection(uri *uri.URI, params map[string]string) (*RedisConn, error) {
+	m.managerMutex.Lock()
+	defer m.managerMutex.Unlock()
 
-	conn := c.get(uri)
+	conn := m.get(uri)
 
 	if conn == nil {
 		var err error
 
-		conn, err = c.create(uri, params)
+		conn, err = m.create(uri, params)
 		if err != nil {
 			return nil, errs.WrapConst(err, zbxerr.ErrorConnectionFailed)
 		}
@@ -111,62 +112,62 @@ func (r *RedisConn) updateAccessTime() {
 }
 
 // closeUnused closes each connection that has not been accessed at least within the keepalive interval.
-func (c *ConnManager) closeUnused() {
-	c.connMutex.Lock()
-	defer c.connMutex.Unlock()
+func (m *Manager) closeUnused() {
+	m.connMutex.Lock()
+	defer m.connMutex.Unlock()
 
-	for uri, conn := range c.connections {
-		if time.Since(conn.lastTimeAccess) > c.keepAlive {
+	for uri, conn := range m.connections {
+		if time.Since(conn.lastTimeAccess) > m.keepAlive {
 			err := conn.client.Close()
 			if err == nil {
-				delete(c.connections, uri)
-				log.Debugf("[%s] Closed unused connection: %s", info.PluginName, uri.Addr())
+				delete(m.connections, uri)
+				m.log.Debugf("Closed unused connection: %s", uri.Addr())
 			} else {
-				log.Errf("[%s] Error occurred while closing connection: %s", info.PluginName, uri.Addr())
+				m.log.Errf("Error occurred while closing connection: %s", uri.Addr())
 			}
 		}
 	}
 }
 
 // closeAll closes all existed connections.
-func (c *ConnManager) closeAll() {
-	c.connMutex.Lock()
-	for u, conn := range c.connections {
+func (m *Manager) closeAll() {
+	m.connMutex.Lock()
+	for u, conn := range m.connections {
 		err := conn.client.Close()
 		if err == nil {
-			delete(c.connections, u)
+			delete(m.connections, u)
 		} else {
-			log.Errf("[%s] Error occurred while closing connection: %s", info.PluginName, u.Addr())
+			m.log.Errf("Error occurred while closing connection: %s", u.Addr())
 		}
 	}
-	c.connMutex.Unlock()
+	m.connMutex.Unlock()
 }
 
 // housekeeper repeatedly checks for unused connections and close them.
-func (c *ConnManager) housekeeper(ctx context.Context, interval time.Duration) {
+func (m *Manager) housekeeper(ctx context.Context, interval time.Duration) {
 	ticker := time.NewTicker(interval)
 
 	for {
 		select {
 		case <-ctx.Done():
 			ticker.Stop()
-			c.closeAll()
+			m.closeAll()
 
 			return
 		case <-ticker.C:
-			c.closeUnused()
+			m.closeUnused()
 		}
 	}
 }
 
 // create creates a new connection with given credentials.
-func (c *ConnManager) create(uri *sdkuri.URI, params map[string]string) (*RedisConn, error) {
+func (m *Manager) create(uri *uri.URI, params map[string]string) (*RedisConn, error) {
 	const clientName = "zbx_monitor"
 
 	const poolSize = 1
 
-	c.connMutex.Lock()
-	defer c.connMutex.Unlock()
+	m.connMutex.Lock()
+	defer m.connMutex.Unlock()
 
 	tlsConfig, err := getTLSConfig(uri, params)
 	if err != nil {
@@ -176,7 +177,7 @@ func (c *ConnManager) create(uri *sdkuri.URI, params map[string]string) (*RedisC
 		}
 	}
 
-	_, ok := c.connections[uri]
+	_, ok := m.connections[uri]
 	if ok {
 		// Should never happen.
 		panic("connection already exists")
@@ -185,7 +186,7 @@ func (c *ConnManager) create(uri *sdkuri.URI, params map[string]string) (*RedisC
 	// authConnFunc is used as radix.ConnFunc to perform AUTH and set timeout.
 	authConnFunc := func(scheme, addr string) (radix.Conn, error) {
 		dialOpts := []radix.DialOpt{
-			radix.DialTimeout(c.timeout),
+			radix.DialTimeout(m.timeout),
 			radix.DialAuthUser(uri.User(), uri.Password()),
 		}
 
@@ -219,22 +220,19 @@ func (c *ConnManager) create(uri *sdkuri.URI, params map[string]string) (*RedisC
 		return nil, errs.Wrap(err, "failed to create pool")
 	}
 
-	c.connections[uri] = &RedisConn{
-		client:         client,
-		lastTimeAccess: time.Now(),
-	}
+	m.connections[uri] = NewRedisConn(client)
 
-	log.Debugf("[%s] Created new connection: %s", info.PluginName, uri.Addr())
+	m.log.Debugf("Created new connection: %s", uri.Addr())
 
-	return c.connections[uri], nil
+	return m.connections[uri], nil
 }
 
 // get returns a connection with given cid if it exists and also updates lastTimeAccess, otherwise returns nil.
-func (c *ConnManager) get(uri *sdkuri.URI) *RedisConn {
-	c.connMutex.Lock()
-	defer c.connMutex.Unlock()
+func (m *Manager) get(uri *uri.URI) *RedisConn {
+	m.connMutex.Lock()
+	defer m.connMutex.Unlock()
 
-	conn, ok := c.connections[uri]
+	conn, ok := m.connections[uri]
 	if ok {
 		conn.updateAccessTime()
 

@@ -17,7 +17,6 @@ package redis
 import (
 	"golang.zabbix.com/agent2/plugins/redis/conn"
 	"golang.zabbix.com/agent2/plugins/redis/handlers"
-	"golang.zabbix.com/agent2/plugins/redis/info"
 	"golang.zabbix.com/sdk/errs"
 	"golang.zabbix.com/sdk/metric"
 	"golang.zabbix.com/sdk/plugin"
@@ -30,6 +29,8 @@ const (
 	keyInfo    = "redis.info"
 	keyPing    = "redis.ping"
 	keySlowlog = "redis.slowlog.count"
+
+	pluginName = "redis"
 )
 
 var (
@@ -108,7 +109,7 @@ type handlerFunc func(redisClient conn.RedisClient, params map[string]string) (r
 
 //nolint:gochecknoinits //legacy implementation
 func init() {
-	err := plugin.RegisterMetrics(&impl, info.PluginName, metrics.List()...)
+	err := plugin.RegisterMetrics(&impl, pluginName, metrics.List()...)
 	if err != nil {
 		panic(errs.Wrap(err, "failed to register metrics"))
 	}
