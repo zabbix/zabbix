@@ -10,7 +10,7 @@ The template collects metrics by polling the HAProxy stats page with HTTP agent.
 
 ## Requirements
 
-Zabbix version: 7.4 and higher.
+Zabbix version: 8.0 and higher.
 
 ## Tested versions
 
@@ -19,7 +19,7 @@ This template has been tested on:
 
 ## Configuration
 
-> Zabbix should be configured according to the instructions in the [Templates out of the box](https://www.zabbix.com/documentation/7.4/manual/config/templates_out_of_the_box) section.
+> Zabbix should be configured according to the instructions in the [Templates out of the box](https://www.zabbix.com/documentation/8.0/manual/config/templates_out_of_the_box) section.
 
 ## Setup
 
@@ -82,7 +82,7 @@ frontend stats
 |Name|Description|Expression|Severity|Dependencies and additional info|
 |----|-----------|----------|--------|--------------------------------|
 |HAProxy: Version has changed|<p>HAProxy version has changed. Acknowledge to close the problem manually.</p>|`last(/HAProxy by HTTP/haproxy.version,#1)<>last(/HAProxy by HTTP/haproxy.version,#2) and length(last(/HAProxy by HTTP/haproxy.version))>0`|Info|**Manual close**: Yes|
-|HAProxy: has been restarted|<p>Uptime is less than 10 minutes.</p>|`last(/HAProxy by HTTP/haproxy.uptime)<10m`|Info|**Manual close**: Yes|
+|HAProxy: Service has been restarted|<p>Uptime is less than 10 minutes.</p>|`last(/HAProxy by HTTP/haproxy.uptime)<10m`|Info|**Manual close**: Yes|
 |HAProxy: Service is down||`last(/HAProxy by HTTP/net.tcp.service["{$HAPROXY.STATS.SCHEME}","{$HAPROXY.STATS.HOST}","{$HAPROXY.STATS.PORT}"])=0`|Average|**Manual close**: Yes|
 |HAProxy: Service response time is too high||`min(/HAProxy by HTTP/net.tcp.service.perf["{$HAPROXY.STATS.SCHEME}","{$HAPROXY.STATS.HOST}","{$HAPROXY.STATS.PORT}"],5m)>{$HAPROXY.RESPONSE_TIME.MAX.WARN}`|Warning|**Manual close**: Yes<br>**Depends on**:<br><ul><li>HAProxy: Service is down</li></ul>|
 

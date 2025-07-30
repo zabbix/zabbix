@@ -12,7 +12,7 @@ See https://docs.pingcap.com/tidb/stable/tidb-monitoring-api.
 
 ## Requirements
 
-Zabbix version: 7.4 and higher.
+Zabbix version: 8.0 and higher.
 
 ## Tested versions
 
@@ -21,7 +21,7 @@ This template has been tested on:
 
 ## Configuration
 
-> Zabbix should be configured according to the instructions in the [Templates out of the box](https://www.zabbix.com/documentation/7.4/manual/config/templates_out_of_the_box) section.
+> Zabbix should be configured according to the instructions in the [Templates out of the box](https://www.zabbix.com/documentation/8.0/manual/config/templates_out_of_the_box) section.
 
 ## Setup
 
@@ -64,7 +64,7 @@ Also, see the Macros section for a list of macros used to set trigger values.
 |----|-----------|----------|--------|--------------------------------|
 |TiDB PD: Instance is not responding||`last(/TiDB PD by HTTP/pd.status)=0`|Average||
 |TiDB PD: Version has changed|<p>PD version has changed. Acknowledge to close the problem manually.</p>|`last(/TiDB PD by HTTP/pd.version,#1)<>last(/TiDB PD by HTTP/pd.version,#2) and length(last(/TiDB PD by HTTP/pd.version))>0`|Info|**Manual close**: Yes|
-|TiDB PD: has been restarted|<p>Uptime is less than 10 minutes.</p>|`last(/TiDB PD by HTTP/pd.uptime)<10m`|Info|**Manual close**: Yes|
+|TiDB PD: Instance has been restarted|<p>Uptime is less than 10 minutes.</p>|`last(/TiDB PD by HTTP/pd.uptime)<10m`|Info|**Manual close**: Yes|
 
 ### LLD rule Cluster metrics discovery
 

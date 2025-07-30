@@ -10,7 +10,7 @@ Template `Kubernetes Scheduler by HTTP` - collects metrics by HTTP agent from Sc
 
 ## Requirements
 
-Zabbix version: 7.4 and higher.
+Zabbix version: 8.0 and higher.
 
 ## Tested versions
 
@@ -19,7 +19,7 @@ This template has been tested on:
 
 ## Configuration
 
-> Zabbix should be configured according to the instructions in the [Templates out of the box](https://www.zabbix.com/documentation/7.4/manual/config/templates_out_of_the_box) section.
+> Zabbix should be configured according to the instructions in the [Templates out of the box](https://www.zabbix.com/documentation/8.0/manual/config/templates_out_of_the_box) section.
 
 ## Setup
 
@@ -41,8 +41,8 @@ For example, for clusters created with `kubeadm` it can be set in the following 
 
 |Name|Description|Default|
 |----|-----------|-------|
-|{$KUBE.SCHEDULER.SERVER.URL}|<p>Kubernetes Scheduler metrics endpoint URL.</p>|`https://localhost:10259/metrics`|
 |{$KUBE.API.TOKEN}|<p>API Authorization Token.</p>||
+|{$KUBE.SCHEDULER.SERVER.URL}|<p>Kubernetes Scheduler metrics endpoint URL.</p>|`https://localhost:10259/metrics`|
 |{$KUBE.SCHEDULER.HTTP.CLIENT.ERROR}|<p>Maximum number of HTTP client requests failures used for trigger.</p>|`2`|
 |{$KUBE.SCHEDULER.UNSCHEDULABLE}|<p>Maximum number of scheduling failures with 'unschedulable' used for trigger.</p>|`2`|
 |{$KUBE.SCHEDULER.ERROR}|<p>Maximum number of scheduling failures with 'error' used for trigger.</p>|`2`|

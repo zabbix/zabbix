@@ -8,11 +8,11 @@ This template set is designed for the effortless deployment of VMware vCenter an
 - The template "VMware Guest" is used in discovery and normally should not be manually linked to a host.
 - The template "VMware Hypervisor" can be used in discovery as well as manually linked to a host.
 
-For additional information, please see [Zabbix documentation on VM monitoring](https://www.zabbix.com/documentation/7.4/manual/vm_monitoring).
+For additional information, please see [Zabbix documentation on VM monitoring](https://www.zabbix.com/documentation/8.0/manual/vm_monitoring).
 
 ## Requirements
 
-Zabbix version: 7.4 and higher.
+Zabbix version: 8.0 and higher.
 
 ## Tested versions
 
@@ -21,7 +21,7 @@ This template has been tested on:
 
 ## Configuration
 
-> Zabbix should be configured according to the instructions in the [Templates out of the box](https://www.zabbix.com/documentation/7.4/manual/config/templates_out_of_the_box) section.
+> Zabbix should be configured according to the instructions in the [Templates out of the box](https://www.zabbix.com/documentation/8.0/manual/config/templates_out_of_the_box) section.
 
 ## Setup
 
@@ -40,8 +40,8 @@ Set the host macros (on the host or template level) required for VMware authenti
 Note: To enable discovery of hardware sensors of VMware hypervisors, set the macro `{$VMWARE.HV.SENSOR.DISCOVERY}` to the value `true` on the discovered host level.
 
 Additional resources:
-- How to [create a custom performance counter](https://www.zabbix.com/documentation/7.2/manual/vm_monitoring/vmware_keys#footnotes)
-- How to get all supported counters and [generate a path for the custom performance counter](https://www.zabbix.com/documentation/7.2/manual/appendix/items/perf_counters)
+- How to [create a custom performance counter](https://www.zabbix.com/documentation/8.0/manual/vm_monitoring/vmware_keys#footnotes)
+- How to get all supported counters and [generate a path for the custom performance counter](https://www.zabbix.com/documentation/8.0/manual/appendix/items/perf_counters)
 
 ### Macros used
 
@@ -51,19 +51,19 @@ Additional resources:
 |{$VMWARE.USERNAME}|<p>VMware service user name.</p>||
 |{$VMWARE.PASSWORD}|<p>VMware service `{$USERNAME}` user password.</p>||
 |{$VMWARE.PROXY}|<p>Sets the HTTP proxy for script items. If this parameter is empty, then no proxy is used.</p>||
+|{$VMWARE.DATASTORE.SPACE.WARN}|<p>The warning threshold of the datastore free space.</p>|`20`|
+|{$VMWARE.DATASTORE.SPACE.CRIT}|<p>The critical threshold of the datastore free space.</p>|`10`|
 |{$VMWARE.HV.SENSOR.DISCOVERY}|<p>Set "true"/"false" to enable or disable monitoring of hardware sensors.</p>|`false`|
 |{$VMWARE.HV.SENSOR.DISCOVERY.NAME.MATCHES}|<p>Sets the regex string of hardware sensor names to be allowed in discovery.</p>|`.*`|
 |{$VMWARE.HV.SENSOR.DISCOVERY.NAME.NOT_MATCHES}|<p>Sets the regex string of hardware sensor names to be ignored in discovery.</p>|`CHANGE_IF_NEEDED`|
 |{$VMWARE.VM.POWERSTATE}|<p>Possibility to filter out VMs by power state.</p>|`poweredOn\|poweredOff\|suspended`|
-|{$VMWARE.DATASTORE.SPACE.CRIT}|<p>The critical threshold of the datastore free space.</p>|`10`|
-|{$VMWARE.DATASTORE.SPACE.WARN}|<p>The warning threshold of the datastore free space.</p>|`20`|
 
 ### Items
 
 |Name|Description|Type|Key and additional info|
 |----|-----------|----|-----------------------|
 |Get alarms|<p>Get alarm status.</p>|Simple check|vmware.alarms.get[{$VMWARE.URL}]|
-|Event log|<p>Collect VMware event log. See also: https://www.zabbix.com/documentation/7.4/manual/config/items/preprocessing/examples#filtering_vmware_event_log_records</p>|Simple check|vmware.eventlog[{$VMWARE.URL},skip]|
+|Event log|<p>Collect VMware event log. See also: https://www.zabbix.com/documentation/8.0/manual/config/items/preprocessing/examples#filtering_vmware_event_log_records</p>|Simple check|vmware.eventlog[{$VMWARE.URL},skip]|
 |Full name|<p>VMware service full name.</p>|Simple check|vmware.fullname[{$VMWARE.URL}]<p>**Preprocessing**</p><ul><li><p>Discard unchanged with heartbeat: `1d`</p></li></ul>|
 |Version|<p>VMware service version.</p>|Simple check|vmware.version[{$VMWARE.URL}]<p>**Preprocessing**</p><ul><li><p>Discard unchanged with heartbeat: `1d`</p></li></ul>|
 |Get Overall Health VC State|<p>Gets overall health of the system. This item works only with VMware vCenter versions above 6.5.</p>|Script|vmware.health.get|
@@ -195,6 +195,7 @@ Additional resources:
 |Uncommitted storage space|<p>Additional storage space, in bytes, potentially used by this VM on all datastores.</p>|Simple check|vmware.vm.storage.uncommitted[{$VMWARE.URL},{$VMWARE.VM.UUID}]|
 |Unshared storage space|<p>Total storage space, in bytes, occupied by the VM across all datastores that is not shared with any other VM.</p>|Simple check|vmware.vm.storage.unshared[{$VMWARE.URL},{$VMWARE.VM.UUID}]|
 |Uptime|<p>System uptime.</p>|Simple check|vmware.vm.uptime[{$VMWARE.URL},{$VMWARE.VM.UUID}]|
+|Boot time|<p>System boot time.</p>|Simple check|vmware.vm.property[{$VMWARE.URL},{$VMWARE.VM.UUID},runtime.bootTime]<p>**Preprocessing**</p><ul><li><p>JavaScript: `return Math.floor(Date.parse(value)/1000);`</p></li><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
 |Guest memory swapped|<p>Amount of guest physical memory that is swapped out to the swap space.</p>|Simple check|vmware.vm.guest.memory.size.swapped[{$VMWARE.URL},{$VMWARE.VM.UUID}]|
 |Host memory consumed|<p>Amount of host physical memory consumed for backing up guest physical memory pages.</p>|Simple check|vmware.vm.memory.size.consumed[{$VMWARE.URL},{$VMWARE.VM.UUID}]|
 |Host memory usage in percent|<p>Percentage of host physical memory that has been consumed.</p>|Simple check|vmware.vm.memory.usage[{$VMWARE.URL},{$VMWARE.VM.UUID}]|
@@ -202,7 +203,7 @@ Additional resources:
 |CPU latency in percent|<p>Percentage of time the VM is unable to run because it is contending for access to the physical CPU(s).</p>|Simple check|vmware.vm.cpu.latency[{$VMWARE.URL},{$VMWARE.VM.UUID}]|
 |CPU readiness latency in percent|<p>Percentage of time that the virtual machine was ready, but was unable to get scheduled to run on the physical CPU.</p>|Simple check|vmware.vm.cpu.readiness[{$VMWARE.URL},{$VMWARE.VM.UUID}]|
 |CPU swap-in latency in percent|<p>Percentage of CPU time spent waiting for a swap-in.</p>|Simple check|vmware.vm.cpu.swapwait[{$VMWARE.URL},{$VMWARE.VM.UUID}]|
-|Uptime of guest OS|<p>Total time elapsed since the last operating system boot-up (in seconds).</p>|Simple check|vmware.vm.guest.osuptime[{$VMWARE.URL},{$VMWARE.VM.UUID}]|
+|Uptime of guest OS|<p>Total time elapsed since the last operating system boot-up (in seconds). Data is collected if Guest OS Add-ons (VMware Tools) are installed.</p>|Simple check|vmware.vm.guest.osuptime[{$VMWARE.URL},{$VMWARE.VM.UUID}]<p>**Preprocessing**</p><ul><li><p>Check for not supported value: `error matches "Performance counter data is not available."`</p><p>⛔️Custom on fail: Discard value</p></li></ul>|
 
 ### Triggers
 
@@ -212,7 +213,7 @@ Additional resources:
 |VMware Guest: VM is not running|<p>VMware virtual machine is not running.</p>|`last(/VMware Guest/vmware.vm.state[{$VMWARE.URL},{$VMWARE.VM.UUID}]) <> 2`|Average|**Depends on**:<br><ul><li>VMware Guest: Hypervisor is in the maintenance mode</li></ul>|
 |VMware Guest: VMware Tools is not running|<p>VMware Tools is not running on the VM.</p>|`last(/VMware Guest/vmware.vm.tools[{$VMWARE.URL},{$VMWARE.VM.UUID},status]) = 1`|Warning|**Depends on**:<br><ul><li>VMware Guest: VM is not running</li><li>VMware Guest: Hypervisor is in the maintenance mode</li></ul>|
 |VMware Guest: Hypervisor is in the maintenance mode|<p>Hypervisor is in the maintenance mode. All other problem on the host will be suppressed.</p>|`last(/VMware Guest/vmware.vm.hv.maintenance[{$VMWARE.URL},{$VMWARE.VM.UUID}])=1 and {$VMWARE.HYPERVISOR.MAINTENANCE}=1`|Info||
-|VMware Guest: VM has been restarted|<p>Uptime is less than 10 minutes.</p>|`(between(last(/VMware Guest/vmware.vm.guest.osuptime[{$VMWARE.URL},{$VMWARE.VM.UUID}]),1,10m)=1 or between(last(/VMware Guest/vmware.vm.uptime[{$VMWARE.URL},{$VMWARE.VM.UUID}]),1,10m)=1) and last(/VMware Guest/vmware.vm.powerstate[{$VMWARE.URL},{$VMWARE.VM.UUID}]) = 1`|Warning|**Manual close**: Yes<br>**Depends on**:<br><ul><li>VMware Guest: Hypervisor is in the maintenance mode</li></ul>|
+|VMware Guest: VM has been restarted|<p>Uptime is less than 10 minutes.</p>|`(now() - last(/VMware Guest/vmware.vm.property[{$VMWARE.URL},{$VMWARE.VM.UUID},runtime.bootTime]) < 10m) and last(/VMware Guest/vmware.vm.powerstate[{$VMWARE.URL},{$VMWARE.VM.UUID}]) = 1`|Warning|**Manual close**: Yes<br>**Depends on**:<br><ul><li>VMware Guest: Hypervisor is in the maintenance mode</li></ul>|
 
 ### LLD rule Network device discovery
 
@@ -253,7 +254,7 @@ Additional resources:
 
 |Name|Description|Type|Key and additional info|
 |----|-----------|----|-----------------------|
-|Mounted filesystem discovery|<p>Discovery of all guest file systems.</p>|Simple check|vmware.vm.vfs.fs.discovery[{$VMWARE.URL},{$VMWARE.VM.UUID}]<p>**Preprocessing**</p><ul><li><p>JavaScript: `The text is too long. Please see the template.`</p></li></ul>|
+|Mounted filesystem discovery|<p>Discovery of all guest file systems.</p>|Simple check|vmware.vm.vfs.fs.discovery[{$VMWARE.URL},{$VMWARE.VM.UUID}]|
 
 ### Item prototypes for Mounted filesystem discovery
 
@@ -279,13 +280,13 @@ This template is designed for the effortless deployment of VMware ESX hypervisor
 
 This template can be used in discovery as well as manually linked to a host.
 
-For additional information, please see [Zabbix documentation on VM monitoring](https://www.zabbix.com/documentation/7.4/manual/vm_monitoring).
+For additional information, please see [Zabbix documentation on VM monitoring](https://www.zabbix.com/documentation/8.0/manual/vm_monitoring).
 
 To use this template as manually linked to a host, attach it to the host and manually set the value of the `{$VMWARE.HV.UUID}` macro.
 
 ## Requirements
 
-Zabbix version: 7.4 and higher.
+Zabbix version: 8.0 and higher.
 
 ## Tested versions
 
@@ -294,7 +295,7 @@ This template has been tested on:
 
 ## Configuration
 
-> Zabbix should be configured according to the instructions in the [Templates out of the box](https://www.zabbix.com/documentation/7.4/manual/config/templates_out_of_the_box) section.
+> Zabbix should be configured according to the instructions in the [Templates out of the box](https://www.zabbix.com/documentation/8.0/manual/config/templates_out_of_the_box) section.
 
 ## Setup
 
@@ -323,12 +324,12 @@ To use this template as manually linked to a host:
 |{$VMWARE.URL}|<p>VMware service (vCenter or ESX hypervisor) SDK URL (https://servername/sdk).</p>||
 |{$VMWARE.USERNAME}|<p>VMware service user name.</p>||
 |{$VMWARE.PASSWORD}|<p>VMware service `{$USERNAME}` user password.</p>||
-|{$VMWARE.HV.SENSOR.DISCOVERY}|<p>Set to "true"/"false" to enable or disable the monitoring of hardware sensors.</p>|`false`|
+|{$VMWARE.HV.UUID}|<p>UUID of hypervisor.</p>||
+|{$VMWARE.HV.DATASTORE.SPACE.WARN}|<p>The warning threshold of the datastore free space.</p>|`20`|
+|{$VMWARE.HV.DATASTORE.SPACE.CRIT}|<p>The critical threshold of the datastore free space.</p>|`10`|
+|{$VMWARE.HV.SENSOR.DISCOVERY}|<p>Set "true"/"false" to enable or disable the monitoring of hardware sensors.</p>|`false`|
 |{$VMWARE.HV.SENSOR.DISCOVERY.NAME.MATCHES}|<p>Sets the regex string of hardware sensor names to be allowed in discovery.</p>|`.*`|
 |{$VMWARE.HV.SENSOR.DISCOVERY.NAME.NOT_MATCHES}|<p>Sets the regex string of hardware sensor names to be ignored in discovery.</p>|`CHANGE_IF_NEEDED`|
-|{$VMWARE.HV.DATASTORE.SPACE.CRIT}|<p>The critical threshold of the datastore free space.</p>|`10`|
-|{$VMWARE.HV.DATASTORE.SPACE.WARN}|<p>The warning threshold of the datastore free space.</p>|`20`|
-|{$VMWARE.HV.UUID}|<p>UUID of hypervisor.</p>||
 
 ### Items
 

@@ -21,15 +21,23 @@
 
 $item = $data['item'];
 $readonly = $item['templated'] || $item['discovered'];
+$parent_lld_link = null;
 
 if ($item['discovered']) {
+	$parent_lld = $item['discoveryRule'] ?: $item['discoveryRulePrototype'];
+
 	$discovered_url = (new CUrl('zabbix.php'))
 		->setArgument('action', 'popup')
 		->setArgument('popup', 'item.prototype.edit')
 		->setArgument('context', $item['context'])
-		->setArgument('itemid', $item['itemDiscovery']['parent_itemid'])
-		->setArgument('parent_discoveryid', $item['discoveryRule']['itemid'])
+		->setArgument('parent_discoveryid', $item['discoveryData']['lldruleid'])
+		->setArgument('itemid', $item['discoveryData']['parent_itemid'])
 		->getUrl();
+
+	$parent_lld_link = [
+		new CLabel(_('Discovered by')),
+		(new CFormField(new CLink($parent_lld['name'], $discovered_url)))->addClass('js-parent-items')
+	];
 }
 
 $formgrid = (new CFormGrid())
@@ -40,10 +48,7 @@ $formgrid = (new CFormGrid())
 		]
 		: null
 	)
-	->addItem($item['discovered'] ? [
-		new CLabel(_('Discovered by')),
-		(new CFormField(new CLink($item['discoveryRule']['name'], $discovered_url)))->addClass('js-parent-items')
-	] : null)
+	->addItem($parent_lld_link)
 	->addItem([
 		(new CLabel(_('Name'), 'name'))->setAsteriskMark(),
 		new CFormField(
@@ -119,6 +124,8 @@ $formgrid = (new CFormGrid())
 			(new CDiv([
 				(new CTable())
 					->setId('query-fields-table')
+					->setAttribute('data-field-type', 'set')
+					->setAttribute('data-field-name', 'query_fields')
 					->setHeader(['', _('Name'), '', _('Value'), ''])
 					->setFooter(
 						(new CCol(
@@ -153,6 +160,8 @@ $formgrid = (new CFormGrid())
 		(new CFormField(
 			(new CDiv([
 				(new CTable())
+					->setAttribute('data-field-type', 'set')
+					->setAttribute('data-field-name', 'parameters')
 					->setId('parameters-table')
 					->setHeader([
 						(new CColHeader(_('Name')))->setWidth('50%'),
@@ -263,6 +272,8 @@ $formgrid = (new CFormGrid())
 		(new CFormField((new CDiv([
 				(new CTable())
 					->setId('headers-table')
+					->setAttribute('data-field-type', 'set')
+					->setAttribute('data-field-name', 'headers')
 					->setAttribute('style', 'width: 100%;')
 					->setHeader(['', _('Name'), '', _('Value'), ''])
 					->setFooter((new CCol(
@@ -475,6 +486,22 @@ if ($data['host']['status'] == HOST_STATUS_MONITORED || $data['host']['status'] 
 	]);
 }
 
+$delay_flex_table = (new CTable())
+	->setId('delay-flex-table')
+	->setHeader([
+		_('Type'), _('Interval'), _('Period'), ''
+	])
+	->setFooter((new CCol(
+		(new CButtonLink(_('Add')))
+			->addClass('element-table-add')
+			->setEnabled(!$item['discovered'])
+		))->setColSpan($item['discovered'] ? 3 : 4)
+	);
+
+foreach ($data['item']['delay_flex'] as $delay_index => $delay) {
+	$delay_flex_table->addItem(getViewCustomIntervalRow($item, ['row_num' => $delay_index] + $delay + ['schedule' => '']));
+}
+
 $formgrid
 	->addItem([
 		(new CLabel([
@@ -513,6 +540,7 @@ $formgrid
 		(new CLabel(_('IPMI sensor'), 'ipmi_sensor'))->setId('js-item-impi-sensor-label'),
 		(new CFormField(
 			(new CTextBox('ipmi_sensor', $item['ipmi_sensor'], $readonly, DB::getFieldLength('items', 'ipmi_sensor')))
+				->setAttribute('data-notrim', '')
 				->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 		))->setId('js-item-impi-sensor-field')
 	])
@@ -647,36 +675,17 @@ $formgrid
 		(new CLabel(_('Custom intervals'), 'delay-flex-table'))->setId('js-item-flex-intervals-label'),
 		(new CFormField(
 			(new CDiv([
-				(new CTable())
-					->setId('delay-flex-table')
-					->setHeader([
-						_('Type'), _('Interval'), _('Period'), ''
-					])
-					->setFooter((new CCol(
-						(new CButtonLink(_('Add')))
-							->addClass('element-table-add')
-							->setEnabled(!$item['discovered'])
-						))->setColSpan($item['discovered'] ? 3 : 4)
-					),
-				new CTemplateTag('delay-flex-row-tmpl', (new CRow([
-						(new CRadioButtonList('delay_flex[#{rowNum}][type]', ITEM_DELAY_FLEXIBLE))
-							->addValue(_('Flexible'), ITEM_DELAY_FLEXIBLE)
-							->addValue(_('Scheduling'), ITEM_DELAY_SCHEDULING)
-							->setReadonly($item['discovered'])
-							->setModern(),
-						[
-							(new CTextBox('delay_flex[#{rowNum}][delay]', '#{delay}', $item['discovered']))
-								->setAttribute('placeholder', ZBX_ITEM_FLEXIBLE_DELAY_DEFAULT),
-							(new CTextBox('delay_flex[#{rowNum}][schedule]', '#{schedule}', $item['discovered']))
-								->addClass(ZBX_STYLE_DISPLAY_NONE)
-								->setAttribute('placeholder', ZBX_ITEM_SCHEDULING_DEFAULT)
-						],
-						(new CTextBox('delay_flex[#{rowNum}][period]', '#{period}', $item['discovered']))
-							->setAttribute('placeholder', ZBX_DEFAULT_INTERVAL),
-						$item['discovered'] ? null : (new CButtonLink(_('Remove')))->addClass('element-table-remove')
-					]))->addClass('form_row')
-				)
+				$delay_flex_table,
+				new CTemplateTag('delay-flex-row-tmpl', getViewCustomIntervalRow($item, [
+					'row_num' => '#{rowNum}',
+					'schedule' => '#{schedule}',
+					'period' => '#{period}',
+					'type' => ITEM_DELAY_FLEXIBLE,
+					'delay' => '#{delay}'
+				]))
 			]))
+				->setAttribute('data-field-name', 'delay_flex')
+				->setAttribute('data-field-type', 'set')
 				->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
 				->setAttribute('style', 'min-width: '.ZBX_TEXTAREA_STANDARD_WIDTH.'px;')
 		))->setId('js-item-flex-intervals-field')
@@ -837,7 +846,9 @@ $formgrid
 	->addItem([
 		(new CLabel(_('Allowed hosts'), 'trapper_hosts'))->setId('js-item-trapper-hosts-label'),
 		(new CFormField(
-			(new CTextBox('trapper_hosts', $item['trapper_hosts'], false, DB::getFieldLength('items', 'trapper_hosts')))
+			(new CTextBox('trapper_hosts', $item['trapper_hosts'], $item['discovered'],
+				DB::getFieldLength('items', 'trapper_hosts')
+			))
 				->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 		))->setId('js-item-trapper-hosts-field')
 	]);
@@ -866,13 +877,12 @@ $formgrid
 		)
 	]);
 
-
-$disabled_by_lld_icon = $item['status'] == ITEM_STATUS_DISABLED && array_key_exists('itemDiscovery', $item)
-		&& $item['itemDiscovery'] && $item['itemDiscovery']['disable_source'] == ZBX_DISABLE_SOURCE_LLD
-	? makeWarningIcon(_('Disabled automatically by an LLD rule.'))
-	: null;
-
 if ($data['source'] === 'item') {
+	$disabled_by_lld_icon = $item['status'] == ITEM_STATUS_DISABLED && $item['discovered']
+			&& $item['discoveryData']['disable_source'] == ZBX_DISABLE_SOURCE_LLD
+		? makeWarningIcon(_('Disabled automatically by an LLD rule.'))
+		: null;
+
 	$formgrid->addItem([
 		new CLabel([_('Enabled'), $disabled_by_lld_icon], 'status'),
 		new CFormField(
@@ -886,7 +896,7 @@ if ($data['source'] === 'item') {
 				(new CUrl())
 					->setArgument('action', 'latest.view')
 					->setArgument('hostids[]', $item['hostid'])
-					->setArgument('name', $item['name'])
+					->setArgument('name', $item['name_resolved'])
 					->setArgument('filter_set', '1')
 			))->setTarget('_blank')))
 		);
@@ -898,15 +908,52 @@ else {
 			new CLabel(_('Create enabled'), 'status'),
 			new CFormField(
 				(new CCheckBox('status', ITEM_STATUS_ACTIVE))
-					->setChecked($item['status'] == ITEM_STATUS_ACTIVE))
+					->setChecked($item['status'] == ITEM_STATUS_ACTIVE)
+					->setReadonly($item['discovered'])
+			)
 		])
 		->addItem([
 			new CLabel(_('Discover'), 'discover'),
 			new CFormField(
 				(new CCheckBox('discover', ZBX_PROTOTYPE_DISCOVER))
 					->setChecked($item['discover'] == ZBX_PROTOTYPE_DISCOVER)
+					->setReadonly($item['discovered'])
 			)
 		]);
+}
+
+function getViewCustomIntervalRow(array $item, array $data): array {
+	$data += ['delay' => '', 'period' => ''];
+	['row_num' => $row_num, 'delay' => $delay, 'schedule' => $schedule, 'period' => $period, 'type' => $type] = $data;
+
+	return [
+		(new CRow([
+			(new CRadioButtonList("delay_flex[$row_num][type]", (int) $type))
+				->addValue(_('Flexible'), ITEM_DELAY_FLEXIBLE)
+				->addValue(_('Scheduling'), ITEM_DELAY_SCHEDULING)
+				->setReadonly($item['discovered'])
+				->setModern(),
+			[
+				(new CTextBox("delay_flex[$row_num][delay]", $delay, $item['discovered']))
+					->setErrorContainer("delay_flex-$row_num-error-container")
+					->setAttribute('data-error-label', _('Interval'))
+					->setAttribute('placeholder', ZBX_ITEM_FLEXIBLE_DELAY_DEFAULT),
+				(new CTextBox("delay_flex[$row_num][schedule]", $schedule, $item['discovered']))
+					->setErrorContainer("delay_flex-$row_num-error-container")
+					->setAttribute('data-error-label', _('Interval'))
+					->addClass(ZBX_STYLE_DISPLAY_NONE)
+					->setAttribute('placeholder', ZBX_ITEM_SCHEDULING_DEFAULT)
+			],
+			(new CTextBox("delay_flex[$row_num][period]", $period, $item['discovered']))
+				->setErrorContainer("delay_flex-$row_num-error-container")
+				->setAttribute('data-error-label', _('Period'))
+				->setAttribute('placeholder', ZBX_DEFAULT_INTERVAL),
+			$item['discovered'] ? null : (new CButtonLink(_('Remove')))->addClass('element-table-remove')
+		]))->addClass('form_row'),
+		(new CRow())
+			->addClass('error-container-row')
+			->addItem((new CCol())->setId("delay_flex-$row_num-error-container")->setColSpan(4))
+	];
 }
 
 $formgrid->show();

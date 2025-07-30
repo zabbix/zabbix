@@ -541,7 +541,7 @@ class testFormHostPrototype extends CLegacyWebTest {
 				' WHERE hostid IN ('.
 				'SELECT hostid'.
 				' FROM host_discovery'.
-				' WHERE parent_itemid='.self::DISCOVERY_RULE_ID.
+				' WHERE lldruleid='.self::DISCOVERY_RULE_ID.
 				')'.
 				'LIMIT 2';
 		$sql_hash = 'SELECT * FROM hosts ORDER BY hostid';
@@ -1026,7 +1026,7 @@ class testFormHostPrototype extends CLegacyWebTest {
 				' WHERE hostid IN ('.
 				'SELECT hostid'.
 				' FROM host_discovery'.
-				' WHERE parent_itemid='.self::DISCOVERY_RULE_ID.
+				' WHERE lldruleid='.self::DISCOVERY_RULE_ID.
 				')'.
 				'LIMIT 1';
 

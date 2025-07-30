@@ -42,6 +42,7 @@ typedef struct
 	zbx_hashset_t			entries;
 	zbx_vector_lld_entry_ptr_t	entries_sorted;
 	zbx_vector_lld_macro_path_ptr_t	macro_paths;
+	zbx_jsonobj_t			source;
 }
 zbx_lld_value_t;
 
@@ -78,6 +79,7 @@ static void	lld_value_init(zbx_lld_value_t *lld_value)
 
 	zbx_vector_lld_macro_path_ptr_create(&lld_value->macro_paths);
 
+	zbx_jsonobj_init(&lld_value->source);
 }
 
 /******************************************************************************
@@ -93,6 +95,8 @@ static void	lld_value_clear(zbx_lld_value_t *lld_value)
 
 	zbx_vector_lld_macro_path_ptr_clear_ext(&lld_value->macro_paths, zbx_lld_macro_path_free);
 	zbx_vector_lld_macro_path_ptr_destroy(&lld_value->macro_paths);
+
+	zbx_jsonobj_clear(&lld_value->source);
 
 	memset(lld_value, 0, sizeof(zbx_lld_value_t));
 }
@@ -202,9 +206,7 @@ static int	lld_prepare_value(const zbx_ipc_message_t *message, zbx_lld_value_t *
 
 	if (NULL != value)
 	{
-		zbx_jsonobj_t	json;
-
-		if (FAIL == zbx_jsonobj_open(value, &json))
+		if (FAIL == zbx_jsonobj_open(value, &lld_value->source))
 		{
 			error = zbx_strdup(NULL, zbx_json_strerror());
 		}
@@ -212,11 +214,9 @@ static int	lld_prepare_value(const zbx_ipc_message_t *message, zbx_lld_value_t *
 		{
 			if (SUCCEED == zbx_lld_macro_paths_get(itemid, &lld_value->macro_paths, &error))
 			{
-				lld_extract_entries(&lld_value->entries, &lld_value->entries_sorted, &json,
+				lld_extract_entries(&lld_value->entries, &lld_value->entries_sorted, &lld_value->source,
 						&lld_value->macro_paths, &error);
 			}
-
-			zbx_jsonobj_clear(&json);
 		}
 	}
 

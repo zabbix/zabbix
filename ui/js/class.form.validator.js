@@ -225,7 +225,7 @@ class CFormValidator {
 					if (field_type === 'array') {
 						when_fields_data[when_path] = {
 							type: field_type,
-							value: field_data.length > 0
+							value: field_data instanceof Array && (field_data.length > 0)
 						};
 					}
 					else if (field_type === 'objects') {

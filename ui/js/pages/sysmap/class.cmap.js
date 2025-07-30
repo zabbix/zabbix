@@ -514,18 +514,24 @@ class CMap {
 		// Open context menu for map element or shape.
 		this.container[0].addEventListener('contextmenu', (e) => {
 			const element = e.target,
-				item_data = {...element.dataset},
 				can_paste = this.copypaste_buffer.items && this.copypaste_buffer.items.length > 0;
 
-			let can_copy = false,
+			let item_data = {...element.dataset},
+				can_copy = false,
 				can_remove = false,
 				can_reorder = false;
+
+			if (item_data.id === undefined && element.closest('.sysmap_shape') !== null) {
+				item_data = element.closest('.sysmap_shape').dataset
+			}
 
 			if (item_data.id === undefined) {
 				this.#clearSelection();
 			}
 			else if (item_data.type && this.selection[item_data.type][item_data.id] === undefined) {
+				this.#clearSelection()
 				this.#selectElements([item_data], false, true);
+				this.#toggleForm();
 			}
 
 			can_copy = this.selection.count.shapes > 0 || this.selection.count.selements > 0;
@@ -891,7 +897,7 @@ class CMap {
 			const disable = e.target.value == SVGMapShape.BORDER_TYPE_NONE;
 
 			document.getElementById('border_width').disabled = disable;
-			document.getElementById('border_color').disabled = disable;
+			document.querySelector(`.${ZBX_STYLE_COLOR_PICKER}[color-field-name="border_color"]`).disabled = disable;
 		});
 
 		// Add event listeners on border type and width in shape mass update form.
@@ -907,7 +913,8 @@ class CMap {
 				chkbox_border_width.disabled = disable;
 				chkbox_border_color.disabled = disable;
 				document.getElementById('mass_border_width').disabled = disable || !chkbox_border_width.checked;
-				document.getElementById('mass_border_color').disabled = disable || !chkbox_border_color.checked;
+				document.querySelector(`.${ZBX_STYLE_COLOR_PICKER}[color-field-name="mass_border_color"]`).disabled =
+					disable || !chkbox_border_color.checked;
 			})
 		);
 
