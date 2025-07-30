@@ -32,7 +32,8 @@ type fieldRequirement int
 
 // gives a map which describes what field combinations are allowed depending on TLSConnect value.
 func getValidationRules(tlsConnect comms.TLSConnectionType) map[comms.ConfigSetting]fieldRequirement {
-	common := map[comms.ConfigSetting]fieldRequirement{
+	// common rules.
+	rules := map[comms.ConfigSetting]fieldRequirement{
 		comms.URI:      optional,
 		comms.User:     optional,
 		comms.Password: optional,
@@ -42,13 +43,21 @@ func getValidationRules(tlsConnect comms.TLSConnectionType) map[comms.ConfigSett
 	}
 
 	switch tlsConnect {
-	case comms.Disabled, comms.Required:
-		common[comms.TLSCAFile] = forbidden
+	case comms.Disabled:
+		rules[comms.TLSCAFile] = forbidden
+
+		rules[comms.TLSKeyFile] = forbidden
+		rules[comms.TLSCertFile] = forbidden
+
+	case comms.Required:
+		rules[comms.TLSCAFile] = forbidden
+
 	case comms.VerifyCA, comms.VerifyFull:
-		common[comms.TLSCAFile] = required
+		rules[comms.TLSCAFile] = required
+
 	}
 
-	return map[comms.ConfigSetting]fieldRequirement{}
+	return rules
 }
 
 // Field groups that must come from the same source (session or defaults).
