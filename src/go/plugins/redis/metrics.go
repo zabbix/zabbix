@@ -30,7 +30,7 @@ const (
 	keyPing    = "redis.ping"
 	keySlowlog = "redis.slowlog.count"
 
-	pluginName = "redis"
+	pluginName = "Redis"
 )
 
 var (
