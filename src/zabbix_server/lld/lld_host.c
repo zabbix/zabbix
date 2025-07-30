@@ -824,8 +824,8 @@ static void	lld_hosts_validate(zbx_vector_lld_host_ptr_t *hosts, int dflags, cha
 	/* checking a host name validity */
 	for (int i = 0; i < hosts->values_num; i++)
 	{
-		char	*ch_error;
-		char	name_trunc[VALUE_ERRMSG_MAX + 1];
+		char		*ch_error, name_trunc[VALUE_ERRMSG_MAX + 1];
+		const char	*kind = "";
 		int	ret;
 
 		host = hosts->values[i];
@@ -839,7 +839,10 @@ static void	lld_hosts_validate(zbx_vector_lld_host_ptr_t *hosts, int dflags, cha
 
 		/* check for valid host name unless it's a prototype */
 		if (0 != (dflags & ZBX_FLAG_DISCOVERY_PROTOTYPE))
+		{
 			ret = zbx_check_prototype_hostname(host->host, &ch_error);
+			kind = " prototype";
+		}
 		else
 			ret = zbx_check_hostname(host->host, &ch_error);
 
@@ -848,8 +851,8 @@ static void	lld_hosts_validate(zbx_vector_lld_host_ptr_t *hosts, int dflags, cha
 
 		zbx_strlcpy(name_trunc, host->host, sizeof(name_trunc));
 
-		*error = zbx_strdcatf(*error, "Cannot %s host \"%s\": %s.\n",
-				(0 != host->hostid ? "update" : "create"), name_trunc, ch_error);
+		*error = zbx_strdcatf(*error, "Cannot %s host%s \"%s\": %s.\n",
+				(0 != host->hostid ? "update" : "create"), kind, name_trunc, ch_error);
 
 		zbx_free(ch_error);
 
@@ -6260,7 +6263,52 @@ static void	lld_host_group_prototypes_get(zbx_uint64_t parent_hostid, const zbx_
 	}
 
 	zbx_db_free_result(result);
+}
 
+/******************************************************************************
+ *                                                                            *
+ * Purpose: validate group prototype name                                     *
+ *                                                                            *
+ * Parameters: groupname - [IN] the group prototype name to validate          *
+ *             error     - [OUT] error message if validation fails            *
+ *                                                                            *
+ * Return value: SUCCEED - group prototype name is valid                      *
+ *               FAIL    - group prototype name is invalid                    *
+ *                                                                            *
+ ******************************************************************************/
+static int	lld_check_prototype_groupname(const char *groupname, char **error)
+{
+	zbx_token_t	token;
+	size_t		pos = 0, macro_len = 0;
+	int		lld_macro_num = 0;
+
+	if (FAIL == lld_validate_group_name(groupname))
+	{
+		*error = zbx_strdup(NULL, "invalid name");
+		return FAIL;
+	}
+
+	while (SUCCEED == zbx_token_find(groupname, (int)pos, &token, ZBX_TOKEN_SEARCH_BASIC))
+	{
+		if (ZBX_TOKEN_LLD_MACRO == token.type || ZBX_TOKEN_LLD_FUNC_MACRO == token.type)
+		{
+			pos = token.loc.r + 1;
+			macro_len += pos - token.loc.l;
+			lld_macro_num++;
+
+			continue;
+		}
+
+		pos++;
+	}
+
+	if (0 == lld_macro_num)
+	{
+		*error = zbx_strdup(NULL, "name does not contain LLD macro");
+		return FAIL;
+	}
+
+	return SUCCEED;
 }
 
 /******************************************************************************
@@ -6273,23 +6321,43 @@ static void	lld_host_group_prototypes_get(zbx_uint64_t parent_hostid, const zbx_
  *             lld_obj   - [IN] LLD data row                                  *
  *                                                                            *
  ******************************************************************************/
-static void	lld_host_group_prototypes_sync(zbx_lld_host_t *hosts, const zbx_sync_rowset_t *group_src,
-		const zbx_lld_entry_t *lld_obj)
+static void	lld_host_group_prototypes_sync(zbx_lld_host_t *host, const zbx_sync_rowset_t *group_src,
+		const zbx_lld_entry_t *lld_obj, char **error)
 {
 	zbx_sync_rowset_t	groups;
+	char			*gerr = NULL;
 
 	zbx_sync_rowset_init(&groups, LLD_GROUP_PROTOTYPE_COLS_NUM);
 
 	zbx_sync_rowset_copy(&groups, group_src);
 
-	for (int i = 0; i < groups.rows.values_num; i++)
+	for (int i = 0; i < groups.rows.values_num; )
 	{
 		zbx_sync_row_t	 *row = groups.rows.values[i];
 
-		zbx_substitute_lld_macros(&row->cols[LLD_GROUP_PROTOTYPE_COL_NAME], lld_obj, ZBX_MACRO_ANY, NULL, 0);
+		/* validate only group prototypes */
+		if (NULL == row->cols[LLD_GROUP_PROTOTYPE_COL_GROUPID])
+		{
+			zbx_substitute_lld_macros(&row->cols[LLD_GROUP_PROTOTYPE_COL_NAME], lld_obj, ZBX_MACRO_ANY,
+					NULL, 0);
+
+			if (FAIL == lld_check_prototype_groupname(row->cols[LLD_GROUP_PROTOTYPE_COL_NAME], &gerr))
+			{
+				*error = zbx_strdcatf(*error, "Invalid group prototype '%s': %s.\n",
+						row->cols[LLD_GROUP_PROTOTYPE_COL_NAME], gerr);
+				zbx_free(gerr);
+
+				zbx_sync_row_free(row);
+				zbx_vector_sync_row_ptr_remove(&groups.rows, i);
+
+				continue;
+			}
+		}
+
+		i++;
 	}
 
-	zbx_sync_rowset_merge(&hosts->group_prototypes, &groups);
+	zbx_sync_rowset_merge(&host->group_prototypes, &groups);
 
 	zbx_sync_rowset_clear(&groups);
 }
@@ -6619,7 +6687,7 @@ void	lld_update_hosts(zbx_uint64_t lld_ruleid, const zbx_vector_lld_row_ptr_t *l
 			if (0 == (dflags & ZBX_FLAG_DISCOVERY_PROTOTYPE))
 				lld_groups_make(host, &groups_in, &group_prototypes, lld_row->data);
 			else
-				lld_host_group_prototypes_sync(host, &group_proto_prototypes, lld_row->data);
+				lld_host_group_prototypes_sync(host, &group_proto_prototypes, lld_row->data, error);
 		}
 
 		zbx_vector_lld_host_ptr_sort(&hosts, lld_host_compare_func);
