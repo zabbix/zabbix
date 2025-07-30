@@ -30,22 +30,14 @@ class CAbsoluteTimeParser extends CParser {
 	 * @var array $tokens
 	 */
 	private $tokens;
-
-	/**
-	 * An error message if IP range is not valid.
-	 *
-	 * @var string
-	 */
-	private $error;
+	private string $error;
 
 	/**
 	 * Supported options:
 	 *   'min' => int  Min allowed UNIX timestamp;
 	 *   'max' => int  Max allowed UNIX timestamp;
-	 *
-	 * @var array
 	 */
-	private $options;
+	private array $options;
 
 
 	/**

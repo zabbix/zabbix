@@ -180,11 +180,6 @@ class CAbsoluteDateParserTest extends TestCase {
 
 	/**
 	 * @dataProvider dataProvider
-	 *
-	 * @param string $source
-	 * @param int    $pos
-	 * @param array  $options
-	 * @param array  $expected
 	 */
 	public function testParse(string $source, int $pos, array $options, array $expected) {
 		$parser = new CAbsoluteDateParser($options);
