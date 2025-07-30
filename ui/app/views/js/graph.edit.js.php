@@ -240,7 +240,7 @@ window.graph_edit_popup = new class {
 				src.setArgument('resolve_macros', this.context === 'template' ? 0 : 1);
 
 				if (this.graph_type == <?= GRAPH_TYPE_PIE ?>
-					|| this.graph_type == <?= GRAPH_TYPE_EXPLODED ?>) {
+						|| this.graph_type == <?= GRAPH_TYPE_EXPLODED ?>) {
 					src.setPath('chart7.php');
 					src.setArgument('graph3d', $('#show_3d').is(':checked') ? 1 : 0);
 				}
@@ -668,4 +668,3 @@ window.graph_edit_popup = new class {
 		);
 	}
 }
-//# sourceURL=graph.edit.js.php
