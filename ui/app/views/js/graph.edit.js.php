@@ -77,10 +77,10 @@ window.graph_edit_popup = new class {
 				this.#openItemPopup(e.target);
 			}
 			else if (e.target.classList.contains('js-add-item')) {
-				this.#openItemSelectPopup();
+				this.#openItemNewSelectPopup();
 			}
 			else if (e.target.classList.contains('js-add-item-prototype')) {
-				this.#openItemPrototypeSelectPopup({writeonly: '1', multiselect: '1', graphtype: this.graph_type});
+				this.#openItemNewSelectPopup(<?= ZBX_FLAG_DISCOVERY_PROTOTYPE ?>);
 			}
 			else if (e.target.classList.contains('js-remove')) {
 				this.#removeItem(e.target);
@@ -240,7 +240,7 @@ window.graph_edit_popup = new class {
 				src.setArgument('resolve_macros', this.context === 'template' ? 0 : 1);
 
 				if (this.graph_type == <?= GRAPH_TYPE_PIE ?>
-						|| this.graph_type == <?= GRAPH_TYPE_EXPLODED ?>) {
+					|| this.graph_type == <?= GRAPH_TYPE_EXPLODED ?>) {
 					src.setPath('chart7.php');
 					src.setArgument('graph3d', $('#show_3d').is(':checked') ? 1 : 0);
 				}
@@ -344,26 +344,29 @@ window.graph_edit_popup = new class {
 		});
 	}
 
-	#openItemPopup(target) {
-		const item_num = target.id.match(/\d+/g);
+	#getItemPopupParameters(item_num = null, flag_prototype = null) {
 		const parameters = {
 			srcfld1: 'itemid',
 			srcfld2: 'name',
 			dstfrm: this.form_name,
-			dstfld1: 'items_' + item_num + '_itemid',
-			dstfld2: 'items_' + item_num + '_name',
 			numeric: 1,
-			writeonly: 1,
-			normal_only: 1
+			writeonly: 1
 		};
-
-		if (document.getElementById('items_' + item_num + '_flags').value == <?= ZBX_FLAG_DISCOVERY_PROTOTYPE ?>) {
+		if (item_num !== null) {
+			parameters['dstfld1'] = 'items_' + item_num + '_itemid';
+			parameters['dstfld2'] = 'items_' + item_num + '_name';
+			parameters['normal_only'] = 1;
+		}
+		if (flag_prototype == <?= ZBX_FLAG_DISCOVERY_PROTOTYPE ?>) {
 			parameters['srctbl'] = 'item_prototypes';
 			parameters['srcfld3'] = 'flags';
-			parameters['dstfld3'] = 'items_' + item_num + '_flags';
 			parameters['parent_discoveryid'] = this.graph.parent_discoveryid;
-		}
-		else {
+			if (item_num !== null) {
+				parameters['dstfld3'] = 'items_' + item_num + '_flags';
+			} else {
+				parameters['graphtype'] = this.graph_type;
+			}
+		} else {
 			parameters['srctbl'] = 'items';
 		}
 
@@ -378,6 +381,19 @@ window.graph_edit_popup = new class {
 			parameters['real_hosts'] = '1';
 			parameters['hostid'] = this.graph.hostid;
 		}
+
+		if (this.graph.normal_only == 1) {
+			parameters['normal_only'] = this.graph.normal_only;
+		}
+
+		return parameters;
+	}
+
+	#openItemPopup(target) {
+		const item_num = target.id.match(/\d+/g);
+		const parameters = this.#getItemPopupParameters(item_num,
+			document.getElementById('items_' + item_num + '_flags').value
+		);
 
 		PopUp('popup.generic', parameters, {dialogue_class: "modal-popup-generic", trigger_element: target});
 	}
@@ -431,21 +447,8 @@ window.graph_edit_popup = new class {
 		$('#item-buttons-row').before($row);
 	}
 
-	#openItemSelectPopup() {
-		const parameters = {
-			srctbl: 'items',
-			srcfld1: 'itemid',
-			srcfld2: 'name',
-			dstfrm: this.form_name,
-			numeric: 1,
-			writeonly: 1,
-			multiselect: 1,
-			hostid: this.hostid
-		};
-
-		if (this.graph.normal_only == 1) {
-			parameters['normal_only'] = this.graph.normal_only;
-		}
+	#openItemNewSelectPopup(flag_prototype = null) {
+		const parameters = this.#getItemPopupParameters(null, flag_prototype);
 
 		PopUp('popup.generic', parameters, {dialogue_class: 'modal-popup-generic'});
 	}
@@ -665,3 +668,4 @@ window.graph_edit_popup = new class {
 		);
 	}
 }
+//# sourceURL=graph.edit.js.php
