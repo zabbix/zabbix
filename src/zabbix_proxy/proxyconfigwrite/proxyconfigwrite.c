@@ -1125,7 +1125,7 @@ static void	proxyconfig_prepare_table(zbx_table_data_t *td, const char *key_fiel
 		zbx_db_result_t	result;
 		zbx_db_row_t	dbrow;
 		size_t		sql_offset = 0;
-		
+
 		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "select %s", td->table->recid);
 
 		for (int i = 1; i < td->fields.values_num; i++)
@@ -2216,7 +2216,7 @@ int	zbx_proxyconfig_process(const char *addr, struct zbx_json_parse *jp, zbx_pro
 			}
 		}
 	}
-	
+
 	zbx_db_begin();
 
 	if (0 != config_tables.values_num)
