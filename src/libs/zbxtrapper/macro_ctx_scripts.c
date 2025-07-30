@@ -194,7 +194,7 @@ static int	macro_normal_script_resolv(zbx_macro_resolv_data_t *p, va_list args, 
 			tz, item_hosts, trigger_hosts, cause_event, cause_recovery_event, replace_to, data, error,
 			maxerrlen);
 
-	if (SUCCEED == ret)
+	if (SUCCEED == ret && NULL != p->macro)
 	{
 		const zbx_db_event	*c_event;
 

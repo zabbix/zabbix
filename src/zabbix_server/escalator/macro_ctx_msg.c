@@ -54,7 +54,7 @@ static int	macro_message_normal_resolv(zbx_macro_resolv_data_t *p, va_list args,
 			service_alarm, service, tz, item_hosts, trigger_hosts, cause_event, cause_recovery_event,
 			replace_to, data, error, maxerrlen);
 
-	if (SUCCEED == ret)
+	if (SUCCEED == ret && NULL != p->macro)
 	{
 		if (EVENT_SOURCE_TRIGGERS == c_event->source)
 		{
@@ -102,7 +102,7 @@ static int	macro_message_update_resolv(zbx_macro_resolv_data_t *p, va_list args,
 			service_alarm, service, tz, item_hosts, trigger_hosts, cause_event, cause_recovery_event,
 			replace_to, data, error, maxerrlen);
 
-	if (SUCCEED == ret)
+	if (SUCCEED == ret && NULL != p->macro)
 	{
 		if (EVENT_SOURCE_TRIGGERS == c_event->source && NULL != ack)
 		{

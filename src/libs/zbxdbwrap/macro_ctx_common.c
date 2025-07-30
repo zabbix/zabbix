@@ -1004,6 +1004,7 @@ int	zbx_macro_message_common_resolv(zbx_macro_resolv_data_t *p, zbx_dc_um_handle
 		}
 		else if (ZBX_TOKEN_EXPRESSION_MACRO == p->inner_token.type)
 		{
+			/* This should be handled first since p->macro is NULL */
 			zbx_timespec_t	ts;
 			char		*errmsg = NULL;
 
