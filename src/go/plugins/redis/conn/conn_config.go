@@ -31,13 +31,16 @@ var errTLSDisabled = errs.New("tls is disabled for this connection")
 
 func getTLSConfig(redisURI *uri.URI, params map[string]string) (*tls.Config, error) {
 	tlsConnect := params[string(comms.TLSConnect)]
-	//nolint:errcheck //ignoring error because all wrong options were eliminated at the validation.
-	tlsConnectionType, _ := comms.NewTLSConnectionType(tlsConnect)
+
+	tlsConnectionType, err := comms.NewTLSConnectionType(tlsConnect)
+	if err != nil {
+		return nil, errs.Wrap(err, "invalid TLS connection type")
+	}
 
 	details := tlsconfig.NewDetails(
 		"",
 		redisURI.String(),
-		tlsconfig.WithTLSServerName(redisURI.Host()),
+		//tlsconfig.WithTLSServerName(redisURI.Host()), only required at the verify_full
 		tlsconfig.WithTLSConnect(string(tlsConnectionType)),
 		tlsconfig.WithTLSCaFile(params[string(comms.TLSCAFile)]),
 		tlsconfig.WithTLSCertFile(params[string(comms.TLSCertFile)]),
@@ -50,29 +53,24 @@ func getTLSConfig(redisURI *uri.URI, params map[string]string) (*tls.Config, err
 		),
 	)
 
+	//could move this to the tlsconfig.
 	switch tlsConnectionType {
 	case comms.Disabled:
 		return nil, errTLSDisabled
 	case comms.Required:
-		return &tls.Config{InsecureSkipVerify: true}, nil //nolint:gosec //intended behavior
+		details.Apply(tlsconfig.WithTLSSkipVerify(true))
 	case comms.VerifyCA:
-		// in case if default values are set
-		details.Apply(tlsconfig.WithTLSCertFile(""), tlsconfig.WithTLSKeyFile(""))
-
-		tlsConfig, err := details.GetTLSConfig()
-		if err != nil {
-			return nil, errs.Wrap(err, "failed to get tls config")
-		}
-
-		return tlsConfig, nil
 	case comms.VerifyFull:
-		tlsConfig, err := details.GetTLSConfig()
-		if err != nil {
-			return nil, errs.Wrap(err, "failed to get tls config")
-		}
+		details.Apply(tlsconfig.WithTLSServerName(redisURI.Host()))
 
-		return tlsConfig, nil
 	default:
 		return nil, errs.New("unsupported TLS connection type: " + string(tlsConnectionType))
 	}
+
+	tlsConfig, err := details.GetTLSConfig()
+	if err != nil {
+		return nil, errs.Wrap(err, "failed to get tls config")
+	}
+
+	return tlsConfig, nil
 }
