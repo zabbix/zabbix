@@ -6679,6 +6679,15 @@ z-select[disabled] .focusable, input[disabled], textarea[disabled], select optio
   display: flex;
   flex-wrap: wrap;
   gap: 2px 3px; }
+  @media screen and (min-width: 1200px) {
+    .tags-wrapper {
+      max-width: 266px; } }
+  @media screen and (min-width: 1400px) {
+    .tags-wrapper {
+      max-width: 359px; } }
+  @media screen and (min-width: 1600px) {
+    .tags-wrapper {
+      max-width: 452px; } }
 
 .tag {
   display: inline-block;

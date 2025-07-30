@@ -1666,7 +1666,7 @@ class CScreenProblem extends CScreenBase {
 					: zbx_date2age($problem['clock']),
 				$problem_update_link,
 				makeEventActionsIcons($problem['eventid'], $data['actions'], $data['users'], $is_acknowledged),
-				$data['filter']['show_tags'] ? $data['tags'][$problem['eventid']] : null
+				$data['filter']['show_tags'] ? (new CDiv($data['tags'][$problem['eventid']]))->addClass(ZBX_STYLE_TAGS_WRAPPER) : null
 			]);
 
 			// Add table row.

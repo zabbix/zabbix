@@ -2506,6 +2506,17 @@ button {
   @media screen and (min-width: 1600px) {
     .list-table thead th.column-tags-3 {
       width: 452px; } }
+.list-table .tags-wrapper {
+  width: 124px; }
+  @media screen and (min-width: 1200px) {
+    .list-table .tags-wrapper {
+      width: 186px; } }
+  @media screen and (min-width: 1400px) {
+    .list-table .tags-wrapper {
+      width: 248px; } }
+  @media screen and (min-width: 1600px) {
+    .list-table .tags-wrapper {
+      width: 310px; } }
 .list-table.compact-view .tag {
   max-width: 40px; }
   @media screen and (min-width: 1200px) {

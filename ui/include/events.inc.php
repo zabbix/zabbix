@@ -168,7 +168,7 @@ function make_event_details(array $event, array $allowed) {
 	$tags = makeTags([$event]);
 
 	$table
-		->addRow([_('Tags'), $tags[$event['eventid']]])
+		->addRow([_('Tags'), (new CDiv($tags[$event['eventid']]))->addClass(ZBX_STYLE_TAGS_WRAPPER)])
 		->addRow([_('Description'), (new CDiv(zbx_str2links($event['comments'])))->addClass(ZBX_STYLE_WORDBREAK)]);
 
 	if ($event['cause_eventid'] == 0) {
