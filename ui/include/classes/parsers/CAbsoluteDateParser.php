@@ -21,19 +21,15 @@ class CAbsoluteDateParser extends CParser {
 
 	/**
 	 * An error message if IP range is not valid.
-	 *
-	 * @var string
 	 */
-	private $error;
+	private string $error;
 
 	/**
 	 * Supported options:
 	 *   'min' => int  Min allowed UNIX timestamp;
 	 *   'max' => int  Max allowed UNIX timestamp;
-	 *
-	 * @var array
 	 */
-	private $options = [
+	private array $options = [
 		'min' => 0,
 		'max' => ZBX_MAX_DATE
 	];
