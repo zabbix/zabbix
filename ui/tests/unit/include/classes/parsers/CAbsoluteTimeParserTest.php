@@ -192,6 +192,78 @@ class CAbsoluteTimeParserTest extends TestCase {
 				'datetime' => ['values' => [null, null]]
 			],
 			[
+				'2018-02-30 12:45:34', 0, [],
+				[
+					'rc' => CParser::PARSE_FAIL,
+					'match' => ''
+				],
+				'datetime' => ['values' => [null, null]]
+			],
+			[
+				'2018-11-31', 0, [],
+				[
+					'rc' => CParser::PARSE_FAIL,
+					'match' => ''
+				],
+				'datetime' => ['values' => [null, null]]
+			],
+			[
+				'2018-11-01 23:59:61', 0, [],
+				[
+					'rc' => CParser::PARSE_FAIL,
+					'match' => ''
+				],
+				'datetime' => ['values' => [null, null]]
+			],
+			[
+				'2018-11-01 23:72:00', 0, [],
+				[
+					'rc' => CParser::PARSE_FAIL,
+					'match' => ''
+				],
+				'datetime' => ['values' => [null, null]]
+			],
+			[
+				'2018-11-01 24:00:00', 0, [],
+				[
+					'rc' => CParser::PARSE_FAIL,
+					'match' => ''
+				],
+				'datetime' => ['values' => [null, null]]
+			],
+			[
+				'201', 0, [],
+				[
+					'rc' => CParser::PARSE_FAIL,
+					'match' => ''
+				],
+				'datetime' => ['values' => [null, null]]
+			],
+			[
+				'20', 0, [],
+				[
+					'rc' => CParser::PARSE_FAIL,
+					'match' => ''
+				],
+				'datetime' => ['values' => [null, null]]
+			],
+			[
+				'2', 0, [],
+				[
+					'rc' => CParser::PARSE_FAIL,
+					'match' => ''
+				],
+				'datetime' => ['values' => [null, null]]
+			],
+			[
+				'', 0, [],
+				[
+					'rc' => CParser::PARSE_FAIL,
+					'match' => ''
+				],
+				'datetime' => ['values' => [null, null]]
+			],
+			[
 				'2018-11-01 23:59:61', 0, [],
 				[
 					'rc' => CParser::PARSE_FAIL,
