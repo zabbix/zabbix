@@ -311,7 +311,7 @@ class CFormValidator {
 
 		if ((array_key_exists('decimal_limit', $result))
 				&& $result['type'] != 'float') {
-			throw new Exception('[RULES ERROR] Rule "max_decimal_point" is not compatible with type "'.$result['type'].'" (Path: '.$rule_path.')');
+			throw new Exception('[RULES ERROR] Rule "decimal_limit" is not compatible with type "'.$result['type'].'" (Path: '.$rule_path.')');
 		}
 
 		if (array_key_exists('length', $result) && $result['type'] !== 'string') {
@@ -877,6 +877,7 @@ class CFormValidator {
 	 * @param array  $rules['in']         (optional) allowed ranges or list of allowed values.
 	 * @param int    $rules['min']        (optional) minimal allowed value length.
 	 * @param int    $rules['max']        (optional) maximum allowed value length.
+	 * @param int    $rules['decimal_limit']
 	 * @param array  $rules['messages']   (optional) Error messages to use when some check fails.
 	 * @param mixed  $value
 	 * @param string $error
