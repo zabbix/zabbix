@@ -6304,7 +6304,7 @@ static int	lld_check_prototype_groupname(const char *groupname, char **error)
 
 	if (0 == lld_macro_num)
 	{
-		*error = zbx_strdup(NULL, "name does not contain LLD macro");
+		*error = zbx_strdup(NULL, "name does not contain LLD macro(s)");
 		return FAIL;
 	}
 

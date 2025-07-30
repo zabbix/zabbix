@@ -208,7 +208,7 @@ int	zbx_check_prototype_hostname(const char *hostname, char **error)
 
 	if (0 == lld_macro_num)
 	{
-		*error = zbx_strdup(NULL, "name does not contain LLD macro");
+		*error = zbx_strdup(NULL, "name does not contain LLD macro(s)");
 		return FAIL;
 	}
 

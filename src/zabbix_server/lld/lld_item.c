@@ -1134,11 +1134,30 @@ static void	lld_validate_item_field(zbx_lld_item_full_t *item, char **field, cha
 		switch (flag)
 		{
 			case ZBX_FLAG_LLD_ITEM_UPDATE_NAME:
-				if ('\0' != **field)
-					return;
-
-				lld_item_add_error(item, error, "name is empty");
-				break;
+				if ('\0' == **field)
+				{
+					lld_item_add_error(item, error, "name is empty");
+					break;
+				}
+				if (0 != (item->item_flags & ZBX_FLAG_DISCOVERY_PROTOTYPE))
+				{
+					if (SUCCEED != lld_text_has_lld_macro(*field))
+					{
+						lld_item_add_error(item, error, "name does not contain LLD macro");
+						break;
+					}
+				}
+				return;
+			case ZBX_FLAG_LLD_ITEM_UPDATE_KEY:
+				if (0 != (item->item_flags & ZBX_FLAG_DISCOVERY_PROTOTYPE))
+				{
+					if (SUCCEED != lld_text_has_lld_macro(*field))
+					{
+						lld_item_add_error(item, error, "key does not contain LLD macro");
+						break;
+					}
+				}
+				return;
 			case ZBX_FLAG_LLD_ITEM_UPDATE_DELAY:
 				switch (item->type)
 				{
