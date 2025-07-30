@@ -36,7 +36,7 @@ var _ plugin.Exporter = (*Plugin)(nil)
 // Plugin inherits plugin.Base and store plugin-specific data.
 type Plugin struct {
 	plugin.Base
-	connMgr *conn.ConnManager
+	connMgr *conn.Manager
 	options pluginOptions
 }
 
@@ -85,7 +85,8 @@ func (p *Plugin) Export(key string, rawParams []string, _ plugin.ContextProvider
 
 // Start implements the Runner interface and performs initialization when plugin is activated.
 func (p *Plugin) Start() {
-	p.connMgr = conn.NewConnManager(
+	p.connMgr = conn.NewManager(
+		p.Logger,
 		time.Duration(p.options.KeepAlive)*time.Second,
 		time.Duration(p.options.Timeout)*time.Second,
 		conn.HouseKeeperInterval*time.Second,

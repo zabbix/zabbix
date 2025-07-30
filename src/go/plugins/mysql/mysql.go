@@ -23,7 +23,7 @@ import (
 	"golang.zabbix.com/sdk/errs"
 	"golang.zabbix.com/sdk/metric"
 	"golang.zabbix.com/sdk/plugin"
-	sdkuri "golang.zabbix.com/sdk/uri"
+	"golang.zabbix.com/sdk/uri"
 	"golang.zabbix.com/sdk/zbxerr"
 )
 
@@ -59,7 +59,7 @@ func (p *Plugin) Export(key string, rawParams []string, _ plugin.ContextProvider
 		return nil, zbxerr.ErrorInvalidParams.Wrap(err)
 	}
 
-	uri, err := sdkuri.NewWithCreds(params["URI"], params["User"], params["Password"], uriDefaults)
+	uri, err := uri.NewWithCreds(params["URI"], params["User"], params["Password"], uriDefaults)
 	if err != nil {
 		return nil, zbxerr.ErrorInvalidParams.Wrap(err)
 	}

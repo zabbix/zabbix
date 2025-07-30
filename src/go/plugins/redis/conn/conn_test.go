@@ -20,11 +20,14 @@ import (
 	"time"
 
 	"github.com/mediocregopher/radix/v3"
+	"golang.zabbix.com/sdk/log"
 	"golang.zabbix.com/sdk/uri"
 )
 
+var unitLogger = log.New("unit test logger")
+
 func TestConnManager_closeUnused(t *testing.T) {
-	connMgr := NewConnManager(1*time.Microsecond, 30*time.Second, HouseKeeperInterval*time.Second)
+	connMgr := NewManager(unitLogger, 1*time.Microsecond, 30*time.Second, HouseKeeperInterval*time.Second)
 	defer connMgr.Destroy()
 
 	u, _ := uri.New("tcp://127.0.0.1", nil)
@@ -40,7 +43,7 @@ func TestConnManager_closeUnused(t *testing.T) {
 }
 
 func TestConnManager_closeAll(t *testing.T) {
-	connMgr := NewConnManager(300*time.Second, 30*time.Second, HouseKeeperInterval*time.Second)
+	connMgr := NewManager(unitLogger, 300*time.Second, 30*time.Second, HouseKeeperInterval*time.Second)
 	defer connMgr.Destroy()
 
 	u, _ := uri.New("tcp://127.0.0.1", nil)
@@ -58,13 +61,10 @@ func TestConnManager_closeAll(t *testing.T) {
 func TestConnManager_create(t *testing.T) {
 	u, _ := uri.New("tcp://127.0.0.1", nil)
 
-	connMgr := NewConnManager(300*time.Second, 30*time.Second, HouseKeeperInterval*time.Second)
+	connMgr := NewManager(unitLogger, 300*time.Second, 30*time.Second, HouseKeeperInterval*time.Second)
 	defer connMgr.Destroy()
 
-	connMgr.connections[u] = &RedisConn{
-		client:         radix.Stub("", "", nil),
-		lastTimeAccess: time.Now(),
-	}
+	connMgr.connections[u] = NewRedisConn(radix.Stub("", "", nil))
 
 	type args struct {
 		uri *uri.URI
@@ -72,7 +72,7 @@ func TestConnManager_create(t *testing.T) {
 
 	tests := []struct {
 		name      string
-		c         *ConnManager
+		c         *Manager
 		args      args
 		want      *RedisConn
 		wantErr   bool
@@ -93,7 +93,7 @@ func TestConnManager_create(t *testing.T) {
 			if tt.wantPanic {
 				defer func() {
 					if r := recover(); r == nil {
-						t.Error("ConnManager.create() must panic with runtime error")
+						t.Error("Manager.create() must panic with runtime error")
 					}
 				}()
 			}
@@ -101,13 +101,13 @@ func TestConnManager_create(t *testing.T) {
 			got, err := tt.c.create(tt.args.uri, map[string]string{})
 
 			if (err != nil) != tt.wantErr {
-				t.Errorf("ConnManager.create() error = %v, wantErr %v", err, tt.wantErr)
+				t.Errorf("Manager.create() error = %v, wantErr %v", err, tt.wantErr)
 
 				return
 			}
 
 			if reflect.TypeOf(got) != reflect.TypeOf(tt.want) {
-				t.Errorf("ConnManager.create() = %v, want %v", got, tt.want)
+				t.Errorf("Manager.create() = %v, want %v", got, tt.want)
 			}
 		})
 	}
@@ -116,12 +116,12 @@ func TestConnManager_create(t *testing.T) {
 func TestConnManager_get(t *testing.T) {
 	u, _ := uri.New("tcp://127.0.0.1", nil)
 
-	connMgr := NewConnManager(300*time.Second, 30*time.Second, HouseKeeperInterval*time.Second)
+	connMgr := NewManager(unitLogger, 300*time.Second, 30*time.Second, HouseKeeperInterval*time.Second)
 	defer connMgr.Destroy()
 
 	t.Run("Should return nil if connection does not exist", func(t *testing.T) {
 		if got := connMgr.get(u); got != nil {
-			t.Errorf("ConnManager.get() = %v, want <nil>", got)
+			t.Errorf("Manager.get() = %v, want <nil>", got)
 		}
 	})
 
@@ -136,7 +136,7 @@ func TestConnManager_get(t *testing.T) {
 	t.Run("Should return connection if it exists", func(t *testing.T) {
 		got := connMgr.get(u)
 		if !reflect.DeepEqual(got, conn) {
-			t.Errorf("ConnManager.get() = %v, want %v", got, conn)
+			t.Errorf("Manager.get() = %v, want %v", got, conn)
 		}
 
 		if lastTimeAccess == got.lastTimeAccess {
