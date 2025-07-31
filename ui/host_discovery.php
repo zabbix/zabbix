@@ -920,6 +920,7 @@ else {
 		'selectHostPrototypes' => API_OUTPUT_COUNT,
 		'selectDiscoveryRulePrototypes' => API_OUTPUT_COUNT,
 		'selectDiscoveryRule' => ['itemid', 'name'],
+		'selectDiscoveryData' => ['status', 'ts_delete', 'ts_disable', 'disable_source'],
 		'editable' => true,
 		'templated' => ($data['context'] === 'template'),
 		'filter' => [],
