@@ -28,152 +28,133 @@ class CAbsoluteDateParserTest extends TestCase {
 				[
 					'rc' => CParser::PARSE_SUCCESS,
 					'match' => '2025-04-15'
-				],
-				'datetime' => ['values' => ['2025-04-15', '2025-04-15']]
+				]
 			],
 			[
 				'2025-04-5', 0, [],
 				[
 					'rc' => CParser::PARSE_SUCCESS,
 					'match' => '2025-04-5'
-				],
-				'datetime' => ['values' => ['2025-04-05', '2025-04-05']]
+				]
 			],
 			[
 				'2025-04-05', 0, [],
 				[
 					'rc' => CParser::PARSE_SUCCESS,
 					'match' => '2025-04-05'
-				],
-				'datetime' => ['values' => ['2025-04-05', '2025-04-05']]
+				]
 			],
 			[
 				'2025-4-5', 0, [],
 				[
 					'rc' => CParser::PARSE_SUCCESS,
 					'match' => '2025-4-5'
-				],
-				'datetime' => ['values' => ['2025-04-05', '2025-04-05']]
+				]
 			],
 			[
 				'2025-01', 0, [],
 				[
 					'rc' => CParser::PARSE_SUCCESS,
 					'match' => '2025-01'
-				],
-				'datetime' => ['values' => ['2025-01-01', '2025-01-01']]
+				]
 			],
 			[
 				'2025-3', 0, [],
 				[
 					'rc' => CParser::PARSE_SUCCESS,
 					'match' => '2025-3'
-				],
-				'datetime' => ['values' => ['2025-03-01', '2025-03-01']]
+				]
 			],
 			[
 				'2025', 0, [],
 				[
 					'rc' => CParser::PARSE_SUCCESS,
 					'match' => '2025'
-				],
-				'datetime' => ['values' => ['2025-01-01', '2025-01-01']]
+				]
 			],
 			[
 				'2025-04-15', 0, ['min' => 10, 'max' => ZBX_MAX_DATE],
 				[
 					'rc' => CParser::PARSE_SUCCESS,
 					'match' => '2025-04-15'
-				],
-				'datetime' => ['values' => ['2025-04-15', '2025-04-15']]
+				]
 			],
 			[
 				'2025-04-15', 0, ['min' => 10, 'max' => 1744578000],
 				[
 					'rc' => CParser::PARSE_FAIL,
 					'match' => ''
-				],
-				'datetime' => ['values' => [null, null]]
+				]
 			],
 			[
 				'2037-04-15', 0, ['min' => ZBX_MAX_DATE],
 				[
 					'rc' => CParser::PARSE_FAIL,
 					'match' => ''
-				],
-				'datetime' => ['values' => [null, null]]
+				]
 			],
 			[
 				'1950-04-15', 0, [],
 				[
 					'rc' => CParser::PARSE_FAIL,
 					'match' => ''
-				],
-				'datetime' => ['values' => [null, null]]
+				]
 			],
 			[
 				'text', 0, [],
 				[
 					'rc' => CParser::PARSE_FAIL,
 					'match' => ''
-				],
-				'datetime' => ['values' => [null, null]]
+				]
 			],
 			[
 				'2025-02-30 12:45:34', 0, [],
 				[
 					'rc' => CParser::PARSE_FAIL,
 					'match' => ''
-				],
-				'datetime' => ['values' => [null, null]]
+				]
 			],
 			[
 				'2025-11-01 aaa', 0, [],
 				[
 					'rc' => CParser::PARSE_FAIL,
 					'match' => ''
-				],
-				'datetime' => ['values' => [null, null]]
+				]
 			],
 			[
 				'2055-11-01', 0, [],
 				[
 					'rc' => CParser::PARSE_FAIL,
 					'match' => ''
-				],
-				'datetime' => ['values' => [null, null]]
+				]
 			],
 			[
 				'202', 0, [],
 				[
 					'rc' => CParser::PARSE_FAIL,
 					'match' => ''
-				],
-				'datetime' => ['values' => [null, null]]
+				]
 			],
 			[
 				'20', 0, [],
 				[
 					'rc' => CParser::PARSE_FAIL,
 					'match' => ''
-				],
-				'datetime' => ['values' => [null, null]]
+				]
 			],
 			[
 				'2', 0, [],
 				[
 					'rc' => CParser::PARSE_FAIL,
 					'match' => ''
-				],
-				'datetime' => ['values' => [null, null]]
+				]
 			],
 			[
 				'', 0, [],
 				[
 					'rc' => CParser::PARSE_FAIL,
 					'match' => ''
-				],
-				'datetime' => ['values' => [null, null]]
+				]
 			]
 		];
 	}
