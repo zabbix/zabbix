@@ -17,6 +17,10 @@ package zbxlib
 /* cspell:disable */
 
 /*
+#cgo LDFLAGS: -Wl,--start-group
+#cgo pcre2 LDFLAGS: -lz -lpcre2-8 -lresolv
+#cgo LDFLAGS: -Wl,--end-group
+
 #include "zbxsysinfo.h"
 #include "zbxcomms.h"
 #include "zbxlog.h"
