@@ -108,7 +108,7 @@ class CFormValidator {
 
 					$db_field = substr($value, 8);
 
-					if (CSettingsSchema::getDbType($db_field) & (DB::FIELD_TYPE_CHAR | DB::FIELD_TYPE_TEXT)) {
+					if (CSettingsSchema::getDbType($db_field) & DB::FIELD_TYPE_CHAR) {
 						if (array_key_exists('length', $result)) {
 							throw new Exception('[RULES ERROR] Rule "length" is specified multiple times (Path: '.$rule_path.')');
 						}
