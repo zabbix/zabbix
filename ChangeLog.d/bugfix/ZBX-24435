@@ -1,1 +1,0 @@
-..F....... [ZBX-24435] fixed slow query when selecting more than 950 ids on PostgreSQL (vso)

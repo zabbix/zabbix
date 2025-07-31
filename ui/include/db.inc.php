@@ -713,11 +713,7 @@ function dbConditionInt($field_name, array $values, $not_in = false, $zero_inclu
 
 	// Process individual values.
 
-	if ($DB['TYPE'] == ZBX_DB_POSTGRESQL) {
-		$single_chunks = [$singles];
-	} else {
-		$single_chunks = array_chunk($singles, $MAX_NUM_IN);
-	}
+	$single_chunks = array_chunk($singles, $MAX_NUM_IN);
 
 	foreach ($single_chunks as $chunk) {
 		if ($condition !== '') {
