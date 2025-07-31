@@ -17,32 +17,44 @@
 class CControllerPopupSlaExcludedDowntimeEdit extends CController {
 
 	protected function init() {
-		$this->setInputValidationMethod(self::INPUT_VALIDATION_FORM);
 		$this->disableCsrfValidation();
 	}
 
-	private static function getValidationRules() {
-		return ['objects', 'fields' => [
-			'edit' => ['integer', 'in' => ['0', '1']],
-			'row_index' => ['integer', 'required'],
-			'name' => ['string'],
-			'period_from' => ['db sla_excluded_downtime.period_from'],
-			'period_to' => ['db sla_excluded_downtime.period_to']
-		]];
-	}
-
 	protected function checkInput(): bool {
-		$ret = $this->validateInput(self::getValidationRules());
+		$fields = [
+			'edit' => 			'in 1',
+			'row_index' =>		'required|int32',
+			'name' =>			'string',
+			'period_from' =>	'uint64',
+			'period_to' =>		'uint64'
+		];
+
+		$ret = $this->validateInput($fields);
+
+		if ($ret && $this->hasInput('edit')) {
+			$fields = [
+				'name' =>			'required',
+				'period_from' =>	'required',
+				'period_to' =>		'required'
+			];
+
+			$validator = new CNewValidator(array_intersect_key($this->getInputAll(), $fields), $fields);
+
+			foreach ($validator->getAllErrors() as $error) {
+				info($error);
+			}
+
+			$ret = !$validator->isErrorFatal() && !$validator->isError();
+		}
 
 		if (!$ret) {
-			$form_errors = $this->getValidationError();
-			$response = $form_errors
-				? ['form_errors' => $form_errors]
-				: ['error' => [
-					'messages' => array_column(get_and_clear_messages(), 'message')
-				]];
-
-			(new CControllerResponseData(['main_block' => json_encode($response)]))->disableView();
+			$this->setResponse(
+				(new CControllerResponseData(['main_block' => json_encode([
+					'error' => [
+						'messages' => array_column(get_and_clear_messages(), 'message')
+					]
+				])]))->disableView()
+			);
 		}
 
 		return $ret;
