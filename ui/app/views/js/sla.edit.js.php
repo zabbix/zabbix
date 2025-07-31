@@ -217,7 +217,8 @@ window.sla_edit_popup = new class {
 
 				this._post(curl.getUrl(), fields, (response) => {
 					if ('form_errors' in response) {
-						this.form.renderErrors(response.form_errors, true, true);
+						this.form.setErrors(response.form_errors, true, true);
+						this.form.renderErrors();
 
 						return;
 					}

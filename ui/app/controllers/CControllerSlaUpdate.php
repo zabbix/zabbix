@@ -116,7 +116,7 @@ class CControllerSlaUpdate extends CController {
 			$response = $form_errors
 				? ['form_errors' => $form_errors]
 				: ['error' => [
-					'title' => _('Cannot create SLA'),
+					'title' => _('Cannot update SLA'),
 					'messages' => array_column(get_and_clear_messages(), 'message')
 				]];
 

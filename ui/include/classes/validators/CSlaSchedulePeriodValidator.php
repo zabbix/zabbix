@@ -17,6 +17,7 @@
 class CSlaSchedulePeriodValidator extends CValidator {
 
 	public function validate($value) {
+		$result = [];
 		$value = trim($value);
 
 		foreach (explode(',', $value) as $schedule_period) {
