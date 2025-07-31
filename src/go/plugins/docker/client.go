@@ -21,33 +21,69 @@ import (
 	"net"
 	"net/http"
 	"path"
+	"strings"
 	"time"
 
 	"golang.zabbix.com/sdk/zbxerr"
 )
 
+const (
+	UnixSocket = 0
+	TCP        = 1
+)
+
 type client struct {
-	client http.Client
+	client         http.Client
+	connectionType int
+	tcpEndpoint    string
 }
 
-func newClient(socketPath string, timeout int) *client {
-	transport := &http.Transport{
-		DialContext: func(_ context.Context, _, _ string) (net.Conn, error) {
-			return net.Dial("unix", socketPath)
-		},
+func newClient(endpoint string, timeout int) *client {
+	var transport http.RoundTripper
+	var connectionType int
+	var tcpEndpoint string
+
+	if strings.HasPrefix(endpoint, "unix://") {
+		socketPath := strings.TrimPrefix(endpoint, "unix://")
+		transport = &http.Transport{
+			DialContext: func(_ context.Context, _, _ string) (net.Conn, error) {
+				return net.Dial("unix", socketPath)
+			},
+		}
+		connectionType = UnixSocket
+	} else if strings.HasPrefix(endpoint, "tcp://") {
+		tcpAddress := strings.TrimPrefix(endpoint, "tcp://")
+		transport = &http.Transport{
+			DialContext: func(_ context.Context, _, _ string) (net.Conn, error) {
+				return net.Dial("tcp", tcpAddress)
+			},
+		}
+		connectionType = TCP
+		tcpEndpoint = tcpAddress
 	}
 
-	client := client{}
-	client.client = http.Client{
-		Transport: transport,
-		Timeout:   time.Duration(timeout) * time.Second,
+	client := client{
+		client: http.Client{
+			Transport: transport,
+			Timeout:   time.Duration(timeout) * time.Second,
+		},
+		connectionType: connectionType,
+		tcpEndpoint:    tcpEndpoint,
 	}
 
 	return &client
 }
 
 func (cli *client) Query(queryPath string) ([]byte, error) {
-	resp, err := cli.client.Get("http://" + path.Join(dockerVersion, queryPath))
+	var resp *http.Response
+	var err error
+
+	if cli.connectionType == UnixSocket {
+		resp, err = cli.client.Get("http://" + path.Join(dockerVersion, queryPath))
+	} else if cli.connectionType == TCP {
+		resp, err = cli.client.Get("http://" + path.Join(cli.tcpEndpoint, queryPath))
+	}
+
 	if err != nil {
 		return nil, zbxerr.ErrorCannotFetchData.Wrap(err)
 	}
