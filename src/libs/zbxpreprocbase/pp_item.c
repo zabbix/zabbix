@@ -48,6 +48,11 @@ zbx_pp_item_preproc_t	*zbx_pp_item_preproc_create(zbx_uint64_t hostid, unsigned 
 	preproc->history_cache = NULL;
 	preproc->history_num = 0;
 
+	preproc->values_num = 0;
+	preproc->values_sz = 0;
+	preproc->time_ms = 0;
+	preproc->total_ms = 0;
+
 	preproc->mode = ZBX_PP_PROCESS_PARALLEL;
 
 	return preproc;
