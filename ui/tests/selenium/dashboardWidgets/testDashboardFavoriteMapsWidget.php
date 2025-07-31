@@ -47,7 +47,7 @@ class testDashboardFavoriteMapsWidget extends CWebTest {
 	protected static $update_widget;
 	const DELETE_WIDGET = 'Favorite maps widget to delete';
 	const CANCEL_WIDGET = 'Widget for testing cancel button';
-	
+
 	/**
 	 * SQL query to get widget and widget_field tables to compare hash values, but without widget_fieldid
 	 * because it can change.
@@ -126,7 +126,7 @@ class testDashboardFavoriteMapsWidget extends CWebTest {
 		]);
 		self::$mapid = $maps['sysmapids'][0];
 	}
-	
+
 	// Add to favorites
 	public function testDashboardFavoriteMapsWidget_AddFavoriteMap() {
 		$this->page->login()->open('sysmaps.php')->waitUntilReady();
@@ -355,7 +355,7 @@ class testDashboardFavoriteMapsWidget extends CWebTest {
 			' LEFT JOIN widget w ON w.widgetid=wf.widgetid'.
 			' WHERE w.name='.zbx_dbstr(self::DELETE_WIDGET)));
 	}
-	
+
 	public static function getCancelData() {
 		return [
 			// Cancel update widget.
@@ -517,7 +517,7 @@ class testDashboardFavoriteMapsWidget extends CWebTest {
 		$dashboard->save();
 		$this->page->waitUntilReady();
 		$this->assertMessage(TEST_GOOD, 'Dashboard updated');
-		
+
 		return $header;
 	}
 }
