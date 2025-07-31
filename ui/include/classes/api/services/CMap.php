@@ -896,14 +896,13 @@ class CMap extends CMapElement {
 				}
 
 				if ($label_name !== 'label_type') {
-					$max_label_name_length = DB::getFieldLength('sysmaps', $label_data['string']);
+					$label_string_length = DB::getFieldLength('sysmaps', $label_data['string']);
 
 					if (array_key_exists($label_data['string'], $map)
-							&& mb_strlen($map[$label_data['string']]) > $max_label_name_length) {
-						self::exception(ZBX_API_ERROR_PARAMETERS, _s(
-							'Incorrect value for field "%1$s": %2$s.',
-							$label_data['string'], _('value is too long')
-						));
+							&& mb_strlen($map[$label_data['string']]) > $label_string_length) {
+						self::exception(ZBX_API_ERROR_PARAMETERS,
+							_s('Incorrect value for field "%1$s": %2$s.', $label_data['string'], _('value is too long'))
+						);
 					}
 				}
 
@@ -1381,14 +1380,13 @@ class CMap extends CMapElement {
 				}
 
 				if ($label_name !== 'label_type') {
-					$max_label_name_length = DB::getFieldLength('sysmaps', $labelData['string']);
+					$label_string_length = DB::getFieldLength('sysmaps', $labelData['string']);
 
 					if (array_key_exists($labelData['string'], $map)
-							&& mb_strlen($map[$labelData['string']]) > $max_label_name_length) {
-						self::exception(ZBX_API_ERROR_PARAMETERS, _s(
-							'Incorrect value for field "%1$s": %2$s.',
-							$labelData['string'], _('value is too long')
-						));
+							&& mb_strlen($map[$labelData['string']]) > $label_string_length) {
+						self::exception(ZBX_API_ERROR_PARAMETERS,
+							_s('Incorrect value for field "%1$s": %2$s.', $labelData['string'], _('value is too long'))
+						);
 					}
 				}
 
