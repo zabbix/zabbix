@@ -1029,8 +1029,8 @@ class CFormValidator {
 				// Some parsers may return empty string as error.
 				if ($error === '') {
 					$error = match ($class_name) {
-						CAbsoluteTimeParser::class => _('invalid date'),
-						CAbsoluteDateParser::class => _('invalid date'),
+						CAbsoluteTimeParser::class => _('Invalid date.'),
+						CAbsoluteDateParser::class => _('Invalid date.'),
 						default => _('Invalid string.')
 					};
 				}
