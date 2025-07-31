@@ -20294,6 +20294,10 @@ msgstr "프로세스 수. integer를 리턴."
 msgid "The parameter \"%1$s\" is missing from the user attributes."
 msgstr "사용자 속성에서 \"%1$s\" 매개변수가 누락되었습니다."
 
+#: app/views/popup.ldap.edit.php:101
+msgid "The previous password was cleared due to a host change. Please enter the new password."
+msgstr ""
+
 #: include/classes/core/CJsonRpc.php:206
 msgid "The received JSON is not a valid JSON-RPC request."
 msgstr "수신된 JSON은 유효한 JSON-RPC 요청이 아닙니다."

@@ -154,6 +154,8 @@ func (c *Connector) refreshActiveChecks() bool {
 			c.configRevision = 0
 		}
 
+		c.resultCache.EnableUpload(false)
+
 		if !reflect.DeepEqual(errs, c.lastActiveCheckErrors) {
 			for i := 0; i < len(errs); i++ {
 				log.Warningf("[%d] %s", c.clientID, errs[i])
@@ -185,6 +187,7 @@ func (c *Connector) refreshActiveChecks() bool {
 	if err != nil {
 		log.Errf("[%d] cannot parse list of active checks from [%s]: %s", c.clientID, c.address.Get(), err)
 
+		c.resultCache.EnableUpload(false)
 		return false
 	}
 

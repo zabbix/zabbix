@@ -94,7 +94,7 @@ You can also add additional context macro {$IIS.APPPOOL.MONITORED:<AppPoolName>}
 |IIS: The World Wide Web Publishing Service (W3SVC) is not running|<p>The World Wide Web Publishing Service (W3SVC) is not in the running state. IIS cannot start.</p>|`last(/IIS by Zabbix agent/service.info[W3SVC])<>0`|High|**Depends on**:<br><ul><li>IIS: Windows process Activation Service (WAS) is not running</li></ul>|
 |IIS: Windows process Activation Service (WAS) is not running|<p>Windows Process Activation Service (WAS) is not in the running state. IIS cannot start.</p>|`last(/IIS by Zabbix agent/service.info[WAS])<>0`|High||
 |IIS: Port {$IIS.PORT} is down||`last(/IIS by Zabbix agent/net.tcp.service[{$IIS.SERVICE},,{$IIS.PORT}])=0`|Average|**Manual close**: Yes<br>**Depends on**:<br><ul><li>IIS: The World Wide Web Publishing Service (W3SVC) is not running</li></ul>|
-|IIS: has been restarted|<p>Uptime is less than 10 minutes.</p>|`last(/IIS by Zabbix agent/perf_counter_en["\Web Service(_Total)\Service Uptime"])<10m`|Info|**Manual close**: Yes|
+|IIS: Service has been restarted|<p>Uptime is less than 10 minutes.</p>|`last(/IIS by Zabbix agent/perf_counter_en["\Web Service(_Total)\Service Uptime"])<10m`|Info|**Manual close**: Yes|
 
 ### LLD rule Application pools discovery
 
