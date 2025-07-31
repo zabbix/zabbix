@@ -786,7 +786,7 @@ function convertUnitsRaw(array $options): array {
  *
  * @return int|null  Decimal integer seconds or null on error.
  */
-function timeUnitToSeconds($time, $with_year = false) {
+function timeUnitToSeconds($time, $with_year = false): ?int {
 	$suffixes = $with_year ? ZBX_TIME_SUFFIXES_WITH_YEAR : ZBX_TIME_SUFFIXES;
 
 	if (!preg_match('/^'.ZBX_PREG_INT.'(?<suffix>['.$suffixes.'])?$/', $time, $matches)) {

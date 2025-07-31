@@ -101,27 +101,32 @@ class CLineGraphDraw extends CGraphDraw {
 	 * Add single item object to graph. If invalid 'delay' interval passed method will interrupt current request with
 	 * error message.
 	 *
-	 * @param array  $graph_item                   Array of graph item properties.
-	 * @param string $graph_item['itemid']         Item id.
-	 * @param string $graph_item['type']           Item type.
-	 * @param string $graph_item['name']           Item host display name.
-	 * @param string $graph_item['hostname']       Item hostname.
-	 * @param string $graph_item['key_']           Item key_ field value.
-	 * @param string $graph_item['value_type']     Item value type.
-	 * @param string $graph_item['history']        Item history field value.
-	 * @param string $graph_item['trends']         Item trends field value.
-	 * @param string $graph_item['delay']          Item delay.
-	 * @param string $graph_item['master_itemid']  Master item id for item of type ITEM_TYPE_DEPENDENT.
-	 * @param string $graph_item['units']          Item units value.
-	 * @param string $graph_item['hostid']         Item host id.
-	 * @param string $graph_item['hostname']       Item host name.
-	 * @param string $graph_item['color']          Item presentation color.
-	 * @param int    $graph_item['drawtype']       Item presentation draw type, could be one of
-	 *                                             GRAPH_ITEM_DRAWTYPE_* constants.
-	 * @param int    $graph_item['yaxisside']      Item axis side, could be one of GRAPH_YAXIS_SIDE_* constants.
-	 * @param int    $graph_item['calc_fnc']       Item calculation function, could be one of CALC_FNC_* constants.
-	 * @param int    $graph_item['calc_type']      Item graph presentation calculation type, GRAPH_ITEM_SIMPLE or
-	 *                                             GRAPH_ITEM_SUM.
+	 * @param array  $graph_item                               Array of graph item properties.
+	 * @param string $graph_item['itemid']                     Item id.
+	 * @param string $graph_item['type']                       Item type.
+	 * @param string $graph_item['name']                       Item host display name.
+	 * @param string $graph_item['hostname']                   Item hostname.
+	 * @param string $graph_item['key_']                       Item key_ field value.
+	 * @param string $graph_item['value_type']                 Item value type.
+	 * @param string $graph_item['history']                    Item history field value.
+	 * @param string $graph_item['trends']                     Item trends field value.
+	 * @param string $graph_item['delay']                      Item delay.
+	 * @param string $graph_item['master_itemid']              Master item id for item of type ITEM_TYPE_DEPENDENT.
+	 * @param string $graph_item['units']                      Item units value.
+	 * @param string $graph_item['hostid']                     Item host id.
+	 * @param string $graph_item['hostname']                   Item host name.
+	 * @param string $graph_item['color']                      Item presentation color.
+	 * @param int    $graph_item['drawtype']                   Item presentation draw type, could be one of
+	 *                                                         GRAPH_ITEM_DRAWTYPE_* constants.
+	 * @param int    $graph_item['yaxisside']                  Item axis side, could be one of GRAPH_YAXIS_SIDE_*
+	 *                                                         constants.
+	 * @param int    $graph_item['calc_fnc']                   Item calculation function, could be one of CALC_FNC_*
+	 *                                                         constants.
+	 * @param int    $graph_item['calc_type']                  Item graph presentation calculation type,
+	 *                                                         GRAPH_ITEM_SIMPLE or GRAPH_ITEM_SUM.
+	 * @param array  $graph_item['preprocessing']              Item preprocessing steps.
+	 * @param string $graph_item['preprocessing'][]['type']    Item preprocessing step type.
+	 * @param string $graph_item['preprocessing'][]['params']  Item preprocessing step parameters.
 	 */
 	public function addItem(array $graph_item) {
 		if ($this->type == GRAPH_TYPE_STACKED) {
@@ -2021,51 +2026,51 @@ class CLineGraphDraw extends CGraphDraw {
 	 * Expands graph item objects data: macros in item name, time units, dependent item
 	 */
 	private function expandItems() {
-		$items_cache = zbx_toHash($this->items, 'itemid');
-		$items = $this->items;
-
-		do {
-			$master_itemids = [];
-
-			foreach ($items as $item) {
-				if ($item['type'] == ITEM_TYPE_DEPENDENT && !array_key_exists($item['master_itemid'], $items_cache)) {
-					$master_itemids[$item['master_itemid']] = true;
-				}
-				$items_cache[$item['itemid']] = $item;
-			}
-			$master_itemids = array_keys($master_itemids);
-
-			$items = API::Item()->get([
-				'output' => ['itemid', 'type', 'master_itemid', 'delay'],
-				'itemids' => $master_itemids,
-				'filter' => [
-					'flags' => [ZBX_FLAG_DISCOVERY_NORMAL, ZBX_FLAG_DISCOVERY_PROTOTYPE, ZBX_FLAG_DISCOVERY_CREATED]
-				]
-			]);
-		} while ($items);
-
-		$update_interval_parser = new CUpdateIntervalParser();
+		$master_itemids = [];
 
 		foreach ($this->items as &$graph_item) {
 			if ($graph_item['type'] == ITEM_TYPE_DEPENDENT) {
-				$master_item = $graph_item;
-
-				while ($master_item && $master_item['type'] == ITEM_TYPE_DEPENDENT) {
-					$master_item = $items_cache[$master_item['master_itemid']];
-				}
-				$graph_item['type'] = $master_item['type'];
-				$graph_item['delay'] = $master_item['delay'];
+				$master_itemids[$graph_item['master_itemid']] = true;
 			}
 
-			$graph_item = CMacrosResolverHelper::resolveTimeUnitMacros([$graph_item], ['delay'])[0];
+			$graph_item['throttling_type'] = 0;
+			$graph_item['throttling_delay'] = '';
 
-			$update_interval_parser->parse($graph_item['delay']);
-			$graph_item['delay'] = getItemDelay($update_interval_parser->getDelay(),
-				$update_interval_parser->getIntervals(ITEM_DELAY_FLEXIBLE)
-			);
+			foreach ($graph_item['preprocessing'] as $step) {
+				if ($step['type'] == ZBX_PREPROC_THROTTLE_VALUE || $step['type'] == ZBX_PREPROC_THROTTLE_TIMED_VALUE) {
+					$graph_item['throttling_type'] = $step['type'];
+					if ($step['type'] == ZBX_PREPROC_THROTTLE_TIMED_VALUE) {
+						$graph_item['throttling_delay'] = $step['params'];
+					}
 
-			$graph_item['has_scheduling_intervals']
-				= (bool) $update_interval_parser->getIntervals(ITEM_DELAY_SCHEDULING);
+					// Only one throttling step is allowed.
+					break;
+				}
+			}
+			unset($graph_item['preprocessing']);
+		}
+		unset($graph_item);
+
+		$master_items = self::getMasterItems(array_keys($master_itemids));
+
+		$master_items = CMacrosResolverHelper::resolveTimeUnitMacros($master_items, ['delay']);
+		$this->items = CMacrosResolverHelper::resolveTimeUnitMacros($this->items, ['delay', 'throttling_delay']);
+
+		foreach ($this->items as &$graph_item) {
+			if ($graph_item['type'] == ITEM_TYPE_DEPENDENT) {
+				$master_itemid = $graph_item['master_itemid'];
+
+				while ($master_items[$master_itemid]['type'] == ITEM_TYPE_DEPENDENT) {
+					$master_itemid = $master_items[$master_itemid]['master_itemid'];
+				}
+
+				// Throttling of the master item is not taken into account, as this configuration is unlikely.
+				$graph_item['type'] = $master_items[$master_itemid]['type'];
+				$graph_item['delay'] = $master_items[$master_itemid]['delay'];
+			}
+
+			$graph_item['delay'] = self::getItemMaxDelay($graph_item);
+			unset($graph_item['throttling_type'], $graph_item['throttling_delay']);
 
 			if (strpos($graph_item['units'], ',') === false) {
 				$graph_item['units_long'] = '';
@@ -2075,6 +2080,84 @@ class CLineGraphDraw extends CGraphDraw {
 			}
 		}
 		unset($graph_item);
+	}
+
+	/**
+	 * Returns an array of master items for the given array of item IDs.
+	 *
+	 * @param array  $master_itemids
+	 *
+	 * @return array
+	 */
+	private static function getMasterItems(array $master_itemids): array {
+		$master_items = [];
+
+		do {
+			$items = API::Item()->get([
+				'output' => ['itemid', 'hostid', 'type', 'master_itemid', 'delay'],
+				'itemids' => $master_itemids,
+				'filter' => [
+					'flags' => [ZBX_FLAG_DISCOVERY_NORMAL, ZBX_FLAG_DISCOVERY_PROTOTYPE, ZBX_FLAG_DISCOVERY_CREATED]
+				]
+			]);
+
+			$master_itemids = [];
+
+			foreach ($items as $item) {
+				if ($item['type'] == ITEM_TYPE_DEPENDENT && !array_key_exists($item['master_itemid'], $master_items)) {
+					$master_itemids[$item['master_itemid']] = true;
+				}
+				$master_items[$item['itemid']] = $item;
+			}
+			$master_itemids = array_keys($master_itemids);
+		} while ($master_itemids);
+
+		return $master_items;
+	}
+
+	/**
+	 * Returns the maximum item update interval based on the values of the "type", "delay", "throttling_type",
+	 * and "throttling_delay" fields. Returns NULL if the item type does not support an update interval,
+	 * if it has a preprocessing step "Discard unchanged", or if the interval cannot be calculated.
+	 *
+	 * @param array  $item
+	 *
+	 * @return int|null
+	 */
+	private static function getItemMaxDelay(array $item): ?int {
+		if (($item['type'] == ITEM_TYPE_ZABBIX_ACTIVE && preg_match('/^(event)?log(rt)?\[/', $item['key_']))
+				|| $item['type'] == ITEM_TYPE_TRAPPER) {
+			return null;
+		}
+
+		if ($item['throttling_type'] == ZBX_PREPROC_THROTTLE_VALUE) {
+			return null;
+		}
+
+		$update_interval_parser = new CUpdateIntervalParser();
+
+		if ($update_interval_parser->parse($item['delay']) != CParser::PARSE_SUCCESS) {
+			return null;
+		}
+
+		$delay = timeUnitToSeconds($update_interval_parser->getDelay());
+
+		foreach ($update_interval_parser->getIntervals(ITEM_DELAY_FLEXIBLE) as $flexible_interval) {
+			$flexible_interval_parts = explode('/', $flexible_interval);
+			$flexible_delay = timeUnitToSeconds($flexible_interval_parts[0]);
+
+			$delay = max($delay, $flexible_delay);
+		}
+
+		if ($item['throttling_type'] == ZBX_PREPROC_THROTTLE_TIMED_VALUE) {
+			if (($throttling_delay = timeUnitToSeconds($item['throttling_delay'])) === null) {
+				return null;
+			}
+
+			$delay = max($delay, $throttling_delay);
+		}
+
+		return $delay;
 	}
 
 	/**
@@ -2129,7 +2212,7 @@ class CLineGraphDraw extends CGraphDraw {
 
 		// Correct item 'delay' field value when graph data requested for trends.
 		foreach ($this->items as &$item) {
-			if ($item['source'] === 'trends' && (!$item['has_scheduling_intervals'] || $item['delay'] != 0)) {
+			if ($item['source'] === 'trends' && $item['delay'] !== null) {
 				$item['delay'] = max($item['delay'], ZBX_MAX_TREND_DIFF);
 			}
 		}
@@ -2160,10 +2243,7 @@ class CLineGraphDraw extends CGraphDraw {
 
 				$delay = $this->items[$item]['delay'];
 
-				if ($this->items[$item]['type'] == ITEM_TYPE_TRAPPER
-						|| ($this->items[$item]['type'] == ITEM_TYPE_ZABBIX_ACTIVE
-							&& preg_match('/^(event)?log(rt)?\[/', $this->items[$item]['key_']))
-						|| ($this->items[$item]['has_scheduling_intervals'] && $delay == 0)) {
+				if ($delay === null) {
 					$draw = true;
 				}
 				else {
