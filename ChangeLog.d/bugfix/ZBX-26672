@@ -1,1 +1,1 @@
-..F....... [ZBX-26672] refactor graph item popup to use same property settings on edit/add (gberzina)
+..F....... [ZBX-26672] fixed to prevent selecting another host in template graph (gberzina)
