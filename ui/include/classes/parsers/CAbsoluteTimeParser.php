@@ -20,11 +20,10 @@
 class CAbsoluteTimeParser extends CParser {
 
 	/**
-	 * Full date in "YYYY-MM-DD hh:mm:ss" format.
+	 * Date and time in "YYYY-MM-DD hh:mm:ss" format.
 	 */
 	private string $date;
 	private array $tokens;
-	private string $error;
 
 	/**
 	 * Parse the given period.
@@ -37,13 +36,10 @@ class CAbsoluteTimeParser extends CParser {
 		$this->length = 0;
 		$this->match = '';
 		$this->date = '';
-		$this->error = '';
 
 		$p = $pos;
 
 		if (!$this->parseAbsoluteTime($source, $p)) {
-			$this->error = _('invalid date');
-
 			return self::PARSE_FAIL;
 		}
 
@@ -88,13 +84,7 @@ class CAbsoluteTimeParser extends CParser {
 
 		$datetime = date_create($date);
 
-		if ($datetime === false) {
-			return false;
-		}
-
-		$datetime_errors = $datetime->getLastErrors();
-
-		if ($datetime_errors !== false && $datetime_errors['warning_count'] != 0) {
+		if ($datetime === false || $datetime->getLastErrors() !== false) {
 			return false;
 		}
 
@@ -144,9 +134,5 @@ class CAbsoluteTimeParser extends CParser {
 		}
 
 		return $date;
-	}
-
-	public function getError(): string {
-		return $this->error;
 	}
 }

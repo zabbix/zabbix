@@ -20,26 +20,9 @@
 class CAbsoluteDateParser extends CParser {
 
 	/**
-	 * An error message if IP range is not valid.
+	 * Date in "YYYY-MM-DD" format.
 	 */
-	private string $error;
-
-	/**
-	 * Supported options:
-	 *   'min' => int  Min allowed UNIX timestamp;
-	 *   'max' => int  Max allowed UNIX timestamp;
-	 */
-	private array $options = [
-		'min' => 0,
-		'max' => ZBX_MAX_DATE
-	];
-
-	/**
-	 * @param array $options
-	 */
-	public function __construct(array $options = []) {
-		$this->options = $options + $this->options;
-	}
+	private string $date = '';
 
 	/**
 	 * Parse the given date.
@@ -48,7 +31,6 @@ class CAbsoluteDateParser extends CParser {
 	 * @param int    $pos     Position offset.
 	 */
 	public function parse($source, $pos = 0) {
-		$this->error = _('invalid date');
 		$this->length = 0;
 		$this->match = '';
 
@@ -66,30 +48,22 @@ class CAbsoluteDateParser extends CParser {
 		$date = sprintf('%04d-%02d-%02d', $matches['Y'], $matches['m'], $matches['d']);
 		$datetime = date_create($date);
 
-		if ($datetime === false) {
+		if ($datetime === false || $datetime->getLastErrors() !== false) {
 			return self::PARSE_FAIL;
 		}
 
-		$datetime_errors = $datetime->getLastErrors();
-
-		if ($datetime_errors !== false && $datetime_errors['warning_count'] != 0) {
-			return self::PARSE_FAIL;
-		}
-
-		$unix_time = strtotime($date);
-
-		if ($unix_time >= $this->options['max'] || $unix_time <= $this->options['min']) {
-			$this->error = _('date is outside the allowed range');
-			return self::PARSE_FAIL;
-		}
-
+		$this->date = $date;
 		$this->match = $subject;
 		$this->length = strlen($subject);
 
 		return self::PARSE_SUCCESS;
 	}
 
-	public function getError(): string {
-		return $this->error;
+	public function getDateTime(?DateTimeZone $timezone = null): ?DateTime {
+		if ($this->date === '') {
+			return null;
+		}
+
+		return new DateTime($this->date, $timezone);
 	}
 }

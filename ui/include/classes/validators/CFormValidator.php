@@ -1028,7 +1028,11 @@ class CFormValidator {
 
 				// Some parsers may return empty string as error.
 				if ($error === '') {
-					$error = _('Invalid string.');
+					$error = match ($class_name) {
+						CAbsoluteTimeParser::class => _('invalid date'),
+						CAbsoluteDateParser::class => _('invalid date'),
+						default => _('Invalid string.')
+					};
 				}
 			}
 		}
@@ -1061,6 +1065,17 @@ class CFormValidator {
 				if (array_key_exists('max', $more_options)
 						&& $instance->getDateTime(true)->getTimestamp() > $more_options['max']) {
 					$error = _s('Value must be smaller than %1$s.', date(ZBX_FULL_DATE_TIME, $more_options['max']));
+				}
+			}
+			elseif ($instance instanceof CAbsoluteDateParser) {
+				if (array_key_exists('min', $more_options)
+						&& $instance->getDateTime()->getTimestamp() < $more_options['min']) {
+					$error = _s('Value must be greater than %1$s.', date(ZBX_DATE, $more_options['min']));
+				}
+
+				if (array_key_exists('max', $more_options)
+						&& $instance->getDateTime()->getTimestamp() > $more_options['max']) {
+					$error = _s('Value must be smaller than %1$s.', date(ZBX_DATE, $more_options['max']));
 				}
 			}
 			elseif ($instance instanceof CSimpleIntervalParser) {

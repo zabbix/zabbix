@@ -18,139 +18,101 @@ use PHPUnit\Framework\TestCase;
 
 class CAbsoluteDateParserTest extends TestCase {
 
-	/**
-	 * An array of absolute times and parsed results.
-	 */
 	public static function dataProvider() {
 		return [
 			[
-				'2025-04-15', 0, [],
+				'2025-04-15', 0,
 				[
 					'rc' => CParser::PARSE_SUCCESS,
 					'match' => '2025-04-15'
 				]
 			],
 			[
-				'2025-04-5', 0, [],
+				'2025-04-5', 0,
 				[
 					'rc' => CParser::PARSE_SUCCESS,
 					'match' => '2025-04-5'
 				]
 			],
 			[
-				'2025-04-05', 0, [],
+				'2025-04-05', 0,
 				[
 					'rc' => CParser::PARSE_SUCCESS,
 					'match' => '2025-04-05'
 				]
 			],
 			[
-				'2025-4-5', 0, [],
+				'2025-4-5', 0,
 				[
 					'rc' => CParser::PARSE_SUCCESS,
 					'match' => '2025-4-5'
 				]
 			],
 			[
-				'2025-01', 0, [],
+				'2025-01', 0,
 				[
 					'rc' => CParser::PARSE_SUCCESS,
 					'match' => '2025-01'
 				]
 			],
 			[
-				'2025-3', 0, [],
+				'2025-3', 0,
 				[
 					'rc' => CParser::PARSE_SUCCESS,
 					'match' => '2025-3'
 				]
 			],
 			[
-				'2025', 0, [],
+				'2025', 0,
 				[
 					'rc' => CParser::PARSE_SUCCESS,
 					'match' => '2025'
 				]
 			],
 			[
-				'2025-04-15', 0, ['min' => 10, 'max' => ZBX_MAX_DATE],
-				[
-					'rc' => CParser::PARSE_SUCCESS,
-					'match' => '2025-04-15'
-				]
-			],
-			[
-				'2025-04-15', 0, ['min' => 10, 'max' => 1744578000],
+				'text', 0,
 				[
 					'rc' => CParser::PARSE_FAIL,
 					'match' => ''
 				]
 			],
 			[
-				'2037-04-15', 0, ['min' => ZBX_MAX_DATE],
+				'2025-02-30 12:45:34', 0,
 				[
 					'rc' => CParser::PARSE_FAIL,
 					'match' => ''
 				]
 			],
 			[
-				'1950-04-15', 0, [],
+				'2025-11-01 aaa', 0,
 				[
 					'rc' => CParser::PARSE_FAIL,
 					'match' => ''
 				]
 			],
 			[
-				'text', 0, [],
+				'202', 0,
 				[
 					'rc' => CParser::PARSE_FAIL,
 					'match' => ''
 				]
 			],
 			[
-				'2025-02-30 12:45:34', 0, [],
+				'20', 0,
 				[
 					'rc' => CParser::PARSE_FAIL,
 					'match' => ''
 				]
 			],
 			[
-				'2025-11-01 aaa', 0, [],
+				'2', 0,
 				[
 					'rc' => CParser::PARSE_FAIL,
 					'match' => ''
 				]
 			],
 			[
-				'2055-11-01', 0, [],
-				[
-					'rc' => CParser::PARSE_FAIL,
-					'match' => ''
-				]
-			],
-			[
-				'202', 0, [],
-				[
-					'rc' => CParser::PARSE_FAIL,
-					'match' => ''
-				]
-			],
-			[
-				'20', 0, [],
-				[
-					'rc' => CParser::PARSE_FAIL,
-					'match' => ''
-				]
-			],
-			[
-				'2', 0, [],
-				[
-					'rc' => CParser::PARSE_FAIL,
-					'match' => ''
-				]
-			],
-			[
-				'', 0, [],
+				'', 0,
 				[
 					'rc' => CParser::PARSE_FAIL,
 					'match' => ''
@@ -162,8 +124,8 @@ class CAbsoluteDateParserTest extends TestCase {
 	/**
 	 * @dataProvider dataProvider
 	 */
-	public function testParse(string $source, int $pos, array $options, array $expected) {
-		$parser = new CAbsoluteDateParser($options);
+	public function testParse(string $source, int $pos, array $expected) {
+		$parser = new CAbsoluteDateParser();
 
 		$this->assertSame($expected, [
 			'rc' => $parser->parse($source, $pos),
