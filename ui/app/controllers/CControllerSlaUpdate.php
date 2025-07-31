@@ -39,42 +39,42 @@ class CControllerSlaUpdate extends CController {
 				'fields' => [
 					'schedule_enabled_0' => ['integer', 'in 1'],
 					'schedule_period_0' => ['string', 'not_empty',
-						'use' => [CSlaSchedulePeriodParser::class, []],
+						'use' => [CSlaSchedulePeriodValidator::class, []],
 						'when' => ['schedule_enabled_0', 'in 1']
 					],
 					'schedule_enabled_1' => ['integer', 'in 1'],
 					'schedule_period_1' => ['string', 'not_empty',
-						'use' => [CSlaSchedulePeriodParser::class, []],
+						'use' => [CSlaSchedulePeriodValidator::class, []],
 						'when' => ['schedule_enabled_1', 'in 1']
 					],
 					'schedule_enabled_2' => ['integer', 'in 1'],
 					'schedule_period_2' => ['string', 'not_empty',
-						'use' => [CSlaSchedulePeriodParser::class, []],
+						'use' => [CSlaSchedulePeriodValidator::class, []],
 						'when' => ['schedule_enabled_2', 'in 1']
 					],
 					'schedule_enabled_3' => ['integer', 'in 1'],
 					'schedule_period_3' => ['string', 'not_empty',
-						'use' => [CSlaSchedulePeriodParser::class, []],
+						'use' => [CSlaSchedulePeriodValidator::class, []],
 						'when' => ['schedule_enabled_3', 'in 1']
 					],
 					'schedule_enabled_4' => ['integer', 'in 1'],
 					'schedule_period_4' => ['string', 'not_empty',
-						'use' => [CSlaSchedulePeriodParser::class, []],
+						'use' => [CSlaSchedulePeriodValidator::class, []],
 						'when' => ['schedule_enabled_4', 'in 1']
 					],
 					'schedule_enabled_5' => ['integer', 'in 1'],
 					'schedule_period_5' => ['string', 'not_empty',
-						'use' => [CSlaSchedulePeriodParser::class, []],
+						'use' => [CSlaSchedulePeriodValidator::class, []],
 						'when' => ['schedule_enabled_5', 'in 1']
 					],
 					'schedule_enabled_6' => ['integer', 'in 1'],
 					'schedule_period_6' => ['string', 'not_empty',
-						'use' => [CSlaSchedulePeriodParser::class, []],
+						'use' => [CSlaSchedulePeriodValidator::class, []],
 						'when' => ['schedule_enabled_6', 'in 1']
 					],
 					'schedule_enabled_7' => ['integer', 'in 1'],
 					'schedule_period_7' => ['string', 'not_empty',
-						'use' => [CSlaSchedulePeriodParser::class, []],
+						'use' => [CSlaSchedulePeriodValidator::class, []],
 						'when' => ['schedule_enabled_7', 'in 1']
 					]
 				],

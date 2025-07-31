@@ -14,32 +14,17 @@
 **/
 
 
-/**
- * A parser for time periods.
- */
-class CSlaSchedulePeriodParser extends CParser {
+class CSlaSchedulePeriodValidator extends CValidator {
 
-	private string $error;
+	public function validate($value) {
+		$value = trim($value);
 
-	/**
-	 * Parse the given period.
-	 *
-	 * @param string $source  Source string that needs to be parsed.
-	 * @param int    $pos     Position offset.
-	 */
-	public function parse($source, $pos = 0) {
-		$this->match = '';
-		$this->length = 0;
-		$this->error = '';
-
-		$source = trim($source);
-
-		foreach (explode(',', $source) as $schedule_period) {
+		foreach (explode(',', $value) as $schedule_period) {
 			if (!preg_match('/^\s*(?<from_h>\d{1,2}):(?<from_m>\d{2})\s*-\s*(?<to_h>\d{1,2}):(?<to_m>\d{2})\s*$/',
 					$schedule_period, $matches)) {
-				$this->error = _('a time period is expected');
+				$this->setError(_('a time period is expected'));
 
-				return self::PARSE_FAIL;
+				return false;
 			}
 
 			$from_h = $matches['from_h'];
@@ -51,15 +36,15 @@ class CSlaSchedulePeriodParser extends CParser {
 			$day_period_to = SEC_PER_HOUR * $to_h + SEC_PER_MIN * $to_m;
 
 			if ($from_m > 59 || $to_m > 59 || $day_period_to > SEC_PER_DAY) {
-				$this->error = _('a time period is expected');
+				$this->setError(_('a time period is expected'));
 
-				return self::PARSE_FAIL;
+				return false;
 			}
 
 			if ($day_period_from >= $day_period_to) {
-				$this->error = _('start time must be less than end time');
+				$this->setError(_('start time must be less than end time'));
 
-				return self::PARSE_FAIL;
+				return false;
 			}
 
 			// Validate period uniqueness.
@@ -69,19 +54,12 @@ class CSlaSchedulePeriodParser extends CParser {
 			];
 
 			if (count($result) !== count(array_unique(array_map('json_encode', $result)))) {
-				$this->error = _('periods must be unique');
+				$this->setError(_('periods must be unique'));
 
-				return self::PARSE_FAIL;
+				return false;
 			}
 		}
 
-		$this->match = substr($source, $pos, strlen($source));
-		$this->length = strlen($source) - $pos;
-
-		return self::PARSE_SUCCESS;
-	}
-
-	public function getError(): string {
-		return $this->error;
+		return true;
 	}
 }
