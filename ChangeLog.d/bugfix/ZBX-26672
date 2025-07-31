@@ -1,1 +1,1 @@
-..F....... [ZBX-26672] fixed to prevent selecting another host in template graph (gberzina)
+..F....... [ZBX-26672] fixed ability to select items from another host/template in template graph (gberzina)
