@@ -4,7 +4,7 @@ msgstr ""
 "Project-Id-Version: Zabbix 6.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2023-10-19 13:48+0300\n"
-"PO-Revision-Date: 2025-05-16 21:07+0000\n"
+"PO-Revision-Date: 2025-07-27 14:15+0000\n"
 "Last-Translator: ERIC <eric78.zabbix@orange.fr>\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
 "Language: fr\n"
@@ -19,7 +19,7 @@ msgstr ""
 #: include/classes/validators/CFormValidator.php:1397
 #: include/classes/validators/CFormValidator.php:1442 jsLoader.php:439
 msgid " or "
-msgstr ""
+msgstr "ou"
 
 #: app/controllers/CControllerSlaReportList.php:182
 #, c-format
@@ -379,7 +379,7 @@ msgstr "1 minute"
 
 #: app/views/host.wizard.edit.php:861
 msgid "1. Install Java Gateway on the same machine running Zabbix server by following the instructions in"
-msgstr ""
+msgstr "1. Installer la Java Gateway sur la même machine hébergeant le serveur Zabbix en suivant les instructions de"
 
 #: app/views/administration.queue.overview.php:48
 #: app/views/administration.queue.overview.proxy.php:48
@@ -393,7 +393,7 @@ msgstr "12 heures"
 
 #: app/views/host.wizard.edit.php:867
 msgid "2. Configure your Java application to support remote JMX monitoring. For example:"
-msgstr ""
+msgstr "2. Configurer votre application Java pour supporter la supervision JMX. Par exemple :"
 
 #: tests/selenium/modules/clock32/includes/WidgetForm.php:115
 #: widgets/clock/includes/WidgetForm.php:115
@@ -458,17 +458,17 @@ msgstr "M"
 
 #: app/views/js/host.wizard.edit.js.php:1143
 msgid "A few more steps"
-msgstr ""
+msgstr "Encore quelques étapes"
 
 #: include/classes/helpers/CItemGeneralHelper.php:356
 #: include/classes/helpers/CItemGeneralHelper.php:399
 #: include/classes/helpers/CItemGeneralHelper.php:407
 msgid "A floating point value is expected."
-msgstr ""
+msgstr "Une virgule est attendue dans la valeur"
 
 #: app/views/host.wizard.edit.php:139
 msgid "A template is a set of predefined configurations (metrics to be collected, conditions for generating alerts, etc.) designed for your monitoring target."
-msgstr ""
+msgstr "Un modèle est un ensemble de paramètres de supervision prédéfinis (métriques à collecter, conditions pour générer des alertes, etc), conçu pour la plateforme cible."
 
 #: widgets/svggraph/includes/CWidgetFieldOverrideView.php:199
 msgid "ADD OVERRIDE"
@@ -727,7 +727,7 @@ msgstr[1] "Actions désactivées"
 
 #: app/controllers/CControllerPopup.php:42
 msgid "Action edit"
-msgstr ""
+msgstr "Éditer l'action"
 
 #: app/controllers/CControllerActionEnable.php:84
 msgid "Action enabled"
@@ -1020,7 +1020,7 @@ msgstr "Ajouter hôte"
 
 #: app/views/host.wizard.edit.php:571 app/views/js/host.wizard.edit.js.php:1133
 msgid "Add host interface"
-msgstr ""
+msgstr "Ajouter une interface hôte"
 
 #: include/actions.inc.php:653 include/actions.inc.php:871
 msgid "Add host tags"
@@ -1222,7 +1222,7 @@ msgstr "Agent (passif)"
 
 #: app/views/host.wizard.edit.php:597
 msgid "Agent address"
-msgstr ""
+msgstr "Adresse de l'agent"
 
 #: include/classes/data/CItemData.php:911
 msgid "Agent availability check. Returns nothing - unavailable; 1 - available"
@@ -1242,7 +1242,7 @@ msgstr "Nom d'hôte de l'agent. Retourne une chaîne de caractères"
 
 #: app/views/js/host.wizard.edit.js.php:96
 msgid "Agent interface"
-msgstr ""
+msgstr "Interface de l'agent"
 
 #: include/views/inventory.host.view.php:64
 msgid "Agent interfaces"
@@ -1254,7 +1254,7 @@ msgstr ""
 
 #: app/views/host.wizard.edit.php:603
 msgid "Agent port"
-msgstr ""
+msgstr "Port de l'agent"
 
 #: include/classes/data/CItemData.php:919
 msgid "Agent variant check. Returns 1 - for Zabbix agent; 2 - for Zabbix agent 2"
@@ -1266,7 +1266,7 @@ msgstr ""
 
 #: app/views/host.wizard.edit.php:159 app/views/js/host.wizard.edit.js.php:1782
 msgid "Agentless"
-msgstr ""
+msgstr "Sans agent"
 
 #: widgets/svggraph/includes/CWidgetFieldDataSetView.php:417
 msgid "Aggregate"
@@ -1458,7 +1458,7 @@ msgstr "Quantité de mémoire physique de l'hôte consommée pour la sauvegarde 
 #: include/classes/api/services/CItemGeneral.php:1913
 #, c-format
 msgid "An LLD rule prototype with key \"%1$s\" already exists on the host \"%2$s\"."
-msgstr ""
+msgstr "Un prototype de règle LLD avec la clé \"%1$s\" existe déjà avec sur l'hôte \"%2$s\"."
 
 #: include/classes/api/services/CItemGeneral.php:1912
 #, c-format
@@ -1479,7 +1479,7 @@ msgstr "Une règle LLD avec la clé \"%1$s\" existe déjà sur le modèle \"%2$s
 #: include/classes/validators/CFormValidator.php:1103
 #: include/classes/validators/CFormValidator.php:1150 jsLoader.php:419
 msgid "An array is expected."
-msgstr ""
+msgstr "Un tableau est attendu."
 
 #: include/classes/api/services/CItemGeneral.php:1775
 #, c-format
@@ -1589,7 +1589,7 @@ msgstr "Toutes les entités de modèle existantes non présentes dans le fichier
 
 #: app/views/host.wizard.edit.php:148
 msgid "Apache, AWS, MySQL, etc."
-msgstr ""
+msgstr "Apache, AWS, MySQL, etc."
 
 #: include/classes/core/CJsonRpc.php:225
 msgid "Application error."
@@ -1758,7 +1758,7 @@ msgstr "Au moins un groupe hôte ou un hôte doit être sélectionné."
 
 #: include/classes/helpers/CItemGeneralHelper.php:411
 msgid "At least one of \"min\" or \"max\" parameters should be specified."
-msgstr ""
+msgstr "Au moins un des paramètres « min » ou « max » doit être spécifié."
 
 #: include/classes/setup/CFrontendSetup.php:252
 msgid "At least one of MySQL or PostgreSQL should be supported."
@@ -2398,7 +2398,7 @@ msgstr "Annuler"
 
 #: app/views/host.wizard.edit.php:1042
 msgid "Cancel Host Wizard?"
-msgstr ""
+msgstr "Annuler l'assistant hôte ?"
 
 #: app/controllers/CControllerTokenCreate.php:65
 #: app/controllers/CControllerTokenCreate.php:135
@@ -2429,7 +2429,7 @@ msgstr "Impossible d'ajouter une page au tableau de bord : le nombre maximal de 
 
 #: host_discovery_prototypes.php:518
 msgid "Cannot add discovery prototype"
-msgstr ""
+msgstr "Impossible d'ajouter le prototype de découverte"
 
 #: host_discovery.php:540
 msgid "Cannot add discovery rule"
@@ -2589,7 +2589,7 @@ msgstr "Impossible d'attribuer le champ d'inventaire \"%1$s\" à l'élément ave
 #: app/controllers/CControllerItem.php:206
 #: app/controllers/CControllerItemPrototype.php:208
 msgid "Cannot be less than or equal to \"Min\"."
-msgstr ""
+msgstr "Ne peut pas être inférieur ou égal à \"Min\"."
 
 #: jsLoader.php:336
 msgctxt "screen reader"
@@ -2867,8 +2867,8 @@ msgstr "Impossible de supprimer la vérification de découverte \"%1$s\" de la r
 #: host_discovery_prototypes.php:313 host_discovery_prototypes.php:605
 msgid "Cannot delete discovery prototype"
 msgid_plural "Cannot delete discovery prototypes"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "Impossible de supprimer le prototype de découverte"
+msgstr[1] "Impossible de supprimer les prototypes de découverte"
 
 #: app/controllers/CControllerDiscoveryDelete.php:68 host_discovery.php:390
 #: host_discovery.php:597
@@ -3193,8 +3193,8 @@ msgstr[1] "Impossible de désactiver les connecteurs"
 #: host_discovery_prototypes.php:586
 msgid "Cannot disable discovery prototype"
 msgid_plural "Cannot disable discovery prototypes"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "Impossible de désactiver le prototype de découverte"
+msgstr[1] "Impossible de désactiver les prototypes de découverte"
 
 #: app/controllers/CControllerDiscoveryDisable.php:76 host_discovery.php:584
 msgid "Cannot disable discovery rule"
@@ -3289,7 +3289,7 @@ msgstr[1] "Impossible d'activer les connecteurs"
 #: host_discovery_prototypes.php:585
 msgid "Cannot enable discovery prototype"
 msgid_plural "Cannot enable discovery prototypes"
-msgstr[0] ""
+msgstr[0] "Impossible d'activer le prototype de découverte"
 msgstr[1] ""
 
 #: app/controllers/CControllerDiscoveryEnable.php:76 host_discovery.php:583
