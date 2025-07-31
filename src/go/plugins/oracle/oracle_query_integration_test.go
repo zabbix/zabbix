@@ -46,7 +46,7 @@ func TestOraConn_Query(t *testing.T) { //nolint:tparallel
 	connMgr := dbconn.NewConnManager(&mock.MockLogger{}, &opt)
 	defer connMgr.Destroy()
 
-	oraCon, err := connMgr.GetConnection(newConnDetDefault(t, testConfig))
+	oraCon, err := connMgr.GetConnection(newConnDetDefault(t, testCfg))
 	if err != nil {
 		t.Fatalf("OraConn_Query: get connection fail: %v", err)
 	}
@@ -76,7 +76,7 @@ func TestOraConn_Query(t *testing.T) { //nolint:tparallel
 		{
 			"+withoutParams",
 			args{
-				fmt.Sprintf("SELECT COUNT(*) FROM dba_users WHERE username = '%s'", testConfig.OraUser),
+				fmt.Sprintf("SELECT COUNT(*) FROM dba_users WHERE username = '%s'", testCfg.OraUser),
 				nil,
 				ctx,
 			},
@@ -86,7 +86,7 @@ func TestOraConn_Query(t *testing.T) { //nolint:tparallel
 			"+withParams",
 			args{
 				"SELECT COUNT(*) FROM dba_users WHERE username = :1",
-				[]any{testConfig.OraUser},
+				[]any{testCfg.OraUser},
 				ctx,
 			},
 			want{1, false},
@@ -112,7 +112,7 @@ func TestOraConn_Query(t *testing.T) { //nolint:tparallel
 		{
 			"withParamsWhenNoNeed",
 			args{
-				fmt.Sprintf("SELECT COUNT(*) FROM dba_users WHERE username = '%s'", testConfig.OraUser),
+				fmt.Sprintf("SELECT COUNT(*) FROM dba_users WHERE username = '%s'", testCfg.OraUser),
 				[]any{"some param"},
 				ctx,
 			},
@@ -174,7 +174,7 @@ func TestOraConn_QueryByName(t *testing.T) { //nolint:tparallel,gocyclo,cyclop
 	connMgr := dbconn.NewConnManager(&mock.MockLogger{}, &opt)
 	defer connMgr.Destroy()
 
-	oraCon, err := connMgr.GetConnection(newConnDetDefault(t, testConfig))
+	oraCon, err := connMgr.GetConnection(newConnDetDefault(t, testCfg))
 	if err != nil {
 		t.Fatalf("OraConn_Query: get connection fail: %v", err)
 	}
@@ -261,7 +261,7 @@ func TestOraConn_QueryRow(t *testing.T) { //nolint:tparallel
 	connMgr := dbconn.NewConnManager(&mock.MockLogger{}, &opt)
 	defer connMgr.Destroy()
 
-	oraCon, err := connMgr.GetConnection(newConnDetDefault(t, testConfig))
+	oraCon, err := connMgr.GetConnection(newConnDetDefault(t, testCfg))
 	if err != nil {
 		t.Fatalf("TestConnManager_Query: get connection fail: %v", err)
 	}
@@ -300,7 +300,7 @@ func TestOraConn_QueryRow(t *testing.T) { //nolint:tparallel
 			"+withParams",
 			args{
 				"SELECT username FROM dba_users WHERE username = :1",
-				[]any{testConfig.OraUser},
+				[]any{testCfg.OraUser},
 				ctx,
 			},
 			want{false},
@@ -356,7 +356,7 @@ func TestOraConn_QueryRowByName(t *testing.T) { //nolint:tparallel
 	connMgr := dbconn.NewConnManager(&mock.MockLogger{}, &opt)
 	defer connMgr.Destroy()
 
-	oraCon, err := connMgr.GetConnection(newConnDetDefault(t, testConfig))
+	oraCon, err := connMgr.GetConnection(newConnDetDefault(t, testCfg))
 	if err != nil {
 		t.Fatalf("OraConn_Query: get connection fail: %v", err)
 	}
@@ -429,19 +429,19 @@ func seedWithSQL(customQueriesPath string) error {
 	}{
 		{
 			"good.sql",
-			fmt.Sprintf("SELECT COUNT(*) FROM dba_users WHERE username = '%s'", testConfig.OraUser),
+			fmt.Sprintf("SELECT COUNT(*) FROM dba_users WHERE username = '%s'", testCfg.OraUser),
 		},
 		{
 			"semicol.sql",
-			fmt.Sprintf("SELECT COUNT(*) FROM dba_users WHERE username = '%s';;", testConfig.OraUser),
+			fmt.Sprintf("SELECT COUNT(*) FROM dba_users WHERE username = '%s';;", testCfg.OraUser),
 		},
 		{
 			"semicol_breakspace.sql",
-			fmt.Sprintf("   SELECT COUNT(*) FROM dba_users WHERE username = '%s';;   ", testConfig.OraUser),
+			fmt.Sprintf("   SELECT COUNT(*) FROM dba_users WHERE username = '%s';;   ", testCfg.OraUser),
 		},
 		{
 			"breakspace.sql",
-			fmt.Sprintf("   SELECT COUNT(*) FROM dba_users WHERE username = '%s'   ", testConfig.OraUser),
+			fmt.Sprintf("   SELECT COUNT(*) FROM dba_users WHERE username = '%s'   ", testCfg.OraUser),
 		},
 		{
 			"only_semicol_breakspace.sql",
@@ -462,11 +462,11 @@ func seedWithSQL(customQueriesPath string) error {
 }
 
 // newConnDet function constructs ConnDetails with default values for testing.
-func newConnDetDefault(t *testing.T, c *mock.TestConfig) dbconn.ConnDetails {
+func newConnDetDefault(t *testing.T, c *testConfig) dbconn.ConnDetails {
 	t.Helper()
 
 	u, _ := uri.NewWithCreds( //nolint:errcheck
-		c.OraURI+"?service="+c.OraSrv,
+		c.OraIP+"?service="+c.OraSrv,
 		c.OraUser,
 		c.OraPwd,
 		dbconn.URIDefaults)

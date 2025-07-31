@@ -22,7 +22,23 @@ import (
 
 	"github.com/google/go-cmp/cmp"
 	"golang.zabbix.com/agent2/plugins/oracle/mock"
+	"golang.zabbix.com/sdk/uri"
 )
+
+var testCfg = testConfig{ //nolint:gochecknoglobals
+	OraURI:  "localhost",
+	OraUser: "ZABBIX_MON",
+	OraPwd:  "zabbix",
+	OraSrv:  "XE",
+}
+
+// testConfig type contains a mocked Oracle server connection credentials.
+type testConfig struct {
+	OraURI  string
+	OraUser string
+	OraPwd  string
+	OraSrv  string
+}
 
 func Test_splitUserPrivilege(t *testing.T) {
 	t.Parallel()
@@ -605,7 +621,7 @@ func TestConnManager_GetConnection(t *testing.T) {
 	}
 }
 
-func Test_containsOnlyHostname(t *testing.T) { //nolint:tparallel
+func Test_isOnlyHostnameOrIP(t *testing.T) { //nolint:tparallel
 	t.Parallel()
 
 	type args struct {
@@ -758,4 +774,16 @@ func compareOraCon(x, y *OraConn) bool {
 	}
 
 	return x.username == y.username
+}
+
+func newConnDet(t *testing.T, username, privilege string) ConnDetails {
+	t.Helper()
+
+	u, _ := uri.NewWithCreds(
+		testCfg.OraURI+"?service="+testCfg.OraSrv,
+		username,
+		"zabbix",
+		URIDefaults)
+
+	return ConnDetails{*u, privilege, false}
 }

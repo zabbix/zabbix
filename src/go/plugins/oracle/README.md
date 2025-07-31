@@ -413,10 +413,11 @@ WHERE
     oracle.custom.query[<commonParams>,payment,"John Doe",1,"10/25/2020"]
 
 ### Developer Section
-Unittests also include integration tests that run when Oracle server is started and available. The server should listen the default port ```1521``` with the service ```XE``` defined. Other Oracle connection configurtion see in variables of the type mock.TestConfig.
-To run integration tests, use tag ```-tags integration_tests```. Some negative subtests run long. To skip them, use ```-test.short``` argument: ```go test -test.short``` <pckg>   
+Golang tests also include integration tests that require a connection to Oracle server using the default port ```1521```. For other Oracle connection configuration, see the testConfig type in the file oracle_export_integration_test.go.
+To run integration tests, use tag ```-tags integration_tests```. Some negative subtests run long. To skip them, use ```-test.short``` argument: ```go test -test.short```   
 
-### Notes:
+
+### Notes
  * Returned data is automatically converted into JSON.
  * Avoid returning JSON directly from queries, as the result will become corrupted when the plugin attempts to convert the result into JSON again.
 

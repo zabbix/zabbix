@@ -21,6 +21,7 @@ import (
 
 	"github.com/godror/godror"
 	"github.com/google/go-cmp/cmp"
+	"golang.zabbix.com/sdk/uri"
 )
 
 func Test_getDriverConnParams(t *testing.T) {
@@ -164,7 +165,8 @@ func Test_getTNSType(t *testing.T) {
 	type args = struct {
 		host         string
 		onlyHostname bool
-		resolveTNS   bool
+
+		resolveTNS bool
 	}
 
 	type want struct {
@@ -349,4 +351,16 @@ func Test_prepareConnectString(t *testing.T) {
 			}
 		})
 	}
+}
+
+func newConnDetHostname(t *testing.T, hostname, service string) *ConnDetails {
+	t.Helper()
+
+	u, _ := uri.NewWithCreds(
+		hostname+"?service="+service,
+		"any_username",
+		"any_password",
+		nil)
+
+	return &ConnDetails{*u, "", false}
 }
