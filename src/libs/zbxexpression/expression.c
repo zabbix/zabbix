@@ -703,6 +703,7 @@ int	substitute_simple_macros_impl(const zbx_uint64_t *actionid, const zbx_db_eve
 	if (SUCCEED != zbx_token_find(*data, pos, &token, token_search))
 		goto out;
 
+
 	um_handle = zbx_dc_open_user_macros();
 	macro_env = zbx_dc_get_user_macro_env(um_handle);
 	zbx_vector_uint64_create(&hostids);
@@ -795,7 +796,6 @@ int	substitute_simple_macros_impl(const zbx_uint64_t *actionid, const zbx_db_eve
 		{
 			um_handle_prev = um_handle;
 			um_handle = zbx_dc_open_user_macros_masked();
-			macro_env = zbx_dc_get_user_macro_env(um_handle);
 		}
 
 		if (0 != (macro_type & (ZBX_MACRO_TYPE_MESSAGE_NORMAL | ZBX_MACRO_TYPE_MESSAGE_RECOVERY |
@@ -2840,7 +2840,6 @@ int	substitute_simple_macros_impl(const zbx_uint64_t *actionid, const zbx_db_eve
 		{
 			zbx_dc_close_user_macros(um_handle);
 			um_handle = um_handle_prev;
-			macro_env = zbx_dc_get_user_macro_env(um_handle);
 		}
 
 		}
@@ -2891,7 +2890,6 @@ int	substitute_simple_macros_impl(const zbx_uint64_t *actionid, const zbx_db_eve
 	zbx_free(expression);
 	zbx_vector_uint64_destroy(&hostids);
 
-	macro_env = zbx_dc_get_user_macro_env(um_handle);
 	zbx_dc_close_user_macros(um_handle);
 
 	if (NULL != cause_event)

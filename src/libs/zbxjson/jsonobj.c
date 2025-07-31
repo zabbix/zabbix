@@ -332,19 +332,21 @@ void	zbx_jsonobj_remove_value(zbx_jsonobj_t *obj, const char *name)
 	zbx_hashset_remove_direct(&obj->data.object, el);
 }
 
-const zbx_jsonobj_el_t	*zbx_jsonobj_get_value(zbx_jsonobj_t *obj, const char *name)
+/******************************************************************************
+ *                                                                            *
+ * Purpose: get json value by name                                            *
+ *                                                                            *
+ ******************************************************************************/
+zbx_jsonobj_t *zbx_jsonobj_get_value(zbx_jsonobj_t *obj, const char *name)
 {
-	zbx_jsonobj_el_t	*el;
-	zbx_hashset_iter_t	it;
+	zbx_jsonobj_el_t	el_local, *el;
 
-	zbx_hashset_iter_reset(&obj->data.object, &it);
+	if (ZBX_JSON_TYPE_OBJECT != obj->type)
+		return NULL;
 
-	while (NULL != (el = (zbx_jsonobj_el_t *)zbx_hashset_iter_next(&it)))
-	{
-		if (0 == strcmp(el->name, name))
-			return el;
-	}
+	el_local.name = (char *)name;
+	if (NULL == (el = (zbx_jsonobj_el_t *)zbx_hashset_search(&obj->data.object, &el_local)))
+		return NULL;
 
-	return NULL;
+	return &el->value;
 }
-

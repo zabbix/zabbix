@@ -3159,13 +3159,17 @@ void	zbx_db_clear_last_errcode(void)
 
 #endif
 
-void	zbx_db_set_log_masked_values(zbx_db_query_mask_t flag)
+zbx_db_query_mask_t	zbx_db_set_log_masked_values(zbx_db_query_mask_t flag)
 {
 #ifdef ZBX_DEBUG
 	ZBX_UNUSED(flag);
-	return;
+	return ZBX_DB_DONT_MASK_QUERIES;
 #else
+	zbx_db_query_mask_t	prev_flag = db_log_masked_values;
+
 	db_log_masked_values = flag;
+
+	return prev_flag;
 #endif
 }
 

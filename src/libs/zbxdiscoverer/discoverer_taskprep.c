@@ -68,6 +68,8 @@ static zbx_ds_dcheck_t	*dcheck_clone_get(zbx_dc_dcheck_t *dcheck, zbx_vector_ds_
 	if (SVC_SNMPv1 == dcheck_ptr->type || SVC_SNMPv2c == dcheck_ptr->type ||
 			SVC_SNMPv3 == dcheck_ptr->type)
 	{
+		zbx_dc_um_handle_t	*um_handle = zbx_dc_open_user_macros_secure();
+
 		zbx_substitute_simple_macros(NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL,
 				NULL, NULL, NULL, NULL, &dcheck_ptr->snmp_community,
 				ZBX_MACRO_TYPE_COMMON, NULL, 0);
@@ -93,6 +95,8 @@ static zbx_ds_dcheck_t	*dcheck_clone_get(zbx_dc_dcheck_t *dcheck, zbx_vector_ds_
 					&dcheck_ptr->snmpv3_contextname, ZBX_MACRO_TYPE_COMMON, NULL,
 					0);
 		}
+
+		zbx_dc_close_user_macros(um_handle);
 	}
 
 	zbx_vector_ds_dcheck_ptr_append(ds_dchecks_common, ds_dcheck);
@@ -165,6 +169,8 @@ static zbx_uint64_t	process_checks(const zbx_dc_drule_t *drule, int unique, zbx_
 		zbx_dc_dcheck_t	*dcheck = (zbx_dc_dcheck_t*)drule->dchecks.values[i];
 		zbx_ds_dcheck_t	*ds_dcheck_common;
 
+		zabbix_log(1, "DBG '%s'", dcheck->snmp_community);
+
 		if (0 != drule->unique_dcheckid &&
 				((1 == unique && drule->unique_dcheckid != dcheck->dcheckid) ||
 				(0 == unique && drule->unique_dcheckid == dcheck->dcheckid)))
@@ -173,6 +179,8 @@ static zbx_uint64_t	process_checks(const zbx_dc_drule_t *drule, int unique, zbx_
 		}
 
 		ds_dcheck_common = dcheck_clone_get(dcheck, ds_dchecks_common);
+
+		zabbix_log(1, "DBG expanded '%s'", ds_dcheck_common->dcheck.snmp_community);
 		checks_count += process_check_range(drule, ds_dcheck_common, ipranges, tasks);
 	}
 

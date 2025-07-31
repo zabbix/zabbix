@@ -288,6 +288,6 @@ void	zbx_db_version_json_create(struct zbx_json *json, struct zbx_db_version_inf
 
 #define ZBX_DB_LARGE_QUERY_BATCH_SIZE	1000
 
-void	zbx_db_set_log_masked_values(zbx_db_query_mask_t flag);
+zbx_db_query_mask_t	zbx_db_set_log_masked_values(zbx_db_query_mask_t flag);
 
 #endif
