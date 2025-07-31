@@ -25,16 +25,13 @@ class MysqlDbBackend extends DbBackend {
 	 */
 	protected function checkDbVersionTable() {
 		global $DB;
+		$table_exists = null;
 
-		if (!array_key_exists('DB', $DB) || $DB['DB'] === null) {
-			return false;
-		}
-
-		try
-		{
-			$table_exists = mysqli_query($DB['DB'], "select null from dbversion");
+		try {
+			$table_exists = mysqli_query($DB['DB'], "select null from dbversion limit 1");
 		}
 		catch (mysqli_sql_exception $e) {
+			// Code is not missing here.
 		}
 
 		if (!$table_exists) {
