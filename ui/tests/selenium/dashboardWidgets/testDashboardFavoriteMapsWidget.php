@@ -14,7 +14,7 @@
 **/
 
 
-require_once __DIR__.'/../../include/CWebTest.php';
+require_once __DIR__ . '/../../include/CWebTest.php';
 
 /**
  * @backup profiles
@@ -23,12 +23,45 @@ require_once __DIR__.'/../../include/CWebTest.php';
  */
 class testDashboardFavoriteMapsWidget extends CWebTest {
 
+	/**
+	 * Attach MessageBehavior and TableBehavior to the test.
+	 *
+	 * @return array
+	 */
+	public function getBehaviors() {
+		return [
+			CMessageBehavior::class,
+			CTableBehavior::class
+		];
+	}
+
+	/**
+	 * Id of the dashboard with widgets.
+	 *
+	 * @var integer
+	 */
 	const MAP_NAME = 'Test map for favourite widget';
 
 	protected static $dashboardid;
 	protected static $mapid;
+	protected static $update_widget;
+	const DELETE_WIDGET = 'Favorite maps widget to delete';
+	const CANCEL_WIDGET = 'Widget for testing cancel button';
+	
+	/**
+	 * SQL query to get widget and widget_field tables to compare hash values, but without widget_fieldid
+	 * because it can change.
+	 */
+	const SQL = 'SELECT wf.widgetid, wf.type, wf.name, wf.value_int, wf.value_str, wf.value_groupid, wf.value_hostid,'.
+			' wf.value_itemid, wf.value_graphid, wf.value_sysmapid, w.widgetid, w.dashboard_pageid, w.type, w.name, w.x, w.y,'.
+			' w.width, w.height'.
+			' FROM widget_field wf'.
+			' INNER JOIN widget w'.
+			' ON w.widgetid=wf.widgetid '.
+			' ORDER BY wf.widgetid, wf.name, wf.value_int, wf.value_str, wf.value_groupid, wf.value_itemid, wf.value_graphid';
 
 	public static function prepareDashboardData() {
+		// Create dashboard with Favorite maps widgets
 		$dashboards = CDataHelper::call('dashboard.create', [
 			[
 				'name' => 'Dashboard with favorite maps widget',
@@ -42,21 +75,41 @@ class testDashboardFavoriteMapsWidget extends CWebTest {
 								'y' => 0,
 								'width' => 12,
 								'height' => 4
+							],
+							[
+								'type' => 'favmaps',
+								'name' => 'Favorite maps widget to delete',
+								'x' => 0,
+								'y' => 5,
+								'width' => 12,
+								'height' => 4
+							],
+							[
+								'type' => 'favmaps',
+								'name' => 'Widget for testing cancel button',
+								'x' => 0,
+								'y' => 10,
+								'width' => 12,
+								'height' => 4
 							]
 						]
 					]
 				]
 			]
 		]);
-		self::$dashboardid = $dashboards['dashboardids'][0];
+		self::$dashboardid = [
+			'Dashboard with favorite maps widget' => $dashboards['dashboardids'][0]
+		];
 
+		// Create host for map
 		$hosts = CDataHelper::call('host.create', [
 			[
 				'host' => 'Map host',
-				'groups' => ['groupid' => 4] // Zabbix servers.
+				'groups' => ['groupid' => 4] // Zabbix servers
 			]
 		]);
 
+		// Create map
 		$maps = CDataHelper::call('map.create', [
 			[
 				'name' => self::MAP_NAME,
@@ -73,7 +126,8 @@ class testDashboardFavoriteMapsWidget extends CWebTest {
 		]);
 		self::$mapid = $maps['sysmapids'][0];
 	}
-
+	
+	// Add to favorites
 	public function testDashboardFavoriteMapsWidget_AddFavoriteMap() {
 		$this->page->login()->open('sysmaps.php')->waitUntilReady();
 		$this->page->assertHeader('Maps');
@@ -85,20 +139,24 @@ class testDashboardFavoriteMapsWidget extends CWebTest {
 		$button->waitUntilClickable()->click();
 		$this->query('id:addrm_fav')->one()->waitUntilAttributesPresent(['title' => 'Remove from favorites']);
 
-		$this->page->login()->open('zabbix.php?action=dashboard.view&dashboardid='.self::$dashboardid)->waitUntilReady();
+		$this->page->login()->open('zabbix.php?action=dashboard.view&dashboardid=' .
+			self::$dashboardid['Dashboard with favorite maps widget'])->waitUntilReady();
 		$widget = CDashboardElement::find()->one()->getWidget('Favorite maps')->waitUntilReady()->getContent();
+
 		$this->assertEquals('zabbix.php?action=map.view&sysmapid='.self::$mapid,
-				$widget->query('link', self::MAP_NAME)->one()->getAttribute('href')
+			$widget->query('link', self::MAP_NAME)->one()->getAttribute('href')
 		);
+
 		$this->assertEquals(1, CDBHelper::getCount('SELECT profileid FROM profiles WHERE idx='.
-				zbx_dbstr('web.favorite.sysmapids').' AND value_id='.zbx_dbstr(self::$mapid))
+			zbx_dbstr('web.favorite.sysmapids').' AND value_id='.zbx_dbstr(self::$mapid))
 		);
 	}
 
-	public function testDashboardFavoriteMapsWidget_RemoveFavoriteMaps() {
+		public function testDashboardFavoriteMapsWidget_RemoveFavoriteMaps() {
 		$favorite_maps = CDBHelper::getAll('SELECT value_id FROM profiles WHERE idx='.zbx_dbstr('web.favorite.sysmapids'));
 
-		$this->page->login()->open('zabbix.php?action=dashboard.view&dashboardid='.self::$dashboardid)->waitUntilReady();
+		$this->page->login()->open('zabbix.php?action=dashboard.view&dashboardid=' .
+			self::$dashboardid['Dashboard with favorite maps widget'])->waitUntilReady();
 		$widget = CDashboardElement::find()->one()->getWidget('Favorite maps')->getContent();
 
 		foreach ($favorite_maps as $map) {
@@ -109,9 +167,357 @@ class testDashboardFavoriteMapsWidget extends CWebTest {
 			$remove_item->waitUntilNotVisible();
 		}
 
-		$this->assertEquals('No maps added.', $widget->query('class:no-data-message')->waitUntilVisible()->one()->getText());
+		$this->assertEquals('No maps added.',
+			$widget->query('class:no-data-message')->waitUntilVisible()->one()->getText()
+		);
 		$this->assertEquals(0, CDBHelper::getCount('SELECT profileid FROM profiles WHERE idx='.
 				zbx_dbstr('web.favorite.sysmapids'))
 		);
+	}
+
+	// Check Favorite map widget layout
+	public function testDashboardFavoriteMapsWidget_Layout() {
+		$this->page->login()->open('zabbix.php?action=dashboard.view&dashboardid=' .
+			self::$dashboardid['Dashboard with favorite maps widget'])->waitUntilReady();
+		$dialog = CDashboardElement::find()->one()->edit()->addWidget();
+		$form = $dialog->asForm();
+
+		$this->assertEquals('Add widget', $dialog->getTitle());
+
+		// Set widget type to "Favorite maps"
+		$form->fill(['Type' => CFormElement::RELOADABLE_FILL('Favorite maps')]);
+
+		// Check default field values
+		$form->checkValue([
+			'Name' => '',
+			'Refresh interval' => 'Default (15 minutes)',
+			'id:show_header' => true
+		]);
+
+		// Check available options for "Refresh interval"
+		$this->assertEquals([
+			'Default (15 minutes)', 'No refresh', '10 seconds', '30 seconds',
+			'1 minute', '2 minutes', '10 minutes', '15 minutes'
+		], $form->getField('Refresh interval')->asDropdown()->getOptions()->asText());
+
+		// Verify visible field labels
+		$this->assertEquals(
+			['Type', 'Show header', 'Name', 'Refresh interval'],
+			array_values($form->getLabels(CElementFilter::VISIBLE)->asText())
+		);
+
+		// Verify that both Apply and Cancel buttons are clickable
+		$this->assertEquals(2, $dialog->getFooter()
+			->query('button', ['Add', 'Cancel'])
+			->all()
+			->filter(new CElementFilter(CElementFilter::CLICKABLE))
+			->count()
+		);
+
+		// Check max length of the "Name" input field
+		$this->assertEquals(255, $form->getField('Name')->getAttribute('maxlength'));
+
+		$dialog->close();
+	}
+
+	public static function getFavoriteMapsWidgetData() {
+		return [
+			// #0 Default widget
+			[
+				[
+					'expected' => TEST_GOOD
+				]
+			],
+			// #1 Special characters in name
+			[
+				[
+					'expected' => TEST_GOOD,
+					'fields' => [
+						'Name' => '⭐㖵㖶 🙃 㓈㓋',
+						'Show header' => true,
+						'Refresh interval' => 'No refresh'
+					]
+				]
+			],
+			// #2 Leading spaces
+			[
+				[
+					'expected' => TEST_GOOD,
+					'fields' => [
+						'Name' => '  Leading space',
+						'Show header' => true,
+						'Refresh interval' => '10 seconds'
+					],
+					'trim' => true
+				]
+			],
+			// #3 Trailing spaces
+			[
+				[
+					'expected' => TEST_GOOD,
+					'fields' => [
+						'Name' => 'Trailing space   ',
+						'Show header' => true,
+						'Refresh interval' => '30 seconds'
+					],
+					'trim' => true
+				]
+			],
+			// #4 Leading + trailing spaces
+			[
+				[
+					'expected' => TEST_GOOD,
+					'fields' => [
+						'Name' => '  Leading and trailing  ',
+						'Show header' => true,
+						'Refresh interval' => '1 minute'
+					],
+					'trim' => true
+				]
+			],
+			// #5 Hidden header
+			[
+				[
+					'expected' => TEST_GOOD,
+					'fields' => [
+						'Name' => 'Header hidden',
+						'Show header' => false,
+						'Refresh interval' => '2 minutes'
+					]
+				]
+			],
+			// #6 Custom refresh interval
+			[
+				[
+					'expected' => TEST_GOOD,
+					'fields' => [
+						'Name' => '10 min refresh',
+						'Show header' => true,
+						'Refresh interval' => '10 minutes'
+					]
+				]
+			],
+			// #7 Max refresh
+			[
+				[
+					'expected' => TEST_GOOD,
+					'fields' => [
+						'Name' => 'Max refresh',
+						'Show header' => true,
+						'Refresh interval' => '15 minutes'
+					]
+				]
+			]
+		];
+	}
+
+	/**
+	* @dataProvider getFavoriteMapsWidgetData
+	*/
+	public function testDashboardFavoriteMapsWidget_Create($data) {
+		$widget_name = $this->checkWidgetForm($data);
+		self::$update_widget = $widget_name;
+	}
+
+	/**
+	* @dataProvider getFavoriteMapsWidgetData
+	* @depends testDashboardFavoriteMapsWidget_Create
+	*/
+	public function testDashboardFavoriteMapsWidget_Update($data) {
+		$this->checkWidgetForm($data, true);
+	}
+
+	public function testDashboardFavoriteMapsWidget_SimpleUpdate() {
+		$old_hash = CDBHelper::getHash(self::SQL);
+		$this->page->login()->open('zabbix.php?action=dashboard.view&dashboardid='.
+			self::$dashboardid['Dashboard with favorite maps widget'])->waitUntilReady();
+		$dashboard = CDashboardElement::find()->one();
+		$dashboard->getWidget(self::$update_widget)->edit()->submit();
+		$dashboard->save();
+		$this->page->waitUntilReady();
+		$this->assertMessage(TEST_GOOD, 'Dashboard updated');
+		$this->assertEquals($old_hash, CDBHelper::getHash(self::SQL));
+	}
+
+	public function testDashboardFavoriteMapsWidget_Delete() {
+		$this->page->login()->open('zabbix.php?action=dashboard.view&dashboardid='.
+			self::$dashboardid['Dashboard with favorite maps widget'])->waitUntilReady();
+
+		$dashboard = CDashboardElement::find()->one()->edit();
+		$widget = $dashboard->getWidget(self::DELETE_WIDGET);
+		$dashboard->deleteWidget(self::DELETE_WIDGET);
+		$widget->waitUntilNotPresent();
+		$dashboard->save();
+		$this->assertMessage(TEST_GOOD, 'Dashboard updated');
+
+		$this->assertFalse($dashboard->getWidget(self::DELETE_WIDGET, false)->isValid());
+		$this->assertEquals(0, CDBHelper::getCount('SELECT * FROM widget_field wf'.
+			' LEFT JOIN widget w ON w.widgetid=wf.widgetid'.
+			' WHERE w.name='.zbx_dbstr(self::DELETE_WIDGET)));
+	}
+	
+	public static function getCancelData() {
+		return [
+			// Cancel update widget.
+			[
+				[
+					'update' => true,
+					'save_widget' => true,
+					'save_dashboard' => false
+				]
+			],
+			[
+				[
+					'update' => true,
+					'save_widget' => false,
+					'save_dashboard' => true
+				]
+			],
+			// Cancel create widget.
+			[
+				[
+					'save_widget' => true,
+					'save_dashboard' => false
+				]
+			],
+			[
+				[
+					'save_widget' => false,
+					'save_dashboard' => true
+				]
+			]
+		];
+	}
+
+	/**
+	 * @dataProvider getCancelData
+	*/
+	public function testDashboardFavoriteMapsWidget_Cancel($data) {
+		$old_hash = CDBHelper::getHash(self::SQL);
+		$new_name = 'Cancel test - favorite maps';
+
+		$this->page->login()->open('zabbix.php?action=dashboard.view&dashboardid='.
+			self::$dashboardid['Dashboard with favorite maps widget'])->waitUntilReady();
+
+		$dashboard = CDashboardElement::find()->one()->edit();
+		$old_widget_count = $dashboard->getWidgets()->count();
+
+		// Start updating or creating a widget.
+		if (CTestArrayHelper::get($data, 'update', false)) {
+			$form = $dashboard->getWidget(self::CANCEL_WIDGET)->edit();
+		}
+		else {
+			$form = $dashboard->addWidget()->asForm();
+			$form->fill(['Type' => CFormElement::RELOADABLE_FILL('Favorite maps')]);
+		}
+
+		$form->fill([
+			'Name' => $new_name,
+			'Refresh interval' => '15 minutes'
+		]);
+
+		// Save or cancel widget.
+		if (CTestArrayHelper::get($data, 'save_widget', false)) {
+			$form->submit();
+			$this->assertTrue($dashboard->getWidget($new_name)->isVisible());
+		}
+		else {
+			COverlayDialogElement::find()->one()->close(true);
+
+			if (CTestArrayHelper::get($data, 'update', false)) {
+				foreach ([self::CANCEL_WIDGET => true, $new_name => false] as $name => $valid) {
+					$dashboard->getWidget($name, false)->isValid($valid);
+				}
+			}
+
+			$this->assertEquals($old_widget_count, $dashboard->getWidgets()->count());
+		}
+
+		// Save or cancel dashboard changes.
+		if (CTestArrayHelper::get($data, 'save_dashboard', false)) {
+			$dashboard->save();
+		}
+		else {
+			$dashboard->cancelEditing();
+		}
+
+		// Assert no DB change.
+		$this->assertEquals($old_hash, CDBHelper::getHash(self::SQL));
+	}
+
+	protected function checkWidgetForm($data, $update = false) {
+		$expected = CTestArrayHelper::get($data, 'expected', TEST_GOOD);
+		$default_values = [
+			'Name' => '',
+			'Show header' => true,
+			'Refresh interval' => 'Default (15 minutes)'
+		];
+		$data['fields'] = CTestArrayHelper::get($data, 'fields', $default_values);
+
+		$this->page->login()->open('zabbix.php?action=dashboard.view&dashboardid=' .
+			self::$dashboardid['Dashboard with favorite maps widget'])->waitUntilReady();
+		$dashboard = CDashboardElement::find()->one();
+		$old_widget_count = $dashboard->getWidgets()->count();
+
+		$form = $update
+			? $dashboard->getWidget(self::$update_widget)->edit()->asForm()
+			: $dashboard->edit()->addWidget()->asForm();
+
+		if (!$update) {
+			$form->fill(['Type' => CFormElement::RELOADABLE_FILL('Favorite maps')]);
+		}
+
+		if (!$data['fields']) {
+			$data['fields'] = $default_values;
+		}
+
+		$form->fill($data['fields']);
+
+		if ($expected === TEST_GOOD) {
+			$values = $form->getFields()->filter(CElementFilter::VISIBLE)->asValues();
+		}
+
+		$form->submit();
+
+		// Trim leading/trailing spaces from expected results if necessary.
+		if (array_key_exists('trim', $data)) {
+			$data['fields']['Name'] = trim($data['fields']['Name']);
+		}
+
+		// If name is empty string it is replaced by default name.
+		$header = (CTestArrayHelper::get($data, 'fields.Name', '') === '')
+			? 'Favorite maps'
+			: $data['fields']['Name'];
+
+		if ($update) {
+			self::$update_widget = $header;
+		}
+
+		COverlayDialogElement::ensureNotPresent();
+		$widget = $dashboard->getWidget($header);
+
+		$dashboard->save();
+		$this->page->waitUntilReady();
+		$this->assertMessage(TEST_GOOD, 'Dashboard updated');
+
+		// Check widgets count.
+		$this->assertEquals($old_widget_count + ($update ? 0 : 1), $dashboard->getWidgets()->count());
+
+		// Check new widget update interval.
+		$refresh = (CTestArrayHelper::get($data['fields'], 'Refresh interval') === 'Default (15 minutes)')
+			? '15 minutes'
+			: CTestArrayHelper::get($data['fields'], 'Refresh interval');
+		$this->assertEquals($refresh, $widget->getRefreshInterval());
+
+		// Check new widget form fields and values in frontend.
+		$saved_form = $widget->edit();
+		$this->assertEquals($values, $saved_form->getFields()->filter(CElementFilter::VISIBLE)->asValues());
+		$saved_form->checkValue($data['fields']);
+		COverlayDialogElement::find()->one()->close();
+		$dashboard->save();
+		$this->page->waitUntilReady();
+		$this->assertMessage(TEST_GOOD, 'Dashboard updated');
+		
+		return $header;
 	}
 }
