@@ -14,7 +14,7 @@ dnl
 
 dnl Process this file with autoconf to produce a configure script.
 
-AC_INIT([Zabbix], [7.4.1])
+AC_INIT([Zabbix], [7.4.2rc1])
 
 AC_MSG_NOTICE([Configuring $PACKAGE_NAME $PACKAGE_VERSION])
 
