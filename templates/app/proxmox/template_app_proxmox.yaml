@@ -362,7 +362,9 @@ zabbix_export:
             
             	getField: function (data, path, val, valAsKey) {
             		var steps = path.split('.');
+            
             		for (var i = 0; i < steps.length; i++) {
+            
             			var step = steps[i];
             			if (typeof data !== 'object' || data === null || typeof data[step] === 'undefined') {
             				if (typeof val === 'undefined') {
@@ -420,6 +422,7 @@ zabbix_export:
             		}
             
             		Proxmox.getField(clusterStatus, 'data', []).forEach(function (node) {
+            
             			if (node.type === 'cluster') {
             				Proxmox.output['data']['cluster']['name'] = Proxmox.getField(node, 'name', '');
             				Proxmox.output['data']['cluster']['nodes'] = Proxmox.getField(node, 'nodes', 1);
@@ -428,6 +431,7 @@ zabbix_export:
             
             			} else if (node.type === 'node') {
             				var nodeName = Proxmox.getField(node, 'name');
+            
             				Proxmox.output['data']['nodes'][nodeName] = {
             					'name': nodeName,
             					'id': Proxmox.getField(node, 'id', ''),
@@ -444,8 +448,10 @@ zabbix_export:
             
             		for (var i = 0; i < resourceList.length; i++) {
             			var resource = resourceList[i];
+            
             			if (resource.type === 'storage') {
             				var storageName = Proxmox.getField(resource, 'storage');
+            
             				if (Proxmox.getField(resource, 'shared', 0) === 1) {
             					if (storageList.indexOf(storageName) !== -1) {
             						continue;
@@ -460,35 +466,43 @@ zabbix_export:
             				Proxmox.output['data']['storage']['utilization'] = Math.round((Proxmox.output['data']['storage']['used'] / Proxmox.output['data']['storage']['total']) * 100);
             
             			} else if (resource.type === 'lxc') {
+            
             				Proxmox.output['data']['lxc'].push({
             					'vmid': Proxmox.getField(resource, 'vmid'),
             					'name': Proxmox.getField(resource, 'name', 'vmid', true),
             					'status': Proxmox.getField(resource, 'status', 'unknown'),
             					'node': Proxmox.getField(resource, 'node')
             				});
+            
             				if (Proxmox.getField(resource, 'status') === 'running') {
             					Proxmox.output['data']['cluster']['lxc_running']++;
             				} else {
             					Proxmox.output['data']['cluster']['lxc_stopped']++;
             				}
+            
             			} else if (resource.type === 'qemu') {
+            
             				Proxmox.output['data']['qemu'].push({
             					'vmid': Proxmox.getField(resource, 'vmid'),
             					'name': Proxmox.getField(resource, 'name', 'vmid', true),
             					'status': Proxmox.getField(resource, 'status', 'unknown'),
             					'node': Proxmox.getField(resource, 'node')
             				});
+            
             				if (Proxmox.getField(resource, 'status') === 'running') {
             					Proxmox.output['data']['cluster']['qemu_running']++;
             				} else {
             					Proxmox.output['data']['cluster']['qemu_stopped']++;
             				}
+            
             			} else if (resource.type === 'node') {
+            
             				if (Proxmox.getField(resource, 'status', 'offline') === 'online') {
             					Proxmox.output['data']['cluster']['node_online']++;
             				} else {
             					Proxmox.output['data']['cluster']['node_offline']++;
             				}
+            
             				Proxmox.output['data']['cluster']['cpu_count'] += Proxmox.getField(resource, 'maxcpu', 0);
             				Proxmox.output['data']['cluster']['memory_used'] += Proxmox.getField(resource, 'mem', 0);
             				Proxmox.output['data']['cluster']['memory_total'] += Proxmox.getField(resource, 'maxmem', 0);
@@ -506,6 +520,7 @@ zabbix_export:
             }
             catch (error) {
             	error += (String(error).endsWith('.')) ? '' : '.';
+            
             	Zabbix.log(3, '[ Proxmox ] ERROR: ' + error);
             
             	Proxmox.output['status'] = 1;
@@ -683,7 +698,9 @@ zabbix_export:
                   	return JSON.stringify(data);
                   
                   } catch (e) {
+                  
                   	Zabbix.log(3, "[ERROR] Proxmox user discovery error: " + e + " for value: " + value);
+                  
                   	return JSON.stringify([]);
                   }
           timeout: '10'
@@ -698,7 +715,7 @@ zabbix_export:
               value: raw
       discovery_rules:
         - uuid: 1c548e56f62840c1a3a96f121f74d59e
-          name: 'Node [{#NODE.NAME}]: certificate discovery'
+          name: 'Node [{#NODE.NAME}]: Certificate discovery'
           type: HTTP_AGENT
           key: 'proxmox_ve.node.certificates.discovery[{#NODE.ID}]'
           delay: '{$PVE.PARAMS.INTERVAL.CERT}'
@@ -713,7 +730,7 @@ zabbix_export:
           description: 'Discovers certificates on the node {#NODE.NAME}.'
           item_prototypes:
             - uuid: fdb6fa2733a6431ba1ff3c5e0e5789b5
-              name: 'Node [{#NODE.NAME}]: certificate [{#CERT.FILENAME}]: get info'
+              name: 'Node [{#NODE.NAME}]: Certificate [{#CERT.FILENAME}]: Get info'
               type: HTTP_AGENT
               key: 'proxmox_ve.node.certificates.expire[{#NODE.ID},{#CERT.FILENAME}]'
               delay: 12h
@@ -739,7 +756,7 @@ zabbix_export:
                 - tag: component
                   value: raw
             - uuid: 6bb5c7740b66469989c6c01a21fe07e4
-              name: 'Node [{#NODE.NAME}]: certificate [{#CERT.FILENAME}]: fingerprint'
+              name: 'Node [{#NODE.NAME}]: Certificate [{#CERT.FILENAME}]: Fingerprint'
               type: DEPENDENT
               key: 'proxmox_ve.node.certificates.fingerprint[{#NODE.ID},{#CERT.FILENAME}]'
               value_type: CHAR
@@ -764,7 +781,7 @@ zabbix_export:
                 - tag: node
                   value: '{#NODE.NAME}'
             - uuid: 54631bc104224928b2bda16b37528bd5
-              name: 'Node [{#NODE.NAME}]: certificate [{#CERT.FILENAME}]: issuer'
+              name: 'Node [{#NODE.NAME}]: Certificate [{#CERT.FILENAME}]: Issuer'
               type: DEPENDENT
               key: 'proxmox_ve.node.certificates.issuer[{#NODE.ID},{#CERT.FILENAME}]'
               value_type: CHAR
@@ -789,7 +806,7 @@ zabbix_export:
                 - tag: node
                   value: '{#NODE.NAME}'
             - uuid: 4c158652201148a7a2825b70e542c34b
-              name: 'Node [{#NODE.NAME}]: certificate [{#CERT.FILENAME}]: notafter'
+              name: 'Node [{#NODE.NAME}]: Certificate [{#CERT.FILENAME}]: Valid not after'
               type: DEPENDENT
               key: 'proxmox_ve.node.certificates.notafter[{#NODE.ID},{#CERT.FILENAME}]'
               units: unixtime
@@ -814,7 +831,7 @@ zabbix_export:
                 - tag: node
                   value: '{#NODE.NAME}'
             - uuid: 7510aad13f8146168bca6440f610a891
-              name: 'Node [{#NODE.NAME}]: certificate [{#CERT.FILENAME}]: notbefore'
+              name: 'Node [{#NODE.NAME}]: Certificate [{#CERT.FILENAME}]: Valid not before'
               type: DEPENDENT
               key: 'proxmox_ve.node.certificates.notbefore[{#NODE.ID},{#CERT.FILENAME}]'
               units: unixtime
@@ -839,7 +856,7 @@ zabbix_export:
                 - tag: node
                   value: '{#NODE.NAME}'
             - uuid: f239f2f0da1249b7a5d1943ab8a0ab4b
-              name: 'Node [{#NODE.NAME}]: certificate [{#CERT.FILENAME}]: subject'
+              name: 'Node [{#NODE.NAME}]: Certificate [{#CERT.FILENAME}]: Subject'
               type: DEPENDENT
               key: 'proxmox_ve.node.certificates.subject[{#NODE.ID},{#CERT.FILENAME}]'
               value_type: CHAR
@@ -866,7 +883,7 @@ zabbix_export:
           trigger_prototypes:
             - uuid: 43465550101a4f959cdf649bd9113e6a
               expression: 'last(/Proxmox VE by HTTP/proxmox_ve.node.certificates.notafter[{#NODE.ID},{#CERT.FILENAME}]) < now() or last(/Proxmox VE by HTTP/proxmox_ve.node.certificates.notbefore[{#NODE.ID},{#CERT.FILENAME}]) > now()'
-              name: 'Proxmox VE: Node [{#NODE.NAME}]: certificate [{#CERT.FILENAME}] not valid'
+              name: 'Proxmox VE: Node [{#NODE.NAME}]: Certificate [{#CERT.FILENAME}]: Not valid'
               priority: AVERAGE
               description: 'The certificate {#CERT.FILENAME} on the node {#NODE.NAME} expires in less than 7 days.'
               tags:
@@ -894,7 +911,7 @@ zabbix_export:
               parameters:
                 - 12h
         - uuid: 3dc3d1bdc2d4484a9f3375c5a16534b5
-          name: 'Node [{#NODE.NAME}]: disks discovery'
+          name: 'Node [{#NODE.NAME}]: Disks discovery'
           type: HTTP_AGENT
           key: 'proxmox_ve.node.disks.discovery[{#NODE.ID}]'
           delay: '{$PVE.PARAMS.INTERVAL.DISK}'
@@ -909,7 +926,7 @@ zabbix_export:
           description: 'Discovers disks on the node {#NODE.NAME}.'
           item_prototypes:
             - uuid: 444fd91bf4124ce391d54fb521a22228
-              name: 'Node [{#NODE.NAME}]: disk [{#DISK.NAME}]: get info'
+              name: 'Node [{#NODE.NAME}]: Disk [{#DISK.NAME}]: Get info'
               type: HTTP_AGENT
               key: 'proxmox_ve.node.disk.info[{#NODE.ID},{#DISK.NAME}]'
               delay: 10m
@@ -932,7 +949,7 @@ zabbix_export:
                 - tag: component
                   value: raw
             - uuid: 7be3405f61bb44f0b9e0b2ff6e77db52
-              name: 'Node [{#NODE.NAME}]: disk [{#DISK.NAME}]: model'
+              name: 'Node [{#NODE.NAME}]: Disk [{#DISK.NAME}]: Model'
               type: DEPENDENT
               key: 'proxmox_ve.node.disk.model[{#NODE.ID},{#DISK.NAME}]'
               value_type: CHAR
@@ -957,7 +974,7 @@ zabbix_export:
                 - tag: node
                   value: '{#NODE.NAME}'
             - uuid: 274a373d073c40588cecf3a27e643aa4
-              name: 'Node [{#NODE.NAME}]: disk [{#DISK.NAME}]: serial'
+              name: 'Node [{#NODE.NAME}]: Disk [{#DISK.NAME}]: Serial'
               type: DEPENDENT
               key: 'proxmox_ve.node.disk.serial[{#NODE.ID},{#DISK.NAME}]'
               value_type: CHAR
@@ -982,7 +999,7 @@ zabbix_export:
                 - tag: node
                   value: '{#NODE.NAME}'
             - uuid: e79e995ce469400aba19e265e0f9d1b4
-              name: 'Node [{#NODE.NAME}]: disk [{#DISK.NAME}]: SMART status'
+              name: 'Node [{#NODE.NAME}]: Disk [{#DISK.NAME}]: SMART status'
               type: HTTP_AGENT
               key: 'proxmox_ve.node.disk.smart[{#NODE.ID},{#DISK.NAME}]'
               delay: 1h
@@ -1024,14 +1041,14 @@ zabbix_export:
               trigger_prototypes:
                 - uuid: 1af8da3c43ed45cc8b240c31647990b5
                   expression: 'last(/Proxmox VE by HTTP/proxmox_ve.node.disk.smart[{#NODE.ID},{#DISK.NAME}]) <> 1'
-                  name: 'Proxmox VE: Node [{#NODE.NAME}]: disk [{#DISK.NAME}] SMART status fail'
+                  name: 'Proxmox VE: Node [{#NODE.NAME}]: Disk [{#DISK.NAME}]: SMART status fail'
                   priority: HIGH
                   description: 'The SMART status for the disk {#DISK.NAME} on the node {#NODE.NAME} is not healthy.'
                   tags:
                     - tag: scope
                       value: notice
             - uuid: 185aa9f874214369acb68d2acefddbe7
-              name: 'Node [{#NODE.NAME}]: disk [{#DISK.NAME}]: type'
+              name: 'Node [{#NODE.NAME}]: Disk [{#DISK.NAME}]: Type'
               type: DEPENDENT
               key: 'proxmox_ve.node.disk.type[{#NODE.ID},{#DISK.NAME}]'
               value_type: CHAR
@@ -1056,7 +1073,7 @@ zabbix_export:
                 - tag: node
                   value: '{#NODE.NAME}'
             - uuid: 1577fa7ce7ce49e6b4e174517dc784d3
-              name: 'Node [{#NODE.NAME}]: disk [{#DISK.NAME}]: vendor'
+              name: 'Node [{#NODE.NAME}]: Disk [{#DISK.NAME}]: Vendor'
               type: DEPENDENT
               key: 'proxmox_ve.node.disk.vendor[{#NODE.ID},{#DISK.NAME}]'
               value_type: CHAR
@@ -1182,7 +1199,7 @@ zabbix_export:
                     - tag: scope
                       value: notice
             - uuid: 1650b41fed4a437d9908bd8dc65ff0ce
-              name: 'Node [{#NODE.NAME}]: LXC [{#LXC.NAME}]: disk total'
+              name: 'Node [{#NODE.NAME}]: LXC [{#LXC.NAME}]: Disk total'
               type: DEPENDENT
               key: 'proxmox_ve.node.lxc.disk.maxdisk[{#NODE.ID},{#LXC.VMID}]'
               units: B
@@ -1209,10 +1226,10 @@ zabbix_export:
                 - tag: node
                   value: '{#NODE.NAME}'
             - uuid: 0f8d1c5b2a3e4b6c9f7d8e9a0b1c2d3e
-              name: 'Node [{#NODE.NAME}]: LXC [{#LXC.NAME}]: disk read speed'
+              name: 'Node [{#NODE.NAME}]: LXC [{#LXC.NAME}]: Disk read speed'
               type: DEPENDENT
               key: 'proxmox_ve.node.lxc.disk.read[{#NODE.ID},{#LXC.VMID}]'
-              units: B/s
+              units: Bps
               description: 'Retrieves disk read speed of the LXC container {#LXC.NAME} on the node {#NODE.NAME}.'
               preprocessing:
                 - type: JSONPATH
@@ -1237,7 +1254,7 @@ zabbix_export:
                 - tag: node
                   value: '{#NODE.NAME}'
             - uuid: 76b338628ded4225aca30a50b68bb196
-              name: 'Node [{#NODE.NAME}]: LXC [{#LXC.NAME}]: disk used'
+              name: 'Node [{#NODE.NAME}]: LXC [{#LXC.NAME}]: Disk used'
               type: DEPENDENT
               key: 'proxmox_ve.node.lxc.disk.usage[{#NODE.ID},{#LXC.VMID}]'
               units: B
@@ -1264,7 +1281,7 @@ zabbix_export:
                 - tag: node
                   value: '{#NODE.NAME}'
             - uuid: 52b92e5ba31d4c27bafc3fe55e57687a
-              name: 'Node [{#NODE.NAME}]: LXC [{#LXC.NAME}]: disk utilization'
+              name: 'Node [{#NODE.NAME}]: LXC [{#LXC.NAME}]: Disk utilization'
               type: CALCULATED
               key: 'proxmox_ve.node.lxc.disk.utilization[{#NODE.ID},{#LXC.VMID}]'
               value_type: FLOAT
@@ -1289,17 +1306,17 @@ zabbix_export:
               trigger_prototypes:
                 - uuid: 8935456bef0f4a4ca20bca78e059b43d
                   expression: 'last(/Proxmox VE by HTTP/proxmox_ve.node.lxc.disk.utilization[{#NODE.ID},{#LXC.VMID}]) > {$PVE.TRIGGER.DISK.WARNING:"{#LXC.NAME}"}'
-                  name: 'Proxmox VE: Node [{#NODE.NAME}]: LXC [{#LXC.NAME}] disk usage high'
+                  name: 'Proxmox VE: Node [{#NODE.NAME}]: LXC [{#LXC.NAME}]: Disk usage high'
                   priority: WARNING
                   description: 'The disk usage of the LXC container {#LXC.NAME} on the node {#NODE.NAME} is high.'
                   tags:
                     - tag: scope
                       value: notice
             - uuid: 06dee8adb3e848d89ab432a4db119e98
-              name: 'Node [{#NODE.NAME}]: LXC [{#LXC.NAME}]: disk write speed'
+              name: 'Node [{#NODE.NAME}]: LXC [{#LXC.NAME}]: Disk write speed'
               type: DEPENDENT
               key: 'proxmox_ve.node.lxc.disk.write[{#NODE.ID},{#LXC.VMID}]'
-              units: B/s
+              units: Bps
               description: 'Retrieves disk write speed of the LXC container {#LXC.NAME} on the node {#NODE.NAME}.'
               preprocessing:
                 - type: JSONPATH
@@ -1324,7 +1341,7 @@ zabbix_export:
                 - tag: node
                   value: '{#NODE.NAME}'
             - uuid: ee43a9fc7a894547a1cc639dc284c60f
-              name: 'Node [{#NODE.NAME}]: LXC [{#LXC.NAME}]: swap total'
+              name: 'Node [{#NODE.NAME}]: LXC [{#LXC.NAME}]: Swap total'
               type: DEPENDENT
               key: 'proxmox_ve.node.lxc.maxswap[{#NODE.ID},{#LXC.VMID}]'
               units: B
@@ -1351,7 +1368,7 @@ zabbix_export:
                 - tag: node
                   value: '{#NODE.NAME}'
             - uuid: d8130fa283bf46669f1900b571637a1f
-              name: 'Node [{#NODE.NAME}]: LXC [{#LXC.NAME}]: memory total'
+              name: 'Node [{#NODE.NAME}]: LXC [{#LXC.NAME}]: Memory total'
               type: DEPENDENT
               key: 'proxmox_ve.node.lxc.memory.max[{#NODE.ID},{#LXC.VMID}]'
               units: B
@@ -1378,7 +1395,7 @@ zabbix_export:
                 - tag: node
                   value: '{#NODE.NAME}'
             - uuid: f065a59f04ae4969ab572eee65b7d353
-              name: 'Node [{#NODE.NAME}]: LXC [{#LXC.NAME}]: memory used'
+              name: 'Node [{#NODE.NAME}]: LXC [{#LXC.NAME}]: Memory used'
               type: DEPENDENT
               key: 'proxmox_ve.node.lxc.memory.usage[{#NODE.ID},{#LXC.VMID}]'
               units: B
@@ -1405,7 +1422,7 @@ zabbix_export:
                 - tag: node
                   value: '{#NODE.NAME}'
             - uuid: ba3c961aadf04103b6480c3f496e3d40
-              name: 'Node [{#NODE.NAME}]: LXC [{#LXC.NAME}]: memory utilization'
+              name: 'Node [{#NODE.NAME}]: LXC [{#LXC.NAME}]: Memory utilization'
               type: CALCULATED
               key: 'proxmox_ve.node.lxc.memory.utilization[{#NODE.ID},{#LXC.VMID}]'
               value_type: FLOAT
@@ -1430,17 +1447,17 @@ zabbix_export:
               trigger_prototypes:
                 - uuid: d61ff3c75f704105864a38f5442d1c19
                   expression: 'last(/Proxmox VE by HTTP/proxmox_ve.node.lxc.memory.utilization[{#NODE.ID},{#LXC.VMID}]) > {$PVE.TRIGGER.MEMORY.WARNING:"{#LXC.NAME}"}'
-                  name: 'Proxmox VE: Node [{#NODE.NAME}]: LXC [{#LXC.NAME}] memory usage high'
+                  name: 'Proxmox VE: Node [{#NODE.NAME}]: LXC [{#LXC.NAME}]: Memory usage high'
                   priority: WARNING
                   description: 'The memory usage of the LXC container {#LXC.NAME} on the node {#NODE.NAME} is high.'
                   tags:
                     - tag: scope
                       value: notice
             - uuid: d9e7cf16eb0242a79a7c4d86e3a66da8
-              name: 'Node [{#NODE.NAME}]: LXC [{#LXC.NAME}]: network input speed'
+              name: 'Node [{#NODE.NAME}]: LXC [{#LXC.NAME}]: Network input speed'
               type: DEPENDENT
               key: 'proxmox_ve.node.lxc.network.input[{#NODE.ID},{#LXC.VMID}]'
-              units: b/s
+              units: bps
               description: 'Retrieves network input speed of the LXC container {#LXC.NAME} on the node {#NODE.NAME}.'
               preprocessing:
                 - type: JSONPATH
@@ -1468,10 +1485,10 @@ zabbix_export:
                 - tag: node
                   value: '{#NODE.NAME}'
             - uuid: cd38f921a8f84947a7e0619968914e00
-              name: 'Node [{#NODE.NAME}]: LXC [{#LXC.NAME}]: network output speed'
+              name: 'Node [{#NODE.NAME}]: LXC [{#LXC.NAME}]: Network output speed'
               type: DEPENDENT
               key: 'proxmox_ve.node.lxc.network.output[{#NODE.ID},{#LXC.VMID}]'
-              units: b/s
+              units: bps
               description: 'Retrieves network output speed of the LXC container {#LXC.NAME} on the node {#NODE.NAME}.'
               preprocessing:
                 - type: JSONPATH
@@ -1499,7 +1516,7 @@ zabbix_export:
                 - tag: node
                   value: '{#NODE.NAME}'
             - uuid: da080118db964798a7fec566eccaf574
-              name: 'Node [{#NODE.NAME}]: LXC [{#LXC.NAME}]: worked node'
+              name: 'Node [{#NODE.NAME}]: LXC [{#LXC.NAME}]: Worked node'
               type: DEPENDENT
               key: 'proxmox_ve.node.lxc.node[{#NODE.ID},{#LXC.VMID}]'
               value_type: CHAR
@@ -1526,8 +1543,8 @@ zabbix_export:
               trigger_prototypes:
                 - uuid: e586b7afb1ee481e94ba3b9cbdc1031c
                   expression: 'last(/Proxmox VE by HTTP/proxmox_ve.node.lxc.node[{#NODE.ID},{#LXC.VMID}], #1) <> last(/Proxmox VE by HTTP/proxmox_ve.node.lxc.node[{#NODE.ID},{#LXC.VMID}], #2)'
-                  name: 'Proxmox VE: Node [{#NODE.NAME}]: LXC [{#LXC.NAME}] changed worked node'
-                  event_name: 'Proxmox VE: LXC [{#LXC.NAME}] changed worked node  to "{ITEM.LASTVALUE}"'
+                  name: 'Proxmox VE: Node [{#NODE.NAME}]: LXC [{#LXC.NAME}]: Changed worked node'
+                  event_name: 'Proxmox VE: LXC [{#LXC.NAME}] changed worked node to "{ITEM.LASTVALUE}"'
                   priority: INFO
                   description: 'The LXC container {#LXC.NAME} migrated to another node.'
                   manual_close: 'YES'
@@ -1535,7 +1552,7 @@ zabbix_export:
                     - tag: scope
                       value: notice
             - uuid: 5a24f791a2444f429cbcb26037f29da1
-              name: 'Node [{#NODE.NAME}]: LXC [{#LXC.NAME}]: status'
+              name: 'Node [{#NODE.NAME}]: LXC [{#LXC.NAME}]: Status'
               type: DEPENDENT
               key: 'proxmox_ve.node.lxc.status[{#NODE.ID},{#LXC.VMID}]'
               description: 'Retrieves the status of the LXC container {#LXC.NAME} on the node {#NODE.NAME}.'
@@ -1573,7 +1590,7 @@ zabbix_export:
               trigger_prototypes:
                 - uuid: da7614ac842b4d3c9d6e4538c0ec09bc
                   expression: 'last(/Proxmox VE by HTTP/proxmox_ve.node.lxc.status[{#NODE.ID},{#LXC.VMID}]) <> 2'
-                  name: 'Proxmox VE: Node [{#NODE.NAME}]: LXC [{#LXC.NAME}] not running'
+                  name: 'Proxmox VE: Node [{#NODE.NAME}]: LXC [{#LXC.NAME}]: Not running'
                   priority: WARNING
                   description: 'The LXC container {#LXC.NAME} on the node {#NODE.NAME} is not running.'
                   manual_close: 'YES'
@@ -1581,7 +1598,7 @@ zabbix_export:
                     - tag: scope
                       value: notice
             - uuid: 440db0f97f3c4639a9e8ceb8bc633cb5
-              name: 'Node [{#NODE.NAME}]: LXC [{#LXC.NAME}]: swap used'
+              name: 'Node [{#NODE.NAME}]: LXC [{#LXC.NAME}]: Swap used'
               type: DEPENDENT
               key: 'proxmox_ve.node.lxc.swap.usage[{#NODE.ID},{#LXC.VMID}]'
               units: B
@@ -1608,7 +1625,7 @@ zabbix_export:
                 - tag: node
                   value: '{#NODE.NAME}'
             - uuid: 17ee49333f0346d5b1073a4c45475dee
-              name: 'Node [{#NODE.NAME}]: LXC [{#LXC.NAME}]: uptime'
+              name: 'Node [{#NODE.NAME}]: LXC [{#LXC.NAME}]: Uptime'
               type: DEPENDENT
               key: 'proxmox_ve.node.lxc.uptime[{#NODE.ID},{#LXC.VMID}]'
               units: uptime
@@ -1634,17 +1651,17 @@ zabbix_export:
               trigger_prototypes:
                 - uuid: 12bc18cf9e2e40e5879a4b58efad70a2
                   expression: 'last(/Proxmox VE by HTTP/proxmox_ve.node.lxc.uptime[{#NODE.ID},{#LXC.VMID}]) < {$PVE.TRIGGER.UPTIME:"{#LXC.NAME}"}'
-                  name: 'Proxmox VE: Node [{#NODE.NAME}]: LXC [{#LXC.NAME}] has been restarted'
+                  name: 'Proxmox VE: Node [{#NODE.NAME}]: LXC [{#LXC.NAME}]: Has been restarted'
                   priority: WARNING
                   description: 'The LXC container {#LXC.NAME} on the node {#NODE.NAME} has been restarted.'
                   dependencies:
-                    - name: 'Proxmox VE: Node [{#NODE.NAME}]: LXC [{#LXC.NAME}] not running'
+                    - name: 'Proxmox VE: Node [{#NODE.NAME}]: LXC [{#LXC.NAME}]: Not running'
                       expression: 'last(/Proxmox VE by HTTP/proxmox_ve.node.lxc.status[{#NODE.ID},{#LXC.VMID}]) <> 2'
                   tags:
                     - tag: scope
                       value: notice
             - uuid: 9c0b4b8892a44c1c8a34e6a802c89d2f
-              name: 'Node [{#NODE.NAME}]: LXC [{#LXC.NAME}]: get info'
+              name: 'Node [{#NODE.NAME}]: LXC [{#LXC.NAME}]: Get info'
               type: HTTP_AGENT
               key: 'proxmox_ve.node.lxc[{#NODE.ID},{#LXC.VMID}]'
               history: '0'
@@ -1669,7 +1686,7 @@ zabbix_export:
           trigger_prototypes:
             - uuid: 11307aab09fa406aaff00e291e2338d2
               expression: 'avg(/Proxmox VE by HTTP/proxmox_ve.node.lxc.swap.usage[{#NODE.ID},{#LXC.VMID}],5m) / last(/Proxmox VE by HTTP/proxmox_ve.node.lxc.maxswap[{#NODE.ID},{#LXC.VMID}]) * 100 > {$PVE.TRIGGER.SWAP.WARNING:"{#LXC.NAME}"}'
-              name: 'Proxmox VE: Node [{#NODE.NAME}]: LXC [{#LXC.NAME}] swap usage high'
+              name: 'Proxmox VE: Node [{#NODE.NAME}]: LXC [{#LXC.NAME}]: Swap usage high'
               priority: WARNING
               description: 'The swap usage of the LXC container {#LXC.NAME} on the node {#NODE.NAME} is high.'
               tags:
@@ -1684,7 +1701,7 @@ zabbix_export:
                     host: 'Proxmox VE by HTTP'
                     key: 'proxmox_ve.node.lxc.cpu[{#NODE.ID},{#LXC.VMID}]'
             - uuid: e3824333db624de6802194b13ee6cafe
-              name: 'Node [{#NODE.NAME}]: LXC [{#LXC.NAME}/{#LXC.VMID}]: disk read speed'
+              name: 'Node [{#NODE.NAME}]: LXC [{#LXC.NAME}/{#LXC.VMID}]: Disk read speed'
               graph_items:
                 - color: 2600ff
                   item:
@@ -1696,7 +1713,7 @@ zabbix_export:
                     host: 'Proxmox VE by HTTP'
                     key: 'proxmox_ve.node.lxc.disk.write[{#NODE.ID},{#LXC.VMID}]'
             - uuid: ef81ffcc73cd4c8295caccf7dff1a09e
-              name: 'Node [{#NODE.NAME}]: LXC [{#LXC.NAME}/{#LXC.VMID}]: disk used'
+              name: 'Node [{#NODE.NAME}]: LXC [{#LXC.NAME}/{#LXC.VMID}]: Disk used'
               graph_items:
                 - color: ff0000
                   item:
@@ -1709,7 +1726,7 @@ zabbix_export:
                     host: 'Proxmox VE by HTTP'
                     key: 'proxmox_ve.node.lxc.disk.maxdisk[{#NODE.ID},{#LXC.VMID}]'
             - uuid: 35c458a6feae4d7aa451ade81eb8664e
-              name: 'Node [{#NODE.NAME}]: LXC [{#LXC.NAME}/{#LXC.VMID}]: memory used'
+              name: 'Node [{#NODE.NAME}]: LXC [{#LXC.NAME}/{#LXC.VMID}]: Memory used'
               graph_items:
                 - color: ff0000
                   item:
@@ -1722,7 +1739,7 @@ zabbix_export:
                     host: 'Proxmox VE by HTTP'
                     key: 'proxmox_ve.node.lxc.memory.max[{#NODE.ID},{#LXC.VMID}]'
             - uuid: 3935a5b9c4384f76a7b50fc1063392b0
-              name: 'Node [{#NODE.NAME}]: LXC [{#LXC.NAME}/{#LXC.VMID}]: network speed'
+              name: 'Node [{#NODE.NAME}]: LXC [{#LXC.NAME}/{#LXC.VMID}]: Network speed'
               graph_items:
                 - color: 2600ff
                   item:
@@ -1734,7 +1751,7 @@ zabbix_export:
                     host: 'Proxmox VE by HTTP'
                     key: 'proxmox_ve.node.lxc.network.output[{#NODE.ID},{#LXC.VMID}]'
             - uuid: 2086bbe1f89a45ab9e8d8d15b883bc67
-              name: 'Node [{#NODE.NAME}]: LXC [{#LXC.NAME}/{#LXC.VMID}]: swap used'
+              name: 'Node [{#NODE.NAME}]: LXC [{#LXC.NAME}/{#LXC.VMID}]: Swap used'
               graph_items:
                 - color: ff0000
                   item:
@@ -1781,7 +1798,7 @@ zabbix_export:
           description: 'Discovers QEMU virtual machines on the node {#NODE.NAME}.'
           item_prototypes:
             - uuid: ff60e7840528434996b2e28b80ea151d
-              name: 'Node [{#NODE.NAME}]: QEMU [{#QEMU.NAME}]: quest agent version'
+              name: 'Node [{#NODE.NAME}]: QEMU [{#QEMU.NAME}]: Guest agent version'
               type: HTTP_AGENT
               key: 'proxmox_ve.node.qemu.agent.version[{#NODE.ID},{#QEMU.VMID}]'
               delay: 12h
@@ -1815,19 +1832,19 @@ zabbix_export:
               trigger_prototypes:
                 - uuid: 757fba13cb1f43af9c8033c8462322e4
                   expression: 'last(/Proxmox VE by HTTP/proxmox_ve.node.qemu.agent.version[{#NODE.ID},{#QEMU.VMID}])="Unknown"'
-                  name: 'Proxmox VE: Node [{#NODE.NAME}]: QEMU [{#QEMU.NAME}] error getting guest agent data'
+                  name: 'Proxmox VE: Node [{#NODE.NAME}]: QEMU [{#QEMU.NAME}]: Error getting guest agent data'
                   priority: WARNING
                   description: |
                     Error retrieving the QEMU guest agent data for the virtual machine {#QEMU.NAME} on the node {#NODE.NAME}.
                     The guest agent may not be running.
                   dependencies:
-                    - name: 'Proxmox VE: Node [{#NODE.NAME}]: QEMU [{#QEMU.NAME}] agent is not enabled'
+                    - name: 'Proxmox VE: Node [{#NODE.NAME}]: QEMU [{#QEMU.NAME}]: Agent is not enabled'
                       expression: 'last(/Proxmox VE by HTTP/proxmox_ve.node.qemu.agent[{#NODE.ID},{#QEMU.VMID}]) <> 1'
                   tags:
                     - tag: scope
                       value: notice
             - uuid: a73999de348a4d79ae7ec582c2550ce2
-              name: 'Node [{#NODE.NAME}]: QEMU [{#QEMU.NAME}]: quest agent'
+              name: 'Node [{#NODE.NAME}]: QEMU [{#QEMU.NAME}]: Guest agent'
               type: DEPENDENT
               key: 'proxmox_ve.node.qemu.agent[{#NODE.ID},{#QEMU.VMID}]'
               description: 'Retrieves the QEMU guest agent status for the virtual machine {#QEMU.NAME} on the node {#NODE.NAME}.'
@@ -1856,7 +1873,7 @@ zabbix_export:
               trigger_prototypes:
                 - uuid: e9f788fde7bc484eb964b4d6bfa5e293
                   expression: 'last(/Proxmox VE by HTTP/proxmox_ve.node.qemu.agent[{#NODE.ID},{#QEMU.VMID}]) <> 1'
-                  name: 'Proxmox VE: Node [{#NODE.NAME}]: QEMU [{#QEMU.NAME}] agent is not enabled'
+                  name: 'Proxmox VE: Node [{#NODE.NAME}]: QEMU [{#QEMU.NAME}]: Agent is not enabled'
                   priority: INFO
                   description: 'The QEMU guest agent for the virtual machine {#QEMU.NAME} on the node {#NODE.NAME} is not enabled.'
                   tags:
@@ -1929,10 +1946,10 @@ zabbix_export:
                     - tag: scope
                       value: notice
             - uuid: 0d1dc0c895e94003b9874e4839707cef
-              name: 'Node [{#NODE.NAME}]: QEMU [{#QEMU.NAME}]: disk read speed'
+              name: 'Node [{#NODE.NAME}]: QEMU [{#QEMU.NAME}]: Disk read speed'
               type: DEPENDENT
               key: 'proxmox_ve.node.qemu.disk.read[{#NODE.ID},{#QEMU.VMID}]'
-              units: B/s
+              units: Bps
               description: 'Retrieves disk read speed of the QEMU virtual machine {#QEMU.NAME} on the node {#NODE.NAME}.'
               preprocessing:
                 - type: JSONPATH
@@ -1957,10 +1974,10 @@ zabbix_export:
                 - tag: qemu
                   value: '{#QEMU.NAME}'
             - uuid: e3e9d0b1b3114d0199576cb92b4bd811
-              name: 'Node [{#NODE.NAME}]: QEMU [{#QEMU.NAME}]: disk write speed'
+              name: 'Node [{#NODE.NAME}]: QEMU [{#QEMU.NAME}]: Disk write speed'
               type: DEPENDENT
               key: 'proxmox_ve.node.qemu.disk.write[{#NODE.ID},{#QEMU.VMID}]'
-              units: B/s
+              units: Bps
               description: 'Retrieves disk write speed of the QEMU virtual machine {#QEMU.NAME} on the node {#NODE.NAME}.'
               preprocessing:
                 - type: JSONPATH
@@ -1985,7 +2002,7 @@ zabbix_export:
                 - tag: qemu
                   value: '{#QEMU.NAME}'
             - uuid: bad696385bb743d98604ce6e769438d2
-              name: 'Node [{#NODE.NAME}]: QEMU [{#QEMU.NAME}]: memory total'
+              name: 'Node [{#NODE.NAME}]: QEMU [{#QEMU.NAME}]: Memory total'
               type: DEPENDENT
               key: 'proxmox_ve.node.qemu.memory.maxmem[{#NODE.ID},{#QEMU.VMID}]'
               units: B
@@ -2012,7 +2029,7 @@ zabbix_export:
                 - tag: qemu
                   value: '{#QEMU.NAME}'
             - uuid: c2471ee3018e4e2fb75b52f4af3a5929
-              name: 'Node [{#NODE.NAME}]: QEMU [{#QEMU.NAME}]: memory used'
+              name: 'Node [{#NODE.NAME}]: QEMU [{#QEMU.NAME}]: Memory used'
               type: DEPENDENT
               key: 'proxmox_ve.node.qemu.memory.usage[{#NODE.ID},{#QEMU.VMID}]'
               units: B
@@ -2039,7 +2056,7 @@ zabbix_export:
                 - tag: qemu
                   value: '{#QEMU.NAME}'
             - uuid: b72d9654decf4bb998386c11892fe137
-              name: 'Node [{#NODE.NAME}]: QEMU [{#QEMU.NAME}]: memory utilization'
+              name: 'Node [{#NODE.NAME}]: QEMU [{#QEMU.NAME}]: Memory utilization'
               type: CALCULATED
               key: 'proxmox_ve.node.qemu.memory.utilization[{#NODE.ID},{#QEMU.VMID}]'
               value_type: FLOAT
@@ -2064,17 +2081,17 @@ zabbix_export:
               trigger_prototypes:
                 - uuid: 88fecebb47ec4af89ea2d0f458e25b64
                   expression: 'avg(/Proxmox VE by HTTP/proxmox_ve.node.qemu.memory.utilization[{#NODE.ID},{#QEMU.VMID}],5m) > {$PVE.TRIGGER.MEMORY.WARNING:"{#QEMU.NAME}"}'
-                  name: 'Proxmox VE: Node [{#NODE.NAME}]: QEMU [{#QEMU.NAME}]: memory usage high'
+                  name: 'Proxmox VE: Node [{#NODE.NAME}]: QEMU [{#QEMU.NAME}]: Memory usage high'
                   priority: WARNING
                   description: 'The memory usage of the QEMU virtual machine {#QEMU.NAME} on the node {#NODE.NAME} is high.'
                   tags:
                     - tag: scope
                       value: notice
             - uuid: d112f6a55e484f3f816f20f7768a9e3e
-              name: 'Node [{#NODE.NAME}]: QEMU [{#QEMU.NAME}]: network input speed'
+              name: 'Node [{#NODE.NAME}]: QEMU [{#QEMU.NAME}]: Network input speed'
               type: DEPENDENT
               key: 'proxmox_ve.node.qemu.network.input[{#NODE.ID},{#QEMU.VMID}]'
-              units: b/s
+              units: bps
               description: 'Retrieves network input speed of the QEMU virtual machine {#QEMU.NAME} on the node {#NODE.NAME}.'
               preprocessing:
                 - type: JSONPATH
@@ -2102,10 +2119,10 @@ zabbix_export:
                 - tag: qemu
                   value: '{#QEMU.NAME}'
             - uuid: e8344592bc0b40aa91528af2a2c4bd15
-              name: 'Node [{#NODE.NAME}]: QEMU [{#QEMU.NAME}]: network output speed'
+              name: 'Node [{#NODE.NAME}]: QEMU [{#QEMU.NAME}]: Network output speed'
               type: DEPENDENT
               key: 'proxmox_ve.node.qemu.network.output[{#NODE.ID},{#QEMU.VMID}]'
-              units: b/s
+              units: bps
               description: 'Retrieves network output speed of the QEMU virtual machine {#QEMU.NAME} on the node {#NODE.NAME}.'
               preprocessing:
                 - type: JSONPATH
@@ -2133,7 +2150,7 @@ zabbix_export:
                 - tag: qemu
                   value: '{#QEMU.NAME}'
             - uuid: bbdf2640ea1e43a897da5d76f373fc80
-              name: 'Node [{#NODE.NAME}]: QEMU [{#QEMU.NAME}]: worked node'
+              name: 'Node [{#NODE.NAME}]: QEMU [{#QEMU.NAME}]: Worked node'
               type: DEPENDENT
               key: 'proxmox_ve.node.qemu.node[{#NODE.ID},{#QEMU.VMID}]'
               value_type: CHAR
@@ -2160,7 +2177,7 @@ zabbix_export:
               trigger_prototypes:
                 - uuid: a02742905e2c4fbdb2f582d0b1905ee6
                   expression: 'last(/Proxmox VE by HTTP/proxmox_ve.node.qemu.node[{#NODE.ID},{#QEMU.VMID}], #1) <> last(/Proxmox VE by HTTP/proxmox_ve.node.qemu.node[{#NODE.ID},{#QEMU.VMID}], #2)'
-                  name: 'Proxmox VE: Node [{#NODE.NAME}]: QEMU [{#QEMU.NAME}] changed worked node'
+                  name: 'Proxmox VE: Node [{#NODE.NAME}]: QEMU [{#QEMU.NAME}]: Changed worked node'
                   event_name: 'Proxmox VE: QEMU [{#QEMU.NAME}] changed worked node to "{ITEM.LASTVALUE}"'
                   priority: INFO
                   description: 'The QEMU virtual machine {#QEMU.NAME} migrated to another node.'
@@ -2169,7 +2186,7 @@ zabbix_export:
                     - tag: scope
                       value: notice
             - uuid: 70dd2565afe54dc9b77a7c49f4ef82c1
-              name: 'Node [{#NODE.NAME}]: QEMU [{#QEMU.NAME}]: status'
+              name: 'Node [{#NODE.NAME}]: QEMU [{#QEMU.NAME}]: Status'
               type: DEPENDENT
               key: 'proxmox_ve.node.qemu.status[{#NODE.ID},{#QEMU.VMID}]'
               description: 'Retrieves the status of the QEMU virtual machine {#QEMU.NAME} on the node {#NODE.NAME}.'
@@ -2207,14 +2224,14 @@ zabbix_export:
               trigger_prototypes:
                 - uuid: 692bf9da2b484abea039746735cefd48
                   expression: 'last(/Proxmox VE by HTTP/proxmox_ve.node.qemu.status[{#NODE.ID},{#QEMU.VMID}]) <> 2'
-                  name: 'Proxmox VE: Node [{#NODE.NAME}]: QEMU [{#QEMU.NAME}]: not running'
+                  name: 'Proxmox VE: Node [{#NODE.NAME}]: QEMU [{#QEMU.NAME}]: Not running'
                   priority: WARNING
                   description: 'The QEMU virtual machine {#QEMU.NAME} on the node {#NODE.NAME} is not running.'
                   tags:
                     - tag: scope
                       value: notice
             - uuid: ed946713280f4cf89d6bdc7f258618b7
-              name: 'Node [{#NODE.NAME}]: QEMU [{#QEMU.NAME}]: time zone'
+              name: 'Node [{#NODE.NAME}]: QEMU [{#QEMU.NAME}]: Time zone'
               type: HTTP_AGENT
               key: 'proxmox_ve.node.qemu.timezone[{#NODE.ID},{#QEMU.VMID}]'
               delay: 12h
@@ -2248,7 +2265,7 @@ zabbix_export:
                 - tag: qemu
                   value: '{#QEMU.NAME}'
             - uuid: c1b4a1af4238431db864d4bff66b1c9c
-              name: 'Node [{#NODE.NAME}]: QEMU [{#QEMU.NAME}]: time'
+              name: 'Node [{#NODE.NAME}]: QEMU [{#QEMU.NAME}]: Time'
               type: HTTP_AGENT
               key: 'proxmox_ve.node.qemu.time[{#NODE.ID},{#QEMU.VMID}]'
               delay: 10m
@@ -2282,7 +2299,7 @@ zabbix_export:
                 - tag: qemu
                   value: '{#QEMU.NAME}'
             - uuid: 2e978c24fadb4f7eb0157d883c7d3bfb
-              name: 'Node [{#NODE.NAME}]: QEMU [{#QEMU.NAME}]: uptime'
+              name: 'Node [{#NODE.NAME}]: QEMU [{#QEMU.NAME}]: Uptime'
               type: DEPENDENT
               key: 'proxmox_ve.node.qemu.uptime[{#NODE.ID},{#QEMU.VMID}]'
               units: uptime
@@ -2308,17 +2325,17 @@ zabbix_export:
               trigger_prototypes:
                 - uuid: 8c9c94cbdd8b491280faff5bc6f10b41
                   expression: 'last(/Proxmox VE by HTTP/proxmox_ve.node.qemu.uptime[{#NODE.ID},{#QEMU.VMID}]) < {$PVE.TRIGGER.UPTIME:"{#QEMU.NAME}"}'
-                  name: 'Proxmox VE: Node [{#NODE.NAME}]: QEMU [{#QEMU.NAME}]: has been restarted'
+                  name: 'Proxmox VE: Node [{#NODE.NAME}]: QEMU [{#QEMU.NAME}]: Has been restarted'
                   priority: WARNING
                   description: 'The QEMU virtual machine {#QEMU.NAME} on the node {#NODE.NAME} has been restarted.'
                   dependencies:
-                    - name: 'Proxmox VE: Node [{#NODE.NAME}]: QEMU [{#QEMU.NAME}]: not running'
+                    - name: 'Proxmox VE: Node [{#NODE.NAME}]: QEMU [{#QEMU.NAME}]: Not running'
                       expression: 'last(/Proxmox VE by HTTP/proxmox_ve.node.qemu.status[{#NODE.ID},{#QEMU.VMID}]) <> 2'
                   tags:
                     - tag: scope
                       value: notice
             - uuid: 49287abe4f694a9895cbb66adf275bde
-              name: 'Node [{#NODE.NAME}]: QEMU [{#QEMU.NAME}]: get info'
+              name: 'Node [{#NODE.NAME}]: QEMU [{#QEMU.NAME}]: Get info'
               type: HTTP_AGENT
               key: 'proxmox_ve.node.qemu[{#NODE.ID},{#QEMU.VMID}]'
               history: '0'
@@ -2349,7 +2366,7 @@ zabbix_export:
                     host: 'Proxmox VE by HTTP'
                     key: 'proxmox_ve.node.qemu.cpu.usage[{#NODE.ID},{#QEMU.VMID}]'
             - uuid: 3d8f0b2d3e4f4a5b8c9d0e1f2a3b4c5f
-              name: 'Node [{#NODE.NAME}]: QEMU [{#QEMU.NAME}/{#QEMU.VMID}]: disk read speed'
+              name: 'Node [{#NODE.NAME}]: QEMU [{#QEMU.NAME}/{#QEMU.VMID}]: Disk read speed'
               graph_items:
                 - color: 2600ff
                   item:
@@ -2361,7 +2378,7 @@ zabbix_export:
                     host: 'Proxmox VE by HTTP'
                     key: 'proxmox_ve.node.qemu.disk.write[{#NODE.ID},{#QEMU.VMID}]'
             - uuid: ba9b128b524e41a0a130b747daa90262
-              name: 'Node [{#NODE.NAME}]: QEMU [{#QEMU.NAME}/{#QEMU.VMID}]: memory used'
+              name: 'Node [{#NODE.NAME}]: QEMU [{#QEMU.NAME}/{#QEMU.VMID}]: Memory used'
               graph_items:
                 - color: ff0000
                   item:
@@ -2374,7 +2391,7 @@ zabbix_export:
                     host: 'Proxmox VE by HTTP'
                     key: 'proxmox_ve.node.qemu.memory.maxmem[{#NODE.ID},{#QEMU.VMID}]'
             - uuid: f200d341935549c798ace87b105321f0
-              name: 'Node [{#NODE.NAME}]: QEMU [{#QEMU.NAME}/{#QEMU.VMID}]: network speed'
+              name: 'Node [{#NODE.NAME}]: QEMU [{#QEMU.NAME}/{#QEMU.VMID}]: Network speed'
               graph_items:
                 - color: 2600ff
                   item:
@@ -2404,7 +2421,7 @@ zabbix_export:
               parameters:
                 - 12h
         - uuid: 3e39886146c24b3e82d57ac347495c5c
-          name: 'Node [{#NODE.NAME}]: QEMU [{#QEMU.NAME}]: filesystem discovery'
+          name: 'Node [{#NODE.NAME}]: QEMU [{#QEMU.NAME}]: Filesystem discovery'
           type: HTTP_AGENT
           key: 'proxmox_ve.node.qemu.filesystem.discovery[{#NODE.ID},{#QEMU.VMID}]'
           delay: '{$PVE.PARAMS.INTERVAL.QEMU.FS}'
@@ -2424,7 +2441,7 @@ zabbix_export:
           description: 'Discovers filesystems of the QEMU virtual machine {#QEMU.NAME} on the node {#NODE.NAME}.'
           item_prototypes:
             - uuid: 814d919286a845429064bd2c6f7f89cf
-              name: 'Node [{#NODE.NAME}]: QEMU [{#QEMU.NAME}][{#QEMU.FS.MOUNTPOINT}]: filesystem total (privileged)'
+              name: 'Node [{#NODE.NAME}]: QEMU [{#QEMU.NAME}][{#QEMU.FS.MOUNTPOINT}]: Filesystem total (privileged)'
               type: DEPENDENT
               key: 'proxmox_ve.node.qemu.filesystem.total.privileged[{#NODE.ID},{#QEMU.VMID},{#QEMU.FS.MOUNTPOINT}]'
               units: B
@@ -2453,7 +2470,7 @@ zabbix_export:
                 - tag: qemu
                   value: '{#QEMU.NAME}'
             - uuid: ccc52ebc5f8d4eae88c09d7dfac7580f
-              name: 'Node [{#NODE.NAME}]: QEMU [{#QEMU.NAME}][{#QEMU.FS.MOUNTPOINT}]: filesystem total'
+              name: 'Node [{#NODE.NAME}]: QEMU [{#QEMU.NAME}][{#QEMU.FS.MOUNTPOINT}]: Filesystem total'
               type: DEPENDENT
               key: 'proxmox_ve.node.qemu.filesystem.total[{#NODE.ID},{#QEMU.VMID},{#QEMU.FS.MOUNTPOINT}]'
               units: B
@@ -2482,7 +2499,7 @@ zabbix_export:
                 - tag: qemu
                   value: '{#QEMU.NAME}'
             - uuid: d3860343ad874217a7739c444a85dfc1
-              name: 'Node [{#NODE.NAME}]: QEMU [{#QEMU.NAME}][{#QEMU.FS.MOUNTPOINT}]: filesystem used'
+              name: 'Node [{#NODE.NAME}]: QEMU [{#QEMU.NAME}][{#QEMU.FS.MOUNTPOINT}]: Filesystem used'
               type: DEPENDENT
               key: 'proxmox_ve.node.qemu.filesystem.usage[{#NODE.ID},{#QEMU.VMID},{#QEMU.FS.MOUNTPOINT}]'
               units: B
@@ -2511,7 +2528,7 @@ zabbix_export:
                 - tag: qemu
                   value: '{#QEMU.NAME}'
             - uuid: 4a7a0540bf0f45edab0b6a33957957cf
-              name: 'Node [{#NODE.NAME}]: QEMU [{#QEMU.NAME}][{#QEMU.FS.MOUNTPOINT}]: filesystem utilization'
+              name: 'Node [{#NODE.NAME}]: QEMU [{#QEMU.NAME}][{#QEMU.FS.MOUNTPOINT}]: Filesystem utilization'
               type: CALCULATED
               key: 'proxmox_ve.node.qemu.filesystem.utilization[{#NODE.ID},{#QEMU.VMID},{#QEMU.FS.MOUNTPOINT}]'
               value_type: FLOAT
@@ -2538,14 +2555,14 @@ zabbix_export:
               trigger_prototypes:
                 - uuid: 0ea2852582cf4a48b1d5c1a74713e9e1
                   expression: 'last(/Proxmox VE by HTTP/proxmox_ve.node.qemu.filesystem.utilization[{#NODE.ID},{#QEMU.VMID},{#QEMU.FS.MOUNTPOINT}]) > {$PVE.TRIGGER.DISK.WARNING:"{#QEMU.NAME}"}'
-                  name: 'Proxmox VE: Node [{#NODE.NAME}]: QEMU [{#QEMU.NAME}][{#QEMU.FS.MOUNTPOINT}]: filesystem used high'
+                  name: 'Proxmox VE: Node [{#NODE.NAME}]: QEMU [{#QEMU.NAME}][{#QEMU.FS.MOUNTPOINT}]: Filesystem used high'
                   priority: WARNING
                   description: 'The filesystem usage of {#QEMU.FS.MOUNTPOINT} on the QEMU virtual machine {#QEMU.NAME} on the node {#NODE.NAME} is high.'
                   tags:
                     - tag: scope
                       value: notice
             - uuid: 3f550a78afa34e79a550d0192e66bac4
-              name: 'Node [{#NODE.NAME}]: QEMU [{#QEMU.NAME}][{#QEMU.FS.MOUNTPOINT}]: filesystem get info'
+              name: 'Node [{#NODE.NAME}]: QEMU [{#QEMU.NAME}][{#QEMU.FS.MOUNTPOINT}]: Filesystem get info'
               type: HTTP_AGENT
               key: 'proxmox_ve.node.qemu.filesystem[{#NODE.ID},{#QEMU.VMID},{#QEMU.FS.MOUNTPOINT}]'
               delay: 10m
@@ -2572,7 +2589,7 @@ zabbix_export:
                   value: raw
           graph_prototypes:
             - uuid: cd8aea318eea413b9f774739e6effda8
-              name: 'Node [{#NODE.NAME}]: QEMU [{#QEMU.NAME}/{#QEMU.VMID}][{#QEMU.FS.MOUNTPOINT}]: filesystem used'
+              name: 'Node [{#NODE.NAME}]: QEMU [{#QEMU.NAME}/{#QEMU.VMID}][{#QEMU.FS.MOUNTPOINT}]: Filesystem used'
               graph_items:
                 - color: ff0000
                   item:
@@ -2607,7 +2624,7 @@ zabbix_export:
               parameters:
                 - 1h
         - uuid: 4f8c1b2d3e4f4a5b8c9d0e1f2a3b4c5e
-          name: 'Node [{#NODE.NAME}]: QEMU [{#QEMU.NAME}]: network interfaces discovery'
+          name: 'Node [{#NODE.NAME}]: QEMU [{#QEMU.NAME}]: Network interfaces discovery'
           type: HTTP_AGENT
           key: 'proxmox_ve.node.qemu.network.discovery[{#NODE.ID},{#QEMU.VMID}]'
           delay: '{$PVE.PARAMS.INTERVAL.QEMU.NETWORK}'
@@ -2622,7 +2639,7 @@ zabbix_export:
           description: 'Discovers network interfaces of the QEMU virtual machine {#QEMU.NAME} on the node {#NODE.NAME}.'
           item_prototypes:
             - uuid: 0ca6ed3bdf7d4584a34ba3452f295146
-              name: 'Node [{#NODE.NAME}]: QEMU [{#QEMU.NAME}][{#QEMU.NETIF.NAME}]: network input dropped'
+              name: 'Node [{#NODE.NAME}]: QEMU [{#QEMU.NAME}][{#QEMU.NETIF.NAME}]: Network input dropped'
               type: DEPENDENT
               key: 'proxmox_ve.node.qemu.network.input.dropped[{#NODE.ID},{#QEMU.VMID},{#QEMU.NETIF.NAME}]'
               units: '!dropped'
@@ -2651,7 +2668,7 @@ zabbix_export:
                 - tag: qemu
                   value: '{#QEMU.NAME}'
             - uuid: 763cba20cd544659aafdd81e66c81d44
-              name: 'Node [{#NODE.NAME}]: QEMU [{#QEMU.NAME}][{#QEMU.NETIF.NAME}]: network input errros'
+              name: 'Node [{#NODE.NAME}]: QEMU [{#QEMU.NAME}][{#QEMU.NETIF.NAME}]: Network input errors'
               type: DEPENDENT
               key: 'proxmox_ve.node.qemu.network.input.errors[{#NODE.ID},{#QEMU.VMID},{#QEMU.NETIF.NAME}]'
               units: '!errors'
@@ -2680,10 +2697,10 @@ zabbix_export:
                 - tag: qemu
                   value: '{#QEMU.NAME}'
             - uuid: dc4f4cdf62bd49fc9a9bf6d705fd2fe4
-              name: 'Node [{#NODE.NAME}]: QEMU [{#QEMU.NAME}][{#QEMU.NETIF.NAME}]: network input speed (in b/s)'
+              name: 'Node [{#NODE.NAME}]: QEMU [{#QEMU.NAME}][{#QEMU.NETIF.NAME}]: Network input speed (in bps)'
               type: DEPENDENT
               key: 'proxmox_ve.node.qemu.network.input.speed.bits[{#NODE.ID},{#QEMU.VMID},{#QEMU.NETIF.NAME}]'
-              units: b/s
+              units: bps
               description: 'Retrieves the input speed of the network interface {#QEMU.NETIF.NAME} of the QEMU virtual machine {#QEMU.NAME} on the node {#NODE.NAME}.'
               preprocessing:
                 - type: JSONPATH
@@ -2713,7 +2730,7 @@ zabbix_export:
                 - tag: qemu
                   value: '{#QEMU.NAME}'
             - uuid: 554ffe79db404b6a864a0af54be2120a
-              name: 'Node [{#NODE.NAME}]: QEMU [{#QEMU.NAME}][{#QEMU.NETIF.NAME}]: network input speed (in packets/s)'
+              name: 'Node [{#NODE.NAME}]: QEMU [{#QEMU.NAME}][{#QEMU.NETIF.NAME}]: Network input speed (in packets/s)'
               type: DEPENDENT
               key: 'proxmox_ve.node.qemu.network.input.speed.packets[{#NODE.ID},{#QEMU.VMID},{#QEMU.NETIF.NAME}]'
               units: packets/s
@@ -2743,7 +2760,7 @@ zabbix_export:
                 - tag: qemu
                   value: '{#QEMU.NAME}'
             - uuid: d60d950efd6c4ba8bee2cf9b30516285
-              name: 'Node [{#NODE.NAME}]: QEMU [{#QEMU.NAME}][{#QEMU.NETIF.NAME}]: hardware address'
+              name: 'Node [{#NODE.NAME}]: QEMU [{#QEMU.NAME}][{#QEMU.NETIF.NAME}]: Hardware address'
               type: DEPENDENT
               key: 'proxmox_ve.node.qemu.network.mac[{#NODE.ID},{#QEMU.VMID},{#QEMU.NETIF.NAME}]'
               value_type: CHAR
@@ -2772,7 +2789,7 @@ zabbix_export:
                 - tag: qemu
                   value: '{#QEMU.NAME}'
             - uuid: efd5da36a4064a4e910f74aa972654b0
-              name: 'Node [{#NODE.NAME}]: QEMU [{#QEMU.NAME}][{#QEMU.NETIF.NAME}]: network output dropped'
+              name: 'Node [{#NODE.NAME}]: QEMU [{#QEMU.NAME}][{#QEMU.NETIF.NAME}]: Network output dropped'
               type: DEPENDENT
               key: 'proxmox_ve.node.qemu.network.output.dropped[{#NODE.ID},{#QEMU.VMID},{#QEMU.NETIF.NAME}]'
               units: '!dropped'
@@ -2801,7 +2818,7 @@ zabbix_export:
                 - tag: qemu
                   value: '{#QEMU.NAME}'
             - uuid: d1764e64cdba4627b10bfbb33f500417
-              name: 'Node [{#NODE.NAME}]: QEMU [{#QEMU.NAME}][{#QEMU.NETIF.NAME}]: network output errors'
+              name: 'Node [{#NODE.NAME}]: QEMU [{#QEMU.NAME}][{#QEMU.NETIF.NAME}]: Network output errors'
               type: DEPENDENT
               key: 'proxmox_ve.node.qemu.network.output.errors[{#NODE.ID},{#QEMU.VMID},{#QEMU.NETIF.NAME}]'
               units: '!errors'
@@ -2830,10 +2847,10 @@ zabbix_export:
                 - tag: qemu
                   value: '{#QEMU.NAME}'
             - uuid: f7a698fdd2794932a11388b95d539143
-              name: 'Node [{#NODE.NAME}]: QEMU [{#QEMU.NAME}][{#QEMU.NETIF.NAME}]: network output speed (in b/s)'
+              name: 'Node [{#NODE.NAME}]: QEMU [{#QEMU.NAME}][{#QEMU.NETIF.NAME}]: Network output speed (in bps)'
               type: DEPENDENT
               key: 'proxmox_ve.node.qemu.network.output.speed.bits[{#NODE.ID},{#QEMU.VMID},{#QEMU.NETIF.NAME}]'
-              units: b/s
+              units: bps
               description: 'Retrieves the output speed of the network interface {#QEMU.NETIF.NAME} of the QEMU virtual machine {#QEMU.NAME} on the node {#NODE.NAME}.'
               preprocessing:
                 - type: JSONPATH
@@ -2863,7 +2880,7 @@ zabbix_export:
                 - tag: qemu
                   value: '{#QEMU.NAME}'
             - uuid: 958a63c0c82e4545b18033ff8bff5384
-              name: 'Node [{#NODE.NAME}]: QEMU [{#QEMU.NAME}][{#QEMU.NETIF.NAME}]: network output speed (in packets/s)'
+              name: 'Node [{#NODE.NAME}]: QEMU [{#QEMU.NAME}][{#QEMU.NETIF.NAME}]: Network output speed (in packets/s)'
               type: DEPENDENT
               key: 'proxmox_ve.node.qemu.network.output.speed.packets[{#NODE.ID},{#QEMU.VMID},{#QEMU.NETIF.NAME}]'
               units: packets/s
@@ -2893,7 +2910,7 @@ zabbix_export:
                 - tag: qemu
                   value: '{#QEMU.NAME}'
             - uuid: 8455021604db43ff80d860ca4ca87e2c
-              name: 'Node [{#NODE.NAME}]: QEMU [{#QEMU.NAME}][{#QEMU.NETIF.NAME}]: network interface info'
+              name: 'Node [{#NODE.NAME}]: QEMU [{#QEMU.NAME}][{#QEMU.NETIF.NAME}]: Network interface info'
               type: HTTP_AGENT
               key: 'proxmox_ve.node.qemu.network[{#NODE.ID},{#QEMU.VMID},{#QEMU.NETIF.NAME}]'
               history: '0'
@@ -2919,7 +2936,7 @@ zabbix_export:
                   value: raw
           graph_prototypes:
             - uuid: 1a7a579a10784f4d8b5087f26c507aca
-              name: 'Node [{#NODE.NAME}]: QEMU [{#QEMU.NAME}/{#QEMU.VMID}][{#QEMU.NETIF.NAME}]: network speed'
+              name: 'Node [{#NODE.NAME}]: QEMU [{#QEMU.NAME}/{#QEMU.VMID}][{#QEMU.NETIF.NAME}]: Network speed'
               graph_items:
                 - color: 2600ff
                   item:
@@ -2931,7 +2948,7 @@ zabbix_export:
                     host: 'Proxmox VE by HTTP'
                     key: 'proxmox_ve.node.qemu.network.output.speed.bits[{#NODE.ID},{#QEMU.VMID},{#QEMU.NETIF.NAME}]'
             - uuid: cff8762c3c0d40b199852574749b08de
-              name: 'Node [{#NODE.NAME}]: QEMU [{#QEMU.NAME}/{#QEMU.VMID}][{#QEMU.NETIF.NAME}]: network speed (in packets/s)'
+              name: 'Node [{#NODE.NAME}]: QEMU [{#QEMU.NAME}/{#QEMU.VMID}][{#QEMU.NETIF.NAME}]: Network speed (in packets/s)'
               graph_items:
                 - color: 2600ff
                   item:
@@ -3022,7 +3039,9 @@ zabbix_export:
                       	return JSON.stringify(data);
                       
                       } catch (e) {
+                      
                       	Zabbix.log(3, "[ERROR] Proxmox ip address discovery error: " + e + " for value: " + value);
+                      
                       	return JSON.stringify([]);
                       }
                 - type: JSONPATH
@@ -3034,11 +3053,13 @@ zabbix_export:
                     - |
                       try {
                       	var data = JSON.parse(value);
-                      	
+                      
                       	return data['ip-address'] + '/' + data['prefix'];
                       
                       } catch (e) {
+                      
                       	Zabbix.log(3, "[ERROR] Proxmox ip address parsing error: " + e + " for value: " + value);
+                      
                       	return "[ERROR] Proxmox ip address parsing error: " + e + " for value: " + value;
                       }
                 - type: DISCARD_UNCHANGED_HEARTBEAT
@@ -3101,7 +3122,9 @@ zabbix_export:
                   	return JSON.stringify(data);
                   
                   } catch (e) {
+                  
                   	Zabbix.log(3, "[ERROR] Proxmox ip address discovery error: " + e + " for value: " + value);
+                  
                   	return JSON.stringify([]);
                   }
             - type: DISCARD_UNCHANGED_HEARTBEAT
@@ -3123,7 +3146,7 @@ zabbix_export:
           description: 'Discovers operating system information of the QEMU virtual machine {#QEMU.NAME} on the node {#NODE.NAME}.'
           item_prototypes:
             - uuid: 52ee9eeab05443269000c1ae2f6dde6c
-              name: 'Node [{#NODE.NAME}]: QEMU [{#QEMU.NAME}]: {#QEMU.OS.METRIC}'
+              name: 'Node [{#NODE.NAME}]: QEMU [{#QEMU.NAME}]: OS [{#QEMU.OS.METRIC}]'
               type: HTTP_AGENT
               key: 'proxmox_ve.node.qemu.os.info[{#NODE.ID},{#QEMU.VMID},{#QEMU.OS.METRIC}]'
               delay: '{$PVE.PARAMS.INTERVAL.QEMU.OS}'
@@ -3197,14 +3220,16 @@ zabbix_export:
                   	return JSON.stringify(output);
                   
                   } catch (e) {
-                  	Zabbix.log(3, "[ERROR] Proxmox OS info discovery error: " + e + " for value: " + value);
+                  
+                  	Zabbix.log(3, '[ERROR] Proxmox OS info discovery error: ' + e + ' for value: ' + value);
+                  
                   	return JSON.stringify([]);
                   }
             - type: DISCARD_UNCHANGED_HEARTBEAT
               parameters:
                 - 12h
         - uuid: 9edd36cafac843879c698b70d925e472
-          name: 'Node [{#NODE.NAME}]: storage discovery'
+          name: 'Node [{#NODE.NAME}]: Storage discovery'
           type: HTTP_AGENT
           key: 'proxmox_ve.node.storage.discovery[{#NODE.ID}]'
           delay: '{$PVE.PARAMS.INTERVAL.STORAGE}'
@@ -3221,7 +3246,7 @@ zabbix_export:
           description: 'Discovers storage devices on the node {#NODE.NAME}.'
           item_prototypes:
             - uuid: 48fdd99d2647428f864bc26aa860deba
-              name: 'Node [{#NODE.NAME}]: storage [{#STORAGE.NAME}]: content'
+              name: 'Node [{#NODE.NAME}]: Storage [{#STORAGE.NAME}]: Content'
               type: DEPENDENT
               key: 'proxmox_ve.node.storage.content[{#NODE.ID},{#STORAGE.NAME}]'
               value_type: CHAR
@@ -3246,7 +3271,7 @@ zabbix_export:
                 - tag: storage
                   value: '{#STORAGE.NAME}'
             - uuid: d36ce78b8ad242d2b436155c9ce566c8
-              name: 'Node [{#NODE.NAME}]: storage [{#STORAGE.NAME}]: total'
+              name: 'Node [{#NODE.NAME}]: Storage [{#STORAGE.NAME}]: Total'
               type: DEPENDENT
               key: 'proxmox_ve.node.storage.total[{#NODE.ID},{#STORAGE.NAME}]'
               units: B
@@ -3271,7 +3296,7 @@ zabbix_export:
                 - tag: storage
                   value: '{#STORAGE.NAME}'
             - uuid: 6aabad76c8c44dc982469478cb7be3a9
-              name: 'Node [{#NODE.NAME}]: storage [{#STORAGE.NAME}]: type'
+              name: 'Node [{#NODE.NAME}]: Storage [{#STORAGE.NAME}]: Type'
               type: DEPENDENT
               key: 'proxmox_ve.node.storage.type[{#NODE.ID},{#STORAGE.NAME}]'
               value_type: CHAR
@@ -3296,7 +3321,7 @@ zabbix_export:
                 - tag: storage
                   value: '{#STORAGE.NAME}'
             - uuid: 2441813b412e47608f7267a6e720a108
-              name: 'Node [{#NODE.NAME}]: storage [{#STORAGE.NAME}]: used'
+              name: 'Node [{#NODE.NAME}]: Storage [{#STORAGE.NAME}]: Used'
               type: DEPENDENT
               key: 'proxmox_ve.node.storage.used[{#NODE.ID},{#STORAGE.NAME}]'
               units: B
@@ -3321,7 +3346,7 @@ zabbix_export:
                 - tag: storage
                   value: '{#STORAGE.NAME}'
             - uuid: 7134005131c24ac28f2b09e77c1c6a25
-              name: 'Node [{#NODE.NAME}]: storage [{#STORAGE.NAME}]: utilization'
+              name: 'Node [{#NODE.NAME}]: Storage [{#STORAGE.NAME}]: Utilization'
               type: CALCULATED
               key: 'proxmox_ve.node.storage.utilization[{#NODE.ID},{#STORAGE.NAME}]'
               value_type: FLOAT
@@ -3344,14 +3369,14 @@ zabbix_export:
               trigger_prototypes:
                 - uuid: 366f5a856684456fbdbcb89653eeb28f
                   expression: 'last(/Proxmox VE by HTTP/proxmox_ve.node.storage.utilization[{#NODE.ID},{#STORAGE.NAME}]) > {$PVE.TRIGGER.DISK.WARNING:"{#STORAGE.NAME}"}'
-                  name: 'Proxmox VE: Node [{#NODE.NAME}]: storage [{#STORAGE.NAME}]: usage high'
+                  name: 'Proxmox VE: Node [{#NODE.NAME}]: Storage [{#STORAGE.NAME}]: Usage high'
                   priority: WARNING
                   description: 'The storage usage of {#STORAGE.NAME} on the node {#NODE.NAME} is high.'
                   tags:
                     - tag: scope
                       value: notice
             - uuid: 50680ac0ba6c42c7b7b28822f41364b5
-              name: 'Node [{#NODE.NAME}]: storage [{#STORAGE.NAME}]: get info'
+              name: 'Node [{#NODE.NAME}]: Storage [{#STORAGE.NAME}]: Get info'
               type: HTTP_AGENT
               key: 'proxmox_ve.node.storage[{#NODE.ID},{#STORAGE.NAME}]'
               delay: 1h
@@ -3376,7 +3401,7 @@ zabbix_export:
           trigger_prototypes:
             - uuid: 65718347d14743b88ffa60051f688c37
               expression: 'last(/Proxmox VE by HTTP/proxmox_ve.node.storage.used[{#NODE.ID},{#STORAGE.NAME}]) / last(/Proxmox VE by HTTP/proxmox_ve.node.storage.total[{#NODE.ID},{#STORAGE.NAME}]) * 100 > {$PVE.TRIGGER.DISK.WARNING:"{#STORAGE.NAME}"}'
-              name: 'Proxmox VE: Node [{#NODE.NAME}]: storage [{#STORAGE.NAME}]: usage high'
+              name: 'Proxmox VE: Node [{#NODE.NAME}]: Storage [{#STORAGE.NAME}]: Usage high'
               priority: WARNING
               description: 'The storage usage of {#STORAGE.NAME} on the node {#NODE.NAME} is high.'
               tags:
@@ -3384,7 +3409,7 @@ zabbix_export:
                   value: notice
           graph_prototypes:
             - uuid: cdc304fb2ed84bd68a81ad6ae4c757b2
-              name: 'Node [{#NODE.NAME}]: storage [{#STORAGE.NAME}]: used'
+              name: 'Node [{#NODE.NAME}]: Storage [{#STORAGE.NAME}]: Used'
               graph_items:
                 - color: ff0000
                   item:
@@ -3492,7 +3517,7 @@ zabbix_export:
                     - tag: scope
                       value: performance
             - uuid: 06e86fe02b47408cb06ee7573eb3daf8
-              name: 'Node [{#NODE.NAME}]: disk utilization'
+              name: 'Node [{#NODE.NAME}]: Disk utilization'
               type: CALCULATED
               key: 'proxmox_ve.node.disk.utilization[{#NODE.ID}]'
               value_type: FLOAT
@@ -3522,7 +3547,7 @@ zabbix_export:
                     - tag: scope
                       value: node
             - uuid: 1143bf5a89a243fa805055432eaef82d
-              name: 'Node [{#NODE.NAME}]: disk used'
+              name: 'Node [{#NODE.NAME}]: Disk used'
               type: DEPENDENT
               key: 'proxmox_ve.node.disk[{#NODE.ID}]'
               units: B
@@ -3545,7 +3570,7 @@ zabbix_export:
                 - tag: node
                   value: '{#NODE.NAME}'
             - uuid: 357ea448aa994da6bd7b613775c661dc
-              name: 'Node [{#NODE.NAME}]: number of PCI devices'
+              name: 'Node [{#NODE.NAME}]: Number of PCI devices'
               type: HTTP_AGENT
               key: 'proxmox_ve.node.hardware.pci[{#NODE.ID}]'
               delay: 1h
@@ -3585,7 +3610,7 @@ zabbix_export:
                   description: 'The number of PCI devices on the node {#NODE.NAME} has changed.'
                   manual_close: 'YES'
             - uuid: d2a13387aa4f4ac0b811634630607d57
-              name: 'Node [{#NODE.NAME}]: number of USB devices'
+              name: 'Node [{#NODE.NAME}]: Number of USB devices'
               type: HTTP_AGENT
               key: 'proxmox_ve.node.hardware.usb[{#NODE.ID}]'
               delay: 1h
@@ -3649,7 +3674,7 @@ zabbix_export:
                 - tag: node
                   value: '{#NODE.NAME}'
             - uuid: 26f241c06bd549d9a275da63fa5e3005
-              name: 'Node [{#NODE.NAME}]: time (local)'
+              name: 'Node [{#NODE.NAME}]: Time (local)'
               type: DEPENDENT
               key: 'proxmox_ve.node.localtime[{#NODE.ID}]'
               units: unixtime
@@ -3670,7 +3695,7 @@ zabbix_export:
                 - tag: node
                   value: '{#NODE.NAME}'
             - uuid: 466efa04cd384304b88e071f40bb7d71
-              name: 'Node [{#NODE.NAME}]: disk total'
+              name: 'Node [{#NODE.NAME}]: Disk total'
               type: DEPENDENT
               key: 'proxmox_ve.node.maxdisk[{#NODE.ID}]'
               units: B
@@ -3693,7 +3718,7 @@ zabbix_export:
                 - tag: node
                   value: '{#NODE.NAME}'
             - uuid: 33b2e681a3444ca2aaf783ff1b4c2262
-              name: 'Node [{#NODE.NAME}]: memory total'
+              name: 'Node [{#NODE.NAME}]: Memory total'
               type: DEPENDENT
               key: 'proxmox_ve.node.maxmem[{#NODE.ID}]'
               units: B
@@ -3716,7 +3741,7 @@ zabbix_export:
                 - tag: node
                   value: '{#NODE.NAME}'
             - uuid: bda2c8134071495aa81c1d3be7b7aafb
-              name: 'Node [{#NODE.NAME}]: memory utilization'
+              name: 'Node [{#NODE.NAME}]: Memory utilization'
               type: CALCULATED
               key: 'proxmox_ve.node.mem.utilization[{#NODE.ID}]'
               value_type: FLOAT
@@ -3746,7 +3771,7 @@ zabbix_export:
                     - tag: scope
                       value: performance
             - uuid: a9b3314f781b4c139eeadec13c8ca545
-              name: 'Node [{#NODE.NAME}]: memory used'
+              name: 'Node [{#NODE.NAME}]: Memory used'
               type: DEPENDENT
               key: 'proxmox_ve.node.mem[{#NODE.ID}]'
               units: B
@@ -3769,7 +3794,7 @@ zabbix_export:
                 - tag: node
                   value: '{#NODE.NAME}'
             - uuid: 836090c775494266ab89ca15de989477
-              name: 'Node [{#NODE.NAME}]: status'
+              name: 'Node [{#NODE.NAME}]: Status'
               type: DEPENDENT
               key: 'proxmox_ve.node.status[{#NODE.ID}]'
               description: 'Retrieves the status of the node {#NODE.NAME}.'
@@ -3785,10 +3810,11 @@ zabbix_export:
                   parameters:
                     - |
                       const status_map = {
-                        'online': '10',
-                        'unknown': '5',
-                        'offline': '1'
+                      	'online': '10',
+                      	'unknown': '5',
+                      	'offline': '1'
                       };
+                      
                       return typeof status_map[value] === 'undefined' ? '0' : status_map[value];
                 - type: DISCARD_UNCHANGED_HEARTBEAT
                   parameters:
@@ -3808,7 +3834,7 @@ zabbix_export:
                   description: 'The node {#NODE.NAME} is not online.'
                   manual_close: 'YES'
             - uuid: 9d296d36d26648f3be04b2d154434b87
-              name: 'Node [{#NODE.NAME}]: subscribe level'
+              name: 'Node [{#NODE.NAME}]: Subscribe level'
               type: DEPENDENT
               key: 'proxmox_ve.node.subscribe[{#NODE.ID}]'
               value_type: CHAR
@@ -3831,7 +3857,7 @@ zabbix_export:
                 - tag: node
                   value: '{#NODE.NAME}'
             - uuid: 565d91b3cab74c52968c6ed244717225
-              name: 'Node [{#NODE.NAME}]: time info'
+              name: 'Node [{#NODE.NAME}]: Time info'
               type: HTTP_AGENT
               key: 'proxmox_ve.node.time.info[{#NODE.ID}]'
               delay: 10m
@@ -3855,7 +3881,7 @@ zabbix_export:
                 - tag: component
                   value: raw
             - uuid: fd3dd8ae953e4c4db06e67986f46f070
-              name: 'Node [{#NODE.NAME}]: time zone'
+              name: 'Node [{#NODE.NAME}]: Time zone'
               type: DEPENDENT
               key: 'proxmox_ve.node.timezone[{#NODE.ID}]'
               value_type: CHAR
@@ -3879,7 +3905,7 @@ zabbix_export:
                 - tag: node
                   value: '{#NODE.NAME}'
             - uuid: 10ac244555b94ef391129bd6c1fd4508
-              name: 'Node [{#NODE.NAME}]: time'
+              name: 'Node [{#NODE.NAME}]: Time'
               type: DEPENDENT
               key: 'proxmox_ve.node.time[{#NODE.ID}]'
               units: unixtime
@@ -3900,7 +3926,7 @@ zabbix_export:
                 - tag: node
                   value: '{#NODE.NAME}'
             - uuid: f2dd7010e59e4af6a897ff8ad2e2b480
-              name: 'Node [{#NODE.NAME}]: available updates'
+              name: 'Node [{#NODE.NAME}]: Available updates'
               type: HTTP_AGENT
               key: 'proxmox_ve.node.updates[{#NODE.ID}]'
               delay: 12h
@@ -3941,7 +3967,7 @@ zabbix_export:
                     - tag: scope
                       value: notice
             - uuid: 0fb93d390b804a0498bbbcca31c0c229
-              name: 'Node [{#NODE.NAME}]: uptime'
+              name: 'Node [{#NODE.NAME}]: Uptime'
               type: DEPENDENT
               key: 'proxmox_ve.node.uptime[{#NODE.ID}]'
               units: uptime
@@ -3967,7 +3993,7 @@ zabbix_export:
                   priority: INFO
                   description: 'The node {#NODE.NAME} has been restarted.'
             - uuid: fd98043c577b4697992da7daf5a838b4
-              name: 'Node [{#NODE.NAME}]: version'
+              name: 'Node [{#NODE.NAME}]: Version'
               type: HTTP_AGENT
               key: 'proxmox_ve.node.version[{#NODE.ID}]'
               delay: 12h
@@ -4099,10 +4125,10 @@ zabbix_export:
                     operator: NOT_EXISTS
               operations:
                 - operator: REGEXP
-                  value: ': memory used$'
+                  value: ': Memory used$'
                   discover: NO_DISCOVER
                 - operator: REGEXP
-                  value: ': memory utilization$'
+                  value: ': Memory utilization$'
                   discover: NO_DISCOVER
             - name: 'Override for "maxmem" macro'
               step: '4'
@@ -4112,7 +4138,7 @@ zabbix_export:
                     operator: NOT_EXISTS
               operations:
                 - operator: REGEXP
-                  value: ': memory total$'
+                  value: ': Memory total$'
                   discover: NO_DISCOVER
             - name: 'Override for "disk" macro'
               step: '5'
@@ -4122,7 +4148,7 @@ zabbix_export:
                     operator: NOT_EXISTS
               operations:
                 - operator: REGEXP
-                  value: ': disk used$'
+                  value: ': Disk used$'
                   discover: NO_DISCOVER
             - name: 'Override for "maxdisk" macro'
               step: '6'
@@ -4132,7 +4158,7 @@ zabbix_export:
                     operator: NOT_EXISTS
               operations:
                 - operator: REGEXP
-                  value: ': disk total$'
+                  value: ': Disk total$'
                   discover: NO_DISCOVER
             - name: 'Override for "uptime" macro'
               step: '7'
@@ -4142,7 +4168,7 @@ zabbix_export:
                     operator: NOT_EXISTS
               operations:
                 - operator: REGEXP
-                  value: ': uptime$'
+                  value: ': Uptime$'
                   discover: NO_DISCOVER
             - name: 'Disable discovery of node certificates'
               step: '8'
@@ -4154,7 +4180,7 @@ zabbix_export:
               operations:
                 - operationobject: LLD_RULE_PROTOTYPE
                   operator: REGEXP
-                  value: ' certificate discovery$'
+                  value: ' Certificate discovery$'
                   discover: NO_DISCOVER
             - name: 'Disable discovery of node disks'
               step: '9'
@@ -4166,7 +4192,7 @@ zabbix_export:
               operations:
                 - operationobject: LLD_RULE_PROTOTYPE
                   operator: REGEXP
-                  value: ' disks discovery$'
+                  value: ' Disks discovery$'
                   discover: NO_DISCOVER
             - name: 'Disable discovery of node storage'
               step: '10'
@@ -4178,7 +4204,7 @@ zabbix_export:
               operations:
                 - operationobject: LLD_RULE_PROTOTYPE
                   operator: REGEXP
-                  value: ' storage discovery$'
+                  value: ' Storage discovery$'
                   discover: NO_DISCOVER
         - uuid: e051676e5cef47038470f58d60519953
           name: 'Proxmox shared storage discovery'
@@ -4194,7 +4220,7 @@ zabbix_export:
                 operator: NOT_MATCHES_REGEX
           item_prototypes:
             - uuid: 84569e8824394c5fa7a842840bef688e
-              name: 'Storage [{#STORAGE.NAME}]: content'
+              name: 'Storage [{#STORAGE.NAME}]: Content'
               type: DEPENDENT
               key: 'proxmox_ve.storage.content[{#STORAGE.NAME}]'
               value_type: CHAR
@@ -4216,7 +4242,7 @@ zabbix_export:
                 - tag: storage
                   value: '{#STORAGE.NAME}'
             - uuid: 0f3db2e0ae4f4cd68411c710d5d12c9e
-              name: 'Storage [{#STORAGE.NAME}]: total'
+              name: 'Storage [{#STORAGE.NAME}]: Total'
               type: DEPENDENT
               key: 'proxmox_ve.storage.total[{#STORAGE.NAME}]'
               units: B
@@ -4238,7 +4264,7 @@ zabbix_export:
                 - tag: storage
                   value: '{#STORAGE.NAME}'
             - uuid: 2692019e125f4aee91dc3f7a25bfe5a1
-              name: 'Storage [{#STORAGE.NAME}]: type'
+              name: 'Storage [{#STORAGE.NAME}]: Type'
               type: DEPENDENT
               key: 'proxmox_ve.storage.type[{#STORAGE.NAME}]'
               value_type: CHAR
@@ -4260,7 +4286,7 @@ zabbix_export:
                 - tag: storage
                   value: '{#STORAGE.NAME}'
             - uuid: f461c12c867b4f9899b4859201b3bd3f
-              name: 'Storage [{#STORAGE.NAME}]: used'
+              name: 'Storage [{#STORAGE.NAME}]: Used'
               type: DEPENDENT
               key: 'proxmox_ve.storage.used[{#STORAGE.NAME}]'
               units: B
@@ -4282,7 +4308,7 @@ zabbix_export:
                 - tag: storage
                   value: '{#STORAGE.NAME}'
             - uuid: 9fc8137e40fc4a17a67704fc0bbdb70c
-              name: 'Storage [{#STORAGE.NAME}]: utilization'
+              name: 'Storage [{#STORAGE.NAME}]: Utilization'
               type: CALCULATED
               key: 'proxmox_ve.storage.utilization[{#STORAGE.NAME}]'
               value_type: FLOAT
@@ -4325,7 +4351,7 @@ zabbix_export:
                 operator: NOT_MATCHES_REGEX
           item_prototypes:
             - uuid: 096a3bd30de646518f9d72983fd0d06f
-              name: 'User [{#USER.FULLNAME}]: enabled'
+              name: 'User [{#USER.FULLNAME}]: Enabled'
               type: DEPENDENT
               key: 'proxmox_ve.user.enabled[{#USER.ID}]'
               description: 'Retrieves enabled status for the user {#USER.FIRSTNAME} {#USER.LASTNAME} ({#USER.ID}).'
@@ -4352,7 +4378,7 @@ zabbix_export:
                   description: 'The user {#USER.FULLNAME} enabled status has changed.'
                   manual_close: 'YES'
             - uuid: 2995051bb2984c3ca382270a06c7c055
-              name: 'User [{#USER.FULLNAME}]: expire after'
+              name: 'User [{#USER.FULLNAME}]: Expire after'
               type: DEPENDENT
               key: 'proxmox_ve.user.expire[{#USER.ID}]'
               value_type: FLOAT
@@ -4373,10 +4399,10 @@ zabbix_export:
                     - |
                       if (value === '0') {
                       	return -1;
-                      } else if (parseInt(value) <= now() / 1000) {
+                      } else if (parseInt(value) <= Date.now() / 1000) {
                       	return 0;
                       } else {
-                      	return parseInt(value) - now() / 1000;
+                      	return Math.trunc(parseInt(value) - Date.now() / 1000);
                       }
               master_item:
                 key: proxmox_ve.get_user_data
@@ -4505,7 +4531,7 @@ zabbix_export:
                 unchecked: '.*'
         - macro: '{$PVE.FILTER.QEMU.FS.MOUNT_POINT.MATCH}'
           value: '.*'
-          description: 'Filter for QEMU virtual machine filesystem discovery by  mount point.'
+          description: 'Filter for QEMU virtual machine filesystem discovery by mount point.'
           config:
             type: TEXT
             priority: '33'
@@ -5132,7 +5158,7 @@ zabbix_export:
                   fields:
                     - type: STRING
                       name: items.0
-                      value: 'Node [*]: status'
+                      value: 'Node [*]: Status'
                     - type: INTEGER
                       name: item_tags.0.operator
                       value: '5'
@@ -5153,7 +5179,7 @@ zabbix_export:
                       value: ''
                     - type: STRING
                       name: primary_label
-                      value: '{{ITEM.NAME}.regsub("^(Node \[)(.*)(\]: status)", "\2")}'
+                      value: '{{ITEM.NAME}.regsub("^(Node \[)(.*)(\]: Status)", "\2")}'
                     - type: STRING
                       name: reference
                       value: FEFFA
@@ -5307,7 +5333,7 @@ zabbix_export:
                       value: '2'
                     - type: STRING
                       name: columns.0.items.0
-                      value: '*memory utilization'
+                      value: '*Memory utilization'
                     - type: INTEGER
                       name: columns.0.item_tags.0.operator
                       value: '2'
@@ -5728,7 +5754,7 @@ zabbix_export:
                       value: '2'
                     - type: STRING
                       name: columns.0.items.0
-                      value: '*torage [*]: utilization'
+                      value: '*torage [*]: Utilization'
                     - type: STRING
                       name: columns.0.max
                       value: '100'
@@ -5832,7 +5858,7 @@ zabbix_export:
                       value: 'Node [*]: QEMU [*]: status'
                     - type: STRING
                       name: primary_label
-                      value: '{{ITEM.NAME}.regsub("^(Node \[)(.*)(: QEMU \[)(.*)(\]: status)", "\4")}'
+                      value: '{{ITEM.NAME}.regsub("^(Node \[)(.*)(: QEMU \[)(.*)(\]: Status)", "\4")}'
                     - type: STRING
                       name: reference
                       value: CEUHK
@@ -5875,13 +5901,13 @@ zabbix_export:
                       value: qemu
                     - type: STRING
                       name: items.0
-                      value: 'Node [*]: QEMU [*]: *utilization'
+                      value: 'Node [*]: QEMU [*]: *Utilization'
                     - type: STRING
                       name: items.1
-                      value: 'Node [*]: QEMU [*]: network input speed*'
+                      value: 'Node [*]: QEMU [*]: Network input speed*'
                     - type: STRING
                       name: items.2
-                      value: 'Node [*]: QEMU [*]: network output speed*'
+                      value: 'Node [*]: QEMU [*]: Network output speed*'
                     - type: INTEGER
                       name: item_tags.0.operator
                       value: '3'
@@ -5985,7 +6011,7 @@ zabbix_export:
                       value: '2'
                     - type: STRING
                       name: columns.0.items.0
-                      value: 'Node [*]: QEMU [*]: memory utilization'
+                      value: 'Node [*]: QEMU [*]: Memory utilization'
                     - type: STRING
                       name: columns.0.max
                       value: '100'
@@ -6015,10 +6041,10 @@ zabbix_export:
                   fields:
                     - type: STRING
                       name: items.0
-                      value: 'Node [*]: LXC [*]: status'
+                      value: 'Node [*]: LXC [*]: Status'
                     - type: STRING
                       name: primary_label
-                      value: '{{ITEM.NAME}.regsub("^(Node \[)(.*)(: LXC \[)(.*)(\]: status)", "\4")}'
+                      value: '{{ITEM.NAME}.regsub("^(Node \[)(.*)(: LXC \[)(.*)(\]: Status)", "\4")}'
                     - type: STRING
                       name: reference
                       value: FYYJF
@@ -6062,10 +6088,10 @@ zabbix_export:
                       value: lxc
                     - type: STRING
                       name: items.0
-                      value: 'Node [*]: LXC [*]: *utilization'
+                      value: 'Node [*]: LXC [*]: *Utilization'
                     - type: STRING
                       name: items.1
-                      value: 'Node [*]: LXC [*]: network*'
+                      value: 'Node [*]: LXC [*]: Network*'
                     - type: INTEGER
                       name: item_tags.0.operator
                       value: '3'
@@ -6169,7 +6195,7 @@ zabbix_export:
                       value: '2'
                     - type: STRING
                       name: columns.0.items.0
-                      value: 'Node [*]: LXC [*]: memory utilization'
+                      value: 'Node [*]: LXC [*]: Memory utilization'
                     - type: STRING
                       name: columns.0.max
                       value: '100'
