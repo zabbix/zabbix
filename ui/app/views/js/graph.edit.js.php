@@ -346,19 +346,19 @@ window.graph_edit_popup = new class {
 
 	#openEditItemPopup(target) {
 		const item_num = target.id.match(/\d+/g);
-		const flag_prototype = document.getElementById('items_' + item_num + '_flags').value == <?= ZBX_FLAG_DISCOVERY_PROTOTYPE ?>;
-		const parameters = this.#getItemPopupParameters(item_num, flag_prototype);
+		const is_prototype = document.getElementById('items_' + item_num + '_flags').value == <?= ZBX_FLAG_DISCOVERY_PROTOTYPE ?>;
+		const parameters = this.#getItemPopupParameters(item_num, is_prototype);
 
 		PopUp('popup.generic', parameters, {dialogue_class: "modal-popup-generic", trigger_element: target});
 	}
 
-	#openAddItemPopup(flag_prototype = false) {
-		const parameters = this.#getItemPopupParameters(null, flag_prototype);
+	#openAddItemPopup(is_prototype = false) {
+		const parameters = this.#getItemPopupParameters(null, is_prototype);
 
 		PopUp('popup.generic', parameters, {dialogue_class: 'modal-popup-generic'});
 	}
 
-	#getItemPopupParameters(item_num = null, flag_prototype = false) {
+	#getItemPopupParameters(item_num = null, is_prototype = false) {
 		const parameters = {
 			srcfld1: 'itemid',
 			srcfld2: 'name',
@@ -376,7 +376,7 @@ window.graph_edit_popup = new class {
 			parameters.dstfld2 = 'items_' + item_num + '_name';
 		}
 
-		if (flag_prototype) {
+		if (is_prototype) {
 			parameters.srctbl = 'item_prototypes';
 			parameters.parent_discoveryid = this.graph.parent_discoveryid;
 
