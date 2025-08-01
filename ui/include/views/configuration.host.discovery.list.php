@@ -333,8 +333,8 @@ foreach ($data['discoveries'] as $discovery) {
 		if ($discovery['status'] == ITEM_STATUS_ACTIVE && $discovery['error'] !== '') {
 			$info_icons[] = makeErrorIcon($discovery['error']);
 		}
-		if ($discovery['discoveryData'] && $discovery['discoveryData']['status'] == ZBX_LLD_STATUS_LOST
-		) {
+
+		if ($discovery['discoveryData'] && $discovery['discoveryData']['status'] == ZBX_LLD_STATUS_LOST) {
 			$info_icons[] = getLldLostEntityIndicator($current_time, $discovery['discoveryData']['ts_delete'],
 				$discovery['discoveryData']['ts_disable'], $disable_source,
 				$discovery['status'] == ITEM_STATUS_DISABLED, _('discovery rule')
