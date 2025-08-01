@@ -250,8 +250,7 @@ class testDashboardItemValueWidget extends CWebTest {
 						"\nUser macros", $hint->one()->getText());
 
 				// Close the hint-box.
-				$hint->one()->query('xpath:.//button[@class="overlay-close-btn"]')->one()->click();
-				$hint->waitUntilNotPresent();
+				$hint->one()->query('xpath:.//button[@class="overlay-close-btn"]')->one()->click()->waitUntilNotVisible();
 
 				// Check default values with Advanced configuration = true.
 				$default_values_advanced = [
@@ -765,6 +764,7 @@ class testDashboardItemValueWidget extends CWebTest {
 				? '1 minute'
 				: (CTestArrayHelper::get($data['fields'], 'Refresh interval', '1 minute'));
 			$this->assertEquals($refresh, CDashboardElement::find()->one()->getWidget($header)->getRefreshInterval());
+			CPopupMenuElement::find()->one()->close();
 
 			// Write new name to update widget for update scenario.
 			if ($update) {

@@ -43,6 +43,17 @@ class COverlayDialogElement extends CElement {
 	}
 
 	/**
+	 * Get overlay dialog by title text.
+	 *
+	 * @param string $name    overlay dialog title
+	 */
+	public static function get($name) {
+		return (new CElementQuery('xpath://div['.CXPathHelper::fromClass('dashboard-widget-head').']/h4[text()='.
+				CXPathHelper::escapeQuotes($name).']/../..'))->waitUntilPresent()->asOverlayDialog()->one()
+				->waitUntilReady();
+	}
+
+	/**
 	 * Get title text.
 	 *
 	 * @return string

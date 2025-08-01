@@ -718,6 +718,7 @@ class testDashboardHostAvailabilityWidget extends CWebTest {
 			? '15 minutes'
 			: (CTestArrayHelper::get($data['fields'], 'Refresh interval', '15 minutes'));
 		$this->assertEquals($refresh, $widget->getRefreshInterval());
+		CPopupMenuElement::find()->one()->close();
 	}
 
 	/*

@@ -86,24 +86,10 @@ class CWidgetElement extends CElement {
 	 */
 	public function edit() {
 		$button = $this->query('xpath:.//button[@class="btn-widget-edit"]')->waitUntilPresent()->one();
+		$button->hoverMouse()->click();
 
-		if ($button->isVisible(false)) {
-			$button->hoverMouse();
-		}
-
-		// Edit can sometimes fail so we have to retry this operation.
-		for ($i = 0; $i < 4; $i++) {
-			$this->query('xpath:.//button[@class="btn-widget-edit"]')->waitUntilPresent()->one()->click(true);
-
-			try {
-				return $this->query('xpath://div[@data-dialogueid="widget_properties"]//form')->waitUntilVisible()->asForm()->one();
-			}
-			catch (\Exception $e) {
-				if ($i === 1) {
-					throw $e;
-				}
-			}
-		}
+		return $this->query('xpath://div[@data-dialogueid="widget_properties"]//form')->waitUntilVisible()
+				->asForm()->one();
 	}
 
 	/**

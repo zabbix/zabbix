@@ -720,6 +720,7 @@ class testDashboardPlainTextWidget extends CWebTest {
 				? '1 minute'
 				: (CTestArrayHelper::get($data['fields'], 'Refresh interval', '1 minute'));
 			$this->assertEquals($refresh, $widget->getRefreshInterval());
+			CPopupMenuElement::find()->one()->close();
 		}
 	}
 

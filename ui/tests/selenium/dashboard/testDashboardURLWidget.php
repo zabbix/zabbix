@@ -476,6 +476,7 @@ class testDashboardURLWidget extends CWebTest {
 					? 'No refresh'
 					: (CTestArrayHelper::get($data['fields'], 'Refresh interval', 'No refresh'));
 			$this->assertEquals($refresh, $widget->getRefreshInterval());
+			CPopupMenuElement::find()->one()->close();
 		}
 	}
 
@@ -754,11 +755,10 @@ class testDashboardURLWidget extends CWebTest {
 
 		$this->page->login()->open('zabbix.php?action=dashboard.view&dashboardid='.self::$dashboardid)->waitUntilReady();
 		$dashboard = CDashboardElement::find()->one();
-		$form = $dashboard->getWidget(self::$default_widget)->edit();
 
 		// Check default URI scheme rules: http, https, ftp, file, mailto, tel, ssh.
-		$this->assertUriScheme($form, $default_valid_schemes);
-		$this->assertUriScheme($form, $invalid_schemes, TEST_BAD);
+		$this->assertUriScheme($default_valid_schemes);
+		$this->assertUriScheme($invalid_schemes, TEST_BAD);
 
 		// Change valid URI schemes on "Other configuration parameters" page.
 		$this->page->open('zabbix.php?action=miscconfig.edit')->waitUntilReady();
@@ -786,8 +786,8 @@ class testDashboardURLWidget extends CWebTest {
 		// Check updated valid URI schemes.
 		$dashboard->getWidget(self::$default_widget)->edit();
 		$broken_form->fill(['URL' => 'any'])->submit();
-		$this->assertUriScheme($form, $default_valid_schemes, TEST_BAD);
-		$this->assertUriScheme($form, $invalid_schemes);
+		$this->assertUriScheme($default_valid_schemes, TEST_BAD);
+		$this->assertUriScheme($invalid_schemes);
 
 		// Disable URI scheme validation.
 		$this->page->open('zabbix.php?action=miscconfig.edit')->waitUntilReady();
@@ -797,20 +797,19 @@ class testDashboardURLWidget extends CWebTest {
 		$this->assertMessage(TEST_GOOD, 'Configuration updated');
 
 		$this->page->open('zabbix.php?action=dashboard.view&dashboardid='.self::$dashboardid)->waitUntilReady();
-		$this->assertUriScheme($form, array_merge($default_valid_schemes, $invalid_schemes));
+		$this->assertUriScheme(array_merge($default_valid_schemes, $invalid_schemes));
 	}
 
 	/**
 	 * Fill in the URL field to check the uri scheme validation rules.
 	 *
-	 * @param CFormElement $form	form element of widget
 	 * @param array $data			url field data
 	 * @param string $expected		expected result after widget form submit, TEST_GOOD or TEST_BAD
 	 */
-	private function assertUriScheme($form, $data, $expected = TEST_GOOD) {
+	private function assertUriScheme($data, $expected = TEST_GOOD) {
 		$dashboard = CDashboardElement::find()->one();
 		foreach ($data as $scheme) {
-			$dashboard->getWidget(self::$default_widget)->edit();
+			$form = $dashboard->getWidget(self::$default_widget)->edit();
 			COverlayDialogElement::find()->one()->waitUntilReady();
 			$form->fill(['URL' => $scheme]);
 			$form->submit();
