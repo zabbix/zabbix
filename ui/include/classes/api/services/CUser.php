@@ -1411,12 +1411,14 @@ class CUser extends CApiService {
 	private static function updateGroups(array &$users, ?array $db_users = null): void {
 		$ins_groups = [];
 		$del_groupids = [];
+		$changed_user_groups = [];
 
 		foreach ($users as &$user) {
 			if (!array_key_exists('usrgrps', $user)) {
 				continue;
 			}
 
+			$is_changed = false;
 			$db_groups = $db_users !== null
 				? array_column($db_users[$user['userid']]['usrgrps'], null, 'usrgrpid')
 				: [];
@@ -1431,22 +1433,32 @@ class CUser extends CApiService {
 						'userid' => $user['userid'],
 						'usrgrpid' => $group['usrgrpid']
 					];
+					$is_changed = true;
 				}
 			}
 			unset($group);
 
-			$del_groupids = array_merge($del_groupids, array_column($db_groups, 'id'));
+			if ($db_groups) {
+				$del_groupids = array_merge($del_groupids, array_column($db_groups, 'id'));
+				$is_changed = true;
+			}
+
+			if ($db_users !== null && $is_changed) {
+				$changed_user_groups[$user['userid']] = $user['usrgrps'];
+			}
 		}
 		unset($user);
 
 		if ($del_groupids) {
 			DB::delete('users_groups', ['id' => $del_groupids]);
-
-			self::deleteMfaTotpSecrets(array_column($users, null, 'userid'));
 		}
 
 		if ($ins_groups) {
 			$groupids = DB::insert('users_groups', $ins_groups);
+		}
+
+		if ($changed_user_groups) {
+			self::deleteInactiveMfaTotpSecrets($changed_user_groups);
 		}
 
 		foreach ($users as &$user) {
@@ -1464,75 +1476,102 @@ class CUser extends CApiService {
 		unset($user);
 	}
 
-	private static function deleteMfaTotpSecrets(array $users): void {
-		$userids = [];
+	private static function deleteInactiveMfaTotpSecrets(array $user_groups): void {
+		$db_mfa_totp_secretids = [];
+
+		$resource = DBselect(
+			'SELECT m.mfa_totp_secretid,m.mfaid,m.userid'.
+			' FROM mfa_totp_secret m'.
+			' WHERE '.dbConditionId('m.userid', array_keys($user_groups))
+		);
+
+		while ($row = DBfetch($resource)) {
+			$db_mfa_totp_secretids[$row['userid']][$row['mfaid']] = $row['mfa_totp_secretid'];
+		}
+
+		if (!$db_mfa_totp_secretids) {
+			return;
+		}
+
+		$user_groups = array_intersect_key($user_groups, $db_mfa_totp_secretids);
 		$groupids = [];
 
-		foreach ($users as $userid => $user) {
-			if (!array_key_exists('usrgrps', $user)) {
-				continue;
-			}
-
-			$userids[] = $userid;
-
-			foreach ($user['usrgrps'] as $group) {
+		foreach ($user_groups as $groups) {
+			foreach ($groups as $group) {
 				$groupids[$group['usrgrpid']] = true;
 			}
 		}
 
-		if (!$userids) {
-			return;
-		}
+		if ($groupids) {
+			$db_user_groups = DB::select('usrgrp', [
+				'output' => ['mfaid'],
+				'filter' => [
+					'mfa_status' => GROUP_MFA_ENABLED,
+					'usrgrpid' => array_keys($groupids)
+				],
+				'preservekeys' => true
+			]);
 
-		$db_mfa_totp_secrets = DB::select('mfa_totp_secret', [
-			'output' => ['mfaid', 'userid'],
-			'filter' => ['userid' => $userids],
-			'preservekeys' => true
-		]);
+			if ($db_user_groups) {
+				$default_mfaid = CAuthenticationHelper::getPublic(CAuthenticationHelper::MFAID);
+				$direct_mfaids = [];
 
-		if (!$db_mfa_totp_secrets) {
-			return;
-		}
+				foreach ($db_user_groups as $group) {
+					if ($group['mfaid'] != 0) {
+						$direct_mfaids[$group['mfaid']] = true;
+					}
+				}
 
-		if (!$groupids) {
-			DB::delete('mfa_totp_secret', ['mfa_totp_secretid' => array_keys($db_mfa_totp_secrets)]);
+				$db_direct_mfas = $direct_mfaids
+					? DB::select('mfa', [
+						'output' => [],
+						'mfaids' => array_keys($direct_mfaids),
+						'sortfield' => ['name'],
+						'preservekeys' => true
+					])
+					: [];
 
-			return;
-		}
+				foreach ($user_groups as $userid => $groups) {
+					$user_direct_mfaids = [];
 
-		$mfa_totp_secretids = [];
+					foreach ($groups as $group) {
+						if (!array_key_exists($group['usrgrpid'], $db_user_groups)) {
+							continue;
+						}
 
-		foreach ($db_mfa_totp_secrets as $mfa_totp_secretid => $db_mfa_totp_secret) {
-			$mfa_totp_secretids[$db_mfa_totp_secret['userid']][$db_mfa_totp_secret['mfaid']] = $mfa_totp_secretid;
-		}
+						$db_user_group = $db_user_groups[$group['usrgrpid']];
 
-		$db_usergroups = DB::select('usrgrp', [
-			'output' => ['mfaid', 'mfa_status'],
-			'usrgrpids' => array_keys($groupids),
-			'preservekeys' => true
-		]);
-		$default_mfaid = CAuthenticationHelper::getPublic(CAuthenticationHelper::MFAID);
-		$del_mfa_totp_secretids = [];
+						if ($db_user_group['mfaid'] != 0) {
+							$user_direct_mfaids[$db_user_group['mfaid']] = true;
+						}
+						else {
+							unset($db_mfa_totp_secretids[$userid][$default_mfaid]);
 
-		foreach ($mfa_totp_secretids as $userid => $mfaids) {
-			foreach ($users[$userid]['usrgrps'] as $group) {
-				$db_usergroup = $db_usergroups[$group['usrgrpid']];
-				$group_mfaid = $db_usergroup['mfa_status'] == GROUP_MFA_ENABLED && $db_usergroup['mfaid'] == 0
-					? $default_mfaid
-					: $db_usergroup['mfaid'];
+							if (!$db_mfa_totp_secretids[$userid]) {
+								unset($db_mfa_totp_secretids[$userid]);
+							}
 
-				if (array_key_exists($group_mfaid, $mfaids)) {
-					unset($mfaids[$group_mfaid]);
+							continue 2;
+						}
+					}
+
+					if ($user_direct_mfaids) {
+						$primary_mfaid = key(array_intersect_key($db_direct_mfas, $user_direct_mfaids));
+
+						if ($primary_mfaid !== null) {
+							unset($db_mfa_totp_secretids[$userid][$primary_mfaid]);
+
+							if (!$db_mfa_totp_secretids[$userid]) {
+								unset($db_mfa_totp_secretids[$userid]);
+							}
+						}
+					}
 				}
 			}
-
-			foreach ($mfaids as $mfa_totp_secretid) {
-				$del_mfa_totp_secretids[] = $mfa_totp_secretid;
-			}
 		}
 
-		if ($del_mfa_totp_secretids) {
-			DB::delete('mfa_totp_secret', ['mfa_totp_secretid' => $del_mfa_totp_secretids]);
+		if ($db_mfa_totp_secretids) {
+			DB::delete('mfa_totp_secret', ['mfa_totp_secretid' => array_merge(...$db_mfa_totp_secretids)]);
 		}
 	}
 
