@@ -4,7 +4,7 @@ msgstr ""
 "Project-Id-Version: Zabbix 6.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2023-10-19 13:48+0300\n"
-"PO-Revision-Date: 2025-07-17 17:53+0000\n"
+"PO-Revision-Date: 2025-07-17 17:57+0000\n"
 "Last-Translator: Vicente Salvador <vicentesalvadorcubedo@gmail.com>\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
 "Language: es\n"
@@ -15235,7 +15235,7 @@ msgstr "Nuevo mapeo de tipos de medio"
 
 #: app/views/oauth.edit.php:237
 msgid "New oauth"
-msgstr ""
+msgstr "Nueva oauth"
 
 #: app/controllers/CControllerPopupLldOperation.php:350
 msgid "New operation"
@@ -20361,7 +20361,7 @@ msgstr "Sencillo"
 
 #: app/views/js/host.wizard.edit.js.php:97
 msgid "Simple Network Management Protocol (SNMP) interface"
-msgstr ""
+msgstr "Interfaz del Protocolo simple de administración de red (SNMP)"
 
 #: include/items.inc.php:1578
 msgid "Simple change"
@@ -20526,12 +20526,12 @@ msgstr "Es posible que parte del historial de esta métrica esté comprimido; la
 #: app/views/host.wizard.edit.php:129
 #, c-format
 msgid "Some templates (%1$s) are hidden. Custom templates are not supported."
-msgstr ""
+msgstr "Algunas plantillas (%1$s) están ocultas. No se admiten plantillas personalizadas."
 
 #: app/views/host.wizard.edit.php:130
 #, c-format
 msgid "Some templates (%1$s) are incompatible with the Host Wizard."
-msgstr ""
+msgstr "Algunas plantillas (%1$s) son incompatibles con el Asistente de equipo."
 
 #: widgets/actionlog/includes/WidgetForm.php:79
 #: widgets/problems/includes/WidgetForm.php:145
@@ -20590,7 +20590,7 @@ msgstr "Especifique alguna condición de filtro para ver los valores."
 
 #: app/views/host.wizard.edit.php:365
 msgid "Specifying new or existing host groups will add the host to these groups without removing it from any current groups."
-msgstr ""
+msgstr "Al especificar grupos de equipos nuevos o existentes, se agregará el equipo a estos grupos sin eliminarlo de ningún grupo actual."
 
 #: httpdetails.php:107 include/classes/screens/CScreenHttpTestDetails.php:82
 msgid "Speed"
@@ -20658,11 +20658,11 @@ msgstr "La hora de inicio debe ser menor que la hora de finalización para el ti
 
 #: app/views/host.wizard.edit.php:310
 msgid "Start typing or click Select to choose an existing host, or enter a new host name."
-msgstr ""
+msgstr "Comience a escribir o haga clic en Seleccionar para elegir un equipo existente o ingrese un nuevo nombre de equipo."
 
 #: app/views/host.wizard.edit.php:334
 msgid "Start typing or click Select to choose existing host groups, or enter a new host group name."
-msgstr ""
+msgstr "Comience a escribir o haga clic en Seleccionar para elegir grupos de equipos existentes o ingrese un nuevo nombre de grupo de equipos."
 
 #: app/views/popup.ldap.edit.php:287
 msgid "StartTLS"
@@ -21640,7 +21640,7 @@ msgstr "El %1$s ya no se descubre más y %2$s."
 
 #: app/views/host.wizard.edit.php:101
 msgid "The Host Wizard will help you set up your monitoring target (device, application, service, etc.) in Zabbix."
-msgstr ""
+msgstr "El Asistente de equipo le ayudará a configurar su objetivo de monitoreo (dispositivo, aplicación, servicio, etc.) en Zabbix."
 
 #: app/views/oauth.edit.php:48
 msgid "The URL must comply with the OAuth provider's policy."
@@ -21753,7 +21753,7 @@ msgstr "El nivel de zoom máximo es \"%1$s\"."
 #: include/classes/api/services/CDiscoveryRule.php:962
 #, c-format
 msgid "The nested LLD rule with key \"%1$s\" of the template \"%2$s\" cannot be inherited to non-discovered host \"%3$s\"."
-msgstr ""
+msgstr "La regla LLD anidada con clave \"%1$s\" de la plantilla \"%2$s\" no se puede heredar del equipo no descubierto \"%3$s\"."
 
 #: include/classes/data/CItemData.php:1281
 msgid "The number of processes. Returns integer"

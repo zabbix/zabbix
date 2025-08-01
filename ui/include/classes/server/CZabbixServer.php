@@ -394,7 +394,9 @@ class CZabbixServer {
 			return false;
 		}
 
-		return true;
+		$api_input_rules = ['type' => API_OBJECT, 'fields' => []];
+
+		return CApiInputValidator::validate($api_input_rules, $response, '/', $this->error);
 	}
 
 	/**
