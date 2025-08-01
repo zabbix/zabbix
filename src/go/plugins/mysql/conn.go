@@ -390,6 +390,8 @@ func getTLSDetails(ck connKey) (*tlsconfig.Details, error) {
 
 	if ck.tlsConnect == disable || ck.tlsConnect == require {
 		validateCA = false
+
+		details.Apply(tlsconfig.WithTLSServerName(""))
 	}
 
 	if details.TLSKeyFile != "" || details.TLSCertFile != "" {

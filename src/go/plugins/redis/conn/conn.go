@@ -83,8 +83,11 @@ func NewManager(logger log.Logger, keepAlive, timeout, hkInterval time.Duration)
 // Query wraps the radix.Client.Do function.
 func (r *RedisConn) Query(cmd radix.CmdAction) error {
 	err := r.client.Do(cmd)
+	if err != nil {
+		return errs.Wrap(err, "query failed")
+	}
 
-	return errs.Wrap(err, "query failed")
+	return nil
 }
 
 // GetConnection returns an existing connection or creates a new one.
