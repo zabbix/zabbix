@@ -4419,10 +4419,10 @@ static void	lld_hosts_save(zbx_uint64_t parent_hostid, zbx_vector_lld_host_ptr_t
 
 	if (0 != new_hostmacros)
 	{
-		zbx_db_set_log_masked_values(ZBX_DB_MASK_QUERIES);
+		zbx_db_query_mask_t	old_queries = zbx_db_set_log_masked_values(ZBX_DB_MASK_QUERIES);
 		zbx_db_insert_execute(&db_insert_hmacro);
 		zbx_db_insert_clean(&db_insert_hmacro);
-		zbx_db_set_log_masked_values(ZBX_DB_DONT_MASK_QUERIES);
+		zbx_db_set_log_masked_values(old_queries);
 	}
 
 	if (0 != new_interfaces)
