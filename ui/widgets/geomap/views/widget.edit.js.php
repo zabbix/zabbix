@@ -14,30 +14,32 @@
 **/
 
 
-namespace Widgets\Geomap;
+?>
 
-use Zabbix\Core\CWidget;
+window.widget_form = new class extends CWidgetForm {
 
-class Widget extends CWidget {
+	init() {
+		this._form = this.getForm();
+		document.getElementById('clustering_mode').addEventListener('change', () => this.#updateForm());
 
-	// Clustering options.
-	public const CLUSTERING_MODE_AUTO = 0;
-	public const CLUSTERING_MODE_MANUAL = 1;
-
-	public function getDefaultName(): string {
-		return _('Geomap');
+		this.#updateForm();
+		this.ready();
 	}
 
-	public function getTranslationStrings(): array {
-		return [
-			'class.widget.js' => [
-				'Actions' => _('Actions'),
-				'Set this view as default' => _('Set this view as default'),
-				'Reset to initial view' => _('Reset to initial view'),
-				'Host' => _('Host'),
-				'Navigate to default view' => _('Navigate to default view'),
-				'Navigate to initial view' => _('Navigate to initial view')
-			]
-		];
+	#updateForm() {
+		const clustering_mode = this._form.querySelector('[name="clustering_mode"]:checked');
+
+		if (!clustering_mode) {
+			return;
+		}
+
+		const clustering_zoom_level = this._form.querySelector('[name="clustering_zoom_level"]');
+		const wrapper = clustering_zoom_level.closest('.form-field');
+
+		if (clustering_mode.value === '1') {
+			wrapper.classList.remove('display-none');
+		} else {
+			wrapper.classList.add('display-none');
+		}
 	}
-}
+};

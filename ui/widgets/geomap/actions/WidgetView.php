@@ -24,6 +24,7 @@ use API,
 	CProfile,
 	CSettingsHelper,
 	CSeverityHelper;
+use Widgets\Geomap\Widget;
 
 class WidgetView extends CControllerDashboardWidgetView {
 
@@ -63,7 +64,7 @@ class WidgetView extends CControllerDashboardWidgetView {
 		if ($this->getInput('initial_load', 0)) {
 			$this->geomap_config = self::getMapConfig();
 
-			$data['config'] = $this->geomap_config + $this->getMapCenter() + [
+			$data['config'] = $this->geomap_config + $this->getMapCenter() + $this->getClusteringSettings() + [
 				'filter' => $this->getUserProfileFilter(),
 				'severities' => self::getSeveritySettings()
 			];
@@ -236,6 +237,17 @@ class WidgetView extends CControllerDashboardWidgetView {
 	private function getUserProfileFilter(): array {
 		return [
 			'severity' => CProfile::get('web.dashboard.widget.geomap.severity_filter', [], $this->widgetid)
+		];
+	}
+
+	private function getClusteringSettings(): array {
+		return [
+			'clustering' => [
+				'mode' => $this->fields_values['clustering_mode'],
+				'zoom_level' => $this->fields_values['clustering_mode'] == Widget::CLUSTERING_MODE_MANUAL
+					? $this->fields_values['clustering_zoom_level']
+					: null
+			]
 		];
 	}
 

@@ -161,7 +161,9 @@ class CWidgetGeoMap extends CWidget {
 		this.initSeverities(config.severities);
 
 		// Create cluster layer.
-		this._clusters = this._createClusterLayer();
+		this._clusters = this._createClusterLayer({
+			clustering_zoom_level: config.clustering.zoom_level
+		});
 		this._map.addLayer(this._clusters);
 
 		// Create markers layer.
@@ -432,14 +434,18 @@ class CWidgetGeoMap extends CWidget {
 	/**
 	 * Function to create cluster layer.
 	 *
+	 * @param {object}  [options] Options object (optional).
+	 * @param {integer} [options.clustering_zoom_level = null] Clustering zoom level. Defaults to null.
+	 *
 	 * @returns {CWidgetGeoMap._createClusterLayer.clusters|L.MarkerClusterGroup}
 	 */
-	_createClusterLayer() {
+	_createClusterLayer({clustering_zoom_level = null} = {}) {
 		const clusters = L.markerClusterGroup({
 			showCoverageOnHover: false,
 			zoomToBoundsOnClick: false,
 			removeOutsideVisibleBounds: true,
 			spiderfyOnMaxZoom: false,
+			disableClusteringAtZoom: clustering_zoom_level,
 			iconCreateFunction: (cluster) => {
 				const max_severity = Math.max(...cluster.getAllChildMarkers().map(p => p.feature.properties.severity));
 				const color = this._severity_levels.get(max_severity).color;

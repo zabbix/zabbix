@@ -16,9 +16,12 @@
 
 namespace Widgets\Geomap\Includes;
 
+use Zabbix\Widgets\CWidgetField;
 use Zabbix\Widgets\CWidgetForm;
+use Widgets\Geomap\Widget;
 
 use Zabbix\Widgets\Fields\{
+	CWidgetFieldIntegerBox,
 	CWidgetFieldLatLng,
 	CWidgetFieldMultiSelectGroup,
 	CWidgetFieldMultiSelectHost,
@@ -31,6 +34,23 @@ use Zabbix\Widgets\Fields\{
  * Geomap widget form.
  */
 class WidgetForm extends CWidgetForm {
+
+	public function validate(bool $strict = false): array {
+		$errors = parent::validate($strict);
+
+		if ($errors) {
+			return $errors;
+		}
+
+		if ($this->getFieldValue('clustering_mode') == Widget::CLUSTERING_MODE_MANUAL
+				&& ($this->getFieldValue('clustering_zoom_level') < 0
+					|| $this->getFieldValue('clustering_zoom_level') > ZBX_GEOMAP_MAX_ZOOM)) {
+			$errors[] = _s('Invalid parameter "%1$s": %2$s.', _('Zoom level'),
+				_s('value must be one of %1$s', implode('-', [0, ZBX_GEOMAP_MAX_ZOOM])));
+		}
+
+		return $errors;
+	}
 
 	public function addFields(): self {
 		return $this
@@ -58,6 +78,18 @@ class WidgetForm extends CWidgetForm {
 			)
 			->addField(
 				new CWidgetFieldMultiSelectOverrideHost()
+			)
+			->addField($this->isTemplateDashboard()
+				? null
+				: (new CWidgetFieldRadioButtonList('clustering_mode', _('Clustering'), [
+					Widget::CLUSTERING_MODE_AUTO => _('Auto'),
+					Widget::CLUSTERING_MODE_MANUAL => _('Zoom level')
+				]))
+			)
+			->addField($this->isTemplateDashboard()
+				? null
+				: (new CWidgetFieldIntegerBox('clustering_zoom_level',  _('Zoom level'), 0, ZBX_GEOMAP_MAX_ZOOM))
+					->setFlags(CWidgetField::FLAG_NOT_EMPTY | CWidgetField::FLAG_LABEL_ASTERISK)
 			);
 	}
 }
