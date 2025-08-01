@@ -1503,7 +1503,7 @@ class CUser extends CApiService {
 		}
 
 		if ($groupids) {
-			$db_user_groups = DB::select('usrgrp', [
+			$db_mfa_user_groups = DB::select('usrgrp', [
 				'output' => ['mfaid'],
 				'filter' => [
 					'mfa_status' => GROUP_MFA_ENABLED,
@@ -1512,11 +1512,11 @@ class CUser extends CApiService {
 				'preservekeys' => true
 			]);
 
-			if ($db_user_groups) {
+			if ($db_mfa_user_groups) {
 				$default_mfaid = CAuthenticationHelper::getPublic(CAuthenticationHelper::MFAID);
 				$direct_mfaids = [];
 
-				foreach ($db_user_groups as $group) {
+				foreach ($db_mfa_user_groups as $group) {
 					if ($group['mfaid'] != 0) {
 						$direct_mfaids[$group['mfaid']] = true;
 					}
@@ -1535,14 +1535,14 @@ class CUser extends CApiService {
 					$user_direct_mfaids = [];
 
 					foreach ($groups as $group) {
-						if (!array_key_exists($group['usrgrpid'], $db_user_groups)) {
+						if (!array_key_exists($group['usrgrpid'], $db_mfa_user_groups)) {
 							continue;
 						}
 
-						$db_user_group = $db_user_groups[$group['usrgrpid']];
+						$db_mfa_user_group = $db_mfa_user_groups[$group['usrgrpid']];
 
-						if ($db_user_group['mfaid'] != 0) {
-							$user_direct_mfaids[$db_user_group['mfaid']] = true;
+						if ($db_mfa_user_group['mfaid'] != 0) {
+							$user_direct_mfaids[$db_mfa_user_group['mfaid']] = true;
 						}
 						else {
 							unset($db_mfa_totp_secretids[$userid][$default_mfaid]);
