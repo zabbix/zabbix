@@ -86,6 +86,13 @@ A......... [ZBX-26191] fixed inconsistent API and frontend validation for mainte
 ...G...... [ZBX-26187] fixed response to wmi.getall from Zabbix agent 2 does not return array-type values (mprihodko)
 
 --------------------------------------------------------------------------------
+Changes for 7.4.2rc1
+
+New features:
+
+Bug fixes:
+
+--------------------------------------------------------------------------------
 Changes for 7.4.1
 
 7.4.1rc1 was released as 7.4.1 without any changes
