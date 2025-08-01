@@ -1,0 +1,129 @@
+---
+test case: Test empty parameter
+in:
+    conf: ''
+out:
+  result: FAIL
+---
+test case: Test parameter ','
+in:
+    conf: ','
+out:
+  result: FAIL
+---
+test case: Test parameter 'sql'
+in:
+    conf: 'sql'
+out:
+  result: FAIL
+---
+test case: Test parameter 'sql,'
+in:
+    conf: 'sql,'
+out:
+  result: FAIL
+---
+test case: Test parameter 'sql,key'
+in:
+    conf: 'sql,key'
+out:
+  result: FAIL
+---
+test case: Test parameter 'sql,key='
+in:
+    conf: 'sql,key='
+out:
+  result: FAIL
+---
+test case: Test parameter 'sql,types='
+in:
+    conf: 'sql,types='
+out:
+  name: sql
+  options:
+  - name: types
+    value: ''
+  result: SUCCEED
+---
+test case: Test parameter 's l,types='
+in:
+    conf: 's l,types='
+out:
+  result: FAIL
+---
+test case: Test parameter 's*l,types='
+in:
+    conf: 's*l,types='
+out:
+  result: FAIL
+---
+test case: Test parameter 'sql,types=dbl,uint'
+in:
+    conf: 'sql,types=dbl,uint'
+out:
+  result: FAIL
+---
+test case: Test parameter 'sql,types="dbl,uint"'
+in:
+    conf: 'sql,types="dbl,uint"'
+out:
+  name: sql
+  options:
+  - name: types
+    value: 'dbl,uint'
+  result: SUCCEED
+---
+test case: Test parameter 'sql , types = "dbl,uint" '
+in:
+    conf: 'sql , types = "dbl,uint" '
+out:
+  name: sql
+  options:
+  - name: types
+    value: 'dbl,uint'
+  result: SUCCEED
+---
+test case: Test parameter 'sql,types=str,'
+in:
+    conf: 'sql,types=str,'
+out:
+  result: FAIL
+---
+test case: Test parameter 'sql,types="str,'
+in:
+    conf: 'sql,types="str,'
+out:
+  result: FAIL
+---
+test case: Test parameter 'sql,types="str\x"'
+in:
+    conf: 'sql,types="str\x"'
+out:
+  result: FAIL
+---
+test case: Test parameter 'sql,types=str,opt="\"\\/\""'
+in:
+    conf: 'sql,types=str,opt="\"\\/\""'
+out:
+  name: sql
+  options:
+  - name: types
+    value: 'str'
+  - name: opt
+    value: '"\/"'
+  result: SUCCEED
+---
+test case: Test parameter 'sql,types=str,opt=1'
+in:
+    conf: 'sql,types=str,opt=1'
+out:
+  name: sql
+  options:
+  - name: types
+    value: 'str'
+  - name: opt
+    value: '1'
+  result: SUCCEED
+...
+
+

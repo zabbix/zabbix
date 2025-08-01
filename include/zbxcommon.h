@@ -216,17 +216,10 @@ typedef enum
 	ITEM_VALUE_TYPE_NONE	/* Artificial value, not written into DB, used internally in server. */
 }
 zbx_item_value_type_t;
-const char	*zbx_item_value_type_string(zbx_item_value_type_t value_type);
 
-typedef struct
-{
-	int	timestamp;
-	int	logeventid;
-	int	severity;
-	char	*source;
-	char	*value;
-}
-zbx_log_value_t;
+#define ITEM_VALUE_TYPE_COUNT	(ITEM_VALUE_TYPE_BIN + 1)
+
+const char	*zbx_item_value_type_string(zbx_item_value_type_t value_type);
 
 /* value for not supported items */
 #define ZBX_NOTSUPPORTED	"ZBX_NOTSUPPORTED"

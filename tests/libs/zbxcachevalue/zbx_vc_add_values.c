@@ -25,7 +25,7 @@
 #include "zbx_vc_common.h"
 
 void	zbx_vc_test_add_values_setup(zbx_mock_handle_t *handle, zbx_vector_dc_history_ptr_t *history, int *err,
-		const char **data, int *ret_flush, int config_history_storage_pipelines)
+		const char **data, zbx_uint64_t *flush_err)
 {
 	/* execute request */
 
@@ -37,7 +37,7 @@ void	zbx_vc_test_add_values_setup(zbx_mock_handle_t *handle, zbx_vector_dc_histo
 	zbx_vector_dc_history_ptr_create(history);
 	zbx_vcmock_get_dc_history(zbx_mock_get_object_member_handle(*handle, "values"), history);
 
-	*err = zbx_vc_add_values(history, ret_flush, config_history_storage_pipelines);
+	*err = zbx_vc_add_values(history, flush_err);
 	*data = zbx_mock_get_parameter_string("out.return");
 	zbx_mock_assert_int_eq("zbx_vc_add_values()", zbx_mock_str_to_return_code(*data), *err);
 

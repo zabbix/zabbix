@@ -13,13 +13,21 @@
 **/
 
 #include "history.h"
+#include "zbxcommon.h"
+#include "zbxhistory.h"
+#include "history_option.h"
+#include "history_sql.h"
+#include "history_elastic.h"
+#include "history_clickhouse.h"
 
+#include "zbxdb.h"
+#include "zbxdbhigh.h"
 #include "zbxstr.h"
 #include "zbxalgo.h"
 #include "zbxnum.h"
 #include "zbxprof.h"
-#include "zbxtime.h"
 #include "zbxvariant.h"
+#include "zbxjson.h"
 
 ZBX_VECTOR_IMPL(history_record, zbx_history_record_t)
 
@@ -30,7 +38,510 @@ void	zbx_dc_history_shallow_free(zbx_dc_history_t *dc_history)
 	zbx_free(dc_history);
 }
 
-zbx_history_iface_t	history_ifaces[ITEM_VALUE_TYPE_BIN + 1];
+ZBX_PTR_VECTOR_DECL(history_provider_ptr, zbx_history_provider_t *)
+ZBX_PTR_VECTOR_IMPL(history_provider_ptr, zbx_history_provider_t *)
+
+ZBX_VECTOR_DECL(history_provider_info, zbx_history_provider_info_t)
+ZBX_VECTOR_IMPL(history_provider_info, zbx_history_provider_info_t)
+
+
+/* history provider registry, initialized during startup */
+typedef struct
+{
+	char				*name;
+	zbx_vector_history_option_t	options;
+	zbx_uint64_t			traits;
+}
+zbx_history_registry_t;
+
+ZBX_PTR_VECTOR_DECL(history_registry_ptr, zbx_history_registry_t *)
+ZBX_PTR_VECTOR_IMPL(history_registry_ptr, zbx_history_registry_t *)
+
+typedef struct zbx_history_manager zbx_history_manager_t;
+
+/* history session, used to access history while reusing history providers */
+typedef struct
+{
+	zbx_history_manager_t	*manager;
+	zbx_history_provider_t	*providers[ITEM_VALUE_TYPE_COUNT];
+}
+zbx_history_session_t;
+
+struct zbx_history_manager
+{
+	/* configured history provider registry */
+	zbx_vector_history_registry_ptr_t	registry;
+
+	/* value type -> registry mapping for all value types */
+	int					type_index[ITEM_VALUE_TYPE_COUNT];
+
+	/* Opened providers by type index, 1 provider per index in standalone processes */
+	/* and <threads num> providers per index in multi-threaded processes.           */
+	/* One provider per index is opened during initialization, more can be opened   */
+	/* as necessary later.                                                          */
+	zbx_vector_history_provider_ptr_t	*providers;
+};
+
+static zbx_history_manager_t        history_manager;
+
+static void	history_session_clear(zbx_history_session_t *session);
+
+/*******************************************************************************
+ *                                                                             *
+ * Purpose: clear history proivider info                                       *
+ *                                                                             *
+ *******************************************************************************/
+static void	history_provider_info_clear(zbx_history_provider_info_t *info)
+{
+	zbx_free(info->database);
+	zbx_free(info->friendly_current_version);
+	zbx_free(info->friendly_min_version);
+	zbx_free(info->friendly_max_version);
+	zbx_free(info->friendly_min_supported_version);
+}
+
+/*******************************************************************************
+ *                                                                             *
+ * Purpose: free history provider                                              *
+ *                                                                             *
+ *******************************************************************************/
+static void	history_provider_free(zbx_history_provider_t *provider)
+{
+	provider->impl.close(provider->data);
+	zbx_free(provider->name);
+	zbx_free(provider);
+}
+
+/*******************************************************************************
+ *                                                                             *
+ * Purpose: open history provider                                              *
+ *                                                                             *
+ * Parameters: name        - [IN] provider name                                *
+ *             options     - [IN] provider options array                       *
+ *             options_num - [IN] number of options                            *
+ *             error       - [OUT] error message                               *
+ *                                                                             *
+ * Return value: Opened history provider or NULL on error                      *
+ *                                                                             *
+ ******************************************************************************/
+static zbx_history_provider_t	*history_provider_open(const char *name, zbx_history_option_t *options,
+		int options_num, char **error)
+{
+	zbx_history_provider_t	*provider = NULL;
+
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s() provider:%s", __func__, name);
+
+	zabbix_log(LOG_LEVEL_DEBUG, "options:");
+	for (int i = 0; i < options_num; i++)
+		zabbix_log(LOG_LEVEL_DEBUG, "  %s: %s", options[i].name, options[i].value);
+
+	if (0 == strcmp(name, HISTORY_PROVIDER_SQL))
+		provider = history_sql_open(options, options_num, error);
+	else if (0 == strcmp(name, HISTORY_PROVIDER_ELASTIC))
+		provider = history_elastic_open(options, options_num, error);
+	else if (0 == strcmp(name, HISTORY_PROVIDER_CLICKHOUSE))
+		provider = history_clickhouse_open(options, options_num, error);
+	else
+		*error = zbx_dsprintf(NULL, "unsupported history storage provider \"%s\"", name);
+
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s() provider:%p error:%s", __func__, provider,
+			ZBX_NULL2EMPTY_STR(*error));
+
+	return provider;
+}
+
+/*******************************************************************************
+ *                                                                             *
+ * Purpose: register a history provider                                        *
+ *                                                                             *
+ * Parameters: manager    - [IN/OUT] history manager                           *
+ *             name       - [IN] provider name                                 *
+ *             options    - [IN] vector of provider options                    *
+ *                                                                             *
+ * Return value: provider registry index                                       *
+ *                                                                             *
+ *******************************************************************************/
+static int	history_manager_register_provider(zbx_history_manager_t *manager, const char *name,
+		zbx_vector_history_option_t *options)
+{
+	zbx_history_registry_t	*registry;
+
+	registry = (zbx_history_registry_t *)zbx_malloc(NULL, sizeof(zbx_history_registry_t));
+	registry->name = zbx_strdup(NULL, name);
+	registry->traits = 0;
+
+	zbx_vector_history_option_create(&registry->options);
+	zbx_vector_history_option_append_array(&registry->options, options->values, options->values_num);
+	zbx_vector_history_option_clear(options);
+
+	zbx_vector_history_registry_ptr_append(&manager->registry, registry);
+
+	return manager->registry.values_num - 1;
+}
+
+/*******************************************************************************
+ *                                                                             *
+ * Purpose: clear the history manager and free allocated resources             *
+ *                                                                             *
+ ******************************************************************************/
+static int	history_manager_clear(zbx_history_manager_t *manager)
+{
+	for (int i = 0; i < manager->registry.values_num; i++)
+	{
+		zbx_history_registry_t	*registry = manager->registry.values[i];
+
+		zbx_vector_history_provider_ptr_clear_ext(&manager->providers[i], history_provider_free);
+		zbx_vector_history_provider_ptr_destroy(&manager->providers[i]);
+
+		for (int j = 0; j < registry->options.values_num; j++)
+		{
+			zbx_free(registry->options.values[j].name);
+			zbx_free(registry->options.values[j].value);
+		}
+		zbx_vector_history_option_destroy(&registry->options);
+
+		zbx_free(registry->name);
+		zbx_free(registry);
+	}
+	zbx_vector_history_registry_ptr_destroy(&manager->registry);
+
+	zbx_free(manager->providers);
+
+	return SUCCEED;
+}
+
+/*******************************************************************************
+ *                                                                             *
+ * Purpose: retrieve opened or open new history provider                       *
+ *                                                                             *
+ * Parameters: manager - [IN] history manager                                  *
+ *             index   - [IN] index of the provider in the registry            *
+ *             error   - [OUT] error message if provider cannot be opened      *
+ *                                                                             *
+ * Return value: history provider or NULL in the case of an error              *
+ *                                                                             *
+ * Comments: If no provider is available, a new one is opened. Otherwise, an   *
+ *           existing provider is returned from the pool.                      *
+ *                                                                             *
+ *******************************************************************************/
+static zbx_history_provider_t	*history_manager_get_provider(zbx_history_manager_t *manager, int index, char **error)
+{
+	zbx_history_provider_t			*provider;
+	zbx_vector_history_provider_ptr_t	*providers = &manager->providers[index];
+
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s() name:%s opened:%d", __func__, manager->registry.values[index]->name,
+			providers->values_num);
+
+	if (0 == providers->values_num)
+	{
+		zbx_history_registry_t	*registry = manager->registry.values[index];
+
+		provider = history_provider_open(registry->name, registry->options.values, registry->options.values_num,
+				error);
+	}
+	else
+	{
+		provider = providers->values[providers->values_num - 1];
+		providers->values_num--;
+	}
+
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
+
+	return provider;
+}
+
+/*******************************************************************************
+ *                                                                             *
+ * Purpose: retrieve traits of a registered history provider for a specific    *
+ *          value type                                                         *
+ *                                                                             *
+ * Parameters: manager    - [IN] history manager                               *
+ *             value_type - [IN] item value type                               *
+ *                                                                             *
+ * Return value: Provider traits as a bitmask                                  *
+ *                                                                             *
+ * Comments: Returns 0 if the value type is unsupported or provider is not     *
+ *           registered                                                        *
+ *                                                                             *
+ *******************************************************************************/
+static zbx_uint64_t	history_manager_get_provider_traits(zbx_history_manager_t *manager, unsigned char value_type)
+{
+	int	index;
+
+	if (ITEM_VALUE_TYPE_BIN < value_type)
+	{
+		THIS_SHOULD_NEVER_HAPPEN_MSG("Unsupported value type %d", value_type);
+		return 0;
+	}
+
+	index = manager->type_index[value_type];
+
+	if (index >= manager->registry.values_num)
+	{
+		THIS_SHOULD_NEVER_HAPPEN_MSG("Unregistered history provider for value type %d", value_type);
+		return 0;
+	}
+
+	return manager->registry.values[index]->traits;
+}
+
+static void	history_manager_map_value_types(zbx_history_manager_t *manager, int index, zbx_uint64_t type_mask)
+{
+	for (int i = 0; i < ITEM_VALUE_TYPE_COUNT; i++)
+	{
+		if (0 != ((__UINT64_C(1) << i) & type_mask))
+			manager->type_index[i] = index;
+	}
+}
+
+/*******************************************************************************
+ *                                                                             *
+ * Purpose: initialize the history manager                                     *
+ *                                                                             *
+ * Parameters: manager                    - [OUT] history manager              *
+ *             config_history_storage_url - [IN] history storage URL           *
+ *             config_history_storage_opts- [IN] history storage options       *
+ *             config_history_storage_date_index [IN]                          *
+ *             providers                  - [IN] array of history provider     *
+ *                                               configuration strings         *
+ *             config_log_slow_queries    - [IN] slow query logging flag       *
+ *             error                      - [OUT] error message                *
+ *                                                                             *
+ * Return value: SUCCEED - manager initialized successfully                    *
+ *               FAIL    - an error occurred                                   *
+ *                                                                             *
+ * Comments: This function sets up the history manager based on configuration  *
+ *           and available providers.                                          *
+ *           All providers will be opened and their handles will be cached per *
+ *           type index.                                                       *
+ *                                                                             *
+ *******************************************************************************/
+static int	history_manager_init(zbx_history_manager_t *manager, const char *config_history_storage_url,
+		const char *config_history_storage_opts, int config_history_storage_pipelines,
+		char **providers, int config_log_slow_queries, char **error)
+{
+	zbx_vector_history_option_t	options;
+	int				ret = FAIL, index;
+	const char			*value_types[] = {"dbl", "str", "log", "uint", "text", "bin"};
+	zbx_uint64_t			value_type_mask = 0, mask;
+
+	memset(manager, 0, sizeof(zbx_history_manager_t));
+	zbx_vector_history_registry_ptr_create(&manager->registry);
+	zbx_vector_history_option_create(&options);
+
+	/* register elastic history provider using deprecated configuration parameters */
+	if (NULL != config_history_storage_url && NULL != config_history_storage_opts)
+	{
+		zbx_vector_history_option_append(&options, history_option_str(HISTORY_PROVIDER_OPTION_URL,
+				config_history_storage_url));
+		zbx_vector_history_option_append(&options, history_option_str(HISTORY_PROVIDER_OPTION_TYPES,
+				config_history_storage_opts));
+		zbx_vector_history_option_append(&options, history_option_int(HISTORY_PROVIDER_OPTION_LOG_SLOW_QUERIES,
+				config_log_slow_queries));
+
+		if (1 == config_history_storage_pipelines)
+		{
+			zbx_vector_history_option_append(&options,
+					history_option_int(HISTORY_PROVIDER_OPTION_DATE_INDEX,
+							config_history_storage_pipelines));
+		}
+
+		mask = history_options_type_mask(options.values, options.values_num, value_types);
+		value_type_mask |= mask;
+
+		index = history_manager_register_provider(manager, HISTORY_PROVIDER_ELASTIC, &options);
+		history_manager_map_value_types(manager, index, mask);
+
+		zbx_vector_history_option_clear(&options);
+	}
+
+	if (NULL != providers)
+	{
+		/* register custom history providers configured with HistoryProvider configuration parameters */
+		for (char **provider = providers; NULL != *provider; provider++)
+		{
+			char	*name = NULL;
+
+			if (SUCCEED != history_provider_parse_options(*provider, &name, &options, error))
+				goto out;
+
+			mask = history_options_type_mask(options.values, options.values_num, value_types);
+			if (0 != (value_type_mask & mask))
+			{
+				zbx_free(name);
+				*error = zbx_dsprintf(NULL, "duplicate type configured for history provider '%s'",
+						*provider);
+				goto out;
+			}
+			value_type_mask |= mask;
+
+			index = history_manager_register_provider(manager, name, &options);
+			history_manager_map_value_types(manager, index, mask);
+
+			zbx_free(name);
+			zbx_vector_history_option_clear(&options);
+		}
+	}
+
+	mask = value_type_mask ^ ((__UINT64_C(1) << ITEM_VALUE_TYPE_COUNT) - 1);
+
+	/* register default SQL provider for unconfigured value types */
+	if (0 != mask)
+	{
+		index = history_manager_register_provider(manager, HISTORY_PROVIDER_SQL, &options);
+		history_manager_map_value_types(manager, index, mask);
+	}
+
+	manager->providers = (zbx_vector_history_provider_ptr_t *)zbx_malloc(NULL,
+			(size_t)manager->registry.values_num * sizeof(zbx_vector_history_provider_ptr_t));
+
+	for (int i = 0; i < manager->registry.values_num; i++)
+		zbx_vector_history_provider_ptr_create(&manager->providers[i]);
+
+	/* open all providers */
+	for (int i = 0; i < manager->registry.values_num; i++)
+	{
+		zbx_history_provider_t	*provider;
+		zbx_history_registry_t	*registry = manager->registry.values[i];
+
+		if (NULL == (provider = history_provider_open(registry->name, registry->options.values,
+				registry->options.values_num, error)))
+		{
+			history_manager_clear(manager);
+			goto out;
+		}
+
+		registry->traits = provider->traits;
+		zbx_vector_history_provider_ptr_append(&manager->providers[i], provider);
+	}
+
+	/* check for supported value types */
+	for (unsigned char value_type = 0; value_type < ITEM_VALUE_TYPE_COUNT; value_type++)
+	{
+		index = manager->type_index[value_type];
+
+		if (index >= manager->registry.values_num || 0 == manager->providers[index].values_num)
+		{
+			*error = zbx_dsprintf(NULL, "uninitialized history provider for value type %s",
+					history_value_type_desc(value_type));
+			goto out;
+		}
+
+		if (0 == ((UINT64_C(1) << value_type) & manager->providers[index].values[0]->traits))
+		{
+			*error = zbx_dsprintf(NULL, "history provider \"%s\" does not support value type %s",
+					manager->registry.values[index]->name, history_value_type_desc(value_type));
+			goto out;
+		}
+	}
+
+	ret = SUCCEED;
+out:
+	history_options_clear(options.values, options.values_num);
+	zbx_vector_history_option_destroy(&options);
+
+	return ret;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: get the value types supported by a specific history provider      *
+ *                                                                            *
+ * Parameters:                                                                *
+ *     manager - [IN] history manager                                         *
+ *     index   - [IN] history provider index in registry                      *
+ *                                                                            *
+ * Return value: A bit mask representing the supported value types            *
+ *                                                                            *
+ ******************************************************************************/
+static zbx_uint64_t	history_manager_get_provider_value_types(zbx_history_manager_t *manager, int index)
+{
+	zbx_uint64_t	flags = 0;
+
+	for (int i = 0; i < ITEM_VALUE_TYPE_COUNT; i++)
+	{
+		if (manager->type_index[i] == index)
+			flags |= (UINT64_C(1) << i);
+	}
+
+	return flags;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: retrieve information about all registered custom history          *
+ *          providers                                                         *
+ *                                                                            *
+ * Parameters:                                                                *
+ *     manager  - [IN] history manager                                        *
+ *     info     - [OUT] array of history provider information structures      *
+ *     info_num - [OUT] number of elements in the info array                  *
+ *     error    - [OUT] error message in case of failure                      *
+ *                                                                            *
+ * Return value: SUCCEED - information retrieved successfully                 *
+ *               FAIL    - an error occurred                                  *
+ *                                                                            *
+ * Comments: The default SQL provider information is not returned since it    *
+ *           has been already handled during main DB version checks.          *
+ *                                                                            *
+ ******************************************************************************/
+static int	history_manager_get_info(zbx_history_manager_t *manager, zbx_history_provider_info_t **info,
+		int *info_num, char **error)
+{
+	int					ret = FAIL;
+	zbx_vector_history_provider_info_t	custom;
+
+	zbx_vector_history_provider_info_create(&custom);
+
+	for (int i = 0; i < manager->registry.values_num; i++)
+	{
+		char				*errmsg = NULL;
+		zbx_history_provider_t		*provider;
+		zbx_history_provider_info_t	mi = {0};
+
+		if (0 != (manager->registry.values[i]->traits & ZBX_HISTORY_TRAIT_DEFAULT_PROVIDER))
+			continue;
+
+		if (0 == manager->providers[i].values_num)
+		{
+			*error = zbx_dsprintf(NULL, "history provider \"%s\" is already in use",
+					manager->registry.values[i]->name);
+			goto out;
+		}
+
+		provider = manager->providers[i].values[0];
+
+		if (FAIL == (ret = provider->impl.get_info(provider->data, &mi, &errmsg)))
+		{
+			*error = zbx_dsprintf(NULL, "cannot retrieve history provider \"%s\" information: %s",
+					manager->registry.values[i]->name, errmsg);
+			zbx_free(errmsg);
+
+			goto out;
+		}
+
+		mi.flags = history_manager_get_provider_value_types(manager, i);
+		zbx_vector_history_provider_info_append(&custom, mi);
+	}
+
+	ret = SUCCEED;
+out:
+	if (FAIL == ret)
+	{
+		for (int i = 0; i < custom.values_num; i++)
+			history_provider_info_clear(&custom.values[i]);
+
+		zbx_vector_history_provider_info_destroy(&custom);
+
+	}
+	else
+	{
+		*info_num = custom.values_num;
+		*info = custom.values;
+	}
+
+	return ret;
+}
 
 /************************************************************************************
  *                                                                                  *
@@ -38,110 +549,337 @@ zbx_history_iface_t	history_ifaces[ITEM_VALUE_TYPE_BIN + 1];
  *                                                                                  *
  * Comments: History interfaces are created for all values types based on           *
  *           configuration. Every value type can have different history storage     *
- *           backend. (Binary value type is not supported for ElasticSearch)        *
+ *           provider. (Binary value type is not supported for ElasticSearch)       *
  *                                                                                  *
  ************************************************************************************/
 int	zbx_history_init(const char *config_history_storage_url, const char *config_history_storage_opts,
-		int config_log_slow_queries, char **error)
+		int config_history_storage_pipelines, char **providers, int config_log_slow_queries, char **error)
 {
-	/* TODO: support per value type specific configuration */
-
-	const char	*opts[] = {"dbl", "str", "log", "uint", "text", "bin"};
-
-	for (int i = ITEM_VALUE_TYPE_FLOAT; i <= ITEM_VALUE_TYPE_BIN; i++)
-	{
-
-		if (NULL == config_history_storage_url || NULL == strstr(config_history_storage_opts, opts[i]))
-		{
-			zbx_history_sql_init(&history_ifaces[i], i);
-		}
-		else
-		{
-			if (ITEM_VALUE_TYPE_BIN == i)
-			{
-				*error = zbx_strdup(*error, "Binary value type is not supported for ElasticSearch"
-						" history storage");
-				return FAIL;
-			}
-
-			if (FAIL == zbx_history_elastic_init(&history_ifaces[i], i, config_history_storage_url,
-					config_log_slow_queries, error))
-			{
-				return FAIL;
-			}
-		}
-	}
-
-	return SUCCEED;
+	return history_manager_init(&history_manager, config_history_storage_url, config_history_storage_opts,
+			config_history_storage_pipelines, providers, config_log_slow_queries, error);
 }
 
 /************************************************************************************
  *                                                                                  *
- * Purpose: destroys history storage                                                *
- *                                                                                  *
- * Comments: All interfaces created by zbx_history_init() function are destroyed    *
- *           here.                                                                  *
+ * Purpose: destroy all created history backends                                    *
  *                                                                                  *
  ************************************************************************************/
 void	zbx_history_destroy(void)
 {
-	int	i;
-
-	for (i = 0; i <= ITEM_VALUE_TYPE_BIN; i++)
-	{
-		zbx_history_iface_t	*writer = &history_ifaces[i];
-
-		writer->destroy(writer);
-	}
+	history_manager_clear(&history_manager);
 }
 
-/************************************************************************************
- *                                                                                  *
- * Purpose: sends values to history storage                                         *
- *                                                                                  *
- * Parameters:                                                                      *
- *    history                          - [IN] values to store                       *
- *    ret_flush                        - [OUT]                                      *
- *    config_history_storage_pipelines - [IN]                                       *
- *                                                                                  *
- * Comments: add history values to the configured storage backends                  *
- *                                                                                  *
- ************************************************************************************/
-int	zbx_history_add_values(const zbx_vector_dc_history_ptr_t *history, int *ret_flush,
-		int config_history_storage_pipelines)
+/*******************************************************************************
+ *                                                                             *
+ * Purpose: initialize a history session                                       *
+ *                                                                             *
+ *******************************************************************************/
+static void	history_manager_init_session(zbx_history_manager_t *manager, zbx_history_session_t *session)
 {
-	int	flags = 0;
+	session->manager = manager;
+	memset(session->providers, 0, sizeof(session->providers));
+}
 
-	*ret_flush = FLUSH_SUCCEED;
+/*******************************************************************************
+ *                                                                             *
+ * Purpose: clear a history session and return used history providers to the   *
+ *          manager                                                            *
+ *                                                                             *
+ *******************************************************************************/
+static void	history_session_clear(zbx_history_session_t *session)
+{
+	if (NULL == session->manager)
+	{
+		THIS_SHOULD_NEVER_HAPPEN_MSG("clearing uninitialized history session");
+		return;
+	}
+
+	/* return providers to the manager */
+	for (int i = 0; i < session->manager->registry.values_num; i++)
+	{
+		if (NULL != session->providers[i])
+		{
+			zbx_vector_history_provider_ptr_append(&session->manager->providers[i], session->providers[i]);
+			session->providers[i] = NULL;
+		}
+	}
+
+	session->manager = NULL;
+}
+
+/*******************************************************************************
+ *                                                                             *
+ * Purpose: retrieve a history provider for a specific value type from history *
+ *          session                                                            *
+ *                                                                             *
+ * Parameters: session    - [IN] history session                               *
+ *             value_type - [IN] item value type                               *
+ *                                                                             *
+ * Return value: history provider or NULL if not available                     *
+ *                                                                             *
+ * Comments: If the provider for the specified value type has not been used by *
+ *           session, it is retrieved from the manager and cached in the       *
+ *           session for future use.                                           *
+ *                                                                             *
+ *******************************************************************************/
+static zbx_history_provider_t	*history_session_get_provider(zbx_history_session_t *session, unsigned char value_type)
+{
+	int			index;
+	zbx_history_provider_t 	*provider = NULL;
+
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
+
+	index = session->manager->type_index[value_type];
+
+	if (NULL == session->providers[index])
+	{
+		char	*error = NULL;
+
+		if (NULL == (session->providers[index] = history_manager_get_provider(session->manager, index, &error)))
+		{
+			THIS_SHOULD_NEVER_HAPPEN_MSG("failed to open backend storage provider %s: %s",
+					session->manager->registry.values[index]->name, error);
+			zbx_free(error);
+
+			goto out;
+		}
+	}
+
+	provider = session->providers[index];
+out:
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
+
+	return provider;
+}
+
+/*******************************************************************************
+ *                                                                             *
+ * Purpose: write history entries using corresponding history provider         *
+ *                                                                             *
+ * Parameters: session    - [IN] history session                               *
+ *             value_type - [IN] item value type                               *
+ *             entries    - [IN] array of history entries to write             *
+ *             entries_num- [IN] number of entries in the array                *
+ *                                                                             *
+ *******************************************************************************/
+static void 	history_session_write(zbx_history_session_t *session, unsigned char value_type,
+		const zbx_history_entry_t * const *entries, int entries_num)
+{
+	zbx_history_provider_t	*provider;
+
+	if (NULL == session->manager)
+	{
+		THIS_SHOULD_NEVER_HAPPEN_MSG("writing value_type %d to uninitialized history session", value_type);
+		return;
+	}
+
+	if (NULL == (provider = history_session_get_provider(session, value_type)))
+		return;
+
+	provider->impl.write(provider->data, value_type, entries, entries_num);
+}
+
+/*******************************************************************************
+ *                                                                             *
+ * Purpose: extract error status for a specific value type from combined flush *
+ *          error                                                              *
+ *                                                                             *
+ * Parameters: error_mask - [IN] bitmask containing flush error statuses       *
+ *             value_type - [IN] item value type                               *
+ *                                                                             *
+ * Return value: FLUSH_SUCCEED     - flush succeeded                           *
+ *               FLUSH_FAIL        - flush failed                              *
+ *               FLUSH_DUPL_REJECTED - duplicate values were rejected          *
+ *               FLUSH_UNKNOWN     - unknown error occurred                    *
+ *                                                                             *
+ *******************************************************************************/
+int	zbx_history_get_flush_error(zbx_uint64_t error_mask, unsigned char value_type)
+{
+	static int	flush_errors[] = {ZBX_HISTORY_FLUSH_SUCCEED, ZBX_HISTORY_FLUSH_FAIL,
+			ZBX_HISTORY_FLUSH_DUPL_REJECTED};
+	zbx_uint64_t	err;
+
+	error_mask >>= (value_type * ZBX_HISTORY_FLUSH_ERR_BITS);
+	err = error_mask & ((1 << ZBX_HISTORY_FLUSH_ERR_BITS) - 1);
+
+	if (ZBX_HISTORY_FLUSH_RET_FAIL_UNKNOWN <= err)
+		return ZBX_HISTORY_FLUSH_UNKNOWN;
+
+	return flush_errors[err];
+}
+
+/*******************************************************************************
+ *                                                                             *
+ * Purpose: create a flush error mask for a specific value type                *
+ *                                                                             *
+ * Parameters: ret        - [IN] flush result (FLUSH_SUCCEED, FLUSH_FAIL,      *
+ *                              FLUSH_DUPL_REJECTED)                           *
+ *             value_type - [IN] item value type                               *
+ *                                                                             *
+ * Return value: 64-bit integer with error bits set for the specified          *
+ *               value type                                                    *
+ *                                                                             *
+ *******************************************************************************/
+zbx_uint64_t	history_make_flush_error(int ret, unsigned char value_type)
+{
+	zbx_uint64_t	err;
+
+	switch (ret)
+	{
+		case ZBX_HISTORY_FLUSH_SUCCEED:
+			err = ZBX_HISTORY_FLUSH_RET_SUCCEED;
+			break;
+		case ZBX_HISTORY_FLUSH_FAIL:
+			err = ZBX_HISTORY_FLUSH_RET_FAIL;
+			break;
+		case ZBX_HISTORY_FLUSH_DUPL_REJECTED:
+			err = ZBX_HISTORY_FLUSH_RET_FAIL_DUPL;
+			break;
+		default:
+			err = ZBX_HISTORY_FLUSH_RET_FAIL_UNKNOWN;
+			THIS_SHOULD_NEVER_HAPPEN_MSG("unexpected flush result %d", ret);
+			break;
+	}
+
+	return (err << (value_type * ZBX_HISTORY_FLUSH_ERR_BITS));
+}
+
+/*******************************************************************************
+ *                                                                             *
+ * Purpose: flush all history providers used in the session                    *
+ *                                                                             *
+ * Parameters: session - [IN] history session                                  *
+ *                                                                             *
+ * Return value: error_mask - bitmask containing flush error statuses for each *
+ *                            value type                                       *
+ *                                                                             *
+ * Comments: This function flushes all history providers that have been used   *
+ *           in the session. It combines the flush results into a single       *
+ *           error_mask, where each value type's status is represented by      *
+ *           ZBX_HISTORY_FLUSH_ERR_BITS bits.                                  *
+ *                                                                             *
+ *******************************************************************************/
+static zbx_uint64_t	history_session_flush(zbx_history_session_t *session)
+{
+	zbx_uint64_t	error_mask = 0;
+
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
+
+	if (NULL == session->manager)
+	{
+		THIS_SHOULD_NEVER_HAPPEN_MSG("flushing uninitialized history session");
+		return HISTORY_FLUSH_RET_FAIL_ALL;
+	}
+
+	for (int i = 0; i < session->manager->registry.values_num; i++)
+	{
+		if (NULL != session->providers[i])
+			error_mask |= session->providers[i]->impl.flush(session->providers[i]->data);
+	}
+
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s(): ret:%lx", __func__, error_mask);
+
+	return error_mask;
+}
+
+/*******************************************************************************
+ *                                                                             *
+ * Purpose: fetch history data for a specific item                             *
+ *                                                                             *
+ * Parameters: session    - [IN] history session                               *
+ *             itemid     - [IN] item identifier                               *
+ *             value_type - [IN] item value type                               *
+ *             start      - [IN] start timestamp of the requested period,      *
+ *                               0 - ignored                                   *
+ *             end        - [IN] end timestamp of the requested period         *
+ *             count      - [IN] maximum number of values to retrieve,         *
+ *                               0 - ignored                                   *
+ *             values     - [OUT] array of retrieved history records           *
+ *                                                                             *
+ * Return value: SUCCEED - data fetched successfully                           *
+ *               FAIL    - an error occurred during data retrieval             *
+ *                                                                             *
+ *******************************************************************************/
+static int	history_session_fetch(zbx_history_session_t *session, zbx_uint64_t itemid, unsigned char value_type,
+		time_t start, time_t end, int count, zbx_history_record_t **values)
+{
+	zbx_history_provider_t	*provider;
+	char			*error = NULL;
+	int			ret;
+
+	if (NULL == session->manager)
+	{
+		THIS_SHOULD_NEVER_HAPPEN_MSG("fetching data from uninitialized history session");
+		return FAIL;
+	}
+
+	if (NULL == (provider = history_session_get_provider(session, value_type)))
+		return FAIL;
+
+	if (FAIL == (ret = provider->impl.fetch(provider->data, itemid, value_type, start, end, count, values, &error)))
+	{
+		zabbix_log(LOG_LEVEL_WARNING, "Failed to fetch data from %s for item \"" ZBX_FS_UI64 "\": %s",
+				provider->name, itemid, error);
+		zbx_free(error);
+	}
+
+	return ret;
+}
+
+/*******************************************************************************
+ *                                                                             *
+ * Purpose: add history values to the history storage                          *
+ *                                                                             *
+ * Parameters: history   - [IN] vector of history data to add                  *
+ *             flush_err - [OUT] bitmask containing flush error statuses per   *
+ *                               value types                                   *
+ *                                                                             *
+ * Return value: SUCCEED - values added successfully                           *
+ *               FAIL    - an error occurred while adding values               *
+ *                                                                             *
+ * Comments: This function writes history data to appropriate providers based  *
+ *           on value types, then flushes all used providers. The flush errors *
+ *           are combined into a single bitmask returned via flush_err         *
+ *           parameter.                                                        *
+ *                                                                             *
+ *******************************************************************************/
+int	zbx_history_add_values(const zbx_vector_dc_history_ptr_t *history, zbx_uint64_t *flush_err)
+{
+	const zbx_history_entry_t	**entries;
+	zbx_history_session_t		session;
 
 	zbx_prof_start(__func__, ZBX_PROF_PROCESSING);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
-	for (int i = 0; i <= ITEM_VALUE_TYPE_BIN; i++)
+	history_manager_init_session(&history_manager, &session);
+
+	entries = (const zbx_history_entry_t **)zbx_malloc(NULL, sizeof(zbx_history_entry_t *) * history->values_num);
+
+	for (int value_type = 0; value_type <= ITEM_VALUE_TYPE_BIN; value_type++)
 	{
-		zbx_history_iface_t	*writer = &history_ifaces[i];
+		int	entries_num = 0;
 
-		if (0 < writer->add_values(writer, history, config_history_storage_pipelines))
-			flags |= (1 << i);
-	}
-
-	for (int i = 0; i <= ITEM_VALUE_TYPE_BIN; i++)
-	{
-		zbx_history_iface_t	*writer = &history_ifaces[i];
-
-		if (0 != (flags & (1 << i)))
+		for (int i = 0; i < history->values_num; i++)
 		{
-			if (FLUSH_DUPL_REJECTED == (*ret_flush = writer->flush(writer)))
-				break;
+			if (history->values[i]->entry.value_type == value_type)
+				entries[entries_num++] = &history->values[i]->entry;
 		}
+
+		if (0 != entries_num)
+			history_session_write(&session, value_type, entries, entries_num);
 	}
 
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
+	*flush_err = history_session_flush(&session);
+
+	history_session_clear(&session);
+	zbx_free(entries);
+
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s(): err:%lx", __func__, *flush_err);
 
 	zbx_prof_end();
 
-	return (FLUSH_SUCCEED == *ret_flush ? SUCCEED : FAIL);
+	return (0 == *flush_err ? SUCCEED : FAIL);
 }
 
 /************************************************************************************
@@ -165,31 +903,45 @@ int	zbx_history_add_values(const zbx_vector_dc_history_ptr_t *history, int *ret_
 int	zbx_history_get_values(zbx_uint64_t itemid, int value_type, int start, int count, int end,
 		zbx_vector_history_record_t *values)
 {
-	int			ret, pos;
-	zbx_history_iface_t	*writer = &history_ifaces[value_type];
+	int			ret, num = 0;
+	zbx_history_session_t	session;
+	zbx_history_record_t	*records = NULL;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() itemid:" ZBX_FS_UI64 " value_type:%d start:%d count:%d end:%d",
 			__func__, itemid, value_type, start, count, end);
 
-	pos = values->values_num;
-	ret = writer->get_values(writer, itemid, start, count, end, values);
+	history_manager_init_session(&history_manager, &session);
 
-	if (SUCCEED == ret && SUCCEED == ZBX_CHECK_LOG_LEVEL(LOG_LEVEL_TRACE))
+	ret = history_session_fetch(&session, itemid, value_type, start, end, count, &records);
+
+	if (SUCCEED <= ret)
 	{
-		int	i;
-		char	buffer[MAX_STRING_LEN];
-
-		for (i = pos; i < values->values_num; i++)
+		if (SUCCEED == ZBX_CHECK_LOG_LEVEL(LOG_LEVEL_TRACE))
 		{
-			zbx_history_record_t	*h = &values->values[i];
+			int	i;
+			char	buffer[MAX_STRING_LEN];
 
-			zbx_history_value2str(buffer, sizeof(buffer), &h->value, value_type);
-			zabbix_log(LOG_LEVEL_TRACE, "  %d.%09d %s", h->timestamp.sec, h->timestamp.ns, buffer);
+
+			for (i = 0; i < ret; i++)
+			{
+				zbx_history_record_t	*h = &records[i];
+
+				zbx_history_value2str(buffer, sizeof(buffer), &h->value, value_type);
+				zabbix_log(LOG_LEVEL_TRACE, "  %d.%09d %s", h->timestamp.sec, h->timestamp.ns, buffer);
+			}
 		}
+
+		if (0 != ret)
+			zbx_vector_history_record_append_array(values, records, ret);
+
+		zbx_free(records);
+
+		ret = SUCCEED;
 	}
 
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s values:%d", __func__, zbx_result_string(ret),
-			values->values_num - pos);
+	history_session_clear(&session);
+
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s values:%d", __func__, zbx_result_string(ret), num);
 
 	return ret;
 }
@@ -209,9 +961,30 @@ int	zbx_history_get_values(zbx_uint64_t itemid, int value_type, int start, int c
  ************************************************************************************/
 int	zbx_history_requires_trends(int value_type)
 {
-	zbx_history_iface_t	*writer = &history_ifaces[value_type];
+	zbx_uint64_t	traits;
 
-	return 0 != writer->requires_trends ? SUCCEED : FAIL;
+	traits = history_manager_get_provider_traits(&history_manager, value_type);
+
+	return 0 != (traits & ZBX_HISTORY_TRAIT_REQUIRES_TRENDS) ? SUCCEED : FAIL;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: check if value type requires external housekeeping                *
+ *                                                                            *
+ * Parameters: value_type - [IN] the value type                               *
+ *                                                                            *
+ * Return value: SUCCEED - housekeeping required                              *
+ *               FAIL    - otherwise                                          *
+ *                                                                            *
+ ******************************************************************************/
+int	zbx_history_requires_housekeeping(int value_type)
+{
+	zbx_uint64_t	traits;
+
+	traits = history_manager_get_provider_traits(&history_manager, value_type);
+
+	return 0 != (traits & ZBX_HISTORY_TRAIT_REQUIRES_HOUSEKEEPING) ? SUCCEED : FAIL;
 }
 
 /******************************************************************************
@@ -451,16 +1224,163 @@ void	zbx_history_value2variant(const zbx_history_value_t *value, unsigned char v
 
 /******************************************************************************
  *                                                                            *
+ * Purpose: add history module version information to JSON                    *
+ *                                                                            *
+ * Parameters: json - [IN/OUT] JSON object to add version info to             *
+ *             info - [IN] history module information                         *
+ *                                                                            *
+ ******************************************************************************/
+static void	history_add_version_info(struct zbx_json *json, zbx_history_provider_info_t *info)
+{
+	zbx_json_addobject(json, NULL);
+
+	zbx_json_addstring(json, "database", info->database, ZBX_JSON_TYPE_STRING);
+
+	if (NULL != info->friendly_current_version)
+		zbx_json_addstring(json, "current_version", info->friendly_current_version, ZBX_JSON_TYPE_STRING);
+
+	if (NULL != info->friendly_min_version)
+		zbx_json_addstring(json, "min_version", info->friendly_min_version, ZBX_JSON_TYPE_STRING);
+
+	if (NULL != info->friendly_max_version)
+		zbx_json_addstring(json, "max_version", info->friendly_max_version, ZBX_JSON_TYPE_STRING);
+
+	if (NULL != info->friendly_min_supported_version)
+	{
+		zbx_json_addstring(json, "min_supported_version", info->friendly_min_supported_version,
+				ZBX_JSON_TYPE_STRING);
+	}
+
+	zbx_json_addint64(json, "value_types", info->flags);
+	zbx_json_close(json);
+
+	zbx_json_close(json);
+}
+
+/******************************************************************************
+ *                                                                            *
  * Purpose: relays the version retrieval logic to the history implementation  *
  *          functions                                                         *
  *                                                                            *
  ******************************************************************************/
-void	zbx_history_check_version(struct zbx_json *json, int *result, int config_allow_unsupported_db_versions,
-		const char *config_history_storage_url)
+int	zbx_history_check_version(int config_allow_unsupported_db_versions, unsigned char program_type)
 {
-	if (NULL != config_history_storage_url)
+	zbx_history_provider_info_t	*info = NULL;
+	int				info_num, ret = SUCCEED;
+	char				*error = NULL;
+	struct zbx_json			json;
+
+	if (FAIL == history_manager_get_info(&history_manager, &info, &info_num, &error))
 	{
-		zbx_elastic_version_extract(json, result, config_allow_unsupported_db_versions,
-				config_history_storage_url);
+		zabbix_log(LOG_LEVEL_CRIT, "%s", error);
+		zbx_free(error);
+		return FAIL;
 	}
+
+	zbx_json_initarray(&json, 1024);
+
+	for (int i = 0; i < info_num; i++)
+	{
+		struct zbx_db_version_info_t	vi = {
+				.database = info[i].database,
+				.friendly_current_version = info[i].friendly_current_version,
+				.friendly_max_version = info[i].friendly_max_version,
+				.friendly_min_version = info[i].friendly_min_version,
+				.friendly_min_supported_version = info[i].friendly_min_supported_version
+		};
+
+		vi.flag = zbx_db_version_check(info[i].database, info[i].current_version, info[i].min_version,
+				info[i].max_version, info[i].min_supported_version);
+
+		if (FAIL == zbx_db_verify_version_info(&vi, config_allow_unsupported_db_versions, program_type))
+			ret = FAIL;
+		else
+			history_add_version_info(&json, info + i);
+
+		history_provider_info_clear(info + i);
+	}
+
+	zbx_free(info);
+
+	zabbix_log(LOG_LEVEL_INFORMATION, "History providers: %s", json.buffer);
+	(void)zbx_db_settings_set_value("dbversion_history_status", json.buffer, ZBX_SETTING_TYPE_STR);
+
+	zbx_json_free(&json);
+
+	return ret;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: duplicates history log by allocating necessary resources and      *
+ *          copying the target log values.                                    *
+ *                                                                            *
+ * Parameters: log   - [IN] the history log to duplicate                      *
+ *                                                                            *
+ * Return value: the duplicated history log                                   *
+ *                                                                            *
+ ******************************************************************************/
+static zbx_log_value_t	*log_value_dup(const zbx_log_value_t *log)
+{
+	zbx_log_value_t	*plog;
+
+	plog = (zbx_log_value_t *)zbx_malloc(NULL, sizeof(zbx_log_value_t));
+
+	plog->timestamp = log->timestamp;
+	plog->logeventid = log->logeventid;
+	plog->severity = log->severity;
+	plog->source = (NULL == log->source ? NULL : zbx_strdup(NULL, log->source));
+	plog->value = zbx_strdup(NULL, log->value);
+
+	return plog;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: copies history value                                              *
+ *                                                                            *
+ * Parameters: dst        - [OUT] a pointer to the destination value          *
+ *             src        - [IN] a pointer to the source value                *
+ *             value_type - [IN] the value type (see ITEM_VALUE_TYPE_* defs)  *
+ *                                                                            *
+ * Comments: Additional memory is allocated to store string, text and log     *
+ *           value contents. This memory must be freed by the caller.         *
+ *                                                                            *
+ ******************************************************************************/
+void	zbx_history_record_copy(zbx_history_record_t *dst, const zbx_history_record_t *src, int value_type)
+{
+	dst->timestamp = src->timestamp;
+
+	switch (value_type)
+	{
+		case ITEM_VALUE_TYPE_STR:
+		case ITEM_VALUE_TYPE_TEXT:
+			dst->value.str = zbx_strdup(NULL, src->value.str);
+			break;
+		case ITEM_VALUE_TYPE_LOG:
+			dst->value.log = log_value_dup(src->value.log);
+			break;
+		default:
+			dst->value = src->value;
+	}
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: get description of history value type                             *
+ *                                                                            *
+ * Parameters: value_type - [IN] the history value type                       *
+ *                                                                            *
+ * Return value: description of the history value type                        *
+ *                                                                            *
+ ******************************************************************************/
+const char	*history_value_type_desc(unsigned char value_type)
+{
+	static char	*value_types_str[] = {"Numeric (float)", "Character", "Log", "Numeric (unsigned)", "Text",
+			"Binary"};
+
+	if (value_type >= ARRSIZE(value_types_str))
+		return "Unknown";
+
+	return value_types_str[value_type];
 }

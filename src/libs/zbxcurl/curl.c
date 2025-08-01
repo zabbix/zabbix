@@ -61,10 +61,10 @@ CURLMcode	zbx_curl_multi_wait(CURLM *multi_handle, int timeout_ms, int *numfds)
 	if (NULL == fptr)
 	{
 		/* this check must be performed before calling this function */
-		if (SUCCEED != zbx_curl_good_for_elasticsearch(NULL))
+		if (SUCCEED != zbx_curl_has_multi_wait(NULL))
 		{
-			zabbix_log(LOG_LEVEL_CRIT, "zbx_curl_multi_wait() should never be called when using cURL library"
-					" <= 7.28.0 (using version %s)", libcurl_version_str());
+			zabbix_log(LOG_LEVEL_CRIT, "zbx_curl_multi_wait() should never be called when using cURL "
+					"library <= 7.28.0 (using version %s)", libcurl_version_str());
 			THIS_SHOULD_NEVER_HAPPEN;
 			exit(EXIT_FAILURE);
 		}
@@ -388,15 +388,15 @@ int	zbx_curl_has_smtp_auth(char **error)
 	return SUCCEED;
 }
 
-int	zbx_curl_good_for_elasticsearch(char **error)
+int	zbx_curl_has_multi_wait(char **error)
 {
-	/* Elasticsearch needs curl_multi_wait() which was added in 7.28.0 (0x071c00) */
+	/* History providers need curl_multi_wait() which was added in 7.28.0 (0x071c00) */
 	if (libcurl_version_num() < 0x071c00)
 	{
 		if (NULL != error)
 		{
-			*error = zbx_dsprintf(*error, "cURL library version %s is too old for Elasticsearch history"
-					" backend, 7.28.0 or newer is required", libcurl_version_str());
+			*error = zbx_dsprintf(*error, "cURL library version %s is too old,"
+					" 7.28.0 or newer is required", libcurl_version_str());
 		}
 
 		return FAIL;

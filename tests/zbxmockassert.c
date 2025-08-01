@@ -18,8 +18,6 @@
 
 #include "zbxnum.h"
 
-void cm_print_error(const char * const format, ...);
-
 #define _FAIL(file, line, prefix, message, ...)						\
 											\
 do 											\

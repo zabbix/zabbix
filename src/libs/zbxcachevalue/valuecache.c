@@ -283,9 +283,6 @@ static zbx_vc_cache_t	*vc_cache = NULL;
 #define	UNLOCK_CACHE	zbx_rwlock_unlock(vc_lock)
 
 /* function prototypes */
-static void	vc_history_record_copy(zbx_history_record_t *dst, const zbx_history_record_t *src, int value_type);
-static void	vc_history_record_vector_clean(zbx_vector_history_record_t *vector, int value_type);
-
 static size_t	vch_item_free_cache(zbx_vc_item_t *item);
 static size_t	vch_item_free_chunk(zbx_vc_item_t *item, zbx_vc_chunk_t *chunk);
 static int	vch_item_add_values_at_tail(zbx_vc_item_t *item, const zbx_history_record_t *values, int values_num);
@@ -491,7 +488,7 @@ static int	vc_db_get_values(zbx_uint64_t itemid, int value_type, zbx_vector_hist
 	/* all values are past requested range (timestamp greater than requested), return empty vector */
 	if (i == values->values_num)
 	{
-		vc_history_record_vector_clean(values, value_type);
+		zbx_history_record_vector_clean(values, value_type);
 		return SUCCEED;
 	}
 
@@ -566,82 +563,6 @@ static int	vc_item_weight_compare_func(const zbx_vc_item_weight_t *d1, const zbx
 	ZBX_RETURN_IF_NOT_EQUAL(d1->weight, d2->weight);
 
 	return 0;
-}
-
-/******************************************************************************
- *                                                                            *
- * Purpose: frees history log and all resources allocated for it              *
- *                                                                            *
- * Parameters: log   - [IN] the history log to free                           *
- *                                                                            *
- ******************************************************************************/
-static void	vc_history_logfree(zbx_log_value_t *log)
-{
-	zbx_free(log->source);
-	zbx_free(log->value);
-	zbx_free(log);
-}
-
-/******************************************************************************
- *                                                                            *
- * Purpose: duplicates history log by allocating necessary resources and      *
- *          copying the target log values.                                    *
- *                                                                            *
- * Parameters: log   - [IN] the history log to duplicate                      *
- *                                                                            *
- * Return value: the duplicated history log                                   *
- *                                                                            *
- ******************************************************************************/
-static zbx_log_value_t	*vc_history_logdup(const zbx_log_value_t *log)
-{
-	zbx_log_value_t	*plog;
-
-	plog = (zbx_log_value_t *)zbx_malloc(NULL, sizeof(zbx_log_value_t));
-
-	plog->timestamp = log->timestamp;
-	plog->logeventid = log->logeventid;
-	plog->severity = log->severity;
-	plog->source = (NULL == log->source ? NULL : zbx_strdup(NULL, log->source));
-	plog->value = zbx_strdup(NULL, log->value);
-
-	return plog;
-}
-
-/******************************************************************************
- *                                                                            *
- * Purpose: releases resources allocated to store history records             *
- *                                                                            *
- * Parameters: vector      - [IN] the history record vector                   *
- *             value_type  - [IN] the type of vector values                   *
- *                                                                            *
- ******************************************************************************/
-static void	vc_history_record_vector_clean(zbx_vector_history_record_t *vector, int value_type)
-{
-	int	i;
-
-	switch (value_type)
-	{
-		case ITEM_VALUE_TYPE_STR:
-		case ITEM_VALUE_TYPE_TEXT:
-			for (i = 0; i < vector->values_num; i++)
-				zbx_free(vector->values[i].value.str);
-
-			break;
-		case ITEM_VALUE_TYPE_LOG:
-			for (i = 0; i < vector->values_num; i++)
-				vc_history_logfree(vector->values[i].value.log);
-			break;
-		case ITEM_VALUE_TYPE_UINT64:
-		case ITEM_VALUE_TYPE_FLOAT:
-			break;
-		case ITEM_VALUE_TYPE_BIN:
-		case ITEM_VALUE_TYPE_NONE:
-		default:
-			THIS_SHOULD_NEVER_HAPPEN;
-			exit(EXIT_FAILURE);
-	}
-
-	zbx_vector_history_record_clear(vector);
 }
 
 /******************************************************************************
@@ -903,36 +824,6 @@ static void	vc_release_space(zbx_vc_item_t *source_item, size_t space)
 
 /******************************************************************************
  *                                                                            *
- * Purpose: copies history value                                              *
- *                                                                            *
- * Parameters: dst        - [OUT] a pointer to the destination value          *
- *             src        - [IN] a pointer to the source value                *
- *             value_type - [IN] the value type (see ITEM_VALUE_TYPE_* defs)  *
- *                                                                            *
- * Comments: Additional memory is allocated to store string, text and log     *
- *           value contents. This memory must be freed by the caller.         *
- *                                                                            *
- ******************************************************************************/
-static void	vc_history_record_copy(zbx_history_record_t *dst, const zbx_history_record_t *src, int value_type)
-{
-	dst->timestamp = src->timestamp;
-
-	switch (value_type)
-	{
-		case ITEM_VALUE_TYPE_STR:
-		case ITEM_VALUE_TYPE_TEXT:
-			dst->value.str = zbx_strdup(NULL, src->value.str);
-			break;
-		case ITEM_VALUE_TYPE_LOG:
-			dst->value.log = vc_history_logdup(src->value.log);
-			break;
-		default:
-			dst->value = src->value;
-	}
-}
-
-/******************************************************************************
- *                                                                            *
  * Purpose: appends the specified value to value vector                       *
  *                                                                            *
  * Parameters: vector     - [IN/OUT] the value vector                         *
@@ -948,7 +839,7 @@ static void	vc_history_record_vector_append(zbx_vector_history_record_t *vector,
 {
 	zbx_history_record_t	record;
 
-	vc_history_record_copy(&record, value, value_type);
+	zbx_history_record_copy(&record, value, value_type);
 	zbx_vector_history_record_append_ptr(vector, &record);
 }
 
@@ -2537,20 +2428,20 @@ void	zbx_vc_reset(void)
  *                                                                            *
  * Parameters:                                                                *
  *   history                          - [IN] item history values              *
- *   ret_flush                        - [OUT]                                 *
+ *   *flush_err                       - [OUT]                                 *
  *   config_history_storage_pipelines - [IN]                                  *
  *                                                                            *
  * Return value: SUCCEED - values were added successfully                     *
  *               FAIL    - otherwise                                          *
  *                                                                            *
  ******************************************************************************/
-int	zbx_vc_add_values(zbx_vector_dc_history_ptr_t *history, int *ret_flush, int config_history_storage_pipelines)
+int	zbx_vc_add_values(zbx_vector_dc_history_ptr_t *history, zbx_uint64_t *flush_err)
 {
 	zbx_vc_item_t		*item;
 	int			i;
 	zbx_dc_history_t	*h;
 
-	if (SUCCEED != zbx_history_add_values(history, ret_flush, config_history_storage_pipelines))
+	if (SUCCEED != zbx_history_add_values(history, flush_err))
 		return FAIL;
 
 	if (ZBX_VC_DISABLED == vc_state)
@@ -2562,16 +2453,15 @@ int	zbx_vc_add_values(zbx_vector_dc_history_ptr_t *history, int *ret_flush, int 
 	{
 		h = history->values[i];
 
-		item = (zbx_vc_item_t *)zbx_hashset_search(&vc_cache->items, &h->itemid);
+		item = (zbx_vc_item_t *)zbx_hashset_search(&vc_cache->items, &h->entry.itemid);
 
 		if (NULL == item && 0 != (h->flags & ZBX_DC_FLAG_HASTRIGGER) && ZBX_VC_MODE_NORMAL == vc_cache->mode)
 		{
 			zbx_vc_item_t	item_local = {
-					.itemid = h->itemid,
-					.value_type = h->value_type,
+					.itemid = h->entry.itemid,
+					.value_type = h->entry.value_type,
 					.last_accessed = (int)time(NULL),
 					.active_range = VC_MIN_RANGE
-
 			};
 
 			item = (zbx_vc_item_t *)zbx_hashset_insert(&vc_cache->items, &item_local, sizeof(item_local));
@@ -2580,7 +2470,7 @@ int	zbx_vc_add_values(zbx_vector_dc_history_ptr_t *history, int *ret_flush, int 
 		/* cache new values only after the item history database status is known */
 		if (NULL != item)
 		{
-			zbx_history_record_t	record = {h->ts, h->value};
+			zbx_history_record_t	record = {h->entry.ts, h->entry.value};
 			zbx_vc_chunk_t		*head = item->head;
 			int			last_value_timestamp;
 
@@ -2595,7 +2485,8 @@ int	zbx_vc_add_values(zbx_vector_dc_history_ptr_t *history, int *ret_flush, int 
 			/* Also remove item if the value adding failed. In this case we             */
 			/* won't have the latest data in cache - so the requests must go directly   */
 			/* to the database.                                                         */
-			if (item->value_type != h->value_type || FAIL == vch_item_add_value_at_head(item, &record))
+			if (item->value_type != h->entry.value_type ||
+					FAIL == vch_item_add_value_at_head(item, &record))
 			{
 				vc_remove_item(item);
 				continue;

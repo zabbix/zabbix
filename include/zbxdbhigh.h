@@ -768,6 +768,8 @@ void	zbx_lld_filter_clean(zbx_lld_filter_t *filter);
 
 #define ZBX_TIMEZONE_DEFAULT_VALUE	"default"
 
+int	zbx_db_verify_version_info(struct zbx_db_version_info_t *info, int allow_unsupported,
+		unsigned char program_type);
 int	zbx_db_check_version_info(struct zbx_db_version_info_t *info, int allow_unsupported,
 		unsigned char program_type);
 void	zbx_db_version_info_clear(struct zbx_db_version_info_t *version_info);
@@ -865,5 +867,17 @@ const zbx_sync_row_t	*zbx_sync_rowset_search_by_id(const zbx_sync_rowset_t *rows
 zbx_sync_row_t	*zbx_sync_rowset_search_by_parent(zbx_sync_rowset_t *rowset, zbx_uint64_t parent_rowid);
 void	zbx_sync_rowset_rollback(zbx_sync_rowset_t *rowset);
 void	zbx_sync_rowset_copy(zbx_sync_rowset_t *dst, const zbx_sync_rowset_t *src);
+
+/* type of value in settings table */
+#define ZBX_SETTING_TYPE_STR			1
+#define ZBX_SETTING_TYPE_INT			2
+#define ZBX_SETTING_TYPE_USRGRPID		3
+#define ZBX_SETTING_TYPE_HOSTGROUPID		4
+#define ZBX_SETTING_TYPE_USRDIRID		5
+#define ZBX_SETTING_TYPE_MFAID			6
+
+#define ZBX_SETTING_TYPE_MAX			7
+
+int	zbx_db_settings_set_value(const char *name, const void *value, int type);
 
 #endif
