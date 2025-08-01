@@ -973,7 +973,6 @@ A......PS. [ZBXNEXT-10056] updated max supported MariaDB version to 11.8 (Sasha)
 ........S. [ZBXNEXT-10122] updated maximal supported TimescaleDB version to 2.21 (mprihodko)
 
 Bug fixes:
-.......PS. [ZBX-26524] fixed threads to terminate gracefully when child process exits unexpectedly to avoid deadlocks (vso)
 ..F....... [ZBX-26159] fixed log[] item with 'numeric' type of information unexpected changing to 'log' type (aluchko)
 ..F....... [ZBX-26374] added updates for displaying the relevant monitoring data or "no permissions" notification for the Classic Graph widget (msnihach)
 .....J.... [ZBX-26220] fixed scheduled report creation with IPv6 address in Zabbix frontend URL (vsmelovs)
