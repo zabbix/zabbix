@@ -369,7 +369,8 @@ class testAuthentication extends CAPITest {
 			],
 			'Test valid LDAP host' => [
 				'authentication' => [
-					'ldap_host' => 'test.ldap.host'
+					'ldap_host' => 'test.ldap.host',
+					'ldap_bind_password' => 'new_password'
 				],
 				'expected_error' => null
 			],
@@ -549,5 +550,17 @@ class testAuthentication extends CAPITest {
 			// Call method and make sure it really returns the error.
 			$this->call('authentication.update', $authentication, $expected_error);
 		}
+	}
+
+	/**
+	 * Method only for 6.0 version, newest version test uses case 'Test update LDAP host requires ldap_bind_password'
+	 * to test.
+	 */
+	public function testLdapPasswordRequiredOnLdapHostChange() {
+		// LDAP host change requires ldap_bind_password only when it's value is not empty in database.
+		$this->call('authentication.update', ['ldap_host' => 'host.com', 'ldap_bind_password' => 'api_json']);
+
+		$expected_error = 'Invalid parameter "/": the parameter "ldap_bind_password" is missing.';
+		$this->call('authentication.update', ['ldap_host' => 'evil.host.com'], $expected_error);
 	}
 }

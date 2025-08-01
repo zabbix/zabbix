@@ -97,20 +97,33 @@
 
 		$form.find('#bind-password-btn').on('click', showPasswordField);
 
+		$form.find('#ldap_host').on('change', showPasswordFieldWithWarning);
+
 		$form.find('[name=ldap_test]').click(function() {
 			warn = false;
 		});
 	});
 
-	function showPasswordField(e) {
-		const form_field = e.target.parentNode;
+	function showPasswordField() {
+		const button = document.getElementById('bind-password-btn');
+
+		const form_field = button.parentNode;
 		const password_field = form_field.querySelector('[name="ldap_bind_password"]');
 
 		password_field.disabled = false;
 		password_field.classList.remove('<?= ZBX_STYLE_DISPLAY_NONE ?>');
 
-		form_field.removeChild(e.target);
+		form_field.removeChild(button);
 
 		document.getElementById('change_bind_password').value = 1;
+	}
+
+	function showPasswordFieldWithWarning() {
+		if (document.getElementById('bind-password-btn') === null) {
+			return;
+		}
+
+		showPasswordField();
+		document.querySelector('.js-bind-password-warning').style.display = '';
 	}
 </script>

@@ -170,6 +170,19 @@ class CAuthentication extends CApiService {
 		$output_fields = $this->output_fields;
 		$output_fields[] = 'configid';
 
-		return DB::select('config', ['output' => $output_fields])[0];
+		$db_auth = DB::select('config', ['output' => $output_fields])[0];
+
+		self::checkLdapBindPassword($auth, $db_auth);
+
+		return $db_auth;
+	}
+
+	private static function checkLdapBindPassword(array $auth, array $db_auth): void {
+		if (array_key_exists('ldap_host', $auth) && $auth['ldap_host'] !== $db_auth['ldap_host']
+				&& !array_key_exists('ldap_bind_password', $auth) && $db_auth['ldap_bind_password'] !== '') {
+			self::exception(ZBX_API_ERROR_PARAMETERS, _s('Invalid parameter "%1$s": %2$s.', '/',
+				_s('the parameter "%1$s" is missing', 'ldap_bind_password')
+			));
+		}
 	}
 }

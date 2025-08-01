@@ -143,12 +143,13 @@ $http_tab = (new CFormList('list_http'))
 
 // LDAP configuration fields.
 if ($data['change_bind_password']) {
-	$password_box = (new CPassBox('ldap_bind_password', $data['ldap_bind_password'],
-		DB::getFieldLength('config', 'ldap_bind_password'))
-	)
-		->setEnabled($data['ldap_enabled'])
-		->setWidth(ZBX_TEXTAREA_SMALL_WIDTH)
-	;
+	$password_box = [
+		(new CPassBox('ldap_bind_password', $data['ldap_bind_password'],
+			DB::getFieldLength('config', 'ldap_bind_password'))
+		)
+			->setEnabled($data['ldap_enabled'])
+			->setWidth(ZBX_TEXTAREA_SMALL_WIDTH)
+	];
 }
 else {
 	$password_box = [
@@ -162,6 +163,12 @@ else {
 			->setEnabled(false)
 	];
 }
+
+$password_box[] = (makeWarningIcon(
+		_('The previous password was cleared due to a host change. Please enter the new password.')
+	))
+	->addStyle('display: none; margin-left: 5px;')
+	->addClass('js-bind-password-warning');
 
 $ldap_tab = (new CFormList('list_ldap'))
 	->addRow(new CLabel(_('Enable LDAP authentication'), 'ldap_configured'),
