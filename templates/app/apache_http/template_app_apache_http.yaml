@@ -1,5 +1,5 @@
 zabbix_export:
-  version: '7.4'
+  version: '8.0'
   template_groups:
     - uuid: a571c0d144b14fd4a87a9d9b2aa9fcd6
       name: Templates/Applications
@@ -99,7 +99,7 @@ zabbix_export:
         2. Set the hostname or IP address of the Apache status page host in the `Apache status host` host wizard configuration field. You can also change the status page port in the `Apache status page port` field and status page path in the `Apache status page path` field if necessary.
       vendor:
         name: Zabbix
-        version: 7.4-1
+        version: 8.0-0
       groups:
         - name: Templates/Applications
       items:
