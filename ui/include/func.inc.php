@@ -784,9 +784,10 @@ function convertUnitsRaw(array $options): array {
  * @param string $time       Decimal integer with optional time suffix.
  * @param bool   $with_year  Additionally parse year suffixes.
  *
- * @return int|null  Decimal integer seconds or null on error.
+ * @return int|float|null  Decimal integer seconds or null on error. Returns a floating-point number if the resulting
+ *                         value exceeds PHP_INT_MAX.
  */
-function timeUnitToSeconds($time, $with_year = false): ?int {
+function timeUnitToSeconds($time, $with_year = false): int|float|null {
 	$suffixes = $with_year ? ZBX_TIME_SUFFIXES_WITH_YEAR : ZBX_TIME_SUFFIXES;
 
 	if (!preg_match('/^'.ZBX_PREG_INT.'(?<suffix>['.$suffixes.'])?$/', $time, $matches)) {

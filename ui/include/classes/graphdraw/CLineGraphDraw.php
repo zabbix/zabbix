@@ -2122,9 +2122,9 @@ class CLineGraphDraw extends CGraphDraw {
 	 *
 	 * @param array  $item
 	 *
-	 * @return int|null
+	 * @return int|float|null
 	 */
-	private static function getItemMaxDelay(array $item): ?int {
+	private static function getItemMaxDelay(array $item): int|float|null {
 		if (($item['type'] == ITEM_TYPE_ZABBIX_ACTIVE && preg_match('/^(event)?log(rt)?\[/', $item['key_']))
 				|| $item['type'] == ITEM_TYPE_TRAPPER) {
 			return null;
