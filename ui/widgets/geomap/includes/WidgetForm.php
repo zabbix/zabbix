@@ -35,23 +35,6 @@ use Zabbix\Widgets\Fields\{
  */
 class WidgetForm extends CWidgetForm {
 
-	public function validate(bool $strict = false): array {
-		$errors = parent::validate($strict);
-
-		if ($errors) {
-			return $errors;
-		}
-
-		if ($this->getFieldValue('clustering_mode') == Widget::CLUSTERING_MODE_MANUAL
-				&& ($this->getFieldValue('clustering_zoom_level') < 0
-					|| $this->getFieldValue('clustering_zoom_level') > ZBX_GEOMAP_MAX_ZOOM)) {
-			$errors[] = _s('Invalid parameter "%1$s": %2$s.', _('Zoom level'),
-				_s('value must be one of %1$s', implode('-', [0, ZBX_GEOMAP_MAX_ZOOM])));
-		}
-
-		return $errors;
-	}
-
 	public function addFields(): self {
 		return $this
 			->addField($this->isTemplateDashboard()
