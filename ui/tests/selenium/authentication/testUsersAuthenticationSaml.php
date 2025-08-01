@@ -836,7 +836,7 @@ uwMrOBKatg7CZ1Uenv1K3ioD5w==
 								'sso_url' => 'SSO',
 								'username_attribute' => 'UA',
 								'sp_entityid' => 'SP',
-								'idp_certificate'=> str_replace("\n", "\r\n", self::SSL_CERTIFICATE)
+								'idp_certificate' => str_replace("\n", "\r\n", self::SSL_CERTIFICATE)
 							]
 						]
 					]
@@ -862,7 +862,7 @@ uwMrOBKatg7CZ1Uenv1K3ioD5w==
 								'sso_url' => 'SSO',
 								'username_attribute' => 'UA',
 								'sp_entityid' => 'SP',
-								'idp_certificate'=> str_replace("\n", "\r\n", self::SSL_CERTIFICATE),
+								'idp_certificate' => str_replace("\n", "\r\n", self::SSL_CERTIFICATE),
 								'sp_private_key' => '',
 								'sp_certificate' => ''
 							]
