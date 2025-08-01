@@ -817,6 +817,19 @@ class CApiService {
 	}
 
 	/**
+	 * Deletes the object with the given IDs with respect to relative objects.
+	 *
+	 * The method must be extended to handle relative objects.
+	 *
+	 * @param array $ids
+	 */
+	protected function deleteByIds(array $ids) {
+		DB::delete($this->tableName(), [
+			$this->pk() => $ids
+		]);
+	}
+
+	/**
 	 * Fetches the fields given in $fields from the database and extends the objects with the loaded data.
 	 *
 	 * @param string $tableName
