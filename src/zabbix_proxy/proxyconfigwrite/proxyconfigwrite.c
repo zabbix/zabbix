@@ -1731,23 +1731,13 @@ static int	proxyconfig_sync_data(zbx_vector_table_data_ptr_t *config_tables, int
 			return FAIL;
 		}
 
-		zbx_db_query_mask_t	old_queries = zbx_db_set_log_masked_values(ZBX_DB_MASK_QUERIES);
-
 		proxyconfig_prepare_hostmacros(hostmacro, hosts_templates, full_sync);
 
 		if (SUCCEED != proxyconfig_prepare_rows(hostmacro, error))
-		{
-			zbx_db_set_log_masked_values(old_queries);
 			return FAIL;
-		}
 
 		if (SUCCEED != proxyconfig_delete_rows(hostmacro, error))
-		{
-			zbx_db_set_log_masked_values(old_queries);
 			return FAIL;
-		}
-
-		zbx_db_set_log_masked_values(old_queries);
 
 		if (SUCCEED != proxyconfig_prepare_rows(hosts_templates, error))
 			return FAIL;
@@ -1764,11 +1754,15 @@ static int	proxyconfig_sync_data(zbx_vector_table_data_ptr_t *config_tables, int
 		if (SUCCEED != proxyconfig_sync_templates(hosts_templates, hostmacro, error))
 			return FAIL;
 
+		zbx_db_query_mask_t	old_queries = zbx_db_set_log_masked_values(ZBX_DB_MASK_QUERIES);
+
 		if (SUCCEED != proxyconfig_insert_rows(hostmacro, error))
 			return FAIL;
 
 		if (SUCCEED != proxyconfig_update_rows(hostmacro, error))
 			return FAIL;
+
+		zbx_db_set_log_masked_values(old_queries);
 	}
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
