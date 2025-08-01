@@ -6042,7 +6042,7 @@ div.dashboard-widget-web .list-table tr[data-hostgroupid] {
     gap: 8px 16px; }
   .modal-popup-host-wizard .fields-group {
     padding: 8px;
-    background: #383838;
+    background: #202020;
     border-radius: 2px; }
   .modal-popup-host-wizard .form-field {
     display: grid;
