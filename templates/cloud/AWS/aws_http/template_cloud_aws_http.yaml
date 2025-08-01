@@ -9458,7 +9458,7 @@ zabbix_export:
         Refer to the Macros section for a list of macros used for LLD filters.
       vendor:
         name: Zabbix
-        version: 8.0-1
+        version: 8.0-2
       groups:
         - name: Templates/Cloud
       items:
@@ -10092,24 +10092,28 @@ zabbix_export:
             		var payload = {
             			'Action': 'ListServices',
             			'Version': '2014-11-13',
+            			'maxResults': 100,
             			'cluster': AWS.params.cluster_name
             		},
             			services = [];
             
-            		ECSClusters_Services = AWS.getField(AWS.request('GET', AWS.params.region, 'ecs', AWS.prepareParams(payload)), 'ListServicesResponse.ListServicesResult.serviceArns');
+            		while (payload.nextToken !== '') {
+            			var services_list = AWS.getField(AWS.request('GET', AWS.params.region, 'ecs', AWS.prepareParams(payload)), 'ListServicesResponse.ListServicesResult');
+            			payload.nextToken = services_list.nextToken || '';
+            			services_arns = AWS.getField(services_list, 'serviceArns');
             
-            		for (k in ECSClusters_Services) {
-            			id = ECSClusters_Services[k];
-            
-            			json = {};
-            			input = id.split(AWS.params.cluster_name + '/');
-            			for (var i = 1; i < input.length; i += 2) {
-            				json[input[i]] = input[i + 1];
+            			for (k in services_arns) {
+            				id = services_arns[k];
+            				json = {};
+            				input = id.split(AWS.params.cluster_name + '/');
+            				for (var i = 1; i < input.length; i += 2) {
+            					json[input[i]] = input[i + 1];
+            				}
+            				services.push({
+            					'service_name': input[1],
+            				});
             			}
-            			services.push({
-            				'service_name': input[1],
-            			});
-            		}
+            		};
             
             		if (Array.isArray(services))
             			return services;
@@ -12023,7 +12027,7 @@ zabbix_export:
         Refer to the Macros section for a list of macros used for LLD filters.
       vendor:
         name: Zabbix
-        version: 8.0-1
+        version: 8.0-2
       groups:
         - name: Templates/Cloud
       items:
@@ -12698,24 +12702,28 @@ zabbix_export:
             		var payload = {
             			'Action': 'ListServices',
             			'Version': '2014-11-13',
+            			'maxResults': 100,
             			'cluster': AWS.params.cluster_name
             		},
             			services = [];
             
-            		ECSClusters_Services = AWS.getField(AWS.request('GET', AWS.params.region, 'ecs', AWS.prepareParams(payload)), 'ListServicesResponse.ListServicesResult.serviceArns');
+            		while (payload.nextToken !== '') {
+            			var services_list = AWS.getField(AWS.request('GET', AWS.params.region, 'ecs', AWS.prepareParams(payload)), 'ListServicesResponse.ListServicesResult');
+            			payload.nextToken = services_list.nextToken || '';
+            			services_arns = AWS.getField(services_list, 'serviceArns');
             
-            		for (k in ECSClusters_Services) {
-            			id = ECSClusters_Services[k];
-            
-            			json = {};
-            			input = id.split(AWS.params.cluster_name + '/');
-            			for (var i = 1; i < input.length; i += 2) {
-            				json[input[i]] = input[i + 1];
+            			for (k in services_arns) {
+            				id = services_arns[k];
+            				json = {};
+            				input = id.split(AWS.params.cluster_name + '/');
+            				for (var i = 1; i < input.length; i += 2) {
+            					json[input[i]] = input[i + 1];
+            				}
+            				services.push({
+            					'service_name': input[1],
+            				});
             			}
-            			services.push({
-            				'service_name': input[1],
-            			});
-            		}
+            		};
             
             		if (Array.isArray(services))
             			return services;
