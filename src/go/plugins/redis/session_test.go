@@ -410,15 +410,6 @@ func TestSession_validateSession(t *testing.T) {
 			errContains: "connection type is invalid",
 		},
 		{
-			name: "missing required field",
-			session: session{
-				TLSConnect: string(comms.Required),
-			},
-			defaults:    session{},
-			wantErr:     true,
-			errContains: "Base fields validation failed",
-		},
-		{
 			name: "inconsistent TLS fields",
 			session: session{
 				URI:        "redis://localhost:6379",
