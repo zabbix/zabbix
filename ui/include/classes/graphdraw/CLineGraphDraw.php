@@ -2157,6 +2157,10 @@ class CLineGraphDraw extends CGraphDraw {
 			$delay = max($delay, $throttling_delay);
 		}
 
+		if ($delay == 0 && $update_interval_parser->getIntervals(ITEM_DELAY_SCHEDULING)) {
+			return null;
+		}
+
 		return $delay;
 	}
 
