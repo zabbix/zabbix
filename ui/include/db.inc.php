@@ -510,20 +510,16 @@ function dbConditionInt($field_name, array $values, $not_in = false, $zero_inclu
 		return dbQuoteInt($value);
 	}, $values);
 
-	// Limit maximum number of values for using in "IN (<id1>,<id2>,...,<idN>)".
-	$single_chunks = array_chunk($singles, 950);
 	$multiple_conditions = false;
 
-	foreach ($single_chunks as $chunk) {
-		if ($condition !== '') {
-			$condition .= $not_in ? ' AND ' : ' OR ';
-			$multiple_conditions = true;
-		}
-
-		$condition .= count($chunk) == 1
-			? $field_name.($not_in ? '!=' : '=').$chunk[0]
-			: $field_name.($not_in ? ' NOT' : '').' IN ('.implode(',', $chunk).')';
+	if ($condition !== '') {
+		$condition .= $not_in ? ' AND ' : ' OR ';
+		$multiple_conditions = true;
 	}
+
+	$condition .= count($singles) == 1
+		? $field_name.($not_in ? '!=' : '=').$singles[0]
+		: $field_name.($not_in ? ' NOT' : '').' IN ('.implode(',', $singles).')';
 
 	if (!$not_in && $multiple_conditions) {
 		$condition = '('.$condition.')';
