@@ -392,11 +392,9 @@ window.graph_edit_popup = new class {
 		if (this.graph.is_template) {
 			parameters.only_hostid = this.graph.hostid
 		}
-		else if (!this.graph.parent_discoveryid && this.graph.hostid) {
-			parameters.hostid = this.graph.hostid;
-		}
 		else {
 			parameters.real_hosts = 1;
+			parameters.hostid = this.graph.hostid;
 		}
 
 		return parameters;
