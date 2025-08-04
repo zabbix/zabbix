@@ -455,9 +455,10 @@ class testDashboardWebMonitoringWidget extends testWidgets {
 		$saved_form = $widget->edit();
 		$this->assertEquals($values, $saved_form->getFields()->filter(CElementFilter::VISIBLE)->asValues());
 		$saved_form->checkValue($data['fields']);
+
 		if (array_key_exists('tags', $data)) {
 			$this->assertTags($data['tags']);
-			}
+		}
 
 		// Close widget window and cancel editing the dashboard.
 		COverlayDialogElement::find()->one()->close();
