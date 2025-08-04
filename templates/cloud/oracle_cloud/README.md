@@ -63,7 +63,7 @@ OCI. Make sure to add the following rules to the policy:
     Allow group 'zabbix_api' to read buckets in tenancy
     Allow group 'zabbix_api' to read autonomous-databases in tenancy
     ```
-    In the example above, the name of the monitoring group is `zabbix_api`, In your setup, replace it with the
+    In the example above, the name of the monitoring group is `zabbix_api`. In your setup, replace it with the
 name of your monitoring user/group.
     
     In some cases, these rules might not be enough for the monitoring user to be able to access all resources in your
