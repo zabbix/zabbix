@@ -510,16 +510,19 @@ function dbConditionInt($field_name, array $values, $not_in = false, $zero_inclu
 		return dbQuoteInt($value);
 	}, $values);
 
+	$singles_count = count($singles);
 	$multiple_conditions = false;
 
-	if ($condition !== '') {
-		$condition .= $not_in ? ' AND ' : ' OR ';
-		$multiple_conditions = true;
-	}
+	if ($singles_count != 0) {
+		if ($condition !== '') {
+			$condition .= $not_in ? ' AND ' : ' OR ';
+			$multiple_conditions = true;
+		}
 
-	$condition .= count($singles) == 1
-		? $field_name.($not_in ? '!=' : '=').$singles[0]
-		: $field_name.($not_in ? ' NOT' : '').' IN ('.implode(',', $singles).')';
+		$condition .= $singles_count == 1
+			? $field_name.($not_in ? '!=' : '=').$singles[0]
+			: $field_name.($not_in ? ' NOT' : '').' IN ('.implode(',', $singles).')';
+	}
 
 	if (!$not_in && $multiple_conditions) {
 		$condition = '('.$condition.')';
