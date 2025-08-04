@@ -29,6 +29,8 @@ window.proxy_edit_popup = new class {
 		this.form = this.overlay.$dialogue.$body[0].querySelector('form');
 		this.footer = this.overlay.$dialogue.$footer[0];
 
+		this.dialogue.classList.add('modal-popup-proxy-edit')
+
 		this.display_change_psk =
 			this.form.querySelector('#tls_connect input:checked').value == <?= HOST_ENCRYPTION_PSK ?>
 				|| document.getElementById('tls_accept_psk').checked;
