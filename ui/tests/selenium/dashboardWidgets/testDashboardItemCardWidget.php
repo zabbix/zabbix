@@ -1158,7 +1158,7 @@ class testDashboardItemCardWidget extends testWidgets {
 
 				if ($item === 'Dashboard') {
 					$form->checkValue(['Override host' => 'Dashboard']);
-					$this->assertTrue($field->query('xpath', './/span[@data-hintbox-contents="Dashboard is used as data source."]')
+					$this->assertTrue($field->query('xpath:.//span[@data-hintbox-contents="Dashboard is used as data source."]')
 							->one()->isVisible()
 					);
 				}
@@ -1945,7 +1945,7 @@ class testDashboardItemCardWidget extends testWidgets {
 
 			// Check trigger counter.
 			$this->assertEquals(count($data['Triggers']), $widget->query('class:section-triggers')
-					->query('class:section-name')->query('xpath', './sup')->one()->getText()
+					->query('class:section-name')->query('xpath:./sup')->one()->getText()
 			);
 
 			// Check table pop-up with trigger data.
@@ -2052,42 +2052,54 @@ class testDashboardItemCardWidget extends testWidgets {
 		$popup->close();
 	}
 
-	public static function getLinkData() {
+	public static function getCheckLinksData() {
 		return 	[
 			[
 				[
-					'Widget name' => 'Master item from host',
-					'Host' => 'zabbix.php?action=popup&popup=host.edit&hostid={host}',
-					'Graph' => 'history.php?action=showgraph&itemids%5B%5D={item}',
-					'Severity' => 'zabbix.php?action=problem.view&hostids%5B0%5D={host}&triggerids%5B0%5D='.
-							'{Not classified trigger}&triggerids%5B1%5D={Information trigger}&triggerids%5B2%5D='.
-							'{Warning trigger}&triggerids%5B3%5D={Average trigger}&triggerids%5B4%5D='.
-							'{High trigger}&triggerids%5B5%5D={Disaster trigger}&filter_set=1'
+					'widget_name' => 'Master item from host',
+					'link_name' => 'host'
 				]
 			],
 			[
 				[
-					'Widget name' => 'Dependent Item from host',
-					'Master item' => 'zabbix.php?action=popup&popup=item.edit&context=host&itemid={master item}'
+					'widget_name' => 'Master item from host',
+					'link_name' => 'graph'
 				]
 			],
 			[
 				[
-					'Widget name' => 'Item card',
-					'Template' => 'zabbix.php?action=item.list&filter_set=1&filter_hostids%5B0%5D={template}&context=template',
-					'History' => 'history.php?action=showvalues&itemids%5B%5D={master item}'
+					'widget_name' => 'Master item from host',
+					'link_name' => 'severity'
 				]
 			],
 			[
 				[
-					'Widget name' => 'SNMP interface',
-					'Severity' => 'zabbix.php?action=problem.view&hostids%5B0%5D={host}&triggerids%5B0%5D={trigger}&filter_set=1'
+					'widget_name' => 'SNMP interface',
+					'link_name' => 'severity'
 				]
 			],
 			[
 				[
-					'Widget name' => 'Link to LLD rule',
-					'Lld rule' => 'zabbix.php?action=item.prototype.list&parent_discoveryid={lld rule}&context=host'
+					'widget_name' => 'Dependent Item from host',
+					'link_name' => 'master_item'
+				]
+			],
+			[
+				[
+					'widget_name' => 'Link to LLD rule',
+					'link_name' => 'lld_rule'
+				]
+			],
+			[
+				[
+					'widget_name' => 'Item card',
+					'link_name' => 'template'
+				]
+			],
+			[
+				[
+					'widget_name' => 'Item card',
+					'link_name' => 'history'
 				]
 			]
 		];
@@ -2096,107 +2108,91 @@ class testDashboardItemCardWidget extends testWidgets {
 	/**
 	 * Check links in Item card widget.
 	 *
-	 * @dataProvider getLinkData
+	 * @dataProvider getCheckLinksData
 	 */
 	public function testDashboardItemCardWidget_CheckLinks($data) {
 		$this->page->login()->open('zabbix.php?action=dashboard.view&dashboardid='.
 				self::$dashboardid['Dashboard for Item Card widget display check'])->waitUntilReady();
 		$dashboard = CDashboardElement::find()->one();
-		$widget = $dashboard->getWidget($data['Widget name']);
+		$widget = $dashboard->getWidget($data['widget_name']);
 
-		if (array_key_exists('Host', $data)) {
-			$data['Host'] = str_replace('{host}', self::$hostids['hostids']['Host for Item Card widget'],
-					$data['Host']
-			);
-			$this->assertEquals($data['Host'], $widget->query('class:sections-header')
-					->query('class:section-path')->query('class:path-element')->one()->getAttribute('href')
-			);
-		}
+		switch ($data['link_name']) {
+			case 'host':
+				$link = 'zabbix.php?action=popup&popup=host.edit&hostid='.self::$hostids['hostids']['Host for Item Card widget'];
+				$this->assertEquals($link, $widget->query('class:sections-header')->query('class:section-path')
+						->query('class:path-element')->one()->getAttribute('href')
+				);
+				break;
 
-		if (array_key_exists('Master item', $data)) {
-			// Replace {master item} draft to the real master item id.
-			$data['Master item'] = str_replace('{master item}', self::$itemids[STRING_255], $data['Master item']);
-			$this->assertEquals($data['Master item'],$widget->query('class:sections-header')->query('class:section-path')
-					->query('class:teal')->one()->getAttribute('href')
-			);
-			$widget->query('class:sections-header')->query('class:section-path')->query('class:teal')
+			case 'graph':
+				$widget->query('class:section-latest-data')->query('class:right-column')->query('link:Graph')->one()->click();
+				$this->page->assertTitle('History [refreshed every 30 sec.]');
+				$this->assertEquals(PHPUNIT_URL.'history.php?action=showgraph&itemids%5B%5D='.self::$itemids[STRING_255],
+						$this->page->getCurrentUrl()
+				);
+				break;
+
+			case 'severity':
+				$link = ($data['widget_name'] === 'Master item from host')
+					? 'zabbix.php?action=problem.view&hostids%5B0%5D='.self::$hostids['hostids']
+						['Host for Item Card widget'].'&triggerids%5B0%5D='.
+						self::$triggers['Not classified trigger'].'&triggerids%5B1%5D='.
+						self::$triggers['Information trigger'].'&triggerids%5B2%5D='.
+						self::$triggers['Warning trigger'].'&triggerids%5B3%5D='.
+						self::$triggers['Average trigger'].'&triggerids%5B4%5D='.
+						self::$triggers['High trigger'].'&triggerids%5B5%5D='.
+						self::$triggers['Disaster trigger'].'&filter_set=1'
+					: 'zabbix.php?action=problem.view&hostids%5B0%5D='.
+						self::$hostids['hostids']['Host for Item Card widget'].'&triggerids%5B0%5D='.
+						self::$triggers['Trigger 1'].'&filter_set=1';
+
+				$this->assertEquals($link, $widget->query('class:sections-header')->query('class:section-item')
+						->query('class:problem-icon-link')->one()->getAttribute('href')
+				);
+				$widget->query('class:sections-header')->query('class:section-item')->query('class:problem-icon-link')
+						->one()->click();
+				$this->page->assertTitle('Problems');
+				break;
+
+			case 'master_item':
+				$link = 'zabbix.php?action=popup&popup=item.edit&context=host&itemid='.self::$itemids[STRING_255];
+				$this->assertEquals($link, $widget->query('class:sections-header')->query('class:section-path')
+						->query('class:teal')->one()->getAttribute('href')
+				);
+				$widget->query('class:sections-header')->query('class:section-path')->query('class:teal')
+						->one()->click();
+				$this->assertEquals(PHPUNIT_URL.$link, $this->page->getCurrentUrl());
+				break;
+
+			case 'lld_rule':
+				$link = 'zabbix.php?action=item.prototype.list&parent_discoveryid='.self::$discovery_rule_id.'&context=host';
+				$this->assertEquals($link, $widget->query('class:sections-header')->query('class:section-path')
+						->query('class:link-alt orange')->one()->getAttribute('href')
+				);
+				$widget->query('class:sections-header')->query('class:section-path')->query('class:link-alt orange')
 					->one()->click();
-			$this->assertEquals(PHPUNIT_URL.$data['Master item'], $this->page->getCurrentUrl());
-		}
+				$this->assertEquals(PHPUNIT_URL.$link, $this->page->getCurrentUrl());
+				break;
 
-		if (array_key_exists('Template', $data)) {
-			// Replace {template} draft to the real template id.
-			$data['Template'] = str_replace('{template}', self::$template['templateids']['Template for item card widget'],
-					$data['Template']
-			);
-			$this->assertEquals($data['Template'],$widget->query('class:sections-header')->query('class:section-path')
-					->query('class:link-alt')->one()->getAttribute('href')
-			);
-			$widget->query('class:sections-header')->query('class:section-path')->query('class:link-alt')
-					->one()->click();
-			$this->assertEquals(PHPUNIT_URL.$data['Template'], $this->page->getCurrentUrl());
+			case 'template':
+				$link = 'zabbix.php?action=item.list&filter_set=1&filter_hostids%5B0%5D='.
+					self::$template['templateids']['Template for item card widget'].'&context=template';
+				$this->assertEquals($link, $widget->query('class:sections-header')->query('class:section-path')
+						->query('class:link-alt')->one()->getAttribute('href')
+				);
 
-			// Back to dashboard and find a widget by name.
-			$this->page->open('zabbix.php?action=dashboard.view&dashboardid='.
-					self::$dashboardid['Dashboard for Item Card widget display check'])->waitUntilReady();
-			$dashboard = CDashboardElement::find()->one();
-			$widget = $dashboard->getWidget($data['Widget name']);
-		}
+				$widget->query('class:sections-header')->query('class:section-path')->query('class:link-alt')
+						->one()->click();
+				$this->assertEquals(PHPUNIT_URL.$link, $this->page->getCurrentUrl());
+				break;
 
-		if (array_key_exists('Graph', $data) || array_key_exists('History', $data)) {
-			if (array_key_exists('Graph', $data)) {
-				$link = 'Graph';
-				$change = ['{item}', self::$itemids[STRING_255]];
-			} else {
-				$link = 'History';
-				$change = ['{master item}', self::$template_items['Master item from template']+1];
-			}
-
-			$data[$link] = str_replace($change[0], $change[1], $data[$link] );
-
-			$widget->query('class:section-latest-data')->query('class:right-column')->query('link:'.$link)
-					->one()->click();
-			$this->page->assertTitle('History [refreshed every 30 sec.]');
-			$this->assertEquals(PHPUNIT_URL.$data[$link], $this->page->getCurrentUrl());
-
-			// Back to dashboard and find a widget by name.
-			$this->page->open('zabbix.php?action=dashboard.view&dashboardid='.
-					self::$dashboardid['Dashboard for Item Card widget display check'])->waitUntilReady();
-			$dashboard = CDashboardElement::find()->one();
-			$widget = $dashboard->getWidget($data['Widget name']);
-		}
-
-		if (array_key_exists('Lld rule', $data)) {
-			// Replace {lld rule} draft to the real LLD rule id.
-			$data['Lld rule'] = str_replace('{lld rule}', self::$discovery_rule_id, $data['Lld rule']);
-			$this->assertEquals($data['Lld rule'], $widget->query('class:sections-header')->query('class:section-path')
-					->query('class:link-alt orange')->one()->getAttribute('href')
-			);
-			$widget->query('class:sections-header')->query('class:section-path')->query('class:link-alt orange')
-					->one()->click();
-			$this->assertEquals(PHPUNIT_URL.$data['Lld rule'], $this->page->getCurrentUrl());
-		}
-
-		if (array_key_exists('Severity', $data)) {
-			$data['Severity'] = str_replace('{host}', self::$hostids['hostids']['Host for Item Card widget'],
-					$data['Severity']
-			);
-
-			if (strpos($data['Severity'],'{trigger}')) {
-				$data['Severity'] = str_replace('{trigger}', self::$triggers['Trigger 1'], $data['Severity']);
-			} else {
-				foreach (['Not classified trigger', 'Information trigger', 'Warning trigger', 'Average trigger',
-					'High trigger', 'Disaster trigger'] as $draft) {
-					$data['Severity'] = str_replace('{'.$draft.'}', self::$triggers[$draft], $data['Severity']);
-				}
-			}
-
-			$this->assertEquals($data['Severity'], $widget->query('class:sections-header')
-					->query('class:section-item')->query('class:problem-icon-link')->one()->getAttribute('href')
-			);
-			$widget->query('class:sections-header')->query('class:section-item')->query('class:problem-icon-link')
-					->one()->click();
-			$this->page->assertTitle('Problems');
+			case 'history':
+				$widget->query('class:section-latest-data')->query('class:right-column')->query('link:History')->one()->click();
+				$this->page->assertTitle('History [refreshed every 30 sec.]');
+				$this->assertEquals(PHPUNIT_URL.'history.php?action=showvalues&itemids%5B%5D='.
+						self::$template_items['Master item from template']+1, $this->page->getCurrentUrl()
+				);
+				break;
 		}
 	}
 
