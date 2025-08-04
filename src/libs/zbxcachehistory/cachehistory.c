@@ -3024,12 +3024,11 @@ static void	hc_log_history_cache_usage(zbx_vector_uint64_pair_t *items, zbx_hc_u
 	}
 	else if (ZBX_HC_CACHE_PRESSURED == ctx)
 	{
-		log_msg = "Detected heavy usage of history cache (more than 60%%).";
+		log_msg = "Detected heavy usage of history cache (more than 60%).";
 		ts = &cache->last_warning_ts;
 	}
 	else
 		return;
-
 
 	if (SEC_PER_MIN > time_now - *ts)
 	{
