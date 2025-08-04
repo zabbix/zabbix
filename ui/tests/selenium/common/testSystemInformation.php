@@ -207,7 +207,7 @@ class testSystemInformation extends CWebTest {
 			}
 		}
 
-		// Check field that is not checked in screenshot with enabled HA.
+		// Check fields that are not checked in screenshot with enabled HA.
 		$data = [
 			[
 				'Parameter' => 'Zabbix server is running',
