@@ -262,8 +262,7 @@ class testDashboardSystemInformationWidget extends testSystemInformation {
 					'available_fields' => [
 						[
 							'Parameter' => 'Zabbix server is running',
-							// TODO: should be changed to 'Yes' if ZBX-26532 will be fixed.
-							'Value' => 'No',
+							'Value' => 'Yes',
 							'Details' => ''
 						],
 						[
@@ -282,8 +281,7 @@ class testDashboardSystemInformationWidget extends testSystemInformation {
 					'available_fields' => [
 						[
 							'Parameter' => 'Zabbix server is running',
-							// TODO: should be changed to 'Yes' if ZBX-26532 will be fixed.
-							'Value' => 'No',
+							'Value' => 'Yes',
 							'Details' => ''
 						],
 						[
@@ -301,8 +299,7 @@ class testDashboardSystemInformationWidget extends testSystemInformation {
 					'available_fields' => [
 						[
 							'Parameter' => 'Zabbix server is running',
-							// TODO: should be changed to 'Yes' if ZBX-26532 will be fixed.
-							'Value' => 'No',
+							'Value' => 'Yes',
 							'Details' => ''
 						],
 						[
@@ -432,6 +429,7 @@ class testDashboardSystemInformationWidget extends testSystemInformation {
 			$refresh_interval = CTestArrayHelper::get($widget_data['fields'], 'Refresh interval', '15 minutes');
 			$widget = $dashboard->getWidget(CTestArrayHelper::get($widget_data['fields'], 'Name', 'System information'));
 			$this->assertEquals($refresh_interval, $widget->getRefreshInterval());
+			CPopupMenuElement::find()->one()->close();
 
 			// Check that widget with the corresponding name is present in DB.
 			$widget_sql = 'SELECT count(widgetid) FROM widget WHERE type='.zbx_dbstr('systeminfo').' AND dashboard_pageid IN'.

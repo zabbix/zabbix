@@ -29,7 +29,7 @@ class testSystemInformation extends CWebTest {
 		];
 	}
 
-	const FAILOVER_DELAY = 20;
+	const FAILOVER_DELAY = 60;
 
 	public static $active_lastaccess;
 	public static $update_timestamp;
@@ -211,8 +211,7 @@ class testSystemInformation extends CWebTest {
 		$data = [
 			[
 				'Parameter' => 'Zabbix server is running',
-				// TODO: should be changed to 'Yes' if ZBX-26532 will be fixed.
-				'Value' => 'No',
+				'Value' => 'Yes',
 				'Details' => $DB['SERVER'].':0'
 			],
 			[
@@ -238,6 +237,21 @@ class testSystemInformation extends CWebTest {
 		CElementQuery::getDriver()->executeScript("arguments[0].textContent = '';",
 				[$this->query('xpath://table[@class="list-table sticky-header"]/tbody/tr[3]/td[1]')->one()]
 		);
+
+		// Check and hide the text of messages, because they contain ip addresses of the current host.
+		$error_text = "Connection to Zabbix server \"".$DB['SERVER'].":0\" refused. Possible reasons:\n".
+				"1. Incorrect \"NodeAddress\" or \"ListenPort\" in the \"zabbix_server.conf\" or server IP/DNS override".
+				" in the \"zabbix.conf.php\";\n".
+				"2. Security environment (for example, SELinux) is blocking the connection;\n".
+				"3. Zabbix server daemon not running;\n".
+				"4. Firewall is blocking TCP connection.\n".
+				"Connection refused";
+
+		$messages = CMessageElement::find()->all();
+		foreach ($messages as $message) {
+			$this->assertTrue($message->hasLine($error_text));
+			self::$skip_fields[] = $message;
+		}
 	}
 
 	/**
@@ -251,8 +265,7 @@ class testSystemInformation extends CWebTest {
 		$table = $this->query('xpath://table[@class="list-table sticky-header"]')->asTable()->waitUntilVisible()->one();
 
 		// Check that before failover delay passes frontend thinks that Zabbix server is running.
-		// TODO: should be changed to 'No' or uncommented after ZBXNEXT-8698
-//		$this->assertEquals('Yes', $table->findRow('Parameter', 'Zabbix server is running')->getColumn('Value')->getText());
+		$this->assertEquals('Yes', $table->findRow('Parameter', 'Zabbix server is running')->getColumn('Value')->getText());
 
 		// Wait for failover delay to pass.
 		sleep(self::$update_timestamp + self::FAILOVER_DELAY - time());

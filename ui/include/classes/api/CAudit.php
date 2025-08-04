@@ -374,7 +374,8 @@ class CAudit {
 			'conditions' => ['type' => ZBX_MACRO_TYPE_SECRET]
 		],
 		self::RESOURCE_USER => ['paths' => ['user.passwd']],
-		self::RESOURCE_USERDIRECTORY => ['paths' => ['userdirectory.bind_password']]
+		self::RESOURCE_USERDIRECTORY => ['paths' => ['userdirectory.bind_password', 'userdirectory.idp_certificate',
+			'userdirectory.sp_certificate', 'userdirectory.sp_private_key']]
 	];
 
 	/**
