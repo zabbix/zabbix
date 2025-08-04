@@ -31,10 +31,10 @@ import (
 	"time"
 
 	mqtt "github.com/eclipse/paho.mqtt.golang"
-	"golang.zabbix.com/agent2/pkg/itemutil"
 	"golang.zabbix.com/agent2/pkg/watch"
 	"golang.zabbix.com/sdk/metric"
 	"golang.zabbix.com/sdk/plugin"
+	"golang.zabbix.com/sdk/plugin/itemutil"
 	"golang.zabbix.com/sdk/tlsconfig"
 	"golang.zabbix.com/sdk/zbxerr"
 )
@@ -100,7 +100,8 @@ func (p *Plugin) createOptions(
 
 		mc.connected = true
 		for _, ms := range mc.subs {
-			if err := ms.subscribe(mc); err != nil {
+			err := ms.subscribe(mc)
+			if err != nil {
 				impl.Warningf("cannot subscribe topic '%s' to [%s]: %s", ms.topic, b.url, err)
 				impl.manager.Notify(ms, err)
 			}
@@ -270,7 +271,9 @@ func (ms *mqttSub) NewFilter(key string) (filter watch.EventFilter, err error) {
 func (p *Plugin) EventSourceByKey(rawKey string) (es watch.EventSource, err error) {
 	var key string
 	var raw []string
-	if key, raw, err = itemutil.ParseKey(rawKey); err != nil {
+	key, raw, err = itemutil.ParseKey(rawKey)
+
+	if err != nil {
 		return
 	}
 
