@@ -96,7 +96,12 @@ $form
 					(new CPassBox('bind_password', '', DB::getFieldLength('userdirectory_ldap', 'bind_password')))
 						->setWidth(ZBX_TEXTAREA_SMALL_WIDTH)
 						->addStyle('display: none;')
-						->setAttribute('disabled', 'disabled')
+						->setAttribute('disabled', 'disabled'),
+					makeWarningIcon(
+						_('The previous password was cleared due to a host change. Please enter the new password.')
+					)
+						->addStyle('display: none;')
+						->addClass('js-bind-password-warning')
 				]
 				: (new CPassBox('bind_password', '', DB::getFieldLength('userdirectory_ldap', 'bind_password')))
 					->setWidth(ZBX_TEXTAREA_SMALL_WIDTH)
