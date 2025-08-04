@@ -250,6 +250,9 @@ class testDashboardSystemInformationWidget extends testSystemInformation {
 	}
 
 	public static function getSystemInformationDataForRunningServer() {
+		/**
+		 * Note: Super admin role is checked within common class.
+		 */
 		return [
 			// #0 Verify widget data that is available for user with admin role.
 			[
@@ -455,7 +458,7 @@ class testDashboardSystemInformationWidget extends testSystemInformation {
 	}
 
 	/**
-	 * Function performs widget data check for different user roles.
+	 * Function performs widget data check based on different user roles.
 	 *
 	 * @param array $data	widget available data
 	 */
