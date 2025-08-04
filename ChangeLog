@@ -1,3 +1,33 @@
+Changes for 7.0.18rc1
+
+New features:
+.........T [ZBXNEXT-9972] added AWS Backup Vault by HTTP template (abrosimovs)
+.......PS. [ZBXNEXT-9090] improved SNMP agent walk[] and get[] to reload credentials when corresponding SNMPv3 interface is updated (vso)
+A......PS. [ZBXNEXT-10056] updated max supported MariaDB version to 11.8 (Sasha)
+........S. [ZBXNEXT-10122] updated maximal supported TimescaleDB version to 2.21 (mprihodko)
+
+Bug fixes:
+..F....... [ZBX-26378] added 4 module margin to QR code image (talbergs)
+...G...... [ZBX-22374] oracle plugin missing privileges added (opucka)
+...G...... [ZBX-26697] fixed memory error in sender when trying to read invalid response (dgoloscapov)
+...G...PS. [ZBX-25708] moved include section in *.conf files from the middle to the end (yurii)
+..F....... [ZBX-26574] changed error messages for timescaledb (rgontarski)
+........S. [ZBX-16925] fixed housekeeper behavior that blocked history sync and caused deadlocks when deleting events (vso)
+.........T [ZBX-25196] fixed an issue with JavaScript in AWS ECS templates (egordymov)
+..F....... [ZBX-26474] fixed reference to undefined variable in piechart widget (gklavins)
+.......PS. [ZBX-26730] suppressed duplicated error in log from XML path preprocessing step and added length of XML data to error message (vsmelovs)
+A......... [ZBX-26078] fixed filtering by inherited tags with negative operators such as "Does not ..." in the Monitoring -> Hosts section (gcalenko, Sasha)
+..F....... [ZBX-26307] fixed undefined array key 'secret' after user auto logout (aluchko)
+..F....... [ZBX-26159] fixed log[] item with 'numeric' type of information unexpected changing to 'log' type (aluchko)
+..F....... [ZBX-26374] added updates for displaying the relevant monitoring data or "no permissions" notification for the Classic Graph widget (msnihach)
+.....J.... [ZBX-26220] fixed scheduled report creation with IPv6 address in Zabbix frontend URL (vsmelovs)
+
+--------------------------------------------------------------------------------
+Changes for 7.0.17
+
+7.0.17rc2 was released as 7.0.17 without any changes
+
+--------------------------------------------------------------------------------
 Changes for 7.0.17rc2
 
 New features:
@@ -3645,6 +3675,8 @@ A.F....PS. [ZBXNEXT-7402,ZBXNEXT-7413] added support for CyberArk Vault (acikuns
 Changes for 6.0.41rc1
 
 New features:
+A......PS. [ZBXNEXT-10056] updated max supported MariaDB version to 11.8 (Sasha)
+........S. [ZBXNEXT-10122] updated maximal supported TimescaleDB version to 2.21 (mprihodko)
 ........S. [ZBXNEXT-10018] updated maximal supported TimescaleDB version to 2.20 (mprihodko)
 ........S. [ZBXNEXT-9905] updated max supported TimescaleDB version to 2.19 (mprihodko)
 
