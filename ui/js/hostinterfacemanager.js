@@ -23,6 +23,7 @@ class HostInterfaceManager {
 	static SNMP_V2C = 2;
 	static SNMP_V3 = 3;
 	static SNMP_BULK_ENABLED = 1;
+	static SNMP_MAX_REPETITIONS = 10;
 	static INTERFACE_SECONDARY = 0;
 	static INTERFACE_PRIMARY = 1;
 	static INTERFACE_USE_IP = 1;
@@ -209,6 +210,14 @@ class HostInterfaceManager {
 					}
 				);
 			}
+
+			if (e.target.value != HostInterfaceManager.SNMP_V1) {
+				const input = document.getElementById(`interfaces_${iface.interfaceid}_details_max_repetitions`);
+
+				if (input && !input.value) {
+					input.value = HostInterfaceManager.SNMP_MAX_REPETITIONS;
+				}
+			}
 		}).trigger('change');
 	}
 
@@ -232,7 +241,7 @@ class HostInterfaceManager {
 			details: {
 				version: HostInterfaceManager.SNMP_V2C,
 				community: '{$SNMP_COMMUNITY}',
-				max_repetitions: 10,
+				max_repetitions: HostInterfaceManager.SNMP_MAX_REPETITIONS,
 				bulk: HostInterfaceManager.SNMP_BULK_ENABLED,
 				securitylevel: HostInterfaceManager.ITEM_SNMPV3_SECURITYLEVEL_NOAUTHNOPRIV,
 				authprotocol: HostInterfaceManager.ITEM_SNMPV3_AUTHPROTOCOL_MD5,
