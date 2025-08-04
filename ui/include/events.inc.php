@@ -123,12 +123,10 @@ function make_event_details(array $event, array $allowed) {
 
 			if ($correlations) {
 				if ($allowed['ui_correlation']) {
-					$correlation_name = (new CLink($correlations[0]['name'],
-						(new CUrl('zabbix.php'))
-							->setArgument('action', 'correlation.edit')
-							->setArgument('correlationid', $correlations[0]['correlationid'])
-							->getUrl()
-					))->addClass(ZBX_STYLE_LINK_ALT);
+					$correlation_name = (new CLink($correlations[0]['name']))
+						->addClass(ZBX_STYLE_LINK_ALT)
+						->addClass('js-correlation_edit')
+						->setAttribute('data-correlationid', $correlations[0]['correlationid']);
 				}
 				else {
 					$correlation_name = $correlations[0]['name'];

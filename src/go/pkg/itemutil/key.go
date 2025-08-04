@@ -290,13 +290,13 @@ func parseMetricKey(text string, wildcard bool) (key string, params []string, er
 }
 
 // ParseKey parses item key in format key[param1, param2, ...] and returns
-// the parsed key and parameteres.
+// the parsed key and parameters.
 func ParseKey(text string) (key string, params []string, err error) {
 	return parseMetricKey(text, false)
 }
 
 // ParseWildcardKey parses item key in format key[param1, param2, ...] and returns
-// the parsed key and parameteres.
+// the parsed key and parameters.
 func ParseWildcardKey(text string) (key string, params []string, err error) {
 	return parseMetricKey(text, true)
 }

@@ -15,7 +15,6 @@
 package systemrun
 
 import (
-	"fmt"
 	"time"
 
 	"golang.zabbix.com/agent2/internal/agent"
@@ -28,14 +27,15 @@ import (
 var impl Plugin
 
 type Options struct {
-	plugin.SystemOptions `conf:"optional,name=System"`
-	LogRemoteCommands    int `conf:"optional,range=0:1,default=0"`
+	LogRemoteCommands int `conf:"optional,range=0:1,default=0"`
 }
 
 // Plugin -
 type Plugin struct {
 	plugin.Base
-	options Options
+	options          Options
+	executor         zbxcmd.Executor
+	executorInitFunc func() (zbxcmd.Executor, error)
 }
 
 func init() {
@@ -47,50 +47,95 @@ func init() {
 	impl.SetHandleTimeout(true)
 }
 
-func (p *Plugin) Configure(global *plugin.GlobalOptions, options interface{}) {
-	if err := conf.Unmarshal(options, &p.options); err != nil {
+// Configure configures plugin based on options and other required initialization.
+func (p *Plugin) Configure(_ *plugin.GlobalOptions, options any) {
+	p.executorInitFunc = zbxcmd.InitExecutor
+
+	err := conf.UnmarshalStrict(options, &p.options)
+	if err != nil {
 		p.Warningf("cannot unmarshal configuration options: %s", err)
 	}
 }
 
-func (p *Plugin) Validate(options interface{}) error {
+// Validate validates plugin options.
+func (*Plugin) Validate(options any) error {
 	var o Options
-	return conf.Unmarshal(options, &o)
+
+	err := conf.UnmarshalStrict(options, &o)
+	if err != nil {
+		return errs.Wrap(err, "plugin config validation failed")
+	}
+
+	return nil
 }
 
 // Export -
-func (p *Plugin) Export(key string, params []string, ctx plugin.ContextProvider) (result interface{}, err error) {
-	if len(params) > 2 {
-		return nil, fmt.Errorf("Too many parameters.")
+func (p *Plugin) Export(_ string, params []string, ctx plugin.ContextProvider) (any, error) {
+	command, wait, err := parseParameters(params)
+	if err != nil {
+		return nil, err
 	}
 
-	if len(params) == 0 || len(params[0]) == 0 {
-		return nil, fmt.Errorf("Invalid first parameter.")
-	}
-
-	if p.options.LogRemoteCommands == 1 && (ctx.ClientID() != agent.LocalChecksClientID) {
+	if p.options.LogRemoteCommands == 1 && ctx.ClientID() != agent.LocalChecksClientID {
 		p.Warningf("Executing command:'%s'", params[0])
 	} else {
 		p.Debugf("Executing command:'%s'", params[0])
 	}
 
-	if len(params) == 1 || params[1] == "" || params[1] == "wait" {
-		stdoutStderr, err := zbxcmd.Execute(params[0], time.Second*time.Duration(ctx.Timeout()), "")
+	// Needed so the executor is initialized once, this should be done in configure, but then Zabbix agent 2
+	// will not start if there are issues with finding cmd.exe on windows, and that will break backwards compatibility.
+	if p.executor == nil {
+		var err error
+
+		p.executor, err = p.executorInitFunc()
 		if err != nil {
-			return nil, err
+			return nil, errs.Wrap(err, "command init failed")
 		}
-
-		p.Debugf("command:'%s' length:%d output:'%.20s'", params[0], len(stdoutStderr), stdoutStderr)
-
-		return stdoutStderr, nil
-	} else if params[1] == "nowait" {
-		err := zbxcmd.ExecuteBackground(params[0])
-		if err != nil {
-			return nil, err
-		}
-
-		return 1, nil
 	}
 
-	return nil, fmt.Errorf("Invalid second parameter.")
+	return p.runCommand(command, wait, ctx.Timeout())
+}
+
+func (p *Plugin) runCommand(command string, wait bool, timeout int) (any, error) {
+	if wait {
+		stdoutStderr, err := p.executor.Execute(command, time.Second*time.Duration(timeout), "")
+		if err != nil {
+			return nil, errs.Wrap(err, "execute failed")
+		}
+
+		p.Debugf("command:'%s' length:%d output:'%.20s'", command, len(stdoutStderr), stdoutStderr)
+
+		return stdoutStderr, nil
+	}
+
+	err := p.executor.ExecuteBackground(command)
+	if err != nil {
+		return nil, errs.Wrap(err, "background execute failed")
+	}
+
+	return 1, nil
+}
+
+func parseParameters(params []string) (string, bool, error) {
+	switch len(params) {
+	case 0:
+		return "", false, errs.New("invalid first parameter")
+	case 1:
+		if params[0] == "" {
+			return "", false, errs.New("invalid first parameter")
+		}
+
+		return params[0], true, nil
+	case 2:
+		switch params[1] {
+		case "wait", "":
+			return params[0], true, nil
+		case "nowait":
+			return params[0], false, nil
+		default:
+			return "", false, errs.New("invalid second parameter")
+		}
+	default:
+		return "", false, errs.New("too many parameters")
+	}
 }

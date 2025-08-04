@@ -4,7 +4,7 @@ msgstr ""
 "Project-Id-Version: Zabbix 6.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2023-10-19 13:48+0300\n"
-"PO-Revision-Date: 2025-01-14 09:52+0000\n"
+"PO-Revision-Date: 2025-05-12 07:55+0000\n"
 "Last-Translator: Tomáš Heřmánek <tomas.hermanek@initmax.cz>\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
 "Language: cs\n"
@@ -2717,6 +2717,11 @@ msgstr "Nelze odstranit výchozí metodu MFA."
 msgid "Cannot delete default user directory."
 msgstr "Nelze odstranit výchozí adresář uživatele."
 
+#: include/classes/api/services/CDRule.php:773
+#, c-format
+msgid "Cannot delete discovery check \"%1$s\" of discovery rule \"%2$s\": %3$s."
+msgstr "Nelze odstranit kontrolu objevováni \"%1$s\" v pravidle objevováni \"%2$s\": %3$s."
+
 #: app/controllers/CControllerDiscoveryDelete.php:68 host_discovery.php:390
 #: host_discovery.php:597
 msgid "Cannot delete discovery rule"
@@ -2724,6 +2729,11 @@ msgid_plural "Cannot delete discovery rules"
 msgstr[0] "Nelze smazat pravidlo nálezu"
 msgstr[1] "Nelze smazat pravidla nálezu"
 msgstr[2] "Nelze smazat pravidlo nálezu"
+
+#: include/classes/api/services/CDRule.php:980
+#, c-format
+msgid "Cannot delete discovery rule \"%1$s\": %2$s."
+msgstr "Nelze smazat pravidlo objevování \"%1$s\": %2$s."
 
 #: app/controllers/CControllerCorrelationDelete.php:68
 msgid "Cannot delete event correlation"
@@ -2753,6 +2763,11 @@ msgstr[0] "Nelze smazat hostitele"
 msgstr[1] "Nelze smazat hostitele"
 msgstr[2] "Nelze smazat hostitele"
 
+#: include/classes/api/services/CHost.php:1636
+#, c-format
+msgid "Cannot delete host \"%1$s\": %2$s."
+msgstr "Nelze smazat hostitele \"%1$s\": %2$s."
+
 #: include/classes/api/services/CHost.php:1461
 #, c-format
 msgid "Cannot delete host %1$s because maintenance \"%2$s\" must contain at least one host or host group."
@@ -2767,6 +2782,11 @@ msgid_plural "Cannot delete host groups"
 msgstr[0] "Nelze odstranit skupinu hostitelů"
 msgstr[1] "Nelze odstranit skupiny hostitelů"
 msgstr[2] "Nelze odstranit skupinu hostitelů"
+
+#: include/classes/api/services/CHostGroup.php:769
+#, c-format
+msgid "Cannot delete host group \"%1$s\": %2$s."
+msgstr "Nelze smazat skupinu hostitelů \"%1$s\": %2$s."
 
 #: include/classes/api/services/CHostGroup.php:858
 #, c-format
@@ -2925,6 +2945,11 @@ msgstr[0] "Nelze smazat šablonu"
 msgstr[1] "Nelze smazat šablony"
 msgstr[2] "Nelze smazat šablony"
 
+#: include/classes/api/services/CTemplate.php:809
+#, c-format
+msgid "Cannot delete template \"%1$s\": %2$s."
+msgstr "Nelze smazat šablonu \"%1$s\": %2$s."
+
 #: app/controllers/CControllerTemplateGroupDelete.php:75
 msgid "Cannot delete template group"
 msgid_plural "Cannot delete template groups"
@@ -2961,6 +2986,11 @@ msgid_plural "Cannot delete triggers"
 msgstr[0] "Nelze smazat trigger"
 msgstr[1] "Nelze smazat triggery"
 msgstr[2] "Nelze smazat triggery"
+
+#: include/classes/api/managers/CTriggerManager.php:126
+#, c-format
+msgid "Cannot delete trigger \"%1$s\": %2$s."
+msgstr "Nelze smazat spouštěč \"%1$s\": %2$s."
 
 #: app/controllers/CControllerTriggerPrototypeDelete.php:72
 msgid "Cannot delete trigger prototype"
@@ -6021,6 +6051,11 @@ msgstr "Databáze šifrování TLS"
 msgid "Database TLS key file"
 msgstr "Soubor klíče TLS databáze"
 
+#: include/classes/api/clients/CLocalApiClient.php:133
+#: include/classes/api/clients/CLocalApiClient.php:147
+msgid "Database error occurred."
+msgstr "Došlo k chybě databáze."
+
 #: app/partials/administration.system.info.php:130
 msgid "Database history tables use primary key"
 msgstr "Databázové tabulky historie používají primární klíč"
@@ -6717,6 +6752,22 @@ msgstr "Smazat web scénář?"
 msgid "Deleted"
 msgstr "Smazáno"
 
+#: include/actions.inc.php:143
+msgid "Deleted host"
+msgstr "Smazaný host"
+
+#: include/actions.inc.php:125
+msgid "Deleted host group"
+msgstr "Smazaná skupina hostů"
+
+#: include/actions.inc.php:710
+msgid "Deleted host group(s)"
+msgstr "Smazané skupiny hostů"
+
+#: include/actions.inc.php:134
+msgid "Deleted trigger"
+msgstr "Smazaný spouštěč"
+
 #: app/views/administration.regex.edit.php:54
 msgid "Delimiter"
 msgstr "Oddělovač"
@@ -7203,6 +7254,10 @@ msgstr "Objekt objevování"
 msgid "Discovery of VMware clusters, \"url\" - VMware service URL. Returns JSON"
 msgstr "Zjištění clusterů VMware, \"url\" – URL služby VMware. Vrátí JSON"
 
+#: include/classes/data/CItemData.php:1931
+msgid "Discovery of VMware datastores, \"url\" - VMware service URL, \"filter_uuid\" - one hv uuid or vm uuid (empty by default). Returns JSON"
+msgstr "Vyhledávání datových úložišť VMware, \"url\" – URL adresa služby VMware, \"filter_uuid\" – jeden hv uuid nebo vm uuid (ve výchozím nastavení prázdné). Vrací JSON."
+
 #: include/classes/data/CItemData.php:1799
 msgid "Discovery of VMware datastores, \"url\" - VMware service URL. Returns JSON"
 msgstr "Zjištění datových úložišť VMware, \"url\" – URL služby VMware. Vrátí JSON"
@@ -7345,7 +7400,7 @@ msgstr "Zobrazení místního času"
 
 #: widgets/itemhistory/views/column.edit.php:240
 msgid "Display log time"
-msgstr ""
+msgstr "Zobrazit čas protokolu"
 
 #: widgets/svggraph/includes/WidgetForm.php:364
 msgid "Display min/avg/max"
@@ -9520,7 +9575,7 @@ msgstr "Funkce historie"
 
 #: app/views/administration.housekeeping.edit.php:218
 msgid "History, trends and audit log compression"
-msgstr ""
+msgstr "Komprese historie, trendov a protokolu auditu"
 
 #: include/classes/html/CTabFilter.php:167
 msgid "Home"
@@ -17928,6 +17983,11 @@ msgstr "Spusťit skript \"%1$s\" na Zabbix serveru"
 msgid "Run script \"%1$s\" on current host"
 msgstr "Spusť skript \"%1$s\" na aktuálním hostovi"
 
+#: include/actions.inc.php:601
+#, c-format
+msgid "Run script \"%1$s\" on deleted object(s)"
+msgstr "Spustit skript \"%1$s\" na smazaných objektech"
+
 #: include/actions.inc.php:622
 #, c-format
 msgid "Run script \"%1$s\" on host groups"
@@ -19553,6 +19613,10 @@ msgstr "Statistiky a dostupnost mezipaměti pro zápis Zabbix. Cache - jedna z h
 msgid "Statistics and availability of proxy memory buffer. Mode (modes: pfree, free, total, used, pused)."
 msgstr "Statistiky a dostupnost vyrovnávací paměti proxy. Režim (režimy: pfree, free, total, used, pussed)."
 
+#: include/classes/data/CItemData.php:2854
+msgid "Statistics of values received by the preprocessing manager."
+msgstr "Statistiky hodnot přijatých správcem předzpracování."
+
 #: app/controllers/CControllerPopupGeneric.php:237
 #: app/controllers/CControllerPopupGeneric.php:251
 #: app/controllers/CControllerPopupGeneric.php:265
@@ -20540,6 +20604,10 @@ msgstr "Počet procesů. Vráti celé číslo"
 msgid "The parameter \"%1$s\" is missing from the user attributes."
 msgstr "V uživatelských atributech chybí parametr \"%1$s\"."
 
+#: app/views/popup.ldap.edit.php:101
+msgid "The previous password was cleared due to a host change. Please enter the new password."
+msgstr ""
+
 #: include/classes/core/CJsonRpc.php:206
 msgid "The received JSON is not a valid JSON-RPC request."
 msgstr "Přijatý JSON není platný JSON-RPC požadavek."
@@ -20581,6 +20649,14 @@ msgstr "Téma"
 #: app/views/mediatype.edit.php:189 app/views/mediatype.test.edit.php:48
 msgid "These parameters will be passed to the script as command-line arguments in the specified order."
 msgstr "Tyto parametry budou předány do skriptu jako argumenty příkazového řádku ve specifikovaném pořadí."
+
+#: app/views/action.list.php:156
+msgid "This action has conditions or operations referencing deleted object(s)."
+msgstr "Tato akce má podmínky nebo operace odkazující na smazané objekty."
+
+#: app/views/action.list.php:151
+msgid "This action has missing conditions or operations due to previously deleted object(s)."
+msgstr "V této akci chybí podmínky nebo operace kvůli dříve smazaným objektům."
 
 #: app/controllers/CControllerDiscoveryEdit.php:175
 #, c-format
@@ -20635,7 +20711,7 @@ msgstr "Toto nastavení zobrazí místo časového razítka místní čas. V pok
 
 #: widgets/itemhistory/views/column.edit.php:241
 msgid "This setting will display log time instead of item's timestamp. \"Show timestamp\" must also be checked in the advanced configuration."
-msgstr ""
+msgstr "Toto nastavení zobrazí čas protokolu namísto časového razítka položky. V pokročilé konfiguraci je také nutné zaškrtnout \"Zobrazit časové razítko\"."
 
 #: include/views/configuration.item.edit.php:129
 #: include/views/configuration.item.prototype.edit.php:114
@@ -24098,6 +24174,41 @@ msgstr "abs() - Absolutní hodnota"
 #: app/controllers/CControllerPopupTriggerExpr.php:339
 msgid "acos() - The arccosine of a value as an angle, expressed in radians"
 msgstr "acos() - Arckosinus hodnoty, kde hodnota je úhel vyjádřený v radiánech"
+
+#: include/classes/api/services/CDRule.php:774
+#, c-format
+msgid "action \"%1$s\" uses this discovery check"
+msgstr "akce \"%1$s\" používá tuto kontrolu objevování"
+
+#: include/classes/api/services/CDRule.php:981
+#, c-format
+msgid "action \"%1$s\" uses this discovery rule"
+msgstr "akce \"%1$s\" používá tuto kontrolu objevování"
+
+#: include/classes/api/services/CHost.php:1637
+#, c-format
+msgid "action \"%1$s\" uses this host"
+msgstr "akce \"%1$s\" používá tento hostitel"
+
+#: include/classes/api/services/CHostGroup.php:770
+#, c-format
+msgid "action \"%1$s\" uses this host group"
+msgstr "akce \"%1$s\" používá tuto skupinu hostů"
+
+#: include/classes/api/services/CService.php:487
+#, c-format
+msgid "action \"%1$s\" uses this service"
+msgstr "akce \"%1$s\" používá tuto službu"
+
+#: include/classes/api/services/CTemplate.php:810
+#, c-format
+msgid "action \"%1$s\" uses this template"
+msgstr "akce \"%1$s\" používá tuto šablonu"
+
+#: include/classes/api/managers/CTriggerManager.php:127
+#, c-format
+msgid "action \"%1$s\" uses this trigger"
+msgstr "akce \"%1$s\" používá tento spouštěč"
 
 #: app/partials/monitoring.charts.subfilter.php:182
 #: app/partials/monitoring.latest.subfilter.php:186 include/forms.inc.php:144

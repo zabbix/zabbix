@@ -4,8 +4,8 @@ msgstr ""
 "Project-Id-Version: Zabbix 6.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2023-10-19 13:48+0300\n"
-"PO-Revision-Date: 2024-12-18 09:31+0000\n"
-"Last-Translator: sergejs.olonkins <sergejs.olonkins@zabbix.com>\n"
+"PO-Revision-Date: 2025-06-10 08:33+0000\n"
+"Last-Translator: Ricky <ricky.techow@uckermark.de>\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
 "Language: de\n"
 "MIME-Version: 1.0\n"
@@ -203,7 +203,7 @@ msgstr[1] "%1$s von %2$s Elementen in problematischem Zustand"
 #: app/views/administration.miscconfig.edit.php:127
 #, c-format
 msgid "%1$s or %2$s - allows the page to be displayed only in a frame on the same origin as the page itself"
-msgstr ""
+msgstr "%1$s oder %2$s - erlaubt die Anzeige der Seite nur in einem Frame auf dem gleichen Ursprung wie die Seite selbst"
 
 #: app/views/administration.miscconfig.edit.php:130
 #, c-format
@@ -2688,12 +2688,22 @@ msgstr ""
 msgid "Cannot delete default user directory."
 msgstr "Das Standardbenutzerverzeichnis kann nicht gelöscht werden."
 
+#: include/classes/api/services/CDRule.php:773
+#, c-format
+msgid "Cannot delete discovery check \"%1$s\" of discovery rule \"%2$s\": %3$s."
+msgstr ""
+
 #: app/controllers/CControllerDiscoveryDelete.php:68 host_discovery.php:390
 #: host_discovery.php:597
 msgid "Cannot delete discovery rule"
 msgid_plural "Cannot delete discovery rules"
 msgstr[0] "Kann Suchlauf nicht löschen"
 msgstr[1] "Kann Suchläufe nicht löschen"
+
+#: include/classes/api/services/CDRule.php:980
+#, c-format
+msgid "Cannot delete discovery rule \"%1$s\": %2$s."
+msgstr ""
 
 #: app/controllers/CControllerCorrelationDelete.php:68
 msgid "Cannot delete event correlation"
@@ -2722,6 +2732,11 @@ msgid_plural "Cannot delete hosts"
 msgstr[0] "Kann Host nicht löschen"
 msgstr[1] "Kann Host nicht löschen"
 
+#: include/classes/api/services/CHost.php:1636
+#, c-format
+msgid "Cannot delete host \"%1$s\": %2$s."
+msgstr ""
+
 #: include/classes/api/services/CHost.php:1461
 #, c-format
 msgid "Cannot delete host %1$s because maintenance \"%2$s\" must contain at least one host or host group."
@@ -2734,6 +2749,11 @@ msgid "Cannot delete host group"
 msgid_plural "Cannot delete host groups"
 msgstr[0] "Hostgruppe kann nicht gelöscht werden"
 msgstr[1] "Hostgruppe kann nicht gelöscht werden"
+
+#: include/classes/api/services/CHostGroup.php:769
+#, c-format
+msgid "Cannot delete host group \"%1$s\": %2$s."
+msgstr ""
 
 #: include/classes/api/services/CHostGroup.php:858
 #, c-format
@@ -2881,6 +2901,11 @@ msgid_plural "Cannot delete templates"
 msgstr[0] "Kann Vorlage nicht löschen"
 msgstr[1] "Kann Vorlage nicht löschen"
 
+#: include/classes/api/services/CTemplate.php:809
+#, c-format
+msgid "Cannot delete template \"%1$s\": %2$s."
+msgstr ""
+
 #: app/controllers/CControllerTemplateGroupDelete.php:75
 msgid "Cannot delete template group"
 msgid_plural "Cannot delete template groups"
@@ -2916,6 +2941,11 @@ msgid "Cannot delete trigger"
 msgid_plural "Cannot delete triggers"
 msgstr[0] "Kann Auslöser nicht löschen"
 msgstr[1] "Kann Auslöser nicht löschen"
+
+#: include/classes/api/managers/CTriggerManager.php:126
+#, c-format
+msgid "Cannot delete trigger \"%1$s\": %2$s."
+msgstr ""
 
 #: app/controllers/CControllerTriggerPrototypeDelete.php:72
 #, fuzzy
@@ -5934,6 +5964,11 @@ msgstr "TLS-Verschlüsselung der Datenbank"
 msgid "Database TLS key file"
 msgstr "Datenbank-TLS-Schlüsseldatei"
 
+#: include/classes/api/clients/CLocalApiClient.php:133
+#: include/classes/api/clients/CLocalApiClient.php:147
+msgid "Database error occurred."
+msgstr ""
+
 #: app/partials/administration.system.info.php:130
 msgid "Database history tables use primary key"
 msgstr "Datenbankverlaufstabellen verwenden Primärschlüssel"
@@ -6630,6 +6665,22 @@ msgstr "Web-Szenario löschen?"
 msgid "Deleted"
 msgstr "Gelöscht"
 
+#: include/actions.inc.php:143
+msgid "Deleted host"
+msgstr ""
+
+#: include/actions.inc.php:125
+msgid "Deleted host group"
+msgstr ""
+
+#: include/actions.inc.php:710
+msgid "Deleted host group(s)"
+msgstr ""
+
+#: include/actions.inc.php:134
+msgid "Deleted trigger"
+msgstr ""
+
 #: app/views/administration.regex.edit.php:54
 msgid "Delimiter"
 msgstr "Trennzeichen"
@@ -7115,6 +7166,10 @@ msgstr "Suchlaufobjekt"
 
 #: include/classes/data/CItemData.php:1764
 msgid "Discovery of VMware clusters, \"url\" - VMware service URL. Returns JSON"
+msgstr ""
+
+#: include/classes/data/CItemData.php:1931
+msgid "Discovery of VMware datastores, \"url\" - VMware service URL, \"filter_uuid\" - one hv uuid or vm uuid (empty by default). Returns JSON"
 msgstr ""
 
 #: include/classes/data/CItemData.php:1799
@@ -17820,6 +17875,11 @@ msgstr "Skript \"%1$s\" auf dem Zabbix-Server ausführen"
 msgid "Run script \"%1$s\" on current host"
 msgstr "Skript \"%1$s\" auf dem aktuellen Host ausführen"
 
+#: include/actions.inc.php:601
+#, c-format
+msgid "Run script \"%1$s\" on deleted object(s)"
+msgstr ""
+
 #: include/actions.inc.php:622
 #, c-format
 msgid "Run script \"%1$s\" on host groups"
@@ -19442,6 +19502,10 @@ msgstr "Statistik und Verfügbarkeit des Zabbix-Schreibcache. Cache - einer der 
 msgid "Statistics and availability of proxy memory buffer. Mode (modes: pfree, free, total, used, pused)."
 msgstr ""
 
+#: include/classes/data/CItemData.php:2854
+msgid "Statistics of values received by the preprocessing manager."
+msgstr ""
+
 #: app/controllers/CControllerPopupGeneric.php:237
 #: app/controllers/CControllerPopupGeneric.php:251
 #: app/controllers/CControllerPopupGeneric.php:265
@@ -20430,6 +20494,10 @@ msgstr "Anzahl der Prozesse. Gibt Integer zurück"
 msgid "The parameter \"%1$s\" is missing from the user attributes."
 msgstr "Der Parameter \"%1$s\" fehlt in den Benutzerattributen."
 
+#: app/views/popup.ldap.edit.php:101
+msgid "The previous password was cleared due to a host change. Please enter the new password."
+msgstr ""
+
 #: include/classes/core/CJsonRpc.php:206
 msgid "The received JSON is not a valid JSON-RPC request."
 msgstr "Das empfangene JSON ist keine gültige JSON-RPC-Anfrage."
@@ -20470,6 +20538,14 @@ msgstr "Thema"
 #: app/views/administration.mediatype.edit.php:139
 #: app/views/mediatype.edit.php:189 app/views/mediatype.test.edit.php:48
 msgid "These parameters will be passed to the script as command-line arguments in the specified order."
+msgstr ""
+
+#: app/views/action.list.php:156
+msgid "This action has conditions or operations referencing deleted object(s)."
+msgstr ""
+
+#: app/views/action.list.php:151
+msgid "This action has missing conditions or operations due to previously deleted object(s)."
 msgstr ""
 
 #: app/controllers/CControllerDiscoveryEdit.php:175
@@ -23973,6 +24049,41 @@ msgstr "abs() - Absolutwert"
 #: app/controllers/CControllerPopupTriggerExpr.php:339
 msgid "acos() - The arccosine of a value as an angle, expressed in radians"
 msgstr "acos() - Der Arkuskosinus eines Werts als Winkel, ausgedrückt in Radiant"
+
+#: include/classes/api/services/CDRule.php:774
+#, c-format
+msgid "action \"%1$s\" uses this discovery check"
+msgstr ""
+
+#: include/classes/api/services/CDRule.php:981
+#, c-format
+msgid "action \"%1$s\" uses this discovery rule"
+msgstr ""
+
+#: include/classes/api/services/CHost.php:1637
+#, c-format
+msgid "action \"%1$s\" uses this host"
+msgstr ""
+
+#: include/classes/api/services/CHostGroup.php:770
+#, c-format
+msgid "action \"%1$s\" uses this host group"
+msgstr ""
+
+#: include/classes/api/services/CService.php:487
+#, c-format
+msgid "action \"%1$s\" uses this service"
+msgstr ""
+
+#: include/classes/api/services/CTemplate.php:810
+#, c-format
+msgid "action \"%1$s\" uses this template"
+msgstr ""
+
+#: include/classes/api/managers/CTriggerManager.php:127
+#, c-format
+msgid "action \"%1$s\" uses this trigger"
+msgstr ""
 
 #: app/partials/monitoring.charts.subfilter.php:182
 #: app/partials/monitoring.latest.subfilter.php:186 include/forms.inc.php:144

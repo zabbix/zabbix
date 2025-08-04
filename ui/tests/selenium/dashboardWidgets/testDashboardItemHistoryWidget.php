@@ -14,10 +14,10 @@
 **/
 
 
-require_once dirname(__FILE__).'/../../include/CWebTest.php';
-require_once dirname(__FILE__).'/../behaviors/CMessageBehavior.php';
-require_once dirname(__FILE__).'/../behaviors/CTableBehavior.php';
-require_once dirname(__FILE__).'/../common/testWidgets.php';
+require_once __DIR__.'/../../include/CWebTest.php';
+require_once __DIR__.'/../behaviors/CMessageBehavior.php';
+require_once __DIR__.'/../behaviors/CTableBehavior.php';
+require_once __DIR__.'/../common/testWidgets.php';
 
 /**
  * @backup dashboard
@@ -560,9 +560,10 @@ class testDashboardItemHistoryWidget extends testWidgets {
 		// Check parameter 'Override host' true/false state.
 		$host_selector = $dashboard->getControls()->query('class:multiselect-control')->asMultiselect()->one();
 		$this->assertTrue($host_selector->isVisible());
-		$dashboard->getWidget(self::DEFAULT_WIDGET)->edit();
-		$this->assertEquals('Edit widget', $dialog->getTitle());
-		$form->fill(['Override host' => ''])->submit();
+		$widget_form = $dashboard->getWidget(self::DEFAULT_WIDGET)->edit();
+		$overlay = COverlayDialogElement::get('Edit widget');
+		$widget_form->fill(['Override host' => ''])->submit();
+		$overlay->ensureNotPresent();
 		$dashboard->save();
 		$this->assertFalse($host_selector->isVisible());
 	}
@@ -2068,6 +2069,7 @@ class testDashboardItemHistoryWidget extends testWidgets {
 				? '1 minute'
 				: $data['fields']['Refresh interval'];
 			$this->assertEquals($refresh, $widget->getRefreshInterval());
+			CPopupMenuElement::find()->one()->close();
 
 			// Check new widget form fields and values in frontend.
 			$saved_form = $widget->edit();

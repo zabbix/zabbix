@@ -389,10 +389,30 @@ class testAgentJsonProtocol extends CIntegrationTest {
 		return true;
 	}
 
+	private function purgeActions() {
+		$params = [
+			'output' => 'actionid',
+			'preservekeys' => true
+		];
+
+		$response = $this->call('action.get', $params);
+
+		$this->assertArrayHasKey('result', $response);
+
+		$ids = array_keys($response['result']);
+
+		if ($ids === []) {
+			return;
+		}
+
+		$response = $this->call('action.delete', $ids);
+	}
+
 	private function checkDiscovery($agent_component) {
 		$this->stopComponent(self::COMPONENT_SERVER);
 		$this->stopComponent($agent_component);
 
+		$this->purgeActions();
 		$this->call('host.delete', [self::$hostid]);
 
 		$response = $this->call('drule.create', [

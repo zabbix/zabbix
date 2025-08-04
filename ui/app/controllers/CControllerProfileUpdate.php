@@ -49,7 +49,7 @@ class CControllerProfileUpdate extends CController {
 				case 'web.hosts.host_discovery.filter.active':
 				case 'web.hosts.httpconf.filter.active':
 				case 'web.hosts.items.list.filter.active':
-				case 'web.hosts.triggers.filter.active':
+				case 'web.hosts.trigger.list.filter.active':
 				case 'web.hostsmon.filter.active':
 				case 'web.httpdetails.filter.active':
 				case 'web.item.graph.filter.active':
@@ -77,7 +77,7 @@ class CControllerProfileUpdate extends CController {
 				case 'web.templates.host_discovery.filter.active':
 				case 'web.templates.httpconf.filter.active':
 				case 'web.templates.items.list.filter.active':
-				case 'web.templates.triggers.filter.active':
+				case 'web.templates.trigger.list.filter.active':
 				case 'web.token.filter.active':
 				case 'web.toptriggers.filter.active':
 				case 'web.tr_events.hats.'.SECTION_HAT_EVENTACTIONS.'.state':

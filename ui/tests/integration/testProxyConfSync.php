@@ -850,6 +850,7 @@ class testProxyConfSync extends CIntegrationTest
 	 */
 	public function prepareData()
 	{
+		$this->purgeExisting('action', 'actionids');
 		$this->purgeExisting('host', 'hostids');
 		$this->purgeExisting('proxy', 'extend');
 		$this->purgeExisting('template', 'templateids');

@@ -16,6 +16,7 @@ package smart
 
 import (
 	"encoding/json"
+	"regexp"
 	"runtime"
 	"strings"
 
@@ -40,11 +41,12 @@ const (
 
 var impl Plugin
 
+var pathRegex = regexp.MustCompile(`^(?:\s*-|'*"*\s*-)`)
+
 // Options -
 type Options struct {
-	plugin.SystemOptions `conf:"optional,name=System"`
-	Timeout              int    `conf:"optional,range=1:30"`
-	Path                 string `conf:"optional"`
+	Timeout int    `conf:"optional,range=1:30"`
+	Path    string `conf:"optional"`
 }
 
 // Plugin -
@@ -76,8 +78,8 @@ func init() {
 }
 
 // Configure -
-func (p *Plugin) Configure(global *plugin.GlobalOptions, options interface{}) {
-	if err := conf.Unmarshal(options, &p.options); err != nil {
+func (p *Plugin) Configure(global *plugin.GlobalOptions, options any) {
+	if err := conf.UnmarshalStrict(options, &p.options); err != nil {
 		p.Errf("cannot unmarshal configuration options: %s", err)
 	}
 
@@ -89,23 +91,25 @@ func (p *Plugin) Configure(global *plugin.GlobalOptions, options interface{}) {
 }
 
 // Validate -
-func (p *Plugin) Validate(options interface{}) error {
+func (p *Plugin) Validate(options any) error { //nolint:revive
 	var o Options
-	return conf.Unmarshal(options, &o)
+
+	err := conf.UnmarshalStrict(options, &o)
+	if err != nil {
+		return errs.Wrap(err, "plugin config validation failed")
+	}
+
+	return nil
 }
 
 // Export -
-func (p *Plugin) Export(key string, params []string, ctx plugin.ContextProvider) (result interface{}, err error) {
-	if len(params) > 0 && key != diskGet {
-		return nil, zbxerr.ErrorTooManyParameters
-	}
-
-	if err = p.checkVersion(); err != nil {
-		return
+func (p *Plugin) Export(key string, params []string, _ plugin.ContextProvider) (any, error) {
+	err := p.validateExport(key, params)
+	if err != nil {
+		return nil, errs.Wrap(err, "export validation failed")
 	}
 
 	var jsonArray []byte
-
 	switch key {
 	case diskDiscovery:
 		jsonArray, err = p.diskDiscovery()
@@ -132,14 +136,13 @@ func (p *Plugin) Export(key string, params []string, ctx plugin.ContextProvider)
 	return string(jsonArray), nil
 }
 
-func (p *Plugin) diskDiscovery() (jsonArray []byte, err error) {
-	out := []device{}
-
+func (p *Plugin) diskDiscovery() ([]byte, error) {
 	r, err := p.execute(false)
 	if err != nil {
 		return nil, err
 	}
 
+	out := make([]device, 0, len(r.devices))
 	for _, dev := range r.devices {
 		out = append(out, device{
 			Name:         cutPrefix(dev.Info.Name),
@@ -152,12 +155,12 @@ func (p *Plugin) diskDiscovery() (jsonArray []byte, err error) {
 		})
 	}
 
-	jsonArray, err = json.Marshal(out)
+	jsonArray, err := json.Marshal(out)
 	if err != nil {
 		return nil, errs.WrapConst(err, zbxerr.ErrorCannotMarshalJSON)
 	}
 
-	return
+	return jsonArray, nil
 }
 
 func (p *Plugin) diskGet(params []string) ([]byte, error) {
@@ -173,6 +176,8 @@ func (p *Plugin) diskGet(params []string) ([]byte, error) {
 	}
 }
 
+// diskGetSingle returns all SMART information about the device. Path to device, e.g., /dev/sda must be specified in
+// path. If raidType specified, the device type is taken into account. It returns result in JSON.
 func (p *Plugin) diskGetSingle(path, raidType string) ([]byte, error) {
 	args := []string{"-a", path, "-j"}
 
@@ -182,7 +187,7 @@ func (p *Plugin) diskGetSingle(path, raidType string) ([]byte, error) {
 
 	device, err := p.ctl.Execute(args...)
 	if err != nil {
-		return nil, errs.Wrap(err, "failed to execute smartctl")
+		return nil, errs.Wrap(err, errFailedToExecute)
 	}
 
 	out, err := setSingleDiskFields(device)
@@ -226,19 +231,19 @@ func (p *Plugin) diskGetAll() (jsonArray []byte, err error) {
 	return
 }
 
-func (p *Plugin) attributeDiscovery() (jsonArray []byte, err error) {
-	out := []attribute{}
-
+func (p *Plugin) attributeDiscovery() ([]byte, error) {
 	r, err := p.execute(false)
 	if err != nil {
 		return nil, err
 	}
 
+	out := []attribute{}
 	for _, dev := range r.devices {
 		t := getAttributeType(dev.Info.DevType, dev.RotationRate, dev.SmartAttributes.Table)
 		for _, attr := range dev.SmartAttributes.Table {
 			out = append(
-				out, attribute{
+				out,
+				attribute{
 					Name:       cutPrefix(dev.Info.Name),
 					DeviceType: t,
 					ID:         attr.ID,
@@ -248,18 +253,20 @@ func (p *Plugin) attributeDiscovery() (jsonArray []byte, err error) {
 		}
 	}
 
-	jsonArray, err = json.Marshal(out)
+	jsonArray, err := json.Marshal(out)
 	if err != nil {
 		return nil, errs.WrapConst(err, zbxerr.ErrorCannotMarshalJSON)
 	}
 
-	return
+	return jsonArray, nil
 }
 
 // setSingleDiskFields goes through provided device json data and sets required output fields.
 // It returns an error if there is an issue with unmarshal for the provided input JSON map.
-func setSingleDiskFields(dev []byte) (out map[string]interface{}, err error) {
-	attr := make(map[string]interface{})
+func setSingleDiskFields(dev []byte) (map[string]any, error) {
+	attr := make(map[string]any)
+
+	var err error
 	if err = json.Unmarshal(dev, &attr); err != nil {
 		return nil, errs.WrapConst(err, zbxerr.ErrorCannotMarshalJSON)
 	}
@@ -269,9 +276,9 @@ func setSingleDiskFields(dev []byte) (out map[string]interface{}, err error) {
 		return nil, errs.WrapConst(err, zbxerr.ErrorCannotMarshalJSON)
 	}
 
-	diskType := getType(getTypeFromJson(attr), getRateFromJson(attr), getTablesFromJson(attr))
+	diskType := getType(getTypeFromJSON(attr), getRateFromJSON(attr), getTablesFromJSON(attr))
 
-	out = map[string]interface{}{}
+	out := make(map[string]any)
 	out["disk_type"] = diskType
 	out["firmware_version"] = sd.Firmware
 	out["model_name"] = sd.ModelName
@@ -284,14 +291,15 @@ func setSingleDiskFields(dev []byte) (out map[string]interface{}, err error) {
 	}
 
 	out["error"] = strings.Join(errors, ", ")
-	out["self_test_passed"] = setSelfTest(sd)
+	out["self_test_passed"] = selfTestPassed(&sd)
+	out["self_test_in_progress"] = selfTestInProgress(&sd)
 
 	if diskType == nvmeType {
 		out["temperature"] = sd.HealthLog.Temperature
 		out["power_on_time"] = sd.HealthLog.PowerOnTime
 		out["critical_warning"] = sd.HealthLog.CriticalWarning
 		out["media_errors"] = sd.HealthLog.MediaErrors
-		out["percentage_used"] = sd.HealthLog.Percentage_used
+		out["percentage_used"] = sd.HealthLog.PercentageUsed
 	} else {
 		out["temperature"] = sd.Temperature.Current
 		out["power_on_time"] = sd.PowerOnTime.Hours
@@ -305,16 +313,34 @@ func setSingleDiskFields(dev []byte) (out map[string]interface{}, err error) {
 			continue
 		}
 
-		out[strings.ToLower(a.Name)] = singleRequestAttribute{a.Raw.Value, a.Raw.Str}
+		out[strings.ToLower(a.Name)] = singleRequestAttribute{a.Raw.Value, a.Raw.Str, a.NormalizedValue}
 	}
 
-	return
+	return out, nil
 }
 
-// setSelfTest determines if device is self test capable and if the test is passed.
-func setSelfTest(sd singleDevice) *bool {
+// selfTestPassed determines if self-test passed returning the values:
+// null:  device is not self-test capable | test is in progress;
+// true:   the test is passed;
+// false:  the test is passed | test is being interrupted.
+func selfTestPassed(sd *singleDevice) *bool {
+	inPr := selfTestInProgress(sd)
+	if inPr == nil || *inPr {
+		return nil
+	}
+
+	return &sd.Data.SelfTest.Status.Passed
+}
+
+// selfTestInProgress determines if self-test is in progress returning the values:
+// null:  device is not self-test capable;
+// true:   the test is in progress;
+// false:  the test is not in progress.
+func selfTestInProgress(sd *singleDevice) *bool {
 	if sd.Data.Capabilities.SelfTestsSupported {
-		return &sd.Data.SelfTest.Status.Passed
+		inPr := (sd.Data.SelfTest.Status.Value >> 4) == 0xf // all in progress values
+
+		return &inPr
 	}
 
 	return nil
@@ -323,23 +349,26 @@ func setSelfTest(sd singleDevice) *bool {
 // setDiskFields goes through provided device json map and sets disk_name
 // disk_type and returns the devices in a slice.
 // It returns an error if there is an issue with unmarshal for the provided input JSON map
-func setDiskFields(deviceJsons map[string]jsonDevice) (out []interface{}, err error) {
+func setDiskFields(deviceJsons map[string]jsonDevice) ([]any, error) {
+	out := make([]any, 0, len(deviceJsons))
+
 	for k, v := range deviceJsons {
-		b := make(map[string]interface{})
-		if err = json.Unmarshal([]byte(v.jsonData), &b); err != nil {
-			return out, errs.WrapConst(err, zbxerr.ErrorCannotMarshalJSON)
+		b := make(map[string]any)
+		if err := json.Unmarshal([]byte(v.jsonData), &b); err != nil {
+			return nil, errs.WrapConst(err, zbxerr.ErrorCannotMarshalJSON) //nolint:wrapcheck
 		}
 
 		b["disk_name"] = cutPrefix(k)
-		b["disk_type"] = getType(getTypeFromJson(b), getRateFromJson(b), getTablesFromJson(b))
+		b["disk_type"] = getType(getTypeFromJSON(b), getRateFromJSON(b), getTablesFromJSON(b))
 
 		out = append(out, b)
 	}
 
-	return
+	return out, nil
 }
 
-func getRateFromJson(in map[string]interface{}) (out int) {
+func getRateFromJSON(in map[string]any) int {
+	var out int
 	if r, ok := in[rotationRateFieldName]; ok {
 		switch rate := r.(type) {
 		case int:
@@ -349,57 +378,59 @@ func getRateFromJson(in map[string]interface{}) (out int) {
 		}
 	}
 
-	return
+	return out
 }
 
-func getTypeFromJson(in map[string]interface{}) (out string) {
+func getTypeFromJSON(in map[string]any) string {
 	if dev, ok := in[deviceFieldName]; ok {
-		m, ok := dev.(map[string]interface{})
+		m, ok := dev.(map[string]any)
 		if ok {
 			if t, ok := m[typeFieldName]; ok {
 				s, ok := t.(string)
 				if ok {
-					out = s
+					return s
 				}
 			}
 		}
 	}
 
-	return
+	return ""
 }
 
-func getTablesFromJson(in map[string]interface{}) (out []table) {
+func getTablesFromJSON(in map[string]any) []table {
+	var out []table
+
 	attr, ok := in[ataSmartAttrFieldName]
 	if !ok {
-		return
+		return nil
 	}
 
-	a, ok := attr.(map[string]interface{})
+	a, ok := attr.(map[string]any)
 	if !ok {
-		return
+		return nil
 	}
 
 	tables, ok := a[ataSmartAttrTableFieldName]
 	if !ok {
-		return
+		return nil
 	}
 
-	tmp, ok := tables.([]interface{})
+	tmp, ok := tables.([]any)
 	if !ok {
-		return
+		return nil
 	}
 
 	b, err := json.Marshal(tmp)
 	if err != nil {
-		return
+		return nil
 	}
 
 	err = json.Unmarshal(b, &out)
 	if err != nil {
-		return
+		return nil
 	}
 
-	return
+	return out
 }
 
 func getAttributeType(devType string, rate int, tables []table) string {
@@ -445,4 +476,34 @@ func getTypeByRateAndAttr(rate int, tables []table) string {
 	}
 
 	return ssdType
+}
+
+// validateExport function validates key, export params and version.
+func (p *Plugin) validateExport(key string, params []string) error {
+	err := validateParams(key, params)
+	if err != nil {
+		return err
+	}
+
+	return p.checkVersion()
+}
+
+// validateParams validates the key's params quantity aspect.
+func validateParams(key string, params []string) error {
+	// No params - nothing to validate.
+	if len(params) == all {
+		return nil
+	}
+
+	// The params can only be for a specific function.
+	if key != diskGet {
+		return zbxerr.ErrorTooManyParameters
+	}
+
+	// Validates the param disk path in the context of an input sanitization.
+	if pathRegex.MatchString(params[0]) {
+		return errs.New("invalid disk descriptor format")
+	}
+
+	return nil
 }

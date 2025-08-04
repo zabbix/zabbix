@@ -14,9 +14,9 @@
 **/
 
 
-require_once dirname(__FILE__).'/../../include/CWebTest.php';
-require_once dirname(__FILE__).'/../behaviors/CMessageBehavior.php';
-require_once dirname(__FILE__).'/../behaviors/CTableBehavior.php';
+require_once __DIR__.'/../../include/CWebTest.php';
+require_once __DIR__.'/../behaviors/CMessageBehavior.php';
+require_once __DIR__.'/../behaviors/CTableBehavior.php';
 
 /**
  * @backup correlation
@@ -1283,7 +1283,7 @@ class testFormEventCorrelation extends CWebTest {
 	 * Resets the update correlation to the starting state.
 	 */
 	public function resetUpdateCorrelation() {
-		// Data is the inital state + the id of the Correlation that is going to be reset.
+		// Data is the initial state + the id of the Correlation that is going to be reset.
 		$data = self::$update_correlation_initial;
 		$data['correlationid'] = self::$update_correlation_id;
 		CDataHelper::call('correlation.update', [$data]);

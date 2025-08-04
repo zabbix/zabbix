@@ -353,8 +353,8 @@ static void	push_item_value_to_history(const zbx_history_recv_item_t *item, zbx_
 	SET_TEXT_RESULT(&result, value->value);
 	value->value = NULL;
 
-	zbx_preprocess_item_value(item->itemid, item->host.hostid, item->value_type, item->flags, &result, &value->ts,
-			ITEM_STATE_NORMAL, NULL);
+	zbx_preprocess_item_value(item->itemid, item->host.hostid, item->value_type, item->flags, item->preprocessing,
+			&result, &value->ts, ITEM_STATE_NORMAL, NULL);
 
 	zbx_free_agent_result(&result);
 }
@@ -604,7 +604,7 @@ static void	process_item_values(const zbx_user_t *user, ZBX_SOCKADDR *peer_addr,
  *                FAIL    - otherwise                                         *
  *                                                                            *
  ******************************************************************************/
-static int	check_user_role_permmissions(const zbx_user_t *user)
+static int	check_user_role_permissions(const zbx_user_t *user)
 {
 #define API_METHOD		"api.method."
 
@@ -707,7 +707,7 @@ static int	process_history_push(zbx_socket_t *sock, const struct zbx_json_parse 
 
 	if (FAIL == zbx_get_user_from_json(jp, &user, NULL) ||
 			SUCCEED != zbx_db_check_user_perm2system(user.userid) ||
-			SUCCEED != check_user_role_permmissions(&user))
+			SUCCEED != check_user_role_permissions(&user))
 	{
 		*error = zbx_strdup(NULL, "Permission denied.");
 		goto out;

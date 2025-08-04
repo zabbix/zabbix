@@ -14,8 +14,8 @@
 **/
 
 
-require_once dirname(__FILE__).'/../../include/CWebTest.php';
-require_once dirname(__FILE__).'/../../include/helpers/CDataHelper.php';
+require_once __DIR__.'/../../include/CWebTest.php';
+require_once __DIR__.'/../../include/helpers/CDataHelper.php';
 
 /**
  * @backup config, widget, hosts
@@ -288,8 +288,7 @@ class testDashboardGeomapWidgetScreenshots extends CWebTest {
 		$this->page->waitUntilReady();
 
 		$widgets = [
-			// TODO: temporarily commented out due to mouse pointer on first widget in Jenkins
-//			'Geomap for screenshots, 5',
+			'Geomap for screenshots, 5',
 			'Geomap for screenshots, 10',
 			'Geomap for screenshots, 30',
 			'Geomap for screenshots, no zoom',
@@ -324,12 +323,12 @@ class testDashboardGeomapWidgetScreenshots extends CWebTest {
 
 		foreach ($widgets as $widget) {
 			$id = $widget.' '.$data['Tile provider'];
-			$element = $this->query("xpath://div[@class=\"dashboard-grid-widget\"]//h4[text()=".
+			$element = $this->query("xpath://div[".CXPathHelper::fromClass('dashboard-grid-widget')."]//h4[text()=".
 					CXPathHelper::escapeQuotes($widget)."]/../..")->waitUntilVisible()->one();
 
 			$count = count($this->errors);
 			/*
-			 * Zoom in and zoom out icons in the geomap widget are not centred on refrence screenshots due to script
+			 * Zoom in and zoom out icons in the geomap widget are not centred on reference screenshots due to script
 			 * execution in the assertScreenshotExcept() method for text and image rendering. This is expected beahavior
 			 * and can only be reproduced by running a test.
 			 */

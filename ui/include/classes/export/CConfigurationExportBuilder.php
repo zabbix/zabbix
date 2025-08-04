@@ -317,7 +317,7 @@ class CConfigurationExportBuilder {
 	 * @param array $templates
 	 * @param array $simple_triggers
 	 */
-	protected function formatTemplates(array $templates, array $simple_triggers = null) {
+	protected function formatTemplates(array $templates, ?array $simple_triggers = null) {
 		$result = [];
 
 		CArrayHelper::sort($templates, ['host']);
@@ -359,7 +359,7 @@ class CConfigurationExportBuilder {
 	 * @param array $hosts
 	 * @param array $simple_triggers
 	 */
-	protected function formatHosts(array $hosts, array $simple_triggers = null) {
+	protected function formatHosts(array $hosts, ?array $simple_triggers = null) {
 		$result = [];
 
 		CArrayHelper::sort($hosts, ['host']);

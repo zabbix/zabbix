@@ -22,6 +22,7 @@
 #include "zbxversion.h"
 #include "zbx_trigger_constants.h"
 #include "zbx_host_constants.h"
+#include "zbxmutexs.h"
 
 #define ZBX_MAINTENANCE_IDLE		0
 #define ZBX_MAINTENANCE_RUNNING		1
@@ -561,6 +562,7 @@ typedef struct
 	/* item statistics per interface */
 	int		items_num;
 	int		version;
+	zbx_uint64_t	revision;
 }
 ZBX_DC_INTERFACE;
 
@@ -1058,6 +1060,7 @@ typedef struct
 								/* until it is parsed/converted to integer    */
 								/* value during next configuration sync	      */
 	int			proxy_lastonline;	/* last server connection timestamp - proxy only */
+	zbx_uint32_t		sync_status;
 }
 zbx_dc_config_t;
 
@@ -1066,21 +1069,18 @@ zbx_dc_config_t	*get_dc_config(void);
 /* for cmocka */
 void	set_dc_config(zbx_dc_config_t *in);
 
-#define	RDLOCK_CACHE	rdlock_cache()
-#define	WRLOCK_CACHE	wrlock_cache()
-#define	UNLOCK_CACHE	unlock_cache()
+int		zbx_get_sync_in_progress(void);
+zbx_rwlock_t	zbx_get_config_lock(void);
 
-void	rdlock_cache(void);
-void	wrlock_cache(void);
-void	unlock_cache(void);
+#define	RDLOCK_CACHE	do { if (0 == zbx_get_sync_in_progress()) zbx_rwlock_rdlock(zbx_get_config_lock()); } while(0)
+#define	WRLOCK_CACHE	do { if (0 == zbx_get_sync_in_progress()) zbx_rwlock_wrlock(zbx_get_config_lock()); } while(0)
+#define	UNLOCK_CACHE	do { if (0 == zbx_get_sync_in_progress()) zbx_rwlock_unlock(zbx_get_config_lock()); } while(0)
 
-void	rdlock_cache_config_history(void);
-void	wrlock_cache_config_history(void);
-void	unlock_cache_config_history(void);
+zbx_rwlock_t	zbx_get_config_history_lock(void);
 
-#define	RDLOCK_CACHE_CONFIG_HISTORY	rdlock_cache_config_history()
-#define	WRLOCK_CACHE_CONFIG_HISTORY	wrlock_cache_config_history()
-#define	UNLOCK_CACHE_CONFIG_HISTORY	unlock_cache_config_history()
+#define	RDLOCK_CACHE_CONFIG_HISTORY	zbx_rwlock_rdlock(zbx_get_config_history_lock())
+#define	WRLOCK_CACHE_CONFIG_HISTORY	zbx_rwlock_wrlock(zbx_get_config_history_lock())
+#define	UNLOCK_CACHE_CONFIG_HISTORY	zbx_rwlock_unlock(zbx_get_config_history_lock())
 
 #define ZBX_IPMI_DEFAULT_AUTHTYPE	-1
 #define ZBX_IPMI_DEFAULT_PRIVILEGE	2
@@ -1132,6 +1132,7 @@ void		DCget_function(zbx_dc_function_t *dst_function, const ZBX_DC_FUNCTION *src
 void		DCget_trigger(zbx_dc_trigger_t *dst_trigger, const ZBX_DC_TRIGGER *src_trigger, unsigned int flags);
 int		DCitem_nextcheck_update(ZBX_DC_ITEM *item, const ZBX_DC_INTERFACE *interface, int flags, int now,
 			char **error);
+unsigned char	zbx_dc_item_requires_preprocessing(const ZBX_DC_ITEM *src_item);
 
 #define ZBX_TRIGGER_TIMER_NONE			0x0000
 #define ZBX_TRIGGER_TIMER_TRIGGER		0x0001

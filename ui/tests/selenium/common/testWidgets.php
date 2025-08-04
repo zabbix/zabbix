@@ -14,7 +14,7 @@
 **/
 
 
-require_once dirname(__FILE__).'/../../include/CWebTest.php';
+require_once __DIR__.'/../../include/CWebTest.php';
 
 class testWidgets extends CWebTest {
 	const HOST_ALL_ITEMS = 'Host for all item value types';
@@ -64,7 +64,7 @@ class testWidgets extends CWebTest {
 		// Assign the dialog from where the last Select button will be clicked.
 		$select_dialog = $widget_dialog;
 
-		// Item types expected in items table. For the most cases theses are all items except of Binary and dependent.
+		// Item types expected in items table. For the most cases these are all items except of Binary and dependent.
 		$item_types = (in_array($widget, ['Item navigator', 'Item history', 'Honeycomb']))
 			? ['Binary item', 'Character item', 'Float item', 'Log item', 'Text item', 'Unsigned item', 'Unsigned_dependent item']
 			: ['Character item', 'Float item', 'Log item', 'Text item', 'Unsigned item', 'Unsigned_dependent item'];
@@ -114,8 +114,7 @@ class testWidgets extends CWebTest {
 		$select_dialog->query($select_button)->one()->waitUntilClickable()->click();
 
 		// Open the dialog where items will be tested.
-		$items_dialog = COverlayDialogElement::find()->all()->last()->waitUntilReady();
-		$this->assertEquals($widget === 'Graph prototype' ? 'Item prototypes' : 'Items', $items_dialog->getTitle());
+		$items_dialog = COverlayDialogElement::get($widget === 'Graph prototype' ? 'Item prototypes' : 'Items');
 
 		// Find the table where items will be expected.
 		$table = $items_dialog->query(self::TABLE_SELECTOR)->asTable()->one()->waitUntilVisible();
@@ -123,15 +122,11 @@ class testWidgets extends CWebTest {
 		// Fill the host name and check the table.
 		$items_dialog->query('class:multiselect-control')->asMultiselect()->one()->fill(self::HOST_ALL_ITEMS);
 		$table->waitUntilReloaded();
+		$items_dialog->query('button:Select')->waitUntilClickable();
 		$this->assertTableDataColumn($item_types, 'Name', self::TABLE_SELECTOR);
 
 		// Close all dialogs.
-		$dialogs = COverlayDialogElement::find()->all();
-
-		$dialog_count = $dialogs->count();
-		for ($i = $dialog_count - 1; $i >= 0; $i--) {
-			$dialogs->get($i)->close(true);
-		}
+		COverlayDialogElement::closeAll();
 	}
 
 	/**

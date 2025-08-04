@@ -126,19 +126,20 @@ static int	pp_execute_trim(int type, zbx_variant_t *value, const char *params)
  *                                                                            *
  * Purpose: execute 'check for unsupported' step                              *
  * *                                                                          *
- * Parameters: value                - [IN/OUT]                                *
- *             params               - [IN] preprocessing parameters           *
- *             error_handler_params - [IN/OUT]                                *
+ * Parameters: value            - [IN/OUT]                                    *
+ *             params           - [IN] preprocessing parameters               *
+ *             output_template  - [IN] the output string template             *
+ *             error            - [OUT] matched error using output template   *
  *                                                                            *
  * Result value: SUCCEED - the input value does not have an error             *
  *               FAIL    - otherwise.                                         *
  *                                                                            *
  ******************************************************************************/
-static int	pp_check_not_supported_error(const zbx_variant_t *value, const char *params,
-		char **error_handler_params)
+static int	pp_check_not_supported_error(zbx_variant_t *value, const char *params, const char *output_template,
+		char **error)
 {
-	if (ZBX_VARIANT_ERR == value->type && SUCCEED == item_preproc_check_error_regex(value, params,
-			error_handler_params))
+	if (ZBX_VARIANT_ERR == value->type && SUCCEED == item_preproc_check_error_regex(value, params, output_template,
+			error))
 	{
 		return FAIL;
 	}
@@ -343,14 +344,17 @@ static int	pp_excute_jsonpath_query(zbx_pp_cache_t *cache, zbx_variant_t *value,
  ******************************************************************************/
 static int	pp_execute_jsonpath(zbx_pp_cache_t *cache, zbx_variant_t *value, const char *params)
 {
-	char	*errmsg = NULL;
+	char	*errmsg = NULL, *error = NULL;
+	size_t	error_alloc = 0, error_offset = 0;
 
 	if (SUCCEED == pp_excute_jsonpath_query(cache, value, params, &errmsg))
 		return SUCCEED;
 
 	zbx_variant_clear(value);
-	zbx_variant_set_error(value, zbx_dsprintf(NULL, "cannot extract value from json by path \"%s\": %s", params,
-			errmsg));
+	zbx_snprintf_alloc(&error, &error_alloc, &error_offset, "cannot extract value from json by path \"%s\": %s",
+			params, errmsg);
+
+	zbx_variant_set_error(value, error);
 
 	zbx_free(errmsg);
 
@@ -1057,8 +1061,8 @@ static int	pp_execute_snmp_get_to_value(zbx_variant_t *value, const char *params
  ******************************************************************************/
 int	pp_execute_step(zbx_pp_context_t *ctx, zbx_pp_cache_t *cache, zbx_dc_um_shared_handle_t *um_handle,
 		zbx_uint64_t hostid, unsigned char value_type, zbx_variant_t *value, zbx_timespec_t ts,
-		zbx_pp_step_t *step, const zbx_variant_t *history_value_in, zbx_variant_t *history_value_out,
-		zbx_timespec_t *history_ts, const char *config_source_ip)
+		const zbx_pp_step_t *step, const zbx_variant_t *history_value_in, zbx_variant_t *history_value_out,
+		zbx_timespec_t *history_ts, const char *config_source_ip, char **error)
 {
 	int	ret, user_macros = 0;
 	char	*params = NULL;
@@ -1066,23 +1070,16 @@ int	pp_execute_step(zbx_pp_context_t *ctx, zbx_pp_cache_t *cache, zbx_dc_um_shar
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() step:%d params:'%s' value:'%.*s' cache:%p", __func__,
 			step->type, step->params, PP_VALUE_LOG_LIMIT, zbx_variant_value_desc(value), (void *)cache);
 
-	params = zbx_strdup(NULL, step->params);
-
+	params = step->params;
 	if (NULL != um_handle)
 	{
 		if (NULL != strstr(params, "{$"))
 		{
-			char		*error = NULL;
 			unsigned char	env = ZBX_PREPROC_SCRIPT == step->type ? ZBX_MACRO_ENV_SECURE :
 					ZBX_MACRO_ENV_NONSECURE;
 
-			if (SUCCEED != zbx_dc_expand_user_and_func_macros_from_cache(um_handle->um_cache, &params,
-					&hostid, 1, env, &error))
-			{
-				zabbix_log(LOG_LEVEL_DEBUG, "cannot resolve user macros: %s", error);
-				zbx_free(error);
-			}
-
+			params = zbx_strdup(NULL, step->params);
+			zbx_dc_expand_user_and_func_macros_from_cache(um_handle->um_cache, &params, &hostid, 1, env);
 			user_macros = 1;
 		}
 	}
@@ -1126,7 +1123,7 @@ int	pp_execute_step(zbx_pp_context_t *ctx, zbx_pp_cache_t *cache, zbx_dc_um_shar
 			ret = pp_validate_not_regex(value, params);
 			goto out;
 		case ZBX_PREPROC_VALIDATE_NOT_SUPPORTED:
-			ret = pp_check_not_supported_error(value, params, &step->error_handler_params);
+			ret = pp_check_not_supported_error(value, params, step->error_handler_params, error);
 			goto out;
 		case ZBX_PREPROC_ERROR_FIELD_JSON:
 			ret = pp_error_from_json(value, params);
@@ -1179,7 +1176,8 @@ int	pp_execute_step(zbx_pp_context_t *ctx, zbx_pp_cache_t *cache, zbx_dc_um_shar
 			ret = FAIL;
 		}
 out:
-	zbx_free(params);
+	if (params != step->params)
+		zbx_free(params);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s() ret:%s value:%.*s", __func__, zbx_result_string(ret),
 			PP_VALUE_LOG_LIMIT, zbx_variant_value_desc(value));
@@ -1259,6 +1257,7 @@ void	pp_execute(zbx_pp_context_t *ctx, zbx_pp_item_preproc_t *preproc, zbx_pp_ca
 		zbx_variant_t		history_value_out, history_none;
 		const zbx_variant_t	*history_value_in;
 		zbx_timespec_t		history_ts;
+		char			*error = NULL;
 
 		if (ZBX_VARIANT_ERR == value_out->type && ZBX_PREPROC_VALIDATE_NOT_SUPPORTED != preproc->steps[i].type)
 			break;
@@ -1276,12 +1275,13 @@ void	pp_execute(zbx_pp_context_t *ctx, zbx_pp_item_preproc_t *preproc, zbx_pp_ca
 		}
 
 		if (SUCCEED != pp_execute_step(ctx, cache, um_handle, preproc->hostid, preproc->value_type, value_out,
-				ts, preproc->steps + i, history_value_in, &history_value_out, &history_ts, config_source_ip))
+				ts, preproc->steps + i, history_value_in, &history_value_out, &history_ts,
+				config_source_ip, &error))
 		{
 			zbx_variant_copy(&value_raw, value_out);
 
-			if (ZBX_PREPROC_FAIL_DEFAULT == (action = pp_error_on_fail(um_handle, preproc->hostid, value_out,
-					preproc->steps + i)))
+			if (ZBX_PREPROC_FAIL_DEFAULT == (action = pp_error_on_fail(um_handle, preproc->hostid,
+					value_out, error, preproc->steps + i)))
 			{
 				zbx_variant_clear(&value_raw);
 			}
@@ -1291,6 +1291,8 @@ void	pp_execute(zbx_pp_context_t *ctx, zbx_pp_item_preproc_t *preproc, zbx_pp_ca
 			if (ZBX_VARIANT_ERR == value_out->type)
 				quote_error = 1;
 		}
+
+		zbx_free(error);
 
 		pp_result_set(results + results_num++, value_out, action, &value_raw);
 

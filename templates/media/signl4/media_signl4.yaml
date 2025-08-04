@@ -1,55 +1,40 @@
 zabbix_export:
   version: '7.0'
   media_types:
-    -
-      name: SIGNL4
+    - name: SIGNL4
       type: WEBHOOK
       parameters:
-        -
-          name: Event_Ack_Status
+        - name: Event_Ack_Status
           value: '{EVENT.ACK.STATUS}'
-        -
-          name: Event_Date_Time
+        - name: Event_Date_Time
           value: '{EVENT.DATE} {EVENT.TIME}'
-        -
-          name: Event_ID
+        - name: Event_ID
           value: '{EVENT.ID}'
-        -
-          name: Event_Update_Action
+        - name: Event_Update_Action
           value: '{EVENT.UPDATE.ACTION}'
-        -
-          name: Event_Update_Status
+        - name: Event_Update_Status
           value: '{EVENT.UPDATE.STATUS}'
-        -
-          name: Hostname
+        - name: Hostname
           value: '{HOST.NAME}'
-        -
-          name: Host_IP
+        - name: Host_IP
           value: '{HOST.IP}'
-        -
-          name: Message
+        - name: Message
           value: '{ALERT.MESSAGE}'
-        -
-          name: Severity
+        - name: Severity
           value: '{EVENT.SEVERITY}'
-        -
-          name: Subject
+        - name: Subject
           value: '{ALERT.SUBJECT}'
-        -
-          name: teamsecret
+        - name: teamsecret
           value: '{ALERT.SENDTO}'
-        -
-          name: Trigger_ID
+        - name: Trigger_ID
           value: '{TRIGGER.ID}'
-        -
-          name: Trigger_Status
+        - name: Trigger_Status
           value: '{TRIGGER.STATUS}'
-        -
-          name: User
+        - name: User
           value: '{USER.FULLNAME}'
-        -
-          name: Zabbix_URL
+        - name: Zabbix_URL
           value: '{$ZABBIX.URL}'
+      status: DISABLED
       script: |
         // SIGNL4 Webhook
         try {
@@ -135,10 +120,8 @@ zabbix_export:
         Get the app at https://www.signl4.com.
         
         Find out more including an integration video here: https://www.signl4.com/blog/portfolio_item/zabbix-mobile-alert-notification-duty-schedule-escalation/
-        
       message_templates:
-        -
-          event_source: TRIGGERS
+        - event_source: TRIGGERS
           operation_mode: PROBLEM
           subject: 'Problem: {EVENT.NAME}'
           message: |
@@ -149,8 +132,7 @@ zabbix_export:
             Operational data: {EVENT.OPDATA}
             Original problem ID: {EVENT.ID}
             {TRIGGER.URL}
-        -
-          event_source: TRIGGERS
+        - event_source: TRIGGERS
           operation_mode: RECOVERY
           subject: 'Resolved: {EVENT.NAME}'
           message: |
@@ -160,8 +142,7 @@ zabbix_export:
             Severity: {EVENT.SEVERITY}
             Original problem ID: {EVENT.ID}
             {TRIGGER.URL}
-        -
-          event_source: TRIGGERS
+        - event_source: TRIGGERS
           operation_mode: UPDATE
           subject: 'Updated problem: {EVENT.NAME}'
           message: |
@@ -169,8 +150,7 @@ zabbix_export:
             {EVENT.UPDATE.MESSAGE}
             
             Current problem status is {EVENT.STATUS}, acknowledged: {EVENT.ACK.STATUS}.
-        -
-          event_source: DISCOVERY
+        - event_source: DISCOVERY
           operation_mode: PROBLEM
           subject: 'Discovery: {DISCOVERY.DEVICE.STATUS} {DISCOVERY.DEVICE.IPADDRESS}'
           message: |
@@ -185,8 +165,7 @@ zabbix_export:
             Device service port: {DISCOVERY.SERVICE.PORT}
             Device service status: {DISCOVERY.SERVICE.STATUS}
             Device service uptime: {DISCOVERY.SERVICE.UPTIME}
-        -
-          event_source: AUTOREGISTRATION
+        - event_source: AUTOREGISTRATION
           operation_mode: PROBLEM
           subject: 'Autoregistration: {HOST.HOST}'
           message: |

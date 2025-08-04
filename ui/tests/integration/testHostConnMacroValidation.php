@@ -768,23 +768,6 @@ class testHostConnMacroValidation extends CIntegrationTest {
 	}
 
 	/**
-	 * Test injection via running an action operation for discovery.
-	 *
-	 * @required-components server, agent
-	 * @configurationDataProvider defaultConfigurationProvider
-	 */
-	public function testHostConnMacroValidation_testInvalidMacroDruleAction() {
-		CDataHelper::call('host.delete', [self::$hostid]);
-		$this->reloadConfigurationCache(self::COMPONENT_SERVER);
-
-		$response = $this->callUntilDataIsPresent('alert.get', [
-			'actionids' => [self::$trigger_actionid_neg]
-		], 30, 2);
-		$this->assertArrayHasKey(0, $response['result']);
-		$this->assertEquals("Invalid macro '{HOST.CONN}' value", $response['result'][0]['error']);
-	}
-
-	/**
 	 * Delete all created data after test.
 	 */
 	public static function clearData(): void {

@@ -39,7 +39,10 @@ class CControllerRegExDelete extends CController {
 
 		$result = API::Regexp()->delete($regexids);
 
-		$response = new CControllerResponseRedirect((new CUrl('zabbix.php'))->setArgument('action', 'regex.list'));
+		$response = new CControllerResponseRedirect(
+			(new CUrl('zabbix.php'))->setArgument('action', 'regex.list')
+		);
+
 		if ($result) {
 			$response->setFormData(['uncheck' => '1']);
 			CMessageHelper::setSuccessTitle(_n('Regular expression deleted', 'Regular expressions deleted',

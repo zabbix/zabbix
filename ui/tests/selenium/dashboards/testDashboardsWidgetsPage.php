@@ -14,7 +14,7 @@
 **/
 
 
-require_once dirname(__FILE__) . '/../../include/CWebTest.php';
+require_once __DIR__ . '/../../include/CWebTest.php';
 
 /**
  * @backup dashboard, profiles
@@ -138,6 +138,7 @@ class testDashboardsWidgetsPage extends CWebTest {
 		$widget = $dashboard->getWidget('Problem hosts');
 		// Check refresh interval of widget.
 		$this->assertEquals('1 minute', $widget->getRefreshInterval());
+		CPopupMenuElement::find()->one()->close();
 
 		// Get widget content as table.
 		$table = $widget->getContent()->asTable();

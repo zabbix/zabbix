@@ -278,4 +278,76 @@ in:
   key: 'key[[a]"b"]'
 out:
   return: 'FAIL'
+---
+test case: valid key, single parameter with unquoted string containing trailing backslash
+in:
+  key: 'key[c:\]'
+out:
+  expected_key: 'key[c:\]'
+  return: 'SUCCEED'
+---
+test case: valid key, single parameter with unquoted macro containing trailing backslash
+in:
+  key: 'key[{#LLDMACRO}]'
+  macro:
+    name: '{#LLDMACRO}'
+    value: c:\
+out:
+  expected_key: 'key[c:\]'
+  return: 'SUCCEED'
+---
+test case: valid key, single parameter with unquoted macro containing two trailing backslashes
+in:
+  key: 'key[{#LLDMACRO}]'
+  macro:
+    name: '{#LLDMACRO}'
+    value: c:\\
+out:
+  expected_key: 'key[c:\\]'
+  return: 'SUCCEED'
+---
+test case: invalid key, single parameter with quoted string containing trailing backslash
+in:
+  key: 'key["c:\"]'
+out:
+  return: 'FAIL'
+---
+test case: valid key, single parameter with quoted macro containing trailing backslash
+in:
+  key: 'key["{#LLDMACRO}"]'
+  macro:
+    name: '{#LLDMACRO}'
+    value: c:\
+out:
+  expected_key: 'key[c:\]'
+  return: 'SUCCEED'
+---
+test case: valid key, single parameter with quoted macro containing two trailing backslashes
+in:
+  key: 'key["{#LLDMACRO}"]'
+  macro:
+    name: '{#LLDMACRO}'
+    value: c:\\
+out:
+  expected_key: 'key[c:\\]'
+  return: 'SUCCEED'
+---
+test case: valid key, single parameter with quoted macro without trailing backslash
+in:
+  key: 'key["{#LLDMACRO}"]'
+  macro:
+    name: '{#LLDMACRO}'
+    value: 'c:'
+out:
+  expected_key: 'key["c:"]'
+  return: 'SUCCEED'
+---
+test case: invalid key, single parameter with quoted macro containing comma and trailing backslash
+in:
+  key: 'key["{#LLDMACRO}"]'
+  macro:
+    name: '{#LLDMACRO}'
+    value: a,c:\
+out:
+  return: 'FAIL'
 ...

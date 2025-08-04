@@ -4,8 +4,8 @@ msgstr ""
 "Project-Id-Version: Zabbix 6.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2023-10-19 13:48+0300\n"
-"PO-Revision-Date: 2024-12-03 09:03+0000\n"
-"Last-Translator: Mike <mmartin@cyres.fr>\n"
+"PO-Revision-Date: 2025-07-30 18:27+0000\n"
+"Last-Translator: ERIC <eric78.zabbix@orange.fr>\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
 "Language: fr\n"
 "MIME-Version: 1.0\n"
@@ -1288,7 +1288,7 @@ msgstr "Tous"
 #: app/views/mediatype.list.php:79 app/views/mediatype.list.php:81
 #: app/views/mediatype.list.php:90 app/views/popup.operation.edit.php:160
 msgid "All available"
-msgstr ""
+msgstr "Tous disponibles"
 
 #: app/views/monitoring.dashboard.view.php:189
 msgid "All dashboards"
@@ -2683,12 +2683,22 @@ msgstr "Impossible de supprimer la méthode d'authentification multi-facteur par
 msgid "Cannot delete default user directory."
 msgstr "Impossible de supprimer l'annuaire des utilisateurs par défaut."
 
+#: include/classes/api/services/CDRule.php:773
+#, c-format
+msgid "Cannot delete discovery check \"%1$s\" of discovery rule \"%2$s\": %3$s."
+msgstr "Impossible de supprimer la vérification de découverte \"%1$s\" de la règle de découverte \"%2$s\": %3$s."
+
 #: app/controllers/CControllerDiscoveryDelete.php:68 host_discovery.php:390
 #: host_discovery.php:597
 msgid "Cannot delete discovery rule"
 msgid_plural "Cannot delete discovery rules"
 msgstr[0] "Impossible de supprimer la règle de découverte"
 msgstr[1] "Impossible de supprimer les règles de découverte"
+
+#: include/classes/api/services/CDRule.php:980
+#, c-format
+msgid "Cannot delete discovery rule \"%1$s\": %2$s."
+msgstr "Impossible de supprimer la règle de découverte \"%1$s\" : %2$s."
 
 #: app/controllers/CControllerCorrelationDelete.php:68
 msgid "Cannot delete event correlation"
@@ -2714,6 +2724,11 @@ msgid_plural "Cannot delete hosts"
 msgstr[0] "Impossible de supprimer l'hôte"
 msgstr[1] "Impossible de supprimer les hôtes"
 
+#: include/classes/api/services/CHost.php:1636
+#, c-format
+msgid "Cannot delete host \"%1$s\": %2$s."
+msgstr "Impossible de supprimer l'hôte \"%1$s\" : %2$s."
+
 #: include/classes/api/services/CHost.php:1461
 #, c-format
 msgid "Cannot delete host %1$s because maintenance \"%2$s\" must contain at least one host or host group."
@@ -2726,6 +2741,11 @@ msgid "Cannot delete host group"
 msgid_plural "Cannot delete host groups"
 msgstr[0] "Impossible de supprimer le groupe d'hôtes"
 msgstr[1] "Impossible de supprimer les groupes d'hôtes"
+
+#: include/classes/api/services/CHostGroup.php:769
+#, c-format
+msgid "Cannot delete host group \"%1$s\": %2$s."
+msgstr "Impossible de supprimer le groupe d'hôtes \"%1$s\" : %2$s."
 
 #: include/classes/api/services/CHostGroup.php:858
 #, c-format
@@ -2869,6 +2889,11 @@ msgid_plural "Cannot delete templates"
 msgstr[0] "Impossible de supprimer le modèle"
 msgstr[1] "Impossible de supprimer les modèles"
 
+#: include/classes/api/services/CTemplate.php:809
+#, c-format
+msgid "Cannot delete template \"%1$s\": %2$s."
+msgstr "Impossible de supprimer le modèle \"%1$s\" : %2$s."
+
 #: app/controllers/CControllerTemplateGroupDelete.php:75
 msgid "Cannot delete template group"
 msgid_plural "Cannot delete template groups"
@@ -2904,6 +2929,11 @@ msgid_plural "Cannot delete triggers"
 msgstr[0] "Impossible de supprimer le déclencheur"
 msgstr[1] "Impossible de supprimer les déclencheurs"
 
+#: include/classes/api/managers/CTriggerManager.php:126
+#, c-format
+msgid "Cannot delete trigger \"%1$s\": %2$s."
+msgstr "Impossible de supprimer le déclencheur \"%1$s\" : %2$s."
+
 #: app/controllers/CControllerTriggerPrototypeDelete.php:72
 msgid "Cannot delete trigger prototype"
 msgid_plural "Cannot delete trigger prototypes"
@@ -2930,12 +2960,12 @@ msgstr[1] "Impossible de supprimer les groupes d'utilisateurs"
 #: include/classes/api/services/CUserGroup.php:1340
 #, c-format
 msgid "Cannot delete user group \"%1$s\", because it is used by LDAP userdirectory \"%2$s\"."
-msgstr ""
+msgstr "Impossible de supprimer le groupe d'utilisateur \"%1$s\", car il est utilisé par  le provisionnement LDAP \"%2$s\"."
 
 #: include/classes/api/services/CUserGroup.php:1335
 #, c-format
 msgid "Cannot delete user group \"%1$s\", because it is used by SAML userdirectory."
-msgstr ""
+msgstr "Impossible de supprimer le groupe d'utilisateur \"%1$s\", car il est utilisé par un userdirectory SAML."
 
 #: include/classes/api/services/CUserGroup.php:1397
 #, c-format
@@ -5911,6 +5941,11 @@ msgstr "Chiffrement TLS de la base de données"
 msgid "Database TLS key file"
 msgstr "Fichier de clé TLS de la base de données"
 
+#: include/classes/api/clients/CLocalApiClient.php:133
+#: include/classes/api/clients/CLocalApiClient.php:147
+msgid "Database error occurred."
+msgstr "Une erreur de base de données s'est produite."
+
 #: app/partials/administration.system.info.php:130
 msgid "Database history tables use primary key"
 msgstr "Les tables d'historique de la base de données utilisent la clé primaire"
@@ -6607,6 +6642,22 @@ msgstr "Supprimer le scénario web ?"
 msgid "Deleted"
 msgstr "Supprimé"
 
+#: include/actions.inc.php:143
+msgid "Deleted host"
+msgstr "Hôte supprimé"
+
+#: include/actions.inc.php:125
+msgid "Deleted host group"
+msgstr "Groupe d'hôtes supprimé"
+
+#: include/actions.inc.php:710
+msgid "Deleted host group(s)"
+msgstr "Groupe(s) d'hôtes supprimé(s)"
+
+#: include/actions.inc.php:134
+msgid "Deleted trigger"
+msgstr "Déclencheur supprimé"
+
 #: app/views/administration.regex.edit.php:54
 msgid "Delimiter"
 msgstr "Délimiteur"
@@ -7093,6 +7144,10 @@ msgstr "Objet de découverte"
 msgid "Discovery of VMware clusters, \"url\" - VMware service URL. Returns JSON"
 msgstr "Découverte des clusters VMware, \"url\" - URL du service VMware. Retourne un JSON"
 
+#: include/classes/data/CItemData.php:1931
+msgid "Discovery of VMware datastores, \"url\" - VMware service URL, \"filter_uuid\" - one hv uuid or vm uuid (empty by default). Returns JSON"
+msgstr "Découverte des datastores VMware, « url » : URL du service VMware, « filter_uuid » : UUID HV ou VM (vide par défaut). Retourne un JSON"
+
 #: include/classes/data/CItemData.php:1799
 msgid "Discovery of VMware datastores, \"url\" - VMware service URL. Returns JSON"
 msgstr "Découverte des datastores VMware, \"url\" - URL du service VMware. Retourne un JSON"
@@ -7220,7 +7275,7 @@ msgstr "Afficher les déclencheurs OK pendant"
 
 #: app/views/mediatype.list.php:75
 msgid "Display actions"
-msgstr ""
+msgstr "Afficher les actions"
 
 #: app/partials/monitoring.latest.view.html.php:309
 msgid "Display graph"
@@ -7232,7 +7287,7 @@ msgstr "Afficher l'heure locale"
 
 #: widgets/itemhistory/views/column.edit.php:240
 msgid "Display log time"
-msgstr ""
+msgstr "Afficher l'heure du journal"
 
 #: widgets/svggraph/includes/WidgetForm.php:364
 msgid "Display min/avg/max"
@@ -8557,7 +8612,7 @@ msgstr "Filtre"
 
 #: app/views/mediatype.list.php:76
 msgid "Filter actions by the scope of media type usage:"
-msgstr ""
+msgstr "Filtrer les actions en fonction de l'étendue de l'utilisation du type de média :"
 
 #: app/views/js/popup.tabfilter.edit.js.php:63
 msgid "Filter deleted"
@@ -9400,7 +9455,7 @@ msgstr "Fonctions d'historique"
 
 #: app/views/administration.housekeeping.edit.php:218
 msgid "History, trends and audit log compression"
-msgstr ""
+msgstr "Historique, tendances et compression des journaux d'audit"
 
 #: include/classes/html/CTabFilter.php:167
 msgid "Home"
@@ -13302,7 +13357,7 @@ msgstr "Le type de média \"%1$s\" existe déjà."
 #: include/classes/api/services/CMediatype.php:927
 #, c-format
 msgid "Media type \"%1$s\" is used by action \"%2$s\"."
-msgstr ""
+msgstr "Le type de média « %1$s » est utilisé par l'action « %2$s »."
 
 #: app/controllers/CControllerMediatypeCreate.php:187
 msgid "Media type added"
@@ -17770,6 +17825,11 @@ msgstr "Exécutez le script \"%1$s\" sur le serveur Zabbix"
 msgid "Run script \"%1$s\" on current host"
 msgstr "Exécuter le script \"%1$s\" sur l'hôte actuel"
 
+#: include/actions.inc.php:601
+#, c-format
+msgid "Run script \"%1$s\" on deleted object(s)"
+msgstr "Exécuter le script \"%1$s\" sur le(s) objet(s) supprimé(s)"
+
 #: include/actions.inc.php:622
 #, c-format
 msgid "Run script \"%1$s\" on host groups"
@@ -18504,7 +18564,7 @@ msgstr "Envoyer à l'arrière"
 
 #: app/views/popup.operation.edit.php:189
 msgid "Send to media type"
-msgstr ""
+msgstr "Envoyer au type de média"
 
 #: app/views/popup.operation.edit.php:108
 msgid "Send to user groups"
@@ -19262,7 +19322,7 @@ msgstr "Espagnol (es_ES)"
 
 #: app/views/mediatype.list.php:83 app/views/mediatype.list.php:91
 msgid "Specific"
-msgstr ""
+msgstr "Spécifique"
 
 #: include/classes/helpers/CRoleHelper.php:199
 msgid "Specified role was not found."
@@ -19386,6 +19446,10 @@ msgstr "Statistiques et disponibilité du cache en écriture Zabbix. Cache - une
 #: include/classes/data/CItemData.php:2848
 msgid "Statistics and availability of proxy memory buffer. Mode (modes: pfree, free, total, used, pused)."
 msgstr "Statistiques et disponibilité de la mémoire tampon du proxy. Mode (modes : pfree, free, total, used, pused)."
+
+#: include/classes/data/CItemData.php:2854
+msgid "Statistics of values received by the preprocessing manager."
+msgstr "Statistiques des valeurs reçues par le gestionnaire de prétraitement."
 
 #: app/controllers/CControllerPopupGeneric.php:237
 #: app/controllers/CControllerPopupGeneric.php:251
@@ -20369,6 +20433,10 @@ msgstr "Le nombre de processus. Retourne un entier"
 msgid "The parameter \"%1$s\" is missing from the user attributes."
 msgstr "Le paramètre \"%1$s\" est absent des attributs de l'utilisateur."
 
+#: app/views/popup.ldap.edit.php:101
+msgid "The previous password was cleared due to a host change. Please enter the new password."
+msgstr "Le mot de passe précédent a été supprimé suite à un changement d'hébergeur. Veuillez saisir le nouveau mot de passe."
+
 #: include/classes/core/CJsonRpc.php:206
 msgid "The received JSON is not a valid JSON-RPC request."
 msgstr "Le JSON reçu n'est pas une requête JSON-RPC valide."
@@ -20410,6 +20478,14 @@ msgstr "Thème"
 #: app/views/mediatype.edit.php:189 app/views/mediatype.test.edit.php:48
 msgid "These parameters will be passed to the script as command-line arguments in the specified order."
 msgstr "Ces paramètres seront transmis au script en tant qu'arguments de ligne de commande dans l'ordre spécifié."
+
+#: app/views/action.list.php:156
+msgid "This action has conditions or operations referencing deleted object(s)."
+msgstr "Cette action comporte des conditions ou des opérations référençant des objets supprimés."
+
+#: app/views/action.list.php:151
+msgid "This action has missing conditions or operations due to previously deleted object(s)."
+msgstr "Cette action comporte des conditions ou des opérations manquantes en raison d'objets précédemment supprimés."
 
 #: app/controllers/CControllerDiscoveryEdit.php:175
 #, c-format
@@ -20463,7 +20539,7 @@ msgstr "Ce paramètre affichera l'heure locale au lieu de l'horodatage. \"Affich
 
 #: widgets/itemhistory/views/column.edit.php:241
 msgid "This setting will display log time instead of item's timestamp. \"Show timestamp\" must also be checked in the advanced configuration."
-msgstr ""
+msgstr "Ce paramètre affichera l'heure du journal au lieu de l'horodatage de l'élément. L'option « Afficher l'horodatage » doit également être cochée dans la configuration avancée."
 
 #: include/views/configuration.item.edit.php:129
 #: include/views/configuration.item.prototype.edit.php:114
@@ -22662,7 +22738,7 @@ msgstr "État d'alimentation de la machine virtuelle VMware, \"url\" - URL du se
 
 #: include/classes/data/CItemData.php:2490
 msgid "VMware virtual machine private memory size, \"url\" - VMware service URL, \"uuid\" - VMware virtual machine global unique identifier"
-msgstr ""
+msgstr "Taille de la mémoire privée de la machine virtuelle VMware, \"url\" - URL du service VMware, \"uuid\" - Identifiant global unique de la machine virtuelle VMware"
 
 #: include/classes/data/CItemData.php:2359
 msgid "VMware virtual machine private memory size, \"url\" - VMware service URL, \"uuid\" - VMware virtual machine global unique identifierr"
@@ -23911,6 +23987,41 @@ msgstr "abs() - Valeur absolue"
 msgid "acos() - The arccosine of a value as an angle, expressed in radians"
 msgstr "acos() - L'arccosinus d'une valeur sous forme d'angle, exprimé en radians"
 
+#: include/classes/api/services/CDRule.php:774
+#, c-format
+msgid "action \"%1$s\" uses this discovery check"
+msgstr "l'action \"%1$s\" utilise cette vérification de découverte"
+
+#: include/classes/api/services/CDRule.php:981
+#, c-format
+msgid "action \"%1$s\" uses this discovery rule"
+msgstr "l'action \"%1$s\" utilise cette règle de découverte"
+
+#: include/classes/api/services/CHost.php:1637
+#, c-format
+msgid "action \"%1$s\" uses this host"
+msgstr "l'action \"%1$s\" utilise cet hôte"
+
+#: include/classes/api/services/CHostGroup.php:770
+#, c-format
+msgid "action \"%1$s\" uses this host group"
+msgstr "l'action \"%1$s\" utilise ce groupe d'hôtes"
+
+#: include/classes/api/services/CService.php:487
+#, c-format
+msgid "action \"%1$s\" uses this service"
+msgstr "l'action \"%1$s\" utilise ce service"
+
+#: include/classes/api/services/CTemplate.php:810
+#, c-format
+msgid "action \"%1$s\" uses this template"
+msgstr "l'action \"%1$s\" utilise ce modèle"
+
+#: include/classes/api/managers/CTriggerManager.php:127
+#, c-format
+msgid "action \"%1$s\" uses this trigger"
+msgstr "l'action \"%1$s\" utilise ce déclencheur"
+
 #: app/partials/monitoring.charts.subfilter.php:182
 #: app/partials/monitoring.latest.subfilter.php:186 include/forms.inc.php:144
 msgid "affects only filtered data"
@@ -24567,15 +24678,15 @@ msgstr "la règle de découverte \"%1$s\" sur l'hôte \"%2$s\" n'est pas surveil
 
 #: app/views/mediatype.list.php:78
 msgid "display all actions"
-msgstr ""
+msgstr "afficher toutes les actions"
 
 #: app/views/mediatype.list.php:80
 msgid "display only actions where All available media types are used in action operation"
-msgstr ""
+msgstr "afficher uniquement les actions où Tous les types de médias disponibles sont utilisés dans l'opération d'action"
 
 #: app/views/mediatype.list.php:84
 msgid "display only actions where specific media type is used in action operation"
-msgstr ""
+msgstr "afficher uniquement les actions où un type de média spécifique est utilisé dans l'opération d'action"
 
 #: app/views/popup.lldoperation.php:65 include/actions.inc.php:27
 #: include/classes/helpers/CCorrelationHelper.php:37

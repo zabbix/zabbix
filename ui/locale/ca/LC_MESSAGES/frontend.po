@@ -4,7 +4,7 @@ msgstr ""
 "Project-Id-Version: Zabbix 6.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2023-10-19 13:48+0300\n"
-"PO-Revision-Date: 2025-01-17 22:25+0000\n"
+"PO-Revision-Date: 2025-05-01 18:38+0000\n"
 "Last-Translator: Xevi Noè i Nogueiras <xevi.noe@gmail.com>\n"
 "Language-Team: none\n"
 "Language: ca\n"
@@ -2682,12 +2682,22 @@ msgstr "No es pot pas esborrar el mètode MFA predeterminat."
 msgid "Cannot delete default user directory."
 msgstr "No es pot pas esborrar el directori d'usuaris per defecte."
 
+#: include/classes/api/services/CDRule.php:773
+#, c-format
+msgid "Cannot delete discovery check \"%1$s\" of discovery rule \"%2$s\": %3$s."
+msgstr "No es pot esborrar la comprovació de descoberta \"%1$s\" de la regla de descoberta \"%2$s\": %3$s."
+
 #: app/controllers/CControllerDiscoveryDelete.php:68 host_discovery.php:390
 #: host_discovery.php:597
 msgid "Cannot delete discovery rule"
 msgid_plural "Cannot delete discovery rules"
 msgstr[0] "No es pot pas esborrar la regla de descoberta"
 msgstr[1] "No es poden pas esborrar les regles de descoberta"
+
+#: include/classes/api/services/CDRule.php:980
+#, c-format
+msgid "Cannot delete discovery rule \"%1$s\": %2$s."
+msgstr "No es pot pas esborrar la regla de descoberta \"%1$s\": %2$s."
 
 #: app/controllers/CControllerCorrelationDelete.php:68
 msgid "Cannot delete event correlation"
@@ -2713,6 +2723,11 @@ msgid_plural "Cannot delete hosts"
 msgstr[0] "No es pot esborrar l'equip"
 msgstr[1] "No es poden pas esborrar els equips"
 
+#: include/classes/api/services/CHost.php:1636
+#, c-format
+msgid "Cannot delete host \"%1$s\": %2$s."
+msgstr "No es pot pas esborrar l'equip \"%1$s\": %2$s."
+
 #: include/classes/api/services/CHost.php:1461
 #, c-format
 msgid "Cannot delete host %1$s because maintenance \"%2$s\" must contain at least one host or host group."
@@ -2725,6 +2740,11 @@ msgid "Cannot delete host group"
 msgid_plural "Cannot delete host groups"
 msgstr[0] "No es pot pas esborrar el grup d'equips"
 msgstr[1] "No es poden pas esborrar els grups d'equips"
+
+#: include/classes/api/services/CHostGroup.php:769
+#, c-format
+msgid "Cannot delete host group \"%1$s\": %2$s."
+msgstr "No es pot pas esborrar el grup d'equips \"%1$s\": %2$s."
 
 #: include/classes/api/services/CHostGroup.php:858
 #, c-format
@@ -2809,8 +2829,8 @@ msgstr "No es poden pas esborrar els servidors intermediaris"
 #: app/controllers/CControllerProxyDelete.php:79
 msgid "Cannot delete proxy"
 msgid_plural "Cannot delete proxies"
-msgstr[0] "No es pot pas esborrar el servidor intermediari"
-msgstr[1] "No es poden pas esborrar els servidors intermediaris"
+msgstr[0] "No es pot esborrar el servidor intermediari"
+msgstr[1] "No es poden esborrar els servidors intermediaris"
 
 #: app/controllers/CControllerProxyGroupDelete.php:78
 msgid "Cannot delete proxy group"
@@ -2820,7 +2840,7 @@ msgstr[1] "No es poden pas esborrar els grups de proxys"
 
 #: app/controllers/CControllerProxyGroupDelete.php:39
 msgid "Cannot delete proxy groups"
-msgstr "No es poden pas esborrar els grups de proxys"
+msgstr "No es poden esborrar els grups de proxys"
 
 #: include/classes/api/services/CRole.php:362
 #, c-format
@@ -2868,6 +2888,11 @@ msgid_plural "Cannot delete templates"
 msgstr[0] "No es pot pas esborrar la plantilla"
 msgstr[1] "No es poden pas esborrar les plantilles"
 
+#: include/classes/api/services/CTemplate.php:809
+#, c-format
+msgid "Cannot delete template \"%1$s\": %2$s."
+msgstr "No es pot pas esborrar la plantilla \"%1$s\": %2$s."
+
 #: app/controllers/CControllerTemplateGroupDelete.php:75
 msgid "Cannot delete template group"
 msgid_plural "Cannot delete template groups"
@@ -2902,6 +2927,11 @@ msgid "Cannot delete trigger"
 msgid_plural "Cannot delete triggers"
 msgstr[0] "No es pot pas esborrar el trigger"
 msgstr[1] "No es poden pas esborrar els triggers"
+
+#: include/classes/api/managers/CTriggerManager.php:126
+#, c-format
+msgid "Cannot delete trigger \"%1$s\": %2$s."
+msgstr "No es pot pas esborrar el trigger \"%1$s\": %2$s."
 
 #: app/controllers/CControllerTriggerPrototypeDelete.php:72
 msgid "Cannot delete trigger prototype"
@@ -3989,7 +4019,7 @@ msgstr "No es pot pas actualitzar l'autenticació"
 #: app/controllers/CControllerTrigDisplayUpdate.php:59
 #: app/controllers/CControllerTrigDisplayUpdate.php:111
 msgid "Cannot update configuration"
-msgstr "No es pot pas actualitzar la configuració"
+msgstr "No es pot actualitzar la configuració"
 
 #: app/controllers/CControllerConnectorUpdate.php:83
 #: app/controllers/CControllerConnectorUpdate.php:157
@@ -5910,6 +5940,11 @@ msgstr "Xifratge TLS de bases de dades"
 msgid "Database TLS key file"
 msgstr "Fitxer de claus TLS de la base de dades"
 
+#: include/classes/api/clients/CLocalApiClient.php:133
+#: include/classes/api/clients/CLocalApiClient.php:147
+msgid "Database error occurred."
+msgstr "S'ha produït un error de base de dades."
+
 #: app/partials/administration.system.info.php:130
 msgid "Database history tables use primary key"
 msgstr "Les taules d'historial de la bases de dades fan ús de clau primària"
@@ -6606,6 +6641,22 @@ msgstr "Vols esborrar l'escenari web?"
 msgid "Deleted"
 msgstr "Esborrat"
 
+#: include/actions.inc.php:143
+msgid "Deleted host"
+msgstr "Equip esborrat"
+
+#: include/actions.inc.php:125
+msgid "Deleted host group"
+msgstr "Grup d'equips esborrat"
+
+#: include/actions.inc.php:710
+msgid "Deleted host group(s)"
+msgstr "Grup(s) d'equips esborrat(s)"
+
+#: include/actions.inc.php:134
+msgid "Deleted trigger"
+msgstr "Trigger esborrat"
+
 #: app/views/administration.regex.edit.php:54
 msgid "Delimiter"
 msgstr "Delimitador"
@@ -7091,6 +7142,10 @@ msgstr "Objecte de descobriment"
 #: include/classes/data/CItemData.php:1764
 msgid "Discovery of VMware clusters, \"url\" - VMware service URL. Returns JSON"
 msgstr "Descoberta de clústers de VMware, \"url\" - URL del servei de VMware. Retorna un JSON"
+
+#: include/classes/data/CItemData.php:1931
+msgid "Discovery of VMware datastores, \"url\" - VMware service URL, \"filter_uuid\" - one hv uuid or vm uuid (empty by default). Returns JSON"
+msgstr "Descoberta de magatzems de dades de VMware, \"url\" - URL del servei de VMware, \"filter_uuid\" - un hv uuid o vm uuid (buit per defecte). Retorna JSON"
 
 #: include/classes/data/CItemData.php:1799
 msgid "Discovery of VMware datastores, \"url\" - VMware service URL. Returns JSON"
@@ -17048,7 +17103,7 @@ msgstr "Recarregar"
 #: app/views/administration.proxy.list.php:206
 #: app/views/popup.proxy.edit.php:334
 msgid "Refresh configuration"
-msgstr "Configuració de recàrrega"
+msgstr "Recarregar configuració"
 
 #: app/views/js/administration.proxy.list.js.php:98
 msgid "Refresh configuration of the selected proxies?"
@@ -17768,6 +17823,11 @@ msgstr "Executeu l'script \"%1$s\" al servidor Zabbix"
 #, c-format
 msgid "Run script \"%1$s\" on current host"
 msgstr "Executeu l'script \"%1$s\" a l'equip actual"
+
+#: include/actions.inc.php:601
+#, c-format
+msgid "Run script \"%1$s\" on deleted object(s)"
+msgstr "Executa l'script \"%1$s\" als objectes esborrats"
 
 #: include/actions.inc.php:622
 #, c-format
@@ -19386,6 +19446,10 @@ msgstr "Estadístiques i disponibilitat de la memòria cau d'escriptura de Zabbi
 msgid "Statistics and availability of proxy memory buffer. Mode (modes: pfree, free, total, used, pused)."
 msgstr "Estadístiques i disponibilitat del buffer de memòria proxy. Mode (modes: pfree, free, total, used, pused)."
 
+#: include/classes/data/CItemData.php:2854
+msgid "Statistics of values received by the preprocessing manager."
+msgstr "Estadístiques dels valors rebuts pel gestor de preprocessament."
+
 #: app/controllers/CControllerPopupGeneric.php:237
 #: app/controllers/CControllerPopupGeneric.php:251
 #: app/controllers/CControllerPopupGeneric.php:265
@@ -20368,6 +20432,10 @@ msgstr "El nombre de processos. Retorna un nombre enter"
 msgid "The parameter \"%1$s\" is missing from the user attributes."
 msgstr "Hi manca el paràmetre \"%1$s\" als atributs d'usuari."
 
+#: app/views/popup.ldap.edit.php:101
+msgid "The previous password was cleared due to a host change. Please enter the new password."
+msgstr ""
+
 #: include/classes/core/CJsonRpc.php:206
 msgid "The received JSON is not a valid JSON-RPC request."
 msgstr "El JSON rebut no és pas una petició JSON-RPC vàlida."
@@ -20409,6 +20477,14 @@ msgstr "Tema"
 #: app/views/mediatype.edit.php:189 app/views/mediatype.test.edit.php:48
 msgid "These parameters will be passed to the script as command-line arguments in the specified order."
 msgstr "Els paràmetre es passaran a l'script com arguments de línia de comandes en l'ordre donat."
+
+#: app/views/action.list.php:156
+msgid "This action has conditions or operations referencing deleted object(s)."
+msgstr "Aquesta acció té condicions o operacions que fan referència a objectes esborrats."
+
+#: app/views/action.list.php:151
+msgid "This action has missing conditions or operations due to previously deleted object(s)."
+msgstr "Aquesta acció té condicions o operacions que manquen a causa d'objectes esborrats anteriorment."
 
 #: app/controllers/CControllerDiscoveryEdit.php:175
 #, c-format
@@ -23504,13 +23580,13 @@ msgstr "YAML"
 #: app/views/slareport.list.php:86 widgets/slareport/views/widget.edit.php:42
 #: widgets/slareport/views/widget.edit.php:43
 msgid "YYYY-MM-DD"
-msgstr "AAAA-MM-DD"
+msgstr "DD/MM/AAAA"
 
 #: app/views/maintenance.edit.php:148 app/views/maintenance.edit.php:158
 #: app/views/maintenance.timeperiod.edit.php:184
 #: app/views/popup.sla.excludeddowntime.edit.php:53
 msgid "YYYY-MM-DD hh:mm"
-msgstr "AAAA-MM-DD hh:mm"
+msgstr "DD/MM/AAAA hh:mm"
 
 #: app/views/popup.token.edit.php:103
 #: widgets/actionlog/views/widget.edit.php:48
@@ -23526,7 +23602,7 @@ msgstr "AAAA-MM-DD hh:mm"
 #: widgets/toptriggers/views/widget.edit.php:57
 #: widgets/toptriggers/views/widget.edit.php:58
 msgid "YYYY-MM-DD hh:mm:ss"
-msgstr "AAAA-MM-DD hh:mm:ss"
+msgstr "DD/MM/AAAA hh:mm:ss"
 
 #: include/classes/import/validators/C20XmlValidator.php:802
 #: include/classes/import/validators/C30XmlValidator.php:865
@@ -23542,7 +23618,7 @@ msgstr "AAAA-MM-DD hh:mm:ss"
 #: include/classes/import/validators/C62XmlValidator.php:2054
 msgctxt "XML date and time format"
 msgid "YYYY-MM-DDThh:mm:ssZ"
-msgstr "AAAA-MM-DDThh:mm:ssZ"
+msgstr "DD/MM/AAAAThh:mm:ssZ"
 
 #: app/controllers/CControllerPopupTriggerExpr.php:122
 #: include/classes/helpers/CSlaHelper.php:65 report4.php:118 report4.php:153
@@ -23731,7 +23807,7 @@ msgstr "El servidor Zabbix no s'està executant: és possible que la informació
 
 #: app/partials/administration.system.info.php:34
 msgid "Zabbix server is running"
-msgstr "El servidor de Zabbix és executant-se"
+msgstr "Servidor Zabbix en marxa"
 
 #: include/classes/setup/CSetupWizard.php:711
 #: include/classes/setup/CSetupWizard.php:870
@@ -23909,6 +23985,41 @@ msgstr "abs() - Valor absolut"
 #: app/controllers/CControllerPopupTriggerExpr.php:339
 msgid "acos() - The arccosine of a value as an angle, expressed in radians"
 msgstr "acos() - L'arccosinus d'un valor com a angle, expressat en radians"
+
+#: include/classes/api/services/CDRule.php:774
+#, c-format
+msgid "action \"%1$s\" uses this discovery check"
+msgstr "l'acció \"%1$s\" empra aquesta comprovació de descoberta"
+
+#: include/classes/api/services/CDRule.php:981
+#, c-format
+msgid "action \"%1$s\" uses this discovery rule"
+msgstr "l'acció \"%1$s\" empra aquesta regla de descoberta"
+
+#: include/classes/api/services/CHost.php:1637
+#, c-format
+msgid "action \"%1$s\" uses this host"
+msgstr "l'acció \"%1$s\" empra aquest equip"
+
+#: include/classes/api/services/CHostGroup.php:770
+#, c-format
+msgid "action \"%1$s\" uses this host group"
+msgstr "l'acció \"%1$s\" empra aquest grup d'equips"
+
+#: include/classes/api/services/CService.php:487
+#, c-format
+msgid "action \"%1$s\" uses this service"
+msgstr "l'acció \"%1$s\" empra aquest servei"
+
+#: include/classes/api/services/CTemplate.php:810
+#, c-format
+msgid "action \"%1$s\" uses this template"
+msgstr "l'acció \"%1$s\" empra aquesta plantilla"
+
+#: include/classes/api/managers/CTriggerManager.php:127
+#, c-format
+msgid "action \"%1$s\" uses this trigger"
+msgstr "l'acció \"%1$s\" empra aquest trigger"
 
 #: app/partials/monitoring.charts.subfilter.php:182
 #: app/partials/monitoring.latest.subfilter.php:186 include/forms.inc.php:144

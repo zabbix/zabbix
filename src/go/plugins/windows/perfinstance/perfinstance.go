@@ -47,7 +47,7 @@ func init() {
 		panic(errs.Wrap(err, "failed to register metrics"))
 	}
 
-	impl.SetCapacity(1)
+	impl.SetMaxCapacity(1)
 }
 
 // Export -

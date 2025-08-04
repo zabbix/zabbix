@@ -14,7 +14,7 @@
 **/
 
 
-require_once dirname(__FILE__).'/../common/testFormAuthentication.php';
+require_once __DIR__.'/../common/testFormAuthentication.php';
 
 /**
  * @backup config
@@ -364,7 +364,7 @@ class testUsersAuthenticationSaml extends testFormAuthentication {
 						'userdirectory_media' => [
 							[
 								'name' => '!@#$%^&*()_+-=[]{};:"|,./<>?Ž©µÆ',
-								'mediatypeid' => 10,
+								'mediatypeid' => 39,
 								'attribute' => '!@#$%^&*()_+-=[]{};:"|,./<>?Ž©µÆ'
 							]
 						]
@@ -429,7 +429,7 @@ class testUsersAuthenticationSaml extends testFormAuthentication {
 						'userdirectory_media' => [
 							[
 								'name' => 'leading.trailing',
-								'mediatypeid' => 10,
+								'mediatypeid' => 39,
 								'attribute' => 'leading.trailing'
 							]
 						]
@@ -495,7 +495,7 @@ class testUsersAuthenticationSaml extends testFormAuthentication {
 						'userdirectory_media' => [
 							[
 								'name' => '1ong_value_long_value_long_value_long_value_long_value_lon',
-								'mediatypeid' => 10,
+								'mediatypeid' => 39,
 								'attribute' => STRING_255
 							]
 						]

@@ -1,61 +1,44 @@
 zabbix_export:
   version: '7.0'
   media_types:
-    -
-      name: ServiceNow
+    - name: ServiceNow
       type: WEBHOOK
       parameters:
-        -
-          name: alert_message
+        - name: alert_message
           value: '{ALERT.MESSAGE}'
-        -
-          name: alert_subject
+        - name: alert_subject
           value: '{ALERT.SUBJECT}'
-        -
-          name: event_nseverity
+        - name: event_nseverity
           value: '{EVENT.NSEVERITY}'
-        -
-          name: event_recovery_value
+        - name: event_recovery_value
           value: '{EVENT.RECOVERY.VALUE}'
-        -
-          name: event_source
+        - name: event_source
           value: '{EVENT.SOURCE}'
-        -
-          name: event_update_status
+        - name: event_update_status
           value: '{EVENT.UPDATE.STATUS}'
-        -
-          name: event_value
+        - name: event_value
           value: '{EVENT.VALUE}'
-        -
-          name: servicenow_password
+        - name: servicenow_password
           value: '<PLACE PASSWORD HERE>'
-        -
-          name: servicenow_sys_id
+        - name: servicenow_sys_id
           value: '{EVENT.TAGS.__zbx_servicenow_sys_id}'
-        -
-          name: servicenow_url
+        - name: servicenow_url
           value: '{ALERT.SENDTO}'
-        -
-          name: servicenow_user
+        - name: servicenow_user
           value: '<PLACE USERNAME HERE>'
-        -
-          name: urgency_for_average
+        - name: urgency_for_average
           value: '2'
-        -
-          name: urgency_for_disaster
+        - name: urgency_for_disaster
           value: '1'
-        -
-          name: urgency_for_high
+        - name: urgency_for_high
           value: '2'
-        -
-          name: urgency_for_information
+        - name: urgency_for_information
           value: '3'
-        -
-          name: urgency_for_not_classified
+        - name: urgency_for_not_classified
           value: '3'
-        -
-          name: urgency_for_warning
+        - name: urgency_for_warning
           value: '3'
+      status: DISABLED
       script: |
         var ServiceNow = {
             params: {},
@@ -264,8 +247,7 @@ zabbix_export:
       event_menu_url: '{EVENT.TAGS.__zbx_servicenow_link}'
       event_menu_name: 'ServiceNow: {EVENT.TAGS.__zbx_servicenow_number}'
       message_templates:
-        -
-          event_source: TRIGGERS
+        - event_source: TRIGGERS
           operation_mode: PROBLEM
           subject: '[{EVENT.STATUS}] {EVENT.NAME}'
           message: |
@@ -276,8 +258,7 @@ zabbix_export:
             Operational data: {EVENT.OPDATA}
             Original problem ID: {EVENT.ID}
             {TRIGGER.URL}
-        -
-          event_source: TRIGGERS
+        - event_source: TRIGGERS
           operation_mode: RECOVERY
           subject: '[{EVENT.STATUS}] {EVENT.NAME}'
           message: |
@@ -287,8 +268,7 @@ zabbix_export:
             Severity: {EVENT.SEVERITY}
             Original problem ID: {EVENT.ID}
             {TRIGGER.URL}
-        -
-          event_source: TRIGGERS
+        - event_source: TRIGGERS
           operation_mode: UPDATE
           subject: '[{EVENT.STATUS}] {EVENT.NAME}'
           message: |
@@ -296,8 +276,7 @@ zabbix_export:
             {EVENT.UPDATE.MESSAGE}
             
             Current problem status is {EVENT.STATUS}, acknowledged: {EVENT.ACK.STATUS}.
-        -
-          event_source: DISCOVERY
+        - event_source: DISCOVERY
           operation_mode: PROBLEM
           subject: 'Discovery: {DISCOVERY.DEVICE.STATUS} {DISCOVERY.DEVICE.IPADDRESS}'
           message: |
@@ -312,8 +291,7 @@ zabbix_export:
             Device service port: {DISCOVERY.SERVICE.PORT}
             Device service status: {DISCOVERY.SERVICE.STATUS}
             Device service uptime: {DISCOVERY.SERVICE.UPTIME}
-        -
-          event_source: AUTOREGISTRATION
+        - event_source: AUTOREGISTRATION
           operation_mode: PROBLEM
           subject: 'Autoregistration: {HOST.HOST}'
           message: |

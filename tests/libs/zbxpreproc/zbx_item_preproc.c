@@ -95,7 +95,7 @@ static int	str_to_preproc_type(const char *str)
 	if (0 == strcmp(str, "ZBX_PREPROC_VALIDATE_NOT_SUPPORTED"))
 		return ZBX_PREPROC_VALIDATE_NOT_SUPPORTED;
 
-	fail_msg("unknow preprocessing step type: %s", str);
+	fail_msg("unknown preprocessing step type: %s", str);
 	return FAIL;
 }
 
@@ -110,7 +110,7 @@ static int	str_to_preproc_error_handler(const char *str)
 	if (0 == strcmp(str, "ZBX_PREPROC_FAIL_SET_ERROR"))
 		return ZBX_PREPROC_FAIL_SET_ERROR;
 
-	fail_msg("unknow preprocessing error handler: %s", str);
+	fail_msg("unknown preprocessing error handler: %s", str);
 	return FAIL;
 }
 
@@ -348,6 +348,7 @@ void	zbx_mock_test_entry(void **state)
 	for (i = 0; i < 4; i++)
 	{
 		zbx_variant_t	history_value_out;
+		char		*error = NULL;
 
 		zbx_variant_set_none(&history_value_out);
 
@@ -361,13 +362,15 @@ void	zbx_mock_test_entry(void **state)
 			step_cache = cache;
 
 		if (FAIL == (returned_ret = pp_execute_step(&ctx, step_cache, NULL, 0, value_type, &value, ts, &step,
-				&history_value_in, &history_value_out, &history_ts, get_zbx_config_source_ip())))
+				&history_value_in, &history_value_out, &history_ts, get_zbx_config_source_ip(),
+				&error)))
 		{
-			pp_error_on_fail(NULL, 0, &value, &step);
+			pp_error_on_fail(NULL, 0, &value, error, &step);
 
 			if (ZBX_VARIANT_ERR != value.type)
 				returned_ret = SUCCEED;
 		}
+		zbx_free(error);
 
 		if (SUCCEED != returned_ret && ZBX_VARIANT_ERR == value.type)
 		{

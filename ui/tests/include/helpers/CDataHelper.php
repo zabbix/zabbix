@@ -15,9 +15,9 @@
 
 require_once 'vendor/autoload.php';
 
-require_once dirname(__FILE__).'/../../../include/defines.inc.php';
-require_once dirname(__FILE__).'/../../../include/hosts.inc.php';
-require_once dirname(__FILE__).'/../../../include/db.inc.php';
+require_once __DIR__.'/../../../include/defines.inc.php';
+require_once __DIR__.'/../../../include/hosts.inc.php';
+require_once __DIR__.'/../../../include/db.inc.php';
 
 class CDataHelper extends CAPIHelper {
 

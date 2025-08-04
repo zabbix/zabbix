@@ -3,13 +3,13 @@
 
 ## Overview
 
-The template to monitor Kubernetes nodes that work without any external scripts.  
+The template to monitor Kubernetes nodes that work without any external scripts.
 It works without external scripts and uses the script item to make HTTP requests to the Kubernetes API.
 Install the Zabbix Helm Chart (https://git.zabbix.com/projects/ZT/repos/kubernetes-helm/browse?at=refs%2Fheads%2Frelease%2F7.0) in your Kubernetes cluster.
 
 Change the values according to the environment in the file $HOME/zabbix_values.yaml.
 
-For example: 
+For example:
 
  -  ## Enables use of **Zabbix proxy**
     enabled: false
@@ -22,7 +22,7 @@ Get the generated service account token using the command
 
 Then set it to the macro `{$KUBE.API.TOKEN}`.
 
-Set up the macros to filter the metrics of discovered nodes    
+Set up the macros to filter the metrics of discovered nodes
 
 
 ## Requirements
@@ -48,7 +48,7 @@ Get the generated service account token using the command
 
 `kubectl get secret zabbix-service-account -n monitoring -o jsonpath={.data.token} | base64 -d`
 
-Then set it to the macro `{$KUBE.API.TOKEN}`.  
+Then set it to the macro `{$KUBE.API.TOKEN}`.
 Set `{$KUBE.NODES.ENDPOINT.NAME}` with Zabbix agent's endpoint name. See `kubectl -n monitoring get ep`. Default: `zabbix-zabbix-helm-chrt-agent`.
 
 Set up the macros to filter the metrics of discovered nodes and host creation based on host prototypes:
@@ -174,7 +174,7 @@ See the Kubernetes documentation for details about labels and annotations:
 |Kubernetes nodes: Node [{#NAME}] Requests: Total CPU requests are too high||`last(/Kubernetes nodes by HTTP/kube.node.requests.cpu[{#NAME}]) / last(/Kubernetes nodes by HTTP/kube.node.allocatable.cpu[{#NAME}]) > 0.8`|Average||
 |Kubernetes nodes: Node [{#NAME}] Requests: Total memory requests are too high||`last(/Kubernetes nodes by HTTP/kube.node.requests.memory[{#NAME}]) / last(/Kubernetes nodes by HTTP/kube.node.allocatable.memory[{#NAME}]) > 0.5`|Warning|**Depends on**:<br><ul><li>Kubernetes nodes: Node [{#NAME}] Requests: Total memory requests are too high</li></ul>|
 |Kubernetes nodes: Node [{#NAME}] Requests: Total memory requests are too high||`last(/Kubernetes nodes by HTTP/kube.node.requests.memory[{#NAME}]) / last(/Kubernetes nodes by HTTP/kube.node.allocatable.memory[{#NAME}]) > 0.8`|Average||
-|Kubernetes nodes: Node [{#NAME}]: Has been restarted|<p>Uptime is less than 10 minutes.</p>|`last(/Kubernetes nodes by HTTP/kube.node.uptime[{#NAME}])<10`|Info||
+|Kubernetes nodes: Node [{#NAME}] has been restarted|<p>Uptime is less than 10 minutes.</p>|`last(/Kubernetes nodes by HTTP/kube.node.uptime[{#NAME}])<10`|Info||
 |Kubernetes nodes: Node [{#NAME}] Used: Kubelet too many pods|<p>Kubelet is running at capacity.</p>|`last(/Kubernetes nodes by HTTP/kube.node.used.pods[{#NAME}])/ last(/Kubernetes nodes by HTTP/kube.node.capacity.pods[{#NAME}]) > 0.9`|Warning||
 
 ### LLD rule Pod discovery
@@ -187,21 +187,21 @@ See the Kubernetes documentation for details about labels and annotations:
 
 |Name|Description|Type|Key and additional info|
 |----|-----------|----|-----------------------|
-|Node [{#NODE}] Pod [{#POD}]: Get data|<p>Collecting and processing cluster by node [{#NODE}] data via Kubernetes API.</p>|Dependent item|kube.pod.get[{#POD}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.Pods[?(@.name == "{#POD}")].first()`</p></li></ul>|
-|Node [{#NODE}] Pod [{#POD}] Conditions: Containers ready|<p>All containers in the Pod are ready.</p><p></p><p>https://kubernetes.io/docs/concepts/workloads/pods/pod-lifecycle/#pod-conditions</p>|Dependent item|kube.pod.conditions.containers_ready[{#POD}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.conditions[?(@.type == "ContainersReady")].status.first()`</p><p>⛔️Custom on fail: Discard value</p></li><li><p>JavaScript: `The text is too long. Please see the template.`</p></li></ul>|
-|Node [{#NODE}] Pod [{#POD}] Conditions: Initialized|<p>All init containers have started successfully.</p><p></p><p>https://kubernetes.io/docs/concepts/workloads/pods/pod-lifecycle/#pod-conditions</p>|Dependent item|kube.pod.conditions.initialized[{#POD}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.conditions[?(@.type == "Initialized")].status.first()`</p><p>⛔️Custom on fail: Discard value</p></li><li><p>JavaScript: `The text is too long. Please see the template.`</p></li></ul>|
-|Node [{#NODE}] Pod [{#POD}] Conditions: Ready|<p>The Pod is able to serve requests and should be added to the load balancing pools of all matching Services.</p><p></p><p>https://kubernetes.io/docs/concepts/workloads/pods/pod-lifecycle/#pod-conditions</p>|Dependent item|kube.pod.conditions.ready[{#POD}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.conditions[?(@.type == "Ready")].status.first()`</p><p>⛔️Custom on fail: Discard value</p></li><li><p>JavaScript: `The text is too long. Please see the template.`</p></li></ul>|
-|Node [{#NODE}] Pod [{#POD}] Conditions: Scheduled|<p>The Pod has been scheduled to a node.</p><p></p><p>https://kubernetes.io/docs/concepts/workloads/pods/pod-lifecycle/#pod-conditions</p>|Dependent item|kube.pod.conditions.scheduled[{#POD}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.conditions[?(@.type == "PodScheduled")].status.first()`</p><p>⛔️Custom on fail: Discard value</p></li><li><p>JavaScript: `The text is too long. Please see the template.`</p></li></ul>|
-|Node [{#NODE}] Pod [{#POD}] Containers: Restarts|<p>The number of times the container has been restarted, currently based on the number of dead containers that have not yet been removed. Note that this is calculated from dead containers. But those containers are subject to garbage collection.</p>|Dependent item|kube.pod.containers.restartcount[{#POD}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.containers.restartCount`</p><p>⛔️Custom on fail: Discard value</p></li></ul>|
-|Node [{#NODE}] Pod [{#POD}] Status: Phase|<p>The phase of a Pod is a simple, high-level summary of where the Pod is in its lifecycle.</p><p></p><p>https://kubernetes.io/docs/concepts/workloads/pods/pod-lifecycle#pod-phase</p>|Dependent item|kube.pod.status.phase[{#POD}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.phase`</p><p>⛔️Custom on fail: Discard value</p></li><li><p>JavaScript: `The text is too long. Please see the template.`</p></li></ul>|
-|Node [{#NODE}] Pod [{#POD}] Uptime|<p>Pod uptime.</p>|Dependent item|kube.pod.uptime[{#POD}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.startTime`</p><p>⛔️Custom on fail: Discard value</p></li><li><p>JavaScript: `return Math.floor((Date.now() - new Date(value)) / 1000);`</p></li></ul>|
+|Node [{#NODE}] Namespace [{#NAMESPACE}] Pod [{#POD}]: Get data|<p>Collecting and processing cluster by node [{#NODE}] data via Kubernetes API.</p>|Dependent item|kube.pod.get[{#NAMESPACE}/{#POD}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `The text is too long. Please see the template.`</p></li></ul>|
+|Node [{#NODE}] Namespace [{#NAMESPACE}] Pod [{#POD}] Conditions: Containers ready|<p>All containers in the Pod are ready.</p><p></p><p>https://kubernetes.io/docs/concepts/workloads/pods/pod-lifecycle/#pod-conditions</p>|Dependent item|kube.pod.conditions.containers_ready[{#NAMESPACE}/{#POD}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.conditions[?(@.type == "ContainersReady")].status.first()`</p><p>⛔️Custom on fail: Discard value</p></li><li><p>JavaScript: `The text is too long. Please see the template.`</p></li></ul>|
+|Node [{#NODE}] Namespace [{#NAMESPACE}] Pod [{#POD}] Conditions: Initialized|<p>All init containers have started successfully.</p><p></p><p>https://kubernetes.io/docs/concepts/workloads/pods/pod-lifecycle/#pod-conditions</p>|Dependent item|kube.pod.conditions.initialized[{#NAMESPACE}/{#POD}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.conditions[?(@.type == "Initialized")].status.first()`</p><p>⛔️Custom on fail: Discard value</p></li><li><p>JavaScript: `The text is too long. Please see the template.`</p></li></ul>|
+|Node [{#NODE}] Namespace [{#NAMESPACE}] Pod [{#POD}] Conditions: Ready|<p>The Pod is able to serve requests and should be added to the load balancing pools of all matching Services.</p><p></p><p>https://kubernetes.io/docs/concepts/workloads/pods/pod-lifecycle/#pod-conditions</p>|Dependent item|kube.pod.conditions.ready[{#NAMESPACE}/{#POD}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.conditions[?(@.type == "Ready")].status.first()`</p><p>⛔️Custom on fail: Discard value</p></li><li><p>JavaScript: `The text is too long. Please see the template.`</p></li></ul>|
+|Node [{#NODE}] Namespace [{#NAMESPACE}] Pod [{#POD}] Conditions: Scheduled|<p>The Pod has been scheduled to a node.</p><p></p><p>https://kubernetes.io/docs/concepts/workloads/pods/pod-lifecycle/#pod-conditions</p>|Dependent item|kube.pod.conditions.scheduled[{#NAMESPACE}/{#POD}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.conditions[?(@.type == "PodScheduled")].status.first()`</p><p>⛔️Custom on fail: Discard value</p></li><li><p>JavaScript: `The text is too long. Please see the template.`</p></li></ul>|
+|Node [{#NODE}] Namespace [{#NAMESPACE}] Pod [{#POD}] Containers: Restarts|<p>The number of times the container has been restarted, currently based on the number of dead containers that have not yet been removed. Note that this is calculated from dead containers. But those containers are subject to garbage collection.</p>|Dependent item|kube.pod.containers.restartcount[{#NAMESPACE}/{#POD}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.containers.restartCount`</p><p>⛔️Custom on fail: Discard value</p></li></ul>|
+|Node [{#NODE}] Namespace [{#NAMESPACE}] Pod [{#POD}] Status: Phase|<p>The phase of a Pod is a simple, high-level summary of where the Pod is in its lifecycle.</p><p></p><p>https://kubernetes.io/docs/concepts/workloads/pods/pod-lifecycle#pod-phase</p>|Dependent item|kube.pod.status.phase[{#NAMESPACE}/{#POD}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.phase`</p><p>⛔️Custom on fail: Discard value</p></li><li><p>JavaScript: `The text is too long. Please see the template.`</p></li></ul>|
+|Node [{#NODE}] Namespace [{#NAMESPACE}] Pod [{#POD}]: Uptime|<p>Pod uptime.</p>|Dependent item|kube.pod.uptime[{#NAMESPACE}/{#POD}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.startTime`</p><p>⛔️Custom on fail: Discard value</p></li><li><p>JavaScript: `return Math.floor((Date.now() - new Date(value)) / 1000);`</p></li></ul>|
 
 ### Trigger prototypes for Pod discovery
 
 |Name|Description|Expression|Severity|Dependencies and additional info|
 |----|-----------|----------|--------|--------------------------------|
-|Kubernetes nodes: Node [{#NODE}] Pod [{#POD}]: Pod is crash looping|<p>Containers of the pod keep restarting. This most likely indicates that the pod is in the CrashLoopBackOff state.</p>|`(last(/Kubernetes nodes by HTTP/kube.pod.containers.restartcount[{#POD}])-min(/Kubernetes nodes by HTTP/kube.pod.containers.restartcount[{#POD}],15m))>1`|Warning||
-|Kubernetes nodes: Node [{#NODE}] Pod [{#POD}] Status: Kubernetes Pod not healthy|<p>Pod has been in a non-ready state for longer than 10 minutes.</p>|`count(/Kubernetes nodes by HTTP/kube.pod.status.phase[{#POD}],10m, "regexp","^(1\|4\|5)$")>=9`|High||
+|Kubernetes nodes: Node [{#NODE}] Namespace [{#NAMESPACE}] Pod [{#POD}]: Pod is crash looping|<p>Containers of the pod keep restarting. This most likely indicates that the pod is in the CrashLoopBackOff state.</p>|`(last(/Kubernetes nodes by HTTP/kube.pod.containers.restartcount[{#NAMESPACE}/{#POD}])-min(/Kubernetes nodes by HTTP/kube.pod.containers.restartcount[{#NAMESPACE}/{#POD}],15m))>1`|Warning||
+|Kubernetes nodes: Node [{#NODE}] Namespace [{#NAMESPACE}] Pod [{#POD}] Status: Kubernetes Pod not healthy|<p>Pod has been in a non-ready state for longer than 10 minutes.</p>|`count(/Kubernetes nodes by HTTP/kube.pod.status.phase[{#NAMESPACE}/{#POD}],10m, "regexp","^(1\|4\|5)$")>=9`|High||
 
 ## Feedback
 

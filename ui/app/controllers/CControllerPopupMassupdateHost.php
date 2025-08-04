@@ -89,6 +89,10 @@ class CControllerPopupMassupdateHost extends CControllerPopupMassupdateAbstract 
 			);
 		}
 
+		if ($this->hasInput('backurl') && !CHtmlUrlValidator::validateSameSite($this->getInput('backurl'))) {
+			throw new CAccessDeniedException();
+		}
+
 		return $ret;
 	}
 
@@ -115,6 +119,8 @@ class CControllerPopupMassupdateHost extends CControllerPopupMassupdateAbstract 
 					return $tag['tag'] !== '' || $tag['value'] !== '';
 				}
 			);
+
+			$result = false;
 
 			try {
 				DBstart();
@@ -176,7 +182,9 @@ class CControllerPopupMassupdateHost extends CControllerPopupMassupdateAbstract 
 							}
 
 							if ($ins_groups) {
-								if (!$result = API::HostGroup()->create($ins_groups)) {
+								$result = API::HostGroup()->create($ins_groups);
+
+								if (!$result) {
 									throw new Exception();
 								}
 
@@ -478,14 +486,12 @@ class CControllerPopupMassupdateHost extends CControllerPopupMassupdateAbstract 
 				if (array_key_exists('valuemaps', $visible)) {
 					$this->updateValueMaps($hostids);
 				}
-
-				DBend();
 			}
 			catch (Exception $e) {
-				DBend(false);
-
 				$result = false;
 			}
+
+			$result = DBend($result);
 
 			if ($this->hasInput('backurl')) {
 				$upd_status = ($this->getInput('status', HOST_STATUS_NOT_MONITORED) == HOST_STATUS_MONITORED);
@@ -506,7 +512,7 @@ class CControllerPopupMassupdateHost extends CControllerPopupMassupdateAbstract 
 					);
 				}
 
-				$this->setResponse(new CControllerResponseRedirect($backurl->getUrl()));
+				$this->setResponse(new CControllerResponseRedirect($backurl));
 			}
 			else {
 				if ($result) {

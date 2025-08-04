@@ -69,6 +69,7 @@ $available_js = [
 	'qrcode.js' => 'vendors/qrcode/',
 	// classes
 	'component.z-bar-gauge.js' => '',
+	'component.z-vertical.js' => '',
 	'component.z-select.js' => '',
 	'class.event-hub.js' => '',
 	'class.base-component.js' => '',
@@ -478,6 +479,7 @@ if (empty($_GET['files'])) {
 		'main.js',
 		'common.js',
 		'component.z-bar-gauge.js',
+		'component.z-vertical.js',
 		'component.z-select.js',
 		'class.event-hub.js',
 		'class.base-component.js',

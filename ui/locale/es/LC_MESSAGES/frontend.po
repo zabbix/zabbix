@@ -4,7 +4,7 @@ msgstr ""
 "Project-Id-Version: Zabbix 6.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2023-10-19 13:48+0300\n"
-"PO-Revision-Date: 2025-01-05 19:27+0000\n"
+"PO-Revision-Date: 2025-07-30 21:23+0000\n"
 "Last-Translator: Vicente Salvador <vicentesalvadorcubedo@gmail.com>\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
 "Language: es\n"
@@ -2518,8 +2518,8 @@ msgstr "No se puede copiar el prototipo del gráfico \"%1$s\", porque la métric
 #: app/controllers/CControllerCopyCreate.php:161
 msgid "Cannot copy item"
 msgid_plural "Cannot copy items"
-msgstr[0] "No se pudo copiar el monitor"
-msgstr[1] "No se pudo copiar los monitores"
+msgstr[0] "No se pudo copiar la métrica"
+msgstr[1] "No se pudieron copiar las métricas"
 
 #: include/classes/api/services/CDiscoveryRule.php:3643
 #, c-format
@@ -2683,12 +2683,22 @@ msgstr "No se puede eliminar el método MFA predeterminado."
 msgid "Cannot delete default user directory."
 msgstr "No se puede borrar el directorio del usuario por defecto."
 
+#: include/classes/api/services/CDRule.php:773
+#, c-format
+msgid "Cannot delete discovery check \"%1$s\" of discovery rule \"%2$s\": %3$s."
+msgstr "No se puede eliminar la comprobación de descubrimiento \"%1$s\" de la regla de descubrimiento \"%2$s\": %3$s."
+
 #: app/controllers/CControllerDiscoveryDelete.php:68 host_discovery.php:390
 #: host_discovery.php:597
 msgid "Cannot delete discovery rule"
 msgid_plural "Cannot delete discovery rules"
 msgstr[0] "No es posible eliminar la regla de descubrimiento"
 msgstr[1] "No es posible eliminar las reglas de descubrimiento"
+
+#: include/classes/api/services/CDRule.php:980
+#, c-format
+msgid "Cannot delete discovery rule \"%1$s\": %2$s."
+msgstr "No se puede eliminar la regla de descubrimiento \"%1$s\": %2$s."
 
 #: app/controllers/CControllerCorrelationDelete.php:68
 msgid "Cannot delete event correlation"
@@ -2714,6 +2724,11 @@ msgid_plural "Cannot delete hosts"
 msgstr[0] "No se puede eliminar el equipo"
 msgstr[1] "No se pueden eliminar los equipos"
 
+#: include/classes/api/services/CHost.php:1636
+#, c-format
+msgid "Cannot delete host \"%1$s\": %2$s."
+msgstr "No se puede eliminar el equipo \"%1$s\": %2$s."
+
 #: include/classes/api/services/CHost.php:1461
 #, c-format
 msgid "Cannot delete host %1$s because maintenance \"%2$s\" must contain at least one host or host group."
@@ -2726,6 +2741,11 @@ msgid "Cannot delete host group"
 msgid_plural "Cannot delete host groups"
 msgstr[0] "No se puede eliminar el grupo de equipos"
 msgstr[1] "No se pueden eliminar los grupos de equipos"
+
+#: include/classes/api/services/CHostGroup.php:769
+#, c-format
+msgid "Cannot delete host group \"%1$s\": %2$s."
+msgstr "No se puede eliminar el grupo de equipos \"%1$s\": %2$s."
 
 #: include/classes/api/services/CHostGroup.php:858
 #, c-format
@@ -2869,6 +2889,11 @@ msgid_plural "Cannot delete templates"
 msgstr[0] "No se puede eliminar la plantilla"
 msgstr[1] "No se pueden eliminar las plantillas"
 
+#: include/classes/api/services/CTemplate.php:809
+#, c-format
+msgid "Cannot delete template \"%1$s\": %2$s."
+msgstr "No se puede eliminar la plantilla \"%1$s\": %2$s."
+
 #: app/controllers/CControllerTemplateGroupDelete.php:75
 msgid "Cannot delete template group"
 msgid_plural "Cannot delete template groups"
@@ -2903,6 +2928,11 @@ msgid "Cannot delete trigger"
 msgid_plural "Cannot delete triggers"
 msgstr[0] "No se puede eliminar el iniciador"
 msgstr[1] "No se pueden eliminar los iniciadores"
+
+#: include/classes/api/managers/CTriggerManager.php:126
+#, c-format
+msgid "Cannot delete trigger \"%1$s\": %2$s."
+msgstr "No se puede eliminar el iniciador \"%1$s\": %2$s."
 
 #: app/controllers/CControllerTriggerPrototypeDelete.php:72
 msgid "Cannot delete trigger prototype"
@@ -4831,7 +4861,7 @@ msgstr "Configuración de prototipos de ítem"
 
 #: items.php:27
 msgid "Configuration of items"
-msgstr "Configuración de monitores"
+msgstr "Configuración de métricas"
 
 #: app/controllers/CControllerMacrosEdit.php:64
 msgid "Configuration of macros"
@@ -5911,6 +5941,11 @@ msgstr "Base de datos TLS cifrado"
 msgid "Database TLS key file"
 msgstr "Base de datos TLS archivo de clave"
 
+#: include/classes/api/clients/CLocalApiClient.php:133
+#: include/classes/api/clients/CLocalApiClient.php:147
+msgid "Database error occurred."
+msgstr "Se produjo un error en la base de datos."
+
 #: app/partials/administration.system.info.php:130
 msgid "Database history tables use primary key"
 msgstr "Las tablas del historial de la base de datos utilizan la clave primaria"
@@ -6607,6 +6642,22 @@ msgstr "¿Desea eliminar el escenario web?"
 msgid "Deleted"
 msgstr "Eliminado"
 
+#: include/actions.inc.php:143
+msgid "Deleted host"
+msgstr "Equipo eliminado"
+
+#: include/actions.inc.php:125
+msgid "Deleted host group"
+msgstr "Grupo de equipos eliminado"
+
+#: include/actions.inc.php:710
+msgid "Deleted host group(s)"
+msgstr "Grupo(s) de equipos eliminado(s)"
+
+#: include/actions.inc.php:134
+msgid "Deleted trigger"
+msgstr "Iniciador eliminado"
+
 #: app/views/administration.regex.edit.php:54
 msgid "Delimiter"
 msgstr "Delimitador"
@@ -7093,6 +7144,10 @@ msgstr "Objeto de descubrimiento"
 msgid "Discovery of VMware clusters, \"url\" - VMware service URL. Returns JSON"
 msgstr "Descubrimiento de clústeres de VMware, \"url\": URL del servicio de VMware. Devuelve JSON"
 
+#: include/classes/data/CItemData.php:1931
+msgid "Discovery of VMware datastores, \"url\" - VMware service URL, \"filter_uuid\" - one hv uuid or vm uuid (empty by default). Returns JSON"
+msgstr "Detección de almacenes de datos de VMware, \"url\": URL del servicio de VMware, \"filter_uuid\": un UUID de hv o de vm (vacío por defecto). Devuelve JSON."
+
 #: include/classes/data/CItemData.php:1799
 msgid "Discovery of VMware datastores, \"url\" - VMware service URL. Returns JSON"
 msgstr "Descubrimiento de almacenes de datos de VMware, \"url\": URL del servicio de VMware. Devuelve JSON"
@@ -7232,7 +7287,7 @@ msgstr "Mostrar hora local"
 
 #: widgets/itemhistory/views/column.edit.php:240
 msgid "Display log time"
-msgstr ""
+msgstr "Mostrar el tiempo de registro"
 
 #: widgets/svggraph/includes/WidgetForm.php:364
 msgid "Display min/avg/max"
@@ -9400,7 +9455,7 @@ msgstr "Funciones de historia"
 
 #: app/views/administration.housekeeping.edit.php:218
 msgid "History, trends and audit log compression"
-msgstr ""
+msgstr "Historial, tendencias y compresión de registros de auditoría"
 
 #: include/classes/html/CTabFilter.php:167
 msgid "Home"
@@ -12059,7 +12114,7 @@ msgstr "La métrica con ID \"%1$s\" no está disponible."
 #: widgets/dataover/partials/table.top.php:31
 #: widgets/plaintext/includes/WidgetForm.php:45
 msgid "Items"
-msgstr "Monitores"
+msgstr "Métricas"
 
 #: include/views/monitoring.history.php:140
 msgid "Items list"
@@ -14469,7 +14524,7 @@ msgstr "Ninguna métrica seleccionada."
 
 #: chart3.php:146 chart7.php:57
 msgid "No items defined."
-msgstr "Sin monitores definidos."
+msgstr "Sin métricas definidas."
 
 #: app/partials/hostmacros.inherited.list.html.php:28
 #: app/partials/hostmacros.list.html.php:28
@@ -15307,7 +15362,7 @@ msgstr "Solo se puede configurar un grupo desactivado para usuarios dados de baj
 
 #: app/partials/administration.system.info.php:66
 msgid "Only items assigned to enabled hosts are counted"
-msgstr "Sólo cuentan los monitores asignados a equipos habilitados"
+msgstr "Sólo cuentan las métricas asignadas a equipos habilitados"
 
 #: include/classes/api/services/CDRule.php:648
 msgid "Only one check can be unique."
@@ -15342,7 +15397,7 @@ msgstr "Solo los superadministradores pueden definir el propietario del informe.
 
 #: app/partials/administration.system.info.php:78
 msgid "Only triggers assigned to enabled hosts and depending on enabled items are counted"
-msgstr "Sólo cuentan los iniciadores asignados a equipos habilitados y que dependan de monitores habilitados"
+msgstr "Sólo cuentan los iniciadores asignados a equipos habilitados y que dependan de métricas habilitadas"
 
 #: jsLoader.php:439
 msgid "Open URL"
@@ -17770,6 +17825,11 @@ msgstr "Ejecutar el comando \"%1$s\" en el servidor Zabbix"
 msgid "Run script \"%1$s\" on current host"
 msgstr "Ejecutar el comando \"%1$s\" en el equipo actual"
 
+#: include/actions.inc.php:601
+#, c-format
+msgid "Run script \"%1$s\" on deleted object(s)"
+msgstr "Ejecutar el script \"%1$s\" en los objetos eliminados"
+
 #: include/actions.inc.php:622
 #, c-format
 msgid "Run script \"%1$s\" on host groups"
@@ -19387,6 +19447,10 @@ msgstr "Estadísticas y disponibilidad de caché de escritura de Zabbix. Caché 
 msgid "Statistics and availability of proxy memory buffer. Mode (modes: pfree, free, total, used, pused)."
 msgstr "Estadísticas y disponibilidad de búfer de memoria del proxy. Modo (modos: pfree, free, total, used, pused)."
 
+#: include/classes/data/CItemData.php:2854
+msgid "Statistics of values received by the preprocessing manager."
+msgstr "Estadísticas de valores recibidos por el gestor de preprocesamiento."
+
 #: app/controllers/CControllerPopupGeneric.php:237
 #: app/controllers/CControllerPopupGeneric.php:251
 #: app/controllers/CControllerPopupGeneric.php:265
@@ -20369,6 +20433,10 @@ msgstr "El número de procesos. Devuelve un número entero"
 msgid "The parameter \"%1$s\" is missing from the user attributes."
 msgstr "Falta el parámetro \"%1$s\" en los atributos del usuario."
 
+#: app/views/popup.ldap.edit.php:101
+msgid "The previous password was cleared due to a host change. Please enter the new password."
+msgstr "La contraseña anterior se borró debido a un cambio de equipo. Ingrese la nueva contraseña."
+
 #: include/classes/core/CJsonRpc.php:206
 msgid "The received JSON is not a valid JSON-RPC request."
 msgstr "El JSON recibido no es una solicitud JSON-RPC válida."
@@ -20410,6 +20478,14 @@ msgstr "Tema"
 #: app/views/mediatype.edit.php:189 app/views/mediatype.test.edit.php:48
 msgid "These parameters will be passed to the script as command-line arguments in the specified order."
 msgstr "Estos parámetros se pasarán al script como argumentos de línea de comandos en el orden especificado."
+
+#: app/views/action.list.php:156
+msgid "This action has conditions or operations referencing deleted object(s)."
+msgstr "Esta acción tiene condiciones u operaciones que hacen referencia a los objetos eliminados."
+
+#: app/views/action.list.php:151
+msgid "This action has missing conditions or operations due to previously deleted object(s)."
+msgstr "A esta acción le faltan condiciones u operaciones debido a objetos eliminados previamente."
 
 #: app/controllers/CControllerDiscoveryEdit.php:175
 #, c-format
@@ -20463,7 +20539,7 @@ msgstr "Esta configuración mostrará la hora local en lugar de la marca de tiem
 
 #: widgets/itemhistory/views/column.edit.php:241
 msgid "This setting will display log time instead of item's timestamp. \"Show timestamp\" must also be checked in the advanced configuration."
-msgstr ""
+msgstr "Esta configuración mostrará la hora del registro en lugar de la marca de tiempo de la métrica. La opción \"Mostrar marca de tiempo\" también debe estar marcada en la configuración avanzada."
 
 #: include/views/configuration.item.edit.php:129
 #: include/views/configuration.item.prototype.edit.php:114
@@ -23910,6 +23986,41 @@ msgstr "abs() - Valor absoluto"
 #: app/controllers/CControllerPopupTriggerExpr.php:339
 msgid "acos() - The arccosine of a value as an angle, expressed in radians"
 msgstr "acos() - El arcocoseno de un valor como ángulo, expresado en radianes"
+
+#: include/classes/api/services/CDRule.php:774
+#, c-format
+msgid "action \"%1$s\" uses this discovery check"
+msgstr "la acción \"%1$s\" utiliza esta comprobación de descubrimiento"
+
+#: include/classes/api/services/CDRule.php:981
+#, c-format
+msgid "action \"%1$s\" uses this discovery rule"
+msgstr "la acción \"%1$s\" utiliza esta regla de descubrimiento"
+
+#: include/classes/api/services/CHost.php:1637
+#, c-format
+msgid "action \"%1$s\" uses this host"
+msgstr "la acción \"%1$s\" usa este equipo"
+
+#: include/classes/api/services/CHostGroup.php:770
+#, c-format
+msgid "action \"%1$s\" uses this host group"
+msgstr "la acción \"%1$s\" usa este grupo de equipos"
+
+#: include/classes/api/services/CService.php:487
+#, c-format
+msgid "action \"%1$s\" uses this service"
+msgstr "la acción \"%1$s\" usa este servicio"
+
+#: include/classes/api/services/CTemplate.php:810
+#, c-format
+msgid "action \"%1$s\" uses this template"
+msgstr "la acción \"%1$s\" usa esta plantilla"
+
+#: include/classes/api/managers/CTriggerManager.php:127
+#, c-format
+msgid "action \"%1$s\" uses this trigger"
+msgstr "la acción \"%1$s\" usa este iniciador"
 
 #: app/partials/monitoring.charts.subfilter.php:182
 #: app/partials/monitoring.latest.subfilter.php:186 include/forms.inc.php:144

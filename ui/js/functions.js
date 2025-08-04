@@ -71,34 +71,28 @@ function escapeHtml(string) {
 		.replace(/\'/g,'&apos;');
 }
 
-function validateNumericBox(obj, allowempty, allownegative) {
-	if (obj != null) {
-		if (allowempty) {
-			if (obj.value.length == 0 || obj.value == null) {
-				obj.value = '';
-			}
-			else {
-				if (isNaN(parseInt(obj.value, 10))) {
-					obj.value = 0;
-				}
-				else {
-					obj.value = parseInt(obj.value, 10);
-				}
-			}
-		}
-		else {
-			if (isNaN(parseInt(obj.value, 10))) {
-				obj.value = 0;
-			}
-			else {
-				obj.value = parseInt(obj.value, 10);
-			}
-		}
+/**
+ * Validates and processes the numeric value in an HTML input element. Leaves negative numbers without leading zeroes.
+ *
+ * @param {HTMLInputElement} input           The HTML input element containing the numeric value.
+ * @param {bool}             allow_empty     If true, the field can be empty; otherwise, empty fields are replaced
+ *                                           with "0".
+ * @param {bool}             allow_negative  If true, negative numbers are allowed; otherwise, negative numbers
+ *                                           are converted to positive.
+ * @param {number}           min_length      Pad number with zeroes to maintain min length.
+ */
+function normalizeNumericBox(input, {allow_empty, allow_negative, min_length}) {
+	let num = parseInt(input.value, 10);
+
+	if (isNaN(num)) {
+		input.value = (input.value === '' && allow_empty) ? '' : '0'.repeat(Math.max(min_length, 1));
 	}
-	if (!allownegative) {
-		if (obj.value < 0) {
-			obj.value = obj.value * -1;
+	else {
+		if (num < 0 && !allow_negative) {
+			num = -num;
 		}
+
+		input.value = num < 0 ? num : num.toString().padStart(min_length, '0');
 	}
 }
 

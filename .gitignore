@@ -203,6 +203,7 @@ tests/libs/zbxexpression/valuemaps
 tests/libs/zbxfile/zbx_buf_readln
 tests/libs/zbxhistory/zbx_history_get_values
 tests/libs/zbxhttp/zbx_determine_charset
+tests/libs/zbxip/zbx_join_hostport
 tests/libs/zbxicmpping/get_interval_option
 tests/libs/zbxicmpping/line_process
 tests/libs/zbxjson/zbx_json_decodevalue
@@ -236,6 +237,7 @@ tests/libs/zbxstr/zbx_truncate_value
 tests/libs/zbxsysinfo/check_get_fqdn
 tests/libs/zbxsysinfo/check_key_access_rules
 tests/libs/zbxsysinfo/check_service_test
+tests/libs/zbxsysinfo/agent/modbus_get
 tests/libs/zbxsysinfo/common/system_localtime
 tests/libs/zbxsysinfo/common/vfs_file_exists
 tests/libs/zbxsysinfo/common/web_page_get
@@ -293,3 +295,4 @@ ui/locale/frontend.pot
 ui/tests/bootstrap.php
 ui/tests/composer.*
 ui/tests/vendor
+ui/tests/.phpunit.result.cache

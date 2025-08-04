@@ -456,9 +456,7 @@ class CScreenHistory extends CScreenBase {
 						['field' => 'ns', 'order' => ZBX_SORT_DOWN]
 					]);
 
-					$table_header[] = (new CSpan($item['name']))
-						->addClass(ZBX_STYLE_TEXT_VERTICAL)
-						->setTitle($item['name']);
+					$table_header[] = (new CVertical($item['name']))->setTitle($item['name']);
 					$history_data_index = 0;
 
 					foreach ($item_data as $item_data_row) {
@@ -498,12 +496,19 @@ class CScreenHistory extends CScreenBase {
 					$row = [(new CCol(zbx_date2str(DATE_TIME_FORMAT_SECONDS, $history_data_row['clock'])))
 						->addClass(ZBX_STYLE_NOWRAP)
 					];
+
 					$values = $history_data_row['values'];
 
 					foreach ($items as $item) {
-						$value = array_key_exists($item['itemid'], $values) ? $values[$item['itemid']] : '';
+						if (!array_key_exists($item['itemid'], $values)) {
+							$row[] = '';
 
-						if ($item['value_type'] == ITEM_VALUE_TYPE_FLOAT && $value !== '') {
+							continue;
+						}
+
+						$value = $values[$item['itemid']];
+
+						if ($item['value_type'] == ITEM_VALUE_TYPE_FLOAT) {
 							$value = formatFloat($value, ['decimals' => ZBX_UNITS_ROUNDOFF_UNSUFFIXED]);
 						}
 

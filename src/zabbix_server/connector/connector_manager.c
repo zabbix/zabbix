@@ -24,6 +24,8 @@
 #include "zbxcacheconfig.h"
 #include "zbxalgo.h"
 #include "zbxdbhigh.h"
+#include "zbxrtc.h"
+#include "zbx_rtc_constants.h"
 
 #define ZBX_CONNECTOR_MANAGER_DELAY	1
 #define ZBX_CONNECTOR_FLUSH_INTERVAL	1
@@ -612,7 +614,7 @@ ZBX_THREAD_ENTRY(connector_manager_thread, args)
 	char					*error = NULL;
 	zbx_ipc_client_t			*client;
 	zbx_ipc_message_t			*message;
-	int					ret, processed_num = 0;
+	int					ret, processed_num = 0, running = 1;
 	double					time_stat, time_idle = 0, time_now, sec;
 	zbx_timespec_t				timeout = {ZBX_CONNECTOR_MANAGER_DELAY, 0};
 	const zbx_thread_info_t			*info = &((zbx_thread_args_t *)args)->info;
@@ -637,6 +639,8 @@ ZBX_THREAD_ENTRY(connector_manager_thread, args)
 		exit(EXIT_FAILURE);
 	}
 
+	zbx_rtc_subscribe_service(ZBX_PROCESS_TYPE_CONNECTORMANAGER, 0, NULL, 0, SEC_PER_MIN,
+			ZBX_IPC_SERVICE_CONNECTOR);
 	connector_init_manager(&manager, args_in->get_process_forks_cb_arg(ZBX_PROCESS_TYPE_CONNECTORWORKER));
 
 	/* initialize statistics */
@@ -702,6 +706,11 @@ ZBX_THREAD_ENTRY(connector_manager_thread, args)
 				case ZBX_IPC_CONNECTOR_QUEUE:
 					connector_get_queue(&manager, client);
 					break;
+				case ZBX_RTC_SHUTDOWN:
+					zabbix_log(LOG_LEVEL_DEBUG, "shutdown message received, terminating...");
+					timeout.sec = 0;
+					timeout.ns = 1e8;
+					break;
 				default:
 					THIS_SHOULD_NEVER_HAPPEN;
 			}
@@ -730,11 +739,11 @@ ZBX_THREAD_ENTRY(connector_manager_thread, args)
 
 			if (0 == num)
 			{
-				if (0 == timeout.sec)
+				if (0 == running)
 					break;
 
-				timeout.sec = 0;
-				timeout.ns = 100000000;
+				running = 0;
+				timeout.ns = 0;
 			}
 		}
 	}
@@ -742,6 +751,8 @@ ZBX_THREAD_ENTRY(connector_manager_thread, args)
 	zbx_vector_connector_object_destroy(&connector_objects);
 	connector_destroy_manager(&manager);
 	zbx_ipc_service_close(&service);
+
+	zbx_setproctitle("%s #%d [terminated]", get_process_type_string(process_type), process_num);
 
 	exit(EXIT_SUCCESS);
 #undef STAT_INTERVAL

@@ -13,7 +13,7 @@
 ** If not, see <https://www.gnu.org/licenses/>.
 **/
 
-require_once dirname(__FILE__).'/../common/testSystemInformation.php';
+require_once __DIR__.'/../common/testSystemInformation.php';
 
 /**
  * @backup ha_node, config
@@ -22,22 +22,22 @@ require_once dirname(__FILE__).'/../common/testSystemInformation.php';
  */
 class testPageReportsSystemInformation extends testSystemInformation {
 
-// Commented until Jenkins issue investigated.
-//	public function testPageReportsSystemInformation_checkDisabledHA() {
-//		$this->page->login()->open('zabbix.php?action=report.status')->waitUntilReady();
-//		$this->assertScreenshotExcept(null,
-//				[$this->query('xpath://footer')->one(),
-//				$this->query('xpath://table[@class="list-table sticky-header"]/tbody/tr[3]/td[1]')->one()],
-//				'report_without_ha');
-//	}
-//
-//	/**
-//	 * @onBefore prepareHANodeData
-//	 */
-//	public function testPageReportsSystemInformation_checkEnabledHA() {
-//		$this->assertEnabledHACluster();
-//		$this->assertScreenshotExcept(null, self::$skip_fields, 'report_with_ha');
-//	}
+	public function testPageReportsSystemInformation_checkDisabledHA() {
+		$this->page->login()->open('zabbix.php?action=report.status')->waitUntilReady();
+		// Remove zabbix version due to unstable screenshot which depends on column width with different version length.
+		CElementQuery::getDriver()->executeScript("arguments[0].textContent = '';",
+				[$this->query('xpath://table[@class="list-table sticky-header"]/tbody/tr[3]/td[1]')->one()]
+		);
+		$this->assertScreenshotExcept(null, $this->query('xpath://footer')->one(), 'report_without_ha');
+	}
+
+	/**
+	 * @onBefore prepareHANodeData
+	 */
+	public function testPageReportsSystemInformation_checkEnabledHA() {
+		$this->assertEnabledHACluster();
+		$this->assertScreenshotExcept(null, self::$skip_fields, 'report_with_ha');
+	}
 
 	/**
 	 * Function checks that zabbix server status is updated after failover delay passes and frontend config is re-validated.

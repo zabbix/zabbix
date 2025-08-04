@@ -164,7 +164,6 @@ void	pg_cache_destroy(zbx_pg_cache_t *cache)
 
 	zbx_pg_proxy_t	*proxy;
 
-
 	zbx_hashset_iter_reset(&cache->proxies, &iter);
 	while (NULL != (proxy = (zbx_pg_proxy_t *)zbx_hashset_iter_next(&iter)))
 		pg_proxy_clear(proxy);
@@ -223,7 +222,6 @@ void	pg_cache_set_host_proxy(zbx_pg_cache_t *cache, zbx_uint64_t hostid, zbx_uin
 	else
 		host->proxyid = proxyid;
 }
-
 
 #define PG_REMOVE_DELETED_PROXY		0
 #define PG_REMOVE_REASSIGNED_PROXY	1
@@ -369,8 +367,8 @@ static int	pg_proxy_hosts_compare_by_hosts_asc(const void *d1, const void *d2)
 static void	pg_cache_proxy_unassign_host(zbx_pg_cache_t *cache, zbx_pg_group_t *group, zbx_pg_proxy_t *proxy,
 		zbx_pg_host_ref_t *ref)
 {
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s() group:%s proxy:%s proxy.hosts:%d hostid:%d", __func__, group->name,
-			proxy->name, proxy->hosts.num_data, ref->host->hostid);
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s() group:%s proxy:%s proxy.hosts:%d hostid:" ZBX_FS_UI64,
+			__func__, group->name, proxy->name, proxy->hosts.num_data, ref->host->hostid);
 
 	zbx_vector_uint64_append(&group->unassigned_hostids, ref->host->hostid);
 	pg_cache_set_host_proxy(cache, ref->host->hostid, 0);
@@ -574,7 +572,7 @@ static int	pg_cache_reassign_hosts(zbx_pg_cache_t *cache, zbx_pg_group_t *group)
 	int				hosts_num = 0, hosts_min, hosts_required, ret = FAIL;
 	zbx_vector_pg_proxy_hosts_ptr_t	proxies;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s() group:%s", __func__, group->name, cache->group_updates.values_num);
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s() group:%s", __func__, group->name);
 
 	zbx_vector_pg_proxy_hosts_ptr_create(&proxies);
 
@@ -1349,7 +1347,7 @@ static void	pg_cache_dump_proxy(zbx_pg_proxy_t *proxy)
 		groupid = proxy->group->proxy_groupid;
 
 	zabbix_log(LOG_LEVEL_TRACE, "    state:%d version:%x lastaccess:%d firstaccess:%d groupid:" ZBX_FS_UI64,
-			proxy->state, proxy->version, proxy->lastaccess, proxy->firstaccess, groupid);
+		proxy->state, (unsigned int)proxy->version, proxy->lastaccess, proxy->firstaccess, groupid);
 
 	zabbix_log(LOG_LEVEL_TRACE, "    hostids: [%d]", proxy->hosts.num_data);
 

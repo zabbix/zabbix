@@ -1380,15 +1380,8 @@ class CDiscoveryRule extends CItemGeneral {
 		$db_filters = DBselect(DB::makeSql($base_table, $options));
 
 		while ($db_filter = DBfetch($db_filters)) {
-			$conditions = [];
-
-			if ($db_filter['evaltype'] == CONDITION_EVAL_TYPE_EXPRESSION) {
-				CConditionHelper::addFormulaIds($conditions, $db_filter['formula']);
-				CConditionHelper::replaceConditionIds($db_filter['formula'], $conditions);
-			}
-
 			$db_objects[$db_filter[$base_pk]]['filter'] =
-				array_diff_key($db_filter, array_flip([$base_pk])) + ['conditions' => $conditions];
+				array_diff_key($db_filter, array_flip([$base_pk])) + ['conditions' => []];
 		}
 
 		$options = [
@@ -1398,17 +1391,25 @@ class CDiscoveryRule extends CItemGeneral {
 		$db_conditions = DBselect(DB::makeSql($condition_table, $options));
 
 		while ($db_condition = DBfetch($db_conditions)) {
-			if ($db_objects[$db_condition[$base_pk]]['filter']['evaltype'] == CONDITION_EVAL_TYPE_EXPRESSION) {
-				$db_objects[$db_condition[$base_pk]]['filter']['conditions'][$db_condition[$condition_pk]] +=
-					array_diff_key($db_condition, array_flip([$base_pk]));
+			$db_objects[$db_condition[$base_pk]]['filter']['conditions'][$db_condition[$condition_pk]] =
+				array_diff_key($db_condition, array_flip([$base_pk]));
+		}
+
+		foreach ($db_objects as &$db_object) {
+			if ($db_object['filter']['evaltype'] == CONDITION_EVAL_TYPE_EXPRESSION) {
+				CConditionHelper::addFormulaIds($db_object['filter']['conditions'], $db_object['filter']['formula']);
+				CConditionHelper::replaceConditionIds($db_object['filter']['formula'],
+					$db_object['filter']['conditions']
+				);
 			}
 			else {
-				$db_condition['formulaid'] = '';
-
-				$db_objects[$db_condition[$base_pk]]['filter']['conditions'][$db_condition[$condition_pk]] =
-					array_diff_key($db_condition, array_flip([$base_pk]));
+				foreach ($db_object['filter']['conditions'] as &$condition) {
+					$condition['formulaid'] = '';
+				}
+				unset($condition);
 			}
 		}
+		unset($db_object);
 	}
 
 	/**
@@ -1868,8 +1869,8 @@ class CDiscoveryRule extends CItemGeneral {
 	 * @param array|null $db_items
 	 * @param array|null $upd_itemids
 	 */
-	private static function updateLldMacroPaths(array &$items, array &$db_items = null,
-			array &$upd_itemids = null): void {
+	private static function updateLldMacroPaths(array &$items, ?array &$db_items = null,
+			?array &$upd_itemids = null): void {
 		$ins_lld_macro_paths = [];
 		$upd_lld_macro_paths = [];
 		$del_lld_macro_pathids = [];
@@ -1956,7 +1957,8 @@ class CDiscoveryRule extends CItemGeneral {
 	 * @param array|null $db_items
 	 * @param array|null $upd_itemids
 	 */
-	private static function updateItemFilters(array &$items, array &$db_items = null, array &$upd_itemids = null): void {
+	private static function updateItemFilters(array &$items, ?array &$db_items = null,
+			?array &$upd_itemids = null): void {
 		self::updateFilters($items, $db_items, $upd_itemids, 'items', 'item_condition');
 	}
 
@@ -2038,8 +2040,8 @@ class CDiscoveryRule extends CItemGeneral {
 	 * @param string     $base_table
 	 * @param string     $condition_table
 	 */
-	private static function updateFilterConditions(array &$objects, array &$db_objects = null,
-			array &$upd_objectids = null, string $base_table, string $condition_table): void {
+	private static function updateFilterConditions(array &$objects, ?array &$db_objects, ?array &$upd_objectids,
+			string $base_table, string $condition_table): void {
 		$base_pk = DB::getPk($base_table);
 		$condition_pk = DB::getPk($condition_table);
 
@@ -2153,7 +2155,8 @@ class CDiscoveryRule extends CItemGeneral {
 	 * @param array|null $db_items
 	 * @param array|null $upd_itemids
 	 */
-	private static function updateOverrides(array &$items, array &$db_items = null, array &$upd_itemids = null): void {
+	private static function updateOverrides(array &$items, ?array &$db_items = null,
+			?array &$upd_itemids = null): void {
 		$ins_overrides = [];
 		$upd_overrides = [];
 		$del_overrideids = [];
@@ -2219,7 +2222,7 @@ class CDiscoveryRule extends CItemGeneral {
 		unset($item);
 
 		if ($del_overrideids) {
-			self::deleteOverrides($del_overrideids);
+			DB::delete('lld_override', ['lld_overrideid' => $del_overrideids]);
 		}
 
 		if ($upd_overrides) {
@@ -2304,24 +2307,6 @@ class CDiscoveryRule extends CItemGeneral {
 	}
 
 	/**
-	 * @param array $del_overrideids
-	 */
-	private static function deleteOverrides(array $del_overrideids): void {
-		DB::delete('lld_override_condition', ['lld_overrideid' => $del_overrideids]);
-
-		$options = [
-			'output' => ['lld_override_operationid'],
-			'filter' => ['lld_overrideid' => $del_overrideids]
-		];
-		$del_operationids =
-			DBfetchColumn(DBselect(DB::makeSql('lld_override_operation', $options)), 'lld_override_operationid');
-
-		self::deleteOverrideOperations($del_operationids);
-
-		DB::delete('lld_override', ['lld_overrideid' => $del_overrideids]);
-	}
-
-	/**
 	 * @param array      $overrides
 	 * @param array|null $db_overrides
 	 * @param array|null $upd_overrideids
@@ -2376,7 +2361,7 @@ class CDiscoveryRule extends CItemGeneral {
 		unset($override);
 
 		if ($del_operationids) {
-			self::deleteOverrideOperations($del_operationids);
+			DB::delete('lld_override_operation', ['lld_override_operationid' => $del_operationids]);
 		}
 
 		if ($ins_operations) {
@@ -2504,17 +2489,6 @@ class CDiscoveryRule extends CItemGeneral {
 		$operation['lld_override_operationid'] = $db_operation['lld_override_operationid'];
 
 		return true;
-	}
-
-	/**
-	 * @param array $del_operationids
-	 */
-	private static function deleteOverrideOperations(array $del_operationids): void {
-		foreach (self::OPERATION_FIELDS as $optable => $foo) {
-			DB::delete($optable, ['lld_override_operationid' => $del_operationids]);
-		}
-
-		DB::delete('lld_override_operation', ['lld_override_operationid' => $del_operationids]);
 	}
 
 	/**
@@ -3088,7 +3062,7 @@ class CDiscoveryRule extends CItemGeneral {
 	 *
 	 * @throws APIException
 	 */
-	private function validateDelete(array $itemids, array &$db_items = null): void {
+	private function validateDelete(array $itemids, ?array &$db_items = null): void {
 		$api_input_rules = ['type' => API_IDS, 'flags' => API_NOT_EMPTY, 'uniq' => true];
 
 		if (!CApiInputValidator::validate($api_input_rules, $itemids, '/', $error)) {
@@ -3125,12 +3099,8 @@ class CDiscoveryRule extends CItemGeneral {
 
 		self::deleteAffectedItemPrototypes($del_itemids);
 		self::deleteAffectedHostPrototypes($del_itemids);
-		self::deleteAffectedOverrides($del_itemids);
 
-		DB::delete('item_parameter', ['itemid' => $del_itemids]);
 		DB::delete('item_preproc', ['itemid' => $del_itemids]);
-		DB::delete('lld_macro_path', ['itemid' => $del_itemids]);
-		DB::delete('item_condition', ['itemid' => $del_itemids]);
 		DB::update('items', [
 			'values' => ['templateid' => 0],
 			'where' => ['itemid' => $del_itemids]
@@ -3189,26 +3159,10 @@ class CDiscoveryRule extends CItemGeneral {
 	}
 
 	/**
-	 * Delete overrides which belong to the given LLD rules.
-	 *
-	 * @param array $del_itemids
-	 */
-	private static function deleteAffectedOverrides(array $del_itemids): void {
-		$del_overrideids = array_keys(DB::select('lld_override', [
-			'filter' => ['itemid' => $del_itemids],
-			'preservekeys' => true
-		]));
-
-		if ($del_overrideids) {
-			self::deleteOverrides($del_overrideids);
-		}
-	}
-
-	/**
 	 * @param array      $templateids
 	 * @param array|null $hostids
 	 */
-	public static function unlinkTemplateObjects(array $templateids, array $hostids = null): void {
+	public static function unlinkTemplateObjects(array $templateids, ?array $hostids = null): void {
 		$hostids_condition = $hostids ? ' AND '.dbConditionId('ii.hostid', $hostids) : '';
 
 		$result = DBselect(
@@ -3252,7 +3206,7 @@ class CDiscoveryRule extends CItemGeneral {
 	 * @param array      $templateids
 	 * @param array|null $hostids
 	 */
-	public static function clearTemplateObjects(array $templateids, array $hostids = null): void {
+	public static function clearTemplateObjects(array $templateids, ?array $hostids = null): void {
 		$hostids_condition = $hostids ? ' AND '.dbConditionId('ii.hostid', $hostids) : '';
 
 		$db_items = DBfetchArrayAssoc(DBselect(

@@ -13,8 +13,8 @@
 ** If not, see <https://www.gnu.org/licenses/>.
 **/
 
-define('ZABBIX_VERSION',		'7.0.9rc2');
-define('ZABBIX_API_VERSION',	'7.0.9');
+define('ZABBIX_VERSION',		'7.0.18rc1');
+define('ZABBIX_API_VERSION',	'7.0.18');
 define('ZABBIX_EXPORT_VERSION',	'7.0');
 
 define('ZABBIX_DB_VERSION',		7000000);
@@ -1645,6 +1645,7 @@ if (!defined('JSON_ERROR_SYNTAX')) {
 
 // API errors
 define('ZBX_API_ERROR_INTERNAL',	111);
+define('ZBX_API_ERROR_DB',			112);
 define('ZBX_API_ERROR_PARAMETERS',	100);
 define('ZBX_API_ERROR_NO_ENTITY',	101);
 define('ZBX_API_ERROR_PERMISSIONS',	120);
@@ -2189,7 +2190,6 @@ define('ZBX_STYLE_TABLE_STATS', 'table-stats');
 define('ZBX_STYLE_TABS_NAV', 'tabs-nav');
 define('ZBX_STYLE_TAG', 'tag');
 define('ZBX_STYLE_TEXT_PLACEHOLDER', 'text-placeholder');
-define('ZBX_STYLE_TEXT_VERTICAL', 'text-vertical');
 define('ZBX_STYLE_TEXTAREA_FLEXIBLE', 'textarea-flexible');
 define('ZBX_STYLE_TEXTAREA_FLEXIBLE_CONTAINER', 'textarea-flexible-container');
 define('ZBX_STYLE_TEXTAREA_FLEXIBLE_PARENT', 'textarea-flexible-parent');

@@ -33,34 +33,39 @@ var (
 	uriDefaults    = &uri.Defaults{Scheme: "tcp", Port: "6379"}
 )
 
-// Common params: [URI|Session][,User][,Password]
+// Common params: [URI|Session][,Password][,User]
+//
+//nolint:gochecknoglobals
 var (
 	paramURI = metric.NewConnParam("URI", "URI to connect or session name.").
 			WithDefault(uriDefaults.Scheme + "://localhost:" + uriDefaults.Port).WithSession().
 			WithValidator(uri.URIValidator{Defaults: uriDefaults, AllowedSchemes: []string{"tcp", "unix"}})
 	paramPassword = metric.NewConnParam("Password", "Redis password.").WithDefault("").
 			WithValidator(metric.LenValidator{Max: &maxAuthPassLen})
+	paramUser = metric.NewConnParam("User", "Redis user.").WithDefault("default")
 )
 
 var metrics = metric.MetricSet{
-	keyConfig: metric.New("Returns configuration parameters of Redis server.",
+	keyConfig: metric.NewUnordered("Returns configuration parameters of Redis server.",
 		[]*metric.Param{
 			paramURI, paramPassword,
 			metric.NewParam("Pattern", "Glob-style pattern to filter configuration parameters.").
 				WithDefault("*"),
+			paramUser,
 		}, false),
 
-	keyInfo: metric.New("Returns output of INFO command.",
+	keyInfo: metric.NewUnordered("Returns output of INFO command.",
 		[]*metric.Param{
 			paramURI, paramPassword,
 			metric.NewParam("Section", "Section of information to return.").WithDefault("default"),
+			paramUser,
 		}, false),
 
 	keyPing: metric.New("Test if connection is alive or not.",
-		[]*metric.Param{paramURI, paramPassword}, false),
+		[]*metric.Param{paramURI, paramPassword, paramUser}, false),
 
 	keySlowlog: metric.New("Returns the number of slow log entries since Redis has been started.",
-		[]*metric.Param{paramURI, paramPassword}, false),
+		[]*metric.Param{paramURI, paramPassword, paramUser}, false),
 }
 
 // handlerFunc defines an interface must be implemented by handlers.

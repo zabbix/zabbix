@@ -2651,12 +2651,22 @@ msgstr ""
 msgid "Cannot delete default user directory."
 msgstr "기본 사용자 디렉터리를 삭제할 수 없습니다."
 
+#: include/classes/api/services/CDRule.php:773
+#, c-format
+msgid "Cannot delete discovery check \"%1$s\" of discovery rule \"%2$s\": %3$s."
+msgstr ""
+
 #: app/controllers/CControllerDiscoveryDelete.php:68 host_discovery.php:390
 #: host_discovery.php:597
 #, fuzzy
 msgid "Cannot delete discovery rule"
 msgid_plural "Cannot delete discovery rules"
 msgstr[0] "디스커버리 규칙을 삭제할 수 없습니다"
+
+#: include/classes/api/services/CDRule.php:980
+#, c-format
+msgid "Cannot delete discovery rule \"%1$s\": %2$s."
+msgstr ""
 
 #: app/controllers/CControllerCorrelationDelete.php:68
 msgid "Cannot delete event correlation"
@@ -2681,6 +2691,11 @@ msgid "Cannot delete host"
 msgid_plural "Cannot delete hosts"
 msgstr[0] "호스트를 삭제할 수 없습니다"
 
+#: include/classes/api/services/CHost.php:1636
+#, c-format
+msgid "Cannot delete host \"%1$s\": %2$s."
+msgstr ""
+
 #: include/classes/api/services/CHost.php:1461
 #, c-format
 msgid "Cannot delete host %1$s because maintenance \"%2$s\" must contain at least one host or host group."
@@ -2691,6 +2706,11 @@ msgstr[0] "유지 관리 \"%2$s\"에 하나 이상의 호스트 또는 호스트
 msgid "Cannot delete host group"
 msgid_plural "Cannot delete host groups"
 msgstr[0] "호스트 그룹을 삭제할 수 없습니다."
+
+#: include/classes/api/services/CHostGroup.php:769
+#, c-format
+msgid "Cannot delete host group \"%1$s\": %2$s."
+msgstr ""
 
 #: include/classes/api/services/CHostGroup.php:858
 #, c-format
@@ -2824,6 +2844,11 @@ msgid "Cannot delete template"
 msgid_plural "Cannot delete templates"
 msgstr[0] "템플릿을 삭제할 수 없습니다"
 
+#: include/classes/api/services/CTemplate.php:809
+#, c-format
+msgid "Cannot delete template \"%1$s\": %2$s."
+msgstr ""
+
 #: app/controllers/CControllerTemplateGroupDelete.php:75
 msgid "Cannot delete template group"
 msgid_plural "Cannot delete template groups"
@@ -2857,6 +2882,11 @@ msgstr "템플릿의 Web시나리오 \"%1$s\"을 삭제할 수 없습니다."
 msgid "Cannot delete trigger"
 msgid_plural "Cannot delete triggers"
 msgstr[0] "트리거를 삭제할 수 없습니다"
+
+#: include/classes/api/managers/CTriggerManager.php:126
+#, c-format
+msgid "Cannot delete trigger \"%1$s\": %2$s."
+msgstr ""
 
 #: app/controllers/CControllerTriggerPrototypeDelete.php:72
 #, fuzzy
@@ -5819,6 +5849,11 @@ msgstr "데이터베이스 TLS 암호화"
 msgid "Database TLS key file"
 msgstr "데이터베이스 TLS 키 파일"
 
+#: include/classes/api/clients/CLocalApiClient.php:133
+#: include/classes/api/clients/CLocalApiClient.php:147
+msgid "Database error occurred."
+msgstr ""
+
 #: app/partials/administration.system.info.php:130
 msgid "Database history tables use primary key"
 msgstr "데이터베이스 기록 테이블은 기본 키를 사용합니다."
@@ -6515,6 +6550,22 @@ msgstr "Web시나리오를 삭제하시겠습니까?"
 msgid "Deleted"
 msgstr "삭제됨"
 
+#: include/actions.inc.php:143
+msgid "Deleted host"
+msgstr ""
+
+#: include/actions.inc.php:125
+msgid "Deleted host group"
+msgstr ""
+
+#: include/actions.inc.php:710
+msgid "Deleted host group(s)"
+msgstr ""
+
+#: include/actions.inc.php:134
+msgid "Deleted trigger"
+msgstr ""
+
 #: app/views/administration.regex.edit.php:54
 msgid "Delimiter"
 msgstr "구분 문자"
@@ -6999,6 +7050,10 @@ msgstr "디스커버리 오브젝트"
 
 #: include/classes/data/CItemData.php:1764
 msgid "Discovery of VMware clusters, \"url\" - VMware service URL. Returns JSON"
+msgstr ""
+
+#: include/classes/data/CItemData.php:1931
+msgid "Discovery of VMware datastores, \"url\" - VMware service URL, \"filter_uuid\" - one hv uuid or vm uuid (empty by default). Returns JSON"
 msgstr ""
 
 #: include/classes/data/CItemData.php:1799
@@ -17641,6 +17696,11 @@ msgstr "Zabbix 서버에서 스크립트 \"%1$s\" 실행"
 msgid "Run script \"%1$s\" on current host"
 msgstr "현재 호스트에서 스크립트 \"%1$s\" 실행"
 
+#: include/actions.inc.php:601
+#, c-format
+msgid "Run script \"%1$s\" on deleted object(s)"
+msgstr ""
+
 #: include/actions.inc.php:622
 #, c-format
 msgid "Run script \"%1$s\" on host groups"
@@ -19251,6 +19311,10 @@ msgstr "Zabbix 쓰기 캐시의 통계 및 가용성. 캐시 - 값 중 하나(�
 msgid "Statistics and availability of proxy memory buffer. Mode (modes: pfree, free, total, used, pused)."
 msgstr ""
 
+#: include/classes/data/CItemData.php:2854
+msgid "Statistics of values received by the preprocessing manager."
+msgstr ""
+
 #: app/controllers/CControllerPopupGeneric.php:237
 #: app/controllers/CControllerPopupGeneric.php:251
 #: app/controllers/CControllerPopupGeneric.php:265
@@ -20230,6 +20294,10 @@ msgstr "프로세스 수. integer를 리턴."
 msgid "The parameter \"%1$s\" is missing from the user attributes."
 msgstr "사용자 속성에서 \"%1$s\" 매개변수가 누락되었습니다."
 
+#: app/views/popup.ldap.edit.php:101
+msgid "The previous password was cleared due to a host change. Please enter the new password."
+msgstr ""
+
 #: include/classes/core/CJsonRpc.php:206
 msgid "The received JSON is not a valid JSON-RPC request."
 msgstr "수신된 JSON은 유효한 JSON-RPC 요청이 아닙니다."
@@ -20270,6 +20338,14 @@ msgstr "테마"
 #: app/views/administration.mediatype.edit.php:139
 #: app/views/mediatype.edit.php:189 app/views/mediatype.test.edit.php:48
 msgid "These parameters will be passed to the script as command-line arguments in the specified order."
+msgstr ""
+
+#: app/views/action.list.php:156
+msgid "This action has conditions or operations referencing deleted object(s)."
+msgstr ""
+
+#: app/views/action.list.php:151
+msgid "This action has missing conditions or operations due to previously deleted object(s)."
 msgstr ""
 
 #: app/controllers/CControllerDiscoveryEdit.php:175
@@ -23758,6 +23834,41 @@ msgstr "abs() - 절대값"
 #: app/controllers/CControllerPopupTriggerExpr.php:339
 msgid "acos() - The arccosine of a value as an angle, expressed in radians"
 msgstr "acos() - 라디안으로 표현되는 각도 값의 아크코사인"
+
+#: include/classes/api/services/CDRule.php:774
+#, c-format
+msgid "action \"%1$s\" uses this discovery check"
+msgstr ""
+
+#: include/classes/api/services/CDRule.php:981
+#, c-format
+msgid "action \"%1$s\" uses this discovery rule"
+msgstr ""
+
+#: include/classes/api/services/CHost.php:1637
+#, c-format
+msgid "action \"%1$s\" uses this host"
+msgstr ""
+
+#: include/classes/api/services/CHostGroup.php:770
+#, c-format
+msgid "action \"%1$s\" uses this host group"
+msgstr ""
+
+#: include/classes/api/services/CService.php:487
+#, c-format
+msgid "action \"%1$s\" uses this service"
+msgstr ""
+
+#: include/classes/api/services/CTemplate.php:810
+#, c-format
+msgid "action \"%1$s\" uses this template"
+msgstr ""
+
+#: include/classes/api/managers/CTriggerManager.php:127
+#, c-format
+msgid "action \"%1$s\" uses this trigger"
+msgstr ""
 
 #: app/partials/monitoring.charts.subfilter.php:182
 #: app/partials/monitoring.latest.subfilter.php:186 include/forms.inc.php:144

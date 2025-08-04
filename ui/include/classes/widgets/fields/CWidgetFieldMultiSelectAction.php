@@ -20,7 +20,7 @@ class CWidgetFieldMultiSelectAction extends CWidgetFieldMultiSelect {
 
 	public const DEFAULT_VIEW = \CWidgetFieldMultiSelectActionView::class;
 
-	public function __construct(string $name, string $label = null) {
+	public function __construct(string $name, ?string $label = null) {
 		parent::__construct($name, $label);
 
 		$this->inaccessible_caption = _('Inaccessible action');
