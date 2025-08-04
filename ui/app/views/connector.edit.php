@@ -148,6 +148,11 @@ $form_grid = (new CFormGrid())
 						'value' => ZBX_CONNECTOR_ITEM_VALUE_TYPE_BIN,
 						'label' => _('Binary'),
 						'checked' => ZBX_CONNECTOR_ITEM_VALUE_TYPE_BIN & $data['form']['item_value_type']
+					],
+					[
+						'value' => ZBX_CONNECTOR_ITEM_VALUE_TYPE_JSON,
+						'label' => _('JSON'),
+						'checked' => ZBX_CONNECTOR_ITEM_VALUE_TYPE_JSON & $data['form']['item_value_type']
 					]
 				])
 				->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
