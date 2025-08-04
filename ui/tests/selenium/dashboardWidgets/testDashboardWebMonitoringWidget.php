@@ -69,12 +69,13 @@ class testDashboardWebMonitoringWidget extends testWidgets {
 								'y' => 0,
 								'width' => 18,
 								'height' => 4,
-								'fields' =>
+								'fields' => [
 									[
-										'type' => 2,
+										'type' => ZBX_WIDGET_FIELD_TYPE_STR,
 										'name' => 'reference',
 										'value' => 'WBMNT'
 									]
+								]
 							],
 							[
 								'name' => 'WebMonitoring for delete',
