@@ -3030,13 +3030,14 @@ static void	hc_log_history_cache_usage(zbx_vector_uint64_pair_t *items, zbx_hc_u
 	else
 		return;
 
+
 	if (SEC_PER_MIN > time_now - *ts)
 	{
-		zabbix_log(LOG_LEVEL_DEBUG, log_msg);
+		zabbix_log(LOG_LEVEL_DEBUG, "%s", log_msg);
 		return;
 	}
 
-	zabbix_log(LOG_LEVEL_WARNING, log_msg);
+	zabbix_log(LOG_LEVEL_WARNING, "%s", log_msg);
 
 	*ts = time_now;
 
