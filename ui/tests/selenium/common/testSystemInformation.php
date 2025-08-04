@@ -207,11 +207,26 @@ class testSystemInformation extends CWebTest {
 			}
 		}
 
+		// Check fields that are not checked in screenshot with enabled HA.
+		$data = [
+			[
+				'Parameter' => 'Zabbix server is running',
+				// TODO: should be changed to 'Yes' if ZBX-26532 will be fixed.
+				'Value' => 'No',
+				'Details' => $DB['SERVER'].':0'
+			],
+			[
+				'Parameter' => 'Zabbix frontend version',
+				'Value' => ZABBIX_VERSION,
+				'Details' => ''
+			]
+		];
+		$this->assertTableHasData($data);
+
 		/**
-		 * Check and hide the active Zabbix server address in widget that is working in System stats mode or in the part
+		 * Hide the active Zabbix server address in widget that is working in System stats mode or in the part
 		 * of the report that displays the overall system statistics.
 		 */
-		$this->assertEquals($DB['SERVER'].':0', $server_address->getText());
 		self::$skip_fields[] = $server_address;
 
 		// Hide the footer of the report as it contains Zabbix version.
@@ -245,35 +260,5 @@ class testSystemInformation extends CWebTest {
 		// Check that after failover delay passes frontend re-validates Zabbix server status.
 		$this->page->refresh();
 		$this->assertEquals('No', $table->findRow('Parameter', 'Zabbix server is running')->getColumn('Value')->getText());
-	}
-
-	public function assertAvailableDataByUserRole($data , $dashboardid = null) {
-		$url = (!$dashboardid) ? 'zabbix.php?action=report.status' : 'zabbix.php?action=dashboard.view&dashboardid='.$dashboardid;
-
-		if (array_key_exists('guest', $data)) {
-			$this->page->open($url)->waitUntilReady();
-			$this->query('button:Login')->one()->click();
-			$this->query('link:sign in as guest')->one()->click();
-		}
-		elseif (array_key_exists('user', $data)) {
-			$this->page->userLogin($data['user'], $data['password'])->open($url)->waitUntilReady();
-		}
-		else {
-			$this->page->login()->open($url)->waitUntilReady();
-		}
-
-		if (!$dashboardid) {
-			$this->page->waitUntilReady();
-		}
-		else {
-			CDashboardElement::find()->one()->waitUntilReady();
-		}
-
-		if (array_key_exists('super_admin', $data)) {
-			$this->assertTableHasData($data['available_fields']);
-		}
-		else {
-			$this->assertTableData($data['available_fields']);
-		}
 	}
 }
