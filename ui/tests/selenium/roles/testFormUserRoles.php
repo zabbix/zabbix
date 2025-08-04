@@ -903,7 +903,7 @@ class testFormUserRoles extends CWebTest {
 						'proxygroup.get', 'report.create', 'report.delete', 'report.get', 'report.update', 'role.get',
 						'script.execute', 'script.get', 'script.getscriptsbyevents', 'script.getscriptsbyhosts',
 						'service.create', 'service.delete', 'service.get', 'service.update', 'settings.get', 'sla.create',
-						'sla.delete', 'sla.get', 'sla.getsli', 'sla.update', 'task.create',  'template.create',
+						'sla.delete', 'sla.get', 'sla.getsli', 'sla.update', 'task.create', 'template.create',
 						'template.delete', 'template.get', 'template.massadd', 'template.massremove',
 						'template.massupdate', 'template.update', 'templatedashboard.create', 'templatedashboard.delete',
 						'templatedashboard.get', 'templatedashboard.update', 'templategroup.delete', 'templategroup.get',
