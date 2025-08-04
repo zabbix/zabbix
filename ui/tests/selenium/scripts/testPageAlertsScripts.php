@@ -76,6 +76,14 @@ class testPageAlertsScripts extends CWebTest {
 				'command' => '/sbin/zabbix_server --runtime-control config_cache_reload',
 				'groupid' => '4',
 				'description' => 'This command reload cache.'
+			],
+			[
+				'name' => 'I love   Zabbix   UI',
+				'type' => ZBX_SCRIPT_TYPE_CUSTOM_SCRIPT,
+				'scope' => ZBX_SCRIPT_SCOPE_ACTION,
+				'command' => '1-2-3-4 spaces',
+				'groupid' => '4',
+				'description' => 'Multiple spaces in script name'
 			]
 		]);
 		$scriptids = CDataHelper::getIds('name');
@@ -131,6 +139,18 @@ class testPageAlertsScripts extends CWebTest {
 						'Commands' => 'sudo /usr/bin/nmap -O {HOST.CONN}',
 						'User group' => 'Zabbix administrators',
 						'Host group' => 'All',
+						'Host access' => 'Read'
+					],
+					[
+						'Name' => 'I love Zabbix UI',
+						'Scope' => 'Action operation',
+						'Count' => '',
+						'Used in actions' => '',
+						'Type' => 'Script',
+						'Execute on' => 'Server (proxy)',
+						'Commands' => '1-2-3-4 spaces',
+						'User group' => 'All',
+						'Host group' => 'Zabbix servers',
 						'Host access' => 'Read'
 					],
 					[
@@ -287,7 +307,7 @@ class testPageAlertsScripts extends CWebTest {
 
 	public function getFilterData() {
 		return [
-			// Name with special symbols.
+			// #0. Name with special symbols.
 			[
 				[
 					'filter' => [
@@ -298,7 +318,7 @@ class testPageAlertsScripts extends CWebTest {
 					]
 				]
 			],
-			// Exact match for field Name.
+			// #1. Exact match for field Name.
 			[
 				[
 					'filter' => [
@@ -309,7 +329,7 @@ class testPageAlertsScripts extends CWebTest {
 					]
 				]
 			],
-			// Partial match for field Name.
+			// #2. Partial match for field Name.
 			[
 				[
 					'filter' => [
@@ -320,7 +340,7 @@ class testPageAlertsScripts extends CWebTest {
 					]
 				]
 			],
-			// Space in search field Name.
+			// #3. Space in search field Name.
 			[
 				[
 					'filter' => [
@@ -329,6 +349,7 @@ class testPageAlertsScripts extends CWebTest {
 					'expected' => [
 						self::$custom_script,
 						'Detect operating system',
+						'I love Zabbix UI',
 						self::$script_scope_event,
 						self::HOST_GROUP_SCRIPT,
 						self::$script_for_filter,
@@ -336,7 +357,18 @@ class testPageAlertsScripts extends CWebTest {
 					]
 				]
 			],
-			// Partial name match with space between.
+			// #4. Multiple spaces in search field Name.
+			[
+				[
+					'filter' => [
+						'Name' => '   Zabbix   '
+					],
+					'expected' => [
+						'I love Zabbix UI'
+					]
+				]
+			],
+			// #5. Partial name match with space between.
 			[
 				[
 					'filter' => [
@@ -348,7 +380,7 @@ class testPageAlertsScripts extends CWebTest {
 					]
 				]
 			],
-			// Partial name match with spaces on the sides.
+			// #6. Partial name match with spaces on the sides.
 			[
 				[
 					'filter' => [
@@ -359,7 +391,7 @@ class testPageAlertsScripts extends CWebTest {
 					]
 				]
 			],
-			// Search should not be case sensitive.
+			// #7. Search should not be case sensitive.
 			[
 				[
 					'filter' => [
@@ -370,7 +402,7 @@ class testPageAlertsScripts extends CWebTest {
 					]
 				]
 			],
-			// Wrong name in filter field "Name".
+			// #8. Wrong name in filter field "Name".
 			[
 				[
 					'filter' => [
@@ -378,7 +410,7 @@ class testPageAlertsScripts extends CWebTest {
 					]
 				]
 			],
-			// Search by Action operation.
+			// #9. Search by Action operation.
 			[
 				[
 					'filter' => [
@@ -386,13 +418,14 @@ class testPageAlertsScripts extends CWebTest {
 					],
 					'expected' => [
 						self::$custom_script,
+						'I love Zabbix UI',
 						'Reboot',
 						self::HOST_GROUP_SCRIPT,
 						'Selenium script'
 					]
 				]
 			],
-			// Search by Action operation and Name.
+			// #10. Search by Action operation and Name.
 			[
 				[
 					'filter' => [
@@ -404,7 +437,7 @@ class testPageAlertsScripts extends CWebTest {
 					]
 				]
 			],
-			// Search by Manual host action.
+			// #11. Search by Manual host action.
 			[
 				[
 					'filter' => [
@@ -417,7 +450,7 @@ class testPageAlertsScripts extends CWebTest {
 					]
 				]
 			],
-			// Search by Manual host action and Partial name match.
+			// #12. Search by Manual host action and Partial name match.
 			[
 				[
 					'filter' => [
@@ -430,7 +463,7 @@ class testPageAlertsScripts extends CWebTest {
 					]
 				]
 			],
-			// Search by Manual event action.
+			// #13. Search by Manual event action.
 			[
 				[
 					'filter' => [
@@ -442,7 +475,7 @@ class testPageAlertsScripts extends CWebTest {
 					]
 				]
 			],
-			// Search by Manual event action and Partial name match.
+			// #14. Search by Manual event action and Partial name match.
 			[
 				[
 					'filter' => [
@@ -454,7 +487,7 @@ class testPageAlertsScripts extends CWebTest {
 					]
 				]
 			],
-			// Search Any scripts.
+			// #15. Search Any scripts.
 			[
 				[
 					'filter' => [
@@ -463,6 +496,7 @@ class testPageAlertsScripts extends CWebTest {
 					'expected' => [
 						self::$custom_script,
 						'Detect operating system',
+						'I love Zabbix UI',
 						self::$script_scope_event,
 						'Ping',
 						'Reboot',
@@ -508,6 +542,7 @@ class testPageAlertsScripts extends CWebTest {
 						'Reboot',
 						'Ping',
 						self::$script_scope_event,
+						'I love Zabbix UI',
 						'Detect operating system',
 						self::$custom_script
 					]
@@ -521,6 +556,7 @@ class testPageAlertsScripts extends CWebTest {
 						'/sbin/shutdown -r',
 						'/sbin/zabbix_server --runtime-control config_cache_reload',
 						'/usr/bin/traceroute {HOST.CONN}',
+						'1-2-3-4 spaces',
 						'ping -c 3 {HOST.CONN}; case $? in [01]) true;; *) false;; esac',
 						// TODO: fix order after fix ZBX-22329
 						'',

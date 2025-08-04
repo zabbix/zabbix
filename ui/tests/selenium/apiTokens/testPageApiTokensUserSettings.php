@@ -153,19 +153,26 @@ class testPageApiTokensUserSettings extends testPageApiTokens {
 				]
 			],
 			// Filter by name with trailing and leading spaces.
-			// TODO Uncomment the below data provider once ZBX-18995 is fixed.
-//			[
-//				[
-//					'filter' => [
-//						'Name' => '   oken   '
-//					],
-//					'expected' => [
-//						'Expired token for admin',
-//						'Future token for admin',
-//						'Token that will expire in 2 days'
-//					]
-//				]
-//			],
+			[
+				[
+					'filter' => [
+						'Name' => '   oken   '
+					],
+					'no_data' => true
+				]
+			],
+			[
+				[
+					'filter' => [
+						'Name' => 'oken '
+					],
+					'expected' => [
+						'Expired token for admin',
+						'Future token for admin',
+						'Token that will expire in 2 days'
+					]
+				]
+			],
 			// Wrong name in filter field "Name".
 			[
 				[

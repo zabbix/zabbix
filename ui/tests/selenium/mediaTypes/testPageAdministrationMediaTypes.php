@@ -62,6 +62,34 @@ class testPageAdministrationMediaTypes extends CWebTest {
 				]
 			]
 		]);
+
+		CDataHelper::call('mediatype.create', [
+			[
+				'type' => MEDIA_TYPE_WEBHOOK,
+				'name' => 'Multiple spaces in   webhook   123',
+				'script' => 'test.sh',
+				'parameters' => [
+					[
+						'name' => 'HTTPProxy'
+					],
+					[
+						'name' => 'Message',
+						'value' => '{ALERT.MESSAGE}'
+					],
+					[
+						'name' => 'Subject',
+						'value' => '{ALERT.SUBJECT}'
+					],
+					[
+						'name' => 'To',
+						'value' => '{ALERT.SENDTO}'
+					],
+					[
+						'name' => 'URL'
+					]
+				]
+			]
+		]);
 	}
 
 	/**
@@ -189,6 +217,14 @@ class testPageAdministrationMediaTypes extends CWebTest {
 			[
 				[
 					'filter' => [
+						'Name' => '   webhook   '
+					],
+					'result' => ['Multiple spaces in webhook 123']
+				]
+			],
+			[
+				[
+					'filter' => [
 						'Name' => 'a S'
 					],
 					'result' => ['Jira Service Management']
@@ -283,7 +319,8 @@ class testPageAdministrationMediaTypes extends CWebTest {
 
 			foreach (CDBHelper::getAll('SELECT name FROM media_type WHERE status='.$db_status.
 					' ORDER BY LOWER(name) ASC') as $name) {
-				$data['result'][] = $name['name'];
+				$data['result'][] = ($name['name'] === 'Multiple spaces in   webhook   123') ? str_replace('  ', '',
+						$name['name']) : $name['name'];
 			}
 		}
 
