@@ -308,28 +308,28 @@ class CControllerPopupItemTestSend extends CControllerPopupItemTest {
 			]
 		];
 
-		if ($this->use_prev_value) {
-			$prev_value = $this->get_value_from_host ? $this->getInput('value', '') : $this->getInput('prev_value', '');
-			$prev_time = $this->getInput('prev_time', '');
-
-			if ($prev_value !== '' || $prev_time !== '') {
-				$data['options']['history'] = [
-					'value' => $prev_value,
-					'timestamp' => $prev_time
-				];
-			}
-		}
-
 		if ($this->get_value_from_host) {
+			$history = [
+				'value' => $this->getInput('value', ''),
+				'timestamp' => $this->getInput('prev_time', '') === '' ? '' : $this->getPrevTime()
+			];
 			$data += $this->prepareTestData();
 		}
 		else {
+			$history = [
+				'value' => $this->getInput('prev_value', ''),
+				'timestamp' => $this->getInput('prev_time', '')
+			];
 			$data['item']['value'] = $this->getInput('value', '');
 			$data['options']['state'] = (int) $this->getInput('not_supported', self::SUPPORTED_STATE);
 
 			if ($data['options']['state'] == self::NOT_SUPPORTED_STATE) {
 				$data['options']['runtime_error'] = $this->getInput('runtime_error', '');
 			}
+		}
+
+		if ($this->use_prev_value && $history['timestamp'] !== '') {
+			$data['options']['history'] = $history;
 		}
 
 		$data['item']['value_type'] = $this->getInput('value_type', ITEM_VALUE_TYPE_STR);
