@@ -1246,8 +1246,6 @@ static void	proxyconfig_prepare_table(zbx_table_data_t *td, const char *key_fiel
 	else
 		zbx_db_large_query_prepare(&query, &sql, &sql_alloc, &sql_offset, key_field);
 
-	
-
 	while (NULL != (dbrow = zbx_db_large_query_fetch(&query)))
 	{
 		zbx_uint64_t	recid;
