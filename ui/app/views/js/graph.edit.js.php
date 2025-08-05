@@ -455,8 +455,7 @@ window.graph_edit_popup = new class {
 			srcfld2: 'name',
 			dstfrm: this.form_name,
 			numeric: '1',
-			parent_discoveryid: this.graph.parent_discoveryid,
-			normal_only: 1
+			parent_discoveryid: this.graph.parent_discoveryid
 		}
 
 		Object.assign(parameters, popup_parameters);
