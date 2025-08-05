@@ -2417,62 +2417,64 @@ int	zbx_dbconn_execute_multiple_query_str(zbx_dbconn_t *db, const char *query, c
 
 /******************************************************************************
  *                                                                            *
+ * Purpose: select next chunk of values for large query processing            *
+ *                                                                            *
+ * Parameters: query      - [IN/OUT] large query object                       *
+ *             values_num - [IN] total number of id values to select          *
+ *                                                                            *
+ * Return value: number of values in the next chunk or FAIL if when all       *
+ *               values have been processed                                   *
+ *                                                                            *
+ ******************************************************************************/
+static int	db_large_query_select_chunk(zbx_db_large_query_t *query, int values_num)
+{
+	int	size = ZBX_DB_LARGE_QUERY_BATCH_SIZE;
+
+	if (query->offset >= values_num)
+		return FAIL;
+
+	if (NULL != query->result)
+	{
+		zbx_db_free_result(query->result);
+		query->result = NULL;
+	}
+
+	if (query->offset + size > values_num)
+		size = values_num - query->offset;
+
+	*query->sql_offset = query->sql_reset;
+
+	return size;
+}
+
+/******************************************************************************
+ *                                                                            *
  * Purpose: selects next batch of ids from database                           *
  *                                                                            *
  ******************************************************************************/
 static int	db_large_query_select(zbx_db_large_query_t *query)
 {
-	int	values_num, size = ZBX_DB_LARGE_QUERY_BATCH_SIZE;
+	int	size = 0;
 
 	switch (query->type)
 	{
 		case ZBX_DB_LARGE_QUERY_UI64:
-			values_num = query->ids.ui64->values_num;
-			break;
-		case ZBX_DB_LARGE_QUERY_STR:
-			values_num = query->ids.str->values_num;
-			break;
-		case ZBX_DB_LARGE_QUERY:
-			if (NULL != query->result)
-				return SUCCEED;
-			break;
-	}
-
-	switch (query->type)
-	{
-		case ZBX_DB_LARGE_QUERY_UI64:
-			ZBX_FALLTHROUGH;
-		case ZBX_DB_LARGE_QUERY_STR:
-			if (query->offset >= values_num)
+			if (FAIL == (size = db_large_query_select_chunk(query, query->ids.ui64->values_num)))
 				return FAIL;
 
-			if (NULL != query->result)
-			{
-				zbx_db_free_result(query->result);
-				query->result = NULL;
-			}
-
-			if (query->offset + size > values_num)
-				size = values_num - query->offset;
-
-			*query->sql_offset = query->sql_reset;
-			break;
-		default:
-			break;
-	}
-
-	switch (query->type)
-	{
-		case ZBX_DB_LARGE_QUERY_UI64:
 			zbx_db_add_condition_alloc(query->sql, query->sql_alloc, query->sql_offset, query->field,
 					query->ids.ui64->values + query->offset, size);
 			break;
 		case ZBX_DB_LARGE_QUERY_STR:
+			if (FAIL == (size = db_large_query_select_chunk(query, query->ids.str->values_num)))
+				return FAIL;
+
 			zbx_db_add_str_condition_alloc(query->sql, query->sql_alloc, query->sql_offset, query->field,
 					(const char * const *)&query->ids.str->values[query->offset], size);
 			break;
-		default:
-			size = 0;
+		case ZBX_DB_LARGE_QUERY:
+			if (NULL != query->result)
+				return SUCCEED;
 			break;
 	}
 
