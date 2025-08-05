@@ -183,7 +183,7 @@ static const duk_function_list_entry	alert_methods[] = {
 void	wd_alert_create(duk_context *ctx, zbx_webdriver_t *wd, const char *text)
 {
 	wd_alert_ctor(ctx, wd, text);
-	duk_put_function_list(ctx, -1, alert_methods);
+	es_put_function_list(ctx, -1, alert_methods);
 }
 
 #endif

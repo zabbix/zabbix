@@ -374,7 +374,7 @@ static const duk_function_list_entry	element_methods[] = {
 void	wd_element_create(duk_context *ctx, zbx_webdriver_t *wd, const char *elementid)
 {
 	wd_element_ctor(ctx, wd, elementid);
-	duk_put_function_list(ctx, -1, element_methods);
+	es_put_function_list(ctx, -1, element_methods);
 }
 
 /******************************************************************************
