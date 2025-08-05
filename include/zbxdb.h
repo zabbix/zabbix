@@ -376,8 +376,6 @@ char	*zbx_db_dyn_escape_string_len(const char *src, size_t length);
 
 void	zbx_db_add_condition_alloc(char **sql, size_t *sql_alloc, size_t *sql_offset, const char *fieldname,
 		const zbx_uint64_t *values, const int num);
-void	add_batch_select_condition(char **sql, size_t *sql_alloc, size_t *sql_offset, const char* column,
-		const zbx_vector_uint64_t *itemids, int *index);
 void	zbx_db_add_str_condition_alloc(char **sql, size_t *sql_alloc, size_t *sql_offset, const char *fieldname,
 		const char * const *values, const int num);
 
@@ -447,8 +445,8 @@ void	zbx_dbconn_large_query_prepare_uint(zbx_db_large_query_t *query, zbx_dbconn
 		size_t *sql_alloc, size_t *sql_offset, const char *field, const zbx_vector_uint64_t *ids);
 void	zbx_dbconn_large_query_prepare_str(zbx_db_large_query_t *query, zbx_dbconn_t *db, char **sql,
 		size_t *sql_alloc, size_t *sql_offset, const char *field, const zbx_vector_str_t *ids);
-void	zbx_dbconn_large_query_prepare(zbx_db_large_query_t *query, zbx_dbconn_t *db, char **sql,
-		size_t *sql_alloc, size_t *sql_offset, const char *field);
+void	zbx_dbconn_large_query_prepare(zbx_db_large_query_t *query, zbx_dbconn_t *db, char **sql, size_t *sql_alloc,
+		size_t *sql_offset);
 zbx_db_row_t	zbx_db_large_query_fetch(zbx_db_large_query_t *query);
 void	zbx_db_large_query_clear(zbx_db_large_query_t *query);
 void	zbx_dbconn_large_query_append_sql(zbx_db_large_query_t *query, const char *sql);
@@ -496,8 +494,7 @@ void	zbx_db_large_query_prepare_uint(zbx_db_large_query_t *query, char **sql,
 		size_t *sql_alloc, size_t *sql_offset, const char *field, const zbx_vector_uint64_t *ids);
 void	zbx_db_large_query_prepare_str(zbx_db_large_query_t *query, char **sql,
 		size_t *sql_alloc, size_t *sql_offset, const char *field, const zbx_vector_str_t *ids);
-void	zbx_db_large_query_prepare(zbx_db_large_query_t *query, char **sql, size_t *sql_alloc, size_t *sql_offset,
-		const char *field);
+void	zbx_db_large_query_prepare(zbx_db_large_query_t *query, char **sql, size_t *sql_alloc, size_t *sql_offset);
 void	zbx_db_large_query_append_sql(zbx_db_large_query_t *query, const char *sql);
 
 #endif

@@ -1221,9 +1221,8 @@ static void	proxyconfig_prepare_table(zbx_table_data_t *td, const char *key_fiel
 	buf = (char *)zbx_malloc(NULL, buf_alloc);
 
 	zbx_db_large_query_t	query;
-
-	char		*delim = " where";
-	zbx_db_row_t	dbrow;
+	char			*delim = " where";
+	zbx_db_row_t		dbrow;
 
 	zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "select %s", td->table->recid);
 
@@ -1244,7 +1243,7 @@ static void	proxyconfig_prepare_table(zbx_table_data_t *td, const char *key_fiel
 		zbx_db_large_query_prepare_uint(&query, &sql, &sql_alloc, &sql_offset, key_field, key_ids);
 	}
 	else
-		zbx_db_large_query_prepare(&query, &sql, &sql_alloc, &sql_offset, key_field);
+		zbx_db_large_query_prepare(&query, &sql, &sql_alloc, &sql_offset);
 
 	while (NULL != (dbrow = zbx_db_large_query_fetch(&query)))
 	{

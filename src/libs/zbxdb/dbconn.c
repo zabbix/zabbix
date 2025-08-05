@@ -2575,7 +2575,6 @@ void	zbx_dbconn_large_query_prepare_str(zbx_db_large_query_t *query, zbx_dbconn_
  *                              or reallocated                                *
  *             sql_alloc  - [IN/OUT] size of allocated SQL string             *
  *             sql_offset - [IN/OUT] length of the SQL string                 *
- *             field      - [IN] ID field name                                *
  *                                                                            *
  * Comments: Large query object 'borrows' the SQL buffer with the query part, *
  *           meaning:                                                         *
@@ -2585,13 +2584,14 @@ void	zbx_dbconn_large_query_prepare_str(zbx_db_large_query_t *query, zbx_dbconn_
  *               when large query object is cleared.                          *
  *                                                                            *
  ******************************************************************************/
-void	zbx_dbconn_large_query_prepare(zbx_db_large_query_t *query, zbx_dbconn_t *db, char **sql,
-		size_t *sql_alloc, size_t *sql_offset, const char *field)
+void	zbx_dbconn_large_query_prepare(zbx_db_large_query_t *query, zbx_dbconn_t *db, char **sql, size_t *sql_alloc,
+		size_t *sql_offset)
 {
 	query->type = ZBX_DB_LARGE_QUERY;
 	query->ids.ui64 = NULL;
+	query->ids.str = NULL;
 
-	db_large_query_prepare(query, db, sql, sql_alloc, sql_offset, field);
+	db_large_query_prepare(query, db, sql, sql_alloc, sql_offset, NULL);
 }
 
 /******************************************************************************
