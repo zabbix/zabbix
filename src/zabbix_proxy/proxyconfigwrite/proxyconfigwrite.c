@@ -1205,8 +1205,7 @@ static void	proxyconfig_prepare_table(zbx_table_data_t *td, const char *key_fiel
 		id_hash_func_t id_hash_func, zbx_vector_uint64_t *recids)
 {
 	char		*sql = NULL, *buf;
-	size_t		sql_alloc = 0, buf_alloc = ZBX_KIBIBYTE;
-	int		batch_index = 0;
+	size_t		sql_alloc = 0, buf_alloc = ZBX_KIBIBYTE, sql_offset = 0;
 
 	zbx_db_field_t	recid_field = td->table->fields[0];
 
@@ -1220,56 +1219,58 @@ static void	proxyconfig_prepare_table(zbx_table_data_t *td, const char *key_fiel
 		return;
 
 	buf = (char *)zbx_malloc(NULL, buf_alloc);
-	do
+
+	zbx_db_large_query_t	query;
+
+	char		*delim = " where";
+	zbx_db_row_t	dbrow;
+
+	zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "select %s", td->table->recid);
+
+	for (int i = 1; i < td->fields.values_num; i++)
+		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, ",%s", td->fields.values[i].field->name);
+
+	zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, " from %s", td->table->table);
+
+	if (NULL != td->sql_filter)
 	{
-		char		*delim = " where";
-		zbx_db_result_t	result;
-		zbx_db_row_t	dbrow;
-		size_t		sql_offset = 0;
-
-		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "select %s", td->table->recid);
-
-		for (int i = 1; i < td->fields.values_num; i++)
-			zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, ",%s", td->fields.values[i].field->name);
-
-		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, " from %s", td->table->table);
-		if (NULL != key_ids)
-		{
-			zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, delim);
-			add_batch_select_condition(&sql, &sql_alloc, &sql_offset, key_field, key_ids, &batch_index);
-			delim = " and";
-		}
-
-		if (NULL != td->sql_filter)
-			zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "%s %s", delim, td->sql_filter);
-
-		result = zbx_db_select("%s", sql);
-
-		while (NULL != (dbrow = zbx_db_fetch(result)))
-		{
-			zbx_uint64_t	recid;
-			zbx_table_row_t	*row;
-
-			if (ZBX_TYPE_ID == recid_field.type)
-				ZBX_STR2UINT64(recid, dbrow[0]);
-			else
-				recid = id_hash_func(dbrow[0]);
-
-			if (NULL != recids)
-				zbx_vector_uint64_append(recids, recid);
-
-			if (NULL == (row = (zbx_table_row_t *)zbx_hashset_search(&td->rows, &recid)))
-			{
-				zbx_vector_uint64_append(&td->del_ids, recid);
-				continue;
-			}
-
-			if (SUCCEED != proxyconfig_compare_row(row, dbrow, &buf, &buf_alloc))
-				zbx_vector_table_row_ptr_append(&td->updates, row);
-		}
-		zbx_db_free_result(result);
+		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "%s %s", delim, td->sql_filter);
+		delim = " and";
 	}
-	while (NULL != key_ids && batch_index < key_ids->values_num);
+
+	if (NULL != key_ids)
+	{
+		zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, delim);
+		zbx_db_large_query_prepare_uint(&query, &sql, &sql_alloc, &sql_offset, key_field, key_ids);
+	}
+	else
+		zbx_db_large_query_prepare(&query, &sql, &sql_alloc, &sql_offset, key_field);
+
+	
+
+	while (NULL != (dbrow = zbx_db_large_query_fetch(&query)))
+	{
+		zbx_uint64_t	recid;
+		zbx_table_row_t	*row;
+
+		if (ZBX_TYPE_ID == recid_field.type)
+			ZBX_STR2UINT64(recid, dbrow[0]);
+		else
+			recid = id_hash_func(dbrow[0]);
+
+		if (NULL != recids)
+			zbx_vector_uint64_append(recids, recid);
+
+		if (NULL == (row = (zbx_table_row_t *)zbx_hashset_search(&td->rows, &recid)))
+		{
+			zbx_vector_uint64_append(&td->del_ids, recid);
+			continue;
+		}
+
+		if (SUCCEED != proxyconfig_compare_row(row, dbrow, &buf, &buf_alloc))
+			zbx_vector_table_row_ptr_append(&td->updates, row);
+	}
+	zbx_db_large_query_clear(&query);
 
 	zbx_free(sql);
 	zbx_free(buf);
