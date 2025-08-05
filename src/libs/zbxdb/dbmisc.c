@@ -1177,7 +1177,7 @@ void	zbx_db_add_condition_alloc(char **sql, size_t *sql_alloc, size_t *sql_offse
 		return;
 	}
 
-	zbx_snprintf_alloc(sql, sql_alloc, sql_offset, " %s in(", fieldname);
+	zbx_snprintf_alloc(sql, sql_alloc, sql_offset, " %s in (", fieldname);
 
 	for (int i = 0; i < num; i++)
 		zbx_snprintf_alloc(sql, sql_alloc, sql_offset, ZBX_FS_UI64 ",", values[i]);
