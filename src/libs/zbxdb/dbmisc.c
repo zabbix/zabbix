@@ -1312,7 +1312,7 @@ void	zbx_db_add_str_condition_alloc(char **sql, size_t *sql_alloc, size_t *sql_o
 			values_num++;
 	}
 #if defined(HAVE_SQLITE3)
-	int	cnt = 0
+	int	cnt = 0;
 
 	if (MAX_EXPRESSIONS < values_num || (0 != values_num && 0 != empty_num))
 #else
