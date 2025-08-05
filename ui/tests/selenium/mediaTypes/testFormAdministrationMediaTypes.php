@@ -46,8 +46,6 @@ class testFormAdministrationMediaTypes extends CWebTest {
 		// Create media types for Oauth checks.
 		$oauth_media_data = [];
 		foreach (['Generic SMTP OAuth', 'Gmail OAuth', 'Gmail relay OAuth', 'Office365 OAuth'] as $provider => $name) {
-			var_dump($provider);
-			var_dump($name);
 			$oauth_media_data[] = [
 				'type' => MEDIA_TYPE_EMAIL,
 				'provider' => $provider,
