@@ -1176,20 +1176,14 @@ void	zbx_db_add_condition_alloc(char **sql, size_t *sql_alloc, size_t *sql_offse
 		zbx_snprintf_alloc(sql, sql_alloc, sql_offset, " %s=" ZBX_FS_UI64, fieldname, values[0]);
 		return;
 	}
-#if defined(HAVE_POSTGRESQL)
-	zbx_snprintf_alloc(sql, sql_alloc, sql_offset, " %s=any(array[", fieldname);
-#else
+
 	zbx_snprintf_alloc(sql, sql_alloc, sql_offset, " %s in(", fieldname);
-#endif
+
 	for (int i = 0; i < num; i++)
 		zbx_snprintf_alloc(sql, sql_alloc, sql_offset, ZBX_FS_UI64 ",", values[i]);
 
 	(*sql_offset)--;
-#if defined(HAVE_POSTGRESQL)
-	zbx_strcpy_alloc(sql, sql_alloc, sql_offset, "])");
-#else
 	zbx_chrcpy_alloc(sql, sql_alloc, sql_offset, ')');
-#endif
 }
 #else
 #define MAX_EXPRESSIONS	950
