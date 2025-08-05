@@ -592,6 +592,8 @@ void	zbx_db_add_condition_alloc(char **sql, size_t *sql_alloc, size_t *sql_offse
 		const zbx_uint64_t *values, const int num);
 void	zbx_db_add_str_condition_alloc(char **sql, size_t *sql_alloc, size_t *sql_offset, const char *fieldname,
 		const char * const *values, const int num);
+void	add_batch_select_condition(char **sql, size_t *sql_alloc, size_t *sql_offset, const char* column,
+		const zbx_vector_uint64_t *itemids, int *index);
 
 int	zbx_check_user_permissions(const zbx_uint64_t *userid, const zbx_uint64_t *recipient_userid);
 
