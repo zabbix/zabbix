@@ -89,7 +89,7 @@ type ConnDetails struct {
 
 // NewConnDetails function creates a ConnDetails instance for connectin to Oracle.
 func NewConnDetails(uriStr, user, pwd, service string) (*ConnDetails, error) {
-	userSplit, privilegeSplit, err := splitUserPrivilege(user)
+	userSplit, privilegeSplit, err := SplitUserPrivilege(user)
 	if err != nil {
 		return nil, errs.WrapConst(err, ErrNewConnDetails)
 	}
@@ -284,8 +284,8 @@ func (c *ConnManager) setConn(cd ConnDetails, conn *OraConn) (*OraConn, error) {
 	return conn, nil
 }
 
-// splitUserPrivilege function splits userWithPrivilege into user and privilege.
-func splitUserPrivilege(userWithPrivilege string) (user, privilege string, err error) { //nolint:nonamedreturns
+// SplitUserPrivilege function splits userWithPrivilege into user and privilege.
+func SplitUserPrivilege(userWithPrivilege string) (user, privilege string, err error) { //nolint:nonamedreturns
 	userWithPrivilege = normalizeSpaces(userWithPrivilege)
 	if userWithPrivilege == "" {
 		return "", "", errs.WrapConst(zbxerr.ErrorTooFewParameters, ErrMissingParamUser)
@@ -311,7 +311,7 @@ func splitUserPrivilege(userWithPrivilege string) (user, privilege string, err e
 }
 
 // setCustomQuery function if enabled, reads the SQLs from a file by path.
-func setCustomQuery(logr log.Logger, enabled bool, path string) yarn.Yarn { //nolint:ireturn
+func setCustomQuery(logr log.Logger, enabled bool, path string) yarn.Yarn {
 	if !enabled {
 		return yarn.NewFromMap(map[string]string{})
 	}

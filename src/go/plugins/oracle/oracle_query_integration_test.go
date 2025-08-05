@@ -423,7 +423,7 @@ func TestOraConn_QueryRowByName(t *testing.T) { //nolint:tparallel
 }
 
 func seedWithSQL(customQueriesPath string) error {
-	var sqls = []struct { //nolint:gochecknoglobals
+	var sqls = []struct {
 		fileName string
 		content  string
 	}{
@@ -465,21 +465,25 @@ func seedWithSQL(customQueriesPath string) error {
 func newConnDetDefault(t *testing.T, c *testConfig) dbconn.ConnDetails {
 	t.Helper()
 
-	u, _ := uri.NewWithCreds( //nolint:errcheck
+	u, _ := uri.NewWithCreds(
 		c.OraIP+"?service="+c.OraSrv,
 		c.OraUser,
 		c.OraPwd,
 		dbconn.URIDefaults)
 
-	return dbconn.ConnDetails{*u, "", false}
+	return dbconn.ConnDetails{
+		Uri:          *u,
+		Privilege:    c.OraPrivilege,
+		OnlyHostname: false}
 }
 
 // closeRows function closes rows if exits. In case of problem - returns an error to subtest.
-func closeRows(t *testing.T, rows *sql.Rows) { //nolint:unused
+func closeRows(t *testing.T, rows *sql.Rows) {
 	t.Helper()
 
 	if rows != nil {
 		err := rows.Close()
+
 		if err != nil {
 			t.Errorf("rows.Close() error: %v", err)
 		}

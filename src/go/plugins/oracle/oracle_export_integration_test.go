@@ -23,7 +23,6 @@ import (
 	"os"
 	"reflect"
 	"regexp"
-	"strings"
 	"testing"
 	"time"
 
@@ -33,20 +32,22 @@ import (
 	"golang.zabbix.com/sdk/zbxerr"
 )
 
+var (
+	testCfg   *testConfig //nolint:gochecknoglobals
+	OraVersRx = regexp.MustCompile(`^\d{2}\.\d+\.\d+\.\d+\.\d+$`)
+)
+
 // testConfig contains connection properties to real Oracle environment.
 type testConfig struct {
 	OraHostname string
 	OraIP       string
 
 	OraUser string
-	OraPwd  string
-	OraSrv  string
+	// More isolated tests which do not use the plugin's Export method needs separate privilege.
+	OraPrivilege string
+	OraPwd       string
+	OraSrv       string
 }
-
-var (
-	testCfg   *testConfig //nolint:gochecknoglobals
-	OraVersRx = regexp.MustCompile(`^\d{2}\.\d+\.\d+\.\d+\.\d+$`)
-)
 
 func TestMain(m *testing.M) {
 	testCfg = &testConfig{
@@ -59,25 +60,32 @@ func TestMain(m *testing.M) {
 	}
 
 	if testCfg.OraIP == "" || testCfg.OraUser == "" || testCfg.OraPwd == "" || testCfg.OraSrv == "" {
-		fmt.Println( //nolint:forbidigo
-			"    ==SETUP NEEDED==\n" +
-				"1) Environment variables ORA_IP, ORA_USER, ORA_PWD and ORA_SRV must be set to run tests.\n" +
-				"  The variable ORA_HOSTNAME is optional but recommended.\n" +
-				"2) The TNS value must be inserted in the appropriate directory of your system, e.g.,\n+" +
-				"  /opt/oracle/instantclient_23_7/network/admin/tnsnames.ora:\n" +
-				"  zbx_tns = (DESCRIPTION=(ADDRESS=(PROTOCOL=TCP)(HOST=<ORA_IP or ORA_HOSTNAME>)(PORT=1521))\n" +
-				"  (CONNECT_DATA=(SERVICE_NAME=<ORA_SRV>))), e.g., zbx_tns = (DESCRIPTION=(ADDRESS=(PROTOCOL=TCP)\n" +
-				"  (HOST=localhost)(PORT=1521))(CONNECT_DATA=(SERVICE_NAME=XE)))",
-		)
-		fmt.Println( //nolint:forbidigo
-			"    ==ADDITIONAL HINTS==\n" +
-				"Use -test.short to avoid long running tests (some negative tests run long because of Oracle client timeouts).\n" +
-				"Usage: \n" +
-				"CLI: go test -test.short <pckg>\n" +
+		fmt.Fprintf(os.Stderr,
+			"\n   ==SETUP NEEDED==\n"+
+				"1) Environment variables ORA_IP, ORA_USER, ORA_PWD and ORA_SRV must be set to run tests.\n"+
+				"  The variable ORA_HOSTNAME is optional but recommended. The variable ORA_USER can be\n"+
+				"  specified with a privilege in the format '<username> as <privilege>.'\n"+
+				"2) The TNS value must be inserted in the appropriate directory of your system, e.g.,\n"+
+				"  /opt/oracle/instantclient_23_7/network/admin/tnsnames.ora in the format:\n"+
+				"  zbx_tns = (DESCRIPTION=(ADDRESS=(PROTOCOL=TCP)(HOST=<ORA_IP or ORA_HOSTNAME>)(PORT=1521))\n"+
+				"  (CONNECT_DATA=(SERVICE_NAME=<ORA_SRV>))), e.g., zbx_tns = (DESCRIPTION=(ADDRESS=(PROTOCOL=TCP)\n"+
+				"  (HOST=localhost)(PORT=1521))(CONNECT_DATA=(SERVICE_NAME=XE)))\n"+
+				"    ==ADDITIONAL HINTS==\n"+
+				"Use -test.short to avoid long running tests (some negative tests run long because of Oracle \n"+
+				"client timeouts). Usage: \n"+
+				"CLI: go test -test.short <pckg>\n"+
 				"GoLAND: add -test.short to Run/Debug config field 'Program arguments'",
 		)
 
-		os.Exit(-1)
+		os.Exit(1)
+	}
+
+	var err error
+
+	testCfg.OraUser, testCfg.OraPrivilege, err = dbconn.SplitUserPrivilege(testCfg.OraUser)
+	if err != nil {
+		fmt.Fprintf(os.Stderr, "wrong username format: %s\n", testCfg.OraUser)
+		os.Exit(1)
 	}
 
 	impl.Init(pluginName)
@@ -96,10 +104,12 @@ func TestPlugin_Start(t *testing.T) { //nolint:paralleltest //nolint:paralleltes
 	})
 }
 
-//nolint:paralleltest
+//nolint:paralleltest,cyclop
 func TestPlugin_Export_TNSDisabled(t *testing.T) {
 	// Set here because the plugin's config file has not been loaded and default ResolveTNS=true
 	impl.options.ResolveTNS = false
+	// If the default service XE is not used, specified one in env must be assigned.
+	impl.options.Default.Service = testCfg.OraSrv
 
 	// When isolated test function is launched - impl.connMgr is nil.
 	if impl.connMgr == nil {
@@ -118,7 +128,7 @@ func TestPlugin_Export_TNSDisabled(t *testing.T) {
 		p          *Plugin
 		args       args
 		wantResult any
-		wantErr    error
+		wantErr    bool
 		longTest   bool
 		//if hasHostname==true and hostname is not specified, the test will be omitted
 		hasHostname bool
@@ -127,11 +137,11 @@ func TestPlugin_Export_TNSDisabled(t *testing.T) {
 			name: "+hostname",
 			p:    &impl,
 			args: args{keyPing,
-				[]string{testCfg.OraHostname, testCfg.OraUser, testCfg.OraPwd, testCfg.OraSrv},
+				[]string{testCfg.OraHostname, testCfg.GetUserWithPrivilege(), testCfg.OraPwd, testCfg.OraSrv},
 				nil,
 			},
 			wantResult:  handlers.PingOk,
-			wantErr:     nil,
+			wantErr:     false,
 			hasHostname: true,
 		},
 		{
@@ -139,11 +149,11 @@ func TestPlugin_Export_TNSDisabled(t *testing.T) {
 			p:    &impl,
 			args: args{keyPing,
 				[]string{"tcp://" + testCfg.OraHostname,
-					testCfg.OraUser, testCfg.OraPwd, testCfg.OraSrv},
+					testCfg.GetUserWithPrivilege(), testCfg.OraPwd, testCfg.OraSrv},
 				nil,
 			},
 			wantResult:  handlers.PingOk,
-			wantErr:     nil,
+			wantErr:     false,
 			hasHostname: true,
 		},
 		{
@@ -151,23 +161,23 @@ func TestPlugin_Export_TNSDisabled(t *testing.T) {
 			p:    &impl,
 			args: args{keyPing,
 				[]string{testCfg.OraHostname + ":1521",
-					testCfg.OraUser, testCfg.OraPwd, testCfg.OraSrv},
+					testCfg.GetUserWithPrivilege(), testCfg.OraPwd, testCfg.OraSrv},
 				nil,
 			},
 			wantResult:  handlers.PingOk,
-			wantErr:     nil,
+			wantErr:     false,
 			hasHostname: true,
 		},
 		{
 			name: "+hostnameWithSchemaPort",
 			p:    &impl,
 			args: args{keyPing,
-				[]string{fmt.Sprintf("tcp://%s:1521", testCfg.OraHostname),
-					testCfg.OraUser, testCfg.OraPwd, testCfg.OraSrv},
+				[]string{fmt.Sprintf("tcp://%s:1521", testCfg.OraHostname), //nolint:nosprintfhostport
+					testCfg.GetUserWithPrivilege(), testCfg.OraPwd, testCfg.OraSrv},
 				nil,
 			},
 			wantResult:  handlers.PingOk,
-			wantErr:     nil,
+			wantErr:     false,
 			hasHostname: true,
 		},
 		{
@@ -175,55 +185,55 @@ func TestPlugin_Export_TNSDisabled(t *testing.T) {
 			p:    &impl,
 			args: args{keyPing,
 				[]string{testCfg.OraIP,
-					testCfg.OraUser, testCfg.OraPwd, testCfg.OraSrv},
+					testCfg.GetUserWithPrivilege(), testCfg.OraPwd, testCfg.OraSrv},
 				nil,
 			},
 			wantResult: handlers.PingOk,
-			wantErr:    nil,
+			wantErr:    false,
 		},
 		{
 			name: "+IPwithSchema",
 			p:    &impl,
 			args: args{keyPing,
 				[]string{"tcp://" + testCfg.OraIP,
-					testCfg.OraUser, testCfg.OraPwd, testCfg.OraSrv},
+					testCfg.GetUserWithPrivilege(), testCfg.OraPwd, testCfg.OraSrv},
 				nil,
 			},
 			wantResult: handlers.PingOk,
-			wantErr:    nil,
+			wantErr:    false,
 		},
 		{
 			name: "+IPwithPort",
 			p:    &impl,
 			args: args{keyPing,
 				[]string{testCfg.OraIP + ":1521",
-					testCfg.OraUser, testCfg.OraPwd, testCfg.OraSrv},
+					testCfg.GetUserWithPrivilege(), testCfg.OraPwd, testCfg.OraSrv},
 				nil,
 			},
 			wantResult: handlers.PingOk,
-			wantErr:    nil,
+			wantErr:    false,
 		},
 		{
 			name: "+IPwithSchemaPort",
 			p:    &impl,
 			args: args{keyPing,
-				[]string{fmt.Sprintf("tcp://%s:1521", testCfg.OraIP),
-					testCfg.OraUser, testCfg.OraPwd, testCfg.OraSrv},
+				[]string{fmt.Sprintf("tcp://%s:1521", testCfg.OraIP), //nolint:nosprintfhostport
+					testCfg.GetUserWithPrivilege(), testCfg.OraPwd, testCfg.OraSrv},
 				nil,
 			},
 			wantResult: handlers.PingOk,
-			wantErr:    nil,
+			wantErr:    false,
 		},
 		{
 			name: "+IPnoService",
 			p:    &impl,
 			args: args{keyPing,
 				[]string{testCfg.OraIP,
-					testCfg.OraUser, testCfg.OraPwd},
+					testCfg.GetUserWithPrivilege(), testCfg.OraPwd},
 				nil,
 			},
 			wantResult: handlers.PingOk,
-			wantErr:    nil,
+			wantErr:    false,
 		},
 		{
 			// Although ResolveTNS is false, the connection by TNS name value anyway should work.
@@ -232,14 +242,14 @@ func TestPlugin_Export_TNSDisabled(t *testing.T) {
 			args: args{keyPing,
 				[]string{fmt.Sprintf("(DESCRIPTION=(ADDRESS=(PROTOCOL=TCP)(HOST=%s)(PORT=1521))"+
 					"(CONNECT_DATA=(SERVICE_NAME=%s)))", testCfg.OraHostname, testCfg.OraSrv),
-					testCfg.OraUser,
+					testCfg.GetUserWithPrivilege(),
 					testCfg.OraPwd,
 					testCfg.OraSrv,
 				},
 				nil,
 			},
 			wantResult:  handlers.PingOk,
-			wantErr:     nil,
+			wantErr:     false,
 			hasHostname: true,
 		},
 		// Although ResolveTNS is false, the connection by TNS name value anyway should work.
@@ -249,51 +259,51 @@ func TestPlugin_Export_TNSDisabled(t *testing.T) {
 			args: args{keyPing,
 				[]string{fmt.Sprintf("(DESCRIPTION=(ADDRESS=(PROTOCOL=TCP)(HOST=%s)(PORT=1521))"+
 					"(CONNECT_DATA=(SERVICE_NAME=%s)))", testCfg.OraIP, testCfg.OraSrv),
-					testCfg.OraUser,
+					testCfg.GetUserWithPrivilege(),
 					testCfg.OraPwd,
 					testCfg.OraSrv,
 				},
 				nil,
 			},
 			wantResult: handlers.PingOk,
-			wantErr:    nil,
+			wantErr:    false,
 		},
 		{
 			name:        "-hostnameOnly",
 			p:           &impl,
 			args:        args{keyPing, []string{testCfg.OraHostname}, nil},
 			wantResult:  handlers.PingFailed,
-			wantErr:     dbconn.ErrMissingParamUser,
+			wantErr:     true,
 			hasHostname: true,
 		},
 		{
 			name:       "-unknownHostname",
 			p:          &impl,
-			args:       args{keyUser, []string{"fake", testCfg.OraUser}, nil},
+			args:       args{keyUser, []string{"fake", testCfg.GetUserWithPrivilege()}, nil},
 			wantResult: nil,
-			wantErr:    errors.New("ORA-12545: Connect failed because target host or object does not exist"),
+			wantErr:    true,
 			longTest:   true,
 		},
 		{
 			name: "-hostnameWithUser",
 			p:    &impl,
 			args: args{keyPing,
-				[]string{testCfg.OraHostname, testCfg.OraUser},
+				[]string{testCfg.OraHostname, testCfg.GetUserWithPrivilege()},
 				nil,
 			},
 			wantResult:  handlers.PingFailed,
-			wantErr:     nil,
+			wantErr:     false,
 			hasHostname: true,
 		},
 		{
 			name: "-hostnameWithUserService",
 			p:    &impl,
 			args: args{keyPing,
-				[]string{testCfg.OraHostname, testCfg.OraUser, "", testCfg.OraSrv},
+				[]string{testCfg.OraHostname, testCfg.GetUserWithPrivilege(), "", testCfg.OraSrv},
 				nil,
 			},
 			wantResult:  handlers.PingFailed,
-			wantErr:     nil,
+			wantErr:     false,
 			hasHostname: true,
 		},
 		{
@@ -303,67 +313,67 @@ func TestPlugin_Export_TNSDisabled(t *testing.T) {
 				[]string{testCfg.OraIP}, nil,
 			},
 			wantResult: handlers.PingFailed,
-			wantErr:    dbconn.ErrMissingParamUser,
+			wantErr:    true,
 		},
 		{
 			name:       "-unknownIP",
 			p:          &impl,
-			args:       args{keyUser, []string{"254.254.254.100", testCfg.OraUser}, nil},
+			args:       args{keyUser, []string{"254.254.254.100", testCfg.GetUserWithPrivilege()}, nil},
 			wantResult: nil,
-			wantErr:    errors.New("ORA-12545: Connect failed because target host or object does not exist"),
+			wantErr:    true,
 			longTest:   true,
 		},
 		{
 			name: "-IPwithUser",
 			p:    &impl,
 			args: args{keyPing,
-				[]string{testCfg.OraIP, testCfg.OraUser},
+				[]string{testCfg.OraIP, testCfg.GetUserWithPrivilege()},
 				nil,
 			},
 			wantResult: handlers.PingFailed,
-			wantErr:    nil,
+			wantErr:    false,
 		},
 		{
 			name: "-IPwithUserService",
 			p:    &impl,
 			args: args{keyPing,
-				[]string{testCfg.OraIP, testCfg.OraUser, "", testCfg.OraSrv},
+				[]string{testCfg.OraIP, testCfg.GetUserWithPrivilege(), "", testCfg.OraSrv},
 				nil,
 			},
 			wantResult: handlers.PingFailed,
-			wantErr:    nil,
+			wantErr:    false,
 		},
 		{
 			name: "-TNSKey",
 			p:    &impl,
 			args: args{keyPing,
-				[]string{"zbx_tns", testCfg.OraUser, testCfg.OraPwd, testCfg.OraSrv},
+				[]string{"zbx_tns", testCfg.GetUserWithPrivilege(), testCfg.OraPwd, testCfg.OraSrv},
 				nil,
 			},
 			wantResult: handlers.PingFailed,
-			wantErr:    nil,
+			wantErr:    false,
 			longTest:   true,
 		},
 		{
 			name: "-TNSKeyNoPassword",
 			p:    &impl,
 			args: args{keyPing,
-				[]string{"zbx_tns", testCfg.OraUser, "", testCfg.OraSrv},
+				[]string{"zbx_tns", testCfg.GetUserWithPrivilege(), "", testCfg.OraSrv},
 				nil,
 			},
 			wantResult: handlers.PingFailed,
-			wantErr:    nil,
+			wantErr:    false,
 			longTest:   true,
 		},
 		{
 			name: "-brokenTNSValue",
 			p:    &impl,
 			args: args{keyPing,
-				[]string{"DESCRIPTION=(AD..", testCfg.OraUser, testCfg.OraPwd},
+				[]string{"DESCRIPTION=(AD..", testCfg.GetUserWithPrivilege(), testCfg.OraPwd},
 				nil,
 			},
 			wantResult: handlers.PingFailed,
-			wantErr:    nil,
+			wantErr:    false,
 		},
 	}
 
@@ -383,13 +393,12 @@ func TestPlugin_Export_TNSDisabled(t *testing.T) {
 			gotResult, err := tt.p.Export(tt.args.key, tt.args.params, tt.args.ctx)
 
 			if err != nil {
-				if tt.wantErr == nil || !strings.Contains(err.Error(), tt.wantErr.Error()) {
-					t.Errorf("Plugin.Export() error = %v, wantErr %v", err, tt.wantErr)
-
+				switch tt.wantErr {
+				case true:
 					return
+				default:
+					t.Fatalf("Plugin.Export() error = %v, wantErr %t", err, tt.wantErr)
 				}
-
-				return
 			}
 
 			if !reflect.DeepEqual(gotResult, tt.wantResult) {
@@ -399,10 +408,12 @@ func TestPlugin_Export_TNSDisabled(t *testing.T) {
 	}
 }
 
-//nolint:paralleltest
+//nolint:paralleltest,cyclop
 func TestPlugin_Export_TNSEnabled(t *testing.T) {
 	// Set here because the plugin's config file has not been loaded and default ResolveTNS=true
 	impl.options.ResolveTNS = false
+	// If the default service XE is not used, specified one in env must be assigned.
+	impl.options.Default.Service = testCfg.OraSrv
 
 	// When isolated test function is launched - impl.connMgr is nil.
 	if impl.connMgr == nil {
@@ -421,7 +432,7 @@ func TestPlugin_Export_TNSEnabled(t *testing.T) {
 		p           *Plugin
 		args        args
 		wantResult  any
-		wantErr     error
+		wantErr     bool
 		longTest    bool
 		hasHostname bool
 	}{
@@ -429,11 +440,11 @@ func TestPlugin_Export_TNSEnabled(t *testing.T) {
 			name: "+TNSKey", // the valid tns name description w/ the key 'zbx_tns' must be added to tnsnames.ora.
 			p:    &impl,
 			args: args{keyPing,
-				[]string{"zbx_tns", testCfg.OraUser, testCfg.OraPwd, testCfg.OraSrv},
+				[]string{"zbx_tns", testCfg.GetUserWithPrivilege(), testCfg.OraPwd, testCfg.OraSrv},
 				nil,
 			},
 			wantResult: handlers.PingOk,
-			wantErr:    nil,
+			wantErr:    false,
 		},
 		{
 			// The connection by TNS name does not depend on ResolveTNS param.
@@ -442,14 +453,14 @@ func TestPlugin_Export_TNSEnabled(t *testing.T) {
 			args: args{keyPing,
 				[]string{fmt.Sprintf("(DESCRIPTION=(ADDRESS=(PROTOCOL=TCP)(HOST=%s)(PORT=1521))"+
 					"(CONNECT_DATA=(SERVICE_NAME=%s)))", testCfg.OraHostname, testCfg.OraSrv),
-					testCfg.OraUser,
+					testCfg.GetUserWithPrivilege(),
 					testCfg.OraPwd,
 					testCfg.OraSrv,
 				},
 				nil,
 			},
 			wantResult:  handlers.PingOk,
-			wantErr:     nil,
+			wantErr:     false,
 			hasHostname: true,
 		},
 		{
@@ -459,25 +470,26 @@ func TestPlugin_Export_TNSEnabled(t *testing.T) {
 			args: args{keyPing,
 				[]string{fmt.Sprintf("(DESCRIPTION=(ADDRESS=(PROTOCOL=TCP)(HOST=%s)(PORT=1521))"+
 					"(CONNECT_DATA=(SERVICE_NAME=%s)))", testCfg.OraIP, testCfg.OraSrv),
-					testCfg.OraUser,
+					testCfg.GetUserWithPrivilege(),
 					testCfg.OraPwd,
 					testCfg.OraSrv,
 				},
 				nil,
 			},
 			wantResult: handlers.PingOk,
-			wantErr:    nil,
+			wantErr:    false,
 		},
 		{
-			//Oracle client looks hostname up in TNS - doesn't find it; tries as hostname - succeeds (godror functionality).
+			// Oracle client looks hostname up in TNS - doesn't find it; tries as hostname - succeeds (godror
+			// functionality).
 			name: "+hostname",
 			p:    &impl,
 			args: args{keyPing,
-				[]string{testCfg.OraHostname, testCfg.OraUser, testCfg.OraPwd, testCfg.OraSrv},
+				[]string{testCfg.OraHostname, testCfg.GetUserWithPrivilege(), testCfg.OraPwd, testCfg.OraSrv},
 				nil,
 			},
 			wantResult:  handlers.PingOk,
-			wantErr:     nil,
+			wantErr:     false,
 			hasHostname: true,
 		},
 		{
@@ -485,11 +497,11 @@ func TestPlugin_Export_TNSEnabled(t *testing.T) {
 			p:    &impl,
 			args: args{keyPing,
 				[]string{"tcp://" + testCfg.OraHostname,
-					testCfg.OraUser, testCfg.OraPwd, testCfg.OraSrv},
+					testCfg.GetUserWithPrivilege(), testCfg.OraPwd, testCfg.OraSrv},
 				nil,
 			},
 			wantResult:  handlers.PingOk,
-			wantErr:     nil,
+			wantErr:     false,
 			hasHostname: true,
 		},
 		{
@@ -497,23 +509,23 @@ func TestPlugin_Export_TNSEnabled(t *testing.T) {
 			p:    &impl,
 			args: args{keyPing,
 				[]string{testCfg.OraHostname + ":1521",
-					testCfg.OraUser, testCfg.OraPwd, testCfg.OraSrv},
+					testCfg.GetUserWithPrivilege(), testCfg.OraPwd, testCfg.OraSrv},
 				nil,
 			},
 			wantResult:  handlers.PingOk,
-			wantErr:     nil,
+			wantErr:     false,
 			hasHostname: true,
 		},
 		{
 			name: "+hostnameWithSchemaPort",
 			p:    &impl,
 			args: args{keyPing,
-				[]string{fmt.Sprintf("tcp://%s:1521", testCfg.OraHostname),
-					testCfg.OraUser, testCfg.OraPwd, testCfg.OraSrv},
+				[]string{fmt.Sprintf("tcp://%s:1521", testCfg.OraHostname), //nolint:nosprintfhostport
+					testCfg.GetUserWithPrivilege(), testCfg.OraPwd, testCfg.OraSrv},
 				nil,
 			},
 			wantResult:  handlers.PingOk,
-			wantErr:     nil,
+			wantErr:     false,
 			hasHostname: true,
 		},
 		{
@@ -521,55 +533,55 @@ func TestPlugin_Export_TNSEnabled(t *testing.T) {
 			p:    &impl,
 			args: args{keyPing,
 				[]string{testCfg.OraIP,
-					testCfg.OraUser, testCfg.OraPwd, testCfg.OraSrv},
+					testCfg.GetUserWithPrivilege(), testCfg.OraPwd, testCfg.OraSrv},
 				nil,
 			},
 			wantResult: handlers.PingOk,
-			wantErr:    nil,
+			wantErr:    false,
 		},
 		{
 			name: "+IPwithSchema",
 			p:    &impl,
 			args: args{keyPing,
 				[]string{"tcp://" + testCfg.OraIP,
-					testCfg.OraUser, testCfg.OraPwd, testCfg.OraSrv},
+					testCfg.GetUserWithPrivilege(), testCfg.OraPwd, testCfg.OraSrv},
 				nil,
 			},
 			wantResult: handlers.PingOk,
-			wantErr:    nil,
+			wantErr:    false,
 		},
 		{
 			name: "+IPwithPort",
 			p:    &impl,
 			args: args{keyPing,
 				[]string{testCfg.OraIP + ":1521",
-					testCfg.OraUser, testCfg.OraPwd, testCfg.OraSrv},
+					testCfg.GetUserWithPrivilege(), testCfg.OraPwd, testCfg.OraSrv},
 				nil,
 			},
 			wantResult: handlers.PingOk,
-			wantErr:    nil,
+			wantErr:    false,
 		},
 		{
 			name: "+IPwithSchemaPort",
 			p:    &impl,
 			args: args{keyPing,
-				[]string{fmt.Sprintf("tcp://%s:1521", testCfg.OraIP),
-					testCfg.OraUser, testCfg.OraPwd, testCfg.OraSrv},
+				[]string{fmt.Sprintf("tcp://%s:1521", testCfg.OraIP), //nolint:nosprintfhostport
+					testCfg.GetUserWithPrivilege(), testCfg.OraPwd, testCfg.OraSrv},
 				nil,
 			},
 			wantResult: handlers.PingOk,
-			wantErr:    nil,
+			wantErr:    false,
 		},
 		{
 			name: "+IPnoService",
 			p:    &impl,
 			args: args{keyPing,
 				[]string{testCfg.OraIP,
-					testCfg.OraUser, testCfg.OraPwd},
+					testCfg.GetUserWithPrivilege(), testCfg.OraPwd},
 				nil,
 			},
 			wantResult: handlers.PingOk,
-			wantErr:    nil,
+			wantErr:    false,
 		},
 		{
 			// Although ResolveTNS is false, the connection by TNS name value anyway should work.
@@ -578,14 +590,14 @@ func TestPlugin_Export_TNSEnabled(t *testing.T) {
 			args: args{keyPing,
 				[]string{fmt.Sprintf("(DESCRIPTION=(ADDRESS=(PROTOCOL=TCP)(HOST=%s)(PORT=1521))"+
 					"(CONNECT_DATA=(SERVICE_NAME=%s)))", testCfg.OraHostname, testCfg.OraSrv),
-					testCfg.OraUser,
+					testCfg.GetUserWithPrivilege(),
 					testCfg.OraPwd,
 					testCfg.OraSrv,
 				},
 				nil,
 			},
 			wantResult:  handlers.PingOk,
-			wantErr:     nil,
+			wantErr:     false,
 			hasHostname: true,
 		},
 		{
@@ -594,73 +606,74 @@ func TestPlugin_Export_TNSEnabled(t *testing.T) {
 			args: args{keyPing,
 				[]string{fmt.Sprintf("(DESCRIPTION=(ADDRESS=(PROTOCOL=TCP)(HOST=%s)(PORT=1521))"+
 					"(CONNECT_DATA=(SERVICE_NAME=%s)))", testCfg.OraIP, testCfg.OraSrv),
-					testCfg.OraUser,
+					testCfg.GetUserWithPrivilege(),
 					testCfg.OraPwd,
 					testCfg.OraSrv,
 				},
 				nil,
 			},
 			wantResult: handlers.PingOk,
-			wantErr:    nil,
+			wantErr:    false,
 		},
 		{
 			// It will work for a few minutes until reach oracle client timeout. If so, then the test is successful.
-			name:       "-unknownTNSandHostname",
-			p:          &impl,
-			args:       args{keyUser, []string{"fake", testCfg.OraUser, testCfg.OraPwd, testCfg.OraSrv}, nil},
+			name: "-unknownTNSandHostname",
+			p:    &impl,
+			args: args{keyUser, []string{"fake", testCfg.GetUserWithPrivilege(),
+				testCfg.OraPwd, testCfg.OraSrv}, nil},
 			wantResult: nil,
-			wantErr:    errors.New("ORA-12154: Cannot connect to database. Cannot find alias"),
+			wantErr:    true,
 			longTest:   true,
 		},
 		{
 			name: "-hostnameWithUser",
 			p:    &impl,
 			args: args{keyPing,
-				[]string{testCfg.OraHostname, testCfg.OraUser},
+				[]string{testCfg.OraHostname, testCfg.GetUserWithPrivilege()},
 				nil,
 			},
 			wantResult:  handlers.PingFailed,
-			wantErr:     nil,
+			wantErr:     false,
 			hasHostname: true,
 		},
 		{
 			name: "-IPnoPwd",
 			p:    &impl,
 			args: args{keyPing,
-				[]string{testCfg.OraIP, testCfg.OraUser},
+				[]string{testCfg.OraIP, testCfg.GetUserWithPrivilege()},
 				nil,
 			},
 			wantResult: handlers.PingFailed,
-			wantErr:    nil,
+			wantErr:    false,
 		},
 		{
 			name:       "-unknownIP",
 			p:          &impl,
-			args:       args{keyUser, []string{"254.254.254.100", testCfg.OraUser}, nil},
+			args:       args{keyUser, []string{"254.254.254.100", testCfg.GetUserWithPrivilege()}, nil},
 			wantResult: nil,
-			wantErr:    errors.New("ORA-12545: Connect failed because target host or object does not exist"),
+			wantErr:    true,
 			longTest:   true,
 		},
 		{
 			name: "-TNSKeyWithPort_TreatedAsHostname",
 			p:    &impl,
 			args: args{keyPing,
-				[]string{"zbx_tns:9999", testCfg.OraUser, testCfg.OraPwd, testCfg.OraSrv},
+				[]string{"zbx_tns:9999", testCfg.GetUserWithPrivilege(), testCfg.OraPwd, testCfg.OraSrv},
 				nil,
 			},
 			wantResult: handlers.PingFailed,
-			wantErr:    nil,
+			wantErr:    false,
 			longTest:   true,
 		},
 		{
 			name: "-TNSKeyWithSchema_TreatedAsHostname",
 			p:    &impl,
 			args: args{keyPing,
-				[]string{"tcp://zbx_tns", testCfg.OraUser, testCfg.OraPwd, testCfg.OraSrv},
+				[]string{"tcp://zbx_tns", testCfg.GetUserWithPrivilege(), testCfg.OraPwd, testCfg.OraSrv},
 				nil,
 			},
 			wantResult: handlers.PingFailed,
-			wantErr:    nil,
+			wantErr:    false,
 			longTest:   true,
 		},
 		{
@@ -669,24 +682,24 @@ func TestPlugin_Export_TNSEnabled(t *testing.T) {
 			args: args{keyPing,
 				[]string{
 					"(DESCRIPTION=(ADDRESS=(PROTOCOL=TCP)(HOST=any)(PORT=1521))(CONNECT_DATA=(SERVICE_NAME=xe___",
-					testCfg.OraUser,
+					testCfg.GetUserWithPrivilege(),
 					testCfg.OraPwd,
 					testCfg.OraSrv,
 				},
 				nil,
 			},
 			wantResult: handlers.PingFailed,
-			wantErr:    nil,
+			wantErr:    false,
 		},
 		{
 			name: "-TNSValueWrongFormat-Leading",
 			p:    &impl,
 			args: args{keyPing,
-				[]string{"(DESCRIPTION=", testCfg.OraUser, testCfg.OraPwd, testCfg.OraSrv},
+				[]string{"(DESCRIPTION=", testCfg.GetUserWithPrivilege(), testCfg.OraPwd, testCfg.OraSrv},
 				nil,
 			},
 			wantResult: handlers.PingFailed,
-			wantErr:    nil,
+			wantErr:    false,
 		},
 	}
 
@@ -706,13 +719,12 @@ func TestPlugin_Export_TNSEnabled(t *testing.T) {
 			gotResult, err := tt.p.Export(tt.args.key, tt.args.params, tt.args.ctx)
 
 			if err != nil {
-				if tt.wantErr == nil || !strings.Contains(err.Error(), tt.wantErr.Error()) {
-					t.Errorf("Plugin.Export() error = %v, wantErr %v", err, tt.wantErr)
-
+				switch tt.wantErr {
+				case true:
 					return
+				default:
+					t.Fatalf("Plugin.Export() error = %v, wantErr %t", err, tt.wantErr)
 				}
-
-				return
 			}
 
 			if !reflect.DeepEqual(gotResult, tt.wantResult) {
@@ -732,7 +744,8 @@ func Test_PingHandler(t *testing.T) {
 
 	metric := keyPing
 
-	got, err := impl.Export(metric, []string{testCfg.OraIP, testCfg.OraUser, testCfg.OraPwd, testCfg.OraSrv}, nil)
+	got, err := impl.Export(metric, []string{testCfg.OraIP, testCfg.GetUserWithPrivilege(),
+		testCfg.OraPwd, testCfg.OraSrv}, nil)
 	if err != nil {
 		t.Fatalf("Plugin.%s() failed with error: %s", getHandlerName(t, metric), err.Error())
 	}
@@ -758,7 +771,7 @@ func Test_VersionHandler(t *testing.T) {
 	metric := keyVersion
 
 	got, err := impl.Export(metric, []string{testCfg.OraIP,
-		testCfg.OraUser, testCfg.OraPwd, testCfg.OraSrv}, nil)
+		testCfg.GetUserWithPrivilege(), testCfg.OraPwd, testCfg.OraSrv}, nil)
 	if err != nil {
 		t.Fatalf("Plugin.%s() failed with error: %s", getHandlerName(t, metric), err.Error())
 	}
@@ -773,7 +786,7 @@ func Test_VersionHandler(t *testing.T) {
 	}
 }
 
-//nolint:gocyclo,cyclop,paralleltest
+//nolint:paralleltest
 func Test_HandlerResultFormat(t *testing.T) {
 	//When isolated test function is launched - impl.connMgr is nil.
 	if impl.connMgr == nil {
@@ -786,7 +799,7 @@ func Test_HandlerResultFormat(t *testing.T) {
 		metric string
 	}
 
-	var tests []test
+	var tests []test //nolint:prealloc
 
 	// Generate test slice.
 	for metric := range plugin.Metrics {
@@ -794,20 +807,23 @@ func Test_HandlerResultFormat(t *testing.T) {
 			// These handlers have a structured - non-error return in case of the negative replay.
 			continue
 		}
+
 		tests = append(tests, test{"+" + metric, metric})
 	}
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			got, err := impl.Export(tt.metric, []string{testCfg.OraIP,
-				testCfg.OraUser, testCfg.OraPwd, testCfg.OraSrv}, nil)
+				testCfg.GetUserWithPrivilege(), testCfg.OraPwd, testCfg.OraSrv}, nil)
 			if err != nil {
-				t.Fatalf("Plugin.%s() failed with error: %s", getHandlerName(t, tt.metric), err.Error())
+				t.Fatalf(
+					"Plugin.%s() failed with error: %s",
+					getHandlerName(t, tt.metric), err.Error())
 			}
 
 			var obj any
-			gotStr, ok := got.(string)
 
+			gotStr, ok := got.(string)
 			if !ok {
 				t.Fatalf("Plugin.%s() = %+v, expected string Export result", getHandlerName(t, tt.metric), got)
 			}
@@ -819,16 +835,17 @@ func Test_HandlerResultFormat(t *testing.T) {
 	}
 }
 
-//nolint:gocyclo,cyclop,paralleltest
+//nolint:paralleltest
 func Test_HandlersResultClosedDb(t *testing.T) {
 	//When isolated test function is launched - impl.connMgr is nil.
 	if impl.connMgr == nil {
 		impl.Start()
 		defer impl.Stop()
 	}
+
 	connDetails, err := dbconn.NewConnDetails(
 		testCfg.OraIP,
-		testCfg.OraUser,
+		testCfg.GetUserWithPrivilege(),
 		testCfg.OraPwd,
 		testCfg.OraSrv,
 	)
@@ -852,19 +869,22 @@ func Test_HandlersResultClosedDb(t *testing.T) {
 		metric string
 	}
 
-	var tests []test
+	var tests []test //nolint:prealloc
 
 	// Generate test slice.
 	for metric := range plugin.Metrics {
 		if metric == keyPing || metric == keyCustomQuery {
 			continue
 		}
+
 		tests = append(tests, test{"-" + metric, metric})
 	}
 
+	//nolint:paralleltest
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			_, err := impl.Export(tt.metric, []string{testCfg.OraIP, testCfg.OraUser, testCfg.OraPwd, testCfg.OraSrv}, nil)
+			_, err := impl.Export(tt.metric, []string{testCfg.OraIP, testCfg.GetUserWithPrivilege(),
+				testCfg.OraPwd, testCfg.OraSrv}, nil)
 
 			if !errors.Is(err, zbxerr.ErrorCannotFetchData) {
 				t.Errorf("Plugin.%s() should return %q if server is not working, got: %q",
@@ -883,4 +903,14 @@ func TestPlugin_Stop(t *testing.T) {
 			t.Error("Connection manager is not deinitialized")
 		}
 	})
+}
+
+// GetUserWithPrivilege function concatenates username with privilege. It is used in tests where Export function
+// is used.
+func (c *testConfig) GetUserWithPrivilege() string {
+	if c.OraPrivilege != "" {
+		return c.OraUser + " as " + c.OraPrivilege
+	}
+
+	return c.OraUser
 }

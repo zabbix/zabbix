@@ -96,19 +96,19 @@ func Test_splitUserPrivilege(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			t.Parallel()
 
-			gotUser, gotPrivilege, err := splitUserPrivilege(tt.args.userWithPrivilege)
+			gotUser, gotPrivilege, err := SplitUserPrivilege(tt.args.userWithPrivilege)
 			if (err != nil) != tt.wantErr {
-				t.Errorf("splitUserPrivilege() error = %v, wantErr %v", err, tt.wantErr)
+				t.Errorf("SplitUserPrivilege() error = %v, wantErr %v", err, tt.wantErr)
 
 				return
 			}
 
 			if gotUser != tt.wantUser {
-				t.Errorf("splitUserPrivilege() gotUser = %v, want %v", gotUser, tt.wantUser)
+				t.Errorf("SplitUserPrivilege() gotUser = %v, want %v", gotUser, tt.wantUser)
 			}
 
 			if gotPrivilege != tt.wantPrivilege {
-				t.Errorf("splitUserPrivilege() gotPrivilege = %v, want %v", gotPrivilege, tt.wantPrivilege)
+				t.Errorf("SplitUserPrivilege() gotPrivilege = %v, want %v", gotPrivilege, tt.wantPrivilege)
 			}
 		})
 	}
