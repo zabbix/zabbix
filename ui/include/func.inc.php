@@ -917,6 +917,41 @@ function zbx_rksort(&$array, $flags = null) {
 }
 
 /**
+ * Filters and sorts threshold values in ascending order.
+ *
+ * @param array $thresholds
+ * @param bool  $is_binary_size
+ *
+ * @return void
+ */
+function filterAndSortThresholds(array &$thresholds, bool $is_binary_size = false): void {
+	$number_parser = new CNumberParser([
+		'with_size_suffix' => true,
+		'with_time_suffix' => true,
+		'is_binary_size' => $is_binary_size
+	]);
+
+	foreach ($thresholds as &$threshold) {
+		$order_threshold = trim($threshold['threshold']);
+
+		if ($order_threshold !== '' && $number_parser->parse($order_threshold) == CParser::PARSE_SUCCESS) {
+			$threshold['order_threshold'] = $number_parser->calcValue();
+		}
+	}
+
+	uasort(
+		$thresholds,
+		static function (array $threshold_1, array $threshold_2): int {
+			return $threshold_1['order_threshold'] <=> $threshold_2['order_threshold'];
+		}
+	);
+
+	foreach ($thresholds as &$threshold) {
+		unset($threshold['order_threshold']);
+	}
+}
+
+/**
  * Sorts the data using a natural sort algorithm.
  *
  * Not suitable for sorting macros, use order_macros() instead.
