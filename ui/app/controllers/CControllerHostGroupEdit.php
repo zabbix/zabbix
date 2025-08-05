@@ -37,7 +37,7 @@ class CControllerHostGroupEdit extends CController{
 	}
 
 	protected function checkPermissions(): bool {
-		if ($this->getInput('groupid') == 0 && $this->getUserType() != USER_TYPE_SUPER_ADMIN) {
+		if ($this->getInput('groupid', 0) == 0 && $this->getUserType() != USER_TYPE_SUPER_ADMIN) {
 			return false;
 		}
 
