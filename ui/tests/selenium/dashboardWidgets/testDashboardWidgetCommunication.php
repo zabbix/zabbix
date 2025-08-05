@@ -803,6 +803,10 @@ class testDashboardWidgetCommunication extends testWidgetCommunication {
 						],
 						'Host card listener' => [
 							'Hostname' => self::FIRST_HOST_NAME
+						],
+						'Item card listener' => [
+							'Hostname' => self::FIRST_HOST_NAME,
+							'Value' => 3
 						]
 					]
 				]
@@ -853,6 +857,10 @@ class testDashboardWidgetCommunication extends testWidgetCommunication {
 						],
 						'Host card listener' => [
 							'Hostname' => self::SECOND_HOST_NAME
+						],
+						'Item card listener' => [
+							'Hostname' => self::SECOND_HOST_NAME,
+							'Value' => 4
 						]
 					]
 				]
@@ -903,6 +911,10 @@ class testDashboardWidgetCommunication extends testWidgetCommunication {
 						],
 						'Host card listener' => [
 							'Hostname' => self::THIRD_HOST_NAME
+						],
+						'Item card listener' => [
+							'Hostname' => self::THIRD_HOST_NAME,
+							'Value' => 5
 						]
 					]
 				]
@@ -953,6 +965,10 @@ class testDashboardWidgetCommunication extends testWidgetCommunication {
 						],
 						'Host card listener' => [
 							'Hostname' => self::FIRST_HOST_NAME
+						],
+						'Item card listener' => [
+							'Hostname' => self::FIRST_HOST_NAME,
+							'Value' => 3
 						]
 					]
 				]
@@ -1003,6 +1019,10 @@ class testDashboardWidgetCommunication extends testWidgetCommunication {
 						],
 						'Host card listener' => [
 							'Hostname' => self::SECOND_HOST_NAME
+						],
+						'Item card listener' => [
+							'Hostname' => self::SECOND_HOST_NAME,
+							'Value' => 4
 						]
 					]
 				]
@@ -1053,6 +1073,10 @@ class testDashboardWidgetCommunication extends testWidgetCommunication {
 						],
 						'Host card listener' => [
 							'Hostname' => self::THIRD_HOST_NAME
+						],
+						'Item card listener' => [
+							'Hostname' => self::THIRD_HOST_NAME,
+							'Value' => 5
 						]
 					]
 				]
@@ -1110,6 +1134,10 @@ class testDashboardWidgetCommunication extends testWidgetCommunication {
 						],
 						'Host card listener' => [
 							'Hostname' => self::FIRST_HOST_NAME
+						],
+						'Item card listener' => [
+							'Hostname' => self::FIRST_HOST_NAME,
+							'Value' => 3
 						]
 					]
 				]
@@ -1160,6 +1188,10 @@ class testDashboardWidgetCommunication extends testWidgetCommunication {
 						],
 						'Host card listener' => [
 							'Hostname' => self::SECOND_HOST_NAME
+						],
+						'Item card listener' => [
+							'Hostname' => self::SECOND_HOST_NAME,
+							'Value' => 4
 						]
 					]
 				]
@@ -1210,6 +1242,10 @@ class testDashboardWidgetCommunication extends testWidgetCommunication {
 						],
 						'Host card listener' => [
 							'Hostname' => self::THIRD_HOST_NAME
+						],
+						'Item card listener' => [
+							'Hostname' => self::THIRD_HOST_NAME,
+							'Value' => 5
 						]
 					]
 				]
@@ -1260,6 +1296,10 @@ class testDashboardWidgetCommunication extends testWidgetCommunication {
 						],
 						'Host card listener' => [
 							'Hostname' => self::FIRST_HOST_NAME
+						],
+						'Item card listener' => [
+							'Hostname' => self::FIRST_HOST_NAME,
+							'Value' => 3
 						]
 					]
 				]
@@ -1288,6 +1328,10 @@ class testDashboardWidgetCommunication extends testWidgetCommunication {
 						'Pie chart listener' => [
 							'name' => self::THIRD_HOST_NAME.': Trapper item',
 							'value' => 5
+						],
+						'Item card listener' => [
+							'Hostname' => self::THIRD_HOST_NAME,
+							'Value' => 5
 						]
 					]
 				]
@@ -1316,6 +1360,10 @@ class testDashboardWidgetCommunication extends testWidgetCommunication {
 						'Pie chart listener' => [
 							'name' => self::FIRST_HOST_NAME.': Trapper item',
 							'value' => 3
+						],
+						'Item card listener' => [
+							'Hostname' => self::FIRST_HOST_NAME,
+							'Value' => 3
 						]
 					]
 				]
@@ -1344,6 +1392,10 @@ class testDashboardWidgetCommunication extends testWidgetCommunication {
 						'Pie chart listener' => [
 							'name' => self::SECOND_HOST_NAME.': Trapper item',
 							'value' => 4
+						],
+						'Item card listener' => [
+							'Hostname' => self::SECOND_HOST_NAME,
+							'Value' => 4
 						]
 					]
 				]
@@ -1372,6 +1424,10 @@ class testDashboardWidgetCommunication extends testWidgetCommunication {
 						'Pie chart listener' => [
 							'name' => self::THIRD_HOST_NAME.': Trapper item',
 							'value' => 5
+						],
+						'Item card listener' => [
+							'Hostname' => self::THIRD_HOST_NAME,
+							'Value' => 5
 						]
 					]
 				]
@@ -1400,6 +1456,10 @@ class testDashboardWidgetCommunication extends testWidgetCommunication {
 						'Pie chart listener' => [
 							'name' => self::FIRST_HOST_NAME.': Trapper item',
 							'value' => 3
+						],
+						'Item card listener' => [
+							'Hostname' => self::FIRST_HOST_NAME,
+							'Value' => 3
 						]
 					]
 				]
@@ -1428,6 +1488,10 @@ class testDashboardWidgetCommunication extends testWidgetCommunication {
 						'Pie chart listener' => [
 							'name' => self::SECOND_HOST_NAME.': Trapper item',
 							'value' => 4
+						],
+						'Item card listener' => [
+							'Hostname' => self::SECOND_HOST_NAME,
+							'Value' => 4
 						]
 					]
 				]
@@ -1626,7 +1690,7 @@ class testDashboardWidgetCommunication extends testWidgetCommunication {
 
 			if ($page === 'Items page') {
 				$listeners = ['Gauge listener', 'Graph (classic) listener', 'Item value listener', 'SVG graph listener',
-						'Pie chart listener', 'Item value'
+						'Pie chart listener', 'Item value', 'Item card listener'
 				];
 			}
 			else {
@@ -1806,6 +1870,10 @@ class testDashboardWidgetCommunication extends testWidgetCommunication {
 						$field = 'Host';
 					}
 
+					if ($listener_name === 'Item card listener' && $field === 'Host') {
+						$field = 'Override host';
+					}
+
 					$this->assertEquals(['Unavailable widget'], $widget_form->getField($field)->getValue());
 
 					// TODO: Move the below code right before closing the dialog after ZBX-25041 is fixed.
@@ -1954,7 +2022,15 @@ class testDashboardWidgetCommunication extends testWidgetCommunication {
 
 				case 'hostcard':
 					$this->assertEquals($values['Hostname'], $listener->query('class:host-name')->one()->getText());
+					break;
 
+				case 'itemcard':
+					$this->assertEquals($values['Hostname'], $listener->query('class:section-path')->one()->getText());
+					$this->assertEquals('Trapper item', $listener->query('class:item-name')->one()->getText());
+					$this->assertEquals($values['Value'], $listener->query('xpath://div[contains(@class, '.
+							'"section-latest-data")]//div[contains(@class,"center-column")]//'.
+							'div[contains(@class,"column-value")]/span')->one()->getText()
+					);
 					break;
 			}
 		}
