@@ -594,7 +594,7 @@ func TestConnManager_GetConnection(t *testing.T) {
 
 			if len(connMgr.Connections) != len(tt.fields.conDet) {
 				t.Fatalf(
-					"ConnManager.GetConnection(): wrong connection cound seeded. Want: %d Got: %d",
+					"ConnManager.GetConnection(): wrong connection count seeded. Want: %d Got: %d",
 					len(tt.fields.conDet), len(connMgr.Connections),
 				)
 			}

@@ -7,7 +7,7 @@ memory usage. It is highly recommended to use it in conjunction with the officia
 [Oracle template.](https://git.zabbix.com/projects/ZBX/repos/zabbix/browse/templates/db/oracle_agent2) 
 You can extend it or create your own template to cater to specific needs.
 
-**Important! This integration queries the `V$ACTIVE_SESSION_HISTORY` dynamic performance view which is part of the Oracle Diagnostics Pack. Please make sure that you have the licence required for using this management pack.**
+**Important! This integration queries the `V$ACTIVE_SESSION_HISTORY` dynamic performance view which is part of the Oracle Diagnostics Pack. Please make sure that you have the license required for using this management pack.**
 
 ## Supported versions
 
@@ -192,11 +192,11 @@ The connection can be configured using either key parameters or named sessions.
     - localhost:1521
     - localhost
   
-    The hostname "locahost" in examples can be IP addess, e.g., 127.0.0.1 or any other hostname.
+    The hostname "localhost" in examples can be IP address, e.g., 127.0.0.1 or any other hostname.
 
 * Usernames are supported only if written in uppercase characters.
 
-* Both oracle TNS key and value value can be specified as Hostname (ommitting schema and port). See chapter [Using TNS Names](#using-tns-names).
+* Both oracle TNS key and value can be specified as Hostname (omitting schema and port). See chapter [Using TNS Names](#using-tns-names).
 
 #### Multitenant architecture tablespace monitoring (across CDB and PDBs)
 
@@ -206,10 +206,10 @@ To be able to monitor tablespaces across multiple containers, the Oracle service
 
 Common parameters for all keys are: [ConnString][User][Password][Service] where `ConnString` can be an URI, session name, TNS key or its value.
 `ConnString` will be treated as follows:   
-  - as session name — if such name is found in the plugin's configuration file
-  - as URI — if no any session with the given name is found, and Plugins.Oracle.ResolveTNS is set to false. If it contains  schema, e.g., "tcp://", port, e.g., 1521 or both, ResolveTNS option will not be taken into account, and it anyway will be treated as URI
+  - as session name — if such a name is found in the plugin's configuration file
+  - as URI — if no any session with the given name is found, and Plugins.Oracle.ResolveTNS is set to false. If it contains a schema, e.g., "tcp://", port, e.g., 1521 or both, ResolveTNS option will not be taken into account, and it anyway will be treated as URI
   - as TNS key — if the plugin's option ResolveTNS is set to true, and none of the above conditions apply
-  - as TNS value — if it starts with the open bracket “(“ (leading spaces ignored). In this case ResolveTNS option is not taken into account.
+  - as TNS value — if it starts with the open bracket “(“ (leading spaces ignored). In this case, the ResolveTNS option is not taken into account.
  
 
  See the chapter [Using TNS Names](#using-tns-names) for the details about how the plugin resolves TNS names.
@@ -220,7 +220,7 @@ If you use `ConnString` as a session name, you can skip the rest of the connecti
 
 _Note:_  
 If ResolveTNS=true and ConnString is specified for TNS lookup, but the name does not exist in tnsnames.ora, the Oracle client tries to resolve the ConnString as a DNS name.
-In the case where it is a non-existent DNS name, the process usually takes a long time and ends with an error response: "Timeout occurred while gathering data" (if default timeout option is used).
+In the case where it is a non-existent DNS name, the process usually takes a long time and ends with an error response: "Timeout occurred while gathering data" (if the default timeout option is used).
 If the specified ConnString is resolved as a DNS name, the Oracle client attempts to connect using the hostname.
  
 #### Using named sessions
@@ -248,8 +248,8 @@ For example:
 
 _Notes_:    
 - Session names are case-sensitive.
-- URI can also contains either TNS key or value. 
-- ConnectTimeout option parameter is not applicable when Oracle client looks the  TNS key up in the tnsnames.ora file.
+- URI can also contain either TNS key or value. 
+- ConnectTimeout option parameter is not applicable when the Oracle client looks the TNS key up in the tnsnames.ora file.
 
 #### Using TNS Names
 TNS names are useful if you want to specify a connection description of some clustered DB environment (it is not possible using only key params without TNS). TNS names also hide details of an Oracle connection from a Zabbix environment.
@@ -282,10 +282,10 @@ _Usage Examples_
 `Plugins.Oracle.Default.Uri=(DESCRIPTION=(ADDRESS=(PROTOCOL=TCP)(HOST=localhost)(PORT=1521))(CONNECT_DATA=(SERVICE_NAME=xe)))`   
 `Plugins.Oracle.Sessions.MySession.Uri=(DESCRIPTION=(ADDRESS=(PROTOCOL=TCP)(HOST=localhost)(PORT=1521))(CONNECT_DATA=(SERVICE_NAME=xe)))`
 
-- TNS key in the metric key's ConnString part (the sevice name "XE" will be ignored):  
+- TNS key in the metric key's ConnString part (the service name "XE" will be ignored):  
 `oracle.ping[zbx_tns_example,ZABBIX_MON,zabbix,xe]`
 
-- TNS value in the metric key (the sevice name "XE" will be ignored):  
+- TNS value in the metric key (the service name "XE" will be ignored):  
 `oracle.ping["(DESCRIPTION=(ADDRESS=(PROTOCOL=TCP)(HOST=localhost)(PORT=1521))(CONNECT_DATA=(SERVICE_NAME=xe)))",ZABBIX_MON,zabbix]`
 
 The plugin will interpret ConnString as TNS only if the option Plugins.Oracle.ResolveTNS is set to true.  Although some nuances exist (see the chapter [Using key parameters](#Using-key-parameters)).
@@ -312,7 +312,7 @@ The plugin will interpret ConnString as TNS only if the option Plugins.Oracle.Re
 **oracle.custom.query[\<commonParams\>,queryName[,args...]]** — returns the result of a custom query.
 
 *Parameters:*  
-`queryName` (required) — the name of a custom query (must be equal to the name of an *sql* file without an extension).
+`queryName` (required) — the name of a custom query (must be equal to the name of a *sql* file without an extension).
 `args` (optional) — one or more arguments to pass to a query.
 
 **oracle.datafiles.stats[\<commonParams\>]** — returns data files statistics.
@@ -331,7 +331,7 @@ The plugin will interpret ConnString as TNS only if the option Plugins.Oracle.Re
 
 **oracle.pga.stats[\<commonParams\>]** — returns the Program Global Area (PGA) statistics.  
 
-**oracle.ping[\<commonParams\>]** —  performs a simple ping to check if the connection is alive or not.
+**oracle.ping[\<commonParams\>]** — performs a simple ping to check if the connection is alive or not.
 
 *Returns:*
 - "1" if a connection is alive.
@@ -357,7 +357,7 @@ Possible values:
 60 — long duration (default).  
 15 — short duration.  
 
-**oracle.sys.params[\<commonParams\>]** — returns a set of a system parameter values.
+**oracle.sys.params[\<commonParams\>]** — returns a set of system parameter values.
 
 **oracle.ts.stats[\<commonParams\>,[tablespace],[type],[conname]]** — returns tablespace statistics. 
 
@@ -368,13 +368,13 @@ Possible values:
 
 **oracle.ts.discovery[\<commonParams\>]** — returns a list of tablespaces in the Low-level discovery (LLD) format.
 
-**oracle.user.info[\<commonParams\>[,username]]** — returns a user information.
+**oracle.user.info[\<commonParams\>[,username]]** — returns user information.
 
 *Parameters:*  
 Username (optional) — the username for which information is required. Usernames written in lowercase characters are not supported.
 Default: the current user.
 
-**oracle.version[\<commonParams\>]** — returns a database server information.
+**oracle.version[\<commonParams\>]** — returns database server information.
 
 ## Custom queries
 

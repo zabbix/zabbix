@@ -130,7 +130,7 @@ func TestOraConn_Query(t *testing.T) { //nolint:tparallel
 					return
 				}
 
-				t.Fatalf("OraConn.Query(): querry failed = %v", err)
+				t.Fatalf("OraConn.Query(): query failed = %v", err)
 			}
 
 			if !rows.Next() {
@@ -141,11 +141,11 @@ func TestOraConn_Query(t *testing.T) { //nolint:tparallel
 
 			var count int
 			if err := rows.Scan(&count); err != nil {
-				t.Errorf("OraConn.Query(): querry failed = %v", err)
+				t.Errorf("OraConn.Query(): query failed = %v", err)
 			}
 
 			if err := rows.Err(); err != nil {
-				log.Fatalf("OraConn.Query(): querry failed = %v", err)
+				log.Fatalf("OraConn.Query(): query failed = %v", err)
 			}
 
 			if diff := cmp.Diff(tt.want.count, count); diff != "" {

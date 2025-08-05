@@ -87,7 +87,7 @@ type ConnDetails struct {
 	OnlyHostname bool
 }
 
-// NewConnDetails function creates a ConnDetails instance for connectin to Oracle.
+// NewConnDetails function creates a ConnDetails instance for connection to Oracle.
 func NewConnDetails(uriStr, user, pwd, service string) (*ConnDetails, error) {
 	userSplit, privilegeSplit, err := SplitUserPrivilege(user)
 	if err != nil {
