@@ -210,7 +210,7 @@ void	zbx_get_time(struct tm *tm, long *milliseconds, zbx_timezone_t *tz)
 	struct _timeb	current_time;
 
 	_ftime(&current_time);
-	*tm = *localtime(&current_time.time);	/* localtime() cannot return NULL if called with valid parameter */
+	*tm = *zbx_localtime(&current_time.time, NULL);
 	*milliseconds = current_time.millitm;
 #else
 	struct timeval	current_time;
@@ -251,7 +251,7 @@ long	zbx_get_timezone_offset(time_t t, struct tm *tm)
 	struct tm	tm_utc;
 #endif
 
-	*tm = *localtime(&t);
+	*tm = *zbx_localtime(&t, NULL);
 
 #ifdef HAVE_TM_TM_GMTOFF
 	offset = tm->tm_gmtoff;
@@ -287,13 +287,18 @@ long	zbx_get_timezone_offset(time_t t, struct tm *tm)
  ******************************************************************************/
 struct tm	*zbx_localtime(const time_t *time, const char *tz)
 {
+	struct tm	*tm;
 #if defined(HAVE_GETENV) && defined(HAVE_UNSETENV) && defined(HAVE_TZSET) && \
 		!defined(_WINDOWS) && !defined(__MINGW32__)
 	char		*old_tz;
-	struct tm	*tm;
 
 	if (NULL == tz || 0 == strcmp(tz, "system"))
-		return localtime(time);
+	{
+		if (NULL == (tm = localtime(time)))
+			tm = localtime(0);
+
+		return tm;
+	}
 
 	if (NULL != (old_tz = getenv("TZ")))
 		old_tz = zbx_strdup(NULL, old_tz);
@@ -301,7 +306,9 @@ struct tm	*zbx_localtime(const time_t *time, const char *tz)
 	setenv("TZ", tz, 1);
 
 	tzset();
-	tm = localtime(time);
+
+	if (NULL == (tm = localtime(time)))
+		tm = localtime(0);
 
 	if (NULL != old_tz)
 	{
@@ -316,7 +323,11 @@ struct tm	*zbx_localtime(const time_t *time, const char *tz)
 	return tm;
 #else
 	ZBX_UNUSED(tz);
-	return localtime(time);
+
+	if (NULL == (tm = localtime(time)))
+		tm = localtime(0);
+
+	return tm;
 #endif
 }
 
