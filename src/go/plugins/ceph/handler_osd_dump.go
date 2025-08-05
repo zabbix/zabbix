@@ -46,7 +46,7 @@ type outOsdDump struct {
 }
 
 // osdDumpHandler returns OSDs dump provided by "osd dump" command.
-func osdDumpHandler(data map[command][]byte) (interface{}, error) {
+func osdDumpHandler(data map[command][]byte) (any, error) {
 	var osdDump cephOsdDump
 
 	err := json.Unmarshal(data[cmdOSDDump], &osdDump)

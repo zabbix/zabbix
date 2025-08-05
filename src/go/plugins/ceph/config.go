@@ -54,7 +54,7 @@ type PluginOptions struct {
 
 // Configure implements the Configurator interface.
 // Initializes configuration structures.
-func (p *Plugin) Configure(global *plugin.GlobalOptions, options interface{}) {
+func (p *Plugin) Configure(global *plugin.GlobalOptions, options any) {
 	if err := conf.UnmarshalStrict(options, &p.options); err != nil {
 		p.Errf("cannot unmarshal configuration options: %s", err)
 	}
@@ -66,7 +66,7 @@ func (p *Plugin) Configure(global *plugin.GlobalOptions, options interface{}) {
 
 // Validate implements the Configurator interface.
 // Returns an error if validation of a plugin's configuration is failed.
-func (p *Plugin) Validate(options interface{}) error {
+func (p *Plugin) Validate(options any) error {
 	var opts PluginOptions
 
 	err := conf.UnmarshalStrict(options, &opts)

@@ -68,7 +68,7 @@ type outDf struct {
 }
 
 // dfHandler returns statistics provided by "df detail" command.
-func dfHandler(data map[command][]byte) (interface{}, error) {
+func dfHandler(data map[command][]byte) (any, error) {
 	var df cephDf
 
 	err := json.Unmarshal(data[cmdDf], &df)

@@ -28,7 +28,7 @@ const (
 )
 
 // pingHandler returns pingOk if a connection is alive or pingFailed otherwise.
-func pingHandler(data map[command][]byte) (interface{}, error) {
+func pingHandler(data map[command][]byte) (any, error) {
 	var health cephHealth
 
 	err := json.Unmarshal(data[cmdHealth], &health)

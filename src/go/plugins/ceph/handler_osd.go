@@ -107,7 +107,7 @@ type outOsdStats struct {
 }
 
 // osdHandler returns OSDs statistics provided by "pg dump" command.
-func osdHandler(data map[command][]byte) (interface{}, error) {
+func osdHandler(data map[command][]byte) (any, error) {
 	var pgDump cephPgDump
 
 	err := json.Unmarshal(data[cmdPgDump], &pgDump)

@@ -38,7 +38,7 @@ func TestOSDDiscoveryHandler(t *testing.T) {
 	tests := []struct {
 		name    string
 		args    args
-		want    interface{}
+		want    any
 		wantErr bool
 	}{
 		{
@@ -98,7 +98,7 @@ func Test_poolDiscoveryHandler(t *testing.T) {
 	tests := []struct {
 		name    string
 		args    args
-		want    interface{}
+		want    any
 		wantErr bool
 	}{
 		{

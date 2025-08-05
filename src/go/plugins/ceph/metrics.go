@@ -116,7 +116,7 @@ var metrics = metric.MetricSet{
 type command string
 
 // handlerFunc defines an interface must be implemented by handlers.
-type handlerFunc func(data map[command][]byte) (res interface{}, err error)
+type handlerFunc func(data map[command][]byte) (res any, err error)
 
 type metricMeta struct {
 	commands []command
@@ -132,6 +132,6 @@ func init() {
 }
 
 // handle runs metric's handler.
-func (m *metricMeta) handle(data map[command][]byte) (res interface{}, err error) {
+func (m *metricMeta) handle(data map[command][]byte) (res any, err error) {
 	return m.handler(data)
 }
