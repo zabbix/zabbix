@@ -104,8 +104,7 @@ static duk_ret_t	wd_alert_ctor(duk_context *ctx, zbx_webdriver_t *wd, const char
 
 	duk_push_string(ctx, "browser");
 	duk_push_heapptr(ctx, wd->browser);
-	duk_def_prop(ctx, -3, DUK_DEFPROP_HAVE_VALUE | DUK_DEFPROP_CLEAR_WRITABLE | DUK_DEFPROP_HAVE_ENUMERABLE |
-			DUK_DEFPROP_HAVE_CONFIGURABLE);
+	duk_def_prop(ctx, -3, ZBX_ES_DEFPROP_READONLY);
 
 	duk_push_c_function(ctx, wd_alert_dtor, 1);
 	duk_set_finalizer(ctx, -2);

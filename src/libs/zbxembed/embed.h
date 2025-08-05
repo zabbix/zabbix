@@ -22,6 +22,8 @@
 
 #define ZBX_ES_LOG_MEMORY_LIMIT	(ZBX_MEBIBYTE * 8)
 #define ZBX_ES_LOG_MSG_LIMIT	8000
+#define ZBX_ES_DEFPROP_READONLY	DUK_DEFPROP_HAVE_VALUE | DUK_DEFPROP_CLEAR_WRITABLE |	\
+			DUK_DEFPROP_CLEAR_ENUMERABLE | DUK_DEFPROP_CLEAR_CONFIGURABLE
 
 /* this macro can be used in time intensive C functions to check for script timeout execution */
 #define ZBX_ES_CHECK_TIMEOUT(ctx, env)									\

@@ -357,8 +357,7 @@ int	zbx_es_init_env(zbx_es_t *es, const char *config_source_ip, char **error)
 
 	duk_push_string(es->env->ctx, "\xff""\xff""zbx_env");
 	duk_push_pointer(es->env->ctx, (void *)es->env);
-	duk_def_prop(es->env->ctx, -3, DUK_DEFPROP_HAVE_VALUE | DUK_DEFPROP_CLEAR_WRITABLE | DUK_DEFPROP_HAVE_ENUMERABLE |
-			DUK_DEFPROP_HAVE_CONFIGURABLE);
+	duk_def_prop(es->env->ctx, -3, ZBX_ES_DEFPROP_READONLY);
 
 	/* JSON parse/stringify is used internally, store them into stash to prevent them */
 	/* from being freed when assigning null to them in scripts                        */
@@ -367,15 +366,13 @@ int	zbx_es_init_env(zbx_es_t *es, const char *config_source_ip, char **error)
 	duk_get_prop_string(es->env->ctx, -2, "parse");			/* [stash,JSON,"_parse",JSON.parse] */
 	es->env->json_parse = duk_get_heapptr(es->env->ctx, -1);
 
-	duk_def_prop(es->env->ctx, -4, DUK_DEFPROP_HAVE_VALUE | DUK_DEFPROP_CLEAR_WRITABLE | DUK_DEFPROP_HAVE_ENUMERABLE |
-			DUK_DEFPROP_HAVE_CONFIGURABLE);	/* [stash,JSON] */
+	duk_def_prop(es->env->ctx, -4, ZBX_ES_DEFPROP_READONLY);	/* [stash,JSON] */
 
 	duk_push_string(es->env->ctx, "\xff""\xff""duk_json_stringify");	/* [stash,JSON,"_stringify"] */
 	duk_get_prop_string(es->env->ctx, -2, "stringify");	/* [stash,JSON,"_stringify",JSON.stringify] */
 	es->env->json_stringify = duk_get_heapptr(es->env->ctx, -1);
 
-	duk_def_prop(es->env->ctx, -4, DUK_DEFPROP_HAVE_VALUE | DUK_DEFPROP_CLEAR_WRITABLE | DUK_DEFPROP_HAVE_ENUMERABLE |
-			DUK_DEFPROP_HAVE_CONFIGURABLE);	/* [stash,JSON] */
+	duk_def_prop(es->env->ctx, -4, ZBX_ES_DEFPROP_READONLY);	/* [stash,JSON] */
 
 	duk_pop(es->env->ctx);
 
@@ -1038,7 +1035,6 @@ void	es_put_function_list(duk_context *ctx, duk_idx_t obj_idx, const duk_functio
 	{
 		duk_push_string(ctx, funcs[i].key);
 		duk_push_c_function(ctx, funcs[i].value, funcs[i].nargs);
-		duk_def_prop(ctx, obj_idx - 2, DUK_DEFPROP_HAVE_VALUE | DUK_DEFPROP_SET_ENUMERABLE |
-				DUK_DEFPROP_CLEAR_WRITABLE | DUK_DEFPROP_CLEAR_CONFIGURABLE);
+		duk_def_prop(ctx, obj_idx - 2, ZBX_ES_DEFPROP_READONLY);
 	}
 }
