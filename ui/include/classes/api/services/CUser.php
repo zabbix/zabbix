@@ -1558,12 +1558,10 @@ class CUser extends CApiService {
 					if ($user_direct_mfaids) {
 						$primary_mfaid = key(array_intersect_key($db_direct_mfas, $user_direct_mfaids));
 
-						if ($primary_mfaid !== null) {
-							unset($db_mfa_totp_secretids[$userid][$primary_mfaid]);
+						unset($db_mfa_totp_secretids[$userid][$primary_mfaid]);
 
-							if (!$db_mfa_totp_secretids[$userid]) {
-								unset($db_mfa_totp_secretids[$userid]);
-							}
+						if (!$db_mfa_totp_secretids[$userid]) {
+							unset($db_mfa_totp_secretids[$userid]);
 						}
 					}
 				}
@@ -1571,7 +1569,15 @@ class CUser extends CApiService {
 		}
 
 		if ($db_mfa_totp_secretids) {
-			DB::delete('mfa_totp_secret', ['mfa_totp_secretid' => array_merge(...$db_mfa_totp_secretids)]);
+			$del_mfa_totp_secretids = [];
+
+			foreach ($db_mfa_totp_secretids as $mfa_totp_secretids) {
+				foreach ($mfa_totp_secretids as $mfa_totp_secretid) {
+					$del_mfa_totp_secretids[] = $mfa_totp_secretid;
+				}
+			}
+
+			DB::delete('mfa_totp_secret', ['mfa_totp_secretid' => $del_mfa_totp_secretids]);
 		}
 	}
 
