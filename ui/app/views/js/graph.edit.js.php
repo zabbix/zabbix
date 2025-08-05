@@ -364,8 +364,7 @@ window.graph_edit_popup = new class {
 			srcfld2: 'name',
 			dstfrm: this.form_name,
 			numeric: 1,
-			writeonly: 1,
-			normal_only: 1
+			writeonly: 1
 		};
 
 		if (item_num === null) {
