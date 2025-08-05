@@ -1022,3 +1022,23 @@ void	*es_obj_detach_data(zbx_es_env_t *env, void *objptr, zbx_es_obj_type_t type
 	else
 		return NULL;
 }
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: create read-only custom functions that are callable from JS       *
+ *                                                                            *
+ * Parameters: ctx     - [IN] duktape context                                 *
+ *             obj_idx - [IN] base stack index                                *
+ *             funcs   - [IN] list of function prototypes                     *
+ *                                                                            *
+ ******************************************************************************/
+void	es_put_function_list(duk_context *ctx, duk_idx_t obj_idx, const duk_function_list_entry *funcs)
+{
+	for (int i = 0; NULL != funcs[i].key; i++)
+	{
+		duk_push_string(ctx, funcs[i].key);
+		duk_push_c_function(ctx, funcs[i].value, funcs[i].nargs);
+		duk_def_prop(ctx, obj_idx - 2, DUK_DEFPROP_HAVE_VALUE | DUK_DEFPROP_SET_ENUMERABLE |
+				DUK_DEFPROP_CLEAR_WRITABLE | DUK_DEFPROP_CLEAR_CONFIGURABLE);
+	}
+}

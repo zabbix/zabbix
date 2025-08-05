@@ -86,5 +86,6 @@ zbx_es_obj_type_t;
 void	es_obj_attach_data(zbx_es_env_t *env, void *objptr, void *data, zbx_es_obj_type_t type);
 void	*es_obj_get_data(zbx_es_env_t *env, const void *objptr, zbx_es_obj_type_t type);
 void	*es_obj_detach_data(zbx_es_env_t *env, void *objptr, zbx_es_obj_type_t type);
+void	es_put_function_list(duk_context *ctx, duk_idx_t obj_idx, const duk_function_list_entry *funcs);
 
 #endif /* ZABBIX_EMBED_H */
