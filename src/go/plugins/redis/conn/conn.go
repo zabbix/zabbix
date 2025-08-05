@@ -49,7 +49,7 @@ type Manager struct {
 	log          log.Logger
 	managerMutex sync.Mutex
 	connMutex    sync.Mutex
-	connections  map[*uri.URI]*RedisConn
+	connections  map[uri.URI]*RedisConn
 	keepAlive    time.Duration
 	timeout      time.Duration
 	Destroy      context.CancelFunc
@@ -69,7 +69,7 @@ func NewManager(logger log.Logger, keepAlive, timeout, hkInterval time.Duration)
 
 	connMgr := &Manager{
 		log:         logger,
-		connections: make(map[*uri.URI]*RedisConn),
+		connections: make(map[uri.URI]*RedisConn),
 		keepAlive:   keepAlive,
 		timeout:     timeout,
 		Destroy:     cancel, // Destroy stops originated goroutines and close connections.
@@ -180,7 +180,7 @@ func (m *Manager) create(uri *uri.URI, params map[string]string) (*RedisConn, er
 		}
 	}
 
-	_, ok := m.connections[uri]
+	_, ok := m.connections[*uri]
 	if ok {
 		// Should never happen.
 		panic("connection already exists")
@@ -223,11 +223,11 @@ func (m *Manager) create(uri *uri.URI, params map[string]string) (*RedisConn, er
 		return nil, errs.Wrap(err, "failed to create pool")
 	}
 
-	m.connections[uri] = NewRedisConn(client)
+	m.connections[*uri] = NewRedisConn(client)
 
 	m.log.Debugf("Created new connection: %s", uri.Addr())
 
-	return m.connections[uri], nil
+	return m.connections[*uri], nil
 }
 
 // get returns a connection with given cid if it exists and also updates lastTimeAccess, otherwise returns nil.
@@ -235,7 +235,7 @@ func (m *Manager) get(uri *uri.URI) *RedisConn {
 	m.connMutex.Lock()
 	defer m.connMutex.Unlock()
 
-	conn, ok := m.connections[uri]
+	conn, ok := m.connections[*uri]
 	if ok {
 		conn.updateAccessTime()
 
