@@ -4,7 +4,7 @@ msgstr ""
 "Project-Id-Version: Zabbix 6.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2023-10-19 13:48+0300\n"
-"PO-Revision-Date: 2025-07-02 08:09+0000\n"
+"PO-Revision-Date: 2025-07-17 07:25+0000\n"
 "Last-Translator: Eiji Kawakita <age@cyber.email.ne.jp>\n"
 "Language-Team: Zabbix\n"
 "Language: ja\n"
@@ -1591,7 +1591,7 @@ msgstr "毎%4$s %2$s %3$s %1$s"
 #: include/classes/helpers/CMaintenanceHelper.php:119
 #, c-format
 msgid "At %1$s on day %2$s of every %3$s"
-msgstr ""
+msgstr "毎%3$s の %2$s日 %1$s に"
 
 #: app/views/maintenance.timeperiod.edit.php:189
 msgid "At (hour:minute)"
@@ -20261,6 +20261,10 @@ msgstr "プロセス数。整数値を返す。"
 #, c-format
 msgid "The parameter \"%1$s\" is missing from the user attributes."
 msgstr "ユーザー属性にパラメータ\"%1$s\"がありません。"
+
+#: app/views/popup.ldap.edit.php:101
+msgid "The previous password was cleared due to a host change. Please enter the new password."
+msgstr ""
 
 #: include/classes/core/CJsonRpc.php:206
 msgid "The received JSON is not a valid JSON-RPC request."

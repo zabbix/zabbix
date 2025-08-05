@@ -20604,6 +20604,10 @@ msgstr "Počet procesů. Vráti celé číslo"
 msgid "The parameter \"%1$s\" is missing from the user attributes."
 msgstr "V uživatelských atributech chybí parametr \"%1$s\"."
 
+#: app/views/popup.ldap.edit.php:101
+msgid "The previous password was cleared due to a host change. Please enter the new password."
+msgstr ""
+
 #: include/classes/core/CJsonRpc.php:206
 msgid "The received JSON is not a valid JSON-RPC request."
 msgstr "Přijatý JSON není platný JSON-RPC požadavek."

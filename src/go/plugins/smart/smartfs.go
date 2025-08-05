@@ -171,6 +171,7 @@ type selfTest struct {
 	Status status `json:"status"`
 }
 type status struct {
+	Value  int  `json:"value"`
 	Passed bool `json:"passed"`
 }
 
