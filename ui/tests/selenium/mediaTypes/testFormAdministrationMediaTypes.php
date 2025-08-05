@@ -43,79 +43,33 @@ class testFormAdministrationMediaTypes extends CWebTest {
 	}
 
 	public function prepareData() {
+		// Create media types for Oauth checks.
+		$oauth_media_data = [];
+		foreach (['Generic SMTP OAuth', 'Gmail OAuth', 'Gmail relay OAuth', 'Office365 OAuth'] as $provider => $name) {
+			var_dump($provider);
+			var_dump($name);
+			$oauth_media_data[] = [
+				'type' => MEDIA_TYPE_EMAIL,
+				'provider' => $provider,
+				'name' => $name,
+				'smtp_server' => 'test@test.com',
+				'smtp_email' => 'zabbix@example.com',
+				'smtp_authentication' => 2,
+				'redirection_url' => 'https://test/zabbix.php?action=oauth.authorize',
+				'client_id' => 'test',
+				'client_secret' => 'test',
+				'authorization_url' => 'https://test/oauth2/v2/auth?response_type=code&scope=https%3A%2F%2Fmail.google.com%2F&access_type=offline&prompt=consent"',
+				'token_url' => 'https://example.com/token?grant_type=authorization_code',
+				'tokens_status' => 3,
+				'access_token' => 'test',
+				'access_token_updated' => time(),
+				'access_expires_in' => '3599',
+				'refresh_token' => 'test'
+			];
+		}
+		CDataHelper::call('mediatype.create', $oauth_media_data);
+
 		CDataHelper::call('mediatype.create', [
-			[
-				'type' => MEDIA_TYPE_EMAIL,
-				'provider' => 0,
-				'name' => 'Generic SMTP OAuth',
-				'smtp_server' => 'test@test.com',
-				'smtp_email' => 'zabbix@example.com',
-				'smtp_authentication' => 2,
-				'redirection_url' => 'https://test/zabbix.php?action=oauth.authorize',
-				'client_id' => 'test',
-				'client_secret' => 'test',
-				'authorization_url' => 'https://test/oauth2/v2/auth?response_type=code&scope=https%3A%2F%2Fmail.google.com%2F&access_type=offline&prompt=consent"',
-				'token_url' => 'https://example.com/token?grant_type=authorization_code',
-				'tokens_status' => 3,
-				'access_token' => 'test',
-				'access_token_updated' => time(),
-				'access_expires_in' => '3599',
-				'refresh_token' => 'test'
-			],
-			[
-				'type' => MEDIA_TYPE_EMAIL,
-				'provider' => 1,
-				'name' => 'Gmail OAuth',
-				'smtp_server' => 'test@test.com',
-				'smtp_email' => 'zabbix@example.com',
-				'smtp_authentication' => 2,
-				'redirection_url' => 'https://test/zabbix.php?action=oauth.authorize',
-				'client_id' => 'test',
-				'client_secret' => 'test',
-				'authorization_url' => 'https://test/oauth2/v2/auth?response_type=code&scope=https%3A%2F%2Fmail.google.com%2F&access_type=offline&prompt=consent"',
-				'token_url' => 'https://example.com/token?grant_type=authorization_code',
-				'tokens_status' => 3,
-				'access_token' => 'test',
-				'access_token_updated' => time(),
-				'access_expires_in' => '3599',
-				'refresh_token' => 'test'
-			],
-			[
-				'type' => MEDIA_TYPE_EMAIL,
-				'provider' => 2,
-				'name' => 'Gmail relay OAuth',
-				'smtp_server' => 'test@test.com',
-				'smtp_email' => 'zabbix@example.com',
-				'smtp_authentication' => 2,
-				'redirection_url' => 'https://test/zabbix.php?action=oauth.authorize',
-				'client_id' => 'test',
-				'client_secret' => 'test',
-				'authorization_url' => 'https://test/oauth2/v2/auth?response_type=code&scope=https%3A%2F%2Fmail.google.com%2F&access_type=offline&prompt=consent"',
-				'token_url' => 'https://example.com/token?grant_type=authorization_code',
-				'tokens_status' => 3,
-				'access_token' => 'test',
-				'access_token_updated' => time(),
-				'access_expires_in' => '3599',
-				'refresh_token' => 'test'
-			],
-			[
-				'type' => MEDIA_TYPE_EMAIL,
-				'provider' => 3,
-				'name' => 'Office365 OAuth',
-				'smtp_server' => 'test@test.com',
-				'smtp_email' => 'zabbix@example.com',
-				'smtp_authentication' => 2,
-				'redirection_url' => 'https://test/zabbix.php?action=oauth.authorize',
-				'client_id' => 'test',
-				'client_secret' => 'test',
-				'authorization_url' => 'https://test/oauth2/v2/auth?response_type=code&scope=https%3A%2F%2Fmail.google.com%2F&access_type=offline&prompt=consent"',
-				'token_url' => 'https://example.com/token?grant_type=authorization_code',
-				'tokens_status' => 3,
-				'access_token' => 'test',
-				'access_token_updated' => time(),
-				'access_expires_in' => '3599',
-				'refresh_token' => 'test'
-			],
 			[
 				'type' => MEDIA_TYPE_WEBHOOK,
 				'name' => 'Switch webhook to script with no params',
