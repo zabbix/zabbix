@@ -465,7 +465,7 @@ class testDashboardSystemInformationWidget extends testSystemInformation {
 	 * @param array $data	widget available data
 	 */
 	protected function assertAvailableDataByUserRole($data) {
-		if (array_key_exists('guest', $data)) {
+		if (CTestArrayHelper::get($data, 'guest')) {
 			$this->page->open(self::URL.self::$dashboardid)->waitUntilReady();
 			$this->query('button:Login')->one()->click();
 			$this->query('link:sign in as guest')->one()->click();
@@ -479,7 +479,7 @@ class testDashboardSystemInformationWidget extends testSystemInformation {
 
 		CDashboardElement::find()->one()->waitUntilReady();
 
-		if (array_key_exists('super_admin', $data)) {
+		if (CTestArrayHelper::get($data, 'super_admin')) {
 			$this->assertTableHasData($data['available_fields']);
 		}
 		else {
