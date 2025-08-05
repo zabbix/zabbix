@@ -1418,7 +1418,6 @@ class CUser extends CApiService {
 				continue;
 			}
 
-			$is_changed = false;
 			$db_groups = $db_users !== null
 				? array_column($db_users[$user['userid']]['usrgrps'], null, 'usrgrpid')
 				: [];
@@ -1433,17 +1432,16 @@ class CUser extends CApiService {
 						'userid' => $user['userid'],
 						'usrgrpid' => $group['usrgrpid']
 					];
-					$is_changed = true;
+
+					if ($db_users !== null) {
+						$changed_user_groups[$user['userid']] = $user['usrgrps'];
+					}
 				}
 			}
 			unset($group);
 
 			if ($db_groups) {
 				$del_groupids = array_merge($del_groupids, array_column($db_groups, 'id'));
-				$is_changed = true;
-			}
-
-			if ($db_users !== null && $is_changed) {
 				$changed_user_groups[$user['userid']] = $user['usrgrps'];
 			}
 		}
