@@ -395,8 +395,7 @@ class testFormMapProperties extends CWebTest {
 			$field = $form->getField($xpath);
 			$this->assertEquals('', $field->getValue());
 			$this->assertEquals('false', $field->getAttribute('spellcheck'));
-			// TODO: When ZBX-26089 is merged, uncomment maxlength attribute check.
-//			$this->assertEquals(255, $field->getAttribute('maxlength'));
+			$this->assertEquals(255, $field->getAttribute('maxlength'));
 		}
 
 		// Check radio buttons.
@@ -917,14 +916,12 @@ class testFormMapProperties extends CWebTest {
 					]
 				]
 			],
-			/**
-			 * TODO: Uncomment test case, when ZBX-26089 is fixed. Update test case if necessary.
-			// # Create with string length which exceeds maximum allowed value.
+			// #23 Create with string length which exceeds maximum allowed value.
 			[
 				[
 					'expected' => TEST_GOOD,
 					'map_properties' => [
-						'Name' => STRING_6000,
+						'Name' => STRING_64.' Check that fields are limited: '.STRING_128,
 						'Width' => '65535',
 						'Height' => '65535',
 						'Advanced labels' => true,
@@ -950,7 +947,7 @@ class testFormMapProperties extends CWebTest {
 					],
 					'result' => [
 						'Owner' => ['Admin (Zabbix Administrator)'],
-						'Name' => STRING_128,
+						'Name' => STRING_64.' Check that fields are limited: '.STRING_32,
 						'Width' => '65535',
 						'Height' => '65535',
 						'Background image' => 'No image',
@@ -986,8 +983,7 @@ class testFormMapProperties extends CWebTest {
 					]
 				]
 			],
-			 */
-			// #23 Create with non-default parameters #1.
+			// #24 Create with non-default parameters #1.
 			[
 				[
 					'expected' => TEST_GOOD,
@@ -1039,7 +1035,7 @@ class testFormMapProperties extends CWebTest {
 					]
 				]
 			],
-			// #24 Create with non-default parameters #2.
+			// #25 Create with non-default parameters #2.
 			[
 				[
 					'expected' => TEST_GOOD,
@@ -1088,7 +1084,7 @@ class testFormMapProperties extends CWebTest {
 					]
 				]
 			],
-			// #25 Create with non-default parameters #3.
+			// #26 Create with non-default parameters #3.
 			[
 				[
 					'expected' => TEST_GOOD,
@@ -1137,7 +1133,7 @@ class testFormMapProperties extends CWebTest {
 					]
 				]
 			],
-			// #26 Create with non-default parameters #4.
+			// #27 Create with non-default parameters #4.
 			[
 				[
 					'expected' => TEST_GOOD,
@@ -1184,7 +1180,7 @@ class testFormMapProperties extends CWebTest {
 					]
 				]
 			],
-			// #27 Advanced labels - Nothing.
+			// #28 Advanced labels - Nothing.
 			[
 				[
 					'expected' => TEST_GOOD,
@@ -1231,7 +1227,7 @@ class testFormMapProperties extends CWebTest {
 					]
 				]
 			],
-			// #28 Advanced labels - Element name.
+			// #29 Advanced labels - Element name.
 			[
 				[
 					'expected' => TEST_GOOD,
@@ -1277,7 +1273,7 @@ class testFormMapProperties extends CWebTest {
 					]
 				]
 			],
-			// #29 Advanced labels - Status only.
+			// #30 Advanced labels - Status only.
 			[
 				[
 					'expected' => TEST_GOOD,
@@ -1323,7 +1319,7 @@ class testFormMapProperties extends CWebTest {
 					]
 				]
 			],
-			// #30 Advanced labels - Label.
+			// #31 Advanced labels - Label.
 			[
 				[
 					'expected' => TEST_GOOD,
@@ -1369,7 +1365,7 @@ class testFormMapProperties extends CWebTest {
 					]
 				]
 			],
-			// #31 Advanced labels - different label types.
+			// #32 Advanced labels - different label types.
 			[
 				[
 					'expected' => TEST_GOOD,
@@ -1417,7 +1413,7 @@ class testFormMapProperties extends CWebTest {
 					]
 				]
 			],
-			// #32 Check creation of different type URLs.
+			// #33 Check creation of different type URLs.
 			[
 				[
 					'expected' => TEST_GOOD,
@@ -1513,7 +1509,7 @@ class testFormMapProperties extends CWebTest {
 			]
 			/**
 			 * TODO: Uncomment test case, when ZBX-26683 is fixed. Update test case if necessary.
-			// #33 Check sorting by name of URLs.
+			// #34 Check sorting by name of URLs.
 			[
 				[
 					'expected' => TEST_GOOD,
@@ -2022,9 +2018,7 @@ class testFormMapProperties extends CWebTest {
 					]
 				]
 			],
-			/**
-			 * TODO: Uncomment test case, when ZBX-26089 is fixed. Update test case if necessary.
-			// # Update with string length which exceeds maximum allowed value.
+			// #23 Update with string length which exceeds maximum allowed value.
 			[
 				[
 					'expected' => TEST_GOOD,
@@ -2141,8 +2135,7 @@ class testFormMapProperties extends CWebTest {
 					]
 				]
 			],
-			 */
-			// #23 Update - change advanced label fields of existing map.
+			// #24 Update - change advanced label fields of existing map.
 			[
 				[
 					'expected' => TEST_GOOD,
@@ -2212,7 +2205,7 @@ class testFormMapProperties extends CWebTest {
 					]
 				]
 			],
-			// #4 Update - change other possible fields.
+			// #25 Update - change other possible fields.
 			[
 				[
 					'expected' => TEST_GOOD,
