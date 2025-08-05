@@ -20437,6 +20437,10 @@ msgstr "Número de processos. Retorna: número inteiro"
 msgid "The parameter \"%1$s\" is missing from the user attributes."
 msgstr "O parâmetro \"%1$s\" está faltando nos atributos do usuário."
 
+#: app/views/popup.ldap.edit.php:101
+msgid "The previous password was cleared due to a host change. Please enter the new password."
+msgstr ""
+
 #: include/classes/core/CJsonRpc.php:206
 msgid "The received JSON is not a valid JSON-RPC request."
 msgstr "O JSON recebido não é uma solicitação JSON-RPC válida."

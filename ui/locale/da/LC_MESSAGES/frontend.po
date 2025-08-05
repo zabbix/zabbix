@@ -20431,6 +20431,10 @@ msgstr "Antallet af processer. Returnerer heltal"
 msgid "The parameter \"%1$s\" is missing from the user attributes."
 msgstr "Parameteren \"%1$s\" mangler i brugerattributterne."
 
+#: app/views/popup.ldap.edit.php:101
+msgid "The previous password was cleared due to a host change. Please enter the new password."
+msgstr ""
+
 #: include/classes/core/CJsonRpc.php:206
 msgid "The received JSON is not a valid JSON-RPC request."
 msgstr "Den modtagne JSON er ikke en gyldig JSON-RPC-anmodning."
