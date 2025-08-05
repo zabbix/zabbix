@@ -1297,13 +1297,11 @@ void	zbx_db_add_condition_alloc(char **sql, size_t *sql_alloc, size_t *sql_offse
 void	zbx_db_add_str_condition_alloc(char **sql, size_t *sql_alloc, size_t *sql_offset, const char *fieldname,
 		const char * const *values, const int num)
 {
-#if defined(HAVE_MYSQL) || defined(HAVE_POSTGRESQL)
-#define MAX_EXPRESSIONS	1000	/* tune according to batch size to avoid unnecessary or conditions */
-#else
+#if defined(HAVE_SQLITE3)
 #define MAX_EXPRESSIONS	950
 #endif
 
-	int	i, cnt = 0;
+	int	i;
 	char	*value_esc;
 	int	values_num = 0, empty_num = 0;
 
@@ -1319,8 +1317,13 @@ void	zbx_db_add_str_condition_alloc(char **sql, size_t *sql_alloc, size_t *sql_o
 		else
 			values_num++;
 	}
+#if defined(HAVE_SQLITE3)
+	int	cnt = 0
 
 	if (MAX_EXPRESSIONS < values_num || (0 != values_num && 0 != empty_num))
+#else
+	if (0 != values_num && 0 != empty_num)
+#endif
 		zbx_chrcpy_alloc(sql, sql_alloc, sql_offset, '(');
 
 	if (0 != empty_num)
@@ -1357,7 +1360,7 @@ void	zbx_db_add_str_condition_alloc(char **sql, size_t *sql_alloc, size_t *sql_o
 	{
 		if ('\0' == *values[i])
 			continue;
-
+#if defined(HAVE_SQLITE3)
 		if (MAX_EXPRESSIONS == cnt)
 		{
 			cnt = 0;
@@ -1366,20 +1369,22 @@ void	zbx_db_add_str_condition_alloc(char **sql, size_t *sql_alloc, size_t *sql_o
 			zbx_strcpy_alloc(sql, sql_alloc, sql_offset, fieldname);
 			zbx_strcpy_alloc(sql, sql_alloc, sql_offset, " in (");
 		}
-
+		cnt++;
+#endif
 		value_esc = zbx_db_dyn_escape_string(values[i]);
 		zbx_chrcpy_alloc(sql, sql_alloc, sql_offset, '\'');
 		zbx_strcpy_alloc(sql, sql_alloc, sql_offset, value_esc);
 		zbx_strcpy_alloc(sql, sql_alloc, sql_offset, "',");
 		zbx_free(value_esc);
-
-		cnt++;
 	}
 
 	(*sql_offset)--;
 	zbx_chrcpy_alloc(sql, sql_alloc, sql_offset, ')');
-
+#if defined(HAVE_SQLITE3)
 	if (MAX_EXPRESSIONS < values_num || 0 != empty_num)
+#else
+	if (0 != empty_num)
+#endif
 		zbx_chrcpy_alloc(sql, sql_alloc, sql_offset, ')');
 
 #undef MAX_EXPRESSIONS
