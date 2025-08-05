@@ -24,6 +24,7 @@
 #include "zbxstr.h"
 #include "zbxjson.h"
 #include "zbxnum.h"
+#include "zbxtime.h"
 
 #ifdef HAVE_SYS_UTSNAME_H
 #	include <sys/utsname.h>
