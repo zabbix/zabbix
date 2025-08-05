@@ -4,7 +4,7 @@
 ## Overview
 
 This template is designed for the effortless deployment of AWS monitoring by Zabbix via HTTP and doesn't require any external scripts.
-- Currently, the template supports the discovery of EC2 and RDS instances, ECS clusters, ELB, Lambda and S3 buckets.
+- Currently, the template supports the discovery of EC2 and RDS instances, ECS clusters, ELB, Lambda, S3 buckets, and backup vaults.
 
 ## Included Monitoring Templates
 
@@ -17,6 +17,7 @@ This template is designed for the effortless deployment of AWS monitoring by Zab
 - *AWS RDS instance by HTTP*
 - *AWS S3 bucket by HTTP*
 - *AWS Cost Explorer by HTTP*
+- *AWS Backup Vault by HTTP*
 
 ## Requirements
 
@@ -61,7 +62,11 @@ Add the following required permissions to your Zabbix IAM policy in order to col
                 "elasticloadbalancing:DescribeLoadBalancers",
                 "elasticloadbalancing:DescribeTargetGroups",
                 "ec2:DescribeSecurityGroups",
-                "lambda:ListFunctions"
+                "lambda:ListFunctions",
+                "backup:ListBackupVaults",
+                "backup:ListBackupJobs",
+                "backup:ListCopyJobs",
+                "backup:ListRestoreJobs"
             ],
             "Effect": "Allow",
             "Resource": "*"
@@ -113,7 +118,11 @@ For using assume role authorization, add the appropriate permissions to the role
                 "elasticloadbalancing:DescribeLoadBalancers",
                 "elasticloadbalancing:DescribeTargetGroups",
                 "ec2:DescribeSecurityGroups",
-                "lambda:ListFunctions"
+                "lambda:ListFunctions",
+                "backup:ListBackupVaults",
+                "backup:ListBackupJobs",
+                "backup:ListCopyJobs",
+                "backup:ListRestoreJobs"
             ],
             "Resource": "*"
         }
@@ -139,6 +148,10 @@ Next, add a principal to the trust relationships of the role you are using:
 }
 ```
 Set the following macros: `{$AWS.ACCESS.KEY.ID}`, `{$AWS.SECRET.ACCESS.KEY}`, `{$AWS.STS.REGION}`, `{$AWS.ASSUME.ROLE.ARN}`.
+
+**Note**: If you set the `{$AWS.ASSUME.ROLE.AUTH.METADATA}` macro to `true` and set the macros `{$AWS.STS.REGION}` and `{$AWS.ASSUME.ROLE.ARN}`, the Zabbix server or proxy will attempt to retrieve the role credentials from the instance metadata service.
+This means that the Zabbix server or proxy must be running on an AWS EC2 instance with an IAM role assigned that has the necessary permissions.
+This approach is recommended when running Zabbix inside an AWS EC2 instance with an IAM role assigned, as it simplifies credential management.
 
 ### Role-Based Authorization
 If you are using role-based authorization, add the appropriate permissions:
@@ -174,7 +187,11 @@ If you are using role-based authorization, add the appropriate permissions:
                 "elasticloadbalancing:DescribeLoadBalancers",
                 "elasticloadbalancing:DescribeTargetGroups",
                 "ec2:DescribeSecurityGroups",
-                "lambda:ListFunctions"
+                "lambda:ListFunctions",
+                "backup:ListBackupVaults",
+                "backup:ListBackupJobs",
+                "backup:ListCopyJobs",
+                "backup:ListRestoreJobs"
             ],
             "Resource": "*"
         }
@@ -222,6 +239,8 @@ Additional information about the metrics and used API methods:
 * [Full metrics list related to S3](https://docs.aws.amazon.com/AmazonS3/latest/userguide/metrics-dimensions.html)
 * [Full metrics list related to ECS](https://docs.aws.amazon.com/AmazonECS/latest/developerguide/cloudwatch-metrics.html)
 * [Full metrics list related to ELB ALB](https://docs.aws.amazon.com/elasticloadbalancing/latest/application/load-balancer-cloudwatch-metrics.html)
+* [Full metrics list related to Backup vault](https://docs.aws.amazon.com/aws-backup/latest/devguide/API_BackupVaultListMember.html)
+* [Full metrics list related to Backup jobs](https://docs.aws.amazon.com/aws-backup/latest/devguide/API_BackupJob.html)
 * [DescribeAlarms API method](https://docs.aws.amazon.com/AmazonCloudWatch/latest/APIReference/API_DescribeAlarms.html)
 * [DescribeVolumes API method](https://docs.aws.amazon.com/AWSEC2/latest/APIReference/API_DescribeVolumes.html)
 * [DescribeLoadBalancers API method](https://docs.aws.amazon.com/elasticloadbalancing/latest/APIReference/API_DescribeLoadBalancers.html)
@@ -240,6 +259,7 @@ Additional information about the metrics and used API methods:
 |{$AWS.DESCRIBE.REGION}|<p>Region used in POST request `DescribeRegions`.</p>|`us-east-1`|
 |{$AWS.STS.REGION}|<p>Region used in assume role request.</p>|`us-east-1`|
 |{$AWS.ASSUME.ROLE.ARN}|<p>ARN assume role; add when using the `assume_role` authorization method.</p>||
+|{$AWS.ASSUME.ROLE.AUTH.METADATA}|<p>Add when using the `assume_role` through instance metadata or environment authorization method. Possible values: `false`, `true`.</p>|`false`|
 |{$AWS.EC2.LLD.FILTER.NAME.MATCHES}|<p>Filter of discoverable EC2 instances by namespace.</p>|`.*`|
 |{$AWS.EC2.LLD.FILTER.NAME.NOT_MATCHES}|<p>Filter to exclude discovered EC2 instances by namespace.</p>|`CHANGE_IF_NEEDED`|
 |{$AWS.EC2.LLD.FILTER.REGION.MATCHES}|<p>Filter of discoverable EC2 instances by region.</p>|`.*`|
@@ -268,6 +288,10 @@ Additional information about the metrics and used API methods:
 |{$AWS.LAMBDA.LLD.FILTER.RUNTIME.NOT_MATCHES}|<p>Filter to exclude discovered Lambda functions by Runtime.</p>|`CHANGE_IF_NEEDED`|
 |{$AWS.LAMBDA.LLD.FILTER.NAME.MATCHES}|<p>Filter of discoverable Lambda functions by name.</p>|`.*`|
 |{$AWS.LAMBDA.LLD.FILTER.NAME.NOT_MATCHES}|<p>Filter to exclude discovered Lambda functions by name.</p>|`CHANGE_IF_NEEDED`|
+|{$AWS.BACKUP_VAULT.LLD.FILTER.NAME.MATCHES}|<p>Filter of discoverable backup vaults by name.</p>|`.*`|
+|{$AWS.BACKUP_VAULT.LLD.FILTER.NAME.NOT_MATCHES}|<p>Filter to exclude discovered backup vaults by name.</p>|`CHANGE_IF_NEEDED`|
+|{$AWS.BACKUP_VAULT.LLD.FILTER.REGION.MATCHES}|<p>Filter of discoverable backup vaults by region.</p>|`.*`|
+|{$AWS.BACKUP_VAULT.LLD.FILTER.REGION.NOT_MATCHES}|<p>Filter to exclude discovered backup vaults by region.</p>|`CHANGE_IF_NEEDED`|
 
 ### LLD rule S3 buckets discovery
 
@@ -304,6 +328,12 @@ Additional information about the metrics and used API methods:
 |Name|Description|Type|Key and additional info|
 |----|-----------|----|-----------------------|
 |Lambda discovery|<p>Get Lambda functions.</p>|Script|aws.lambda.discovery|
+
+### LLD rule Backup vault discovery
+
+|Name|Description|Type|Key and additional info|
+|----|-----------|----|-----------------------|
+|Backup vault discovery|<p>Get backup vaults.</p>|Script|aws.backup_vault.discovery|
 
 # AWS EC2 by HTTP
 
@@ -414,6 +444,10 @@ Next, add a principal to the trust relationships of the role you are using:
 ```
 Set the following macros: `{$AWS.ACCESS.KEY.ID}`, `{$AWS.SECRET.ACCESS.KEY}`, `{$AWS.STS.REGION}`, `{$AWS.ASSUME.ROLE.ARN}`.
 
+**Note**: If you set the `{$AWS.ASSUME.ROLE.AUTH.METADATA}` macro to `true` and set the macros `{$AWS.STS.REGION}` and `{$AWS.ASSUME.ROLE.ARN}`, the Zabbix server or proxy will attempt to retrieve the role credentials from the instance metadata service.
+This means that the Zabbix server or proxy must be running on an AWS EC2 instance with an IAM role assigned that has the necessary permissions.
+This approach is recommended when running Zabbix inside an AWS EC2 instance with an IAM role assigned, as it simplifies credential management.
+
 ### Role-Based Authorization
 If you are using role-based authorization, set the appropriate permissions:
 
@@ -486,6 +520,7 @@ Also, see the Macros section for a list of macros used for LLD filters.
 |{$AWS.AUTH_TYPE}|<p>Authorization method. Possible values: `access_key`, `assume_role`, `role_base`.</p>|`access_key`|
 |{$AWS.STS.REGION}|<p>Region used in assume role request.</p>|`us-east-1`|
 |{$AWS.ASSUME.ROLE.ARN}|<p>ARN assume role; add when using the `assume_role` authorization method.</p>||
+|{$AWS.ASSUME.ROLE.AUTH.METADATA}|<p>Add when using the `assume_role` through instance metadata or environment authorization method. Possible values: `false`, `true`.</p>|`false`|
 |{$AWS.EC2.INSTANCE.ID}|<p>EC2 instance ID.</p>||
 |{$AWS.EC2.LLD.FILTER.VOLUME_TYPE.MATCHES}|<p>Filter of discoverable volumes by type.</p>|`.*`|
 |{$AWS.EC2.LLD.FILTER.VOLUME_TYPE.NOT_MATCHES}|<p>Filter to exclude discovered volumes by type.</p>|`CHANGE_IF_NEEDED`|
@@ -717,6 +752,10 @@ Next, add a principal to the trust relationships of the role you are using:
 ```
 Set the following macros: `{$AWS.ACCESS.KEY.ID}`, `{$AWS.SECRET.ACCESS.KEY}`, `{$AWS.STS.REGION}`, `{$AWS.ASSUME.ROLE.ARN}`.
 
+**Note**: If you set the `{$AWS.ASSUME.ROLE.AUTH.METADATA}` macro to `true` and set the macros `{$AWS.STS.REGION}` and `{$AWS.ASSUME.ROLE.ARN}`, the Zabbix server or proxy will attempt to retrieve the role credentials from the instance metadata service.
+This means that the Zabbix server or proxy must be running on an AWS EC2 instance with an IAM role assigned that has the necessary permissions.
+This approach is recommended when running Zabbix inside an AWS EC2 instance with an IAM role assigned, as it simplifies credential management.
+
 ### Role-Based Authorization
 If you are using role-based authorization, set the appropriate permissions:
 
@@ -788,6 +827,7 @@ Also, see the Macros section for a list of macros used for LLD filters.
 |{$AWS.AUTH_TYPE}|<p>Authorization method. Possible values: `access_key`, `assume_role`, `role_base`.</p>|`access_key`|
 |{$AWS.STS.REGION}|<p>Region used in assume role request.</p>|`us-east-1`|
 |{$AWS.ASSUME.ROLE.ARN}|<p>ARN assume role; add when using the `assume_role` authorization method.</p>||
+|{$AWS.ASSUME.ROLE.AUTH.METADATA}|<p>Add when using the `assume_role` through instance metadata or environment authorization method. Possible values: `false`, `true`.</p>|`false`|
 |{$AWS.RDS.INSTANCE.ID}|<p>RDS DB Instance identifier.</p>||
 |{$AWS.RDS.LLD.FILTER.ALARM_SERVICE_NAMESPACE.MATCHES}|<p>Filter of discoverable alarms by namespace.</p>|`.*`|
 |{$AWS.RDS.LLD.FILTER.ALARM_SERVICE_NAMESPACE.NOT_MATCHES}|<p>Filter to exclude discovered alarms by namespace.</p>|`CHANGE_IF_NEEDED`|
@@ -1069,6 +1109,10 @@ Next, add a principal to the trust relationships of the role you are using:
 ```
 Set the following macros: `{$AWS.ACCESS.KEY.ID}`, `{$AWS.SECRET.ACCESS.KEY}`, `{$AWS.STS.REGION}`, `{$AWS.ASSUME.ROLE.ARN}`.
 
+**Note**: If you set the `{$AWS.ASSUME.ROLE.AUTH.METADATA}` macro to `true` and set the macros `{$AWS.STS.REGION}` and `{$AWS.ASSUME.ROLE.ARN}`, the Zabbix server or proxy will attempt to retrieve the role credentials from the instance metadata service.
+This means that the Zabbix server or proxy must be running on an AWS EC2 instance with an IAM role assigned that has the necessary permissions.
+This approach is recommended when running Zabbix inside an AWS EC2 instance with an IAM role assigned, as it simplifies credential management.
+
 ### Role-Based Authorization
 If you are using role-based authorization, set the appropriate permissions:
 
@@ -1142,6 +1186,7 @@ Also, see the Macros section for a list of macros used for LLD filters.
 |{$AWS.REQUEST.REGION}|<p>Region used in GET request `ListBuckets`.</p>|`us-east-1`|
 |{$AWS.STS.REGION}|<p>Region used in assume role request.</p>|`us-east-1`|
 |{$AWS.ASSUME.ROLE.ARN}|<p>ARN assume role; add when using the `assume_role` authorization method.</p>||
+|{$AWS.ASSUME.ROLE.AUTH.METADATA}|<p>Add when using the `assume_role` through instance metadata or environment authorization method. Possible values: `false`, `true`.</p>|`false`|
 |{$AWS.S3.BUCKET.NAME}|<p>S3 bucket name.</p>||
 |{$AWS.S3.LLD.FILTER.ALARM_NAME.MATCHES}|<p>Filter of discoverable alarms by name.</p>|`.*`|
 |{$AWS.S3.LLD.FILTER.ALARM_NAME.NOT_MATCHES}|<p>Filter to exclude discovered alarms by name.</p>|`CHANGE_IF_NEEDED`|
@@ -1327,6 +1372,10 @@ Next, add a principal to the trust relationships of the role you are using:
 ```
 Set the following macros: `{$AWS.ACCESS.KEY.ID}`, `{$AWS.SECRET.ACCESS.KEY}`, `{$AWS.STS.REGION}`, `{$AWS.ASSUME.ROLE.ARN}`.
 
+**Note**: If you set the `{$AWS.ASSUME.ROLE.AUTH.METADATA}` macro to `true` and set the macros `{$AWS.STS.REGION}` and `{$AWS.ASSUME.ROLE.ARN}`, the Zabbix server or proxy will attempt to retrieve the role credentials from the instance metadata service.
+This means that the Zabbix server or proxy must be running on an AWS EC2 instance with an IAM role assigned that has the necessary permissions.
+This approach is recommended when running Zabbix inside an AWS EC2 instance with an IAM role assigned, as it simplifies credential management.
+
 ### Role-Based Authorization
 If you are using role-based authorization, set the appropriate permissions:
 
@@ -1395,6 +1444,7 @@ Refer to the Macros section for a list of macros used for LLD filters.
 |{$AWS.AUTH_TYPE}|<p>Authorization method. Possible values: `access_key`, `assume_role`, `role_base`.</p>|`access_key`|
 |{$AWS.STS.REGION}|<p>Region used in assume role request.</p>|`us-east-1`|
 |{$AWS.ASSUME.ROLE.ARN}|<p>ARN assume role; add when using the `assume_role` authorization method.</p>||
+|{$AWS.ASSUME.ROLE.AUTH.METADATA}|<p>Add when using the `assume_role` through instance metadata or environment authorization method. Possible values: `false`, `true`.</p>|`false`|
 |{$AWS.ECS.CLUSTER.NAME}|<p>ECS cluster name.</p>||
 |{$AWS.ECS.LLD.FILTER.ALARM_NAME.MATCHES}|<p>Filter of discoverable alarms by name.</p>|`.*`|
 |{$AWS.ECS.LLD.FILTER.ALARM_NAME.NOT_MATCHES}|<p>Filter to exclude discovered alarms by name.</p>|`CHANGE_IF_NEEDED`|
@@ -1598,6 +1648,10 @@ Next, add a principal to the trust relationships of the role you are using:
 ```
 Set the following macros: `{$AWS.ACCESS.KEY.ID}`, `{$AWS.SECRET.ACCESS.KEY}`, `{$AWS.STS.REGION}`, `{$AWS.ASSUME.ROLE.ARN}`.
 
+**Note**: If you set the `{$AWS.ASSUME.ROLE.AUTH.METADATA}` macro to `true` and set the macros `{$AWS.STS.REGION}` and `{$AWS.ASSUME.ROLE.ARN}`, the Zabbix server or proxy will attempt to retrieve the role credentials from the instance metadata service.
+This means that the Zabbix server or proxy must be running on an AWS EC2 instance with an IAM role assigned that has the necessary permissions.
+This approach is recommended when running Zabbix inside an AWS EC2 instance with an IAM role assigned, as it simplifies credential management.
+
 ### Role-Based Authorization
 If you are using role-based authorization, set the appropriate permissions:
 
@@ -1667,6 +1721,7 @@ Refer to the Macros section for a list of macros used for LLD filters.
 |{$AWS.AUTH_TYPE}|<p>Authorization method. Possible values: `access_key`, `assume_role`, `role_base`.</p>|`access_key`|
 |{$AWS.STS.REGION}|<p>Region used in assume role request.</p>|`us-east-1`|
 |{$AWS.ASSUME.ROLE.ARN}|<p>ARN assume role; add when using the `assume_role` authorization method.</p>||
+|{$AWS.ASSUME.ROLE.AUTH.METADATA}|<p>Add when using the `assume_role` through instance metadata or environment authorization method. Possible values: `false`, `true`.</p>|`false`|
 |{$AWS.ECS.CLUSTER.NAME}|<p>ECS cluster name.</p>||
 |{$AWS.ECS.LLD.FILTER.ALARM_NAME.MATCHES}|<p>Filter of discoverable alarms by name.</p>|`.*`|
 |{$AWS.ECS.LLD.FILTER.ALARM_NAME.NOT_MATCHES}|<p>Filter to exclude discovered alarms by name.</p>|`CHANGE_IF_NEEDED`|
@@ -1867,6 +1922,10 @@ Next, add a principal to the trust relationships of the role you are using:
 ```
 Set the following macros: `{$AWS.ACCESS.KEY.ID}`, `{$AWS.SECRET.ACCESS.KEY}`, `{$AWS.STS.REGION}`, `{$AWS.ASSUME.ROLE.ARN}`.
 
+**Note**: If you set the `{$AWS.ASSUME.ROLE.AUTH.METADATA}` macro to `true` and set the macros `{$AWS.STS.REGION}` and `{$AWS.ASSUME.ROLE.ARN}`, the Zabbix server or proxy will attempt to retrieve the role credentials from the instance metadata service.
+This means that the Zabbix server or proxy must be running on an AWS EC2 instance with an IAM role assigned that has the necessary permissions.
+This approach is recommended when running Zabbix inside an AWS EC2 instance with an IAM role assigned, as it simplifies credential management.
+
 ### Role-Based Authorization
 If you are using role-based authorization, set the appropriate permissions:
 
@@ -1938,6 +1997,7 @@ See the section below for a list of macros used for LLD filters.
 |{$AWS.AUTH_TYPE}|<p>Authorization method. Possible values: `access_key`, `assume_role`, `role_base`.</p>|`access_key`|
 |{$AWS.STS.REGION}|<p>Region used in assume role request.</p>|`us-east-1`|
 |{$AWS.ASSUME.ROLE.ARN}|<p>ARN assume role; add when using the `assume_role` authorization method.</p>||
+|{$AWS.ASSUME.ROLE.AUTH.METADATA}|<p>Add when using the `assume_role` through instance metadata or environment authorization method. Possible values: `false`, `true`.</p>|`false`|
 |{$AWS.ELB.ARN}|<p>Amazon Resource Names (ARN) of the load balancer.</p>||
 |{$AWS.HTTP.4XX.FAIL.MAX.WARN}|<p>Maximum number of HTTP request failures for a trigger expression.</p>|`5`|
 |{$AWS.HTTP.5XX.FAIL.MAX.WARN}|<p>Maximum number of HTTP request failures for a trigger expression.</p>|`5`|
@@ -2149,6 +2209,10 @@ Next, add a principal to the trust relationships of the role you are using:
 ```
 Set the following macros: `{$AWS.ACCESS.KEY.ID}`, `{$AWS.SECRET.ACCESS.KEY}`, `{$AWS.STS.REGION}`, `{$AWS.ASSUME.ROLE.ARN}`.
 
+**Note**: If you set the `{$AWS.ASSUME.ROLE.AUTH.METADATA}` macro to `true` and set the macros `{$AWS.STS.REGION}` and `{$AWS.ASSUME.ROLE.ARN}`, the Zabbix server or proxy will attempt to retrieve the role credentials from the instance metadata service.
+This means that the Zabbix server or proxy must be running on an AWS EC2 instance with an IAM role assigned that has the necessary permissions.
+This approach is recommended when running Zabbix inside an AWS EC2 instance with an IAM role assigned, as it simplifies credential management.
+
 ### Role-Based Authorization
 If you are using role-based authorization, set the appropriate permissions:
 
@@ -2220,6 +2284,7 @@ See the section below for a list of macros used for LLD filters.
 |{$AWS.AUTH_TYPE}|<p>Authorization method. Possible values: `access_key`, `assume_role`, `role_base`.</p>|`access_key`|
 |{$AWS.STS.REGION}|<p>Region used in assume role request.</p>|`us-east-1`|
 |{$AWS.ASSUME.ROLE.ARN}|<p>ARN assume role; add when using the `assume_role` authorization method.</p>||
+|{$AWS.ASSUME.ROLE.AUTH.METADATA}|<p>Add when using the `assume_role` through instance metadata or environment authorization method. Possible values: `false`, `true`.</p>|`false`|
 |{$AWS.ELB.ARN}|<p>Amazon Resource Names (ARN) of the load balancer.</p>||
 |{$AWS.ELB.LLD.FILTER.TARGET.GROUP.MATCHES}|<p>Filter of discoverable target groups by name.</p>|`.*`|
 |{$AWS.ELB.LLD.FILTER.TARGET.GROUP.NOT_MATCHES}|<p>Filter to exclude discovered target groups by name.</p>|`CHANGE_IF_NEEDED`|
@@ -2421,6 +2486,10 @@ Next, add a principal to the trust relationships of the role you are using:
 ```
 Set the following macros: `{$AWS.ACCESS.KEY.ID}`, `{$AWS.SECRET.ACCESS.KEY}`, `{$AWS.STS.REGION}`, `{$AWS.ASSUME.ROLE.ARN}`.
 
+**Note**: If you set the `{$AWS.ASSUME.ROLE.AUTH.METADATA}` macro to `true` and set the macros `{$AWS.STS.REGION}` and `{$AWS.ASSUME.ROLE.ARN}`, the Zabbix server or proxy will attempt to retrieve the role credentials from the instance metadata service.
+This means that the Zabbix server or proxy must be running on an AWS EC2 instance with an IAM role assigned that has the necessary permissions.
+This approach is recommended when running Zabbix inside an AWS EC2 instance with an IAM role assigned, as it simplifies credential management.
+
 ### Role-Based Authorization
 If you are using role-based authorization, set the appropriate permissions:
 
@@ -2490,6 +2559,7 @@ See the section below for a list of macros used for LLD filters.
 |{$AWS.AUTH_TYPE}|<p>Authorization method. Possible values: `access_key`, `assume_role`, `role_base`.</p>|`access_key`|
 |{$AWS.STS.REGION}|<p>Region used in assume role request.</p>|`us-east-1`|
 |{$AWS.ASSUME.ROLE.ARN}|<p>ARN assume role; add when using the `assume_role` authorization method.</p>||
+|{$AWS.ASSUME.ROLE.AUTH.METADATA}|<p>Add when using the `assume_role` through instance metadata or environment authorization method. Possible values: `false`, `true`.</p>|`false`|
 |{$AWS.LAMBDA.ARN}|<p>The Amazon Resource Names (ARN) of the Lambda function.</p>||
 |{$AWS.LAMBDA.LLD.FILTER.ALARM_SERVICE_NAMESPACE.MATCHES}|<p>Filter of discoverable alarms by namespace.</p>|`.*`|
 |{$AWS.LAMBDA.LLD.FILTER.ALARM_SERVICE_NAMESPACE.NOT_MATCHES}|<p>Filter to exclude discovered alarms by namespace.</p>|`CHANGE_IF_NEEDED`|
@@ -2542,6 +2612,248 @@ See the section below for a list of macros used for LLD filters.
 |----|-----------|----------|--------|--------------------------------|
 |AWS Lambda: [{#ALARM_NAME}] has 'Alarm' state|<p>The alarm `{#ALARM_NAME}` is in the ALARM state.<br>Reason: `{ITEM.LASTVALUE2}`</p>|`last(/AWS Lambda by HTTP/aws.lambda.alarm.state["{#ALARM_NAME}"])=2 and length(last(/AWS Lambda by HTTP/aws.lambda.alarm.state_reason["{#ALARM_NAME}"]))>0`|Average||
 |AWS Lambda: [{#ALARM_NAME}] has 'Insufficient data' state|<p>Either the alarm has just started, the metric is not available, or not enough data is available for the metric to determine the alarm state.</p>|`last(/AWS Lambda by HTTP/aws.lambda.alarm.state["{#ALARM_NAME}"])=1`|Info||
+
+# AWS Backup Vault by HTTP
+
+## Overview
+
+This template uses AWS Backup API calls to list and retrieve metrics.
+For more information, please refer to the [AWS Backup API](https://docs.aws.amazon.com/aws-backup/latest/devguide/api-reference.html) page.
+
+Additional information about metrics and API methods used in the template:
+* [Metrics related to backup vaults](https://docs.aws.amazon.com/aws-backup/latest/devguide/API_BackupVaultListMember.html)
+* [Metrics related to backup jobs](https://docs.aws.amazon.com/aws-backup/latest/devguide/API_BackupJob.html)
+
+
+## Requirements
+
+Zabbix version: 7.0 and higher.
+
+## Tested versions
+
+This template has been tested on:
+- AWS Backup Vault service
+
+## Configuration
+
+> Zabbix should be configured according to the instructions in the [Templates out of the box](https://www.zabbix.com/documentation/7.0/manual/config/templates_out_of_the_box) section.
+
+## Setup
+
+The template gets AWS Backup vault metrics and uses the script item to make HTTP requests to the AWS Backup API.
+
+Before using the template, you need to create an IAM policy with the necessary permissions for the Zabbix role in your AWS account.
+
+### Required permissions
+Add the following required permissions to your Zabbix IAM policy in order to collect AWS backup vaults and jobs.
+
+```json
+{
+    "Version":"2012-10-17",
+    "Statement":[
+        {
+          "Action":[
+              "backup:ListBackupVaults",
+              "backup:ListBackupJobs",
+              "backup:ListCopyJobs",
+              "backup:ListRestoreJobs"
+          ],
+          "Effect":"Allow",
+          "Resource":"*"
+        }
+    ]
+  }
+```
+
+### Access Key Authorization
+
+If you are using access key authorization, you need to generate an access key and a secret key for an IAM user with the necessary permissions:
+
+1. Create an IAM user with programmatic access.
+2. Attach the required policy to the IAM user.
+3. Generate an access key and a secret key.
+4. Use the generated credentials in the macros `{$AWS.ACCESS.KEY.ID}` and `{$AWS.SECRET.ACCESS.KEY}`.
+
+### Assume Role authorization
+For using Assume Role authorization, add the appropriate permissions to the role you are using:
+
+```json
+{
+    "Version": "2012-10-17",
+    "Statement": [
+        {
+            "Effect": "Allow",
+            "Action": "sts:AssumeRole",
+            "Resource": "arn:aws:iam::{Account}:user/{UserName}"
+        },
+        {
+            "Effect": "Allow",
+            "Action": [
+                "backup:ListBackupVaults",
+                "backup:ListBackupJobs",
+                "backup:ListCopyJobs",
+                "backup:ListRestoreJobs"
+            ],
+            "Resource": "*"
+        }
+    ]
+}
+```
+
+#### Trust Relationships for Assume Role Authorization
+Next, add a principal to the trust relationships of the role you are using:
+
+```json
+{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Effect": "Allow",
+      "Principal": {
+        "AWS": "arn:aws:iam::{Account}:user/{UserName}"
+      },
+      "Action": "sts:AssumeRole"
+    }
+  ]
+}
+```
+Set the following macros: `{$AWS.ACCESS.KEY.ID}`, `{$AWS.SECRET.ACCESS.KEY}`, `{$AWS.STS.REGION}`, `{$AWS.ASSUME.ROLE.ARN}`.
+
+**Note**: If you set the `{$AWS.ASSUME.ROLE.AUTH.METADATA}` macro to `true` and set the macros `{$AWS.STS.REGION}` and `{$AWS.ASSUME.ROLE.ARN}`, the Zabbix server or proxy will attempt to retrieve the role credentials from the instance metadata service.
+This means that the Zabbix server or proxy must be running on an AWS EC2 instance with an IAM role assigned that has the necessary permissions.
+This approach is recommended when running Zabbix inside an AWS EC2 instance with an IAM role assigned, as it simplifies credential management.
+
+### Role-Based Authorization
+If you are using role-based authorization, set the appropriate permissions:
+
+```json
+{
+    "Version": "2012-10-17",
+    "Statement": [
+        {
+            "Effect": "Allow",
+            "Action": "iam:PassRole",
+            "Resource": "arn:aws:iam::<<--account-id-->>:role/<<--role_name-->>"
+        },
+        {
+            "Sid": "VisualEditor1",
+            "Effect": "Allow",
+            "Action": [
+                "backup:ListBackupVaults",
+                "backup:ListBackupJobs",
+                "backup:ListCopyJobs",
+                "backup:ListRestoreJobs"
+            ],
+            "Resource": "*"
+        }
+    ]
+}
+```
+#### Trust Relationships for Role-Based Authorization
+Next, add a principal to the trust relationships of the role you are using:
+
+```json
+{
+    "Version": "2012-10-17",
+    "Statement": [
+        {
+            "Effect": "Allow",
+            "Principal": {
+                "Service": [
+                    "backup.amazonaws.com"
+                ]
+            },
+            "Action": [
+                "sts:AssumeRole"
+            ]
+        }
+    ]
+}
+```
+
+**Note**: Using role-based authorization is only possible when you use a Zabbix server or proxy inside AWS.
+
+Set the macros: `{$AWS.AUTH_TYPE}`, `{$AWS.REGION}`, and `{$AWS.BACKUP_VAULT.NAME}`.
+
+For more information about managing access keys, see the [official AWS documentation](https://docs.aws.amazon.com/general/latest/gr/aws-sec-cred-types.html#access-keys-and-secret-access-keys).
+
+See the section below for a list of macros used for LLD filters.
+
+
+### Macros used
+
+|Name|Description|Default|
+|----|-----------|-------|
+|{$AWS.DATA.TIMEOUT}|<p>API response timeout.</p>|`60s`|
+|{$AWS.PROXY}|<p>Sets the HTTP proxy value. If this macro is empty, no proxy is used.</p>||
+|{$AWS.ACCESS.KEY.ID}|<p>Access key ID.</p>||
+|{$AWS.SECRET.ACCESS.KEY}|<p>Secret access key.</p>||
+|{$AWS.REGION}|<p>AWS backup vault region code.</p>|`us-west-1`|
+|{$AWS.AUTH_TYPE}|<p>Authorization method. Possible values: `access_key`, `assume_role`, `role_base`.</p>|`access_key`|
+|{$AWS.STS.REGION}|<p>Region used in assume role request.</p>|`us-east-1`|
+|{$AWS.ASSUME.ROLE.ARN}|<p>ARN assume role; add when using the `assume_role` authorization method.</p>||
+|{$AWS.ASSUME.ROLE.AUTH.METADATA}|<p>Add when using the `assume_role` through instance metadata or environment authorization method. Possible values: `false`, `true`.</p>|`false`|
+|{$AWS.BACKUP_VAULT.NAME}|<p>AWS backup vault name.</p>||
+|{$AWS.BACKUP_JOB.STATE.MATCHES}|<p>Filter of discoverable jobs by state.</p>|`.*`|
+|{$AWS.BACKUP_JOB.STATE.NOT_MATCHES}|<p>Filter to exclude discovered jobs by state.</p>|`CHANGE_IF_NEEDED`|
+|{$AWS.BACKUP_JOB.RESOURCE_TYPE.MATCHES}|<p>Filter of discoverable jobs by resource type.</p>|`.*`|
+|{$AWS.BACKUP_JOB.RESOURCE_TYPE.NOT_MATCHES}|<p>Filter to exclude discovered jobs by resource type.</p>|`CHANGE_IF_NEEDED`|
+|{$AWS.BACKUP_JOB.RESOURCE_NAME.MATCHES}|<p>Filter of discoverable jobs by resource name.</p>|`.*`|
+|{$AWS.BACKUP_JOB.RESOURCE_NAME.NOT_MATCHES}|<p>Filter to exclude discovered jobs by resource name.</p>|`CHANGE_IF_NEEDED`|
+|{$AWS.BACKUP_JOB.PERIOD}|<p>The number of days over which to retrieve backup jobs.</p>|`7`|
+
+### Items
+
+|Name|Description|Type|Key and additional info|
+|----|-----------|----|-----------------------|
+|Get jobs|<p>Get a list of jobs in the vault.</p>|Script|aws.backup_vault.job.get|
+|Get data|<p>Retrieve AWS backup vault metrics.</p><p>More information here: https://docs.aws.amazon.com/aws-backup/latest/devguide/API_BackupVaultListMember.html</p>|Script|aws.backup_vault.data.get|
+|Recovery points|<p>The total number of recovery points in the backup vault.</p>|Dependent item|aws.backup_vault.recovery_points<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.NumberOfRecoveryPoints`</p></li><li><p>Does not match regular expression: `null`</p><p>⛔️Custom on fail: Discard value</p></li></ul>|
+|Age|<p>The age of the vault.</p>|Dependent item|aws.backup_vault.age<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.CreationDate`</p></li><li><p>JavaScript: `return Date.now() / 1000 - value`</p></li></ul>|
+|Retention period, min|<p>The minimum retention period that the vault retains its recovery points.</p>|Dependent item|aws.backup_vault.retention.min<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.MinRetentionDays`</p></li><li><p>Does not match regular expression: `null`</p><p>⛔️Custom on fail: Set error to: `The vault does not have the minimum retention period set.`</p></li></ul>|
+|Retention period, max|<p>The maximum retention period that the vault retains its recovery points.</p>|Dependent item|aws.backup_vault.retention.max<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.MaxRetentionDays`</p></li><li><p>Does not match regular expression: `null`</p><p>⛔️Custom on fail: Set error to: `The vault does not have the maximum retention period set.`</p></li></ul>|
+|Lock status|<p>Indicates whether AWS Backup Vault Lock is applied to the selected backup vault. When the vault is locked, delete and update operations on recovery points in that vault are prevented.</p>|Dependent item|aws.backup_vault.lock.status<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.Locked`</p></li><li><p>Replace: `false -> 0`</p></li><li><p>Replace: `true -> 1`</p></li></ul>|
+|Lock time remain|<p>The remaining time before AWS Backup Vault Lock configuration becomes immutable, meaning it cannot be changed or deleted.</p>|Dependent item|aws.backup_vault.lock.time_left<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.LockDate`</p></li><li><p>Does not match regular expression: `null`</p><p>⛔️Custom on fail: Set error to: `Either the vault is not locked, or the lock date is not specified.`</p></li><li><p>JavaScript: `The text is too long. Please see the template.`</p></li></ul>|
+|Lock date|<p>The date and time when AWS Backup Vault Lock configuration becomes immutable, meaning it cannot be changed or deleted.</p>|Dependent item|aws.backup_vault.lock.date<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.LockDate`</p></li><li><p>Does not match regular expression: `null`</p><p>⛔️Custom on fail: Set error to: `Either the vault is not locked, or the lock date is not specified.`</p></li></ul>|
+|State|<p>The current state of the backup vault.</p><p>Possible values are:</p><p>- Unknown</p><p>- Creating</p><p>- Available</p><p>- Failed</p>|Dependent item|aws.backup_vault.state<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.VaultState`</p></li><li><p>JavaScript: `The text is too long. Please see the template.`</p></li></ul>|
+|Jobs: Size, avg|<p>The average size, in bytes, of a backup (recovery point).</p><p>This value can render differently depending on the resource type as AWS Backup pulls in data information from other AWS services. For example, the value returned may show a value of `0`, which may differ from the anticipated value.</p>|Dependent item|aws.backup_vault.job.size.avg<p>**Preprocessing**</p><ul><li><p>JSON Path: `$[?(@.job_size > 0)].job_size.avg()`</p><p>⛔️Custom on fail: Discard value</p></li><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
+|Jobs: Size, max|<p>The maximum size, in bytes, of a backup (recovery point).</p><p>This value can render differently depending on the resource type as AWS Backup pulls in data information from other AWS services. For example, the value returned may show a value of `0`, which may differ from the anticipated value.</p>|Dependent item|aws.backup_vault.job.size.max<p>**Preprocessing**</p><ul><li><p>JSON Path: `$[?(@.job_size > 0)].job_size.max()`</p><p>⛔️Custom on fail: Discard value</p></li><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
+|Jobs: Size, min|<p>The minimum size, in bytes, of a backup (recovery point).</p><p>This value can render differently depending on the resource type as AWS Backup pulls in data information from other AWS services. For example, the value returned may show a value of `0`, which may differ from the anticipated value.</p>|Dependent item|aws.backup_vault.job.size.min<p>**Preprocessing**</p><ul><li><p>JSON Path: `$[?(@.job_size > 0)].job_size.min()`</p><p>⛔️Custom on fail: Discard value</p></li><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
+|Jobs: Backup|<p>The number of backup jobs in the vault over the last `{$AWS.BACKUP_JOB.PERIOD}` day(s).</p>|Dependent item|aws.backup_vault.job.backup.count<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.[?(@.job_type == "backup-job")].length()`</p></li><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
+|Jobs: Restore|<p>The number of restore jobs in the vault over the last `{$AWS.BACKUP_JOB.PERIOD}` day(s).</p>|Dependent item|aws.backup_vault.job.restore.count<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.[?(@.job_type == "restore-job")].length()`</p></li><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
+|Jobs: Copy|<p>The number of copy jobs in the vault over the last `{$AWS.BACKUP_JOB.PERIOD}` day(s).</p>|Dependent item|aws.backup_vault.job.copy.count<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.[?(@.job_type == "copy-job")].length()`</p></li><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
+|Jobs: Total|<p>The total number of jobs in the vault over the last `{$AWS.BACKUP_JOB.PERIOD}` day(s).</p>|Dependent item|aws.backup_vault.job.total.count<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.length()`</p></li><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
+|Jobs: Failed backup|<p>The number of failed backup jobs in the vault over the last `{$AWS.BACKUP_JOB.PERIOD}` day(s).</p>|Dependent item|aws.backup_vault.job.backup.failed.count<p>**Preprocessing**</p><ul><li><p>JSON Path: `The text is too long. Please see the template.`</p></li><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
+|Jobs: Failed restore|<p>The number of failed restore jobs in the vault over the last `{$AWS.BACKUP_JOB.PERIOD}` day(s).</p>|Dependent item|aws.backup_vault.job.restore.failed.count<p>**Preprocessing**</p><ul><li><p>JSON Path: `The text is too long. Please see the template.`</p></li><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
+|Jobs: Failed copy|<p>The number of failed copy jobs in the vault over the last `{$AWS.BACKUP_JOB.PERIOD}` day(s).</p>|Dependent item|aws.backup_vault.job.copy.failed.count<p>**Preprocessing**</p><ul><li><p>JSON Path: `The text is too long. Please see the template.`</p></li><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
+
+### Triggers
+
+|Name|Description|Expression|Severity|Dependencies and additional info|
+|----|-----------|----------|--------|--------------------------------|
+|AWS Backup vault: Restore job has appeared|<p>New restore job has appeared.</p>|`change(/AWS Backup Vault by HTTP/aws.backup_vault.job.restore.count)>0`|Average|**Manual close**: Yes|
+|AWS Backup vault: Copy job has appeared|<p>New copy job has appeared.</p>|`change(/AWS Backup Vault by HTTP/aws.backup_vault.job.copy.count)>0`|Warning|**Manual close**: Yes|
+
+### LLD rule AWS Backup job discovery
+
+|Name|Description|Type|Key and additional info|
+|----|-----------|----|-----------------------|
+|AWS Backup job discovery|<p>AWS Backup job discovery.</p>|Dependent item|aws.backup_vault.job.discovery<p>**Preprocessing**</p><ul><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
+
+### Item prototypes for AWS Backup job discovery
+
+|Name|Description|Type|Key and additional info|
+|----|-----------|----|-----------------------|
+|Job state [{#AWS.BACKUP_JOB.RESOURCE_NAME}][{#AWS.BACKUP_JOB.ID}]|<p>The state of the job.</p><p>Possible values are:</p><p>- Unknown</p><p>- Created</p><p>- Pending</p><p>- Running</p><p>- Aborting</p><p>- Aborted</p><p>- Completed</p><p>- Failed</p><p>- Expired</p><p>- Partial</p>|Dependent item|aws.backup_vault.job.state["{#AWS.BACKUP_JOB.ID}"]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.[?(@.job_id == "{#AWS.BACKUP_JOB.ID}")].job_state.first()`</p><p>⛔️Custom on fail: Discard value</p></li><li><p>JavaScript: `The text is too long. Please see the template.`</p></li><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
+
+### Trigger prototypes for AWS Backup job discovery
+
+|Name|Description|Expression|Severity|Dependencies and additional info|
+|----|-----------|----------|--------|--------------------------------|
+|AWS Backup vault: Job failed [{#AWS.BACKUP_JOB.ID}]|<p>Job has failed.</p>|`last(/AWS Backup Vault by HTTP/aws.backup_vault.job.state["{#AWS.BACKUP_JOB.ID}"])=7`|High|**Manual close**: Yes|
+|AWS Backup vault: Job has been aborted [{#AWS.BACKUP_JOB.ID}]|<p>Job has been aborted.</p>|`last(/AWS Backup Vault by HTTP/aws.backup_vault.job.state["{#AWS.BACKUP_JOB.ID}"])=5`|Average|**Manual close**: Yes|
+|AWS Backup vault: Job has expired [{#AWS.BACKUP_JOB.ID}]|<p>Job expired.</p>|`last(/AWS Backup Vault by HTTP/aws.backup_vault.job.state["{#AWS.BACKUP_JOB.ID}"])=8`|Warning|**Manual close**: Yes|
+|AWS Backup vault: Job is in an unknown state [{#AWS.BACKUP_JOB.ID}]|<p>Job is in unknown state.</p>|`last(/AWS Backup Vault by HTTP/aws.backup_vault.job.state["{#AWS.BACKUP_JOB.ID}"])=0`|Warning|**Manual close**: Yes|
 
 # AWS Cost Explorer by HTTP
 
@@ -2644,6 +2956,10 @@ Next, add a principal to the trust relationships of the role you are using:
 ```
 Set the following macros: `{$AWS.ACCESS.KEY.ID}`, `{$AWS.SECRET.ACCESS.KEY}`, `{$AWS.STS.REGION}`, `{$AWS.ASSUME.ROLE.ARN}`.
 
+**Note**: If you set the `{$AWS.ASSUME.ROLE.AUTH.METADATA}` macro to `true` and set the macros `{$AWS.STS.REGION}` and `{$AWS.ASSUME.ROLE.ARN}`, the Zabbix server or proxy will attempt to retrieve the role credentials from the instance metadata service.
+This means that the Zabbix server or proxy must be running on an AWS EC2 instance with an IAM role assigned that has the necessary permissions.
+This approach is recommended when running Zabbix inside an AWS EC2 instance with an IAM role assigned, as it simplifies credential management.
+
 ### Role-Based Authorization
 If you are using role-based authorization, add the appropriate permissions:
 
@@ -2716,6 +3032,7 @@ Additional information about metrics and used API methods:
 |{$AWS.AUTH_TYPE}|<p>Authorization method. Possible values: `access_key`, `assume_role`, `role_base`.</p>|`access_key`|
 |{$AWS.STS.REGION}|<p>Region used in assume role request.</p>|`us-east-1`|
 |{$AWS.ASSUME.ROLE.ARN}|<p>ARN assume role; add when using the `assume_role` authorization method.</p>||
+|{$AWS.ASSUME.ROLE.AUTH.METADATA}|<p>Add when using the `assume_role` through instance metadata or environment authorization method. Possible values: `false`, `true`.</p>|`false`|
 |{$AWS.BILLING.MONTH}|<p>Months to get historical data from AWS Cost Explore API, no more than 12 months.</p>|`11`|
 |{$AWS.BILLING.LLD.FILTER.SERVICE.MATCHES}|<p>Filter of discoverable discovered billing service by name.</p>|`.*`|
 |{$AWS.BILLING.LLD.FILTER.SERVICE.NOT_MATCHES}|<p>Filter to exclude discovered billing service by name.</p>|`CHANGE_IF_NEEDED`|

@@ -638,12 +638,13 @@ function check_db_fields($dbFields, &$args) {
  *
  * @param string $field_name
  * @param array  $values
- * @param bool   $not_in        Create inverse condition.
- * @param bool   $zero_to_null  Cast zero to null.
+ * @param bool   $not_in              Create inverse condition.
+ * @param bool   $zero_includes_null  ID fields may have default DB column value either null or 0. Consider them
+ *                                    equivalent for 0 in the given values.
  *
  * @return string
  */
-function dbConditionInt($field_name, array $values, $not_in = false, $zero_to_null = false) {
+function dbConditionInt($field_name, array $values, $not_in = false, $zero_includes_null = false) {
 	global $DB;
 
 	$MIN_NUM_BETWEEN = 4; // Minimum number of consecutive values for using "BETWEEN <id1> AND <idN>".
@@ -655,11 +656,10 @@ function dbConditionInt($field_name, array $values, $not_in = false, $zero_to_nu
 
 	$values = array_flip($values);
 
-	$has_zero = false;
+	$condition = '';
 
-	if ($zero_to_null && array_key_exists(0, $values)) {
-		$has_zero = true;
-		unset($values[0]);
+	if ($zero_includes_null && array_key_exists(0, $values)) {
+		$condition .= $field_name.($not_in ? ' IS NOT NULL' : ' IS NULL');
 	}
 
 	$values = array_keys($values);
@@ -698,13 +698,14 @@ function dbConditionInt($field_name, array $values, $not_in = false, $zero_to_nu
 		}, $values);
 	}
 
-	$condition = '';
+	$multiple_conditions = false;
 
 	// Process intervals.
 
 	foreach ($intervals as $interval) {
 		if ($condition !== '') {
 			$condition .= $not_in ? ' AND ' : ' OR ';
+			$multiple_conditions = true;
 		}
 
 		$condition .= ($not_in ? 'NOT ' : '').$field_name.' BETWEEN '.$interval[0].' AND '.$interval[1];
@@ -717,6 +718,7 @@ function dbConditionInt($field_name, array $values, $not_in = false, $zero_to_nu
 	foreach ($single_chunks as $chunk) {
 		if ($condition !== '') {
 			$condition .= $not_in ? ' AND ' : ' OR ';
+			$multiple_conditions = true;
 		}
 
 		if (count($chunk) == 1) {
@@ -727,18 +729,8 @@ function dbConditionInt($field_name, array $values, $not_in = false, $zero_to_nu
 		}
 	}
 
-	if ($has_zero) {
-		if ($condition !== '') {
-			$condition .= $not_in ? ' AND ' : ' OR ';
-		}
-
-		$condition .= $field_name.($not_in ? ' IS NOT NULL' : ' IS NULL');
-	}
-
-	if (!$not_in) {
-		if ((int) $has_zero + count($intervals) + count($single_chunks) > 1) {
-			$condition = '('.$condition.')';
-		}
+	if (!$not_in && $multiple_conditions) {
+		$condition = '('.$condition.')';
 	}
 
 	return $condition;

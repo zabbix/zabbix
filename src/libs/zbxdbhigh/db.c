@@ -24,7 +24,8 @@
 #	include "zbx_dbversion_constants.h"
 #endif
 
-#define ZBX_DB_WAIT_DOWN	10
+#define ZBX_DB_WAIT_DOWN		10
+#define ZBX_DB_WAIT_AFTER_RECONNECT	3
 
 #define ZBX_MAX_SQL_SIZE	262144	/* 256KB */
 #ifndef ZBX_MAX_OVERFLOW_SQL_SIZE
@@ -225,6 +226,13 @@ void	zbx_db_validate_config(const zbx_config_dbhigh_t *config_dbhigh)
 				" \"DBTLSKeyFile\", \"DBTLSCertFile\" or \"DBTLSCAFile\" is not defined");
 		exit(EXIT_FAILURE);
 	}
+
+	if (NULL != config_dbhigh->config_dbsocket && 0 != config_dbhigh->config_dbport)
+	{
+		zabbix_log(LOG_LEVEL_CRIT, "Both parameters \"DBPort\" and \"DBSocket\" are defined. Either one of "
+				"them can be defined, or neither.");
+		exit(EXIT_FAILURE);
+	}
 }
 #endif
 
@@ -298,6 +306,8 @@ int	zbx_db_connect(int flag)
 
 	if (0 != connection_failure)
 	{
+		/* wait ZBX_DB_WAIT_AFTER_RECONNECT to allow HA manager recover */
+		zbx_sleep(ZBX_DB_WAIT_AFTER_RECONNECT);
 		zabbix_log(LOG_LEVEL_ERR, "database connection re-established");
 		connection_failure = 0;
 #if defined(HAVE_POSTGRESQL)
@@ -1418,6 +1428,22 @@ void	zbx_db_add_condition_alloc(char **sql, size_t *sql_alloc, size_t *sql_offse
 #ifdef HAVE_ORACLE
 #undef MIN_NUM_BETWEEN
 #endif
+}
+
+void	add_batch_select_condition(char **sql, size_t *sql_alloc, size_t *sql_offset, const char* column,
+		const zbx_vector_uint64_t *itemids, int *index)
+{
+#define ZBX_SELECT_BATCH_SIZE	1000
+	int	new_index = *index + ZBX_SELECT_BATCH_SIZE;
+#undef ZBX_LLD_ITEMS_BATCH_SIZE
+
+	if (new_index > itemids->values_num)
+		new_index = itemids->values_num;
+
+	zbx_db_add_condition_alloc(sql, sql_alloc, sql_offset, column,
+			itemids->values + *index, new_index - *index);
+
+	*index = new_index;
 }
 
 /*********************************************************************************

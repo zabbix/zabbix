@@ -4,7 +4,7 @@ msgstr ""
 "Project-Id-Version: Zabbix 6.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2023-10-19 13:48+0300\n"
-"PO-Revision-Date: 2025-03-24 11:38+0000\n"
+"PO-Revision-Date: 2025-05-12 07:41+0000\n"
 "Last-Translator: Tomáš Heřmánek <tomas.hermanek@initmax.cz>\n"
 "Language-Team: Zabbix translation team\n"
 "Language: sk\n"
@@ -7257,7 +7257,7 @@ msgstr "Prehľadávanie klastrov VMware, \"url\" – URL služby VMware. Vráti 
 
 #: include/classes/data/CItemData.php:1931
 msgid "Discovery of VMware datastores, \"url\" - VMware service URL, \"filter_uuid\" - one hv uuid or vm uuid (empty by default). Returns JSON"
-msgstr ""
+msgstr "Vyhľadávanie dátových úložísk VMware, \"url\" – URL adresa služby VMware, \"filter_uuid\" – jeden hv uuid alebo vm uuid (predvolene prázdne). Vráti JSON"
 
 #: include/classes/data/CItemData.php:1799
 msgid "Discovery of VMware datastores, \"url\" - VMware service URL. Returns JSON"
@@ -19616,7 +19616,7 @@ msgstr "Štatistiky a dostupnosť vyrovnávacej pamäte proxy. Režim (režimy: 
 
 #: include/classes/data/CItemData.php:2854
 msgid "Statistics of values received by the preprocessing manager."
-msgstr ""
+msgstr "Štatistiky hodnôt prijatých manažérom predspracovania."
 
 #: app/controllers/CControllerPopupGeneric.php:237
 #: app/controllers/CControllerPopupGeneric.php:251
@@ -20604,6 +20604,10 @@ msgstr "Počet procesov. Vráti celé číslo"
 #, c-format
 msgid "The parameter \"%1$s\" is missing from the user attributes."
 msgstr "V atribútoch používateľa chýba parameter „%1$s“."
+
+#: app/views/popup.ldap.edit.php:101
+msgid "The previous password was cleared due to a host change. Please enter the new password."
+msgstr ""
 
 #: include/classes/core/CJsonRpc.php:206
 msgid "The received JSON is not a valid JSON-RPC request."
