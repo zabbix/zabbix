@@ -158,22 +158,25 @@ static int	macro_message_update_resolv(zbx_macro_resolv_data_t *p, va_list args,
 
 				*replace_to = zbx_strdup(*replace_to, user_name1);
 			}
-			else if (0 == strcmp(p->macro, MVAR_EVENT_UPDATE_STATUS))
-			{
-				*replace_to = zbx_strdup(*replace_to, "1");
-			}
 		}
-		else
+
+		if (0 == strcmp(p->macro, MVAR_EVENT_UPDATE_STATUS))
 		{
-			*replace_to = zbx_strdup(*replace_to, "0");
+			if (NULL != ack)
+				*replace_to = zbx_strdup(*replace_to, "1");
+			else
+				*replace_to = zbx_strdup(*replace_to, "0");
 		}
 	}
 	else if (0 == p->indexed && EVENT_SOURCE_SERVICE == c_event->source)
 	{
-		if (NULL != service_alarm && 0 == strcmp(p->macro, MVAR_EVENT_UPDATE_STATUS))
-			*replace_to = zbx_strdup(*replace_to, "1");
-		else
-			*replace_to = zbx_strdup(*replace_to, "0");
+		if (0 == strcmp(p->macro, MVAR_EVENT_UPDATE_STATUS))
+		{
+			if (NULL != service_alarm)
+				*replace_to = zbx_strdup(*replace_to, "1");
+			else
+				*replace_to = zbx_strdup(*replace_to, "0");
+		}
 	}
 
 	return ret;
