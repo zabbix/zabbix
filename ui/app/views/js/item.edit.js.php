@@ -522,7 +522,7 @@ window.item_edit_form = new class {
 	#getFormFields() {
 		const values = this.form.getAllValues();
 
-		if (values.delay === null) {
+		if (values.delay === undefined) {
 			values.delay = '';
 		}
 
