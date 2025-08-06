@@ -22,24 +22,20 @@ class CControllerProxyEdit extends CController {
 	private ?array $proxy = null;
 
 	protected function init(): void {
+		$this->setInputValidationMethod(self::INPUT_VALIDATION_FORM);
 		$this->disableCsrfValidation();
 	}
 
 	protected function checkInput(): bool {
-		$fields = [
-			'proxyid' =>	'db proxy.proxyid'
-		];
+		$allow_any = [];
+		foreach (array_keys(CControllerProxyUpdate::getValidationRules()['fields']) as $name) {
+			$allow_any[$name] = [];
+		}
 
-		$ret = $this->validateInput($fields);
+		$ret = $this->validateInput(['object', 'fields' => $allow_any]);
 
 		if (!$ret) {
-			$this->setResponse(
-				(new CControllerResponseData(['main_block' => json_encode([
-					'error' => [
-						'messages' => array_column(get_and_clear_messages(), 'message')
-					]
-				])]))->disableView()
-			);
+			$this->setResponse(new CControllerResponseFatal());
 		}
 
 		return $ret;
@@ -172,6 +168,16 @@ class CControllerProxyEdit extends CController {
 		$data['user'] = [
 			'debug_mode' => $this->getDebugMode(),
 			'can_edit_global_timeouts' => $this->checkAccess(CRoleHelper::UI_ADMINISTRATION_GENERAL)
+		];
+
+		$create_rules = (new CFormValidator(CControllerProxyCreate::getValidationRules()))->getRules();
+		$rules = $this->hasInput('proxyid')
+			? (new CFormValidator(CControllerProxyUpdate::getValidationRules()))->getRules()
+			: $create_rules;
+
+		$data += [
+			'js_validation_rules' => $rules,
+			'js_clone_validation_rules' => $create_rules
 		];
 
 		$this->setResponse(new CControllerResponseData($data));

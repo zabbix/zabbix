@@ -123,7 +123,9 @@ class CControllerProxyCreate extends CController {
 			'timeout_browser' =>		['db proxy.timeout_browser', 'required', 'not_empty',
 				'use' => [CTimeUnitValidator::class, ['max' => SEC_PER_DAY, 'usermacros' => true]],
 				'when' => ['custom_timeouts', 'in' => [ZBX_PROXY_CUSTOM_TIMEOUTS_ENABLED]]
-			]
+			],
+			'clone_psk' => ['boolean'],
+			'clone_proxyid' => ['db proxy.proxyid']
 		]];
 	}
 
