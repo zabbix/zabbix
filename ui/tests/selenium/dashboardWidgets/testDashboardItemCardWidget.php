@@ -397,7 +397,7 @@ class testDashboardItemCardWidget extends testWidgets {
 		}
 
 		$trigger_names = ['Not classified trigger', 'Information trigger', 'Warning trigger', 'Average trigger',
-			    'High trigger', 'Disaster trigger', 'Disaster trigger', 'Trigger 1', 'Trigger 2'];
+				'High trigger', 'Disaster trigger', 'Disaster trigger', 'Trigger 1', 'Trigger 2'];
 		CDBHelper::setTriggerProblem($trigger_names);
 
 		// Add red error messages.
@@ -2466,7 +2466,7 @@ class testDashboardItemCardWidget extends testWidgets {
 	 */
 	protected function asssertSectionValue($widget, $section_name, $expected_value) {
 		$row = $widget->query('xpath:.//div[@class="section-name" and text()='.
-                CXPathHelper::escapeQuotes($section_name).']')->one();
+				CXPathHelper::escapeQuotes($section_name).']')->one();
 		$value = $row->query('xpath:./following-sibling::div[1]')->one()->getText();
 		$this->assertEquals($expected_value, $value);
 	}
