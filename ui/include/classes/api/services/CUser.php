@@ -1477,11 +1477,11 @@ class CUser extends CApiService {
 	private static function deleteInactiveMfaTotpSecrets(array $user_groups): void {
 		$db_mfa_totp_secretids = [];
 
-		$resource = DBselect(
-			'SELECT m.mfa_totp_secretid,m.mfaid,m.userid'.
-			' FROM mfa_totp_secret m'.
-			' WHERE '.dbConditionId('m.userid', array_keys($user_groups))
-		);
+		$options = [
+			'output' => ['userid', 'mfaid', 'mfa_totp_secretid'],
+			'filter' => ['userid' => array_keys($user_groups)]
+		];
+		$resource = DBselect(DB::makeSql('mfa_totp_secret', $options));
 
 		while ($row = DBfetch($resource)) {
 			$db_mfa_totp_secretids[$row['userid']][$row['mfaid']] = $row['mfa_totp_secretid'];
