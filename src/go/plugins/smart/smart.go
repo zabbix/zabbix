@@ -185,7 +185,7 @@ func setSingleDiskFields(dev []byte) (map[string]any, error) {
 		out["temperature"] = sd.Temperature.Current
 		out["power_on_time"] = sd.PowerOnTime.Hours
 		out["critical_warning"] = 0
-		out["media_errors"] = 0
+		out["media_errors"] = json.Number("0")
 		out["percentage_used"] = 0
 	}
 
