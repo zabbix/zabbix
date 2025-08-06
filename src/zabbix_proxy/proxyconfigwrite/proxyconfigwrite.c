@@ -1238,7 +1238,7 @@ static void	proxyconfig_prepare_table(zbx_table_data_t *td, const char *key_fiel
 
 	zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, " from %s t", td->table->table);
 
-	if (NULL != td->join)
+	if (NULL != key_ids && NULL != td->join)
 		zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, td->join);
 
 	if (NULL != td->sql_filter)
