@@ -1,0 +1,1 @@
+..F....... [ZBX-26030] fixed the visibility of the history and trends fields on discovered items when the option is set to "Do not store" (rgontarski)
