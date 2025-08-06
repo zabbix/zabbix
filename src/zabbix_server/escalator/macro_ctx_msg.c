@@ -109,9 +109,12 @@ static int	macro_message_update_resolv(zbx_macro_resolv_data_t *p, va_list args,
 			service_alarm, service, tz, item_hosts, trigger_hosts, cause_event, cause_recovery_event,
 			replace_to, data, error, maxerrlen);
 
-	if (SUCCEED == ret && NULL != p->macro)
+	if (SUCCEED != ret || NULL == p->macro)
+		return ret;
+
+	if (EVENT_SOURCE_TRIGGERS == c_event->source)
 	{
-		if (EVENT_SOURCE_TRIGGERS == c_event->source && NULL != ack)
+		if (NULL != ack)
 		{
 			if (0 == strcmp(p->macro, MVAR_ACK_MESSAGE) || 0 == strcmp(p->macro, MVAR_EVENT_UPDATE_MESSAGE))
 			{
@@ -160,13 +163,17 @@ static int	macro_message_update_resolv(zbx_macro_resolv_data_t *p, va_list args,
 				*replace_to = zbx_strdup(*replace_to, "1");
 			}
 		}
-		else if (0 == p->indexed && EVENT_SOURCE_SERVICE == c_event->source && NULL != service_alarm)
+		else
 		{
-			if (0 == strcmp(p->macro, MVAR_EVENT_UPDATE_STATUS))
-			{
-				*replace_to = zbx_strdup(*replace_to, "1");
-			}
+			*replace_to = zbx_strdup(*replace_to, "0");
 		}
+	}
+	else if (0 == p->indexed && EVENT_SOURCE_SERVICE == c_event->source)
+	{
+		if (NULL != service_alarm && 0 == strcmp(p->macro, MVAR_EVENT_UPDATE_STATUS))
+			*replace_to = zbx_strdup(*replace_to, "1");
+		else
+			*replace_to = zbx_strdup(*replace_to, "0");
 	}
 
 	return ret;
