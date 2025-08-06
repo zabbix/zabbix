@@ -72,6 +72,9 @@ class testPageHostGroups extends testPageGroups {
 			],
 			[
 				'name' => 'Group 3 for Delete test'
+			],
+			[
+				'name' => 'Multiple spaces in   group name'
 			]
 		]);
 		$host_groupids = CDataHelper::getIds('name');
@@ -207,12 +210,20 @@ class testPageHostGroups extends testPageGroups {
 			// Too many spaces in field.
 			[
 				[
-					'Name' => '  host'
+					'Name' => '  host',
+					'expected' => ['Multiple spaces in group name']
 				]
 			],
 			[
 				[
-					'Name' => 'host  '
+					'Name' => 'host  ',
+					'expected' => ['Multiple spaces in group name']
+				]
+			],
+			[
+				[
+					'Name' => '   host   ',
+					'expected' => ['Multiple spaces in group name']
 				]
 			],
 			// Template group name.
