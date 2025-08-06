@@ -15034,6 +15034,12 @@ void	zbx_dc_update_proxy(zbx_proxy_diff_t *diff)
 			diff->flags &= (~ZBX_FLAGS_PROXY_DIFF_UPDATE_SUPPRESS_WIN);
 		}
 
+		if (0 != (diff->flags & ZBX_FLAGS_PROXY_DIFF_UPDATE_PENDING_HISTORY))
+		{
+			proxy->pending_history = diff->pending_history;
+			diff->flags &= (~ZBX_FLAGS_PROXY_DIFF_UPDATE_PENDING_HISTORY);
+		}
+
 		if (0 != notify)
 		{
 			lastaccess = proxy->lastaccess;

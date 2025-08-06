@@ -1739,8 +1739,9 @@ void	zbx_sync_history_cache_server(const zbx_events_funcs_t *events_cbs, zbx_ipc
  ******************************************************************************/
 int	zbx_hc_check_proxy(zbx_uint64_t proxyid, int pending_history)
 {
-	double	hc_pused;
-	int	ret;
+	double				hc_pused;
+	int				ret, stats_retrieved = FAIL;
+	zbx_vector_uint64_pair_t	items;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() proxyid:"ZBX_FS_UI64" pending_history:%i",
 			__func__, proxyid, pending_history);
@@ -1748,6 +1749,9 @@ int	zbx_hc_check_proxy(zbx_uint64_t proxyid, int pending_history)
 	zbx_dbcache_lock();
 
 	hc_pused = zbx_hc_mem_pused();
+
+	zabbix_log(LOG_LEVEL_DEBUG, "%s() hc_used: %f, state: %s", __func__, hc_pused,
+			(ZBX_HC_PROXYQUEUE_STATE_WAIT == zbx_dbcache_getproxyqueue_state() ? "wait" : "normal") );
 
 	if (20 >= hc_pused)
 	{
@@ -1787,19 +1791,33 @@ int	zbx_hc_check_proxy(zbx_uint64_t proxyid, int pending_history)
 	{
 		if (60 < hc_pused && 0 != pending_history)
 		{
-			zbx_hc_log_high_cache_usage();
+			if (SUCCEED == (stats_retrieved = zbx_hc_check_high_usage_timer()))
+			{
+				zbx_vector_uint64_pair_create(&items);
+				zbx_hc_get_items(&items);
+			}
+
 			ret = FAIL;
+			zabbix_log(LOG_LEVEL_DEBUG, "%s() proxyid %llu prethrottled", __func__, proxyid);
 		}
 		else
+		{
+			zabbix_log(LOG_LEVEL_DEBUG, "%s() proxyid %llu NOT prethrottled", __func__, proxyid);
 			ret = SUCCEED;
+		}
 
 		goto out;
 	}
 
 	ret = zbx_hc_proxyqueue_dequeue(proxyid);
-
 out:
 	zbx_dbcache_unlock();
+
+	if (SUCCEED == stats_retrieved)
+	{
+		zbx_hc_log_high_cache_usage(&items);
+		zbx_vector_uint64_pair_destroy(&items);
+	}
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __func__, zbx_result_string(ret));
 

@@ -639,8 +639,8 @@ static int	process_proxy(const zbx_config_vault_t *config_vault, int config_time
 						goto error;
 					}
 
-					zbx_dc_update_proxy_pending_history(&proxy, (ZBX_PROXY_DATA_MORE == more ?
-							ZBX_PROXY_PENDING_HISTORY_YES : ZBX_PROXY_PENDING_HISTORY_NO));
+					proxy.pending_history = (ZBX_PROXY_DATA_MORE == more ?
+							ZBX_PROXY_PENDING_HISTORY_YES : ZBX_PROXY_PENDING_HISTORY_NO);
 
 					check_tasks = 0;
 				}
@@ -659,9 +659,11 @@ static int	process_proxy(const zbx_config_vault_t *config_vault, int config_time
 error:
 		zbx_free(proxy.addr);
 		if (0 != strcmp(proxy_old.version_str, proxy.version_str) ||
-				proxy_old.lastaccess != proxy.lastaccess)
+				proxy_old.lastaccess != proxy.lastaccess ||
+				proxy_old.pending_history != proxy.pending_history)
 		{
-			zbx_update_proxy_data(&proxy_old, proxy.version_str, proxy.version_int, proxy.lastaccess, 0);
+			zbx_update_proxy_data(&proxy_old, proxy.version_str, proxy.version_int, proxy.lastaccess,
+					proxy.pending_history, ZBX_FLAGS_PROXY_DIFF_UPDATE_PENDING_HISTORY);
 		}
 
 		zbx_dc_requeue_proxy(proxy.proxyid, update_nextcheck, ret, proxyconfig_frequency, proxydata_frequency);

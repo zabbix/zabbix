@@ -3030,15 +3030,18 @@ static void	hc_log_history_cache_usage(zbx_vector_uint64_pair_t *items, zbx_hc_u
 	else
 		return;
 
-	if (SEC_PER_MIN > time_now - *ts)
+	if (ZBX_HC_CACHE_FULL == ctx)
 	{
-		zabbix_log(LOG_LEVEL_DEBUG, "%s", log_msg);
-		return;
+		if (SEC_PER_MIN > time_now - *ts)
+		{
+			zabbix_log(LOG_LEVEL_DEBUG, "%s", log_msg);
+			return;
+		}
+
+		*ts = time_now;
 	}
 
 	zabbix_log(LOG_LEVEL_WARNING, "%s", log_msg);
-
-	*ts = time_now;
 
 	zbx_vector_uint64_pair_sort(items, diag_compare_pair_second_desc);
 
@@ -3057,22 +3060,10 @@ static void	hc_log_history_cache_usage(zbx_vector_uint64_pair_t *items, zbx_hc_u
 	zbx_free(str);
 }
 
-void	zbx_hc_log_high_cache_usage(void)
+void	zbx_hc_log_high_cache_usage(zbx_vector_uint64_pair_t *items)
 {
-	zbx_vector_uint64_pair_t	items;
-
-	zbx_vector_uint64_pair_create(&items);
-	hc_get_items(&items);
-
-	UNLOCK_CACHE;
-
-	hc_log_history_cache_usage(&items, ZBX_HC_CACHE_PRESSURED);
-
-	LOCK_CACHE;
-
-	zbx_vector_uint64_pair_destroy(&items);
+	hc_log_history_cache_usage(items, ZBX_HC_CACHE_PRESSURED);
 }
-
 
 /******************************************************************************
  *                                                                            *
@@ -3729,6 +3720,18 @@ static void	hc_get_items(zbx_vector_uint64_pair_t *items)
 		zbx_uint64_pair_t	pair = {item->itemid, item->values_num};
 		zbx_vector_uint64_pair_append_ptr(items, &pair);
 	}
+}
+
+int	zbx_hc_check_high_usage_timer(void)
+{
+	double	now = zbx_time();
+
+	if (SEC_PER_MIN > now - cache->last_warning_ts)
+		return SUCCEED;
+
+	cache->last_warning_ts = now;
+
+	return FAIL;
 }
 
 /******************************************************************************

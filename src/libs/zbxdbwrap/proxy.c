@@ -2508,13 +2508,13 @@ int	zbx_process_proxy_data(const zbx_dc_proxy_t *proxy, const struct zbx_json_pa
 
 	proxy_diff.lastaccess = lastaccess;
 
-	if (SUCCEED == zbx_json_value_by_name(jp, ZBX_PROTO_TAG_MORE, value, sizeof(value), NULL))
-		proxy_diff.more_data = atoi(value);
-	else
-		proxy_diff.more_data = ZBX_PROXY_DATA_DONE;
-
 	if (NULL != more)
-		*more = proxy_diff.more_data;
+	{
+		if (SUCCEED == zbx_json_value_by_name(jp, ZBX_PROTO_TAG_MORE, value, sizeof(value), NULL))
+			*more = atoi(value);
+		else
+			*more = ZBX_PROXY_DATA_DONE;
+	}
 
 	if (SUCCEED == zbx_json_value_by_name(jp, ZBX_PROTO_TAG_PROXY_DELAY, value, sizeof(value), NULL))
 		proxy_diff.proxy_delay = atoi(value);
@@ -2527,10 +2527,10 @@ int	zbx_process_proxy_data(const zbx_dc_proxy_t *proxy, const struct zbx_json_pa
 	check_proxy_nodata(ts, proxy_status, proxydata_frequency, &proxy_diff);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "%s() flag_win:%d/%d flag:%d proxy_status:%d period_end:%d delay:" ZBX_FS_TIME_T
-			" timestamp:%d lastaccess:" ZBX_FS_TIME_T " proxy_delay:%d more:%d", __func__,
+			" timestamp:%d lastaccess:" ZBX_FS_TIME_T " proxy_delay:%d", __func__,
 			proxy_diff.nodata_win.flags, flags_old, (int)proxy_diff.flags, proxy_status,
 			proxy_diff.nodata_win.period_end, (zbx_fs_time_t)(ts->sec - proxy_diff.lastaccess), ts->sec,
-			(zbx_fs_time_t)proxy_diff.lastaccess, proxy_diff.proxy_delay, proxy_diff.more_data);
+			(zbx_fs_time_t)proxy_diff.lastaccess, proxy_diff.proxy_delay);
 
 	if (ZBX_FLAGS_PROXY_DIFF_UNSET != proxy_diff.flags)
 		zbx_dc_update_proxy(&proxy_diff);
@@ -2805,23 +2805,25 @@ static zbx_proxy_compatibility_t	zbx_get_proxy_compatibility(int proxy_version)
 #undef SERVER_VERSION
 }
 
-/******************************************************************************
- *                                                                            *
- * Purpose: updates proxy runtime properties in cache and database.           *
- *                                                                            *
- * Parameters: proxy       - [IN/OUT] the proxy                               *
- *             version_str - [IN] the proxy version as string                 *
- *             version_int - [IN] the proxy version in numeric representation *
- *             lastaccess  - [IN] the last proxy access time                  *
- *             compress    - [IN] 1 if proxy is using data compression,       *
- *                                0 otherwise                                 *
- *             flags_add   - [IN] additional flags for update proxy           *
- *                                                                            *
- * Comments: The proxy parameter properties are also updated.                 *
- *                                                                            *
- ******************************************************************************/
+/************************************************************************************
+ *                                                                                  *
+ * Purpose: updates proxy runtime properties in cache and database.                 *
+ *                                                                                  *
+ * Parameters: proxy           - [IN/OUT] the proxy                                 *
+ *             version_str     - [IN] the proxy version as string                   *
+ *             version_int     - [IN] the proxy version in numeric representation   *
+ *             lastaccess      - [IN] the last proxy access time                    *
+ *             compress        - [IN] 1 if proxy is using data compression,         *
+ *             pending_history - [IN] flag to specify that proxy has more           *
+ *                                    history to send (required by history          *
+ *                                    cache to make decision about throttling)      *
+ *             flags_add       - [IN] additional flags for update proxy             *
+ *                                                                                  *
+ * Comments: The proxy parameter properties are also updated.                       *
+ *                                                                                  *
+ ***********************************************************************************/
 void	zbx_update_proxy_data(zbx_dc_proxy_t *proxy, char *version_str, int version_int, time_t lastaccess,
-		zbx_uint64_t flags_add)
+		int pending_history, zbx_uint64_t flags_add)
 {
 	zbx_proxy_diff_t		diff;
 	zbx_proxy_compatibility_t	compatibility;
@@ -2834,6 +2836,7 @@ void	zbx_update_proxy_data(zbx_dc_proxy_t *proxy, char *version_str, int version
 	diff.version_int = version_int;
 	diff.compatibility = compatibility;
 	diff.lastaccess = lastaccess;
+	diff.pending_history = pending_history;
 
 	zbx_dc_update_proxy(&diff);
 

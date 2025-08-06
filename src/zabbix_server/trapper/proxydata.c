@@ -220,7 +220,7 @@ out:
 		else
 			lastaccess = ts->sec;
 
-		zbx_update_proxy_data(&proxy, version_str, version_int, lastaccess, 0);
+		zbx_update_proxy_data(&proxy, version_str, version_int, lastaccess, 0, 0);
 	}
 
 	if (0 == responded)
