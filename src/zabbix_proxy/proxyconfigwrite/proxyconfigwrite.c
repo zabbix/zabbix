@@ -148,6 +148,7 @@ typedef struct
 
 	/* optional sql filter to limit managed object scope (exclude templates from hosts) */
 	char				*sql_filter;
+	const char			*join;
 }
 zbx_table_data_t;
 
@@ -337,6 +338,7 @@ static zbx_table_data_t	*proxyconfig_create_table(const char *name)
 	td->table = table;
 	td->rename_field = NULL;
 	td->sql_filter = NULL;
+	td->join = NULL;
 	zbx_vector_str_create(&td->reset_fields);
 	zbx_vector_const_field_create(&td->fields);
 	zbx_hashset_create(&td->rows, 100, ZBX_DEFAULT_UINT64_HASH_FUNC, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
@@ -367,7 +369,7 @@ static zbx_table_data_t	*proxyconfig_create_table(const char *name)
 	}
 	else if (0 == strcmp(table->table, "hosts"))
 	{
-		td->sql_filter = zbx_dsprintf(NULL, "status<>%d", HOST_STATUS_TEMPLATE);
+		td->sql_filter = zbx_dsprintf(NULL, "t.status<>%d", HOST_STATUS_TEMPLATE);
 	}
 	else if (0 == strcmp(table->table, "items"))
 	{
@@ -381,6 +383,11 @@ static zbx_table_data_t	*proxyconfig_create_table(const char *name)
 	else if (0 == strcmp(table->table, "host_proxy"))
 	{
 		zbx_vector_str_append(&td->reset_fields, "proxyid");
+	}
+	else if (0 == strcmp(table->table, "item_rtdata") || 0 == strcmp(table->table, "item_preproc") ||
+			0 == strcmp(table->table, "item_parameter"))
+	{
+		td->join = " join items i on i.itemid=t.itemid and";
 	}
 
 	/* get table fields from database schema */
@@ -1224,22 +1231,39 @@ static void	proxyconfig_prepare_table(zbx_table_data_t *td, const char *key_fiel
 	char			*delim = " where";
 	zbx_db_row_t		dbrow;
 
-	zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "select %s", td->table->recid);
+	zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "select t.%s", td->table->recid);
 
 	for (int i = 1; i < td->fields.values_num; i++)
-		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, ",%s", td->fields.values[i].field->name);
+		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, ",t.%s", td->fields.values[i].field->name);
 
-	zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, " from %s", td->table->table);
+	zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, " from %s t", td->table->table);
 
 	if (NULL != td->sql_filter)
 	{
-		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "%s %s", delim, td->sql_filter);
-		delim = " and";
+		if (NULL != td->join)
+		{
+			char	*suffix = zbx_dsprintf(NULL, "where %s", td->sql_filter);
+			zbx_db_large_query_append_sql(&query, suffix);
+			zbx_free(suffix);
+		}
+		else
+		{
+			zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "%s %s", delim, td->sql_filter);
+			delim = " and";
+		}
+
 	}
 
 	if (NULL != key_ids)
 	{
-		zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, delim);
+		if (NULL == td->join)
+		{
+			zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, delim);
+			delim = " and";
+		}
+		else
+			zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, td->join);
+
 		zbx_db_large_query_prepare_uint(&query, &sql, &sql_alloc, &sql_offset, key_field, key_ids);
 	}
 	else
@@ -1514,9 +1538,10 @@ static int	proxyconfig_sync_hosts(zbx_vector_table_data_ptr_t *config_tables, in
 		proxyconfig_prepare_table(interface_snmp, "interfaceid", &interfaceids, NULL, NULL);
 
 		proxyconfig_prepare_table(items, "hostid", &hostids, NULL, &itemids);
-		proxyconfig_prepare_table(item_rtdata, "itemid", &itemids, NULL, NULL);
-		proxyconfig_prepare_table(item_preproc, "itemid", &itemids, NULL, NULL);
-		proxyconfig_prepare_table(item_parameter, "itemid", &itemids, NULL, NULL);
+
+		proxyconfig_prepare_table(item_rtdata, "i.hostid", &hostids, NULL, NULL);
+		proxyconfig_prepare_table(item_preproc, "i.hostid", &hostids, NULL, NULL);
+		proxyconfig_prepare_table(item_parameter, "i.hostid", &hostids, NULL, NULL);
 
 		proxyconfig_prepare_table(httptest, "hostid", &hostids, NULL, &httptestids);
 		proxyconfig_prepare_table(httptestitem, "httptestid", &httptestids, NULL, NULL);
