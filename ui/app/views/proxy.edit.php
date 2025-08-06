@@ -24,7 +24,8 @@ $form = (new CForm('post'))
 	->setId('proxy-form')
 	->setName('proxy_form')
 	->addStyle('display: none;')
-	->addItem(getMessages());
+	->addItem(getMessages())
+	->addVar('proxyid', $data['proxyid']);
 
 // Enable form submitting on Enter.
 $form->addItem((new CSubmitButton())->addClass(ZBX_STYLE_FORM_SUBMIT_HIDDEN));

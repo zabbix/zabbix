@@ -22,7 +22,9 @@ class CControllerProxyUpdate extends CController {
 	}
 
 	public static function getValidationRules(): array {
-		return ['object', 'fields' => [
+		$api_uniq = ['proxy.get', ['name' => '{name}'], 'proxyid'];
+
+		return ['object', 'api_uniq' => $api_uniq, 'fields' => [
 			'proxyid' => ['db proxy.proxyid', 'required'],
 			'name' => ['db proxy.name', 'required', 'not_empty'],
 			'proxy_groupid' => ['db proxy.proxy_groupid'],
