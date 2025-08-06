@@ -1750,9 +1750,6 @@ int	zbx_hc_check_proxy(zbx_uint64_t proxyid, int pending_history)
 
 	hc_pused = zbx_hc_mem_pused();
 
-	zabbix_log(LOG_LEVEL_DEBUG, "%s() hc_used: %f, state: %s", __func__, hc_pused,
-			(ZBX_HC_PROXYQUEUE_STATE_WAIT == zbx_dbcache_getproxyqueue_state() ? "wait" : "normal") );
-
 	if (20 >= hc_pused)
 	{
 		zbx_dbcache_setproxyqueue_state(ZBX_HC_PROXYQUEUE_STATE_NORMAL);
@@ -1798,13 +1795,9 @@ int	zbx_hc_check_proxy(zbx_uint64_t proxyid, int pending_history)
 			}
 
 			ret = FAIL;
-			zabbix_log(LOG_LEVEL_DEBUG, "%s() proxyid %llu prethrottled", __func__, proxyid);
 		}
 		else
-		{
-			zabbix_log(LOG_LEVEL_DEBUG, "%s() proxyid %llu NOT prethrottled", __func__, proxyid);
 			ret = SUCCEED;
-		}
 
 		goto out;
 	}
