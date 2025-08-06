@@ -175,11 +175,17 @@ class CForm {
 				if (i === key_parts.length - 1) {
 					if (typeof field.getExtraFields === 'function') {
 						for (const [extra_key, values] of Object.entries(field.getExtraFields())) {
-							key_fields[extra_key] = values;
+							if (values != null) {
+								key_fields[extra_key] = values;
+							}
 						}
 					}
 					else {
-						key_fields[key_part] = field.getValueTrimmed();
+						let trimmedValue = field.getValueTrimmed();
+
+						if (trimmedValue != null) {
+							key_fields[key_part] = trimmedValue;
+						}
 					}
 
 					break;
