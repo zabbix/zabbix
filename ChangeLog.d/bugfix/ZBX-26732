@@ -1,1 +1,1 @@
-.......P.. [ZBX-26732] improved partial configuration sync performance on Zabbix proxy by selecting in batches (vso)
+.......P.. [ZBX-26732] improved partial configuration sync performance on Zabbix proxy by eliminating inefficient SELECT queries involving large ID lists (vso)
