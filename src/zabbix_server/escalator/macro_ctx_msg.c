@@ -63,7 +63,7 @@ static int	macro_message_normal_resolv(zbx_macro_resolv_data_t *p, va_list args,
 				*replace_to = zbx_strdup(*replace_to, "0");
 			}
 		}
-		else if (0 == p->indexed && EVENT_SOURCE_SERVICE == c_event->source && NULL != service_alarm)
+		else if (0 == p->indexed && EVENT_SOURCE_SERVICE == c_event->source)
 		{
 			if (0 == strcmp(p->macro, MVAR_EVENT_UPDATE_STATUS))
 			{
