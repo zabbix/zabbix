@@ -19,6 +19,7 @@ import (
 	"fmt"
 	"strconv"
 
+	"golang.zabbix.com/sdk/errs"
 	"golang.zabbix.com/sdk/zbxerr"
 )
 
@@ -35,9 +36,33 @@ type crushTree struct {
 }
 
 type osdEntity struct {
-	OSDName string `json:"{#OSDNAME}"`
-	Class   string `json:"{#CLASS}"`
-	Host    string `json:"{#HOST}"`
+	OSDName string `json:"{#osdname}"`
+	Class   string `json:"{#class}"`
+	Host    string `json:"{#host}"`
+}
+
+type osdDumpPool struct {
+	Pools []struct { //nolint:revive //part of ceph response.
+		Name      string `json:"pool_name"`
+		CrushRule int64  `json:"crush_rule"`
+	} `json:"pools"`
+}
+
+type poolEntity struct {
+	PoolName  string `json:"{#poolname}"`
+	CrushRule string `json:"{#crushrule}"`
+}
+
+type step struct {
+	Op       string `json:"op"`
+	Item     int64  `json:"item"`
+	ItemName string `json:"item_name"`
+}
+
+type crushRule struct {
+	ID    int64  `json:"rule_id"`
+	Name  string `json:"rule_name"`
+	Steps []step `json:"steps"`
 }
 
 // osdDiscoveryHandler returns list of OSDs in LLD format.
@@ -51,15 +76,15 @@ func osdDiscoveryHandler(data map[Command][]byte) (any, error) {
 
 	err := json.Unmarshal(data[cmdOSDCrushTree], &tree)
 	if err != nil {
-		return nil, zbxerr.ErrorCannotUnmarshalJSON.Wrap(err)
+		return nil, errs.WrapConst(err, zbxerr.ErrorCannotUnmarshalJSON)
 	}
 
 	for i, n := range tree.Nodes {
 		switch n.Type {
 		case "host":
 			host = &tree.Nodes[i]
-			continue
 
+			continue
 		case "osd":
 			if host == nil {
 				continue
@@ -82,34 +107,10 @@ func osdDiscoveryHandler(data map[Command][]byte) (any, error) {
 
 	jsonLLD, err := json.Marshal(lld)
 	if err != nil {
-		return nil, zbxerr.ErrorCannotMarshalJSON.Wrap(err)
+		return nil, errs.WrapConst(err, zbxerr.ErrorCannotMarshalJSON)
 	}
 
 	return string(jsonLLD), nil
-}
-
-type osdDumpPool struct {
-	Pools []struct {
-		Name      string `json:"pool_name"`
-		CrushRule int64  `json:"crush_rule"`
-	} `json:"pools"`
-}
-
-type poolEntity struct {
-	PoolName  string `json:"{#POOLNAME}"`
-	CrushRule string `json:"{#CRUSHRULE}"`
-}
-
-type step struct {
-	Op       string `json:"op"`
-	Item     int64  `json:"item"`
-	ItemName string `json:"item_name"`
-}
-
-type crushRule struct {
-	ID    int64  `json:"rule_id"`
-	Name  string `json:"rule_name"`
-	Steps []step `json:"steps"`
 }
 
 // getStepOpTake finds a step with a "take" op for a given rule.
@@ -134,20 +135,20 @@ func poolDiscoveryHandler(data map[Command][]byte) (any, error) {
 
 	err := json.Unmarshal(data[cmdOSDDump], &poolsDump)
 	if err != nil {
-		return nil, zbxerr.ErrorCannotUnmarshalJSON.Wrap(err)
+		return nil, errs.WrapConst(err, zbxerr.ErrorCannotUnmarshalJSON)
 	}
 
 	err = json.Unmarshal(data[cmdOSDCrushRuleDump], &crushRules)
 	if err != nil {
-		return nil, zbxerr.ErrorCannotUnmarshalJSON.Wrap(err)
+		return nil, errs.WrapConst(err, zbxerr.ErrorCannotUnmarshalJSON)
 	}
 
 	for _, pool := range poolsDump.Pools {
 		for _, rule := range crushRules {
 			if pool.CrushRule == rule.ID {
-				s, err := getStepOpTake(rule)
+				s, err := getStepOpTake(rule) //nolint:govet //shadowed error here does not cause confusion
 				if err != nil {
-					return nil, zbxerr.ErrorCannotParseResult.Wrap(err)
+					return nil, errs.WrapConst(err, zbxerr.ErrorCannotParseResult)
 				}
 
 				lld = append(lld, poolEntity{
@@ -162,7 +163,7 @@ func poolDiscoveryHandler(data map[Command][]byte) (any, error) {
 
 	jsonLLD, err := json.Marshal(lld)
 	if err != nil {
-		return nil, zbxerr.ErrorCannotMarshalJSON.Wrap(err)
+		return nil, errs.WrapConst(err, zbxerr.ErrorCannotMarshalJSON)
 	}
 
 	return string(jsonLLD), nil

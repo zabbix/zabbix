@@ -21,9 +21,10 @@ import (
 	"testing"
 )
 
-var fixtures map[Command][]byte
-
 const cmdBroken Command = "broken"
+
+//nolint:gochecknoglobals //globals used for unit tests only and is initialized in TestMain.
+var fixtures map[Command][]byte
 
 func TestMain(m *testing.M) {
 	fixtures = make(map[Command][]byte)
@@ -32,6 +33,7 @@ func TestMain(m *testing.M) {
 		cmdDf, cmdPgDump, cmdOSDCrushRuleDump, cmdOSDCrushTree, cmdOSDDump, cmdHealth,
 	} {
 		var err error
+
 		fixtures[cmd], err = os.ReadFile(
 			"testdata/" + strings.ReplaceAll(string(cmd), " ", "_") + ".json",
 		)

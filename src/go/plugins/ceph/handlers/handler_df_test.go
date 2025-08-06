@@ -16,12 +16,16 @@ package handlers
 
 import (
 	"encoding/json"
-	"reflect"
 	"testing"
+
+	"github.com/google/go-cmp/cmp"
+	"github.com/google/go-cmp/cmp/cmpopts"
 )
 
 func Test_dfHandler(t *testing.T) {
-	out := outDf{
+	t.Parallel()
+
+	wantSuccessStruct := outDf{
 		Pools: map[string]poolStat{
 			"device_health_metrics": {
 				PercentUsed: 0.3,
@@ -79,52 +83,66 @@ func Test_dfHandler(t *testing.T) {
 		TotalObjects:    4,
 	}
 
-	success, err := json.Marshal(out)
-	if err != nil {
-		t.Fatal(err)
-	}
-
-	type args struct {
-		data map[Command][]byte
-	}
-
-	tests := []struct {
+	testCases := []struct {
 		name    string
-		args    args
-		want    any
+		args    map[Command][]byte
 		wantErr bool
 	}{
 		{
-			string("Must parse an output of " + cmdDf + "Command"),
-			args{map[Command][]byte{cmdDf: fixtures[cmdDf]}},
-			string(success),
-			false,
+			name:    "+ok",
+			args:    map[Command][]byte{cmdDf: fixtures[cmdDf]},
+			wantErr: false,
 		},
 		{
-			"Must fail on malformed input",
-			args{map[Command][]byte{cmdDf: fixtures[cmdBroken]}},
-			nil,
-			true,
+			name:    "-malformedInput",
+			args:    map[Command][]byte{cmdDf: fixtures[cmdBroken]},
+			wantErr: true,
 		},
 	}
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			got, err := dfHandler(tt.args.data)
-			if (err != nil) != tt.wantErr {
-				t.Errorf("dfHandler() error = %v, wantErr %v", err, tt.wantErr)
 
+	for _, tc := range testCases {
+		t.Run(tc.name, func(t *testing.T) {
+			t.Parallel()
+
+			gotAny, err := dfHandler(tc.args)
+			if (err != nil) != tc.wantErr {
+				t.Fatalf("dfHandler() error = %v, wantErr %v", err, tc.wantErr)
+			}
+
+			if tc.wantErr {
 				return
 			}
 
-			if !reflect.DeepEqual(got, tt.want) {
-				t.Errorf("dfHandler() got = %v, want %v", got, tt.want)
+			gotJSON, ok := gotAny.(string)
+			if !ok {
+				t.Fatalf("dfHandler() expected a string return type, but got %T", gotAny)
+			}
+
+			var gotStruct outDf
+			if err := json.Unmarshal([]byte(gotJSON), &gotStruct); err != nil {
+				t.Fatalf("Failed to unmarshal dfHandler() output: %v", err)
+			}
+
+			// Use an approximator for float comparisons to avoid precision issues.
+			opts := cmpopts.EquateApprox(0, 1e-9)
+			if diff := cmp.Diff(wantSuccessStruct, gotStruct, opts); diff != "" {
+				t.Errorf("dfHandler() mismatch (-want +got):\n%s", diff)
 			}
 		})
 	}
 }
 
 func Benchmark_dfHandler(b *testing.B) {
-	for i := 0; i < b.N; i++ {
-		_, _ = dfHandler(map[Command][]byte{cmdDf: fixtures[cmdDf]})
+	b.ReportAllocs()
+
+	args := map[Command][]byte{cmdDf: fixtures[cmdDf]}
+
+	b.ResetTimer()
+
+	for range b.N {
+		_, err := dfHandler(args)
+		if err != nil {
+			b.Fatalf("dfHandler() failed during benchmark: %v", err)
+		}
 	}
 }

@@ -65,30 +65,30 @@ var healthMap = map[string]int8{
 }
 
 type cephStatus struct {
-	PgMap struct {
-		PgsByState []struct {
+	PgMap struct { //nolint:revive //part of response from ceph
+		PgsByState []struct { //nolint:revive //part of response from ceph
 			StateName string `json:"state_name"`
 			Count     uint64 `json:"count"`
 		} `json:"pgs_by_state"`
 		NumPgs uint64 `json:"num_pgs"`
 	} `json:"pgmap"`
-	Health struct {
+	Health struct { //nolint:revive //part of response from ceph
 		Status string `json:"status"`
 	} `json:"health"`
-	OSDMap struct {
-		NumOsds   *uint64 `json:"num_osds"`
-		NumInOsds *uint64 `json:"num_in_osds"`
-		NumUpOsds *uint64 `json:"num_up_osds"`
-		OSDMap    *struct {
+	OSDMap struct { //nolint:revive //part of response from ceph
+		NumOsds   *uint64   `json:"num_osds"`
+		NumInOsds *uint64   `json:"num_in_osds"`
+		NumUpOsds *uint64   `json:"num_up_osds"`
+		OSDMap    *struct { //nolint:revive //part of response from ceph
 			NumOsds   uint64 `json:"num_osds"`
 			NumInOsds uint64 `json:"num_in_osds"`
 			NumUpOsds uint64 `json:"num_up_osds"`
 		} `json:"osdmap"`
 	} `json:"osdmap"`
-	MonMap struct {
+	MonMap struct { //nolint:revive //part of response from ceph
 		NumMons           *uint64    `json:"num_mons"`
 		MinMonReleaseName string     `json:"min_mon_release_name"`
-		Mons              []struct{} `json:"mons"`
+		Mons              []struct{} `json:"mons"` //nolint:revive //part of response from ceph
 	} `json:"monmap"`
 }
 
@@ -127,11 +127,11 @@ func statusHandler(data map[Command][]byte) (any, error) {
 
 	for _, pbs := range cStatus.PgMap.PgsByState {
 		for _, s := range strings.Split(pbs.StateName, "+") {
-			if _, ok := pgStats[s]; ok {
-				pgStats[s] += pbs.Count
-			} else {
+			if _, ok := pgStats[s]; !ok {
 				return nil, errs.Errorf("unknown pg state %q", s)
 			}
+
+			pgStats[s] += pbs.Count
 		}
 	}
 

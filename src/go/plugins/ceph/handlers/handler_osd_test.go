@@ -16,12 +16,15 @@ package handlers
 
 import (
 	"encoding/json"
-	"reflect"
 	"testing"
+
+	"github.com/google/go-cmp/cmp"
 )
 
 func Test_osdHandler(t *testing.T) {
-	out := outOsdStats{
+	t.Parallel()
+
+	wantSuccessStruct := outOsdStats{
 		LatencyApply:  aggDataInt{Min: 0, Max: 1, Avg: 0.6666666666666666},
 		LatencyCommit: aggDataInt{Min: 0, Max: 1, Avg: 0.6666666666666666},
 		Fill:          aggDataFloat{Min: 28, Max: 28, Avg: 28},
@@ -33,96 +36,115 @@ func Test_osdHandler(t *testing.T) {
 		},
 	}
 
-	success, err := json.Marshal(out)
+	wantSuccessJSON, err := json.Marshal(wantSuccessStruct)
 	if err != nil {
-		t.Fatal(err)
+		t.Fatalf("Failed to marshal expected output: %v", err)
 	}
 
-	type args struct {
-		data map[Command][]byte
-	}
-	tests := []struct {
+	testCases := []struct {
 		name    string
-		args    args
-		want    any
+		args    map[Command][]byte
+		want    string
 		wantErr bool
 	}{
 		{
-			string("Must parse an output of " + cmdPgDump + "Command"),
-			args{map[Command][]byte{cmdPgDump: fixtures[cmdPgDump]}},
-			string(success),
-			false,
+			name:    "+ok",
+			args:    map[Command][]byte{cmdPgDump: fixtures[cmdPgDump]},
+			want:    string(wantSuccessJSON),
+			wantErr: false,
 		},
 		{
-			"Must fail on malformed input",
-			args{map[Command][]byte{cmdPgDump: fixtures[cmdBroken]}},
-			nil,
-			true,
+			name:    "-malformedInput",
+			args:    map[Command][]byte{cmdPgDump: fixtures[cmdBroken]},
+			want:    "", // No output is expected on error.
+			wantErr: true,
 		},
 	}
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			got, err := osdHandler(tt.args.data)
-			if (err != nil) != tt.wantErr {
-				t.Errorf("osdHandler() error = %v, wantErr %v", err, tt.wantErr)
+
+	for _, tc := range testCases {
+		t.Run(tc.name, func(t *testing.T) {
+			t.Parallel()
+
+			got, err := osdHandler(tc.args)
+			if (err != nil) != tc.wantErr {
+				t.Fatalf("osdHandler() error = %v, wantErr %v", err, tc.wantErr)
+			}
+
+			if tc.wantErr {
 				return
 			}
-			if !reflect.DeepEqual(got, tt.want) {
-				t.Errorf("osdHandler() got = %v, want %v", got, tt.want)
+
+			if diff := cmp.Diff(tc.want, got); diff != "" {
+				t.Errorf("osdHandler() mismatch (-want +got):\n%s", diff)
 			}
 		})
 	}
 }
 
 func Benchmark_osdHandler(b *testing.B) {
-	for i := 0; i < b.N; i++ {
-		_, _ = osdHandler(map[Command][]byte{cmdPgDump: fixtures[cmdPgDump]})
+	b.ReportAllocs()
+
+	args := map[Command][]byte{cmdPgDump: fixtures[cmdPgDump]}
+
+	b.ResetTimer() // Don't include setup in the benchmark time.
+
+	for range b.N {
+		_, err := osdHandler(args)
+		if err != nil {
+			b.Fatalf("osdHandler() failed during benchmark: %v", err)
+		}
 	}
 }
 
 func Test_newAggDataFloat(t *testing.T) {
-	type args struct {
-		v []float64
-	}
-	tests := []struct {
+	t.Parallel()
+
+	testCases := []struct {
 		name string
-		args args
+		args []float64
 		want aggDataFloat
 	}{
 		{
-			"Must calculate correct aggregated data",
-			args{[]float64{-999, 42, 124}},
-			aggDataFloat{Min: -999, Max: 124, Avg: -277.6666666666667},
+			name: "CalculatesCorrectAggregatedData",
+			args: []float64{-999, 42, 124},
+			want: aggDataFloat{Min: -999, Max: 124, Avg: -277.6666666666667},
 		},
 	}
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			if got := newAggDataFloat(tt.args.v); !reflect.DeepEqual(got, tt.want) {
-				t.Errorf("newAggDataFloat() = %v, want %v", got, tt.want)
+
+	for _, tc := range testCases {
+		t.Run(tc.name, func(t *testing.T) {
+			t.Parallel()
+
+			got := newAggDataFloat(tc.args)
+			if diff := cmp.Diff(tc.want, got); diff != "" {
+				t.Errorf("newAggDataFloat() mismatch (-want +got):\n%s", diff)
 			}
 		})
 	}
 }
 
 func Test_newAggDataInt(t *testing.T) {
-	type args struct {
-		v []uint64
-	}
-	tests := []struct {
+	t.Parallel()
+
+	testCases := []struct {
 		name string
-		args args
+		args []uint64
 		want aggDataInt
 	}{
 		{
-			"Must calculate correct aggregated data",
-			args{[]uint64{999, 42, 146}},
-			aggDataInt{Min: 42, Max: 999, Avg: 395.6666666666667},
+			name: "CalculatesCorrectAggregatedData",
+			args: []uint64{999, 42, 146},
+			want: aggDataInt{Min: 42, Max: 999, Avg: 395.6666666666667},
 		},
 	}
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			if got := newAggDataInt(tt.args.v); !reflect.DeepEqual(got, tt.want) {
-				t.Errorf("newAggDataInt() = %v, want %v", got, tt.want)
+
+	for _, tc := range testCases {
+		t.Run(tc.name, func(t *testing.T) {
+			t.Parallel()
+
+			got := newAggDataInt(tc.args)
+			if diff := cmp.Diff(tc.want, got); diff != "" {
+				t.Errorf("newAggDataInt() mismatch (-want +got):\n%s", diff)
 			}
 		})
 	}

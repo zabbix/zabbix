@@ -36,29 +36,16 @@ var (
 func Test_statusHandler(t *testing.T) {
 	t.Parallel()
 
-	toJSONString := func(v any) string {
-		s, err := json.Marshal(v)
-		if err != nil {
-			t.Fatal(err)
-		}
-
-		return string(s)
-	}
-
-	type args struct {
-		data map[Command][]byte
-	}
-
-	tests := []struct {
+	testCases := []struct {
 		name    string
-		args    args
+		args    map[Command][]byte
 		want    *outStatus
 		wantErr bool
 	}{
 		{
-			"+valid",
-			args{map[Command][]byte{cmdStatus: testDataCephStatusOutput1}},
-			&outStatus{
+			name: "+valid",
+			args: map[Command][]byte{cmdStatus: testDataCephStatusOutput1},
+			want: &outStatus{
 				OverallStatus: 0,
 				NumMon:        3,
 				NumOsd:        3,
@@ -101,12 +88,12 @@ func Test_statusHandler(t *testing.T) {
 				},
 				MinMonReleaseName: "octopus",
 			},
-			false,
+			wantErr: false,
 		},
 		{
-			"+valid2",
-			args{map[Command][]byte{cmdStatus: testDataCephStatusOutput2}},
-			&outStatus{
+			name: "+valid2",
+			args: map[Command][]byte{cmdStatus: testDataCephStatusOutput2},
+			want: &outStatus{
 				OverallStatus: 0,
 				NumMon:        3,
 				NumOsd:        283,
@@ -149,12 +136,12 @@ func Test_statusHandler(t *testing.T) {
 				},
 				MinMonReleaseName: "",
 			},
-			false,
+			wantErr: false,
 		},
 		{
-			"+valid3",
-			args{map[Command][]byte{cmdStatus: testDataCephStatusOutput3}},
-			&outStatus{
+			name: "+valid3",
+			args: map[Command][]byte{cmdStatus: testDataCephStatusOutput3},
+			want: &outStatus{
 				OverallStatus: 1,
 				NumMon:        1,
 				NumOsd:        1,
@@ -197,90 +184,87 @@ func Test_statusHandler(t *testing.T) {
 				},
 				MinMonReleaseName: "reef",
 			},
-			false,
+			wantErr: false,
 		},
 		{
-			"-unmarshalErr",
-			args{map[Command][]byte{cmdStatus: []byte("{")}},
-			nil,
-			true,
+			name:    "-unmarshalErr",
+			args:    map[Command][]byte{cmdStatus: []byte("{")},
+			want:    nil,
+			wantErr: true,
 		},
 		{
-			"-unknownHealth",
-			args{
-				map[Command][]byte{
-					cmdStatus: []byte(`{"health": {"status":"bannana"}}`),
-				},
-			},
-			nil,
-			true,
+			name: "-unknownHealth",
+			args: map[Command][]byte{
+				cmdStatus: []byte(`{"health": {"status":"bannana"}}`)},
+			want:    nil,
+			wantErr: true,
 		},
 		{
-			"-unknownPGState",
-			args{map[Command][]byte{cmdStatus: []byte(
+			name: "-unknownPGState",
+			args: map[Command][]byte{cmdStatus: []byte(
 				`{
                     "health": {"status":"HEALTH_OK"},
                     "pgmap": {"pgs_by_state":[{"state_name":"bannan", "count": 3}]}
                  }`,
-			)}},
-			nil,
-			true,
+			)},
+			want:    nil,
+			wantErr: true,
 		},
 		{
-			"-noDataForNumMon",
-			args{map[Command][]byte{cmdStatus: []byte(
+			name: "-noDataForNumMon",
+			args: map[Command][]byte{cmdStatus: []byte(
 				`{
                     "health": {"status":"HEALTH_OK"}
                  }`,
-			)}},
-			nil,
-			true,
+			)},
+			want:    nil,
+			wantErr: true,
 		},
 		{
-			"-noDataForOSDMap",
-			args{map[Command][]byte{cmdStatus: []byte(
+			name: "-noDataForOSDMap",
+			args: map[Command][]byte{cmdStatus: []byte(
 				`{
                     "health": {"status":"HEALTH_OK"},
                     "monmap": { "mons": [] }
                  }`,
-			)}},
-			nil,
-			true,
+			)},
+			want:    nil,
+			wantErr: true,
 		},
 	}
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
+
+	for _, tc := range testCases {
+		t.Run(tc.name, func(t *testing.T) {
 			t.Parallel()
 
-			got, err := statusHandler(tt.args.data)
-			if (err != nil) != tt.wantErr {
-				t.Fatalf(
-					"statusHandler() error = %v, wantErr %v",
-					err,
-					tt.wantErr,
-				)
+			got, err := statusHandler(tc.args)
+			if (err != nil) != tc.wantErr {
+				t.Fatalf("statusHandler() error = %v, wantErr %v", err, tc.wantErr)
 			}
 
-			var want any
-
-			if tt.want != nil {
-				want = toJSONString(tt.want)
+			// If an error was expected and occurred, no further checks are needed.
+			if tc.wantErr {
+				return
 			}
 
-			if diff := cmp.Diff(want, got); diff != "" {
-				t.Fatalf("statusHandler() mismatch (-want +got):\n%s", diff)
+			status, _ := json.Marshal(*tc.want)
+
+			if diff := cmp.Diff(string(status), got); diff != "" {
+				t.Errorf("statusHandler() mismatch (-want +got):\n%s", diff)
 			}
 		})
 	}
 }
 
 func Benchmark_statusHandler(b *testing.B) {
-	for i := 0; i < b.N; i++ {
+	b.ReportAllocs()
+
+	for range b.N {
 		_, err := statusHandler(
 			map[Command][]byte{cmdStatus: testDataCephStatusOutput1},
 		)
 		if err != nil {
-			b.Fatalf("statusHandler() error = %v", err)
+			b.Fatal(err)
 		}
 	}
 }

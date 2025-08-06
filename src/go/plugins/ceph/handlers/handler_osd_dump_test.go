@@ -16,75 +16,72 @@ package handlers
 
 import (
 	"encoding/json"
-	"reflect"
 	"testing"
+
+	"github.com/google/go-cmp/cmp"
+	"github.com/google/go-cmp/cmp/cmpopts"
 )
 
 func Test_osdDumpHandler(t *testing.T) {
-	out := outOsdDump{
+	t.Parallel()
+
+	wantSuccessStruct := outOsdDump{
 		BackfillFullRatio: 0.9,
 		FullRatio:         0.95,
 		NearFullRatio:     0.85,
 		NumPgTemp:         0,
 		Osds: map[string]osdStatus{
-			"0": {
-				In: 1,
-				Up: 1,
-			},
-			"1": {
-				In: 1,
-				Up: 1,
-			},
-			"2": {
-				In: 1,
-				Up: 1,
-			},
+			"0": {In: 1, Up: 1},
+			"1": {In: 1, Up: 1},
+			"2": {In: 1, Up: 1},
 		},
 	}
 
-	success, err := json.Marshal(out)
-	if err != nil {
-		t.Fatal(err)
-	}
-
-	type args struct {
-		data map[Command][]byte
-	}
-	tests := []struct {
+	testCases := []struct {
 		name    string
-		args    args
-		want    any
+		args    map[Command][]byte
 		wantErr bool
 	}{
 		{
-			string("Must parse an output of " + cmdOSDDump + "Command"),
-			args{map[Command][]byte{cmdOSDDump: fixtures[cmdOSDDump]}},
-			string(success),
-			false,
+			name:    "+ok",
+			args:    map[Command][]byte{cmdOSDDump: fixtures[cmdOSDDump]},
+			wantErr: false,
 		},
 		{
-			"Must fail on malformed input",
-			args{map[Command][]byte{cmdOSDDump: fixtures[cmdBroken]}},
-			nil,
-			true,
+			name:    "-malformedInput",
+			args:    map[Command][]byte{cmdOSDDump: fixtures[cmdBroken]},
+			wantErr: true,
 		},
 	}
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			got, err := osdDumpHandler(tt.args.data)
-			if (err != nil) != tt.wantErr {
-				t.Errorf("osdDumpHandler() error = %v, wantErr %v", err, tt.wantErr)
+
+	for _, tc := range testCases {
+		t.Run(tc.name, func(t *testing.T) {
+			t.Parallel()
+
+			gotAny, err := osdDumpHandler(tc.args)
+			if (err != nil) != tc.wantErr {
+				t.Fatalf("osdDumpHandler() error = %v, wantErr %v", err, tc.wantErr)
+			}
+
+			if tc.wantErr {
 				return
 			}
-			if !reflect.DeepEqual(got, tt.want) {
-				t.Errorf("osdDumpHandler() got = %v, want %v", got, tt.want)
+
+			gotJSON, ok := gotAny.(string)
+			if !ok {
+				t.Fatalf("osdDumpHandler() expected a string return type, but got %T", gotAny)
+			}
+
+			var gotStruct outOsdDump
+			if err := json.Unmarshal([]byte(gotJSON), &gotStruct); err != nil {
+				t.Fatalf("Failed to unmarshal osdDumpHandler() output: %v", err)
+			}
+
+			opts := cmpopts.EquateApprox(0, 1e-9)
+
+			if diff := cmp.Diff(wantSuccessStruct, gotStruct, opts); diff != "" {
+				t.Errorf("osdDumpHandler() mismatch (-want +got):\n%s", diff)
 			}
 		})
-	}
-}
-
-func Benchmark_osdDumpHandler(b *testing.B) {
-	for i := 0; i < b.N; i++ {
-		_, _ = osdDumpHandler(map[Command][]byte{cmdOSDDump: fixtures[cmdOSDDump]})
 	}
 }

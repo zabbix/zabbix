@@ -18,18 +18,19 @@ import (
 	"encoding/json"
 	"math"
 
+	"golang.zabbix.com/sdk/errs"
 	"golang.zabbix.com/sdk/zbxerr"
 )
 
 type cephOsdDump struct {
-	BackfillFullRatio float64 `json:"backfillfull_ratio"`
-	FullRatio         float64 `json:"full_ratio"`
-	NearFullRatio     float64 `json:"nearfull_ratio"`
-	Osds              []struct {
+	BackfillFullRatio float64    `json:"backfillfull_ratio"`
+	FullRatio         float64    `json:"full_ratio"`
+	NearFullRatio     float64    `json:"nearfull_ratio"`
+	Osds              []struct { //nolint:revive //part of ceph response
 		Name json.Number `json:"osd"`
 		osdStatus
 	} `json:"osds"`
-	PgTemp []struct{} `json:"pg_temp"`
+	PgTemp []struct{} `json:"pg_temp"` //nolint:revive //part of ceph response
 }
 
 type osdStatus struct {
@@ -51,7 +52,7 @@ func osdDumpHandler(data map[Command][]byte) (any, error) {
 
 	err := json.Unmarshal(data[cmdOSDDump], &osdDump)
 	if err != nil {
-		return nil, zbxerr.ErrorCannotUnmarshalJSON.Wrap(err)
+		return nil, errs.WrapConst(err, zbxerr.ErrorCannotUnmarshalJSON)
 	}
 
 	out := outOsdDump{
@@ -71,7 +72,7 @@ func osdDumpHandler(data map[Command][]byte) (any, error) {
 
 	jsonRes, err := json.Marshal(out)
 	if err != nil {
-		return nil, zbxerr.ErrorCannotMarshalJSON.Wrap(err)
+		return nil, errs.WrapConst(err, zbxerr.ErrorCannotMarshalJSON)
 	}
 
 	return string(jsonRes), nil

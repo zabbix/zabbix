@@ -19,6 +19,7 @@ import (
 	"math"
 	"sort"
 
+	"golang.zabbix.com/sdk/errs"
 	"golang.zabbix.com/sdk/zbxerr"
 )
 
@@ -28,59 +29,17 @@ type aggDataInt struct {
 	Avg float64 `json:"avg"`
 }
 
-// newAggDataInt calculates min, max and average values for a given slice of integers.
-func newAggDataInt(v []uint64) aggDataInt {
-	if len(v) == 0 {
-		return aggDataInt{0, 0, 0}
-	}
-
-	var total uint64 = 0
-
-	for _, value := range v {
-		total += value
-	}
-
-	sort.Slice(v, func(i, j int) bool { return v[i] < v[j] })
-
-	return aggDataInt{
-		Min: v[0],
-		Max: v[len(v)-1],
-		Avg: float64(total) / float64(len(v)),
-	}
-}
-
 type aggDataFloat struct {
 	Min float64 `json:"min"`
 	Max float64 `json:"max"`
 	Avg float64 `json:"avg"`
 }
 
-// newAggDataFloat calculates min, max and average values for a given slice of floats.
-func newAggDataFloat(v []float64) aggDataFloat {
-	if len(v) == 0 {
-		return aggDataFloat{0, 0, 0}
-	}
-
-	var total float64 = 0
-
-	for _, value := range v {
-		total += value
-	}
-
-	sort.Float64s(v)
-
-	return aggDataFloat{
-		Min: v[0],
-		Max: v[len(v)-1],
-		Avg: total / float64(len(v)),
-	}
-}
-
 type cephPgDump struct {
-	PgMap struct {
-		OsdStats []struct {
+	PgMap struct { //nolint:revive //part of ceph response.
+		OsdStats []struct { //nolint:revive //part of ceph response.
 			Name     json.Number `json:"osd"`
-			PerfStat struct {
+			PerfStat struct {    //nolint:revive //part of ceph response.
 				LatencyApply  uint64 `json:"apply_latency_ms"`
 				LatencyCommit uint64 `json:"commit_latency_ms"`
 			} `json:"perf_stat"`
@@ -106,21 +65,63 @@ type outOsdStats struct {
 	Osds          map[string]osdStat `json:"osds"`
 }
 
+// newAggDataInt calculates min, max and average values for a given slice of integers.
+func newAggDataInt(v []uint64) aggDataInt {
+	if len(v) == 0 {
+		return aggDataInt{0, 0, 0}
+	}
+
+	var total uint64
+
+	for _, value := range v {
+		total += value
+	}
+
+	sort.Slice(v, func(i, j int) bool { return v[i] < v[j] })
+
+	return aggDataInt{
+		Min: v[0],
+		Max: v[len(v)-1],
+		Avg: float64(total) / float64(len(v)),
+	}
+}
+
+// newAggDataFloat calculates min, max and average values for a given slice of floats.
+func newAggDataFloat(v []float64) aggDataFloat {
+	if len(v) == 0 {
+		return aggDataFloat{0, 0, 0}
+	}
+
+	var total float64
+
+	for _, value := range v {
+		total += value
+	}
+
+	sort.Float64s(v)
+
+	return aggDataFloat{
+		Min: v[0],
+		Max: v[len(v)-1],
+		Avg: total / float64(len(v)),
+	}
+}
+
 // osdHandler returns OSDs statistics provided by "pg dump" Command.
 func osdHandler(data map[Command][]byte) (any, error) {
 	var pgDump cephPgDump
 
 	err := json.Unmarshal(data[cmdPgDump], &pgDump)
 	if err != nil {
-		return nil, zbxerr.ErrorCannotUnmarshalJSON.Wrap(err)
+		return nil, errs.WrapConst(err, zbxerr.ErrorCannotUnmarshalJSON)
 	}
 
 	var (
 		fill              float64
-		latencyApplyList  []uint64
-		latencyCommitList []uint64
-		fillList          []float64
-		PgsList           []uint64
+		latencyApplyList  = make([]uint64, 0, len(pgDump.PgMap.OsdStats))
+		latencyCommitList = make([]uint64, 0, len(pgDump.PgMap.OsdStats))
+		fillList          = make([]float64, 0, len(pgDump.PgMap.OsdStats))
+		PgsList           = make([]uint64, 0, len(pgDump.PgMap.OsdStats))
 		out               outOsdStats
 	)
 
@@ -152,7 +153,7 @@ func osdHandler(data map[Command][]byte) (any, error) {
 
 	jsonRes, err := json.Marshal(out)
 	if err != nil {
-		return nil, zbxerr.ErrorCannotMarshalJSON.Wrap(err)
+		return nil, errs.WrapConst(err, zbxerr.ErrorCannotMarshalJSON)
 	}
 
 	return string(jsonRes), nil

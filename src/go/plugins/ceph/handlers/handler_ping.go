@@ -18,14 +18,15 @@ import (
 	"encoding/json"
 )
 
-type cephHealth struct {
-	Status string `json:"status"`
-}
-
+// The constants below define the possible statuses of a ping check.
 const (
 	PingFailed = 0
 	PingOk     = 1
 )
+
+type cephHealth struct {
+	Status string `json:"status"`
+}
 
 // pingHandler returns pingOk if a connection is alive or PingFailed otherwise.
 func pingHandler(data map[Command][]byte) (any, error) {
@@ -33,10 +34,10 @@ func pingHandler(data map[Command][]byte) (any, error) {
 
 	err := json.Unmarshal(data[cmdHealth], &health)
 	if err != nil {
-		return PingFailed, nil
+		return PingFailed, nil //nolint:nilerr //intended behavior - ping failed
 	}
 
-	if len(health.Status) > 0 {
+	if health.Status != "" {
 		return PingOk, nil
 	}
 

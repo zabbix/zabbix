@@ -15,43 +15,45 @@
 package handlers
 
 import (
-	"fmt"
-	"reflect"
 	"testing"
+
+	"github.com/google/go-cmp/cmp"
 )
 
 func Test_pingHandler(t *testing.T) {
-	type args struct {
-		data map[Command][]byte
-	}
-	tests := []struct {
+	t.Parallel()
+
+	testCases := []struct {
 		name    string
-		args    args
-		want    any
+		args    map[Command][]byte
+		want    int
 		wantErr bool
 	}{
 		{
-			fmt.Sprintf("Must return %d if connection is ok", PingOk),
-			args{map[Command][]byte{cmdHealth: fixtures[cmdHealth]}},
-			PingOk,
-			false,
+			name:    "+ok",
+			args:    map[Command][]byte{cmdHealth: fixtures[cmdHealth]},
+			want:    PingOk,
+			wantErr: false,
 		},
 		{
-			fmt.Sprintf("Must return %d if connection failed", PingFailed),
-			args{map[Command][]byte{cmdHealth: fixtures[cmdBroken]}},
-			PingFailed,
-			false,
+			name:    "+failed",
+			args:    map[Command][]byte{cmdHealth: fixtures[cmdBroken]},
+			want:    PingFailed,
+			wantErr: false,
 		},
 	}
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			got, err := pingHandler(tt.args.data)
-			if (err != nil) != tt.wantErr {
-				t.Errorf("pingHandler() error = %v, wantErr %v", err, tt.wantErr)
-				return
+
+	for _, tc := range testCases {
+		t.Run(tc.name, func(t *testing.T) {
+			t.Parallel()
+
+			got, err := pingHandler(tc.args)
+			if (err != nil) != tc.wantErr {
+				t.Fatalf("pingHandler() error = %v, wantErr %v", err, tc.wantErr)
 			}
-			if !reflect.DeepEqual(got, tt.want) {
-				t.Errorf("pingHandler() got = %v, want %v", got, tt.want)
+
+			if diff := cmp.Diff(tc.want, got); diff != "" {
+				t.Errorf("pingHandler() mismatch (-want +got):\n%s", diff)
 			}
 		})
 	}

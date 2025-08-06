@@ -21,6 +21,7 @@ import (
 	"net/http"
 
 	"golang.zabbix.com/agent2/plugins/ceph/handlers"
+	"golang.zabbix.com/sdk/errs"
 	"golang.zabbix.com/sdk/log"
 	"golang.zabbix.com/sdk/zbxerr"
 )
@@ -37,7 +38,13 @@ type cephResponse struct {
 }
 
 // request makes an http request to Ceph RESTful API Module with a given command and extra parameters.
-func request(ctx context.Context, client *http.Client, uri string, cmd handlers.Command, args map[string]string) ([]byte, error) {
+func request(
+	ctx context.Context,
+	client *http.Client,
+	uri string,
+	cmd handlers.Command,
+	args map[string]string,
+) ([]byte, error) {
 	var resp cephResponse
 
 	params := map[string]string{
@@ -54,7 +61,7 @@ func request(ctx context.Context, client *http.Client, uri string, cmd handlers.
 		return nil, zbxerr.ErrorCannotMarshalJSON.Wrap(err)
 	}
 
-	req, err := http.NewRequestWithContext(ctx, "POST", uri+"/request?wait=1", bytes.NewBuffer(requestBody))
+	req, err := http.NewRequestWithContext(ctx, http.MethodPost, uri+"/request?wait=1", bytes.NewBuffer(requestBody))
 	if err != nil {
 		return nil, zbxerr.New(err.Error())
 	}
@@ -70,7 +77,7 @@ func request(ctx context.Context, client *http.Client, uri string, cmd handlers.
 
 	err = json.NewDecoder(res.Body).Decode(&resp)
 	if err != nil {
-		return nil, zbxerr.ErrorCannotUnmarshalJSON.Wrap(err)
+		return nil, errs.WrapConst(err, zbxerr.ErrorCannotUnmarshalJSON)
 	}
 
 	if resp.HasFailed {

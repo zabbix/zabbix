@@ -17,18 +17,19 @@ package handlers
 import (
 	"encoding/json"
 
+	"golang.zabbix.com/sdk/errs"
 	"golang.zabbix.com/sdk/zbxerr"
 )
 
 type cephDf struct {
-	Stats struct {
+	Stats struct { //nolint:revive //part of ceph response.
 		TotalBytes      uint64 `json:"total_bytes"`
 		TotalAvailBytes uint64 `json:"total_avail_bytes"`
 		TotalUsedBytes  uint64 `json:"total_used_bytes"`
 	} `json:"stats"`
-	Pools []struct {
-		Name  string `json:"name"`
-		Stats struct {
+	Pools []struct { //nolint:revive //part of ceph response.
+		Name  string   `json:"name"`
+		Stats struct { //nolint:revive //part of ceph response.
 			PercentUsed float64 `json:"percent_used"`
 			Objects     uint64  `json:"objects"`
 			BytesUsed   uint64  `json:"bytes_used"`
@@ -73,7 +74,7 @@ func dfHandler(data map[Command][]byte) (any, error) {
 
 	err := json.Unmarshal(data[cmdDf], &df)
 	if err != nil {
-		return nil, zbxerr.ErrorCannotUnmarshalJSON.Wrap(err)
+		return nil, errs.WrapConst(err, zbxerr.ErrorCannotUnmarshalJSON)
 	}
 
 	var (
@@ -119,7 +120,7 @@ func dfHandler(data map[Command][]byte) (any, error) {
 
 	jsonRes, err := json.Marshal(out)
 	if err != nil {
-		return nil, zbxerr.ErrorCannotMarshalJSON.Wrap(err)
+		return nil, errs.WrapConst(err, zbxerr.ErrorCannotMarshalJSON)
 	}
 
 	return string(jsonRes), nil

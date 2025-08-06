@@ -1,5 +1,6 @@
 package handlers
 
+// The constants below define the unique keys for each supported Ceph metric.
 const (
 	KeyDf            Key = "ceph.df.details"
 	KeyOSD           Key = "ceph.osd.stats"
@@ -58,13 +59,16 @@ var metricsMeta = map[Key]MetricMeta{
 	},
 }
 
+// Key is a unique identifier for a specific metric.
 type Key string
 
+// Command represents a command to be executed, typically a Ceph CLI command.
 type Command string
 
 // handlerFunc defines an interface must be implemented by handlers.
 type handlerFunc func(data map[Command][]byte) (res any, err error)
 
+// MetricMeta holds the metadata required to collect a specific Ceph metric.
 type MetricMeta struct {
 	Commands  []Command
 	Arguments map[string]string
@@ -77,6 +81,6 @@ func GetMetricMeta(key Key) MetricMeta {
 }
 
 // Handle runs metric's handler.
-func (m *MetricMeta) Handle(data map[Command][]byte) (res any, err error) {
+func (m *MetricMeta) Handle(data map[Command][]byte) (any, error) {
 	return m.handler(data)
 }
