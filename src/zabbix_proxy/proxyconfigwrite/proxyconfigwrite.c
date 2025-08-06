@@ -1243,7 +1243,7 @@ static void	proxyconfig_prepare_table(zbx_table_data_t *td, const char *key_fiel
 
 	if (NULL != td->sql_filter)
 	{
-		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "where %s", td->sql_filter);
+		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, " where %s", td->sql_filter);
 		delim = " and";
 	}
 
