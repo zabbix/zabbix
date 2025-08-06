@@ -124,7 +124,7 @@ class testDashboardItemCardWidget extends testWidgets {
 			[
 				'host' => 'Host for Item Card widget',
 				'name' => 'Visible host name for Item Card widget',
-				'groups' => [['groupid' => 4]], //Zabbix servers.
+				'groups' => ['groupid' => 4], //Zabbix servers.
 				'interfaces' => [
 					[
 						'type' => INTERFACE_TYPE_AGENT,
@@ -132,7 +132,7 @@ class testDashboardItemCardWidget extends testWidgets {
 						'useip' => INTERFACE_USE_DNS,
 						'ip' => '127.0.0.1',
 						'dns' => 'zabbixzabbixzabbix.com',
-						'port' => '10050'
+						'port' => 10050
 					],
 					[
 						'type' => INTERFACE_TYPE_SNMP,
@@ -393,11 +393,11 @@ class testDashboardItemCardWidget extends testWidgets {
 		];
 
 		foreach ($item_data as $params) {
-				CDataHelper::addItemData(self::$itemids[$params['name']], $params['value'], $params['time']);
+			CDataHelper::addItemData(self::$itemids[$params['name']], $params['value'], $params['time']);
 		}
 
 		$trigger_names = ['Not classified trigger', 'Information trigger', 'Warning trigger', 'Average trigger',
-			'High trigger', 'Disaster trigger', 'Disaster trigger', 'Trigger 1', 'Trigger 2'];
+			    'High trigger', 'Disaster trigger', 'Disaster trigger', 'Trigger 1', 'Trigger 2'];
 		CDBHelper::setTriggerProblem($trigger_names);
 
 		// Add red error messages.
@@ -1300,7 +1300,6 @@ class testDashboardItemCardWidget extends testWidgets {
 			// #6.
 			[
 				[
-					'expected' => TEST_GOOD,
 					'fields' => [
 						'Show header' => false,
 						'Name' => '  Trimmed name_3  ',
@@ -1329,7 +1328,6 @@ class testDashboardItemCardWidget extends testWidgets {
 			// #7.
 			[
 				[
-					'expected' => TEST_GOOD,
 					'fields' => [
 						'Show header' => true,
 						'Name' => 'кирилица, ñ ç ö ø, 🙂🙂🙂🙂, みけめ, "],*,a[x=": "],*,a[x="/\|',
@@ -1348,7 +1346,6 @@ class testDashboardItemCardWidget extends testWidgets {
 			// #8.
 			[
 				[
-					'expected' => TEST_GOOD,
 					'fields' => [
 						'Name' => '<img src=\"x\" onerror=\"alert("ERROR");\"/>',
 						'Refresh interval' => '30 seconds',
@@ -1365,7 +1362,6 @@ class testDashboardItemCardWidget extends testWidgets {
 			// #9.
 			[
 				[
-					'expected' => TEST_GOOD,
 					'fields' => [
 						'Name' => '105\'; --DROP TABLE Users',
 						'Refresh interval' => '1 minute',
@@ -1382,7 +1378,6 @@ class testDashboardItemCardWidget extends testWidgets {
 			// #10.
 			[
 				[
-					'expected' => TEST_GOOD,
 					'fields' => [
 						'Name' => 'Update then remove one Show option',
 						'Refresh interval' => '2 minutes',
@@ -1400,7 +1395,6 @@ class testDashboardItemCardWidget extends testWidgets {
 			// #11.
 			[
 				[
-					'expected' => TEST_GOOD,
 					'fields' => [
 						'Name' => 'Dashboard source for override host field',
 						'Refresh interval' => '10 minutes',
@@ -1427,7 +1421,6 @@ class testDashboardItemCardWidget extends testWidgets {
 			// #12.
 			[
 				[
-					'expected' => TEST_GOOD,
 					'fields' => [
 						'Name' => 'Other widget as the source for override host field',
 						'Refresh interval' => '15 minutes',
@@ -1455,7 +1448,6 @@ class testDashboardItemCardWidget extends testWidgets {
 			// #13.
 			[
 				[
-					'expected' => TEST_GOOD,
 					'fields' => [
 						'Name' => 'User changing Show options',
 						'Item' => STRING_255
@@ -2473,7 +2465,8 @@ class testDashboardItemCardWidget extends testWidgets {
 	 * @param string			$expected_value		expected section value
 	 */
 	protected function asssertSectionValue($widget, $section_name, $expected_value) {
-		$row = $widget->query('xpath:.//div[@class="section-name" and text()='.CXPathHelper::escapeQuotes($section_name).']')->one();
+		$row = $widget->query('xpath:.//div[@class="section-name" and text()='.
+                CXPathHelper::escapeQuotes($section_name).']')->one();
 		$value = $row->query('xpath:./following-sibling::div[1]')->one()->getText();
 		$this->assertEquals($expected_value, $value);
 	}
