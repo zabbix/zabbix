@@ -578,10 +578,6 @@
 					parameters['srctbl'] = 'items';
 				}
 
-				if (this.graphs.normal_only !== '') {
-					parameters['normal_only'] = '1';
-				}
-
 				if (!this.graphs.parent_discoveryid && this.graphs.hostid) {
 					parameters['hostid'] = this.graphs.hostid;
 				}
