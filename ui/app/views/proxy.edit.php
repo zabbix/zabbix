@@ -35,21 +35,39 @@ $local_address = (new CTable())
 	->setHeader([_('Address'), _('Port')])
 	->addRow([
 		(new CTextBox('local_address', $data['form']['local_address'], false,
-			DB::getFieldLength('proxy', 'local_address')
-		))->setWidth(336),
+			DB::getFieldLength('proxy', 'local_address')))
+			->setWidth(336)
+			->setErrorLabel(_('Address'))
+			->setErrorContainer('local_address_port_error_container'),
 		(new CTextBox('local_port', $data['form']['local_port'], false, DB::getFieldLength('proxy', 'local_port')))
 			->setWidth(ZBX_TEXTAREA_INTERFACE_PORT_WIDTH)
+			->setErrorLabel(_('Port'))
+			->setErrorContainer('local_address_port_error_container')
 			->setAriaRequired()
-	]);
+	])
+	->addRow(
+		(new CCol())
+			->setId('local_address_port_error_container')
+			->addClass(ZBX_STYLE_ERROR_CONTAINER)
+	);
 $interface = (new CTable())
 	->setHeader([_('Address'), _('Port')])
 	->addRow([
 		(new CTextBox('address', $data['form']['address'], false, DB::getFieldLength('proxy', 'address')))
-			->setWidth(336),
+			->setWidth(336)
+			->setErrorLabel(_('Address'))
+			->setErrorContainer('address_port_error_container'),
 		(new CTextBox('port', $data['form']['port'], false, DB::getFieldLength('proxy', 'port')))
 			->setWidth(ZBX_TEXTAREA_INTERFACE_PORT_WIDTH)
+			->setErrorLabel(_('Port'))
+			->setErrorContainer('address_port_error_container')
 			->setAriaRequired()
-	]);
+	])
+	->addRow(
+		(new CCol())
+			->setId('address_port_error_container')
+			->addClass(ZBX_STYLE_ERROR_CONTAINER)
+	);
 
 $proxy_tab = (new CFormGrid())
 	->addItem([
@@ -362,6 +380,7 @@ $form
 	->addItem(
 		(new CScriptTag('
 			proxy_edit_popup.init('.json_encode([
+				'rules' => $data['js_validation_rules'],
 				'proxyid' => $data['proxyid']
 			]).');
 		'))->setOnDocumentReady()
