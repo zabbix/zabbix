@@ -77,6 +77,7 @@ $host_tab->addRow(
 			'name' => 'groups[]',
 			'object_name' => 'hostGroup',
 			'add_new' => (CWebUser::getType() == USER_TYPE_SUPER_ADMIN),
+			'maxlength' => DB::getFieldLength('hstgrp', 'name'),
 			'data' => [],
 			'popup' => [
 				'parameters' => [
