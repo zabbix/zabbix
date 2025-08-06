@@ -1532,23 +1532,23 @@ static int	proxyconfig_sync_hosts(zbx_vector_table_data_ptr_t *config_tables, in
 		while (NULL != (row = (zbx_table_row_t *)zbx_hashset_iter_next(&iter)))
 			zbx_vector_uint64_append(&recids, row->recid);
 
-		proxyconfig_prepare_table(hosts, "hostid", &recids, NULL, &hostids);
-		proxyconfig_prepare_table(host_inventory, "hostid", &hostids, NULL, NULL);
-		proxyconfig_prepare_table(interface, "hostid", &hostids, NULL, &interfaceids);
-		proxyconfig_prepare_table(interface_snmp, "interfaceid", &interfaceids, NULL, NULL);
+		proxyconfig_prepare_table(hosts, "t.hostid", &recids, NULL, &hostids);
+		proxyconfig_prepare_table(host_inventory, "t.hostid", &hostids, NULL, NULL);
+		proxyconfig_prepare_table(interface, "t.hostid", &hostids, NULL, &interfaceids);
+		proxyconfig_prepare_table(interface_snmp, "t.interfaceid", &interfaceids, NULL, NULL);
 
-		proxyconfig_prepare_table(items, "hostid", &hostids, NULL, &itemids);
+		proxyconfig_prepare_table(items, "t.hostid", &hostids, NULL, NULL);
 
 		proxyconfig_prepare_table(item_rtdata, "i.hostid", &hostids, NULL, NULL);
 		proxyconfig_prepare_table(item_preproc, "i.hostid", &hostids, NULL, NULL);
 		proxyconfig_prepare_table(item_parameter, "i.hostid", &hostids, NULL, NULL);
 
-		proxyconfig_prepare_table(httptest, "hostid", &hostids, NULL, &httptestids);
-		proxyconfig_prepare_table(httptestitem, "httptestid", &httptestids, NULL, NULL);
-		proxyconfig_prepare_table(httptest_field, "httptestid", &httptestids, NULL, NULL);
-		proxyconfig_prepare_table(httpstep, "httptestid", &httptestids, NULL, &httpstepids);
-		proxyconfig_prepare_table(httpstepitem, "httpstepid", &httpstepids, NULL, NULL);
-		proxyconfig_prepare_table(httpstep_field, "httpstepid", &httpstepids, NULL, NULL);
+		proxyconfig_prepare_table(httptest, "t.hostid", &hostids, NULL, &httptestids);
+		proxyconfig_prepare_table(httptestitem, "t.httptestid", &httptestids, NULL, NULL);
+		proxyconfig_prepare_table(httptest_field, "t.httptestid", &httptestids, NULL, NULL);
+		proxyconfig_prepare_table(httpstep, "t.httptestid", &httptestids, NULL, &httpstepids);
+		proxyconfig_prepare_table(httpstepitem, "t.httpstepid", &httpstepids, NULL, NULL);
+		proxyconfig_prepare_table(httpstep_field, "t.httpstepid", &httpstepids, NULL, NULL);
 
 		zbx_vector_uint64_destroy(&httpstepids);
 		zbx_vector_uint64_destroy(&httptestids);
@@ -1669,7 +1669,7 @@ static void	proxyconfig_prepare_hostmacros(zbx_table_data_t *hostmacro, zbx_tabl
 		zbx_vector_uint64_uniq(&hostids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
 
 		key_ids = &hostids;
-		key_field = "hostid";
+		key_field = "t.hostid";
 	}
 
 	proxyconfig_prepare_table(hostmacro, key_field, key_ids, NULL, NULL);
