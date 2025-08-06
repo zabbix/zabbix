@@ -66,6 +66,7 @@ class testFormAdministrationMediaTypes extends CWebTest {
 			];
 		}
 		CDataHelper::call('mediatype.create', $oauth_media_data);
+		self::$mediatypeids = CDataHelper::getIds('name');
 
 		CDataHelper::call('mediatype.create', [
 			[
@@ -146,7 +147,6 @@ class testFormAdministrationMediaTypes extends CWebTest {
 				]
 			]
 		]);
-		self::$mediatypeids = CDataHelper::getIds('name');
 	}
 
 	public function testFormAdministrationMediaTypes_GeneralLayout() {
@@ -501,7 +501,7 @@ class testFormAdministrationMediaTypes extends CWebTest {
 						? array_merge($hints_data['common'], $hints_data['generic'])
 						: $hints_data['common'];
 					foreach ($hints as $hint) {
-						$this->checkHint($oauth_form, $hint['label'], $hint['text']);
+						$this->checkHint($oauth_form, 'zi-help-filled-small', $hint['text'], $hint['label']);
 					}
 
 					// Check buttons related to 'Authorization parameters' and 'Token parameters' tables.
@@ -651,11 +651,18 @@ class testFormAdministrationMediaTypes extends CWebTest {
 	 * Check field's hint text.
 	 *
 	 * @param CFormElement $form         given form
-	 * @param string       $label        checked field's label
+	 * @param string       $selector     hintbox selector
 	 * @param string       $hint_text    text of the hint
+	 * @param string       $label        checked field's label
 	 */
-	protected function checkHint($form, $label, $hint_text) {
-		$form->getLabel($label)->query('xpath:./button[contains(@class, "zi-help-filled-small")]')->one()->click();
+	protected function checkHint($form, $selector, $hint_text, $label = null) {
+		if ($label === null) {
+			$form->query('xpath://button[contains(@class, "'.$selector.'")]')->one()->click();
+		}
+		else {
+			$form->getLabel($label)->query('xpath:./button[contains(@class, "'.$selector.'")]')->one()->click();
+		}
+
 		$hint = $this->query('xpath://div[@data-hintboxid]')->waitUntilVisible();
 		$this->assertEquals($hint_text, $hint->one()->getText());
 		$hint->one()->query('xpath:.//button[@class="btn-overlay-close"]')->one()->click();
@@ -1887,5 +1894,36 @@ class testFormAdministrationMediaTypes extends CWebTest {
 		}
 
 		COverlayDialogElement::find()->one()->close();
+	}
+
+	/**
+	 * Check scenarios when warning tooltip does or doesn't appear.
+	 * Possible values:
+	 * 		0 - (default) Both tokens contain invalid value;
+	 * 		1 - Access token contain valid value;
+	 * 		2 - Refresh token contain valid value;
+	 * 		3 - Both tokens contain valid value.
+	 */
+	public function testFormAdministrationMediaTypes_InvalidRefreshToken() {
+		$this->page->login()->open('zabbix.php?action=mediatype.list')->waitUntilReady();
+
+		foreach (['Generic SMTP OAuth', 'Gmail OAuth', 'Gmail relay OAuth', 'Office365 OAuth'] as $name) {
+			foreach ([0, 1, 2, 3] as $tokens_status) {
+				DBexecute('UPDATE media_type_oauth SET tokens_status='.$tokens_status.' WHERE mediatypeid='.
+						self::$mediatypeids[$name]
+				);
+				$this->query('link', $name)->waitUntilClickable()->one()->click();
+				$form = COverlayDialogElement::find()->asForm()->one()->waitUntilReady();
+
+				if ($tokens_status === 0 || $tokens_status === 1) {
+					$this->checkHint($form, 'zi-i-negative', 'Refresh token is invalid or outdated.');
+				}
+				else {
+					$this->assertFalse($form->query('xpath://button[contains(@class, "zi-i-negative")]')->one(false)->isValid());
+				}
+
+				COverlayDialogElement::find()->one()->close();
+			}
+		}
 	}
 }
