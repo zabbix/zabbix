@@ -1517,6 +1517,7 @@ static int	proxyconfig_sync_hosts(zbx_vector_table_data_ptr_t *config_tables, in
 		zbx_hashset_iter_reset(&hosts->rows, &iter);
 		while (NULL != (row = (zbx_table_row_t *)zbx_hashset_iter_next(&iter)))
 			zbx_vector_uint64_append(&recids, row->recid);
+		zbx_vector_uint64_sort(&recids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
 
 		proxyconfig_prepare_table(hosts, "t.hostid", &recids, NULL, &hostids);
 		proxyconfig_prepare_table(host_inventory, "t.hostid", &hostids, NULL, NULL);
