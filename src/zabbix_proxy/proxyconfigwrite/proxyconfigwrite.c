@@ -387,7 +387,7 @@ static zbx_table_data_t	*proxyconfig_create_table(const char *name)
 	else if (0 == strcmp(table->table, "item_rtdata") || 0 == strcmp(table->table, "item_preproc") ||
 			0 == strcmp(table->table, "item_parameter"))
 	{
-		td->join = " join items i on i.itemid=t.itemid and";
+		td->join = " join items i on i.itemid=t.itemid";
 	}
 
 	/* get table fields from database schema */
@@ -1238,32 +1238,19 @@ static void	proxyconfig_prepare_table(zbx_table_data_t *td, const char *key_fiel
 
 	zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, " from %s t", td->table->table);
 
+	if (NULL != td->join)
+		zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, td->join);
+
 	if (NULL != td->sql_filter)
 	{
-		if (NULL != td->join)
-		{
-			char	*suffix = zbx_dsprintf(NULL, "where %s", td->sql_filter);
-			zbx_db_large_query_append_sql(&query, suffix);
-			zbx_free(suffix);
-		}
-		else
-		{
-			zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "%s %s", delim, td->sql_filter);
-			delim = " and";
-		}
-
+		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "%s %s", " where", td->sql_filter);
+		delim = " and";
 	}
+
 
 	if (NULL != key_ids)
 	{
-		if (NULL == td->join)
-		{
-			zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, delim);
-			delim = " and";
-		}
-		else
-			zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, td->join);
-
+		zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, delim);
 		zbx_db_large_query_prepare_uint(&query, &sql, &sql_alloc, &sql_offset, key_field, key_ids);
 	}
 	else
