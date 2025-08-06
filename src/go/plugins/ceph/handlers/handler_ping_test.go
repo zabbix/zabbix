@@ -12,7 +12,7 @@
 ** If not, see <https://www.gnu.org/licenses/>.
 **/
 
-package ceph
+package handlers
 
 import (
 	"fmt"
@@ -22,7 +22,7 @@ import (
 
 func Test_pingHandler(t *testing.T) {
 	type args struct {
-		data map[command][]byte
+		data map[Command][]byte
 	}
 	tests := []struct {
 		name    string
@@ -31,15 +31,15 @@ func Test_pingHandler(t *testing.T) {
 		wantErr bool
 	}{
 		{
-			fmt.Sprintf("Must return %d if connection is ok", pingOk),
-			args{map[command][]byte{cmdHealth: fixtures[cmdHealth]}},
-			pingOk,
+			fmt.Sprintf("Must return %d if connection is ok", PingOk),
+			args{map[Command][]byte{cmdHealth: fixtures[cmdHealth]}},
+			PingOk,
 			false,
 		},
 		{
-			fmt.Sprintf("Must return %d if connection failed", pingFailed),
-			args{map[command][]byte{cmdHealth: fixtures[cmdBroken]}},
-			pingFailed,
+			fmt.Sprintf("Must return %d if connection failed", PingFailed),
+			args{map[Command][]byte{cmdHealth: fixtures[cmdBroken]}},
+			PingFailed,
 			false,
 		},
 	}

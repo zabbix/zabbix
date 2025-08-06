@@ -12,7 +12,7 @@
 ** If not, see <https://www.gnu.org/licenses/>.
 **/
 
-package ceph
+package handlers
 
 import (
 	"encoding/json"
@@ -41,7 +41,7 @@ type osdEntity struct {
 }
 
 // osdDiscoveryHandler returns list of OSDs in LLD format.
-func osdDiscoveryHandler(data map[command][]byte) (any, error) {
+func osdDiscoveryHandler(data map[Command][]byte) (any, error) {
 	var (
 		tree crushTree
 		host *node
@@ -124,7 +124,7 @@ func getStepOpTake(rule crushRule) (*step, error) {
 }
 
 // osdDiscoveryHandler returns list of pools in LLD format.
-func poolDiscoveryHandler(data map[command][]byte) (any, error) {
+func poolDiscoveryHandler(data map[Command][]byte) (any, error) {
 	var (
 		poolsDump  osdDumpPool
 		crushRules []crushRule

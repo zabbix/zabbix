@@ -12,7 +12,7 @@
 ** If not, see <https://www.gnu.org/licenses/>.
 **/
 
-package ceph
+package handlers
 
 import (
 	"encoding/json"
@@ -85,7 +85,7 @@ func Test_dfHandler(t *testing.T) {
 	}
 
 	type args struct {
-		data map[command][]byte
+		data map[Command][]byte
 	}
 
 	tests := []struct {
@@ -95,14 +95,14 @@ func Test_dfHandler(t *testing.T) {
 		wantErr bool
 	}{
 		{
-			"Must parse an output of " + cmdDf + "command",
-			args{map[command][]byte{cmdDf: fixtures[cmdDf]}},
+			string("Must parse an output of " + cmdDf + "Command"),
+			args{map[Command][]byte{cmdDf: fixtures[cmdDf]}},
 			string(success),
 			false,
 		},
 		{
 			"Must fail on malformed input",
-			args{map[command][]byte{cmdDf: fixtures[cmdBroken]}},
+			args{map[Command][]byte{cmdDf: fixtures[cmdBroken]}},
 			nil,
 			true,
 		},
@@ -125,6 +125,6 @@ func Test_dfHandler(t *testing.T) {
 
 func Benchmark_dfHandler(b *testing.B) {
 	for i := 0; i < b.N; i++ {
-		_, _ = dfHandler(map[command][]byte{cmdDf: fixtures[cmdDf]})
+		_, _ = dfHandler(map[Command][]byte{cmdDf: fixtures[cmdDf]})
 	}
 }

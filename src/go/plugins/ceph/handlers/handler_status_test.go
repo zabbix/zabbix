@@ -12,7 +12,7 @@
 ** If not, see <https://www.gnu.org/licenses/>.
 **/
 
-package ceph
+package handlers
 
 import (
 	_ "embed"
@@ -46,7 +46,7 @@ func Test_statusHandler(t *testing.T) {
 	}
 
 	type args struct {
-		data map[command][]byte
+		data map[Command][]byte
 	}
 
 	tests := []struct {
@@ -57,7 +57,7 @@ func Test_statusHandler(t *testing.T) {
 	}{
 		{
 			"+valid",
-			args{map[command][]byte{cmdStatus: testDataCephStatusOutput1}},
+			args{map[Command][]byte{cmdStatus: testDataCephStatusOutput1}},
 			&outStatus{
 				OverallStatus: 0,
 				NumMon:        3,
@@ -105,7 +105,7 @@ func Test_statusHandler(t *testing.T) {
 		},
 		{
 			"+valid2",
-			args{map[command][]byte{cmdStatus: testDataCephStatusOutput2}},
+			args{map[Command][]byte{cmdStatus: testDataCephStatusOutput2}},
 			&outStatus{
 				OverallStatus: 0,
 				NumMon:        3,
@@ -153,7 +153,7 @@ func Test_statusHandler(t *testing.T) {
 		},
 		{
 			"+valid3",
-			args{map[command][]byte{cmdStatus: testDataCephStatusOutput3}},
+			args{map[Command][]byte{cmdStatus: testDataCephStatusOutput3}},
 			&outStatus{
 				OverallStatus: 1,
 				NumMon:        1,
@@ -201,14 +201,14 @@ func Test_statusHandler(t *testing.T) {
 		},
 		{
 			"-unmarshalErr",
-			args{map[command][]byte{cmdStatus: []byte("{")}},
+			args{map[Command][]byte{cmdStatus: []byte("{")}},
 			nil,
 			true,
 		},
 		{
 			"-unknownHealth",
 			args{
-				map[command][]byte{
+				map[Command][]byte{
 					cmdStatus: []byte(`{"health": {"status":"bannana"}}`),
 				},
 			},
@@ -217,7 +217,7 @@ func Test_statusHandler(t *testing.T) {
 		},
 		{
 			"-unknownPGState",
-			args{map[command][]byte{cmdStatus: []byte(
+			args{map[Command][]byte{cmdStatus: []byte(
 				`{
                     "health": {"status":"HEALTH_OK"},
                     "pgmap": {"pgs_by_state":[{"state_name":"bannan", "count": 3}]}
@@ -228,7 +228,7 @@ func Test_statusHandler(t *testing.T) {
 		},
 		{
 			"-noDataForNumMon",
-			args{map[command][]byte{cmdStatus: []byte(
+			args{map[Command][]byte{cmdStatus: []byte(
 				`{
                     "health": {"status":"HEALTH_OK"}
                  }`,
@@ -238,7 +238,7 @@ func Test_statusHandler(t *testing.T) {
 		},
 		{
 			"-noDataForOSDMap",
-			args{map[command][]byte{cmdStatus: []byte(
+			args{map[Command][]byte{cmdStatus: []byte(
 				`{
                     "health": {"status":"HEALTH_OK"},
                     "monmap": { "mons": [] }
@@ -277,7 +277,7 @@ func Test_statusHandler(t *testing.T) {
 func Benchmark_statusHandler(b *testing.B) {
 	for i := 0; i < b.N; i++ {
 		_, err := statusHandler(
-			map[command][]byte{cmdStatus: testDataCephStatusOutput1},
+			map[Command][]byte{cmdStatus: testDataCephStatusOutput1},
 		)
 		if err != nil {
 			b.Fatalf("statusHandler() error = %v", err)

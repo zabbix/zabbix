@@ -12,7 +12,7 @@
 ** If not, see <https://www.gnu.org/licenses/>.
 **/
 
-package ceph
+package handlers
 
 import (
 	"encoding/json"
@@ -106,8 +106,8 @@ type outOsdStats struct {
 	Osds          map[string]osdStat `json:"osds"`
 }
 
-// osdHandler returns OSDs statistics provided by "pg dump" command.
-func osdHandler(data map[command][]byte) (any, error) {
+// osdHandler returns OSDs statistics provided by "pg dump" Command.
+func osdHandler(data map[Command][]byte) (any, error) {
 	var pgDump cephPgDump
 
 	err := json.Unmarshal(data[cmdPgDump], &pgDump)

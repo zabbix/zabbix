@@ -12,7 +12,7 @@
 ** If not, see <https://www.gnu.org/licenses/>.
 **/
 
-package ceph
+package handlers
 
 import (
 	"encoding/json"
@@ -67,8 +67,8 @@ type outDf struct {
 	TotalObjects    uint64              `json:"total_objects"`
 }
 
-// dfHandler returns statistics provided by "df detail" command.
-func dfHandler(data map[command][]byte) (any, error) {
+// dfHandler returns statistics provided by "df detail" Command.
+func dfHandler(data map[Command][]byte) (any, error) {
 	var df cephDf
 
 	err := json.Unmarshal(data[cmdDf], &df)

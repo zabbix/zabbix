@@ -12,7 +12,7 @@
 ** If not, see <https://www.gnu.org/licenses/>.
 **/
 
-package ceph
+package handlers
 
 import (
 	"log"
@@ -21,14 +21,14 @@ import (
 	"testing"
 )
 
-var fixtures map[command][]byte
+var fixtures map[Command][]byte
 
-const cmdBroken command = "broken"
+const cmdBroken Command = "broken"
 
 func TestMain(m *testing.M) {
-	fixtures = make(map[command][]byte)
+	fixtures = make(map[Command][]byte)
 
-	for _, cmd := range []command{
+	for _, cmd := range []Command{
 		cmdDf, cmdPgDump, cmdOSDCrushRuleDump, cmdOSDCrushTree, cmdOSDDump, cmdHealth,
 	} {
 		var err error

@@ -20,6 +20,7 @@ import (
 	"encoding/json"
 	"net/http"
 
+	"golang.zabbix.com/agent2/plugins/ceph/handlers"
 	"golang.zabbix.com/sdk/log"
 	"golang.zabbix.com/sdk/zbxerr"
 )
@@ -36,11 +37,11 @@ type cephResponse struct {
 }
 
 // request makes an http request to Ceph RESTful API Module with a given command and extra parameters.
-func request(ctx context.Context, client *http.Client, uri, cmd string, args map[string]string) ([]byte, error) {
+func request(ctx context.Context, client *http.Client, uri string, cmd handlers.Command, args map[string]string) ([]byte, error) {
 	var resp cephResponse
 
 	params := map[string]string{
-		"prefix": cmd,
+		"prefix": string(cmd),
 		"format": "json",
 	}
 
@@ -94,26 +95,26 @@ func request(ctx context.Context, client *http.Client, uri, cmd string, args map
 }
 
 type response struct {
-	cmd  string
-	data []byte
-	err  error
+	command handlers.Command
+	data    []byte
+	err     error
 }
 
 // asyncRequest makes asynchronous https requests to Ceph RESTful API Module for each metric's command and sends
 // results to the channel.
 func asyncRequest(ctx context.Context, cancel context.CancelFunc, client *http.Client,
-	uri string, meta metricMeta) <-chan *response {
-	ch := make(chan *response, len(meta.commands))
+	uri string, meta handlers.MetricMeta) <-chan *response {
+	ch := make(chan *response, len(meta.Commands))
 
-	for _, cmd := range meta.commands {
-		go func(cmd string) {
-			data, err := request(ctx, client, uri, cmd, meta.args)
+	for _, cmd := range meta.Commands {
+		go func(cmd handlers.Command) {
+			data, err := request(ctx, client, uri, cmd, meta.Arguments)
 			if err != nil {
 				cancel()
 				ch <- &response{cmd, nil, err}
 			}
 			ch <- &response{cmd, data, err}
-		}(string(cmd))
+		}(cmd)
 	}
 
 	return ch

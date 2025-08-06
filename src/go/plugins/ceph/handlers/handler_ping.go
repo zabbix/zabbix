@@ -12,7 +12,7 @@
 ** If not, see <https://www.gnu.org/licenses/>.
 **/
 
-package ceph
+package handlers
 
 import (
 	"encoding/json"
@@ -23,22 +23,22 @@ type cephHealth struct {
 }
 
 const (
-	pingFailed = 0
-	pingOk     = 1
+	PingFailed = 0
+	PingOk     = 1
 )
 
-// pingHandler returns pingOk if a connection is alive or pingFailed otherwise.
-func pingHandler(data map[command][]byte) (any, error) {
+// pingHandler returns pingOk if a connection is alive or PingFailed otherwise.
+func pingHandler(data map[Command][]byte) (any, error) {
 	var health cephHealth
 
 	err := json.Unmarshal(data[cmdHealth], &health)
 	if err != nil {
-		return pingFailed, nil
+		return PingFailed, nil
 	}
 
 	if len(health.Status) > 0 {
-		return pingOk, nil
+		return PingOk, nil
 	}
 
-	return pingFailed, nil
+	return PingFailed, nil
 }

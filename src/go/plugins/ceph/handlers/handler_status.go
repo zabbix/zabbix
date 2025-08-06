@@ -12,7 +12,7 @@
 ** If not, see <https://www.gnu.org/licenses/>.
 **/
 
-package ceph
+package handlers
 
 import (
 	"encoding/json"
@@ -103,8 +103,8 @@ type outStatus struct {
 	MinMonReleaseName string            `json:"min_mon_release_name"`
 }
 
-// statusHandler returns data provided by "status" command.
-func statusHandler(data map[command][]byte) (any, error) {
+// statusHandler returns data provided by "status" Command.
+func statusHandler(data map[Command][]byte) (any, error) {
 	cStatus := &cephStatus{}
 
 	err := json.Unmarshal(data[cmdStatus], cStatus)

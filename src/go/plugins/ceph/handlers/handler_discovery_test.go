@@ -12,7 +12,7 @@
 ** If not, see <https://www.gnu.org/licenses/>.
 **/
 
-package ceph
+package handlers
 
 import (
 	"encoding/json"
@@ -33,7 +33,7 @@ func TestOSDDiscoveryHandler(t *testing.T) {
 	}
 
 	type args struct {
-		data map[command][]byte
+		data map[Command][]byte
 	}
 	tests := []struct {
 		name    string
@@ -43,7 +43,7 @@ func TestOSDDiscoveryHandler(t *testing.T) {
 	}{
 		{
 			"Must return correct LLD rules for OSDs",
-			args{map[command][]byte{
+			args{map[Command][]byte{
 				cmdOSDCrushTree: fixtures[cmdOSDCrushTree],
 			}},
 			string(success),
@@ -51,7 +51,7 @@ func TestOSDDiscoveryHandler(t *testing.T) {
 		},
 		{
 			"Must fail on malformed input",
-			args{map[command][]byte{
+			args{map[Command][]byte{
 				cmdOSDCrushTree: {1, 2, 3, 4, 5},
 			}},
 			nil,
@@ -74,7 +74,7 @@ func TestOSDDiscoveryHandler(t *testing.T) {
 
 func Benchmark_osdDiscoveryHandler(b *testing.B) {
 	for i := 0; i < b.N; i++ {
-		_, _ = osdDiscoveryHandler(map[command][]byte{
+		_, _ = osdDiscoveryHandler(map[Command][]byte{
 			cmdOSDCrushRuleDump: fixtures[cmdOSDCrushRuleDump],
 			cmdOSDCrushTree:     fixtures[cmdOSDCrushTree],
 		})
@@ -93,7 +93,7 @@ func Test_poolDiscoveryHandler(t *testing.T) {
 	}
 
 	type args struct {
-		data map[command][]byte
+		data map[Command][]byte
 	}
 	tests := []struct {
 		name    string
@@ -103,7 +103,7 @@ func Test_poolDiscoveryHandler(t *testing.T) {
 	}{
 		{
 			"Must return correct LLD rules for pools",
-			args{map[command][]byte{
+			args{map[Command][]byte{
 				cmdOSDDump:          fixtures[cmdOSDDump],
 				cmdOSDCrushRuleDump: fixtures[cmdOSDCrushRuleDump],
 			}},
@@ -112,7 +112,7 @@ func Test_poolDiscoveryHandler(t *testing.T) {
 		},
 		{
 			"Must fail on malformed input",
-			args{map[command][]byte{
+			args{map[Command][]byte{
 				cmdOSDDump:          {1, 2, 3, 4, 5},
 				cmdOSDCrushRuleDump: fixtures[cmdOSDCrushRuleDump],
 			}},
@@ -120,8 +120,8 @@ func Test_poolDiscoveryHandler(t *testing.T) {
 			true,
 		},
 		{
-			"Must fail if one of necessary commands is absent",
-			args{map[command][]byte{cmdOSDDump: fixtures[cmdBroken]}},
+			"Must fail if one of necessary Commands is absent",
+			args{map[Command][]byte{cmdOSDDump: fixtures[cmdBroken]}},
 			nil,
 			true,
 		},
@@ -142,7 +142,7 @@ func Test_poolDiscoveryHandler(t *testing.T) {
 
 func Benchmark_poolDiscoveryHandler(b *testing.B) {
 	for i := 0; i < b.N; i++ {
-		_, _ = poolDiscoveryHandler(map[command][]byte{
+		_, _ = poolDiscoveryHandler(map[Command][]byte{
 			cmdOSDDump:          fixtures[cmdOSDDump],
 			cmdOSDCrushRuleDump: fixtures[cmdOSDCrushRuleDump],
 		})

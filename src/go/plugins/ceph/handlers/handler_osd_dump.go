@@ -12,7 +12,7 @@
 ** If not, see <https://www.gnu.org/licenses/>.
 **/
 
-package ceph
+package handlers
 
 import (
 	"encoding/json"
@@ -45,8 +45,8 @@ type outOsdDump struct {
 	Osds              map[string]osdStatus `json:"osds"`
 }
 
-// osdDumpHandler returns OSDs dump provided by "osd dump" command.
-func osdDumpHandler(data map[command][]byte) (any, error) {
+// osdDumpHandler returns OSDs dump provided by "osd dump" Command.
+func osdDumpHandler(data map[Command][]byte) (any, error) {
 	var osdDump cephOsdDump
 
 	err := json.Unmarshal(data[cmdOSDDump], &osdDump)

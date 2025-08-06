@@ -15,69 +15,12 @@
 package ceph
 
 import (
+	"golang.zabbix.com/agent2/plugins/ceph/handlers"
 	"golang.zabbix.com/sdk/errs"
 	"golang.zabbix.com/sdk/metric"
 	"golang.zabbix.com/sdk/plugin"
 	"golang.zabbix.com/sdk/uri"
 )
-
-const (
-	keyDf            = "ceph.df.details"
-	keyOSD           = "ceph.osd.stats"
-	keyOSDDiscovery  = "ceph.osd.discovery"
-	keyOSDDump       = "ceph.osd.dump"
-	keyPing          = "ceph.ping"
-	keyPoolDiscovery = "ceph.pool.discovery"
-	keyStatus        = "ceph.status"
-)
-
-const (
-	cmdDf               = "df"
-	cmdPgDump           = "pg dump"
-	cmdOSDCrushRuleDump = "osd crush rule dump"
-	cmdOSDCrushTree     = "osd crush tree"
-	cmdOSDDump          = "osd dump"
-	cmdHealth           = "health"
-	cmdStatus           = "status"
-)
-
-var metricsMeta = map[string]metricMeta{
-	keyDf: {
-		commands: []command{cmdDf},
-		args:     map[string]string{"detail": "detail"},
-		handler:  dfHandler,
-	},
-	keyOSD: {
-		commands: []command{cmdPgDump},
-		args:     nil,
-		handler:  osdHandler,
-	},
-	keyOSDDiscovery: {
-		commands: []command{cmdOSDCrushTree},
-		args:     nil,
-		handler:  osdDiscoveryHandler,
-	},
-	keyOSDDump: {
-		commands: []command{cmdOSDDump},
-		args:     nil,
-		handler:  osdDumpHandler,
-	},
-	keyPing: {
-		commands: []command{cmdHealth},
-		args:     nil,
-		handler:  pingHandler,
-	},
-	keyPoolDiscovery: {
-		commands: []command{cmdOSDDump, cmdOSDCrushRuleDump},
-		args:     nil,
-		handler:  poolDiscoveryHandler,
-	},
-	keyStatus: {
-		commands: []command{cmdStatus},
-		args:     nil,
-		handler:  statusHandler,
-	},
-}
 
 var uriDefaults = &uri.Defaults{Scheme: "https", Port: "8003"}
 
@@ -91,37 +34,26 @@ var (
 )
 
 var metrics = metric.MetricSet{
-	keyDf: metric.New("Returns information about cluster’s data usage and distribution among pools.",
+	string(handlers.KeyDf): metric.New("Returns information about cluster’s data usage and distribution among pools.",
 		[]*metric.Param{paramURI, paramUsername, paramAPIKey}, false),
 
-	keyOSD: metric.New("Returns aggregated and per OSD statistics.",
+	string(handlers.KeyOSD): metric.New("Returns aggregated and per OSD statistics.",
 		[]*metric.Param{paramURI, paramUsername, paramAPIKey}, false),
 
-	keyOSDDiscovery: metric.New("Returns a list of discovered OSDs.",
+	string(handlers.KeyOSDDiscovery): metric.New("Returns a list of discovered OSDs.",
 		[]*metric.Param{paramURI, paramUsername, paramAPIKey}, false),
 
-	keyOSDDump: metric.New("Returns usage thresholds and statuses of OSDs.",
+	string(handlers.KeyOSDDump): metric.New("Returns usage thresholds and statuses of OSDs.",
 		[]*metric.Param{paramURI, paramUsername, paramAPIKey}, false),
 
-	keyPing: metric.New("Tests if a connection is alive or not.",
+	string(handlers.KeyPing): metric.New("Tests if a connection is alive or not.",
 		[]*metric.Param{paramURI, paramUsername, paramAPIKey}, false),
 
-	keyPoolDiscovery: metric.New("Returns a list of discovered pools.",
+	string(handlers.KeyPoolDiscovery): metric.New("Returns a list of discovered pools.",
 		[]*metric.Param{paramURI, paramUsername, paramAPIKey}, false),
 
-	keyStatus: metric.New("Returns an overall cluster's status.",
+	string(handlers.KeyStatus): metric.New("Returns an overall cluster's status.",
 		[]*metric.Param{paramURI, paramUsername, paramAPIKey}, false),
-}
-
-type command string
-
-// handlerFunc defines an interface must be implemented by handlers.
-type handlerFunc func(data map[command][]byte) (res any, err error)
-
-type metricMeta struct {
-	commands []command
-	args     map[string]string
-	handler  handlerFunc
 }
 
 func init() {
@@ -129,9 +61,4 @@ func init() {
 	if err != nil {
 		panic(errs.Wrap(err, "failed to register metrics"))
 	}
-}
-
-// handle runs metric's handler.
-func (m *metricMeta) handle(data map[command][]byte) (res any, err error) {
-	return m.handler(data)
 }

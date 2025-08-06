@@ -12,7 +12,7 @@
 ** If not, see <https://www.gnu.org/licenses/>.
 **/
 
-package ceph
+package handlers
 
 import (
 	"encoding/json"
@@ -39,7 +39,7 @@ func Test_osdHandler(t *testing.T) {
 	}
 
 	type args struct {
-		data map[command][]byte
+		data map[Command][]byte
 	}
 	tests := []struct {
 		name    string
@@ -48,14 +48,14 @@ func Test_osdHandler(t *testing.T) {
 		wantErr bool
 	}{
 		{
-			"Must parse an output of " + cmdPgDump + "command",
-			args{map[command][]byte{cmdPgDump: fixtures[cmdPgDump]}},
+			string("Must parse an output of " + cmdPgDump + "Command"),
+			args{map[Command][]byte{cmdPgDump: fixtures[cmdPgDump]}},
 			string(success),
 			false,
 		},
 		{
 			"Must fail on malformed input",
-			args{map[command][]byte{cmdPgDump: fixtures[cmdBroken]}},
+			args{map[Command][]byte{cmdPgDump: fixtures[cmdBroken]}},
 			nil,
 			true,
 		},
@@ -76,7 +76,7 @@ func Test_osdHandler(t *testing.T) {
 
 func Benchmark_osdHandler(b *testing.B) {
 	for i := 0; i < b.N; i++ {
-		_, _ = osdHandler(map[command][]byte{cmdPgDump: fixtures[cmdPgDump]})
+		_, _ = osdHandler(map[Command][]byte{cmdPgDump: fixtures[cmdPgDump]})
 	}
 }
 

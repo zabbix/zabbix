@@ -20,6 +20,7 @@ import (
 	"net/http"
 	"time"
 
+	"golang.zabbix.com/agent2/plugins/ceph/handlers"
 	"golang.zabbix.com/sdk/metric"
 	"golang.zabbix.com/sdk/plugin"
 	"golang.zabbix.com/sdk/uri"
@@ -54,15 +55,17 @@ func (p *Plugin) Export(key string, rawParams []string, _ plugin.ContextProvider
 		return nil, err
 	}
 
-	meta := metricsMeta[key]
-	responses := make(map[command][]byte)
+	handlerKey := handlers.Key(key)
+
+	meta := handlers.GetMetricMeta(handlerKey)
+	responses := make(map[handlers.Command][]byte)
 
 	ctx, cancel := context.WithCancel(context.Background())
 	defer cancel()
 
 	resCh := asyncRequest(ctx, cancel, p.client, uri.String(), meta)
 
-	for range meta.commands {
+	for range meta.Commands {
 		r := <-resCh
 		if r.err != nil {
 			if err == nil {
@@ -72,20 +75,20 @@ func (p *Plugin) Export(key string, rawParams []string, _ plugin.ContextProvider
 			break
 		}
 
-		responses[command(r.cmd)] = r.data
+		responses[r.command] = r.data
 	}
 
 	if err != nil {
 		// Special logic of processing connection errors is used if keyPing is requested
 		// because it must return pingFailed if any error occurred.
-		if key == keyPing {
-			return pingFailed, nil
+		if handlerKey == handlers.KeyPing {
+			return handlers.PingFailed, nil
 		}
 
 		return nil, err
 	}
 
-	result, err = meta.handle(responses)
+	result, err = meta.Handle(responses)
 	if err != nil {
 		p.Errf(err.Error())
 	}
