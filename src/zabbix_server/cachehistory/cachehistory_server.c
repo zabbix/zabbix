@@ -1786,7 +1786,7 @@ int	zbx_hc_check_proxy(zbx_uint64_t proxyid, int pending_history)
 
 	if (0 == zbx_hc_proxyqueue_peek())
 	{
-		if (60 < hc_pused && 0 != pending_history)
+		if (60 < hc_pused && ZBX_PROXY_PENDING_HISTORY_YES == pending_history)
 		{
 			if (SUCCEED == (stats_retrieved = zbx_hc_check_high_usage_timer()))
 			{
