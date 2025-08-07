@@ -200,14 +200,26 @@ static int	macro_normal_script_resolv(zbx_macro_resolv_data_t *p, va_list args, 
 
 		c_event = ((NULL != r_event) ? r_event : event);
 
-		if (EVENT_SOURCE_TRIGGERS == c_event->source && NULL != userid)
+		if (EVENT_SOURCE_TRIGGERS == c_event->source)
 		{
-			if (0 == strcmp(p->macro, MVAR_USER_USERNAME) || 0 == strcmp(p->macro, MVAR_USER_NAME) ||
+			if (NULL != userid && (0 == strcmp(p->macro, MVAR_USER_USERNAME) ||
+					0 == strcmp(p->macro, MVAR_USER_NAME) ||
 					0 == strcmp(p->macro, MVAR_USER_SURNAME) ||
 					0 == strcmp(p->macro, MVAR_USER_FULLNAME) ||
-					0 == strcmp(p->macro, MVAR_USER_ALIAS))
+					0 == strcmp(p->macro, MVAR_USER_ALIAS)))
 			{
 				resolve_user_macros(*userid, p->macro, user_names, user_names_found, replace_to);
+			}
+			else if (0 == strcmp(p->macro, MVAR_EVENT_UPDATE_STATUS))
+			{
+				*replace_to = zbx_strdup(*replace_to, "0");
+			}
+		}
+		else if (0 == p->indexed && EVENT_SOURCE_SERVICE == c_event->source)
+		{
+			if (0 == strcmp(p->macro, MVAR_EVENT_UPDATE_STATUS))
+			{
+				*replace_to = zbx_strdup(*replace_to, "0");
 			}
 		}
 	}
