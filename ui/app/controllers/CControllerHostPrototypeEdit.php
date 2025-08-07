@@ -234,7 +234,6 @@ class CControllerHostPrototypeEdit extends CController {
 			])
 			: [];
 
-
 		if ($this->hasInput('clone')) {
 			$data['groups'] = [];
 			$data['host_prototype']['host'] = $this->getInput('host', '');
