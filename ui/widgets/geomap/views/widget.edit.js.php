@@ -38,4 +38,4 @@ window.widget_form = new class extends CWidgetForm {
 			this._form.querySelector('[name="clustering_zoom_level"]').value = 0;
 		}
 	}
-};
+}
