@@ -1904,7 +1904,7 @@ class testFormAdministrationMediaTypes extends CWebTest {
 	 * 		2 - Refresh token contain valid value;
 	 * 		3 - Both tokens contain valid value.
 	 */
-	public function testFormAdministrationMediaTypes_InvalidRefreshToken() {
+	public function testFormAdministrationMediaTypes_TokenStatus() {
 		$this->page->login()->open('zabbix.php?action=mediatype.list')->waitUntilReady();
 
 		foreach (['Generic SMTP OAuth', 'Gmail OAuth', 'Gmail relay OAuth', 'Office365 OAuth'] as $name) {
@@ -1925,5 +1925,71 @@ class testFormAdministrationMediaTypes extends CWebTest {
 				COverlayDialogElement::find()->one()->close();
 			}
 		}
+	}
+
+	public function getTimeIntervalData() {
+		return [
+			[
+				[
+					'access_token_updated' => strtotime('now')
+				]
+			],
+			[
+				[
+					'access_token_updated' => strtotime('-2 minutes -5 seconds')
+				]
+			],
+			[
+				[
+					'access_token_updated' => strtotime('-3 hours -2 minutes')
+				]
+			],
+			[
+				[
+					'access_token_updated' => strtotime('-4 days -5 hours -4 minutes -3 seconds')
+				]
+			],
+			[
+				[
+					'access_token_updated' => strtotime('-2 weeks -1 day -1 hour -1 minute -1 second')
+				]
+			],
+			[
+				[
+					'access_token_updated' => strtotime('-2 months -3 weeks -5 days -2 hours -4 minutes -3 seconds')
+				]
+			],
+			[
+				[
+					'access_token_updated' => strtotime('-1 year -1 month -1 week -1 day -1 hour 1 minute -1 second')
+				]
+			]
+		];
+	}
+
+	/**
+	 * Check OAuth tokens configured time.
+	 *
+	 * @dataProvider getTimeIntervalData
+	 */
+	public function testFormAdministrationMediaTypes_ConfiguredTime($data) {
+		DBexecute('UPDATE media_type_oauth SET access_token_updated='.$data['access_token_updated'].' WHERE mediatypeid='.
+				self::$mediatypeids['Generic SMTP OAuth']
+		);
+		$this->page->login()->open('zabbix.php?action=popup&popup=mediatype.edit&mediatypeid='.self::$mediatypeids['Generic SMTP OAuth'])
+				->waitUntilReady();
+		$form = COverlayDialogElement::find()->asForm()->one()->waitUntilReady();
+
+		// Check configured time taking into account that page and form opening could take extra time.
+		$reference_uptime = [];
+		for ($i = -1; $i <= 1; $i++) {
+			$reference_uptime[] = convertUnitsS(time() - $data['access_token_updated'] + $i);
+		}
+
+		// Remove text from both sides and compare token uptime results.
+		$uptime = preg_replace('/^Configured | ago$/', '', $form->query('id:js-oauth-status')->one()->getText());
+		$this->assertTrue(in_array($uptime, $reference_uptime), $uptime.' is not among values '.implode(', ', $reference_uptime));
+
+		COverlayDialogElement::find()->one()->close();
 	}
 }
