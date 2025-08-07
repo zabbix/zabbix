@@ -44,8 +44,9 @@ if ($host_is_discovered) {
 	if ($data['host']['discoveryRule']) {
 		if ($data['is_discovery_rule_editable']) {
 			$discovery_rule = (new CLink($data['host']['discoveryRule']['name'],
-				(new CUrl('host_prototypes.php'))
-					->setArgument('form', 'update')
+				(new CUrl('zabbix.php'))
+					->setArgument('action', 'popup')
+					->setArgument('popup', 'host.prototype.edit')
 					->setArgument('parent_discoveryid', $data['host']['discoveryRule']['itemid'])
 					->setArgument('hostid', $data['host']['discoveryData']['parent_hostid'])
 					->setArgument('context', 'host')
@@ -482,7 +483,6 @@ $macro_row_tmpl = (new CTemplateTag('macro-row-tmpl'))
 				->addClass(ZBX_STYLE_ERROR_CONTAINER)
 				->setColSpan(4)
 		)
-
 	);
 
 $macro_row_inherited_tmpl = (new CTemplateTag('macro-row-tmpl-inherited'))

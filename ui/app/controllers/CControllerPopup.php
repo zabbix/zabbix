@@ -46,6 +46,7 @@ class CControllerPopup extends CController {
 			'graph.edit' => _('Graph edit'),
 			'graph.prototype.edit' => _('Graph prototype edit'),
 			'host.edit' => _('Host edit'),
+			'host.prototype.edit' => _('Host prototype edit'),
 			'host.wizard.edit' => _('Host Wizard'),
 			'hostgroup.edit' => _('Host group edit'),
 			'item.edit' => _('Item edit'),

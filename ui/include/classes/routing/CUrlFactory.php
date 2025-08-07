@@ -28,10 +28,6 @@ class CUrlFactory {
 			'remove' => ['itemid'],
 			'add' => ['hostid']
 		],
-		'host_prototypes.php' => [
-			'remove' => ['hostid'],
-			'add' => ['parent_discoveryid']
-		],
 		'httpconf.php' => [
 			'remove' => ['httptestid']
 		],

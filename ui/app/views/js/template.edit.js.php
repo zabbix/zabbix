@@ -92,6 +92,7 @@ window.template_edit_popup = new class {
 		this.macros_manager = new HostMacrosManager({
 			container: $('#template_macros_container .table-forms-td-right'),
 			source: 'template',
+			has_inline_validation: 1,
 			load_callback: () => {
 				this.form.discoverAllFields();
 
