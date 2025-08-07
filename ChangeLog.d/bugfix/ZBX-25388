@@ -1,1 +1,1 @@
-A......... [ZBX-25388] fixed xml template import constant displaying that discard_unchanges was changed (aluchko)
+A......... [ZBX-25388] prevented displaying of parameter values not involved in import in the response of configuration.importcompare API method (aluchko)
