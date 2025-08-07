@@ -26,7 +26,7 @@ import (
 
 var unitLogger = log.New("unit test logger")
 
-func TestConnManager_closeUnused(t *testing.T) {
+func TestManager_CloseUnused(t *testing.T) {
 	connMgr := NewManager(unitLogger, 1*time.Microsecond, 30*time.Second, HouseKeeperInterval*time.Second)
 	defer connMgr.Destroy()
 
@@ -42,7 +42,7 @@ func TestConnManager_closeUnused(t *testing.T) {
 	})
 }
 
-func TestConnManager_closeAll(t *testing.T) {
+func TestManager_CloseAll(t *testing.T) {
 	connMgr := NewManager(unitLogger, 300*time.Second, 30*time.Second, HouseKeeperInterval*time.Second)
 	defer connMgr.Destroy()
 
@@ -58,13 +58,13 @@ func TestConnManager_closeAll(t *testing.T) {
 	})
 }
 
-func TestConnManager_create(t *testing.T) {
+func TestManager_Create(t *testing.T) {
 	u, _ := uri.New("tcp://127.0.0.1", nil)
 
 	connMgr := NewManager(unitLogger, 300*time.Second, 30*time.Second, HouseKeeperInterval*time.Second)
 	defer connMgr.Destroy()
 
-	connMgr.connections[u] = NewRedisConn(radix.Stub("", "", nil))
+	connMgr.connections[*u] = NewRedisConn(radix.Stub("", "", nil))
 
 	type args struct {
 		uri *uri.URI
@@ -113,7 +113,7 @@ func TestConnManager_create(t *testing.T) {
 	}
 }
 
-func TestConnManager_get(t *testing.T) {
+func TestManager_Get(t *testing.T) {
 	u, _ := uri.New("tcp://127.0.0.1", nil)
 
 	connMgr := NewManager(unitLogger, 300*time.Second, 30*time.Second, HouseKeeperInterval*time.Second)
@@ -131,7 +131,7 @@ func TestConnManager_get(t *testing.T) {
 		lastTimeAccess: lastTimeAccess,
 	}
 
-	connMgr.connections[u] = conn
+	connMgr.connections[*u] = conn
 
 	t.Run("Should return connection if it exists", func(t *testing.T) {
 		got := connMgr.get(u)

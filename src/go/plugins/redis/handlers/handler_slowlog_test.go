@@ -23,7 +23,7 @@ import (
 	"golang.zabbix.com/agent2/plugins/redis/conn"
 )
 
-func Test_getLastSlowlogId(t *testing.T) {
+func TestGetLastSlowlogID(t *testing.T) {
 	type args struct {
 		slowlog slowlog
 	}
@@ -88,7 +88,7 @@ func Test_getLastSlowlogId(t *testing.T) {
 	}
 }
 
-func TestPlugin_slowlogHandler(t *testing.T) {
+func TestSlowlogHandler(t *testing.T) {
 	stubConn := radix.Stub("", "", func(args []string) any {
 		return errors.New("cannot fetch data")
 	})

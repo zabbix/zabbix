@@ -53,7 +53,7 @@ connected_slaves:0`
 test:111`
 )
 
-func Test_parseRedisInfo(t *testing.T) {
+func TestParseRedisInfo(t *testing.T) {
 	type args struct {
 		info string
 	}
@@ -61,7 +61,7 @@ func Test_parseRedisInfo(t *testing.T) {
 	tests := []struct {
 		name    string
 		args    args
-		wantRes redisInfoMap
+		wantRes redisInfo
 		wantErr bool
 	}{
 		{
@@ -85,7 +85,7 @@ func Test_parseRedisInfo(t *testing.T) {
 		{
 			`Parse of output of "info CommonSection" command`,
 			args{infoCommonSectionOutput},
-			redisInfoMap{
+			redisInfo{
 				"CommonSection": infoKeySpace{
 					"foo": "123", "bar": "0.00",
 				},
@@ -95,7 +95,7 @@ func Test_parseRedisInfo(t *testing.T) {
 		{
 			`Parse of output of "info Commandstats" command`,
 			args{infoExtendedSectionOutput},
-			redisInfoMap{
+			redisInfo{
 				"Commandstats": infoKeySpace{
 					"cmdstat_info": infoExtKeySpace{
 						"calls":         "11150",
@@ -114,7 +114,7 @@ func Test_parseRedisInfo(t *testing.T) {
 		{
 			`Parse of output of "info Replication" command for Master role`,
 			args{infoMasterReplicationOutput},
-			redisInfoMap{
+			redisInfo{
 				"Replication": infoKeySpace{
 					"role":             "master",
 					"connected_slaves": "1",
@@ -133,7 +133,7 @@ func Test_parseRedisInfo(t *testing.T) {
 		{
 			`Parse of output of "info Replication" command for Slave role`,
 			args{infoSlaveReplicationOutput},
-			redisInfoMap{
+			redisInfo{
 				"Replication": infoKeySpace{
 					"role":              "slave",
 					"master_host":       "redis-master",
@@ -161,19 +161,19 @@ func Test_parseRedisInfo(t *testing.T) {
 	}
 }
 
-func Benchmark_parseRedisInfo_Common(b *testing.B) {
+func BenchmarkParseRedisInfo_Common(b *testing.B) {
 	for i := 0; i < b.N; i++ {
 		_, _ = parseRedisInfo(infoExtendedSectionOutput)
 	}
 }
 
-func Benchmark_parseRedisInfo_Extended(b *testing.B) {
+func BenchmarkParseRedisInfo_Extended(b *testing.B) {
 	for i := 0; i < b.N; i++ {
 		_, _ = parseRedisInfo(infoCommonSectionOutput)
 	}
 }
 
-func TestPlugin_infoHandler(t *testing.T) {
+func TestHandlers_InfoHandler(t *testing.T) {
 	stubConn := radix.Stub("", "", func(args []string) any {
 		switch args[1] {
 		case "commonsection":

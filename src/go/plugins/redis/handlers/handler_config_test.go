@@ -24,7 +24,7 @@ import (
 	"golang.zabbix.com/agent2/plugins/redis/conn"
 )
 
-func TestPlugin_configHandler(t *testing.T) {
+func TestConfigHandler(t *testing.T) {
 	stubConn := radix.Stub("", "", func(args []string) any {
 		switch strings.ToLower(args[2]) {
 		case "param1":

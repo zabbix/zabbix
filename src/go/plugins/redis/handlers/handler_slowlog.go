@@ -56,7 +56,7 @@ func SlowlogHandler(redisClient conn.RedisClient, _ map[string]string) (any, err
 		return nil, errs.WrapConst(err, zbxerr.ErrorCannotFetchData)
 	}
 
-	lastID, err := getLastSlowlogID(slowlog(res))
+	lastID, err := getLastSlowlogID(res)
 
 	return lastID, err
 }

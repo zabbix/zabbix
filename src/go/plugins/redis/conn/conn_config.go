@@ -36,7 +36,7 @@ func getTLSConfig(redisURI *uri.URI, params map[string]string) (*tls.Config, err
 	details := tlsconfig.NewDetails(
 		"",
 		redisURI.String(),
-		//tlsconfig.WithTLSServerName(redisURI.Host()), only required at the verify_full
+		tlsconfig.WithTLSServerName(redisURI.Host()),
 		tlsconfig.WithTLSConnect(string(tlsConnectionType)),
 		tlsconfig.WithTLSCaFile(params[string(comms.TLSCAFile)]),
 		tlsconfig.WithTLSCertFile(params[string(comms.TLSCertFile)]),
@@ -54,10 +54,16 @@ func getTLSConfig(redisURI *uri.URI, params map[string]string) (*tls.Config, err
 	case comms.Disabled:
 		return nil, errTLSDisabled
 	case comms.Required:
-		details.Apply(tlsconfig.WithTLSSkipVerify(true))
+		details.Apply(tlsconfig.WithSkipDefaultTLSVerification(true))
 	case comms.VerifyCA:
+		details.Apply(
+			tlsconfig.WithTLSServerName(""),
+			// eliminate default config check to use custom which ignores SAN
+			tlsconfig.WithSkipDefaultTLSVerification(true),
+			tlsconfig.WithCustomTLSVerification(tlsconfig.VerifyPeerCertificateFunc("", nil)),
+		)
+
 	case comms.VerifyFull:
-		details.Apply(tlsconfig.WithTLSServerName(redisURI.Host()))
 
 	default:
 		return nil, errs.New("unsupported TLS connection type: " + string(tlsConnectionType))

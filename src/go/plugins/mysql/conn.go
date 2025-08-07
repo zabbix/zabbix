@@ -75,7 +75,7 @@ type connectionManagerOptions struct {
 }
 
 type connKey struct {
-	uri        *uri.URI
+	uri        uri.URI
 	rawUri     string
 	tlsConnect string
 	tlsCA      string
@@ -228,7 +228,7 @@ func (c *ConnManager) create(ck connKey) (*MyConn, error) {
 		return nil, err
 	}
 
-	config, err := getMySQLConfig(ck.uri, tlsConfig, c.connectTimeout, c.callTimeout)
+	config, err := getMySQLConfig(&ck.uri, tlsConfig, c.connectTimeout, c.callTimeout)
 	if err != nil {
 		return nil, err
 	}
@@ -326,7 +326,7 @@ func (c *ConnManager) getTLSConfig(details *tlsconfig.Details) (*tls.Config, err
 		tlsConf = &tls.Config{InsecureSkipVerify: true} //nolint:gosec //intended behaviour
 	case "verify_ca":
 		details.Apply(
-			tlsconfig.WithTLSSkipVerify(true),
+			tlsconfig.WithSkipDefaultTLSVerification(true),
 			tlsconfig.WithTLSServerName(""),
 		)
 
@@ -357,7 +357,7 @@ func createConnKey(uri *uri.URI, params map[string]string) connKey {
 	}
 
 	return connKey{
-		uri:        uri,
+		uri:        *uri,
 		rawUri:     params[uriParam],
 		tlsConnect: tlsType,
 		tlsCA:      params[tlsCAParam],
