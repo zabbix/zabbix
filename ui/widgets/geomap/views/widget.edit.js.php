@@ -29,17 +29,13 @@ window.widget_form = new class extends CWidgetForm {
 	}
 
 	#updateForm() {
-		const is_clustering_mode_manual = this._form.querySelector('[name="clustering_mode"]:checked')
-			.value === '<?= Widget::CLUSTERING_MODE_MANUAL ?>';
+		const is_clustering_mode_auto = this._form.querySelector('[name="clustering_mode"]:checked')
+			.value === '<?= Widget::CLUSTERING_MODE_AUTO ?>';
 
-		const clustering_zoom_level_element = document.getElementById('clustering_zoom_level');
-		clustering_zoom_level_element.hidden = !is_clustering_mode_manual;
-		clustering_zoom_level_element.value = is_clustering_mode_manual ? clustering_zoom_level_element.value : 0;
+		this._form.querySelector('.js-zoom-level-field').hidden = is_clustering_mode_auto;
 
-		/*const clustering_zoom_level_input_container = this._form.querySelector('.js-zoom-level-field');
-		const clustering_zoom_level_input = clustering_zoom_level_input_container.querySelector('input');
-
-		clustering_zoom_level_input_container.hidden = !is_clustering_mode_manual;
-		clustering_zoom_level_input.value = is_clustering_mode_manual ? clustering_zoom_level_input.value : 0;*/
+		if (is_clustering_mode_auto) {
+			this._form.querySelector('[name="clustering_zoom_level"]').value = 0;
+		}
 	}
 };

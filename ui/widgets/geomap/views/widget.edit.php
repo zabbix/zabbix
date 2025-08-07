@@ -64,6 +64,6 @@ function getClusteringFieldsGroupView(array $fields): CWidgetFieldsGroupView {
 		->addField(
 			(new CWidgetFieldIntegerBoxView($fields['clustering_zoom_level']))
 				->removeLabel()
-				//->addClass('js-zoom-level-field')
+				->addClass('js-zoom-level-field')
 		);
 }
