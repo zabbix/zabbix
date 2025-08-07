@@ -603,7 +603,8 @@ static zbx_uint64_t	add_discovered_host(const zbx_db_event *event, int *status, 
 			zbx_db_free_result(result2);
 
 			sql = zbx_dsprintf(sql,
-					"select hostid,proxyid,name,status,proxy_groupid,monitored_by"
+					"select hostid,proxyid,name,status,proxy_groupid,monitored_by,tls_connect,"
+					"tls_accept,tls_psk_identity,tls_psk"
 					" from hosts"
 					" where host='%s'"
 						" and flags&%d=0"
@@ -683,6 +684,9 @@ static zbx_uint64_t	add_discovered_host(const zbx_db_event *event, int *status, 
 			{
 				zbx_uint64_t	proxy_groupid;
 				unsigned char	monitored_by;
+				int		host_tls_connect, host_tls_accept;
+				char		host_tls_psk_identity[HOST_TLS_PSK_IDENTITY_LEN_MAX];
+				char		host_tls_psk[HOST_TLS_PSK_LEN_MAX];
 
 				ZBX_STR2UINT64(hostid, row2[0]);
 				ZBX_DBROW2UINT64(host_proxyid, row2[1]);
@@ -690,6 +694,15 @@ static zbx_uint64_t	add_discovered_host(const zbx_db_event *event, int *status, 
 				*status = atoi(row2[3]);
 				ZBX_DBROW2UINT64(proxy_groupid, row2[4]);
 				ZBX_STR2UCHAR(monitored_by, row2[5]);
+				host_tls_connect = atoi(row2[6]);
+				host_tls_accept = atoi(row2[7]);
+				zbx_strlcpy(host_tls_psk_identity, ZBX_NULL2EMPTY_STR(row2[8]),
+						sizeof(host_tls_psk_identity));
+				zbx_strlcpy(host_tls_psk, ZBX_NULL2EMPTY_STR(row2[9]), sizeof(host_tls_psk));
+
+				zabbix_log(LOG_LEVEL_WARNING, "AUTOREG DEBUG: hostid=" ZBX_FS_UI64
+						" host_tls_connect=%d host_tls_accept=%d tls_accepted=%d",
+						hostid, host_tls_connect, host_tls_accept, tls_accepted);
 
 				zbx_audit_host_create_entry(zbx_map_db_event_to_audit_context(event),
 						ZBX_AUDIT_ACTION_UPDATE, hostid, hostname);
@@ -754,6 +767,48 @@ static zbx_uint64_t	add_discovered_host(const zbx_db_event *event, int *status, 
 
 					(void)zbx_db_execute("%s", sql);
 					zbx_free(sql);
+				}
+				/* Update TLS parameters if needed */
+				if (host_tls_connect != tls_accepted || host_tls_accept != tls_accepted)
+				{
+					char	*sql_tls = NULL;
+					size_t	sql_tls_alloc = 0, sql_tls_offset = 0;
+
+					if (ZBX_TCP_SEC_TLS_PSK == tls_accepted)
+					{
+						char	psk_identity[HOST_TLS_PSK_IDENTITY_LEN_MAX],
+						psk[HOST_TLS_PSK_LEN_MAX];
+						char	*psk_identity_esc, *psk_esc;
+
+						zbx_dc_get_autoregistration_psk(psk_identity, sizeof(psk_identity),
+								(unsigned char *)psk, sizeof(psk));
+
+						psk_identity_esc = zbx_db_dyn_escape_string(psk_identity);
+						psk_esc = zbx_db_dyn_escape_string(psk);
+
+						zbx_snprintf_alloc(&sql_tls, &sql_tls_alloc, &sql_tls_offset,
+								"update hosts set tls_connect=%d,tls_accept=%d,"
+									"tls_psk_identity='%s',tls_psk='%s'"
+								" where hostid=" ZBX_FS_UI64,
+								tls_accepted, tls_accepted, psk_identity_esc, psk_esc,
+								hostid);
+
+						zbx_free(psk_identity_esc);
+						zbx_free(psk_esc);
+					}
+					else
+					{
+						zbx_snprintf_alloc(&sql_tls, &sql_tls_alloc, &sql_tls_offset,
+								"update hosts set tls_connect=%d,tls_accept=%d,"
+									"tls_psk_identity='',tls_psk=''"
+								" where hostid=" ZBX_FS_UI64,
+								tls_accepted, tls_accepted, hostid);
+					}
+
+					zabbix_log(LOG_LEVEL_WARNING, "AUTOREG DEBUG: Executing TLS update SQL: %s",
+							sql_tls);
+					(void)zbx_db_execute("%s", sql_tls);
+					zbx_free(sql_tls);
 				}
 
 				zbx_db_add_interface(hostid, INTERFACE_TYPE_AGENT, useip, row[2], row[3], port, flags,

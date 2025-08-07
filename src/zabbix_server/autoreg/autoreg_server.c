@@ -61,7 +61,7 @@ static void	autoreg_process_hosts_server(zbx_vector_autoreg_host_ptr_t *autoreg_
 	sql_offset = 0;
 	zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset,
 			"select h.host,h.hostid,h.proxyid,a.host_metadata,a.listen_ip,a.listen_dns,"
-				"a.listen_port,a.flags,a.proxyid,h.monitored_by,h.proxy_groupid"
+				"a.listen_port,a.flags,a.proxyid,h.monitored_by,h.proxy_groupid,a.tls_accepted"
 			" from hosts h"
 			" left join autoreg_host a"
 				" on a.host=h.host"
@@ -84,9 +84,12 @@ static void	autoreg_process_hosts_server(zbx_vector_autoreg_host_ptr_t *autoreg_
 				break;
 
 			ZBX_STR2UINT64(autoreg_host->hostid, row[1]);
+			/* check if TLS settings have changed */
+			unsigned int current_tls_accepted = (SUCCEED == zbx_db_is_null(row[11])) ? 1 : atoi(row[11]);
 
 			if (0 != strcmp(autoreg_host->host_metadata, row[3]) ||
-					autoreg_host->flag != atoi(row[7]))
+					autoreg_host->flag != atoi(row[7]) ||
+					autoreg_host->connection_type != current_tls_accepted)
 				break;
 
 			/* process with autoregistration if the connection type was forced and */
@@ -313,6 +316,20 @@ void	zbx_autoreg_flush_hosts_server(zbx_vector_autoreg_host_ptr_t *autoreg_hosts
 		zbx_db_execute("%s", sql);
 		zbx_free(sql);
 	}
+	/* update TLS settings in hosts table for existing hosts */
+	for (int i = 0; i < autoreg_hosts->values_num; i++)
+	{
+		autoreg_host = autoreg_hosts->values[i];
+
+		if (0 != autoreg_host->hostid)
+		{
+			/* update tls_accept in hosts table to match the new connection type */
+			unsigned char tls_accept = (unsigned char)autoreg_host->connection_type;
+
+			zbx_db_execute("update hosts set tls_accept=%u where hostid=" ZBX_FS_UI64,
+					tls_accept, autoreg_host->hostid);
+		}
+	}
 
 	zbx_vector_autoreg_host_ptr_sort(autoreg_hosts, compare_autoreg_host_by_hostid);
 
@@ -389,7 +406,8 @@ void	zbx_autoreg_update_host_server(const zbx_dc_proxy_t *proxy, const char *hos
 	zbx_db_begin();
 	zbx_autoreg_flush_hosts_server(&autoreg_hosts, proxy, events_cbs);
 	zbx_db_commit();
-
+	/* invalidate cache to force immediate reload of host TLS settings */
+	zbx_autoreg_host_invalidate_cache(&autoreg_hosts);
 	zbx_vector_autoreg_host_ptr_clear_ext(&autoreg_hosts, zbx_autoreg_host_free_server);
 	zbx_vector_autoreg_host_ptr_destroy(&autoreg_hosts);
 }

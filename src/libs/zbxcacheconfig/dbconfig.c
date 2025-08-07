@@ -1100,7 +1100,8 @@ static void	DCsync_autoreg_host(zbx_dbsync_t *sync)
 
 	while (SUCCEED == zbx_dbsync_next(sync, &rowid, &row, &tag))
 	{
-		ZBX_DC_AUTOREG_HOST	*autoreg_host, autoreg_host_local = {.host = row[0]};
+		ZBX_DC_AUTOREG_HOST	*autoreg_host, autoreg_host_local = {.host = row[0],
+				.tls_accepted = ZBX_TCP_SEC_UNENCRYPTED};
 		int			found;
 
 		autoreg_host = (ZBX_DC_AUTOREG_HOST *)zbx_hashset_search(&config->autoreg_hosts, &autoreg_host_local);
@@ -1123,6 +1124,7 @@ static void	DCsync_autoreg_host(zbx_dbsync_t *sync)
 		dc_strpool_replace(found, &autoreg_host->host_metadata, row[3]);
 		autoreg_host->flags = atoi(row[4]);
 		autoreg_host->listen_port = atoi(row[5]);
+		autoreg_host->tls_accepted = atoi(row[6]);
 		autoreg_host->timestamp = 0;
 	}
 
@@ -9061,7 +9063,7 @@ int	zbx_dc_check_host_conn_permissions(const char *host, const zbx_socket_t *soc
 }
 
 int	zbx_dc_is_autoreg_host_changed(const char *host, unsigned short port, const char *host_metadata,
-		zbx_conn_flags_t flag, const char *interface, int now)
+		zbx_conn_flags_t flag, const char *interface, int now, unsigned int connection_type)
 {
 #define AUTO_REGISTRATION_HEARTBEAT	120
 
@@ -9096,6 +9098,10 @@ int	zbx_dc_is_autoreg_host_changed(const char *host, unsigned short port, const 
 	{
 		ret = SUCCEED;
 	}
+	else if (dc_autoreg_host->tls_accepted != (int)connection_type)
+	{
+		ret = SUCCEED;
+	}
 	else
 		ret = FAIL;
 
@@ -9105,9 +9111,11 @@ int	zbx_dc_is_autoreg_host_changed(const char *host, unsigned short port, const 
 }
 
 void	zbx_dc_config_update_autoreg_host(const char *host, const char *listen_ip, const char *listen_dns,
-		unsigned short listen_port, const char *host_metadata, zbx_conn_flags_t flags, int now)
+		unsigned short listen_port, const char *host_metadata, zbx_conn_flags_t flags, int now,
+		unsigned int connection_type)
 {
-	ZBX_DC_AUTOREG_HOST	*dc_autoreg_host, dc_autoreg_host_local = {.host = host};
+	ZBX_DC_AUTOREG_HOST	*dc_autoreg_host, dc_autoreg_host_local = {.host = host,
+			.tls_accepted = ZBX_TCP_SEC_UNENCRYPTED};
 	int			found;
 
 	WRLOCK_CACHE;
@@ -9118,6 +9126,7 @@ void	zbx_dc_config_update_autoreg_host(const char *host, const char *listen_ip, 
 		found = 0;
 		dc_autoreg_host = zbx_hashset_insert(&config->autoreg_hosts, &dc_autoreg_host_local,
 				sizeof(ZBX_DC_AUTOREG_HOST));
+		dc_autoreg_host->tls_accepted = ZBX_TCP_SEC_UNENCRYPTED;
 	}
 	else
 
@@ -9129,6 +9138,7 @@ void	zbx_dc_config_update_autoreg_host(const char *host, const char *listen_ip, 
 	dc_strpool_replace(found, &dc_autoreg_host->host_metadata, host_metadata);
 	dc_autoreg_host->flags = flags;
 	dc_autoreg_host->timestamp = now;
+	dc_autoreg_host->tls_accepted = connection_type;
 	dc_autoreg_host->listen_port = listen_port;
 
 	UNLOCK_CACHE;
