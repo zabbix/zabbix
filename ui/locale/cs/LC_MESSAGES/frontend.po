@@ -6894,6 +6894,10 @@ msgstr "Detaily web scénáře"
 msgid "Detected TimescaleDB license does not support compression. Compression is supported in TimescaleDB Community Edition."
 msgstr "Detekovaná licence TimescaleDB nepodporuje kompresi. Komprese je podporována v Komunitní edici TimescaleDB."
 
+#: app/views/administration.housekeeping.edit.php:204
+msgid "Detected license does not support compression. Compression is supported in TimescaleDB Community Edition."
+msgstr ""
+
 #: app/controllers/CControllerPopupTriggerExpr.php:1130
 msgid "Detection period"
 msgstr "Období detekce"
@@ -13438,6 +13442,11 @@ msgstr "Maximální počet řádků"
 msgid "Maximum required %1$s database version is %2$s."
 msgstr "Maximální požadovaná verze databáze %1$s je %2$s."
 
+#: app/partials/administration.system.info.php:221
+#, c-format
+msgid "Maximum required version is %1$s."
+msgstr ""
+
 #: app/controllers/CControllerTimeSelectorUpdate.php:136
 #: include/classes/mvc/CController.php:320
 #: include/classes/widgets/fields/CWidgetFieldTimePeriod.php:203
@@ -13777,6 +13786,12 @@ msgstr "Minimální požadovaný limit doby provádění PHP skriptu je %s (Nast
 msgid "Minimum required size of PHP post is %1$s (configuration option \"post_max_size\")."
 msgstr "Minimální požadovaný PHP upload limit je %s (Nastavení \"upload_max_filesize\")."
 
+#: app/partials/administration.system.info.php:212
+#: app/views/administration.housekeeping.edit.php:183
+#, c-format
+msgid "Minimum required version is %1$s."
+msgstr ""
+
 #: app/views/monitoring.map.view.php:48
 #: include/views/monitoring.sysmap.edit.php:276
 msgid "Minimum severity"
@@ -14009,6 +14024,16 @@ msgstr "Násobek"
 #: include/triggers.inc.php:611
 msgid "Multiple PROBLEM events"
 msgstr "Multiple PROBLEM události"
+
+#: app/partials/administration.system.info.php:235
+#, c-format
+msgid "Must be at least %1$s."
+msgstr ""
+
+#: app/partials/administration.system.info.php:254
+#, c-format
+msgid "Must not be higher than %1$s."
+msgstr ""
 
 #: jsLoader.php:284
 msgid "Mute"
@@ -19085,6 +19110,18 @@ msgstr "Krátký"
 msgid "Shortened"
 msgstr "Zkrácený"
 
+#: app/partials/administration.system.info.php:243
+#: app/views/administration.housekeeping.edit.php:187
+#, c-format
+msgid "Should be at least %1$s."
+msgstr ""
+
+#: app/partials/administration.system.info.php:262
+#: app/views/administration.housekeeping.edit.php:197
+#, c-format
+msgid "Should not be higher than %1$s."
+msgstr ""
+
 #: app/partials/monitoring.problem.filter.php:27
 #: app/views/monitoring.charts.view.php:80
 #: app/views/monitoring.dashboard.list.php:64
@@ -21665,6 +21702,14 @@ msgstr "Nelze získat stav podpory komprese TimescaleDB."
 msgid "Unable to retrieve TimescaleDB version."
 msgstr "Nelze získat verzi TimescaleDB."
 
+#: app/views/administration.housekeeping.edit.php:173
+msgid "Unable to retrieve compression support status of TimescaleDB time-series database extension for PostgreSQL."
+msgstr ""
+
+#: app/views/administration.housekeeping.edit.php:178
+msgid "Unable to retrieve version of TimescaleDB time-series database extension for PostgreSQL."
+msgstr ""
+
 #: include/views/mfa.login.php:65
 #, c-format
 msgid "Unable to scan? You can use %1$s secret key to manually configure your authenticator app:"
@@ -21942,6 +21987,11 @@ msgstr "Nepodporovaná verze databázového serveru %1$s. Musí být nejméně %
 #, c-format
 msgid "Unsupported %1$s database server version. Must not be higher than %2$s."
 msgstr "Nepodporovaná verze databázového serveru %1$s. Nesmí být vyšší než %2$s."
+
+#: app/partials/administration.system.info.php:206
+#: app/views/administration.housekeeping.edit.php:169
+msgid "Unsupported TimescaleDB time-series database extension for PostgreSQL is used."
+msgstr ""
 
 #: app/views/administration.housekeeping.edit.php:190
 #, c-format
@@ -23362,6 +23412,11 @@ msgstr "Varování"
 #: include/func.inc.php:1775 jsLoader.php:216
 msgid "Warning message"
 msgstr "Varovná zpráva"
+
+#: app/partials/administration.system.info.php:243
+#: app/partials/administration.system.info.php:262
+msgid "Warning!"
+msgstr ""
 
 #: app/partials/administration.system.info.php:198
 msgid "Warning! Support for Oracle DB is deprecated since Zabbix 7.0 and will be removed in future versions."
