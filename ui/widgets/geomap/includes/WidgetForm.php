@@ -60,19 +60,17 @@ class WidgetForm extends CWidgetForm {
 				new CWidgetFieldLatLng('default_view', _('Initial view'))
 			)
 			->addField(
-				new CWidgetFieldMultiSelectOverrideHost()
-			)
-			->addField($this->isTemplateDashboard()
-				? null
-				: (new CWidgetFieldRadioButtonList('clustering_mode', _('Clustering'), [
+				new CWidgetFieldRadioButtonList('clustering_mode', _('Clustering'), [
 					Widget::CLUSTERING_MODE_AUTO => _('Auto'),
 					Widget::CLUSTERING_MODE_MANUAL => _('Zoom level')
-				]))
+				])
 			)
-			->addField($this->isTemplateDashboard()
-				? null
-				: (new CWidgetFieldIntegerBox('clustering_zoom_level',  _('Zoom level'), 0, ZBX_GEOMAP_MAX_ZOOM))
+			->addField(
+				(new CWidgetFieldIntegerBox('clustering_zoom_level',  _('Zoom level'), 0, ZBX_GEOMAP_MAX_ZOOM))
 					->setFlags(CWidgetField::FLAG_NOT_EMPTY | CWidgetField::FLAG_LABEL_ASTERISK)
+			)
+			->addField(
+				new CWidgetFieldMultiSelectOverrideHost()
 			);
 	}
 }
