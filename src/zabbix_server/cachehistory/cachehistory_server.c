@@ -1791,7 +1791,7 @@ int	zbx_hc_check_proxy(zbx_uint64_t proxyid, int pending_history)
 			if (SUCCEED == (stats_retrieved = zbx_hc_check_high_usage_timer()))
 			{
 				zbx_vector_uint64_pair_create(&items);
-				zbx_hc_get_items(&items);
+				zbx_hc_get_items_unlocked(&items);
 			}
 
 			ret = FAIL;
@@ -1808,6 +1808,7 @@ out:
 
 	if (SUCCEED == stats_retrieved)
 	{
+		zabbix_log(LOG_LEVEL_WARNING, "Detected heavy usage of history cache (more than 60%% space used).");
 		zbx_hc_log_high_cache_usage(&items);
 		zbx_vector_uint64_pair_destroy(&items);
 	}

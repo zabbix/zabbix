@@ -165,13 +165,6 @@ typedef struct
 }
 dc_item_value_t;
 
-typedef enum
-{
-	ZBX_HC_CACHE_FULL,
-	ZBX_HC_CACHE_PRESSURED
-}
-zbx_hc_usage_message_context_t;
-
 static char		*string_values = NULL;
 static size_t		string_values_alloc = 0, string_values_offset = 0;
 static dc_item_value_t	*item_values = NULL;
@@ -3009,39 +3002,36 @@ static int	diag_compare_pair_second_desc(const void *d1, const void *d2)
  * Purpose: log history cache full message and top values                     *
  *                                                                            *
  ******************************************************************************/
-static void	hc_log_history_cache_usage(zbx_vector_uint64_pair_t *items, zbx_hc_usage_message_context_t ctx)
+static void	hc_log_history_cache_usage(zbx_vector_uint64_pair_t *items)
 {
-	int		limit;
-	char		*str = NULL;
-	const char	*log_msg;
-	size_t		str_alloc = 0, str_offset = 0;
-	double		*ts, time_now = zbx_time();
+	const char	*log_msg = "History cache is full. Sleeping for 1 second.";
+	double		time_now = zbx_time();
 
-	if (ZBX_HC_CACHE_FULL == ctx)
+	if (SEC_PER_MIN > time_now - cache->last_error_ts)
 	{
-		log_msg = "History cache is full. Sleeping for 1 second.";
-		ts = &cache->last_error_ts;
-	}
-	else if (ZBX_HC_CACHE_PRESSURED == ctx)
-	{
-		log_msg = "Detected heavy usage of history cache (more than 60%).";
-		ts = &cache->last_warning_ts;
-	}
-	else
+		zabbix_log(LOG_LEVEL_DEBUG, "%s", log_msg);
 		return;
-
-	if (ZBX_HC_CACHE_FULL == ctx)
-	{
-		if (SEC_PER_MIN > time_now - *ts)
-		{
-			zabbix_log(LOG_LEVEL_DEBUG, "%s", log_msg);
-			return;
-		}
-
-		*ts = time_now;
 	}
+
+	cache->last_error_ts = time_now;
 
 	zabbix_log(LOG_LEVEL_WARNING, "%s", log_msg);
+	zbx_hc_log_high_cache_usage(items);
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: log items with highest number of values in history cache when     *
+ *          cache usage is high                                               *
+ *                                                                            *
+ * Parameters: items - [IN] vector of itemid/value count pairs                *
+ *                                                                            *
+ ******************************************************************************/
+void	zbx_hc_log_high_cache_usage(zbx_vector_uint64_pair_t *items)
+{
+	int	limit;
+	char	*str = NULL;
+	size_t	str_alloc = 0, str_offset = 0;
 
 	zbx_vector_uint64_pair_sort(items, diag_compare_pair_second_desc);
 
@@ -3058,11 +3048,6 @@ static void	hc_log_history_cache_usage(zbx_vector_uint64_pair_t *items, zbx_hc_u
 	zabbix_log(LOG_LEVEL_WARNING, "%s", str);
 
 	zbx_free(str);
-}
-
-void	zbx_hc_log_high_cache_usage(zbx_vector_uint64_pair_t *items)
-{
-	hc_log_history_cache_usage(items, ZBX_HC_CACHE_PRESSURED);
 }
 
 /******************************************************************************
@@ -3120,7 +3105,7 @@ static void	hc_add_item_values(dc_item_value_t *values, int values_num)
 
 				UNLOCK_CACHE;
 
-				hc_log_history_cache_usage(&items, ZBX_HC_CACHE_FULL);
+				hc_log_history_cache_usage(&items);
 
 				zbx_vector_uint64_pair_destroy(&items);
 				sleep(1);
@@ -3726,7 +3711,7 @@ int	zbx_hc_check_high_usage_timer(void)
 {
 	double	now = zbx_time();
 
-	if (SEC_PER_MIN > now - cache->last_warning_ts)
+	if (SEC_PER_MIN <= now - cache->last_warning_ts)
 	{
 		cache->last_warning_ts = now;
 		return SUCCEED;
@@ -3747,6 +3732,11 @@ void	zbx_hc_get_items(zbx_vector_uint64_pair_t *items)
 	hc_get_items(items);
 
 	UNLOCK_CACHE;
+}
+
+void	zbx_hc_get_items_unlocked(zbx_vector_uint64_pair_t *items)
+{
+	hc_get_items(items);
 }
 
 void	zbx_hc_acquire(void)
