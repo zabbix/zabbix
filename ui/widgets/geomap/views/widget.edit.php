@@ -13,7 +13,6 @@
 ** If not, see <https://www.gnu.org/licenses/>.
 **/
 
-use Widgets\Geomap\Widget;
 
 /**
  * Geomap widget form view.
@@ -58,20 +57,13 @@ $groupids = array_key_exists('groupids', $data['fields'])
 function getClusteringFieldsGroupView(array $fields): CWidgetFieldsGroupView {
 	return (new CWidgetFieldsGroupView(_('Clustering')))
 		->addField(
-			array_key_exists('clustering_mode', $fields)
-				? (new CWidgetFieldRadioButtonListView($fields['clustering_mode']))
-					->removeLabel()
-					->addClass(ZBX_STYLE_FORM_INPUT_MARGIN)
-				: null
-		)
-		->addField(array_key_exists('clustering_zoom_level', $fields)
-			? (new CWidgetFieldIntegerBoxView($fields['clustering_zoom_level']))
+			(new CWidgetFieldRadioButtonListView($fields['clustering_mode']))
 				->removeLabel()
-				->addClass(
-					$fields['clustering_mode']->getValue() === Widget::CLUSTERING_MODE_AUTO
-						? ZBX_STYLE_DISPLAY_NONE
-						: ''
-				)
-			: null
+				->addClass(ZBX_STYLE_FORM_INPUT_MARGIN)
+		)
+		->addField(
+			(new CWidgetFieldIntegerBoxView($fields['clustering_zoom_level']))
+				->removeLabel()
+				//->addClass('js-zoom-level-field')
 		);
 }

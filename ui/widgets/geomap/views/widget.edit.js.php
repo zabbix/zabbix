@@ -14,6 +14,8 @@
 **/
 
 
+use Widgets\Geomap\Widget;
+
 ?>
 
 window.widget_form = new class extends CWidgetForm {
@@ -27,19 +29,17 @@ window.widget_form = new class extends CWidgetForm {
 	}
 
 	#updateForm() {
-		const clustering_mode = this._form.querySelector('[name="clustering_mode"]:checked');
+		const is_clustering_mode_manual = this._form.querySelector('[name="clustering_mode"]:checked')
+			.value === '<?= Widget::CLUSTERING_MODE_MANUAL ?>';
+			
+		const clustering_zoom_level_element = document.getElementById('clustering_zoom_level');
+		clustering_zoom_level_element.hidden = !is_clustering_mode_manual;
+		clustering_zoom_level_element.value = is_clustering_mode_manual ? clustering_zoom_level_element.value : 0;
+			
+		/*const clustering_zoom_level_input_container = this._form.querySelector('.js-zoom-level-field');
+		const clustering_zoom_level_input = clustering_zoom_level_input_container.querySelector('input');
 
-		if (!clustering_mode) {
-			return;
-		}
-
-		const clustering_zoom_level = this._form.querySelector('[name="clustering_zoom_level"]');
-		const wrapper = clustering_zoom_level.closest('.form-field');
-
-		if (clustering_mode.value === '1') {
-			wrapper.classList.remove('display-none');
-		} else {
-			wrapper.classList.add('display-none');
-		}
+		clustering_zoom_level_input_container.hidden = !is_clustering_mode_manual;
+		clustering_zoom_level_input.value = is_clustering_mode_manual ? clustering_zoom_level_input.value : 0;*/
 	}
 };

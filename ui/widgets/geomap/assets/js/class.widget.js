@@ -435,7 +435,7 @@ class CWidgetGeoMap extends CWidget {
 	 * Function to create cluster layer.
 	 *
 	 * @param {object}  [options] Options object (optional).
-	 * @param {integer} [options.clustering_zoom_level = null] Clustering zoom level. Defaults to null.
+	 * @param {number|null} [options.clustering_zoom_level = null] Numeric value of clustering zoom level. Defaults to null.
 	 *
 	 * @returns {CWidgetGeoMap._createClusterLayer.clusters|L.MarkerClusterGroup}
 	 */

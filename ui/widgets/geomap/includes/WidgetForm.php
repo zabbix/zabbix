@@ -16,9 +16,10 @@
 
 namespace Widgets\Geomap\Includes;
 
-use Zabbix\Widgets\CWidgetField;
-use Zabbix\Widgets\CWidgetForm;
-use Widgets\Geomap\Widget;
+use Zabbix\Widgets\{
+	CWidgetField,
+	CWidgetForm
+};
 
 use Zabbix\Widgets\Fields\{
 	CWidgetFieldIntegerBox,
@@ -29,6 +30,8 @@ use Zabbix\Widgets\Fields\{
 	CWidgetFieldRadioButtonList,
 	CWidgetFieldTags
 };
+
+use Widgets\Geomap\Widget;
 
 /**
  * Geomap widget form.

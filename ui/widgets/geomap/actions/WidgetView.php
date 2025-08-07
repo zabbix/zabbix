@@ -24,6 +24,7 @@ use API,
 	CProfile,
 	CSettingsHelper,
 	CSeverityHelper;
+
 use Widgets\Geomap\Widget;
 
 class WidgetView extends CControllerDashboardWidgetView {
