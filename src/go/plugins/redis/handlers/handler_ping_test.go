@@ -24,7 +24,7 @@ import (
 	"golang.zabbix.com/sdk/plugin/comms"
 )
 
-func TestPlugin_pingHandler(t *testing.T) {
+func TestPingHandler(t *testing.T) {
 	stubConn := radix.Stub("", "", func(args []string) any {
 		return "PONG"
 	})

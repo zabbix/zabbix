@@ -34,19 +34,19 @@ type infoKeySpace map[infoKey]any
 type infoExtKey string
 type infoExtKeySpace map[infoExtKey]string
 
-type redisInfoMap map[infoSection]infoKeySpace
+type redisInfo map[infoSection]infoKeySpace
 
 // parseRedisInfo parses an output of 'INFO' command.
 // https://redis.io/commands/info
 //
 //nolint:gocyclo,cyclop // this is a parser.
-func parseRedisInfo(info string) (redisInfoMap, error) {
+func parseRedisInfo(info string) (redisInfo, error) {
 	var (
 		section infoSection
 	)
 
 	scanner := bufio.NewScanner(strings.NewReader(info))
-	res := make(redisInfoMap)
+	res := make(redisInfo)
 
 	for scanner.Scan() {
 		line := scanner.Text()
