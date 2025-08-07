@@ -3727,9 +3727,10 @@ int	zbx_hc_check_high_usage_timer(void)
 	double	now = zbx_time();
 
 	if (SEC_PER_MIN > now - cache->last_warning_ts)
+	{
+		cache->last_warning_ts = now;
 		return SUCCEED;
-
-	cache->last_warning_ts = now;
+	}
 
 	return FAIL;
 }
