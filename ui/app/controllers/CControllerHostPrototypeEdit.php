@@ -266,7 +266,7 @@ class CControllerHostPrototypeEdit extends CController {
 				]);
 
 				if ($editable_groups_count != count($this->getInput('group_links'))) {
-					$data['warnings'][] = _("The host being cloned belongs to a host group you don't have write permissions to. Non-writable group has been removed from the new host.");
+					$data['warnings'][] = _("The host prototype being cloned belongs to a host group you don't have write permissions to. Non-writable group has been removed from the new host prototype.");
 				}
 			}
 
