@@ -1,0 +1,1 @@
+...G...... [ZBX-25094] added null value checks in tablespaces queries for Oracle Zabbix agent 2 plugin (knaglis)

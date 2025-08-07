@@ -76,6 +76,7 @@ typedef struct
 	zbx_get_config_str_f		get_scripts_path_cb_arg;
 	const zbx_db_config_t		*db_config;
 	const char			*config_source_ip;
+	const char			*config_ssl_ca_location;
 }
 zbx_thread_alert_manager_args;
 
