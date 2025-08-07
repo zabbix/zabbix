@@ -288,6 +288,7 @@ long	zbx_get_timezone_offset(time_t t, struct tm *tm)
 struct tm	*zbx_localtime(const time_t *time, const char *tz)
 {
 	struct tm	*tm;
+	time_t		time_zerro = (time_t)0;
 #if defined(HAVE_GETENV) && defined(HAVE_UNSETENV) && defined(HAVE_TZSET) && \
 		!defined(_WINDOWS) && !defined(__MINGW32__)
 	char		*old_tz;
@@ -295,7 +296,7 @@ struct tm	*zbx_localtime(const time_t *time, const char *tz)
 	if (NULL == tz || 0 == strcmp(tz, "system"))
 	{
 		if (NULL == (tm = localtime(time)))
-			tm = localtime(0);
+			tm = localtime(&time_zerro);
 
 		return tm;
 	}
@@ -308,7 +309,7 @@ struct tm	*zbx_localtime(const time_t *time, const char *tz)
 	tzset();
 
 	if (NULL == (tm = localtime(time)))
-		tm = localtime(0);
+		tm = localtime(&time_zerro);
 
 	if (NULL != old_tz)
 	{
@@ -319,16 +320,14 @@ struct tm	*zbx_localtime(const time_t *time, const char *tz)
 		unsetenv("TZ");
 
 	tzset();
-
-	return tm;
 #else
 	ZBX_UNUSED(tz);
 
 	if (NULL == (tm = localtime(time)))
-		tm = localtime(0);
+		tm = localtime(&time_zerro);
 
-	return tm;
 #endif
+	return tm;
 }
 
 /******************************************************************************
