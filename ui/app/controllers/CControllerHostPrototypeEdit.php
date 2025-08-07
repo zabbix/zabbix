@@ -323,7 +323,7 @@ class CControllerHostPrototypeEdit extends CController {
 			unset($macro);
 
 			if ($secret_macro_reset) {
-				$data['warnings'][] = _('The cloned host contains user defined macros with type "Secret text". The value and type of these macros were reset.');
+				$data['warnings'][] = _('The cloned host prototype contains user defined macros with type "Secret text". The value and type of these macros were reset.');
 			}
 
 			$interfaces = $this->getInput('interfaces', []);
