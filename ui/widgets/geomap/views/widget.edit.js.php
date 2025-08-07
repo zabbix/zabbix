@@ -31,11 +31,11 @@ window.widget_form = new class extends CWidgetForm {
 	#updateForm() {
 		const is_clustering_mode_manual = this._form.querySelector('[name="clustering_mode"]:checked')
 			.value === '<?= Widget::CLUSTERING_MODE_MANUAL ?>';
-			
+
 		const clustering_zoom_level_element = document.getElementById('clustering_zoom_level');
 		clustering_zoom_level_element.hidden = !is_clustering_mode_manual;
 		clustering_zoom_level_element.value = is_clustering_mode_manual ? clustering_zoom_level_element.value : 0;
-			
+
 		/*const clustering_zoom_level_input_container = this._form.querySelector('.js-zoom-level-field');
 		const clustering_zoom_level_input = clustering_zoom_level_input_container.querySelector('input');
 
