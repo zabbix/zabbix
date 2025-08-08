@@ -230,16 +230,15 @@ class testFormTotpEnroll extends testFormTotp {
 	public function testFormTotpEnroll_Screenshot() {
 		$this->resetTotpConfiguration();
 		$this->userLogin();
+		$form = $this->query('class:signin-container')->waitUntilVisible()->one();
+		$skip_fields = [
+			// Hide the QR code.
+			$this->page->query('class:qr-code')->one(),
+			// Hide the secret string. It does not have a good selector, sadly.
+			$this->page->query('xpath://form/div[last()]')->one()
+		];
 		$this->page->removeFocus();
-		$this->assertScreenshotExcept($this->query('class:signin-container')->waitUntilVisible()->one(),
-			[
-				// Hide the QR code.
-				$this->page->query('class:qr-code')->one(),
-				// Hide the secret string. It does not have a good selector, sadly.
-				$this->page->query('xpath://form/div[last()]')->one()
-			],
-			'TOTP enroll form'
-		);
+		$this->assertScreenshotExcept($form, $skip_fields, 'TOTP enroll form');
 	}
 
 	/**
