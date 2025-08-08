@@ -207,7 +207,7 @@
 
 		<!-- Binaries for integration tests -->
 		<exec executable="./configure" failonerror="on">
-			<arg line="CFLAGS='-g -std=gnu99 -Wenum-conversion -fsanitize=leak,address,undefined -fno-omit-frame-pointer'"/>
+			<arg line="CFLAGS='-g -std=gnu99 -Wenum-conversion -fsanitize=leak,address,undefined -fno-omit-frame-pointer -DZBX_DEBUG'"/>
 			<arg line="CC='clang'"/>
 			<arg line="LDFLAGS='-fsanitize=leak,address,undefined -fno-omit-frame-pointer'"/>
 			<arg line="--quiet"/>

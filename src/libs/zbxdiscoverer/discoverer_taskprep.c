@@ -169,8 +169,6 @@ static zbx_uint64_t	process_checks(const zbx_dc_drule_t *drule, int unique, zbx_
 		zbx_dc_dcheck_t	*dcheck = (zbx_dc_dcheck_t*)drule->dchecks.values[i];
 		zbx_ds_dcheck_t	*ds_dcheck_common;
 
-		zabbix_log(1, "DBG '%s'", dcheck->snmp_community);
-
 		if (0 != drule->unique_dcheckid &&
 				((1 == unique && drule->unique_dcheckid != dcheck->dcheckid) ||
 				(0 == unique && drule->unique_dcheckid == dcheck->dcheckid)))
@@ -180,7 +178,6 @@ static zbx_uint64_t	process_checks(const zbx_dc_drule_t *drule, int unique, zbx_
 
 		ds_dcheck_common = dcheck_clone_get(dcheck, ds_dchecks_common);
 
-		zabbix_log(1, "DBG expanded '%s'", ds_dcheck_common->dcheck.snmp_community);
 		checks_count += process_check_range(drule, ds_dcheck_common, ipranges, tasks);
 	}
 
