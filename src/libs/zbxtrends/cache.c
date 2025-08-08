@@ -19,6 +19,7 @@
 #include "zbxshmem.h"
 #include "zbxnum.h"
 #include "zbxstr.h"
+#include "zbxtime.h"
 
 typedef struct
 {
