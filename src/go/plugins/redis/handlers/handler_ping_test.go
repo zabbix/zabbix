@@ -25,24 +25,44 @@ import (
 )
 
 func TestPingHandler(t *testing.T) {
+	t.Parallel()
+
 	stubConn := radix.Stub("", "", func(args []string) any {
 		return "PONG"
 	})
-	defer stubConn.Close()
+
+	t.Cleanup(func() {
+		err := stubConn.Close()
+		if err != nil {
+			t.Errorf("failed to close stub connection: %v", err)
+		}
+	})
 
 	connection := conn.NewRedisConn(stubConn)
 
 	brokenStubConn := radix.Stub("", "", func(args []string) any {
 		return ""
 	})
-	defer brokenStubConn.Close()
+
+	t.Cleanup(func() {
+		err := brokenStubConn.Close()
+		if err != nil {
+			t.Errorf("failed to close stub connection: %v", err)
+		}
+	})
 
 	brokenConn := conn.NewRedisConn(brokenStubConn)
 
 	closedStubConn := radix.Stub("", "", func(args []string) any {
 		return ""
 	})
-	closedStubConn.Close()
+
+	t.Cleanup(func() {
+		err := closedStubConn.Close()
+		if err != nil {
+			t.Errorf("failed to close stub connection: %v", err)
+		}
+	})
 
 	closedConn := conn.NewRedisConn(closedStubConn)
 
@@ -78,6 +98,8 @@ func TestPingHandler(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
+			t.Parallel()
+
 			got, err := PingHandler(tt.args.conn, tt.args.params)
 			if (err != nil) != tt.wantErr {
 				t.Errorf("Plugin.PingHandler() error = %v, wantErr %v", err, tt.wantErr)

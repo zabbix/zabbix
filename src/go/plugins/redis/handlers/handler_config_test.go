@@ -25,6 +25,8 @@ import (
 )
 
 func TestConfigHandler(t *testing.T) {
+	t.Parallel()
+
 	stubConn := radix.Stub("", "", func(args []string) any {
 		switch strings.ToLower(args[2]) {
 		case "param1":
@@ -41,7 +43,12 @@ func TestConfigHandler(t *testing.T) {
 		}
 	})
 
-	defer stubConn.Close()
+	t.Cleanup(func() {
+		err := stubConn.Close()
+		if err != nil {
+			t.Fatal(err)
+		}
+	})
 
 	connection := conn.NewRedisConn(stubConn)
 
@@ -83,6 +90,8 @@ func TestConfigHandler(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
+			t.Parallel()
+
 			got, err := ConfigHandler(tt.args.conn, tt.args.params)
 			if (err != nil) != tt.wantErr {
 				t.Errorf("Plugin.ConfigHandler() error = %v, wantErr %v", err, tt.wantErr)

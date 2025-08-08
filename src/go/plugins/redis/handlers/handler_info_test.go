@@ -54,6 +54,8 @@ test:111`
 )
 
 func TestParseRedisInfo(t *testing.T) {
+	t.Parallel()
+
 	type args struct {
 		info string
 	}
@@ -147,6 +149,8 @@ func TestParseRedisInfo(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
+			t.Parallel()
+
 			gotRes, err := parseRedisInfo(tt.args.info)
 			if (err != nil) != tt.wantErr {
 				t.Errorf("parseRedisInfo() error = %#v, wantErr %#v", err, tt.wantErr)
@@ -162,18 +166,20 @@ func TestParseRedisInfo(t *testing.T) {
 }
 
 func BenchmarkParseRedisInfo_Common(b *testing.B) {
-	for i := 0; i < b.N; i++ {
+	for range b.N {
 		_, _ = parseRedisInfo(infoExtendedSectionOutput)
 	}
 }
 
 func BenchmarkParseRedisInfo_Extended(b *testing.B) {
-	for i := 0; i < b.N; i++ {
+	for range b.N {
 		_, _ = parseRedisInfo(infoCommonSectionOutput)
 	}
 }
 
-func TestHandlers_InfoHandler(t *testing.T) {
+func TestInfoHandler(t *testing.T) {
+	t.Parallel()
+
 	stubConn := radix.Stub("", "", func(args []string) any {
 		switch args[1] {
 		case "commonsection":
@@ -190,7 +196,12 @@ func TestHandlers_InfoHandler(t *testing.T) {
 		}
 	})
 
-	defer stubConn.Close()
+	t.Cleanup(func() {
+		err := stubConn.Close()
+		if err != nil {
+			t.Errorf("failed to close stubConn: %v", err)
+		}
+	})
 
 	connection := conn.NewRedisConn(stubConn)
 
@@ -232,6 +243,8 @@ func TestHandlers_InfoHandler(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
+			t.Parallel()
+
 			got, err := InfoHandler(tt.args.conn, tt.args.params)
 			if (err != nil) != tt.wantErr {
 				t.Errorf("Plugin.InfoHandler() error = %v, wantErr %v", err, tt.wantErr)

@@ -33,7 +33,6 @@ type infoKey string
 type infoKeySpace map[infoKey]any
 type infoExtKey string
 type infoExtKeySpace map[infoExtKey]string
-
 type redisInfo map[infoSection]infoKeySpace
 
 // parseRedisInfo parses an output of 'INFO' command.
@@ -120,12 +119,12 @@ func InfoHandler(redisClient conn.RedisClient, params map[string]string) (any, e
 		return nil, errs.WrapConst(err, zbxerr.ErrorCannotFetchData)
 	}
 
-	redisInfo, err := parseRedisInfo(res)
+	parsedRedisInfo, err := parseRedisInfo(res)
 	if err != nil {
 		return nil, err
 	}
 
-	jsonRes, err := json.Marshal(redisInfo)
+	jsonRes, err := json.Marshal(parsedRedisInfo)
 	if err != nil {
 		return nil, errs.WrapConst(err, zbxerr.ErrorCannotMarshalJSON)
 	}

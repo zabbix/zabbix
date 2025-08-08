@@ -24,6 +24,8 @@ import (
 )
 
 func TestGetLastSlowlogID(t *testing.T) {
+	t.Parallel()
+
 	type args struct {
 		slowlog slowlog
 	}
@@ -74,6 +76,8 @@ func TestGetLastSlowlogID(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
+			t.Parallel()
+
 			got, err := getLastSlowlogID(tt.args.slowlog)
 			if (err != nil) != tt.wantErr {
 				t.Errorf("getLastSlowlogID() error = %v, wantErr %v", err, tt.wantErr)
@@ -89,11 +93,18 @@ func TestGetLastSlowlogID(t *testing.T) {
 }
 
 func TestSlowlogHandler(t *testing.T) {
+	t.Parallel()
+
 	stubConn := radix.Stub("", "", func(args []string) any {
 		return errors.New("cannot fetch data")
 	})
 
-	defer stubConn.Close()
+	t.Cleanup(func() {
+		err := stubConn.Close()
+		if err != nil {
+			t.Errorf("failed to close stub connection: %v", err)
+		}
+	})
 
 	connection := conn.NewRedisConn(stubConn)
 
@@ -118,6 +129,8 @@ func TestSlowlogHandler(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
+			t.Parallel()
+
 			got, err := SlowlogHandler(tt.args.conn, tt.args.params)
 			if (err != nil) != tt.wantErr {
 				t.Errorf("Plugin.SlowlogHandler() error = %v, wantErr %v", err, tt.wantErr)
