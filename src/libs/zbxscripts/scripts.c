@@ -384,7 +384,7 @@ static int	active_command_send_and_result_fetch(const zbx_dc_host_t *host, const
 	for (time_start = zbx_time(); config_timeout > zbx_time() - time_start;)
 	{
 		sleep(1);
-		
+
 		if  (0 != (REMOTE_COMMAND_COMPLETED & pcmd->flag))
 		{
 			commands_lock();
