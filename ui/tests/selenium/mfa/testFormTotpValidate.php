@@ -148,8 +148,9 @@ class testFormTotpValidate extends testFormTotp {
 		$this->resetTotpConfiguration();
 		$this->quickEnrollUser();
 		$this->userLogin();
+		$form = $this->query('class:signin-container')->waitUntilVisible()->one();
 		$this->page->removeFocus();
-		$this->assertScreenshot($this->query('class:signin-container')->waitUntilVisible()->one(), 'TOTP validation form');
+		$this->assertScreenshot($form, 'TOTP validation form');
 	}
 
 	/**
