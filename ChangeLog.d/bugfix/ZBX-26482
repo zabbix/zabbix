@@ -1,1 +1,1 @@
-..F....... [ZBX-26482] fixed TypeError after item from data set in item list was deleted (isharha)
+..F....... [ZBX-26482] fixed TypeError after deleting datasets in Graph and Pie chart widgets (isharha)
