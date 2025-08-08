@@ -115,7 +115,7 @@ class CControllerHostPrototypeEdit extends CController {
 		return true;
 	}
 
-	protected function doAction() {
+	protected function doAction(): void {
 		$data = [
 			'context' => $this->getInput('context'),
 			'discovery_rule' => $this->parent_discovery,

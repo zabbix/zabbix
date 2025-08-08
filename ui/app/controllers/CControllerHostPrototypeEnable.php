@@ -49,7 +49,7 @@ class CControllerHostPrototypeEnable extends CController {
 			: $this->checkAccess(CRoleHelper::UI_CONFIGURATION_TEMPLATES);
 	}
 
-	protected function doAction() {
+	protected function doAction(): void {
 		$host_prototypeids = $this->getInput('hostids');
 		$upd_count = count($host_prototypeids);
 		$host_prototypes = [];
