@@ -22,67 +22,70 @@ class CControllerScriptUpdate extends CController {
 	private array $script = [];
 
 	protected function init(): void {
+		$this->setInputValidationMethod(self::INPUT_VALIDATION_FORM);
 		$this->setPostContentType(self::POST_CONTENT_TYPE_JSON);
 	}
 
 	protected function checkInput(): bool {
-		$fields = [
-			'scriptid' =>					'fatal|required|db scripts.scriptid',
-			'name' =>						'required|db scripts.name|not_empty',
-			'scope' =>						'db scripts.scope| in '.implode(',', [ZBX_SCRIPT_SCOPE_ACTION, ZBX_SCRIPT_SCOPE_HOST, ZBX_SCRIPT_SCOPE_EVENT]),
-			'type' =>						'required|db scripts.type|in '.implode(',', [ZBX_SCRIPT_TYPE_CUSTOM_SCRIPT, ZBX_SCRIPT_TYPE_IPMI, ZBX_SCRIPT_TYPE_SSH, ZBX_SCRIPT_TYPE_TELNET, ZBX_SCRIPT_TYPE_WEBHOOK, ZBX_SCRIPT_TYPE_URL]),
-			'execute_on' =>					'db scripts.execute_on|in '.implode(',', [ZBX_SCRIPT_EXECUTE_ON_AGENT, ZBX_SCRIPT_EXECUTE_ON_SERVER, ZBX_SCRIPT_EXECUTE_ON_PROXY]),
-			'menu_path' =>					'db scripts.menu_path',
-			'authtype' =>					'db scripts.authtype|in '.implode(',', [ITEM_AUTHTYPE_PASSWORD, ITEM_AUTHTYPE_PUBLICKEY]),
-			'username' =>					'db scripts.username',
-			'password' =>					'db scripts.password',
-			'publickey' =>					'db scripts.publickey',
-			'privatekey' =>					'db scripts.privatekey',
-			'passphrase' =>					'db scripts.password',
-			'port' =>						'db scripts.port',
-			'command' =>					'db scripts.command|flags '.P_CRLF,
-			'commandipmi' =>				'db scripts.command|flags '.P_CRLF,
-			'parameters' =>					'array',
-			'script' => 					'db scripts.command|flags '.P_CRLF,
-			'timeout' => 					'db scripts.timeout|time_unit '.implode(':', [1, SEC_PER_MIN]),
-			'url' => 						'db scripts.url',
-			'new_window' => 				'db scripts.new_window|in '.ZBX_SCRIPT_URL_NEW_WINDOW_YES,
-			'description' =>				'db scripts.description',
-			'host_access' =>				'db scripts.host_access|in '.implode(',', [PERM_READ, PERM_READ_WRITE]),
-			'groupid' =>					'db scripts.groupid',
-			'usrgrpid' =>					'db scripts.usrgrpid',
-			'hgstype' =>					'in 0,1',
-			'manualinput' =>				'db scripts.manualinput|in '.ZBX_SCRIPT_MANUALINPUT_ENABLED,
-			'manualinput_prompt' =>			'db scripts.manualinput_prompt',
-			'manualinput_validator_type' =>	'db scripts.manualinput_validator_type|in '.implode(',', [ZBX_SCRIPT_MANUALINPUT_TYPE_STRING, ZBX_SCRIPT_MANUALINPUT_TYPE_LIST]),
-			'manualinput_default_value' =>	'db scripts.manualinput_default_value|string',
-			'manualinput_validator' =>		'db scripts.manualinput_validator',
-			'dropdown_options' =>			'db scripts.manualinput_validator',
-			'enable_confirmation' =>		'in 1',
-			'confirmation' =>				'db scripts.confirmation|not_empty'
-		];
-
-		$ret = $this->validateInput($fields);
-
-		if (!CSettingsHelper::isGlobalScriptsEnabled()
-				&& $this->getInput('execute_on', ZBX_SCRIPT_EXECUTE_ON_SERVER) == ZBX_SCRIPT_EXECUTE_ON_SERVER) {
-			error(_('Global script execution on Zabbix server is disabled by server configuration.'));
-
-			$ret = false;
-		}
+		$ret = $this->validateInput(self::getValidationRules());
 
 		if (!$ret) {
+			$form_errors = $this->getValidationError();
+			$response = $form_errors
+				? ['form_errors' => $form_errors]
+				: ['error' => [
+					'title' => _('Cannot update script'),
+					'messages' => array_column(get_and_clear_messages(), 'message')
+				]];
+
 			$this->setResponse(
-				new CControllerResponseData(['main_block' => json_encode([
-					'error' => [
-						'title' => _('Cannot update script'),
-						'messages' => array_column(get_and_clear_messages(), 'message')
-					]
-				], JSON_THROW_ON_ERROR)])
+				new CControllerResponseData(['main_block' => json_encode($response)])
 			);
 		}
 
 		return $ret;
+	}
+
+	public static function getValidationRules(): array {
+		$api_uniq = ['script.get', ['name' => '{name}', 'menu_path' => '{menu_path}'], 'scriptid'];
+
+		return ['object', 'api_uniq' => $api_uniq, 'fields' => [
+			'scriptid' => ['db scripts.scriptid'],
+			'name' => ['db scripts.name', 'required', 'not_empty'],
+			'scope' => ['db scripts.scope', 'required', 'in' => [ZBX_SCRIPT_SCOPE_ACTION, ZBX_SCRIPT_SCOPE_HOST, ZBX_SCRIPT_SCOPE_EVENT]],
+			'type' => ['required','db scripts.type', 'in' => [ZBX_SCRIPT_TYPE_CUSTOM_SCRIPT, ZBX_SCRIPT_TYPE_IPMI, ZBX_SCRIPT_TYPE_SSH, ZBX_SCRIPT_TYPE_TELNET, ZBX_SCRIPT_TYPE_WEBHOOK, ZBX_SCRIPT_TYPE_URL]],
+			'execute_on' =>	['db scripts.execute_on','in' => [ZBX_SCRIPT_EXECUTE_ON_AGENT, ZBX_SCRIPT_EXECUTE_ON_SERVER, ZBX_SCRIPT_EXECUTE_ON_PROXY]],
+			'menu_path' => ['db scripts.menu_path'],
+			'authtype' => ['db scripts.authtype', 'in' => [ITEM_AUTHTYPE_PASSWORD, ITEM_AUTHTYPE_PUBLICKEY]],
+			'username' => ['db scripts.username', 'required', 'not_empty', 'when' => ['type', 'in' => [ZBX_SCRIPT_TYPE_SSH, ZBX_SCRIPT_TYPE_TELNET]]],
+			'password' => ['db scripts.password'],
+			'publickey' => ['db scripts.publickey', 'required', 'not_empty', 'when' => ['authtype', 'in' => [ITEM_AUTHTYPE_PUBLICKEY]]],
+			'privatekey' => ['db scripts.privatekey', 'required', 'not_empty', 'when' => ['authtype', 'in' => [ITEM_AUTHTYPE_PUBLICKEY]]],
+			'passphrase' => ['db scripts.password'],
+			'port' => ['db scripts.port'],
+			'command' => ['db scripts.command', 'required', 'not_empty', 'when' => ['type', 'in' => [ZBX_SCRIPT_TYPE_CUSTOM_SCRIPT, ZBX_SCRIPT_TYPE_IPMI, ZBX_SCRIPT_TYPE_SSH, ZBX_SCRIPT_TYPE_TELNET]]],
+			'commandipmi' => ['db scripts.command', 'required', 'not_empty', 'when' => ['type', 'in' => [ZBX_SCRIPT_TYPE_IPMI]]],
+			'parameters' =>	['array'],
+			'script' => ['db scripts.command'],
+			'timeout' => ['db scripts.timeout', 'required', 'not_empty',
+				'use' => [CTimeUnitValidator::class, ['min' => 1, 'max' => SEC_PER_MIN, 'usermacros' => true]],
+			],
+			'url' => ['db scripts.url', 'required', 'not_empty', 'when' => ['type', 'in' => [ZBX_SCRIPT_TYPE_URL]]],
+			'new_window' => ['db scripts.new_window', 'in' => [ZBX_SCRIPT_URL_NEW_WINDOW_NO, ZBX_SCRIPT_URL_NEW_WINDOW_YES]],
+			'description' => ['db scripts.description'],
+			'host_access' => ['db scripts.host_access', 'in' => [PERM_READ, PERM_READ_WRITE]],
+			'groupid' => ['db scripts.groupid'],
+			'usrgrpid' => ['db scripts.usrgrpid'],
+			'hgstype' => ['boolean'],
+			'manualinput' => ['db scripts.manualinput', 'in' => [ZBX_SCRIPT_MANUALINPUT_DISABLED, ZBX_SCRIPT_MANUALINPUT_ENABLED]],
+			'manualinput_prompt' => ['db scripts.manualinput_prompt', 'required', 'not_empty', 'when' => ['manualinput', 'in' => [ZBX_SCRIPT_MANUALINPUT_ENABLED]]],
+			'manualinput_validator_type' =>	['db scripts.manualinput_validator_type', 'in' => [ZBX_SCRIPT_MANUALINPUT_TYPE_STRING, ZBX_SCRIPT_MANUALINPUT_TYPE_LIST]],
+			'manualinput_default_value' => ['db scripts.manualinput_default_value'],
+			'manualinput_validator' => ['db scripts.manualinput_validator', 'required', 'not_empty', 'when' => ['manualinput_validator_type', 'in' => [ZBX_SCRIPT_MANUALINPUT_TYPE_STRING]]],
+			'dropdown_options' => ['db scripts.manualinput_validator', 'required', 'not_empty', 'when' => ['manualinput_validator_type', 'in' => [ZBX_SCRIPT_MANUALINPUT_TYPE_LIST]]],
+			'enable_confirmation' => ['boolean'],
+			'confirmation' => ['db scripts.confirmation', 'required', 'not_empty', 'when' => ['enable_confirmation', true]]
+		]];
 	}
 
 	protected function checkPermissions(): bool {
