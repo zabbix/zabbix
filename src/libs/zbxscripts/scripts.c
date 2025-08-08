@@ -338,7 +338,7 @@ static int	active_command_send_and_result_fetch(const zbx_dc_host_t *host, const
 {
 	int			ret = FAIL, completed = 0, sent = 0;
 	zbx_rc_command_t	cmd, *pcmd;
-	time_t			time_start;
+	double			time_start;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
@@ -381,8 +381,10 @@ static int	active_command_send_and_result_fetch(const zbx_dc_host_t *host, const
 	remote_commands->commands_num++;
 	commands_unlock();
 
-	for (time_start = time(NULL); config_timeout > time(NULL) - time_start; sleep(1))
+	for (time_start = zbx_time(); config_timeout > zbx_time() - time_start;)
 	{
+		sleep(1);
+		
 		if  (0 != (REMOTE_COMMAND_COMPLETED & pcmd->flag))
 		{
 			commands_lock();
@@ -404,7 +406,9 @@ static int	active_command_send_and_result_fetch(const zbx_dc_host_t *host, const
 	if (0 == completed)
 	{
 		if (0 == sent)
+		{
 			zbx_snprintf(error, max_error_len, "timed out while requesting remote command in active mode");
+		}
 		else
 		{
 			zbx_snprintf(error, max_error_len, "timed out while waiting for result of remote command in"
