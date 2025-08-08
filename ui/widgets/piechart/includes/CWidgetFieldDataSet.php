@@ -70,7 +70,7 @@ class CWidgetFieldDataSet extends CWidgetField {
 			if (array_key_exists('itemids', $data_set)) {
 				$data_set['itemids'] = array_values($data_set['itemids']);
 			}
-			
+
 			$data_sets[] = $data_set + self::getDefaults();
 		}
 
