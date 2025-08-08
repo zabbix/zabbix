@@ -51,7 +51,6 @@ ZBX_SHMEM_FUNC_IMPL(__remote_commands, remote_commands_mem)
 typedef struct
 {
 	zbx_uint64_t		maxid;
-	int			commands_num;
 	zbx_hashset_t		commands;
 }
 zbx_remote_commands_t;
@@ -115,7 +114,6 @@ int	zbx_init_remote_commands_cache(char **error)
 	memset(remote_commands, 0, sizeof(zbx_remote_commands_t));
 
 	remote_commands->maxid = 0;
-	remote_commands->commands_num = 0;
 
 	zbx_hashset_create_ext(&remote_commands->commands, REMOTE_COMMANS_INITIAL_HASH_SIZE,
 			remote_commands_commands_hash_func,remote_commands_commands_compare_func, NULL,
@@ -281,9 +279,6 @@ void	zbx_remote_commands_prepare_to_send(struct zbx_json *json, zbx_uint64_t hos
 
 	commands_lock();
 
-	if (0 == remote_commands->commands_num)
-		goto out;
-
 	zbx_hashset_iter_reset(&remote_commands->commands, &iter_comands);
 
 	while (NULL != (command = (zbx_rc_command_t *)zbx_hashset_iter_next(&iter_comands)))
@@ -313,14 +308,12 @@ void	zbx_remote_commands_prepare_to_send(struct zbx_json *json, zbx_uint64_t hos
 			zbx_json_adduint64(json, ZBX_PROTO_TAG_TIMEOUT, (zbx_uint64_t)config_timeout);
 
 			zbx_json_close(json);
-
-			remote_commands->commands_num--;
 		}
 	}
 
 	if (0 != has_commands)
 		zbx_json_close(json);
-out:
+
 	commands_unlock();
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
@@ -371,7 +364,6 @@ static int	active_command_send_and_result_fetch(const zbx_dc_host_t *host, const
 		goto out;
 	}
 
-	remote_commands->commands_num++;
 	commands_unlock();
 
 	for (time_start = zbx_time(); config_timeout > zbx_time() - time_start;)
