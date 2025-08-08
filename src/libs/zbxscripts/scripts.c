@@ -525,7 +525,7 @@ static int	zbx_execute_script_on_agent(const zbx_dc_host_t *host, const char *co
 			{
 				if ('\0' == *error)
 					zbx_snprintf(error, max_error_len, "Zabbix agent is not available");
-		
+
 				return FAIL;
 			}
 
