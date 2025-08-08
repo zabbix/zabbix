@@ -37,7 +37,7 @@ class testFormTotpValidate extends testFormTotp {
 		$this->testTotpLayout();
 
 		// QR code should not be visible.
-		$container = $this->query('class:signin-container')->one();
+		$container = $this->query('class:signin-container')->waitUntilVisible()->one();
 		$this->assertFalse($container->query('xpath:.//div[text()="Scan this QR code"]')->one(false)->isVisible());
 		$this->assertFalse($container->query('class:qr-code')->query('tag:img')->one(false)->isVisible());
 	}
@@ -114,7 +114,7 @@ class testFormTotpValidate extends testFormTotp {
 		$this->userLogin();
 		CMfaTotpHelper::waitForSafeTotpWindow();
 		$totp = CMfaTotpHelper::generateTotp(self::TOTP_SECRET_32);
-		$form = $this->query('class:signin-container')->asForm()->one();
+		$form = $this->query('class:signin-container')->waitUntilVisible()->asForm()->one();
 		$form->getField('id:verification_code')->fill($totp);
 		$form->query('button:Sign in')->one()->click();
 		$this->page->waitUntilReady();
@@ -149,7 +149,7 @@ class testFormTotpValidate extends testFormTotp {
 		$this->quickEnrollUser();
 		$this->userLogin();
 		$this->page->removeFocus();
-		$this->assertScreenshot($this->query('class:signin-container')->one(), 'TOTP validation form');
+		$this->assertScreenshot($this->query('class:signin-container')->waitUntilVisible()->one(), 'TOTP validation form');
 	}
 
 	/**
