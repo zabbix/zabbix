@@ -249,8 +249,7 @@ int	substitute_script_macros(char **data, char *error, int maxerrlen, int script
 	{
 		case ZBX_SCRIPT_SCOPE_HOST:
 			ret = zbx_substitute_macros(data, error, maxerrlen, &macro_host_script_resolv, um_handle,
-					userid, dc_host, &user_names_found, &user_names,
-					&item_hosts, &trigger_hosts, &cause_event, &cause_recovery_event);
+					userid, dc_host, &user_names_found, &user_names);
 			break;
 		case ZBX_SCRIPT_SCOPE_EVENT:
 			ret = zbx_substitute_macros(data, error, maxerrlen, &macro_normal_script_resolv, um_handle,
@@ -260,6 +259,12 @@ int	substitute_script_macros(char **data, char *error, int maxerrlen, int script
 		default:
 			THIS_SHOULD_NEVER_HAPPEN;
 	}
+
+	if (NULL != cause_event)
+		zbx_db_free_event(cause_event);
+
+	if (NULL != cause_recovery_event)
+		zbx_db_free_event(cause_recovery_event);
 
 	zbx_vector_uint64_destroy(&item_hosts);
 

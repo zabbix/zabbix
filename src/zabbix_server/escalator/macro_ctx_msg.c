@@ -223,6 +223,12 @@ int	substitute_message_macros(char **data, char *error, int maxerrlen, int messa
 			break;
 	}
 
+	if (NULL != cause_event)
+		zbx_db_free_event(cause_event);
+
+	if (NULL != cause_recovery_event)
+		zbx_db_free_event(cause_recovery_event);
+
 	zbx_vector_uint64_destroy(&item_hosts);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __func__, zbx_result_string(ret));
