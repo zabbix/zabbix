@@ -532,7 +532,7 @@ static int	zbx_execute_script_on_agent(const zbx_dc_host_t *host, const char *co
 				return FAIL;
 			}
 
-			return active_command_send_and_result_fetch(host, command, result, config_timeout,
+			return active_command_send_and_result_fetch(host, command, result, SEC_PER_MIN,
 					get_config_forks, error, max_error_len);
 	}
 }
