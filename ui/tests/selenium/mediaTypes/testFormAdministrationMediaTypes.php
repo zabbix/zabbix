@@ -24,6 +24,7 @@ require_once __DIR__.'/../behaviors/CMessageBehavior.php';
  */
 class testFormAdministrationMediaTypes extends CWebTest {
 
+	const URL = 'zabbix.php?action=mediatype.list';
 	protected static $mediatype_sql = 'SELECT * FROM media_type ORDER BY mediatypeid';
 	protected static $update_mediatypes = [
 		'Email' => 'Email',
@@ -56,8 +57,8 @@ class testFormAdministrationMediaTypes extends CWebTest {
 				'redirection_url' => 'https://test/zabbix.php?action=oauth.authorize',
 				'client_id' => 'test',
 				'client_secret' => 'test',
-				'authorization_url' => 'https://test/oauth2/v2/auth?response_type=code&scope=https%3A%2F%2Fmail.google.com%2F&access_type=offline&prompt=consent"',
-				'token_url' => 'https://example.com/token?grant_type=authorization_code',
+				'authorization_url' => 'https://test/oauth2/v2/auth?response_type=code&scope=https%3A%2F%2Fmail.kstest.com%2F&access_type=offline&prompt=consent"',
+				'token_url' => 'https://zabbixexample.com/token?grant_type=authorization_code',
 				'tokens_status' => 3,
 				'access_token' => 'test',
 				'access_token_updated' => time(),
@@ -150,7 +151,7 @@ class testFormAdministrationMediaTypes extends CWebTest {
 	}
 
 	public function testFormAdministrationMediaTypes_GeneralLayout() {
-		$this->page->login()->open('zabbix.php?action=mediatype.list');
+		$this->page->login()->open(self::URL);
 		$this->query('button:Create media type')->waitUntilClickable()->one()->click();
 		$overlay = COverlayDialogElement::find()->one()->waitUntilReady();
 		$this->assertEquals('New media type', $overlay->getTitle());
@@ -297,7 +298,7 @@ class testFormAdministrationMediaTypes extends CWebTest {
 	 * @dataProvider getLayoutMediaTypes
 	 */
 	public function testFormAdministrationMediaTypes_MediatypeLayout($data) {
-		$this->page->login()->open('zabbix.php?action=mediatype.list');
+		$this->page->login()->open(self::URL);
 		$this->query('button:Create media type')->waitUntilClickable()->one()->click();
 		$overlay = COverlayDialogElement::find()->one()->waitUntilReady();
 
@@ -1472,7 +1473,7 @@ class testFormAdministrationMediaTypes extends CWebTest {
 	public function testFormAdministrationMediaTypes_SimpleUpdate($data) {
 		$old_hash = CDBHelper::getHash(self::$mediatype_sql);
 
-		$this->page->login()->open('zabbix.php?action=mediatype.list');
+		$this->page->login()->open(self::URL);
 		$this->query('link', $data['media_type'])->one()->WaitUntilClickable()->click();
 		COverlayDialogElement::find()->one()->waitUntilReady()->asForm()->submit();
 		COverlayDialogElement::ensureNotPresent();
@@ -1492,7 +1493,7 @@ class testFormAdministrationMediaTypes extends CWebTest {
 		$old_hash = CDBHelper::getHash($clone_sql.zbx_dbstr($data['media_type']));
 
 		// Clone the media type.
-		$this->page->login()->open('zabbix.php?action=mediatype.list');
+		$this->page->login()->open(self::URL);
 		$this->query('link', $data['media_type'])->WaitUntilClickable()->one()->click();
 		$overlay = COverlayDialogElement::find()->one()->waitUntilReady();
 		$this->assertEquals('Media type', $overlay->getTitle());
@@ -1532,7 +1533,7 @@ class testFormAdministrationMediaTypes extends CWebTest {
 	}
 
 	public function testFormAdministrationMediaTypes_Delete() {
-		$this->page->login()->open('zabbix.php?action=mediatype.list');
+		$this->page->login()->open(self::URL);
 		$this->query('link', self::$delete_mediatype)->WaitUntilClickable()->one()->click();
 		$dialog = COverlayDialogElement::find()->one()->waitUntilReady();
 		$dialog->query('button:Delete')->one()->waitUntilClickable()->click();
@@ -1575,7 +1576,7 @@ class testFormAdministrationMediaTypes extends CWebTest {
 			]
 		];
 		$old_hash = CDBHelper::getHash(self::$mediatype_sql);
-		$this->page->login()->open('zabbix.php?action=mediatype.list');
+		$this->page->login()->open(self::URL);
 
 		$locator = ($action === 'create') ? 'button:Create media type' : 'link:'.self::$update_mediatypes['Email'];
 		$this->query($locator)->waitUntilClickable()->one()->click();
@@ -1624,7 +1625,7 @@ class testFormAdministrationMediaTypes extends CWebTest {
 		}
 
 		// Open the corresponding media type form.
-		$this->page->login()->open('zabbix.php?action=mediatype.list')->waitUntilReady();
+		$this->page->login()->open(self::URL)->waitUntilReady();
 
 		if ($create) {
 			$this->query('button:Create media type')->waitUntilClickable()->one()->click();
@@ -1866,7 +1867,7 @@ class testFormAdministrationMediaTypes extends CWebTest {
 	 * @dataProvider getSavedParametersData
 	 */
 	public function testFormAdministrationMediaTypes_SavedParameters($data) {
-		$this->page->login()->open('zabbix.php?action=mediatype.list');
+		$this->page->login()->open(self::URL);
 		$this->query('link', $data['object'])->waitUntilClickable()->one()->click();
 
 		$form = COverlayDialogElement::find()->asForm()->one()->waitUntilReady();
@@ -1905,7 +1906,7 @@ class testFormAdministrationMediaTypes extends CWebTest {
 	 * 		3 - Both tokens contain valid value.
 	 */
 	public function testFormAdministrationMediaTypes_TokenStatus() {
-		$this->page->login()->open('zabbix.php?action=mediatype.list')->waitUntilReady();
+		$this->page->login()->open(self::URL)->waitUntilReady();
 
 		foreach (['Generic SMTP OAuth', 'Gmail OAuth', 'Gmail relay OAuth', 'Office365 OAuth'] as $name) {
 			foreach ([0, 1, 2, 3] as $tokens_status) {
@@ -1928,6 +1929,11 @@ class testFormAdministrationMediaTypes extends CWebTest {
 	}
 
 	public function getTimeIntervalData() {
+		/**
+		 * The following units are used: years, months, days, hours, minutes.
+		 * Only the 3 most significant units will be displayed: #y #M #d, #M #d #h, #d #h #m and so on.
+		 *
+		 */
 		return [
 			[
 				[
@@ -1946,19 +1952,25 @@ class testFormAdministrationMediaTypes extends CWebTest {
 			],
 			[
 				[
-					'access_token_updated' => strtotime('-4 days -5 hours -4 minutes -3 seconds')
+					'access_token_updated' => strtotime('-4 days -5 hours -4 minutes -6 seconds') // 4d 5h 4m.
 				]
 			],
 			[
 				[
-					'access_token_updated' => strtotime('-2 weeks -1 day -1 hour -1 minute -1 second')
+					'access_token_updated' => strtotime('-2 weeks -1 day -1 hour -1 minute -1 second') // 15d 1h 1m.
 				]
 			],
+			/**
+			 * If time interval contains month with 31 day then expected result will be 1M 27d 2h, otherwise 1M 26d 2h.
+			 */
 			[
 				[
-					'access_token_updated' => strtotime('-2 months -3 weeks -5 days -2 hours -4 minutes -3 seconds')
+					'access_token_updated' => strtotime('-1 months -3 weeks -5 days -2 hours -4 minutes -3 seconds')
 				]
 			],
+			/**
+			 * If time interval contains month with 31 day then expected result will be 1y 1M 9d, otherwise 1y 1M 8d.
+			 */
 			[
 				[
 					'access_token_updated' => strtotime('-1 year -1 month -1 week -1 day -1 hour 1 minute -1 second')
@@ -1976,8 +1988,8 @@ class testFormAdministrationMediaTypes extends CWebTest {
 		DBexecute('UPDATE media_type_oauth SET access_token_updated='.$data['access_token_updated'].' WHERE mediatypeid='.
 				self::$mediatypeids['Generic SMTP OAuth']
 		);
-		$this->page->login()->open('zabbix.php?action=popup&popup=mediatype.edit&mediatypeid='.self::$mediatypeids['Generic SMTP OAuth'])
-				->waitUntilReady();
+		$this->page->login()->open('zabbix.php?action=popup&popup=mediatype.edit&mediatypeid='.
+				self::$mediatypeids['Generic SMTP OAuth'])->waitUntilReady();
 		$form = COverlayDialogElement::find()->asForm()->one()->waitUntilReady();
 
 		// Check configured time taking into account that page and form opening could take extra time.
