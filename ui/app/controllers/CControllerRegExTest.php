@@ -36,11 +36,11 @@ class CControllerRegExTest extends CController {
 		return $ret;
 	}
 
-	protected function checkPermissions() {
+	protected function checkPermissions(): bool {
 		return $this->checkAccess(CRoleHelper::UI_ADMINISTRATION_GENERAL);
 	}
 
-	protected function doAction() {
+	protected function doAction(): void {
 		$result = [
 			'expressions' => $this->getInput('expressions', []),
 			'errors' => [],

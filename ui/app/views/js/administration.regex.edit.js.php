@@ -41,7 +41,7 @@
 		init({rules}) {
 			this.form_element = document.getElementById('regexp-form');
 			this.form = new CForm(this.form_element, rules);
-			this.form_element.addEventListener('submit', (e) => {
+			this.form_element.addEventListener('submit', e => {
 				e.preventDefault();
 				this.submit();
 			});
@@ -52,11 +52,11 @@
 			const table = document.getElementById('regular-expressions-table');
 
 			table.querySelector('button[name="add"]').addEventListener('click', () => this.#addRow());
-			table.querySelectorAll('button[name="remove"]').forEach((node) =>
-				node.addEventListener('click', (e) => this.#removeRow(e))
+			table.querySelectorAll('button[name="remove"]').forEach(node =>
+				node.addEventListener('click', e => this.#removeRow(e))
 			);
-			table.querySelectorAll('.js-expression-type-select').forEach((node) =>
-				node.addEventListener('change', (e) => this.#updateRow(e))
+			table.querySelectorAll('.js-expression-type-select').forEach(node =>
+				node.addEventListener('change', e => this.#updateRow(e))
 			);
 
 			this.#test_results = document.getElementById('test-result-table').querySelector('tbody');
@@ -81,7 +81,7 @@
 			const fields = this.form.getAllValues();
 
 			this.form.validateSubmit(fields)
-				.then((result) => {
+				.then(result => {
 					if (!result) {
 						this.#unsetLoadingStatus();
 
@@ -97,8 +97,8 @@
 						headers: {'Content-Type': 'application/json'},
 						body: JSON.stringify(fields)
 					})
-						.then((response) => response.json())
-						.then((response) => {
+						.then(response => response.json())
+						.then(response => {
 							if ('form_errors' in response) {
 								this.form.setErrors(response.form_errors, true, true);
 								this.form.renderErrors();
@@ -118,7 +118,7 @@
 								location.href = curl.getUrl();
 							}
 						})
-						.catch((exception) => this.#ajaxExceptionHandler(exception));
+						.catch(exception => this.#ajaxExceptionHandler(exception));
 				});
 		}
 
@@ -139,8 +139,9 @@
 
 		#clone() {
 			this.#setLoadingStatus(['clone']);
-			const curl = new Curl(this.form_element.getAttribute('action')),
-				{name, expressions, test_string} = this.form.getAllValues();
+
+			const curl = new Curl(this.form_element.getAttribute('action'));
+			const {name, expressions, test_string} = this.form.getAllValues();
 
 			curl.setArgument('action', 'regex.edit');
 			curl.setArgument('regexp[name]', name);
@@ -165,9 +166,9 @@
 		}
 
 		#addRow() {
-			const indexes = Object.keys(this.form.findFieldByName('expressions').getValue()),
-				next_index = indexes.length ? Math.max(...indexes) + 1 : 0,
-				template = new Template(document.getElementById('row-expression-template').innerHTML);
+			const indexes = Object.keys(this.form.findFieldByName('expressions').getValue());
+			const next_index = indexes.length ? Math.max(...indexes) + 1 : 0;
+			const template = new Template(document.getElementById('row-expression-template').innerHTML);
 
 			document
 				.getElementById('expression-list-footer')
@@ -177,13 +178,13 @@
 				.getElementById('regular-expressions-table')
 				.querySelector(`tr[data-index="${next_index}"]`);
 
-			row.querySelector('button[name="remove"]').addEventListener('click', (e) => this.#removeRow(e));
-			row.querySelector('.js-expression-type-select').addEventListener('change', (e) => this.#updateRow(e));
+			row.querySelector('button[name="remove"]').addEventListener('click', e => this.#removeRow(e));
+			row.querySelector('.js-expression-type-select').addEventListener('change', e => this.#updateRow(e));
 		}
 
 		#testExpression() {
-			const {expressions, test_string} = this.form.getAllValues(),
-				curl = new Curl(this.form_element.getAttribute('action'));
+			const {expressions, test_string} = this.form.getAllValues();
+			const curl = new Curl(this.form_element.getAttribute('action'));
 
 			curl.setArgument('action', 'regex.test');
 
@@ -195,9 +196,9 @@
 				headers: {'Content-Type': 'application/json'},
 				body: JSON.stringify({expressions, test_string})
 			})
-				.then((response) => response.json())
-				.then((response) => this.#showTestResult(response, expressions))
-				.catch((exception) => this.#ajaxExceptionHandler(exception))
+				.then(response => response.json())
+				.then(response => this.#showTestResult(response, expressions))
+				.catch(exception => this.#ajaxExceptionHandler(exception))
 				.finally(() => this.#unsetTestLoadingStatus());
 		}
 
@@ -207,7 +208,7 @@
 				document.getElementById('clone'),
 				document.getElementById('delete'),
 				document.getElementById('update')
-			].forEach((button) => {
+			].forEach(button => {
 				if (button) {
 					button.setAttribute('disabled', true);
 
@@ -224,7 +225,7 @@
 				document.getElementById('clone'),
 				document.getElementById('delete'),
 				document.getElementById('update')
-			].forEach((button) => {
+			].forEach(button => {
 				if (button) {
 					button.classList.remove('is-loading');
 					button.removeAttribute('disabled');
@@ -233,8 +234,8 @@
 		}
 
 		#setTestLoadingStatus() {
-			const button = document.getElementById('test-expression'),
-				textarea = document.getElementById('test-string');
+			const button = document.getElementById('test-expression');
+			const textarea = document.getElementById('test-string');
 
 			button.classList.add('is-loading');
 			button.setAttribute('disabled', true);
@@ -242,8 +243,8 @@
 		}
 
 		#unsetTestLoadingStatus() {
-			const button = document.getElementById('test-expression'),
-				textarea = document.getElementById('test-string');
+			const button = document.getElementById('test-expression');
+			const textarea = document.getElementById('test-string');
 
 			button.classList.remove('is-loading');
 			button.removeAttribute('disabled');
@@ -251,20 +252,20 @@
 		}
 
 		#showTestResult(response, expressions) {
-			this.#test_results.querySelectorAll('.js-expression-result-row').forEach((row) => row.remove());
+			this.#test_results.querySelectorAll('.js-expression-result-row').forEach(row => row.remove());
 
-			const indexes = Object.keys(expressions),
-				message = response.final ? <?= json_encode(_('TRUE')) ?> : <?= json_encode(_('FALSE')) ?>,
-				combined_result = {message, result: response.final};
+			const indexes = Object.keys(expressions);
+			const message = response.final ? <?= json_encode(_('TRUE')) ?> : <?= json_encode(_('FALSE')) ?>;
+			const combined_result = {message, result: response.final};
 
 			if (indexes.length == 0) {
 				return this.#addTestResultCombined(false, <?= json_encode(_('UNKNOWN')) ?>);
 			}
 
 			for (let index of indexes) {
-				const result = response.expressions[index],
-					error = response.errors[index],
-					expression = expressions[index];
+				const result = response.expressions[index];
+				const error = response.errors[index];
+				const expression = expressions[index];
 
 				if (error !== undefined) {
 					combined_result.message = <?= json_encode(_('UNKNOWN')) ?>;

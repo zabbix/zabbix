@@ -32,7 +32,7 @@ class CControllerRegExList extends CController {
 		return $this->checkAccess(CRoleHelper::UI_ADMINISTRATION_GENERAL);
 	}
 
-	protected function doAction() {
+	protected function doAction(): void {
 		$data = [
 			'regexps' => API::Regexp()->get([
 				'output' => ['regexpid', 'name'],

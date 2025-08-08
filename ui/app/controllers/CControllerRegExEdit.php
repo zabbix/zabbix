@@ -24,8 +24,8 @@ class CControllerRegExEdit extends CController {
 
 	protected function checkInput(): bool {
 		$fields = [
-			'regexpid' => 'db regexps.regexpid',
-			'regexp' => 'array'
+			'regexpid' =>	'db regexps.regexpid',
+			'regexp' =>		'array'
 		];
 
 		$ret = $this->validateInput($fields);
