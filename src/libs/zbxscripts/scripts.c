@@ -41,6 +41,7 @@
 #define REMOTE_COMMAND_RESULT_OOM	1
 #define REMOTE_COMMAND_RESULT_WAIT	2
 #define REMOTE_COMMAND_COMPLETED	4
+#define REMOTE_COMMAND_SENT		8
 
 static zbx_uint64_t	remote_command_cache_size = 256 * ZBX_KIBIBYTE;
 
@@ -309,7 +310,10 @@ void	zbx_remote_commands_prepare_to_send(struct zbx_json *json, zbx_uint64_t hos
 			zbx_json_adduint64(json, ZBX_PROTO_TAG_ID, command->id);
 
 			if (0 != (command->flag & REMOTE_COMMAND_RESULT_WAIT))
+			{
 				wait = 1;
+				command->flag |= REMOTE_COMMAND_SENT;
+			}
 
 			zbx_json_adduint64(json, ZBX_PROTO_TAG_WAIT, (zbx_uint64_t)wait);
 
@@ -332,7 +336,7 @@ out:
 static int	active_command_send_and_result_fetch(const zbx_dc_host_t *host, const char *command, char **result,
 		int config_timeout, zbx_get_config_forks_f get_config_forks, char *error, size_t max_error_len)
 {
-	int			ret = FAIL, completed = 0;
+	int			ret = FAIL, completed = 0, sent = 0;
 	zbx_rc_command_t	cmd, *pcmd;
 	time_t			time_start;
 
@@ -385,6 +389,9 @@ static int	active_command_send_and_result_fetch(const zbx_dc_host_t *host, const
 
 			if (0 == (REMOTE_COMMAND_COMPLETED & pcmd->flag))
 			{
+				if (0 != (REMOTE_COMMAND_SENT & pcmd->flag))
+					sent = 1;
+
 				commands_unlock();
 				continue;
 			}
@@ -396,7 +403,13 @@ static int	active_command_send_and_result_fetch(const zbx_dc_host_t *host, const
 
 	if (0 == completed)
 	{
-		zbx_snprintf(error, max_error_len, "timeout while retrieving result for remote command");
+		if (0 == sent)
+			zbx_snprintf(error, max_error_len, "timed out while requesting remote command in active mode");
+		else
+		{
+			zbx_snprintf(error, max_error_len, "timed out while waiting for result of remote command in"
+					" active mode");
+		}
 		commands_lock();
 	}
 	else  if (0 != (REMOTE_COMMAND_RESULT_OOM & pcmd->flag))
