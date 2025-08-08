@@ -65,10 +65,12 @@ class CControllerScriptUpdate extends CController {
 			'port' => ['db scripts.port'],
 			'command' => ['db scripts.command', 'required', 'not_empty', 'when' => ['type', 'in' => [ZBX_SCRIPT_TYPE_CUSTOM_SCRIPT, ZBX_SCRIPT_TYPE_IPMI, ZBX_SCRIPT_TYPE_SSH, ZBX_SCRIPT_TYPE_TELNET]]],
 			'commandipmi' => ['db scripts.command', 'required', 'not_empty', 'when' => ['type', 'in' => [ZBX_SCRIPT_TYPE_IPMI]]],
-			'parameters' =>	['array'],
-			'script' => ['db scripts.command'],
+			'parameters' =>	['object', 'fields' => ['name' => ['array'], 'value' => ['array']],
+				'when' => ['type', 'in' => [ZBX_SCRIPT_TYPE_WEBHOOK]]
+			],
+			'script' => ['db scripts.command', 'required', 'not_empty', 'when' => ['type', 'in' => [ZBX_SCRIPT_TYPE_WEBHOOK]]],
 			'timeout' => ['db scripts.timeout', 'required', 'not_empty',
-				'use' => [CTimeUnitValidator::class, ['min' => 1, 'max' => SEC_PER_MIN, 'usermacros' => true]],
+				'use' => [CTimeUnitValidator::class, ['min' => 1, 'max' => SEC_PER_MIN, 'usermacros' => true]]
 			],
 			'url' => ['db scripts.url', 'required', 'not_empty', 'when' => ['type', 'in' => [ZBX_SCRIPT_TYPE_URL]]],
 			'new_window' => ['db scripts.new_window', 'in' => [ZBX_SCRIPT_URL_NEW_WINDOW_NO, ZBX_SCRIPT_URL_NEW_WINDOW_YES]],
