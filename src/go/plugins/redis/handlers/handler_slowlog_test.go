@@ -16,9 +16,9 @@ package handlers
 
 import (
 	"errors"
-	"reflect"
 	"testing"
 
+	"github.com/google/go-cmp/cmp"
 	"github.com/mediocregopher/radix/v3"
 	"golang.zabbix.com/agent2/plugins/redis/conn"
 )
@@ -138,8 +138,9 @@ func TestSlowlogHandler(t *testing.T) {
 				return
 			}
 
-			if !reflect.DeepEqual(got, tt.want) {
-				t.Errorf("Plugin.SlowlogHandler() = %v, want %v", got, tt.want)
+			diff := cmp.Diff(tt.want, got)
+			if diff != "" {
+				t.Fatalf("Plugin.SlowlogHandler() mismatch (-want +got):\n%s", diff)
 			}
 		})
 	}
