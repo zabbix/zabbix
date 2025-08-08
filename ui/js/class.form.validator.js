@@ -484,6 +484,36 @@ class CFormValidator {
 	}
 
 	/**
+	 * Call validation which uses API service function
+	 *
+	 * @param method
+	 * @param params
+	 * @param exclude_id
+	 * @returns {Promise}
+	 */
+	#validateWithApi (method, params, exclude_id) {
+		const url = new URL('zabbix.php', location.href);
+		url.searchParams.set('action', 'validate.with.api');
+
+		return fetch(url.href, {
+			method: 'POST',
+			headers: {'Content-Type': 'application/json'},
+			credentials: 'same-origin',
+			body: JSON.stringify({method, params, exclude_id}),
+		})
+			.then(response => response.json())
+			.then(response => {
+				if ('error' in response) {
+					if ('error' in response) {
+						throw {error: response.error};
+					}
+				}
+
+				return response;
+			});
+	}
+
+	/**
 	 * Check data uniqueness using JS API call.
 	 *
 	 * @returns {Promise}
@@ -512,18 +542,10 @@ class CFormValidator {
 				for (const check of api_uniq_checks) {
 					const {method, parameters, exclude_id} = check;
 
-					const api_call = ApiCall(method, {output: [], filter: parameters, preservekeys: true})
+					const api_call = this.#validateWithApi(method, {filter: parameters}, exclude_id)
 						.then(result => {
-							result = Object.keys(result.result);
-
-							if (exclude_id) {
-								const index = result.indexOf(exclude_id);
-								if (index !== -1) {
-									result.splice(index, 1);
-								}
-							}
-
-							check.result = result;
+							check.result = result.result;
+							check.api_error_msg = (result.result ? null : result.error_msg);
 						});
 
 					requests.push(api_call);
@@ -533,8 +555,8 @@ class CFormValidator {
 					let result_all = true;
 
 					api_uniq_checks.forEach((check) => {
-						if (check.result.length) {
-							const error_message = check.error_msg ?? t('This object already exists.');
+						if (check.result === false) {
+							const error_message = check.error_msg ? check.error_msg : check.api_error_msg;
 
 							this.#addError(check.fields[0], error_message, CFormValidator.ERROR_LEVEL_API);
 							result_all = false;

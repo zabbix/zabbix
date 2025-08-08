@@ -1291,4 +1291,31 @@ class CApiService {
 	public static function getAuthIdentifier(): string {
 		return array_key_exists('sessionid', self::$userData) ? self::$userData['sessionid'] : self::$userData['token'];
 	}
+
+
+	/**
+	 * Check if there are any matching items based on get() function result
+	 *
+	 * @param array $options
+	 * @param int|null $exclude_primary_id
+	 *
+	 * @return bool	Returns true if there are any items that matches, excluding specific ID
+	 *
+	 * @throws  Exception
+	 */
+	public function exists (array $options, ?int $exclude_primary_id = null): bool
+	{
+		$options['preservekeys'] = true;
+		$result = $this->get($options);
+
+		if ($result) {
+			$matches = array_diff(array_keys($result), [$exclude_primary_id]);
+
+			if (count($matches) > 0) {
+				return true;
+			}
+		}
+
+		return false;
+	}
 }

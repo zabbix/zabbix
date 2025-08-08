@@ -1230,33 +1230,10 @@ class CFormValidator {
 		}
 
 		$parameters = [
-			'output' => [],
 			'filter' => $parameters,
-			'preservekeys' => true
 		];
 
-		$auth = [
-			'type' => CJsonRpc::AUTH_TYPE_COOKIE,
-			'auth' => CWebUser::$data['sessionid']
-		];
-
-		$response = API::getWrapper()->getClient()->callMethod($api, $method, $parameters, $auth);
-
-		if ($response->errorCode) {
-			throw new Exception($response->errorMessage);
-		}
-
-		$result = $response->data;
-
-		if ($exclude_id !== null) {
-			$exclude_id_field_data = $this->getWhenFieldValue($exclude_id, $path);
-
-			if ($exclude_id_field_data['type'] === 'id') {
-				unset($result[$exclude_id_field_data['value']]);
-			}
-		}
-
-		if (count($result)) {
+		if (API::getApiService($api)->exists($parameters, $exclude_id)) {
 			$error = _('This object already exists.');
 
 			if ($path === '') {
