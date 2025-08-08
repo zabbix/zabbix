@@ -477,7 +477,6 @@ static int	passive_command_send_and_result_fetch(const zbx_dc_host_t *host, cons
 	{
 		if (ZBX_ISSET_MSG(&agent_result))
 			zbx_strlcpy(error, agent_result.msg, max_error_len);
-		ret = FAIL;
 	}
 	else if (NULL != result && ZBX_ISSET_TEXT(&agent_result))
 		*result = zbx_strdup(*result, agent_result.text);
@@ -502,21 +501,37 @@ static int	zbx_execute_script_on_agent(const zbx_dc_host_t *host, const char *co
 		unsigned char program_type, char *error, size_t max_error_len)
 {
 	zbx_dc_interface_t	interface;
+	int			ret;
 
-	memset(&interface, 0, sizeof(interface));
-
-	if (FAIL == zbx_dc_config_get_interface_by_type(&interface, host->hostid, INTERFACE_TYPE_AGENT))
-		zabbix_log(LOG_LEVEL_DEBUG, "cannot find agent interface on host \"%s\"", host->host);
-
-	if (ZBX_INTERFACE_AVAILABLE_TRUE != interface.available &&
-			ZBX_INTERFACE_AVAILABLE_TRUE == zbx_get_active_agent_availability(host->hostid))
+	if (SUCCEED == (ret = zbx_dc_config_get_interface_by_type(&interface, host->hostid, INTERFACE_TYPE_AGENT)))
 	{
-		return active_command_send_and_result_fetch(host, command, result, config_timeout, get_config_forks,
-				error, max_error_len);
+		ret = passive_command_send_and_result_fetch(host, command, result, config_timeout,
+				config_source_ip, program_type, error, max_error_len);
 	}
 
-	return passive_command_send_and_result_fetch(host, command, result, config_timeout, config_source_ip,
-			program_type, error, max_error_len);
+	switch (ret)
+	{
+		case SUCCEED:
+			return SUCCEED;
+		case TIMEOUT_ERROR:
+		case GATEWAY_ERROR:
+		case NOTSUPPORTED:
+			return FAIL;
+		case NETWORK_ERROR:
+		case CONFIG_ERROR:
+		case FAIL:
+		default:
+			if (ZBX_INTERFACE_AVAILABLE_TRUE != zbx_get_active_agent_availability(host->hostid))
+			{
+				if ('\0' == *error)
+					zbx_snprintf(error, max_error_len, "Zabbix agent is not available");
+		
+				return FAIL;
+			}
+
+			return active_command_send_and_result_fetch(host, command, result, config_timeout,
+					get_config_forks, error, max_error_len);
+	}
 }
 
 static int	zbx_execute_script_on_terminal(const zbx_dc_host_t *host, const zbx_script_t *script, char **result,
