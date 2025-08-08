@@ -15,9 +15,9 @@
 package redis
 
 import (
-	"reflect"
 	"testing"
 
+	"github.com/google/go-cmp/cmp"
 	"golang.zabbix.com/sdk/plugin"
 )
 
@@ -77,8 +77,9 @@ func TestPlugin_Export(t *testing.T) {
 				return
 			}
 
-			if !reflect.DeepEqual(gotResult, tt.wantResult) {
-				t.Errorf("Plugin.Export() = %v, want %v", gotResult, tt.wantResult)
+			diff := cmp.Diff(tt.wantResult, gotResult)
+			if diff != "" {
+				t.Fatalf("Plugin.Export() mismatch (-want +got):\n%s", diff)
 			}
 		})
 	}

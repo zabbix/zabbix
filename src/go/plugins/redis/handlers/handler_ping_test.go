@@ -16,9 +16,9 @@ package handlers
 
 import (
 	"fmt"
-	"reflect"
 	"testing"
 
+	"github.com/google/go-cmp/cmp"
 	"github.com/mediocregopher/radix/v3"
 	"golang.zabbix.com/agent2/plugins/redis/conn"
 	"golang.zabbix.com/sdk/plugin/comms"
@@ -106,9 +106,9 @@ func TestPingHandler(t *testing.T) {
 
 				return
 			}
-
-			if !reflect.DeepEqual(got, tt.want) {
-				t.Errorf("Plugin.PingHandler() = %v, want %v", got, tt.want)
+			diff := cmp.Diff(tt.want, got)
+			if diff != "" {
+				t.Fatalf("Plugin.PingHandler() mismatch (-want +got):\n%s", diff)
 			}
 		})
 	}

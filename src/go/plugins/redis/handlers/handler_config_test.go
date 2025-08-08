@@ -16,10 +16,10 @@ package handlers
 
 import (
 	"errors"
-	"reflect"
 	"strings"
 	"testing"
 
+	"github.com/google/go-cmp/cmp"
 	"github.com/mediocregopher/radix/v3"
 	"golang.zabbix.com/agent2/plugins/redis/conn"
 )
@@ -99,8 +99,9 @@ func TestConfigHandler(t *testing.T) {
 				return
 			}
 
-			if !reflect.DeepEqual(got, tt.want) {
-				t.Errorf("Plugin.ConfigHandler() = %v, want %v", got, tt.want)
+			diff := cmp.Diff(tt.want, got)
+			if diff != "" {
+				t.Fatalf("Plugin.ConfigHandler() mismatch (-want +got):\n%s", diff)
 			}
 		})
 	}
