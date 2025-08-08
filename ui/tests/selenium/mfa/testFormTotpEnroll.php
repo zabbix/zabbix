@@ -109,7 +109,7 @@ class testFormTotpEnroll extends testFormTotp {
 		$totp_code_length = CTestArrayHelper::get($data, 'mfa_data.code_length', self::DEFAULT_TOTP_CODE_LENGTH);
 
 		// Get elements.
-		$form = $this->query('class:signin-container')->asForm()->one();
+		$form = $this->query('class:signin-container')->waitUntilVisible()->asForm()->one();
 
 		// Assert the QR code and get the secret.
 		$totp_secret = $this->validateQrCodeAndExtractSecret($totp_name, self::USER_NAME, $totp_algo,

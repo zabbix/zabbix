@@ -75,7 +75,7 @@ class testFormTotpValidate extends testFormTotp {
 		$totp_code_length = CTestArrayHelper::get($data, 'mfa_data.code_length', self::DEFAULT_TOTP_CODE_LENGTH);
 		$totp_secret = CTestArrayHelper::get($data, 'totp_secret', self::TOTP_SECRET_32);
 
-		$form = $this->query('class:signin-container')->asForm()->one();
+		$form = $this->query('class:signin-container')->waitUntilVisible()->asForm()->one();
 
 		// Get the verification code (the TOTP itself). Generate only if it is not defined in the data provider.
 		CMfaTotpHelper::waitForSafeTotpWindow();
