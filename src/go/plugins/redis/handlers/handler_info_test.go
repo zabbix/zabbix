@@ -16,9 +16,9 @@ package handlers
 
 import (
 	"errors"
-	"reflect"
 	"testing"
 
+	"github.com/google/go-cmp/cmp"
 	"github.com/mediocregopher/radix/v3"
 	"golang.zabbix.com/agent2/plugins/redis/conn"
 )
@@ -158,8 +158,9 @@ func TestParseRedisInfo(t *testing.T) {
 				return
 			}
 
-			if !reflect.DeepEqual(gotRes, tt.wantRes) {
-				t.Errorf("parseRedisInfo() = %#v, want %#v", gotRes, tt.wantRes)
+			diff := cmp.Diff(tt.wantRes, gotRes)
+			if diff != "" {
+				t.Fatalf("parseRedisInfo() mismatch (-want +got):\n%s\ngot=%#v\nwant=%#v", diff, gotRes, tt.wantRes)
 			}
 		})
 	}
@@ -252,8 +253,9 @@ func TestInfoHandler(t *testing.T) {
 				return
 			}
 
-			if !reflect.DeepEqual(got, tt.want) {
-				t.Errorf("Plugin.InfoHandler() = %v, want %v", got, tt.want)
+			diff := cmp.Diff(tt.want, got)
+			if diff != "" {
+				t.Fatalf("Plugin.InfoHandler() mismatch (-want +got):\n%s", diff)
 			}
 		})
 	}

@@ -152,9 +152,11 @@ func TestManager_Get(t *testing.T) {
 		}
 	})
 
+	stubClient := radix.Stub("", "", nil)
+
 	lastTimeAccess := time.Now()
 	conn := &RedisConn{
-		client:         radix.Stub("", "", nil),
+		client:         stubClient,
 		lastTimeAccess: lastTimeAccess,
 	}
 
@@ -164,7 +166,9 @@ func TestManager_Get(t *testing.T) {
 		t.Parallel()
 
 		got := connMgr.get(u)
-		if !reflect.DeepEqual(got, conn) {
+
+		// has to return the same pointer.
+		if conn != got {
 			t.Errorf("Manager.get() = %v, want %v", got, conn)
 		}
 
