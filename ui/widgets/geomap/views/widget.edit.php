@@ -48,7 +48,7 @@ $groupids = array_key_exists('groupids', $data['fields'])
 		(new CWidgetFieldLatLngView($data['fields']['default_view']))->setPlaceholder('40.6892494,-74.0466891')
 	)
 	->addFieldsGroup(
-		getClusteringFieldsGroupView($data['fields'])->addClass('clustering')
+		getClusteringFieldsGroupView($data['fields'])->addClass('fields-group-clustering')
 	)
 	->includeJsFile('widget.edit.js.php')
 	->initFormJs('widget_form.init();')

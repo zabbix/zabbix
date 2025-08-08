@@ -4579,6 +4579,10 @@ div.dashboard-widget-gauge {
 div.dashboard-widget-gauge .dashboard-grid-widget-body a:link {
   border: 0; }
 
+form.dashboard-widget-geomap .fields-group-clustering {
+  display: flex;
+  gap: 3px; }
+
 div.dashboard-widget-geomap {
   --hover-fill: #e8e9ed;
   --selected-fill: #d9d9d9;
@@ -4642,10 +4646,6 @@ div.dashboard-widget-geomap {
   white-space: normal; }
   .geomap-hintbox tr[data-hostid] {
     cursor: pointer; }
-
-.clustering {
-  display: flex;
-  gap: 3px; }
 
 form.dashboard-widget-honeycomb .fields-group.fields-group-primary-label, form.dashboard-widget-honeycomb .fields-group.fields-group-secondary-label {
   display: grid;
