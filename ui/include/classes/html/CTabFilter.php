@@ -377,9 +377,9 @@ class CTabFilter extends CDiv {
 
 		$nav_list = new CList([
 			(new CButtonIcon(ZBX_ICON_CHEVRON_DOWN))->setAttribute('data-action', 'toggleTabsList')
-				->setAttribute('aria-label', _('Tabs list')),
+				->setAttribute('aria-label', _('List of open filter tabs')),
 			(new CButtonIcon(ZBX_ICON_CHEVRON_RIGHT))->setAttribute('data-action', 'selectNextTab')
-				->setAttribute('aria-label', _('Next tab'))
+				->setAttribute('aria-label', _('Go to next filter tab'))
 		]);
 
 		if (array_key_exists('timeselector', $this->options)) {
@@ -391,7 +391,7 @@ class CTabFilter extends CDiv {
 		return new CTag('nav', true,
 			new CList([
 				(new CButtonIcon(ZBX_ICON_CHEVRON_LEFT))->setAttribute('data-action', 'selectPrevTab')
-					->setAttribute('aria-label', _('Previous tab')),
+					->setAttribute('aria-label', _('Go to previous filter tab')),
 				$sortable ? (new CList($sortable))->addClass(static::CSS_TABS) : null,
 				$static ?: null,
 				$nav_list

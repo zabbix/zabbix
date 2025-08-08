@@ -163,13 +163,15 @@ function get_icon($type, $params = []): ?CSimpleButton {
 			if (CFavorite::exists($params['fav'], $params['elid'], $params['elname'])) {
 				$icon = (new CSimpleButton())
 					->addClass(ZBX_ICON_STAR_FILLED)
-					->setTitle(_('Remove from favorites'))
+					->setHint(_('Remove from favorites'), '', false)
+					->setAttribute('aria-label', _('Remove map from the Favorite maps widget'))
 					->onClick('rm4favorites("'.$params['elname'].'", "'.$params['elid'].'");');
 			}
 			else {
 				$icon = (new CSimpleButton())
 					->addClass(ZBX_ICON_STAR)
-					->setTitle(_('Add to favorites'))
+					->setHint(_('Add to favorites'), '', false)
+					->setAttribute('aria-label', _('Add map to Favorite maps widget'))
 					->onClick('add2favorites("'.$params['elname'].'", "'.$params['elid'].'");');
 			}
 			$icon->setId('addrm_fav');
@@ -182,7 +184,8 @@ function get_icon($type, $params = []): ?CSimpleButton {
 					->addClass(ZBX_LAYOUT_MODE)
 					->addClass(ZBX_ICON_MINIMIZE)
 					->addClass(ZBX_STYLE_BTN_DASHBOARD_NORMAL)
-					->setTitle(_('Normal view'))
+					->setHint(_('Normal view'), '', false)
+					->setAttribute('aria-label', _('Exit full screen mode'))
 					->setAttribute('data-layout-mode', ZBX_LAYOUT_NORMAL);
 			}
 			else {
@@ -190,7 +193,8 @@ function get_icon($type, $params = []): ?CSimpleButton {
 					->addClass(ZBX_LAYOUT_MODE)
 					->addClass(ZBX_ICON_FULLSCREEN)
 					->addClass(ZBX_STYLE_BTN_KIOSK)
-					->setTitle(_('Kiosk mode'))
+					->setHint(_('Kiosk mode'), '', false)
+					->setAttribute('aria-label', _('Enter full screen mode'))
 					->setAttribute('data-layout-mode', ZBX_LAYOUT_KIOSKMODE);
 			}
 

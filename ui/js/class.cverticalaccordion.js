@@ -78,7 +78,6 @@ jQuery(function($) {
 				accordion.trigger('collapse', {section: $(this)});
 			});
 
-			$(options['handler'], accordion).attr('title', t('S_EXPAND'));
 			$(options['handler'], accordion).attr('aria-expanded', false);
 		},
 		// Expand N-th row in accordion. Collapse others.
@@ -96,7 +95,6 @@ jQuery(function($) {
 
 			accordion.trigger('expand', {section: section});
 
-			handler.attr('title', t('S_COLLAPSE'));
 			handler.attr('aria-expanded', true);
 		}
 	};

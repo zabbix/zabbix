@@ -138,7 +138,7 @@ class CHtmlPage {
 			(new CTag('nav', true,
 				(new CButtonIcon(ZBX_ICON_MENU, _('Show sidebar')))
 					->setId('sidebar-button-toggle')
-					->setAttribute('aria-label', _('Show main menu'))
+					->setAttribute('aria-label', _('Show sidebar'))
 					->setAttribute('aria-expanded', 'false')
 					->setAttribute('aria-controls', 'sidebar')
 			))
@@ -172,9 +172,8 @@ class CHtmlPage {
 				(new CLink(null, $this->doc_url))
 					->addClass(ZBX_STYLE_BTN_ICON)
 					->addClass(ZBX_ICON_HELP)
-					->setTitle(_('Help'))
 					->setTarget('_blank')
-					->setAttribute('aria-label', _('Help'))
+					->setAttribute('aria-label', _('Open Zabbix documentation in a new tab'))
 			))->addClass(self::ZBX_STYLE_HEADER_DOC_LINK);
 		}
 

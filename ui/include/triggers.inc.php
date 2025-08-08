@@ -2000,7 +2000,7 @@ function makeTriggerDependencies(array $dependencies, bool $freeze_on_click = tr
 
 	foreach (['down', 'up'] as $type) {
 		if (array_key_exists($type, $dependencies)) {
-			$title = $type === 'down' ? _('Depends on') : _('Dependent');
+			$title = $type === 'down' ? _('Dependent trigger') : _('Parent trigger');
 
 			$table = (new CTableInfo())
 				->setAttribute('style', 'max-width: '.ZBX_TEXTAREA_STANDARD_WIDTH.'px;')
