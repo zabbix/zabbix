@@ -50,7 +50,8 @@ func getValidationRules(tlsConnect comms.TLSConnectionType) map[comms.ConfigSett
 
 	case comms.VerifyCA, comms.VerifyFull:
 		rules[comms.TLSCAFile] = required
-
+	default:
+		return map[comms.ConfigSetting]fieldRequirement{}
 	}
 
 	return rules

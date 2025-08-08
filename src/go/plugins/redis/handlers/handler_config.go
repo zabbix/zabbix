@@ -16,7 +16,6 @@ package handlers
 
 import (
 	"encoding/json"
-	"fmt"
 	"strings"
 
 	"github.com/mediocregopher/radix/v3"
@@ -37,7 +36,7 @@ func ConfigHandler(redisClient conn.RedisClient, params map[string]string) (any,
 	}
 
 	if len(res) == 0 {
-		return nil, fmt.Errorf("no config parameter found for pattern %q", params["Pattern"])
+		return nil, errs.New("no config parameter found for pattern " + params["Pattern"])
 	}
 
 	if strings.ContainsAny(params["Pattern"], globChars) {

@@ -24,16 +24,23 @@ import (
 	"golang.zabbix.com/sdk/uri"
 )
 
-var unitLogger = log.New("unit test logger")
+var unitLogger = log.New("unit test logger") //nolint:gochecknoglobals // logger just for testing.
 
 func TestManager_CloseUnused(t *testing.T) {
+	t.Parallel()
+
 	connMgr := NewManager(unitLogger, 1*time.Microsecond, 30*time.Second, HouseKeeperInterval*time.Second)
-	defer connMgr.Destroy()
+
+	t.Cleanup(func() {
+		connMgr.Destroy()
+	})
 
 	u, _ := uri.New("tcp://127.0.0.1", nil)
 	_, _ = connMgr.create(u, map[string]string{})
 
 	t.Run("Unused connections should have been deleted", func(t *testing.T) {
+		t.Parallel()
+
 		connMgr.closeUnused()
 
 		if len(connMgr.connections) != 0 {
@@ -43,13 +50,20 @@ func TestManager_CloseUnused(t *testing.T) {
 }
 
 func TestManager_CloseAll(t *testing.T) {
+	t.Parallel()
+
 	connMgr := NewManager(unitLogger, 300*time.Second, 30*time.Second, HouseKeeperInterval*time.Second)
-	defer connMgr.Destroy()
+
+	t.Cleanup(func() {
+		connMgr.Destroy()
+	})
 
 	u, _ := uri.New("tcp://127.0.0.1", nil)
 	_, _ = connMgr.create(u, map[string]string{})
 
 	t.Run("All connections should have been deleted", func(t *testing.T) {
+		t.Parallel()
+
 		connMgr.closeAll()
 
 		if len(connMgr.connections) != 0 {
@@ -59,10 +73,15 @@ func TestManager_CloseAll(t *testing.T) {
 }
 
 func TestManager_Create(t *testing.T) {
+	t.Parallel()
+
 	u, _ := uri.New("tcp://127.0.0.1", nil)
 
 	connMgr := NewManager(unitLogger, 300*time.Second, 30*time.Second, HouseKeeperInterval*time.Second)
-	defer connMgr.Destroy()
+
+	t.Cleanup(func() {
+		connMgr.Destroy()
+	})
 
 	connMgr.connections[*u] = NewRedisConn(radix.Stub("", "", nil))
 
@@ -90,6 +109,8 @@ func TestManager_Create(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
+			t.Parallel()
+
 			if tt.wantPanic {
 				defer func() {
 					if r := recover(); r == nil {
@@ -114,11 +135,17 @@ func TestManager_Create(t *testing.T) {
 }
 
 func TestManager_Get(t *testing.T) {
+	t.Parallel()
+
 	u, _ := uri.New("tcp://127.0.0.1", nil)
 
 	connMgr := NewManager(unitLogger, 300*time.Second, 30*time.Second, HouseKeeperInterval*time.Second)
-	defer connMgr.Destroy()
 
+	t.Cleanup(func() {
+		connMgr.Destroy()
+	})
+
+	//nolint:paralleltest //should be done before attempt to make connection is made
 	t.Run("Should return nil if connection does not exist", func(t *testing.T) {
 		if got := connMgr.get(u); got != nil {
 			t.Errorf("Manager.get() = %v, want <nil>", got)
@@ -134,12 +161,14 @@ func TestManager_Get(t *testing.T) {
 	connMgr.connections[*u] = conn
 
 	t.Run("Should return connection if it exists", func(t *testing.T) {
+		t.Parallel()
+
 		got := connMgr.get(u)
 		if !reflect.DeepEqual(got, conn) {
 			t.Errorf("Manager.get() = %v, want %v", got, conn)
 		}
 
-		if lastTimeAccess == got.lastTimeAccess {
+		if lastTimeAccess.Equal(got.lastTimeAccess) {
 			t.Error("conn.lastTimeAccess should be updated, but it's not")
 		}
 	})

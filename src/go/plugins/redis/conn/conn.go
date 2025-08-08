@@ -91,16 +91,16 @@ func (r *RedisConn) Query(cmd radix.CmdAction) error {
 }
 
 // GetConnection returns an existing connection or creates a new one.
-func (m *Manager) GetConnection(uri *uri.URI, params map[string]string) (*RedisConn, error) {
+func (m *Manager) GetConnection(u *uri.URI, params map[string]string) (*RedisConn, error) {
 	m.managerMutex.Lock()
 	defer m.managerMutex.Unlock()
 
-	conn := m.get(uri)
+	conn := m.get(u)
 
 	if conn == nil {
 		var err error
 
-		conn, err = m.create(uri, params)
+		conn, err = m.create(u, params)
 		if err != nil {
 			return nil, errs.WrapConst(err, zbxerr.ErrorConnectionFailed)
 		}
@@ -119,14 +119,14 @@ func (m *Manager) closeUnused() {
 	m.connMutex.Lock()
 	defer m.connMutex.Unlock()
 
-	for uri, conn := range m.connections {
+	for u, conn := range m.connections {
 		if time.Since(conn.lastTimeAccess) > m.keepAlive {
 			err := conn.client.Close()
 			if err == nil {
-				delete(m.connections, uri)
-				m.log.Debugf("Closed unused connection: %s", uri.Addr())
+				delete(m.connections, u)
+				m.log.Debugf("Closed unused connection: %s", u.Addr())
 			} else {
-				m.log.Errf("Error occurred while closing connection: %s", uri.Addr())
+				m.log.Errf("Error occurred while closing connection: %s", u.Addr())
 			}
 		}
 	}
@@ -135,6 +135,7 @@ func (m *Manager) closeUnused() {
 // closeAll closes all existed connections.
 func (m *Manager) closeAll() {
 	m.connMutex.Lock()
+
 	for u, conn := range m.connections {
 		err := conn.client.Close()
 		if err == nil {
@@ -143,6 +144,7 @@ func (m *Manager) closeAll() {
 			m.log.Errf("Error occurred while closing connection: %s", u.Addr())
 		}
 	}
+
 	m.connMutex.Unlock()
 }
 
@@ -164,7 +166,7 @@ func (m *Manager) housekeeper(ctx context.Context, interval time.Duration) {
 }
 
 // create creates a new connection with given credentials.
-func (m *Manager) create(uri *uri.URI, params map[string]string) (*RedisConn, error) {
+func (m *Manager) create(u *uri.URI, params map[string]string) (*RedisConn, error) {
 	const clientName = "zbx_monitor"
 
 	const poolSize = 1
@@ -172,7 +174,7 @@ func (m *Manager) create(uri *uri.URI, params map[string]string) (*RedisConn, er
 	m.connMutex.Lock()
 	defer m.connMutex.Unlock()
 
-	tlsConfig, err := getTLSConfig(uri, params)
+	tlsConfig, err := getTLSConfig(u, params)
 	if err != nil {
 		if !errors.Is(err, errTLSDisabled) {
 			// If it's any other error, it's a real failure.
@@ -180,7 +182,7 @@ func (m *Manager) create(uri *uri.URI, params map[string]string) (*RedisConn, er
 		}
 	}
 
-	_, ok := m.connections[*uri]
+	_, ok := m.connections[*u]
 	if ok {
 		// Should never happen.
 		panic("connection already exists")
@@ -190,7 +192,7 @@ func (m *Manager) create(uri *uri.URI, params map[string]string) (*RedisConn, er
 	authConnFunc := func(scheme, addr string) (radix.Conn, error) {
 		dialOpts := []radix.DialOpt{
 			radix.DialTimeout(m.timeout),
-			radix.DialAuthUser(uri.User(), uri.Password()),
+			radix.DialAuthUser(u.User(), u.Password()),
 		}
 
 		if tlsConfig != nil {
@@ -218,24 +220,24 @@ func (m *Manager) create(uri *uri.URI, params map[string]string) (*RedisConn, er
 		return conn, nil
 	}
 
-	client, err := radix.NewPool(uri.Scheme(), uri.Addr(), poolSize, radix.PoolConnFunc(authConnFunc))
+	client, err := radix.NewPool(u.Scheme(), u.Addr(), poolSize, radix.PoolConnFunc(authConnFunc))
 	if err != nil {
 		return nil, errs.Wrap(err, "failed to create pool")
 	}
 
-	m.connections[*uri] = NewRedisConn(client)
+	m.connections[*u] = NewRedisConn(client)
 
-	m.log.Debugf("Created new connection: %s", uri.Addr())
+	m.log.Debugf("Created new connection: %s", u.Addr())
 
-	return m.connections[*uri], nil
+	return m.connections[*u], nil
 }
 
 // get returns a connection with given cid if it exists and also updates lastTimeAccess, otherwise returns nil.
-func (m *Manager) get(uri *uri.URI) *RedisConn {
+func (m *Manager) get(u *uri.URI) *RedisConn {
 	m.connMutex.Lock()
 	defer m.connMutex.Unlock()
 
-	conn, ok := m.connections[*uri]
+	conn, ok := m.connections[*u]
 	if ok {
 		conn.updateAccessTime()
 
