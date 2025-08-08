@@ -1,1 +1,0 @@
-.......PS. [ZBX-25887] returned empty JSON array instead of error if input value for "SNMP walk to JSON" item preprocessing step is empty (MVekslers)
