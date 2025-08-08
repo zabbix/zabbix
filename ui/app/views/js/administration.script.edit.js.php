@@ -21,10 +21,12 @@
 
 window.script_edit_popup = new class {
 
-	init({script}) {
+	init({script, rules, rules_for_clone = null}) {
 		this.overlay = overlays_stack.getById('script.edit');
 		this.dialogue = this.overlay.$dialogue[0];
-		this.form = this.overlay.$dialogue.$body[0].querySelector('form');
+		this.form_element = this.overlay.$dialogue.$body[0].querySelector('form');
+		this.form = new CForm(this.form_element, rules);
+		this.rules_for_clone = rules_for_clone;
 		this.script = script;
 		this.scriptid = script.scriptid;
 
@@ -43,14 +45,14 @@ window.script_edit_popup = new class {
 	}
 
 	#initActions() {
-		this.form.querySelector('#scope').dispatchEvent(new Event('change'));
-		this.form.querySelector('#type').dispatchEvent(new Event('change'));
-		this.form.querySelector('#enable_confirmation').dispatchEvent(new Event('change'));
+		this.form_element.querySelector('#scope').dispatchEvent(new Event('change'));
+		this.form_element.querySelector('#type').dispatchEvent(new Event('change'));
+		this.form_element.querySelector('#enable_confirmation').dispatchEvent(new Event('change'));
 
-		this.form.querySelector('.js-parameter-add').addEventListener('click', () => {
-			const template = new Template(this.form.querySelector('#script-parameter-template').innerHTML);
+		this.form_element.querySelector('.js-parameter-add').addEventListener('click', () => {
+			const template = new Template(this.form_element.querySelector('#script-parameter-template').innerHTML);
 
-			this.form
+			this.form_element
 				.querySelector('#parameters-table tbody')
 				.insertAdjacentHTML('beforeend', template.evaluate({}));
 		});
@@ -68,9 +70,9 @@ window.script_edit_popup = new class {
 	 * @param {object} parameter  The parameter object.
 	 */
 	#addParameter(parameter) {
-		const template = new Template(this.form.querySelector('#script-parameter-template').innerHTML);
+		const template = new Template(this.form_element.querySelector('#script-parameter-template').innerHTML);
 
-		this.form
+		this.form_element
 			.querySelector('#parameters-table tbody')
 			.insertAdjacentHTML('beforeend', template.evaluate(parameter));
 	}
@@ -85,10 +87,10 @@ window.script_edit_popup = new class {
 		this.type = parseInt(script.type);
 		this.confirmation = script.enable_confirmation;
 
-		const type = this.form.querySelector('#type');
+		const type = this.form_element.querySelector('#type');
 
 		// Load scope fields.
-		this.form.querySelector('#scope').addEventListener('change', (e) => {
+		this.form_element.querySelector('#scope').addEventListener('change', (e) => {
 			this.#hideFormFields('all');
 			this.#loadScopeFields(e);
 			type.dispatchEvent(new Event('change'));
@@ -98,44 +100,44 @@ window.script_edit_popup = new class {
 		type.addEventListener('change', (e) => this.#loadTypeFields(script, e));
 
 		// Update user input fields.
-		this.form.querySelector('#manualinput').addEventListener('change', (e) => this.#loadUserInputFields(e));
-		this.form.querySelector('#manualinput').dispatchEvent(new Event('change'));
+		this.form_element.querySelector('#manualinput').addEventListener('change', (e) => this.#loadUserInputFields(e));
+		this.form_element.querySelector('#manualinput').dispatchEvent(new Event('change'));
 
 
 		// Update confirmation fields.
-		this.form.querySelector('#enable_confirmation').addEventListener('change', (e) =>
+		this.form_element.querySelector('#enable_confirmation').addEventListener('change', (e) =>
 			this.#loadConfirmationFields(e)
 		);
 
 		// Test user input button.
-		this.form.querySelector('#test_user_input').addEventListener('click', () => this.#openManualinputTestPopup());
+		this.form_element.querySelector('#test_user_input').addEventListener('click', () => this.#openManualinputTestPopup());
 
 		// Test confirmation button.
-		this.form.querySelector('#test_confirmation').addEventListener('click', (e) => {
-			if (this.form.querySelector('input[name="type"]:checked').value == <?= ZBX_SCRIPT_TYPE_URL ?>) {
-				Script.openUrl(null, this.form.querySelector('#confirmation').value, e.target);
+		this.form_element.querySelector('#test_confirmation').addEventListener('click', (e) => {
+			if (this.form_element.querySelector('input[name="type"]:checked').value == <?= ZBX_SCRIPT_TYPE_URL ?>) {
+				Script.openUrl(null, this.form_element.querySelector('#confirmation').value, e.target);
 			}
 			else {
-				Script.execute(null, this.form.querySelector('#confirmation').value, e.target)
+				Script.execute(null, this.form_element.querySelector('#confirmation').value, e.target)
 			}
 		});
 
 		// Host group selection.
-		const hgstype = this.form.querySelector('#hgstype-select');
-		const hostgroup_selection = this.form.querySelector('#host-group-selection');
+		const hgstype = this.form_element.querySelector('#hgstype-select');
+		const hostgroup_selection = this.form_element.querySelector('#host-group-selection');
 
 		hgstype.addEventListener('change', () =>
 			hostgroup_selection.style.display = hgstype.value === '1' ? '' : 'none'
 		);
 
 		hgstype.dispatchEvent(new Event('change'));
-		this.form.removeAttribute('style');
+		this.form_element.removeAttribute('style');
 		this.overlay.recoverFocus();
 
 		// Load manual input fields based on input type.
-		const input_prompt = this.form.querySelector('#manualinput_prompt');
-		const test_user_input = this.form.querySelector('#test_user_input');
-		const dropdown_options = this.form.querySelector('#dropdown_options');
+		const input_prompt = this.form_element.querySelector('#manualinput_prompt');
+		const test_user_input = this.form_element.querySelector('#test_user_input');
+		const dropdown_options = this.form_element.querySelector('#dropdown_options');
 
 		for (const button of document.querySelectorAll('[name="manualinput_validator_type"]')) {
 			button.addEventListener('click', (e) => {
@@ -145,7 +147,7 @@ window.script_edit_popup = new class {
 
 				if (this.input_type == <?= ZBX_SCRIPT_MANUALINPUT_TYPE_STRING ?>) {
 					this.#updateManualinputFields(test_user_input, input_prompt,
-						this.form.querySelector('#manualinput_validator'), this.input_type
+						this.form_element.querySelector('#manualinput_validator'), this.input_type
 					);
 				}
 				else {
@@ -159,15 +161,15 @@ window.script_edit_popup = new class {
 
 	#openManualinputTestPopup() {
 		const input_validation = this.input_type == <?= ZBX_SCRIPT_MANUALINPUT_TYPE_STRING ?>
-			? this.form.querySelector('#manualinput_validator').value
-			: this.form.querySelector('#dropdown_options').value;
+			? this.form_element.querySelector('#manualinput_validator').value
+			: this.form_element.querySelector('#dropdown_options').value;
 
 		const default_input = this.input_type == <?= ZBX_SCRIPT_MANUALINPUT_TYPE_STRING ?>
-			? this.form.querySelector('#manualinput_default_value').value
+			? this.form_element.querySelector('#manualinput_default_value').value
 			: '';
 
 		const parameters = {
-			manualinput_prompt: this.form.querySelector('#manualinput_prompt').value,
+			manualinput_prompt: this.form_element.querySelector('#manualinput_prompt').value,
 			manualinput_default_value: default_input,
 			manualinput_validator_type: this.input_type,
 			manualinput_validator: input_validation,
@@ -183,7 +185,9 @@ window.script_edit_popup = new class {
 	clone({title, buttons}) {
 		this.scriptid = null;
 
-		for (const input of this.form.querySelectorAll('input[name=scope]')) {
+		this.form.reload(this.rules_for_clone);
+
+		for (const input of this.form_element.querySelectorAll('input[name=scope]')) {
 			input.disabled = false;
 		}
 
@@ -207,7 +211,7 @@ window.script_edit_popup = new class {
 	}
 
 	submit() {
-		const fields = getFormFields(this.form);
+		const fields = getFormFields(this.form_element);
 
 		for (let key in fields) {
 			if (typeof fields[key] === 'string' && key !== 'confirmation') {
@@ -224,11 +228,20 @@ window.script_edit_popup = new class {
 
 		curl.setArgument('action', this.scriptid === null ? 'script.create' : 'script.update');
 
-		this.#post(curl.getUrl(), fields, (response) => {
-			overlayDialogueDestroy(this.overlay.dialogueid);
+		this.form.validateSubmit(fields)
+			.then((result) => {
+				if (!result) {
+				this.overlay.unsetLoading();
 
-			this.dialogue.dispatchEvent(new CustomEvent('dialogue.submit', {detail: response}));
-		});
+					return;
+				}
+
+				this.#post(curl.getUrl(), fields, (response) => {
+					overlayDialogueDestroy(this.overlay.dialogueid);
+
+					this.dialogue.dispatchEvent(new CustomEvent('dialogue.submit', {detail: response}));
+				});
+			});
 	}
 
 	/**
@@ -254,7 +267,7 @@ window.script_edit_popup = new class {
 			})
 			.then(success_callback)
 			.catch((exception) => {
-				for (const element of this.form.parentNode.children) {
+				for (const element of this.form_element.parentNode.children) {
 					if (element.matches('.msg-good, .msg-bad, .msg-warning')) {
 						element.parentNode.removeChild(element);
 					}
@@ -273,7 +286,7 @@ window.script_edit_popup = new class {
 
 				const message_box = makeMessageBox('bad', messages, title)[0];
 
-				this.form.parentNode.insertBefore(message_box, this.form);
+				this.form_element.parentNode.insertBefore(message_box, this.form_element);
 			})
 			.finally(() => this.overlay.unsetLoading());
 	}
@@ -288,7 +301,7 @@ window.script_edit_popup = new class {
 			this.scope = parseInt(event.target.value);
 		}
 
-		const url_radio_button = this.form.querySelector(
+		const url_radio_button = this.form_element.querySelector(
 			`#type input[type="radio"][value="${<?= ZBX_SCRIPT_TYPE_URL ?>}"]`
 		);
 
@@ -301,7 +314,7 @@ window.script_edit_popup = new class {
 				];
 
 				show_fields.forEach((field) => {
-					this.form.querySelector(field).style.display = '';
+					this.form_element.querySelector(field).style.display = '';
 				});
 
 				url_radio_button.closest('li').style.display = '';
@@ -311,13 +324,13 @@ window.script_edit_popup = new class {
 				const hide_fields = ['#menu-path', '#menu-path-label'];
 
 				hide_fields.forEach((field) => {
-					this.form.querySelector(field).style.display = 'none';
+					this.form_element.querySelector(field).style.display = 'none';
 				});
 
 				url_radio_button.closest('li').style.display = 'none';
 
-				if (this.form.querySelector('input[name="type"]:checked').value == <?= ZBX_SCRIPT_TYPE_URL ?>) {
-					const webhook = this.form.querySelector(`#type [value="${<?= ZBX_SCRIPT_TYPE_WEBHOOK ?>}"]`);
+				if (this.form_element.querySelector('input[name="type"]:checked').value == <?= ZBX_SCRIPT_TYPE_URL ?>) {
+					const webhook = this.form_element.querySelector(`#type [value="${<?= ZBX_SCRIPT_TYPE_WEBHOOK ?>}"]`);
 
 					webhook.checked = true;
 					this.type = parseInt(<?= ZBX_SCRIPT_TYPE_WEBHOOK ?>);
@@ -348,11 +361,11 @@ window.script_edit_popup = new class {
 		];
 
 		hide_fields.forEach((field) => {
-			this.form.querySelector(field).style.display = 'none';
+			this.form_element.querySelector(field).style.display = 'none';
 		})
 
-		const command_ipmi = this.form.querySelector('#commandipmi');
-		const command = this.form.querySelector('#command');
+		const command_ipmi = this.form_element.querySelector('#commandipmi');
+		const command = this.form_element.querySelector('#command');
 
 		switch (this.type) {
 			case <?= ZBX_SCRIPT_TYPE_CUSTOM_SCRIPT ?>:
@@ -387,7 +400,7 @@ window.script_edit_popup = new class {
 				// Load authentication fields.
 				this.authtype = parseInt(script.authtype);
 
-				const authtype = this.form.querySelector('#authtype');
+				const authtype = this.form_element.querySelector('#authtype');
 
 				authtype.addEventListener('change', (e) => this.#loadAuthFields(e));
 				authtype.dispatchEvent(new Event('change'));
@@ -418,7 +431,7 @@ window.script_edit_popup = new class {
 				break;
 		}
 
-		show_fields.forEach((field) => this.form.querySelector(field).style.display = '');
+		show_fields.forEach((field) => this.form_element.querySelector(field).style.display = '');
 	}
 
 	/**
@@ -449,7 +462,7 @@ window.script_edit_popup = new class {
 				break;
 		}
 
-		show_fields.forEach((field) => this.form.querySelector(field).style.display = '');
+		show_fields.forEach((field) => this.form_element.querySelector(field).style.display = '');
 	}
 
 	/**
@@ -463,14 +476,14 @@ window.script_edit_popup = new class {
 			this.user_input_checked = event.target.checked;
 		}
 
-		const input_prompt = this.form.querySelector('#manualinput_prompt');
-		const test_user_input = this.form.querySelector('#test_user_input');
-		const input_type = this.form.querySelector('#manualinput_validator_type');
-		const default_input = this.form.querySelector('#manualinput_default_value');
-		const input_validation = this.form.querySelector('#manualinput_validator');
-		const dropdown_options = this.form.querySelector('#dropdown_options');
+		const input_prompt = this.form_element.querySelector('#manualinput_prompt');
+		const test_user_input = this.form_element.querySelector('#test_user_input');
+		const input_type = this.form_element.querySelector('#manualinput_validator_type');
+		const default_input = this.form_element.querySelector('#manualinput_default_value');
+		const input_validation = this.form_element.querySelector('#manualinput_validator');
+		const dropdown_options = this.form_element.querySelector('#dropdown_options');
 
-		this.input_type = this.form.querySelector('input[name="manualinput_validator_type"]:checked').value;
+		this.input_type = this.form_element.querySelector('input[name="manualinput_validator_type"]:checked').value;
 
 		this.#updateManualinputFields(test_user_input, input_prompt, input_validation, this.input_type);
 
@@ -480,17 +493,17 @@ window.script_edit_popup = new class {
 		input_type.querySelectorAll('input').forEach((element) => element.disabled = !this.user_input_checked);
 
 		if (this.user_input_checked) {
-			this.form.querySelector('label[for="manualinput_prompt"]').classList
+			this.form_element.querySelector('label[for="manualinput_prompt"]').classList
 				.add('<?= ZBX_STYLE_FIELD_LABEL_ASTERISK ?>');
 		}
 		else {
-			this.form.querySelector('label[for="manualinput_prompt"]').classList
+			this.form_element.querySelector('label[for="manualinput_prompt"]').classList
 				.remove('<?= ZBX_STYLE_FIELD_LABEL_ASTERISK ?>');
 		}
 
 		const validator = this.input_type == <?= ZBX_SCRIPT_MANUALINPUT_DISABLED ?>
-			? this.form.querySelector('#manualinput_validator')
-			: this.form.querySelector('#dropdown_options');
+			? this.form_element.querySelector('#manualinput_validator')
+			: this.form_element.querySelector('#dropdown_options');
 
 		this.#updateManualinputFields(test_user_input, input_prompt, validator, this.input_type);
 	}
@@ -498,18 +511,18 @@ window.script_edit_popup = new class {
 	#updateManualinputFields(test_user_input, input_prompt, validator) {
 		const is_input_type_string = this.input_type == <?= ZBX_SCRIPT_MANUALINPUT_TYPE_STRING ?>
 
-		this.form.querySelector('label[for=manualinput_default_value]').style.display = is_input_type_string
+		this.form_element.querySelector('label[for=manualinput_default_value]').style.display = is_input_type_string
 			? ''
 			: 'none';
-		this.form.querySelector('#manualinput_default_value').parentNode.style.display = is_input_type_string
+		this.form_element.querySelector('#manualinput_default_value').parentNode.style.display = is_input_type_string
 			? ''
 			: 'none';
 
-		this.form.querySelector('label[for=manualinput_validator]').style.display = is_input_type_string ? '' : 'none';
-		this.form.querySelector('#manualinput_validator').parentNode.style.display = is_input_type_string ? '' : 'none';
+		this.form_element.querySelector('label[for=manualinput_validator]').style.display = is_input_type_string ? '' : 'none';
+		this.form_element.querySelector('#manualinput_validator').parentNode.style.display = is_input_type_string ? '' : 'none';
 
-		this.form.querySelector('label[for=dropdown_options]').style.display = is_input_type_string ? 'none' : '';
-		this.form.querySelector('#dropdown_options').parentNode.style.display = is_input_type_string ? 'none' : '';
+		this.form_element.querySelector('label[for=dropdown_options]').style.display = is_input_type_string ? 'none' : '';
+		this.form_element.querySelector('#dropdown_options').parentNode.style.display = is_input_type_string ? 'none' : '';
 
 		if (this.user_input_checked) {
 			document.querySelector(`label[for="${validator.name}"]`).classList
@@ -542,11 +555,11 @@ window.script_edit_popup = new class {
 			this.confirmation = event.target.checked;
 		}
 
-		const confirmation = this.form.querySelector('#confirmation');
-		const test_confirmation = this.form.querySelector('#test_confirmation');
+		const confirmation = this.form_element.querySelector('#confirmation');
+		const test_confirmation = this.form_element.querySelector('#test_confirmation');
 
 		if (this.confirmation) {
-			this.form.querySelector('label[for="confirmation"]').classList.add('<?= ZBX_STYLE_FIELD_LABEL_ASTERISK ?>');
+			this.form_element.querySelector('label[for="confirmation"]').classList.add('<?= ZBX_STYLE_FIELD_LABEL_ASTERISK ?>');
 
 			confirmation.removeAttribute('disabled');
 
@@ -557,7 +570,7 @@ window.script_edit_popup = new class {
 			confirmation.dispatchEvent(new Event('keyup'));
 		}
 		else {
-			this.form.querySelector('label[for="confirmation"]').classList
+			this.form_element.querySelector('label[for="confirmation"]').classList
 				.remove('<?= ZBX_STYLE_FIELD_LABEL_ASTERISK ?>');
 			confirmation.setAttribute('disabled', 'disabled');
 			test_confirmation.setAttribute('disabled', 'disabled');
@@ -580,7 +593,7 @@ window.script_edit_popup = new class {
 		}
 
 		if (type === 'all') {
-			this.form.querySelector(`#type input[type="radio"][value="${<?= ZBX_SCRIPT_TYPE_URL ?>}"]`)
+			this.form_element.querySelector(`#type input[type="radio"][value="${<?= ZBX_SCRIPT_TYPE_URL ?>}"]`)
 				.closest('li').style.display = 'none';
 
 			fields = [
@@ -595,6 +608,6 @@ window.script_edit_popup = new class {
 			];
 		}
 
-		fields.forEach((field) => this.form.querySelector(field).style.display = 'none');
+		fields.forEach((field) => this.form_element.querySelector(field).style.display = 'none');
 	}
 }

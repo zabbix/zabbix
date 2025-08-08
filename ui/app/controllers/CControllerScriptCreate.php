@@ -42,7 +42,7 @@ class CControllerScriptCreate extends CController {
 	}
 
 	public static function getValidationRules(): array {
-		$api_uniq = ['script.get', ['name' => '{name}', 'menu_path' => '{menu_path}'], 'scriptid'];
+		$api_uniq = ['script.get', ['name' => '{name}', 'menu_path' => '{menu_path}']];
 
 		return ['object', 'api_uniq' => $api_uniq, 'fields' => [
 			'name' => ['db scripts.name', 'required', 'not_empty'],

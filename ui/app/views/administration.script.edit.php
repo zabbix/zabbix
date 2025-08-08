@@ -23,7 +23,7 @@ $form = (new CForm())
 	->addItem((new CVar(CSRF_TOKEN_NAME, CCsrfTokenHelper::get('script')))->removeId())
 	->setId('script-form')
 	->setName('scripts')
-	->addVar('scriptid', $data['scriptid'])
+	->addVar('scriptid', $data['form']['scriptid'])
 	->addItem((new CInput('submit', null))->addStyle('display: none;'));
 
 $parameters_table = (new CTable())
@@ -63,7 +63,7 @@ $form_grid = (new CFormGrid())
 		(new CLabel(_('Name'), 'name'))
 			->setAsteriskMark(),
 		(new CFormField(
-			(new CTextBox('name', $data['name'], false, DB::getFieldLength('scripts', 'name')))
+			(new CTextBox('name', $data['form']['name'], false, DB::getFieldLength('scripts', 'name')))
 				->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 				->setAriaRequired()
 		))
@@ -71,18 +71,18 @@ $form_grid = (new CFormGrid())
 	->addItem([
 		new CLabel(_('Scope'), 'scope'),
 		new CFormField(
-			(new CRadioButtonList('scope', (int) $data['scope']))
+			(new CRadioButtonList('scope', (int) $data['form']['scope']))
 				->addValue(_('Action operation'), ZBX_SCRIPT_SCOPE_ACTION)
 				->addValue(_('Manual host action'), ZBX_SCRIPT_SCOPE_HOST)
 				->addValue(_('Manual event action'), ZBX_SCRIPT_SCOPE_EVENT)
 				->setModern()
-				->setEnabled(!$data['actions'])
+				->setEnabled(!$data['form']['actions'])
 		)
 	])
 	->addItem([
 		(new CLabel(_('Menu path'), 'menu_path'))->setId('menu-path-label'),
 		(new CFormField(
-			(new CTextBox('menu_path', $data['menu_path'], false, DB::getFieldLength('scripts', 'menu_path')))
+			(new CTextBox('menu_path', $data['form']['menu_path'], false, DB::getFieldLength('scripts', 'menu_path')))
 				->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 				->setAttribute('placeholder', _('<sub-menu/sub-menu/...>'))
 		))->setId('menu-path')
@@ -90,7 +90,7 @@ $form_grid = (new CFormGrid())
 	->addItem([
 		(new CLabel(_('Type'), 'type')),
 		new CFormField(
-			(new CRadioButtonList('type', (int) $data['type']))
+			(new CRadioButtonList('type', (int) $data['form']['type']))
 				->addValue(_('URL'), ZBX_SCRIPT_TYPE_URL)
 				->addValue(_('Webhook'), ZBX_SCRIPT_TYPE_WEBHOOK)
 				->addValue(_('Script'), ZBX_SCRIPT_TYPE_CUSTOM_SCRIPT)
@@ -103,15 +103,15 @@ $form_grid = (new CFormGrid())
 	->addItem([
 		(new CLabel(_('Execute on'), 'execute_on'))->setId('execute-on-label'),
 		(new CFormField([
-			(new CRadioButtonList('execute_on', (int) $data['execute_on']))
+			(new CRadioButtonList('execute_on', (int) $data['form']['execute_on']))
 				->addValue(_('Zabbix agent'), ZBX_SCRIPT_EXECUTE_ON_AGENT)
 				->addValue(_('Zabbix proxy or server'), ZBX_SCRIPT_EXECUTE_ON_PROXY)
 				->addValue(_('Zabbix server'), ZBX_SCRIPT_EXECUTE_ON_SERVER, null, null,
-					!$data['is_global_scripts_enabled']
+					!$data['form']['is_global_scripts_enabled']
 				)
 				->setModern()
 				->setId('execute-on'),
-			!$data['is_global_scripts_enabled']
+			!$data['form']['is_global_scripts_enabled']
 				? makeWarningIcon(_('Global script execution on Zabbix server is disabled by server configuration.'))
 				: null
 		]))->setId('execute-on')
@@ -121,7 +121,7 @@ $form_grid = (new CFormGrid())
 		(new CFormField(
 			(new CSelect('authtype'))
 				->setId('authtype')
-				->setValue($data['authtype'])
+				->setValue($data['form']['authtype'])
 				->setFocusableElementId('authentication')
 				->addOptions(CSelect::createOptionsFromArray([
 					ITEM_AUTHTYPE_PASSWORD => _('Password'),
@@ -134,7 +134,7 @@ $form_grid = (new CFormGrid())
 			->setId('username-label')
 			->setAsteriskMark(),
 		(new CFormField(
-			(new CTextBox('username', $data['username'], false, DB::getFieldLength('scripts', 'username')))
+			(new CTextBox('username', $data['form']['username'], false, DB::getFieldLength('scripts', 'username')))
 				->setWidth(ZBX_TEXTAREA_SMALL_WIDTH)
 				->setAriaRequired()
 		))->setId('username-field')
@@ -144,7 +144,7 @@ $form_grid = (new CFormGrid())
 			->setId('publickey-label')
 			->setAsteriskMark(),
 		(new CFormField(
-			(new CTextBox('publickey', $data['publickey'], false, DB::getFieldLength('scripts', 'publickey')))
+			(new CTextBox('publickey', $data['form']['publickey'], false, DB::getFieldLength('scripts', 'publickey')))
 				->setWidth(ZBX_TEXTAREA_SMALL_WIDTH)
 				->setAriaRequired()
 		))->setId('publickey-field')
@@ -154,7 +154,7 @@ $form_grid = (new CFormGrid())
 			->setId('privatekey-label')
 			->setAsteriskMark(),
 		(new CFormField(
-			(new CTextBox('privatekey', $data['privatekey'], false, DB::getFieldLength('scripts', 'privatekey')))
+			(new CTextBox('privatekey', $data['form']['privatekey'], false, DB::getFieldLength('scripts', 'privatekey')))
 				->setWidth(ZBX_TEXTAREA_SMALL_WIDTH)
 				->setAriaRequired()
 		))->setId('privatekey-field')
@@ -162,21 +162,21 @@ $form_grid = (new CFormGrid())
 	->addItem([
 		(new CLabel(_('Password'), 'password'))->setId('password-label'),
 		(new CFormField(
-			(new CTextBox('password', $data['password'], false, DB::getFieldLength('scripts', 'password')))
+			(new CTextBox('password', $data['form']['password'], false, DB::getFieldLength('scripts', 'password')))
 				->setWidth(ZBX_TEXTAREA_SMALL_WIDTH)
 		))->setId('password-field')
 	])
 	->addItem([
 		(new CLabel(_('Key passphrase'), 'passphrase'))->setId('passphrase-label'),
 		(new CFormField(
-			(new CTextBox('passphrase', $data['passphrase'], false, DB::getFieldLength('scripts', 'password')))
+			(new CTextBox('passphrase', $data['form']['passphrase'], false, DB::getFieldLength('scripts', 'password')))
 				->setWidth(ZBX_TEXTAREA_SMALL_WIDTH)
 		))->setId('passphrase-field')
 	])
 	->addItem([
 		(new CLabel(_('Port'), 'port'))->setId('port-label'),
 		(new CFormField(
-			(new CTextBox('port', $data['port'], false, DB::getFieldLength('scripts', 'port')))
+			(new CTextBox('port', $data['form']['port'], false, DB::getFieldLength('scripts', 'port')))
 				->setWidth(ZBX_TEXTAREA_SMALL_WIDTH)
 		))->setId('port-field')
 	])
@@ -185,7 +185,7 @@ $form_grid = (new CFormGrid())
 			->setId('commands-label')
 			->setAsteriskMark(),
 		(new CFormField(
-			(new CTextArea('command', $data['command']))
+			(new CTextArea('command', $data['form']['command']))
 				->addClass(ZBX_STYLE_MONOSPACE_FONT)
 				->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 				->setMaxlength(DB::getFieldLength('scripts', 'command'))
@@ -198,7 +198,7 @@ $form_grid = (new CFormGrid())
 			->setId('command-ipmi-label')
 			->setAsteriskMark(),
 		(new CFormField(
-			(new CTextBox('commandipmi', $data['commandipmi'], false, DB::getFieldLength('scripts', 'command')))
+			(new CTextBox('commandipmi', $data['form']['commandipmi'], false, DB::getFieldLength('scripts', 'command')))
 				->addClass(ZBX_STYLE_MONOSPACE_FONT)
 				->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 				->setAriaRequired()
@@ -217,7 +217,7 @@ $form_grid = (new CFormGrid())
 			->setId('url-label')
 			->setAsteriskMark(),
 		(new CFormField(
-			(new CTextBox('url', $data['url'], false, DB::getFieldLength('scripts', 'url')))
+			(new CTextBox('url', $data['form']['url'], false, DB::getFieldLength('scripts', 'url')))
 				->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 				->setAriaRequired()
 		))->setId('url')
@@ -226,7 +226,7 @@ $form_grid = (new CFormGrid())
 		(new CLabel(_('Open in a new window')))->setId('new-window-label'),
 		(new CFormField(
 			(new CCheckBox('new_window'))
-				->setChecked($data['new_window'])
+				->setChecked($data['form']['new_window'])
 				->setUncheckedValue(ZBX_SCRIPT_URL_NEW_WINDOW_NO)
 		))->setId('new-window')
 	])
@@ -235,7 +235,7 @@ $form_grid = (new CFormGrid())
 			->setAsteriskMark()
 			->setId('script-label'),
 		(new CFormField(
-			(new CMultilineInput('script', $data['script'], [
+			(new CMultilineInput('script', $data['form']['script'], [
 				'title' => _('JavaScript'),
 				'placeholder' => _('script'),
 				'placeholder_textarea' => 'return value',
@@ -252,7 +252,7 @@ $form_grid = (new CFormGrid())
 			->setAsteriskMark()
 			->setId('timeout-label'),
 		(new CFormField(
-			(new CTextBox('timeout', $data['timeout'], false, DB::getFieldLength('scripts', 'timeout')))
+			(new CTextBox('timeout', $data['form']['timeout'], false, DB::getFieldLength('scripts', 'timeout')))
 				->setWidth(ZBX_TEXTAREA_SMALL_WIDTH)
 				->setAriaRequired()
 		))->setId('timeout-field')
@@ -260,7 +260,7 @@ $form_grid = (new CFormGrid())
 	->addItem([
 		(new CLabel(_('Description'), 'description')),
 		new CFormField(
-			(new CTextArea('description', $data['description']))
+			(new CTextArea('description', $data['form']['description']))
 				->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 				->setMaxlength(DB::getFieldLength('scripts', 'description'))
 		)
@@ -268,24 +268,24 @@ $form_grid = (new CFormGrid())
 
 $select_usrgrpid = (new CSelect('usrgrpid'))
 	->setId('user-group')
-	->setValue($data['usrgrpid'])
+	->setValue($data['form']['usrgrpid'])
 	->setFocusableElementId('usrgrpid')
 	->addOption(new CSelectOption(0, _('All')))
-	->addOptions(CSelect::createOptionsFromArray($data['usergroups']));
+	->addOptions(CSelect::createOptionsFromArray($data['form']['usergroups']));
 
 $select_hgstype = (new CSelect('hgstype'))
 	->setId('hgstype-select')
-	->setValue($data['hgstype'])
+	->setValue($data['form']['hgstype'])
 	->setFocusableElementId('hgstype')
 	->addOption(new CSelectOption(0, _('All')))
 	->addOption(new CSelectOption(1, _('Selected')));
 
-$validation_rule = $data['manualinput_validator_type'] == ZBX_SCRIPT_MANUALINPUT_TYPE_STRING
-	? $data['manualinput_validator']
+$validation_rule = $data['form']['manualinput_validator_type'] == ZBX_SCRIPT_MANUALINPUT_TYPE_STRING
+	? $data['form']['manualinput_validator']
 	: '';
 
-$dropdown_options = $data['manualinput_validator_type'] == ZBX_SCRIPT_MANUALINPUT_TYPE_LIST
-	? $data['manualinput_validator']
+$dropdown_options = $data['form']['manualinput_validator_type'] == ZBX_SCRIPT_MANUALINPUT_TYPE_LIST
+	? $data['form']['manualinput_validator']
 	: '';
 
 $form_grid
@@ -299,7 +299,7 @@ $form_grid
 				'name' => 'groupid',
 				'object_name' => 'hostGroup',
 				'multiple' => false,
-				'data' => $data['hostgroup'],
+				'data' => $data['form']['hostgroup'],
 				'popup' => [
 					'parameters' => [
 						'srctbl' => 'host_groups',
@@ -319,7 +319,7 @@ $form_grid
 	->addItem([
 		(new CLabel(_('Required host permissions'), 'host_access'))->setId('host-access-label'),
 		(new CFormField(
-			(new CRadioButtonList('host_access', (int) $data['host_access']))
+			(new CRadioButtonList('host_access', (int) $data['form']['host_access']))
 				->addValue(_('Read'), PERM_READ)
 				->addValue(_('Write'), PERM_READ_WRITE)
 				->setModern()
@@ -331,13 +331,13 @@ $form_grid
 		->addItem([
 			(new CLabel(_('Enable user input'), 'manualinput')),
 			new CFormField(
-				(new CCheckBox('manualinput'))->setChecked($data['manualinput'] == ZBX_SCRIPT_MANUALINPUT_ENABLED)
+				(new CCheckBox('manualinput'))->setChecked($data['form']['manualinput'] == ZBX_SCRIPT_MANUALINPUT_ENABLED)
 			)
 		])
 		->addItem([
 			(new CLabel(_('Input prompt'), 'manualinput_prompt')),
 			new CFormField([
-				(new CTextBox('manualinput_prompt', $data['manualinput_prompt'], false,
+				(new CTextBox('manualinput_prompt', $data['form']['manualinput_prompt'], false,
 					DB::getFieldLength('scripts', 'manualinput_prompt')
 				))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH),
 				NBSP(),
@@ -347,7 +347,7 @@ $form_grid
 		->addItem([
 			(new CLabel(_('Input type'), 'manualinput_validator_type')),
 			new CFormField(
-				(new CRadioButtonList('manualinput_validator_type', (int) $data['manualinput_validator_type']))
+				(new CRadioButtonList('manualinput_validator_type', (int) $data['form']['manualinput_validator_type']))
 					->addValue(_('String'), ZBX_SCRIPT_MANUALINPUT_TYPE_STRING)
 					->addValue(_('Dropdown'), ZBX_SCRIPT_MANUALINPUT_TYPE_LIST)
 					->setModern()
@@ -356,7 +356,7 @@ $form_grid
 		->addItem([
 			new CLabel(_('Default input string'), 'manualinput_default_value'),
 			new CFormField([
-				(new CTextBox('manualinput_default_value', $data['manualinput_default_value'], false,
+				(new CTextBox('manualinput_default_value', $data['form']['manualinput_default_value'], false,
 					DB::getFieldLength('scripts', 'manualinput_default_value')
 				))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 			])
@@ -384,13 +384,13 @@ $form_grid
 		->addItem([
 			(new CLabel(_('Enable confirmation'), 'enable_confirmation')),
 			new CFormField(
-				(new CCheckBox('enable_confirmation'))->setChecked($data['enable_confirmation'])
+				(new CCheckBox('enable_confirmation'))->setChecked($data['form']['enable_confirmation'])
 			)
 		])
 		->addItem([
 			(new CLabel(_('Confirmation text'), 'confirmation')),
 			new CFormField([
-				(new CTextBox('confirmation', $data['confirmation'], false,
+				(new CTextBox('confirmation', $data['form']['confirmation'], false,
 					DB::getFieldLength('scripts', 'confirmation')
 				))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH),
 				NBSP(),
@@ -399,7 +399,7 @@ $form_grid
 		])
 	);
 
-if ($data['scriptid'] === null) {
+if ($data['form']['scriptid'] === null) {
 	$buttons = [
 		[
 			'title' => _('Add'),
@@ -457,13 +457,15 @@ $form
 	->addItem($row_template)
 	->addItem(
 		(new CScriptTag('script_edit_popup.init('.json_encode([
-			'script' => $data
+			'script' => $data['form'],
+			'rules' => $data['js_validation_rules'],
+			'rules_for_clone' => $data['js_clone_validation_rules']
 		]).');'))->setOnDocumentReady()
 	)
 	->addStyle('display: none;');
 
 $output = [
-	'header' => $data['scriptid'] === null ? _('New script') : _('Script'),
+	'header' => $data['form']['scriptid'] === null ? _('New script') : _('Script'),
 	'doc_url' => CDocHelper::getUrl(CDocHelper::ALERTS_SCRIPT_EDIT),
 	'body' => $form->toString(),
 	'buttons' => $buttons,
