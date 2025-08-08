@@ -4733,6 +4733,10 @@ div.dashboard-widget-geomap {
   .geomap-hintbox tr[data-hostid] {
     cursor: pointer; }
 
+.clustering {
+  display: flex;
+  gap: 3px; }
+
 form.dashboard-widget-honeycomb .fields-group.fields-group-primary-label, form.dashboard-widget-honeycomb .fields-group.fields-group-secondary-label {
   display: grid;
   grid-template-columns: minmax(85px, max-content) 1fr max-content minmax(110px, max-content);

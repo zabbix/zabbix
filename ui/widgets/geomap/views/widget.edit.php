@@ -48,7 +48,7 @@ $groupids = array_key_exists('groupids', $data['fields'])
 		(new CWidgetFieldLatLngView($data['fields']['default_view']))->setPlaceholder('40.6892494,-74.0466891')
 	)
 	->addFieldsGroup(
-		getClusteringFieldsGroupView($data['fields'])->addStyle('display: flex')
+		getClusteringFieldsGroupView($data['fields'])->addClass('clustering')
 	)
 	->includeJsFile('widget.edit.js.php')
 	->initFormJs('widget_form.init();')
@@ -57,13 +57,10 @@ $groupids = array_key_exists('groupids', $data['fields'])
 function getClusteringFieldsGroupView(array $fields): CWidgetFieldsGroupView {
 	return (new CWidgetFieldsGroupView(_('Clustering')))
 		->addField(
-			(new CWidgetFieldRadioButtonListView($fields['clustering_mode']))
-				->removeLabel()
-				->addClass(ZBX_STYLE_FORM_INPUT_MARGIN)
+			(new CWidgetFieldRadioButtonListView($fields['clustering_mode']))->removeLabel()
 		)
 		->addField(
-			(new CWidgetFieldIntegerBoxView($fields['clustering_zoom_level']))
-				->removeLabel()
+			(new CWidgetFieldIntegerBoxView($fields['clustering_zoom_level']))->removeLabel()
 				->addClass('js-zoom-level-field')
 		);
 }
