@@ -15,16 +15,15 @@
 #include "zbxcommon.h"
 #include "zbxtime.h"
 
-void	__wrap_zbx_preprocess_item_value(zbx_uint64_t itemid, zbx_uint64_t hostid, unsigned char item_value_type,
-		unsigned char item_flags, AGENT_RESULT *result, zbx_timespec_t *ts, unsigned char state, char *error);
+void	__wrap_zbx_preprocess_item_value(zbx_uint64_t itemid, unsigned char item_value_type, unsigned char item_flags,
+		AGENT_RESULT *result, zbx_timespec_t *ts, unsigned char state, char *error);
 
 void	__wrap_zbx_preprocessor_flush(void);
 
-void	__wrap_zbx_preprocess_item_value(zbx_uint64_t itemid, zbx_uint64_t hostid, unsigned char item_value_type,
-		unsigned char item_flags, AGENT_RESULT *result, zbx_timespec_t *ts, unsigned char state, char *error)
+void	__wrap_zbx_preprocess_item_value(zbx_uint64_t itemid, unsigned char item_value_type, unsigned char item_flags,
+		AGENT_RESULT *result, zbx_timespec_t *ts, unsigned char state, char *error)
 {
 	ZBX_UNUSED(itemid);
-	ZBX_UNUSED(hostid);
 	ZBX_UNUSED(item_value_type);
 	ZBX_UNUSED(item_flags);
 	ZBX_UNUSED(result);
