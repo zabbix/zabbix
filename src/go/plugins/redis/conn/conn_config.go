@@ -49,7 +49,7 @@ func getTLSConfig(redisURI *uri.URI, params map[string]string) (*tls.Config, err
 		),
 	)
 
-	//could move this to the tlsconfig.
+	// could move this to the tlsconfig.
 	switch tlsConnectionType {
 	case comms.Disabled:
 		return nil, errTLSDisabled

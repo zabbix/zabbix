@@ -20,7 +20,7 @@ import (
 	"golang.zabbix.com/sdk/plugin/comms"
 )
 
-// PingHandler executes 'PING' command and returns pingOk if a connection is alive or pingFailed otherwise.
+// PingHandler executes 'PING' command and returns pingOk if a connection is alive or pingFailed otherwise..
 func PingHandler(redisClient conn.RedisClient, _ map[string]string) (any, error) {
 	var res string
 

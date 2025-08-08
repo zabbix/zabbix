@@ -24,7 +24,7 @@ import (
 type slowlog []any
 type logItem = []any
 
-// getLastSlowlogID gets the last log item ID from slowlog.
+// getLastSlowlogID gets the last log item ID from slowlog..
 func getLastSlowlogID(sl slowlog) (int64, error) {
 	if len(sl) == 0 {
 		return 0, nil

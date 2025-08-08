@@ -21,8 +21,11 @@ import (
 	"golang.zabbix.com/sdk/plugin"
 )
 
+//nolint:tparallel // due to plugin being a global variable, cannot test in parallel.
 func TestPlugin_Start(t *testing.T) {
 	t.Run("Connection manager must be initialized", func(t *testing.T) {
+		t.Parallel()
+
 		impl.Start()
 
 		if impl.connMgr == nil {
@@ -31,6 +34,7 @@ func TestPlugin_Start(t *testing.T) {
 	})
 }
 
+//nolint:paralleltest,tparallel // due to plugin being a global variable, cannot test in parallel.
 func TestPlugin_Export(t *testing.T) {
 	type args struct {
 		key    string
@@ -64,6 +68,8 @@ func TestPlugin_Export(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
+			t.Parallel()
+
 			gotResult, err := tt.p.Export(tt.args.key, tt.args.params, tt.args.ctx)
 			if (err != nil) != tt.wantErr {
 				t.Errorf("Plugin.Export() error = %v, wantErr %v", err, tt.wantErr)
@@ -78,8 +84,11 @@ func TestPlugin_Export(t *testing.T) {
 	}
 }
 
+//nolint:tparallel // due to plugin being a global variable, cannot test in parallel.
 func TestPlugin_Stop(t *testing.T) {
 	t.Run("Connection manager must be deinitialized", func(t *testing.T) {
+		t.Parallel()
+
 		impl.Stop()
 
 		if impl.connMgr != nil {

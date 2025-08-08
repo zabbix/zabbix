@@ -25,7 +25,7 @@ import (
 	"golang.zabbix.com/sdk/uri"
 )
 
-//nolint:gocyclo,cyclop //this is unit test
+//nolint:gocyclo,cyclop,gocognit //this is unit test and complexity rises from the possible test cases
 func TestGetTLSConfig(t *testing.T) {
 	t.Parallel()
 
@@ -57,11 +57,14 @@ func TestGetTLSConfig(t *testing.T) {
 			params: map[string]string{string(comms.TLSConnect): string(comms.VerifyCA)},
 			validateFunc: func(t *testing.T, cfg *tls.Config, host string) {
 				t.Helper()
-				if cfg.InsecureSkipVerify {
-					t.Error("expected InsecureSkipVerify to be false, but it was true")
+				if !cfg.InsecureSkipVerify {
+					t.Error("expected InsecureSkipVerify to be true, but it was false")
 				}
 				if cfg.ServerName != "" {
 					t.Errorf("expected ServerName to be empty, but got %q", cfg.ServerName)
+				}
+				if cfg.VerifyPeerCertificate == nil {
+					t.Error("expected VerifyPeerCertificate to be set, but it was nil")
 				}
 			},
 		},

@@ -18,6 +18,7 @@ import (
 	"time"
 
 	"golang.zabbix.com/agent2/plugins/redis/conn"
+	"golang.zabbix.com/sdk/errs"
 	"golang.zabbix.com/sdk/metric"
 	"golang.zabbix.com/sdk/plugin"
 	"golang.zabbix.com/sdk/plugin/comms"
@@ -36,6 +37,7 @@ var _ plugin.Exporter = (*Plugin)(nil)
 // Plugin inherits plugin.Base and store plugin-specific data.
 type Plugin struct {
 	plugin.Base
+
 	connMgr *conn.Manager
 	options pluginOptions
 }
@@ -44,17 +46,17 @@ type Plugin struct {
 func (p *Plugin) Export(key string, rawParams []string, _ plugin.ContextProvider) (any, error) {
 	params, _, hc, err := metrics[key].EvalParams(rawParams, p.options.Sessions)
 	if err != nil {
-		return nil, err
+		return nil, errs.Wrap(err, "failed to eval params")
 	}
 
 	err = metric.SetDefaults(params, hc, p.options.Default)
 	if err != nil {
-		return nil, err
+		return nil, errs.Wrap(err, "failed to set metric defaults")
 	}
 
 	redisURI, err := uri.NewWithCreds(params["URI"], params["User"], params["Password"], uriDefaults)
 	if err != nil {
-		return nil, err
+		return nil, errs.Wrap(err, "could not create URI for Redis")
 	}
 
 	handleMetric := getHandlerFunc(key)
@@ -72,7 +74,7 @@ func (p *Plugin) Export(key string, rawParams []string, _ plugin.ContextProvider
 
 		p.Errf(err.Error())
 
-		return nil, err
+		return nil, errs.Wrap(err, "failed to get connection to Redis")
 	}
 
 	result, err := handleMetric(connection, params)
@@ -80,7 +82,7 @@ func (p *Plugin) Export(key string, rawParams []string, _ plugin.ContextProvider
 		p.Errf(err.Error())
 	}
 
-	return result, err
+	return result, nil
 }
 
 // Start implements the Runner interface and performs initialization when plugin is activated.
