@@ -257,14 +257,7 @@ void	zbx_process_command_results(struct zbx_json_parse *jp)
 		zbx_free(error);
 
 		if (SUCCEED != zbx_json_value_by_name_dyn(&jp_command, ZBX_PROTO_TAG_VALUE, &value, &str_alloc, NULL))
-		{
-
-			if (SUCCEED != zbx_json_value_by_name_dyn(&jp_command, ZBX_PROTO_TAG_ERROR, &error, &str_alloc,
-					NULL))
-			{
-				continue;
-			}
-		}
+			zbx_json_value_by_name_dyn(&jp_command, ZBX_PROTO_TAG_ERROR, &error, &str_alloc, NULL);
 
 		values_num++;
 		if (SUCCEED == remote_commands_insert_result(id, value, error))
@@ -420,18 +413,19 @@ static int	active_command_send_and_result_fetch(const zbx_dc_host_t *host, const
 	{
 		zbx_snprintf(error, max_error_len, "cannot allocate memory for remote command result");
 	}
-	else if (NULL != pcmd->value)
-	{
-		if (NULL != result)
-			*result = zbx_strdup(*result, pcmd->value);
-
-		__remote_commands_shmem_free_func(pcmd->value);
-		ret = SUCCEED;
-	}
 	else if (NULL != pcmd->error)
 	{
 		zbx_strlcpy(error, pcmd->error, max_error_len);
 		__remote_commands_shmem_free_func(pcmd->error);
+	}
+	else
+	{
+		if (NULL != result)
+			*result = zbx_strdup(*result, ZBX_NULL2EMPTY_STR(pcmd->value));
+
+		if (NULL != pcmd->value)
+			__remote_commands_shmem_free_func(pcmd->value);
+		ret = SUCCEED;
 	}
 
 	__remote_commands_shmem_free_func(pcmd->command);
@@ -439,7 +433,7 @@ static int	active_command_send_and_result_fetch(const zbx_dc_host_t *host, const
 
 	commands_unlock();
 out:
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __func__, zbx_result_string(ret));
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s error:%s", __func__, zbx_result_string(ret), error);
 
 	return ret;
 }
@@ -508,7 +502,7 @@ fail:
 	zbx_free(port);
 	zbx_free(param);
 
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __func__, zbx_result_string(ret));
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s error:%s", __func__, zbx_result_string(ret), error);
 
 	return ret;
 }
