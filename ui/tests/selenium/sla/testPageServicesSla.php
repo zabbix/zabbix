@@ -65,6 +65,16 @@ class testPageServicesSla extends CWebTest {
 				'Status' => 'Disabled'
 			],
 			[
+				'Name' => 'Multiple spaces in SLA name',
+				'SLO' => '33.5555%',
+				'Effective date' => '2021-05-01',
+				'Reporting period' => 'Weekly',
+				'Timezone' => 'Europe/Riga',
+				'Schedule' => '24x7',
+				'SLA report' => 'SLA report',
+				'Status' => 'Enabled'
+			],
+			[
 				'Name' => 'SLA Annual',
 				'SLO' => '44.44%',
 				'Effective date' => '2021-05-01',
@@ -198,6 +208,9 @@ class testPageServicesSla extends CWebTest {
 			],
 			[
 				'name' => 'Update SLA'
+			],
+			[
+				'name' => 'Multiple spaces in SLA name'
 			]
 		];
 
@@ -289,8 +302,9 @@ class testPageServicesSla extends CWebTest {
 		// Check the links in SLA report column.
 		foreach ($sla_data as $sla) {
 			if ($sla['SLA report'] === 'SLA report') {
-				$link = 'zabbix.php?action=slareport.list&filter_slaid='.CDataHelper::get('Sla.slaids')[$sla['Name']].'&filter_set=1';
-				$this->assertStringEndsWith($link, $table->findRow('Name', $sla['Name'])->query('link:SLA report')->one()
+				$name = ($sla['Name'] == 'Multiple spaces in SLA name') ? 'Multiple   spaces   in SLA name' : $sla['Name'];
+				$link = 'zabbix.php?action=slareport.list&filter_slaid='.CDataHelper::get('Sla.slaids')[$name].'&filter_set=1';
+				$this->assertStringEndsWith($link, $table->findRow('Name', $name)->query('link:SLA report')->one()
 						->getAttribute('href')
 				);
 			}
@@ -316,7 +330,9 @@ class testPageServicesSla extends CWebTest {
 				$overlay->close();
 			}
 			else {
-				$this->assertFalse($table->findRow('Name', $schedule['name'])->query('class:icon-description')
+				$schedule = ($schedule['name'] == 'Multiple spaces in SLA name') ? 'Multiple   spaces   in SLA name'
+						: $schedule['name'];
+				$this->assertFalse($table->findRow('Name', $schedule)->query('class:icon-description')
 						->one(false)->isValid()
 				);
 			}
@@ -429,7 +445,8 @@ class testPageServicesSla extends CWebTest {
 						'Name' => ' SLA '
 					],
 					'expected' => [
-						'Disabled SLA Annual'
+						'Disabled SLA Annual',
+						'Multiple spaces in SLA name'
 					]
 				]
 			],
@@ -461,6 +478,7 @@ class testPageServicesSla extends CWebTest {
 					'expected' => [
 						'Disabled SLA',
 						'Disabled SLA Annual',
+						'Multiple spaces in SLA name',
 						'SLA Annual',
 						'SLA Daily',
 						'SLA Monthly',
@@ -472,6 +490,15 @@ class testPageServicesSla extends CWebTest {
 					]
 				]
 			],
+			// Multiple spaces in search field Name.
+			[
+				[
+					'filter' => [
+						'Name' => '   spaces   '
+					],
+					'expected' => ['Multiple spaces in SLA name']
+				]
+			],
 			// Retrieve only Enabled SLAs.
 			[
 				[
@@ -479,6 +506,7 @@ class testPageServicesSla extends CWebTest {
 						'Status' => 'Enabled'
 					],
 					'expected' => [
+						'Multiple spaces in SLA name',
 						'SLA Annual',
 						'SLA Daily',
 						'SLA Monthly',
@@ -563,6 +591,7 @@ class testPageServicesSla extends CWebTest {
 						]
 					],
 					'expected' => [
+						'Multiple spaces in SLA name',
 						'SLA Monthly',
 						'SLA Quarterly',
 						'SLA Weekly',
@@ -583,6 +612,7 @@ class testPageServicesSla extends CWebTest {
 					],
 					'expected' => [
 						'Disabled SLA',
+						'Multiple spaces in SLA name',
 						'SLA Monthly',
 						'SLA Quarterly',
 						'SLA Weekly',
@@ -603,6 +633,7 @@ class testPageServicesSla extends CWebTest {
 					],
 					'expected' => [
 						'Disabled SLA Annual',
+						'Multiple spaces in SLA name',
 						'SLA Annual',
 						'SLA Daily',
 						'SLA Monthly',
@@ -666,6 +697,7 @@ class testPageServicesSla extends CWebTest {
 					],
 					'expected' => [
 						'Disabled SLA Annual',
+						'Multiple spaces in SLA name',
 						'SLA Annual',
 						'SLA Daily',
 						'SLA Monthly',
@@ -697,6 +729,7 @@ class testPageServicesSla extends CWebTest {
 						]
 					],
 					'expected' => [
+						'Multiple spaces in SLA name',
 						'Update SLA'
 					]
 				]
@@ -752,6 +785,7 @@ class testPageServicesSla extends CWebTest {
 						'SLA Monthly',
 						'SLA Daily',
 						'SLA Annual',
+						'Multiple spaces in SLA name',
 						'Disabled SLA Annual',
 						'Disabled SLA'
 					]
@@ -767,6 +801,7 @@ class testPageServicesSla extends CWebTest {
 						'13.01%',
 						'22.22%',
 						'33.33%',
+						'33.5555%',
 						'44.44%',
 						'55.5555%',
 						'66.6%',
@@ -785,6 +820,7 @@ class testPageServicesSla extends CWebTest {
 						'2021-05-01',
 						'2021-05-01',
 						'2021-05-01',
+						'2021-05-01',
 						'2022-04-30',
 						'2022-05-01',
 						'2030-12-31'
@@ -797,6 +833,7 @@ class testPageServicesSla extends CWebTest {
 					'expected' => [
 						'Disabled',
 						'Disabled',
+						'Enabled',
 						'Enabled',
 						'Enabled',
 						'Enabled',
