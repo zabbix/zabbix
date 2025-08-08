@@ -1230,7 +1230,7 @@ class CFormValidator {
 		}
 
 		$parameters = [
-			'filter' => $parameters,
+			'filter' => $parameters
 		];
 
 		if (API::getApiService($api)->exists($parameters, $exclude_id)) {
