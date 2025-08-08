@@ -538,7 +538,7 @@ static int	zbx_execute_script_on_agent(const zbx_dc_host_t *host, const char *co
 		case CONFIG_ERROR:
 		case FAIL:
 		default:
-			if (ZBX_INTERFACE_AVAILABLE_TRUE != zbx_get_active_agent_availability(host->hostid))
+			if (ZBX_INTERFACE_AVAILABLE_FALSE == zbx_get_active_agent_availability(host->hostid))
 			{
 				if ('\0' == *error)
 					zbx_snprintf(error, max_error_len, "Zabbix agent is not available");
@@ -972,7 +972,7 @@ int	zbx_script_execute(const zbx_script_t *script, const zbx_dc_host_t *host, co
 	if (SUCCEED != ret && NULL != result)
 		*result = zbx_strdup(*result, "");
 
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __func__, zbx_result_string(ret));
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s error:%s", __func__, zbx_result_string(ret), error);
 
 	return ret;
 }
