@@ -78,6 +78,10 @@ class CWidgetFieldDataSet extends CWidgetField {
 		$data_sets = [];
 
 		foreach ((array) $value as $data_set) {
+			if (array_key_exists('itemids', $data_set)) {
+				$data_set['itemids'] = array_values($data_set['itemids']);
+			}
+			
 			$data_sets[] = $data_set + self::getDefaults();
 		}
 
