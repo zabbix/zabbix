@@ -25,6 +25,7 @@ require_once __DIR__.'/../behaviors/CMessageBehavior.php';
 class testFormAdministrationMediaTypes extends CWebTest {
 
 	const URL = 'zabbix.php?action=mediatype.list';
+
 	protected static $mediatype_sql = 'SELECT * FROM media_type ORDER BY mediatypeid';
 	protected static $update_mediatypes = [
 		'Email' => 'Email',
@@ -1932,7 +1933,6 @@ class testFormAdministrationMediaTypes extends CWebTest {
 		/**
 		 * The following units are used: years, months, days, hours, minutes.
 		 * Only the 3 most significant units will be displayed: #y #M #d, #M #d #h, #d #h #m and so on.
-		 *
 		 */
 		return [
 			[
