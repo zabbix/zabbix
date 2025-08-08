@@ -1292,7 +1292,6 @@ class CApiService {
 		return array_key_exists('sessionid', self::$userData) ? self::$userData['sessionid'] : self::$userData['token'];
 	}
 
-
 	/**
 	 * Check if there are any matching items based on get() function result
 	 *
