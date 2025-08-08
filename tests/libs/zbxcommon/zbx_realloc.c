@@ -25,7 +25,7 @@ void	__wrap_zbx_log_handle(int level, const char *fmt, ...);
 
 void		*ret_ptr = (void *)1;
 size_t		got_size;
-const char	*warning[2] = {0};;
+const char	*warning[2] = {0};
 int		out_of_mem = 0;
 
 void	*__wrap_realloc(void *old , size_t size)
