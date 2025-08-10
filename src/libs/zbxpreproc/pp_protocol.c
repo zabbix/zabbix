@@ -299,7 +299,7 @@ static void     preprocessor_serialize_value(zbx_uint64_t itemid, unsigned char 
 	if (NULL != result && ZBX_ISSET_META(result))
 	{
 		ptr += zbx_serialize_value(ptr, result->lastlogsize);
-		ptr += zbx_serialize_value(ptr, result->mtime);
+		(void)zbx_serialize_value(ptr, result->mtime);
 	}
 
 	preproc_offset += data_len;
