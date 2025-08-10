@@ -446,3 +446,17 @@ int	zbx_tsdb_get_compression_availability(void)
 
 #endif
 
+#if defined(HAVE_MYSQL)
+/******************************************************************************
+ *                                                                            *
+ * Purpose: retrieves MariaDB fork info                                       *
+ *                                                                            *
+ * Return value: 0 (OFF): MySQL detected                                      *
+ *               1 (ON):  MariaDB fork detected                               *
+ *                                                                            *
+ ******************************************************************************/
+int	zbx_mariadb_fork_get(void)
+{
+	return ZBX_MARIADB_SFORK;
+}
+#endif

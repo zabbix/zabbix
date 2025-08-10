@@ -13,6 +13,7 @@
 **/
 
 #include "dbupgrade.h"
+#include "zbxdbschema.h"
 
 #include "zbxdbschema.h"
 
@@ -45,6 +46,30 @@ static int	DBpatch_7050002(void)
 
 static int	DBpatch_7050003(void)
 {
+	return DBdrop_foreign_key("event_recovery", 2);
+}
+
+static int	DBpatch_7050004(void)
+{
+	const zbx_db_field_t	field = {"r_eventid", NULL, "events", "eventid", 0, ZBX_TYPE_ID, ZBX_NOTNULL, 0};
+
+	return DBadd_foreign_key("event_recovery", 2, &field);
+}
+
+static int	DBpatch_7050005(void)
+{
+	return DBdrop_foreign_key("problem", 2);
+}
+
+static int	DBpatch_7050006(void)
+{
+	const zbx_db_field_t	field = {"r_eventid", NULL, "events", "eventid", 0, ZBX_TYPE_ID, ZBX_NOTNULL, 0};
+
+	return DBadd_foreign_key("problem", 2, &field);
+}
+
+static int	DBpatch_7050007(void)
+{
 	const zbx_db_table_t	table =
 			{"history_json", "itemid,clock,ns", 0,
 				{
@@ -59,6 +84,7 @@ static int	DBpatch_7050003(void)
 
 	return DBcreate_table(&table);
 }
+
 #endif
 
 DBPATCH_START(7050)
@@ -69,5 +95,9 @@ DBPATCH_ADD(7050000, 0, 1)
 DBPATCH_ADD(7050001, 0, 1)
 DBPATCH_ADD(7050002, 0, 1)
 DBPATCH_ADD(7050003, 0, 1)
+DBPATCH_ADD(7050004, 0, 1)
+DBPATCH_ADD(7050005, 0, 1)
+DBPATCH_ADD(7050006, 0, 1)
+DBPATCH_ADD(7050007, 0, 1)
 
 DBPATCH_END()
