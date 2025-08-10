@@ -112,6 +112,23 @@ void	pp_task_queue_destroy(zbx_pp_queue_t *queue)
 	if (0 != (queue->init_flags & PP_TASK_QUEUE_INIT_EVENT))
 		pthread_cond_destroy(&queue->event);
 
+	zbx_hashset_iter_t	iter;
+	zbx_pp_item_tasks_t	*item_tasks;
+
+	zbx_hashset_iter_reset(&queue->tasks, &iter);
+	while (NULL != (item_tasks = (zbx_pp_item_tasks_t *)zbx_hashset_iter_next(&iter)))
+	{
+		zbx_pp_task_t	*task;
+
+		while (SUCCEED == zbx_list_pop(&item_tasks->tasks, (void **)&task))
+		{
+			if (ZBX_PP_TASK_FINISHED == task->state)
+				pp_task_free(task);
+		}
+	}
+
+	zbx_hashset_destroy(&queue->tasks);
+
 	pp_task_queue_clear_tasks(&queue->pending);
 	zbx_list_destroy(&queue->pending);
 
@@ -122,7 +139,6 @@ void	pp_task_queue_destroy(zbx_pp_queue_t *queue)
 	zbx_list_destroy(&queue->finished);
 
 	zbx_hashset_destroy(&queue->sequences);
-	zbx_hashset_destroy(&queue->tasks);
 
 	queue->init_flags = PP_TASK_QUEUE_INIT_NONE;
 }
