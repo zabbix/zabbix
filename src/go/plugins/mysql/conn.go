@@ -32,14 +32,6 @@ import (
 	"golang.zabbix.com/sdk/zbxerr"
 )
 
-const (
-	// connType
-	disable    = "disabled"
-	require    = "required"
-	verifyCa   = "verify_ca"
-	verifyFull = "verify_full"
-)
-
 type MyClient interface {
 	Query(ctx context.Context, query string, args ...interface{}) (rows *sql.Rows, err error)
 	QueryByName(ctx context.Context, queryName string, args ...interface{}) (rows *sql.Rows, err error)
@@ -223,9 +215,9 @@ func (c *ConnManager) create(ck connKey) (*MyConn, error) {
 		return nil, err
 	}
 
-	tlsConfig, err := c.getTLSConfig(details)
+	tlsConfig, err := details.GetTLSConfig()
 	if err != nil {
-		return nil, err
+		return nil, errs.Wrap(err, "failed to get TLS config")
 	}
 
 	config, err := getMySQLConfig(&ck.uri, tlsConfig, c.connectTimeout, c.callTimeout)
@@ -311,56 +303,10 @@ func getMySQLConfig(
 	return config, nil
 }
 
-func (c *ConnManager) getTLSConfig(details *tlsconfig.Details) (*tls.Config, error) {
-	var (
-		tlsConf *tls.Config
-		err     error
-	)
-
-	switch details.TLSConnect {
-	case "required":
-		if details.TLSCaFile != "" {
-			c.log.Warningf("server CA will not be verified for %s", details.TLSConnect)
-		}
-		details.Apply(
-			tlsconfig.WithSkipDefaultTLSVerification(true),
-			tlsconfig.WithTLSServerName(""),
-		)
-
-		tlsConf, err = details.GetTLSConfig()
-		if err != nil {
-			return nil, errs.Wrap(err, "failed to get TLS config for required connectionn")
-		}
-	case "verify_ca":
-		details.Apply(
-			tlsconfig.WithSkipDefaultTLSVerification(true),
-			tlsconfig.WithTLSServerName(""),
-		)
-
-		tlsConf, err = details.GetTLSConfig()
-		if err != nil {
-			return nil, errs.Wrap(err, "failed to get TLS config for verify_ca connectionn")
-		}
-
-		tlsConf.VerifyPeerCertificate = tlsconfig.VerifyPeerCertificateFunc("", tlsConf.RootCAs)
-	case "verify_full":
-		tlsConf, err = details.GetTLSConfig()
-		if err != nil {
-			return nil, errs.Wrap(err, "failed to get TLS config for verify_full connection")
-		}
-
-		tlsConf.VerifyPeerCertificate = tlsconfig.VerifyPeerCertificateFunc(tlsConf.ServerName, tlsConf.RootCAs)
-	default:
-		return nil, nil
-	}
-
-	return tlsConf, nil
-}
-
 func createConnKey(uri *uri.URI, params map[string]string) connKey {
 	tlsType := params[tlsConnectParam]
 	if tlsType == "" {
-		tlsType = disable
+		tlsType = string(tlsconfig.Disabled)
 	}
 
 	return connKey{
@@ -379,33 +325,35 @@ func getTLSDetails(ck connKey) (*tlsconfig.Details, error) {
 		validateClient = false
 	)
 
+	connectionType, err := tlsconfig.NewTLSConnectionType(ck.tlsConnect)
+	if err != nil {
+		return nil, errs.Wrap(err, "failed to parse TLS connection type "+ck.tlsConnect)
+	}
+
 	details := tlsconfig.NewDetails(
 		"",
 		ck.rawUri,
-		tlsconfig.WithTLSServerName(ck.uri.Host()),
 		tlsconfig.WithTLSCaFile(ck.tlsCA),
 		tlsconfig.WithTLSCertFile(ck.tlsCert),
 		tlsconfig.WithTLSKeyFile(ck.tlsKey),
-		tlsconfig.WithTLSConnect(ck.tlsConnect),
+		tlsconfig.WithTLSConnect(connectionType),
 		tlsconfig.WithAllowedConnections(
-			disable,
-			require,
-			verifyCa,
-			verifyFull,
+			string(tlsconfig.Disabled),
+			string(tlsconfig.Required),
+			string(tlsconfig.VerifyCA),
+			string(tlsconfig.VerifyFull),
 		),
 	)
 
-	if ck.tlsConnect == disable || ck.tlsConnect == require {
+	if connectionType == tlsconfig.Disabled || connectionType == tlsconfig.Required {
 		validateCA = false
-
-		details.Apply(tlsconfig.WithTLSServerName(""))
 	}
 
 	if details.TLSKeyFile != "" || details.TLSCertFile != "" {
 		validateClient = true
 	}
 
-	err := details.Validate(validateCA, validateClient, validateClient)
+	err = details.Validate(validateCA, validateClient, validateClient)
 	if err != nil {
 		return nil, errs.WrapConst(err, zbxerr.ErrorInvalidConfiguration)
 	}

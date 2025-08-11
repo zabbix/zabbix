@@ -18,56 +18,31 @@ import (
 	"crypto/tls"
 
 	"golang.zabbix.com/sdk/errs"
-	"golang.zabbix.com/sdk/plugin/comms"
 	"golang.zabbix.com/sdk/tlsconfig"
-	"golang.zabbix.com/sdk/uri"
 )
 
-var errTLSDisabled = errs.New("tls is disabled for this connection")
+func getTLSConfig(ck *connKey) (*tls.Config, error) {
+	tlsConnect := ck.tlsConnect
 
-func getTLSConfig(redisURI *uri.URI, params map[string]string) (*tls.Config, error) {
-	tlsConnect := params[string(comms.TLSConnect)]
-
-	tlsConnectionType, err := comms.NewTLSConnectionType(tlsConnect)
+	tlsConnectionType, err := tlsconfig.NewTLSConnectionType(tlsConnect)
 	if err != nil {
 		return nil, errs.Wrap(err, "invalid TLS connection type")
 	}
 
 	details := tlsconfig.NewDetails(
 		"",
-		redisURI.String(),
-		tlsconfig.WithTLSServerName(redisURI.Host()),
-		tlsconfig.WithTLSConnect(string(tlsConnectionType)),
-		tlsconfig.WithTLSCaFile(params[string(comms.TLSCAFile)]),
-		tlsconfig.WithTLSCertFile(params[string(comms.TLSCertFile)]),
-		tlsconfig.WithTLSKeyFile(params[string(comms.TLSKeyFile)]),
+		ck.uri.String(),
+		tlsconfig.WithTLSConnect(tlsConnectionType),
+		tlsconfig.WithTLSCaFile(ck.tlsCA),
+		tlsconfig.WithTLSCertFile(ck.tlsCert),
+		tlsconfig.WithTLSKeyFile(ck.tlsKey),
 		tlsconfig.WithAllowedConnections(
-			string(comms.Disabled),
-			string(comms.Required),
-			string(comms.VerifyCA),
-			string(comms.VerifyFull),
+			string(tlsconfig.Disabled),
+			string(tlsconfig.Required),
+			string(tlsconfig.VerifyCA),
+			string(tlsconfig.VerifyFull),
 		),
 	)
-
-	// could move this to the tlsconfig.
-	switch tlsConnectionType {
-	case comms.Disabled:
-		return nil, errTLSDisabled
-	case comms.Required:
-		details.Apply(tlsconfig.WithSkipDefaultTLSVerification(true))
-	case comms.VerifyCA:
-		details.Apply(
-			tlsconfig.WithTLSServerName(""),
-			// eliminate default config check to use custom which ignores SAN
-			tlsconfig.WithSkipDefaultTLSVerification(true),
-			tlsconfig.WithCustomTLSVerification(tlsconfig.VerifyPeerCertificateFunc("", nil)),
-		)
-
-	case comms.VerifyFull: // uses default configuration with all provided data.
-
-	default:
-		return nil, errs.New("unsupported TLS connection type: " + string(tlsConnectionType))
-	}
 
 	tlsConfig, err := details.GetTLSConfig()
 	if err != nil {

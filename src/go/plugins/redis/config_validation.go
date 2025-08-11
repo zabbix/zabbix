@@ -16,6 +16,7 @@ package redis
 
 import (
 	"golang.zabbix.com/sdk/plugin/comms"
+	"golang.zabbix.com/sdk/tlsconfig"
 )
 
 const (
@@ -27,7 +28,7 @@ const (
 type fieldRequirement int
 
 // gives a map which describes what field combinations are allowed depending on TLSConnect value.
-func getValidationRules(tlsConnect comms.TLSConnectionType) map[comms.ConfigSetting]fieldRequirement {
+func getValidationRules(tlsConnect tlsconfig.TLSConnectionType) map[comms.ConfigSetting]fieldRequirement {
 	// common rules.
 	rules := map[comms.ConfigSetting]fieldRequirement{
 		comms.URI:      optional,
@@ -39,16 +40,16 @@ func getValidationRules(tlsConnect comms.TLSConnectionType) map[comms.ConfigSett
 	}
 
 	switch tlsConnect {
-	case comms.Disabled:
+	case tlsconfig.Disabled:
 		rules[comms.TLSCAFile] = forbidden
 
 		rules[comms.TLSKeyFile] = forbidden
 		rules[comms.TLSCertFile] = forbidden
 
-	case comms.Required:
+	case tlsconfig.Required:
 		rules[comms.TLSCAFile] = forbidden
 
-	case comms.VerifyCA, comms.VerifyFull:
+	case tlsconfig.VerifyCA, tlsconfig.VerifyFull:
 		rules[comms.TLSCAFile] = required
 	default:
 		return map[comms.ConfigSetting]fieldRequirement{}

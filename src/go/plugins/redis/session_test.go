@@ -20,6 +20,7 @@ import (
 
 	"github.com/google/go-cmp/cmp"
 	"golang.zabbix.com/sdk/plugin/comms"
+	"golang.zabbix.com/sdk/tlsconfig"
 )
 
 func TestSession_getFieldValues(t *testing.T) {
@@ -36,7 +37,7 @@ func TestSession_getFieldValues(t *testing.T) {
 				URI:         "redis://localhost:6379",
 				Password:    "secret",
 				User:        "testuser",
-				TLSConnect:  string(comms.Disabled),
+				TLSConnect:  string(tlsconfig.Disabled),
 				TLSCAFile:   "/path/to/ca.pem",
 				TLSCertFile: "/path/to/cert.pem",
 				TLSKeyFile:  "/path/to/key.pem",
@@ -45,7 +46,7 @@ func TestSession_getFieldValues(t *testing.T) {
 				comms.URI:         "redis://localhost:6379",
 				comms.Password:    "secret",
 				comms.User:        "testuser",
-				comms.TLSConnect:  string(comms.Disabled),
+				comms.TLSConnect:  string(tlsconfig.Disabled),
 				comms.TLSCAFile:   "/path/to/ca.pem",
 				comms.TLSCertFile: "/path/to/cert.pem",
 				comms.TLSKeyFile:  "/path/to/key.pem",
@@ -85,42 +86,42 @@ func TestSession_resolveTLSConnect(t *testing.T) {
 		name        string
 		session     session
 		defaults    session
-		want        comms.TLSConnectionType
+		want        tlsconfig.TLSConnectionType
 		wantErr     bool
 		errContains string
 	}{
 		{
 			name: "session TLS connect set to disabled",
 			session: session{
-				TLSConnect: string(comms.Disabled),
+				TLSConnect: string(tlsconfig.Disabled),
 			},
 			defaults: session{},
-			want:     comms.Disabled,
+			want:     tlsconfig.Disabled,
 			wantErr:  false,
 		},
 		{
 			name: "session TLS connect set to required",
 			session: session{
-				TLSConnect: string(comms.Required),
+				TLSConnect: string(tlsconfig.Required),
 			},
 			defaults: session{},
-			want:     comms.Required,
+			want:     tlsconfig.Required,
 			wantErr:  false,
 		},
 		{
 			name:    "defaults TLS connect used when session empty",
 			session: session{},
 			defaults: session{
-				TLSConnect: string(comms.Required),
+				TLSConnect: string(tlsconfig.Required),
 			},
-			want:    comms.Required,
+			want:    tlsconfig.Required,
 			wantErr: false,
 		},
 		{
 			name:     "both empty defaults to disabled",
 			session:  session{},
 			defaults: session{},
-			want:     comms.Disabled,
+			want:     tlsconfig.Disabled,
 			wantErr:  false,
 		},
 		{
@@ -375,7 +376,7 @@ func TestSession_validateSession(t *testing.T) {
 			name: "valid session with TLS disabled",
 			session: session{
 				URI:        "redis://localhost:6379",
-				TLSConnect: string(comms.Disabled),
+				TLSConnect: string(tlsconfig.Disabled),
 				Password:   "abc",
 			},
 			defaults: session{},
@@ -386,7 +387,7 @@ func TestSession_validateSession(t *testing.T) {
 			session: session{
 				URI:         "redis://localhost:6379",
 				Password:    "abc",
-				TLSConnect:  string(comms.VerifyFull),
+				TLSConnect:  string(tlsconfig.VerifyFull),
 				TLSCAFile:   "/path/to/ca.pem",
 				TLSCertFile: "/path/to/cert.pem",
 				TLSKeyFile:  "/path/to/key.pem",
@@ -410,7 +411,7 @@ func TestSession_validateSession(t *testing.T) {
 			session: session{
 				URI:        "redis://localhost:6379",
 				Password:   "abc",
-				TLSConnect: string(comms.VerifyFull),
+				TLSConnect: string(tlsconfig.VerifyFull),
 				TLSCAFile:  "/path/to/ca.pem",
 				TLSKeyFile: "/path/to/key.pem",
 			},
@@ -425,7 +426,7 @@ func TestSession_validateSession(t *testing.T) {
 			session: session{
 				URI:        "redis://localhost:6379",
 				Password:   "abc",
-				TLSConnect: string(comms.VerifyCA),
+				TLSConnect: string(tlsconfig.VerifyCA),
 			},
 			defaults:    session{},
 			wantErr:     true,
