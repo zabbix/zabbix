@@ -22,6 +22,9 @@
 #include "zbxvariant.h"
 #include "zbxtime.h"
 #include "zbxstats.h"
+#include "zbxcacheconfig.h"
+#include "zbxcachehistory.h"
+#include "zbxjson.h"
 
 #define PACKED_FIELD_RAW	0
 #define PACKED_FIELD_STRING	1

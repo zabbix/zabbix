@@ -13,8 +13,8 @@
 **/
 
 #include "lld.h"
+#include "zbxcommon.h"
 #include "zbxalgo.h"
-#include "lld_audit.h"
 #include "audit/zbxaudit.h"
 #include "audit/zbxaudit_item.h"
 #include "zbxdb.h"
@@ -22,11 +22,13 @@
 #include "zbx_item_constants.h"
 #include "zbxpreproc.h"
 #include "zbxeval.h"
-#include "zbxexpr.h"
 #include "zbxnum.h"
 #include "zbxstr.h"
 #include "zbxtime.h"
 #include "zbxvariant.h"
+#include "zbxcacheconfig.h"
+#include "zbxjson.h"
+#include "zbxtypes.h"
 
 /* lld_override table columns */
 #define LLD_OVERRIDE_COL_NAME			0
