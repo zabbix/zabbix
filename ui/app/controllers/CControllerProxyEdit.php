@@ -147,7 +147,7 @@ class CControllerProxyEdit extends CController {
 					'tls_connect' => (int) DB::getDefault('proxy', 'tls_connect'),
 					'tls_accept' => (int) DB::getDefault('proxy', 'tls_connect'),
 					'tls_psk_identity' => DB::getDefault('proxy', 'tls_psk_identity'),
-					'tls_psk' => DB::getDefault('proxy', 'tls_psk_identity'),
+					'tls_psk' => DB::getDefault('proxy', 'tls_psk'),
 					'tls_issuer' => DB::getDefault('proxy', 'tls_issuer'),
 					'tls_subject' => DB::getDefault('proxy', 'tls_subject'),
 					'custom_timeouts' => (int) DB::getDefault('proxy', 'custom_timeouts'),

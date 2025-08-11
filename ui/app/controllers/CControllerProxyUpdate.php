@@ -63,7 +63,7 @@ class CControllerProxyUpdate extends CController {
 				'when' => ['operating_mode', 'in' => [PROXY_OPERATING_MODE_PASSIVE]]
 			],
 			'tls_psk_identity' => ['db proxy.tls_psk_identity', 'not_empty',
-				'when' => ['tls_connect', 'in' => [HOST_ENCRYPTION_PSK]]],
+				'when' => ['tls_accept_psk', true]],
 			'tls_psk' => [
 				['db proxy.tls_psk',
 					'regex' => '/^(.{2})+$/',
@@ -77,7 +77,7 @@ class CControllerProxyUpdate extends CController {
 					'regex' => '/^[0-9a-f]*$/i',
 					'messages' => ['regex' => _('PSK must contain only hexadecimal characters.')]
 				],
-				['db proxy.tls_psk', 'not_empty', 'when' => ['tls_connect', 'in' => [HOST_ENCRYPTION_PSK]]]
+				['db proxy.tls_psk', 'not_empty', 'when' => ['tls_accept_psk', true]]
 			],
 			'tls_issuer' => ['db proxy.tls_issuer', 'when' => ['tls_connect', 'in' => [HOST_ENCRYPTION_CERTIFICATE]]],
 			'tls_subject' => ['db proxy.tls_subject', 'when' => ['tls_connect', 'in' => [HOST_ENCRYPTION_CERTIFICATE]]],
