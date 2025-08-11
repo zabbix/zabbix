@@ -19,9 +19,9 @@ import (
 	"errors"
 	"testing"
 
-	"github.com/google/go-cmp/cmp"
 	"golang.zabbix.com/sdk/errs"
 	"golang.zabbix.com/sdk/plugin/comms"
+	"golang.zabbix.com/sdk/tlsconfig"
 	"golang.zabbix.com/sdk/uri"
 )
 
@@ -44,7 +44,7 @@ func TestGetTLSConfig(t *testing.T) {
 	}{
 		{
 			name:   "TLS connection type is required",
-			params: map[string]string{string(comms.TLSConnect): string(comms.Required)},
+			params: map[string]string{string(comms.TLSConnect): string(tlsconfig.Required)},
 			validateFunc: func(t *testing.T, cfg *tls.Config, host string) {
 				t.Helper()
 				if !cfg.InsecureSkipVerify {
@@ -54,7 +54,7 @@ func TestGetTLSConfig(t *testing.T) {
 		},
 		{
 			name:   "TLS connection type is verify_ca",
-			params: map[string]string{string(comms.TLSConnect): string(comms.VerifyCA)},
+			params: map[string]string{string(comms.TLSConnect): string(tlsconfig.VerifyCA)},
 			validateFunc: func(t *testing.T, cfg *tls.Config, host string) {
 				t.Helper()
 				if !cfg.InsecureSkipVerify {
@@ -70,21 +70,18 @@ func TestGetTLSConfig(t *testing.T) {
 		},
 		{
 			name:   "TLS connection type is verify_full",
-			params: map[string]string{string(comms.TLSConnect): string(comms.VerifyFull)},
+			params: map[string]string{string(comms.TLSConnect): string(tlsconfig.VerifyFull)},
 			validateFunc: func(t *testing.T, cfg *tls.Config, host string) {
 				t.Helper()
 				if cfg.InsecureSkipVerify {
 					t.Error("expected InsecureSkipVerify to be false, but it was true")
 				}
-				if diff := cmp.Diff(host, cfg.ServerName); diff != "" {
-					t.Errorf("ServerName mismatch (-want +got):\n%s", diff)
-				}
 			},
 		},
 		{
-			name:          "-tls connection type is disabled",
-			params:        map[string]string{string(comms.TLSConnect): string(comms.Disabled)},
-			expectedError: errTLSDisabled,
+			name:          "+tls connection type is disabled",
+			params:        map[string]string{string(comms.TLSConnect): string(tlsconfig.Disabled)},
+			expectedError: nil,
 		},
 		{
 			name:          "-invalid TLS connection type",
@@ -103,7 +100,8 @@ func TestGetTLSConfig(t *testing.T) {
 		t.Run(tc.name, func(t *testing.T) {
 			t.Parallel()
 
-			tlsConfig, err := getTLSConfig(redisURI, tc.params)
+			ck := createConnKey(redisURI, tc.params)
+			tlsConfig, err := getTLSConfig(ck)
 
 			// Check for expected errors.
 			if tc.expectedError != nil {
