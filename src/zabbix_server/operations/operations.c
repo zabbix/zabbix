@@ -770,8 +770,7 @@ static zbx_uint64_t	add_discovered_host(const zbx_db_event *event, int *status, 
 
 					if (update_tls)
 					{
-						const char	*psk_identity = "";
-						const char	*psk_value    = "";
+						const char	*psk_identity = "", *psk_value    = "";
 
 						if (ZBX_TCP_SEC_TLS_PSK == tls_accepted)
 						{
@@ -785,8 +784,8 @@ static zbx_uint64_t	add_discovered_host(const zbx_db_event *event, int *status, 
 								psk_value);
 
 						zbx_audit_host_update_json_add_tls_and_psk(
-						zbx_map_db_event_to_audit_context(event), hostid,
-						tls_accepted, tls_accepted);
+								zbx_map_db_event_to_audit_context(event), hostid,
+								tls_accepted, tls_accepted);
 					}
 
 					zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
