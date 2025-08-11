@@ -170,11 +170,11 @@ out:
  *                FAIL - error occurred or host not found                           *
  *                                                                                  *
  * Comments: NB! adds host to the database if it does not exist or if it            *
- *           exists but metadata, interface, interface type or port has             *
- *           changed                                                                *
+ *           exists but metadata, interface, interface type, connection type        *
+ *           or port has changed                                                    *
  *                                                                                  *
  ************************************************************************************/
-static int	get_hostid_by_host_or_autoregister(zbx_socket_t *sock, const char *host, const char *ip,
+static int	get_hostid_by_host_or_autoregister(const zbx_socket_t *sock, const char *host, const char *ip,
 		unsigned short port, const char *host_metadata, zbx_conn_flags_t flag, const char *interface,
 		const zbx_events_funcs_t *events_cbs, int config_timeout,
 		zbx_autoreg_update_host_func_t autoreg_update_host_func_cb, zbx_uint64_t *hostid,

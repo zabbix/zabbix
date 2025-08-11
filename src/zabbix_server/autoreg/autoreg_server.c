@@ -66,7 +66,6 @@ static void	autoreg_process_hosts_server(zbx_vector_autoreg_host_ptr_t *autoreg_
 			" left join autoreg_host a"
 				" on a.host=h.host"
 			" where");
-
 	zbx_db_add_str_condition_alloc(&sql, &sql_alloc, &sql_offset, "h.host",
 			(const char * const *)hosts.values, hosts.values_num);
 

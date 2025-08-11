@@ -9008,8 +9008,8 @@ static void	zbx_dc_update_host_tls_accept(zbx_uint64_t hostid, unsigned int conn
 	ZBX_DC_HOST	*dc_host;
 
 	WRLOCK_CACHE;
-
 	dc_host = (ZBX_DC_HOST *)zbx_hashset_search(&config->hosts, &hostid);
+
 	if (NULL != dc_host)
 	{
 		/* Add the connection type to tls_accept if not already present */
@@ -9051,7 +9051,7 @@ static void	zbx_dc_update_host_tls_accept(zbx_uint64_t hostid, unsigned int conn
  *     locking.                                                               *
  *                                                                            *
  ******************************************************************************/
-int	zbx_dc_check_host_conn_permissions(const char *host, zbx_socket_t *sock, zbx_uint64_t *hostid,
+int	zbx_dc_check_host_conn_permissions(const char *host, const zbx_socket_t *sock, zbx_uint64_t *hostid,
 		unsigned char *status, unsigned char *monitored_by, zbx_uint64_t *revision,
 		zbx_comms_redirect_t *redirect, char **error)
 {
