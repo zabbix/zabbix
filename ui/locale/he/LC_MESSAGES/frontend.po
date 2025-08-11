@@ -12540,6 +12540,62 @@ msgstr "אין הרשאות לגישה למערכת."
 msgid "No permissions to call \"%1$s.%2$s\"."
 msgstr "אין הרשאות לקרוא ל־„%1$s.%2$s”."
 
+#: include/classes/api/services/CConfiguration.php:299
+msgid "No permissions to import discovery rules."
+msgstr ""
+
+#: include/classes/api/services/CConfiguration.php:300
+msgid "No permissions to import graphs."
+msgstr ""
+
+#: include/classes/api/services/CConfiguration.php:301
+msgid "No permissions to import groups."
+msgstr ""
+
+#: include/classes/api/services/CConfiguration.php:302
+msgid "No permissions to import hosts."
+msgstr ""
+
+#: include/classes/api/services/CConfiguration.php:304
+msgid "No permissions to import images."
+msgstr ""
+
+#: include/classes/api/services/CConfiguration.php:305
+msgid "No permissions to import items."
+msgstr ""
+
+#: include/classes/api/services/CConfiguration.php:306
+msgid "No permissions to import maps."
+msgstr ""
+
+#: include/classes/api/services/CConfiguration.php:307
+msgid "No permissions to import media types."
+msgstr ""
+
+#: include/classes/api/services/CConfiguration.php:310
+msgid "No permissions to import template dashboards."
+msgstr ""
+
+#: include/classes/api/services/CConfiguration.php:308
+msgid "No permissions to import template links."
+msgstr ""
+
+#: include/classes/api/services/CConfiguration.php:309
+msgid "No permissions to import templates."
+msgstr ""
+
+#: include/classes/api/services/CConfiguration.php:311
+msgid "No permissions to import triggers."
+msgstr ""
+
+#: include/classes/api/services/CConfiguration.php:312
+msgid "No permissions to import value maps."
+msgstr ""
+
+#: include/classes/api/services/CConfiguration.php:303
+msgid "No permissions to import web scenarios."
+msgstr ""
+
 #: app/controllers/CControllerChartsView.php:119
 #: app/controllers/CControllerDashboardPrint.php:96
 #: app/controllers/CControllerDashboardShareUpdate.php:98
