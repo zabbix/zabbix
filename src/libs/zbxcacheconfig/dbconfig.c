@@ -9055,7 +9055,9 @@ int	zbx_dc_check_host_conn_permissions(const char *host, zbx_socket_t *sock, zbx
 		unsigned char *status, unsigned char *monitored_by, zbx_uint64_t *revision,
 		zbx_comms_redirect_t *redirect, char **error)
 {
-	const ZBX_DC_HOST	*dc_host = NULL;
+	const ZBX_DC_HOST		*dc_host = NULL;
+	const ZBX_DC_AUTOREG_HOST	*dc_autoreg_host;
+	unsigned int			need_update_tls = 0, need_update_psk = 0;
 #if defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
 	zbx_tls_conn_attr_t	attr;
 
@@ -9088,53 +9090,45 @@ int	zbx_dc_check_host_conn_permissions(const char *host, zbx_socket_t *sock, zbx
 	}
 
 	/* Check if this is an autoregistered host and update connection type if needed */
-	const ZBX_DC_AUTOREG_HOST	*dc_autoreg_host = DCfind_autoreg_host(host);
-
-	if (NULL != dc_autoreg_host)
+	if (NULL != (dc_autoreg_host = DCfind_autoreg_host(host)))
 	{
 		zabbix_log(LOG_LEVEL_DEBUG, "autoregistered host \"%s\": sock_conn_type=%u, autoreg_conn_type=%u, "
-				"host_tls_accept=%u",
-				host, sock->connection_type, dc_autoreg_host->connection_type, dc_host->tls_accept);
+				"host_tls_accept=%u", host, sock->connection_type, dc_autoreg_host->connection_type,
+				dc_host->tls_accept);
 
-		/* Update the host's tls_accept in cache to allow the current connection type */
 		if (0 == ((unsigned int)dc_host->tls_accept & sock->connection_type))
+			need_update_tls = 1;
+
+		if (ZBX_TCP_SEC_TLS_PSK == sock->connection_type && NULL == dc_host->tls_dc_psk)
+			need_update_psk = 1;
+	}
+
+	if (need_update_tls || need_update_psk)
+	{
+		zbx_uint64_t id = dc_host->hostid;
+		UNLOCK_CACHE;
+
+		if (need_update_tls)
 		{
 			zabbix_log(LOG_LEVEL_DEBUG, "updating host tls_accept for host \"%s\" to allow connection type "
 					"%u", host, sock->connection_type);
-
-			/* Update tls_accept in database to allow this connection type */
-			UNLOCK_CACHE;
-			zbx_dc_update_host_tls_accept(dc_host->hostid, sock->connection_type);
-			RDLOCK_CACHE;
-
-			/* Re-find the host after potential cache update */
-			dc_host = DCfind_host(host);
-			if (NULL == dc_host)
-			{
-				UNLOCK_CACHE;
-				*hostid = 0;
-				return SUCCEED;
-			}
+			zbx_dc_update_host_tls_accept(id, sock->connection_type);
 		}
 
-		/* If connection type is PSK and host doesn't have PSK configured, configure it from autoreg PSK */
-		if (ZBX_TCP_SEC_TLS_PSK == sock->connection_type && NULL == dc_host->tls_dc_psk)
+		if (need_update_psk)
 		{
 			zabbix_log(LOG_LEVEL_DEBUG, "configuring PSK for host \"%s\" from autoreg PSK", host);
+			zbx_dc_configure_host_psk(id);
+		}
 
-			/* Configure PSK for host from autoreg PSK */
+		RDLOCK_CACHE;
+
+		if (NULL == (dc_host = DCfind_host(host)))
+		{
 			UNLOCK_CACHE;
-			zbx_dc_configure_host_psk(dc_host->hostid);
-			RDLOCK_CACHE;
+			*hostid = 0;
 
-			/* Re-find the host after potential cache update */
-			dc_host = DCfind_host(host);
-			if (NULL == dc_host)
-			{
-				UNLOCK_CACHE;
-				*hostid = 0;
-				return SUCCEED;
-			}
+			return SUCCEED;
 		}
 	}
 
@@ -9228,6 +9222,16 @@ void	zbx_dc_config_update_autoreg_host(const char *host, const char *listen_ip, 
 	ZBX_DC_AUTOREG_HOST	*dc_autoreg_host, dc_autoreg_host_local = {.host = host};
 	int			found;
 
+	/* Validate connection_type before saving */
+	if (ZBX_TCP_SEC_UNENCRYPTED != connection_type &&
+		ZBX_TCP_SEC_TLS_PSK != connection_type &&
+		ZBX_TCP_SEC_TLS_CERT != connection_type)
+	{
+		zabbix_log(LOG_LEVEL_DEBUG, "invalid connection type %u for host \"%s\", using unencrypted",
+				connection_type, host);
+		connection_type = ZBX_TCP_SEC_UNENCRYPTED;
+	}
+
 	WRLOCK_CACHE;
 
 	dc_autoreg_host = (ZBX_DC_AUTOREG_HOST *)zbx_hashset_search(&config->autoreg_hosts, &dc_autoreg_host_local);
@@ -9236,22 +9240,10 @@ void	zbx_dc_config_update_autoreg_host(const char *host, const char *listen_ip, 
 		found = 0;
 		dc_autoreg_host = zbx_hashset_insert(&config->autoreg_hosts, &dc_autoreg_host_local,
 				sizeof(ZBX_DC_AUTOREG_HOST));
-		dc_autoreg_host->connection_type = 0; /* Initialize with default value */
 	}
 	else
 
 		found = 1;
-	/* Validate connection_type before saving */
-	if (connection_type != ZBX_TCP_SEC_UNENCRYPTED &&
-		connection_type != ZBX_TCP_SEC_TLS_PSK &&
-		connection_type != ZBX_TCP_SEC_TLS_CERT)
-	{
-		UNLOCK_CACHE;
-		zabbix_log(LOG_LEVEL_DEBUG, "invalid connection type %u for host \"%s\", using unencrypted",
-				connection_type, host);
-		connection_type = ZBX_TCP_SEC_UNENCRYPTED;
-		WRLOCK_CACHE;
-	}
 
 	dc_strpool_replace(found, &dc_autoreg_host->host, host);
 	dc_strpool_replace(found, &dc_autoreg_host->listen_ip, listen_ip);

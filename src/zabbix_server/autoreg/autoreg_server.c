@@ -100,7 +100,7 @@ static void	autoreg_process_hosts_server(zbx_vector_autoreg_host_ptr_t *autoreg_
 					zabbix_log(LOG_LEVEL_DEBUG, "Connection type changed for host '%s': old=%u, "
 							"new=%u, setting autoreg_hostid to 0", autoreg_host->host,
 							current_connection_type, autoreg_host->connection_type);
-					/* connection_type has changed - set autoreg_hostid = 0 to create new record */
+
 					autoreg_host->autoreg_hostid = 0;
 
 					break;
