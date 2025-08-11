@@ -10,6 +10,7 @@
 .deps
 .dirstamp
 .vscode
+.idea
 /.buildpath
 /.idea
 /.project
