@@ -44,14 +44,6 @@ class testEscalations extends CIntegrationTest {
 		// Create host "testhost".
 		$response = $this->call('host.create', [
 			'host' => self::HOST_NAME,
-			'interfaces' => [
-				'type' => 1,
-				'main' => 1,
-				'useip' => 1,
-				'ip' => '127.0.0.1',
-				'dns' => '',
-				'port' => $this->getConfigurationValue(self::COMPONENT_AGENT, 'ListenPort')
-			],
 			'groups' => ['groupid' => 4]
 		]);
 
@@ -181,7 +173,6 @@ class testEscalations extends CIntegrationTest {
 						'ListenPort', 10051),
 				'AllowKey' => 'system.run[*]',
 				'LogRemoteCommands' => 1,
-				'StartAgents' => 0
 			]
 		];
 	}
