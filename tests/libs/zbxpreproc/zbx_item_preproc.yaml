@@ -914,7 +914,7 @@ out:
   return: SUCCEED
   value: <b x="1"/><d x="1"/>
 ---
-test case: jsonpath1
+test case: jsonpath1_str
 in:
   value:
     value_type: ITEM_VALUE_TYPE_STR
@@ -926,7 +926,19 @@ in:
 out:
   return: FAIL
 ---
-test case: jsonpath2
+test case: jsonpath1_json
+in:
+  value:
+    value_type: ITEM_VALUE_TYPE_JSON
+    time: 2017-10-29 03:15:00 +03:00
+    data: abc
+  step:
+    type: ZBX_PREPROC_JSONPATH
+    params: 
+out:
+  return: FAIL
+---
+test case: jsonpath2_str
 in:
   value:
     value_type: ITEM_VALUE_TYPE_STR
@@ -939,7 +951,20 @@ in:
 out:
   return: FAIL
 ---
-test case: jsonpath3
+test case: jsonpath2_json
+in:
+  value:
+    value_type: ITEM_VALUE_TYPE_JSON
+    time: 2017-10-29 03:15:00 +03:00
+    data: |-
+      {"a":{"b":[1, 2, 3]}}
+  step:
+    type: ZBX_PREPROC_JSONPATH
+    params: $abc
+out:
+  return: FAIL
+---
+test case: jsonpath3_str
 in:
   value:
     value_type: ITEM_VALUE_TYPE_STR
@@ -951,8 +976,20 @@ in:
     params: $.abc
 out:
   return: FAIL
+test case: jsonpath3_json
+in:
+  value:
+    value_type: ITEM_VALUE_TYPE_JSON
+    time: 2017-10-29 03:15:00 +03:00
+    data: |-
+      {"a":{"b":[1, 2, 3]}}
+  step:
+    type: ZBX_PREPROC_JSONPATH
+    params: $.abc
+out:
+  return: FAIL
 ---
-test case: jsonpath4
+test case: jsonpath4_str
 in:
   value:
     value_type: ITEM_VALUE_TYPE_STR
@@ -967,7 +1004,22 @@ out:
   value: |-
     {"b":[1,2,3]}
 ---
-test case: jsonpath5
+test case: jsonpath4_json
+in:
+  value:
+    value_type: ITEM_VALUE_TYPE_JSON
+    time: 2017-10-29 03:15:00 +03:00
+    data: |- 
+      {"a":{"b":[1, 2, 3]}}
+  step:
+    type: ZBX_PREPROC_JSONPATH
+    params: $.a
+out:
+  return: SUCCEED
+  value: |-
+    {"b":[1,2,3]}
+---
+test case: jsonpath5_str
 in:
   value:
     value_type: ITEM_VALUE_TYPE_STR
@@ -981,8 +1033,22 @@ out:
   return: SUCCEED
   value: |-
     [1,2,3]
+test case: jsonpath5_json
+in:
+  value:
+    value_type: ITEM_VALUE_TYPE_JSON
+    time: 2017-10-29 03:15:00 +03:00
+    data: |- 
+      {"a":{"b":[1, 2, 3]}}
+  step:
+    type: ZBX_PREPROC_JSONPATH
+    params: $.a['b']
+out:
+  return: SUCCEED
+  value: |-
+    [1,2,3]
 ---
-test case: jsonpath6
+test case: jsonpath6_str
 in:
   value:
     value_type: ITEM_VALUE_TYPE_STR
@@ -996,7 +1062,21 @@ out:
   return: SUCCEED
   value: 2
 ---
-test case: jsonpath7
+test case: jsonpath6_json
+in:
+  value:
+    value_type: ITEM_VALUE_TYPE_JSON
+    time: 2017-10-29 03:15:00 +03:00
+    data: |- 
+      {"a":{"b":[1, 2, 3]}}
+  step:
+    type: ZBX_PREPROC_JSONPATH
+    params: $.a['b'][1]
+out:
+  return: SUCCEED
+  value: 2
+---
+test case: jsonpath7_str
 in:
   value:
     value_type: ITEM_VALUE_TYPE_STR
@@ -1010,7 +1090,21 @@ out:
   return: SUCCEED
   value: '["one","two","three"]'
 ---
-test case: jsonpath8
+test case: jsonpath7_json
+in:
+  value:
+    value_type: ITEM_VALUE_TYPE_JSON
+    time: 2017-10-29 03:15:00 +03:00
+    data: |- 
+      {"a":{"b c":["one", "two", "three"]}}
+  step:
+    type: ZBX_PREPROC_JSONPATH
+    params: $.a['b c']
+out:
+  return: SUCCEED
+  value: '["one","two","three"]'
+---
+test case: jsonpath8_str
 in:
   value:
     value_type: ITEM_VALUE_TYPE_STR
@@ -1024,7 +1118,21 @@ out:
   return: SUCCEED
   value: two "2"
 ---
-test case: jsonpath9
+test case: jsonpath8_json
+in:
+  value:
+    value_type: ITEM_VALUE_TYPE_JSON
+    time: 2017-10-29 03:15:00 +03:00
+    data: |- 
+      {"a":{"b c":["one", "two \"2\"", 3]}}
+  step:
+    type: ZBX_PREPROC_JSONPATH
+    params: $.a['b c'][1]
+out:
+  return: SUCCEED
+  value: two "2"
+---
+test case: jsonpath9_str
 in:
   value:
     value_type: ITEM_VALUE_TYPE_STR
@@ -1038,7 +1146,21 @@ out:
   return: SUCCEED
   value: 3
 ---
-test case: jsonpath10
+test case: jsonpath9_json
+in:
+  value:
+    value_type: ITEM_VALUE_TYPE_JSON
+    time: 2017-10-29 03:15:00 +03:00
+    data: |- 
+      {"a":{"b c":["one", "two \"2\"", 3]}}
+  step:
+    type: ZBX_PREPROC_JSONPATH
+    params: $.a['b c'][2]
+out:
+  return: SUCCEED
+  value: 3
+---
+test case: jsonpath10_str
 in:
   value:
     value_type: ITEM_VALUE_TYPE_STR
@@ -1051,7 +1173,20 @@ in:
 out:
   return: FAIL
 ---
-test case: jsonpath11
+test case: jsonpath10_json
+in:
+  value:
+    value_type: ITEM_VALUE_TYPE_JSON
+    time: 2017-10-29 03:15:00 +03:00
+    data: |- 
+      {"a":{"b":[1, 2, 3]}}
+  step:
+    type: ZBX_PREPROC_JSONPATH
+    params: $.a['b'][3]
+out:
+  return: FAIL
+---
+test case: jsonpath11_str
 in:
   value:
     value_type: ITEM_VALUE_TYPE_STR
@@ -1064,7 +1199,20 @@ in:
 out:
   return: FAIL
 ---
-test case: jsonpath12
+test case: jsonpath11_json
+in:
+  value:
+    value_type: ITEM_VALUE_TYPE_JSON
+    time: 2017-10-29 03:15:00 +03:00
+    data: |- 
+      {"a":{"b":[1, 2, 3]}}
+  step:
+    type: ZBX_PREPROC_JSONPATH
+    params: $.a['b'][
+out:
+  return: FAIL
+---
+test case: jsonpath12_str
 in:
   value:
     value_type: ITEM_VALUE_TYPE_STR
@@ -1076,11 +1224,37 @@ in:
     params: $.a['b][3]
 out:
   return: FAIL
+---    
+test case: jsonpath12_json
+in:
+  value:
+    value_type: ITEM_VALUE_TYPE_JSON
+    time: 2017-10-29 03:15:00 +03:00
+    data: |- 
+      {"a":{"b":[1, 2, 3]}}
+  step:
+    type: ZBX_PREPROC_JSONPATH
+    params: $.a['b][3]
+out:
+  return: FAIL
 ---
-test case: jsonpath13
+test case: jsonpath13_str
 in:
   value:
     value_type: ITEM_VALUE_TYPE_STR
+    time: 2017-10-29 03:15:00 +03:00
+    data: |- 
+      {"a":{"\ud800": 1}}
+  step:
+    type: ZBX_PREPROC_JSONPATH
+    params: $.a
+out:
+  return: FAIL
+---
+test case: jsonpath13_json
+in:
+  value:
+    value_type: ITEM_VALUE_TYPE_JSON
     time: 2017-10-29 03:15:00 +03:00
     data: |- 
       {"a":{"\ud800": 1}}
