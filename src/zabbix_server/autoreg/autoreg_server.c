@@ -61,11 +61,12 @@ static void	autoreg_process_hosts_server(zbx_vector_autoreg_host_ptr_t *autoreg_
 	sql_offset = 0;
 	zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset,
 			"select h.host,h.hostid,h.proxyid,a.host_metadata,a.listen_ip,a.listen_dns,"
-				"a.listen_port,a.flags,h.monitored_by,h.proxy_groupid,a.tls_accepted,a.autoreg_hostid"
+				"a.listen_port,a.flags,a.proxyid,h.monitored_by,h.proxy_groupid,a.tls_accepted"
 			" from hosts h"
 			" left join autoreg_host a"
 				" on a.host=h.host"
 			" where");
+
 	zbx_db_add_str_condition_alloc(&sql, &sql_alloc, &sql_offset, "h.host",
 			(const char * const *)hosts.values, hosts.values_num);
 
@@ -90,11 +91,11 @@ static void	autoreg_process_hosts_server(zbx_vector_autoreg_host_ptr_t *autoreg_
 				break;
 
 			/* check if connection_type has changed */
-			if (SUCCEED != zbx_db_is_null(row[10]))
+			if (SUCCEED != zbx_db_is_null(row[11]))
 			{
 				unsigned int	current_connection_type;
 
-				if (FAIL == zbx_is_uint32(row[10], &current_connection_type) ||
+				if (FAIL == zbx_is_uint32(row[11], &current_connection_type) ||
 						current_connection_type != autoreg_host->connection_type)
 					break;
 			}
@@ -118,7 +119,7 @@ static void	autoreg_process_hosts_server(zbx_vector_autoreg_host_ptr_t *autoreg_
 				}
 			}
 
-			ZBX_STR2UCHAR(current_monitored_by, row[8]);
+			ZBX_STR2UCHAR(current_monitored_by, row[9]);
 
 			if (NULL == proxy)
 			{
@@ -129,7 +130,7 @@ static void	autoreg_process_hosts_server(zbx_vector_autoreg_host_ptr_t *autoreg_
 			{
 				zbx_uint64_t	current_autoreg_proxyid;
 
-				ZBX_DBROW2UINT64(current_autoreg_proxyid, row[2]);
+				ZBX_DBROW2UINT64(current_autoreg_proxyid, row[8]);
 
 				/* if proxy is in a group then host must be monitored by this group, */
 				/* unless host was already directly monitored by this proxy          */
@@ -157,7 +158,7 @@ static void	autoreg_process_hosts_server(zbx_vector_autoreg_host_ptr_t *autoreg_
 				{
 					zbx_uint64_t	current_proxy_groupid;
 
-					ZBX_DBROW2UINT64(current_proxy_groupid, row[9]);
+					ZBX_DBROW2UINT64(current_proxy_groupid, row[10]);
 
 					if (current_proxy_groupid != proxy->proxy_groupid)
 						break;
@@ -349,9 +350,6 @@ void	zbx_autoreg_flush_hosts_server(zbx_vector_autoreg_host_ptr_t *autoreg_hosts
 
 	if (NULL != events_cbs->clean_events_cb)
 		events_cbs->clean_events_cb();
-
-	/* Invalidate cache after database update */
-	zbx_autoreg_host_invalidate_cache(autoreg_hosts);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 }
