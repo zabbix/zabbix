@@ -17692,6 +17692,10 @@ msgstr "Anzahl der Prozesse. Gibt Integer zurück"
 msgid "The parameter \"%1$s\" is missing from the user attributes."
 msgstr "Der Parameter \"%1$s\" fehlt in den Benutzerattributen."
 
+#: app/views/administration.authentication.edit.php:168
+msgid "The previous password was cleared due to a host change. Please enter the new password."
+msgstr ""
+
 #: include/classes/core/CJsonRpc.php:177
 msgid "The received JSON is not a valid JSON-RPC request."
 msgstr "Das empfangene JSON ist keine gültige JSON-RPC-Anfrage."

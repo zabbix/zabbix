@@ -17644,6 +17644,10 @@ msgstr ""
 msgid "The parameter \"%1$s\" is missing from the user attributes."
 msgstr ""
 
+#: app/views/administration.authentication.edit.php:168
+msgid "The previous password was cleared due to a host change. Please enter the new password."
+msgstr ""
+
 #: include/classes/core/CJsonRpc.php:177
 msgid "The received JSON is not a valid JSON-RPC request."
 msgstr ""
