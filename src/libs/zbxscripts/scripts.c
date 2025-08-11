@@ -298,10 +298,9 @@ void	zbx_remote_commands_prepare_to_send(struct zbx_json *json, zbx_uint64_t hos
 			zbx_json_adduint64(json, ZBX_PROTO_TAG_ID, command->id);
 
 			if (0 != (command->flag & REMOTE_COMMAND_RESULT_WAIT))
-			{
 				wait = 1;
-				command->flag |= REMOTE_COMMAND_SENT;
-			}
+
+			command->flag |= REMOTE_COMMAND_SENT;
 
 			zbx_json_adduint64(json, ZBX_PROTO_TAG_WAIT, (zbx_uint64_t)wait);
 
@@ -370,15 +369,15 @@ static int	active_command_send_and_result_fetch(const zbx_dc_host_t *host, const
 	{
 		sleep(1);
 
+		if (0 != (REMOTE_COMMAND_SENT & pcmd->flag))
+			sent = 1;
+
 		if  (0 != (REMOTE_COMMAND_COMPLETED & pcmd->flag))
 		{
 			commands_lock();
 
 			if (0 == (REMOTE_COMMAND_COMPLETED & pcmd->flag))
 			{
-				if (0 != (REMOTE_COMMAND_SENT & pcmd->flag))
-					sent = 1;
-
 				commands_unlock();
 				continue;
 			}
