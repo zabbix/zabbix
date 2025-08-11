@@ -4610,4 +4610,17 @@ in:
 out:
   value: "0"
   return: SUCCEED
+---
+test case: JSON
+in:
+  value:
+    value_type: ITEM_VALUE_TYPE_JSON
+    time: 2017-10-29 03:15:00 +03:00
+    data: '"a"'
+  step:
+    type: ZBX_PREPROC_STR_REPLACE
+    params: "a\nb"
+out:
+  return: SUCCEED
+  value: '"b"'
 ...
