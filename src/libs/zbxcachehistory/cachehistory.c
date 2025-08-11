@@ -2628,12 +2628,14 @@ void	zbx_dc_add_history_variant(zbx_uint64_t itemid, unsigned char value_type, u
 					return;
 				}
 
-				if (FAIL == zbx_json_open(value->data.json, &jp))
-				{
+				char	*err = NULL;
 
+				if (0 == zbx_json_validate_ext(value->data.json, &err))
+				{
 					dc_local_add_history_notsupported(itemid, &ts,
-							"JSON type requires valid JSON. ", lastlogsize, mtime,
-							value_flags);
+							err, lastlogsize, mtime, value_flags);
+					zbx_free(err);
+
 					return;
 				}
 
