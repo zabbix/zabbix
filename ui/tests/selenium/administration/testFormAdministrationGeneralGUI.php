@@ -990,6 +990,8 @@ class testFormAdministrationGeneralGUI extends testFormAdministrationGeneral {
 		// Fill necessary settings.
 		$form->fill($data['field']);
 		$form->submit();
+		// Wait for Successful configuration update message before opening page affected by settings update.
+		CMessageElement::find()->waituntilVisible();
 		// Check saved settings.
 		$this->page->open($data['link'])->waitUntilReady();
 
