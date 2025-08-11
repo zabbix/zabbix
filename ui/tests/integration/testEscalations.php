@@ -54,7 +54,7 @@ class testEscalations extends CIntegrationTest {
 		// Get host.
 		$response = $this->call('host.get', [
 			'output' => ['host'],
-			'hostids' => [self::$hostid],
+			'hostids' => [self::$hostid]
 		]);
 
 		$this->assertArrayHasKey(0, $response['result']);
