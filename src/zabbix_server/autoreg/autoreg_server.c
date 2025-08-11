@@ -61,7 +61,7 @@ static void	autoreg_process_hosts_server(zbx_vector_autoreg_host_ptr_t *autoreg_
 	sql_offset = 0;
 	zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset,
 			"select h.host,h.hostid,h.proxyid,a.host_metadata,a.listen_ip,a.listen_dns,"
-				"a.listen_port,a.flags,a.proxyid,h.monitored_by,h.proxy_groupid,a.tls_accepted"
+				"a.listen_port,a.flags,h.monitored_by,h.proxy_groupid,a.tls_accepted,a.autoreg_hostid"
 			" from hosts h"
 			" left join autoreg_host a"
 				" on a.host=h.host"
@@ -84,13 +84,36 @@ static void	autoreg_process_hosts_server(zbx_vector_autoreg_host_ptr_t *autoreg_
 				break;
 
 			ZBX_STR2UINT64(autoreg_host->hostid, row[1]);
-			/* check if TLS settings have changed */
-			unsigned int current_tls_accepted = (SUCCEED == zbx_db_is_null(row[11])) ? 1 : atoi(row[11]);
 
 			if (0 != strcmp(autoreg_host->host_metadata, row[3]) ||
-					autoreg_host->flag != atoi(row[7]) ||
-					autoreg_host->connection_type != current_tls_accepted)
+					autoreg_host->flag != atoi(row[7]))
 				break;
+
+			/* check if connection_type has changed */
+			if (SUCCEED != zbx_db_is_null(row[10]))
+			{
+				unsigned int	current_connection_type;
+
+				if (FAIL == zbx_is_uint32(row[10], &current_connection_type) ||
+						current_connection_type != autoreg_host->connection_type)
+				{
+					zabbix_log(LOG_LEVEL_WARNING, "Connection type changed for host '%s': old=%u, "
+							"new=%u, setting autoreg_hostid to 0", autoreg_host->host,
+							current_connection_type, autoreg_host->connection_type);
+
+					/* connection_type has changed - set autoreg_hostid = 0 to create new record */
+					autoreg_host->autoreg_hostid = 0;
+					zabbix_log(LOG_LEVEL_WARNING, "Host '%s' marked for recreation with "
+							"autoreg_hostid=0", autoreg_host->host);
+					break;
+				}
+				else
+				{
+					zabbix_log(LOG_LEVEL_DEBUG, "Connection type unchanged for host '%s': "
+							"current=%u, new=%u", autoreg_host->host,
+							current_connection_type, autoreg_host->connection_type);
+				}
+			}
 
 			/* process with autoregistration if the connection type was forced and */
 			/* is different from the last registered connection type               */
@@ -111,7 +134,7 @@ static void	autoreg_process_hosts_server(zbx_vector_autoreg_host_ptr_t *autoreg_
 				}
 			}
 
-			ZBX_STR2UCHAR(current_monitored_by, row[9]);
+			ZBX_STR2UCHAR(current_monitored_by, row[8]);
 
 			if (NULL == proxy)
 			{
@@ -122,7 +145,7 @@ static void	autoreg_process_hosts_server(zbx_vector_autoreg_host_ptr_t *autoreg_
 			{
 				zbx_uint64_t	current_autoreg_proxyid;
 
-				ZBX_DBROW2UINT64(current_autoreg_proxyid, row[8]);
+				ZBX_DBROW2UINT64(current_autoreg_proxyid, row[2]);
 
 				/* if proxy is in a group then host must be monitored by this group, */
 				/* unless host was already directly monitored by this proxy          */
@@ -150,7 +173,7 @@ static void	autoreg_process_hosts_server(zbx_vector_autoreg_host_ptr_t *autoreg_
 				{
 					zbx_uint64_t	current_proxy_groupid;
 
-					ZBX_DBROW2UINT64(current_proxy_groupid, row[10]);
+					ZBX_DBROW2UINT64(current_proxy_groupid, row[9]);
 
 					if (current_proxy_groupid != proxy->proxy_groupid)
 						break;
@@ -183,7 +206,7 @@ static void	autoreg_process_hosts_server(zbx_vector_autoreg_host_ptr_t *autoreg_
 		/* update autoreg_id in vector if already exists in autoreg_host table */
 		sql_offset = 0;
 		zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset,
-				"select autoreg_hostid,host"
+				"select autoreg_hostid,host,tls_accepted"
 				" from autoreg_host"
 				" where");
 		zbx_db_add_str_condition_alloc(&sql, &sql_alloc, &sql_offset, "host",
@@ -199,7 +222,38 @@ static void	autoreg_process_hosts_server(zbx_vector_autoreg_host_ptr_t *autoreg_
 
 				if (0 == autoreg_host->autoreg_hostid && 0 == strcmp(autoreg_host->host, row[1]))
 				{
-					ZBX_STR2UINT64(autoreg_host->autoreg_hostid, row[0]);
+					/* Check if connection_type has changed don't restore autoreg_hostid */
+					if (SUCCEED != zbx_db_is_null(row[2]))
+					{
+						unsigned int	current_connection_type;
+
+						if (SUCCEED == zbx_is_uint32(row[2], &current_connection_type) &&
+								current_connection_type == autoreg_host->connection_type
+								)
+						{
+							/* connection_type hasn't changed, restore autoreg_hostid */
+							ZBX_STR2UINT64(autoreg_host->autoreg_hostid, row[0]);
+							zabbix_log(LOG_LEVEL_DEBUG, "Restoring autoreg_hostid=%s for "
+									"host '%s' (connection_type unchanged)", row[0],
+									autoreg_host->host);
+						}
+						else
+						{
+							/* connection_type has changed, keep autoreg_hostid = 0
+							 * to create new record */
+							zabbix_log(LOG_LEVEL_DEBUG, "Keeping autoreg_hostid=0 for host "
+									"'%s' (connection_type changed: DB=%u, new=%u)",
+									autoreg_host->host, current_connection_type,
+									autoreg_host->connection_type);
+						}
+					}
+					else
+					{
+						/* No tls_accepted in DB, restore autoreg_hostid */
+						ZBX_STR2UINT64(autoreg_host->autoreg_hostid, row[0]);
+						zabbix_log(LOG_LEVEL_DEBUG, "Restoring autoreg_hostid=%s for host '%s' "
+								"(no tls_accepted in DB)", row[0], autoreg_host->host);
+					}
 					break;
 				}
 			}
@@ -273,6 +327,13 @@ void	zbx_autoreg_flush_hosts_server(zbx_vector_autoreg_host_ptr_t *autoreg_hosts
 
 		if (0 == autoreg_host->autoreg_hostid)
 		{
+			zabbix_log(LOG_LEVEL_WARNING, "Creating new autoreg_host record for host '%s' with "
+					"connection_type=%u", autoreg_host->host, autoreg_host->connection_type);
+
+			/* Delete existing record to avoid unique constraint violation */
+			zbx_db_execute("delete from autoreg_host where host='%s'",
+					zbx_db_dyn_escape_string(autoreg_host->host));
+
 			autoreg_host->autoreg_hostid = autoreg_hostid++;
 
 			zbx_db_insert_add_values(&db_insert, autoreg_host->autoreg_hostid, proxyid,
@@ -316,20 +377,6 @@ void	zbx_autoreg_flush_hosts_server(zbx_vector_autoreg_host_ptr_t *autoreg_hosts
 		zbx_db_execute("%s", sql);
 		zbx_free(sql);
 	}
-	/* update TLS settings in hosts table for existing hosts */
-	for (int i = 0; i < autoreg_hosts->values_num; i++)
-	{
-		autoreg_host = autoreg_hosts->values[i];
-
-		if (0 != autoreg_host->hostid)
-		{
-			/* update tls_accept in hosts table to match the new connection type */
-			unsigned char tls_accept = (unsigned char)autoreg_host->connection_type;
-
-			zbx_db_execute("update hosts set tls_accept=%u where hostid=" ZBX_FS_UI64,
-					tls_accept, autoreg_host->hostid);
-		}
-	}
 
 	zbx_vector_autoreg_host_ptr_sort(autoreg_hosts, compare_autoreg_host_by_hostid);
 
@@ -356,6 +403,9 @@ void	zbx_autoreg_flush_hosts_server(zbx_vector_autoreg_host_ptr_t *autoreg_hosts
 
 	if (NULL != events_cbs->clean_events_cb)
 		events_cbs->clean_events_cb();
+
+	/* Invalidate cache after database update */
+	zbx_autoreg_host_invalidate_cache(autoreg_hosts);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 }
@@ -406,8 +456,7 @@ void	zbx_autoreg_update_host_server(const zbx_dc_proxy_t *proxy, const char *hos
 	zbx_db_begin();
 	zbx_autoreg_flush_hosts_server(&autoreg_hosts, proxy, events_cbs);
 	zbx_db_commit();
-	/* invalidate cache to force immediate reload of host TLS settings */
-	zbx_autoreg_host_invalidate_cache(&autoreg_hosts);
+
 	zbx_vector_autoreg_host_ptr_clear_ext(&autoreg_hosts, zbx_autoreg_host_free_server);
 	zbx_vector_autoreg_host_ptr_destroy(&autoreg_hosts);
 }

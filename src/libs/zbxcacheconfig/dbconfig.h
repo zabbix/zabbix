@@ -439,8 +439,8 @@ typedef struct
 	const char	*host_metadata;
 	int		flags;
 	int		timestamp;
-	int		tls_accepted;
 	unsigned short	listen_port;
+	unsigned int	connection_type;
 }
 ZBX_DC_AUTOREG_HOST;
 
