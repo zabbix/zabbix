@@ -51,16 +51,13 @@ class testEscalations extends CIntegrationTest {
 		$this->assertArrayHasKey(0, $response['result']['hostids']);
 		self::$hostid = $response['result']['hostids'][0];
 
-		// Get host interface ids.
+		// Get host.
 		$response = $this->call('host.get', [
 			'output' => ['host'],
 			'hostids' => [self::$hostid],
-			'selectInterfaces' => ['interfaceid']
 		]);
 
 		$this->assertArrayHasKey(0, $response['result']);
-		$this->assertArrayHasKey('interfaces', $response['result'][0]);
-		$this->assertArrayHasKey(0, $response['result'][0]['interfaces']);
 
 		// Create trapper item
 		$response = $this->call('item.create', [
