@@ -9816,8 +9816,6 @@ void	zbx_dc_config_get_hostid_by_itemid(zbx_vector_uint64_t *hostids, zbx_uint64
 
 		UNLOCK_CACHE;
 	}
-	else
-		THIS_SHOULD_NEVER_HAPPEN;
 }
 
 int	zbx_dc_config_get_active_items_count_by_hostid(zbx_uint64_t hostid)
