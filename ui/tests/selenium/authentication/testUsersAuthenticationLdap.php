@@ -386,7 +386,8 @@ class testUsersAuthenticationLdap extends testFormAuthentication {
 					],
 					'test_settings' => [
 						'Login' => 'employee',
-						'User password' => 'Secret123'
+						// User password made complex to avoid the "insecure password" chrome popup in Jenkins.
+						'User password' => '!123Zabbix321!'
 					],
 					'test_error' => 'Login failed',
 					'test_error_details' => [
@@ -2507,7 +2508,8 @@ class testUsersAuthenticationLdap extends testFormAuthentication {
 								'Base DN' => 'cn=users,cn=accounts,dc=demo1,dc=freeipa,dc=org',
 								'Search attribute' => 'uid',
 								'Bind DN' => 'uid=admin,cn=users,cn=accounts,dc=demo1,dc=freeipa,dc=org',
-								'Bind password' => 'Secret123',
+								// Bind password made complex to avoid the "insecure password" chrome popup in Jenkins.
+								'Bind password' => '!321Zabbix123!',
 								'Description' => 'description',
 								'Advanced configuration' => true,
 								'StartTLS' => true,
@@ -2525,7 +2527,7 @@ class testUsersAuthenticationLdap extends testFormAuthentication {
 								'port' => 389,
 								'base_dn' => 'cn=users,cn=accounts,dc=demo1,dc=freeipa,dc=org',
 								'bind_dn' => 'uid=admin,cn=users,cn=accounts,dc=demo1,dc=freeipa,dc=org',
-								'bind_password' => 'Secret123',
+								'bind_password' => '!321Zabbix123!',
 								'search_attribute' => 'uid',
 								'start_tls' => 1,
 								'search_filter' => 'filter'
@@ -2953,9 +2955,11 @@ class testUsersAuthenticationLdap extends testFormAuthentication {
 	 */
 	private function openLdapForm($auth = 'Internal') {
 		$this->page->login()->open('zabbix.php?action=authentication.edit')->waitUntilReady();
-		$form = $this->query('id:authentication-form')->asForm()->one();
+		$form = $this->query('id:authentication-form')->waitUntilVisible()->asForm()->one();
 		$form->fill(['Default authentication' => $auth]);
 		$form->selectTab('LDAP settings');
+		// Wait for the LDAP tab contents to be visible.
+		$form->query('id:ldap')->waitUntilVisible();
 
 		return $form;
 	}
