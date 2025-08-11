@@ -22,20 +22,24 @@ class CControllerProxyEdit extends CController {
 	private ?array $proxy = null;
 
 	protected function init(): void {
-		$this->setInputValidationMethod(self::INPUT_VALIDATION_FORM);
 		$this->disableCsrfValidation();
 	}
 
 	protected function checkInput(): bool {
-		$allow_any = [];
-		foreach (array_keys(CControllerProxyUpdate::getValidationRules()['fields']) as $name) {
-			$allow_any[$name] = [];
-		}
+		$fields = [
+			'proxyid' =>	'db proxy.proxyid'
+		];
 
-		$ret = $this->validateInput(['object', 'fields' => $allow_any]);
+		$ret = $this->validateInput($fields);
 
 		if (!$ret) {
-			$this->setResponse(new CControllerResponseFatal());
+			$this->setResponse(
+				(new CControllerResponseData(['main_block' => json_encode([
+					'error' => [
+						'messages' => array_column(get_and_clear_messages(), 'message')
+					]
+				])]))->disableView()
+			);
 		}
 
 		return $ret;

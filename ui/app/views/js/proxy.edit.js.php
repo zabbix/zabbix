@@ -23,16 +23,14 @@ window.proxy_edit_popup = new class {
 		this.form_element = null;
 	}
 
-	init({rules, proxyid, action, rules_for_clone = null}) {
+	init({proxyid, rules}) {
 		this.proxyid = proxyid;
 
 		this.overlay = overlays_stack.getById('proxy.edit');
 		this.dialogue = this.overlay.$dialogue[0];
 		this.form_element = this.overlay.$dialogue.$body[0].querySelector('form');
 		this.form = new CForm(this.form_element, rules);
-		this.rules_for_clone = rules_for_clone;
 		this.footer = this.overlay.$dialogue.$footer[0];
-		this.action = action;
 
 		const return_url = new URL('zabbix.php', location.href);
 		return_url.searchParams.set('action', 'proxy.list');
@@ -176,11 +174,11 @@ window.proxy_edit_popup = new class {
 		});
 	}
 
-	clone({title, buttons}) {
+	clone({title, buttons, rules}) {
 		this.clone_proxyid = this.proxyid;
 		this.proxyid = null;
 
-		this.form.reload(this.rules_for_clone);
+		this.form.reload(rules);
 
 		this.overlay.unsetLoading();
 		this.overlay.setProperties({title, buttons});
