@@ -169,7 +169,7 @@ class testEscalations extends CIntegrationTest {
 				'ServerActive' => '127.0.0.1:'.self::getConfigurationValue(self::COMPONENT_SERVER,
 						'ListenPort', 10051),
 				'AllowKey' => 'system.run[*]',
-				'LogRemoteCommands' => 1,
+				'LogRemoteCommands' => 1
 			]
 		];
 	}
