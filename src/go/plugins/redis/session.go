@@ -19,6 +19,7 @@ import (
 
 	"golang.zabbix.com/sdk/errs"
 	"golang.zabbix.com/sdk/plugin/comms"
+	"golang.zabbix.com/sdk/tlsconfig"
 )
 
 type session struct {
@@ -64,9 +65,9 @@ func (s *session) validateSession(defaults *session) error {
 	return nil
 }
 
-func (s *session) resolveTLSConnect(defaults *session) (comms.TLSConnectionType, error) {
+func (s *session) resolveTLSConnect(defaults *session) (tlsconfig.TLSConnectionType, error) {
 	if s.TLSConnect != "" {
-		connectionType, err := comms.NewTLSConnectionType(s.TLSConnect)
+		connectionType, err := tlsconfig.NewTLSConnectionType(s.TLSConnect)
 		if err != nil {
 			return "", errs.Wrap(err, "Session TLS connection type is invalid")
 		}
@@ -75,7 +76,7 @@ func (s *session) resolveTLSConnect(defaults *session) (comms.TLSConnectionType,
 	}
 
 	if defaults.TLSConnect != "" {
-		connectionType, err := comms.NewTLSConnectionType(defaults.TLSConnect)
+		connectionType, err := tlsconfig.NewTLSConnectionType(defaults.TLSConnect)
 		if err != nil {
 			return "", errs.Wrap(err, "Default TLS connection type is invalid")
 		}
@@ -83,11 +84,11 @@ func (s *session) resolveTLSConnect(defaults *session) (comms.TLSConnectionType,
 		return connectionType, nil
 	}
 
-	return comms.Disabled, nil
+	return tlsconfig.Disabled, nil
 }
 
 func (s *session) runValidationRules(
-	tlsConnect comms.TLSConnectionType,
+	tlsConnect tlsconfig.TLSConnectionType,
 	defaultSession *session,
 ) error {
 	values := s.getFieldValues()

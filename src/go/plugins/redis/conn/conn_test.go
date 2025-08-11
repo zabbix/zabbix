@@ -36,7 +36,7 @@ func TestManager_CloseUnused(t *testing.T) {
 	})
 
 	u, _ := uri.New("tcp://127.0.0.1", nil)
-	_, _ = connMgr.create(u, map[string]string{})
+	_, _ = connMgr.create(createConnKey(u, map[string]string{}))
 
 	t.Run("Unused connections should have been deleted", func(t *testing.T) {
 		t.Parallel()
@@ -59,7 +59,7 @@ func TestManager_CloseAll(t *testing.T) {
 	})
 
 	u, _ := uri.New("tcp://127.0.0.1", nil)
-	_, _ = connMgr.create(u, map[string]string{})
+	_, _ = connMgr.create(createConnKey(u, map[string]string{}))
 
 	t.Run("All connections should have been deleted", func(t *testing.T) {
 		t.Parallel()
@@ -83,7 +83,7 @@ func TestManager_Create(t *testing.T) {
 		connMgr.Destroy()
 	})
 
-	connMgr.connections[*u] = NewRedisConn(radix.Stub("", "", nil))
+	connMgr.connections[*createConnKey(u, map[string]string{})] = NewRedisConn(radix.Stub("", "", nil))
 
 	type args struct {
 		uri *uri.URI
@@ -119,7 +119,7 @@ func TestManager_Create(t *testing.T) {
 				}()
 			}
 
-			got, err := tt.c.create(tt.args.uri, map[string]string{})
+			got, err := tt.c.create(createConnKey(tt.args.uri, map[string]string{}))
 
 			if (err != nil) != tt.wantErr {
 				t.Errorf("Manager.create() error = %v, wantErr %v", err, tt.wantErr)
@@ -147,7 +147,7 @@ func TestManager_Get(t *testing.T) {
 
 	//nolint:paralleltest //should be done before attempt to make connection is made
 	t.Run("Should return nil if connection does not exist", func(t *testing.T) {
-		if got := connMgr.get(u); got != nil {
+		if got := connMgr.get(createConnKey(u, map[string]string{})); got != nil {
 			t.Errorf("Manager.get() = %v, want <nil>", got)
 		}
 	})
@@ -160,12 +160,12 @@ func TestManager_Get(t *testing.T) {
 		lastTimeAccess: lastTimeAccess,
 	}
 
-	connMgr.connections[*u] = conn
+	connMgr.connections[*createConnKey(u, map[string]string{})] = conn
 
 	t.Run("Should return connection if it exists", func(t *testing.T) {
 		t.Parallel()
 
-		got := connMgr.get(u)
+		got := connMgr.get(createConnKey(u, map[string]string{}))
 
 		// has to return the same pointer.
 		if conn != got {
