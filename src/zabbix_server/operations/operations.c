@@ -683,7 +683,8 @@ static zbx_uint64_t	add_discovered_host(const zbx_db_event *event, int *status, 
 			{
 				zbx_uint64_t	proxy_groupid;
 				unsigned char	monitored_by;
-				int		host_tls_accept;
+				int		host_tls_accept, update_tls = 0;
+				char		*esc_identity = NULL, *esc_psk = NULL;
 
 				ZBX_STR2UINT64(hostid, row2[0]);
 				ZBX_DBROW2UINT64(host_proxyid, row2[1]);
@@ -707,10 +708,6 @@ static zbx_uint64_t	add_discovered_host(const zbx_db_event *event, int *status, 
 						new_proxy_groupid = 0;
 					}
 				}
-
-				int		update_tls = 0;
-				char		*esc_identity = NULL;
-				char		*esc_psk = NULL;
 
 				if (host_tls_accept != tls_accepted)
 				{
