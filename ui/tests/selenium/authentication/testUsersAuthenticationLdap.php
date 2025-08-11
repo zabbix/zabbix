@@ -386,8 +386,7 @@ class testUsersAuthenticationLdap extends testFormAuthentication {
 					],
 					'test_settings' => [
 						'Login' => 'employee',
-						// User password made complex to avoid the "insecure password" chrome popup in Jenkins.
-						'User password' => '!123Zabbix321!'
+						'User password' => 'Secret123'
 					],
 					'test_error' => 'Login failed',
 					'test_error_details' => [
@@ -2508,8 +2507,7 @@ class testUsersAuthenticationLdap extends testFormAuthentication {
 								'Base DN' => 'cn=users,cn=accounts,dc=demo1,dc=freeipa,dc=org',
 								'Search attribute' => 'uid',
 								'Bind DN' => 'uid=admin,cn=users,cn=accounts,dc=demo1,dc=freeipa,dc=org',
-								// Bind password made complex to avoid the "insecure password" chrome popup in Jenkins.
-								'Bind password' => '!321Zabbix123!',
+								'Bind password' => 'Secret123',
 								'Description' => 'description',
 								'Advanced configuration' => true,
 								'StartTLS' => true,
@@ -2527,7 +2525,7 @@ class testUsersAuthenticationLdap extends testFormAuthentication {
 								'port' => 389,
 								'base_dn' => 'cn=users,cn=accounts,dc=demo1,dc=freeipa,dc=org',
 								'bind_dn' => 'uid=admin,cn=users,cn=accounts,dc=demo1,dc=freeipa,dc=org',
-								'bind_password' => '!321Zabbix123!',
+								'bind_password' => 'Secret123',
 								'search_attribute' => 'uid',
 								'start_tls' => 1,
 								'search_filter' => 'filter'
