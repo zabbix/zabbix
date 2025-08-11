@@ -14624,6 +14624,66 @@ msgstr ""
 msgid "No permissions to call \"%1$s.%2$s\"."
 msgstr "Geen rechten om \"%1$s.%2$s\" aan te roepen."
 
+#: include/classes/api/services/CConfiguration.php:312
+msgid "No permissions to import discovery rules."
+msgstr ""
+
+#: include/classes/api/services/CConfiguration.php:313
+msgid "No permissions to import graphs."
+msgstr ""
+
+#: include/classes/api/services/CConfiguration.php:314
+msgid "No permissions to import host groups."
+msgstr ""
+
+#: include/classes/api/services/CConfiguration.php:316
+msgid "No permissions to import hosts."
+msgstr ""
+
+#: include/classes/api/services/CConfiguration.php:318
+msgid "No permissions to import images."
+msgstr ""
+
+#: include/classes/api/services/CConfiguration.php:319
+msgid "No permissions to import items."
+msgstr ""
+
+#: include/classes/api/services/CConfiguration.php:320
+msgid "No permissions to import maps."
+msgstr ""
+
+#: include/classes/api/services/CConfiguration.php:321
+msgid "No permissions to import media types."
+msgstr ""
+
+#: include/classes/api/services/CConfiguration.php:324
+msgid "No permissions to import template dashboards."
+msgstr ""
+
+#: include/classes/api/services/CConfiguration.php:315
+msgid "No permissions to import template groups."
+msgstr ""
+
+#: include/classes/api/services/CConfiguration.php:322
+msgid "No permissions to import template links."
+msgstr ""
+
+#: include/classes/api/services/CConfiguration.php:323
+msgid "No permissions to import templates."
+msgstr ""
+
+#: include/classes/api/services/CConfiguration.php:325
+msgid "No permissions to import triggers."
+msgstr ""
+
+#: include/classes/api/services/CConfiguration.php:326
+msgid "No permissions to import value maps."
+msgstr ""
+
+#: include/classes/api/services/CConfiguration.php:317
+msgid "No permissions to import web scenarios."
+msgstr ""
+
 #: app/controllers/CControllerChartsView.php:133
 #: app/controllers/CControllerDashboardPrint.php:99
 #: app/controllers/CControllerDashboardShareUpdate.php:97
