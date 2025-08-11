@@ -802,6 +802,7 @@ static zbx_uint64_t	add_discovered_host(const zbx_db_event *event, int *status, 
 
 				if (NULL != esc_identity)
 					zbx_free(esc_identity);
+
 				if (NULL != esc_psk)
 					zbx_free(esc_psk);
 

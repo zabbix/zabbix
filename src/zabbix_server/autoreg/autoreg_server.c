@@ -96,15 +96,7 @@ static void	autoreg_process_hosts_server(zbx_vector_autoreg_host_ptr_t *autoreg_
 
 				if (FAIL == zbx_is_uint32(row[10], &current_connection_type) ||
 						current_connection_type != autoreg_host->connection_type)
-				{
-					zabbix_log(LOG_LEVEL_DEBUG, "Connection type changed for host '%s': old=%u, "
-							"new=%u, setting autoreg_hostid to 0", autoreg_host->host,
-							current_connection_type, autoreg_host->connection_type);
-
-					autoreg_host->autoreg_hostid = 0;
-
 					break;
-				}
 			}
 
 			/* process with autoregistration if the connection type was forced and */
@@ -214,22 +206,7 @@ static void	autoreg_process_hosts_server(zbx_vector_autoreg_host_ptr_t *autoreg_
 
 				if (0 == autoreg_host->autoreg_hostid && 0 == strcmp(autoreg_host->host, row[1]))
 				{
-					/* Check if connection_type has changed don't restore autoreg_hostid */
-					if (SUCCEED != zbx_db_is_null(row[2]))
-					{
-						unsigned int	current_connection_type;
-
-						if (SUCCEED == zbx_is_uint32(row[2], &current_connection_type) &&
-								current_connection_type == autoreg_host->connection_type
-								)
-						{
-							/* connection_type hasn't changed, restore autoreg_hostid */
-							ZBX_STR2UINT64(autoreg_host->autoreg_hostid, row[0]);
-							zabbix_log(LOG_LEVEL_DEBUG, "Restoring autoreg_hostid=%s for "
-									"host '%s' (connection_type unchanged)", row[0],
-									autoreg_host->host);
-						}
-					}
+					ZBX_STR2UINT64(autoreg_host->autoreg_hostid, row[0]);
 					break;
 				}
 			}
@@ -303,10 +280,6 @@ void	zbx_autoreg_flush_hosts_server(zbx_vector_autoreg_host_ptr_t *autoreg_hosts
 
 		if (0 == autoreg_host->autoreg_hostid)
 		{
-			/* Delete existing record to avoid unique constraint violation */
-			zbx_db_execute("delete from autoreg_host where host='%s'",
-					zbx_db_dyn_escape_string(autoreg_host->host));
-
 			autoreg_host->autoreg_hostid = autoreg_hostid++;
 
 			zbx_db_insert_add_values(&db_insert, autoreg_host->autoreg_hostid, proxyid,
