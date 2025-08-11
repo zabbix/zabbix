@@ -711,9 +711,6 @@ static zbx_uint64_t	add_discovered_host(const zbx_db_event *event, int *status, 
 
 				if (host_tls_accept != tls_accepted)
 				{
-					zabbix_log(LOG_LEVEL_DEBUG, "TLS Debug - Updating TLS settings for host: %s",
-							hostname);
-
 					if (ZBX_TCP_SEC_TLS_PSK == tls_accepted)
 					{
 						char	psk_identity[HOST_TLS_PSK_IDENTITY_LEN_MAX],
@@ -724,6 +721,7 @@ static zbx_uint64_t	add_discovered_host(const zbx_db_event *event, int *status, 
 						esc_identity = zbx_db_dyn_escape_string(psk_identity);
 						esc_psk = zbx_db_dyn_escape_string(psk);
 					}
+
 					update_tls = 1;
 				}
 
@@ -772,25 +770,23 @@ static zbx_uint64_t	add_discovered_host(const zbx_db_event *event, int *status, 
 
 					if (update_tls)
 					{
+						const char	*psk_identity = "";
+						const char	*psk_value    = "";
+
 						if (ZBX_TCP_SEC_TLS_PSK == tls_accepted)
 						{
-							zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
-									"%ctls_connect=%d,tls_accept=%d,"
-									"tls_psk_identity='%s',tls_psk='%s'", delim,
-									tls_accepted, tls_accepted, esc_identity,
-									esc_psk);
-						}
-						else
-						{
-							zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
-									"%ctls_connect=%d,tls_accept=%d,"
-									"tls_psk_identity='',tls_psk=''", delim,
-									tls_accepted, tls_accepted);
+							psk_identity = esc_identity;
+							psk_value = esc_psk;
 						}
 
+						zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "%ctls_connect=%d,"
+								"tls_accept=%d,tls_psk_identity='%s',tls_psk='%s'",
+								delim, tls_accepted, tls_accepted, psk_identity,
+								psk_value);
+
 						zbx_audit_host_update_json_add_tls_and_psk(
-								zbx_map_db_event_to_audit_context(event), hostid,
-								tls_accepted, tls_accepted);
+						zbx_map_db_event_to_audit_context(event), hostid,
+						tls_accepted, tls_accepted);
 					}
 
 					zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
