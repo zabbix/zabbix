@@ -26,6 +26,8 @@
 
 #define ZBX_IPC_WAIT_FOREVER	-1
 
+#define ZBX_IPC_HEADER_SIZE	(int)(sizeof(zbx_uint32_t) * 2)
+
 typedef struct
 {
 	/* the message code */
