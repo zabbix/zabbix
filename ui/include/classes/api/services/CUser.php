@@ -133,17 +133,35 @@ class CUser extends CApiService {
 
 		// permission check
 		if (self::$userData['type'] != USER_TYPE_SUPER_ADMIN) {
+			$currentUserid = self::$userData['userid'];
+
 			if (!$options['editable']) {
-				$sqlParts['from']['users_groups'] = 'users_groups ug';
-				$sqlParts['where']['uug'] = 'u.userid=ug.userid';
-				$sqlParts['where'][] = 'ug.usrgrpid IN ('.
-					' SELECT uug.usrgrpid'.
-					' FROM users_groups uug'.
-					' WHERE uug.userid='.self::$userData['userid'].
-				')';
+				$sqlParts['from']['users'] = 'users u';
+				$sqlParts['where'][] =
+					'(' .
+						'NOT EXISTS ('.
+							' SELECT NULL'.
+							' FROM users_groups ug0'.
+							' WHERE ug0.userid = '.$currentUserid.
+						')' .
+						' AND u.userid = '.$currentUserid.
+					')' .
+					' OR '.
+					'('.
+						'EXISTS ('.
+							'SELECT NULL '.
+							' FROM users_groups ug1' .
+							' WHERE ug1.userid = u.userid' .
+								' AND ug1.usrgrpid IN ('.
+									'SELECT ug2.usrgrpid'.
+									' FROM users_groups ug2'.
+									' WHERE ug2.userid = '.$currentUserid.
+								')' .
+						')' .
+					')';
 			}
 			else {
-				$sqlParts['where']['userid'] = 'u.userid='.self::$userData['userid'];
+				$sqlParts['where']['userid'] = 'u.userid='.$currentUserid;
 			}
 		}
 
