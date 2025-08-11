@@ -29,6 +29,7 @@
 #include "zbxcacheconfig.h"
 #include "zbxjson.h"
 #include "zbxtypes.h"
+#include "zbxexpr.h"
 
 /* lld_override table columns */
 #define LLD_OVERRIDE_COL_NAME			0
