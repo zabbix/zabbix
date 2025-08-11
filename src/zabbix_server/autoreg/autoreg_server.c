@@ -97,21 +97,15 @@ static void	autoreg_process_hosts_server(zbx_vector_autoreg_host_ptr_t *autoreg_
 				if (FAIL == zbx_is_uint32(row[10], &current_connection_type) ||
 						current_connection_type != autoreg_host->connection_type)
 				{
-					zabbix_log(LOG_LEVEL_WARNING, "Connection type changed for host '%s': old=%u, "
+					zabbix_log(LOG_LEVEL_DEBUG, "Connection type changed for host '%s': old=%u, "
 							"new=%u, setting autoreg_hostid to 0", autoreg_host->host,
 							current_connection_type, autoreg_host->connection_type);
 
 					/* connection_type has changed - set autoreg_hostid = 0 to create new record */
 					autoreg_host->autoreg_hostid = 0;
-					zabbix_log(LOG_LEVEL_WARNING, "Host '%s' marked for recreation with "
+					zabbix_log(LOG_LEVEL_DEBUG, "Host '%s' marked for recreation with "
 							"autoreg_hostid=0", autoreg_host->host);
 					break;
-				}
-				else
-				{
-					zabbix_log(LOG_LEVEL_DEBUG, "Connection type unchanged for host '%s': "
-							"current=%u, new=%u", autoreg_host->host,
-							current_connection_type, autoreg_host->connection_type);
 				}
 			}
 
@@ -237,15 +231,6 @@ static void	autoreg_process_hosts_server(zbx_vector_autoreg_host_ptr_t *autoreg_
 									"host '%s' (connection_type unchanged)", row[0],
 									autoreg_host->host);
 						}
-						else
-						{
-							/* connection_type has changed, keep autoreg_hostid = 0
-							 * to create new record */
-							zabbix_log(LOG_LEVEL_DEBUG, "Keeping autoreg_hostid=0 for host "
-									"'%s' (connection_type changed: DB=%u, new=%u)",
-									autoreg_host->host, current_connection_type,
-									autoreg_host->connection_type);
-						}
 					}
 					else
 					{
@@ -327,9 +312,6 @@ void	zbx_autoreg_flush_hosts_server(zbx_vector_autoreg_host_ptr_t *autoreg_hosts
 
 		if (0 == autoreg_host->autoreg_hostid)
 		{
-			zabbix_log(LOG_LEVEL_WARNING, "Creating new autoreg_host record for host '%s' with "
-					"connection_type=%u", autoreg_host->host, autoreg_host->connection_type);
-
 			/* Delete existing record to avoid unique constraint violation */
 			zbx_db_execute("delete from autoreg_host where host='%s'",
 					zbx_db_dyn_escape_string(autoreg_host->host));

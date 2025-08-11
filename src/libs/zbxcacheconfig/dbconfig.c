@@ -8942,7 +8942,7 @@ static void	DCget_host(zbx_dc_host_t *dst_host, const ZBX_DC_HOST *src_host)
  *                                                                            *
  * Purpose: Locate host in configuration cache                                *
  *                                                                            *
- * Parameters: host   - [OUT] pointer to zbx_dc_host_t structure              *
+ * Parameters: host - [OUT] pointer to zbx_dc_host_t structure                *
  *             hostid - [IN] host ID from database                            *
  *                                                                            *
  * Return value: SUCCEED if record located and FAIL otherwise                 *

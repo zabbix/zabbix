@@ -707,19 +707,14 @@ static zbx_uint64_t	add_discovered_host(const zbx_db_event *event, int *status, 
 						new_proxy_groupid = 0;
 					}
 				}
-				/* Check if TLS settings need to be updated */
+
 				int		update_tls = 0;
 				char		*esc_identity = NULL;
 				char		*esc_psk = NULL;
 
-				/* Debug: Log TLS values for troubleshooting */
-				zabbix_log(LOG_LEVEL_WARNING, "TLS Debug - host: %s, host_tls_accept: %d, tls_accepted:"
-						" %d", hostname, host_tls_accept, tls_accepted);
-
-				/* Update TLS settings if tls_accepted has changed */
 				if (host_tls_accept != tls_accepted)
 				{
-					zabbix_log(LOG_LEVEL_WARNING, "TLS Debug - Updating TLS settings for host: %s",
+					zabbix_log(LOG_LEVEL_DEBUG, "TLS Debug - Updating TLS settings for host: %s",
 							hostname);
 
 					if (ZBX_TCP_SEC_TLS_PSK == tls_accepted)
@@ -733,11 +728,6 @@ static zbx_uint64_t	add_discovered_host(const zbx_db_event *event, int *status, 
 						esc_psk = zbx_db_dyn_escape_string(psk);
 					}
 					update_tls = 1;
-				}
-				else
-				{
-					zabbix_log(LOG_LEVEL_WARNING, "TLS Debug - No TLS update needed for host: %s",
-							hostname);
 				}
 
 				if (host_proxyid != new_proxyid || proxy_groupid != new_proxy_groupid ||
@@ -808,10 +798,6 @@ static zbx_uint64_t	add_discovered_host(const zbx_db_event *event, int *status, 
 
 					zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
 							" where hostid=" ZBX_FS_UI64, hostid);
-
-
-					/* Debug: Log SQL query for troubleshooting */
-					zabbix_log(LOG_LEVEL_WARNING, "TLS Debug - SQL UPDATE: %s", sql);
 
 					(void)zbx_db_execute("%s", sql);
 					zbx_free(sql);
