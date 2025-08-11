@@ -8968,7 +8968,7 @@ int	zbx_dc_get_host_by_hostid(zbx_dc_host_t *host, zbx_uint64_t hostid)
 
 /******************************************************************************
  *                                                                            *
- * Purpose: configure PSK for host from autoreg PSK                           *
+ * Purpose: Configure PSK for host from autoreg PSK                           *
  *                                                                            *
  * Parameters:                                                                *
  *     hostid - [IN] host ID                                                  *
@@ -8981,7 +8981,6 @@ static void	zbx_dc_configure_host_psk(zbx_uint64_t hostid)
 	{
 		zabbix_log(LOG_LEVEL_DEBUG, "configuring PSK for host %lu with identity \"%s\"",
 				(unsigned long)hostid, config->autoreg_psk_identity);
-
 		/* Update PSK and tls_connect in database */
 		zbx_db_execute("update hosts set tls_connect=%u,tls_psk_identity='%s',tls_psk='%s' where hostid="
 				ZBX_FS_UI64, ZBX_TCP_SEC_TLS_PSK, config->autoreg_psk_identity, config->autoreg_psk,
@@ -8989,14 +8988,14 @@ static void	zbx_dc_configure_host_psk(zbx_uint64_t hostid)
 	}
 	else
 	{
-		zabbix_log(LOG_LEVEL_WARNING, "cannot configure PSK for host %lu: autoreg PSK not configured",
+		zabbix_log(LOG_LEVEL_DEBUG, "cannot configure PSK for host %lu: autoreg PSK not configured",
 				(unsigned long)hostid);
 	}
 }
 
 /******************************************************************************
  *                                                                            *
- * Purpose: update host's tls_accept in cache to allow the specified          *
+ * Purpose: Update host's tls_accept in cache to allow the specified          *
  *          connection type                                                   *
  *                                                                            *
  * Parameters:                                                                *
@@ -9017,7 +9016,6 @@ static void	zbx_dc_update_host_tls_accept(zbx_uint64_t hostid, unsigned int conn
 		if (0 == ((unsigned int)dc_host->tls_accept & connection_type))
 		{
 			dc_host->tls_accept |= (unsigned char)connection_type;
-
 			/* Also update tls_accept in database */
 			UNLOCK_CACHE;
 			zbx_db_execute("update hosts set tls_accept=%u where hostid=" ZBX_FS_UI64,
