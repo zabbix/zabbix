@@ -390,6 +390,7 @@ class testFormUserMedia extends CWebTest {
 				$media_form = COverlayDialogElement::find()->one()->waitUntilReady()->asForm();
 				$media_form->fill($media);
 				$media_form->submit();
+				COverlayDialogElement::ensureNotPresent();
 				$this->page->waitUntilReady();
 				$user_form->invalidate();
 				$this->assertEquals($user_form->getField('Media')->asTable()->getRows()->count(), $i + 2);
