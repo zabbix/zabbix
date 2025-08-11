@@ -1202,6 +1202,30 @@ class CFormValidator {
 		return true;
 	}
 
+	/**
+	 * Check via API if item exists, excluding provided id. Used for unique checks
+	 *
+	 * @param string $api
+	 * @param array $options
+	 * @param int|null $exclude_primary_id
+	 * @return bool
+	 */
+	public static function existsAPIObject (string $api, array $options, ?int $exclude_primary_id = null): bool
+	{
+		$options['preservekeys'] = true;
+		$result = API::getApiService($api)->get($options);
+
+		if ($result) {
+			$matches = array_diff(array_keys($result), [$exclude_primary_id]);
+
+			if (count($matches) > 0) {
+				return true;
+			}
+		}
+
+		return false;
+	}
+
 	private function validateApiUniq(array $check, string &$path, ?string &$error = null): bool {
 		[$method, $parameters, $exclude_id] = $check;
 		[$api, $method] = explode('.', $method);
@@ -1229,11 +1253,22 @@ class CFormValidator {
 			return true;
 		}
 
+		if ($exclude_id !== null) {
+			$exclude_id_field_data = $this->getWhenFieldValue($exclude_id, $path);
+
+			if ($exclude_id_field_data['type'] === 'id') {
+				$exclude_id = $exclude_id_field_data['value'];
+			}
+			else {
+				$exclude_id = null;
+			}
+		}
+
 		$parameters = [
 			'filter' => $parameters
 		];
 
-		if (API::getApiService($api)->exists($parameters, $exclude_id)) {
+		if (self::existsAPIObject($api, $parameters, $exclude_id)) {
 			$error = _('This object already exists.');
 
 			if ($path === '') {

@@ -62,11 +62,12 @@ class CControllerValidateWithApi extends CController {
 		$response = [];
 
 		try {
-			$service = API::getApiService($this->api);
 
 			if ($this->method == 'get') {
+				$object_exists = CFormValidator::existsAPIObject($this->api, $this->getInput('params'),
+					$this->getInput('exclude_id'));
 
-				if ($service->exists($this->getInput('params'), $this->getInput('exclude_id'))) {
+				if ($object_exists) {
 					$response += [
 						'result' => false,
 						'error_msg' => _('This object already exists.')
