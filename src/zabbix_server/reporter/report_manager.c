@@ -534,8 +534,10 @@ static int	rm_get_report_range(int report_time, unsigned char period, struct tm 
 	time_t		from_time = report_time;
 	zbx_time_unit_t	period2unit[] = {ZBX_TIME_UNIT_DAY, ZBX_TIME_UNIT_WEEK, ZBX_TIME_UNIT_MONTH, ZBX_TIME_UNIT_YEAR};
 
-	if (ARRSIZE(period2unit) <= period || NULL == (tm = localtime(&from_time)))
+	if (ARRSIZE(period2unit) <= period)
 		return FAIL;
+
+	tm = zbx_localtime(&from_time, NULL);
 
 	*to = *tm;
 	zbx_tm_round_down(to, period2unit[period]);
@@ -580,11 +582,9 @@ static char	*rm_get_report_name(const char *name, int report_time)
 		}
 	}
 
-	if (NULL == (tm = localtime(&rtime)))
-		name_full = zbx_dsprintf(NULL, "%s.pdf", name_esc);
-	else
-		name_full = zbx_dsprintf(NULL, "%s_%04d-%02d-%02d_%02d-%02d.pdf", name_esc, tm->tm_year + 1900,
-				tm->tm_mon + 1, tm->tm_mday, tm->tm_hour, tm->tm_min);
+	tm = zbx_localtime(&rtime, NULL);
+	name_full = zbx_dsprintf(NULL, "%s_%04d-%02d-%02d_%02d-%02d.pdf", name_esc, tm->tm_year + 1900,
+			tm->tm_mon + 1, tm->tm_mday, tm->tm_hour, tm->tm_min);
 
 	zbx_free(name_esc);
 

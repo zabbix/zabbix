@@ -106,7 +106,7 @@ static void	tm_add_seconds(struct tm *tm, int seconds)
 	}
 
 	time_new += seconds;
-	localtime_r(&time_new, &tm_new);
+	tm_new = *zbx_localtime(&time_new, NULL);
 
 	if (tm->tm_isdst != tm_new.tm_isdst && -1 != tm->tm_isdst && -1 != tm_new.tm_isdst)
 	{
@@ -444,7 +444,7 @@ const char	*zbx_timespec_str(const zbx_timespec_t *ts)
 	time_t		ts_time = ts->sec;
 	struct tm	tm;
 
-	localtime_r(&ts_time, &tm);
+	tm = *zbx_localtime(&ts_time, NULL);
 	zbx_snprintf(str, sizeof(str), "%04d.%02d.%02d %02d:%02d:%02d.%09d", tm.tm_year + 1900, tm.tm_mon + 1,
 			tm.tm_mday, tm.tm_hour, tm.tm_min, tm.tm_sec, ts->ns);
 

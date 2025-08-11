@@ -342,13 +342,13 @@ void	zbx_get_time(struct tm *tm, long *milliseconds, zbx_timezone_t *tz)
 	struct _timeb	current_time;
 
 	_ftime(&current_time);
-	*tm = *localtime(&current_time.time);	/* localtime() cannot return NULL if called with valid parameter */
+	*tm = *zbx_localtime(&current_time.time, NULL);
 	*milliseconds = current_time.millitm;
 #else
 	struct timeval	current_time;
 
 	gettimeofday(&current_time, NULL);
-	localtime_r(&current_time.tv_sec, tm);
+	*tm = *zbx_localtime(&current_time.tv_sec, NULL);
 	*milliseconds = current_time.tv_usec / 1000;
 #endif
 	if (NULL != tz)
@@ -383,7 +383,7 @@ long	zbx_get_timezone_offset(time_t t, struct tm *tm)
 	struct tm	tm_utc;
 #endif
 
-	*tm = *localtime(&t);
+	*tm = *zbx_localtime(&t, NULL);
 
 #ifdef HAVE_TM_TM_GMTOFF
 	offset = tm->tm_gmtoff;
@@ -412,6 +412,29 @@ long	zbx_get_timezone_offset(time_t t, struct tm *tm)
  * Purpose: get broken-down representation of the time in specified time zone *
  *                                                                            *
  * Parameters: time - [IN] input time                                         *
+ *                                                                            *
+ * Return value: broken-down representation of the time in specified time zone*
+ *                                                                            *
+ ******************************************************************************/
+static struct tm	*zbx_localtime_r(const time_t *time)
+{
+	time_t					time_zerro = (time_t)0;
+	static ZBX_THREAD_LOCAL struct tm	tm_safe;
+
+	if (NULL == localtime_r(time, &tm_safe))
+	{
+		zabbix_log(LOG_LEVEL_DEBUG, "Wrong time value " ZBX_FS_TIME_T, (zbx_fs_time_t)(*time));
+		localtime_r(&time_zerro, &tm_safe);
+	}
+
+	return &tm_safe;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: get broken-down representation of the time in specified time zone *
+ *                                                                            *
+ * Parameters: time - [IN] input time                                         *
  *             tz   - [IN] time zone                                          *
  *                                                                            *
  * Return value: broken-down representation of the time in specified time zone*
@@ -419,13 +442,14 @@ long	zbx_get_timezone_offset(time_t t, struct tm *tm)
  ******************************************************************************/
 struct tm	*zbx_localtime(const time_t *time, const char *tz)
 {
+	struct tm	*tm;
+
 #if defined(HAVE_GETENV) && defined(HAVE_PUTENV) && defined(HAVE_UNSETENV) && defined(HAVE_TZSET) && \
 		!defined(_WINDOWS) && !defined(__MINGW32__)
 	char		*old_tz;
-	struct tm	*tm;
 
 	if (NULL == tz || 0 == strcmp(tz, "system"))
-		return localtime(time);
+		return zbx_localtime_r(time);
 
 	if (NULL != (old_tz = getenv("TZ")))
 		old_tz = zbx_strdup(NULL, old_tz);
@@ -433,7 +457,7 @@ struct tm	*zbx_localtime(const time_t *time, const char *tz)
 	setenv("TZ", tz, 1);
 
 	tzset();
-	tm = localtime(time);
+	tm = zbx_localtime_r(time);
 
 	if (NULL != old_tz)
 	{
@@ -444,12 +468,12 @@ struct tm	*zbx_localtime(const time_t *time, const char *tz)
 		unsetenv("TZ");
 
 	tzset();
-
-	return tm;
 #else
 	ZBX_UNUSED(tz);
-	return localtime(time);
+
+	tm = zbx_localtime_r(time);
 #endif
+	return tm;
 }
 
 /******************************************************************************
@@ -469,7 +493,7 @@ const struct tm	*zbx_localtime_now(const time_t *time)
 	if (time_last != *time)
 	{
 		time_last = *time;
-		localtime_r(time, &tm_last);
+		tm_last = *zbx_localtime(time, NULL);
 	}
 
 	return &tm_last;
@@ -1726,7 +1750,7 @@ static time_t	scheduler_find_dst_change(time_t time_start, time_t time_end)
 		start = time_start / 60;
 		end = time_end / 60;
 
-		tm = localtime(&time_start);
+		tm = zbx_localtime(&time_start, NULL);
 		dst_start = tm->tm_isdst;
 
 		while (end > start + 1)
@@ -1734,7 +1758,7 @@ static time_t	scheduler_find_dst_change(time_t time_start, time_t time_end)
 			mid = (start + end) / 2;
 			time_mid = mid * 60;
 
-			tm = localtime(&time_mid);
+			tm = zbx_localtime(&time_mid, NULL);
 
 			if (tm->tm_isdst == dst_start)
 				start = mid;
@@ -1814,14 +1838,14 @@ static time_t	scheduler_get_nextcheck(zbx_scheduler_interval_t *interval, time_t
 		}
 		while (-1 == (current_nextcheck = mktime(&tm)));
 
-		tm_dst = *(localtime(&current_nextcheck));
+		tm_dst = *(zbx_localtime(&current_nextcheck, NULL));
 		if (tm_dst.tm_isdst != tm_start.tm_isdst)
 		{
 			int	dst = tm_dst.tm_isdst;
 			time_t	time_dst;
 
 			time_dst = scheduler_find_dst_change(now, current_nextcheck);
-			tm_dst = *localtime(&time_dst);
+			tm_dst = *zbx_localtime(&time_dst, NULL);
 
 			scheduler_apply_day_filter(interval, &tm_dst);
 			scheduler_apply_hour_filter(interval, &tm_dst);
@@ -3711,7 +3735,7 @@ int	zbx_get_report_nextcheck(int now, unsigned char cycle, unsigned char weekday
 	time_t		yesterday = now - SEC_PER_DAY;
 	int		nextcheck, tm_hour, tm_min, tm_sec;
 
-	if (NULL == (tm = localtime(&yesterday)))
+	if (NULL == (tm = zbx_localtime(&yesterday, NULL)))
 		return -1;
 
 	tm_sec = start_time % 60;
