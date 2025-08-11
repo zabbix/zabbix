@@ -280,6 +280,29 @@ long	zbx_get_timezone_offset(time_t t, struct tm *tm)
  * Purpose: get broken-down representation of the time in specified time zone *
  *                                                                            *
  * Parameters: time - [IN] input time                                         *
+ *                                                                            *
+ * Return value: broken-down representation of the time in specified time zone*
+ *                                                                            *
+ ******************************************************************************/
+static struct tm	*zbx_localtime_r(const time_t *time)
+{
+	time_t					time_zerro = (time_t)0;
+	static ZBX_THREAD_LOCAL struct tm	tm_safe;
+
+	if (NULL == localtime_r(time, &tm_safe))
+	{
+		zabbix_log(LOG_LEVEL_DEBUG, "Wrong time value " ZBX_FS_TIME_T, (zbx_fs_time_t)(*time));
+		localtime_r(&time_zerro, &tm_safe);
+	}
+
+	return &tm_safe;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: get broken-down representation of the time in specified time zone *
+ *                                                                            *
+ * Parameters: time - [IN] input time                                         *
  *             tz   - [IN] time zone                                          *
  *                                                                            *
  * Return value: broken-down representation of the time in specified time zone*
@@ -288,20 +311,13 @@ long	zbx_get_timezone_offset(time_t t, struct tm *tm)
 struct tm	*zbx_localtime(const time_t *time, const char *tz)
 {
 	struct tm				*tm;
-	time_t					time_zerro = (time_t)0;
-	static ZBX_THREAD_LOCAL struct tm	tm_safe;
 
 #if defined(HAVE_GETENV) && defined(HAVE_UNSETENV) && defined(HAVE_TZSET) && \
 		!defined(_WINDOWS) && !defined(__MINGW32__)
 	char		*old_tz;
 
 	if (NULL == tz || 0 == strcmp(tz, "system"))
-	{
-		if (NULL == (tm = localtime(time)))
-			tm = localtime_r(&time_zerro, &tm_safe);
-
-		return tm;
-	}
+		return zbx_localtime_r(time);
 
 	if (NULL != (old_tz = getenv("TZ")))
 		old_tz = zbx_strdup(NULL, old_tz);
@@ -310,8 +326,7 @@ struct tm	*zbx_localtime(const time_t *time, const char *tz)
 
 	tzset();
 
-	if (NULL == (tm = localtime(time)))
-		tm = localtime_r(&time_zerro, &tm_safe);
+	tm = zbx_localtime_r(time);
 
 	if (NULL != old_tz)
 	{
@@ -325,9 +340,7 @@ struct tm	*zbx_localtime(const time_t *time, const char *tz)
 #else
 	ZBX_UNUSED(tz);
 
-	if (NULL == (tm = localtime(time)))
-		tm = localtime_r(&time_zerro, &tm_safe);
-
+	tm = zbx_localtime_r(time);
 #endif
 	return tm;
 }
