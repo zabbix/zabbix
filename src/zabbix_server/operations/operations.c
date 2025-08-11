@@ -684,7 +684,7 @@ static zbx_uint64_t	add_discovered_host(const zbx_db_event *event, int *status, 
 				zbx_uint64_t	proxy_groupid;
 				unsigned char	monitored_by;
 				int		host_tls_accept, update_tls = 0;
-				char		*esc_identity = NULL, *esc_psk = NULL;
+				char		*esc_psk_identity = NULL, *esc_psk_key = NULL;
 
 				ZBX_STR2UINT64(hostid, row2[0]);
 				ZBX_DBROW2UINT64(host_proxyid, row2[1]);
@@ -714,12 +714,12 @@ static zbx_uint64_t	add_discovered_host(const zbx_db_event *event, int *status, 
 					if (ZBX_TCP_SEC_TLS_PSK == tls_accepted)
 					{
 						char	psk_identity[HOST_TLS_PSK_IDENTITY_LEN_MAX];
-						char 	psk[HOST_TLS_PSK_LEN_MAX];
+						char 	psk_key[HOST_TLS_PSK_LEN_MAX];
 
 						zbx_dc_get_autoregistration_psk(psk_identity, sizeof(psk_identity),
-								(unsigned char *)psk, sizeof(psk));
-						esc_identity = zbx_db_dyn_escape_string(psk_identity);
-						esc_psk = zbx_db_dyn_escape_string(psk);
+								(unsigned char *)psk_key, sizeof(psk_key));
+						esc_psk_identity = zbx_db_dyn_escape_string(psk_identity);
+						esc_psk_key = zbx_db_dyn_escape_string(psk_key);
 					}
 
 					update_tls = 1;
@@ -770,18 +770,16 @@ static zbx_uint64_t	add_discovered_host(const zbx_db_event *event, int *status, 
 
 					if (update_tls)
 					{
-						const char	*psk_identity = "", *psk_value = "";
-
-						if (ZBX_TCP_SEC_TLS_PSK == tls_accepted)
+						if (ZBX_TCP_SEC_TLS_PSK != tls_accepted)
 						{
-							psk_identity = esc_identity;
-							psk_value = esc_psk;
+							esc_psk_identity = "";
+							esc_psk_key = "";
 						}
 
 						zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "%ctls_connect=%d,"
 								"tls_accept=%d,tls_psk_identity='%s',tls_psk='%s'",
-								delim, tls_accepted, tls_accepted, psk_identity,
-								psk_value);
+								delim, tls_accepted, tls_accepted, esc_psk_identity,
+								esc_psk_key);
 
 						zbx_audit_host_update_json_add_tls_and_psk(
 								zbx_map_db_event_to_audit_context(event), hostid,
@@ -795,11 +793,11 @@ static zbx_uint64_t	add_discovered_host(const zbx_db_event *event, int *status, 
 					zbx_free(sql);
 				}
 
-				if (NULL != esc_identity)
-					zbx_free(esc_identity);
+				if (NULL != esc_psk_identity && '\0' != esc_psk_identity[0])
+					zbx_free(esc_psk_identity);
 
-				if (NULL != esc_psk)
-					zbx_free(esc_psk);
+				if (NULL != esc_psk_key && '\0' != esc_psk_key[0])
+					zbx_free(esc_psk_key);
 
 				zbx_db_add_interface(hostid, INTERFACE_TYPE_AGENT, useip, row[2], row[3], port, flags,
 						zbx_map_db_event_to_audit_context(event));
