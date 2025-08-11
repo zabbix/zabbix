@@ -98,6 +98,23 @@
 					})
 						.then((response) => response.json())
 						.then((response) => {
+							if ('error' in response) {
+								throw {error: response.error};
+							}
+
+							if ('form_errors' in response) {
+								form.setErrors(response.form_errors, true, true);
+								form.renderErrors();
+
+								for (const element of form_element.parentNode.children) {
+									if (element.matches('.msg-good, .msg-bad, .msg-warning')) {
+										element.parentNode.removeChild(element);
+									}
+								}
+
+								return;
+							}
+
 							postMessageOk(response.success.title);
 							location.href = location.href;
 						})
