@@ -8,6 +8,9 @@ A......PS. [ZBXNEXT-10056] updated max supported MariaDB version to 11.8 (Sasha)
 .......PS. [ZBXNEXT-9090] improved SNMP agent walk[] and get[] to reload credentials when corresponding SNMPv3 interface is updated (vso)
 
 Bug fixes:
+........S. [ZBX-26775] fixed crash on data processing from system.localtime item key (sboidenko)
+.......PS. [ZBX-24799] fixed timeouts during active mode script execution on Zabbix agent 2 on action operation or manual action if script had no output; fixed timeout by allowing active agent to retrieve scripts in 60 seconds (vso)
+A......... [ZBX-25388] prevented displaying of parameter values not involved in import in the response of configuration.importcompare API method (aluchko)
 .......PS. [ZBX-25887] returned empty JSON array instead of error if input value for "SNMP walk to JSON" item preprocessing step is empty (MVekslers)
 .........T [ZBX-25288] fixed trigger in Elasticsearch Cluster by HTTP template (egordymov)
 ..F....... [ZBX-26539] fixed raw html in tooltips for additional rules in services (gklavins)
@@ -349,6 +352,8 @@ A......PS. [ZBXNEXT-10056] updated max supported MariaDB version to 11.8 (Sasha)
 ........S. [ZBXNEXT-10122] updated maximal supported TimescaleDB version to 2.21 (mprihodko)
 
 Bug fixes:
+........S. [ZBX-26775] fixed crash on data processing from system.localtime item key (sboidenko)
+........S. [ZBX-16925] fixed housekeeper behavior that blocked history sync and caused deadlocks when deleting events (vso)
 ...G...... [ZBX-26745] fixed Zabbix agent 2 RefreshActiveChecks (sboidenko)
 ..F....... [ZBX-26606] fixed user macros not working in testing dialog (gklavins)
 ...G...... [ZBX-26697] fixed memory error in sender when trying to read invalid response (dgoloscapov)
@@ -924,6 +929,8 @@ A......PS. [ZBXNEXT-10056] updated max supported MariaDB version to 11.8 (Sasha)
 ........S. [ZBXNEXT-10122] updated maximal supported TimescaleDB version to 2.21 (mprihodko)
 
 Bug fixes:
+.......PS. [ZBX-24799] fixed timeouts during active mode script execution on Zabbix agent 2 on action operation or manual action if script had no output; fixed timeout by allowing active agent to retrieve scripts in 60 seconds (vso)
+A......... [ZBX-25388] prevented displaying of parameter values not involved in import in the response of configuration.importcompare API method (aluchko)
 .......PS. [ZBX-25887] returned empty JSON array instead of error if input value for "SNMP walk to JSON" item preprocessing step is empty (MVekslers)
 .........T [ZBX-25288] fixed trigger in Elasticsearch Cluster by HTTP template (egordymov)
 ..F....... [ZBX-26539] fixed raw html in tooltips for additional rules in services (gklavins)
