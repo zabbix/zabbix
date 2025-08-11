@@ -106,6 +106,7 @@ func TestPingHandler(t *testing.T) {
 
 				return
 			}
+
 			diff := cmp.Diff(tt.want, got)
 			if diff != "" {
 				t.Fatalf("Plugin.PingHandler() mismatch (-want +got):\n%s", diff)

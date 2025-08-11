@@ -322,8 +322,15 @@ func (c *ConnManager) getTLSConfig(details *tlsconfig.Details) (*tls.Config, err
 		if details.TLSCaFile != "" {
 			c.log.Warningf("server CA will not be verified for %s", details.TLSConnect)
 		}
+		details.Apply(
+			tlsconfig.WithSkipDefaultTLSVerification(true),
+			tlsconfig.WithTLSServerName(""),
+		)
 
-		tlsConf = &tls.Config{InsecureSkipVerify: true} //nolint:gosec //intended behaviour
+		tlsConf, err = details.GetTLSConfig()
+		if err != nil {
+			return nil, errs.Wrap(err, "failed to get TLS config for required connectionn")
+		}
 	case "verify_ca":
 		details.Apply(
 			tlsconfig.WithSkipDefaultTLSVerification(true),

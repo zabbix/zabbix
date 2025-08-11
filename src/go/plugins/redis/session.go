@@ -107,6 +107,7 @@ func (s *session) runValidationRules(
 		case forbidden:
 			err = validateForbiddenField(fieldName, fieldValue)
 		case optional: // No action needed for optional fields.
+		default:
 		}
 
 		if err != nil {

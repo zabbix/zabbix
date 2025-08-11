@@ -63,7 +63,7 @@ func getTLSConfig(redisURI *uri.URI, params map[string]string) (*tls.Config, err
 			tlsconfig.WithCustomTLSVerification(tlsconfig.VerifyPeerCertificateFunc("", nil)),
 		)
 
-	case comms.VerifyFull:
+	case comms.VerifyFull: // uses default configuration with all provided data.
 
 	default:
 		return nil, errs.New("unsupported TLS connection type: " + string(tlsConnectionType))
