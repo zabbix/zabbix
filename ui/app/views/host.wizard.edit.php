@@ -465,7 +465,10 @@ function stepInstallAgent($agent_script_data): array {
 											DB::getFieldLength('hosts', 'tls_psk_identity')
 										))->setAriaRequired(),
 										(new CDiv(
-											_('Enter a non-secret pre-shared key identity string. Avoid including sensitive data.')
+											_('Enter a unique name that Zabbix components will use to recognize the pre-shared key.')
+										))->addClass(ZBX_STYLE_FORM_FIELDS_HINT),
+										(new CDiv(
+											_('Avoid including sensitive data.')
 										))->addClass(ZBX_STYLE_FORM_FIELDS_HINT)
 									]))->addClass('js-tls-input'),
 									(new CFormField([

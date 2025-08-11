@@ -209,7 +209,7 @@ window.host_wizard_edit = new class {
 			tls_psk_identity: {
 				required: () => this.#data.tls_required,
 				maxlength: <?= DB::getFieldLength('hosts', 'tls_psk_identity') ?>,
-				regex: /^[^`']*$/
+				regex: /^<?= ZBX_PREG_PSK_IDENTITY_FORMAT ?>$/
 			}
 		},
 		[this.STEP_ADD_HOST_INTERFACE]: {},
@@ -354,6 +354,10 @@ window.host_wizard_edit = new class {
 
 		this.#updateStepsQueue();
 		this.#gotoStep(this.#current_step);
+	}
+
+	#getHostName() {
+		return this.#data.host_new !== null ? this.#data.host_new.id : this.#data.host.name;
 	}
 
 	#initViewTemplates() {
@@ -630,7 +634,7 @@ window.host_wizard_edit = new class {
 
 		const view = this.#view_templates.step_add_host_interface.evaluateToElement({
 			template_name: this.#getSelectedTemplate()?.name,
-			host_name: this.#data.host_new !== null ? this.#data.host_new.id : this.#data.host.name,
+			host_name: this.#getHostName(),
 			interfaces_long: interfaces_long.join(' / '),
 			interfaces_short: interfaces_short.join('/')
 		});
@@ -864,7 +868,7 @@ window.host_wizard_edit = new class {
 					this.#data.tls_warning = this.#data.install_agent_required && !no_encryption && !psk_encryption;
 				}
 
-				this.#data.tls_psk_identity = '';
+				this.#data.tls_psk_identity = this.#getHostName().substring(0, 124) + ' PSK';
 				this.#data.tls_psk = this.#data.tls_required ? this.#generatePSK() : '';
 
 				this.#data.interfaces = [];
@@ -1260,7 +1264,7 @@ window.host_wizard_edit = new class {
 				})();
 
 				let server_host = '';
-				let hostname = this.#data.host_new !== null ? this.#data.host_new.id : this.#data.host.name;
+				let hostname = this.#getHostName();
 				let psk_identity = '';
 				let psk = '';
 
