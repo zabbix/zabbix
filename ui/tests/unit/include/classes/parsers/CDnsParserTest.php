@@ -18,9 +18,6 @@ use PHPUnit\Framework\TestCase;
 
 class CDnsParserTest extends TestCase {
 
-	/**
-	 * An array of trigger functions and parsed results.
-	 */
 	public static function dataProvider() {
 		return [
 			[

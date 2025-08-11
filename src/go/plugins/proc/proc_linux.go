@@ -19,6 +19,8 @@ package proc
 
 /*
 #include <unistd.h>
+#include <stdlib.h>
+#include <pwd.h>
 */
 import "C"
 
@@ -32,6 +34,7 @@ import (
 	"strconv"
 	"sync"
 	"time"
+	"unsafe"
 
 	"golang.zabbix.com/agent2/pkg/procfs"
 	"golang.zabbix.com/sdk/errs"
@@ -55,6 +58,14 @@ type Plugin struct {
 
 type PluginExport struct {
 	plugin.Base
+}
+
+type uid struct {
+	uid uint32
+}
+
+type userNotFoundError struct {
+	name string
 }
 
 var impl Plugin = Plugin{
@@ -251,20 +262,45 @@ func (q *cpuUtilQuery) match(p *procInfo) bool {
 	return true
 }
 
-func newCpuUtilQuery(q *procQuery, pattern *regexp.Regexp) (query *cpuUtilQuery, err error) {
-	query = &cpuUtilQuery{procQuery: *q}
+func (err *userNotFoundError) Error() string {
+	return fmt.Sprintf("user `%s` not found!", err.name)
+}
+
+// Cannot use go user.Lookup() since it (unlike Zabbix agent C.getpwnam()) ignores remote services like SSSD.
+func getUIDByName(userName string) (*uid, error) {
+	userNameC := C.CString(userName)
+
+	defer C.free(unsafe.Pointer(userNameC))
+	passwdC, err := C.getpwnam(userNameC)
+
+	if passwdC == nil {
+		return nil, err
+	}
+
+	return &uid{uint32(passwdC.pw_uid)}, nil
+}
+
+func newCPUUtilQuery(q *procQuery, pattern *regexp.Regexp) (*cpuUtilQuery, error) {
+	query := &cpuUtilQuery{procQuery: *q}
 	if q.user != "" {
-		var u *user.User
-		if u, err = user.Lookup(q.user); err != nil {
-			return
+		var err error
+		var uid *uid
+		uid, err = getUIDByName(q.user)
+
+		if uid == nil {
+			if err != nil {
+				return nil, err
+			}
+
+			return query, &userNotFoundError{}
 		}
-		if query.userid, err = strconv.ParseInt(u.Uid, 10, 64); err != nil {
-			return
-		}
+
+		query.userid = int64(uid.uid)
 	}
 
 	query.cmdlinePattern = pattern
-	return
+
+	return query, nil
 }
 
 func (p *Plugin) prepareQueries() (queries []*cpuUtilQuery, flags int) {
@@ -280,9 +316,14 @@ func (p *Plugin) prepareQueries() (queries []*cpuUtilQuery, flags int) {
 			continue
 		}
 		var query *cpuUtilQuery
-		if query, stats.err = newCpuUtilQuery(&q, stats.cmdlinePattern); stats.err != nil {
-			p.Debugf("cannot create CPU utilization query %+v: %s", q, stats.err)
-			continue
+
+		query, stats.err = newCPUUtilQuery(&q, stats.cmdlinePattern)
+
+		if stats.err != nil {
+			u := &userNotFoundError{}
+			if !errors.As(stats.err, &u) {
+				continue
+			}
 		}
 		queries = append(queries, query)
 		stats.scanid = p.scanid
@@ -461,8 +502,7 @@ func (p *Plugin) Export(key string, params []string, ctx plugin.ContextProvider)
 	if stats, ok := p.queries[query]; ok {
 		stats.accessed = now
 		if stats.err != nil {
-			p.Debugf("CPU utilization gathering error %s", err)
-			return nil, stats.err
+			return 0, nil
 		}
 		if stats.tail == stats.head {
 			return
@@ -512,9 +552,10 @@ func (p *PluginExport) prepareQuery(q *procQuery) (query *cpuUtilQuery, flags in
 	if err != nil {
 		return nil, 0, fmt.Errorf("cannot compile regex for %s: %s", q.cmdline, err.Error())
 	}
+	query, err = newCPUUtilQuery(q, regxp)
 
-	if query, err = newCpuUtilQuery(q, regxp); err != nil {
-		return nil, 0, fmt.Errorf("cannot create CPU utilization query %+v: %s", q, err.Error())
+	if err != nil {
+		return nil, 0, err
 	}
 
 	if q.name != "" {
@@ -549,7 +590,7 @@ func (p *PluginExport) Export(key string, params []string, ctx plugin.ContextPro
 
 func (p *PluginExport) exportProcMem(params []string) (result interface{}, err error) {
 	var name, mode, cmdline, memtype string
-	var usr *user.User
+	var uid *uid
 
 	switch len(params) {
 	case 5:
@@ -563,13 +604,14 @@ func (p *PluginExport) exportProcMem(params []string) (result interface{}, err e
 		fallthrough
 	case 2:
 		if username := params[1]; username != "" {
-			usr, err = user.Lookup(username)
-			if err == user.UnknownUserError(username) {
-				p.Debugf("Failed to obtain user '%s': %s", username, err.Error())
+			uid, err = getUIDByName(username)
+
+			if uid == nil {
+				if err != nil {
+					return nil, err
+				}
+
 				return 0, nil
-			}
-			if err != nil {
-				return nil, fmt.Errorf("Failed to obtain user '%s': %s", username, err.Error())
 			}
 		}
 		fallthrough
@@ -618,11 +660,8 @@ func (p *PluginExport) exportProcMem(params []string) (result interface{}, err e
 	}
 
 	userID := int64(-1)
-	if usr != nil {
-		userID, err = strconv.ParseInt(usr.Uid, 10, 64)
-		if err != nil {
-			return nil, fmt.Errorf("Failed to parse userid '%s' for user '%s", usr.Uid, usr.Username)
-		}
+	if uid != nil {
+		userID = int64(uid.uid)
 	}
 
 	processes, err := getProcesses(procInfoName | procInfoCmdline | procInfoUser)
@@ -757,9 +796,13 @@ func (p *PluginExport) exportProcNum(params []string) (interface{}, error) {
 	}
 
 	var count int
-
 	query, flags, err := p.prepareQuery(&procQuery{name, userName, cmdline, state})
+
 	if err != nil {
+		u := &userNotFoundError{}
+		if errors.As(err, &u) {
+			return 0, nil
+		}
 		return nil, fmt.Errorf("Failed to prepare query: %s", err.Error())
 	}
 
@@ -803,7 +846,13 @@ func (p *PluginExport) exportProcGet(params []string) (interface{}, error) {
 	case 2:
 		userName = params[1]
 		if userName != "" {
-			if _, err := user.Lookup(userName); err != nil {
+			uid, err := getUIDByName(userName)
+
+			if uid == nil {
+				if err != nil {
+					return nil, err
+				}
+
 				return "[]", nil
 			}
 		}

@@ -46,7 +46,7 @@ class CDocHelper {
 	const ALERTS_SCRIPT_EDIT =									'web_interface/frontend_sections/alerts/scripts#configuring-a-global-script';
 	const ALERTS_SCRIPT_LIST =									'web_interface/frontend_sections/alerts/scripts';
 	const CONFIGURATION_DASHBOARDS_EDIT =						'web_interface/frontend_sections/dashboards#creating-a-dashboard';
-	const CONFIGURATION_DASHBOARDS_LIST =						'config/visualization/host_screens';
+	const CONFIGURATION_DASHBOARDS_LIST =						'web_interface/frontend_sections/monitoring/hosts/dashboards';
 	const DASHBOARDS_LIST =										'web_interface/frontend_sections/dashboards';
 	const DASHBOARDS_VIEW =										'web_interface/frontend_sections/dashboards';
 	const DASHBOARDS_PAGE_PROPERTIES_EDIT =						'web_interface/frontend_sections/dashboards#adding-pages';
@@ -71,6 +71,7 @@ class CDocHelper {
 	const DATA_COLLECTION_HOST_PROTOTYPE_LIST =					'web_interface/frontend_sections/data_collection/hosts/discovery/host_prototypes';
 	const DATA_COLLECTION_HOST_TRIGGERS_LIST =					'web_interface/frontend_sections/data_collection/hosts/triggers';
 	const DATA_COLLECTION_HOST_TRIGGER_PROTOTYPE_LIST =			'web_interface/frontend_sections/data_collection/hosts/discovery/trigger_prototypes';
+	const DATA_COLLECTION_HOST_WIZARD =							'config/hosts/host_wizard';
 	const DATA_COLLECTION_HOSTGROUPS_EDIT =						'config/hosts/host#creating-a-host-group';
 	const DATA_COLLECTION_HOSTGROUPS_LIST =						'web_interface/frontend_sections/data_collection/hostgroups';
 	const DATA_COLLECTION_HTTPCONF_EDIT =						'web_monitoring#configuring-a-web-scenario';
@@ -96,6 +97,9 @@ class CDocHelper {
 	const DATA_COLLECTION_TRIGGERS_EDIT =						'config/triggers/trigger#configuration';
 	const INVENTORY_HOST_LIST =									'web_interface/frontend_sections/inventory/hosts';
 	const INVENTORY_HOST_OVERVIEW =								'web_interface/frontend_sections/inventory/overview';
+	const INSTALLATION_PACKAGES_MAC =							'installation/install_from_packages/mac_pkg';
+	const INSTALLATION_PACKAGES_MSI =							'installation/install_from_packages/win_msi';
+	const INSTALLATION_PACKAGES_OTHER =							'installation/install_from_packages';
 	const ITEM_TYPES_DB_MONITOR =								'config/items/itemtypes/odbc_checks';
 	const ITEM_TYPES_IPMI_AGENT =								'config/items/itemtypes/ipmi';
 	const ITEM_TYPES_JMX_AGENT =								'config/items/itemtypes/jmx_monitoring';
@@ -105,7 +109,7 @@ class CDocHelper {
 	const ITEM_TYPES_ZABBIX_INTERNAL =							'config/items/itemtypes/internal';
 	const MONITORING_CHARTS_VIEW =								'web_interface/frontend_sections/monitoring/hosts/graphs';
 	const MONITORING_DISCOVERY_VIEW =							'web_interface/frontend_sections/monitoring/discovery';
-	const MONITORING_HOST_DASHBOARD_VIEW =						'config/visualization/host_screens';
+	const MONITORING_HOST_DASHBOARD_VIEW =						'web_interface/frontend_sections/monitoring/hosts/dashboards';
 	const MONITORING_HOST_VIEW =								'web_interface/frontend_sections/monitoring/hosts';
 	const MONITORING_HISTORY =									'web_interface/frontend_sections/monitoring/latest_data#graphs';
 	const MONITORING_LATEST_VIEW =								'web_interface/frontend_sections/monitoring/latest_data';
@@ -135,6 +139,7 @@ class CDocHelper {
 	const POPUP_TEMPLATE_IMPORT =								'xml_export_import/templates#importing';
 	const POPUP_TOKEN_EDIT =									'web_interface/frontend_sections/users/api_tokens';
 	const POPUP_TEST_EDIT =										'config/items/item#testing';
+	const PROCESSES_JAVA_GATEWAY =								'concepts/java';
 	const QUEUE_DETAILS =										'web_interface/frontend_sections/administration/queue#list-of-waiting-items';
 	const QUEUE_OVERVIEW =										'web_interface/frontend_sections/administration/queue#overview-by-item-type';
 	const QUEUE_OVERVIEW_PROXY =								'web_interface/frontend_sections/administration/queue#overview-by-proxy';
@@ -151,6 +156,7 @@ class CDocHelper {
 	const SERVICES_SLA_LIST =									'web_interface/frontend_sections/services/sla#overview';
 	const SERVICES_SLAREPORT_LIST =								'web_interface/frontend_sections/services/sla_report#overview';
 	const TR_EVENTS =											'web_interface/frontend_sections/monitoring/problems#viewing-details';
+	const TEMPLATES_OUT_OF_THE_BOX =							'config/templates_out_of_the_box#template-upgrade';
 	const USERS_AUTHENTICATION_EDIT =							'web_interface/frontend_sections/users/authentication';
 	const USERS_TOKEN_LIST =									'web_interface/frontend_sections/users/api_tokens';
 	const USERS_USER_EDIT =										'config/users_and_usergroups/user';

@@ -20,6 +20,16 @@ class CFieldMultiline extends CField {
 		jQuery(this._field).on('change', () => this.fieldChanged());
 	}
 
+	getValueTrimmed() {
+		const value = this.getValue();
+
+		if (value === null || !this._allow_trim) {
+			return value;
+		}
+
+		return value.trim();
+	}
+
 	getValue() {
 		return this._field.querySelector(`input[name="${this.getName()}"]`).value;
 	}

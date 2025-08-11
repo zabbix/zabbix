@@ -151,7 +151,7 @@ class testFormUserLdapMediaJit extends CWebTest {
 		]);
 
 		CDataHelper::call('authentication.update', [
-				'authentication_type' => SMTP_AUTHENTICATION_NORMAL,
+				'authentication_type' => ZBX_AUTH_LDAP,
 				'ldap_auth_enabled' => ZBX_AUTH_LDAP_ENABLED,
 				'disabled_usrgrpid' => 9, // Disabled.
 				'ldap_jit_status' => JIT_PROVISIONING_ENABLED
@@ -911,6 +911,7 @@ class testFormUserLdapMediaJit extends CWebTest {
 
 		$dialog->query('button:Update')->one()->click();
 		$form->submit();
+		$this->assertMessage(TEST_GOOD, 'Authentication settings updated');
 
 		// Check that no changes are present until user is provisioned.
 		$this->page->open('zabbix.php?action=user.list')->waitUntilReady();
@@ -1248,7 +1249,7 @@ class testFormUserLdapMediaJit extends CWebTest {
 		$media_mapping_form = COverlayDialogElement::find()->all()->last()->asForm();
 
 		$media_mapping_form->fill($data['mapping']);
-		$media_mapping_form->submit();
+		$media_mapping_form->submit()->waitUntilNotVisible();
 		$dialog->query('button:Update')->one()->click();
 		$form->submit();
 

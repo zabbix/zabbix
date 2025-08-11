@@ -7,7 +7,7 @@ This template is designed for the effortless deployment of MySQL monitoring by Z
 
 ## Requirements
 
-Zabbix version: 7.4 and higher.
+Zabbix version: 8.0 and higher.
 
 ## Tested versions
 
@@ -18,7 +18,7 @@ This template has been tested on:
 
 ## Configuration
 
-> Zabbix should be configured according to the instructions in the [Templates out of the box](https://www.zabbix.com/documentation/7.4/manual/config/templates_out_of_the_box) section.
+> Zabbix should be configured according to the instructions in the [Templates out of the box](https://www.zabbix.com/documentation/8.0/manual/config/templates_out_of_the_box) section.
 
 ## Setup
 
@@ -89,9 +89,9 @@ EOF
 
 |Name|Description|Default|
 |----|-----------|-------|
-|{$MYSQL.ABORTED_CONN.MAX.WARN}|<p>Number of failed attempts to connect to the MySQL server for trigger expressions.</p>|`3`|
 |{$MYSQL.HOST}|<p>Hostname or IP of MySQL host or container.</p>|`127.0.0.1`|
 |{$MYSQL.PORT}|<p>MySQL service port.</p>|`3306`|
+|{$MYSQL.ABORTED_CONN.MAX.WARN}|<p>Number of failed attempts to connect to the MySQL server for trigger expressions.</p>|`3`|
 |{$MYSQL.REPL_LAG.MAX.WARN}|<p>Amount of time the slave is behind the master for trigger expressions.</p>|`30m`|
 |{$MYSQL.SLOW_QUERIES.MAX.WARN}|<p>Number of slow queries for trigger expressions.</p>|`3`|
 |{$MYSQL.BUFF_UTIL.MIN.WARN}|<p>The minimum buffer pool utilization in percentage for trigger expressions.</p>|`50`|

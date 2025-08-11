@@ -310,7 +310,7 @@ class testTemplateInheritance extends CLegacyWebTest {
 		$this->zbxTestDropdownSelect('type', 'Simple check');
 		$this->zbxTestInputType('delay', '31s');
 		$this->zbxTestInputType('lifetime', '32d');
-		$this->zbxTestInputType('description', 'description');
+		$this->zbxTestInputType('js-item-description-field', 'description');
 		$this->zbxTestInputType('delay_flex_0_delay', '50s');
 		$this->zbxTestInputType('delay_flex_0_period', '1-7,00:00-24:00');
 		$this->zbxTestClickWait('interval_add');

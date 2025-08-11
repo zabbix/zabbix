@@ -169,8 +169,21 @@ tests/libs/zbxdbhigh/DBadd_condition_alloc
 tests/libs/zbxdbhigh/zbx_add_tags
 tests/libs/zbxdbhigh/zbx_del_tags
 tests/libs/zbxdbhigh/zbx_merge_tags
+tests/libs/zbxdbhigh/zbx_sync_rowset_merge
 tests/libs/zbxeval/zbx_eval_compose_expression
 tests/libs/zbxeval/zbx_eval_check_timer_functions
+tests/libs/zbxeval/zbx_eval_calc_avg
+tests/libs/zbxeval/zbx_eval_calc_kurtosis
+tests/libs/zbxeval/zbx_eval_calc_mad
+tests/libs/zbxeval/zbx_eval_calc_max
+tests/libs/zbxeval/zbx_eval_calc_min
+tests/libs/zbxeval/zbx_eval_calc_skewness
+tests/libs/zbxeval/zbx_eval_calc_stddevpop
+tests/libs/zbxeval/zbx_eval_calc_stddevsamp
+tests/libs/zbxeval/zbx_eval_calc_sum
+tests/libs/zbxeval/zbx_eval_calc_sumofsquares
+tests/libs/zbxeval/zbx_eval_calc_varpop
+tests/libs/zbxeval/zbx_eval_calc_varsamp
 tests/libs/zbxeval/zbx_eval_copy
 tests/libs/zbxeval/zbx_eval_deserialize_dyn
 tests/libs/zbxeval/zbx_eval_extract_item_refs
@@ -186,6 +199,8 @@ tests/libs/zbxeval/zbx_eval_parse_query
 tests/libs/zbxeval/zbx_eval_prepare_filter
 tests/libs/zbxeval/zbx_eval_replace_functionid
 tests/libs/zbxeval/zbx_eval_serialize
+tests/libs/zbxeval/zbx_eval_substitute_macros
+tests/libs/zbxeval/zbx_eval_query_subtitute_user_macros
 tests/libs/zbxeval/zbx_get_serialized_expression_functionids
 tests/libs/zbxexpr/calculate_item_nextcheck
 tests/libs/zbxexpr/calculate_item_nextcheck_unreachable
@@ -196,6 +211,7 @@ tests/libs/zbxexpr/macro_tr
 tests/libs/zbxexpr/macro_regrepl
 tests/libs/zbxexpr/parse_key
 tests/libs/zbxexpr/zbx_check_hostname
+tests/libs/zbxexpr/zbx_check_prototype_hostname
 tests/libs/zbxexpr/zbx_check_time_period
 tests/libs/zbxexpr/zbx_custom_interval_is_scheduling
 tests/libs/zbxexpr/zbx_function_find
@@ -218,7 +234,9 @@ tests/libs/zbxexpr/zbx_uint64match_condition
 tests/libs/zbxexpr/zbx_user_macro_parse
 tests/libs/zbxexpr/zbx_url_encode_decode
 tests/libs/zbxexpr/zbx_user_macro_quote_context_dyn
+tests/libs/zbxexpr/zbx_substitute_item_key_params
 tests/libs/zbxexpr/zbx_validate_interval
+tests/libs/zbxexpr/zbx_substitute_snmp_oid_params
 tests/libs/zbxexpression/zbx_evaluate
 tests/libs/zbxexpression/zbx_evaluate_unknown
 tests/libs/zbxexpression/zbx_evaluate_function
@@ -240,6 +258,7 @@ tests/libs/zbxip/zbx_iprange_uniq_iter
 tests/libs/zbxip/zbx_iprange_uniq_next
 tests/libs/zbxip/zbx_parse_serveractive_element
 tests/libs/zbxip/zbx_portrange_uniq_next
+tests/libs/zbxip/zbx_join_hostport
 tests/libs/zbxicmpping/get_interval_option
 tests/libs/zbxicmpping/line_process
 tests/libs/zbxjson/zbx_json_decodevalue
@@ -342,6 +361,7 @@ tests/libs/zbxxml/zbx_json_to_xml
 tests/libs/zbxxml/zbx_xml_to_json
 tests/zabbix_server/lld/lld_compare_entries
 tests/zabbix_server/lld/lld_entry_create
+tests/zabbix_server/lld/lld_rule_merge_exported_macros
 tests/zabbix_server/lld/zbx_lld_hgsets_test
 tests/zabbix_server/lld/zbx_substitute_lld_macros
 tests/zabbix_server/pinger/zbx_pinger_test
@@ -364,3 +384,4 @@ ui/locale/frontend.pot
 ui/tests/bootstrap.php
 ui/tests/composer.*
 ui/tests/vendor
+ui/tests/.phpunit.result.cache

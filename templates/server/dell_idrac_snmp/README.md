@@ -7,7 +7,7 @@ This is a template for monitoring Dell iDRAC servers with iDRAC version 7 (and l
 
 ## Requirements
 
-Zabbix version: 7.4 and higher.
+Zabbix version: 8.0 and higher.
 
 ## Tested versions
 
@@ -20,7 +20,7 @@ This template has been tested on:
 
 ## Configuration
 
-> Zabbix should be configured according to the instructions in the [Templates out of the box](https://www.zabbix.com/documentation/7.4/manual/config/templates_out_of_the_box) section.
+> Zabbix should be configured according to the instructions in the [Templates out of the box](https://www.zabbix.com/documentation/8.0/manual/config/templates_out_of_the_box) section.
 
 ## Setup
 
@@ -242,7 +242,7 @@ Refer to the vendor documentation.
 |Dell iDRAC: Physical disk [{#DISK_NAME}]: Failed state|<p>Please check physical disk for warnings or errors.</p>|`last(/Dell iDRAC by SNMP/dell.server.hw.physicaldisk.status[physicalDiskComponentStatus.{#SNMPINDEX}])={$DELL.SNMP.DISK.STATUS.FAIL:"critical"} or last(/Dell iDRAC by SNMP/dell.server.hw.physicaldisk.status[physicalDiskComponentStatus.{#SNMPINDEX}])={$DELL.SNMP.DISK.STATUS.FAIL:"nonRecoverable"}`|High||
 |Dell iDRAC: Physical disk [{#DISK_NAME}]: Warning state|<p>Please check physical disk for warnings or errors.</p>|`last(/Dell iDRAC by SNMP/dell.server.hw.physicaldisk.status[physicalDiskComponentStatus.{#SNMPINDEX}])={$DELL.SNMP.DISK.STATUS.WARN:"nonCritical"}`|Warning|**Depends on**:<br><ul><li>Dell iDRAC: Physical disk [{#DISK_NAME}]: Failed state</li></ul>|
 |Dell iDRAC: Physical disk [{#DISK_NAME}]: S.M.A.R.T. failed|<p>Disk probably requires replacement.</p>|`last(/Dell iDRAC by SNMP/dell.server.hw.physicaldisk.smart_status[physicalDiskSmartAlertIndication.{#SNMPINDEX}])={$DELL.SNMP.DISK.SMART.STATUS.FAIL:"replaceDrive"} or last(/Dell iDRAC by SNMP/dell.server.hw.physicaldisk.smart_status[physicalDiskSmartAlertIndication.{#SNMPINDEX}])={$DELL.SNMP.DISK.SMART.STATUS.FAIL:"replaceDriveSSDWearOut"}`|High|**Depends on**:<br><ul><li>Dell iDRAC: Physical disk [{#DISK_NAME}]: Failed state</li></ul>|
-|Dell iDRAC: Physical disk [{#DISK_NAME}]: Has been replaced|<p>[{#DISK_NAME}] serial number has changed. Acknowledge to close the problem manually.</p>|`last(/Dell iDRAC by SNMP/dell.server.hw.physicaldisk.serialnumber[physicalDiskSerialNo.{#SNMPINDEX}],#1)<>last(/Dell iDRAC by SNMP/dell.server.hw.physicaldisk.serialnumber[physicalDiskSerialNo.{#SNMPINDEX}],#2) and length(last(/Dell iDRAC by SNMP/dell.server.hw.physicaldisk.serialnumber[physicalDiskSerialNo.{#SNMPINDEX}]))>0`|Info|**Manual close**: Yes|
+|Dell iDRAC: Physical disk [{#DISK_NAME}] has been replaced|<p>[{#DISK_NAME}] serial number has changed. Acknowledge to close the problem manually.</p>|`last(/Dell iDRAC by SNMP/dell.server.hw.physicaldisk.serialnumber[physicalDiskSerialNo.{#SNMPINDEX}],#1)<>last(/Dell iDRAC by SNMP/dell.server.hw.physicaldisk.serialnumber[physicalDiskSerialNo.{#SNMPINDEX}],#2) and length(last(/Dell iDRAC by SNMP/dell.server.hw.physicaldisk.serialnumber[physicalDiskSerialNo.{#SNMPINDEX}]))>0`|Info|**Manual close**: Yes|
 
 ### LLD rule Virtual disk discovery
 

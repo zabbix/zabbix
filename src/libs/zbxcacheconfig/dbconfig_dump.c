@@ -633,7 +633,7 @@ static void	DCdump_items(void)
 		zabbix_log(LOG_LEVEL_TRACE, "  type:%u value_type:%u", item->type, item->value_type);
 		zabbix_log(LOG_LEVEL_TRACE, "  interfaceid:" ZBX_FS_UI64, item->interfaceid);
 		zabbix_log(LOG_LEVEL_TRACE, "  state:%u error:'%s'", item->state, item->error);
-		zabbix_log(LOG_LEVEL_TRACE, "  flags:%u status:%u", item->flags, item->status);
+		zabbix_log(LOG_LEVEL_TRACE, "  flags:%x status:%u", item->flags, item->status);
 		zabbix_log(LOG_LEVEL_TRACE, "  valuemapid:" ZBX_FS_UI64, item->valuemapid);
 		zabbix_log(LOG_LEVEL_TRACE, "  lastlogsize:" ZBX_FS_UI64 " mtime:%d", item->lastlogsize, item->mtime);
 		zabbix_log(LOG_LEVEL_TRACE, "  delay:'%s' nextcheck:%d", item->delay, item->nextcheck);
@@ -713,6 +713,8 @@ static void	DCdump_items(void)
 				break;
 			case ITEM_TYPE_BROWSER:
 				DCdump_browseritem(item->itemtype.browseritem);
+				break;
+			case ITEM_TYPE_NESTED_LLD:
 				break;
 		}
 
@@ -906,7 +908,7 @@ static void	DCdump_triggers(void)
 		zbx_uint64_t	*itemid;
 
 		trigger = (ZBX_DC_TRIGGER *)index.values[i];
-		if (ZBX_FLAG_DISCOVERY_PROTOTYPE == trigger->flags)
+		if (0 != (trigger->flags & ZBX_FLAG_DISCOVERY_PROTOTYPE))
 		{
 			zabbix_log(LOG_LEVEL_TRACE, "triggerid:" ZBX_FS_UI64 " flags:%u", trigger->triggerid,
 					trigger->flags);

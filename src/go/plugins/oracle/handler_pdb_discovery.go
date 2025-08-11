@@ -28,7 +28,8 @@ func pdbDiscoveryHandler(ctx context.Context, conn OraClient, params map[string]
 		SELECT
 			JSON_ARRAYAGG(
 				JSON_OBJECT(
-					'{#DBNAME}' VALUE NAME
+					'{#DBNAME}' VALUE NAME,
+					'{#CON_ID}' VALUE CON_ID
 				)
 			) LLD
 		FROM

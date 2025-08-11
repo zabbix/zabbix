@@ -38,8 +38,8 @@ typedef int (*zbx_evaluate_function_trigger_t)(zbx_variant_t *, const zbx_dc_eva
 		const char *, const zbx_timespec_t *, char **);
 typedef void (*zbx_lld_process_agent_result_func_t)(zbx_uint64_t itemid, zbx_uint64_t hostid, AGENT_RESULT *result,
 		zbx_timespec_t *ts, char *error);
-typedef void (*zbx_preprocess_item_value_func_t)(zbx_uint64_t itemid, zbx_uint64_t hostid,
-		unsigned char item_value_type, unsigned char item_flags, AGENT_RESULT *result, zbx_timespec_t *ts,
+typedef void (*zbx_preprocess_item_value_func_t)(zbx_uint64_t itemid, unsigned char item_value_type,
+		unsigned char item_flags, unsigned char preprocessing, AGENT_RESULT *result, zbx_timespec_t *ts,
 		unsigned char state, char *error);
 typedef void (*zbx_preprocessor_flush_func_t)(void);
 
@@ -79,6 +79,7 @@ int	zbx_process_proxy_data(const zbx_dc_proxy_t *proxy, const struct zbx_json_pa
 		zbx_autoreg_prepare_host_func_t autoreg_prepare_host_cb, int *more, char **error);
 int	zbx_check_protocol_version(zbx_dc_proxy_t *proxy, int version);
 
+int	zbx_check_missing_host_templates(zbx_uint64_t hostid, zbx_vector_uint64_t *lnk_templateids, char **error);
 int	zbx_db_copy_template_elements(zbx_uint64_t hostid, zbx_vector_uint64_t *lnk_templateids,
 		zbx_host_template_link_type link_type, int audit_context_mode, char **error);
 int	zbx_db_delete_template_elements(zbx_uint64_t hostid, const char *hostname, zbx_vector_uint64_t *del_templateids,
@@ -90,6 +91,8 @@ void	zbx_db_delete_triggers(zbx_vector_uint64_t *triggerids, int audit_context_m
 
 void	zbx_db_delete_hosts(const zbx_vector_uint64_t *hostids, const zbx_vector_str_t *hostnames,
 		int audit_context_mode);
+void	zbx_db_delete_host_prototypes(const zbx_vector_uint64_t *host_prototype_ids,
+		const zbx_vector_str_t *host_prototype_names, int audit_context_mode);
 
 void	zbx_db_set_host_inventory(zbx_uint64_t hostid, int inventory_mode, int audit_context_mode);
 void	zbx_db_add_host_inventory(zbx_uint64_t hostid, int inventory_mode, int audit_context_mode);
@@ -103,6 +106,7 @@ void	zbx_host_groups_add(zbx_uint64_t hostid, zbx_vector_uint64_t *groupids, int
 void	zbx_host_groups_remove(zbx_uint64_t hostid, zbx_vector_uint64_t *groupids);
 
 void	zbx_hgset_hash_calculate(zbx_vector_uint64_t *groupids, char *hash_str, size_t hash_len);
+void	zbx_delete_lld_rule_host_prototypes(zbx_vector_uint64_t *lldrule_itemids, int audit_context_mode);
 
 zbx_uint64_t	zbx_db_add_interface(zbx_uint64_t hostid, unsigned char type, unsigned char useip,
 		const char *ip, const char *dns, unsigned short port, zbx_conn_flags_t flags, int audit_context_mode);
@@ -190,5 +194,14 @@ int	zbx_db_trigger_supplement_eval_resolv(zbx_token_type_t token_type, char **va
 
 int	zbx_db_item_value_type_changed_category(unsigned char value_type_new, unsigned char value_type_old);
 void	zbx_db_update_item_map_links(const zbx_vector_uint64_t *itemids);
+
+typedef struct
+{
+	zbx_uint64_t	id;
+	char		*name;
+}
+zbx_id_name_pair_t;
+
+ZBX_VECTOR_DECL(id_name_pair, zbx_id_name_pair_t)
 
 #endif /* ZABBIX_DBWRAP_H */

@@ -71,34 +71,33 @@ function escapeHtml(string) {
 		.replace(/\'/g,'&apos;');
 }
 
-function validateNumericBox(obj, allowempty, allownegative) {
-	if (obj != null) {
-		if (allowempty) {
-			if (obj.value.length == 0 || obj.value == null) {
-				obj.value = '';
-			}
-			else {
-				if (isNaN(parseInt(obj.value, 10))) {
-					obj.value = 0;
-				}
-				else {
-					obj.value = parseInt(obj.value, 10);
-				}
-			}
-		}
-		else {
-			if (isNaN(parseInt(obj.value, 10))) {
-				obj.value = 0;
-			}
-			else {
-				obj.value = parseInt(obj.value, 10);
-			}
-		}
+/**
+ * Validates and processes the numeric value in an HTML input element. Leaves negative numbers without leading zeroes.
+ *
+ * @param {HTMLInputElement} input           The HTML input element containing the numeric value.
+ * @param {bool}             allow_empty     If true, the field can be empty; otherwise, empty fields are replaced
+ *                                           with "0".
+ * @param {bool}             allow_negative  If true, negative numbers are allowed; otherwise, negative numbers
+ *                                           are converted to positive.
+ * @param {number}           min_length      Pad number with zeroes to maintain min length.
+ */
+function normalizeNumericBox(input, {allow_empty, allow_negative, min_length}) {
+	const old_value = input.value;
+	let num = parseInt(input.value, 10);
+
+	if (isNaN(num)) {
+		input.value = (input.value === '' && allow_empty) ? '' : '0'.repeat(Math.max(min_length, 1));
 	}
-	if (!allownegative) {
-		if (obj.value < 0) {
-			obj.value = obj.value * -1;
+	else {
+		if (num < 0 && !allow_negative) {
+			num = -num;
 		}
+
+		input.value = num < 0 ? num : num.toString().padStart(min_length, '0');
+	}
+
+	if (old_value !== input.value) {
+		input.dispatchEvent(new Event('input', {bubbles: true}));
 	}
 }
 
@@ -440,14 +439,34 @@ function overlayPreloaderDestroy(id) {
 /**
  * Close and destroy overlay dialogue and move focus to IU element that was clicked to open it.
  *
+ * Closing action by user (not script) can be prevented by preventing default action of the "dialog.close" event.
+ *
  * @param {string} dialogueid
  * @param {string} close_by    Indicates the initiator of closing action.
+ *
+ * @returns {boolean}  Whether the dialog was closed (or wasn't opened).
  */
 function overlayDialogueDestroy(dialogueid, close_by = Overlay.prototype.CLOSE_BY_SCRIPT) {
 	const overlay = overlays_stack.getById(dialogueid);
 
 	if (overlay === undefined) {
-		return;
+		return true;
+	}
+
+	const is_default_prevented = !overlay.$dialogue[0].dispatchEvent(
+		new CustomEvent('dialogue.close', {
+			detail: {
+				dialogueid,
+				position: overlay.getPosition(),
+				position_fix: overlay.getPositionFix(),
+				close_by
+			},
+			cancelable: true
+		})
+	);
+
+	if (close_by === Overlay.prototype.CLOSE_BY_USER && is_default_prevented) {
+		return false;
 	}
 
 	if (overlay.xhr !== undefined) {
@@ -464,46 +483,26 @@ function overlayDialogueDestroy(dialogueid, close_by = Overlay.prototype.CLOSE_B
 
 	removeFromOverlaysStack(dialogueid);
 
-	overlay.$dialogue[0].dispatchEvent(new CustomEvent('dialogue.close', {detail: {dialogueid, close_by}}));
+	return true;
 }
 
 /**
- * Display modal window.
+ * Create and display stacked popup dialogue.
  *
- * @param {object} params                                   Modal window params.
- * @param {string} params.title                             Modal window title.
- * @param {string} params.class                             Modal window CSS class, often based on .modal-popup*.
- * @param {object} params.content                           Window content.
- * @param {object} params.footer                           	Window footer content.
- * @param {object} params.controls                          Window controls.
- * @param {array}  params.buttons                           Window buttons.
- * @param {string} params.debug                             Debug HTML displayed in modal window.
- * @param {string} params.buttons[]['title']                Text on the button.
- * @param {object}|{string} params.buttons[]['action']      Function object or executable string that will be executed
- *                                                          on click.
- * @param {string} params.buttons[]['class']    (optional)  Button class.
- * @param {bool}   params.buttons[]['cancel']   (optional)  It means what this button has cancel action.
- * @param {bool}   params.buttons[]['focused']  (optional)  Focus this button.
- * @param {bool}   params.buttons[]['enabled']  (optional)  Should the button be enabled? Default: true.
- * @param {bool}   params.buttons[]['keepOpen'] (optional)  Prevent dialogue closing, if button action returned false.
- * @param string   params.dialogueid            (optional)  Unique dialogue identifier to reuse existing overlay dialog
- *                                                          or create a new one if value is not set.
- * @param string   params.script_inline         (optional)  Custom javascript code to execute when initializing dialog.
- * @param {Node|null} trigger_elmnt                         UI element which triggered opening of overlay dialogue.
+ * @param {Object} properties  Mutable properties of dialogue.
+ * @param {Object} options     Overlay options.
  *
- * @return {Overlay}
+ * Will reuse existing overlay object, if "options.dialogueid" is specified.
+ *
+ * @see Overlay for supported options.
+ * @see Overlay.prototype.setProperties for supported properties.
+ *
+ * @returns {Overlay}
  */
-function overlayDialogue(params, trigger_elmnt) {
-	params.element = params.element || trigger_elmnt;
-	params.type = params.type || 'popup';
+function overlayDialogue(properties, options = {}) {
+	const overlay = overlays_stack.getById(options.dialogueid) || new Overlay({...options, type: 'popup'});
 
-	var overlay = overlays_stack.getById(params.dialogueid);
-
-	if (!overlay) {
-		overlay = new Overlay(params.type, params.dialogueid);
-	}
-
-	overlay.setProperties(params);
+	overlay.setProperties(properties);
 	overlay.mount();
 	overlay.recoverFocus();
 	overlay.containFocus();
@@ -628,8 +627,10 @@ function parseUrlString(url_string) {
  * @return {jQuery}
  */
 function makeMessageBox(type, messages, title = null, show_close_box = true, show_details = null) {
-	const classes = {good: 'msg-good', bad: 'msg-bad', warning: 'msg-warning'};
-	const aria_labels = {good: t('Success message'), bad: t('Error message'), warning: t('Warning message')};
+	const classes = {good: 'msg-good', info: 'msg-info', warning: 'msg-warning', bad: 'msg-bad'};
+	const aria_labels = {good: t('Success message'), info: t('Info message'), warning: t('Warning message'),
+		bad: t('Error message')
+	};
 
 	if (show_details === null) {
 		show_details = type === 'bad' || type === 'warning';
@@ -977,3 +978,4 @@ function convertHSLToRGB(h, s, l) {
 function isColorHex(value) {
 	return /^#([0-9A-F]{6})$/i.test(value);
 }
+

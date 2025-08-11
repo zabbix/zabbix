@@ -16,9 +16,9 @@
 
 class CSection extends CTag {
 
-	private const ZBX_STYLE_HEAD = 'section-head';
-	private const ZBX_STYLE_BODY = 'section-body';
-	private const ZBX_STYLE_FOOT = 'section-foot';
+	public const ZBX_STYLE_HEAD = 'section-head';
+	public const ZBX_STYLE_BODY = 'section-body';
+	public const ZBX_STYLE_FOOT = 'section-foot';
 
 	protected ?CDiv $header = null;
 	protected ?CDiv $footer = null;

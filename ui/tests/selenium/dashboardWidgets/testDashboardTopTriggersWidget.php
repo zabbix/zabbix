@@ -26,7 +26,7 @@ require_once __DIR__.'/../behaviors/CTagBehavior.php';
  *
  * @dataSource UserPermissions
  */
-class testDashboardTopTriggersWidget extends CWebTest {
+class testDashboardTopTriggersWidget extends testWidgets {
 
 	/**
 	 * Attach MessageBehavior, TableBehavior and TagBehavior to the test.
@@ -739,6 +739,7 @@ class testDashboardTopTriggersWidget extends CWebTest {
 				? 'No refresh'
 				: (CTestArrayHelper::get($data['fields'], 'Refresh interval', 'No refresh'));
 			$this->assertEquals($refresh, $widget->getRefreshInterval());
+			CPopupMenuElement::find()->one()->close();
 
 			// Check new widget form fields and values in frontend.
 			$saved_form = $widget->edit();

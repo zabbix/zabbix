@@ -42,7 +42,7 @@ class CControllerPopupItemTestEdit extends CControllerPopupItemTest {
 			'interfaceid'			=> 'db interface.interfaceid',
 			'ipmi_sensor'			=> 'string',
 			'itemid'				=> 'db items.itemid',
-			'item_type'				=> 'in '.implode(',', [ITEM_TYPE_ZABBIX, ITEM_TYPE_TRAPPER, ITEM_TYPE_SIMPLE, ITEM_TYPE_INTERNAL, ITEM_TYPE_ZABBIX_ACTIVE, ITEM_TYPE_HTTPTEST, ITEM_TYPE_EXTERNAL, ITEM_TYPE_DB_MONITOR, ITEM_TYPE_IPMI, ITEM_TYPE_SSH, ITEM_TYPE_TELNET, ITEM_TYPE_CALCULATED, ITEM_TYPE_JMX, ITEM_TYPE_SNMPTRAP, ITEM_TYPE_DEPENDENT, ITEM_TYPE_HTTPAGENT, ITEM_TYPE_SNMP, ITEM_TYPE_SCRIPT, ITEM_TYPE_BROWSER]),
+			'item_type'				=> 'in '.implode(',', [ITEM_TYPE_ZABBIX, ITEM_TYPE_TRAPPER, ITEM_TYPE_SIMPLE, ITEM_TYPE_INTERNAL, ITEM_TYPE_ZABBIX_ACTIVE, ITEM_TYPE_HTTPTEST, ITEM_TYPE_EXTERNAL, ITEM_TYPE_DB_MONITOR, ITEM_TYPE_IPMI, ITEM_TYPE_SSH, ITEM_TYPE_TELNET, ITEM_TYPE_CALCULATED, ITEM_TYPE_JMX, ITEM_TYPE_SNMPTRAP, ITEM_TYPE_DEPENDENT, ITEM_TYPE_HTTPAGENT, ITEM_TYPE_SNMP, ITEM_TYPE_SCRIPT, ITEM_TYPE_BROWSER, ITEM_TYPE_NESTED]),
 			'jmx_endpoint'			=> 'string',
 			'output_format'			=> 'in '.implode(',', [HTTPCHECK_STORE_RAW, HTTPCHECK_STORE_JSON]),
 			'params_ap'				=> 'string',
@@ -67,7 +67,7 @@ class CControllerPopupItemTestEdit extends CControllerPopupItemTest {
 			'ssl_key_file'			=> 'string',
 			'ssl_key_password'		=> 'string',
 			'status_codes'			=> 'string',
-			'test_type'				=> 'required|in '.implode(',', [self::ZBX_TEST_TYPE_ITEM, self::ZBX_TEST_TYPE_ITEM_PROTOTYPE, self::ZBX_TEST_TYPE_LLD]),
+			'test_type'				=> 'required|in '.implode(',', [self::ZBX_TEST_TYPE_ITEM, self::ZBX_TEST_TYPE_ITEM_PROTOTYPE, self::ZBX_TEST_TYPE_LLD, self::ZBX_TEST_TYPE_LLD_PROTOTYPE]),
 			'timeout'				=> 'string',
 			'username'				=> 'string',
 			'url'					=> 'string',
@@ -101,10 +101,11 @@ class CControllerPopupItemTestEdit extends CControllerPopupItemTest {
 		$testable_item_types = self::getTestableItemTypes((string) $this->getInput('hostid', '0'));
 		$this->item_type = $this->hasInput('item_type') ? (int) $this->getInput('item_type') : -1;
 		$this->test_type = (int) $this->getInput('test_type');
-		$this->is_item_testable = in_array($this->item_type, $testable_item_types);
+		$this->is_item_testable = in_array($this->item_type, $testable_item_types)
+			&& $this->item_type != ITEM_TYPE_NESTED;
 
 		// Check if key is valid for item types it's mandatory.
-		if (in_array($this->item_type, $this->item_types_has_key_mandatory)) {
+		if (in_array($this->item_type, self::$item_types_has_key_mandatory)) {
 			$item_key_parser = new CItemKey();
 
 			if ($item_key_parser->parse($this->getInput('key', '')) != CParser::PARSE_SUCCESS) {
@@ -135,6 +136,10 @@ class CControllerPopupItemTestEdit extends CControllerPopupItemTest {
 				case self::ZBX_TEST_TYPE_LLD:
 					$api_input_rules = CDiscoveryRule::getPreprocessingValidationRules();
 					break;
+
+				case self::ZBX_TEST_TYPE_LLD_PROTOTYPE:
+					$api_input_rules = CDiscoveryRulePrototype::getPreprocessingValidationRules();
+					break;
 			}
 
 			if (!CApiInputValidator::validate($api_input_rules, $steps, '/', $error)) {
@@ -143,7 +148,7 @@ class CControllerPopupItemTestEdit extends CControllerPopupItemTest {
 				return false;
 			}
 
-			if ($this->test_type != self::ZBX_TEST_TYPE_LLD) {
+			if (!in_array($this->test_type, [self::ZBX_TEST_TYPE_LLD, self::ZBX_TEST_TYPE_LLD_PROTOTYPE])) {
 				$api_input_rules = ['type' => API_OBJECTS, 'uniq' => [['type', 'params']], 'fields' => [
 					'type' =>	['type' => API_ANY],
 					'params' =>	['type' => API_ANY]
@@ -189,6 +194,10 @@ class CControllerPopupItemTestEdit extends CControllerPopupItemTest {
 
 		// Get item and host properties and values from cache.
 		$data = $this->getInput('data', []);
+		if (array_key_exists('macros', $data)) {
+			$data['macros'] = json_decode($data['macros'], true);
+		}
+
 		$inputs = $this->getItemTestProperties($this->getInputAll());
 
 		// Work with preprocessing steps.
@@ -196,7 +205,9 @@ class CControllerPopupItemTestEdit extends CControllerPopupItemTest {
 		$preprocessing_steps = normalizeItemPreprocessingSteps($preprocessing_steps);
 		$preprocessing_types = array_column($preprocessing_steps, 'type');
 		$preprocessing_names = get_preprocessing_types(null, false, $preprocessing_types);
-		$support_lldmacros = ($this->test_type == self::ZBX_TEST_TYPE_ITEM_PROTOTYPE);
+		$support_lldmacros = in_array($this->test_type,
+			[self::ZBX_TEST_TYPE_ITEM_PROTOTYPE, self::ZBX_TEST_TYPE_LLD_PROTOTYPE]
+		);
 		$show_prev = (count(array_intersect($preprocessing_types, self::$preproc_steps_using_prev_value)) > 0);
 
 		// Collect item texts and macros to later check their usage.

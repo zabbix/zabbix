@@ -38,10 +38,34 @@ $available_js = [
 	'class.widget.inaccessible.js' => '',
 	'class.widget.iterator.js' => '',
 	'class.widget.misconfigured.js' => '',
-	'class.widget.paste-placeholder.js' => '',
+	'class.widget.create-placeholder.js' => '',
+	'class.widget-field.js' => '',
+	'class.widget-edit.dialogue.js' => '',
+	'class.widget-edit.sandbox.js' => '',
+	'class.widget-edit.validator.js' => '',
+	'class.widget-field.checkbox.js' => '',
 	'class.widget-field.checkbox-list.js' => '',
+	'class.widget-field.color.js' => '',
+	'class.widget-field.date-picker.js' => '',
+	'class.widget-field.integer-box.js' => '',
+	'class.widget-field.lat-lng.js' => '',
 	'class.widget-field.multiselect.js' => '',
+	'class.widget-field.numeric-box.js' => '',
+	'class.widget-field.pattern-select.js' => '',
+	'class.widget-field.radio-button-list.js' => '',
+	'class.widget-field.range-control.js' => '',
+	'class.widget-field.select.js' => '',
+	'class.widget-field.severities.js' => '',
+	'class.widget-field.tags.js' => '',
+	'class.widget-field.text-area.js' => '',
+	'class.widget-field.text-box.js' => '',
+	'class.widget-field.thresholds.js' => '',
 	'class.widget-field.time-period.js' => '',
+	'class.widget-field.url.js' => '',
+	'class.widget-field.time-zone.js' => '',
+	'class.widget-field-event.js' => '',
+	'class.widget-form.js' => '',
+	'class.widget-form-event.js' => '',
 	'class.widget-select.popup.js' => '',
 	'hostinterfacemanager.js' => '',
 	'hostmacrosmanager.js' => '',
@@ -54,7 +78,6 @@ $available_js = [
 	'flickerfreescreen.js' => '',
 	'multilineinput.js' => '',
 	'multiselect.js' => '',
-	'colorpicker.js' => '',
 	'chkbxrange.js' => '',
 	'layout.mode.js' => '',
 	'textareaflexible.js' => '',
@@ -69,9 +92,10 @@ $available_js = [
 	'qrcode.js' => 'vendors/qrcode/',
 	// classes
 	'component.z-bar-gauge.js' => '',
-	'component.z-vertical.js' => '',
+	'component.z-color-picker.js' => '',
 	'component.z-select.js' => '',
 	'component.z-sparkline.js' => '',
+	'component.z-vertical.js' => '',
 	'class.event-hub.js' => '',
 	'class.event-hub.event.js' => '',
 	'class.base-component.js' => '',
@@ -172,6 +196,7 @@ $translate_strings = [
 		'Cannot paste inaccessible widget.' => _('Cannot paste inaccessible widget.'),
 		'Copy' => _('Copy'),
 		'Delete' => _('Delete'),
+		'Editing other objects is not allowed in dashboard editing mode.' => _('Editing other objects is not allowed in dashboard editing mode.'),
 		'Failed to paste dashboard page.' => _('Failed to paste dashboard page.'),
 		'Failed to paste widget.' => _('Failed to paste widget.'),
 		'Failed to update dashboard page properties.' => _('Failed to update dashboard page properties.'),
@@ -231,6 +256,15 @@ $translate_strings = [
 		'Name' => _('Name'),
 		'No compatible widgets.' => _('No compatible widgets.'),
 		'Widget' => _('Widget')
+	],
+	'class.widget-edit.dialogue.js' => [
+		'Widget configuration will be reverted.' => _('Widget configuration will be reverted.')
+	],
+	'class.widget-edit.sandbox.js' => [
+		'Cannot add widget: not enough free space on the dashboard.' => _('Cannot add widget: not enough free space on the dashboard.')
+	],
+	'class.widget-edit.validator.js' => [
+		'Failed to update widget properties.' => _('Failed to update widget properties.')
 	],
 	'class.widget-field.multiselect.js' => [
 		'Dashboard' => _('Dashboard'),
@@ -475,6 +509,7 @@ $translate_strings = [
 		'Graphs' => _('Graphs'),
 		'History' => _('History'),
 		'Host' => _('Host'),
+		'Host Wizard' => _('Host Wizard'),
 		'Inventory' => _('Inventory'),
 		'Latest data' => _('Latest data'),
 		'Latest values' => _('Latest values'),
@@ -513,11 +548,6 @@ $translate_strings = [
 		'No interface found' => _('No interface found'),
 		'Item type does not use interface' => _('Item type does not use interface')
 	],
-	'colorpicker.js' => [
-		'D' => _x('D', 'Default color option'),
-		'S_CLOSE' => _('Close'),
-		'Use default' => _('Use default')
-	],
 	'class.csvggraph.js' => [
 		'S_DISPLAYING_FOUND' => _('Displaying %1$s of %2$s found'),
 		'S_MINUTE_SHORT' => _x('m', 'minute short'),
@@ -551,6 +581,16 @@ $translate_strings = [
 	'class.navigationtree.js' => [
 		'Maintenance with data collection' => _('Maintenance with data collection'),
 		'Maintenance without data collection' => _('Maintenance without data collection')
+	],
+	'component.z-color-picker.js' => [
+		'Apply' => _('Apply'),
+		'Clear' => _('Clear'),
+		'D' => _x('D', 'Default color option'),
+		'No color' => _('No color'),
+		'Palette' => _('Palette'),
+		'Palette %1$d' => _('Palette %1$d'),
+		'Solid color' => _('Solid color'),
+		'Use default' => _('Use default')
 	]
 ];
 
@@ -561,12 +601,12 @@ if (empty($_GET['files'])) {
 		'jquery.js',
 		'jquery-ui.js',
 		'main.js',
-		'colorpicker.js',
 		'common.js',
 		'component.z-bar-gauge.js',
-		'component.z-vertical.js',
+		'component.z-color-picker.js',
 		'component.z-select.js',
 		'component.z-sparkline.js',
+		'component.z-vertical.js',
 		'class.event-hub.js',
 		'class.event-hub.event.js',
 		'class.base-component.js',

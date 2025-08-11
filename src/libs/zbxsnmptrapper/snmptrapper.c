@@ -21,7 +21,6 @@
 #include "zbxdb.h"
 #include "zbxdbhigh.h"
 #include "zbxstr.h"
-#include "zbxexpression.h"
 #include "zbxself.h"
 #include "zbxnix.h"
 #include "zbxlog.h"
@@ -33,6 +32,7 @@
 #include "zbxpreproc.h"
 #include "zbxcrypto.h"
 #include "zbxhash.h"
+#include "zbxexpr.h"
 
 static int	trap_fd = -1;
 static off_t	trap_lastsize;
@@ -69,7 +69,7 @@ static int	process_trap_for_interface(zbx_uint64_t interfaceid, char *trap, zbx_
 
 	zbx_vector_expression_create(&regexps);
 
-	um_handle = zbx_dc_open_user_macros();
+	um_handle = zbx_dc_open_user_macros_masked();
 
 	size_t			num = zbx_dc_config_get_snmp_items_by_interfaceid(interfaceid, &items);
 	zbx_uint64_t		*itemids = (zbx_uint64_t *)zbx_malloc(NULL, sizeof(zbx_uint64_t) * num);
@@ -83,8 +83,8 @@ static int	process_trap_for_interface(zbx_uint64_t interfaceid, char *trap, zbx_
 		errcodes[i] = FAIL;
 
 		items[i].key = zbx_strdup(items[i].key, items[i].key_orig);
-		if (SUCCEED != zbx_substitute_key_macros(&items[i].key, NULL, &items[i], NULL, NULL,
-				ZBX_MACRO_TYPE_ITEM_KEY, error, sizeof(error)))
+		if (SUCCEED != zbx_substitute_item_key_params(&items[i].key, error, sizeof(error),
+				zbx_item_key_subst_cb, um_handle, &items[i]))
 		{
 			SET_MSG_RESULT(&results[i], zbx_strdup(NULL, error));
 			errcodes[i] = NOTSUPPORTED;
@@ -165,16 +165,16 @@ next:
 				}
 
 				items[i].state = ITEM_STATE_NORMAL;
-				zbx_preprocess_item_value(items[i].itemid, items[i].host.hostid, items[i].value_type,
-						items[i].flags, &results[i], ts, items[i].state, NULL);
+				zbx_preprocess_item_value(items[i].itemid, items[i].value_type, items[i].flags,
+						items[i].preprocessing, &results[i], ts, items[i].state, NULL);
 
 				itemids[i] = items[i].itemid;
 				lastclocks[i] = ts->sec;
 				break;
 			case NOTSUPPORTED:
 				items[i].state = ITEM_STATE_NOTSUPPORTED;
-				zbx_preprocess_item_value(items[i].itemid, items[i].host.hostid, items[i].value_type,
-						items[i].flags, NULL, ts, items[i].state, results[i].msg);
+				zbx_preprocess_item_value(items[i].itemid, items[i].value_type, items[i].flags,
+						items[i].preprocessing, NULL, ts, items[i].state, results[i].msg);
 
 				itemids[i] = items[i].itemid;
 				lastclocks[i] = ts->sec;
