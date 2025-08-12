@@ -3900,7 +3900,7 @@ static int	dc_function_calculate_trends_nextcheck(time_t from, const char *perio
 	time_t		next = from;
 	struct tm	tm;
 
-	localtime_r(&next, &tm);
+	tm = *zbx_localtime(&next, NULL);
 
 	while (SUCCEED == zbx_trends_parse_nextcheck(next, period_shift, nextcheck, error))
 	{
@@ -3946,7 +3946,7 @@ static int	dc_function_calculate_nextcheck(const zbx_trigger_timer_t *timer, tim
 
 		if (ZBX_TIME_UNIT_HOUR == timer->trend_base)
 		{
-			localtime_r(&from, &tm);
+			tm = *zbx_localtime(&from, NULL);
 			zbx_tm_round_up(&tm, timer->trend_base);
 
 			if (-1 == (nextcheck = mktime(&tm)))

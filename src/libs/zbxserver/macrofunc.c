@@ -106,7 +106,7 @@ static int	macrofunc_fmttime(char **params, size_t nparam, char **out)
 		return FAIL;
 
 	time_new = time(&time_new);
-	localtime_r(&time_new, &local_time);
+	local_time = *zbx_localtime(&time_new, NULL);
 
 	if (2 == nparam)
 	{
