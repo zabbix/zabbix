@@ -8594,6 +8594,12 @@ size_t	zbx_maintenance_update_flags_num(void)
 			/ (sizeof(uint64_t) * 8));
 }
 
+static void	config_unlock_shmem_on_oom(void)
+{
+	if (1 == zbx_get_sync_in_progress())
+		FINISH_SYNC;
+}
+
 /******************************************************************************
  *                                                                            *
  * Purpose: Allocate shared memory for configuration cache                    *
@@ -8620,6 +8626,8 @@ int	zbx_init_configuration_cache(zbx_get_program_type_f get_program_type, zbx_ge
 	{
 		goto out;
 	}
+
+	config_mem->unlock_shmem_on_oom = config_unlock_shmem_on_oom;
 
 	config = (zbx_dc_config_t *)__config_shmem_malloc_func(NULL, sizeof(zbx_dc_config_t) +
 			(size_t)get_config_forks_cb(ZBX_PROCESS_TYPE_TIMER) * sizeof(zbx_vector_ptr_t));
