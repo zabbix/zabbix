@@ -2044,7 +2044,7 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 		{
 			if (SUCCEED == zbx_child_cleanup(pid, zbx_threads, zbx_threads_num))
 			{
-				zbx_set_exiting_with_succeed();
+				zbx_set_exiting_with_fail();
 				break;
 			}
 		}
