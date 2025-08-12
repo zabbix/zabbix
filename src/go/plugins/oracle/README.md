@@ -214,7 +214,7 @@ Common parameters for all keys are: [ConnString][User][Password][Service] where 
 
  See the chapter [Using TNS Names](#using-tns-names) for the details about how the plugin resolves TNS names.
 
-The parameter User can contain sysdba, sysoper, sysasm privileges. It must be used with `as` as a separator
+The parameter User can contain sysdba, sysoper, sysasm, sysbackup, sysdg, syskm, sysrac privileges. It must be used with `as` as a separator
 e.g `user as sysdba`, privilege can be upper or lowercase, and must be at the end of the username string.
 If you use `ConnString` as a session name, you can skip the rest of the connection parameters.
 
@@ -413,8 +413,8 @@ WHERE
     oracle.custom.query[<commonParams>,payment,"John Doe",1,"10/25/2020"]
 
 ### Developer Section
-Golang tests also include integration tests that require a connection to Oracle server using the default port ```1521```. For other Oracle connection configuration, see the testConfig type in the file oracle_export_integration_test.go.
-To run integration tests, use tag ```-tags integration_tests```. Some negative subtests run long. To skip them, use ```-test.short``` argument: ```go test -test.short```   
+Golang tests also include integration tests that run when Oracle server is started and available. The default port ```1521``` should be configured for Oracle Server. Other Oracle connection configuration, see in the type testConfig in the file oracle_export_integration_test.go.
+To run integration tests, use tag ```-tags integration_tests```. Some negative subtests run long. To skip them, use ```-test.short``` argument: ```go test -test.short``` <pckg>
 
 
 ### Notes
