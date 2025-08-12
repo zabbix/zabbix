@@ -25,8 +25,8 @@ import (
 	"golang.zabbix.com/sdk/uri"
 )
 
-//nolint:gocyclo,cyclop,gocognit //this is unit test and complexity rises from the possible test cases
-func TestGetTLSConfig(t *testing.T) {
+//nolint:gocyclo,cyclop //this is unit test and complexity rises from the possible test cases
+func Test_getTLSConfig(t *testing.T) {
 	t.Parallel()
 
 	// Mocking the URI for consistent test inputs.
@@ -43,7 +43,7 @@ func TestGetTLSConfig(t *testing.T) {
 		validateFunc  func(t *testing.T, cfg *tls.Config, host string)
 	}{
 		{
-			name:   "TLS connection type is required",
+			name:   "required",
 			params: map[string]string{string(comms.TLSConnect): string(tlsconfig.Required)},
 			validateFunc: func(t *testing.T, cfg *tls.Config, host string) {
 				t.Helper()
@@ -53,7 +53,7 @@ func TestGetTLSConfig(t *testing.T) {
 			},
 		},
 		{
-			name:   "TLS connection type is verify_ca",
+			name:   "verify_ca",
 			params: map[string]string{string(comms.TLSConnect): string(tlsconfig.VerifyCA)},
 			validateFunc: func(t *testing.T, cfg *tls.Config, host string) {
 				t.Helper()
@@ -69,7 +69,7 @@ func TestGetTLSConfig(t *testing.T) {
 			},
 		},
 		{
-			name:   "TLS connection type is verify_full",
+			name:   "verify_full",
 			params: map[string]string{string(comms.TLSConnect): string(tlsconfig.VerifyFull)},
 			validateFunc: func(t *testing.T, cfg *tls.Config, host string) {
 				t.Helper()
@@ -79,17 +79,17 @@ func TestGetTLSConfig(t *testing.T) {
 			},
 		},
 		{
-			name:          "+tls connection type is disabled",
+			name:          "+disabled",
 			params:        map[string]string{string(comms.TLSConnect): string(tlsconfig.Disabled)},
 			expectedError: nil,
 		},
 		{
-			name:          "-invalid TLS connection type",
+			name:          "-invalid",
 			params:        map[string]string{string(comms.TLSConnect): "invalid_type"},
 			expectedError: errs.New("Invalid TLS connection type: invalid_type connection type is invalid."),
 		},
 		{
-			name:   "-unsupported but valid TLS connection type",
+			name:   "-unsupportedButValid",
 			params: map[string]string{string(comms.TLSConnect): "some_future_unsupported_type"},
 			expectedError: errs.New("Invalid TLS connection type: " +
 				"some_future_unsupported_type connection type is invalid."),

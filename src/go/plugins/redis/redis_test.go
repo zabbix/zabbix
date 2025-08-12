@@ -52,14 +52,14 @@ func TestPlugin_Export(t *testing.T) {
 		wantErr    bool
 	}{
 		{
-			name:       "Too many parameters",
+			name:       "-tooManyParameters",
 			p:          &impl,
 			args:       args{keyPing, []string{"localhost", "sEcReT", "param1", "param2"}, nil},
 			wantResult: nil,
 			wantErr:    true,
 		},
 		{
-			name:       "Must fail if server is not working",
+			name:       "-noServer",
 			p:          &impl,
 			args:       args{keySlowlog, []string{"tcp://127.0.0.1:1"}, nil},
 			wantResult: nil,
