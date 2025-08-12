@@ -52,6 +52,7 @@ zabbix_export:
             function getHttpData(url) {
             	var startTime = new Date().getTime();
             	var maxWait = 1 * 60 * 60 * 1000;
+            	var waitFor = 1000;
             	
             	while (true) {
             		response = request.get(url);
@@ -71,17 +72,28 @@ zabbix_export:
             		if (status === 429 && response && response.errors && Array.isArray(response.errors) &&
             			response.errors.indexOf("API rate limit exceeded for organization") !== -1) {
             			var now = new Date().getTime();
-            			if (now - startTime + 1000 > maxWait) {
+            			var headers = request.getHeaders(false);
+            
+            			if ('Retry-After' in headers) {
+            				var retryAfter = headers['Retry-After'];
+            				Zabbix.log(4, '[ Meraki API ] API rate limit exceeded. Retrying after ' + retryAfter + ' seconds.');				 
+            				waitFor = parseInt(retryAfter) * 1000;
+            			}
+            			else {
+            				Zabbix.log(4, '[ Meraki API ] API rate limit exceeded. No Retry-After header. Retrying after 1 second.');
+            			}
+            			if (now - startTime + waitFor > maxWait) {
             				throw 'Failed to receive data: API rate limit exceeded and retry timeout reached.';
             			}
-            			Zabbix.sleep(1000);
+            			Zabbix.sleep(waitFor);
             			continue;
             		}
             	
             		if (status !== 200) {
             			if (response.errors) {
             				throw response.errors.join(', ');
-            			} else {
+            			}
+            			else {
             				throw 'Failed to receive data: invalid response status code.';
             			}
             		}
@@ -438,50 +450,62 @@ zabbix_export:
             	response = [],
             	timespan;
             
-            function getHttpData(url) {
-            	var startTime = new Date().getTime();
-            	var maxWait = parseInt(timespan, 10) * 1000;
+            	function getHttpData(url) {
+            		var startTime = new Date().getTime();
+            		var maxWait = parseInt(timespan, 10) * 1000;
+            		var waitFor = 1000;
             	
-            	while (true) {
-            		response = request.get(url);
-            		Zabbix.log(4, '[ Meraki API ] [ ' + url + ' ] Received response with status code ' + request.getStatus() + ': ' + response);
+            		while (true) {
+            			response = request.get(url);
+            			Zabbix.log(4, '[ Meraki API ] [ ' + url + ' ] Received response with status code ' + request.getStatus() + ': ' + response);
             	
-            		var status = request.getStatus();
+            			var status = request.getStatus();
             	
-            		if (response !== null) {
-            			try {
-            				response = JSON.parse(response);
+            			if (response !== null) {
+            				try {
+            					response = JSON.parse(response);
+            				}
+            				catch (error) {
+            					throw 'Failed to parse response received from Meraki API. Check debug log for more information.';
+            				}
             			}
-            			catch (error) {
-            				throw 'Failed to parse response received from Meraki API. Check debug log for more information.';
+            	
+            			if (status === 429 && response && response.errors && Array.isArray(response.errors) &&
+            				response.errors.indexOf("API rate limit exceeded for organization") !== -1) {
+            				var now = new Date().getTime();
+            				var headers = request.getHeaders(false);
+            	
+            				if ('Retry-After' in headers) {
+            					var retryAfter = headers['Retry-After'];
+            					Zabbix.log(4, '[ Meraki API ] API rate limit exceeded. Retrying after ' + retryAfter + ' seconds.');				 
+            					waitFor = parseInt(retryAfter) * 1000;
+            				}
+            				else {
+            					Zabbix.log(4, '[ Meraki API ] API rate limit exceeded. No Retry-After header. Retrying after 1 second.');
+            				}
+            				if (now - startTime + waitFor > maxWait) {
+            					throw 'Failed to receive data: API rate limit exceeded and retry timeout reached.';
+            				}
+            				Zabbix.sleep(waitFor);
+            				continue;
             			}
-            		}
             	
-            		if (status === 429 && response && response.errors && Array.isArray(response.errors) &&
-            			response.errors.indexOf("API rate limit exceeded for organization") !== -1) {
-            			var now = new Date().getTime();
-            			if (now - startTime + 1000 > maxWait) {
-            				throw 'Failed to receive data: API rate limit exceeded and retry timeout reached.';
+            			if (status !== 200) {
+            				if (response.errors) {
+            					throw response.errors.join(', ');
+            				}
+            				else {
+            					throw 'Failed to receive data: invalid response status code.';
+            				}
             			}
-            			Zabbix.sleep(1000);
-            			continue;
-            		}
             	
-            		if (status !== 200) {
-            			if (response.errors) {
-            				throw response.errors.join(', ');
-            			} else {
-            				throw 'Failed to receive data: invalid response status code.';
+            			if (typeof (response) !== 'object' || response === null) {
+            				throw 'Cannot process response data: received data is not an object.';
             			}
-            		}
             	
-            		if (typeof (response) !== 'object' || response === null) {
-            			throw 'Cannot process response data: received data is not an object.';
+            			return response;
             		}
-            	
-            		return response;
-            	}
-            };
+            	};
             
             try {
             
@@ -739,6 +763,7 @@ zabbix_export:
             - type: JSONPATH
               parameters:
                 - $.data.status
+              error_handler: DISCARD_VALUE
             - type: JAVASCRIPT
               parameters:
                 - |
@@ -802,6 +827,7 @@ zabbix_export:
             function getHttpData(url) {
             	var startTime = new Date().getTime();
             	var maxWait = (parseInt(timespan, 10) - 10) * 1000;
+            	var waitFor = 1000;
             
             	while (true) {
             		response = request.get(url);
@@ -821,17 +847,28 @@ zabbix_export:
             		if (status === 429 && response && response.errors && Array.isArray(response.errors) &&
             			response.errors.indexOf("API rate limit exceeded for organization") !== -1) {
             			var now = new Date().getTime();
-            			if (now - startTime + 1000 > maxWait) {
+            			var headers = request.getHeaders(false);
+            
+            			if ('Retry-After' in headers) {
+            				var retryAfter = headers['Retry-After'];
+            				Zabbix.log(4, '[ Meraki API ] API rate limit exceeded. Retrying after ' + retryAfter + ' seconds.');				 
+            				waitFor = parseInt(retryAfter) * 1000;
+            			}
+            			else {
+            				Zabbix.log(4, '[ Meraki API ] API rate limit exceeded. No Retry-After header. Retrying after 1 second.');
+            			}
+            			if (now - startTime + waitFor > maxWait) {
             				throw 'Failed to receive data: API rate limit exceeded and retry timeout reached.';
             			}
-            			Zabbix.sleep(1 * 1000);
+            			Zabbix.sleep(waitFor);
             			continue;
             		}
             
             		if (status !== 200) {
             			if (response.errors) {
             				throw response.errors.join(', ');
-            			} else {
+            			}
+            			else {
             				throw 'Failed to receive data: invalid response status code.';
             			}
             		}
@@ -970,50 +1007,62 @@ zabbix_export:
             	deviceInfo = [],
             	timespan;
             
-            function getHttpData(url) {
-            	var startTime = new Date().getTime();
-            	var maxWait = parseInt(timespan, 10) * 1000;
+            	function getHttpData(url) {
+            		var startTime = new Date().getTime();
+            		var maxWait = parseInt(timespan, 10) * 1000;
+            		var waitFor = 1000;
             	
-            	while (true) {
-            		response = request.get(url);
-            		Zabbix.log(4, '[ Meraki API ] [ ' + url + ' ] Received response with status code ' + request.getStatus() + ': ' + response);
+            		while (true) {
+            			response = request.get(url);
+            			Zabbix.log(4, '[ Meraki API ] [ ' + url + ' ] Received response with status code ' + request.getStatus() + ': ' + response);
             	
-            		var status = request.getStatus();
+            			var status = request.getStatus();
             	
-            		if (response !== null) {
-            			try {
-            				response = JSON.parse(response);
+            			if (response !== null) {
+            				try {
+            					response = JSON.parse(response);
+            				}
+            				catch (error) {
+            					throw 'Failed to parse response received from Meraki API. Check debug log for more information.';
+            				}
             			}
-            			catch (error) {
-            				throw 'Failed to parse response received from Meraki API. Check debug log for more information.';
+            	
+            			if (status === 429 && response && response.errors && Array.isArray(response.errors) &&
+            				response.errors.indexOf("API rate limit exceeded for organization") !== -1) {
+            				var now = new Date().getTime();
+            				var headers = request.getHeaders(false);
+            	
+            				if ('Retry-After' in headers) {
+            					var retryAfter = headers['Retry-After'];
+            					Zabbix.log(4, '[ Meraki API ] API rate limit exceeded. Retrying after ' + retryAfter + ' seconds.');				 
+            					waitFor = parseInt(retryAfter) * 1000;
+            				}
+            				else {
+            					Zabbix.log(4, '[ Meraki API ] API rate limit exceeded. No Retry-After header. Retrying after 1 second.');
+            				}
+            				if (now - startTime + waitFor > maxWait) {
+            					throw 'Failed to receive data: API rate limit exceeded and retry timeout reached.';
+            				}
+            				Zabbix.sleep(waitFor);
+            				continue;
             			}
-            		}
             	
-            		if (status === 429 && response && response.errors && Array.isArray(response.errors) &&
-            			response.errors.indexOf("API rate limit exceeded for organization") !== -1) {
-            			var now = new Date().getTime();
-            			if (now - startTime + 1000 > maxWait) {
-            				throw 'Failed to receive data: API rate limit exceeded and retry timeout reached.';
+            			if (status !== 200) {
+            				if (response.errors) {
+            					throw response.errors.join(', ');
+            				}
+            				else {
+            					throw 'Failed to receive data: invalid response status code.';
+            				}
             			}
-            			Zabbix.sleep(1000);
-            			continue;
-            		}
             	
-            		if (status !== 200) {
-            			if (response.errors) {
-            				throw response.errors.join(', ');
-            			} else {
-            				throw 'Failed to receive data: invalid response status code.';
+            			if (typeof (response) !== 'object' || response === null) {
+            				throw 'Cannot process response data: received data is not an object.';
             			}
-            		}
             	
-            		if (typeof (response) !== 'object' || response === null) {
-            			throw 'Cannot process response data: received data is not an object.';
+            			return response;
             		}
-            	
-            		return response;
-            	}
-            };
+            	};
             
             try {
             
@@ -1550,13 +1599,14 @@ zabbix_export:
             function getHttpData(url) {
             	var startTime = new Date().getTime();
             	var maxWait = parseInt(timespan, 10) * 1000;
-            	
+            	var waitFor = 1000;
+            
             	while (true) {
             		response = request.get(url);
             		Zabbix.log(4, '[ Meraki API ] [ ' + url + ' ] Received response with status code ' + request.getStatus() + ': ' + response);
-            	
+            
             		var status = request.getStatus();
-            	
+            
             		if (response !== null) {
             			try {
             				response = JSON.parse(response);
@@ -1565,29 +1615,40 @@ zabbix_export:
             				throw 'Failed to parse response received from Meraki API. Check debug log for more information.';
             			}
             		}
-            	
+            
             		if (status === 429 && response && response.errors && Array.isArray(response.errors) &&
             			response.errors.indexOf("API rate limit exceeded for organization") !== -1) {
             			var now = new Date().getTime();
-            			if (now - startTime + 1000 > maxWait) {
+            			var headers = request.getHeaders(false);
+            
+            			if ('Retry-After' in headers) {
+            				var retryAfter = headers['Retry-After'];
+            				Zabbix.log(4, '[ Meraki API ] API rate limit exceeded. Retrying after ' + retryAfter + ' seconds.');				 
+            				waitFor = parseInt(retryAfter) * 1000;
+            			}
+            			else {
+            				Zabbix.log(4, '[ Meraki API ] API rate limit exceeded. No Retry-After header. Retrying after 1 second.');
+            			}
+            			if (now - startTime + waitFor > maxWait) {
             				throw 'Failed to receive data: API rate limit exceeded and retry timeout reached.';
             			}
-            			Zabbix.sleep(1000);
+            			Zabbix.sleep(waitFor);
             			continue;
             		}
-            	
+            
             		if (status !== 200) {
             			if (response.errors) {
             				throw response.errors.join(', ');
-            			} else {
+            			}
+            			else {
             				throw 'Failed to receive data: invalid response status code.';
             			}
             		}
-            	
+            
             		if (typeof (response) !== 'object' || response === null) {
             			throw 'Cannot process response data: received data is not an object.';
             		}
-            	
+            
             		return response;
             	}
             };
@@ -1695,6 +1756,7 @@ zabbix_export:
             function getHttpData(url) {
             	var startTime = new Date().getTime();
             	var maxWait = 1 * 60 * 60 * 1000;
+            	var waitFor = 1000;
             	
             	while (true) {
             		response = request.get(url);
@@ -1714,17 +1776,28 @@ zabbix_export:
             		if (status === 429 && response && response.errors && Array.isArray(response.errors) &&
             			response.errors.indexOf("API rate limit exceeded for organization") !== -1) {
             			var now = new Date().getTime();
-            			if (now - startTime + 1000 > maxWait) {
+            			var headers = request.getHeaders(false);
+            
+            			if ('Retry-After' in headers) {
+            				var retryAfter = headers['Retry-After'];
+            				Zabbix.log(4, '[ Meraki API ] API rate limit exceeded. Retrying after ' + retryAfter + ' seconds.');				 
+            				waitFor = parseInt(retryAfter) * 1000;
+            			}
+            			else {
+            				Zabbix.log(4, '[ Meraki API ] API rate limit exceeded. No Retry-After header. Retrying after 1 second.');
+            			}
+            			if (now - startTime + waitFor > maxWait) {
             				throw 'Failed to receive data: API rate limit exceeded and retry timeout reached.';
             			}
-            			Zabbix.sleep(1000);
+            			Zabbix.sleep(waitFor);
             			continue;
             		}
             	
             		if (status !== 200) {
             			if (response.errors) {
             				throw response.errors.join(', ');
-            			} else {
+            			}
+            			else {
             				throw 'Failed to receive data: invalid response status code.';
             			}
             		}
@@ -1853,6 +1926,7 @@ zabbix_export:
             function getHttpData(url) {
             	var startTime = new Date().getTime();
             	var maxWait = 1 * 60 * 60 * 1000;
+            	var waitFor = 1000;
             	
             	while (true) {
             		response = request.get(url);
@@ -1872,17 +1946,28 @@ zabbix_export:
             		if (status === 429 && response && response.errors && Array.isArray(response.errors) &&
             			response.errors.indexOf("API rate limit exceeded for organization") !== -1) {
             			var now = new Date().getTime();
-            			if (now - startTime + 1000 > maxWait) {
+            			var headers = request.getHeaders(false);
+            
+            			if ('Retry-After' in headers) {
+            				var retryAfter = headers['Retry-After'];
+            				Zabbix.log(4, '[ Meraki API ] API rate limit exceeded. Retrying after ' + retryAfter + ' seconds.');				 
+            				waitFor = parseInt(retryAfter) * 1000;
+            			}
+            			else {
+            				Zabbix.log(4, '[ Meraki API ] API rate limit exceeded. No Retry-After header. Retrying after 1 second.');
+            			}
+            			if (now - startTime + waitFor > maxWait) {
             				throw 'Failed to receive data: API rate limit exceeded and retry timeout reached.';
             			}
-            			Zabbix.sleep(1000);
+            			Zabbix.sleep(waitFor);
             			continue;
             		}
             	
             		if (status !== 200) {
             			if (response.errors) {
             				throw response.errors.join(', ');
-            			} else {
+            			}
+            			else {
             				throw 'Failed to receive data: invalid response status code.';
             			}
             		}
@@ -1979,50 +2064,62 @@ zabbix_export:
             	networks = [],
             	uplinks = [];
             
-            	function getHttpData(url) {
-            		var startTime = new Date().getTime();
-            		var maxWait = 1 * 60 * 1000;
+            function getHttpData(url) {
+            	var startTime = new Date().getTime();
+            	var maxWait = 1 * 60 * 1000;
+            	var waitFor = 1000;
             		
-            		while (true) {
-            			response = request.get(url);
-            			Zabbix.log(4, '[ Meraki API ] [ ' + url + ' ] Received response with status code ' + request.getStatus() + ': ' + response);
+            	while (true) {
+            		response = request.get(url);
+            		Zabbix.log(4, '[ Meraki API ] [ ' + url + ' ] Received response with status code ' + request.getStatus() + ': ' + response);
             		
-            			var status = request.getStatus();
+            		var status = request.getStatus();
             		
-            			if (response !== null) {
-            				try {
-            					response = JSON.parse(response);
-            				}
-            				catch (error) {
-            					throw 'Failed to parse response received from Meraki API. Check debug log for more information.';
-            				}
+            		if (response !== null) {
+            			try {
+            				response = JSON.parse(response);
             			}
-            		
-            			if (status === 429 && response && response.errors && Array.isArray(response.errors) &&
-            				response.errors.indexOf("API rate limit exceeded for organization") !== -1) {
-            				var now = new Date().getTime();
-            				if (now - startTime + 1000 > maxWait) {
-            					throw 'Failed to receive data: API rate limit exceeded and retry timeout reached.';
-            				}
-            				Zabbix.sleep(1000);
-            				continue;
+            			catch (error) {
+            				throw 'Failed to parse response received from Meraki API. Check debug log for more information.';
             			}
-            		
-            			if (status !== 200) {
-            				if (response.errors) {
-            					throw response.errors.join(', ');
-            				} else {
-            					throw 'Failed to receive data: invalid response status code.';
-            				}
-            			}
-            		
-            			if (typeof (response) !== 'object' || response === null) {
-            				throw 'Cannot process response data: received data is not an object.';
-            			}
-            		
-            			return response;
             		}
-            	};
+            		
+            		if (status === 429 && response && response.errors && Array.isArray(response.errors) &&
+            			response.errors.indexOf("API rate limit exceeded for organization") !== -1) {
+            			var now = new Date().getTime();
+            			var headers = request.getHeaders(false);
+            
+            			if ('Retry-After' in headers) {
+            				var retryAfter = headers['Retry-After'];
+            				Zabbix.log(4, '[ Meraki API ] API rate limit exceeded. Retrying after ' + retryAfter + ' seconds.');				 
+            				waitFor = parseInt(retryAfter) * 1000;
+            			}
+            			else {
+            				Zabbix.log(4, '[ Meraki API ] API rate limit exceeded. No Retry-After header. Retrying after 1 second.');
+            			}
+            			if (now - startTime + waitFor > maxWait) {
+            				throw 'Failed to receive data: API rate limit exceeded and retry timeout reached.';
+            			}
+            			Zabbix.sleep(waitFor);
+            			continue;
+            		}
+            		
+            		if (status !== 200) {
+            			if (response.errors) {
+            				throw response.errors.join(', ');
+            			}
+            			else {
+            				throw 'Failed to receive data: invalid response status code.';
+            			}
+            		}
+            		
+            		if (typeof (response) !== 'object' || response === null) {
+            			throw 'Cannot process response data: received data is not an object.';
+            		}
+            		
+            		return response;
+            	}
+            };
             
             try {
             
@@ -2137,6 +2234,7 @@ zabbix_export:
             - type: JSONPATH
               parameters:
                 - $.samlSSO.enabled
+              error_handler: DISCARD_VALUE
             - type: BOOL_TO_DECIMAL
               parameters:
                 - ''
@@ -2182,13 +2280,14 @@ zabbix_export:
             function getHttpData(url) {
             	var startTime = new Date().getTime();
             	var maxWait = parseInt(timespan, 10) * 1000;
-            	
+            	var waitFor = 1000;
+            
             	while (true) {
             		response = request.get(url);
             		Zabbix.log(4, '[ Meraki API ] [ ' + url + ' ] Received response with status code ' + request.getStatus() + ': ' + response);
-            	
+            
             		var status = request.getStatus();
-            	
+            
             		if (response !== null) {
             			try {
             				response = JSON.parse(response);
@@ -2197,29 +2296,40 @@ zabbix_export:
             				throw 'Failed to parse response received from Meraki API. Check debug log for more information.';
             			}
             		}
-            	
+            
             		if (status === 429 && response && response.errors && Array.isArray(response.errors) &&
             			response.errors.indexOf("API rate limit exceeded for organization") !== -1) {
             			var now = new Date().getTime();
-            			if (now - startTime + 1000 > maxWait) {
+            			var headers = request.getHeaders(false);
+            
+            			if ('Retry-After' in headers) {
+            				var retryAfter = headers['Retry-After'];
+            				Zabbix.log(4, '[ Meraki API ] API rate limit exceeded. Retrying after ' + retryAfter + ' seconds.');				 
+            				waitFor = parseInt(retryAfter) * 1000;
+            			}
+            			else {
+            				Zabbix.log(4, '[ Meraki API ] API rate limit exceeded. No Retry-After header. Retrying after 1 second.');
+            			}
+            			if (now - startTime + waitFor > maxWait) {
             				throw 'Failed to receive data: API rate limit exceeded and retry timeout reached.';
             			}
-            			Zabbix.sleep(1000);
+            			Zabbix.sleep(waitFor);
             			continue;
             		}
-            	
+            
             		if (status !== 200) {
             			if (response.errors) {
             				throw response.errors.join(', ');
-            			} else {
+            			}
+            			else {
             				throw 'Failed to receive data: invalid response status code.';
             			}
             		}
-            	
+            
             		if (typeof (response) !== 'object' || response === null) {
             			throw 'Cannot process response data: received data is not an object.';
             		}
-            	
+            
             		return response;
             	}
             };
@@ -2346,6 +2456,7 @@ zabbix_export:
             - type: JSONPATH
               parameters:
                 - $.loginSecurity.idleTimeoutMinutes
+              error_handler: DISCARD_VALUE
             - type: NOT_MATCHES_REGEX
               parameters:
                 - ^null$
@@ -2369,6 +2480,7 @@ zabbix_export:
             - type: JSONPATH
               parameters:
                 - $.licenseStates.expirationDate
+              error_handler: DISCARD_VALUE
             - type: JAVASCRIPT
               parameters:
                 - |
@@ -2413,6 +2525,7 @@ zabbix_export:
             - type: JSONPATH
               parameters:
                 - $.licenseStates.status
+              error_handler: DISCARD_VALUE
             - type: JAVASCRIPT
               parameters:
                 - |
@@ -2449,6 +2562,7 @@ zabbix_export:
             - type: JSONPATH
               parameters:
                 - $.loginSecurity.enforceAccountLockout
+              error_handler: DISCARD_VALUE
             - type: BOOL_TO_DECIMAL
               parameters:
                 - ''
@@ -2469,6 +2583,7 @@ zabbix_export:
             - type: JSONPATH
               parameters:
                 - $.loginSecurity.enforceDifferentPasswords
+              error_handler: DISCARD_VALUE
             - type: BOOL_TO_DECIMAL
               parameters:
                 - ''
@@ -2489,6 +2604,7 @@ zabbix_export:
             - type: JSONPATH
               parameters:
                 - $.loginSecurity.enforceIdleTimeout
+              error_handler: DISCARD_VALUE
             - type: BOOL_TO_DECIMAL
               parameters:
                 - ''
@@ -2509,6 +2625,7 @@ zabbix_export:
             - type: JSONPATH
               parameters:
                 - $.loginSecurity.enforceLoginIpRanges
+              error_handler: DISCARD_VALUE
             - type: BOOL_TO_DECIMAL
               parameters:
                 - ''
@@ -2529,6 +2646,7 @@ zabbix_export:
             - type: JSONPATH
               parameters:
                 - $.loginSecurity.enforcePasswordExpiration
+              error_handler: DISCARD_VALUE
             - type: BOOL_TO_DECIMAL
               parameters:
                 - ''
@@ -2549,6 +2667,7 @@ zabbix_export:
             - type: JSONPATH
               parameters:
                 - $.loginSecurity.enforceTwoFactorAuth
+              error_handler: DISCARD_VALUE
             - type: BOOL_TO_DECIMAL
               parameters:
                 - ''
@@ -2567,6 +2686,7 @@ zabbix_export:
             - type: JSONPATH
               parameters:
                 - $.loginSecurity.numDifferentPasswords
+              error_handler: DISCARD_VALUE
             - type: NOT_MATCHES_REGEX
               parameters:
                 - ^null$
@@ -2586,6 +2706,7 @@ zabbix_export:
             - type: JSONPATH
               parameters:
                 - $.loginSecurity.passwordExpirationDays
+              error_handler: DISCARD_VALUE
             - type: NOT_MATCHES_REGEX
               parameters:
                 - ^null$
@@ -2605,6 +2726,7 @@ zabbix_export:
             - type: JSONPATH
               parameters:
                 - $.data.counts.policies
+              error_handler: DISCARD_VALUE
           master_item:
             key: meraki.get.adaptive.policy
           tags:
@@ -2620,6 +2742,7 @@ zabbix_export:
             - type: JSONPATH
               parameters:
                 - $.data.counts.allowPolicies
+              error_handler: DISCARD_VALUE
           master_item:
             key: meraki.get.adaptive.policy
           tags:
@@ -2635,6 +2758,7 @@ zabbix_export:
             - type: JSONPATH
               parameters:
                 - $.data.counts.customAcls
+              error_handler: DISCARD_VALUE
           master_item:
             key: meraki.get.adaptive.policy
           tags:
@@ -2650,6 +2774,7 @@ zabbix_export:
             - type: JSONPATH
               parameters:
                 - $.data.counts.denyPolicies
+              error_handler: DISCARD_VALUE
           master_item:
             key: meraki.get.adaptive.policy
           tags:
@@ -2665,6 +2790,7 @@ zabbix_export:
             - type: JSONPATH
               parameters:
                 - $.data.counts.groups
+              error_handler: DISCARD_VALUE
           master_item:
             key: meraki.get.adaptive.policy
           tags:
