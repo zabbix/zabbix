@@ -24,7 +24,7 @@ import (
 	"golang.zabbix.com/sdk/plugin/comms"
 )
 
-func TestPingHandler(t *testing.T) {
+func Test_PingHandler(t *testing.T) {
 	t.Parallel()
 
 	stubConn := radix.Stub("", "", func(args []string) any {

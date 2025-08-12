@@ -30,7 +30,12 @@ func TestGetTLSDetails(t *testing.T) {
 	// Mock URL for testing.
 	testURL, _ := uri.New("https://zabbix.com:10051", nil)
 
-	allowedConnections := map[string]bool{disable: true, require: true, verifyCa: true, verifyFull: true}
+	allowedConnections := map[string]bool{
+		string(tlsconfig.Disabled):   true,
+		string(tlsconfig.Required):   true,
+		string(tlsconfig.VerifyCA):   true,
+		string(tlsconfig.VerifyFull): true,
+	}
 
 	// Define test cases.
 	tests := []struct {
@@ -44,11 +49,11 @@ func TestGetTLSDetails(t *testing.T) {
 			name: "+tlsConnect disable",
 			ck: connKey{
 				rawUri:     "zabbix.com",
-				uri:        testURL,
-				tlsConnect: disable,
+				uri:        *testURL,
+				tlsConnect: string(tlsconfig.Disabled),
 			},
 			wantDetails: &tlsconfig.Details{
-				TLSConnect:         disable,
+				TLSConnect:         tlsconfig.Disabled,
 				RawURI:             "zabbix.com",
 				AllowedConnections: allowedConnections,
 			},
@@ -58,13 +63,13 @@ func TestGetTLSDetails(t *testing.T) {
 			name: "+tlsConnect require with client certs",
 			ck: connKey{
 				rawUri:     "zabbix.com",
-				uri:        testURL,
+				uri:        *testURL,
 				tlsCert:    "client.crt",
 				tlsKey:     "client.key",
-				tlsConnect: require,
+				tlsConnect: string(tlsconfig.Required),
 			},
 			wantDetails: &tlsconfig.Details{
-				TLSConnect:         require,
+				TLSConnect:         tlsconfig.Required,
 				RawURI:             "zabbix.com",
 				TLSCertFile:        "client.crt",
 				TLSKeyFile:         "client.key",
@@ -76,14 +81,13 @@ func TestGetTLSDetails(t *testing.T) {
 			name: "+tlsConnect verifyCa",
 			ck: connKey{
 				rawUri:     "zabbix.com",
-				uri:        testURL,
+				uri:        *testURL,
 				tlsCA:      "ca.pem",
-				tlsConnect: verifyCa,
+				tlsConnect: string(tlsconfig.VerifyCA),
 			},
 			wantDetails: &tlsconfig.Details{
-				TLSConnect:         verifyCa,
+				TLSConnect:         tlsconfig.VerifyCA,
 				RawURI:             "zabbix.com",
-				TLSServerName:      "zabbix.com",
 				TLSCaFile:          "ca.pem",
 				AllowedConnections: allowedConnections,
 			},
@@ -93,16 +97,15 @@ func TestGetTLSDetails(t *testing.T) {
 			name: "+tlsConnect verifyFull",
 			ck: connKey{
 				rawUri:     "zabbix.com",
-				uri:        testURL,
+				uri:        *testURL,
 				tlsCA:      "ca.pem",
 				tlsCert:    "client.crt",
 				tlsKey:     "client.key",
-				tlsConnect: verifyFull,
+				tlsConnect: string(tlsconfig.VerifyFull),
 			},
 			wantDetails: &tlsconfig.Details{
-				TLSConnect:         verifyFull,
+				TLSConnect:         tlsconfig.VerifyFull,
 				RawURI:             "zabbix.com",
-				TLSServerName:      "zabbix.com",
 				TLSCaFile:          "ca.pem",
 				TLSCertFile:        "client.crt",
 				TLSKeyFile:         "client.key",
@@ -114,8 +117,8 @@ func TestGetTLSDetails(t *testing.T) {
 			name: "-validation fails",
 			ck: connKey{
 				rawUri:     "zabbix.com",
-				uri:        testURL,
-				tlsConnect: verifyFull,
+				uri:        *testURL,
+				tlsConnect: string(tlsconfig.VerifyFull),
 			},
 			wantErr:       true,
 			validationErr: errors.New("invalid TLS configuration"),

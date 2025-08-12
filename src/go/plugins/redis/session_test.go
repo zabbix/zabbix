@@ -32,7 +32,7 @@ func TestSession_getFieldValues(t *testing.T) {
 		want    map[comms.ConfigSetting]string
 	}{
 		{
-			name: "all fields populated",
+			name: "allFields",
 			session: session{
 				URI:         "redis://localhost:6379",
 				Password:    "secret",
@@ -53,7 +53,7 @@ func TestSession_getFieldValues(t *testing.T) {
 			},
 		},
 		{
-			name:    "empty session",
+			name:    "emptySession",
 			session: session{},
 			want: map[comms.ConfigSetting]string{
 				comms.URI:         "",
@@ -91,7 +91,7 @@ func TestSession_resolveTLSConnect(t *testing.T) {
 		errContains string
 	}{
 		{
-			name: "session TLS connect set to disabled",
+			name: "+sessionTLSDisabled",
 			session: session{
 				TLSConnect: string(tlsconfig.Disabled),
 			},
@@ -100,7 +100,7 @@ func TestSession_resolveTLSConnect(t *testing.T) {
 			wantErr:  false,
 		},
 		{
-			name: "session TLS connect set to required",
+			name: "+sessionTLSRequired",
 			session: session{
 				TLSConnect: string(tlsconfig.Required),
 			},
@@ -109,7 +109,7 @@ func TestSession_resolveTLSConnect(t *testing.T) {
 			wantErr:  false,
 		},
 		{
-			name:    "defaults TLS connect used when session empty",
+			name:    "+defaultsTLSFallback",
 			session: session{},
 			defaults: session{
 				TLSConnect: string(tlsconfig.Required),
@@ -118,14 +118,14 @@ func TestSession_resolveTLSConnect(t *testing.T) {
 			wantErr: false,
 		},
 		{
-			name:     "both empty defaults to disabled",
+			name:     "+defaultDisabled",
 			session:  session{},
 			defaults: session{},
 			want:     tlsconfig.Disabled,
 			wantErr:  false,
 		},
 		{
-			name: "invalid session TLS connect",
+			name: "-invalidSessionTLSConnect",
 			session: session{
 				TLSConnect: "invalid",
 			},
@@ -135,7 +135,7 @@ func TestSession_resolveTLSConnect(t *testing.T) {
 			errContains: "Session TLS connection type is invalid",
 		},
 		{
-			name:    "invalid default TLS connect",
+			name:    "-invalidTLSConnect",
 			session: session{},
 			defaults: session{
 				TLSConnect: "invalid",
@@ -179,7 +179,7 @@ func TestSession_resolveTLSConnect(t *testing.T) {
 	}
 }
 
-func TestValidateRequiredField(t *testing.T) {
+func Test_validateRequiredField(t *testing.T) {
 	t.Parallel()
 
 	tests := []struct {
@@ -191,28 +191,28 @@ func TestValidateRequiredField(t *testing.T) {
 		errContains  string
 	}{
 		{
-			name:         "value provided",
+			name:         "+valueProvided",
 			fieldName:    comms.URI,
 			value:        "redis://localhost:6379",
 			defaultValue: "",
 			wantErr:      false,
 		},
 		{
-			name:         "default value provided",
+			name:         "+defaultValueProvided",
 			fieldName:    comms.URI,
 			value:        "",
 			defaultValue: "redis://localhost:6379",
 			wantErr:      false,
 		},
 		{
-			name:         "both values provided",
+			name:         "+bothValuesProvided",
 			fieldName:    comms.URI,
 			value:        "redis://localhost:6379",
 			defaultValue: "redis://default:6379",
 			wantErr:      false,
 		},
 		{
-			name:         "both values empty",
+			name:         "-bothValuesEmpty",
 			fieldName:    comms.URI,
 			value:        "",
 			defaultValue: "",
@@ -248,7 +248,7 @@ func TestValidateRequiredField(t *testing.T) {
 	}
 }
 
-func TestValidateForbiddenField(t *testing.T) {
+func Test_validateForbiddenField(t *testing.T) {
 	t.Parallel()
 
 	tests := []struct {
@@ -259,13 +259,13 @@ func TestValidateForbiddenField(t *testing.T) {
 		errContains string
 	}{
 		{
-			name:      "empty value allowed",
+			name:      "+emptyValueAllowed",
 			fieldName: comms.TLSCAFile,
 			value:     "",
 			wantErr:   false,
 		},
 		{
-			name:        "non-empty value forbidden",
+			name:        "-nonEmptyValueForbidden",
 			fieldName:   comms.TLSCAFile,
 			value:       "/path/to/ca.pem",
 			wantErr:     true,
@@ -309,7 +309,7 @@ func TestSession_runSourceConsistencyValidation(t *testing.T) {
 		errContains string
 	}{
 		{
-			name: "all TLS fields set - valid",
+			name: "+allTLSFields",
 			session: session{
 				TLSCAFile:   "/path/to/ca.pem",
 				TLSCertFile: "/path/to/cert.pem",
@@ -318,12 +318,12 @@ func TestSession_runSourceConsistencyValidation(t *testing.T) {
 			wantErr: false,
 		},
 		{
-			name:    "all TLS fields empty - valid",
+			name:    "+allTLSFieldsEmpty",
 			session: session{},
 			wantErr: false,
 		},
 		{
-			name: "mixed TLS fields - invalid",
+			name: "-mixedTLSFields",
 			session: session{
 				TLSCAFile:   "/path/to/ca.pem",
 				TLSCertFile: "",
@@ -373,7 +373,7 @@ func TestSession_validateSession(t *testing.T) {
 		errContains string
 	}{
 		{
-			name: "valid session with TLS disabled",
+			name: "+validSessionWithTLSDisabled",
 			session: session{
 				URI:        "redis://localhost:6379",
 				TLSConnect: string(tlsconfig.Disabled),
@@ -383,7 +383,7 @@ func TestSession_validateSession(t *testing.T) {
 			wantErr:  false,
 		},
 		{
-			name: "valid session with TLS full",
+			name: "+validSessionWithTLSFull",
 			session: session{
 				URI:         "redis://localhost:6379",
 				Password:    "abc",
@@ -396,7 +396,7 @@ func TestSession_validateSession(t *testing.T) {
 			wantErr:  false,
 		},
 		{
-			name: "invalid TLS connect type",
+			name: "-invalidConnectType",
 			session: session{
 				URI:        "redis://localhost:6379",
 				Password:   "abc",
@@ -407,7 +407,7 @@ func TestSession_validateSession(t *testing.T) {
 			errContains: "connection type is invalid",
 		},
 		{
-			name: "inconsistent TLS fields",
+			name: "-inconsistentTLSFields",
 			session: session{
 				URI:        "redis://localhost:6379",
 				Password:   "abc",
@@ -422,7 +422,7 @@ func TestSession_validateSession(t *testing.T) {
 			errContains: "Source-consistency validation failed",
 		},
 		{
-			name: "missing CA certificate",
+			name: "-missingCACertificate",
 			session: session{
 				URI:        "redis://localhost:6379",
 				Password:   "abc",
