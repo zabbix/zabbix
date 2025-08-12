@@ -63,6 +63,28 @@ class CWidgetFieldDataSet extends CWidgetField {
 			]]);
 	}
 
+	public function getValue() {
+		$values = parent::getValue();
+
+		foreach ($values as &$value) {
+
+			if ($value['dataset_type'] != self::DATASET_TYPE_SINGLE_ITEM) {
+				continue;
+			}
+
+			foreach (array_keys($value['itemids']) as $i) {
+
+				if (!array_key_exists($i, $value['type'])) {
+					$value['type'][$i] = self::ITEM_TYPE_NORMAL;
+				}
+			}
+		}
+
+		unset($value);
+
+		return $values;
+	}
+
 	public function setValue($value): self {
 		$data_sets = [];
 
