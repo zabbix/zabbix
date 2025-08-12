@@ -7,6 +7,7 @@ A......PS. [ZBXNEXT-10056] updated maximum supported MariaDB version to 11.8 (Sa
 ........S. [ZBXNEXT-9905] updated maximum supported TimescaleDB version to 2.19 (mprihodko)
 
 Bug fixes:
+........S. [ZBX-26775] fixed crash on data processing from system.localtime item key (sboidenko)
 .......PS. [ZBX-26528] fixed improper handling of long or corrupted ODBC error messages (dgoloscapov)
 ........S. [ZBX-26591] fixed detection of read-only state in PostgreSQL replicated database (sboidenko)
 ........S. [ZBX-26486] fixed errors in Zabbix server log on second and subsequent server starts with TimescaleDB (mprihodko)
