@@ -283,7 +283,6 @@ static int	threads_kill_and_wait(ZBX_THREAD_HANDLE *threads, const int *threads_
 			nanosleep(&poll_delay, NULL);
 		}
 
-
 		while (0 < (pid = waitpid((pid_t)-1, &status, WNOHANG)))
 		{
 			if (SUCCEED != zbx_child_cleanup(pid, threads, threads_num))
