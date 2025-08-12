@@ -213,6 +213,12 @@ class TopHostsWidget {
 				'pages' => [[]]
 			],
 			[
+				'name' => 'Multiple   spaces   in dashboard name',
+				'display_period' => 30,
+				'auto_start' => 1,
+				'pages' => [[]]
+			],
+			[
 				'name' => 'top_host_delete',
 				'display_period' => 30,
 				'auto_start' => 1,
