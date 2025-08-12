@@ -9,6 +9,8 @@ A......PS. [ZBXNEXT-10056] updated maximum supported MariaDB version to 11.8 (Sa
 ........S. [ZBXNEXT-10122] updated maximum supported TimescaleDB version to 2.21 (mprihodko)
 
 Bug fixes:
+..F....... [ZBX-26649] prohibited showing the create Host groups/Template group form without super admin role (msnihach)
+........S. [ZBX-26775] fixed crash on data processing from system.localtime item key (sboidenko)
 .......PS. [ZBX-24799] fixed timeouts during active mode script execution on Zabbix agent 2 on action operation or manual action if script had no output; fixed timeout by allowing active agent to retrieve scripts in 60 seconds (vso)
 A......... [ZBX-25388] prevented displaying of parameter values not involved in import in the response of configuration.importcompare API method (aluchko)
 .......PS. [ZBX-25887] returned empty JSON array instead of error if input value for "SNMP walk to JSON" item preprocessing step is empty (MVekslers)
