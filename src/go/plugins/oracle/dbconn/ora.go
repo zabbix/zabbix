@@ -34,17 +34,6 @@ import (
 	"golang.zabbix.com/sdk/zbxerr"
 )
 
-var validAdminRoles = map[dsn.AdminRole]bool{
-	dsn.SysDBA:    true,
-	dsn.SysOPER:   true,
-	dsn.SysBACKUP: true,
-	dsn.SysDG:     true,
-	dsn.SysKM:     true,
-	dsn.SysRAC:    true,
-	dsn.SysASM:    true,
-	dsn.NoRole:    true,
-}
-
 const (
 	// tnsNone - the plugin won't interpret connString as TNS name.
 	tnsNone TNSNameType = iota
@@ -192,6 +181,7 @@ func createDBConnector(cd *ConnDetails, connectTimeout time.Duration, resolveTNS
 	}
 
 	connector := createDriverConnector(connectString, cd.Uri.User(), cd.Uri.Password(), cd.Privilege)
+
 	return connector, nil
 }
 

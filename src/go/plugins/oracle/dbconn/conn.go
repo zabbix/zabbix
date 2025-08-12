@@ -39,6 +39,18 @@ const (
 	hkInterval = 10 * time.Second
 )
 
+//nolint:gochecknoglobals
+var validAdminRoles = map[dsn.AdminRole]bool{
+	dsn.SysDBA:    true,
+	dsn.SysOPER:   true,
+	dsn.SysBACKUP: true,
+	dsn.SysDG:     true,
+	dsn.SysKM:     true,
+	dsn.SysRAC:    true,
+	dsn.SysASM:    true,
+	dsn.NoRole:    true,
+}
+
 // URIDefaults variable contains default URI field values.
 var (
 	URIDefaults = &uri.Defaults{Scheme: "tcp", Port: "1521"} //nolint:gochecknoglobals
@@ -289,7 +301,7 @@ func (c *ConnManager) setConn(cd ConnDetails, conn *OraConn) (*OraConn, error) {
 // It accepts formats like "system", "system as sysdba", or "SYSTEM AS SYSDBA".
 // It returns the clean username, a validated dsn.AdminRole, and an error if the
 // format is invalid or the role is unknown.
-func SplitUserAndPrivilege(userWithPrivilege string) (string, dsn.AdminRole, error) { //nolint:nonamedreturns
+func SplitUserAndPrivilege(userWithPrivilege string) (string, dsn.AdminRole, error) {
 	userStr := normalizeSpaces(userWithPrivilege)
 	if userStr == "" {
 		return "", "", errs.WrapConst(zbxerr.ErrorTooFewParameters, ErrMissingParamUser)
@@ -326,6 +338,8 @@ func SplitUserAndPrivilege(userWithPrivilege string) (string, dsn.AdminRole, err
 }
 
 // setCustomQuery function if enabled, reads the SQLs from a file by path.
+//
+//nolint:ireturn
 func setCustomQuery(logr log.Logger, enabled bool, path string) yarn.Yarn {
 	if !enabled {
 		return yarn.NewFromMap(map[string]string{})
