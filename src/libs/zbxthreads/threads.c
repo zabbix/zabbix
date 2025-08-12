@@ -347,8 +347,7 @@ void	zbx_threads_kill_and_wait(ZBX_THREAD_HANDLE *threads, const int *threads_fl
 	if (TIMEOUT_ERROR == threads_kill_and_wait(threads, threads_flags, threads_num, ZBX_THREAD_PRIORITY_COLLECTOR,
 			SUCCEED, SEC_PER_MIN))
 	{
-		threads_kill_and_wait(threads, threads_flags, threads_num, ZBX_THREAD_PRIORITY_COLLECTOR,
-				FAIL, 0);
+		threads_kill_and_wait(threads, threads_flags, threads_num, ZBX_THREAD_PRIORITY_COLLECTOR, FAIL, 0);
 	}
 
 	threads_kill_and_wait(threads, threads_flags, threads_num, ZBX_THREAD_PRIORITY_SYNCER, ret, 0);
