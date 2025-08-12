@@ -923,17 +923,14 @@ class testUsersAuthenticationSaml extends testFormAuthentication {
 			}
 
 			if (array_key_exists('storage', $data)) {
-
 				foreach (['IdP certificate', 'SP private key', 'SP certificate'] as $field) {
 					$button = $form->query('button', 'Change '.$field)->one(false);
 
 					if (array_key_exists($field, $data['fields'])) {
-						$this->assertTrue($button->isClickable(), 'Button Change '.$field.' should be clickable.'
-						);
+						$this->assertTrue($button->isClickable(), 'Button Change '.$field.' should be clickable.');
 					}
 					else {
-						$this->assertFalse($button->isValid(), 'Button Change '.$field.' should not exists.'
-						);
+						$this->assertFalse($button->isValid(), 'Button Change '.$field.' should not exists.');
 					}
 				}
 
@@ -965,7 +962,8 @@ class testUsersAuthenticationSaml extends testFormAuthentication {
 
 						// Check that certificate is not overwritten if alert is dismissed.
 						$this->assertEquals($data['fields'][$params['label']],
-							CDBHelper::getValue('SELECT '.$params['id'].' FROM userdirectory_saml'));
+								CDBHelper::getValue('SELECT '.$params['id'].' FROM userdirectory_saml')
+						);
 						$this->page->refresh()->waitUntilReady();
 						$form->selectTab('SAML settings');
 						$form->query('button', $sp_button)->one()->click();
