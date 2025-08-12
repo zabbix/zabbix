@@ -8981,14 +8981,9 @@ static void	zbx_dc_configure_host_psk(zbx_uint64_t hostid)
 	{
 		zabbix_log(LOG_LEVEL_DEBUG, "configuring PSK for host %lu with identity \"%s\"", (unsigned long)hostid,
 				config->autoreg_psk_identity);
-		zbx_db_execute("update hosts set tls_connect=%u,tls_psk_identity='%s',tls_psk='%s' where hostid="
-				ZBX_FS_UI64, ZBX_TCP_SEC_TLS_PSK, config->autoreg_psk_identity, config->autoreg_psk,
-				hostid);
-	}
-	else
-	{
-		zabbix_log(LOG_LEVEL_DEBUG, "cannot configure PSK for host %lu: autoreg PSK not configured",
-				(unsigned long)hostid);
+		zbx_db_execute("update hosts set tls_connect=%u,tls_psk_identity='%s',tls_psk='%s'"
+				" where hostid=" ZBX_FS_UI64,
+				ZBX_TCP_SEC_TLS_PSK, config->autoreg_psk_identity, config->autoreg_psk, hostid);
 	}
 }
 
@@ -9017,8 +9012,9 @@ static void	zbx_dc_update_host_tls_accept(zbx_uint64_t hostid, unsigned int conn
 			dc_host->tls_accept |= (unsigned char)connection_type;
 
 			UNLOCK_CACHE;
-			zbx_db_execute("update hosts set tls_accept=%u where hostid=" ZBX_FS_UI64, dc_host->tls_accept,
-					hostid);
+			zbx_db_execute("update hosts set tls_accept=%u"
+					" where hostid=" ZBX_FS_UI64,
+					dc_host->tls_accept, hostid);
 			WRLOCK_CACHE;
 		}
 	}
