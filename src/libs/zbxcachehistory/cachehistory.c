@@ -2618,8 +2618,6 @@ void	zbx_dc_add_history_variant(zbx_uint64_t itemid, unsigned char value_type, u
 			}
 			else if (ITEM_VALUE_TYPE_JSON == value_type)
 			{
-				struct zbx_json_parse   jp;
-
 				if (ZBX_HISTORY_JSON_VALUE_LEN < strlen(value->data.json))
 				{
 					dc_local_add_history_notsupported(itemid, &ts,
