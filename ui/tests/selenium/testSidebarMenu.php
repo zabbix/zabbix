@@ -408,6 +408,7 @@ class testSidebarMenu extends CWebTest {
 		}
 		else {
 			$this->query('xpath://ul[@class="menu-user"]//a[text()="'.$data['section'].'"]')->one()->click();
+			$this->page->waitUntilReady();
 			$this->page->assertTitle('Zabbix');
 		}
 	}
