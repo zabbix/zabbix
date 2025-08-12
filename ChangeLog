@@ -60,6 +60,7 @@ New features:
 .......PS. [ZBXNEXT-9931] added top items sorted by received values number and size to diaginfo preprocessing section (asestakovs)
 
 Bug fixes:
+.......PS. [ZBX-26510] fixed timeouts during script execution on Zabbix agent on action operation or manual action by trying passive interface if exists (vso)
 ...G...... [ZBX-26697] fixed memory error in sender when trying to read invalid response (dgoloscapov)
 ..F....... [ZBX-26717] fixed undefined index on agent installation step in Host Wizard (vmurzins)
 ........S. [ZBX-26645] fixed lost resource handling in LLD prototype discovery (wiper)
@@ -353,6 +354,7 @@ A......PS. [ZBXNEXT-10056] updated max supported MariaDB version to 11.8 (Sasha)
 ........S. [ZBXNEXT-10122] updated maximal supported TimescaleDB version to 2.21 (mprihodko)
 
 Bug fixes:
+.......PS. [ZBX-26510] fixed timeouts during script execution on Zabbix agent on action operation or manual action by trying passive interface if exists (vso)
 ..F....... [ZBX-26649] prohibited showing the create Host groups/Template group form without super admin role (msnihach)
 .......PS. [ZBX-24799] fixed timeouts during active mode script execution on Zabbix agent 2 on action operation or manual action if script had no output; fixed timeout by allowing active agent to retrieve scripts in 60 seconds (vso)
 ........S. [ZBX-26775] fixed crash on data processing from system.localtime item key (sboidenko)
@@ -932,7 +934,8 @@ A......PS. [ZBXNEXT-10056] updated maximum supported MariaDB version to 11.8 (Sa
 ........S. [ZBXNEXT-10122] updated maximum supported TimescaleDB version to 2.21 (mprihodko)
 
 Bug fixes:
-..F....... [ZBX-26649] prohibited showing the create Host groups/Template group form without super admin role (msnihach)
+.......PS. [ZBX-26510] fixed timeouts during script execution on Zabbix agent on action operation or manual action by trying passive interface if exists (vso)
+..F....... [ZBX-26649] prohibited showing form for creating host group/template group to users without super admin role (msnihach)
 ........S. [ZBX-26775] fixed crash on data processing from system.localtime item key (sboidenko)
 .......PS. [ZBX-24799] fixed timeouts during active mode script execution on Zabbix agent 2 on action operation or manual action if script had no output; fixed timeout by allowing active agent to retrieve scripts in 60 seconds (vso)
 A......... [ZBX-25388] prevented displaying of parameter values not involved in import in the response of configuration.importcompare API method (aluchko)
