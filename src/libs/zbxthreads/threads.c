@@ -337,6 +337,7 @@ void	zbx_threads_kill_and_wait(ZBX_THREAD_HANDLE *threads, const int *threads_fl
 	sigset_t	set;
 
 	/* ignore SIGCHLD signals in order for zbx_sleep() to work */
+	sigemptyset(&set);
 	sigaddset(&set, SIGCHLD);
 	zbx_sigmask(SIG_BLOCK, &set, NULL);
 
