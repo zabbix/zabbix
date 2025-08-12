@@ -1,7 +1,7 @@
 Changes for 7.0.18rc1
 
 New features:
-...G...... [ZBXNEXT-9028]  added by-id scan parameter to Zabbix agent 2 S.M.A.R.T. disk discovery (esneiders)
+...G...... [ZBXNEXT-9028] added by-id scan parameter to Zabbix agent 2 S.M.A.R.T. disk discovery (esneiders)
 .........T [ZBXNEXT-9687] updated filesystem discovery low space trigger override regex in F5 Big-IP by SNMP template (drasikhov)
 .........T [ZBXNEXT-9972] added AWS Backup Vault by HTTP template (abrosimovs)
 .......PS. [ZBXNEXT-9090] improved SNMP agent walk[] and get[] to reload credentials when corresponding SNMPv3 interface is updated (vso)
