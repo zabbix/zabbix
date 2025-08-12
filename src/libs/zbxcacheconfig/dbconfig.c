@@ -8996,6 +8996,8 @@ static void	zbx_db_configure_host_psk(zbx_uint64_t hostid)
  *     hostid          - [IN] host ID                                         *
  *     connection_type - [IN] connection type to allow                        *
  *                                                                            *
+ * Return value: SUCCEED if host updated and FAIL otherwise                   *
+ *                                                                            *
  ******************************************************************************/
 int	zbx_dc_update_host_tls_accept(zbx_uint64_t hostid, unsigned int connection_type)
 {
@@ -9099,9 +9101,10 @@ int	zbx_dc_check_host_conn_permissions(const char *host, const zbx_socket_t *soc
 	if (0 != need_update_tls || 0 != need_update_psk)
 	{
 		zbx_uint64_t id = dc_host->hostid;
+
 		UNLOCK_CACHE;
 
-		if (need_update_tls)
+		if (0 != need_update_tls)
 		{
 			zabbix_log(LOG_LEVEL_DEBUG, "updating host tls_accept for host \"%s\" to allow connection type "
 					"%u", host, sock->connection_type);
