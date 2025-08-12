@@ -26,9 +26,10 @@
 #define ZBX_EXIT_SUCCESS	1
 #define ZBX_EXIT_FAILURE	2
 
-static int	sig_parent_pid = -1;
+static int		sig_parent_pid = -1;
+static unsigned long	parent_thread_id;
 
-static const pid_t	*child_pids = NULL;
+static pid_t	*child_pids = NULL;
 static size_t		child_pid_count = 0;
 
 void	set_sig_parent_pid(int in)
@@ -39,6 +40,16 @@ void	set_sig_parent_pid(int in)
 int	get_sig_parent_pid(void)
 {
 	return sig_parent_pid;
+}
+
+void	zbx_set_parent_thread_id(unsigned long in)
+{
+	parent_thread_id = in;
+}
+
+static unsigned long	zbx_get_parent_thread_id(void)
+{
+	return parent_thread_id;
 }
 
 typedef struct
@@ -237,15 +248,24 @@ static void	child_signal_handler(int sig, siginfo_t *siginfo, void *context)
 {
 	SIG_CHECK_PARAMS(sig, siginfo, context);
 
-	if (FAIL == zbx_is_child_pid(siginfo->si_pid, child_pids, child_pid_count))
-		return;
+	pid_t	pid;
+	int	status;
+
+	if (0 < (pid = waitpid((pid_t)-1, &status, WNOHANG)))
+	{
+		if (FAIL == zbx_child_cleanup(pid, child_pids, child_pid_count))
+			return;
+	}
 
 	if (!SIG_PARENT_PROCESS)
 		exit_with_failure();
 
 	if (ZBX_EXIT_NONE == sig_exiting)
 	{
-		sig_exiting = ZBX_EXIT_FAILURE;
+		if (0 >= pid || 0 == WIFEXITED(status) || 0 != WEXITSTATUS(status))
+			sig_exiting = ZBX_EXIT_FAILURE;
+		else
+			sig_exiting = ZBX_EXIT_SUCCESS;
 
 		if (-1 == siginfo_exit.sig)
 			set_siginfo_exit(sig, siginfo);

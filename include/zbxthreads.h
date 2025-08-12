@@ -46,7 +46,7 @@
 
 	int	zbx_fork(void);
 	void	zbx_child_fork(pid_t *pid);
-	int	zbx_is_child_pid(pid_t pid, const pid_t *child_pids, size_t child_pids_num);
+	int	zbx_child_cleanup(pid_t pid, pid_t *threads, size_t threads_num);
 
 	#define ZBX_THREAD_ERROR		-1
 
@@ -54,9 +54,10 @@
 	#define ZBX_THREAD_HANDLE_NULL		0
 
 	#define ZBX_THREAD_PRIORITY_NONE	0
-	#define ZBX_THREAD_PRIORITY_FIRST	1
-	#define ZBX_THREAD_PRIORITY_SECOND	2
-	#define ZBX_THREAD_PRIORITY_COUNT	3
+	#define ZBX_THREAD_PRIORITY_COLLECTOR	1
+	#define ZBX_THREAD_PRIORITY_FIRST	2
+	#define ZBX_THREAD_PRIORITY_SECOND	3
+	#define ZBX_THREAD_PRIORITY_COUNT	4
 
 	#define ZBX_THREAD_ENTRY_POINTER(pointer_name)	\
 		unsigned (* pointer_name)(void *)
@@ -96,7 +97,7 @@ zbx_thread_args_t;
 
 void	zbx_thread_start(ZBX_THREAD_ENTRY_POINTER(handler), zbx_thread_args_t *thread_args, ZBX_THREAD_HANDLE *thread);
 int	zbx_thread_wait(ZBX_THREAD_HANDLE thread);
-void	zbx_threads_kill_and_wait(ZBX_THREAD_HANDLE *threads, const int *threads_flags, int threads_num);
+void	zbx_threads_kill_and_wait(ZBX_THREAD_HANDLE *threads, const int *threads_flags, int threads_num, int ret);
 
 #if !defined(_WINDOWS) && !defined(__MINGW32__)
 void	zbx_pthread_init_attr(pthread_attr_t *attr);

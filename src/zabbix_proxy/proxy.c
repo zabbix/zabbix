@@ -1157,7 +1157,7 @@ static void	zbx_on_exit(int ret, void *on_exit_args)
 	if (NULL != zbx_threads)
 	{
 		/* wait for all child processes to exit */
-		zbx_threads_kill_and_wait(zbx_threads, threads_flags, zbx_threads_num);
+		zbx_threads_kill_and_wait(zbx_threads, threads_flags, zbx_threads_num, ret);
 
 		zbx_free(zbx_threads);
 		zbx_free(threads_flags);
@@ -2042,9 +2042,9 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 
 		if (0 < (pid = waitpid((pid_t)-1, &i, WNOHANG)))
 		{
-			if (SUCCEED == zbx_is_child_pid(pid, zbx_threads, zbx_threads_num))
+			if (SUCCEED == zbx_child_cleanup(pid, zbx_threads, zbx_threads_num))
 			{
-				zbx_set_exiting_with_fail();
+				zbx_set_exiting_with_succeed();
 				break;
 			}
 		}

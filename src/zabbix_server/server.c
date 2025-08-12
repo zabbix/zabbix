@@ -1210,10 +1210,17 @@ static void	zbx_on_exit(int ret, void *on_exit_args)
 
 	zabbix_log(LOG_LEVEL_DEBUG, "zbx_on_exit() called with ret:%d", ret);
 
+	if (SUCCEED != zbx_ha_stop(&error))
+	{
+		zabbix_log(LOG_LEVEL_CRIT, "cannot stop HA manager: %s", error);
+		zbx_free(error);
+		zbx_ha_kill();
+	}
+
 	if (NULL != zbx_threads)
 	{
 		/* wait for all child processes to exit */
-		zbx_threads_kill_and_wait(zbx_threads, threads_flags, zbx_threads_num);
+		zbx_threads_kill_and_wait(zbx_threads, threads_flags, zbx_threads_num, ret);
 
 		zbx_free(zbx_threads);
 		zbx_free(threads_flags);
@@ -1222,12 +1229,6 @@ static void	zbx_on_exit(int ret, void *on_exit_args)
 #ifdef HAVE_PTHREAD_PROCESS_SHARED
 		zbx_locks_disable();
 #endif
-	if (SUCCEED != zbx_ha_stop(&error))
-	{
-		zabbix_log(LOG_LEVEL_CRIT, "cannot stop HA manager: %s", error);
-		zbx_free(error);
-		zbx_ha_kill();
-	}
 
 	if (ZBX_NODE_STATUS_ACTIVE == ha_status)
 	{
@@ -1997,7 +1998,7 @@ static int	server_startup(zbx_socket_t *listen_sock, int *ha_stat, int *ha_failo
 				zbx_thread_start(zbx_httppoller_thread, &thread_args, &zbx_threads[i]);
 				break;
 			case ZBX_PROCESS_TYPE_DISCOVERYMANAGER:
-				threads_flags[i] = ZBX_THREAD_PRIORITY_FIRST;
+				threads_flags[i] = ZBX_THREAD_PRIORITY_COLLECTOR;
 				thread_args.args = &discoverer_args;
 				zbx_thread_start(zbx_discoverer_thread, &thread_args, &zbx_threads[i]);
 				break;
@@ -2035,7 +2036,7 @@ static int	server_startup(zbx_socket_t *listen_sock, int *ha_stat, int *ha_failo
 				zbx_thread_start(taskmanager_thread, &thread_args, &zbx_threads[i]);
 				break;
 			case ZBX_PROCESS_TYPE_PREPROCMAN:
-				threads_flags[i] = ZBX_THREAD_PRIORITY_FIRST;
+				threads_flags[i] = ZBX_THREAD_PRIORITY_COLLECTOR;
 				thread_args.args = &preproc_man_args;
 				zbx_thread_start(zbx_pp_manager_thread, &thread_args, &zbx_threads[i]);
 				break;
@@ -2103,16 +2104,19 @@ static int	server_startup(zbx_socket_t *listen_sock, int *ha_stat, int *ha_failo
 				zbx_thread_start(zbx_poller_thread, &thread_args, &zbx_threads[i]);
 				break;
 			case ZBX_PROCESS_TYPE_HTTPAGENT_POLLER:
+				threads_flags[i] = ZBX_THREAD_PRIORITY_COLLECTOR;
 				poller_args.poller_type = ZBX_POLLER_TYPE_HTTPAGENT;
 				thread_args.args = &poller_args;
 				zbx_thread_start(zbx_async_poller_thread, &thread_args, &zbx_threads[i]);
 				break;
 			case ZBX_PROCESS_TYPE_AGENT_POLLER:
+				threads_flags[i] = ZBX_THREAD_PRIORITY_COLLECTOR;
 				poller_args.poller_type = ZBX_POLLER_TYPE_AGENT;
 				thread_args.args = &poller_args;
 				zbx_thread_start(zbx_async_poller_thread, &thread_args, &zbx_threads[i]);
 				break;
 			case ZBX_PROCESS_TYPE_SNMP_POLLER:
+				threads_flags[i] = ZBX_THREAD_PRIORITY_COLLECTOR;
 				poller_args.poller_type = ZBX_POLLER_TYPE_SNMP;
 				thread_args.args = &poller_args;
 				zbx_thread_start(zbx_async_poller_thread, &thread_args, &zbx_threads[i]);
@@ -2710,9 +2714,9 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 
 		if (0 < (pid = waitpid((pid_t)-1, &i, WNOHANG)))
 		{
-			if (SUCCEED == zbx_is_child_pid(pid, zbx_threads, zbx_threads_num))
+			if (SUCCEED == zbx_child_cleanup(pid, zbx_threads, zbx_threads_num))
 			{
-				zbx_set_exiting_with_fail();
+					zbx_set_exiting_with_succeed();
 				break;
 			}
 			else
