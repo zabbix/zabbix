@@ -132,7 +132,7 @@ class testDashboardsListPage extends CWebTest {
 			[
 				[
 					'fields' => [
-						'Name' => '   ',
+						'Name' => '   '
 					],
 					'result_count' => 1
 				]
