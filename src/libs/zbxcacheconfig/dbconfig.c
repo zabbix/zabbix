@@ -2374,6 +2374,7 @@ static void	DCsync_interfaces(zbx_dbsync_t *sync, zbx_uint64_t revision)
 			interface->items_num = 0;
 			dc_strpool_replace(found, &interface->error, row[10]);
 			interface->version = 0;
+			interface->revision = revision;
 		}
 
 		/* update interfaces_ht index using new data, if not done already */
@@ -2462,6 +2463,7 @@ static void	DCsync_interfaces(zbx_dbsync_t *sync, zbx_uint64_t revision)
 				update->interface->version = ZBX_COMPONENT_VERSION(7, 0, 0);
 			}
 
+			update->interface->revision = revision;
 			dc_host_update_revision(update->host, revision);
 
 			if (NULL != update->snmp)
@@ -4090,7 +4092,7 @@ static int	dc_function_calculate_trends_nextcheck(const zbx_dc_um_handle_t *um_h
 		goto out;
 	}
 
-	localtime_r(&timer->lastcheck, &tm);
+	tm = *zbx_localtime(&timer->lastcheck, NULL);
 
 	if (ZBX_TIME_UNIT_HOUR == trend_base)
 	{
@@ -9302,6 +9304,7 @@ void	DCget_interface(zbx_dc_interface_t *dst_interface, const ZBX_DC_INTERFACE *
 		dst_interface->errors_from = src_interface->errors_from;
 		zbx_strscpy(dst_interface->error, src_interface->error);
 		dst_interface->version = src_interface->version;
+		dst_interface->revision = src_interface->revision;
 	}
 	else
 	{
@@ -9317,6 +9320,7 @@ void	DCget_interface(zbx_dc_interface_t *dst_interface, const ZBX_DC_INTERFACE *
 		dst_interface->errors_from = 0;
 		*dst_interface->error = '\0';
 		dst_interface->version = ZBX_COMPONENT_VERSION(7, 0, 0);
+		dst_interface->revision = 0;
 	}
 
 	dst_interface->addr = (1 == dst_interface->useip ? dst_interface->ip_orig : dst_interface->dns_orig);
@@ -9331,6 +9335,7 @@ static void	DCget_item(zbx_dc_item_t *dst_item, const ZBX_DC_ITEM *src_item)
 	const ZBX_DC_INTERFACE		*dc_interface;
 	int				i;
 
+	dst_item->preprocessing = zbx_dc_item_requires_preprocessing(src_item);
 	dst_item->type = src_item->type;
 	dst_item->value_type = src_item->value_type;
 
@@ -10005,6 +10010,17 @@ static int	dc_preproc_item_changed(ZBX_DC_ITEM *dc_item, zbx_pp_item_t *pp_item)
 	return FAIL;
 }
 
+unsigned char	zbx_dc_item_requires_preprocessing(const ZBX_DC_ITEM *dc_item)
+{
+	if (NULL == dc_item->preproc_item && NULL == dc_item->master_item &&
+			0 == (dc_item->flags & ZBX_FLAG_DISCOVERY_RULE))
+	{
+		return ZBX_ITEM_REQUIRES_PREPROCESSING_NO;
+	}
+
+	return ZBX_ITEM_REQUIRES_PREPROCESSING_YES;
+}
+
 /******************************************************************************
  *                                                                            *
  * Purpose: get preprocessable items:                                         *
@@ -10054,12 +10070,8 @@ void	zbx_dc_config_get_preprocessable_items(zbx_hashset_t *items, zbx_dc_um_shar
 			if (ITEM_STATUS_ACTIVE != dc_item->status || ITEM_TYPE_DEPENDENT == dc_item->type)
 				continue;
 
-			if (NULL == dc_item->preproc_item && NULL == dc_item->master_item &&
-					ITEM_TYPE_INTERNAL != dc_item->type &&
-					0 == (dc_item->flags & ZBX_FLAG_DISCOVERY_RULE))
-			{
+			if (ZBX_ITEM_REQUIRES_PREPROCESSING_NO == zbx_dc_item_requires_preprocessing(dc_item))
 				continue;
-			}
 
 			if (HOST_MONITORED_BY_SERVER == dc_host->monitored_by ||
 					SUCCEED == zbx_is_item_processed_by_server(dc_item->type, dc_item->key) ||
@@ -12394,9 +12406,6 @@ static void	DCget_proxy(zbx_dc_proxy_t *dst_proxy, const ZBX_DC_PROXY *src_proxy
 	dst_proxy->compatibility = src_proxy->compatibility;
 	dst_proxy->lastaccess = src_proxy->lastaccess;
 	dst_proxy->last_version_error_time = src_proxy->last_version_error_time;
-
-	dst_proxy->revision = src_proxy->revision;
-	dst_proxy->macro_revision = config->um_cache->revision;
 
 	zbx_strscpy(dst_proxy->name, src_proxy->name);
 	zbx_strscpy(dst_proxy->allowed_addresses, src_proxy->allowed_addresses);
@@ -15164,8 +15173,9 @@ zbx_session_t	*zbx_dc_get_or_create_session(zbx_uint64_t hostid, const char *tok
  * Return value: The number of created sessions                               *
  *                                                                            *
  ******************************************************************************/
-int	zbx_dc_register_config_session(zbx_uint64_t hostid, const char *token, zbx_uint64_t session_config_revision,
-		zbx_dc_revision_t *dc_revision)
+int	zbx_dc_register_proxy_config_session(zbx_uint64_t hostid, const char *token,
+		zbx_uint64_t session_config_revision, zbx_dc_revision_t *dc_revision,
+		zbx_uint64_t *proxy_revision, zbx_uint64_t *macro_revision)
 {
 	zbx_session_t	*session, session_local;
 	time_t		now;
@@ -15184,6 +15194,16 @@ int	zbx_dc_register_config_session(zbx_uint64_t hostid, const char *token, zbx_u
 		session->lastaccess = now;
 	}
 	*dc_revision = config->revision;
+
+	*macro_revision = config->um_cache->revision;
+
+	ZBX_DC_PROXY	*dc_proxy;
+
+	if (NULL != (dc_proxy = (ZBX_DC_PROXY *)zbx_hashset_search(&config->proxies, &hostid)))
+		*proxy_revision = dc_proxy->revision;
+	else
+		*proxy_revision = 0;
+
 	UNLOCK_CACHE;
 
 	if (NULL != session)
@@ -16904,20 +16924,15 @@ void	zbx_dc_get_macro_updates(const zbx_vector_uint64_t *hostids, const zbx_vect
 		zbx_uint64_t revision, zbx_vector_uint64_t *macro_hostids, int *global,
 		zbx_vector_uint64_t *del_macro_hostids)
 {
-	zbx_vector_uint64_t	hostids_tmp, globalids;
+	zbx_vector_uint64_t	globalids;
 	zbx_uint64_t		globalhostid = 0;
+	int			full_sync = FAIL;
 
 	/* force full sync for updated hosts (in the case host was assigned to proxy) */
 	/* and revision based sync for the monitored hosts (except updated hosts that */
 	/* were already synced)                                                       */
 
-	zbx_vector_uint64_create(&hostids_tmp);
-	if (0 != hostids->values_num)
-	{
-		zbx_vector_uint64_append_array(&hostids_tmp, hostids->values, hostids->values_num);
-		zbx_vector_uint64_setdiff(&hostids_tmp, updated_hostids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
-	}
-
+	*global = FAIL;
 	zbx_vector_uint64_create(&globalids);
 
 	RDLOCK_CACHE;
@@ -16925,30 +16940,51 @@ void	zbx_dc_get_macro_updates(const zbx_vector_uint64_t *hostids, const zbx_vect
 	/* check revision of global macro 'host' (hostid 0) */
 	um_cache_get_macro_updates(config->um_cache, &globalhostid, 1, revision, &globalids, del_macro_hostids);
 
-	if (0 != hostids_tmp.values_num)
+	/* if no global macro updates or host changes are found, check macro updates for monitored hosts */
+	if (0 == globalids.values_num && 0 == updated_hostids->values_num)
 	{
-		um_cache_get_macro_updates(config->um_cache, hostids_tmp.values, hostids_tmp.values_num, revision,
+		full_sync = um_cache_check_macro_updates(config->um_cache, hostids->values, hostids->values_num,
+				revision);
+
+		um_cache_get_macro_updates(config->um_cache, hostids->values, hostids->values_num, revision,
 				macro_hostids, del_macro_hostids);
+
+		if (0 != macro_hostids->values_num)
+		{
+			/* force full sync if there were macro updates for monitored hosts */
+			full_sync = SUCCEED;
+			zbx_vector_uint64_clear(macro_hostids);
+		}
+	}
+	else
+	{
+		/* force full sync if there were global macro updates or host changes */
+		full_sync = SUCCEED;
 	}
 
-	if (0 != updated_hostids->values_num)
+	if (SUCCEED == full_sync)
 	{
-		um_cache_get_macro_updates(config->um_cache, updated_hostids->values, updated_hostids->values_num, 0,
-				macro_hostids, del_macro_hostids);
+		/* force global sync with full sync */
+		*global = SUCCEED;
+
+		um_cache_get_macro_updates(config->um_cache, hostids->values, hostids->values_num, 0, macro_hostids,
+				del_macro_hostids);
 	}
 
 	UNLOCK_CACHE;
 
-	*global = (0 < globalids.values_num ? SUCCEED : FAIL);
-
 	if (0 != macro_hostids->values_num)
+	{
+		/* force global macro sync if host macros are being synced */
+		*global = SUCCEED;
 		zbx_vector_uint64_sort(macro_hostids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
+	}
+
 
 	if (0 != del_macro_hostids->values_num)
 		zbx_vector_uint64_sort(del_macro_hostids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
 
 	zbx_vector_uint64_destroy(&globalids);
-	zbx_vector_uint64_destroy(&hostids_tmp);
 }
 
 void	zbx_dc_get_unused_macro_templates(zbx_hashset_t *templates, const zbx_vector_uint64_t *hostids,

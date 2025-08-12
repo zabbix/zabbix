@@ -27,6 +27,7 @@ typedef struct
 	zbx_uint64_t	processing_num;
 
 	zbx_hashset_t	sequences;
+	zbx_hashset_t	tasks;
 
 	zbx_list_t	pending;
 	zbx_list_t	immediate;
