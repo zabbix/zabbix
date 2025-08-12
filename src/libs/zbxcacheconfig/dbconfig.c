@@ -8968,7 +8968,7 @@ int	zbx_dc_get_host_by_hostid(zbx_dc_host_t *host, zbx_uint64_t hostid)
 
 /******************************************************************************
  *                                                                            *
- * Purpose: Configure PSK in DB for host from autoreg PSK                     *
+ * Purpose: Configure PSK in DB for host from autoreg                         *
  *                                                                            *
  * Parameters:                                                                *
  *     hostid - [IN] host ID                                                  *
@@ -8989,7 +8989,7 @@ static void	zbx_db_configure_host_psk(zbx_uint64_t hostid)
 
 /******************************************************************************
  *                                                                            *
- * Purpose: Update host's tls_accept in cache to allow the specified          *
+ * Purpose: Update host tls_accept in cache to allow the specified            *
  *          connection type                                                   *
  *                                                                            *
  * Parameters:                                                                *
@@ -8999,7 +8999,7 @@ static void	zbx_db_configure_host_psk(zbx_uint64_t hostid)
  * Return value: SUCCEED if host updated and FAIL otherwise                   *
  *                                                                            *
  ******************************************************************************/
-int	zbx_dc_update_host_tls_accept(zbx_uint64_t hostid, unsigned int connection_type)
+static int	zbx_dc_update_host_tls_accept(zbx_uint64_t hostid, unsigned int connection_type)
 {
 	ZBX_DC_HOST	*dc_host;
 	int		ret = FAIL;
