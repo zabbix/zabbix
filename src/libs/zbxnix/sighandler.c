@@ -265,12 +265,15 @@ static void	child_signal_handler(int sig, siginfo_t *siginfo, void *context)
 			return;
 	}
 
+	if (0 >= pid)
+		return;
+
 	if (!SIG_PARENT_PROCESS)
 		exit_with_failure();
 
 	if (ZBX_EXIT_NONE == sig_exiting)
 	{
-		if (0 >= pid || 0 == WIFEXITED(status) || 0 != WEXITSTATUS(status))
+		if (0 == WIFEXITED(status) || 0 != WEXITSTATUS(status))
 			sig_exiting = ZBX_EXIT_FAILURE;
 		else
 			sig_exiting = ZBX_EXIT_SUCCESS;
