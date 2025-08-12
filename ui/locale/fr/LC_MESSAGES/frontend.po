@@ -7285,6 +7285,10 @@ msgstr "Détails du scénario web"
 msgid "Detected TimescaleDB license does not support compression. Compression is supported in TimescaleDB Community Edition."
 msgstr "La licence TimescaleDB détectée ne prend pas en charge la compression. La compression est prise en charge dans TimescaleDB Community Edition."
 
+#: app/views/administration.housekeeping.edit.php:204
+msgid "Detected license does not support compression. Compression is supported in TimescaleDB Community Edition."
+msgstr ""
+
 #: app/controllers/CControllerPopupTriggerExpr.php:1130
 msgid "Detection period"
 msgstr "Période de détection"
@@ -14231,6 +14235,11 @@ msgstr "Nombre maximum de lignes"
 msgid "Maximum required %1$s database version is %2$s."
 msgstr "La version maximale requise de la base de données %1$s est %2$s."
 
+#: app/partials/administration.system.info.php:221
+#, c-format
+msgid "Maximum required version is %1$s."
+msgstr ""
+
 #: app/controllers/CControllerTimeSelectorUpdate.php:136
 #: include/classes/mvc/CController.php:320
 #: include/classes/widgets/fields/CWidgetFieldTimePeriod.php:203
@@ -14574,6 +14583,12 @@ msgstr "La limite minimale requise pour la durée de traitement des entrées des
 msgid "Minimum required size of PHP post is %1$s (configuration option \"post_max_size\")."
 msgstr "La taille minimale requise pour les post HTTP est %1$s (option \"post_max_size\")."
 
+#: app/partials/administration.system.info.php:212
+#: app/views/administration.housekeeping.edit.php:183
+#, c-format
+msgid "Minimum required version is %1$s."
+msgstr ""
+
 #: app/views/monitoring.map.view.php:48
 #: include/views/monitoring.sysmap.edit.php:276
 msgid "Minimum severity"
@@ -14806,8 +14821,18 @@ msgstr "Multiple"
 msgid "Multiple PROBLEM events"
 msgstr "Événements PROBLÈME multiples"
 
+#: app/partials/administration.system.info.php:235
+#, c-format
+msgid "Must be at least %1$s."
+msgstr ""
+
 #: include/classes/validators/CFormValidator.php:340
 msgid "Must be selected."
+msgstr ""
+
+#: app/partials/administration.system.info.php:254
+#, c-format
+msgid "Must not be higher than %1$s."
 msgstr ""
 
 #: jsLoader.php:284
@@ -20112,6 +20137,18 @@ msgstr "Court"
 msgid "Shortened"
 msgstr "Raccourci"
 
+#: app/partials/administration.system.info.php:243
+#: app/views/administration.housekeeping.edit.php:187
+#, c-format
+msgid "Should be at least %1$s."
+msgstr ""
+
+#: app/partials/administration.system.info.php:262
+#: app/views/administration.housekeeping.edit.php:197
+#, c-format
+msgid "Should not be higher than %1$s."
+msgstr ""
+
 #: app/partials/monitoring.problem.filter.php:27
 #: app/views/monitoring.charts.view.php:80
 #: app/views/monitoring.dashboard.list.php:64
@@ -21764,6 +21801,10 @@ msgstr "Le nombre de processus. Retourne un entier"
 msgid "The parameter \"%1$s\" is missing from the user attributes."
 msgstr "Le paramètre \"%1$s\" est absent des attributs de l'utilisateur."
 
+#: app/views/popup.ldap.edit.php:101
+msgid "The previous password was cleared due to a host change. Please enter the new password."
+msgstr ""
+
 #: include/classes/core/CJsonRpc.php:206
 msgid "The received JSON is not a valid JSON-RPC request."
 msgstr "Le JSON reçu n'est pas une requête JSON-RPC valide."
@@ -22965,6 +23006,14 @@ msgstr "Impossible de récupérer l'état de prise en charge de la compression d
 msgid "Unable to retrieve TimescaleDB version."
 msgstr "Impossible de récupérer la version de TimescaleDB."
 
+#: app/views/administration.housekeeping.edit.php:173
+msgid "Unable to retrieve compression support status of TimescaleDB time-series database extension for PostgreSQL."
+msgstr ""
+
+#: app/views/administration.housekeeping.edit.php:178
+msgid "Unable to retrieve version of TimescaleDB time-series database extension for PostgreSQL."
+msgstr ""
+
 #: include/views/mfa.login.php:65
 #, c-format
 msgid "Unable to scan? You can use %1$s secret key to manually configure your authenticator app:"
@@ -23253,6 +23302,11 @@ msgstr "Version du serveur de base de données %1$s non supportée. Doit être d
 #, c-format
 msgid "Unsupported %1$s database server version. Must not be higher than %2$s."
 msgstr "Version du serveur de base de données %1$s non supportée. Doit être d'au moins %2$s."
+
+#: app/partials/administration.system.info.php:206
+#: app/views/administration.housekeeping.edit.php:169
+msgid "Unsupported TimescaleDB time-series database extension for PostgreSQL is used."
+msgstr ""
 
 #: app/views/administration.housekeeping.edit.php:190
 #, c-format
@@ -24703,6 +24757,11 @@ msgstr "Avertissement"
 #: include/func.inc.php:1775 jsLoader.php:216
 msgid "Warning message"
 msgstr "Message d'alerte"
+
+#: app/partials/administration.system.info.php:243
+#: app/partials/administration.system.info.php:262
+msgid "Warning!"
+msgstr ""
 
 #: app/partials/administration.system.info.php:198
 msgid "Warning! Support for Oracle DB is deprecated since Zabbix 7.0 and will be removed in future versions."
