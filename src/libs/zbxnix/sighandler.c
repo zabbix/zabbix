@@ -126,6 +126,14 @@ static void	fatal_signal_handler(int sig, siginfo_t *siginfo, void *context)
 	log_fatal_signal(sig, siginfo, context);
 	zbx_log_fatal_info(context, ZBX_FATAL_LOG_FULL_INFO);
 
+	if (0 != zbx_get_parent_thread_id() && zbx_get_parent_thread_id() != pthread_self())
+	{
+		zbx_set_exiting_with_fail();
+		int	ret = EXIT_FAILURE;
+
+		pthread_exit(&ret);
+	}
+
 	exit_with_failure();
 }
 

@@ -151,6 +151,7 @@ static zbx_pp_manager_t	*zbx_pp_manager_create(int workers_num, zbx_pp_finished_
 
 	manager->workers_num = workers_num;
 	manager->workers = (zbx_pp_worker_t *)zbx_calloc(NULL, (size_t)workers_num, sizeof(zbx_pp_worker_t));
+	zbx_set_parent_thread_id(pthread_self());
 
 	for (i = 0; i < workers_num; i++)
 	{

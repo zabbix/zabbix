@@ -1210,13 +1210,6 @@ static void	zbx_on_exit(int ret, void *on_exit_args)
 
 	zabbix_log(LOG_LEVEL_DEBUG, "zbx_on_exit() called with ret:%d", ret);
 
-	if (SUCCEED != zbx_ha_stop(&error))
-	{
-		zabbix_log(LOG_LEVEL_CRIT, "cannot stop HA manager: %s", error);
-		zbx_free(error);
-		zbx_ha_kill();
-	}
-
 	if (NULL != zbx_threads)
 	{
 		/* wait for all child processes to exit */
@@ -1229,6 +1222,12 @@ static void	zbx_on_exit(int ret, void *on_exit_args)
 #ifdef HAVE_PTHREAD_PROCESS_SHARED
 		zbx_locks_disable();
 #endif
+	if (SUCCEED != zbx_ha_stop(&error))
+	{
+		zabbix_log(LOG_LEVEL_CRIT, "cannot stop HA manager: %s", error);
+		zbx_free(error);
+		zbx_ha_kill();
+	}
 
 	if (ZBX_NODE_STATUS_ACTIVE == ha_status)
 	{
