@@ -1,0 +1,279 @@
+zabbix_export:
+  version: '6.0'
+  media_types:
+    -
+      name: SMSEagle v2
+      type: WEBHOOK
+      parameters:
+        -
+          name: url
+          value: '<PLACE YOUR SMSEAGLE URL>'
+        -
+          name: flash
+          value: 'false'
+        -
+          name: recipient
+          value: '{ALERT.SENDTO}'
+        -
+          name: text
+          value: '{ALERT.MESSAGE}'
+        -
+          name: priority
+          value: '0'
+        -
+          name: modem_no
+          value: 'default'
+        -
+          name: oid
+          value: 'default'
+        -
+          name: encoding
+          value: 'standard'
+        -
+          name: date
+          value: 'YYYYmmDDHHMM'
+        -
+          name: send_after
+          value: 'HH:MM'
+        -
+          name: send_before
+          value: 'HH:MM'
+        -
+          name: access_token
+          value: '<PLACE ACCESS TOKEN>'
+        -
+          name: type
+          value: 'sms'
+        -
+          name: duration
+          value: '10'
+        -
+          name: voice_id
+          value: '0'
+        -
+          name: test
+          value: 'false'
+      script: |
+        var SMSEagle = {
+            params: [],
+            requestBody: {},
+
+            addParam: function (name, value) {
+                SMSEagle.requestBody[name] = value;
+            },
+
+            setProxy: function (HTTPProxy) {
+                SMSEagle.HTTPProxy = HTTPProxy;
+            },
+
+            setPayload: function (params) {
+                
+                    defaultValues = {
+                        flash: 'false',
+                        modem_no: 'default',
+                        oid: 'default',
+                        date: 'YYYYmmDDHHMM',
+                        send_before: 'HH:MM',
+                        send_after: 'HH:MM',
+                        encoding: 'default',
+                        voice_id: '0',
+                        priority: '0',
+                        test: 'false'
+                    }
+
+                Object.keys(params).forEach(function (key) {
+                    if (params[key] && params[key] !== "" && params[key].trim() && params[key] !== defaultValues[key]) {
+                        if (key === 'flash' || key === 'test') {
+                            params[key] = (params[key] === 'true');
+                        }
+
+                        if (key === 'priority' || key === 'duration' || key === 'voice_id') {
+                            params[key] = parseInt(params[key]);
+                        }
+
+                        SMSEagle.addParam(key, params[key]);
+                        Zabbix.log(4, '[ SMSEagle Webhook ] ' + key + ": " + SMSEagle.requestBody[key]);
+                    }
+                });
+
+                var parts = params.recipient.split(',');
+        
+                var recipientGroups = [];
+                var recipientNumbers = [];
+                var recipientContacts = [];
+        
+                var recipientSplit = null;
+        
+                parts.forEach(function (value) {
+                    recipientSplit = value.split(':');
+        
+                    var recipientType = '';
+                    if (recipientSplit[1] === 'g') {
+                        recipientGroups.push(parseInt(recipientSplit[0]));
+                        Zabbix.log(4, '[ SMSEagle Webhook ] ' + 'groups' + ": " + parseInt(recipientSplit[0]));
+                    } else if (recipientSplit[1] === 'c') {
+                        recipientContacts.push(parseInt(recipientSplit[0]));
+                        Zabbix.log(4, '[ SMSEagle Webhook ] ' + 'contacts' + ": " + parseInt(recipientSplit[0]));
+                    } else {
+                        recipientNumbers.push(recipientSplit[0]);
+                        Zabbix.log(4, '[ SMSEagle Webhook ] ' + 'to' + ": " + recipientSplit[0]);
+                    }
+        
+                    SMSEagle.addParam('groups', recipientGroups);
+                    SMSEagle.addParam('contacts', recipientContacts);
+                    SMSEagle.addParam('to', recipientNumbers);
+                });
+
+                delete params.recipient;
+            },
+
+            request: function (element) {
+                var dest_url;
+
+                switch (element) {
+                    case 'tts':
+                        dest_url = params.url + '/api/v2/calls/tts';
+                        break;
+                    case 'tts_adv':
+                        dest_url = params.url + '/api/v2/calls/tts_advanced';
+                        break;
+                    case 'sms':
+                        dest_url = params.url + '/api/v2/messages/sms';
+                        break;
+                    case 'mms':
+                        dest_url = params.url + '/api/v2/messages/mms';
+                        break;
+                    default:
+                        dest_url = params.url + '/api/v2/messages/sms';
+                        break;
+                }
+
+                body = JSON.stringify(SMSEagle.requestBody);
+
+                if (typeof SMSEagle.HTTPProxy !== 'undefined' && SMSEagle.HTTPProxy !== '') {
+                    request.setProxy(SMSEagle.HTTPProxy);
+                }
+
+                Zabbix.log(4, '[ SMSEagle Webhook ] Sending request: ' + dest_url);
+
+                request.addHeader('Content-Type: application/json');
+                request.addHeader('access-token: ' + params.access_token);
+                response = request.post(dest_url, body);
+
+                Zabbix.log(4, '[ SMSEagle Webhook ] Received response with status code ' + request.getStatus() + '\n' + response);
+
+                if (request.getStatus() < 200 || request.getStatus() >= 300) {
+                    var message = 'Request failed with status code ' + request.getStatus();
+
+                    if (response) {
+                        message += ': ' + response;
+                    }
+
+                    throw message + '. Check debug log for more information.';
+                }
+            }
+        };
+
+        try {
+            var response,
+                request,
+                params = JSON.parse(value),
+                body;
+
+            ['url', 'access_token', 'text', 'recipient'].forEach(function (field) {
+                if (typeof params !== 'object' || typeof params[field] === 'undefined'
+                    || !params[field].trim()) {
+                    throw 'Required parameter is not set: "' + field + '".';
+                }
+            });
+
+            if (params.type.includes('tts_adv')) {
+                if (typeof params !== 'object' || typeof params['voice_id'] === 'undefined' || !params['voice_id'].trim()) {
+                    throw 'Required parameter is not set: "voice_id".';
+                }
+            }
+
+            if (params.recipient === '{ALERT.SENDTO}') {
+                throw 'Required parameter is not set: "recipient".';
+            }
+
+            if (params.access_token === "<PLACE ACCESS TOKEN>") {
+                throw 'Required parameter is not set: "access_token".';
+            }
+
+            if (params.url === "<PLACE YOUR SMSEAGLE URL>") {
+                throw 'Required parameter is not set: "url".';
+            }
+
+            params.type = params.type.trim();
+            var types = params.type.split(",");
+
+            SMSEagle.setPayload(params);
+            types.forEach(function (element) {
+                request = new HttpRequest();
+                SMSEagle.setProxy(params.HTTPProxy);
+                SMSEagle.request(element);
+            });
+
+            return 'OK';
+        }
+        catch (error) {
+            Zabbix.log(3, '[ SMSEagle Webhook ] ERROR: ' + error);
+            throw 'Sending failed: ' + error;
+        }
+      message_templates:
+        -
+          event_source: TRIGGERS
+          operation_mode: PROBLEM
+          subject: '[{EVENT.STATUS}] {EVENT.NAME}'
+          message: |
+            [{EVENT.STATUS}] {EVENT.NAME}
+            Started at {EVENT.TIME} on {EVENT.DATE}
+            Host: {HOST.NAME}
+            Severity: {EVENT.SEVERITY}
+            Operational data: {EVENT.OPDATA}
+            Event info: {$ZABBIX.URL}/tr_events.php?triggerid={TRIGGER.ID}&eventid={EVENT.ID}
+        -
+          event_source: TRIGGERS
+          operation_mode: RECOVERY
+          subject: 'Resolved in {EVENT.DURATION}: {EVENT.NAME}'
+          message: |
+            [{EVENT.STATUS}] {EVENT.NAME}
+            Resolved in {EVENT.DURATION} at {EVENT.RECOVERY.TIME} on {EVENT.RECOVERY.DATE}
+            Host: {HOST.NAME}
+            Severity: {EVENT.SEVERITY}
+            Event info: {$ZABBIX.URL}/tr_events.php?triggerid={TRIGGER.ID}&eventid={EVENT.ID}
+        -
+          event_source: TRIGGERS
+          operation_mode: UPDATE
+          subject: '[{EVENT.STATUS}] {EVENT.NAME}'
+          message: |
+            [{EVENT.STATUS}] {EVENT.NAME}
+            
+            {USER.FULLNAME} {EVENT.UPDATE.ACTION} problem at {EVENT.UPDATE.DATE} {EVENT.UPDATE.TIME}.
+            {EVENT.UPDATE.MESSAGE}
+        -
+          event_source: DISCOVERY
+          operation_mode: PROBLEM
+          subject: 'Discovery: {DISCOVERY.DEVICE.STATUS} {DISCOVERY.DEVICE.IPADDRESS}'
+          message: |
+            Discovery: {DISCOVERY.DEVICE.STATUS} {DISCOVERY.DEVICE.IPADDRESS}
+            Discovery rule: {DISCOVERY.RULE.NAME}
+            
+            Device IP: {DISCOVERY.DEVICE.IPADDRESS}
+            Device DNS: {DISCOVERY.DEVICE.DNS}
+            Device status: {DISCOVERY.DEVICE.STATUS}
+            Device uptime: {DISCOVERY.DEVICE.UPTIME}
+            
+            Device service name: {DISCOVERY.SERVICE.NAME}
+            Device service port: {DISCOVERY.SERVICE.PORT}
+            Device service status: {DISCOVERY.SERVICE.STATUS}
+            Device service uptime: {DISCOVERY.SERVICE.UPTIME}
+        -
+          event_source: AUTOREGISTRATION
+          operation_mode: PROBLEM
+          subject: 'Autoregistration: {HOST.HOST}'
+          message: |
+            Autoregistration: {HOST.HOST}
+            Host IP: {HOST.IP}
+            Agent port: {HOST.PORT}
