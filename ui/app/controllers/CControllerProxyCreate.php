@@ -35,7 +35,7 @@ class CControllerProxyCreate extends CController {
 			'operating_mode' => ['db proxy.operating_mode', 'required', 'in' => [PROXY_OPERATING_MODE_ACTIVE, PROXY_OPERATING_MODE_PASSIVE]],
 			'address' => [
 				['db proxy.address', 'use' => [CIPParser::class, [
-					'usermacros' => true, 'lldmacros' => true, 'macros' => true, 'v6' => ZBX_HAVE_IPV6
+					'usermacros' => false, 'lldmacros' => false, 'macros' => true, 'v6' => ZBX_HAVE_IPV6
 				]],
 					'messages' => ['use' => _('Invalid address.')]
 				],
@@ -46,7 +46,7 @@ class CControllerProxyCreate extends CController {
 				'when' => ['operating_mode', 'in' => [PROXY_OPERATING_MODE_PASSIVE]]
 			],
 			'local_address' => ['db proxy.local_address', 'required', 'not_empty',
-				'use' => [CIPParser::class, ['usermacros' => true, 'lldmacros' => true, 'macros' => true,
+				'use' => [CIPParser::class, ['usermacros' => false, 'lldmacros' => false, 'macros' => true,
 					'v6' => ZBX_HAVE_IPV6]], 'messages' => ['use' => _('Invalid address.')],
 				'when' => ['proxy_groupid', 'not_empty']
 			],
@@ -55,13 +55,19 @@ class CControllerProxyCreate extends CController {
 				'when' => ['proxy_groupid', 'not_empty']
 			],
 			'allowed_addresses' => ['db proxy.allowed_addresses',
-				'use' => [CIPRangeParser::class, ['v6' => ZBX_HAVE_IPV6, 'dns' => true, 'usermacros' => true, 'macros' => ['{HOST.HOST}', '{HOSTNAME}', '{HOST.NAME}', '{HOST.CONN}', '{HOST.IP}', '{IPADDRESS}', '{HOST.DNS}']], 'messages' => ['use' => _('Invalid address.')]]
+				'use' => [CIPRangeParser::class, ['v6' => ZBX_HAVE_IPV6, 'dns' => true, 'usermacros' => true, 'macros' => true], 'messages' => ['use' => _('Invalid address.')]]
 			],
 			'description' => ['db proxy.description'],
 			'tls_accept' => ['db proxy.tls_accept'],
-			'tls_accept_none' => ['boolean'],
+			'tls_accept_certificate' => ['boolean'],
 			'tls_accept_psk' =>	['boolean'],
-			'tls_accept_certificate' =>	['boolean'],
+			'tls_accept_none' => [
+				['boolean'],
+				[
+					'integer', 'required', 'in 1', 'when' => [['tls_accept_certificate', 'in 0'], ['tls_accept_psk', 'in 0']],
+					'messages' => ['in' => _s('Incorrect value for field "%1$s": %2$s.', _('Connections from proxy'), _('cannot be empty'))]
+				]
+			],
 			'tls_connect' => ['db proxy.tls_connect', 'required',
 				'in' => [HOST_ENCRYPTION_NONE, HOST_ENCRYPTION_PSK, HOST_ENCRYPTION_CERTIFICATE],
 				'when' => ['operating_mode', 'in' => [PROXY_OPERATING_MODE_PASSIVE]]
