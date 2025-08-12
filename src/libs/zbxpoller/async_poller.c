@@ -840,6 +840,8 @@ ZBX_THREAD_ENTRY(zbx_async_poller_thread, args)
 #endif
 	}
 
+	zbx_setproctitle("%s #%d [terminating]", get_process_type_string(process_type), process_num);
+
 	async_poller_destroy(&poller_config);
 
 #ifdef HAVE_NETSNMP

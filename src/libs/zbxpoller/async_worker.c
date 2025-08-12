@@ -245,6 +245,9 @@ static void	*async_worker_entry(void *args)
 
 		async_task_queue_lock(queue);
 
+		if (1 == worker->stop)
+			break;
+
 		if (NULL != poller_item)
 		{
 			processing_num = queue->processing_num += poller_item->num;

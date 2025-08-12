@@ -351,8 +351,8 @@ void	zbx_threads_kill_and_wait(ZBX_THREAD_HANDLE *threads, const int *threads_fl
 				FAIL, 0);
 	}
 
-	threads_kill_and_wait(threads, threads_flags, threads_num, ZBX_THREAD_PRIORITY_FIRST, ret, 0);
-	threads_kill_and_wait(threads, threads_flags, threads_num, ZBX_THREAD_PRIORITY_SECOND, ret, 0);
+	threads_kill_and_wait(threads, threads_flags, threads_num, ZBX_THREAD_PRIORITY_SYNCER, ret, 0);
+	threads_kill_and_wait(threads, threads_flags, threads_num, ZBX_THREAD_PRIORITY_WORKER, ret, 0);
 	/* signal idle threads to exit */
 	threads_kill_and_wait(threads, threads_flags, threads_num, ZBX_THREAD_PRIORITY_NONE, FAIL, 0);
 #else
