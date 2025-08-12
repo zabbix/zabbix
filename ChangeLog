@@ -8,6 +8,7 @@ A......PS. [ZBXNEXT-10056] updated max supported MariaDB version to 11.8 (Sasha)
 .......PS. [ZBXNEXT-9090] improved SNMP agent walk[] and get[] to reload credentials when corresponding SNMPv3 interface is updated (vso)
 
 Bug fixes:
+..F....... [ZBX-26649] prohibited showing the create Host groups/Template group form without super admin role (msnihach)
 ........S. [ZBX-26775] fixed crash on data processing from system.localtime item key (sboidenko)
 .......PS. [ZBX-24799] fixed timeouts during active mode script execution on Zabbix agent 2 on action operation or manual action if script had no output; fixed timeout by allowing active agent to retrieve scripts in 60 seconds (vso)
 A......... [ZBX-25388] prevented displaying of parameter values not involved in import in the response of configuration.importcompare API method (aluchko)
@@ -352,6 +353,7 @@ A......PS. [ZBXNEXT-10056] updated max supported MariaDB version to 11.8 (Sasha)
 ........S. [ZBXNEXT-10122] updated maximal supported TimescaleDB version to 2.21 (mprihodko)
 
 Bug fixes:
+..F....... [ZBX-26649] prohibited showing the create Host groups/Template group form without super admin role (msnihach)
 .......PS. [ZBX-24799] fixed timeouts during active mode script execution on Zabbix agent 2 on action operation or manual action if script had no output; fixed timeout by allowing active agent to retrieve scripts in 60 seconds (vso)
 ........S. [ZBX-26775] fixed crash on data processing from system.localtime item key (sboidenko)
 ........S. [ZBX-16925] fixed housekeeper behavior that blocked history sync and caused deadlocks when deleting events (vso)
@@ -4625,6 +4627,7 @@ A......PS. [ZBXNEXT-10056] updated maximum supported MariaDB version to 11.8 (Sa
 ........S. [ZBXNEXT-9905] updated maximum supported TimescaleDB version to 2.19 (mprihodko)
 
 Bug fixes:
+........S. [ZBX-26775] fixed crash on data processing from system.localtime item key (sboidenko)
 .......PS. [ZBX-26528] fixed improper handling of long or corrupted ODBC error messages (dgoloscapov)
 ........S. [ZBX-26591] fixed detection of read-only state in PostgreSQL replicated database (sboidenko)
 ........S. [ZBX-26486] fixed errors in Zabbix server log on second and subsequent server starts with TimescaleDB (mprihodko)
