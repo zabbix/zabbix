@@ -53,7 +53,7 @@ connected_slaves:0`
 test:111`
 )
 
-func TestParseRedisInfo(t *testing.T) {
+func Test_parseRedisInfo(t *testing.T) {
 	t.Parallel()
 
 	type args struct {
@@ -178,7 +178,7 @@ func BenchmarkParseRedisInfo_Extended(b *testing.B) {
 	}
 }
 
-func TestInfoHandler(t *testing.T) {
+func Test_InfoHandler(t *testing.T) {
 	t.Parallel()
 
 	stubConn := radix.Stub("", "", func(args []string) any {

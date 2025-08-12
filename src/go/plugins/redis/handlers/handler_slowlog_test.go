@@ -23,7 +23,7 @@ import (
 	"golang.zabbix.com/agent2/plugins/redis/conn"
 )
 
-func TestGetLastSlowlogID(t *testing.T) {
+func Test_GetLastSlowlogID(t *testing.T) {
 	t.Parallel()
 
 	type args struct {
@@ -92,7 +92,7 @@ func TestGetLastSlowlogID(t *testing.T) {
 	}
 }
 
-func TestSlowlogHandler(t *testing.T) {
+func Test_SlowlogHandler(t *testing.T) {
 	t.Parallel()
 
 	stubConn := radix.Stub("", "", func(args []string) any {

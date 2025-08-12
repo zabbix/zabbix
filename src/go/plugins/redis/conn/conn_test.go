@@ -26,7 +26,7 @@ import (
 
 var unitLogger = log.New("unit test logger") //nolint:gochecknoglobals // logger just for testing.
 
-func TestManager_CloseUnused(t *testing.T) {
+func TestManager_closeUnused(t *testing.T) {
 	t.Parallel()
 
 	connMgr := NewManager(unitLogger, 1*time.Microsecond, 30*time.Second, HouseKeeperInterval*time.Second)
@@ -49,7 +49,7 @@ func TestManager_CloseUnused(t *testing.T) {
 	})
 }
 
-func TestManager_CloseAll(t *testing.T) {
+func TestManager_closeAll(t *testing.T) {
 	t.Parallel()
 
 	connMgr := NewManager(unitLogger, 300*time.Second, 30*time.Second, HouseKeeperInterval*time.Second)
@@ -72,7 +72,7 @@ func TestManager_CloseAll(t *testing.T) {
 	})
 }
 
-func TestManager_Create(t *testing.T) {
+func TestManager_create(t *testing.T) {
 	t.Parallel()
 
 	u, _ := uri.New("tcp://127.0.0.1", nil)
@@ -98,7 +98,7 @@ func TestManager_Create(t *testing.T) {
 		wantPanic bool
 	}{
 		{
-			name:      "Must panic if connection already exists",
+			name:      "-connectionExists",
 			c:         connMgr,
 			args:      args{uri: u},
 			want:      nil,
@@ -134,7 +134,7 @@ func TestManager_Create(t *testing.T) {
 	}
 }
 
-func TestManager_Get(t *testing.T) {
+func TestManager_get(t *testing.T) {
 	t.Parallel()
 
 	u, _ := uri.New("tcp://127.0.0.1", nil)

@@ -24,7 +24,7 @@ import (
 	"golang.zabbix.com/agent2/plugins/redis/conn"
 )
 
-func TestConfigHandler(t *testing.T) {
+func Test_ConfigHandler(t *testing.T) {
 	t.Parallel()
 
 	stubConn := radix.Stub("", "", func(args []string) any {
