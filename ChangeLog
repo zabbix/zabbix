@@ -61,7 +61,6 @@ New features:
 .......PS. [ZBXNEXT-9931] added top items sorted by received values number and size to diaginfo preprocessing section (asestakovs)
 
 Bug fixes:
-.......PS. [ZBX-26510] fixed timeouts during script execution on Zabbix agent on action operation or manual action by trying passive interface if exists (vso)
 ...G...... [ZBX-26697] fixed memory error in sender when trying to read invalid response (dgoloscapov)
 ..F....... [ZBX-26717] fixed undefined index on agent installation step in Host Wizard (vmurzins)
 ........S. [ZBX-26645] fixed lost resource handling in LLD prototype discovery (wiper)
