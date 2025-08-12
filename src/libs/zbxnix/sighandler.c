@@ -425,7 +425,7 @@ void	zbx_set_on_exit_args(void *args)
 	zbx_on_exit_args = args;
 }
 
-void	zbx_set_child_pids(const pid_t *pids, size_t pid_num)
+void	zbx_set_child_pids(pid_t *pids, size_t pid_num)
 {
 	child_pids = pids;
 	child_pid_count = pid_num;
