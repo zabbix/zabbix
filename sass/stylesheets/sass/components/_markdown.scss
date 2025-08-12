@@ -35,18 +35,14 @@
 		&:first-child {
 			margin-top: 0;
 		}
+
+		ol, ul {
+			margin-top: 0;
+		}
 	}
 
 	h5 + * {
 		margin-top: 0;
-	}
-
-	ol {
-		list-style-type: decimal;
-	}
-
-	ul {
-		list-style-type: initial;
 	}
 
 	ol, ul {

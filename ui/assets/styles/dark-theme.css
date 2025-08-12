@@ -28,9 +28,6 @@ article, aside, details, figcaption, figure, footer, header, hgroup, menu, nav, 
 body {
   line-height: 1; }
 
-ol, ul {
-  list-style: none; }
-
 blockquote, q {
   quotes: none; }
 
@@ -2748,12 +2745,10 @@ div[data-field-type="set"].has-error {
     margin-bottom: 0; }
     .markdown ol:first-child, .modal-popup-host-wizard .formated-text ol:first-child, .markdown ul:first-child, .modal-popup-host-wizard .formated-text ul:first-child, .markdown p:first-child, .modal-popup-host-wizard .formated-text p:first-child, .markdown pre:first-child, .modal-popup-host-wizard .formated-text pre:first-child, .markdown blockquote:first-child, .modal-popup-host-wizard .formated-text blockquote:first-child {
       margin-top: 0; }
+    .markdown ol ol, .modal-popup-host-wizard .formated-text ol ol, .markdown ol ul, .modal-popup-host-wizard .formated-text ol ul, .markdown ul ol, .modal-popup-host-wizard .formated-text ul ol, .markdown ul ul, .modal-popup-host-wizard .formated-text ul ul, .markdown p ol, .modal-popup-host-wizard .formated-text p ol, .markdown p ul, .modal-popup-host-wizard .formated-text p ul, .markdown pre ol, .modal-popup-host-wizard .formated-text pre ol, .markdown pre ul, .modal-popup-host-wizard .formated-text pre ul, .markdown blockquote ol, .modal-popup-host-wizard .formated-text blockquote ol, .markdown blockquote ul, .modal-popup-host-wizard .formated-text blockquote ul {
+      margin-top: 0; }
   .markdown h5 + *, .modal-popup-host-wizard .formated-text h5 + * {
     margin-top: 0; }
-  .markdown ol, .modal-popup-host-wizard .formated-text ol {
-    list-style-type: decimal; }
-  .markdown ul, .modal-popup-host-wizard .formated-text ul {
-    list-style-type: initial; }
   .markdown ol, .modal-popup-host-wizard .formated-text ol, .markdown ul, .modal-popup-host-wizard .formated-text ul {
     list-style-position: outside;
     padding-left: 2em; }
