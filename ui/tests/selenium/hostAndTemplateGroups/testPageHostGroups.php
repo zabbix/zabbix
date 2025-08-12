@@ -215,6 +215,12 @@ class testPageHostGroups extends testPageGroups {
 					'Name' => 'host  '
 				]
 			],
+			[
+				[
+					'Name' => '   spaces   ',
+					'expected' => ['Multiple spaces in host group name']
+				]
+			],
 			// Template group name.
 			[
 				[

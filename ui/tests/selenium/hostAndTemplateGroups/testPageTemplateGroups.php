@@ -146,6 +146,12 @@ class testPageTemplateGroups extends testPageGroups {
 					'Name' => 'with  '
 				]
 			],
+			[
+				[
+					'Name' => '   spaces   ',
+					'expected' => ['Multiple spaces in template group name']
+				]
+			],
 			// Host group name.
 			[
 				[
@@ -221,7 +227,7 @@ class testPageTemplateGroups extends testPageGroups {
 			[
 				[
 					'expected' => TEST_BAD,
-					'error' => 'Template "Linux by Zabbix agent" cannot be without template group.'
+					'error' => 'Template "ClickHouse by HTTP" cannot be without template group.'
 				]
 			],
 			// One of the groups can't be deleted.
