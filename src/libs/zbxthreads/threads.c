@@ -258,8 +258,8 @@ static int	zbx_thread_count(pid_t *threads, size_t threads_num, const int *threa
 	return count;
 }
 
-static int	threads_kill_and_wait(ZBX_THREAD_HANDLE *threads, const int *threads_flags, int threads_num, int priority,
-		int ret, int timeout)
+static int	threads_kill_and_wait(ZBX_THREAD_HANDLE *threads, const int *threads_flags, int threads_num,
+		int priority, int ret, int timeout)
 {
 	pid_t	pid;
 	double	time_start = zbx_time();
