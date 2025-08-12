@@ -2761,6 +2761,9 @@ div[data-field-type="set"].has-error {
       padding-bottom: 0; }
   .markdown p, .modal-popup-host-wizard .formated-text p, .markdown pre, .modal-popup-host-wizard .formated-text pre {
     overflow: hidden; }
+  .markdown code, .modal-popup-host-wizard .formated-text code {
+    font-family: "Courier New", Courier, monospace;
+    font-size: 1em; }
   .markdown pre, .modal-popup-host-wizard .formated-text pre {
     padding: 5px;
     background: #383838;
