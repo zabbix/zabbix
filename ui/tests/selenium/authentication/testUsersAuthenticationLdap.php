@@ -2952,7 +2952,7 @@ class testUsersAuthenticationLdap extends testFormAuthentication {
 	 * @param string $auth    default authentication field value
 	 */
 	private function openLdapForm($auth = 'Internal') {
-		$this->page->login()->open('zabbix.php?action=authentication.edit');
+		$this->page->login()->open('zabbix.php?action=authentication.edit')->waitUntilReady();
 		$form = $this->query('id:authentication-form')->asForm()->one();
 		$form->fill(['Default authentication' => $auth]);
 		$form->selectTab('LDAP settings');
