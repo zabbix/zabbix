@@ -26,6 +26,7 @@ import (
 	"testing"
 	"time"
 
+	"github.com/godror/godror/dsn"
 	"golang.zabbix.com/agent2/plugins/oracle/dbconn"
 	"golang.zabbix.com/agent2/plugins/oracle/handlers"
 	"golang.zabbix.com/sdk/plugin"
@@ -44,7 +45,7 @@ type testConfig struct {
 
 	OraUser string
 	// More isolated tests which do not use the plugin's Export method needs separate privilege.
-	OraPrivilege string
+	OraPrivilege dsn.AdminRole
 	OraPwd       string
 	OraSrv       string
 }
@@ -82,7 +83,7 @@ func TestMain(m *testing.M) {
 
 	var err error
 
-	testCfg.OraUser, testCfg.OraPrivilege, err = dbconn.SplitUserPrivilege(testCfg.OraUser)
+	testCfg.OraUser, testCfg.OraPrivilege, err = dbconn.SplitUserAndPrivilege(testCfg.OraUser)
 	if err != nil {
 		fmt.Fprintf(os.Stderr, "wrong username format: %s\n", testCfg.OraUser)
 		os.Exit(1)
@@ -909,7 +910,7 @@ func TestPlugin_Stop(t *testing.T) {
 // is used.
 func (c *testConfig) GetUserWithPrivilege() string {
 	if c.OraPrivilege != "" {
-		return c.OraUser + " as " + c.OraPrivilege
+		return c.OraUser + " as " + string(c.OraPrivilege)
 	}
 
 	return c.OraUser

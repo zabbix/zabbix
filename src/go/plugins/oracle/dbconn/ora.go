@@ -27,21 +27,23 @@ import (
 	"time"
 
 	"github.com/godror/godror"
+	"github.com/godror/godror/dsn"
 	"github.com/omeid/go-yarn"
 	"golang.zabbix.com/sdk/errs"
 	"golang.zabbix.com/sdk/log"
 	"golang.zabbix.com/sdk/zbxerr"
 )
 
-const (
-	sysdbaExtension  = " as sysdba"
-	sysasmExtension  = " as sysoper"
-	sysoperExtension = " as sysasm"
-
-	sysdbaPrivilege  = "sysdba"
-	sysasmPrivilege  = "sysoper"
-	sysoperPrivilege = "sysasm"
-)
+var validAdminRoles = map[dsn.AdminRole]bool{
+	dsn.SysDBA:    true,
+	dsn.SysOPER:   true,
+	dsn.SysBACKUP: true,
+	dsn.SysDG:     true,
+	dsn.SysKM:     true,
+	dsn.SysRAC:    true,
+	dsn.SysASM:    true,
+	dsn.NoRole:    true,
+}
 
 const (
 	// tnsNone - the plugin won't interpret connString as TNS name.
@@ -55,9 +57,8 @@ const (
 var (
 	_ OraClient = (*OraConn)(nil)
 
-	errInvalidPrivilege = errs.New("invalid connection privilege")
-	ErrMissingParamUser = errors.New("missing parameter User") //nolint:revive
-	errorQueryNotFound  = "query %q not found"                 //nolint:gochecknoglobals
+	ErrMissingParamUser = errors.New("missing parameter 'User'") //nolint:revive
+	errorQueryNotFound  = "query %q not found"                   //nolint:gochecknoglobals
 
 	userNameRx = regexp.MustCompile(`\s+`)
 )
@@ -181,27 +182,6 @@ func (conn *OraConn) closeWithLog() {
 	}
 }
 
-// getDriverConnParams function creates godror connection params and assigns privilege by string passed as arg.
-func getDriverConnParams(privilege string) (godror.ConnParams, error) {
-	var out godror.ConnParams
-
-	privilege = strings.ToLower(privilege)
-	switch privilege {
-	case "sysdba":
-		out.IsSysDBA = true
-	case "sysoper":
-		out.IsSysOper = true
-	case "sysasm":
-		out.IsSysASM = true
-	case "":
-	default:
-		return godror.ConnParams{},
-			errs.Wrapf(errInvalidPrivilege, "unknown Privilege %s", privilege)
-	}
-
-	return out, nil
-}
-
 // createDBConnector function creates a connection string and godror connection by ConnDetails.
 func createDBConnector(cd *ConnDetails, connectTimeout time.Duration, resolveTNS bool) (driver.Connector, error) {
 	tnsInterpretationType := getTNSType(cd.Uri.Host(), cd.OnlyHostname, resolveTNS)
@@ -211,29 +191,23 @@ func createDBConnector(cd *ConnDetails, connectTimeout time.Duration, resolveTNS
 		return nil, errs.WrapConst(err, zbxerr.ErrorInvalidParams)
 	}
 
-	return createDriverConnector(connectString, cd.Uri.User(), cd.Uri.Password(), cd.Privilege)
+	connector := createDriverConnector(connectString, cd.Uri.User(), cd.Uri.Password(), cd.Privilege)
+	return connector, nil
 }
 
 // createDriverConnector function creates a driver.Connector to be used with sql.OpenDB.
-func createDriverConnector(hostOrTNS, user, pwd, privilege string) (driver.Connector, error) {
-	connParams, err := getDriverConnParams(privilege)
-	if err != nil {
-		return nil, errs.WrapConst(err, zbxerr.ErrorInvalidParams)
-	}
+func createDriverConnector(hostOrTNS, user, pwd string, privilege dsn.AdminRole) driver.Connector {
+	connParams := godror.ConnParams{AdminRole: privilege}
 
-	connector := godror.NewConnector(
-		godror.ConnectionParams{
-			StandaloneConnection: true,
-			CommonParams: godror.CommonParams{
-				Username:      user,
-				ConnectString: hostOrTNS,
-				Password:      godror.NewPassword(pwd),
-			},
-			ConnParams: connParams,
-		},
-	)
+	params := godror.ConnectionParams{}
+	params.StandaloneConnection = sql.NullBool{Bool: true, Valid: true}
+	params.Username, params.Password = user, godror.NewPassword(pwd)
+	params.ConnectString = hostOrTNS
+	params.ConnParams = connParams
 
-	return connector, nil
+	connector := godror.NewConnector(params)
+
+	return connector
 }
 
 // getTNSType returns TNSNameType for a host by parameters onlyHostname & resolveTNS.

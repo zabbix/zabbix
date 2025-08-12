@@ -20,6 +20,7 @@ import (
 	"testing"
 	"time"
 
+	"github.com/godror/godror/dsn"
 	"github.com/google/go-cmp/cmp"
 	"golang.zabbix.com/agent2/plugins/oracle/mock"
 	"golang.zabbix.com/sdk/uri"
@@ -40,7 +41,7 @@ type testConfig struct {
 	OraSrv  string
 }
 
-func Test_splitUserPrivilege(t *testing.T) {
+func Test_SplitUserAndPrivilege(t *testing.T) {
 	t.Parallel()
 
 	type args struct {
@@ -51,64 +52,63 @@ func Test_splitUserPrivilege(t *testing.T) {
 		name          string
 		args          args
 		wantUser      string
-		wantPrivilege string
+		wantPrivilege dsn.AdminRole
 		wantErr       bool
 	}{
-		{"+only_user",
+		{"+simpleUsername",
 			args{"foobar"},
-			"foobar", "", false},
-		{"+sysdba_privilege_lowercase",
-			args{"foobar as sysdba"},
-			"foobar", "sysdba", false},
-		{"+sysdba_privilege_uppercase",
-			args{"foobar AS SYSDBA"},
-			"foobar", "sysdba", false},
-		{"+sysdba_privilege_mix",
+			"foobar", dsn.NoRole, false},
+		{"+sysdbaWithMixedCase",
 			args{"foobar AS sySdBa"},
-			"foobar", "sysdba", false},
-		{"+sysoper_privilege_lowercase",
-			args{"foobar as sysoper"},
-			"foobar", "sysoper", false},
-		{"+sysoper_privilege_uppercase",
-			args{"foobar AS SYSOPER"},
-			"foobar", "sysoper", false},
-		{"+sysoper_privilege_mix",
-			args{"foobar AS sysOpEr"},
-			"foobar", "sysoper", false},
-		{"+sysasm_privilege_lowercase",
-			args{"foobar as sysasm"},
-			"foobar", "sysasm", false},
-		{"+sysasm_privilege_uppercase",
+			"foobar", dsn.SysDBA, false},
+		{"+sysoperWithExtraSpaces",
+			args{"foobar   as   sysoper"},
+			"foobar", dsn.SysOPER, false},
+		{"+sysasmUppercase",
 			args{"foobar AS SYSASM"},
-			"foobar", "sysasm", false},
-		{"+sysasm_privilege_mix",
-			args{"foobar AS sysAsM"},
-			"foobar", "sysasm", false},
-		{"+incorrect_privilege",
+			"foobar", dsn.SysASM, false},
+		{"+sysbackupPrivilege",
+			args{"backup_user as sysbackup"},
+			"backup_user", dsn.SysBACKUP, false},
+		{"+sysdgForDataGuard",
+			args{"dg_admin as sysdg"},
+			"dg_admin", dsn.SysDG, false},
+		{"+syskmFoKeystoreManagement",
+			args{"key_mgr AS SYSKM"},
+			"key_mgr", dsn.SysKM, false},
+		{"+sysracForRACAdmin",
+			args{"rac_user As SysRac"},
+			"rac_user", dsn.SysRAC, false},
+		{"+unknownPrivilege",
 			args{"foobar as barfoo"},
-			"foobar as barfoo", "", false},
-		{"-empty_user",
+			"foobar as barfoo", dsn.NoRole, false},
+		{"-missingUser",
 			args{""},
-			"", "", true},
+			"", dsn.NoRole, true},
+		{"-tooManyParts",
+			args{"foobar as sysdba extra"},
+			"", dsn.NoRole, true},
 	}
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			t.Parallel()
 
-			gotUser, gotPrivilege, err := SplitUserPrivilege(tt.args.userWithPrivilege)
+			gotUser, gotPrivilege, err := SplitUserAndPrivilege(tt.args.userWithPrivilege)
 			if (err != nil) != tt.wantErr {
-				t.Errorf("SplitUserPrivilege() error = %v, wantErr %v", err, tt.wantErr)
+				t.Fatalf("SplitUserAndPrivilege() error = %v, wantErr %v", err, tt.wantErr)
+			}
 
+			if tt.wantErr {
 				return
 			}
 
-			if gotUser != tt.wantUser {
-				t.Errorf("SplitUserPrivilege() gotUser = %v, want %v", gotUser, tt.wantUser)
+			if diff := cmp.Diff(tt.wantUser, gotUser); diff != "" {
+				t.Errorf("splitUserAndPrivilege() gotUser mismatch (-want +got):\n%s", diff)
 			}
 
-			if gotPrivilege != tt.wantPrivilege {
-				t.Errorf("SplitUserPrivilege() gotPrivilege = %v, want %v", gotPrivilege, tt.wantPrivilege)
+			if diff := cmp.Diff(tt.wantPrivilege, gotPrivilege); diff != "" {
+				t.Errorf("splitUserAndPrivilege() gotPrivilege mismatch (-want +got):\n%s", diff)
 			}
 		})
 	}
@@ -243,33 +243,33 @@ func TestConnManager_setConn(t *testing.T) {
 		{
 			"+createFirst",
 			[]fields{},
-			args{newConnDet(t, "zabbix_mon", ""), &OraConn{username: "first"}},
+			args{newConnDet(t, "zabbix_mon", dsn.NoRole), &OraConn{username: "first"}},
 			wants{1, &OraConn{username: "first"}},
 			false,
 		},
 		{
 			"+createSecond",
 			[]fields{
-				{newConnDet(t, "zabbix_mon", ""), &OraConn{username: "first"}},
+				{newConnDet(t, "zabbix_mon", dsn.NoRole), &OraConn{username: "first"}},
 			},
-			args{newConnDet(t, "sys", "sysdba"), &OraConn{username: "second"}},
+			args{newConnDet(t, "sys", dsn.SysDBA), &OraConn{username: "second"}},
 			wants{2, &OraConn{username: "second"}},
 			false,
 		},
 		{
 			"+getExisting",
 			[]fields{
-				{newConnDet(t, "zabbix_mon", ""), &OraConn{username: "first"}},
-				{newConnDet(t, "sys", "sysdba"), &OraConn{username: "second"}},
+				{newConnDet(t, "zabbix_mon", dsn.NoRole), &OraConn{username: "first"}},
+				{newConnDet(t, "sys", dsn.SysDBA), &OraConn{username: "second"}},
 			},
-			args{newConnDet(t, "zabbix_mon", ""), &OraConn{username: "third"}},
+			args{newConnDet(t, "zabbix_mon", dsn.NoRole), &OraConn{username: "third"}},
 			wants{2, &OraConn{username: "first"}},
 			false,
 		},
 		{
 			"-connectionNull",
 			[]fields{},
-			args{newConnDet(t, "zabbix_mon", ""), nil},
+			args{newConnDet(t, "zabbix_mon", dsn.NoRole), nil},
 			wants{},
 			true,
 		},
@@ -565,13 +565,6 @@ func TestConnManager_GetConnection(t *testing.T) {
 			want{"zabbix_mon", 2},
 			false,
 		},
-		{
-			"-connErr",
-			fields{},
-			args{newConnDet(t, "zabbix_mon", "err")},
-			want{},
-			true,
-		},
 	}
 
 	for _, tt := range tests {
@@ -776,7 +769,7 @@ func compareOraCon(x, y *OraConn) bool {
 	return x.username == y.username
 }
 
-func newConnDet(t *testing.T, username, privilege string) ConnDetails {
+func newConnDet(t *testing.T, username string, privilege dsn.AdminRole) ConnDetails {
 	t.Helper()
 
 	u, _ := uri.NewWithCreds(

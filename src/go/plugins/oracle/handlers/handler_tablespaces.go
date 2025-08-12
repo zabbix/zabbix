@@ -39,7 +39,7 @@ func TablespacesHandler(ctx context.Context, conn dbconn.OraClient, params map[s
 
 	query, args, err := getTablespacesQuery(params)
 	if err != nil {
-		return nil, errs.Wrap(err, "failed to retrieve tabespace query")
+		return nil, errs.Wrap(err, "failed to retrieve tablespace query")
 	}
 
 	row, err := conn.QueryRow(ctx, query, args...)
@@ -148,7 +148,7 @@ SELECT JSON_ARRAYAGG(
                                )
                    ) RETURNING CLOB
            )
-FROM (SELECT df.CON_NAME,
+FROM (SELECT NVL(df.CON_NAME, 'NOCDB')           AS CON_NAME,
              df.TABLESPACE_NAME                  AS TABLESPACE_NAME,
              df.CONTENTS                         AS CONTENTS,
              NVL(SUM(df.BYTES), 0)               AS FILE_BYTES,
@@ -195,7 +195,7 @@ FROM (SELECT df.CON_NAME,
                df.CONTENTS,
                df.STATUS
       UNION ALL
-      SELECT Y.CON_NAME,
+      SELECT NVL(Y.CON_NAME, 'NOCDB')                 AS CON_NAME,
              Y.NAME                                   AS TABLESPACE_NAME,
              Y.CONTENTS                               AS CONTENTS,
              NVL(SUM(Y.BYTES), 0)                     AS FILE_BYTES,
@@ -413,7 +413,7 @@ SELECT JSON_ARRAYAGG(
                                )
                    ) RETURNING CLOB
            )
-FROM (SELECT df.CON_NAME,
+FROM (SELECT NVL(df.CON_NAME, 'NOCDB')           AS CON_NAME,
              df.TABLESPACE_NAME                  AS TABLESPACE_NAME,
              df.CONTENTS                         AS CONTENTS,
              NVL(SUM(df.BYTES), 0)               AS FILE_BYTES,
@@ -484,7 +484,7 @@ SELECT JSON_ARRAYAGG(
                                )
                    ) RETURNING CLOB
            )
-FROM (SELECT Y.CON_NAME,
+FROM (SELECT NVL(Y.CON_NAME, 'NOCDB')                 AS CON_NAME,
              Y.NAME                                   AS TABLESPACE_NAME,
              Y.CONTENTS                               AS CONTENTS,
              NVL(SUM(Y.BYTES), 0)                     AS FILE_BYTES,

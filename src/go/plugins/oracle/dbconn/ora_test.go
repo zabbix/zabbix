@@ -15,54 +15,12 @@
 package dbconn
 
 import (
-	"reflect"
 	"testing"
 	"time"
 
-	"github.com/godror/godror"
 	"github.com/google/go-cmp/cmp"
 	"golang.zabbix.com/sdk/uri"
 )
-
-func Test_getDriverConnParams(t *testing.T) {
-	t.Parallel()
-
-	type args struct {
-		privilege string
-	}
-
-	tests := []struct {
-		name    string
-		args    args
-		wantOut godror.ConnParams
-		wantErr bool
-	}{
-		{"+noPrivilege", args{}, godror.ConnParams{}, false},
-		{"+sysdba", args{"sysdba"}, godror.ConnParams{IsSysDBA: true}, false},
-		{"+sysoperCapital", args{"SYSOPER"}, godror.ConnParams{IsSysOper: true}, false},
-		{"+sysoper", args{"sysoper"}, godror.ConnParams{IsSysOper: true}, false},
-		{"+sysasm", args{"sysasm"}, godror.ConnParams{IsSysASM: true}, false},
-		{"+empty_privilege", args{""}, godror.ConnParams{}, false},
-		{"-incorrect_privilege", args{"foobar"}, godror.ConnParams{}, true},
-	}
-
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			t.Parallel()
-
-			gotOut, err := getDriverConnParams(tt.args.privilege)
-			if (err != nil) != tt.wantErr {
-				t.Errorf("getDriverConnParams() error = %v, wantErr %v", err, tt.wantErr)
-
-				return
-			}
-
-			if !reflect.DeepEqual(gotOut, tt.wantOut) {
-				t.Errorf("getDriverConnParams() = %v, want %v", gotOut, tt.wantOut)
-			}
-		})
-	}
-}
 
 func TestOraConn_WhoAmI(t *testing.T) {
 	t.Parallel()

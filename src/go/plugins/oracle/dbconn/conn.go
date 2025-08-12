@@ -26,6 +26,7 @@ import (
 	"time"
 
 	"github.com/godror/godror"
+	"github.com/godror/godror/dsn"
 	"github.com/omeid/go-yarn"
 	"golang.zabbix.com/sdk/errs"
 	"golang.zabbix.com/sdk/log"
@@ -77,19 +78,19 @@ type ConnManager struct {
 // for reuse.
 type ConnDetails struct {
 	Uri       uri.URI //nolint:revive
-	Privilege string
+	Privilege dsn.AdminRole
 
 	// OnlyHostname is used to distinguish the case when a user wants to connect by URI or by TNS names key.
 	// If true - no schema and/or port was specified and, in case if the option ResolveTNS=true, we treat
 	// it as hostname and prepare the appropriate connect-string.
-	// If false - and ResolveTNS=true we treat it as tns and prepare tns-like connect-string. See the function
+	// If false - and ResolveTNS = true, we treat it as tns and prepare tns-like connect-string. See the function
 	// isOnlyHostnameOrIP().
 	OnlyHostname bool
 }
 
 // NewConnDetails function creates a ConnDetails instance for connection to Oracle.
 func NewConnDetails(uriStr, user, pwd, service string) (*ConnDetails, error) {
-	userSplit, privilegeSplit, err := SplitUserPrivilege(user)
+	userSplit, privilegeAdminRole, err := SplitUserAndPrivilege(user)
 	if err != nil {
 		return nil, errs.WrapConst(err, ErrNewConnDetails)
 	}
@@ -101,13 +102,13 @@ func NewConnDetails(uriStr, user, pwd, service string) (*ConnDetails, error) {
 		return nil, errs.WrapConst(err, ErrNewConnDetails)
 	}
 
-	// Create uri with attrinutes as well as default values
+	// Create uri with attributes as well as default values
 	u, err := uri.NewWithCreds(uriStr+"?service="+service, userSplit, pwd, URIDefaults)
 	if err != nil {
 		return nil, errs.WrapConst(err, ErrNewConnDetails)
 	}
 
-	return &ConnDetails{Uri: *u, Privilege: privilegeSplit, OnlyHostname: onlyHostname}, nil
+	return &ConnDetails{Uri: *u, Privilege: privilegeAdminRole, OnlyHostname: onlyHostname}, nil
 }
 
 // NewConnManager initializes connManager structure and runs goroutine that watches for unused connections.
@@ -284,30 +285,44 @@ func (c *ConnManager) setConn(cd ConnDetails, conn *OraConn) (*OraConn, error) {
 	return conn, nil
 }
 
-// SplitUserPrivilege function splits userWithPrivilege into user and privilege.
-func SplitUserPrivilege(userWithPrivilege string) (user, privilege string, err error) { //nolint:nonamedreturns
-	userWithPrivilege = normalizeSpaces(userWithPrivilege)
-	if userWithPrivilege == "" {
+// SplitUserAndPrivilege parses userWithPrivilege that may contain a privilege role.
+// It accepts formats like "system", "system as sysdba", or "SYSTEM AS SYSDBA".
+// It returns the clean username, a validated dsn.AdminRole, and an error if the
+// format is invalid or the role is unknown.
+func SplitUserAndPrivilege(userWithPrivilege string) (string, dsn.AdminRole, error) { //nolint:nonamedreturns
+	userStr := normalizeSpaces(userWithPrivilege)
+	if userStr == "" {
 		return "", "", errs.WrapConst(zbxerr.ErrorTooFewParameters, ErrMissingParamUser)
 	}
+	// strings.Fields is robust against multiple spaces and leading/trailing whitespace.
+	parts := strings.Fields(userStr)
 
-	var extension string
+	switch len(parts) {
+	case 0:
+		// The user string was empty or just whitespace.
+		return "", dsn.NoRole, nil // returning nil to keep backwards compatible code
+	case 1:
+		// A simple username with no privilege, e.g., "myuser". This is valid.
+		return parts[0], dsn.NoRole, nil
+	case 3:
+		// Potential "user as privilege" format.
+		// Use strings.EqualFold for a case-insensitive "as" check.
+		if !strings.EqualFold(parts[1], "as") {
+			return userStr, dsn.NoRole, nil // returning given string and no error to keep backwards compatible code
+		}
 
-	switch {
-	case strings.HasSuffix(strings.ToLower(userWithPrivilege), sysdbaExtension):
-		privilege = sysdbaPrivilege
-		extension = sysdbaExtension
-	case strings.HasSuffix(strings.ToLower(userWithPrivilege), sysoperExtension):
-		privilege = sysoperPrivilege
-		extension = sysoperExtension
-	case strings.HasSuffix(strings.ToLower(userWithPrivilege), sysasmExtension):
-		privilege = sysasmPrivilege
-		extension = sysasmExtension
+		role := dsn.AdminRole(strings.ToUpper(parts[2]))
+
+		if validAdminRoles[role] {
+			return parts[0], role, nil
+		}
+
+		return userStr, dsn.NoRole, nil
 	}
 
-	user = userWithPrivilege[:len(userWithPrivilege)-len(extension)]
-
-	return user, privilege, nil
+	// All other formats (e.g., "user sysdba", "user as", "user as sysdba extra") are invalid.
+	return "", dsn.NoRole,
+		errs.Wrap(errs.New("invalid user format: expected 'user' or 'user as <privilege>', but got :"), userStr)
 }
 
 // setCustomQuery function if enabled, reads the SQLs from a file by path.
