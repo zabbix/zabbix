@@ -51,6 +51,7 @@ static void	autoreg_process_hosts_server(zbx_vector_autoreg_host_ptr_t *autoreg_
 	char			*sql = NULL;
 	size_t			sql_alloc = 512, sql_offset;
 	zbx_autoreg_host_t	*autoreg_host;
+	unsigned int		current_connection_type;
 
 	sql = (char *)zbx_malloc(sql, sql_alloc);
 	zbx_vector_str_create(&hosts);
@@ -89,15 +90,9 @@ static void	autoreg_process_hosts_server(zbx_vector_autoreg_host_ptr_t *autoreg_
 					autoreg_host->flag != atoi(row[7]))
 				break;
 
-			/* check if connection_type has changed */
-			if (SUCCEED != zbx_db_is_null(row[11]))
-			{
-				unsigned int	current_connection_type;
-
-				if (FAIL == zbx_is_uint32(row[11], &current_connection_type) ||
-						current_connection_type != autoreg_host->connection_type)
-					break;
-			}
+			if (FAIL == zbx_is_uint32(row[11], &current_connection_type) ||
+					current_connection_type != autoreg_host->connection_type)
+				break;
 
 			/* process with autoregistration if the connection type was forced and */
 			/* is different from the last registered connection type               */
@@ -190,7 +185,7 @@ static void	autoreg_process_hosts_server(zbx_vector_autoreg_host_ptr_t *autoreg_
 		/* update autoreg_id in vector if already exists in autoreg_host table */
 		sql_offset = 0;
 		zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset,
-				"select autoreg_hostid,host,tls_accepted"
+				"select autoreg_hostid,host"
 				" from autoreg_host"
 				" where");
 		zbx_db_add_str_condition_alloc(&sql, &sql_alloc, &sql_offset, "host",

@@ -726,7 +726,7 @@ static zbx_uint64_t	add_discovered_host(const zbx_db_event *event, int *status, 
 				}
 
 				if (host_proxyid != new_proxyid || proxy_groupid != new_proxy_groupid ||
-						monitored_by != new_monitored_by || update_tls)
+						monitored_by != new_monitored_by || 0 != update_tls)
 				{
 					char	delim = ' ';
 					size_t	sql_alloc = 0, sql_offset = 0;
@@ -768,7 +768,7 @@ static zbx_uint64_t	add_discovered_host(const zbx_db_event *event, int *status, 
 								(int)monitored_by, (int)new_monitored_by);
 					}
 
-					if (update_tls)
+					if (0 != update_tls)
 					{
 						if (ZBX_TCP_SEC_TLS_PSK == tls_accepted)
 						{
