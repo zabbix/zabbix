@@ -25,6 +25,7 @@ class CControllerImageUpdate extends CController {
 		$api_uniq = [
 			['image.get', ['name' => '{name}'], 'imageid']
 		];
+
 		return ['object', 'api_uniq' => $api_uniq, 'fields' => [
 			'imageid' => ['required', 'db images.imageid'],
 			'imagetype' => ['required', 'db images.imagetype', 'in '.IMAGE_TYPE_ICON.','.IMAGE_TYPE_BACKGROUND],
