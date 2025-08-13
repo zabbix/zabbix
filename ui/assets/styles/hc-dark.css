@@ -7103,6 +7103,13 @@ z-select[disabled] .focusable, input[disabled], textarea[disabled], select optio
     border: 0; }
   .setup-right-body h1 {
     margin: 25% 0 .4em; }
+  .setup-right-body .table-forms-td-left {
+    white-space: unset;
+    min-width: 180px;
+    vertical-align: middle; }
+    .setup-right-body .table-forms-td-left label {
+      height: unset;
+      line-height: unset; }
 
 .setup-title {
   margin: 109px 0 16px 0;

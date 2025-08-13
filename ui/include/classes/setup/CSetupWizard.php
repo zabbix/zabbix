@@ -616,7 +616,9 @@ class CSetupWizard extends CForm {
 					false
 				))->setWidth(ZBX_TEXTAREA_SMALL_WIDTH),
 				(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
-				(new CSpan(_('0 - use default port')))->addClass(ZBX_STYLE_GREY)
+				(new CSpan(_('0 - use default port')))
+					->addClass(ZBX_STYLE_GREY)
+					->addClass(ZBX_STYLE_NOWRAP)
 			])
 			->addRow(_('Database name'),
 				(new CTextBox('database', $this->getConfig('DB_DATABASE', 'zabbix')))
