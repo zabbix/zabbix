@@ -236,6 +236,10 @@ abstract class CController {
 				// Replace window.history to avoid resubmission warning dialog.
 				zbx_add_post_js("history.replaceState({}, '');");
 			}
+
+			foreach ($_FILES as $file_key => $file) {
+				$input[$file_key] = new CUploadFile($_FILES[$file_key]);
+			}
 		}
 
 		return $input;

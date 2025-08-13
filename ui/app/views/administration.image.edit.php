@@ -18,6 +18,8 @@
  * @var CView $this
  */
 
+$data['form_name'] = 'image-form';
+
 $this->includeJsFile('administration.image.edit.js.php');
 
 $html_page = (new CHtmlPage())
@@ -27,10 +29,14 @@ $html_page = (new CHtmlPage())
 
 $csrf_token = CCsrfTokenHelper::get('image');
 
-$form = (new CForm('post', (new CUrl('zabbix.php'))
-	->setArgument('action', ($data['imageid'] == 0) ? 'image.create' : 'image.update')
-	->getUrl(), 'multipart/form-data')
-)
+$form = (new CForm())
+	->setAction((new CUrl('zabbix.php'))
+		->setArgument('action', ($data['imageid'] == 0) ? 'image.create' : 'image.update')
+		->getUrl()
+	)
+	->setAttribute('onsubmit', 'administration_image_edit.submit(event);')
+	->setId($data['form_name'])
+	->setName($data['form_name'])
 	->addItem((new CVar(CSRF_TOKEN_NAME, $csrf_token))->removeId())
 	->setAttribute('aria-labelledby', CHtmlPage::PAGE_TITLE_ID)
 	->addVar('imagetype', $data['imagetype']);
@@ -52,6 +58,7 @@ $form_list = (new CFormList('imageFormList'))
 		(new CFile('image'))
 			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 			->setAriaRequired()
+			->setAttribute('accept', 'image/*')
 	);
 
 if ($data['imageid'] != 0) {
@@ -102,3 +109,10 @@ else {
 }
 
 $html_page->addItem($form->addItem($tab_view))->show();
+
+(new CScriptTag('
+	administration_image_edit.init('.json_encode([
+		'rules' => $data['js_validation_rules']
+	]).');
+'))
+	->show();

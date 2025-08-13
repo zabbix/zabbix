@@ -71,7 +71,13 @@ class CControllerImageEdit extends CController {
 	}
 
 	protected function doAction() {
-		$response = new CControllerResponseData($this->getInputAll() + $this->image);
+		$data = $this->getInputAll() + $this->image;
+		$data['js_validation_rules'] = $this->image['imageid']
+			? CControllerImageUpdate::getValidationRules()
+			: CControllerImageCreate::getValidationRules();
+		$data['js_validation_rules'] = (new CFormValidator($data['js_validation_rules']))->getRules();
+
+		$response = new CControllerResponseData($data);
 		$response->setTitle(_('Configuration of images'));
 		$this->setResponse($response);
 	}

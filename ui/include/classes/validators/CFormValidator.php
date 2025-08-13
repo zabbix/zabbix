@@ -171,6 +171,18 @@ class CFormValidator {
 
 					$result['not_in'] = self::parseIn(substr($value, 7));
 				}
+				elseif (strncmp($value, 'file ', 5) === 0) {
+					$result['type'] = 'file';
+					$result['file'] = 'file';
+					$result['max-file-size'] = intval(substr($value, 5));
+					$result['max-file-size-MB'] = convertUnits(['value' => $result['max-file-size'], 'units' => 'B']);
+				}
+				elseif (strncmp($value, 'image ', 6) === 0) {
+					$result['type'] = 'file';
+					$result['file'] = 'image';
+					$result['max-file-size'] = intval(substr($value, 6));
+					$result['max-file-size-MB'] = convertUnits(['value' => $result['max-file-size'], 'units' => 'B']);
+				}
 				else {
 					throw new Exception('[RULES ERROR] Unknown rule "'.$value.'" (Path: '.$rule_path.')');
 				}
@@ -746,6 +758,14 @@ class CFormValidator {
 						return;
 					}
 					break;
+
+				case 'file':
+					if (!$this->validateFile($rules, $data[$field], $error)) {
+						$this->addError(self::ERROR, $path, $error, self::ERROR_LEVEL_PRIMARY);
+
+						return;
+					}
+					break;
 			}
 		}
 	}
@@ -1185,6 +1205,8 @@ class CFormValidator {
 			return false;
 		}
 
+		error_log('validate array');
+
 		if (array_key_exists('field', $rules)) {
 			foreach (array_keys($array_values) as $index) {
 				$this->validateField($rules['field'], $array_values, $index, $path.'/'.$index);
@@ -1296,6 +1318,46 @@ class CFormValidator {
 			}
 
 			return false;
+		}
+
+		return true;
+	}
+
+	/**
+	 * File validator
+	 *
+	 * @param array  $rules
+	 * @param string $rules['file']		  		file type (image or file)
+	 * @param int    $rules['max-file-size']	(optional) maximum size of file
+	 * @param array  $rules['messages']			(optional) Error messages to use when some check fails.
+	 * @param mixed  $value
+	 * @param string $error
+	 *
+	 * @return bool
+	 */
+	private static function validateFile ($rules, &$value, ?string &$error = null): bool {
+		if ($rules['max-file-size']) {
+			try {
+				$value->validateFileSize($rules['max-file-size']);
+			}
+			catch (Exception $e) {
+				$error = $e->getMessage();
+				return false;
+			}
+		}
+
+		if ($rules['file'] == 'image') {
+			try {
+
+				if (@imageCreateFromString($value->getContent()) === false) {
+					$error = _('File format is unsupported');
+					return false;
+				}
+			}
+			catch (Exception $e) {
+				$error = $e->getMessage();
+				return false;
+			}
 		}
 
 		return true;
@@ -1909,6 +1971,9 @@ class CFormValidator {
 
 			case 'string':
 				return self::validateStringUtf8($when_rules, $when_field['value']);
+
+			case 'file':
+				return self::validateFile($when_rules, $when_field['value']);
 
 			default:
 				/*

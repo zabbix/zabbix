@@ -113,17 +113,26 @@ class CUploadFile {
 	}
 
 	/**
-	 * Validate image size.
+	 * Validate size of file.
 	 *
-	 * @throws Exception if image size is 1MB or greater.
+	 * @throws Exception if file size is over provided limit
 	 */
-	public function validateImageSize() {
-		if ($this->error === UPLOAD_ERR_INI_SIZE || $this->size > ZBX_MAX_IMAGE_SIZE) {
+	public function validateFileSize(int $max_file_size) {
+		if ($this->error === UPLOAD_ERR_INI_SIZE || $this->size > $max_file_size) {
 			throw new Exception(_s('Image size must be less than %1$s.', convertUnits([
 				'value' => ZBX_MAX_IMAGE_SIZE,
 				'units' => 'B'
 			])));
 		}
+	}
+
+	/**
+	 * Validate image size.
+	 *
+	 * @throws Exception if image size is 1MB or greater.
+	 */
+	public function validateImageSize() {
+		return $this->validateFileSize(intval(ZBX_MAX_IMAGE_SIZE));
 	}
 
 	/**

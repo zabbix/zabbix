@@ -924,7 +924,8 @@ class CFormValidator {
 			'string': this.#validateStringUtf8,
 			'array': this.#validateArray,
 			'object': this.#validateObject,
-			'objects': this.#validateObjects
+			'objects': this.#validateObjects,
+			'file': this.#validateFile,
 		}[rules.type] || null;
 
 		if (validator !== null) {
@@ -1343,6 +1344,36 @@ class CFormValidator {
 		objects_values = normalized_values;
 
 		return {result: CFormValidator.SUCCESS, value: objects_values};
+	}
+
+	/**
+	 * Function to validate data that according to the rules is expected to be a file.
+	 *
+	 * @param {Object} rules  Ruleset to use for validation.
+	 * @param {any}    value  Data to validate (upploaded file).
+	 *
+	 * @returns {Object}
+	 */
+	#validateFile(rules, value) {
+		if (rules['max-file-size'] && value && value.size > rules['max-file-size']) {
+			return {
+				result: CFormValidator.ERROR,
+				error: this.#getMessage(rules, 'file',
+					sprintf(t('File size must be less than %1$s.'), rules['max-file-size-MB']))
+			};
+		}
+
+		if (rules['file'] !== 'file') {
+
+			if (!value.type.startsWith(`${rules['file']}/`)) {
+				return {
+					result: CFormValidator.ERROR,
+					error: this.#getMessage(rules, 'file-format', t('File format is unsupported'))
+				};
+			}
+		}
+
+		return {result: CFormValidator.SUCCESS, value};
 	}
 
 	/**

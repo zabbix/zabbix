@@ -16,31 +16,41 @@
 
 class CControllerImageCreate extends CController {
 
-	protected function checkInput() {
-		$fields = [
-			'name'      => 'required|not_empty|db images.name',
-			'imagetype' => 'required|fatal|db images.imagetype'
-		];
+	protected function init(): void {
+		$this->setInputValidationMethod(self::INPUT_VALIDATION_FORM);
+		$this->setPostContentType(self::POST_CONTENT_TYPE_FORM);
+	}
 
-		$ret = $this->validateInput($fields);
+	public static function getValidationRules(): array {
+		$api_uniq = [
+			['image.get', ['name' => '{name}'], 'imageid']
+		];
+		return ['object', 'api_uniq' => $api_uniq, 'fields' => [
+			'imagetype' => ['required', 'db images.imagetype', 'in '.IMAGE_TYPE_ICON.','.IMAGE_TYPE_BACKGROUND],
+			'name' => ['db images.name', 'required', 'not_empty'],
+			'image' => ['required', 'image '.ZBX_MAX_IMAGE_SIZE,
+				'messages' => ['file' => _s('Image size must be less than %1$s.', convertUnits(['value' =>
+					ZBX_MAX_IMAGE_SIZE, 'units' => 'B']))]
+			]
+		]];
+	}
+
+	protected function checkInput() {
+
+		$ret = $this->validateInput(self::getValidationRules());
 
 		if (!$ret) {
-			switch ($this->getValidationResult()) {
-				case self::VALIDATION_ERROR:
-					$url = (new CUrl('zabbix.php'))
-						->setArgument('action', 'image.edit')
-						->setArgument('imagetype', $this->getInput('imagetype'));
+			$form_errors = $this->getValidationError();
+			$response = $form_errors
+				? ['form_errors' => $form_errors]
+				: ['error' => [
+					'title' => _('Cannot update image'),
+					'messages' => array_column(get_and_clear_messages(), 'message')
+				]];
 
-					$response = new CControllerResponseRedirect($url);
-					$response->setFormData($this->getInputAll());
-					CMessageHelper::setErrorTitle(_('Cannot add image'));
-					$this->setResponse($response);
-					break;
-
-				case self::VALIDATION_FATAL_ERROR:
-					$this->setResponse(new CControllerResponseFatal());
-					break;
-			}
+			$this->setResponse(
+				new CControllerResponseData(['main_block' => json_encode($response)])
+			);
 		}
 
 		return $ret;
@@ -61,11 +71,10 @@ class CControllerImageCreate extends CController {
 	 */
 	protected function uploadImage(&$error) {
 		try {
-			if (array_key_exists('image', $_FILES)) {
-				$file = new CUploadFile($_FILES['image']);
+			if ($this->hasInput('image')) {
+				$file = $this->getInput('image');
 
 				if ($file->wasUploaded()) {
-					$file->validateImageSize();
 					return base64_encode($file->getContent());
 				}
 
@@ -86,16 +95,12 @@ class CControllerImageCreate extends CController {
 		$image = $this->uploadImage($error);
 
 		if ($error) {
-			$url = (new CUrl('zabbix.php'))
-				->setArgument('action', 'image.edit')
-				->setArgument('imagetype', $this->getInput('imagetype'));
+			$output['error'] = [
+				'title' => _('Cannot add image'),
+				'messages' => $error
+			];
+			$this->setResponse(new CControllerResponseData(['main_block' => json_encode($output)]));
 
-			$response = new CControllerResponseRedirect($url);
-			error($error);
-			$response->setFormData($this->getInputAll());
-			CMessageHelper::setErrorTitle(_('Cannot add image'));
-
-			$this->setResponse($response);
 			return;
 		}
 
@@ -111,23 +116,23 @@ class CControllerImageCreate extends CController {
 		$result = API::Image()->create($options);
 
 		if ($result) {
-			$response = new CControllerResponseRedirect(
-				(new CUrl('zabbix.php'))
-					->setArgument('action', 'image.list')
-					->setArgument('imagetype', $this->getInput('imagetype'))
-			);
-			CMessageHelper::setSuccessTitle(_('Image added'));
+			$output['success']['title'] = _('Image added');
+			$output['success']['redirect'] = (new CUrl('zabbix.php'))
+				->setArgument('action', 'image.list')
+				->setArgument('imagetype', $this->getInput('imagetype'))
+				->getUrl();
+
+			if ($messages = get_and_clear_messages()) {
+				$output['success']['messages'] = array_column($messages, 'message');
+			}
 		}
 		else {
-			$response = new CControllerResponseRedirect(
-				(new CUrl('zabbix.php'))
-					->setArgument('action', 'image.edit')
-					->setArgument('imagetype', $this->getInput('imagetype'))
-			);
-			$response->setFormData($this->getInputAll());
-			CMessageHelper::setErrorTitle(_('Cannot add image'));
+			$output['error'] = [
+				'title' => _('Cannot add image'),
+				'messages' => array_column(get_and_clear_messages(), 'message')
+			];
 		}
 
-		$this->setResponse($response);
+		$this->setResponse(new CControllerResponseData(['main_block' => json_encode($output)]));
 	}
 }

@@ -1,4 +1,3 @@
-<?php
 /*
 ** Copyright (C) 2001-2025 Zabbix SIA
 **
@@ -14,15 +13,31 @@
 **/
 
 
-class CFile extends CInput {
+class CFieldFile extends CField {
 
-	public function __construct($name = 'file') {
-		parent::__construct('file', $name);
-		$this->setAttribute('data-field-type', 'file');
+	init() {
+		super.init();
+
+		this._field.addEventListener('input', () => this.onBlur());
 	}
 
-	public function setWidth($value) {
-		$this->addStyle('width: '.$value.'px;');
-		return $this;
+	getName() {
+		return this._field.getAttribute('name');
+	}
+
+	getValue() {
+		if (this._field.disabled) {
+			return null;
+		}
+		return this._field.files[0] ? this._field.files[0] : null;
+	}
+
+	getValueTrimmed() {
+		return this.getValue();
+	}
+
+	focusErrorField() {
+		super.focusErrorField();
+		this._field.focus();
 	}
 }
