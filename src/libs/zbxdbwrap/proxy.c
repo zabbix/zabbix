@@ -894,15 +894,9 @@ static int	parse_history_data_row_value(const struct zbx_json_parse *jp_row, zbx
 		if (FAIL == zbx_is_uint31(tmp, &av->ts.sec))
 			goto out;
 
-		if (SUCCEED == zbx_json_value_by_name_dyn(jp_row, ZBX_PROTO_TAG_NS, &tmp, &tmp_alloc, NULL))
-		{
-			if (FAIL == zbx_is_uint_n_range(tmp, tmp_alloc, &av->ts.ns, sizeof(av->ts.ns),
-				0LL, 999999999LL))
-			{
-				goto out;
-			}
-		}
-		else
+		if (FAIL == zbx_json_value_by_name_dyn(jp_row, ZBX_PROTO_TAG_NS, &tmp, &tmp_alloc, NULL) ||
+				FAIL == zbx_is_uint_n_range(tmp, tmp_alloc, &av->ts.ns, sizeof(av->ts.ns), 1LL,
+				999999999LL))
 		{
 			/* ensure unique value timestamp (clock, ns) if only clock is available */
 
