@@ -76,6 +76,14 @@ class testPageAlertsScripts extends CWebTest {
 				'command' => '/sbin/zabbix_server --runtime-control config_cache_reload',
 				'groupid' => '4',
 				'description' => 'This command reload cache.'
+			],
+			[
+				'name' => 'I love   Zabbix   UI',
+				'type' => ZBX_SCRIPT_TYPE_CUSTOM_SCRIPT,
+				'scope' => ZBX_SCRIPT_SCOPE_ACTION,
+				'command' => '1-2-3-4 spaces',
+				'groupid' => '4',
+				'description' => 'Multiple spaces in script name'
 			]
 		]);
 		$scriptids = CDataHelper::getIds('name');
@@ -131,6 +139,18 @@ class testPageAlertsScripts extends CWebTest {
 						'Commands' => 'sudo /usr/bin/nmap -O {HOST.CONN}',
 						'User group' => 'Zabbix administrators',
 						'Host group' => 'All',
+						'Host access' => 'Read'
+					],
+					[
+						'Name' => 'I love Zabbix UI',
+						'Scope' => 'Action operation',
+						'Count' => '',
+						'Used in actions' => '',
+						'Type' => 'Script',
+						'Execute on' => 'Server (proxy)',
+						'Commands' => '1-2-3-4 spaces',
+						'User group' => 'All',
+						'Host group' => 'Zabbix servers',
 						'Host access' => 'Read'
 					],
 					[
@@ -329,10 +349,22 @@ class testPageAlertsScripts extends CWebTest {
 					'expected' => [
 						self::$custom_script,
 						'Detect operating system',
+						'I love Zabbix UI',
 						self::$script_scope_event,
 						self::HOST_GROUP_SCRIPT,
 						self::$script_for_filter,
 						'Selenium script'
+					]
+				]
+			],
+			// Multiple spaces in search field Name.
+			[
+				[
+					'filter' => [
+						'Name' => '   Zabbix   '
+					],
+					'expected' => [
+						'I love Zabbix UI'
 					]
 				]
 			],
@@ -386,6 +418,7 @@ class testPageAlertsScripts extends CWebTest {
 					],
 					'expected' => [
 						self::$custom_script,
+						'I love Zabbix UI',
 						'Reboot',
 						self::HOST_GROUP_SCRIPT,
 						'Selenium script'
@@ -463,6 +496,7 @@ class testPageAlertsScripts extends CWebTest {
 					'expected' => [
 						self::$custom_script,
 						'Detect operating system',
+						'I love Zabbix UI',
 						self::$script_scope_event,
 						'Ping',
 						'Reboot',
@@ -508,6 +542,7 @@ class testPageAlertsScripts extends CWebTest {
 						'Reboot',
 						'Ping',
 						self::$script_scope_event,
+						'I love Zabbix UI',
 						'Detect operating system',
 						self::$custom_script
 					]
@@ -521,6 +556,7 @@ class testPageAlertsScripts extends CWebTest {
 						'/sbin/shutdown -r',
 						'/sbin/zabbix_server --runtime-control config_cache_reload',
 						'/usr/bin/traceroute {HOST.CONN}',
+						'1-2-3-4 spaces',
 						'ping -c 3 {HOST.CONN}; case $? in [01]) true;; *) false;; esac',
 						// TODO: fix order after fix ZBX-22329
 						'',
