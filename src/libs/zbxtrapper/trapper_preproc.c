@@ -307,6 +307,20 @@ int	zbx_trapper_preproc_test_run(const struct zbx_json_parse *jp_item, const str
 				break;
 			}
 		}
+
+		if (ITEM_VALUE_TYPE_JSON == value_type)
+		{
+			if (ZBX_HISTORY_JSON_VALUE_LEN < strlen(result->value.data.json))
+			{
+				preproc_error = zbx_strdup(NULL, "JSON limit reached.");
+				break;
+			}
+
+			if (0 == zbx_json_validate_ext(result->value.data.json, &preproc_error))
+			{
+				break;
+			}
+		}
 	}
 
 	if (i + 1 < values_num)
