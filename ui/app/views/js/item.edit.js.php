@@ -57,6 +57,7 @@ window.item_edit_form = new class {
 		this.type_interfaceids = {};
 		this.type_with_key_select = type_with_key_select;
 		this.value_type_keys = value_type_keys;
+		this.last_inferred_type = null;
 
 		for (const type in interface_types) {
 			if (interface_types[type] == INTERFACE_TYPE_OPT) {
@@ -195,6 +196,9 @@ window.item_edit_form = new class {
 				passphrase.value = password.value;
 			}
 		});
+
+		// Initialising last_inferred_type start value
+		this.last_inferred_type = this.#getInferredValueType(this.field.key.value);
 	}
 
 	initFormCustomIntervals() {
@@ -245,6 +249,10 @@ window.item_edit_form = new class {
 		this.field.request_method.addEventListener('change', this.updateFieldsVisibility.bind(this));
 		this.form_element.addEventListener('click', e => {
 			const target = e.target;
+
+			if (target.readOnly) {
+				return;
+			}
 
 			switch (target.getAttribute('name')) {
 				case 'custom_timeout':
@@ -771,8 +779,8 @@ window.item_edit_form = new class {
 	}
 
 	#updateHistoryModeVisibility() {
-		const mode_field = [].filter.call(this.field.history_mode, e => e.matches(':checked')).pop();
-		const disabled = mode_field.value == ITEM_STORAGE_OFF && !mode_field.readOnly;
+		const mode_field = [].filter.call(this.field.history_mode, e => e.matches(':checked')).pop(),
+			disabled = mode_field.value == ITEM_STORAGE_OFF && (!mode_field.readOnly || this.field.history.readOnly);
 
 		this.field.history.toggleAttribute('disabled', disabled);
 		this.field.history.classList.toggle(ZBX_STYLE_DISPLAY_NONE, disabled);
@@ -780,8 +788,8 @@ window.item_edit_form = new class {
 	}
 
 	#updateTrendsModeVisibility() {
-		const mode_field = [].filter.call(this.field.trends_mode, e => e.matches(':checked')).pop();
-		const disabled = mode_field.value == ITEM_STORAGE_OFF && !mode_field.readOnly;
+		const mode_field = [].filter.call(this.field.trends_mode, e => e.matches(':checked')).pop(),
+			disabled = mode_field.value == ITEM_STORAGE_OFF && (!mode_field.readOnly || this.field.trends.readOnly);
 
 		this.field.trends.toggleAttribute('disabled', disabled);
 		this.field.trends.classList.toggle(ZBX_STYLE_DISPLAY_NONE, disabled);
@@ -857,9 +865,11 @@ window.item_edit_form = new class {
 	#keyChangeHandler() {
 		const inferred_type = this.#getInferredValueType(this.field.key.value);
 
-		if (inferred_type !== null) {
+		if (inferred_type !== null && this.last_inferred_type !== inferred_type) {
 			this.field.value_type.value = inferred_type;
 		}
+
+		this.last_inferred_type = inferred_type;
 
 		this.updateFieldsVisibility();
 		this.form.validateChanges(['key']);
