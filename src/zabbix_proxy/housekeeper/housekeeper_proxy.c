@@ -24,6 +24,7 @@
 #include "zbx_rtc_constants.h"
 #include "zbxipcservice.h"
 #include "zbxdbhigh.h"
+#include "zbxstr.h"
 #include "zbxdb.h"
 
 /******************************************************************************
@@ -78,7 +79,7 @@ static int	delete_history(const char *table, const char *lastid_field, const cha
 #if defined(HAVE_POSTGRESQL)
 	const char* enable_timescale  = getenv("ENABLE_TIMESCALEDB");
 
-	if (0 == strcmp(table,"proxy_history") && 0 == strcmp(enable_timescale, "true"))
+	if (0 == strcmp(table,"proxy_history") && 0 == zbx_strcmp_null(enable_timescale, "true"))
 	{
 		zbx_uint64_t	keep_from;
 
