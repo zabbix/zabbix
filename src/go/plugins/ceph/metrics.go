@@ -22,9 +22,9 @@ import (
 	"golang.zabbix.com/sdk/uri"
 )
 
-var uriDefaults = &uri.Defaults{Scheme: "https", Port: "8003"}
+var uriDefaults = &uri.Defaults{Scheme: "https", Port: "8003"} //nolint:gochecknoglobals // constant
 
-// Common params: [URI|Session][,User][,ApiKey]
+// Common params: [URI|session][,User][,ApiKey].
 var (
 	paramURI = metric.NewConnParam("URI", "URI to connect or session name.").
 			WithDefault(uriDefaults.Scheme + "://localhost:" + uriDefaults.Port).WithSession().

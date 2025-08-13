@@ -20,7 +20,12 @@ import (
 	"golang.zabbix.com/sdk/plugin"
 )
 
-type Session struct {
+var _ plugin.Exporter = (*Plugin)(nil)
+
+type session struct {
+	// Mode defines that connection to ceph will be done using old restful mode or new - native.
+	Mode string `json:"mode"`
+
 	// URI defines an endpoint to REST API.
 	URI string `conf:"name=Uri,optional"`
 
@@ -29,7 +34,7 @@ type Session struct {
 	User string `conf:"name=User"`
 }
 
-type PluginOptions struct {
+type pluginOptions struct {
 	// InsecureSkipVerify controls whether an http client verifies the
 	// server's certificate chain and host name.
 	// If InsecureSkipVerify is true, TLS accepts any certificate
@@ -42,14 +47,14 @@ type PluginOptions struct {
 	KeepAlive int `conf:"optional,range=60:900,default=300"`
 
 	// Sessions stores pre-defined named sets of connections settings.
-	Sessions map[string]Session `conf:"optional"`
+	Sessions map[string]session `conf:"optional"`
 
 	// Timeout is the maximum time in seconds for waiting when a request has to be done.
 	// Default value equals to the global timeout.
 	Timeout int `conf:"optional,range=1:30"`
 
 	// Default stores default connection parameter values from configuration file
-	Default Session `conf:"optional"`
+	Default session `conf:"optional"`
 }
 
 // Configure implements the Configurator interface.
@@ -67,7 +72,7 @@ func (p *Plugin) Configure(global *plugin.GlobalOptions, options any) {
 // Validate implements the Configurator interface.
 // Returns an error if validation of a plugin's configuration is failed.
 func (p *Plugin) Validate(options any) error {
-	var opts PluginOptions
+	var opts pluginOptions
 
 	err := conf.UnmarshalStrict(options, &opts)
 	if err != nil {
