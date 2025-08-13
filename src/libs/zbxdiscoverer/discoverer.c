@@ -1215,9 +1215,6 @@ static void	*discoverer_worker_entry(void *net_check_worker)
 	zbx_discoverer_worker_t	*worker = (zbx_discoverer_worker_t*)net_check_worker;
 	zbx_discoverer_queue_t	*queue = worker->queue;
 
-	zabbix_log(LOG_LEVEL_INFORMATION, "thread started [%s #%d]",
-			get_process_type_string(ZBX_PROCESS_TYPE_DISCOVERER), worker->worker_id);
-
 	log_worker_id = worker->worker_id;
 	sigemptyset(&mask);
 	sigaddset(&mask, SIGQUIT);
@@ -1230,6 +1227,10 @@ static void	*discoverer_worker_entry(void *net_check_worker)
 
 	if (0 > (err = pthread_sigmask(SIG_BLOCK, &mask, NULL)))
 		zabbix_log(LOG_LEVEL_WARNING, "cannot block the signals: %s", zbx_strerror(err));
+
+
+	zabbix_log(LOG_LEVEL_INFORMATION, "thread started [%s #%d]",
+			get_process_type_string(ZBX_PROCESS_TYPE_DISCOVERER), worker->worker_id);
 
 	zbx_init_icmpping_env(get_process_type_string(ZBX_PROCESS_TYPE_DISCOVERER), worker->worker_id);
 	worker->stop = 0;

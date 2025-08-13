@@ -109,9 +109,6 @@ static void	*pp_worker_entry(void *args)
 	zbx_snprintf(component, sizeof(component), "%d", worker->id);
 	zbx_set_log_component(component, &worker->logger);
 
-	zabbix_log(LOG_LEVEL_INFORMATION, "thread started [%s #%d]",
-			get_process_type_string(ZBX_PROCESS_TYPE_PREPROCESSOR), worker->id);
-
 	zbx_init_regexp_env();
 
 	sigemptyset(&mask);
@@ -125,6 +122,8 @@ static void	*pp_worker_entry(void *args)
 	if (0 != (err = pthread_sigmask(SIG_BLOCK, &mask, NULL)))
 		zabbix_log(LOG_LEVEL_WARNING, "cannot block signals: %s", zbx_strerror(err));
 
+	zabbix_log(LOG_LEVEL_INFORMATION, "thread started [%s #%d]",
+			get_process_type_string(ZBX_PROCESS_TYPE_PREPROCESSOR), worker->id);
 	worker->stop = 0;
 
 	pp_context_init(&worker->execute_ctx);
