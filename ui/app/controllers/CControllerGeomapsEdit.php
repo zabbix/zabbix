@@ -32,21 +32,32 @@ class CControllerGeomapsEdit extends CController {
 	}
 
 	protected function doAction(): void {
+		$geomaps_tile_provider = CSettingsHelper::get(CSettingsHelper::GEOMAPS_TILE_PROVIDER);
+		$tile_providers = getTileProviders();
+
 		$data = [
-			'geomaps_tile_provider' => CSettingsHelper::get(CSettingsHelper::GEOMAPS_TILE_PROVIDER),
-			'tile_providers' => getTileProviders(),
+			'geomaps_tile_provider' => $geomaps_tile_provider,
+			'tile_providers' => $tile_providers,
 			'js_validation_rules' => (new CFormValidator(
 				CControllerGeomapsUpdate::getValidationRules()
 			))->getRules()
 		];
 
-		$data += (array_key_exists($data['geomaps_tile_provider'], $data['tile_providers']))
-			? $data['tile_providers'][$data['geomaps_tile_provider']]
-			: [
+		if ($geomaps_tile_provider === '') {
+			$data += [
 				'geomaps_tile_url' => CSettingsHelper::get(CSettingsHelper::GEOMAPS_TILE_URL),
 				'geomaps_max_zoom' => CSettingsHelper::get(CSettingsHelper::GEOMAPS_MAX_ZOOM),
 				'geomaps_attribution' => CSettingsHelper::get(CSettingsHelper::GEOMAPS_ATTRIBUTION)
 			];
+		}
+		elseif (array_key_exists($geomaps_tile_provider, $tile_providers)) {
+			$data += $tile_providers[$geomaps_tile_provider];
+		}
+		else {
+			$data['geomaps_tile_provider'] = array_key_first($tile_providers);
+
+			$data += reset($tile_providers);
+		}
 
 		$response = new CControllerResponseData($data);
 		$response->setTitle(_('Geographical maps'));

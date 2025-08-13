@@ -41,6 +41,30 @@ static int	DBpatch_7050002(void)
 	return DBadd_field("userdirectory_saml", &field);
 }
 
+static int	DBpatch_7050003(void)
+{
+	return DBdrop_foreign_key("event_recovery", 2);
+}
+
+static int	DBpatch_7050004(void)
+{
+	const zbx_db_field_t	field = {"r_eventid", NULL, "events", "eventid", 0, ZBX_TYPE_ID, ZBX_NOTNULL, 0};
+
+	return DBadd_foreign_key("event_recovery", 2, &field);
+}
+
+static int	DBpatch_7050005(void)
+{
+	return DBdrop_foreign_key("problem", 2);
+}
+
+static int	DBpatch_7050006(void)
+{
+	const zbx_db_field_t	field = {"r_eventid", NULL, "events", "eventid", 0, ZBX_TYPE_ID, ZBX_NOTNULL, 0};
+
+	return DBadd_foreign_key("problem", 2, &field);
+}
+
 #endif
 
 DBPATCH_START(7050)
@@ -50,5 +74,9 @@ DBPATCH_START(7050)
 DBPATCH_ADD(7050000, 0, 1)
 DBPATCH_ADD(7050001, 0, 1)
 DBPATCH_ADD(7050002, 0, 1)
+DBPATCH_ADD(7050003, 0, 1)
+DBPATCH_ADD(7050004, 0, 1)
+DBPATCH_ADD(7050005, 0, 1)
+DBPATCH_ADD(7050006, 0, 1)
 
 DBPATCH_END()
