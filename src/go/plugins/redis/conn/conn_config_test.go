@@ -43,7 +43,7 @@ func Test_getTLSConfig(t *testing.T) {
 		validateFunc  func(t *testing.T, cfg *tls.Config, host string)
 	}{
 		{
-			name:   "required",
+			name:   "+required",
 			params: map[string]string{string(comms.TLSConnect): string(tlsconfig.Required)},
 			validateFunc: func(t *testing.T, cfg *tls.Config, host string) {
 				t.Helper()
@@ -51,9 +51,10 @@ func Test_getTLSConfig(t *testing.T) {
 					t.Error("expected InsecureSkipVerify to be true, but it was false")
 				}
 			},
+			expectedError: nil,
 		},
 		{
-			name:   "verify_ca",
+			name:   "+verify_ca",
 			params: map[string]string{string(comms.TLSConnect): string(tlsconfig.VerifyCA)},
 			validateFunc: func(t *testing.T, cfg *tls.Config, host string) {
 				t.Helper()
@@ -67,9 +68,10 @@ func Test_getTLSConfig(t *testing.T) {
 					t.Error("expected VerifyPeerCertificate to be set, but it was nil")
 				}
 			},
+			expectedError: nil,
 		},
 		{
-			name:   "verify_full",
+			name:   "+verify_full",
 			params: map[string]string{string(comms.TLSConnect): string(tlsconfig.VerifyFull)},
 			validateFunc: func(t *testing.T, cfg *tls.Config, host string) {
 				t.Helper()
@@ -77,6 +79,7 @@ func Test_getTLSConfig(t *testing.T) {
 					t.Error("expected InsecureSkipVerify to be false, but it was true")
 				}
 			},
+			expectedError: nil,
 		},
 		{
 			name:          "+disabled",
