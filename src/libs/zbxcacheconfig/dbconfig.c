@@ -8968,62 +8968,6 @@ int	zbx_dc_get_host_by_hostid(zbx_dc_host_t *host, zbx_uint64_t hostid)
 
 /******************************************************************************
  *                                                                            *
- * Purpose: Configure PSK in DB for host from autoreg                         *
- *                                                                            *
- * Parameters:                                                                *
- *     hostid - [IN] host ID                                                  *
- *                                                                            *
- ******************************************************************************/
-static void	zbx_db_configure_host_psk(zbx_uint64_t hostid)
-{
-	/* Check if autoreg PSK is configured */
-	if ('\0' != config->autoreg_psk_identity[0] && '\0' != config->autoreg_psk[0])
-	{
-		zabbix_log(LOG_LEVEL_DEBUG, "configuring PSK for host %lu with identity \"%s\"", (unsigned long)hostid,
-				config->autoreg_psk_identity);
-		zbx_db_execute("update hosts set tls_connect=%u,tls_psk_identity='%s',tls_psk='%s'"
-				" where hostid=" ZBX_FS_UI64,
-				ZBX_TCP_SEC_TLS_PSK, config->autoreg_psk_identity, config->autoreg_psk, hostid);
-	}
-}
-
-/******************************************************************************
- *                                                                            *
- * Purpose: Update host tls_accept in cache to allow the specified            *
- *          connection type                                                   *
- *                                                                            *
- * Parameters:                                                                *
- *     hostid          - [IN] host ID                                         *
- *     connection_type - [IN] connection type to allow                        *
- *                                                                            *
- * Return value: SUCCEED if host updated and FAIL otherwise                   *
- *                                                                            *
- ******************************************************************************/
-static int	zbx_dc_update_host_tls_accept(zbx_uint64_t hostid, unsigned int connection_type)
-{
-	ZBX_DC_HOST	*dc_host;
-	int		ret = FAIL;
-
-	WRLOCK_CACHE;
-	dc_host = (ZBX_DC_HOST *)zbx_hashset_search(&config->hosts, &hostid);
-
-	if (NULL != dc_host)
-	{
-		/* Add the connection type to tls_accept if not already present */
-		if (0 == ((unsigned int)dc_host->tls_accept & connection_type))
-		{
-			dc_host->tls_accept |= (unsigned char)connection_type;
-			ret = SUCCEED;
-		}
-	}
-
-	UNLOCK_CACHE;
-
-	return ret;
-}
-
-/******************************************************************************
- *                                                                            *
  * Purpose:                                                                   *
  *     Check connection access rights for host and get host data              *
  *                                                                            *
@@ -9052,9 +8996,9 @@ int	zbx_dc_check_host_conn_permissions(const char *host, const zbx_socket_t *soc
 {
 	const ZBX_DC_HOST		*dc_host = NULL;
 	const ZBX_DC_AUTOREG_HOST	*dc_autoreg_host;
-	unsigned int			need_update_tls = 0, need_update_psk = 0;
 #if defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
 	zbx_tls_conn_attr_t	attr;
+	int			skip_tls_validation = 0;
 
 	if (FAIL == zbx_tls_get_attr(sock, &attr, error))
 		return FAIL;
@@ -9084,67 +9028,24 @@ int	zbx_dc_check_host_conn_permissions(const char *host, const zbx_socket_t *soc
 		return SUCCEED;
 	}
 
-	/* Check if this is an autoregistered host and update connection type if needed */
-	if (NULL != (dc_autoreg_host = DCfind_autoreg_host(host)))
-	{
-		zabbix_log(LOG_LEVEL_DEBUG, "autoregistered host \"%s\": sock_conn_type=%u, autoreg_conn_type=%u, "
-				"host_tls_accept=%u", host, sock->connection_type, dc_autoreg_host->connection_type,
-				dc_host->tls_accept);
-
-		if (0 == ((unsigned int)dc_host->tls_accept & sock->connection_type))
-			need_update_tls = 1;
-
-		if (ZBX_TCP_SEC_TLS_PSK == sock->connection_type && NULL == dc_host->tls_dc_psk)
-			need_update_psk = 1;
-	}
-
-	if (0 != need_update_tls || 0 != need_update_psk)
-	{
-		zbx_uint64_t id = dc_host->hostid;
-
-		UNLOCK_CACHE;
-
-		if (0 != need_update_tls)
-		{
-			zabbix_log(LOG_LEVEL_DEBUG, "updating host tls_accept for host \"%s\" to allow connection type "
-					"%u", host, sock->connection_type);
-
-			if (SUCCEED == zbx_dc_update_host_tls_accept(id, sock->connection_type))
-			{
-				zbx_db_execute("update hosts set tls_accept=%u"
-						" where hostid=" ZBX_FS_UI64,
-						dc_host->tls_accept, hostid);
-			}
-		}
-
-		if (0 != need_update_psk)
-		{
-			zabbix_log(LOG_LEVEL_DEBUG, "configuring PSK for host \"%s\" from autoreg PSK", host);
-			zbx_db_configure_host_psk(id);
-		}
-
-		RDLOCK_CACHE;
-
-		if (NULL == (dc_host = DCfind_host(host)))
-		{
-			UNLOCK_CACHE;
-			*hostid = 0;
-
-			return SUCCEED;
-		}
-	}
-
 	if (0 == ((unsigned int)dc_host->tls_accept & sock->connection_type))
 	{
-		UNLOCK_CACHE;
-		*error = zbx_dsprintf(NULL, "connection of type \"%s\" is not allowed for host \"%s\"",
-				zbx_tcp_connection_type_name(sock->connection_type), host);
-		return FAIL;
+		if (NULL == DCfind_autoreg_host(host))
+		{
+			UNLOCK_CACHE;
+			*error = zbx_dsprintf(NULL, "connection of type \"%s\" is not allowed for host \"%s\"",
+					zbx_tcp_connection_type_name(sock->connection_type), host);
+			return FAIL;
+		}
+#if defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
+		skip_tls_validation = 1;
+#endif
 	}
+
 #if defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
 	const char	*msg;
 
-	if (0 == need_update_psk && FAIL == zbx_tls_validate_attr(&attr, dc_host->tls_issuer, dc_host->tls_subject,
+	if (0 == skip_tls_validation && FAIL == zbx_tls_validate_attr(&attr,dc_host->tls_issuer, dc_host->tls_subject,
 			NULL == dc_host->tls_dc_psk ? NULL : dc_host->tls_dc_psk->tls_psk_identity, &msg))
 	{
 		UNLOCK_CACHE;
