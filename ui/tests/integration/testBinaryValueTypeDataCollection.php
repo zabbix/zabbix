@@ -18,7 +18,6 @@ require_once dirname(__FILE__).'/../include/helpers/CDataHelper.php';
 
 /**
  * Test suite for data collection using both active and passive agents.
- *
  * @backup history, hosts, host_rtdata, proxy, proxy_rtdata, auditlog, changelog, settings, ha_node, changelog
  * @backup config_autoreg_tls, expressions, globalmacro, hosts, interface, item_preproc, item_rtdata, items, regexps
  */
@@ -30,7 +29,7 @@ class testBinaryValueTypeDataCollection extends CIntegrationTest {
 
 	const base64_empty = "";
 	const base64_invalid = "a";
-	const json_data_error_message_text = "assertion failed: element id top-header not found";
+	const json_data_http_response = "200";
 
 	const TEST_FILE_NAME_JSON_WITH_IMAGE="/tmp/json_with_image.txt";
 	const TEST_FILE_NAME_JSON_WITH_IMAGE_2="/tmp/json_with_image2.txt";
@@ -45,12 +44,12 @@ class testBinaryValueTypeDataCollection extends CIntegrationTest {
 		$base64_image = self::base64_image;
 		$base64_empty = self::base64_empty;
 		$base64_invalid = self::base64_invalid;
-		$json_data_error_message_text = self::json_data_error_message_text;
+		$json_data_http_response = self::json_data_http_response;
 		$json_with_image = <<<HEREA
 		{
 			"result": "fail",
-			"error_message": "$json_data_error_message_text",
-			"http_response": "200",
+			"error_message": "assertion failed: element id top-header not found",
+			"http_response": "$json_data_http_response",
 			"start_time": {
 			"value": "Nov 11 10:00:00 2022 GMT",
 			"timestamp": 1668153600
@@ -246,7 +245,7 @@ class testBinaryValueTypeDataCollection extends CIntegrationTest {
 						'preprocessing' =>
 						[[
 							'type' => ZBX_PREPROC_JSONPATH,
-							'params' => '$.error_message',
+							'params' => '$.http_response',
 							'error_handler' => 0,
 							'error_handler_params' => ''
 						]]
@@ -292,7 +291,7 @@ class testBinaryValueTypeDataCollection extends CIntegrationTest {
 					'preprocessing' =>
 						[[
 							'type' => ZBX_PREPROC_JSONPATH,
-							'params' => '$.error_message',
+							'params' => '$.http_response',
 							'error_handler' => 0,
 							'error_handler_params' => ''
 						]]
@@ -393,9 +392,9 @@ class testBinaryValueTypeDataCollection extends CIntegrationTest {
 			'history'	=>	ITEM_VALUE_TYPE_JSON
 		]);
 
-		$json_data_error_message_text = self::json_data_error_message_text;
+		$json_data_http_response = self::json_data_http_response;
 		foreach ($active_data['result'] as $item) {
-			$this->assertEquals($base64_image, $item['value']);
+			$this->assertEquals($json_data_http_response, $item['value']);
 		}
 
 		$this->checkItemState('agent:BINARY_IMAGE', ITEM_STATE_NORMAL);
@@ -473,9 +472,9 @@ class testBinaryValueTypeDataCollection extends CIntegrationTest {
 			'history'	=> ITEM_VALUE_TYPE_JSON
 		]);
 
-		$json_data_error_message_text = self::json_data_error_message_text;
+		$json_data_http_response = self::json_data_http_response;
 		foreach ($active_data['result'] as $item) {
-			$this->assertEquals($json_data_error_message_text, $item['value']);
+			$this->assertEquals($json_data_http_response, $item['value']);
 		}
 	}
 }
