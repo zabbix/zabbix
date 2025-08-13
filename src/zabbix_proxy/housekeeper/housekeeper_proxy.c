@@ -87,7 +87,7 @@ static int	delete_history(const char *table, const char *lastid_field, const cha
 			condition = zbx_dsprintf(NULL, " or %s>=%d", clock_field, now - config_local_buffer * SEC_PER_HOUR);
 
 		result = zbx_db_select(
-				"select coalesce(min(id),%d) from %s"
+				"select floor(coalesce(min(id),%d)/1000000)*1000000 from %s"
 				" where (id>" ZBX_FS_UI64 " and %s>=%d) %s",
 				maxid + 1, table, lastid,
 				clock_field, now - config_offline_buffer * SEC_PER_HOUR,
