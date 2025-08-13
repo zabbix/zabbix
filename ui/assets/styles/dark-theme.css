@@ -28,6 +28,9 @@ article, aside, details, figcaption, figure, footer, header, hgroup, menu, nav, 
 body {
   line-height: 1; }
 
+ol, ul {
+  list-style: none; }
+
 blockquote, q {
   quotes: none; }
 
@@ -2749,6 +2752,18 @@ div[data-field-type="set"].has-error {
       margin-top: 0; }
   .markdown h5 + *, .modal-popup-host-wizard .formated-text h5 + * {
     margin-top: 0; }
+  .markdown ul, .modal-popup-host-wizard .formated-text ul {
+    list-style-type: disc; }
+  .markdown :is(dir, menu, ol, ul) ul, .modal-popup-host-wizard .formated-text :is(dir, menu, ol, ul) ul {
+    list-style-type: circle; }
+  .markdown :is(dir, menu, ol, ul) :is(dir, menu, ol, ul) ul, .modal-popup-host-wizard .formated-text :is(dir, menu, ol, ul) :is(dir, menu, ol, ul) ul {
+    list-style-type: square; }
+  .markdown ol, .modal-popup-host-wizard .formated-text ol {
+    list-style-type: decimal; }
+  .markdown :is(dir, menu, ol, ul) ol, .modal-popup-host-wizard .formated-text :is(dir, menu, ol, ul) ol {
+    list-style-type: lower-latin; }
+  .markdown :is(dir, menu, ol, ul) :is(dir, menu, ol, ul) ol, .modal-popup-host-wizard .formated-text :is(dir, menu, ol, ul) :is(dir, menu, ol, ul) ol {
+    list-style-type: lower-roman; }
   .markdown ol, .modal-popup-host-wizard .formated-text ol, .markdown ul, .modal-popup-host-wizard .formated-text ul {
     list-style-position: outside;
     padding-left: 2em; }

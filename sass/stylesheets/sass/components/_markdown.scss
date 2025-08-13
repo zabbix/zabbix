@@ -45,6 +45,30 @@
 		margin-top: 0;
 	}
 
+	ul {
+		list-style-type: disc;
+	}
+
+	:is(ol, ul) ul {
+		list-style-type: circle;
+	}
+
+	:is(ol, ul) :is(ol, ul) ul {
+		list-style-type: square;
+	}
+
+	ol {
+		list-style-type: decimal;
+	}
+
+	:is(ol, ul) ol {
+		list-style-type: lower-latin;
+	}
+
+	:is(ol, ul) :is(ol, ul) ol {
+		list-style-type: lower-roman;
+	}
+
 	ol, ul {
 		list-style-position: outside;
 		padding-left: 2em;
