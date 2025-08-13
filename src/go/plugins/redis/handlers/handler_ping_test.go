@@ -15,7 +15,6 @@
 package handlers
 
 import (
-	"fmt"
 	"testing"
 
 	"github.com/google/go-cmp/cmp"
@@ -78,24 +77,25 @@ func Test_PingHandler(t *testing.T) {
 		wantErr bool
 	}{
 		{
-			fmt.Sprintf("PingHandler should return %d if connection is ok", comms.PingOk),
-			args{conn: connection},
-			comms.PingOk,
-			false,
+			name:    "+connectionOk",
+			args:    args{conn: connection, params: nil},
+			want:    comms.PingOk,
+			wantErr: false,
 		},
 		{
-			fmt.Sprintf("PingHandler should return %d if PING answers wrong", comms.PingFailed),
-			args{conn: brokenConn},
-			comms.PingFailed,
-			false,
+			name:    "+wrongPingAnswer",
+			args:    args{conn: brokenConn, params: nil},
+			want:    comms.PingFailed,
+			wantErr: false,
 		},
 		{
-			fmt.Sprintf("PingHandler should return %d if connection failed", comms.PingFailed),
-			args{conn: closedConn},
-			comms.PingFailed,
-			false,
+			name:    "+connectionFailed",
+			args:    args{conn: closedConn, params: nil},
+			want:    comms.PingFailed,
+			wantErr: false,
 		},
 	}
+
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			t.Parallel()

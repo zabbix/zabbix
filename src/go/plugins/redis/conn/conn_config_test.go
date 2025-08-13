@@ -54,7 +54,7 @@ func Test_getTLSConfig(t *testing.T) {
 			expectedError: nil,
 		},
 		{
-			name:   "+verify_ca",
+			name:   "+verifyCA",
 			params: map[string]string{string(comms.TLSConnect): string(tlsconfig.VerifyCA)},
 			validateFunc: func(t *testing.T, cfg *tls.Config, host string) {
 				t.Helper()
@@ -71,7 +71,7 @@ func Test_getTLSConfig(t *testing.T) {
 			expectedError: nil,
 		},
 		{
-			name:   "+verify_full",
+			name:   "+verifyFull",
 			params: map[string]string{string(comms.TLSConnect): string(tlsconfig.VerifyFull)},
 			validateFunc: func(t *testing.T, cfg *tls.Config, host string) {
 				t.Helper()
