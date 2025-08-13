@@ -486,6 +486,13 @@ static int	dbconn_open(zbx_dbconn_t *db)
 		ret = ZBX_DB_FAIL;
 	}
 
+	/* innodb_snapshot_isolation variable became ON by default in MariaDB 11.6.2, we need it to be OFF */
+	if (ZBX_DB_OK == ret && ON == zbx_mariadb_fork_get() && 110602 <= db_get_server_version())
+	{
+		if (0 < (ret = dbconn_execute(db, "set innodb_snapshot_isolation='OFF'")))
+			ret = ZBX_DB_OK;
+	}
+
 	if (ZBX_DB_OK == ret)
 	{
 		/* in contrast to "set names utf8" results of this call will survive auto-reconnects */
@@ -644,6 +651,26 @@ static int	dbconn_open(zbx_dbconn_t *db)
 	if (NULL != (row = zbx_db_fetch(result)))
 	{
 		if (0 == strcmp(row[0], "on"))
+		{
+			zbx_db_free_result(result);
+			ret = ZBX_DB_RONLY;
+			goto out;
+		}
+	}
+
+	zbx_db_free_result(result);
+
+	result = dbconn_select(db, "select pg_is_in_recovery();");
+
+	if ((zbx_db_result_t)ZBX_DB_DOWN == result || NULL == result)
+	{
+		ret = (NULL == result) ? ZBX_DB_FAIL : ZBX_DB_DOWN;
+		goto out;
+	}
+
+	if (NULL != (row = zbx_db_fetch(result)))
+	{
+		if (0 == strcmp(row[0], "t"))
 		{
 			zbx_db_free_result(result);
 			ret = ZBX_DB_RONLY;

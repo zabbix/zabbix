@@ -153,8 +153,8 @@ static void	process_test_data(zbx_uint64_t httptestid, int lastfailedstep, doubl
 			}
 
 			items[i].state = ITEM_STATE_NORMAL;
-			zbx_preprocess_item_value(items[i].itemid, items[i].host.hostid, items[i].value_type, 0, &value,
-					ts, items[i].state, NULL);
+			zbx_preprocess_item_value(items[i].itemid, items[i].value_type, 0, items[i].preprocessing,
+					&value, ts, items[i].state, NULL);
 
 			zbx_free_agent_result(&value);
 		}
@@ -361,8 +361,8 @@ static void	process_step_data(zbx_uint64_t httpstepid, zbx_httpstat_t *stat, zbx
 			}
 
 			items[i].state = ITEM_STATE_NORMAL;
-			zbx_preprocess_item_value(items[i].itemid, items[i].host.hostid, items[i].value_type, 0, &value,
-					ts, items[i].state, NULL);
+			zbx_preprocess_item_value(items[i].itemid, items[i].value_type, 0, items[i].preprocessing,
+					&value, ts, items[i].state, NULL);
 
 			zbx_free_agent_result(&value);
 		}
