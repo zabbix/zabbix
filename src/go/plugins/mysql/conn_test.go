@@ -138,6 +138,7 @@ func TestGetTLSDetails(t *testing.T) {
 
 			if tc.wantErr {
 				if !errors.Is(err, zbxerr.ErrorInvalidConfiguration) &&
+					//nolint:staticcheck //old test that still works
 					err.Error() != zbxerr.ErrorInvalidConfiguration.Error()+": "+tc.validationErr.Error() {
 					t.Errorf("getTLSDetails() error = %v, "+
 						"want wrapped error for %v", err, zbxerr.ErrorInvalidConfiguration)
