@@ -30,8 +30,12 @@ class testBinaryValueTypeDataCollection extends CIntegrationTest {
 
 	const base64_empty = "";
 	const base64_invalid = "a";
+	const json_data_error_message_text = "assertion failed: element id top-header not found";
 
 	const TEST_FILE_NAME_JSON_WITH_IMAGE="/tmp/json_with_image.txt";
+	const TEST_FILE_NAME_JSON_WITH_IMAGE_2="/tmp/json_with_image2.txt";
+	const TEST_FILE_NAME_INVALID_JSON="/tmp/invalid_JSON.txt";
+	const TEST_FILE_NAME_INVALID_JSON_2="/tmp/invalid_JSON_2.txt";
 
 	/**
 	 * @inheritdoc
@@ -41,10 +45,11 @@ class testBinaryValueTypeDataCollection extends CIntegrationTest {
 		$base64_image = self::base64_image;
 		$base64_empty = self::base64_empty;
 		$base64_invalid = self::base64_invalid;
+		$json_data_error_message_text = self::json_data_error_message_text;
 		$json_with_image = <<<HEREA
 		{
 			"result": "fail",
-			"error_message": "assertion failed: element id top-header not found",
+			"error_message": "$json_data_error_message_text",
 			"http_response": "200",
 			"start_time": {
 			"value": "Nov 11 10:00:00 2022 GMT",
@@ -65,7 +70,18 @@ class testBinaryValueTypeDataCollection extends CIntegrationTest {
 		}
 		HEREA;
 
+		$invalid_json = <<<HEREA
+		{
+			"a": "a",
+			"b": "b",
+		},
+		HEREA;
+
+
 		$this->assertTrue(@file_put_contents(self::TEST_FILE_NAME_JSON_WITH_IMAGE, $json_with_image) !== false);
+		$this->assertTrue(@file_put_contents(self::TEST_FILE_NAME_JSON_WITH_IMAGE_2, $json_with_image) !== false);
+		$this->assertTrue(@file_put_contents(self::TEST_FILE_NAME_INVALID_JSON, $invalid_json) !== false);
+		$this->assertTrue(@file_put_contents(self::TEST_FILE_NAME_INVALID_JSON_2, $invalid_json) !== false);
 
 		CDataHelper::call('proxy.create', [
 			'name' => 'proxy',
@@ -98,7 +114,28 @@ class testBinaryValueTypeDataCollection extends CIntegrationTest {
 						'type' => ITEM_TYPE_ZABBIX,
 						'value_type' => ITEM_VALUE_TYPE_TEXT,
 						'delay' => '1s'
-					]
+					],
+					[
+						'name' => 'JSON_WITH_IMAGE_JSON_VALUE_TYPE',
+						'key_' => 'vfs.file.contents['.self::TEST_FILE_NAME_JSON_WITH_IMAGE_2.',]',
+						'type' => ITEM_TYPE_ZABBIX,
+						'value_type' => ITEM_VALUE_TYPE_JSON,
+						'delay' => '1s'
+					],
+					[
+						'name' => 'INVALID_JSON_JSON_VALUE_TYPE',
+						'key_' => 'vfs.file.contents['.self::TEST_FILE_NAME_INVALID_JSON.',]',
+						'type' => ITEM_TYPE_ZABBIX,
+						'value_type' => ITEM_VALUE_TYPE_JSON,
+						'delay' => '1s'
+					],
+					[
+						'name' => 'INVALID_JSON_TEXT_VALUE_TYPE',
+						'key_' => 'vfs.file.contents[ '.self::TEST_FILE_NAME_INVALID_JSON_2.',]',
+						'type' => ITEM_TYPE_ZABBIX,
+						'value_type' => ITEM_VALUE_TYPE_TEXT,
+						'delay' => '1s'
+					],
 				]
 			],
 			[
@@ -115,7 +152,28 @@ class testBinaryValueTypeDataCollection extends CIntegrationTest {
 						'type' => ITEM_TYPE_ZABBIX,
 						'value_type' => ITEM_VALUE_TYPE_TEXT,
 						'delay' => '1s'
-					]
+					],
+					[
+						'name' => 'JSON_WITH_IMAGE_JSON_VALUE_TYPE',
+						'key_' => 'vfs.file.contents['.self::TEST_FILE_NAME_JSON_WITH_IMAGE_2.',]',
+						'type' => ITEM_TYPE_ZABBIX,
+						'value_type' => ITEM_VALUE_TYPE_JSON,
+						'delay' => '1s'
+					],
+					[
+						'name' => 'INVALID_JSON_JSON_VALUE_TYPE',
+						'key_' => 'vfs.file.contents['.self::TEST_FILE_NAME_INVALID_JSON.',]',
+						'type' => ITEM_TYPE_ZABBIX,
+						'value_type' => ITEM_VALUE_TYPE_JSON,
+						'delay' => '1s'
+					],
+					[
+						'name' => 'INVALID_JSON_TEXT_VALUE_TYPE',
+						'key_' => 'vfs.file.contents['.self::TEST_FILE_NAME_INVALID_JSON_2.',]',
+						'type' => ITEM_TYPE_ZABBIX,
+						'value_type' => ITEM_VALUE_TYPE_TEXT,
+						'delay' => '1s'
+					],
 				]
 			]
 		]);
@@ -132,7 +190,7 @@ class testBinaryValueTypeDataCollection extends CIntegrationTest {
 						'master_itemid' => self::$itemids['agent:vfs.file.contents['.self::TEST_FILE_NAME_JSON_WITH_IMAGE.',]'],
 						'value_type' => ITEM_VALUE_TYPE_BINARY,
 						'delay' => '0s',
-						'preprocessing' => [['type' => 12, 'params' => '$.screenshot_image',
+						'preprocessing' => [['type' => ZBX_PREPROC_JSONPATH, 'params' => '$.screenshot_image',
 						'error_handler' => 0,
 						'error_handler_params' => ''
 							]]
@@ -146,7 +204,7 @@ class testBinaryValueTypeDataCollection extends CIntegrationTest {
 					'delay' => '0s',
 					'preprocessing' =>
 						[[
-							'type' => 12,
+							'type' => ZBX_PREPROC_JSONPATH,
 							'params' => '$.screenshot_empty',
 							'error_handler' => 0,
 							'error_handler_params' => ''
@@ -161,12 +219,47 @@ class testBinaryValueTypeDataCollection extends CIntegrationTest {
 					'delay' => '0s',
 					'preprocessing' =>
 						[[
-							'type' => 12,
+							'type' => ZBX_PREPROC_JSONPATH,
 							'params' => '$.screenshot_invalid',
 							'error_handler' => 0,
 							'error_handler_params' => ''
 						]]
-				]]
+				],
+
+
+				[
+						'name' => 'JSON_VALUE_TYPE_DEP',
+						'key_' => 'JSON_VALUE_TYPE_DEP',
+						'type' => ITEM_TYPE_DEPENDENT,
+						'master_itemid' => self::$itemids['agent:vfs.file.contents['.self::TEST_FILE_NAME_JSON_WITH_IMAGE_2.',]'],
+						'value_type' => ITEM_VALUE_TYPE_JSON,
+						'delay' => '0s'
+				],
+
+				[
+						'name' => 'JSON_VALUE_TYPE_DEP_WITH_PREPROC',
+						'key_' => 'JSON_VALUE_TYPE_DEP_WITH_PREPROC',
+						'type' => ITEM_TYPE_DEPENDENT,
+						'master_itemid' => self::$itemids['agent:vfs.file.contents['.self::TEST_FILE_NAME_JSON_WITH_IMAGE_2.',]'],
+						'value_type' => ITEM_VALUE_TYPE_JSON,
+						'delay' => '0s',
+						'preprocessing' =>
+						[[
+							'type' => ZBX_PREPROC_JSONPATH,
+							'params' => '$.error_message',
+							'error_handler' => 0,
+							'error_handler_params' => ''
+						]]
+				],
+				[
+						'name' => 'JSON_VALUE_TYPE_DEP_INVALID',
+						'key_' => 'JSON_VALUE_TYPE_DEP_INVALID',
+						'type' => ITEM_TYPE_DEPENDENT,
+						'master_itemid' => self::$itemids['agent:vfs.file.contents['.self::TEST_FILE_NAME_INVALID_JSON.',]'],
+						'value_type' => ITEM_VALUE_TYPE_JSON,
+						'delay' => '0s'
+				],
+				]
 			]
 		, $result['hostids']);
 
@@ -183,12 +276,28 @@ class testBinaryValueTypeDataCollection extends CIntegrationTest {
 					'delay' => '0s',
 					'preprocessing' =>
 						[[
-							'type' => 12,
+							'type' => ZBX_PREPROC_JSONPATH,
 							'params' => '$.screenshot_image',
 							'error_handler' => 0,
 							'error_handler_params' => ''
 						]]
-				]]
+				],
+				[
+					'name' => 'JSON_VALUE_TYPE_DEP_WITH_PREPROC',
+					'key_' => 'JSON_VALUE_TYPE_DEP_WITH_PREPROC',
+					'type' => ITEM_TYPE_DEPENDENT,
+					'master_itemid' => self::$itemids['proxy_agent:vfs.file.contents['.self::TEST_FILE_NAME_JSON_WITH_IMAGE_2.',]'],
+					'value_type' => ITEM_VALUE_TYPE_JSON,
+					'delay' => '0s',
+					'preprocessing' =>
+						[[
+							'type' => ZBX_PREPROC_JSONPATH,
+							'params' => '$.error_message',
+							'error_handler' => 0,
+							'error_handler_params' => ''
+						]]
+				],
+				]
 			]
 		, $result['hostids']);
 
@@ -278,9 +387,24 @@ class testBinaryValueTypeDataCollection extends CIntegrationTest {
 			$this->assertEquals($base64_empty, $item['value']);
 		}
 
+		// Retrieve JSON item value type history data from API
+		$active_data = $this->callUntilDataIsPresent('history.get', [
+			'itemids'	=>	self::$itemids['agent:JSON_VALUE_TYPE_DEP_WITH_PREPROC'],
+			'history'	=>	ITEM_VALUE_TYPE_JSON
+		]);
+
+		$json_data_error_message_text = self::json_data_error_message_text;
+		foreach ($active_data['result'] as $item) {
+			$this->assertEquals($base64_image, $item['value']);
+		}
+
 		$this->checkItemState('agent:BINARY_IMAGE', ITEM_STATE_NORMAL);
 		$this->checkItemState('agent:BINARY_IMAGE_EMPTY', ITEM_STATE_NORMAL);
 		$this->checkItemState('agent:BINARY_IMAGE_INVALID', ITEM_STATE_NOTSUPPORTED);
+
+		$this->checkItemState('agent:JSON_VALUE_TYPE_DEP', ITEM_STATE_NORMAL);
+		$this->checkItemState('agent:JSON_VALUE_TYPE_DEP_WITH_PREPROC', ITEM_STATE_NORMAL);
+		$this->checkItemState('agent:JSON_VALUE_TYPE_DEP_INVALID', ITEM_STATE_NOTSUPPORTED);
 	}
 
 	/**
@@ -332,7 +456,7 @@ class testBinaryValueTypeDataCollection extends CIntegrationTest {
 
 		$base64_image = self::base64_image;
 
-		// Retrieve history data from API as soon it is available.
+		// Retrieve binary image history data from API as soon it is available.
 		$active_data = $this->callUntilDataIsPresent('history.get', [
 			'itemids'	=> self::$itemids['proxy_agent:BINARY_IMAGE'],
 			'history'	=> ITEM_VALUE_TYPE_BINARY
@@ -340,6 +464,18 @@ class testBinaryValueTypeDataCollection extends CIntegrationTest {
 
 		foreach ($active_data['result'] as $item) {
 			$this->assertEquals($base64_image, $item['value']);
+		}
+
+
+		// Retrieve JSON item value type history data from API
+		$active_data = $this->callUntilDataIsPresent('history.get', [
+			'itemids'	=> self::$itemids['proxy_agent:JSON_VALUE_TYPE_DEP_WITH_PREPROC'],
+			'history'	=> ITEM_VALUE_TYPE_JSON
+		]);
+
+		$json_data_error_message_text = self::json_data_error_message_text;
+		foreach ($active_data['result'] as $item) {
+			$this->assertEquals($json_data_error_message_text, $item['value']);
 		}
 	}
 }
