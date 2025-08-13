@@ -21,7 +21,7 @@ const (
 	cmdStatus           Command = "status"
 )
 
-var metricsMeta = map[Key]MetricMeta{
+var metricsMeta = map[Key]MetricMeta{ //nolint:gochecknoglobals // used as a static const
 	KeyDf: {
 		Commands:  []Command{cmdDf},
 		Arguments: map[string]string{"detail": "detail"},

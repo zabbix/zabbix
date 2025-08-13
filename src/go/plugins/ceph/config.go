@@ -24,7 +24,7 @@ var _ plugin.Exporter = (*Plugin)(nil)
 
 type session struct {
 	// Mode defines that connection to ceph will be done using old restful mode or new - native.
-	Mode string `json:"mode"`
+	Mode string `conf:"name=Mode,optional"`
 
 	// URI defines an endpoint to REST API.
 	URI string `conf:"name=Uri,optional"`
@@ -71,7 +71,7 @@ func (p *Plugin) Configure(global *plugin.GlobalOptions, options any) {
 
 // Validate implements the Configurator interface.
 // Returns an error if validation of a plugin's configuration is failed.
-func (p *Plugin) Validate(options any) error {
+func (*Plugin) Validate(options any) error {
 	var opts pluginOptions
 
 	err := conf.UnmarshalStrict(options, &opts)

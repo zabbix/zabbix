@@ -67,10 +67,47 @@ func (p *Plugin) Export(key string, rawParams []string, _ plugin.ContextProvider
 	meta := handlers.GetMetricMeta(handlerKey)
 	responses := make(map[handlers.Command][]byte)
 
-	ctx, cancel := context.WithCancel(context.Background())
-	defer cancel()
+	var resCh <-chan *response
+	switch params["Mode"] {
+	case "restful":
 
-	resCh := asyncRequest(ctx, cancel, p.client, u.String(), meta)
+		ctx, cancel := context.WithCancel(context.Background())
+		defer cancel()
+
+		resCh = asyncRequest(ctx, cancel, p.client, u.String(), meta)
+	case "native":
+		ch := make(chan *response, len(meta.Commands))
+
+		go func() {
+			conn, err := p.connMgr.GetConnection(u, params)
+			if err != nil {
+				ch <- &response{
+					command: "status",
+					err:     err,
+				}
+
+				return
+			}
+
+			cmd := []byte(`{"prefix":"status", "format":"json", "detail":"detail"}`)
+
+			res, _, err := conn.Client.MonCommand(cmd)
+			if err != nil {
+				ch <- &response{
+					command: "status",
+					err:     err,
+				}
+			}
+
+			ch <- &response{
+				command: "status",
+				data:    res,
+				err:     nil,
+			}
+		}()
+
+		resCh = ch
+	}
 
 	for range meta.Commands {
 		r := <-resCh

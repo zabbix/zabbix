@@ -16,11 +16,13 @@ package conn
 
 import (
 	"context"
+	"fmt"
 	"strconv"
 	"sync"
 	"time"
 
 	"github.com/ceph/go-ceph/rados"
+	"golang.org/x/sync/singleflight"
 	"golang.zabbix.com/sdk/errs"
 	"golang.zabbix.com/sdk/log"
 	"golang.zabbix.com/sdk/uri"
@@ -37,11 +39,12 @@ type Manager struct {
 	callTimeout    int // seconds
 	log            log.Logger
 	destroy        context.CancelFunc
+	createGroup    singleflight.Group // Used to ensure only one creation happens per key
 }
 
 // Conn is a connection to a rados with last access time stored in it.
 type Conn struct {
-	client           *rados.Conn
+	Client           *rados.Conn
 	lastAccessTime   time.Time
 	lastAccessTimeMu sync.RWMutex
 }
@@ -78,23 +81,24 @@ func NewManager(
 func (c *Manager) GetConnection(u *uri.URI, params map[string]string) (*Conn, error) {
 	ck := createConnKey(u, params)
 
-	conn := c.getConn(ck)
-	if conn != nil {
-		c.log.Tracef("connection found for host: %s", u.Host())
-
-		conn.updateLastAccessTime()
-
-		return conn, nil
-	}
-
-	c.log.Tracef("creating new connection for host: %s", u.Host())
-
-	conn, err := c.createConn(ck)
+	conn, err := c.getConn(ck)
 	if err != nil {
-		return nil, err
+		return nil, errs.Wrap(err, "cannot get connection")
 	}
+
+	c.log.Tracef("connection found for key: " + ck.string())
+
+	conn.updateLastAccessTime()
 
 	return conn, nil
+}
+
+func createConnKey(u *uri.URI, params map[string]string) *connKey {
+	return &connKey{
+		uri:      *u,
+		apiKey:   params["APIKey"], // todo make enums
+		username: params["User"],   // todo make enums
+	}
 }
 
 // Close gracefully closes all connections and started goroutines.
@@ -103,22 +107,63 @@ func (c *Manager) Close() {
 	c.destroy()
 }
 
-func createConnKey(u *uri.URI, params map[string]string) *connKey {
-	return &connKey{
-		uri:      *u,
-		apiKey:   params["api_key"],  // todo make enums
-		username: params["username"], // todo make enums
-	}
+func (ck *connKey) string() string {
+	return fmt.Sprintf("%s@%s", ck.username, ck.uri.Addr())
 }
 
-// createConn creates a new connection with given credentials.
+// getConn retrieves a connection, creating it if it doesn't exist.
+// This is the most robust and performant implementation.
+func (c *Manager) getConn(ck *connKey) (*Conn, error) {
+	c.connectionsMu.RLock()
+	conn, ok := c.connections[*ck]
+	c.connectionsMu.RUnlock()
+
+	if ok {
+		return conn, nil
+	}
+
+	// The `Do` method takes a key and a function. It guarantees that for a
+	// given key, the function will only be executed by one goroutine.
+	// Other goroutines calling `Do` with the same key will wait.
+	newConnInterface, err, _ := c.createGroup.Do(ck.string(), func() (any, error) {
+		// This block is the "work" function. It's protected by the singleflight group.
+		// The expensive connection logic is here,
+		// safely outside any global lock to maintain ability getting connections.
+		createdConn, err := c.createConn(ck)
+		if err != nil {
+			return nil, err
+		}
+
+		// Now that we have a connection, acquire the write lock for the
+		// brief moment it takes to store it in the map.
+		c.connectionsMu.Lock()
+		c.connections[*ck] = createdConn
+		c.connectionsMu.Unlock()
+
+		return createdConn, nil
+	})
+
+	if err != nil {
+		return nil, errs.Wrap(err, "cannot create connection "+ck.string())
+	}
+
+	// in golang casting function is very efficient
+	connection, ok := newConnInterface.(*Conn)
+	if !ok {
+		return nil, errs.New("cannot cast to rados connection " + ck.string())
+	}
+
+	return connection, nil
+}
+
+// createConn is now a private helper that just does the work without any locking.
 func (c *Manager) createConn(ck *connKey) (*Conn, error) {
 	radosConn, err := rados.NewConnWithUser(ck.username)
 	if err != nil {
 		return nil, errs.Wrap(err, "failed to create connection")
 	}
 
-	err = radosConn.SetConfigOption("mon_host", ck.uri.String()) //todo test this
+	err = radosConn.SetConfigOption("mon_host", ck.uri.Addr())
 	if err != nil {
 		return nil, errs.Wrap(err, "failed to set config option monitor host")
 	}
@@ -143,40 +188,12 @@ func (c *Manager) createConn(ck *connKey) (*Conn, error) {
 		return nil, errs.Wrap(err, "failed to connect")
 	}
 
-	c.connectionsMu.Lock()
-	defer c.connectionsMu.Unlock()
-
-	// CRITICAL: Double-check. Another goroutine might have created the connection
-	// in the small window while we were creating connection.
-	cachedConn, ok := c.connections[*ck]
-	if ok {
-		log.Debugf("conn already exists: %s", ck.uri)
-
-		go radosConn.Shutdown()
-
-		return cachedConn, nil
-	}
-
 	connection := &Conn{
-		client:           radosConn,
-		lastAccessTimeMu: sync.RWMutex{},
-		lastAccessTime:   time.Now(),
+		Client:         radosConn,
+		lastAccessTime: time.Now(),
 	}
-	c.connections[*ck] = connection
 
 	return connection, nil
-}
-
-func (c *Manager) getConn(ck *connKey) *Conn {
-	c.connectionsMu.RLock()
-	defer c.connectionsMu.RUnlock()
-
-	conn, ok := c.connections[*ck]
-	if !ok {
-		return nil
-	}
-
-	return conn
 }
 
 // updateLastAccessTime updates the last time a connection was accessed.
@@ -216,7 +233,7 @@ func (c *Manager) closeUnused() {
 
 	// 3. Perform the slow I/O operations without holding the lock.
 	for _, item := range toClose {
-		item.conn.client.Shutdown()
+		item.conn.Client.Shutdown()
 		c.log.Debugf("Closed unused connection: %s", item.key.uri.Addr())
 	}
 }
@@ -230,7 +247,7 @@ func (c *Manager) closeAll() {
 	c.connectionsMu.Unlock() // 2. Release the lock immediately.
 
 	for _, conn := range oldConns {
-		conn.client.Shutdown()
+		conn.Client.Shutdown()
 	}
 }
 

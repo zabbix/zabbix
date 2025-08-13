@@ -157,6 +157,7 @@ linters:
         - .WithMessagef(
         - .WithStack(
         - errs.New(
+        - errs.WrapConst(
   exclusions:
     generated: lax
     rules:

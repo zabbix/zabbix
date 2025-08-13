@@ -27,14 +27,20 @@ import (
 )
 
 type cephResponse struct {
-	Failed []struct {
+	Failed []struct { //nolint:revive //this is ceph reply struct
 		Outs string `json:"outs"`
 	} `json:"failed"`
-	Finished []struct {
+	Finished []struct { //nolint:revive //this is ceph reply struct
 		Outb string `json:"outb"`
 	} `json:"finished"`
 	HasFailed bool   `json:"has_failed"`
 	Message   string `json:"message"`
+}
+
+type response struct {
+	command handlers.Command
+	data    []byte
+	err     error
 }
 
 // request makes an http request to Ceph RESTful API Module with a given command and extra parameters.
@@ -58,12 +64,12 @@ func request(
 
 	requestBody, err := json.Marshal(params)
 	if err != nil {
-		return nil, zbxerr.ErrorCannotMarshalJSON.Wrap(err)
+		return nil, errs.WrapConst(err, zbxerr.ErrorCannotMarshalJSON)
 	}
 
 	req, err := http.NewRequestWithContext(ctx, http.MethodPost, uri+"/request?wait=1", bytes.NewBuffer(requestBody))
 	if err != nil {
-		return nil, zbxerr.New(err.Error())
+		return nil, errs.New(err.Error())
 	}
 
 	req.Header.Set("Content-Type", "application/json")
@@ -71,9 +77,9 @@ func request(
 
 	res, err := client.Do(req)
 	if err != nil {
-		return nil, zbxerr.ErrorCannotFetchData.Wrap(err)
+		return nil, errs.WrapConst(err, zbxerr.ErrorCannotFetchData)
 	}
-	defer res.Body.Close()
+	defer res.Body.Close() //nolint:errcheck // this is a defer close function.
 
 	err = json.NewDecoder(res.Body).Decode(&resp)
 	if err != nil {
@@ -85,11 +91,11 @@ func request(
 			return nil, zbxerr.ErrorCannotParseResult
 		}
 
-		return nil, zbxerr.New(resp.Failed[0].Outs)
+		return nil, errs.New(resp.Failed[0].Outs)
 	}
 
-	if len(resp.Message) > 0 {
-		return nil, zbxerr.New(resp.Message)
+	if resp.Message != "" {
+		return nil, errs.New(resp.Message)
 	}
 
 	log.Debugf("Response = %+v", resp)
@@ -99,12 +105,6 @@ func request(
 	}
 
 	return []byte(resp.Finished[0].Outb), nil
-}
-
-type response struct {
-	command handlers.Command
-	data    []byte
-	err     error
 }
 
 // asyncRequest makes asynchronous https requests to Ceph RESTful API Module for each metric's command and sends
@@ -118,8 +118,10 @@ func asyncRequest(ctx context.Context, cancel context.CancelFunc, client *http.C
 			data, err := request(ctx, client, uri, cmd, meta.Arguments)
 			if err != nil {
 				cancel()
+
 				ch <- &response{cmd, nil, err}
 			}
+
 			ch <- &response{cmd, data, err}
 		}(cmd)
 	}

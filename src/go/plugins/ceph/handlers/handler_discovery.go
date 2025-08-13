@@ -16,7 +16,6 @@ package handlers
 
 import (
 	"encoding/json"
-	"fmt"
 	"strconv"
 
 	"golang.zabbix.com/sdk/errs"
@@ -121,7 +120,7 @@ func getStepOpTake(rule crushRule) (*step, error) {
 		}
 	}
 
-	return nil, fmt.Errorf(`cannot find step with "take" op for rule %q`, rule.Name)
+	return nil, errs.New(`cannot find step with "take" op for rule ` + rule.Name)
 }
 
 // osdDiscoveryHandler returns list of pools in LLD format.

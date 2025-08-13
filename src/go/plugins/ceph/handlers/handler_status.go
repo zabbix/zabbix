@@ -23,7 +23,7 @@ import (
 
 // pgStates is a list of all possible placement group states according to the Ceph's documentation.
 // https://docs.ceph.com/en/octopus/rados/operations/pg-states/
-var pgStates = []string{
+var pgStates = []string{ //nolint:gochecknoglobals //used as a static const
 	"creating",
 	"activating",
 	"active",
@@ -58,7 +58,7 @@ var pgStates = []string{
 	"unknown",
 }
 
-var healthMap = map[string]int8{
+var healthMap = map[string]int8{ //nolint:gochecknoglobals // used as a static const
 	"HEALTH_OK":   0,
 	"HEALTH_WARN": 1,
 	"HEALTH_ERR":  2,
