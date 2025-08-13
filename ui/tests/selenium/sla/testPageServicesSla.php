@@ -66,7 +66,7 @@ class testPageServicesSla extends CWebTest {
 			],
 			[
 				'Name' => 'Multiple spaces in SLA name',
-				'SLO' => '33.5555%',
+				'SLO' => '33.55%',
 				'Effective date' => '2021-05-01',
 				'Reporting period' => 'Weekly',
 				'Timezone' => 'Europe/Riga',
@@ -801,7 +801,7 @@ class testPageServicesSla extends CWebTest {
 						'13.01%',
 						'22.22%',
 						'33.33%',
-						'33.5555%',
+						'33.55%',
 						'44.44%',
 						'55.5555%',
 						'66.6%',
