@@ -20,6 +20,11 @@ require_once __DIR__.'/../behaviors/CTagBehavior.php';
 
 use Facebook\WebDriver\WebDriverBy;
 
+/**
+ * @onBefore createNewTrigger
+ *
+ * @backup triggers
+ */
 class testPageTriggers extends CLegacyWebTest {
 
 	/**
@@ -44,6 +49,16 @@ class testPageTriggers extends CLegacyWebTest {
 			' FROM hosts'.
 			' WHERE host LIKE \'%-layout-test%\''
 		);
+	}
+
+	public static function createNewTrigger() {
+		CDataHelper::call('trigger.create', [
+			[
+				'description' => 'Multiple   spaces   in trigger name',
+				'expression' => 'last(/Host for triggers filtering/trap)<>0',
+				'priority' => TRIGGER_SEVERITY_WARNING
+			]
+		]);
 	}
 
 	/**
@@ -483,6 +498,7 @@ class testPageTriggers extends CLegacyWebTest {
 						['text' => 'Dependent trigger ONE', 'selector' => 'xpath:./a[@class="js-trigger-edit wordwrap"]'],
 						['text' => 'Discovered trigger one', 'selector' => 'xpath:./a[@class="js-trigger-edit wordwrap"]'],
 						['text' => 'Inheritance trigger with tags', 'selector' => 'xpath:./a[@class="js-trigger-edit wordwrap"]'],
+						'Multiple spaces in trigger name',
 						'Trigger disabled with tags'
 					]
 				]
@@ -508,6 +524,7 @@ class testPageTriggers extends CLegacyWebTest {
 					'result' => [
 						['text' => 'Dependent trigger ONE', 'selector' => 'xpath:./a[@class="js-trigger-edit wordwrap"]'],
 						['text' => 'Discovered trigger one', 'selector' => 'xpath:./a[@class="js-trigger-edit wordwrap"]'],
+						'Multiple spaces in trigger name',
 						'Trigger disabled with tags'
 					]
 				]
@@ -547,6 +564,17 @@ class testPageTriggers extends CLegacyWebTest {
 					]
 				]
 			],
+			// Multiple spaces in Name field.
+			[
+				[
+					'filter_options' => [
+						'Name' => '   '
+					],
+					'result' => [
+						['text' => 'Multiple spaces in trigger name', 'selector' => 'xpath:./a[@class="js-trigger-edit wordwrap"]']
+					]
+				]
+			],
 			// Normal state.
 			[
 				[
@@ -555,7 +583,8 @@ class testPageTriggers extends CLegacyWebTest {
 					],
 					'result' => [
 						['text' => 'Dependent trigger ONE', 'selector' => 'xpath:./a[@class="js-trigger-edit wordwrap"]'],
-						['text' => 'Discovered trigger one', 'selector' => 'xpath:./a[@class="js-trigger-edit wordwrap"]']
+						['text' => 'Discovered trigger one', 'selector' => 'xpath:./a[@class="js-trigger-edit wordwrap"]'],
+						['text' => 'Multiple spaces in trigger name', 'selector' => 'xpath:./a[@class="js-trigger-edit wordwrap"]']
 					]
 				]
 			],
@@ -568,7 +597,8 @@ class testPageTriggers extends CLegacyWebTest {
 					'result' => [
 						['text' => 'Dependent trigger ONE', 'selector' => 'xpath:./a[@class="js-trigger-edit wordwrap"]'],
 						['text' => 'Discovered trigger one', 'selector' => 'xpath:./a[@class="js-trigger-edit wordwrap"]'],
-						['text' => 'Inheritance trigger with tags', 'selector' => 'xpath:./a[@class="js-trigger-edit wordwrap"]']
+						['text' => 'Inheritance trigger with tags', 'selector' => 'xpath:./a[@class="js-trigger-edit wordwrap"]'],
+						['text' => 'Multiple spaces in trigger name', 'selector' => 'xpath:./a[@class="js-trigger-edit wordwrap"]']
 					]
 				]
 			],
@@ -591,6 +621,7 @@ class testPageTriggers extends CLegacyWebTest {
 					'result' => [
 						['text' => 'Dependent trigger ONE', 'selector' => 'xpath:./a[@class="js-trigger-edit wordwrap"]'],
 						['text' => 'Discovered trigger one', 'selector' => 'xpath:./a[@class="js-trigger-edit wordwrap"]'],
+						'Multiple spaces in trigger name',
 						'Trigger disabled with tags'
 					]
 				]
@@ -724,6 +755,10 @@ class testPageTriggers extends CLegacyWebTest {
 						],
 						[
 							'Host' => 'Host for triggers filtering',
+							'Name' => 'Multiple spaces in trigger name'
+						],
+						[
+							'Host' => 'Host for triggers filtering',
 							'Name' => 'Trigger disabled with tags'
 						]
 					]
@@ -821,6 +856,10 @@ class testPageTriggers extends CLegacyWebTest {
 						[
 							'Host' => 'Host for triggers filtering',
 							'Name' => ['text' => 'Inheritance trigger with tags', 'selector' => 'xpath:./a[@class="js-trigger-edit wordwrap"]']
+						],
+						[
+							'Host' => 'Host for triggers filtering',
+							'Name' => 'Multiple spaces in trigger name'
 						],
 						[
 							'Host' => 'Host for trigger tags filtering',
