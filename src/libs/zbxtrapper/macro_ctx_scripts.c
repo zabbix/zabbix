@@ -234,16 +234,10 @@ int	substitute_script_macros(char **data, char *error, int maxerrlen, int script
 	int	ret = SUCCEED;
 
 	/* Shared data between resolver calls */
-	int				user_names_found = 0;
-	zbx_user_names_t		*user_names = NULL;
-	zbx_vector_uint64_t		item_hosts;
-	const zbx_vector_uint64_t	*trigger_hosts = NULL;
-	zbx_db_event			*cause_event = NULL;
-	zbx_db_event			*cause_recovery_event = NULL;
+	int			user_names_found = 0;
+	zbx_user_names_t	*user_names = NULL;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() script_type:%d", __func__, script_type);
-
-	zbx_vector_uint64_create(&item_hosts);
 
 	switch (script_type)
 	{
@@ -252,21 +246,31 @@ int	substitute_script_macros(char **data, char *error, int maxerrlen, int script
 					userid, dc_host, &user_names_found, &user_names);
 			break;
 		case ZBX_SCRIPT_SCOPE_EVENT:
-			ret = zbx_substitute_macros(data, error, maxerrlen, &macro_normal_script_resolv, um_handle,
-					event, r_event, userid, dc_host, tz, &user_names_found, &user_names,
-					&item_hosts, &trigger_hosts, &cause_event, &cause_recovery_event);
+			{
+				zbx_vector_uint64_t		item_hosts;
+				const zbx_vector_uint64_t	*trigger_hosts = NULL;
+				zbx_db_event			*cause_event = NULL;
+				zbx_db_event			*cause_recovery_event = NULL;
+
+				zbx_vector_uint64_create(&item_hosts);
+
+				ret = zbx_substitute_macros(data, error, maxerrlen, &macro_normal_script_resolv,
+						um_handle, event, r_event, userid, dc_host, tz, &user_names_found,
+						&user_names, &item_hosts, &trigger_hosts, &cause_event,
+						&cause_recovery_event);
+
+				if (NULL != cause_event)
+					zbx_db_free_event(cause_event);
+
+				if (NULL != cause_recovery_event)
+					zbx_db_free_event(cause_recovery_event);
+
+				zbx_vector_uint64_destroy(&item_hosts);
+			}
 			break;
 		default:
 			THIS_SHOULD_NEVER_HAPPEN;
 	}
-
-	if (NULL != cause_event)
-		zbx_db_free_event(cause_event);
-
-	if (NULL != cause_recovery_event)
-		zbx_db_free_event(cause_recovery_event);
-
-	zbx_vector_uint64_destroy(&item_hosts);
 
 	if (NULL != user_names)
 	{
