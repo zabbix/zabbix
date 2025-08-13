@@ -388,6 +388,10 @@ class testFormAdministrationMediaTypes extends CWebTest {
 						$auth_field = $form->getField('Authentication');
 						$this->assertEquals(['None', 'Email and password', 'OAuth'], $auth_field->getLabels()->asText());
 						$auth_field->fill('Email and password');
+
+						if ($email_provider === 'Office365 relay') {
+							$this->assertFalse($form->getField('OAuth')->isEnabled());
+						}
 					}
 
 					$this->checkTabFields($form, $auth['password']);
@@ -456,11 +460,11 @@ class testFormAdministrationMediaTypes extends CWebTest {
 					$this->assertTrue($oauth_form->query('xpath:.//button[contains(@class, "zi-copy")]')->one()->isClickable());
 
 					// Check fields attributes.
-					$oauth_provider = ($email_provider == 'Generic SMTP') ? $oauth_fields['generic_smtp'] : $oauth_fields['other'];
+					$oauth_provider = ($email_provider === 'Generic SMTP') ? $oauth_fields['generic_smtp'] : $oauth_fields['other'];
 					$this->checkFieldsAttributes($oauth_form, $oauth_provider);
 
 					// Check "Authorization code" related fields.
-					if ($email_provider == 'Generic SMTP') {
+					if ($email_provider === 'Generic SMTP') {
 						$this->assertEquals('Authorization code', $oauth_form->getField('id:code')->getAttribute('placeholder'));
 						$this->assertFalse($oauth_form->getField('id:code')->isEnabled());
 						$oauth_form->fill(['id:authorization_mode' => 'Manual']);
@@ -499,7 +503,7 @@ class testFormAdministrationMediaTypes extends CWebTest {
 							]
 						]
 					];
-					$hints = ($email_provider == 'Generic SMTP')
+					$hints = ($email_provider === 'Generic SMTP')
 						? array_merge($hints_data['common'], $hints_data['generic'])
 						: $hints_data['common'];
 					foreach ($hints as $hint) {
@@ -507,7 +511,7 @@ class testFormAdministrationMediaTypes extends CWebTest {
 					}
 
 					// Check buttons related to 'Authorization parameters' and 'Token parameters' tables.
-					if ($email_provider == 'Generic SMTP') {
+					if ($email_provider === 'Generic SMTP') {
 						foreach (['id:oauth-auth-parameters-table', 'id:oauth-token-parameters-table'] as $locator) {
 							$this->assertEquals(2, $oauth_form->query($locator)->one()->query('button', ['Add', 'Remove'])->all()
 									->filter((CElementFilter::CLICKABLE))->count()
@@ -659,15 +663,16 @@ class testFormAdministrationMediaTypes extends CWebTest {
 	 */
 	protected function checkHint($form, $selector, $hint_text, $label = null) {
 		if ($label === null) {
-			$form->query('xpath://button[contains(@class, "'.$selector.'")]')->one()->click();
+			$form->query('xpath://button[contains(@class, '.CXPathHelper::escapeQuotes($selector).')]')->one()->click();
 		}
 		else {
-			$form->getLabel($label)->query('xpath:./button[contains(@class, "'.$selector.'")]')->one()->click();
+			$form->getLabel($label)->query('xpath:./button[contains(@class, '.
+				CXPathHelper::escapeQuotes($selector).')]')->one()->click();
 		}
 
-		$hint = $this->query('xpath://div[@data-hintboxid]')->waitUntilVisible();
-		$this->assertEquals($hint_text, $hint->one()->getText());
-		$hint->one()->query('xpath:.//button[@class="btn-overlay-close"]')->one()->click();
+		$hint = $this->query('xpath://div[@data-hintboxid]')->waitUntilVisible()->one();
+		$this->assertEquals($hint_text, $hint->getText());
+		$hint->query('xpath:.//button[@class="btn-overlay-close"]')->one()->click();
 		$hint->waitUntilNotPresent();
 	}
 
