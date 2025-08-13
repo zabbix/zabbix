@@ -31,13 +31,10 @@ func Test_ConfigHandler(t *testing.T) {
 		switch strings.ToLower(args[2]) {
 		case "param1":
 			return map[string]string{"param1": "foo"}
-
 		case "*":
 			return map[string]string{"param1": "foo", "param2": "bar"}
-
 		case "unknownparam":
 			return map[string]string{}
-
 		default:
 			return errors.New("cannot fetch data")
 		}
@@ -57,37 +54,40 @@ func Test_ConfigHandler(t *testing.T) {
 		params map[string]string
 	}
 
-	tests := []struct {
+	type testCase struct {
 		name    string
 		args    args
 		want    any
 		wantErr bool
-	}{
+	}
+
+	tests := []testCase{
 		{
-			"Pattern * should be used if it is not explicitly specified",
-			args{conn: connection, params: map[string]string{"Pattern": "*"}},
-			`{"param1":"foo","param2":"bar"}`,
-			false,
+			name:    "+defaultPattern",
+			args:    args{conn: connection, params: map[string]string{"Pattern": "*"}},
+			want:    `{"param1":"foo","param2":"bar"}`,
+			wantErr: false,
 		},
 		{
-			"Should fetch specified parameter and return its value",
-			args{conn: connection, params: map[string]string{"Pattern": "param1"}},
-			`foo`,
-			false,
+			name:    "+specificParam",
+			args:    args{conn: connection, params: map[string]string{"Pattern": "param1"}},
+			want:    "foo",
+			wantErr: false,
 		},
 		{
-			"Should fail if parameter not found",
-			args{conn: connection, params: map[string]string{"Pattern": "UnknownParam"}},
-			nil,
-			true,
+			name:    "-unknownParam",
+			args:    args{conn: connection, params: map[string]string{"Pattern": "UnknownParam"}},
+			want:    nil,
+			wantErr: true,
 		},
 		{
-			"Should fail if error occurred",
-			args{conn: connection, params: map[string]string{"Pattern": "WantErr"}},
-			nil,
-			true,
+			name:    "-fetchError",
+			args:    args{conn: connection, params: map[string]string{"Pattern": "WantErr"}},
+			want:    nil,
+			wantErr: true,
 		},
 	}
+
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			t.Parallel()

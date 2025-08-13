@@ -37,40 +37,40 @@ func Test_GetLastSlowlogID(t *testing.T) {
 		wantErr bool
 	}{
 		{
-			"Should return 0 for empty log",
-			args{slowlog{}},
-			0,
-			false,
+			name:    "+emptyLog",
+			args:    args{slowlog: slowlog{}},
+			want:    0,
+			wantErr: false,
 		},
 		{
-			"Should return 128 for last ID=127",
-			args{slowlog{
+			name: "+lastId127",
+			args: args{slowlog: slowlog{
 				logItem{
 					int64(127),
 					int64(1571840072),
 					3,
 					[]any{},
 				}}},
-			128,
-			false,
+			want:    128,
+			wantErr: false,
 		},
 		{
-			"Should fail if logItem is not slice",
-			args{slowlog{"wrong_item_type"}},
-			0,
-			true,
+			name:    "-wrongItemType",
+			args:    args{slowlog: slowlog{"wrong_item_type"}},
+			want:    0,
+			wantErr: true,
 		},
 		{
-			"Should fail if logItem is empty",
-			args{slowlog{logItem{}}},
-			0,
-			true,
+			name:    "-emptyLogItem",
+			args:    args{slowlog: slowlog{logItem{}}},
+			want:    0,
+			wantErr: true,
 		},
 		{
-			"Should fail if logItem id is not int64",
-			args{slowlog{logItem{"wrong_id_type"}}},
-			0,
-			true,
+			name:    "-wrongIdType",
+			args:    args{slowlog: slowlog{logItem{"wrong_id_type"}}},
+			want:    0,
+			wantErr: true,
 		},
 	}
 
@@ -120,10 +120,10 @@ func Test_SlowlogHandler(t *testing.T) {
 		wantErr bool
 	}{
 		{
-			"Should fail if error occurred",
-			args{conn: connection, params: map[string]string{}},
-			nil,
-			true,
+			name:    "-fetchError",
+			args:    args{conn: connection, params: map[string]string{}},
+			want:    nil,
+			wantErr: true,
 		},
 	}
 
