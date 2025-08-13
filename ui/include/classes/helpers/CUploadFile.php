@@ -113,16 +113,20 @@ class CUploadFile {
 	}
 
 	/**
-	 * Validate size of file.
+	 * Validate file size.
+	 *
+	 * @param int $max_file_size	maximum size in B
+	 * @param string $file_type		affects exception text
 	 *
 	 * @throws Exception if file size is over provided limit
 	 */
-	public function validateFileSize(int $max_file_size) {
+	public function validateFileSize(int $max_file_size, string $file_type = 'file') {
+		$exception_message = ($file_type == 'image') ?
+			_('Image size must be less than %1$s.') :
+			_('File size must be less than %1$s.');
+
 		if ($this->error === UPLOAD_ERR_INI_SIZE || $this->size > $max_file_size) {
-			throw new Exception(_s('Image size must be less than %1$s.', convertUnits([
-				'value' => ZBX_MAX_IMAGE_SIZE,
-				'units' => 'B'
-			])));
+			throw new Exception(_s($exception_message, convertUnits(['value' => ZBX_MAX_IMAGE_SIZE, 'units' => 'B'])));
 		}
 	}
 
@@ -132,7 +136,7 @@ class CUploadFile {
 	 * @throws Exception if image size is 1MB or greater.
 	 */
 	public function validateImageSize() {
-		return $this->validateFileSize(intval(ZBX_MAX_IMAGE_SIZE));
+		return $this->validateFileSize(intval(ZBX_MAX_IMAGE_SIZE), 'image');
 	}
 
 	/**

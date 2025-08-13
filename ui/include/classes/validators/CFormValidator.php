@@ -1205,8 +1205,6 @@ class CFormValidator {
 			return false;
 		}
 
-		error_log('validate array');
-
 		if (array_key_exists('field', $rules)) {
 			foreach (array_keys($array_values) as $index) {
 				$this->validateField($rules['field'], $array_values, $index, $path.'/'.$index);
@@ -1338,7 +1336,7 @@ class CFormValidator {
 	private static function validateFile ($rules, &$value, ?string &$error = null): bool {
 		if ($rules['max-file-size']) {
 			try {
-				$value->validateFileSize($rules['max-file-size']);
+				$value->validateFileSize($rules['max-file-size'], $rules['file']);
 			}
 			catch (Exception $e) {
 				$error = $e->getMessage();
