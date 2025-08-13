@@ -139,8 +139,6 @@ static void	*async_worker_entry(void *args)
 	zbx_vector_int32_t		errcodes;
 	zbx_vector_int32_t		lastclocks;
 
-	zabbix_log(LOG_LEVEL_INFORMATION, "thread started");
-
 	sigemptyset(&mask);
 	sigaddset(&mask, SIGTERM);
 	sigaddset(&mask, SIGUSR1);
@@ -152,6 +150,7 @@ static void	*async_worker_entry(void *args)
 	if (0 != (err = pthread_sigmask(SIG_BLOCK, &mask, NULL)))
 		zabbix_log(LOG_LEVEL_WARNING, "cannot block signals: %s", zbx_strerror(err));
 
+	zabbix_log(LOG_LEVEL_INFORMATION, "thread started");
 	worker->stop = 0;
 
 	async_task_queue_lock(queue);
