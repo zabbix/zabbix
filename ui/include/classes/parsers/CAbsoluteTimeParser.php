@@ -84,7 +84,19 @@ class CAbsoluteTimeParser extends CParser {
 
 		$datetime = date_create($date);
 
-		if ($datetime === false || $datetime->getLastErrors() !== false) {
+
+		if ($datetime === false) {
+			return false;
+		}
+
+		if (PHP_VERSION_ID < 82000) {
+			$errors = $datetime->getLastErrors();
+
+			if ($errors['errors'] || $errors['warnings']) {
+				return false;
+			}
+		}
+		elseif ($datetime->getLastErrors() !== false) {
 			return false;
 		}
 

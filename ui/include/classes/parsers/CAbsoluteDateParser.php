@@ -48,7 +48,18 @@ class CAbsoluteDateParser extends CParser {
 		$date = sprintf('%04d-%02d-%02d', $matches['Y'], $matches['m'], $matches['d']);
 		$datetime = date_create($date);
 
-		if ($datetime === false || $datetime->getLastErrors() !== false) {
+		if ($datetime === false) {
+			return self::PARSE_FAIL;
+		}
+
+		if (PHP_VERSION_ID < 82000) {
+			$errors = $datetime->getLastErrors();
+
+			if ($errors['errors'] || $errors['warnings']) {
+				return self::PARSE_FAIL;
+			}
+		}
+		elseif ($datetime->getLastErrors() !== false) {
 			return self::PARSE_FAIL;
 		}
 
