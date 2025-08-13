@@ -55,7 +55,8 @@ class CControllerProxyCreate extends CController {
 				'when' => ['proxy_groupid', 'not_empty']
 			],
 			'allowed_addresses' => ['db proxy.allowed_addresses',
-				'use' => [CIPRangeParser::class, ['v6' => ZBX_HAVE_IPV6, 'dns' => true, 'usermacros' => true, 'macros' => true], 'messages' => ['use' => _('Invalid address.')]]
+				'use' => [CIPRangeParser::class, ['v6' => ZBX_HAVE_IPV6, 'dns' => true, 'usermacros' => true, 'macros' => false], 'messages' => ['use' => _('Invalid address.')]],
+				'when' => ['operating_mode', 'in' => [PROXY_OPERATING_MODE_ACTIVE]]
 			],
 			'description' => ['db proxy.description'],
 			'tls_accept' => ['db proxy.tls_accept'],
@@ -72,8 +73,10 @@ class CControllerProxyCreate extends CController {
 				'in' => [HOST_ENCRYPTION_NONE, HOST_ENCRYPTION_PSK, HOST_ENCRYPTION_CERTIFICATE],
 				'when' => ['operating_mode', 'in' => [PROXY_OPERATING_MODE_PASSIVE]]
 			],
-			'tls_psk_identity' => ['db proxy.tls_psk_identity', 'not_empty',
-				'when' => ['tls_accept_psk', true]],
+			'tls_psk_identity' => [
+				['db proxy.tls_psk_identity', 'not_empty', 'when' => ['tls_accept_psk', true]],
+				['db proxy.tls_psk_identity', 'not_empty', 'when' => ['tls_connect', 'in' => [HOST_ENCRYPTION_PSK]]]
+			],
 			'tls_psk' => [
 				['db proxy.tls_psk',
 					'regex' => '/^(.{2})+$/',
@@ -87,7 +90,8 @@ class CControllerProxyCreate extends CController {
 					'regex' => '/^[0-9a-f]*$/i',
 					'messages' => ['regex' => _('PSK must contain only hexadecimal characters.')]
 				],
-				['db proxy.tls_psk', 'not_empty', 'when' => ['tls_accept_psk', true]]
+				['db proxy.tls_psk', 'not_empty', 'when' => ['tls_accept_psk', true]],
+				['db proxy.tls_psk_identity', 'not_empty', 'when' => ['tls_connect', 'in' => [HOST_ENCRYPTION_PSK]]]
 			],
 			'tls_issuer' => ['db proxy.tls_issuer', 'when' => ['tls_connect', 'in' => [HOST_ENCRYPTION_CERTIFICATE]]],
 			'tls_subject' => ['db proxy.tls_subject', 'when' => ['tls_connect', 'in' => [HOST_ENCRYPTION_CERTIFICATE]]],
@@ -195,9 +199,9 @@ class CControllerProxyCreate extends CController {
 			case PROXY_OPERATING_MODE_ACTIVE:
 				$proxy['allowed_addresses'] = $this->getInput('allowed_addresses', '');
 
-				$proxy['tls_accept'] = ($this->hasInput('tls_accept_none') ? HOST_ENCRYPTION_NONE : 0)
-					| ($this->hasInput('tls_accept_psk') ? HOST_ENCRYPTION_PSK : 0)
-					| ($this->hasInput('tls_accept_certificate') ? HOST_ENCRYPTION_CERTIFICATE : 0);
+				$proxy['tls_accept'] = ($this->getInput('tls_accept_none', 0) ? HOST_ENCRYPTION_NONE : 0)
+					| ($this->getInput('tls_accept_psk', 0) ? HOST_ENCRYPTION_PSK : 0)
+					| ($this->getInput('tls_accept_certificate', 0) ? HOST_ENCRYPTION_CERTIFICATE : 0);
 
 				if ($this->getInput('clone_psk') && $this->hasInput('tls_accept_psk')) {
 					$proxy['tls_psk_identity'] = $this->clone_proxy['tls_psk_identity'];
