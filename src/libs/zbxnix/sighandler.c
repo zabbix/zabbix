@@ -401,6 +401,27 @@ void 	zbx_set_metric_thread_signal_handler(void)
  * Purpose: block signals to avoid interruption                               *
  *                                                                            *
  ******************************************************************************/
+void	zbx_block_thread_signals(sigset_t *orig_mask)
+{
+	sigset_t	mask;
+
+	sigemptyset(&mask);
+	sigaddset(&mask, SIGTERM);
+	sigaddset(&mask, SIGUSR1);
+	sigaddset(&mask, SIGUSR2);
+	sigaddset(&mask, SIGHUP);
+	sigaddset(&mask, SIGQUIT);
+	sigaddset(&mask, SIGINT);
+
+	if (0 > zbx_sigmask(SIG_BLOCK, &mask, orig_mask))
+		zabbix_log(LOG_LEVEL_WARNING, "cannot set signal mask to block the signal");
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: block signals to avoid interruption                               *
+ *                                                                            *
+ ******************************************************************************/
 void	zbx_block_signals(sigset_t *orig_mask)
 {
 	sigset_t	mask;

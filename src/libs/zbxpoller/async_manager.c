@@ -19,6 +19,7 @@
 #include "zbxstr.h"
 #include "zbxalgo.h"
 #include "zbxpoller.h"
+#include "zbxnix.h"
 
 ZBX_PTR_VECTOR_IMPL(interface_status, zbx_interface_status_t *)
 ZBX_PTR_VECTOR_IMPL(poller_item, zbx_poller_item_t *)
@@ -48,18 +49,9 @@ zbx_async_manager_t	*zbx_async_manager_create(int workers_num, zbx_async_notify_
 	manager->workers_num = workers_num;
 	manager->workers = (zbx_async_worker_t *)zbx_calloc(NULL, (size_t)workers_num, sizeof(zbx_async_worker_t));
 
-	sigset_t	mask, orig_mask;
+	sigset_t	orig_mask;
 
-	sigemptyset(&mask);
-	sigaddset(&mask, SIGTERM);
-	sigaddset(&mask, SIGUSR1);
-	sigaddset(&mask, SIGUSR2);
-	sigaddset(&mask, SIGHUP);
-	sigaddset(&mask, SIGQUIT);
-	sigaddset(&mask, SIGINT);
-
-	if (0 > zbx_sigmask(SIG_BLOCK, &mask, &orig_mask))
-		zabbix_log(LOG_LEVEL_WARNING, "cannot set signal mask to block the user signal");
+	zbx_block_thread_signals(&orig_mask);
 
 	for (int i = 0; i < workers_num; i++)
 	{
@@ -107,8 +99,7 @@ out:
 		manager = NULL;
 	}
 
-	if (0 > zbx_sigmask(SIG_SETMASK, &orig_mask, NULL))
-		zabbix_log(LOG_LEVEL_WARNING, "cannot restore signal mask");
+	zbx_unblock_signals(&orig_mask);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s() ret:%s error:%s", __func__, zbx_result_string(ret),
 			ZBX_NULL2EMPTY_STR(*error));

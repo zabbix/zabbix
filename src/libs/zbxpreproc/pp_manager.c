@@ -152,18 +152,9 @@ static zbx_pp_manager_t	*zbx_pp_manager_create(int workers_num, zbx_pp_finished_
 	manager->workers_num = workers_num;
 	manager->workers = (zbx_pp_worker_t *)zbx_calloc(NULL, (size_t)workers_num, sizeof(zbx_pp_worker_t));
 
-	sigset_t	mask, orig_mask;
+	sigset_t	orig_mask;
 
-	sigemptyset(&mask);
-	sigaddset(&mask, SIGTERM);
-	sigaddset(&mask, SIGUSR1);
-	sigaddset(&mask, SIGUSR2);
-	sigaddset(&mask, SIGHUP);
-	sigaddset(&mask, SIGQUIT);
-	sigaddset(&mask, SIGINT);
-
-	if (0 > zbx_sigmask(SIG_BLOCK, &mask, &orig_mask))
-		zabbix_log(LOG_LEVEL_WARNING, "cannot set signal mask to block the user signal");
+	zbx_block_thread_signals(&orig_mask);
 
 	for (i = 0; i < workers_num; i++)
 	{
@@ -218,8 +209,7 @@ out:
 		manager = NULL;
 	}
 
-	if (0 > zbx_sigmask(SIG_SETMASK, &orig_mask, NULL))
-		zabbix_log(LOG_LEVEL_WARNING, "cannot restore signal mask");
+	zbx_unblock_signals(&orig_mask);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s() ret:%s error:%s", __func__, zbx_result_string(ret),
 			ZBX_NULL2EMPTY_STR(*error));
