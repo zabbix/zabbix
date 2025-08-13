@@ -2953,9 +2953,11 @@ class testUsersAuthenticationLdap extends testFormAuthentication {
 	 */
 	private function openLdapForm($auth = 'Internal') {
 		$this->page->login()->open('zabbix.php?action=authentication.edit')->waitUntilReady();
-		$form = $this->query('id:authentication-form')->asForm()->one();
+		$form = $this->query('id:authentication-form')->waitUntilVisible()->asForm()->one();
 		$form->fill(['Default authentication' => $auth]);
 		$form->selectTab('LDAP settings');
+		// Wait for the LDAP tab contents to be visible.
+		$form->query('id:ldap')->waitUntilVisible();
 
 		return $form;
 	}
