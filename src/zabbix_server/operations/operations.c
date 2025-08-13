@@ -683,8 +683,7 @@ static zbx_uint64_t	add_discovered_host(const zbx_db_event *event, int *status, 
 			{
 				zbx_uint64_t	proxy_groupid;
 				unsigned char	monitored_by;
-				int		host_tls_accept, update_tls = 0;
-				char		*esc_identity = NULL, *esc_psk = NULL;
+				int		host_tls_accept = 0;
 
 				ZBX_STR2UINT64(hostid, row2[0]);
 				ZBX_DBROW2UINT64(host_proxyid, row2[1]);
@@ -709,25 +708,8 @@ static zbx_uint64_t	add_discovered_host(const zbx_db_event *event, int *status, 
 					}
 				}
 
-				if (host_tls_accept != tls_accepted)
-				{
-					if (ZBX_TCP_SEC_TLS_PSK == tls_accepted)
-					{
-						char	psk_identity[HOST_TLS_PSK_IDENTITY_LEN_MAX];
-						char	psk[HOST_TLS_PSK_LEN_MAX];
-
-						zbx_dc_get_autoregistration_psk(psk_identity, sizeof(psk_identity),
-								(unsigned char *)psk, sizeof(psk));
-
-						esc_identity = zbx_db_dyn_escape_string(psk_identity);
-						esc_psk = zbx_db_dyn_escape_string(psk);
-					}
-
-					update_tls = 1;
-				}
-
 				if (host_proxyid != new_proxyid || proxy_groupid != new_proxy_groupid ||
-						monitored_by != new_monitored_by || 0 != update_tls)
+						monitored_by != new_monitored_by || host_tls_accept != tls_accepted)
 				{
 					char	delim = ' ';
 					size_t	sql_alloc = 0, sql_offset = 0;
@@ -769,23 +751,23 @@ static zbx_uint64_t	add_discovered_host(const zbx_db_event *event, int *status, 
 								(int)monitored_by, (int)new_monitored_by);
 					}
 
-					if (0 != update_tls)
+					if (host_tls_accept != tls_accepted)
 					{
-						if (ZBX_TCP_SEC_TLS_PSK == tls_accepted)
+						char	psk_identity[HOST_TLS_PSK_IDENTITY_LEN_MAX];
+						char	psk[HOST_TLS_PSK_LEN_MAX];
+
+						zbx_dc_get_autoregistration_psk(psk_identity, sizeof(psk_identity),
+								(unsigned char *)psk, sizeof(psk));
+
+						if (ZBX_TCP_SEC_TLS_PSK != tls_accepted)
 						{
-							zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
-									"%ctls_connect=%d,tls_accept=%d,"
-									"tls_psk_identity='%s',tls_psk='%s'",
-									delim, tls_accepted, tls_accepted,
-									esc_identity, esc_psk);
+							psk_identity[0] = '\0';
+							psk[0] = '\0';
 						}
-						else
-						{
-							zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
-									"%ctls_connect=%d,tls_accept=%d,"
-									"tls_psk_identity='',tls_psk=''",
-									delim, tls_accepted, tls_accepted);
-						}
+
+						zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "%ctls_connect=%d,"
+								"tls_accept=%d,tls_psk_identity='%s',tls_psk='%s'",
+								delim, tls_accepted, tls_accepted, psk_identity, psk);
 
 						zbx_audit_host_update_json_add_tls_and_psk(
 								zbx_map_db_event_to_audit_context(event), hostid,
@@ -798,9 +780,6 @@ static zbx_uint64_t	add_discovered_host(const zbx_db_event *event, int *status, 
 					(void)zbx_db_execute("%s", sql);
 					zbx_free(sql);
 				}
-
-				zbx_free(esc_identity);
-				zbx_free(esc_psk);
 
 				zbx_db_add_interface(hostid, INTERFACE_TYPE_AGENT, useip, row[2], row[3], port, flags,
 						zbx_map_db_event_to_audit_context(event));

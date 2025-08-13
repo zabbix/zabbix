@@ -51,7 +51,6 @@ static void	autoreg_process_hosts_server(zbx_vector_autoreg_host_ptr_t *autoreg_
 	char			*sql = NULL;
 	size_t			sql_alloc = 512, sql_offset;
 	zbx_autoreg_host_t	*autoreg_host;
-	unsigned int		current_connection_type;
 
 	sql = (char *)zbx_malloc(sql, sql_alloc);
 	zbx_vector_str_create(&hosts);
@@ -90,8 +89,7 @@ static void	autoreg_process_hosts_server(zbx_vector_autoreg_host_ptr_t *autoreg_
 					autoreg_host->flag != atoi(row[7]))
 				break;
 
-			if (FAIL == zbx_is_uint32(row[11], &current_connection_type) ||
-					current_connection_type != autoreg_host->connection_type)
+			if (autoreg_host->connection_type != atoi(row[11]))
 				break;
 
 			/* process with autoregistration if the connection type was forced and */
