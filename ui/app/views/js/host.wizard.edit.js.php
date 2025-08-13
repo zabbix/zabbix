@@ -356,10 +356,6 @@ window.host_wizard_edit = new class {
 		this.#gotoStep(this.#current_step);
 	}
 
-	#getHostName() {
-		return this.#data.host_new !== null ? this.#data.host_new.id : this.#data.host.name;
-	}
-
 	#initViewTemplates() {
 		const tmpl = id => new Template(document.getElementById(id).innerHTML);
 
@@ -868,7 +864,9 @@ window.host_wizard_edit = new class {
 					this.#data.tls_warning = this.#data.install_agent_required && !no_encryption && !psk_encryption;
 				}
 
-				this.#data.tls_psk_identity = this.#getHostName().substring(0, 124) + ' PSK';
+				const host_field_length = <?= DB::getFieldLength('hosts', 'host') ?>;
+
+				this.#data.tls_psk_identity = `${this.#getHostName().substring(0, host_field_length - 4)} PSK`;
 				this.#data.tls_psk = this.#data.tls_required ? this.#generatePSK() : '';
 
 				this.#data.interfaces = [];
@@ -1546,6 +1544,10 @@ window.host_wizard_edit = new class {
 		const selected = this.#data.selected_template;
 
 		return selected && this.#templates.get(selected.split(':').pop());
+	}
+
+	#getHostName() {
+		return this.#data.host_new !== null ? this.#data.host_new.id : this.#data.host.name;
 	}
 
 	#isRequiredAddHostInterface() {
