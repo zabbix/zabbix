@@ -145,6 +145,8 @@ static void	*async_worker_entry(void *args)
 	zabbix_log(LOG_LEVEL_INFORMATION, "thread started");
 	worker->stop = 0;
 
+	zbx_init_regexp_env();
+
 	async_task_queue_lock(queue);
 	async_task_queue_register_worker(queue);
 
@@ -267,6 +269,8 @@ static void	*async_worker_entry(void *args)
 	zbx_vector_uint64_destroy(&itemids);
 
 	zabbix_log(LOG_LEVEL_INFORMATION, "thread stopped");
+
+	zbx_deinit_regexp_env();
 
 	return NULL;
 }

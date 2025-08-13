@@ -173,6 +173,7 @@ static void	*pp_worker_entry(void *args)
 
 	pp_task_queue_deregister_worker(queue);
 	pp_task_queue_unlock(queue);
+	zbx_deinit_regexp_env();
 
 	zabbix_log(LOG_LEVEL_INFORMATION, "thread stopped [%s #%d]",
 			get_process_type_string(ZBX_PROCESS_TYPE_PREPROCESSOR), worker->id);
