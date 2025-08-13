@@ -8280,7 +8280,7 @@ svg {
 
 .preprocessing-list {
   display: block;
-  max-width: 930px;
+  max-width: 998px;
   min-width: 800px;
   position: relative; }
   .preprocessing-list > li {
@@ -8317,8 +8317,8 @@ svg {
   .preprocessing-list .on-fail-options > .radio-segmented {
     padding: 5px 5px 5px 0; }
   .preprocessing-list .step-name {
-    flex: 0 0 285px;
-    max-width: 285px; }
+    flex: 0 0 205px;
+    max-width: 205px; }
   .preprocessing-list .preprocessing-step {
     align-items: start; }
     .preprocessing-list .preprocessing-step .drag-icon {
@@ -8342,11 +8342,11 @@ svg {
     justify-content: center;
     text-align: center; }
   .preprocessing-list .step-action {
-    flex: 0 0 120px;
-    max-width: 120px;
+    flex: 0 0 188px;
+    max-width: 188px;
     padding-right: 0; }
   .preprocessing-list .on-fail-options {
-    padding-right: 225px;
+    padding-right: 293px;
     margin-bottom: 5px; }
     .preprocessing-list .on-fail-options > label {
       padding-left: 30px; }
@@ -8358,8 +8358,8 @@ svg {
     color: #737373;
     line-height: 14px; }
     .preprocessing-list .preprocessing-list-head .step-name {
-      flex: 0 0 295px;
-      max-width: 295px;
+      flex: 0 0 215px;
+      max-width: 215px;
       padding-left: 30px; }
     .preprocessing-list .preprocessing-list-head .step-on-fail {
       display: inline-block; }
