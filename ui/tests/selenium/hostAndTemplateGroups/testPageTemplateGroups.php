@@ -146,6 +146,12 @@ class testPageTemplateGroups extends testPageGroups {
 					'Name' => 'with  '
 				]
 			],
+			[
+				[
+					'Name' => '   spaces   ',
+					'expected' => ['Multiple spaces in template group name']
+				]
+			],
 			// Host group name.
 			[
 				[
