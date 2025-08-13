@@ -29,6 +29,7 @@ class CFieldFile extends CField {
 		if (this._field.disabled) {
 			return null;
 		}
+
 		return this._field.files[0] ? this._field.files[0] : null;
 	}
 

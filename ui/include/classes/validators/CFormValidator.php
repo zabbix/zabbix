@@ -1346,7 +1346,6 @@ class CFormValidator {
 
 		if ($rules['file'] == 'image') {
 			try {
-
 				if (@imageCreateFromString($value->getContent()) === false) {
 					$error = _('File format is unsupported');
 					return false;
