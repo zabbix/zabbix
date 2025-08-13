@@ -605,7 +605,7 @@ func Test_diskGetSingle(t *testing.T) {
 		raidType string
 	}
 
-	type fileds struct {
+	type fields struct {
 		ctlOutput []byte
 		ctlErr    error
 	}
@@ -618,7 +618,7 @@ func Test_diskGetSingle(t *testing.T) {
 	tests := []struct {
 		name   string
 		args   args
-		fileds fileds
+		fields fields
 		want   want
 	}{
 		{
@@ -627,7 +627,7 @@ func Test_diskGetSingle(t *testing.T) {
 				path:     "path",
 				raidType: "rt",
 			},
-			fileds{
+			fields{
 				ctlOutput: []byte(nvme),
 				ctlErr:    nil,
 			},
@@ -647,7 +647,7 @@ func Test_diskGetSingle(t *testing.T) {
 				path:     "path",
 				raidType: "rt",
 			},
-			fileds{
+			fields{
 				ctlOutput: []byte(nvmeMediaErrorOverflow),
 				ctlErr:    nil,
 			},
@@ -667,7 +667,7 @@ func Test_diskGetSingle(t *testing.T) {
 				path:     "path",
 				raidType: "rt",
 			},
-			fileds{
+			fields{
 				ctlOutput: []byte{},
 				ctlErr:    errs.New("test"),
 			},
@@ -682,7 +682,7 @@ func Test_diskGetSingle(t *testing.T) {
 				path:     "path",
 				raidType: "rt",
 			},
-			fileds{
+			fields{
 				ctlOutput: []byte(`{abc`),
 				ctlErr:    nil,
 			},
@@ -700,8 +700,8 @@ func Test_diskGetSingle(t *testing.T) {
 
 			mockCTL.
 				ExpectExecute().
-				WillReturnOutput(tt.fileds.ctlOutput).
-				WillReturnError(tt.fileds.ctlErr)
+				WillReturnOutput(tt.fields.ctlOutput).
+				WillReturnError(tt.fields.ctlErr)
 
 			p := &Plugin{
 				ctl: mockCTL,
