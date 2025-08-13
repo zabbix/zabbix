@@ -253,7 +253,8 @@ int	zbx_curl_setopt_https(CURL *easyhandle, char **error)
 		else
 		{
 			/* 181L is CURLOPT_PROTOCOLS, remove when cURL requirement will become >= 7.85.0 */
-			if (CURLE_OK != (err = curl_easy_setopt(easyhandle, 181L, CURLPROTO_HTTP | CURLPROTO_HTTPS)))
+			if (CURLE_OK != (err = curl_easy_setopt(easyhandle, 181L,
+					(long)(CURLPROTO_HTTP | CURLPROTO_HTTPS))))
 			{
 				setopt_error("HTTP/HTTPS", err, error);
 				return FAIL;
@@ -289,7 +290,8 @@ int	zbx_curl_setopt_smtps(CURL *easyhandle, char **error)
 		else
 		{
 			/* 181L is CURLOPT_PROTOCOLS, remove when cURL requirement will become >= 7.85.0 */
-			if (CURLE_OK != (err = curl_easy_setopt(easyhandle, 181L, CURLPROTO_SMTP | CURLPROTO_SMTPS)))
+			if (CURLE_OK != (err = curl_easy_setopt(easyhandle, 181L,
+					(long)(CURLPROTO_SMTP | CURLPROTO_SMTPS))))
 			{
 				setopt_error("SMTP/SMTPS", err, error);
 				return FAIL;
@@ -311,7 +313,7 @@ int	zbx_curl_setopt_ssl_version(CURL *easyhandle, char **error)
 
 	if (libcurl_version_num() >= 0x072200)
 	{
-		if (CURLE_OK != (err = curl_easy_setopt(easyhandle, CURLOPT_SSLVERSION, CURL_SSLVERSION_TLSv1_2)))
+		if (CURLE_OK != (err = curl_easy_setopt(easyhandle, CURLOPT_SSLVERSION, (long)CURL_SSLVERSION_TLSv1_2)))
 		{
 			setopt_error("CURL_SSLVERSION_TLSv1_2", err, error);
 			return FAIL;
