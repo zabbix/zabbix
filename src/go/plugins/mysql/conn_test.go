@@ -24,7 +24,7 @@ import (
 	"golang.zabbix.com/sdk/zbxerr"
 )
 
-func TestGetTLSDetails(t *testing.T) {
+func Test_getTLSDetails(t *testing.T) {
 	t.Parallel()
 
 	// Mock URL for testing.
@@ -46,7 +46,7 @@ func TestGetTLSDetails(t *testing.T) {
 		validationErr error
 	}{
 		{
-			name: "+tlsConnect disable",
+			name: "+tlsConnectDisable",
 			ck: connKey{
 				rawUri:     "zabbix.com",
 				uri:        *testURL,
@@ -60,7 +60,7 @@ func TestGetTLSDetails(t *testing.T) {
 			wantErr: false,
 		},
 		{
-			name: "+tlsConnect require with client certs",
+			name: "+tlsConnectRequireWithClientCerts",
 			ck: connKey{
 				rawUri:     "zabbix.com",
 				uri:        *testURL,
@@ -78,7 +78,7 @@ func TestGetTLSDetails(t *testing.T) {
 			wantErr: false,
 		},
 		{
-			name: "+tlsConnect verifyCa",
+			name: "+tlsConnectVerifyCa",
 			ck: connKey{
 				rawUri:     "zabbix.com",
 				uri:        *testURL,
@@ -94,7 +94,7 @@ func TestGetTLSDetails(t *testing.T) {
 			wantErr: false,
 		},
 		{
-			name: "+tlsConnect verifyFull",
+			name: "+tlsConnectVerifyFull",
 			ck: connKey{
 				rawUri:     "zabbix.com",
 				uri:        *testURL,
@@ -114,7 +114,7 @@ func TestGetTLSDetails(t *testing.T) {
 			wantErr: false,
 		},
 		{
-			name: "-validation fails",
+			name: "-validationFails",
 			ck: connKey{
 				rawUri:     "zabbix.com",
 				uri:        *testURL,
