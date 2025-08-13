@@ -67,37 +67,37 @@ func Test_parseRedisInfo(t *testing.T) {
 		wantErr bool
 	}{
 		{
-			"Should fail on malformed input",
-			args{"foobar"},
-			nil,
-			true,
+			name:    "-malformedInput",
+			args:    args{info: "foobar"},
+			wantRes: nil,
+			wantErr: true,
 		},
 		{
-			"Should fail on empty section name",
-			args{infoMalformedSectionOutput},
-			nil,
-			true,
+			name:    "-emptySectionName",
+			args:    args{info: infoMalformedSectionOutput},
+			wantRes: nil,
+			wantErr: true,
 		},
 		{
-			"Should fail on empty input",
-			args{""},
-			nil,
-			true,
+			name:    "-emptyInput",
+			args:    args{info: ""},
+			wantRes: nil,
+			wantErr: true,
 		},
 		{
-			`Parse of output of "info CommonSection" command`,
-			args{infoCommonSectionOutput},
-			redisInfo{
+			name: "+commonSectionParse",
+			args: args{info: infoCommonSectionOutput},
+			wantRes: redisInfo{
 				"CommonSection": infoKeySpace{
 					"foo": "123", "bar": "0.00",
 				},
 			},
-			false,
+			wantErr: false,
 		},
 		{
-			`Parse of output of "info Commandstats" command`,
-			args{infoExtendedSectionOutput},
-			redisInfo{
+			name: "+commandstatsParse",
+			args: args{info: infoExtendedSectionOutput},
+			wantRes: redisInfo{
 				"Commandstats": infoKeySpace{
 					"cmdstat_info": infoExtKeySpace{
 						"calls":         "11150",
@@ -111,12 +111,12 @@ func Test_parseRedisInfo(t *testing.T) {
 					},
 				},
 			},
-			false,
+			wantErr: false,
 		},
 		{
-			`Parse of output of "info Replication" command for Master role`,
-			args{infoMasterReplicationOutput},
-			redisInfo{
+			name: "+replicationMasterParse",
+			args: args{info: infoMasterReplicationOutput},
+			wantRes: redisInfo{
 				"Replication": infoKeySpace{
 					"role":             "master",
 					"connected_slaves": "1",
@@ -130,12 +130,12 @@ func Test_parseRedisInfo(t *testing.T) {
 					"master_replid": "5a9346f8855b4766efca35d4a83cfd151db3fa4a",
 				},
 			},
-			false,
+			wantErr: false,
 		},
 		{
-			`Parse of output of "info Replication" command for Slave role`,
-			args{infoSlaveReplicationOutput},
-			redisInfo{
+			name: "+replicationSlaveParse",
+			args: args{info: infoSlaveReplicationOutput},
+			wantRes: redisInfo{
 				"Replication": infoKeySpace{
 					"role":              "slave",
 					"master_host":       "redis-master",
@@ -144,9 +144,10 @@ func Test_parseRedisInfo(t *testing.T) {
 					"connected_slaves":  "0",
 				},
 			},
-			false,
+			wantErr: false,
 		},
 	}
+
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			t.Parallel()
@@ -166,13 +167,13 @@ func Test_parseRedisInfo(t *testing.T) {
 	}
 }
 
-func BenchmarkParseRedisInfo_Common(b *testing.B) {
+func Benchmark_ParseRedisInfo_Common(b *testing.B) {
 	for range b.N {
 		_, _ = parseRedisInfo(infoExtendedSectionOutput)
 	}
 }
 
-func BenchmarkParseRedisInfo_Extended(b *testing.B) {
+func Benchmark_ParseRedisInfo_Extended(b *testing.B) {
 	for range b.N {
 		_, _ = parseRedisInfo(infoCommonSectionOutput)
 	}
@@ -185,13 +186,10 @@ func Test_InfoHandler(t *testing.T) {
 		switch args[1] {
 		case "commonsection":
 			return infoCommonSectionOutput
-
 		case "default":
 			return infoDefaultSectionOutput
-
 		case "unknownsection":
 			return ""
-
 		default:
 			return errors.New("cannot fetch data")
 		}
@@ -218,30 +216,31 @@ func Test_InfoHandler(t *testing.T) {
 		wantErr bool
 	}{
 		{
-			"Default section should be used if it is not explicitly specified",
-			args{conn: connection, params: map[string]string{"Section": "default"}},
-			`{"DefaultSection":{"test":"111"}}`,
-			false,
+			name:    "+defaultSection",
+			args:    args{conn: connection, params: map[string]string{"Section": "default"}},
+			want:    `{"DefaultSection":{"test":"111"}}`,
+			wantErr: false,
 		},
 		{
-			"Should fetch specified section and return marshalled result",
-			args{conn: connection, params: map[string]string{"Section": "COMMONSECTION"}},
-			`{"CommonSection":{"bar":"0.00","foo":"123"}}`,
-			false,
+			name:    "+specifiedSection",
+			args:    args{conn: connection, params: map[string]string{"Section": "COMMONSECTION"}},
+			want:    `{"CommonSection":{"bar":"0.00","foo":"123"}}`,
+			wantErr: false,
 		},
 		{
-			"Should fail if error occurred",
-			args{conn: connection, params: map[string]string{"Section": "WantErr"}},
-			nil,
-			true,
+			name:    "-fetchError",
+			args:    args{conn: connection, params: map[string]string{"Section": "WantErr"}},
+			want:    nil,
+			wantErr: true,
 		},
 		{
-			"Should fail on malformed data",
-			args{conn: connection, params: map[string]string{"Section": "UnknownSection"}},
-			nil,
-			true,
+			name:    "-malformedData",
+			args:    args{conn: connection, params: map[string]string{"Section": "UnknownSection"}},
+			want:    nil,
+			wantErr: true,
 		},
 	}
+
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			t.Parallel()
