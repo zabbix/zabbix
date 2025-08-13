@@ -25,6 +25,7 @@
 #include "zbxpoller.h"
 #include "zbxavailability.h"
 #include "zbxinterface.h"
+#include "zbxnix.h"
 
 #define ASYNC_WORKER_INIT_NONE		0x00
 #define ASYNC_WORKER_INIT_THREAD	0x01
@@ -132,22 +133,13 @@ static void	*async_worker_entry(void *args)
 	zbx_async_worker_t		*worker = (zbx_async_worker_t *)args;
 	zbx_async_queue_t		*queue = worker->queue;
 	char				*error = NULL;
-	sigset_t			mask;
 	int				err;
 	zbx_vector_interface_status_t	interfaces;
 	zbx_vector_uint64_t		itemids;
 	zbx_vector_int32_t		errcodes;
 	zbx_vector_int32_t		lastclocks;
 
-	sigemptyset(&mask);
-	sigaddset(&mask, SIGTERM);
-	sigaddset(&mask, SIGUSR1);
-	sigaddset(&mask, SIGUSR2);
-	sigaddset(&mask, SIGHUP);
-	sigaddset(&mask, SIGQUIT);
-	sigaddset(&mask, SIGINT);
-
-	if (0 != (err = pthread_sigmask(SIG_BLOCK, &mask, NULL)))
+	if (0 != (err = zbx_set_sig_thread()))
 		zabbix_log(LOG_LEVEL_WARNING, "cannot block signals: %s", zbx_strerror(err));
 
 	zabbix_log(LOG_LEVEL_INFORMATION, "thread started");

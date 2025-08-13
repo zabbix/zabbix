@@ -103,7 +103,6 @@ static void	*pp_worker_entry(void *args)
 	zbx_pp_queue_t		*queue = worker->queue;
 	zbx_pp_task_t		*in;
 	char			*error = NULL, component[MAX_ID_LEN + 1];
-	sigset_t		mask;
 	int			err;
 
 	zbx_snprintf(component, sizeof(component), "%d", worker->id);
@@ -111,15 +110,7 @@ static void	*pp_worker_entry(void *args)
 
 	zbx_init_regexp_env();
 
-	sigemptyset(&mask);
-	sigaddset(&mask, SIGTERM);
-	sigaddset(&mask, SIGUSR1);
-	sigaddset(&mask, SIGUSR2);
-	sigaddset(&mask, SIGHUP);
-	sigaddset(&mask, SIGQUIT);
-	sigaddset(&mask, SIGINT);
-
-	if (0 != (err = pthread_sigmask(SIG_BLOCK, &mask, NULL)))
+	if (0 != (err = zbx_set_sig_thread()))
 		zabbix_log(LOG_LEVEL_WARNING, "cannot block signals: %s", zbx_strerror(err));
 
 	zabbix_log(LOG_LEVEL_INFORMATION, "thread started [%s #%d]",

@@ -361,17 +361,8 @@ static void	*pg_service_entry(void *data)
 	zbx_ipc_client_t	*client;
 	zbx_ipc_message_t	*message;
 	int			err;
-	sigset_t		mask;
 
-	sigemptyset(&mask);
-	sigaddset(&mask, SIGTERM);
-	sigaddset(&mask, SIGUSR1);
-	sigaddset(&mask, SIGUSR2);
-	sigaddset(&mask, SIGHUP);
-	sigaddset(&mask, SIGQUIT);
-	sigaddset(&mask, SIGINT);
-
-	if (0 != (err = pthread_sigmask(SIG_BLOCK, &mask, NULL)))
+	if (0 != (err = zbx_set_sig_thread()))
 		zabbix_log(LOG_LEVEL_WARNING, "cannot block signals: %s", zbx_strerror(err));
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);

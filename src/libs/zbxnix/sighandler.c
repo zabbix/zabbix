@@ -26,8 +26,8 @@
 #define ZBX_EXIT_SUCCESS	1
 #define ZBX_EXIT_FAILURE	2
 
-static int		sig_parent_pid = -1;
-static unsigned long	parent_thread_id;
+static int				sig_parent_pid = -1;
+static ZBX_THREAD_LOCAL unsigned long	sig_thread;
 
 static pid_t	*child_pids = NULL;
 static size_t		child_pid_count = 0;
@@ -42,14 +42,21 @@ int	get_sig_parent_pid(void)
 	return sig_parent_pid;
 }
 
-void	zbx_set_parent_thread_id(unsigned long in)
+int	zbx_set_sig_thread(void)
 {
-	parent_thread_id = in;
-}
+	sigset_t	mask;
 
-static unsigned long	zbx_get_parent_thread_id(void)
-{
-	return parent_thread_id;
+	sig_thread = 1;
+
+	sigemptyset(&mask);
+	sigaddset(&mask, SIGTERM);
+	sigaddset(&mask, SIGUSR1);
+	sigaddset(&mask, SIGUSR2);
+	sigaddset(&mask, SIGHUP);
+	sigaddset(&mask, SIGQUIT);
+	sigaddset(&mask, SIGINT);
+
+	return pthread_sigmask(SIG_BLOCK, &mask, NULL);
 }
 
 typedef struct
@@ -126,7 +133,7 @@ static void	fatal_signal_handler(int sig, siginfo_t *siginfo, void *context)
 	log_fatal_signal(sig, siginfo, context);
 	zbx_log_fatal_info(context, ZBX_FATAL_LOG_FULL_INFO);
 
-	if (0 != zbx_get_parent_thread_id() && zbx_get_parent_thread_id() != pthread_self())
+	if (1 == sig_thread)
 	{
 		zbx_set_exiting_with_fail();
 		int	ret = EXIT_FAILURE;
