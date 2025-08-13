@@ -1502,7 +1502,6 @@ static int	discoverer_manager_init(zbx_discoverer_manager_t *manager, zbx_thread
 			sizeof(zbx_discoverer_worker_t));
 	sigset_t	mask, orig_mask;
 
-	/* block signals to prevent deadlock on log file mutex when signal handler attempts to lock log */
 	sigemptyset(&mask);
 	sigaddset(&mask, SIGTERM);
 	sigaddset(&mask, SIGUSR1);

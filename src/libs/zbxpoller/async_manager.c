@@ -50,7 +50,6 @@ zbx_async_manager_t	*zbx_async_manager_create(int workers_num, zbx_async_notify_
 
 	sigset_t	mask, orig_mask;
 
-	/* block signals to prevent deadlock on log file mutex when signal handler attempts to lock log */
 	sigemptyset(&mask);
 	sigaddset(&mask, SIGTERM);
 	sigaddset(&mask, SIGUSR1);

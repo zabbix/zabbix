@@ -517,7 +517,6 @@ ZBX_THREAD_ENTRY(pg_manager_thread, args)
 
 	sigset_t	mask, orig_mask;
 
-	/* block signals to prevent deadlock on log file mutex when signal handler attempts to lock log */
 	sigemptyset(&mask);
 	sigaddset(&mask, SIGTERM);
 	sigaddset(&mask, SIGUSR1);

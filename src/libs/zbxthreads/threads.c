@@ -370,7 +370,6 @@ void	zbx_threads_kill_and_wait(ZBX_THREAD_HANDLE *threads, const int *threads_fl
 	WaitForMultipleObjectsEx(threads_num, threads, TRUE, 1000, FALSE);
 	threads_kill(threads, threads_num, threads_flags, ZBX_THREAD_PRIORITY_NONE, FAIL);
 
-
 	for (int i = 0; i < threads_num; i++)
 	{
 		if (!threads[i])
