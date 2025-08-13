@@ -34,7 +34,7 @@ class testPageApiTokensAdministrationGeneral extends testPageApiTokens {
 
 		$response = CDataHelper::call('token.create', [
 			[
-				'name' => 'Admin: future token for admin',
+				'name' => 'Future t   oken   for admin',
 				'userid' => 1,
 				'description' => 'admin token to be used in update scenarios',
 				'status' => '0',
@@ -123,16 +123,6 @@ class testPageApiTokensAdministrationGeneral extends testPageApiTokens {
 
 			],
 			[
-				'Name' => 'Admin: future token for admin',
-				'User' => 'Admin (Zabbix Administrator)',
-				'Expires at' => '2026-12-31 23:59:59',
-				'Created at' => '2021-01-01 00:00:01',
-				'Created by user' => 'Admin (Zabbix Administrator)',
-				'Last accessed at' => '2021-01-01 00:00:02',
-				'Status' => 'Enabled'
-
-			],
-			[
 				'Name' => 'Admin: token for filter-create',
 				'User' => 'filter-create',
 				'Expires at' => date('Y-m-d H:i:s', self::$timestamp),
@@ -181,6 +171,16 @@ class testPageApiTokensAdministrationGeneral extends testPageApiTokens {
 				'Last accessed at' => '2021-01-01 00:00:09',
 				'Status' => 'Disabled'
 
+			],
+			[
+				'Name' => 'Future t oken for admin',
+				'User' => 'Admin (Zabbix Administrator)',
+				'Expires at' => '2026-12-31 23:59:59',
+				'Created at' => '2021-01-01 00:00:01',
+				'Created by user' => 'Admin (Zabbix Administrator)',
+				'Last accessed at' => '2021-01-01 00:00:02',
+				'Status' => 'Enabled'
+
 			]
 		];
 
@@ -213,7 +213,6 @@ class testPageApiTokensAdministrationGeneral extends testPageApiTokens {
 					'expected' => [
 						'Admin: aktīvs токен - 頑張って',
 						'Admin: expired token for admin',
-						'Admin: future token for admin',
 						'Admin: token for filter-create'
 					]
 				]
@@ -226,7 +225,6 @@ class testPageApiTokensAdministrationGeneral extends testPageApiTokens {
 					],
 					'expected' => [
 						'Admin: expired token for admin',
-						'Admin: future token for admin',
 						'Admin: token for filter-create',
 						'filter-create: expired token for filter-create',
 						'filter-create: future token for filter-create',
@@ -235,18 +233,16 @@ class testPageApiTokensAdministrationGeneral extends testPageApiTokens {
 				]
 			],
 			// Filter by name with trailing and leading spaces.
-			// TODO Uncomment the below data provider once ZBX-18995 is fixed.
-//			[
-//				[
-//					'filter' => [
-//						'Name' => '   future token   '
-//					],
-//					'expected' => [
-//						'Admin: future token for admin',
-//						'filter-create: future token for filter-create'
-//					]
-//				]
-//			],
+			[
+				[
+					'filter' => [
+						'Name' => '   oken   '
+					],
+					'expected' => [
+						'Future t oken for admin'
+					]
+				]
+			],
 			// Wrong name in filter field "Name".
 			[
 				[
@@ -264,9 +260,9 @@ class testPageApiTokensAdministrationGeneral extends testPageApiTokens {
 					],
 					'expected' => [
 						'Admin: expired token for admin',
-						'Admin: future token for admin',
 						'filter-create: expired token for filter-create',
-						'filter-create: future token for filter-create'
+						'filter-create: future token for filter-create',
+						'Future t oken for admin'
 					]
 				]
 			],
@@ -307,8 +303,8 @@ class testPageApiTokensAdministrationGeneral extends testPageApiTokens {
 					'expected' => [
 						'Admin: aktīvs токен - 頑張って',
 						'Admin: expired token for admin',
-						'Admin: future token for admin',
-						'Admin: token for filter-create'
+						'Admin: token for filter-create',
+						'Future t oken for admin'
 					]
 				]
 			],
@@ -321,12 +317,12 @@ class testPageApiTokensAdministrationGeneral extends testPageApiTokens {
 					'expected' => [
 						'Admin: aktīvs токен - 頑張って',
 						'Admin: expired token for admin',
-						'Admin: future token for admin',
 						'Admin: token for filter-create',
 						'filter-create: aktīvs токен - 頑張って',
 						'filter-create: expired token for filter-create',
 						'filter-create: future token for filter-create',
-						'filter-create: token for Admin'
+						'filter-create: token for Admin',
+						'Future t oken for admin'
 					]
 				]
 			],
@@ -348,8 +344,8 @@ class testPageApiTokensAdministrationGeneral extends testPageApiTokens {
 					'expected' => [
 						'Admin: aktīvs токен - 頑張って',
 						'Admin: expired token for admin',
-						'Admin: future token for admin',
-						'filter-create: token for Admin'
+						'filter-create: token for Admin',
+						'Future t oken for admin'
 					]
 				]
 			],
@@ -376,12 +372,12 @@ class testPageApiTokensAdministrationGeneral extends testPageApiTokens {
 					'expected' => [
 						'Admin: aktīvs токен - 頑張って',
 						'Admin: expired token for admin',
-						'Admin: future token for admin',
 						'Admin: token for filter-create',
 						'filter-create: aktīvs токен - 頑張って',
 						'filter-create: expired token for filter-create',
 						'filter-create: future token for filter-create',
-						'filter-create: token for Admin'
+						'filter-create: token for Admin',
+						'Future t oken for admin'
 					]
 				]
 			],
@@ -441,12 +437,12 @@ class testPageApiTokensAdministrationGeneral extends testPageApiTokens {
 				[
 					'sort_field' => 'Name',
 					'expected' => [
+						'Future t oken for admin',
 						'filter-create: token for Admin',
 						'filter-create: future token for filter-create',
 						'filter-create: expired token for filter-create',
 						'filter-create: aktīvs токен - 頑張って',
 						'Admin: token for filter-create',
-						'Admin: future token for admin',
 						'Admin: expired token for admin',
 						'Admin: aktīvs токен - 頑張って'
 					]

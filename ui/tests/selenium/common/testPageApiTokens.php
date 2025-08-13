@@ -252,6 +252,7 @@ class testPageApiTokens extends CWebTest {
 	 */
 	public function checkDelete($url, $token) {
 		$this->page->login()->open($url);
+		$token = ($token === 'Future t oken for admin' ? 'Future t   oken   for admin' : $token);
 
 		// Delete API token.
 		$this->query('class:list-table')->asTable()->one()->findRow('Name', $token)->select();
