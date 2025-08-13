@@ -129,19 +129,19 @@ func NewConnManager(options *connectionManagerOptions) *ConnManager {
 }
 
 // GetConnection returns an existing connection or creates a new one.
-func (c *ConnManager) GetConnection(uri *uri.URI, params map[string]string) (*MyConn, error) {
-	ck := createConnKey(uri, params)
+func (c *ConnManager) GetConnection(u *uri.URI, params map[string]string) (*MyConn, error) {
+	ck := createConnKey(u, params)
 
 	conn := c.getConn(ck)
 	if conn != nil {
-		c.log.Tracef("connection found for host: %s", uri.Host())
+		c.log.Tracef("connection found for host: %s", u.Host())
 
 		conn.updateLastAccessTime()
 
 		return conn, nil
 	}
 
-	c.log.Tracef("creating new connection for host: %s", uri.Host())
+	c.log.Tracef("creating new connection for host: %s", u.Host())
 
 	conn, err := c.create(ck)
 	if err != nil {
@@ -275,16 +275,16 @@ func (c *ConnManager) setConn(ck connKey, conn *MyConn) *MyConn {
 }
 
 func getMySQLConfig(
-	uri *uri.URI,
+	u *uri.URI,
 	tlsConfig *tls.Config,
 	connectTimeout,
 	callTimeout time.Duration,
 ) (*mysql.Config, error) {
 	config := mysql.NewConfig()
-	config.User = uri.User()
-	config.Passwd = uri.Password()
-	config.Net = uri.Scheme()
-	config.Addr = uri.Addr()
+	config.User = u.User()
+	config.Passwd = u.Password()
+	config.Net = u.Scheme()
+	config.Addr = u.Addr()
 	config.Timeout = connectTimeout
 	config.ReadTimeout = callTimeout
 	config.InterpolateParams = true
@@ -293,24 +293,24 @@ func getMySQLConfig(
 		return config, nil
 	}
 
-	err := mysql.RegisterTLSConfig(uri.String(), tlsConfig)
+	err := mysql.RegisterTLSConfig(u.String(), tlsConfig)
 	if err != nil {
 		return nil, zbxerr.New("failed to register TLS config").Wrap(err)
 	}
 
-	config.TLSConfig = uri.String()
+	config.TLSConfig = u.String()
 
 	return config, nil
 }
 
-func createConnKey(uri *uri.URI, params map[string]string) connKey {
+func createConnKey(u *uri.URI, params map[string]string) connKey {
 	tlsType := params[tlsConnectParam]
 	if tlsType == "" {
 		tlsType = string(tlsconfig.Disabled)
 	}
 
 	return connKey{
-		uri:        *uri,
+		uri:        *u,
 		rawUri:     params[uriParam],
 		tlsConnect: tlsType,
 		tlsCA:      params[tlsCAParam],

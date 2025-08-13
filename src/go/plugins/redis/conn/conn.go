@@ -59,7 +59,7 @@ type Manager struct {
 
 type connKey struct {
 	uri        uri.URI
-	rawUri     string
+	rawURI     string
 	tlsConnect string
 	tlsCA      string
 	tlsCert    string
@@ -122,15 +122,15 @@ func (m *Manager) GetConnection(u *uri.URI, params map[string]string) (*RedisCon
 	return conn, nil
 }
 
-func createConnKey(uri *uri.URI, params map[string]string) *connKey {
+func createConnKey(u *uri.URI, params map[string]string) *connKey {
 	tlsType := params[string(comms.TLSConnect)]
 	if tlsType == "" {
 		tlsType = string(tlsconfig.Disabled)
 	}
 
 	return &connKey{
-		uri:        *uri,
-		rawUri:     params[string(comms.URI)],
+		uri:        *u,
+		rawURI:     params[string(comms.URI)],
 		tlsConnect: tlsType,
 		tlsCA:      params[string(comms.TLSCAFile)],
 		tlsCert:    params[string(comms.TLSCertFile)],
@@ -205,9 +205,7 @@ func (m *Manager) create(u *connKey) (*RedisConn, error) {
 
 	tlsConfig, err := getTLSConfig(u)
 	if err != nil {
-		{
-			return nil, errs.Wrap(err, "failed to get tls config")
-		}
+		return nil, errs.Wrap(err, "failed to get tls config")
 	}
 
 	_, ok := m.connections[*u]
