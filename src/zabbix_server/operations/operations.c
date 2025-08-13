@@ -756,10 +756,13 @@ static zbx_uint64_t	add_discovered_host(const zbx_db_event *event, int *status, 
 						char	psk_identity[HOST_TLS_PSK_IDENTITY_LEN_MAX];
 						char	psk[HOST_TLS_PSK_LEN_MAX];
 
-						zbx_dc_get_autoregistration_psk(psk_identity, sizeof(psk_identity),
-								(unsigned char *)psk, sizeof(psk));
-
-						if (ZBX_TCP_SEC_TLS_PSK != tls_accepted)
+						if (ZBX_TCP_SEC_TLS_PSK == tls_accepted)
+						{
+							zbx_dc_get_autoregistration_psk(psk_identity,
+									sizeof(psk_identity), (unsigned char *)psk,
+									sizeof(psk));
+						}
+						else
 						{
 							psk_identity[0] = '\0';
 							psk[0] = '\0';
