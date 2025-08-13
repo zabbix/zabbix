@@ -42,7 +42,7 @@ int	get_sig_parent_pid(void)
 	return sig_parent_pid;
 }
 
-int	zbx_set_sig_thread(void)
+int	zbx_init_thread_signal_handler(void)
 {
 	sigset_t	mask;
 

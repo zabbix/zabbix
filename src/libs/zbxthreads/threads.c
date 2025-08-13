@@ -208,7 +208,7 @@ static void	threads_kill(ZBX_THREAD_HANDLE *threads, int threads_num, const int 
 {
 	for (int i = 0; i < threads_num; i++)
 	{
-		if (!threads[i])
+		if (ZBX_THREAD_HANDLE_NULL == threads[i])
 			continue;
 
 		if (SUCCEED != ret)
@@ -249,7 +249,7 @@ static int	zbx_thread_count(pid_t *threads, size_t threads_num, const int *threa
 
 	for (int i = 0; i < (int)threads_num; i++)
 	{
-		if (!threads[i] || priority != threads_flags[i])
+		if (ZBX_THREAD_HANDLE_NULL == threads[i] || priority != threads_flags[i])
 			continue;
 
 		count++;
@@ -372,7 +372,7 @@ void	zbx_threads_kill_and_wait(ZBX_THREAD_HANDLE *threads, const int *threads_fl
 
 	for (int i = 0; i < threads_num; i++)
 	{
-		if (!threads[i])
+		if (ZBX_THREAD_HANDLE_NULL == threads[i])
 			continue;
 
 		zbx_thread_wait(threads[i]);

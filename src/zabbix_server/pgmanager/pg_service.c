@@ -362,7 +362,7 @@ static void	*pg_service_entry(void *data)
 	zbx_ipc_message_t	*message;
 	int			err;
 
-	if (0 != (err = zbx_set_sig_thread()))
+	if (0 != (err = zbx_init_thread_signal_handler()))
 		zabbix_log(LOG_LEVEL_WARNING, "cannot block signals: %s", zbx_strerror(err));
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
