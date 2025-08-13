@@ -1,15 +1,15 @@
 Changes for 7.4.2rc1
 
 New features:
-...G...... [ZBXNEXT-9028]  added by Id scan parameter to Zabbix agent 2 smart disk discovery (esneiders)
+...G...... [ZBXNEXT-9028] added by-id scan parameter to Zabbix agent 2 S.M.A.R.T. disk discovery (esneiders)
 .........T [ZBXNEXT-9687] updated filesystem discovery low space trigger override regex in F5 Big-IP by SNMP template (drasikhov)
-A......PS. [ZBXNEXT-10056] updated max supported MariaDB version to 11.8 (Sasha)
+A......PS. [ZBXNEXT-10056] updated maximum supported MariaDB version to 11.8 (Sasha)
 .........T [ZBXNEXT-9972] added AWS Backup Vault by HTTP template (abrosimovs)
 .......PS. [ZBXNEXT-9090] improved SNMP agent walk[] and get[] to reload credentials when corresponding SNMPv3 interface is updated (vso)
 
 Bug fixes:
 .......PS. [ZBX-26510] fixed timeouts during script execution on Zabbix agent on action operation or manual action by trying passive interface if exists (vso)
-..F....... [ZBX-26649] prohibited showing the create Host groups/Template group form without super admin role (msnihach)
+..F....... [ZBX-26649] prohibited showing form for creating host group/template group to users without super admin role (msnihach)
 ........S. [ZBX-26775] fixed crash on data processing from system.localtime item key (sboidenko)
 .......PS. [ZBX-24799] fixed timeouts during active mode script execution on Zabbix agent 2 on action operation or manual action if script had no output; fixed timeout by allowing active agent to retrieve scripts in 60 seconds (vso)
 A......... [ZBX-25388] prevented displaying of parameter values not involved in import in the response of configuration.importcompare API method (aluchko)
@@ -20,7 +20,7 @@ A......... [ZBX-25388] prevented displaying of parameter values not involved in 
 .....J.... [ZBX-26220] fixed scheduled report creation with IPv6 address in Zabbix frontend URL (vsmelovs)
 ...G...... [ZBX-26723] fixed Zabbix Agent active remote command getting timeout applied due to incorrect parsing of JSON (dgoloscapov)
 ........S. [ZBX-24311] fixed slow trend sync when receiving trends from present and then from past again (vso)
-...G...... [ZBX-25872] fixed media_error overflow for Smart plugin in Zabbix agent 2 (esneiders)
+...G...... [ZBX-25872] fixed media_error overflow for S.M.A.R.T. plugin in Zabbix agent 2 (esneiders)
 ..F....... [ZBX-26030] fixed the visibility of the history and trends fields on discovered items when the option is set to "Do not store" (rgontarski)
 ..F....... [ZBX-25420] fixed regsub/iregsub returning output if there is no match (gklavins, talbergs)
 ...G...... [ZBX-26745] fixed Zabbix agent 2 RefreshActiveChecks (sboidenko)
@@ -36,8 +36,8 @@ A.F....... [ZBX-26089] added length validation for advanced custom labels in Net
 ..F....... [ZBX-26159] fixed log[] item with 'numeric' type of information unexpected changing to 'log' type (aluchko)
 ..F....... [ZBX-26378] added 4 module margin to QR code image (talbergs)
 A......... [ZBX-26078] fixed filtering by inherited tags with negative operators such as "Does not ..." in the Monitoring -> Hosts section (gcalenko, Sasha)
-...G...... [ZBX-22374] oracle plugin missing privileges added (opucka)
-..F....... [ZBX-26574] changed error messages for timescaledb (rgontarski)
+...G...... [ZBX-22374] added missing privileges for Oracle Zabbix agent 2 plugin (opucka)
+..F....... [ZBX-26574] changed error messages for TimescaleDB (rgontarski)
 ...G...PS. [ZBX-25708] moved include section in *.conf files from the middle to the end (yurii)
 ........S. [ZBX-16925] fixed housekeeper behavior that blocked history sync and caused deadlocks when deleting events (vso)
 .........T [ZBX-25196] fixed an issue with JavaScript in AWS ECS templates (egordymov)
@@ -350,12 +350,12 @@ A.F....PS. [ZBXNEXT-9564] implemented vault macro resolution on proxies (esekace
 Changes for 7.2.12rc1
 
 New features:
-A......PS. [ZBXNEXT-10056] updated max supported MariaDB version to 11.8 (Sasha)
-........S. [ZBXNEXT-10122] updated maximal supported TimescaleDB version to 2.21 (mprihodko)
+A......PS. [ZBXNEXT-10056] updated maximum supported MariaDB version to 11.8 (Sasha)
+........S. [ZBXNEXT-10122] updated maximum supported TimescaleDB version to 2.21 (mprihodko)
 
 Bug fixes:
 .......PS. [ZBX-26510] fixed timeouts during script execution on Zabbix agent on action operation or manual action by trying passive interface if exists (vso)
-..F....... [ZBX-26649] prohibited showing the create Host groups/Template group form without super admin role (msnihach)
+..F....... [ZBX-26649] prohibited showing form for creating host group/template group to users without super admin role (msnihach)
 .......PS. [ZBX-24799] fixed timeouts during active mode script execution on Zabbix agent 2 on action operation or manual action if script had no output; fixed timeout by allowing active agent to retrieve scripts in 60 seconds (vso)
 ........S. [ZBX-26775] fixed crash on data processing from system.localtime item key (sboidenko)
 ........S. [ZBX-16925] fixed housekeeper behavior that blocked history sync and caused deadlocks when deleting events (vso)
