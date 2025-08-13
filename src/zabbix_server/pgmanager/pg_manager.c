@@ -515,12 +515,29 @@ ZBX_THREAD_ENTRY(pg_manager_thread, args)
 
 	pgm_init(&cache);
 
+	sigset_t	mask, orig_mask;
+
+	/* block signals to prevent deadlock on log file mutex when signal handler attempts to lock log */
+	sigemptyset(&mask);
+	sigaddset(&mask, SIGTERM);
+	sigaddset(&mask, SIGUSR1);
+	sigaddset(&mask, SIGUSR2);
+	sigaddset(&mask, SIGHUP);
+	sigaddset(&mask, SIGQUIT);
+	sigaddset(&mask, SIGINT);
+
+	if (0 > zbx_sigmask(SIG_BLOCK, &mask, &orig_mask))
+		zabbix_log(LOG_LEVEL_WARNING, "cannot set signal mask to block the user signal");
+
 	if (FAIL == pg_service_init(&pgs, &cache, &error))
 	{
 		zabbix_log(LOG_LEVEL_CRIT, "cannot start proxy group manager service: %s", error);
 		zbx_free(error);
 		exit(EXIT_FAILURE);
 	}
+
+	if (0 > zbx_sigmask(SIG_SETMASK, &orig_mask, NULL))
+		zabbix_log(LOG_LEVEL_WARNING, "cannot restore signal mask");
 
 	pgm_update(&cache);
 	pgm_db_get_hosts(&cache);

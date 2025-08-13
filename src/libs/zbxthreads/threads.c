@@ -334,6 +334,7 @@ void	zbx_threads_kill_and_wait(ZBX_THREAD_HANDLE *threads, const int *threads_fl
 {
 #if !defined(_WINDOWS) && !defined(__MINGW32__)
 	sigset_t	set;
+	int		timeout = SUCCEED == ret ? 0 : SEC_PER_MIN;
 
 	/* ignore SIGCHLD signals in order for zbx_sleep() to work */
 	sigemptyset(&set);
@@ -345,21 +346,21 @@ void	zbx_threads_kill_and_wait(ZBX_THREAD_HANDLE *threads, const int *threads_fl
 
 	/* always try to exit gracefully */
 	if (TIMEOUT_ERROR == threads_kill_and_wait(threads, threads_flags, threads_num, ZBX_THREAD_PRIORITY_COLLECTOR,
-			SUCCEED, SEC_PER_MIN))
+			SUCCEED, timeout))
 	{
-		threads_kill_and_wait(threads, threads_flags, threads_num, ZBX_THREAD_PRIORITY_COLLECTOR, ret, 0);
+		threads_kill_and_wait(threads, threads_flags, threads_num, ZBX_THREAD_PRIORITY_COLLECTOR, FAIL, 0);
 	}
 
 	if (TIMEOUT_ERROR == threads_kill_and_wait(threads, threads_flags, threads_num, ZBX_THREAD_PRIORITY_SYNCER,
-			SUCCEED, SEC_PER_MIN))
+			SUCCEED, timeout))
 	{
-		threads_kill_and_wait(threads, threads_flags, threads_num, ZBX_THREAD_PRIORITY_SYNCER, ret, 0);
+		threads_kill_and_wait(threads, threads_flags, threads_num, ZBX_THREAD_PRIORITY_SYNCER, FAIL, 0);
 	}
 
 	if (TIMEOUT_ERROR == threads_kill_and_wait(threads, threads_flags, threads_num, ZBX_THREAD_PRIORITY_WORKER,
-			SUCCEED, SEC_PER_MIN))
+			SUCCEED, timeout))
 	{
-		threads_kill_and_wait(threads, threads_flags, threads_num, ZBX_THREAD_PRIORITY_WORKER, ret, 0);
+		threads_kill_and_wait(threads, threads_flags, threads_num, ZBX_THREAD_PRIORITY_WORKER, FAIL, 0);
 	}
 
 	/* signal idle threads to exit */

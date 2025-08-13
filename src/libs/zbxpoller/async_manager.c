@@ -48,6 +48,20 @@ zbx_async_manager_t	*zbx_async_manager_create(int workers_num, zbx_async_notify_
 	manager->workers_num = workers_num;
 	manager->workers = (zbx_async_worker_t *)zbx_calloc(NULL, (size_t)workers_num, sizeof(zbx_async_worker_t));
 
+	sigset_t	mask, orig_mask;
+
+	/* block signals to prevent deadlock on log file mutex when signal handler attempts to lock log */
+	sigemptyset(&mask);
+	sigaddset(&mask, SIGTERM);
+	sigaddset(&mask, SIGUSR1);
+	sigaddset(&mask, SIGUSR2);
+	sigaddset(&mask, SIGHUP);
+	sigaddset(&mask, SIGQUIT);
+	sigaddset(&mask, SIGINT);
+
+	if (0 > zbx_sigmask(SIG_BLOCK, &mask, &orig_mask))
+		zabbix_log(LOG_LEVEL_WARNING, "cannot set signal mask to block the user signal");
+
 	for (int i = 0; i < workers_num; i++)
 	{
 		if (SUCCEED != async_worker_init(&manager->workers[i], &manager->queue, poller_args_in->progname,
@@ -93,6 +107,9 @@ out:
 
 		manager = NULL;
 	}
+
+	if (0 > zbx_sigmask(SIG_SETMASK, &orig_mask, NULL))
+		zabbix_log(LOG_LEVEL_WARNING, "cannot restore signal mask");
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s() ret:%s error:%s", __func__, zbx_result_string(ret),
 			ZBX_NULL2EMPTY_STR(*error));

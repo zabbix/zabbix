@@ -1500,6 +1500,19 @@ static int	discoverer_manager_init(zbx_discoverer_manager_t *manager, zbx_thread
 	manager->workers_num = args_in->workers_num;
 	manager->workers = (zbx_discoverer_worker_t*)zbx_calloc(NULL, (size_t)args_in->workers_num,
 			sizeof(zbx_discoverer_worker_t));
+	sigset_t	mask, orig_mask;
+
+	/* block signals to prevent deadlock on log file mutex when signal handler attempts to lock log */
+	sigemptyset(&mask);
+	sigaddset(&mask, SIGTERM);
+	sigaddset(&mask, SIGUSR1);
+	sigaddset(&mask, SIGUSR2);
+	sigaddset(&mask, SIGHUP);
+	sigaddset(&mask, SIGQUIT);
+	sigaddset(&mask, SIGINT);
+
+	if (0 > zbx_sigmask(SIG_BLOCK, &mask, &orig_mask))
+		zabbix_log(LOG_LEVEL_WARNING, "cannot set signal mask to block the user signal");
 
 	for (i = 0; i < args_in->workers_num; i++)
 	{
@@ -1546,6 +1559,9 @@ out:
 		zbx_timekeeper_free(manager->timekeeper);
 		discoverer_libs_destroy();
 	}
+
+	if (0 > zbx_sigmask(SIG_SETMASK, &orig_mask, NULL))
+		zabbix_log(LOG_LEVEL_WARNING, "cannot restore signal mask");
 
 	return ret;
 
