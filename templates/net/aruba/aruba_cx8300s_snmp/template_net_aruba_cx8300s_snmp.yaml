@@ -2059,17 +2059,17 @@ zabbix_export:
                 - |
                   const data = value.split("\n");
                   
-                  var base_oid = ".1.3.6.1.4.1.47196.4.1.1.3.22.1.0.1.1.3";
-                  var lld_json = []
+                  var base_oid = ".1.3.6.1.4.1.47196.4.1.1.3.22.1.0.1.1.3",
+                  	lld_json = [];
                   
                   for (var line in data) {
                   	var index = data[line].indexOf(base_oid);
-                  	
+                  
                   	if (index !== -1) {
-                  		var result = [];
-                  		var oid = data[line].split(' ')[0];
-                  		var tail = oid.substring(index + base_oid.length + 1);
-                  		var parts = tail.split('.')
+                  		var result = [],
+                  			oid = data[line].split(' ')[0],
+                  			tail = oid.substring(index + base_oid.length + 1),
+                  			parts = tail.split('.');
                   
                   		var i = 0;
                   		while (i < parts.length) {
@@ -2095,12 +2095,13 @@ zabbix_export:
                   				}
                   				result.push(str);
                   				i = i + 1 + len;
-                  			} else {
+                  			}
+                  			else {
                   				i++;
                   			}
                   		}
                   
-                  		lld_json.push({'{#SNMPVALUE}': result.join(" "), '{#SNMPINDEX}': tail})
+                  		lld_json.push({'{#SNMPVALUE}': result.join(" "), '{#SNMPINDEX}': tail});
                   	}
                   }
                   
@@ -2233,8 +2234,8 @@ zabbix_export:
                   const json_data = JSON.parse(value);
                   
                   for (var entity in json_data) {
-                  	json_data[entity]["{#ARUBA.TEMPERATURE.MIN}"] = json_data[entity]["{#ARUBA.TEMPERATURE.MIN}"]/1000
-                  	json_data[entity]["{#ARUBA.TEMPERATURE.MAX}"] = json_data[entity]["{#ARUBA.TEMPERATURE.MAX}"]/1000
+                  	json_data[entity]["{#ARUBA.TEMPERATURE.MIN}"] = json_data[entity]["{#ARUBA.TEMPERATURE.MIN}"]/1000;
+                  	json_data[entity]["{#ARUBA.TEMPERATURE.MAX}"] = json_data[entity]["{#ARUBA.TEMPERATURE.MAX}"]/1000;
                   }
                   
                   return JSON.stringify(json_data);
