@@ -21,11 +21,9 @@ package zbxlib
 #include "zbxwin32.h"
 #include "../src/zabbix_agent/metrics/metrics.h"
 
-#cgo LDFLAGS: -Wl,--start-group
 #cgo LDFLAGS: -lDbghelp -lpsapi -lws2_32 -lWevtapi -ldnsapi
 #cgo pcre2 LDFLAGS: -lpcre2-8
 #cgo openssl LDFLAGS: -lssl -lcrypto
-#cgo LDFLAGS: -Wl,--end-group
 
 int	CONFIG_TCP_MAX_BACKLOG_SIZE	= SOMAXCONN;
 
