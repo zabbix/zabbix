@@ -23,7 +23,7 @@ import (
 	"golang.zabbix.com/sdk/plugin/comms"
 )
 
-func Test_PingHandler(t *testing.T) {
+func TestPingHandler(t *testing.T) {
 	t.Parallel()
 
 	stubConn := radix.Stub("", "", func(args []string) any {
@@ -66,8 +66,8 @@ func Test_PingHandler(t *testing.T) {
 	closedConn := conn.NewRedisConn(closedStubConn)
 
 	type args struct {
-		conn   conn.RedisClient
-		params map[string]string
+		redisClient conn.RedisClient
+		params      map[string]string
 	}
 
 	tests := []struct {
@@ -78,19 +78,19 @@ func Test_PingHandler(t *testing.T) {
 	}{
 		{
 			name:    "+connectionOk",
-			args:    args{conn: connection, params: nil},
+			args:    args{redisClient: connection, params: nil},
 			want:    comms.PingOk,
 			wantErr: false,
 		},
 		{
 			name:    "+wrongPingAnswer",
-			args:    args{conn: brokenConn, params: nil},
+			args:    args{redisClient: brokenConn, params: nil},
 			want:    comms.PingFailed,
 			wantErr: false,
 		},
 		{
 			name:    "+connectionFailed",
-			args:    args{conn: closedConn, params: nil},
+			args:    args{redisClient: closedConn, params: nil},
 			want:    comms.PingFailed,
 			wantErr: false,
 		},
@@ -100,16 +100,13 @@ func Test_PingHandler(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			t.Parallel()
 
-			got, err := PingHandler(tt.args.conn, tt.args.params)
+			got, err := PingHandler(tt.args.redisClient, tt.args.params)
 			if (err != nil) != tt.wantErr {
-				t.Errorf("Plugin.PingHandler() error = %v, wantErr %v", err, tt.wantErr)
-
-				return
+				t.Fatalf("PingHandler() error = %v, wantErr %v", err, tt.wantErr)
 			}
 
-			diff := cmp.Diff(tt.want, got)
-			if diff != "" {
-				t.Fatalf("Plugin.PingHandler() mismatch (-want +got):\n%s", diff)
+			if diff := cmp.Diff(tt.want, got); diff != "" {
+				t.Fatalf("PingHandler() = %s", diff)
 			}
 		})
 	}

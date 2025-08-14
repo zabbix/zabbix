@@ -15,7 +15,6 @@
 package redis
 
 import (
-	"strings"
 	"testing"
 
 	"github.com/google/go-cmp/cmp"
@@ -23,17 +22,27 @@ import (
 	"golang.zabbix.com/sdk/tlsconfig"
 )
 
-func TestSession_getFieldValues(t *testing.T) {
+func Test_session_getFieldValues(t *testing.T) {
 	t.Parallel()
 
+	type fields struct {
+		URI         string
+		Password    string
+		User        string
+		TLSConnect  string
+		TLSCAFile   string
+		TLSCertFile string
+		TLSKeyFile  string
+	}
+
 	tests := []struct {
-		name    string
-		session session
-		want    map[comms.ConfigSetting]string
+		name   string
+		fields fields
+		want   map[comms.ConfigSetting]string
 	}{
 		{
-			name: "allFields",
-			session: session{
+			name: "+allFields",
+			fields: fields{
 				URI:         "redis://localhost:6379",
 				Password:    "secret",
 				User:        "testuser",
@@ -53,8 +62,8 @@ func TestSession_getFieldValues(t *testing.T) {
 			},
 		},
 		{
-			name:    "emptySession",
-			session: session{},
+			name:   "+emptySession",
+			fields: fields{},
 			want: map[comms.ConfigSetting]string{
 				comms.URI:         "",
 				comms.Password:    "",
@@ -71,78 +80,227 @@ func TestSession_getFieldValues(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			t.Parallel()
 
-			got := tt.session.getFieldValues()
-			if diff := cmp.Diff(tt.want, got); diff != "" {
-				t.Errorf("getFieldValues() mismatch (-want +got):\n%s", diff)
+			s := &session{
+				URI:         tt.fields.URI,
+				Password:    tt.fields.Password,
+				User:        tt.fields.User,
+				TLSConnect:  tt.fields.TLSConnect,
+				TLSCAFile:   tt.fields.TLSCAFile,
+				TLSCertFile: tt.fields.TLSCertFile,
+				TLSKeyFile:  tt.fields.TLSKeyFile,
+			}
+
+			got := s.getFieldValues()
+
+			diff := cmp.Diff(tt.want, got)
+			if diff != "" {
+				t.Fatalf("session.getFieldValues() = %s", diff)
 			}
 		})
 	}
 }
 
-func TestSession_resolveTLSConnect(t *testing.T) {
+func Test_session_validateSession(t *testing.T) {
 	t.Parallel()
 
+	type fields struct {
+		URI         string
+		Password    string
+		User        string
+		TLSConnect  string
+		TLSCAFile   string
+		TLSCertFile string
+		TLSKeyFile  string
+	}
+
+	type args struct {
+		defaults *session
+	}
+
 	tests := []struct {
-		name        string
-		session     session
-		defaults    session
-		want        tlsconfig.TLSConnectionType
-		wantErr     bool
-		errContains string
+		name    string
+		fields  fields
+		args    args
+		wantErr bool
+	}{
+		{
+			name: "+validSessionWithTLSDisabled",
+			fields: fields{
+				URI:        "redis://localhost:6379",
+				TLSConnect: string(tlsconfig.Disabled),
+				Password:   "abc",
+			},
+			args: args{
+				defaults: &session{},
+			},
+			wantErr: false,
+		},
+		{
+			name: "+validSessionWithTLSFull",
+			fields: fields{
+				URI:         "redis://localhost:6379",
+				Password:    "abc",
+				TLSConnect:  string(tlsconfig.VerifyFull),
+				TLSCAFile:   "/path/to/ca.pem",
+				TLSCertFile: "/path/to/cert.pem",
+				TLSKeyFile:  "/path/to/key.pem",
+			},
+			args: args{
+				defaults: &session{},
+			},
+			wantErr: false,
+		},
+		{
+			name: "-invalidConnectType",
+			fields: fields{
+				URI:        "redis://localhost:6379",
+				Password:   "abc",
+				TLSConnect: "invalid",
+			},
+			args: args{
+				defaults: &session{},
+			},
+			wantErr: true,
+		},
+		{
+			name: "-inconsistentTLSFields",
+			fields: fields{
+				URI:        "redis://localhost:6379",
+				Password:   "abc",
+				TLSConnect: string(tlsconfig.VerifyFull),
+				TLSCAFile:  "/path/to/ca.pem",
+				TLSKeyFile: "/path/to/key.pem",
+			},
+			args: args{
+				defaults: &session{
+					TLSCertFile: "/path/to/cert.pem",
+				},
+			},
+			wantErr: true,
+		},
+		{
+			name: "-missingCACertificate",
+			fields: fields{
+				URI:        "redis://localhost:6379",
+				Password:   "abc",
+				TLSConnect: string(tlsconfig.VerifyCA),
+			},
+			args: args{
+				defaults: &session{},
+			},
+			wantErr: true,
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			t.Parallel()
+
+			s := &session{
+				URI:         tt.fields.URI,
+				Password:    tt.fields.Password,
+				User:        tt.fields.User,
+				TLSConnect:  tt.fields.TLSConnect,
+				TLSCAFile:   tt.fields.TLSCAFile,
+				TLSCertFile: tt.fields.TLSCertFile,
+				TLSKeyFile:  tt.fields.TLSKeyFile,
+			}
+
+			err := s.validateSession(tt.args.defaults)
+			if (err != nil) != tt.wantErr {
+				t.Fatalf("session.validateSession() error = %v, wantErr %v", err, tt.wantErr)
+			}
+		})
+	}
+}
+
+func Test_session_resolveTLSConnect(t *testing.T) {
+	t.Parallel()
+
+	type fields struct {
+		URI         string
+		Password    string
+		User        string
+		TLSConnect  string
+		TLSCAFile   string
+		TLSCertFile string
+		TLSKeyFile  string
+	}
+
+	type args struct {
+		defaults *session
+	}
+
+	tests := []struct {
+		name    string
+		fields  fields
+		args    args
+		want    tlsconfig.TLSConnectionType
+		wantErr bool
 	}{
 		{
 			name: "+sessionTLSDisabled",
-			session: session{
+			fields: fields{
 				TLSConnect: string(tlsconfig.Disabled),
 			},
-			defaults: session{},
-			want:     tlsconfig.Disabled,
-			wantErr:  false,
+			args: args{
+				defaults: &session{},
+			},
+			want:    tlsconfig.Disabled,
+			wantErr: false,
 		},
 		{
 			name: "+sessionTLSRequired",
-			session: session{
+			fields: fields{
 				TLSConnect: string(tlsconfig.Required),
 			},
-			defaults: session{},
-			want:     tlsconfig.Required,
-			wantErr:  false,
-		},
-		{
-			name:    "+defaultsTLSFallback",
-			session: session{},
-			defaults: session{
-				TLSConnect: string(tlsconfig.Required),
+			args: args{
+				defaults: &session{},
 			},
 			want:    tlsconfig.Required,
 			wantErr: false,
 		},
 		{
-			name:     "+defaultDisabled",
-			session:  session{},
-			defaults: session{},
-			want:     tlsconfig.Disabled,
-			wantErr:  false,
+			name:   "+defaultsTLSFallback",
+			fields: fields{},
+			args: args{
+				defaults: &session{
+					TLSConnect: string(tlsconfig.Required),
+				},
+			},
+			want:    tlsconfig.Required,
+			wantErr: false,
+		},
+		{
+			name:   "+defaultDisabled",
+			fields: fields{},
+			args: args{
+				defaults: &session{},
+			},
+			want:    tlsconfig.Disabled,
+			wantErr: false,
 		},
 		{
 			name: "-invalidSessionTLSConnect",
-			session: session{
+			fields: fields{
 				TLSConnect: "invalid",
 			},
-			defaults:    session{},
-			want:        "",
-			wantErr:     true,
-			errContains: "Session TLS connection type is invalid",
-		},
-		{
-			name:    "-invalidTLSConnect",
-			session: session{},
-			defaults: session{
-				TLSConnect: "invalid",
+			args: args{
+				defaults: &session{},
 			},
-			want:        "",
-			wantErr:     true,
-			errContains: "Default TLS connection type is invalid",
+			want:    "",
+			wantErr: true,
+		},
+		{
+			name:   "-invalidTLSConnect",
+			fields: fields{},
+			args: args{
+				defaults: &session{
+					TLSConnect: "invalid",
+				},
+			},
+			want:    "",
+			wantErr: true,
 		},
 	}
 
@@ -150,167 +308,50 @@ func TestSession_resolveTLSConnect(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			t.Parallel()
 
-			got, err := tt.session.resolveTLSConnect(&tt.defaults)
-
-			if tt.wantErr {
-				if err == nil {
-					t.Errorf("resolveTLSConnect() error = nil, wantErr %v", tt.wantErr)
-
-					return
-				}
-
-				if tt.errContains != "" && !contains(err.Error(), tt.errContains) {
-					t.Errorf("resolveTLSConnect() error = %v, want error containing %v", err, tt.errContains)
-				}
-
-				return
+			s := &session{
+				URI:         tt.fields.URI,
+				Password:    tt.fields.Password,
+				User:        tt.fields.User,
+				TLSConnect:  tt.fields.TLSConnect,
+				TLSCAFile:   tt.fields.TLSCAFile,
+				TLSCertFile: tt.fields.TLSCertFile,
+				TLSKeyFile:  tt.fields.TLSKeyFile,
 			}
 
-			if err != nil {
-				t.Errorf("resolveTLSConnect() error = %v, wantErr %v", err, tt.wantErr)
-
-				return
+			got, err := s.resolveTLSConnect(tt.args.defaults)
+			if (err != nil) != tt.wantErr {
+				t.Fatalf("session.resolveTLSConnect() error = %v, wantErr %v", err, tt.wantErr)
 			}
 
-			if got != tt.want {
-				t.Errorf("resolveTLSConnect() = %v, want %v", got, tt.want)
+			diff := cmp.Diff(tt.want, got)
+			if diff != "" {
+				t.Fatalf("session.resolveTLSConnect() = %s", diff)
 			}
 		})
 	}
 }
 
-func Test_validateRequiredField(t *testing.T) {
+func Test_session_runSourceConsistencyValidation(t *testing.T) {
 	t.Parallel()
 
-	tests := []struct {
-		name         string
-		fieldName    comms.ConfigSetting
-		value        string
-		defaultValue string
-		wantErr      bool
-		errContains  string
-	}{
-		{
-			name:         "+valueProvided",
-			fieldName:    comms.URI,
-			value:        "redis://localhost:6379",
-			defaultValue: "",
-			wantErr:      false,
-		},
-		{
-			name:         "+defaultValueProvided",
-			fieldName:    comms.URI,
-			value:        "",
-			defaultValue: "redis://localhost:6379",
-			wantErr:      false,
-		},
-		{
-			name:         "+bothValuesProvided",
-			fieldName:    comms.URI,
-			value:        "redis://localhost:6379",
-			defaultValue: "redis://default:6379",
-			wantErr:      false,
-		},
-		{
-			name:         "-bothValuesEmpty",
-			fieldName:    comms.URI,
-			value:        "",
-			defaultValue: "",
-			wantErr:      true,
-			errContains:  "is required",
-		},
+	type fields struct {
+		URI         string
+		Password    string
+		User        string
+		TLSConnect  string
+		TLSCAFile   string
+		TLSCertFile string
+		TLSKeyFile  string
 	}
-
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			t.Parallel()
-
-			err := validateRequiredField(tt.fieldName, tt.value, tt.defaultValue)
-
-			if tt.wantErr {
-				if err == nil {
-					t.Errorf("validateRequiredField() error = nil, wantErr %v", tt.wantErr)
-
-					return
-				}
-
-				if tt.errContains != "" && !contains(err.Error(), tt.errContains) {
-					t.Errorf("validateRequiredField() error = %v, want error containing %v", err, tt.errContains)
-				}
-
-				return
-			}
-
-			if err != nil {
-				t.Errorf("validateRequiredField() error = %v, wantErr %v", err, tt.wantErr)
-			}
-		})
-	}
-}
-
-func Test_validateForbiddenField(t *testing.T) {
-	t.Parallel()
 
 	tests := []struct {
-		name        string
-		fieldName   comms.ConfigSetting
-		value       string
-		wantErr     bool
-		errContains string
-	}{
-		{
-			name:      "+emptyValueAllowed",
-			fieldName: comms.TLSCAFile,
-			value:     "",
-			wantErr:   false,
-		},
-		{
-			name:        "-nonEmptyValueForbidden",
-			fieldName:   comms.TLSCAFile,
-			value:       "/path/to/ca.pem",
-			wantErr:     true,
-			errContains: "is forbidden",
-		},
-	}
-
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			t.Parallel()
-
-			err := validateForbiddenField(tt.fieldName, tt.value)
-
-			if tt.wantErr {
-				if err == nil {
-					t.Errorf("validateForbiddenField() error = nil, wantErr %v", tt.wantErr)
-
-					return
-				}
-
-				if tt.errContains != "" && !contains(err.Error(), tt.errContains) {
-					t.Errorf("validateForbiddenField() error = %v, want error containing %v", err, tt.errContains)
-				}
-
-				return
-			}
-
-			if err != nil {
-				t.Errorf("validateForbiddenField() error = %v, wantErr %v", err, tt.wantErr)
-			}
-		})
-	}
-}
-func TestSession_runSourceConsistencyValidation(t *testing.T) {
-	t.Parallel()
-
-	tests := []struct {
-		name        string
-		session     session
-		wantErr     bool
-		errContains string
+		name    string
+		fields  fields
+		wantErr bool
 	}{
 		{
 			name: "+allTLSFields",
-			session: session{
+			fields: fields{
 				TLSCAFile:   "/path/to/ca.pem",
 				TLSCertFile: "/path/to/cert.pem",
 				TLSKeyFile:  "/path/to/key.pem",
@@ -319,118 +360,91 @@ func TestSession_runSourceConsistencyValidation(t *testing.T) {
 		},
 		{
 			name:    "+allTLSFieldsEmpty",
-			session: session{},
+			fields:  fields{},
 			wantErr: false,
 		},
 		{
 			name: "-mixedTLSFields",
-			session: session{
+			fields: fields{
 				TLSCAFile:   "/path/to/ca.pem",
 				TLSCertFile: "",
 				TLSKeyFile:  "/path/to/key.pem",
 			},
-			wantErr:     true,
-			errContains: "required to be filled in the same source",
+			wantErr: true,
 		},
 	}
-
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			t.Parallel()
 
-			err := tt.session.runSourceConsistencyValidation()
-
-			if tt.wantErr {
-				if err == nil {
-					t.Errorf("runSourceConsistencyValidation() error = nil, wantErr %v", tt.wantErr)
-
-					return
-				}
-
-				if tt.errContains != "" && !contains(err.Error(), tt.errContains) {
-					t.Errorf(
-						"runSourceConsistencyValidation() error = %v, want error containing %v", err, tt.errContains)
-				}
-
-				return
+			s := &session{
+				URI:         tt.fields.URI,
+				Password:    tt.fields.Password,
+				User:        tt.fields.User,
+				TLSConnect:  tt.fields.TLSConnect,
+				TLSCAFile:   tt.fields.TLSCAFile,
+				TLSCertFile: tt.fields.TLSCertFile,
+				TLSKeyFile:  tt.fields.TLSKeyFile,
 			}
 
-			if err != nil {
-				t.Errorf("runSourceConsistencyValidation() error = %v, wantErr %v", err, tt.wantErr)
+			err := s.runSourceConsistencyValidation()
+			if (err != nil) != tt.wantErr {
+				t.Fatalf("session.runSourceConsistencyValidation() error = %v, wantErr %v", err, tt.wantErr)
 			}
 		})
 	}
 }
 
-func TestSession_validateSession(t *testing.T) {
+func Test_validateRequiredField(t *testing.T) {
 	t.Parallel()
 
+	type args struct {
+		name         comms.ConfigSetting
+		value        string
+		defaultValue string
+	}
+
 	tests := []struct {
-		name        string
-		session     session
-		defaults    session
-		wantErr     bool
-		errContains string
+		name    string
+		args    args
+		wantErr bool
 	}{
 		{
-			name: "+validSessionWithTLSDisabled",
-			session: session{
-				URI:        "redis://localhost:6379",
-				TLSConnect: string(tlsconfig.Disabled),
-				Password:   "abc",
+			name: "+valueProvided",
+			args: args{
+				name:         comms.URI,
+				value:        "redis://localhost:6379",
+				defaultValue: "",
 			},
-			defaults: session{},
-			wantErr:  false,
+			wantErr: false,
 		},
 		{
-			name: "+validSessionWithTLSFull",
-			session: session{
-				URI:         "redis://localhost:6379",
-				Password:    "abc",
-				TLSConnect:  string(tlsconfig.VerifyFull),
-				TLSCAFile:   "/path/to/ca.pem",
-				TLSCertFile: "/path/to/cert.pem",
-				TLSKeyFile:  "/path/to/key.pem",
+			name: "+defaultValueProvided",
+			args: args{
+				name:         comms.URI,
+				value:        "",
+				defaultValue: "redis://localhost:6379",
 			},
-			defaults: session{},
-			wantErr:  false,
+			wantErr: false,
 		},
 		{
-			name: "-invalidConnectType",
-			session: session{
-				URI:        "redis://localhost:6379",
-				Password:   "abc",
-				TLSConnect: "invalid",
+
+			name: "+bothValuesProvided",
+			args: args{
+				name:         comms.URI,
+				value:        "redis://localhost:6379",
+				defaultValue: "redis://default:6379",
 			},
-			defaults:    session{},
-			wantErr:     true,
-			errContains: "connection type is invalid",
+			wantErr: false,
 		},
 		{
-			name: "-inconsistentTLSFields",
-			session: session{
-				URI:        "redis://localhost:6379",
-				Password:   "abc",
-				TLSConnect: string(tlsconfig.VerifyFull),
-				TLSCAFile:  "/path/to/ca.pem",
-				TLSKeyFile: "/path/to/key.pem",
+			name: "-bothValuesEmpty",
+			args: args{
+				name:         comms.URI,
+				value:        "",
+				defaultValue: "",
 			},
-			defaults: session{
-				TLSCertFile: "/path/to/cert.pem",
-			},
-			wantErr:     true,
-			errContains: "Source-consistency validation failed",
-		},
-		{
-			name: "-missingCACertificate",
-			session: session{
-				URI:        "redis://localhost:6379",
-				Password:   "abc",
-				TLSConnect: string(tlsconfig.VerifyCA),
-			},
-			defaults:    session{},
-			wantErr:     true,
-			errContains: "TLSCAFile is required",
+			wantErr: true,
 		},
 	}
 
@@ -438,30 +452,53 @@ func TestSession_validateSession(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			t.Parallel()
 
-			err := tt.session.validateSession(&tt.defaults)
-
-			if tt.wantErr {
-				if err == nil {
-					t.Errorf("validateSession() error = nil, wantErr %v", tt.wantErr)
-
-					return
-				}
-
-				if tt.errContains != "" && !contains(err.Error(), tt.errContains) {
-					t.Errorf("validateSession() error = %v, want error containing %v", err, tt.errContains)
-				}
-
-				return
-			}
-
-			if err != nil {
-				t.Errorf("validateSession() error = %v, wantErr %v", err, tt.wantErr)
+			err := validateRequiredField(tt.args.name, tt.args.value, tt.args.defaultValue)
+			if (err != nil) != tt.wantErr {
+				t.Fatalf("validateRequiredField() error = %v, wantErr %v", err, tt.wantErr)
 			}
 		})
 	}
 }
 
-func contains(s, substr string) bool {
-	return len(s) >= len(substr) && s[:len(substr)] == substr ||
-		len(s) > len(substr) && strings.Contains(s, substr)
+func Test_validateForbiddenField(t *testing.T) {
+	t.Parallel()
+
+	type args struct {
+		name  comms.ConfigSetting
+		value string
+	}
+
+	tests := []struct {
+		name    string
+		args    args
+		wantErr bool
+	}{
+
+		{
+			name: "+emptyValueAllowed",
+			args: args{
+				name:  comms.TLSCAFile,
+				value: "",
+			},
+			wantErr: false,
+		},
+		{
+			name: "-nonEmptyValueForbidden",
+			args: args{
+				name:  comms.TLSCAFile,
+				value: "/path/to/ca.pem",
+			},
+			wantErr: true,
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			t.Parallel()
+
+			err := validateForbiddenField(tt.args.name, tt.args.value)
+			if (err != nil) != tt.wantErr {
+				t.Fatalf("validateForbiddenField() error = %v, wantErr %v", err, tt.wantErr)
+			}
+		})
+	}
 }

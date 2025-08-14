@@ -34,52 +34,49 @@ func TestPlugin_Start(t *testing.T) {
 	})
 }
 
-//nolint:paralleltest,tparallel // due to plugin being a global variable, cannot test in parallel.
+//nolint:tparallel,paralleltest // due to plugin being a global variable, cannot test in parallel.
 func TestPlugin_Export(t *testing.T) {
 	type args struct {
-		key    string
-		params []string
-		ctx    plugin.ContextProvider
+		key       string
+		rawParams []string
+		ctx       plugin.ContextProvider
 	}
-
-	impl.Configure(&plugin.GlobalOptions{}, nil)
 
 	tests := []struct {
-		name       string
-		p          *Plugin
-		args       args
-		wantResult any
-		wantErr    bool
+		name    string
+		p       *Plugin
+		args    args
+		want    any
+		wantErr bool
 	}{
 		{
-			name:       "-tooManyParameters",
-			p:          &impl,
-			args:       args{keyPing, []string{"localhost", "sEcReT", "param1", "param2"}, nil},
-			wantResult: nil,
-			wantErr:    true,
+			name:    "-tooManyParameters",
+			p:       &impl,
+			args:    args{keyPing, []string{"localhost", "sEcReT", "param1", "param2"}, nil},
+			want:    nil,
+			wantErr: true,
 		},
 		{
-			name:       "-noServer",
-			p:          &impl,
-			args:       args{keySlowlog, []string{"tcp://127.0.0.1:1"}, nil},
-			wantResult: nil,
-			wantErr:    true,
+			name:    "-noServer",
+			p:       &impl,
+			args:    args{keySlowlog, []string{"tcp://127.0.0.1:1"}, nil},
+			want:    nil,
+			wantErr: true,
 		},
 	}
+
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			t.Parallel()
 
-			gotResult, err := tt.p.Export(tt.args.key, tt.args.params, tt.args.ctx)
+			got, err := tt.p.Export(tt.args.key, tt.args.rawParams, tt.args.ctx)
 			if (err != nil) != tt.wantErr {
-				t.Errorf("Plugin.Export() error = %v, wantErr %v", err, tt.wantErr)
-
-				return
+				t.Fatalf("Plugin.Export() error = %v, wantErr %v", err, tt.wantErr)
 			}
 
-			diff := cmp.Diff(tt.wantResult, gotResult)
+			diff := cmp.Diff(tt.want, got)
 			if diff != "" {
-				t.Fatalf("Plugin.Export() mismatch (-want +got):\n%s", diff)
+				t.Fatalf("Plugin.Export() = %s", diff)
 			}
 		})
 	}
