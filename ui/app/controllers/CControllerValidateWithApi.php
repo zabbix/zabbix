@@ -16,32 +16,35 @@
 
 class CControllerValidateWithApi extends CController {
 
-	private string $api;
-	private string $method;
-
 	protected function init() {
 		$this->disableCsrfValidation();
 		$this->setPostContentType(self::POST_CONTENT_TYPE_JSON);
+		$this->setInputValidationMethod(self::INPUT_VALIDATION_FORM);
+	}
+
+	public static function getValidationRules(): array {
+		$api_services = ['host', 'image', 'item', 'itemprototype', 'template'];
+
+		return ['object', 'fields' => [
+			'validations' => ['objects', 'fields' => [
+				'api' => ['string', 'required', 'in' => $api_services],
+				'method' => ['string', 'required', 'in' => ['get']],
+				'field' => ['string', 'required'],
+				'options' => ['array'],
+				'exclude_id' => ['integer'],
+				'error_msg' => ['string']
+			]]
+		]];
 	}
 
 	protected function checkInput() {
-		$fields = [
-			'method' =>			'required',
-			'params' =>			'array',
-			'exclude_id' =>		''
-		];
-
-		$ret = $this->validateInput($fields);
-
-		if ($ret) {
-			list($this->api, $this->method) = explode('.', $this->getInput('method')) + [1 => ''];
-		}
+		$ret = $this->validateInput($this->getValidationRules());
 
 		if (!$ret) {
 			$this->setResponse(
 				(new CControllerResponseData(['main_block' => json_encode([
 					'error' => [
-						'messages' => array_column(get_and_clear_messages(), 'message')
+						'messages' => $this->getValidationError()
 					]
 				])]))->disableView()
 			);
@@ -51,31 +54,34 @@ class CControllerValidateWithApi extends CController {
 	}
 
 	protected function checkPermissions(): bool {
-		if (in_array($this->method, ['get'])) {
-			return true;
-		}
-
-		return false;
+		return true;
 	}
 
 	protected function doAction() {
 		$response = [];
+		$errors = [];
 
 		try {
-
-			if ($this->method == 'get') {
-				$object_exists = CFormValidator::existsAPIObject($this->api, $this->getInput('params'),
-					$this->getInput('exclude_id'));
+			foreach ($this->getInput('validations') as $validation) {
+				$object_exists = CFormValidator::existsAPIObject($validation['api'], $validation['options'],
+					$validation['exclude_id']);
 
 				if ($object_exists) {
-					$response += [
-						'result' => false,
-						'error_msg' => _('This object already exists.')
+					$errors[] = [
+						'field' => $validation['field'],
+						'message' => $validation['error_msg'] ?: _('This object already exists.')
 					];
 				}
-				else {
-					$response += ['result' => true];
-				}
+			}
+
+			if ($errors) {
+				$response += [
+					'result' => false,
+					'errors' => $errors
+				];
+			}
+			else {
+				$response += ['result' => true];
 			}
 		}
 		catch (Exception $e) {

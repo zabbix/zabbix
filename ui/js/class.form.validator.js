@@ -484,29 +484,25 @@ class CFormValidator {
 	}
 
 	/**
-	 * Call validation which uses API service function
+	 * Call API request to validate all api based validations
 	 *
-	 * @param method
-	 * @param params
-	 * @param exclude_id
+	 * @param {Array} validatons
+	 *
 	 * @returns {Promise}
 	 */
-	#validateWithApi (method, params, exclude_id) {
+	#validateWithApi (validatons) {
 		const url = new URL('zabbix.php', location.href);
 		url.searchParams.set('action', 'validate.with.api');
 
 		return fetch(url.href, {
 			method: 'POST',
 			headers: {'Content-Type': 'application/json'},
-			credentials: 'same-origin',
-			body: JSON.stringify({method, params, exclude_id}),
+			body: JSON.stringify({validations: validatons}),
 		})
 			.then(response => response.json())
 			.then(response => {
 				if ('error' in response) {
-					if ('error' in response) {
-						throw {error: response.error};
-					}
+					throw {error: response.error};
 				}
 
 				return response;
@@ -535,39 +531,35 @@ class CFormValidator {
 			return all_fields_valid && parameters_set;
 		});
 
-		return new Promise((resolve_all) => {
-			if (api_uniq_checks.length) {
-				const requests = [];
+		const api_validations = [];
+		for (const check of api_uniq_checks) {
+			const {method, parameters, exclude_id} = check;
+			const [api, api_method] = method.split('.');
+			api_validations.push({
+				api,
+				method: api_method,
+				options: {filter: parameters},
+				exclude_id,
+				field: check.fields[0],
+				error_msg: check.error_msg
+			});
+		}
 
-				for (const check of api_uniq_checks) {
-					const {method, parameters, exclude_id} = check;
-
-					const api_call = this.#validateWithApi(method, {filter: parameters}, exclude_id)
-						.then(result => {
-							check.result = result.result;
-							check.api_error_msg = (result.result ? null : result.error_msg);
-						});
-
-					requests.push(api_call);
-				}
-
-				Promise.all(requests).then(() => {
-					let result_all = true;
-
-					api_uniq_checks.forEach((check) => {
-						if (check.result === false) {
-							const error_message = check.error_msg ? check.error_msg : check.api_error_msg;
-
-							this.#addError(check.fields[0], error_message, CFormValidator.ERROR_LEVEL_API);
-							result_all = false;
+		return new Promise((resolve) => {
+			if (api_validations.length) {
+				this.#validateWithApi(api_validations)
+					.then(result => {
+						if (result.result === false && result.errors) {
+							result.errors.forEach((error) => {
+								this.#addError(error.field, error.message, CFormValidator.ERROR_LEVEL_API);
+							});
 						}
-					});
 
-					resolve_all(result_all);
-				});
+						resolve(result.result);
+					});
 			}
 			else {
-				resolve_all(true);
+				resolve(true);
 			}
 		});
 	}

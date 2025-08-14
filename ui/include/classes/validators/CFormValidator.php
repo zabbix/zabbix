@@ -230,6 +230,9 @@ class CFormValidator {
 						}
 
 						foreach ($value as &$api_uniq_check) {
+							if (count(explode('.', $api_uniq_check[0])) !== 2) {
+								throw new Exception('[RULES ERROR] Rule "'.$key.'" should contain a valid API call (Path: '.$rule_path.', API call:'.$api_uniq_check[0].')');
+							}
 							$api_uniq_check += [1 => [], 2 => null, 3 => null];
 						}
 						unset($api_uniq_check);
@@ -1210,8 +1213,7 @@ class CFormValidator {
 	 * @param int|null $exclude_primary_id
 	 * @return bool
 	 */
-	public static function existsAPIObject (string $api, array $options, ?int $exclude_primary_id = null): bool
-	{
+	public static function existsAPIObject (string $api, array $options, ?int $exclude_primary_id = null): bool {
 		$options['preservekeys'] = true;
 		$result = API::getApiService($api)->get($options);
 
@@ -1228,7 +1230,7 @@ class CFormValidator {
 
 	private function validateApiUniq(array $check, string &$path, ?string &$error = null): bool {
 		[$method, $parameters, $exclude_id] = $check;
-		[$api, $method] = explode('.', $method);
+		[$api, ] = explode('.', $method);
 
 		$field_path = null;
 
@@ -1256,12 +1258,7 @@ class CFormValidator {
 		if ($exclude_id !== null) {
 			$exclude_id_field_data = $this->getWhenFieldValue($exclude_id, $path);
 
-			if ($exclude_id_field_data['type'] === 'id') {
-				$exclude_id = $exclude_id_field_data['value'];
-			}
-			else {
-				$exclude_id = null;
-			}
+			$exclude_id = $exclude_id_field_data['type'] === 'id' ? $exclude_id_field_data['value'] : null;
 		}
 
 		$parameters = [
