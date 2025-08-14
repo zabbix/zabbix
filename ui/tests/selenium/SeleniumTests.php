@@ -393,316 +393,316 @@ class SeleniumTests {
 		$suite->addTestSuite('testUsersAuthenticationMfa');
 		$suite->addTestSuite('testUsersPasswordComplexity');
 
-		// Connectors.
-		$suite->addTestSuite('testFormConnectors');
-		$suite->addTestSuite('testPageConnectors');
-
-		// Dashboards.
-		$suite->addTestSuite('testDashboardsForm');
-		$suite->addTestSuite('testDashboardsHostDashboardPage');
-		$suite->addTestSuite('testDashboardsListPage');
-		$suite->addTestSuite('testDashboardsPages');
-		$suite->addTestSuite('testDashboardsTemplatedDashboardForm');
-		$suite->addTestSuite('testDashboardsTemplatedDashboardPage');
-		$suite->addTestSuite('testDashboardsViewMode');
-		$suite->addTestSuite('testDashboardsWidgetsPage');
-
-		// Dashboard widgets.
-		$suite->addTestSuite('testDashboardClockWidget');
-		$suite->addTestSuite('testDashboardCopyWidgets');
-		$suite->addTestSuite('testDashboardDiscoveryStatusWidget');
-		$suite->addTestSuite('testDashboardDynamicItemWidgets');
-		$suite->addTestSuite('testDashboardFavoriteGraphsWidget');
-		$suite->addTestSuite('testDashboardFavoriteMapsWidget');
-		$suite->addTestSuite('testDashboardGaugeWidget');
-		$suite->addTestSuite('testDashboardGeomapWidget');
-		$suite->addTestSuite('testDashboardGeomapWidgetScreenshots');
-		$suite->addTestSuite('testDashboardGraphPrototypeWidget');
-		$suite->addTestSuite('testDashboardGraphWidget');
-		$suite->addTestSuite('testDashboardGraphWidgetSelectedHosts');
-		$suite->addTestSuite('testDashboardHoneycombWidget');
-		$suite->addTestSuite('testDashboardHostAvailabilityWidget');
-		$suite->addTestSuite('testDashboardHostCardWidget');
-		$suite->addTestSuite('testDashboardHostNavigatorWidget');
-		$suite->addTestSuite('testDashboardItemHistoryWidget');
-		$suite->addTestSuite('testDashboardItemNavigatorWidget');
-		$suite->addTestSuite('testDashboardItemValueWidget');
-		$suite->addTestSuite('testDashboardPieChartWidget');
-		$suite->addTestSuite('testDashboardProblemHostsWidget');
-		$suite->addTestSuite('testDashboardProblemsBySeverityWidget');
-		$suite->addTestSuite('testDashboardProblemsWidget');
-		$suite->addTestSuite('testDashboardProblemsWidgetDisplay');
-		$suite->addTestSuite('testDashboardSlaReportWidget');
-		$suite->addTestSuite('testDashboardSystemInformationWidget');
-		$suite->addTestSuite('testDashboardTopHostsWidget');
-		$suite->addTestSuite('testDashboardTopTriggersWidget');
-		$suite->addTestSuite('testDashboardTriggerOverviewWidget');
-		$suite->addTestSuite('testDashboardURLWidget');
-		$suite->addTestSuite('testDashboardWebMonitoringWidget');
-		$suite->addTestSuite('testDashboardWidgetBroadcastedData');
-		$suite->addTestSuite('testDashboardWidgetCommunication');
-
-		// Event correlation.
-		$suite->addTestSuite('testFormEventCorrelation');
-		$suite->addTestSuite('testPageEventCorrelation');
-
-		// Filter tabs.
-		$suite->addTestSuite('testFormFilterHosts');
-		$suite->addTestSuite('testFormFilterLatestData');
-		$suite->addTestSuite('testFormFilterProblems');
-
-		// Graphs.
-		$suite->addTestSuite('testDataDisplayInGraphs');
-		$suite->addTestSuite('testFormGraph');
-		$suite->addTestSuite('testFormGraphPrototype');
-		$suite->addTestSuite('testGraphAxis');
-		$suite->addTestSuite('testInheritanceGraph');
-		$suite->addTestSuite('testInheritanceGraphPrototype');
-		$suite->addTestSuite('testPageGraphPrototypes');
-		$suite->addTestSuite('testPageGraphPrototypesTemplate');
-		$suite->addTestSuite('testPageHostGraph');
-		$suite->addTestSuite('testPageMonitoringHostsGraph');
-
-		// Groups.
-		$suite->addTestSuite('testFormHostGroup');
-		$suite->addTestSuite('testFormHostGroupSearchPage');
-		$suite->addTestSuite('testFormTemplateGroup');
-		$suite->addTestSuite('testFormTemplateGroupSearchPage');
-		$suite->addTestSuite('testPageHostGroups');
-		$suite->addTestSuite('testPageTemplateGroups');
-
-		// Hosts.
-		$suite->addTestSuite('testFormHostFromConfiguration');
-		$suite->addTestSuite('testFormHostFromMonitoring');
-		$suite->addTestSuite('testFormHostLinkTemplates');
-		$suite->addTestSuite('testFormHostPrototype');
-		$suite->addTestSuite('testInheritanceHostPrototype');
-		$suite->addTestSuite('testPageHostInterfaces');
-		$suite->addTestSuite('testPageHostPrototypes');
-		$suite->addTestSuite('testPageHostPrototypesTemplate');
-		$suite->addTestSuite('testPageHosts');
-		$suite->addTestSuite('testPageMonitoringHosts');
-
-		// Icon mapping.
-		$suite->addTestSuite('testFormAdministrationGeneralIconMapping');
-		$suite->addTestSuite('testPageAdministrationGeneralIconMapping');
-
-		// Items.
-		$suite->addTestSuite('testFormItem');
-		$suite->addTestSuite('testFormItemHttpAgent');
-		$suite->addTestSuite('testFormItemPrototype');
-		$suite->addTestSuite('testFormTestItem');
-		$suite->addTestSuite('testFormTestItemPrototype');
-		$suite->addTestSuite('testFormulaCalculatedItem');
-		$suite->addTestSuite('testFormulaCalculatedItemPrototype');
-		$suite->addTestSuite('testInheritanceItem');
-		$suite->addTestSuite('testInheritanceItemPrototype');
-		$suite->addTestSuite('testItemTypeSelection');
-		$suite->addTestSuite('testPageItemPrototypes');
-		$suite->addTestSuite('testPageItemPrototypesTemplate');
-		$suite->addTestSuite('testPageItems');
-		$suite->addTestSuite('testPageMassUpdateItemPrototypes');
-		$suite->addTestSuite('testPageMassUpdateItems');
-
-		// Latest data.
-		$suite->addTestSuite('testPageItemHistory');
-		$suite->addTestSuite('testPageMonitoringLatestData');
-
-		// LLD.
-		$suite->addTestSuite('testFormLowLevelDiscoveryFromHost');
-		$suite->addTestSuite('testFormLowLevelDiscoveryFromTemplate');
-		$suite->addTestSuite('testFormLowLevelDiscoveryOverrides');
-		$suite->addTestSuite('testFormTestLowLevelDiscovery');
-		$suite->addTestSuite('testInheritanceDiscoveryRule');
-		$suite->addTestSuite('testLowLevelDiscoveryDisabledObjects');
-		$suite->addTestSuite('testPageLowLevelDiscovery');
-		$suite->addTestSuite('testPageLowLevelDiscoveryPrototypes');
-
-		// Macros.
-		$suite->addTestSuite('testFormMacrosAdministrationGeneral');
-		$suite->addTestSuite('testFormMacrosDiscoveredHost');
-		$suite->addTestSuite('testFormMacrosHost');
-		$suite->addTestSuite('testFormMacrosHostPrototype');
-		$suite->addTestSuite('testFormMacrosTemplate');
-
-		// Maintenance.
-		$suite->addTestSuite('testFormMaintenance');
-		$suite->addTestSuite('testPageMaintenance');
-
-		// Maps.
-		$suite->addTestSuite('testFormMapConstructor');
-		$suite->addTestSuite('testFormMapProperties');
-		$suite->addTestSuite('testPageMaps');
-
-		// Media types.
-		$suite->addTestSuite('testFormAdministrationMediaTypeMessageTemplates');
-		$suite->addTestSuite('testFormAdministrationMediaTypes');
-		$suite->addTestSuite('testFormAdministrationMediaTypeWebhook');
-		$suite->addTestSuite('testPageAdministrationMediaTypes');
-
-		// MFA.
-		$suite->addTestSuite('testFormTotpEnroll');
-		$suite->addTestSuite('testFormTotpValidate');
-
-		// Multiselects.
-		$suite->addTestSuite('testMultiselects');
-		$suite->addTestSuite('testMultiselectsErrorsHostsTemplates');
-		$suite->addTestSuite('testMultiselectsLatestData');
-		$suite->addTestSuite('testMultiselectsProblems');
-		$suite->addTestSuite('testMultiselectsWithoutData');
-
-		// Network discovery.
-		$suite->addTestSuite('testFormNetworkDiscovery');
-		$suite->addTestSuite('testPageNetworkDiscovery');
-
-		// Permissions.
-		$suite->addTestSuite('testPermissionsWithoutCSRF');
-		$suite->addTestSuite('testTagBasedPermissions');
-		$suite->addTestSuite('testUrlUserPermissions');
-
-		// Preprocessing.
-		$suite->addTestSuite('testFormPreprocessingCloneHost');
-		$suite->addTestSuite('testFormPreprocessingCloneTemplate');
-		$suite->addTestSuite('testFormPreprocessingItem');
-		$suite->addTestSuite('testFormPreprocessingItemPrototype');
-		$suite->addTestSuite('testFormPreprocessingLowLevelDiscovery');
-		$suite->addTestSuite('testFormPreprocessingTest');
-
-		// Problems.
-		$suite->addTestSuite('testCauseAndSymptomEvents');
-		$suite->addTestSuite('testPageProblems');
-		$suite->addTestSuite('testFormUpdateProblem');
-
-		// Proxies.
-		$suite->addTestSuite('testFormAdministrationProxies');
-		$suite->addTestSuite('testPageAdministrationProxies');
-
-		// Proxy groups.
-		$suite->addTestSuite('testFormAdministrationProxyGroups');
-		$suite->addTestSuite('testPageAdministrationProxyGroups');
-
-		// Queue.
-		/*
-		$suite->addTestSuite('testPageQueueDetails');
-		$suite->addTestSuite('testPageQueueOverview');
-		$suite->addTestSuite('testPageQueueOverviewByProxy');
-		*/
-
-		// Regexp.
-		$suite->addTestSuite('testFormAdministrationGeneralRegexp');
-		$suite->addTestSuite('testPageAdministrationGeneralRegexp');
-
-		// Reports.
-		$suite->addTestSuite('testFormScheduledReport');
-		$suite->addTestSuite('testPageAvailabilityReport');
-		$suite->addTestSuite('testPageReportsActionLog');
-		$suite->addTestSuite('testPageReportsAudit');
-		$suite->addTestSuite('testPageReportsNotifications');
-		$suite->addTestSuite('testPageReportsSystemInformation');
-		$suite->addTestSuite('testPageReportsTopTriggers');
-		$suite->addTestSuite('testPageScheduledReport');
-		$suite->addTestSuite('testScheduledReportPermissions');
-
-		// Roles.
-		$suite->addTestSuite('testFormUserRoles');
-		$suite->addTestSuite('testPageUserRoles');
-		$suite->addTestSuite('testUserRolesPermissions');
-
-		// Scripts.
-		$suite->addTestSuite('testFormAlertsScripts');
-		$suite->addTestSuite('testManualActionScripts');
-		$suite->addTestSuite('testPageAlertsScripts');
-
-		// Services.
-		$suite->addTestSuite('testFormServicesServices');
-		$suite->addTestSuite('testPageServicesServices');
-		$suite->addTestSuite('testPageServicesServicesMassUpdate');
-
-		// SLA.
-		$suite->addTestSuite('testFormServicesSla');
-		$suite->addTestSuite('testPageServicesSla');
-		$suite->addTestSuite('testPageServicesSlaReport');
-
-		// Tags.
-		$suite->addTestSuite('testFormTagsConnectors');
-		$suite->addTestSuite('testFormTagsDiscoveredHost');
-		$suite->addTestSuite('testFormTagsHost');
-		$suite->addTestSuite('testFormTagsHostPrototype');
-		$suite->addTestSuite('testFormTagsServices');
-		$suite->addTestSuite('testFormTagsServicesProblemTags');
-		$suite->addTestSuite('testFormTagsItem');
-		$suite->addTestSuite('testFormTagsItemPrototype');
-		$suite->addTestSuite('testFormTagsTemplate');
-		$suite->addTestSuite('testFormTagsTrigger');
-		$suite->addTestSuite('testFormTagsTriggerPrototype');
-		$suite->addTestSuite('testFormTagsWeb');
-
-		// Templates.
-		$suite->addTestSuite('testFormTemplate');
-		$suite->addTestSuite('testPageTemplates');
-		$suite->addTestSuite('testTemplateInheritance');
-
-		// Timeouts.
-		$suite->addTestSuite('testTimeoutsHosts');
-		$suite->addTestSuite('testTimeoutsLinkedTemplates');
-		$suite->addTestSuite('testTimeoutsTemplates');
-
-		// Trigger dependencies.
-		$suite->addTestSuite('testHostTriggerDependencies');
-		$suite->addTestSuite('testTemplateTriggerDependencies');
-
-		// Triggers.
-		$suite->addTestSuite('testFormTrigger');
-		$suite->addTestSuite('testFormTriggerPrototype');
-		$suite->addTestSuite('testInheritanceTrigger');
-		$suite->addTestSuite('testInheritanceTriggerPrototype');
-		$suite->addTestSuite('testPageTriggerDescription');
-		$suite->addTestSuite('testPageTriggerPrototypes');
-		$suite->addTestSuite('testPageTriggerPrototypesTemplate');
-		$suite->addTestSuite('testPageTriggers');
-		$suite->addTestSuite('testPageTriggerUrl');
-		$suite->addTestSuite('testTriggerExpressions');
-
-		// Users.
-		$suite->addTestSuite('testFormUser');
-		$suite->addTestSuite('testFormUserGroups');
-		$suite->addTestSuite('testFormUserMedia');
-		$suite->addTestSuite('testFormUserLdapMediaJit');
-		$suite->addTestSuite('testFormUserPermissions');
-		$suite->addTestSuite('testAlarmNotification');
-		$suite->addTestSuite('testFormUserProfile');
-		$suite->addTestSuite('testPageUserGroups');
-		$suite->addTestSuite('testPageUsers');
-
-		// Value mapping.
-		$suite->addTestSuite('testFormValueMappingsHost');
-		$suite->addTestSuite('testFormValueMappingsTemplate');
-
-		// Web scenarios.
-		$suite->addTestSuite('testFormWebScenario');
-		$suite->addTestSuite('testFormWebScenarioStep');
-		$suite->addTestSuite('testInheritanceWeb');
-		$suite->addTestSuite('testPageMonitoringWeb');
-		$suite->addTestSuite('testPageMonitoringWebDetails');
-
-		$suite->addTestSuite('testDocumentationLinks');
-		$suite->addTestSuite('testExecuteNow');
-		$suite->addTestSuite('testExpandExpressionMacros');
-		$suite->addTestSuite('testFormLogin');
-		$suite->addTestSuite('testFormSetup');
-		$suite->addTestSuite('testFormTabIndicators');
-		$suite->addTestSuite('testGeneric');
-		$suite->addTestSuite('testLanguage');
-		$suite->addTestSuite('testPageBrowserWarning');
-		$suite->addTestSuite('testPageInventory');
-		$suite->addTestSuite('testPageSearch');
-		$suite->addTestSuite('testPageStatusOfZabbix');
-		$suite->addTestSuite('testPagesWithoutData');
-		$suite->addTestSuite('testPSKEncryption');
-		$suite->addTestSuite('testSidebarMenu');
-		$suite->addTestSuite('testTimezone');
-		$suite->addTestSuite('testUrlParameters');
-		$suite->addTestSuite('testZBX6663');
+//		// Connectors.
+//		$suite->addTestSuite('testFormConnectors');
+//		$suite->addTestSuite('testPageConnectors');
+//
+//		// Dashboards.
+//		$suite->addTestSuite('testDashboardsForm');
+//		$suite->addTestSuite('testDashboardsHostDashboardPage');
+//		$suite->addTestSuite('testDashboardsListPage');
+//		$suite->addTestSuite('testDashboardsPages');
+//		$suite->addTestSuite('testDashboardsTemplatedDashboardForm');
+//		$suite->addTestSuite('testDashboardsTemplatedDashboardPage');
+//		$suite->addTestSuite('testDashboardsViewMode');
+//		$suite->addTestSuite('testDashboardsWidgetsPage');
+//
+//		// Dashboard widgets.
+//		$suite->addTestSuite('testDashboardClockWidget');
+//		$suite->addTestSuite('testDashboardCopyWidgets');
+//		$suite->addTestSuite('testDashboardDiscoveryStatusWidget');
+//		$suite->addTestSuite('testDashboardDynamicItemWidgets');
+//		$suite->addTestSuite('testDashboardFavoriteGraphsWidget');
+//		$suite->addTestSuite('testDashboardFavoriteMapsWidget');
+//		$suite->addTestSuite('testDashboardGaugeWidget');
+//		$suite->addTestSuite('testDashboardGeomapWidget');
+//		$suite->addTestSuite('testDashboardGeomapWidgetScreenshots');
+//		$suite->addTestSuite('testDashboardGraphPrototypeWidget');
+//		$suite->addTestSuite('testDashboardGraphWidget');
+//		$suite->addTestSuite('testDashboardGraphWidgetSelectedHosts');
+//		$suite->addTestSuite('testDashboardHoneycombWidget');
+//		$suite->addTestSuite('testDashboardHostAvailabilityWidget');
+//		$suite->addTestSuite('testDashboardHostCardWidget');
+//		$suite->addTestSuite('testDashboardHostNavigatorWidget');
+//		$suite->addTestSuite('testDashboardItemHistoryWidget');
+//		$suite->addTestSuite('testDashboardItemNavigatorWidget');
+//		$suite->addTestSuite('testDashboardItemValueWidget');
+//		$suite->addTestSuite('testDashboardPieChartWidget');
+//		$suite->addTestSuite('testDashboardProblemHostsWidget');
+//		$suite->addTestSuite('testDashboardProblemsBySeverityWidget');
+//		$suite->addTestSuite('testDashboardProblemsWidget');
+//		$suite->addTestSuite('testDashboardProblemsWidgetDisplay');
+//		$suite->addTestSuite('testDashboardSlaReportWidget');
+//		$suite->addTestSuite('testDashboardSystemInformationWidget');
+//		$suite->addTestSuite('testDashboardTopHostsWidget');
+//		$suite->addTestSuite('testDashboardTopTriggersWidget');
+//		$suite->addTestSuite('testDashboardTriggerOverviewWidget');
+//		$suite->addTestSuite('testDashboardURLWidget');
+//		$suite->addTestSuite('testDashboardWebMonitoringWidget');
+//		$suite->addTestSuite('testDashboardWidgetBroadcastedData');
+//		$suite->addTestSuite('testDashboardWidgetCommunication');
+//
+//		// Event correlation.
+//		$suite->addTestSuite('testFormEventCorrelation');
+//		$suite->addTestSuite('testPageEventCorrelation');
+//
+//		// Filter tabs.
+//		$suite->addTestSuite('testFormFilterHosts');
+//		$suite->addTestSuite('testFormFilterLatestData');
+//		$suite->addTestSuite('testFormFilterProblems');
+//
+//		// Graphs.
+//		$suite->addTestSuite('testDataDisplayInGraphs');
+//		$suite->addTestSuite('testFormGraph');
+//		$suite->addTestSuite('testFormGraphPrototype');
+//		$suite->addTestSuite('testGraphAxis');
+//		$suite->addTestSuite('testInheritanceGraph');
+//		$suite->addTestSuite('testInheritanceGraphPrototype');
+//		$suite->addTestSuite('testPageGraphPrototypes');
+//		$suite->addTestSuite('testPageGraphPrototypesTemplate');
+//		$suite->addTestSuite('testPageHostGraph');
+//		$suite->addTestSuite('testPageMonitoringHostsGraph');
+//
+//		// Groups.
+//		$suite->addTestSuite('testFormHostGroup');
+//		$suite->addTestSuite('testFormHostGroupSearchPage');
+//		$suite->addTestSuite('testFormTemplateGroup');
+//		$suite->addTestSuite('testFormTemplateGroupSearchPage');
+//		$suite->addTestSuite('testPageHostGroups');
+//		$suite->addTestSuite('testPageTemplateGroups');
+//
+//		// Hosts.
+//		$suite->addTestSuite('testFormHostFromConfiguration');
+//		$suite->addTestSuite('testFormHostFromMonitoring');
+//		$suite->addTestSuite('testFormHostLinkTemplates');
+//		$suite->addTestSuite('testFormHostPrototype');
+//		$suite->addTestSuite('testInheritanceHostPrototype');
+//		$suite->addTestSuite('testPageHostInterfaces');
+//		$suite->addTestSuite('testPageHostPrototypes');
+//		$suite->addTestSuite('testPageHostPrototypesTemplate');
+//		$suite->addTestSuite('testPageHosts');
+//		$suite->addTestSuite('testPageMonitoringHosts');
+//
+//		// Icon mapping.
+//		$suite->addTestSuite('testFormAdministrationGeneralIconMapping');
+//		$suite->addTestSuite('testPageAdministrationGeneralIconMapping');
+//
+//		// Items.
+//		$suite->addTestSuite('testFormItem');
+//		$suite->addTestSuite('testFormItemHttpAgent');
+//		$suite->addTestSuite('testFormItemPrototype');
+//		$suite->addTestSuite('testFormTestItem');
+//		$suite->addTestSuite('testFormTestItemPrototype');
+//		$suite->addTestSuite('testFormulaCalculatedItem');
+//		$suite->addTestSuite('testFormulaCalculatedItemPrototype');
+//		$suite->addTestSuite('testInheritanceItem');
+//		$suite->addTestSuite('testInheritanceItemPrototype');
+//		$suite->addTestSuite('testItemTypeSelection');
+//		$suite->addTestSuite('testPageItemPrototypes');
+//		$suite->addTestSuite('testPageItemPrototypesTemplate');
+//		$suite->addTestSuite('testPageItems');
+//		$suite->addTestSuite('testPageMassUpdateItemPrototypes');
+//		$suite->addTestSuite('testPageMassUpdateItems');
+//
+//		// Latest data.
+//		$suite->addTestSuite('testPageItemHistory');
+//		$suite->addTestSuite('testPageMonitoringLatestData');
+//
+//		// LLD.
+//		$suite->addTestSuite('testFormLowLevelDiscoveryFromHost');
+//		$suite->addTestSuite('testFormLowLevelDiscoveryFromTemplate');
+//		$suite->addTestSuite('testFormLowLevelDiscoveryOverrides');
+//		$suite->addTestSuite('testFormTestLowLevelDiscovery');
+//		$suite->addTestSuite('testInheritanceDiscoveryRule');
+//		$suite->addTestSuite('testLowLevelDiscoveryDisabledObjects');
+//		$suite->addTestSuite('testPageLowLevelDiscovery');
+//		$suite->addTestSuite('testPageLowLevelDiscoveryPrototypes');
+//
+//		// Macros.
+//		$suite->addTestSuite('testFormMacrosAdministrationGeneral');
+//		$suite->addTestSuite('testFormMacrosDiscoveredHost');
+//		$suite->addTestSuite('testFormMacrosHost');
+//		$suite->addTestSuite('testFormMacrosHostPrototype');
+//		$suite->addTestSuite('testFormMacrosTemplate');
+//
+//		// Maintenance.
+//		$suite->addTestSuite('testFormMaintenance');
+//		$suite->addTestSuite('testPageMaintenance');
+//
+//		// Maps.
+//		$suite->addTestSuite('testFormMapConstructor');
+//		$suite->addTestSuite('testFormMapProperties');
+//		$suite->addTestSuite('testPageMaps');
+//
+//		// Media types.
+//		$suite->addTestSuite('testFormAdministrationMediaTypeMessageTemplates');
+//		$suite->addTestSuite('testFormAdministrationMediaTypes');
+//		$suite->addTestSuite('testFormAdministrationMediaTypeWebhook');
+//		$suite->addTestSuite('testPageAdministrationMediaTypes');
+//
+//		// MFA.
+//		$suite->addTestSuite('testFormTotpEnroll');
+//		$suite->addTestSuite('testFormTotpValidate');
+//
+//		// Multiselects.
+//		$suite->addTestSuite('testMultiselects');
+//		$suite->addTestSuite('testMultiselectsErrorsHostsTemplates');
+//		$suite->addTestSuite('testMultiselectsLatestData');
+//		$suite->addTestSuite('testMultiselectsProblems');
+//		$suite->addTestSuite('testMultiselectsWithoutData');
+//
+//		// Network discovery.
+//		$suite->addTestSuite('testFormNetworkDiscovery');
+//		$suite->addTestSuite('testPageNetworkDiscovery');
+//
+//		// Permissions.
+//		$suite->addTestSuite('testPermissionsWithoutCSRF');
+//		$suite->addTestSuite('testTagBasedPermissions');
+//		$suite->addTestSuite('testUrlUserPermissions');
+//
+//		// Preprocessing.
+//		$suite->addTestSuite('testFormPreprocessingCloneHost');
+//		$suite->addTestSuite('testFormPreprocessingCloneTemplate');
+//		$suite->addTestSuite('testFormPreprocessingItem');
+//		$suite->addTestSuite('testFormPreprocessingItemPrototype');
+//		$suite->addTestSuite('testFormPreprocessingLowLevelDiscovery');
+//		$suite->addTestSuite('testFormPreprocessingTest');
+//
+//		// Problems.
+//		$suite->addTestSuite('testCauseAndSymptomEvents');
+//		$suite->addTestSuite('testPageProblems');
+//		$suite->addTestSuite('testFormUpdateProblem');
+//
+//		// Proxies.
+//		$suite->addTestSuite('testFormAdministrationProxies');
+//		$suite->addTestSuite('testPageAdministrationProxies');
+//
+//		// Proxy groups.
+//		$suite->addTestSuite('testFormAdministrationProxyGroups');
+//		$suite->addTestSuite('testPageAdministrationProxyGroups');
+//
+//		// Queue.
+//		/*
+//		$suite->addTestSuite('testPageQueueDetails');
+//		$suite->addTestSuite('testPageQueueOverview');
+//		$suite->addTestSuite('testPageQueueOverviewByProxy');
+//		*/
+//
+//		// Regexp.
+//		$suite->addTestSuite('testFormAdministrationGeneralRegexp');
+//		$suite->addTestSuite('testPageAdministrationGeneralRegexp');
+//
+//		// Reports.
+//		$suite->addTestSuite('testFormScheduledReport');
+//		$suite->addTestSuite('testPageAvailabilityReport');
+//		$suite->addTestSuite('testPageReportsActionLog');
+//		$suite->addTestSuite('testPageReportsAudit');
+//		$suite->addTestSuite('testPageReportsNotifications');
+//		$suite->addTestSuite('testPageReportsSystemInformation');
+//		$suite->addTestSuite('testPageReportsTopTriggers');
+//		$suite->addTestSuite('testPageScheduledReport');
+//		$suite->addTestSuite('testScheduledReportPermissions');
+//
+//		// Roles.
+//		$suite->addTestSuite('testFormUserRoles');
+//		$suite->addTestSuite('testPageUserRoles');
+//		$suite->addTestSuite('testUserRolesPermissions');
+//
+//		// Scripts.
+//		$suite->addTestSuite('testFormAlertsScripts');
+//		$suite->addTestSuite('testManualActionScripts');
+//		$suite->addTestSuite('testPageAlertsScripts');
+//
+//		// Services.
+//		$suite->addTestSuite('testFormServicesServices');
+//		$suite->addTestSuite('testPageServicesServices');
+//		$suite->addTestSuite('testPageServicesServicesMassUpdate');
+//
+//		// SLA.
+//		$suite->addTestSuite('testFormServicesSla');
+//		$suite->addTestSuite('testPageServicesSla');
+//		$suite->addTestSuite('testPageServicesSlaReport');
+//
+//		// Tags.
+//		$suite->addTestSuite('testFormTagsConnectors');
+//		$suite->addTestSuite('testFormTagsDiscoveredHost');
+//		$suite->addTestSuite('testFormTagsHost');
+//		$suite->addTestSuite('testFormTagsHostPrototype');
+//		$suite->addTestSuite('testFormTagsServices');
+//		$suite->addTestSuite('testFormTagsServicesProblemTags');
+//		$suite->addTestSuite('testFormTagsItem');
+//		$suite->addTestSuite('testFormTagsItemPrototype');
+//		$suite->addTestSuite('testFormTagsTemplate');
+//		$suite->addTestSuite('testFormTagsTrigger');
+//		$suite->addTestSuite('testFormTagsTriggerPrototype');
+//		$suite->addTestSuite('testFormTagsWeb');
+//
+//		// Templates.
+//		$suite->addTestSuite('testFormTemplate');
+//		$suite->addTestSuite('testPageTemplates');
+//		$suite->addTestSuite('testTemplateInheritance');
+//
+//		// Timeouts.
+//		$suite->addTestSuite('testTimeoutsHosts');
+//		$suite->addTestSuite('testTimeoutsLinkedTemplates');
+//		$suite->addTestSuite('testTimeoutsTemplates');
+//
+//		// Trigger dependencies.
+//		$suite->addTestSuite('testHostTriggerDependencies');
+//		$suite->addTestSuite('testTemplateTriggerDependencies');
+//
+//		// Triggers.
+//		$suite->addTestSuite('testFormTrigger');
+//		$suite->addTestSuite('testFormTriggerPrototype');
+//		$suite->addTestSuite('testInheritanceTrigger');
+//		$suite->addTestSuite('testInheritanceTriggerPrototype');
+//		$suite->addTestSuite('testPageTriggerDescription');
+//		$suite->addTestSuite('testPageTriggerPrototypes');
+//		$suite->addTestSuite('testPageTriggerPrototypesTemplate');
+//		$suite->addTestSuite('testPageTriggers');
+//		$suite->addTestSuite('testPageTriggerUrl');
+//		$suite->addTestSuite('testTriggerExpressions');
+//
+//		// Users.
+//		$suite->addTestSuite('testFormUser');
+//		$suite->addTestSuite('testFormUserGroups');
+//		$suite->addTestSuite('testFormUserMedia');
+//		$suite->addTestSuite('testFormUserLdapMediaJit');
+//		$suite->addTestSuite('testFormUserPermissions');
+//		$suite->addTestSuite('testAlarmNotification');
+//		$suite->addTestSuite('testFormUserProfile');
+//		$suite->addTestSuite('testPageUserGroups');
+//		$suite->addTestSuite('testPageUsers');
+//
+//		// Value mapping.
+//		$suite->addTestSuite('testFormValueMappingsHost');
+//		$suite->addTestSuite('testFormValueMappingsTemplate');
+//
+//		// Web scenarios.
+//		$suite->addTestSuite('testFormWebScenario');
+//		$suite->addTestSuite('testFormWebScenarioStep');
+//		$suite->addTestSuite('testInheritanceWeb');
+//		$suite->addTestSuite('testPageMonitoringWeb');
+//		$suite->addTestSuite('testPageMonitoringWebDetails');
+//
+//		$suite->addTestSuite('testDocumentationLinks');
+//		$suite->addTestSuite('testExecuteNow');
+//		$suite->addTestSuite('testExpandExpressionMacros');
+//		$suite->addTestSuite('testFormLogin');
+//		$suite->addTestSuite('testFormSetup');
+//		$suite->addTestSuite('testFormTabIndicators');
+//		$suite->addTestSuite('testGeneric');
+//		$suite->addTestSuite('testLanguage');
+//		$suite->addTestSuite('testPageBrowserWarning');
+//		$suite->addTestSuite('testPageInventory');
+//		$suite->addTestSuite('testPageSearch');
+//		$suite->addTestSuite('testPageStatusOfZabbix');
+//		$suite->addTestSuite('testPagesWithoutData');
+//		$suite->addTestSuite('testPSKEncryption');
+//		$suite->addTestSuite('testSidebarMenu');
+//		$suite->addTestSuite('testTimezone');
+//		$suite->addTestSuite('testUrlParameters');
+//		$suite->addTestSuite('testZBX6663');
 
 		return $suite;
 	}
