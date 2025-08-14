@@ -17,8 +17,6 @@
 class CControllerHostGroupEdit extends CController{
 
 	protected function init(): void {
-		$this->setInputValidationMethod(self::INPUT_VALIDATION_FORM);
-		$this->setPostContentType(self::POST_CONTENT_TYPE_JSON);
 		$this->disableCsrfValidation();
 	}
 
@@ -31,7 +29,13 @@ class CControllerHostGroupEdit extends CController{
 	}
 
 	protected function checkInput(): bool {
-		$ret = $this->validateInput(self::getValidationRules());
+		$fields = [
+			'groupid' =>	'db hstgrp.groupid',
+			'name' =>		'string',
+			'subgroups' =>	'in 0,1'
+		];
+
+		$ret = $this->validateInput($fields);
 
 		if (!$ret) {
 			$this->setResponse(new CControllerResponseFatal());

@@ -28,7 +28,7 @@ class CControllerTemplateGroupCreate extends CController {
 
 		return ['object', 'api_uniq' => $api_uniq, 'fields' => [
 			'name' => ['db hstgrp.name', 'required', 'not_empty'],
-			'subgroups' => ['integer', 'in' => [0, 1]]
+			'subgroups' => ['boolean']
 		]];
 	}
 

@@ -16,7 +16,7 @@
 
 window.hostgroup_edit_popup = new class {
 
-	init({popup_url, groupid, name, rules}) {
+	init({rules, popup_url, groupid, name}) {
 		history.replaceState({}, '', popup_url);
 
 		this.groupid = groupid;
@@ -60,22 +60,11 @@ window.hostgroup_edit_popup = new class {
 	}
 
 	delete() {
-		const fields = this.form.getAllValues();
+		const url = new URL('zabbix.php', location.href);
+		url.searchParams.set('action', 'hostgroup.delete');
+		url.searchParams.set(CSRF_TOKEN_NAME, <?= json_encode(CCsrfTokenHelper::get('hostgroup')) ?>);
 
-		this.form.validateSubmit(fields)
-			.then((result) => {
-				if (!result) {
-					this.overlay.unsetLoading();
-
-					return;
-				}
-
-				const delete_url = new URL('zabbix.php', location.href);
-				delete_url.searchParams.set('action', 'hostgroup.delete');
-				delete_url.searchParams.set(CSRF_TOKEN_NAME, <?= json_encode(CCsrfTokenHelper::get('hostgroup')) ?>);
-
-				this.#post(delete_url.href, fields);
-			});
+		this.#post(url.href, {groupids: [this.groupid]});
 	}
 
 	#post(url, fields) {

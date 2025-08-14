@@ -16,7 +16,7 @@
 
 window.templategroup_edit_popup = new class {
 
-	init({groupid, name, rules}) {
+	init({rules, groupid, name}) {
 		this.groupid = groupid;
 		this.name = name;
 
@@ -61,23 +61,11 @@ window.templategroup_edit_popup = new class {
 	}
 
 	delete() {
-		const fields = this.form.getAllValues();
+		const url = new URL('zabbix.php', location.href);
+		url.searchParams.set('action', 'templategroup.delete');
+		url.searchParams.set(CSRF_TOKEN_NAME, <?= json_encode(CCsrfTokenHelper::get('templategroup')) ?>);
 
-		this.form.validateSubmit(fields)
-			.then((result) => {
-				if (!result) {
-					this.overlay.unsetLoading();
-
-					return;
-				}
-
-				const delete_url = new URL('zabbix.php', location.href);
-				delete_url.searchParams.set('action', 'templategroup.delete');
-				delete_url.searchParams.set(CSRF_TOKEN_NAME,
-					<?= json_encode(CCsrfTokenHelper::get('templategroup')) ?>);
-
-				this.#post(delete_url.href, fields);
-			});
+		this.#post(url.href, {groupids: [this.groupid]});
 	}
 
 	#post(url, fields) {
