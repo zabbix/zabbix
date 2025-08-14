@@ -8994,8 +8994,7 @@ int	zbx_dc_check_host_conn_permissions(const char *host, const zbx_socket_t *soc
 		unsigned char *status, unsigned char *monitored_by, zbx_uint64_t *revision,
 		zbx_comms_redirect_t *redirect, char **error)
 {
-	const ZBX_DC_HOST		*dc_host = NULL;
-	const ZBX_DC_AUTOREG_HOST	*dc_autoreg_host;
+	const ZBX_DC_HOST	*dc_host = NULL;
 #if defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
 	zbx_tls_conn_attr_t	attr;
 	int			skip_tls_validation = 0;

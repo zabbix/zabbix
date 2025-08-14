@@ -773,7 +773,8 @@ static zbx_uint64_t	add_discovered_host(const zbx_db_event *event, int *status, 
 
 						zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "%ctls_connect=%d,"
 								"tls_accept=%d,tls_psk_identity='%s',tls_psk='%s'",
-								delim, tls_accepted, tls_accepted, psk_identity, psk);
+								delim, tls_accepted, tls_accepted, esc_psk_identity,
+								esc_psk);
 
 						zbx_free(esc_psk_identity);
 						zbx_free(esc_psk);
