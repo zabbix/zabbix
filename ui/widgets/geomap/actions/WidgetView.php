@@ -242,12 +242,14 @@ class WidgetView extends CControllerDashboardWidgetView {
 	}
 
 	private function getClusteringSettings(): array {
+		if ($this->fields_values['clustering_mode'] == Widget::CLUSTERING_MODE_AUTO) {
+			$this->fields_values['clustering_zoom_level'] = 0;
+		}
+
 		return [
 			'clustering' => [
 				'mode' => $this->fields_values['clustering_mode'],
-				'zoom_level' => $this->fields_values['clustering_mode'] == Widget::CLUSTERING_MODE_MANUAL
-					? $this->fields_values['clustering_zoom_level']
-					: null
+				'zoom_level' => $this->fields_values['clustering_zoom_level']
 			]
 		];
 	}

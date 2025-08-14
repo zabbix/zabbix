@@ -162,7 +162,9 @@ class CWidgetGeoMap extends CWidget {
 
 		// Create cluster layer.
 		this._clusters = this._createClusterLayer({
-			clustering_zoom_level: config.clustering.zoom_level
+			clustering_zoom_level: config.clustering.mode === GEOMAP_CLUSTERING_MODE_MANUAL
+				? config.clustering.zoom_level
+				: null
 		});
 		this._map.addLayer(this._clusters);
 
