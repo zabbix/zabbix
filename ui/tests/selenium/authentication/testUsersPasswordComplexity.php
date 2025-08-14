@@ -1038,7 +1038,7 @@ class testUsersPasswordComplexity extends CWebTest {
 
 		if ($update === false) {
 			$user_form->selectTab('Permissions');
-			$user_form->fill(['Role' => 'User role']);
+			$user_form->fill(['Role' => 'User role'])->waitUntilReloaded();
 		}
 
 		$user_form->submit();

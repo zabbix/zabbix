@@ -606,6 +606,7 @@ class CElement extends CBaseElement implements IWaitable {
 	 *
 	 * @param integer $timeout    timeout in seconds
 	 *
+	 * @return $this
 	 * @throws Exception
 	 */
 	public function waitUntilReloaded($timeout = null) {
@@ -614,6 +615,8 @@ class CElement extends CBaseElement implements IWaitable {
 		}
 
 		$this->waitUntilStalled($timeout, true);
+
+		return $this;
 	}
 
 	/**
