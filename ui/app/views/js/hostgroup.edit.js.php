@@ -68,6 +68,8 @@ window.hostgroup_edit_popup = new class {
 	}
 
 	#post(url, fields) {
+		this.#removePopupMessages();
+
 		fetch(url, {
 			method: 'POST',
 			headers: {'Content-Type': 'application/json'},
@@ -80,7 +82,8 @@ window.hostgroup_edit_popup = new class {
 				}
 
 				if ('form_errors' in response) {
-					this.form.renderErrors(response.form_errors, true, true);
+					this.form.setErrors(response.form_errors, true, true);
+					this.form.renderErrors();
 				}
 				else {
 					postMessageOk(response.success.title);
@@ -88,13 +91,23 @@ window.hostgroup_edit_popup = new class {
 					this.dialogue.dispatchEvent(new CustomEvent('dialogue.submit', {detail: response}));
 				}
 			})
-			.catch(this.#ajaxExceptionHandler.bind(this))
+			.catch(exception => {
+				this.#ajaxExceptionHandler(exception);
+			})
+			.finally(() => {
+				this.overlay.unsetLoading();
+			});
+	}
+
+	#removePopupMessages() {
+		for (const el of this.form_element.parentNode.children) {
+			if (el.matches('.msg-good, .msg-bad, .msg-warning')) {
+				el.parentNode.removeChild(el);
+			}
+		}
 	}
 
 	#ajaxExceptionHandler(exception) {
-		this.form_element.parentElement.querySelectorAll('.msg-good, .msg-bad, .msg-warning')
-			.forEach(node => node.remove());
-
 		let title, messages;
 
 		if (typeof exception === 'object' && 'error' in exception) {
@@ -105,6 +118,8 @@ window.hostgroup_edit_popup = new class {
 			messages = [<?= json_encode(_('Unexpected server error.')) ?>];
 		}
 
-		this.form_element.insertAdjacentElement('beforebegin', makeMessageBox('bad', messages, title).get(0));
+		const message_box = makeMessageBox('bad', messages, title)[0];
+
+		this.form_element.parentNode.insertBefore(message_box, this.form_element);
 	}
 }

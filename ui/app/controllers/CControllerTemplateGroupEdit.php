@@ -20,14 +20,6 @@ class CControllerTemplateGroupEdit extends CController{
 		$this->disableCsrfValidation();
 	}
 
-	public static function getValidationRules(): array {
-		return ['object', 'fields' => [
-			'groupid' => [],
-			'name' => [],
-			'subgroups' => []
-		]];
-	}
-
 	protected function checkInput(): bool {
 		$fields = [
 			'groupid' =>			'db hstgrp.groupid',
