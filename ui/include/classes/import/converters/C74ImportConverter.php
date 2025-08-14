@@ -29,6 +29,61 @@ class C74ImportConverter extends CConverter {
 	public function convert(array $data): array {
 		$data['zabbix_export']['version'] = '8.0';
 
+		if (array_key_exists('templates', $data['zabbix_export'])) {
+			$data['zabbix_export']['templates'] = self::convertTemplates($data['zabbix_export']['templates']);
+		}
+
 		return $data;
+	}
+
+	private static function convertTemplates(array $templates): array {
+		foreach ($templates as &$template) {
+			if (array_key_exists('dashboards', $template)) {
+				$template['dashboards'] = self::convertDashboards($template['dashboards']);
+			}
+		}
+		unset($template);
+
+		return $templates;
+	}
+
+	private static function convertDashboards(array $dashboards): array {
+		foreach ($dashboards as &$dashboard) {
+			if (!array_key_exists('pages', $dashboard)) {
+				continue;
+			}
+
+			foreach ($dashboard['pages'] as &$dashboard_page) {
+				if (!array_key_exists('widgets', $dashboard_page)) {
+					continue;
+				}
+
+				foreach ($dashboard_page['widgets'] as &$widget) {
+					if ($widget['type'] === 'geomap') {
+						if (!array_key_exists('fields', $widget)) {
+							continue;
+						}
+
+						$fields_to_add = ['clustering_mode' => '0', 'clustering_zoom_level' => '0'];
+						$field_names = array_column($widget['fields'], 'name');
+
+						foreach ($fields_to_add as $field_name => $field_value) {
+							if (!in_array($field_name, $field_names)) {
+								$widget['fields'][] = [
+									'type' => CXmlConstantName::DASHBOARD_WIDGET_FIELD_TYPE_STRING,
+									'name' => $field_name,
+									'value' => $field_value,
+								];
+							}
+						}
+					}
+				}
+				unset($widget);
+			}
+			unset($dashboard_page);
+		}
+		unset($dashboard);
+
+		return $dashboards;
 	}
 }
