@@ -63,31 +63,13 @@ func Test_parseRedisInfo(t *testing.T) {
 	tests := []struct {
 		name    string
 		args    args
-		wantRes redisInfo
+		want    redisInfo
 		wantErr bool
 	}{
 		{
-			name:    "-malformedInput",
-			args:    args{info: "foobar"},
-			wantRes: nil,
-			wantErr: true,
-		},
-		{
-			name:    "-emptySectionName",
-			args:    args{info: infoMalformedSectionOutput},
-			wantRes: nil,
-			wantErr: true,
-		},
-		{
-			name:    "-emptyInput",
-			args:    args{info: ""},
-			wantRes: nil,
-			wantErr: true,
-		},
-		{
 			name: "+commonSectionParse",
 			args: args{info: infoCommonSectionOutput},
-			wantRes: redisInfo{
+			want: redisInfo{
 				"CommonSection": infoKeySpace{
 					"foo": "123", "bar": "0.00",
 				},
@@ -97,7 +79,7 @@ func Test_parseRedisInfo(t *testing.T) {
 		{
 			name: "+commandstatsParse",
 			args: args{info: infoExtendedSectionOutput},
-			wantRes: redisInfo{
+			want: redisInfo{
 				"Commandstats": infoKeySpace{
 					"cmdstat_info": infoExtKeySpace{
 						"calls":         "11150",
@@ -116,7 +98,7 @@ func Test_parseRedisInfo(t *testing.T) {
 		{
 			name: "+replicationMasterParse",
 			args: args{info: infoMasterReplicationOutput},
-			wantRes: redisInfo{
+			want: redisInfo{
 				"Replication": infoKeySpace{
 					"role":             "master",
 					"connected_slaves": "1",
@@ -135,7 +117,7 @@ func Test_parseRedisInfo(t *testing.T) {
 		{
 			name: "+replicationSlaveParse",
 			args: args{info: infoSlaveReplicationOutput},
-			wantRes: redisInfo{
+			want: redisInfo{
 				"Replication": infoKeySpace{
 					"role":              "slave",
 					"master_host":       "redis-master",
@@ -146,22 +128,37 @@ func Test_parseRedisInfo(t *testing.T) {
 			},
 			wantErr: false,
 		},
+		{
+			name:    "-malformedInput",
+			args:    args{info: "foobar"},
+			want:    nil,
+			wantErr: true,
+		},
+		{
+			name:    "-emptySectionName",
+			args:    args{info: infoMalformedSectionOutput},
+			want:    nil,
+			wantErr: true,
+		},
+		{
+			name:    "-emptyInput",
+			args:    args{info: ""},
+			want:    nil,
+			wantErr: true,
+		},
 	}
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			t.Parallel()
 
-			gotRes, err := parseRedisInfo(tt.args.info)
+			got, err := parseRedisInfo(tt.args.info)
 			if (err != nil) != tt.wantErr {
-				t.Errorf("parseRedisInfo() error = %#v, wantErr %#v", err, tt.wantErr)
-
-				return
+				t.Fatalf("parseRedisInfo() error = %v, wantErr %v", err, tt.wantErr)
 			}
 
-			diff := cmp.Diff(tt.wantRes, gotRes)
-			if diff != "" {
-				t.Fatalf("parseRedisInfo() mismatch (-want +got):\n%s\ngot=%#v\nwant=%#v", diff, gotRes, tt.wantRes)
+			if diff := cmp.Diff(tt.want, got); diff != "" {
+				t.Fatalf("parseRedisInfo() = %s", diff)
 			}
 		})
 	}
@@ -179,7 +176,7 @@ func Benchmark_ParseRedisInfo_Extended(b *testing.B) {
 	}
 }
 
-func Test_InfoHandler(t *testing.T) {
+func TestInfoHandler(t *testing.T) {
 	t.Parallel()
 
 	stubConn := radix.Stub("", "", func(args []string) any {
@@ -205,8 +202,8 @@ func Test_InfoHandler(t *testing.T) {
 	connection := conn.NewRedisConn(stubConn)
 
 	type args struct {
-		conn   conn.RedisClient
-		params map[string]string
+		redisClient conn.RedisClient
+		params      map[string]string
 	}
 
 	tests := []struct {
@@ -217,25 +214,25 @@ func Test_InfoHandler(t *testing.T) {
 	}{
 		{
 			name:    "+defaultSection",
-			args:    args{conn: connection, params: map[string]string{"Section": "default"}},
+			args:    args{redisClient: connection, params: map[string]string{"Section": "default"}},
 			want:    `{"DefaultSection":{"test":"111"}}`,
 			wantErr: false,
 		},
 		{
 			name:    "+specifiedSection",
-			args:    args{conn: connection, params: map[string]string{"Section": "COMMONSECTION"}},
+			args:    args{redisClient: connection, params: map[string]string{"Section": "COMMONSECTION"}},
 			want:    `{"CommonSection":{"bar":"0.00","foo":"123"}}`,
 			wantErr: false,
 		},
 		{
 			name:    "-fetchError",
-			args:    args{conn: connection, params: map[string]string{"Section": "WantErr"}},
+			args:    args{redisClient: connection, params: map[string]string{"Section": "WantErr"}},
 			want:    nil,
 			wantErr: true,
 		},
 		{
 			name:    "-malformedData",
-			args:    args{conn: connection, params: map[string]string{"Section": "UnknownSection"}},
+			args:    args{redisClient: connection, params: map[string]string{"Section": "UnknownSection"}},
 			want:    nil,
 			wantErr: true,
 		},
@@ -245,16 +242,13 @@ func Test_InfoHandler(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			t.Parallel()
 
-			got, err := InfoHandler(tt.args.conn, tt.args.params)
+			got, err := InfoHandler(tt.args.redisClient, tt.args.params)
 			if (err != nil) != tt.wantErr {
-				t.Errorf("Plugin.InfoHandler() error = %v, wantErr %v", err, tt.wantErr)
-
-				return
+				t.Fatalf("InfoHandler() error = %v, wantErr %v", err, tt.wantErr)
 			}
 
-			diff := cmp.Diff(tt.want, got)
-			if diff != "" {
-				t.Fatalf("Plugin.InfoHandler() mismatch (-want +got):\n%s", diff)
+			if diff := cmp.Diff(tt.want, got); diff != "" {
+				t.Fatalf("InfoHandler() = %s", diff)
 			}
 		})
 	}

@@ -23,7 +23,7 @@ import (
 	"golang.zabbix.com/agent2/plugins/redis/conn"
 )
 
-func Test_GetLastSlowlogID(t *testing.T) {
+func Test_getLastSlowlogID(t *testing.T) {
 	t.Parallel()
 
 	type args struct {
@@ -80,19 +80,17 @@ func Test_GetLastSlowlogID(t *testing.T) {
 
 			got, err := getLastSlowlogID(tt.args.slowlog)
 			if (err != nil) != tt.wantErr {
-				t.Errorf("getLastSlowlogID() error = %v, wantErr %v", err, tt.wantErr)
-
-				return
+				t.Fatalf("getLastSlowlogID() error = %v, wantErr %v", err, tt.wantErr)
 			}
 
-			if got != tt.want {
-				t.Errorf("getLastSlowlogID() = %v, want %v", got, tt.want)
+			if diff := cmp.Diff(tt.want, got); diff != "" {
+				t.Fatalf("getLastSlowlogID() = %s", diff)
 			}
 		})
 	}
 }
 
-func Test_SlowlogHandler(t *testing.T) {
+func TestSlowlogHandler(t *testing.T) {
 	t.Parallel()
 
 	stubConn := radix.Stub("", "", func(args []string) any {
@@ -109,8 +107,8 @@ func Test_SlowlogHandler(t *testing.T) {
 	connection := conn.NewRedisConn(stubConn)
 
 	type args struct {
-		conn   conn.RedisClient
-		params map[string]string
+		redisClient conn.RedisClient
+		params      map[string]string
 	}
 
 	tests := []struct {
@@ -121,26 +119,22 @@ func Test_SlowlogHandler(t *testing.T) {
 	}{
 		{
 			name:    "-fetchError",
-			args:    args{conn: connection, params: map[string]string{}},
+			args:    args{redisClient: connection, params: map[string]string{}},
 			want:    nil,
 			wantErr: true,
 		},
 	}
-
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			t.Parallel()
 
-			got, err := SlowlogHandler(tt.args.conn, tt.args.params)
+			got, err := SlowlogHandler(tt.args.redisClient, tt.args.params)
 			if (err != nil) != tt.wantErr {
-				t.Errorf("Plugin.SlowlogHandler() error = %v, wantErr %v", err, tt.wantErr)
-
-				return
+				t.Fatalf("SlowlogHandler() error = %v, wantErr %v", err, tt.wantErr)
 			}
 
-			diff := cmp.Diff(tt.want, got)
-			if diff != "" {
-				t.Fatalf("Plugin.SlowlogHandler() mismatch (-want +got):\n%s", diff)
+			if diff := cmp.Diff(tt.want, got); diff != "" {
+				t.Fatalf("SlowlogHandler() = %s", diff)
 			}
 		})
 	}
