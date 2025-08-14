@@ -49,7 +49,7 @@ type pluginOptions struct {
 	// Sessions stores pre-defined named sets of connections settings.
 	Sessions map[string]session `conf:"optional"`
 
-	// Timeout is the maximum time in seconds for waiting when a request has to be done.
+	// Timeout is the maximum time in seconds for waiting when a restfulRequest has to be done.
 	// Default value equals to the global timeout.
 	Timeout int `conf:"optional,range=1:30"`
 
@@ -60,7 +60,8 @@ type pluginOptions struct {
 // Configure implements the Configurator interface.
 // Initializes configuration structures.
 func (p *Plugin) Configure(global *plugin.GlobalOptions, options any) {
-	if err := conf.UnmarshalStrict(options, &p.options); err != nil {
+	err := conf.UnmarshalStrict(options, &p.options)
+	if err != nil {
 		p.Errf("cannot unmarshal configuration options: %s", err)
 	}
 

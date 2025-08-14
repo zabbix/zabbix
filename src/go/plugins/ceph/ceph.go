@@ -16,11 +16,7 @@ package ceph
 
 import (
 	"context"
-	"crypto/tls"
-	"net/http"
-	"time"
 
-	"golang.zabbix.com/agent2/plugins/ceph/conn"
 	"golang.zabbix.com/agent2/plugins/ceph/handlers"
 	"golang.zabbix.com/sdk/errs"
 	"golang.zabbix.com/sdk/metric"
@@ -29,21 +25,18 @@ import (
 )
 
 const pluginName = "Ceph"
+const modeParamName = "Mode"
+
+const (
+	restful = "restful"
+	native  = "native"
+)
 
 var _ plugin.Runner = (*Plugin)(nil)
 var _ plugin.Exporter = (*Plugin)(nil)
 
 // impl is the pointer to the plugin implementation.
-var impl Plugin //nolint:gochecknoglobals // this is legacy implementation
-
-// Plugin inherits plugin.Base and store plugin-specific data.
-type Plugin struct {
-	plugin.Base
-
-	connMgr *conn.Manager
-	options pluginOptions
-	client  *http.Client
-}
+var impl Plugin //nolint:gochecknoglobals // this is flagship (legacy) implementation
 
 // Export implements the Exporter interface.
 func (p *Plugin) Export(key string, rawParams []string, _ plugin.ContextProvider) (any, error) {
@@ -65,48 +58,29 @@ func (p *Plugin) Export(key string, rawParams []string, _ plugin.ContextProvider
 	handlerKey := handlers.Key(key)
 
 	meta := handlers.GetMetricMeta(handlerKey)
+	if meta == nil {
+		return nil, errs.New("no metric found for key " + key)
+	}
+
 	responses := make(map[handlers.Command][]byte)
 
 	var resCh <-chan *response
-	switch params["Mode"] {
-	case "restful":
 
+	switch params[modeParamName] {
+	case restful:
 		ctx, cancel := context.WithCancel(context.Background())
 		defer cancel()
 
-		resCh = asyncRequest(ctx, cancel, p.client, u.String(), meta)
-	case "native":
-		ch := make(chan *response, len(meta.Commands))
+		resCh = p.asyncRestfulRequest(ctx, cancel, u, meta)
+	case native:
+		// handle this differently due to OS differences.
+		resCh, err = p.handleNativeMode(u, meta)
+		if err != nil {
+			return nil, err
+		}
 
-		go func() {
-			conn, err := p.connMgr.GetConnection(u, params)
-			if err != nil {
-				ch <- &response{
-					command: "status",
-					err:     err,
-				}
-
-				return
-			}
-
-			cmd := []byte(`{"prefix":"status", "format":"json", "detail":"detail"}`)
-
-			res, _, err := conn.Client.MonCommand(cmd)
-			if err != nil {
-				ch <- &response{
-					command: "status",
-					err:     err,
-				}
-			}
-
-			ch <- &response{
-				command: "status",
-				data:    res,
-				err:     nil,
-			}
-		}()
-
-		resCh = ch
+	default:
+		return nil, errs.Errorf("unknown mode: %s", params[modeParamName])
 	}
 
 	for range meta.Commands {
@@ -138,32 +112,4 @@ func (p *Plugin) Export(key string, rawParams []string, _ plugin.ContextProvider
 	}
 
 	return result, nil
-}
-
-// Start implements the Runner interface and performs initialization when plugin is activated.
-func (p *Plugin) Start() {
-	p.client = &http.Client{
-		Timeout: time.Duration(p.options.Timeout) * time.Second,
-	}
-
-	p.client.Transport = &http.Transport{
-		DisableKeepAlives: false,
-		IdleConnTimeout:   time.Duration(p.options.KeepAlive) * time.Second,
-		TLSClientConfig:   &tls.Config{InsecureSkipVerify: p.options.InsecureSkipVerify}, //nolint:gosec // user defined
-	}
-
-	p.connMgr = conn.NewManager(
-		time.Duration(p.options.KeepAlive)*time.Second,
-		p.options.Timeout, // time in seconds
-		p.Logger,
-	)
-}
-
-// Stop implements the Runner interface and frees resources when plugin is deactivated.
-func (p *Plugin) Stop() {
-	p.client.CloseIdleConnections()
-	p.client = nil
-
-	p.connMgr.Close()
-	p.connMgr = nil
 }

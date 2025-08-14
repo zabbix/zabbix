@@ -23,6 +23,7 @@ import (
 	"golang.zabbix.com/agent2/plugins/ceph/handlers"
 	"golang.zabbix.com/sdk/errs"
 	"golang.zabbix.com/sdk/log"
+	"golang.zabbix.com/sdk/uri"
 	"golang.zabbix.com/sdk/zbxerr"
 )
 
@@ -43,11 +44,10 @@ type response struct {
 	err     error
 }
 
-// request makes an http request to Ceph RESTful API Module with a given command and extra parameters.
-func request(
+// restfulRequest makes an http restfulRequest to Ceph RESTful API Module with a given command and extra parameters.
+func (p *Plugin) restfulRequest(
 	ctx context.Context,
-	client *http.Client,
-	uri string,
+	u *uri.URI,
 	cmd handlers.Command,
 	args map[string]string,
 ) ([]byte, error) {
@@ -67,7 +67,12 @@ func request(
 		return nil, errs.WrapConst(err, zbxerr.ErrorCannotMarshalJSON)
 	}
 
-	req, err := http.NewRequestWithContext(ctx, http.MethodPost, uri+"/request?wait=1", bytes.NewBuffer(requestBody))
+	req, err := http.NewRequestWithContext(
+		ctx,
+		http.MethodPost,
+		u.String()+"/request?wait=1",
+		bytes.NewBuffer(requestBody),
+	)
 	if err != nil {
 		return nil, errs.New(err.Error())
 	}
@@ -75,7 +80,7 @@ func request(
 	req.Header.Set("Content-Type", "application/json")
 	req.Header.Add("User-Agent", "zbx_monitor")
 
-	res, err := client.Do(req)
+	res, err := p.client.Do(req)
 	if err != nil {
 		return nil, errs.WrapConst(err, zbxerr.ErrorCannotFetchData)
 	}
@@ -107,22 +112,26 @@ func request(
 	return []byte(resp.Finished[0].Outb), nil
 }
 
-// asyncRequest makes asynchronous https requests to Ceph RESTful API Module for each metric's command and sends
+// asyncRestfulRequest makes asynchronous https requests to Ceph RESTful API Module for each metric's command and sends
 // results to the channel.
-func asyncRequest(ctx context.Context, cancel context.CancelFunc, client *http.Client,
-	uri string, meta handlers.MetricMeta) <-chan *response {
+func (p *Plugin) asyncRestfulRequest(
+	ctx context.Context,
+	cancel context.CancelFunc,
+	u *uri.URI,
+	meta *handlers.MetricMeta,
+) <-chan *response {
 	ch := make(chan *response, len(meta.Commands))
 
 	for _, cmd := range meta.Commands {
 		go func(cmd handlers.Command) {
-			data, err := request(ctx, client, uri, cmd, meta.Arguments)
+			data, err := p.restfulRequest(ctx, u, cmd, meta.Arguments)
 			if err != nil {
 				cancel()
 
 				ch <- &response{cmd, nil, err}
 			}
 
-			ch <- &response{cmd, data, err}
+			ch <- &response{cmd, data, nil}
 		}(cmd)
 	}
 
