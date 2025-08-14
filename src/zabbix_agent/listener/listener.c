@@ -108,7 +108,14 @@ static int	process_passive_checks_json(zbx_socket_t *s, int config_timeout, stru
 		if (SUCCEED == zbx_execute_agent_check(key, ZBX_PROCESS_WITH_ALIAS, &result, timeout))
 		{
 			if (NULL != (value = ZBX_GET_TEXT_RESULT(&result)))
-				zbx_json_addstring(&j, ZBX_PROTO_TAG_VALUE, *value, ZBX_JSON_TYPE_STRING);
+			{
+				if (0 == strncmp(*value, ZBX_NOTSUPPORTED, ZBX_CONST_STRLEN(ZBX_NOTSUPPORTED)))
+				{
+					zbx_json_addstring(&j, ZBX_PROTO_TAG_ERROR,
+							*value + ZBX_CONST_STRLEN(ZBX_NOTSUPPORTED),
+							ZBX_JSON_TYPE_STRING);
+				}
+			}
 			else
 				zbx_json_addraw(&j, ZBX_PROTO_TAG_VALUE, "null");
 		}
