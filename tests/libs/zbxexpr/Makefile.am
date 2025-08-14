@@ -1,4 +1,5 @@
 include ../Makefile.include
+include ../../mocks/valuecache/symbol-wraps.mk
 
 BINARIES_tests = \
 	zbx_function_find \

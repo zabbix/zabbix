@@ -1,4 +1,5 @@
 include ../Makefile.include
+include ../../mocks/valuecache/symbol-wraps.mk
 
 if SERVER
 SERVER_tests = \
