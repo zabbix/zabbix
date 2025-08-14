@@ -2428,26 +2428,6 @@ void	zbx_dc_add_history(zbx_uint64_t itemid, unsigned char item_value_type, unsi
 	/*   1) the NOVALUE flag is set                                                      */
 	/*   2) the NOVALUE flag is not set and value conversion succeeded                   */
 
-	if (ITEM_VALUE_TYPE_JSON == item_value_type)
-	{
-		if (ZBX_HISTORY_JSON_VALUE_LEN < strlen(result->text))
-		{
-			dc_local_add_history_notsupported(itemid, ts, "JSON limit reached. ", result->lastlogsize,
-					result->mtime, value_flags);
-			return;
-		}
-
-		char    *err = NULL;
-
-		if (0 == zbx_json_validate_ext(result->text, &err))
-		{
-			dc_local_add_history_notsupported(itemid, ts, err, result->lastlogsize, result->mtime,
-					value_flags);
-			zbx_free(err);
-
-			return;
-		}
-	}
 
 	if (0 == (value_flags & ZBX_DC_FLAG_NOVALUE))
 	{
@@ -2492,6 +2472,26 @@ void	zbx_dc_add_history(zbx_uint64_t itemid, unsigned char item_value_type, unsi
 		{
 			dc_local_add_history_bin(itemid, item_value_type, ts, result->bin, result->lastlogsize,
 					result->mtime, value_flags);
+		}
+		else if (ZBX_ISSET_JSON(result))
+		{
+			if (ZBX_HISTORY_JSON_VALUE_LEN < strlen(result->tjson))
+			{
+				dc_local_add_history_notsupported(itemid, ts, "JSON limit reached. ",
+						result->lastlogsize, result->mtime, value_flags);
+				return;
+			}
+
+			char	*err = NULL;
+
+			if (0 == zbx_json_validate_ext(result->tjson, &err))
+			{
+				dc_local_add_history_notsupported(itemid, ts, err, result->lastlogsize, result->mtime,
+						value_flags);
+				zbx_free(err);
+
+				return;
+			}
 		}
 		else
 		{

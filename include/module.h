@@ -82,6 +82,7 @@ zbx_log_t;
 #define AR_MESSAGE	0x0020
 #define AR_META		0x0040
 #define AR_BIN		0x0080
+#define AR_JSON		0x0100
 
 /* Agent return structure.                                       */
 /* Need to preserve the compatibility with previous versions,    */
@@ -98,7 +99,7 @@ typedef struct
 	int		type;		/* flags: see AR_* above */
 	int		mtime;		/* meta information */
 	char		*bin;
-	char		*tjson;
+	char            *tjson;
 }
 AGENT_RESULT;
 
@@ -143,6 +144,13 @@ zbx_metric_t;
 )
 
 /* NOTE: always allocate new memory for val! DON'T USE STATIC OR STACK MEMORY!!! */
+#define SET_JSON_RESULT(res, val)		\
+(						\
+	(res)->type |= AR_JSON,			\
+	(res)->tjson = (char *)(val)		\
+)
+
+/* NOTE: always allocate new memory for val! DON'T USE STATIC OR STACK MEMORY!!! */
 #define SET_LOG_RESULT(res, val)		\
 (						\
 	(res)->type |= AR_LOG,			\
@@ -166,8 +174,9 @@ zbx_metric_t;
 #define ZBX_ISSET_MSG(res)	((res)->type & AR_MESSAGE)
 #define ZBX_ISSET_META(res)	((res)->type & AR_META)
 #define ZBX_ISSET_BIN(res)	((res)->type & AR_BIN)
+#define ZBX_ISSET_JSON(res)	((res)->type & AR_JSON)
 
-#define ZBX_ISSET_VALUE(res)	((res)->type & (AR_UINT64 | AR_DOUBLE | AR_STRING | AR_TEXT | AR_LOG))
+#define ZBX_ISSET_VALUE(res)	((res)->type & (AR_UINT64 | AR_DOUBLE | AR_STRING | AR_TEXT | AR_LOG | AR_JSON))
 
 /* UNSET RESULT */
 
@@ -251,6 +260,18 @@ do									\
 }									\
 while (0)
 
+#define ZBX_UNSET_JSON_RESULT(res)					\
+									\
+do									\
+{									\
+	if ((res)->type & AR_JSON)					\
+	{								\
+		zbx_free((res)->tjson);					\
+		(res)->type &= ~AR_JSON	;				\
+	}								\
+}									\
+while (0)
+
 
 /* AR_META is always excluded */
 #define ZBX_UNSET_RESULT_EXCLUDING(res, exc_type)				\
@@ -264,6 +285,7 @@ do										\
 	if (!(exc_type & AR_LOG))	ZBX_UNSET_LOG_RESULT(res);		\
 	if (!(exc_type & AR_MESSAGE))	ZBX_UNSET_MSG_RESULT(res);		\
 	if (!(exc_type & AR_BIN))	ZBX_UNSET_BIN_RESULT(res);		\
+	if (!(exc_type & AR_JSON))	ZBX_UNSET_JSON_RESULT(res);		\
 }										\
 while (0)
 
@@ -279,6 +301,7 @@ while (0)
 	ZBX_UNSET_LOG_RESULT((result));		\
 	ZBX_UNSET_MSG_RESULT((result));		\
 	ZBX_UNSET_BIN_RESULT(result);		\
+	ZBX_UNSET_JSON_RESULT(result);		\
 }
 
 #define SYSINFO_RET_OK		0
