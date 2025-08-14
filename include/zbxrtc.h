@@ -82,6 +82,7 @@ void	zbx_rtc_subscribe(unsigned char proc_type, int proc_num, zbx_uint32_t *msgs
 		zbx_ipc_async_socket_t *rtc);
 void	zbx_rtc_subscribe_service(unsigned char proc_type, int proc_num, zbx_uint32_t *msgs, int msgs_num,
 		int config_timeout, const char *service);
+void	zbx_rtc_unsubscribe_service(int config_timeout, const char *service);
 int	zbx_rtc_wait(zbx_ipc_async_socket_t *rtc, const zbx_thread_info_t *info, zbx_uint32_t *cmd,
 		unsigned char **data, int timeout);
 int	zbx_rtc_reload_config_cache(char **error);

@@ -1524,6 +1524,8 @@ ZBX_THREAD_ENTRY(zbx_pp_manager_thread, args)
 
 	zbx_setproctitle("%s #%d [terminating]", get_process_type_string(process_type), process_num);
 
+	zbx_rtc_unsubscribe_service(pp_args->config_timeout, ZBX_IPC_SERVICE_PREPROCESSING);
+
 	zbx_vector_pp_task_ptr_destroy(&tasks);
 	zbx_pp_manager_free(manager);
 
