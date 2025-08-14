@@ -57,7 +57,9 @@ func parseRedisInfo(info string) (redisInfo, error) {
 		// Names of sections are preceded by '#'.
 		if line[0] == '#' {
 			section = infoSection(line[2:])
-			if _, ok := res[section]; !ok {
+
+			_, ok := res[section]
+			if !ok {
 				res[section] = make(infoKeySpace)
 			}
 

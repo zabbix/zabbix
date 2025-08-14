@@ -15,12 +15,15 @@
 package conn
 
 import (
-	"reflect"
 	"testing"
 	"time"
 
+	"github.com/google/go-cmp/cmp"
+	"github.com/google/go-cmp/cmp/cmpopts"
 	"github.com/mediocregopher/radix/v3"
 	"golang.zabbix.com/sdk/log"
+	"golang.zabbix.com/sdk/plugin/comms"
+	"golang.zabbix.com/sdk/tlsconfig"
 	"golang.zabbix.com/sdk/uri"
 )
 
@@ -86,12 +89,11 @@ func TestManager_create(t *testing.T) {
 	connMgr.connections[*createConnKey(u, map[string]string{})] = NewRedisConn(radix.Stub("", "", nil))
 
 	type args struct {
-		uri *uri.URI
+		u *connKey
 	}
 
 	tests := []struct {
 		name      string
-		c         *Manager
 		args      args
 		want      *RedisConn
 		wantErr   bool
@@ -99,8 +101,7 @@ func TestManager_create(t *testing.T) {
 	}{
 		{
 			name:      "-connectionExists",
-			c:         connMgr,
-			args:      args{uri: u},
+			args:      args{u: createConnKey(u, map[string]string{})},
 			want:      nil,
 			wantErr:   false,
 			wantPanic: true,
@@ -111,24 +112,21 @@ func TestManager_create(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			t.Parallel()
 
-			if tt.wantPanic {
-				defer func() {
-					if r := recover(); r == nil {
-						t.Error("Manager.create() must panic with runtime error")
-					}
-				}()
-			}
+			defer func() {
+				r := recover()
+				if tt.wantPanic && r == nil {
+					t.Fatalf("Manager.create() must panic with runtime error")
+				}
+			}()
 
-			got, err := tt.c.create(createConnKey(tt.args.uri, map[string]string{}))
-
+			got, err := connMgr.create(tt.args.u)
 			if (err != nil) != tt.wantErr {
-				t.Errorf("Manager.create() error = %v, wantErr %v", err, tt.wantErr)
-
-				return
+				t.Fatalf("Manager.create() error = %v, wantErr %v", err, tt.wantErr)
 			}
 
-			if reflect.TypeOf(got) != reflect.TypeOf(tt.want) {
-				t.Errorf("Manager.create() = %v, want %v", got, tt.want)
+			diff := cmp.Diff(tt.want, got)
+			if diff != "" {
+				t.Fatalf("Manager.create() = %s", diff)
 			}
 		})
 	}
@@ -145,13 +143,6 @@ func TestManager_get(t *testing.T) {
 		connMgr.Destroy()
 	})
 
-	//nolint:paralleltest //should be done before attempt to make connection is made
-	t.Run("Should return nil if connection does not exist", func(t *testing.T) {
-		if got := connMgr.get(createConnKey(u, map[string]string{})); got != nil {
-			t.Errorf("Manager.get() = %v, want <nil>", got)
-		}
-	})
-
 	stubClient := radix.Stub("", "", nil)
 
 	lastTimeAccess := time.Now()
@@ -162,18 +153,39 @@ func TestManager_get(t *testing.T) {
 
 	connMgr.connections[*createConnKey(u, map[string]string{})] = conn
 
-	t.Run("Should return connection if it exists", func(t *testing.T) {
-		t.Parallel()
+	type args struct {
+		u *connKey
+	}
 
-		got := connMgr.get(createConnKey(u, map[string]string{}))
+	tests := []struct {
+		name string
+		args args
+		want *RedisConn
+	}{
+		{
+			name: "+getConn",
+			args: args{
+				u: createConnKey(u, map[string]string{}),
+			},
+			want: conn,
+		},
+		{
+			name: "-getConn",
+			args: args{
+				u: createConnKey(u, map[string]string{string(comms.TLSConnect): string(tlsconfig.Required)}),
+			},
+			want: nil,
+		},
+	}
 
-		// has to return the same pointer.
-		if conn != got {
-			t.Errorf("Manager.get() = %v, want %v", got, conn)
-		}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			t.Parallel()
 
-		if lastTimeAccess.Equal(got.lastTimeAccess) {
-			t.Error("conn.lastTimeAccess should be updated, but it's not")
-		}
-	})
+			got := connMgr.get(tt.args.u)
+			if diff := cmp.Diff(tt.want, got, cmpopts.IgnoreUnexported(RedisConn{})); diff != "" {
+				t.Fatalf("Manager.get() = %s", diff)
+			}
+		})
+	}
 }
