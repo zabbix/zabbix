@@ -1230,7 +1230,7 @@ class CFormValidator {
 
 	private function validateApiUniq(array $check, string &$path, ?string &$error = null): bool {
 		[$method, $parameters, $exclude_id] = $check;
-		[$api, ] = explode('.', $method);
+		[$api] = explode('.', $method);
 
 		$field_path = null;
 
