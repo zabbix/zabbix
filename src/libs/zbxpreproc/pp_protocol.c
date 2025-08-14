@@ -1102,12 +1102,6 @@ void	zbx_preprocess_item_value(zbx_uint64_t itemid, unsigned char item_value_typ
 				value_len = len;
 		}
 
-		if (0 != ZBX_ISSET_JSON(result))
-		{
-			if (value_len < (len = strlen(result->tjson)))
-				value_len = len;
-		}
-
 		if (0 != ZBX_ISSET_BIN(result))
 		{
 			THIS_SHOULD_NEVER_HAPPEN;
