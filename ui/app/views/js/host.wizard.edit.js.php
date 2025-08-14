@@ -1655,7 +1655,7 @@ window.host_wizard_edit = new class {
 				const subclasses_list = section.querySelector('.template-subfilter');
 				const subclasses = template_subclasses.get(category);
 
-				if (subclasses !== undefined && subclasses.length > 1 && templateids.length > 1) {
+				if (subclasses?.length > 1 && templateids.length > 1) {
 					for (const subclass of subclasses.sort()) {
 						const subfilter_button = this.#view_templates.subclass_filter_item.evaluateToElement({
 							label: subclass
