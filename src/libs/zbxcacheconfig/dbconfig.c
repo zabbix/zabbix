@@ -9044,7 +9044,7 @@ int	zbx_dc_check_host_conn_permissions(const char *host, const zbx_socket_t *soc
 #if defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
 	const char	*msg;
 
-	if (0 == skip_tls_validation && FAIL == zbx_tls_validate_attr(&attr,dc_host->tls_issuer, dc_host->tls_subject,
+	if (0 == skip_tls_validation && FAIL == zbx_tls_validate_attr(&attr, dc_host->tls_issuer, dc_host->tls_subject,
 			NULL == dc_host->tls_dc_psk ? NULL : dc_host->tls_dc_psk->tls_psk_identity, &msg))
 	{
 		UNLOCK_CACHE;
