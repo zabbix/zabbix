@@ -42,52 +42,32 @@ class CColorPickerElement extends CElement {
 	 */
 	public function overwrite($color) {
 		$this->query('xpath:./button['.CXPathHelper::fromClass('color-picker-preview').']')->one()->click();
-		$overlay = (new CElementQuery('id:color_picker'))->waitUntilVisible()->asOverlayDialog()->one();
+		$element = (new CElementQuery('id:color_picker'))->waitUntilReady()->asColorPicker()->one();
 
 		if ($color === null) {
-			$overlay->query('button:Use default')->one()->click();
+			$element->query('button:Use default')->one()->click();
 		}
 		else {
-			$overlay->asColorPicker()->selectTab('Solid color');
-			$overlay->query('class:color-picker-input')->waitUntilVisible()->one()->overwrite($color);
+			if ($element->query('xpath:.//ul['.CXPathHelper::fromClass('color-picker-tabs').']')
+						->waitUntilPresent()->one()->isDisplayed()) {
+				$tab_selector = ('xpath:.//label[text()='.CXPathHelper::escapeQuotes('Solid color').']');
+				$element->query($tab_selector)->waitUntilPresent()->one()->click();
+				$element->query($tab_selector.'/..')->waitUntilClassesPresent('color-picker-tab-selected');
+			}
+
+			$element->query('class:color-picker-input')->waitUntilVisible()->one()->overwrite($color);
 		}
 
-		$apply_button = $overlay->query('button:Apply');
+		$apply_button = $element->query('button:Apply');
 
 		if (preg_match('/^[a-fA-F0-9]+$/', $color) === 1 && strlen($color) === 6) {
 			CElementQuery::getPage()->pressKey(WebDriverKeys::ENTER);
-			$overlay->waitUntilNotVisible();
+			$element->waitUntilNotVisible();
 		}
 		else {
 			if (!$apply_button->one()->isAttributePresent('disabled')) {
 				throw new \Exception('Passes value is not a valid hexadecimal value, but Apply button is not disabled.');
 			}
-		}
-
-		return $this;
-	}
-
-	/**
-	 * Get text of selected color-picker tab.
-	 *
-	 * @return string
-	 */
-	public function getSelectedTab() {
-		return $this->query('xpath:.//ul[@class="color-picker-tabs"]'.
-			'//li[contains(@class, "color-picker-tab-selected")]/label')->waitUntilPresent()->one()->getText();
-	}
-
-	/**
-	 * Switch color-picker tab by its name.
-	 *
-	 * @return $this
-	 */
-	public function selectTab($name) {
-		$selector = 'xpath:.//label[text()='.CXPathHelper::escapeQuotes($name).']';
-
-		if ($this->getSelectedTab() !== $name) {
-			$this->query($selector)->waitUntilPresent()->one()->click();
-			$this->query($selector.'/..')->waitUntilClassesPresent('color-picker-tab-selected');
 		}
 
 		return $this;
