@@ -268,7 +268,12 @@ class WidgetView extends CControllerDashboardWidgetView {
 			];
 		}
 
-		$tile_provider = getTileProviders()[CSettingsHelper::get(CSettingsHelper::GEOMAPS_TILE_PROVIDER)];
+		$tile_providers = getTileProviders();
+		$geomaps_tile_provider = CSettingsHelper::get(CSettingsHelper::GEOMAPS_TILE_PROVIDER);
+
+		$tile_provider = array_key_exists($geomaps_tile_provider, $tile_providers)
+			? $tile_providers[$geomaps_tile_provider]
+			: reset($tile_providers);
 
 		return [
 			'tile_url' => $tile_provider['geomaps_tile_url'],
