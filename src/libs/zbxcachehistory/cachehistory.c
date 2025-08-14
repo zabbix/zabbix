@@ -2492,6 +2492,9 @@ void	zbx_dc_add_history(zbx_uint64_t itemid, unsigned char item_value_type, unsi
 
 				return;
 			}
+
+			dc_local_add_history_json(itemid, item_value_type, ts, result->tjson, result->lastlogsize,
+					result->mtime, value_flags);
 		}
 		else
 		{
