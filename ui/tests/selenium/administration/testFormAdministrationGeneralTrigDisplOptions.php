@@ -791,7 +791,7 @@ class testFormAdministrationGeneralTrigDisplOptions extends testFormAdministrati
 			$color_picker = $form->query($xpath)->one()->asColorPicker();
 			$color_picker->fill($data['value']);
 			$this->assertTrue($color_picker->isSubmittionDisabled());
-			$color_picker->close();
+			CColorPickerElement::close();
 		}
 	}
 }

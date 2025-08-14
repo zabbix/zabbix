@@ -346,9 +346,8 @@ class testWidgets extends CWebTest {
 	 */
 	public function checkColorPickerState($data) {
 		if (CTestArrayHelper::get($data, 'invalid_color')) {
-			$color_picker = $this->query('class:color-picker-dialog')->one()->asColorPicker();
-			$this->assertTrue($color_picker->isSubmittionDisabled());
-			$color_picker->close();
+			$this->assertTrue($this->query('id:color-picker')->one()->asColorPicker()->isSubmittionDisabled());
+			CColorPickerElement::close();
 		}
 	}
 }

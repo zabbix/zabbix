@@ -1346,11 +1346,8 @@ class testDashboardPieChartWidget extends testWidgets {
 
 		// Verify that it is not possible to submit color-picker dialog with invalid color or proceed with form submission.
 		if (CTestArrayHelper::get($data, 'invalid_color')) {
-			$color_picker_dialog = $this->query('class:color-picker-dialog')->one()->asColorPicker();
-			$this->assertTrue($color_picker_dialog->isSubmittionDisabled());
-
-			$color_picker_dialog->close();
-			COverlayDialogElement::find()->one()->close();
+			$this->assertTrue($this->query('class:color-picker-dialog')->one()->asColorPicker()->isSubmittionDisabled());
+			CColorPickerElement::close();
 		}
 		else {
 			$form->submit();
