@@ -121,7 +121,7 @@ $output = [
 		'templategroup_edit_popup.init('.json_encode([
 			'rules' => $data['js_validation_rules'],
 			'groupid' => $data['groupid'],
-			'name' => $data['name'],
+			'name' => $data['name']
 		]).');',
 	'dialogue_class' => 'modal-popup-static'
 ];
