@@ -98,5 +98,7 @@ void				results_free(zbx_discoverer_results_t *result);
 zbx_discoverer_dservice_t	*result_dservice_create(const unsigned short port, const zbx_uint64_t dcheckid);
 void				dcheck_port_ranges_get(const char *ports, zbx_vector_portrange_t *ranges);
 int				dcheck_is_async(zbx_ds_dcheck_t *ds_dcheck);
+zbx_discoverer_dservice_t	*zbx_vector_discoverer_services_ptr_pop(zbx_vector_discoverer_services_ptr_t *services,
+		zbx_uint64_t dcheckid);
 
 #endif /* ZABBIX_DISCOVERER_INT_H_ */

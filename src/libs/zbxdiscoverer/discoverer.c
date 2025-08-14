@@ -289,7 +289,7 @@ void	dcheck_port_ranges_get(const char *ports, zbx_vector_portrange_t *ranges)
 
 static int	process_services(void *handle, zbx_uint64_t druleid, zbx_db_dhost *dhost, const char *ip,
 		const char *dns, time_t now, zbx_uint64_t unique_dcheckid,
-		const zbx_vector_discoverer_services_ptr_t *services, zbx_add_event_func_t add_event_cb,
+		zbx_vector_discoverer_services_ptr_t *services, zbx_add_event_func_t add_event_cb,
 		zbx_discovery_update_service_func_t discovery_update_service_cb,
 		zbx_discovery_update_service_down_func_t discovery_update_service_down_cb,
 		zbx_discovery_find_host_func_t discovery_find_host_cb)
@@ -300,6 +300,20 @@ static int	process_services(void *handle, zbx_uint64_t druleid, zbx_db_dhost *dh
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
 	zbx_vector_uint64_create(&dserviceids);
+
+	zbx_discoverer_dservice_t *service = NULL;
+
+	if (NULL != (service = zbx_vector_discoverer_services_ptr_pop(services, unique_dcheckid)))
+	{
+		if ((-1 == host_status || DOBJECT_STATUS_UP == service->status) && host_status != service->status)
+				host_status = service->status;
+
+		discovery_update_service_cb(handle, druleid, service->dcheckid, unique_dcheckid, dhost,
+				ip, dns, service->port, service->status, service->value, now, &dserviceids,
+				add_event_cb);
+
+		zbx_free(service);
+	}
 
 	for (int i = 0; i < services->values_num; i++)
 	{
@@ -1107,6 +1121,24 @@ int	discoverer_results_partrange_merge(zbx_hashset_t *hr_dst, zbx_vector_discove
 			hr_dst->num_data);
 
 	return ret;
+}
+
+zbx_discoverer_dservice_t	*zbx_vector_discoverer_services_ptr_pop(zbx_vector_discoverer_services_ptr_t *services,
+		zbx_uint64_t dcheckid)
+{
+	zbx_discoverer_dservice_t *service = NULL;
+
+	for (int i = 0; i < services->values_num; i++)
+	{
+		if (services->values[i]->dcheckid == dcheckid)
+		{
+			service = services->values[i];
+			zbx_vector_discoverer_services_ptr_remove(services, i);
+			break;
+		}
+	}
+
+	return service;
 }
 
 static int	discoverer_net_check_icmp(zbx_uint64_t druleid, zbx_discoverer_task_t *task, int concurrency_max,
