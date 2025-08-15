@@ -12,7 +12,7 @@
 ** If not, see <https://www.gnu.org/licenses/>.
 **/
 
-package ceph
+package requests
 
 import (
 	"bytes"
@@ -38,15 +38,17 @@ type cephResponse struct {
 	Message   string `json:"message"`
 }
 
-type response struct {
-	command handlers.Command
-	data    []byte
-	err     error
+// Response holds information that is received from the ceph that will be passed into the channel.
+type Response struct {
+	Command handlers.Command
+	Data    []byte
+	Err     error
 }
 
 // restfulRequest makes an http restfulRequest to Ceph RESTful API Module with a given command and extra parameters.
-func (p *Plugin) restfulRequest(
+func restfulRequest(
 	ctx context.Context,
+	client *http.Client,
 	u *uri.URI,
 	cmd handlers.Command,
 	args map[string]string,
@@ -80,7 +82,7 @@ func (p *Plugin) restfulRequest(
 	req.Header.Set("Content-Type", "application/json")
 	req.Header.Add("User-Agent", "zbx_monitor")
 
-	res, err := p.client.Do(req)
+	res, err := client.Do(req)
 	if err != nil {
 		return nil, errs.WrapConst(err, zbxerr.ErrorCannotFetchData)
 	}
@@ -112,26 +114,27 @@ func (p *Plugin) restfulRequest(
 	return []byte(resp.Finished[0].Outb), nil
 }
 
-// asyncRestfulRequest makes asynchronous https requests to Ceph RESTful API Module for each metric's command and sends
+// AsyncRestfulRequest makes asynchronous https requests to Ceph RESTful API Module for each metric's command and sends
 // results to the channel.
-func (p *Plugin) asyncRestfulRequest(
+func AsyncRestfulRequest(
 	ctx context.Context,
 	cancel context.CancelFunc,
+	client *http.Client,
 	u *uri.URI,
 	meta *handlers.MetricMeta,
-) <-chan *response {
-	ch := make(chan *response, len(meta.Commands))
+) <-chan *Response {
+	ch := make(chan *Response, len(meta.Commands))
 
 	for _, cmd := range meta.Commands {
 		go func(cmd handlers.Command) {
-			data, err := p.restfulRequest(ctx, u, cmd, meta.Arguments)
+			data, err := restfulRequest(ctx, client, u, cmd, meta.Arguments)
 			if err != nil {
 				cancel()
 
-				ch <- &response{cmd, nil, err}
+				ch <- &Response{cmd, nil, err}
 			}
 
-			ch <- &response{cmd, data, nil}
+			ch <- &Response{cmd, data, nil}
 		}(cmd)
 	}
 

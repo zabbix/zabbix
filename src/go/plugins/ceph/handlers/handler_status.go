@@ -114,13 +114,10 @@ func statusHandler(data map[Command][]byte) (any, error) {
 
 	intHealth, ok := healthMap[cStatus.Health.Status]
 	if !ok {
-		return nil, errs.Errorf(
-			"unknown health status %q", cStatus.Health.Status,
-		)
+		return nil, errs.Errorf("unknown health status %q", cStatus.Health.Status)
 	}
 
-	pgStats := make(map[string]uint64)
-
+	pgStats := make(map[string]uint64, len(pgStates))
 	for _, s := range pgStates {
 		pgStats[s] = 0
 	}
@@ -142,34 +139,14 @@ func statusHandler(data map[Command][]byte) (any, error) {
 		MinMonReleaseName: cStatus.MonMap.MinMonReleaseName,
 	}
 
-	switch {
-	case cStatus.MonMap.NumMons != nil:
-		status.NumMon = *cStatus.MonMap.NumMons
-	case cStatus.MonMap.Mons != nil:
-		status.NumMon = uint64(len(cStatus.MonMap.Mons))
-	default:
-		return nil, errs.New(
-			"unable to get data for num_mon: " +
-				"both monmap.num_mons and monmap.mons are empty",
-		)
+	err = getMonData(cStatus, &status)
+	if err != nil {
+		return nil, err
 	}
 
-	switch {
-	case cStatus.OSDMap.NumOsds != nil &&
-		cStatus.OSDMap.NumInOsds != nil &&
-		cStatus.OSDMap.NumUpOsds != nil:
-		status.NumOsd = *cStatus.OSDMap.NumOsds
-		status.NumOsdIn = *cStatus.OSDMap.NumInOsds
-		status.NumOsdUp = *cStatus.OSDMap.NumUpOsds
-	case cStatus.OSDMap.OSDMap != nil:
-		status.NumOsd = cStatus.OSDMap.OSDMap.NumOsds
-		status.NumOsdIn = cStatus.OSDMap.OSDMap.NumInOsds
-		status.NumOsdUp = cStatus.OSDMap.OSDMap.NumUpOsds
-	default:
-		return nil, errs.New(
-			"unable to get data for num_osd, num_osd_in and num_osd_up: " +
-				"both osdmap.num_* and osdmap.osdmap.num_* are empty",
-		)
+	err = getOSDData(cStatus, &status)
+	if err != nil {
+		return nil, err
 	}
 
 	jsonRes, err := json.Marshal(status)
@@ -178,4 +155,43 @@ func statusHandler(data map[Command][]byte) (any, error) {
 	}
 
 	return string(jsonRes), nil
+}
+
+// getMonData extracts monitor count information from the cephStatus and populates the outStatus.
+func getMonData(c *cephStatus, s *outStatus) error {
+	if c.MonMap.NumMons != nil {
+		s.NumMon = *c.MonMap.NumMons
+
+		return nil
+	}
+
+	if c.MonMap.Mons != nil {
+		s.NumMon = uint64(len(c.MonMap.Mons))
+
+		return nil
+	}
+
+	return errs.New("unable to get data for num_mon: both monmap.num_mons and monmap.mons are empty")
+}
+
+// getOSDData extracts OSD count information from the cephStatus and populates the outStatus.
+func getOSDData(c *cephStatus, s *outStatus) error {
+	if c.OSDMap.NumOsds != nil && c.OSDMap.NumInOsds != nil && c.OSDMap.NumUpOsds != nil {
+		s.NumOsd = *c.OSDMap.NumOsds
+		s.NumOsdIn = *c.OSDMap.NumInOsds
+		s.NumOsdUp = *c.OSDMap.NumUpOsds
+
+		return nil
+	}
+
+	if c.OSDMap.OSDMap != nil {
+		s.NumOsd = c.OSDMap.OSDMap.NumOsds
+		s.NumOsdIn = c.OSDMap.OSDMap.NumInOsds
+		s.NumOsdUp = c.OSDMap.OSDMap.NumUpOsds
+
+		return nil
+	}
+
+	return errs.New("unable to get data for num_osd, num_osd_in and num_osd_up: " +
+		"both osdmap.num_* and osdmap.osdmap.num_* are empty")
 }

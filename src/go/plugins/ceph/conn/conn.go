@@ -94,7 +94,7 @@ func (m *Manager) Close() {
 // arguments and returns the resulting output data, a status string, and any
 // error that occurred during execution.
 func (c *Conn) Command(args []byte) ([]byte, string, error) {
-	return c.client.MonCommand(args) //nolint:wrapcheck
+	return c.client.MonCommand(args) //nolint:wrapcheck // just isolated client from the struct.
 }
 
 // getConn retrieves a connection, creating it if it doesn't exist.

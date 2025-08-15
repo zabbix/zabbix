@@ -20,7 +20,7 @@ import (
 	"golang.zabbix.com/sdk/plugin"
 )
 
-var _ plugin.Exporter = (*Plugin)(nil)
+var _ plugin.Configurator = (*Plugin)(nil)
 
 type session struct {
 	// Mode defines that connection to ceph will be done using old restful mode or new - native.

@@ -18,6 +18,7 @@ import (
 	"context"
 
 	"golang.zabbix.com/agent2/plugins/ceph/handlers"
+	"golang.zabbix.com/agent2/plugins/ceph/requests"
 	"golang.zabbix.com/sdk/errs"
 	"golang.zabbix.com/sdk/metric"
 	"golang.zabbix.com/sdk/plugin"
@@ -62,41 +63,16 @@ func (p *Plugin) Export(key string, rawParams []string, _ plugin.ContextProvider
 		return nil, errs.New("no metric found for key " + key)
 	}
 
-	responses := make(map[handlers.Command][]byte)
+	responses := make(map[handlers.Command][]byte, len(meta.Commands))
 
-	var resCh <-chan *response
-
-	switch params[modeParamName] {
-	case restful:
-		ctx, cancel := context.WithCancel(context.Background())
-		defer cancel()
-
-		resCh = p.asyncRestfulRequest(ctx, cancel, u, meta)
-	case native:
-		// handle this differently due to OS differences.
-		resCh, err = p.handleNativeMode(u, meta)
-		if err != nil {
-			return nil, err
-		}
-
-	default:
-		return nil, errs.Errorf("unknown mode: %s", params[modeParamName])
-	}
-
-	for range meta.Commands {
-		r := <-resCh
-		if r.err != nil {
-			err = r.err
-
-			break
-		}
-
-		responses[r.command] = r.data
-	}
-
+	resCh, err := p.getResponseChannel(params[modeParamName], u, meta)
 	if err != nil {
-		// Special logic of processing connection errors is used if keyPing is requested
-		// because it must return pingFailed if any error occurred.
+		return nil, err
+	}
+
+	err = p.collectResponses(meta, resCh, responses)
+	if err != nil {
+		// Special logic for ping key requires returning pingFailed on any error.
 		if handlerKey == handlers.KeyPing {
 			return handlers.PingFailed, nil
 		}
@@ -112,4 +88,45 @@ func (p *Plugin) Export(key string, rawParams []string, _ plugin.ContextProvider
 	}
 
 	return result, nil
+}
+
+// getResponseChannel determines the mode and returns the appropriate response channel.
+func (p *Plugin) getResponseChannel(
+	mode string,
+	u *uri.URI,
+	meta *handlers.MetricMeta,
+) (<-chan *requests.Response, error) {
+	switch mode {
+	case restful:
+		ctx, cancel := context.WithCancel(context.Background())
+		defer cancel()
+
+		return requests.AsyncRestfulRequest(ctx, cancel, p.client, u, meta), nil
+	case native:
+		// handle this differently due to OS differences.
+		resCh, err := p.handleNativeMode(u, meta)
+		if err != nil {
+			return nil, err
+		}
+
+		return resCh, nil
+	default:
+		return nil, errs.New("unknown mode: " + mode)
+	}
+}
+
+// collectResponses reads from the response channel and populates the responses map.
+// It returns the first error encountered.
+func (*Plugin) collectResponses(meta *handlers.MetricMeta, resCh <-chan *requests.Response,
+	responses map[handlers.Command][]byte) error {
+	for range meta.Commands {
+		r := <-resCh
+		if r.Err != nil {
+			return r.Err
+		}
+
+		responses[r.Command] = r.Data
+	}
+
+	return nil
 }

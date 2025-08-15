@@ -39,6 +39,6 @@ func (p *Plugin) Stop() {
 }
 
 // handleNativeMode for Windows returns an error.
-func (p *Plugin) handleNativeMode(_ *uri.URI, _ *handlers.MetricMeta) (<-chan *response, error) {
+func (*Plugin) handleNativeMode(_ *uri.URI, _ *handlers.MetricMeta) (<-chan *response, error) {
 	return nil, errs.New("native mode is only supported on linux")
 }

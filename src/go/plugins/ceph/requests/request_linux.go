@@ -12,7 +12,7 @@
  ** If not, see <https://www.gnu.org/licenses/>.
  **/
 
-package ceph
+package requests
 
 import (
 	"encoding/json"
@@ -23,7 +23,7 @@ import (
 	"golang.zabbix.com/sdk/zbxerr"
 )
 
-func (*Plugin) nativeRequest(
+func nativeRequest(
 	connection *conn.Conn,
 	cmd handlers.Command,
 	args map[string]string,
@@ -50,27 +50,28 @@ func (*Plugin) nativeRequest(
 	return res, nil
 }
 
-func (p *Plugin) asyncNativeRequest(
+// AsyncNativeRequest makes requests to the ceph in asynchronous way.
+func AsyncNativeRequest(
 	connection *conn.Conn,
 	meta *handlers.MetricMeta,
-) <-chan *response {
-	ch := make(chan *response, len(meta.Commands))
+) <-chan *Response {
+	ch := make(chan *Response, len(meta.Commands))
 
 	for _, cmd := range meta.Commands {
 		go func() {
-			res, err := p.nativeRequest(connection, cmd, meta.Arguments)
+			res, err := nativeRequest(connection, cmd, meta.Arguments)
 			if err != nil {
-				ch <- &response{
-					err: err,
+				ch <- &Response{
+					Err: err,
 				}
 
 				return
 			}
 
-			ch <- &response{
-				command: cmd,
-				data:    res,
-				err:     nil,
+			ch <- &Response{
+				Command: cmd,
+				Data:    res,
+				Err:     nil,
 			}
 		}()
 	}

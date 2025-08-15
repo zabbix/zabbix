@@ -22,6 +22,7 @@ import (
 
 	"golang.zabbix.com/agent2/plugins/ceph/conn"
 	"golang.zabbix.com/agent2/plugins/ceph/handlers"
+	"golang.zabbix.com/agent2/plugins/ceph/requests"
 	"golang.zabbix.com/sdk/errs"
 	"golang.zabbix.com/sdk/plugin"
 	"golang.zabbix.com/sdk/uri"
@@ -64,11 +65,11 @@ func (p *Plugin) Stop() {
 	p.connMgr = nil
 }
 
-func (p *Plugin) handleNativeMode(u *uri.URI, meta *handlers.MetricMeta) (<-chan *response, error) {
+func (p *Plugin) handleNativeMode(u *uri.URI, meta *handlers.MetricMeta) (<-chan *requests.Response, error) {
 	connection, err := p.connMgr.GetConnection(u)
 	if err != nil {
 		return nil, errs.Wrap(err, "failed to get connection")
 	}
 
-	return p.asyncNativeRequest(connection, meta), nil
+	return requests.AsyncNativeRequest(connection, meta), nil
 }

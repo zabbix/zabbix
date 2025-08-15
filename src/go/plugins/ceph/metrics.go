@@ -35,7 +35,7 @@ var (
 	paramAPIKey   = metric.NewConnParam("APIKey", "Ceph API key.").SetRequired()
 	paramMode     = metric.NewConnParam("Mode", "Ceph modes native|restful").
 			WithDefault("restful").
-			WithValidator(metric.SetValidator{Set: []string{"native", "restful"}, CaseInsensitive: true})
+			WithValidator(metric.SetValidator{Set: []string{"native", "restful"}, CaseInsensitive: false})
 )
 
 //nolint:gochecknoglobals // map that is used as a constant static map.
