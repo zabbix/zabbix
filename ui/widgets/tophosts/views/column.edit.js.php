@@ -339,6 +339,13 @@ window.tophosts_column_edit_form = new class {
 			}
 		}
 
+		const aggregate_function_warning = this.#form.querySelector('.js-aggregate-function-warning');
+		if (aggregate_function_warning) {
+			const warning_show = aggregation_function_select.value !== <?= AGGREGATE_NONE ?> && display_sparkline;
+
+			aggregate_function_warning.style.display = warning_show ? '' : 'none';
+		}
+
 		// Time period.
 		const use_aggregation = aggregation_function_select.value != <?= AGGREGATE_NONE ?>;
 

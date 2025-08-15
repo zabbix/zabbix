@@ -293,7 +293,17 @@ class WidgetView extends CControllerDashboardWidgetView {
 			$options['evaltype'] = $column['item_tags_evaltype'];
 		}
 
-		return CArrayHelper::renameObjectsKeys(API::Item()->get($options), ['name_resolved' => 'name']);
+		$items = API::Item()->get($options);
+
+		if ($column['aggregate_grouping'] === TOP_ITEMS_AGGREGATE_COMBINED &&
+				$column['combined_aggregate_function'] !== AGGREGATE_NONE) {
+			$itemid = array_key_first($items);
+
+			$items = [$itemid => $items[$itemid]];
+			$items[$itemid]['name_resolved'] = $column['combined_column_name'];
+		}
+
+		return CArrayHelper::renameObjectsKeys($items, ['name_resolved' => 'name']);
 	}
 
 	private static function getItemValues(array $items, array $column): array {
@@ -316,7 +326,18 @@ class WidgetView extends CControllerDashboardWidgetView {
 				$column['time_period']['to_ts']
 			);
 
-			$result += array_column($values, 'value', 'itemid');
+			if ($values && $column['aggregate_grouping'] === TOP_ITEMS_AGGREGATE_COMBINED &&
+					$column['combined_aggregate_function'] !== AGGREGATE_NONE) {
+				$itemid = array_key_first($values);
+				$values = array_column($values, 'value');
+
+				$result += [
+					$itemid => CItemHelper::getAggregatedValue($values, $column['combined_aggregate_function'])
+				];
+			}
+			else {
+				$result += array_column($values, 'value', 'itemid');
+			}
 		}
 		else {
 			$items_by_source = ['history' => [], 'trends' => []];

@@ -55,7 +55,7 @@ window.topitems_column_edit_form = new class {
 
 		this.#form
 			.querySelectorAll(
-				'[name="display_value_as"], [name="aggregate_function"], [name="display"], [name="history"]'
+				'[name="display_value_as"], [name="aggregate_function"], [name="display"], [name="history"], [name="aggregate_grouping"]'
 			)
 			.forEach(element => {
 				element.addEventListener('change', () => this.#updateForm());
@@ -139,8 +139,10 @@ window.topitems_column_edit_form = new class {
 	 * Updates widget column configuration form field visibility, enable/disable state and available options.
 	 */
 	#updateForm() {
-		const display_value_as = this.#form.querySelector('[name=display_value_as]:checked').value;
-		const display = this.#form.querySelector('[name=display]:checked').value;
+		const display_value_as = parseInt(this.#form.querySelector('[name="display_value_as"]:checked').value);
+		const display = parseInt(this.#form.querySelector('[name="display"]:checked').value);
+		const aggregate_grouping = parseInt(this.#form.querySelector('[name="aggregate_grouping"]:checked').value);
+		const item_aggregate_function = parseInt(this.#form.querySelector('[name="aggregate_function"]').value);
 
 		// Display.
 		const display_show = display_value_as == <?= CWidgetFieldColumnsList::DISPLAY_VALUE_AS_NUMERIC ?>;
@@ -236,6 +238,40 @@ window.topitems_column_edit_form = new class {
 			for (const input of element.querySelectorAll('input')) {
 				input.disabled = !history_show;
 			}
+		}
+
+		// Combined fields.
+		const display_sparkline = display === <?= CWidgetFieldColumnsList::DISPLAY_SPARKLINE ?>;
+		const aggregate_grouping_show = (item_aggregate_function === <?= AGGREGATE_COUNT ?> ||
+			(display_value_as === <?= CWidgetFieldColumnsList::DISPLAY_VALUE_AS_NUMERIC ?> &&
+			item_aggregate_function !== <?= AGGREGATE_NONE ?>)) &&
+			!display_sparkline;
+
+		for (const element of this.#form.querySelectorAll('.js-aggregate-grouping-row')) {
+			element.style.display = aggregate_grouping_show ? '' : 'none';
+
+			for (const input of element.querySelectorAll('input')) {
+				input.disabled = !aggregate_grouping_show;
+			}
+		}
+
+		const combined_fields_show = aggregate_grouping_show &&
+			aggregate_grouping === <?= TOP_ITEMS_AGGREGATE_COMBINED ?> &&
+			!display_sparkline;
+
+		for (const element of this.#form.querySelectorAll('.js-combined-row')) {
+			element.style.display = combined_fields_show ? '' : 'none';
+
+			for (const input of element.querySelectorAll('input')) {
+				input.disabled = !combined_fields_show;
+			}
+		}
+
+		const item_aggregate_function_warning = this.#form.querySelector('.js-item-aggregate-function-warning');
+		if (item_aggregate_function_warning) {
+			const warning_show = item_aggregate_function !== <?= AGGREGATE_NONE ?> && display_sparkline;
+
+			item_aggregate_function_warning.style.display = warning_show ? '' : 'none';
 		}
 	}
 
