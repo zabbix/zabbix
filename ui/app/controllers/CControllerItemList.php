@@ -43,7 +43,6 @@ class CControllerItemList extends CControllerItem {
 			'filter_with_triggers'		=> 'in -1,0,1',
 			'filter_inherited'			=> 'in -1,0,1',
 			'filter_discovered'			=> 'in '.implode(',', [-1, ZBX_FLAG_DISCOVERY_CREATED, ZBX_FLAG_DISCOVERY_NORMAL]),
-			'subfilter_set'				=> 'in 1',
 			'subfilter_types'			=> 'array',
 			'subfilter_value_types'		=> 'array',
 			'subfilter_status'			=> 'array',
@@ -85,7 +84,7 @@ class CControllerItemList extends CControllerItem {
 	}
 
 	public function doAction() {
-		if ($this->hasInput('filter_set') || $this->hasInput('subfilter_set')) {
+		if ($this->hasInput('filter_set')) {
 			$this->updateProfiles();
 		}
 		elseif ($this->hasInput('filter_rst')) {
@@ -778,7 +777,7 @@ class CControllerItemList extends CControllerItem {
 	 */
 	protected function getFilter(): array {
 		$context = $this->getInput('context');
-		$filter = $this->getProfiles() + [
+		$filter = $this->getInputFilters(true) + [
 			'ms_hostgroups' => [],
 			'ms_hosts' => [],
 			'ms_valuemaps' => []
@@ -823,8 +822,13 @@ class CControllerItemList extends CControllerItem {
 		return $filter;
 	}
 
+	private function getContextPrefix(): string
+	{
+		return $this->getInput('context') === 'host' ? 'web.hosts.items.list.' : 'web.templates.items.list.';
+	}
+
 	protected function getProfiles(): array {
-		$prefix = $this->getInput('context') === 'host' ? 'web.hosts.items.list.' : 'web.templates.items.list.';
+		$prefix = $this->getContextPrefix();
 		$filter = [
 			'filter_evaltype'		=> CProfile::get($prefix.'filter.evaltype', TAG_EVAL_TYPE_AND_OR),
 			'filter_groupids'		=> CProfile::getArray($prefix.'filter_groupids', []),
@@ -867,44 +871,90 @@ class CControllerItemList extends CControllerItem {
 		return $filter;
 	}
 
-	protected function updateProfiles() {
-		$filter_tags = ['tags' => [], 'values' => [], 'operators' => []];
+	/**
+	 * @param bool $empty_use_profile	set true to load filters from profile if there are none set
+	 *
+	 * @return array
+	 */
+	private function getInputFilters(bool $empty_use_profile = false) : array {
+		$input_filters = ['filter_tags' => [],  'tags' => [], 'values' => [], 'operators' => []];
+
 		foreach ($this->getInput('filter_tags', []) as $tag) {
 			if ($tag['tag'] === '' && $tag['value'] === '') {
 				continue;
 			}
 
-			$filter_tags['tags'][] = $tag['tag'];
-			$filter_tags['values'][] = $tag['value'];
-			$filter_tags['operators'][] = $tag['operator'];
+			$input_filters['tags'][] = $tag['tag'];
+			$input_filters['values'][] = $tag['value'];
+			$input_filters['operators'][] = $tag['operator'];
+			$input_filters['filter_tags'][] = $tag;
 		}
 
-		$prefix = $this->getInput('context') === 'host' ? 'web.hosts.items.list.' : 'web.templates.items.list.';
-		CProfile::updateArray($prefix.'filter_groupids', $this->getInput('filter_groupids', []), PROFILE_TYPE_ID);
-		CProfile::updateArray($prefix.'filter_hostids', $this->getInput('filter_hostids', []), PROFILE_TYPE_ID);
-		CProfile::updateArray($prefix.'filter_valuemapids', $this->getInput('filter_valuemapids', []), PROFILE_TYPE_ID);
-		CProfile::update($prefix.'filter_name', $this->getInput('filter_name', ''), PROFILE_TYPE_STR);
-		CProfile::update($prefix.'filter_type', $this->getInput('filter_type', -1), PROFILE_TYPE_INT);
-		CProfile::update($prefix.'filter_key', $this->getInput('filter_key', ''), PROFILE_TYPE_STR);
-		CProfile::update($prefix.'filter_snmp_oid', $this->getInput('filter_snmp_oid', ''), PROFILE_TYPE_STR);
-		CProfile::update($prefix.'filter_value_type', $this->getInput('filter_value_type', -1), PROFILE_TYPE_INT);
-		CProfile::update($prefix.'filter_delay', $this->getInput('filter_delay', ''), PROFILE_TYPE_STR);
-		CProfile::update($prefix.'filter_history', $this->getInput('filter_history', ''), PROFILE_TYPE_STR);
-		CProfile::update($prefix.'filter_trends', $this->getInput('filter_trends', ''), PROFILE_TYPE_STR);
-		CProfile::update($prefix.'filter_status', $this->getInput('filter_status', -1), PROFILE_TYPE_INT);
-		CProfile::update($prefix.'filter_state', $this->getInput('filter_state', -1), PROFILE_TYPE_INT);
-		CProfile::update($prefix.'filter_inherited', $this->getInput('filter_inherited', -1), PROFILE_TYPE_INT);
-		CProfile::update($prefix.'filter_with_triggers', $this->getInput('filter_with_triggers', -1), PROFILE_TYPE_INT);
-		CProfile::update($prefix.'filter_discovered', $this->getInput('filter_discovered', -1), PROFILE_TYPE_INT);
-		CProfile::update($prefix.'filter.evaltype', $this->getInput('filter_evaltype', TAG_EVAL_TYPE_AND_OR), PROFILE_TYPE_INT);
-		CProfile::updateArray($prefix.'filter.tags.tag', $filter_tags['tags'], PROFILE_TYPE_STR);
-		CProfile::updateArray($prefix.'filter.tags.value', $filter_tags['values'], PROFILE_TYPE_STR);
-		CProfile::updateArray($prefix.'filter.tags.operator', $filter_tags['operators'], PROFILE_TYPE_INT);
+		$input_filters += [
+			'filter_groupids' => $this->getInput('filter_groupids', []),
+			'filter_hostids' => $this->getInput('filter_hostids', []),
+			'filter_valuemapids' => $this->getInput('filter_valuemapids', []),
+			'filter_name' => $this->getInput('filter_name', ''),
+			'filter_type' => $this->getInput('filter_type', -1),
+			'filter_key' => $this->getInput('filter_key', ''),
+			'filter_snmp_oid' => $this->getInput('filter_snmp_oid', ''),
+			'filter_value_type' => $this->getInput('filter_value_type', -1),
+			'filter_delay' => $this->getInput('filter_delay', ''),
+			'filter_history' => $this->getInput('filter_history', ''),
+			'filter_trends' => $this->getInput('filter_trends', ''),
+			'filter_status' => $this->getInput('filter_status', -1),
+			'filter_state' => $this->getInput('filter_state', -1),
+			'filter_inherited' => $this->getInput('filter_inherited', -1),
+			'filter_with_triggers' => $this->getInput('filter_with_triggers', -1),
+			'filter_discovered' => $this->getInput('filter_discovered', -1),
+			'filter_evaltype' => $this->getInput('filter_evaltype', TAG_EVAL_TYPE_AND_OR)
+		];
+
+		if ($empty_use_profile && count(array_intersect_key($input_filters, $this->input)) === 0) {
+			$input_filters = $this->getProfiles();
+		}
+		else {
+			$prefix = $this->getContextPrefix();
+			$input_filters += [
+				'filter_profile'	=> $prefix.'filter',
+				'filter_tab'		=> CProfile::get($prefix.'filter.active', 1),
+				'sort'				=> $this->getInput('sort', CProfile::get($prefix.'sort', 'name')),
+				'sortorder'			=> $this->getInput('sortorder', CProfile::get($prefix.'sortorder', ZBX_SORT_UP))
+			];
+		}
+
+		return $input_filters;
+	}
+
+	protected function updateProfiles() {
+		$input_filters = $this->getInputFilters();
+
+		$prefix = $this->getContextPrefix();
+		CProfile::updateArray($prefix.'filter_groupids',$input_filters['filter_groupids'], PROFILE_TYPE_ID);
+		CProfile::updateArray($prefix.'filter_hostids', $input_filters['filter_hostids'], PROFILE_TYPE_ID);
+		CProfile::updateArray($prefix.'filter_valuemapids', $input_filters['filter_valuemapids'], PROFILE_TYPE_ID);
+		CProfile::update($prefix.'filter_name', $input_filters['filter_name'], PROFILE_TYPE_STR);
+		CProfile::update($prefix.'filter_type', $input_filters['filter_type'], PROFILE_TYPE_INT);
+		CProfile::update($prefix.'filter_key', $input_filters['filter_key'], PROFILE_TYPE_STR);
+		CProfile::update($prefix.'filter_snmp_oid',$input_filters['filter_snmp_oid'], PROFILE_TYPE_STR);
+		CProfile::update($prefix.'filter_value_type', $input_filters['filter_value_type'], PROFILE_TYPE_INT);
+		CProfile::update($prefix.'filter_delay', $input_filters['filter_delay'], PROFILE_TYPE_STR);
+		CProfile::update($prefix.'filter_history', $input_filters['filter_history'], PROFILE_TYPE_STR);
+		CProfile::update($prefix.'filter_trends',$input_filters['filter_trends'], PROFILE_TYPE_STR);
+		CProfile::update($prefix.'filter_status', $input_filters['filter_status'], PROFILE_TYPE_INT);
+		CProfile::update($prefix.'filter_state', $input_filters['filter_state'], PROFILE_TYPE_INT);
+		CProfile::update($prefix.'filter_inherited', $input_filters['filter_inherited'], PROFILE_TYPE_INT);
+		CProfile::update($prefix.'filter_with_triggers', $input_filters['filter_with_triggers'], PROFILE_TYPE_INT);
+		CProfile::update($prefix.'filter_discovered', $input_filters['filter_discovered'], PROFILE_TYPE_INT);
+		CProfile::update($prefix.'filter.evaltype', $input_filters['filter_evaltype'], PROFILE_TYPE_INT);
+		CProfile::updateArray($prefix.'filter.tags.tag', $input_filters['tags'], PROFILE_TYPE_STR);
+		CProfile::updateArray($prefix.'filter.tags.value', $input_filters['values'], PROFILE_TYPE_STR);
+		CProfile::updateArray($prefix.'filter.tags.operator', $input_filters['operators'], PROFILE_TYPE_INT);
 		$this->updateProfileSort();
 	}
 
 	protected function updateProfileSort() {
-		$prefix = $this->getInput('context') === 'host' ? 'web.hosts.items.list.' : 'web.templates.items.list.';
+		$prefix = $this->getContextPrefix();
 
 		if ($this->hasInput('sort')) {
 			CProfile::update($prefix.'sort', $this->getInput('sort'), PROFILE_TYPE_STR);
@@ -916,7 +966,7 @@ class CControllerItemList extends CControllerItem {
 	}
 
 	protected function deleteProfiles() {
-		$prefix = $this->getInput('context') === 'host' ? 'web.hosts.items.list.' : 'web.templates.items.list.';
+		$prefix = $this->getContextPrefix();
 
 		if (count(CProfile::getArray($prefix.'filter_hostids', [])) != 1) {
 			CProfile::deleteIdx($prefix.'filter_hostids');

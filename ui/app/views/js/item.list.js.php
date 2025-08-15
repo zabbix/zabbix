@@ -61,21 +61,22 @@
 				const target = e.target;
 
 				if (target.matches('.link-action') && target.closest('.subfilter') !== null) {
-					create_var(this.filter_form, 'subfilter_set', 1);
-
 					const subfilter = target.closest('.subfilter');
 
+					const search_params = new URLSearchParams(window.location.search);
+					const url = new URL(window.location.href);
+
 					if (subfilter.matches('.subfilter-enabled')) {
-						subfilter.querySelector('input[type="hidden"]').remove();
-						this.filter_form.submit();
+						search_params.delete(target.getAttribute('data-name'), target.getAttribute('data-value'));
 					}
 					else {
-						const name = target.getAttribute('data-name');
-						const value = target.getAttribute('data-value');
-
-						subfilter.classList.add('subfilter-enabled');
-						submitFormWithParam('zbx_filter', name, value);
+						search_params.append(target.getAttribute('data-name'), target.getAttribute('data-value'));
 					}
+
+					search_params.delete('filter_set');
+					search_params.delete('filter_rst');
+
+					window.location.href = url.origin + url.pathname + '?' + search_params.toString();
 				}
 				else if (target.matches('[name="filter_state"]')) {
 					const disabled = e.target.getAttribute('value') != -1;
