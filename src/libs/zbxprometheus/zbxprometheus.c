@@ -1945,7 +1945,7 @@ int	zbx_prometheus_pattern_ex(zbx_prometheus_t *prom, const char *filter_data, c
 	zbx_vector_prometheus_row_create(&rows);
 
 	if (SUCCEED != prometheus_validate_request(request, output, error))
-		return FAIL;
+		goto cleanup;
 
 	if (SUCCEED != prometheus_get_indexed_rows_by_label(prom, &filter, &prows) || NULL == prows)
 		prows = &prom->rows;
@@ -1958,6 +1958,7 @@ int	zbx_prometheus_pattern_ex(zbx_prometheus_t *prom, const char *filter_data, c
 		zbx_free(errmsg);
 	}
 
+cleanup:
 	prometheus_filter_clear(&filter);
 	zbx_vector_prometheus_row_destroy(&rows);
 out:
