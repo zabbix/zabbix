@@ -5,49 +5,69 @@ Best for use in conjunction with the official
 [Ceph template.](https://git.zabbix.com/projects/ZBX/repos/zabbix/browse/templates/app/ceph_agent2)
 You can extend it or create your template for your specific needs.
 
+This plugin operates in two modes:
+*   **native**: This mode uses the `go-ceph` library to communicate directly with the Ceph cluster using
+the native Ceph API (`msgr2` protocol). This is the recommended mode for modern Ceph installations 
+but is **only supported on Linux**.
+*   **restful (deprecated)**: This mode uses the Ceph RESTful API for communication. It is the 
+default mode for backward compatibility but will not work with Ceph version 20 
+(Tentacle) or newer due to the removal of the `mgr/restful` module.
+
+It is best used in conjunction with the official [Ceph template](https://git.zabbix.com/projects/ZBX/repos/zabbix/browse/templates/app/ceph_agent2). 
+You can extend it or create your own template for specific needs.
+
 ## Supported versions
-* Ceph, version 14+
+*   **native mode**: Ceph v16+
+*   **restful mode**: Ceph v14 - v19
 
 ## Installation
 
-* Configure the Ceph RESTful Module according to [documentation.](https://docs.ceph.com/en/latest/mgr/restful/)
-* Make sure a RESTful API endpoint is available for connection.
-* Additionally, the `mgr` instance providing the `restful` module requires
-  extended capabilities for `mon` instances.
-  * Run
+### For native mode
+*   This mode communicates directly with the Ceph cluster and does not require the `mgr/restful` module.
+*   Ensure that the Zabbix agent has access to the necessary Ceph configuration files (e.g., `ceph.conf`) and keyring for authentication.
+
+### For restful mode
+*   Configure the Ceph RESTful Module according to its [documentation](https://docs.ceph.com/en/latest/mgr/restful/).
+*   Make sure a RESTful API endpoint is available for connection.
+*   Additionally, the `mgr` instance providing the `restful` module requires extended capabilities for `mon` instances.
+    *   Run
     ```sh
     ceph auth caps $YOUR_MGR_INSTANCE_NAME mon 'allow *' ...other caps...
     # Omitting other caps, run `ceph auth ls` to find out what they are on
     # your setup.
 
     # Running `ceph auth caps $YOUR_MGR_INSTANCE_NAME mon 'allow *'` with just
-    # the `mon` capability, will remove all other capabilities from the instance
+    # the `mon` capability will remove all other capabilities from the instance
     # so make sure to include them all.
     ```
-  * Restart the `mgr` instance.
-  * Why? - The plugin uses the `restful` module from the `mgr` instance to run
-    commands that the `mgr` component further executes on other Ceph components
-    like `mon` and `osd`. The default capabilities are not enough to run
-    `pg dumg` command, hence the capability boost.
+    *   Restart the `mgr` instance.
+    *   **Why?** The plugin uses the `restful` module to run commands that the `mgr` component executes on other Ceph components like `mon` and `osd`. The default capabilities are not sufficient to run the `pg dump` command, hence the capability boost.
+
 
 ## Configuration
 The Zabbix agent 2 configuration file is used to configure plugins.
 
-**Plugins.Ceph.InsecureSkipVerify** — InsecureSkipVerify controls whether an http client verifies the
-server's certificate chain and host name. If InsecureSkipVerify is true, TLS accepts any certificate presented by
-the server and any host name in that certificate. In this mode, TLS is susceptible to man-in-the-middle attacks.
-**This should be used only for testing.**
-*Default value:* false
-*Limits:* false | true
+**Plugins.Ceph.InsecureSkipVerify** — In `restful` mode, controls whether the HTTP client verifies the
+server's certificate chain and host name. If set to `true`, TLS accepts any certificate, making the connection 
+vulnerable to man-in-the-middle attacks. **This should be used only for testing.**
+This option is **ignored** in `native` mode, as connection security is handled by the `msgr2` protocol.
+
+*Default value:* `false`
+
+*Limits:* `false` | `true`
 
 **Plugins.Ceph.Timeout** — The maximum time in seconds for waiting when a request has to be done. The timeout includes
 connection time, any redirects, and reading the response body.
+
 *Default value:* equals the global Timeout configuration parameter.
-*Limits:* 1-30
+
+*Limits:* `1-30`
 
 **Plugins.Ceph.KeepAlive** — Sets a time for waiting before unused connections will be closed.
-*Default value:* 300 sec.
-*Limits:* 60-900
+
+*Default value:* `300` sec.
+
+*Limits:* `60-900`
 
 ### Configuring connection
 A connection can be configured using either keys' parameters or named sessions.
@@ -75,16 +95,21 @@ ConnString will be treated as a URI if no session with the given name is found.
 If you use ConnString as a session name, just skip the rest of the connection parameters.
 
 #### Using named sessions
-Named sessions allow you to define specific parameters for each Ceph instance. Currently, there are only three supported
-parameters: Uri, User and ApiKey. It's a bit more secure way to store credentials compared to item keys or macros.
+Named sessions provide a more secure way to store connection credentials by defining specific parameters for each Ceph instance 
+within the agent configuration file.
 
-E.g: suppose you have two Ceph clusters: "Prod" and "Test".
-You should add the following options to the agent configuration file:
+For example, suppose you have two Ceph clusters: "Prod" (running in `native` mode) and "Test" (running in legacy `restful` mode). 
+You would add the following to the agent configuration file:
 
-    Plugins.Ceph.Sessions.Prod.Uri=https://192.168.1.1:8003
+    # Prod cluster uses the new native mode.
+    # The Uri should point to Ceph monitors, e.g., '192.168.1.1:3300'.
+    Plugins.Ceph.Sessions.Prod.Mode=native	
+    Plugins.Ceph.Sessions.Prod.Uri=192.168.1.1:3300
     Plugins.Ceph.Sessions.Prod.User=<UserForProd>
     Plugins.Ceph.Sessions.Prod.ApiKey=<ApiKeyForProd>
 
+    # Test cluster uses the deprecated restful mode.
+    Plugins.Ceph.Sessions.Test.Mode=restful
     Plugins.Ceph.Sessions.Test.Uri=https://192.168.0.1:8003
     Plugins.Ceph.Sessions.Test.User=<UserForTest>
     Plugins.Ceph.Sessions.Test.ApiKey=<ApiKeyForTest>
@@ -342,6 +367,6 @@ Uses data provided by "status" command.
 The plugin uses Zabbix agent's logs. You can increase debugging level of Zabbix Agent if you need more details about
 what is happening.
 
-If you get the error "x509: cannot validate certificate for x.x.x.x because it doesn't contain any IP SANs",
-probably you need to set the InsecureSkipVerify option to "true" or use a certificate that is signed by the
-organization’s certificate authority.
+If you encounter the error `"x509: cannot validate certificate for x.x.x.x because it doesn't contain any IP SANs"` 
+in `restful` mode, you may need to set the `InsecureSkipVerify` option to `true` or use a certificate signed by 
+a valid certificate authority. This error does not occur in `native` mode.
