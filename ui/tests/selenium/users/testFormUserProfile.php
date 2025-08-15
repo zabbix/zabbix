@@ -164,8 +164,8 @@ class testFormUserProfile extends CLegacyWebTest {
 						'"User settings"]')->exists()
 				);
 				self::$old_password = $data['password1'];
-				// TODO: Following test ThemeChange fails on Jenkins with error access denied for Admin to dahsboard page. Wait may help
-				CDashboardElement::find()->waitUntilVisible()->waitUntilReady();
+				// TODO: Following test fails on Jenkins with error access denied for Admin to dahsboard page. Logout may help
+				$this->page->logout();
 				break;
 			case TEST_BAD:
 				$this->zbxTestWaitUntilMessageTextPresent('msg-bad' , $data['error_msg']);

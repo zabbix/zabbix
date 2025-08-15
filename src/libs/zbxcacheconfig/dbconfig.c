@@ -10049,7 +10049,7 @@ void	zbx_dc_config_get_preprocessable_items(zbx_hashset_t *items, zbx_dc_um_shar
 		return;
 
 	zbx_vector_dc_item_ptr_create(&items_sync);
-	zbx_vector_dc_item_ptr_reserve(&items_sync, 100);
+	zbx_vector_dc_item_ptr_reserve(&items_sync, MAX(items->num_data, 100));
 
 	RDLOCK_CACHE;
 
@@ -17226,4 +17226,16 @@ int	zbx_dc_sync_lock(void)
 	UNLOCK_CACHE;
 
 	return ret;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: get the number of items in configuration cache                    *
+ *                                                                            *
+ * Return value: number of items                                              *
+ *                                                                            *
+ ******************************************************************************/
+zbx_uint64_t	zbx_dc_get_cache_size(void)
+{
+	return config_mem->total_size;
 }
