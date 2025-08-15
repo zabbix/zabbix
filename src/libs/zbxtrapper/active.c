@@ -95,7 +95,7 @@ static void	db_register_host(const char *host, const char *ip, unsigned short po
 	now = time(NULL);
 
 	/* update before changing database in case Zabbix proxy also changed database and then deleted from cache */
-	zbx_dc_config_update_autoreg_host(host, p_ip, p_dns, port, host_metadata, flag, now, connection_type);
+	zbx_dc_config_update_autoreg_host(host, p_ip, p_dns, port, host_metadata, flag, connection_type, now);
 
 	autoreg_update_host_func_cb(NULL, host, p_ip, p_dns, port, connection_type, host_metadata, (unsigned short)flag,
 			now, events_cbs);
@@ -170,8 +170,8 @@ out:
  *                FAIL - error occurred or host not found                           *
  *                                                                                  *
  * Comments: NB! adds host to the database if it does not exist or if it            *
- *           exists but metadata, interface, interface type or port has             *
- *           changed                                                                *
+ *           exists but metadata, interface, interface type, connection type        *
+ *           or port has changed                                                    *
  *                                                                                  *
  ************************************************************************************/
 static int	get_hostid_by_host_or_autoregister(const zbx_socket_t *sock, const char *host, const char *ip,
