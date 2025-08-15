@@ -200,6 +200,11 @@ static void     preprocessor_serialize_value(zbx_uint64_t itemid, unsigned char 
 			THIS_SHOULD_NEVER_HAPPEN;
 			exit(EXIT_FAILURE);
 		}
+		else if (ZBX_ISSET_JSON(result))
+		{
+			THIS_SHOULD_NEVER_HAPPEN;
+			exit(EXIT_FAILURE);
+		}
 	}
 
 	zbx_serialize_prepare_value(data_len, ts->sec);
@@ -1137,7 +1142,26 @@ void	zbx_preprocess_item_value(zbx_uint64_t itemid, unsigned char item_value_typ
 	}
 	else
 	{
-		zbx_dc_add_history(itemid, item_value_type, item_flags, result, ts, state, error);
+
+		if (ITEM_VALUE_TYPE_JSON == item_value_type && ITEM_STATE_NOTSUPPORTED != state)
+		{
+			char	*dyn_error = NULL;
+
+			if (ZBX_HISTORY_JSON_VALUE_LEN < strlen(result->text))
+			{
+				state = ITEM_STATE_NOTSUPPORTED;
+				dyn_error = zbx_strdup(NULL, "JSON limit reached");
+			}
+			else if (0 == zbx_json_validate_ext(result->text, &dyn_error))
+			{
+				state = ITEM_STATE_NOTSUPPORTED;
+			}
+
+			zbx_dc_add_history(itemid, item_value_type, item_flags, result, ts, state, dyn_error);
+			zbx_free(dyn_error);
+		}
+		else
+			zbx_dc_add_history(itemid, item_value_type, item_flags, result, ts, state, error);
 	}
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);

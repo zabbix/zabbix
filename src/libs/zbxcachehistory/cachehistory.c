@@ -2475,24 +2475,6 @@ void	zbx_dc_add_history(zbx_uint64_t itemid, unsigned char item_value_type, unsi
 		}
 		else if (ZBX_ISSET_JSON(result))
 		{
-			if (ZBX_HISTORY_JSON_VALUE_LEN < strlen(result->tjson))
-			{
-				dc_local_add_history_notsupported(itemid, ts, "JSON limit reached. ",
-						result->lastlogsize, result->mtime, value_flags);
-				return;
-			}
-
-			char	*err = NULL;
-
-			if (0 == zbx_json_validate_ext(result->tjson, &err))
-			{
-				dc_local_add_history_notsupported(itemid, ts, err, result->lastlogsize, result->mtime,
-						value_flags);
-				zbx_free(err);
-
-				return;
-			}
-
 			dc_local_add_history_json(itemid, item_value_type, ts, result->tjson, result->lastlogsize,
 					result->mtime, value_flags);
 		}
