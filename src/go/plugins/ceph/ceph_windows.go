@@ -6,6 +6,7 @@ import (
 	"time"
 
 	"golang.zabbix.com/agent2/plugins/ceph/handlers"
+	"golang.zabbix.com/agent2/plugins/ceph/requests"
 	"golang.zabbix.com/sdk/errs"
 	"golang.zabbix.com/sdk/plugin"
 	"golang.zabbix.com/sdk/uri"
@@ -39,6 +40,6 @@ func (p *Plugin) Stop() {
 }
 
 // handleNativeMode for Windows returns an error.
-func (*Plugin) handleNativeMode(_ *uri.URI, _ *handlers.MetricMeta) (<-chan *response, error) {
+func (*Plugin) handleNativeMode(_ *uri.URI, _ *handlers.MetricMeta) (<-chan *requests.Response, error) {
 	return nil, errs.New("native mode is only supported on linux")
 }
