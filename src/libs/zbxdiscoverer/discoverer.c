@@ -1852,7 +1852,9 @@ ZBX_THREAD_ENTRY(zbx_discoverer_thread, args)
 
 	zbx_setproctitle("%s #%d [terminating]", get_process_type_string(info->process_type), info->process_num);
 
-	zbx_rtc_unsubscribe_service(discoverer_args_in->config_timeout, ZBX_IPC_SERVICE_DISCOVERER);
+	/* on normal exit the shutdown message already has been processed and no more messages will be sent */
+	if (SUCCEED != ZBX_EXIT_STATUS())
+		zbx_rtc_unsubscribe_service(discoverer_args_in->config_timeout, ZBX_IPC_SERVICE_DISCOVERER);
 
 	zbx_vector_uint64_pair_destroy(&revisions);
 	zbx_vector_uint64_destroy(&del_druleids);
