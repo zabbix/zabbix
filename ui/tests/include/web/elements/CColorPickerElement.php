@@ -44,29 +44,35 @@ class CColorPickerElement extends CElement {
 		$this->query('xpath:./button['.CXPathHelper::fromClass('color-picker-preview').']')->one()->click();
 		$element = (new CElementQuery('id:color_picker'))->waitUntilReady()->asColorPicker()->one();
 
+		$name = (is_int($color) && $color >= 0 && $color <= 11) ? 'Palette' : 'Solid color';
 		if ($color === null) {
 			$element->query('button:Use default')->one()->click();
 		}
 		else {
-			if ($element->query('xpath:.//ul['.CXPathHelper::fromClass('color-picker-tabs').']')
-						->waitUntilPresent()->one()->isDisplayed()) {
-				$tab_selector = ('xpath:.//label[text()='.CXPathHelper::escapeQuotes('Solid color').']');
+			if ($element->query('xpath:.//li['.CXPathHelper::fromClass('color-picker-tab-selected').']/label')
+					->waitUntilPresent()->one()->getText() !== $name) {
+				$tab_selector = ('xpath:.//label[text()='.CXPathHelper::escapeQuotes($name).']');
 				$element->query($tab_selector)->waitUntilPresent()->one()->click();
 				$element->query($tab_selector.'/..')->waitUntilClassesPresent('color-picker-tab-selected');
 			}
 
-			$element->query('class:color-picker-input')->waitUntilVisible()->one()->overwrite($color);
+			if ($name === 'Palette') {
+				$element->query('xpath:.//input[@id="color-picker-palette-input-'.$color.'"]')->waitUntilReady()->one()->click();
+			}
+			else {
+				$element->query('class:color-picker-input')->waitUntilVisible()->one()->overwrite($color);
+			}
 		}
 
-		$apply_button = $element->query('button:Apply');
-
-		if (preg_match('/^[a-fA-F0-9]+$/', $color) === 1 && strlen($color) === 6) {
-			CElementQuery::getPage()->pressKey(WebDriverKeys::ENTER);
-			$element->waitUntilNotVisible();
-		}
-		else {
-			if (!$apply_button->one()->isAttributePresent('disabled')) {
-				throw new \Exception('Passes value is not a valid hexadecimal value, but Apply button is not disabled.');
+		if ($name !== 'Palette') {
+			if (preg_match('/^[a-fA-F0-9]+$/', $color) === 1 && strlen($color) === 6) {
+				CElementQuery::getPage()->pressKey(WebDriverKeys::ENTER);
+				$element->waitUntilNotVisible();
+			}
+			else {
+				if (!$element->query('button:Apply')->one()->isAttributePresent('disabled')) {
+					throw new \Exception('Passes value is not a valid hexadecimal value, but Apply button is not disabled.');
+				}
 			}
 		}
 
