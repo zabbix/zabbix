@@ -91,6 +91,12 @@ class CPage {
 
 		if (!defined('PHPUNIT_BROWSER_NAME') || PHPUNIT_BROWSER_NAME === 'chrome') {
 			$options = new ChromeOptions();
+
+			$prefs = [
+				'profile.password_manager_leak_detection' => false
+			];
+			$options->setExperimentalOption('prefs', $prefs);
+
 			$options->addArguments([
 				'--no-sandbox',
 				'--enable-font-antialiasing=false',
