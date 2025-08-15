@@ -1,1 +1,1 @@
-..F....... [ZBX-26044] added item filtering by active status for honeycomb widget (rgontarski)
+..F....... [ZBX-26044] fixed Honeycomb widget to not display disabled items (rgontarski)
