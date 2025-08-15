@@ -219,7 +219,7 @@ void	zbx_process_command_results(struct zbx_json_parse *jp)
 	int			values_num = 0, parsed_num = 0, results_num = 0;
 	const char		*pnext = NULL;
 	struct zbx_json_parse	jp_commands, jp_command;
-	char			*str = NULL, *value = NULL, *error = NULL;
+	char			*str = NULL;
 	size_t			str_alloc = 0;
 	zbx_uint64_t		id;
 
@@ -230,15 +230,15 @@ void	zbx_process_command_results(struct zbx_json_parse *jp)
 
 	while (NULL != (pnext = zbx_json_next(&jp_commands, pnext)))
 	{
+		char	*value = NULL, *error = NULL;
+
 		if (FAIL == zbx_json_brackets_open(pnext, &jp_command))
 		{
 			zabbix_log(LOG_LEVEL_WARNING, "%s", zbx_json_strerror());
-			goto out;
+			break;
 		}
 
 		parsed_num++;
-		str_alloc = 0;
-		zbx_free(str);
 
 		if (SUCCEED != zbx_json_value_by_name_dyn(&jp_command, ZBX_PROTO_TAG_ID, &str, &str_alloc, NULL))
 			continue;
@@ -246,15 +246,18 @@ void	zbx_process_command_results(struct zbx_json_parse *jp)
 		if (SUCCEED != zbx_is_uint64(str, &id))
 		{
 			zabbix_log(LOG_LEVEL_WARNING, "Wrong command id '%s'", str);
-			goto out;
+			break;
 		}
 
-		str_alloc = 0;
-		zbx_free(value);
-		zbx_free(error);
-
-		if (SUCCEED != zbx_json_value_by_name_dyn(&jp_command, ZBX_PROTO_TAG_VALUE, &value, &str_alloc, NULL))
-			zbx_json_value_by_name_dyn(&jp_command, ZBX_PROTO_TAG_ERROR, &error, &str_alloc, NULL);
+		if (SUCCEED == zbx_json_value_by_name_dyn(&jp_command, ZBX_PROTO_TAG_VALUE, &str, &str_alloc, NULL))
+		{
+			value = str;
+		}
+		else if (SUCCEED == zbx_json_value_by_name_dyn(&jp_command, ZBX_PROTO_TAG_ERROR, &str, &str_alloc,
+				NULL))
+		{
+			error = str;
+		}
 
 		values_num++;
 		if (SUCCEED == remote_commands_insert_result(id, value, error))
@@ -262,8 +265,7 @@ void	zbx_process_command_results(struct zbx_json_parse *jp)
 	}
 out:
 	zbx_free(str);
-	zbx_free(value);
-	zbx_free(error);
+
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s(), parsed %d values received %d results inserted %d", __func__,
 			parsed_num, values_num, results_num);
 }
