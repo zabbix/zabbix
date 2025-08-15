@@ -124,7 +124,7 @@ void	pp_task_queue_destroy(zbx_pp_queue_t *queue)
 	{
 		zbx_pp_task_t	*task;
 
-		while (SUCCEED == zbx_list_pop(&item_tasks->tasks, (void **)&task))
+		while (NULL != (task = (zbx_pp_task_t *)zbx_queue_ptr_pop(&item_tasks->tasks)))
 		{
 			if (ZBX_PP_TASK_FINISHED == task->state)
 				pp_task_free(task);
