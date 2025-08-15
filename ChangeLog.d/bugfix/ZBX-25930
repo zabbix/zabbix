@@ -1,1 +1,1 @@
-..F....... [ZBX-25930] fixed incorrect filter being applied when switching subfilters in multiple tabs in host item and host graphs views (rgontarski, gberzina)
+..F....... [ZBX-25930] fixed incorrect filter being applied when switching subfilters in multiple tabs in host item and host graphs views (gberzina, rgontarski)
