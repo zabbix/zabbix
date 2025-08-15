@@ -1,1 +1,1 @@
-..F....... [ZBX-26459] added abortion of uncompleted requests and initiation of a new one when changing the macro view (rgontarski)
+..F....... [ZBX-26459] fixed in host macros view to not display both macro types when quickly switching them (rgontarski)
