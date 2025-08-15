@@ -294,7 +294,9 @@ static int	process_services(void *handle, zbx_uint64_t druleid, zbx_db_dhost *dh
 		zbx_discovery_update_service_down_func_t discovery_update_service_down_cb,
 		zbx_discovery_find_host_func_t discovery_find_host_cb)
 {
-	int			host_status = -1;
+	int				host_status = -1, unique_index;
+	zbx_vector_uint64_t		dserviceids;
+	zbx_discoverer_dservice_t	unique_service;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
@@ -305,13 +307,7 @@ static int	process_services(void *handle, zbx_uint64_t druleid, zbx_db_dhost *dh
 		goto out;
 	}
 
-	zbx_vector_uint64_t	dserviceids;
-
 	zbx_vector_uint64_create(&dserviceids);
-
-	zbx_discoverer_dservice_t unique_service;
-	int unique_index;
-
 	unique_service.dcheckid = unique_dcheckid;
 
 	if (FAIL != (unique_index = zbx_vector_discoverer_services_ptr_search(services, &unique_service,
