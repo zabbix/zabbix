@@ -2931,13 +2931,12 @@ static void	lld_rule_export_lld_macros(const zbx_vector_lld_item_full_ptr_t *ite
  *                                                                            *
  * Purpose: process nested LLD rules                                          *
  *                                                                            *
- * Parameters: hostid          - [IN] host identifier                         *
- *             items           - [IN] vector of discovered LLD items          *
+ * Parameters: items           - [IN] vector of discovered LLD items          *
  *                                                                            *
  * Comments: Nested LLD in this scope is an LLD rule of nested item type      *
  *                                                                            *
  ******************************************************************************/
-static void	lld_rule_process_nested_rules(zbx_uint64_t hostid, const zbx_vector_lld_item_full_ptr_t *items)
+static void	lld_rule_process_nested_rules(const zbx_vector_lld_item_full_ptr_t *items)
 {
 	for (int i = 0; i < items->values_num; i++)
 	{
@@ -2952,7 +2951,7 @@ static void	lld_rule_process_nested_rules(zbx_uint64_t hostid, const zbx_vector_
 			continue;
 		}
 
-		lld_rule_process_nested_rule(hostid, item->itemid, item->lld_row);
+		lld_rule_process_nested_rule(item->itemid, item->lld_row);
 	}
 }
 
@@ -2990,7 +2989,7 @@ int	lld_rule_discover_prototypes(zbx_uint64_t hostid, const zbx_vector_lld_row_p
 			ZBX_DEFAULT_MEM_MALLOC_FUNC, ZBX_DEFAULT_MEM_REALLOC_FUNC, ZBX_DEFAULT_MEM_FREE_FUNC);
 
 	lld_rule_export_lld_macros(items);
-	lld_rule_process_nested_rules(hostid, items);
+	lld_rule_process_nested_rules(items);
 
 	/* prepare remapping of prototype ids to lld rule ids for discovered item prototypes */
 
@@ -3113,7 +3112,7 @@ out:
  * Comments: Nested LLD in this scope is an LLD rule of nested item type      *
  *                                                                            *
  ******************************************************************************/
-void	lld_rule_process_nested_rule(zbx_uint64_t hostid, zbx_uint64_t itemid, const zbx_lld_row_t *lld_row)
+void	lld_rule_process_nested_rule(zbx_uint64_t itemid, const zbx_lld_row_t *lld_row)
 {
 	char		*value = NULL;
 	size_t		value_alloc = 0, value_offset = 0;
@@ -3127,7 +3126,7 @@ void	lld_rule_process_nested_rule(zbx_uint64_t hostid, zbx_uint64_t itemid, cons
 
 	zbx_timespec(&ts);
 
-	zbx_preprocess_item_value(itemid, hostid, ITEM_VALUE_TYPE_TEXT, ZBX_FLAG_DISCOVERY_RULE,
+	zbx_preprocess_item_value(itemid, ITEM_VALUE_TYPE_TEXT, ZBX_FLAG_DISCOVERY_RULE,
 			ZBX_ITEM_REQUIRES_PREPROCESSING_YES, &result, &ts, ITEM_STATE_NORMAL, NULL);
 	zbx_preprocessor_flush();
 

@@ -778,121 +778,6 @@ static void	preprocessor_sync_configuration(zbx_pp_manager_t *manager)
 
 /******************************************************************************
  *                                                                            *
- * Purpose: frees resources allocated by preprocessor item value              *
- *                                                                            *
- * Parameters: value - [IN] value to be freed                                 *
- *                                                                            *
- ******************************************************************************/
-static void	preproc_item_value_clear(zbx_preproc_item_value_t *value)
-{
-	zbx_free(value->error);
-	zbx_free(value->ts);
-
-	if (NULL != value->result)
-	{
-		zbx_free_agent_result(value->result);
-		zbx_free(value->result);
-	}
-}
-
-/******************************************************************************
- *                                                                            *
- * Purpose: extract value, timestamp and optional data from preprocessing     *
- *          item value.                                                       *
- *                                                                            *
- * Parameters: value - [IN] preprocessing item value                          *
- *             var   - [OUT] extracted value (including error message)        *
- *             ts    - [OUT] extracted timestamp                              *
- *             opt   - [OUT] extracted optional data                          *
- *                                                                            *
- ******************************************************************************/
-static void	preproc_item_value_extract_data(zbx_preproc_item_value_t *value, zbx_variant_t *var, zbx_timespec_t *ts,
-		zbx_pp_value_opt_t *opt)
-{
-	opt->flags = ZBX_PP_VALUE_OPT_NONE;
-
-	if (NULL != value->ts)
-	{
-		*ts = *value->ts;
-	}
-	else
-	{
-		ts->sec = 0;
-		ts->ns = 0;
-	}
-
-	if (ITEM_STATE_NOTSUPPORTED == value->state)
-	{
-		if (NULL != value->error)
-		{
-			zbx_variant_set_error(var, value->error);
-			value->error = NULL;
-		}
-		else if (NULL != value->result && ZBX_ISSET_MSG(value->result))
-			zbx_variant_set_error(var, zbx_strdup(NULL, value->result->msg));
-		else
-			zbx_variant_set_error(var, zbx_strdup(NULL, "Unknown error."));
-
-		return;
-	}
-
-	if (NULL == value->result)
-	{
-		zbx_variant_set_none(var);
-		return;
-	}
-
-	if (ZBX_ISSET_LOG(value->result))
-	{
-		zbx_variant_set_str(var, value->result->log->value);
-		value->result->log->value = NULL;
-
-		opt->source = value->result->log->source;
-		value->result->log->source = NULL;
-
-		opt->logeventid = value->result->log->logeventid;
-		opt->severity = value->result->log->severity;
-		opt->timestamp = value->result->log->timestamp;
-
-		opt->flags |= ZBX_PP_VALUE_OPT_LOG;
-	}
-	else if (ZBX_ISSET_UI64(value->result))
-	{
-		zbx_variant_set_ui64(var, value->result->ui64);
-	}
-	else if (ZBX_ISSET_DBL(value->result))
-	{
-		zbx_variant_set_dbl(var, value->result->dbl);
-	}
-	else if (ZBX_ISSET_STR(value->result))
-	{
-		zbx_variant_set_str(var, value->result->str);
-		value->result->str = NULL;
-	}
-	else if (ZBX_ISSET_TEXT(value->result))
-	{
-		zbx_variant_set_str(var, value->result->text);
-		value->result->text = NULL;
-	}
-	else if (ZBX_ISSET_BIN(value->result))
-	{
-		THIS_SHOULD_NEVER_HAPPEN;
-		exit(EXIT_FAILURE);
-	}
-	else
-		zbx_variant_set_none(var);
-
-	if (ZBX_ISSET_META(value->result))
-	{
-		opt->lastlogsize = value->result->lastlogsize;
-		opt->mtime = value->result->mtime;
-
-		opt->flags |= ZBX_PP_VALUE_OPT_META;
-	}
-}
-
-/******************************************************************************
- *                                                                            *
  * Purpose: handle new preprocessing request                                  *
  *                                                                            *
  * Parameters: manager    - [IN] preprocessing manager                        *
@@ -906,9 +791,8 @@ static void	preproc_item_value_extract_data(zbx_preproc_item_value_t *value, zbx
 static zbx_uint64_t	preprocessor_add_request(zbx_pp_manager_t *manager, zbx_ipc_message_t *message,
 		zbx_uint64_t *direct_num, zbx_uint64_t *direct_sz, zbx_vector_pp_task_ptr_t *tasks)
 {
-	zbx_uint32_t			offset = 0;
-	zbx_preproc_item_value_t	value;
-	zbx_uint64_t			queued_num;
+	zbx_uint32_t	offset = 0;
+	zbx_uint64_t	queued_num;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
@@ -923,18 +807,20 @@ static zbx_uint64_t	preprocessor_add_request(zbx_pp_manager_t *manager, zbx_ipc_
 		zbx_timespec_t		ts;
 		zbx_pp_task_t		*task;
 		zbx_pp_item_t		*item;
+		zbx_uint64_t		itemid;
+		unsigned char		value_type, item_flags;
 
-		offset += zbx_preprocessor_unpack_value(&value, message->data + offset);
+		offset += zbx_preprocessor_deserialize_value(message->data + offset, &itemid, &value_type, &item_flags,
+				&var, &ts, &var_opt);
+
 		sz = offset - offset_prev;
-		preproc_item_value_extract_data(&value, &var, &ts, &var_opt);
 
-		if (NULL == (task = zbx_pp_manager_create_task(manager, value.itemid, &var, ts, &var_opt)))
+		if (NULL == (task = zbx_pp_manager_create_task(manager, itemid, &var, ts, &var_opt)))
 		{
 			(*direct_num)++;
 			*direct_sz += sz;
 			/* allow empty values */
-			preproc_flush_value_func_cb(manager, value.itemid, value.item_value_type, value.item_flags,
-					&var, ts, &var_opt);
+			preproc_flush_value_func_cb(manager, itemid, value_type, item_flags, &var, ts, &var_opt);
 
 			zbx_variant_clear(&var);
 			zbx_pp_value_opt_clear(&var_opt);
@@ -942,13 +828,11 @@ static zbx_uint64_t	preprocessor_add_request(zbx_pp_manager_t *manager, zbx_ipc_
 		else
 			zbx_vector_pp_task_ptr_append(tasks, task);
 
-		if (NULL != (item = (zbx_pp_item_t *)zbx_hashset_search(&manager->items, &value.itemid)))
+		if (NULL != (item = (zbx_pp_item_t *)zbx_hashset_search(&manager->items, &itemid)))
 		{
 			item->preproc->values_num++;
 			item->preproc->values_sz += sz;
 		}
-
-		preproc_item_value_clear(&value);
 	}
 
 	if (0 != tasks->values_num)
