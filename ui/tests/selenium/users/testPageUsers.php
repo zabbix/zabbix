@@ -104,9 +104,11 @@ class testPageUsers extends CLegacyWebTest {
 
 	public function testPageUsers_FilterNone() {
 		$this->zbxTestLogin('zabbix.php?action=user.list');
+		$table = $this->query('class:list-table')->asTable()->one();
 		$this->zbxTestDropdownSelectWait('filter_usrgrpid', 'All');
 		$this->zbxTestInputTypeOverwrite('filter_username', '1928379128ksdhksdjfh');
 		$this->zbxTestClickButtonText('Apply');
+		$table->waitUntilReloaded();
 		$this->zbxTestAssertElementText("//div[@class='table-stats']", 'Displaying 0 of 0 found');
 		$this->zbxTestInputTypeOverwrite('filter_username', '%');
 		$this->zbxTestClickButtonText('Apply');

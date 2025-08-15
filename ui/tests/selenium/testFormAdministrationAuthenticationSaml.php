@@ -379,6 +379,7 @@ class testFormAdministrationAuthenticationSaml extends CWebTest {
 		// Make sure that it is possible to log out.
 		$this->query('link:Sign out')->one()->click();
 		$this->page->waitUntilReady();
+		$this->query('class:signin-logo')->waitUntilVisible()->one();
 		$this->assertStringContainsString('index.php', $this->page->getCurrentUrl());
 	}
 

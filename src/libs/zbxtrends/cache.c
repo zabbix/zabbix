@@ -490,9 +490,9 @@ int	zbx_tfc_get_value(zbx_uint64_t itemid, int start, int end, zbx_trend_functio
 		struct tm	tm_start, tm_end;
 
 		ts_time = start;
-		localtime_r(&ts_time, &tm_start);
+		tm_start = *zbx_localtime(&ts_time, NULL);
 		ts_time = end;
-		localtime_r(&ts_time, &tm_end);
+		tm_end = *zbx_localtime(&ts_time, NULL);
 
 		zabbix_log(LOG_LEVEL_DEBUG, "In %s() itemid:" ZBX_FS_UI64 " %s(%04d.%02d.%02d/%02d,"
 				" %04d.%02d.%02d/%02d)", __func__, itemid, tfc_function_str(function),
@@ -565,9 +565,10 @@ void	zbx_tfc_put_value(zbx_uint64_t itemid, int start, int end, zbx_trend_functi
 		char		buf[ZBX_MAX_DOUBLE_LEN + 1];
 
 		ts_time = start;
-		localtime_r(&ts_time, &tm_start);
+		tm_start = *zbx_localtime(&ts_time, NULL);
+
 		ts_time = end;
-		localtime_r(&ts_time, &tm_end);
+		tm_end = *zbx_localtime(&ts_time, NULL);
 
 		if (state == ZBX_TREND_STATE_NODATA)
 			zbx_strlcpy(buf, "none", sizeof(buf));

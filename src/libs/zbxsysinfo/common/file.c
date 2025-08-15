@@ -1260,7 +1260,7 @@ static char	*get_print_time(time_t st_raw)
 	char		*st_str;
 
 	st_str = zbx_malloc(NULL, MAX_TIME_STR_LEN);
-	localtime_r(&st_raw, &st);
+	st = *zbx_localtime(&st_raw, NULL);
 	strftime(st_str, MAX_TIME_STR_LEN, "%Y-%m-%dT%T%z", &st);
 
 	return st_str;

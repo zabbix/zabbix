@@ -545,7 +545,7 @@ static int	dc_calculate_maintenance_period(const zbx_dc_maintenance_t *maintenan
 			if (start_date < active_since)
 				return FAIL;
 
-			tm = *localtime(&active_since);
+			tm = *zbx_localtime(&active_since, NULL);
 			active_since = dc_subtract_time(active_since,
 					tm.tm_hour * SEC_PER_HOUR + tm.tm_min * SEC_PER_MIN + tm.tm_sec, &tm);
 
@@ -556,7 +556,7 @@ static int	dc_calculate_maintenance_period(const zbx_dc_maintenance_t *maintenan
 			if (start_date < active_since)
 				return FAIL;
 
-			tm = *localtime(&active_since);
+			tm = *zbx_localtime(&active_since, NULL);
 			wday = (0 == tm.tm_wday ? 7 : tm.tm_wday) - 1;
 			active_since = dc_subtract_time(active_since, wday * SEC_PER_DAY +
 					tm.tm_hour * SEC_PER_HOUR + tm.tm_min * SEC_PER_MIN + tm.tm_sec, &tm);
@@ -569,7 +569,7 @@ static int	dc_calculate_maintenance_period(const zbx_dc_maintenance_t *maintenan
 					continue;
 
 				/* check for day of the week */
-				tm = *localtime(&start_date);
+				tm = *zbx_localtime(&start_date, NULL);
 				wday = (0 == tm.tm_wday ? 7 : tm.tm_wday) - 1;
 				if (0 == (period->dayofweek & (1 << wday)))
 					continue;
@@ -581,7 +581,7 @@ static int	dc_calculate_maintenance_period(const zbx_dc_maintenance_t *maintenan
 			for (; start_date >= active_since; start_date = dc_subtract_time(start_date, SEC_PER_DAY, &tm))
 			{
 				/* check for month */
-				tm = *localtime(&start_date);
+				tm = *zbx_localtime(&start_date, NULL);
 				if (0 == (period->month & (1 << tm.tm_mon)))
 					continue;
 
@@ -652,12 +652,12 @@ static int	dc_check_maintenance_period(const zbx_dc_maintenance_t *maintenance,
 	int		seconds, rc, ret = FAIL;
 	time_t		period_start, period_end;
 
-	tm = *localtime(&now);
+	tm = *zbx_localtime(&now, NULL);
 	seconds = tm.tm_hour * SEC_PER_HOUR + tm.tm_min * SEC_PER_MIN + tm.tm_sec;
 	period_start = dc_subtract_time(now, seconds, &tm);
 	period_start = dc_subtract_time(period_start, -period->start_time, &tm);
 
-	tm = *localtime(&period_start);
+	tm = *zbx_localtime(&period_start, NULL);
 
 	/* skip maintenance if the time does not exist due to DST */
 	if (period->start_time != (tm.tm_hour * SEC_PER_HOUR + tm.tm_min * SEC_PER_MIN + tm.tm_sec))
