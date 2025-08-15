@@ -451,12 +451,7 @@ class testDashboardItemValueWidget extends testWidgets {
 				];
 				foreach ($inputs as $field => $attributes) {
 					foreach ($attributes as $attribute => $value) {
-						if ($attribute === 'color') {
-							$this->assertEquals($value, $form->query($field)->asColorPicker()->one()->getValue());
-						}
-						else {
-							$this->assertEquals($value, $form->getField($field)->getAttribute($attribute));
-						}
+						$this->assertEquals($value, $form->getField($field)->getAttribute($attribute));
 					}
 				}
 

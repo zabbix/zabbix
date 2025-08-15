@@ -472,14 +472,14 @@ class testDashboardTopHostsWidget extends testWidgets {
 						'header' => 'Threshold',
 						'color_selector' => self::PATH_TO_COLOR_PICKER.'"thresholds[0][color]"]',
 						'input_selector' => 'id:thresholds_0_threshold',
-						'color' => 'FCCB1D'
+						'color' => 'E65660'
 					]
 					: [
 						'label' => 'Highlights',
 						'header' => 'Regular expression',
 						'color_selector' => self::PATH_TO_COLOR_PICKER.'"highlights[0][color]"]',
 						'input_selector' => 'id:highlights_0_pattern',
-						'color' => 'E65660'
+						'color' => 'FCCB1D'
 					];
 
 				$color_container = $column_form->getFieldContainer(($color_table['label']));
@@ -487,7 +487,7 @@ class testDashboardTopHostsWidget extends testWidgets {
 				$color_container->query('button:Add')->one()->waitUntilClickable()->click();
 
 				$this->checkFieldsAttributes([
-						$color_table['color_selector'] => [$color_table['color']],
+						$color_table['color_selector'] => ['color' => $color_table['color']],
 						$color_table['input_selector'] => ['value' => '', 'maxlength' => 255]
 					], $column_form
 				);
@@ -6248,6 +6248,7 @@ class testDashboardTopHostsWidget extends testWidgets {
 
 			foreach ($attributes as $attribute => $value) {
 				switch ($attribute) {
+					case 'color':
 					case 'value':
 						$this->assertEquals($value, $field->getValue());
 						break;
@@ -6263,10 +6264,6 @@ class testDashboardTopHostsWidget extends testWidgets {
 
 					case 'options':
 						$this->assertEquals($value, $field->asDropdown()->getOptions()->asText());
-						break;
-
-					case 'color':
-						$this->assertEquals($value, $form->query($label)->asColorPicker()->one()->getValue());
 						break;
 				}
 			}

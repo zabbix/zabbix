@@ -267,29 +267,23 @@ class testDashboardGaugeWidget extends testWidgets {
 
 		$not_visible = [];
 		foreach ($fields as $label => $attributes) {
-			if (array_key_exists('color', $attributes)) {
-				$this->assertEquals($attributes['color'], $form->query($label)->asColorPicker()->one()->getValue());
+			$field = $form->getField($label);
+			foreach ($attributes as $attribute => $value) {
+				if ($attribute === 'color' || $attribute === 'value') {
+					$this->assertEquals($value, $field->getValue());
+				}
+
+				if ($attribute === 'maxlength' || $attribute === 'placeholder') {
+					$this->assertEquals($value, $field->getAttribute($attribute));
+				}
+
+				if ($attribute === 'labels') {
+					$this->assertEquals($value, $field->asSegmentedRadio()->getLabels()->asText());
+				}
 			}
 
-			$field = $form->getField($label);
 			$this->assertTrue($field->isEnabled($attributes['enabled']));
 			$this->assertTrue($field->isVisible($attributes['visible']));
-
-			if (array_key_exists('value', $attributes)) {
-				$this->assertEquals($attributes['value'], $field->getValue());
-			}
-
-			if (array_key_exists('maxlength', $attributes)) {
-				$this->assertEquals($attributes['maxlength'], $field->getAttribute('maxlength'));
-			}
-
-			if (array_key_exists('placeholder', $attributes)) {
-				$this->assertEquals($attributes['placeholder'], $field->getAttribute('placeholder'));
-			}
-
-			if (array_key_exists('labels', $attributes)) {
-				$this->assertEquals($attributes['labels'], $field->asSegmentedRadio()->getLabels()->asText());
-			}
 
 			// Show Needle is unchecked and Needle color remains invisible by default.
 			if ($attributes['visible'] === false && $label !== self::PATH_TO_COLOR_PICKER.'"needle_color"]') {
