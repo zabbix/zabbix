@@ -8997,7 +8997,6 @@ int	zbx_dc_check_host_conn_permissions(const char *host, const zbx_socket_t *soc
 	const ZBX_DC_HOST	*dc_host = NULL;
 #if defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
 	zbx_tls_conn_attr_t	attr;
-	int			skip_tls_validation = 0;
 
 	if (FAIL == zbx_tls_get_attr(sock, &attr, error))
 		return FAIL;
