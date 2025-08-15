@@ -1,1 +1,1 @@
-........S. [ZBX-26863] fixed unique checks not processed first during network discovery with multiple checks (aetatsu)
+........S. [ZBX-26863] fixed duplicate host creation in network discovery with multiple checks for hosts found on several IP addresses when uniqueness criteria is not set to IP address (aetatsu)

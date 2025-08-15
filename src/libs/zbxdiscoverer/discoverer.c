@@ -301,17 +301,25 @@ static int	process_services(void *handle, zbx_uint64_t druleid, zbx_db_dhost *dh
 
 	zbx_vector_uint64_create(&dserviceids);
 
-	zbx_discoverer_dservice_t *service = NULL;
+	zbx_discoverer_dservice_t unique_service;
+	int unique_index = FAIL;
 
-	if (NULL != (service = zbx_vector_discoverer_services_ptr_pop(services, unique_dcheckid)))
+	unique_service.dcheckid = unique_dcheckid;
+	unique_index = zbx_vector_discoverer_services_ptr_search(services, &unique_service,
+			ZBX_DEFAULT_UINT64_PTR_COMPARE_FUNC);
+
+	if (FAIL != unique_index)
 	{
+		zbx_discoverer_dservice_t	*service = (zbx_discoverer_dservice_t *)services->values[unique_index];
+
 		if ((-1 == host_status || DOBJECT_STATUS_UP == service->status) && host_status != service->status)
-				host_status = service->status;
+			host_status = service->status;
 
 		discovery_update_service_cb(handle, druleid, service->dcheckid, unique_dcheckid, dhost,
 				ip, dns, service->port, service->status, service->value, now, &dserviceids,
 				add_event_cb);
 
+		zbx_vector_discoverer_services_ptr_remove(services, unique_index);
 		zbx_free(service);
 	}
 
@@ -1121,24 +1129,6 @@ int	discoverer_results_partrange_merge(zbx_hashset_t *hr_dst, zbx_vector_discove
 			hr_dst->num_data);
 
 	return ret;
-}
-
-zbx_discoverer_dservice_t	*zbx_vector_discoverer_services_ptr_pop(zbx_vector_discoverer_services_ptr_t *services,
-		zbx_uint64_t dcheckid)
-{
-	zbx_discoverer_dservice_t *service = NULL;
-
-	for (int i = 0; i < services->values_num; i++)
-	{
-		if (services->values[i]->dcheckid == dcheckid)
-		{
-			service = services->values[i];
-			zbx_vector_discoverer_services_ptr_remove(services, i);
-			break;
-		}
-	}
-
-	return service;
 }
 
 static int	discoverer_net_check_icmp(zbx_uint64_t druleid, zbx_discoverer_task_t *task, int concurrency_max,
