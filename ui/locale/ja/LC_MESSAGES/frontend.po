@@ -4,7 +4,7 @@ msgstr ""
 "Project-Id-Version: Zabbix 6.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2023-10-19 13:48+0300\n"
-"PO-Revision-Date: 2025-08-05 01:07+0000\n"
+"PO-Revision-Date: 2025-08-12 03:51+0000\n"
 "Last-Translator: Eiji Kawakita <age@cyber.email.ne.jp>\n"
 "Language-Team: Zabbix\n"
 "Language: ja\n"
@@ -6676,7 +6676,7 @@ msgstr "検出されたTimescaleDBのライセンスは、圧縮をサポート�
 
 #: app/views/administration.housekeeping.edit.php:204
 msgid "Detected license does not support compression. Compression is supported in TimescaleDB Community Edition."
-msgstr ""
+msgstr "検出されたライセンスは圧縮をサポートしていません。TimescaleDB Community Editionでは圧縮がサポートされています。"
 
 #: app/controllers/CControllerPopupTriggerExpr.php:1130
 msgid "Detection period"
@@ -21406,11 +21406,11 @@ msgstr "TimescaleDBのバージョンを取得できません。"
 
 #: app/views/administration.housekeeping.edit.php:173
 msgid "Unable to retrieve compression support status of TimescaleDB time-series database extension for PostgreSQL."
-msgstr ""
+msgstr "PostgreSQL の TimescaleDB 時系列データベース拡張機能の圧縮サポート ステータスを取得できません。"
 
 #: app/views/administration.housekeeping.edit.php:178
 msgid "Unable to retrieve version of TimescaleDB time-series database extension for PostgreSQL."
-msgstr ""
+msgstr "PostgreSQL の TimescaleDB 時系列データベース拡張機能のバージョンを取得できません。"
 
 #: include/views/mfa.login.php:65
 #, c-format
@@ -21693,7 +21693,7 @@ msgstr "データベースサーバーのバージョン%1$sはサポートさ�
 #: app/partials/administration.system.info.php:206
 #: app/views/administration.housekeeping.edit.php:169
 msgid "Unsupported TimescaleDB time-series database extension for PostgreSQL is used."
-msgstr ""
+msgstr "PostgreSQL ではサポートされていない TimescaleDB 時系列データベース拡張機能が使用されています。"
 
 #: app/views/administration.housekeeping.edit.php:190
 #, c-format
@@ -23106,7 +23106,7 @@ msgstr "警告メッセージ"
 #: app/partials/administration.system.info.php:243
 #: app/partials/administration.system.info.php:262
 msgid "Warning!"
-msgstr ""
+msgstr "警告！"
 
 #: app/partials/administration.system.info.php:198
 msgid "Warning! Support for Oracle DB is deprecated since Zabbix 7.0 and will be removed in future versions."
