@@ -38,10 +38,8 @@ class ZVertical extends HTMLElement {
 		this.#inner_container = document.createElement('div');
 
 		Object.assign(this.#inner_container.style, {
-			display: 'inline-block',
-			position: 'absolute',
-			bottom: 0,
-			left: 0,
+			display: 'block',
+			paddingRight: '-1px',
 			transform: 'rotate(270deg)'
 		});
 
