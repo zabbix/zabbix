@@ -933,8 +933,6 @@ A.F....... [ZBX-23227] fixed issue where using an empty array or string value fo
 --------------------------------------------------------------------------------
 Changes for 7.0.18rc2
 
-New features:
-
 Bug fixes:
 .......PS. [ZBX-26868] fixed crash when adding new SNMP device (vso)
 
