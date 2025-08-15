@@ -1001,10 +1001,16 @@ void	zbx_dc_requeue_proxy(zbx_uint64_t proxyid, unsigned char update_nextcheck, 
 		int proxyconfig_frequency, int proxydata_frequency);
 int	zbx_dc_check_host_conn_permissions(const char *host, const zbx_socket_t *sock, zbx_uint64_t *hostid,
 		unsigned char *status, unsigned char *monitored_by, zbx_uint64_t *revision,
-		zbx_comms_redirect_t *redirect, char **error, void **dc_autoreg_host);
+		zbx_comms_redirect_t *redirect, char **error, int connection_type_changed);
+
+#define ZBX_AUTOREG_NO_CHANGES			0x00
+#define ZBX_AUTOREG_CHANGED_HOST_METADATA	0x01
+#define ZBX_AUTOREG_CHANGED_FLAGS		0x02
+#define ZBX_AUTOREG_CHANGED_INTERFACE_IP	0x04
+#define ZBX_AUTOREG_CHANGED_INTERFACE_DNS	0x08
+#define ZBX_AUTOREG_CHANGED_HEARTBEAT		0x10
+#define ZBX_AUTOREG_CHANGED_CONNECTION_TYPE	0x20
 int	zbx_dc_is_autoreg_host_changed(const char *host, unsigned short port, const char *host_metadata,
-		zbx_conn_flags_t flag, const char *interface, unsigned int connection_type, int now);
-int	zbx_dc_is_autoreg_host_changed_with_host(void *dc_autoreg_host, unsigned short port, const char *host_metadata,
 		zbx_conn_flags_t flag, const char *interface, unsigned int connection_type, int now);
 
 #if defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)

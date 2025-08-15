@@ -95,7 +95,7 @@ static void	db_register_host(const char *host, const char *ip, unsigned short po
 	now = time(NULL);
 
 	/* update before changing database in case Zabbix proxy also changed database and then deleted from cache */
-	zbx_dc_config_update_autoreg_host(host, p_ip, p_dns, port, host_metadata, flag, connection_type, now);
+	zbx_dc_config_update_autoreg_host(host, p_ip, p_dns, port, host_metadata, flag, now, connection_type);
 
 	autoreg_update_host_func_cb(NULL, host, p_ip, p_dns, port, connection_type, host_metadata, (unsigned short)flag,
 			now, events_cbs);
@@ -170,8 +170,8 @@ out:
  *                FAIL - error occurred or host not found                           *
  *                                                                                  *
  * Comments: NB! adds host to the database if it does not exist or if it            *
- *           exists but metadata, interface, interface type, connection type        *
- *           or port has changed                                                    *
+ *           exists but metadata, interface, interface type or port has             *
+ *           changed                                                                *
  *                                                                                  *
  ************************************************************************************/
 static int	get_hostid_by_host_or_autoregister(const zbx_socket_t *sock, const char *host, const char *ip,
@@ -198,14 +198,20 @@ static int	get_hostid_by_host_or_autoregister(const zbx_socket_t *sock, const ch
 	}
 
 	/* if host exists then check host connection permissions */
-	void	*dc_autoreg_host = NULL;
+	int	change_flags = 0;
+	int	connection_type_changed = 0;
 
-	if (FAIL == zbx_dc_check_host_conn_permissions(host, sock, hostid, &status, &monitored_by, revision, redirect,
-			&ch_error, &dc_autoreg_host))
+	/* First check if autoregistration host has changed */
+	if (AUTOREG_ENABLED == autoreg)
 	{
-		zbx_snprintf(error, MAX_STRING_LEN, "%s", ch_error);
-		zbx_free(ch_error);
-		goto out;
+		change_flags = zbx_dc_is_autoreg_host_changed(host, port, host_metadata, flag, interface,
+				sock->connection_type, (int)time(NULL));
+
+		/* Check if connection type changed */
+		if (0 != (change_flags & ZBX_AUTOREG_CHANGED_CONNECTION_TYPE))
+		{
+			connection_type_changed = 1;
+		}
 	}
 
 	if (0 != (trapper_get_program_type()() & ZBX_PROGRAM_TYPE_SERVER))
@@ -221,8 +227,17 @@ static int	get_hostid_by_host_or_autoregister(const zbx_socket_t *sock, const ch
 		autoreg = AUTOREG_DISABLED;
 	}
 
-	if (AUTOREG_ENABLED == autoreg && SUCCEED == zbx_dc_is_autoreg_host_changed_with_host((void *)dc_autoreg_host,
-			port, host_metadata, flag, interface, sock->connection_type, (int)time(NULL)))
+	/* if host exists then check host connection permissions */
+	if (FAIL == zbx_dc_check_host_conn_permissions(host, sock, hostid, &status, &monitored_by, revision, redirect,
+			&ch_error, connection_type_changed))
+	{
+		zbx_snprintf(error, MAX_STRING_LEN, "%s", ch_error);
+		zbx_free(ch_error);
+		goto out;
+	}
+
+	/* Register host if autoregistration is enabled and host has changed */
+	if (AUTOREG_ENABLED == autoreg && 0 != change_flags)
 	{
 		db_register_host(host, ip, port, sock->connection_type, host_metadata, flag, interface, events_cbs,
 				config_timeout, autoreg_update_host_func_cb);
