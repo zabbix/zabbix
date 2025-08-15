@@ -2001,7 +2001,7 @@ int	zbx_prometheus_pattern(const char *data, const char *filter_data, const char
 	zbx_vector_prometheus_row_create(&rows);
 
 	if (SUCCEED != prometheus_validate_request(request, output, error))
-		return FAIL;
+		goto cleanup;
 
 	if (FAIL == prometheus_parse_rows(&filter, data, &rows, NULL, error))
 		goto cleanup;
