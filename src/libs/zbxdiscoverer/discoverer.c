@@ -295,58 +295,58 @@ static int	process_services(void *handle, zbx_uint64_t druleid, zbx_db_dhost *dh
 		zbx_discovery_find_host_func_t discovery_find_host_cb)
 {
 	int			host_status = -1;
-	zbx_vector_uint64_t	dserviceids;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
-
-	zbx_vector_uint64_create(&dserviceids);
-
-	zbx_discoverer_dservice_t unique_service;
-	int unique_index = FAIL;
-
-	unique_service.dcheckid = unique_dcheckid;
-	unique_index = zbx_vector_discoverer_services_ptr_search(services, &unique_service,
-			ZBX_DEFAULT_UINT64_PTR_COMPARE_FUNC);
-
-	if (FAIL != unique_index)
-	{
-		zbx_discoverer_dservice_t	*service = (zbx_discoverer_dservice_t *)services->values[unique_index];
-
-		if ((-1 == host_status || DOBJECT_STATUS_UP == service->status) && host_status != service->status)
-			host_status = service->status;
-
-		discovery_update_service_cb(handle, druleid, service->dcheckid, unique_dcheckid, dhost,
-				ip, dns, service->port, service->status, service->value, now, &dserviceids,
-				add_event_cb);
-
-		zbx_vector_discoverer_services_ptr_remove(services, unique_index);
-		zbx_free(service);
-	}
-
-	for (int i = 0; i < services->values_num; i++)
-	{
-		zbx_discoverer_dservice_t	*service = (zbx_discoverer_dservice_t *)services->values[i];
-
-		if ((-1 == host_status || DOBJECT_STATUS_UP == service->status) && host_status != service->status)
-			host_status = service->status;
-
-		discovery_update_service_cb(handle, druleid, service->dcheckid, unique_dcheckid, dhost,
-				ip, dns, service->port, service->status, service->value, now, &dserviceids,
-				add_event_cb);
-
-	}
 
 	if (0 == services->values_num)
 	{
 		discovery_find_host_cb(druleid, ip, dhost);
 		host_status = DOBJECT_STATUS_DOWN;
+		goto out;
+	}
+
+	zbx_vector_uint64_t	dserviceids;
+
+	zbx_vector_uint64_create(&dserviceids);
+
+	zbx_discoverer_dservice_t unique_service;
+	int unique_index;
+
+	unique_service.dcheckid = unique_dcheckid;
+
+	if (FAIL != (unique_index = zbx_vector_discoverer_services_ptr_search(services, &unique_service,
+			ZBX_DEFAULT_UINT64_PTR_COMPARE_FUNC)))
+	{
+		zbx_discoverer_dservice_t	*service = services->values[unique_index];
+
+		if ((-1 == host_status || DOBJECT_STATUS_UP == service->status) && host_status != service->status)
+				host_status = service->status;
+
+		discovery_update_service_cb(handle, druleid, service->dcheckid, unique_dcheckid, dhost,
+				ip, dns, service->port, service->status, service->value, now, &dserviceids,
+				add_event_cb);
+
+		zbx_vector_discoverer_services_ptr_remove_noorder(services, unique_index);
+		service_free(service);
+	}
+
+	for (int i = 0; i < services->values_num; i++)
+	{
+		zbx_discoverer_dservice_t	*service = services->values[i];
+
+		if ((-1 == host_status || DOBJECT_STATUS_UP == service->status) && host_status != service->status)
+			host_status = service->status;
+
+		discovery_update_service_cb(handle, druleid, service->dcheckid, unique_dcheckid, dhost,
+				ip, dns, service->port, service->status, service->value, now, &dserviceids,
+				add_event_cb);
 	}
 
 	if (0 != dhost->dhostid)
 		discovery_update_service_down_cb(dhost->dhostid, now, &dserviceids);
 
 	zbx_vector_uint64_destroy(&dserviceids);
-
+out:
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 
 	return host_status;
