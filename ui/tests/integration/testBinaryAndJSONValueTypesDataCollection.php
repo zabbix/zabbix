@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types = 1);
 /*
 ** Copyright (C) 2001-2025 Zabbix SIA
 **
@@ -18,6 +18,7 @@ require_once dirname(__FILE__).'/../include/helpers/CDataHelper.php';
 
 /**
  * Test suite for data collection using both active and passive agents.
+ *
  * @backup history, hosts, host_rtdata, proxy, proxy_rtdata, auditlog, changelog, settings, ha_node, changelog
  * @backup config_autoreg_tls, expressions, globalmacro, hosts, interface, item_preproc, item_rtdata, items, regexps
  */
@@ -31,20 +32,26 @@ class testBinaryValueTypeDataCollection extends CIntegrationTest {
 	const base64_invalid = "a";
 	const json_data_http_response = "200";
 
-	const TEST_FILE_NAME_JSON_WITH_IMAGE="/tmp/json_with_image.txt";
-	const TEST_FILE_NAME_JSON_WITH_IMAGE_2="/tmp/json_with_image2.txt";
-	const TEST_FILE_NAME_INVALID_JSON="/tmp/invalid_JSON.txt";
-	const TEST_FILE_NAME_INVALID_JSON_2="/tmp/invalid_JSON_2.txt";
+	static $file_name_json_with_image_for_binary_item;
+	static $file_name_json_with_image_for_json_item;
+	static $file_name_invalid_json_for_binary_item;
+	static $file_name_invalid_json_for_json_item;
 
 	/**
 	 * @inheritdoc
 	 */
 	public function prepareData() {
 
+		self::$file_name_json_with_image_for_binary_item = "/tmp/json_with_image.txt".time();
+		self::$file_name_json_with_image_for_json_item = "/tmp/json_with_image2.txt".time();
+		self::$file_name_invalid_json_for_binary_item = "/tmp/invalid_JSON.txt".time();
+		self::$file_name_invalid_json_for_json_item = "/tmp/invalid_JSON_2.txt".time();
+
 		$base64_image = self::base64_image;
 		$base64_empty = self::base64_empty;
 		$base64_invalid = self::base64_invalid;
 		$json_data_http_response = self::json_data_http_response;
+
 		$json_with_image = <<<HEREA
 		{
 			"result": "fail",
@@ -76,11 +83,26 @@ class testBinaryValueTypeDataCollection extends CIntegrationTest {
 		},
 		HEREA;
 
+		if (file_exists(self::$file_name_json_with_image_for_binary_item)) {
+			unlink(self::$file_name_json_with_image_for_binary_item);
+		}
 
-		$this->assertTrue(@file_put_contents(self::TEST_FILE_NAME_JSON_WITH_IMAGE, $json_with_image) !== false);
-		$this->assertTrue(@file_put_contents(self::TEST_FILE_NAME_JSON_WITH_IMAGE_2, $json_with_image) !== false);
-		$this->assertTrue(@file_put_contents(self::TEST_FILE_NAME_INVALID_JSON, $invalid_json) !== false);
-		$this->assertTrue(@file_put_contents(self::TEST_FILE_NAME_INVALID_JSON_2, $invalid_json) !== false);
+		if (file_exists(self::$file_name_json_with_image_for_json_item)) {
+			unlink(self::$file_name_json_with_image_for_json_item);
+		}
+
+		if (file_exists(self::$file_name_invalid_json_for_binary_item)) {
+			unlink(self::$file_name_invalid_json_for_binary_item);
+		}
+
+		if (file_exists(self::$file_name_invalid_json_for_json_item)) {
+			unlink(self::$file_name_invalid_json_for_json_item);
+		}
+
+		$this->assertTrue(@file_put_contents(self::$file_name_json_with_image_for_binary_item, $json_with_image) !== false);
+		$this->assertTrue(@file_put_contents(self::$file_name_json_with_image_for_json_item, $json_with_image) !== false);
+		$this->assertTrue(@file_put_contents(self::$file_name_invalid_json_for_binary_item, $invalid_json) !== false);
+		$this->assertTrue(@file_put_contents(self::$file_name_invalid_json_for_json_item, $invalid_json) !== false);
 
 		CDataHelper::call('proxy.create', [
 			'name' => 'proxy',
@@ -109,28 +131,28 @@ class testBinaryValueTypeDataCollection extends CIntegrationTest {
 				'items' => [
 					[
 						'name' => 'JSON_WITH_IMAGE',
-						'key_' => 'vfs.file.contents['.self::TEST_FILE_NAME_JSON_WITH_IMAGE.',]',
+						'key_' => 'vfs.file.contents['.self::$file_name_json_with_image_for_binary_item.',]',
 						'type' => ITEM_TYPE_ZABBIX,
 						'value_type' => ITEM_VALUE_TYPE_TEXT,
 						'delay' => '1s'
 					],
 					[
 						'name' => 'JSON_WITH_IMAGE_JSON_VALUE_TYPE',
-						'key_' => 'vfs.file.contents['.self::TEST_FILE_NAME_JSON_WITH_IMAGE_2.',]',
+						'key_' => 'vfs.file.contents['.self::$file_name_json_with_image_for_json_item.',]',
 						'type' => ITEM_TYPE_ZABBIX,
 						'value_type' => ITEM_VALUE_TYPE_JSON,
 						'delay' => '1s'
 					],
 					[
 						'name' => 'INVALID_JSON_JSON_VALUE_TYPE',
-						'key_' => 'vfs.file.contents['.self::TEST_FILE_NAME_INVALID_JSON.',]',
+						'key_' => 'vfs.file.contents['.self::$file_name_invalid_json_for_binary_item.',]',
 						'type' => ITEM_TYPE_ZABBIX,
 						'value_type' => ITEM_VALUE_TYPE_JSON,
 						'delay' => '1s'
 					],
 					[
 						'name' => 'INVALID_JSON_TEXT_VALUE_TYPE',
-						'key_' => 'vfs.file.contents[ '.self::TEST_FILE_NAME_INVALID_JSON_2.',]',
+						'key_' => 'vfs.file.contents[ '.self::$file_name_invalid_json_for_json_item.',]',
 						'type' => ITEM_TYPE_ZABBIX,
 						'value_type' => ITEM_VALUE_TYPE_TEXT,
 						'delay' => '1s'
@@ -147,28 +169,28 @@ class testBinaryValueTypeDataCollection extends CIntegrationTest {
 				'items' => [
 					[
 						'name' => 'JSON_WITH_IMAGE',
-						'key_' => 'vfs.file.contents['.self::TEST_FILE_NAME_JSON_WITH_IMAGE.',]',
+						'key_' => 'vfs.file.contents['.self::$file_name_json_with_image_for_binary_item.',]',
 						'type' => ITEM_TYPE_ZABBIX,
 						'value_type' => ITEM_VALUE_TYPE_TEXT,
 						'delay' => '1s'
 					],
 					[
 						'name' => 'JSON_WITH_IMAGE_JSON_VALUE_TYPE',
-						'key_' => 'vfs.file.contents['.self::TEST_FILE_NAME_JSON_WITH_IMAGE_2.',]',
+						'key_' => 'vfs.file.contents['.self::$file_name_json_with_image_for_json_item.',]',
 						'type' => ITEM_TYPE_ZABBIX,
 						'value_type' => ITEM_VALUE_TYPE_JSON,
 						'delay' => '1s'
 					],
 					[
 						'name' => 'INVALID_JSON_JSON_VALUE_TYPE',
-						'key_' => 'vfs.file.contents['.self::TEST_FILE_NAME_INVALID_JSON.',]',
+						'key_' => 'vfs.file.contents['.self::$file_name_invalid_json_for_binary_item.',]',
 						'type' => ITEM_TYPE_ZABBIX,
 						'value_type' => ITEM_VALUE_TYPE_JSON,
 						'delay' => '1s'
 					],
 					[
 						'name' => 'INVALID_JSON_TEXT_VALUE_TYPE',
-						'key_' => 'vfs.file.contents['.self::TEST_FILE_NAME_INVALID_JSON_2.',]',
+						'key_' => 'vfs.file.contents['.self::$file_name_invalid_json_for_json_item.',]',
 						'type' => ITEM_TYPE_ZABBIX,
 						'value_type' => ITEM_VALUE_TYPE_TEXT,
 						'delay' => '1s'
@@ -186,7 +208,7 @@ class testBinaryValueTypeDataCollection extends CIntegrationTest {
 						'name' => 'BINARY_IMAGE',
 						'key_' => 'BINARY_IMAGE',
 						'type' => ITEM_TYPE_DEPENDENT,
-						'master_itemid' => self::$itemids['agent:vfs.file.contents['.self::TEST_FILE_NAME_JSON_WITH_IMAGE.',]'],
+						'master_itemid' => self::$itemids['agent:vfs.file.contents['.self::$file_name_json_with_image_for_binary_item.',]'],
 						'value_type' => ITEM_VALUE_TYPE_BINARY,
 						'delay' => '0s',
 						'preprocessing' => [['type' => ZBX_PREPROC_JSONPATH, 'params' => '$.screenshot_image',
@@ -198,7 +220,7 @@ class testBinaryValueTypeDataCollection extends CIntegrationTest {
 					'name' => 'BINARY_IMAGE_EMPTY',
 					'key_' => 'BINARY_IMAGE_EMPTY',
 					'type' => ITEM_TYPE_DEPENDENT,
-					'master_itemid' => self::$itemids['agent:vfs.file.contents['.self::TEST_FILE_NAME_JSON_WITH_IMAGE.',]'],
+					'master_itemid' => self::$itemids['agent:vfs.file.contents['.self::$file_name_json_with_image_for_binary_item.',]'],
 					'value_type' => ITEM_VALUE_TYPE_BINARY,
 					'delay' => '0s',
 					'preprocessing' =>
@@ -213,7 +235,7 @@ class testBinaryValueTypeDataCollection extends CIntegrationTest {
 					'name' => 'BINARY_IMAGE_INVALID',
 					'key_' => 'BINARY_IMAGE_INVALID',
 					'type' => ITEM_TYPE_DEPENDENT,
-					'master_itemid' => self::$itemids['agent:vfs.file.contents['.self::TEST_FILE_NAME_JSON_WITH_IMAGE.',]'],
+					'master_itemid' => self::$itemids['agent:vfs.file.contents['.self::$file_name_json_with_image_for_binary_item.',]'],
 					'value_type' => ITEM_VALUE_TYPE_BINARY,
 					'delay' => '0s',
 					'preprocessing' =>
@@ -230,7 +252,7 @@ class testBinaryValueTypeDataCollection extends CIntegrationTest {
 						'name' => 'JSON_VALUE_TYPE_DEP',
 						'key_' => 'JSON_VALUE_TYPE_DEP',
 						'type' => ITEM_TYPE_DEPENDENT,
-						'master_itemid' => self::$itemids['agent:vfs.file.contents['.self::TEST_FILE_NAME_JSON_WITH_IMAGE_2.',]'],
+						'master_itemid' => self::$itemids['agent:vfs.file.contents['.self::$file_name_json_with_image_for_json_item.',]'],
 						'value_type' => ITEM_VALUE_TYPE_JSON,
 						'delay' => '0s'
 				],
@@ -239,7 +261,7 @@ class testBinaryValueTypeDataCollection extends CIntegrationTest {
 						'name' => 'JSON_VALUE_TYPE_DEP_WITH_PREPROC',
 						'key_' => 'JSON_VALUE_TYPE_DEP_WITH_PREPROC',
 						'type' => ITEM_TYPE_DEPENDENT,
-						'master_itemid' => self::$itemids['agent:vfs.file.contents['.self::TEST_FILE_NAME_JSON_WITH_IMAGE_2.',]'],
+						'master_itemid' => self::$itemids['agent:vfs.file.contents['.self::$file_name_json_with_image_for_json_item.',]'],
 						'value_type' => ITEM_VALUE_TYPE_JSON,
 						'delay' => '0s',
 						'preprocessing' =>
@@ -254,7 +276,7 @@ class testBinaryValueTypeDataCollection extends CIntegrationTest {
 						'name' => 'JSON_VALUE_TYPE_DEP_INVALID',
 						'key_' => 'JSON_VALUE_TYPE_DEP_INVALID',
 						'type' => ITEM_TYPE_DEPENDENT,
-						'master_itemid' => self::$itemids['agent:vfs.file.contents['.self::TEST_FILE_NAME_INVALID_JSON.',]'],
+						'master_itemid' => self::$itemids['agent:vfs.file.contents['.self::$file_name_invalid_json_for_binary_item.',]'],
 						'value_type' => ITEM_VALUE_TYPE_JSON,
 						'delay' => '0s'
 				],
@@ -270,7 +292,7 @@ class testBinaryValueTypeDataCollection extends CIntegrationTest {
 					'name' => 'BINARY_IMAGE',
 					'key_' => 'BINARY_IMAGE',
 					'type' => ITEM_TYPE_DEPENDENT,
-					'master_itemid' => self::$itemids['proxy_agent:vfs.file.contents['.self::TEST_FILE_NAME_JSON_WITH_IMAGE.',]'],
+					'master_itemid' => self::$itemids['proxy_agent:vfs.file.contents['.self::$file_name_json_with_image_for_binary_item.',]'],
 					'value_type' => ITEM_VALUE_TYPE_BINARY,
 					'delay' => '0s',
 					'preprocessing' =>
@@ -285,7 +307,7 @@ class testBinaryValueTypeDataCollection extends CIntegrationTest {
 					'name' => 'JSON_VALUE_TYPE_DEP_WITH_PREPROC',
 					'key_' => 'JSON_VALUE_TYPE_DEP_WITH_PREPROC',
 					'type' => ITEM_TYPE_DEPENDENT,
-					'master_itemid' => self::$itemids['proxy_agent:vfs.file.contents['.self::TEST_FILE_NAME_JSON_WITH_IMAGE_2.',]'],
+					'master_itemid' => self::$itemids['proxy_agent:vfs.file.contents['.self::$file_name_json_with_image_for_json_item.',]'],
 					'value_type' => ITEM_VALUE_TYPE_JSON,
 					'delay' => '0s',
 					'preprocessing' =>
