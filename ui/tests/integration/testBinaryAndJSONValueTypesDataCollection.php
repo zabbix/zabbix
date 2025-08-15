@@ -156,7 +156,7 @@ class testBinaryValueTypeDataCollection extends CIntegrationTest {
 						'type' => ITEM_TYPE_ZABBIX,
 						'value_type' => ITEM_VALUE_TYPE_TEXT,
 						'delay' => '1s'
-					],
+					]
 				]
 			],
 			[
@@ -194,7 +194,7 @@ class testBinaryValueTypeDataCollection extends CIntegrationTest {
 						'type' => ITEM_TYPE_ZABBIX,
 						'value_type' => ITEM_VALUE_TYPE_TEXT,
 						'delay' => '1s'
-					],
+					]
 				]
 			]
 		]);
@@ -279,7 +279,7 @@ class testBinaryValueTypeDataCollection extends CIntegrationTest {
 						'master_itemid' => self::$itemids['agent:vfs.file.contents['.self::$file_name_invalid_json_for_binary_item.',]'],
 						'value_type' => ITEM_VALUE_TYPE_JSON,
 						'delay' => '0s'
-				],
+				]
 				]
 			]
 		, $result['hostids']);
@@ -317,7 +317,7 @@ class testBinaryValueTypeDataCollection extends CIntegrationTest {
 							'error_handler' => 0,
 							'error_handler_params' => ''
 						]]
-				],
+				]
 				]
 			]
 		, $result['hostids']);

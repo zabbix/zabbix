@@ -15,14 +15,11 @@
 #include "dbupgrade.h"
 #include "zbxdbschema.h"
 
-#include "zbxdbschema.h"
-
 /*
  * 8.0 development database patches
  */
 
 #ifndef HAVE_SQLITE3
-
 static int	DBpatch_7050000(void)
 {
 	const zbx_db_field_t	field = {"idp_certificate", "", NULL, NULL, 0, ZBX_TYPE_TEXT, ZBX_NOTNULL, 0};

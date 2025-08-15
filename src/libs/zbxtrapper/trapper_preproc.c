@@ -317,9 +317,7 @@ int	zbx_trapper_preproc_test_run(const struct zbx_json_parse *jp_item, const str
 			}
 
 			if (0 == zbx_json_validate_ext(result->value.data.json, &preproc_error))
-			{
 				break;
-			}
 		}
 	}
 
