@@ -198,8 +198,10 @@ static int	get_hostid_by_host_or_autoregister(const zbx_socket_t *sock, const ch
 	}
 
 	/* if host exists then check host connection permissions */
+	void	*dc_autoreg_host = NULL;
+
 	if (FAIL == zbx_dc_check_host_conn_permissions(host, sock, hostid, &status, &monitored_by, revision, redirect,
-			&ch_error))
+			&ch_error, &dc_autoreg_host))
 	{
 		zbx_snprintf(error, MAX_STRING_LEN, "%s", ch_error);
 		zbx_free(ch_error);
@@ -219,8 +221,8 @@ static int	get_hostid_by_host_or_autoregister(const zbx_socket_t *sock, const ch
 		autoreg = AUTOREG_DISABLED;
 	}
 
-	if (AUTOREG_ENABLED == autoreg && SUCCEED == zbx_dc_is_autoreg_host_changed(host, port, host_metadata, flag,
-			interface, sock->connection_type, (int)time(NULL)))
+	if (AUTOREG_ENABLED == autoreg && SUCCEED == zbx_dc_is_autoreg_host_changed_with_host((void *)dc_autoreg_host,
+			port, host_metadata, flag, interface, sock->connection_type, (int)time(NULL)))
 	{
 		db_register_host(host, ip, port, sock->connection_type, host_metadata, flag, interface, events_cbs,
 				config_timeout, autoreg_update_host_func_cb);

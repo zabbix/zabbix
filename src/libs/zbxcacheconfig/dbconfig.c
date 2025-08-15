@@ -8992,7 +8992,7 @@ int	zbx_dc_get_host_by_hostid(zbx_dc_host_t *host, zbx_uint64_t hostid)
  ******************************************************************************/
 int	zbx_dc_check_host_conn_permissions(const char *host, const zbx_socket_t *sock, zbx_uint64_t *hostid,
 		unsigned char *status, unsigned char *monitored_by, zbx_uint64_t *revision,
-		zbx_comms_redirect_t *redirect, char **error)
+		zbx_comms_redirect_t *redirect, char **error, void **dc_autoreg_host)
 {
 	const ZBX_DC_HOST	*dc_host = NULL;
 #if defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
@@ -9023,24 +9023,36 @@ int	zbx_dc_check_host_conn_permissions(const char *host, const zbx_socket_t *soc
 	{
 		UNLOCK_CACHE;
 		*hostid = 0;
+		if (NULL != dc_autoreg_host)
+			*dc_autoreg_host = NULL;
 
 		return SUCCEED;
 	}
 
 	if (0 == ((unsigned int)dc_host->tls_accept & sock->connection_type))
 	{
-		if (NULL == DCfind_autoreg_host(host))
+		const ZBX_DC_AUTOREG_HOST	*autoreg_host = DCfind_autoreg_host(host);
+
+		if (NULL == autoreg_host)
 		{
 			UNLOCK_CACHE;
 			*error = zbx_dsprintf(NULL, "connection of type \"%s\" is not allowed for host \"%s\"",
 					zbx_tcp_connection_type_name(sock->connection_type), host);
 			return FAIL;
 		}
+
+		if (NULL != dc_autoreg_host)
+			*dc_autoreg_host = (void *)autoreg_host;
 #if defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
 		skip_tls_validation = 1;
 #endif
 	}
-
+	else
+	{
+		/* Host found and connection type is allowed, no autoregistration needed */
+		if (NULL != dc_autoreg_host)
+			*dc_autoreg_host = NULL;
+	}
 #if defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
 	const char	*msg;
 
@@ -9069,50 +9081,66 @@ int	zbx_dc_check_host_conn_permissions(const char *host, const zbx_socket_t *soc
 	return SUCCEED;
 }
 
-int	zbx_dc_is_autoreg_host_changed(const char *host, unsigned short port, const char *host_metadata,
+int	zbx_dc_is_autoreg_host_changed_with_host(void *dc_autoreg_host, unsigned short port, const char *host_metadata,
 		zbx_conn_flags_t flag, const char *interface, unsigned int connection_type, int now)
 {
 #define AUTO_REGISTRATION_HEARTBEAT	120
-
-	const ZBX_DC_AUTOREG_HOST	*dc_autoreg_host;
+	const ZBX_DC_AUTOREG_HOST	*autoreg_host;
 	int				ret;
 
-	RDLOCK_CACHE;
-
-	if (NULL == (dc_autoreg_host = DCfind_autoreg_host(host)))
-	{
-		ret = SUCCEED;
-	}
-	else if (0 != strcmp(dc_autoreg_host->host_metadata, host_metadata))
-	{
-		ret = SUCCEED;
-	}
-	else if (dc_autoreg_host->flags != (int)flag)
-	{
-		ret = SUCCEED;
-	}
-	else if (ZBX_CONN_IP == flag && (0 != strcmp(dc_autoreg_host->listen_ip, interface) ||
-			dc_autoreg_host->listen_port != port))
-	{
-		ret = SUCCEED;
-	}
-	else if (ZBX_CONN_DNS == flag && (0 != strcmp(dc_autoreg_host->listen_dns, interface) ||
-			dc_autoreg_host->listen_port != port))
-	{
-		ret = SUCCEED;
-	}
-	else if (AUTO_REGISTRATION_HEARTBEAT < now - dc_autoreg_host->timestamp)
-	{
-		ret = SUCCEED;
-	}
-	else if (dc_autoreg_host->connection_type != connection_type)
+	if (NULL == dc_autoreg_host)
 	{
 		ret = SUCCEED;
 	}
 	else
-		ret = FAIL;
+	{
+		autoreg_host = (const ZBX_DC_AUTOREG_HOST *)dc_autoreg_host;
 
+		if (0 != strcmp(autoreg_host->host_metadata, host_metadata))
+		{
+			ret = SUCCEED;
+		}
+		else if (autoreg_host->flags != (int)flag)
+		{
+			ret = SUCCEED;
+		}
+		else if (ZBX_CONN_IP == flag && (0 != strcmp(autoreg_host->listen_ip, interface) ||
+				autoreg_host->listen_port != port))
+		{
+			ret = SUCCEED;
+		}
+		else if (ZBX_CONN_DNS == flag && (0 != strcmp(autoreg_host->listen_dns, interface) ||
+				autoreg_host->listen_port != port))
+		{
+			ret = SUCCEED;
+		}
+		else if (AUTO_REGISTRATION_HEARTBEAT < now - autoreg_host->timestamp)
+		{
+			ret = SUCCEED;
+		}
+		else if (autoreg_host->connection_type != connection_type)
+		{
+			ret = SUCCEED;
+		}
+		else
+			ret = FAIL;
+	}
+
+	return ret;
+}
+
+int	zbx_dc_is_autoreg_host_changed(const char *host, unsigned short port, const char *host_metadata,
+		zbx_conn_flags_t flag, const char *interface, unsigned int connection_type, int now)
+{
+	const ZBX_DC_AUTOREG_HOST	*dc_autoreg_host;
+	int				ret;
+
+	RDLOCK_CACHE;
+	dc_autoreg_host = DCfind_autoreg_host(host);
 	UNLOCK_CACHE;
+
+	ret = zbx_dc_is_autoreg_host_changed_with_host((void *)dc_autoreg_host, port, host_metadata, flag, interface,
+			connection_type, now);
 
 	return ret;
 }
