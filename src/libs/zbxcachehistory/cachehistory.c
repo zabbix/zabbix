@@ -2619,7 +2619,7 @@ void	zbx_dc_add_history_variant(zbx_uint64_t itemid, unsigned char value_type, u
 				if (ZBX_HISTORY_JSON_VALUE_LEN < strlen(value->data.json))
 				{
 					dc_local_add_history_notsupported(itemid, &ts,
-							"JSON limit reached. ", lastlogsize, mtime,
+							"JSON is too large. ", lastlogsize, mtime,
 							value_flags);
 					return;
 				}

@@ -1150,7 +1150,7 @@ void	zbx_preprocess_item_value(zbx_uint64_t itemid, unsigned char item_value_typ
 			if (ZBX_HISTORY_JSON_VALUE_LEN < strlen(result->text))
 			{
 				state = ITEM_STATE_NOTSUPPORTED;
-				dyn_error = zbx_strdup(NULL, "JSON limit reached");
+				dyn_error = zbx_strdup(NULL, "JSON is too large.");
 			}
 			else if (0 == zbx_json_validate_ext(result->text, &dyn_error))
 			{

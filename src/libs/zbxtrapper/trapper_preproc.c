@@ -312,7 +312,7 @@ int	zbx_trapper_preproc_test_run(const struct zbx_json_parse *jp_item, const str
 		{
 			if (ZBX_HISTORY_JSON_VALUE_LEN < strlen(result->value.data.json))
 			{
-				preproc_error = zbx_strdup(NULL, "JSON limit reached.");
+				preproc_error = zbx_strdup(NULL, "JSON is too large.");
 				break;
 			}
 
