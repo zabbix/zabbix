@@ -777,7 +777,8 @@ int	db_is_escape_sequence(char c)
  ******************************************************************************/
 static int	dbconn_vexecute(zbx_dbconn_t *db, const char *fmt, va_list args)
 {
-	char		*sql = NULL, *sql_printable = NULL;
+	char		*sql_trunc, *sql = NULL, *sql_printable = NULL;
+	char		buf_sql_trunc[MAX_BUFFER_LEN + 1];
 	int		ret = ZBX_DB_OK;
 	double		sec = 0;
 	size_t		sql_alloc = 0, sql_offset = 0;
@@ -805,8 +806,7 @@ static int	dbconn_vexecute(zbx_dbconn_t *db, const char *fmt, va_list args)
 		goto clean;
 	}
 
-	char		buf_trunc[MAX_BUFFER_LEN + 1];
-	const char	*sql_trunc = zbx_truncate_value(sql, MAX_BUFFER_LEN, buf_trunc, sizeof(buf_trunc));
+	*sql_trunc = zbx_truncate_value(sql, MAX_BUFFER_LEN, buf_sql_trunc, sizeof(buf_sql_trunc));
 
 	zabbix_log(LOG_LEVEL_DEBUG, "query [txnlev:%d] [%s]", db->txn_level,
 			db_replace_nonprintable_chars(sql_trunc, &sql_printable));
