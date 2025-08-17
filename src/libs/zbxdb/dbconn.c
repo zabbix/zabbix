@@ -805,9 +805,11 @@ static int	dbconn_vexecute(zbx_dbconn_t *db, const char *fmt, va_list args)
 		goto clean;
 	}
 
-	zabbix_log(LOG_LEVEL_DEBUG, "query [txnlev:%d] [%s]", db->txn_level,
-			db_replace_nonprintable_chars(sql, &sql_printable));
+	char		buf_trunc[MAX_BUFFER_LEN + 1];
+	const char	*sql_trunc = zbx_truncate_value(sql, MAX_BUFFER_LEN, buf_trunc, sizeof(buf_trunc));
 
+	zabbix_log(LOG_LEVEL_DEBUG, "query [txnlev:%d] [%s]", db->txn_level,
+			db_replace_nonprintable_chars(sql_trunc, &sql_printable));
 #if defined(HAVE_MYSQL)
 	if (NULL == db->conn)
 	{
