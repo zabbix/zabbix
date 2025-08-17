@@ -840,7 +840,7 @@ static int	housekeeping_process_rule(int now, int config_max_hk_delete, zbx_hk_r
 
 			zbx_db_begin();
 
-			if (NULL != rule->fk_table)
+			if (NULL != rule->fk_table && 0 == id_field_str_type)
 			{
 				sql_offset = 0;
 				zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "delete from %s where",
