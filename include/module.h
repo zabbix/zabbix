@@ -99,7 +99,7 @@ typedef struct
 	int		type;		/* flags: see AR_* above */
 	int		mtime;		/* meta information */
 	char		*bin;
-	char            *tjson;
+	char		*tjson;
 }
 AGENT_RESULT;
 

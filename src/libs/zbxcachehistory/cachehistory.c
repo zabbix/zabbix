@@ -2428,7 +2428,6 @@ void	zbx_dc_add_history(zbx_uint64_t itemid, unsigned char item_value_type, unsi
 	/*   1) the NOVALUE flag is set                                                      */
 	/*   2) the NOVALUE flag is not set and value conversion succeeded                   */
 
-
 	if (0 == (value_flags & ZBX_DC_FLAG_NOVALUE))
 	{
 		if (0 != (ZBX_FLAG_DISCOVERY_RULE & item_flags))
@@ -2537,9 +2536,7 @@ void	zbx_dc_add_history_variant(zbx_uint64_t itemid, unsigned char value_type, u
 	}
 
 	if (ZBX_VARIANT_NONE == value->type)
-	{
 		value_flags |= ZBX_DC_FLAG_NOVALUE;
-	}
 
 	/* Add data to the local history cache if:                                           */
 	/*   1) the NOVALUE flag is set (data contains either meta information or timestamp) */
