@@ -9027,7 +9027,7 @@ int	zbx_dc_check_host_conn_permissions(const char *host, const zbx_socket_t *soc
 	}
 
 	/* Skip connection type check and TLS validation if connection type changed during autoregistration */
-	if (ZBX_AUTOREG_NO_CHANGES == (change_flags & ZBX_AUTOREG_CHANGED_CONNECTION_TYPE))
+	if (0 == (change_flags & ZBX_AUTOREG_CHANGED_CONNECTION_TYPE))
 	{
 		if (0 == ((unsigned int)dc_host->tls_accept & sock->connection_type))
 		{
