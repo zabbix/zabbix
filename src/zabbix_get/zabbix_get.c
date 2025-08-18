@@ -69,11 +69,13 @@ static const char	*usage_message[] = {
 ZBX_GET_CONFIG_VAR(unsigned char, zbx_program_type, ZBX_PROGRAM_TYPE_GET)
 
 #define CONFIG_GET_TIMEOUT_MIN		1
+#define CONFIG_GET_TIMEOUT_DEF		30
 #define CONFIG_GET_TIMEOUT_MAX		600
 #define CONFIG_GET_TIMEOUT_MIN_STR	ZBX_STR(CONFIG_GET_TIMEOUT_MIN)
+#define CONFIG_GET_TIMEOUT_DEF_STR	ZBX_STR(CONFIG_GET_TIMEOUT_DEF)
 #define CONFIG_GET_TIMEOUT_MAX_STR	ZBX_STR(CONFIG_GET_TIMEOUT_MAX)
 
-static int	config_get_timeout = CONFIG_GET_TIMEOUT_MAX;
+static int	config_get_timeout = CONFIG_GET_TIMEOUT_DEF;
 
 static const char	*help_message[] = {
 	"Get data from Zabbix agent.",
@@ -86,7 +88,7 @@ static const char	*help_message[] = {
 	"",
 	"  -t --timeout seconds       Specify timeout. Valid range: " CONFIG_GET_TIMEOUT_MIN_STR "-"
 			CONFIG_GET_TIMEOUT_MAX_STR " seconds",
-	"                             (default: " CONFIG_GET_TIMEOUT_MAX_STR " seconds)",
+	"                             (default: " CONFIG_GET_TIMEOUT_DEF_STR " seconds)",
 	"",
 	"  -k --key item-key          Specify key of the item to retrieve value for",
 	"",
