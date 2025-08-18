@@ -289,7 +289,7 @@ void	dcheck_port_ranges_get(const char *ports, zbx_vector_portrange_t *ranges)
 
 static int	process_services(void *handle, zbx_uint64_t druleid, zbx_db_dhost *dhost, const char *ip,
 		const char *dns, time_t now, zbx_uint64_t unique_dcheckid,
-		zbx_vector_discoverer_services_ptr_t *services, zbx_add_event_func_t add_event_cb,
+		const zbx_vector_discoverer_services_ptr_t *services, zbx_add_event_func_t add_event_cb,
 		zbx_discovery_update_service_func_t discovery_update_service_cb,
 		zbx_discovery_update_service_down_func_t discovery_update_service_down_cb,
 		zbx_discovery_find_host_func_t discovery_find_host_cb)
@@ -299,13 +299,6 @@ static int	process_services(void *handle, zbx_uint64_t druleid, zbx_db_dhost *dh
 	zbx_discoverer_dservice_t	unique_service;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
-
-	if (0 == services->values_num)
-	{
-		discovery_find_host_cb(druleid, ip, dhost);
-		host_status = DOBJECT_STATUS_DOWN;
-		goto out;
-	}
 
 	zbx_vector_uint64_create(&dserviceids);
 	unique_service.dcheckid = unique_dcheckid;
@@ -321,13 +314,13 @@ static int	process_services(void *handle, zbx_uint64_t druleid, zbx_db_dhost *dh
 		discovery_update_service_cb(handle, druleid, service->dcheckid, unique_dcheckid, dhost,
 				ip, dns, service->port, service->status, service->value, now, &dserviceids,
 				add_event_cb);
-
-		zbx_vector_discoverer_services_ptr_remove_noorder(services, unique_index);
-		service_free(service);
 	}
 
 	for (int i = 0; i < services->values_num; i++)
 	{
+		if (i == unique_index)
+			continue;
+
 		zbx_discoverer_dservice_t	*service = services->values[i];
 
 		if ((-1 == host_status || DOBJECT_STATUS_UP == service->status) && host_status != service->status)
@@ -338,11 +331,17 @@ static int	process_services(void *handle, zbx_uint64_t druleid, zbx_db_dhost *dh
 				add_event_cb);
 	}
 
+	if (0 == services->values_num)
+	{
+		discovery_find_host_cb(druleid, ip, dhost);
+		host_status = DOBJECT_STATUS_DOWN;
+	}
+
 	if (0 != dhost->dhostid)
 		discovery_update_service_down_cb(dhost->dhostid, now, &dserviceids);
 
 	zbx_vector_uint64_destroy(&dserviceids);
-out:
+
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 
 	return host_status;
