@@ -185,7 +185,7 @@ static int	get_hostid_by_host_or_autoregister(const zbx_socket_t *sock, const ch
 
 	char		*ch_error;
 	int		ret = FAIL;
-	int		autoreg = AUTOREG_ENABLED;
+	int		autoreg = AUTOREG_ENABLED, change_flags = ZBX_AUTOREG_NO_CHANGES;
 	unsigned char	status, monitored_by;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() host:'%s' metadata:'%s'", __func__, host, host_metadata);
@@ -195,23 +195,6 @@ static int	get_hostid_by_host_or_autoregister(const zbx_socket_t *sock, const ch
 		zbx_snprintf(error, MAX_STRING_LEN, "invalid host name [%s]: %s", host, ch_error);
 		zbx_free(ch_error);
 		goto out;
-	}
-
-	/* if host exists then check host connection permissions */
-	int	change_flags = 0;
-	int	connection_type_changed = 0;
-
-	/* First check if autoregistration host has changed */
-	if (AUTOREG_ENABLED == autoreg)
-	{
-		change_flags = zbx_dc_is_autoreg_host_changed(host, port, host_metadata, flag, interface,
-				sock->connection_type, (int)time(NULL));
-
-		/* Check if connection type changed */
-		if (0 != (change_flags & ZBX_AUTOREG_CHANGED_CONNECTION_TYPE))
-		{
-			connection_type_changed = 1;
-		}
 	}
 
 	if (0 != (trapper_get_program_type()() & ZBX_PROGRAM_TYPE_SERVER))
@@ -227,9 +210,16 @@ static int	get_hostid_by_host_or_autoregister(const zbx_socket_t *sock, const ch
 		autoreg = AUTOREG_DISABLED;
 	}
 
+	/* First check if autoregistration host has changed */
+	if (AUTOREG_ENABLED == autoreg)
+	{
+		change_flags = zbx_dc_is_autoreg_host_changed(host, port, host_metadata, flag, interface,
+				sock->connection_type, (int)time(NULL));
+	}
+
 	/* if host exists then check host connection permissions */
 	if (FAIL == zbx_dc_check_host_conn_permissions(host, sock, hostid, &status, &monitored_by, revision, redirect,
-			&ch_error, connection_type_changed))
+			change_flags, &ch_error))
 	{
 		zbx_snprintf(error, MAX_STRING_LEN, "%s", ch_error);
 		zbx_free(ch_error);

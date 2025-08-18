@@ -8992,7 +8992,7 @@ int	zbx_dc_get_host_by_hostid(zbx_dc_host_t *host, zbx_uint64_t hostid)
  ******************************************************************************/
 int	zbx_dc_check_host_conn_permissions(const char *host, const zbx_socket_t *sock, zbx_uint64_t *hostid,
 		unsigned char *status, unsigned char *monitored_by, zbx_uint64_t *revision,
-		zbx_comms_redirect_t *redirect, char **error, int connection_type_changed)
+		zbx_comms_redirect_t *redirect, int change_flags, char **error)
 {
 	const ZBX_DC_HOST	*dc_host = NULL;
 #if defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
@@ -9027,7 +9027,7 @@ int	zbx_dc_check_host_conn_permissions(const char *host, const zbx_socket_t *soc
 	}
 
 	/* Skip connection type check and TLS validation if connection type changed during autoregistration */
-	if (0 == connection_type_changed)
+	if (ZBX_AUTOREG_NO_CHANGES == (change_flags & ZBX_AUTOREG_CHANGED_CONNECTION_TYPE))
 	{
 		if (0 == ((unsigned int)dc_host->tls_accept & sock->connection_type))
 		{
