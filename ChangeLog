@@ -1,7 +1,5 @@
 Changes for 7.4.2rc2
 
-New features:
-
 Bug fixes:
 .......PS. [ZBX-26868] fixed crash when adding new SNMP device (vso)
 
