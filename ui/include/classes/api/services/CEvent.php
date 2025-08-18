@@ -749,7 +749,6 @@ class CEvent extends CApiService {
 			}
 
 			$relation_map = $this->createRelationMap($db_acknowledges, 'eventid', 'acknowledgeid');
-
 			$db_acknowledges = $this->unsetExtraFields($db_acknowledges, ['eventid', 'acknowledgeid', 'userid'],
 				$output
 			);
