@@ -3026,7 +3026,7 @@ zabbix_export:
             label: 'Mount point filter (exclude)'
             description: 'Filter to exclude discovered by mount point names.'
         - macro: '{$BIGIP.LLD.OVERRIDE.PART.FILTER_LOW_SPACE_TRIGGER}'
-          value: ^/usr$
+          value: '^(?:/usr|/opt/\.sdm/(?:usr|lib|lib64))$'
           description: 'Partitions that low free space trigger should ignore.'
           config:
             type: TEXT

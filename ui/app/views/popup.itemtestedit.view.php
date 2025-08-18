@@ -69,21 +69,24 @@ $i = 0;
 foreach ($data['macros'] as $macro_name => $macro_value) {
 	$macros_table->addRow([
 		(new CCol(
-			(new CTextAreaFlexible('macro_rows['.$i++.']', $macro_name, ['readonly' => true]))
+			(new CTextAreaFlexible('macro_rows['.$i.']', $macro_name, ['readonly' => true]))
 				->setWidth(ZBX_TEXTAREA_MACRO_WIDTH)
 				->removeId()
 				->removeAttribute('name')
 		))->addClass(ZBX_STYLE_TEXTAREA_FLEXIBLE_PARENT),
 		(new CCol(RARR()))->addStyle('vertical-align: top;'),
-		(new CCol(
-			(new CTextAreaFlexible('macros['.$macro_name.']', $macro_value))
+		(new CCol([
+			new CVar('macro_names['.$i.']', $macro_name),
+			(new CTextAreaFlexible('macro_values['.$i.']', $macro_value))
 				->setWidth(ZBX_TEXTAREA_MACRO_VALUE_WIDTH)
 				->setMaxlength(CControllerPopupItemTest::INPUT_MAX_LENGTH)
 				->setAttribute('placeholder', _('value'))
 				->disableSpellcheck()
 				->removeId()
-		))->addClass(ZBX_STYLE_TEXTAREA_FLEXIBLE_PARENT)
+		]))->addClass(ZBX_STYLE_TEXTAREA_FLEXIBLE_PARENT)
 	]);
+
+	$i++;
 }
 
 $form_grid = (new CFormGrid())

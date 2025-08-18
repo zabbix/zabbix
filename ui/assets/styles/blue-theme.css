@@ -6205,6 +6205,22 @@ div.dashboard-widget-web .list-table tr[data-hostgroupid] {
   .modal-popup-host-wizard .host-macro-list {
     display: contents; }
 
+.temp-tags-list {
+  visibility: hidden;
+  position: absolute;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  width: 195px;
+  pointer-events: none;
+  z-index: -1; }
+  .temp-tags-list .tag {
+    margin: 0; }
+  .temp-tags-list .btn-icon {
+    min-width: 16px;
+    height: 16px;
+    line-height: 16px; }
+
 .link-action {
   color: #1f2c33;
   cursor: pointer; }
