@@ -438,7 +438,8 @@ else {
 						'cancel' => true,
 						'action' => ''
 					]
-				]
+				],
+				'rules' => $data['js_clone_validation_rules']
 			]).');'
 		],
 		[
@@ -458,8 +459,7 @@ $form
 	->addItem(
 		(new CScriptTag('script_edit_popup.init('.json_encode([
 			'script' => $data['form'],
-			'rules' => $data['js_validation_rules'],
-			'rules_for_clone' => $data['js_clone_validation_rules']
+			'rules' => $data['js_validation_rules']
 		]).');'))->setOnDocumentReady()
 	)
 	->addStyle('display: none;');

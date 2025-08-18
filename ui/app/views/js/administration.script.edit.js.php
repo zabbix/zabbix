@@ -21,12 +21,11 @@
 
 window.script_edit_popup = new class {
 
-	init({script, rules, rules_for_clone = null}) {
+	init({script, rules}) {
 		this.overlay = overlays_stack.getById('script.edit');
 		this.dialogue = this.overlay.$dialogue[0];
 		this.form_element = this.overlay.$dialogue.$body[0].querySelector('form');
 		this.form = new CForm(this.form_element, rules);
-		this.rules_for_clone = rules_for_clone;
 		this.script = script;
 		this.scriptid = script.scriptid;
 
@@ -182,10 +181,10 @@ window.script_edit_popup = new class {
 		});
 	}
 
-	clone({title, buttons}) {
+	clone({title, buttons, rules}) {
 		this.scriptid = null;
 
-		this.form.reload(this.rules_for_clone);
+		this.form.reload(rules);
 
 		for (const input of this.form_element.querySelectorAll('input[name=scope]')) {
 			input.disabled = false;
@@ -211,7 +210,7 @@ window.script_edit_popup = new class {
 	}
 
 	submit() {
-		const fields = getFormFields(this.form_element);
+		const fields = this.form.getAllValues();
 
 		for (let key in fields) {
 			if (typeof fields[key] === 'string' && key !== 'confirmation') {
