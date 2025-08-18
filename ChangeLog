@@ -127,8 +127,6 @@ A......... [ZBX-26191] fixed inconsistent API and frontend validation for mainte
 --------------------------------------------------------------------------------
 Changes for 7.4.2rc2
 
-New features:
-
 Bug fixes:
 .......PS. [ZBX-26868] fixed crash when adding new SNMP device (vso)
 
