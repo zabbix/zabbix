@@ -270,8 +270,9 @@ class CPage {
 			}
 
 			if ($session !== null) {
-				$sessionid = CTestArrayHelper::get(json_decode(base64_decode(urldecode($session)), true), 'sessionid');
-				DBExecute('DELETE FROM sessions WHERE sessionid='.zbx_dbstr($sessionid));
+				DBExecute('DELETE FROM sessions WHERE sessionid='.zbx_dbstr(
+						CTestArrayHelper::get(json_decode(base64_decode(urldecode($session)), true), 'sessionid')
+				));
 			}
 
 			$this->driver->manage()->deleteAllCookies();
