@@ -531,7 +531,7 @@ class CFormValidator {
 			return Object.values(check.parameters).some((value) => value !== '');
 		});
 
-		const api_validations =  api_uniq_checks.map((check) => {
+		const api_validations = api_uniq_checks.map((check) => {
 			const {method, parameters, exclude_id} = check;
 			const [api, api_method] = method.split('.');
 			return {
