@@ -53,7 +53,7 @@ Additional resources:
 |{$VMWARE.PROXY}|<p>Sets the HTTP proxy for script items. If this parameter is empty, then no proxy is used.</p>||
 |{$VMWARE.DATASTORE.SPACE.WARN}|<p>The warning threshold of the datastore free space.</p>|`20`|
 |{$VMWARE.DATASTORE.SPACE.CRIT}|<p>The critical threshold of the datastore free space.</p>|`10`|
-|{$VMWARE.HV.SENSOR.DISCOVERY}|<p>Set "true"/"false" to enable or disable monitoring of hardware sensors.</p>|`false`|
+|{$VMWARE.HV.SENSOR.DISCOVERY}|<p>Set "true"/"false" to enable or disable monitoring of hardware sensors.</p>|`FALSE`|
 |{$VMWARE.HV.SENSOR.DISCOVERY.NAME.MATCHES}|<p>Sets the regex string of hardware sensor names to be allowed in discovery.</p>|`.*`|
 |{$VMWARE.HV.SENSOR.DISCOVERY.NAME.NOT_MATCHES}|<p>Sets the regex string of hardware sensor names to be ignored in discovery.</p>|`CHANGE_IF_NEEDED`|
 |{$VMWARE.VM.POWERSTATE}|<p>Possibility to filter out VMs by power state.</p>|`poweredOn\|poweredOff\|suspended`|
@@ -327,7 +327,7 @@ To use this template as manually linked to a host:
 |{$VMWARE.HV.UUID}|<p>UUID of hypervisor.</p>||
 |{$VMWARE.HV.DATASTORE.SPACE.WARN}|<p>The warning threshold of the datastore free space.</p>|`20`|
 |{$VMWARE.HV.DATASTORE.SPACE.CRIT}|<p>The critical threshold of the datastore free space.</p>|`10`|
-|{$VMWARE.HV.SENSOR.DISCOVERY}|<p>Set "true"/"false" to enable or disable the monitoring of hardware sensors.</p>|`false`|
+|{$VMWARE.HV.SENSOR.DISCOVERY}|<p>Set "true"/"false" to enable or disable the monitoring of hardware sensors.</p>|`FALSE`|
 |{$VMWARE.HV.SENSOR.DISCOVERY.NAME.MATCHES}|<p>Sets the regex string of hardware sensor names to be allowed in discovery.</p>|`.*`|
 |{$VMWARE.HV.SENSOR.DISCOVERY.NAME.NOT_MATCHES}|<p>Sets the regex string of hardware sensor names to be ignored in discovery.</p>|`CHANGE_IF_NEEDED`|
 
