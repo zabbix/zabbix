@@ -14,7 +14,7 @@
 **/
 
 
-class CControllerValidateWithApi extends CController {
+class CControllerValidateApiExists extends CController {
 
 	protected function init() {
 		$this->disableCsrfValidation();
