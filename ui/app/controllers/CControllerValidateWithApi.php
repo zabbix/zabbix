@@ -24,13 +24,13 @@ class CControllerValidateWithApi extends CController {
 
 	public static function getValidationRules(): array {
 		$api_services = ['dashboard', 'discoveryrule', 'discoveryruleprototype', 'host', 'hostgroup', 'hostprototype',
-			'httptest', 'image', 'iconmap', 'item', 'itemprototype', 'maintenance', 'mediatype', 'mfa', 'module',
-			'proxy', 'proxygroup', 'report', 'regexp', 'role', 'service', 'sla', 'template', 'templatedashboard',
-			'templategroup', 'token', 'user', 'usergroup', 'usermacro', 'valuemap'
+			'httptest', 'image', 'iconmap', 'item', 'itemprototype', 'maintenance', 'mediatype', 'proxy', 'proxygroup',
+			'report', 'regexp', 'role', 'service', 'sla', 'template', 'templatedashboard', 'templategroup', 'token',
+			'user', 'usergroup', 'usermacro'
 		];
 
 		return ['object', 'fields' => [
-			'validations' => ['objects', 'fields' => [
+			'validations' => ['objects', 'not_empty', 'fields' => [
 				'api' => ['string', 'required', 'in' => $api_services],
 				'method' => ['string', 'required', 'in' => ['get']],
 				'field' => ['string', 'required'],

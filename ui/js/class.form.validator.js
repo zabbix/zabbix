@@ -490,14 +490,14 @@ class CFormValidator {
 	 *
 	 * @returns {Promise}
 	 */
-	#validateWithApi (validatons) {
+	#validateWithApi (validations) {
 		const url = new URL('zabbix.php', location.href);
 		url.searchParams.set('action', 'validate.with.api');
 
 		return fetch(url.href, {
 			method: 'POST',
 			headers: {'Content-Type': 'application/json'},
-			body: JSON.stringify({validations: validatons}),
+			body: JSON.stringify({validations}),
 		})
 			.then(response => response.json())
 			.then(response => {
@@ -506,6 +506,10 @@ class CFormValidator {
 				}
 
 				return response;
+			})
+			.catch(exception => {
+				console.error(exception);
+				return { result: false };
 			});
 	}
 
