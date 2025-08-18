@@ -44,13 +44,36 @@ static int	DBpatch_7050002(void)
 
 static int	DBpatch_7050003(void)
 {
-	const zbx_db_field_t	field = {"automatic", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0};
-
-	return DBadd_field("trigger_tag", &field);
-
+	return DBdrop_foreign_key("event_recovery", 2);
 }
 
 static int	DBpatch_7050004(void)
+{
+	const zbx_db_field_t	field = {"r_eventid", NULL, "events", "eventid", 0, ZBX_TYPE_ID, ZBX_NOTNULL, 0};
+
+	return DBadd_foreign_key("event_recovery", 2, &field);
+}
+
+static int	DBpatch_7050005(void)
+{
+	return DBdrop_foreign_key("problem", 2);
+}
+
+static int	DBpatch_7050006(void)
+{
+	const zbx_db_field_t	field = {"r_eventid", NULL, "events", "eventid", 0, ZBX_TYPE_ID, ZBX_NOTNULL, 0};
+
+	return DBadd_foreign_key("problem", 2, &field);
+}
+
+static int	DBpatch_7050007(void)
+{
+	const zbx_db_field_t	field = {"automatic", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0};
+
+	return DBadd_field("trigger_tag", &field);
+}
+
+static int	DBpatch_7050008(void)
 {
 	if (ZBX_DB_OK > zbx_db_execute(
 			"update trigger_tag"
@@ -78,5 +101,9 @@ DBPATCH_ADD(7050001, 0, 1)
 DBPATCH_ADD(7050002, 0, 1)
 DBPATCH_ADD(7050003, 0, 1)
 DBPATCH_ADD(7050004, 0, 1)
+DBPATCH_ADD(7050005, 0, 1)
+DBPATCH_ADD(7050006, 0, 1)
+DBPATCH_ADD(7050007, 0, 1)
+DBPATCH_ADD(7050008, 0, 1)
 
 DBPATCH_END()
