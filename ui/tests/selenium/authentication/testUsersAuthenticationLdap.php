@@ -2962,7 +2962,7 @@ class testUsersAuthenticationLdap extends testFormAuthentication {
 	 * @param string $values    simple LDAP server values
 	 */
 	private function setLdap($data, $query, $values = null) {
-		$form = $this->query('id:authentication-form')->asForm()->one();
+		$form = $this->query('id:authentication-form')->waitUntilVisible()->asForm()->one();
 
 		// Select LDAP setting tab if it is not selected.
 		if ($form->getSelectedTab() !== 'LDAP settings') {
