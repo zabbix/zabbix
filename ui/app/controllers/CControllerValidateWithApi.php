@@ -30,7 +30,7 @@ class CControllerValidateWithApi extends CController {
 		];
 
 		return ['object', 'fields' => [
-			'validations' => ['objects', 'not_empty', 'fields' => [
+			'validations' => ['objects', 'required', 'not_empty', 'fields' => [
 				'api' => ['string', 'required', 'in' => $api_services],
 				'method' => ['string', 'required', 'in' => ['get']],
 				'field' => ['string', 'required'],
