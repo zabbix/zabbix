@@ -9080,8 +9080,7 @@ int	zbx_dc_is_autoreg_host_changed(const char *host, unsigned short port, const 
 
 	if (NULL != (dc_autoreg_host = DCfind_autoreg_host(host)))
 	{
-		if (NULL == dc_autoreg_host->host_metadata || NULL == host_metadata ||
-			0 != strcmp(dc_autoreg_host->host_metadata, host_metadata))
+		if (0 != strcmp(dc_autoreg_host->host_metadata, host_metadata))
 		{
 			change_flags |= ZBX_AUTOREG_CHANGED_HOST_METADATA;
 		}
@@ -9091,15 +9090,13 @@ int	zbx_dc_is_autoreg_host_changed(const char *host, unsigned short port, const 
 			change_flags |= ZBX_AUTOREG_CHANGED_FLAGS;
 		}
 
-		if (ZBX_CONN_IP == flag && (NULL == dc_autoreg_host->listen_ip || NULL == interface ||
-				0 != strcmp(dc_autoreg_host->listen_ip, interface) ||
+		if (ZBX_CONN_IP == flag && (0 != strcmp(dc_autoreg_host->listen_ip, interface) ||
 				dc_autoreg_host->listen_port != port))
 		{
 			change_flags |= ZBX_AUTOREG_CHANGED_INTERFACE_IP;
 		}
 
-		if (ZBX_CONN_DNS == flag && (NULL == dc_autoreg_host->listen_dns || NULL == interface ||
-				0 != strcmp(dc_autoreg_host->listen_dns, interface) ||
+		if (ZBX_CONN_DNS == flag && (0 != strcmp(dc_autoreg_host->listen_dns, interface) ||
 				dc_autoreg_host->listen_port != port))
 		{
 			change_flags |= ZBX_AUTOREG_CHANGED_INTERFACE_DNS;
