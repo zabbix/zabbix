@@ -542,7 +542,7 @@ class CFormValidator {
 				field: check.fields[0],
 				error_msg: check.error_msg
 			};
-		})
+		});
 
 		if (api_validations.length) {
 			return this.#validateApiExists(api_validations)
@@ -554,9 +554,7 @@ class CFormValidator {
 					}
 				});
 		}
-		else {
-			return Promise.resolve(true);
-		}
+		return Promise.resolve(true);
 	}
 
 	/**
