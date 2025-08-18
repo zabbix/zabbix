@@ -20,6 +20,7 @@ import (
 	"golang.zabbix.com/sdk/plugin"
 )
 
+// Session type contains session parameters of the config file.
 type Session struct {
 	// URI defines an address of the Oracle Net Listener.
 	URI string `conf:"name=Uri,optional"`
@@ -32,6 +33,7 @@ type Session struct {
 	Service string `conf:"optional"`
 }
 
+// PluginOptions option from the config file.
 type PluginOptions struct {
 	// ConnectTimeout is the maximum time in seconds for waiting when a connection has to be established.
 	// Default value equals to the global timeout.
@@ -50,13 +52,16 @@ type PluginOptions struct {
 	// CustomQueriesPath is a full pathname of a directory containing *.sql files with custom queries.
 	CustomQueriesPath string `conf:"optional"`
 
+	// ResolveTNS enables the interpretation of a connection string (ConnString) in a metrics key as TNS.
+	ResolveTNS bool `conf:"optional,default=true"`
+
 	// Default stores default connection parameter values from configuration file
 	Default Session `conf:"optional"`
 }
 
 // Configure implements the Configurator interface.
 // Initializes configuration structures.
-func (p *Plugin) Configure(global *plugin.GlobalOptions, options interface{}) {
+func (p *Plugin) Configure(global *plugin.GlobalOptions, options any) {
 	if err := conf.UnmarshalStrict(options, &p.options); err != nil {
 		p.Errf("cannot unmarshal configuration options: %s", err)
 	}
@@ -72,7 +77,7 @@ func (p *Plugin) Configure(global *plugin.GlobalOptions, options interface{}) {
 
 // Validate implements the Configurator interface.
 // Returns an error if validation of a plugin's configuration is failed.
-func (p *Plugin) Validate(options interface{}) error {
+func (p *Plugin) Validate(options any) error { //nolint:revive
 	var opts PluginOptions
 
 	err := conf.UnmarshalStrict(options, &opts)
