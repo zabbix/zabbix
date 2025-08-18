@@ -1592,7 +1592,7 @@ zabbix_export:
               filter:
                 conditions:
                   - macro: '{#NODE.DELAY}'
-                    operator: NOT_EXISTS
+                    value: '.*'
               operations:
                 - operator: LIKE
                   value: '.*Average latency&'
@@ -1766,7 +1766,7 @@ zabbix_export:
               filter:
                 conditions:
                   - macro: '{#POOL.USED.CAPACITY}'
-                    operator: NOT_EXISTS
+                    value: '.*'
               operations:
                 - operator: LIKE
                   value: '.*Capacity used&'
