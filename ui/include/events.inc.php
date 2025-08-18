@@ -511,11 +511,6 @@ function hasEventCloseAction(array $acknowledges): bool {
  * @return bool
  */
 function isEventRecentlySuppressed(array $acknowledges, &$suppression_action = null): bool {
-	CArrayHelper::sort($acknowledges, [
-		['field' => 'clock', 'order' => ZBX_SORT_DOWN],
-		['field' => 'acknowledgeid', 'order' => ZBX_SORT_DOWN]
-	]);
-
 	foreach ($acknowledges as $ack) {
 		if (!array_key_exists('suppress_until', $ack)) {
 			continue;

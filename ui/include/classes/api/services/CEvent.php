@@ -721,8 +721,8 @@ class CEvent extends CApiService {
 			$db_acknowledges = DB::select('acknowledges', [
 				'output' => $this->outputExtend($output, ['acknowledgeid', 'eventid', 'userid']),
 				'filter' => ['eventid' => array_keys($result)],
-				'sortfield' => ['clock'],
-				'sortorder' => [ZBX_SORT_DOWN],
+				'sortfield' => ['clock', 'acknowledgeid'],
+				'sortorder' => [ZBX_SORT_DOWN, ZBX_SORT_DOWN],
 				'preservekeys' => true
 			]);
 
@@ -749,11 +749,6 @@ class CEvent extends CApiService {
 			}
 
 			$relation_map = $this->createRelationMap($db_acknowledges, 'eventid', 'acknowledgeid');
-
-			CArrayHelper::sort($db_acknowledges, [
-				['field' => 'clock', 'order' => ZBX_SORT_DOWN],
-				['field' => 'acknowledgeid', 'order' => ZBX_SORT_DOWN]
-			]);
 
 			$db_acknowledges = $this->unsetExtraFields($db_acknowledges, ['eventid', 'acknowledgeid', 'userid'],
 				$output
