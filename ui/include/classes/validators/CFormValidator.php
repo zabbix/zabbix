@@ -1210,10 +1210,10 @@ class CFormValidator {
 	 *
 	 * @param string $api
 	 * @param array $options
-	 * @param int|null $exclude_primary_id
+	 * @param string|null $exclude_primary_id
 	 * @return bool
 	 */
-	public static function existsAPIObject (string $api, array $options, ?int $exclude_primary_id = null): bool {
+	public static function existsAPIObject (string $api, array $options, ?string $exclude_primary_id = null): bool {
 		$options['preservekeys'] = true;
 		$result = API::getApiService($api)->get($options);
 
