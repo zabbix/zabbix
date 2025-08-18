@@ -1638,7 +1638,7 @@ zabbix_export:
               filter:
                 conditions:
                   - macro: '{#NODE.DELAY}'
-                    operator: NOT_EXISTS
+                    value: '.*'
                     formulaid: A
               operations:
                 - operationobject: ITEM_PROTOTYPE
@@ -1820,7 +1820,7 @@ zabbix_export:
               filter:
                 conditions:
                   - macro: '{#POOL.USED.CAPACITY}'
-                    operator: NOT_EXISTS
+                    value: '.*'
                     formulaid: A
               operations:
                 - operationobject: ITEM_PROTOTYPE
