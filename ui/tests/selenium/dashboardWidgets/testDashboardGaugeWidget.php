@@ -1459,22 +1459,21 @@ class testDashboardGaugeWidget extends testWidgets {
 					],
 					'result' => 'Problem, Problem, Problem, Problem, test, test'
 				]
+			],
+			'Macro functions regsub() / iregsub() - successful scenarios' => [
+				[
+					'fields' => [
+						'Advanced configuration' => true,
+						'id:description' => '{'.self::USER_MACRO.'.regsub(0, Problem)}, '.
+							'{'.self::USER_MACRO.'.iregsub(0, Problem)}, '.
+							'{'.self::USER_SECRET_MACRO.'.regsub(0, Problem)}, '.
+							'{'.self::USER_SECRET_MACRO.'.iregsub(0, Problem)}, '.
+							'{{ITEM.NAME}.regsub(0, test)}, {{ITEM.NAME}.iregsub(0, test)}',
+						'id:desc_size' => 5
+					],
+					'result' => ', , , , ,'
+				]
 			]
-			// TODO: Uncomment and check the test case, after ZBX-25420 fix.
-//			'Macro functions regsub() / iregsub() - successful scenarios' => [
-//				[
-//					'fields' => [
-//						'Advanced configuration' => true,
-//						'id:description' => '{'.self::USER_MACRO.'.regsub(0, Problem)}, '.
-//							'{'.self::USER_MACRO.'.iregsub(0, Problem)}, '.
-//							'{'.self::USER_SECRET_MACRO.'.regsub(0, Problem)}, '.
-//							'{'.self::USER_SECRET_MACRO.'.iregsub(0, Problem)}, '.
-//							'{{ITEM.NAME}.regsub(0, test)}, {{ITEM.NAME}.iregsub(0, test)}',
-//						'id:desc_size' => 5
-//					],
-//					'result' => ', , , , ,'
-//				]
-//			]
 		];
 	}
 

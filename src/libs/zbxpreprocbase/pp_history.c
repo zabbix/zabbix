@@ -219,3 +219,22 @@ void	zbx_pp_history_cache_history_set_and_release(zbx_pp_history_cache_t *histor
 
 	pthread_mutex_unlock(&history_cache->lock);
 }
+
+zbx_uint64_t	zbx_pp_history_cache_history_size(zbx_pp_history_cache_t *history_cache)
+{
+	zbx_uint64_t	history_size = 0;
+
+	if (NULL == history_cache)
+		return 0;
+
+	pthread_mutex_lock(&history_cache->lock);
+
+	if (NULL != history_cache->history)
+	{
+		for (int i = 0; i < history_cache->history->step_history.values_num; i++)
+			history_size += zbx_variant_size(&history_cache->history->step_history.values[i].value);
+	}
+	pthread_mutex_unlock(&history_cache->lock);
+
+	return history_size;
+}

@@ -43,6 +43,7 @@ const (
 // Plugin -
 type Plugin struct {
 	plugin.Base
+	executor zbxcmd.Executor
 }
 
 var impl Plugin
@@ -264,13 +265,27 @@ func clen(n []byte) int {
 	return len(n)
 }
 
-func (p *Plugin) exportDevices(params []string, timeout int) (result interface{}, err error) {
+func (p *Plugin) exportDevices(params []string, timeout int) (any, error) {
 	cmd, err := getDeviceCmd(params)
 	if err != nil {
-		return
+		return nil, err
 	}
 
-	return zbxcmd.ExecuteStrict(cmd, time.Second*time.Duration(timeout), "")
+	// Needed so the executor is initialized once, this should be done in configure, but then Zabbix agent 2
+	// will not start if there are issues with finding cmd.exe on windows, and that will break backwards compatibility.
+	if p.executor == nil {
+		p.executor, err = zbxcmd.InitExecutor()
+		if err != nil {
+			return nil, errs.Wrap(err, "command init failed")
+		}
+	}
+
+	out, err := p.executor.ExecuteStrict(cmd, time.Second*time.Duration(timeout), "")
+	if err != nil {
+		return "", errs.New("command exec failed")
+	}
+
+	return out, nil
 }
 
 func getDeviceCmd(params []string) (string, error) {
