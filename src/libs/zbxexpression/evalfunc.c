@@ -28,6 +28,7 @@
 #include "zbxvariant.h"
 #include "zbxdb.h"
 #include "zbxeval.h"
+#include "zbxtime.h"
 
 #define ZBX_VALUEMAP_TYPE_MATCH			0
 #define ZBX_VALUEMAP_TYPE_GREATER_OR_EQUAL	1
@@ -319,7 +320,7 @@ static void	add_value_suffix(char *value, size_t max_len, const char *units, uns
 			if (0 == strcmp(units, "unixtime"))
 			{
 				time = (time_t)atol(value);
-				local_time = localtime(&time);
+				local_time = zbx_localtime(&time, NULL);
 				strftime(value, max_len, "%Y.%m.%d %H:%M:%S", local_time);
 				break;
 			}

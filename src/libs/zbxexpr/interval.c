@@ -987,7 +987,7 @@ static time_t	scheduler_find_dst_change(time_t time_start, time_t time_end)
 		start = time_start / 60;
 		end = time_end / 60;
 
-		tm = localtime(&time_start);
+		tm = zbx_localtime(&time_start, NULL);
 		dst_start = tm->tm_isdst;
 
 		while (end > start + 1)
@@ -995,7 +995,7 @@ static time_t	scheduler_find_dst_change(time_t time_start, time_t time_end)
 			mid = (start + end) / 2;
 			time_mid = mid * 60;
 
-			tm = localtime(&time_mid);
+			tm = zbx_localtime(&time_mid, NULL);
 
 			if (tm->tm_isdst == dst_start)
 				start = mid;
@@ -1419,14 +1419,14 @@ static time_t	scheduler_get_nextcheck(zbx_scheduler_interval_t *interval, time_t
 		}
 		while (-1 == (current_nextcheck = mktime(&tm)));
 
-		tm_dst = *(localtime(&current_nextcheck));
+		tm_dst = *(zbx_localtime(&current_nextcheck, NULL));
 		if (tm_dst.tm_isdst != tm_start.tm_isdst)
 		{
 			int	dst = tm_dst.tm_isdst;
 			time_t	time_dst;
 
 			time_dst = scheduler_find_dst_change(now, current_nextcheck);
-			tm_dst = *localtime(&time_dst);
+			tm_dst = *zbx_localtime(&time_dst, NULL);
 
 			scheduler_apply_day_filter(interval, &tm_dst);
 			scheduler_apply_hour_filter(interval, &tm_dst);
@@ -1690,8 +1690,7 @@ int	zbx_get_report_nextcheck(int now, unsigned char cycle, unsigned char weekday
 	time_t		yesterday = now - SEC_PER_DAY;
 	int		nextcheck, tm_hour, tm_min, tm_sec;
 
-	if (NULL == (tm = localtime(&yesterday)))
-		return -1;
+	tm = zbx_localtime(&yesterday, NULL);
 
 	tm_sec = start_time % 60;
 	start_time /= 60;

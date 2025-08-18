@@ -62,6 +62,20 @@ class testPageAdministrationMediaTypes extends CWebTest {
 				]
 			]
 		]);
+
+		CDataHelper::call('mediatype.create', [
+			[
+				'type' => MEDIA_TYPE_EXEC,
+				'name' => 'Test script',
+				'exec_path' => 'selenium_test_script.sh',
+				'parameters' => [
+					[
+						'sortorder' => '0',
+						'value' => '{ALERT.SUBJECT}'
+					]
+				]
+			]
+		]);
 	}
 
 	/**
@@ -415,7 +429,7 @@ class testPageAdministrationMediaTypes extends CWebTest {
 			: (($action === 'enable' && CTestArrayHelper::get($data, 'select_all'))
 				? 'Media types '.$action.'d. Not enabled: Gmail, Office365. Incomplete configuration.'
 				: 'Media types '.$action.'d'
-			);
+		);
 		$this->assertMessage(TEST_GOOD, $message_title);
 
 		// Check the results in DB.

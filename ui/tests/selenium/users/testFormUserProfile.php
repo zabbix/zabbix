@@ -64,6 +64,23 @@ class testFormUserProfile extends CLegacyWebTest {
 		$this->assertEquals($oldHashUsers, CDBHelper::getHash($sqlHashUsers));
 	}
 
+	public function testFormUserProfile_ThemeChange() {
+		$sqlHashUsers = "select * from users where username<>'".PHPUNIT_LOGIN_NAME."' order by userid";
+		$oldHashUsers = CDBHelper::getHash($sqlHashUsers);
+
+		$this->page->login()->open('zabbix.php?action=userprofile.edit')->waitUntilReady();
+		$form = $this->query('name:userprofile_form')->asForm()->waitUntilVisible()->one();
+		$form->fill(['Theme' => 'Blue'])->submit();
+		$this->page->waitUntilReady();
+		CDashboardElement::find()->waitUntilVisible()->waitUntilReady();
+		$this->assertMessage(TEST_GOOD, 'User updated');
+		$this->zbxTestCheckHeader('Global view');
+		$row = DBfetch(DBselect("select theme from users where username='".PHPUNIT_LOGIN_NAME."'"));
+		$this->assertEquals('blue-theme', $row['theme']);
+
+		$this->assertEquals($oldHashUsers, CDBHelper::getHash($sqlHashUsers));
+	}
+
 	public static function passwords() {
 		return [
 			[[
@@ -147,8 +164,8 @@ class testFormUserProfile extends CLegacyWebTest {
 						'"User settings"]')->exists()
 				);
 				self::$old_password = $data['password1'];
-				// TODO: Following test ThemeChange fails on Jenkins with error access denied for Admin to dahsboard page. Wait may help
-				CDashboardElement::find()->waitUntilVisible()->waitUntilReady();
+				// TODO: Following test fails on Jenkins with error access denied for Admin to dahsboard page. Logout may help
+				$this->page->logout();
 				break;
 			case TEST_BAD:
 				$this->zbxTestWaitUntilMessageTextPresent('msg-bad' , $data['error_msg']);
@@ -156,23 +173,6 @@ class testFormUserProfile extends CLegacyWebTest {
 				$this->assertEquals($oldHashUsers, CDBHelper::getHash($sqlHashUsers));
 				break;
 		}
-	}
-
-	public function testFormUserProfile_ThemeChange() {
-		$sqlHashUsers = "select * from users where username<>'".PHPUNIT_LOGIN_NAME."' order by userid";
-		$oldHashUsers = CDBHelper::getHash($sqlHashUsers);
-
-		$this->page->login()->open('zabbix.php?action=userprofile.edit')->waitUntilReady();
-		$form = $this->query('name:userprofile_form')->asForm()->waitUntilVisible()->one();
-		$form->fill(['Theme' => 'Blue'])->submit();
-		$this->page->waitUntilReady();
-		CDashboardElement::find()->waitUntilVisible()->waitUntilReady();
-		$this->assertMessage(TEST_GOOD, 'User updated');
-		$this->zbxTestCheckHeader('Global view');
-		$row = DBfetch(DBselect("select theme from users where username='".PHPUNIT_LOGIN_NAME."'"));
-		$this->assertEquals('blue-theme', $row['theme']);
-
-		$this->assertEquals($oldHashUsers, CDBHelper::getHash($sqlHashUsers));
 	}
 
 	public static function refresh() {

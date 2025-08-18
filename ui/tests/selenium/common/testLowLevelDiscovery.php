@@ -2686,7 +2686,7 @@ class testLowLevelDiscovery extends CWebTest {
 		$form->query('button:Clone')->waitUntilClickable()->one()->click();
 		$form->invalidate();
 		$this->assertEquals(['Add', 'Test', 'Cancel'], $form->query('xpath:.//div[@class="form-actions"]/button')
-				->all()->filter(CElementFilter::CLICKABLE)->asText()
+				->waitUntilVisible()->all()->filter(CElementFilter::CLICKABLE)->asText()
 		);
 
 		if (CTestArrayHelper::get($data, 'fields')) {

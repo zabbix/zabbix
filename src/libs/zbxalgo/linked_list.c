@@ -14,6 +14,99 @@
 
 #include "zbxalgo.h"
 
+struct zbx_list_item_pool
+{
+	zbx_list_item_t	*slots;
+	int		slots_num;
+	zbx_list_item_t *free_slots;
+};
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: create a pool of preallocated list items to reduce memory         *
+ *          allocation overhead for small lists                               *
+ *                                                                            *
+ * Parameters: slots_num - [IN] number of list items to preallocate           *
+ *                                                                            *
+ * Return value: pointer to the created pool or NULL on allocation failure    *
+ *                                                                            *
+ ******************************************************************************/
+static zbx_list_item_pool_t	*list_item_pool_create(zbx_list_t *list, int slots_num)
+{
+	zbx_list_item_pool_t	*pool;
+
+	pool = (zbx_list_item_pool_t *)list->mem_malloc_func(NULL, sizeof(zbx_list_item_pool_t));
+	pool->slots_num = slots_num;
+	pool->slots = (zbx_list_item_t *)list->mem_malloc_func(NULL, (size_t)slots_num * sizeof(zbx_list_item_t));
+
+	for (int i = 0; i < slots_num - 1; i++)
+		pool->slots[i].next = &pool->slots[i + 1];
+
+	pool->slots[slots_num - 1].next = NULL;
+	pool->free_slots = &pool->slots[0];
+
+	return pool;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: free memory allocated for list item pool                          *
+ *                                                                            *
+ * Parameters: list - [IN] list containing the pool                           *
+ *             pool - [IN] pool to be freed                                   *
+ *                                                                            *
+ ******************************************************************************/
+static void	list_item_pool_destroy(zbx_list_t *list, zbx_list_item_pool_t *pool)
+{
+	list->mem_free_func(pool->slots);
+	list->mem_free_func(pool);
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: allocate a list item from the pool                                *
+ *                                                                            *
+ * Parameters: pool - [IN] pool to allocate from (can be NULL)                *
+ *                                                                            *
+ * Return value: pointer to allocated list item or NULL if pool is empty      *
+ *               or not initialized                                           *
+ *                                                                            *
+ ******************************************************************************/
+static zbx_list_item_t	*list_item_pool_alloc(zbx_list_item_pool_t *pool)
+{
+	if (NULL == pool || NULL == pool->free_slots)
+		return NULL;
+
+	zbx_list_item_t	*item = pool->free_slots;
+
+	pool->free_slots = item->next;
+
+	return item;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: return a list item to the pool for reuse                          *
+ *                                                                            *
+ * Parameters: pool - [IN] pool to return item to                             *
+ *             item - [IN] list item to be returned                           *
+ *                                                                            *
+ * Return value: SUCCEED - item was successfully returned to pool             *
+ *               FAIL    - pool is not initialized or item is not from this   *
+ *                         pool                                               *
+ *                                                                            *
+ ******************************************************************************/
+static int	list_item_pool_free(zbx_list_item_pool_t *pool, zbx_list_item_t *item)
+{
+	if (NULL == pool || item < pool->slots || item > &pool->slots[pool->slots_num - 1])
+		return FAIL;
+
+	item->next = pool->free_slots;
+	pool->free_slots = item;
+
+	return SUCCEED;
+}
+
 /******************************************************************************
  *                                                                            *
  * Purpose: create singly linked list (with custom memory functions)          *
@@ -47,6 +140,9 @@ void	zbx_list_destroy(zbx_list_t *list)
 {
 	while (FAIL != zbx_list_pop(list, NULL))
 		;
+
+	if (NULL != list->item_pool)
+		list_item_pool_destroy(list, list->item_pool);
 }
 
 /******************************************************************************
@@ -63,7 +159,10 @@ static void	list_create_item(zbx_list_t *list, void *value, zbx_list_item_t **cr
 {
 	zbx_list_item_t *item;
 
-	if (NULL != (item = (zbx_list_item_t *)list->mem_malloc_func(NULL, sizeof(zbx_list_item_t))))
+	if (NULL == (item = list_item_pool_alloc(list->item_pool)))
+		item = (zbx_list_item_t *)list->mem_malloc_func(NULL, sizeof(zbx_list_item_t));
+
+	if (NULL != item)
 	{
 		item->next = NULL;
 		item->data = value;
@@ -195,7 +294,8 @@ int	zbx_list_pop(zbx_list_t *list, void **value)
 		*value = head->data;
 
 	list->head = list->head->next;
-	list->mem_free_func(head);
+	if (SUCCEED != list_item_pool_free(list->item_pool, head))
+		list->mem_free_func(head);
 
 	if (NULL == list->head)
 		list->tail = NULL;
@@ -406,4 +506,24 @@ void	*zbx_list_iterator_remove_next(zbx_list_iterator_t *iterator)
 	iterator->list->mem_free_func(next);
 
 	return data;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: initialize memory pool for list items to reduce allocation        *
+ *          overhead                                                          *
+ *                                                                            *
+ * Parameters: list      - [IN] list to initialize pool for                   *
+ *             slots_num - [IN] number of list items to preallocate           *
+ *                                                                            *
+ ******************************************************************************/
+void	zbx_list_init_pool(zbx_list_t *list, int slots_num)
+{
+	if (NULL != list->item_pool)
+	{
+		THIS_SHOULD_NEVER_HAPPEN_MSG("memory pool has been already initialized");
+		exit(EXIT_FAILURE);
+	}
+
+	list->item_pool = list_item_pool_create(list, slots_num);
 }

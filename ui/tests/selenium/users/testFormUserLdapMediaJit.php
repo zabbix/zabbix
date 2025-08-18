@@ -911,6 +911,7 @@ class testFormUserLdapMediaJit extends CWebTest {
 
 		$dialog->query('button:Update')->one()->click();
 		$form->submit();
+		$this->assertMessage(TEST_GOOD, 'Authentication settings updated');
 
 		// Check that no changes are present until user is provisioned.
 		$this->page->open('zabbix.php?action=user.list')->waitUntilReady();

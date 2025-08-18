@@ -1059,6 +1059,7 @@ class testUsersPasswordComplexity extends CWebTest {
 			}
 			else {
 				$this->assertMessage(TEST_GOOD, 'User '.($update ? 'updated' : 'added'));
+				$this->page->logout();
 			}
 
 			// Check user saved in db.
@@ -1069,6 +1070,7 @@ class testUsersPasswordComplexity extends CWebTest {
 			$this->assertTrue($this->query('xpath://a[@title='.zbx_dbstr(($userid === 1) ? 'Admin (Zabbix Administrator)'
 					: $username).' and text()="User settings"]')->exists()
 			);
+			$this->page->logout();
 
 			// Write new password for next case.
 			if (($userid === 1) && ($own || $update)) {
@@ -1087,5 +1089,6 @@ class testUsersPasswordComplexity extends CWebTest {
 		$this->query('button:Change password')->waitUntilClickable()->one()->click();
 		$this->query('id:password1')->waitUntilPresent()->one();
 		$this->query('id:password2')->waitUntilPresent()->one();
+		$this->page->waitUntilReady();
 	}
 }

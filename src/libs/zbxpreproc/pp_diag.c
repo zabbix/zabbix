@@ -78,12 +78,13 @@ int	zbx_diag_add_preproc_info(const struct zbx_json_parse *jp, struct zbx_json *
 		if (0 != (fields & ZBX_DIAG_PREPROC_SIMPLE))
 		{
 			zbx_uint64_t	preproc_num, pending_num, finished_num, sequences_num, queued_num, queued_sz,
-					direct_num, direct_sz, history_sz;
+					direct_num, direct_sz, history_sz, finished_peak_num, pending_peak_num,
+					processed_num;
 
 			time1 = zbx_time();
 			if (FAIL == (ret = zbx_preprocessor_get_diag_stats(&preproc_num, &pending_num, &finished_num,
 					&sequences_num, &queued_num, &queued_sz, &direct_num, &direct_sz,
-					&history_sz, error)))
+					&history_sz, &finished_peak_num, &pending_peak_num, &processed_num, error)))
 			{
 				goto out;
 			}
@@ -97,11 +98,14 @@ int	zbx_diag_add_preproc_info(const struct zbx_json_parse *jp, struct zbx_json *
 				zbx_json_adduint64(json, "pending tasks", pending_num);
 				zbx_json_adduint64(json, "finished tasks", finished_num);
 				zbx_json_adduint64(json, "task sequences", sequences_num);
+				zbx_json_adduint64(json, "finished count", processed_num);
 				zbx_json_adduint64(json, "queued count", queued_num);
 				zbx_json_adduint64(json, "queued size", queued_sz);
 				zbx_json_adduint64(json, "direct count", direct_num);
 				zbx_json_adduint64(json, "direct size", direct_sz);
 				zbx_json_adduint64(json, "history size", history_sz);
+				zbx_json_adduint64(json, "pending tasks peak", pending_peak_num);
+				zbx_json_adduint64(json, "finished tasks peak", finished_peak_num);
 			}
 		}
 

@@ -881,21 +881,21 @@ class testConfiguration extends CAPITest {
 								</groups>
 								</zabbix_export>',
 				'sql' => 'select * from hstgrp where name=\'API host group xml import as non Super Admin\'',
-				'expected_error' => 'No permissions to call "hostgroup.create".'
+				'expected_error' => 'No permissions to import host groups.'
 			],
 			[
 				'format' => 'json',
 				'parameter' => 'host_groups',
 				'source' => '{"zabbix_export":{"version":"3.2","date":"2016-12-09T12:29:57Z","groups":[{"name":"API host group json import as non Super Admin"}]}}',
 				'sql' => 'select * from hstgrp where name=\'API host group json import as non Super Admin\'',
-				'expected_error' => 'No permissions to call "hostgroup.create".'
+				'expected_error' => 'No permissions to import host groups.'
 			],
 			[
 				'format' => 'yaml',
 				'parameter' => 'host_groups',
 				'source' => "---\nzabbix_export:\n  version: \"4.0\"\n  date: \"2020-08-03T12:41:17Z\"\n  groups:\n  - name: API host group yaml import as non Super Admin\n...\n",
 				'sql' => 'select * from hstgrp where name=\'API host group yaml import as non Super Admin\'',
-				'expected_error' => 'No permissions to call "hostgroup.create".'
+				'expected_error' => 'No permissions to import host groups.'
 			],
 				// test for template groups
 			[
@@ -925,21 +925,21 @@ class testConfiguration extends CAPITest {
 							</templates>
 						</zabbix_export>',
 			'sql' => 'select * from hstgrp where name=\'API template group xml import as non Super Admin\'',
-			'expected_error' => 'No permissions to call "templategroup.create".'
+			'expected_error' => 'No permissions to import template groups.'
 			],
 			[
 				'format' => 'json',
 				'parameter' => 'template_groups',
 				'source' => '{"zabbix_export": {"version": "5.4","date": "2022-04-05T13:57:36Z","groups": [{"uuid": "1b086ec667184dff8015c7f7bb5c5978","name": "API template group xml import as non Super Admin"}],"templates": [{"uuid": "17e68f86419d40a18bb3b1d1a876d231","template": "API xml import template as non Super Admin","name": "API xml import template as non Super Admin","groups": [{"name": "API template group xml import as non Super Admin"}]}]}}',
 				'sql' => 'select * from hstgrp where name=\'API template group json import as non Super Admin\'',
-				'expected_error' => 'No permissions to call "templategroup.create".'
+				'expected_error' => 'No permissions to import template groups.'
 			],
 			[
 				'format' => 'yaml',
 				'parameter' => 'template_groups',
 				'source' => "{zabbix_export: {version: '5.4', date: '2022-04-05T13:59:57Z', groups: [{uuid: 1b086ec667184dff8015c7f7bb5c5978, name: API template group xml import as non Super Admin}], templates: [{uuid: 17e68f86419d40a18bb3b1d1a876d231, template: API xml import template as non Super Admin, name: API xml import template as non Super Admin, groups: [{name: API template group xml import as non Super Admin}]}]}}",
 				'sql' => 'select * from hstgrp where name=\'API template group yaml import as non Super Admin\'',
-				'expected_error' => 'No permissions to call "templategroup.create".'
+				'expected_error' => 'No permissions to import template groups.'
 			]
 		];
 	}

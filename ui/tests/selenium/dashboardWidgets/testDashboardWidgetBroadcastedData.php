@@ -421,6 +421,8 @@ class testDashboardWidgetBroadcastedData extends testWidgetCommunication {
 					'","from_ts":'.$from_unixtime.',"to_ts":'.$to_unixtime.'}';
 		}
 
+		$dashboard->waitUntilReady();
+
 		// Get the feedback value from the textarea, remove the timestamp and compare with the expected string.
 		$this->assertEquals($expected, substr($feedback_field->getValue(), 11));
 
@@ -656,6 +658,7 @@ class testDashboardWidgetBroadcastedData extends testWidgetCommunication {
 
 		// Select an element on the broadcaster widget to trigger a broadcast.
 		$this->getWidgetElement($data['select_element'], $broadcaster)->click();
+		$dashboard->waitUntilReady();
 
 		// Check the broadcasted value on the listener.
 		$selected_entity = CTestArrayHelper::get($data, 'selected_entity', $data['select_element']);

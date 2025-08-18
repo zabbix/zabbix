@@ -22,6 +22,7 @@
 #include "zbx_host_constants.h"
 #include "zbx_trigger_constants.h"
 #include "zbx_item_constants.h"
+#include "zbxtime.h"
 
 /*
  * 2.2 development database patches
@@ -517,7 +518,7 @@ static int	DBpatch_2010050(void)
 		{
 			if (SEC_PER_WEEK < (ts = (time_t)atoi(row[1])))
 			{
-				tm = localtime(&ts);
+				tm = zbx_localtime(&ts, NULL);
 				ts = tm->tm_wday * SEC_PER_DAY + tm->tm_hour * SEC_PER_HOUR + tm->tm_min * SEC_PER_MIN;
 				zbx_db_execute("update services_times set %s=%d where timeid=%s",
 						fields[i], (int)ts, row[0]);
