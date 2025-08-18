@@ -777,7 +777,8 @@ int	db_is_escape_sequence(char c)
  ******************************************************************************/
 static int	dbconn_vexecute(zbx_dbconn_t *db, const char *fmt, va_list args)
 {
-	char		*sql_trunc, *sql = NULL, *sql_printable = NULL;
+	char		*sql = NULL, *sql_printable = NULL;
+	const char	*sql_trunc;
 	char		buf_sql_trunc[MAX_BUFFER_LEN + 1];
 	int		ret = ZBX_DB_OK;
 	double		sec = 0;
