@@ -42,7 +42,7 @@ zabbix_export:
         3. If you use an atypical location of ES API, don't forget to change the host wizard configuration fields `Elasticsearch scheme`,`Elasticsearch port`.
       vendor:
         name: Zabbix
-        version: 8.0-1
+        version: 8.0-2
       groups:
         - name: Templates/Applications
       items:
@@ -1767,6 +1767,12 @@ zabbix_export:
         - macro: '{$ELASTICSEARCH.SINGLE.NODE.JVM.SPACE.MIN}'
           value: 10G
           description: 'Minimum free space available to JVM in single node instance in bytes for trigger expression.'
+          config:
+            type: TEXT
+            priority: '13'
+            section_name: Thresholds
+            label: 'Single node JVM minimum space (bytes)'
+            description: 'Minimum free space available to JVM in single node instance in bytes for trigger expression.'
         - macro: '{$ELASTICSEARCH.USERNAME}'
           description: 'The username of the Elasticsearch.'
           config:
