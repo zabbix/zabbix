@@ -4812,8 +4812,17 @@ static void	lld_hosts_remove(const zbx_vector_lld_host_ptr_t *hosts, const zbx_l
 		zbx_db_add_condition_alloc(&sql, &sql_alloc, &sql_offset, "hostid",
 				discovered_hostids.values, discovered_hostids.values_num);
 		zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, ";\n");
-
+#ifdef HAVE_ORACLE
+		if (16 < sql_offset)
+		{
+			zbx_db_end_multiple_update(&sql, &sql_alloc, &sql_offset);
+			zbx_db_execute("%s", sql);
+			sql_offset = 0;
+			zbx_db_begin_multiple_update(&sql, &sql_alloc, &sql_offset);
+		}
+#else
 		zbx_db_execute_overflowed_sql(&sql, &sql_alloc, &sql_offset);
+#endif
 	}
 
 	if (0 != lost_hostids.values_num)
@@ -4824,7 +4833,17 @@ static void	lld_hosts_remove(const zbx_vector_lld_host_ptr_t *hosts, const zbx_l
 				lost_hostids.values, lost_hostids.values_num);
 		zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, ";\n");
 
+#ifdef HAVE_ORACLE
+		if (16 < sql_offset)
+		{
+			zbx_db_end_multiple_update(&sql, &sql_alloc, &sql_offset);
+			zbx_db_execute("%s", sql);
+			sql_offset = 0;
+			zbx_db_begin_multiple_update(&sql, &sql_alloc, &sql_offset);
+		}
+#else
 		zbx_db_execute_overflowed_sql(&sql, &sql_alloc, &sql_offset);
+#endif
 	}
 
 	if (0 != lc_hostids.values_num)
@@ -4834,8 +4853,17 @@ static void	lld_hosts_remove(const zbx_vector_lld_host_ptr_t *hosts, const zbx_l
 		zbx_db_add_condition_alloc(&sql, &sql_alloc, &sql_offset, "hostid",
 				lc_hostids.values, lc_hostids.values_num);
 		zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, ";\n");
-
+#ifdef HAVE_ORACLE
+		if (16 < sql_offset)
+		{
+			zbx_db_end_multiple_update(&sql, &sql_alloc, &sql_offset);
+			zbx_db_execute("%s", sql);
+			sql_offset = 0;
+			zbx_db_begin_multiple_update(&sql, &sql_alloc, &sql_offset);
+		}
+#else
 		zbx_db_execute_overflowed_sql(&sql, &sql_alloc, &sql_offset);
+#endif
 	}
 
 	if (0 != en_hostids.values_num)
@@ -4846,7 +4874,17 @@ static void	lld_hosts_remove(const zbx_vector_lld_host_ptr_t *hosts, const zbx_l
 				en_hostids.values, en_hostids.values_num);
 		zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, ";\n");
 
+#ifdef HAVE_ORACLE
+		if (16 < sql_offset)
+		{
+			zbx_db_end_multiple_update(&sql, &sql_alloc, &sql_offset);
+			zbx_db_execute("%s", sql);
+			sql_offset = 0;
+			zbx_db_begin_multiple_update(&sql, &sql_alloc, &sql_offset);
+		}
+#else
 		zbx_db_execute_overflowed_sql(&sql, &sql_alloc, &sql_offset);
+#endif
 	}
 
 	if (0 != dis_hostids.values_num)
@@ -4856,8 +4894,17 @@ static void	lld_hosts_remove(const zbx_vector_lld_host_ptr_t *hosts, const zbx_l
 		zbx_db_add_condition_alloc(&sql, &sql_alloc, &sql_offset, "hostid",
 				dis_hostids.values, dis_hostids.values_num);
 		zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, ";\n");
-
+#ifdef HAVE_ORACLE
+		if (16 < sql_offset)
+		{
+			zbx_db_end_multiple_update(&sql, &sql_alloc, &sql_offset);
+			zbx_db_execute("%s", sql);
+			sql_offset = 0;
+			zbx_db_begin_multiple_update(&sql, &sql_alloc, &sql_offset);
+		}
+#else
 		zbx_db_execute_overflowed_sql(&sql, &sql_alloc, &sql_offset);
+#endif
 
 		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "update hosts set status=%d where",
 				HOST_STATUS_NOT_MONITORED);
