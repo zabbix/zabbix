@@ -1,5 +1,5 @@
 zabbix_export:
-  version: '7.4'
+  version: '8.0'
   media_types:
     - name: 'MS Teams Workflow'
       type: WEBHOOK
@@ -30,6 +30,7 @@ zabbix_export:
           value: '{TRIGGER.ID}'
         - name: zabbix_url
           value: '{$ZABBIX.URL}'
+      status: DISABLED
       script: |
         const CLogger = function(serviceName) {
         	this.serviceName = serviceName;

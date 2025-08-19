@@ -1,0 +1,557 @@
+.modal-popup-host-wizard {
+	--modal-max-width: 1120px;
+
+	&.overlay-dialogue.modal {
+		display: grid;
+		grid-template-rows: max-content 1fr max-content;
+		padding: 0;
+		min-height: unquote("min(calc(100vh - 100px), 580px)");
+		max-height: calc(100vh - 100px);
+
+		.overlay-dialogue-header {
+			flex-wrap: wrap;
+			margin: 0;
+			padding: 56px 56px 16px 56px;
+
+			h4 {
+				min-height: 1.2em;
+			}
+
+			.btn-icon,
+			.btn-overlay-close {
+				margin-top: 0;
+			}
+
+			.btn-overlay-close {
+				margin-right: 0;
+			}
+
+			.progress {
+				flex: 0 0 100%;
+				margin-top: 16px;
+			}
+		}
+
+		.overlay-dialogue-body {
+			margin: 0;
+			padding: 0 56px 32px 56px;
+			width: initial;
+
+			form {
+				padding: 0;
+			}
+		}
+
+		.overlay-dialogue-footer {
+			display: flex;
+			justify-content: flex-end;
+			align-items: baseline;
+			padding: 24px 56px;
+			border-top: 1px solid $ui-border-color;
+
+			.dialogue-cancel {
+				margin-right: auto;
+			}
+		}
+	}
+
+	output {
+		margin: 16px 0 0;
+	}
+
+	section {
+		margin-top: 32px;
+		margin-bottom: 0;
+		border: none;
+
+		&.collapsible,
+		&.no-found {
+			margin-top: 16px;
+			padding: 16px;
+			border: 1px solid $ui-border-color;
+			border-radius: 2px;
+		}
+
+		&.collapsible {
+			.section-head {
+				height: 24px;
+				line-height: 24px;
+			}
+
+			.section-body {
+				margin-top: 16px;
+
+				& > div:not(:first-child) {
+					margin-top: 16px;
+				}
+			}
+
+			.toggle {
+				grid-column: 1 / -1;
+				justify-self: start;
+				min-width: 0;
+				max-width: 100%;
+			}
+		}
+
+		&.grid-columns {
+			gap: 12px 48px;
+
+			.section-head,
+			.section-body {
+				display: contents;
+
+				.formated-text:not(:first-of-type) {
+					margin-top: 8px;
+				}
+			}
+		}
+	}
+
+	.formated-group {
+		display: grid;
+		gap: 16px;
+
+		.formated-text {
+			margin-top: 0;
+		}
+
+		&:not(:first-child) {
+			margin-top: 8px;
+		}
+	}
+
+	.formated-text {
+		@extend .markdown;
+
+		.sub-step-counter {
+			margin-left: 6px;
+			color: $font-light-color;
+		}
+	}
+
+	.ordered-list {
+		--counter-width: 2ch;
+
+		.ordered-list-item {
+			gap: 12px 48px;
+
+			.formated-text,
+			.form-field {
+				&:not(:first-child) {
+					margin-top: 8px;
+				}
+			}
+
+			.formated-text + .form-field {
+				margin-top: 16px;
+			}
+
+			.formated-group + .form-field {
+				margin-top: 16px;
+			}
+
+			&:not(:first-child) {
+				margin-top: 24px;
+			}
+		}
+	}
+
+	.progress {
+		display: grid;
+		grid-auto-flow: column;
+		grid-auto-columns: 1fr;
+		align-items: end;
+		gap: 8px;
+		line-height: 18px;
+
+		.progress-step {
+			position: relative;
+			padding-bottom: 8px;
+			min-width: 0;
+			color: $font-alt-color;
+
+			&::after {
+				content: '';
+				position: absolute;
+				left: 0;
+				right: 0;
+				bottom: 0;
+				height: 0;
+				border-bottom: 4px var(--progress-type-style, solid) var(--pregress-step-color, #{$progress-default-color});
+				border-radius: 2px;
+			}
+
+			&.progress-step-complete {
+				--pregress-step-color: #{$progress-complete-color};
+			}
+
+			&.progress-step-current {
+				--pregress-step-color: #{$progress-current-color};
+				color: $font-color;
+			}
+
+			&.progress-step-error {
+				--pregress-step-color: #{$progress-error-color};
+			}
+
+			&.progress-step-disabled {
+				--progress-type-style: dashed;
+			}
+		}
+
+		.progress-info {
+			overflow: hidden;
+			text-overflow: ellipsis;
+			white-space: nowrap;
+		}
+	}
+
+	.grid-columns {
+		.form-fields-inline {
+			display: flex;
+			gap: 16px;
+
+			label {
+				margin: 0;
+			}
+
+			.radio-list-control {
+				label {
+					margin: 0;
+				}
+			}
+		}
+
+		&.form-columns {
+			> .form-fields-hint {
+				margin-top: -4px;
+			}
+		}
+	}
+
+	.form-columns,
+	.fields-group {
+		display: grid;
+		gap: 8px 16px;
+	}
+
+	.fields-group {
+		padding: 8px;
+		background: $form-darker-bg-color;
+		border-radius: 2px;
+	}
+
+	.form-field {
+		display: grid;
+		gap: 4px;
+		min-width: 0;
+
+		> * {
+			min-width: 0;
+		}
+
+		> label {
+			line-height: 16px;
+
+			.btn-small {
+				margin-left: 4px;
+			}
+		}
+
+		input,
+		textarea,
+		z-select > button {
+			border-radius: 2px;
+		}
+
+		z-select {
+			.list {
+				li {
+					max-width: 100%;
+				}
+			}
+		}
+
+		input[type="checkbox"] + label {
+			cursor: pointer;
+		}
+
+		.multiselect-control {
+			width: auto;
+
+			.multiselect {
+				flex: 1 1 auto;
+			}
+
+			.btn-split {
+				margin-right: 0;
+
+				li:first-child {
+					margin-left: 0;
+				}
+			}
+		}
+
+		.macro-input-group {
+			input,
+			textarea {
+				border-top-right-radius: 0;
+				border-bottom-right-radius: 0;
+			}
+		}
+
+		.radio-list-control {
+			display: flex;
+			justify-self: start;
+			max-width: 100%;
+
+			li {
+				flex: 1 1 auto;
+				min-width: 0;
+			}
+
+			label {
+				box-sizing: border-box;
+				max-width: 100%;
+				overflow: hidden;
+				text-overflow: ellipsis;
+			}
+		}
+
+		.warning {
+			line-height: 16px;
+
+			&::before {
+				color: $warning-color;
+			}
+		}
+
+		&.field-checkbox {
+			gap: 0;
+
+			label {
+				line-height: 24px;
+			}
+		}
+
+		.input-secret {
+			.btn-undo {
+				border-color: $form-border-color;
+			}
+
+			input:focus + .btn-undo {
+				border-color: $form-focus-border-color;
+			}
+		}
+
+		&.field-has-error {
+			.btn-undo {
+				border-color: $negative-color;
+			}
+		}
+
+		.has-error {
+			border-color: $negative-color;
+		}
+
+		.error {
+			line-height: 16px;
+			color: $negative-color;
+		}
+	}
+
+	.form-fields-hint {
+		font-size: 11px;
+		line-height: 16px;
+		white-space: initial;
+		color: $form-field-hint-color;
+	}
+
+	.form-description {
+		position: relative;
+		padding-left: 24px;
+
+		.markdown {
+			margin-top: 7px;
+		}
+
+		&::before {
+			content: '';
+			position: absolute;
+			top: 0;
+			bottom: -1px;
+			left: 0;
+			width: 0;
+			border-left: 4px solid $form-description-border-color;
+			border-radius: 2px;
+		}
+
+		&.field-baseline {
+			margin-top: 16px;
+		}
+	}
+
+	.zi-circle-question {
+		&::before {
+			font-size: 16px;
+		}
+	}
+
+	.pre-shared-key-field {
+		display: grid;
+		grid-template-columns: 1fr max-content;
+		gap: 4px;
+	}
+
+	.template-subfilter {
+		display: flex;
+		gap: 4px 16px;
+		flex-wrap: wrap;
+
+		.template-subfilter-item {
+			padding: 0 4px;
+			min-width: 0;
+			height: 22px;
+			overflow: hidden;
+			text-overflow: ellipsis;
+			border: 0;
+			background: transparent;
+			color: $font-alt-color;
+			line-height: 20px;
+
+			&.selected {
+				background: $ui-bg-selected-color;
+				color: $ui-selected-color;
+			}
+		}
+	}
+
+	.templates-card-list {
+		.radio-card {
+			display: flex;
+			flex-direction: column;
+			gap: 16px;
+			max-height: 360px;
+		}
+
+		.radio-card-label,
+		.template-tag,
+		.template-info-toggle-container {
+			flex: 0 0 auto;
+		}
+
+		.template-info {
+			flex: 1 1 auto;
+			overflow-x: hidden;
+			overflow-y: auto;
+		}
+
+		.radio-card-label {
+			display: -webkit-box;
+			font-size: 14px;
+			line-height: 21px;
+			overflow: hidden;
+			text-overflow: ellipsis;
+			line-clamp: 2;
+			white-space: normal;
+			word-break: break-word;
+			-webkit-line-clamp: 2;
+			-webkit-box-orient: vertical;
+		}
+
+		.template-tags {
+			label {
+				color: $font-alt-color;
+			}
+
+			.tags-list {
+				position: relative;
+				display: flex;
+				flex-wrap: wrap;
+				gap: 8px;
+				margin-top: 4px;
+			}
+
+			.tag {
+				margin: 0;
+			}
+
+			.btn-icon {
+				min-width: 16px;
+				height: 16px;
+				line-height: 16px;
+
+				&::before {
+					font-size: 16px;
+				}
+			}
+		}
+
+		.template-info {
+			@extend %webkit-scrollbar;
+
+			line-height: 1.5;
+		}
+
+		.template-info-item {
+			.title {
+				color: $font-alt-color;
+			}
+
+			.content {
+				white-space: pre-line;
+				word-break: break-word;
+				overflow-wrap: anywhere;
+				hyphens: auto;
+			}
+
+			&:not(:first-child) {
+				margin-top: 1.5em;
+			}
+		}
+
+		.template-info-toggle-container {
+			margin-top: auto;
+
+			.btn-link {
+				float: right;
+				color: $font-color;
+
+				span {
+					pointer-events: none;
+				}
+			}
+		}
+
+		.no-data-message {
+			padding-top: 32px;
+			padding-bottom: 32px;
+		}
+	}
+
+	.host-macro-list {
+		display: contents;
+	}
+}
+
+.temp-tags-list {
+	visibility: hidden;
+	position: absolute;
+	display: flex;
+	flex-wrap: wrap;
+	gap: 8px;
+	width: 195px;
+	pointer-events: none;
+	z-index: -1;
+
+	.tag {
+		margin: 0;
+	}
+
+	.btn-icon {
+		min-width: 16px;
+		height: 16px;
+		line-height: 16px;
+	}
+}

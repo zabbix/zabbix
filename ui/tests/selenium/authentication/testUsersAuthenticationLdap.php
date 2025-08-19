@@ -917,7 +917,7 @@ class testUsersAuthenticationLdap extends testFormAuthentication {
 						'userdirectory_media' => [
 							[
 								'name' => 'Test Discord mapping',
-								'mediatypeid' => 10,
+								'mediatypeid' => 71,
 								'attribute' => 'test discord',
 								'period' => '1-7,00:00-24:00',
 								'severity' => 63,
@@ -925,7 +925,7 @@ class testUsersAuthenticationLdap extends testFormAuthentication {
 							],
 							[
 								'name' => 'Test iLert mapping (disabled)',
-								'mediatypeid' => 22,
+								'mediatypeid' => 76,
 								'attribute' => 'test iLert',
 								'period' => '1-7,00:00-24:00',
 								'severity' => 63,
@@ -933,7 +933,7 @@ class testUsersAuthenticationLdap extends testFormAuthentication {
 							],
 							[
 								'name' => 'Test Brevis - macro',
-								'mediatypeid' => 29,
+								'mediatypeid' => 70,
 								'attribute' => 'test macro',
 								'severity' => 63,
 								'period' => '{$TEST.MACRO}',
@@ -941,7 +941,7 @@ class testUsersAuthenticationLdap extends testFormAuthentication {
 							],
 							[
 								'name' => 'Test Brevis - time period',
-								'mediatypeid' => 29,
+								'mediatypeid' => 70,
 								'attribute' => 'test time period',
 								'severity' => 63,
 								'period' => '1-5,12:00-13:00',
@@ -949,7 +949,7 @@ class testUsersAuthenticationLdap extends testFormAuthentication {
 							],
 							[
 								'name' => 'Test Brevis with severity: Not classified',
-								'mediatypeid' => 29,
+								'mediatypeid' => 70,
 								'attribute' => 'severity not classified',
 								'severity' => 1,
 								'period' => '1-7,00:00-24:00',
@@ -957,7 +957,7 @@ class testUsersAuthenticationLdap extends testFormAuthentication {
 							],
 							[
 								'name' => 'Test Brevis with severity: Information',
-								'mediatypeid' => 29,
+								'mediatypeid' => 70,
 								'attribute' => 'severity information',
 								'severity' => 2,
 								'period' => '1-7,00:00-24:00',
@@ -965,7 +965,7 @@ class testUsersAuthenticationLdap extends testFormAuthentication {
 							],
 							[
 								'name' => 'Test Brevis with severity: Warning',
-								'mediatypeid' => 29,
+								'mediatypeid' => 70,
 								'attribute' => 'severity warning',
 								'severity' => 4,
 								'period' => '1-7,00:00-24:00',
@@ -973,7 +973,7 @@ class testUsersAuthenticationLdap extends testFormAuthentication {
 							],
 							[
 								'name' => 'Test Brevis with severity: Average',
-								'mediatypeid' => 29,
+								'mediatypeid' => 70,
 								'attribute' => 'severity average',
 								'severity' => 8,
 								'period' => '1-7,00:00-24:00',
@@ -981,7 +981,7 @@ class testUsersAuthenticationLdap extends testFormAuthentication {
 							],
 							[
 								'name' => 'Test Brevis with severity: High',
-								'mediatypeid' => 29,
+								'mediatypeid' => 70,
 								'attribute' => 'severity high',
 								'severity' => 16,
 								'period' => '1-7,00:00-24:00',
@@ -989,7 +989,7 @@ class testUsersAuthenticationLdap extends testFormAuthentication {
 							],
 							[
 								'name' => 'Test Brevis with severity: Disaster',
-								'mediatypeid' => 29,
+								'mediatypeid' => 70,
 								'attribute' => 'severity disaster',
 								'severity' => 32,
 								'period' => '1-7,00:00-24:00',
@@ -997,7 +997,7 @@ class testUsersAuthenticationLdap extends testFormAuthentication {
 							],
 							[
 								'name' => 'Test Brevis with no severity',
-								'mediatypeid' => 29,
+								'mediatypeid' => 70,
 								'attribute' => 'severity none',
 								'severity' => 0,
 								'period' => '1-7,00:00-24:00',
@@ -1307,7 +1307,7 @@ class testUsersAuthenticationLdap extends testFormAuthentication {
 						'userdirectory_media' => [
 							[
 								'name' => 'Test iLert mapping',
-								'mediatypeid' => 22,
+								'mediatypeid' => 76,
 								'attribute' => 'test iLert',
 								'period' => '1-7,00:00-24:00',
 								'severity' => 63,
@@ -1315,7 +1315,7 @@ class testUsersAuthenticationLdap extends testFormAuthentication {
 							],
 							[
 								'name' => 'Test Discord mapping (disable)',
-								'mediatypeid' => 10,
+								'mediatypeid' => 71,
 								'attribute' => 'test discord',
 								'period' => '1-7,00:00-24:00',
 								'severity' => 63,
@@ -2031,12 +2031,12 @@ class testUsersAuthenticationLdap extends testFormAuthentication {
 						'userdirectory_media' => [
 							[
 								'name' => 'кириллица1',
-								'mediatypeid' => 10,
+								'mediatypeid' => 71,
 								'attribute' => 'кириллица'
 							],
 							[
 								'name' => 'кириллица2',
-								'mediatypeid' => 22,
+								'mediatypeid' => 76,
 								'attribute' => 'кириллица'
 							]
 						]
@@ -2181,12 +2181,12 @@ class testUsersAuthenticationLdap extends testFormAuthentication {
 						'userdirectory_media' => [
 							[
 								'name' => '~`!@#$%^7*()_+=/1',
-								'mediatypeid' => 10,
+								'mediatypeid' => 71,
 								'attribute' => '!@#$%^&*()_+-=[]{};:"|,./<>?Ž©µÆ'
 							],
 							[
 								'name' => '~`!@#$%^7*()_+=/2',
-								'mediatypeid' => 22,
+								'mediatypeid' => 76,
 								'attribute' => '!@#$%^&*()_+-=[]{};:"|,./<>?Ž©µÆ'
 							]
 						]
@@ -2329,7 +2329,7 @@ class testUsersAuthenticationLdap extends testFormAuthentication {
 						'userdirectory_media' => [
 							[
 								'name' => 'leading.trailing',
-								'mediatypeid' => 10,
+								'mediatypeid' => 71,
 								'attribute' => 'leading.trailing'
 							]
 						]
@@ -2482,12 +2482,12 @@ class testUsersAuthenticationLdap extends testFormAuthentication {
 						'userdirectory_media' => [
 							[
 								'name' => '1ong_value_long_value_long_value_long_value_long_value_long_valu',
-								'mediatypeid' => 10,
+								'mediatypeid' => 71,
 								'attribute' => STRING_255
 							],
 							[
 								'name' => '2ong_value_long_value_long_value_long_value_long_value_long_valu',
-								'mediatypeid' => 22,
+								'mediatypeid' => 76,
 								'attribute' => STRING_255
 							]
 						]
@@ -2673,7 +2673,7 @@ class testUsersAuthenticationLdap extends testFormAuthentication {
 						'userdirectory_media' => [
 							[
 								'name' => 'Create Test Discord mapping with default values',
-								'mediatypeid' => 10,
+								'mediatypeid' => 71,
 								'attribute' => 'test discord',
 								'period' => '1-7,00:00-24:00',
 								'severity' => 63,
@@ -2681,7 +2681,7 @@ class testUsersAuthenticationLdap extends testFormAuthentication {
 							],
 							[
 								'name' => 'Create Test iLert mapping with disabled status',
-								'mediatypeid' => 22,
+								'mediatypeid' => 76,
 								'attribute' => 'test iLert',
 								'period' => '1-7,00:00-24:00',
 								'severity' => 63,
@@ -2689,7 +2689,7 @@ class testUsersAuthenticationLdap extends testFormAuthentication {
 							],
 							[
 								'name' => 'Create Test Brevis mapping with user macro in time period',
-								'mediatypeid' => 29,
+								'mediatypeid' => 70,
 								'attribute' => 'test macro',
 								'severity' => 63,
 								'period' => '{$TEST.MACRO}',
@@ -2697,7 +2697,7 @@ class testUsersAuthenticationLdap extends testFormAuthentication {
 							],
 							[
 								'name' => 'Create Test Brevis mapping with non-default time period',
-								'mediatypeid' => 29,
+								'mediatypeid' => 70,
 								'attribute' => 'test time period',
 								'severity' => 63,
 								'period' => '1-5,12:00-13:00',
@@ -2705,7 +2705,7 @@ class testUsersAuthenticationLdap extends testFormAuthentication {
 							],
 							[
 								'name' => 'Create Test Brevis with severity: Not classified',
-								'mediatypeid' => 29,
+								'mediatypeid' => 70,
 								'attribute' => 'severity not classified',
 								'severity' => 1,
 								'period' => '1-7,00:00-24:00',
@@ -2713,7 +2713,7 @@ class testUsersAuthenticationLdap extends testFormAuthentication {
 							],
 							[
 								'name' => 'Create Test Brevis with severity: Information',
-								'mediatypeid' => 29,
+								'mediatypeid' => 70,
 								'attribute' => 'severity information',
 								'severity' => 2,
 								'period' => '1-7,00:00-24:00',
@@ -2721,7 +2721,7 @@ class testUsersAuthenticationLdap extends testFormAuthentication {
 							],
 							[
 								'name' => 'Create Test Brevis with severity: Warning',
-								'mediatypeid' => 29,
+								'mediatypeid' => 70,
 								'attribute' => 'severity warning',
 								'severity' => 4,
 								'period' => '1-7,00:00-24:00',
@@ -2729,7 +2729,7 @@ class testUsersAuthenticationLdap extends testFormAuthentication {
 							],
 							[
 								'name' => 'Create Test Brevis with severity: Average',
-								'mediatypeid' => 29,
+								'mediatypeid' => 70,
 								'attribute' => 'severity average',
 								'severity' => 8,
 								'period' => '1-7,00:00-24:00',
@@ -2737,7 +2737,7 @@ class testUsersAuthenticationLdap extends testFormAuthentication {
 							],
 							[
 								'name' => 'Create Test Brevis with severity: High',
-								'mediatypeid' => 29,
+								'mediatypeid' => 70,
 								'attribute' => 'severity high',
 								'severity' => 16,
 								'period' => '1-7,00:00-24:00',
@@ -2745,7 +2745,7 @@ class testUsersAuthenticationLdap extends testFormAuthentication {
 							],
 							[
 								'name' => 'Create Test Brevis with severity: Disaster',
-								'mediatypeid' => 29,
+								'mediatypeid' => 70,
 								'attribute' => 'severity disaster',
 								'severity' => 32,
 								'period' => '1-7,00:00-24:00',
@@ -2753,7 +2753,7 @@ class testUsersAuthenticationLdap extends testFormAuthentication {
 							],
 							[
 								'name' => 'Create Test Brevis with no severity',
-								'mediatypeid' => 29,
+								'mediatypeid' => 70,
 								'attribute' => 'severity none',
 								'severity' => 0,
 								'period' => '1-7,00:00-24:00',
@@ -2890,15 +2890,74 @@ class testUsersAuthenticationLdap extends testFormAuthentication {
 	}
 
 	/**
+	 * Check that Bind password field clears itself after changing Host field.
+	 */
+	public function testUsersAuthenticationLdap_BindPassword() {
+		$values = [
+			'servers_settings' => [
+				[
+					'fields' => [
+						'Name' => 'name_created',
+						'Port' => '123',
+						'Base DN' => 'base_dn_created',
+						'Search attribute' => 'search_attribute_created',
+						'Bind DN' => 'bind_dn_created',
+						'Bind password' => 'bind_password',
+						'Host' => 'host_created'
+					]
+				]
+			]
+		];
+
+		$form = $this->openLdapForm();
+		$this->setLdap($values, 'button:Add');
+		$form->submit();
+		$form->selectTab('LDAP settings');
+		$form->query('link:name_created')->waitUntilClickable()->one()->click();
+
+		// Open newly created LDAP authentication for updates.
+		$dialog = COverlayDialogElement::find()->waitUntilReady()->one();
+		$ldap_form = $dialog->asForm();
+		$bind_password_field = $ldap_form->getFieldContainer('Bind password');
+		unset($values['servers_settings'][0]['fields']['Bind password']);
+
+		// Change fields one by one and check that Bind password field cleared only after Host change.
+		foreach ($values['servers_settings'][0]['fields'] as $field => $value) {
+			$ldap_form->fill([$field => $value.'1']);
+			$this->page->removeFocus();
+
+			if ($field === 'Host') {
+				$ldap_form->checkValue(['Bind password' => '']);
+				$bind_password_field->query('xpath:./button[@data-hintbox]')->one()->click();
+				$hint = $this->query('xpath://div[@class="overlay-dialogue wordbreak"]')->waitUntilPresent()->one();
+				$this->assertEquals('The previous password was cleared due to a host change. Please enter the new password.',
+						$hint->getText()
+				);
+
+				// Check that Change password button is not available.
+				$this->assertFalse($bind_password_field->query('button:Change password')->one(false)->isClickable());
+			}
+			else {
+				$this->assertTrue($bind_password_field->query('button:Change password')->one()->isClickable());
+
+				// Check that hint is not visible.
+				$this->assertFalse($bind_password_field->query('xpath:./button[@data-hintbox]')->one()->isVisible());
+			}
+		}
+	}
+
+	/**
 	 * Function for opening LDAP configuration form.
 	 *
 	 * @param string $auth    default authentication field value
 	 */
 	private function openLdapForm($auth = 'Internal') {
-		$this->page->login()->open('zabbix.php?action=authentication.edit');
-		$form = $this->query('id:authentication-form')->asForm()->one();
+		$this->page->login()->open('zabbix.php?action=authentication.edit')->waitUntilReady();
+		$form = $this->query('id:authentication-form')->waitUntilVisible()->asForm()->one();
 		$form->fill(['Default authentication' => $auth]);
 		$form->selectTab('LDAP settings');
+		// Wait for the LDAP tab contents to be visible.
+		$form->query('id:ldap')->waitUntilVisible();
 
 		return $form;
 	}
@@ -2911,7 +2970,7 @@ class testUsersAuthenticationLdap extends testFormAuthentication {
 	 * @param string $values    simple LDAP server values
 	 */
 	private function setLdap($data, $query, $values = null) {
-		$form = $this->query('id:authentication-form')->asForm()->one();
+		$form = $this->query('id:authentication-form')->waitUntilVisible()->asForm()->one();
 
 		// Select LDAP setting tab if it is not selected.
 		if ($form->getSelectedTab() !== 'LDAP settings') {
@@ -2941,8 +3000,11 @@ class testUsersAuthenticationLdap extends testFormAuthentication {
 			$ldap_form->fill($ldap['fields']);
 
 			if (array_key_exists('Bind password', $ldap)) {
-				$ldap_form->getFieldContainer('Bind password')->query('button:Change password')->waitUntilClickable()
-						->one()->click();
+				if (!array_key_exists('Host', $ldap['fields'])) {
+					$ldap_form->getFieldContainer('Bind password')->query('button:Change password')->waitUntilClickable()
+							->one()->click();
+				}
+
 				$ldap_form->query('id:bind_password')->one()->waitUntilVisible()->fill($ldap['Bind password']);
 			}
 

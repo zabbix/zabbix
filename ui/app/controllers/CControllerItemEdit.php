@@ -18,6 +18,16 @@ require 'include/forms.inc.php';
 
 class CControllerItemEdit extends CControllerItem {
 
+	/**
+	 * @var array
+	 */
+	private $host;
+
+	/**
+	 * @var array
+	 */
+	private $template;
+
 	protected function init() {
 		$this->disableCsrfValidation();
 	}
@@ -56,6 +66,34 @@ class CControllerItemEdit extends CControllerItem {
 	protected function checkPermissions(): bool {
 		if (!CWebUser::isLoggedIn() || !$this->validateReferredObjects()) {
 			return false;
+		}
+
+		if ($this->getInput('context') === 'host') {
+			$host = API::Host()->get([
+				'output' => ['hostid', 'name', 'monitored_by', 'proxyid', 'assigned_proxyid', 'flags', 'status'],
+				'selectInterfaces' => ['interfaceid', 'ip', 'port', 'dns', 'useip', 'details', 'type', 'main'],
+				'hostids' => !$this->hasInput('itemid') ? [$this->getInput('hostid')] : null,
+				'itemids' => $this->hasInput('itemid') ? [$this->getInput('itemid')] : null
+			]);
+
+			if (!$host) {
+				return false;
+			}
+
+			$this->host = reset($host);
+		}
+		else {
+			$template = API::Template()->get([
+				'output' => ['templateid', 'name', 'flags'],
+				'templateids' => !$this->hasInput('itemid') ? [$this->getInput('hostid')] : null,
+				'itemids' => $this->hasInput('itemid') ? [$this->getInput('itemid')] : null
+			]);
+
+			if (!$template) {
+				return false;
+			}
+
+			$this->template = reset($template);
 		}
 
 		return parent::checkPermissions();
@@ -101,10 +139,29 @@ class CControllerItemEdit extends CControllerItem {
 			}
 		}
 
+		if ($item['flags'] & ZBX_FLAG_DISCOVERY_CREATED) {
+			$db_parent = API::ItemPrototype()->get([
+				'itemids' => $item['discoveryData']['parent_itemid'],
+				'selectDiscoveryRule' => ['itemid'],
+				'selectDiscoveryRulePrototype' => ['itemid'],
+				'nopermissions' => true
+			]);
+			$db_parent = reset($db_parent);
+
+			$parent_lld = $db_parent['discoveryRule'] ?: $db_parent['discoveryRulePrototype'];
+			$item['discoveryData']['lldruleid'] = $parent_lld['itemid'];
+		}
+
 		$data = [
+			'js_test_validation_rules' => (new CFormValidator(
+				CControllerPopupItemTestSend::getValidationRules(allow_lld_macro: false)
+			))->getRules(),
+			'js_validation_rules' => !$this->hasInput('itemid') || $this->hasInput('clone')
+				? (new CFormValidator(CControllerItemCreate::getValidationRules()))->getRules()
+				: (new CFormValidator(CControllerItemUpdate::getValidationRules()))->getRules(),
 			'item' => $item,
 			'host' => $host,
-			'types' => array_diff_key(item_type2str(), array_flip([ITEM_TYPE_HTTPTEST])),
+			'types' => array_diff_key(item_type2str(), array_flip([ITEM_TYPE_HTTPTEST, ITEM_TYPE_NESTED])),
 			'testable_item_types' => CControllerPopupItemTest::getTestableItemTypes($host['hostid']),
 			'executable_item_types' => checkNowAllowedTypes(),
 			'inherited_timeouts' => $inherited_timeouts,
@@ -137,12 +194,7 @@ class CControllerItemEdit extends CControllerItem {
 	 * @return array
 	 */
 	protected function getHost(): array {
-		[$host] = API::Host()->get([
-			'output' => ['hostid', 'name', 'monitored_by', 'proxyid', 'assigned_proxyid', 'flags', 'status'],
-			'selectInterfaces' => ['interfaceid', 'ip', 'port', 'dns', 'useip', 'details', 'type', 'main'],
-			'hostids' => !$this->hasInput('itemid') ? [$this->getInput('hostid')] : null,
-			'itemids' => $this->hasInput('itemid') ? [$this->getInput('itemid')] : null
-		]);
+		$host = $this->host;
 
 		if ($host['monitored_by'] == ZBX_MONITORED_BY_PROXY_GROUP) {
 			$host['proxyid'] = $host['assigned_proxyid'];
@@ -165,11 +217,7 @@ class CControllerItemEdit extends CControllerItem {
 	 * @return array
 	 */
 	protected function getTemplate(): array {
-		[$template] = API::Template()->get([
-			'output' => ['templateid', 'name', 'flags'],
-			'templateids' => !$this->hasInput('itemid') ? [$this->getInput('hostid')] : null,
-			'itemids' => $this->hasInput('itemid') ? [$this->getInput('itemid')] : null
-		]);
+		$template = $this->template;
 		$template += [
 			'hostid' => $template['templateid'],
 			'proxyid' => 0,
@@ -244,8 +292,8 @@ class CControllerItemEdit extends CControllerItem {
 		if ($this->hasInput('itemid')) {
 			[$item] = API::Item()->get([
 				'output' => [
-					'itemid', 'type', 'snmp_oid', 'hostid', 'name', 'key_', 'delay', 'history', 'trends', 'status',
-					'value_type', 'trapper_hosts', 'units', 'logtimefmt', 'templateid', 'valuemapid', 'params',
+					'itemid', 'type', 'snmp_oid', 'hostid', 'name', 'name_resolved', 'key_', 'delay', 'history', 'trends',
+					'status', 'value_type', 'trapper_hosts', 'units', 'logtimefmt', 'templateid', 'valuemapid', 'params',
 					'ipmi_sensor', 'authtype', 'username', 'password', 'publickey', 'privatekey', 'flags', 'interfaceid',
 					'description', 'inventory_link', 'lifetime', 'jmx_endpoint', 'master_itemid', 'url', 'query_fields',
 					'parameters', 'timeout', 'posts', 'status_codes', 'follow_redirects', 'post_type', 'http_proxy',
@@ -254,7 +302,7 @@ class CControllerItemEdit extends CControllerItem {
 				],
 				'selectDiscoveryRule' => ['name', 'templateid'],
 				'selectInterfaces' => ['interfaceid', 'type', 'ip', 'dns', 'port', 'useip', 'main'],
-				'selectItemDiscovery' => ['parent_itemid', 'disable_source'],
+				'selectDiscoveryData' => ['parent_itemid', 'disable_source'],
 				'selectPreprocessing' => ['type', 'params', 'error_handler', 'error_handler_params'],
 				'selectTags' => ['tag', 'value'],
 				'itemids' => [$this->getInput('itemid')]

@@ -412,6 +412,8 @@ static void	dc_kvs_path_remove(zbx_dc_kvs_path_t *kvs_path)
 
 	zbx_hashset_destroy(&kvs_path->kvs);
 	dc_strpool_release(kvs_path->path);
+	if (NULL != kvs_path->last_error)
+		dc_strpool_release(kvs_path->last_error);
 
 	dbconfig_shmem_free_func(kvs_path);
 }
@@ -491,6 +493,7 @@ static void	um_macro_register_kvs(zbx_um_macro_t *macro, const char *location,
 	{
 		kvs_path = (zbx_dc_kvs_path_t *)dbconfig_shmem_malloc_func(NULL, sizeof(zbx_dc_kvs_path_t));
 		kvs_path->path = dc_strpool_intern(path);
+		kvs_path->last_error = NULL;
 		zbx_hashset_create_ext(&kvs_path->kvs, 0, dc_kv_hash, dc_kv_compare, NULL,
 				dbconfig_shmem_malloc_func, dbconfig_shmem_realloc_func, dbconfig_shmem_free_func);
 
@@ -1000,7 +1003,11 @@ static int	um_cache_get_host_macro(const zbx_um_cache_t *cache, const zbx_uint64
 	}
 
 	if (0 != templateids.values_num)
+	{
+		/* Sort templates by id so the import order precedences over the linking order. */
+		zbx_vector_uint64_sort(&templateids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
 		ret = um_cache_get_host_macro(cache, templateids.values, templateids.values_num, name, context, macro);
+	}
 	else
 		ret = FAIL;
 out:
@@ -1122,7 +1129,7 @@ void	um_cache_resolve(const zbx_um_cache_t *cache, const zbx_uint64_t *hostids, 
 			if (ZBX_MACRO_VALUE_TEXT == um_macro->type)
 				out = um_macro->value;
 			else
-				out = (NULL == um_macro->value ? ZBX_MACRO_SECRET_MASK : ZBX_MACRO_NO_KVS_VALUE);
+				out = (NULL != um_macro->value ? ZBX_MACRO_SECRET_MASK : ZBX_MACRO_NO_KVS_VALUE);
 		}
 
 		zabbix_log(LOG_LEVEL_DEBUG, "End of %s(): %s", __func__, ZBX_NULL2EMPTY_STR(out));
@@ -1342,6 +1349,44 @@ void	um_cache_get_macro_updates(const zbx_um_cache_t *cache, const zbx_uint64_t 
 
 	zbx_vector_um_host_destroy(&hosts);
 }
+
+/*********************************************************************************
+ *                                                                               *
+ * Purpose: check if there are any macro updates for the specified hosts since   *
+ *          the given revision                                                   *
+ *                                                                               *
+ * Parameters: cache       - [IN] user macro cache                               *
+ *             hostids     - [IN] identifiers of the hosts to check              *
+ *             hostids_num - [IN] number of hosts to check                       *
+ *             revision    - [IN]                                                *
+ *                                                                               *
+ * Return value: SUCCEED - at least one host has updates since the revision      *
+ *               FAIL    - no updates found                                      *
+ *                                                                               *
+ *********************************************************************************/
+int	um_cache_check_macro_updates(const zbx_um_cache_t *cache, const zbx_uint64_t *hostids, int hostids_num,
+		zbx_uint64_t revision)
+{
+	int			ret = SUCCEED;
+	zbx_vector_um_host_t	hosts;
+
+	zbx_vector_um_host_create(&hosts);
+
+	for (int i = 0; i < hostids_num; i++)
+	{
+		um_cache_get_hosts(cache, &hostids[i], revision, &hosts);
+
+		if (0 != hosts.values_num)
+			goto out;
+	}
+
+	ret = FAIL;
+out:
+	zbx_vector_um_host_destroy(&hosts);
+
+	return ret;
+}
+
 
 /*********************************************************************************
  *                                                                               *

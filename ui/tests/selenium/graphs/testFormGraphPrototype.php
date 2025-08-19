@@ -28,7 +28,8 @@ require_once __DIR__.'/../common/testFormGraphs.php';
 class testFormGraphPrototype extends testFormGraphs {
 
 	protected $prototype = true;
-	protected $url = 'graphs.php?parent_discoveryid='.self::LLDID.'&context=host';
+	protected $url = 'zabbix.php?action=graph.prototype.list&parent_discoveryid='.self::LLDID.'&context=host';
+	protected $formid = 'graph-prototype-form';
 
 	public function prepareGraphPrototypesData() {
 		self::$update_graph = 'Graph for update';
@@ -133,24 +134,6 @@ class testFormGraphPrototype extends testFormGraphs {
 					],
 					'details' => [
 						'Graph prototype "Empty item prototype {#KEY}" must have at least one item prototype.'
-					]
-				]
-			],
-			[
-				[
-					'expected' => TEST_BAD,
-					'fields' => [
-						'Name' => 'Empty color in item prototype {#KEY}'
-					],
-					'items' => [
-						[
-							'prototype' => true,
-							'item' => 'testFormItemPrototype1',
-							'color' => ''
-						]
-					],
-					'details' => [
-						'Empty colour.'
 					]
 				]
 			],
@@ -683,7 +666,7 @@ class testFormGraphPrototype extends testFormGraphs {
 	 */
 	public function testFormGraphPrototype_CheckAvailableItems() {
 		$lldid = CDBHelper::getValue('SELECT itemid FROM items WHERE name='.zbx_dbstr(self::LLD_WITH_ITEMS));
-		$url = 'graphs.php?form=create&parent_discoveryid='.$lldid.'&context=host';
+		$url = 'zabbix.php?action=popup&popup=graph.prototype.edit&context=host&parent_discoveryid='.$lldid;
 
 		$this->checkAvailableItems($url);
 	}

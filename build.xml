@@ -41,6 +41,7 @@
 		<property name="url" value="${URL}"/>
 		<property name="screenshot_dir" value="${SCREENSHOT_DIR}"/>
 		<property name="screenshot_url" value="${SCREENSHOT_URL}"/>
+		<property name="component_dir" value="${COMPONENT_DIR}"/>
 		<property name="phpunit_port_prefix" value="${PHPUNIT_PORT_PREFIX}"/>
 		<property name="screenshot_references_dir" value="${SCREENSHOT_REFERENCES_DIR}"/>
 		<condition property="phpunit_driver_address" value="${PHPUNIT_DRIVER_ADDRESS}" else="localhost">
@@ -60,7 +61,7 @@
 		<replace file="ui/tests/bootstrap.php" token="{BINARY_DIR}" value="${basedir}/sbin/"/>
 		<replace file="ui/tests/bootstrap.php" token="{CONFIG_SOURCE_DIR}" value="${basedir}/conf/"/>
 		<replace file="ui/tests/bootstrap.php" token="{CONFIG_DIR}" value="${basedir}/etc/"/>
-		<replace file="ui/tests/bootstrap.php" token="{COMPONENT_DIR}" value="${basedir}/runtime/"/>
+		<replace file="ui/tests/bootstrap.php" token="{COMPONENT_DIR}" value="${component_dir}"/>
 		<replace file="ui/tests/bootstrap.php" token="{PORT_PREFIX}" value="${phpunit_port_prefix}"/>
 		<replace file="ui/tests/bootstrap.php" token="{SCREENSHOT_REFERENCES_DIR}" value="${screenshot_references_dir}"/>
 		<replace file="ui/tests/bootstrap.php" token="{PHPUNIT_DRIVER_ADDRESS}" value="${phpunit_driver_address}"/>
@@ -181,19 +182,40 @@
 		</exec>
 	</target>
 
-	<target name="make-binaries-postgresql">
-		<!-- Binaries for integration tests -->
-		<exec executable="./bootstrap.sh" failonerror="on"/>
+	<target name="make-binaries-agent2">
 		<exec executable="./configure" failonerror="on">
+			<arg line="--quiet"/>
+			<arg line="--enable-agent2"/>
+			<arg line="--prefix=${basedir}"/>
+			<arg line="--with-libcurl"/>
+			<arg line="--with-stacksize=128"/>
+			<arg line="--with-openssl"/>
+			<arg line="--with-net-snmp"/>
+			<arg line="--with-ssh2"/>
+		</exec>
+		<exec executable="make" failonerror="on">
+			<arg line="-j4"/>
+			<arg line="-s"/>
+			<arg line="install"/>
+		</exec>
+	</target>
+
+	<target name="make-binaries-postgresql">
+		<exec executable="./bootstrap.sh" failonerror="on"/>
+
+		<antcall target="make-binaries-agent2"/>
+
+		<!-- Binaries for integration tests -->
+		<exec executable="./configure" failonerror="on">
+			<arg line="CONFIG_SITE='share/config.site.d/clang-debug-sanitize'"/>
 			<arg line="--quiet"/>
 			<arg line="--enable-server"/>
 			<arg line="--enable-proxy"/>
 			<arg line="--enable-agent"/>
-			<arg line="--enable-agent2"/>
 			<arg line="--with-postgresql"/>
 			<arg line="--prefix=${basedir}"/>
 			<arg line="--with-libcurl"/>
-			<arg line="--with-stacksize=128"/>
+			<arg line="--with-stacksize=512"/>
 			<arg line="--with-openssl"/>
 			<arg line="--with-net-snmp"/>
 			<arg line="--with-ssh2"/>
@@ -402,18 +424,21 @@
 	<target name="init-dast-postgresql" depends="create-frontend-configs,make-dbschema,create-db-postgresql"/>
 
 	<target name="make-binaries-mysql">
-		<!-- Binaries for integration tests -->
 		<exec executable="./bootstrap.sh" failonerror="on"/>
+
+		<antcall target="make-binaries-agent2"/>
+
+		<!-- Binaries for integration tests -->
 		<exec executable="./configure" failonerror="on">
+			<arg line="CONFIG_SITE='share/config.site.d/clang-debug-sanitize'"/>
 			<arg line="--quiet"/>
 			<arg line="--enable-server"/>
 			<arg line="--enable-proxy"/>
 			<arg line="--enable-agent"/>
-			<arg line="--enable-agent2"/>
 			<arg line="--with-mysql"/>
 			<arg line="--prefix=${basedir}"/>
 			<arg line="--with-libcurl"/>
-			<arg line="--with-stacksize=128"/>
+			<arg line="--with-stacksize=512"/>
 			<arg line="--with-openssl"/>
 			<arg line="--with-net-snmp"/>
 			<arg line="--with-ssh2"/>
@@ -583,6 +608,7 @@
 
 	<target name="test-integration">
 		<exec executable="phpunit" dir="ui/tests" failonerror="off">
+			<env key="UBSAN_OPTIONS" value="print_stacktrace=1:suppressions=../tests/ubsan.supp"/>
 			<arg line="--log-junit=${basedir}/build/logs/phpunit.xml"/>
 			<arg line="--bootstrap=bootstrap.php"/>
 			<arg line="--do-not-cache-result"/>

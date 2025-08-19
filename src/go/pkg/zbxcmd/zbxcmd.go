@@ -16,16 +16,27 @@ package zbxcmd
 
 import "time"
 
-//MaxExecuteOutputLenB maximum output length for Execute and ExecuteStrict in bytes.
+// MaxExecuteOutputLenB maximum output length for Execute and ExecuteStrict in bytes.
 const MaxExecuteOutputLenB = 16 * 1024 * 1024
+
+var (
+	_ Executor = (*ZBXExec)(nil)
+)
+
+// Executor interface required for executing commands.
+type Executor interface {
+	Execute(command string, timeout time.Duration, execDir string) (string, error)
+	ExecuteStrict(command string, timeout time.Duration, execDir string) (string, error)
+	ExecuteBackground(command string) error
+}
 
 // Execute runs the 's' command without checking cmd.Wait error.
 // This means that non zero exit status code will not return an error.
 // Returns an error if there is an issue with executing the command or
 // if the specified timeout has been reached or if maximum output length
 // has been reached.
-func Execute(s string, timeout time.Duration, path string) (string, error) {
-	return execute(s, timeout, path, false)
+func (e *ZBXExec) Execute(command string, timeout time.Duration, execDir string) (string, error) {
+	return e.execute(command, timeout, execDir, false)
 }
 
 // ExecuteStrict runs the 's' command and checks cmd.Wait error.
@@ -33,6 +44,12 @@ func Execute(s string, timeout time.Duration, path string) (string, error) {
 // Also returns an error if there is an issue with executing the command or
 // if the specified timeout has been reached or if maximum output length
 // has been reached.
-func ExecuteStrict(s string, timeout time.Duration, path string) (string, error) {
-	return execute(s, timeout, path, true)
+func (e *ZBXExec) ExecuteStrict(command string, timeout time.Duration, path string) (string, error) {
+	return e.execute(command, timeout, path, true)
+}
+
+// ExecuteBackground runs the 's' command and waits for cmd.Wait in a go routine
+// This does not check cmd.Wait error.
+func (e *ZBXExec) ExecuteBackground(command string) error {
+	return e.executeBackground(command)
 }

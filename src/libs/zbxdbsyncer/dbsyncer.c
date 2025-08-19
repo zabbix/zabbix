@@ -28,6 +28,8 @@
 #include "zbxrtc.h"
 #include "zbx_rtc_constants.h"
 #include "zbxipcservice.h"
+#include "zbxlog.h"
+#include "zbxhistory.h"
 
 static sigset_t			orig_mask;
 
@@ -160,7 +162,10 @@ ZBX_THREAD_ENTRY(zbx_dbsyncer_thread, args)
 		zabbix_report_log_level_change();
 
 		if (0 != sleeptime)
+		{
+			zbx_handle_log();
 			zbx_setproctitle("%s #%d [%s, syncing history]", process_name, process_num, stats);
+		}
 
 		/* clear timer trigger queue to avoid processing time triggers at exit */
 		if (!ZBX_IS_RUNNING())
@@ -276,6 +281,9 @@ ZBX_THREAD_ENTRY(zbx_dbsyncer_thread, args)
 	zbx_db_close();
 	zbx_unblock_signals(&orig_mask);
 
+	if (0 != (info->program_type & ZBX_PROGRAM_TYPE_SERVER))
+		zbx_history_destroy();
+
 	if (SUCCEED != zbx_ipc_async_socket_flush(&rtc, dbsyncer_args->config_timeout))
 		zabbix_log(LOG_LEVEL_WARNING, "%s #%d cannot flush RTC socket", process_name, process_num);
 
@@ -287,6 +295,8 @@ ZBX_THREAD_ENTRY(zbx_dbsyncer_thread, args)
 
 	if (SUCCEED == zbx_is_export_enabled(ZBX_FLAG_EXPTYPE_EVENTS))
 		zbx_export_deinit(problems_export);
+
+	zbx_ipc_async_socket_close(&rtc);
 
 	zbx_free(stats);
 

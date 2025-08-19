@@ -384,6 +384,7 @@ static int	config_allow_root			= 0;
 static int	config_enable_global_scripts		= 1;
 static int	config_allow_software_update_check	= 1;
 static char	*config_sms_devices			= NULL;
+static char	*config_frontend_allowed_ip		= NULL;
 static zbx_config_log_t	log_file_cfg			= {NULL, NULL, ZBX_LOG_TYPE_UNDEFINED, 1};
 
 struct zbx_db_version_info_t	db_version_info;
@@ -757,6 +758,14 @@ static void	zbx_validate_config(ZBX_TASK_EX *task)
 		err = 1;
 	}
 
+	if (NULL != config_frontend_allowed_ip && FAIL == zbx_validate_peer_list(config_frontend_allowed_ip, &ch_error))
+	{
+		zabbix_log(LOG_LEVEL_CRIT, "invalid entry in \"FrontendAllowedIP\" configuration parameter: %s",
+			ch_error);
+		zbx_free(ch_error);
+		err = 1;
+	}
+
 	if (SUCCEED != zbx_validate_export_type(zbx_config_export.type, NULL))
 	{
 		zabbix_log(LOG_LEVEL_CRIT, "invalid \"ExportType\" configuration parameter: %s",
@@ -822,14 +831,21 @@ static void	zbx_validate_config(ZBX_TASK_EX *task)
 	err |= (FAIL == zbx_check_cfg_feature_str("TLSCRLFile", zbx_config_tls->crl_file, "TLS support"));
 	err |= (FAIL == zbx_check_cfg_feature_str("TLSCertFile", zbx_config_tls->cert_file, "TLS support"));
 	err |= (FAIL == zbx_check_cfg_feature_str("TLSKeyFile", zbx_config_tls->key_file, "TLS support"));
-#endif
-#if !(defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL))
 	err |= (FAIL == zbx_check_cfg_feature_str("TLSCipherCert", zbx_config_tls->cipher_cert,
 			"GnuTLS or OpenSSL"));
 	err |= (FAIL == zbx_check_cfg_feature_str("TLSCipherPSK", zbx_config_tls->cipher_psk,
 			"GnuTLS or OpenSSL"));
 	err |= (FAIL == zbx_check_cfg_feature_str("TLSCipherAll", zbx_config_tls->cipher_all,
 			"GnuTLS or OpenSSL"));
+	err |= (FAIL == zbx_check_cfg_feature_str("TLSFrontendCertSubject", zbx_config_tls->frontend_cert_subject,
+		"GnuTLS or OpenSSL"));
+	err |= (FAIL == zbx_check_cfg_feature_str("TLSFrontendCertIssuer", zbx_config_tls->frontend_cert_issuer,
+		"GnuTLS or OpenSSL"));
+	err |= (FAIL == zbx_check_cfg_feature_str("TLSListen", zbx_config_tls->tls_listen,
+		"GnuTLS or OpenSSL"));
+	err |= (FAIL == zbx_check_cfg_feature_str("TLSFrontendAccept", zbx_config_tls->frontend_accept,
+		"GnuTLS or OpenSSL"));
+
 #endif
 #if !defined(HAVE_OPENSSL)
 	err |= (FAIL == zbx_check_cfg_feature_str("TLSCipherCert13", zbx_config_tls->cipher_cert13,
@@ -914,11 +930,11 @@ static void	zbx_load_config(ZBX_TASK_EX *task)
 		{"CacheSize",			&config_conf_cache_size,		ZBX_CFG_TYPE_UINT64,
 				ZBX_CONF_PARM_OPT,	128 * ZBX_KIBIBYTE,	__UINT64_C(64) * ZBX_GIBIBYTE},
 		{"HistoryCacheSize",		&config_history_cache_size,		ZBX_CFG_TYPE_UINT64,
-				ZBX_CONF_PARM_OPT,	128 * ZBX_KIBIBYTE,	__UINT64_C(2) * ZBX_GIBIBYTE},
+				ZBX_CONF_PARM_OPT,	128 * ZBX_KIBIBYTE,	__UINT64_C(16) * ZBX_GIBIBYTE},
 		{"HistoryIndexCacheSize",	&config_history_index_cache_size,	ZBX_CFG_TYPE_UINT64,
-				ZBX_CONF_PARM_OPT,	128 * ZBX_KIBIBYTE,	__UINT64_C(2) * ZBX_GIBIBYTE},
+				ZBX_CONF_PARM_OPT,	128 * ZBX_KIBIBYTE,	__UINT64_C(16) * ZBX_GIBIBYTE},
 		{"TrendCacheSize",		&config_trends_cache_size,		ZBX_CFG_TYPE_UINT64,
-				ZBX_CONF_PARM_OPT,	128 * ZBX_KIBIBYTE,	__UINT64_C(2) * ZBX_GIBIBYTE},
+				ZBX_CONF_PARM_OPT,	128 * ZBX_KIBIBYTE,	__UINT64_C(16) * ZBX_GIBIBYTE},
 		{"TrendFunctionCacheSize",	&config_trend_func_cache_size,		ZBX_CFG_TYPE_UINT64,
 				ZBX_CONF_PARM_OPT,	0,			__UINT64_C(2) * ZBX_GIBIBYTE},
 		{"ValueCacheSize",		&config_value_cache_size,		ZBX_CFG_TYPE_UINT64,
@@ -1069,6 +1085,14 @@ static void	zbx_load_config(ZBX_TASK_EX *task)
 				ZBX_CONF_PARM_OPT,	0,			0},
 		{"TLSCipherAll",		&(zbx_config_tls->cipher_all),		ZBX_CFG_TYPE_STRING,
 				ZBX_CONF_PARM_OPT,	0,			0},
+		{"TLSFrontendCertIssuer",	&(zbx_config_tls->frontend_cert_issuer),	ZBX_CFG_TYPE_STRING,
+			ZBX_CONF_PARM_OPT,	0,			0},
+		{"TLSFrontendCertSubject",	&(zbx_config_tls->frontend_cert_subject),	ZBX_CFG_TYPE_STRING,
+				ZBX_CONF_PARM_OPT,	0,			0},
+		{"TLSFrontendAccept",		&(zbx_config_tls->frontend_accept),	ZBX_CFG_TYPE_STRING_LIST,
+			ZBX_CONF_PARM_OPT,	0,			0},
+		{"TLSListen",			&zbx_config_tls->tls_listen,		ZBX_CFG_TYPE_STRING,
+				ZBX_CONF_PARM_OPT,	0,			0},
 		{"SocketDir",			&CONFIG_SOCKET_PATH,			ZBX_CFG_TYPE_STRING,
 				ZBX_CONF_PARM_OPT,	0,			0},
 		{"StartAlerters",		&config_forks[ZBX_PROCESS_TYPE_ALERTER],
@@ -1147,6 +1171,8 @@ static void	zbx_load_config(ZBX_TASK_EX *task)
 				ZBX_CONF_PARM_OPT,	0,			0},
 		{"SMSDevices",			&config_sms_devices,			ZBX_CFG_TYPE_STRING_LIST,
 				ZBX_CONF_PARM_OPT,	0,			1},
+		{"FrontendAllowedIP",		&config_frontend_allowed_ip,		ZBX_CFG_TYPE_STRING_LIST,
+			ZBX_CONF_PARM_OPT,	0,			0},
 		{0}
 	};
 
@@ -1187,7 +1213,7 @@ static void	zbx_on_exit(int ret, void *on_exit_args)
 	if (NULL != zbx_threads)
 	{
 		/* wait for all child processes to exit */
-		zbx_threads_kill_and_wait(zbx_threads, threads_flags, zbx_threads_num, ret);
+		zbx_threads_kill_and_wait(zbx_threads, threads_flags, zbx_threads_num);
 
 		zbx_free(zbx_threads);
 		zbx_free(threads_flags);
@@ -1585,7 +1611,8 @@ static int	server_startup(zbx_socket_t *listen_sock, int *ha_stat, int *ha_failo
 			.config_ssh_key_location = config_ssh_key_location,
 			.config_webdriver_url = config_webdriver_url,
 			.trapper_process_request_func_cb = zbx_trapper_process_request_server,
-			.autoreg_update_host_cb = zbx_autoreg_update_host_server
+			.autoreg_update_host_cb = zbx_autoreg_update_host_server,
+			.config_frontend_allowed_ip = config_frontend_allowed_ip
 		};
 
 	zbx_thread_escalator_args	escalator_args =
@@ -1735,7 +1762,8 @@ static int	server_startup(zbx_socket_t *listen_sock, int *ha_stat, int *ha_failo
 			.get_process_forks_cb_arg = get_config_forks,
 			.get_scripts_path_cb_arg = get_zbx_config_alert_scripts_path,
 			.db_config = zbx_db_config,
-			.config_source_ip = zbx_config_source_ip
+			.config_source_ip = zbx_config_source_ip,
+			.config_ssl_ca_location = config_ssl_ca_location
 		};
 
 	zbx_thread_lld_manager_args	lld_manager_args =
@@ -2113,6 +2141,14 @@ static int	server_startup(zbx_socket_t *listen_sock, int *ha_stat, int *ha_failo
 		zabbix_log(LOG_LEVEL_CRIT, "cannot obtain HA status: %s", error);
 		zbx_free(error);
 	}
+
+	if (SUCCEED != zbx_db_init(&error))
+	{
+		zabbix_log(LOG_LEVEL_CRIT, "cannot initialize database: %s", error);
+		zbx_free(error);
+		exit(EXIT_FAILURE);
+	}
+
 out:
 	zbx_unset_exit_on_terminate();
 
@@ -2197,6 +2233,8 @@ static void	server_teardown(zbx_rtc_t *rtc, zbx_socket_t *listen_sock)
 	zbx_free_configuration_cache();
 	zbx_free_database_cache(ZBX_SYNC_NONE, &events_cbs, config_history_storage_pipelines);
 	zbx_deinit_remote_commands_cache();
+	zbx_db_deinit();
+
 #ifdef HAVE_PTHREAD_PROCESS_SHARED
 	zbx_locks_enable();
 #endif
@@ -2526,12 +2564,12 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 		zbx_set_exiting_with_fail();
 	}
 
-	zbx_register_stats_data_func(zbx_preproc_stats_ext_get, NULL);
-	zbx_register_stats_data_func(zbx_discovery_stats_ext_get, NULL);
-	zbx_register_stats_data_func(zbx_server_stats_ext_get, NULL);
-	zbx_register_stats_ext_func(zbx_vmware_stats_ext_get, NULL);
-	zbx_register_stats_procinfo_func(ZBX_PROCESS_TYPE_PREPROCESSOR, zbx_preprocessor_get_worker_info);
-	zbx_register_stats_procinfo_func(ZBX_PROCESS_TYPE_DISCOVERER, zbx_discovery_get_worker_info);
+	zbx_register_stats_ext_get_data_func(zbx_preproc_stats_ext_get_data, NULL);
+	zbx_register_stats_ext_get_data_func(zbx_discovery_stats_ext_get_data, NULL);
+	zbx_register_stats_ext_get_data_func(zbx_stats_ext_get_data_server, NULL);
+	zbx_register_stats_ext_get_func(zbx_vmware_stats_ext_get, NULL);
+	zbx_register_stats_procinfo_func(ZBX_PROCESS_TYPE_PREPROCESSOR, zbx_preprocessor_stats_procinfo);
+	zbx_register_stats_procinfo_func(ZBX_PROCESS_TYPE_DISCOVERER, zbx_discovery_stats_procinfo);
 	zbx_diag_init(diag_add_section_info_server);
 
 	if (ZBX_NODE_STATUS_ACTIVE == ha_status)
@@ -2690,6 +2728,8 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 
 		zbx_vault_renew_token(&zbx_config_vault, zbx_config_source_ip, config_ssl_ca_location,
 				config_ssl_cert_location, config_ssl_key_location);
+
+		__zbx_update_env(zbx_time());
 	}
 
 	zbx_log_exit_signal();

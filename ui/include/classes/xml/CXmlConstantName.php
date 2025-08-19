@@ -238,6 +238,7 @@ class CXmlConstantName {
 	const SNMP_AGENT = 'SNMP_AGENT';
 	// const SCRIPT = 'SCRIPT'; // Duplicate.
 	const BROWSER = 'BROWSER';
+	const NESTED = 'NESTED';
 
 	const FLOAT = 'FLOAT';
 	const CHAR = 'CHAR';
@@ -309,6 +310,7 @@ class CXmlConstantName {
 
 	const SMTP_AUTHENTICATION_NONE = 'NONE';
 	const SMTP_AUTHENTICATION_PASSWORD = 'PASSWORD';
+	const SMTP_AUTHENTICATION_OAUTH = 'OAUTH';
 
 	const MESSAGE_FORMAT_TEXT = 'TEXT'; // Duplicate.
 	const MESSAGE_FORMAT_HTML = 'HTML';
@@ -327,6 +329,11 @@ class CXmlConstantName {
 	const MACRO_TYPE_SECRET = 'SECRET_TEXT';
 	const MACRO_TYPE_VAULT = 'VAULT';
 
+	const MACRO_CONFIG_TYPE_NOCONF = 'NOCONF';
+	const MACRO_CONFIG_TYPE_TEXT = 'TEXT';
+	const MACRO_CONFIG_TYPE_LIST = 'LIST';
+	const MACRO_CONFIG_TYPE_CHECKBOX = 'CHECKBOX';
+
 	// Constants for low-level discovery rules.
 	const LLD_DELETE_AFTER = 'DELETE_AFTER';
 	const LLD_DELETE_NEVER = 'DELETE_NEVER';
@@ -342,6 +349,7 @@ class CXmlConstantName {
 	const LLD_OVERRIDE_OPERATION_OBJECT_TRIGGER_PROTOTYPE = 'TRIGGER_PROTOTYPE';
 	const LLD_OVERRIDE_OPERATION_OBJECT_GRAPH_PROTOTYPE = 'GRAPH_PROTOTYPE';
 	const LLD_OVERRIDE_OPERATION_OBJECT_HOST_PROTOTYPE = 'HOST_PROTOTYPE';
+	const LLD_OVERRIDE_OPERATION_OBJECT_LLD_RULE_PROTOTYPE = 'LLD_RULE_PROTOTYPE';
 	const CONDITION_OPERATOR_EQUAL = 'EQUAL';
 	const CONDITION_OPERATOR_NOT_EQUAL = 'NOT_EQUAL';
 	const CONDITION_OPERATOR_LIKE = 'LIKE';
@@ -381,4 +389,18 @@ class CXmlConstantName {
 	const MAPPING_IN_RANGE = 'IN_RANGE';
 	const MAPPING_REGEXP = 'REGEXP';
 	const MAPPING_DEFAULT = 'DEFAULT';
+
+	// Constants for map background scale.
+	public const MAP_BACKGROUND_SCALE_NONE = 'NONE';
+	public const MAP_BACKGROUND_SCALE_COVER = 'PROPORTIONALLY';
+
+	// Constants for map element label appearance.
+	public const SHOW_LABEL_DEFAULT = 'DEFAULT';
+	public const SHOW_LABEL_AUTO_HIDE = 'AUTO_HIDE';
+	public const SHOW_LABEL_ALWAYS = 'ALWAYS';
+
+	// Constants for map link indicators.
+	public const INDICATOR_TYPE_STATIC_LINK = 'STATIC_LINK';
+	public const INDICATOR_TYPE_TRIGGER = 'TRIGGER';
+	public const INDICATOR_TYPE_ITEM_VALUE = 'ITEM_VALUE';
 }

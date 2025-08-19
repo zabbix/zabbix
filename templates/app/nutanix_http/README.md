@@ -13,7 +13,7 @@ More details can be found in the official documentation:
 
 ## Requirements
 
-Zabbix version: 7.4 and higher.
+Zabbix version: 8.0 and higher.
 
 ## Tested versions
 
@@ -22,7 +22,7 @@ This template has been tested on:
 
 ## Configuration
 
-> Zabbix should be configured according to the instructions in the [Templates out of the box](https://www.zabbix.com/documentation/7.4/manual/config/templates_out_of_the_box) section.
+> Zabbix should be configured according to the instructions in the [Templates out of the box](https://www.zabbix.com/documentation/8.0/manual/config/templates_out_of_the_box) section.
 
 ## Setup
 
@@ -44,10 +44,10 @@ This template has been tested on:
 
 |Name|Description|Default|
 |----|-----------|-------|
-|{$NUTANIX.PRISM.ELEMENT.IP}|<p>Set the Nutanix API IP here.</p>|`<Put your IP here>`|
+|{$NUTANIX.PRISM.ELEMENT.IP}|<p>Set the Nutanix API IP here.</p>||
 |{$NUTANIX.PRISM.ELEMENT.PORT}|<p>Set the Nutanix API port here.</p>|`9440`|
-|{$NUTANIX.USER}|<p>Nutanix API username.</p>|`<Put your API username here>`|
-|{$NUTANIX.PASSWORD}|<p>Nutanix API password.</p>|`<Put your API password here>`|
+|{$NUTANIX.USER}|<p>Nutanix API username.</p>||
+|{$NUTANIX.PASSWORD}|<p>Nutanix API password.</p>||
 |{$NUTANIX.PROXY}|<p>Sets the HTTP proxy value. If this macro is empty, then no proxy is used.</p>||
 |{$NUTANIX.CLUSTER.DISCOVERY.NAME.MATCHES}|<p>Filter of discoverable Nutanix clusters by name.</p>|`.*`|
 |{$NUTANIX.CLUSTER.DISCOVERY.NAME.NOT_MATCHES}|<p>Filter to exclude discovered Nutanix clusters by name.</p>|`CHANGE_IF_NEEDED`|
@@ -117,7 +117,7 @@ More details can be found in the official documentation:
 
 ## Requirements
 
-Zabbix version: 7.4 and higher.
+Zabbix version: 8.0 and higher.
 
 ## Tested versions
 
@@ -126,7 +126,7 @@ This template has been tested on:
 
 ## Configuration
 
-> Zabbix should be configured according to the instructions in the [Templates out of the box](https://www.zabbix.com/documentation/7.4/manual/config/templates_out_of_the_box) section.
+> Zabbix should be configured according to the instructions in the [Templates out of the box](https://www.zabbix.com/documentation/8.0/manual/config/templates_out_of_the_box) section.
 
 ## Setup
 
@@ -152,10 +152,10 @@ This template has been tested on:
 
 |Name|Description|Default|
 |----|-----------|-------|
-|{$NUTANIX.PRISM.ELEMENT.IP}|<p>Set the Nutanix API IP here.</p>|`<Put your IP here>`|
+|{$NUTANIX.PRISM.ELEMENT.IP}|<p>Set the Nutanix API IP here.</p>||
 |{$NUTANIX.PRISM.ELEMENT.PORT}|<p>Set the Nutanix API port here.</p>|`9440`|
-|{$NUTANIX.USER}|<p>Nutanix API username.</p>|`<Put your API username here>`|
-|{$NUTANIX.PASSWORD}|<p>Nutanix API password.</p>|`<Put your API password here>`|
+|{$NUTANIX.USER}|<p>Nutanix API username.</p>||
+|{$NUTANIX.PASSWORD}|<p>Nutanix API password.</p>||
 |{$NUTANIX.PROXY}|<p>Sets the HTTP proxy value. If this macro is empty, then no proxy is used.</p>||
 |{$NUTANIX.CLUSTER.UUID}|<p>UUID of the cluster.</p>||
 |{$NUTANIX.TIMEOUT}|<p>API response timeout.</p>|`10s`|
@@ -308,7 +308,7 @@ More details can be found in the official documentation:
 
 ## Requirements
 
-Zabbix version: 7.4 and higher.
+Zabbix version: 8.0 and higher.
 
 ## Tested versions
 
@@ -317,7 +317,7 @@ This template has been tested on:
 
 ## Configuration
 
-> Zabbix should be configured according to the instructions in the [Templates out of the box](https://www.zabbix.com/documentation/7.4/manual/config/templates_out_of_the_box) section.
+> Zabbix should be configured according to the instructions in the [Templates out of the box](https://www.zabbix.com/documentation/8.0/manual/config/templates_out_of_the_box) section.
 
 ## Setup
 
@@ -343,10 +343,10 @@ This template has been tested on:
 
 |Name|Description|Default|
 |----|-----------|-------|
-|{$NUTANIX.PRISM.ELEMENT.IP}|<p>Set the Nutanix API IP here.</p>|`<Put your IP here>`|
+|{$NUTANIX.PRISM.ELEMENT.IP}|<p>Set the Nutanix API IP here.</p>||
 |{$NUTANIX.PRISM.ELEMENT.PORT}|<p>Set the Nutanix API port here.</p>|`9440`|
-|{$NUTANIX.USER}|<p>Nutanix API username.</p>|`<Put your API username here>`|
-|{$NUTANIX.PASSWORD}|<p>Nutanix API password.</p>|`<Put your API password here>`|
+|{$NUTANIX.USER}|<p>Nutanix API username.</p>||
+|{$NUTANIX.PASSWORD}|<p>Nutanix API password.</p>||
 |{$NUTANIX.PROXY}|<p>Sets the HTTP proxy value. If this macro is empty, then no proxy is used.</p>||
 |{$NUTANIX.HOST.UUID}|<p>UUID of the host.</p>||
 |{$NUTANIX.TIMEOUT}|<p>API response timeout.</p>|`10s`|

@@ -8,7 +8,7 @@ This template is based on the original template developed by Igor Akkuratov, Sen
 
 ## Requirements
 
-Zabbix version: 7.4 and higher.
+Zabbix version: 8.0 and higher.
 
 ## Tested versions
 
@@ -17,7 +17,7 @@ This template has been tested on:
 
 ## Configuration
 
-> Zabbix should be configured according to the instructions in the [Templates out of the box](https://www.zabbix.com/documentation/7.4/manual/config/templates_out_of_the_box) section.
+> Zabbix should be configured according to the instructions in the [Templates out of the box](https://www.zabbix.com/documentation/8.0/manual/config/templates_out_of_the_box) section.
 
 ## Setup
 
@@ -66,7 +66,7 @@ This template works with standalone and cluster instances. Metrics are collected
 
 |Name|Description|Expression|Severity|Dependencies and additional info|
 |----|-----------|----------|--------|--------------------------------|
-|GridGain: GridGain [{#JMXIGNITEINSTANCENAME}]: has been restarted|<p>Uptime is less than 10 minutes.</p>|`last(/GridGain by JMX/jmx["{#JMXOBJ}",UpTime])<10m`|Info|**Manual close**: Yes|
+|GridGain: GridGain [{#JMXIGNITEINSTANCENAME}]: Instance has been restarted|<p>Uptime is less than 10 minutes.</p>|`last(/GridGain by JMX/jmx["{#JMXOBJ}",UpTime])<10m`|Info|**Manual close**: Yes|
 |GridGain: GridGain [{#JMXIGNITEINSTANCENAME}]: Failed to fetch info data|<p>Zabbix has not received data for items for the last 10 minutes.</p>|`nodata(/GridGain by JMX/jmx["{#JMXOBJ}",UpTime],10m)=1`|Warning|**Manual close**: Yes|
 |GridGain: GridGain [{#JMXIGNITEINSTANCENAME}]: Version has changed|<p>The GridGain [{#JMXIGNITEINSTANCENAME}] version has changed. Acknowledge to close the problem manually.</p>|`last(/GridGain by JMX/jmx["{#JMXOBJ}",FullVersion],#1)<>last(/GridGain by JMX/jmx["{#JMXOBJ}",FullVersion],#2) and length(last(/GridGain by JMX/jmx["{#JMXOBJ}",FullVersion]))>0`|Info|**Manual close**: Yes|
 

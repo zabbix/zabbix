@@ -192,6 +192,32 @@ class CConfigFile {
 			$this->config['ALLOW_HTTP_AUTH'] = $ALLOW_HTTP_AUTH;
 		}
 
+		if (isset($ZBX_SERVER_TLS) && is_array($ZBX_SERVER_TLS)) {
+			if (array_key_exists('ACTIVE', $ZBX_SERVER_TLS)) {
+				$this->config['ZBX_SERVER_TLS']['ACTIVE'] = $ZBX_SERVER_TLS['ACTIVE'];
+			}
+
+			if (array_key_exists('CA_FILE', $ZBX_SERVER_TLS)) {
+				$this->config['ZBX_SERVER_TLS']['CA_FILE'] = $ZBX_SERVER_TLS['CA_FILE'];
+			}
+
+			if (array_key_exists('KEY_FILE', $ZBX_SERVER_TLS)) {
+				$this->config['ZBX_SERVER_TLS']['KEY_FILE'] = $ZBX_SERVER_TLS['KEY_FILE'];
+			}
+
+			if (array_key_exists('CERT_FILE', $ZBX_SERVER_TLS)) {
+				$this->config['ZBX_SERVER_TLS']['CERT_FILE'] = $ZBX_SERVER_TLS['CERT_FILE'];
+			}
+
+			if (array_key_exists('CERTIFICATE_ISSUER', $ZBX_SERVER_TLS)) {
+				$this->config['ZBX_SERVER_TLS']['CERTIFICATE_ISSUER'] = $ZBX_SERVER_TLS['CERTIFICATE_ISSUER'];
+			}
+
+			if (array_key_exists('CERTIFICATE_SUBJECT', $ZBX_SERVER_TLS)) {
+				$this->config['ZBX_SERVER_TLS']['CERTIFICATE_SUBJECT'] = $ZBX_SERVER_TLS['CERTIFICATE_SUBJECT'];
+			}
+		}
+
 		$this->makeGlobal();
 
 		return $this->config;
@@ -199,7 +225,7 @@ class CConfigFile {
 
 	public function makeGlobal() {
 		global $DB, $ZBX_SERVER, $ZBX_SERVER_PORT, $ZBX_SERVER_NAME, $IMAGE_FORMAT_DEFAULT, $HISTORY, $SSO,
-			$ALLOW_HTTP_AUTH;
+			$ALLOW_HTTP_AUTH, $ZBX_SERVER_TLS;
 
 		$DB = $this->config['DB'];
 		$ZBX_SERVER = $this->config['ZBX_SERVER'];
@@ -209,6 +235,7 @@ class CConfigFile {
 		$HISTORY = $this->config['HISTORY'];
 		$SSO = $this->config['SSO'];
 		$ALLOW_HTTP_AUTH = $this->config['ALLOW_HTTP_AUTH'];
+		$ZBX_SERVER_TLS = $this->config['ZBX_SERVER_TLS'];
 	}
 
 	public function save() {
@@ -287,7 +314,7 @@ $DB[\'VAULT_KEY_FILE\']		= \''.addcslashes($this->config['DB']['VAULT_KEY_FILE']
 
 $ZBX_SERVER_NAME		= \''.addcslashes($this->config['ZBX_SERVER_NAME'], "'\\").'\';
 
-$IMAGE_FORMAT_DEFAULT	= IMAGE_FORMAT_PNG;
+$IMAGE_FORMAT_DEFAULT		= IMAGE_FORMAT_PNG;
 
 // Uncomment this block only if you are using Elasticsearch.
 // Elasticsearch url (can be string if same url is used for all types).
@@ -299,14 +326,27 @@ $IMAGE_FORMAT_DEFAULT	= IMAGE_FORMAT_PNG;
 //$HISTORY[\'types\'] = [\'uint\', \'text\'];
 
 // Used for SAML authentication.
-// Uncomment to override the default paths to SP private key, SP and IdP X.509 certificates, and to set extra settings.
-//$SSO[\'SP_KEY\']			= \'conf/certs/sp.key\';
-//$SSO[\'SP_CERT\']			= \'conf/certs/sp.crt\';
-//$SSO[\'IDP_CERT\']		= \'conf/certs/idp.crt\';
+
+// Uncomment to set extra settings.
 //$SSO[\'SETTINGS\']		= [];
+
+// Set to \'file\' to store the private key and certificates on the file system.
+$SSO[\'CERT_STORAGE\']		= \'database\';
+
+// Uncomment to override the default paths for the private key and certificates, if stored on the file system.
+//$SSO[\'SP_KEY\']		= \'conf/certs/sp.key\';
+//$SSO[\'SP_CERT\']		= \'conf/certs/sp.crt\';
+//$SSO[\'IDP_CERT\']		= \'conf/certs/idp.crt\';
 
 // If set to false, support for HTTP authentication will be disabled.
 // $ALLOW_HTTP_AUTH = true;
+
+$ZBX_SERVER_TLS[\'ACTIVE\'] = \''.addcslashes($this->config['ZBX_SERVER_TLS']['ACTIVE'], "'\\").'\';
+$ZBX_SERVER_TLS[\'CA_FILE\'] = \''.addcslashes($this->config['ZBX_SERVER_TLS']['CA_FILE'], "'\\").'\';
+$ZBX_SERVER_TLS[\'KEY_FILE\'] = \''.addcslashes($this->config['ZBX_SERVER_TLS']['KEY_FILE'], "'\\").'\';
+$ZBX_SERVER_TLS[\'CERT_FILE\'] = \''.addcslashes($this->config['ZBX_SERVER_TLS']['CERT_FILE'], "'\\").'\';
+$ZBX_SERVER_TLS[\'CERTIFICATE_ISSUER\']  = \''.addcslashes($this->config['ZBX_SERVER_TLS']['CERTIFICATE_ISSUER'], "'\\").'\';
+$ZBX_SERVER_TLS[\'CERTIFICATE_SUBJECT\'] = \''.addcslashes($this->config['ZBX_SERVER_TLS']['CERTIFICATE_SUBJECT'], "'\\").'\';
 ';
 	}
 
@@ -341,5 +381,13 @@ $IMAGE_FORMAT_DEFAULT	= IMAGE_FORMAT_PNG;
 		$this->config['HISTORY'] = null;
 		$this->config['SSO'] = null;
 		$this->config['ALLOW_HTTP_AUTH'] = true;
+		$this->config['ZBX_SERVER_TLS'] = [
+			'ACTIVE' => 0,
+			'CA_FILE' => '',
+			'KEY_FILE' => '',
+			'CERT_FILE' => '',
+			'CERTIFICATE_ISSUER' => '',
+			'CERTIFICATE_SUBJECT' => ''
+		];
 	}
 }

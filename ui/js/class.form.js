@@ -175,11 +175,17 @@ class CForm {
 				if (i === key_parts.length - 1) {
 					if (typeof field.getExtraFields === 'function') {
 						for (const [extra_key, values] of Object.entries(field.getExtraFields())) {
-							key_fields[extra_key] = values;
+							if (values !== null) {
+								key_fields[extra_key] = values;
+							}
 						}
 					}
 					else {
-						key_fields[key_part] = field.getValueTrimmed();
+						let trimmed_value = field.getValueTrimmed();
+
+						if (trimmed_value !== null) {
+							key_fields[key_part] = trimmed_value;
+						}
 					}
 
 					break;
@@ -255,6 +261,7 @@ class CForm {
 	}
 
 	extendValidation(callback) {
+		throw new Error('Missing implementation.');
 		this.#custom_validation.push(callback);
 	}
 
@@ -318,15 +325,16 @@ class CForm {
 	 * is completed so that popup can be opened only when validation succeeds.
 	 *
 	 * @param {Array} fields
+	 * @param {?Object} rules
 	 *
 	 * @returns {Promise}
 	 */
-	validateFieldsForAction(fields) {
-		const validator = new CFormValidator(this.#rules);
+	validateFieldsForAction(fields, rules) {
+		const validator = new CFormValidator(rules ? rules : this.#rules);
 
 		return validator.validateChanges(this.getAllValues(), fields)
 			.then((result) => {
-				this.setErrors(validator.getErrors(), false);
+				this.setErrors(validator.getErrors(), true);
 				this.renderErrors();
 
 				return result;
@@ -379,7 +387,7 @@ class CForm {
 		}
 
 		if (focus_error_field) {
-			this.focusErrorField();
+			this.focusErrorField(Object.keys(field_errors));
 		}
 	}
 
@@ -397,6 +405,25 @@ class CForm {
 			const field_name = field.getName();
 			const field_path = field.getPath();
 			const subfield_path = new RegExp('^' + field_path + '/');
+
+			if (field instanceof CFieldMultiselect) {
+				const affixed_path = '/' + field_name + '_new';
+				const affixed_subfield = new RegExp('^/' + field_name + '_new/');
+
+				for (const error_path in raw_errors) {
+					const affixed = error_path === affixed_path || affixed_subfield.test(error_path);
+
+					if (!affixed) {
+						continue;
+					}
+
+					if (raw_errors[error_path].length) {
+						raw_errors[field_path] = [...raw_errors[field_path], ...raw_errors[error_path]]
+							.filter(({message}) => message.length);
+						raw_errors[error_path] = [];
+					}
+				}
+			}
 
 			Object.entries(raw_errors).filter(([path]) => {
 				return field_path === path || subfield_path.test(path);
@@ -454,10 +481,13 @@ class CForm {
 		});
 	}
 
-	focusErrorField() {
-		for (const field of Object.values(this.#fields)) {
-			if (field.hasErrors()) {
-				$(this.#tabs).tabs({active: $(`a[href="#${field.getTabId()}"]`, $(this.#tabs)).parent().index()});
+	focusErrorField(field_names) {
+		for (const [key, field] of Object.entries(this.#fields)) {
+			if (field_names.includes(key) && field.hasErrors()) {
+				if (field.getTabId() !== null) {
+					$(this.#tabs).tabs({active: $(`a[href="#${field.getTabId()}"]`, $(this.#tabs)).parent().index()});
+				}
+
 				field.focusErrorField();
 				break;
 			}

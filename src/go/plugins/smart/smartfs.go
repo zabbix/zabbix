@@ -65,12 +65,19 @@ const (
 	SCSI      = DeviceType("scsi")
 )
 
+const (
+	errFailedToExecute     = "failed to execute smartctl"
+	errSmartReturn         = "smartctl returned error"
+	errInvalidSmartVersion = "invalid smartctl version"
+)
+
 var (
 	lastVerCheck time.Time
 	versionMux   sync.Mutex
+)
 
-	// ErrNoSmartStatus error indicated that device has no smart status.
-	ErrNoSmartStatus = errs.New("smartctl returned no smart status")
+var (
+	errNoSmartStatus = errs.New("smartctl returned no smart status")
 )
 
 // SmartCtlDeviceData describes all data collected from smartctl for a particular
@@ -117,11 +124,11 @@ type singleDevice struct {
 }
 
 type healthLog struct {
-	Temperature     int `json:"temperature"`
-	PowerOnTime     int `json:"power_on_hours"`
-	CriticalWarning int `json:"critical_warning"`
-	MediaErrors     int `json:"media_errors"`
-	PercentageUsed  int `json:"percentage_used"`
+	Temperature     int         `json:"temperature"`
+	PowerOnTime     int         `json:"power_on_hours"`
+	CriticalWarning int         `json:"critical_warning"`
+	MediaErrors     json.Number `json:"media_errors"`
+	PercentageUsed  int         `json:"percentage_used"`
 }
 
 type temperature struct {
@@ -164,6 +171,7 @@ type selfTest struct {
 	Status status `json:"status"`
 }
 type status struct {
+	Value  int  `json:"value"`
 	Passed bool `json:"passed"`
 }
 
@@ -229,10 +237,14 @@ type runner struct {
 // execute returns the smartctl runner with all devices data returned by smartctl.
 // If jsonRunner is 'true' the returned data is in json format in 'jsonDevices' field.
 // If jsonRunner is 'false' the returned data is 'devices' field.
+// If byID is 'true' smart devices will be found by smart ID.
+// If byID is 'false' smart devices will be found by smart name.
 // Currently looks for 5 raid types "3ware", "areca", "cciss", "megaraid", "sat".
 // It returns an error if there is an issue with getting or parsing results from smartctl.
-func (p *Plugin) execute(jsonRunner bool) (*runner, error) {
-	basicDev, raidDev, megaraidDev, err := p.getDevices()
+//
+//nolint:gocyclo,cyclop
+func (p *Plugin) execute(byID, jsonRunner bool) (*runner, error) {
+	basicDev, raidDev, megaraidDev, err := p.getOsDevices(byID)
 	if err != nil {
 		return nil, err
 	}
@@ -271,7 +283,7 @@ func (p *Plugin) execute(jsonRunner bool) (*runner, error) {
 			default:
 				deviceInfo, err := getBasicDeviceInfo(p.ctl, name) //nolint:govet
 				if err != nil {
-					if errors.Is(err, ErrNoSmartStatus) {
+					if errors.Is(err, errNoSmartStatus) {
 						p.Logger.Debugf("skipping device with no smart status: %q", name)
 
 						return nil
@@ -348,7 +360,7 @@ func (p *Plugin) checkVersion() error {
 
 	out, err := p.ctl.Execute("-j", "-V")
 	if err != nil {
-		return errs.Wrap(err, "failed to execute smartctl")
+		return errs.Wrap(err, errFailedToExecute)
 	}
 
 	body := &smartctl{}
@@ -380,7 +392,7 @@ func versionCheckNeeded() bool {
 // evaluateVersion checks version digits if they match the current allowed version or higher.
 func evaluateVersion(versionDigits []int) error {
 	if len(versionDigits) < 1 {
-		return errs.Errorf("invalid smartctl version")
+		return errs.Wrap(errs.Errorf("Incorrect smartctl version number"), errInvalidSmartVersion)
 	}
 
 	var version string
@@ -392,13 +404,13 @@ func evaluateVersion(versionDigits []int) error {
 
 	v, err := strconv.ParseFloat(version, 64)
 	if err != nil {
-		return errs.WrapConst(err, zbxerr.ErrorCannotParseResult)
+		return errs.Wrap(err, errInvalidSmartVersion)
 	}
 
 	if v < supportedSmartctl {
-		return errs.Errorf(
-			"Incorrect smartctl version, must be %v or higher",
-			supportedSmartctl,
+		return errs.Wrap(
+			errs.Errorf("incorrect smartctl version, must be %v or higher", supportedSmartctl),
+			errInvalidSmartVersion,
 		)
 	}
 
@@ -413,7 +425,7 @@ func cutPrefix(in string) string {
 func getBasicDeviceInfo(ctl SmartController, deviceName string) (*SmartCtlDeviceData, error) {
 	device, err := ctl.Execute("-a", deviceName, "-j")
 	if err != nil {
-		return nil, errs.Wrap(err, "failed to execute smartctl")
+		return nil, errs.Wrap(err, errFailedToExecute)
 	}
 
 	dp := &deviceParser{}
@@ -425,11 +437,11 @@ func getBasicDeviceInfo(ctl SmartController, deviceName string) (*SmartCtlDevice
 
 	err = dp.checkErr()
 	if err != nil {
-		return nil, errs.Wrap(err, "smartctl returned error")
+		return nil, errs.Wrap(err, errSmartReturn)
 	}
 
 	if dp.SmartStatus == nil {
-		return nil, errs.Wrapf(ErrNoSmartStatus, "got no smart status for device %q", deviceName)
+		return nil, errs.Wrapf(errNoSmartStatus, "got no smart status for device %q", deviceName)
 	}
 
 	dp.Info.name = deviceName
@@ -449,7 +461,7 @@ func getAllDeviceInfoByType(
 ) (*SmartCtlDeviceData, error) {
 	device, err := ctl.Execute("-a", deviceName, "-d", deviceType, "-j")
 	if err != nil {
-		return nil, errs.Wrap(err, "failed to execute smartctl")
+		return nil, errs.Wrap(err, errFailedToExecute)
 	}
 
 	dp := &deviceParser{}
@@ -461,11 +473,11 @@ func getAllDeviceInfoByType(
 
 	err = dp.checkErr()
 	if err != nil {
-		return nil, errs.Wrap(err, "smartctl returned error")
+		return nil, errs.Wrap(err, errSmartReturn)
 	}
 
 	if dp.SmartStatus == nil {
-		return nil, ErrNoSmartStatus
+		return nil, errNoSmartStatus
 	}
 
 	dp.Info.Name = fmt.Sprintf("%s %s", deviceName, deviceType)
@@ -612,13 +624,13 @@ func (dp *deviceParser) checkErr() error {
 // getDevices returns a parsed slices of all devices returned by smartctl scan.
 // Returns a separate slice for basic, raid and megaraid devices. (in the described order)
 // It returns an error if there is an issue with getting or parsing results from smartctl.
-func (p *Plugin) getDevices() ([]deviceInfo, []deviceInfo, []deviceInfo, error) {
-	basicTmp, err := p.scanDevices("--scan", "-j")
+func (p *Plugin) getDevices(scanCMDArgs, raidScanCMDArgs []string) ([]deviceInfo, []deviceInfo, []deviceInfo, error) {
+	basicTmp, err := p.scanDevices(scanCMDArgs...)
 	if err != nil {
 		return nil, nil, nil, errs.Wrap(err, "failed to scan for devices")
 	}
 
-	raidTmp, err := p.scanDevices("--scan", "-d", "sat", "-j")
+	raidTmp, err := p.scanDevices(raidScanCMDArgs...)
 	if err != nil {
 		return nil, nil, nil, errs.Wrap(err, "failed to scan for sat devices")
 	}

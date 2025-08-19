@@ -696,21 +696,21 @@ void	zbx_strsplit_last(const char *src, char delimiter, char **left, char **righ
 
 /*******************************************************************************
  *                                                                             *
- * Purpose: Appends src to string dst of size size (unlike strncat, size is    *
- *          the full size of dst, not space left). At most size - 1 characters *
+ * Purpose: Appends src to string dst of size siz (unlike strncat, size is     *
+ *          the full size of dst, not space left). At most siz - 1 characters  *
  *          will be copied. Always null terminates (unless                     *
- *          size <= strlen(dst)).                                              *
+ *          siz <= strlen(dst)).                                               *
  *                                                                             *
  *******************************************************************************/
-void	zbx_strlcat(char *dst, const char *src, size_t size)
+void	zbx_strlcat(char *dst, const char *src, size_t siz)
 {
 	while ('\0' != *dst)
 	{
 		dst++;
-		size--;
+		siz--;
 	}
 
-	zbx_strlcpy(dst, src, size);
+	zbx_strlcpy(dst, src, siz);
 }
 
 /******************************************************************************
@@ -796,18 +796,19 @@ char	*zbx_strdcat(char *dest, const char *src)
  * Comments: returns pointer to allocated memory                              *
  *                                                                            *
  ******************************************************************************/
-char	*zbx_strdcatf(char *dest, const char *f, ...)
+char	*zbx_strdcatf(char *dest, const char *fmt, ...)
 {
-	char	*string, *result;
 	va_list	args;
+	char	*result, *str = NULL;
+	size_t	str_len = 0, str_offset = 0;
 
-	va_start(args, f);
-	string = zbx_dvsprintf(NULL, f, args);
+	va_start(args, fmt);
+	zbx_vsnprintf_alloc(&str, &str_len, &str_offset, fmt, args);
 	va_end(args);
 
-	result = zbx_strdcat(dest, string);
+	result = zbx_strdcat(dest, str);
 
-	zbx_free(string);
+	zbx_free(str);
 
 	return result;
 }

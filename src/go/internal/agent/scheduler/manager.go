@@ -30,12 +30,12 @@ import (
 	"golang.zabbix.com/agent2/internal/agent/resultcache"
 	"golang.zabbix.com/agent2/internal/monitor"
 	"golang.zabbix.com/agent2/pkg/glexpr"
-	"golang.zabbix.com/agent2/pkg/itemutil"
 	"golang.zabbix.com/agent2/plugins/external"
 	"golang.zabbix.com/sdk/errs"
 	"golang.zabbix.com/sdk/log"
 	"golang.zabbix.com/sdk/plugin"
 	"golang.zabbix.com/sdk/plugin/comms"
+	"golang.zabbix.com/sdk/plugin/itemutil"
 )
 
 const (
@@ -121,7 +121,8 @@ type Scheduler interface {
 		commands []*agent.RemoteCommand,
 		now time.Time,
 	)
-	FinishTask(task performer)
+	// FinishTask executes task finishing on given Performer.
+	FinishTask(task Performer)
 	PerformTask(
 		key string,
 		timeout time.Duration,
@@ -259,9 +260,8 @@ func ParseItemTimeoutAny(timeoutIn any) (int, error) {
 // processUpdateRequest processes client update request. It's being used for multiple requests
 // (active checks on a server) and also for direct requests (single passive and internal checks).
 func (m *Manager) processUpdateRequestRun(update *updateRequest) {
-	var c *client
-	var ok bool
-	if c, ok = m.clients[update.clientID]; !ok {
+	c, ok := m.clients[update.clientID]
+	if !ok {
 		if len(update.requests) == 0 {
 			log.Debugf(
 				"[%d] skipping empty update for unregistered client",
@@ -284,7 +284,9 @@ func (m *Manager) processUpdateRequestRun(update *updateRequest) {
 		var p *pluginAgent
 
 		r.Key = m.aliases.Get(r.Key)
-		if key, params, err = itemutil.ParseKey(r.Key); err == nil {
+		key, params, err = itemutil.ParseKey(r.Key)
+
+		if err == nil { //nolint:nestif
 			p, ok = m.plugins[key]
 			if ok && update.clientID != agent.LocalChecksClientID {
 				ok = keyaccess.CheckRules(key, params)
@@ -489,7 +491,7 @@ func (m *Manager) processAndFlushUserParamQueue(now time.Time) {
 }
 
 // processFinishRequest handles finished tasks
-func (m *Manager) processFinishRequest(task performer) {
+func (m *Manager) processFinishRequest(task Performer) {
 	m.activeTasksNum--
 	p := task.getPlugin()
 	p.releaseCapacity(task)
@@ -611,7 +613,7 @@ run:
 			case *commandRequest:
 				m.processCommandRequest(v)
 				m.processQueue(time.Now())
-			case performer:
+			case Performer:
 				m.processFinishRequest(v)
 				if m.shutdownSeconds != shutdownInactive && m.activeTasksNum+len(m.pluginQueue) == 0 {
 					break run
@@ -776,7 +778,8 @@ func (m *Manager) PerformTask(
 	return r.Value, r.Error
 }
 
-func (m *Manager) FinishTask(task performer) {
+// FinishTask executes task finishing on given Performer.
+func (m *Manager) FinishTask(task Performer) {
 	m.input <- task
 }
 
@@ -926,7 +929,7 @@ func (m *Manager) addUserParamsPlugin(key string) {
 	m.plugins[key] = pagent
 }
 
-func peekTask(tasks performerHeap) performer {
+func peekTask(tasks performerHeap) Performer {
 	if len(tasks) == 0 {
 		return nil
 	}
@@ -935,31 +938,32 @@ func peekTask(tasks performerHeap) performer {
 }
 
 func getPluginCapacity(
-	pluginCapacity, defaultCapacity, pluginMaxCapacity, defaultMaxCapacity int, pluginName string,
+	pluginCapacity, defaultCapacity, pluginMaxCapacity, defaultMaxCapacity int,
+	pluginName string,
 ) int {
-	capacity := pluginCapacity
-	if capacity == 0 {
-		capacity = defaultCapacity
+	maxCapacity := pluginMaxCapacity
+	if maxCapacity < 1 {
+		maxCapacity = defaultMaxCapacity
 	}
 
-	maxCapacity := defaultMaxCapacity
-
-	if pluginMaxCapacity > 0 {
-		maxCapacity = pluginMaxCapacity
-	}
-
-	if capacity > maxCapacity {
+	if pluginCapacity > maxCapacity {
 		log.Warningf(
 			"lowering the plugin %s capacity to hard limit %d as the configured capacity %d exceeds limits",
-			pluginName,
-			maxCapacity,
-			capacity,
+			pluginName, maxCapacity, pluginCapacity,
 		)
 
 		return maxCapacity
 	}
 
-	return capacity
+	if pluginCapacity != 0 {
+		return pluginCapacity
+	}
+
+	if defaultCapacity < maxCapacity {
+		return defaultCapacity
+	}
+
+	return maxCapacity
 }
 
 func getPluginForceActiveChecks(

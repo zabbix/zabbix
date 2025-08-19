@@ -411,6 +411,18 @@ return [
 				'type' => DB::FIELD_TYPE_INT,
 				'length' => 10,
 				'default' => '0'
+			],
+			'wizard_ready' => [
+				'null' => false,
+				'type' => DB::FIELD_TYPE_INT,
+				'length' => 10,
+				'default' => '0'
+			],
+			'readme' => [
+				'null' => false,
+				'type' => DB::FIELD_TYPE_TEXT,
+				'length' => 65535,
+				'default' => ''
 			]
 		]
 	],
@@ -1596,6 +1608,78 @@ return [
 				'type' => DB::FIELD_TYPE_INT,
 				'length' => 10,
 				'default' => '0'
+			]
+		]
+	],
+	'media_type_oauth' => [
+		'key' => 'mediatypeid',
+		'fields' => [
+			'mediatypeid' => [
+				'null' => false,
+				'type' => DB::FIELD_TYPE_ID,
+				'length' => 20,
+				'ref_table' => 'media_type',
+				'ref_field' => 'mediatypeid'
+			],
+			'redirection_url' => [
+				'null' => false,
+				'type' => DB::FIELD_TYPE_CHAR,
+				'length' => 2048,
+				'default' => ''
+			],
+			'client_id' => [
+				'null' => false,
+				'type' => DB::FIELD_TYPE_CHAR,
+				'length' => 255,
+				'default' => ''
+			],
+			'client_secret' => [
+				'null' => false,
+				'type' => DB::FIELD_TYPE_CHAR,
+				'length' => 255,
+				'default' => ''
+			],
+			'authorization_url' => [
+				'null' => false,
+				'type' => DB::FIELD_TYPE_CHAR,
+				'length' => 2048,
+				'default' => ''
+			],
+			'tokens_status' => [
+				'null' => false,
+				'type' => DB::FIELD_TYPE_INT,
+				'length' => 10,
+				'default' => '0'
+			],
+			'access_token' => [
+				'null' => false,
+				'type' => DB::FIELD_TYPE_TEXT,
+				'length' => 65535,
+				'default' => ''
+			],
+			'access_token_updated' => [
+				'null' => false,
+				'type' => DB::FIELD_TYPE_INT,
+				'length' => 10,
+				'default' => '0'
+			],
+			'access_expires_in' => [
+				'null' => false,
+				'type' => DB::FIELD_TYPE_INT,
+				'length' => 10,
+				'default' => '0'
+			],
+			'refresh_token' => [
+				'null' => false,
+				'type' => DB::FIELD_TYPE_TEXT,
+				'length' => 65535,
+				'default' => ''
+			],
+			'token_url' => [
+				'null' => false,
+				'type' => DB::FIELD_TYPE_CHAR,
+				'length' => 2048,
+				'default' => ''
 			]
 		]
 	],
@@ -2964,6 +3048,66 @@ return [
 			]
 		]
 	],
+	'hostmacro_config' => [
+		'key' => 'hostmacroid',
+		'fields' => [
+			'hostmacroid' => [
+				'null' => false,
+				'type' => DB::FIELD_TYPE_ID,
+				'length' => 20,
+				'ref_table' => 'hostmacro',
+				'ref_field' => 'hostmacroid'
+			],
+			'type' => [
+				'null' => false,
+				'type' => DB::FIELD_TYPE_INT,
+				'length' => 10,
+				'default' => '0'
+			],
+			'priority' => [
+				'null' => false,
+				'type' => DB::FIELD_TYPE_INT,
+				'length' => 10,
+				'default' => '0'
+			],
+			'section_name' => [
+				'null' => false,
+				'type' => DB::FIELD_TYPE_CHAR,
+				'length' => 255,
+				'default' => ''
+			],
+			'label' => [
+				'null' => false,
+				'type' => DB::FIELD_TYPE_CHAR,
+				'length' => 255,
+				'default' => ''
+			],
+			'description' => [
+				'null' => false,
+				'type' => DB::FIELD_TYPE_TEXT,
+				'length' => 65535,
+				'default' => ''
+			],
+			'required' => [
+				'null' => false,
+				'type' => DB::FIELD_TYPE_INT,
+				'length' => 10,
+				'default' => '0'
+			],
+			'regex' => [
+				'null' => false,
+				'type' => DB::FIELD_TYPE_CHAR,
+				'length' => 255,
+				'default' => ''
+			],
+			'options' => [
+				'null' => false,
+				'type' => DB::FIELD_TYPE_TEXT,
+				'length' => 65535,
+				'default' => ''
+			]
+		]
+	],
 	'hosts_groups' => [
 		'key' => 'hostgroupid',
 		'fields' => [
@@ -3519,6 +3663,24 @@ return [
 				'type' => DB::FIELD_TYPE_INT,
 				'length' => 10,
 				'default' => '0'
+			],
+			'background_scale' => [
+				'null' => false,
+				'type' => DB::FIELD_TYPE_INT,
+				'length' => 10,
+				'default' => '1'
+			],
+			'show_element_label' => [
+				'null' => false,
+				'type' => DB::FIELD_TYPE_INT,
+				'length' => 10,
+				'default' => '1'
+			],
+			'show_link_label' => [
+				'null' => false,
+				'type' => DB::FIELD_TYPE_INT,
+				'length' => 10,
+				'default' => '1'
 			]
 		]
 	],
@@ -3642,6 +3804,18 @@ return [
 				'type' => DB::FIELD_TYPE_INT,
 				'length' => 10,
 				'default' => '0'
+			],
+			'show_label' => [
+				'null' => false,
+				'type' => DB::FIELD_TYPE_INT,
+				'length' => 10,
+				'default' => '-1'
+			],
+			'zindex' => [
+				'null' => false,
+				'type' => DB::FIELD_TYPE_INT,
+				'length' => 10,
+				'default' => '0'
 			]
 		]
 	],
@@ -3691,6 +3865,25 @@ return [
 				'type' => DB::FIELD_TYPE_CHAR,
 				'length' => 2048,
 				'default' => ''
+			],
+			'show_label' => [
+				'null' => false,
+				'type' => DB::FIELD_TYPE_INT,
+				'length' => 10,
+				'default' => '-1'
+			],
+			'indicator_type' => [
+				'null' => false,
+				'type' => DB::FIELD_TYPE_INT,
+				'length' => 10,
+				'default' => '0'
+			],
+			'itemid' => [
+				'null' => true,
+				'type' => DB::FIELD_TYPE_ID,
+				'length' => 20,
+				'ref_table' => 'items',
+				'ref_field' => 'itemid'
 			]
 		]
 	],
@@ -3727,6 +3920,59 @@ return [
 				'type' => DB::FIELD_TYPE_CHAR,
 				'length' => 6,
 				'default' => '000000'
+			]
+		]
+	],
+	'sysmap_link_threshold' => [
+		'key' => 'linkthresholdid',
+		'fields' => [
+			'linkthresholdid' => [
+				'null' => false,
+				'type' => DB::FIELD_TYPE_ID,
+				'length' => 20
+			],
+			'linkid' => [
+				'null' => false,
+				'type' => DB::FIELD_TYPE_ID,
+				'length' => 20,
+				'ref_table' => 'sysmaps_links',
+				'ref_field' => 'linkid'
+			],
+			'drawtype' => [
+				'null' => false,
+				'type' => DB::FIELD_TYPE_INT,
+				'length' => 10,
+				'default' => '0'
+			],
+			'color' => [
+				'null' => false,
+				'type' => DB::FIELD_TYPE_CHAR,
+				'length' => 6,
+				'default' => '000000'
+			],
+			'type' => [
+				'null' => false,
+				'type' => DB::FIELD_TYPE_INT,
+				'length' => 10,
+				'default' => '0'
+			],
+			'threshold' => [
+				'null' => false,
+				'type' => DB::FIELD_TYPE_CHAR,
+				'length' => 255,
+				'default' => ''
+			],
+			'pattern' => [
+				'null' => false,
+				'type' => DB::FIELD_TYPE_CHAR,
+				'length' => 255,
+				'default' => ''
+			],
+			'sortorder' => [
+				'null' => false,
+				'type' => DB::FIELD_TYPE_INT,
+				'length' => 10,
+				'default' => '0'
 			]
 		]
 	],
@@ -5736,7 +5982,7 @@ return [
 				'ref_field' => 'itemid'
 			],
 			'parent_itemid' => [
-				'null' => false,
+				'null' => true,
 				'type' => DB::FIELD_TYPE_ID,
 				'length' => 20,
 				'ref_table' => 'items',
@@ -5777,6 +6023,13 @@ return [
 				'type' => DB::FIELD_TYPE_INT,
 				'length' => 10,
 				'default' => '0'
+			],
+			'lldruleid' => [
+				'null' => true,
+				'type' => DB::FIELD_TYPE_ID,
+				'length' => 20,
+				'ref_table' => 'items',
+				'ref_field' => 'itemid'
 			]
 		]
 	],
@@ -5797,7 +6050,7 @@ return [
 				'ref_table' => 'hosts',
 				'ref_field' => 'hostid'
 			],
-			'parent_itemid' => [
+			'lldruleid' => [
 				'null' => true,
 				'type' => DB::FIELD_TYPE_ID,
 				'length' => 20,
@@ -9049,6 +9302,24 @@ return [
 				'type' => DB::FIELD_TYPE_INT,
 				'length' => 10,
 				'default' => '0'
+			],
+			'idp_certificate' => [
+				'null' => false,
+				'type' => DB::FIELD_TYPE_TEXT,
+				'length' => 65535,
+				'default' => ''
+			],
+			'sp_certificate' => [
+				'null' => false,
+				'type' => DB::FIELD_TYPE_TEXT,
+				'length' => 65535,
+				'default' => ''
+			],
+			'sp_private_key' => [
+				'null' => false,
+				'type' => DB::FIELD_TYPE_TEXT,
+				'length' => 65535,
+				'default' => ''
 			]
 		]
 	],
@@ -9883,6 +10154,35 @@ return [
 				'length' => 20,
 				'ref_table' => 'mfa',
 				'ref_field' => 'mfaid'
+			]
+		]
+	],
+	'lld_macro_export' => [
+		'key' => 'lld_macro_exportid',
+		'fields' => [
+			'lld_macro_exportid' => [
+				'null' => false,
+				'type' => DB::FIELD_TYPE_ID,
+				'length' => 20
+			],
+			'itemid' => [
+				'null' => false,
+				'type' => DB::FIELD_TYPE_ID,
+				'length' => 20,
+				'ref_table' => 'items',
+				'ref_field' => 'itemid'
+			],
+			'lld_macro' => [
+				'null' => false,
+				'type' => DB::FIELD_TYPE_CHAR,
+				'length' => 255,
+				'default' => ''
+			],
+			'value' => [
+				'null' => false,
+				'type' => DB::FIELD_TYPE_TEXT,
+				'length' => 65535,
+				'default' => ''
 			]
 		]
 	],

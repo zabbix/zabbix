@@ -68,9 +68,7 @@ class CControllerUserProfileNotificationEdit extends CControllerUserEditGeneral 
 
 		$users = API::User()->get([
 			'output' => ['provisioned'],
-			'selectMedias' => (CWebUser::$data['type'] > USER_TYPE_ZABBIX_USER)
-				? ['mediaid', 'mediatypeid', 'period', 'sendto', 'severity', 'active', 'provisioned']
-				: null,
+			'selectMedias' => ['mediaid', 'mediatypeid', 'period', 'sendto', 'severity', 'active', 'provisioned'],
 			'userids' => CWebUser::$data['userid'],
 			'editable' => true
 		]);
@@ -95,13 +93,11 @@ class CControllerUserProfileNotificationEdit extends CControllerUserEditGeneral 
 		// Overwrite with input variables.
 		$this->getInputs($data, array_keys($data));
 
-		if (CWebUser::$data['type'] > USER_TYPE_ZABBIX_USER) {
-			$data['medias'] = $data['form_refresh'] != 0
-				? $this->getInput('medias', [])
-				: $this->user['medias'];
+		$data['medias'] = $data['form_refresh'] != 0
+			? $this->getInput('medias', [])
+			: $this->user['medias'];
 
-			$data = $this->setUserMedias($data);
-		}
+		$data = $this->setUserMedias($data);
 
 		$data += [
 			'userid' => CWebUser::$data['userid'],

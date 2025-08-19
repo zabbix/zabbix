@@ -718,6 +718,9 @@ static void	zbx_validate_config(ZBX_TASK_EX *task)
 			"GnuTLS or OpenSSL"));
 	err |= (FAIL == zbx_check_cfg_feature_str("TLSCipherAll", zbx_config_tls->cipher_all,
 			"GnuTLS or OpenSSL"));
+	err |= (FAIL == zbx_check_cfg_feature_str("TLSListen", zbx_config_tls->tls_listen,
+			"GnuTLS or OpenSSL"));
+
 #endif
 #if !defined(HAVE_OPENSSL)
 	err |= (FAIL == zbx_check_cfg_feature_str("TLSCipherCert13", zbx_config_tls->cipher_cert13,
@@ -896,9 +899,9 @@ static void	zbx_load_config(ZBX_TASK_EX *task)
 		{"CacheSize",			&config_conf_cache_size,		ZBX_CFG_TYPE_UINT64,
 				ZBX_CONF_PARM_OPT,	128 * ZBX_KIBIBYTE,	__UINT64_C(64) * ZBX_GIBIBYTE},
 		{"HistoryCacheSize",		&config_history_cache_size,		ZBX_CFG_TYPE_UINT64,
-				ZBX_CONF_PARM_OPT,	128 * ZBX_KIBIBYTE,	__UINT64_C(2) * ZBX_GIBIBYTE},
+				ZBX_CONF_PARM_OPT,	128 * ZBX_KIBIBYTE,	__UINT64_C(16) * ZBX_GIBIBYTE},
 		{"HistoryIndexCacheSize",	&config_history_index_cache_size,	ZBX_CFG_TYPE_UINT64,
-				ZBX_CONF_PARM_OPT,	128 * ZBX_KIBIBYTE,	__UINT64_C(2) * ZBX_GIBIBYTE},
+				ZBX_CONF_PARM_OPT,	128 * ZBX_KIBIBYTE,	__UINT64_C(16) * ZBX_GIBIBYTE},
 		{"HousekeepingFrequency",	&config_housekeeping_frequency,		ZBX_CFG_TYPE_INT,
 				ZBX_CONF_PARM_OPT,	0,			24},
 		{"ProxyLocalBuffer",		&config_proxy_local_buffer,		ZBX_CFG_TYPE_INT,
@@ -1056,6 +1059,8 @@ static void	zbx_load_config(ZBX_TASK_EX *task)
 				ZBX_CONF_PARM_OPT,	0,			0},
 		{"TLSCipherAll",		&(zbx_config_tls->cipher_all),		ZBX_CFG_TYPE_STRING,
 				ZBX_CONF_PARM_OPT,	0,			0},
+		{"TLSListen",			&zbx_config_tls->tls_listen,		ZBX_CFG_TYPE_STRING,
+				ZBX_CONF_PARM_OPT,	0,			0},
 		{"SocketDir",			&config_socket_path,			ZBX_CFG_TYPE_STRING,
 				ZBX_CONF_PARM_OPT,	0,			0},
 		{"EnableRemoteCommands",	&zbx_config_enable_remote_commands,	ZBX_CFG_TYPE_INT,
@@ -1152,7 +1157,7 @@ static void	zbx_on_exit(int ret, void *on_exit_args)
 	if (NULL != zbx_threads)
 	{
 		/* wait for all child processes to exit */
-		zbx_threads_kill_and_wait(zbx_threads, threads_flags, zbx_threads_num, ret);
+		zbx_threads_kill_and_wait(zbx_threads, threads_flags, zbx_threads_num);
 
 		zbx_free(zbx_threads);
 		zbx_free(threads_flags);
@@ -1385,6 +1390,8 @@ static void	proxy_db_init(void)
 {
 	char		*error = NULL;
 	int		db_type, version_check;
+
+	zbx_db_config->read_only_recoverable = 1;
 
 	if (SUCCEED != zbx_db_init(&error))
 	{
@@ -1867,12 +1874,12 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 
 	zabbix_log(LOG_LEVEL_INFORMATION, "proxy #0 started [main process]");
 
-	zbx_register_stats_data_func(zbx_preproc_stats_ext_get, NULL);
-	zbx_register_stats_data_func(zbx_discovery_stats_ext_get, NULL);
-	zbx_register_stats_data_func(zbx_proxy_stats_ext_get, &config_comms);
-	zbx_register_stats_ext_func(zbx_vmware_stats_ext_get, NULL);
-	zbx_register_stats_procinfo_func(ZBX_PROCESS_TYPE_PREPROCESSOR, zbx_preprocessor_get_worker_info);
-	zbx_register_stats_procinfo_func(ZBX_PROCESS_TYPE_DISCOVERER, zbx_discovery_get_worker_info);
+	zbx_register_stats_ext_get_data_func(zbx_preproc_stats_ext_get_data, NULL);
+	zbx_register_stats_ext_get_data_func(zbx_discovery_stats_ext_get_data, NULL);
+	zbx_register_stats_ext_get_data_func(zbx_stats_ext_get_data_proxy, &config_comms);
+	zbx_register_stats_ext_get_func(zbx_vmware_stats_ext_get, NULL);
+	zbx_register_stats_procinfo_func(ZBX_PROCESS_TYPE_PREPROCESSOR, zbx_preprocessor_stats_procinfo);
+	zbx_register_stats_procinfo_func(ZBX_PROCESS_TYPE_DISCOVERER, zbx_discovery_stats_procinfo);
 	zbx_diag_init(diag_add_section_info_proxy);
 
 	thread_args.info.program_type = zbx_program_type;
@@ -2051,6 +2058,8 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 
 		zbx_vault_renew_token(&zbx_config_vault, zbx_config_source_ip, config_ssl_ca_location,
 				config_ssl_cert_location, config_ssl_key_location);
+
+		__zbx_update_env(zbx_time());
 	}
 out:
 	zbx_log_exit_signal();

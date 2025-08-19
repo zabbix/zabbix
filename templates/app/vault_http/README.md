@@ -11,7 +11,7 @@ See https://www.vaultproject.io/api-docs/system/metrics.
 
 ## Requirements
 
-Zabbix version: 7.4 and higher.
+Zabbix version: 8.0 and higher.
 
 ## Tested versions
 
@@ -20,11 +20,11 @@ This template has been tested on:
 
 ## Configuration
 
-> Zabbix should be configured according to the instructions in the [Templates out of the box](https://www.zabbix.com/documentation/7.4/manual/config/templates_out_of_the_box) section.
+> Zabbix should be configured according to the instructions in the [Templates out of the box](https://www.zabbix.com/documentation/8.0/manual/config/templates_out_of_the_box) section.
 
 ## Setup
 
-> See [Zabbix template operation](https://www.zabbix.com/documentation/7.4/manual/config/templates_out_of_the_box/http) for basic instructions.
+> See [Zabbix template operation](https://www.zabbix.com/documentation/8.0/manual/config/templates_out_of_the_box/http) for basic instructions.
 
 Configure Vault API. See [Vault Configuration](https://www.vaultproject.io/docs/configuration).
 Create a Vault service token and set it to the macro `{$VAULT.TOKEN}`.
@@ -35,13 +35,13 @@ Create a Vault service token and set it to the macro `{$VAULT.TOKEN}`.
 |----|-----------|-------|
 |{$VAULT.API.PORT}|<p>Vault port.</p>|`8200`|
 |{$VAULT.API.SCHEME}|<p>Vault API scheme.</p>|`http`|
-|{$VAULT.HOST}|<p>Vault host name.</p>|`<PUT YOUR VAULT HOST>`|
+|{$VAULT.HOST}|<p>Vault host name.</p>||
 |{$VAULT.OPEN.FDS.MAX.WARN}|<p>Maximum percentage of used file descriptors for trigger expression.</p>|`90`|
 |{$VAULT.LEADERSHIP.SETUP.FAILED.MAX.WARN}|<p>Maximum number of Vault leadership setup failed.</p>|`5`|
 |{$VAULT.LEADERSHIP.LOSSES.MAX.WARN}|<p>Maximum number of Vault leadership losses.</p>|`5`|
 |{$VAULT.LEADERSHIP.STEPDOWNS.MAX.WARN}|<p>Maximum number of Vault leadership step downs.</p>|`5`|
 |{$VAULT.LLD.FILTER.STORAGE.MATCHES}|<p>Filter of discoverable storage backends.</p>|`.+`|
-|{$VAULT.TOKEN}|<p>Vault auth token.</p>|`<PUT YOUR AUTH TOKEN>`|
+|{$VAULT.TOKEN}|<p>Vault auth token.</p>||
 |{$VAULT.TOKEN.ACCESSORS}|<p>Vault accessors separated by spaces for monitoring token expiration time.</p>||
 |{$VAULT.TOKEN.TTL.MIN.CRIT}|<p>Token TTL critical threshold.</p>|`3d`|
 |{$VAULT.TOKEN.TTL.MIN.WARN}|<p>Token TTL warning threshold.</p>|`7d`|
@@ -146,7 +146,7 @@ Create a Vault service token and set it to the macro `{$VAULT.TOKEN}`.
 |HashiCorp Vault: Vault server is not responding||`last(/HashiCorp Vault by HTTP/vault.health.check)=0`|High||
 |HashiCorp Vault: Failed to get metrics||`length(last(/HashiCorp Vault by HTTP/vault.get_metrics.error))>0`|Warning|**Depends on**:<br><ul><li>HashiCorp Vault: Vault server is sealed</li></ul>|
 |HashiCorp Vault: Current number of open files is too high||`min(/HashiCorp Vault by HTTP/vault.metrics.process.open.fds,5m)/last(/HashiCorp Vault by HTTP/vault.metrics.process.max.fds)*100>{$VAULT.OPEN.FDS.MAX.WARN}`|Warning||
-|HashiCorp Vault: has been restarted|<p>Uptime is less than 10 minutes.</p>|`last(/HashiCorp Vault by HTTP/vault.metrics.process.uptime)<10m`|Info|**Manual close**: Yes|
+|HashiCorp Vault: Service has been restarted|<p>Uptime is less than 10 minutes.</p>|`last(/HashiCorp Vault by HTTP/vault.metrics.process.uptime)<10m`|Info|**Manual close**: Yes|
 |HashiCorp Vault: High frequency of leadership setup failures|<p>There have been more than {$VAULT.LEADERSHIP.SETUP.FAILED.MAX.WARN} Vault leadership setup failures in the past 1h.</p>|`(max(/HashiCorp Vault by HTTP/vault.metrics.core.leadership.setup_failed,1h)-min(/HashiCorp Vault by HTTP/vault.metrics.core.leadership.setup_failed,1h))>{$VAULT.LEADERSHIP.SETUP.FAILED.MAX.WARN}`|Average||
 |HashiCorp Vault: High frequency of leadership losses|<p>There have been more than {$VAULT.LEADERSHIP.LOSSES.MAX.WARN} Vault leadership losses in the past 1h.</p>|`(max(/HashiCorp Vault by HTTP/vault.metrics.core.leadership_lost,1h)-min(/HashiCorp Vault by HTTP/vault.metrics.core.leadership_lost,1h))>{$VAULT.LEADERSHIP.LOSSES.MAX.WARN}`|Average||
 |HashiCorp Vault: High frequency of leadership step downs|<p>There have been more than {$VAULT.LEADERSHIP.STEPDOWNS.MAX.WARN} Vault leadership step downs in the past 1h.</p>|`(max(/HashiCorp Vault by HTTP/vault.metrics.core.step_down,1h)-min(/HashiCorp Vault by HTTP/vault.metrics.core.step_down,1h))>{$VAULT.LEADERSHIP.STEPDOWNS.MAX.WARN}`|Average||

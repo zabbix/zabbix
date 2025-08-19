@@ -400,14 +400,22 @@ class CIntegrationTest extends CAPITest {
 	 */
 	protected static function waitForShutdown($component, array $child_pids) {
 		if (!self::checkPidKilled($component)) {
-			throw new Exception('Failed to wait for component "'.$component.'" to stop.');
+			$pid = @file_get_contents(self::getPidPath($component));
+
+			if ($pid !== false && is_numeric($pid)) {
+				$child_pids[] = $pid;
+			}
 		}
 
 		$failed_pids = [];
+		$failed_kills = [];
 
 		foreach ($child_pids as $child_pid) {
 			if (ctype_digit($child_pid) && posix_kill($child_pid, 0)) {
-				posix_kill($child_pid, SIGKILL);
+				if (!posix_kill($child_pid, SIGKILL)) {
+					$error_code = posix_get_last_error();
+					$failed_kills[] = ' - '.$child_pid.' ('.$error_code.') '.posix_strerror($error_code);
+				}
 				$failed_pids[] = $child_pid;
 			}
 		}
@@ -416,10 +424,13 @@ class CIntegrationTest extends CAPITest {
 			return;
 		}
 
-		$log = CLogHelper::readLog(self::getLogPath($component), false);
+		$log = CLogHelper::readLog(self::getLogPath($component), false, true);
+		$failed_kills = $failed_kills
+			? "\n".'The following processes could not be terminated using SIGKILL:'."\n".implode("\n", $failed_kills)
+			: '';
 
 		throw new Exception('Multiple child processes for component "'.$component.'" did not stop gracefully:'."\n".
-			implode(', ', $failed_pids)."\n".
+			implode(', ', $failed_pids).$failed_kills."\n".
 			'Log file contents: '."\n".$log."\n");
 	}
 
@@ -632,7 +643,7 @@ class CIntegrationTest extends CAPITest {
 		if ($pid !== false && is_numeric($pid)) {
 			$output = shell_exec('pgrep -P '.$pid);
 			if ($output !== false && $output !== null) {
-				$child_pids = explode("\n", $output);
+				$child_pids = explode("\n", trim($output));
 			}
 
 			posix_kill($pid, SIGTERM);
@@ -657,7 +668,7 @@ class CIntegrationTest extends CAPITest {
 		if ($pid !== false && is_numeric($pid)) {
 			$output = shell_exec('pgrep -P '.$pid);
 			if ($output !== false && $output !== null) {
-				$child_pids = explode("\n", $output);
+				$child_pids = explode("\n", trim($output));
 				foreach ($child_pids as $child_pid) {
 					if (ctype_digit($child_pid) && posix_kill($child_pid, 0)) {
 						posix_kill($child_pid, SIGKILL);
@@ -686,7 +697,7 @@ class CIntegrationTest extends CAPITest {
 		}
 
 		return new CZabbixClient('localhost', self::getConfigurationValue($component, 'ListenPort', 10051), 3, 3,
-			ZBX_SOCKET_BYTES_LIMIT
+			ZBX_SOCKET_BYTES_LIMIT, tls_config: ['ACTIVE' => '0']
 		);
 	}
 
@@ -1047,18 +1058,19 @@ class CIntegrationTest extends CAPITest {
 			$description = 'line "'.$lines.'"';
 		}
 
-		$c = CLogHelper::readLog(self::getLogPath($component), false);
+		$error_msg = 'Failed to wait for '.$description.' to be present in '.$component.
+				'log file: '.self::getLogPath($component)."\n";
 
-		if (file_exists(self::getLogPath(self::COMPONENT_AGENT))) {
-			$c2 = @CLogHelper::readLog(self::getLogPath(self::COMPONENT_AGENT), false);
-		}
-		else {
-			$c2 = '';
+		$error_msg .= CLogHelper::readLog(self::getLogPath($component), false, true);
+
+		foreach (self::getComponents() as $c) {
+			if ($c !== $component && file_exists(self::getLogPath($c))) {
+				$error_msg .= "\n\n".$c.' log file contents:'."\n";
+				$error_msg .= @CLogHelper::readLog(self::getLogPath($c), false, true);
+			}
 		}
 
-		throw new Exception('Failed to wait for '.$description.' to be present in '.$component .
-				'log file path:'.self::getLogPath($component).' and server log file contents: ' .
-				$c  . "\n and agent log file contents: " . $c2);
+		throw new Exception($error_msg);
 	}
 
 	/**

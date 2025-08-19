@@ -551,11 +551,15 @@ class CDBHelper {
 			if ($trigger) {
 				$trigger = $trigger[0];
 
-				$tags = DB::select('trigger_tag', [
+				$trigger_tags = DB::select('trigger_tag', [
 					'output' => ['tag', 'value'],
-					'filter' => ['triggerid' => $trigger['triggerid']],
-					'preservekeys' => true
+					'filter' => ['triggerid' => $trigger['triggerid']]
 				]);
+				$item_tags = CDBHelper::getAll(
+					'SELECT tag, value FROM item_tag WHERE itemid IN'.
+						' (SELECT DISTINCT itemid FROM functions WHERE triggerid='.zbx_dbstr($trigger['triggerid']).')'
+				);
+				$all_tags = array_merge($trigger_tags, $item_tags);
 
 				$time = time();
 
@@ -621,11 +625,18 @@ class CDBHelper {
 						}
 					}
 
-					if ($tags) {
-						foreach ($tags as &$tag) {
-							$tag['eventid'] = $fields['eventid'];
+					if ($all_tags) {
+						// Keep unique 'tag' => 'value' pair from merged trigger and item tags.
+						$unique = [];
+						foreach ($all_tags as &$tag) {
+							$key = $tag['tag'].'|'.$tag['value'];
+							if (!array_key_exists($key, $unique)) {
+								$unique[$key] = $tag;
+								$unique[$key]['eventid'] = $fields['eventid'];
+							}
 						}
 						unset($tag);
+						$tags = array_values($unique);
 
 						DB::insertBatch('event_tag', $tags);
 
@@ -661,14 +672,20 @@ class CDBHelper {
 	public static function removeDumpFile($file) {
 		if (strstr(strtolower(PHP_OS), 'win') !== false) {
 			$file = str_replace('/', '\\', $file);
-			exec('del '.$file);
+
+			if (is_file($file)) {
+				exec('del '.$file.' /q 2>nul');
+			}
+			else {
+				exec('rd '.$file.' /q /s 2>nul');
+			}
 		}
 		else {
 			exec('rm -rf '.$file, $output, $result_code);
-		}
 
-		if ($result_code != 0) {
-			throw new Exception('Failed to remove "'.$file.'".');
+			if ($result_code != 0) {
+				throw new Exception('Failed to remove "'.$file.'".');
+			}
 		}
 	}
 }

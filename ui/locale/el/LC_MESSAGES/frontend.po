@@ -19,6 +19,11 @@ msgstr ""
 "X-Generator: Pontoon\n"
 "X-POOTLE-MTIME: 1412318596.000000\n"
 
+#: include/classes/validators/CFormValidator.php:1397
+#: include/classes/validators/CFormValidator.php:1442 jsLoader.php:439
+msgid " or "
+msgstr ""
+
 #: app/controllers/CControllerSlaReportList.php:182
 #, c-format
 msgid "\"%1$s\" date must be less than \"%2$s\" date."
@@ -60,6 +65,10 @@ msgstr "Το \"%1$s\" πρέπει να είναι μια κενή συμβολ�
 #: include/classes/import/validators/C10XmlValidator.php:404
 msgid "\"host:key\" pair is expected"
 msgstr "Αναμένεται το ζεύγος \"host:key\""
+
+#: app/views/host.wizard.edit.php:1024
+msgid "#{section_name}"
+msgstr ""
 
 #: include/forms.inc.php:1330
 #: include/views/configuration.host.discovery.edit.php:932
@@ -371,6 +380,10 @@ msgstr "0 ή 1"
 msgid "1 minute"
 msgstr "1 λεπτό"
 
+#: app/views/host.wizard.edit.php:861
+msgid "1. Install Java Gateway on the same machine running Zabbix server by following the instructions in"
+msgstr ""
+
 #: app/views/administration.queue.overview.php:48
 #: app/views/administration.queue.overview.proxy.php:48
 msgid "10 seconds"
@@ -380,6 +393,10 @@ msgstr "10 δευτερόλεπτα"
 #: widgets/clock/includes/WidgetForm.php:116
 msgid "12-hour"
 msgstr "12ωρο"
+
+#: app/views/host.wizard.edit.php:867
+msgid "2. Configure your Java application to support remote JMX monitoring. For example:"
+msgstr ""
 
 #: tests/selenium/modules/clock32/includes/WidgetForm.php:115
 #: widgets/clock/includes/WidgetForm.php:115
@@ -440,6 +457,20 @@ msgstr ""
 #: widgets/geomap/Widget.php:48
 msgctxt "abbreviation of severity level"
 msgid "A"
+msgstr ""
+
+#: app/views/js/host.wizard.edit.js.php:1143
+msgid "A few more steps"
+msgstr ""
+
+#: include/classes/helpers/CItemGeneralHelper.php:356
+#: include/classes/helpers/CItemGeneralHelper.php:399
+#: include/classes/helpers/CItemGeneralHelper.php:407
+msgid "A floating point value is expected."
+msgstr ""
+
+#: app/views/host.wizard.edit.php:139
+msgid "A template is a set of predefined configurations (metrics to be collected, conditions for generating alerts, etc.) designed for your monitoring target."
 msgstr ""
 
 #: widgets/svggraph/includes/CWidgetFieldOverrideView.php:199
@@ -991,6 +1022,10 @@ msgstr "Προσθήκη από πρότυπο"
 msgid "Add host"
 msgstr "Προσθήκη διακομιστή"
 
+#: app/views/host.wizard.edit.php:571 app/views/js/host.wizard.edit.js.php:1133
+msgid "Add host interface"
+msgstr ""
+
 #: include/actions.inc.php:653 include/actions.inc.php:871
 msgid "Add host tags"
 msgstr "Προσθήκη ετικετών διακομιστή"
@@ -1107,6 +1142,10 @@ msgstr "Πρόσθετος κανόνας"
 msgid "Additional rules"
 msgstr "Πρόσθετοι κανόνες"
 
+#: app/views/host.wizard.edit.php:521 app/views/host.wizard.edit.php:544
+msgid "Additionally, make sure to complete the agent installation as described in this step, then return to this screen to continue to the next step."
+msgstr ""
+
 #: app/controllers/CControllerProxyCreate.php:82
 #: app/controllers/CControllerProxyUpdate.php:76
 #: app/partials/administration.ha.nodes.php:28
@@ -1185,6 +1224,10 @@ msgstr ""
 msgid "Agent (passive)"
 msgstr ""
 
+#: app/views/host.wizard.edit.php:597
+msgid "Agent address"
+msgstr ""
+
 #: include/classes/data/CItemData.php:911
 msgid "Agent availability check. Returns nothing - unavailable; 1 - available"
 msgstr ""
@@ -1201,13 +1244,33 @@ msgstr "Μεταδεδομένα πράκτορα του διακομιστή. �
 msgid "Agent host name. Returns string"
 msgstr "Όνομα διακομιστή του πράκτορα. Επιστρέφει συμβολοσειρά"
 
+#: app/views/js/host.wizard.edit.js.php:96
+msgid "Agent interface"
+msgstr ""
+
 #: include/views/inventory.host.view.php:64
 msgid "Agent interfaces"
 msgstr "Διεπαφές πράκτορα"
 
+#: app/views/host.wizard.edit.php:163 app/views/js/host.wizard.edit.js.php:1788
+msgid "Agent mode"
+msgstr ""
+
+#: app/views/host.wizard.edit.php:603
+msgid "Agent port"
+msgstr ""
+
 #: include/classes/data/CItemData.php:919
 msgid "Agent variant check. Returns 1 - for Zabbix agent; 2 - for Zabbix agent 2"
 msgstr "Έλεγχος παραλλαγής πράκτορα. Επιστρέφει 1 - για τον πράκτορα Zabbix. 2 - για τον πράκτορα Zabbix 2"
+
+#: app/views/host.wizard.edit.php:158 app/views/js/host.wizard.edit.js.php:1781
+msgid "Agent-based"
+msgstr ""
+
+#: app/views/host.wizard.edit.php:159 app/views/js/host.wizard.edit.js.php:1782
+msgid "Agentless"
+msgstr ""
 
 #: widgets/svggraph/includes/CWidgetFieldDataSetView.php:417
 msgid "Aggregate"
@@ -1380,6 +1443,14 @@ msgstr "Χρησιμοποιείται επίσης ως ετικέτα λεζά
 msgid "Alternatively, you can install it manually:"
 msgstr "Εναλλακτικά, μπορείτε να το εγκαταστήσετε χειροκίνητα:"
 
+#: include/views/js/monitoring.sysmaps.js.php:161
+#: include/views/js/monitoring.sysmaps.js.php:701
+#: include/views/js/monitoring.sysmaps.js.php:817
+#: include/views/monitoring.sysmap.edit.php:269
+#: include/views/monitoring.sysmap.edit.php:276
+msgid "Always"
+msgstr ""
+
 #: include/classes/data/CItemData.php:2317
 msgid "Amount of guest physical memory that is swapped out to the swap space, \"url\" - VMware service URL, \"uuid\" - VMware virtual machine global unique identifier"
 msgstr "Ποσότητα φυσικής μνήμης του επισκέπτη που ανταλλάσσεται στον χώρο ανταλλαγής, \"url\" - URL υπηρεσίας VMware, \"uuid\" - παγκόσμιο μοναδικό αναγνωριστικό εικονικής μηχανής VMware"
@@ -1387,6 +1458,16 @@ msgstr "Ποσότητα φυσικής μνήμης του επισκέπτη �
 #: include/classes/data/CItemData.php:2352
 msgid "Amount of host physical memory consumed for backing up guest physical memory pages, \"url\" - VMware service URL, \"uuid\" - VMware virtual machine global unique identifier"
 msgstr "Ποσότητα φυσικής μνήμης του διακομιστή που καταναλώνεται για τη δημιουργία αντιγράφων ασφαλείας σελίδων φυσικής μνήμης επισκέπτη, \"url\" - URL υπηρεσίας VMware, \"uuid\" - παγκόσμιο μοναδικό αναγνωριστικό εικονικής μηχανής VMware"
+
+#: include/classes/api/services/CItemGeneral.php:1913
+#, c-format
+msgid "An LLD rule prototype with key \"%1$s\" already exists on the host \"%2$s\"."
+msgstr ""
+
+#: include/classes/api/services/CItemGeneral.php:1912
+#, c-format
+msgid "An LLD rule prototype with key \"%1$s\" already exists on the template \"%2$s\"."
+msgstr ""
 
 #: include/classes/api/services/CItemGeneral.php:1781
 #, c-format
@@ -1397,6 +1478,12 @@ msgstr "Ένας κανόνας LLD με κλειδί \"%1$s\" υπάρχει ή
 #, c-format
 msgid "An LLD rule with key \"%1$s\" already exists on the template \"%2$s\"."
 msgstr "Ένας κανόνας LLD με το κλειδί \"%1$s\" υπάρχει ήδη στο πρότυπο \"%2$s\"."
+
+#: include/classes/validators/CFormValidator.php:1064
+#: include/classes/validators/CFormValidator.php:1103
+#: include/classes/validators/CFormValidator.php:1150 jsLoader.php:419
+msgid "An array is expected."
+msgstr ""
 
 #: include/classes/api/services/CItemGeneral.php:1775
 #, c-format
@@ -1502,6 +1589,10 @@ msgstr ""
 
 #: app/views/js/popup.import.js.php:106
 msgid "Any existing template entities not present in the import file will be deleted. Click OK to proceed."
+msgstr ""
+
+#: app/views/host.wizard.edit.php:148
+msgid "Apache, AWS, MySQL, etc."
 msgstr ""
 
 #: include/classes/core/CJsonRpc.php:225
@@ -1669,6 +1760,10 @@ msgstr "Πρέπει να οριστεί τουλάχιστον μία ημέρ�
 msgid "At least one host group or host must be selected."
 msgstr "Πρέπει να επιλεγεί τουλάχιστον μία ομάδα διακομιστών ή διακομιστής."
 
+#: include/classes/helpers/CItemGeneralHelper.php:411
+msgid "At least one of \"min\" or \"max\" parameters should be specified."
+msgstr ""
+
 #: include/classes/setup/CFrontendSetup.php:252
 msgid "At least one of MySQL or PostgreSQL should be supported."
 msgstr ""
@@ -1820,6 +1915,26 @@ msgstr "Συγγραφέας"
 msgid "Authorization"
 msgstr "Εξουσιοδότηση"
 
+#: app/views/oauth.edit.php:167 app/views/oauth.edit.php:182
+msgid "Authorization code"
+msgstr ""
+
+#: app/views/oauth.edit.php:136
+msgid "Authorization endpoint"
+msgstr ""
+
+#: app/views/oauth.edit.php:148
+msgid "Authorization parameters"
+msgstr ""
+
+#: app/views/oauth.edit.php:137
+msgid "Authorization server URL for requesting user authorization."
+msgstr ""
+
+#: app/views/oauth.edit.php:189
+msgid "Authorization server URL to exchange the authorization code for an access token."
+msgstr ""
+
 #: widgets/piechart/includes/WidgetForm.php:154
 #: widgets/tophosts/views/column.edit.php:204
 msgid "Auto"
@@ -1832,6 +1947,14 @@ msgstr "Αυτόματο"
 msgctxt "history source selection method"
 msgid "Auto"
 msgstr "Αυτόματο"
+
+#: include/views/js/monitoring.sysmaps.js.php:162
+#: include/views/js/monitoring.sysmaps.js.php:702
+#: include/views/js/monitoring.sysmaps.js.php:818
+#: include/views/monitoring.sysmap.edit.php:270
+#: include/views/monitoring.sysmap.edit.php:277
+msgid "Auto hide"
+msgstr ""
 
 #: app/views/administration.user.edit.php:294
 msgid "Auto-login"
@@ -1954,6 +2077,10 @@ msgstr "Χρώμα παρασκηνίου"
 #: include/views/monitoring.sysmap.edit.php:125
 msgid "Background image"
 msgstr "Εικόνα παρασκηνίου"
+
+#: include/views/monitoring.sysmap.edit.php:123
+msgid "Background scale"
+msgstr ""
 
 #: widgets/svggraph/includes/CWidgetFieldDataSetView.php:286
 #: widgets/svggraph/includes/CWidgetFieldOverrideView.php:176
@@ -2113,6 +2240,10 @@ msgstr "Κάτω"
 msgid "Bottom N"
 msgstr "Τελευταίοι Ν"
 
+#: app/views/host.wizard.edit.php:429
+msgid "Brackets to specify IPv6 addresses"
+msgstr ""
+
 #: jsLoader.php:266
 msgid "Bring forward"
 msgstr ""
@@ -2212,6 +2343,10 @@ msgstr "CSV σε JSON"
 msgid "CUID is expected"
 msgstr "Αναμένεται CUID"
 
+#: app/controllers/CControllerOauthAuthorize.php:135
+msgid "CURL Error"
+msgstr ""
+
 #: include/items.inc.php:100 include/views/configuration.graph.edit.php:180
 #: include/views/configuration.graph.edit.php:275
 msgid "Calculated"
@@ -2265,6 +2400,10 @@ msgstr "Επανάκληση"
 msgid "Cancel"
 msgstr "Ματαίωση"
 
+#: app/views/host.wizard.edit.php:1042
+msgid "Cancel Host Wizard?"
+msgstr ""
+
 #: app/controllers/CControllerTokenCreate.php:65
 #: app/controllers/CControllerTokenCreate.php:135
 msgid "Cannot add API token"
@@ -2291,6 +2430,10 @@ msgstr "Αδύνατη η προσθήκη ενέργειας"
 #, c-format
 msgid "Cannot add dashboard page: maximum number of %1$d dashboard pages has been added."
 msgstr "Δεν είναι δυνατή η προσθήκη σελίδας πίνακα ελέγχου: έχει προστεθεί ο μέγιστος αριθμός %1$d σελίδων πίνακα ελέγχου."
+
+#: host_discovery_prototypes.php:518
+msgid "Cannot add discovery prototype"
+msgstr ""
 
 #: host_discovery.php:540
 msgid "Cannot add discovery rule"
@@ -2447,6 +2590,11 @@ msgstr ""
 msgid "Cannot assign the inventory field \"%1$s\" to the item with key \"%2$s\" of template \"%3$s\", because it is already populated by the item with key \"%4$s\"."
 msgstr ""
 
+#: app/controllers/CControllerItem.php:206
+#: app/controllers/CControllerItemPrototype.php:208
+msgid "Cannot be less than or equal to \"Min\"."
+msgstr ""
+
 #: jsLoader.php:336
 msgctxt "screen reader"
 msgid "Cannot be removed"
@@ -2500,6 +2648,21 @@ msgstr "Aδύνατη η σύνδεση στη βάση δεδομένων."
 #: app/views/js/webscenario.step.edit.js.php:200
 msgid "Cannot convert POST data:"
 msgstr "Aδύνατη η μετατροπή δεδομένων POST:"
+
+#: include/classes/helpers/CItemGeneralHelper.php:1016
+#, c-format
+msgid "Cannot copy LLD rule prototype with key \"%1$s\" without its master item prototype with key \"%2$s\"."
+msgstr ""
+
+#: include/classes/helpers/CItemGeneralHelper.php:1004
+#, c-format
+msgid "Cannot copy LLD rule prototype with key \"%1$s\" without its master item with key \"%2$s\"."
+msgstr ""
+
+#: include/classes/helpers/CItemGeneralHelper.php:1003
+#, c-format
+msgid "Cannot copy LLD rule with key \"%1$s\" without its master item with key \"%2$s\"."
+msgstr ""
 
 #: app/controllers/CControllerCopyCreate.php:183
 msgid "Cannot copy graph"
@@ -2705,6 +2868,12 @@ msgstr "Αδύνατη η διαγραφή του προεπιλεγμένου �
 #, c-format
 msgid "Cannot delete discovery check \"%1$s\" of discovery rule \"%2$s\": %3$s."
 msgstr ""
+
+#: host_discovery_prototypes.php:313 host_discovery_prototypes.php:605
+msgid "Cannot delete discovery prototype"
+msgid_plural "Cannot delete discovery prototypes"
+msgstr[0] ""
+msgstr[1] ""
 
 #: app/controllers/CControllerDiscoveryDelete.php:68 host_discovery.php:390
 #: host_discovery.php:597
@@ -3036,6 +3205,12 @@ msgid_plural "Cannot disable connectors"
 msgstr[0] "Αδύνατη η απενεργοποίηση του συνδέσμου"
 msgstr[1] "Αδύνατη η απενεργοποίηση των συνδέσμων"
 
+#: host_discovery_prototypes.php:586
+msgid "Cannot disable discovery prototype"
+msgid_plural "Cannot disable discovery prototypes"
+msgstr[0] ""
+msgstr[1] ""
+
 #: app/controllers/CControllerDiscoveryDisable.php:76 host_discovery.php:584
 msgid "Cannot disable discovery rule"
 msgid_plural "Cannot disable discovery rules"
@@ -3126,6 +3301,12 @@ msgid_plural "Cannot enable connectors"
 msgstr[0] "Αδύνατη η ενεργοποίηση του συνδέσμου"
 msgstr[1] "Αδύνατη η ενεργοποίηση των συνδέσμων"
 
+#: host_discovery_prototypes.php:585
+msgid "Cannot enable discovery prototype"
+msgid_plural "Cannot enable discovery prototypes"
+msgstr[0] ""
+msgstr[1] ""
+
 #: app/controllers/CControllerDiscoveryEnable.php:76 host_discovery.php:583
 msgid "Cannot enable discovery rule"
 msgid_plural "Cannot enable discovery rules"
@@ -3203,6 +3384,11 @@ msgstr ""
 msgid "Cannot expand macros."
 msgstr ""
 
+#: include/classes/import/CConfigurationImport.php:1159
+#, c-format
+msgid "Cannot find \"parent_discovery_rule\" with key \"%1$s\" used for LLD rule prototype with key \"%2$s\" on \"%3$s\"."
+msgstr ""
+
 #: include/classes/import/importers/CTemplateDashboardImporter.php:217
 #, c-format
 msgid "Cannot find SLA \"%1$s\" used in dashboard \"%2$s\"."
@@ -3242,6 +3428,11 @@ msgstr "Αδύνατη η εύρεση του διακομιστή \"%1$s\" πο
 #, c-format
 msgid "Cannot find host group \"%1$s\" for host prototype \"%2$s\" of discovery rule \"%3$s\" on \"%4$s\"."
 msgstr "Αδύνατη η εύρεση της ομάδας διακομιστή \"%1$s\" για το πρωτότυπο διακομιστή \"%2$s\" του κανόνα εντοπισμού \"%3$s\" στο \"%4$s\"."
+
+#: include/classes/import/CConfigurationImport.php:1326
+#, c-format
+msgid "Cannot find host group \"%1$s\" for host prototype \"%2$s\" of discovery rule prototype \"%3$s\" on \"%4$s\"."
+msgstr ""
 
 #: include/classes/api/services/CDiscoveryRule.php:3350
 #, c-format
@@ -3283,6 +3474,11 @@ msgstr ""
 msgid "Cannot find interface \"%1$s\" used for item prototype \"%2$s\" of discovery rule \"%3$s\" on \"%4$s\"."
 msgstr ""
 
+#: include/classes/import/CConfigurationImport.php:1220
+#, c-format
+msgid "Cannot find interface \"%1$s\" used for item prototype \"%2$s\" of discovery rule prototype \"%3$s\" on \"%4$s\"."
+msgstr ""
+
 #: include/classes/import/CConfigurationImport.php:1852
 #, c-format
 msgid "Cannot find item \"%1$s\" on \"%2$s\" used as the Y axis MAX value for graph \"%3$s\"."
@@ -3292,6 +3488,11 @@ msgstr "Δεν βρίσκω συλλέκτη \"%1$s\" σε \"%2$s\" με χρή�
 #, c-format
 msgid "Cannot find item \"%1$s\" on \"%2$s\" used as the Y axis MAX value for graph prototype \"%3$s\" of discovery rule \"%4$s\" on \"%5$s\"."
 msgstr "Δεν βρίσκω συλλέκτη \"%1$s\" σε \"%2$s\" με χρήση ως Y άξονα ΜΕΓ τιμής δια πρωτότυπο γράφημα \"%3$s\" κανόνα εντοπισμού \"%4$s\" σε \"%5$s\"."
+
+#: include/classes/import/CConfigurationImport.php:1515
+#, c-format
+msgid "Cannot find item \"%1$s\" on \"%2$s\" used as the Y axis MAX value for graph prototype \"%3$s\" of discovery rule prototype \"%4$s\" on \"%5$s\"."
+msgstr ""
 
 #: include/classes/import/CConfigurationImport.php:1834
 #, c-format
@@ -3303,6 +3504,16 @@ msgstr "Δεν βρίσκω συλλέκτη \"%1$s\" σε \"%2$s\" με χρή�
 msgid "Cannot find item \"%1$s\" on \"%2$s\" used as the Y axis MIN value for graph prototype \"%3$s\" of discovery rule \"%4$s\" on \"%5$s\"."
 msgstr "Δεν βρίσκω συλλέκτη \"%1$s\" σε \"%2$s\" με χρήση ως Y άξονα ΕΛΑΧ τιμής για πρωτότυπο γράφημα \"%3$s\" κανόνα εντοπισμού \"%4$s\" σε \"%5$s\"."
 
+#: include/classes/import/CConfigurationImport.php:1490
+#, c-format
+msgid "Cannot find item \"%1$s\" on \"%2$s\" used as the Y axis MIN value for graph prototype \"%3$s\" of discovery rule prototype \"%4$s\" on \"%5$s\"."
+msgstr ""
+
+#: include/classes/import/importers/CMapImporter.php:244
+#, c-format
+msgid "Cannot find item \"%1$s\" on \"%2$s\" used in a link of map \"%3$s\"."
+msgstr ""
+
 #: include/classes/import/CConfigurationImport.php:1872
 #, c-format
 msgid "Cannot find item \"%1$s\" on \"%2$s\" used in graph \"%3$s\"."
@@ -3312,6 +3523,11 @@ msgstr "Δεν βρίσκω συλλέκτη \"%1$s\" σε \"%2$s\" με χρή�
 #, c-format
 msgid "Cannot find item \"%1$s\" on \"%2$s\" used in graph prototype \"%3$s\" of discovery rule \"%4$s\" on \"%5$s\"."
 msgstr "Δεν βρίσκω συλλέκτη \"%1$s\" σε \"%2$s\" με χρήση σε πρωτότυπο γράφημα \"%3$s\" κανόνα εντοπισμού \"%4$s\" σε \"%5$s\"."
+
+#: include/classes/import/CConfigurationImport.php:1540
+#, c-format
+msgid "Cannot find item \"%1$s\" on \"%2$s\" used in graph prototype \"%3$s\" of discovery rule prototype \"%4$s\" on \"%5$s\"."
+msgstr ""
 
 #: include/classes/import/importers/CTemplateDashboardImporter.php:166
 #, c-format
@@ -3343,6 +3559,11 @@ msgstr ""
 msgid "Cannot find template \"%1$s\" for host prototype \"%2$s\" of discovery rule \"%3$s\" on \"%4$s\"."
 msgstr "Αδύνατη η εύρεση του προτύπου \"%1$s\" για το πρωτότυπο διακομιστή \"%2$s\" του κανόνα εντοπισμού \"%3$s\" στο \"%4$s\"."
 
+#: include/classes/import/CConfigurationImport.php:1353
+#, c-format
+msgid "Cannot find template \"%1$s\" for host prototype \"%2$s\" of discovery rule prototype \"%3$s\" on \"%4$s\"."
+msgstr ""
+
 #: include/classes/import/CConfigurationImport.php:1182
 #, c-format
 msgid "Cannot find template \"%1$s\" for override \"%2$s\" of discovery rule \"%3$s\" on \"%4$s\"."
@@ -3372,6 +3593,15 @@ msgstr "Δεν βρίσκω αντιστοίχιση τιμής \"%1$s\" με χ
 #, c-format
 msgid "Cannot find value map \"%1$s\" used for item prototype \"%2$s\" of discovery rule \"%3$s\" on \"%4$s\"."
 msgstr "Δεν βρίσκω αντιστοίχιση τιμής \"%1$s\" με χρήση σε πρωτότυπο συλλέκτη \"%2$s\" κανόνα εντοπισμού \"%3$s\" σε \"%4$s\"."
+
+#: include/classes/import/CConfigurationImport.php:1243
+#, c-format
+msgid "Cannot find value map \"%1$s\" used for item prototype \"%2$s\" of discovery rule prototype \"%3$s\" on \"%4$s\"."
+msgstr ""
+
+#: app/views/oauth.edit.php:230
+msgid "Cannot get authorization code."
+msgstr ""
 
 #: include/classes/api/services/CRole.php:583
 #: include/classes/api/services/CRole.php:600
@@ -3405,6 +3635,76 @@ msgstr ""
 msgid "Cannot inherit LDD rules with key \"%1$s\" of both \"%2$s\" and \"%3$s\" templates, because the key must be unique on template \"%4$s\"."
 msgstr ""
 
+#: include/classes/api/services/CItemGeneral.php:1000
+#, c-format
+msgid "Cannot inherit LLD rule prototype with key \"%1$s\" of template \"%2$s\" and LLD rule \"%3$s\" to host \"%4$s\", because an LLD rule prototype with the same key already belongs to LLD rule \"%5$s\"."
+msgstr ""
+
+#: include/classes/api/services/CItemGeneral.php:1001
+#, c-format
+msgid "Cannot inherit LLD rule prototype with key \"%1$s\" of template \"%2$s\" and LLD rule \"%3$s\" to template \"%4$s\", because an LLD rule prototype with the same key already belongs to LLD rule \"%5$s\"."
+msgstr ""
+
+#: include/classes/api/services/CItemGeneral.php:926
+#, c-format
+msgid "Cannot inherit LLD rule prototype with key \"%1$s\" of template \"%2$s\" to host \"%3$s\", because a discovered LLD rule prototype with the same key already exists."
+msgstr ""
+
+#: include/classes/api/services/CItemGeneral.php:1358
+#, c-format
+msgid "Cannot inherit LLD rule prototype with key \"%1$s\" of template \"%2$s\" to host \"%3$s\", because a host interface of type \"%4$s\" is required."
+msgstr ""
+
+#: include/classes/api/services/CItemGeneral.php:969
+#, c-format
+msgid "Cannot inherit LLD rule prototype with key \"%1$s\" of template \"%2$s\" to host \"%3$s\", because an LLD rule prototype with the same key is already inherited from template \"%4$s\"."
+msgstr ""
+
+#: include/classes/api/services/CItemGeneral.php:921
+#, c-format
+msgid "Cannot inherit LLD rule prototype with key \"%1$s\" of template \"%2$s\" to host \"%3$s\", because an LLD rule with the same key already exists."
+msgstr ""
+
+#: include/classes/api/services/CItemGeneral.php:914
+#, c-format
+msgid "Cannot inherit LLD rule prototype with key \"%1$s\" of template \"%2$s\" to host \"%3$s\", because an item prototype with the same key already exists."
+msgstr ""
+
+#: include/classes/api/services/CItemGeneral.php:907
+#, c-format
+msgid "Cannot inherit LLD rule prototype with key \"%1$s\" of template \"%2$s\" to host \"%3$s\", because an item with the same key already exists."
+msgstr ""
+
+#: include/classes/api/services/CItemGeneral.php:970
+#, c-format
+msgid "Cannot inherit LLD rule prototype with key \"%1$s\" of template \"%2$s\" to template \"%3$s\", because an LLD rule prototype with the same key is already inherited from template \"%4$s\"."
+msgstr ""
+
+#: include/classes/api/services/CItemGeneral.php:922
+#, c-format
+msgid "Cannot inherit LLD rule prototype with key \"%1$s\" of template \"%2$s\" to template \"%3$s\", because an LLD rule with the same key already exists."
+msgstr ""
+
+#: include/classes/api/services/CItemGeneral.php:915
+#, c-format
+msgid "Cannot inherit LLD rule prototype with key \"%1$s\" of template \"%2$s\" to template \"%3$s\", because an item prototype with the same key already exists."
+msgstr ""
+
+#: include/classes/api/services/CItemGeneral.php:908
+#, c-format
+msgid "Cannot inherit LLD rule prototype with key \"%1$s\" of template \"%2$s\" to template \"%3$s\", because an item with the same key already exists."
+msgstr ""
+
+#: include/classes/api/services/CItemGeneral.php:717
+#, c-format
+msgid "Cannot inherit LLD rule prototypes with key \"%1$s\" of both \"%2$s\" and \"%3$s\" templates, because the key must be unique on host \"%4$s\"."
+msgstr ""
+
+#: include/classes/api/services/CItemGeneral.php:718
+#, c-format
+msgid "Cannot inherit LLD rule prototypes with key \"%1$s\" of both \"%2$s\" and \"%3$s\" templates, because the key must be unique on template \"%4$s\"."
+msgstr ""
+
 #: include/classes/api/services/CItemGeneral.php:819
 #, c-format
 msgid "Cannot inherit LLD rule with key \"%1$s\" of template \"%2$s\" to host \"%3$s\", because a discovered item with the same key already exists."
@@ -3413,6 +3713,11 @@ msgstr ""
 #: include/classes/api/services/CItemGeneral.php:1230
 #, c-format
 msgid "Cannot inherit LLD rule with key \"%1$s\" of template \"%2$s\" to host \"%3$s\", because a host interface of type \"%4$s\" is required."
+msgstr ""
+
+#: include/classes/api/services/CItemGeneral.php:897
+#, c-format
+msgid "Cannot inherit LLD rule with key \"%1$s\" of template \"%2$s\" to host \"%3$s\", because an LLD rule prototype with the same key already exists."
 msgstr ""
 
 #: include/classes/api/services/CItemGeneral.php:874
@@ -3433,6 +3738,11 @@ msgstr ""
 #: include/classes/api/services/CItemGeneral.php:820
 #, c-format
 msgid "Cannot inherit LLD rule with key \"%1$s\" of template \"%2$s\" to template \"%3$s\", because a discovered item with the same key already exists."
+msgstr ""
+
+#: include/classes/api/services/CItemGeneral.php:898
+#, c-format
+msgid "Cannot inherit LLD rule with key \"%1$s\" of template \"%2$s\" to template \"%3$s\", because an LLD rule prototype with the same key already exists."
 msgstr ""
 
 #: include/classes/api/services/CItemGeneral.php:875
@@ -3470,6 +3780,11 @@ msgstr ""
 msgid "Cannot inherit item prototype with key \"%1$s\" of template \"%2$s\" and LLD rule \"%3$s\" to template \"%4$s\", because an item prototype with the same key already belongs to LLD rule \"%5$s\"."
 msgstr ""
 
+#: include/classes/api/services/CItemGeneral.php:856
+#, c-format
+msgid "Cannot inherit item prototype with key \"%1$s\" of template \"%2$s\" to host \"%3$s\", because a discovered item prototype with the same key already exists."
+msgstr ""
+
 #: include/classes/api/services/CItemGeneral.php:841
 #, c-format
 msgid "Cannot inherit item prototype with key \"%1$s\" of template \"%2$s\" to host \"%3$s\", because a discovered item with the same key already exists."
@@ -3478,6 +3793,11 @@ msgstr ""
 #: include/classes/api/services/CItemGeneral.php:1234
 #, c-format
 msgid "Cannot inherit item prototype with key \"%1$s\" of template \"%2$s\" to host \"%3$s\", because a host interface of type \"%4$s\" is required."
+msgstr ""
+
+#: include/classes/api/services/CItemGeneral.php:869
+#, c-format
+msgid "Cannot inherit item prototype with key \"%1$s\" of template \"%2$s\" to host \"%3$s\", because an LLD rule prototype with the same key already exists."
 msgstr ""
 
 #: include/classes/api/services/CItemGeneral.php:835
@@ -3498,6 +3818,11 @@ msgstr ""
 #: include/classes/api/services/CItemGeneral.php:842
 #, c-format
 msgid "Cannot inherit item prototype with key \"%1$s\" of template \"%2$s\" to template \"%3$s\", because a discovered item with the same key already exists."
+msgstr ""
+
+#: include/classes/api/services/CItemGeneral.php:870
+#, c-format
+msgid "Cannot inherit item prototype with key \"%1$s\" of template \"%2$s\" to template \"%3$s\", because an LLD rule prototype with the same key already exists."
 msgstr ""
 
 #: include/classes/api/services/CItemGeneral.php:836
@@ -3535,6 +3860,11 @@ msgstr ""
 msgid "Cannot inherit item with key \"%1$s\" of template \"%2$s\" and item with key \"%3$s\" of template \"%4$s\" to template \"%5$s\", because they would populate the same inventory field \"%6$s\"."
 msgstr ""
 
+#: include/classes/api/services/CItemGeneral.php:891
+#, c-format
+msgid "Cannot inherit item with key \"%1$s\" of template \"%2$s\" to host \"%3$s\", because a discovered LLD rule with the same key already exists."
+msgstr ""
+
 #: include/classes/api/services/CItemGeneral.php:797
 #, c-format
 msgid "Cannot inherit item with key \"%1$s\" of template \"%2$s\" to host \"%3$s\", because a discovered item with the same key already exists."
@@ -3543,6 +3873,11 @@ msgstr ""
 #: include/classes/api/services/CItemGeneral.php:1226
 #, c-format
 msgid "Cannot inherit item with key \"%1$s\" of template \"%2$s\" to host \"%3$s\", because a host interface of type \"%4$s\" is required."
+msgstr ""
+
+#: include/classes/api/services/CItemGeneral.php:841
+#, c-format
+msgid "Cannot inherit item with key \"%1$s\" of template \"%2$s\" to host \"%3$s\", because an LLD rule prototype with the same key already exists."
 msgstr ""
 
 #: include/classes/api/services/CItemGeneral.php:785
@@ -3568,6 +3903,11 @@ msgstr ""
 #: include/classes/api/services/CItemGeneral.php:798
 #, c-format
 msgid "Cannot inherit item with key \"%1$s\" of template \"%2$s\" to template \"%3$s\", because a discovered item with the same key already exists."
+msgstr ""
+
+#: include/classes/api/services/CItemGeneral.php:842
+#, c-format
+msgid "Cannot inherit item with key \"%1$s\" of template \"%2$s\" to template \"%3$s\", because an LLD rule prototype with the same key already exists."
 msgstr ""
 
 #: include/classes/api/services/CItemGeneral.php:786
@@ -3737,6 +4077,10 @@ msgstr "Αδύνατη η μαζική ενημέρωση ορατού ονόμ�
 
 #: jsLoader.php:435
 msgid "Cannot open URL"
+msgstr ""
+
+#: app/views/oauth.edit.php:229
+msgid "Cannot open authorization popup window."
 msgstr ""
 
 #: include/classes/api/services/CHostBase.php:1561
@@ -4059,6 +4403,10 @@ msgstr "Αδύνατη η ενημέρωση διαμόρφωσης"
 #: app/controllers/CControllerConnectorUpdate.php:157
 msgid "Cannot update connector"
 msgstr "Αδύνατη η ενημέρωση του συνδέσμου"
+
+#: host_discovery_prototypes.php:526 host_discovery_prototypes.php:550
+msgid "Cannot update discovery prototype"
+msgstr ""
 
 #: app/controllers/CControllerDiscoveryUpdate.php:48
 #: app/controllers/CControllerDiscoveryUpdate.php:96 host_discovery.php:548
@@ -4396,6 +4744,10 @@ msgstr "Αλλαγή συνθηματικού"
 msgid "Change per second"
 msgstr ""
 
+#: app/views/host.wizard.edit.php:386
+msgid "Change pre-shared key"
+msgstr ""
+
 #: include/classes/helpers/CRoleHelper.php:561
 msgid "Change problem ranking"
 msgstr ""
@@ -4557,6 +4909,10 @@ msgstr "Κυκλική σύνδεση σχεδιότυπου μη επιτρεπ
 msgid "Class %1$s not found for action %2$s."
 msgstr ""
 
+#: jsLoader.php:551
+msgid "Clear"
+msgstr ""
+
 #: include/views/configuration.httpconf.edit.php:398
 #: include/views/configuration.httpconf.list.php:237
 #: include/views/configuration.item.edit.php:1127
@@ -4584,6 +4940,20 @@ msgstr ""
 #: app/views/popup.massupdate.host.php:66 app/views/template.massupdate.php:70
 msgid "Clear when unlinking"
 msgstr "Εκκαθάριση όταν αποσυνδέεται"
+
+#: app/views/host.wizard.edit.php:1007
+#, c-format
+msgid "Click %1$s to complete the setup."
+msgstr ""
+
+#: app/views/js/host.wizard.edit.js.php:771
+msgid "Click Finish to close the Host wizard."
+msgstr ""
+
+#: app/views/js/host.wizard.edit.js.php:770
+#, c-format
+msgid "Click Finish to navigate to the Latest data section and view the most recent data for your host (%1$s)."
+msgstr ""
 
 #: jsLoader.php:157
 msgid "Click and drag to desired size."
@@ -4701,6 +5071,10 @@ msgstr ""
 msgid "Collapse sidebar"
 msgstr ""
 
+#: app/views/host.wizard.edit.php:426
+msgid "Colon to separate IP/DNS address from port"
+msgstr ""
+
 #: include/views/configuration.graph.edit.php:398
 #: include/views/js/monitoring.sysmaps.js.php:383
 #: include/views/js/monitoring.sysmaps.js.php:404
@@ -4754,6 +5128,10 @@ msgstr "Συνδυασμένο αποτέλεσμα"
 msgid "Comma separated center coordinates and zoom level to display when the widget is initially loaded."
 msgstr ""
 
+#: app/views/host.wizard.edit.php:427
+msgid "Comma to separate multiple Zabbix servers, proxies, or clusters"
+msgstr ""
+
 #: app/views/administration.script.edit.php:199
 #: app/views/reports.actionlog.list.csv.php:45
 #: app/views/reports.actionlog.list.php:140 include/actions.inc.php:1864
@@ -4769,6 +5147,14 @@ msgstr "Εντολές"
 msgid "Communication"
 msgstr ""
 
+#: app/views/host.wizard.edit.php:375
+msgid "Communication between Zabbix agent and server/proxy is secured with a unique user-defined pre-shared key identity and a secret pre-shared key linked to it."
+msgstr ""
+
+#: app/views/host.wizard.edit.php:414
+msgid "Communication between Zabbix agent and server/proxy is secured with the pre-shared key (PSK) encryption method."
+msgstr ""
+
 #: include/items.inc.php:946
 msgctxt "SNMP Community"
 msgid "Community"
@@ -4776,6 +5162,10 @@ msgstr ""
 
 #: app/partials/monitoring.problem.filter.php:291
 msgid "Compact view"
+msgstr ""
+
+#: app/views/oauth.edit.php:228
+msgid "Complete authentication to get tokens."
 msgstr ""
 
 #: include/classes/core/CComponentRegistry.php:53
@@ -4826,6 +5216,10 @@ msgstr "Διαμόρφωση"
 msgid "Configuration cache statistics. Cache - buffer (modes: pfree, total, used, free)."
 msgstr "Διαμόρφωση στατιστικών cache. Cache - buffer (λειτουργίες: pfree, συνολική, χρήση, ελεύθερη)"
 
+#: app/views/host.wizard.edit.php:1024
+msgid "Configuration complete"
+msgstr ""
+
 #: include/classes/setup/CSetupWizard.php:1061
 #, c-format
 msgid "Configuration file \"%1$s\" created."
@@ -4850,6 +5244,10 @@ msgstr ""
 #: app/controllers/CControllerTemplateDashboardEdit.php:103
 #: app/controllers/CControllerTemplateDashboardList.php:93
 msgid "Configuration of dashboards"
+msgstr ""
+
+#: host_discovery_prototypes.php:22
+msgid "Configuration of discovery prototypes"
 msgstr ""
 
 #: app/controllers/CControllerDiscoveryEdit.php:144
@@ -5004,6 +5402,10 @@ msgstr ""
 msgid "Configuration updated"
 msgstr "Διαμόρφωση ενημερώθηκε"
 
+#: app/views/mediatype.edit.php:184
+msgid "Configure"
+msgstr ""
+
 #: include/classes/setup/CSetupWizard.php:60
 #: include/classes/setup/CSetupWizard.php:696
 msgid "Configure DB connection"
@@ -5012,6 +5414,22 @@ msgstr ""
 #: app/views/administration.authentication.edit.php:422
 #: app/views/popup.ldap.edit.php:119
 msgid "Configure JIT provisioning"
+msgstr ""
+
+#: app/views/host.wizard.edit.php:368
+msgid "Configure encryption"
+msgstr ""
+
+#: app/views/host.wizard.edit.php:895 app/views/host.wizard.edit.php:926
+#: app/views/host.wizard.edit.php:1006
+#: app/views/js/host.wizard.edit.js.php:1138
+msgid "Configure host"
+msgstr ""
+
+#: app/controllers/CControllerOauthAuthorize.php:166
+#: app/views/mediatype.edit.php:155
+#, c-format
+msgid "Configured %1$s ago"
 msgstr ""
 
 #: app/views/js/administration.authentication.edit.js.php:143
@@ -5349,6 +5767,11 @@ msgstr ""
 msgid "Count of values enqueued in the preprocessing queue."
 msgstr ""
 
+#: app/views/js/host.wizard.edit.js.php:761
+#: app/views/js/host.wizard.edit.js.php:1441
+msgid "Create"
+msgstr ""
+
 #: app/views/administration.token.list.php:109
 #: app/views/administration.user.token.list.php:76
 msgid "Create API token"
@@ -5372,6 +5795,14 @@ msgstr ""
 
 #: include/classes/helpers/CRoleHelper.php:535
 msgid "Create and edit maps"
+msgstr ""
+
+#: include/classes/helpers/CRoleHelper.php:550
+msgid "Create and edit own media"
+msgstr ""
+
+#: include/classes/helpers/CRoleHelper.php:554
+msgid "Create and edit user media"
 msgstr ""
 
 #: app/views/administration.image.list.php:60
@@ -5399,6 +5830,10 @@ msgstr ""
 #: include/views/configuration.host.prototype.list.php:200
 #: include/views/configuration.item.prototype.list.php:211
 msgid "Create disabled"
+msgstr ""
+
+#: include/views/configuration.host.discovery.prototype.list.php:34
+msgid "Create discovery prototype"
 msgstr ""
 
 #: app/views/configuration.discovery.list.php:35
@@ -5535,6 +5970,10 @@ msgstr "Δημιουργία νέου"
 
 #: jsLoader.php:372
 msgid "Create new report"
+msgstr ""
+
+#: app/views/host.wizard.edit.php:273 app/views/js/host.wizard.edit.js.php:1122
+msgid "Create or select a host"
 msgstr ""
 
 #: app/views/administration.proxy.list.php:239
@@ -5740,6 +6179,10 @@ msgstr "Ονόματα προσαρμοσμένης σοβαρότητας επ�
 msgid "Custom size"
 msgstr "Προσαρμοσμένο μέγεθος"
 
+#: app/views/host.wizard.edit.php:138
+msgid "Custom templates are not supported."
+msgstr ""
+
 #: app/views/administration.miscconfig.edit.php:103
 #: include/classes/setup/CSetupWizard.php:561
 msgid "CyberArk Vault"
@@ -5908,6 +6351,18 @@ msgstr ""
 msgid "Data from %1$s. Generated in %2$s sec."
 msgstr "Δεδομένα από %1$s. Παραγόμενα σε %2$s δευτ."
 
+#: app/views/host.wizard.edit.php:168
+msgid "Data is collected by Zabbix agent, a lightweight software `component installed on your monitoring target."
+msgstr ""
+
+#: app/views/js/host.wizard.edit.js.php:89
+msgid "Data is collected by Zabbix agent, a lightweight software component installed on your monitoring target."
+msgstr ""
+
+#: app/views/js/host.wizard.edit.js.php:90
+msgid "Data is collected by Zabbix server or proxy using standard protocols (e.g., SNMP, ICMP) or remote access methods (e.g., SSH)."
+msgstr ""
+
 #: app/views/js/webscenario.step.edit.js.php:297
 msgid "Data is not properly encoded."
 msgstr ""
@@ -5980,6 +6435,11 @@ msgstr ""
 #: include/classes/setup/CSetupWizard.php:844
 #: include/classes/setup/CSetupWizard.php:1128
 msgid "Database TLS key file"
+msgstr ""
+
+#: include/classes/api/clients/CLocalApiClient.php:124
+#: include/classes/api/clients/CLocalApiClient.php:138
+msgid "Database error occurred."
 msgstr ""
 
 #: app/partials/administration.system.info.php:130
@@ -6312,6 +6772,10 @@ msgstr "Διαγραφή τρέχουσας ενέργειας;"
 msgid "Delete dashboard?"
 msgstr ""
 
+#: include/views/configuration.host.discovery.prototype.edit.php:1086
+msgid "Delete discovery prototype?"
+msgstr ""
+
 #: app/views/configuration.discovery.edit.php:264
 #: include/views/configuration.host.discovery.edit.php:1032
 msgid "Delete discovery rule?"
@@ -6411,6 +6875,14 @@ msgstr ""
 #: app/views/configuration.dashboard.list.php:72
 #: app/views/monitoring.dashboard.list.php:126
 msgid "Delete selected dashboards?"
+msgstr ""
+
+#: include/views/configuration.host.discovery.prototype.list.php:280
+msgid "Delete selected discovery prototype?"
+msgstr ""
+
+#: include/views/configuration.host.discovery.prototype.list.php:281
+msgid "Delete selected discovery prototypes?"
 msgstr ""
 
 #: app/views/js/configuration.discovery.list.js.php:113
@@ -6797,6 +7269,10 @@ msgstr "Περιγραφή"
 msgid "Description size"
 msgstr ""
 
+#: app/views/oauth.edit.php:46
+msgid "Destination URL where successful authorization redirects."
+msgstr ""
+
 #: include/classes/data/CItemData.php:1503
 msgid "Detailed listing of installed packages. Returns text in JSON format"
 msgstr ""
@@ -6946,6 +7422,14 @@ msgstr "Απενεργοποίηση επιλεγμένου συνδέσμου;"
 #: app/views/js/connector.list.js.php:102
 msgid "Disable selected connectors?"
 msgstr "Απενεργοποίηση επιλεγμένων συνδέσμων;"
+
+#: include/views/configuration.host.discovery.prototype.list.php:265
+msgid "Disable selected discovery prototype?"
+msgstr ""
+
+#: include/views/configuration.host.discovery.prototype.list.php:266
+msgid "Disable selected discovery prototypes?"
+msgstr ""
 
 #: app/views/js/configuration.discovery.list.js.php:97
 #: include/views/configuration.host.discovery.list.php:349
@@ -7180,6 +7664,10 @@ msgstr "Αντικείμενο εντοπισμού"
 msgid "Discovery of VMware clusters, \"url\" - VMware service URL. Returns JSON"
 msgstr ""
 
+#: include/classes/data/CItemData.php:1940
+msgid "Discovery of VMware datastores, \"url\" - VMware service URL, \"filter_uuid\" - one hv uuid or vm uuid (empty by default). Returns JSON"
+msgstr ""
+
 #: include/classes/data/CItemData.php:1799
 msgid "Discovery of VMware datastores, \"url\" - VMware service URL. Returns JSON"
 msgstr ""
@@ -7210,6 +7698,46 @@ msgstr ""
 
 #: include/classes/data/CItemData.php:2310
 msgid "Discovery of VMware virtual machines, \"url\" - VMware service URL. Returns JSON"
+msgstr ""
+
+#: app/views/popup.lldoperation.php:49
+#: include/views/configuration.host.discovery.prototype.edit.php:1051
+#: include/views/js/configuration.host.discovery.edit.overr.js.php:156
+msgid "Discovery prototype"
+msgstr ""
+
+#: host_discovery_prototypes.php:515
+msgid "Discovery prototype created"
+msgstr ""
+
+#: host_discovery_prototypes.php:313 host_discovery_prototypes.php:604
+msgid "Discovery prototype deleted"
+msgid_plural "Discovery prototypes deleted"
+msgstr[0] ""
+msgstr[1] ""
+
+#: host_discovery_prototypes.php:579
+msgid "Discovery prototype disabled"
+msgid_plural "Discovery prototypes disabled"
+msgstr[0] ""
+msgstr[1] ""
+
+#: host_discovery_prototypes.php:578
+msgid "Discovery prototype enabled"
+msgid_plural "Discovery prototypes enabled"
+msgstr[0] ""
+msgstr[1] ""
+
+#: host_discovery_prototypes.php:523 host_discovery_prototypes.php:547
+msgid "Discovery prototype updated"
+msgstr ""
+
+#: include/html.inc.php:645
+#: include/views/configuration.host.discovery.list.php:389
+#: include/views/configuration.host.discovery.prototype.edit.php:25
+#: include/views/configuration.host.discovery.prototype.list.php:25
+#: include/views/configuration.host.discovery.prototype.list.php:241
+msgid "Discovery prototypes"
 msgstr ""
 
 #: app/controllers/CControllerAuditLogList.php:228
@@ -7374,6 +7902,10 @@ msgstr ""
 
 #: app/controllers/CControllerPopupTriggerExpr.php:841
 msgid "Division denominator"
+msgstr ""
+
+#: app/views/host.wizard.edit.php:114
+msgid "Do not show welcome screen"
 msgstr ""
 
 #: app/views/popup.lldoperation.php:188 app/views/popup.lldoperation.php:209
@@ -7603,6 +8135,10 @@ msgstr ""
 msgid "Edit widget"
 msgstr ""
 
+#: jsLoader.php:185
+msgid "Editing other objects is not allowed in dashboard editing mode."
+msgstr ""
+
 #: app/views/popup.sla.edit.php:114 app/views/sla.list.php:89
 msgid "Effective date"
 msgstr ""
@@ -7710,6 +8246,10 @@ msgstr ""
 msgid "Enable HTTP authentication for all users."
 msgstr ""
 
+#: app/views/host.wizard.edit.php:811
+msgid "Enable IPMI checks on Zabbix server"
+msgstr ""
+
 #: app/views/administration.authentication.edit.php:209
 #: app/views/administration.authentication.edit.php:281
 msgid "Enable JIT provisioning"
@@ -7785,6 +8325,10 @@ msgstr "Ενεργοποίηση εσωτερικής τακτοποίησης"
 msgid "Enable multi-factor authentication"
 msgstr ""
 
+#: app/views/host.wizard.edit.php:859
+msgid "Enable remote JMX monitoring"
+msgstr ""
+
 #: app/views/administration.token.list.php:205
 #: app/views/administration.user.token.list.php:158
 msgid "Enable selected API token?"
@@ -7818,6 +8362,14 @@ msgstr "Ενεργοποίηση επιλεγμένου συνδέσμου;"
 #: app/views/js/connector.list.js.php:87
 msgid "Enable selected connectors?"
 msgstr "Ενεργοποίηση επιλεγμένων συνδέσμων;"
+
+#: include/views/configuration.host.discovery.prototype.list.php:259
+msgid "Enable selected discovery prototype?"
+msgstr ""
+
+#: include/views/configuration.host.discovery.prototype.list.php:260
+msgid "Enable selected discovery prototypes?"
+msgstr ""
 
 #: app/views/js/configuration.discovery.list.js.php:81
 #: include/views/configuration.host.discovery.list.php:343
@@ -7967,6 +8519,11 @@ msgstr "Ενεργοποιημένο"
 msgid "Encrypt"
 msgstr ""
 
+#: include/classes/setup/CSetupWizard.php:846
+#: include/classes/setup/CSetupWizard.php:1075
+msgid "Encrypt connections from Web interface"
+msgstr ""
+
 #: app/partials/configuration.host.edit.html.php:513
 #: app/views/administration.proxy.list.php:88
 #: app/views/popup.massupdate.host.php:291 app/views/popup.proxy.edit.php:308
@@ -7993,6 +8550,35 @@ msgstr ""
 #: include/locales.inc.php:34
 msgid "English (en_US)"
 msgstr "Αγγλικά (en_US)"
+
+#: app/views/host.wizard.edit.php:399
+msgid "Enter a non-secret pre-shared key identity string. Avoid including sensitive data."
+msgstr ""
+
+#: app/views/host.wizard.edit.php:609
+msgid "Enter the IP/DNS address and port of the Zabbix agent installed on your monitoring target."
+msgstr ""
+
+#: app/views/host.wizard.edit.php:771
+msgid "Enter the IP/DNS address and port of your IPMI-enabled monitoring target."
+msgstr ""
+
+#: app/views/host.wizard.edit.php:847
+msgid "Enter the IP/DNS address and port of your JMX-enabled monitoring target."
+msgstr ""
+
+#: app/views/host.wizard.edit.php:412
+msgid "Enter the IP/DNS address and port of your Zabbix server, proxy, or cluster configuration."
+msgstr ""
+
+#: app/views/host.wizard.edit.php:642
+msgid "Enter the IP/DNS address, port, and authentication details of your SNMP-enabled monitoring target."
+msgstr ""
+
+#: include/classes/validators/CFormValidator.php:1192 jsLoader.php:435
+#, c-format
+msgid "Entry \"%1$s\" is not unique."
+msgstr ""
 
 #: app/partials/monitoring.host.filter.php:51
 #: app/partials/monitoring.host.filter.php:202
@@ -8037,6 +8623,10 @@ msgstr "Σφάλμα στό αίτημα αναζήτησης για πίνακ�
 
 #: include/func.inc.php:1774 jsLoader.php:215
 msgid "Error message"
+msgstr ""
+
+#: widgets/itemcard/includes/CWidgetFieldItemSectionsView.php:73
+msgid "Error text"
 msgstr ""
 
 #: app/partials/administration.system.info.php:141
@@ -8186,6 +8776,10 @@ msgstr "Κάθε εβδομάδα (ες)"
 msgid "Example"
 msgstr ""
 
+#: app/views/host.wizard.edit.php:417
+msgid "Example:"
+msgstr ""
+
 #: app/views/administration.miscconfig.edit.php:38
 msgid "Example: https://localhost/zabbix/ui/"
 msgstr ""
@@ -8300,6 +8894,13 @@ msgstr ""
 #: include/views/monitoring.sysmap.edit.php:156
 msgid "Expand single problem"
 msgstr "Ανάπτυξη απλού προβλήματος"
+
+#: app/controllers/CControllerHostCreate.php:195
+#: app/controllers/CControllerHostUpdate.php:200
+#: app/controllers/CControllerTemplateCreate.php:69
+#: app/controllers/CControllerTemplateUpdate.php:71
+msgid "Expected user macro format is \"{$MACRO}\"."
+msgstr ""
 
 #: app/partials/scheduledreport.table.html.php:93
 #: app/views/reports.scheduledreport.list.php:65
@@ -8758,6 +9359,10 @@ msgstr ""
 msgid "Font size"
 msgstr ""
 
+#: app/views/host.wizard.edit.php:816 app/views/host.wizard.edit.php:873
+msgid "For more details, see"
+msgstr ""
+
 #: app/views/webscenario.step.edit.php:106
 msgid "Form data"
 msgstr ""
@@ -8859,6 +9464,14 @@ msgstr ""
 msgid "General"
 msgstr "Γενικά"
 
+#: app/views/host.wizard.edit.php:417
+msgid "Generate a secret pre-shared key hexadecimal string."
+msgstr ""
+
+#: app/views/host.wizard.edit.php:411
+msgid "Generate new"
+msgstr ""
+
 #: app/partials/scheduledreport.subscription.php:34
 #: app/views/popup.scheduledreport.subscription.php:98
 msgid "Generate report by"
@@ -8909,6 +9522,12 @@ msgstr ""
 #: include/triggers.inc.php:767
 msgid "Given expression is not a macro"
 msgstr "Η δοσμένη έκφραση δεν είναι μακροεντολή"
+
+#: app/controllers/CControllerValueMapCheck.php:49
+#: app/controllers/CControllerValueMapEdit.php:95
+#: app/controllers/CControllerValueMapEdit.php:109
+msgid "Given valuemap name is already taken."
+msgstr ""
 
 #: app/views/popup.massupdate.item.php:298 app/views/popup.proxy.edit.php:194
 #: include/views/configuration.host.discovery.edit.php:734
@@ -9066,6 +9685,10 @@ msgid_plural "Graphs deleted"
 msgstr[0] "Γράφημα διεγράφη"
 msgstr[1] "Γράφημα διεγράφη"
 
+#: app/controllers/CControllerPopup.php:46
+msgid "Graph edit"
+msgstr ""
+
 #: app/controllers/CControllerAuditLogList.php:230
 #: app/views/popup.lldoperation.php:51
 #: include/classes/data/CWidgetsData.php:104
@@ -9077,6 +9700,11 @@ msgstr[1] "Γράφημα διεγράφη"
 #: widgets/graphprototype/Widget.php:29
 msgid "Graph prototype"
 msgstr "Πρωτότυπο γράφημα"
+
+#: include/classes/api/services/CGraphGeneral.php:1354
+#, c-format
+msgid "Graph prototype \"%1$s\" already exists on \"%2$s\" as a discovered graph prototype."
+msgstr ""
 
 #: include/classes/api/services/CGraphPrototype.php:470
 #, c-format
@@ -9113,6 +9741,10 @@ msgid "Graph prototype deleted"
 msgid_plural "Graph prototypes deleted"
 msgstr[0] "Πρωτότυπο γράφημα διεγράφη"
 msgstr[1] "Πρωτότυπο γράφημα διεγράφη"
+
+#: app/controllers/CControllerPopup.php:47
+msgid "Graph prototype edit"
+msgstr ""
 
 #: graphs.php:222 graphs.php:294
 msgid "Graph prototype updated"
@@ -9602,6 +10234,11 @@ msgstr ""
 msgid "Host IP"
 msgstr "IP ξενιστή"
 
+#: app/controllers/CControllerPopup.php:49
+#: app/views/configuration.host.list.php:35
+msgid "Host Wizard"
+msgstr ""
+
 #: app/views/administration.script.list.php:99
 msgid "Host access"
 msgstr "Πρόσβαση ξενιστή"
@@ -9609,6 +10246,10 @@ msgstr "Πρόσβαση ξενιστή"
 #: app/controllers/CControllerHostCreate.php:127
 msgid "Host added"
 msgstr "Ξενιστής προστέθηκε"
+
+#: app/controllers/CControllerHostWizardCreate.php:142
+msgid "Host added successfully"
+msgstr ""
 
 #: app/controllers/CControllerPopupItemTest.php:1351
 #: app/views/popup.itemtestedit.view.php:99
@@ -9971,6 +10612,10 @@ msgid_plural "Hosts updated"
 msgstr[0] "Ξενιστής ενημερώθηκε"
 msgstr[1] "Ξενιστής ενημερώθηκε"
 
+#: app/controllers/CControllerHostWizardUpdate.php:147
+msgid "Host updated successfully"
+msgstr ""
+
 #: include/classes/api/services/CDashboardGeneral.php:583
 #, c-format
 msgid "Host with ID \"%1$s\" is not available."
@@ -10043,6 +10688,10 @@ msgstr ""
 #: widgets/web/includes/WidgetForm.php:52
 msgid "Hosts"
 msgstr "Ξενιστές"
+
+#: app/views/host.wizard.edit.php:278
+msgid "Hosts are organized into host groups for easier management and access control."
+msgstr ""
 
 #: widgets/dataover/includes/WidgetForm.php:65
 #: widgets/trigover/includes/WidgetForm.php:72
@@ -10142,13 +10791,25 @@ msgstr ""
 msgid "IPMI"
 msgstr "IPMI"
 
+#: app/views/host.wizard.edit.php:759
+msgid "IPMI address"
+msgstr ""
+
 #: include/items.inc.php:96
 msgid "IPMI agent"
 msgstr "Αντιπρόσωπος IPMI"
 
+#: app/views/host.wizard.edit.php:818
+msgid "IPMI checks"
+msgstr ""
+
 #: include/views/inventory.host.view.php:67
 msgid "IPMI interfaces"
 msgstr "Διεπαφές IPMI"
+
+#: app/views/host.wizard.edit.php:765
+msgid "IPMI port"
+msgstr ""
 
 #: disc_prototypes.php:116 host_discovery.php:106
 #: include/views/configuration.host.discovery.edit.php:569
@@ -10317,6 +10978,10 @@ msgstr ""
 msgid "If weight of child services with %1$s status or below is less than %2$s"
 msgstr ""
 
+#: app/views/host.wizard.edit.php:380
+msgid "If you do not know your PSK or would like to change it, click the button below. Note that changing the PSK may impact existing configurations."
+msgstr ""
+
 #: include/classes/core/ZBase.php:767 include/func.inc.php:1688
 #: include/func.inc.php:1710
 msgid "If you think this message is wrong, please consult your administrators about getting the necessary permissions."
@@ -10426,6 +11091,10 @@ msgstr "Σε εξέλιξη"
 
 #: include/items.inc.php:1602
 msgid "In range"
+msgstr ""
+
+#: app/views/host.wizard.edit.php:813
+msgid "In the Zabbix server configuration file (zabbix_server.conf), set the StartIPMIPollers parameter to a non-zero value."
 msgstr ""
 
 #: include/classes/widgets/fields/CWidgetFieldMultiSelectSla.php:31
@@ -10625,6 +11294,11 @@ msgstr "Λανθασμένη %1$s τιμή σήμανσης για χάρτη \"
 msgid "Incorrect API \"%1$s\"."
 msgstr "Λανθασμένο API \"%1$s\"."
 
+#: app/controllers/CControllerHostCreate.php:65
+#: app/controllers/CControllerHostUpdate.php:69
+msgid "Incorrect DNS provided."
+msgstr ""
+
 #: include/classes/api/services/CDRule.php:602
 msgid "Incorrect SNMP OID."
 msgstr "Λανθασμένο SNMP OID."
@@ -10764,6 +11438,16 @@ msgstr "Λανθασμένη ομαδική τιμή διεπαφής."
 msgid "Incorrect characters used for host name \"%1$s\"."
 msgstr ""
 
+#: app/controllers/CControllerHostCreate.php:39
+#: app/controllers/CControllerHostUpdate.php:42
+msgid "Incorrect characters used for host name."
+msgstr ""
+
+#: app/controllers/CControllerTemplateCreate.php:35
+#: app/controllers/CControllerTemplateUpdate.php:36
+msgid "Incorrect characters used for template name."
+msgstr ""
+
 #: include/classes/api/services/CUser.php:482
 msgid "Incorrect current password."
 msgstr ""
@@ -10872,6 +11556,11 @@ msgstr ""
 #: include/classes/api/services/CDRule.php:517
 msgid "Incorrect port range."
 msgstr "Λανθασμένη περιοχή θυρών."
+
+#: app/controllers/CControllerHostCreate.php:71
+#: app/controllers/CControllerHostUpdate.php:75
+msgid "Incorrect port."
+msgstr ""
 
 #: app/controllers/CControllerRegExTest.php:77
 #, c-format
@@ -11234,6 +11923,13 @@ msgstr ""
 msgid "Incorrect value for field \"%1$s\": %2$s."
 msgstr ""
 
+#: app/controllers/CControllerHostWizardUpdateGeneral.php:81
+#: app/controllers/CControllerHostWizardUpdateGeneral.php:87
+#: app/controllers/CControllerHostWizardUpdateGeneral.php:107
+#, c-format
+msgid "Incorrect value for macro \"%1$s\": %2$s."
+msgstr ""
+
 #: include/classes/helpers/CServiceHelper.php:149
 msgid "Increase by"
 msgstr ""
@@ -11241,6 +11937,10 @@ msgstr ""
 #: app/views/popup.acknowledge.edit.php:91 include/actions.inc.php:1583
 #: include/actions.inc.php:2008 include/html.inc.php:971
 msgid "Indefinitely"
+msgstr ""
+
+#: include/views/js/monitoring.sysmaps.js.php:841
+msgid "Indicator type"
 msgstr ""
 
 #: widgets/tophosts/views/column.edit.php:184
@@ -11285,6 +11985,10 @@ msgstr ""
 
 #: include/classes/data/CItemData.php:2002
 msgid "Info about internal disks of hypervisor required for vmware.datastore.perfcounter, \"url\" - VMware service URL, \"uuid\" - VMware hypervisor global unique identifier. Returns JSON"
+msgstr ""
+
+#: include/func.inc.php:1610
+msgid "Info message"
 msgstr ""
 
 #: app/views/administration.trigdisplay.edit.php:110 include/items.inc.php:31
@@ -11371,6 +12075,18 @@ msgstr "Εισαγωγή έκφρασης"
 msgid "Install"
 msgstr ""
 
+#: app/views/host.wizard.edit.php:351 app/views/js/host.wizard.edit.js.php:1128
+msgid "Install Zabbix agent"
+msgstr ""
+
+#: app/views/host.wizard.edit.php:512 app/views/host.wizard.edit.php:535
+msgid "Install Zabbix agent 2 and its plugins on your monitoring target by following the installation instructions below."
+msgstr ""
+
+#: app/views/host.wizard.edit.php:551 app/views/host.wizard.edit.php:574
+msgid "Install Zabbix agent and its plugins on your monitoring target by following the installation instructions below."
+msgstr ""
+
 #: setup.php:163
 msgid "Installation"
 msgstr "Εγκατάσταση"
@@ -11389,6 +12105,10 @@ msgstr ""
 
 #: include/classes/helpers/CMenuHelper.php:431
 msgid "Integrations"
+msgstr ""
+
+#: app/views/js/host.wizard.edit.js.php:98
+msgid "Intelligent Platform Management Interface (IPMI)"
 msgstr ""
 
 #: app/partials/monitoring.host.view.html.php:36
@@ -11502,6 +12222,11 @@ msgstr ""
 msgid "Invalid IP address \"%1$s\"."
 msgstr ""
 
+#: app/controllers/CControllerHostCreate.php:57
+#: app/controllers/CControllerHostUpdate.php:61
+msgid "Invalid IP address."
+msgstr ""
+
 #: include/classes/core/CJsonRpc.php:201
 msgid "Invalid JSON. An error occurred on the server while parsing the JSON text."
 msgstr "Άκυρο JSON. Παρουσιάστηκε σφάλμα στον εξυπηρετητή ενώ ανέλυε το κείμενο JSON."
@@ -11524,6 +12249,20 @@ msgstr ""
 #: app/controllers/CControllerMfaCheck.php:53
 #: app/controllers/CControllerMfaEdit.php:48
 msgid "Invalid MFA configuration"
+msgstr ""
+
+#: app/controllers/CControllerOauthCheck.php:44
+#: app/controllers/CControllerOauthEdit.php:43
+msgid "Invalid OAuth configuration"
+msgstr ""
+
+#: include/classes/helpers/CItemGeneralHelper.php:456
+msgid "Invalid Prometheus label."
+msgstr ""
+
+#: include/classes/helpers/CItemGeneralHelper.php:441
+#: include/classes/helpers/CItemGeneralHelper.php:446
+msgid "Invalid Prometheus pattern."
 msgstr ""
 
 #: app/controllers/CControllerAuthenticationUpdate.php:208
@@ -11578,6 +12317,17 @@ msgstr ""
 #: include/items.inc.php:2026
 #, c-format
 msgid "Invalid interval \"%1$s\"."
+msgstr ""
+
+#: app/controllers/CControllerItemCreate.php:247
+#: app/controllers/CControllerItemCreate.php:252
+#: app/controllers/CControllerItemPrototypeCreate.php:255
+#: app/controllers/CControllerItemPrototypeCreate.php:260
+#: app/controllers/CControllerItemPrototypeUpdate.php:212
+#: app/controllers/CControllerItemPrototypeUpdate.php:217
+#: app/controllers/CControllerItemUpdate.php:212
+#: app/controllers/CControllerItemUpdate.php:217
+msgid "Invalid interval."
 msgstr ""
 
 #: app/controllers/CControllerDiscoveryCheckCheck.php:64
@@ -11857,6 +12607,27 @@ msgstr ""
 msgid "Invalid params."
 msgstr "Άκυρες παράμετροι."
 
+#: app/controllers/CControllerItemCreate.php:257
+#: app/controllers/CControllerItemPrototypeCreate.php:265
+#: app/controllers/CControllerItemPrototypeUpdate.php:222
+#: app/controllers/CControllerItemUpdate.php:222
+msgid "Invalid period."
+msgstr ""
+
+#: app/controllers/CControllerItemCreate.php:167
+#: app/controllers/CControllerItemPrototypeCreate.php:171
+#: app/controllers/CControllerItemPrototypeUpdate.php:155
+#: app/controllers/CControllerItemUpdate.php:154
+msgid "Invalid range expression."
+msgstr ""
+
+#: app/controllers/CControllerHostCreate.php:228
+#: app/controllers/CControllerHostUpdate.php:233
+#: app/controllers/CControllerTemplateCreate.php:102
+#: app/controllers/CControllerTemplateUpdate.php:104
+msgid "Invalid range."
+msgstr ""
+
 #: include/classes/core/CJsonRpc.php:205
 msgid "Invalid request."
 msgstr ""
@@ -11866,6 +12637,11 @@ msgstr ""
 #, c-format
 msgid "Invalid response code \"%1$s\"."
 msgstr "Άκυρος κωδικός απόκρισης \"%1$s\"."
+
+#: include/classes/validators/CFormValidator.php:1001
+#: include/classes/validators/CFormValidator.php:1007
+msgid "Invalid string."
+msgstr ""
 
 #: include/classes/export/CConfigurationExportBuilder.php:82
 #: include/classes/export/CConfigurationExportBuilder.php:105
@@ -12000,6 +12776,10 @@ msgstr "Συλλέκτης"
 #: items.php:667
 msgid "Item added"
 msgstr "Συλλέκτης προστέθηκε"
+
+#: widgets/itemcard/Widget.php:32
+msgid "Item card"
+msgstr ""
 
 #: app/views/popup.itemtestedit.view.php:433
 msgid "Item contains user-defined macros with secret values. Values of these macros should be entered manually."
@@ -12225,6 +13005,10 @@ msgstr ""
 msgid "JMX"
 msgstr "JMX"
 
+#: app/views/host.wizard.edit.php:835
+msgid "JMX address"
+msgstr ""
+
 #: include/items.inc.php:99
 msgid "JMX agent"
 msgstr "Αντιπρόσωπος JMX"
@@ -12239,6 +13023,14 @@ msgstr ""
 #: include/views/inventory.host.view.php:66
 msgid "JMX interfaces"
 msgstr "JMX διεπαφές"
+
+#: app/views/host.wizard.edit.php:874
+msgid "JMX monitoring"
+msgstr ""
+
+#: app/views/host.wizard.edit.php:841
+msgid "JMX port"
+msgstr ""
 
 #: include/classes/html/CButtonExport.php:79
 msgid "JSON"
@@ -12257,6 +13049,10 @@ msgstr ""
 
 #: include/classes/validators/CApiInputValidator.php:3982
 msgid "JSON is expected"
+msgstr ""
+
+#: include/forms.inc.php:466 include/views/js/item.preprocessing.js.php:135
+msgid "JSON path"
 msgstr ""
 
 #: include/classes/validators/CNewValidator.php:113
@@ -12285,6 +13081,10 @@ msgstr "Ιανουάριος"
 #: include/locales.inc.php:51
 msgid "Japanese (ja_JP)"
 msgstr "Ιαπωνικά (ja_JP)"
+
+#: app/views/js/host.wizard.edit.js.php:99
+msgid "Java Management Extensions (JMX) interface"
+msgstr ""
 
 #: app/views/administration.mediatype.edit.php:235
 #: app/views/administration.script.edit.php:241
@@ -12406,6 +13206,14 @@ msgstr ""
 
 #: app/controllers/CControllerAuditLogList.php:242
 msgid "LLD rule"
+msgstr ""
+
+#: app/controllers/CControllerAuditLogList.php:227
+msgid "LLD rule prototype"
+msgstr ""
+
+#: include/classes/api/services/CItemGeneral.php:566
+msgid "LLD rule prototype with the same UUID already exists"
 msgstr ""
 
 #: include/classes/api/services/CItemGeneral.php:539
@@ -12700,6 +13508,10 @@ msgstr ""
 msgid "Link templates"
 msgstr "Σύνδεση σχεδιότυπων"
 
+#: app/views/host.wizard.edit.php:174
+msgid "Linked"
+msgstr ""
+
 #: widgets/navtree/views/navtreeitem.edit.php:65
 msgid "Linked map"
 msgstr ""
@@ -12715,6 +13527,10 @@ msgstr ""
 #: include/views/js/monitoring.sysmaps.js.php:755
 #: include/views/js/monitoring.sysmaps.js.php:766
 msgid "Links"
+msgstr ""
+
+#: app/views/host.wizard.edit.php:431
+msgid "Linux"
 msgstr ""
 
 #: include/classes/html/CList.php:39
@@ -12747,6 +13563,10 @@ msgstr ""
 
 #: include/classes/data/CItemData.php:1559
 msgid "List of block devices and their type. Returns JSON"
+msgstr ""
+
+#: include/forms.inc.php:448 include/views/js/item.preprocessing.js.php:111
+msgid "List of characters"
 msgstr ""
 
 #: include/classes/data/CItemData.php:1359
@@ -12980,6 +13800,10 @@ msgstr ""
 msgid "MFA settings"
 msgstr ""
 
+#: app/views/host.wizard.edit.php:550
+msgid "Mac OS"
+msgstr ""
+
 #: app/controllers/CControllerAuditLogList.php:243
 #: app/partials/hostmacros.inherited.list.html.php:49
 #: app/partials/hostmacros.list.html.php:36
@@ -13001,6 +13825,18 @@ msgstr "Η μακροεντολή \"%1$s\" υπάρχει ήδη σε \"%2$s\"."
 #, c-format
 msgid "Macro \"%1$s\" already exists."
 msgstr "Η μακροεντολή \"%1$s\" υπάρχει ήδη."
+
+#: app/controllers/CControllerHostWizardUpdateGeneral.php:63
+#, c-format
+msgid "Macro \"%1$s\" is missing."
+msgstr ""
+
+#: app/controllers/CControllerHostCreate.php:180
+#: app/controllers/CControllerHostUpdate.php:185
+#: app/controllers/CControllerTemplateCreate.php:54
+#: app/controllers/CControllerTemplateUpdate.php:56
+msgid "Macro name is not unique."
+msgstr ""
 
 #: app/partials/configuration.host.edit.html.php:511
 #: app/partials/massupdate.macros.tab.php:121
@@ -13241,6 +14077,13 @@ msgstr "Αντιστοιχισμένο σε"
 #: app/controllers/CControllerPopupGeneric.php:455
 #: app/controllers/CControllerPopupGeneric.php:468
 msgid "Mapping"
+msgstr ""
+
+#: app/controllers/CControllerHostCreate.php:208
+#: app/controllers/CControllerHostUpdate.php:213
+#: app/controllers/CControllerTemplateCreate.php:82
+#: app/controllers/CControllerTemplateUpdate.php:84
+msgid "Mapping type and value combination is not unique."
 msgstr ""
 
 #: app/controllers/CControllerPopupValueMapUpdate.php:147
@@ -13678,6 +14521,10 @@ msgstr "Μέθοδος δεν βρέθηκε."
 msgid "Methods"
 msgstr ""
 
+#: widgets/itemcard/includes/CWidgetFieldItemSectionsView.php:74
+msgid "Metrics"
+msgstr ""
+
 #: include/httptest.inc.php:392
 msgid "Microsoft Edge"
 msgstr ""
@@ -13983,6 +14830,10 @@ msgstr ""
 msgid "Multiple PROBLEM events"
 msgstr "Πολλαπλά ΠΡΟΒΛΗΜΑΤΙΚΑ συμβάντα"
 
+#: include/classes/validators/CFormValidator.php:340
+msgid "Must be selected."
+msgstr ""
+
 #: jsLoader.php:284
 msgid "Mute"
 msgstr "Σίγαση"
@@ -14242,6 +15093,10 @@ msgstr ""
 msgid "Needle"
 msgstr ""
 
+#: include/items.inc.php:100
+msgid "Nested"
+msgstr ""
+
 #: app/views/administration.housekeeping.edit.php:77
 msgid "Network discovery data storage period"
 msgstr ""
@@ -14361,6 +15216,14 @@ msgstr ""
 msgid "New excluded downtime"
 msgstr ""
 
+#: app/views/graph.edit.php:130
+msgid "New graph"
+msgstr ""
+
+#: app/views/graph.prototype.edit.php:131
+msgid "New graph prototype"
+msgstr ""
+
 #: app/views/configuration.host.edit.php:71 app/views/popup.host.edit.php:83
 msgid "New host"
 msgstr ""
@@ -14383,12 +15246,20 @@ msgstr ""
 msgid "New maintenance period"
 msgstr ""
 
+#: app/views/popup.media.edit.php:144
+msgid "New media"
+msgstr ""
+
 #: app/views/mediatype.edit.php:507 app/views/mediatype.edit.php:546
 msgid "New media type"
 msgstr ""
 
 #: app/views/popup.mediatypemapping.edit.php:76
 msgid "New media type mapping"
+msgstr ""
+
+#: app/views/oauth.edit.php:237
+msgid "New oauth"
 msgstr ""
 
 #: app/controllers/CControllerPopupLldOperation.php:350
@@ -14463,6 +15334,10 @@ msgstr ""
 msgid "New values"
 msgstr ""
 
+#: app/views/host.wizard.edit.php:59 app/views/js/host.wizard.edit.js.php:1450
+msgid "Next"
+msgstr ""
+
 #: app/views/monitoring.host.dashboard.view.php:146
 msgid "Next dashboard"
 msgstr ""
@@ -14524,6 +15399,10 @@ msgstr ""
 
 #: app/views/popup.import.compare.php:58
 msgid "No changes."
+msgstr ""
+
+#: jsLoader.php:553
+msgid "No color"
 msgstr ""
 
 #: jsLoader.php:194
@@ -15108,6 +15987,10 @@ msgstr ""
 msgid "Not inherited items"
 msgstr ""
 
+#: app/views/host.wizard.edit.php:175
+msgid "Not linked"
+msgstr ""
+
 #: app/controllers/CControllerLatest.php:546
 #: app/partials/configuration.filter.items.php:184
 #: app/partials/monitoring.latest.filter.php:191
@@ -15120,6 +16003,15 @@ msgstr "Μη υποστηριζόμενο"
 #: app/views/administration.miscconfig.edit.php:138
 #, c-format
 msgid "Note that %1$s or %2$s will be regarded as hostnames if used without single quotes."
+msgstr ""
+
+#: app/views/host.wizard.edit.php:518 app/views/host.wizard.edit.php:541
+msgid "Note that during agent installation, you will need to configure both the PSK identity and PSK. Make sure they match the PSK identity and PSK set in step 1."
+msgstr ""
+
+#: app/views/host.wizard.edit.php:578
+#, c-format
+msgid "Note: %1$s must be configured and enabled on your monitoring target."
 msgstr ""
 
 #: include/hosts.inc.php:229
@@ -15155,6 +16047,10 @@ msgstr "Νοε"
 #: include/func.inc.php:110 include/func.inc.php:263 jsLoader.php:233
 msgid "November"
 msgstr "Νοέμβριος"
+
+#: include/forms.inc.php:437 include/views/js/item.preprocessing.js.php:96
+msgid "Number"
+msgstr ""
 
 #: include/classes/data/CItemData.php:1383
 msgid "Number of CPUs. Returns integer"
@@ -15313,6 +16209,18 @@ msgstr ""
 msgid "Numeric (unsigned)"
 msgstr "Αριθμητικό (απρόσημο)"
 
+#: app/views/mediatype.edit.php:127 app/views/oauth.edit.php:237
+msgid "OAuth"
+msgstr ""
+
+#: app/controllers/CControllerOauthAuthorize.php:155
+msgid "OAuth response missing mandatory fields."
+msgstr ""
+
+#: app/views/mediatype.edit.php:177
+msgid "OAuth tokens"
+msgstr ""
+
 #: include/hosts.inc.php:36 include/hosts.inc.php:64
 msgid "OEM"
 msgstr "OEM"
@@ -15431,6 +16339,10 @@ msgstr ""
 msgid "Old tag name"
 msgstr ""
 
+#: app/views/host.wizard.edit.php:454
+msgid "Older version"
+msgstr ""
+
 #: include/views/monitoring.sysmap.constructor.php:51
 #: include/views/monitoring.sysmap.constructor.php:61 jsLoader.php:251
 msgid "On"
@@ -15448,6 +16360,21 @@ msgstr "Άπαξ"
 #: app/views/configuration.discovery.edit.php:88
 #: app/views/mediatype.edit.php:445
 msgid "One"
+msgstr ""
+
+#: app/controllers/CControllerItem.php:166
+#: app/controllers/CControllerItemPrototype.php:168
+msgid "One \"Change\" step allowed per item."
+msgstr ""
+
+#: app/controllers/CControllerItem.php:182
+#: app/controllers/CControllerItemPrototype.php:184
+msgid "One \"Prometheus\" step allowed per item."
+msgstr ""
+
+#: app/controllers/CControllerItem.php:174
+#: app/controllers/CControllerItemPrototype.php:176
+msgid "One \"Throttling\" step allowed per item."
 msgstr ""
 
 #: app/views/maintenance.timeperiod.edit.php:79
@@ -15538,8 +16465,17 @@ msgstr ""
 msgid "Open in a new window"
 msgstr ""
 
+#: app/views/host.wizard.edit.php:524 app/views/host.wizard.edit.php:547
+#: app/views/host.wizard.edit.php:553
+msgid "Open installation instructions"
+msgstr ""
+
 #: app/views/mediatype.test.edit.php:101 app/views/popup.scriptexec.php:41
 msgid "Open log"
+msgstr ""
+
+#: include/classes/server/CZabbixServer.php:627
+msgid "OpenSSL extension is not available."
 msgstr ""
 
 #: include/httptest.inc.php:414
@@ -15740,6 +16676,10 @@ msgstr "Αρχικό"
 #: widgets/piechart/actions/WidgetView.php:599
 msgid "Other"
 msgstr "Άλλο"
+
+#: app/views/host.wizard.edit.php:556
+msgid "Other OS"
+msgstr ""
 
 #: app/controllers/CControllerMiscConfigEdit.php:112
 #: app/views/administration.miscconfig.edit.php:30
@@ -16045,6 +16985,21 @@ msgstr ""
 msgid "PSK identity"
 msgstr ""
 
+#: app/controllers/CControllerHostCreate.php:162
+#: app/controllers/CControllerHostUpdate.php:167
+msgid "PSK must be an even number of characters."
+msgstr ""
+
+#: app/controllers/CControllerHostCreate.php:166
+#: app/controllers/CControllerHostUpdate.php:171
+msgid "PSK must be at least 32 characters long."
+msgstr ""
+
+#: app/controllers/CControllerHostCreate.php:170
+#: app/controllers/CControllerHostUpdate.php:175
+msgid "PSK must contain only hexadecimal characters."
+msgstr ""
+
 #: jsLoader.php:146
 #, c-format
 msgid "Page %1$d"
@@ -16066,6 +17021,15 @@ msgstr "Η σελίδα έλαβε λάθος δεδομένα"
 #: include/classes/helpers/CPagerHelper.php:159
 msgctxt "page navigation"
 msgid "Pager"
+msgstr ""
+
+#: jsLoader.php:554
+msgid "Palette"
+msgstr ""
+
+#: jsLoader.php:555
+#, c-format
+msgid "Palette %1$d"
 msgstr ""
 
 #: app/partials/administration.system.info.php:30
@@ -16101,6 +17065,10 @@ msgstr ""
 #: app/controllers/CControllerActionOperationCheck.php:85
 #: include/classes/api/services/CAction.php:2953
 msgid "Parameters \"esc_step_from\" and \"esc_step_to\" must be set together."
+msgstr ""
+
+#: include/views/configuration.host.discovery.prototype.edit.php:66
+msgid "Parent discovery prototypes"
 msgstr ""
 
 #: include/views/configuration.host.discovery.edit.php:56
@@ -16498,6 +17466,14 @@ msgstr ""
 msgid "Pre-installation summary"
 msgstr ""
 
+#: app/views/host.wizard.edit.php:405
+msgid "Pre-shared key"
+msgstr ""
+
+#: app/views/host.wizard.edit.php:394
+msgid "Pre-shared key identity"
+msgstr ""
+
 #: app/views/popup.triggerexpr.php:132
 msgid "Prediction functions"
 msgstr ""
@@ -16513,6 +17489,11 @@ msgstr ""
 #: include/views/configuration.item.edit.php:1082
 #: include/views/configuration.item.prototype.edit.php:950
 msgid "Preprocessing is a transformation before saving the value to the database. It is possible to define a sequence of preprocessing steps, and those are executed in the order they are set."
+msgstr ""
+
+#: app/controllers/CControllerItem.php:190
+#: app/controllers/CControllerItemPrototype.php:192
+msgid "Preprocessing step with such Name and Parameters combination already exists."
 msgstr ""
 
 #: app/views/popup.itemtestedit.view.php:375
@@ -16789,6 +17770,10 @@ msgstr ""
 msgid "Properties"
 msgstr ""
 
+#: include/views/monitoring.sysmap.edit.php:126
+msgid "Proportionally"
+msgstr ""
+
 #: app/views/connector.edit.php:47
 msgid "Protocol"
 msgstr ""
@@ -17004,6 +17989,10 @@ msgstr "Αρχείο δημόσιου κλειδιού"
 
 #: app/controllers/CControllerAuditLogList.php:210
 msgid "Push"
+msgstr ""
+
+#: include/views/js/item.preprocessing.js.php:208
+msgid "Qualifier"
 msgstr ""
 
 #: include/classes/helpers/CSlaHelper.php:64
@@ -17230,6 +18219,10 @@ msgstr ""
 msgid "Rectangle"
 msgstr ""
 
+#: app/views/oauth.edit.php:44
+msgid "Redirection endpoint"
+msgstr ""
+
 #: app/views/popup.ldap.edit.php:172
 msgid "Reference attribute"
 msgstr ""
@@ -17263,6 +18256,10 @@ msgstr ""
 #: include/classes/core/CWidget.php:60 jsLoader.php:176 jsLoader.php:181
 #: jsLoader.php:190
 msgid "Refresh interval"
+msgstr ""
+
+#: app/views/mediatype.edit.php:163
+msgid "Refresh token is invalid or outdated."
 msgstr ""
 
 #: app/views/popup.token.edit.php:129
@@ -17644,6 +18641,10 @@ msgstr ""
 #: include/views/configuration.httpconf.edit.php:228
 msgid "Required"
 msgstr "Απαιτούμενο"
+
+#: include/classes/validators/CFormValidator.php:652 jsLoader.php:420
+msgid "Required field is missing."
+msgstr ""
 
 #: app/views/administration.script.edit.php:314
 msgid "Required host permissions"
@@ -18161,6 +19162,10 @@ msgstr "SNMP"
 msgid "SNMP OID"
 msgstr "SNMP OID"
 
+#: app/views/host.wizard.edit.php:630
+msgid "SNMP address"
+msgstr ""
+
 #: app/views/administration.timeouts.edit.php:65
 #: app/views/popup.proxy.edit.php:228 include/items.inc.php:89
 msgid "SNMP agent"
@@ -18180,6 +19185,10 @@ msgstr ""
 #: include/views/inventory.host.view.php:65
 msgid "SNMP interfaces"
 msgstr "Διεπαφές SNMP"
+
+#: app/views/host.wizard.edit.php:636
+msgid "SNMP port"
+msgstr ""
 
 #: include/items.inc.php:90
 msgid "SNMP trap"
@@ -18641,6 +19650,10 @@ msgstr "Επίπεδο ασφάλειας"
 msgid "Security name"
 msgstr "Όνομα ασφάλειας"
 
+#: app/views/host.wizard.edit.php:132
+msgid "See"
+msgstr ""
+
 #: app/views/popup.condition.edit.php:402 app/views/popup.generic.php:874
 #: app/views/popup.massupdate.item.php:440 app/views/popup.services.php:92
 #: app/views/popup.triggerexpr.php:88 include/classes/html/CMultiSelect.php:70
@@ -18654,12 +19667,28 @@ msgstr "Επιλέξτε"
 msgid "Select SLA to display SLA report."
 msgstr ""
 
+#: app/views/host.wizard.edit.php:137 app/views/js/host.wizard.edit.js.php:1116
+msgid "Select a template"
+msgstr ""
+
 #: app/views/popup.massupdate.item.php:458 app/views/popup.triggerexpr.php:95
 #: include/views/configuration.graph.edit.php:242
 #: include/views/configuration.graph.edit.php:336
 #: include/views/configuration.item.prototype.edit.php:550
 msgid "Select prototype"
 msgstr "Επιλέξτε πρωτότυπο"
+
+#: app/views/oauth.edit.php:171
+msgid "Select retrieval method: automatically through a redirection page or manually if automatic retrieval fails."
+msgstr ""
+
+#: app/views/host.wizard.edit.php:447
+msgid "Select the OS distribution"
+msgstr ""
+
+#: app/views/host.wizard.edit.php:424
+msgid "Select the OS of your monitoring target"
+msgstr ""
 
 #: app/views/administration.script.edit.php:283
 #: include/views/monitoring.history.php:185
@@ -18673,6 +19702,10 @@ msgstr ""
 #: include/views/js/monitoring.sysmaps.js.php:654
 msgid "Selected elements"
 msgstr "Επιλεγμένα στοιχεία"
+
+#: app/views/js/host.wizard.edit.js.php:1110
+msgid "Selected host"
+msgstr ""
 
 #: widgets/svggraph/includes/WidgetForm.php:380
 msgid "Selected items only"
@@ -18688,6 +19721,10 @@ msgstr ""
 #, c-format
 msgctxt "screen reader"
 msgid "Selected, %1$s, read only, in position %2$d of %3$d"
+msgstr ""
+
+#: app/views/host.wizard.edit.php:428
+msgid "Semicolon to separate clusters (one or more server addresses)"
 msgstr ""
 
 #: jsLoader.php:267
@@ -18784,6 +19821,20 @@ msgstr "Εξυπηρετητής"
 
 #: app/views/administration.script.list.php:204
 msgid "Server (proxy)"
+msgstr ""
+
+#: include/classes/setup/CSetupWizard.php:1081
+msgid "Server TLS CA file"
+msgstr ""
+
+#: include/classes/setup/CSetupWizard.php:890
+#: include/classes/setup/CSetupWizard.php:1095
+msgid "Server TLS certificate issuer"
+msgstr ""
+
+#: include/classes/setup/CSetupWizard.php:899
+#: include/classes/setup/CSetupWizard.php:1099
+msgid "Server TLS certificate subject"
 msgstr ""
 
 #: tests/selenium/modules/clock32/includes/WidgetForm.php:62
@@ -18971,6 +20022,14 @@ msgstr ""
 msgid "Set this view as default"
 msgstr ""
 
+#: app/views/host.wizard.edit.php:493
+msgid "Set up Zabbix agent on your monitoring target by executing the following PowerShell script [with administrator permissions]:"
+msgstr ""
+
+#: app/views/host.wizard.edit.php:477
+msgid "Set up Zabbix agent on your monitoring target by executing the following script [bash under root]:"
+msgstr ""
+
 #: app/views/js/popup.itemtestedit.view.js.php:383 include/forms.inc.php:1599
 #: include/views/js/item.preprocessing.js.php:67
 msgid "Set value to"
@@ -19135,6 +20194,12 @@ msgstr ""
 msgid "Show hosts in maintenance"
 msgstr "Εμφάνιση ξενιστών σε συντήρηση"
 
+#: include/views/js/monitoring.sysmaps.js.php:158
+#: include/views/js/monitoring.sysmaps.js.php:698
+#: include/views/js/monitoring.sysmaps.js.php:813
+msgid "Show label"
+msgstr ""
+
 #: widgets/gauge/includes/WidgetForm.php:299
 msgid "Show labels"
 msgstr ""
@@ -19147,11 +20212,27 @@ msgstr ""
 msgid "Show legend"
 msgstr "Εμφάνιση υπομνήματος"
 
+#: app/views/js/host.wizard.edit.js.php:1507
+msgid "Show less"
+msgstr ""
+
 #: widgets/actionlog/includes/WidgetForm.php:91
 #: widgets/plaintext/includes/WidgetForm.php:55
 #: widgets/problems/includes/WidgetForm.php:162
 msgid "Show lines"
 msgstr "Εμφάνιση γραμμών"
+
+#: include/views/monitoring.sysmap.edit.php:274
+msgid "Show link labels"
+msgstr ""
+
+#: include/views/monitoring.sysmap.edit.php:267
+msgid "Show map element labels"
+msgstr ""
+
+#: app/views/host.wizard.edit.php:247 app/views/js/host.wizard.edit.js.php:1508
+msgid "Show more"
+msgstr ""
 
 #: app/views/popup.tabfilter.edit.php:34
 msgid "Show number of records"
@@ -19213,6 +20294,10 @@ msgstr ""
 
 #: app/views/administration.gui.edit.php:120
 msgid "Show technical errors"
+msgstr ""
+
+#: app/views/host.wizard.edit.php:171
+msgid "Show templates"
 msgstr ""
 
 #: widgets/plaintext/includes/WidgetForm.php:62
@@ -19302,6 +20387,10 @@ msgstr ""
 #: include/views/js/configuration.graph.edit.js.php:285
 msgid "Simple"
 msgstr "Απλό"
+
+#: app/views/js/host.wizard.edit.js.php:97
+msgid "Simple Network Management Protocol (SNMP) interface"
+msgstr ""
 
 #: include/items.inc.php:1578
 msgid "Simple change"
@@ -19402,6 +20491,10 @@ msgstr ""
 msgid "Size of the response received from Zabbix server \"%1$s\" exceeds the allowed size of %2$s bytes. This value can be increased in the ZBX_SOCKET_BYTES_LIMIT constant in include/defines.inc.php."
 msgstr "Μέγεθος ληφθείσης απόκρισης από εξυπηρετητή Zabbix \"%1$s\" υπερβαίνει το επιτρεπόμενο μέγεθος %2$s bytes. Η τιμή μπορεί να αυξηθεί στη σταθερά ZBX_SOCKET_BYTES_LIMIT στο include/defines.inc.php."
 
+#: app/views/host.wizard.edit.php:355
+msgid "Skip OS selection if you already have Zabbix agent installed."
+msgstr ""
+
 #: include/locales.inc.php:61
 msgid "Slovak (sk_SK)"
 msgstr "Σλοβακικά (sk_SK)"
@@ -19451,8 +20544,22 @@ msgstr ""
 msgid "Software update last checked"
 msgstr ""
 
+#: jsLoader.php:556
+msgid "Solid color"
+msgstr ""
+
 #: include/classes/api/managers/CHistoryManager.php:1343
 msgid "Some of the history for this item may be compressed, deletion is not available."
+msgstr ""
+
+#: app/views/host.wizard.edit.php:129
+#, c-format
+msgid "Some templates (%1$s) are hidden. Custom templates are not supported."
+msgstr ""
+
+#: app/views/host.wizard.edit.php:130
+#, c-format
+msgid "Some templates (%1$s) are incompatible with the Host Wizard."
 msgstr ""
 
 #: widgets/actionlog/includes/WidgetForm.php:79
@@ -19509,6 +20616,10 @@ msgstr ""
 #: app/views/popup.generic.php:180 include/views/monitoring.history.php:293
 msgid "Specify some filter condition to see the values."
 msgstr "Καθορισμός μερικών συνθηκών φίλτρων γιά εμφάνιση τιμών."
+
+#: app/views/host.wizard.edit.php:365
+msgid "Specifying new or existing host groups will add the host to these groups without removing it from any current groups."
+msgstr ""
 
 #: httpdetails.php:107 include/classes/screens/CScreenHttpTestDetails.php:82
 msgid "Speed"
@@ -19574,6 +20685,14 @@ msgstr ""
 msgid "Start time must be less than end time for excluded downtime \"%2$s\" of SLA \"%1$s\"."
 msgstr ""
 
+#: app/views/host.wizard.edit.php:310
+msgid "Start typing or click Select to choose an existing host, or enter a new host name."
+msgstr ""
+
+#: app/views/host.wizard.edit.php:334
+msgid "Start typing or click Select to choose existing host groups, or enter a new host group name."
+msgstr ""
+
 #: app/views/popup.ldap.edit.php:287
 msgid "StartTLS"
 msgstr ""
@@ -19609,12 +20728,20 @@ msgctxt "history source selection method"
 msgid "Static"
 msgstr ""
 
+#: include/views/js/monitoring.sysmaps.js.php:843
+msgid "Static link"
+msgstr ""
+
 #: include/classes/data/CItemData.php:2841
 msgid "Statistics and availability of Zabbix write cache. Cache - one of values (modes: all, float, uint, str, log, text, not supported), history (modes: pfree, free, total, used, pused), index (modes: pfree, free, total, used, pused), trend (modes: pfree, free, total, used, pused)."
 msgstr ""
 
 #: include/classes/data/CItemData.php:2848
 msgid "Statistics and availability of proxy memory buffer. Mode (modes: pfree, free, total, used, pused)."
+msgstr ""
+
+#: include/classes/data/CItemData.php:2870
+msgid "Statistics of values received by the preprocessing manager."
 msgstr ""
 
 #: app/controllers/CControllerPopupGeneric.php:237
@@ -20032,6 +21159,25 @@ msgstr "TCP"
 msgid "TELNET agent"
 msgstr "Αντιπρόσωπος TELNET"
 
+#: include/classes/setup/CSetupWizard.php:855
+msgid "TLS CA file"
+msgstr ""
+
+#: include/classes/setup/CSetupWizard.php:873
+msgid "TLS certificate file"
+msgstr ""
+
+#: include/classes/server/CZabbixServer.php:634
+#: include/classes/server/CZabbixServer.php:641
+#: include/classes/server/CZabbixServer.php:648
+#: include/classes/setup/CSetupWizard.php:911
+msgid "TLS fields are misconfigured or the files are not accessible."
+msgstr ""
+
+#: include/classes/setup/CSetupWizard.php:865
+msgid "TLS key file"
+msgstr ""
+
 #: include/classes/screens/CScreenHttpTestDetails.php:190
 msgid "TOTAL"
 msgstr "ΣΥΝΟΛΟ"
@@ -20103,6 +21249,21 @@ msgstr ""
 #: app/partials/monitoring.problem.filter.php:260 include/actions.inc.php:67
 #: widgets/problems/includes/WidgetForm.php:104
 msgid "Tag name"
+msgstr ""
+
+#: app/controllers/CControllerHostCreate.php:129
+#: app/controllers/CControllerHostUpdate.php:133
+#: app/controllers/CControllerItemCreate.php:339
+#: app/controllers/CControllerItemPrototypeCreate.php:346
+#: app/controllers/CControllerItemPrototypeUpdate.php:301
+#: app/controllers/CControllerItemUpdate.php:302
+#: app/controllers/CControllerTemplateCreate.php:47
+#: app/controllers/CControllerTemplateUpdate.php:49
+#: app/controllers/CControllerTriggerCreate.php:60
+#: app/controllers/CControllerTriggerPrototypeCreate.php:60
+#: app/controllers/CControllerTriggerPrototypeUpdate.php:61
+#: app/controllers/CControllerTriggerUpdate.php:61
+msgid "Tag name and value combination is not unique."
 msgstr ""
 
 #: include/actions.inc.php:68
@@ -20385,6 +21546,10 @@ msgstr "Σχεδιότυπα \"%1$s\" αποσυνδεδεμένα απο ξεν
 msgid "Templates linked by host discovery cannot be unlinked."
 msgstr ""
 
+#: app/views/oauth.edit.php:169
+msgid "Temporary token to exchange for an access token."
+msgstr ""
+
 #: app/controllers/CControllerPopupTestTriggerExpr.php:211
 #: app/partials/scheduledreport.formgrid.html.php:211
 #: app/views/administration.regex.edit.php:147
@@ -20504,6 +21669,14 @@ msgstr ""
 msgid "The %1$s is not discovered anymore and %2$s."
 msgstr ""
 
+#: app/views/host.wizard.edit.php:101
+msgid "The Host Wizard will help you set up your monitoring target (device, application, service, etc.) in Zabbix."
+msgstr ""
+
+#: app/views/oauth.edit.php:48
+msgid "The URL must comply with the OAuth provider's policy."
+msgstr ""
+
 #: app/views/administration.geomaps.edit.php:30
 msgid "The URL template is used to load and display the tile layer on geographical maps."
 msgstr ""
@@ -20519,6 +21692,14 @@ msgstr ""
 
 #: include/classes/data/CItemData.php:2492
 msgid "The average time a write to the virtual disk takes, \"url\" - VMware service URL, \"uuid\" - VMware virtual machine global unique identifier, \"instance\" - disk device instance"
+msgstr ""
+
+#: app/views/oauth.edit.php:70
+msgid "The client identifier registered within the authorization server."
+msgstr ""
+
+#: app/views/oauth.edit.php:110
+msgid "The client secret registered within the authorization server."
 msgstr ""
 
 #: app/controllers/CControllerHostEdit.php:282
@@ -20600,6 +21781,11 @@ msgstr ""
 msgid "The maximum zoom level is \"%1$s\"."
 msgstr ""
 
+#: include/classes/api/services/CDiscoveryRule.php:962
+#, c-format
+msgid "The nested LLD rule with key \"%1$s\" of the template \"%2$s\" cannot be inherited to non-discovered host \"%3$s\"."
+msgstr ""
+
 #: include/classes/data/CItemData.php:1281
 msgid "The number of processes. Returns integer"
 msgstr ""
@@ -20621,6 +21807,26 @@ msgstr "Η ζητούμενη απομακρυσμένη-διαδικασία δ
 msgid "The template being cloned belongs to a template group you don't have write permissions to. Non-writable group has been removed from the new template."
 msgstr ""
 
+#: app/views/host.wizard.edit.php:275
+#, c-format
+msgid "The template you selected (%1$s) must be linked to a host - an entity in Zabbix that represents your monitoring target."
+msgstr ""
+
+#: app/views/host.wizard.edit.php:353
+#, c-format
+msgid "The template you selected (%1$s) requires Zabbix agent to be installed and running on your monitoring target."
+msgstr ""
+
+#: app/views/host.wizard.edit.php:899
+#, c-format
+msgid "The template you selected (%1$s) requires additional configuration."
+msgstr ""
+
+#: app/views/host.wizard.edit.php:573
+#, c-format
+msgid "The template you selected (%1$s) requires the %2$s to be added to the host (%3$s)."
+msgstr ""
+
 #: app/views/popup.token.view.php:62
 msgid "The token has expired. Please update the expiry date to use the token."
 msgstr ""
@@ -20632,6 +21838,10 @@ msgstr ""
 
 #: include/html.inc.php:746
 msgid "The trigger is not discovered anymore and will be deleted the next time discovery rule is processed."
+msgstr ""
+
+#: app/views/js/host.wizard.edit.js.php:722
+msgid "The value does not match the existing value on the selected host."
 msgstr ""
 
 #: include/views/configuration.host.discovery.edit.php:712
@@ -20666,13 +21876,34 @@ msgid_plural "This check cannot be removed, as it is used as a condition in %1$s
 msgstr[0] ""
 msgstr[1] ""
 
+#: app/views/host.wizard.edit.php:384
+msgid "This configuration will overwrite all existing encryption settings on the host."
+msgstr ""
+
 #: include/func.inc.php:2566
 msgid "This day last week"
+msgstr ""
+
+#: include/classes/validators/CFormValidator.php:929
+#: include/classes/validators/CFormValidator.php:1109
+#: include/classes/validators/CFormValidator.php:1158 jsLoader.php:427
+msgid "This field cannot be empty."
+msgstr ""
+
+#: app/controllers/CControllerItemCreate.php:263
+#: app/controllers/CControllerItemPrototypeCreate.php:271
+#: app/controllers/CControllerItemPrototypeUpdate.php:228
+#: app/controllers/CControllerItemUpdate.php:228
+msgid "This field cannot be set to \"0\" without defining custom intervals."
 msgstr ""
 
 #: app/partials/configuration.host.edit.html.php:383
 #, c-format
 msgid "This field is automatically populated by item \"%1$s\"."
+msgstr ""
+
+#: include/classes/validators/CItemKeyValidator.php:42
+msgid "This field must contain at least one low-level discovery macro."
 msgstr ""
 
 #: app/controllers/CControllerMediatypeTestEdit.php:86
@@ -20685,6 +21916,10 @@ msgstr "Αυτό το μήνα"
 
 #: include/func.inc.php:2575
 msgid "This month so far"
+msgstr ""
+
+#: include/classes/validators/CFormValidator.php:1260 jsLoader.php:425
+msgid "This object already exists."
 msgstr ""
 
 #: widgets/item/views/widget.edit.php:229
@@ -20720,6 +21955,72 @@ msgstr ""
 
 #: app/views/administration.user.edit.php:61
 msgid "This user is IdP provisioned. Manual changes for provisioned fields are not allowed."
+msgstr ""
+
+#: include/classes/validators/CFormValidator.php:1442
+#: include/classes/validators/CFormValidator.php:1482 jsLoader.php:430
+#, c-format
+msgid "This value cannot be %1$s."
+msgid_plural "This value cannot be one of %1$s."
+msgstr[0] ""
+msgstr[1] ""
+
+#: jsLoader.php:429
+#, c-format
+msgid "This value cannot be one of %1$s."
+msgstr ""
+
+#: include/classes/validators/CFormValidator.php:946 jsLoader.php:421
+msgid "This value does not match pattern."
+msgstr ""
+
+#: include/classes/validators/CFormValidator.php:874 jsLoader.php:424
+msgid "This value is not a valid floating-point value."
+msgstr ""
+
+#: include/classes/validators/CFormValidator.php:790 jsLoader.php:422
+msgid "This value is not a valid identifier."
+msgstr ""
+
+#: include/classes/validators/CFormValidator.php:823 jsLoader.php:423
+msgid "This value is not a valid integer."
+msgstr ""
+
+#: include/classes/validators/CFormValidator.php:923 jsLoader.php:426
+msgid "This value is not a valid string."
+msgstr ""
+
+#: include/classes/validators/CFormValidator.php:940 jsLoader.php:428
+msgid "This value is too long."
+msgstr ""
+
+#: app/views/js/host.wizard.edit.js.php:2045
+msgid "This value is too short."
+msgstr ""
+
+#: include/classes/validators/CFormValidator.php:1397
+#: include/classes/validators/CFormValidator.php:1461 jsLoader.php:431
+#, c-format
+msgid "This value must be %1$s."
+msgid_plural "This value must be one of %1$s."
+msgstr[0] ""
+msgstr[1] ""
+
+#: include/classes/validators/CFormValidator.php:847
+#: include/classes/validators/CFormValidator.php:898 jsLoader.php:433
+#, c-format
+msgid "This value must be no greater than \"%1$s\"."
+msgstr ""
+
+#: include/classes/validators/CFormValidator.php:841
+#: include/classes/validators/CFormValidator.php:892 jsLoader.php:432
+#, c-format
+msgid "This value must be no less than \"%1$s\"."
+msgstr ""
+
+#: jsLoader.php:434
+#, c-format
+msgid "This value must be one of %1$s."
 msgstr ""
 
 #: include/func.inc.php:2572
@@ -20941,6 +22242,10 @@ msgstr ""
 msgid "To"
 msgstr "Σε"
 
+#: app/views/host.wizard.edit.php:930
+msgid "To complete the setup, configure the following variables (host macros)."
+msgstr ""
+
 #: jsLoader.php:398
 msgid "To set a host interface select a single item type for all items"
 msgstr "Για να ορίσετε διεπαφή ξενιστή επιλέξτε απλό τύπο στοιχείου για όλα τα στοιχεία"
@@ -20955,6 +22260,14 @@ msgstr ""
 
 #: app/controllers/CControllerPopup.php:60
 msgid "Token edit"
+msgstr ""
+
+#: app/views/oauth.edit.php:188
+msgid "Token endpoint"
+msgstr ""
+
+#: app/views/oauth.edit.php:201
+msgid "Token parameters"
 msgstr ""
 
 #: include/views/js/monitoring.sysmaps.js.php:40
@@ -21509,6 +22822,10 @@ msgstr "Τύπος (Αναλυτικά στοιχεία)"
 msgid "Type (OK)"
 msgstr "Τύπος (OK)"
 
+#: app/views/host.wizard.edit.php:149
+msgid "Type a keyword to search for templates."
+msgstr ""
+
 #: app/views/correlation.edit.php:195 app/views/popup.action.edit.php:125
 #: app/views/popup.lldoverride.php:77 app/views/popup.operation.edit.php:423
 #: include/views/configuration.host.discovery.edit.php:784
@@ -21632,6 +22949,11 @@ msgstr "Ουκρανικά (uk_UA)"
 msgid "Unable to change configuration file permissions to 0600."
 msgstr ""
 
+#: include/classes/server/CZabbixServer.php:673
+#: include/classes/server/CZabbixServer.php:681 jsrpc.php:86 jsrpc.php:101
+msgid "Unable to connect to the Zabbix server due to TLS settings. Some functions are unavailable."
+msgstr ""
+
 #: include/classes/core/CConfigFile.php:237
 msgid "Unable to create the configuration file."
 msgstr ""
@@ -21748,6 +23070,17 @@ msgstr ""
 #: app/views/popup.acknowledge.edit.php:126
 msgid "Undo problem acknowledgement."
 msgstr ""
+
+#: app/controllers/CControllerOauthAuthorize.php:146
+msgid "Unexpected HTTP response status code."
+msgstr ""
+
+#: app/controllers/CControllerHostWizardUpdateGeneral.php:119
+#, c-format
+msgid "Unexpected macro \"%1$s\""
+msgid_plural "Unexpected macros \"%1$s\""
+msgstr[0] ""
+msgstr[1] ""
 
 #: include/classes/core/ZBase.php:679
 #, c-format
@@ -22219,6 +23552,10 @@ msgstr ""
 msgid "Use the filter to display results"
 msgstr ""
 
+#: app/views/host.wizard.edit.php:424
+msgid "Use:"
+msgstr ""
+
 #: app/views/administration.script.list.php:93 app/views/mediatype.list.php:98
 msgid "Used in actions"
 msgstr "Χρησιμοποιείται σε ενέργειες"
@@ -22635,6 +23972,10 @@ msgstr ""
 #: include/views/monitoring.sysmap.edit.php:362
 msgid "Users"
 msgstr "Χρήστες"
+
+#: include/locales.inc.php:62
+msgid "Uzbek (uz_UZ)"
+msgstr ""
 
 #: include/classes/data/CItemData.php:1876
 msgid "VMware Distributed Virtual Switch, \"url\" - VMware service URL. Returns JSON"
@@ -23153,6 +24494,18 @@ msgstr "Αντιστοίχιση τιμής"
 msgid "Value mappings"
 msgstr ""
 
+#: include/classes/validators/CFormValidator.php:1028
+#: include/classes/validators/CFormValidator.php:1038
+#, c-format
+msgid "Value must be greater than %1$s."
+msgstr ""
+
+#: include/classes/validators/CFormValidator.php:1033
+#: include/classes/validators/CFormValidator.php:1042
+#, c-format
+msgid "Value must be smaller than %1$s."
+msgstr ""
+
 #: include/classes/data/CItemData.php:1078
 msgid "Value of MQTT topic. Format of returned data depends on the topic content. If wildcards are used, returns topic values in JSON"
 msgstr ""
@@ -23277,8 +24630,16 @@ msgstr "Αναλυτικό"
 msgid "Verification code"
 msgstr ""
 
+#: app/views/host.wizard.edit.php:407
+msgid "Verify Zabbix server, proxy, or cluster address"
+msgstr ""
+
 #: include/classes/setup/CSetupWizard.php:655
 msgid "Verify database certificate"
+msgstr ""
+
+#: include/classes/setup/CSetupWizard.php:881
+msgid "Verify server certificate issuer and subject"
 msgstr ""
 
 #: app/views/administration.proxy.list.php:62
@@ -23415,6 +24776,14 @@ msgstr "Λυπούμαστε, ο μέγιστος πιθανόν αριθμός 
 msgid "Web"
 msgstr "Ιστός"
 
+#: include/classes/setup/CSetupWizard.php:1089
+msgid "Web interface TLS certificate file"
+msgstr ""
+
+#: include/classes/setup/CSetupWizard.php:1085
+msgid "Web interface TLS key file"
+msgstr ""
+
 #: app/controllers/CControllerWebView.php:163
 #: app/views/monitoring.web.view.php:37 include/items.inc.php:101
 #: include/views/configuration.httpconf.edit.php:30
@@ -23517,6 +24886,10 @@ msgstr ""
 msgid "Welcome to"
 msgstr ""
 
+#: app/views/host.wizard.edit.php:99
+msgid "Welcome to the Host Wizard"
+msgstr ""
+
 #: app/views/administration.user.edit.php:334 app/views/popup.media.php:96
 msgid "When active"
 msgstr "Όταν είναι ενεργά"
@@ -23531,6 +24904,10 @@ msgstr ""
 #: include/classes/api/services/CDashboardGeneral.php:352
 #, c-format
 msgid "Widget at X:%3$d, Y:%4$d on page #%2$d of dashboard \"%1$s\" is out of bounds."
+msgstr ""
+
+#: jsLoader.php:247
+msgid "Widget configuration will be reverted."
 msgstr ""
 
 #: include/classes/html/widgets/CWidgetFormView.php:234
@@ -23568,6 +24945,14 @@ msgstr ""
 #: widgets/svggraph/includes/CWidgetFieldOverrideView.php:213
 msgid "Width"
 msgstr "Πλάτος"
+
+#: app/views/host.wizard.edit.php:435
+msgid "Windows"
+msgstr ""
+
+#: app/views/host.wizard.edit.php:450
+msgid "Windows 10/Server 2016 or later"
+msgstr ""
 
 #: app/controllers/CControllerLatest.php:554
 msgid "With data"
@@ -23885,6 +25270,10 @@ msgstr "Δεν μπορείται να επιλέξετε κάποια από τ
 msgid "You are not logged in"
 msgstr ""
 
+#: app/views/host.wizard.edit.php:103
+msgid "You can always access Host Wizard from Data collection > Hosts."
+msgstr ""
+
 #: app/views/popup.generic.php:74
 msgid "You cannot switch hosts for current selection."
 msgstr ""
@@ -23925,6 +25314,10 @@ msgstr ""
 msgid "Your database is not working properly. Please wait a few minutes and try to repeat this action. If the problem still persists, please contact system administrator. The problem might be caused by long running transaction or row level lock accomplished by your database management system."
 msgstr ""
 
+#: app/views/host.wizard.edit.php:1044
+msgid "Your progress will be discarded and you will exit the Host Wizard. Are you sure you want to cancel?"
+msgstr ""
+
 #: include/page_header.php:122
 msgid "Zabbix"
 msgstr "Zabbix"
@@ -23958,6 +25351,18 @@ msgstr "Αντιπρόσωπος Zabbix (ενεργός)"
 
 #: widgets/hostavail/includes/WidgetForm.php:48
 msgid "Zabbix agent (passive checks)"
+msgstr ""
+
+#: app/views/js/host.wizard.edit.js.php:91
+msgid "Zabbix agent initiates connections to Zabbix server or proxy to send data. Recommended for monitoring targets behind a firewall."
+msgstr ""
+
+#: app/views/host.wizard.edit.php:422
+msgid "Zabbix agent must be able to connect to the specified address or list of addresses."
+msgstr ""
+
+#: app/views/host.wizard.edit.php:863
+msgid "Zabbix documentation"
 msgstr ""
 
 #: app/partials/administration.system.info.php:45
@@ -24020,6 +25425,10 @@ msgstr "Ο Εξυπηρετητής Zabbix λειτουργεί"
 #: include/classes/setup/CSetupWizard.php:870
 msgid "Zabbix server name"
 msgstr "Όνομα εξυπηρετητή Zabbix"
+
+#: app/views/js/host.wizard.edit.js.php:92
+msgid "Zabbix server or proxy initiates connections to Zabbix agent to request data. Recommended for networks without a firewall or with open firewall ports."
+msgstr ""
 
 #: app/partials/administration.system.info.php:40
 msgid "Zabbix server version"
@@ -24134,6 +25543,10 @@ msgstr ""
 #: app/controllers/CControllerPopupItemTest.php:1330
 #: include/classes/api/services/CDRule.php:338
 msgid "a numeric value is expected"
+msgstr ""
+
+#: include/classes/validators/CApiInputValidator.php:2884
+msgid "a port number is expected"
 msgstr ""
 
 #: app/controllers/CControllerPopupItemTestSend.php:193
@@ -24398,6 +25811,18 @@ msgstr ""
 msgid "asin() - The arcsine of a value as an angle, expressed in radians"
 msgstr ""
 
+#: jsLoader.php:300
+msgid "at least 1 link highlight is required"
+msgstr ""
+
+#: jsLoader.php:301
+msgid "at least 1 link threshold is required"
+msgstr ""
+
+#: jsLoader.php:299
+msgid "at least 1 link trigger is required"
+msgstr ""
+
 #: app/controllers/CControllerPopupScheduledReportCreate.php:70
 #: app/controllers/CControllerScheduledReportCreate.php:83
 #: app/controllers/CControllerScheduledReportUpdate.php:87
@@ -24454,6 +25879,10 @@ msgstr ""
 msgid "between() - Checks if a value belongs to the given range (1 - in range, 0 - otherwise)"
 msgstr ""
 
+#: include/classes/api/services/CMap.php:1973
+msgid "binary item is not supported"
+msgstr ""
+
 #: app/partials/monitoring.latest.view.html.php:149
 #: include/classes/screens/CScreenHistory.php:309
 #: include/classes/screens/CScreenHistory.php:432
@@ -24500,6 +25929,14 @@ msgstr ""
 #: app/views/administration.trigdisplay.edit.php:73
 #: app/views/administration.trigdisplay.edit.php:85
 msgid "blinking"
+msgstr ""
+
+#: include/classes/api/services/CMediatype.php:680
+msgid "both \"access_token\" and \"access_expires_in\" must be specified when marking access token valid"
+msgstr ""
+
+#: include/classes/api/services/CMediatype.php:695
+msgid "both \"access_token\" and \"access_expires_in\" should be either present or absent"
 msgstr ""
 
 #: include/classes/api/services/CItemGeneral.php:265
@@ -24681,6 +26118,10 @@ msgstr ""
 msgid "cannot delete inherited LLD rule"
 msgstr ""
 
+#: include/classes/api/services/CDiscoveryRulePrototype.php:1231
+msgid "cannot delete inherited LLD rule prototype"
+msgstr ""
+
 #: include/classes/api/services/CItem.php:909
 msgid "cannot delete inherited item"
 msgstr ""
@@ -24691,6 +26132,10 @@ msgstr ""
 
 #: include/classes/api/services/CHostPrototype.php:2504
 msgid "cannot delete templated host prototype"
+msgstr ""
+
+#: include/classes/api/services/CDiscoveryRule.php:726
+msgid "cannot have a nested LLD rule on a non-discovered host"
 msgstr ""
 
 #: include/classes/api/services/CHostPrototype.php:1411
@@ -24972,6 +26417,10 @@ msgstr ""
 msgid "exp() - Euler's number at a power of a value"
 msgstr ""
 
+#: jsLoader.php:294
+msgid "expecting hexadecimal color code (6 symbols)"
+msgstr ""
+
 #: app/controllers/CControllerPopupTriggerExpr.php:610
 msgid "expm1() - Euler's number at a power of a value minus 1"
 msgstr ""
@@ -25096,6 +26545,10 @@ msgstr "ομάδα ξενιστή"
 msgid "host group with the same UUID already exists"
 msgstr ""
 
+#: include/classes/api/services/CMap.php:1967
+msgid "host item ID is expected"
+msgstr ""
+
 #: widgets/piechart/includes/CWidgetFieldDataSetView.php:156
 #: widgets/svggraph/includes/CWidgetFieldDataSetView.php:160
 #: widgets/svggraph/includes/CWidgetFieldOverrideView.php:310
@@ -25112,6 +26565,14 @@ msgstr ""
 
 #: include/classes/api/services/CHostPrototype.php:1249
 msgid "host prototype with the same UUID already exists"
+msgstr ""
+
+#: include/classes/api/services/CMap.php:2198
+msgid "host trigger ID is expected"
+msgstr ""
+
+#: app/views/host.wizard.edit.php:134
+msgid "how to update them"
 msgstr ""
 
 #: include/classes/api/services/CMap.php:844
@@ -25174,6 +26635,10 @@ msgstr ""
 msgid "incorrect expression starting from \"%1$s\""
 msgstr ""
 
+#: jsLoader.php:298
+msgid "incorrect item value type"
+msgstr ""
+
 #: include/classes/api/services/CAction.php:2851
 #: include/classes/api/services/CCorrelation.php:725
 msgid "incorrect number of conditions"
@@ -25191,6 +26656,11 @@ msgstr "ανακριβής σύνταξη πλησίον \"%1$s\""
 #: include/classes/validators/CExpressionValidator.php:197
 #, c-format
 msgid "incorrect usage of function \"%1$s\""
+msgstr ""
+
+#: app/controllers/CControllerHostWizardUpdateGeneral.php:88
+#, c-format
+msgid "input does not match the pattern: %1$s"
 msgstr ""
 
 #: app/controllers/CControllerScriptUserInputCheck.php:111
@@ -25469,6 +26939,10 @@ msgstr ""
 msgid "m-d h:i A"
 msgstr "m-d H:i"
 
+#: app/views/host.wizard.edit.php:589
+msgid "macOS"
+msgstr ""
+
 #: include/classes/parsers/CUserMacroParser.php:37
 msgid "macro is empty"
 msgstr ""
@@ -25734,6 +27208,14 @@ msgstr ""
 msgid "no permissions to create and edit maps"
 msgstr ""
 
+#: include/classes/api/services/CUser.php:502
+msgid "no permissions to create and edit own media"
+msgstr ""
+
+#: include/classes/api/services/CUser.php:508
+msgid "no permissions to create and edit user media"
+msgstr ""
+
 #: include/classes/api/services/CEvent.php:1566
 msgid "no permissions to suppress problems"
 msgstr ""
@@ -25861,6 +27343,12 @@ msgstr "εκτός"
 #: include/classes/setup/CFrontendSetup.php:627
 msgid "on"
 msgstr "επί"
+
+#: include/classes/validators/CFormValidator.php:1388
+#: include/classes/validators/CFormValidator.php:1433 jsLoader.php:438
+#, c-format
+msgid "one of %1$s"
+msgstr ""
 
 #: include/classes/validators/CApiInputValidator.php:2420
 #, c-format
@@ -26194,6 +27682,10 @@ msgstr ""
 
 #: include/classes/api/services/CTemplate.php:458
 msgid "template with the same UUID already exists"
+msgstr ""
+
+#: include/classes/api/services/CMediatype.php:688
+msgid "the \"refresh_token\" parameter must be specified when marking refresh token valid"
 msgstr ""
 
 #: include/classes/api/services/CItemGeneral.php:1814
@@ -26595,6 +28087,14 @@ msgstr[1] ""
 msgid "value must be between \"%1$s\" and \"%2$s\""
 msgstr ""
 
+#: app/controllers/CControllerGraphCreate.php:208
+#: app/controllers/CControllerGraphPrototypeCreate.php:226
+#: app/controllers/CControllerGraphPrototypeUpdate.php:240
+#: app/controllers/CControllerGraphUpdate.php:228
+#, c-format
+msgid "value must be between \"%1$s\" and \"%2$s\", and have no more than \"%3$s\" digits after the decimal point"
+msgstr ""
+
 #: include/classes/validators/CApiInputValidator.php:676
 msgid "value must be empty"
 msgstr ""
@@ -26715,6 +28215,18 @@ msgstr ""
 
 #: include/html.inc.php:741 include/html.inc.php:776
 msgid "will not be disabled"
+msgstr ""
+
+#: include/classes/validators/CFormValidator.php:1393
+#: include/classes/validators/CFormValidator.php:1438 jsLoader.php:436
+#, c-format
+msgid "within range %1$s"
+msgstr ""
+
+#: include/classes/validators/CFormValidator.php:1394
+#: include/classes/validators/CFormValidator.php:1439 jsLoader.php:437
+#, c-format
+msgid "within ranges %1$s"
 msgstr ""
 
 #: app/controllers/CControllerItemMassCheckNow.php:122
