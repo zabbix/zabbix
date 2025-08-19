@@ -40,7 +40,7 @@ window.widget_form = new class extends CWidgetForm {
 		this._any_ds_aggregation_function_enabled = false;
 
 		this.#dataset_row_unique_id =
-			this._dataset_wrapper.querySelectorAll('.<?= ZBX_STYLE_LIST_ACCORDION_ITEM ?>').length;
+			this._dataset_wrapper.querySelectorAll('.<?= ZBX_STYLE_LIST_ACCORDION_ITEM ?>').length - 1;
 
 		jQuery(`#${form_tabs_id}`)
 			.on('change', 'input, z-color-picker, z-select, .multiselect', () => this.onGraphConfigChange());
@@ -302,7 +302,7 @@ window.widget_form = new class extends CWidgetForm {
 		}
 
 		const fragment = document.createRange().createContextualFragment(template.evaluate({
-			rowNum: this.#dataset_row_unique_id++,
+			rowNum: ++this.#dataset_row_unique_id,
 			color: type == <?= CWidgetFieldDataSet::DATASET_TYPE_SINGLE_ITEM ?>
 				? ''
 				: colorPalette.getNextColor(used_colors)
@@ -388,6 +388,8 @@ window.widget_form = new class extends CWidgetForm {
 		const dataset_remove = obj.closest('.list-accordion-item');
 
 		dataset_remove.remove();
+
+		this.#dataset_row_unique_id--;
 
 		if (this.#single_items_sortable.has(dataset_remove)) {
 			this.#single_items_sortable.get(dataset_remove).enable(false);
