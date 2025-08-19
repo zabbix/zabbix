@@ -42,8 +42,6 @@ struct zbx_dbconn_pool
 	pthread_mutex_t		lock;
 	pthread_cond_t		event;
 
-	int			open_num;
-
 	double			time_modified;	// time when statistics were updated (connection acquired/released)
 	double			time_housekeep;	// time when pool housekeeping was performed
 };
@@ -60,17 +58,21 @@ struct zbx_dbconn_pool
  ******************************************************************************/
 static void	dbconn_pool_close_unused(zbx_dbconn_pool_t *pool, double now)
 {
-	int	closed_num = 0;
+	int	closed_num = 0, idle_num = 0;
 
-	for (int i = 0; i < pool->available.values_num && pool->open_num > pool->cfg.max_idle; i++)
+	for (int i = pool->available.values_num - 1; i >= 0; i--)
 	{
 		zbx_dbconn_t	*db = pool->available.values[i];
 
 		if (SUCCEED == dbconn_is_open(db) && now - db->last_used > pool->cfg.idle_timeout)
 		{
-			dbconn_close(pool->available.values[i]);
-			pool->open_num--;
-			closed_num++;
+			idle_num++;
+
+			if (idle_num > pool->cfg.max_idle)
+			{
+				dbconn_close(pool->available.values[i]);
+				closed_num++;
+			}
 		}
 	}
 
@@ -379,7 +381,6 @@ zbx_dbconn_pool_t	*zbx_dbconn_pool_create(char **error)
 	pool->time_modified = now;
 	pool->lock = lock;
 	pool->event = event;
-	pool->open_num = 0;
 
 	zbx_vector_dbconn_ptr_create(&pool->conns);
 	zbx_vector_dbconn_ptr_create(&pool->available);
@@ -442,10 +443,7 @@ zbx_dbconn_t	*zbx_dbconn_pool_acquire_connection(zbx_dbconn_pool_t *pool)
 	pthread_mutex_unlock(&pool->lock);
 
 	if (SUCCEED != dbconn_is_open(db))
-	{
 		dbconn_open_retry(db);
-		pool->open_num++;
-	}
 
 	return db;
 }
