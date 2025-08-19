@@ -22,7 +22,6 @@ import (
 	"testing"
 	"time"
 
-	"github.com/godror/godror"
 	"github.com/omeid/go-yarn"
 	"golang.zabbix.com/sdk/uri"
 )
@@ -166,17 +165,17 @@ func TestConnManager_GetConnection(t *testing.T) {
 	defer connMgr.Destroy()
 
 	t.Run("Should create connection if it does not exist", func(t *testing.T) {
-		got, _ := connMgr.GetConnection(*u)
+		got, _ := connMgr.getConnection(*u)
 		if reflect.TypeOf(got) != reflect.TypeOf(conn) {
-			t.Errorf("ConnManager.GetConnection() = %s, want *OraConn", reflect.TypeOf(got))
+			t.Errorf("ConnManager.getConnection() = %s, want *OraConn", reflect.TypeOf(got))
 		}
 		conn = got
 	})
 
 	t.Run("Should return previously created connection", func(t *testing.T) {
-		got, _ := connMgr.GetConnection(*u)
+		got, _ := connMgr.getConnection(*u)
 		if !reflect.DeepEqual(got, conn) {
-			t.Errorf("ConnManager.GetConnection() = %v, want %v", got, conn)
+			t.Errorf("ConnManager.getConnection() = %v, want %v", got, conn)
 		}
 	})
 }

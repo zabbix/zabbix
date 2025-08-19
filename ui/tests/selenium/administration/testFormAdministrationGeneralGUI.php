@@ -989,7 +989,9 @@ class testFormAdministrationGeneralGUI extends testFormAdministrationGeneral {
 		$this->resetConfiguration($form, $this->default_values, 'Reset defaults');
 		// Fill necessary settings.
 		$form->fill($data['field']);
-		$form->submit();
+		$form->submit()->waitUntilStalled();
+		$this->page->waitUntilReady();
+
 		// Check saved settings.
 		$this->page->open($data['link'])->waitUntilReady();
 

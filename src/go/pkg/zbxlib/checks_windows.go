@@ -18,11 +18,17 @@ package zbxlib
 
 /*
 #cgo CFLAGS: -I${SRCDIR}/../../../../../include -I${SRCDIR}/../../../../build/win32/include
+#cgo CFLAGS: -DUNICODE -D__MINGW32__ -I${SRCDIR}/../../../../src/libs
 
 #include "zbxsysinfo.h"
 #include "module.h"
 
-int	system_localtime(AGENT_REQUEST *request, AGENT_RESULT *result);
+
+// vfs_dir_get, system_localtime
+#include "zbxsysinfo/common/system.c"
+#include "zbxsysinfo/common/vfs_file.c"
+#include "zbxsysinfo/common/dir.c"
+
 int	proc_mem(AGENT_REQUEST *request, AGENT_RESULT *result);
 int	proc_num(AGENT_REQUEST *request, AGENT_RESULT *result);
 int	system_boottime(AGENT_REQUEST *request, AGENT_RESULT *result);
@@ -43,7 +49,6 @@ int	system_sw_packages(AGENT_REQUEST *request, AGENT_RESULT *result);
 int	system_swap_in(AGENT_REQUEST *request, AGENT_RESULT *result);
 int	system_swap_out(AGENT_REQUEST *request, AGENT_RESULT *result);
 int	system_swap_size(AGENT_REQUEST *request, AGENT_RESULT *result);
-int	vfs_dir_get(AGENT_REQUEST *request, AGENT_RESULT *result);
 int	vfs_fs_inode(AGENT_REQUEST *request, AGENT_RESULT *result);
 int	vm_memory_size(AGENT_REQUEST *request, AGENT_RESULT *result);
 */
