@@ -44,7 +44,9 @@ class CControllerPopupServiceStatusRuleEdit extends CController {
 					'messages' => array_column(get_and_clear_messages(), 'message')
 				]];
 
-			(new CControllerResponseData(['main_block' => json_encode($response)]))->disableView();
+			$this->setResponse(
+				(new CControllerResponseData(['main_block' => json_encode($response)]))->disableView()
+			);
 		}
 
 		return $ret;
