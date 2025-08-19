@@ -1100,10 +1100,12 @@ class testPasswordComplexity extends CWebTest {
 
 		if ($update === false) {
 			$user_form->selectTab('Permissions');
-			$user_form->fill(['Role' => 'User role']);
+			$user_form->fill(['Role' => 'User role'])->waitUntilReloaded();
 		}
 
 		$user_form->submit();
+		$user_form->waitUntilStalled();
+		$this->page->waitUntilReady();
 
 		if (CTestArrayHelper::get($data, 'expected', TEST_GOOD) === TEST_BAD) {
 			$this->assertMessage(TEST_BAD, 'Cannot '.($update ? 'update' : 'add').' user', $data['error']);
