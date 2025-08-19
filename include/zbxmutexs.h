@@ -52,6 +52,7 @@ typedef enum
 	ZBX_MUTEX_REMOTE_COMMANDS,
 	ZBX_MUTEX_PROXY_BUFFER,
 	ZBX_MUTEX_VPS_MONITOR,
+	ZBX_MUTEX_DBCONN_POOL,
 	/* NOTE: Do not forget to sync changes here with mutex names in diag_add_locks_info()! */
 	ZBX_MUTEX_COUNT
 }

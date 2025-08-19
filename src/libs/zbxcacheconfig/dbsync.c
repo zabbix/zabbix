@@ -263,6 +263,11 @@ void	zbx_dbsync_env_init(zbx_dc_config_t *cache)
 	zbx_hashset_create(&dbsync_env.changelog, 100, ZBX_DEFAULT_UINT64_HASH_FUNC, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
 }
 
+void	zbx_dbsync_env_destroy(void)
+{
+	zbx_hashset_destroy(&dbsync_env.changelog);
+}
+
 /******************************************************************************
  *                                                                            *
  * Purpose: remove old (1h+) changelog records from database and cache using  *

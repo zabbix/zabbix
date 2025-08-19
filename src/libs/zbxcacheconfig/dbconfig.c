@@ -8853,6 +8853,8 @@ void	zbx_free_configuration_cache(void)
 	zbx_hashset_destroy(&config_private.item_tag_links);
 	memset(&config_private, 0, sizeof(config_private));
 
+	zbx_dbsync_env_destroy();
+
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 }
 
@@ -9516,10 +9518,10 @@ static void	DCget_item(zbx_dc_item_t *dst_item, const ZBX_DC_ITEM *src_item)
 			zbx_vector_ptr_pair_create(&dst_item->script_params);
 			for (i = 0; i < src_item->itemtype.browseritem->params.values_num; i++)
 			{
-				zbx_dc_item_param_t	*params =
-						(zbx_dc_item_param_t*)(src_item->itemtype.browseritem->params.values[i]);
+				zbx_dc_item_param_t	*params;
 				zbx_ptr_pair_t	pair;
 
+				params = (zbx_dc_item_param_t*)src_item->itemtype.browseritem->params.values[i];
 				pair.first = zbx_strdup(NULL, params->name);
 				pair.second = zbx_strdup(NULL, params->value);
 				zbx_vector_ptr_pair_append(&dst_item->script_params, pair);

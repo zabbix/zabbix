@@ -246,6 +246,63 @@ int	zbx_rtc_parse_options(const char *opt, zbx_uint32_t *code, struct zbx_json *
 		}
 	}
 
+	if (0 == strncmp(opt, ZBX_DBPOOL_STATUS, ZBX_CONST_STRLEN(ZBX_DBPOOL_STATUS)))
+	{
+		*code = ZBX_RTC_DBPOOL_STATUS;
+		return SUCCEED;
+	}
+
+	if (0 == strncmp(opt, ZBX_DBPOOL_SET_MIN_CONN, ZBX_CONST_STRLEN(ZBX_DBPOOL_SET_MIN_CONN)))
+	{
+		const char	*param = opt + ZBX_CONST_STRLEN(ZBX_DBPOOL_SET_MIN_CONN);
+		zbx_uint64_t	limit;
+
+		if ('=' != *param || FAIL == zbx_is_uint64(param + 1, &limit))
+		{
+			*error = zbx_strdup(NULL, "missing minimum connection limit parameter");
+			return FAIL;
+		}
+
+		zbx_json_adduint64(j, ZBX_PROTO_TAG_MIN_LIMIT, limit);
+
+		*code = ZBX_RTC_DBPOOL_SET_MIN_CONN;
+		return SUCCEED;
+	}
+
+	if (0 == strncmp(opt, ZBX_DBPOOL_SET_MAX_CONN, ZBX_CONST_STRLEN(ZBX_DBPOOL_SET_MAX_CONN)))
+	{
+		const char	*param = opt + ZBX_CONST_STRLEN(ZBX_DBPOOL_SET_MAX_CONN);
+		zbx_uint64_t	limit;
+
+		if ('=' != *param || FAIL == zbx_is_uint64(param + 1, &limit))
+		{
+			*error = zbx_strdup(NULL, "missing maximum connection limit parameter");
+			return FAIL;
+		}
+
+		zbx_json_adduint64(j, ZBX_PROTO_TAG_MAX_LIMIT, limit);
+
+		*code = ZBX_RTC_DBPOOL_SET_MAX_CONN;
+		return SUCCEED;
+	}
+
+	if (0 == strncmp(opt, ZBX_DBPOOL_SET_IDLE_TIMEOUT, ZBX_CONST_STRLEN(ZBX_DBPOOL_SET_IDLE_TIMEOUT)))
+	{
+		const char	*param = opt + ZBX_CONST_STRLEN(ZBX_DBPOOL_SET_IDLE_TIMEOUT);
+		int		timeout;
+
+		if ('=' != *param || FAIL == zbx_is_time_suffix(param + 1, &timeout, ZBX_LENGTH_UNLIMITED))
+		{
+			*error = zbx_strdup(NULL, "missing idle timeout parameter");
+			return FAIL;
+		}
+
+		zbx_json_addint64(j, ZBX_PROTO_TAG_IDLE_TIMEOUT, timeout);
+
+		*code = ZBX_RTC_DBPOOL_SET_IDLE_TIMEOUT;
+		return SUCCEED;
+	}
+
 	return SUCCEED;
 }
 

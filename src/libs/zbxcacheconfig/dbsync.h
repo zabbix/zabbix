@@ -180,6 +180,7 @@ typedef struct
 zbx_dbsync_env_t;
 
 void	zbx_dbsync_env_init(zbx_dc_config_t *cache);
+void	zbx_dbsync_env_destroy(void);
 int	zbx_dbsync_env_prepare(unsigned char mode);
 void	zbx_dbsync_env_flush_changelog(void);
 void	zbx_dbsync_env_clear(void);

@@ -61,9 +61,37 @@ typedef struct
 zbx_db_idcache_t;
 
 /* nextid cache for tables updated only by server/proxy */
-static zbx_mutex_t	idcache_mutex = ZBX_MUTEX_NULL;
-zbx_shmem_info_t	*idcache_mem;
-static zbx_db_idcache_t	*idcache = NULL;
+static zbx_mutex_t		idcache_mutex = ZBX_MUTEX_NULL;
+static zbx_mutex_t		pool_cache_mutex = ZBX_MUTEX_NULL;
+zbx_shmem_info_t		*idcache_mem;
+static zbx_db_idcache_t		*idcache = NULL;
+
+static zbx_dbconn_pool_info_t	*pool_cache = NULL;
+
+static int	db_is_threadsafe(void)
+{
+#if defined(HAVE_MYSQL)
+	return (0 != mysql_thread_safe() ? SUCCEED : FAIL);
+#elif defined(HAVE_POSTGRESQL)
+	return (0 != PQisthreadsafe() ? SUCCEED : FAIL);
+#else
+	return (0 != sqlite3_threadsafe() ? SUCCEED : FAIL);
+#endif
+}
+
+int	zbx_db_library_init(char **error)
+{
+#if defined(HAVE_MYSQL)
+	mysql_library_init(0, NULL, NULL);
+#endif
+	if (FAIL == db_is_threadsafe())
+	{
+		*error = zbx_dsprintf(*error, "Database does not support thread safety.");
+		return FAIL;
+	}
+
+	return SUCCEED;
+}
 
 int	zbx_db_init(char **error)
 {
@@ -78,14 +106,20 @@ int	zbx_db_init(char **error)
 	if (SUCCEED != zbx_mutex_create(&idcache_mutex, ZBX_MUTEX_CACHE_IDS, error))
 		return FAIL;
 
-	if (SUCCEED != zbx_shmem_create_min(&idcache_mem, sizeof(zbx_db_idcache_t), "table ids cache", "TidsCache", 0,
-			error))
+	if (SUCCEED != zbx_mutex_create(&pool_cache_mutex, ZBX_MUTEX_DBCONN_POOL, error))
+		return FAIL;
+
+	if (SUCCEED != zbx_shmem_create_min(&idcache_mem, ZBX_SIZE_T_ALIGN8(sizeof(zbx_db_idcache_t)) +
+			sizeof(zbx_dbconn_pool_info_t), "table ids and connection pool cache", NULL, 0, error))
 	{
 		return FAIL;
 	}
 
 	idcache = zbx_shmem_malloc(idcache_mem, NULL, sizeof(zbx_db_idcache_t));
 	memset(idcache->lastids, 0, sizeof(idcache->lastids));
+
+	pool_cache = (zbx_dbconn_pool_info_t *)(idcache + 1);
+	memset(pool_cache, 0, sizeof(zbx_dbconn_pool_info_t));
 
 	return SUCCEED;
 }
@@ -98,6 +132,7 @@ void	zbx_db_deinit(void)
 	idcache_mem = NULL;
 
 	zbx_mutex_destroy(&idcache_mutex);
+	zbx_mutex_destroy(&pool_cache_mutex);
 }
 
 /******************************************************************************
@@ -648,7 +683,7 @@ int	zbx_db_validate_field_size(const char *tablename, const char *fieldname, con
 		return FAIL;
 	}
 
-#if defined(HAVE_MYSQL) || defined(HAVE_ORACLE)
+#if defined(HAVE_MYSQL)
 	max_bytes = get_string_field_size(field);
 #else
 	max_bytes = ZBX_SIZE_T_MAX;
@@ -1400,4 +1435,141 @@ const char	*zbx_db_sql_id_cmp(zbx_uint64_t id)
 	zbx_snprintf(buf, sizeof(buf), "=" ZBX_FS_UI64, id);
 
 	return buf;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: update database pool configuration in cache                       *
+ *                                                                            *
+ ******************************************************************************/
+void	zbx_dbconn_pool_set_config(const zbx_dbconn_pool_config_t *cfg)
+{
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s() min:%d max:%d idle_timeout:%d", __func__, cfg->min_limit, cfg->max_limit,
+			cfg->idle_timeout);
+
+	zbx_mutex_lock(pool_cache_mutex);
+
+	pool_cache->cfg = *cfg;
+
+	zbx_mutex_unlock(pool_cache_mutex);
+
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: get database pool configuration from cache                        *
+ *                                                                            *
+ ******************************************************************************/
+void	zbx_dbconn_pool_get_config(zbx_dbconn_pool_config_t *cfg)
+{
+	zbx_mutex_lock(pool_cache_mutex);
+
+	*cfg = pool_cache->cfg;
+
+	zbx_mutex_unlock(pool_cache_mutex);
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: update database pool configuration and flush it to db             *
+ *                                                                            *
+ ******************************************************************************/
+int	zbx_dbconn_pool_flush_config(zbx_dbconn_pool_config_t *cfg, char **error)
+{
+	zbx_dbconn_pool_config_t	cfg_old;
+	int				ret;
+
+	zbx_mutex_lock(pool_cache_mutex);
+
+	cfg_old = pool_cache->cfg;
+	pool_cache->cfg = *cfg;
+
+	zbx_mutex_unlock(pool_cache_mutex);
+
+	if (cfg_old.min_limit == cfg->min_limit && cfg_old.max_limit == cfg->max_limit &&
+			cfg_old.idle_timeout == cfg->idle_timeout)
+	{
+		return SUCCEED;
+	}
+
+	zbx_dbconn_t	*db;
+
+	db = zbx_dbconn_create();
+	zbx_dbconn_set_connect_options(db, ZBX_DB_CONNECT_ONCE);
+
+	if (ZBX_DB_OK != zbx_dbconn_open(db))
+	{
+		zbx_dbconn_free(db);
+		*error = zbx_strdup(NULL, "cannot connect to database");
+		return FAIL;
+	}
+
+	char	*sql = NULL;
+	size_t	sql_alloc = 0, sql_offset = 0;
+
+	if (cfg_old.min_limit != cfg->min_limit)
+	{
+		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "update settings set value_int=%d where name='"
+				ZBX_SETTINGS_DBPOOL_MIN_CONN "';\n", cfg->min_limit);
+	}
+
+	if (cfg_old.max_limit != cfg->max_limit)
+	{
+		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "update settings set value_int=%d where name='"
+				ZBX_SETTINGS_DBPOOL_MAX_CONN "';\n", cfg->max_limit);
+	}
+
+	if (cfg_old.idle_timeout != cfg->idle_timeout)
+	{
+		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "update settings set value_int=%d where name='"
+				ZBX_SETTINGS_DBPOOL_IDLE_TIMEOUT "';\n", cfg->idle_timeout);
+	}
+
+	if (ZBX_DB_OK > zbx_dbconn_execute(db, sql))
+	{
+		*error = zbx_strdup(NULL, "failed to update database connection settings");
+		ret = FAIL;
+	}
+	else
+		ret = SUCCEED;
+
+	zbx_dbconn_free(db);
+	zbx_free(sql);
+
+	return ret;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: get database pool statistics from cache                           *
+ *                                                                            *
+ ******************************************************************************/
+void	zbx_dbconn_pool_get_stats(zbx_dbconn_pool_stats_t *stats)
+{
+	zbx_mutex_lock(pool_cache_mutex);
+
+	*stats = pool_cache->stats;
+
+	zbx_mutex_unlock(pool_cache_mutex);
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: update database pool statistics in cache and get configuration    *
+ *                                                                            *
+ ******************************************************************************/
+void	dbconn_pool_sync_info(zbx_dbconn_pool_stats_t *stats, zbx_dbconn_pool_config_t *cfg)
+{
+	zbx_mutex_lock(pool_cache_mutex);
+
+	pool_cache->stats.provided_num += stats->provided_num;
+	pool_cache->stats.time_wait += stats->time_wait;
+	pool_cache->stats.time_idle += stats->time_idle;
+
+	*cfg = pool_cache->cfg;
+
+	zbx_mutex_unlock(pool_cache_mutex);
+
+	memset(stats, 0, sizeof(zbx_dbconn_pool_stats_t));
 }

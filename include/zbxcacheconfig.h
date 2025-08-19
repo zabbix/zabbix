@@ -431,16 +431,6 @@ zbx_host_key_t;
 
 ZBX_VECTOR_DECL(host_key, zbx_host_key_t)
 
-/* type of value in settings table */
-#define ZBX_SETTING_TYPE_STR			1
-#define ZBX_SETTING_TYPE_INT			2
-#define ZBX_SETTING_TYPE_USRGRPID		3
-#define ZBX_SETTING_TYPE_HOSTGROUPID		4
-#define ZBX_SETTING_TYPE_USRDIRID		5
-#define ZBX_SETTING_TYPE_MFAID			6
-
-#define ZBX_SETTING_TYPE_MAX			7
-
 typedef struct
 {
 	const char	*name;

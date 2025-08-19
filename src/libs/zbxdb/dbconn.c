@@ -27,6 +27,8 @@
 #	define ZBX_PG_DEADLOCK		"40P01"
 #endif
 
+ZBX_PTR_VECTOR_IMPL(dbconn_ptr, zbx_dbconn_t *)
+
 struct zbx_db_result
 {
 #if defined(HAVE_MYSQL)
@@ -282,7 +284,7 @@ static void	db_get_postgresql_error(char **error, const PGresult *pg_result)
  * Purpose: close database connection                                         *
  *                                                                            *
  ******************************************************************************/
-static void	dbconn_close(zbx_dbconn_t *db)
+void	dbconn_close(zbx_dbconn_t *db)
 {
 #if defined(HAVE_MYSQL)
 	if (NULL != db->conn)
@@ -748,9 +750,9 @@ out:
  * Purpose: set connection as managed by connection pool                      *
  *                                                                            *
  ******************************************************************************/
-void	dbconn_set_managed(zbx_dbconn_t *db)
+void	dbconn_set_managed(zbx_dbconn_t *db, zbx_dbconn_type_t type)
 {
-	db->managed = DBCONN_TYPE_MANAGED;
+	db->managed = type;
 }
 
 int	db_is_escape_sequence(char c)
@@ -1267,6 +1269,91 @@ static zbx_db_result_t	dbconn_select_n(zbx_dbconn_t *db, const char *query, int 
 	return dbconn_select(db, "%s limit %d", query, n);
 }
 
+int	dbconn_is_open(zbx_dbconn_t *db)
+{
+	return (db->conn != NULL ? SUCCEED : FAIL);
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: open database connection                                          *
+ *                                                                            *
+ * Return value: ZBX_DB_OK - successfully connected                           *
+ *               ZBX_DB_DOWN - database is down                               *
+ *               ZBX_DB_FAIL - failed to connect                              *
+ *                                                                            *
+ ******************************************************************************/
+int	dbconn_open_retry(zbx_dbconn_t *db)
+{
+#if defined(HAVE_POSTGRESQL)
+#	define ZBX_DB_WAIT_RETRY_COUNT	6
+
+	int	retries = ZBX_DB_WAIT_RETRY_COUNT;
+#endif
+
+	int	err;
+
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s() options:%d", __func__, db->connect_options);
+
+	while (ZBX_DB_OK != (err = dbconn_open(db)))
+	{
+		if (ZBX_DB_CONNECT_ONCE == db->connect_options)
+		{
+#if defined(HAVE_POSTGRESQL)
+			if (ZBX_DB_RONLY == err)
+				err = ZBX_DB_DOWN;
+#endif
+			break;
+		}
+
+		if (ZBX_DB_FAIL == err || ZBX_DB_CONNECT_EXIT == db->connect_options)
+		{
+			zabbix_log(LOG_LEVEL_CRIT, "Cannot connect to the database. Exiting...");
+			exit(EXIT_FAILURE);
+		}
+
+#if defined(HAVE_POSTGRESQL)
+		if (ZBX_DB_RONLY == err)
+		{
+			if (0 == db->config->read_only_recoverable && 0 >= retries--)
+			{
+				zabbix_log(LOG_LEVEL_ERR, "database is read-only: Exiting...");
+				exit(EXIT_FAILURE);
+			}
+
+			zabbix_log(LOG_LEVEL_ERR, "database is read-only: reconnecting in %d seconds",
+					ZBX_DB_WAIT_DOWN);
+		}
+		else
+#endif
+		{
+			zabbix_log(LOG_LEVEL_ERR, "database is down: reconnecting in %d seconds", ZBX_DB_WAIT_DOWN);
+		}
+
+		db->connection_failure = 1;
+		zbx_sleep(ZBX_DB_WAIT_DOWN);
+	}
+
+	if (0 != db->connection_failure)
+	{
+		/* wait ZBX_DB_WAIT_AFTER_RECONNECT to allow HA manager recover */
+		zbx_sleep(ZBX_DB_WAIT_AFTER_RECONNECT);
+		zabbix_log(LOG_LEVEL_ERR, "database connection re-established");
+		db->connection_failure = 0;
+#if defined(HAVE_POSTGRESQL)
+		db->last_db_errcode = 0;
+#endif
+	}
+
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%d", __func__, err);
+
+#if defined(HAVE_POSTGRESQL)
+#	undef ZBX_DB_WAIT_RETRY_COUNT
+#endif
+
+	return err;
+}
+
 /*
  * Public API
  */
@@ -1358,11 +1445,7 @@ void	zbx_dbconn_free(zbx_dbconn_t *db)
  ******************************************************************************/
 int	zbx_dbconn_open(zbx_dbconn_t *db)
 {
-#define ZBX_DB_WAIT_RETRY_COUNT	6
 	int	err;
-#if defined(HAVE_POSTGRESQL)
-	int	retries = ZBX_DB_WAIT_RETRY_COUNT;
-#endif
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() options:%d", __func__, db->connect_options);
 
@@ -1370,64 +1453,13 @@ int	zbx_dbconn_open(zbx_dbconn_t *db)
 	{
 		THIS_SHOULD_NEVER_HAPPEN_MSG("Cannot open managed connections");
 		err = ZBX_DB_FAIL;
-
-		goto out;
 	}
+	else
+		err = dbconn_open_retry(db);
 
-	while (ZBX_DB_OK != (err = dbconn_open(db)))
-	{
-		if (ZBX_DB_CONNECT_ONCE == db->connect_options)
-		{
-#if defined(HAVE_POSTGRESQL)
-			if (ZBX_DB_RONLY == err)
-				err = ZBX_DB_DOWN;
-#endif
-			break;
-		}
-
-		if (ZBX_DB_FAIL == err || ZBX_DB_CONNECT_EXIT == db->connect_options)
-		{
-			zabbix_log(LOG_LEVEL_CRIT, "Cannot connect to the database. Exiting...");
-			exit(EXIT_FAILURE);
-		}
-
-#if defined(HAVE_POSTGRESQL)
-		if (ZBX_DB_RONLY == err)
-		{
-			if (0 == db->config->read_only_recoverable && 0 >= retries--)
-			{
-				zabbix_log(LOG_LEVEL_ERR, "database is read-only: Exiting...");
-				exit(EXIT_FAILURE);
-			}
-
-			zabbix_log(LOG_LEVEL_ERR, "database is read-only: reconnecting in %d seconds",
-					ZBX_DB_WAIT_DOWN);
-		}
-		else
-#endif
-		{
-			zabbix_log(LOG_LEVEL_ERR, "database is down: reconnecting in %d seconds", ZBX_DB_WAIT_DOWN);
-		}
-
-		db->connection_failure = 1;
-		zbx_sleep(ZBX_DB_WAIT_DOWN);
-	}
-
-	if (0 != db->connection_failure)
-	{
-		/* wait ZBX_DB_WAIT_AFTER_RECONNECT to allow HA manager recover */
-		zbx_sleep(ZBX_DB_WAIT_AFTER_RECONNECT);
-		zabbix_log(LOG_LEVEL_ERR, "database connection re-established");
-		db->connection_failure = 0;
-#if defined(HAVE_POSTGRESQL)
-		db->last_db_errcode = 0;
-#endif
-	}
-out:
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%d", __func__, err);
 
 	return err;
-#undef ZBX_DB_WAIT_RETRY_COUNT
 }
 
 /******************************************************************************
@@ -2613,5 +2645,3 @@ void	zbx_dbconn_large_query_append_sql(zbx_db_large_query_t *query, const char *
 {
 	query->suffix = zbx_strdup(NULL, sql);
 }
-
-
