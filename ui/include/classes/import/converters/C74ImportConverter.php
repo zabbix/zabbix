@@ -72,7 +72,7 @@ class C74ImportConverter extends CConverter {
 								$widget['fields'][] = [
 									'type' => CXmlConstantName::DASHBOARD_WIDGET_FIELD_TYPE_STRING,
 									'name' => $field_name,
-									'value' => $field_value,
+									'value' => $field_value
 								];
 							}
 						}
