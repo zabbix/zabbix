@@ -35,7 +35,7 @@
 #define ZBX_RTC_PROF_ENABLE			20
 #define ZBX_RTC_PROF_DISABLE			21
 #define ZBX_RTC_HISTORY_CACHE_CLEAR		22
-#define ZBX_RTC_DBPOOL_SET_MIN_CONN		23
+#define ZBX_RTC_DBPOOL_SET_MAX_IDLE		23
 #define ZBX_RTC_DBPOOL_SET_MAX_CONN		24
 #define ZBX_RTC_DBPOOL_SET_IDLE_TIMEOUT		25
 #define ZBX_RTC_DBPOOL_STATUS			26
@@ -73,7 +73,7 @@
 #define ZBX_PROF_ENABLE			"prof_enable"
 #define ZBX_PROF_DISABLE		"prof_disable"
 #define ZBX_HISTORY_CACHE_CLEAR		"history_cache_clear"
-#define ZBX_DBPOOL_SET_MIN_CONN		"dbpool_set_min_conn"
+#define ZBX_DBPOOL_SET_MAX_IDLE		"dbpool_set_max_idle"
 #define ZBX_DBPOOL_SET_MAX_CONN		"dbpool_set_max_conn"
 #define ZBX_DBPOOL_SET_IDLE_TIMEOUT	"dbpool_set_idle_timeout"
 #define ZBX_DBPOOL_STATUS		"dbpool_status"

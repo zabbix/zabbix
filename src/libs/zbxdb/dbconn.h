@@ -91,7 +91,7 @@ void	dbconn_pool_sync_info(zbx_dbconn_pool_stats_t *stats, zbx_dbconn_pool_confi
 
 /* connection pool settings */
 #define ZBX_SETTINGS_DBPOOL			"dbpool_"
-#define ZBX_SETTINGS_DBPOOL_MIN_CONN		ZBX_SETTINGS_DBPOOL "min_conn"
+#define ZBX_SETTINGS_DBPOOL_MAX_IDLE		ZBX_SETTINGS_DBPOOL "max_idle"
 #define ZBX_SETTINGS_DBPOOL_MAX_CONN		ZBX_SETTINGS_DBPOOL "max_conn"
 #define ZBX_SETTINGS_DBPOOL_IDLE_TIMEOUT	ZBX_SETTINGS_DBPOOL "idle_timeout"
 

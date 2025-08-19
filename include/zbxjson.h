@@ -231,11 +231,9 @@
 #define ZBX_PROTO_TAG_WAIT_TIME			"wait_time"
 #define ZBX_PROTO_TAG_IDLE_TIME			"idle_time"
 #define ZBX_PROTO_TAG_CONN_PROVIDED		"connections_provided"
-#define ZBX_PROTO_TAG_CONN_MAX			"connections_max"
-#define ZBX_PROTO_TAG_CONN_MIN			"connections_min"
 #define ZBX_PROTO_TAG_IDLE_TIMEOUT		"idle_timeout"
-#define ZBX_PROTO_TAG_MIN_LIMIT			"min_limit"
-#define ZBX_PROTO_TAG_MAX_LIMIT			"max_limit"
+#define ZBX_PROTO_TAG_MAX_IDLE			"max_idle"
+#define ZBX_PROTO_TAG_MAX_CONN			"max_conn"
 
 #define ZBX_PROTO_VALUE_FAILED		"failed"
 #define ZBX_PROTO_VALUE_SUCCESS		"success"

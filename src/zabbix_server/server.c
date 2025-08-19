@@ -155,7 +155,7 @@ static const char	*help_message[] = {
 	"                                        All proxies will be reloaded if no names were specified.",
 	"      " ZBX_DBPOOL_STATUS "                    Display database connection pool status",
 	"      " ZBX_DBPOOL_SET_IDLE_TIMEOUT "=seconds  Set database connection pool idle timeout",
-	"      " ZBX_DBPOOL_SET_MIN_CONN "=num          Set database connection pool minimum connection limit",
+	"      " ZBX_DBPOOL_SET_MAX_IDLE "=num          Set database connection pool maximum idle connection limit",
 	"      " ZBX_DBPOOL_SET_MAX_CONN "=num          Set database connection pool maximum connection limit",
 	"",
 	"      Log level control targets:",

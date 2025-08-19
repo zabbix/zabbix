@@ -252,20 +252,20 @@ int	zbx_rtc_parse_options(const char *opt, zbx_uint32_t *code, struct zbx_json *
 		return SUCCEED;
 	}
 
-	if (0 == strncmp(opt, ZBX_DBPOOL_SET_MIN_CONN, ZBX_CONST_STRLEN(ZBX_DBPOOL_SET_MIN_CONN)))
+	if (0 == strncmp(opt, ZBX_DBPOOL_SET_MAX_IDLE, ZBX_CONST_STRLEN(ZBX_DBPOOL_SET_MAX_IDLE)))
 	{
-		const char	*param = opt + ZBX_CONST_STRLEN(ZBX_DBPOOL_SET_MIN_CONN);
+		const char	*param = opt + ZBX_CONST_STRLEN(ZBX_DBPOOL_SET_MAX_IDLE);
 		zbx_uint64_t	limit;
 
 		if ('=' != *param || FAIL == zbx_is_uint64(param + 1, &limit))
 		{
-			*error = zbx_strdup(NULL, "missing minimum connection limit parameter");
+			*error = zbx_strdup(NULL, "missing maximum idle connection limit parameter");
 			return FAIL;
 		}
 
-		zbx_json_adduint64(j, ZBX_PROTO_TAG_MIN_LIMIT, limit);
+		zbx_json_adduint64(j, ZBX_PROTO_TAG_MAX_IDLE, limit);
 
-		*code = ZBX_RTC_DBPOOL_SET_MIN_CONN;
+		*code = ZBX_RTC_DBPOOL_SET_MAX_IDLE;
 		return SUCCEED;
 	}
 
@@ -280,7 +280,7 @@ int	zbx_rtc_parse_options(const char *opt, zbx_uint32_t *code, struct zbx_json *
 			return FAIL;
 		}
 
-		zbx_json_adduint64(j, ZBX_PROTO_TAG_MAX_LIMIT, limit);
+		zbx_json_adduint64(j, ZBX_PROTO_TAG_MAX_CONN, limit);
 
 		*code = ZBX_RTC_DBPOOL_SET_MAX_CONN;
 		return SUCCEED;
