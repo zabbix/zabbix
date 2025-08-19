@@ -62,8 +62,8 @@ class CControllerScriptUpdate extends CController {
 			'publickey' => ['db scripts.publickey', 'required', 'not_empty', 'when' => ['authtype', 'in' => [ITEM_AUTHTYPE_PUBLICKEY]]],
 			'privatekey' => ['db scripts.privatekey', 'required', 'not_empty', 'when' => ['authtype', 'in' => [ITEM_AUTHTYPE_PUBLICKEY]]],
 			'passphrase' => ['db scripts.password'],
-			'port' => ['db scripts.port'],
-			'command' => ['db scripts.command', 'required', 'not_empty', 'when' => ['type', 'in' => [ZBX_SCRIPT_TYPE_CUSTOM_SCRIPT, ZBX_SCRIPT_TYPE_IPMI, ZBX_SCRIPT_TYPE_SSH, ZBX_SCRIPT_TYPE_TELNET]]],
+			'port' => ['db scripts.port', 'use' => [CPortParser::class, ['usermacros' => true]], 'messages' => ['use' => _('Incorrect port.')]],
+			'command' => ['db scripts.command', 'required', 'not_empty', 'when' => ['type', 'in' => [ZBX_SCRIPT_TYPE_CUSTOM_SCRIPT, ZBX_SCRIPT_TYPE_SSH, ZBX_SCRIPT_TYPE_TELNET]]],
 			'commandipmi' => ['db scripts.command', 'required', 'not_empty', 'when' => ['type', 'in' => [ZBX_SCRIPT_TYPE_IPMI]]],
 			'parameters' =>	['object', 'fields' => ['name' => ['array'], 'value' => ['array']],
 				'when' => ['type', 'in' => [ZBX_SCRIPT_TYPE_WEBHOOK]]
