@@ -109,7 +109,8 @@
 			this.macros_manager = new HostMacrosManager({
 				container: $('#macros_container .table-forms-td-right'),
 				readonly: this.readonly,
-				parent_hostid: this.parent_hostid
+				parent_hostid: this.parent_hostid,
+				show_inherited_macros_element: document.getElementById('show_inherited_macros')
 			});
 
 			const show_inherited_macros_element = document.getElementById('show_inherited_macros');

@@ -26,14 +26,20 @@ class HostMacrosManager {
 	static DISCOVERY_STATE_CONVERTING = 0x2;
 	static DISCOVERY_STATE_MANUAL = 0x3;
 
-	constructor({container, readonly, parent_hostid}) {
+	constructor({container, readonly, parent_hostid, show_inherited_macros_element}) {
 		this.$container = container;
 		this.readonly = readonly;
 		this.parent_hostid = parent_hostid ?? null;
-		this.xhr = null;
+		this.show_inherited_macros_element = show_inherited_macros_element;
 	}
 
 	load(show_inherited_macros, templateids) {
+		if (this.show_inherited_macros_element.querySelector('input').hasAttribute('readonly')) {
+			console.warn('Skip loading host macros: already in progress.');
+			return;
+		}
+
+		this.disableRadioShowInheritedMacros();
 		const url = new Curl('zabbix.php');
 		url.setArgument('action', 'hostmacros.list');
 
@@ -48,11 +54,7 @@ class HostMacrosManager {
 			post_data.parent_hostid = this.parent_hostid;
 		}
 
-		if (this.xhr) {
-			this.xhr.abort()
-		}
-
-		this.xhr = $.ajax(url.getUrl(), {
+		$.ajax(url.getUrl(), {
 			data: post_data,
 			dataType: 'json',
 			method: 'POST',
@@ -92,6 +94,7 @@ class HostMacrosManager {
 			})
 			.always(() => {
 				this.loaderStop();
+				this.enableRadioShowInheritedMacros();
 			});
 	}
 
@@ -272,6 +275,18 @@ class HostMacrosManager {
 
 	getMacroTable() {
 		return $('.inherited-macros-table, .host-macros-table', this.$container).eq(0);
+	}
+
+	disableRadioShowInheritedMacros() {
+		this.show_inherited_macros_element.querySelectorAll('input').forEach(radio_input => {
+			radio_input.setAttribute('readonly', 'readonly');
+		});
+	}
+
+	enableRadioShowInheritedMacros() {
+		this.show_inherited_macros_element.querySelectorAll('input').forEach(radio_input => {
+			radio_input.removeAttribute('readonly');
+		});
 	}
 
 	loaderStart() {
