@@ -30,7 +30,8 @@ class CControllerProxyCreate extends CController {
 		$api_uniq = ['proxy.get', ['name' => '{name}']];
 
 		return ['object', 'api_uniq' => $api_uniq, 'fields' => [
-			'name' => ['db proxy.name', 'required', 'not_empty'],
+			'name' => ['db proxy.name', 'required', 'not_empty', 'regex' => '/^'.ZBX_PREG_HOST_FORMAT.'$/',
+				'messages' => ['regex' => _('Incorrect characters used for proxy name.')]],
 			'proxy_groupid' => ['db proxy.proxy_groupid'],
 			'operating_mode' => ['db proxy.operating_mode', 'required', 'in' => [PROXY_OPERATING_MODE_ACTIVE, PROXY_OPERATING_MODE_PASSIVE]],
 			'address' => [
