@@ -53,7 +53,7 @@ type PluginOptions struct {
 	CustomQueriesPath string `conf:"optional"`
 
 	// ResolveTNS enables the interpretation of a connection string (ConnString) in a metrics key as TNS.
-	ResolveTNS bool `conf:"optional,default=true"`
+	ResolveTNS bool `conf:"optional,default=false"`
 
 	// Default stores default connection parameter values from configuration file
 	Default Session `conf:"optional"`
