@@ -148,7 +148,7 @@
 				// check if the macro has an hidden ID element, if it does - increment the deleted macro counter
 				removed += $('#macros_' + $(this).attr('id').split('_')[1] + '_globalmacroid').length;
 			})
-			.dynamicRows({template: '#macro-row-tmpl', allow_empty: true})
+			.dynamicRows({template: '#macro-row-tmpl', allow_empty: true, counter: <?= count($data['macros']) ?>})
 			.on('afteradd.dynamicRows', function() {
 				$('.macro-input-group', table).macroValue();
 				$('.<?= ZBX_STYLE_TEXTAREA_FLEXIBLE ?>', table).textareaFlexible();
