@@ -1444,8 +1444,8 @@ const char	*zbx_db_sql_id_cmp(zbx_uint64_t id)
  ******************************************************************************/
 void	zbx_dbconn_pool_set_config(const zbx_dbconn_pool_config_t *cfg)
 {
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s() max_idle:%d max_conn:%d idle_timeout:%d", __func__, cfg->max_idle,
-			cfg->max_conn, cfg->idle_timeout);
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s() max_idle:%d max_open:%d idle_timeout:%d", __func__, cfg->max_idle,
+			cfg->max_open, cfg->idle_timeout);
 
 	zbx_mutex_lock(pool_cache_mutex);
 
@@ -1487,7 +1487,7 @@ int	zbx_dbconn_pool_flush_config(zbx_dbconn_pool_config_t *cfg, char **error)
 
 	zbx_mutex_unlock(pool_cache_mutex);
 
-	if (cfg_old.max_idle == cfg->max_idle && cfg_old.max_conn == cfg->max_conn &&
+	if (cfg_old.max_idle == cfg->max_idle && cfg_old.max_open == cfg->max_open &&
 			cfg_old.idle_timeout == cfg->idle_timeout)
 	{
 		return SUCCEED;
@@ -1514,10 +1514,10 @@ int	zbx_dbconn_pool_flush_config(zbx_dbconn_pool_config_t *cfg, char **error)
 				ZBX_SETTINGS_DBPOOL_MAX_IDLE "';\n", cfg->max_idle);
 	}
 
-	if (cfg_old.max_conn != cfg->max_conn)
+	if (cfg_old.max_open != cfg->max_open)
 	{
 		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "update settings set value_int=%d where name='"
-				ZBX_SETTINGS_DBPOOL_MAX_CONN "';\n", cfg->max_conn);
+				ZBX_SETTINGS_DBPOOL_MAX_OPEN "';\n", cfg->max_open);
 	}
 
 	if (cfg_old.idle_timeout != cfg->idle_timeout)

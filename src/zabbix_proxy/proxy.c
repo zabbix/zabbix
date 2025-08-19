@@ -122,7 +122,7 @@ static const char	*help_message[] = {
 	"                                 Set the idle timeout for connections in the database pool",
 	"      " ZBX_DBPOOL_SET_MAX_IDLE "=num    Set the maximum number of idle connections retained in",
 	"      "      "                           the database pool",
-	"      " ZBX_DBPOOL_SET_MAX_CONN "=num    Set the maximum number of open connections in the database pool",
+	"      " ZBX_DBPOOL_SET_MAX_OPEN "=num    Set the maximum number of open connections in the database pool",
 	"",
 	"      Log level control targets:",
 	"        process-type             All processes of specified type",

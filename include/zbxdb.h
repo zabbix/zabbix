@@ -454,7 +454,7 @@ typedef struct zbx_dbconn_pool zbx_dbconn_pool_t;
 
 typedef struct
 {
-	int	max_conn;
+	int	max_open;
 	int	max_idle;
 	int	idle_timeout;
 }
@@ -542,7 +542,7 @@ void	zbx_db_large_query_append_sql(zbx_db_large_query_t *query, const char *sql)
 #define ZBX_SETTING_TYPE_MAX			7
 
 #define DBPOOL_MINIMUM_MAX_IDLE	0
-#define DBPOOL_MINIMUM_MAX_CONN	1
+#define DBPOOL_MINIMUM_MAX_OPEN	1
 
 #define DBPOOL_MINIMUM_IDLE_TIMEOUT	SEC_PER_MIN
 #define DBPOOL_MAXIMUM_IDLE_TIMEOUT	SEC_PER_DAY

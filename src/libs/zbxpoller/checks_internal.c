@@ -1090,7 +1090,7 @@ int	get_value_internal(const zbx_dc_item_t *item, AGENT_RESULT *result, const zb
 		zbx_json_adddouble(&j, ZBX_PROTO_TAG_WAIT_TIME, stats.time_wait);
 		zbx_json_adddouble(&j, ZBX_PROTO_TAG_IDLE_TIME, stats.time_idle);
 		zbx_json_adduint64(&j, ZBX_PROTO_TAG_CONN_PROVIDED, stats.provided_num);
-		zbx_json_addint64(&j, ZBX_PROTO_TAG_MAX_CONN, config.max_conn);
+		zbx_json_addint64(&j, ZBX_PROTO_TAG_MAX_OPEN, config.max_open);
 		zbx_json_addint64(&j, ZBX_PROTO_TAG_MAX_IDLE, config.max_idle);
 		zbx_json_addint64(&j, ZBX_PROTO_TAG_IDLE_TIMEOUT, config.idle_timeout);
 

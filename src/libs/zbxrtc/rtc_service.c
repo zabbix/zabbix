@@ -293,7 +293,7 @@ static void	rtc_process_db_status(char **result)
 	zbx_strlog_alloc(LOG_LEVEL_INFORMATION, result, &result_alloc, &result_offset,
 			"  maximum idle connection limit: %d", cfg.max_idle);
 	zbx_strlog_alloc(LOG_LEVEL_INFORMATION, result, &result_alloc, &result_offset,
-			"  maximum connection limit: %d", cfg.max_conn);
+			"  maximum connection limit: %d", cfg.max_open);
 	zbx_strlog_alloc(LOG_LEVEL_INFORMATION, result, &result_alloc, &result_offset,
 			"              idle timeout: %d", cfg.idle_timeout);
 
@@ -332,10 +332,10 @@ static int	rtc_db_set_max_idle(const char *data, int *limit, char **error)
 
 	zbx_dbconn_pool_get_config(&cfg);
 
-	if (cfg.max_conn < *limit)
+	if (cfg.max_open < *limit)
 	{
 		*error = zbx_dsprintf(NULL, "maximum idle connection limit %d cannot be higher than maximum connection"
-				" limit %d", *limit, cfg.max_conn);
+				" limit %d", *limit, cfg.max_open);
 		return FAIL;
 	}
 
@@ -386,14 +386,14 @@ static void	rtc_process_db_set_max_idle(const char *data, char **result)
  *             result - [OUT] runtime control result                          *
  *                                                                            *
  ******************************************************************************/
-static int	rtc_db_set_max_conn(const char *data, int *limit, char **error)
+static int	rtc_db_set_max_open(const char *data, int *limit, char **error)
 {
 	struct zbx_json_parse		jp;
 	char				buf[MAX_STRING_LEN];
 	zbx_dbconn_pool_config_t	cfg;
 
 	if (FAIL == zbx_json_open(data, &jp) ||
-			SUCCEED != zbx_json_value_by_name(&jp, ZBX_PROTO_TAG_MAX_CONN, buf, sizeof(buf), NULL) ||
+			SUCCEED != zbx_json_value_by_name(&jp, ZBX_PROTO_TAG_MAX_OPEN, buf, sizeof(buf), NULL) ||
 			SUCCEED != zbx_is_int(buf, limit))
 	{
 		*error = zbx_dsprintf(NULL, "invalid parameters \"%s\"", data);
@@ -404,18 +404,19 @@ static int	rtc_db_set_max_conn(const char *data, int *limit, char **error)
 
 	if (cfg.max_idle > *limit)
 	{
-		*error = zbx_dsprintf(NULL, "maximum connection limit %d cannot be lower than maximum idle connection"
-				" limit %d", *limit, cfg.max_idle);
+		*error = zbx_dsprintf(NULL, "maximum open connection limit %d cannot be lower than maximum idle"
+				" connection limit %d", *limit, cfg.max_idle);
 		return FAIL;
 	}
 
-	if (DBPOOL_MINIMUM_MAX_CONN > *limit)
+	if (DBPOOL_MINIMUM_MAX_OPEN > *limit)
 	{
-		*error = zbx_dsprintf(NULL, "maximum connection limit must be at least %d", DBPOOL_MINIMUM_MAX_CONN);
+		*error = zbx_dsprintf(NULL, "maximum open connection limit must be at least %d",
+				DBPOOL_MINIMUM_MAX_OPEN);
 		return FAIL;
 	}
 
-	cfg.max_conn = *limit;
+	cfg.max_open = *limit;
 
 	return zbx_dbconn_pool_flush_config(&cfg, error);
 }
@@ -428,22 +429,22 @@ static int	rtc_db_set_max_conn(const char *data, int *limit, char **error)
  *             result - [OUT] the runtime control result                      *
  *                                                                            *
  ******************************************************************************/
-static void	rtc_process_db_set_max_conn(const char *data, char **result)
+static void	rtc_process_db_set_max_open(const char *data, char **result)
 {
 	size_t	result_alloc = 0, result_offset = 0;
 	char	*error = NULL;
 	int	limit;
 
-	if (SUCCEED != rtc_db_set_max_conn(data, &limit, &error))
+	if (SUCCEED != rtc_db_set_max_open(data, &limit, &error))
 	{
 		zbx_strlog_alloc(LOG_LEVEL_ERR, result, &result_alloc, &result_offset,
-				"cannot set maximum database connection limit: %s", error);
+				"cannot set maximum open connection limit: %s", error);
 		zbx_free(error);
 		return;
 	}
 
 	zbx_strlog_alloc(LOG_LEVEL_INFORMATION, result, &result_alloc, &result_offset,
-			"updated maximum database connection limit to %d", limit);
+			"updated maximum open connection limit to %d", limit);
 }
 
 /******************************************************************************
@@ -786,8 +787,8 @@ static void	rtc_process_request(zbx_rtc_t *rtc, zbx_uint32_t code, const unsigne
 		case ZBX_RTC_DBPOOL_SET_MAX_IDLE:
 			rtc_process_db_set_max_idle((const char *)data, result);
 			return;
-		case ZBX_RTC_DBPOOL_SET_MAX_CONN:
-			rtc_process_db_set_max_conn((const char *)data, result);
+		case ZBX_RTC_DBPOOL_SET_MAX_OPEN:
+			rtc_process_db_set_max_open((const char *)data, result);
 			return;
 		case ZBX_RTC_DBPOOL_SET_IDLE_TIMEOUT:
 			rtc_process_db_set_idle_timeout((const char *)data, result);

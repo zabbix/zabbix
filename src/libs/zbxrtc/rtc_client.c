@@ -269,9 +269,9 @@ int	zbx_rtc_parse_options(const char *opt, zbx_uint32_t *code, struct zbx_json *
 		return SUCCEED;
 	}
 
-	if (0 == strncmp(opt, ZBX_DBPOOL_SET_MAX_CONN, ZBX_CONST_STRLEN(ZBX_DBPOOL_SET_MAX_CONN)))
+	if (0 == strncmp(opt, ZBX_DBPOOL_SET_MAX_OPEN, ZBX_CONST_STRLEN(ZBX_DBPOOL_SET_MAX_OPEN)))
 	{
-		const char	*param = opt + ZBX_CONST_STRLEN(ZBX_DBPOOL_SET_MAX_CONN);
+		const char	*param = opt + ZBX_CONST_STRLEN(ZBX_DBPOOL_SET_MAX_OPEN);
 		zbx_uint64_t	limit;
 
 		if ('=' != *param || FAIL == zbx_is_uint64(param + 1, &limit))
@@ -280,9 +280,9 @@ int	zbx_rtc_parse_options(const char *opt, zbx_uint32_t *code, struct zbx_json *
 			return FAIL;
 		}
 
-		zbx_json_adduint64(j, ZBX_PROTO_TAG_MAX_CONN, limit);
+		zbx_json_adduint64(j, ZBX_PROTO_TAG_MAX_OPEN, limit);
 
-		*code = ZBX_RTC_DBPOOL_SET_MAX_CONN;
+		*code = ZBX_RTC_DBPOOL_SET_MAX_OPEN;
 		return SUCCEED;
 	}
 

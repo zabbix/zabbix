@@ -28,7 +28,7 @@
 #define DBPOOL_HOUSEKEEP_INTERVAL	60
 
 #define DBPOOL_DEFAULT_MAX_IDLE        10
-#define DBPOOL_DEFAULT_MAX_CONN        100
+#define DBPOOL_DEFAULT_MAX_OPEN        100
 #define DBPOOL_DEFAULT_IDLE_TIMEOUT     (SEC_PER_HOUR)
 
 struct zbx_dbconn_pool
@@ -133,54 +133,54 @@ static void	dbconn_pool_remove_connection(zbx_dbconn_pool_t *pool, zbx_dbconn_t 
  ******************************************************************************/
 static void	dbconn_pool_apply_config(zbx_dbconn_pool_t *pool, zbx_dbconn_pool_config_t *config)
 {
-	int	old_limit = pool->cfg.max_conn;
+	int	old_limit = pool->cfg.max_open;
 
-	pool->cfg.max_conn = config->max_conn;
+	pool->cfg.max_open = config->max_open;
 	pool->cfg.max_idle = config->max_idle;
 	pool->cfg.idle_timeout = config->idle_timeout;
 
 	if (DBPOOL_MINIMUM_MAX_IDLE > pool->cfg.max_idle)
 		pool->cfg.max_idle = DBPOOL_MINIMUM_MAX_IDLE;
 
-	if (DBPOOL_MINIMUM_MAX_CONN > pool->cfg.max_conn)
-		pool->cfg.max_conn = DBPOOL_MINIMUM_MAX_CONN;
-	else if (pool->cfg.max_idle > pool->cfg.max_conn)
-		pool->cfg.max_conn = pool->cfg.max_idle;
+	if (DBPOOL_MINIMUM_MAX_OPEN > pool->cfg.max_open)
+		pool->cfg.max_open = DBPOOL_MINIMUM_MAX_OPEN;
+	else if (pool->cfg.max_idle > pool->cfg.max_open)
+		pool->cfg.max_open = pool->cfg.max_idle;
 
 	if (DBPOOL_MINIMUM_IDLE_TIMEOUT > pool->cfg.idle_timeout)
 		pool->cfg.idle_timeout = DBPOOL_MINIMUM_IDLE_TIMEOUT;
 	else if (pool->cfg.idle_timeout > DBPOOL_MAXIMUM_IDLE_TIMEOUT)
 		pool->cfg.idle_timeout = DBPOOL_MAXIMUM_IDLE_TIMEOUT;
 
-	if (pool->cfg.max_conn == pool->conns.values_num)
+	if (pool->cfg.max_open == pool->conns.values_num)
 		return;
 
-	if (pool->cfg.max_conn > pool->conns.values_num)
+	if (pool->cfg.max_open > pool->conns.values_num)
 	{
 		double	now;
 
-		zbx_vector_dbconn_ptr_reserve(&pool->conns, (size_t)pool->cfg.max_conn);
+		zbx_vector_dbconn_ptr_reserve(&pool->conns, (size_t)pool->cfg.max_open);
 		now = zbx_time();
 
-		for (int i = pool->conns.values_num; i < pool->cfg.max_conn; i++)
+		for (int i = pool->conns.values_num; i < pool->cfg.max_open; i++)
 			dbconn_pool_create_connection(pool, now);
 
 		zabbix_log(LOG_LEVEL_DEBUG, "extended database pool limit from %d to %d",
-				old_limit, pool->cfg.max_conn);
+				old_limit, pool->cfg.max_open);
 
 		return;
 	}
 
 	int	removed_num = 0;
 
-	while (0 < pool->available.values_num && pool->conns.values_num > pool->cfg.max_conn)
+	while (0 < pool->available.values_num && pool->conns.values_num > pool->cfg.max_open)
 	{
 		dbconn_pool_remove_connection(pool, pool->available.values[pool->available.values_num - 1]);
 		removed_num++;
 	}
 
 	zabbix_log(LOG_LEVEL_DEBUG, "reduced database pool limit from %d to %d and removed %d connections",
-			old_limit, pool->cfg.max_conn, removed_num);
+			old_limit, pool->cfg.max_open, removed_num);
 
 }
 
@@ -279,21 +279,21 @@ static int	dbconn_pool_sync_settings(zbx_dbconn_pool_config_t *cfg, char **error
 	result = zbx_dbconn_select(db, "select name,value_int from settings where name like '%s%%'", pattern);
 	zbx_free(pattern);
 
-	cfg->max_idle = cfg->max_conn = cfg->idle_timeout = -1;
+	cfg->max_idle = cfg->max_open = cfg->idle_timeout = -1;
 
 	while (NULL != (row = zbx_db_fetch(result)))
 	{
 		if (0 == strcmp(row[0], ZBX_SETTINGS_DBPOOL_MAX_IDLE))
 			cfg->max_idle = atoi(row[1]);
-		else if (0 == strcmp(row[0], ZBX_SETTINGS_DBPOOL_MAX_CONN))
-			cfg->max_conn = atoi(row[1]);
+		else if (0 == strcmp(row[0], ZBX_SETTINGS_DBPOOL_MAX_OPEN))
+			cfg->max_open = atoi(row[1]);
 		else if (0 == strcmp(row[0], ZBX_SETTINGS_DBPOOL_IDLE_TIMEOUT))
 			cfg->idle_timeout = atoi(row[1]);
 	}
 	zbx_db_free_result(result);
 
 	/* write default settings to database if not set */
-	if (-1 == cfg->max_idle || -1 == cfg->max_conn || -1 == cfg->idle_timeout)
+	if (-1 == cfg->max_idle || -1 == cfg->max_open || -1 == cfg->idle_timeout)
 	{
 		zbx_db_insert_t	db_insert;
 
@@ -306,11 +306,11 @@ static int	dbconn_pool_sync_settings(zbx_dbconn_pool_config_t *cfg, char **error
 					cfg->max_idle);
 		}
 
-		if (-1 == cfg->max_conn)
+		if (-1 == cfg->max_open)
 		{
-			cfg->max_conn = DBPOOL_DEFAULT_MAX_CONN;
-			zbx_db_insert_add_values(&db_insert, ZBX_SETTINGS_DBPOOL_MAX_CONN, ZBX_SETTING_TYPE_INT,
-					cfg->max_conn);
+			cfg->max_open = DBPOOL_DEFAULT_MAX_OPEN;
+			zbx_db_insert_add_values(&db_insert, ZBX_SETTINGS_DBPOOL_MAX_OPEN, ZBX_SETTING_TYPE_INT,
+					cfg->max_open);
 		}
 
 		if (-1 == cfg->idle_timeout)
@@ -462,7 +462,7 @@ void	zbx_dbconn_pool_release_connection(zbx_dbconn_pool_t *pool, zbx_dbconn_t *d
 
 	dbconn_pool_update_stats(pool, zbx_time(), 0.0, 0, db);
 
-	if (pool->conns.values_num <= pool->cfg.max_conn)
+	if (pool->conns.values_num <= pool->cfg.max_open)
 	{
 		zbx_vector_dbconn_ptr_append(&pool->available, db);
 		pthread_cond_broadcast(&pool->event);
