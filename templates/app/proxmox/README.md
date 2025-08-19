@@ -62,7 +62,7 @@ Please provide the necessary access levels for both the User and the Token:
 
 |Name|Description|Default|
 |----|-----------|-------|
-|{$PVE.URL.HOST}|<p>The hostname or IP address of the Proxmox VE API host.</p>|`<SET PVE HOST>`|
+|{$PVE.URL.HOST}|<p>The hostname or IP address of the Proxmox VE API host.</p>||
 |{$PVE.URL.PORT}|<p>The port number of the Proxmox VE API host.</p>|`8006`|
 |{$PVE.TOKEN.ID}|<p>API tokens allow stateless access to most parts of the REST API by another system, software or API client.</p>|`USER@REALM!TOKENID`|
 |{$PVE.TOKEN.SECRET}|<p>Secret key.</p>||

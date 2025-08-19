@@ -100,7 +100,7 @@ zabbix_export:
         3. Set the hostname or IP address of the Proxmox API VE host in the `Proxmox VE Host`. You can also change the API port in the `Proxmox VE Port` if necessary.
       vendor:
         name: Zabbix
-        version: 8.0-1
+        version: 8.0-2
       groups:
         - name: Templates/Applications
       items:
@@ -128,7 +128,7 @@ zabbix_export:
           type: DEPENDENT
           key: proxmox_ve.cluster.cpu.utilization
           value_type: FLOAT
-          units: '!%'
+          units: '%'
           description: 'Retrieves the CPU utilization percentage for the Proxmox VE cluster.'
           preprocessing:
             - type: JSONPATH
@@ -223,7 +223,7 @@ zabbix_export:
           type: DEPENDENT
           key: proxmox_ve.cluster.memory.utilization
           value_type: FLOAT
-          units: '!%'
+          units: '%'
           description: 'Retrieves the memory utilization percentage for the Proxmox VE cluster.'
           preprocessing:
             - type: JSONPATH
@@ -594,7 +594,7 @@ zabbix_export:
           type: DEPENDENT
           key: proxmox_ve.cluster.storage.utilization
           value_type: FLOAT
-          units: '!%'
+          units: '%'
           description: 'Retrieves the storage utilization percentage for the Proxmox VE cluster.'
           preprocessing:
             - type: JSONPATH
@@ -1163,7 +1163,7 @@ zabbix_export:
               type: DEPENDENT
               key: 'proxmox_ve.node.lxc.cpu[{#NODE.ID},{#LXC.VMID}]'
               value_type: FLOAT
-              units: '!%'
+              units: '%'
               description: 'Retrieves the CPU utilization of the LXC container {#LXC.NAME} on the node {#NODE.NAME}.'
               preprocessing:
                 - type: JSONPATH
@@ -1285,7 +1285,7 @@ zabbix_export:
               type: CALCULATED
               key: 'proxmox_ve.node.lxc.disk.utilization[{#NODE.ID},{#LXC.VMID}]'
               value_type: FLOAT
-              units: '!%'
+              units: '%'
               params: 'last(//proxmox_ve.node.lxc.disk.usage[{#NODE.ID},{#LXC.VMID}]) / last(//proxmox_ve.node.lxc.disk.maxdisk[{#NODE.ID},{#LXC.VMID}]) * 100'
               description: 'Retrieves disk utilization of the LXC container {#LXC.NAME} on the node {#NODE.NAME}.'
               preprocessing:
@@ -1426,7 +1426,7 @@ zabbix_export:
               type: CALCULATED
               key: 'proxmox_ve.node.lxc.memory.utilization[{#NODE.ID},{#LXC.VMID}]'
               value_type: FLOAT
-              units: '!%'
+              units: '%'
               params: 'last(//proxmox_ve.node.lxc.memory.usage[{#NODE.ID},{#LXC.VMID}]) / last(//proxmox_ve.node.lxc.memory.max[{#NODE.ID},{#LXC.VMID}]) * 100'
               description: 'Retrieves memory utilization of the LXC container {#LXC.NAME} on the node {#NODE.NAME}.'
               preprocessing:
@@ -1910,7 +1910,7 @@ zabbix_export:
               type: DEPENDENT
               key: 'proxmox_ve.node.qemu.cpu.usage[{#NODE.ID},{#QEMU.VMID}]'
               value_type: FLOAT
-              units: '!%'
+              units: '%'
               description: 'Retrieves the QEMU CPU utilization for the virtual machine {#QEMU.NAME} on the node {#NODE.NAME}.'
               preprocessing:
                 - type: JSONPATH
@@ -2060,7 +2060,7 @@ zabbix_export:
               type: CALCULATED
               key: 'proxmox_ve.node.qemu.memory.utilization[{#NODE.ID},{#QEMU.VMID}]'
               value_type: FLOAT
-              units: '!%'
+              units: '%'
               params: 'last(//proxmox_ve.node.qemu.memory.usage[{#NODE.ID},{#QEMU.VMID}]) / last(//proxmox_ve.node.qemu.memory.maxmem[{#NODE.ID},{#QEMU.VMID}]) * 100'
               description: 'Retrieves memory utilization of the QEMU virtual machine {#QEMU.NAME} on the node {#NODE.NAME}.'
               preprocessing:
@@ -2532,7 +2532,7 @@ zabbix_export:
               type: CALCULATED
               key: 'proxmox_ve.node.qemu.filesystem.utilization[{#NODE.ID},{#QEMU.VMID},{#QEMU.FS.MOUNTPOINT}]'
               value_type: FLOAT
-              units: '!%'
+              units: '%'
               params: 'last(//proxmox_ve.node.qemu.filesystem.usage[{#NODE.ID},{#QEMU.VMID},{#QEMU.FS.MOUNTPOINT}]) / last(//proxmox_ve.node.qemu.filesystem.total[{#NODE.ID},{#QEMU.VMID},{#QEMU.FS.MOUNTPOINT}]) * 100'
               description: 'Retrieves filesystem utilization of the QEMU virtual machine {#QEMU.NAME} on the node {#NODE.NAME}.'
               preprocessing:
@@ -3486,7 +3486,7 @@ zabbix_export:
               type: DEPENDENT
               key: 'proxmox_ve.node.cpu[{#NODE.ID}]'
               value_type: FLOAT
-              units: '!%'
+              units: '%'
               description: 'Retrieves the CPU utilization of the node {#NODE.NAME}.'
               preprocessing:
                 - type: JSONPATH
@@ -3521,7 +3521,7 @@ zabbix_export:
               type: CALCULATED
               key: 'proxmox_ve.node.disk.utilization[{#NODE.ID}]'
               value_type: FLOAT
-              units: '!%'
+              units: '%'
               params: 'last(//proxmox_ve.node.disk[{#NODE.ID}]) / last(//proxmox_ve.node.maxdisk[{#NODE.ID}]) * 100'
               description: 'Retrieves the disk utilization percentage for the node {#NODE.NAME}.'
               preprocessing:
@@ -3745,7 +3745,7 @@ zabbix_export:
               type: CALCULATED
               key: 'proxmox_ve.node.mem.utilization[{#NODE.ID}]'
               value_type: FLOAT
-              units: '!%'
+              units: '%'
               params: 'last(//proxmox_ve.node.mem[{#NODE.ID}]) / last(//proxmox_ve.node.maxmem[{#NODE.ID}]) * 100'
               description: 'Retrieves the memory utilization percentage for the node {#NODE.NAME}.'
               preprocessing:
@@ -4312,7 +4312,7 @@ zabbix_export:
               type: CALCULATED
               key: 'proxmox_ve.storage.utilization[{#STORAGE.NAME}]'
               value_type: FLOAT
-              units: '!%'
+              units: '%'
               params: 'last(//proxmox_ve.storage.used[{#STORAGE.NAME}]) / last(//proxmox_ve.storage.total[{#STORAGE.NAME}]) * 100'
               description: 'Retrieves the storage utilization percentage for shared storage {#STORAGE.NAME}.'
               preprocessing:
@@ -4899,7 +4899,6 @@ zabbix_export:
             description: 'If the node uptime is less than this value, a trigger will be activated..'
             regex: '.*'
         - macro: '{$PVE.URL.HOST}'
-          value: '<SET PVE HOST>'
           description: 'The hostname or IP address of the Proxmox VE API host.'
           config:
             type: TEXT
