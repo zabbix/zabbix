@@ -32,19 +32,21 @@ foreach ($data['preprocessing'] as $step) {
 $formgrid = (new CFormGrid())
 	->setId('item_preproc_list')
 	->addItem([
-		new CLabel([
+		(new CLabel([
 			_('Preprocessing steps'),
 			makeHelpIcon([
 				_('Preprocessing is a transformation before saving the value to the database. It is possible to define a sequence of preprocessing steps, and those are executed in the order they are set.'),
 				BR(), BR(),
 				_('However, if "Check for not supported value" steps are configured, they are always placed and executed first (with "any error" being the last of them).')
 			])
-		]),
+		]))
+			->addStyle('max-width: 115px; white-space: normal;'),
 		new CFormField(getItemPreprocessing($preprocessing, $data['readonly'], $data['preprocessing_types']))
 	])
 	->addItem([
 		(new CLabel(_('Type of information'), 'label-value-type-steps'))
-			->addClass('js-item-preprocessing-type'),
+			->addClass('js-item-preprocessing-type')
+			->addStyle('max-width: 115px; white-space: normal;'),
 		(new CFormField((new CSelect('value_type_steps'))
 			->setFocusableElementId('label-value-type-steps')
 			->setValue($data['item']['value_type'])

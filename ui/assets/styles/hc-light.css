@@ -8212,6 +8212,9 @@ svg {
   cursor: unset;
   color: #cccccc; }
 
+#processing-tab {
+  margin: 0 -10px; }
+
 .preprocessing-list {
   display: block;
   max-width: 998px;

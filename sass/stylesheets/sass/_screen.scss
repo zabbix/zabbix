@@ -3215,6 +3215,10 @@ svg {
 	color: $btn-icon-disabled-color;
 }
 
+#processing-tab {
+	margin: 0 -10px;
+}
+
 .preprocessing-list {
 	$drag-icon: 10px;
 	$name-width: 205px;
