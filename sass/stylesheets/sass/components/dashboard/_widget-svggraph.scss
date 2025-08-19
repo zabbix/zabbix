@@ -1,7 +1,7 @@
 // Widget configuration.
 
 form.dashboard-widget-svggraph {
-	max-width: 1330px;
+	max-width: 1420px;
 	min-width: 1120px;
 	width: 100vw;
 
@@ -90,7 +90,7 @@ form.dashboard-widget-svggraph {
 	.list-accordion-item {
 		position: relative;
 		display: grid;
-		grid-template-columns: 5px 100px 24px 24px 1fr 0.9fr 24px;
+		grid-template-columns: 5px 100px 24px 24px 1fr 1fr 24px;
 		grid-gap: 10px;
 		align-items: start;
 		padding: 5px 0;
