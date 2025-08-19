@@ -27,8 +27,8 @@
 
 #define DBPOOL_HOUSEKEEP_INTERVAL	60
 
-#define DBPOOL_DEFAULT_MIN_LIMIT        1
-#define DBPOOL_DEFAULT_MAX_LIMIT        100
+#define DBPOOL_DEFAULT_MAX_IDLE        10
+#define DBPOOL_DEFAULT_MAX_CONN        100
 #define DBPOOL_DEFAULT_IDLE_TIMEOUT     (SEC_PER_HOUR)
 
 struct zbx_dbconn_pool
@@ -301,14 +301,14 @@ static int	dbconn_pool_sync_settings(zbx_dbconn_pool_config_t *cfg, char **error
 
 		if (-1 == cfg->max_idle)
 		{
-			cfg->max_idle = DBPOOL_DEFAULT_MIN_LIMIT;
+			cfg->max_idle = DBPOOL_DEFAULT_MAX_IDLE;
 			zbx_db_insert_add_values(&db_insert, ZBX_SETTINGS_DBPOOL_MAX_IDLE, ZBX_SETTING_TYPE_INT,
 					cfg->max_idle);
 		}
 
 		if (-1 == cfg->max_conn)
 		{
-			cfg->max_conn = DBPOOL_DEFAULT_MAX_LIMIT;
+			cfg->max_conn = DBPOOL_DEFAULT_MAX_CONN;
 			zbx_db_insert_add_values(&db_insert, ZBX_SETTINGS_DBPOOL_MAX_CONN, ZBX_SETTING_TYPE_INT,
 					cfg->max_conn);
 		}
