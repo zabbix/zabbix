@@ -632,7 +632,7 @@
 				'placeholder': ms.options.placeholder,
 				'aria-label': ($label.length ? $label.text() + '. ' : '') + ms.options.placeholder,
 				'aria-required': ms.options.required_str,
-				'maxlength': ms.options.maxlength ? ms.options.maxlength : null
+				'maxlength': ms.options.maxlength
 			})
 				.on('keyup', function(e) {
 					switch (e.which) {
