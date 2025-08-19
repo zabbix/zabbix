@@ -1,1 +1,1 @@
-..F....... [ZBX-26459] fixed in host macros view to not display both macro types when quickly switching them (rgontarski)
+..F....... [ZBX-26459] fixed host macros view to avoid displaying both macro types when switching quickly (gberzina)
