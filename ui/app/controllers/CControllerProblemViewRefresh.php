@@ -19,10 +19,6 @@
  */
 class CControllerProblemViewRefresh extends CControllerProblemView {
 
-	protected function init(): void {
-		$this->disableCsrfValidation();
-	}
-
 	protected function checkInput(): bool {
 		$fields = [
 			'action' =>					'string',
@@ -65,10 +61,6 @@ class CControllerProblemViewRefresh extends CControllerProblemView {
 		}
 
 		return $ret;
-	}
-
-	protected function checkPermissions(): bool {
-		return $this->getUserType() >= USER_TYPE_ZABBIX_USER;
 	}
 
 	protected function doAction(): void {

@@ -579,17 +579,19 @@ static void	lld_hosts_get(zbx_uint64_t parent_hostid, zbx_vector_lld_host_ptr_t 
 		zbx_uint64_t proxyid, zbx_uint64_t proxy_groupid, signed char ipmi_authtype,
 		unsigned char ipmi_privilege, const char *ipmi_username, const char *ipmi_password,
 		unsigned char tls_connect, unsigned char tls_accept, const char *tls_issuer, const char *tls_subject,
-		const char *tls_psk_identity, const char *tls_psk)
+		const char *tls_psk_identity, const char *tls_psk, const zbx_vector_uint64_t *ruleids)
 {
 	zbx_db_result_t		result;
 	zbx_db_row_t		row;
 	zbx_lld_host_t		*host;
 	zbx_uint64_t		db_proxyid, db_proxy_groupid;
 	unsigned char		db_monitored_by;
+	char			*sql = NULL;
+	size_t			sql_alloc = 0, sql_offset = 0;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
-	result = zbx_db_select(
+	zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
 			"select hd.hostid,hd.host,hd.lastcheck,hd.ts_delete,h.host,h.name,h.proxyid,"
 				"h.ipmi_authtype,h.ipmi_privilege,h.ipmi_username,h.ipmi_password,hi.inventory_mode,"
 				"h.tls_connect,h.tls_accept,h.tls_issuer,h.tls_subject,h.tls_psk_identity,h.tls_psk,"
@@ -604,6 +606,16 @@ static void	lld_hosts_get(zbx_uint64_t parent_hostid, zbx_vector_lld_host_ptr_t 
 					" on hd.hostid=hi.hostid"
 			" where hd.parent_hostid=" ZBX_FS_UI64,
 			parent_hostid);
+
+	if (NULL != ruleids)
+	{
+		zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, " and");
+		zbx_db_add_condition_alloc(&sql, &sql_alloc, &sql_offset, "hd.lldruleid", ruleids->values,
+				ruleids->values_num);
+	}
+
+	result = zbx_db_select("%s", sql);
+	zbx_free(sql);
 
 	while (NULL != (row = zbx_db_fetch(result)))
 	{
@@ -6202,22 +6214,34 @@ static void	lld_group_prototype_prototypes_get(zbx_uint64_t parent_hostid, zbx_s
  *             hosts         - [IN/OUT] vector of discovered hosts            *
  *                                                                            *
  ******************************************************************************/
-static void	lld_host_group_prototypes_get(zbx_uint64_t parent_hostid, zbx_vector_lld_host_ptr_t *hosts)
+static void	lld_host_group_prototypes_get(zbx_uint64_t parent_hostid, const zbx_vector_uint64_t *ruleids,
+		zbx_vector_lld_host_ptr_t *hosts)
 {
-	zbx_db_result_t		result;
-	zbx_db_row_t		row;
+	zbx_db_result_t	result;
+	zbx_db_row_t	row;
+	char		*sql = NULL;
+	size_t		sql_alloc = 0, sql_offset = 0;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
 	zbx_vector_lld_host_ptr_sort(hosts, lld_host_compare_func);
 
-	result = zbx_db_select(
-			"select gp.group_prototypeid,gp.hostid,gp.name,gp.groupid"
+	zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "select gp.group_prototypeid,gp.hostid,gp.name,gp.groupid"
 			" from host_discovery hd"
 				" join group_prototype gp"
 				" on hd.hostid=gp.hostid"
 			" where hd.parent_hostid=" ZBX_FS_UI64,
 			parent_hostid);
+
+	if (NULL != ruleids)
+	{
+		zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, " and");
+		zbx_db_add_condition_alloc(&sql, &sql_alloc, &sql_offset, "hd.lldruleid", ruleids->values,
+				ruleids->values_num);
+	}
+
+	result = zbx_db_select("%s", sql);
+	zbx_free(sql);
 
 	while (NULL != (row = zbx_db_fetch(result)))
 	{
@@ -6422,7 +6446,7 @@ static void	lld_host_process_nested_lld_rules(const zbx_vector_lld_host_ptr_t *h
 
 		ZBX_STR2UINT64(itemid, row[1]);
 
-		lld_rule_process_nested_rule(host_local.hostid, itemid, hosts->values[index]->lld_row);
+		lld_rule_process_nested_rule(itemid, hosts->values[index]->lld_row);
 	}
 	zbx_db_free_result(result);
 out:
@@ -6439,7 +6463,7 @@ out:
  ******************************************************************************/
 void	lld_update_hosts(zbx_uint64_t lld_ruleid, const zbx_vector_lld_row_ptr_t *lld_rows, char **error,
 		const zbx_lld_lifetime_t *lifetime, const zbx_lld_lifetime_t *enabled_lifetime, int lastcheck,
-		int dflags, zbx_hashset_t *rule_index)
+		int dflags, zbx_hashset_t *rule_index, const zbx_vector_uint64_t *ruleids)
 {
 	zbx_db_result_t				result;
 	zbx_db_row_t				row;
@@ -6555,7 +6579,7 @@ void	lld_update_hosts(zbx_uint64_t lld_ruleid, const zbx_vector_lld_row_ptr_t *l
 
 		lld_hosts_get(parent_hostid, &hosts, monitored_by, proxyid, proxy_groupid, ipmi_authtype, ipmi_privilege,
 				ipmi_username, ipmi_password, tls_connect, tls_accept, tls_issuer, tls_subject,
-				tls_psk_identity, tls_psk);
+				tls_psk_identity, tls_psk, ruleids);
 
 		if (0 != hosts.values_num)
 		{
@@ -6576,7 +6600,7 @@ void	lld_update_hosts(zbx_uint64_t lld_ruleid, const zbx_vector_lld_row_ptr_t *l
 			zbx_sync_rowset_init(&group_proto_prototypes, LLD_GROUP_PROTOTYPE_COLS_NUM);
 
 			lld_group_prototype_prototypes_get(parent_hostid, &group_proto_prototypes);
-			lld_host_group_prototypes_get(parent_hostid, &hosts);
+			lld_host_group_prototypes_get(parent_hostid, ruleids, &hosts);
 		}
 
 		lld_hostmacros_get(parent_hostid, &masterhostmacros, &hostmacros);
