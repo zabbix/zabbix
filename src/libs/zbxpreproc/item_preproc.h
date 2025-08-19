@@ -43,8 +43,9 @@ int	item_preproc_throttle_value(zbx_variant_t *value, const zbx_timespec_t *ts,
 int	item_preproc_throttle_timed_value(zbx_variant_t *value, const zbx_timespec_t *ts, const char *params,
 		const zbx_variant_t *history_value_last, zbx_variant_t *history_value, zbx_timespec_t *history_ts,
 		char **errmsg);
-int	item_preproc_script(zbx_es_t *es, zbx_variant_t *value, const char *params, const zbx_variant_t *bytecode_last,
-		zbx_variant_t *bytecode, const char *config_source_ip, char **errmsg);
+int	item_preproc_script(zbx_es_t *es, zbx_variant_t *value, const char *params, int user_macros,
+		const zbx_variant_t *bytecode_in, zbx_variant_t *bytecode_out, const char *config_source_ip,
+		char **errmsg);
 int	item_preproc_csv_to_json(zbx_variant_t *value, const char *params, char **errmsg);
 int	item_preproc_xml_to_json(zbx_variant_t *value, char **errmsg);
 int	item_preproc_str_replace(zbx_variant_t *value, const char *params, char **errmsg);

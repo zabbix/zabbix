@@ -2134,8 +2134,6 @@ zabbix_export:
         
         For more information about managing access keys, see [official documentation](https://docs.aws.amazon.com/general/latest/gr/aws-sec-cred-types.html#access-keys-and-secret-access-keys).
         
-        Refer to the Macros section for a list of macros used for LLD filters.
-        
         Additional information about the metrics and used API methods:
         * [Full metrics list related to EBS](https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/using_cloudwatch_ebs.html)
         * [Full metrics list related to EC2](https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/viewing_metrics_with_cloudwatch.html)
@@ -2151,7 +2149,7 @@ zabbix_export:
         * [DescribeLoadBalancers API method](https://docs.aws.amazon.com/elasticloadbalancing/latest/APIReference/API_DescribeLoadBalancers.html)
       vendor:
         name: Zabbix
-        version: 8.0-2
+        version: 8.0-3
       groups:
         - name: Templates/Cloud
       discovery_rules:
@@ -5176,7 +5174,7 @@ zabbix_export:
         1. Create an IAM user with programmatic access.
         2. Attach the required policy to the IAM user.
         3. Generate an access key and secret key.
-        4. Use the generated credentials in the macros `Access key ID` and `Secret access key`.
+        4. Use the generated credentials in the host wizard configuration fields `Access key ID` and `Secret access key`.
         
         ### Assume Role Authorization
         For using assume role authorization, add the appropriate permissions to the role you are using:
@@ -5275,14 +5273,12 @@ zabbix_export:
         
         For more information about managing access keys, see the [official documentation](https://docs.aws.amazon.com/general/latest/gr/aws-sec-cred-types.html#access-keys-and-secret-access-keys).
         
-        Also, see the Macros section for a list of macros used in LLD filters.
-        
         Additional information about metrics and used API methods:
         
         * [Describe AWS Cost Explore API actions](https://docs.aws.amazon.com/aws-cost-management/latest/APIReference/API_Operations.html)
       vendor:
         name: Zabbix
-        version: 8.0-2
+        version: 8.0-3
       groups:
         - name: Templates/Cloud
       items:
@@ -6070,6 +6066,8 @@ zabbix_export:
           value: cloud
         - tag: target
           value: aws
+        - tag: target
+          value: cost
       macros:
         - macro: '{$AWS.ACCESS.KEY.ID}'
           description: 'Access key ID.'
@@ -6287,7 +6285,7 @@ zabbix_export:
         1. Create an IAM user with programmatic access.
         2. Attach the required policy to the IAM user.
         3. Generate an access key and secret key.
-        4. Use the generated credentials in the macros `Access key ID` and `Secret access key`.
+        4. Use the generated credentials in the host wizard configuration fields `Access key ID` and `Secret access key`.
         
         ### Assume Role Authorization
         For using assume role authorization, add the appropriate permissions to the role you are using:
@@ -6390,11 +6388,9 @@ zabbix_export:
         Set the following fields: `Authorization method`, `AWS Region`, `EC2 instance ID`.
         
         For more information about manage access keys, see [official documentation](https://docs.aws.amazon.com/general/latest/gr/aws-sec-cred-types.html#access-keys-and-secret-access-keys)
-        
-        Also, see the Macros section for a list of macros used for LLD filters.
       vendor:
         name: Zabbix
-        version: 8.0-1
+        version: 8.0-2
       groups:
         - name: Templates/Cloud
       items:
@@ -9354,7 +9350,7 @@ zabbix_export:
         1. Create an IAM user with programmatic access.
         2. Attach the required policy to the IAM user.
         3. Generate an access key and secret key.
-        4. Use the generated credentials in the macros `Access key ID` and `Secret access key`.
+        4. Use the generated credentials in the host wizard configuration fields `Access key ID` and `Secret access key`.
         
         ### Assume role authorization
         For using assume role authorization, add the appropriate permissions to the role you are using:
@@ -9451,14 +9447,12 @@ zabbix_export:
         
         **Note**: Using role-based authorization is only possible when you use a Zabbix server or proxy inside AWS.
         
-        Set the following macros `Authorization method`, `AWS Region`, `ECS cluster name`.
+        Set the following host wizard configuration fields `Authorization method`, `AWS Region`, `ECS cluster name`.
         
         For more information about managing access keys, see [official documentation](https://docs.aws.amazon.com/general/latest/gr/aws-sec-cred-types.html#access-keys-and-secret-access-keys)
-        
-        Refer to the Macros section for a list of macros used for LLD filters.
       vendor:
         name: Zabbix
-        version: 8.0-2
+        version: 8.0-3
       groups:
         - name: Templates/Cloud
       items:
@@ -11923,7 +11917,7 @@ zabbix_export:
         1. Create an IAM user with programmatic access.
         2. Attach the required policy to the IAM user.
         3. Generate an access key and secret key.
-        4. Use the generated credentials in the macros `Access key ID` and `Secret access key`.
+        4. Use the generated credentials in the host wizard configuration fields `Access key ID` and `Secret access key`.
         
         ### Assume role authorization
         For using assume role authorization, add the appropriate permissions to the role you are using:
@@ -12020,14 +12014,12 @@ zabbix_export:
         
         **Note**: Using role-based authorization is only possible when you use a Zabbix server or proxy inside AWS.
         
-        Set the following macros `Authorization method`, `AWS Region`, `ECS cluster name`.
+        Set the following host wizard configuration fields `Authorization method`, `AWS Region`, `ECS cluster name`.
         
         For more information about managing access keys, see [official documentation](https://docs.aws.amazon.com/general/latest/gr/aws-sec-cred-types.html#access-keys-and-secret-access-keys)
-        
-        Refer to the Macros section for a list of macros used for LLD filters.
       vendor:
         name: Zabbix
-        version: 8.0-2
+        version: 8.0-3
       groups:
         - name: Templates/Cloud
       items:
@@ -14646,7 +14638,7 @@ zabbix_export:
         1. Create an IAM user with programmatic access.
         2. Attach the required policy to the IAM user.
         3. Generate an access key and secret key.
-        4. Use the generated credentials in the macros `Access key ID` and `Secret access key`.
+        4. Use the generated credentials in the host wizard configuration fields `Access key ID` and `Secret access key`.
         
         ### Assume role authorization
         For using assume role authorization, add the appropriate permissions to the role you are using:
@@ -14747,11 +14739,9 @@ zabbix_export:
         Set the following fields: `Authorization method`, `AWS Region`, and `Load Balancer ARN`.
         
         For more information about managing access keys, see [official AWS documentation](https://docs.aws.amazon.com/general/latest/gr/aws-sec-cred-types.html#access-keys-and-secret-access-keys).
-        
-        See the section below for a list of macros used for LLD filters.
       vendor:
         name: Zabbix
-        version: 8.0-1
+        version: 8.0-2
       groups:
         - name: Templates/Cloud
       items:
@@ -17730,7 +17720,7 @@ zabbix_export:
         1. Create an IAM user with programmatic access.
         2. Attach the required policy to the IAM user.
         3. Generate an access key and secret key.
-        4. Use the generated credentials in the macros `Access key ID` and `Secret access key`.
+        4. Use the generated credentials in the host wizard configuration fields `Access key ID` and `Secret access key`.
         
         ### Assume role authorization
         For using assume role authorization, add the appropriate permissions to the role you are using:
@@ -17831,11 +17821,9 @@ zabbix_export:
         Set the following fields: `Authorization method`, `AWS Region`, and `Load Balancer ARN`.
         
         For more information about managing access keys, see [official AWS documentation](https://docs.aws.amazon.com/general/latest/gr/aws-sec-cred-types.html#access-keys-and-secret-access-keys).
-        
-        See the section below for a list of macros used for LLD filters.
       vendor:
         name: Zabbix
-        version: 8.0-1
+        version: 8.0-2
       groups:
         - name: Templates/Cloud
       items:
@@ -20428,7 +20416,7 @@ zabbix_export:
         1. Create an IAM user with programmatic access.
         2. Attach the required policy to the IAM user.
         3. Generate an access key and secret key.
-        4. Use the generated credentials in the macros `Access key ID` and `Secret access key`.
+        4. Use the generated credentials in the host wizard configuration fields `Access key ID` and `Secret access key`.
         
         ### Assume role authorization
         For using assume role authorization, add the appropriate permissions to the role you are using:
@@ -20526,11 +20514,9 @@ zabbix_export:
         Set the following fields: `Authorization method`, `AWS Region`, and `Lambda function ARN`.
         
         For more information about managing access keys, see the [official AWS documentation](https://docs.aws.amazon.com/general/latest/gr/aws-sec-cred-types.html#access-keys-and-secret-access-keys).
-        
-        See the section below for a list of macros used for LLD filters.
       vendor:
         name: Zabbix
-        version: 8.0-1
+        version: 8.0-2
       groups:
         - name: Templates/Cloud
       items:
@@ -21840,7 +21826,7 @@ zabbix_export:
         1. Create an IAM user with programmatic access.
         2. Attach the required policy to the IAM user.
         3. Generate an access key and secret key.
-        4. Use the generated credentials in the macros `Access key ID` and `Secret access key`.
+        4. Use the generated credentials in the host wizard configuration fields `Access key ID` and `Secret access key`.
         
         ### Assume Role Authorization
         For using assume role authorization, add the appropriate permissions to the role you are using:
@@ -21943,11 +21929,9 @@ zabbix_export:
         Set the following fields: `Authorization method`, `AWS Region`, `RDS DB Instance identifier`.
         
         For more information about manage access keys, see [official documentation](https://docs.aws.amazon.com/general/latest/gr/aws-sec-cred-types.html#access-keys-and-secret-access-keys)
-        
-        Also, see the Macros section for a list of macros used for LLD filters.
       vendor:
         name: Zabbix
-        version: 8.0-1
+        version: 8.0-2
       groups:
         - name: Templates/Cloud
       items:
@@ -25472,7 +25456,7 @@ zabbix_export:
         1. Create an IAM user with programmatic access.
         2. Attach the required policy to the IAM user.
         3. Generate an access key and secret key.
-        4. Use the generated credentials in the macros `Access key ID` and `Secret access key`.
+        4. Use the generated credentials in the host wizard configuration fields `Access key ID` and `Secret access key`.
         
         ### Assume role authorization
         For using assume role authorization, add the appropriate permissions to the role you are using:
@@ -25577,11 +25561,9 @@ zabbix_export:
         Set the following fields: `Authorization method`, `S3 bucket name`.
         
         For more information about manage access keys, see [official documentation](https://docs.aws.amazon.com/general/latest/gr/aws-sec-cred-types.html#access-keys-and-secret-access-keys)
-        
-        Also, see the Macros section for a list of macros used for LLD filters.
       vendor:
         name: Zabbix
-        version: 8.0-1
+        version: 8.0-2
       groups:
         - name: Templates/Cloud
       items:

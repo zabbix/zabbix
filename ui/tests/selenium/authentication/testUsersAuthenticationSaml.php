@@ -1173,7 +1173,7 @@ class testUsersAuthenticationSaml extends testFormAuthentication {
 			$this->page->waitUntilReady();
 			$this->query('id:username')->one()->waitUntilVisible()->fill($data['username']);
 			$this->query('id:password')->one()->waitUntilVisible()->fill('zabbix');
-			$this->query('button:Login')-> one()->click();
+			$this->query('button:Login')-> one()->click()->waitUntilStalled();
 		}
 
 		$this->page->waitUntilReady();
