@@ -1622,9 +1622,7 @@ int	zbx_db_vexecute(const char *fmt, va_list args)
 	}
 
 	if (OCI_SUCCESS != err)
-	{
 		ret = OCI_handle_sql_error((err == ORA_ERR_UNIQ_CONSTRAINT ? ERR_Z3008 : ERR_Z3005), err, sql);
-	}
 
 #elif defined(HAVE_POSTGRESQL)
 	result = PQexec(conn,sql);
