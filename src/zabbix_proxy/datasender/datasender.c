@@ -335,7 +335,7 @@ ZBX_THREAD_ENTRY(datasender_thread, args)
 			time_diff = time_now - time_start;
 		}
 		while (ZBX_PROXY_DATA_MORE == more && time_diff < SEC_PER_MIN && ZBX_IS_RUNNING());
-	
+
 		if (0 != new_tasks)
 		{
 			zbx_rtc_notify_generic(&rtc, ZBX_PROCESS_TYPE_TASKMANAGER, 1, ZBX_RTC_TASK_MANAGER_NOTIFY,

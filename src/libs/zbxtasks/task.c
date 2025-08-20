@@ -1189,7 +1189,7 @@ static int	zbx_tm_task_result_wait(zbx_uint64_t taskid, char **info)
 	zbx_db_row_t	row;
 	int		ret, time_start;
 	struct timespec	poll_delay = {0, 1e8};
-	
+
 	for (time_start = time(NULL); ZBX_DATA_TTL > time(NULL) - time_start; nanosleep(&poll_delay, NULL))
 	{
 		result = zbx_db_select("select status,info"
