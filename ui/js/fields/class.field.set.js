@@ -59,7 +59,7 @@ class CFieldSet extends CField {
 				|| observations.some(obs => obs.type === 'attributes' && obs.attributeName === 'data-skip-from-submit');
 
 			if (force_validate || !skip) {
-				this.#on_blur_debounce && clearTimeout(this.#on_blur_debounce);
+				clearTimeout(this.#on_blur_debounce);
 				this.#on_blur_debounce = setTimeout(() => this.onBlur(), 50);
 			}
 		});
