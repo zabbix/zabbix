@@ -350,18 +350,20 @@ ZBX_THREAD_ENTRY(datasender_thread, args)
 		{
 			zbx_uint32_t	rtc_cmd;
 			unsigned char	*rtc_data = NULL;
-
-			if (SUCCEED == zbx_rtc_wait(&rtc, info, &rtc_cmd, &rtc_data, ZBX_TASK_UPDATE_FREQUENCY) &&
-					0 != rtc_cmd)
+			int		sleeptime = ZBX_TASK_UPDATE_FREQUENCY;
+	
+			while (SUCCEED == zbx_rtc_wait(&rtc, info, &rtc_cmd, &rtc_data, sleeptime) && 0 != rtc_cmd)
 			{
-				task_timestamp = 0;
-				zbx_free(rtc_data);
-
-				if (ZBX_RTC_SHUTDOWN == rtc_cmd)
-					break;
+				switch (rtc_cmd)
+				{
+					case ZBX_RTC_SHUTDOWN:
+						zbx_set_exiting_with_succeed();
+						ZBX_FALLTHROUGH;
+					default:
+						break;
+				}
 			}
 		}
-
 	}
 
 	zbx_setproctitle("%s #%d [terminated]", get_process_type_string(process_type), process_num);
