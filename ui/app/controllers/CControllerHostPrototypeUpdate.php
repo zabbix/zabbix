@@ -158,7 +158,7 @@ class CControllerHostPrototypeUpdate extends CController {
 						'tag' => ['db host_tag.tag', 'required', 'not_empty', 'when' => ['value', 'not_empty']]
 					]
 				],
-				'macros' => ['objects', 'uniq' => [['macro']],
+				'macros' => ['objects', 'uniq' => ['macro'],
 					'messages' => ['uniq' => _('Macro name is not unique.')],
 					'fields' => [
 						'hostmacroid' => ['db hostmacro.hostmacroid'],
