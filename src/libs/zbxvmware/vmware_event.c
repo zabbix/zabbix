@@ -1357,10 +1357,12 @@ int	zbx_vmware_service_eventlog_update(zbx_vmware_service_t *service, const char
 	zabbix_log(LOG_LEVEL_DEBUG, "%s() state pause:%u end_time/delta:" ZBX_FS_TIME_T "/" ZBX_FS_TIME_T
 			" last_ts/delta:" ZBX_FS_TIME_T "/" ZBX_FS_TIME_T " last_key:" ZBX_FS_UI64
 			" interval:" ZBX_FS_TIME_T " skip_old:%u severity:%u shmem_free_sz:" ZBX_FS_UI64
-			" req_sz:" ZBX_FS_UI64 " oom:%u service type:%u evt_num:%d", __func__, evt_pause,
+			" req_sz:" ZBX_FS_UI64 " oom:%u service type:%u evt_num:%d svc error:[%s]", __func__, evt_pause,
 			service->eventlog.end_time, now - service->eventlog.end_time, evt_last_ts,
 			now - evt_last_ts, evt_last_key, evt_query_interval, evt_skip_old, evt_severity, shmem_free_sz,
-			service->eventlog.req_sz, service->eventlog.oom, service->type, evt_num);
+			service->eventlog.req_sz, service->eventlog.oom, service->type, evt_num,
+			NULL != service->eventlog.data && NULL != service->eventlog.data->error ?
+			service->eventlog.data->error : "none");
 
 	if (0 != evt_pause)
 	{
