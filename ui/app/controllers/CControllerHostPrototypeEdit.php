@@ -375,7 +375,7 @@ class CControllerHostPrototypeEdit extends CController {
 			]), ['proxy_groupid' => 'id']);
 		}
 
-		$this->extendLinkedTemplates($data);
+		self::extendLinkedTemplates($data);
 
 		$data += [
 			'readonly' => $data['host_prototype']['templateid'] != 0 || $data['is_discovered_prototype'],
@@ -428,12 +428,7 @@ class CControllerHostPrototypeEdit extends CController {
 		$this->setResponse($response);
 	}
 
-	/**
-	 * Function to prepare data for Linked templates list.
-	 *
-	 * @param array $editable_templates
-	 */
-	protected function extendLinkedTemplates(array &$data): void {
+	private static function extendLinkedTemplates(array &$data): void {
 		$data['editable_templates'] = $data['host_prototype']['templates']
 			? API::Template()->get([
 				'output' => ['templateid'],
