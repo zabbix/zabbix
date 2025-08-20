@@ -72,7 +72,7 @@ window.host_prototype_edit_popup = new class {
 	#initPopupListeners() {
 		const subscriptions = [];
 
-		for (const action of ['template.edit']) {
+		for (const action of ['template.edit', 'host.prototype.edit']) {
 			subscriptions.push(
 				ZABBIX.EventHub.subscribe({
 					require: {
