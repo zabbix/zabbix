@@ -227,7 +227,7 @@ static int	get_hostid_by_host_or_autoregister(const zbx_socket_t *sock, const ch
 		goto out;
 	}
 
-	/* Register host if autoregistration is enabled and host has changed */
+	/* Register host if autoregistration is enabled and host does not exist yet or has changed */
 	if (AUTOREG_ENABLED == autoreg && (0 == *hostid || 0 != change_flags))
 	{
 		db_register_host(host, ip, port, sock->connection_type, host_metadata, flag, interface, events_cbs,
