@@ -52,13 +52,7 @@ class CControllerHostPrototypeCreate extends CController {
 				'group_prototypes' => ['objects', 'uniq' => ['name'],
 					'messages' => ['uniq' => _('Group prototype is not unique.')],
 					'fields' => [
-						'name' => [
-							'db hstgrp.name',
-							'use' => [CHostGroupNameValidator::class, ['lldmacros' => true]],
-							'messages' => [
-								'use' => _('This field must contain at least one low-level discovery macro.')
-							]
-						],
+						'name' => ['db hstgrp.name', 'use' => [CHostGroupNameValidator::class, ['lldmacros' => true]]],
 						'group_prototypeid' => ['string']
 					]
 				],
