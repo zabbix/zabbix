@@ -1661,7 +1661,7 @@ class CMacrosResolver extends CMacrosResolverGeneral {
 
 			foreach ($matched_macros['macros'] as $type => $matches) {
 				foreach ($matches as $token => $_data) {
-					$macros[$token] = $data['macros_values'][$type][$token];
+					$macros[$token] = $data['macros_values'][$type][$token] ?? '';
 				}
 			}
 		}

@@ -752,6 +752,8 @@ ZBX_THREAD_ENTRY(connector_manager_thread, args)
 	connector_destroy_manager(&manager);
 	zbx_ipc_service_close(&service);
 
+	zbx_setproctitle("%s #%d [terminated]", get_process_type_string(process_type), process_num);
+
 	exit(EXIT_SUCCESS);
 #undef STAT_INTERVAL
 }

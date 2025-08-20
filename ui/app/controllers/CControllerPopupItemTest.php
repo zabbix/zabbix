@@ -182,29 +182,7 @@ abstract class CControllerPopupItemTest extends CController {
 		'parameters' => [
 			'host' => ['{HOSTNAME}', '{HOST.HOST}', '{HOST.NAME}'],
 			'interface' => ['{HOST.IP}', '{IPADDRESS}', '{HOST.DNS}', '{HOST.CONN}'],
-			'inventory' => [
-				'{INVENTORY.ALIAS}', '{INVENTORY.ASSET.TAG}', '{INVENTORY.CHASSIS}', '{INVENTORY.CONTACT}',
-				'{PROFILE.CONTACT}', '{INVENTORY.CONTRACT.NUMBER}', '{INVENTORY.DEPLOYMENT.STATUS}', '{INVENTORY.HARDWARE}',
-				'{PROFILE.HARDWARE}', '{INVENTORY.HARDWARE.FULL}', '{INVENTORY.HOST.NETMASK}', '{INVENTORY.HOST.NETWORKS}',
-				'{INVENTORY.HOST.ROUTER}', '{INVENTORY.HW.ARCH}', '{INVENTORY.HW.DATE.DECOMM}', '{INVENTORY.HW.DATE.EXPIRY}',
-				'{INVENTORY.HW.DATE.INSTALL}', '{INVENTORY.HW.DATE.PURCHASE}', '{INVENTORY.INSTALLER.NAME}', '{INVENTORY.LOCATION}',
-				'{PROFILE.LOCATION}', '{INVENTORY.LOCATION.LAT}', '{INVENTORY.LOCATION.LON}', '{INVENTORY.MACADDRESS.A}',
-				'{PROFILE.MACADDRESS}', '{INVENTORY.MACADDRESS.B}', '{INVENTORY.MODEL}', '{INVENTORY.NAME}', '{PROFILE.NAME}',
-				'{INVENTORY.NOTES}', '{PROFILE.NOTES}', '{INVENTORY.OOB.IP}', '{INVENTORY.OOB.NETMASK}',
-				'{INVENTORY.OOB.ROUTER}', '{INVENTORY.OS}', '{PROFILE.OS}', '{INVENTORY.OS.FULL}', '{INVENTORY.OS.SHORT}',
-				'{INVENTORY.POC.PRIMARY.CELL}', '{INVENTORY.POC.PRIMARY.EMAIL}', '{INVENTORY.POC.PRIMARY.NAME}',
-				'{INVENTORY.POC.PRIMARY.NOTES}', '{INVENTORY.POC.PRIMARY.PHONE.A}', '{INVENTORY.POC.PRIMARY.PHONE.B}',
-				'{INVENTORY.POC.PRIMARY.SCREEN}', '{INVENTORY.POC.SECONDARY.CELL}', '{INVENTORY.POC.SECONDARY.EMAIL}',
-				'{INVENTORY.POC.SECONDARY.NAME}', '{INVENTORY.POC.SECONDARY.NOTES}', '{INVENTORY.POC.SECONDARY.PHONE.A}',
-				'{INVENTORY.POC.SECONDARY.PHONE.B}', '{INVENTORY.POC.SECONDARY.SCREEN}', '{INVENTORY.SERIALNO.A}',
-				'{PROFILE.SERIALNO}', '{INVENTORY.SERIALNO.B}', '{INVENTORY.SITE.ADDRESS.A}', '{INVENTORY.SITE.ADDRESS.B}',
-				'{INVENTORY.SITE.ADDRESS.C}', '{INVENTORY.SITE.CITY}', '{INVENTORY.SITE.COUNTRY}', '{INVENTORY.SITE.NOTES}',
-				'{INVENTORY.SITE.RACK}', '{INVENTORY.SITE.STATE}', '{INVENTORY.SITE.ZIP}', '{INVENTORY.SOFTWARE}',
-				'{PROFILE.SOFTWARE}', '{INVENTORY.SOFTWARE.APP.A}', '{INVENTORY.SOFTWARE.APP.B}', '{INVENTORY.SOFTWARE.APP.C}',
-				'{INVENTORY.SOFTWARE.APP.D}', '{INVENTORY.SOFTWARE.APP.E}', '{INVENTORY.SOFTWARE.FULL}', '{INVENTORY.TAG}',
-				'{PROFILE.TAG}', '{INVENTORY.TYPE}', '{PROFILE.DEVICETYPE}', '{INVENTORY.TYPE.FULL}', '{INVENTORY.URL.A}',
-				'{INVENTORY.URL.B}', '{INVENTORY.URL.C}', '{INVENTORY.VENDOR}'
-			],
+			'inventory' => ['{INVENTORY.ALIAS}', '{INVENTORY.ASSET.TAG}', '{INVENTORY.CHASSIS}', '{INVENTORY.CONTACT}', '{PROFILE.CONTACT}', '{INVENTORY.CONTRACT.NUMBER}', '{INVENTORY.DEPLOYMENT.STATUS}', '{INVENTORY.HARDWARE}', '{PROFILE.HARDWARE}', '{INVENTORY.HARDWARE.FULL}', '{INVENTORY.HOST.NETMASK}', '{INVENTORY.HOST.NETWORKS}', '{INVENTORY.HOST.ROUTER}', '{INVENTORY.HW.ARCH}', '{INVENTORY.HW.DATE.DECOMM}', '{INVENTORY.HW.DATE.EXPIRY}', '{INVENTORY.HW.DATE.INSTALL}', '{INVENTORY.HW.DATE.PURCHASE}', '{INVENTORY.INSTALLER.NAME}', '{INVENTORY.LOCATION}', '{PROFILE.LOCATION}', '{INVENTORY.LOCATION.LAT}', '{INVENTORY.LOCATION.LON}', '{INVENTORY.MACADDRESS.A}', '{PROFILE.MACADDRESS}', '{INVENTORY.MACADDRESS.B}', '{INVENTORY.MODEL}', '{INVENTORY.NAME}', '{PROFILE.NAME}', '{INVENTORY.NOTES}', '{PROFILE.NOTES}', '{INVENTORY.OOB.IP}', '{INVENTORY.OOB.NETMASK}', '{INVENTORY.OOB.ROUTER}', '{INVENTORY.OS}', '{PROFILE.OS}', '{INVENTORY.OS.FULL}', '{INVENTORY.OS.SHORT}', '{INVENTORY.POC.PRIMARY.CELL}', '{INVENTORY.POC.PRIMARY.EMAIL}', '{INVENTORY.POC.PRIMARY.NAME}', '{INVENTORY.POC.PRIMARY.NOTES}', '{INVENTORY.POC.PRIMARY.PHONE.A}', '{INVENTORY.POC.PRIMARY.PHONE.B}', '{INVENTORY.POC.PRIMARY.SCREEN}', '{INVENTORY.POC.SECONDARY.CELL}', '{INVENTORY.POC.SECONDARY.EMAIL}', '{INVENTORY.POC.SECONDARY.NAME}', '{INVENTORY.POC.SECONDARY.NOTES}', '{INVENTORY.POC.SECONDARY.PHONE.A}', '{INVENTORY.POC.SECONDARY.PHONE.B}', '{INVENTORY.POC.SECONDARY.SCREEN}', '{INVENTORY.SERIALNO.A}', '{PROFILE.SERIALNO}', '{INVENTORY.SERIALNO.B}', '{INVENTORY.SITE.ADDRESS.A}', '{INVENTORY.SITE.ADDRESS.B}', '{INVENTORY.SITE.ADDRESS.C}', '{INVENTORY.SITE.CITY}', '{INVENTORY.SITE.COUNTRY}', '{INVENTORY.SITE.NOTES}', '{INVENTORY.SITE.RACK}', '{INVENTORY.SITE.STATE}', '{INVENTORY.SITE.ZIP}', '{INVENTORY.SOFTWARE}', '{PROFILE.SOFTWARE}', '{INVENTORY.SOFTWARE.APP.A}', '{INVENTORY.SOFTWARE.APP.B}', '{INVENTORY.SOFTWARE.APP.C}', '{INVENTORY.SOFTWARE.APP.D}', '{INVENTORY.SOFTWARE.APP.E}', '{INVENTORY.SOFTWARE.FULL}', '{INVENTORY.TAG}', '{PROFILE.TAG}', '{INVENTORY.TYPE}', '{PROFILE.DEVICETYPE}', '{INVENTORY.TYPE.FULL}', '{INVENTORY.URL.A}', '{INVENTORY.URL.B}', '{INVENTORY.URL.C}', '{INVENTORY.VENDOR}'],
 			'item' => ['{ITEM.ID}', '{ITEM.KEY.ORIG}', '{ITEM.KEY}'],
 			'support_user_macros' => true,
 			'support_lld_macros' => true
@@ -332,6 +310,9 @@ abstract class CControllerPopupItemTest extends CController {
 					'maintenance_status', 'maintenance_type', 'ipmi_authtype', 'ipmi_privilege', 'ipmi_username',
 					'ipmi_password', 'tls_subject', 'tls_issuer', 'tls_connect'
 				],
+				'selectInventory' => in_array($this->item_type, [ITEM_TYPE_SCRIPT, ITEM_TYPE_BROWSER])
+					? API_OUTPUT_EXTEND
+					: null,
 				'hostids' => [$hostid],
 				'editable' => true
 			]);
@@ -779,8 +760,6 @@ abstract class CControllerPopupItemTest extends CController {
 	protected function getSupportedMacros(array $inputs) {
 		$interface = $this->getHostInterface(['interfaceid' => $inputs['interfaceid']]);
 
-		$inventory = CMacrosResolverGeneral::getHostInventoryMacros($this->host['hostid'], $inputs['parameters']);
-
 		$macros = [
 			'host' => [
 				'{HOSTNAME}' => $this->host['host'],
@@ -794,15 +773,21 @@ abstract class CControllerPopupItemTest extends CController {
 				'{HOST.CONN}' => $interface['address'],
 				'{HOST.PORT}' => $interface['port']
 			],
+			'inventory' => [],
 			'item' => [
 				'{ITEM.ID}' => (array_key_exists('itemid', $inputs) && $inputs['itemid'])
 					? $inputs['itemid']
 					: UNRESOLVED_MACRO_STRING,
 				'{ITEM.KEY}' => array_key_exists('key', $inputs) ? $inputs['key'] : UNRESOLVED_MACRO_STRING,
 				'{ITEM.KEY.ORIG}' => array_key_exists('key', $inputs) ? $inputs['key'] : UNRESOLVED_MACRO_STRING
-			],
-			'inventory' => $inventory
+			]
 		];
+
+		if (array_key_exists('inventory', $this->host) && $this->host['inventory']) {
+			foreach (CMacrosResolverGeneral::getSupportedHostInventoryMacrosMap() as $macro_name => $db_field_name) {
+				$macros['inventory'][$macro_name] = $this->host['inventory'][$db_field_name];
+			}
+		}
 
 		if (array_key_exists('key', $inputs) && strstr($inputs['key'], '{') !== false) {
 			$usermacros = CMacrosResolverHelper::extractItemTestMacros([

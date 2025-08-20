@@ -34,7 +34,7 @@ class testFormAuthentication extends CWebTest {
 	/**
 	 * Open specific Authentication form tab and check basic common fields.
 	 *
-	 * @param string    $auth_type    LDAP or SAML
+	 * @param string    $auth_type           LDAP, SAML or MFA
 	 */
 	protected function openFormAndCheckBasics($auth_type) {
 		$this->page->login()->open('zabbix.php?action=authentication.edit');
@@ -43,10 +43,11 @@ class testFormAuthentication extends CWebTest {
 		$this->page->assertHeader('Authentication');
 		$this->page->assertTitle('Configuration of authentication');
 
-		$enable_auth_checkbox = $form->getField('Enable '.$auth_type.' authentication');
+		$ui_name = ($auth_type === 'MFA') ? 'multi-factor' : $auth_type;
+		$enable_auth_checkbox = $form->getField('Enable '.$ui_name.' authentication');
 		$this->assertTrue($enable_auth_checkbox->isEnabled());
 		$this->assertTrue($enable_auth_checkbox->isVisible());
-		$form->checkValue(['Enable '.$auth_type.' authentication' => false]);
+		$form->checkValue(['Enable '.$ui_name.' authentication' => false]);
 
 		// Check that Update button is clickable and no other buttons present.
 		$this->assertTrue($form->query('button:Update')->one()->isClickable());

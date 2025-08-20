@@ -13,10 +13,21 @@
 ** If not, see <https://www.gnu.org/licenses/>.
 **/
 
+
 require_once __DIR__.'/../../include/CWebTest.php';
 require_once __DIR__.'/../../include/helpers/CDataHelper.php';
 
 class testSystemInformation extends CWebTest {
+
+	/**
+	 * Attach MessageBehavior and CTableBehavior to the test.
+	 */
+	public function getBehaviors() {
+		return [
+			CMessageBehavior::class,
+			CTableBehavior::class
+		];
+	}
 
 	const FAILOVER_DELAY = 20;
 
@@ -25,7 +36,6 @@ class testSystemInformation extends CWebTest {
 	public static $standby_lastaccess;
 	public static $stopped_lastaccess;
 	public static $unavailable_lastaccess;
-
 	public static $skip_fields;
 
 	/**
@@ -96,6 +106,37 @@ class testSystemInformation extends CWebTest {
 		self::$update_timestamp = time();
 	}
 
+	public function prepareUsersData() {
+		CDataHelper::call('user.create', [
+			[
+				'username' => 'admin for system information test',
+				'passwd' => 'z@$$ix!#%1',
+				'roleid' => USER_TYPE_ZABBIX_ADMIN,
+				'usrgrps' => [
+					['usrgrpid' => 7] // Zabbix administrators.
+				]
+			],
+			[
+				'username' => 'user for system information test',
+				'passwd' => 'z@$$ix!#%2',
+				'roleid' => USER_TYPE_ZABBIX_USER,
+				'usrgrps' => [
+					['usrgrpid' => 7] // Zabbix administrators.
+				]
+			]
+		]);
+
+		// Enable guest role for system information permissions test.
+		CDataHelper::call('user.update', [
+			[
+				'userid' => 2, // guest.
+				'usrgrps' => [
+					['usrgrpid' => 8] // Guests.
+				]
+			]
+		]);
+	}
+
 	// Change failover delay not to wait too long for server to update its status.
 	public static function changeFailoverDelay() {
 		DBexecute('UPDATE config SET ha_failover_delay='.self::FAILOVER_DELAY);
@@ -110,6 +151,7 @@ class testSystemInformation extends CWebTest {
 		global $DB;
 		self::$skip_fields = [];
 		$url = (!$dashboardid) ? 'zabbix.php?action=report.status' : 'zabbix.php?action=dashboard.view&dashboardid='.$dashboardid;
+
 		// Wait for frontend to get the new config from updated zabbix.conf.php file.
 		sleep((int) ini_get('opcache.revalidate_freq') + 1);
 
@@ -165,11 +207,25 @@ class testSystemInformation extends CWebTest {
 			}
 		}
 
+		// Check fields that are not checked in screenshot with enabled HA.
+		$data = [
+			[
+				'Parameter' => 'Zabbix server is running',
+				'Value' => 'Yes',
+				'Details' => $DB['SERVER'].':0'
+			],
+			[
+				'Parameter' => 'Zabbix frontend version',
+				'Value' => ZABBIX_VERSION,
+				'Details' => ''
+			]
+		];
+		$this->assertTableHasData($data);
+
 		/**
-		 * Check and hide the active Zabbix server address in widget that is working in System stats mode or in the part
+		 * Hide the active Zabbix server address in widget that is working in System stats mode or in the part
 		 * of the report that displays the overall system statistics.
 		 */
-		$this->assertEquals($DB['SERVER'].':0', $server_address->getText());
 		self::$skip_fields[] = $server_address;
 
 		// Hide the footer of the report as it contains Zabbix version.
