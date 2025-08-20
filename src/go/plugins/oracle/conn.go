@@ -232,6 +232,7 @@ func (c *ConnManager) create(cd *connDetails) (*OraConn, error) {
 	params.Username, params.Password = cd.uri.User(), godror.NewPassword(cd.uri.Password())
 	params.ConnectString = connectString
 	params.ConnParams = connParams
+	params.Timezone = time.Local
 	client := sql.OpenDB(godror.NewConnector(params))
 
 	serverVersion, err := godror.ServerVersion(ctx, client)
