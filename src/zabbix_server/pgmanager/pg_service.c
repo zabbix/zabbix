@@ -97,7 +97,7 @@ static void	pg_update_host_pgroup(zbx_pg_service_t *pgs, zbx_ipc_message_t *mess
  *                                                                            *
  * Parameter: pgs     - [IN] proxy group service                              *
  *            message - [IN] IPC message with proxy last access               *
- *                                                                            *
+ *                                                                            **
  ******************************************************************************/
 static void	pg_update_proxy_rtdata(zbx_pg_service_t *pgs, zbx_ipc_message_t *message)
 {
