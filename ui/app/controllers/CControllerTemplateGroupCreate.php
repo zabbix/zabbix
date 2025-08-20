@@ -27,7 +27,9 @@ class CControllerTemplateGroupCreate extends CController {
 		];
 
 		return ['object', 'api_uniq' => $api_uniq, 'fields' => [
-			'name' => ['db hstgrp.name', 'required', 'not_empty'],
+			'name' => ['db hstgrp.name', 'required', 'not_empty', 'use' => [CHostGroupNameParser::class],
+				'messages' => ['use' => _('Invalid template group name.')]
+			],
 			'subgroups' => ['boolean']
 		]];
 	}

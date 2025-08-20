@@ -28,7 +28,9 @@ class CControllerTemplateGroupUpdate extends CController {
 
 		return ['object', 'api_uniq' => $api_uniq, 'fields' => [
 			'groupid' => ['db hstgrp.groupid', 'required'],
-			'name' => ['db hstgrp.name', 'required', 'not_empty'],
+			'name' => ['db hstgrp.name', 'required', 'not_empty', 'use' => [CHostGroupNameParser::class],
+				'messages' => ['use' => _('Invalid template group name.')]
+			],
 			'subgroups' => ['boolean']
 		]];
 	}
