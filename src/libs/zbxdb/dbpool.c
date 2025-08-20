@@ -27,9 +27,9 @@
 
 #define DBPOOL_HOUSEKEEP_INTERVAL	60
 
-#define DBPOOL_DEFAULT_MAX_IDLE        10
-#define DBPOOL_DEFAULT_MAX_OPEN        100
-#define DBPOOL_DEFAULT_IDLE_TIMEOUT     (SEC_PER_HOUR)
+#define DBPOOL_DEFAULT_MAX_IDLE		10
+#define DBPOOL_DEFAULT_MAX_OPEN		100
+#define DBPOOL_DEFAULT_IDLE_TIMEOUT	(SEC_PER_HOUR)
 
 struct zbx_dbconn_pool
 {
@@ -88,9 +88,9 @@ static void	dbconn_pool_close_unused(zbx_dbconn_pool_t *pool, double now)
  *             now  - [IN] current time in seconds                            *
  *                                                                            *
  ******************************************************************************/
-static void        dbconn_pool_create_connection(zbx_dbconn_pool_t *pool, double now)
+static void	dbconn_pool_create_connection(zbx_dbconn_pool_t *pool, double now)
 {
-	zbx_dbconn_t        *db;
+	zbx_dbconn_t	*db;
 
 	db = zbx_dbconn_create();
 	dbconn_set_managed(db, DBCONN_TYPE_MANAGED);
