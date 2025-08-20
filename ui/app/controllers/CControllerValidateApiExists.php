@@ -73,7 +73,8 @@ class CControllerValidateApiExists extends CController {
 				if ($object_exists) {
 					$errors[] = [
 						'field' => $validation['field'],
-						'message' => $validation['error_msg'] ?: _('This object already exists.')
+						'message' => array_key_exists('error_msg', $validation) ? $validation['error_msg']:
+							_('This object already exists.')
 					];
 				}
 			}
