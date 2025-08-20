@@ -662,7 +662,7 @@ class CMediatype extends CApiService {
 			'token_url' =>				['type' => API_STRING_UTF8, 'flags' => $api_required | API_NOT_EMPTY, 'length' => DB::getFieldLength('media_type_oauth', 'token_url')],
 			'tokens_status' =>			['type' => API_INT32, 'in' => implode(':', [0, OAUTH_ACCESS_TOKEN_VALID | OAUTH_REFRESH_TOKEN_VALID])],
 			'access_token' =>			['type' => API_STRING_UTF8, 'flags' => API_NOT_EMPTY, 'length' => DB::getFieldLength('media_type_oauth', 'access_token')],
-			'access_token_updated' =>	['type' => API_TIMESTAMP],
+			'access_token_updated' =>	['type' => API_TIMESTAMP,'in' => '0:'.time()],
 			'access_expires_in' =>		['type' => API_INT32],
 			'refresh_token' =>			['type' => API_STRING_UTF8, 'flags' => API_NOT_EMPTY, 'length' => DB::getFieldLength('media_type_oauth', 'refresh_token')]
 		]];

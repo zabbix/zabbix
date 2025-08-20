@@ -1,0 +1,1 @@
+A......... [ZBX-26799] fixed ability to create OAuth when access_token_updated greater than the current Unix timestamp (kkuzmina)
