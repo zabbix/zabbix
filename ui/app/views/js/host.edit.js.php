@@ -268,8 +268,6 @@ window.host_edit_popup = {
 	initMacrosTab() {
 		this.macros_manager = new HostMacrosManager({
 			container: $('#macros_container .table-forms-td-right'),
-			source: 'host',
-			has_inline_validation: 1,
 			load_callback: () => {
 				this.form.discoverAllFields();
 

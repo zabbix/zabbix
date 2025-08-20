@@ -460,8 +460,7 @@ $macro_tab = (new CFormGrid())
 				[
 					'macros' => $data['host_prototype']['macros'],
 					'parent_hostid' => $data['parent_host']['hostid'],
-					'readonly' => $data['readonly'],
-					'has_inline_validation' => true
+					'readonly' => $data['readonly']
 				]
 			)
 		))

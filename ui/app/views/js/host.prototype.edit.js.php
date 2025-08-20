@@ -354,8 +354,6 @@ window.host_prototype_edit_popup = new class {
 			container: $('#macros_container'),
 			readonly: this.readonly,
 			parent_hostid: this.parent_hostid,
-			source: 'host_prototype',
-			has_inline_validation: 1,
 			load_callback: () => {
 				if (!this.readonly) {
 					this.form.discoverAllFields();
