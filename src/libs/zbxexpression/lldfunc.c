@@ -585,7 +585,10 @@ int	zbx_substitute_lld_macros(char **data, const struct zbx_json_parse *jp_row,
 		pos++;
 	}
 
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s data:'%s'", __func__, zbx_result_string(ret), *data);
+#ifdef ZBX_DEBUG
+	zabbix_log(LOG_LEVEL_DEBUG, "%s() result:'%s'", __func__, *data);
+#endif
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __func__, zbx_result_string(ret));
 
 	return ret;
 }
