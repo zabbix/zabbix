@@ -1110,56 +1110,62 @@ clean:
 static void	proxyconfig_prepare_table(zbx_table_data_t *td, const char *key_field, zbx_vector_uint64_t *key_ids,
 		zbx_vector_uint64_t *recids)
 {
-	zbx_db_result_t	result;
-	zbx_db_row_t	dbrow;
-	char		*sql = NULL, *buf, *delim = " where";
-	size_t		sql_alloc = 0, sql_offset = 0, buf_alloc = ZBX_KIBIBYTE;
-	zbx_uint64_t	recid;
-	zbx_table_row_t	*row;
-	int		i;
+	char		*sql = NULL, *buf;
+	size_t		sql_alloc = 0, buf_alloc = ZBX_KIBIBYTE;
+	int		batch_index = 0;
 
 	if (NULL != key_ids && 0 == key_ids->values_num)
 		return;
 
 	buf = (char *)zbx_malloc(NULL, buf_alloc);
 
-	zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "select %s", td->table->recid);
-
-	for (i = 1; i < td->fields.values_num; i++)
-		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, ",%s", td->fields.values[i].field->name);
-
-	zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, " from %s", td->table->table);
-	if (NULL != key_ids)
+	do
 	{
-		zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, delim);
-		zbx_db_add_condition_alloc(&sql, &sql_alloc, &sql_offset, key_field, key_ids->values, key_ids->values_num);
-		delim = " and";
-	}
+		char		*delim = " where";
+		zbx_db_result_t	result;
+		zbx_db_row_t	dbrow;
+		size_t		sql_offset = 0;
 
-	if (NULL != td->sql_filter)
-		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "%s %s", delim, td->sql_filter);
+		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "select %s", td->table->recid);
 
-	zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, " order by %s", td->table->recid);
+		for (int i = 1; i < td->fields.values_num; i++)
+			zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, ",%s", td->fields.values[i].field->name);
 
-	result = zbx_db_select("%s", sql);
-
-	while (NULL != (dbrow = zbx_db_fetch(result)))
-	{
-		ZBX_STR2UINT64(recid, dbrow[0]);
-
-		if (NULL != recids)
-			zbx_vector_uint64_append(recids, recid);
-
-		if (NULL == (row = (zbx_table_row_t *)zbx_hashset_search(&td->rows, &recid)))
+		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, " from %s", td->table->table);
+		if (NULL != key_ids)
 		{
-			zbx_vector_uint64_append(&td->del_ids, recid);
-			continue;
+			zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, delim);
+			add_batch_select_condition(&sql, &sql_alloc, &sql_offset, key_field, key_ids, &batch_index);
+			delim = " and";
 		}
 
-		if (SUCCEED != proxyconfig_compare_row(row, dbrow, &buf, &buf_alloc))
-			zbx_vector_table_row_ptr_append(&td->updates, row);
+		if (NULL != td->sql_filter)
+			zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "%s %s", delim, td->sql_filter);
+
+		result = zbx_db_select("%s", sql);
+
+		while (NULL != (dbrow = zbx_db_fetch(result)))
+		{
+			zbx_uint64_t	recid;
+			zbx_table_row_t	*row;
+
+			ZBX_STR2UINT64(recid, dbrow[0]);
+
+			if (NULL != recids)
+				zbx_vector_uint64_append(recids, recid);
+
+			if (NULL == (row = (zbx_table_row_t *)zbx_hashset_search(&td->rows, &recid)))
+			{
+				zbx_vector_uint64_append(&td->del_ids, recid);
+				continue;
+			}
+
+			if (SUCCEED != proxyconfig_compare_row(row, dbrow, &buf, &buf_alloc))
+				zbx_vector_table_row_ptr_append(&td->updates, row);
+		}
+		zbx_db_free_result(result);
 	}
-	zbx_db_free_result(result);
+	while (NULL != key_ids && batch_index < key_ids->values_num);
 
 	zbx_free(sql);
 	zbx_free(buf);

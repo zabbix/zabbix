@@ -284,22 +284,6 @@ static void	zbx_item_discovery_free(zbx_item_discovery_t *data)
 	zbx_free(data);
 }
 
-static void	add_batch_select_condition(char **sql, size_t *sql_alloc, size_t *sql_offset, const char* column,
-		const zbx_vector_uint64_t *itemids, int *index)
-{
-#define ZBX_LLD_ITEMS_BATCH_SIZE	1000
-	int	new_index = *index + ZBX_LLD_ITEMS_BATCH_SIZE;
-#undef ZBX_LLD_ITEMS_BATCH_SIZE
-
-	if (new_index > itemids->values_num)
-		new_index = itemids->values_num;
-
-	zbx_db_add_condition_alloc(sql, sql_alloc, sql_offset, column,
-			itemids->values + *index, new_index - *index);
-
-	*index = new_index;
-}
-
 /******************************************************************************
  *                                                                            *
  * Purpose: Retrieves existing items for the specified item prototypes.       *
