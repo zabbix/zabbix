@@ -108,7 +108,10 @@ static int	execute_remote_script(const zbx_script_t *script, const zbx_dc_host_t
 		return FAIL;
 	}
 
-	for (int time_start = time(NULL); config_trapper_timeout > time(NULL) - time_start; sleep(1))
+	struct timespec	poll_delay = {0, 1e8};
+
+	for (int time_start = time(NULL); config_trapper_timeout > time(NULL) - time_start;
+			nanosleep(&poll_delay, NULL))
 	{
 		result = zbx_db_select(
 				"select tr.status,tr.info"

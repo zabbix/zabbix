@@ -542,11 +542,12 @@ ZBX_THREAD_ENTRY(taskmanager_thread, args)
 	double				sec1, sec2;
 	zbx_ipc_async_socket_t		rtc;
 	const zbx_thread_info_t		*info = &((zbx_thread_args_t *)args)->info;
-	int				tasks_num, rtc_msgs_num = 1,
+	int				tasks_num, rtc_msgs_num = 2,
 					server_num = ((zbx_thread_args_t *)args)->info.server_num,
 					process_num = ((zbx_thread_args_t *)args)->info.process_num;
 	unsigned char			process_type = ((zbx_thread_args_t *)args)->info.process_type;
-	zbx_uint32_t			rtc_msgs[] = {ZBX_RTC_CONFIG_CACHE_RELOAD, ZBX_RTC_SNMP_CACHE_RELOAD};
+	zbx_uint32_t			rtc_msgs[] = {ZBX_RTC_CONFIG_CACHE_RELOAD, ZBX_RTC_TASK_MANAGER_NOTIFY,
+					ZBX_RTC_SNMP_CACHE_RELOAD};
 
 	zabbix_log(LOG_LEVEL_INFORMATION, "%s #%d started [%s #%d]", get_program_type_string(info->program_type),
 			server_num, get_process_type_string(process_type), process_num);
@@ -571,7 +572,7 @@ ZBX_THREAD_ENTRY(taskmanager_thread, args)
 	rtc_msgs_num++;
 #endif
 
-	zbx_rtc_subscribe(process_type, process_num, rtc_msgs,rtc_msgs_num,
+	zbx_rtc_subscribe(process_type, process_num, rtc_msgs, rtc_msgs_num,
 			taskmanager_args_in->config_comms->config_timeout, &rtc);
 
 	while (ZBX_IS_RUNNING())
@@ -614,6 +615,12 @@ ZBX_THREAD_ENTRY(taskmanager_thread, args)
 				taskmanager_args_in->config_enable_global_scripts,
 				taskmanager_args_in->config_ssh_key_location,
 				taskmanager_args_in->config_webdriver_url);
+
+		if (ZBX_PROXYMODE_ACTIVE == taskmanager_args_in->config_comms->proxymode && 0 != tasks_num)
+		{
+			zbx_rtc_notify_generic(&rtc, ZBX_PROCESS_TYPE_DATASENDER, 1, ZBX_RTC_TASK_MANAGER_NOTIFY,
+					NULL, 0);
+		}
 
 		if (ZBX_TM_CLEANUP_PERIOD <= sec1 - cleanup_time)
 		{
