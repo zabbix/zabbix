@@ -580,8 +580,9 @@ ZBX_THREAD_ENTRY(taskmanager_thread, args)
 		zbx_uint32_t	rtc_cmd;
 		unsigned char	*rtc_data = NULL;
 
-		if (SUCCEED == zbx_rtc_wait(&rtc, info, &rtc_cmd, &rtc_data, sleeptime) && 0 != rtc_cmd)
+		while (SUCCEED == zbx_rtc_wait(&rtc, info, &rtc_cmd, &rtc_data, sleeptime) && 0 != rtc_cmd)
 		{
+			sleeptime = 0;
 #ifdef HAVE_NETSNMP
 			if (ZBX_RTC_SNMP_CACHE_RELOAD == rtc_cmd)
 				zbx_clear_cache_snmp(process_type, process_num);

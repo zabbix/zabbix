@@ -354,6 +354,9 @@ ZBX_THREAD_ENTRY(datasender_thread, args)
 
 			while (SUCCEED == zbx_rtc_wait(&rtc, info, &rtc_cmd, &rtc_data, sleeptime) && 0 != rtc_cmd)
 			{
+				sleeptime = 0;
+				task_timestamp = 0;
+
 				switch (rtc_cmd)
 				{
 					case ZBX_RTC_SHUTDOWN:
