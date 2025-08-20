@@ -552,6 +552,7 @@ class CFormValidator {
 							this.#addError(error.field, error.message, CFormValidator.ERROR_LEVEL_API);
 						});
 					}
+					return result.result;
 				});
 		}
 		return Promise.resolve(true);
