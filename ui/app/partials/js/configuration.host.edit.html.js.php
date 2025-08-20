@@ -287,12 +287,12 @@
 		 * Set up of macros functionality.
 		 */
 		initMacrosTab() {
+			const show_inherited_macros_element = document.getElementById('show_inherited_macros');
 			this.macros_manager = new HostMacrosManager({
 				container: $('#macros_container .table-forms-td-right'),
-				show_inherited_macros_element: document.getElementById('show_inherited_macros')
+				show_inherited_macros_element
 			});
 
-			const show_inherited_macros_element = document.getElementById('show_inherited_macros');
 			this.show_inherited_macros = show_inherited_macros_element.querySelector('input:checked').value == 1;
 
 			this.macros_manager.initMacroTable(this.show_inherited_macros);

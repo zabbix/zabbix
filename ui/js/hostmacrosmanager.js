@@ -31,15 +31,14 @@ class HostMacrosManager {
 		this.readonly = readonly;
 		this.parent_hostid = parent_hostid ?? null;
 		this.show_inherited_macros_element = show_inherited_macros_element;
+		this.xhr = null;
 	}
 
 	load(show_inherited_macros, templateids) {
-		if (this.show_inherited_macros_element.querySelector('input').hasAttribute('readonly')) {
-			console.warn('Skip loading host macros: already in progress.');
-			return;
+		if (this.xhr) {
+			this.xhr.abort()
 		}
 
-		this.disableRadioShowInheritedMacros();
 		const url = new Curl('zabbix.php');
 		url.setArgument('action', 'hostmacros.list');
 
@@ -54,7 +53,7 @@ class HostMacrosManager {
 			post_data.parent_hostid = this.parent_hostid;
 		}
 
-		$.ajax(url.getUrl(), {
+		this.xhr = $.ajax(url.getUrl(), {
 			data: post_data,
 			dataType: 'json',
 			method: 'POST',
@@ -66,9 +65,11 @@ class HostMacrosManager {
 				if (typeof response === 'object' && 'error' in response) {
 					const message_box = makeMessageBox('bad', response.error.messages, response.error.title);
 
-					this.$container.append(message_box);
+					this.$container.prepend(message_box);
 				}
 				else {
+					this.$container.empty();
+
 					if (typeof response.messages !== 'undefined') {
 						this.$container.append(response.messages);
 					}
@@ -94,7 +95,6 @@ class HostMacrosManager {
 			})
 			.always(() => {
 				this.loaderStop();
-				this.enableRadioShowInheritedMacros();
 			});
 	}
 
@@ -277,27 +277,39 @@ class HostMacrosManager {
 		return $('.inherited-macros-table, .host-macros-table', this.$container).eq(0);
 	}
 
-	disableRadioShowInheritedMacros() {
-		this.show_inherited_macros_element.querySelectorAll('input').forEach(radio_input => {
-			radio_input.setAttribute('readonly', 'readonly');
-		});
+	#disableRadioShowInheritedMacros() {
+		this.show_inherited_macros_element.querySelectorAll('input').forEach(radio_input =>
+			radio_input.setAttribute('readonly', 'readonly')
+		);
 	}
 
-	enableRadioShowInheritedMacros() {
-		this.show_inherited_macros_element.querySelectorAll('input').forEach(radio_input => {
-			radio_input.removeAttribute('readonly');
-		});
+	#enableRadioShowInheritedMacros() {
+		this.show_inherited_macros_element.querySelectorAll('input').forEach(radio_input =>
+			radio_input.removeAttribute('readonly')
+		);
 	}
 
 	loaderStart() {
+		this.#disableRadioShowInheritedMacros();
 		this.$preloader = $('<span>', {class: 'is-loading'});
-		this.$container
-			.empty()
-			.append(this.$preloader);
+		const macros_table = this.$container.find('table');
+
+		if (macros_table) {
+			macros_table.hide();
+		}
+
+		this.$container.append(this.$preloader);
 	}
 
 	loaderStop() {
 		this.$preloader.remove();
+		const macros_table = this.$container.find('table');
+
+		if (macros_table) {
+			macros_table.show();
+		}
+
+		this.#enableRadioShowInheritedMacros();
 	}
 
 	macroToUpperCase($element) {
