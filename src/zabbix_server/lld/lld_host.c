@@ -4816,7 +4816,6 @@ static void	lld_hosts_remove(const zbx_vector_lld_host_ptr_t *hosts, const zbx_l
 		zbx_db_add_condition_alloc(&sql, &sql_alloc, &sql_offset, "hostid",
 				discovered_hostids.values, discovered_hostids.values_num);
 		zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, ";\n");
-
 		zbx_db_execute_overflowed_sql(&sql, &sql_alloc, &sql_offset);
 	}
 
@@ -4838,7 +4837,6 @@ static void	lld_hosts_remove(const zbx_vector_lld_host_ptr_t *hosts, const zbx_l
 		zbx_db_add_condition_alloc(&sql, &sql_alloc, &sql_offset, "hostid",
 				lc_hostids.values, lc_hostids.values_num);
 		zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, ";\n");
-
 		zbx_db_execute_overflowed_sql(&sql, &sql_alloc, &sql_offset);
 	}
 
@@ -4860,7 +4858,6 @@ static void	lld_hosts_remove(const zbx_vector_lld_host_ptr_t *hosts, const zbx_l
 		zbx_db_add_condition_alloc(&sql, &sql_alloc, &sql_offset, "hostid",
 				dis_hostids.values, dis_hostids.values_num);
 		zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, ";\n");
-
 		zbx_db_execute_overflowed_sql(&sql, &sql_alloc, &sql_offset);
 
 		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "update hosts set status=%d where",
