@@ -1141,7 +1141,7 @@ static int	process_trap(zbx_socket_t *sock, char *s, zbx_timespec_t *ts,
 		int config_enable_global_scripts, zbx_get_value_internal_ext_f zbx_get_value_internal_ext_cb,
 		const char *config_ssh_key_location, const char *config_webdriver_url,
 		zbx_trapper_process_request_func_t trapper_process_request_cb,
-		zbx_autoreg_update_host_func_t autoreg_update_host_cb)
+		zbx_autoreg_update_host_func_t autoreg_update_host_cb, zbx_ipc_async_socket_t *rtc)
 {
 	int	ret = SUCCEED;
 
@@ -1228,7 +1228,7 @@ static int	process_trap(zbx_socket_t *sock, char *s, zbx_timespec_t *ts,
 			ret = process_active_check_heartbeat(sock, &jp, config_comms->config_timeout);
 		}
 		else if (SUCCEED != trapper_process_request_cb(value, sock, &jp, ts, config_comms, config_vault,
-				proxydata_frequency, zbx_get_program_type_cb, events_cbs, get_config_forks))
+				proxydata_frequency, zbx_get_program_type_cb, events_cbs, get_config_forks, rtc))
 		{
 			zabbix_log(LOG_LEVEL_WARNING, "unknown request received from \"%s\": [%s]", sock->peer,
 				value);
@@ -1318,7 +1318,7 @@ static void	process_trapper_child(zbx_socket_t *sock, zbx_timespec_t *ts,
 		int config_enable_global_scripts, zbx_get_value_internal_ext_f zbx_get_value_internal_ext_cb,
 		const char *config_ssh_key_location, const char *config_webdriver_url,
 		zbx_trapper_process_request_func_t trapper_process_request_cb,
-		zbx_autoreg_update_host_func_t autoreg_update_host_cb)
+		zbx_autoreg_update_host_func_t autoreg_update_host_cb, zbx_ipc_async_socket_t *rtc)
 {
 	if (FAIL == zbx_tcp_recv_to(sock, config_comms->config_trapper_timeout))
 		return;
@@ -1327,7 +1327,7 @@ static void	process_trapper_child(zbx_socket_t *sock, zbx_timespec_t *ts,
 			events_cbs, proxydata_frequency, get_config_forks, config_stats_allowed_ip, progname,
 			config_java_gateway, config_java_gateway_port, config_externalscripts,
 			config_enable_global_scripts, zbx_get_value_internal_ext_cb, config_ssh_key_location,
-			config_webdriver_url, trapper_process_request_cb, autoreg_update_host_cb);
+			config_webdriver_url, trapper_process_request_cb, autoreg_update_host_cb, rtc);
 }
 
 ZBX_THREAD_ENTRY(zbx_trapper_thread, args)
@@ -1437,7 +1437,7 @@ ZBX_THREAD_ENTRY(zbx_trapper_thread, args)
 					trapper_args_in->config_ssh_key_location,
 					trapper_args_in->config_webdriver_url,
 					trapper_args_in->trapper_process_request_func_cb,
-					trapper_args_in->autoreg_update_host_cb);
+					trapper_args_in->autoreg_update_host_cb, &rtc);
 			sec = zbx_time() - sec;
 
 			zbx_tcp_unaccept(&s);
