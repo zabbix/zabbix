@@ -76,8 +76,6 @@ const char	*zbx_interface_type_string(zbx_interface_type_t type)
 			return "JMX";
 		case INTERFACE_TYPE_OPT:
 			return "optional";
-		case INTERFACE_TYPE_ANY:
-			return "any";
 		case INTERFACE_TYPE_UNKNOWN:
 		default:
 			return "unknown";
