@@ -362,7 +362,7 @@ static int	DBcopy_template_trigger_tags(const zbx_vector_uint64_t *new_triggerid
 	zbx_vector_trigger_tags_reserve(&triggers_tags, (size_t)triggerids.values_alloc);
 
 	zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset,
-			"select tt.triggertagid,t.triggerid,t.flags,tt.tag,tt.value"
+			"select tt.triggertagid,t.triggerid,t.flags,tt.tag,tt.value,tt.automatic"
 			" from triggers t"
 			" left join trigger_tag tt on tt.triggerid=t.triggerid"
 			" where");
@@ -393,6 +393,7 @@ static int	DBcopy_template_trigger_tags(const zbx_vector_uint64_t *new_triggerid
 		{
 			db_tag = zbx_db_tag_create(row[3], row[4]);
 			ZBX_DBROW2UINT64(db_tag->tagid, row[0]);
+			db_tag->automatic = atoi(row[5]);
 			zbx_vector_db_tag_ptr_append(&trigger_tags->tags, db_tag);
 		}
 	}
@@ -460,7 +461,7 @@ static int	DBcopy_template_trigger_tags(const zbx_vector_uint64_t *new_triggerid
 	if (0 != insert_num)
 	{
 		zbx_db_insert_prepare(&db_insert, "trigger_tag", "triggertagid", "triggerid", "tag", "value",
-				(char *)NULL);
+				"automatic", (char *)NULL);
 		tagid = zbx_db_get_maxid_num("trigger_tag", insert_num);
 	}
 
@@ -483,11 +484,11 @@ static int	DBcopy_template_trigger_tags(const zbx_vector_uint64_t *new_triggerid
 			if (0 == db_tag->tagid)
 			{
 				zbx_db_insert_add_values(&db_insert, tagid, trigger_tags->triggerid,
-						db_tag->tag, db_tag->value);
+						db_tag->tag, db_tag->value, db_tag->automatic);
 
 				zbx_audit_trigger_update_json_add_tags_and_values(audit_context_mode,
 						trigger_tags->triggerid, trigger_tags->flags, tagid, db_tag->tag,
-						db_tag->value);
+						db_tag->value, db_tag->automatic);
 
 				tagid++;
 			}
@@ -520,11 +521,23 @@ static int	DBcopy_template_trigger_tags(const zbx_vector_uint64_t *new_triggerid
 
 					value_esc = zbx_db_dyn_escape_string(db_tag->value);
 					zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "%svalue='%s'", d, value_esc);
+
+					d = ",";
 					zbx_free(value_esc);
 
 					zbx_audit_trigger_update_json_update_tag_value(audit_context_mode,
 							trigger_tags->triggerid, trigger_tags->flags, db_tag->tagid,
 							db_tag->value_orig, db_tag->value);
+				}
+
+				if (0 != (db_tag->flags & ZBX_FLAG_DB_TAG_UPDATE_AUTOMATIC))
+				{
+					zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "%sautomatic=%d", d,
+							db_tag->automatic);
+
+					zbx_audit_trigger_update_json_update_tag_automatic(audit_context_mode,
+							trigger_tags->triggerid, trigger_tags->flags, db_tag->tagid,
+							db_tag->automatic_orig, db_tag->automatic);
 				}
 
 				zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, " where triggertagid=" ZBX_FS_UI64
