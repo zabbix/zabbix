@@ -718,11 +718,12 @@ class CFrontendSetup {
 	 * @return array
 	 */
 	public function checkPhpCurlModule() {
-		$current = function_exists('curl_init');
+		$current = function_exists('curl_init') && function_exists('curl_version');
+		$version_match = $current && version_compare(curl_version()['version'], '7.19.4', '>=');
 
 		return [
 			'name' => _('PHP curl'),
-			'current' => $current ? _('on') : _('off'),
+			'current' => $current && $version_match ? _('on') : _('off'),
 			'required' => null,
 			'result' => $current ? self::CHECK_OK : self::CHECK_WARNING,
 			'error' => _('PHP curl extension missing.')

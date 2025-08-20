@@ -27,16 +27,20 @@ $errors = CMessageHelper::getMessages();
 CMessageHelper::clear();
 
 $body = new CDiv();
+$show_error_details = true;
 
-if ($errors || array_key_exists('raw_response', $data['tokens'])) {
-	$show_details = true;
+if (array_key_exists('raw_response', $data['tokens'])) {
+	$errors[] = ['message' => [
+		_('Response'),
+		new CPre($data['user']['debug_mode']
+			? $data['tokens']['raw_response']
+			: _('Response body is available only in debug mode.')
+	)]];
+	$show_error_details = false;
+}
 
-	if ($data && array_key_exists('raw_response', $data['tokens'])) {
-		$errors[] = ['message' => [_('Response'), new CPre($data['tokens']['raw_response'])]];
-		$show_details = false;
-	}
-
-	$body->addItem(makeMessageBox(ZBX_STYLE_MSG_BAD, $errors, $error_title, false, $show_details));
+if ($errors) {
+	$body->addItem(makeMessageBox(ZBX_STYLE_MSG_BAD, $errors, $error_title, false, $show_error_details));
 }
 else {
 	$body->addItem(new CScriptTag('window.opener.postMessage('.json_encode($data['tokens']).', window.location.origin);'));

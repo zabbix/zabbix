@@ -102,7 +102,8 @@ class CControllerOauthAuthorize extends CController {
 		}
 
 		$this->setResponse(new CControllerResponseData([
-			'tokens' => $this->exchangeCodeToTokens($token_url, $data)
+			'tokens' => $this->exchangeCodeToTokens($token_url, $data),
+			'user' => ['debug_mode' => $this->getDebugMode()]
 		]));
 	}
 
@@ -123,9 +124,19 @@ class CControllerOauthAuthorize extends CController {
 			CURLOPT_POSTFIELDS => http_build_query($data),
 			CURLOPT_HTTPHEADER => ['Content-Type: application/x-www-form-urlencoded'],
 			CURLOPT_TIMEOUT => 30,
+			CURLOPT_MAXREDIRS => 10,
 			CURLOPT_SSL_VERIFYPEER => true,
 			CURLOPT_SSL_VERIFYHOST => 2
 		];
+
+		if (defined('CURLOPT_PROTOCOLS_STR')) {
+			$curl_options[CURLOPT_PROTOCOLS_STR] = 'https,http';
+			$curl_options[CURLOPT_REDIR_PROTOCOLS_STR] = 'https,http';
+		}
+		else {
+			$curl_options[CURLOPT_PROTOCOLS] = CURLPROTO_HTTPS | CURLPROTO_HTTP;
+			$curl_options[CURLOPT_REDIR_PROTOCOLS] = CURLPROTO_HTTPS | CURLPROTO_HTTP;
+		}
 
 		curl_setopt_array($handle, $curl_options);
 
