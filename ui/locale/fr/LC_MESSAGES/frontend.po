@@ -4,7 +4,7 @@ msgstr ""
 "Project-Id-Version: Zabbix 6.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2023-10-19 13:48+0300\n"
-"PO-Revision-Date: 2025-05-16 21:07+0000\n"
+"PO-Revision-Date: 2025-07-27 14:15+0000\n"
 "Last-Translator: ERIC <eric78.zabbix@orange.fr>\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
 "Language: fr\n"
@@ -19,7 +19,7 @@ msgstr ""
 #: include/classes/validators/CFormValidator.php:1397
 #: include/classes/validators/CFormValidator.php:1442 jsLoader.php:439
 msgid " or "
-msgstr ""
+msgstr "ou"
 
 #: app/controllers/CControllerSlaReportList.php:182
 #, c-format
@@ -379,7 +379,7 @@ msgstr "1 minute"
 
 #: app/views/host.wizard.edit.php:861
 msgid "1. Install Java Gateway on the same machine running Zabbix server by following the instructions in"
-msgstr ""
+msgstr "1. Installer la Java Gateway sur la même machine hébergeant le serveur Zabbix en suivant les instructions de"
 
 #: app/views/administration.queue.overview.php:48
 #: app/views/administration.queue.overview.proxy.php:48
@@ -393,7 +393,7 @@ msgstr "12 heures"
 
 #: app/views/host.wizard.edit.php:867
 msgid "2. Configure your Java application to support remote JMX monitoring. For example:"
-msgstr ""
+msgstr "2. Configurer votre application Java pour supporter la supervision JMX. Par exemple :"
 
 #: tests/selenium/modules/clock32/includes/WidgetForm.php:115
 #: widgets/clock/includes/WidgetForm.php:115
@@ -458,17 +458,17 @@ msgstr "M"
 
 #: app/views/js/host.wizard.edit.js.php:1143
 msgid "A few more steps"
-msgstr ""
+msgstr "Encore quelques étapes"
 
 #: include/classes/helpers/CItemGeneralHelper.php:356
 #: include/classes/helpers/CItemGeneralHelper.php:399
 #: include/classes/helpers/CItemGeneralHelper.php:407
 msgid "A floating point value is expected."
-msgstr ""
+msgstr "Une virgule est attendue dans la valeur"
 
 #: app/views/host.wizard.edit.php:139
 msgid "A template is a set of predefined configurations (metrics to be collected, conditions for generating alerts, etc.) designed for your monitoring target."
-msgstr ""
+msgstr "Un modèle est un ensemble de paramètres de supervision prédéfinis (métriques à collecter, conditions pour générer des alertes, etc), conçu pour la plateforme cible."
 
 #: widgets/svggraph/includes/CWidgetFieldOverrideView.php:199
 msgid "ADD OVERRIDE"
@@ -727,7 +727,7 @@ msgstr[1] "Actions désactivées"
 
 #: app/controllers/CControllerPopup.php:42
 msgid "Action edit"
-msgstr ""
+msgstr "Éditer l'action"
 
 #: app/controllers/CControllerActionEnable.php:84
 msgid "Action enabled"
@@ -1020,7 +1020,7 @@ msgstr "Ajouter hôte"
 
 #: app/views/host.wizard.edit.php:571 app/views/js/host.wizard.edit.js.php:1133
 msgid "Add host interface"
-msgstr ""
+msgstr "Ajouter une interface hôte"
 
 #: include/actions.inc.php:653 include/actions.inc.php:871
 msgid "Add host tags"
@@ -1222,7 +1222,7 @@ msgstr "Agent (passif)"
 
 #: app/views/host.wizard.edit.php:597
 msgid "Agent address"
-msgstr ""
+msgstr "Adresse de l'agent"
 
 #: include/classes/data/CItemData.php:911
 msgid "Agent availability check. Returns nothing - unavailable; 1 - available"
@@ -1242,7 +1242,7 @@ msgstr "Nom d'hôte de l'agent. Retourne une chaîne de caractères"
 
 #: app/views/js/host.wizard.edit.js.php:96
 msgid "Agent interface"
-msgstr ""
+msgstr "Interface de l'agent"
 
 #: include/views/inventory.host.view.php:64
 msgid "Agent interfaces"
@@ -1254,7 +1254,7 @@ msgstr ""
 
 #: app/views/host.wizard.edit.php:603
 msgid "Agent port"
-msgstr ""
+msgstr "Port de l'agent"
 
 #: include/classes/data/CItemData.php:919
 msgid "Agent variant check. Returns 1 - for Zabbix agent; 2 - for Zabbix agent 2"
@@ -1266,7 +1266,7 @@ msgstr ""
 
 #: app/views/host.wizard.edit.php:159 app/views/js/host.wizard.edit.js.php:1782
 msgid "Agentless"
-msgstr ""
+msgstr "Sans agent"
 
 #: widgets/svggraph/includes/CWidgetFieldDataSetView.php:417
 msgid "Aggregate"
@@ -1458,7 +1458,7 @@ msgstr "Quantité de mémoire physique de l'hôte consommée pour la sauvegarde 
 #: include/classes/api/services/CItemGeneral.php:1913
 #, c-format
 msgid "An LLD rule prototype with key \"%1$s\" already exists on the host \"%2$s\"."
-msgstr ""
+msgstr "Un prototype de règle LLD avec la clé \"%1$s\" existe déjà avec sur l'hôte \"%2$s\"."
 
 #: include/classes/api/services/CItemGeneral.php:1912
 #, c-format
@@ -1479,7 +1479,7 @@ msgstr "Une règle LLD avec la clé \"%1$s\" existe déjà sur le modèle \"%2$s
 #: include/classes/validators/CFormValidator.php:1103
 #: include/classes/validators/CFormValidator.php:1150 jsLoader.php:419
 msgid "An array is expected."
-msgstr ""
+msgstr "Un tableau est attendu."
 
 #: include/classes/api/services/CItemGeneral.php:1775
 #, c-format
@@ -1589,7 +1589,7 @@ msgstr "Toutes les entités de modèle existantes non présentes dans le fichier
 
 #: app/views/host.wizard.edit.php:148
 msgid "Apache, AWS, MySQL, etc."
-msgstr ""
+msgstr "Apache, AWS, MySQL, etc."
 
 #: include/classes/core/CJsonRpc.php:225
 msgid "Application error."
@@ -1758,7 +1758,7 @@ msgstr "Au moins un groupe hôte ou un hôte doit être sélectionné."
 
 #: include/classes/helpers/CItemGeneralHelper.php:411
 msgid "At least one of \"min\" or \"max\" parameters should be specified."
-msgstr ""
+msgstr "Au moins un des paramètres « min » ou « max » doit être spécifié."
 
 #: include/classes/setup/CFrontendSetup.php:252
 msgid "At least one of MySQL or PostgreSQL should be supported."
@@ -2398,7 +2398,7 @@ msgstr "Annuler"
 
 #: app/views/host.wizard.edit.php:1042
 msgid "Cancel Host Wizard?"
-msgstr ""
+msgstr "Annuler l'assistant hôte ?"
 
 #: app/controllers/CControllerTokenCreate.php:65
 #: app/controllers/CControllerTokenCreate.php:135
@@ -2429,7 +2429,7 @@ msgstr "Impossible d'ajouter une page au tableau de bord : le nombre maximal de 
 
 #: host_discovery_prototypes.php:518
 msgid "Cannot add discovery prototype"
-msgstr ""
+msgstr "Impossible d'ajouter le prototype de découverte"
 
 #: host_discovery.php:540
 msgid "Cannot add discovery rule"
@@ -2589,7 +2589,7 @@ msgstr "Impossible d'attribuer le champ d'inventaire \"%1$s\" à l'élément ave
 #: app/controllers/CControllerItem.php:206
 #: app/controllers/CControllerItemPrototype.php:208
 msgid "Cannot be less than or equal to \"Min\"."
-msgstr ""
+msgstr "Ne peut pas être inférieur ou égal à \"Min\"."
 
 #: jsLoader.php:336
 msgctxt "screen reader"
@@ -2867,8 +2867,8 @@ msgstr "Impossible de supprimer la vérification de découverte \"%1$s\" de la r
 #: host_discovery_prototypes.php:313 host_discovery_prototypes.php:605
 msgid "Cannot delete discovery prototype"
 msgid_plural "Cannot delete discovery prototypes"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "Impossible de supprimer le prototype de découverte"
+msgstr[1] "Impossible de supprimer les prototypes de découverte"
 
 #: app/controllers/CControllerDiscoveryDelete.php:68 host_discovery.php:390
 #: host_discovery.php:597
@@ -3193,8 +3193,8 @@ msgstr[1] "Impossible de désactiver les connecteurs"
 #: host_discovery_prototypes.php:586
 msgid "Cannot disable discovery prototype"
 msgid_plural "Cannot disable discovery prototypes"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "Impossible de désactiver le prototype de découverte"
+msgstr[1] "Impossible de désactiver les prototypes de découverte"
 
 #: app/controllers/CControllerDiscoveryDisable.php:76 host_discovery.php:584
 msgid "Cannot disable discovery rule"
@@ -3289,7 +3289,7 @@ msgstr[1] "Impossible d'activer les connecteurs"
 #: host_discovery_prototypes.php:585
 msgid "Cannot enable discovery prototype"
 msgid_plural "Cannot enable discovery prototypes"
-msgstr[0] ""
+msgstr[0] "Impossible d'activer le prototype de découverte"
 msgstr[1] ""
 
 #: app/controllers/CControllerDiscoveryEnable.php:76 host_discovery.php:583
@@ -7284,6 +7284,10 @@ msgstr "Détails du scénario web"
 #: app/views/administration.housekeeping.edit.php:206
 msgid "Detected TimescaleDB license does not support compression. Compression is supported in TimescaleDB Community Edition."
 msgstr "La licence TimescaleDB détectée ne prend pas en charge la compression. La compression est prise en charge dans TimescaleDB Community Edition."
+
+#: app/views/administration.housekeeping.edit.php:204
+msgid "Detected license does not support compression. Compression is supported in TimescaleDB Community Edition."
+msgstr ""
 
 #: app/controllers/CControllerPopupTriggerExpr.php:1130
 msgid "Detection period"
@@ -14231,6 +14235,11 @@ msgstr "Nombre maximum de lignes"
 msgid "Maximum required %1$s database version is %2$s."
 msgstr "La version maximale requise de la base de données %1$s est %2$s."
 
+#: app/partials/administration.system.info.php:221
+#, c-format
+msgid "Maximum required version is %1$s."
+msgstr ""
+
 #: app/controllers/CControllerTimeSelectorUpdate.php:136
 #: include/classes/mvc/CController.php:320
 #: include/classes/widgets/fields/CWidgetFieldTimePeriod.php:203
@@ -14574,6 +14583,12 @@ msgstr "La limite minimale requise pour la durée de traitement des entrées des
 msgid "Minimum required size of PHP post is %1$s (configuration option \"post_max_size\")."
 msgstr "La taille minimale requise pour les post HTTP est %1$s (option \"post_max_size\")."
 
+#: app/partials/administration.system.info.php:212
+#: app/views/administration.housekeeping.edit.php:183
+#, c-format
+msgid "Minimum required version is %1$s."
+msgstr ""
+
 #: app/views/monitoring.map.view.php:48
 #: include/views/monitoring.sysmap.edit.php:276
 msgid "Minimum severity"
@@ -14806,8 +14821,18 @@ msgstr "Multiple"
 msgid "Multiple PROBLEM events"
 msgstr "Événements PROBLÈME multiples"
 
+#: app/partials/administration.system.info.php:235
+#, c-format
+msgid "Must be at least %1$s."
+msgstr ""
+
 #: include/classes/validators/CFormValidator.php:340
 msgid "Must be selected."
+msgstr ""
+
+#: app/partials/administration.system.info.php:254
+#, c-format
+msgid "Must not be higher than %1$s."
 msgstr ""
 
 #: jsLoader.php:284
@@ -15578,6 +15603,66 @@ msgstr "Aucune permission pour l'accès au système."
 #, c-format
 msgid "No permissions to call \"%1$s.%2$s\"."
 msgstr "Aucune autorisation pour appeler \"%1$s.%2$s\"."
+
+#: include/classes/api/services/CConfiguration.php:312
+msgid "No permissions to import discovery rules."
+msgstr ""
+
+#: include/classes/api/services/CConfiguration.php:313
+msgid "No permissions to import graphs."
+msgstr ""
+
+#: include/classes/api/services/CConfiguration.php:314
+msgid "No permissions to import host groups."
+msgstr ""
+
+#: include/classes/api/services/CConfiguration.php:316
+msgid "No permissions to import hosts."
+msgstr ""
+
+#: include/classes/api/services/CConfiguration.php:318
+msgid "No permissions to import images."
+msgstr ""
+
+#: include/classes/api/services/CConfiguration.php:319
+msgid "No permissions to import items."
+msgstr ""
+
+#: include/classes/api/services/CConfiguration.php:320
+msgid "No permissions to import maps."
+msgstr ""
+
+#: include/classes/api/services/CConfiguration.php:321
+msgid "No permissions to import media types."
+msgstr ""
+
+#: include/classes/api/services/CConfiguration.php:324
+msgid "No permissions to import template dashboards."
+msgstr ""
+
+#: include/classes/api/services/CConfiguration.php:315
+msgid "No permissions to import template groups."
+msgstr ""
+
+#: include/classes/api/services/CConfiguration.php:322
+msgid "No permissions to import template links."
+msgstr ""
+
+#: include/classes/api/services/CConfiguration.php:323
+msgid "No permissions to import templates."
+msgstr ""
+
+#: include/classes/api/services/CConfiguration.php:325
+msgid "No permissions to import triggers."
+msgstr ""
+
+#: include/classes/api/services/CConfiguration.php:326
+msgid "No permissions to import value maps."
+msgstr ""
+
+#: include/classes/api/services/CConfiguration.php:317
+msgid "No permissions to import web scenarios."
+msgstr ""
 
 #: app/controllers/CControllerChartsView.php:133
 #: app/controllers/CControllerDashboardPrint.php:99
@@ -20112,6 +20197,18 @@ msgstr "Court"
 msgid "Shortened"
 msgstr "Raccourci"
 
+#: app/partials/administration.system.info.php:243
+#: app/views/administration.housekeeping.edit.php:187
+#, c-format
+msgid "Should be at least %1$s."
+msgstr ""
+
+#: app/partials/administration.system.info.php:262
+#: app/views/administration.housekeeping.edit.php:197
+#, c-format
+msgid "Should not be higher than %1$s."
+msgstr ""
+
 #: app/partials/monitoring.problem.filter.php:27
 #: app/views/monitoring.charts.view.php:80
 #: app/views/monitoring.dashboard.list.php:64
@@ -21764,6 +21861,10 @@ msgstr "Le nombre de processus. Retourne un entier"
 msgid "The parameter \"%1$s\" is missing from the user attributes."
 msgstr "Le paramètre \"%1$s\" est absent des attributs de l'utilisateur."
 
+#: app/views/popup.ldap.edit.php:101
+msgid "The previous password was cleared due to a host change. Please enter the new password."
+msgstr ""
+
 #: include/classes/core/CJsonRpc.php:206
 msgid "The received JSON is not a valid JSON-RPC request."
 msgstr "Le JSON reçu n'est pas une requête JSON-RPC valide."
@@ -22965,6 +23066,14 @@ msgstr "Impossible de récupérer l'état de prise en charge de la compression d
 msgid "Unable to retrieve TimescaleDB version."
 msgstr "Impossible de récupérer la version de TimescaleDB."
 
+#: app/views/administration.housekeeping.edit.php:173
+msgid "Unable to retrieve compression support status of TimescaleDB time-series database extension for PostgreSQL."
+msgstr ""
+
+#: app/views/administration.housekeeping.edit.php:178
+msgid "Unable to retrieve version of TimescaleDB time-series database extension for PostgreSQL."
+msgstr ""
+
 #: include/views/mfa.login.php:65
 #, c-format
 msgid "Unable to scan? You can use %1$s secret key to manually configure your authenticator app:"
@@ -23253,6 +23362,11 @@ msgstr "Version du serveur de base de données %1$s non supportée. Doit être d
 #, c-format
 msgid "Unsupported %1$s database server version. Must not be higher than %2$s."
 msgstr "Version du serveur de base de données %1$s non supportée. Doit être d'au moins %2$s."
+
+#: app/partials/administration.system.info.php:206
+#: app/views/administration.housekeeping.edit.php:169
+msgid "Unsupported TimescaleDB time-series database extension for PostgreSQL is used."
+msgstr ""
 
 #: app/views/administration.housekeeping.edit.php:190
 #, c-format
@@ -24703,6 +24817,11 @@ msgstr "Avertissement"
 #: include/func.inc.php:1775 jsLoader.php:216
 msgid "Warning message"
 msgstr "Message d'alerte"
+
+#: app/partials/administration.system.info.php:243
+#: app/partials/administration.system.info.php:262
+msgid "Warning!"
+msgstr ""
 
 #: app/partials/administration.system.info.php:198
 msgid "Warning! Support for Oracle DB is deprecated since Zabbix 7.0 and will be removed in future versions."
