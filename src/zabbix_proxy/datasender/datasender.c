@@ -351,7 +351,7 @@ ZBX_THREAD_ENTRY(datasender_thread, args)
 			zbx_uint32_t	rtc_cmd;
 			unsigned char	*rtc_data = NULL;
 			int		sleeptime = ZBX_TASK_UPDATE_FREQUENCY;
-	
+
 			while (SUCCEED == zbx_rtc_wait(&rtc, info, &rtc_cmd, &rtc_data, sleeptime) && 0 != rtc_cmd)
 			{
 				switch (rtc_cmd)
