@@ -783,7 +783,7 @@ abstract class CControllerPopupItemTest extends CController {
 			]
 		];
 
-		if (array_key_exists('inventory', $this->host)) {
+		if (array_key_exists('inventory', $this->host) && $this->host['inventory']) {
 			foreach (CMacrosResolverGeneral::getSupportedHostInventoryMacrosMap() as $macro_name => $db_field_name) {
 				$macros['inventory'][$macro_name] = $this->host['inventory'][$db_field_name];
 			}
