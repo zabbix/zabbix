@@ -240,33 +240,25 @@ class PostgresqlDbBackend extends DbBackend {
 			return false;
 		}
 
-		$queries = [];
-		$use_deprecated_function = self::getTimescaleDBVersion() < 21800;
-
-		foreach ($tables as $table) {
-			$queries[] = $use_deprecated_function
-				? 'SELECT number_compressed_chunks chunks'.
-					' FROM hypertable_compression_stats('.zbx_dbstr($table).')'.
-					' WHERE number_compressed_chunks != 0'
-				: 'SELECT number_compressed_chunks chunks'.
-					' FROM hypertable_columnstore_stats('.zbx_dbstr($table).')'.
-					' WHERE number_compressed_chunks != 0';
-		}
-
-		$result = DBfetch(DBselect(implode(' UNION ', $queries)));
-
-		return $result && $result['chunks'];
-	}
-
-	private static function getTimescaleDBVersion(): int {
 		$res = DBfetch(DBselect(
 			'SELECT extversion'.
 			' FROM pg_extension'.
 			' WHERE '.zbx_dbstr('extname', ZBX_DB_EXTENSION_TIMESCALEDB)
 		));
 
-		[$major, $minor, $patch] = explode('.', $res['extversion']);
+		$stats_function = version_compare($res['extversion'], '2.18.0', '<')
+			? 'hypertable_compression_stats'
+			: 'hypertable_columnstore_stats';
+		$chunk_queries = [];
 
-		return $major * 10000 + $minor * 100 + $patch * 1;
+		foreach ($tables as $table) {
+			$chunk_queries[] = 'SELECT number_compressed_chunks chunks'.
+				' FROM '.$stats_function.'('.zbx_dbstr($table).')'.
+				' WHERE number_compressed_chunks != 0';
+		}
+
+		$result = DBfetch(DBselect(implode(' UNION ', $chunk_queries)));
+
+		return $result && $result['chunks'];
 	}
 }
