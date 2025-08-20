@@ -452,7 +452,7 @@ class testPageAdministrationMediaTypes extends CWebTest {
 			: (($action === 'enable' && CTestArrayHelper::get($data, 'select_all'))
 				? 'Media types '.$action.'d. Not enabled: Gmail, Office365. Incomplete configuration.'
 				: 'Media types '.$action.'d'
-			);
+		);
 		$this->assertMessage(TEST_GOOD, $message_title);
 
 		// Check the results in DB.

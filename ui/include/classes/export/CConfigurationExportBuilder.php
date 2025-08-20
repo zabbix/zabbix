@@ -700,6 +700,7 @@ class CConfigurationExportBuilder {
 				'http_proxy' => $discoveryRule['http_proxy'],
 				'headers' => $discoveryRule['headers'],
 				'retrieve_mode' => $discoveryRule['retrieve_mode'],
+				'output_format' => $discoveryRule['output_format'],
 				'request_method' => $discoveryRule['request_method'],
 				'allow_traps' => $discoveryRule['allow_traps'],
 				'ssl_cert_file' => $discoveryRule['ssl_cert_file'],
