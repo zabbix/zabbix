@@ -1,1 +1,0 @@
-...G.....T [ZBX-25944] replaced container name with container id where used in queries and items for both Oracle templates and Oracle Zabbix agent 2 plugin (knaglis)

@@ -1606,7 +1606,7 @@ abstract class CHostBase extends CApiService {
 
 		if (self::isTemplate()) {
 			$macros = [];
-			$db_macros = $db_hosts !== null ? [] : null;
+			$db_macros = [];
 
 			foreach ($hosts as &$host) {
 				if (!array_key_exists('macros', $host)) {
@@ -1618,22 +1618,13 @@ abstract class CHostBase extends CApiService {
 						$macro['hostmacroid'] = array_shift($hostmacroids);
 
 						if (array_key_exists('config', $macro)) {
-							self::prepareMacroConfigOptionsForAuditlog($macro);
-
-							if ($db_hosts !== null) {
-								$macros[] = $macro;
-								$db_macros[$macro['hostmacroid']] = ['config' => DB::getDefaults('hostmacro_config')];
-							}
+							$macros[] = $macro;
 						}
 					}
 					elseif (array_key_exists('config', $macro)) {
 						$macros[] = $macro;
 						$db_macros[$macro['hostmacroid']] =
 							$db_hosts[$host[$id_field_name]]['macros'][$macro['hostmacroid']];
-
-						self::prepareMacroConfigOptionsForAuditlog($macro,
-							$db_hosts[$host[$id_field_name]]['macros'][$macro['hostmacroid']]
-						);
 					}
 				}
 				unset($macro);
@@ -1661,7 +1652,7 @@ abstract class CHostBase extends CApiService {
 		}
 	}
 
-	private static function updateMacroConfigs(array $macros, ?array $db_macros): void {
+	private static function updateMacroConfigs(array $macros, array $db_macros): void {
 		$ins_hostmacro_configs = [];
 		$upd_hostmacro_configs = [];
 		$del_hostmacroids = [];
@@ -1675,6 +1666,7 @@ abstract class CHostBase extends CApiService {
 
 			if (array_key_exists($macro['hostmacroid'], $db_macros)) {
 				$db_macro = $db_macros[$macro['hostmacroid']];
+
 				$db_macro['config']['options'] = $db_macro['config']['options']
 					? json_encode($db_macro['config']['options'])
 					: '';
@@ -1735,24 +1727,6 @@ abstract class CHostBase extends CApiService {
 		$config += array_intersect_key(DB::getDefaults('hostmacro_config'),
 			array_flip(array_diff($type_fields[$db_config['type']], $type_fields[$config['type']]))
 		);
-	}
-
-	private static function prepareMacroConfigOptionsForAuditlog(array &$macro, ?array &$db_macro = null): void {
-		if (!array_key_exists('options', $macro['config'])) {
-			return;
-		}
-
-		foreach ($macro['config']['options'] as $i => &$option) {
-			$option['index'] = $i;
-		}
-		unset($option);
-
-		if ($db_macro !== null) {
-			foreach ($db_macro['config']['options'] as $i => &$db_option) {
-				$db_option['index'] = $i;
-			}
-			unset($db_option);
-		}
 	}
 
 	/**

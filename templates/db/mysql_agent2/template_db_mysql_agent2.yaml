@@ -1,5 +1,5 @@
 zabbix_export:
-  version: '7.4'
+  version: '8.0'
   template_groups:
     - uuid: 748ad4d098d447d492bb935c907f652f
       name: Templates/Databases
@@ -55,7 +55,7 @@ zabbix_export:
         
         For more information please read the MariaDB documentation https://mariadb.com/docs/server/ref/mdb/privileges/SLAVE_MONITOR/
         
-        2. Set in the `MySQL DSN` host wizard configuration field macro the data source name of the MySQL instance either session name from Zabbix agent 2 configuration file or URI.
+        2. Set in the `MySQL DSN` host wizard configuration field the data source name of the MySQL instance either session name from Zabbix agent 2 configuration file or URI.
         **Examples:** MySQL1, tcp://localhost:3306, tcp://172.16.0.10, unix:/var/run/mysql.sock
         For more information about MySQL Unix socket file, see the MySQL documentation https://dev.mysql.com/doc/refman/8.0/en/problems-with-mysql-sock.html.
         
@@ -64,7 +64,7 @@ zabbix_export:
         For more information about configuring the Zabbix MySQL plugin, see the documentation https://git.zabbix.com/projects/ZBX/repos/zabbix/browse/src/go/plugins/mysql/README.md.
       vendor:
         name: Zabbix
-        version: 7.4-3
+        version: 8.0-1
       groups:
         - name: Templates/Databases
       items:

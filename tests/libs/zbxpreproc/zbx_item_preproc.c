@@ -458,7 +458,9 @@ void	zbx_mock_test_entry(void **state)
 			zbx_mock_assert_int_eq("result variant type", ZBX_VARIANT_ERR, value.type);
 
 		zbx_variant_clear(&value);
-		zbx_variant_clear(&history_value_out);
+
+		if (SUCCEED != zbx_variant_same(&history_value_in, &history_value_out))
+			zbx_variant_clear(&history_value_out);
 	}
 
 	pp_cache_release(cache);

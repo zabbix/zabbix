@@ -1,5 +1,5 @@
 zabbix_export:
-  version: '7.4'
+  version: '8.0'
   template_groups:
     - uuid: 748ad4d098d447d492bb935c907f652f
       name: Templates/Databases
@@ -34,7 +34,7 @@ zabbix_export:
          ```zabbix_get -s oracle-host -k  oracle.ping["{$ORACLE.CONNSTRING}","{$ORACLE.USER}","{$ORACLE.PASSWORD}","{$ORACLE.SERVICE}"]```
       vendor:
         name: Zabbix
-        version: 7.4-1
+        version: 8.0-0
       groups:
         - name: Templates/Databases
       items:

@@ -10,7 +10,7 @@ The template collects metrics by polling the HAProxy stats page with HTTP agent.
 
 ## Requirements
 
-Zabbix version: 7.4 and higher.
+Zabbix version: 8.0 and higher.
 
 ## Tested versions
 
@@ -19,7 +19,7 @@ This template has been tested on:
 
 ## Configuration
 
-> Zabbix should be configured according to the instructions in the [Templates out of the box](https://www.zabbix.com/documentation/7.4/manual/config/templates_out_of_the_box) section.
+> Zabbix should be configured according to the instructions in the [Templates out of the box](https://www.zabbix.com/documentation/8.0/manual/config/templates_out_of_the_box) section.
 
 ## Setup
 
@@ -47,7 +47,7 @@ frontend stats
 |Name|Description|Default|
 |----|-----------|-------|
 |{$HAPROXY.STATS.SCHEME}|<p>The scheme of HAProxy stats page (http/https).</p>|`http`|
-|{$HAPROXY.STATS.HOST}|<p>The hostname or IP address of the HAProxy stats host or container.</p>|`<SET HAPROXY HOST>`|
+|{$HAPROXY.STATS.HOST}|<p>The hostname or IP address of the HAProxy stats host or container.</p>||
 |{$HAPROXY.STATS.PORT}|<p>The port of the HAProxy stats host or container.</p>|`8404`|
 |{$HAPROXY.STATS.PATH}|<p>The path of the HAProxy stats page.</p>|`stats`|
 |{$HAPROXY.USERNAME}|<p>The username of the HAProxy stats page.</p>||

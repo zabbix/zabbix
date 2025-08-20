@@ -448,6 +448,10 @@ int	zbx_trapper_item_test_run(const struct zbx_json_parse *jp_data, zbx_uint64_t
 				config_startup_time, program_type, progname, get_config_forks, config_java_gateway,
 				config_java_gateway_port, config_externalscripts, get_value_internal_ext_cb,
 				config_ssh_key_location, config_webdriver_url);
+#ifdef HAVE_NETSNMP
+		if (ITEM_TYPE_SNMP == item.type)
+			zbx_clear_cache_snmp(ZBX_PROCESS_TYPE_TRAPPER, FAIL);
+#endif
 
 		switch (errcode)
 		{
@@ -676,13 +680,17 @@ void	zbx_trapper_item_test(zbx_socket_t *sock, const struct zbx_json_parse *jp,
 		const char *progname, zbx_get_config_forks_f get_config_forks, const char *config_java_gateway,
 		int config_java_gateway_port, const char *config_externalscripts,
 		zbx_get_value_internal_ext_f get_value_internal_ext_cb, const char *config_ssh_key_location,
-		const char *config_webdriver_url)
+		const char *config_webdriver_url, const zbx_config_tls_t *config_tls,
+		const char *config_frontend_allowed_ip)
 {
 	struct zbx_json	json;
 	int		ret;
 	char		*error = NULL;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
+
+	if (SUCCEED != zbx_check_frontend_conn_accept(sock, config_tls, config_frontend_allowed_ip))
+		goto out;
 
 	zbx_json_init(&json, 1024);
 
@@ -702,5 +710,6 @@ void	zbx_trapper_item_test(zbx_socket_t *sock, const struct zbx_json_parse *jp,
 	}
 
 	zbx_json_free(&json);
+out:
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 }

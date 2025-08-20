@@ -533,6 +533,7 @@ zbx_proxy_suppress_t;
 #define ZBX_JAN_1970_IN_SEC	2208988800.0	/* 1970 - 1900 in seconds */
 
 #define ZBX_MAX_RECV_DATA_SIZE		(1 * ZBX_GIBIBYTE)
+#define ZBX_MAX_RECV_2KB_DATA_SIZE	(2 * ZBX_KIBIBYTE)
 #if (4 < SIZEOF_SIZE_T)
 #define ZBX_MAX_RECV_LARGE_DATA_SIZE	(__UINT64_C(16) * ZBX_GIBIBYTE)
 #else
@@ -577,6 +578,7 @@ size_t	zbx_snprintf(char *str, size_t count, const char *fmt, ...) __zbx_attr_fo
 /* could be moved into libzbxstr.a but it seems to be logically grouped with surrounding functions */
 void	zbx_snprintf_alloc(char **str, size_t *alloc_len, size_t *offset, const char *fmt, ...)
 		__zbx_attr_format_printf(4, 5);
+void	zbx_vsnprintf_alloc(char **str, size_t *alloc_len, size_t *offset, const char *fmt, va_list args);
 
 #if defined(__hpux)
 int	zbx_hpux_vsnprintf_is_c99(void);
@@ -592,9 +594,6 @@ char	*zbx_dsprintf(char *dest, const char *f, ...) __zbx_attr_format_printf(2, 3
 
 /* used by zbxcommon, setproctitle */
 size_t	zbx_strlcpy(char *dst, const char *src, size_t siz);
-
-/* used by dsprintf, which is used by log */
-char	*zbx_dvsprintf(char *dest, const char *f, va_list args);
 
 #define VALUE_ERRMSG_MAX	128
 #define ZBX_LENGTH_UNLIMITED	0x7fffffff

@@ -13,11 +13,11 @@
 ** If not, see <https://www.gnu.org/licenses/>.
 **/
 
-define('ZABBIX_VERSION',		'7.4.0rc1');
-define('ZABBIX_API_VERSION',	'7.4.0');
-define('ZABBIX_EXPORT_VERSION',	'7.4');
+define('ZABBIX_VERSION',		'8.0.0alpha1');
+define('ZABBIX_API_VERSION',	'8.0.0');
+define('ZABBIX_EXPORT_VERSION',	'8.0');
 
-define('ZABBIX_DB_VERSION',		7030048);
+define('ZABBIX_DB_VERSION',		7050006);
 
 define('DB_VERSION_SUPPORTED',						0);
 define('DB_VERSION_LOWER_THAN_MINIMUM',				1);
@@ -1650,6 +1650,8 @@ define('API_HOST_ADDRESS',			69);
 define('API_ESCAPED_STRING_UTF8',	70);
 define('API_NUMBER',				71);
 define('API_SELEMENTID',			72);
+define('API_SSL_CERTIFICATE',		73);
+define('API_SSL_PRIVATE_KEY',		74);
 
 // flags
 define('API_REQUIRED',					0x00001);
@@ -2222,7 +2224,6 @@ define('ZBX_STYLE_STATUS_RED', 'status-red');
 define('ZBX_STYLE_STATUS_WARNING_BG', 'status-warning-bg');
 define('ZBX_STYLE_STATUS_YELLOW', 'status-yellow');
 define('ZBX_STYLE_SVG_GRAPH', 'svg-graph');
-define('ZBX_STYLE_SVG_GRAPH_PREVIEW', 'svg-graph-preview');
 define('ZBX_STYLE_SUBFILTER', 'subfilter');
 define('ZBX_STYLE_SUBFILTER_ENABLED', 'subfilter-enabled');
 define('ZBX_STYLE_SYSMAP', 'sysmap');
@@ -2392,6 +2393,7 @@ define('ZBX_ICON_CHEVRON_LEFT', 'zi-chevron-left');
 define('ZBX_ICON_CHEVRON_RIGHT', 'zi-chevron-right');
 define('ZBX_ICON_CHEVRON_UP', 'zi-chevron-up');
 define('ZBX_ICON_CIRCLE_INFO', 'zi-circle-info');
+define('ZBX_ICON_CIRCLE_QUESTION', 'zi-circle-question');
 define('ZBX_ICON_CIRCLE_QUESTION_FILLED', 'zi-circle-question-filled');
 define('ZBX_ICON_CLOCK', 'zi-clock');
 define('ZBX_ICON_COG_FILLED', 'zi-cog-filled');

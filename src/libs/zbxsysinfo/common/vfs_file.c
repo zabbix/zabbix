@@ -1271,7 +1271,7 @@ static char	*get_print_time(time_t st_raw)
 	char		*st_str;
 
 	st_str = zbx_malloc(NULL, MAX_TIME_STR_LEN);
-	localtime_r(&st_raw, &st);
+	st = *zbx_localtime(&st_raw, NULL);
 	strftime(st_str, MAX_TIME_STR_LEN, "%Y-%m-%dT%T%z", &st);
 
 	return st_str;
@@ -1283,23 +1283,22 @@ static char	*get_print_time(time_t st_raw)
 	{									\
 		char	*tmp;							\
 										\
-		if (0 < time)							\
-		{								\
+		if (0 <= time)							\
 			tmp = get_print_time((time_t)time);			\
-			zbx_json_addstring(j, tag, tmp, ZBX_JSON_TYPE_STRING);	\
-			zbx_free(tmp);						\
-		}								\
 		else								\
-			zbx_json_addstring(j, tag, NULL, ZBX_JSON_TYPE_STRING);	\
+			tmp = get_print_time(0);				\
+										\
+		zbx_json_addstring(j, tag, tmp, ZBX_JSON_TYPE_STRING);		\
+		zbx_free(tmp);							\
 	} while (0)
 
 #define VFS_FILE_ADD_TS(time, tag)						\
 	do									\
 	{									\
-		if (0 < time)							\
+		if (0 <= time)							\
 			zbx_json_adduint64(j, tag, (zbx_uint64_t)time);		\
 		else								\
-			zbx_json_addstring(j, tag, NULL, ZBX_JSON_TYPE_STRING);	\
+			zbx_json_adduint64(j, tag, 0);				\
 	} while (0)
 
 #if defined(_WINDOWS) || defined(__MINGW32__)

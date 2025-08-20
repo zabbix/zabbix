@@ -74,7 +74,7 @@ class CSystemInfoHelper {
 			'sortorder' => 'DESC'
 		], false);
 
-		foreach ($ha_nodes as $node) {
+		foreach ($ha_nodes as $index => $node) {
 			if ($node['name'] === '' && $node['status'] == ZBX_NODE_STATUS_ACTIVE) {
 				$ha_cluster_enabled = false;
 				$ha_nodes = [];
@@ -82,6 +82,16 @@ class CSystemInfoHelper {
 			}
 			elseif ($node['status'] == ZBX_NODE_STATUS_STANDBY || $node['status'] == ZBX_NODE_STATUS_ACTIVE) {
 				$ha_cluster_enabled = true;
+			}
+
+			if ($node['status'] == ZBX_NODE_STATUS_ACTIVE) {
+				$server = new CZabbixServer($node['address'], $node['port'],
+					timeUnitToSeconds(CSettingsHelper::get(CSettingsHelper::CONNECT_TIMEOUT)),
+					timeUnitToSeconds(CSettingsHelper::get(CSettingsHelper::SOCKET_TIMEOUT)), ZBX_SOCKET_BYTES_LIMIT);
+
+				if (!$server->canConnect(CSessionHelper::getId())) {
+					$ha_nodes[$index]['status'] = ZBX_NODE_STATUS_UNAVAILABLE;
+				}
 			}
 		}
 
@@ -139,9 +149,16 @@ class CSystemInfoHelper {
 			timeUnitToSeconds(CSettingsHelper::get(CSettingsHelper::SOCKET_TIMEOUT)), ZBX_SOCKET_BYTES_LIMIT
 		);
 
-		$status['is_running'] = $server->isRunning(CSessionHelper::getId());
+		$status['is_running'] = $server->isRunning() || $server->canConnect(CSessionHelper::getId());
 
-		if ($status['is_running'] === false || CWebUser::getType() != USER_TYPE_SUPER_ADMIN) {
+		if (CWebUser::getType() != USER_TYPE_SUPER_ADMIN) {
+			return $status;
+		}
+
+		if ($status['is_running'] === false) {
+			if ($server->getErrorCode() === CZabbixServer::ERROR_CODE_TLS) {
+				error($server->getError());
+			}
 			return $status;
 		}
 

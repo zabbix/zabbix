@@ -85,6 +85,13 @@
 					margin-top: 16px;
 				}
 			}
+
+			.toggle {
+				grid-column: 1 / -1;
+				justify-self: start;
+				min-width: 0;
+				max-width: 100%;
+			}
 		}
 
 		&.grid-columns {
@@ -127,6 +134,8 @@
 		--counter-width: 2ch;
 
 		.ordered-list-item {
+			gap: 12px 48px;
+
 			.formated-text,
 			.form-field {
 				&:not(:first-child) {
@@ -377,6 +386,16 @@
 			border-left: 4px solid $form-description-border-color;
 			border-radius: 2px;
 		}
+
+		&.field-baseline {
+			margin-top: 16px;
+		}
+	}
+
+	.zi-circle-question {
+		&::before {
+			font-size: 16px;
+		}
 	}
 
 	.pre-shared-key-field {
@@ -392,7 +411,10 @@
 
 		.template-subfilter-item {
 			padding: 0 4px;
+			min-width: 0;
 			height: 22px;
+			overflow: hidden;
+			text-overflow: ellipsis;
 			border: 0;
 			background: transparent;
 			color: $font-alt-color;
@@ -407,14 +429,35 @@
 
 	.templates-card-list {
 		.radio-card {
-			grid-template-rows: repeat(2, max-content) 1fr;
+			display: flex;
+			flex-direction: column;
 			gap: 16px;
 			max-height: 360px;
 		}
 
+		.radio-card-label,
+		.template-tag,
+		.template-info-toggle-container {
+			flex: 0 0 auto;
+		}
+
+		.template-info {
+			flex: 1 1 auto;
+			overflow-x: hidden;
+			overflow-y: auto;
+		}
+
 		.radio-card-label {
+			display: -webkit-box;
 			font-size: 14px;
 			line-height: 21px;
+			overflow: hidden;
+			text-overflow: ellipsis;
+			line-clamp: 2;
+			white-space: normal;
+			word-break: break-word;
+			-webkit-line-clamp: 2;
+			-webkit-box-orient: vertical;
 		}
 
 		.template-tags {
@@ -448,8 +491,6 @@
 		.template-info {
 			@extend %webkit-scrollbar;
 
-			overflow-x: hidden;
-			overflow-y: auto;
 			line-height: 1.5;
 		}
 
@@ -471,7 +512,7 @@
 		}
 
 		.template-info-toggle-container {
-			align-self: end;
+			margin-top: auto;
 
 			.btn-link {
 				float: right;
@@ -491,5 +532,26 @@
 
 	.host-macro-list {
 		display: contents;
+	}
+}
+
+.temp-tags-list {
+	visibility: hidden;
+	position: absolute;
+	display: flex;
+	flex-wrap: wrap;
+	gap: 8px;
+	width: 195px;
+	pointer-events: none;
+	z-index: -1;
+
+	.tag {
+		margin: 0;
+	}
+
+	.btn-icon {
+		min-width: 16px;
+		height: 16px;
+		line-height: 16px;
 	}
 }
