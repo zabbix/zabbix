@@ -50,23 +50,7 @@ class testFormAdministrationGeneralGeomaps extends CWebTest {
 					'Max zoom level' => 17
 				]
 			],
-			// #2.
-			[
-				[
-					'Tile provider' => 'Stamen Toner Lite',
-					'Tile URL' => 'https://stamen-tiles-{s}.a.ssl.fastly.net/toner-lite/{z}/{x}/{y}{r}.png',
-					'Max zoom level' => 20
-				]
-			],
-			// #3.
-			[
-				[
-					'Tile provider' => 'Stamen Terrain',
-					'Tile URL' => 'https://stamen-tiles-{s}.a.ssl.fastly.net/terrain/{z}/{x}/{y}{r}.png',
-					'Max zoom level' => 18
-				]
-			],
-			//#4.
+			//#2.
 			[
 				[
 					'Tile provider' => 'USGS US Topo',
@@ -74,7 +58,7 @@ class testFormAdministrationGeneralGeomaps extends CWebTest {
 					'Max zoom level' => 20
 				]
 			],
-			// #5.
+			// #3.
 			[
 				[
 					'Tile provider' => 'USGS US Imagery',
@@ -82,7 +66,7 @@ class testFormAdministrationGeneralGeomaps extends CWebTest {
 					'Max zoom level' => 20
 				]
 			],
-			// #6.
+			// #4.
 			[
 				[
 					'Tile provider' => 'Other',
@@ -109,7 +93,7 @@ class testFormAdministrationGeneralGeomaps extends CWebTest {
 		 */
 		if ($data['Tile provider'] === 'Other') {
 			// Check dropdown options presence.
-			$this->assertEquals(['OpenStreetMap Mapnik', 'OpenTopoMap', 'Stamen Toner Lite', 'Stamen Terrain',
+			$this->assertEquals(['OpenStreetMap Mapnik', 'OpenTopoMap',
 				'USGS US Topo', 'USGS US Imagery', 'Other'], $form->getField('Tile provider')->asDropdown()
 				->getOptions()->asText()
 			);
@@ -185,24 +169,6 @@ class testFormAdministrationGeneralGeomaps extends CWebTest {
 			// #2.
 			[
 				[
-					'fields' => [
-						'Tile provider' => 'Stamen Toner Lite'
-					],
-					'db' => 'Stamen.TonerLite'
-				]
-			],
-			// #3.
-			[
-				[
-					'fields' => [
-						'Tile provider' => 'Stamen Terrain'
-					],
-					'db' => 'Stamen.Terrain'
-				]
-			],
-			// #4.
-			[
-				[
 					'expected' => TEST_BAD,
 					'fields' => [
 						'Tile provider' => 'Other'
@@ -213,7 +179,7 @@ class testFormAdministrationGeneralGeomaps extends CWebTest {
 					]
 				]
 			],
-			// #5.
+			// #3.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -227,7 +193,7 @@ class testFormAdministrationGeneralGeomaps extends CWebTest {
 					]
 				]
 			],
-			// #6.
+			// #4.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -241,7 +207,7 @@ class testFormAdministrationGeneralGeomaps extends CWebTest {
 					]
 				]
 			],
-			// #7.
+			// #5.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -255,7 +221,7 @@ class testFormAdministrationGeneralGeomaps extends CWebTest {
 					]
 				]
 			],
-			// #8.
+			// #6.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -269,7 +235,7 @@ class testFormAdministrationGeneralGeomaps extends CWebTest {
 					]
 				]
 			],
-			// #9.
+			// #7.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -283,7 +249,7 @@ class testFormAdministrationGeneralGeomaps extends CWebTest {
 					]
 				]
 			],
-			// #10.
+			// #8.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -297,7 +263,7 @@ class testFormAdministrationGeneralGeomaps extends CWebTest {
 					]
 				]
 			],
-			// #11.
+			// #9.
 			[
 				[
 					'fields' => [
@@ -307,7 +273,7 @@ class testFormAdministrationGeneralGeomaps extends CWebTest {
 					]
 				]
 			],
-			// #12.
+			// #10.
 			[
 				[
 					'fields' => [
@@ -318,7 +284,7 @@ class testFormAdministrationGeneralGeomaps extends CWebTest {
 					]
 				]
 			],
-			// #13.
+			// #11.
 			[
 				[
 					'fields' => [
@@ -329,7 +295,7 @@ class testFormAdministrationGeneralGeomaps extends CWebTest {
 					]
 				]
 			],
-			// #14.
+			// #12.
 			[
 				[
 					'fields' => [
@@ -340,7 +306,7 @@ class testFormAdministrationGeneralGeomaps extends CWebTest {
 					]
 				]
 			],
-			// #15.
+			// #13.
 			[
 				[
 					'fields' => [
@@ -354,7 +320,7 @@ class testFormAdministrationGeneralGeomaps extends CWebTest {
 					]
 				]
 			],
-			// #16.
+			// #14.
 			[
 				[
 					'fields' => [
@@ -366,7 +332,7 @@ class testFormAdministrationGeneralGeomaps extends CWebTest {
 					'trim' => true
 				]
 			],
-			// #17.
+			// #15.
 			[
 				[
 					'fields' => [
