@@ -110,6 +110,7 @@ foreach ($data['triggers'] as $trigger) {
 					->setAttribute('data-triggerid', $dep_trigger['triggerid'])
 					->setAttribute('data-context', $data['context'])
 					->addClass(triggerIndicatorStyle($dep_trigger['status']))
+					->addClass(ZBX_STYLE_LINK_ALT)
 					->addClass('js-trigger-edit');
 			}
 
