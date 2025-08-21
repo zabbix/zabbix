@@ -1355,20 +1355,20 @@ class CFormValidator {
 	 * @returns {Object}
 	 */
 	#validateFile(rules, value) {
-		if (rules['max-file-size'] && value && value.size > rules['max-file-size']) {
+		if (rules.file['max-size'] && value && value.size > rules.file['max-size']) {
 			return {
 				result: CFormValidator.ERROR,
 				error: this.#getMessage(rules, 'file',
-					sprintf(t('File size must be less than %1$s.'), rules['max-file-size-MB']))
+					sprintf(t('File size must be less than %1$s.'), rules.file['max-size-MB']))
 			};
 		}
 
-		if (rules['file'] !== 'file') {
+		if (rules.file.type !== 'file') {
 
-			if (!value.type.startsWith(`${rules['file']}/`)) {
+			if (!value.type.startsWith(`${rules.file['type']}/`)) {
 				return {
 					result: CFormValidator.ERROR,
-					error: this.#getMessage(rules, 'file.type', t('File format is unsupported'))
+					error: this.#getMessage(rules, 'type', t('File format is unsupported.'))
 				};
 			}
 		}

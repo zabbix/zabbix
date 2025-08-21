@@ -172,17 +172,9 @@ class CFormValidator {
 
 					$result['not_in'] = self::parseIn(substr($value, 7));
 				}
-				elseif (strncmp($value, 'file ', 5) === 0) {
+				elseif ($value === 'file') {
 					$result['type'] = 'file';
-					$result['file'] = 'file';
-					$result['max-file-size'] = (int) substr($value, 5);
-					$result['max-file-size-MB'] = convertUnits(['value' => $result['max-file-size'], 'units' => 'B']);
-				}
-				elseif (strncmp($value, 'image ', 6) === 0) {
-					$result['type'] = 'file';
-					$result['file'] = 'image';
-					$result['max-file-size'] = (int) substr($value, 6);
-					$result['max-file-size-MB'] = convertUnits(['value' => $result['max-file-size'], 'units' => 'B']);
+					$result['file'] = ['max-size' => null, 'type' => 'file', ];
 				}
 				else {
 					throw new Exception('[RULES ERROR] Unknown rule "'.$value.'" (Path: '.$rule_path.')');
@@ -285,6 +277,22 @@ class CFormValidator {
 						}
 
 						$result[$key] = $value;
+						break;
+
+					case 'file':
+						$result['type'] = 'file';
+						$file_rules = [
+							'max-size' => null,
+							'type' => array_key_exists(1, $value) ? $value[1] : 'file'
+						];
+
+						if (array_key_exists(0, $value)) {
+							$file_rules['max-size'] = (int) $value[0];
+							$file_rules['max-size-MB'] = convertUnits(['value' => $file_rules['max-size'], 'units' => 'B']);
+						}
+
+						$result['file'] = $file_rules;
+
 						break;
 
 					default:
@@ -1330,34 +1338,33 @@ class CFormValidator {
 	 * File validator
 	 *
 	 * @param array  $rules
-	 * @param string $rules['file']		  		file type (image or file)
-	 * @param int    $rules['max-file-size']	(optional) maximum size of file
-	 * @param array  $rules['messages']			(optional) Error messages to use when some check fails.
+	 * @param string $rules['file']['type']       File type (image or file).
+	 * @param int    $rules['file']['max-size']  (optional) Maximum size of file
+	 * @param array  $rules['messages']			 (optional) Error messages to use when some check fails.
 	 * @param mixed  $value
 	 * @param string $error
 	 *
 	 * @return bool
 	 */
 	private static function validateFile($rules, &$value, ?string &$error = null): bool {
-		if ($rules['max-file-size']) {
+		if ($rules['file']['max-size']) {
 			try {
-				$value->validateFileSize($rules['max-file-size'], $rules['file']);
+				$value->validateFileSize($rules['file']['max-size'], $rules['file']['type']);
 			}
 			catch (Exception $e) {
-				$error = $e->getMessage();
+				$error =  self::getMessage($rules, 'file', $e->getMessage());
 				return false;
 			}
 		}
 
-		if ($rules['file'] == 'image') {
+		if ($rules['file']['type'] == 'image') {
 			try {
 				if (@imageCreateFromString($value->getContent()) === false) {
-					$error = _('File format is unsupported');
-					return false;
+					throw new Exception(_('File format is unsupported.'));
 				}
 			}
 			catch (Exception $e) {
-				$error = $e->getMessage();
+				$error =  self::getMessage($rules, 'type', $e->getMessage());
 				return false;
 			}
 		}

@@ -29,7 +29,7 @@ class CControllerImageCreate extends CController {
 		return ['object', 'api_uniq' => $api_uniq, 'fields' => [
 			'imagetype' => ['db images.imagetype','required', 'in '.IMAGE_TYPE_ICON.','.IMAGE_TYPE_BACKGROUND],
 			'name' => ['db images.name', 'required', 'not_empty'],
-			'image' => ['image '.ZBX_MAX_IMAGE_SIZE, 'required',
+			'image' => ['file' => [ZBX_MAX_IMAGE_SIZE, 'image'], 'required',
 				'messages' => ['file' => _s('Image size must be less than %1$s.', convertUnits(['value' =>
 					ZBX_MAX_IMAGE_SIZE, 'units' => 'B']))]
 			]
