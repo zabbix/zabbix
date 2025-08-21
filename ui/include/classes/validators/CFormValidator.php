@@ -52,7 +52,8 @@ class CFormValidator {
 	 *
 	 * Supported rules:
 	 *   Data types:
-	 *     'boolean', 'string', 'integer', 'float', 'id', 'objects', 'object', 'array', 'db <table>.<field>'
+	 *     'boolean', 'string', 'integer', 'float', 'id', 'objects', 'object', 'array', 'db <table>.<field>',
+	 *     'image <size>', 'file <size>'
 	 *   Constraints:
 	 *     'not_empty', 'required', 'length', 'api_uniq'
 	 *   Value comparisons:
@@ -174,13 +175,13 @@ class CFormValidator {
 				elseif (strncmp($value, 'file ', 5) === 0) {
 					$result['type'] = 'file';
 					$result['file'] = 'file';
-					$result['max-file-size'] = intval(substr($value, 5));
+					$result['max-file-size'] = (int) substr($value, 5);
 					$result['max-file-size-MB'] = convertUnits(['value' => $result['max-file-size'], 'units' => 'B']);
 				}
 				elseif (strncmp($value, 'image ', 6) === 0) {
 					$result['type'] = 'file';
 					$result['file'] = 'image';
-					$result['max-file-size'] = intval(substr($value, 6));
+					$result['max-file-size'] = (int) substr($value, 6);
 					$result['max-file-size-MB'] = convertUnits(['value' => $result['max-file-size'], 'units' => 'B']);
 				}
 				else {
@@ -600,10 +601,11 @@ class CFormValidator {
 	 * Base validation function.
 	 *
 	 * @param array  $data  Form input data.
+	 * @param array  $files From files
 	 *
 	 * @return int
 	 */
-	public function validate(&$data): int {
+	public function validate(&$data, &$files): int {
 		$this->errors = [];
 
 		$this->has_fatal = false;
@@ -613,7 +615,7 @@ class CFormValidator {
 		$this->field_values = $this->resolveWhenFields($this->rules, $data);
 
 		$path = '';
-		if ($this->validateObject($this->rules, $data, $error, $path) === false) {
+		if ($this->validateObject($this->rules, $data, $error, $path, $files) === false) {
 			$this->addError(self::ERROR, $path, $error, self::ERROR_LEVEL_PRIMARY);
 		}
 
@@ -668,8 +670,9 @@ class CFormValidator {
 	 * @param array  $data    Data to validate.
 	 * @param string $field   Field to validate.
 	 * @param string $path    Path of field.
+	 * @param array $files    Files to validate
 	 */
-	private function validateField(array $rules, &$data, string $field, string $path): void {
+	private function validateField(array $rules, &$data, string $field, string $path, ?array &$files = []): void {
 		if (array_key_exists('when', $rules)) {
 			foreach ($rules['when'] as $when) {
 				if ($this->testWhenCondition($when, $path) === false) {
@@ -683,7 +686,7 @@ class CFormValidator {
 			unset($data[$field]);
 		}
 
-		if (!array_key_exists($field, $data)) {
+		if (!array_key_exists($field, $data) && !array_key_exists($field, $files)) {
 			if (array_key_exists('required', $rules)) {
 				$this->addError(self::ERROR, $path,
 					self::getMessage($rules, 'required', _('Required field is missing.')), self::ERROR_LEVEL_PRIMARY
@@ -760,7 +763,7 @@ class CFormValidator {
 					break;
 
 				case 'file':
-					if (!$this->validateFile($rules, $data[$field], $error)) {
+					if (array_key_exists($field, $files) && !$this->validateFile($rules, $files[$field], $error)) {
 						$this->addError(self::ERROR, $path, $error, self::ERROR_LEVEL_PRIMARY);
 
 						return;
@@ -1101,10 +1104,11 @@ class CFormValidator {
 	 * @param mixed  $value
 	 * @param string $error
 	 * @param string $path
+	 * @param array $files
 	 *
 	 * @return bool
 	 */
-	public function validateObject(array $rules, &$value, ?string &$error = null, string &$path = ''): bool {
+	public function validateObject(array $rules, &$value, ?string &$error = null, string &$path = '', ?array &$files = []): bool {
 		if (!is_array($value)) {
 			$error = self::getMessage($rules, 'type', _('An array is expected.'));
 
@@ -1113,11 +1117,12 @@ class CFormValidator {
 
 		foreach ($rules['fields'] as $field => $rule_sets) {
 			foreach ($rule_sets as $rule_set) {
-				$this->validateField($rule_set, $value, $field, $path.'/'.$field);
+				$this->validateField($rule_set, $value, $field, $path.'/'.$field, $files);
 			}
 		}
 
 		$value = array_intersect_key($value, $rules['fields']);
+		$files = $files ? array_intersect_key($files, $rules['fields']) : $files;
 
 		if (array_key_exists('api_uniq', $rules)) {
 			foreach ($rules['api_uniq'] as $api_check) {
@@ -1333,7 +1338,7 @@ class CFormValidator {
 	 *
 	 * @return bool
 	 */
-	private static function validateFile ($rules, &$value, ?string &$error = null): bool {
+	private static function validateFile($rules, &$value, ?string &$error = null): bool {
 		if ($rules['max-file-size']) {
 			try {
 				$value->validateFileSize($rules['max-file-size'], $rules['file']);

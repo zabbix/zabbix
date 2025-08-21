@@ -27,9 +27,9 @@ class CControllerImageCreate extends CController {
 		];
 
 		return ['object', 'api_uniq' => $api_uniq, 'fields' => [
-			'imagetype' => ['required', 'db images.imagetype', 'in '.IMAGE_TYPE_ICON.','.IMAGE_TYPE_BACKGROUND],
+			'imagetype' => ['db images.imagetype','required', 'in '.IMAGE_TYPE_ICON.','.IMAGE_TYPE_BACKGROUND],
 			'name' => ['db images.name', 'required', 'not_empty'],
-			'image' => ['required', 'image '.ZBX_MAX_IMAGE_SIZE,
+			'image' => ['image '.ZBX_MAX_IMAGE_SIZE, 'required',
 				'messages' => ['file' => _s('Image size must be less than %1$s.', convertUnits(['value' =>
 					ZBX_MAX_IMAGE_SIZE, 'units' => 'B']))]
 			]
@@ -72,8 +72,8 @@ class CControllerImageCreate extends CController {
 	 */
 	protected function uploadImage(&$error) {
 		try {
-			if ($this->hasInput('image')) {
-				$file = $this->getInput('image');
+			if ($this->hasFile('image')) {
+				$file = $this->getFile('image');
 
 				if ($file->wasUploaded()) {
 					return base64_encode($file->getContent());

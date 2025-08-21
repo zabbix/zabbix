@@ -33,10 +33,6 @@ class CFieldFile extends CField {
 		return this._field.files[0] ? this._field.files[0] : null;
 	}
 
-	getValueTrimmed() {
-		return this.getValue();
-	}
-
 	focusErrorField() {
 		super.focusErrorField();
 		this._field.focus();

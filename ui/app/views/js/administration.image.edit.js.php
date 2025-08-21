@@ -31,7 +31,6 @@ const administration_image_edit = {
 	},
 
 	ajaxExceptionHandler(exception) {
-		console.log('exception handler');
 		let title, messages;
 
 		if (typeof exception === 'object' && 'error' in exception) {

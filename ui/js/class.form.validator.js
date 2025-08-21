@@ -925,7 +925,7 @@ class CFormValidator {
 			'array': this.#validateArray,
 			'object': this.#validateObject,
 			'objects': this.#validateObjects,
-			'file': this.#validateFile,
+			'file': this.#validateFile
 		}[rules.type] || null;
 
 		if (validator !== null) {
@@ -1368,7 +1368,7 @@ class CFormValidator {
 			if (!value.type.startsWith(`${rules['file']}/`)) {
 				return {
 					result: CFormValidator.ERROR,
-					error: this.#getMessage(rules, 'file-format', t('File format is unsupported'))
+					error: this.#getMessage(rules, 'file.type', t('File format is unsupported'))
 				};
 			}
 		}

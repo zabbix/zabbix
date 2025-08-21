@@ -83,6 +83,20 @@ abstract class CController {
 	protected $input = [];
 
 	/**
+	 * Non-validated files parameters.
+	 *
+	 * @var array|null
+	 */
+	private $raw_files;
+
+	/**
+	 * Validated files parameters.
+	 *
+	 * @var array
+	 */
+	private $files = [];
+
+	/**
 	 * Validate CSRF token flag, if true CSRF token must be validated.
 	 *
 	 * @var bool
@@ -236,10 +250,6 @@ abstract class CController {
 				// Replace window.history to avoid resubmission warning dialog.
 				zbx_add_post_js("history.replaceState({}, '');");
 			}
-
-			foreach ($_FILES as $file_key => $file) {
-				$input[$file_key] = new CUploadFile($_FILES[$file_key]);
-			}
 		}
 
 		return $input;
@@ -268,6 +278,20 @@ abstract class CController {
 	}
 
 	/**
+	 * @return array
+	 * @throws Exception
+	 */
+	private static function getFileInput(): array {
+		$files = [];
+
+		foreach ($_FILES as $file_key => $file) {
+			$files[$file_key] = new CUploadFile($file);
+		}
+
+		return $files;
+	}
+
+	/**
 	 * Validate input parameters.
 	 *
 	 * @param array $validation_rules
@@ -275,7 +299,7 @@ abstract class CController {
 	 * @return bool
 	 */
 	protected function validateInput(array $validation_rules): bool {
-		if ($this->raw_input === null) {
+		if ($this->raw_input === null && $this->raw_files === null) {
 			$this->validation_result = self::VALIDATION_FATAL_ERROR;
 
 			return false;
@@ -296,12 +320,14 @@ abstract class CController {
 	protected function validateWithFormValidator(array $validation_rules): bool {
 		$validator = new CFormValidator($validation_rules);
 		$data = $this->raw_input;
+		$files = $this->raw_files;
 
-		switch ($validator->validate($data)) {
+		switch ($validator->validate($data, $files)) {
 			case CFormValidator::SUCCESS:
 				$this->validation_result = self::VALIDATION_OK;
 				$this->validation_errors = [];
 				$this->input = $data;
+				$this->files = $files;
 				break;
 
 			case CFormValidator::ERROR:
@@ -483,6 +509,28 @@ abstract class CController {
 	}
 
 	/**
+	 * Check if file parameter exists.
+	 *
+	 * @param string $var
+	 *
+	 * @return bool
+	 */
+	protected function hasFile($var): bool {
+		return array_key_exists($var, $this->files);
+	}
+
+	/**
+	 * Get single file by parameter.
+	 *
+	 * @param string $var
+	 *
+	 * @return CUploadFile
+	 */
+	protected function getFile($var): ?CUploadFile {
+		return $this->files[$var];
+	}
+
+	/**
 	 * Check user permissions.
 	 *
 	 * @abstract
@@ -542,14 +590,17 @@ abstract class CController {
 		switch ($this->getPostContentType()) {
 			case self::POST_CONTENT_TYPE_FORM:
 				$this->raw_input = self::getFormInput();
+				$this->raw_files = self::getFileInput();
 				break;
 
 			case self::POST_CONTENT_TYPE_JSON:
 				$this->raw_input = self::getJsonInput();
+				$this->raw_files = self::getFileInput();
 				break;
 
 			default:
 				$this->raw_input = null;
+				$this->raw_files = null;
 		}
 	}
 
