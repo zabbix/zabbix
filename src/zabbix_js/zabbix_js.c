@@ -166,6 +166,15 @@ static int	execute_script(const char *command, const char *param, int timeout, c
 		goto failure;
 	}
 
+	if (SUCCEED != zbx_es_globals_make_readonly(&es, &errmsg))
+	{
+		zbx_snprintf(error, max_error_len, "cannot initialize read-only environment: %s", errmsg);
+		zbx_free(errmsg);
+		ret = FAIL;
+
+		goto failure;
+	}
+
 	if (FAIL == zbx_es_compile(&es, command, &code, &size, &errmsg))
 	{
 		zbx_snprintf(error, max_error_len, "cannot compile script: %s", errmsg);
