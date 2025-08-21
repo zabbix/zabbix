@@ -81,6 +81,7 @@ void	zbx_service_serialize_event(unsigned char **data, size_t *data_alloc, size_
 	if (NULL == maintenanceids)
 	{
 		ptr += zbx_serialize_value(ptr, maintenance_num);
+		(void)ptr;
 	}
 	else
 	{

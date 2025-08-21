@@ -110,6 +110,7 @@ static void	pg_update_proxy_rtdata(zbx_pg_service_t *pgs, zbx_ipc_message_t *mes
 	ptr += zbx_deserialize_value(ptr, &proxyid);
 	ptr += zbx_deserialize_value(ptr, &lastaccess);
 	ptr += zbx_deserialize_value(ptr, &version);
+	(void)ptr;
 
 	pg_cache_lock(pgs->cache);
 
