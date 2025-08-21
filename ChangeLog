@@ -1,6 +1,7 @@
 Changes for 8.0.0alpha1
 
 New features:
+...G.J.... [ZBXNEXT-9902] changed timeout range for Zabbix JS and Zabbix get utilities (askolmeisters)
 ...G...... [ZBXNEXT-9028]  added by Id scan parameter to Zabbix agent 2 smart disk discovery (esneiders)
 .........T [ZBXNEXT-9687] updated filesystem discovery low space trigger override regex in F5 Big-IP by SNMP template (drasikhov)
 .........T [ZBXNEXT-9972] added AWS Backup Vault by HTTP template (abrosimovs)
@@ -22,6 +23,7 @@ A......PS. [ZBXNEXT-10056] updated max supported MariaDB version to 11.8 (Sasha)
 .......PS. [ZBXNEXT-10079] updated minimal supported MySQL/Percona version to 8.4 (mprihodko)
 
 Bug fixes:
+.......PS. [ZBX-25752] reduced memory allocations in preprocessing manager (wiper)
 .......PS. [ZBX-26868] fixed crash when adding new SNMP device (vso)
 .......PS. [ZBX-26510] fixed timeouts during script execution on Zabbix agent on action operation or manual action by trying passive interface if exists (vso)
 ..F....... [ZBX-26649] prohibited showing the create Host groups/Template group form without super admin role (msnihach)
@@ -124,8 +126,6 @@ A......... [ZBX-26191] fixed inconsistent API and frontend validation for mainte
 
 --------------------------------------------------------------------------------
 Changes for 7.4.2rc2
-
-New features:
 
 Bug fixes:
 .......PS. [ZBX-26868] fixed crash when adding new SNMP device (vso)
@@ -478,6 +478,18 @@ A.F....PS. [ZBXNEXT-9564] implemented vault macro resolution on proxies (esekace
 ........S. [ZBXNEXT-9582] added discarding of queued duplicate LLD rule values based on embedded and LLD macros (wiper)
 ..F....... [ZBXNEXT-9614] implemented scrolling down to bottom in Item history widget when New values parameter is set to "Bottom" (dfofanovs)
 ...G...... [ZBXNEXT-9508] added custom query path to MySQL and Oracle plugins for Zabbix agent 2 (esneiders)
+
+--------------------------------------------------------------------------------
+Changes for 7.2.13rc1
+
+New features:
+
+Bug fixes:
+
+--------------------------------------------------------------------------------
+Changes for 7.2.12
+
+7.2.12rc1 was released as 7.2.12 without any changes
 
 --------------------------------------------------------------------------------
 Changes for 7.2.12rc1
@@ -4758,6 +4770,18 @@ A.F....PS. [ZBXNEXT-7402,ZBXNEXT-7413] added support for CyberArk Vault (acikuns
 ..F.I..... [ZBXNEXT-7397] removed support for MD5 user passwords (asestakovs, mkrisjanis)
 ........S. [ZBXNEXT-7488] removed zabbix[history*] and zabbix[trends*] internal items (akozlovs)
 ..F....... [ZBXNEXT-7138] added modal form for API tokens in User settings->API tokens and Administration->General->API tokens (epulke)
+
+--------------------------------------------------------------------------------
+Changes for 6.0.42rc1
+
+New features:
+
+Bug fixes:
+
+--------------------------------------------------------------------------------
+Changes for 6.0.41
+
+6.0.41rc1 was released as 6.0.41 without any changes
 
 --------------------------------------------------------------------------------
 Changes for 6.0.41rc1

@@ -17,12 +17,37 @@ package zbxlib
 /* cspell:disable */
 
 /*
-#cgo CFLAGS: -I${SRCDIR}/../../../../../include
+#cgo CFLAGS: -I${SRCDIR}/../../../../../include -I${SRCDIR}/../../../../src/libs
 
 #include "zbxsysinfo.h"
 #include "module.h"
 
-int	system_localtime(AGENT_REQUEST *request, AGENT_RESULT *result);
+// vfs_dir_get, system_localtime, system_users_num
+#include "zbxsysinfo/common/zbxsysinfo_common.c"
+#include "zbxsysinfo/common/system.c"
+#include "zbxsysinfo/common/vfs_file.c"
+#include "zbxsysinfo/common/dir.c"
+int	net_dns(AGENT_REQUEST *request, AGENT_RESULT *result)
+{
+	return SYSINFO_RET_FAIL;
+}
+int	net_dns_record(AGENT_REQUEST *request, AGENT_RESULT *result)
+{
+	return SYSINFO_RET_FAIL;
+}
+int	net_dns_perf(AGENT_REQUEST *request, AGENT_RESULT *result)
+{
+	return SYSINFO_RET_FAIL;
+}
+int	net_tcp_port(AGENT_REQUEST *request, AGENT_RESULT *result)
+{
+	return SYSINFO_RET_FAIL;
+}
+int	zabbix_stats(AGENT_REQUEST *request, AGENT_RESULT *result)
+{
+	return SYSINFO_RET_FAIL;
+}
+
 int	proc_mem(AGENT_REQUEST *request, AGENT_RESULT *result);
 int	proc_num(AGENT_REQUEST *request, AGENT_RESULT *result);
 int	system_boottime(AGENT_REQUEST *request, AGENT_RESULT *result);
@@ -40,8 +65,6 @@ int	system_sw_packages(AGENT_REQUEST *request, AGENT_RESULT *result);
 int	system_swap_in(AGENT_REQUEST *request, AGENT_RESULT *result);
 int	system_swap_out(AGENT_REQUEST *request, AGENT_RESULT *result);
 int	system_swap_size(AGENT_REQUEST *request, AGENT_RESULT *result);
-int	system_users_num(AGENT_REQUEST *request, AGENT_RESULT *result);
-int	vfs_dir_get(AGENT_REQUEST *request, AGENT_RESULT *result);
 int	vfs_fs_discovery(AGENT_REQUEST *request, AGENT_RESULT *result);
 int	vfs_fs_inode(AGENT_REQUEST *request, AGENT_RESULT *result);
 int	vfs_fs_size(AGENT_REQUEST *request, AGENT_RESULT *result);

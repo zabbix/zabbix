@@ -50,7 +50,7 @@ Additional points to consider:
 
 |Name|Description|Default|
 |----|-----------|-------|
-|{$ETCD.HOST}|<p>The hostname or IP address of the `etcd` API endpoint.</p>|`<SET ETCD HOST>`|
+|{$ETCD.HOST}|<p>The hostname or IP address of the `etcd` API endpoint.</p>||
 |{$ETCD.PORT}|<p>The port of the `etcd` API endpoint.</p>|`2379`|
 |{$ETCD.SCHEME}|<p>The request scheme which may be `http` or `https`.</p>|`http`|
 |{$ETCD.USER}|||
