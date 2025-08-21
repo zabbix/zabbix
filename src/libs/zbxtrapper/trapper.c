@@ -1341,10 +1341,7 @@ ZBX_THREAD_ENTRY(zbx_trapper_thread, args)
 	int			ret = SUCCEED, server_num = ((zbx_thread_args_t *)args)->info.server_num,
 				process_num = ((zbx_thread_args_t *)args)->info.process_num;
 	unsigned char		process_type = ((zbx_thread_args_t *)args)->info.process_type;
-#ifdef HAVE_NETSNMP
-	zbx_uint32_t		rtc_msgs[] = {ZBX_RTC_SNMP_CACHE_RELOAD};
 	zbx_ipc_async_socket_t	rtc;
-#endif
 
 	zbx_get_program_type_cb = trapper_args_in->zbx_get_program_type_cb_arg;
 
@@ -1363,18 +1360,12 @@ ZBX_THREAD_ENTRY(zbx_trapper_thread, args)
 
 	zbx_db_connect(ZBX_DB_CONNECT_NORMAL);
 
-#ifdef HAVE_NETSNMP
-	zbx_rtc_subscribe(process_type, process_num, rtc_msgs, ARRSIZE(rtc_msgs),
-			trapper_args_in->config_comms->config_timeout, &rtc);
-#endif
+	zbx_rtc_subscribe(process_type, process_num, NULL, 0, trapper_args_in->config_comms->config_timeout, &rtc);
 
 	while (ZBX_IS_RUNNING())
 	{
-#ifdef HAVE_NETSNMP
 		zbx_uint32_t	rtc_cmd;
 		unsigned char	*rtc_data;
-		int		snmp_reload = 0;
-#endif
 
 		if (TIMEOUT_ERROR != ret)
 		{
@@ -1407,22 +1398,15 @@ ZBX_THREAD_ENTRY(zbx_trapper_thread, args)
 			zbx_setproctitle("%s #%d [processing data]", get_process_type_string(process_type),
 					process_num);
 
-#ifdef HAVE_NETSNMP
 			while (SUCCEED == zbx_rtc_wait(&rtc, info, &rtc_cmd, &rtc_data, 0) && 0 != rtc_cmd)
 			{
-				if (ZBX_RTC_SNMP_CACHE_RELOAD == rtc_cmd && 0 == snmp_reload)
-				{
-					zbx_clear_cache_snmp(process_type, process_num);
-					snmp_reload = 1;
-				}
-				else if (ZBX_RTC_SHUTDOWN == rtc_cmd)
+				if (ZBX_RTC_SHUTDOWN == rtc_cmd)
 				{
 					zbx_tcp_unaccept(&s);
 					goto out;
 				}
-
 			}
-#endif
+
 			sec = zbx_time();
 			process_trapper_child(&s, &ts, trapper_args_in->config_comms, trapper_args_in->config_vault,
 					trapper_args_in->config_startup_time, trapper_args_in->events_cbs,

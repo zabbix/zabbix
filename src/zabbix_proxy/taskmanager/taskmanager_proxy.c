@@ -546,8 +546,7 @@ ZBX_THREAD_ENTRY(taskmanager_thread, args)
 					server_num = ((zbx_thread_args_t *)args)->info.server_num,
 					process_num = ((zbx_thread_args_t *)args)->info.process_num;
 	unsigned char			process_type = ((zbx_thread_args_t *)args)->info.process_type;
-	zbx_uint32_t			rtc_msgs[] = {ZBX_RTC_CONFIG_CACHE_RELOAD, ZBX_RTC_TASK_MANAGER_NOTIFY,
-					ZBX_RTC_SNMP_CACHE_RELOAD};
+	zbx_uint32_t			rtc_msgs[] = {ZBX_RTC_CONFIG_CACHE_RELOAD, ZBX_RTC_TASK_MANAGER_NOTIFY};
 
 	zabbix_log(LOG_LEVEL_INFORMATION, "%s #%d started [%s #%d]", get_program_type_string(info->program_type),
 			server_num, get_process_type_string(process_type), process_num);
@@ -568,10 +567,6 @@ ZBX_THREAD_ENTRY(taskmanager_thread, args)
 	zbx_setproctitle("%s [started, idle " ZBX_FS_TIME_T " sec]", get_process_type_string(process_type),
 			(zbx_fs_time_t)sleeptime);
 
-#ifdef HAVE_NETSNMP
-	rtc_msgs_num++;
-#endif
-
 	zbx_rtc_subscribe(process_type, process_num, rtc_msgs, rtc_msgs_num,
 			taskmanager_args_in->config_comms->config_timeout, &rtc);
 
@@ -583,10 +578,7 @@ ZBX_THREAD_ENTRY(taskmanager_thread, args)
 		while (SUCCEED == zbx_rtc_wait(&rtc, info, &rtc_cmd, &rtc_data, sleeptime) && 0 != rtc_cmd)
 		{
 			sleeptime = 0;
-#ifdef HAVE_NETSNMP
-			if (ZBX_RTC_SNMP_CACHE_RELOAD == rtc_cmd)
-				zbx_clear_cache_snmp(process_type, process_num);
-#endif
+
 			if (ZBX_RTC_CONFIG_CACHE_RELOAD == rtc_cmd &&
 					ZBX_PROXYMODE_PASSIVE == taskmanager_args_in->config_comms->proxymode)
 			{
