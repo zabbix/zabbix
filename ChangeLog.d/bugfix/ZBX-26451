@@ -1,1 +1,1 @@
-..F....... [ZBX-26451] updates for resolving Inventory macros in Script type items (msnihach)
+..F....... [ZBX-26451] fixed inventory macros not being resolved in script and browser type items (msnihach)

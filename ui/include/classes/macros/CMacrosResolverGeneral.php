@@ -2969,40 +2969,4 @@ class CMacrosResolverGeneral {
 
 		return $macro_values;
 	}
-
-	/**
-	 * Get inventory macros by hostId.
-	 *
-	 * @param string $hostId
-	 * @param array $parameters [n]['name']
-	 * @param array $parameters [n]['value']
-	 *
-	 * @return array
-	 */
-	public static function getHostInventoryMacros(string $hostId, array $parameters): array {
-		$inventory_macros = self::getSupportedHostInventoryMacrosMap();
-
-		$db_hosts = API::Host()->get([
-			'output' => ['inventory_mode'],
-			'selectInventory' => array_values($inventory_macros),
-			'hostids' => $hostId,
-			'preservekeys' => true
-		]);
-
-		$macros = [];
-
-		if (count($db_hosts) === 0 || !array_key_exists($hostId, $db_hosts)) {
-			return $macros;
-		}
-
-		$inventory = $db_hosts[$hostId]['inventory'];
-
-		foreach ($parameters as $item) {
-			if (array_key_exists($item['value'], $inventory_macros)) {
-				$macros[$item['value']] = $inventory[$inventory_macros[$item['value']]];
-			}
-		}
-
-		return $macros;
-	}
 }
