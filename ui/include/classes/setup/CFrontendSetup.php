@@ -28,6 +28,7 @@ class CFrontendSetup {
 	const MIN_PHP_MAX_INPUT_TIME = 300;
 	const MIN_PHP_GD_VERSION = '2.0';
 	const MIN_PHP_LIBXML_VERSION = '2.6.15';
+	const MIN_PHP_CURL_VERSION = '7.19.4';
 	const REQUIRED_PHP_ARG_SEPARATOR_OUTPUT = '&';
 
 	/**
@@ -718,14 +719,17 @@ class CFrontendSetup {
 	 * @return array
 	 */
 	public function checkPhpCurlModule() {
-		$current = function_exists('curl_init') && function_exists('curl_version');
-		$version_match = $current && version_compare(curl_version()['version'], '7.19.4', '>=');
+		$enabled = function_exists('curl_init') && function_exists('curl_close') && function_exists('curl_errno')
+			&& function_exists('curl_error') && function_exists('curl_exec') && function_exists('curl_setopt')
+			&& function_exists('curl_setopt_array') && function_exists('curl_version');
+		$current_version = $enabled ? curl_version()['version'] : '';
+		$enabled = $enabled && version_compare($current_version, self::MIN_PHP_CURL_VERSION, '>=');
 
 		return [
 			'name' => _('PHP curl'),
-			'current' => $current && $version_match ? _('on') : _('off'),
-			'required' => null,
-			'result' => $current ? self::CHECK_OK : self::CHECK_WARNING,
+			'current' => $current_version,
+			'required' => self::MIN_PHP_CURL_VERSION,
+			'result' => $enabled ? self::CHECK_OK : self::CHECK_WARNING,
 			'error' => _('PHP curl extension missing.')
 		];
 	}
