@@ -25,13 +25,8 @@ import (
 	"golang.zabbix.com/sdk/log"
 )
 
-var ObjectsNames map[string]string
-
-type sysCounter struct {
-	name  string
-	index string
-}
-
+// The following constants define the types of objects and counters
+// used for performance monitoring.
 const (
 	ObjectSystem = iota
 	ObjectProcessor
@@ -41,9 +36,21 @@ const (
 	CounterSystemUptime
 	ObjectTerminalServices
 	CounterTotalSessions
+	CounterActiveSessions
 )
 
-var sysCounters []sysCounter = []sysCounter{
+// HKEY_PERFORMANCE_TEXT is a handle to the registry key containing performance counter
+// names in English. The name follows a legacy pattern to align with the Windows API.
+const HKEY_PERFORMANCE_TEXT = 0x80000050 //nolint:revive
+
+// HKEY_PERFORMANCE_NLSTEXT is a handle to the registry key containing performance counter
+// names in the system's default language. The name follows a legacy pattern to align with the Windows API.
+const HKEY_PERFORMANCE_NLSTEXT = 0x80000060 //nolint:revive
+
+// ObjectsNames maps English performance object names to their localized counterparts.
+var ObjectsNames map[string]string //nolint:gochecknoglobals // legacy implementation
+
+var sysCounters = []sysCounter{ //nolint:gochecknoglobals // this is filled once at startup
 	{name: "System"},
 	{name: "Processor"},
 	{name: "Processor Information"},
@@ -52,10 +59,13 @@ var sysCounters []sysCounter = []sysCounter{
 	{name: "System Up Time"},
 	{name: "Terminal Services"},
 	{name: "Total Sessions"},
+	{name: "Active Sessions"},
 }
 
-const HKEY_PERFORMANCE_TEXT = 0x80000050
-const HKEY_PERFORMANCE_NLSTEXT = 0x80000060
+type sysCounter struct {
+	name  string
+	index string
+}
 
 type CounterPathElements struct {
 	MachineName    string
