@@ -593,6 +593,8 @@ class testDashboardProblemHostsWidget extends testWidgets {
 		// Close widget edit form and cancel editing.
 		COverlayDialogElement::find()->one()->close();
 		$dashboard->waitUntilReady()->cancelEditing();
+		// TODO: unstable test on Jenkins, appears js error 34749:5 Uncaught
+		$dashboard->waitUntilReady();
 	}
 
 	public function testDashboardProblemHostsWidget_SimpleUpdate() {
