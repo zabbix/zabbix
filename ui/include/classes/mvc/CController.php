@@ -285,7 +285,7 @@ abstract class CController {
 		$files = [];
 
 		foreach ($_FILES as $file_key => $file) {
-			$files[$file_key] = new CUploadFile($file);
+			$files[$file_key] = $file ? new CUploadFile($file) : null;
 		}
 
 		return $files;

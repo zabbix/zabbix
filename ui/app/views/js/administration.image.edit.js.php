@@ -57,9 +57,7 @@ const administration_image_edit = {
 
 				const form_data = new FormData();
 				Object.keys(fields).forEach(key => {
-					if (key != 'image' || fields[key]) {
-						form_data.append(key, fields[key]);
-					}
+					form_data.append(key, fields[key]);
 				});
 
 				fetch(url.href, {
