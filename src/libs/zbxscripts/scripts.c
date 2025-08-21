@@ -983,7 +983,7 @@ zbx_uint64_t	zbx_script_create_task(const zbx_script_t *script, const zbx_dc_hos
 	unsigned short	port;
 	zbx_uint64_t	taskid;
 
-	if (NULL == script->port || '\0' == script->port[0] || FAIL == zbx_is_ushort(script->port, &port))
+	if (FAIL == zbx_is_ushort(script->port, &port))
 		port = 0;
 
 	zbx_db_begin();
