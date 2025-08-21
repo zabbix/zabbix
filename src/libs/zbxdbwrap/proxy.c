@@ -1430,7 +1430,7 @@ typedef struct
 }
 item_timestamp_t;
 
-static zbx_hash_t item_timestamp_hash(const void *data)
+static zbx_hash_t	item_timestamp_hash(const void *data)
 {
 	const item_timestamp_t	*p = (const item_timestamp_t *)data;
 
@@ -1439,7 +1439,7 @@ static zbx_hash_t item_timestamp_hash(const void *data)
 	return ZBX_DEFAULT_PTR_HASH_ALGO(&p->ts, sizeof(zbx_timespec_t), hash);
 }
 
-static int item_timestamp_compare(const void *d1, const void *d2)
+static int	item_timestamp_compare(const void *d1, const void *d2)
 {
 	const item_timestamp_t	*p1 = (const item_timestamp_t *)d1;
 	const item_timestamp_t	*p2 = (const item_timestamp_t *)d2;
