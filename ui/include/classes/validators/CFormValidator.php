@@ -174,7 +174,7 @@ class CFormValidator {
 				}
 				elseif ($value === 'file') {
 					$result['type'] = 'file';
-					$result['file'] = ['max-size' => null, 'type' => 'file', ];
+					$result['file'] = ['max-size' => null, 'type' => 'file'];
 				}
 				else {
 					throw new Exception('[RULES ERROR] Unknown rule "'.$value.'" (Path: '.$rule_path.')');
@@ -694,7 +694,22 @@ class CFormValidator {
 			unset($data[$field]);
 		}
 
-		if (!array_key_exists($field, $data) && !array_key_exists($field, $files)) {
+		if (array_key_exists('type', $rules) && $rules['type'] == 'file') {
+			if (array_key_exists($field, $files) && $files[$field] == null) {
+				unset($files[$field]);
+			}
+
+			if (!array_key_exists($field, $files)) {
+				if (array_key_exists('required', $rules)) {
+					$this->addError(self::ERROR, $path,
+						self::getMessage($rules, 'required', _('Required field is missing.')), self::ERROR_LEVEL_PRIMARY
+					);
+				}
+
+				return;
+			}
+		}
+		else if (!array_key_exists($field, $data)) {
 			if (array_key_exists('required', $rules)) {
 				$this->addError(self::ERROR, $path,
 					self::getMessage($rules, 'required', _('Required field is missing.')), self::ERROR_LEVEL_PRIMARY
@@ -771,7 +786,7 @@ class CFormValidator {
 					break;
 
 				case 'file':
-					if (array_key_exists($field, $files) && !$this->validateFile($rules, $files[$field], $error)) {
+					if (!$this->validateFile($rules, $files[$field], $error)) {
 						$this->addError(self::ERROR, $path, $error, self::ERROR_LEVEL_PRIMARY);
 
 						return;
