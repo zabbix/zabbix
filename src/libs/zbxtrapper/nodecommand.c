@@ -92,9 +92,6 @@ static int	execute_remote_script(const zbx_script_t *script, const zbx_dc_host_t
 		int config_trapper_timeout, char **info, char *error, size_t max_error_len)
 {
 	zbx_uint64_t	taskid;
-	zbx_db_result_t	result = NULL;
-	zbx_db_row_t	row;
-	int		sleep_ms = 500, i = 0;
 
 	if (0 == host->proxyid)
 	{
@@ -109,14 +106,14 @@ static int	execute_remote_script(const zbx_script_t *script, const zbx_dc_host_t
 		return FAIL;
 	}
 
-	for (int time_start = time(NULL); config_trapper_timeout > time(NULL) - time_start; i++)
+	for (int time_start = time(NULL), i = 0; config_trapper_timeout > time(NULL) - time_start; i++)
 	{
+		zbx_db_result_t	result;
+		zbx_db_row_t	row;
+		int		sleep_ms = 3 > i ? 500 : 1000;
 		struct timespec	poll_delay = {.tv_sec = sleep_ms / 1000, .tv_nsec = sleep_ms % 1000 * 1000000};
 
 		nanosleep(&poll_delay, NULL);
-
-		if (i > 0)
-			sleep_ms = 1000;
 
 		result = zbx_db_select(
 				"select tr.status,tr.info"
