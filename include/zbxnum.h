@@ -73,7 +73,6 @@ int		zbx_number_parse(const char *number, int *len);
 		{										\
 			uint = 0;								\
 			THIS_SHOULD_NEVER_HAPPEN_MSG("%s", NULL == string  ? "(NULL)" : string);\
-			exit(EXIT_FAILURE);							\
 		}										\
 	}											\
 	while (0)
