@@ -65,10 +65,13 @@
 <script type="text/javascript">
 	$(function() {
 		const table = $('#tbl_macros');
-		let removed = 0;
 
 		const form_element = document.forms.macrosForm;
 		const form = new CForm(form_element, <?= json_encode($data['js_validation_rules']) ?>);
+		const macros_count_filtered = () => Object.values(form.getAllValues().macros)
+			.filter(({macro, value, description}) => `${macro}${value ?? ''}${description}`.length != 0)
+			.length;
+		const macros_count = macros_count_filtered();
 
 		form_element.addEventListener('submit', (e) => {
 			e.preventDefault();
@@ -76,6 +79,7 @@
 
 			const fields = form.getAllValues();
 			const curl = new Curl(form_element.action);
+			const removed = macros_count - macros_count_filtered();
 
 			form.validateSubmit(fields)
 				.then((result) => {
@@ -155,10 +159,6 @@
 		});
 
 		table
-			.on('click', 'button.element-table-remove', function() {
-				// check if the macro has an hidden ID element, if it does - increment the deleted macro counter
-				removed += $('#macros_' + $(this).attr('id').split('_')[1] + '_globalmacroid').length;
-			})
 			.dynamicRows({template: '#macro-row-tmpl', allow_empty: true, counter: <?= count($data['macros']) ?>})
 			.on('afteradd.dynamicRows', function() {
 				$('.macro-input-group', table).macroValue();
