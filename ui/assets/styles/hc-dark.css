@@ -2790,16 +2790,17 @@ button {
 output {
   position: relative;
   box-sizing: border-box;
-  display: grid;
-  align-items: center;
+  display: block;
   flex-shrink: 0;
   min-height: 48px;
-  padding: 6px 10px;
+  padding: 6px 20px 6px 10px;
   margin: 10px;
   background: #000000;
   border-style: solid;
   border-width: 2px 2px 2px 60px;
-  border-radius: 4px; }
+  border-radius: 4px;
+  word-break: break-all;
+  white-space: normal; }
   output::before {
     position: absolute;
     top: 6px;
@@ -2808,7 +2809,15 @@ output {
     color: rgba(255, 255, 255, 0.9);
     text-shadow: 0 0 5px rgba(0, 0, 0, 0.9); }
   output > span {
-    font-size: 1.167em; }
+    font-size: 1.167em;
+    padding-left: 10px;
+    max-height: 15px; }
+  output > a,
+  output > span {
+    display: inline-block;
+    transition: transform 0.3s ease; }
+  output > div {
+    margin-top: 6px; }
   output .msg-buttons {
     margin-top: 4px;
     text-align: right; }
@@ -2848,7 +2857,11 @@ output {
     output.collapsible.collapsed {
       grid-template-rows: 32px 0fr;
       grid-row-gap: 0; }
+      output.collapsible.collapsed > a,
+      output.collapsible.collapsed > span {
+        transform: scaleY(1) translateY(50%); }
       output.collapsible.collapsed .msg-details {
+        display: none;
         padding-top: 0;
         border-top: none;
         opacity: 0;
