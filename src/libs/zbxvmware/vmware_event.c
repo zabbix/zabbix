@@ -1487,6 +1487,12 @@ out:
 						vmware_shmem_get_vmware_mem()->total_size);
 			}
 		}
+
+		if (NULL != evt_data->error)	/* we have to always return collected events */
+		{
+			zabbix_log(LOG_LEVEL_DEBUG, "Ignored error of events collection: %s.", evt_data->error);
+			zbx_free(evt_data->error);
+		}
 	}
 
 	if (0 == evt_pause)
