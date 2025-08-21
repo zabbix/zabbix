@@ -151,8 +151,8 @@ class CPage {
 			}
 		}
 
-		$this->driver->manage()->deleteAllCookies();
 		try {
+			$this->logout();
 			$this->driver->executeScript('sessionStorage.clear();');
 		} catch (Exception $exception) {
 			// Code is not missing here.
@@ -253,7 +253,7 @@ class CPage {
 	public function logout() {
 		try {
 			// Before logout open page without any scripts, otherwise session might be restored and logout won't work.
-			$this->open('setup.php');
+			$this->open('setup.php')->waitUntilReady();
 
 			$session = null;
 
@@ -270,7 +270,9 @@ class CPage {
 			}
 
 			if ($session !== null) {
-				DBExecute('DELETE FROM sessions WHERE sessionid='.zbx_dbstr($session));
+				DBExecute('DELETE FROM sessions WHERE sessionid='.zbx_dbstr(
+						CTestArrayHelper::get(json_decode(base64_decode(urldecode($session)), true), 'sessionid')
+				));
 			}
 
 			$this->driver->manage()->deleteAllCookies();
@@ -624,13 +626,14 @@ class CPage {
 	public function userLogin($alias, $password, $scenario = TEST_GOOD, $url = 'index.php', $check_logged_in = true) {
 		if (self::$cookie === null) {
 			$this->driver->get(PHPUNIT_URL);
+			$this->waitUntilReady();
 		}
 
 		$this->logout();
 		$this->open($url);
 		$this->query('id:name')->waitUntilVisible()->one()->fill($alias);
 		$this->query('id:password')->one()->fill($password);
-		$this->query('id:enter')->one()->click();
+		$this->query('id:enter')->one()->click()->waitUntilStalled();
 		$this->waitUntilReady();
 
 		if ($check_logged_in) {
