@@ -42,7 +42,9 @@ $list_url = (new CUrl('zabbix.php'))
 
 $header = [
 	(new CColHeader(
-		(new CCheckBox('all_items'))->onClick("checkAll('item_list', 'all_items', 'itemids');")
+		(new CCheckBox('all_items'))
+			->setAttribute('autocomplete', 'off')
+			->onClick("checkAll('item_list', 'all_items', 'itemids');")
 	))->addClass(ZBX_STYLE_CELL_WIDTH),
 	'',
 	($data['hostid'] != 0)
@@ -204,6 +206,7 @@ foreach ($data['items'] as $item) {
 
 	$row = [
 		(new CCheckBox('itemids['.$item['itemid'].']', $item['itemid']))
+			->setAttribute('autocomplete', 'off')
 			->setAttribute('data-actions', $can_execute ? 'execute' : null),
 		(new CButtonIcon(ZBX_ICON_MORE))
 			->setMenuPopup(

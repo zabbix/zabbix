@@ -56,7 +56,9 @@ $trigger_form = (new CForm('post', $url))
 $trigger_table = (new CTableInfo())
 	->setHeader([
 		(new CColHeader(
-			(new CCheckBox('all_triggers'))->onClick("checkAll('".$trigger_form->getName()."', 'all_triggers', 'g_triggerid');")
+			(new CCheckBox('all_triggers'))
+				->setAttribute('autocomplete', 'off')
+				->onClick("checkAll('".$trigger_form->getName()."', 'all_triggers', 'g_triggerid');")
 		))->addClass(ZBX_STYLE_CELL_WIDTH),
 		make_sorting_header(_('Severity'), 'priority', $data['sort'], $data['sortorder'], $url),
 		make_sorting_header(_('Name'), 'description', $data['sort'], $data['sortorder'], $url),
@@ -181,10 +183,9 @@ foreach ($data['triggers'] as $trigger) {
 		$expression = $trigger['expression'];
 	}
 
-	$checkBox = new CCheckBox('g_triggerid['.$triggerid.']', $triggerid);
-
 	$trigger_table->addRow([
-		$checkBox,
+		(new CCheckBox('g_triggerid['.$triggerid.']', $triggerid))
+			->setAttribute('autocomplete', 'off'),
 		CSeverityHelper::makeSeverityCell((int) $trigger['priority']),
 		(new CCol($description))->addClass(ZBX_STYLE_WORDBREAK),
 		(new CCol($trigger['opdata']))->addClass(ZBX_STYLE_WORDBREAK),

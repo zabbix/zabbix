@@ -59,6 +59,7 @@ $graphs_table = (new CTableInfo())
 	->setHeader([
 		(new CColHeader(
 			(new CCheckBox('all_graphs'))
+				->setAttribute('autocomplete', 'off')
 				->onClick("checkAll('".$graphs_form->getName()."', 'all_graphs', 'group_graphid');")
 		))->addClass(ZBX_STYLE_CELL_WIDTH),
 		($data['hostid'] == 0) ? (($data['context'] === 'host') ? _('Host') : _('Template')) : null,
@@ -135,7 +136,8 @@ foreach ($data['graphs'] as $graph) {
 			->addClass(ZBX_STYLE_LINK_ACTION);
 
 	$graphs_table->addRow([
-		new CCheckBox('group_graphid['.$graphid.']', $graphid),
+		(new CCheckBox('group_graphid['.$graphid.']', $graphid))
+			->setAttribute('autocomplete', 'off'),
 		$hosts,
 		$name,
 		$graph['width'],

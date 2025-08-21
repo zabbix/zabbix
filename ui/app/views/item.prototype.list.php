@@ -35,7 +35,9 @@ $list_url = (new CUrl('zabbix.php'))
 $table = (new CTableInfo())
 	->setHeader([
 		(new CColHeader(
-			(new CCheckBox('all_items'))->onClick("checkAll('".$form->getName()."', 'all_items', 'itemids');")
+			(new CCheckBox('all_items'))
+				->setAttribute('autocomplete', 'off')
+				->onClick("checkAll('".$form->getName()."', 'all_items', 'itemids');")
 		))->addClass(ZBX_STYLE_CELL_WIDTH),
 		'',
 		make_sorting_header(_('Name'),'name', $data['sort'], $data['sortorder'], $list_url),
@@ -137,7 +139,8 @@ foreach ($data['items'] as $item) {
 			->setAttribute('data-context', $data['context']);
 
 	$table->addRow([
-		new CCheckBox('itemids['.$item['itemid'].']', $item['itemid']),
+		(new CCheckBox('itemids['.$item['itemid'].']', $item['itemid']))
+			->setAttribute('autocomplete', 'off'),
 		(new CButtonIcon(ZBX_ICON_MORE))
 			->setMenuPopup(
 				CMenuPopupHelper::getItemPrototype([

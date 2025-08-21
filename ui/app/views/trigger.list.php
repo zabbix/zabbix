@@ -205,6 +205,7 @@ $triggers_table = (new CTableInfo())
 	->setHeader([
 		(new CColHeader(
 			(new CCheckBox('all_triggers'))
+				->setAttribute('autocomplete', 'off')
 				->onClick("checkAll('".$triggers_form->getName()."', 'all_triggers', 'g_triggerid');")
 		))->addClass(ZBX_STYLE_CELL_WIDTH),
 		make_sorting_header(_('Severity'), 'priority', $data['sort'], $data['sortorder'], $url),
@@ -361,7 +362,8 @@ foreach ($data['triggers'] as $tnum => $trigger) {
 	$disabled_by_lld = $disable_source == ZBX_DISABLE_SOURCE_LLD;
 
 	$triggers_table->addRow([
-		new CCheckBox('g_triggerid['.$triggerid.']', $triggerid),
+		(new CCheckBox('g_triggerid['.$triggerid.']', $triggerid))
+			->setAttribute('autocomplete', 'off'),
 		CSeverityHelper::makeSeverityCell((int) $trigger['priority']),
 		$data['show_value_column'] ? $trigger_value : null,
 		$hosts,
@@ -411,7 +413,7 @@ $triggers_form->addItem([
 					->setId('js-massdelete-trigger')
 			]
 		],
-		'trigger'
+		'trigger'.($data['checkbox_hash'] ? '_'.$data['checkbox_hash'] : '')
 	)
 ]);
 
