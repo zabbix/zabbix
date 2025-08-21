@@ -526,12 +526,10 @@ int	zbx_substitute_lld_macros(char **data, const struct zbx_json_parse *jp_row,
 	size_t		i;
 	zbx_token_t	token;
 
-#ifdef ZBX_DEBUG
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s() data:'%s'", __func__, *data);
-#else
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
+#ifdef ZBX_DEBUG
+	zabbix_log(LOG_LEVEL_DEBUG, "%s() data:'%s'", __func__, *data);
 #endif
-
 	while (SUCCEED == ret && SUCCEED == zbx_token_find(*data, pos, &token, ZBX_TOKEN_SEARCH_EXPRESSION_MACRO))
 	{
 		for (i = prev_token_loc_r + 1; i < token.loc.l; i++)
