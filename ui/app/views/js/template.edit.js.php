@@ -87,6 +87,7 @@ window.template_edit_popup = new class {
 
 	#initMacrosTab() {
 		const show_inherited_macros_element = document.getElementById('show_inherited_template_macros');
+
 		this.macros_manager = new HostMacrosManager({
 			container: $('#template_macros_container .table-forms-td-right'),
 			show_inherited_macros_element

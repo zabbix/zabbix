@@ -107,6 +107,7 @@
 
 		initMacrosTab() {
 			const show_inherited_macros_element = document.getElementById('show_inherited_macros');
+
 			this.macros_manager = new HostMacrosManager({
 				container: $('#macros_container .table-forms-td-right'),
 				readonly: this.readonly,
