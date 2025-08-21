@@ -1188,7 +1188,7 @@ static int	zbx_tm_task_result_wait(zbx_uint64_t taskid, char **info)
 	zbx_db_result_t	result;
 	zbx_db_row_t	row;
 	int		ret, time_start, i = 0, sleep_ms = 500;
-	
+
 	for (time_start = time(NULL); ZBX_DATA_TTL > time(NULL) - time_start; i++)
 	{
 		struct timespec	poll_delay = {.tv_sec = sleep_ms / 1000, .tv_nsec = sleep_ms % 1000 * 1000000};
