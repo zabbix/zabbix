@@ -138,4 +138,11 @@ class CColorPickerElement extends CElement {
 
 		return ($clickable === $submitable && $displayed === !$submitable);
 	}
+
+	/**
+	 * @inheritdoc
+	 */
+	public static function find() {
+		return (new CElementQuery('id:color_picker'))->asColorPicker()->one();
+	}
 }

@@ -148,9 +148,10 @@ class testFormAdministrationGeneralTrigDisplOptions extends testFormAdministrati
 		foreach ($color_pickers as $selector) {
 			$form->query('xpath:.//z-color-picker[@color-field-name='.CXPathHelper::escapeQuotes($selector).']')->one()
 					->click();
-			$color_picker_dialog = $this->query('class:color-picker-dialog')->asColorPicker()->one();
-			$this->assertEquals(6, $color_picker_dialog->query('class:color-picker-input')->one()->getAttribute('maxlength'));
-			$color_picker_dialog->close();
+			$this->assertEquals(6, CColorPickerElement::find()->query('class:color-picker-input')
+				->one()->getAttribute('maxlength')
+			);
+			CColorPickerElement::close();
 		}
 
 		$checkboxes = [
@@ -787,10 +788,10 @@ class testFormAdministrationGeneralTrigDisplOptions extends testFormAdministrati
 			'severity_color_1', 'severity_color_2', 'severity_color_3', 'severity_color_4', 'severity_color_5'
 		];
 		foreach ($color_picker_names as $field_name) {
-			$xpath = 'xpath:.//z-color-picker[@color-field-name='.CXPathHelper::escapeQuotes($field_name).']';
-			$color_picker = $form->query($xpath)->one()->asColorPicker();
-			$color_picker->fill($data['value']);
-			$this->assertTrue($color_picker->isSubmittionDisabled());
+			$this->query('xpath:.//z-color-picker[@color-field-name='.CXPathHelper::escapeQuotes($field_name).']')->one()
+				->click();
+			CColorPickerElement::find()->query('class:color-picker-input')->one()->fill($data['value']);
+			$this->assertTrue(CColorPickerElement::find()->isSubmittionDisabled());
 			CColorPickerElement::close();
 		}
 	}
