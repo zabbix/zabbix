@@ -290,19 +290,19 @@ static int	setup_entry_table(zbx_dbsync_t *sync, zbx_setting_value_t *values)
 				break;
 			case ZBX_SETTING_TYPE_USRGRPID:
 				values[index].value.ui64 = 0;
-				ZBX_STR2UINT64(values[index].value.ui64, row[4]);
+				(void)zbx_is_uint64(row[4], &values[index].value.ui64);
 				break;
 			case ZBX_SETTING_TYPE_HOSTGROUPID:
 				values[index].value.ui64 = 0;
-				ZBX_STR2UINT64(values[index].value.ui64, row[5]);
+				(void)zbx_is_uint64(row[5], &values[index].value.ui64);
 				break;
 			case ZBX_SETTING_TYPE_USRDIRID:
 				values[index].value.ui64 = 0;
-				ZBX_STR2UINT64(values[index].value.ui64, row[6]);
+				(void)zbx_is_uint64(row[6], &values[index].value.ui64);
 				break;
 			case ZBX_SETTING_TYPE_MFAID:
 				values[index].value.ui64 = 0;
-				ZBX_STR2UINT64(values[index].value.ui64, row[7]);
+				(void)zbx_is_uint64(row[7], &values[index].value.ui64);
 				break;
 			default:
 				zabbix_log(LOG_LEVEL_CRIT, "Unknown setting type %d", entry->type);
