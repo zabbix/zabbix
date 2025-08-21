@@ -164,6 +164,7 @@ class CControllerChartsView extends CControllerCharts {
 	 * Get used filters.
 	 *
 	 * @param bool $use_profile Set true to load filters from profile if there aren't any input filters.
+	 *
 	 * @return array
 	 */
 	private function getInputFilters(bool $use_profile = false): array {
