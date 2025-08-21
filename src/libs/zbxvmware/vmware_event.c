@@ -1490,7 +1490,7 @@ out:
 
 		if (NULL != evt_data->error)	/* we have to always return collected events */
 		{
-			zabbix_log(LOG_LEVEL_DEBUG, "Ignored error of events collection: %s.", evt_data->error);
+			zabbix_log(LOG_LEVEL_DEBUG, "Ignored error of events collection: [%s].", evt_data->error);
 			zbx_free(evt_data->error);
 		}
 	}
@@ -1517,7 +1517,9 @@ out:
 			service->eventlog.data->events.values[0]->key : 0),
 			(NULL != service->eventlog.data && 0 != service->eventlog.data->events.values_num ?
 			service->eventlog.data->events.values[service->eventlog.data->events.values_num - 1]->key : 0),
-			shmem_free_sz, service->eventlog.end_time, NULL == evt_data->error ? "none" : evt_data->error,
+			shmem_free_sz, service->eventlog.end_time,
+			(NULL != service->eventlog.data && NULL != service->eventlog.data->error ?
+			service->eventlog.data->error : "none"),
 			vmware_shmem_get_vmware_mem()->free_size, zbx_vmware_get_vmware()->strpool_sz,
 			vmware_shmem_get_vmware_mem()->total_size);
 
