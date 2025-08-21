@@ -327,6 +327,7 @@ class testFormUserPermissions extends CWebTest {
 				$form = $this->query('id:userrole-form')->waitUntilPresent()->asForm()->one();
 				$form->fill($fields);
 				$form->submit();
+				$this->assertMessage(TEST_GOOD, 'User role updated');
 				$this->page->open('zabbix.php?action=user.edit&userid='.self::$admin_user);
 			}
 		}
@@ -385,6 +386,7 @@ class testFormUserPermissions extends CWebTest {
 								->setFillMode(CMultiselectElement::MODE_SELECT_MULTIPLE)->fill(['host.create', 'host.delete']);
 					}
 					$form->submit();
+					$this->assertMessage(TEST_GOOD, 'User role updated');
 					$this->page->open('zabbix.php?action=user.edit&userid='.self::$admin_user);
 				}
 			}
@@ -467,10 +469,11 @@ class testFormUserPermissions extends CWebTest {
 
 			if ($enable_modules) {
 				$this->assertEquals('status-green', $this->query($selector.'"4"]')->one()->getAttribute('class'));
-				$this->page->open('zabbix.php?action=userrole.edit&roleid='.self::$admin_roleid);
+				$this->page->open('zabbix.php?action=userrole.edit&roleid='.self::$admin_roleid)->waitUntilReady();
 				$form = $this->query('id:userrole-form')->waitUntilPresent()->asForm()->one();
 				$form->getField('4th Module')->uncheck();
 				$form->submit();
+				$this->assertMessage(TEST_GOOD, 'User role updated');
 			}
 			else {
 				$this->assertEquals('status-grey', $this->query($selector.'"4"]')->one()->getAttribute('class'));

@@ -246,7 +246,7 @@ class testFormMaintenance extends CLegacyWebTest {
 		$this->zbxTestClickLinkText($this->name);
 
 		// Clone maintenance, rename the clone and save it.
-		$this->zbxTestClickWait('clone');
+		$this->query('button:Clone')->waitUntilVisible()->one()->click()->waitUntilStalled();
 		$this->zbxTestInputTypeOverwrite('mname', $this->name.$suffix);
 		$this->zbxTestClickXpath('//button[@id="add"][@type="submit"]');
 

@@ -198,6 +198,7 @@ class testPageActions extends CLegacyWebTest {
 		$this->zbxTestLogin('actionconf.php?eventsource='.$action['eventsource']);
 		$this->zbxTestClickLinkText($action['name']);
 		$this->zbxTestClickWait('update');
+		$this->page->waitUntilReady();
 		$this->zbxTestCheckTitle('Configuration of actions');
 		$this->assertMessage(TEST_GOOD, 'Action updated');
 		$this->zbxTestTextPresent($action['name']);

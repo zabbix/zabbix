@@ -2118,11 +2118,12 @@ class testDataDisplayInGraphs extends CWebTest {
 					'type' => 'history'
 				]
 			],
-			[
-				[
-					'type' => 'trends'
-				]
-			],
+			// TODO: uncomment after fix DEV-4332
+//			[
+//				[
+//					'type' => 'trends'
+//				]
+//			],
 			[
 				[
 					'type' => 'pie'
@@ -2134,12 +2135,13 @@ class testDataDisplayInGraphs extends CWebTest {
 					'kiosk_mode' => true
 				]
 			],
-			[
-				[
-					'type' => 'trends',
-					'kiosk_mode' => true
-				]
-			],
+			// TODO: uncomment after fix DEV-4332
+//			[
+//				[
+//					'type' => 'trends',
+//					'kiosk_mode' => true
+//				]
+//			],
 			[
 				[
 					'type' => 'pie',

@@ -738,7 +738,7 @@ class testPageSearch extends CWebTest {
 			$form->getField('id:search')->fireEvent('keyup');
 		}
 
-		$form->submit();
+		$form->submit()->waitUntilStalled();
 		$this->page->waitUntilReady();
 	}
 }
