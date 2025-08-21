@@ -290,19 +290,19 @@ static int	setup_entry_table(zbx_dbsync_t *sync, zbx_setting_value_t *values)
 				break;
 			case ZBX_SETTING_TYPE_USRGRPID:
 				values[index].value.ui64 = 0;
-				zbx_is_uint64(row[4], &values[index].value.ui64);
+				ZBX_STR2UINT64(values[index].value.ui64, row[4]);
 				break;
 			case ZBX_SETTING_TYPE_HOSTGROUPID:
 				values[index].value.ui64 = 0;
-				zbx_is_uint64(row[5], &values[index].value.ui64);
+				ZBX_STR2UINT64(values[index].value.ui64, row[5]);
 				break;
 			case ZBX_SETTING_TYPE_USRDIRID:
 				values[index].value.ui64 = 0;
-				zbx_is_uint64(row[6], &values[index].value.ui64);
+				ZBX_STR2UINT64(values[index].value.ui64, row[6]);
 				break;
 			case ZBX_SETTING_TYPE_MFAID:
 				values[index].value.ui64 = 0;
-				zbx_is_uint64(row[7], &values[index].value.ui64);
+				ZBX_STR2UINT64(values[index].value.ui64, row[7]);
 				break;
 			default:
 				zabbix_log(LOG_LEVEL_CRIT, "Unknown setting type %d", entry->type);
@@ -387,7 +387,7 @@ static int	setting_get_uint64(const zbx_setting_value_t *values, const char *nam
 			if (NULL == e->default_value)
 				*value = 0;
 			else
-				ret = ZBX_STR2UINT64(*value, e->default_value);
+				ret = zbx_is_uint64(e->default_value, value);
 
 			if (SUCCEED == ret)
 			{

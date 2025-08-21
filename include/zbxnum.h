@@ -36,7 +36,7 @@
 #define zbx_is_uint31_1(str, value) \
 	zbx_is_uint_n_range(str, ZBX_SIZE_T_MAX, value, 4, 0x0, ZBX_MAX_UINT31_1)
 
-#define zbx_is_uint_range(str, value, min, max) \
+#define	zbx_is_uint_range(str, value, min, max) \
 	zbx_is_uint_n_range(str, ZBX_SIZE_T_MAX, value, sizeof(unsigned int), min, max)
 int	zbx_is_uint_n_range(const char *str, size_t n, void *value, size_t size, zbx_uint64_t min, zbx_uint64_t max);
 
@@ -67,15 +67,15 @@ int	zbx_wis_uint(const wchar_t *wide_string);
 const char	*zbx_print_double(char *buffer, size_t size, double val);
 int		zbx_number_parse(const char *number, int *len);
 
-#define ZBX_STR2UINT64(uint, string)							\
-	do {										\
-		if (FAIL == zbx_is_uint64(string, &uint))				\
-		{									\
-			uint = 0;							\
-			THIS_SHOULD_NEVER_HAPPEN_MSG("%s", ZBX_NULL2STR(string));	\
-			exit(EXIT_FAILURE);						\
-		}									\
-	}										\
+#define ZBX_STR2UINT64(uint, string)								\
+	do {											\
+		if (FAIL == zbx_is_uint64(string, &uint))					\
+		{										\
+			uint = 0;								\
+			THIS_SHOULD_NEVER_HAPPEN_MSG("%s", NULL == string  ? "(NULL)" : string);\
+			exit(EXIT_FAILURE);							\
+		}										\
+	}											\
 	while (0)
 
 int	zbx_str2uint64(const char *str, const char *suffixes, zbx_uint64_t *value);
