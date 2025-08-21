@@ -161,7 +161,7 @@ static void	get_template_items(zbx_uint64_t hostid, const zbx_vector_uint64_t *t
 	zbx_db_result_t		result;
 	zbx_db_row_t		row;
 	char			*sql = NULL;
-	size_t			sql_alloc = 0, sql_offset = 0, i;
+	size_t			sql_alloc = 0, sql_offset = 0;
 	unsigned char		interface_type;
 	zbx_template_item_t	*item;
 	zbx_uint64_t		interfaceids[4];
