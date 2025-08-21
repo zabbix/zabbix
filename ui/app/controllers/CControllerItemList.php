@@ -822,8 +822,7 @@ class CControllerItemList extends CControllerItem {
 		return $filter;
 	}
 
-	private function getContextPrefix(): string
-	{
+	private function getContextPrefix(): string {
 		return $this->getInput('context') === 'host' ? 'web.hosts.items.list.' : 'web.templates.items.list.';
 	}
 
@@ -872,11 +871,12 @@ class CControllerItemList extends CControllerItem {
 	}
 
 	/**
-	 * @param bool $empty_use_profile	set true to load filters from profile if there are none set
+	 * Get used filters.
 	 *
+	 * @param bool $use_profile Set true to load filters from profile if there aren't any input filters.
 	 * @return array
 	 */
-	private function getInputFilters(bool $empty_use_profile = false) : array {
+	private function getInputFilters(bool $use_profile = false): array {
 		$input_filters = ['filter_tags' => [],  'tags' => [], 'values' => [], 'operators' => []];
 
 		foreach ($this->getInput('filter_tags', []) as $tag) {
@@ -910,7 +910,7 @@ class CControllerItemList extends CControllerItem {
 			'filter_evaltype' => $this->getInput('filter_evaltype', TAG_EVAL_TYPE_AND_OR)
 		];
 
-		if ($empty_use_profile && count(array_intersect_key($input_filters, $this->input)) === 0) {
+		if ($use_profile && count(array_intersect_key($input_filters, $this->getInputAll())) == 0) {
 			$input_filters = $this->getProfiles();
 		}
 		else {
@@ -926,7 +926,7 @@ class CControllerItemList extends CControllerItem {
 		return $input_filters;
 	}
 
-	protected function updateProfiles() {
+	private function updateProfiles(): void {
 		$input_filters = $this->getInputFilters();
 
 		$prefix = $this->getContextPrefix();
@@ -953,7 +953,7 @@ class CControllerItemList extends CControllerItem {
 		$this->updateProfileSort();
 	}
 
-	protected function updateProfileSort() {
+	protected function updateProfileSort(): void {
 		$prefix = $this->getContextPrefix();
 
 		if ($this->hasInput('sort')) {
@@ -965,13 +965,10 @@ class CControllerItemList extends CControllerItem {
 		}
 	}
 
-	protected function deleteProfiles() {
+	protected function deleteProfiles(): void {
 		$prefix = $this->getContextPrefix();
 
-		if (count(CProfile::getArray($prefix.'filter_hostids', [])) != 1) {
-			CProfile::deleteIdx($prefix.'filter_hostids');
-		}
-
+		CProfile::deleteIdx($prefix.'filter_hostids');
 		CProfile::deleteIdx($prefix.'filter_groupids');
 		CProfile::deleteIdx($prefix.'filter_name');
 		CProfile::deleteIdx($prefix.'filter_type');

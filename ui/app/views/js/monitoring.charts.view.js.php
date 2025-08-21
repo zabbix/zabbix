@@ -22,8 +22,6 @@
 		_data: null,
 		_resize_observer: null,
 		_container: null,
-		_filter_tags: new Map(),
-		_filter_tagnames: new Set(),
 
 		init({filter_form_name, data, timeline}) {
 			this._filter_form = document.querySelector(`[name="${filter_form_name}"]`);
@@ -45,21 +43,48 @@
 		},
 
 		initSubfilter() {
-			for (const element of this._filter_form.querySelectorAll('.js-subfilter-unset')) {
-				this.setSubfilter(element.dataset.tag, element.dataset.value || null);
-			}
-
 			this._filter_form.addEventListener('click', (e) => {
-				const link = e.target;
+				const target = e.target;
 
-				if (link.classList.contains('js-subfilter-set')) {
-					this.setSubfilter(link.getAttribute('data-tag'), link.getAttribute('data-value'));
-					this.submitSubfilter();
+				if (target.matches('.link-action') && target.closest('.subfilter') !== null) {
+					const search_params = new URLSearchParams(window.location.search);
+					const url = new URL(window.location.href);
+					let reload_page = true;
+
+					if (target.matches('.js-subfilter-set')) {
+						search_params.append(target.getAttribute('data-name'), target.getAttribute('data-value'));
+					}
+					else if (target.matches('.js-subfilter-unset')) {
+						search_params.delete(target.getAttribute('data-name'), target.getAttribute('data-value'));
+					}
+					else {
+						reload_page = false;
+					}
+
+					if (reload_page) {
+						search_params.delete('filter_set');
+						search_params.delete('filter_rst');
+						search_params.set('subfilter_set', '1');
+						search_params.set('from', this._filter_form.querySelector('input[name="from"]').value);
+						search_params.set('to', this._filter_form.querySelector('input[name="to"]').value);
+
+						window.location.href = url.origin + url.pathname + '?' + search_params.toString();
+					}
 				}
-				else if (link.classList.contains('js-subfilter-unset')) {
-					this.unsetSubfilter(link.getAttribute('data-tag'), link.getAttribute('data-value'));
-					this.submitSubfilter();
-				}
+			});
+
+			this._filter_form.addEventListener('submit', e => {
+				e.preventDefault();
+				const search_params = new URLSearchParams(new FormData(e.target));
+				const url = new URL(window.location.href);
+
+				Array.from(search_params.keys()).forEach(filter_key => {
+					if (filter_key.startsWith('subfilter_')) {
+						search_params.delete(filter_key);
+					}
+				});
+
+				window.location.href = url.origin + url.pathname + '?' + search_params.toString();
 			});
 		},
 
@@ -93,58 +118,6 @@
 			if (document.getElementById('subfilter') !== null) {
 				document.getElementById('subfilter').outerHTML = subfilter;
 			}
-		},
-
-		setSubfilter(tag, value) {
-			if (value !== null) {
-				const tag_values = this._filter_tags.has(tag) ? this._filter_tags.get(tag) : [];
-
-				tag_values.push(value);
-				this._filter_tags.set(tag, tag_values);
-			}
-			else {
-				this._filter_tagnames.add(tag);
-			}
-		},
-
-		unsetSubfilter(tag, value) {
-			if (value !== null) {
-				const values = this._filter_tags.get(tag);
-
-				this._filter_tags.set(tag, values.filter((tag_value) => value !== tag_value));
-			}
-			else {
-				this._filter_tagnames.delete(tag);
-			}
-		},
-
-		filterAddVar(name, value) {
-			const input = document.createElement('input');
-
-			input.type = 'hidden';
-			input.name = name;
-			input.value = value;
-
-			this._filter_form.appendChild(input);
-		},
-
-		submitSubfilter() {
-			this.filterAddVar('subfilter_set', '1');
-
-			for (const element of this._filter_form.querySelectorAll('[name^="subfilter_tag"]')) {
-				element.remove();
-			}
-
-			this._filter_tags.forEach((values, tag) => {
-				for (let value of values) {
-					this.filterAddVar(`subfilter_tags[${encodeURIComponent(tag)}][]`, value);
-				}
-			});
-			this._filter_tagnames.forEach(tag => {
-				this.filterAddVar(`subfilter_tagnames[]`, tag);
-			});
-
-			this._filter_form.submit();
 		}
 	};
 </script>

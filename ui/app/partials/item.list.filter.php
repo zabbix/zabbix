@@ -261,14 +261,18 @@ if ($data['filtered_count'] > 1) {
 	}
 }
 
+$reset_url = (new CUrl('zabbix.php'))
+	->setArgument('action', $data['action'])
+	->setArgument('context', $data['context']);
+
+if (count($data['filter_data']['filter_hostids']) == 1) {
+	$reset_url->setArgument('filter_hostids', $data['filter_data']['filter_hostids']);
+}
+
 $filter
 	->setProfile($data['filter_data']['filter_profile'])
 	->setActiveTab($data['filter_data']['filter_tab'])
-	->setResetUrl(
-		(new CUrl('zabbix.php'))
-			->setArgument('action', $data['action'])
-			->setArgument('context', $data['context'])
-	)
+	->setResetUrl($reset_url)
 	->addVar('action', $data['action'], uniqid('item_'))
 	->addVar('context', $data['context'], uniqid('item_'))
 	->addFilterTab(_('Filter'), $filter_columns, $subfilters_table);

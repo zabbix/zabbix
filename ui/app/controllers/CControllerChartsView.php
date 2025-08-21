@@ -80,6 +80,7 @@ class CControllerChartsView extends CControllerCharts {
 			$this->updateProfiles();
 		}
 
+		updateTimeSelectorPeriod($this->getTimeSelectorOptions());
 		$data = $this->getInputFilters(true) + [
 			'view_as' => $this->getInput('view_as', HISTORY_GRAPH),
 			'ms_hosts' => [],
@@ -97,6 +98,7 @@ class CControllerChartsView extends CControllerCharts {
 			// Continue with readable hosts only.
 			if (count($data['filter_hostids']) != count($data['ms_hosts'])) {
 				$data['filter_hostids'] = array_column($data['ms_hosts'], 'id');
+
 				if ($this->hasInput('filter_set')) {
 					$data['error'] = _('No permissions to referred object or it does not exist!');
 				}
@@ -140,31 +142,31 @@ class CControllerChartsView extends CControllerCharts {
 		$this->setResponse($response);
 	}
 
-	protected function deleteProfiles() {
+	private function deleteProfiles(): void {
 		CProfile::deleteIdx('web.charts.filter.hostids');
 		CProfile::deleteIdx('web.charts.filter.name');
 		CProfile::deleteIdx('web.charts.filter.show');
 		CProfile::deleteIdx('web.charts.subfilter.tagnames');
 		CProfile::deleteIdx('web.charts.subfilter.tags');
-		updateTimeSelectorPeriod($this->getTimeSelectorOptions());
 	}
 
-	private function getTimeSelectorOptions (): array {
+	private function getTimeSelectorOptions(): array {
 		return [
 			'profileIdx' => 'web.charts.filter',
 			'profileIdx2' => 0,
-			'from' => $this->hasInput('from') ? $this->getInput('from') : null,
-			'to' => $this->hasInput('to') ? $this->getInput('to') : null
+			'from' => $this->hasInput('from') ? $this->getInput('from') :
+				CProfile::get('web.charts.filter.from', 'now-'.CSettingsHelper::get(CSettingsHelper::PERIOD_DEFAULT)),
+			'to' => $this->hasInput('to') ? $this->getInput('to') : CProfile::get('web.charts.filter.to', 'now')
 		];
 	}
 
 	/**
-	 * @param bool $empty_use_profile	set true to load filters from profile if there are none set
+	 * Get used filters.
 	 *
+	 * @param bool $use_profile Set true to load filters from profile if there aren't any input filters.
 	 * @return array
 	 */
-	private function getInputFilters(bool $empty_use_profile = false): array
-	{
+	private function getInputFilters(bool $use_profile = false): array {
 		$input_filters = [
 			'filter_hostids' => $this->getInput('filter_hostids', []),
 			'filter_name' => $this->getInput('filter_name', ''),
@@ -173,8 +175,13 @@ class CControllerChartsView extends CControllerCharts {
 			'subfilter_tags' => $this->getInput('subfilter_tags', [])
 		];
 
-		if ($empty_use_profile && count(array_intersect_key($input_filters, $this->input)) === 0) {
+		if ($use_profile && count(array_intersect_key($input_filters, $this->getInputAll())) == 0) {
 			$input_filters = $this->getProfiles();
+		}
+
+		if ($this->hasInput('filter_set') || $this->hasInput('filter_rst')) {
+			$input_filters['subfilter_tagnames'] = [];
+			$input_filters['subfilter_tags'] = [];
 		}
 
 		$input_filters['timeline'] = getTimeSelectorPeriod($this->getTimeSelectorOptions());
@@ -182,7 +189,7 @@ class CControllerChartsView extends CControllerCharts {
 		return $input_filters;
 	}
 
-	protected function updateProfiles() {
+	private function updateProfiles(): void {
 		$input_filters = $this->getInputFilters();
 
 		CProfile::updateArray('web.charts.filter.hostids', $input_filters['filter_hostids'], PROFILE_TYPE_ID);
@@ -190,10 +197,9 @@ class CControllerChartsView extends CControllerCharts {
 		CProfile::update('web.charts.filter.show', $input_filters['filter_show'], PROFILE_TYPE_INT);
 		CProfile::updateArray('web.charts.subfilter.tagnames', [], PROFILE_TYPE_STR);
 		CProfile::update('web.charts.subfilter.tags', json_encode([]), PROFILE_TYPE_STR);
-		updateTimeSelectorPeriod($this->getTimeSelectorOptions());
 	}
 
-	protected function getProfiles(): array {
+	private function getProfiles(): array {
 		return [
 			'filter_hostids' => CProfile::get('web.charts.filter.hostids', []),
 			'filter_name' => CProfile::get('web.charts.filter.filter_name', ''),

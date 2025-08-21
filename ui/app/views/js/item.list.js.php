@@ -62,7 +62,6 @@
 
 				if (target.matches('.link-action') && target.closest('.subfilter') !== null) {
 					const subfilter = target.closest('.subfilter');
-
 					const search_params = new URLSearchParams(window.location.search);
 					const url = new URL(window.location.href);
 
@@ -86,6 +85,21 @@
 					});
 				}
 			});
+
+			this.filter_form.addEventListener('submit', e => {
+				e.preventDefault();
+				const search_params = new URLSearchParams(new FormData(e.target));
+				const url = new URL(window.location.href);
+
+				Array.from(search_params.keys()).forEach(filter_key => {
+					if (filter_key.startsWith('subfilter_')) {
+						search_params.delete(filter_key);
+					}
+				});
+
+				window.location.href = url.origin + url.pathname + '?' + search_params.toString();
+			});
+
 			this.form.addEventListener('click', (e) => {
 				const target = e.target;
 				const itemids = Object.keys(chkbxRange.getSelectedIds());
