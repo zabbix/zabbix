@@ -293,22 +293,14 @@ class HostMacrosManager {
 		this.#disableRadioShowInheritedMacros();
 		this.$preloader = $('<span>', {class: 'is-loading'});
 		const macros_table = this.$container.find('table');
-
-		if (macros_table) {
-			macros_table.hide();
-		}
-
+		macros_table.hide();
 		this.$container.append(this.$preloader);
 	}
 
 	loaderStop() {
 		this.$preloader.remove();
 		const macros_table = this.$container.find('table');
-
-		if (macros_table) {
-			macros_table.show();
-		}
-
+		macros_table.show();
 		this.#enableRadioShowInheritedMacros();
 	}
 
