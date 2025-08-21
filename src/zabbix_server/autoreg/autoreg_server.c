@@ -89,7 +89,7 @@ static void	autoreg_process_hosts_server(zbx_vector_autoreg_host_ptr_t *autoreg_
 					autoreg_host->flag != atoi(row[7]))
 				break;
 
-			if (autoreg_host->connection_type != atoi(row[11]))
+			if (autoreg_host->connection_type != (unsigned int)atoi(row[11]))
 				break;
 
 			/* process with autoregistration if the connection type was forced and */
