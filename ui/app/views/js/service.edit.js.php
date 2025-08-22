@@ -407,10 +407,18 @@ window.service_edit_popup = new class {
 		curl.setArgument('action', 'service.delete');
 		curl.setArgument(CSRF_TOKEN_NAME, <?= json_encode(CCsrfTokenHelper::get('service')) ?>);
 
-		this.#post(curl.getUrl(), {serviceids: [this.serviceid]}, (response) => {
-			overlayDialogueDestroy(this.overlay.dialogueid);
-
-			this.dialogue.dispatchEvent(new CustomEvent('dialogue.submit', {detail: response}));
+		this.#post(curl.getUrl(), {serviceids: [this.serviceid]}, response => {
+			if ('form_errors' in response) {
+				this.form.setErrors(response.form_errors, true, true);
+				this.form.renderErrors();
+			}
+			else if ('error' in response) {
+				throw {error: response.error};
+			}
+			else {
+				overlayDialogueDestroy(this.overlay.dialogueid);
+				this.dialogue.dispatchEvent(new CustomEvent('dialogue.submit', {detail: response}));
+			}
 		});
 	}
 
