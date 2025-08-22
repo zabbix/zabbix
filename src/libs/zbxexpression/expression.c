@@ -21,7 +21,6 @@
 #include "zbxeval.h"
 #include "zbxdbwrap.h"
 #include "zbxcachevalue.h"
-#include "macrofunc.h"
 #include "zbxxml.h"
 #include "zbxstr.h"
 #include "zbxexpr.h"
@@ -741,7 +740,7 @@ int	substitute_simple_macros_impl(const zbx_uint64_t *actionid, const zbx_db_eve
 			case ZBX_TOKEN_USER_FUNC_MACRO:
 				raw_value = 1;
 				/* user macros are not indexed */
-				if (NULL == (m_ptr = func_get_macro_from_func(*data, &token.data.func_macro, NULL)) ||
+				if (NULL == (m_ptr = zbx_get_macro_from_func(*data, &token.data.func_macro, NULL)) ||
 						SUCCEED != zbx_token_find(*data, token.data.func_macro.macro.l,
 						&inner_token, token_search))
 				{
@@ -755,7 +754,8 @@ int	substitute_simple_macros_impl(const zbx_uint64_t *actionid, const zbx_db_eve
 			case ZBX_TOKEN_FUNC_MACRO:
 				raw_value = 1;
 				indexed_macro = is_indexed_macro(*data, &token);
-				if (NULL == (m_ptr = func_get_macro_from_func(*data, &token.data.func_macro, &N_functionid))
+				if (NULL == (m_ptr = zbx_get_macro_from_func(*data, &token.data.func_macro,
+							&N_functionid))
 						|| SUCCEED != zbx_token_find(*data, token.data.func_macro.macro.l,
 						&inner_token, token_search))
 				{
