@@ -2238,7 +2238,7 @@ const SUBJECT_INTERNAL = "Internal";
 			'eventobject' => EVENT_OBJECT_TRIGGER,
 			'eventsource' => EVENT_SOURCE_INTERNAL
 		], 2, 2);
-		$this->assertCount(2, $alert_response_internal_trigger['result']);
+		$this->assertCount(2, $alert_response_internal_trigger['result'], json_encode($alert_response_internal_trigger));
 
 		//test inconsistent macros
 		$inconsistent_macros_resolved = "/ACTION.ID[\s\S]*" .
