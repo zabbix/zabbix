@@ -172,6 +172,18 @@ tests/libs/zbxdbhigh/zbx_merge_tags
 tests/libs/zbxdbhigh/zbx_sync_rowset_merge
 tests/libs/zbxeval/zbx_eval_compose_expression
 tests/libs/zbxeval/zbx_eval_check_timer_functions
+tests/libs/zbxeval/zbx_eval_calc_avg
+tests/libs/zbxeval/zbx_eval_calc_kurtosis
+tests/libs/zbxeval/zbx_eval_calc_mad
+tests/libs/zbxeval/zbx_eval_calc_max
+tests/libs/zbxeval/zbx_eval_calc_min
+tests/libs/zbxeval/zbx_eval_calc_skewness
+tests/libs/zbxeval/zbx_eval_calc_stddevpop
+tests/libs/zbxeval/zbx_eval_calc_stddevsamp
+tests/libs/zbxeval/zbx_eval_calc_sum
+tests/libs/zbxeval/zbx_eval_calc_sumofsquares
+tests/libs/zbxeval/zbx_eval_calc_varpop
+tests/libs/zbxeval/zbx_eval_calc_varsamp
 tests/libs/zbxeval/zbx_eval_copy
 tests/libs/zbxeval/zbx_eval_deserialize_dyn
 tests/libs/zbxeval/zbx_eval_extract_item_refs
@@ -187,6 +199,8 @@ tests/libs/zbxeval/zbx_eval_parse_query
 tests/libs/zbxeval/zbx_eval_prepare_filter
 tests/libs/zbxeval/zbx_eval_replace_functionid
 tests/libs/zbxeval/zbx_eval_serialize
+tests/libs/zbxeval/zbx_eval_substitute_macros
+tests/libs/zbxeval/zbx_eval_query_subtitute_user_macros
 tests/libs/zbxeval/zbx_get_serialized_expression_functionids
 tests/libs/zbxexpr/calculate_item_nextcheck
 tests/libs/zbxexpr/calculate_item_nextcheck_unreachable
@@ -244,6 +258,7 @@ tests/libs/zbxip/zbx_iprange_uniq_iter
 tests/libs/zbxip/zbx_iprange_uniq_next
 tests/libs/zbxip/zbx_parse_serveractive_element
 tests/libs/zbxip/zbx_portrange_uniq_next
+tests/libs/zbxip/zbx_join_hostport
 tests/libs/zbxicmpping/get_interval_option
 tests/libs/zbxicmpping/line_process
 tests/libs/zbxjson/zbx_json_decodevalue

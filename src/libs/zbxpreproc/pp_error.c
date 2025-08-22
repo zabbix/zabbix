@@ -145,9 +145,10 @@ static int	zbx_db_mock_field_append(zbx_db_mock_field_t *field, const char *text
  *           larger than ZBX_PP_VALUE_PREVIEW_LEN characters.                 *
  *                                                                            *
  ******************************************************************************/
-static void	pp_error_format_value(const zbx_variant_t *value, char **value_str)
+static char	*pp_error_format_value(const zbx_variant_t *value)
 {
 	const char	*value_desc;
+	char		*value_str;
 	size_t		i, len;
 
 #define ZBX_PP_VALUE_PREVIEW_LEN	100
@@ -158,23 +159,24 @@ static void	pp_error_format_value(const zbx_variant_t *value, char **value_str)
 	{
 		/* truncate value and append '...' */
 		len = zbx_strlen_utf8_nchars(value_desc, ZBX_PP_VALUE_PREVIEW_LEN - ZBX_CONST_STRLEN("..."));
-		*value_str = zbx_malloc(NULL, len + ZBX_CONST_STRLEN("...") + 1);
-		memcpy(*value_str, value_desc, len);
-		memcpy(*value_str + len, "...", ZBX_CONST_STRLEN("...") + 1);
+		value_str = zbx_malloc(NULL, len + ZBX_CONST_STRLEN("...") + 1);
+		memcpy(value_str, value_desc, len);
+		memcpy(value_str + len, "...", ZBX_CONST_STRLEN("...") + 1);
 	}
 	else
 	{
-		*value_str = zbx_malloc(NULL, (len = strlen(value_desc)) + 1);
-		memcpy(*value_str, value_desc, len + 1);
+		value_str = zbx_malloc(NULL, (len = strlen(value_desc)) + 1);
+		memcpy(value_str, value_desc, len + 1);
 	}
 
 	/* replace control characters */
 	for (i = 0; i < len; i++)
 	{
-		if (0 != iscntrl((*value_str)[i]))
-			(*value_str)[i] = '.';
+		if (0 != iscntrl(value_str[i]))
+			value_str[i] = '.';
 	}
 
+	return value_str;
 #undef ZBX_PP_VALUE_PREVIEW_LEN
 }
 
@@ -187,23 +189,27 @@ static void	pp_error_format_value(const zbx_variant_t *value, char **value_str)
  *             out    - [OUT] formatted string                                *
  *                                                                            *
  ******************************************************************************/
-static void	pp_error_format_result(int step, const zbx_pp_result_t *result, char **out)
+static char	*pp_error_format_result(int step, const zbx_pp_result_t *result)
 {
-	char	*actions[] = {"", " (discard value)", " (set value)", " (set error)"};
+	char	*actions[] = {"", " (discard value)", " (set value)", " (set error)"}, *error = NULL;
+	size_t	error_alloc = 0, error_offset = 0;
 
 	if (ZBX_VARIANT_ERR != result->value.type)
 	{
 		char	*value_str;
 
-		pp_error_format_value(&result->value, &value_str);
-		*out = zbx_dsprintf(NULL, "%d. Result%s: %s\n", step, actions[result->action], value_str);
+		value_str = pp_error_format_value(&result->value);
+		zbx_snprintf_alloc(&error, &error_alloc, &error_offset, "%d. Result%s: %s\n", step,
+				actions[result->action], value_str);
 		zbx_free(value_str);
 	}
 	else
 	{
-		*out = zbx_dsprintf(NULL, "%d. Failed%s: %s\n", step, actions[result->action],
-				zbx_variant_value_desc(&result->value));
+		zbx_snprintf_alloc(&error, &error_alloc, &error_offset, "%d. Failed%s: %s\n", step,
+			actions[result->action], zbx_variant_value_desc(&result->value));
 	}
+
+	return error;
 }
 
 /******************************************************************************
@@ -218,17 +224,17 @@ static void	pp_error_format_result(int step, const zbx_pp_result_t *result, char
  ******************************************************************************/
 void	pp_format_error(const zbx_variant_t *value, zbx_pp_result_t *results, int results_num, char **error)
 {
-	char			*value_str, *err_step;
+	char			*value_str, *err_step = NULL;
 	int			i;
-	size_t			error_alloc = 512, error_offset = 0;
+	size_t			error_alloc = 0, error_offset = 0;
 	zbx_vector_str_t	results_str;
 	zbx_db_mock_field_t	field;
 
 	zbx_vector_str_create(&results_str);
+	zbx_vector_str_reserve(&results_str, 3);
 
 	/* add header to error message */
-	*error = zbx_malloc(NULL, error_alloc);
-	pp_error_format_value(value, &value_str);
+	value_str = pp_error_format_value(value);
 	zbx_snprintf_alloc(error, &error_alloc, &error_offset, "Preprocessing failed for: %s\n", value_str);
 	zbx_free(value_str);
 
@@ -238,7 +244,7 @@ void	pp_format_error(const zbx_variant_t *value, zbx_pp_result_t *results, int r
 	zbx_db_mock_field_append(&field, "...\n");
 
 	/* format the last (failed) step */
-	pp_error_format_result(results_num, &results[results_num - 1], &err_step);
+	err_step = pp_error_format_result(results_num, &results[results_num - 1]);
 	zbx_vector_str_append(&results_str, err_step);
 
 	if (SUCCEED == zbx_db_mock_field_append(&field, err_step))
@@ -246,7 +252,7 @@ void	pp_format_error(const zbx_variant_t *value, zbx_pp_result_t *results, int r
 		/* format the first steps */
 		for (i = results_num - 2; i >= 0; i--)
 		{
-			pp_error_format_result(i + 1, &results[i], &err_step);
+			err_step = pp_error_format_result(i + 1, &results[i]);
 
 			if (SUCCEED != zbx_db_mock_field_append(&field, err_step))
 			{

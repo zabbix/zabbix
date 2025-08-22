@@ -12,7 +12,7 @@ This template uses SSH checks with a new `subsystem` parameter in the item key, 
 
 ## Requirements
 
-Zabbix version: 7.4 and higher.
+Zabbix version: 8.0 and higher.
 
 ## Tested versions
 
@@ -21,7 +21,7 @@ This template has been tested on:
 
 ## Configuration
 
-> Zabbix should be configured according to the instructions in the [Templates out of the box](https://www.zabbix.com/documentation/7.4/manual/config/templates_out_of_the_box) section.
+> Zabbix should be configured according to the instructions in the [Templates out of the box](https://www.zabbix.com/documentation/8.0/manual/config/templates_out_of_the_box) section.
 
 ## Setup
 
@@ -66,7 +66,7 @@ For more details, please see: [Enable NETCONF Service over SSH](https://www.juni
 |----|-----------|-------|
 |{$JUNIPER.MX.NETCONF.USERNAME}|<p>Juniper NETCONF username.</p>||
 |{$JUNIPER.MX.NETCONF.PASSWORD}|<p>Juniper NETCONF password.</p>||
-|{$JUNIPER.MX.NETCONF.IP}|<p>The IP address of the Juniper MX device.</p>|`<SET JUNIPER MX IP NETCONF>`|
+|{$JUNIPER.MX.NETCONF.IP}|<p>The IP address of the Juniper MX device.</p>||
 |{$JUNIPER.MX.NETCONF.PORT}|<p>The NETCONF port of the Juniper MX device.</p>|`830`|
 |{$JUNIPER.MX.NETCONF.TIMEOUT}|<p>SSH response timeout.</p>|`15s`|
 |{$JUNIPER.MX.NETCONF.RESPONSE_TIME.MAX.WARN}|<p>The maximum Juniper NETCONF response time expressed in seconds, for a trigger expression.</p>|`10`|

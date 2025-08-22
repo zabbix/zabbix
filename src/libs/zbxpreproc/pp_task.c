@@ -119,6 +119,7 @@ zbx_pp_task_t	*pp_task_value_create(zbx_uint64_t itemid, zbx_pp_item_preproc_t *
 
 	task->itemid = itemid;
 	task->type = ZBX_PP_TASK_VALUE;
+	task->state = ZBX_PP_TASK_PENDING;
 
 	if (NULL != value)
 		d->value = *value;

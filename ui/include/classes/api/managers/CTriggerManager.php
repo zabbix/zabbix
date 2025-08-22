@@ -66,9 +66,6 @@ class CTriggerManager {
 		DB::insertBatch('housekeeper', $ins_housekeeper);
 
 		DB::delete('functions', ['triggerid' => $del_triggerids]);
-		DB::delete('trigger_discovery', ['triggerid' => $del_triggerids]);
-		DB::delete('trigger_depends', ['triggerid_down' => $del_triggerids]);
-		DB::delete('trigger_depends', ['triggerid_up' => $del_triggerids]);
 		DB::delete('trigger_tag', ['triggerid' => $del_triggerids]);
 		DB::update('triggers', [
 			'values' => ['templateid' => 0],

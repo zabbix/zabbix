@@ -11,7 +11,7 @@ Please note that the Teams free plan does **not** support the [incoming webhook]
 
 ## Requirements
 
-Zabbix version: 7.4 and higher.
+Zabbix version: 8.0 and higher.
 
 ## Parameters
 
@@ -118,7 +118,7 @@ Make sure this user has access to all the hosts for which you would like problem
 
 6\. Done! You can now start receiving Teams alerts.
 
-For more information, please see [Zabbix](https://www.zabbix.com/documentation/7.4/manual/config/notifications) and [Microsoft Teams webhook](https://docs.microsoft.com/en-US/microsoftteams/platform/webhooks-and-connectors/how-to/add-incoming-webhook) documentation.
+For more information, please see [Zabbix](https://www.zabbix.com/documentation/8.0/manual/config/notifications) and [Microsoft Teams webhook](https://docs.microsoft.com/en-US/microsoftteams/platform/webhooks-and-connectors/how-to/add-incoming-webhook) documentation.
 
 ## Feedback
 

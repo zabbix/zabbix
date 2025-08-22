@@ -24,14 +24,13 @@ import (
 	"time"
 
 	"github.com/godror/godror"
+	"github.com/godror/godror/dsn"
 	"github.com/omeid/go-yarn"
-	"golang.zabbix.com/sdk/errs"
 	"golang.zabbix.com/sdk/log"
 	"golang.zabbix.com/sdk/uri"
-	"golang.zabbix.com/sdk/zbxerr"
 )
 
-var errInvalidPrivilege = errs.New("invalid connection privilege")
+const errorQueryNotFound = "query %q not found"
 
 type OraClient interface {
 	Query(ctx context.Context, query string, args ...interface{}) (rows *sql.Rows, err error)
@@ -52,7 +51,23 @@ type OraConn struct {
 	username         string
 }
 
-var errorQueryNotFound = "query %q not found"
+// ConnManager is thread-safe structure for manage connections.
+type ConnManager struct {
+	// cached connections
+	connections   map[*connDetails]*OraConn
+	connectionsMu sync.Mutex
+
+	keepAlive      time.Duration
+	connectTimeout time.Duration
+	callTimeout    time.Duration
+	Destroy        context.CancelFunc
+	queryStorage   yarn.Yarn
+}
+
+type connDetails struct {
+	uri       uri.URI
+	privilege dsn.AdminRole
+}
 
 // Query wraps DB.QueryContext.
 func (conn *OraConn) Query(ctx context.Context, query string, args ...interface{}) (rows *sql.Rows, err error) {
@@ -65,7 +80,7 @@ func (conn *OraConn) Query(ctx context.Context, query string, args ...interface{
 	return
 }
 
-// Query executes a query from queryStorage by its name and returns multiple rows.
+// QueryByName executes a query from queryStorage by its name and returns multiple rows.
 func (conn *OraConn) QueryByName(ctx context.Context, queryName string,
 	args ...interface{},
 ) (rows *sql.Rows, err error) {
@@ -78,7 +93,7 @@ func (conn *OraConn) QueryByName(ctx context.Context, queryName string,
 	return nil, fmt.Errorf(errorQueryNotFound, queryName)
 }
 
-// Query wraps DB.QueryRowContext.
+// QueryRow wraps DB.QueryRowContext.
 func (conn *OraConn) QueryRow(ctx context.Context, query string, args ...interface{}) (row *sql.Row, err error) {
 	row = conn.client.QueryRowContext(ctx, query, args...)
 
@@ -89,7 +104,7 @@ func (conn *OraConn) QueryRow(ctx context.Context, query string, args ...interfa
 	return
 }
 
-// Query executes a query from queryStorage by its name and returns a single row.
+// QueryRowByName executes a query from queryStorage by its name and returns a single row.
 func (conn *OraConn) QueryRowByName(ctx context.Context, queryName string,
 	args ...interface{},
 ) (row *sql.Row, err error) {
@@ -122,24 +137,6 @@ func (conn *OraConn) getLastAccessTime() time.Time {
 	return conn.lastAccessTime
 }
 
-// ConnManager is thread-safe structure for manage connections.
-type ConnManager struct {
-	// cached connections
-	connections   map[connDetails]*OraConn
-	connectionsMu sync.Mutex
-
-	keepAlive      time.Duration
-	connectTimeout time.Duration
-	callTimeout    time.Duration
-	Destroy        context.CancelFunc
-	queryStorage   yarn.Yarn
-}
-
-type connDetails struct {
-	uri       uri.URI
-	privilege string
-}
-
 // NewConnManager initializes connManager structure and runs Go Routine that watches for unused connections.
 func NewConnManager(keepAlive, connectTimeout, callTimeout,
 	hkInterval time.Duration, queryStorage yarn.Yarn,
@@ -147,7 +144,7 @@ func NewConnManager(keepAlive, connectTimeout, callTimeout,
 	ctx, cancel := context.WithCancel(context.Background())
 
 	connMgr := &ConnManager{
-		connections:    make(map[connDetails]*OraConn),
+		connections:    make(map[*connDetails]*OraConn),
 		keepAlive:      keepAlive,
 		connectTimeout: connectTimeout,
 		callTimeout:    callTimeout,
@@ -203,7 +200,7 @@ func (c *ConnManager) housekeeper(ctx context.Context, interval time.Duration) {
 }
 
 // create creates a new connection for given credentials.
-func (c *ConnManager) create(cd connDetails) (*OraConn, error) {
+func (c *ConnManager) create(cd *connDetails) (*OraConn, error) {
 	ctx := godror.ContextWithTraceTag(
 		context.Background(),
 		godror.TraceTag{
@@ -226,24 +223,16 @@ func (c *ConnManager) create(cd connDetails) (*OraConn, error) {
 		c.connectTimeout/time.Second,
 	)
 
-	connParams, err := getConnParams(cd.privilege)
-	if err != nil {
-		return nil, errs.WrapConst(err, zbxerr.ErrorInvalidParams)
+	connParams := godror.ConnParams{
+		AdminRole: cd.privilege,
 	}
 
-	connector := godror.NewConnector(
-		godror.ConnectionParams{
-			StandaloneConnection: true,
-			CommonParams: godror.CommonParams{
-				Username:      cd.uri.User(),
-				ConnectString: connectString,
-				Password:      godror.NewPassword(cd.uri.Password()),
-			},
-			ConnParams: connParams,
-		},
-	)
-
-	client := sql.OpenDB(connector)
+	var params godror.ConnectionParams
+	params.StandaloneConnection = sql.NullBool{Bool: true, Valid: true}
+	params.Username, params.Password = cd.uri.User(), godror.NewPassword(cd.uri.Password())
+	params.ConnectString = connectString
+	params.ConnParams = connParams
+	client := sql.OpenDB(godror.NewConnector(params))
 
 	serverVersion, err := godror.ServerVersion(ctx, client)
 	if err != nil {
@@ -267,7 +256,7 @@ func (c *ConnManager) create(cd connDetails) (*OraConn, error) {
 //
 // Attempts to retrieve a connection from cache by its connDetails.
 // Returns nil if no connection associated with the given connDetails is found.
-func (c *ConnManager) getConn(cd connDetails) *OraConn { //nolint:gocritic
+func (c *ConnManager) getConn(cd *connDetails) *OraConn {
 	c.connectionsMu.Lock()
 	defer c.connectionsMu.Unlock()
 
@@ -283,9 +272,7 @@ func (c *ConnManager) getConn(cd connDetails) *OraConn { //nolint:gocritic
 //
 // Returns the cached connection. If the provider connection is already present
 // in cache, it is closed.
-//
-//nolint:gocritic
-func (c *ConnManager) setConn(cd connDetails, conn *OraConn) *OraConn {
+func (c *ConnManager) setConn(cd *connDetails, conn *OraConn) *OraConn {
 	c.connectionsMu.Lock()
 	defer c.connectionsMu.Unlock()
 
@@ -303,8 +290,8 @@ func (c *ConnManager) setConn(cd connDetails, conn *OraConn) *OraConn {
 	return conn
 }
 
-// GetConnection returns an existing connection or creates a new one.
-func (c *ConnManager) GetConnection(cd connDetails) (*OraConn, error) { //nolint:gocritic
+// getConnection returns an existing connection or creates a new one.
+func (c *ConnManager) getConnection(cd *connDetails) (*OraConn, error) {
 	conn := c.getConn(cd)
 	if conn != nil {
 		conn.updateLastAccessTime()
@@ -318,23 +305,4 @@ func (c *ConnManager) GetConnection(cd connDetails) (*OraConn, error) { //nolint
 	}
 
 	return c.setConn(cd, conn), err
-}
-
-func getConnParams(privilege string) (godror.ConnParams, error) {
-	var out godror.ConnParams
-
-	switch privilege {
-	case "sysdba":
-		out.IsSysDBA = true
-	case "sysoper":
-		out.IsSysOper = true
-	case "sysasm":
-		out.IsSysASM = true
-	case "":
-	default:
-		return godror.ConnParams{},
-			errs.Wrapf(errInvalidPrivilege, "unknown privilege %s", privilege)
-	}
-
-	return out, nil
 }

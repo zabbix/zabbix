@@ -2079,7 +2079,8 @@ button {
     background-color: #020202; }
 .dashboard.dashboard-is-edit-mode .highlight {
   position: absolute;
-  z-index: 10; }
+  z-index: 10;
+  will-change: transform; }
   .dashboard.dashboard-is-edit-mode .highlight.highlight-n {
     border-bottom: 3px solid #bbbbbb;
     top: calc(.25rem - 1px);
@@ -6158,6 +6159,22 @@ div.dashboard-widget-web .list-table tr[data-hostgroupid] {
   .modal-popup-host-wizard .host-macro-list {
     display: contents; }
 
+.temp-tags-list {
+  visibility: hidden;
+  position: absolute;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  width: 195px;
+  pointer-events: none;
+  z-index: -1; }
+  .temp-tags-list .tag {
+    margin: 0; }
+  .temp-tags-list .btn-icon {
+    min-width: 16px;
+    height: 16px;
+    line-height: 16px; }
+
 .link-action {
   color: #ffffff;
   cursor: pointer; }
@@ -8540,6 +8557,9 @@ svg {
   margin-right: 3px; }
 #graph-tab .graph-items {
   max-width: 750px; }
+
+#graph-preview-tab {
+  overflow: auto; }
 
 .z-select.z-select-host-interface .description:not(:empty),
 z-select.z-select-host-interface .description:not(:empty) {

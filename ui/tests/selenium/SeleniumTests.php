@@ -74,11 +74,13 @@ require_once __DIR__.'/dashboardWidgets/testDashboardGraphWidget.php';
 require_once __DIR__.'/dashboardWidgets/testDashboardGraphWidgetSelectedHosts.php';
 require_once __DIR__.'/dashboardWidgets/testDashboardHoneycombWidget.php';
 require_once __DIR__.'/dashboardWidgets/testDashboardHostAvailabilityWidget.php';
+require_once __DIR__.'/dashboardWidgets/testDashboardHostCardWidget.php';
 require_once __DIR__.'/dashboardWidgets/testDashboardHostNavigatorWidget.php';
 require_once __DIR__.'/dashboardWidgets/testDashboardItemHistoryWidget.php';
 require_once __DIR__.'/dashboardWidgets/testDashboardItemNavigatorWidget.php';
 require_once __DIR__.'/dashboardWidgets/testDashboardItemValueWidget.php';
 require_once __DIR__.'/dashboardWidgets/testDashboardPieChartWidget.php';
+require_once __DIR__.'/dashboardWidgets/testDashboardProblemHostsWidget.php';
 require_once __DIR__.'/dashboardWidgets/testDashboardProblemsBySeverityWidget.php';
 require_once __DIR__.'/dashboardWidgets/testDashboardProblemsWidget.php';
 require_once __DIR__.'/dashboardWidgets/testDashboardProblemsWidgetDisplay.php';
@@ -88,6 +90,7 @@ require_once __DIR__.'/dashboardWidgets/testDashboardTopHostsWidget.php';
 require_once __DIR__.'/dashboardWidgets/testDashboardTopTriggersWidget.php';
 require_once __DIR__.'/dashboardWidgets/testDashboardTriggerOverviewWidget.php';
 require_once __DIR__.'/dashboardWidgets/testDashboardURLWidget.php';
+require_once __DIR__.'/dashboardWidgets/testDashboardWebMonitoringWidget.php';
 require_once __DIR__.'/dashboardWidgets/testDashboardWidgetBroadcastedData.php';
 require_once __DIR__.'/dashboardWidgets/testDashboardWidgetCommunication.php';
 
@@ -165,6 +168,7 @@ require_once __DIR__.'/lld/testFormTestLowLevelDiscovery.php';
 require_once __DIR__.'/lld/testInheritanceDiscoveryRule.php';
 require_once __DIR__.'/lld/testLowLevelDiscoveryDisabledObjects.php';
 require_once __DIR__.'/lld/testPageLowLevelDiscovery.php';
+require_once __DIR__.'/lld/testPageLowLevelDiscoveryPrototypes.php';
 
 // Macros.
 require_once __DIR__.'/macros/testFormMacrosAdministrationGeneral.php';
@@ -418,11 +422,13 @@ class SeleniumTests {
 		$suite->addTestSuite('testDashboardGraphWidgetSelectedHosts');
 		$suite->addTestSuite('testDashboardHoneycombWidget');
 		$suite->addTestSuite('testDashboardHostAvailabilityWidget');
+		$suite->addTestSuite('testDashboardHostCardWidget');
 		$suite->addTestSuite('testDashboardHostNavigatorWidget');
 		$suite->addTestSuite('testDashboardItemHistoryWidget');
 		$suite->addTestSuite('testDashboardItemNavigatorWidget');
 		$suite->addTestSuite('testDashboardItemValueWidget');
 		$suite->addTestSuite('testDashboardPieChartWidget');
+		$suite->addTestSuite('testDashboardProblemHostsWidget');
 		$suite->addTestSuite('testDashboardProblemsBySeverityWidget');
 		$suite->addTestSuite('testDashboardProblemsWidget');
 		$suite->addTestSuite('testDashboardProblemsWidgetDisplay');
@@ -432,6 +438,7 @@ class SeleniumTests {
 		$suite->addTestSuite('testDashboardTopTriggersWidget');
 		$suite->addTestSuite('testDashboardTriggerOverviewWidget');
 		$suite->addTestSuite('testDashboardURLWidget');
+		$suite->addTestSuite('testDashboardWebMonitoringWidget');
 		$suite->addTestSuite('testDashboardWidgetBroadcastedData');
 		$suite->addTestSuite('testDashboardWidgetCommunication');
 
@@ -509,6 +516,7 @@ class SeleniumTests {
 		$suite->addTestSuite('testInheritanceDiscoveryRule');
 		$suite->addTestSuite('testLowLevelDiscoveryDisabledObjects');
 		$suite->addTestSuite('testPageLowLevelDiscovery');
+		$suite->addTestSuite('testPageLowLevelDiscoveryPrototypes');
 
 		// Macros.
 		$suite->addTestSuite('testFormMacrosAdministrationGeneral');

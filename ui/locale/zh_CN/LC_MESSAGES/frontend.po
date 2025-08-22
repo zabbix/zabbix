@@ -7,7 +7,7 @@ msgstr ""
 "Project-Id-Version: Zabbix 6.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2023-10-19 13:48+0300\n"
-"PO-Revision-Date: 2025-06-04 08:46+0000\n"
+"PO-Revision-Date: 2025-06-19 15:32+0000\n"
 "Last-Translator: NoYoWiFi <1284524409@qq.com>\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
 "Language: zh_CN\n"
@@ -68,7 +68,7 @@ msgstr "需要“主机:键值” 对形式"
 
 #: app/views/host.wizard.edit.php:1024
 msgid "#{section_name}"
-msgstr ""
+msgstr "#{section_name}"
 
 #: include/forms.inc.php:1330
 #: include/views/configuration.host.discovery.edit.php:932
@@ -2216,7 +2216,7 @@ msgstr "倒数N"
 
 #: app/views/host.wizard.edit.php:429
 msgid "Brackets to specify IPv6 addresses"
-msgstr ""
+msgstr "括号用于指定 IPv6 地址"
 
 #: jsLoader.php:266
 msgid "Bring forward"
@@ -4948,7 +4948,7 @@ msgstr "隐藏侧边栏"
 
 #: app/views/host.wizard.edit.php:426
 msgid "Colon to separate IP/DNS address from port"
-msgstr ""
+msgstr "冒号将 IP/DNS 地址与端口分隔开"
 
 #: include/views/configuration.graph.edit.php:398
 #: include/views/js/monitoring.sysmaps.js.php:383
@@ -5005,7 +5005,7 @@ msgstr "初始加载小组件时显示的逗号分隔中心坐标和缩放级别
 
 #: app/views/host.wizard.edit.php:427
 msgid "Comma to separate multiple Zabbix servers, proxies, or clusters"
-msgstr ""
+msgstr "用逗号分隔多个 Zabbix servers, proxies 或 clusters"
 
 #: app/views/administration.script.edit.php:199
 #: app/views/reports.actionlog.list.csv.php:45
@@ -5028,7 +5028,7 @@ msgstr "Zabbix agent与server/proxy之间的通信通过唯一的用户定义预
 
 #: app/views/host.wizard.edit.php:414
 msgid "Communication between Zabbix agent and server/proxy is secured with the pre-shared key (PSK) encryption method."
-msgstr ""
+msgstr "Zabbix agent 和 server/proxy 之间的通信通过预共享密钥 (PSK) 加密方法进行保护。"
 
 #: include/items.inc.php:946
 msgctxt "SNMP Community"
@@ -6061,7 +6061,7 @@ msgstr "自定义大小"
 
 #: app/views/host.wizard.edit.php:138
 msgid "Custom templates are not supported."
-msgstr ""
+msgstr "不支持自定义模板。"
 
 #: app/views/administration.miscconfig.edit.php:103
 #: include/classes/setup/CSetupWizard.php:561
@@ -6232,7 +6232,7 @@ msgstr "数据来自 %1$s. 产生于 %2$s 秒."
 
 #: app/views/host.wizard.edit.php:168
 msgid "Data is collected by Zabbix agent, a lightweight software `component installed on your monitoring target."
-msgstr ""
+msgstr "数据由安装在监控目标上的轻量级组件Zabbix agent收集"
 
 #: app/views/js/host.wizard.edit.js.php:89
 msgid "Data is collected by Zabbix agent, a lightweight software component installed on your monitoring target."
@@ -8441,7 +8441,7 @@ msgstr "输入支持JMX的监控目标的IP/DNS地址和端口"
 
 #: app/views/host.wizard.edit.php:412
 msgid "Enter the IP/DNS address and port of your Zabbix server, proxy, or cluster configuration."
-msgstr ""
+msgstr "输入您的  Zabbix server, proxy 或 cluster 配置的 IP/DNS 地址和端口。"
 
 #: app/views/host.wizard.edit.php:642
 msgid "Enter the IP/DNS address, port, and authentication details of your SNMP-enabled monitoring target."
@@ -8645,7 +8645,7 @@ msgstr "示例"
 
 #: app/views/host.wizard.edit.php:417
 msgid "Example:"
-msgstr ""
+msgstr "示例："
 
 #: app/views/administration.miscconfig.edit.php:38
 msgid "Example: https://localhost/zabbix/ui/"
@@ -11933,7 +11933,7 @@ msgstr "按照以下安装说明在监控目标上安装Zabbix agent 2及其插�
 
 #: app/views/host.wizard.edit.php:551 app/views/host.wizard.edit.php:574
 msgid "Install Zabbix agent and its plugins on your monitoring target by following the installation instructions below."
-msgstr ""
+msgstr "按照以下安装说明在监控目标上安装Zabbix agent 及其插件"
 
 #: setup.php:163
 msgid "Installation"
@@ -19456,7 +19456,7 @@ msgstr "安全名称"
 
 #: app/views/host.wizard.edit.php:132
 msgid "See"
-msgstr ""
+msgstr "看"
 
 #: app/views/popup.condition.edit.php:402 app/views/popup.generic.php:874
 #: app/views/popup.massupdate.item.php:440 app/views/popup.services.php:92
@@ -19529,7 +19529,7 @@ msgstr "已选择，%1$s，只读，位于 %3$d 的位置 %2$d"
 
 #: app/views/host.wizard.edit.php:428
 msgid "Semicolon to separate clusters (one or more server addresses)"
-msgstr ""
+msgstr "用分号分隔 clusters（一个或多个 server 地址）"
 
 #: jsLoader.php:267
 msgid "Send backward"
@@ -20362,7 +20362,7 @@ msgstr "部分模板(%1$s)已隐藏。不支持自定义模板"
 #: app/views/host.wizard.edit.php:130
 #, c-format
 msgid "Some templates (%1$s) are incompatible with the Host Wizard."
-msgstr ""
+msgstr "某些模板（%1$s）与主机向导不兼容。"
 
 #: widgets/actionlog/includes/WidgetForm.php:79
 #: widgets/problems/includes/WidgetForm.php:145
@@ -20421,7 +20421,7 @@ msgstr "指定过滤器条件以用于查看值"
 
 #: app/views/host.wizard.edit.php:365
 msgid "Specifying new or existing host groups will add the host to these groups without removing it from any current groups."
-msgstr ""
+msgstr "指定新的或现有的主机组将把主机添加到这些组中，而不会将其从任何当前组中删除。"
 
 #: httpdetails.php:107 include/classes/screens/CScreenHttpTestDetails.php:82
 msgid "Speed"
@@ -21672,7 +21672,7 @@ msgstr[0] "此检查无法删除，因为它在%1$s发现操作中被用作一�
 
 #: app/views/host.wizard.edit.php:384
 msgid "This configuration will overwrite all existing encryption settings on the host."
-msgstr ""
+msgstr "此配置将覆盖主机上所有现有的加密设置。"
 
 #: include/func.inc.php:2566
 msgid "This day last week"
@@ -23333,7 +23333,7 @@ msgstr "使用过滤器显示结果"
 
 #: app/views/host.wizard.edit.php:424
 msgid "Use:"
-msgstr ""
+msgstr "用途:.使用："
 
 #: app/views/administration.script.list.php:93 app/views/mediatype.list.php:98
 msgid "Used in actions"
@@ -24406,7 +24406,7 @@ msgstr "验证码"
 
 #: app/views/host.wizard.edit.php:407
 msgid "Verify Zabbix server, proxy, or cluster address"
-msgstr ""
+msgstr "用途:.验证 server, proxy 或 cluster 地址 agent 必须能够连接到指定的地址或地址列表。验证server, proxy 或 cluster 地址"
 
 #: include/classes/setup/CSetupWizard.php:655
 msgid "Verify database certificate"
@@ -25129,7 +25129,7 @@ msgstr "Zabbix agent主动连接Zabbix server/proxy发送数据，推荐用于�
 
 #: app/views/host.wizard.edit.php:422
 msgid "Zabbix agent must be able to connect to the specified address or list of addresses."
-msgstr ""
+msgstr "Zabbix agent 必须能够连接到指定的地址或地址列表。"
 
 #: app/views/host.wizard.edit.php:863
 msgid "Zabbix documentation"
@@ -26346,7 +26346,7 @@ msgstr "需要主机触发器ID"
 
 #: app/views/host.wizard.edit.php:134
 msgid "how to update them"
-msgstr ""
+msgstr "如何更新它们"
 
 #: include/classes/api/services/CMap.php:844
 #: include/classes/api/services/CMap.php:1311
@@ -26714,7 +26714,7 @@ msgstr "m-d H:i"
 
 #: app/views/host.wizard.edit.php:589
 msgid "macOS"
-msgstr ""
+msgstr "macOS"
 
 #: include/classes/parsers/CUserMacroParser.php:37
 msgid "macro is empty"

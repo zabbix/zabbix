@@ -4,6 +4,7 @@ in:
   rules: [ZBX_EVAL_PARSE_FUNCTIONID,ZBX_EVAL_PARSE_MATH]
   expression: '{3}+{100}+{200}'
 out:
+  result: SUCCEED
   ids:
   - 3
   - 100
@@ -14,7 +15,21 @@ in:
   rules: [ZBX_EVAL_PARSE_FUNCTIONID,ZBX_EVAL_PARSE_MATH]
   expression: '{9874562345678901234}+{9874562345678901235}+{9874564345678901234}'
 out:
+  result: SUCCEED
   ids:
   - 9874562345678901234
   - 9874562345678901235
   - 9874564345678901234
+---
+test case: With str variant
+in:
+  rules: [ZBX_EVAL_PARSE_FUNCTIONID,ZBX_EVAL_PARSE_MATH,ZBX_EVAL_PARSE_ITEM_QUERY,ZBX_EVAL_PARSE_FUNCTION,ZBX_EVAL_PARSE_GROUP,ZBX_EVAL_PARSE_VAR]
+  expression: '{1} + {2} + last(/host/key,#1:now-1h) + {3}'
+  variant: ZBX_VARIANT_STR
+out:
+  result: FAIL
+  ids:
+  - 1
+  - 2
+  - 3
+...

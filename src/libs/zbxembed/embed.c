@@ -759,6 +759,11 @@ out:
 	return ret;
 }
 
+size_t	zbx_es_total_alloc(const zbx_es_t *es)
+{
+	return es->env->total_alloc;
+}
+
 /******************************************************************************
  *                                                                            *
  * Purpose: sets script execution timeout                                     *

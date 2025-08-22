@@ -659,7 +659,7 @@ class testEventsCauseAndSymptoms extends CIntegrationTest {
 
 		$response = $this->callUntilDataIsPresent('script.execute', [
 			'scriptid' => self::$test_simplemacro,
-			'eventid' =>  1
+			'eventid' => $this->eventNumToId(1)
 		], 10, 1);
 
 		$this->assertArrayHasKey('result', $response);

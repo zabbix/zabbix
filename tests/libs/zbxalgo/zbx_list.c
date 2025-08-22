@@ -39,13 +39,16 @@ static void	mock_read_values(zbx_mock_handle_t hdata, zbx_vector_ptr_t *values)
 	}
 }
 
-static void	test_list_range_values(int iterations, zbx_vector_ptr_t *values)
+static void	test_list_range_values(int iterations, int pool_size, zbx_vector_ptr_t *values)
 {
 	zbx_list_t	list;
 	void		*ptr;
 	int		i, j;
 
 	zbx_list_create(&list);
+
+	if (0 != pool_size)
+		zbx_list_init_pool(&list, pool_size);
 
 	for (i = 0; i < iterations; i++)
 	{
@@ -67,7 +70,6 @@ static void	test_list_range_values(int iterations, zbx_vector_ptr_t *values)
 		{
 			fail_msg("succeeded to pop empty list");
 		}
-		zbx_mock_assert_ptr_eq("value", NULL, ptr);
 	}
 
 	zbx_list_destroy(&list);
@@ -75,13 +77,13 @@ static void	test_list_range_values(int iterations, zbx_vector_ptr_t *values)
 
 #define	ZBX_LIST_TEST_ITERATIONS	117
 
-static void	test_list_range(void)
+static void test_list_range(int pool_size)
 {
 	zbx_vector_ptr_t	values;
 
 	zbx_vector_ptr_create(&values);
 	mock_read_values(zbx_mock_get_parameter_handle("in.values"), &values);
-	test_list_range_values(ZBX_LIST_TEST_ITERATIONS, &values);
+	test_list_range_values(ZBX_LIST_TEST_ITERATIONS, pool_size, &values);
 	zbx_vector_ptr_destroy(&values);
 }
 
@@ -317,12 +319,16 @@ static int	get_step_type_int(const char *str)
 
 void	zbx_mock_test_entry(void **state)
 {
+	int	pool_size;
+
 	ZBX_UNUSED(state);
+
+	pool_size = zbx_mock_get_parameter_int("in.pool");
 
 	switch (get_step_type_int(zbx_mock_get_parameter_string("in.type")))
 	{
 		case TEST_RANGE:
-			test_list_range();
+			test_list_range(pool_size);
 			break;
 		case TEST_ITERATOR_EQUAL:
 			test_list_iterator_equal();

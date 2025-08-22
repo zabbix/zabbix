@@ -99,16 +99,31 @@ static int	zbx_odbc_diag(SQLSMALLINT h_type, SQLHANDLE h, SQLRETURN rc, char **d
 
 	if (SQL_ERROR == rc || SQL_SUCCESS_WITH_INFO == rc)
 	{
-		SQLCHAR		sql_state[SQL_SQLSTATE_SIZE + 1], err_msg[128];
+		SQLCHAR		sql_state[SQL_SQLSTATE_SIZE + 1];
 		SQLINTEGER	err_code = 0;
-		SQLSMALLINT	rec_nr = 1;
+		SQLSMALLINT	rec_nr = 1, msg_len;
 
-		while (0 != SQL_SUCCEEDED(SQLGetDiagRec(h_type, h, rec_nr++, sql_state, &err_code, err_msg,
-				sizeof(err_msg), NULL)))
+		while (0 != SQL_SUCCEEDED(SQLGetDiagRec(h_type, h, rec_nr, sql_state, &err_code, NULL, 0, &msg_len)))
 		{
+			char	*err_msg;
+
+			if (1 < rec_nr)
+				zbx_chrcpy_alloc(&buffer, &alloc, &offset, '\n');
+
+			err_msg = zbx_malloc(NULL, msg_len + 1);
+
 			zbx_chrcpy_alloc(&buffer, &alloc, &offset, (NULL == buffer ? ':' : '|'));
-			zbx_snprintf_alloc(&buffer, &alloc, &offset, "[%s][%ld][%s]", sql_state, (long)err_code,
-					err_msg);
+			zbx_snprintf_alloc(&buffer, &alloc, &offset, "[%s][%ld]", sql_state, (long)err_code);
+
+			if (0 != SQL_SUCCEEDED(SQLGetDiagRec(h_type, h, rec_nr, sql_state, &err_code,
+					(SQLCHAR *)err_msg, msg_len + 1, NULL)))
+			{
+				zbx_replace_invalid_utf8((char *)err_msg);
+				zbx_snprintf_alloc(&buffer, &alloc, &offset, "[%s]", err_msg);
+			}
+
+			zbx_free(err_msg);
+			rec_nr++;
 		}
 	}
 

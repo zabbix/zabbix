@@ -132,6 +132,31 @@ class CFormValidator {
 							throw new Exception('[RULES ERROR] Unknown field type in db schema (Path: '.$rule_path.')');
 					}
 				}
+				elseif (strncmp($value, 'setting ', 8) === 0) {
+					if (array_key_exists('type', $result)) {
+						throw new Exception('[RULES ERROR] Rule "type" is specified multiple times (Path: '.$rule_path.')');
+					}
+
+					$db_field = substr($value, 8);
+
+					if (CSettingsSchema::getDbType($db_field) & DB::FIELD_TYPE_CHAR) {
+						if (array_key_exists('length', $result)) {
+							throw new Exception('[RULES ERROR] Rule "length" is specified multiple times (Path: '.$rule_path.')');
+						}
+
+						$result['type'] = 'string';
+						$result['length'] = CSettingsSchema::getFieldLength($db_field);
+					}
+					elseif (CSettingsSchema::getDbType($db_field) & (DB::FIELD_TYPE_ID)) {
+						$result['type'] = 'id';
+					}
+					elseif (CSettingsSchema::getDbType($db_field) & (DB::FIELD_TYPE_INT)) {
+						$result['type'] = 'integer';
+					}
+					else {
+						throw new Exception('[RULES ERROR] Unknown field type in db schema (Path: '.$rule_path.')');
+					}
+				}
 				elseif (strncmp($value, 'in ', 3) === 0) {
 					if (array_key_exists('in', $result) || array_key_exists('not_in', $result)) {
 						throw new Exception('[RULES ERROR] Rule "in" or "not_in" is specified multiple times (Path: '.$rule_path.')');

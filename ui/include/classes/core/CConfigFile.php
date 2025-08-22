@@ -314,7 +314,7 @@ $DB[\'VAULT_KEY_FILE\']		= \''.addcslashes($this->config['DB']['VAULT_KEY_FILE']
 
 $ZBX_SERVER_NAME		= \''.addcslashes($this->config['ZBX_SERVER_NAME'], "'\\").'\';
 
-$IMAGE_FORMAT_DEFAULT	= IMAGE_FORMAT_PNG;
+$IMAGE_FORMAT_DEFAULT		= IMAGE_FORMAT_PNG;
 
 // Uncomment this block only if you are using Elasticsearch.
 // Elasticsearch url (can be string if same url is used for all types).
@@ -326,11 +326,17 @@ $IMAGE_FORMAT_DEFAULT	= IMAGE_FORMAT_PNG;
 //$HISTORY[\'types\'] = [\'uint\', \'text\'];
 
 // Used for SAML authentication.
-// Uncomment to override the default paths to SP private key, SP and IdP X.509 certificates, and to set extra settings.
-//$SSO[\'SP_KEY\']			= \'conf/certs/sp.key\';
-//$SSO[\'SP_CERT\']			= \'conf/certs/sp.crt\';
-//$SSO[\'IDP_CERT\']		= \'conf/certs/idp.crt\';
+
+// Uncomment to set extra settings.
 //$SSO[\'SETTINGS\']		= [];
+
+// Set to \'file\' to store the private key and certificates on the file system.
+$SSO[\'CERT_STORAGE\']		= \'database\';
+
+// Uncomment to override the default paths for the private key and certificates, if stored on the file system.
+//$SSO[\'SP_KEY\']		= \'conf/certs/sp.key\';
+//$SSO[\'SP_CERT\']		= \'conf/certs/sp.crt\';
+//$SSO[\'IDP_CERT\']		= \'conf/certs/idp.crt\';
 
 // If set to false, support for HTTP authentication will be disabled.
 // $ALLOW_HTTP_AUTH = true;

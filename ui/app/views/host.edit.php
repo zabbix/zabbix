@@ -293,7 +293,7 @@ $host_tab
 				'object_name' => 'proxies',
 				'multiple' => false,
 				'data' => $data['ms_proxy'],
-				'disabled' => $host_is_discovered,
+				'readonly' => $host_is_discovered,
 				'popup' => [
 					'parameters' => [
 						'srctbl' => 'proxies',
@@ -313,7 +313,7 @@ $host_tab
 				'object_name' => 'proxy_groups',
 				'multiple' => false,
 				'data' => $data['ms_proxy_group'],
-				'disabled' => $host_is_discovered,
+				'readonly' => $host_is_discovered,
 				'popup' => [
 					'parameters' => [
 						'srctbl' => 'proxy_groups',

@@ -18,4 +18,15 @@ test case: '{$MACRO:"context:\"context\""}'
 in:
   rules: [ZBX_EVAL_PARSE_USERMACRO]
   expression: '{$MACRO:"context:\"context\""}'
+---
+test case: '{$MACRO:"context:\"context\""}'
+in:
+  rules: [ZBX_EVAL_PARSE_USERMACRO]
+  expression: '{$MACRO:"context:\"context\""}'
+---
+test case: 'skip ids parse'
+in:
+  skip_ids: "yes"
+  rules: [ZBX_EVAL_PARSE_FUNCTIONID,ZBX_EVAL_PARSE_MATH]
+  expression: '{3}+{100}+{200}+{1}'
 ...

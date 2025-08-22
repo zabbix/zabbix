@@ -11,7 +11,7 @@ This guide describes how to integrate your Zabbix installation with Telegram mes
 
 ## Requirements
 
-Zabbix version: 7.4 and higher.
+Zabbix version: 8.0 and higher.
 
 ## Parameters
 

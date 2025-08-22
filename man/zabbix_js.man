@@ -73,7 +73,7 @@ Specify the webdriver URL.
 .IP "\fB\-l\fR, \fB\-\-loglevel\fR \fIlog\-level\fR"
 Specify the log level.
 .IP "\fB\-t\fR, \fB\-\-timeout\fR \fItimeout\fR"
-Specify the timeout in seconds. Valid range: 1\-60 seconds (default: 10)
+Specify the timeout in seconds. Valid range: 1\-600 seconds (default: 10)
 .IP "\fB\-h\fR, \fB\-\-help\fR"
 Display this help and exit.
 .IP "\fB\-V\fR, \fB\-\-version\fR"

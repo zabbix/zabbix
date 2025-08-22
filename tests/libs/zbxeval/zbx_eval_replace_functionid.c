@@ -38,6 +38,15 @@ void	zbx_mock_test_entry(void **state)
 	else
 		mock_dump_stack(&ctx);
 
+	if (SUCCEED == zbx_mock_parameter_exists("in.variant"))
+	{
+		for (int i = 0; i < ctx.stack.values_num; i++)
+		{
+			zbx_variant_set_str(&ctx.stack.values[i].value, zbx_strdup(NULL,
+					zbx_mock_get_parameter_string("in.variant")));
+		}
+	}
+
 	zbx_eval_replace_functionid(&ctx,zbx_mock_get_parameter_uint64("in.oldid"),
 			zbx_mock_get_parameter_uint64("in.newid"));
 	result = zbx_eval_validate_replaced_functionids(&ctx,&error);

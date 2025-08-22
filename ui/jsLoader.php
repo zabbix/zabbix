@@ -509,6 +509,7 @@ $translate_strings = [
 		'Graphs' => _('Graphs'),
 		'History' => _('History'),
 		'Host' => _('Host'),
+		'Host Wizard' => _('Host Wizard'),
 		'Inventory' => _('Inventory'),
 		'Latest data' => _('Latest data'),
 		'Latest values' => _('Latest values'),

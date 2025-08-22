@@ -285,3 +285,27 @@ fail:
 
 	return res;
 }
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: combines host and port into a network address "host:port"         *
+ *                                                                            *
+ * Parameters: hostport       - [IN/OUT] string formatting buffer pointer     *
+ *             hostport_sz    - [IN] size of buffer                           *
+ *             host           - [IN]                                          *
+ *             port           - [IN]                                          *
+ *                                                                            *
+ * Return value: pointer to hostport buffer                                   *
+ *                                                                            *
+ ******************************************************************************/
+char	*zbx_join_hostport(char *hostport, size_t hostport_sz, const char *host, unsigned short port)
+{
+	const char	*format = "%s:%hu";
+
+	if (NULL != strchr(host, ':'))
+		format = "[%s]:%hu";
+
+	zbx_snprintf(hostport, hostport_sz, format, host, port);
+
+	return hostport;
+}

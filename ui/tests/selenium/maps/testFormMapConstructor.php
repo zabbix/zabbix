@@ -379,12 +379,11 @@ class testFormMapConstructor extends CLegacyWebTest {
 			[
 				'label' => '*UNKNOWN*, *UNKNOWN*, *UNKNOWN*, *UNKNOWN*, *UNKNOWN*, *UNKNOWN*, *UNKNOWN*',
 				'id' => 14
+			],
+			[
+				'label' => ', , ,',
+				'id' => 16
 			]
-			// TODO: Uncomment and check the test case, after ZBX-25420 fix.
-//			[
-//				'label' => ', , ,',
-//				'id' => 16
-//			]
 		];
 
 		foreach ($objects as $object) {

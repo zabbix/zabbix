@@ -1,5 +1,5 @@
 zabbix_export:
-  version: '7.4'
+  version: '8.0'
   template_groups:
     - uuid: a571c0d144b14fd4a87a9d9b2aa9fcd6
       name: Templates/Applications
@@ -24,7 +24,7 @@ zabbix_export:
         Specify the address of the remote Zabbix server as the values for the `Zabbix server Address` and `Zabbix server Port` configuration fields. Don't forget to adjust the `StatsAllowedIP` parameter in the remote server's configuration file to allow the collection of statistics.
       vendor:
         name: Zabbix
-        version: 7.4-5
+        version: 8.0-0
       groups:
         - name: Templates/Applications
       items:
@@ -3840,7 +3840,7 @@ zabbix_export:
         Link this template to the local Zabbix server host.
       vendor:
         name: Zabbix
-        version: 7.4-5
+        version: 8.0-0
       groups:
         - name: Templates/Applications
       items:
@@ -7437,7 +7437,7 @@ zabbix_export:
         Specify the address of the remote Zabbix server as the values for the `Zabbix server Address` and `Zabbix server Port` configuration fields. Don't forget to adjust the `StatsAllowedIP` parameter in the remote server's configuration file to allow the collection of statistics.
       vendor:
         name: Zabbix
-        version: 7.4-5
+        version: 8.0-0
       groups:
         - name: Templates/Applications
       items:
@@ -11250,7 +11250,7 @@ zabbix_export:
         Specify the address of the remote Zabbix server as the values for the `Zabbix server Address` and `Zabbix server Port` configuration fields. Don't forget to adjust the `StatsAllowedIP` parameter in the remote server's configuration file to allow the collection of statistics.
       vendor:
         name: Zabbix
-        version: 7.4-5
+        version: 8.0-0
       groups:
         - name: Templates/Applications
       items:

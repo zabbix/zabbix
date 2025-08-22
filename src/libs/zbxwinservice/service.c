@@ -48,7 +48,7 @@ void	ZBX_DO_EXIT(void)
 #undef ZBX_APP_RUNNING
 
 /* free resources allocated by MAIN_ZABBIX_ENTRY() */
-void	zbx_free_service_resources(int ret);
+void	zbx_free_service_resources(void);
 
 static void	parent_signal_handler(int sig)
 {
@@ -96,7 +96,7 @@ static VOID WINAPI	ServiceCtrlHandler(DWORD ctrlCode)
 
 			/* notify other threads and allow them to terminate */
 			ZBX_DO_EXIT();
-			zbx_free_service_resources(SUCCEED);
+			zbx_free_service_resources();
 
 			serviceStatus.dwCurrentState	= SERVICE_STOPPED;
 			serviceStatus.dwWaitHint	= 0;

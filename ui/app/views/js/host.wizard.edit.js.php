@@ -197,6 +197,9 @@ window.host_wizard_edit = new class {
 			}
 		},
 		[this.STEP_INSTALL_AGENT]: {
+			agent_script_server_host: {
+				regex: /^[^`']*$/
+			},
 			tls_psk: {
 				required: () => this.#data.tls_required,
 				minlength: 32,
@@ -205,7 +208,8 @@ window.host_wizard_edit = new class {
 			},
 			tls_psk_identity: {
 				required: () => this.#data.tls_required,
-				maxlength: <?= DB::getFieldLength('hosts', 'tls_psk_identity') ?>
+				maxlength: <?= DB::getFieldLength('hosts', 'tls_psk_identity') ?>,
+				regex: /^[^`']*$/
 			}
 		},
 		[this.STEP_ADD_HOST_INTERFACE]: {},
@@ -1255,20 +1259,24 @@ window.host_wizard_edit = new class {
 					}
 				})();
 
-				let hostname = '';
 				let server_host = '';
+				let hostname = this.#data.host_new !== null ? this.#data.host_new.id : this.#data.host.name;
 				let psk_identity = '';
 				let psk = '';
 
+				const step_errors = this.#validation_errors[this.#getCurrentStep()];
+				const agent_script_has_error = step_errors['agent_script_server_host'] !== null;
+				const tls_psk_identity_has_error = step_errors['tls_psk_identity'] !== null;
+
 				if (this.#data.monitoring_os === 'linux') {
-					server_host = this.#data.agent_script_server_host !== ''
+					server_host = this.#data.agent_script_server_host !== '' && !agent_script_has_error
 						? `--server-host '${this.#data.agent_script_server_host}'`
 						: `--server-host-stdin`;
 
-					hostname = `--hostname '${this.#data.host_new.id}'`;
+					hostname = `--hostname '${hostname}'`;
 
-					psk_identity = this.#data.tls_psk_identity !== ''
-						? `--psk-identity '${this.#data.tls_psk_identity.replace(/'/g, `\\'`)}'`
+					psk_identity = this.#data.tls_psk_identity !== '' && !tls_psk_identity_has_error
+						? `--psk-identity '${this.#data.tls_psk_identity}'`
 						: `--psk-identity-stdin`;
 
 					psk = this.#data.tls_psk !== ''
@@ -1277,14 +1285,14 @@ window.host_wizard_edit = new class {
 				}
 
 				if (this.#data.monitoring_os === 'windows') {
-					server_host = this.#data.agent_script_server_host !== ''
-						? `-serverHost '${this.#data.agent_script_server_host}'`
+					server_host = this.#data.agent_script_server_host !== '' && !tls_psk_identity_has_error
+						? `-serverHost '${this.#data.agent_script_server_host.replace(/ /g, `\` `)}'`
 						: `-serverHostSTDIN`;
 
-					hostname = `-hostName '${this.#data.host_new.id}'`;
+					hostname = `-hostName '${hostname.replace(/ /g, `\` `)}'`;
 
-					psk_identity = this.#data.tls_psk_identity !== ''
-						? `-pskIdentity '${this.#data.tls_psk_identity.replace(/'/g, `\\'`)}'`
+					psk_identity = this.#data.tls_psk_identity !== '' && !tls_psk_identity_has_error
+						? `-pskIdentity '${this.#data.tls_psk_identity.replace(/ /g, `\` `)}'`
 						: `-pskIdentitySTDIN`;
 
 					psk = this.#data.tls_psk !== ''
@@ -1439,7 +1447,7 @@ window.host_wizard_edit = new class {
 
 			input
 				.closest(`.${ZBX_STYLE_FORM_FIELD}`)
-				?.querySelector('label').classList.toggle(ZBX_STYLE_FIELD_LABEL_ASTERISK, !!set_asterisk);
+				?.querySelector('label')?.classList.toggle(ZBX_STYLE_FIELD_LABEL_ASTERISK, !!set_asterisk);
 		}
 	}
 
@@ -1747,17 +1755,13 @@ window.host_wizard_edit = new class {
 			const tag_value = [tag, value].filter(val => val !== '').join(': ');
 
 			return this.#view_templates.tag.evaluateToElement({tag_value, hint_tag_value: escapeHtml(tag_value)});
-		};
+		}
 
 		if (template.tags.length) {
-			const temp_tag_list = tags_list.cloneNode(false);
+			const tags_max_height = 44;
+			const temp_tag_list = document.createElement('div');
 
-			temp_tag_list.style.visibility = 'hidden';
-			temp_tag_list.style.position = 'absolute';
-			temp_tag_list.style.width = '195px';
-			temp_tag_list.style.maxHeight = '40px';
-			temp_tag_list.style.pointerEvents = 'none';
-			temp_tag_list.style.zIndex = '-1';
+			temp_tag_list.classList.add('temp-tags-list');
 
 			document.body.appendChild(temp_tag_list);
 
@@ -1768,7 +1772,7 @@ window.host_wizard_edit = new class {
 
 				temp_tag_list.appendChild(tag_element);
 
-				if (temp_tag_list.scrollHeight > temp_tag_list.clientHeight) {
+				if (temp_tag_list.scrollHeight > tags_max_height) {
 					temp_tag_list.removeChild(tag_element);
 					all_fits = false;
 					break;
@@ -1780,7 +1784,7 @@ window.host_wizard_edit = new class {
 					tag_values: template.tags.map(tag_value => tag(tag_value).outerHTML).join('')
 				}));
 
-				if (temp_tag_list.scrollHeight > temp_tag_list.clientHeight) {
+				if (temp_tag_list.scrollHeight > tags_max_height) {
 					const tags = temp_tag_list.querySelectorAll(`.${ZBX_STYLE_TAG}`);
 
 					temp_tag_list.removeChild(tags[tags.length - 1]);

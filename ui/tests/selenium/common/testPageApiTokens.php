@@ -205,7 +205,7 @@ class testPageApiTokens extends CWebTest {
 		}
 
 		$form->fill($data['filter']);
-		$form->submit();
+		$form->submit()->waitUntilStalled();
 		$this->page->waitUntilReady();
 
 		if (CTestArrayHelper::get($data, 'no_data')) {

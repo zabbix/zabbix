@@ -70,7 +70,7 @@ class CControllerPopupItemTestSend extends CControllerPopupItemTest {
 			'ipmi_sensor'			=> 'string',
 			'item_type'				=> 'in '.implode(',', [ITEM_TYPE_ZABBIX, ITEM_TYPE_TRAPPER, ITEM_TYPE_SIMPLE, ITEM_TYPE_INTERNAL, ITEM_TYPE_ZABBIX_ACTIVE, ITEM_TYPE_HTTPTEST, ITEM_TYPE_EXTERNAL, ITEM_TYPE_DB_MONITOR, ITEM_TYPE_IPMI, ITEM_TYPE_SSH, ITEM_TYPE_TELNET, ITEM_TYPE_CALCULATED, ITEM_TYPE_JMX, ITEM_TYPE_SNMPTRAP, ITEM_TYPE_DEPENDENT, ITEM_TYPE_HTTPAGENT, ITEM_TYPE_SNMP, ITEM_TYPE_SCRIPT, ITEM_TYPE_BROWSER]),
 			'jmx_endpoint'			=> 'string',
-			'macros'				=> 'array',
+			'macros'				=> 'string',
 			'output_format'			=> 'in '.implode(',', [HTTPCHECK_STORE_RAW, HTTPCHECK_STORE_JSON]),
 			'params_ap'				=> 'string',
 			'params_es'				=> 'string',
@@ -308,28 +308,28 @@ class CControllerPopupItemTestSend extends CControllerPopupItemTest {
 			]
 		];
 
-		if ($this->use_prev_value) {
-			$prev_value = $this->get_value_from_host ? $this->getInput('value', '') : $this->getInput('prev_value', '');
-			$prev_time = $this->getInput('prev_time', '');
-
-			if ($prev_value !== '' || $prev_time !== '') {
-				$data['options']['history'] = [
-					'value' => $prev_value,
-					'timestamp' => $prev_time
-				];
-			}
-		}
-
 		if ($this->get_value_from_host) {
+			$history = [
+				'value' => $this->getInput('value', ''),
+				'timestamp' => $this->getInput('prev_time', '') === '' ? '' : $this->getPrevTime()
+			];
 			$data += $this->prepareTestData();
 		}
 		else {
+			$history = [
+				'value' => $this->getInput('prev_value', ''),
+				'timestamp' => $this->getInput('prev_time', '')
+			];
 			$data['item']['value'] = $this->getInput('value', '');
 			$data['options']['state'] = (int) $this->getInput('not_supported', self::SUPPORTED_STATE);
 
 			if ($data['options']['state'] == self::NOT_SUPPORTED_STATE) {
 				$data['options']['runtime_error'] = $this->getInput('runtime_error', '');
 			}
+		}
+
+		if ($this->use_prev_value && $history['timestamp'] !== '') {
+			$data['options']['history'] = $history;
 		}
 
 		$data['item']['value_type'] = $this->getInput('value_type', ITEM_VALUE_TYPE_STR);

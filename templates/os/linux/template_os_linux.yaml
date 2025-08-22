@@ -1,5 +1,5 @@
 zabbix_export:
-  version: '7.4'
+  version: '8.0'
   template_groups:
     - uuid: 846977d1dfed4968bc5f8bdb363285bc
       name: 'Templates/Operating systems'
@@ -8,7 +8,7 @@ zabbix_export:
       template: 'Linux by Zabbix agent'
       name: 'Linux by Zabbix agent'
       description: |
-        This is an official Linux template. It requires Zabbix agent 7.4 or newer.
+        This is an official Linux template. It requires Zabbix agent 8.0 or newer.
         
         Notes on filesystem (FS) discovery:
         - The ext4/3/2 filesystem reserves space for privileged usage, typically set at 5% by default.
@@ -24,7 +24,7 @@ zabbix_export:
       readme: |
         ## Overview
         
-        This is an official Linux template. It requires Zabbix agent 7.4 or newer.
+        This is an official Linux template. It requires Zabbix agent 8.0 or newer.
         
         #### Notes on filesystem (FS) discovery:
         - The ext4/3/2 FS reserves space for privileged usage, typically set at 5% by default.
@@ -34,7 +34,7 @@ zabbix_export:
         - The FS utilization chart, derived from graph prototypes, reflects FS reserved space as the difference between used and available space from the total volume.
       vendor:
         name: Zabbix
-        version: 7.4-2
+        version: 8.0-0
       groups:
         - name: 'Templates/Operating systems'
       items:

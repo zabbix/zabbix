@@ -27,7 +27,9 @@
 		tile_providers: {},
 		defaults: {},
 
-		init({tile_providers}) {
+		init({rules, tile_providers}) {
+			this.form_element = document.getElementById('geomaps-form');
+			this.form = new CForm(this.form_element, rules);
 			this.tile_url = document.getElementById('geomaps_tile_url');
 			this.attribution = document.getElementById('geomaps_attribution');
 			this.max_zoom = document.getElementById('geomaps_max_zoom');
@@ -41,7 +43,21 @@
 			document.querySelector('[name="geomaps_tile_provider"]')
 				.addEventListener('change', this.events.tileProviderChange);
 
-			document.getElementById('geomaps-form').addEventListener('submit', this.events.submit);
+			document.getElementById('geomaps-form').addEventListener('submit', (e) => {
+				e.preventDefault();
+
+				const fields = this.form.getAllValues(),
+					curl = new Curl(this.form_element.getAttribute('action'));
+
+				this.form.validateSubmit(fields)
+					.then((result) => {
+						if (!result) {
+							return;
+						}
+
+						this.post(curl.getUrl(), fields);
+					});
+			});
 		},
 
 		events: {
@@ -72,12 +88,53 @@
 				view.tile_url.value = data.geomaps_tile_url;
 				view.max_zoom.value = data.geomaps_max_zoom;
 				view.attribution.value = '';
-			},
 
-			submit() {
-				view.tile_url.value = view.tile_url.value.trim();
-				view.attribution.value = view.attribution.value.trim();
+				view.form.validateChanges(['geomaps_tile_url', 'geomaps_max_zoom', 'geomaps_attribution']);
 			}
+		},
+
+		post(url, data) {
+			fetch(url, {
+				method: 'POST',
+				headers: {'Content-Type': 'application/json'},
+				body: JSON.stringify(data)
+			})
+				.then((response) => response.json())
+				.then((response) => {
+					if ('form_errors' in response) {
+						this.form.setErrors(response.form_errors, true, true);
+						this.form.renderErrors();
+					}
+					else if ('error' in response) {
+						throw {error: response.error};
+					}
+					else {
+						postMessageOk(response.success.title);
+						location.href = location.href;
+					}
+				})
+				.catch((exception) => {
+					for (const element of this.form_element.parentNode.children) {
+						if (element.matches('.msg-good, .msg-bad, .msg-warning')) {
+							element.parentNode.removeChild(element);
+						}
+					}
+
+					let title;
+					let messages;
+
+					if (typeof exception === 'object' && 'error' in exception) {
+						title = exception.error.title;
+						messages = exception.error.messages;
+					}
+					else {
+						messages = [<?= json_encode(_('Unexpected server error.')) ?>];
+					}
+
+					const message_box = makeMessageBox('bad', messages, title)[0];
+
+					this.form_element.parentNode.insertBefore(message_box, this.form_element);
+				});
 		}
 	};
 </script>

@@ -28,7 +28,7 @@ static int	compare_vectors_str(zbx_vector_str_t *v1, zbx_vector_str_t *v2)
 
 	for (int i = 0; i < v1->values_num; i++)
 	{
-		if (FAIL == strcmp(v1->values[i],v2->values[i]))
+		if (0 != strcmp(v1->values[i],v2->values[i]))
 			return FAIL;
 	}
 
@@ -41,19 +41,30 @@ void	zbx_mock_test_entry(void **state)
 	zbx_eval_context_t	ctx;
 	char			*error = NULL;
 	zbx_uint64_t		rules;
-	zbx_vector_str_t	refs, exp_refs;
+	zbx_vector_str_t	refs, exp_refs, parameters;
 
 	ZBX_UNUSED(state);
+
+	zbx_vector_str_create(&refs);
+	zbx_vector_str_create(&parameters);
 
 	rules = mock_eval_read_rules("in.rules");
 	returned_ret = zbx_eval_parse_expression(&ctx, zbx_mock_get_parameter_string("in.expression"), rules, &error);
 
 	if (SUCCEED != returned_ret)
-		printf("ERROR: %s\n", error);
+		fail_msg("ERROR: %s\n", error);
 	else
 		mock_dump_stack(&ctx);
 
-	zbx_vector_str_create(&refs);
+	if (ZBX_MOCK_SUCCESS == zbx_mock_parameter_exists("in.variant_text"))
+	{
+		for (int i = 0; i < ctx.stack.values_num; i++)
+		{
+			zbx_variant_set_str(&ctx.stack.values[i].value, zbx_strdup(NULL,
+					zbx_mock_get_parameter_string("in.variant_text")));
+		}
+	}
+
 	zbx_eval_extract_item_refs(&ctx, &refs);
 	zbx_vector_str_create(&exp_refs);
 	zbx_mock_extract_yaml_values_str("out.refs", &exp_refs);

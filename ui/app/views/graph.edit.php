@@ -97,7 +97,7 @@ $graph_form
 					'form_name' => $graph_form->getName()
 				]))
 			)
-			->addTab('preview-tab', _('Preview'), $preview_table)
+			->addTab('graph-preview-tab', _('Preview'), $preview_table)
 			->setSelected(0)
 	)
 	->addItem(

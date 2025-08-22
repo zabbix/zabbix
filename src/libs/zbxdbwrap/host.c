@@ -6323,6 +6323,7 @@ void	zbx_db_delete_hosts(const zbx_vector_uint64_t *hostids, const zbx_vector_st
 /******************************************************************************
  *                                                                            *
  * Purpose: adds new interface to specified host                              *
+ *          or update main interface of this type for specified host          *
  *                                                                            *
  * Parameters:                                                                *
  *             hostid             - [IN] host id from database                *
@@ -6342,9 +6343,9 @@ zbx_uint64_t	zbx_db_add_interface(zbx_uint64_t hostid, unsigned char type, unsig
 {
 	zbx_db_result_t		result;
 	zbx_db_row_t		row;
-	char			*ip_esc, *dns_esc, *tmp = NULL;
+	char			*ip_esc, *dns_esc;
 	zbx_uint64_t		interfaceid = 0;
-	unsigned char		main_ = 1, db_main, db_useip;
+	unsigned char		main_ = 1, db_useip;
 	unsigned short		db_port;
 	const char		*db_ip, *db_dns;
 	zbx_dc_um_handle_t	*um_handle;
@@ -6354,97 +6355,72 @@ zbx_uint64_t	zbx_db_add_interface(zbx_uint64_t hostid, unsigned char type, unsig
 	um_handle = zbx_dc_open_user_macros();
 
 	result = zbx_db_select(
-			"select interfaceid,useip,ip,dns,port,main"
+			"select interfaceid,useip,ip,dns,port"
 			" from interface"
 			" where hostid=" ZBX_FS_UI64
-				" and type=%d",
+				" and type=%d"
+				" and main<>0",
 			hostid, (int)type);
 
-	while (NULL != (row = zbx_db_fetch(result)))
+	if (NULL != (row = zbx_db_fetch(result)))
 	{
+		char	*update = NULL, delim = ' ', *tmp = NULL;
+		size_t	update_alloc = 0, update_offset = 0;
+
+		ZBX_STR2UINT64(interfaceid, row[0]);
 		db_useip = (unsigned char)atoi(row[1]);
 		db_ip = row[2];
 		db_dns = row[3];
-		db_main = (unsigned char)atoi(row[5]);
-		if (1 == db_main)
-			main_ = 0;
 
-		if (ZBX_CONN_DEFAULT == flags)
+		if (db_useip != useip)
 		{
-			if (db_useip != useip)
-				continue;
-			if (useip && 0 != strcmp(db_ip, ip))
-				continue;
-
-			if (!useip && 0 != strcmp(db_dns, dns))
-				continue;
-
-			zbx_free(tmp);
-			tmp = strdup(row[4]);
-			zbx_dc_expand_user_and_func_macros(um_handle, &tmp, &hostid, 1, NULL);
-			if (FAIL == zbx_is_ushort(tmp, &db_port) || db_port != port)
-				continue;
-
-			ZBX_STR2UINT64(interfaceid, row[0]);
-			break;
+			zbx_snprintf_alloc(&update, &update_alloc, &update_offset, "%cuseip=%d", delim, useip);
+			delim = ',';
+			zbx_audit_host_update_json_update_interface_useip(audit_context_mode, hostid,
+					interfaceid, db_useip, useip);
 		}
 
-		/* update main interface if explicit connection flags were passed (flags != ZBX_CONN_DEFAULT) */
-		if (1 == db_main)
+		if ((ZBX_CONN_DEFAULT == flags || ZBX_CONN_IP == flags) && 0 != strcmp(db_ip, ip))
 		{
-			char	*update = NULL, delim = ' ';
-			size_t	update_alloc = 0, update_offset = 0;
+			ip_esc = zbx_db_dyn_escape_field("interface", "ip", ip);
+			zbx_snprintf_alloc(&update, &update_alloc, &update_offset, "%cip='%s'", delim, ip_esc);
+			zbx_free(ip_esc);
+			delim = ',';
+			zbx_audit_host_update_json_update_interface_ip(audit_context_mode, hostid, interfaceid,
+					db_ip, ip);
+		}
 
-			ZBX_STR2UINT64(interfaceid, row[0]);
+		if ((ZBX_CONN_DEFAULT == flags || ZBX_CONN_DNS == flags) && 0 != strcmp(db_dns, dns))
+		{
+			dns_esc = zbx_db_dyn_escape_field("interface", "dns", dns);
+			zbx_snprintf_alloc(&update, &update_alloc, &update_offset, "%cdns='%s'", delim,
+					dns_esc);
+			zbx_free(dns_esc);
+			delim = ',';
+			zbx_audit_host_update_json_update_interface_dns(audit_context_mode, hostid, interfaceid,
+					db_dns, dns);
+		}
 
-			if (db_useip != useip)
-			{
-				zbx_snprintf_alloc(&update, &update_alloc, &update_offset, "%cuseip=%d", delim, useip);
-				delim = ',';
-				zbx_audit_host_update_json_update_interface_useip(audit_context_mode, hostid,
-						interfaceid, db_useip, useip);
-			}
+		tmp = strdup(row[4]);
+		zbx_dc_expand_user_and_func_macros(um_handle, &tmp, &hostid, 1, NULL);
 
-			if (ZBX_CONN_IP == flags && 0 != strcmp(db_ip, ip))
-			{
-				ip_esc = zbx_db_dyn_escape_field("interface", "ip", ip);
-				zbx_snprintf_alloc(&update, &update_alloc, &update_offset, "%cip='%s'", delim, ip_esc);
-				zbx_free(ip_esc);
-				delim = ',';
-				zbx_audit_host_update_json_update_interface_ip(audit_context_mode, hostid, interfaceid,
-						db_ip, ip);
-			}
+		if (FAIL == zbx_is_ushort(tmp, &db_port) || db_port != port)
+		{
+			zbx_snprintf_alloc(&update, &update_alloc, &update_offset, "%cport=%u", delim, port);
+			zbx_audit_host_update_json_update_interface_port(audit_context_mode, hostid,
+					interfaceid, db_port, port);
+		}
 
-			if (ZBX_CONN_DNS == flags && 0 != strcmp(db_dns, dns))
-			{
-				dns_esc = zbx_db_dyn_escape_field("interface", "dns", dns);
-				zbx_snprintf_alloc(&update, &update_alloc, &update_offset, "%cdns='%s'", delim,
-						dns_esc);
-				zbx_free(dns_esc);
-				delim = ',';
-				zbx_audit_host_update_json_update_interface_dns(audit_context_mode, hostid, interfaceid,
-						db_dns, dns);
-			}
+		zbx_free(tmp);
 
-			if (FAIL == zbx_is_ushort(row[4], &db_port) || db_port != port)
-			{
-				zbx_snprintf_alloc(&update, &update_alloc, &update_offset, "%cport=%u", delim, port);
-				zbx_audit_host_update_json_update_interface_port(audit_context_mode, hostid,
-						interfaceid, db_port, port);
-			}
-
-			if (0 != update_alloc)
-			{
-				zbx_db_execute("update interface set%s where interfaceid=" ZBX_FS_UI64, update,
-						interfaceid);
-				zbx_free(update);
-			}
-			break;
+		if (0 != update_alloc)
+		{
+			zbx_db_execute("update interface set%s where interfaceid=" ZBX_FS_UI64, update,
+					interfaceid);
+			zbx_free(update);
 		}
 	}
 	zbx_db_free_result(result);
-
-	zbx_free(tmp);
 
 	if (0 != interfaceid)
 		goto out;

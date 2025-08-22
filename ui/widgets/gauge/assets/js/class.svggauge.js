@@ -347,6 +347,30 @@ class CSVGGauge {
 	}
 
 	/**
+	 * Set description of the gauge.
+	 *
+	 * @param {string} description  Description with expanded macros.
+	 */
+	setDescription(description) {
+		const {container} = this.#elements.description;
+
+		container.innerHTML = '';
+
+		for (const text of description.split('\r\n')) {
+			if (text.replace(/ /g, '') !== '') {
+				const line = document.createElementNS(CSVGGauge.XHTML_NS, 'div');
+
+				line.innerText = text;
+
+				container.appendChild(line);
+			}
+		}
+
+		this.#drawDescription();
+		this.#adjustScalableGroup();
+	}
+
+	/**
 	 * Remove created SVG element from the container.
 	 */
 	destroy() {
@@ -378,16 +402,6 @@ class CSVGGauge {
 
 		if (this.#config.description.color !== '') {
 			container.style.color = `#${this.#config.description.color}`;
-		}
-
-		for (const text of this.#config.description.text.split('\r\n')) {
-			if (text.replace(/ /g, '') !== '') {
-				const line = document.createElementNS(CSVGGauge.XHTML_NS, 'div');
-
-				line.innerText = text;
-
-				container.appendChild(line);
-			}
 		}
 
 		this.#elements.description = {container};

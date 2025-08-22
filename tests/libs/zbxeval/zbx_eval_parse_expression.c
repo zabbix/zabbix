@@ -32,11 +32,17 @@ void	zbx_mock_test_entry(void **state)
 
 	rules = mock_eval_read_rules("in.rules");
 	returned_ret = zbx_eval_parse_expression(&ctx, zbx_mock_get_parameter_string("in.expression"), rules, &error);
+
+	if (FAIL == returned_ret)
+		zbx_eval_set_exception(&ctx, zbx_dsprintf(NULL, "Cannot parse formula: %s", error));
+
 	expected_ret = zbx_mock_str_to_return_code(zbx_mock_get_parameter_string("out.result"));
+
 	if (SUCCEED != returned_ret)
 		printf("ERROR: %s\n", error);
 	else
 		mock_dump_stack(&ctx);
+
 	zbx_mock_assert_result_eq("return value", expected_ret, returned_ret);
 
 	if (SUCCEED == expected_ret)
@@ -44,5 +50,4 @@ void	zbx_mock_test_entry(void **state)
 
 	zbx_eval_clear(&ctx);
 	zbx_free(error);
-
 }

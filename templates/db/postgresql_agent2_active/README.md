@@ -7,7 +7,7 @@ This template is designed for the deployment of PostgreSQL monitoring by Zabbix 
 
 ## Requirements
 
-Zabbix version: 7.4 and higher.
+Zabbix version: 8.0 and higher.
 
 ## Tested versions
 
@@ -16,11 +16,11 @@ This template has been tested on:
 
 ## Configuration
 
-> Zabbix should be configured according to the instructions in the [Templates out of the box](https://www.zabbix.com/documentation/7.4/manual/config/templates_out_of_the_box) section.
+> Zabbix should be configured according to the instructions in the [Templates out of the box](https://www.zabbix.com/documentation/8.0/manual/config/templates_out_of_the_box) section.
 
 ## Setup
 
-1. Deploy Zabbix agent 2 with the PostgreSQL plugin. Starting with Zabbix versions 6.0.10 / 6.2.4 / 6.4 PostgreSQL metrics are moved to a loadable plugin and require installation of a separate package or [`compilation of the plugin from sources`](https://www.zabbix.com/documentation/7.4/manual/extensions/plugins/build).
+1. Deploy Zabbix agent 2 with the PostgreSQL plugin. Starting with Zabbix versions 6.0.10 / 6.2.4 / 6.4 PostgreSQL metrics are moved to a loadable plugin and require installation of a separate package or [`compilation of the plugin from sources`](https://www.zabbix.com/documentation/8.0/manual/extensions/plugins/build).
 
 2. Create the PostgreSQL user for monitoring (`<password>` at your discretion) and inherit permissions from the default role `pg_monitor`:
 
@@ -44,7 +44,7 @@ For more information please read the PostgreSQL documentation `https://www.postg
 
 **Note:** if you want to use SSL/TLS encryption to protect communications with the remote PostgreSQL instance, a named session must be used. In that case, the instance URI should be specified in the `Plugins.PostgreSQL.Sessions.*.Uri` parameter in the PostgreSQL plugin configuration files alongside all the encryption parameters (type, certificate/key filepaths if needed etc.).
 
-You can check the [`PostgreSQL plugin documentation`](https://git.zabbix.com/projects/AP/repos/postgresql/browse?at=refs%2Fheads%2Frelease%2F7.4) for details about agent plugin parameters and named sessions.
+You can check the [`PostgreSQL plugin documentation`](https://git.zabbix.com/projects/AP/repos/postgresql/browse?at=refs%2Fheads%2Frelease%2F8.0) for details about agent plugin parameters and named sessions.
 
 Also, it is assumed that you set up the PostgreSQL instance to work in the desired encryption mode. Check the [`PostgreSQL documentation`](https://www.postgresql.org/docs/current/ssl-tcp.html) for details.
 

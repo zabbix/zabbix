@@ -56,6 +56,8 @@ void			zbx_pp_history_cache_release(zbx_pp_history_cache_t *history_cache);
 zbx_pp_history_t	*zbx_pp_history_cache_history_acquire(zbx_pp_history_cache_t *history_cache);
 void			zbx_pp_history_cache_history_set_and_release(zbx_pp_history_cache_t *history_cache,
 				zbx_pp_history_t *history_in, zbx_pp_history_t *history_out);
+zbx_uint64_t		zbx_pp_history_cache_history_size(zbx_pp_history_cache_t *history_cache);
+void	zbx_pp_history_free_unique(const zbx_pp_history_t *history_in, zbx_pp_history_t *history_out);
 
 typedef enum
 {
@@ -97,6 +99,11 @@ typedef struct
 	zbx_pp_process_mode_t	mode;
 	int			history_num;	/* the number of preprocessing steps requiring history */
 	zbx_pp_history_cache_t	*history_cache;	/* the preprocessing history */
+
+	zbx_uint64_t		values_num;
+	zbx_uint64_t		values_sz;
+	zbx_uint64_t		time_ms;
+	zbx_uint64_t		total_ms;
 }
 zbx_pp_item_preproc_t;
 

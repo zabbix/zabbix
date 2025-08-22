@@ -75,20 +75,25 @@ class CProvisioning {
 		]);
 		$userdirectory = reset($userdirectories);
 
-		if (!$userdirectory || $userdirectory['provision_status'] == JIT_PROVISIONING_DISABLED) {
-			return new self($userdirectory, []);
-		}
+		switch ($userdirectory['idp_type']) {
+			case IDP_TYPE_LDAP:
+				$userdirectory += DB::select('userdirectory_ldap', [
+					'output' => ['bind_password'],
+					'filter' => ['userdirectoryid' => $userdirectoryid]
+				])[0];
+				break;
 
-		if ($userdirectory['idp_type'] == IDP_TYPE_LDAP) {
-			$userdirectory += DB::select('userdirectory_ldap', [
-				'output' => ['bind_password'],
-				'filter' => ['userdirectoryid' => $userdirectoryid]
-			])[0];
+			case IDP_TYPE_SAML:
+				$userdirectory += DB::select('userdirectory_saml', [
+					'output' => CUserDirectory::SAML_HASH_FIELDS,
+					'filter' => ['userdirectoryid' => $userdirectoryid]
+				])[0];
+				break;
 		}
 
 		$mapping_roles = [];
 
-		if ($userdirectory['provision_groups']) {
+		if ($userdirectory['provision_status'] == JIT_PROVISIONING_ENABLED) {
 			$mapping_roles = DB::select('role', [
 				'output' => ['roleid', 'name', 'type'],
 				'roleids' => array_column($userdirectory['provision_groups'], 'roleid', 'roleid'),
@@ -113,7 +118,7 @@ class CProvisioning {
 			IDP_TYPE_SAML	=> ['idp_entityid', 'sso_url', 'slo_url', 'username_attribute', 'sp_entityid',
 				'nameid_format', 'sign_messages', 'sign_assertions', 'sign_authn_requests', 'sign_logout_requests',
 				'sign_logout_responses', 'encrypt_nameid', 'encrypt_assertions', 'group_name', 'user_username',
-				'user_lastname', 'scim_status'
+				'user_lastname', 'scim_status', 'idp_certificate', 'sp_certificate', 'sp_private_key'
 			]
 		];
 

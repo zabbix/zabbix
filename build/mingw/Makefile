@@ -3,13 +3,14 @@
 SHELL := cmd
 BUILDDIR := $(subst /,\,$(CURDIR))
 TOPDIR := $(BUILDDIR)\..\..
-OUTPUTDIR := output
+OUTPUTDIR := $(BUILDDIR)\output
 
 MODULEDIR = $(TOPDIR)\src\go
 TARGETDIR = $(TOPDIR)\src\go\cmd\zabbix_agent2
 TARGETPKG=golang.zabbix.com/agent2/cmd/zabbix_agent2
 
 CC = gcc
+AR = ar
 WINDRES = windres.exe
 
 OBJS = \
@@ -50,18 +51,12 @@ OBJS = \
 	$(OUTPUTDIR)\jsonobj.o \
 	$(OUTPUTDIR)\sha256crypt.o \
 	$(OUTPUTDIR)\variant.o \
-	$(OUTPUTDIR)\sysinfo_system.o \
-	$(OUTPUTDIR)\sysinfo_dns.o \
-	$(OUTPUTDIR)\sysinfo_ip_reverse.o \
-	$(OUTPUTDIR)\sysinfo_vfs_file.o \
-	$(OUTPUTDIR)\sysinfo_dir.o \
 	$(OUTPUTDIR)\sysinfo_alias.o \
 	$(OUTPUTDIR)\eventlog.o \
 	$(OUTPUTDIR)\process_eventslog.o \
 	$(OUTPUTDIR)\process_eventslog6.o \
 	$(OUTPUTDIR)\symbols.o \
-	$(OUTPUTDIR)\win32_file.o \
-	$(TARGETDIR)\resource.syso
+	$(OUTPUTDIR)\win32_file.o
 
 CFLAGS := $(CFLAGS) -O2 -g -DHAVE_STDINT_H=1 -DZBX_BUILD_AGENT2=1  -DHAVE_THREAD_LOCAL=1 \
 	-I$(TOPDIR)\build\win32\include\common -I$(TOPDIR)\build\mingw -I$(TOPDIR)\include -I$(TOPDIR)\include\common
@@ -217,21 +212,6 @@ $(OUTPUTDIR)\json.o: $(TOPDIR)\src\libs\zbxjson\json.c
 $(OUTPUTDIR)\sysinfo.o: $(TOPDIR)\src\libs\zbxsysinfo\sysinfo.c
 	$(CC) $(CFLAGS) -DUNICODE -DWITH_COMMON_METRICS -c $^ -o $@
 
-$(OUTPUTDIR)\sysinfo_system.o: $(TOPDIR)\src\libs\zbxsysinfo\common\system.c
-	$(CC) $(CFLAGS) -DUNICODE -c $^ -o $@
-
-$(OUTPUTDIR)\sysinfo_ip_reverse.o: $(TOPDIR)\src\libs\zbxsysinfo\common\ip_reverse.c
-	$(CC) $(CFLAGS) -DUNICODE -c $^ -o $@
-
-$(OUTPUTDIR)\sysinfo_dns.o: $(TOPDIR)\src\libs\zbxsysinfo\common\dns.c
-	$(CC) $(CFLAGS) -DUNICODE -c $^ -o $@
-
-$(OUTPUTDIR)\sysinfo_vfs_file.o: $(TOPDIR)\src\libs\zbxsysinfo\common\vfs_file.c
-	$(CC) $(CFLAGS) -DUNICODE -c $^ -o $@
-
-$(OUTPUTDIR)\sysinfo_dir.o: $(TOPDIR)\src\libs\zbxsysinfo\common\dir.c
-	$(CC) $(CFLAGS) -DUNICODE -c $^ -o $@
-
 $(OUTPUTDIR)\sysinfo_alias.o: $(TOPDIR)\src\libs\zbxsysinfo\alias\alias.c
 	$(CC) $(CFLAGS) -DUNICODE -c $^ -o $@
 
@@ -271,10 +251,13 @@ $(OUTPUTDIR)\logfiles.o: $(TOPDIR)\src\zabbix_agent\logfiles\logfiles.c
 $(TARGETDIR)\resource.syso: $(TOPDIR)\build\win32\project\resource.rc
 	$(WINDRES) $^ $(RFLAGS) -D _WINDOWS -D ZABBIX_AGENT2 -o $@
 
+$(OUTPUTDIR)\libagent.a: $(OBJS)
+	$(AR) rcs $@ $^
+
 .FORCE:
-$(TARGETBIN): $(OBJS) .FORCE
+$(TARGETBIN): $(OBJS) $(OUTPUTDIR)\libagent.a $(TARGETDIR)\resource.syso .FORCE
 	set CGO_CFLAGS=$(CGO_CFLAGS)
-	set CGO_LDFLAGS=$(CGO_LDFLAGS)
+	set CGO_LDFLAGS=$(CGO_LDFLAGS) $(OUTPUTDIR)\libagent.a
 	set GOARCH=$(GOARCH)
 	set CGO_ENABLED=1
 
@@ -290,4 +273,4 @@ $(TARGETBIN): $(OBJS) .FORCE
 
 clean:
 	go clean -cache
-	del $(TOPDIR)\include\common\config.h "$(TARGETBIN)" $(OUTPUTDIR)\*.o $(TARGETDIR)\*.syso 2>NUL
+	del $(TOPDIR)\include\common\config.h "$(TARGETBIN)" $(OUTPUTDIR)\*.o $(OUTPUTDIR)\*.a $(TARGETDIR)\*.syso 2>NUL

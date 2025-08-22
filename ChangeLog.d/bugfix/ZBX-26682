@@ -1,0 +1,1 @@
+.......PS. [ZBX-26682] fixed history_bin table compression status being interpreted as trends compression status (dgoloscapov)

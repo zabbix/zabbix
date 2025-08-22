@@ -149,9 +149,16 @@ class CSystemInfoHelper {
 			timeUnitToSeconds(CSettingsHelper::get(CSettingsHelper::SOCKET_TIMEOUT)), ZBX_SOCKET_BYTES_LIMIT
 		);
 
-		$status['is_running'] = $server->isRunning() && $server->canConnect(CSessionHelper::getId());
+		$status['is_running'] = $server->isRunning() || $server->canConnect(CSessionHelper::getId());
 
-		if ($status['is_running'] === false || CWebUser::getType() != USER_TYPE_SUPER_ADMIN) {
+		if (CWebUser::getType() != USER_TYPE_SUPER_ADMIN) {
+			return $status;
+		}
+
+		if ($status['is_running'] === false) {
+			if ($server->getErrorCode() === CZabbixServer::ERROR_CODE_TLS) {
+				error($server->getError());
+			}
 			return $status;
 		}
 

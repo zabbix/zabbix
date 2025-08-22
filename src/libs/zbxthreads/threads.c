@@ -250,7 +250,7 @@ static void	threads_kill(ZBX_THREAD_HANDLE *threads, int threads_num, const int 
  *                                  FAIL                                      *
  *                                                                            *
  ******************************************************************************/
-void	zbx_threads_kill_and_wait(ZBX_THREAD_HANDLE *threads, const int *threads_flags, int threads_num, int ret)
+void	zbx_threads_kill_and_wait(ZBX_THREAD_HANDLE *threads, const int *threads_flags, int threads_num)
 {
 #if !defined(_WINDOWS) && !defined(__MINGW32__)
 	sigset_t	set;
@@ -261,11 +261,11 @@ void	zbx_threads_kill_and_wait(ZBX_THREAD_HANDLE *threads, const int *threads_fl
 	zbx_sigmask(SIG_BLOCK, &set, NULL);
 
 	/* signal all threads to go into idle state and wait for threads with higher priority to exit */
-	threads_kill(threads, threads_num, threads_flags, ZBX_THREAD_PRIORITY_NONE, ret);
+	threads_kill(threads, threads_num, threads_flags, ZBX_THREAD_PRIORITY_NONE, SUCCEED);
 
 	for (int j = ZBX_THREAD_PRIORITY_FIRST; j < ZBX_THREAD_PRIORITY_COUNT; j++)
 	{
-		threads_kill(threads, threads_num, threads_flags, j, ret);
+		threads_kill(threads, threads_num, threads_flags, j, SUCCEED);
 
 		for (int i = 0; i < threads_num; i++)
 		{
@@ -283,7 +283,7 @@ void	zbx_threads_kill_and_wait(ZBX_THREAD_HANDLE *threads, const int *threads_fl
 #else
 	/* wait for threads to finish first; although listener threads will never end */
 	WaitForMultipleObjectsEx(threads_num, threads, TRUE, 1000, FALSE);
-	threads_kill(threads, threads_num, threads_flags, ZBX_THREAD_PRIORITY_NONE, ret);
+	threads_kill(threads, threads_num, threads_flags, ZBX_THREAD_PRIORITY_NONE, FAIL);
 #endif
 
 	for (int i = 0; i < threads_num; i++)

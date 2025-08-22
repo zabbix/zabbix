@@ -1182,7 +1182,7 @@ int	lld_process_discovery_rule(zbx_dc_item_t *item, zbx_vector_lld_entry_ptr_t *
 	zbx_audit_init(cfg.auditlog_enabled, cfg.auditlog_mode, ZBX_AUDIT_LLD_CONTEXT);
 
 	if (SUCCEED != lld_update_items(hostid, item->itemid, &lld_rows, error, &lifetime, &enabled_lifetime, now,
-			ZBX_FLAG_DISCOVERY_NORMAL, NULL))
+			ZBX_FLAG_DISCOVERY_NORMAL, NULL, NULL))
 	{
 		zabbix_log(LOG_LEVEL_DEBUG, "cannot update/add items because parent host was removed while"
 				" processing lld rule");
@@ -1192,7 +1192,7 @@ int	lld_process_discovery_rule(zbx_dc_item_t *item, zbx_vector_lld_entry_ptr_t *
 	lld_item_links_sort(&lld_rows);
 
 	if (SUCCEED != lld_update_triggers(hostid, item->itemid, &lld_rows, error, &lifetime, &enabled_lifetime, now,
-			ZBX_FLAG_DISCOVERY_NORMAL))
+			ZBX_FLAG_DISCOVERY_NORMAL, NULL))
 	{
 		zabbix_log(LOG_LEVEL_DEBUG, "cannot update/add triggers because parent host was removed while"
 				" processing lld rule");
@@ -1200,7 +1200,7 @@ int	lld_process_discovery_rule(zbx_dc_item_t *item, zbx_vector_lld_entry_ptr_t *
 	}
 
 	if (SUCCEED != lld_update_graphs(hostid, item->itemid, &lld_rows, error, &lifetime, now,
-			ZBX_FLAG_DISCOVERY_NORMAL))
+			ZBX_FLAG_DISCOVERY_NORMAL, NULL))
 	{
 		zabbix_log(LOG_LEVEL_DEBUG, "cannot update/add graphs because parent host was removed while"
 				" processing lld rule");
@@ -1208,7 +1208,7 @@ int	lld_process_discovery_rule(zbx_dc_item_t *item, zbx_vector_lld_entry_ptr_t *
 	}
 
 	lld_update_hosts(item->itemid, &lld_rows, error, &lifetime, &enabled_lifetime, now, ZBX_FLAG_DISCOVERY_NORMAL,
-			NULL);
+			NULL, NULL);
 
 	/* add informative warning to the error message about lack of data for macros used in filter */
 	if (NULL != info)

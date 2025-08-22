@@ -27,9 +27,9 @@ class CDiscoveryRule extends CDiscoveryRuleGeneral {
 		'trapper_hosts', 'templateid', 'params', 'ipmi_sensor', 'authtype', 'username', 'password', 'publickey',
 		'privatekey', 'flags', 'interfaceid', 'description', 'lifetime_type', 'lifetime', 'enabled_lifetime_type',
 		'enabled_lifetime', 'jmx_endpoint', 'master_itemid', 'timeout', 'url', 'query_fields', 'posts', 'status_codes',
-		'follow_redirects', 'post_type', 'http_proxy', 'headers', 'retrieve_mode', 'request_method', 'ssl_cert_file',
-		'ssl_key_file', 'ssl_key_password', 'verify_peer', 'verify_host', 'allow_traps', 'state', 'error', 'parameters',
-		'uuid'
+		'follow_redirects', 'post_type', 'http_proxy', 'headers', 'retrieve_mode', 'request_method', 'output_format',
+		'ssl_cert_file', 'ssl_key_file', 'ssl_key_password', 'verify_peer', 'verify_host', 'allow_traps', 'state',
+		'error', 'parameters', 'uuid'
 	];
 
 	public static function getOutputFieldsOnHost(): array {
@@ -281,12 +281,6 @@ class CDiscoveryRule extends CDiscoveryRuleGeneral {
 			$result = $this->unsetExtraFields($result, ['formula', 'evaltype']);
 			$result = $this->unsetExtraFields($result, ['hostid'], $options['output']);
 		}
-
-		foreach ($result as &$item) {
-			// Option 'Convert to JSON' is not supported for discovery rule.
-			unset($item['output_format']);
-		}
-		unset($item);
 
 		if (!$options['preservekeys']) {
 			$result = array_values($result);
@@ -1324,14 +1318,8 @@ class CDiscoveryRule extends CDiscoveryRuleGeneral {
 		self::deleteAffectedItemPrototypes($del_itemids);
 		self::deleteAffectedHostPrototypes($del_itemids);
 		self::deleteAffectedLldRulePrototypes($db_items);
-		self::deleteAffectedOverrides($del_itemids);
 
-		DB::delete('item_parameter', ['itemid' => $del_itemids]);
 		DB::delete('item_preproc', ['itemid' => $del_itemids]);
-		DB::delete('lld_macro_export', ['itemid' => $del_itemids]);
-		DB::delete('lld_macro_path', ['itemid' => $del_itemids]);
-		DB::delete('item_condition', ['itemid' => $del_itemids]);
-		DB::delete('item_discovery', ['itemid' => $del_itemids]);
 		DB::update('items', [
 			'values' => ['templateid' => 0],
 			'where' => ['itemid' => $del_itemids]

@@ -1,5 +1,21 @@
 [
     {
+        "value": "abc",
+        "macrofunc": {
+            "function": "regsub",
+            "parameters": ["123", "321"]
+        },
+        "result": ""
+    },
+    {
+        "value": "abc",
+        "macrofunc": {
+            "function": "regsub",
+            "parameters": ["^(\\d+):(\\d+:\\d+\\.\\d+)", "a: \\2"]
+        },
+        "result": ""
+    },
+    {
         "value": "2876256:20231009:190531.385 server #18 started [history syncer #4",
         "macrofunc": {
             "function": "regsub",

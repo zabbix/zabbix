@@ -41,12 +41,12 @@ class WidgetView extends CControllerDashboardWidgetView {
 	}
 
 	protected function doAction(): void {
-		$edit_mode = (int) $this->getInput('edit_mode', 0);
-
 		$width = (int) $this->getInput('contents_width', 100);
 		$height = (int) $this->getInput('contents_height', 100);
 
 		$resourceid = null;
+		$host = [];
+		$graph = [];
 		$profileIdx = 'web.dashboard.filter';
 		$profileIdx2 = $this->getInput('dashboardid', 0);
 		$is_resource_available = true;
@@ -108,6 +108,8 @@ class WidgetView extends CControllerDashboardWidgetView {
 					'webitems' => true
 				];
 
+				$src_items = [];
+
 				if ($this->isTemplateDashboard()) {
 					$options['itemids'] = $resourceid;
 				}
@@ -118,15 +120,23 @@ class WidgetView extends CControllerDashboardWidgetView {
 						'webitems' => true
 					]);
 
-					$options['filter']['key_'] = $src_items[0]['key_'];
+					if ($src_items) {
+						$options['filter']['key_'] = $src_items[0]['key_'];
+					}
 				}
 
-				$items = API::Item()->get($options);
-				$item = reset($items);
+				if ($this->isTemplateDashboard() || $src_items) {
+					$items = API::Item()->get($options);
+					$item = reset($items);
 
-				if ($item) {
-					$resourceid = $item['itemid'];
-					$item = CArrayHelper::renameKeys($item, ['name_resolved' => 'name']);
+					if ($item) {
+						$resourceid = $item['itemid'];
+						$item = CArrayHelper::renameKeys($item, ['name_resolved' => 'name']);
+					}
+					else {
+						$resourceid = null;
+						$is_resource_available = false;
+					}
 				}
 				else {
 					$resourceid = null;
@@ -151,43 +161,9 @@ class WidgetView extends CControllerDashboardWidgetView {
 				]);
 				$graph = reset($graph);
 
-				// If all items are from one host we change them, or set calculated if not exist on that host.
 				if ($graph && count($graph['hosts']) == 1) {
-					if ($graph['ymax_type'] == GRAPH_YAXIS_TYPE_ITEM_VALUE && $graph['ymax_itemid']) {
-						$ymax_item = ['itemid' => $graph['ymax_itemid']];
-
-						if (!$this->isTemplateDashboard()) {
-							$ymax_items = getSameGraphItemsForHost([$ymax_item],
-								$this->fields_values['override_hostid'][0], false
-							);
-							$ymax_item = reset($ymax_items);
-						}
-
-						if ($ymax_item && $ymax_item['itemid'] > 0) {
-							$graph['ymax_itemid'] = $ymax_item['itemid'];
-						}
-						else {
-							$graph['ymax_type'] = GRAPH_YAXIS_TYPE_CALCULATED;
-						}
-					}
-
-					if ($graph['ymin_type'] == GRAPH_YAXIS_TYPE_ITEM_VALUE && $graph['ymin_itemid']) {
-						$ymin_item = ['itemid' => $graph['ymin_itemid']];
-
-						if (!$this->isTemplateDashboard()) {
-							$ymin_items = getSameGraphItemsForHost([$ymin_item],
-								$this->fields_values['override_hostid'][0], false
-							);
-							$ymin_item = reset($ymin_items);
-						}
-
-						if ($ymin_item && $ymin_item['itemid'] > 0) {
-							$graph['ymin_itemid'] = $ymin_item['itemid'];
-						}
-						else {
-							$graph['ymin_type'] = GRAPH_YAXIS_TYPE_CALCULATED;
-						}
-					}
+					$graph = $this->setAxisItem($graph, 'ymax');
+					$graph = $this->setAxisItem($graph, 'ymin');
 				}
 
 				if ($graph) {
@@ -291,39 +267,9 @@ class WidgetView extends CControllerDashboardWidgetView {
 					? $graph['hosts'][0]['name'].NAME_DELIMITER.$graph['name']
 					: $graph['name'];
 
-				if ($this->fields_values['override_hostid'] && $resourceid) {
-					if ($graph['graphtype'] == GRAPH_TYPE_PIE || $graph['graphtype'] == GRAPH_TYPE_EXPLODED) {
-						$graph_src = (new CUrl('chart7.php'))
-							->setArgument('name', $host['name'].NAME_DELIMITER.$graph['name'])
-							->setArgument('graphtype', $graph['graphtype'])
-							->setArgument('graph3d', $graph['show_3d']);
-					}
-					else {
-						$graph_src = (new CUrl('chart3.php'))
-							->setArgument('name', $host['name'].NAME_DELIMITER.$graph['name'])
-							->setArgument('ymin_type', $graph['ymin_type'])
-							->setArgument('ymax_type', $graph['ymax_type'])
-							->setArgument('ymin_itemid', $graph['ymin_itemid'])
-							->setArgument('ymax_itemid', $graph['ymax_itemid'])
-							->setArgument('showworkperiod', $graph['show_work_period'])
-							->setArgument('showtriggers', $graph['show_triggers'])
-							->setArgument('graphtype', $graph['graphtype'])
-							->setArgument('yaxismin', $graph['yaxismin'])
-							->setArgument('yaxismax', $graph['yaxismax'])
-							->setArgument('percent_left', $graph['percent_left'])
-							->setArgument('percent_right', $graph['percent_right']);
-					}
-
-					$new_graph_items = getSameGraphItemsForHost($graph['gitems'],
-						$this->fields_values['override_hostid'][0], false
-					);
-
-					foreach ($new_graph_items as &$new_graph_item) {
-						unset($new_graph_item['gitemid'], $new_graph_item['graphid']);
-					}
-					unset($new_graph_item);
-
-					$graph_src->setArgument('items', $new_graph_items);
+				if ($this->fields_values['override_hostid'] && $resourceid
+						&& array_key_exists('name', $host) && $graph) {
+					$graph_src = $this->prepareGraphSrc($graph, $host);
 				}
 
 				if ($graph_dims['graphtype'] == GRAPH_TYPE_PIE || $graph_dims['graphtype'] == GRAPH_TYPE_EXPLODED) {
@@ -367,46 +313,7 @@ class WidgetView extends CControllerDashboardWidgetView {
 			$graph_src->setArgument('widget_view', '1');
 			$time_control_data['src'] = $graph_src->getUrl();
 
-			if ($edit_mode || ($this->isTemplateDashboard() && !$this->fields_values['override_hostid'])) {
-				$graph_url = null;
-			}
-			else {
-				if ($this->fields_values['source_type'] == ZBX_WIDGET_FIELD_RESOURCE_GRAPH) {
-					$has_host_graph = $this->fields_values['override_hostid']
-						? (bool) API::Graph()->get([
-							'output' => [],
-							'hostids' => $this->fields_values['override_hostid'],
-							'filter' => [
-								'name' => $graph['name']
-							]
-						])
-						: true;
-
-					if ($has_host_graph) {
-						$graph_url = $this->checkAccess(CRoleHelper::UI_MONITORING_HOSTS)
-							? (new CUrl('zabbix.php'))
-								->setArgument('action', 'charts.view')
-								->setArgument('filter_hostids', [$graph['hosts'][0]['hostid']])
-								->setArgument('filter_name', $graph['name'])
-								->setArgument('filter_show', GRAPH_FILTER_HOST)
-								->setArgument('filter_set', '1')
-								->setArgument('from')
-								->setArgument('to')
-							: null;
-					}
-					else {
-						$graph_url = null;
-					}
-				}
-				else {
-					$graph_url = $this->checkAccess(CRoleHelper::UI_MONITORING_LATEST_DATA)
-						? (new CUrl('history.php'))
-							->setArgument('itemids', [$resourceid])
-							->setArgument('from')
-							->setArgument('to')
-						: null;
-				}
-			}
+			$graph_url = $this->prepareGraphUrl($graph, $resourceid);
 		}
 
 		$response = [
@@ -442,5 +349,111 @@ class WidgetView extends CControllerDashboardWidgetView {
 		}
 
 		return $info;
+	}
+
+	private function setAxisItem(array $graph, string $axis): array {
+		$type_key = $axis.'_type';
+		$itemid_key = $axis.'_itemid';
+
+		if ($graph[$type_key] == GRAPH_YAXIS_TYPE_ITEM_VALUE && $graph[$itemid_key]) {
+			$item = ['itemid' => $graph[$itemid_key]];
+
+			if (!$this->isTemplateDashboard()) {
+				$items = getSameGraphItemsForHost([$item],
+					$this->fields_values['override_hostid'][0], false
+				);
+				$item = reset($items);
+			}
+
+			if ($item && $item['itemid'] > 0) {
+				$graph[$itemid_key] = $item['itemid'];
+			}
+			else {
+				$graph[$type_key] = GRAPH_YAXIS_TYPE_CALCULATED;
+			}
+		}
+
+		return $graph;
+	}
+
+	private function prepareGraphSrc(array $graph, array $host): CUrl {
+		if ($graph['graphtype'] == GRAPH_TYPE_PIE || $graph['graphtype'] == GRAPH_TYPE_EXPLODED) {
+			$graph_src = (new CUrl('chart7.php'))
+				->setArgument('name', $host['name'].NAME_DELIMITER.$graph['name'])
+				->setArgument('graphtype', $graph['graphtype'])
+				->setArgument('graph3d', $graph['show_3d']);
+		}
+		else {
+			$graph_src = (new CUrl('chart3.php'))
+				->setArgument('name', $host['name'].NAME_DELIMITER.$graph['name'])
+				->setArgument('ymin_type', $graph['ymin_type'])
+				->setArgument('ymax_type', $graph['ymax_type'])
+				->setArgument('ymin_itemid', $graph['ymin_itemid'])
+				->setArgument('ymax_itemid', $graph['ymax_itemid'])
+				->setArgument('showworkperiod', $graph['show_work_period'])
+				->setArgument('showtriggers', $graph['show_triggers'])
+				->setArgument('graphtype', $graph['graphtype'])
+				->setArgument('yaxismin', $graph['yaxismin'])
+				->setArgument('yaxismax', $graph['yaxismax'])
+				->setArgument('percent_left', $graph['percent_left'])
+				->setArgument('percent_right', $graph['percent_right']);
+		}
+
+		$new_graph_items = getSameGraphItemsForHost($graph['gitems'],
+			$this->fields_values['override_hostid'][0], false
+		);
+
+		foreach ($new_graph_items as &$new_graph_item) {
+			unset($new_graph_item['gitemid'], $new_graph_item['graphid']);
+		}
+		unset($new_graph_item);
+
+		$graph_src->setArgument('items', $new_graph_items);
+
+		return $graph_src;
+	}
+
+	private function prepareGraphUrl(array $graph, ?string $resourceid = null): ?CUrl {
+		if ($this->isEditMode() || !$graph
+				|| ($this->isTemplateDashboard() && !$this->fields_values['override_hostid'])) {
+			return null;
+		}
+
+		if ($this->fields_values['source_type'] == ZBX_WIDGET_FIELD_RESOURCE_GRAPH) {
+			$has_host_graph = $this->fields_values['override_hostid']
+				? (bool) API::Graph()->get([
+					'output' => [],
+					'hostids' => $this->fields_values['override_hostid'],
+					'filter' => [
+						'name' => $graph['name']
+					]
+				])
+				: true;
+
+			if ($has_host_graph && $this->checkAccess(CRoleHelper::UI_MONITORING_HOSTS)) {
+				return (new CUrl('zabbix.php'))
+					->setArgument('action', 'charts.view')
+					->setArgument('filter_hostids', [$graph['hosts'][0]['hostid']])
+					->setArgument('filter_name', $graph['name'])
+					->setArgument('filter_show', GRAPH_FILTER_HOST)
+					->setArgument('filter_set', '1')
+					->setArgument('from')
+					->setArgument('to');
+			}
+			else {
+				return null;
+			}
+		}
+
+		return $this->checkAccess(CRoleHelper::UI_MONITORING_LATEST_DATA)
+			? (new CUrl('history.php'))
+				->setArgument('itemids', [$resourceid])
+				->setArgument('from')
+				->setArgument('to')
+			: null;
+	}
+
+	private function isEditMode(): bool {
+		return (bool) $this->getInput('edit_mode', 0);
 	}
 }

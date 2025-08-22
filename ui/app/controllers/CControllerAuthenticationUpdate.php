@@ -76,6 +76,14 @@ class CControllerAuthenticationUpdate extends CController {
 			'mfa_removed_mfaids' =>				'array_id'
 		];
 
+		if (CAuthenticationHelper::isSamlCertsStorageDatabase()) {
+			$fields += [
+				'idp_certificate' => 'db userdirectory_saml.idp_certificate',
+				'sp_certificate' => 'db userdirectory_saml.sp_certificate',
+				'sp_private_key' => 'db userdirectory_saml.sp_private_key'
+			];
+		}
+
 		if ($ALLOW_HTTP_AUTH) {
 			$fields += [
 				'http_auth_enabled' =>		'in '.ZBX_AUTH_HTTP_DISABLED.','.ZBX_AUTH_HTTP_ENABLED,
@@ -552,6 +560,14 @@ class CControllerAuthenticationUpdate extends CController {
 		];
 		$this->getInputs($saml_data, array_keys($saml_data));
 
+		if (CAuthenticationHelper::isSamlCertsStorageDatabase()) {
+			$this->getInputs($saml_data, [
+				'idp_certificate',
+				'sp_certificate',
+				'sp_private_key'
+			]);
+		}
+
 		if ($this->getInput('saml_provision_status', JIT_PROVISIONING_DISABLED) == JIT_PROVISIONING_ENABLED) {
 			$provisioning_fields = [
 				'saml_provision_status' => JIT_PROVISIONING_ENABLED,
@@ -594,7 +610,6 @@ class CControllerAuthenticationUpdate extends CController {
 	 * @return bool
 	 */
 	private function invalidateSessions() {
-		$result = true;
 		$internal_auth_user_groups = API::UserGroup()->get([
 			'output' => [],
 			'filter' => [
@@ -611,13 +626,13 @@ class CControllerAuthenticationUpdate extends CController {
 		unset($internal_auth_users[CWebUser::$data['userid']]);
 
 		if ($internal_auth_users) {
-			$result = DB::update('sessions', [
+			DB::update('sessions', [
 				'values' => ['status' => ZBX_SESSION_PASSIVE],
 				'where' => ['userid' => array_keys($internal_auth_users)]
 			]);
 		}
 
-		return $result;
+		return true;
 	}
 
 	private function validateProvisionGroups(array $provision_group): bool {

@@ -24,27 +24,27 @@ class dbConditionIdTest extends CTest {
 		return [
 			[
 				['field', [0]],
-				"field IS NULL"
+				"(field IS NULL OR field=0)"
 			],
 			[
 				['field', [0, 1]],
-				"(field=1 OR field IS NULL)"
+				"(field IS NULL OR field IN (0,1))"
 			],
 			[
 				['field', [1, 0]],
-				"(field=1 OR field IS NULL)"
+				"(field IS NULL OR field IN (0,1))"
 			],
 			[
 				['field', [0, 1, 2, 3]],
-				"(field IN (1,2,3) OR field IS NULL)"
+				"(field IS NULL OR field IN (0,1,2,3))"
 			],
 			[
 				['field', [0, 1, 2, 3, 5, 6, 7, 8, 9, 10]],
-				"(field IN (1,2,3,5,6,7,8,9,10) OR field IS NULL)"
+				"(field IS NULL OR field IN (0,1,2,3,5,6,7,8,9,10))"
 			],
 			[
 				['field', [0, 1, 2, 3, 5, 6, 7, 8, 9, 10], true],
-				"field NOT IN (1,2,3,5,6,7,8,9,10) AND field IS NOT NULL"
+				"field IS NOT NULL AND field NOT IN (0,1,2,3,5,6,7,8,9,10)"
 			]
 		];
 	}

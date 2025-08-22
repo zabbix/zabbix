@@ -209,17 +209,151 @@ zbx_pp_history_t	*zbx_pp_history_cache_history_acquire(zbx_pp_history_cache_t *h
 	return history;
 }
 
-void	zbx_pp_history_cache_history_set_and_release(zbx_pp_history_cache_t *history_cache, zbx_pp_history_t *history_in,
-		zbx_pp_history_t *history_out)
+static int	pp_history_same(const zbx_pp_history_t *history_in, const zbx_pp_history_t *history_out)
+{
+	if (history_in->step_history.values_num != history_out->step_history.values_num)
+		return FAIL;
+
+	for (int i = 0; i < history_in->step_history.values_num; i++)
+	{
+		const zbx_pp_step_history_t	*in = &history_in->step_history.values[i];
+		const zbx_pp_step_history_t	*out = &history_out->step_history.values[i];
+
+		if (in->index != out->index)
+			return FAIL;
+
+		if (in->ts.sec != out->ts.sec || in->ts.ns != out->ts.ns)
+			return FAIL;
+
+		if (SUCCEED != zbx_variant_same(&in->value, &out->value))
+			return FAIL;
+	}
+
+	return SUCCEED;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: split output history from input history by copying shared values  *
+ *          from input to output history                                      *
+ *                                                                            *
+ * Parameters: history_in  - [IN] input preprocessing history                 *
+ *             history_out - [IN/OUT] output preprocessing history to update  *
+ *                                                                            *
+ * Return value: SUCCEED - all shared values were copied                      *
+ *               FAIL    - histories were fully shared, no changes made       *
+ *                                                                            *
+ * Comments: This function compares input and output histories and, if not    *
+ *           fully shared, copies shared values by cloning them from the      *
+ *           input and overwriting corresponding slots in the output history. *
+ *                                                                            *
+ ******************************************************************************/
+static int	pp_history_split(const zbx_pp_history_t *history_in, zbx_pp_history_t *history_out)
+{
+	if (NULL == history_out)
+		return (NULL == history_in ? FAIL : SUCCEED);
+
+	if (NULL == history_in)
+		return SUCCEED;
+
+	if (SUCCEED == pp_history_same(history_in, history_out))
+		return FAIL;
+
+	for (int i = 0; i < history_out->step_history.values_num; i++)
+	{
+		zbx_pp_step_history_t	*out = &history_out->step_history.values[i];
+		const zbx_variant_t	*value_in;
+		zbx_timespec_t		ts_in;
+
+		zbx_pp_history_get(history_in, out->index, &value_in, &ts_in);
+
+		if (NULL != value_in && out->ts.sec == ts_in.sec && out->ts.ns == ts_in.ns &&
+				SUCCEED == zbx_variant_same(&out->value, value_in))
+		{
+			zbx_variant_copy(&out->value, value_in);
+		}
+	}
+
+	return SUCCEED;
+}
+
+void	zbx_pp_history_cache_history_set_and_release(zbx_pp_history_cache_t *history_cache,
+		zbx_pp_history_t *history_in, zbx_pp_history_t *history_out)
 {
 	if (NULL == history_cache)
 		return;
 
+	int	replace;
+
+	if (SUCCEED != (replace = pp_history_split(history_in, history_out)))
+	{
+		/* old history does not need to be replaced - free the new one without freeing shared history */
+		if (NULL != history_out)
+		{
+			zbx_vector_pp_step_history_destroy(&history_out->step_history);
+			zbx_free(history_out);
+		}
+	}
+
 	pthread_mutex_lock(&history_cache->lock);
 
+	if (SUCCEED == replace)
+	{
+		zbx_pp_history_release(history_cache->history);
+		history_cache->history = history_out;
+	}
+
 	zbx_pp_history_release(history_in);
-	zbx_pp_history_release(history_cache->history);
-	history_cache->history = history_out;
 
 	pthread_mutex_unlock(&history_cache->lock);
+}
+
+zbx_uint64_t	zbx_pp_history_cache_history_size(zbx_pp_history_cache_t *history_cache)
+{
+	zbx_uint64_t	history_size = 0;
+
+	if (NULL == history_cache)
+		return 0;
+
+	pthread_mutex_lock(&history_cache->lock);
+
+	if (NULL != history_cache->history)
+	{
+		for (int i = 0; i < history_cache->history->step_history.values_num; i++)
+			history_size += zbx_variant_size(&history_cache->history->step_history.values[i].value);
+	}
+	pthread_mutex_unlock(&history_cache->lock);
+
+	return history_size;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: free unique values from output history not present in input       *
+ *                                                                            *
+ * Parameters: history_in  - [IN] input preprocessing history                 *
+ *             history_out - [IN/OUT] output preprocessing history to clean   *
+ *                                                                            *
+ * Comments: This function compares the input and output histories. It clears *
+ *           values from the output history that are not present or different *
+ *           in the input history. After clearing values, it destroys the     *
+ *           output history structure and frees its memory.                   *
+ *                                                                            *
+ ******************************************************************************/
+void	zbx_pp_history_free_unique(const zbx_pp_history_t *history_in, zbx_pp_history_t *history_out)
+{
+	for (int i = 0; i < history_out->step_history.values_num; i++)
+	{
+		zbx_pp_step_history_t	*out = &history_out->step_history.values[i];
+		const zbx_variant_t	*value_in;
+		zbx_timespec_t		ts_in;
+
+		zbx_pp_history_get(history_in, out->index, &value_in, &ts_in);
+
+		if (NULL == value_in || SUCCEED != zbx_variant_same(&out->value, value_in))
+			zbx_variant_clear(&out->value);
+	}
+
+	zbx_vector_pp_step_history_destroy(&history_out->step_history);
+	zbx_free(history_out);
 }

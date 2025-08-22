@@ -1540,7 +1540,10 @@ ZBX_THREAD_ENTRY(zbx_trapper_thread, args)
 	}
 #ifdef HAVE_NETSNMP
 out:
+	zbx_ipc_async_socket_close(&rtc);
 #endif
+	zbx_db_close();
+
 	zbx_setproctitle("%s #%d [terminated]", get_process_type_string(process_type), process_num);
 
 	while (1)

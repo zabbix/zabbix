@@ -1683,7 +1683,7 @@ ZBX_THREAD_ENTRY(zbx_discoverer_thread, args)
 
 	while (ZBX_IS_RUNNING())
 	{
-		int		processing_rules_num, more_results, is_drules_rev_updated;
+		int		shutdown = 0, processing_rules_num, more_results, is_drules_rev_updated;
 		zbx_uint64_t	unsaved_checks;
 
 		sec = zbx_time();
@@ -1838,7 +1838,8 @@ ZBX_THREAD_ENTRY(zbx_discoverer_thread, args)
 #endif
 				case ZBX_RTC_SHUTDOWN:
 					zabbix_log(LOG_LEVEL_DEBUG, "shutdown message received, terminating...");
-					goto out;
+					shutdown = 1;
+					break;
 			}
 
 			zbx_ipc_message_free(message);
@@ -1847,9 +1848,12 @@ ZBX_THREAD_ENTRY(zbx_discoverer_thread, args)
 		if (NULL != client)
 			zbx_ipc_client_release(client);
 
+		if (1 == shutdown)
+			break;
+
 		zbx_timekeeper_collect(dmanager.timekeeper);
 	}
-out:
+
 	zbx_setproctitle("%s #%d [terminating]", get_process_type_string(info->process_type), info->process_num);
 
 	zbx_vector_uint64_pair_destroy(&revisions);
@@ -1860,6 +1864,9 @@ out:
 	zbx_hashset_destroy(&incomplete_druleids);
 	discoverer_manager_free(&dmanager);
 	zbx_ipc_service_close(&ipc_service);
+	zbx_db_close();
+
+	zbx_setproctitle("%s #%d [terminated]", get_process_type_string(info->process_type), info->process_num);
 
 	exit(EXIT_SUCCESS);
 }

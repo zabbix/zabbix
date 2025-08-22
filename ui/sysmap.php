@@ -374,6 +374,9 @@ $selements_resolved = CMacrosResolverHelper::resolveMacrosInMapElements($data['s
 // Set extended and restore original labels.
 foreach ($data['sysmap']['selements'] as $selementid => &$selement) {
 	$selement['expanded'] = $selements_resolved[$selementid]['label'];
+
+	CArrayHelper::sort($selement['urls'], ['name']);
+	$selement['urls'] = array_values($selement['urls']);
 }
 unset($selement);
 

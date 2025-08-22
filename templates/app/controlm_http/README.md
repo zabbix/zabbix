@@ -8,7 +8,7 @@ The template to monitor Control-M by Zabbix that work without any external scrip
 
 ## Requirements
 
-Zabbix version: 7.4 and higher.
+Zabbix version: 8.0 and higher.
 
 ## Tested versions
 
@@ -17,7 +17,7 @@ This template has been tested on:
 
 ## Configuration
 
-> Zabbix should be configured according to the instructions in the [Templates out of the box](https://www.zabbix.com/documentation/7.4/manual/config/templates_out_of_the_box) section.
+> Zabbix should be configured according to the instructions in the [Templates out of the box](https://www.zabbix.com/documentation/8.0/manual/config/templates_out_of_the_box) section.
 
 ## Setup
 
@@ -45,8 +45,8 @@ For example, `https://monitored.controlm.instance:8443/automation-api`.
 
 |Name|Description|Default|
 |----|-----------|-------|
-|{$API.URI.ENDPOINT}|<p>The API endpoint is a URI - for example, `https://monitored.controlm.instance:8443/automation-api`.</p>|`<set the api uri endpoint here>`|
-|{$API.TOKEN}|<p>A token to use for API connections.</p>|`<set the token here>`|
+|{$API.URI.ENDPOINT}|<p>The API endpoint is a URI - for example, `https://monitored.controlm.instance:8443/automation-api`.</p>||
+|{$API.TOKEN}|<p>A token to use for API connections.</p>||
 
 ### Items
 
@@ -102,7 +102,7 @@ To use this template, macros {$API.TOKEN}, {$API.URI.ENDPOINT}, and {$SERVER.NAM
 
 ## Requirements
 
-Zabbix version: 7.4 and higher.
+Zabbix version: 8.0 and higher.
 
 ## Tested versions
 
@@ -111,7 +111,7 @@ This template has been tested on:
 
 ## Configuration
 
-> Zabbix should be configured according to the instructions in the [Templates out of the box](https://www.zabbix.com/documentation/7.4/manual/config/templates_out_of_the_box) section.
+> Zabbix should be configured according to the instructions in the [Templates out of the box](https://www.zabbix.com/documentation/8.0/manual/config/templates_out_of_the_box) section.
 
 ## Setup
 
@@ -141,9 +141,9 @@ For example, `https://monitored.controlm.instance:8443/automation-api`.
 
 |Name|Description|Default|
 |----|-----------|-------|
-|{$SERVER.NAME}|<p>The name of the Control-M server.</p>|`<set the server name here>`|
-|{$API.URI.ENDPOINT}|<p>The API endpoint is a URI - for example, `https://monitored.controlm.instance:8443/automation-api`.</p>|`<set the api uri endpoint here>`|
-|{$API.TOKEN}|<p>A token to use for API connections.</p>|`<set the token here>`|
+|{$SERVER.NAME}|<p>The name of the Control-M server.</p>||
+|{$API.URI.ENDPOINT}|<p>The API endpoint is a URI - for example, `https://monitored.controlm.instance:8443/automation-api`.</p>||
+|{$API.TOKEN}|<p>A token to use for API connections.</p>||
 
 ### Items
 

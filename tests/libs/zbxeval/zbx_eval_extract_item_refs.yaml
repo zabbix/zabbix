@@ -15,3 +15,15 @@ in:
 out:
   refs:
   - "/host/key"
+---
+test case: 'test with variant set'
+in:
+  variant_text: "text"
+  rules: [ZBX_EVAL_PARSE_ITEM_QUERY,ZBX_EVAL_PARSE_FUNCTION,ZBX_EVAL_PARSE_GROUP,ZBX_EVAL_PARSE_MATH,ZBX_EVAL_PARSE_VAR]
+  expression: 'last(/host/key,#1:now-1h) + last(/host/key,#1:now-2h) + last(/host/key,#1:now-3h)'
+out:
+  refs:
+  - "text"
+  - "text"
+  - "text"
+...

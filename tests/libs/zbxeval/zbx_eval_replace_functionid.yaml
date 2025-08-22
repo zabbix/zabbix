@@ -25,3 +25,14 @@ in:
   newid: 5
 out:
   result: FAIL
+---
+test case: test with variant ui64
+in:
+  rules: [ZBX_EVAL_PARSE_FUNCTIONID,ZBX_EVAL_PARSE_MATH,ZBX_EVAL_PARSE_ITEM_QUERY,ZBX_EVAL_PARSE_FUNCTION,ZBX_EVAL_PARSE_GROUP,ZBX_EVAL_PARSE_VAR]
+  expression: "{1}+{1}+{1}+last(/host/key,#1:now-1h)"
+  variant: "ZBX_VARIAN_STR"
+  oldid: 1
+  newid: 123
+out:
+  result: FAIL
+...

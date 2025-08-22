@@ -413,10 +413,8 @@ ZBX_THREAD_ENTRY(zbx_availability_manager_thread, args)
 
 	zbx_ipc_service_t		service;
 	char				*error = NULL;
-	zbx_ipc_client_t		*client;
-	zbx_ipc_message_t		*message;
 	int				ret, processed_num = 0;
-	double				time_stat, time_idle = 0, time_now, time_flush, sec, last_proxy_flush;
+	double				time_stat, time_idle = 0, time_flush, sec, last_proxy_flush;
 	zbx_vector_availability_ptr_t	interface_availabilities;
 	zbx_timespec_t			timeout = {AVAILABILITY_MANAGER_DELAY, 0};
 	zbx_avail_active_hb_cache_t	active_hb_cache;
@@ -460,7 +458,10 @@ ZBX_THREAD_ENTRY(zbx_availability_manager_thread, args)
 
 	while (ZBX_IS_RUNNING())
 	{
-		time_now = zbx_time();
+		int			shutdown = 0;
+		zbx_ipc_message_t	*message = NULL;
+		double			time_now = zbx_time();
+		zbx_ipc_client_t	*client = NULL;
 
 		if (STAT_INTERVAL < time_now - time_stat)
 		{
@@ -513,7 +514,8 @@ ZBX_THREAD_ENTRY(zbx_availability_manager_thread, args)
 					break;
 				case ZBX_RTC_SHUTDOWN:
 					zabbix_log(LOG_LEVEL_DEBUG, "shutdown message received, terminating...");
-					goto out;
+					shutdown = 1;
+					break;
 				default:
 					THIS_SHOULD_NEVER_HAPPEN;
 			}
@@ -523,6 +525,9 @@ ZBX_THREAD_ENTRY(zbx_availability_manager_thread, args)
 
 		if (NULL != client)
 			zbx_ipc_client_release(client);
+
+		if (1 == shutdown)
+			break;
 
 		if (AVAILABILITY_MANAGER_ACTIVE_HEARTBEAT_DELAY_SEC < time_now - active_hb_cache.last_status_refresh)
 		{
@@ -570,15 +575,18 @@ ZBX_THREAD_ENTRY(zbx_availability_manager_thread, args)
 			last_proxy_flush = time_now;
 		}
 	}
-out:
+
 	zbx_block_signals(&orig_mask);
 	if (0 != interface_availabilities.values_num)
 	{
 		zbx_vector_availability_ptr_sort(&interface_availabilities, interface_availability_compare);
 		zbx_db_update_interface_availabilities(&interface_availabilities);
 	}
+	zbx_ipc_service_close(&service);
 	zbx_db_close();
 	zbx_unblock_signals(&orig_mask);
+
+	zbx_setproctitle("%s #%d [terminated]", get_process_type_string(process_type), process_num);
 
 	exit(EXIT_SUCCESS);
 #undef STAT_INTERVAL

@@ -2747,7 +2747,7 @@ class CConfigurationImport {
 	}
 
 	/**
-	 * Deletes discovery rules and rule prototypes from DB that are missing in import file.
+	 * Deletes discovery rules from DB that are missing in import file.
 	 */
 	protected function deleteMissingDiscoveryRules(): void {
 		if (!$this->options['discoveryRules']['deleteMissing']) {
@@ -2773,7 +2773,7 @@ class CConfigurationImport {
 			}
 
 			foreach ($discovery_rules as $discovery_rule) {
-				if (!array_key_exists('parent_discovery_rule', $discovery_rule)) {
+				if (array_key_exists('parent_discovery_rule', $discovery_rule)) {
 					continue;
 				}
 

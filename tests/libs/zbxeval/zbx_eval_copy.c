@@ -40,6 +40,14 @@ void	zbx_mock_test_entry(void **state)
 	else
 		mock_dump_stack(&ctx);
 
+	if (SUCCEED == zbx_mock_parameter_exists("in.variant"))
+	{
+		for (int i = 0; i < ctx.stack.values_num; i++)			{
+				zbx_variant_set_str(&ctx.stack.values[i].value, zbx_strdup(NULL,
+						zbx_mock_get_parameter_string("in.variant")));
+		}
+	}
+
 	zbx_eval_copy(&dst, &ctx, expression);
 
 	zbx_mock_assert_int_eq("return value:", SUCCEED, compare_ctx(&ctx, &dst));

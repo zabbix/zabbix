@@ -47,9 +47,11 @@ The plugin provides specific items for monitoring disk health.
 
 ### `smart.disk.discovery`
 - **Description:** Performs low-level discovery of all SMART-capable disks on the system.
-- **Key:** `smart.disk.discovery`
+- **Key:** `smart.disk.discovery["<type>"]`
+  - `<type>`: By what to scan for the drives (default: `name`).
+    -  accepted values: `name`, `id`
 - **Output:** Returns a JSON array containing details for each discovered disk, including:
-  - `{#NAME}`: Disk name.
+  - `{#NAME}`: Disk name or smart ID.
   - `{#DISKTYPE}`: Disk type (e.g., `nvme`, `ata`).
   - `{#MODEL}`: Disk model.
   - `{#SN}`: Serial number.

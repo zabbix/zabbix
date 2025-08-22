@@ -1626,7 +1626,7 @@ abstract class CDiscoveryRuleGeneral extends CItemGeneral {
 		unset($item);
 
 		if ($del_overrideids) {
-			self::deleteOverrides($del_overrideids);
+			DB::delete('lld_override', ['lld_overrideid' => $del_overrideids]);
 		}
 
 		if ($upd_overrides) {
@@ -1711,24 +1711,6 @@ abstract class CDiscoveryRuleGeneral extends CItemGeneral {
 	}
 
 	/**
-	 * @param array $del_overrideids
-	 */
-	protected static function deleteOverrides(array $del_overrideids): void {
-		DB::delete('lld_override_condition', ['lld_overrideid' => $del_overrideids]);
-
-		$options = [
-			'output' => ['lld_override_operationid'],
-			'filter' => ['lld_overrideid' => $del_overrideids]
-		];
-		$del_operationids =
-			DBfetchColumn(DBselect(DB::makeSql('lld_override_operation', $options)), 'lld_override_operationid');
-
-		self::deleteOverrideOperations($del_operationids);
-
-		DB::delete('lld_override', ['lld_overrideid' => $del_overrideids]);
-	}
-
-	/**
 	 * @param array      $overrides
 	 * @param array|null $db_overrides
 	 * @param array|null $upd_overrideids
@@ -1783,7 +1765,7 @@ abstract class CDiscoveryRuleGeneral extends CItemGeneral {
 		unset($override);
 
 		if ($del_operationids) {
-			self::deleteOverrideOperations($del_operationids);
+			DB::delete('lld_override_operation', ['lld_override_operationid' => $del_operationids]);
 		}
 
 		if ($ins_operations) {
@@ -1911,17 +1893,6 @@ abstract class CDiscoveryRuleGeneral extends CItemGeneral {
 		$operation['lld_override_operationid'] = $db_operation['lld_override_operationid'];
 
 		return true;
-	}
-
-	/**
-	 * @param array $del_operationids
-	 */
-	protected static function deleteOverrideOperations(array $del_operationids): void {
-		foreach (self::OPERATION_FIELDS as $optable => $foo) {
-			DB::delete($optable, ['lld_override_operationid' => $del_operationids]);
-		}
-
-		DB::delete('lld_override_operation', ['lld_override_operationid' => $del_operationids]);
 	}
 
 	/**
@@ -2084,22 +2055,6 @@ abstract class CDiscoveryRuleGeneral extends CItemGeneral {
 
 		if ($db_host_prototypes) {
 			CHostPrototype::deleteForce($db_host_prototypes);
-		}
-	}
-
-	/**
-	 * Delete overrides which belong to the given LLD rules.
-	 *
-	 * @param array $del_itemids
-	 */
-	protected static function deleteAffectedOverrides(array $del_itemids): void {
-		$del_overrideids = array_keys(DB::select('lld_override', [
-			'filter' => ['itemid' => $del_itemids],
-			'preservekeys' => true
-		]));
-
-		if ($del_overrideids) {
-			self::deleteOverrides($del_overrideids);
 		}
 	}
 }

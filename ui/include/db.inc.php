@@ -483,23 +483,23 @@ function check_db_fields($dbFields, &$args) {
  *
  * @param string $field_name
  * @param array  $values
- * @param bool   $not_in        Create inverse condition.
- * @param bool   $zero_to_null  Cast zero to null.
+ * @param bool   $not_in              Create inverse condition.
+ * @param bool   $zero_includes_null  ID fields may have default DB column value either null or 0. Consider them
+ *                                    equivalent for 0 in the given values.
  *
  * @return string
  */
-function dbConditionInt($field_name, array $values, $not_in = false, $zero_to_null = false) {
+function dbConditionInt($field_name, array $values, $not_in = false, $zero_includes_null = false) {
 	if (is_bool(reset($values))) {
 		return $not_in ? '1=1' : '1=0';
 	}
 
 	$values = array_flip($values);
 
-	$has_zero = false;
+	$condition = '';
 
-	if ($zero_to_null && array_key_exists(0, $values)) {
-		$has_zero = true;
-		unset($values[0]);
+	if ($zero_includes_null && array_key_exists(0, $values)) {
+		$condition .= $field_name.($not_in ? ' IS NOT NULL' : ' IS NULL');
 	}
 
 	$values = array_keys($values);
@@ -510,14 +510,14 @@ function dbConditionInt($field_name, array $values, $not_in = false, $zero_to_nu
 		return dbQuoteInt($value);
 	}, $values);
 
-	$condition = '';
-
 	// Limit maximum number of values for using in "IN (<id1>,<id2>,...,<idN>)".
 	$single_chunks = array_chunk($singles, 950);
+	$multiple_conditions = false;
 
 	foreach ($single_chunks as $chunk) {
 		if ($condition !== '') {
 			$condition .= $not_in ? ' AND ' : ' OR ';
+			$multiple_conditions = true;
 		}
 
 		$condition .= count($chunk) == 1
@@ -525,18 +525,8 @@ function dbConditionInt($field_name, array $values, $not_in = false, $zero_to_nu
 			: $field_name.($not_in ? ' NOT' : '').' IN ('.implode(',', $chunk).')';
 	}
 
-	if ($has_zero) {
-		if ($condition !== '') {
-			$condition .= $not_in ? ' AND ' : ' OR ';
-		}
-
-		$condition .= $field_name.($not_in ? ' IS NOT NULL' : ' IS NULL');
-	}
-
-	if (!$not_in) {
-		if ((int) $has_zero + count($single_chunks) > 1) {
-			$condition = '('.$condition.')';
-		}
+	if (!$not_in && $multiple_conditions) {
+		$condition = '('.$condition.')';
 	}
 
 	return $condition;

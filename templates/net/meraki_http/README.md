@@ -7,7 +7,7 @@ This template is designed for the effortless deployment of Cisco Meraki dashboar
 
 ## Requirements
 
-Zabbix version: 7.4 and higher.
+Zabbix version: 8.0 and higher.
 
 ## Tested versions
 
@@ -16,7 +16,7 @@ This template has been tested on:
 
 ## Configuration
 
-> Zabbix should be configured according to the instructions in the [Templates out of the box](https://www.zabbix.com/documentation/7.4/manual/config/templates_out_of_the_box) section.
+> Zabbix should be configured according to the instructions in the [Templates out of the box](https://www.zabbix.com/documentation/8.0/manual/config/templates_out_of_the_box) section.
 
 ## Setup
 
@@ -42,7 +42,7 @@ Set filters with macros if you want to override default filter parameters.
 |{$MERAKI.DEVICE.NAME.NOT_MATCHES}|<p>This macro is used in devices discovery. Can be overridden on the host or linked template level.</p>|`CHANGE_IF_NEEDED`|
 |{$MERAKI.DEVICE.STATUS.MATCHES}|<p>This macro is used in devices discovery. Can be overridden on the host or linked template level.</p>|`.*`|
 |{$MERAKI.DEVICE.STATUS.NOT_MATCHES}|<p>This macro is used in devices discovery. Can be overridden on the host or linked template level.</p>|`CHANGE_IF_NEEDED`|
-|{$MERAKI.HTTP_PROXY}|<p>HTTP proxy for API requests. You can specify it using the format [protocol://][username[:password]@]proxy.example.com[:port]. See documentation at https://www.zabbix.com/documentation/7.4/manual/config/items/itemtypes/http</p>||
+|{$MERAKI.HTTP_PROXY}|<p>HTTP proxy for API requests. You can specify it using the format [protocol://][username[:password]@]proxy.example.com[:port]. See documentation at https://www.zabbix.com/documentation/8.0/manual/config/items/itemtypes/http</p>||
 
 ### Items
 
@@ -94,7 +94,7 @@ Set filters with macros if you want to override default filter parameters.
 |{$MERAKI.ADMIN.NAME.NOT_MATCHES}|<p>Filter to exclude discovered admins in organization.</p>|`CHANGE_IF_NEEDED`|
 |{$MERAKI.ADMIN.ORG.ACCESS.MATCHES}|<p>Filter of discoverable admins in organization.</p>|`.*`|
 |{$MERAKI.ADMIN.ORG.ACCESS.NOT_MATCHES}|<p>Filter to exclude discovered admins in organization.</p>|`CHANGE_IF_NEEDED`|
-|{$MERAKI.HTTP_PROXY}|<p>HTTP proxy for API requests. You can specify it using the format [protocol://][username[:password]@]proxy.example.com[:port]. See documentation at https://www.zabbix.com/documentation/7.4/manual/config/items/itemtypes/http</p>||
+|{$MERAKI.HTTP_PROXY}|<p>HTTP proxy for API requests. You can specify it using the format [protocol://][username[:password]@]proxy.example.com[:port]. See documentation at https://www.zabbix.com/documentation/8.0/manual/config/items/itemtypes/http</p>||
 |{$MERAKI.LLD.UPLINK.NETWORK.NAME.MATCHES}|<p>This macro is used in uplinks discovery. Can be overridden on the host or linked template level.</p>|`.*`|
 |{$MERAKI.LLD.UPLINK.NETWORK.NAME.NOT_MATCHES}|<p>This macro is used in uplinks discovery. Can be overridden on the host or linked template level.</p>|`CHANGE_IF_NEEDED`|
 |{$MERAKI.LLD.UPLINK.ROLE.MATCHES}|<p>This macro is used in uplinks discovery. Can be overridden on the host or linked template level.</p>|`.*`|
@@ -295,7 +295,7 @@ Set filters with macros if you want to override default filter parameters.
 |{$MERAKI.DEVICE.LATENCY}|<p>Devices uplink latency threshold, in seconds.</p>|`0.15`|
 |{$MERAKI.GET.STATUS.INTERVAL}|<p>Update interval for get status item.</p>|`300`|
 |{$MERAKI.DATA.TIMEOUT}|<p>Response timeout for an API.</p>|`60`|
-|{$MERAKI.HTTP_PROXY}|<p>HTTP proxy for API requests. You can specify it using the format [protocol://][username[:password]@]proxy.example.com[:port]. See documentation at https://www.zabbix.com/documentation/7.4/manual/config/items/itemtypes/http</p>||
+|{$MERAKI.HTTP_PROXY}|<p>HTTP proxy for API requests. You can specify it using the format [protocol://][username[:password]@]proxy.example.com[:port]. See documentation at https://www.zabbix.com/documentation/8.0/manual/config/items/itemtypes/http</p>||
 |{$MERAKI.UPLINK.LL.TIMESPAN}|<p>Timespan in seconds for getting device uplinks loss and quality stats. Used in the metric configuration and in the JavaScript API query. Must be between 1 and 86400 seconds.</p>|`180`|
 |{$MERAKI.DEVICE.UPLINK.MATCHES}|<p>This macro is used in loss and latency checks discovery. Can be overridden on the host or linked template level.</p>|`.*`|
 |{$MERAKI.DEVICE.UPLINK.NOT_MATCHES}|<p>This macro is used in loss and latency checks discovery. Can be overridden on the host or linked template level.</p>|`^null$`|
@@ -308,15 +308,27 @@ Set filters with macros if you want to override default filter parameters.
 |----|-----------|----|-----------------------|
 |Get device data|<p>Item for gathering device data from Meraki API.</p>|Script|meraki.get.device|
 |Device data item errors|<p>Item for gathering errors of the device item.</p>|Dependent item|meraki.get.device.errors<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.error`</p></li><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
+|Get inventory data|<p>Item for gathering device inventory data from Meraki API.</p>|Script|meraki.get.inventory|
+|Device inventory data item errors|<p>Item for gathering errors of the inventory data item.</p>|Dependent item|meraki.get.inventory.errors<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.error`</p></li><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
 |Get status|<p>Item for gathering device status from Meraki API.</p>|HTTP agent|meraki.device.get.status<p>**Preprocessing**</p><ul><li><p>JSON Path: `$[0]`</p></li></ul>|
-|status|<p>Device operational status</p><p>Network: {$NETWORK.ID} </p><p>MAC: {$MAC}</p>|Dependent item|meraki.device.status<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.status`</p></li><li><p>JavaScript: `The text is too long. Please see the template.`</p></li></ul>|
-|public IP|<p>Device public IP</p><p>Network: {$NETWORK.ID}</p><p>MAC: {$MAC}</p>|Dependent item|meraki.device.public.ip<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.publicIp`</p></li></ul>|
+|Status|<p>Device operational status</p><p>Network: {$NETWORK.ID}</p>|Dependent item|meraki.device.status<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.status`</p></li><li><p>JavaScript: `The text is too long. Please see the template.`</p></li></ul>|
+|Public IP|<p>Device public IP</p><p>Network: {$NETWORK.ID}</p>|Dependent item|meraki.device.public.ip<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.publicIp`</p></li></ul>|
+|MAC address|<p>Device MAC address</p><p>Network: {$NETWORK.ID}</p>|Dependent item|meraki.device.mac.address<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.deviceInfo[0].mac`</p></li></ul>|
+|Firmware|<p>Device firmware</p><p>Network: {$NETWORK.ID}</p>|Dependent item|meraki.device.firmware<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.deviceInfo[0].firmware`</p></li></ul>|
+|Serial number|<p>Device serial number</p><p>Network: {$NETWORK.ID}</p>|Dependent item|meraki.device.serialnumber<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.deviceInfo[0].serial`</p></li></ul>|
+|Device address|<p>Device location address</p><p>Network: {$NETWORK.ID}</p>|Dependent item|meraki.device.address<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.deviceInfo[0].address`</p></li></ul>|
+|Device latitude|<p>Latitude of the device location</p><p>Network: {$NETWORK.ID}</p>|Dependent item|meraki.device.latitude<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.deviceInfo[0].lat`</p></li></ul>|
+|Device longitude|<p>Longitude of the device location</p><p>Network: {$NETWORK.ID}</p>|Dependent item|meraki.device.longitude<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.deviceInfo[0].lng`</p></li></ul>|
+|Device model|<p>Device model</p><p>Network: {$NETWORK.ID}</p>|Dependent item|meraki.device.model<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.deviceInfo[0].model`</p></li></ul>|
+|Device OS|<p>Device operation system</p><p>Network: {$NETWORK.ID}</p>|Dependent item|meraki.device.os<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.deviceInfo[0].details[0].value`</p><p>⛔️Custom on fail: Discard value</p></li></ul>|
+|Device notes|<p>Notes about the device</p><p>Network: {$NETWORK.ID}</p>|Dependent item|meraki.device.notes<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.deviceInfo[0].notes`</p><p>⛔️Custom on fail: Discard value</p></li></ul>|
 
 ### Triggers
 
 |Name|Description|Expression|Severity|Dependencies and additional info|
 |----|-----------|----------|--------|--------------------------------|
 |Meraki: There are errors in 'Get device data' metric||`length(last(/Cisco Meraki device by HTTP/meraki.get.device.errors))>0`|Warning||
+|Meraki: There are errors in 'Get inventory data' metric||`length(last(/Cisco Meraki device by HTTP/meraki.get.inventory.errors))>0`|Warning||
 |Meraki: Status is not online||`last(/Cisco Meraki device by HTTP/meraki.device.status)<>1`|Warning||
 
 ### LLD rule Uplinks loss and quality discovery

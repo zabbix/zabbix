@@ -221,13 +221,9 @@ window.graph_edit_popup = new class {
 
 	#initPreviewTab() {
 		$('#tabs').on('tabscreate tabsactivate', (event, ui) => {
-			document.querySelector('#preview-tab').style.overflow = document.getElementById('width').value > 900
-				? 'auto'
-				: ''
-
 			const $panel = (event.type === 'tabscreate') ? ui.panel : ui.newPanel;
 
-			if ($panel.attr('id') === 'preview-tab') {
+			if ($panel.attr('id') === 'graph-preview-tab') {
 				const $preview_chart = $('#preview-chart');
 				const src = new Curl('chart3.php');
 

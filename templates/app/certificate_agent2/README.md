@@ -8,7 +8,7 @@ Zabbix agent 2 requests the certificate via the `web.certificate.get` key throug
 
 ## Requirements
 
-Zabbix version: 7.4 and higher.
+Zabbix version: 8.0 and higher.
 
 ## Tested versions
 
@@ -17,7 +17,7 @@ This template has been tested on:
 
 ## Configuration
 
-> Zabbix should be configured according to the instructions in the [Templates out of the box](https://www.zabbix.com/documentation/7.4/manual/config/templates_out_of_the_box) section.
+> Zabbix should be configured according to the instructions in the [Templates out of the box](https://www.zabbix.com/documentation/8.0/manual/config/templates_out_of_the_box) section.
 
 ## Setup
 
@@ -44,14 +44,14 @@ As shown in the example above, the following websites will be discovered:
 - Website the with host name `hostname_03` - the host name itself will be used for connection (because the address is not set and treated as an empty string); the port is `port_03`.
 
 For additional details, please refer to official documentation about the Zabbix agent 2 `web.certificate.get` key:
-https://www.zabbix.com/documentation/7.4/manual/config/items/itemtypes/zabbix_agent/zabbix_agent2#web.certificate.get
+https://www.zabbix.com/documentation/8.0/manual/config/items/itemtypes/zabbix_agent/zabbix_agent2#web.certificate.get
 
 ### Macros used
 
 |Name|Description|Default|
 |----|-----------|-------|
 |{$CERT.EXPIRY.WARN}|<p>Number of days until the certificate expires.</p>|`7`|
-|{$CERT.WEBSITE.HOSTNAME}|<p>The website's DNS name used for the connection.</p>|`<Enter DNS name>`|
+|{$CERT.WEBSITE.HOSTNAME}|<p>The website's DNS name used for the connection.</p>||
 |{$CERT.WEBSITE.PORT}|<p>The TLS/SSL port number of the website.</p>|`443`|
 |{$CERT.WEBSITE.IP}|<p>The website's IP address used for the connection.</p>||
 |{$CERT.PARAMS.CHECK}|<p>The type of verification of input parameters.</p><p>`STRICT` (default) - when an error occurs, the check stops.</p><p>Any other value - erroneous records are ignored.</p>|`STRICT`|
