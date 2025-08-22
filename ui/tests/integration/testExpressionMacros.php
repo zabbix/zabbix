@@ -1444,7 +1444,7 @@ const SUBJECT_INTERNAL = "Internal";
 			'eventobject' => EVENT_OBJECT_ITEM,
 			'eventsource' => EVENT_SOURCE_INTERNAL
 		], 4, 2);
-		$this->assertCount(2, $alert_response_internal['result'], json_encode(alert_response_internal));
+		$this->assertCount(2, $alert_response_internal['result'], json_encode($alert_response_internal));
 
 		// Test inconsistent macro resolution.
 
