@@ -76,6 +76,9 @@ static int	DBpatch_7050007(void)
 			"web.templates.host_prototypes.php.sortorder", "web.templates.host.prototype.list.sortorder"
 		};
 
+	if (0 == (DBget_program_type() & ZBX_PROGRAM_TYPE_SERVER))
+		return SUCCEED;
+
 	for (i = 0; i < (int)ARRSIZE(values); i += 2)
 	{
 		if (ZBX_DB_OK > zbx_db_execute("update profiles set idx='%s' where idx='%s'", values[i + 1], values[i]))
