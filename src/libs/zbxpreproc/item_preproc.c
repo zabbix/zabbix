@@ -1275,10 +1275,10 @@ int	item_preproc_script(zbx_es_t *es, zbx_variant_t *value, const char *params, 
 	{
 		if (SUCCEED != zbx_es_init_env(es, config_source_ip, errmsg))
 			return FAIL;
-	}
 
-	if (SUCCEED != zbx_es_globals_make_readonly(es, errmsg))
-		return FAIL;
+		if (SUCCEED != zbx_es_globals_make_readonly(es, errmsg))
+			return FAIL;
+	}
 
 	if (ZBX_VARIANT_BIN != bytecode_in->type)
 	{
