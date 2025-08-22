@@ -276,7 +276,7 @@ void	zbx_autoreg_flush_hosts_server(zbx_vector_autoreg_host_ptr_t *autoreg_hosts
 			zbx_db_insert_add_values(&db_insert, autoreg_host->autoreg_hostid, proxyid,
 					autoreg_host->host, autoreg_host->ip, autoreg_host->dns,
 					(int)autoreg_host->port, (int)autoreg_host->connection_type,
-					autoreg_host->host_metadata, autoreg_host->flag);
+					autoreg_host->host_metadata, (int)autoreg_host->flag);
 		}
 		else
 		{
