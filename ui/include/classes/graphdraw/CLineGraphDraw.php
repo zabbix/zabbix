@@ -1645,7 +1645,8 @@ class CLineGraphDraw extends CGraphDraw {
 		return true;
 	}
 
-	protected function drawElement(&$data, $from, $to, $drawtype, $max_color, $avg_color, $min_color, $minmax_color, $calc_fnc, $yaxisside) {
+	protected function drawElement(&$data, $from, $to, $drawtype, $max_color, $avg_color, $min_color, $minmax_color,
+			$calc_fnc, $yaxisside, bool $share_edges) {
 		if (!isset($data['max'][$from]) || !isset($data['max'][$to])) {
 			return;
 		}
@@ -1742,9 +1743,9 @@ class CLineGraphDraw extends CGraphDraw {
 				$a[1] = $y1max;
 				$a[2] = $x1;
 				$a[3] = $y1min;
-				$a[4] = $x2;
+				$a[4] = $share_edges ? $x2 + 1 : $x2;
 				$a[5] = $y2min;
-				$a[6] = $x2;
+				$a[6] = $share_edges ? $x2 + 1 : $x2;
 				$a[7] = $y2max;
 
 			// don't use break, avg must be drawn in this statement
@@ -1822,9 +1823,9 @@ class CLineGraphDraw extends CGraphDraw {
 					$a[1] = $y1;
 					$a[2] = $x1;
 					$a[3] = $y1_shift;
-					$a[4] = $x2;
+					$a[4] = $share_edges ? $x2 + 1 : $x2;
 					$a[5] = $y2_shift;
-					$a[6] = $x2;
+					$a[6] = $share_edges ? $x2 + 1 : $x2;
 					$a[7] = $y2;
 
 					if (PHP_VERSION_ID >= 80100) {
@@ -2152,7 +2153,7 @@ class CLineGraphDraw extends CGraphDraw {
 			$calc_fnc = $this->items[$item]['calc_fnc'];
 
 			$prev_draw = true;
-			$prev_full_width = false;
+			$prev_share_edges = false;
 
 			for ($i = 1, $j = 0; $i <= $this->sizeX; $i++) { // new point
 				if ($data['count'][$i] == 0 && $i != $this->sizeX) {
@@ -2198,18 +2199,19 @@ class CLineGraphDraw extends CGraphDraw {
 					$this->drawElement(
 						$data,
 						$i,
-						$prev_full_width ? $j + 1 : $j,
+						$j,
 						$value_draw_type,
 						$max_color,
 						$avg_color,
 						$min_color,
 						$minmax_color,
 						$calc_fnc,
-						$this->items[$item]['yaxisside']
+						$this->items[$item]['yaxisside'],
+						$prev_share_edges
 					);
 				}
 
-				$prev_full_width = $draw
+				$prev_share_edges = $draw
 					&& $value_draw_type != GRAPH_ITEM_DRAWTYPE_DOT
 					&& $value_draw_type != GRAPH_ITEM_DRAWTYPE_BOLD_DOT;
 
