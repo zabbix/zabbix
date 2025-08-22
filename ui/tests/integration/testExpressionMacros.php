@@ -421,76 +421,76 @@ class testExpressionMacros extends CIntegrationTest {
 		"ACTION.NAME.urlencode() -> action_name_%20%21%22%23%24%25%26%27%28%29%2A%2B%2C-.%2F0123456789%3A%3B%3C%3D%3E%3F%40ABCDEFGHIJKLMNOPQRSTUVWXYZ%5B%5C%5D%5E_%60abcdefghijklmnopqrstuvwxyz%7B%7C%7D~ <-";
 
 	const INVENTORY_RESOLVED =
-		"INVENTORY.ALIAS -> "			. REDUCTED_PRINTABLE_ASCII	. " <-\n" .
-		"INVENTORY.ASSET.TAG -> "		. REDUCTED_PRINTABLE_ASCII	. " <-\n" .
-		"INVENTORY.CHASSIS -> "			. REDUCTED_PRINTABLE_ASCII	. " <-\n" .
-		"INVENTORY.CONTACT-> "			. REDUCTED_PRINTABLE_ASCII	. " <-\n" .
-		"INVENTORY.CONTRACT.NUMBER -> "		. REDUCTED_PRINTABLE_ASCII	. " <-\n" .
-		"INVENTORY.DEPLOYMENT.STATUS -> "	. REDUCTED_PRINTABLE_ASCII	. " <-\n" .
-		"INVENTORY.HARDWARE -> "		. REDUCTED_PRINTABLE_ASCII	. " <-\n" .
-		"INVENTORY.HARDWARE.FULL -> "		. REDUCTED_PRINTABLE_ASCII	. " <-\n" .
-		"INVENTORY.HOST.NETMASK -> "		. self::INVENTORY_HOST_NETMASK	. " <-\n" .
-		"INVENTORY.HOST.NETWORKS -> "		. REDUCTED_PRINTABLE_ASCII	. " <-\n" .
-		"INVENTORY.HOST.ROUTER -> "		. self::INVENTORY_HOST_ROUTER	. " <-\n" .
-		"INVENTORY.HW.ARCH -> "			. self::INVENTORY_HW_ARCH	. " <-\n" .
-		"INVENTORY.HW.DATE.DECOMM -> "		. REDUCTED_PRINTABLE_ASCII	. " <-\n" .
-		"INVENTORY.HW.DATE.EXPIRY -> "		. REDUCTED_PRINTABLE_ASCII	. " <-\n" .
-		"INVENTORY.HW.DATE.INSTALL -> "		. REDUCTED_PRINTABLE_ASCII	. " <-\n" .
-		"INVENTORY.HW.DATE.PURCHASE-> "		. REDUCTED_PRINTABLE_ASCII	. " <-\n" .
-		"INVENTORY.INSTALLER.NAME -> "		. REDUCTED_PRINTABLE_ASCII	. " <-\n" .
-		"INVENTORY.LOCATION -> "		. REDUCTED_PRINTABLE_ASCII	. " <-\n" .
-		"INVENTORY.LOCATION.LAT -> "		. self::INVENTORY_LOCATION_LAT	. " <-\n" .
-		"INVENTORY.LOCATION.LON -> "		. self::INVENTORY_LOCATION_LON	. " <-\n" .
-		"INVENTORY.MACADDRESS.A -> "		. REDUCTED_PRINTABLE_ASCII	. " <-\n" .
-		"INVENTORY.MACADDRESS.B -> "		. REDUCTED_PRINTABLE_ASCII	. " <-\n" .
-		"INVENTORY.MODEL -> "			. REDUCTED_PRINTABLE_ASCII	. " <-\n" .
-		"INVENTORY.NAME -> "			. REDUCTED_PRINTABLE_ASCII	. " <-\n" .
-		"INVENTORY.NOTES -> "			. REDUCTED_PRINTABLE_ASCII	. " <-\n" .
-		"INVENTORY.OOB.IP -> "			. self::INVENTORY_OOB_IP	. " <-\n" .
-		"INVENTORY.OOB.NETMASK -> "		. self::INVENTORY_OOB_NETMASK	. " <-\n" .
-		"INVENTORY.OOB.ROUTER -> "		. self::INVENTORY_OOB_ROUTER	. " <-\n" .
-		"INVENTORY.OS -> "			. REDUCTED_PRINTABLE_ASCII	. " <-\n" .
-		"INVENTORY.OS.FULL -> "			. REDUCTED_PRINTABLE_ASCII	. " <-\n" .
-		"INVENTORY.OS.SHORT -> "		. REDUCTED_PRINTABLE_ASCII	. " <-\n" .
-		"INVENTORY.POC.PRIMARY.CELL -> "	. REDUCTED_PRINTABLE_ASCII	. " <-\n" .
-		"INVENTORY.POC.PRIMARY.EMAIL -> "	. REDUCTED_PRINTABLE_ASCII	. " <-\n" .
-		"INVENTORY.POC.PRIMARY.NAME -> "	. REDUCTED_PRINTABLE_ASCII	. " <-\n" .
-		"INVENTORY.POC.PRIMARY.NOTES -> "	. REDUCTED_PRINTABLE_ASCII	. " <-\n" .
-		"INVENTORY.POC.PRIMARY.PHONE.A -> "	. REDUCTED_PRINTABLE_ASCII	. " <-\n" .
-		"INVENTORY.POC.PRIMARY.PHONE.B -> "	. REDUCTED_PRINTABLE_ASCII	. " <-\n" .
-		"INVENTORY.POC.PRIMARY.SCREEN -> "	. REDUCTED_PRINTABLE_ASCII	. " <-\n" .
-		"INVENTORY.POC.SECONDARY.CELL -> "	. REDUCTED_PRINTABLE_ASCII	. " <-\n" .
-		"INVENTORY.POC.SECONDARY.EMAIL -> "	. REDUCTED_PRINTABLE_ASCII	. " <-\n" .
-		"INVENTORY.POC.SECONDARY.NAME -> "	. REDUCTED_PRINTABLE_ASCII	. " <-\n" .
-		"INVENTORY.POC.SECONDARY.NOTES -> "	. REDUCTED_PRINTABLE_ASCII	. " <-\n" .
-		"INVENTORY.POC.SECONDARY.PHONE.A -> "	. REDUCTED_PRINTABLE_ASCII	. " <-\n" .
-		"INVENTORY.POC.SECONDARY.PHONE.B -> "	. REDUCTED_PRINTABLE_ASCII	. " <-\n" .
-		"INVENTORY.POC.SECONDARY.SCREEN -> "	. REDUCTED_PRINTABLE_ASCII	. " <-\n" .
-		"INVENTORY.SERIALNO.A -> "		. REDUCTED_PRINTABLE_ASCII	. " <-\n" .
-		"INVENTORY.SERIALNO.B -> "		. REDUCTED_PRINTABLE_ASCII	. " <-\n" .
-		"INVENTORY.SITE.ADDRESS.A -> "		. REDUCTED_PRINTABLE_ASCII	. " <-\n" .
-		"INVENTORY.SITE.ADDRESS.B -> "		. REDUCTED_PRINTABLE_ASCII	. " <-\n" .
-		"INVENTORY.SITE.ADDRESS.C -> "		. REDUCTED_PRINTABLE_ASCII	. " <-\n" .
-		"INVENTORY.SITE.CITY -> "		. REDUCTED_PRINTABLE_ASCII	. " <-\n" .
-		"INVENTORY.SITE.COUNTRY -> "		. REDUCTED_PRINTABLE_ASCII	. " <-\n" .
-		"INVENTORY.SITE.NOTES -> "		. REDUCTED_PRINTABLE_ASCII	. " <-\n" .
-		"INVENTORY.SITE.RACK -> "		. REDUCTED_PRINTABLE_ASCII	. " <-\n" .
-		"INVENTORY.SITE.STATE -> "		. REDUCTED_PRINTABLE_ASCII	. " <-\n" .
-		"INVENTORY.SITE.ZIP -> "		. REDUCTED_PRINTABLE_ASCII	. " <-\n" .
-		"INVENTORY.SOFTWARE -> "		. REDUCTED_PRINTABLE_ASCII	. " <-\n" .
-		"INVENTORY.SOFTWARE.APP.A -> "		. REDUCTED_PRINTABLE_ASCII	. " <-\n" .
-		"INVENTORY.SOFTWARE.APP.B -> "		. REDUCTED_PRINTABLE_ASCII	. " <-\n" .
-		"INVENTORY.SOFTWARE.APP.C -> "		. REDUCTED_PRINTABLE_ASCII	. " <-\n" .
-		"INVENTORY.SOFTWARE.APP.D -> "		. REDUCTED_PRINTABLE_ASCII	. " <-\n" .
-		"INVENTORY.SOFTWARE.APP.E -> "		. REDUCTED_PRINTABLE_ASCII	. " <-\n" .
-		"INVENTORY.SOFTWARE.FULL -> "		. REDUCTED_PRINTABLE_ASCII	. " <-\n" .
-		"INVENTORY.TAG -> "			. REDUCTED_PRINTABLE_ASCII	. " <-\n" .
-		"INVENTORY.TYPE -> "			. REDUCTED_PRINTABLE_ASCII	. " <-\n" .
-		"INVENTORY.TYPE.FULL -> "		. REDUCTED_PRINTABLE_ASCII	. " <-\n" .
-		"INVENTORY.URL.A -> "			. REDUCTED_PRINTABLE_ASCII	. " <-\n" .
-		"INVENTORY.URL.B -> "			. REDUCTED_PRINTABLE_ASCII	. " <-\n" .
-		"INVENTORY.URL.C} -> "			. REDUCTED_PRINTABLE_ASCII	. " <-\n" .
-		"INVENTORY.VENDOR -> "			. REDUCTED_PRINTABLE_ASCII	. " <-";
+		"INVENTORY.ALIAS -> "					. REDUCTED_PRINTABLE_ASCII		. " <-\n" .
+		"INVENTORY.ASSET.TAG -> "				. REDUCTED_PRINTABLE_ASCII		. " <-\n" .
+		"INVENTORY.CHASSIS -> "					. REDUCTED_PRINTABLE_ASCII		. " <-\n" .
+		"INVENTORY.CONTACT-> "					. REDUCTED_PRINTABLE_ASCII		. " <-\n" .
+		"INVENTORY.CONTRACT.NUMBER -> "			. REDUCTED_PRINTABLE_ASCII		. " <-\n" .
+		"INVENTORY.DEPLOYMENT.STATUS -> "		. REDUCTED_PRINTABLE_ASCII		. " <-\n" .
+		"INVENTORY.HARDWARE -> "				. REDUCTED_PRINTABLE_ASCII		. " <-\n" .
+		"INVENTORY.HARDWARE.FULL -> "			. REDUCTED_PRINTABLE_ASCII		. " <-\n" .
+		"INVENTORY.HOST.NETMASK -> "			. self::INVENTORY_HOST_NETMASK	. " <-\n" .
+		"INVENTORY.HOST.NETWORKS -> "			. REDUCTED_PRINTABLE_ASCII		. " <-\n" .
+		"INVENTORY.HOST.ROUTER -> "				. self::INVENTORY_HOST_ROUTER	. " <-\n" .
+		"INVENTORY.HW.ARCH -> "					. self::INVENTORY_HW_ARCH		. " <-\n" .
+		"INVENTORY.HW.DATE.DECOMM -> "			. REDUCTED_PRINTABLE_ASCII		. " <-\n" .
+		"INVENTORY.HW.DATE.EXPIRY -> "			. REDUCTED_PRINTABLE_ASCII		. " <-\n" .
+		"INVENTORY.HW.DATE.INSTALL -> "			. REDUCTED_PRINTABLE_ASCII		. " <-\n" .
+		"INVENTORY.HW.DATE.PURCHASE-> "			. REDUCTED_PRINTABLE_ASCII		. " <-\n" .
+		"INVENTORY.INSTALLER.NAME -> "			. REDUCTED_PRINTABLE_ASCII		. " <-\n" .
+		"INVENTORY.LOCATION -> "				. REDUCTED_PRINTABLE_ASCII		. " <-\n" .
+		"INVENTORY.LOCATION.LAT -> "			. self::INVENTORY_LOCATION_LAT	. " <-\n" .
+		"INVENTORY.LOCATION.LON -> "			. self::INVENTORY_LOCATION_LON	. " <-\n" .
+		"INVENTORY.MACADDRESS.A -> "			. REDUCTED_PRINTABLE_ASCII		. " <-\n" .
+		"INVENTORY.MACADDRESS.B -> "			. REDUCTED_PRINTABLE_ASCII		. " <-\n" .
+		"INVENTORY.MODEL -> "					. REDUCTED_PRINTABLE_ASCII		. " <-\n" .
+		"INVENTORY.NAME -> "					. REDUCTED_PRINTABLE_ASCII		. " <-\n" .
+		"INVENTORY.NOTES -> "					. REDUCTED_PRINTABLE_ASCII		. " <-\n" .
+		"INVENTORY.OOB.IP -> "					. self::INVENTORY_OOB_IP		. " <-\n" .
+		"INVENTORY.OOB.NETMASK -> "				. self::INVENTORY_OOB_NETMASK	. " <-\n" .
+		"INVENTORY.OOB.ROUTER -> "				. self::INVENTORY_OOB_ROUTER	. " <-\n" .
+		"INVENTORY.OS -> "						. REDUCTED_PRINTABLE_ASCII		. " <-\n" .
+		"INVENTORY.OS.FULL -> "					. REDUCTED_PRINTABLE_ASCII		. " <-\n" .
+		"INVENTORY.OS.SHORT -> "				. REDUCTED_PRINTABLE_ASCII		. " <-\n" .
+		"INVENTORY.POC.PRIMARY.CELL -> "		. REDUCTED_PRINTABLE_ASCII		. " <-\n" .
+		"INVENTORY.POC.PRIMARY.EMAIL -> "		. REDUCTED_PRINTABLE_ASCII		. " <-\n" .
+		"INVENTORY.POC.PRIMARY.NAME -> "		. REDUCTED_PRINTABLE_ASCII		. " <-\n" .
+		"INVENTORY.POC.PRIMARY.NOTES -> "		. REDUCTED_PRINTABLE_ASCII		. " <-\n" .
+		"INVENTORY.POC.PRIMARY.PHONE.A -> "		. REDUCTED_PRINTABLE_ASCII		. " <-\n" .
+		"INVENTORY.POC.PRIMARY.PHONE.B -> "		. REDUCTED_PRINTABLE_ASCII		. " <-\n" .
+		"INVENTORY.POC.PRIMARY.SCREEN -> "		. REDUCTED_PRINTABLE_ASCII		. " <-\n" .
+		"INVENTORY.POC.SECONDARY.CELL -> "		. REDUCTED_PRINTABLE_ASCII		. " <-\n" .
+		"INVENTORY.POC.SECONDARY.EMAIL -> "		. REDUCTED_PRINTABLE_ASCII		. " <-\n" .
+		"INVENTORY.POC.SECONDARY.NAME -> "		. REDUCTED_PRINTABLE_ASCII		. " <-\n" .
+		"INVENTORY.POC.SECONDARY.NOTES -> "		. REDUCTED_PRINTABLE_ASCII		. " <-\n" .
+		"INVENTORY.POC.SECONDARY.PHONE.A -> "	. REDUCTED_PRINTABLE_ASCII		. " <-\n" .
+		"INVENTORY.POC.SECONDARY.PHONE.B -> "	. REDUCTED_PRINTABLE_ASCII		. " <-\n" .
+		"INVENTORY.POC.SECONDARY.SCREEN -> "	. REDUCTED_PRINTABLE_ASCII		. " <-\n" .
+		"INVENTORY.SERIALNO.A -> "				. REDUCTED_PRINTABLE_ASCII		. " <-\n" .
+		"INVENTORY.SERIALNO.B -> "				. REDUCTED_PRINTABLE_ASCII		. " <-\n" .
+		"INVENTORY.SITE.ADDRESS.A -> "			. REDUCTED_PRINTABLE_ASCII		. " <-\n" .
+		"INVENTORY.SITE.ADDRESS.B -> "			. REDUCTED_PRINTABLE_ASCII		. " <-\n" .
+		"INVENTORY.SITE.ADDRESS.C -> "			. REDUCTED_PRINTABLE_ASCII		. " <-\n" .
+		"INVENTORY.SITE.CITY -> "				. REDUCTED_PRINTABLE_ASCII		. " <-\n" .
+		"INVENTORY.SITE.COUNTRY -> "			. REDUCTED_PRINTABLE_ASCII		. " <-\n" .
+		"INVENTORY.SITE.NOTES -> "				. REDUCTED_PRINTABLE_ASCII		. " <-\n" .
+		"INVENTORY.SITE.RACK -> "				. REDUCTED_PRINTABLE_ASCII		. " <-\n" .
+		"INVENTORY.SITE.STATE -> "				. REDUCTED_PRINTABLE_ASCII		. " <-\n" .
+		"INVENTORY.SITE.ZIP -> "				. REDUCTED_PRINTABLE_ASCII		. " <-\n" .
+		"INVENTORY.SOFTWARE -> "				. REDUCTED_PRINTABLE_ASCII		. " <-\n" .
+		"INVENTORY.SOFTWARE.APP.A -> "			. REDUCTED_PRINTABLE_ASCII		. " <-\n" .
+		"INVENTORY.SOFTWARE.APP.B -> "			. REDUCTED_PRINTABLE_ASCII		. " <-\n" .
+		"INVENTORY.SOFTWARE.APP.C -> "			. REDUCTED_PRINTABLE_ASCII		. " <-\n" .
+		"INVENTORY.SOFTWARE.APP.D -> "			. REDUCTED_PRINTABLE_ASCII		. " <-\n" .
+		"INVENTORY.SOFTWARE.APP.E -> "			. REDUCTED_PRINTABLE_ASCII		. " <-\n" .
+		"INVENTORY.SOFTWARE.FULL -> "			. REDUCTED_PRINTABLE_ASCII		. " <-\n" .
+		"INVENTORY.TAG -> "						. REDUCTED_PRINTABLE_ASCII		. " <-\n" .
+		"INVENTORY.TYPE -> "					. REDUCTED_PRINTABLE_ASCII		. " <-\n" .
+		"INVENTORY.TYPE.FULL -> "				. REDUCTED_PRINTABLE_ASCII		. " <-\n" .
+		"INVENTORY.URL.A -> "					. REDUCTED_PRINTABLE_ASCII		. " <-\n" .
+		"INVENTORY.URL.B -> "					. REDUCTED_PRINTABLE_ASCII		. " <-\n" .
+		"INVENTORY.URL.C} -> "					. REDUCTED_PRINTABLE_ASCII		. " <-\n" .
+		"INVENTORY.VENDOR -> "					. REDUCTED_PRINTABLE_ASCII		. " <-";
 
 	/**
 	 * @inheritdoc
@@ -513,56 +513,56 @@ class testExpressionMacros extends CIntegrationTest {
 		self::$event_name_resolved = self::EVENT_PREFIX . self::VALUE_TO_FIRE_TRIGGER;
 
 		self::$BUILTIN_MACROS_CONSISTENT_RESOLVE_COMMON_RESOLVED =
-			"ACTION.NAME -> "				. self::ACTION_NAME				. " <-\n" .
-			"EVENT.ACK.STATUS -> "				. 'No'						. " <-\n" .
-			"EVENT.NAME -> "				. self::$event_name_resolved			. " <-\n" .
-			"EVENT.NSEVERITY -> "				. self::TRIGGER_PRIORITY			. " <-\n" .
-			"EVENT.OBJECT -> "				. '0'						. " <-\n" . // 0 -> Trigger
-			"EVENT.OPDATA -> "				. self::TRIGGER_OPDATA				. " <-\n" .
-			"EVENT.SEVERITY -> "				. 'Average'					. " <-\n" . // self::TRIGGER_PRIORITY
-			"EVENT.SOURCE -> "				. '0'						. " <-\n" . // 0 -> Trigger
-			"EVENT.STATUS -> "				. 'PROBLEM'					. " <-\n" . // 1 -> PROBLEM
-			"EVENT.TAGS -> "				. self::TAG_NAME . ':' . self::TAG_VALUE	. " <-\n" .
-			"EVENT.TAGSJSON -> "				. self::$event_tags_json			. " <-\n" .
-			"EVENT.UPDATE.HISTORY -> "			. ''						. " <-\n" .
-			"EVENT.UPDATE.STATUS -> "			. '0'						. " <-\n" .
-			"EVENT.VALUE -> "				. '1'						. " <-\n" . // 0 -> Problem
-			"HOST.CONN -> "					. '127.0.0.1'					. " <-\n" .
-			"HOST.DESCRIPTION -> "				. ''						. " <-\n" .
-			"HOST.DNS -> "					. ''						. " <-\n" .
-			"HOST.HOST -> "					. self::HOST_NAME				. " <-\n" .
-			"HOST.IP -> "					. '127.0.0.1'					. " <-\n" .
-			"HOST.NAME -> "					. self::HOST_NAME				. " <-\n" .
-			"HOST.PORT -> "					. PHPUNIT_PORT_PREFIX.self::AGENT_PORT_SUFFIX	. " <-\n" .
-			"ITEM.DESCRIPTION -> "				. ''						. " <-\n" .
-			"ITEM.DESCRIPTION.ORIG -> "			. ''						. " <-\n" .
-			"ITEM.KEY -> "					. self::TRAPPER_ITEM_KEY . '1'			. " <-\n" .
-			"ITEM.KEY.ORIG -> "				. self::TRAPPER_ITEM_KEY . '1'			. " <-\n" .
-			"ITEM.LASTVALUE -> "				. self::VALUE_TO_FIRE_TRIGGER			. " <-\n" .
-			"ITEM.NAME -> "					. self::TRAPPER_ITEM_NAME . '1'			. " <-\n" .
-			"ITEM.NAME.ORIG -> "				. self::TRAPPER_ITEM_NAME . '1'			. " <-\n" .
-			"ITEM.VALUE -> "				. self::VALUE_TO_FIRE_TRIGGER			. " <-\n" .
-			"ITEM.VALUETYPE -> "				. ITEM_VALUE_TYPE_UINT64			. " <-\n" .
-			"PROXY.DESCRIPTION -> "				. ''						. " <-\n" .
-			"PROXY.NAME -> "				. ''						. " <-\n" .
-			"TRIGGER.DESCRIPTION -> "			. self::TRIGGER_COMMENTS			. " <-\n" .
-			"TRIGGER.EXPRESSION.EXPLAIN -> "		. self::$trigger_expression_explain		. " <-\n" .
+			"ACTION.NAME -> "							. self::ACTION_NAME								. " <-\n" .
+			"EVENT.ACK.STATUS -> "						. 'No'											. " <-\n" .
+			"EVENT.NAME -> "							. self::$event_name_resolved					. " <-\n" .
+			"EVENT.NSEVERITY -> "						. self::TRIGGER_PRIORITY						. " <-\n" .
+			"EVENT.OBJECT -> "							. '0'											. " <-\n" . // 0 -> Trigger
+			"EVENT.OPDATA -> "							. self::TRIGGER_OPDATA							. " <-\n" .
+			"EVENT.SEVERITY -> "						. 'Average'										. " <-\n" . // self::TRIGGER_PRIORITY
+			"EVENT.SOURCE -> "							. '0'											. " <-\n" . // 0 -> Trigger
+			"EVENT.STATUS -> "							. 'PROBLEM'										. " <-\n" . // 1 -> PROBLEM
+			"EVENT.TAGS -> "							. self::TAG_NAME . ':' . self::TAG_VALUE		. " <-\n" .
+			"EVENT.TAGSJSON -> "						. self::$event_tags_json						. " <-\n" .
+			"EVENT.UPDATE.HISTORY -> "					. ''											. " <-\n" .
+			"EVENT.UPDATE.STATUS -> "					. '0'											. " <-\n" .
+			"EVENT.VALUE -> "							. '1'											. " <-\n" . // 0 -> Problem
+			"HOST.CONN -> "								. '127.0.0.1'									. " <-\n" .
+			"HOST.DESCRIPTION -> "						. ''											. " <-\n" .
+			"HOST.DNS -> "								. ''											. " <-\n" .
+			"HOST.HOST -> "								. self::HOST_NAME								. " <-\n" .
+			"HOST.IP -> "								. '127.0.0.1'									. " <-\n" .
+			"HOST.NAME -> "								. self::HOST_NAME								. " <-\n" .
+			"HOST.PORT -> "								. PHPUNIT_PORT_PREFIX.self::AGENT_PORT_SUFFIX	. " <-\n" .
+			"ITEM.DESCRIPTION -> "						. ''											. " <-\n" .
+			"ITEM.DESCRIPTION.ORIG -> "					. ''											. " <-\n" .
+			"ITEM.KEY -> "								. self::TRAPPER_ITEM_KEY . '1'					. " <-\n" .
+			"ITEM.KEY.ORIG -> "							. self::TRAPPER_ITEM_KEY . '1'					. " <-\n" .
+			"ITEM.LASTVALUE -> "						. self::VALUE_TO_FIRE_TRIGGER					. " <-\n" .
+			"ITEM.NAME -> "								. self::TRAPPER_ITEM_NAME . '1'					. " <-\n" .
+			"ITEM.NAME.ORIG -> "						. self::TRAPPER_ITEM_NAME . '1'					. " <-\n" .
+			"ITEM.VALUE -> "							. self::VALUE_TO_FIRE_TRIGGER					. " <-\n" .
+			"ITEM.VALUETYPE -> "						. ITEM_VALUE_TYPE_UINT64						. " <-\n" .
+			"PROXY.DESCRIPTION -> "						. ''											. " <-\n" .
+			"PROXY.NAME -> "							. ''											. " <-\n" .
+			"TRIGGER.DESCRIPTION -> "					. self::TRIGGER_COMMENTS						. " <-\n" .
+			"TRIGGER.EXPRESSION.EXPLAIN -> "			. self::$trigger_expression_explain				. " <-\n" .
 			"TRIGGER.EXPRESSION.RECOVERY.EXPLAIN -> "	. self::$trigger_recovery_expression_explain	. " <-\n" .
-			"TRIGGER.EVENTS.ACK -> "			. '0'						. " <-\n" .
-			"TRIGGER.EVENTS.PROBLEM.ACK -> "		. '0'						. " <-\n" .
-			"TRIGGER.EVENTS.PROBLEM.UNACK -> "		. '1'						. " <-\n" .
-			"TRIGGER.EVENTS.UNACK -> "			. '1'						. " <-\n" .
-			"TRIGGER.HOSTGROUP.NAME -> "			. 'Zabbix servers'				. " <-\n" . // 4 -> 'Zabbix servers'
-			"TRIGGER.EXPRESSION -> "			. self::$trigger_expression			. " <-\n" .
-			"TRIGGER.EXPRESSION.RECOVERY -> "		. self::$trigger_recovery_expression		. " <-\n" .
-			"TRIGGER.NAME -> "				. 'trigger_trap'				. " <-\n" .
-			"TRIGGER.NAME.ORIG -> "				. 'trigger_trap'				. " <-\n" .
-			"TRIGGER.NSEVERITY -> "				. self::TRIGGER_PRIORITY			. " <-\n" .
-			"TRIGGER.SEVERITY -> "				. 'Average'					. " <-\n" . // 3 -> Average
-			"TRIGGER.STATUS -> "				. 'PROBLEM'					. " <-\n" .
-			"TRIGGER.URL -> "				. self::TRIGGER_URL				. " <-\n" .
-			"TRIGGER.URL.NAME -> "				. self::TRIGGER_URL_NAME			. " <-\n" .
-			"TRIGGER.VALUE -> "				. '1'						. " <-\n" .  // 1 -> Problem
+			"TRIGGER.EVENTS.ACK -> "					. '0'											. " <-\n" .
+			"TRIGGER.EVENTS.PROBLEM.ACK -> "			. '0'											. " <-\n" .
+			"TRIGGER.EVENTS.PROBLEM.UNACK -> "			. '1'											. " <-\n" .
+			"TRIGGER.EVENTS.UNACK -> "					. '1'											. " <-\n" .
+			"TRIGGER.HOSTGROUP.NAME -> "				. 'Zabbix servers'								. " <-\n" . // 4 -> 'Zabbix servers'
+			"TRIGGER.EXPRESSION -> "					. self::$trigger_expression						. " <-\n" .
+			"TRIGGER.EXPRESSION.RECOVERY -> "			. self::$trigger_recovery_expression			. " <-\n" .
+			"TRIGGER.NAME -> "							. 'trigger_trap'								. " <-\n" .
+			"TRIGGER.NAME.ORIG -> "						. 'trigger_trap'								. " <-\n" .
+			"TRIGGER.NSEVERITY -> "						. self::TRIGGER_PRIORITY						. " <-\n" .
+			"TRIGGER.SEVERITY -> "						. 'Average'										. " <-\n" . // 3 -> Average
+			"TRIGGER.STATUS -> "						. 'PROBLEM'										. " <-\n" .
+			"TRIGGER.URL -> "							. self::TRIGGER_URL								. " <-\n" .
+			"TRIGGER.URL.NAME -> "						. self::TRIGGER_URL_NAME						. " <-\n" .
+			"TRIGGER.VALUE -> "							. '1'											. " <-\n" .  // 1 -> Problem
 			self::INVENTORY_RESOLVED;
 
 		$response = $this->call('host.create', [
@@ -584,37 +584,37 @@ class testExpressionMacros extends CIntegrationTest {
 			],
 			'inventory_mode' => HOST_INVENTORY_MANUAL,
 			'inventory' => [
-				'alias'			=> REDUCTED_PRINTABLE_ASCII,
-				'asset_tag'		=> REDUCTED_PRINTABLE_ASCII,
-				'chassis'		=> REDUCTED_PRINTABLE_ASCII,
-				'contact'		=> REDUCTED_PRINTABLE_ASCII,
+				'alias'				=> REDUCTED_PRINTABLE_ASCII,
+				'asset_tag'			=> REDUCTED_PRINTABLE_ASCII,
+				'chassis'			=> REDUCTED_PRINTABLE_ASCII,
+				'contact'			=> REDUCTED_PRINTABLE_ASCII,
 				'contract_number'	=> REDUCTED_PRINTABLE_ASCII,
 				'date_hw_decomm'	=> REDUCTED_PRINTABLE_ASCII,
 				'date_hw_expiry'	=> REDUCTED_PRINTABLE_ASCII,
 				'date_hw_install'	=> REDUCTED_PRINTABLE_ASCII,
 				'date_hw_purchase'	=> REDUCTED_PRINTABLE_ASCII,
 				'deployment_status'	=> REDUCTED_PRINTABLE_ASCII,
-				'hardware'		=> REDUCTED_PRINTABLE_ASCII,
+				'hardware'			=> REDUCTED_PRINTABLE_ASCII,
 				'hardware_full'		=> REDUCTED_PRINTABLE_ASCII,
 				'host_netmask'		=> self::INVENTORY_HOST_NETMASK,
 				'host_networks'		=> REDUCTED_PRINTABLE_ASCII,
 				'host_router'		=> self::INVENTORY_HOST_ROUTER,
-				'hw_arch'		=> self::INVENTORY_HW_ARCH,
+				'hw_arch'			=> self::INVENTORY_HW_ARCH,
 				'installer_name'	=> REDUCTED_PRINTABLE_ASCII,
-				'location'		=> REDUCTED_PRINTABLE_ASCII,
+				'location'			=> REDUCTED_PRINTABLE_ASCII,
 				'location_lat'		=> self::INVENTORY_LOCATION_LAT,
 				'location_lon'		=> self::INVENTORY_LOCATION_LON,
 				'macaddress_a'		=> REDUCTED_PRINTABLE_ASCII,
 				'macaddress_b'		=> REDUCTED_PRINTABLE_ASCII,
-				'model'			=> REDUCTED_PRINTABLE_ASCII,
-				'name'			=> REDUCTED_PRINTABLE_ASCII,
-				'notes'			=> REDUCTED_PRINTABLE_ASCII,
-				'oob_ip'		=> self::INVENTORY_OOB_IP,
+				'model'				=> REDUCTED_PRINTABLE_ASCII,
+				'name'				=> REDUCTED_PRINTABLE_ASCII,
+				'notes'				=> REDUCTED_PRINTABLE_ASCII,
+				'oob_ip'			=> self::INVENTORY_OOB_IP,
 				'oob_netmask'		=> self::INVENTORY_OOB_NETMASK,
 				'oob_router'		=> self::INVENTORY_OOB_ROUTER,
-				'os'			=> REDUCTED_PRINTABLE_ASCII,
-				'os_full'		=> REDUCTED_PRINTABLE_ASCII,
-				'os_short'		=> REDUCTED_PRINTABLE_ASCII,
+				'os'				=> REDUCTED_PRINTABLE_ASCII,
+				'os_full'			=> REDUCTED_PRINTABLE_ASCII,
+				'os_short'			=> REDUCTED_PRINTABLE_ASCII,
 				'poc_1_cell'		=> REDUCTED_PRINTABLE_ASCII,
 				'poc_1_email'		=> REDUCTED_PRINTABLE_ASCII,
 				'poc_1_name'		=> REDUCTED_PRINTABLE_ASCII,
@@ -634,26 +634,26 @@ class testExpressionMacros extends CIntegrationTest {
 				'site_address_a'	=> REDUCTED_PRINTABLE_ASCII,
 				'site_address_b'	=> REDUCTED_PRINTABLE_ASCII,
 				'site_address_c'	=> REDUCTED_PRINTABLE_ASCII,
-				'site_city'		=> REDUCTED_PRINTABLE_ASCII,
+				'site_city'			=> REDUCTED_PRINTABLE_ASCII,
 				'site_country'		=> REDUCTED_PRINTABLE_ASCII,
 				'site_notes'		=> REDUCTED_PRINTABLE_ASCII,
-				'site_rack'		=> REDUCTED_PRINTABLE_ASCII,
+				'site_rack'			=> REDUCTED_PRINTABLE_ASCII,
 				'site_state'		=> REDUCTED_PRINTABLE_ASCII,
-				'site_zip'		=> REDUCTED_PRINTABLE_ASCII,
-				'software'		=> REDUCTED_PRINTABLE_ASCII,
+				'site_zip'			=> REDUCTED_PRINTABLE_ASCII,
+				'software'			=> REDUCTED_PRINTABLE_ASCII,
 				'software_app_a'	=> REDUCTED_PRINTABLE_ASCII,
 				'software_app_b'	=> REDUCTED_PRINTABLE_ASCII,
 				'software_app_c'	=> REDUCTED_PRINTABLE_ASCII,
 				'software_app_d'	=> REDUCTED_PRINTABLE_ASCII,
 				'software_app_e'	=> REDUCTED_PRINTABLE_ASCII,
 				'software_full'		=> REDUCTED_PRINTABLE_ASCII,
-				'tag'			=> REDUCTED_PRINTABLE_ASCII,
-				'type'			=> REDUCTED_PRINTABLE_ASCII,
-				'type_full'		=> REDUCTED_PRINTABLE_ASCII,
-				'url_a'			=> REDUCTED_PRINTABLE_ASCII,
-				'url_b'			=> REDUCTED_PRINTABLE_ASCII,
-				'url_c'			=> REDUCTED_PRINTABLE_ASCII,
-				'vendor'		=> REDUCTED_PRINTABLE_ASCII
+				'tag'				=> REDUCTED_PRINTABLE_ASCII,
+				'type'				=> REDUCTED_PRINTABLE_ASCII,
+				'type_full'			=> REDUCTED_PRINTABLE_ASCII,
+				'url_a'				=> REDUCTED_PRINTABLE_ASCII,
+				'url_b'				=> REDUCTED_PRINTABLE_ASCII,
+				'url_c'				=> REDUCTED_PRINTABLE_ASCII,
+				'vendor'			=> REDUCTED_PRINTABLE_ASCII
 			]
 		]);
 
@@ -703,22 +703,22 @@ class testExpressionMacros extends CIntegrationTest {
 		$this->assertEquals(count(self::$item_ids), count($response['result']['itemids']));
 
 		$response = $this->call('trigger.create', [
-			'description' => 'trigger_trap',
-			'expression' => self::$trigger_expression,
-			'recovery_expression' => self::$trigger_recovery_expression,
-			'recovery_mode' => self::TRIGGER_RECOVERY_MODE,
-			'event_name' => self::$event_name,
-			'priority' => self::TRIGGER_PRIORITY,
-			'status' => self::TRIGGER_STATUS_ENABLED,
-			'comments' => self::TRIGGER_COMMENTS,
-			'url' => self::TRIGGER_URL,
-			'url_name' => self::TRIGGER_URL_NAME,
-			'type' => self::TRIGGER_TYPE,
-			'recovery_mode' => self::TRIGGER_RECOVERY_MODE,
-			'correlation_mode' => self::TRIGGER_CORRELATION_MODE,
-			'correlation_tag' => self::TAG_NAME,
-			'manual_close' => self::TRIGGER_MANUAL_CLOSE,
-			'opdata' => self::TRIGGER_OPDATA,
+			'description'			=> 'trigger_trap',
+			'expression'			=> self::$trigger_expression,
+			'recovery_expression'	=> self::$trigger_recovery_expression,
+			'recovery_mode'			=> self::TRIGGER_RECOVERY_MODE,
+			'event_name'			=> self::$event_name,
+			'priority'				=> self::TRIGGER_PRIORITY,
+			'status'				=> self::TRIGGER_STATUS_ENABLED,
+			'comments'				=> self::TRIGGER_COMMENTS,
+			'url'					=> self::TRIGGER_URL,
+			'url_name'				=> self::TRIGGER_URL_NAME,
+			'type'					=> self::TRIGGER_TYPE,
+			'recovery_mode'			=> self::TRIGGER_RECOVERY_MODE,
+			'correlation_mode'		=> self::TRIGGER_CORRELATION_MODE,
+			'correlation_tag'		=> self::TAG_NAME,
+			'manual_close'			=> self::TRIGGER_MANUAL_CLOSE,
+			'opdata'				=>	self::TRIGGER_OPDATA,
 			'tags' => [
 				[
 					'tag' => self::TAG_NAME,
@@ -1011,56 +1011,56 @@ class testExpressionMacros extends CIntegrationTest {
 		$trigger_recovery_expression_explain = self::VALUE_TO_RECOVER_TRIGGER . '=' . self::VALUE_TO_RECOVER_TRIGGER;
 
 		$BUILTIN_MACROS_CONSISTENT_RESOLVE_COMMON_RESOLVED =
-			"ACTION.NAME -> "				. self::ACTION_NAME				. " <-\n" .
-			"EVENT.ACK.STATUS -> "				. 'No'						. " <-\n" .
-			"EVENT.NAME -> "				. self::$event_name_resolved			. " <-\n" .
-			"EVENT.NSEVERITY -> "				. self::TRIGGER_PRIORITY			. " <-\n" .
-			"EVENT.OBJECT -> "				. '0'						. " <-\n" . // 0 -> Trigger
-			"EVENT.OPDATA -> "				. self::TRIGGER_OPDATA				. " <-\n" .
-			"EVENT.SEVERITY -> "				. 'Average'					. " <-\n" . // self::TRIGGER_PRIORITY
-			"EVENT.SOURCE -> "				. '0'						. " <-\n" . // 0 -> Trigger
-			"EVENT.STATUS -> "				. 'RESOLVED'					. " <-\n" . //  0 -> RESOLVED
-			"EVENT.TAGS -> "				. self::TAG_NAME . ':' . self::TAG_VALUE	. " <-\n" .
-			"EVENT.TAGSJSON -> "				. self::$event_tags_json			. " <-\n" .
-			"EVENT.UPDATE.HISTORY -> "			. ''						. " <-\n" .
-			"EVENT.UPDATE.STATUS -> "			. '0'						. " <-\n" .
-			"EVENT.VALUE -> "				. '0'						. " <-\n" . // 0 -> Resolved
-			"HOST.CONN -> "					. '127.0.0.1'					. " <-\n" .
-			"HOST.DESCRIPTION -> "				. ''						. " <-\n" .
-			"HOST.DNS -> "					. ''						. " <-\n" .
-			"HOST.HOST -> "					. self::HOST_NAME				. " <-\n" .
-			"HOST.IP -> "					. '127.0.0.1'					. " <-\n" .
-			"HOST.NAME -> "					. self::HOST_NAME				. " <-\n" .
-			"HOST.PORT -> "					. PHPUNIT_PORT_PREFIX.self::AGENT_PORT_SUFFIX	. " <-\n" .
-			"ITEM.DESCRIPTION -> "				. ''						. " <-\n" .
-			"ITEM.DESCRIPTION.ORIG -> "			. ''						. " <-\n" .
-			"ITEM.KEY -> "					. self::TRAPPER_ITEM_KEY . '1'			. " <-\n" .
-			"ITEM.KEY.ORIG -> "				. self::TRAPPER_ITEM_KEY . '1'			. " <-\n" .
-			"ITEM.LASTVALUE -> "				. self::VALUE_TO_RECOVER_TRIGGER		. " <-\n" .
-			"ITEM.NAME -> "					. self::TRAPPER_ITEM_NAME . '1'			. " <-\n" .
-			"ITEM.NAME.ORIG -> "				. self::TRAPPER_ITEM_NAME . '1'			. " <-\n" .
-			"ITEM.VALUE -> "				. self::VALUE_TO_RECOVER_TRIGGER		. " <-\n" .
-			"ITEM.VALUETYPE -> "				. ITEM_VALUE_TYPE_UINT64			. " <-\n" .
-			"PROXY.DESCRIPTION -> "				. ''						. " <-\n" .
-			"PROXY.NAME -> "				. ''						. " <-\n" .
-			"TRIGGER.DESCRIPTION -> "			. self::TRIGGER_COMMENTS			. " <-\n" .
-			"TRIGGER.EXPRESSION.EXPLAIN -> "		. $trigger_expression_explain			. " <-\n" .
-			"TRIGGER.EXPRESSION.RECOVERY.EXPLAIN -> "	. $trigger_recovery_expression_explain		. " <-\n" .
-			"TRIGGER.EVENTS.ACK -> "			. '0'						. " <-\n" .
-			"TRIGGER.EVENTS.PROBLEM.ACK -> "		. '0'						. " <-\n" .
-			"TRIGGER.EVENTS.PROBLEM.UNACK -> "		. '1'						. " <-\n" .
-			"TRIGGER.EVENTS.UNACK -> "			. '2'						. " <-\n" .
-			"TRIGGER.HOSTGROUP.NAME -> "			. 'Zabbix servers'				. " <-\n" . // 4 -> 'Zabbix servers'
-			"TRIGGER.EXPRESSION -> "			. self::$trigger_expression			. " <-\n" .
-			"TRIGGER.EXPRESSION.RECOVERY -> "		. self::$trigger_recovery_expression		. " <-\n" .
-			"TRIGGER.NAME -> "				. 'trigger_trap'				. " <-\n" .
-			"TRIGGER.NAME.ORIG -> "				. 'trigger_trap'				. " <-\n" .
-			"TRIGGER.NSEVERITY -> "				. self::TRIGGER_PRIORITY			. " <-\n" .
-			"TRIGGER.SEVERITY -> "				. 'Average'					. " <-\n" . // 3 -> Average
-			"TRIGGER.STATUS -> "				. 'OK'						. " <-\n" .
-			"TRIGGER.URL -> "				. self::TRIGGER_URL				. " <-\n" .
-			"TRIGGER.URL.NAME -> "				. self::TRIGGER_URL_NAME			. " <-\n" .
-			"TRIGGER.VALUE -> "				. '0'						. " <-\n" . // 0 -> No problem
+			"ACTION.NAME -> "							. self::ACTION_NAME								. " <-\n" .
+			"EVENT.ACK.STATUS -> "						. 'No'											. " <-\n" .
+			"EVENT.NAME -> "							. self::$event_name_resolved					. " <-\n" .
+			"EVENT.NSEVERITY -> "						. self::TRIGGER_PRIORITY						. " <-\n" .
+			"EVENT.OBJECT -> "							. '0'											. " <-\n" . // 0 -> Trigger
+			"EVENT.OPDATA -> "							. self::TRIGGER_OPDATA							. " <-\n" .
+			"EVENT.SEVERITY -> "						. 'Average'										. " <-\n" . // self::TRIGGER_PRIORITY
+			"EVENT.SOURCE -> "							. '0'											. " <-\n" . // 0 -> Trigger
+			"EVENT.STATUS -> "							. 'RESOLVED'									. " <-\n" . // 0 -> RESOLVED
+			"EVENT.TAGS -> "							. self::TAG_NAME . ':' . self::TAG_VALUE		. " <-\n" .
+			"EVENT.TAGSJSON -> "						. self::$event_tags_json						. " <-\n" .
+			"EVENT.UPDATE.HISTORY -> "					. ''											. " <-\n" .
+			"EVENT.UPDATE.STATUS -> "					. '0'											. " <-\n" .
+			"EVENT.VALUE -> "							. '0'											. " <-\n" . // 0 -> Resolved
+			"HOST.CONN -> "								. '127.0.0.1'									. " <-\n" .
+			"HOST.DESCRIPTION -> "						. ''											. " <-\n" .
+			"HOST.DNS -> "								. ''											. " <-\n" .
+			"HOST.HOST -> "								. self::HOST_NAME								. " <-\n" .
+			"HOST.IP -> "								. '127.0.0.1'									. " <-\n" .
+			"HOST.NAME -> "								. self::HOST_NAME								. " <-\n" .
+			"HOST.PORT -> "								. PHPUNIT_PORT_PREFIX.self::AGENT_PORT_SUFFIX	. " <-\n" .
+			"ITEM.DESCRIPTION -> "						. ''											. " <-\n" .
+			"ITEM.DESCRIPTION.ORIG -> "					. ''											. " <-\n" .
+			"ITEM.KEY -> "								. self::TRAPPER_ITEM_KEY . '1'					. " <-\n" .
+			"ITEM.KEY.ORIG -> "							. self::TRAPPER_ITEM_KEY . '1'					. " <-\n" .
+			"ITEM.LASTVALUE -> "						. self::VALUE_TO_RECOVER_TRIGGER				. " <-\n" .
+			"ITEM.NAME -> "								. self::TRAPPER_ITEM_NAME . '1'					. " <-\n" .
+			"ITEM.NAME.ORIG -> "						. self::TRAPPER_ITEM_NAME . '1'					. " <-\n" .
+			"ITEM.VALUE -> "							. self::VALUE_TO_RECOVER_TRIGGER				. " <-\n" .
+			"ITEM.VALUETYPE -> "						. ITEM_VALUE_TYPE_UINT64						. " <-\n" .
+			"PROXY.DESCRIPTION -> "						. ''											. " <-\n" .
+			"PROXY.NAME -> "							. ''											. " <-\n" .
+			"TRIGGER.DESCRIPTION -> "					. self::TRIGGER_COMMENTS						. " <-\n" .
+			"TRIGGER.EXPRESSION.EXPLAIN -> "			. $trigger_expression_explain					. " <-\n" .
+			"TRIGGER.EXPRESSION.RECOVERY.EXPLAIN -> "	. $trigger_recovery_expression_explain			. " <-\n" .
+			"TRIGGER.EVENTS.ACK -> "					. '0'											. " <-\n" .
+			"TRIGGER.EVENTS.PROBLEM.ACK -> "			. '0'											. " <-\n" .
+			"TRIGGER.EVENTS.PROBLEM.UNACK -> "			. '1'											. " <-\n" .
+			"TRIGGER.EVENTS.UNACK -> "					. '2'											. " <-\n" .
+			"TRIGGER.HOSTGROUP.NAME -> "				. 'Zabbix servers'								. " <-\n" . // 4 -> 'Zabbix servers'
+			"TRIGGER.EXPRESSION -> "					. self::$trigger_expression						. " <-\n" .
+			"TRIGGER.EXPRESSION.RECOVERY -> "			. self::$trigger_recovery_expression			. " <-\n" .
+			"TRIGGER.NAME -> "							. 'trigger_trap'								. " <-\n" .
+			"TRIGGER.NAME.ORIG -> "						. 'trigger_trap'								. " <-\n" .
+			"TRIGGER.NSEVERITY -> "						. self::TRIGGER_PRIORITY						. " <-\n" .
+			"TRIGGER.SEVERITY -> "						. 'Average'										. " <-\n" . // 3 -> Average
+			"TRIGGER.STATUS -> "						. 'OK'											. " <-\n" .
+			"TRIGGER.URL -> "							. self::TRIGGER_URL								. " <-\n" .
+			"TRIGGER.URL.NAME -> "						. self::TRIGGER_URL_NAME						. " <-\n" .
+			"TRIGGER.VALUE -> "							. '0'											. " <-\n" . // 0 -> No problem
 			self::INVENTORY_RESOLVED;
 
 		$recovery_event_name_resolved = self::EVENT_PREFIX . self::VALUE_TO_RECOVER_TRIGGER;
@@ -1467,32 +1467,32 @@ const SUBJECT_INTERNAL = "Internal";
 		$event_name = "Value of type \"string\" is not suitable for value type \"Numeric (unsigned)\". Value \"trap !\"#\$%&'()*+,-./0123456789:;<=>?@ABCDEFGHIJKLMNOPQRSTUVWXYZ[\\]^_`abcdefghijklmnopqrstuvwxyz{|}~\"";
 
 		self::$BUILTIN_MACROS_CONSISTENT_RESOLVE_COMMON_RESOLVED =
-			"ACTION.NAME -> "			. self::ACTION_NAME					. " <-\n" .
-			"EVENT.NAME -> "			. $event_name						. " <-\n" .
-			"EVENT.OBJECT -> "			. '4'							. " <-\n" . // -Item
-			"EVENT.SOURCE -> "			. '3'							. " <-\n" .
-			"EVENT.STATUS -> "			. 'Not supported'					. " <-\n" .
-			"EVENT.TAGS -> "			. ''							. " <-\n" .
-			"EVENT.TAGSJSON -> "			. '[]'							. " <-\n" .
-			"EVENT.VALUE -> "			. '1'							. " <-\n" .
-			"HOST.CONN -> "				. '127.0.0.1'						. " <-\n" .
-			"HOST.DESCRIPTION -> "			. ''							. " <-\n" .
-			"HOST.DNS -> "				. ''							. " <-\n" .
-			"HOST.HOST -> "				. self::HOST_NAME					. " <-\n" .
-			"HOST.IP -> "				. '127.0.0.1'						. " <-\n" .
-			"HOST.NAME -> "				. self::HOST_NAME					. " <-\n" .
-			"HOST.PORT -> "				. PHPUNIT_PORT_PREFIX.self::AGENT_PORT_SUFFIX		. " <-\n" .
-			"ITEM.DESCRIPTION -> "			. ''							. " <-\n" .
-			"ITEM.DESCRIPTION.ORIG -> "		. ''							. " <-\n" .
-			"ITEM.KEY -> "				. self::TRAPPER_ITEM_KEY . '1'				. " <-\n" .
-			"ITEM.KEY.ORIG -> "			. self::TRAPPER_ITEM_KEY . '1'				. " <-\n" .
-			"ITEM.NAME -> "				. self::TRAPPER_ITEM_NAME . '1'				. " <-\n" .
-			"ITEM.NAME.ORIG -> "			. self::TRAPPER_ITEM_NAME . '1'				. " <-\n" .
-			"ITEM.STATE -> "			. "Not supported"					. " <-\n" .
-			"ITEM.STATE.ERROR -> "			. $event_name						. " <-\n" .
-			"ITEM.VALUETYPE -> "			. ITEM_VALUE_TYPE_UINT64				. " <-\n" .
-			"PROXY.DESCRIPTION -> "			. ''							. " <-\n" .
-			"PROXY.NAME -> "			. ''							. " <-\n" .
+			"ACTION.NAME -> "			. self::ACTION_NAME								. " <-\n" .
+			"EVENT.NAME -> "			. $event_name									. " <-\n" .
+			"EVENT.OBJECT -> "			. '4'											. " <-\n" . // -Item
+			"EVENT.SOURCE -> "			. '3'											. " <-\n" .
+			"EVENT.STATUS -> "			. 'Not supported'								. " <-\n" .
+			"EVENT.TAGS -> "			. ''											. " <-\n" .
+			"EVENT.TAGSJSON -> "		. '[]'											. " <-\n" .
+			"EVENT.VALUE -> "			. '1'											. " <-\n" .
+			"HOST.CONN -> "				. '127.0.0.1'									. " <-\n" .
+			"HOST.DESCRIPTION -> "		. ''											. " <-\n" .
+			"HOST.DNS -> "				. ''											. " <-\n" .
+			"HOST.HOST -> "				. self::HOST_NAME								. " <-\n" .
+			"HOST.IP -> "				. '127.0.0.1'									. " <-\n" .
+			"HOST.NAME -> "				. self::HOST_NAME								. " <-\n" .
+			"HOST.PORT -> "				. PHPUNIT_PORT_PREFIX.self::AGENT_PORT_SUFFIX	. " <-\n" .
+			"ITEM.DESCRIPTION -> "		. ''											. " <-\n" .
+			"ITEM.DESCRIPTION.ORIG -> "	. ''											. " <-\n" .
+			"ITEM.KEY -> "				. self::TRAPPER_ITEM_KEY . '1'					. " <-\n" .
+			"ITEM.KEY.ORIG -> "			. self::TRAPPER_ITEM_KEY . '1'					. " <-\n" .
+			"ITEM.NAME -> "				. self::TRAPPER_ITEM_NAME . '1'					. " <-\n" .
+			"ITEM.NAME.ORIG -> "		. self::TRAPPER_ITEM_NAME . '1'					. " <-\n" .
+			"ITEM.STATE -> "			. "Not supported"								. " <-\n" .
+			"ITEM.STATE.ERROR -> "		. $event_name									. " <-\n" .
+			"ITEM.VALUETYPE -> "		. ITEM_VALUE_TYPE_UINT64						. " <-\n" .
+			"PROXY.DESCRIPTION -> "		. ''											. " <-\n" .
+			"PROXY.NAME -> "			. ''											. " <-\n" .
 			self::INVENTORY_RESOLVED;
 
 		// Test builtin consistent macro resolution during the initial operation (item became not supported).
@@ -1879,31 +1879,31 @@ const SUBJECT_INTERNAL = "Internal";
 		$this->assertRegExp($inconsistent_macros_resolved, $alert_response_internal_LLD['result'][0]['message']);
 
 		self::$BUILTIN_MACROS_CONSISTENT_RESOLVE_COMMON_RESOLVED =
-			"ACTION.NAME -> "		. self::ACTION_NAME										. " <-\n" .
-			"EVENT.NAME -> "		. "{EVENT.NAME}"										. " <-\n" .
-			"EVENT.OBJECT -> "		. '5'												. " <-\n" . // LLD Rule
-			"EVENT.SOURCE -> "		. '3'												. " <-\n" .
-			"EVENT.STATUS -> "		. 'Not supported'										. " <-\n" .
-			"EVENT.TAGS -> "		. ''												. " <-\n" .
-			"EVENT.TAGSJSON -> "		. '[]'												. " <-\n" .
-			"EVENT.VALUE -> "		. '1'												. " <-\n" .
-			"HOST.CONN -> "			. '127.0.0.1'											. " <-\n" .
-			"HOST.DESCRIPTION -> "		. ''												. " <-\n" .
-			"HOST.DNS -> "			. ''												. " <-\n" .
-			"HOST.HOST -> "			. self::HOST_NAME										. " <-\n" .
-			"HOST.IP -> "			. '127.0.0.1'											. " <-\n" .
-			"HOST.NAME -> "			. self::HOST_NAME										. " <-\n" .
-			"HOST.PORT -> "			. PHPUNIT_PORT_PREFIX.self::AGENT_PORT_SUFFIX							. " <-\n" .
-			"LLDRULE.DESCRIPTION -> "	. ''												. " <-\n" .
-			"LLDRULE.DESCRIPTION.ORIG -> "	. ''												. " <-\n" .
-			"LLDRULE.KEY -> "		. 'vfs.file.contents[/tmp/0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz]'	. " <-\n" .
-			"LLDRULE.KEY.ORIG -> "		. 'vfs.file.contents[/tmp/0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz]'	. " <-\n" .
-			"LLDRULE.NAME -> "		. 'LLD'												. " <-\n" .
-			"LLDRULE.NAME.ORIG -> "		. 'LLD'												. " <-\n" .
-			"LLDRULE.STATE -> "		. 'Not supported'										. " <-\n" .
-			"LLDRULE.STATE.ERROR -> "	. 'Cannot open file: [2] No such file or directory'						. " <-\n" .
-			"PROXY.DESCRIPTION -> "		. ''												. " <-\n" .
-			"PROXY.NAME -> "		. ''												. " <-\n" .
+			"ACTION.NAME -> "				. self::ACTION_NAME																			. " <-\n" .
+			"EVENT.NAME -> "				. "{EVENT.NAME}"																			. " <-\n" .
+			"EVENT.OBJECT -> "				. '5'																						. " <-\n" . // LLD Rule
+			"EVENT.SOURCE -> "				. '3'																						. " <-\n" .
+			"EVENT.STATUS -> "				. 'Not supported'																			. " <-\n" .
+			"EVENT.TAGS -> "				. ''																						. " <-\n" .
+			"EVENT.TAGSJSON -> "			. '[]'																						. " <-\n" .
+			"EVENT.VALUE -> "				. '1'																						. " <-\n" .
+			"HOST.CONN -> "					. '127.0.0.1'																				. " <-\n" .
+			"HOST.DESCRIPTION -> "			. ''																						. " <-\n" .
+			"HOST.DNS -> "					. ''																						. " <-\n" .
+			"HOST.HOST -> "					. self::HOST_NAME																			. " <-\n" .
+			"HOST.IP -> "					. '127.0.0.1'																				. " <-\n" .
+			"HOST.NAME -> "					. self::HOST_NAME																			. " <-\n" .
+			"HOST.PORT -> "					. PHPUNIT_PORT_PREFIX.self::AGENT_PORT_SUFFIX												. " <-\n" .
+			"LLDRULE.DESCRIPTION -> "		. ''																						. " <-\n" .
+			"LLDRULE.DESCRIPTION.ORIG -> "	. ''																						. " <-\n" .
+			"LLDRULE.KEY -> "				. 'vfs.file.contents[/tmp/0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz]'	. " <-\n" .
+			"LLDRULE.KEY.ORIG -> "			. 'vfs.file.contents[/tmp/0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz]'	. " <-\n" .
+			"LLDRULE.NAME -> "				. 'LLD'																						. " <-\n" .
+			"LLDRULE.NAME.ORIG -> "			. 'LLD'																						. " <-\n" .
+			"LLDRULE.STATE -> "				. 'Not supported'																			. " <-\n" .
+			"LLDRULE.STATE.ERROR -> "		. 'Cannot open file: [2] No such file or directory'											. " <-\n" .
+			"PROXY.DESCRIPTION -> "			. ''																						. " <-\n" .
+			"PROXY.NAME -> "				. ''																						. " <-\n" .
 			self::INVENTORY_RESOLVED;
 
 		// Test builtin consistent macro resolution during the initial operation (LLD became not supported).
@@ -2202,22 +2202,22 @@ const SUBJECT_INTERNAL = "Internal";
 
 		//create trigger
 		$response = $this->call('trigger.create', [
-			'description' => 'triger_internal',
-			'expression' => $trigger_expression_internal,
-			'recovery_expression' => self::$trigger_recovery_expression,
-			'recovery_mode' => self::TRIGGER_RECOVERY_MODE,
-			'event_name' => self::$event_name,
-			'priority' => self::TRIGGER_PRIORITY,
-			'status' => self::TRIGGER_STATUS_ENABLED,
-			'comments' => self::TRIGGER_COMMENTS,
-			'url' => self::TRIGGER_URL,
-			'url_name' => self::TRIGGER_URL_NAME,
-			'type' => self::TRIGGER_TYPE,
-			'recovery_mode' => self::TRIGGER_RECOVERY_MODE,
-			'correlation_mode' => self::TRIGGER_CORRELATION_MODE,
-			'correlation_tag' => self::TAG_NAME,
-			'manual_close' => self::TRIGGER_MANUAL_CLOSE,
-			'opdata' => self::TRIGGER_OPDATA,
+			'description'			=> 'triger_internal',
+			'expression' 			=> $trigger_expression_internal,
+			'recovery_expression' 	=> self::$trigger_recovery_expression,
+			'recovery_mode' 		=> self::TRIGGER_RECOVERY_MODE,
+			'event_name' 			=> self::$event_name,
+			'priority' 				=> self::TRIGGER_PRIORITY,
+			'status' 				=> self::TRIGGER_STATUS_ENABLED,
+			'comments' 				=> self::TRIGGER_COMMENTS,
+			'url' 					=> self::TRIGGER_URL,
+			'url_name' 				=> self::TRIGGER_URL_NAME,
+			'type' 					=> self::TRIGGER_TYPE,
+			'recovery_mode'			=> self::TRIGGER_RECOVERY_MODE,
+			'correlation_mode'		=> self::TRIGGER_CORRELATION_MODE,
+			'correlation_tag'		=> self::TAG_NAME,
+			'manual_close' 			=> self::TRIGGER_MANUAL_CLOSE,
+			'opdata'				=> self::TRIGGER_OPDATA,
 			'tags' => [
 				[
 					'tag' => self::TAG_NAME_SERVICE,
@@ -2236,11 +2236,11 @@ const SUBJECT_INTERNAL = "Internal";
 		$this->waitForLogLineToBePresent(self::COMPONENT_SERVER, 'End of add_message_alert()', true);
 
 		$alert_response_internal_trigger = $this->callUntilDataIsPresent('alert.get', [
-			'hostids' =>  [self::$host_id],
-			'actionids' => [self::$internal_trigger_action_id],
-			'sortfield' => 'alertid',
-			'eventobject' => EVENT_OBJECT_TRIGGER,
-			'eventsource' => EVENT_SOURCE_INTERNAL
+			'hostids'		=>  [self::$host_id],
+			'actionids'		=> [self::$internal_trigger_action_id],
+			'sortfield'		=> 'alertid',
+			'eventobject'	=> EVENT_OBJECT_TRIGGER,
+			'eventsource'	=> EVENT_SOURCE_INTERNAL
 		], 2, 2);
 		$this->assertCount(2, $alert_response_internal_trigger['result'], json_encode($alert_response_internal_trigger));
 
@@ -2261,42 +2261,42 @@ const SUBJECT_INTERNAL = "Internal";
 
 		// setup resolved builtin consistent macros
 		self::$BUILTIN_MACROS_CONSISTENT_RESOLVE_COMMON_RESOLVED =
-			"ACTION.NAME -> "			. self::ACTION_NAME									. " <-\n" .
-			"EVENT.NAME -> "			. 'Cannot evaluate function last(/test_macros_host/trap2): item is not supported.'	. " <-\n" .
-			"EVENT.OBJECT -> "			. '0'											. " <-\n" . // trigger
-			"EVENT.SOURCE -> "			. '3'											. " <-\n" . // internal event
-			"EVENT.STATUS -> "			. 'Unknown'										. " <-\n" .
-			"EVENT.TAGS -> "			. 'tag_name:tag_value'									. " <-\n" .
-			"EVENT.TAGSJSON -> "			. '[{"tag":"tag_name","value":"tag_value"}]'						. " <-\n" .
-			"EVENT.VALUE -> "			. '1'											. " <-\n" .
-			"HOST.CONN -> "				. '127.0.0.1'										. " <-\n" .
-			"HOST.DESCRIPTION -> "			. ''											. " <-\n" .
-			"HOST.DNS -> "				. ''											. " <-\n" .
-			"HOST.HOST -> "				. self::HOST_NAME									. " <-\n" .
-			"HOST.IP -> "				. '127.0.0.1'										. " <-\n" .
-			"HOST.NAME -> "				. self::HOST_NAME									. " <-\n" .
-			"HOST.PORT -> "				. PHPUNIT_PORT_PREFIX.self::AGENT_PORT_SUFFIX						. " <-\n" .
-			"PROXY.DESCRIPTION -> "			. ''											. " <-\n" .
-			"PROXY.NAME -> "			. ''											. " <-\n" .
-			"ITEM.DESCRIPTION -> "			. ''											. " <-\n" .
-			"ITEM.DESCRIPTION.ORIG -> "		. ''											. " <-\n" .
-			"ITEM.KEY -> "				. 'trap2'										. " <-\n" .
-			"ITEM.KEY.ORIG -> "			. 'trap2'										. " <-\n" .
-			"ITEM.NAME -> "				. 'trap' . ALL_PRINTABLE_ASCII . "2"							. " <-\n" .
-			"ITEM.NAME.ORIG -> "			. 'trap' . ALL_PRINTABLE_ASCII . "2"							. " <-\n" .
-			"ITEM.VALUETYPE -> "			. '3'											. " <-\n" .
-			"TRIGGER.STATE -> "			. 'Unknown'										. " <-\n" .
-			"TRIGGER.STATE.ERROR -> "		. 'Cannot evaluate function last(/test_macros_host/trap2): item is not supported.'	. " <-\n" .
-			"TRIGGER.DESCRIPTION -> "		. 'strata_trigger_comment_' . ALL_PRINTABLE_ASCII					. " <-\n" .
-			"TRIGGER.HOSTGROUP.NAME -> "		. 'Zabbix servers'									. " <-\n" .
-			"TRIGGER.EXPRESSION -> "		. 'last(/test_macros_host/trap2)=3'							. " <-\n" .
-			"TRIGGER.EXPRESSION.RECOVERY -> "	. 'last(/test_macros_host/trap1)=2147483647'						. " <-\n" .
-			"TRIGGER.NAME -> "			. 'triger_internal'									. " <-\n" .
-			"TRIGGER.NAME.ORIG -> "			. 'triger_internal'									. " <-\n" .
-			"TRIGGER.NSEVERITY -> "			. '3'											. " <-\n" .
-			"TRIGGER.SEVERITY -> "			. 'Average'										. " <-\n" .
-			"TRIGGER.URL -> "			. 'strata_trigger_url_' . ALL_PRINTABLE_ASCII						. " <-\n" .
-			"TRIGGER.URL.NAME -> "			. 'url_name_' . REDUCTED_PRINTABLE_ASCII						. " <-\n" .
+			"ACTION.NAME -> "					. self::ACTION_NAME																	. " <-\n" .
+			"EVENT.NAME -> "					. 'Cannot evaluate function last(/test_macros_host/trap2): item is not supported.'	. " <-\n" .
+			"EVENT.OBJECT -> "					. '0'																				. " <-\n" . // trigger
+			"EVENT.SOURCE -> "					. '3'																				. " <-\n" . // internal event
+			"EVENT.STATUS -> "					. 'Unknown'																			. " <-\n" .
+			"EVENT.TAGS -> "					. 'tag_name:tag_value'																. " <-\n" .
+			"EVENT.TAGSJSON -> "				. '[{"tag":"tag_name","value":"tag_value"}]'										. " <-\n" .
+			"EVENT.VALUE -> "					. '1'																				. " <-\n" .
+			"HOST.CONN -> "						. '127.0.0.1'																		. " <-\n" .
+			"HOST.DESCRIPTION -> "				. ''																				. " <-\n" .
+			"HOST.DNS -> "						. ''																				. " <-\n" .
+			"HOST.HOST -> "						. self::HOST_NAME																	. " <-\n" .
+			"HOST.IP -> "						. '127.0.0.1'																		. " <-\n" .
+			"HOST.NAME -> "						. self::HOST_NAME																	. " <-\n" .
+			"HOST.PORT -> "						. PHPUNIT_PORT_PREFIX.self::AGENT_PORT_SUFFIX										. " <-\n" .
+			"PROXY.DESCRIPTION -> "				. ''																				. " <-\n" .
+			"PROXY.NAME -> "					. ''																				. " <-\n" .
+			"ITEM.DESCRIPTION -> "				. ''																				. " <-\n" .
+			"ITEM.DESCRIPTION.ORIG -> "			. ''																				. " <-\n" .
+			"ITEM.KEY -> "						. 'trap2'																			. " <-\n" .
+			"ITEM.KEY.ORIG -> "					. 'trap2'																			. " <-\n" .
+			"ITEM.NAME -> "						. 'trap' . ALL_PRINTABLE_ASCII . "2"												. " <-\n" .
+			"ITEM.NAME.ORIG -> "				. 'trap' . ALL_PRINTABLE_ASCII . "2"												. " <-\n" .
+			"ITEM.VALUETYPE -> "				. '3'																				. " <-\n" .
+			"TRIGGER.STATE -> "					. 'Unknown'																			. " <-\n" .
+			"TRIGGER.STATE.ERROR -> "			. 'Cannot evaluate function last(/test_macros_host/trap2): item is not supported.'	. " <-\n" .
+			"TRIGGER.DESCRIPTION -> "			. 'strata_trigger_comment_' . ALL_PRINTABLE_ASCII									. " <-\n" .
+			"TRIGGER.HOSTGROUP.NAME -> "		. 'Zabbix servers'																	. " <-\n" .
+			"TRIGGER.EXPRESSION -> "			. 'last(/test_macros_host/trap2)=3'													. " <-\n" .
+			"TRIGGER.EXPRESSION.RECOVERY -> "	. 'last(/test_macros_host/trap1)=2147483647'										. " <-\n" .
+			"TRIGGER.NAME -> "					. 'triger_internal'																	. " <-\n" .
+			"TRIGGER.NAME.ORIG -> "				. 'triger_internal'																	. " <-\n" .
+			"TRIGGER.NSEVERITY -> "				. '3'																				. " <-\n" .
+			"TRIGGER.SEVERITY -> "				. 'Average'																			. " <-\n" .
+			"TRIGGER.URL -> "					. 'strata_trigger_url_' . ALL_PRINTABLE_ASCII										. " <-\n" .
+			"TRIGGER.URL.NAME -> "				. 'url_name_' . REDUCTED_PRINTABLE_ASCII											. " <-\n" .
 			self::INVENTORY_RESOLVED;
 
 		$message_expect = '===1===' . "\n" .
@@ -2574,11 +2574,11 @@ const SUBJECT_INTERNAL = "Internal";
 		$this->removeValue(self::$action_ids, self::$internal_trigger_action_id);
 
 		$response = $this->call('item.create', [
-			'hostid' => self::$host_id,
-			'name' => self::TRAPPER_ITEM_KEY_SERVICE,
-			'key_' => self::TRAPPER_ITEM_KEY_SERVICE,
-			'type' => ITEM_TYPE_TRAPPER,
-			'value_type' => ITEM_VALUE_TYPE_UINT64
+			'hostid'		=> self::$host_id,
+			'name'			=> self::TRAPPER_ITEM_KEY_SERVICE,
+			'key_'			=> self::TRAPPER_ITEM_KEY_SERVICE,
+			'type'			=> ITEM_TYPE_TRAPPER,
+			'value_type'	=> ITEM_VALUE_TYPE_UINT64
 		]);
 		$this->assertArrayHasKey('itemids', $response['result']);
 		$this->assertEquals(1, count($response['result']['itemids']));
@@ -2587,26 +2587,26 @@ const SUBJECT_INTERNAL = "Internal";
 
 		//create trigger
 		$response = $this->call('trigger.create', [
-			'description' => 'trigger_trap',
-			'expression' => self::$trigger_expression,
-			'recovery_expression' => self::$trigger_recovery_expression,
-			'recovery_mode' => self::TRIGGER_RECOVERY_MODE,
-			'event_name' => self::$event_name,
-			'priority' => self::TRIGGER_PRIORITY,
-			'status' => self::TRIGGER_STATUS_ENABLED,
-			'comments' => self::TRIGGER_COMMENTS,
-			'url' => self::TRIGGER_URL,
-			'url_name' => self::TRIGGER_URL_NAME,
-			'type' => self::TRIGGER_TYPE,
-			'recovery_mode' => self::TRIGGER_RECOVERY_MODE,
-			'correlation_mode' => self::TRIGGER_CORRELATION_MODE,
-			'correlation_tag' => self::TAG_NAME,
-			'manual_close' => self::TRIGGER_MANUAL_CLOSE,
-			'opdata' => self::TRIGGER_OPDATA,
+			'description'			=> 'trigger_trap',
+			'expression'			=> self::$trigger_expression,
+			'recovery_expression'	=> self::$trigger_recovery_expression,
+			'recovery_mode'			=> self::TRIGGER_RECOVERY_MODE,
+			'event_name'			=> self::$event_name,
+			'priority'				=> self::TRIGGER_PRIORITY,
+			'status'				=> self::TRIGGER_STATUS_ENABLED,
+			'comments'				=> self::TRIGGER_COMMENTS,
+			'url'					=> self::TRIGGER_URL,
+			'url_name'				=> self::TRIGGER_URL_NAME,
+			'type'					=> self::TRIGGER_TYPE,
+			'recovery_mode'			=> self::TRIGGER_RECOVERY_MODE,
+			'correlation_mode'		=> self::TRIGGER_CORRELATION_MODE,
+			'correlation_tag'		=> self::TAG_NAME,
+			'manual_close'			=> self::TRIGGER_MANUAL_CLOSE,
+			'opdata'				=> self::TRIGGER_OPDATA,
 			'tags' => [
 				[
-					'tag' => self::TAG_NAME_SERVICE,
-					'value' => self::TAG_VALUE_SERVICE
+					'tag'	=> self::TAG_NAME_SERVICE,
+					'value'	=> self::TAG_VALUE_SERVICE
 				]
 			]
 		]);
@@ -2617,11 +2617,11 @@ const SUBJECT_INTERNAL = "Internal";
 		// Create service on that trigger
 		$response = $this->call('service.create', [
 			'name' => self::SERVICE_NAME,
-			'algorithm' => 1,
-			'sortorder' => 1,
-			'problem_tags' => [
+			'algorithm'		=> 1,
+			'sortorder'		=> 1,
+			'problem_tags'	=> [
 				[
-					'tag' => self::TAG_NAME_SERVICE,
+					'tag'	=> self::TAG_NAME_SERVICE,
 					'value' => self::TAG_VALUE_SERVICE
 				]
 			]
@@ -2695,32 +2695,32 @@ const SUBJECT_INTERNAL = "Internal";
 		$this->waitForLogLineToBePresent(self::COMPONENT_SERVER, 'End of escalation_execute()', true);
 
 		self::$alert_response_service = $this->callUntilDataIsPresent('alert.get', [
-			'hostids' =>  [self::$host_id],
-			'actionids' => [self::$service_action_id],
-			'sortfield' => 'alertid',
-			'eventobject' => EVENT_OBJECT_SERVICE,
-			'eventsource' => EVENT_SOURCE_SERVICE
+			'hostids'		=>  [self::$host_id],
+			'actionids'		=> [self::$service_action_id],
+			'sortfield'		=> 'alertid',
+			'eventobject'	=> EVENT_OBJECT_SERVICE,
+			'eventsource'	=> EVENT_SOURCE_SERVICE
 		], 4, 2);
 		$this->assertCount(2, self::$alert_response_service['result']);
 
 		// setup resolved builtin consistent macros
 
 		self::$BUILTIN_MACROS_CONSISTENT_RESOLVE_COMMON_RESOLVED =
-			"ACTION.NAME -> "		. self::ACTION_NAME					. " <-\n" .
-			"EVENT.NAME -> "		. "Status of service \"Server1\" changed to Average"	. " <-\n" .
-			"EVENT.NSEVERITY -> "		. '3'							. " <-\n" .
-			"EVENT.OBJECT -> "		. '6'							. " <-\n" . // service
-			"EVENT.SEVERITY -> "		. 'Average'						. " <-\n" .
-			"EVENT.SOURCE -> "		. '4'							. " <-\n" . //created on service status update
-			"EVENT.STATUS -> "		. 'PROBLEM'						. " <-\n" .
-			"EVENT.TAGS -> "		. ''							. " <-\n" .
-			"EVENT.TAGSJSON -> "		. '[]'							. " <-\n" .
-			"EVENT.UPDATE.STATUS -> "	. '0'							. " <-\n" .
-			"EVENT.VALUE -> "		. '1'							. " <-\n" .
-			"SERVICE.DESCRIPTION -> "	. ''							. " <-\n" .
-			"SERVICE.NAME -> "		. self::SERVICE_NAME					. " <-\n" .
-			"SERVICE.TAGS -> "		. ''							. " <-\n" .
-			"SERVICE.TAGSJSON -> "		. '[]'							. " <-";
+			"ACTION.NAME -> "			. self::ACTION_NAME										. " <-\n" .
+			"EVENT.NAME -> "			. "Status of service \"Server1\" changed to Average"	. " <-\n" .
+			"EVENT.NSEVERITY -> "		. '3'													. " <-\n" .
+			"EVENT.OBJECT -> "			. '6'													. " <-\n" . // service
+			"EVENT.SEVERITY -> "		. 'Average'												. " <-\n" .
+			"EVENT.SOURCE -> "			. '4'													. " <-\n" . //created on service status update
+			"EVENT.STATUS -> "			. 'PROBLEM'												. " <-\n" .
+			"EVENT.TAGS -> "			. ''													. " <-\n" .
+			"EVENT.TAGSJSON -> "		. '[]'													. " <-\n" .
+			"EVENT.UPDATE.STATUS -> "	. '0'													. " <-\n" .
+			"EVENT.VALUE -> "			. '1'													. " <-\n" .
+			"SERVICE.DESCRIPTION -> "	. ''													. " <-\n" .
+			"SERVICE.NAME -> "			. self::SERVICE_NAME									. " <-\n" .
+			"SERVICE.TAGS -> "			. ''													. " <-\n" .
+			"SERVICE.TAGSJSON -> "		. '[]'													. " <-";
 
 		$inconsistent_macros_resolved = "/ACTION.ID[\s\S]*" .
 			"ESC.HISTORY[\s\S]*" .
@@ -3093,15 +3093,15 @@ const SUBJECT_INTERNAL = "Internal";
 		// setup resolved builtin consistent macros
 
 		self::$BUILTIN_MACROS_CONSISTENT_RESOLVE_COMMON_RESOLVED =
-			"ACTION.NAME -> "			. self::ACTION_NAME	. " <-\n" .
-			"EVENT.OBJECT -> "			. '1'			. " <-\n" . // discovered host
-			"EVENT.SOURCE -> "			. '1'			. " <-\n" . // created by a discovery rule
-			"PROXY.DESCRIPTION -> "			. ''			. " <-\n" .
-			"PROXY.NAME -> "			. ''			. " <-\n" .
+			"ACTION.NAME -> "					. self::ACTION_NAME	. " <-\n" .
+			"EVENT.OBJECT -> "					. '1'				. " <-\n" . // discovered host
+			"EVENT.SOURCE -> "					. '1'				. " <-\n" . // created by a discovery rule
+			"PROXY.DESCRIPTION -> "				. ''				. " <-\n" .
+			"PROXY.NAME -> "					. ''				. " <-\n" .
 			"DISCOVERY.DEVICE.IPADDRESS -> "	. '127.0.0.1'		. " <-\n" .
-			"DISCOVERY.DEVICE.DNS -> "		. 'localhost'		. " <-\n" .
-			"DISCOVERY.DEVICE.STATUS -> "		. 'UP'			. " <-\n" .
-			"DISCOVERY.RULE.NAME -> "		. 'Discovery1'		. " <-";
+			"DISCOVERY.DEVICE.DNS -> "			. 'localhost'		. " <-\n" .
+			"DISCOVERY.DEVICE.STATUS -> "		. 'UP'				. " <-\n" .
+			"DISCOVERY.RULE.NAME -> "			. 'Discovery1'		. " <-";
 
 		// Test builtin consistent macro resolution during the initial operation (A new host discovered).
 
@@ -3455,13 +3455,13 @@ const SUBJECT_INTERNAL = "Internal";
 		$macros = explode('==8==', $message_got);
 
 		self::$BUILTIN_MACROS_CONSISTENT_RESOLVE_COMMON_RESOLVED =
-			"ACTION.NAME -> "	. self::ACTION_NAME	. " <-\n" .
-			"EVENT.OBJECT -> "	. '3'			. " <-\n" . // auto-registered host
-			"EVENT.SOURCE -> "	. '2'			. " <-\n" . // created by active agent autoregistration
-			"PROXY.DESCRIPTION -> "	. ''			. " <-\n" .
-			"PROXY.NAME -> "	. ''			. " <-\n" .
-			"HOST.HOST -> "		. 'test_macros_host'	. " <-\n" .
-			"HOST.IP -> "		. '127.0.0.1'		. " <-";
+			"ACTION.NAME -> "		. self::ACTION_NAME		. " <-\n" .
+			"EVENT.OBJECT -> "		. '3'					. " <-\n" . // auto-registered host
+			"EVENT.SOURCE -> "		. '2'					. " <-\n" . // created by active agent autoregistration
+			"PROXY.DESCRIPTION -> "	. ''					. " <-\n" .
+			"PROXY.NAME -> "		. ''					. " <-\n" .
+			"HOST.HOST -> "			. 'test_macros_host'	. " <-\n" .
+			"HOST.IP -> "			. '127.0.0.1'			. " <-";
 
 		// Test builtin consistent macro resolution during the initial operation (A new host registered).
 
