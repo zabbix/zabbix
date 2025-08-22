@@ -283,6 +283,7 @@ window.host_wizard_edit = new class {
 		this.#dialogue.addEventListener('click', ({target}) => {
 			if (target.classList.contains('js-tls-key-change')) {
 				this.#data.tls_required = true;
+				this.#data.tls_psk_identity = this.#generatePSKIdentity();
 			}
 
 			if (target.classList.contains('js-generate-pre-shared-key')) {
@@ -806,7 +807,7 @@ window.host_wizard_edit = new class {
 		// Don't send request if template or host hasn't changed.
 		if (this.#template?.templateid === templateid
 				&& (this.#host?.hostid === hostid || (this.#host === null && hostid === null))) {
-			this.#data.tls_psk_identity = this.#generatePSKIdentity();
+			this.#data.tls_psk_identity = this.#data.tls_required ? this.#generatePSKIdentity() : '';
 
 			return Promise.resolve();
 		}
@@ -834,6 +835,7 @@ window.host_wizard_edit = new class {
 					this.#data.host = {
 						...this.#data.host,
 						id: this.#host.hostid,
+						host: this.#host.host,
 						name: this.#host.name
 					}
 				}
@@ -866,7 +868,7 @@ window.host_wizard_edit = new class {
 					this.#data.tls_warning = this.#data.install_agent_required && !no_encryption && !psk_encryption;
 				}
 
-				this.#data.tls_psk_identity = this.#generatePSKIdentity();
+				this.#data.tls_psk_identity = this.#data.tls_required ? this.#generatePSKIdentity() : '';
 				this.#data.tls_psk = this.#data.tls_required ? this.#generatePSK() : '';
 
 				this.#data.interfaces = [];
@@ -1550,8 +1552,10 @@ window.host_wizard_edit = new class {
 		return selected && this.#templates.get(selected.split(':').pop());
 	}
 
-	#getHostName() {
-		return this.#data.host_new !== null ? this.#data.host_new.id : this.#data.host.name;
+	#getHostName(visible_name = true) {
+		return this.#data.host_new !== null
+			? this.#data.host_new.id
+			: (visible_name ? this.#data.host.name : this.#data.host.host);
 	}
 
 	#isRequiredAddHostInterface() {
@@ -1563,7 +1567,7 @@ window.host_wizard_edit = new class {
 	#generatePSKIdentity() {
 		const host_field_length = <?= DB::getFieldLength('hosts', 'host') ?>;
 
-		return `${this.#getHostName().substring(0, host_field_length - 4)} PSK`;
+		return `${this.#getHostName(false).substring(0, host_field_length - 4)} PSK`;
 	}
 
 	#generatePSK() {
