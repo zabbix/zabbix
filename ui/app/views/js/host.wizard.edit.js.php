@@ -1277,13 +1277,15 @@ window.host_wizard_edit = new class {
 
 					hostname = `--hostname '${hostname}'`;
 
-					psk_identity = this.#data.tls_psk_identity !== '' && !tls_psk_identity_has_error
-						? `--psk-identity '${this.#data.tls_psk_identity}'`
-						: `--psk-identity-stdin`;
+					if (this.#data.tls_required) {
+						psk_identity = this.#data.tls_psk_identity !== '' && !tls_psk_identity_has_error
+							? `--psk-identity '${this.#data.tls_psk_identity}'`
+							: `--psk-identity-stdin`;
 
-					psk = this.#data.tls_psk !== ''
-						? `--psk ${this.#data.tls_psk}`
-						: `--psk-stdin`;
+						psk = this.#data.tls_psk !== ''
+							? `--psk ${this.#data.tls_psk}`
+							: `--psk-stdin`;
+					}
 				}
 
 				if (this.#data.monitoring_os === 'windows') {
@@ -1293,13 +1295,15 @@ window.host_wizard_edit = new class {
 
 					hostname = `-hostName '${hostname.replace(/ /g, `\` `)}'`;
 
-					psk_identity = this.#data.tls_psk_identity !== '' && !tls_psk_identity_has_error
-						? `-pskIdentity '${this.#data.tls_psk_identity.replace(/ /g, `\` `)}'`
-						: `-pskIdentitySTDIN`;
+					if (this.#data.tls_required) {
+						psk_identity = this.#data.tls_psk_identity !== '' && !tls_psk_identity_has_error
+							? `-pskIdentity '${this.#data.tls_psk_identity.replace(/ /g, `\` `)}'`
+							: `-pskIdentitySTDIN`;
 
-					psk = this.#data.tls_psk !== ''
-						? `-psk ${this.#data.tls_psk}`
-						: `-pskSTDIN`;
+						psk = this.#data.tls_psk !== ''
+							? `-psk ${this.#data.tls_psk}`
+							: `-pskSTDIN`;
+					}
 				}
 
 				this.#dialogue.querySelector('.js-install-agent-readme').innerHTML = readme_template.evaluate({
