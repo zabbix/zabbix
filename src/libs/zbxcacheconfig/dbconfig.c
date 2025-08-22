@@ -11535,7 +11535,7 @@ int	zbx_dc_config_get_snmp_interfaceids_by_addr(const char *addr, zbx_uint64_t *
 	const ZBX_DC_INTERFACE_ADDR	*dc_interface_snmpaddr;
 	ZBX_DC_INTERFACE_ADDR		dc_interface_snmpaddr_local;
 
-	zabbix_log(LOG_LEVEL_WARNING, "In %s() addr:'%s'", __func__, addr);
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s() addr:'%s'", __func__, addr);
 
 	dc_interface_snmpaddr_local.addr = addr;
 
@@ -11557,7 +11557,7 @@ int	zbx_dc_config_get_snmp_interfaceids_by_addr(const char *addr, zbx_uint64_t *
 unlock:
 	UNLOCK_CACHE;
 
-	zabbix_log(LOG_LEVEL_WARNING, "End of %s():%d", __func__, count);
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%d", __func__, count);
 
 	return count;
 }
@@ -11629,7 +11629,7 @@ size_t	zbx_dc_config_get_snmp_items_by_interfaceid(zbx_uint64_t interfaceid, zbx
 unlock:
 	UNLOCK_CACHE;
 
-	zabbix_log(LOG_LEVEL_WARNING, "End of %s():" ZBX_FS_SIZE_T, __func__, (zbx_fs_size_t)items_num);
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():" ZBX_FS_SIZE_T, __func__, (zbx_fs_size_t)items_num);
 
 	return items_num;
 }
