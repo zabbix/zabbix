@@ -210,13 +210,13 @@ void	zbx_get_time(struct tm *tm, long *milliseconds, zbx_timezone_t *tz)
 	struct _timeb	current_time;
 
 	_ftime(&current_time);
-	*tm = *localtime(&current_time.time);	/* localtime() cannot return NULL if called with valid parameter */
+	*tm = *zbx_localtime(&current_time.time, NULL);
 	*milliseconds = current_time.millitm;
 #else
 	struct timeval	current_time;
 
 	gettimeofday(&current_time, NULL);
-	localtime_r(&current_time.tv_sec, tm);
+	*tm = *zbx_localtime(&current_time.tv_sec, NULL);
 	*milliseconds = current_time.tv_usec / 1000;
 #endif
 	if (NULL != tz)
@@ -251,7 +251,7 @@ long	zbx_get_timezone_offset(time_t t, struct tm *tm)
 	struct tm	tm_utc;
 #endif
 
-	*tm = *localtime(&t);
+	*tm = *zbx_localtime(&t, NULL);
 
 #ifdef HAVE_TM_TM_GMTOFF
 	offset = tm->tm_gmtoff;
@@ -280,6 +280,29 @@ long	zbx_get_timezone_offset(time_t t, struct tm *tm)
  * Purpose: get broken-down representation of the time in specified time zone *
  *                                                                            *
  * Parameters: time - [IN] input time                                         *
+ *                                                                            *
+ * Return value: broken-down representation of the time in specified time zone*
+ *                                                                            *
+ ******************************************************************************/
+static struct tm	*zbx_localtime_r(const time_t *time)
+{
+	time_t					time_zerro = (time_t)0;
+	static ZBX_THREAD_LOCAL struct tm	tm_safe;
+
+	if (NULL == localtime_r(time, &tm_safe))
+	{
+		zabbix_log(LOG_LEVEL_DEBUG, "Wrong time value " ZBX_FS_TIME_T, (zbx_fs_time_t)(*time));
+		localtime_r(&time_zerro, &tm_safe);
+	}
+
+	return &tm_safe;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: get broken-down representation of the time in specified time zone *
+ *                                                                            *
+ * Parameters: time - [IN] input time                                         *
  *             tz   - [IN] time zone                                          *
  *                                                                            *
  * Return value: broken-down representation of the time in specified time zone*
@@ -287,13 +310,14 @@ long	zbx_get_timezone_offset(time_t t, struct tm *tm)
  ******************************************************************************/
 struct tm	*zbx_localtime(const time_t *time, const char *tz)
 {
+	struct tm				*tm;
+
 #if defined(HAVE_GETENV) && defined(HAVE_PUTENV) && defined(HAVE_UNSETENV) && defined(HAVE_TZSET) && \
 		!defined(_WINDOWS) && !defined(__MINGW32__)
 	char		*old_tz;
-	struct tm	*tm;
 
 	if (NULL == tz || 0 == strcmp(tz, "system"))
-		return localtime(time);
+		return zbx_localtime_r(time);
 
 	if (NULL != (old_tz = getenv("TZ")))
 		old_tz = zbx_strdup(NULL, old_tz);
@@ -301,7 +325,8 @@ struct tm	*zbx_localtime(const time_t *time, const char *tz)
 	setenv("TZ", tz, 1);
 
 	tzset();
-	tm = localtime(time);
+
+	tm = zbx_localtime_r(time);
 
 	if (NULL != old_tz)
 	{
@@ -312,12 +337,12 @@ struct tm	*zbx_localtime(const time_t *time, const char *tz)
 		unsetenv("TZ");
 
 	tzset();
-
-	return tm;
 #else
 	ZBX_UNUSED(tz);
-	return localtime(time);
+
+	tm = zbx_localtime_r(time);
 #endif
+	return tm;
 }
 
 /******************************************************************************
@@ -337,7 +362,7 @@ const struct tm	*zbx_localtime_now(const time_t *time)
 	if (time_last != *time)
 	{
 		time_last = *time;
-		localtime_r(time, &tm_last);
+		tm_last = *zbx_localtime(time, NULL);
 	}
 
 	return &tm_last;
@@ -515,7 +540,7 @@ static void	tm_add_seconds(struct tm *tm, int seconds)
 	}
 
 	time_new += seconds;
-	localtime_r(&time_new, &tm_new);
+	tm_new = *zbx_localtime(&time_new, NULL);
 
 	if (tm->tm_isdst != tm_new.tm_isdst && -1 != tm->tm_isdst && -1 != tm_new.tm_isdst)
 	{
@@ -853,7 +878,7 @@ const char	*zbx_timespec_str(const zbx_timespec_t *ts)
 	time_t		ts_time = ts->sec;
 	struct tm	tm;
 
-	localtime_r(&ts_time, &tm);
+	tm = *zbx_localtime(&ts_time, NULL);
 	zbx_snprintf(str, sizeof(str), "%04d.%02d.%02d %02d:%02d:%02d.%09d", tm.tm_year + 1900, tm.tm_mon + 1,
 			tm.tm_mday, tm.tm_hour, tm.tm_min, tm.tm_sec, ts->ns);
 

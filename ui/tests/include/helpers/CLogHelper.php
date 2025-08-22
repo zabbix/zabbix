@@ -47,14 +47,16 @@ class CLogHelper {
 	/**
 	 * Read content of the log.
 	 *
-	 * @param string  $path          log file path
-	 * @param boolean $incremental   flag to be used to enable incremental read
+	 * @param string  $path         log file path
+	 * @param boolean $incremental  flag to be used to enable incremental read
+	 * @param boolean $truncate     truncate lines from the middle of the returned string if its length exceeds 768
+	 *                              lines
 	 *
 	 * @return string
 	 *
 	 * @throws Exception    on cases when log is not available
 	 */
-	public static function readLog($path, $incremental = false) {
+	public static function readLog($path, $incremental = false, $truncate = false) {
 		$offset = ($incremental && array_key_exists($path, self::$log_offsets))
 				? self::$log_offsets[$path] : 0;
 
@@ -69,6 +71,36 @@ class CLogHelper {
 			}
 
 			self::$log_offsets[$path] = $offset + $pos;
+		}
+
+		if ($truncate) {
+			$head = [];
+			$tail = [];
+			$head_len = 128; // output the first N lines
+			$tail_len = 640; // output the last N lines
+			$truncated_lines = 0;
+
+			for ($n = 0, $lpos = 0, $rpos = strpos($content, "\n", $lpos); $n < $head_len && $rpos !== false;
+					$n++, $lpos = $rpos, $rpos = strpos($content, "\n", $lpos + 1)) {
+				$head[] = substr($content, $lpos + 1, $rpos - $lpos);
+			}
+
+
+			for ($n = 0, $lpos = $rpos, $rpos = strpos($content, "\n", $lpos); $rpos !== false;
+					$lpos = $rpos, $rpos = strpos($content, "\n", $lpos + 1)) {
+				$tail[] = substr($content, $lpos + 1, $rpos - $lpos);
+
+				if (count($tail) > $tail_len) {
+					$truncated_lines++;
+					array_shift($tail);
+				}
+			}
+
+			if ($truncated_lines != 0) {
+				$head[] = '...'."\n".'truncated '.$truncated_lines.' lines'."\n".'...'."\n";
+			}
+
+			$content = implode("", array_merge($head, $tail));
 		}
 
 		return $content;

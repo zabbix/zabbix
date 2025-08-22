@@ -22,6 +22,7 @@ use CAuthenticationHelper;
 use CApiInputValidator;
 use CProvisioning;
 use DB;
+use Exception;
 use SCIM\ScimApiService;
 
 class Group extends ScimApiService {
@@ -223,12 +224,13 @@ class Group extends ScimApiService {
 		$db_scim_group = $db_scim_groups[0];
 
 		if ($options['displayName'] !== $db_scim_group['name']) {
-			$scim_groupid = DB::update('scim_group', [
-				'values' => ['name' => $options['displayName']],
-				'where' => ['scim_groupid' => $options['id']]
-			]);
-
-			if (!$scim_groupid) {
+			try {
+				DB::update('scim_group', [
+					'values' => ['name' => $options['displayName']],
+					'where' => ['scim_groupid' => $options['id']]
+				]);
+			}
+			catch (Exception $e) {
 				self::exception(ZBX_API_ERROR_INTERNAL,
 					'Cannot update group '.$db_scim_group['name'].' to group '.$options['displayName'].'.'
 				);
@@ -356,12 +358,13 @@ class Group extends ScimApiService {
 
 		foreach ($options['Operations'] as $operation) {
 			if ($operation['path'] === 'displayName') {
-				$scim_groupid = DB::update('scim_group', [
-					'values' => ['name' => $operation['value']],
-					'where' => ['scim_groupid' => $options['id']]
-				]);
-
-				if (!$scim_groupid) {
+				try {
+					DB::update('scim_group', [
+						'values' => ['name' => $operation['value']],
+						'where' => ['scim_groupid' => $options['id']]
+					]);
+				}
+				catch (Exception $e) {
 					self::exception(ZBX_API_ERROR_INTERNAL,
 						'Cannot update group '.$db_scim_groups[0]['name'].' to group '.$operation['value'].'.'
 					);
