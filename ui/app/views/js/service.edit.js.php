@@ -28,10 +28,12 @@ window.service_edit_popup = new class {
 		this.status_rules = status_rules;
 
 		const return_url = new URL('zabbix.php', location.href);
+
 		return_url.searchParams.set('action', 'service.list');
 		ZABBIX.PopupManager.setReturnUrl(return_url.href);
 
-		this.#initTemplates();
+		this.status_rule_template = new Template(this.form_element.querySelector('#status-rule-tmpl').innerHTML);
+		this.child_template = new Template(this.form_element.querySelector('#child-service-tmpl').innerHTML);
 
 		for (const status_rule of status_rules) {
 			this.#addStatusRule(status_rule);
@@ -50,7 +52,6 @@ window.service_edit_popup = new class {
 		this.#filterChildren();
 
 		// Setup parent services.
-
 		jQuery('#parent_serviceids_')
 			.multiSelect('getSelectButton')
 			.addEventListener('click', () => {
@@ -58,7 +59,6 @@ window.service_edit_popup = new class {
 			});
 
 		// Setup problem tags.
-
 		const $problem_tags = jQuery(document.getElementById('problem_tags'));
 
 		$problem_tags.dynamicRows({
@@ -80,7 +80,6 @@ window.service_edit_popup = new class {
 		table.addEventListener('change', () => this.#update());
 
 		// Setup service rules.
-
 		document
 			.getElementById('status_rules')
 			.addEventListener('click', (e) => {
@@ -96,7 +95,6 @@ window.service_edit_popup = new class {
 			});
 
 		// Setup tags tab.
-
 		const tabs = jQuery('#' + tabs_id);
 
 		const initialize_tags = (event, ui) => {
@@ -122,7 +120,6 @@ window.service_edit_popup = new class {
 		tabs.on('tabscreate tabsactivate', initialize_tags);
 
 		// Setup child services.
-
 		document
 			.getElementById('children-filter')
 			.addEventListener('click', (e) => {
@@ -156,7 +153,6 @@ window.service_edit_popup = new class {
 			});
 
 		// Update form field state according to the form data.
-
 		for (const id of ['propagation_rule', 'algorithm']) {
 			document.getElementById(id).addEventListener('change', () => this.#update());
 		}
@@ -164,21 +160,6 @@ window.service_edit_popup = new class {
 		this.#update();
 
 		new CFormFieldsetCollapsible(document.getElementById('advanced-configuration'));
-	}
-
-	#initTemplates() {
-		this.status_rule_template = new Template(this.form_element.querySelector('#status-rule-tmpl').innerHTML);
-		//this.child_template = new Template(this.form_element.querySelector('#child-service-tmpl').innerHTML);
-
-		this.child_template = new Template(`
-			<tr data-serviceid="#{serviceid}">
-				<td class="<?= ZBX_STYLE_WORDWRAP ?>" style="max-width: <?= ZBX_TEXTAREA_BIG_WIDTH ?>px;">#{name}</td>
-				<td class="<?= ZBX_STYLE_WORDWRAP ?>">#{*problem_tags_html}</td>
-				<td>
-					<button type="button" class="<?= ZBX_STYLE_BTN_LINK ?> js-remove"><?= _('Remove') ?></button>
-				</td>
-			</tr>
-		`);
 	}
 
 	#update() {
@@ -197,12 +178,11 @@ window.service_edit_popup = new class {
 		document
 			.getElementById('problem_tags')
 			.querySelectorAll('.js-problem-tag-input, .element-table-remove, .element-table-add')
-			.forEach((element) => {
-				element.disabled = this.children.size > 0;
-			});
+			.forEach(element => element.disabled = this.children.size > 0);
 
-		document.getElementById('algorithm-not-applicable-warning').style.display =
-			this.children.size > 0 ? 'none' : '';
+		document.getElementById('algorithm-not-applicable-warning').style.display = this.children.size > 0
+			? 'none'
+			: '';
 
 		switch (propagation_rule) {
 			case '<?= ZBX_SERVICE_STATUS_PROPAGATION_INCREASE ?>':
@@ -312,12 +292,11 @@ window.service_edit_popup = new class {
 
 	#filterChildren() {
 		const container = document.querySelector('#children tbody');
-
-		container.innerHTML = '';
-
 		const filter_name = document.getElementById('children-filter-name').value.toLowerCase();
 
 		let count = 0;
+
+		container.innerHTML = '';
 
 		for (const service of this.children.values()) {
 			if (!service.name.toLowerCase().includes(filter_name)) {
@@ -337,7 +316,6 @@ window.service_edit_popup = new class {
 
 	#updateChildrenFilterStats() {
 		const container = document.querySelector('#children tbody');
-
 		const stats_template = <?= json_encode(_('Displaying %1$s of %2$s found')) ?>;
 
 		document.querySelector('#children tfoot .inline-filter-stats').textContent = this.children.size > 0
@@ -425,6 +403,7 @@ window.service_edit_popup = new class {
 		this.overlay.setLoading();
 
 		const curl = new Curl('zabbix.php');
+
 		curl.setArgument('action', 'service.delete');
 		curl.setArgument(CSRF_TOKEN_NAME, <?= json_encode(CCsrfTokenHelper::get('service')) ?>);
 
@@ -463,17 +442,18 @@ window.service_edit_popup = new class {
 		this.overlay.setLoading();
 
 		const curl = new Curl('zabbix.php');
+
 		curl.setArgument('action', this.serviceid !== null ? 'service.update' : 'service.create');
 
 		this.form.validateSubmit(fields)
-			.then((result) => {
+			.then(result => {
 				this.overlay.unsetLoading();
 
 				if (!result) {
 					return;
 				}
 
-				this.#post(curl.getUrl(), fields, (response) => {
+				this.#post(curl.getUrl(), fields, response => {
 					if ('form_errors' in response) {
 						this.form.setErrors(response.form_errors, true, true);
 						this.form.renderErrors();
@@ -495,25 +475,9 @@ window.service_edit_popup = new class {
 			headers: {'Content-Type': 'application/json'},
 			body: JSON.stringify(data)
 		})
-			.then((response) => response.json())
-			.then((response) => {
-				if ('form_errors' in response) {
-					this.form.setErrors(response.form_errors, true, true);
-					this.form.renderErrors();
-				}
-				else if ('error' in response) {
-					throw {error: response.error};
-				}
-				else {
-					overlayDialogueDestroy(this.overlay.dialogueid, true);
-
-					this.dialogue.dispatchEvent(new CustomEvent('dialogue.submit', {detail: response}));
-				}
-
-				return response;
-			})
+			.then(response => response.json())
 			.then(success_callback)
-			.catch((exception) => {
+			.catch(exception => {
 				for (const element of this.form_element.parentNode.children) {
 					if (element.matches('.msg-good, .msg-bad, .msg-warning')) {
 						element.parentNode.removeChild(element);
@@ -534,8 +498,6 @@ window.service_edit_popup = new class {
 
 				this.form_element.parentNode.insertBefore(message_box, this.form_element);
 			})
-			.finally(() => {
-				this.overlay.unsetLoading();
-			});
+			.finally(() => this.overlay.unsetLoading());
 	}
-};
+}
