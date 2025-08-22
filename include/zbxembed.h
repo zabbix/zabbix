@@ -35,7 +35,6 @@ int	zbx_es_is_env_initialized(zbx_es_t *es);
 int	zbx_es_init_browser_env(zbx_es_t *es, const char *endpoint, char **error);
 int	zbx_es_globals_make_readonly(zbx_es_t *es, char **error);
 
-
 int		zbx_es_fatal_error(zbx_es_t *es);
 int		zbx_es_compile(zbx_es_t *es, const char *script, char **code, int *size, char **error);
 int		zbx_es_execute(zbx_es_t *es, const char *script, const char *code, int size, const char *param,

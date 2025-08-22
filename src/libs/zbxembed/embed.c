@@ -1041,7 +1041,6 @@ void	es_put_function_list(duk_context *ctx, duk_idx_t obj_idx, const duk_functio
 	}
 }
 
-
 /******************************************************************************
  *                                                                            *
  * Purpose: retrieve 'enumerable' state of property from prototype            *
