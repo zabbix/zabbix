@@ -910,6 +910,7 @@ class testExpressionMacros extends CIntegrationTest {
 		$this->waitForLogLineToBePresent(self::COMPONENT_SERVER, 'End of escalation_recover()', true, 10, 3);
 
 		self::$alert_response = $this->callUntilDataIsPresent('alert.get', [
+			'hostids' => [self::$host_id],
 			'actionids' => [self::$trigger_action_id],
 			'sortfield' => 'alertid'
 		], 5, 2);
@@ -1437,6 +1438,7 @@ const SUBJECT_INTERNAL = "Internal";
 
 		//get alert messages
 		$alert_response_internal = $this->callUntilDataIsPresent('alert.get', [
+			'hostids' => [self::$host_id],
 			'actionids' => [self::$internal_action_id],
 			'sortfield' => 'alertid',
 			'eventobject' => EVENT_OBJECT_ITEM,
@@ -1853,6 +1855,7 @@ const SUBJECT_INTERNAL = "Internal";
 
 		//get alert messages
 		$alert_response_internal_LLD = $this->callUntilDataIsPresent('alert.get', [
+			'hostids' => [self::$host_id],
 			'actionids' => [self::$internal_lld_action_id],
 			'sortfield' => 'alertid',
 			'eventobject' => EVENT_OBJECT_LLDRULE,
@@ -2233,6 +2236,7 @@ const SUBJECT_INTERNAL = "Internal";
 		$this->waitForLogLineToBePresent(self::COMPONENT_SERVER, 'End of add_message_alert()', true);
 
 		$alert_response_internal_trigger = $this->callUntilDataIsPresent('alert.get', [
+			'hostids' =>  [self::$host_id],
 			'actionids' => [self::$internal_trigger_action_id],
 			'sortfield' => 'alertid',
 			'eventobject' => EVENT_OBJECT_TRIGGER,
@@ -2691,6 +2695,7 @@ const SUBJECT_INTERNAL = "Internal";
 		$this->waitForLogLineToBePresent(self::COMPONENT_SERVER, 'End of escalation_execute()', true);
 
 		self::$alert_response_service = $this->callUntilDataIsPresent('alert.get', [
+			'hostids' =>  [self::$host_id],
 			'actionids' => [self::$service_action_id],
 			'sortfield' => 'alertid',
 			'eventobject' => EVENT_OBJECT_SERVICE,
@@ -3074,6 +3079,7 @@ const SUBJECT_INTERNAL = "Internal";
 		$this->waitForLogLineToBePresent(self::COMPONENT_SERVER, 'End of add_object_msg()', true);
 
 		$response = $this->call('alert.get', [
+			'hostids' => [self::$host_id],
 			'actionids' => self::$discovery_action_id,
 			'sortfield' => 'alertid',
 			'eventobject' => EVENT_OBJECT_DHOST,
@@ -3437,6 +3443,7 @@ const SUBJECT_INTERNAL = "Internal";
 		$this->waitForLogLineToBePresent(self::COMPONENT_SERVER, "End substitute_simple_macros_impl() data:'Autoregistration'", true, 120);
 
 		$response = $this->call('alert.get', [
+			'hostids' => [self::$host_id],
 			'actionids' => self::$autoregistration_action_id,
 			'sortfield' => 'alertid',
 			'eventobject' => EVENT_OBJECT_AUTOREGHOST,
