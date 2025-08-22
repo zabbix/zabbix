@@ -1215,7 +1215,18 @@ class CFormValidator {
 	 */
 	public static function existsAPIObject (string $api, array $options, ?string $exclude_primary_id = null): bool {
 		$options['preservekeys'] = true;
-		$result = API::getApiService($api)->get($options);
+		$auth = [
+			'type' => CJsonRpc::AUTH_TYPE_COOKIE,
+			'auth' => CWebUser::$data['sessionid']
+		];
+
+		$response = API::getWrapper()->getClient()->callMethod($api, 'get', $options, $auth);
+
+		if ($response->errorCode) {
+			throw new Exception($response->errorMessage);
+		}
+
+		$result = $response->data;
 
 		if ($result) {
 			$matches = array_diff(array_keys($result), [$exclude_primary_id]);
