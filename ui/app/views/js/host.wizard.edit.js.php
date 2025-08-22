@@ -806,6 +806,8 @@ window.host_wizard_edit = new class {
 		// Don't send request if template or host hasn't changed.
 		if (this.#template?.templateid === templateid
 				&& (this.#host?.hostid === hostid || (this.#host === null && hostid === null))) {
+			this.#data.tls_psk_identity = this.#generatePSKIdentity();
+
 			return Promise.resolve();
 		}
 
@@ -864,9 +866,7 @@ window.host_wizard_edit = new class {
 					this.#data.tls_warning = this.#data.install_agent_required && !no_encryption && !psk_encryption;
 				}
 
-				const host_field_length = <?= DB::getFieldLength('hosts', 'host') ?>;
-
-				this.#data.tls_psk_identity = `${this.#getHostName().substring(0, host_field_length - 4)} PSK`;
+				this.#data.tls_psk_identity = this.#generatePSKIdentity();
 				this.#data.tls_psk = this.#data.tls_required ? this.#generatePSK() : '';
 
 				this.#data.interfaces = [];
@@ -1554,6 +1554,12 @@ window.host_wizard_edit = new class {
 		return this.#data.interface_required.some(required_type =>
 			!this.#host?.interfaces.some(({type}) => Number(type) === required_type)
 		);
+	}
+
+	#generatePSKIdentity() {
+		const host_field_length = <?= DB::getFieldLength('hosts', 'host') ?>;
+
+		return `${this.#getHostName().substring(0, host_field_length - 4)} PSK`;
 	}
 
 	#generatePSK() {
