@@ -30,7 +30,7 @@ func Test_pingHandler(t *testing.T) {
 		wantErr bool
 	}{
 		{
-			name:    "+ok",
+			name:    "+valid",
 			args:    map[Command][]byte{cmdHealth: fixtures[cmdHealth]},
 			want:    PingOk,
 			wantErr: false,

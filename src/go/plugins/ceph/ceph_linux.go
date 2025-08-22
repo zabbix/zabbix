@@ -10,9 +10,8 @@
 **
 ** You should have received a copy of the GNU Affero General Public License along with this program.
 ** If not, see <https://www.gnu.org/licenses/>.
+**/
 
-*
- */
 package ceph
 
 import (
@@ -32,7 +31,7 @@ import (
 type Plugin struct {
 	plugin.Base
 
-	connMgr *conn.Manager
+	connMgr *conn.ConnManager
 	options pluginOptions
 	client  *http.Client
 }

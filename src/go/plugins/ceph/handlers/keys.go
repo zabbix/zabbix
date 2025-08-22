@@ -10,9 +10,8 @@
 **
 ** You should have received a copy of the GNU Affero General Public License along with this program.
 ** If not, see <https://www.gnu.org/licenses/>.
+**/
 
-*
- */
 package handlers
 
 // The constants below define the unique keys for each supported Ceph metric.
@@ -24,16 +23,6 @@ const (
 	KeyPing          Key = "ceph.ping"
 	KeyPoolDiscovery Key = "ceph.pool.discovery"
 	KeyStatus        Key = "ceph.status"
-)
-
-const (
-	cmdDf               Command = "df"
-	cmdPgDump           Command = "pg dump"
-	cmdOSDCrushRuleDump Command = "osd crush rule dump"
-	cmdOSDCrushTree     Command = "osd crush tree"
-	cmdOSDDump          Command = "osd dump"
-	cmdHealth           Command = "health"
-	cmdStatus           Command = "status"
 )
 
 var metricsMeta = map[Key]MetricMeta{ //nolint:gochecknoglobals // used as a static const
@@ -76,9 +65,6 @@ var metricsMeta = map[Key]MetricMeta{ //nolint:gochecknoglobals // used as a sta
 
 // Key is a unique identifier for a specific metric.
 type Key string
-
-// Command represents a command to be executed, typically a Ceph CLI command.
-type Command string
 
 // handlerFunc defines an interface must be implemented by handlers.
 type handlerFunc func(data map[Command][]byte) (res any, err error)

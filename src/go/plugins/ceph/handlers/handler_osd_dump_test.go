@@ -43,7 +43,7 @@ func Test_osdDumpHandler(t *testing.T) {
 		wantErr bool
 	}{
 		{
-			name:    "+ok",
+			name:    "+valid",
 			args:    map[Command][]byte{cmdOSDDump: fixtures[cmdOSDDump]},
 			wantErr: false,
 		},

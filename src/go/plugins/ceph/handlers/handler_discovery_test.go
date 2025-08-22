@@ -36,12 +36,12 @@ func TestOSDDiscoveryHandler(t *testing.T) {
 		wantErr bool
 	}{
 		{
-			name:    "+must return correct LLD rules for OSDs",
+			name:    "+correctLLDRules",
 			args:    map[Command][]byte{cmdOSDCrushTree: fixtures[cmdOSDCrushTree]},
 			wantErr: false,
 		},
 		{
-			name:    "-must fail on malformed input",
+			name:    "-malformedInput",
 			args:    map[Command][]byte{cmdOSDCrushTree: {1, 2, 3, 4, 5}},
 			wantErr: true,
 		},
@@ -68,7 +68,9 @@ func TestOSDDiscoveryHandler(t *testing.T) {
 
 			// Unmarshal the result and compare it to the expected struct.
 			var gotStruct []osdEntity
-			if err := json.Unmarshal([]byte(gotJSON), &gotStruct); err != nil {
+
+			err = json.Unmarshal([]byte(gotJSON), &gotStruct)
+			if err != nil {
 				t.Fatalf("Failed to unmarshal result: %v", err)
 			}
 
@@ -152,7 +154,9 @@ func Test_poolDiscoveryHandler(t *testing.T) {
 			}
 
 			var gotStruct []poolEntity
-			if err := json.Unmarshal([]byte(gotJSON), &gotStruct); err != nil {
+
+			err = json.Unmarshal([]byte(gotJSON), &gotStruct)
+			if err != nil {
 				t.Fatalf("Failed to unmarshal result: %v", err)
 			}
 

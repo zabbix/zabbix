@@ -48,7 +48,7 @@ func Test_osdHandler(t *testing.T) {
 		wantErr bool
 	}{
 		{
-			name:    "+ok",
+			name:    "+valid",
 			args:    map[Command][]byte{cmdPgDump: fixtures[cmdPgDump]},
 			want:    string(wantSuccessJSON),
 			wantErr: false,

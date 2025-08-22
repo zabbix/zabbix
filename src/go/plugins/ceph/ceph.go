@@ -29,8 +29,8 @@ const pluginName = "Ceph"
 const modeParamName = "Mode"
 
 const (
-	restful = "restful"
-	native  = "native"
+	restful mode = "restful"
+	native  mode = "native"
 )
 
 var _ plugin.Runner = (*Plugin)(nil)
@@ -38,6 +38,8 @@ var _ plugin.Exporter = (*Plugin)(nil)
 
 // impl is the pointer to the plugin implementation.
 var impl Plugin //nolint:gochecknoglobals // this is flagship (legacy) implementation
+
+type mode string
 
 // Export implements the Exporter interface.
 func (p *Plugin) Export(key string, rawParams []string, _ plugin.ContextProvider) (any, error) {
@@ -65,7 +67,7 @@ func (p *Plugin) Export(key string, rawParams []string, _ plugin.ContextProvider
 
 	responses := make(map[handlers.Command][]byte, len(meta.Commands))
 
-	resCh, err := p.getResponseChannel(params[modeParamName], u, meta)
+	resCh, err := p.getResponseChannel(mode(params[modeParamName]), u, meta)
 	if err != nil {
 		return nil, err
 	}
@@ -92,11 +94,11 @@ func (p *Plugin) Export(key string, rawParams []string, _ plugin.ContextProvider
 
 // getResponseChannel determines the mode and returns the appropriate response channel.
 func (p *Plugin) getResponseChannel(
-	mode string,
+	m mode,
 	u *uri.URI,
 	meta *handlers.MetricMeta,
 ) (<-chan *requests.Response, error) {
-	switch mode {
+	switch m {
 	case restful:
 		ctx, cancel := context.WithCancel(context.Background())
 		defer cancel()
@@ -111,7 +113,7 @@ func (p *Plugin) getResponseChannel(
 
 		return resCh, nil
 	default:
-		return nil, errs.New("unknown mode: " + mode)
+		return nil, errs.New("unknown mode: " + string(m))
 	}
 }
 

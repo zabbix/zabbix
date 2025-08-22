@@ -89,7 +89,7 @@ func Test_dfHandler(t *testing.T) {
 		wantErr bool
 	}{
 		{
-			name:    "+ok",
+			name:    "+valid",
 			args:    map[Command][]byte{cmdDf: fixtures[cmdDf]},
 			wantErr: false,
 		},

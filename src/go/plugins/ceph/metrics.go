@@ -24,20 +24,6 @@ import (
 
 var uriDefaults = &uri.Defaults{Scheme: "https", Port: "8003"} //nolint:gochecknoglobals // constant.
 
-// Common params: [URI|session][,User][,ApiKey].
-//
-//nolint:gochecknoglobals // constants.
-var (
-	paramURI = metric.NewConnParam("URI", "URI to connect or session name.").
-			WithDefault(uriDefaults.Scheme + "://localhost:" + uriDefaults.Port).WithSession().
-			WithValidator(uri.URIValidator{Defaults: uriDefaults, AllowedSchemes: []string{"https"}})
-	paramUsername = metric.NewConnParam("User", "Ceph API user.").SetRequired()
-	paramAPIKey   = metric.NewConnParam("APIKey", "Ceph API key.").SetRequired()
-	paramMode     = metric.NewConnParam("Mode", "Ceph modes native|restful").
-			WithDefault("restful").
-			WithValidator(metric.SetValidator{Set: []string{"native", "restful"}, CaseInsensitive: false})
-)
-
 //nolint:gochecknoglobals // map that is used as a constant static map.
 var metrics = metric.MetricSet{
 	string(handlers.KeyDf): metric.New("Returns information about cluster’s data usage and distribution among pools.",
@@ -61,6 +47,20 @@ var metrics = metric.MetricSet{
 	string(handlers.KeyStatus): metric.New("Returns an overall cluster's status.",
 		[]*metric.Param{paramURI, paramUsername, paramAPIKey, paramMode}, false),
 }
+
+// Common params: [URI|session][,User][,ApiKey].
+//
+//nolint:gochecknoglobals // constants.
+var (
+	paramURI = metric.NewConnParam("URI", "URI to connect or session name.").
+			WithDefault(uriDefaults.Scheme + "://localhost:" + uriDefaults.Port).WithSession().
+			WithValidator(uri.URIValidator{Defaults: uriDefaults, AllowedSchemes: []string{"https"}})
+	paramUsername = metric.NewConnParam("User", "Ceph API user.").SetRequired()
+	paramAPIKey   = metric.NewConnParam("APIKey", "Ceph API key.").SetRequired()
+	paramMode     = metric.NewConnParam("Mode", "Ceph modes native|restful").
+			WithDefault("restful").
+			WithValidator(metric.SetValidator{Set: []string{"native", "restful"}, CaseInsensitive: false})
+)
 
 //nolint:gochecknoinits // flagship (legacy) implementation
 func init() {
