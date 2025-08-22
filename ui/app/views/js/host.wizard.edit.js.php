@@ -2181,9 +2181,17 @@ window.host_wizard_edit = new class {
 
 		form_field.querySelectorAll(type === 'error' ? '.error' : '.warning').forEach(element => element.remove());
 
-		messages.forEach(message => form_field.appendChild(this.#view_templates[type].evaluateToElement({
-			message: `${type === 'error' && messages.length > 1 ? '- ' : ''}${message}`
-		})));
+		messages.forEach(message => {
+			const message_element = this.#view_templates[type].evaluateToElement({
+				message: `${type === 'error' && messages.length > 1 ? '- ' : ''}${message}`
+			});
+
+			if (field.parentElement.classList.contains(ZBX_STYLE_FORM_FIELD)) {
+				field.parentNode.insertBefore(message_element, field.nextSibling);
+			} else {
+				field.parentElement.parentNode.insertBefore(message_element, field.parentElement.nextSibling);
+			}
+		});
 	}
 
 	#initReactiveData(target_object, on_change_callback) {
