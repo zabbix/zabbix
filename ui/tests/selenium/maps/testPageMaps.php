@@ -292,6 +292,10 @@ class testPageMaps extends CWebTest {
 						'Name' => ''
 					],
 					'expected' => [
+						'1st host for widgets map',
+						'1st hostgroup for widgets map',
+						'2nd host for widgets map',
+						'2nd hostgroup for widgets map',
 						self::SYSMAP_NAME_LOW_NUMBER,
 						self::SYSMAP_NAME_HIGH_NUMBER,
 						self::SYSMAP_FIRST_A,
@@ -331,6 +335,10 @@ class testPageMaps extends CWebTest {
 						'Name' => ' '
 					],
 					'expected' => [
+						'1st host for widgets map',
+						'1st hostgroup for widgets map',
+						'2nd host for widgets map',
+						'2nd hostgroup for widgets map',
 						self::SYSMAP_NAME_LOW_NUMBER,
 						self::SYSMAP_NAME_HIGH_NUMBER,
 						self::SYSMAP_FIRST_A,
