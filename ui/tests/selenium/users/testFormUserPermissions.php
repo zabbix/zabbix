@@ -298,6 +298,7 @@ class testFormUserPermissions extends CWebTest {
 		$update_field = (array_key_exists('User type', $data['before'])) ? $data['after'] : $data['change'];
 		$role_form->fill($update_field);
 		$role_form->submit();
+		$this->assertMessage(TEST_GOOD, 'User role updated');
 
 		$this->page->open('zabbix.php?action=user.edit&userid='.self::$admin_user);
 		$form->selectTab('Permissions');

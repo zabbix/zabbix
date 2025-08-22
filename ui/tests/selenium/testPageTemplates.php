@@ -37,7 +37,8 @@ class testPageTemplates extends CLegacyWebTest {
 	public function getBehaviors() {
 		return [
 			CTableBehavior::class,
-			CTagBehavior::class
+			CTagBehavior::class,
+			CMessageBehavior::class
 		];
 	}
 
@@ -109,9 +110,9 @@ class testPageTemplates extends CLegacyWebTest {
 		$this->zbxTestCheckHeader('Templates');
 		$this->zbxTestTextPresent('All templates');
 		$this->zbxTestClickWait('update');
+		$this->assertMessage(TEST_GOOD, 'Template updated');
 		$this->zbxTestCheckTitle('Configuration of templates');
 		$this->zbxTestCheckHeader('Templates');
-		$this->zbxTestTextPresent('Template updated');
 		$this->zbxTestTextPresent($name);
 
 		$this->assertEquals($oldHashTemplate, CDBHelper::getHash($sqlTemplate));

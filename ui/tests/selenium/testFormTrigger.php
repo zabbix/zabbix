@@ -993,10 +993,12 @@ class testFormTrigger extends CLegacyWebTest {
 	* @param string    $name    name of a host or template where triggers are opened
 	*/
 	private function filterEntriesAndOpenTriggers($name, $form) {
+		$table = $this->query('xpath://table[@class="list-table"]')->asTable()->one();
 		$this->query('button:Reset')->one()->click();
 		$form->fill(['Name' => $name]);
 		$this->query('button:Apply')->one()->waitUntilClickable()->click();
-		$this->query('xpath://table[@class="list-table"]')->asTable()->one()->findRow('Name', $name)
-			->getColumn('Triggers')->query('link:Triggers')->one()->click();
+		$form->waitUntilStalled();
+		$table->waitUntilReloaded();
+		$table->findRow('Name', $name)->getColumn('Triggers')->query('link:Triggers')->one()->click();
 	}
 }

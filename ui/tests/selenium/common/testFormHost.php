@@ -1794,7 +1794,7 @@ class testFormHost extends CWebTest {
 
 		// Check that the host creation page is open after cloning or full cloning.
 		if ($data['action'] === 'Clone' || $data['action'] === 'Full clone') {
-			$form_type->invalidate();
+			$form_type->waitUntilStalled()->invalidate();
 			$id = CDBHelper::getValue('SELECT hostid FROM hosts WHERE host='.zbx_dbstr($host));
 			$action = ($data['action'] === 'Clone') ? 'clone' : 'full_clone';
 			$expected_url = PHPUNIT_URL.'zabbix.php?action=host.edit&hostid='.$id.'&'.$action.'=1';

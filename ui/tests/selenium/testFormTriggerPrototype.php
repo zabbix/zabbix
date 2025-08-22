@@ -959,6 +959,7 @@ class testFormTriggerPrototype extends CLegacyWebTest {
 		$this->query('button:Reset')->one()->click();
 		$form->fill(['Name' => $name]);
 		$this->query('button:Apply')->one()->waitUntilClickable()->click();
+		$form->waitUntilStalled();
 		$table->waitUntilReloaded();
 		$table->findRow('Name', $name)->getColumn('Discovery')->query('link:Discovery')->one()->click();
 	}

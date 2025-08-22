@@ -2359,11 +2359,11 @@ class testFormItemPrototype extends CLegacyWebTest {
 	 * @param string    $name    name of a host
 	 */
 	private function filterEntriesAndOpenDiscovery($name) {
-		$table = $this->query('xpath://table[@class="list-table"]')->asTable();
 		$form = $this->query('name:zbx_filter')->asForm()->waitUntilReady()->one();
+		$table = $this->query('xpath:(//table[@class="list-table"])[1]')->asTable()->one();
 		$form->fill(['Name' => $name]);
 		$this->query('button:Apply')->one()->waitUntilClickable()->click();
 		$table->waitUntilReloaded();
-		$table->one()->findRow('Name', $name)->getColumn('Discovery')->query('link:Discovery')->one()->click();
+		$table->findRow('Name', $name)->getColumn('Discovery')->query('link:Discovery')->one()->click();
 	}
 }

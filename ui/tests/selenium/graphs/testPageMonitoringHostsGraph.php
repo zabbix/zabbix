@@ -873,6 +873,7 @@ class testPageMonitoringHostsGraph extends CWebTest {
 					$this->query($xpath)->waitUntilClickable()->one()->click();
 					$this->query($xpath.'/ancestor::span')->one()->
 							waitUntilAttributesPresent(['class' => 'subfilter subfilter-enabled']);
+					$table->waitUntilReloaded();
 					$this->page->waitUntilReady();
 				}
 			}
@@ -881,10 +882,10 @@ class testPageMonitoringHostsGraph extends CWebTest {
 		$table = $this->getTable();
 		$form->fill($data['filter'])->submit()->waitUntilStalled();
 		$table->waitUntilReloaded();
+		$this->page->waitUntilReady();
 
 		// Check result amount and graph/item ids.
 		if (array_key_exists('graphs_amount', $data)) {
-			$this->query('xpath://div[@class="table-stats"]')->one()->waitUntilStalled();
 			$this->assertEquals($data['graphs_amount'],
 					$this->query('xpath://tbody/tr/div[@class="flickerfreescreen"]')->all()->count());
 			$this->assertTableStats($data['graphs_amount']);

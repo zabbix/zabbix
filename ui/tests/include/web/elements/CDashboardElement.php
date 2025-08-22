@@ -121,7 +121,7 @@ class CDashboardElement extends CElement {
 	 */
 	public function editProperties() {
 		$this->checkIfEditable();
-		$this->getControls()->query('id:dashboard-config')->one()->click();
+		$this->getControls()->query('id:dashboard-config')->one()->hoverMouse()->click();
 
 		return $this->query('xpath://div[contains(@class, "overlay-dialogue")][@data-dialogueid="dashboard_properties"]')
 				->waitUntilVisible()->asOverlayDialog()->one()->waitUntilReady();
@@ -150,7 +150,8 @@ class CDashboardElement extends CElement {
 		$controls = $this->getControls();
 
 		if ($controls->query('xpath:.//nav[@class="dashboard-edit"]')->one()->isDisplayed()) {
-			$controls->query('id:dashboard-cancel')->one()->click(true);
+			// Added hoverMouse() due to unstable tests on Jenkins.
+			$controls->query('id:dashboard-cancel')->one()->hoverMouse()->click(true);
 
 			if (CElementQuery::getPage()->isAlertPresent()) {
 				CElementQuery::getPage()->acceptAlert();
