@@ -3498,7 +3498,7 @@ static void	DCsync_items(zbx_dbsync_t *sync, zbx_uint64_t revision, zbx_synced_n
 
 		/* SNMP trap items for current server/proxy */
 
-		if (ITEM_TYPE_SNMPTRAP == item->type && 0 == host->proxyid)
+		if (ITEM_TYPE_SNMPTRAP == item->type)
 		{
 			interface_snmpitem = (ZBX_DC_INTERFACE_ITEM *)DCfind_id(&config->interface_snmpitems,
 					item->interfaceid, sizeof(ZBX_DC_INTERFACE_ITEM), &found);
@@ -11535,7 +11535,7 @@ int	zbx_dc_config_get_snmp_interfaceids_by_addr(const char *addr, zbx_uint64_t *
 	const ZBX_DC_INTERFACE_ADDR	*dc_interface_snmpaddr;
 	ZBX_DC_INTERFACE_ADDR		dc_interface_snmpaddr_local;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s() addr:'%s'", __func__, addr);
+	zabbix_log(LOG_LEVEL_WARNING, "In %s() addr:'%s'", __func__, addr);
 
 	dc_interface_snmpaddr_local.addr = addr;
 
@@ -11557,7 +11557,7 @@ int	zbx_dc_config_get_snmp_interfaceids_by_addr(const char *addr, zbx_uint64_t *
 unlock:
 	UNLOCK_CACHE;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%d", __func__, count);
+	zabbix_log(LOG_LEVEL_WARNING, "End of %s():%d", __func__, count);
 
 	return count;
 }
@@ -11589,6 +11589,9 @@ size_t	zbx_dc_config_get_snmp_items_by_interfaceid(zbx_uint64_t interfaceid, zbx
 		goto unlock;
 
 	if (HOST_STATUS_MONITORED != dc_host->status)
+		goto unlock;
+
+	if (dc_host->proxyid != 0)
 		goto unlock;
 
 	if (NULL == (dc_interface_snmpitem = (const ZBX_DC_INTERFACE_ITEM *)zbx_hashset_search(
@@ -11626,7 +11629,7 @@ size_t	zbx_dc_config_get_snmp_items_by_interfaceid(zbx_uint64_t interfaceid, zbx
 unlock:
 	UNLOCK_CACHE;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():" ZBX_FS_SIZE_T, __func__, (zbx_fs_size_t)items_num);
+	zabbix_log(LOG_LEVEL_WARNING, "End of %s():" ZBX_FS_SIZE_T, __func__, (zbx_fs_size_t)items_num);
 
 	return items_num;
 }
