@@ -1689,7 +1689,7 @@ class CLineGraphDraw extends CGraphDraw {
 		$avg_to = $data['avg'][$to] + $shift_avg_to;
 
 		$x1 = $from + $this->shiftXleft;
-		$x2 = $to + $this->shiftXleft + 1;
+		$x2 = $to + $this->shiftXleft;
 
 		$y1min = (int) round($zero - ($min_from - $oxy) / $unit2px);
 		$y2min = (int) round($zero - ($min_to - $oxy) / $unit2px);
@@ -2151,8 +2151,9 @@ class CLineGraphDraw extends CGraphDraw {
 
 			$calc_fnc = $this->items[$item]['calc_fnc'];
 
-			// for each X
-			$prevDraw = true;
+			$prev_draw = true;
+			$prev_full_width = false;
+
 			for ($i = 1, $j = 0; $i <= $this->sizeX; $i++) { // new point
 				if ($data['count'][$i] == 0 && $i != $this->sizeX) {
 					continue;
@@ -2184,21 +2185,21 @@ class CLineGraphDraw extends CGraphDraw {
 					}
 				}
 
-				if (!$draw && !$prevDraw) {
+				if (!$draw && !$prev_draw) {
 					$draw = true;
-					$valueDrawType = GRAPH_ITEM_DRAWTYPE_BOLD_DOT;
+					$value_draw_type = GRAPH_ITEM_DRAWTYPE_BOLD_DOT;
 				}
 				else {
-					$valueDrawType = $drawtype;
-					$prevDraw = $draw;
+					$value_draw_type = $drawtype;
+					$prev_draw = $draw;
 				}
 
 				if ($draw) {
 					$this->drawElement(
 						$data,
 						$i,
-						$j,
-						$valueDrawType,
+						$prev_full_width ? $j + 1 : $j,
+						$value_draw_type,
 						$max_color,
 						$avg_color,
 						$min_color,
@@ -2207,6 +2208,10 @@ class CLineGraphDraw extends CGraphDraw {
 						$this->items[$item]['yaxisside']
 					);
 				}
+
+				$prev_full_width = $draw
+					&& $value_draw_type != GRAPH_ITEM_DRAWTYPE_DOT
+					&& $value_draw_type != GRAPH_ITEM_DRAWTYPE_BOLD_DOT;
 
 				$j = $i;
 			}
