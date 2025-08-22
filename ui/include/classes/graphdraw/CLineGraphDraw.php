@@ -1701,7 +1701,7 @@ class CLineGraphDraw extends CGraphDraw {
 		$y1avg = (int) round($zero - ($avg_from - $oxy) / $unit2px);
 		$y2avg = (int) round($zero - ($avg_to - $oxy) / $unit2px);
 
-		$share_edges = $drawtype !== null && $prev_drawtype !== null
+		$share_edges = $prev_drawtype !== null
 			&& !in_array($drawtype, [GRAPH_ITEM_DRAWTYPE_DOT, GRAPH_ITEM_DRAWTYPE_BOLD_DOT])
 			&& !in_array($prev_drawtype, [GRAPH_ITEM_DRAWTYPE_DOT, GRAPH_ITEM_DRAWTYPE_BOLD_DOT]);
 
