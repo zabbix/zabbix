@@ -3201,15 +3201,26 @@ retry_oracle:
 
 	if (SUCCEED == ZBX_CHECK_LOG_LEVEL(LOG_LEVEL_DEBUG))
 	{
-		for (i = 0; i < self->rows.values_num; i++)
+		if (ZBX_DB_MASK_QUERIES == zbx_db_get_log_masked_values())
 		{
-			zbx_db_value_t	*values = (zbx_db_value_t *)self->rows.values[i];
-			char	*str;
+			zabbix_log(LOG_LEVEL_DEBUG, "insert [txnlev:%d] %d value(s)", zbx_db_txn_level(),
+					self->rows.values_num);
+		}
+		else
+		{
+			for (i = 0; i < self->rows.values_num; i++)
+			{
+				zbx_db_value_t	*values = (zbx_db_value_t *)self->rows.values[i];
+				char	*str;
 
-			str = zbx_db_format_values((zbx_db_field_t **)self->fields.values, values,
-					self->fields.values_num);
-			zabbix_log(LOG_LEVEL_DEBUG, "insert [txnlev:%d] [%s]", zbx_db_txn_level(), ZBX_NULL2EMPTY_STR(str));
-			zbx_free(str);
+				str = zbx_db_format_values((zbx_db_field_t **)self->fields.values, values,
+						self->fields.values_num);
+
+				zabbix_log(LOG_LEVEL_DEBUG, "insert [txnlev:%d] [%s]", zbx_db_txn_level(),
+						ZBX_NULL2EMPTY_STR(str));
+
+				zbx_free(str);
+			}
 		}
 	}
 

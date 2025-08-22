@@ -3200,3 +3200,12 @@ zbx_db_query_mask_t	zbx_db_set_log_masked_values(zbx_db_query_mask_t flag)
 #endif
 }
 
+zbx_db_query_mask_t	zbx_db_get_log_masked_values(void)
+{
+#ifdef ZBX_DEBUG
+	return ZBX_DB_DONT_MASK_QUERIES;
+#else
+	return db_log_masked_values;
+#endif
+}
+
