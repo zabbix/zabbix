@@ -1444,7 +1444,7 @@ const SUBJECT_INTERNAL = "Internal";
 			'eventobject' => EVENT_OBJECT_ITEM,
 			'eventsource' => EVENT_SOURCE_INTERNAL
 		], 4, 2);
-		$this->assertCount(2, $alert_response_internal['result']);
+		$this->assertCount(2, $alert_response_internal['result'], json_encode(alert_response_internal));
 
 		// Test inconsistent macro resolution.
 
@@ -1514,7 +1514,7 @@ const SUBJECT_INTERNAL = "Internal";
 
 			$this->assertEquals($message_expect, $alert_response_internal['result'][1]['message']);
 
-			// enable defaul host
+			// enable default host
 			$response = $this->call('host.update', [
 				'hostid' => self::$host_id_disable,
 				'status' => ITEM_STATUS_ACTIVE
@@ -2316,7 +2316,7 @@ const SUBJECT_INTERNAL = "Internal";
 
 			$this->assertEquals($message_expect, $alert_response_internal_trigger['result'][1]['message']);
 
-			// enable defaul host
+			// enable default host
 			$response = $this->call('host.update', [
 				'hostid' => self::$host_id_disable,
 				'status' => ITEM_STATUS_ACTIVE
@@ -3389,7 +3389,7 @@ const SUBJECT_INTERNAL = "Internal";
 
 		$this->reloadConfigurationCache(self::COMPONENT_SERVER);
 
-		// Create discovery rule action
+		// Create autoregistration action
 		$response = $this->call('action.create', [
 			'eventsource' => EVENT_SOURCE_AUTOREGISTRATION,
 			'status' => ACTION_STATUS_ENABLED,
@@ -3463,7 +3463,7 @@ const SUBJECT_INTERNAL = "Internal";
 			"HOST.HOST -> "		. 'test_macros_host'	. " <-\n" .
 			"HOST.IP -> "		. '127.0.0.1'		. " <-";
 
-		// Test builtin consistent macro resolution during the initial operation (A new host registred).
+		// Test builtin consistent macro resolution during the initial operation (A new host registered).
 
 		$message_expect = '===1===' . "\n" .
 			self::$BUILTIN_MACROS_CONSISTENT_RESOLVE_COMMON_RESOLVED . "\n" .
