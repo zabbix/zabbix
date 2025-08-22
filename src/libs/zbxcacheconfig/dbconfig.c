@@ -9430,6 +9430,10 @@ int	zbx_dc_is_autoreg_host_changed(const char *host, unsigned short port, const 
 			change_flags |= ZBX_AUTOREG_CHANGED_CONNECTION_TYPE;
 		}
 	}
+	else
+	{
+		change_flags |= ZBX_AUTOREG_NOT_FOUND;
+	}
 
 	UNLOCK_CACHE;
 
