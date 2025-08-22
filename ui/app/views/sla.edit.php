@@ -23,6 +23,10 @@ $form = (new CForm('post'))
 	->addItem((new CVar(CSRF_TOKEN_NAME, CCsrfTokenHelper::get('sla')))->removeId())
 	->setId('sla-form')
 	->setName('sla_form')
+	->setAction((new CUrl('zabbix.php'))
+		->setArgument('action', $data['form_action'])
+		->getUrl()
+	)
 	->addItem(getMessages())
 	->addStyle('display: none;');
 

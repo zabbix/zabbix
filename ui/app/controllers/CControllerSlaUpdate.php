@@ -21,63 +21,35 @@ class CControllerSlaUpdate extends CController {
 		$this->setPostContentType(self::POST_CONTENT_TYPE_JSON);
 	}
 
-	static function getValidationRules(): array {
+	public static function getValidationRules(): array {
 		$api_uniq = [
 			['sla.get', ['name' => '{name}'], 'slaid']
 		];
+		$schedule_fields = [];
+
+		for ($i = 0; $i < 7; $i++) {
+			$schedule_fields += [
+				'schedule_enabled_'.$i => ['integer', 'in 1'],
+				'schedule_period_'.$i => ['string', 'not_empty',
+					'use' => [CSlaSchedulePeriodValidator::class, []],
+					'when' => ['schedule_enabled_'.$i, 'in 1']
+				],
+			];
+		}
 
 		return ['object', 'api_uniq' => $api_uniq, 'fields' => [
 			'slaid' => ['db sla.slaid', 'required'],
 			'name' => ['db sla.name', 'required', 'not_empty'],
 			'slo' => ['float', 'required', 'not_empty', 'min' => 0, 'max' => 100, 'decimal_limit' => 4],
-			'period' => ['db sla.period', 'required', 'in' => [
-				ZBX_SLA_PERIOD_DAILY, ZBX_SLA_PERIOD_WEEKLY, ZBX_SLA_PERIOD_MONTHLY, ZBX_SLA_PERIOD_QUARTERLY, ZBX_SLA_PERIOD_ANNUALLY
+			'period' => ['db sla.period', 'in' => [
+				ZBX_SLA_PERIOD_DAILY, ZBX_SLA_PERIOD_WEEKLY, ZBX_SLA_PERIOD_MONTHLY, ZBX_SLA_PERIOD_QUARTERLY,
+				ZBX_SLA_PERIOD_ANNUALLY
 			]],
-			'timezone' => ['db sla.timezone', 'required','not_empty','in' => array_merge([ZBX_DEFAULT_TIMEZONE], array_keys(CTimezoneHelper::getList()))],
-			'schedule_mode' => ['integer', 'required', 'in' => [CSlaHelper::SCHEDULE_MODE_24X7, CSlaHelper::SCHEDULE_MODE_CUSTOM]],
+			'timezone' => ['db sla.timezone',
+				'in' => array_merge([ZBX_DEFAULT_TIMEZONE], array_keys(CTimezoneHelper::getList()))],
+			'schedule_mode' => ['integer', 'in' => [CSlaHelper::SCHEDULE_MODE_24X7, CSlaHelper::SCHEDULE_MODE_CUSTOM]],
 			'schedule' => ['object', 'not_empty',
-				'fields' => [
-					'schedule_enabled_0' => ['integer', 'in 1'],
-					'schedule_period_0' => ['string', 'not_empty',
-						'use' => [CSlaSchedulePeriodValidator::class, []],
-						'when' => ['schedule_enabled_0', 'in 1']
-					],
-					'schedule_enabled_1' => ['integer', 'in 1'],
-					'schedule_period_1' => ['string', 'not_empty',
-						'use' => [CSlaSchedulePeriodValidator::class, []],
-						'when' => ['schedule_enabled_1', 'in 1']
-					],
-					'schedule_enabled_2' => ['integer', 'in 1'],
-					'schedule_period_2' => ['string', 'not_empty',
-						'use' => [CSlaSchedulePeriodValidator::class, []],
-						'when' => ['schedule_enabled_2', 'in 1']
-					],
-					'schedule_enabled_3' => ['integer', 'in 1'],
-					'schedule_period_3' => ['string', 'not_empty',
-						'use' => [CSlaSchedulePeriodValidator::class, []],
-						'when' => ['schedule_enabled_3', 'in 1']
-					],
-					'schedule_enabled_4' => ['integer', 'in 1'],
-					'schedule_period_4' => ['string', 'not_empty',
-						'use' => [CSlaSchedulePeriodValidator::class, []],
-						'when' => ['schedule_enabled_4', 'in 1']
-					],
-					'schedule_enabled_5' => ['integer', 'in 1'],
-					'schedule_period_5' => ['string', 'not_empty',
-						'use' => [CSlaSchedulePeriodValidator::class, []],
-						'when' => ['schedule_enabled_5', 'in 1']
-					],
-					'schedule_enabled_6' => ['integer', 'in 1'],
-					'schedule_period_6' => ['string', 'not_empty',
-						'use' => [CSlaSchedulePeriodValidator::class, []],
-						'when' => ['schedule_enabled_6', 'in 1']
-					],
-					'schedule_enabled_7' => ['integer', 'in 1'],
-					'schedule_period_7' => ['string', 'not_empty',
-						'use' => [CSlaSchedulePeriodValidator::class, []],
-						'when' => ['schedule_enabled_7', 'in 1']
-					]
-				],
+				'fields' => $schedule_fields,
 				'messages' => ['not_empty' => _('At least one schedule must be added.')],
 				'when' => ['schedule_mode', 'in' => [CSlaHelper::SCHEDULE_MODE_CUSTOM]]
 			],
@@ -94,9 +66,9 @@ class CControllerSlaUpdate extends CController {
 					'tag' => ['db sla_service_tag.tag', 'required', 'not_empty', 'when' => ['value', 'not_empty']]
 				]
 			],
-			'description' => ['db sla.description', 'required'],
+			'description' => ['db sla.description'],
 			'excluded_downtimes' => ['objects', 'uniq' => ['period_from', 'period_to'],
-				'messages' => ['uniq' => _('Period from and period to combination is not unique.')],
+				'messages' => ['uniq' => _('Excluded downtime periods must be unique.')],
 				'fields' => [
 					'name' => ['string'],
 					'period_from' => ['string'],

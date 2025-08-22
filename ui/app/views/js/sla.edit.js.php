@@ -31,6 +31,10 @@ window.sla_edit_popup = new class {
 		this.form_element = this.overlay.$dialogue.$body[0].querySelector('form');
 		this.form = new CForm(this.form_element, rules);
 
+		this.excluded_downtime_template = new Template(
+			this.form_element.querySelector('#excluded-downtime-tmpl').innerHTML
+		);
+
 		const return_url = new URL('zabbix.php', location.href);
 		return_url.searchParams.set('action', 'sla.list');
 		ZABBIX.PopupManager.setReturnUrl(return_url.href);
@@ -40,14 +44,11 @@ window.sla_edit_popup = new class {
 		}
 
 		// Update form field state according to the form data.
-
-		for (const element of document.querySelectorAll('#schedule_mode input[type="radio"')) {
-			element.addEventListener('change', () => this._update());
-		}
-
-		for (const element of document.querySelectorAll('#schedule input[type="checkbox"]')) {
-			element.addEventListener('change', () => this._update());
-		}
+		document
+			.querySelectorAll('#schedule_mode input[type="radio"], #schedule input[type="checkbox"]')
+			.forEach(element => {
+				element.addEventListener('change', () => this._updateScheduleFields());
+			});
 
 		// Setup Problem tags.
 		const tag_table = document.getElementById('service-tags');
@@ -79,20 +80,22 @@ window.sla_edit_popup = new class {
 				}
 			});
 
-		this._update();
+		this._updateScheduleFields();
 
 		this.form_element.style.display = '';
 		this.overlay.recoverFocus();
 	}
 
-	_update() {
+	_updateScheduleFields() {
 		const schedule = document.getElementById('schedule');
 		const schedule_mode = document.querySelector('#schedule_mode input:checked').value;
 
 		schedule.style.display = schedule_mode == <?= CSlaHelper::SCHEDULE_MODE_CUSTOM ?> ? '' : 'none';
 
 		schedule.querySelectorAll('input[type="checkbox"]').forEach((element, i) => {
-			schedule.querySelector(`input[name="schedule[schedule_period_${i}]"]`).disabled = element.checked ? '' : 'disabled';
+			schedule
+				.querySelector(`input[name="schedule[schedule_period_${i}]"]`)
+				.disabled = element.checked ? '' : 'disabled';
 		});
 	}
 
@@ -135,21 +138,13 @@ window.sla_edit_popup = new class {
 	}
 
 	_addExcludedDowntime(excluded_downtime) {
-		const excluded_downtime_template = new Template(
-			this.form_element.querySelector('#excluded-downtime-tmpl').innerHTML
-		);
-
 		document
 			.querySelector('#excluded-downtimes tbody')
-			.insertAdjacentHTML('beforeend', excluded_downtime_template.evaluate(excluded_downtime));
+			.insertAdjacentHTML('beforeend', this.excluded_downtime_template.evaluate(excluded_downtime));
 	}
 
 	_updateExcludedDowntime(row, excluded_downtime) {
-		const excluded_downtime_template = new Template(
-			this.form_element.querySelector('#excluded-downtime-tmpl').innerHTML
-		);
-
-		row.insertAdjacentHTML('afterend', excluded_downtime_template.evaluate(excluded_downtime));
+		row.insertAdjacentHTML('afterend', this.excluded_downtime_template.evaluate(excluded_downtime));
 		row.remove();
 	}
 
@@ -165,6 +160,9 @@ window.sla_edit_popup = new class {
 	}
 
 	delete() {
+		this._removePopupMessages();
+		this.overlay.setLoading();
+
 		const curl = new Curl('zabbix.php');
 		curl.setArgument('action', 'sla.delete');
 		curl.setArgument(CSRF_TOKEN_NAME, <?= json_encode(CCsrfTokenHelper::get('sla')) ?>);
@@ -177,19 +175,21 @@ window.sla_edit_popup = new class {
 	}
 
 	submit() {
+		this._removePopupMessages();
+
 		const fields = this.form.getAllValues();
+		this.overlay.setLoading();
 
 		if (this.slaid !== null) {
 			fields.slaid = this.slaid;
 		}
 
 		Object.keys(fields.schedule).forEach(key => {
-			if (key.startsWith("schedule_enabled_") && fields.schedule[key] == null) {
-				delete fields.schedule[key];
-			}
-			if (key.startsWith("schedule_period_") && fields.schedule[key] == null) {
-				delete fields.schedule[key];
-			}
+			['schedule_enabled_', 'schedule_period_'].forEach(prefix => {
+				if (key.startsWith(prefix) && fields.schedule[key] === null) {
+					delete fields.schedule[key];
+				}
+			});
 		});
 
 		if ('service_tags' in fields) {
@@ -202,16 +202,13 @@ window.sla_edit_popup = new class {
 			}
 		}
 
-		this.overlay.setLoading();
-
-		const curl = new Curl('zabbix.php');
-		curl.setArgument('action', this.slaid !== null ? 'sla.update' : 'sla.create');
+		const curl = new Curl(this.form_element.getAttribute('action'));
 
 		this.form.validateSubmit(fields)
 			.then((result) => {
-				this.overlay.unsetLoading();
-
 				if (!result) {
+					this.overlay.unsetLoading();
+
 					return;
 				}
 
@@ -222,13 +219,10 @@ window.sla_edit_popup = new class {
 
 						return;
 					}
-					else if ('error' in response) {
-						throw {error: response.error};
-					}
-					else {
-						overlayDialogueDestroy(this.overlay.dialogueid);
-						this.dialogue.dispatchEvent(new CustomEvent('dialogue.submit', {detail: response}));
-					}
+
+					overlayDialogueDestroy(this.overlay.dialogueid);
+
+					this.dialogue.dispatchEvent(new CustomEvent('dialogue.submit', {detail: response}));
 				});
 			});
 	}
@@ -249,28 +243,47 @@ window.sla_edit_popup = new class {
 			})
 			.then(success_callback)
 			.catch((exception) => {
-				for (const element of this.form_element.parentNode.children) {
-					if (element.matches('.msg-good, .msg-bad, .msg-warning')) {
-						element.parentNode.removeChild(element);
-					}
-				}
-
-				let title, messages;
-
-				if (typeof exception === 'object' && 'error' in exception) {
-					title = exception.error.title;
-					messages = exception.error.messages;
-				}
-				else {
-					messages = [<?= json_encode(_('Unexpected server error.')) ?>];
-				}
-
-				const message_box = makeMessageBox('bad', messages, title)[0];
-
-				this.form_element.parentNode.insertBefore(message_box, this.form_element);
+				this._ajaxExceptionHandler(exception)
 			})
 			.finally(() => {
 				this.overlay.unsetLoading();
 			});
 	}
+
+	_removePopupMessages() {
+		for (const el of this.form_element.parentNode.children) {
+			if (el.matches('.msg-good, .msg-bad, .msg-warning')) {
+				el.parentNode.removeChild(el);
+			}
+		}
+	}
+
+	_ajaxExceptionHandler(exception) {
+		let title;
+		let messages;
+
+		if (typeof exception === 'object' && 'error' in exception) {
+			title = exception.error.title;
+			messages = exception.error.messages;
+		}
+		else {
+			messages = [<?= json_encode(_('Unexpected server error.')) ?>];
+		}
+
+		this._addMessageBox(makeMessageBox('bad', messages, title)[0]);
+	}
+
+	_addMessageBox(message_box) {
+		this._removeMessageBoxes();
+
+		const step_form = this.dialogue.querySelector('.step-form');
+
+		step_form.parentNode.insertBefore(message_box, step_form);
+	}
+
+	_removeMessageBoxes() {
+		this.dialogue.querySelectorAll('.overlay-dialogue-body .msg-bad').forEach(message_box => message_box.remove());
+	}
 };
+
+//# sourceURL=media.test.edit.js.php

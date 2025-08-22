@@ -22,7 +22,7 @@
 $form = (new CForm())
 	->setId('sla-excluded-downtime-form')
 	->setName('sla_excluded_downtime_form')
-	->addVar('edit', $data['is_edit'] ? '1' : '0')
+	->addVar('edit', $data['is_edit'] ? '1' : null)
 	->addVar('row_index', $data['row_index'])
 	->addItem(getMessages());
 

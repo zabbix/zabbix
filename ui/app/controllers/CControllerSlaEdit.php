@@ -98,6 +98,7 @@ class CControllerSlaEdit extends CController {
 
 			$data = [
 				'slaid' => $this->sla['slaid'],
+				'form_action' => 'sla.update',
 				'form' => [
 					'name' => $this->sla['name'],
 					'slo' => (string) round((float) $this->sla['slo'], 4),
@@ -118,6 +119,7 @@ class CControllerSlaEdit extends CController {
 		else {
 			$data = [
 				'slaid' => null,
+				'form_action' => 'sla.create',
 				'form' => [
 					'name' => $defaults['name'],
 					'slo' => '',
