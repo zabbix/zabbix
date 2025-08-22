@@ -931,17 +931,17 @@ class CControllerItemList extends CControllerItem {
 		$input_filters = $this->getInputFilters();
 
 		$prefix = $this->getContextPrefix();
-		CProfile::updateArray($prefix.'filter_groupids',$input_filters['filter_groupids'], PROFILE_TYPE_ID);
+		CProfile::updateArray($prefix.'filter_groupids', $input_filters['filter_groupids'], PROFILE_TYPE_ID);
 		CProfile::updateArray($prefix.'filter_hostids', $input_filters['filter_hostids'], PROFILE_TYPE_ID);
 		CProfile::updateArray($prefix.'filter_valuemapids', $input_filters['filter_valuemapids'], PROFILE_TYPE_ID);
 		CProfile::update($prefix.'filter_name', $input_filters['filter_name'], PROFILE_TYPE_STR);
 		CProfile::update($prefix.'filter_type', $input_filters['filter_type'], PROFILE_TYPE_INT);
 		CProfile::update($prefix.'filter_key', $input_filters['filter_key'], PROFILE_TYPE_STR);
-		CProfile::update($prefix.'filter_snmp_oid',$input_filters['filter_snmp_oid'], PROFILE_TYPE_STR);
+		CProfile::update($prefix.'filter_snmp_oid', $input_filters['filter_snmp_oid'], PROFILE_TYPE_STR);
 		CProfile::update($prefix.'filter_value_type', $input_filters['filter_value_type'], PROFILE_TYPE_INT);
 		CProfile::update($prefix.'filter_delay', $input_filters['filter_delay'], PROFILE_TYPE_STR);
 		CProfile::update($prefix.'filter_history', $input_filters['filter_history'], PROFILE_TYPE_STR);
-		CProfile::update($prefix.'filter_trends',$input_filters['filter_trends'], PROFILE_TYPE_STR);
+		CProfile::update($prefix.'filter_trends', $input_filters['filter_trends'], PROFILE_TYPE_STR);
 		CProfile::update($prefix.'filter_status', $input_filters['filter_status'], PROFILE_TYPE_INT);
 		CProfile::update($prefix.'filter_state', $input_filters['filter_state'], PROFILE_TYPE_INT);
 		CProfile::update($prefix.'filter_inherited', $input_filters['filter_inherited'], PROFILE_TYPE_INT);

@@ -154,8 +154,9 @@ class CControllerChartsView extends CControllerCharts {
 		return [
 			'profileIdx' => 'web.charts.filter',
 			'profileIdx2' => 0,
-			'from' => $this->hasInput('from') ? $this->getInput('from') :
-				CProfile::get('web.charts.filter.from', 'now-'.CSettingsHelper::get(CSettingsHelper::PERIOD_DEFAULT)),
+			'from' => $this->hasInput('from')
+				? $this->getInput('from')
+				: CProfile::get('web.charts.filter.from', 'now-'.CSettingsHelper::get(CSettingsHelper::PERIOD_DEFAULT)),
 			'to' => $this->hasInput('to') ? $this->getInput('to') : CProfile::get('web.charts.filter.to', 'now')
 		];
 	}
@@ -202,10 +203,10 @@ class CControllerChartsView extends CControllerCharts {
 
 	private function getProfiles(): array {
 		return [
-			'filter_hostids' => CProfile::get('web.charts.filter.hostids', []),
+			'filter_hostids' => CProfile::getArray('web.charts.filter.hostids', []),
 			'filter_name' => CProfile::get('web.charts.filter.filter_name', ''),
 			'filter_show' => (int) CProfile::get('web.charts.filter.filter_show', GRAPH_FILTER_ALL),
-			'subfilter_tagnames' => CProfile::get('web.charts.filter.subfilter_tagnames', []),
+			'subfilter_tagnames' => CProfile::getArray('web.charts.filter.subfilter_tagnames', []),
 			'subfilter_tags' => json_decode(CProfile::get('web.charts.filter.subfilter_tags', '{}'), true)
 		];
 	}

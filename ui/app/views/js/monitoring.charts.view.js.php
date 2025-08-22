@@ -22,6 +22,7 @@
 		_data: null,
 		_resize_observer: null,
 		_container: null,
+		_init_filer_values: null,
 
 		init({filter_form_name, data, timeline}) {
 			this._filter_form = document.querySelector(`[name="${filter_form_name}"]`);
@@ -40,6 +41,7 @@
 			});
 
 			timeControl.processObjects();
+			this._init_filer_values = this.getFilterValues();
 		},
 
 		initSubfilter() {
@@ -47,44 +49,42 @@
 				const target = e.target;
 
 				if (target.matches('.link-action') && target.closest('.subfilter') !== null) {
-					const search_params = new URLSearchParams(window.location.search);
-					const url = new URL(window.location.href);
-					let reload_page = true;
+					const url = new URL('zabbix.php', window.location.origin);
+					url.searchParams.set('action', 'charts.view');
+
+					this._init_filer_values.forEach(filter => {
+						url.searchParams.append(filter.key, filter.value);
+					});
 
 					if (target.matches('.js-subfilter-set')) {
-						search_params.append(target.getAttribute('data-name'), target.getAttribute('data-value'));
+						url.searchParams.append(target.getAttribute('data-name'), target.getAttribute('data-value'));
 					}
 					else if (target.matches('.js-subfilter-unset')) {
-						search_params.delete(target.getAttribute('data-name'), target.getAttribute('data-value'));
-					}
-					else {
-						reload_page = false;
+						url.searchParams.delete(target.getAttribute('data-name'), target.getAttribute('data-value'));
 					}
 
-					if (reload_page) {
-						search_params.delete('filter_set');
-						search_params.delete('filter_rst');
-						search_params.set('subfilter_set', '1');
-						search_params.set('from', this._filter_form.querySelector('input[name="from"]').value);
-						search_params.set('to', this._filter_form.querySelector('input[name="to"]').value);
+					url.searchParams.delete('filter_set');
+					url.searchParams.delete('filter_rst');
+					url.searchParams.set('subfilter_set', '1');
 
-						window.location.href = url.origin + url.pathname + '?' + search_params.toString();
-					}
+					window.location.href = url.href;
 				}
 			});
 
 			this._filter_form.addEventListener('submit', e => {
 				e.preventDefault();
 				const search_params = new URLSearchParams(new FormData(e.target));
-				const url = new URL(window.location.href);
+				const url = new URL('zabbix.php', window.location.origin);
+				url.searchParams.set('action', 'charts.view');
+				url.searchParams.set('filter_set', '1');
 
-				Array.from(search_params.keys()).forEach(filter_key => {
-					if (filter_key.startsWith('subfilter_')) {
-						search_params.delete(filter_key);
+				search_params.forEach((filter_value, filter_key) => {
+					if (!filter_key.startsWith('subfilter_')) {
+						url.searchParams.append(filter_key, filter_value);
 					}
 				});
 
-				window.location.href = url.origin + url.pathname + '?' + search_params.toString();
+				window.location.href = url.href;
 			});
 		},
 
@@ -108,6 +108,32 @@
 				this._app.timeline = data;
 				this._app.updateCharts();
 			});
+		},
+
+		getFilterValues() {
+			const filters = Object.keys(this._data.config).reduce((filtered, filter_key) => {
+				if (filter_key.includes('filter_')) {
+					if (Array.isArray(this._data.config[filter_key])) {
+						this._data.config[filter_key].forEach(value => filtered.push({key: `${filter_key}[]`, value}));
+					}
+					else if (typeof this._data.config[filter_key] === 'object') {
+						Object.keys(this._data.config[filter_key]).forEach(key =>
+							this._data.config[filter_key][key].forEach(value =>
+								filtered.push({key: `${filter_key}[${key}][]`, value})
+							)
+						)
+					}
+					else {
+						filtered.push({key: filter_key, value: this._data.config[filter_key]});
+					}
+				}
+				return filtered;
+			}, []);
+
+			filters.push({key: 'from', value: this._data.timeline.from});
+			filters.push({key: 'to', value: this._data.timeline.to});
+
+			return filters;
 		},
 
 		replacePaging(paging) {
