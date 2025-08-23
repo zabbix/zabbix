@@ -4,7 +4,7 @@ msgstr ""
 "Project-Id-Version: Zabbix 6.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2023-10-19 13:48+0300\n"
-"PO-Revision-Date: 2025-08-20 19:55+0000\n"
+"PO-Revision-Date: 2025-08-22 18:18+0000\n"
 "Last-Translator: ERIC <eric78.zabbix@orange.fr>\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
 "Language: fr\n"
@@ -1140,7 +1140,7 @@ msgstr "Règles supplémentaires"
 
 #: app/views/host.wizard.edit.php:521 app/views/host.wizard.edit.php:544
 msgid "Additionally, make sure to complete the agent installation as described in this step, then return to this screen to continue to the next step."
-msgstr ""
+msgstr "De plus, assurez-vous de terminer l’installation de l’agent comme décrit dans cette étape, puis revenez à cet écran pour passer à l’étape suivante."
 
 #: app/controllers/CControllerProxyCreate.php:82
 #: app/controllers/CControllerProxyUpdate.php:76
@@ -2238,7 +2238,7 @@ msgstr "Bas N"
 
 #: app/views/host.wizard.edit.php:429
 msgid "Brackets to specify IPv6 addresses"
-msgstr ""
+msgstr "Crochets pour spécifier les adresses IPv6"
 
 #: jsLoader.php:266
 msgid "Bring forward"
@@ -2648,17 +2648,17 @@ msgstr "Impossible de convertir les données POST :"
 #: include/classes/helpers/CItemGeneralHelper.php:1016
 #, c-format
 msgid "Cannot copy LLD rule prototype with key \"%1$s\" without its master item prototype with key \"%2$s\"."
-msgstr ""
+msgstr "Impossible de copier le prototype de règle LLD avec la clé « %1$s » sans son prototype d'élément maître avec la clé « %2$s »."
 
 #: include/classes/helpers/CItemGeneralHelper.php:1004
 #, c-format
 msgid "Cannot copy LLD rule prototype with key \"%1$s\" without its master item with key \"%2$s\"."
-msgstr ""
+msgstr "Impossible de copier le prototype de règle LLD avec la clé « %1$s » sans son élément maître avec la clé « %2$s »."
 
 #: include/classes/helpers/CItemGeneralHelper.php:1003
 #, c-format
 msgid "Cannot copy LLD rule with key \"%1$s\" without its master item with key \"%2$s\"."
-msgstr ""
+msgstr "Impossible de copier la règle LLD avec la clé « %1$s » sans son élément maître avec la clé « %2$s »."
 
 #: app/controllers/CControllerCopyCreate.php:183
 msgid "Cannot copy graph"
@@ -3290,7 +3290,7 @@ msgstr[1] "Impossible d'activer les connecteurs"
 msgid "Cannot enable discovery prototype"
 msgid_plural "Cannot enable discovery prototypes"
 msgstr[0] "Impossible d'activer le prototype de découverte"
-msgstr[1] ""
+msgstr[1] "Impossible d'activer les prototypes de découverte"
 
 #: app/controllers/CControllerDiscoveryEnable.php:76 host_discovery.php:583
 msgid "Cannot enable discovery rule"
@@ -3372,7 +3372,7 @@ msgstr "Substitution des macros impossible."
 #: include/classes/import/CConfigurationImport.php:1159
 #, c-format
 msgid "Cannot find \"parent_discovery_rule\" with key \"%1$s\" used for LLD rule prototype with key \"%2$s\" on \"%3$s\"."
-msgstr ""
+msgstr "Impossible de trouver « parent_discovery_rule » avec la clé « %1$s » utilisée pour le prototype de règle LLD avec la clé « %2$s » sur « %3$s »."
 
 #: include/classes/import/importers/CTemplateDashboardImporter.php:217
 #, c-format
@@ -3417,7 +3417,7 @@ msgstr "Impossible de trouver le groupe d'hôtes \"%1$s\" pour le prototype d'h�
 #: include/classes/import/CConfigurationImport.php:1326
 #, c-format
 msgid "Cannot find host group \"%1$s\" for host prototype \"%2$s\" of discovery rule prototype \"%3$s\" on \"%4$s\"."
-msgstr ""
+msgstr "Impossible de trouver le groupe d'hôtes « %1$s » pour le prototype d'hôte « %2$s » du prototype de règle de découverte « %3$s » sur « %4$s »."
 
 #: include/classes/api/services/CDiscoveryRule.php:3350
 #, c-format
@@ -4391,7 +4391,7 @@ msgstr "Impossible de mettre à jour le connecteur"
 
 #: host_discovery_prototypes.php:526 host_discovery_prototypes.php:550
 msgid "Cannot update discovery prototype"
-msgstr ""
+msgstr "Impossible de mettre à jour le prototype de découverte"
 
 #: app/controllers/CControllerDiscoveryUpdate.php:48
 #: app/controllers/CControllerDiscoveryUpdate.php:96 host_discovery.php:548
@@ -4922,7 +4922,7 @@ msgstr "Effacer en déliant"
 #: app/views/host.wizard.edit.php:1007
 #, c-format
 msgid "Click %1$s to complete the setup."
-msgstr ""
+msgstr "Cliquez sur %1$s pour terminer la configuration."
 
 #: app/views/js/host.wizard.edit.js.php:771
 msgid "Click Finish to close the Host wizard."
@@ -4931,7 +4931,7 @@ msgstr "Cliquez sur Terminer pour fermer l’assistant d'hôte."
 #: app/views/js/host.wizard.edit.js.php:770
 #, c-format
 msgid "Click Finish to navigate to the Latest data section and view the most recent data for your host (%1$s)."
-msgstr ""
+msgstr "Cliquez sur Terminer pour accéder à la section Dernières données et afficher les données les plus récentes pour votre hôte (%1$s)."
 
 #: jsLoader.php:157
 msgid "Click and drag to desired size."
@@ -5108,7 +5108,7 @@ msgstr "Coordonnées centrales séparées par des virgules et niveau de zoom à 
 
 #: app/views/host.wizard.edit.php:427
 msgid "Comma to separate multiple Zabbix servers, proxies, or clusters"
-msgstr ""
+msgstr "Virgule pour séparer plusieurs serveurs, proxys ou clusters Zabbix"
 
 #: app/views/administration.script.edit.php:199
 #: app/views/reports.actionlog.list.csv.php:45
@@ -5131,7 +5131,7 @@ msgstr ""
 
 #: app/views/host.wizard.edit.php:414
 msgid "Communication between Zabbix agent and server/proxy is secured with the pre-shared key (PSK) encryption method."
-msgstr ""
+msgstr "La communication entre l'agent Zabbix et le serveur/proxy est sécurisée avec la méthode de cryptage à clé pré-partagée (PSK)."
 
 #: include/items.inc.php:946
 msgctxt "SNMP Community"
@@ -5396,7 +5396,7 @@ msgstr "Configurer le provisionnement JIT"
 
 #: app/views/host.wizard.edit.php:368
 msgid "Configure encryption"
-msgstr ""
+msgstr "Configurer le chiffrement"
 
 #: app/views/host.wizard.edit.php:895 app/views/host.wizard.edit.php:926
 #: app/views/host.wizard.edit.php:1006
@@ -6342,15 +6342,15 @@ msgstr "Données de %1$s. Générées en %2$s sec."
 
 #: app/views/host.wizard.edit.php:168
 msgid "Data is collected by Zabbix agent, a lightweight software `component installed on your monitoring target."
-msgstr ""
+msgstr "Les données sont collectées par l'agent Zabbix, un composant logiciel léger installé sur votre cible à surveiller."
 
 #: app/views/js/host.wizard.edit.js.php:89
 msgid "Data is collected by Zabbix agent, a lightweight software component installed on your monitoring target."
-msgstr ""
+msgstr "Les données sont collectées par l'agent Zabbix, un composant logiciel léger installé sur votre cible à surveiller."
 
 #: app/views/js/host.wizard.edit.js.php:90
 msgid "Data is collected by Zabbix server or proxy using standard protocols (e.g., SNMP, ICMP) or remote access methods (e.g., SSH)."
-msgstr ""
+msgstr "Les données sont collectées par le serveur ou le proxy Zabbix à l'aide de protocoles standard (par exemple, SNMP, ICMP) ou de méthodes d'accès à distance (par exemple, SSH)."
 
 #: app/views/js/webscenario.step.edit.js.php:297
 msgid "Data is not properly encoded."
@@ -8545,7 +8545,7 @@ msgstr "Anglais (en_US)"
 
 #: app/views/host.wizard.edit.php:399
 msgid "Enter a non-secret pre-shared key identity string. Avoid including sensitive data."
-msgstr ""
+msgstr "Saisissez une chaîne d'identité de clé pré-partagée non secrète. Évitez d'inclure des données sensibles."
 
 #: app/views/host.wizard.edit.php:609
 msgid "Enter the IP/DNS address and port of the Zabbix agent installed on your monitoring target."
@@ -8561,7 +8561,7 @@ msgstr "Saisissez l'adresse IP/DNS et le port JMX de votre cible à surveiller."
 
 #: app/views/host.wizard.edit.php:412
 msgid "Enter the IP/DNS address and port of your Zabbix server, proxy, or cluster configuration."
-msgstr ""
+msgstr "Saisissez l'adresse IP/DNS et le port de votre serveur Zabbix, proxy ou configuration de cluster."
 
 #: app/views/host.wizard.edit.php:642
 msgid "Enter the IP/DNS address, port, and authentication details of your SNMP-enabled monitoring target."
@@ -9694,7 +9694,7 @@ msgstr "Prototype de graphique"
 #: include/classes/api/services/CGraphGeneral.php:1354
 #, c-format
 msgid "Graph prototype \"%1$s\" already exists on \"%2$s\" as a discovered graph prototype."
-msgstr ""
+msgstr "Le prototype de graphique « %1$s » existe déjà sur « %2$s » en tant que prototype de graphique découvert."
 
 #: include/classes/api/services/CGraphPrototype.php:470
 #, c-format
@@ -10226,7 +10226,7 @@ msgstr "IP hôte"
 #: app/controllers/CControllerPopup.php:49
 #: app/views/configuration.host.list.php:35
 msgid "Host Wizard"
-msgstr ""
+msgstr "Assistant d'hôte"
 
 #: app/views/administration.script.list.php:99
 msgid "Host access"
@@ -10238,7 +10238,7 @@ msgstr "Hôte ajouté"
 
 #: app/controllers/CControllerHostWizardCreate.php:142
 msgid "Host added successfully"
-msgstr ""
+msgstr "Hôte ajouté avec succès"
 
 #: app/controllers/CControllerPopupItemTest.php:1351
 #: app/views/popup.itemtestedit.view.php:99
@@ -10676,7 +10676,7 @@ msgstr "Hôtes"
 
 #: app/views/host.wizard.edit.php:278
 msgid "Hosts are organized into host groups for easier management and access control."
-msgstr ""
+msgstr "Les hôtes sont organisés en groupes d'hôtes pour faciliter la gestion et le contrôle d'accès."
 
 #: widgets/dataover/includes/WidgetForm.php:65
 #: widgets/trigover/includes/WidgetForm.php:72
@@ -10965,7 +10965,7 @@ msgstr "Si le poids des services enfants avec le statut %1$s ou inférieur est i
 
 #: app/views/host.wizard.edit.php:380
 msgid "If you do not know your PSK or would like to change it, click the button below. Note that changing the PSK may impact existing configurations."
-msgstr ""
+msgstr "Si vous ne connaissez pas votre PSK ou souhaitez le modifier, cliquez sur le bouton ci-dessous. Notez que la modification du PSK peut avoir un impact sur les configurations existantes."
 
 #: include/classes/core/ZBase.php:767 include/func.inc.php:1688
 #: include/func.inc.php:1710
@@ -12066,11 +12066,11 @@ msgstr "Installer l'agent Zabbix"
 
 #: app/views/host.wizard.edit.php:512 app/views/host.wizard.edit.php:535
 msgid "Install Zabbix agent 2 and its plugins on your monitoring target by following the installation instructions below."
-msgstr ""
+msgstr "Installez l'agent Zabbix 2 et ses plugins sur votre cible à surveiller en suivant les instructions d'installation ci-dessous."
 
 #: app/views/host.wizard.edit.php:551 app/views/host.wizard.edit.php:574
 msgid "Install Zabbix agent and its plugins on your monitoring target by following the installation instructions below."
-msgstr ""
+msgstr "Installez l'agent Zabbix et ses plugins sur votre cible à surveiller en suivant les instructions d'installation ci-dessous."
 
 #: setup.php:163
 msgid "Installation"
@@ -12094,7 +12094,7 @@ msgstr "Intégrations"
 
 #: app/views/js/host.wizard.edit.js.php:98
 msgid "Intelligent Platform Management Interface (IPMI)"
-msgstr ""
+msgstr "Intelligent Platform Management Interface (IPMI)"
 
 #: app/partials/monitoring.host.view.html.php:36
 #: app/views/configuration.host.list.php:208 app/views/popup.proxy.edit.php:68
@@ -13034,7 +13034,7 @@ msgstr "Un JSON est attendu"
 
 #: include/forms.inc.php:466 include/views/js/item.preprocessing.js.php:135
 msgid "JSON path"
-msgstr ""
+msgstr "JSON path"
 
 #: include/classes/validators/CNewValidator.php:113
 msgid "JSON string is expected"
@@ -13065,7 +13065,7 @@ msgstr "Japonais (ja_JP)"
 
 #: app/views/js/host.wizard.edit.js.php:99
 msgid "Java Management Extensions (JMX) interface"
-msgstr ""
+msgstr "Interface Java Management Extensions (JMX)"
 
 #: app/views/administration.mediatype.edit.php:235
 #: app/views/administration.script.edit.php:241
@@ -13191,11 +13191,11 @@ msgstr "Règle LLD"
 
 #: app/controllers/CControllerAuditLogList.php:227
 msgid "LLD rule prototype"
-msgstr ""
+msgstr "Prototype de règle LLD"
 
 #: include/classes/api/services/CItemGeneral.php:566
 msgid "LLD rule prototype with the same UUID already exists"
-msgstr ""
+msgstr "Un prototype de règle LLD avec le même UUID existe déjà"
 
 #: include/classes/api/services/CItemGeneral.php:539
 msgid "LLD rule with the same UUID already exists"
@@ -14065,7 +14065,7 @@ msgstr "Correspondance"
 #: app/controllers/CControllerTemplateCreate.php:82
 #: app/controllers/CControllerTemplateUpdate.php:84
 msgid "Mapping type and value combination is not unique."
-msgstr ""
+msgstr "La combinaison du type et de la valeur de la correspondance n'est pas unique."
 
 #: app/controllers/CControllerPopupValueMapUpdate.php:147
 #: app/views/administration.iconmap.edit.php:126
@@ -15096,7 +15096,7 @@ msgstr "Aiguille"
 
 #: include/items.inc.php:100
 msgid "Nested"
-msgstr ""
+msgstr "Imbriqué"
 
 #: app/views/administration.housekeeping.edit.php:77
 msgid "Network discovery data storage period"
@@ -16067,12 +16067,12 @@ msgstr "Notez que %1$s ou %2$s seront considérés comme des noms d'hôtes s'ils
 
 #: app/views/host.wizard.edit.php:518 app/views/host.wizard.edit.php:541
 msgid "Note that during agent installation, you will need to configure both the PSK identity and PSK. Make sure they match the PSK identity and PSK set in step 1."
-msgstr ""
+msgstr "Notez que lors de l'installation de l'agent, vous devrez configurer l'identité PSK et le PSK. Assurez-vous qu'ils correspondent à l'identité PSK et au PSK définis à l'étape 1."
 
 #: app/views/host.wizard.edit.php:578
 #, c-format
 msgid "Note: %1$s must be configured and enabled on your monitoring target."
-msgstr ""
+msgstr "Remarque : %1$s doit être configuré et activé sur votre cible à surveiller."
 
 #: include/hosts.inc.php:229
 msgid "Notes"
@@ -16528,7 +16528,7 @@ msgstr "Ouvrir dans une nouvelle fenêtre"
 #: app/views/host.wizard.edit.php:524 app/views/host.wizard.edit.php:547
 #: app/views/host.wizard.edit.php:553
 msgid "Open installation instructions"
-msgstr ""
+msgstr "Ouvrir les instructions d'installation"
 
 #: app/views/mediatype.test.edit.php:101 app/views/popup.scriptexec.php:41
 msgid "Open log"
@@ -17554,7 +17554,7 @@ msgstr "Le prétraitement est une transformation avant d'enregistrer la valeur d
 #: app/controllers/CControllerItem.php:190
 #: app/controllers/CControllerItemPrototype.php:192
 msgid "Preprocessing step with such Name and Parameters combination already exists."
-msgstr ""
+msgstr "L'étape de prétraitement avec cette combinaison de nom et de paramètres existe déjà."
 
 #: app/views/popup.itemtestedit.view.php:375
 #: app/views/popup.massupdate.item.php:203
@@ -19782,7 +19782,7 @@ msgstr "Sélectionné, %1$s, lecture seule, en position %2$d de %3$d"
 
 #: app/views/host.wizard.edit.php:428
 msgid "Semicolon to separate clusters (one or more server addresses)"
-msgstr ""
+msgstr "Point-virgule pour séparer les clusters (une ou plusieurs adresses de serveur)"
 
 #: jsLoader.php:267
 msgid "Send backward"
@@ -20080,11 +20080,11 @@ msgstr "Définir cette vue par défaut"
 
 #: app/views/host.wizard.edit.php:493
 msgid "Set up Zabbix agent on your monitoring target by executing the following PowerShell script [with administrator permissions]:"
-msgstr ""
+msgstr "Configurez l'agent Zabbix sur votre cible à surveiller en exécutant le script PowerShell suivant [avec les autorisations d'administrateur] :"
 
 #: app/views/host.wizard.edit.php:477
 msgid "Set up Zabbix agent on your monitoring target by executing the following script [bash under root]:"
-msgstr ""
+msgstr "Configurez l'agent Zabbix sur votre cible à surveiller en exécutant le script suivant [bash sous root] :"
 
 #: app/views/js/popup.itemtestedit.view.js.php:383 include/forms.inc.php:1599
 #: include/views/js/item.preprocessing.js.php:67
@@ -20687,7 +20687,7 @@ msgstr "Spécifier des conditions de filtre pour voir les valeurs."
 
 #: app/views/host.wizard.edit.php:365
 msgid "Specifying new or existing host groups will add the host to these groups without removing it from any current groups."
-msgstr ""
+msgstr "La spécification de groupes d'hôtes nouveaux ou existants ajoutera l'hôte à ces groupes sans le supprimer des groupes actuels."
 
 #: httpdetails.php:107 include/classes/screens/CScreenHttpTestDetails.php:82
 msgid "Speed"
@@ -20755,11 +20755,11 @@ msgstr "L'heure de début doit être inférieure à l'heure de fin pour l'exclus
 
 #: app/views/host.wizard.edit.php:310
 msgid "Start typing or click Select to choose an existing host, or enter a new host name."
-msgstr ""
+msgstr "Commencez à taper ou cliquez sur Sélectionner pour choisir un hôte existant ou entrez un nouveau nom d’hôte."
 
 #: app/views/host.wizard.edit.php:334
 msgid "Start typing or click Select to choose existing host groups, or enter a new host group name."
-msgstr ""
+msgstr "Commencez à saisir ou cliquez sur Sélectionner pour choisir des groupes d’hôtes existants ou entrez un nouveau nom de groupe d’hôtes."
 
 #: app/views/popup.ldap.edit.php:287
 msgid "StartTLS"
@@ -21737,7 +21737,7 @@ msgstr "Le %1$s n'est plus découvert et %2$s."
 
 #: app/views/host.wizard.edit.php:101
 msgid "The Host Wizard will help you set up your monitoring target (device, application, service, etc.) in Zabbix."
-msgstr ""
+msgstr "L'assistant d'hôte vous aidera à configurer votre cible à surveiller (appareil, application, service, etc.) dans Zabbix."
 
 #: app/views/oauth.edit.php:48
 msgid "The URL must comply with the OAuth provider's policy."
@@ -21850,7 +21850,7 @@ msgstr "Le niveau de zoom maximum est \"%1$s\"."
 #: include/classes/api/services/CDiscoveryRule.php:962
 #, c-format
 msgid "The nested LLD rule with key \"%1$s\" of the template \"%2$s\" cannot be inherited to non-discovered host \"%3$s\"."
-msgstr ""
+msgstr "La règle LLD imbriquée avec la clé « %1$s » du modèle « %2$s » ne peut pas être héritée de l'hôte non découvert « %3$s »."
 
 #: include/classes/data/CItemData.php:1281
 msgid "The number of processes. Returns integer"
@@ -21880,22 +21880,22 @@ msgstr "Le modèle cloné appartient à un groupe de modèles pour lequel vous n
 #: app/views/host.wizard.edit.php:275
 #, c-format
 msgid "The template you selected (%1$s) must be linked to a host - an entity in Zabbix that represents your monitoring target."
-msgstr ""
+msgstr "Le modèle que vous avez sélectionné (%1$s) doit être lié à un hôte - une entité dans Zabbix qui représente votre cible à surveiller."
 
 #: app/views/host.wizard.edit.php:353
 #, c-format
 msgid "The template you selected (%1$s) requires Zabbix agent to be installed and running on your monitoring target."
-msgstr ""
+msgstr "Le modèle que vous avez sélectionné (%1$s) nécessite que l'agent Zabbix soit installé et s'exécute sur votre cible à surveiller."
 
 #: app/views/host.wizard.edit.php:899
 #, c-format
 msgid "The template you selected (%1$s) requires additional configuration."
-msgstr ""
+msgstr "Le modèle que vous avez sélectionné (%1$s) nécessite une configuration supplémentaire."
 
 #: app/views/host.wizard.edit.php:573
 #, c-format
 msgid "The template you selected (%1$s) requires the %2$s to be added to the host (%3$s)."
-msgstr ""
+msgstr "Le modèle que vous avez sélectionné (%1$s) nécessite que les %2$s soient ajoutés à l'hôte (%3$s)."
 
 #: app/views/popup.token.view.php:62
 msgid "The token has expired. Please update the expiry date to use the token."
@@ -21948,7 +21948,7 @@ msgstr[1] "Cette vérification ne peut pas être supprimée, car elle est utilis
 
 #: app/views/host.wizard.edit.php:384
 msgid "This configuration will overwrite all existing encryption settings on the host."
-msgstr ""
+msgstr "Cette configuration écrasera tous les paramètres de chiffrement existants sur l'hôte."
 
 #: include/func.inc.php:2566
 msgid "This day last week"
@@ -21974,7 +21974,7 @@ msgstr "Ce champ est automatiquement rempli par l'élément \"%1$s\"."
 
 #: include/classes/validators/CItemKeyValidator.php:42
 msgid "This field must contain at least one low-level discovery macro."
-msgstr ""
+msgstr "Ce champ doit contenir au moins une macro de découverte de bas niveau."
 
 #: app/controllers/CControllerMediatypeTestEdit.php:86
 msgid "This is the test message from Zabbix"
@@ -22890,7 +22890,7 @@ msgstr "Type (OK)"
 
 #: app/views/host.wizard.edit.php:149
 msgid "Type a keyword to search for templates."
-msgstr ""
+msgstr "Tapez un mot-clé pour rechercher des modèles."
 
 #: app/views/correlation.edit.php:195 app/views/popup.action.edit.php:125
 #: app/views/popup.lldoverride.php:77 app/views/popup.operation.edit.php:423
@@ -23018,7 +23018,7 @@ msgstr "Impossible de modifier les autorisations du fichier de configuration ver
 #: include/classes/server/CZabbixServer.php:673
 #: include/classes/server/CZabbixServer.php:681 jsrpc.php:86 jsrpc.php:101
 msgid "Unable to connect to the Zabbix server due to TLS settings. Some functions are unavailable."
-msgstr ""
+msgstr "Impossible de se connecter au serveur Zabbix en raison des paramètres TLS. Certaines fonctionnalités sont indisponibles."
 
 #: include/classes/core/CConfigFile.php:237
 msgid "Unable to create the configuration file."
@@ -26222,7 +26222,7 @@ msgstr "impossible de supprimer un prototype d'hôte provenant d'un modèle"
 
 #: include/classes/api/services/CDiscoveryRule.php:726
 msgid "cannot have a nested LLD rule on a non-discovered host"
-msgstr ""
+msgstr "impossible d'avoir une règle LLD imbriquée sur un hôte non découvert"
 
 #: include/classes/api/services/CHostPrototype.php:1411
 msgid "cannot have more than one default interface of the same type"
