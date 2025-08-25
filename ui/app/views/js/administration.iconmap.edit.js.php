@@ -54,7 +54,7 @@
 		 */
 		#default_imageid;
 
-		init({action, default_imageid, rules}) {
+		init({rules, default_imageid}) {
 			this.#default_imageid = default_imageid;
 			this.#row_template = new Template(document.getElementById('icon-mapping-template').innerHTML);
 
@@ -94,7 +94,7 @@
 			});
 
 			const curl = new Curl(this.form_element.getAttribute('action'));
-			curl.setArgument('action', action);
+			curl.setArgument('action', this.form.findFieldByName('iconmapid') === null ? 'iconmap.create' : 'iconmap.update');
 			this.#form_action = curl.getUrl();
 			curl.setArgument('action', 'iconmap.list');
 			this.#list_action = curl.getUrl();

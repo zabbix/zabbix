@@ -62,7 +62,7 @@ $form_grid = (new CFormGrid())
 	->addItem((new CLabel(_('Name'), 'name'))->setAsteriskMark())
 	->addItem(new CFormField((new CTextBox('name', $data['iconmap']['name']))
 		->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
-		->setAttribute('maxlength', 64)
+		->setAttribute('maxlength', DB::getFieldLength('icon_map', 'name'))
 		->setAriaRequired()
 		->setAttribute('autofocus', 'autofocus')
 	))
@@ -126,7 +126,6 @@ $form
 		)
 	)
 	->addItem(new CScriptTag('iconmap_edit.init('.json_encode([
-		'action' => $data['iconmapid'] != 0 ? 'iconmap.update' : 'iconmap.create',
 		'rules' => $data['js_validation_rules'],
 		'default_imageid' => $data['default_imageid']
 	]).');'));
