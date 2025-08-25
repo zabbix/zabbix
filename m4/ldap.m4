@@ -88,6 +88,10 @@ AS_HELP_STRING([--with-ldap@<:@=DIR@:>@],[Include LDAP support @<:@default=no@:>
                         LDAP_INCDIR=/usr/local/include
                         LDAP_LIBDIR=/usr/local/lib
                         found_ldap="yes"
+                elif test -f /opt/homebrew/opt/openldap/include/ldap.h; then
+                        LDAP_INCDIR="/opt/homebrew/opt/openldap/include"
+                        LDAP_LIBDIR="/opt/homebrew/opt/openldap/lib"
+                        found_ldap="yes"
                 else
                         found_ldap="no"
                         AC_MSG_RESULT(no)
