@@ -1645,8 +1645,8 @@ class CLineGraphDraw extends CGraphDraw {
 		return true;
 	}
 
-	protected function drawElement(&$data, $from, $to, $drawtype, $prev_drawtype, $max_color, $avg_color, $min_color,
-			$minmax_color, $calc_fnc, $yaxisside) {
+	protected function drawElement(&$data, $from, $to, $drawtype, $max_color, $avg_color, $min_color, $minmax_color,
+			$calc_fnc, $yaxisside, bool $share_edges) {
 		if (!isset($data['max'][$from]) || !isset($data['max'][$to])) {
 			return;
 		}
@@ -1700,10 +1700,6 @@ class CLineGraphDraw extends CGraphDraw {
 
 		$y1avg = (int) round($zero - ($avg_from - $oxy) / $unit2px);
 		$y2avg = (int) round($zero - ($avg_to - $oxy) / $unit2px);
-
-		$share_edges = $drawtype !== null && $prev_drawtype !== null
-			&& !in_array($drawtype, [GRAPH_ITEM_DRAWTYPE_DOT, GRAPH_ITEM_DRAWTYPE_BOLD_DOT])
-			&& !in_array($prev_drawtype, [GRAPH_ITEM_DRAWTYPE_DOT, GRAPH_ITEM_DRAWTYPE_BOLD_DOT]);
 
 		switch ($calc_fnc) {
 			case CALC_FNC_MAX:
@@ -2157,7 +2153,7 @@ class CLineGraphDraw extends CGraphDraw {
 			$calc_fnc = $this->items[$item]['calc_fnc'];
 
 			$prev_draw = true;
-			$prev_draw_type = null;
+			$prev_share_edges = false;
 
 			for ($i = 1, $j = 0; $i <= $this->sizeX; $i++) { // new point
 				if ($data['count'][$i] == 0 && $i != $this->sizeX) {
@@ -2205,17 +2201,19 @@ class CLineGraphDraw extends CGraphDraw {
 						$i,
 						$j,
 						$value_draw_type,
-						$prev_draw_type,
 						$max_color,
 						$avg_color,
 						$min_color,
 						$minmax_color,
 						$calc_fnc,
-						$this->items[$item]['yaxisside']
+						$this->items[$item]['yaxisside'],
+						$prev_share_edges
 					);
 				}
 
-				$prev_draw_type = $draw ? $value_draw_type : null;
+				$prev_share_edges = $draw
+					&& $value_draw_type != GRAPH_ITEM_DRAWTYPE_DOT
+					&& $value_draw_type != GRAPH_ITEM_DRAWTYPE_BOLD_DOT;
 
 				$j = $i;
 			}
