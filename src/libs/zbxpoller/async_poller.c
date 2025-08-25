@@ -382,7 +382,8 @@ static void	async_timeout_timer(evutil_socket_t fd, short events, void *arg)
 
 			ares_timeout(poller_config->channel, &tv, &tv_next);
 
-			zabbix_log(LOG_LEVEL_DEBUG, "next timer sec:%ld usec:%ld", tv_next.tv_sec, tv_next.tv_usec);
+			zabbix_log(LOG_LEVEL_DEBUG, "next timer sec:%ld usec:%ld", (long)tv_next.tv_sec,
+					(long)tv_next.tv_usec);
 		}
 
 		evtimer_add(poller_config->async_timeout_timer, &tv_next);
