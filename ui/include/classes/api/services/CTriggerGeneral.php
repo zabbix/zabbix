@@ -85,11 +85,11 @@ abstract class CTriggerGeneral extends CApiService {
 			while ($row = DBfetch($resource)) {
 				if ($row['tag_table'] === 'item_tag') {
 					if ($row['flags'] == ZBX_FLAG_DISCOVERY_PROTOTYPE) {
-						$row['object'] = ZBX_TAG_OBJECT_ITEM_PROTOTYPE;
+						$row['object'] = (string) ZBX_TAG_OBJECT_ITEM_PROTOTYPE;
 					}
 				}
 				elseif ($row['flags'] == ZBX_FLAG_DISCOVERY_NORMAL || $row['flags'] == ZBX_FLAG_DISCOVERY_CREATED) {
-					$row['object'] = ZBX_TAG_OBJECT_HOST;
+					$row['object'] = (string) ZBX_TAG_OBJECT_HOST;
 				}
 
 				$tag = [];

@@ -153,7 +153,7 @@ abstract class CItemGeneral extends CApiService {
 
 			while ($row = DBfetch($resource)) {
 				if ($row['flags'] == ZBX_FLAG_DISCOVERY_NORMAL || $row['flags'] == ZBX_FLAG_DISCOVERY_CREATED) {
-					$row['object'] = ZBX_TAG_OBJECT_HOST;
+					$row['object'] = (string) ZBX_TAG_OBJECT_HOST;
 				}
 
 				$items[$row['itemid']]['inheritedTags'][] = array_diff_key($row, array_flip(['itemid', 'flags']));
