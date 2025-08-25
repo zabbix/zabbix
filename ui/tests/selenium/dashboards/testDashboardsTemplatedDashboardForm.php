@@ -365,42 +365,6 @@ class testDashboardsTemplatedDashboardForm extends CWebTest {
 								]
 							],
 							[
-								'type'=> 'itemcard',
-								'name'=> 'Item card widget',
-								'x'=> 48,
-								'y'=> 8,
-								'width'=> 12,
-								'height'=> 4,
-								'view_mode'=> '0',
-								'fields'=> [
-									[
-										'type'=> ZBX_WIDGET_FIELD_TYPE_ITEM,
-										'name'=> 'itemid.0',
-										'value'=> self::$template_itemid
-									],
-									[
-										'type'=> 0,
-										'name'=> 'sections.0',
-										'value'=> 2
-									],
-									[
-										'type'=> '0',
-										'name'=> 'sections.1',
-										'value'=> 4
-									],
-									[
-										'type'=> 0,
-										'name'=> 'sections.2',
-										'value'=> 6
-									],
-									[
-										'type'=> 0,
-										'name'=> 'sections.3',
-										'value'=> 7
-									]
-								]
-							],
-							[
 								'type' => 'problemhosts',
 								'name' => 'Problem hosts widget',
 								'x' => 60,
@@ -590,7 +554,7 @@ class testDashboardsTemplatedDashboardForm extends CWebTest {
 								'type' => 'hostcard',
 								'name' => 'Host card widget',
 								'x' => 60,
-								'y' => 16,
+								'y' => 20,
 								'width' => 12,
 								'height' => 4,
 								'fields' => [
@@ -598,6 +562,26 @@ class testDashboardsTemplatedDashboardForm extends CWebTest {
 										'type' => 3,
 										'name' => 'hostid.0',
 										'value' => 10084 // Zabbix server.
+									]
+								]
+							],
+							[
+								'type'=> 'itemcard',
+								'name'=> 'Item card widget',
+								'x'=> 60,
+								'y'=> 24,
+								'width'=> 12,
+								'height'=> 4,
+								'fields'=> [
+									[
+										'type'=> ZBX_WIDGET_FIELD_TYPE_ITEM,
+										'name'=> 'itemid.0',
+										'value'=> self::$template_itemid
+									],
+									[
+										'type'=> 0,
+										'name'=> 'sections.0',
+										'value'=> 2
 									]
 								]
 							]
@@ -2277,6 +2261,20 @@ class testDashboardsTemplatedDashboardForm extends CWebTest {
 					],
 					'fill_for_hidden' => [
 						'Advanced configuration' => true
+					]
+				]
+			],
+			// #24 Item card widget.
+			[
+				[
+					'type' => CFormElement::RELOADABLE_FILL('Item card'),
+					'refresh_interval' => 'Default (1 minute)',
+					'fields' => [
+						[
+							'field' => 'Item',
+							'type' => 'multiselect',
+							'mandatory' => true,
+						]
 					]
 				]
 			]

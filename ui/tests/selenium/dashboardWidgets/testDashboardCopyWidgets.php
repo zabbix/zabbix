@@ -335,6 +335,18 @@ class testDashboardCopyWidgets extends CWebTest {
 			],
 			[
 				[
+					'name' => 'Host card widget',
+					'copy to' => 'same page'
+				]
+			],
+			[
+				[
+				'name' => 'Item card widget',
+					'copy to' => 'same page'
+				]
+			],
+			[
+				[
 					'name' => 'Clock widget',
 					'copy to' => 'another page'
 				]
@@ -407,6 +419,18 @@ class testDashboardCopyWidgets extends CWebTest {
 			],
 			[
 				[
+					'name' => 'Host card widget',
+					'copy to' => 'another page'
+				]
+			],
+			[
+				[
+					'name' => 'Item card widget',
+					'copy to' => 'another page'
+				]
+			],
+			[
+				[
 					'name' => 'Clock widget',
 					'copy to' => 'another dashboard'
 				]
@@ -438,7 +462,19 @@ class testDashboardCopyWidgets extends CWebTest {
 			[
 				[
 					'name' => 'Honeycomb widget',
-					'copy to' => 'another page'
+					'copy to' => 'another dashboard'
+				]
+			],
+			[
+				[
+					'name' => 'Host card widget',
+					'copy to' => 'another dashboard'
+				]
+			],
+			[
+				[
+					'name' => 'Item card widget',
+					'copy to' => 'another dashboard'
 				]
 			],
 			[
@@ -492,6 +528,18 @@ class testDashboardCopyWidgets extends CWebTest {
 			[
 				[
 					'name' => 'Honeycomb widget',
+					'copy to' => 'another template'
+				]
+			],
+			[
+				[
+					'name' => 'Host card widget',
+					'copy to' => 'another template'
+				]
+			],
+			[
+				[
+					'name' => 'Item card widget',
 					'copy to' => 'another template'
 				]
 			]
