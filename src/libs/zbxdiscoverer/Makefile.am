@@ -22,4 +22,5 @@ libzbxdiscoverer_a_SOURCES = \
 
 libzbxdiscoverer_a_CFLAGS = \
 	$(TLS_CFLAGS) \
-	$(ARES_CFLAGS)
+	$(ARES_CFLAGS) \
+	$(LIBEVENT_CFLAGS)
