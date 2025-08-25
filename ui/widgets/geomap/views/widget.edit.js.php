@@ -33,9 +33,6 @@ window.widget_form = new class extends CWidgetForm {
 			.value === '<?= Widget::CLUSTERING_MODE_AUTO ?>';
 
 		this._form.querySelector('.js-zoom-level-field').hidden = is_clustering_mode_auto;
-
-		if (is_clustering_mode_auto) {
-			this._form.querySelector('[name="clustering_zoom_level"]').value = 0;
-		}
+		document.getElementById('clustering_zoom_level').disabled = is_clustering_mode_auto;
 	}
 }

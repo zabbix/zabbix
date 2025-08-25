@@ -69,12 +69,26 @@ class WidgetForm extends CWidgetForm {
 				]))->setDefault(Widget::CLUSTERING_MODE_AUTO)
 			)
 			->addField(
-				(new CWidgetFieldIntegerBox('clustering_zoom_level',  _('Zoom level'), 0, ZBX_GEOMAP_MAX_ZOOM))
+				(new CWidgetFieldIntegerBox('clustering_zoom_level', _('Zoom level'), 0, ZBX_GEOMAP_MAX_ZOOM))
 					->setDefault(0)
 					->setFlags(CWidgetField::FLAG_NOT_EMPTY | CWidgetField::FLAG_LABEL_ASTERISK)
 			)
 			->addField(
 				new CWidgetFieldMultiSelectOverrideHost()
 			);
+	}
+
+	public function validate(bool $strict = false): array {
+		$errors = parent::validate($strict);
+
+		if ($errors) {
+			return $errors;
+		}
+
+		if ($this->getFieldValue('clustering_mode') == Widget::CLUSTERING_MODE_AUTO) {
+			$this->getField('clustering_zoom_level')->setValue(0);
+		}
+
+		return [];
 	}
 }

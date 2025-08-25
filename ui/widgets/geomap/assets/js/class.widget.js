@@ -15,6 +15,8 @@
 
 class CWidgetGeoMap extends CWidget {
 
+	static GEOMAP_CLUSTERING_MODE_MANUAL = 1;
+
 	static ZBX_STYLE_HINTBOX = 'geomap-hintbox';
 
 	static SEVERITY_NO_PROBLEMS = -1;
@@ -162,8 +164,8 @@ class CWidgetGeoMap extends CWidget {
 
 		// Create cluster layer.
 		this._clusters = this._createClusterLayer({
-			clustering_zoom_level: config.clustering.mode === GEOMAP_CLUSTERING_MODE_MANUAL
-				? config.clustering.zoom_level
+			clustering_zoom_level: this.getFields().clustering_mode === CWidgetGeoMap.GEOMAP_CLUSTERING_MODE_MANUAL
+				? this.getFields().clustering_zoom_level
 				: null
 		});
 		this._map.addLayer(this._clusters);
@@ -436,12 +438,11 @@ class CWidgetGeoMap extends CWidget {
 	/**
 	 * Function to create cluster layer.
 	 *
-	 * @param {object}  [options] Options object (optional).
-	 * @param {number|null} [options.clustering_zoom_level = null] Numeric value of clustering zoom level. Defaults to null.
+	 * @param {number|null} clustering_zoom_level  Numeric value of clustering zoom level or null.
 	 *
 	 * @returns {CWidgetGeoMap._createClusterLayer.clusters|L.MarkerClusterGroup}
 	 */
-	_createClusterLayer({clustering_zoom_level = null} = {}) {
+	_createClusterLayer({clustering_zoom_level}) {
 		const clusters = L.markerClusterGroup({
 			showCoverageOnHover: false,
 			zoomToBoundsOnClick: false,
