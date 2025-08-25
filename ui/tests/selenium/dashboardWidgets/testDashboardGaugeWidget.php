@@ -228,7 +228,7 @@ class testDashboardGaugeWidget extends testWidgets {
 			'id:desc_size' => ['value' => '15', 'maxlength' => 3, 'enabled' => true, 'visible' => false],
 			'id:desc_v_pos' => ['value' => 'Bottom', 'enabled' => true, 'labels' => ['Top', 'Bottom'], 'visible' => false],
 			'id:desc_bold' => ['value' => false, 'enabled' => true, 'visible' => false],
-			self::PATH_TO_COLOR_PICKER.'"desc_color"]' =>  ['color' => '', 'enabled' => true, 'visible' => false],
+			self::PATH_TO_COLOR_PICKER.'"desc_color"]' => ['color' => '', 'enabled' => true, 'visible' => false],
 
 			// Value.
 			'id:decimal_places' => ['value' => 2, 'maxlength' => 2, 'enabled' => true, 'visible' => false],
@@ -291,7 +291,7 @@ class testDashboardGaugeWidget extends testWidgets {
 			}
 		}
 
-		// Check  Advanced configuration's fields visibility.
+		// Check Advanced configuration's fields visibility.
 		$form->fill(['Advanced configuration' => true]);
 
 		// Check hintboxes.
@@ -455,10 +455,10 @@ class testDashboardGaugeWidget extends testWidgets {
 				'id:show_2' => true, // Value.
 				'id:show_3' => true, // Needle.
 				'id:show_4' => true, // Scale.
-				'id:show_5' => true  // Value arc.
+				'id:show_5' => true // Value arc.
 			];
 
-			if (!$show_arc)  {
+			if (!$show_arc) {
 				$show['id:show_3'] = false;
 				$show['id:show_4'] = false;
 			}
@@ -777,7 +777,7 @@ class testDashboardGaugeWidget extends testWidgets {
 						'id:show_2' => false, // Value.
 						'id:show_3' => false, // Needle.
 						'id:show_4' => false, // Scale.
-						'id:show_5' => false  // Value arc.
+						'id:show_5' => false // Value arc.
 					],
 					'error' => [
 						'Invalid parameter "Show": at least one option must be selected.'
@@ -974,9 +974,9 @@ class testDashboardGaugeWidget extends testWidgets {
 			COverlayDialogElement::ensureNotPresent();
 
 			/**
-			 *  When name is absent in create scenario it remains default: host name + item name,
-			 *  if name is absent in update scenario then previous name remains.
-			 *  If name is empty string in both scenarios it is replaced by host name + item name.
+			 * When name is absent in create scenario it remains default: host name + item name,
+			 * if name is absent in update scenario then previous name remains.
+			 * If name is empty string in both scenarios it is replaced by host name + item name.
 			 */
 			if (array_key_exists('Name', $data['fields'])) {
 				$header = ($data['fields']['Name'] === '')

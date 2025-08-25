@@ -214,8 +214,8 @@ class testFormGraphs extends CWebTest {
 						'id:ymax_type' => ['exists' => true, 'visible' => false], // Y axis MAX value dropdown.
 						'id:yaxismin' => ['exists' => true, 'visible' => false], // Y axis MIN fixed value input.
 						'id:yaxismax' => ['exists' => true, 'visible' => false], // Y axis MAX fixed value input.
-						'id:ymin_itemid' =>  ['visible' => false], // Y axis MIN item input.
-						'id:ymax_itemid' =>  ['visible' => false], // Y axis MAX item input.
+						'id:ymin_itemid' => ['visible' => false], // Y axis MIN item input.
+						'id:ymax_itemid' => ['visible' => false], // Y axis MAX item input.
 						'id:show_3d' => ['value' => false],
 						'id:items-table' => ['visible' => true]
 					],
@@ -236,8 +236,8 @@ class testFormGraphs extends CWebTest {
 						'id:visible_percent_right' => true // Percentile line (right) checkbox.
 					],
 					'check_fields' => [
-						'id:percent_left' =>  ['value' => 0, 'visible' => true], // Percentile line (left) input.
-						'id:percent_right' =>  ['value' => 0, 'visible' => true] // Percentile line (right) input.
+						'id:percent_left' => ['value' => 0, 'visible' => true], // Percentile line (left) input.
+						'id:percent_right' => ['value' => 0, 'visible' => true] // Percentile line (right) input.
 					]
 				]
 			],
@@ -249,8 +249,8 @@ class testFormGraphs extends CWebTest {
 						'id:ymax_type' => CFormElement::RELOADABLE_FILL('Fixed') // Y axis MAX value dropdown.
 					],
 					'check_fields' => [
-						'id:yaxismin' =>  ['value' => 0, 'visible' => true], // Y axis MIN fixed value input.
-						'id:yaxismax' =>  ['value' => 100, 'visible' => true] // Y axis MAX fixed value input.
+						'id:yaxismin' => ['value' => 0, 'visible' => true], // Y axis MIN fixed value input.
+						'id:yaxismax' => ['value' => 100, 'visible' => true] // Y axis MAX fixed value input.
 					]
 				]
 			],
@@ -262,8 +262,8 @@ class testFormGraphs extends CWebTest {
 						'id:ymax_type' => CFormElement::RELOADABLE_FILL('Item') // Y axis MAX value dropdown.
 					],
 					'check_fields' => [
-						'id:ymin_itemid' =>  ['value' => '', 'visible' => true], // Y axis MIN item input.
-						'id:ymax_itemid' =>  ['value' => '', 'visible' => true] // Y axis MAX item input.
+						'id:ymin_itemid' => ['value' => '', 'visible' => true], // Y axis MIN item input.
+						'id:ymax_itemid' => ['value' => '', 'visible' => true] // Y axis MAX item input.
 					]
 				]
 			]
@@ -865,7 +865,7 @@ class testFormGraphs extends CWebTest {
 			foreach ($data['yaxis_items'] as $y => $yaxis_item) {
 				if ($this->prototype) {
 					$form->query('xpath:.//button[@id="yaxis_'.$y.'_prototype"]')->waitUntilClickable()->one()->click();
-					$yaxis_items_dialog  = COverlayDialogElement::find()->all()->waitUntilReady()->last();
+					$yaxis_items_dialog = COverlayDialogElement::find()->all()->waitUntilReady()->last();
 					$yaxis_items_dialog->query('link', $yaxis_item)->waitUntilClickable()->one()->click();
 					$yaxis_items_dialog->waitUntilNotPresent();
 				}
@@ -1282,7 +1282,7 @@ class testFormGraphs extends CWebTest {
 		$item_dialog = COverlayDialogElement::find()->all()->waitUntilReady()->last();
 
 		// Assert that text items are not present in dialog.
-		foreach ($data['items'] as  $item) {
+		foreach ($data['items'] as $item) {
 			$this->assertFalse($item_dialog->query('link', $item)->exists());
 		}
 
