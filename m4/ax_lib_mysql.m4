@@ -190,10 +190,11 @@ AC_DEFUN([AX_LIB_MYSQL],
                 TLS_LDFLAGS=`$PKG_CONFIG --libs-only-L openssl`
 			fi
 
+            _full_libmysql_libs="${_full_libmysql_libs} ${ZSTD_LDFLAGS}"
             _save_mysql_ldflags="${LDFLAGS}"
             _save_mysql_cflags="${CFLAGS}"
             _save_mysql_libs="${LIBS}"
-            LDFLAGS="${LDFLAGS} ${_full_libmysql_libs} ${ZSTD_LDFLAGS} ${TLS_LDFLAGS}"
+            LDFLAGS="${LDFLAGS} ${_full_libmysql_libs} ${TLS_LDFLAGS}"
             CFLAGS="${CFLAGS} ${MYSQL_CFLAGS}"
 
             for i in $_full_libmysql_libs; do
