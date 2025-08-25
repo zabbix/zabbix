@@ -1125,7 +1125,7 @@ static void	rm_update_cache_reports_params(zbx_rm_t *manager)
 	}
 	zbx_db_free_result(result);
 
-	if (0 != params.values_num)
+	if (NULL != report && 0 != params.values_num)
 		rm_report_update_params(report, &params);
 
 	report_destroy_params(&params);
