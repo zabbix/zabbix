@@ -859,9 +859,8 @@ static int	validate_nested_lldrules(zbx_uint64_t hostid, const zbx_vector_uint64
 	result = zbx_db_select("%s", sql);
 	zbx_free(sql);
 
-	if (NULL != (row = zbx_db_fetch(result)))
+	if (NULL != zbx_db_fetch(result))
 	{
-		(void)row;
 		zbx_strlcpy(error, "nested LLD rules are supported only on hosts created by LLD", max_error_len);
 		ret = FAIL;
 	}

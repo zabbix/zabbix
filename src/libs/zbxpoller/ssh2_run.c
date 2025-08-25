@@ -467,11 +467,9 @@ int	ssh_run(zbx_dc_item_t *item, AGENT_RESULT *result, const char *encoding, con
 			goto channel_close;
 		}
 
-		if (0 > (rc = libssh2_channel_write(channel, item->params, strlen(item->params))))
+		if (0 > libssh2_channel_write(channel, item->params, strlen(item->params)))
 		{
 			char	*err;
-
-			(void)rc;
 
 			if (LIBSSH2_ERROR_NONE != libssh2_session_last_error(session, &err, NULL, 0))
 				SET_MSG_RESULT(result, zbx_dsprintf(NULL, "Cannot execute request: %s", err));

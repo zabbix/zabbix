@@ -1713,11 +1713,10 @@ int	zbx_process_sender_history_data(zbx_socket_t *sock, struct zbx_json_parse *j
 
 	if (SUCCEED == zbx_json_brackets_by_name(jp, ZBX_PROTO_TAG_DATA, &jp_data))
 	{
-		if (SUCCEED == (ret = peek_hostkey_host(&jp_data, host, sizeof(host), info)))
+		if (SUCCEED == peek_hostkey_host(&jp_data, host, sizeof(host), info))
 		{
 			zbx_comms_redirect_t	redirect;
 			zbx_uint64_t		hostid;
-			(void)ret;
 
 			if (SUCCEED_PARTIAL == (ret = zbx_dc_config_get_hostid_by_name(host, sock, &hostid, &redirect)))
 			{

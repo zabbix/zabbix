@@ -99,8 +99,7 @@ void	zbx_lld_deserialize_value(const unsigned char *data, char **value)
 {
 	zbx_uint32_t	value_len;
 
-	data += zbx_deserialize_str(data, value, value_len);
-	(void)data;
+	(void)zbx_deserialize_str(data, value, value_len);
 }
 
 
