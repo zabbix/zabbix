@@ -2825,9 +2825,7 @@ class testDashboardItemHistoryWidget extends testWidgets {
 		$container->query('button:Add')->one()->click();
 		$input = $form->query('xpath:.//input[contains(@id, '.CXPathHelper::escapeQuotes($i.$selector).')]')->one();
 		$this->assertTrue($input->isVisible());
-		$this->assertEquals('E65660', $container->query('xpath:.//z-color-picker')
-				->asColorPicker()->one()->getValue()
-		);
+		$this->assertEquals('E65660', $container->query('xpath:.//z-color-picker/input')->one()->getValue());
 		$container->query('xpath:.//button[contains(@id, '.CXPathHelper::escapeQuotes($i.'_remove').')]')
 				->one()->click();
 		$this->assertFalse($input->isVisible());

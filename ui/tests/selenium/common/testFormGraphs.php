@@ -972,9 +972,7 @@ class testFormGraphs extends CWebTest {
 
 				// Check lines color.
 				if (array_key_exists('color', $item)) {
-					$this->assertEquals($item['color'],
-							$item_row->query('xpath:.//z-color-picker')->asColorPicker()->one()->getValue()
-					);
+					$this->assertEquals($item['color'], $item_row->query('xpath:.//z-color-picker/input')->one()->getValue());
 				}
 			}
 		}
@@ -1122,9 +1120,7 @@ class testFormGraphs extends CWebTest {
 			}
 
 			// Check lines color.
-			$this->assertEquals($data['items'][0]['color'],
-					$item_row->query('xpath:.//z-color-picker')->asColorPicker()->one()->getValue()
-			);
+			$this->assertEquals($data['items'][0]['color'], $item_row->query('xpath:.//z-color-picker/input')->one()->getValue());
 		}
 	}
 
@@ -1238,9 +1234,7 @@ class testFormGraphs extends CWebTest {
 			);
 		}
 
-		$this->assertEquals($data['expected']['color'],
-				$item_row->query('xpath:.//z-color-picker')->asColorPicker()->one()->getValue()
-		);
+		$this->assertEquals($data['expected']['color'], $item_row->query('xpath:.//z-color-picker/input')->one()->getValue());
 	}
 
 	public function checkDelete() {
