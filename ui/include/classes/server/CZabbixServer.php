@@ -630,25 +630,19 @@ class CZabbixServer {
 			return null;
 		}
 
-		if ($error_message = self::checkTLSFile('CA_FILE', $this->tls_config['CA_FILE'])) {
-			$this->error = $error_message;
-			$this->error_code = self::ERROR_CODE_TLS;
+		$required_files = [
+			'CA_FILE' => $this->tls_config['CA_FILE'] ?? '',
+			'KEY_FILE' => $this->tls_config['KEY_FILE'] ?? '',
+			'CERT_FILE' => $this->tls_config['CERT_FILE'] ?? ''
+		];
 
-			return null;
-		}
-
-		if ($error_message = self::checkTLSFile('KEY_FILE', $this->tls_config['KEY_FILE'])) {
-			$this->error = $error_message;
-			$this->error_code = self::ERROR_CODE_TLS;
-
-			return null;
-		}
-
-		if ($error_message = self::checkTLSFile('CERT_FILE', $this->tls_config['CERT_FILE'])) {
-			$this->error = $error_message;
-			$this->error_code = self::ERROR_CODE_TLS;
-
-			return null;
+		if (CWebUser::getType() == USER_TYPE_SUPER_ADMIN) {
+			foreach ($required_files as $required_file => $path) {
+				if ($error_message = self::checkTLSFile($required_file, $path)) {
+					$this->error = $error_message;
+					$this->error_code = self::ERROR_CODE_TLS;
+				}
+			}
 		}
 
 		$capture_peer_cert = $this->tls_config['CERTIFICATE_ISSUER'] || $this->tls_config['CERTIFICATE_SUBJECT'];
