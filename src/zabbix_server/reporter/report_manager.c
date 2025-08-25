@@ -1262,7 +1262,7 @@ static void	rm_update_cache_reports_usergroups(zbx_rm_t *manager)
 	}
 	zbx_db_free_result(result);
 
-	if (0 != usergroups.values_num)
+	if (NULL != report && 0 != usergroups.values_num)
 		rm_report_update_usergroups(report, &usergroups);
 
 	zbx_vector_recipient_destroy(&usergroups);
