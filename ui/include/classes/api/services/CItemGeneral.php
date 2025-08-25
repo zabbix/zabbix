@@ -30,6 +30,8 @@ abstract class CItemGeneral extends CApiService {
 		'disable_source'
 	];
 
+	protected const INHERITED_TAG_OUTPUT_FIELDS = ['tag', 'value', 'object', 'objectid'];
+
 	public const INTERFACE_TYPES_BY_PRIORITY = [
 		INTERFACE_TYPE_AGENT,
 		INTERFACE_TYPE_SNMP,
