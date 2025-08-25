@@ -280,7 +280,7 @@ $tags_tab = (new CFormGrid())
 				->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
 				->addStyle('min-width: '.ZBX_TEXTAREA_BIG_WIDTH.'px;')
 				->addItem([
-					renderTagTable($data['form']['tags'])
+					renderTagTable($data['form']['tags'], options: ['has_inline_validation' => true])
 						->addClass('tags-table')
 						->setHeader((new CRowHeader([_('Name'), _('Value'), '']))->addClass(ZBX_STYLE_GREY)),
 					(new CTemplateTag('tag-row-tmpl'))->addItem(

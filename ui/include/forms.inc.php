@@ -1199,6 +1199,10 @@ function renderTagTable(array $tags, $readonly = false, array $options = []) {
 		$row_options['field_name'] = $options['field_name'];
 	}
 
+	if (array_key_exists('has_inline_validation', $options)) {
+		$row_options['has_inline_validation'] = $options['has_inline_validation'];
+	}
+
 	foreach ($tags as $index => $tag) {
 		$tag = ['automatic' => $with_automatic ? $tag['automatic'] : ZBX_TAG_MANUAL] + $tag;
 
