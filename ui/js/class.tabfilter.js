@@ -697,6 +697,7 @@ class CTabFilter extends CBaseComponent {
 				}
 
 				$(this._target).menuPopup(dropdown, new jQuery.Event(ev));
+				ev.target.setAttribute('aria-expanded', 'true');
 			},
 
 			/**

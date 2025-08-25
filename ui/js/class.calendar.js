@@ -28,11 +28,13 @@ var CLNDR = null,
 function toggleCalendar(trigger_elmnt, time_input, date_time_format) {
 	if (CLNDR && jQuery(trigger_elmnt).is(CLNDR.trigger_elmnt) && CLNDR.is_visible) {
 		CLNDR.clndrhide();
+		trigger_elmnt.setAttribute('aria-expanded', 'false');
 	}
 	else {
 		CLNDR && CLNDR.clndrhide();
 		CLNDR = new calendar(time_input, trigger_elmnt, date_time_format);
 		CLNDR.clndrshow();
+		trigger_elmnt.setAttribute('aria-expanded', 'true');
 	}
 }
 

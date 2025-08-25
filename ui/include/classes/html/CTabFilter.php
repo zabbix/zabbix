@@ -166,9 +166,8 @@ class CTabFilter extends CDiv {
 		if (!is_a($label, CTag::class)) {
 			if ($tab_index == 0) {
 				$label = (new CLink(''))
-					->setAttribute('aria-label', _('Home'))
-					->addClass(ZBX_ICON_FILTER)
-					->setAttribute('aria-label', _('Default filter tab'));
+					->setAttribute('aria-label', _('Default filter tab'))
+					->addClass(ZBX_ICON_FILTER);
 				$data += [
 					'filter_sortable' => false,
 					'filter_configurable' => false
@@ -377,7 +376,8 @@ class CTabFilter extends CDiv {
 
 		$nav_list = new CList([
 			(new CButtonIcon(ZBX_ICON_CHEVRON_DOWN))->setAttribute('data-action', 'toggleTabsList')
-				->setAttribute('aria-label', _('List of open filter tabs')),
+				->setAttribute('aria-label', _('List of open filter tabs'))
+				->setAttribute('aria-expanded', 'false'),
 			(new CButtonIcon(ZBX_ICON_CHEVRON_RIGHT))->setAttribute('data-action', 'selectNextTab')
 				->setAttribute('aria-label', _('Go to next filter tab'))
 		]);
