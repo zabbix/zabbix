@@ -422,6 +422,7 @@ class testFormGroups extends CWebTest {
 
 		$form = $this->openForm($data['name'], CTestArrayHelper::get($data, 'discovered', false));
 		$form->query('button:Clone')->one()->waitUntilClickable()->click();
+		$form->waitUntilStalled();
 
 		// Check that the group creation form is open after cloning.
 		$this->page->assertHeader('Host groups');

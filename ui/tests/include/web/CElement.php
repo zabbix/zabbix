@@ -598,9 +598,7 @@ class CElement extends CBaseElement implements IWaitable {
 			throw new Exception('Cannot wait for element reload on element selected in multi-element query.');
 		}
 
-		$this->waitUntilStalled($timeout, true);
-
-		return $this;
+		return $this->waitUntilStalled($timeout, true);
 	}
 
 	/**
@@ -626,6 +624,8 @@ class CElement extends CBaseElement implements IWaitable {
 
 					return !$element->isStalled();
 				}
+
+				return false;
 			}
 			catch (Exception $e) {
 				// Code is not missing here.

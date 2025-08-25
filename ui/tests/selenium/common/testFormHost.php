@@ -1784,17 +1784,22 @@ class testFormHost extends CWebTest {
 		$interfaces_form->fill($interface);
 
 		if (in_array($data['action'], ['Clone', 'Full clone', 'Delete'])) {
-			$form_type->query('button', $data['action'])->one()->click();
-		}
-		if ($data['action'] === 'Delete') {
-			$this->page->dismissAlert();
+			$button = $form_type->query('button', $data['action'])->one();
+			$button->click();
+
+			if ($data['action'] === 'Delete') {
+				$this->page->dismissAlert();
+			}
+			else {
+				$button->waitUntilNotVisible();
+			}
 		}
 
 		$this->page->waitUntilReady();
 
 		// Check that the host creation page is open after cloning or full cloning.
 		if ($data['action'] === 'Clone' || $data['action'] === 'Full clone') {
-			$form_type->waitUntilStalled()->invalidate();
+			$form_type->invalidate();
 			$id = CDBHelper::getValue('SELECT hostid FROM hosts WHERE host='.zbx_dbstr($host));
 			$action = ($data['action'] === 'Clone') ? 'clone' : 'full_clone';
 			$expected_url = PHPUNIT_URL.'zabbix.php?action=host.edit&hostid='.$id.'&'.$action.'=1';

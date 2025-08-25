@@ -868,12 +868,14 @@ class testPageMonitoringHostsGraph extends CWebTest {
 			// Click on subfilter.
 			foreach ($data['subfilter'] as $header => $values) {
 				foreach ($values as $value) {
+					// TODO: need to figure out why the table needs to be initialized again
+					$table = $this->getTable();
 					$xpath = 'xpath://h3[text()='.CXPathHelper::escapeQuotes($header).']/..//a[text()='.
 							CXPathHelper::escapeQuotes($value).']';
 					$this->query($xpath)->waitUntilClickable()->one()->click();
+					$table->waitUntilReloaded();
 					$this->query($xpath.'/ancestor::span')->one()->
 							waitUntilAttributesPresent(['class' => 'subfilter subfilter-enabled']);
-					$table->waitUntilReloaded();
 					$this->page->waitUntilReady();
 				}
 			}

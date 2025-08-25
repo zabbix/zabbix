@@ -102,10 +102,11 @@ class testPageTemplates extends CLegacyWebTest {
 
 		// Filter necessary Template name.
 		$form = $this->query('name:zbx_filter')->asForm()->waitUntilVisible()->one();
+		$table = $this->getTable();
 		$form->fill(['Name' => $name]);
 		$this->query('button:Apply')->one()->waitUntilClickable()->click();
-		$this->query('xpath://table[@class="list-table"]')->asTable()->waitUntilVisible()->one()->findRow('Name', $name)
-				->getColumn('Name')->query('link', $name)->one()->click();
+		$table->waitUntilReloaded();
+		$table->findRow('Name', $name)->getColumn('Name')->query('link', $name)->one()->click();
 
 		$this->zbxTestCheckHeader('Templates');
 		$this->zbxTestTextPresent('All templates');

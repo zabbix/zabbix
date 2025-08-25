@@ -31,13 +31,14 @@ require_once dirname(__FILE__) . '/../../include/CWebTest.php';
 class testAlarmNotification extends CWebTest {
 
 	/**
-	 * Attach MessageBehavior to the test.
+	 * Attach MessageBehavior, CTableBehavior to the test.
 	 *
 	 * @return array
 	 */
 	public function getBehaviors() {
 		return [
-			CTableBehavior::class
+			CTableBehavior::class,
+			CMessageBehavior::class
 		];
 	}
 
@@ -614,7 +615,7 @@ class testAlarmNotification extends CWebTest {
 		$form->selectTab('Messaging');
 		$form->fill($data['profile_setting']);
 		$form->submit();
-		$this->page->waitUntilReady();
+		$this->assertMessage(TEST_GOOD, 'User updated');
 
 		// Trigger problem.
 		if (array_key_exists('suppressed_problem', $data)) {

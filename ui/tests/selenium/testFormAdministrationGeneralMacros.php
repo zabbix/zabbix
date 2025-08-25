@@ -200,7 +200,7 @@ class testFormAdministrationGeneralMacros extends testFormMacros {
 		$this->openGlobalMacros();
 
 		$this->saveGlobalMacros();
-		$this->zbxTestTextPresent('Macros updated');
+		$this->assertMessage(TEST_GOOD, 'Macros updated');
 
 		$this->checkGlobalMacrosOrder();
 
@@ -872,7 +872,7 @@ class testFormAdministrationGeneralMacros extends testFormMacros {
 		$this->page->login()->open('zabbix.php?action=macros.edit')->waitUntilReady();
 		$this->fillMacros([$data]);
 		$this->query('button:Update')->one()->click();
-		$this->page->waitUntilReady();
+		$this->assertMessage(TEST_GOOD, 'Macros updated');
 		$result = [];
 		foreach (['macro', 'value', 'description'] as $field) {
 			$result[] = $this->query('xpath://textarea[@id="macros_'.$data['index'].'_'.$field.'"]')->one()->getText();

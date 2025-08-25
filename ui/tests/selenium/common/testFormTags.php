@@ -879,6 +879,7 @@ class testFormTags extends CWebTest {
 			$this->page->waitUntilReady();
 			$this->query('button:Reset')->one()->click();
 			$form = $this->query('name:zbx_filter')->asForm()->waitUntilReady()->one();
+			$table = $this->query('xpath://table[@class="list-table"]')->asTable()->one();
 			$form->fill(['Name' => $new_name]);
 			$this->query('button:Apply')->one()->waitUntilClickable()->click();
 
@@ -902,8 +903,7 @@ class testFormTags extends CWebTest {
 					break;
 			}
 
-			$this->query('xpath://table[@class="list-table"]')->asTable()->one()->findRow('Name', $new_name)
-					->getColumn($column)->query('link', $column)->one()->click();
+			$table->waitUntilReloaded()->findRow('Name', $new_name)->getColumn($column)->query('link', $column)->one()->click();
 		}
 		else {
 			// Open cloned host/template.
