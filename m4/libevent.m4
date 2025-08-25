@@ -75,8 +75,20 @@ AS_HELP_STRING([--with-libevent@<:@=DIR@:>@], [use libevent from given base inst
 		LIBEVENT_LDFLAGS="-L/usr/local/lib"
 		found_libevent="yes"
 	else
-		found_libevent="no"
-		AC_MSG_RESULT(no)
+		m4_ifdef([PKG_PROG_PKG_CONFIG], [
+			PKG_PROG_PKG_CONFIG()
+			if test -z "$PKG_CONFIG"; then
+				AC_MSG_ERROR([pkg-config is required but not found. Please install pkg-config.])
+			fi
+		], [
+			AC_MSG_WARN([pkg-config not found, skipping libevent detection via pkg-config])
+		])
+
+		if test -n "$PKG_CONFIG"; then
+			LIBEVENT_CFLAGS=`$PKG_CONFIG --cflags libevent`
+			LIBEVENT_LDFLAGS=`$PKG_CONFIG --libs-only-L libevent`
+			found_libevent="yes"
+		fi
 	fi
 
 	if test "x$found_libevent" = "xyes"; then

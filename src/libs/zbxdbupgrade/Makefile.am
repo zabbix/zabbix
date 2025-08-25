@@ -44,3 +44,6 @@ libzbxdbupgrade_a_SOURCES = \
 	dbupgrade_common.c \
 	dbupgrade_common.h \
 	dbupgrade.h
+
+libzbxdbupgrade_a_CFLAGS = \
+	$(TLS_CFLAGS)

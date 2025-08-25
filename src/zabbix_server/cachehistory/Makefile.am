@@ -7,7 +7,7 @@ libzbxcachehistory_server_a_SOURCES = \
 	cachehistory_server.h \
 	trigger_eval.c
 
-libzbxcachehistory_a_CFLAGS = \
+libzbxcachehistory_server_a_CFLAGS = \
 	-I$(top_srcdir)/src/zabbix_server/ \
 	$(TLS_CFLAGS) \
 	$(TEST_FLAGS)
