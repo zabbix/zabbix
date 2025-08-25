@@ -70,7 +70,7 @@
 			const delete_btn = document.getElementById('delete');
 
 			if (delete_btn) {
-				delete_btn.addEventListener('click', () => this.#setLoadingStatus(['delete']));
+				delete_btn.addEventListener('click', () => this.#delete(delete_btn.getAttribute('data-redirect-url')));
 			}
 		}
 
@@ -135,6 +135,13 @@
 
 			addMessage(makeMessageBox('bad', messages, title));
 			this.#unsetLoadingStatus();
+		}
+
+		#delete(url) {
+			if (window.confirm('<?=_('Delete regular expression?') ?>')) {
+				this.#setLoadingStatus(['delete']);
+				redirect(url, 'post', 'action', undefined, true);
+			}
 		}
 
 		#clone() {

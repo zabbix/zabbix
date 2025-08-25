@@ -114,13 +114,13 @@ $tabs = (new CTabView())
 	->setFooter($data['regexp']['regexpid'] != 0
 		? makeFormFooter(new CSubmit('update', _('Update')), [
 			(new CSimpleButton(_('Clone')))->setId('clone'),
-			(new CRedirectButton(_('Delete'),
-				(new CUrl('zabbix.php'))
+			(new CSimpleButton(_('Delete')))
+				->setAttribute('data-redirect-url', (new CUrl('zabbix.php'))
 					->setArgument('action', 'regex.delete')
 					->setArgument('regexpids', (array) $data['regexp']['regexpid'])
-					->setArgument(CSRF_TOKEN_NAME, $csrf_token),
-				_('Delete regular expression?')
-			))->setId('delete'),
+					->setArgument(CSRF_TOKEN_NAME, $csrf_token)
+				)
+				->setId('delete'),
 			$cancel_button
 		])
 		: makeFormFooter(new CSubmit('add', _('Add')), [$cancel_button])
