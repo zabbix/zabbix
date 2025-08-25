@@ -100,7 +100,6 @@ class CItemPrototype extends CItemGeneral {
 			'selectGraphs'					=> null,
 			'selectPreprocessing'			=> null,
 			'selectTags'					=> null,
-			'selectInheritedTags'			=> null,
 			'selectValueMap'				=> null,
 			'countOutput'					=> false,
 			'groupCount'					=> false,
@@ -310,13 +309,14 @@ class CItemPrototype extends CItemGeneral {
 		return $items;
 	}
 
-	private static function validateGet(array &$options) {
+	private static function validateGet(array &$options): void {
 		$api_input_rules = ['type' => API_OBJECT, 'flags' => API_ALLOW_UNEXPECTED, 'fields' => [
+			// Output.
+			'selectValueMap' =>					['type' => API_OUTPUT, 'flags' => API_ALLOW_NULL, 'in' => implode(',', ['valuemapid', 'name', 'mappings'])],
+			'selectInheritedTags' =>			['type' => API_OUTPUT, 'flags' => API_ALLOW_NULL | API_NORMALIZE, 'in' => implode(',', ['tag', 'value', 'object', 'objectid']), 'default' => null],
 			'selectDiscoveryRule' =>			['type' => API_OUTPUT, 'flags' => API_ALLOW_NULL | API_NORMALIZE, 'in' => implode(',', CDiscoveryRule::OUTPUT_FIELDS), 'default' => null],
 			'selectDiscoveryRulePrototype' =>	['type' => API_OUTPUT, 'flags' => API_ALLOW_NULL | API_NORMALIZE, 'in' => implode(',', CDiscoveryRulePrototype::OUTPUT_FIELDS), 'default' => null],
-			'selectDiscoveryData' =>			['type' => API_OUTPUT, 'flags' => API_ALLOW_NULL | API_NORMALIZE, 'in' => implode(',', self::DISCOVERY_DATA_OUTPUT_FIELDS), 'default' => null],
-			'selectInheritedTags' =>			['type' => API_OUTPUT, 'flags' => API_ALLOW_NULL | API_NORMALIZE, 'in' => implode(',', ['tag', 'value', 'object', 'objectid'])],
-			'selectValueMap' =>					['type' => API_OUTPUT, 'flags' => API_ALLOW_NULL, 'in' => implode(',', ['valuemapid', 'name', 'mappings'])]
+			'selectDiscoveryData' =>			['type' => API_OUTPUT, 'flags' => API_ALLOW_NULL | API_NORMALIZE, 'in' => implode(',', self::DISCOVERY_DATA_OUTPUT_FIELDS), 'default' => null]
 		]];
 
 		if (!CApiInputValidator::validate($api_input_rules, $options, '/', $error)) {
@@ -1473,59 +1473,6 @@ class CItemPrototype extends CItemGeneral {
 		self::addRelatedInheritedTags($options, $result);
 
 		return $result;
-	}
-
-	private static function addRelatedInheritedTags(array $options, array &$result): void {
-		if ($options['selectInheritedTags'] === null) {
-			return;
-		}
-
-		foreach ($result as &$row) {
-			$row['inheritedTags'] = [];
-		}
-		unset($row);
-
-		$output = ['itc.itemid'];
-
-		foreach ($options['selectInheritedTags'] as $field) {
-			$output[] = match ($field) {
-				'tag', 'value' => 'ht.'.$field,
-				'object' => ZBX_TAG_OBJECT_TEMPLATE.' AS '.$field,
-				'objectid' => 'itc.link_hostid AS '.$field
-			};
-		}
-
-		if (in_array('object', $options['selectInheritedTags'])) {
-			$output[] = 'h.flags';
-
-			$resource = DBselect(
-				'SELECT '.implode(',', $output).
-				' FROM item_template_cache itc'.
-				' JOIN host_tag ht ON itc.link_hostid=ht.hostid'.
-				' JOIN hosts h ON itc.link_hostid=h.hostid'.
-				' WHERE '.dbConditionId('itc.itemid', array_keys($result))
-			);
-
-			while ($row = DBfetch($resource)) {
-				if ($row['flags'] == ZBX_FLAG_DISCOVERY_NORMAL || $row['flags'] == ZBX_FLAG_DISCOVERY_CREATED) {
-					$row['object'] = ZBX_TAG_OBJECT_HOST;
-				}
-
-				$result[$row['itemid']]['inheritedTags'][] = array_diff_key($row, array_flip(['itemid', 'flags']));
-			}
-		}
-		else {
-			$resource = DBselect(
-				'SELECT '.implode(',', $output).
-				' FROM item_template_cache itc'.
-				' JOIN host_tag ht ON itc.link_hostid=ht.hostid'.
-				' WHERE '.dbConditionId('itc.itemid', array_keys($result))
-			);
-
-			while ($row = DBfetch($resource)) {
-				$result[$row['itemid']]['inheritedTags'][] = array_diff_key($row, array_flip(['itemid']));
-			}
-		}
 	}
 
 	/**

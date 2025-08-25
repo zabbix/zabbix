@@ -44,6 +44,39 @@ abstract class CHostBase extends CApiService {
 		return static::class === 'CHostPrototype';
 	}
 
+	protected static function addRelatedInheritedTags(array $options, array &$hosts): void {
+		if ($options['selectInheritedTags'] === null) {
+			return;
+		}
+
+		foreach ($hosts as &$host) {
+			$host['inheritedTags'] = [];
+		}
+		unset($host);
+
+		$output = ['htc.hostid'];
+
+		foreach ($options['selectInheritedTags'] as $field) {
+			$output[] = match ($field) {
+				'tag', 'value' => 'ht.'.$field,
+				'object' => ZBX_TAG_OBJECT_TEMPLATE.' AS '.$field,
+				'objectid' => 'htc.link_hostid AS '.$field
+			};
+		}
+
+		$resource = DBselect(
+			'SELECT '.implode(',', $output).
+			' FROM host_template_cache htc'.
+			' JOIN host_tag ht ON htc.link_hostid=ht.hostid'.
+			' WHERE htc.hostid!=htc.link_hostid'.
+				' AND '.dbConditionId('htc.hostid', array_keys($hosts))
+		);
+
+		while ($row = DBfetch($resource)) {
+			$hosts[$row['hostid']]['inheritedTags'][] = array_diff_key($row, array_flip(['hostid']));
+		}
+	}
+
 	protected function checkTemplates(array &$hosts, ?array &$db_hosts = null, ?string $path = null,
 			?array $template_indexes = null, ?string $path_clear = null, ?array $template_clear_indexes = null): void {
 		$id_field_name = $this instanceof CTemplate ? 'templateid' : 'hostid';
@@ -2089,14 +2122,6 @@ abstract class CHostBase extends CApiService {
 		}
 	}
 
-	protected function addRelatedObjects(array $options, array $result) {
-		$result = parent::addRelatedObjects($options, $result);
-
-		self::addRelatedInheritedTags($options, $result);
-
-		return $result;
-	}
-
 	protected static function addRelatedMacros(array $options, array &$result): void {
 		if ($options['selectMacros'] === null) {
 			return;
@@ -2200,39 +2225,6 @@ abstract class CHostBase extends CApiService {
 		while ($discovery_data = DBfetch($resource)) {
 			$result[$discovery_data['hostid']]['discoveryData'] =
 				array_diff_key($discovery_data, array_flip(['hostid']));
-		}
-	}
-
-	private static function addRelatedInheritedTags(array $options, array &$result): void {
-		if ($options['selectInheritedTags'] === null) {
-			return;
-		}
-
-		foreach ($result as &$row) {
-			$row['inheritedTags'] = [];
-		}
-		unset($row);
-
-		$output = ['htc.hostid'];
-
-		foreach ($options['selectInheritedTags'] as $field) {
-			$output[] = match ($field) {
-				'tag', 'value' => 'ht.'.$field,
-				'object' => ZBX_TAG_OBJECT_TEMPLATE.' AS '.$field,
-				'objectid' => 'htc.link_hostid AS '.$field
-			};
-		}
-
-		$resource = DBselect(
-			'SELECT '.implode(',', $output).
-			' FROM host_template_cache htc'.
-			' JOIN host_tag ht ON htc.link_hostid=ht.hostid'.
-			' WHERE htc.hostid!=htc.link_hostid'.
-				' AND '.dbConditionId('htc.hostid', array_keys($result))
-		);
-
-		while ($row = DBfetch($resource)) {
-			$result[$row['hostid']]['inheritedTags'][] = array_diff_key($row, array_flip(['hostid']));
 		}
 	}
 }

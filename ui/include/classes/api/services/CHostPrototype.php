@@ -222,6 +222,7 @@ class CHostPrototype extends CHostBase {
 	protected function addRelatedObjects(array $options, array $result) {
 		$result = parent::addRelatedObjects($options, $result);
 
+		self::addRelatedInheritedTags($options, $result);
 		self::addRelatedMacros($options, $result);
 
 		$hostids = array_keys($result);

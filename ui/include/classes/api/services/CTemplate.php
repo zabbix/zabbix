@@ -57,7 +57,6 @@ class CTemplate extends CHostGeneral {
 			// filter
 			'evaltype'					=> TAG_EVAL_TYPE_AND_OR,
 			'tags'						=> null,
-			'inheritedTags'				=> false,
 			'filter'					=> null,
 			'search'					=> '',
 			'searchByAny'				=> null,
@@ -76,7 +75,6 @@ class CTemplate extends CHostGeneral {
 			'selectDashboards'			=> null,
 			'selectHttpTests'			=> null,
 			'selectTags'				=> null,
-			'selectInheritedTags'		=> null,
 			'selectValueMaps'			=> null,
 			'countOutput'				=> false,
 			'groupCount'				=> false,
@@ -292,15 +290,15 @@ class CTemplate extends CHostGeneral {
 	private static function validateGet(array &$options): void {
 		$api_input_rules = ['type' => API_OBJECT, 'flags' => API_ALLOW_UNEXPECTED, 'fields' => [
 			// Filters.
-			'inheritedTags' =>			['type' => API_BOOLEAN],
+			'inheritedTags' =>			['type' => API_BOOLEAN, 'default' => false],
 			// Output.
-			'selectDiscoveries' =>		['type' => API_OUTPUT, 'flags' => API_ALLOW_NULL | API_ALLOW_COUNT | API_NORMALIZE | API_DEPRECATED, 'in' => implode(',', array_diff(CDiscoveryRule::getOutputFieldsOnTemplate(), ['hostid'])), 'default' => null],
-			'selectDiscoveryRules' =>	['type' => API_OUTPUT, 'flags' => API_ALLOW_NULL | API_ALLOW_COUNT | API_NORMALIZE, 'in' => implode(',', array_diff(CDiscoveryRule::getOutputFieldsOnTemplate(), ['hostid'])), 'default' => null],
-			'selectMacros' =>			['type' => API_OUTPUT, 'flags' => API_ALLOW_NULL | API_NORMALIZE, 'in' => implode(',', CUserMacro::getOutputFieldsOnTemplate()), 'default' => null],
 			'selectParentTemplates' =>	['type' => API_OUTPUT, 'flags' => API_ALLOW_NULL | API_ALLOW_COUNT, 'in' => implode(',', ['templateid', 'host', 'name', 'description', 'uuid'])],
 			'selectTags' =>				['type' => API_OUTPUT, 'flags' => API_ALLOW_NULL, 'in' => implode(',', ['tag', 'value'])],
-			'selectInheritedTags' =>	['type' => API_OUTPUT, 'flags' => API_ALLOW_NULL | API_NORMALIZE, 'in' => implode(',', self::INHERITED_TAG_OUTPUT_FIELDS)],
+			'selectInheritedTags' =>	['type' => API_OUTPUT, 'flags' => API_ALLOW_NULL | API_NORMALIZE, 'in' => implode(',', self::INHERITED_TAG_OUTPUT_FIELDS), 'default' => null],
+			'selectMacros' =>			['type' => API_OUTPUT, 'flags' => API_ALLOW_NULL | API_NORMALIZE, 'in' => implode(',', CUserMacro::getOutputFieldsOnTemplate()), 'default' => null],
 			'selectValueMaps' =>		['type' => API_OUTPUT, 'flags' => API_ALLOW_NULL, 'in' => implode(',', ['valuemapid', 'name', 'mappings', 'uuid'])],
+			'selectDiscoveries' =>		['type' => API_OUTPUT, 'flags' => API_ALLOW_NULL | API_ALLOW_COUNT | API_NORMALIZE | API_DEPRECATED, 'in' => implode(',', array_diff(CDiscoveryRule::getOutputFieldsOnTemplate(), ['hostid'])), 'default' => null],
+			'selectDiscoveryRules' =>	['type' => API_OUTPUT, 'flags' => API_ALLOW_NULL | API_ALLOW_COUNT | API_NORMALIZE, 'in' => implode(',', array_diff(CDiscoveryRule::getOutputFieldsOnTemplate(), ['hostid'])), 'default' => null],
 			// Sort and limit.
 			'limitSelects' =>			['type' => API_INT32, 'flags' => API_ALLOW_NULL, 'in' => '1:'.ZBX_MAX_INT32, 'default' => null]
 		]];
@@ -1208,6 +1206,7 @@ class CTemplate extends CHostGeneral {
 	protected function addRelatedObjects(array $options, array $result) {
 		$result = parent::addRelatedObjects($options, $result);
 
+		self::addRelatedInheritedTags($options, $result);
 		self::addRelatedMacros($options, $result);
 		$this->addRelatedTemplateGroups($options, $result);
 		self::addRelatedChildDiscoveries($options, $result);

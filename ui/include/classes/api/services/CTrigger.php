@@ -93,7 +93,6 @@ class CTrigger extends CTriggerGeneral {
 			'min_severity'					=> null,
 			'evaltype'						=> TAG_EVAL_TYPE_AND_OR,
 			'tags'							=> null,
-			'inheritedTags'					=> false,
 			'filter'						=> null,
 			'search'						=> null,
 			'searchByAny'					=> null,
@@ -113,7 +112,6 @@ class CTrigger extends CTriggerGeneral {
 			'selectDependencies'			=> null,
 			'selectLastEvent'				=> null,
 			'selectTags'					=> null,
-			'selectInheritedTags'			=> null,
 			'countOutput'					=> false,
 			'groupCount'					=> false,
 			'preservekeys'					=> false,
@@ -532,12 +530,12 @@ class CTrigger extends CTriggerGeneral {
 	private static function validateGet(array &$options): void {
 		$api_input_rules = ['type' => API_OBJECT, 'flags' => API_ALLOW_UNEXPECTED, 'fields' => [
 			// Filters.
-			'inheritedTags' =>			['type' => API_BOOLEAN],
+			'inheritedTags' =>			['type' => API_BOOLEAN, 'default' => false],
 			// Output.
+			'selectInheritedTags' =>	['type' => API_OUTPUT, 'flags' => API_ALLOW_NULL | API_NORMALIZE, 'in' => implode(',', self::INHERITED_TAG_OUTPUT_FIELDS), 'default' => null],
 			'selectTriggerDiscovery' =>	['type' => API_OUTPUT, 'flags' => API_ALLOW_NULL | API_NORMALIZE | API_DEPRECATED, 'in' => implode(',', self::DISCOVERY_DATA_OUTPUT_FIELDS), 'default' => null],
 			'selectDiscoveryData' =>	['type' => API_OUTPUT, 'flags' => API_ALLOW_NULL | API_NORMALIZE, 'in' => implode(',', self::DISCOVERY_DATA_OUTPUT_FIELDS), 'default' => null],
-			'selectDiscoveryRule' =>	['type' => API_OUTPUT, 'flags' => API_ALLOW_NULL | API_NORMALIZE, 'in' => implode(',', CDiscoveryRule::OUTPUT_FIELDS), 'default' => null],
-			'selectInheritedTags' =>	['type' => API_OUTPUT, 'flags' => API_ALLOW_NULL | API_NORMALIZE, 'in' => implode(',', self::INHERITED_TAG_OUTPUT_FIELDS)]
+			'selectDiscoveryRule' =>	['type' => API_OUTPUT, 'flags' => API_ALLOW_NULL | API_NORMALIZE, 'in' => implode(',', CDiscoveryRule::OUTPUT_FIELDS), 'default' => null]
 		]];
 
 		if (!CApiInputValidator::validate($api_input_rules, $options, '/', $error)) {
@@ -745,9 +743,7 @@ class CTrigger extends CTriggerGeneral {
 	protected function addRelatedObjects(array $options, array $result) {
 		$result = parent::addRelatedObjects($options, $result);
 
-		if (!$result) {
-			return $result;
-		}
+		self::addRelatedInheritedTags($options, $result);
 
 		$triggerids = array_keys($result);
 

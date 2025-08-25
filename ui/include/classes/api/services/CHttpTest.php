@@ -61,7 +61,6 @@ class CHttpTest extends CApiService {
 			'nopermissions'			=> null,
 			'evaltype'				=> TAG_EVAL_TYPE_AND_OR,
 			'tags'					=> null,
-			'inheritedTags'			=> false,
 			// filter
 			'filter'				=> null,
 			'search'				=> null,
@@ -75,7 +74,6 @@ class CHttpTest extends CApiService {
 			'selectHosts'			=> null,
 			'selectSteps'			=> null,
 			'selectTags'			=> null,
-			'selectInheritedTags'	=> null,
 			'countOutput'			=> false,
 			'groupCount'			=> false,
 			'preservekeys'			=> false,
@@ -85,14 +83,7 @@ class CHttpTest extends CApiService {
 		];
 		$options = zbx_array_merge($defOptions, $options);
 
-		$api_input_rules = ['type' => API_OBJECT, 'flags' => API_ALLOW_UNEXPECTED, 'fields' => [
-			'inheritedTags' =>			['type' => API_BOOLEAN],
-			'selectInheritedTags' =>	['type' => API_OUTPUT, 'flags' => API_ALLOW_NULL | API_NORMALIZE, 'in' => implode(',', ['tag', 'value', 'object', 'objectid'])]
-		]];
-
-		if (!CApiInputValidator::validate($api_input_rules, $options, '/', $error)) {
-			self::exception(ZBX_API_ERROR_PARAMETERS, $error);
-		}
+		self::validateGet($options);
 
 		// editable + PERMISSION CHECK
 		if (self::$userData['type'] != USER_TYPE_SUPER_ADMIN && !$options['nopermissions']) {
@@ -257,6 +248,73 @@ class CHttpTest extends CApiService {
 		}
 
 		return $result;
+	}
+
+	private static function validateGet(array &$options): void {
+		$api_input_rules = ['type' => API_OBJECT, 'flags' => API_ALLOW_UNEXPECTED, 'fields' => [
+			// Filters.
+			'inheritedTags' =>			['type' => API_BOOLEAN, 'default' => false],
+			// Output.
+			'selectInheritedTags' =>	['type' => API_OUTPUT, 'flags' => API_ALLOW_NULL | API_NORMALIZE, 'in' => implode(',', ['tag', 'value', 'object', 'objectid']), 'default' => null]
+		]];
+
+		if (!CApiInputValidator::validate($api_input_rules, $options, '/', $error)) {
+			self::exception(ZBX_API_ERROR_PARAMETERS, $error);
+		}
+	}
+
+	private static function addRelatedInheritedTags(array $options, array &$httptests): void {
+		if ($options['selectInheritedTags'] === null) {
+			return;
+		}
+
+		foreach ($httptests as &$httptest) {
+			$httptest['inheritedTags'] = [];
+		}
+		unset($httptest);
+
+		$output = ['htc.httptestid'];
+
+		foreach ($options['selectInheritedTags'] as $field) {
+			$output[] = match ($field) {
+				'tag', 'value' => 'ht.'.$field,
+				'object' => ZBX_TAG_OBJECT_TEMPLATE.' AS '.$field,
+				'objectid' => 'htc.link_hostid AS '.$field
+			};
+		}
+
+		if (in_array('object', $options['selectInheritedTags'])) {
+			$output[] = 'h.flags';
+
+			$resource = DBselect(
+				'SELECT '.implode(',', $output).
+				' FROM httptest_template_cache htc'.
+				' JOIN host_tag ht ON htc.link_hostid=ht.hostid'.
+				' JOIN hosts h ON htc.link_hostid=h.hostid'.
+				' WHERE '.dbConditionId('htc.httptestid', array_keys($httptests))
+			);
+
+			while ($row = DBfetch($resource)) {
+				if ($row['flags'] == ZBX_FLAG_DISCOVERY_NORMAL || $row['flags'] == ZBX_FLAG_DISCOVERY_CREATED) {
+					$row['object'] = ZBX_TAG_OBJECT_HOST;
+				}
+
+				$httptests[$row['httptestid']]['inheritedTags'][] =
+					array_diff_key($row, array_flip(['httptestid', 'flags']));
+			}
+		}
+		else {
+			$resource = DBselect(
+				'SELECT '.implode(',', $output).
+				' FROM httptest_template_cache htc'.
+				' JOIN host_tag ht ON htc.link_hostid=ht.hostid'.
+				' WHERE '.dbConditionId('htc.httptestid', array_keys($httptests))
+			);
+
+			while ($row = DBfetch($resource)) {
+				$httptests[$row['httptestid']]['inheritedTags'][] = array_diff_key($row, array_flip(['httptestid']));
+			}
+		}
 	}
 
 	/**
@@ -1111,60 +1169,6 @@ class CHttpTest extends CApiService {
 		self::addRelatedInheritedTags($options, $result);
 
 		return $result;
-	}
-
-	private static function addRelatedInheritedTags(array $options, array &$result): void {
-		if ($options['selectInheritedTags'] === null) {
-			return;
-		}
-
-		foreach ($result as &$row) {
-			$row['inheritedTags'] = [];
-		}
-		unset($row);
-
-		$output = ['htc.httptestid'];
-
-		foreach ($options['selectInheritedTags'] as $field) {
-			$output[] = match ($field) {
-				'tag', 'value' => 'ht.'.$field,
-				'object' => ZBX_TAG_OBJECT_TEMPLATE.' AS '.$field,
-				'objectid' => 'htc.link_hostid AS '.$field
-			};
-		}
-
-		if (in_array('object', $options['selectInheritedTags'])) {
-			$output[] = 'h.flags';
-
-			$resource = DBselect(
-				'SELECT '.implode(',', $output).
-				' FROM httptest_template_cache htc'.
-				' JOIN host_tag ht ON htc.link_hostid=ht.hostid'.
-				' JOIN hosts h ON htc.link_hostid=h.hostid'.
-				' WHERE '.dbConditionId('htc.httptestid', array_keys($result))
-			);
-
-			while ($row = DBfetch($resource)) {
-				if ($row['flags'] == ZBX_FLAG_DISCOVERY_NORMAL || $row['flags'] == ZBX_FLAG_DISCOVERY_CREATED) {
-					$row['object'] = ZBX_TAG_OBJECT_HOST;
-				}
-
-				$result[$row['httptestid']]['inheritedTags'][] =
-					array_diff_key($row, array_flip(['httptestid', 'flags']));
-			}
-		}
-		else {
-			$resource = DBselect(
-				'SELECT '.implode(',', $output).
-				' FROM httptest_template_cache htc'.
-				' JOIN host_tag ht ON htc.link_hostid=ht.hostid'.
-				' WHERE '.dbConditionId('htc.httptestid', array_keys($result))
-			);
-
-			while ($row = DBfetch($resource)) {
-				$result[$row['httptestid']]['inheritedTags'][] = array_diff_key($row, array_flip(['httptestid']));
-			}
-		}
 	}
 
 	/**
