@@ -62,6 +62,20 @@ class testPageAdministrationMediaTypes extends CWebTest {
 				]
 			]
 		]);
+
+		CDataHelper::call('mediatype.create', [
+			[
+				'type' => MEDIA_TYPE_EXEC,
+				'name' => 'Test script',
+				'exec_path' => 'selenium_test_script.sh',
+				'parameters' => [
+					[
+						'sortorder' => '0',
+						'value' => '{ALERT.SUBJECT}'
+					]
+				]
+			]
+		]);
 	}
 
 	/**
