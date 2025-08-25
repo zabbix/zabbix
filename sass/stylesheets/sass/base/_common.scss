@@ -2,7 +2,7 @@ body {
 	position: relative;
 	background-color: $body-bg-color;
 	font-family: var(--font-stack);
-	font-size: $font-body-size;
+	font-size: var(--font-body-size);
 	line-height: $body-line-height;
 	color: $font-color;
 }

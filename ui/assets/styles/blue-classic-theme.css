@@ -1,10 +1,14 @@
 @charset "UTF-8";
 :root {
   --font-stack: Inter, "Noto Sans Georgian", "Noto Sans Hebrew", "Noto Sans JP", "Noto Sans KR", "Noto Sans SC", "Apple SD Gothic Neo", "Arial Hebrew", Arial, "DejaVu Sans", Helvetica, "Hiragino Sans", "Liberation Sans", "Malgun Gothic", Meiryo, "Microsoft YaHei", "PingFang SC", Roboto, Sylfaen, sans-serif;
-  --font-stack-mono: "Courier New", Courier, monospace; }
+  --font-stack-mono: "Courier New", Courier, monospace;
+  --font-body-size: 75%; }
 
 [lang="zh"] {
   --font-stack: Inter, "Noto Sans Georgian", "Noto Sans Hebrew", "Noto Sans KR", "Noto Sans SC", "Noto Sans JP", "Apple SD Gothic Neo", "Arial Hebrew", Arial, "DejaVu Sans", Helvetica, "Hiragino Sans", "Liberation Sans", "Malgun Gothic", Meiryo, "Microsoft YaHei", "PingFang SC", Roboto, Sylfaen, sans-serif; }
+
+[lang="ka"] {
+  --font-body-size: 70%; }
 
 .sidebar .server-name, .dashboard-navigation-tabs .sortable li div span, .host-dashboard-header-navigation .host-dashboard-navigation .host-dashboard-navigation-tabs .sortable li div span, .dashboard-grid-widget-header h4, .dashboard-grid-iterator-header h4, .list-table .action-container .link-action, div.dashboard-widget-hostcard .host-card .sections-header .host-name .link-action, div.dashboard-widget-hostcard .host-card .sections .section .section-name, div.dashboard-widget-hostcard .host-card .sections .section.section-host-groups .host-groups .host-group .host-group-name, div.dashboard-widget-hostcard .host-card .sections .section.section-monitoring .monitoring .monitoring-item .monitoring-item-name, div.dashboard-widget-hostcard .host-card .sections .section.section-monitored-by .section-body, div.dashboard-widget-hostcard .host-card .sections .section.section-templates .templates .template .template-name, div.dashboard-widget-hostcard .host-card .sections .section.section-inventory .section-body .inventory-field-name,
 div.dashboard-widget-hostcard .host-card .sections .section.section-inventory .section-body .inventory-field-value, div.dashboard-widget-itemcard .item-card .sections-header .section-item .item-name .link-action, div.dashboard-widget-itemcard .item-card .sections-header .section-path, div.dashboard-widget-itemcard .item-card .sections-header .section-path .path-element, div.dashboard-widget-itemcard .item-card .sections .section .section-name, div.dashboard-widget-itemcard .item-card .sections .section.section-metrics .center-column, div.dashboard-widget-itemcard .item-card .sections .section.section-latest-data .center-column, div.dashboard-widget-itemcard .item-card .sections .section.section-metrics .column, div.dashboard-widget-itemcard .item-card .sections .section.section-metrics .right-column, div.dashboard-widget-itemcard .item-card .sections .section.section-latest-data .column, div.dashboard-widget-itemcard .item-card .sections .section.section-latest-data .right-column, div.dashboard-widget-itemcard .item-card .sections .section.section-metrics .column .column-header, div.dashboard-widget-itemcard .item-card .sections .section.section-metrics .column .column-value, div.dashboard-widget-itemcard .item-card .sections .section.section-metrics .right-column .column-header, div.dashboard-widget-itemcard .item-card .sections .section.section-metrics .right-column .column-value, div.dashboard-widget-itemcard .item-card .sections .section.section-latest-data .column .column-header, div.dashboard-widget-itemcard .item-card .sections .section.section-latest-data .column .column-value, div.dashboard-widget-itemcard .item-card .sections .section.section-latest-data .right-column .column-header, div.dashboard-widget-itemcard .item-card .sections .section.section-latest-data .right-column .column-value, div.dashboard-widget-itemcard .item-card .sections .section.section-triggers .triggers .trigger .trigger-name, div.dashboard-widget-itemcard .item-card .sections .section.section-single-parameter .section-body, div.dashboard-widget-map .btn-back-map-container a:focus .btn-back-map .btn-back-map-content, div.dashboard-widget-map .btn-back-map-container a:hover .btn-back-map .btn-back-map-content, form.dashboard-widget-tophosts #list_columns .text, form.dashboard-widget-topitems #list_columns .text, .menu-popup .menu-popup-item, .menu-popup h3, .notif-body h4, .overlay-descr-url, .tag, .overflow-ellipsis, .overflow-ellipsis td:not(.wordbreak, .wordwrap), .overflow-ellipsis th, .overflow-ellipsis th a, .preprocessing-list .preprocessing-list-head .step-on-fail, .totals-list.totals-list-horizontal .count,
@@ -498,7 +502,7 @@ body {
   position: relative;
   background-color: #ebeef0;
   font-family: var(--font-stack);
-  font-size: 75%;
+  font-size: var(--font-body-size);
   line-height: 1.4em;
   color: #1f2c33; }
 
@@ -5668,7 +5672,7 @@ div.dashboard-widget-problemsbysv .list-table tr[data-hostgroupid] {
   cursor: pointer; }
 
 form.dashboard-widget-svggraph {
-  max-width: 1420px;
+  max-width: 1360px;
   min-width: 1120px;
   width: 100vw; }
   form.dashboard-widget-svggraph .graph-widget-config-tabs {
@@ -6617,7 +6621,7 @@ form.is-loading {
   background-color: #ffffff; }
   .filter-forms .cell {
     text-align: left;
-    padding: 0 20px 5px; }
+    padding: 0 10px 5px; }
     .filter-forms .cell:first-child {
       padding-left: 0; }
     .filter-forms .cell:last-child {
@@ -6633,6 +6637,8 @@ form.is-loading {
     margin: 10px 5px 0; }
   .filter-forms select {
     vertical-align: top; }
+  .filter-forms .table-forms .table-forms-td-left label {
+    max-width: 85px; }
   .filter-forms .table-forms .table-forms-td-right td {
     padding: 0 5px 5px 0;
     vertical-align: middle; }
@@ -6692,7 +6698,9 @@ form.is-loading {
     .table-forms .table-forms-td-left label {
       display: block;
       height: 24px;
-      line-height: 24px; }
+      line-height: 24px;
+      overflow: hidden;
+      text-overflow: ellipsis; }
       .table-forms .table-forms-td-left label .btn-icon,
       .table-forms .table-forms-td-left label .icon {
         margin-left: 5px; }
@@ -7142,6 +7150,23 @@ z-select[disabled] .focusable, input[disabled], textarea[disabled], select optio
   width: auto;
   margin-left: 200px; }
 
+#preprocessing_tab .table-forms-td-left label,
+.setup-right-body .table-forms-td-left label, .form-grid label {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis; }
+  #preprocessing_tab .table-forms-td-left label > inlinetext,
+  .setup-right-body .table-forms-td-left label > inlinetext, .form-grid label > inlinetext {
+    max-width: calc(var(--label-width) - 21px);
+    overflow: hidden;
+    text-overflow: ellipsis;
+    display: inline-block;
+    vertical-align: bottom; }
+    #preprocessing_tab .table-forms-td-left label > inlinetext + .btn-icon.btn-small,
+    .setup-right-body .table-forms-td-left label > inlinetext + .btn-icon.btn-small, .form-grid label > inlinetext + .btn-icon.btn-small {
+      vertical-align: top;
+      top: 3px; }
+
 .setup-right-body {
   padding-right: 5px;
   max-height: 345px;
@@ -7150,13 +7175,18 @@ z-select[disabled] .focusable, input[disabled], textarea[disabled], select optio
     border: 0; }
   .setup-right-body h1 {
     margin: 25% 0 .4em; }
-  .setup-right-body .table-forms-td-left {
-    white-space: unset;
-    min-width: 170px;
-    vertical-align: middle; }
-    .setup-right-body .table-forms-td-left label {
-      height: unset;
-      line-height: unset; }
+
+#preprocessing_tab .table-forms-td-left,
+.setup-right-body .table-forms-td-left {
+  --label-width: 170px; }
+  #preprocessing_tab .table-forms-td-left label,
+  .setup-right-body .table-forms-td-left label {
+    max-width: var(--label-width); }
+
+#preprocessing_tab .table-forms-td-left label {
+  --label-width: 150px; }
+  #preprocessing_tab .table-forms-td-left label > inlinetext {
+    max-width: calc(var(--label-width) - 45px); }
 
 .setup-title {
   margin: 109px 0 16px 0;
@@ -7388,7 +7418,7 @@ z-select[disabled] .focusable, input[disabled], textarea[disabled], select optio
     .overlay-dialogue.modal-popup.modal-popup-static {
       --modal-max-width: 700px; }
     .overlay-dialogue.modal-popup.modal-popup-preprocessing {
-      --modal-max-width: 900px; }
+      --modal-max-width: 1024px; }
     .overlay-dialogue.modal-popup.modal-popup-fullscreen {
       --modal-width: calc(100vw - 40px);
       --modal-max-width: calc(100vw - 40px); }
@@ -8768,6 +8798,8 @@ z-select.z-select-host-interface li[disabled] .description:not(:empty) {
 .overlay-dialogue .valuemap-list-table td {
   vertical-align: top; }
 
+.form-grid li > label {
+  overflow: unset; }
 .form-grid .subscriptions-table th {
   color: #768d99; }
 .form-grid .subscriptions-table .icon {

@@ -195,12 +195,12 @@ $preprocessing_form_list = (new CFormList('preprocessing-form-list'))
 	->addRow(
 		(new CVisibilityBox('visible[preprocessing]', 'preprocessing-field', _('Original')))
 			->setLabel([
-				_('Preprocessing steps'),
+				new CTag('inlinetext', true, _('Preprocessing steps')),
 				makeHelpIcon([
 					_('Preprocessing is a transformation before saving the value to the database. It is possible to define a sequence of preprocessing steps, and those are executed in the order they are set.'),
 					BR(), BR(),
 					_('However, if "Check for not supported value" steps are configured, they are always placed and executed first (with "any error" being the last of them).')
-				])
+				])->setId('preprocessing_steps_hint')
 			]),
 		(new CDiv([
 			(new CRadioButtonList('preprocessing_action', ZBX_ACTION_REPLACE))

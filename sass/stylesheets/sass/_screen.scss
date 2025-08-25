@@ -619,7 +619,7 @@ form {
 
 	.cell {
 		text-align: left;
-		padding: 0 20px 5px;
+		padding: 0 10px 5px;
 
 		&:first-child {
 			padding-left: 0;
@@ -649,6 +649,12 @@ form {
 
 	select {
 		vertical-align: top;
+	}
+
+	.table-forms .table-forms-td-left {
+		label {
+			max-width: 85px;
+		}
 	}
 
 	.table-forms .table-forms-td-right {
@@ -748,6 +754,8 @@ form {
 			display: block;
 			height: 24px;
 			line-height: 24px;
+			overflow: hidden;
+			text-overflow: ellipsis;
 
 			.btn-icon,
 			.icon {
@@ -1556,6 +1564,25 @@ div {
 	margin-left: 200px;
 }
 
+%hint-icon-ellipsis {
+	white-space: nowrap;
+	overflow: hidden;
+	text-overflow: ellipsis;
+
+	& > inlinetext {
+		max-width: calc(var(--label-width) - 21px);
+		overflow: hidden;
+		text-overflow: ellipsis;
+		display: inline-block;
+		vertical-align: bottom;
+
+		& + .btn-icon.btn-small {
+			vertical-align: top;
+			top: 3px;
+		}
+	}
+}
+
 .setup-right-body {
 	padding-right: 5px;
 	max-height: 345px;
@@ -1570,15 +1597,29 @@ div {
 	}
 
 	@extend %webkit-scrollbar;
+}
 
+#preprocessing_tab,
+.setup-right-body {
 	.table-forms-td-left {
-		white-space: unset;
-		min-width: 170px;
-		vertical-align: middle;
+		--label-width: 170px;
 
 		label {
-			height: unset;
-			line-height: unset;
+			max-width: var(--label-width);
+
+			@extend %hint-icon-ellipsis;
+		}
+	}
+}
+
+#preprocessing_tab {
+	.table-forms-td-left {
+		label {
+			--label-width: 150px;
+
+			& > inlinetext {
+				max-width: calc(var(--label-width) - 45px);
+			}
 		}
 	}
 }
@@ -1923,7 +1964,7 @@ div {
 	//   modal-popup-generic: 650px - max-content
 	//   modal-popup-small: max-content - 450px
 	//   modal-popup-static: max-content - 700px
-	//   modal-popup-preprocessing: max-content - 900px
+	//   modal-popup-preprocessing: max-content - 1024px
 	//   modal-popup-large: max-content - 1024px
 	//   modal-popup-fullscreen: (full_width-40px)
 	&.modal-popup {
@@ -1951,7 +1992,7 @@ div {
 		}
 
 		&.modal-popup-preprocessing {
-			--modal-max-width: 900px;
+			--modal-max-width: 1024px;
 		}
 
 		&.modal-popup-fullscreen {
@@ -4066,6 +4107,14 @@ z-select {
 }
 
 .form-grid {
+	label {
+		@extend %hint-icon-ellipsis;
+	}
+
+	li > label {
+		overflow: unset;
+	}
+
 	.subscriptions-table {
 		th {
 			color: $font-alt-color;
