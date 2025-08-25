@@ -1198,7 +1198,7 @@ static void	rm_update_cache_reports_users(zbx_rm_t *manager)
 	}
 	zbx_db_free_result(result);
 
-	if (0 != users.values_num || 0 != users_excl.values_num)
+	if (NULL != report && (0 != users.values_num || 0 != users_excl.values_num))
 		rm_report_update_users(report, &users, &users_excl);
 
 	zbx_vector_uint64_destroy(&users_excl);
