@@ -336,9 +336,10 @@ class testDashboardPieChartWidget extends testWidgets {
 			'Size' => false,
 			'Decimal places' => false,
 			'Units' => false,
-			'Bold' => false
+			'Bold' => false,
+			'Colour' => false
 		];
-		$expected_labels = array_merge($expected_labels, array_keys($inputs_enabled), ['Colour']);
+		$expected_labels = array_merge($expected_labels, array_keys($inputs_enabled));
 		$this->assertAllVisibleLabels($displaying_options_tab, $expected_labels);
 		$this->assertRangeSliderParameters($form, 'Width', ['min' => '20', 'max' => '50', 'step' => '10']);
 		$this->assertRangeSliderParameters($form, 'Stroke width', ['min' => '0', 'max' => '10', 'step' => '1']);
@@ -357,9 +358,6 @@ class testDashboardPieChartWidget extends testWidgets {
 		foreach ($inputs_enabled as $label => $enabled) {
 			$this->assertEquals($enabled, $form->getField($label)->isEnabled());
 		}
-
-		// Check that total value color picker element is disabled.
-		$this->assertFalse($form->query('xpath:.//z-color-picker[@color-field-name="value_color"]')->one()->isEnabled());
 
 		$field_maxlengths = [
 			'id:space' => 2,
