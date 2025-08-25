@@ -69,11 +69,13 @@ static const char	*usage_message[] = {
 ZBX_GET_CONFIG_VAR(unsigned char, zbx_program_type, ZBX_PROGRAM_TYPE_GET)
 
 #define CONFIG_GET_TIMEOUT_MIN		1
-#define CONFIG_GET_TIMEOUT_MAX		30
+#define CONFIG_GET_TIMEOUT_DEF		30
+#define CONFIG_GET_TIMEOUT_MAX		600
 #define CONFIG_GET_TIMEOUT_MIN_STR	ZBX_STR(CONFIG_GET_TIMEOUT_MIN)
+#define CONFIG_GET_TIMEOUT_DEF_STR	ZBX_STR(CONFIG_GET_TIMEOUT_DEF)
 #define CONFIG_GET_TIMEOUT_MAX_STR	ZBX_STR(CONFIG_GET_TIMEOUT_MAX)
 
-static int	CONFIG_GET_TIMEOUT = CONFIG_GET_TIMEOUT_MAX;
+static int	config_get_timeout = CONFIG_GET_TIMEOUT_DEF;
 
 static const char	*help_message[] = {
 	"Get data from Zabbix agent.",
@@ -86,7 +88,7 @@ static const char	*help_message[] = {
 	"",
 	"  -t --timeout seconds       Specify timeout. Valid range: " CONFIG_GET_TIMEOUT_MIN_STR "-"
 			CONFIG_GET_TIMEOUT_MAX_STR " seconds",
-	"                             (default: " CONFIG_GET_TIMEOUT_MAX_STR " seconds)",
+	"                             (default: " CONFIG_GET_TIMEOUT_DEF_STR " seconds)",
 	"",
 	"  -k --key item-key          Specify key of the item to retrieve value for",
 	"",
@@ -173,8 +175,6 @@ static const char	*help_message[] = {
 };
 
 static zbx_config_tls_t	*zbx_config_tls = NULL;
-
-int	CONFIG_TCP_MAX_BACKLOG_SIZE	= SOMAXCONN;
 
 /* COMMAND LINE OPTIONS */
 
@@ -272,7 +272,7 @@ static int	get_value(const char *source_ip, const char *host, unsigned short por
 			return FAIL;
 	}
 
-	if (SUCCEED == (ret = zbx_tcp_connect(&s, source_ip, host, port, CONFIG_GET_TIMEOUT + 1,
+	if (SUCCEED == (ret = zbx_tcp_connect(&s, source_ip, host, port, config_get_timeout + 1,
 			zbx_config_tls->connect_mode, tls_arg1, tls_arg2)))
 	{
 		struct zbx_json	j;
@@ -287,7 +287,7 @@ static int	get_value(const char *source_ip, const char *host, unsigned short por
 
 		if (ZBX_COMPONENT_VERSION(7, 0, 0) <= *version)
 		{
-			zbx_agent_prepare_request(&j, key, CONFIG_GET_TIMEOUT);
+			zbx_agent_prepare_request(&j, key, config_get_timeout);
 			ptr = j.buffer;
 			len = j.buffer_size;
 		}
@@ -411,8 +411,8 @@ int	main(int argc, char **argv)
 					source_ip = zbx_strdup(NULL, zbx_optarg);
 				break;
 			case 't':
-				if (FAIL == zbx_is_uint_n_range(zbx_optarg, ZBX_MAX_UINT64_LEN, &CONFIG_GET_TIMEOUT,
-						sizeof(CONFIG_GET_TIMEOUT), CONFIG_GET_TIMEOUT_MIN,
+				if (FAIL == zbx_is_uint_n_range(zbx_optarg, ZBX_MAX_UINT64_LEN, &config_get_timeout,
+						sizeof(config_get_timeout), CONFIG_GET_TIMEOUT_MIN,
 						CONFIG_GET_TIMEOUT_MAX))
 				{
 					zbx_error("Invalid timeout, valid range %d:%d seconds", CONFIG_GET_TIMEOUT_MIN,

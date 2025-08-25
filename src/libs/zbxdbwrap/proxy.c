@@ -926,11 +926,10 @@ static int	parse_history_data_row_value(const struct zbx_json_parse *jp_row, zbx
 	/* New agents will not send meta information for items in unsupported state.      */
 	if (ITEM_STATE_NOTSUPPORTED != av->state)
 	{
-		if (SUCCEED == zbx_json_value_by_name_dyn(jp_row, ZBX_PROTO_TAG_LASTLOGSIZE, &tmp, &tmp_alloc, NULL))
+		if (SUCCEED == zbx_json_value_by_name_dyn(jp_row, ZBX_PROTO_TAG_LASTLOGSIZE, &tmp, &tmp_alloc, NULL) &&
+				SUCCEED == zbx_is_uint64(tmp, &av->lastlogsize))
 		{
 			av->meta = 1;	/* contains meta information */
-
-			zbx_is_uint64(tmp, &av->lastlogsize);
 
 			if (SUCCEED == zbx_json_value_by_name_dyn(jp_row, ZBX_PROTO_TAG_MTIME, &tmp, &tmp_alloc, NULL))
 				av->mtime = atoi(tmp);
