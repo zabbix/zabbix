@@ -8,7 +8,7 @@ This template is based on the original template developed by Igor Akkuratov, Sen
 
 ## Requirements
 
-Zabbix version: 7.4 and higher.
+Zabbix version: 8.0 and higher.
 
 ## Tested versions
 
@@ -17,7 +17,7 @@ This template has been tested on:
 
 ## Configuration
 
-> Zabbix should be configured according to the instructions in the [Templates out of the box](https://www.zabbix.com/documentation/7.4/manual/config/templates_out_of_the_box) section.
+> Zabbix should be configured according to the instructions in the [Templates out of the box](https://www.zabbix.com/documentation/8.0/manual/config/templates_out_of_the_box) section.
 
 ## Setup
 
@@ -30,7 +30,7 @@ This template works with standalone and cluster instances. Metrics are collected
 
 |Name|Description|Default|
 |----|-----------|-------|
-|{$IGNITE.PASSWORD}||`<secret>`|
+|{$IGNITE.PASSWORD}|||
 |{$IGNITE.USER}||`zabbix`|
 |{$IGNITE.LLD.FILTER.THREAD.POOL.MATCHES}|<p>Filter of discoverable thread pools.</p>|`.*`|
 |{$IGNITE.LLD.FILTER.THREAD.POOL.NOT_MATCHES}|<p>Filter to exclude discovered thread pools.</p>|`Macro too long. Please see the template.`|

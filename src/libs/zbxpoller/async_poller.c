@@ -91,9 +91,8 @@ static void	process_async_result(zbx_dc_item_context_t *item, zbx_poller_config_
 	{
 		if (ZBX_IS_RUNNING())
 		{
-			zbx_preprocess_item_value(item->itemid,
-				item->hostid,item->value_type,item->flags,
-				&item->result, &timespec, ITEM_STATE_NORMAL, NULL);
+			zbx_preprocess_item_value(item->itemid, item->value_type, item->flags, item->preprocessing,
+					&item->result, &timespec, ITEM_STATE_NORMAL, NULL);
 		}
 	}
 	else
@@ -102,8 +101,9 @@ static void	process_async_result(zbx_dc_item_context_t *item, zbx_poller_config_
 		{
 			if (NOTSUPPORTED == item->ret || AGENT_ERROR == item->ret || CONFIG_ERROR == item->ret)
 			{
-				zbx_preprocess_item_value(item->itemid, item->hostid, item->value_type,
-					item->flags, NULL, &timespec, ITEM_STATE_NOTSUPPORTED, item->result.msg);
+				zbx_preprocess_item_value(item->itemid, item->value_type, item->flags,
+						item->preprocessing, NULL, &timespec, ITEM_STATE_NOTSUPPORTED,
+						item->result.msg);
 			}
 		}
 
@@ -180,8 +180,8 @@ static void	process_httpagent_result(CURL *easy_handle, CURLcode err, void *arg)
 		out = NULL;
 		if (ZBX_IS_RUNNING())
 		{
-			zbx_preprocess_item_value(item_context->itemid, item_context->hostid,item_context->value_type,
-					item_context->flags, &result, &timespec, ITEM_STATE_NORMAL, NULL);
+			zbx_preprocess_item_value(item_context->itemid, item_context->value_type, item_context->flags,
+					item_context->preprocessing, &result, &timespec, ITEM_STATE_NORMAL, NULL);
 		}
 	}
 	else
@@ -189,8 +189,9 @@ static void	process_httpagent_result(CURL *easy_handle, CURLcode err, void *arg)
 		SET_MSG_RESULT(&result, error);
 		if (ZBX_IS_RUNNING())
 		{
-			zbx_preprocess_item_value(item_context->itemid, item_context->hostid, item_context->value_type,
-					item_context->flags, NULL, &timespec, ITEM_STATE_NOTSUPPORTED, result.msg);
+			zbx_preprocess_item_value(item_context->itemid, item_context->value_type, item_context->flags,
+					item_context->preprocessing, NULL, &timespec, ITEM_STATE_NOTSUPPORTED,
+					result.msg);
 		}
 	}
 
@@ -230,19 +231,23 @@ static void	async_initiate_queued_checks(zbx_poller_config_t *poller_config, con
 
 	zbx_vector_poller_item_create(&poller_items);
 #ifdef HAVE_NETSNMP
-	if (1 == poller_config->clear_cache)
+	if (0 != poller_config->clear_cache)
 	{
 		if (0 != poller_config->processing)
-		{
 			goto exit;
-		}
-		else
+
+		if (ZBX_SNMP_POLLER_CLEAR_CACHE == poller_config->clear_cache)
 		{
 			zbx_unset_snmp_bulkwalk_options();
 			zbx_clear_cache_snmp(ZBX_PROCESS_TYPE_SNMP_POLLER, poller_config->process_num);
 			zbx_set_snmp_bulkwalk_options(zbx_progname);
-			poller_config->clear_cache = 0;
 		}
+		else if (ZBX_SNMP_POLLER_HOUSEKEEP_CACHE == poller_config->clear_cache)
+		{
+			zbx_housekeep_snmp_engineid_cache();
+		}
+
+		poller_config->clear_cache = 0;
 	}
 #else
 	ZBX_UNUSED(zbx_progname);
@@ -318,8 +323,8 @@ static void	async_initiate_queued_checks(zbx_poller_config_t *poller_config, con
 			{
 				if (ZBX_IS_RUNNING())
 				{
-					zbx_preprocess_item_value(items[i].itemid, items[i].host.hostid,
-							items[i].value_type, items[i].flags, NULL, &timespec,
+					zbx_preprocess_item_value(items[i].itemid, items[i].value_type, items[i].flags,
+							items[i].preprocessing, NULL, &timespec,
 							ITEM_STATE_NOTSUPPORTED, results[i].msg);
 				}
 
@@ -797,7 +802,7 @@ ZBX_THREAD_ENTRY(zbx_async_poller_thread, args)
 				case ZBX_RTC_SNMP_CACHE_RELOAD:
 
 					if (ZBX_POLLER_TYPE_SNMP == poller_type)
-						poller_config.clear_cache = 1;
+						poller_config.clear_cache = ZBX_SNMP_POLLER_CLEAR_CACHE;
 					break;
 			}
 #endif
@@ -809,8 +814,7 @@ ZBX_THREAD_ENTRY(zbx_async_poller_thread, args)
 				SNMP_ENGINEID_HK_INTERVAL + last_snmp_engineid_hk_time)
 		{
 			last_snmp_engineid_hk_time = time(NULL);
-			zbx_housekeep_snmp_engineid_cache();
-			poller_config.clear_cache = 1;
+			poller_config.clear_cache = ZBX_SNMP_POLLER_HOUSEKEEP_CACHE;
 		}
 #undef SNMP_ENGINEID_HK_INTERVAL
 #endif
@@ -840,6 +844,7 @@ ZBX_THREAD_ENTRY(zbx_async_poller_thread, args)
 	if (ZBX_POLLER_TYPE_SNMP == poller_type)
 		zbx_destroy_snmp_engineid_cache();
 #endif
+	zbx_ipc_async_socket_close(&rtc);
 
 	zbx_setproctitle("%s #%d [terminated]", get_process_type_string(process_type), process_num);
 

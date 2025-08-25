@@ -448,6 +448,10 @@ int	zbx_trapper_item_test_run(const struct zbx_json_parse *jp_data, zbx_uint64_t
 				config_startup_time, program_type, progname, get_config_forks, config_java_gateway,
 				config_java_gateway_port, config_externalscripts, get_value_internal_ext_cb,
 				config_ssh_key_location, config_webdriver_url);
+#ifdef HAVE_NETSNMP
+		if (ITEM_TYPE_SNMP == item.type)
+			zbx_clear_cache_snmp(ZBX_PROCESS_TYPE_TRAPPER, FAIL);
+#endif
 
 		switch (errcode)
 		{
