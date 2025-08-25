@@ -205,6 +205,7 @@ window.service_edit_popup = new class {
 		}
 
 		document.querySelector('#children .js-add').disabled = has_problem_tags;
+		this.form.validateChanges(['problem_tags']);
 	}
 
 	#editStatusRule(row = null) {
