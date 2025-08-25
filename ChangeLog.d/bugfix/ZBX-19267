@@ -1,0 +1,1 @@
+...G...... [ZBX-19267] fixed wmi.get items sometimes incorectly returning "Empty WMI search result" with Agent2 (aetatsu)

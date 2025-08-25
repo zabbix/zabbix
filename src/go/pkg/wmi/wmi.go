@@ -120,6 +120,11 @@ func (r *valueResult) write(rs *ole.IDispatch) (err error) {
 			propsCol := vc.ToIDispatch()
 			defer propsCol.Release()
 
+			isKeyProperty, err := isPropertyKeyProperty(propsCol)
+			if err != nil {
+				return
+			}
+
 			propsName, err := oleutil.GetProperty(propsCol, "Name")
 			if err != nil {
 				return
@@ -132,22 +137,18 @@ func (r *valueResult) write(rs *ole.IDispatch) (err error) {
 			}
 			defer clearOle(propsVal)
 
+			if isKeyProperty {
+				// remember key field value in the case it was the only selected column
+				propertyKeyFieldValue = propsVal.Value()
+				return
+			}
+
 			if propsVal.Value() == nil {
 				return errors.New("Empty WMI search result.")
 			}
 
-			isKeyProperty, err := isPropertyKeyProperty(propsCol)
-			if err != nil {
-				return
-			}
-
-			if !isKeyProperty {
-				r.data = propsVal.Value()
-				return stopErrorCol
-			}
-			// remember key field value in the case it was the only selected column
-			propertyKeyFieldValue = propsVal.Value()
-			return
+			r.data = propsVal.Value()
+			return stopErrorCol
 		})
 
 		if err == nil {
@@ -155,13 +156,18 @@ func (r *valueResult) write(rs *ole.IDispatch) (err error) {
 		}
 		return
 	})
-	if stop, ok := oleErr.(stopError); !ok {
+
+	stop, ok := oleErr.(stopError)
+	if !ok {
 		return oleErr
-	} else {
-		if oleErr == nil || stop == stopErrorRow {
-			r.data = propertyKeyFieldValue
-		}
 	}
+	if oleErr == nil || stop == stopErrorRow {
+		if propertyKeyFieldValue == nil {
+			return errors.New("Empty WMI search result.")
+		}
+		r.data = propertyKeyFieldValue
+	}
+
 	return
 }
 
