@@ -99,11 +99,16 @@
 			curl.setArgument('action', 'iconmap.list');
 			this.#list_action = curl.getUrl();
 
-			const clone = document.getElementById('clone');
-			clone && clone.addEventListener('click', () => this.#clone());
+			const clone_btn = document.getElementById('clone');
+			clone_btn && clone_btn.addEventListener('click', () => this.#clone());
+
+			const delete_btn = document.getElementById('delete');
+			delete_btn && delete_btn.addEventListener('click', () => this.#delete(delete_btn.getAttribute('data-redirect-url')));
 		}
 
 		#clone() {
+			this.setLoadingStatus(['clone']);
+
 			const curl = new Curl(this.form_element.getAttribute('action')),
 				{name, mappings, default_iconid} = this.form.getAllValues();
 
@@ -140,11 +145,14 @@
 		}
 
 		submit() {
+			this.#setLoadingStatus(['add', 'update']);
 			const fields = this.form.getAllValues();
 
 			this.form.validateSubmit(fields)
 				.then((result) => {
 					if (!result) {
+						this.#unsetLoadingStatus();
+
 						return;
 					}
 
@@ -156,24 +164,21 @@
 						.then((response) => response.json())
 						.then((response) => {
 							if ('error' in response) {
+								this.#unsetLoadingStatus();
+
 								throw {error: response.error};
 							}
 
 							if ('form_errors' in response) {
-								this.form.renderErrors(response.form_errors, true, true);
+								this.form.setErrors(response.form_errors, true, true);
+								this.form.renderErrors();
 							}
 							else {
 								postMessageOk(response.success.title);
 								location.href = this.#list_action;
 							}
 						})
-						.catch((exception) => {
-							this.form_element.parentElement.querySelectorAll('.msg-good, .msg-bad, .msg-warning')
-								.forEach(node => node.remove());
-							this.form_element.insertAdjacentElement('beforebegin',
-								makeMessageBox('bad', exception.error.title, exception.error.messages).get(0)
-							);
-						});
+						.catch((exception) => this.#ajaxExceptionHandler(exception));
 			});
 		}
 
@@ -184,6 +189,57 @@
 			img.setAttribute('src', src);
 			img.setAttribute('data-image-full', 'imgstore.php?iconid=' + iconid);
 		}
+
+		#delete(url) {
+			if (window.confirm('<?= _('Delete icon map?') ?>')) {
+				this.#setLoadingStatus(['delete']);
+				redirect(url, 'post', 'action', undefined, true);
+			}
+		}
+
+		#ajaxExceptionHandler(exception) {
+			this.form_element.parentElement.querySelectorAll('.msg-good, .msg-bad, .msg-warning')
+				.forEach(node => node.remove());
+			this.form_element.insertAdjacentElement('beforebegin',
+				makeMessageBox('bad', exception.error.title, exception.error.messages).get(0)
+			);
+
+			this.#unsetLoadingStatus();
+
+			return Promise.reject();
+		}
+
+		#setLoadingStatus(loading_ids) {
+			[
+				document.getElementById('add'),
+				document.getElementById('clone'),
+				document.getElementById('delete'),
+				document.getElementById('update')
+			].forEach(button => {
+				if (button) {
+					button.setAttribute('disabled', true);
+
+					if (loading_ids.includes(button.id)) {
+						button.classList.add('is-loading');
+					}
+				}
+			});
+		}
+
+		#unsetLoadingStatus() {
+			[
+				document.getElementById('add'),
+				document.getElementById('clone'),
+				document.getElementById('delete'),
+				document.getElementById('update')
+			].forEach(button => {
+				if (button) {
+					button.classList.remove('is-loading');
+					button.removeAttribute('disabled');
+				}
+			});
+		}
+
 	}
 
 </script>

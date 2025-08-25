@@ -108,12 +108,13 @@ $form
 		->setFooter($data['iconmapid'] != 0
 			? makeFormFooter(new CSubmit('update', _('Update')), [
 				(new CSimpleButton(_('Clone')))->setId('clone'),
-				(new CRedirectButton(_('Delete'), (new CUrl('zabbix.php'))
+				(new CSimpleButton(_('Delete')))
+					->setAttribute('data-redirect-url', (new CUrl('zabbix.php'))
 						->setArgument('action', 'iconmap.delete')
 						->setArgument('iconmapid', $data['iconmapid'])
-						->setArgument(CSRF_TOKEN_NAME, $csrf_token),
-					_('Delete icon map?')
-				))->setId('delete'),
+						->setArgument(CSRF_TOKEN_NAME, $csrf_token)
+					)
+					->setId('delete'),
 				(new CRedirectButton(_('Cancel'), (new CUrl('zabbix.php'))
 					->setArgument('action', 'iconmap.list')
 				))->setId('cancel')
