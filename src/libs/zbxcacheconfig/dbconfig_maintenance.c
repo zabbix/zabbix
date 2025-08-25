@@ -1677,7 +1677,3 @@ int	zbx_dc_get_running_maintenanceids(zbx_vector_uint64_t *maintenanceids)
 
 	return (0 != maintenanceids->values_num ? SUCCEED : FAIL);
 }
-
-#ifdef HAVE_TESTS
-#	include "../../../tests/libs/zbxcacheconfig/dbconfig_maintenance_test.c"
-#endif

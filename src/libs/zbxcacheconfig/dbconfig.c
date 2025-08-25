@@ -17004,11 +17004,6 @@ void	zbx_dc_get_unused_macro_templates(zbx_hashset_t *templates, const zbx_vecto
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s() templateids_num:%d", __func__, templateids->values_num);
 }
 
-#ifdef HAVE_TESTS
-#	include "../../../tests/libs/zbxcacheconfig/dc_item_poller_type_update_test.c"
-#	include "../../../tests/libs/zbxcacheconfig/dc_function_calculate_nextcheck_test.c"
-#endif
-
 void	zbx_recalc_time_period(time_t *ts_from, int table_group)
 {
 #define HK_CFG_UPDATE_INTERVAL	5
