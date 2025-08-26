@@ -75,6 +75,7 @@ typedef struct
 	char		error[ZBX_INTERFACE_ERROR_LEN_MAX];
 	int		errors_from;
 	int		version;
+	zbx_uint64_t	revision;
 }
 zbx_dc_interface_t;
 
@@ -93,6 +94,9 @@ typedef struct
 }
 zbx_dc_interface2_t;
 
+#define ZBX_ITEM_REQUIRES_PREPROCESSING_NO	0
+#define ZBX_ITEM_REQUIRES_PREPROCESSING_YES	1
+
 typedef struct
 {
 	zbx_uint64_t		itemid;
@@ -106,6 +110,7 @@ typedef struct
 	int			ret;
 	int			version;
 	AGENT_RESULT		result;
+	unsigned char		preprocessing;
 }
 zbx_dc_item_context_t;
 
@@ -202,6 +207,7 @@ typedef struct
 	char			*error;
 	unsigned char		*formula_bin;
 	int			snmp_max_repetitions;
+	unsigned char		preprocessing;
 }
 zbx_dc_item_t;
 
@@ -279,6 +285,7 @@ typedef struct
 	char			key_orig[ZBX_ITEM_KEY_LEN * ZBX_MAX_BYTES_IN_UTF8_CHAR + 1], *key;
 	char			trapper_hosts[ZBX_ITEM_TRAPPER_HOSTS_LEN_MAX];
 	char			logtimefmt[ZBX_ITEM_LOGTIMEFMT_LEN_MAX];
+	unsigned char		preprocessing;
 }
 zbx_history_recv_item_t;
 
@@ -379,9 +386,6 @@ typedef struct
 	char				tls_psk_identity[HOST_TLS_PSK_IDENTITY_LEN_MAX];
 	char				tls_psk[HOST_TLS_PSK_LEN_MAX];
 #endif
-	zbx_uint64_t			revision;
-	zbx_uint64_t			macro_revision;
-
 	char				allowed_addresses[ZBX_HOST_PROXY_ADDRESS_LEN_MAX];
 	time_t				last_version_error_time;
 }
@@ -1088,8 +1092,9 @@ zbx_dc_revision_t;
 const char	*zbx_dc_get_session_token(void);
 zbx_session_t	*zbx_dc_get_or_create_session(zbx_uint64_t hostid, const char *token, zbx_session_type_t session_type);
 
-int	zbx_dc_register_config_session(zbx_uint64_t hostid, const char *token, zbx_uint64_t session_config_revision,
-		zbx_dc_revision_t *dc_revision);
+int	zbx_dc_register_proxy_config_session(zbx_uint64_t hostid, const char *token,
+		zbx_uint64_t session_config_revision, zbx_dc_revision_t *dc_revision, zbx_uint64_t *proxy_revision,
+		zbx_uint64_t *macro_revision);
 
 void		zbx_dc_cleanup_sessions(void);
 
@@ -1226,8 +1231,8 @@ void	zbx_dc_get_user_macro(const zbx_dc_um_handle_t *um_handle, const char *macr
 
 int	zbx_dc_expand_user_and_func_macros(const zbx_dc_um_handle_t *um_handle, char **text,
 		const zbx_uint64_t *hostids, int hostids_num, char **error);
-int	zbx_dc_expand_user_and_func_macros_from_cache(zbx_um_cache_t *um_cache, char **text,
-		const zbx_uint64_t *hostids, int hostids_num, unsigned char env, char **error);
+void	zbx_dc_expand_user_and_func_macros_from_cache(zbx_um_cache_t *um_cache, char **text,
+		const zbx_uint64_t *hostids, int hostids_num, unsigned char env);
 
 char	*zbx_dc_expand_user_macros_in_func_params(const char *params, zbx_uint64_t hostid);
 
@@ -1508,6 +1513,9 @@ zbx_uint64_t	zbx_dc_get_proxy_groupid(zbx_uint64_t proxyid);
 
 void	zbx_dc_set_itservices_num(int num);
 int	zbx_dc_get_itservices_num(void);
+
+int	zbx_dc_sync_lock(void);
+void	zbx_dc_sync_unlock(void);
 
 int	zbx_dc_get_proxy_version(zbx_uint64_t proxyid);
 

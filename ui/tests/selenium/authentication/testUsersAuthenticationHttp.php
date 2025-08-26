@@ -14,7 +14,7 @@
 **/
 
 
-require_once dirname(__FILE__).'/../../include/CLegacyWebTest.php';
+require_once __DIR__.'/../../include/CLegacyWebTest.php';
 
 /**
  * @onBefore removeGuestFromDisabledGroup, addDefaultAllowAuthKeyToConfig
@@ -32,7 +32,7 @@ class testUsersAuthenticationHttp extends CLegacyWebTest {
 	const LOGIN_HTTP	= 3;
 
 	protected function getFilePath() {
-		return dirname(__FILE__).'/../../../conf/zabbix.conf.php';
+		return __DIR__.'/../../../conf/zabbix.conf.php';
 	}
 
 	/**
@@ -231,10 +231,10 @@ class testUsersAuthenticationHttp extends CLegacyWebTest {
 							'action' => self::LOGIN_HTTP,
 							'target' => 'Global view'
 						],
-						// Sign in through zabbix login form after logout.
+						// Sign in through zabbix login form after logout - should redirect to index.php.
 						[
 							'page' => 'index.php?reconnect=1&form=default',
-							'error' => 'Zabbix has received an incorrect request.',
+							'redirect' => 'index.php',
 							'no_login' => true
 						],
 						// Couldn't open Hosts page due access.
@@ -592,6 +592,12 @@ class testUsersAuthenticationHttp extends CLegacyWebTest {
 
 					$this->assertMessage(TEST_BAD, $check['error']);
 				}
+
+				continue;
+			}
+			elseif (array_key_exists('redirect', $check)) {
+				$this->page->open($check['page'])->waitUntilReady();
+				$this->assertEquals(PHPUNIT_URL.$check['redirect'], $this->page->getCurrentUrl());
 
 				continue;
 			}

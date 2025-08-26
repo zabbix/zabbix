@@ -244,7 +244,7 @@ class CIconMap extends CApiService {
 	 *
 	 * @throws APIException if the input is invalid.
 	 */
-	private static function validateUpdate(array &$iconmaps, array &$db_iconmaps = null) {
+	private static function validateUpdate(array &$iconmaps, ?array &$db_iconmaps = null) {
 		$api_input_rules = ['type' => API_OBJECTS, 'flags' => API_NOT_EMPTY | API_NORMALIZE, 'uniq' => [['iconmapid'], ['name']], 'fields' => [
 			'iconmapid' =>		['type' => API_ID, 'flags' => API_REQUIRED],
 			'name' =>			['type' => API_STRING_UTF8, 'flags' => API_NOT_EMPTY, 'length' => DB::getFieldLength('icon_map', 'name')],
@@ -285,7 +285,7 @@ class CIconMap extends CApiService {
 	 *
 	 * @throws APIException  if user already exists.
 	 */
-	private static function checkDuplicates(array $iconmaps, array $db_iconmaps = null) {
+	private static function checkDuplicates(array $iconmaps, ?array $db_iconmaps = null) {
 		$names = [];
 
 		foreach ($iconmaps as $iconmap) {
@@ -404,7 +404,7 @@ class CIconMap extends CApiService {
 	 * @param string     $method
 	 * @param array|null $db_iconmaps
 	 */
-	private static function updateMappings(array &$iconmaps, string $method, array $db_iconmaps = null): void {
+	private static function updateMappings(array &$iconmaps, string $method, ?array $db_iconmaps = null): void {
 		$ins_mappings = [];
 		$upd_mappings = [];
 		$del_mappingids = [];
@@ -505,7 +505,7 @@ class CIconMap extends CApiService {
 	 *
 	 * @throws APIException if the input is invalid.
 	 */
-	private static function validateDelete(array &$iconmapids, array &$db_iconmaps = null) {
+	private static function validateDelete(array &$iconmapids, ?array &$db_iconmaps = null) {
 		$api_input_rules = ['type' => API_IDS, 'flags' => API_NOT_EMPTY, 'uniq' => true];
 
 		if (!CApiInputValidator::validate($api_input_rules, $iconmapids, '/', $error)) {

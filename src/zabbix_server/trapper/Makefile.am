@@ -12,4 +12,5 @@ libzbxtrapper_server_a_SOURCES = \
 
 libzbxtrapper_server_a_CFLAGS = \
 	-I$(top_srcdir)/src/zabbix_server \
-	$(TLS_CFLAGS)
+	$(TLS_CFLAGS) \
+	$(ARES_CFLAGS)

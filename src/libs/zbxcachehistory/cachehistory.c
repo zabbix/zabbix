@@ -104,11 +104,14 @@ typedef struct
 	int			trends_last_cleanup_hour;
 	int			history_num_total;
 	int			history_progress_ts;
+	int			trends_num_total;
+	int			trends_progress_ts;
 
 	unsigned char		db_trigger_queue_lock;
 
 	zbx_hc_proxyqueue_t	proxyqueue;
 	int			processing_num;
+	int			refcount;
 }
 ZBX_DC_CACHE;
 
@@ -118,6 +121,13 @@ static ZBX_DC_CACHE	*cache = NULL;
 #define ZBX_MAX_VALUES_LOCAL	256
 #define ZBX_STRUCT_REALLOC_STEP	8
 #define ZBX_STRING_REALLOC_STEP	ZBX_KIBIBYTE
+
+typedef enum
+{
+	ZBX_DC_SYNC_TREND_MODE_PARALLEL,
+	ZBX_DC_SYNC_TREND_MODE_FULL
+}
+zbx_dc_sync_trend_mode_t;
 
 typedef struct
 {
@@ -160,6 +170,7 @@ static size_t		item_values_alloc = 0, item_values_num = 0;
 static void	hc_add_item_values(dc_item_value_t *values, int values_num);
 static void	hc_queue_item(zbx_hc_item_t *item);
 static int	hc_queue_elem_compare_func(const void *d1, const void *d2);
+static void	zbx_log_sync_trends_cache_progress(void);
 
 void	zbx_pp_value_opt_clear(zbx_pp_value_opt_t *opt)
 {
@@ -380,7 +391,7 @@ void	zbx_dc_update_trends(zbx_vector_uint64_pair_t *trends_diff)
  * Purpose: helper function for DCflush trends                                *
  *                                                                            *
  ******************************************************************************/
-static void	dc_insert_trends_in_db(ZBX_DC_TREND *trends, int trends_num, unsigned char value_type,
+static void	dc_insert_trends_in_db(ZBX_DC_TREND *trends, int trends_num, int upserts_num, unsigned char value_type,
 		const char *table_name, int clock)
 {
 	ZBX_DC_TREND	*trend;
@@ -389,6 +400,18 @@ static void	dc_insert_trends_in_db(ZBX_DC_TREND *trends, int trends_num, unsigne
 
 	zbx_db_insert_prepare(&db_insert, table_name, "itemid", "clock", "num", "value_min", "value_avg",
 			"value_max", (char *)NULL);
+
+#ifdef HAVE_POSTGRESQL
+	if (0 != upserts_num)
+	{
+		zbx_db_insert_clause(&db_insert, " on conflict (itemid,clock) do update set num=EXCLUDED.num,"
+				"value_min=EXCLUDED.value_min,"
+				"value_avg=EXCLUDED.value_avg,"
+				"value_max=EXCLUDED.value_max");
+	}
+#else
+	ZBX_UNUSED(upserts_num);
+#endif
 
 	for (i = 0; i < trends_num; i++)
 	{
@@ -499,7 +522,7 @@ static void	dc_remove_updated_trends(ZBX_DC_TREND *trends, int trends_num, const
  * Purpose: helper function for DCflush trends                                *
  *                                                                            *
  ******************************************************************************/
-static void	dc_trends_update_float(ZBX_DC_TREND *trend, zbx_db_row_t row, int num, size_t *sql_offset)
+static void	dc_trends_update_float(ZBX_DC_TREND *trend, zbx_db_row_t row, int num)
 {
 	zbx_history_value_t	value_min, value_avg, value_max;
 
@@ -516,7 +539,10 @@ static void	dc_trends_update_float(ZBX_DC_TREND *trend, zbx_db_row_t row, int nu
 	trend->value_avg.dbl = trend->value_avg.dbl / (trend->num + num) * trend->num +
 			value_avg.dbl / (trend->num + num) * num;
 	trend->num += num;
+}
 
+static void	db_trends_update_float(ZBX_DC_TREND *trend, size_t *sql_offset)
+{
 	zbx_snprintf_alloc(&sql, &sql_alloc, sql_offset, "update trends set"
 			" num=%d,value_min=" ZBX_FS_DBL64_SQL ",value_avg=" ZBX_FS_DBL64_SQL
 			",value_max=" ZBX_FS_DBL64_SQL
@@ -530,7 +556,7 @@ static void	dc_trends_update_float(ZBX_DC_TREND *trend, zbx_db_row_t row, int nu
  * Purpose: helper function for DCflush trends                                *
  *                                                                            *
  ******************************************************************************/
-static void	dc_trends_update_uint(ZBX_DC_TREND *trend, zbx_db_row_t row, int num, size_t *sql_offset)
+static void	dc_trends_update_uint(ZBX_DC_TREND *trend, zbx_db_row_t row, int num)
 {
 	zbx_history_value_t	value_min, value_avg, value_max;
 	zbx_uint128_t		avg;
@@ -544,12 +570,18 @@ static void	dc_trends_update_uint(ZBX_DC_TREND *trend, zbx_db_row_t row, int num
 	if (value_max.ui64 > trend->value_max.ui64)
 		trend->value_max.ui64 = value_max.ui64;
 
+	trend->num += num;
+
 	/* calculate the trend average value */
 	zbx_umul64_64(&avg, num, value_avg.ui64);
 	zbx_uinc128_128(&trend->value_avg.ui64, &avg);
-	zbx_udiv128_64(&avg, &trend->value_avg.ui64, trend->num + num);
+}
 
-	trend->num += num;
+static void	db_trends_update_uint(ZBX_DC_TREND *trend, size_t *sql_offset)
+{
+	zbx_uint128_t	avg;
+
+	zbx_udiv128_64(&avg, &trend->value_avg.ui64, trend->num);
 
 	zbx_snprintf_alloc(&sql, &sql_alloc, sql_offset,
 			"update trends_uint set num=%d,value_min=" ZBX_FS_UI64 ",value_avg="
@@ -569,17 +601,21 @@ static void	dc_trends_update_uint(ZBX_DC_TREND *trend, zbx_db_row_t row, int num
  *                                                                            *
  ******************************************************************************/
 static void	dc_trends_fetch_and_update(ZBX_DC_TREND *trends, int trends_num, zbx_uint64_t *itemids,
-		int itemids_num, int *inserts_num, unsigned char value_type,
-		const char *table_name, int clock)
+		int itemids_num, int *inserts_num, int *upserts_num, unsigned char value_type, const char *table_name,
+		int clock)
 {
-
 	int		i, num;
 	zbx_db_result_t	result;
 	zbx_db_row_t	row;
 	zbx_uint64_t	itemid;
 	ZBX_DC_TREND	*trend;
 	size_t		sql_offset;
+#ifdef HAVE_POSTGRESQL
+	int		upsert = 0;
 
+	if (0 != zbx_tsdb_get_version())
+		upsert = 1;
+#endif
 	sql_offset = 0;
 	zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
 			"select itemid,num,value_min,value_avg,value_max"
@@ -589,7 +625,14 @@ static void	dc_trends_fetch_and_update(ZBX_DC_TREND *trends, int trends_num, zbx
 
 	zbx_db_add_condition_alloc(&sql, &sql_alloc, &sql_offset, "itemid", itemids, itemids_num);
 
+#ifdef HAVE_POSTGRESQL
+	if (1 == upsert)
+		result = zbx_db_select("%s", sql);
+	else
+		result = zbx_db_select("%s order by itemid,clock", sql);
+#else
 	result = zbx_db_select("%s order by itemid,clock", sql);
+#endif
 
 	sql_offset = 0;
 	zbx_db_begin_multiple_update(&sql, &sql_alloc, &sql_offset);
@@ -620,9 +663,23 @@ static void	dc_trends_fetch_and_update(ZBX_DC_TREND *trends, int trends_num, zbx
 		num = atoi(row[1]);
 
 		if (value_type == ITEM_VALUE_TYPE_FLOAT)
-			dc_trends_update_float(trend, row, num, &sql_offset);
+			dc_trends_update_float(trend, row, num);
 		else
-			dc_trends_update_uint(trend, row, num, &sql_offset);
+			dc_trends_update_uint(trend, row, num);
+
+#ifdef HAVE_POSTGRESQL
+		if (1 == upsert)
+		{
+			(*upserts_num)++;
+			continue;
+		}
+#else
+		ZBX_UNUSED(upserts_num);
+#endif
+		if (value_type == ITEM_VALUE_TYPE_FLOAT)
+			db_trends_update_float(trend, &sql_offset);
+		else
+			db_trends_update_uint(trend, &sql_offset);
 
 		trend->itemid = 0;
 
@@ -646,7 +703,8 @@ static void	dc_trends_fetch_and_update(ZBX_DC_TREND *trends, int trends_num, zbx
  ******************************************************************************/
 void	zbx_db_flush_trends(ZBX_DC_TREND *trends, int *trends_num, zbx_vector_uint64_pair_t *trends_diff)
 {
-	int		num, i, clock, inserts_num = 0, itemids_alloc, itemids_num = 0, trends_to = *trends_num;
+	int		num, clock, selects_num = 0, inserts_num = 0, upserts_num = 0, itemids_alloc, itemids_num = 0;
+	int		trends_to = *trends_num, i;
 	unsigned char	value_type;
 	zbx_uint64_t	*itemids = NULL;
 	ZBX_DC_TREND	*trend = NULL;
@@ -683,11 +741,18 @@ void	zbx_db_flush_trends(ZBX_DC_TREND *trends, int *trends_num, zbx_vector_uint6
 		inserts_num++;
 
 		if (0 != trend->disable_from)
-			continue;
+		{
+			if (clock >= trend->disable_from)
+				continue;
+		}
+		else
+		{
+			if (NULL != trends_diff)
+				uint64_array_add(&itemids, &itemids_alloc, &itemids_num, trend->itemid, 64);
+		}
 
-		uint64_array_add(&itemids, &itemids_alloc, &itemids_num, trend->itemid, 64);
-
-		if (ZBX_HC_SYNC_MAX == itemids_num)
+		selects_num++;
+		if (ZBX_HC_SYNC_MAX == selects_num)
 		{
 			trends_to = i + 1;
 			break;
@@ -715,8 +780,8 @@ void	zbx_db_flush_trends(ZBX_DC_TREND *trends, int *trends_num, zbx_vector_uint6
 
 	if (0 != itemids_num)
 	{
-		dc_trends_fetch_and_update(trends, trends_to, itemids, itemids_num,
-				&inserts_num, value_type, table_name, clock);
+		dc_trends_fetch_and_update(trends, trends_to, itemids, itemids_num, &inserts_num, &upserts_num,
+				value_type, table_name, clock);
 	}
 
 	zbx_free(itemids);
@@ -745,7 +810,7 @@ void	zbx_db_flush_trends(ZBX_DC_TREND *trends, int *trends_num, zbx_vector_uint6
 	}
 
 	if (0 != inserts_num)
-		dc_insert_trends_in_db(trends, trends_to, value_type, table_name, clock);
+		dc_insert_trends_in_db(trends, trends_to, upserts_num, value_type, table_name, clock);
 
 	/* clean trends */
 	for (i = 0, num = 0; i < *trends_num; i++)
@@ -1616,19 +1681,22 @@ static void	DCexport_all_trends(const ZBX_DC_TREND *trends, int trends_num)
  * Purpose: flush all trends to the database                                  *
  *                                                                            *
  ******************************************************************************/
-static void	DCsync_trends(void)
+static void	DCsync_trends(int parallel_num, zbx_dc_sync_trend_mode_t sync_trend_mode)
 {
 	zbx_hashset_iter_t	iter;
 	ZBX_DC_TREND		*trends = NULL, *trend;
-	int			trends_alloc = 0, trends_num = 0, compression_age;
+	int			trends_alloc = 0, trends_num = 0, compression_age, limit;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() trends_num:%d", __func__, cache->trends_num);
 
 	compression_age = zbx_hc_get_history_compression_age();
 
-	zabbix_log(LOG_LEVEL_WARNING, "syncing trend data...");
-
 	LOCK_TRENDS;
+
+	if (ZBX_DC_SYNC_TREND_MODE_PARALLEL == sync_trend_mode)
+		limit = cache->trends.num_data / parallel_num + (cache->trends.num_data % parallel_num);
+	else
+		limit = INT_MAX;
 
 	zbx_hashset_iter_reset(&cache->trends, &iter);
 
@@ -1637,7 +1705,20 @@ static void	DCsync_trends(void)
 		if (SUCCEED == zbx_history_requires_trends(trend->value_type) && trend->clock >= compression_age &&
 				0 != trend->num)
 		{
+			if (ZBX_DC_SYNC_TREND_MODE_PARALLEL == sync_trend_mode)
+			{
+				if (SUCCEED == zbx_hc_is_itemid_cached(trend->itemid))
+					continue;
+			}
+
 			DCflush_trend(trend, &trends, &trends_alloc, &trends_num);
+
+			if (ZBX_DC_SYNC_TREND_MODE_PARALLEL == sync_trend_mode)
+			{
+				limit--;
+				if (0 >= limit)
+					break;
+			}
 		}
 	}
 
@@ -1652,15 +1733,40 @@ static void	DCsync_trends(void)
 	zbx_db_begin();
 
 	while (trends_num > 0)
+	{
+		int	trends_num_last = trends_num;
+
+		zbx_log_sync_trends_cache_progress();
+
 		zbx_db_flush_trends(trends, &trends_num, NULL);
+
+		LOCK_TRENDS;
+		cache->trends_num -= trends_num_last - trends_num;
+		UNLOCK_TRENDS;
+	}
 
 	zbx_db_commit();
 
+	if (ZBX_DC_SYNC_TREND_MODE_FULL == sync_trend_mode)
+	{
+		LOCK_TRENDS;
+		cache->trends_num = 0;
+		UNLOCK_TRENDS;
+	}
+
+	zbx_log_sync_trends_cache_progress();
+
 	zbx_free(trends);
 
-	zabbix_log(LOG_LEVEL_WARNING, "syncing trend data done");
-
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
+}
+
+void	zbx_dc_sync_trends(int parallel_num)
+{
+	if (0 == (get_program_type_cb() & ZBX_PROGRAM_TYPE_SERVER))
+		return;
+
+	DCsync_trends(parallel_num, ZBX_DC_SYNC_TREND_MODE_PARALLEL);
 }
 
 static void	DCadd_update_inventory_sql(size_t *sql_offset, const zbx_vector_inventory_value_ptr_t *inventory_values)
@@ -1911,6 +2017,56 @@ void	zbx_log_sync_history_cache_progress(void)
 
 	if (INT_MAX == ts_next)
 		zabbix_log(LOG_LEVEL_WARNING, "syncing history data done");
+}
+
+/******************************************************************************
+*                                                                            *
+* Purpose: log progress of syncing history data                              *
+*                                                                            *
+******************************************************************************/
+static void	zbx_log_sync_trends_cache_progress(void)
+{
+	double	pcnt = -1.0;
+	int	ts_last, ts_next, sec;
+
+	LOCK_TRENDS;
+
+	if (INT_MAX == cache->trends_progress_ts)
+	{
+		UNLOCK_TRENDS;
+		return;
+	}
+
+	ts_last = cache->trends_progress_ts;
+	sec = time(NULL);
+
+	if (0 == cache->trends_progress_ts)
+	{
+		cache->trends_num = cache->trends.num_data;
+		cache->trends_num_total = cache->trends.num_data;
+		cache->trends_progress_ts = sec;
+	}
+
+	if (ZBX_HC_SYNC_TIME_MAX <= sec - cache->trends_progress_ts || 0 == cache->trends_num)
+	{
+		if (0 != cache->trends_num_total)
+			pcnt = 100 * (double)(cache->trends_num_total - cache->trends_num) / cache->trends_num_total;
+
+		cache->trends_progress_ts = (0 == cache->trends_num ? INT_MAX : sec);
+	}
+
+	ts_next = cache->trends_progress_ts;
+
+	UNLOCK_TRENDS;
+
+	if (0 == ts_last)
+		zabbix_log(LOG_LEVEL_WARNING, "syncing trend data in progress... ");
+
+	if (-1.0 != pcnt)
+		zabbix_log(LOG_LEVEL_WARNING, "syncing trend data... " ZBX_FS_DBL "%%", pcnt);
+
+	if (INT_MAX == ts_next)
+		zabbix_log(LOG_LEVEL_WARNING, "syncing trend data done");
 }
 
 /***************************************************************************************
@@ -3204,9 +3360,11 @@ int	zbx_init_database_cache(zbx_get_program_type_f get_program_type, zbx_history
 			goto out;
 	}
 
+	cache->refcount = 0;
 	cache->processing_num = 0;
 	cache->history_num_total = 0;
 	cache->history_progress_ts = 0;
+	cache->trends_progress_ts = 0;
 
 	cache->db_trigger_queue_lock = 1;
 
@@ -3230,7 +3388,7 @@ static void	DCsync_all(const zbx_events_funcs_t *events_cbs, int config_history_
 	sync_history_cache_full(events_cbs, config_history_storage_pipelines);
 
 	if (0 != (get_program_type_cb() & ZBX_PROGRAM_TYPE_SERVER))
-		DCsync_trends();
+		DCsync_trends(1, ZBX_DC_SYNC_TREND_MODE_FULL);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of DCsync_all()");
 }
@@ -3403,6 +3561,25 @@ void	zbx_hc_get_mem_stats(zbx_shmem_stats_t *data, zbx_shmem_stats_t *index)
 
 /******************************************************************************
  *                                                                            *
+ * Purpose: checks if item is present in history cache                        *
+ *                                                                            *
+ ******************************************************************************/
+int	zbx_hc_is_itemid_cached(zbx_uint64_t itemid)
+{
+	int	ret = FAIL;
+
+	LOCK_CACHE;
+
+	if (NULL != zbx_hashset_search(&cache->history_items, &itemid))
+		ret = SUCCEED;
+
+	UNLOCK_CACHE;
+
+	return ret;
+}
+
+/******************************************************************************
+ *                                                                            *
  * Purpose: get statistics of cached items                                    *
  *                                                                            *
  ******************************************************************************/
@@ -3423,6 +3600,34 @@ void	zbx_hc_get_items(zbx_vector_uint64_pair_t *items)
 	}
 
 	UNLOCK_CACHE;
+}
+
+void	zbx_hc_acquire(void)
+{
+	LOCK_CACHE;
+	cache->refcount++;
+	UNLOCK_CACHE;
+}
+
+int	zbx_hc_release(void)
+{
+	int	refcount;
+
+	LOCK_CACHE;
+	refcount = cache->refcount--;
+	UNLOCK_CACHE;
+
+	return refcount;
+}
+
+int	zbx_hc_refcount_peek(void)
+{
+	int	refcount;
+	LOCK_CACHE;
+	refcount = cache->refcount;
+	UNLOCK_CACHE;
+
+	return refcount;
 }
 
 /******************************************************************************

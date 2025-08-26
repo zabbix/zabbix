@@ -104,6 +104,11 @@ class CControllerMenuPopup extends CController {
 		$validator = new CNewValidator($this->input['data'], $rules);
 		array_map('error', $validator->getAllErrors());
 
+		if (array_key_exists('backurl', $this->input['data'])
+				&& !CHtmlUrlValidator::validateSameSite($this->input['data']['backurl'])) {
+			throw new CAccessDeniedException();
+		}
+
 		return !$validator->isError() && !$validator->isErrorFatal();
 	}
 
@@ -166,6 +171,7 @@ class CControllerMenuPopup extends CController {
 				'output' => ['hostid', 'status'],
 				'selectGraphs' => API_OUTPUT_COUNT,
 				'selectHttpTests' => API_OUTPUT_COUNT,
+				'selectDashboards' => API_OUTPUT_COUNT,
 				'hostids' => $data['hostid']
 			])
 			: API::Host()->get([
@@ -244,7 +250,7 @@ class CControllerMenuPopup extends CController {
 
 			if ($has_goto) {
 				$menu_data['showGraphs'] = (bool) $db_host['graphs'];
-				$menu_data['showDashboards'] = (bool) getHostDashboards($data['hostid']);
+				$menu_data['showDashboards'] = (bool) $db_host['dashboards'];
 				$menu_data['showWeb'] = (bool) $db_host['httpTests'];
 				$menu_data['isWriteable'] = $rw_hosts;
 				$menu_data['showTriggers'] = ($db_host['status'] == HOST_STATUS_MONITORED);
@@ -353,7 +359,7 @@ class CControllerMenuPopup extends CController {
 	 */
 	private static function getMenuDataItemPrototype(array $data) {
 		$db_item_prototypes = API::ItemPrototype()->get([
-			'output' => ['name', 'key_'],
+			'output' => ['name', 'key_', 'value_type'],
 			'selectDiscoveryRule' => ['itemid'],
 			'selectHosts' => ['host'],
 			'selectTriggers' => ['triggerid', 'description'],
@@ -369,6 +375,7 @@ class CControllerMenuPopup extends CController {
 				'itemid' => $data['itemid'],
 				'name' => $db_item_prototype['name'],
 				'key' => $db_item_prototype['key_'],
+				'is_binary_value_type' => $db_item_prototype['value_type'] == ITEM_VALUE_TYPE_BINARY,
 				'hostid' => $db_item_prototype['hosts'][0]['hostid'],
 				'host' => $db_item_prototype['hosts'][0]['host'],
 				'parent_discoveryid' => $db_item_prototype['discoveryRule']['itemid'],

@@ -923,6 +923,12 @@ ZBX_NotificationsAlarm.prototype.unmute = function() {
 ZBX_NotificationsAlarm.prototype.render = function(user_settings, list) {
 	user_settings.muted ? this.mute() : this.unmute();
 
+	let alarm_timeout = user_settings.alarm_timeout;
+
+	if (list.length > 0) {
+		alarm_timeout += (list[0].received_at - new Date / 1000);
+	}
+
 	if (this.isStopped() || this.isPlayed() || this.isSnoozed(list)) {
 		return this.player.stop();
 	}
@@ -934,8 +940,10 @@ ZBX_NotificationsAlarm.prototype.render = function(user_settings, list) {
 		this.player.stop();
 	}
 
+	let timeout = this.calcTimeout(user_settings);
+
 	this.player.tune({
-		playOnce: (this.calcTimeout(user_settings) == ZBX_Notifications.ALARM_ONCE_PLAYER),
+		playOnce: (timeout == ZBX_Notifications.ALARM_ONCE_PLAYER),
 		messageTimeout: (this.notif.calcDisplayTimeout(user_settings) / 1000) >> 0,
 		callback: function() {
 			this.markAsPlayed();
@@ -943,7 +951,12 @@ ZBX_NotificationsAlarm.prototype.render = function(user_settings, list) {
 		}.bind(this)
 	});
 
-	this.player.timeout(this.calcTimeout(user_settings));
+	if (timeout != ZBX_Notifications.ALARM_INFINITE_SERVER && timeout != ZBX_Notifications.ALARM_ONCE_SERVER
+			&& alarm_timeout > 0) {
+		timeout = alarm_timeout;
+	}
+
+	this.player.timeout(timeout);
 	this.old_id = this.getId();
 };
 

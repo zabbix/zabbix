@@ -53,7 +53,7 @@ class CService extends CApiService {
 	 *
 	 * @return array|string
 	 */
-	private function doGet(array $options = [], array $permissions = null) {
+	private function doGet(array $options = [], ?array $permissions = null) {
 		$api_input_rules = ['type' => API_OBJECT, 'fields' => [
 			// filter
 			'serviceids' =>				['type' => API_IDS, 'flags' => API_ALLOW_NULL | API_NORMALIZE, 'default' => null],
@@ -433,41 +433,59 @@ class CService extends CApiService {
 		$db_services = $this->doGet([
 			'output' => ['serviceid', 'name', 'readonly'],
 			'selectChildren' => $permissions['rw_services'] !== null ? ['serviceid', 'name'] : null,
-			'serviceids' => $serviceids
+			'serviceids' => $serviceids,
+			'preservekeys' => true
 		], $permissions);
 
 		if (count($db_services) != count($serviceids)) {
 			self::exception(ZBX_API_ERROR_PERMISSIONS, _('No permissions to referred object or it does not exist!'));
 		}
 
-		if ($permissions['rw_services'] === null) {
-			return;
-		}
+		if ($permissions['rw_services'] !== null) {
+			foreach ($db_services as $db_service) {
+				if ($db_service['readonly'] == 1) {
+					$error_detail = _('read-write access to the service is required');
+					$error = _s('Cannot delete service "%1$s": %2$s.', $db_service['name'], $error_detail);
 
-		foreach ($db_services as $db_service) {
-			if ($db_service['readonly'] == 1) {
-				$error_detail = _('read-write access to the service is required');
-				$error = _s('Cannot delete service "%1$s": %2$s.', $db_service['name'], $error_detail);
-
-				self::exception(ZBX_API_ERROR_PERMISSIONS, $error);
+					self::exception(ZBX_API_ERROR_PERMISSIONS, $error);
+				}
 			}
-		}
 
-		foreach ($db_services as $db_service) {
-			foreach ($db_service['children'] as $child_service) {
-				if ($permissions['rw_services'][$child_service['serviceid']] !== null) {
-					$permissions['rw_services'][$child_service['serviceid']]--;
+			foreach ($db_services as $db_service) {
+				foreach ($db_service['children'] as $child_service) {
+					if ($permissions['rw_services'][$child_service['serviceid']] !== null) {
+						$permissions['rw_services'][$child_service['serviceid']]--;
 
-					if ($permissions['rw_services'][$child_service['serviceid']] == 0) {
-						$error_detail = _s('read-write access to the child service "%1$s" must be retained',
-							$child_service['name']
-						);
-						$error = _s('Cannot delete service "%1$s": %2$s.', $db_service['name'], $error_detail);
+						if ($permissions['rw_services'][$child_service['serviceid']] == 0) {
+							$error_detail = _s('read-write access to the child service "%1$s" must be retained',
+								$child_service['name']
+							);
+							$error = _s('Cannot delete service "%1$s": %2$s.', $db_service['name'], $error_detail);
 
-						self::exception(ZBX_API_ERROR_PERMISSIONS, $error);
+							self::exception(ZBX_API_ERROR_PERMISSIONS, $error);
+						}
 					}
 				}
 			}
+		}
+
+		self::checkUsedInActions($db_services);
+	}
+
+	private static function checkUsedInActions(array $db_services): void {
+		$row = DBfetch(DBselect(
+			'SELECT c.value AS serviceid,a.name'.
+			' FROM conditions c'.
+			' JOIN actions a ON c.actionid=a.actionid'.
+			' WHERE c.conditiontype='.ZBX_CONDITION_TYPE_SERVICE.
+				' AND '.dbConditionString('c.value', array_keys($db_services)),
+			1
+		));
+
+		if ($row) {
+			self::exception(ZBX_API_ERROR_PARAMETERS, _s('Cannot delete service "%1$s": %2$s.',
+				$db_services[$row['serviceid']]['name'], _s('action "%1$s" uses this service', $row['name'])
+			));
 		}
 	}
 
@@ -612,7 +630,7 @@ class CService extends CApiService {
 	 *
 	 * @return array
 	 */
-	protected function addRelatedObjects(array $options, array $result, array $permissions = null): array {
+	protected function addRelatedObjects(array $options, array $result, ?array $permissions = null): array {
 		$result = parent::addRelatedObjects($options, $result);
 
 		$this->addRelatedParents($options, $result, $permissions);
@@ -1085,7 +1103,7 @@ class CService extends CApiService {
 	 * @return array
 	 */
 	private static function getProblemEvents(string $parent_serviceid, array $services, array $relations,
-			array $service_problems, int $min_status = null): array {
+			array $service_problems, ?int $min_status = null): array {
 		$parent = $services[$parent_serviceid];
 
 		if (!array_key_exists($parent_serviceid, $relations)) {
@@ -1379,7 +1397,7 @@ class CService extends CApiService {
 	 *
 	 * @throws APIException
 	 */
-	private static function checkUuidDuplicates(array $services, array $db_services = null): void {
+	private static function checkUuidDuplicates(array $services, ?array $db_services = null): void {
 		$service_indexes = [];
 
 		foreach ($services as $i => $service) {
@@ -1419,7 +1437,7 @@ class CService extends CApiService {
 	 *
 	 * @throws APIException
 	 */
-	private static function checkStatusPropagation(array $services, array $db_services = null): void {
+	private static function checkStatusPropagation(array $services, ?array $db_services = null): void {
 		foreach ($services as $service) {
 			$name = $db_services !== null ? $db_services[$service['serviceid']]['name'] : $service['name'];
 
@@ -1475,7 +1493,7 @@ class CService extends CApiService {
 	 *
 	 * @throws APIException
 	 */
-	private static function checkChildrenOrProblemTags(array $services, array $db_services = null): void {
+	private static function checkChildrenOrProblemTags(array $services, ?array $db_services = null): void {
 		foreach ($services as $service) {
 			$name = $db_services !== null ? $db_services[$service['serviceid']]['name'] : $service['name'];
 
@@ -1553,7 +1571,7 @@ class CService extends CApiService {
 	 *
 	 * @throws APIException
 	 */
-	private static function checkCircularReferences(array $services, array $db_services = null): void {
+	private static function checkCircularReferences(array $services, ?array $db_services = null): void {
 		$add_references = [];
 		$del_references = [];
 
@@ -1794,7 +1812,7 @@ class CService extends CApiService {
 	 * @param array      $services
 	 * @param array|null $db_services
 	 */
-	private static function updateTags(array &$services, array $db_services = null): void {
+	private static function updateTags(array &$services, ?array $db_services = null): void {
 		$ins_tags = [];
 		$del_tags = [];
 
@@ -1856,7 +1874,7 @@ class CService extends CApiService {
 	 * @param array      $services
 	 * @param array|null $db_services
 	 */
-	private static function updateProblemTags(array &$services, array $db_services = null): void {
+	private static function updateProblemTags(array &$services, ?array $db_services = null): void {
 		$ins_problem_tags = [];
 		$del_problem_tags = [];
 
@@ -1926,7 +1944,7 @@ class CService extends CApiService {
 	 * @param array      $services
 	 * @param array|null $db_services
 	 */
-	private static function updateParents(array &$services, array $db_services = null): void {
+	private static function updateParents(array &$services, ?array $db_services = null): void {
 		$ins_parents = [];
 		$del_parents = [];
 
@@ -1988,7 +2006,7 @@ class CService extends CApiService {
 	 * @param array      $services
 	 * @param array|null $db_services
 	 */
-	private static function updateChildren(array &$services, array $db_services = null): void {
+	private static function updateChildren(array &$services, ?array $db_services = null): void {
 		$ins_children = [];
 		$del_children = [];
 
@@ -2050,7 +2068,7 @@ class CService extends CApiService {
 	 * @param array      $services
 	 * @param array|null $db_services
 	 */
-	private static function updateStatusRules(array &$services, array $db_services = null): void {
+	private static function updateStatusRules(array &$services, ?array $db_services = null): void {
 		$ins_status_rules = [];
 		$upd_status_rules = [];
 		$del_status_rules = [];
@@ -2275,7 +2293,7 @@ class CService extends CApiService {
 	 *
 	 * @throws APIException
 	 */
-	private static function checkPermissions(array $permissions, array $services, array $db_services = null): void {
+	private static function checkPermissions(array $permissions, array $services, ?array $db_services = null): void {
 		[
 			'r_services' => $r_services,
 			'rw_services' => $rw_services,

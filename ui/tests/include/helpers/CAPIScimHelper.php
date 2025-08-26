@@ -51,7 +51,7 @@ class CAPIScimHelper extends CAPIHelper {
 	 *
 	 * @throws Exception      if API SCIM call fails.
 	 */
-	public static function callRaw($data, string $auth_token = null): array {
+	public static function callRaw($data, ?string $auth_token = null): array {
 		[$class, $method_type] = explode('.', $data['method'], 2) + ['', ''];
 
 		$url = PHPUNIT_URL.'api_scim.php/'.ucfirst($class);

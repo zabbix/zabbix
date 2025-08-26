@@ -34,7 +34,7 @@ abstract class CDashboardGeneral extends CApiService {
 		ZBX_WIDGET_FIELD_TYPE_MEDIA_TYPE => 'value_mediatypeid'
 	];
 
-	protected const WIDGET_FIELD_TYPE_COLUMNS = [
+	public const WIDGET_FIELD_TYPE_COLUMNS = [
 		ZBX_WIDGET_FIELD_TYPE_INT32 => 'value_int',
 		ZBX_WIDGET_FIELD_TYPE_STR => 'value_str'
 	] + self::WIDGET_FIELD_TYPE_COLUMNS_FK;
@@ -221,10 +221,9 @@ abstract class CDashboardGeneral extends CApiService {
 
 				if ($widgetids) {
 					$options = [
-						'output' => ['widget_fieldid', 'widgetid', 'type', 'name', 'value_int', 'value_str',
-							'value_groupid', 'value_hostid', 'value_itemid', 'value_graphid', 'value_serviceid',
-							'value_slaid', 'value_userid', 'value_actionid', 'value_mediatypeid', 'value_sysmapid'
-						],
+						'output' => array_merge(['widget_fieldid', 'widgetid', 'type', 'name'],
+							array_unique(array_values(CDashboardGeneral::WIDGET_FIELD_TYPE_COLUMNS))
+						),
 						'filter' => ['widgetid' => $widgetids]
 					];
 					$db_widget_fields = DBselect(DB::makeSql('widget_field', $options));
@@ -305,7 +304,7 @@ abstract class CDashboardGeneral extends CApiService {
 	 *
 	 * @throws APIException if the input is invalid.
 	 */
-	protected function checkWidgets(array $dashboards, array $db_dashboards = null): void {
+	protected function checkWidgets(array $dashboards, ?array $db_dashboards = null): void {
 		$widget_defaults = DB::getDefaults('widget');
 
 		foreach ($dashboards as $dashboard) {
@@ -364,7 +363,7 @@ abstract class CDashboardGeneral extends CApiService {
 	 *
 	 * @throws APIException if the input is invalid.
 	 */
-	protected function checkWidgetFields(array $dashboards, array $db_dashboards = null): void {
+	protected function checkWidgetFields(array $dashboards, ?array $db_dashboards = null): void {
 		$ids = [
 			ZBX_WIDGET_FIELD_TYPE_ITEM => [],
 			ZBX_WIDGET_FIELD_TYPE_ITEM_PROTOTYPE => [],
@@ -697,7 +696,7 @@ abstract class CDashboardGeneral extends CApiService {
 	 * @param array      $dashboards
 	 * @param array|null $db_dashboards
 	 */
-	protected function updatePages(array &$dashboards, array $db_dashboards = null): void {
+	protected function updatePages(array &$dashboards, ?array $db_dashboards = null): void {
 		$db_dashboard_pages = [];
 
 		if ($db_dashboards !== null) {
@@ -777,7 +776,7 @@ abstract class CDashboardGeneral extends CApiService {
 	 * @param array      $dashboards
 	 * @param array|null $db_dashboards
 	 */
-	protected function updateWidgets(array &$dashboards, array $db_dashboards = null): void {
+	protected function updateWidgets(array &$dashboards, ?array $db_dashboards = null): void {
 		$db_widgets = [];
 
 		if ($db_dashboards !== null) {
@@ -878,7 +877,7 @@ abstract class CDashboardGeneral extends CApiService {
 	 * @param array      $dashboards
 	 * @param array|null $db_dashboards
 	 */
-	protected function updateWidgetFields(array &$dashboards, array $db_dashboards = null): void {
+	protected function updateWidgetFields(array &$dashboards, ?array $db_dashboards = null): void {
 		$ins_widget_fields = [];
 		$upd_widget_fields = [];
 		$del_widget_fieldids = [];
@@ -1064,10 +1063,9 @@ abstract class CDashboardGeneral extends CApiService {
 						unset($db_widget);
 
 						$db_widget_fields = DB::select('widget_field', [
-							'output' => ['widget_fieldid', 'widgetid', 'type', 'name', 'value_int', 'value_str',
-								'value_groupid', 'value_hostid', 'value_itemid', 'value_graphid', 'value_serviceid',
-								'value_slaid', 'value_userid', 'value_actionid', 'value_mediatypeid', 'value_sysmapid'
-							],
+							'output' => array_merge(['widget_fieldid', 'widgetid', 'type', 'name'],
+								array_unique(array_values(CDashboardGeneral::WIDGET_FIELD_TYPE_COLUMNS))
+							),
 							'filter' => [
 								'widgetid' => array_keys($db_widgets),
 								'type' => array_keys(self::WIDGET_FIELD_TYPE_COLUMNS)

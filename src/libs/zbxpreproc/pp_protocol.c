@@ -22,6 +22,8 @@
 #include "zbxvariant.h"
 #include "zbxtime.h"
 #include "zbxstats.h"
+#include "zbxcacheconfig.h"
+#include "zbxcachehistory.h"
 
 #define PACKED_FIELD_RAW	0
 #define PACKED_FIELD_STRING	1
@@ -479,10 +481,20 @@ zbx_uint32_t	zbx_preprocessor_pack_test_result(unsigned char **data, const zbx_p
  *                               preprocessed                                 *
  *             finished_num  - [IN] number of values being preprocessed       *
  *             sequences_num - [IN] number of registered task sequences       *
+ *             queued_num    - [IN] number of queued values that require      *
+ *                               preprocessing                                *
+ *             queued_sz     - [IN] size of queued values that require        *
+ *                               preprocessing                                *
+ *             direct_num    - [IN] number of queued values that do not       *
+ *                               require preprocessing                        *
+ *             direct_sz     - [IN] size of queued values that do not         *
+ *                               require preprocessing                        *
  *                                                                            *
  ******************************************************************************/
 zbx_uint32_t	zbx_preprocessor_pack_diag_stats(unsigned char **data, zbx_uint64_t preproc_num,
-		zbx_uint64_t pending_num, zbx_uint64_t finished_num, zbx_uint64_t sequences_num)
+		zbx_uint64_t pending_num, zbx_uint64_t finished_num, zbx_uint64_t sequences_num,
+		zbx_uint64_t queued_num, zbx_uint64_t queued_sz, zbx_uint64_t direct_num, zbx_uint64_t direct_sz,
+		zbx_uint64_t history_sz)
 {
 	unsigned char	*ptr;
 	zbx_uint32_t	data_len = 0;
@@ -491,6 +503,11 @@ zbx_uint32_t	zbx_preprocessor_pack_diag_stats(unsigned char **data, zbx_uint64_t
 	zbx_serialize_prepare_value(data_len, pending_num);
 	zbx_serialize_prepare_value(data_len, finished_num);
 	zbx_serialize_prepare_value(data_len, sequences_num);
+	zbx_serialize_prepare_value(data_len, queued_num);
+	zbx_serialize_prepare_value(data_len, queued_sz);
+	zbx_serialize_prepare_value(data_len, direct_num);
+	zbx_serialize_prepare_value(data_len, direct_sz);
+	zbx_serialize_prepare_value(data_len, history_sz);
 
 	*data = (unsigned char *)zbx_malloc(NULL, data_len);
 
@@ -498,7 +515,53 @@ zbx_uint32_t	zbx_preprocessor_pack_diag_stats(unsigned char **data, zbx_uint64_t
 	ptr += zbx_serialize_value(ptr, preproc_num);
 	ptr += zbx_serialize_value(ptr, pending_num);
 	ptr += zbx_serialize_value(ptr, finished_num);
-	(void)zbx_serialize_value(ptr, sequences_num);
+	ptr += zbx_serialize_value(ptr, sequences_num);
+	ptr += zbx_serialize_value(ptr, queued_num);
+	ptr += zbx_serialize_value(ptr, queued_sz);
+	ptr += zbx_serialize_value(ptr, direct_num);
+	ptr += zbx_serialize_value(ptr, direct_sz);
+	(void)zbx_serialize_value(ptr, history_sz);
+
+	return data_len;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: pack preprocessing values statistics data into a single buffer    *
+ *          that can be used in IPC                                           *
+ * Parameters: data          - [OUT] memory buffer for packed data            *
+ *             queued_num    - [IN] number of queued values that require      *
+ *                                preprocessing                               *
+ *             queued_sz     - [IN] size of queued values that require        *
+ *                                preprocessing                               *
+ *             direct_num    - [IN] number of queued values that do not       *
+ *                                require preprocessing                       *
+ *             direct_sz     - [IN] size of queued values that do not         *
+ *                                require preprocessing                       *
+ *             enqueued_num  - [IN] number of values enqueued in              *
+ *                                preprocessing queue                         *
+ *                                                                            *
+ ******************************************************************************/
+zbx_uint32_t	zbx_preprocessor_pack_values_stats(unsigned char **data, zbx_uint64_t queued_num,
+		zbx_uint64_t queued_sz, zbx_uint64_t direct_num, zbx_uint64_t direct_sz, zbx_uint64_t enqueued_num)
+{
+	unsigned char	*ptr;
+	zbx_uint32_t	data_len = 0;
+
+	zbx_serialize_prepare_value(data_len, queued_num);
+	zbx_serialize_prepare_value(data_len, queued_sz);
+	zbx_serialize_prepare_value(data_len, direct_num);
+	zbx_serialize_prepare_value(data_len, direct_sz);
+	zbx_serialize_prepare_value(data_len, enqueued_num);
+
+	*data = (unsigned char *)zbx_malloc(NULL, data_len);
+
+	ptr = *data;
+	ptr += zbx_serialize_value(ptr, queued_num);
+	ptr += zbx_serialize_value(ptr, queued_sz);
+	ptr += zbx_serialize_value(ptr, direct_num);
+	ptr += zbx_serialize_value(ptr, direct_sz);
+	(void)zbx_serialize_value(ptr, enqueued_num);
 
 	return data_len;
 }
@@ -569,7 +632,7 @@ zbx_uint32_t	zbx_preprocessor_pack_top_stats_result(unsigned char **data, zbx_ve
 	if (0 != stats_num)
 	{
 		zbx_serialize_prepare_value(stat_len, stats->values[0]->itemid);
-		zbx_serialize_prepare_value(stat_len, stats->values[0]->tasks_num);
+		zbx_serialize_prepare_value(stat_len, stats->values[0]->num);
 	}
 
 	zbx_serialize_prepare_value(data_len, stats_num);
@@ -582,7 +645,7 @@ zbx_uint32_t	zbx_preprocessor_pack_top_stats_result(unsigned char **data, zbx_ve
 	for (int i = 0; i < stats_num; i++)
 	{
 		ptr += zbx_serialize_value(ptr, stats->values[i]->itemid);
-		ptr += zbx_serialize_value(ptr, stats->values[i]->tasks_num);
+		ptr += zbx_serialize_value(ptr, stats->values[i]->num);
 	}
 
 	return data_len;
@@ -701,18 +764,63 @@ void	zbx_preprocessor_unpack_test_result(zbx_vector_pp_result_ptr_t *results, zb
  *                               preprocessed                                 *
  *             finished_num  - [OUT] number of values being preprocessed      *
  *             sequences_num - [OUT] number of registered task sequences      *
+ *             queued_num    - [OUT] number of queued values that require     *
+ *                               preprocessing                                *
+ *             queued_sz     - [OUT] size of queued values that require       *
+ *                               preprocessing                                *
+ *             direct_num    - [OUT] number of queued values that do not      *
+ *                               require preprocessing                        *
+ *             direct_sz     - [OUT] size of queued values that do not        *
+ *                               require preprocessing                        *
  *             data          - [OUT] data buffer                              *
  *                                                                            *
  ******************************************************************************/
 void	zbx_preprocessor_unpack_diag_stats(zbx_uint64_t *preproc_num, zbx_uint64_t *pending_num,
-		zbx_uint64_t *finished_num, zbx_uint64_t *sequences_num, const unsigned char *data)
+		zbx_uint64_t *finished_num, zbx_uint64_t *sequences_num, zbx_uint64_t *queued_num,
+		zbx_uint64_t *queued_sz, zbx_uint64_t *direct_num, zbx_uint64_t *direct_sz, zbx_uint64_t *history_sz,
+		const unsigned char *data)
 {
 	const unsigned char	*offset = data;
 
 	offset += zbx_deserialize_value(offset, preproc_num);
 	offset += zbx_deserialize_value(offset, pending_num);
 	offset += zbx_deserialize_value(offset, finished_num);
-	(void)zbx_deserialize_value(offset, sequences_num);
+	offset += zbx_deserialize_value(offset, sequences_num);
+	offset += zbx_deserialize_value(offset, queued_num);
+	offset += zbx_deserialize_value(offset, queued_sz);
+	offset += zbx_deserialize_value(offset, direct_num);
+	offset += zbx_deserialize_value(offset, direct_sz);
+	(void)zbx_deserialize_value(offset, history_sz);
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: unpack preprocessing values statistics data from IPC data buffer  *
+ *                                                                            *
+ * Parameters: queued_num    - [OUT] number of queued values that require     *
+ *                                preprocessing                               *
+ *             queued_sz     - [OUT] size of queued values that require       *
+ *                                preprocessing                               *
+ *             direct_num    - [OUT] number of queued values that do not      *
+ *                                require preprocessing                       *
+ *             direct_sz     - [OUT] size of queued values that do not        *
+ *                                require preprocessing                       *
+ *             enqueued_num  - [OUT] number of values enqueued in             *
+ *                                preprocessing queue                         *
+ *             data          - [OUT] data buffer                              *
+ *                                                                            *
+ ******************************************************************************/
+void	zbx_preprocessor_unpack_values_stats(zbx_uint64_t *queued_num, zbx_uint64_t *queued_sz,
+		zbx_uint64_t *direct_num, zbx_uint64_t *direct_sz, zbx_uint64_t *enqueued_num,
+		const unsigned char *data)
+{
+	const unsigned char	*offset = data;
+
+	offset += zbx_deserialize_value(offset, queued_num);
+	offset += zbx_deserialize_value(offset, queued_sz);
+	offset += zbx_deserialize_value(offset, direct_num);
+	offset += zbx_deserialize_value(offset, direct_sz);
+	(void)zbx_deserialize_value(offset, enqueued_num);
 }
 
 /******************************************************************************
@@ -780,7 +888,7 @@ void	zbx_preprocessor_unpack_top_stats_result(zbx_vector_pp_top_stats_ptr_t *sta
 
 			stat = (zbx_pp_top_stats_t *)zbx_malloc(NULL, sizeof(zbx_pp_top_stats_t));
 			data += zbx_deserialize_value(data, &stat->itemid);
-			data += zbx_deserialize_value(data, &stat->tasks_num);
+			data += zbx_deserialize_value(data, &stat->num);
 			zbx_vector_pp_top_stats_ptr_append(stats, stat);
 		}
 	}
@@ -840,8 +948,9 @@ static void	preprocessor_send(zbx_uint32_t code, unsigned char *data, zbx_uint32
  *                               ITEM_STATE_NOTSUPPORTED                      *
  *                                                                            *
  ******************************************************************************/
-void	zbx_preprocess_item_value(zbx_uint64_t itemid, zbx_uint64_t hostid, unsigned char item_value_type,
-		unsigned char item_flags, AGENT_RESULT *result, zbx_timespec_t *ts, unsigned char state, char *error)
+void	zbx_preprocess_item_value(zbx_uint64_t itemid, zbx_uint64_t hostid,
+		unsigned char item_value_type, unsigned char item_flags, unsigned char preprocessing,
+		AGENT_RESULT *result, zbx_timespec_t *ts, unsigned char state, char *error)
 {
 	zbx_preproc_item_value_t	value = {.itemid = itemid, .hostid = hostid, .item_value_type = item_value_type,
 					.error = error, .item_flags = item_flags, .state = state, .ts = ts,
@@ -881,14 +990,23 @@ void	zbx_preprocess_item_value(zbx_uint64_t itemid, zbx_uint64_t hostid, unsigne
 		}
 	}
 
-	if (0 == preprocessor_pack_value(&cached_message, &value))
+	if (ZBX_ITEM_REQUIRES_PREPROCESSING_YES == preprocessing)
 	{
-		zbx_preprocessor_flush();
-		preprocessor_pack_value(&cached_message, &value);
-	}
+		if (0 == preprocessor_pack_value(&cached_message, &value))
+		{
+			zbx_preprocessor_flush();
+			preprocessor_pack_value(&cached_message, &value);
+		}
 
-	if (ZBX_PREPROCESSING_BATCH_SIZE < ++cached_values)
-		zbx_preprocessor_flush();
+		if (ZBX_PREPROCESSING_BATCH_SIZE < ++cached_values)
+			zbx_preprocessor_flush();
+
+	}
+	else
+	{
+		zbx_dc_add_history(value.itemid, value.item_value_type, value.item_flags, value.result, value.ts,
+				value.state, value.error);
+	}
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 }
@@ -908,6 +1026,8 @@ void	zbx_preprocessor_flush(void)
 		zbx_ipc_message_init(&cached_message);
 		cached_values = 0;
 	}
+
+	zbx_dc_flush_history();
 }
 
 /******************************************************************************
@@ -928,6 +1048,42 @@ zbx_uint64_t	zbx_preprocessor_get_queue_size(void)
 	zbx_ipc_message_clean(&message);
 
 	return size;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: add values count and size to JSON                                 *
+ *                                                                            *
+ ******************************************************************************/
+static void	preprocessor_add_size_json(struct zbx_json *json, const char *type, zbx_uint64_t num,
+		zbx_uint64_t sz)
+{
+	zbx_json_addobject(json, type);
+	zbx_json_adduint64(json, "count", num);
+	zbx_json_adduint64(json, "size", sz);
+	zbx_json_close(json);
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: get count and size of received values by preprocessing manager    *
+ *                                                                            *
+ ******************************************************************************/
+void	zbx_preprocessor_get_size(struct zbx_json *json)
+{
+	zbx_uint64_t		queued_num, queued_sz, direct_num, direct_sz, enqueued_num;
+	zbx_ipc_message_t	message;
+
+	zbx_ipc_message_init(&message);
+	preprocessor_send(ZBX_IPC_PREPROCESSOR_SIZE, NULL, 0, &message);
+	zbx_preprocessor_unpack_values_stats(&queued_num, &queued_sz, &direct_num, &direct_sz, &enqueued_num,
+			message.data);
+	zbx_ipc_message_clean(&message);
+
+	preprocessor_add_size_json(json, "queued", queued_num, queued_sz);
+	preprocessor_add_size_json(json, "direct", direct_num, direct_sz);
+
+	zbx_json_adduint64(json, "queue", enqueued_num);
 }
 
 /******************************************************************************
@@ -1062,7 +1218,9 @@ out:
  *                                                                            *
  ******************************************************************************/
 int	zbx_preprocessor_get_diag_stats(zbx_uint64_t *preproc_num, zbx_uint64_t *pending_num,
-		zbx_uint64_t *finished_num, zbx_uint64_t *sequences_num, char **error)
+		zbx_uint64_t *finished_num, zbx_uint64_t *sequences_num, zbx_uint64_t *queued_num,
+		zbx_uint64_t *queued_sz, zbx_uint64_t *direct_num, zbx_uint64_t *direct_sz, zbx_uint64_t *history_sz,
+		char **error)
 {
 	unsigned char	*result;
 
@@ -1072,7 +1230,8 @@ int	zbx_preprocessor_get_diag_stats(zbx_uint64_t *preproc_num, zbx_uint64_t *pen
 		return FAIL;
 	}
 
-	zbx_preprocessor_unpack_diag_stats(preproc_num, pending_num, finished_num, sequences_num, result);
+	zbx_preprocessor_unpack_diag_stats(preproc_num, pending_num, finished_num, sequences_num, queued_num,
+			queued_sz, direct_num, direct_sz, history_sz, result);
 	zbx_free(result);
 
 	return SUCCEED;
@@ -1124,6 +1283,46 @@ int	zbx_preprocessor_get_top_sequences(int limit, zbx_vector_pp_top_stats_ptr_t 
 int	zbx_preprocessor_get_top_peak(int limit, zbx_vector_pp_top_stats_ptr_t *stats, char **error)
 {
 	return preprocessor_get_top_view(limit, stats, error, ZBX_IPC_PREPROCESSOR_TOP_PEAK);
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: get the top N items by the number of received values              *
+ *                                                                            *
+ ******************************************************************************/
+int	zbx_preprocessor_get_top_values_num(int limit, zbx_vector_pp_top_stats_ptr_t *stats, char **error)
+{
+	return preprocessor_get_top_view(limit, stats, error, ZBX_IPC_PREPROCESSOR_TOP_VALUES_NUM);
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: get the top N items by the size of received values                *
+ *                                                                            *
+ ******************************************************************************/
+int	zbx_preprocessor_get_top_values_size(int limit, zbx_vector_pp_top_stats_ptr_t *stats, char **error)
+{
+	return preprocessor_get_top_view(limit, stats, error, ZBX_IPC_PREPROCESSOR_TOP_VALUES_SZ);
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: get the top N items by the elapsed time                           *
+ *                                                                            *
+ ******************************************************************************/
+int	zbx_preprocessor_get_top_time_ms(int limit, zbx_vector_pp_top_stats_ptr_t *stats, char **error)
+{
+	return preprocessor_get_top_view(limit, stats, error, ZBX_IPC_PREPROCESSOR_TOP_TIME_MS);
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: get the top N items by the total elapsed time                     *
+ *                                                                            *
+ ******************************************************************************/
+int	zbx_preprocessor_get_top_total_ms(int limit, zbx_vector_pp_top_stats_ptr_t *stats, char **error)
+{
+	return preprocessor_get_top_view(limit, stats, error, ZBX_IPC_PREPROCESSOR_TOP_TOTAL_MS);
 }
 
 /******************************************************************************

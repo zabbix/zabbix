@@ -20,7 +20,7 @@ class CWidgetFieldSeverities extends CWidgetFieldCheckBoxList {
 
 	public const DEFAULT_VIEW = \CWidgetFieldSeveritiesView::class;
 
-	public function __construct(string $name, string $label = null) {
+	public function __construct(string $name, ?string $label = null) {
 		parent::__construct($name, $label, range(TRIGGER_SEVERITY_NOT_CLASSIFIED, TRIGGER_SEVERITY_COUNT - 1));
 	}
 }

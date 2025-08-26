@@ -268,19 +268,19 @@ class CControllerHostList extends CController {
 		order_result($hosts, $sort_field, $sort_order);
 
 		$hostids = array_column($hosts, 'hostid');
-
-		// Get count for every host with item type ITEM_TYPE_ZABBIX_ACTIVE (7) and ITEM_TYPE_ZABBIX (0).
-		$active_item_count_by_hostid = getItemTypeCountByHostId(ITEM_TYPE_ZABBIX_ACTIVE, $hostids);
-		$passive_item_count_by_hostid = getItemTypeCountByHostId(ITEM_TYPE_ZABBIX, $hostids);
+		$active_item_count_by_hostid = getEnabledItemTypeCountByHostId(ITEM_TYPE_ZABBIX_ACTIVE, $hostids);
 
 		// Selecting linked templates to templates linked to hosts.
 		$templateids = [];
+		$interfaceids = [];
 
 		foreach ($hosts as $host) {
 			$templateids = array_merge($templateids, array_column($host['parentTemplates'], 'templateid'));
+			$interfaceids = array_merge($interfaceids, array_column($host['interfaces'], 'interfaceid'));
 		}
 
 		$templateids = array_keys(array_flip($templateids));
+		$interface_enabled_items_count = getEnabledItemsCountByInterfaceIds($interfaceids);
 
 		$templates = API::Template()->get([
 			'output' => ['templateid', 'name'],
@@ -314,19 +314,24 @@ class CControllerHostList extends CController {
 				['field' => 'main', 'order' => ZBX_SORT_DOWN]
 			]);
 
+			foreach ($host['interfaces'] as &$interface) {
+				$interfaceid = $interface['interfaceid'];
+				$interface['has_enabled_items'] = array_key_exists($interfaceid, $interface_enabled_items_count)
+					&& $interface_enabled_items_count[$interfaceid] > 0;
+			}
+			unset($interface);
+
 			// Add active checks interface if host have items with type ITEM_TYPE_ZABBIX_ACTIVE (7).
 			if (array_key_exists($host['hostid'], $active_item_count_by_hostid)
 					&& $active_item_count_by_hostid[$host['hostid']] > 0) {
 				$host['interfaces'][] = [
 					'type' => INTERFACE_TYPE_AGENT_ACTIVE,
 					'available' => $host['active_available'],
+					'has_enabled_items' => true,
 					'error' => ''
 				];
 			}
 			unset($host['active_available']);
-
-			$host['has_passive_checks'] = array_key_exists($host['hostid'], $passive_item_count_by_hostid)
-				&& $passive_item_count_by_hostid[$host['hostid']] > 0;
 
 			if ($host['monitored_by'] == ZBX_MONITORED_BY_PROXY) {
 				$proxyids[$host['proxyid']] = true;

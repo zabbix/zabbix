@@ -4,8 +4,8 @@ msgstr ""
 "Project-Id-Version: Zabbix 6.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2023-10-19 13:48+0300\n"
-"PO-Revision-Date: 2024-12-03 09:03+0000\n"
-"Last-Translator: Mike <mmartin@cyres.fr>\n"
+"PO-Revision-Date: 2025-08-20 19:49+0000\n"
+"Last-Translator: ERIC <eric78.zabbix@orange.fr>\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
 "Language: fr\n"
 "MIME-Version: 1.0\n"
@@ -1288,7 +1288,7 @@ msgstr "Tous"
 #: app/views/mediatype.list.php:79 app/views/mediatype.list.php:81
 #: app/views/mediatype.list.php:90 app/views/popup.operation.edit.php:160
 msgid "All available"
-msgstr ""
+msgstr "Tous disponibles"
 
 #: app/views/monitoring.dashboard.view.php:189
 msgid "All dashboards"
@@ -2683,12 +2683,22 @@ msgstr "Impossible de supprimer la méthode d'authentification multi-facteur par
 msgid "Cannot delete default user directory."
 msgstr "Impossible de supprimer l'annuaire des utilisateurs par défaut."
 
+#: include/classes/api/services/CDRule.php:773
+#, c-format
+msgid "Cannot delete discovery check \"%1$s\" of discovery rule \"%2$s\": %3$s."
+msgstr "Impossible de supprimer la vérification de découverte \"%1$s\" de la règle de découverte \"%2$s\": %3$s."
+
 #: app/controllers/CControllerDiscoveryDelete.php:68 host_discovery.php:390
 #: host_discovery.php:597
 msgid "Cannot delete discovery rule"
 msgid_plural "Cannot delete discovery rules"
 msgstr[0] "Impossible de supprimer la règle de découverte"
 msgstr[1] "Impossible de supprimer les règles de découverte"
+
+#: include/classes/api/services/CDRule.php:980
+#, c-format
+msgid "Cannot delete discovery rule \"%1$s\": %2$s."
+msgstr "Impossible de supprimer la règle de découverte \"%1$s\" : %2$s."
 
 #: app/controllers/CControllerCorrelationDelete.php:68
 msgid "Cannot delete event correlation"
@@ -2714,6 +2724,11 @@ msgid_plural "Cannot delete hosts"
 msgstr[0] "Impossible de supprimer l'hôte"
 msgstr[1] "Impossible de supprimer les hôtes"
 
+#: include/classes/api/services/CHost.php:1636
+#, c-format
+msgid "Cannot delete host \"%1$s\": %2$s."
+msgstr "Impossible de supprimer l'hôte \"%1$s\" : %2$s."
+
 #: include/classes/api/services/CHost.php:1461
 #, c-format
 msgid "Cannot delete host %1$s because maintenance \"%2$s\" must contain at least one host or host group."
@@ -2726,6 +2741,11 @@ msgid "Cannot delete host group"
 msgid_plural "Cannot delete host groups"
 msgstr[0] "Impossible de supprimer le groupe d'hôtes"
 msgstr[1] "Impossible de supprimer les groupes d'hôtes"
+
+#: include/classes/api/services/CHostGroup.php:769
+#, c-format
+msgid "Cannot delete host group \"%1$s\": %2$s."
+msgstr "Impossible de supprimer le groupe d'hôtes \"%1$s\" : %2$s."
 
 #: include/classes/api/services/CHostGroup.php:858
 #, c-format
@@ -2869,6 +2889,11 @@ msgid_plural "Cannot delete templates"
 msgstr[0] "Impossible de supprimer le modèle"
 msgstr[1] "Impossible de supprimer les modèles"
 
+#: include/classes/api/services/CTemplate.php:809
+#, c-format
+msgid "Cannot delete template \"%1$s\": %2$s."
+msgstr "Impossible de supprimer le modèle \"%1$s\" : %2$s."
+
 #: app/controllers/CControllerTemplateGroupDelete.php:75
 msgid "Cannot delete template group"
 msgid_plural "Cannot delete template groups"
@@ -2904,6 +2929,11 @@ msgid_plural "Cannot delete triggers"
 msgstr[0] "Impossible de supprimer le déclencheur"
 msgstr[1] "Impossible de supprimer les déclencheurs"
 
+#: include/classes/api/managers/CTriggerManager.php:126
+#, c-format
+msgid "Cannot delete trigger \"%1$s\": %2$s."
+msgstr "Impossible de supprimer le déclencheur \"%1$s\" : %2$s."
+
 #: app/controllers/CControllerTriggerPrototypeDelete.php:72
 msgid "Cannot delete trigger prototype"
 msgid_plural "Cannot delete trigger prototypes"
@@ -2930,12 +2960,12 @@ msgstr[1] "Impossible de supprimer les groupes d'utilisateurs"
 #: include/classes/api/services/CUserGroup.php:1340
 #, c-format
 msgid "Cannot delete user group \"%1$s\", because it is used by LDAP userdirectory \"%2$s\"."
-msgstr ""
+msgstr "Impossible de supprimer le groupe d'utilisateur \"%1$s\", car il est utilisé par  le provisionnement LDAP \"%2$s\"."
 
 #: include/classes/api/services/CUserGroup.php:1335
 #, c-format
 msgid "Cannot delete user group \"%1$s\", because it is used by SAML userdirectory."
-msgstr ""
+msgstr "Impossible de supprimer le groupe d'utilisateur \"%1$s\", car il est utilisé par un userdirectory SAML."
 
 #: include/classes/api/services/CUserGroup.php:1397
 #, c-format
@@ -5911,6 +5941,11 @@ msgstr "Chiffrement TLS de la base de données"
 msgid "Database TLS key file"
 msgstr "Fichier de clé TLS de la base de données"
 
+#: include/classes/api/clients/CLocalApiClient.php:133
+#: include/classes/api/clients/CLocalApiClient.php:147
+msgid "Database error occurred."
+msgstr "Une erreur de base de données s'est produite."
+
 #: app/partials/administration.system.info.php:130
 msgid "Database history tables use primary key"
 msgstr "Les tables d'historique de la base de données utilisent la clé primaire"
@@ -6607,6 +6642,22 @@ msgstr "Supprimer le scénario web ?"
 msgid "Deleted"
 msgstr "Supprimé"
 
+#: include/actions.inc.php:143
+msgid "Deleted host"
+msgstr "Hôte supprimé"
+
+#: include/actions.inc.php:125
+msgid "Deleted host group"
+msgstr "Groupe d'hôtes supprimé"
+
+#: include/actions.inc.php:710
+msgid "Deleted host group(s)"
+msgstr "Groupe(s) d'hôtes supprimé(s)"
+
+#: include/actions.inc.php:134
+msgid "Deleted trigger"
+msgstr "Déclencheur supprimé"
+
 #: app/views/administration.regex.edit.php:54
 msgid "Delimiter"
 msgstr "Délimiteur"
@@ -6731,6 +6782,10 @@ msgstr "Détails du scénario web"
 
 #: app/views/administration.housekeeping.edit.php:206
 msgid "Detected TimescaleDB license does not support compression. Compression is supported in TimescaleDB Community Edition."
+msgstr "La licence TimescaleDB détectée ne prend pas en charge la compression. La compression est prise en charge dans TimescaleDB Community Edition."
+
+#: app/views/administration.housekeeping.edit.php:204
+msgid "Detected license does not support compression. Compression is supported in TimescaleDB Community Edition."
 msgstr "La licence TimescaleDB détectée ne prend pas en charge la compression. La compression est prise en charge dans TimescaleDB Community Edition."
 
 #: app/controllers/CControllerPopupTriggerExpr.php:1130
@@ -7093,6 +7148,10 @@ msgstr "Objet de découverte"
 msgid "Discovery of VMware clusters, \"url\" - VMware service URL. Returns JSON"
 msgstr "Découverte des clusters VMware, \"url\" - URL du service VMware. Retourne un JSON"
 
+#: include/classes/data/CItemData.php:1931
+msgid "Discovery of VMware datastores, \"url\" - VMware service URL, \"filter_uuid\" - one hv uuid or vm uuid (empty by default). Returns JSON"
+msgstr "Découverte des datastores VMware, « url » : URL du service VMware, « filter_uuid » : UUID HV ou VM (vide par défaut). Retourne un JSON"
+
 #: include/classes/data/CItemData.php:1799
 msgid "Discovery of VMware datastores, \"url\" - VMware service URL. Returns JSON"
 msgstr "Découverte des datastores VMware, \"url\" - URL du service VMware. Retourne un JSON"
@@ -7220,7 +7279,7 @@ msgstr "Afficher les déclencheurs OK pendant"
 
 #: app/views/mediatype.list.php:75
 msgid "Display actions"
-msgstr ""
+msgstr "Afficher les actions"
 
 #: app/partials/monitoring.latest.view.html.php:309
 msgid "Display graph"
@@ -7232,7 +7291,7 @@ msgstr "Afficher l'heure locale"
 
 #: widgets/itemhistory/views/column.edit.php:240
 msgid "Display log time"
-msgstr ""
+msgstr "Afficher l'heure du journal"
 
 #: widgets/svggraph/includes/WidgetForm.php:364
 msgid "Display min/avg/max"
@@ -8557,7 +8616,7 @@ msgstr "Filtre"
 
 #: app/views/mediatype.list.php:76
 msgid "Filter actions by the scope of media type usage:"
-msgstr ""
+msgstr "Filtrer les actions en fonction de l'étendue de l'utilisation du type de média :"
 
 #: app/views/js/popup.tabfilter.edit.js.php:63
 msgid "Filter deleted"
@@ -9400,7 +9459,7 @@ msgstr "Fonctions d'historique"
 
 #: app/views/administration.housekeeping.edit.php:218
 msgid "History, trends and audit log compression"
-msgstr ""
+msgstr "Historique, tendances et compression des journaux d'audit"
 
 #: include/classes/html/CTabFilter.php:167
 msgid "Home"
@@ -13239,6 +13298,11 @@ msgstr "Nombre maximum de lignes"
 msgid "Maximum required %1$s database version is %2$s."
 msgstr "La version maximale requise de la base de données %1$s est %2$s."
 
+#: app/partials/administration.system.info.php:221
+#, c-format
+msgid "Maximum required version is %1$s."
+msgstr "La version maximale requise est %1$s."
+
 #: app/controllers/CControllerTimeSelectorUpdate.php:136
 #: include/classes/mvc/CController.php:320
 #: include/classes/widgets/fields/CWidgetFieldTimePeriod.php:203
@@ -13302,7 +13366,7 @@ msgstr "Le type de média \"%1$s\" existe déjà."
 #: include/classes/api/services/CMediatype.php:927
 #, c-format
 msgid "Media type \"%1$s\" is used by action \"%2$s\"."
-msgstr ""
+msgstr "Le type de média « %1$s » est utilisé par l'action « %2$s »."
 
 #: app/controllers/CControllerMediatypeCreate.php:187
 msgid "Media type added"
@@ -13574,6 +13638,12 @@ msgstr "La limite minimale requise pour la durée de traitement des entrées des
 msgid "Minimum required size of PHP post is %1$s (configuration option \"post_max_size\")."
 msgstr "La taille minimale requise pour les post HTTP est %1$s (option \"post_max_size\")."
 
+#: app/partials/administration.system.info.php:212
+#: app/views/administration.housekeeping.edit.php:183
+#, c-format
+msgid "Minimum required version is %1$s."
+msgstr "La version minimale requise est %1$s."
+
 #: app/views/monitoring.map.view.php:48
 #: include/views/monitoring.sysmap.edit.php:276
 msgid "Minimum severity"
@@ -13801,6 +13871,16 @@ msgstr "Multiple"
 #: include/triggers.inc.php:611
 msgid "Multiple PROBLEM events"
 msgstr "Événements PROBLÈME multiples"
+
+#: app/partials/administration.system.info.php:235
+#, c-format
+msgid "Must be at least %1$s."
+msgstr "Doit être au moins %1$s."
+
+#: app/partials/administration.system.info.php:254
+#, c-format
+msgid "Must not be higher than %1$s."
+msgstr "Ne doit pas être supérieur à %1$s."
 
 #: jsLoader.php:284
 msgid "Mute"
@@ -14542,6 +14622,66 @@ msgstr "Aucune permission pour l'accès au système."
 #, c-format
 msgid "No permissions to call \"%1$s.%2$s\"."
 msgstr "Aucune autorisation pour appeler \"%1$s.%2$s\"."
+
+#: include/classes/api/services/CConfiguration.php:312
+msgid "No permissions to import discovery rules."
+msgstr "Aucune autorisation pour importer des règles de découverte."
+
+#: include/classes/api/services/CConfiguration.php:313
+msgid "No permissions to import graphs."
+msgstr "Aucune autorisation pour importer des graphiques."
+
+#: include/classes/api/services/CConfiguration.php:314
+msgid "No permissions to import host groups."
+msgstr "Aucune autorisation pour importer des groupes d'hôtes."
+
+#: include/classes/api/services/CConfiguration.php:316
+msgid "No permissions to import hosts."
+msgstr "Aucune autorisation pour importer des hôtes."
+
+#: include/classes/api/services/CConfiguration.php:318
+msgid "No permissions to import images."
+msgstr "Aucune autorisation pour importer des images."
+
+#: include/classes/api/services/CConfiguration.php:319
+msgid "No permissions to import items."
+msgstr "Aucune autorisation pour importer des éléments."
+
+#: include/classes/api/services/CConfiguration.php:320
+msgid "No permissions to import maps."
+msgstr "Aucune autorisation pour importer des cartes."
+
+#: include/classes/api/services/CConfiguration.php:321
+msgid "No permissions to import media types."
+msgstr "Aucune autorisation pour importer des types de médias."
+
+#: include/classes/api/services/CConfiguration.php:324
+msgid "No permissions to import template dashboards."
+msgstr "Aucune autorisation pour importer des modèles de tableau de bord."
+
+#: include/classes/api/services/CConfiguration.php:315
+msgid "No permissions to import template groups."
+msgstr "Aucune autorisation pour importer des modèles de groupe."
+
+#: include/classes/api/services/CConfiguration.php:322
+msgid "No permissions to import template links."
+msgstr "Aucune autorisation pour importer des modèles de lien."
+
+#: include/classes/api/services/CConfiguration.php:323
+msgid "No permissions to import templates."
+msgstr "Aucune autorisation pour importer des modèles."
+
+#: include/classes/api/services/CConfiguration.php:325
+msgid "No permissions to import triggers."
+msgstr "Aucune autorisation pour importer des déclencheurs."
+
+#: include/classes/api/services/CConfiguration.php:326
+msgid "No permissions to import value maps."
+msgstr "Aucune autorisation pour importer des tables de correspondances."
+
+#: include/classes/api/services/CConfiguration.php:317
+msgid "No permissions to import web scenarios."
+msgstr "Aucune autorisation pour importer des scénarios Web."
 
 #: app/controllers/CControllerChartsView.php:133
 #: app/controllers/CControllerDashboardPrint.php:99
@@ -17770,6 +17910,11 @@ msgstr "Exécutez le script \"%1$s\" sur le serveur Zabbix"
 msgid "Run script \"%1$s\" on current host"
 msgstr "Exécuter le script \"%1$s\" sur l'hôte actuel"
 
+#: include/actions.inc.php:601
+#, c-format
+msgid "Run script \"%1$s\" on deleted object(s)"
+msgstr "Exécuter le script \"%1$s\" sur le(s) objet(s) supprimé(s)"
+
 #: include/actions.inc.php:622
 #, c-format
 msgid "Run script \"%1$s\" on host groups"
@@ -18504,7 +18649,7 @@ msgstr "Envoyer à l'arrière"
 
 #: app/views/popup.operation.edit.php:189
 msgid "Send to media type"
-msgstr ""
+msgstr "Envoyer au type de média"
 
 #: app/views/popup.operation.edit.php:108
 msgid "Send to user groups"
@@ -18858,6 +19003,18 @@ msgstr "Court"
 #: widgets/problems/includes/WidgetForm.php:106
 msgid "Shortened"
 msgstr "Raccourci"
+
+#: app/partials/administration.system.info.php:243
+#: app/views/administration.housekeeping.edit.php:187
+#, c-format
+msgid "Should be at least %1$s."
+msgstr "Devrait être au moins %1$s."
+
+#: app/partials/administration.system.info.php:262
+#: app/views/administration.housekeeping.edit.php:197
+#, c-format
+msgid "Should not be higher than %1$s."
+msgstr "Ne devrait pas être supérieur à %1$s."
 
 #: app/partials/monitoring.problem.filter.php:27
 #: app/views/monitoring.charts.view.php:80
@@ -19262,7 +19419,7 @@ msgstr "Espagnol (es_ES)"
 
 #: app/views/mediatype.list.php:83 app/views/mediatype.list.php:91
 msgid "Specific"
-msgstr ""
+msgstr "Spécifique"
 
 #: include/classes/helpers/CRoleHelper.php:199
 msgid "Specified role was not found."
@@ -19386,6 +19543,10 @@ msgstr "Statistiques et disponibilité du cache en écriture Zabbix. Cache - une
 #: include/classes/data/CItemData.php:2848
 msgid "Statistics and availability of proxy memory buffer. Mode (modes: pfree, free, total, used, pused)."
 msgstr "Statistiques et disponibilité de la mémoire tampon du proxy. Mode (modes : pfree, free, total, used, pused)."
+
+#: include/classes/data/CItemData.php:2854
+msgid "Statistics of values received by the preprocessing manager."
+msgstr "Statistiques des valeurs reçues par le gestionnaire de prétraitement."
 
 #: app/controllers/CControllerPopupGeneric.php:237
 #: app/controllers/CControllerPopupGeneric.php:251
@@ -20369,6 +20530,10 @@ msgstr "Le nombre de processus. Retourne un entier"
 msgid "The parameter \"%1$s\" is missing from the user attributes."
 msgstr "Le paramètre \"%1$s\" est absent des attributs de l'utilisateur."
 
+#: app/views/popup.ldap.edit.php:101
+msgid "The previous password was cleared due to a host change. Please enter the new password."
+msgstr "Le mot de passe précédent a été supprimé suite à un changement d'hôte. Veuillez saisir le nouveau mot de passe."
+
 #: include/classes/core/CJsonRpc.php:206
 msgid "The received JSON is not a valid JSON-RPC request."
 msgstr "Le JSON reçu n'est pas une requête JSON-RPC valide."
@@ -20410,6 +20575,14 @@ msgstr "Thème"
 #: app/views/mediatype.edit.php:189 app/views/mediatype.test.edit.php:48
 msgid "These parameters will be passed to the script as command-line arguments in the specified order."
 msgstr "Ces paramètres seront transmis au script en tant qu'arguments de ligne de commande dans l'ordre spécifié."
+
+#: app/views/action.list.php:156
+msgid "This action has conditions or operations referencing deleted object(s)."
+msgstr "Cette action comporte des conditions ou des opérations référençant des objets supprimés."
+
+#: app/views/action.list.php:151
+msgid "This action has missing conditions or operations due to previously deleted object(s)."
+msgstr "Cette action comporte des conditions ou des opérations manquantes en raison d'objets précédemment supprimés."
 
 #: app/controllers/CControllerDiscoveryEdit.php:175
 #, c-format
@@ -20463,7 +20636,7 @@ msgstr "Ce paramètre affichera l'heure locale au lieu de l'horodatage. \"Affich
 
 #: widgets/itemhistory/views/column.edit.php:241
 msgid "This setting will display log time instead of item's timestamp. \"Show timestamp\" must also be checked in the advanced configuration."
-msgstr ""
+msgstr "Ce paramètre affichera l'heure du journal au lieu de l'horodatage de l'élément. L'option « Afficher l'horodatage » doit également être cochée dans la configuration avancée."
 
 #: include/views/configuration.item.edit.php:129
 #: include/views/configuration.item.prototype.edit.php:114
@@ -21410,6 +21583,14 @@ msgstr "Impossible de récupérer l'état de prise en charge de la compression d
 msgid "Unable to retrieve TimescaleDB version."
 msgstr "Impossible de récupérer la version de TimescaleDB."
 
+#: app/views/administration.housekeeping.edit.php:173
+msgid "Unable to retrieve compression support status of TimescaleDB time-series database extension for PostgreSQL."
+msgstr "Impossible de récupérer l'état de prise en charge de la compression de l'extension TimescaleDB pour PostgreSQL."
+
+#: app/views/administration.housekeeping.edit.php:178
+msgid "Unable to retrieve version of TimescaleDB time-series database extension for PostgreSQL."
+msgstr "Impossible de récupérer la version de l'extension TimescaleDB pour PostgreSQL."
+
 #: include/views/mfa.login.php:65
 #, c-format
 msgid "Unable to scan? You can use %1$s secret key to manually configure your authenticator app:"
@@ -21687,6 +21868,11 @@ msgstr "Version du serveur de base de données %1$s non supportée. Doit être d
 #, c-format
 msgid "Unsupported %1$s database server version. Must not be higher than %2$s."
 msgstr "Version du serveur de base de données %1$s non supportée. Doit être d'au moins %2$s."
+
+#: app/partials/administration.system.info.php:206
+#: app/views/administration.housekeeping.edit.php:169
+msgid "Unsupported TimescaleDB time-series database extension for PostgreSQL is used."
+msgstr "Extension TimescaleDB non prise en charge pour PostgreSQL est utilisée."
 
 #: app/views/administration.housekeeping.edit.php:190
 #, c-format
@@ -22662,7 +22848,7 @@ msgstr "État d'alimentation de la machine virtuelle VMware, \"url\" - URL du se
 
 #: include/classes/data/CItemData.php:2490
 msgid "VMware virtual machine private memory size, \"url\" - VMware service URL, \"uuid\" - VMware virtual machine global unique identifier"
-msgstr ""
+msgstr "Taille de la mémoire privée de la machine virtuelle VMware, \"url\" - URL du service VMware, \"uuid\" - Identifiant global unique de la machine virtuelle VMware"
 
 #: include/classes/data/CItemData.php:2359
 msgid "VMware virtual machine private memory size, \"url\" - VMware service URL, \"uuid\" - VMware virtual machine global unique identifierr"
@@ -23101,6 +23287,11 @@ msgstr "Avertissement"
 #: include/func.inc.php:1775 jsLoader.php:216
 msgid "Warning message"
 msgstr "Message d'alerte"
+
+#: app/partials/administration.system.info.php:243
+#: app/partials/administration.system.info.php:262
+msgid "Warning!"
+msgstr "Avertissement !"
 
 #: app/partials/administration.system.info.php:198
 msgid "Warning! Support for Oracle DB is deprecated since Zabbix 7.0 and will be removed in future versions."
@@ -23911,6 +24102,41 @@ msgstr "abs() - Valeur absolue"
 msgid "acos() - The arccosine of a value as an angle, expressed in radians"
 msgstr "acos() - L'arccosinus d'une valeur sous forme d'angle, exprimé en radians"
 
+#: include/classes/api/services/CDRule.php:774
+#, c-format
+msgid "action \"%1$s\" uses this discovery check"
+msgstr "l'action \"%1$s\" utilise cette vérification de découverte"
+
+#: include/classes/api/services/CDRule.php:981
+#, c-format
+msgid "action \"%1$s\" uses this discovery rule"
+msgstr "l'action \"%1$s\" utilise cette règle de découverte"
+
+#: include/classes/api/services/CHost.php:1637
+#, c-format
+msgid "action \"%1$s\" uses this host"
+msgstr "l'action \"%1$s\" utilise cet hôte"
+
+#: include/classes/api/services/CHostGroup.php:770
+#, c-format
+msgid "action \"%1$s\" uses this host group"
+msgstr "l'action \"%1$s\" utilise ce groupe d'hôtes"
+
+#: include/classes/api/services/CService.php:487
+#, c-format
+msgid "action \"%1$s\" uses this service"
+msgstr "l'action \"%1$s\" utilise ce service"
+
+#: include/classes/api/services/CTemplate.php:810
+#, c-format
+msgid "action \"%1$s\" uses this template"
+msgstr "l'action \"%1$s\" utilise ce modèle"
+
+#: include/classes/api/managers/CTriggerManager.php:127
+#, c-format
+msgid "action \"%1$s\" uses this trigger"
+msgstr "l'action \"%1$s\" utilise ce déclencheur"
+
 #: app/partials/monitoring.charts.subfilter.php:182
 #: app/partials/monitoring.latest.subfilter.php:186 include/forms.inc.php:144
 msgid "affects only filtered data"
@@ -24567,15 +24793,15 @@ msgstr "la règle de découverte \"%1$s\" sur l'hôte \"%2$s\" n'est pas surveil
 
 #: app/views/mediatype.list.php:78
 msgid "display all actions"
-msgstr ""
+msgstr "afficher toutes les actions"
 
 #: app/views/mediatype.list.php:80
 msgid "display only actions where All available media types are used in action operation"
-msgstr ""
+msgstr "afficher uniquement les actions où Tous les types de médias disponibles sont utilisés dans l'opération d'action"
 
 #: app/views/mediatype.list.php:84
 msgid "display only actions where specific media type is used in action operation"
-msgstr ""
+msgstr "afficher uniquement les actions où un type de média spécifique est utilisé dans l'opération d'action"
 
 #: app/views/popup.lldoperation.php:65 include/actions.inc.php:27
 #: include/classes/helpers/CCorrelationHelper.php:37

@@ -24,7 +24,8 @@
 #	include "zbx_dbversion_constants.h"
 #endif
 
-#define ZBX_DB_WAIT_DOWN	10
+#define ZBX_DB_WAIT_DOWN		10
+#define ZBX_DB_WAIT_AFTER_RECONNECT	3
 
 #define ZBX_MAX_SQL_SIZE	262144	/* 256KB */
 #ifndef ZBX_MAX_OVERFLOW_SQL_SIZE
@@ -56,6 +57,8 @@
 #else
 #	define ZBX_ROW_DL	";\n"
 #endif
+
+#define ZBX_MAX_IDS	950
 
 ZBX_PTR_VECTOR_IMPL(db_event, zbx_db_event *)
 ZBX_PTR_VECTOR_IMPL(events_ptr, zbx_event_t *)
@@ -223,6 +226,13 @@ void	zbx_db_validate_config(const zbx_config_dbhigh_t *config_dbhigh)
 				" \"DBTLSKeyFile\", \"DBTLSCertFile\" or \"DBTLSCAFile\" is not defined");
 		exit(EXIT_FAILURE);
 	}
+
+	if (NULL != config_dbhigh->config_dbsocket && 0 != config_dbhigh->config_dbport)
+	{
+		zabbix_log(LOG_LEVEL_CRIT, "Both parameters \"DBPort\" and \"DBSocket\" are defined. Either one of "
+				"them can be defined, or neither.");
+		exit(EXIT_FAILURE);
+	}
 }
 #endif
 
@@ -249,35 +259,66 @@ void	zbx_db_init_autoincrement_options(void)
  ******************************************************************************/
 int	zbx_db_connect(int flag)
 {
+#define ZBX_DB_WAIT_RETRY_COUNT	6
 	int	err;
-
+#if defined(HAVE_POSTGRESQL)
+	int	retries = ZBX_DB_WAIT_RETRY_COUNT;
+#endif
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() flag:%d", __func__, flag);
 
 	while (ZBX_DB_OK != (err = zbx_db_connect_basic(zbx_cfg_dbhigh)))
 	{
 		if (ZBX_DB_CONNECT_ONCE == flag)
+		{
+#if defined(HAVE_POSTGRESQL)
+			if (ZBX_DB_RONLY == err)
+				err = ZBX_DB_DOWN;
+#endif
 			break;
+		}
 
 		if (ZBX_DB_FAIL == err || ZBX_DB_CONNECT_EXIT == flag)
 		{
 			zabbix_log(LOG_LEVEL_CRIT, "Cannot connect to the database. Exiting...");
 			exit(EXIT_FAILURE);
 		}
+#if defined(HAVE_POSTGRESQL)
+		if (ZBX_DB_RONLY == err)
+		{
+			if (0 == zbx_cfg_dbhigh->read_only_recoverable && 0 >= retries--)
+			{
+				zabbix_log(LOG_LEVEL_ERR, "database is read-only: Exiting...");
+				exit(EXIT_FAILURE);
+			}
 
-		zabbix_log(LOG_LEVEL_ERR, "database is down: reconnecting in %d seconds", ZBX_DB_WAIT_DOWN);
+			zabbix_log(LOG_LEVEL_ERR, "database is read-only: reconnecting in %d seconds",
+					ZBX_DB_WAIT_DOWN);
+		}
+		else
+#endif
+		{
+			zabbix_log(LOG_LEVEL_ERR, "database is down: reconnecting in %d seconds", ZBX_DB_WAIT_DOWN);
+		}
+
 		connection_failure = 1;
 		zbx_sleep(ZBX_DB_WAIT_DOWN);
 	}
 
 	if (0 != connection_failure)
 	{
+		/* wait ZBX_DB_WAIT_AFTER_RECONNECT to allow HA manager recover */
+		zbx_sleep(ZBX_DB_WAIT_AFTER_RECONNECT);
 		zabbix_log(LOG_LEVEL_ERR, "database connection re-established");
 		connection_failure = 0;
+#if defined(HAVE_POSTGRESQL)
+		zbx_db_clear_last_errcode();
+#endif
 	}
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%d", __func__, err);
 
 	return err;
+#undef ZBX_DB_WAIT_RETRY_COUNT
 }
 
 int	zbx_db_init(zbx_dc_get_nextid_func_t cb_nextid, int log_slow_queries, char **error)
@@ -1389,6 +1430,22 @@ void	zbx_db_add_condition_alloc(char **sql, size_t *sql_alloc, size_t *sql_offse
 #endif
 }
 
+void	add_batch_select_condition(char **sql, size_t *sql_alloc, size_t *sql_offset, const char* column,
+		const zbx_vector_uint64_t *itemids, int *index)
+{
+#define ZBX_SELECT_BATCH_SIZE	1000
+	int	new_index = *index + ZBX_SELECT_BATCH_SIZE;
+#undef ZBX_LLD_ITEMS_BATCH_SIZE
+
+	if (new_index > itemids->values_num)
+		new_index = itemids->values_num;
+
+	zbx_db_add_condition_alloc(sql, sql_alloc, sql_offset, column,
+			itemids->values + *index, new_index - *index);
+
+	*index = new_index;
+}
+
 /*********************************************************************************
  *                                                                               *
  * Purpose: This function is similar to the zbx_db_add_condition_alloc(), except *
@@ -1709,7 +1766,7 @@ const char	*zbx_db_sql_id_cmp(zbx_uint64_t id)
  * Purpose: execute a set of SQL statements IF it is big enough               *
  *                                                                            *
  ******************************************************************************/
-int	zbx_db_execute_overflowed_sql(char **sql, size_t *sql_alloc, size_t *sql_offset)
+static int	db_execute_overflowed_sql(char **sql, size_t *sql_alloc, size_t *sql_offset, const char *clause)
 {
 	int	ret = SUCCEED;
 
@@ -1719,10 +1776,15 @@ int	zbx_db_execute_overflowed_sql(char **sql, size_t *sql_alloc, size_t *sql_off
 		if (',' == (*sql)[*sql_offset - 1])
 		{
 			(*sql_offset)--;
+
+			if (NULL != clause)
+				zbx_strcpy_alloc(sql, sql_alloc, sql_offset, clause);
+
 			zbx_strcpy_alloc(sql, sql_alloc, sql_offset, ";\n");
 		}
 #else
 		ZBX_UNUSED(sql_alloc);
+		ZBX_UNUSED(clause);
 #endif
 #if defined(HAVE_ORACLE) && 0 == ZBX_MAX_OVERFLOW_SQL_SIZE
 		/* make sure we are not called twice without */
@@ -1749,6 +1811,16 @@ int	zbx_db_execute_overflowed_sql(char **sql, size_t *sql_alloc, size_t *sql_off
 	}
 
 	return ret;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: execute a set of SQL statements IF it is big enough               *
+ *                                                                            *
+ ******************************************************************************/
+int	zbx_db_execute_overflowed_sql(char **sql, size_t *sql_alloc, size_t *sql_offset)
+{
+	return db_execute_overflowed_sql(sql, sql_alloc, sql_offset, NULL);
 }
 
 /******************************************************************************
@@ -2293,10 +2365,9 @@ void	zbx_db_select_uint64(const char *sql, zbx_vector_uint64_t *ids)
 	zbx_vector_uint64_sort(ids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
 }
 
-int	zbx_db_prepare_multiple_query(const char *query, const char *field_name, zbx_vector_uint64_t *ids, char **sql,
-		size_t	*sql_alloc, size_t *sql_offset)
+static int	db_prepare_multiple_query(const char *query, const char *field_name, const zbx_vector_uint64_t *ids,
+		char **sql, size_t *sql_alloc, size_t *sql_offset)
 {
-#define ZBX_MAX_IDS	950
 	int	i, ret = SUCCEED;
 
 	for (i = 0; i < ids->values_num; i += ZBX_MAX_IDS)
@@ -2313,7 +2384,45 @@ int	zbx_db_prepare_multiple_query(const char *query, const char *field_name, zbx
 	return ret;
 }
 
-int	zbx_db_execute_multiple_query(const char *query, const char *field_name, zbx_vector_uint64_t *ids)
+static int	db_prepare_multiple_query_str(const char *query, const char *field_name, const zbx_vector_uint64_t *ids,
+		char **sql, size_t *sql_alloc, size_t *sql_offset)
+{
+	int			i, j, ret = SUCCEED;
+	zbx_vector_str_t	str_ids;
+
+	zbx_vector_str_create(&str_ids);
+
+	for (i = 0; i < ids->values_num; i += ZBX_MAX_IDS)
+	{
+		int	batch_size = MIN(ZBX_MAX_IDS, ids->values_num - i);
+
+		for (j = i; j < i + batch_size; j++)
+			zbx_vector_str_append(&str_ids, zbx_dsprintf(NULL, ZBX_FS_UI64, ids->values[j]));
+
+		zbx_strcpy_alloc(sql, sql_alloc, sql_offset, query);
+		zbx_db_add_str_condition_alloc(sql, sql_alloc, sql_offset, field_name, (const char**)str_ids.values,
+				batch_size);
+		zbx_strcpy_alloc(sql, sql_alloc, sql_offset, ";\n");
+
+		zbx_vector_str_clear_ext(&str_ids, zbx_str_free);
+
+		if (SUCCEED != (ret = zbx_db_execute_overflowed_sql(sql, sql_alloc, sql_offset)))
+			break;
+	}
+
+	zbx_vector_str_destroy(&str_ids);
+
+	return ret;
+}
+
+int	zbx_db_prepare_multiple_query(const char *query, const char *field_name, const zbx_vector_uint64_t *ids,
+		char **sql, size_t *sql_alloc, size_t *sql_offset)
+{
+	return db_prepare_multiple_query(query, field_name, ids, sql, sql_alloc, sql_offset);
+}
+
+static int	db_execute_multiple_query(const char *query, const char *field_name, const zbx_vector_uint64_t *ids,
+		int as_str)
 {
 	char	*sql = NULL;
 	size_t	sql_alloc = ZBX_KIBIBYTE, sql_offset = 0;
@@ -2323,7 +2432,12 @@ int	zbx_db_execute_multiple_query(const char *query, const char *field_name, zbx
 
 	zbx_db_begin_multiple_update(&sql, &sql_alloc, &sql_offset);
 
-	ret = zbx_db_prepare_multiple_query(query, field_name, ids, &sql, &sql_alloc, &sql_offset);
+	if (1 == as_str)
+	{
+		ret = db_prepare_multiple_query_str(query, field_name, ids, &sql, &sql_alloc, &sql_offset);
+	}
+	else
+		ret = db_prepare_multiple_query(query, field_name, ids, &sql, &sql_alloc, &sql_offset);
 
 	if (SUCCEED == ret && sql_offset > 16)	/* in ORACLE always present begin..end; */
 	{
@@ -2336,6 +2450,16 @@ int	zbx_db_execute_multiple_query(const char *query, const char *field_name, zbx
 	zbx_free(sql);
 
 	return ret;
+}
+
+int	zbx_db_execute_multiple_query(const char *query, const char *field_name, const zbx_vector_uint64_t *ids)
+{
+	return db_execute_multiple_query(query, field_name, ids, 0);
+}
+
+int	zbx_db_execute_multiple_query_str(const char *query, const char *field_name, const zbx_vector_uint64_t *ids)
+{
+	return db_execute_multiple_query(query, field_name, ids, 1);
 }
 
 #if defined(HAVE_MYSQL) || defined(HAVE_POSTGRESQL)
@@ -2651,6 +2775,8 @@ static char	*zbx_db_format_values(zbx_db_field_t **fields, const zbx_db_value_t 
  ******************************************************************************/
 void	zbx_db_insert_clean(zbx_db_insert_t *self)
 {
+	zbx_free(self->clause);
+
 	for (int i = 0; i < self->rows.values_num; i++)
 	{
 		zbx_db_value_t	*row = self->rows.values[i];
@@ -2714,6 +2840,7 @@ void	zbx_db_insert_prepare_dyn(zbx_db_insert_t *self, const zbx_db_table_t *tabl
 
 	self->autoincrement = -1;
 	self->lastid = 0;
+	self->clause = NULL;
 
 	zbx_vector_db_field_ptr_create(&self->fields);
 	zbx_vector_db_value_ptr_create(&self->rows);
@@ -3186,7 +3313,7 @@ retry_oracle:
 
 		zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, ")" ZBX_ROW_DL);
 
-		if (SUCCEED != (ret = zbx_db_execute_overflowed_sql(&sql, &sql_alloc, &sql_offset)))
+		if (SUCCEED != (ret = db_execute_overflowed_sql(&sql, &sql_alloc, &sql_offset, self->clause)))
 			goto out;
 	}
 
@@ -3196,6 +3323,9 @@ retry_oracle:
 		if (',' == sql[sql_offset - 1])
 		{
 			sql_offset--;
+			if (NULL != self->clause)
+				zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, self->clause);
+
 			zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, ";\n");
 		}
 #	endif
@@ -3245,6 +3375,18 @@ void	zbx_db_insert_autoincrement(zbx_db_insert_t *self, const char *field_name)
 
 	THIS_SHOULD_NEVER_HAPPEN;
 	exit(EXIT_FAILURE);
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: adds clause to insert statement                                   *
+ *                                                                            *
+ * Parameters: self - [IN] the bulk insert data                               *
+ *                                                                            *
+ ******************************************************************************/
+void	zbx_db_insert_clause(zbx_db_insert_t *self, const char *clause)
+{
+	self->clause = zbx_strdup(self->clause, clause);
 }
 
 /******************************************************************************
@@ -3788,3 +3930,5 @@ clean:
 	return ret;
 }
 #endif /* defined(HAVE_ORACLE) */
+
+#undef ZBX_MAX_IDS

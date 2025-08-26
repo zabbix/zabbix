@@ -869,7 +869,7 @@ class CItemPrototype extends CItemGeneral {
 	/**
 	 * @inheritDoc
 	 */
-	protected static function inherit(array $items, array $db_items = [], array $hostids = null,
+	protected static function inherit(array $items, array $db_items = [], ?array $hostids = null,
 			bool $is_dep_items = false): void {
 		$tpl_links = self::getTemplateLinks($items, $hostids);
 
@@ -1526,10 +1526,6 @@ class CItemPrototype extends CItemGeneral {
 
 		self::deleteAffectedTriggers($del_itemids);
 
-		DB::delete('graphs_items', ['itemid' => $del_itemids]);
-		DB::delete('widget_field', ['value_itemid' => $del_itemids]);
-		DB::delete('item_discovery', ['itemid' => $del_itemids]);
-		DB::delete('item_parameter', ['itemid' => $del_itemids]);
 		DB::delete('item_preproc', ['itemid' => $del_itemids]);
 		DB::delete('item_tag', ['itemid' => $del_itemids]);
 		DB::update('items', [

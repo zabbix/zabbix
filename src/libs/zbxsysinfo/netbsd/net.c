@@ -12,31 +12,52 @@
 ** If not, see <https://www.gnu.org/licenses/>.
 **/
 
+#include <net/route.h>
+#include <net/if.h>
+#include <net/if_dl.h>
+#include <net/if_types.h>
+
 #include "zbxsysinfo.h"
 #include "../sysinfo.h"
 
 #include "zbxjson.h"
 
-static struct nlist kernel_symbols[] =
+static void	get_rtaddrs(int addrs, struct sockaddr *sa, struct sockaddr **rti_info)
 {
-	{"_ifnet", N_UNDF, 0, 0, 0},
-	{"_tcbtable", N_UNDF, 0, 0, 0},
-	{NULL, 0, 0, 0, 0}
-};
+	int i;
+
+	for (i = 0; i < RTAX_MAX; i++)
+	{
+		if (addrs & (1 << i))
+		{
+			rti_info[i] = sa;
+			sa = (struct sockaddr *)((char *)(sa) + RT_ROUNDUP(sa->sa_len));
+		}
+		else
+			rti_info[i] = NULL;
+	}
+}
 
 static int	get_ifdata(const char *if_name,
-		zbx_uint64_t *ibytes, zbx_uint64_t *ipackets, zbx_uint64_t *ierrors, zbx_uint64_t *idropped,
-		zbx_uint64_t *obytes, zbx_uint64_t *opackets, zbx_uint64_t *oerrors,
-		zbx_uint64_t *tbytes, zbx_uint64_t *tpackets, zbx_uint64_t *terrors,
-		zbx_uint64_t *icollisions, char **error)
+				zbx_uint64_t *ibytes, zbx_uint64_t *ipackets,
+				zbx_uint64_t *ierrors, zbx_uint64_t *idropped,
+				zbx_uint64_t *obytes, zbx_uint64_t *opackets,
+				zbx_uint64_t *oerrors, zbx_uint64_t *tbytes,
+				zbx_uint64_t *tpackets, zbx_uint64_t *terrors,
+				zbx_uint64_t *icollisions, char **error)
 {
-#define IFNET_ID 0
-	struct ifnet_head	head;
-	struct ifnet		*ifp;
-	struct ifnet		v;
-
-	kvm_t	*kp;
-	int	ret = SYSINFO_RET_FAIL;
+	static size_t		olen;
+	static char		*buf = NULL;
+	int			ret = SYSINFO_RET_FAIL;
+	int			mib[6] = { CTL_NET, AF_ROUTE, 0, 0, NET_RT_IFLIST, 0 };
+	size_t			len;
+	char			name[IFNAMSIZ + 1];
+	char			*next, *end, *cp;
+	struct if_msghdr	*ifm;
+	struct rt_msghdr	*rtm;
+	struct if_data		*ifd = NULL;
+	struct sockaddr		*sa, *rti_info[RTAX_MAX];
+	struct sockaddr_dl	*sdl;
 
 	if (NULL == if_name || '\0' == *if_name)
 	{
@@ -44,101 +65,94 @@ static int	get_ifdata(const char *if_name,
 		return FAIL;
 	}
 
-	if (NULL == (kp = kvm_open(NULL, NULL, NULL, O_RDONLY, NULL))) /* requires root privileges */
+	if (-1 == sysctl(mib, 6, NULL, &len, NULL, 0))
+		return FAIL;
+
+	if (len > olen)
 	{
-		*error = zbx_strdup(NULL, "Cannot obtain a descriptor to access kernel virtual memory.");
+		zbx_free(buf);
+
+		if (NULL == (buf = zbx_malloc(buf, len)))
+		{
+			*error = zbx_strdup(NULL, "sysctl get-length failed");
+			return FAIL;
+		}
+
+		olen = len;
+	}
+
+	if (-1 == sysctl(mib, 6, buf, &len, NULL, 0))
+	{
+		*error = zbx_strdup(NULL, "sysctl get-if-list failed");
 		return FAIL;
 	}
 
-	if (N_UNDF == kernel_symbols[IFNET_ID].n_type)
-		if (0 != kvm_nlist(kp, &kernel_symbols[0]))
-			kernel_symbols[IFNET_ID].n_type = N_UNDF;
-
-	if (N_UNDF != kernel_symbols[IFNET_ID].n_type)
+	for (next = buf, end = buf + len; next < end; next += rtm->rtm_msglen)
 	{
-		int	len = sizeof(struct ifnet_head);
+		rtm = (struct rt_msghdr *)next;
+		if (RTM_VERSION != rtm->rtm_version)
+			continue;
 
-		if (kvm_read(kp, kernel_symbols[IFNET_ID].n_value, &head, len) >= len)
-		{
-			len = sizeof(struct ifnet);
+		if (RTM_IFINFO != rtm->rtm_type)
+			continue;
 
-			/* if_ibytes;		total number of octets received */
-			/* if_ipackets;		packets received on interface */
-			/* if_ierrors;		input errors on interface */
-			/* if_iqdrops;		dropped on input, this interface */
-			/* if_obytes;		total number of octets sent */
-			/* if_opackets;		packets sent on interface */
-			/* if_oerrors;		output errors on interface */
-			/* if_collisions;	collisions on csma interfaces */
+		ifm = (struct if_msghdr *)next;
+		ifd = &ifm->ifm_data;
+		sa = (struct sockaddr *)(ifm + 1);
+		get_rtaddrs(ifm->ifm_addrs, sa, rti_info);
 
-			if (ibytes)
-				*ibytes = 0;
-			if (ipackets)
-				*ipackets = 0;
-			if (ierrors)
-				*ierrors = 0;
-			if (idropped)
-				*idropped = 0;
-			if (obytes)
-				*obytes = 0;
-			if (opackets)
-				*opackets = 0;
-			if (oerrors)
-				*oerrors = 0;
-			if (tbytes)
-				*tbytes = 0;
-			if (tpackets)
-				*tpackets = 0;
-			if (terrors)
-				*terrors = 0;
-			if (icollisions)
-				*icollisions = 0;
+		sdl = (struct sockaddr_dl *)rti_info[RTAX_IFP];
 
-			for (ifp = head.tqh_first; ifp; ifp = v.if_list.tqe_next)
-			{
-				if (kvm_read(kp, (u_long)ifp, &v, len) < len)
-					break;
+		memset(name, 0, sizeof(name));
+		if (IFNAMSIZ <= sdl->sdl_nlen)
+			memcpy(name, sdl->sdl_data, IFNAMSIZ - 1);
+		else if (0 < sdl->sdl_nlen)
+			memcpy(name, sdl->sdl_data, sdl->sdl_nlen);
 
-				if (0 == strcmp(if_name, v.if_xname))
-				{
-					if (ibytes)
-						*ibytes += v.if_ibytes;
-					if (ipackets)
-						*ipackets += v.if_ipackets;
-					if (ierrors)
-						*ierrors += v.if_ierrors;
-					if (idropped)
-						*idropped += v.if_iqdrops;
-					if (obytes)
-						*obytes += v.if_obytes;
-					if (opackets)
-						*opackets += v.if_opackets;
-					if (oerrors)
-						*oerrors += v.if_oerrors;
-					if (tbytes)
-						*tbytes += v.if_ibytes + v.if_obytes;
-					if (tpackets)
-						*tpackets += v.if_ipackets + v.if_opackets;
-					if (terrors)
-						*terrors += v.if_ierrors + v.if_oerrors;
-					if (icollisions)
-						*icollisions += v.if_collisions;
-					ret = SYSINFO_RET_OK;
-				}
-			}
-		}
+		if (0 != strcmp(name, if_name))
+			continue;
+
+		/*
+		 * ifi_ibytes		total number of octets received
+		 * ifi_ipackets		packets received on interface
+		 * ifi_ierrors		input errors on interface
+		 * ifi_iqdrops		dropped on input, this interface
+		 * ifi_obytes		total number of octets sent
+		 * ifi_opackets		packets sent on interface
+		 * ifi_oerrors		output errors on interface
+		 * ifi_collisions	collisions on csma interfaces
+		 */
+
+		if (ibytes)
+			*ibytes = ifd->ifi_ibytes;
+		if (ipackets)
+			*ipackets = ifd->ifi_ipackets;
+		if (ierrors)
+			*ierrors = ifd->ifi_ierrors;
+		if (idropped)
+			*idropped = ifd->ifi_iqdrops;
+		if (obytes)
+			*obytes = ifd->ifi_obytes;
+		if (opackets)
+			*opackets = ifd->ifi_opackets;
+		if (oerrors)
+			*oerrors = ifd->ifi_oerrors;
+		if (tbytes)
+			*tbytes = ifd->ifi_ibytes + ifd->ifi_obytes;
+		if (tpackets)
+			*tpackets = ifd->ifi_ipackets + ifd->ifi_opackets;
+		if (terrors)
+			*terrors = ifd->ifi_ierrors + ifd->ifi_oerrors;
+		if (icollisions)
+			*icollisions = ifd->ifi_collisions;
+
+		ret = SYSINFO_RET_OK;
 	}
 
-	kvm_close(kp);
-
-	if (SYSINFO_RET_FAIL == ret)
-	{
+	if (SYSINFO_RET_OK != ret)
 		*error = zbx_strdup(NULL, "Cannot find information for this network interface.");
-		return SYSINFO_RET_FAIL;
-	}
 
 	return ret;
-#undef IFNET_ID
 }
 
 int	net_if_in(AGENT_REQUEST *request, AGENT_RESULT *result)

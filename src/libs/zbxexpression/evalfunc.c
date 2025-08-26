@@ -18,6 +18,7 @@
 
 #include "zbxregexp.h"
 #include "zbxcachevalue.h"
+#include "zbxcachehistory.h"
 #include "zbxtrends.h"
 #include "anomalystl.h"
 #include "zbxnum.h"
@@ -28,6 +29,7 @@
 #include "zbxdb.h"
 #include "zbxdbhigh.h"
 #include "zbxeval.h"
+#include "zbxtime.h"
 
 #define ZBX_VALUEMAP_TYPE_MATCH			0
 #define ZBX_VALUEMAP_TYPE_GREATER_OR_EQUAL	1
@@ -319,7 +321,7 @@ static void	add_value_suffix(char *value, size_t max_len, const char *units, uns
 			if (0 == strcmp(units, "unixtime"))
 			{
 				time = (time_t)atol(value);
-				local_time = localtime(&time);
+				local_time = zbx_localtime(&time, NULL);
 				strftime(value, max_len, "%Y.%m.%d %H:%M:%S", local_time);
 				break;
 			}
@@ -1741,7 +1743,8 @@ static int	evaluate_NODATA(zbx_variant_t *value, const zbx_dc_evaluate_item_t *i
 			goto out;
 		}
 
-		if (0 != (nodata_win.flags & ZBX_PROXY_SUPPRESS_ACTIVE))
+		if (0 != (nodata_win.flags & ZBX_PROXY_SUPPRESS_ACTIVE) || (0 != item->proxyid && 0 != lazy &&
+				SUCCEED == zbx_hc_is_itemid_cached(item->itemid)))
 		{
 			*error = zbx_strdup(*error, "historical data transfer from proxy is still in progress");
 			goto out;

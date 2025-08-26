@@ -111,7 +111,7 @@ func (c *client) addRequest(p *pluginAgent, r *Request, timeout int, sink plugin
 	}
 
 	// list of created tasks to be queued
-	tasks := make([]performer, 0, 6)
+	tasks := make([]Performer, 0, 6)
 
 	// handle Collector interface
 	if col, ok := p.impl.(plugin.Collector); ok {
@@ -169,7 +169,7 @@ func (c *client) addRequest(p *pluginAgent, r *Request, timeout int, sink plugin
 					output:   sink,
 				}
 
-				if scheduling == false && (firstActiveChecksRefreshed == true || p.forceActiveChecksOnStart != 0) {
+				if !scheduling && !firstActiveChecksRefreshed && p.forceActiveChecksOnStart {
 					task.scheduled = time.Unix(now.Unix(), priorityExporterTaskNs)
 				} else if err = task.reschedule(now); err != nil {
 					return

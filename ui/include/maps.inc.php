@@ -295,7 +295,7 @@ function addElementNames(array &$selements) {
  *
  * @return array
  */
-function getSelementInfo(array $i, int $host_count = 0, int $show_unack = null): array {
+function getSelementInfo(array $i, int $host_count = 0, ?int $show_unack = null): array {
 	if ($i['elementtype'] == SYSMAP_ELEMENT_TYPE_IMAGE) {
 		return [
 			'iconid' => $i['iconid_off'],
@@ -763,28 +763,8 @@ function getSelementsInfo(array $sysmap, array $options = []): array {
 		}
 
 		$host_count = count($selement['hosts']);
-
-		if ($selement['elementtype'] == SYSMAP_ELEMENT_TYPE_TRIGGER
-				|| $selement['elementtype'] == SYSMAP_ELEMENT_TYPE_MAP) {
-			$trigger_hosts = [];
-			foreach ($selement['triggers'] as $trigger) {
-				foreach ($trigger['hosts'] as $host) {
-					if (!array_key_exists($host['hostid'], $trigger_hosts)
-							&& !array_key_exists($host['hostid'], $selement['hosts'])) {
-						$trigger_hosts[$host['hostid']] = true;
-						$host_count++;
-
-						if ($host['status'] == HOST_STATUS_MONITORED
-								&& $host['maintenance_status'] == HOST_MAINTENANCE_STATUS_ON
-								&& ($selement['elementtype'] == SYSMAP_ELEMENT_TYPE_TRIGGER
-									|| ($selement['elementtype'] == SYSMAP_ELEMENT_TYPE_MAP
-										&& array_key_exists(SYSMAP_ELEMENT_TYPE_TRIGGER, $trigger['source'])))) {
-							$selement_info['maintenance']++;
-						}
-					}
-				}
-			}
-		}
+		$trigger_hosts = [];
+		$selement_info['maintenance'] = getTriggerMaintenance($selement, $selement_info, $sysmaps_data, $trigger_hosts);
 
 		foreach ($selement['hosts'] as $hostid) {
 			$host = $hosts[$hostid];
@@ -919,7 +899,41 @@ function getSelementsInfo(array $sysmap, array $options = []): array {
 	return $info;
 }
 
-function getElementHosts($selement, $sysmaps_data, $hosts_by_groupids) {
+function getTriggerMaintenance($selement, $selement_info, $sysmaps_data, &$trigger_hosts): int {
+	if ($selement['elementtype'] == SYSMAP_ELEMENT_TYPE_TRIGGER) {
+		foreach ($selement['triggers'] as $trigger) {
+			foreach ($trigger['hosts'] as $host) {
+				if (!array_key_exists($host['hostid'], $trigger_hosts)
+						&& !array_key_exists($host['hostid'], $selement['hosts'])
+						&& $host['status'] == HOST_STATUS_MONITORED
+						&& $host['maintenance_status'] == HOST_MAINTENANCE_STATUS_ON) {
+					$selement_info['maintenance']++;
+				}
+
+				$trigger_hosts[$host['hostid']] = true;
+			}
+		}
+	}
+	elseif ($selement['elementtype'] == SYSMAP_ELEMENT_TYPE_MAP) {
+		$sysmapid = $selement['elements'][0]['sysmapid'];
+
+		if (array_key_exists($sysmapid, $sysmaps_data)) {
+			foreach ($sysmaps_data[$sysmapid]['selements'] as $nested_element) {
+				foreach ($nested_element['hosts'] as $key => $host) {
+					$trigger_hosts[$key] = true;
+				}
+
+				$selement_info['maintenance'] = getTriggerMaintenance($nested_element, $selement_info, $sysmaps_data,
+					$trigger_hosts
+				);
+			}
+		}
+	}
+
+	return $selement_info['maintenance'];
+}
+
+function getElementHosts($selement, $sysmaps_data, $hosts_by_groupids): array {
 	$host_ids = [];
 
 	if ($selement['elementtype'] == SYSMAP_ELEMENT_TYPE_HOST) {

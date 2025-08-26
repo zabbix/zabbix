@@ -285,7 +285,7 @@ int	item_preproc_delta(unsigned char value_type, zbx_variant_t *value, const zbx
 						zbx_variant_type_desc(value),
 						zbx_get_variant_type_desc(ZBX_VARIANT_DBL));
 
-				zabbix_log(LOG_LEVEL_CRIT, *errmsg);
+				zabbix_log(LOG_LEVEL_CRIT, "%s", *errmsg);
 				THIS_SHOULD_NEVER_HAPPEN;
 				return FAIL;
 			}
@@ -296,7 +296,7 @@ int	item_preproc_delta(unsigned char value_type, zbx_variant_t *value, const zbx
 						zbx_variant_type_desc(history_value_out),
 						zbx_get_variant_type_desc(ZBX_VARIANT_DBL));
 
-				zabbix_log(LOG_LEVEL_CRIT, *errmsg);
+				zabbix_log(LOG_LEVEL_CRIT, "%s", *errmsg);
 				THIS_SHOULD_NEVER_HAPPEN;
 				return FAIL;
 			}
@@ -311,7 +311,7 @@ int	item_preproc_delta(unsigned char value_type, zbx_variant_t *value, const zbx
 						zbx_variant_type_desc(value),
 						zbx_get_variant_type_desc(ZBX_VARIANT_UI64));
 
-				zabbix_log(LOG_LEVEL_CRIT, *errmsg);
+				zabbix_log(LOG_LEVEL_CRIT, "%s", *errmsg);
 				THIS_SHOULD_NEVER_HAPPEN;
 				return FAIL;
 			}
@@ -322,7 +322,7 @@ int	item_preproc_delta(unsigned char value_type, zbx_variant_t *value, const zbx
 						zbx_variant_type_desc(history_value_out),
 						zbx_get_variant_type_desc(ZBX_VARIANT_UI64));
 
-				zabbix_log(LOG_LEVEL_CRIT, *errmsg);
+				zabbix_log(LOG_LEVEL_CRIT, "%s", *errmsg);
 				THIS_SHOULD_NEVER_HAPPEN;
 				return FAIL;
 			}
@@ -1079,16 +1079,18 @@ out:
  *                                                                            *
  * Purpose: checks error for pattern matching regular expression              *
  *                                                                            *
- * Parameters: value  - [IN] value to process                                 *
- *             params - [IN] operation parameters                             *
- *             error  - [IN/OUT]                                              *
+ * Parameters: value            - [IN] value to process                       *
+ *             params           - [IN] operation parameters                   *
+ *             output_template  - [IN] the output string template             *
+ *             error            - [OUT] matched error using output template   *
  *                                                                            *
  * Return value: FAIL - preprocessing step error                              *
  *               SUCCEED - preprocessing step succeeded, error may contain    *
  *                         extracted error message                            *
  *                                                                            *
  ******************************************************************************/
-int	item_preproc_check_error_regex(const zbx_variant_t *value, const char *params, char **error)
+int	item_preproc_check_error_regex(const zbx_variant_t *value, const char *params, const char *output_template,
+		char **error)
 {
 #define ZBX_PP_MATCH_TYPE_MATCHES	0
 #define ZBX_PP_MATCH_TYPE_ANY		-1
@@ -1118,8 +1120,8 @@ int	item_preproc_check_error_regex(const zbx_variant_t *value, const char *param
 			goto out;
 		}
 
-		if (SUCCEED == zbx_mregexp_sub_precompiled(value->data.str, regex, *error, ZBX_MAX_RECV_DATA_SIZE,
-				&out))
+		if (SUCCEED == zbx_mregexp_sub_precompiled(value->data.str, regex, output_template,
+				ZBX_MAX_RECV_DATA_SIZE, &out))
 		{
 			if (NULL != out)
 			{
@@ -1296,6 +1298,16 @@ int	item_preproc_script(zbx_es_t *es, zbx_variant_t *value, const char *params, 
 
 		if (NULL != output)
 			zbx_variant_set_str(value, output);
+
+		if (ZBX_MEBIBYTE < zbx_es_total_alloc(es))
+		{
+			if (SUCCEED != zbx_es_destroy_env(es, &error))
+			{
+				zabbix_log(LOG_LEVEL_WARNING,
+						"Cannot destroy embedded scripting engine environment: %s", error);
+				zbx_free(error);
+			}
+		}
 
 		return SUCCEED;
 	}

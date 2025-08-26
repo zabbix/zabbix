@@ -588,6 +588,8 @@ class CUserDirectory extends CApiService {
 			self::exception(ZBX_API_ERROR_PERMISSIONS, _('No permissions to referred object or it does not exist!'));
 		}
 
+		self::addBindPassword($db_userdirectories);
+
 		foreach ($userdirectories as $i => &$userdirectory) {
 			$db_userdirectory = $db_userdirectories[$userdirectory['userdirectoryid']];
 			$userdirectory += [
@@ -618,6 +620,19 @@ class CUserDirectory extends CApiService {
 		self::checkDuplicates($userdirectories, $db_userdirectories);
 		self::checkProvisionGroups($userdirectories, $db_userdirectories);
 		self::checkMediaTypes($userdirectories, $db_userdirectories);
+		self::checkLdapBindPassword($userdirectories, $db_userdirectories);
+	}
+
+	private static function addBindPassword(array &$db_userdirectories): void {
+		$db_bind_passwords = DB::select('userdirectory_ldap', [
+			'output' => ['bind_password'],
+			'filter' => ['userdirectoryid' => array_keys($db_userdirectories)],
+			'preservekeys' => true
+		]);
+
+		foreach ($db_bind_passwords as $db_userdirectoryid => $db_bind_password) {
+			$db_userdirectories[$db_userdirectoryid] += $db_bind_password;
+		}
 	}
 
 	private static function addRequiredFieldsByType(array &$userdirectories, array $db_userdirectories): void {
@@ -794,7 +809,7 @@ class CUserDirectory extends CApiService {
 	 *
 	 * @throws APIException if userdirectory name is not unique.
 	 */
-	private static function checkDuplicates(array $userdirectories, array $db_userdirectories = null): void {
+	private static function checkDuplicates(array $userdirectories, ?array $db_userdirectories = null): void {
 		$names = [];
 
 		foreach ($userdirectories as $userdirectory) {
@@ -825,7 +840,7 @@ class CUserDirectory extends CApiService {
 		}
 	}
 
-	private static function checkProvisionGroups(array $userdirectories, array $db_userdirectories = null): void {
+	private static function checkProvisionGroups(array $userdirectories, ?array $db_userdirectories = null): void {
 		$role_indexes = [];
 		$user_group_indexes = [];
 
@@ -902,7 +917,7 @@ class CUserDirectory extends CApiService {
 		}
 	}
 
-	private static function checkMediaTypes(array $userdirectories, array $db_userdirectories = null): void {
+	private static function checkMediaTypes(array $userdirectories, ?array $db_userdirectories = null): void {
 		$media_indexes = [];
 
 		foreach ($userdirectories as $i1 => $userdirectory) {
@@ -939,6 +954,24 @@ class CUserDirectory extends CApiService {
 
 				self::exception(ZBX_API_ERROR_PARAMETERS, _s('Invalid parameter "%1$s": %2$s.',
 					'/'.($i1 + 1).'/provision_media/'.($i2 + 1).'/mediatypeid', _('object does not exist')
+				));
+			}
+		}
+	}
+
+	private static function checkLdapBindPassword(array $userdirectories, array $db_userdirectories): void {
+		foreach ($userdirectories as $i => $userdirectory) {
+			if ($userdirectory['idp_type'] != IDP_TYPE_LDAP) {
+				continue;
+			}
+
+			$db_userdirectory = $db_userdirectories[$userdirectory['userdirectoryid']];
+
+			if (array_key_exists('host', $userdirectory) && $userdirectory['host'] !== $db_userdirectory['host']
+					&& !array_key_exists('bind_password', $userdirectory)
+					&& $db_userdirectory['bind_password'] !== '') {
+				self::exception(ZBX_API_ERROR_PARAMETERS, _s('Invalid parameter "%1$s": %2$s.', '/'.($i + 1),
+					_s('the parameter "%1$s" is missing', 'bind_password')
 				));
 			}
 		}
@@ -1245,7 +1278,7 @@ class CUserDirectory extends CApiService {
 		}
 	}
 
-	private static function updateProvisionMedia(array &$userdirectories, array $db_userdirectories = null): void {
+	private static function updateProvisionMedia(array &$userdirectories, ?array $db_userdirectories = null): void {
 		$ins_provision_medias = [];
 		$upd_provision_medias = [];
 		$del_provision_mediaids = [];
@@ -1310,7 +1343,7 @@ class CUserDirectory extends CApiService {
 		unset($userdirectory);
 	}
 
-	private static function updateProvisionGroups(array &$userdirectories, array $db_userdirectories = null): void {
+	private static function updateProvisionGroups(array &$userdirectories, ?array $db_userdirectories = null): void {
 		$ins_provision_groups = [];
 		$upd_provision_groups = [];
 		$del_provision_groupids = [];

@@ -14,7 +14,7 @@ dnl
 
 dnl Process this file with autoconf to produce a configure script.
 
-AC_INIT([Zabbix],[7.0.9rc1])
+AC_INIT([Zabbix],[7.0.18])
 AC_CONFIG_SRCDIR(src/zabbix_server/server.c)
 AM_INIT_AUTOMAKE([subdir-objects tar-pax])
 
@@ -36,6 +36,31 @@ dnl *****************************************************************
 
 AC_PROG_CC([cc c99 gcc clang])
 AM_PROG_CC_C_O
+
+dnl A C99 compliant compiler must support this.
+dnl
+dnl The implementations differ across compilers and platforms.
+dnl GCC allocates the storage blocks in bss during compilation,
+dnl while others elect for the runtime loader to handle the allocation.
+dnl
+dnl This means the proper test would be to run the executable,
+dnl but that would make no sense when cross-compiling,
+dnl so the best we can do is just reject compilers that don't even
+dnl recognize the keyword.
+AC_MSG_CHECKING(whether compiler supports thread-local storage)
+AC_COMPILE_IFELSE([AC_LANG_PROGRAM([[
+    #include <stdio.h>
+    ]], [[
+    static __thread int a = 0;
+    (void)a;
+    ]])],
+    [
+        AC_MSG_RESULT(yes)
+    ], [
+        AC_MSG_RESULT(no)
+        AC_MSG_ERROR([compiler does not recognize the __thread keyword])
+    ]
+)
 
 dnl *****************************************************************
 dnl *                                                               *
@@ -628,11 +653,6 @@ AC_MSG_RESULT(yes)],[AC_MSG_RESULT(no)
 ])
 LDFLAGS="$saved_LDFLAGS"
 
-AC_MSG_CHECKING(for '__thread' compiler support)
-AC_COMPILE_IFELSE([AC_LANG_PROGRAM([[#include <stdio.h>]], [[static __thread int a = 0;]])],[AC_DEFINE(HAVE_THREAD_LOCAL,1,Define to 1 if compiler keyword '__thread' supported.)
-AC_MSG_RESULT(yes)],[AC_MSG_RESULT(no)
-HAVE_THREAD_LOCAL="no"])
-
 AC_MSG_CHECKING(for field updates in struct vminfo_t)
 AC_COMPILE_IFELSE([AC_LANG_PROGRAM([[
 #include <sys/sysinfo.h>
@@ -1214,7 +1234,6 @@ AC_ARG_ENABLE(agent2,[  --enable-agent2         Turn on build of Zabbix agent 2]
   no)  agent2=no ;;
   *) AC_MSG_ERROR([bad value ${enableval} for --enable-agent2]) ;;
 esac
-test "x$agent2" = "xyes" -a "x$HAVE_THREAD_LOCAL" = "xno" && AC_MSG_ERROR([C compiler is not compatible with agent2 assembly])
 ],
 [agent2=no])
 AM_CONDITIONAL(AGENT2, test "x$agent2" = "xyes")
@@ -1225,7 +1244,6 @@ AC_ARG_ENABLE(webservice,[  --enable-webservice         Turn on build of Zabbix 
   no)  webservice=no ;;
   *) AC_MSG_ERROR([bad value ${enableval} for --enable-webservice]) ;;
 esac
-test "x$webservice" = "xyes" -a "x$HAVE_THREAD_LOCAL" = "xno" && AC_MSG_ERROR([C compiler is not compatible with webservice assembly])
 ],
 [webservice=no])
 AM_CONDITIONAL(WEBSERVICE, test "x$webservice" = "xyes")
@@ -1345,9 +1363,11 @@ if test "x$server" = "xyes" || test "x$proxy" = "xyes"; then
 
 			saved_CPPFLAGS="$CPPFLAGS"
 			saved_LDFLAGS="$LDFLAGS"
+			saved_LIBS="$LIBS"
 
 			CPPFLAGS="$CPPFLAGS $SQLITE3_CPPFLAGS"
-			LDFLAGS="$LDFLAGS $SQLITE3_LDFLAGS $SQLITE3_LIBS"
+			LDFLAGS="$LDFLAGS $SQLITE3_LDFLAGS"
+			LIBS="$LIBS $SQLITE3_LIBS"
 
 			AC_MSG_CHECKING([for function sqlite3_open_v2() in sqlite3.h])
 			AC_LINK_IFELSE([AC_LANG_PROGRAM([[#include <sqlite3.h>]], [[sqlite3 *conn = 0;
@@ -1357,6 +1377,7 @@ if test "x$server" = "xyes" || test "x$proxy" = "xyes"; then
 
 			CPPFLAGS="$saved_CPPFLAGS"
 			LDFLAGS="$saved_LDFLAGS"
+			LIBS="$saved_LIBS"
 		else
 			AC_MSG_ERROR([SQLite3 library not found])
 		fi
@@ -1513,6 +1534,22 @@ if test "x$server" = "xyes" || test "x$proxy" = "xyes"; then
 	fi
 
 	AC_SUBST(ZLIB_CFLAGS)
+
+	dnl Checking for c-ares support
+	ARES_CHECK_CONFIG([no])
+	if test "x$want_ares" = "xyes"; then
+		if test "x$found_ares" != "xyes"; then
+			AC_MSG_ERROR([Unable to use ares (ares check failed)])
+		fi
+		have_ares="yes"
+	fi
+	SERVER_LDFLAGS="$SERVER_LDFLAGS $ARES_LDFLAGS"
+	SERVER_LIBS="$SERVER_LIBS $ARES_LIBS"
+
+	PROXY_LDFLAGS="$PROXY_LDFLAGS $ARES_LDFLAGS"
+	PROXY_LIBS="$PROXY_LIBS $ARES_LIBS"
+
+	AC_SUBST(ARES_CFLAGS)
 
 	dnl Check for 'libpthread' library that supports PTHREAD_PROCESS_SHARED flag
 	LIBPTHREAD_CHECK_CONFIG([no])
@@ -2228,6 +2265,10 @@ fi
 
 if test "x$UNIXODBC_CFLAGS" != "x"; then
 	echo "    unixODBC:              ${UNIXODBC_CFLAGS}"
+fi
+
+if test "x$ARES_CFLAGS" != "x"; then
+	echo "    c-ares:              ${ARES_CFLAGS}"
 fi
 
 if test "x$SNMP_CFLAGS" != "x"; then

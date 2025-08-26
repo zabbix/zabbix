@@ -14,8 +14,8 @@
 **/
 
 
-require_once dirname(__FILE__).'/../../include/CWebTest.php';
-require_once dirname(__FILE__).'/../behaviors/CMessageBehavior.php';
+require_once __DIR__.'/../../include/CWebTest.php';
+require_once __DIR__.'/../behaviors/CMessageBehavior.php';
 
 /**
  * @backup media_type
@@ -109,6 +109,17 @@ class testFormAdministrationMediaTypes extends CWebTest {
 				'type' => MEDIA_TYPE_EXEC,
 				'name' => 'Switch script to webhook with custom params',
 				'exec_path' => 'script3.sh'
+			],
+			[
+				'type' => MEDIA_TYPE_EXEC,
+				'name' => 'Test script',
+				'exec_path' => 'selenium_test_script.sh',
+				'parameters' => [
+					[
+						'sortorder' => '0',
+						'value' => '{ALERT.SUBJECT}'
+					]
+				]
 			]
 		]);
 	}

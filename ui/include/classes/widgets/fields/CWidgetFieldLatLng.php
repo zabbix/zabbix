@@ -26,7 +26,7 @@ class CWidgetFieldLatLng extends CWidgetField {
 	/**
 	 * Latitude, longitude and zoom level input text box widget field.
 	 */
-	public function __construct(string $name, string $label = null) {
+	public function __construct(string $name, ?string $label = null) {
 		parent::__construct($name, $label);
 
 		$this

@@ -14,7 +14,7 @@
 **/
 
 
-require_once dirname(__FILE__).'/../../include/CLegacyWebTest.php';
+require_once __DIR__.'/../../include/CLegacyWebTest.php';
 
 /**
  * @onBefore prepareUserMediaData
@@ -38,14 +38,14 @@ class testPageUsers extends CLegacyWebTest {
 				'userid' => 1,
 				'medias' => [
 					[
-						'mediatypeid' => 10, // Discord.
+						'mediatypeid' => 39, // Discord.
 						'sendto' => 'test@zabbix.com',
 						'active' => MEDIA_TYPE_STATUS_ACTIVE,
 						'severity' => 16,
 						'period' => '1-7,00:00-24:00'
 					],
 					[
-						'mediatypeid' => 12, // Jira.
+						'mediatypeid' => 46, // Jira.
 						'sendto' => 'test_account',
 						'active' => MEDIA_TYPE_STATUS_ACTIVE,
 						'severity' => 63,
@@ -144,10 +144,12 @@ class testPageUsers extends CLegacyWebTest {
 
 	public function testPageUsers_FilterNone() {
 		$this->zbxTestLogin('zabbix.php?action=user.list');
+		$table = $this->query('class:list-table')->asTable()->one();
 		$form = $this->query('name:zbx_filter')->asForm()->waitUntilVisible()->one();
 		$form->query('button:Reset')->waitUntilClickable()->one()->click();
 		$form->fill(['Username' => '1928379128ksdhksdjfh']);
 		$form->submit();
+		$table->waitUntilReloaded();
 		$this->assertFalse($this->query('xpath://div[@class="table-stats"]')->one(false)->isValid());
 		$this->zbxTestTextNotPresent('Displaying 0 of 0 found');
 		$this->zbxTestInputTypeOverwrite('filter_username', '%');

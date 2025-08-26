@@ -140,7 +140,7 @@ func (c *ConnManager) create(uri uri.URI) (*RedisConn, error) {
 	AuthConnFunc := func(scheme, addr string) (conn radix.Conn, err error) {
 		conn, err = radix.Dial(scheme, addr,
 			radix.DialTimeout(c.timeout),
-			radix.DialAuthPass(uri.Password()))
+			radix.DialAuthUser(uri.User(), uri.Password()))
 
 		// Set name for connection. It will be showed in "client list" output.
 		if err == nil {

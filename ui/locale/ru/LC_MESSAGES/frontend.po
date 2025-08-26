@@ -4,7 +4,7 @@ msgstr ""
 "Project-Id-Version: Zabbix 6.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2023-10-19 13:48+0300\n"
-"PO-Revision-Date: 2024-10-16 06:20+0000\n"
+"PO-Revision-Date: 2025-07-14 08:07+0000\n"
 "Last-Translator: Alexey <alexey.pustovalov@zabbix.com>\n"
 "Language-Team: Zabbix translation team\n"
 "Language: ru\n"
@@ -1311,7 +1311,7 @@ msgstr "Все"
 #: app/views/mediatype.list.php:79 app/views/mediatype.list.php:81
 #: app/views/mediatype.list.php:90 app/views/popup.operation.edit.php:160
 msgid "All available"
-msgstr ""
+msgstr "Все доступные"
 
 #: app/views/monitoring.dashboard.view.php:189
 msgid "All dashboards"
@@ -2096,11 +2096,11 @@ msgstr "Ширина рамки"
 
 #: include/classes/api/services/CHost.php:1445
 msgid "Both \"tls_connect\" and \"tls_accept\" fields must be specified when changing settings of connection encryption."
-msgstr ""
+msgstr "При изменении настроек шифрования соединения необходимо указать оба поля: \"tls_connect\" и \"tls_accept\"."
 
 #: include/classes/api/services/CHost.php:1452
 msgid "Both \"tls_psk_identity\" and \"tls_psk\" fields must be specified when changing the PSK for connection encryption."
-msgstr ""
+msgstr "При изменении PSK для шифрования соединения необходимо указать оба поля: «tls_psk_identity» и «tls_psk»."
 
 #: app/controllers/CControllerUserUpdateGeneral.php:105
 msgid "Both passwords must be equal."
@@ -2717,6 +2717,11 @@ msgstr "Невозможно удалить MFA метод по умолчани
 msgid "Cannot delete default user directory."
 msgstr "Не получилось удалить каталог пользователя по умолчанию."
 
+#: include/classes/api/services/CDRule.php:773
+#, c-format
+msgid "Cannot delete discovery check \"%1$s\" of discovery rule \"%2$s\": %3$s."
+msgstr "Невозможно удалить проверку обнаружения \"%1$s\" правила обнаружения \"%2$s\": %3$s."
+
 #: app/controllers/CControllerDiscoveryDelete.php:68 host_discovery.php:390
 #: host_discovery.php:597
 msgid "Cannot delete discovery rule"
@@ -2724,6 +2729,11 @@ msgid_plural "Cannot delete discovery rules"
 msgstr[0] "Не удалось удалить правило обнаружения"
 msgstr[1] "Не удалось удалить правила обнаружения"
 msgstr[2] "Не удалось удалить правила обнаружения"
+
+#: include/classes/api/services/CDRule.php:980
+#, c-format
+msgid "Cannot delete discovery rule \"%1$s\": %2$s."
+msgstr "Невозможно удалить правило обнаружения \"%1$s\": %2$s."
 
 #: app/controllers/CControllerCorrelationDelete.php:68
 msgid "Cannot delete event correlation"
@@ -2753,6 +2763,11 @@ msgstr[0] "Не удалось удалить узел сети"
 msgstr[1] "Не удалось удалить узелы сети"
 msgstr[2] "Не удалось удалить узелы сети"
 
+#: include/classes/api/services/CHost.php:1636
+#, c-format
+msgid "Cannot delete host \"%1$s\": %2$s."
+msgstr "Невозможно удалить хост \"%1$s\": %2$s."
+
 #: include/classes/api/services/CHost.php:1461
 #, c-format
 msgid "Cannot delete host %1$s because maintenance \"%2$s\" must contain at least one host or host group."
@@ -2767,6 +2782,11 @@ msgid_plural "Cannot delete host groups"
 msgstr[0] "Не удалось удалить группу узлов сети"
 msgstr[1] "Не удалось удалить группы узлов сети"
 msgstr[2] "Не удалось удалить групп узлов сети"
+
+#: include/classes/api/services/CHostGroup.php:769
+#, c-format
+msgid "Cannot delete host group \"%1$s\": %2$s."
+msgstr "Невозможно удалить группу хостов \"%1$s\": %2$s."
 
 #: include/classes/api/services/CHostGroup.php:858
 #, c-format
@@ -2925,6 +2945,11 @@ msgstr[0] "Не удалось удалить шаблон"
 msgstr[1] "Не удалось удалить шаблоны"
 msgstr[2] "Не удалось удалить шаблоны"
 
+#: include/classes/api/services/CTemplate.php:809
+#, c-format
+msgid "Cannot delete template \"%1$s\": %2$s."
+msgstr "Не удалось создать шаблон\"%1$s\": %2$s."
+
 #: app/controllers/CControllerTemplateGroupDelete.php:75
 msgid "Cannot delete template group"
 msgid_plural "Cannot delete template groups"
@@ -2962,6 +2987,11 @@ msgstr[0] "Не удалось удалить триггер"
 msgstr[1] "Не удалось удалить триггеры"
 msgstr[2] "Не удалось удалить триггеры"
 
+#: include/classes/api/managers/CTriggerManager.php:126
+#, c-format
+msgid "Cannot delete trigger \"%1$s\": %2$s."
+msgstr "Не удалось удалить триггер \"%1$s\": %2$s."
+
 #: app/controllers/CControllerTriggerPrototypeDelete.php:72
 msgid "Cannot delete trigger prototype"
 msgid_plural "Cannot delete trigger prototypes"
@@ -2991,12 +3021,12 @@ msgstr[2] "Не удалось удалить группы пользовате�
 #: include/classes/api/services/CUserGroup.php:1340
 #, c-format
 msgid "Cannot delete user group \"%1$s\", because it is used by LDAP userdirectory \"%2$s\"."
-msgstr ""
+msgstr "Не удается удалить группу пользователей \"%1$s\", поскольку она используется каталогом пользователей LDAP \"%2$s\"."
 
 #: include/classes/api/services/CUserGroup.php:1335
 #, c-format
 msgid "Cannot delete user group \"%1$s\", because it is used by SAML userdirectory."
-msgstr ""
+msgstr "Невозможно удалить группу пользователей «%1$s», поскольку она используется каталогом пользователей SAML."
 
 #: include/classes/api/services/CUserGroup.php:1397
 #, c-format
@@ -3485,12 +3515,12 @@ msgstr "Не удалось унаследовать LDD правило с кл�
 #: include/classes/api/services/CItemGeneral.php:684
 #, c-format
 msgid "Cannot inherit LLD rules with key \"%1$s\" of both \"%2$s\" and \"%3$s\" templates, because the key must be unique on host \"%4$s\"."
-msgstr ""
+msgstr "Невозможно наследовать правила LLD с ключом \"%1$s\" из обоих шаблонов \"%2$s\" и \"%3$s\", поскольку ключ должен быть уникальным на хосте \"%4$s\"."
 
 #: include/classes/api/services/CItemGeneral.php:685
 #, c-format
 msgid "Cannot inherit LLD rules with key \"%1$s\" of both \"%2$s\" and \"%3$s\" templates, because the key must be unique on template \"%4$s\"."
-msgstr ""
+msgstr "Невозможно наследовать правила заполнения с ключом \"%1$s\" как из шаблонов \"%2$s\", так и \"%3$s\", поскольку ключ должен быть уникальным для шаблона \"%4$s\"."
 
 #: include/classes/api/services/CItemPrototype.php:1220
 #, c-format
@@ -5573,7 +5603,7 @@ msgstr "Создать новое"
 
 #: jsLoader.php:372
 msgid "Create new report"
-msgstr ""
+msgstr "Создать новый отчет"
 
 #: app/views/administration.proxy.list.php:239
 msgid "Create proxy"
@@ -6020,6 +6050,11 @@ msgstr "TLS шифрование базы данных"
 #: include/classes/setup/CSetupWizard.php:1128
 msgid "Database TLS key file"
 msgstr "Файл TLS ключа базы данных"
+
+#: include/classes/api/clients/CLocalApiClient.php:133
+#: include/classes/api/clients/CLocalApiClient.php:147
+msgid "Database error occurred."
+msgstr "Произошла ошибка базы данных."
 
 #: app/partials/administration.system.info.php:130
 msgid "Database history tables use primary key"
@@ -6717,6 +6752,22 @@ msgstr "Удалить веб-сценарий?"
 msgid "Deleted"
 msgstr "Удалено"
 
+#: include/actions.inc.php:143
+msgid "Deleted host"
+msgstr "Удалённый хост"
+
+#: include/actions.inc.php:125
+msgid "Deleted host group"
+msgstr "Удаленная группа хостов"
+
+#: include/actions.inc.php:710
+msgid "Deleted host group(s)"
+msgstr "Удалены группы хостов"
+
+#: include/actions.inc.php:134
+msgid "Deleted trigger"
+msgstr "Удалён триггер"
+
 #: app/views/administration.regex.edit.php:54
 msgid "Delimiter"
 msgstr "Разделитель"
@@ -6842,6 +6893,10 @@ msgstr "Подробности о веб-сценарии"
 #: app/views/administration.housekeeping.edit.php:206
 msgid "Detected TimescaleDB license does not support compression. Compression is supported in TimescaleDB Community Edition."
 msgstr "Обнаруженная лицензия TimescaleDB не поддерживает сжатие. Сжатие поддерживается в TimescaleDB Community Edition."
+
+#: app/views/administration.housekeeping.edit.php:204
+msgid "Detected license does not support compression. Compression is supported in TimescaleDB Community Edition."
+msgstr ""
 
 #: app/controllers/CControllerPopupTriggerExpr.php:1130
 msgid "Detection period"
@@ -7203,6 +7258,10 @@ msgstr "Объект обнаружения"
 msgid "Discovery of VMware clusters, \"url\" - VMware service URL. Returns JSON"
 msgstr "Обнаружение VMware кластеров, \"url\" - URL службы VMware. Возвращает JSON"
 
+#: include/classes/data/CItemData.php:1931
+msgid "Discovery of VMware datastores, \"url\" - VMware service URL, \"filter_uuid\" - one hv uuid or vm uuid (empty by default). Returns JSON"
+msgstr "Обнаружение VMware хранилищ данных, \"url\" - URL службы VMware, \"filter_uuid\" - uuid гипервизора или uuid виртуальной машины (по умолчанию пустой). Возвращает JSON"
+
 #: include/classes/data/CItemData.php:1799
 msgid "Discovery of VMware datastores, \"url\" - VMware service URL. Returns JSON"
 msgstr "Обнаружение VMware хранилищ данных, \"url\" - URL службы VMware. Возвращает JSON"
@@ -7333,7 +7392,7 @@ msgstr "Отображать триггеры в состоянии ОК в те
 
 #: app/views/mediatype.list.php:75
 msgid "Display actions"
-msgstr ""
+msgstr "Отображать действия"
 
 #: app/partials/monitoring.latest.view.html.php:309
 msgid "Display graph"
@@ -7345,7 +7404,7 @@ msgstr "Локальное время"
 
 #: widgets/itemhistory/views/column.edit.php:240
 msgid "Display log time"
-msgstr ""
+msgstr "Отображение времени регистрации"
 
 #: widgets/svggraph/includes/WidgetForm.php:364
 msgid "Display min/avg/max"
@@ -8674,7 +8733,7 @@ msgstr "Фильтр"
 
 #: app/views/mediatype.list.php:76
 msgid "Filter actions by the scope of media type usage:"
-msgstr ""
+msgstr "Фильтр действия по области использования способов оповещения:"
 
 #: app/views/js/popup.tabfilter.edit.js.php:63
 msgid "Filter deleted"
@@ -9520,7 +9579,7 @@ msgstr "Функции истории"
 
 #: app/views/administration.housekeeping.edit.php:218
 msgid "History, trends and audit log compression"
-msgstr ""
+msgstr "Сжатие истории, тенденций и журнала аудита"
 
 #: include/classes/html/CTabFilter.php:167
 msgid "Home"
@@ -9733,7 +9792,7 @@ msgstr "Элементы группы узлов сети"
 
 #: jsLoader.php:292
 msgid "Host group is not selected."
-msgstr ""
+msgstr "Группа узлов сети не выбрана."
 
 #: include/views/monitoring.sysmap.edit.php:168
 msgid "Host group label type"
@@ -9816,7 +9875,7 @@ msgstr "Обзор инвентарных данных узла сети"
 
 #: jsLoader.php:289
 msgid "Host is not selected."
-msgstr ""
+msgstr "Хост не выбран."
 
 #: include/views/monitoring.sysmap.edit.php:183
 msgid "Host label type"
@@ -12723,7 +12782,7 @@ msgstr "Список Zabbix прокси с именем, режимом, шиф
 
 #: include/classes/data/CItemData.php:2935
 msgid "List of Zabbix proxy groups configuration data and real-time data. Configuration data includes proxy group name, failover delay, and minimum number of online proxies required for the group to be online. Real-time data includes number of online proxies, percentage of online proxies, and state of proxy group (unknown, offline, recovering, online, degrading). This item does not return groupless proxies. Returns JSON."
-msgstr ""
+msgstr "Список данных конфигурации и данных в реальном времени для групп прокси Zabbix. Данные конфигурации включают название группы прокси, задержку переключения на резервный узел и минимальное количество онлайн-прокси, необходимое для того, чтобы группа считалась онлайн. Данные в реальном времени включают количество онлайн-прокси, процент онлайн-прокси и состояние группы прокси (неизвестно, офлайн, восстанавливается, онлайн, деградирует). Этот элемент не возвращает прокси без группы. Возвращает JSON."
 
 #: include/classes/data/CItemData.php:1559
 msgid "List of block devices and their type. Returns JSON"
@@ -13161,7 +13220,7 @@ msgstr "Тип подписи к элементам карты"
 
 #: jsLoader.php:290
 msgid "Map is not selected."
-msgstr ""
+msgstr "Карта не выбрана."
 
 #: sysmap.php:128
 msgid "Map is updated! Return to map list?"
@@ -13383,6 +13442,11 @@ msgstr "Максимальное количество строк"
 msgid "Maximum required %1$s database version is %2$s."
 msgstr "Максимально требуемая версия базы данных %1$s - %2$s."
 
+#: app/partials/administration.system.info.php:221
+#, c-format
+msgid "Maximum required version is %1$s."
+msgstr ""
+
 #: app/controllers/CControllerTimeSelectorUpdate.php:136
 #: include/classes/mvc/CController.php:320
 #: include/classes/widgets/fields/CWidgetFieldTimePeriod.php:203
@@ -13447,7 +13511,7 @@ msgstr "Тип медиа \"%1$s\" уже существует."
 #: include/classes/api/services/CMediatype.php:927
 #, c-format
 msgid "Media type \"%1$s\" is used by action \"%2$s\"."
-msgstr ""
+msgstr "Тип носителя \"%1$s\" используется при выполнении действия \"%2$s\"."
 
 #: app/controllers/CControllerMediatypeCreate.php:187
 msgid "Media type added"
@@ -13579,7 +13643,7 @@ msgstr "Путь в меню"
 
 #: widgets/piechart/includes/WidgetForm.php:149
 msgid "Merge sectors smaller than"
-msgstr ""
+msgstr "Объединить сектора, меньшие, чем"
 
 #: widgets/piechart/includes/WidgetForm.php:138
 msgid "Merge sectors smaller than "
@@ -13721,6 +13785,12 @@ msgstr "Минимально требуемый лимит времени раз
 #, c-format
 msgid "Minimum required size of PHP post is %1$s (configuration option \"post_max_size\")."
 msgstr "Минимально требуемый размер PHP post - %1$s (\"post_max_size\" параметр конфигурации)."
+
+#: app/partials/administration.system.info.php:212
+#: app/views/administration.housekeeping.edit.php:183
+#, c-format
+msgid "Minimum required version is %1$s."
+msgstr ""
 
 #: app/views/monitoring.map.view.php:48
 #: include/views/monitoring.sysmap.edit.php:276
@@ -13954,6 +14024,16 @@ msgstr "Множественный"
 #: include/triggers.inc.php:611
 msgid "Multiple PROBLEM events"
 msgstr "Множественные события ПРОБЛЕМА"
+
+#: app/partials/administration.system.info.php:235
+#, c-format
+msgid "Must be at least %1$s."
+msgstr ""
+
+#: app/partials/administration.system.info.php:254
+#, c-format
+msgid "Must not be higher than %1$s."
+msgstr ""
 
 #: jsLoader.php:284
 msgid "Mute"
@@ -14697,6 +14777,66 @@ msgstr "Нет прав доступа в систему."
 msgid "No permissions to call \"%1$s.%2$s\"."
 msgstr "Нет прав доступа на вызов \"%1$s.%2$s\"."
 
+#: include/classes/api/services/CConfiguration.php:312
+msgid "No permissions to import discovery rules."
+msgstr ""
+
+#: include/classes/api/services/CConfiguration.php:313
+msgid "No permissions to import graphs."
+msgstr ""
+
+#: include/classes/api/services/CConfiguration.php:314
+msgid "No permissions to import host groups."
+msgstr ""
+
+#: include/classes/api/services/CConfiguration.php:316
+msgid "No permissions to import hosts."
+msgstr ""
+
+#: include/classes/api/services/CConfiguration.php:318
+msgid "No permissions to import images."
+msgstr ""
+
+#: include/classes/api/services/CConfiguration.php:319
+msgid "No permissions to import items."
+msgstr ""
+
+#: include/classes/api/services/CConfiguration.php:320
+msgid "No permissions to import maps."
+msgstr ""
+
+#: include/classes/api/services/CConfiguration.php:321
+msgid "No permissions to import media types."
+msgstr ""
+
+#: include/classes/api/services/CConfiguration.php:324
+msgid "No permissions to import template dashboards."
+msgstr ""
+
+#: include/classes/api/services/CConfiguration.php:315
+msgid "No permissions to import template groups."
+msgstr ""
+
+#: include/classes/api/services/CConfiguration.php:322
+msgid "No permissions to import template links."
+msgstr ""
+
+#: include/classes/api/services/CConfiguration.php:323
+msgid "No permissions to import templates."
+msgstr ""
+
+#: include/classes/api/services/CConfiguration.php:325
+msgid "No permissions to import triggers."
+msgstr ""
+
+#: include/classes/api/services/CConfiguration.php:326
+msgid "No permissions to import value maps."
+msgstr ""
+
+#: include/classes/api/services/CConfiguration.php:317
+msgid "No permissions to import web scenarios."
+msgstr ""
+
 #: app/controllers/CControllerChartsView.php:133
 #: app/controllers/CControllerDashboardPrint.php:99
 #: app/controllers/CControllerDashboardShareUpdate.php:97
@@ -15438,13 +15578,13 @@ msgstr "Онлайн прокси"
 #: include/classes/api/services/CUser.php:889
 #, c-format
 msgid "Only Super admin or Admin users can update \"%1$s\" parameter."
-msgstr ""
+msgstr "Только пользователи с правами Супер-администратора могут обновлять параметр \"%1$s\"."
 
 #: include/classes/api/services/CUser.php:812
 #: include/classes/api/services/CUser.php:853
 #, c-format
 msgid "Only Super admin users can update \"%1$s\" parameter."
-msgstr ""
+msgstr "Только пользователи с правами Супер-администратора могут обновлять параметр \"%1$s\"."
 
 #: include/classes/api/services/CDRule.php:509
 msgid "Only Zabbix agent, SNMPv1, SNMPv2 and SNMPv3 checks can be made unique."
@@ -17928,6 +18068,11 @@ msgstr "Выполнение скрипта \"%1$s\" на Zabbix сервере"
 msgid "Run script \"%1$s\" on current host"
 msgstr "Выполнение скрипта \"%1$s\" на текущем узле сети"
 
+#: include/actions.inc.php:601
+#, c-format
+msgid "Run script \"%1$s\" on deleted object(s)"
+msgstr "Запустить скрипт \"%1$s\" на удаленном объекте(ах)"
+
 #: include/actions.inc.php:622
 #, c-format
 msgid "Run script \"%1$s\" on host groups"
@@ -18669,7 +18814,7 @@ msgstr "На задний план"
 
 #: app/views/popup.operation.edit.php:189
 msgid "Send to media type"
-msgstr ""
+msgstr "Отправить способом оповещения"
 
 #: app/views/popup.operation.edit.php:108
 msgid "Send to user groups"
@@ -19025,6 +19170,18 @@ msgstr "Короткий"
 msgid "Shortened"
 msgstr "Сокращённое"
 
+#: app/partials/administration.system.info.php:243
+#: app/views/administration.housekeeping.edit.php:187
+#, c-format
+msgid "Should be at least %1$s."
+msgstr ""
+
+#: app/partials/administration.system.info.php:262
+#: app/views/administration.housekeeping.edit.php:197
+#, c-format
+msgid "Should not be higher than %1$s."
+msgstr ""
+
 #: app/partials/monitoring.problem.filter.php:27
 #: app/views/monitoring.charts.view.php:80
 #: app/views/monitoring.dashboard.list.php:64
@@ -19214,7 +19371,7 @@ msgstr "Отображается именем аккаунта всем поль
 
 #: app/views/mfa.edit.php:67
 msgid "Shown as the label to all MFA users in authenticator apps."
-msgstr "Отображается в виде метки всем пользователям MFA в приложениях аутентификации."
+msgstr "Отобразится меткой у всех пользователей MFA в приложениях-аутентификаторах."
 
 #: include/classes/html/CHtmlPage.php:148
 msgid "Sidebar control"
@@ -19428,7 +19585,7 @@ msgstr "Испанский (es_ES)"
 
 #: app/views/mediatype.list.php:83 app/views/mediatype.list.php:91
 msgid "Specific"
-msgstr ""
+msgstr "Специфический"
 
 #: include/classes/helpers/CRoleHelper.php:199
 msgid "Specified role was not found."
@@ -19552,6 +19709,10 @@ msgstr "Статистика и доступность кэша записи в 
 #: include/classes/data/CItemData.php:2848
 msgid "Statistics and availability of proxy memory buffer. Mode (modes: pfree, free, total, used, pused)."
 msgstr "Статистика и доступность буфера памяти прокси. Режим (режимы: pfree, free, total, used, pused)."
+
+#: include/classes/data/CItemData.php:2854
+msgid "Statistics of values received by the preprocessing manager."
+msgstr "Статистика значений, полученных менеджером предварительной обработки."
 
 #: app/controllers/CControllerPopupGeneric.php:237
 #: app/controllers/CControllerPopupGeneric.php:251
@@ -19759,7 +19920,7 @@ msgstr "Строковые функции"
 
 #: widgets/piechart/includes/WidgetForm.php:137
 msgid "Stroke width"
-msgstr ""
+msgstr "Ширина обводки"
 
 #: include/items.inc.php:1545 include/items.inc.php:1549
 #: include/items.inc.php:1553 include/items.inc.php:1557
@@ -19794,7 +19955,7 @@ msgstr "Подкарта"
 
 #: tests/selenium/modules/module_number_7/views/csrf.form.view.php:20
 msgid "Submit"
-msgstr ""
+msgstr "Подтвердить"
 
 #: app/controllers/CControllerPopupScheduledReportSubscriptionEdit.php:167
 msgid "Subscription"
@@ -20464,7 +20625,7 @@ msgstr "Склонированный шаблон содержит пользо�
 
 #: include/classes/api/services/CHost.php:1433
 msgid "The field \"monitored_by\" must be specified when changing proxy or proxy group for host monitoring."
-msgstr ""
+msgstr "Поле \"monitored_by\" необходимо указать при смене прокси-сервера или группы прокси-серверов для мониторинга узела сети."
 
 #: app/views/administration.geomaps.edit.php:36
 msgid "The following placeholders are supported:"
@@ -20540,6 +20701,10 @@ msgstr "Количество процессов. Возвращает число
 msgid "The parameter \"%1$s\" is missing from the user attributes."
 msgstr "Параметр \"%1$s\" отсутствует в атрибутах пользователя."
 
+#: app/views/popup.ldap.edit.php:101
+msgid "The previous password was cleared due to a host change. Please enter the new password."
+msgstr ""
+
 #: include/classes/core/CJsonRpc.php:206
 msgid "The received JSON is not a valid JSON-RPC request."
 msgstr "Полученный JSON не является корректным JSON-RPC запросом."
@@ -20582,13 +20747,21 @@ msgstr "Тема"
 msgid "These parameters will be passed to the script as command-line arguments in the specified order."
 msgstr "Эти параметры будут переданы в скрипт аргументами командной строки в указанном порядке."
 
+#: app/views/action.list.php:156
+msgid "This action has conditions or operations referencing deleted object(s)."
+msgstr "Это действие имеет условия или операции, ссылающиеся на удаленные объект(ы)."
+
+#: app/views/action.list.php:151
+msgid "This action has missing conditions or operations due to previously deleted object(s)."
+msgstr "В этом действии отсутствуют условия или операции из-за ранее удаленных объект(ов)."
+
 #: app/controllers/CControllerDiscoveryEdit.php:175
 #, c-format
 msgid "This check cannot be removed, as it is used as a condition in %1$s discovery action."
 msgid_plural "This check cannot be removed, as it is used as a condition in %1$s discovery actions."
-msgstr[0] ""
-msgstr[1] ""
-msgstr[2] ""
+msgstr[0] "Эту проверку нельзя удалить, так как она используется как условие в действии обнаружения %1$s."
+msgstr[1] "Эту проверку нельзя удалить, так как она используется как условие в действии обнаружения %1$s."
+msgstr[2] "Эту проверку нельзя удалить, так как она используется как условие в действии обнаружения %1$s."
 
 #: include/func.inc.php:2566
 msgid "This day last week"
@@ -20635,7 +20808,7 @@ msgstr "Эта настройка отобразит локальное врем
 
 #: widgets/itemhistory/views/column.edit.php:241
 msgid "This setting will display log time instead of item's timestamp. \"Show timestamp\" must also be checked in the advanced configuration."
-msgstr ""
+msgstr "При этом параметре вместо метки времени элемента данных будет отображаться время регистрации. В расширенной конфигурации также необходимо установить флажок \"Показывать метку времени\"."
 
 #: include/views/configuration.item.edit.php:129
 #: include/views/configuration.item.prototype.edit.php:114
@@ -21160,7 +21333,7 @@ msgstr "У триггера из шаблона \"%1$s\" есть зависим
 
 #: jsLoader.php:291
 msgid "Trigger is not selected."
-msgstr ""
+msgstr "Триггер не выбран."
 
 #: include/views/monitoring.sysmap.edit.php:198
 msgid "Trigger label type"
@@ -21589,6 +21762,14 @@ msgstr "Не удалось получить состояние поддержк
 msgid "Unable to retrieve TimescaleDB version."
 msgstr "Не удалось получить версию TimescaleDB."
 
+#: app/views/administration.housekeeping.edit.php:173
+msgid "Unable to retrieve compression support status of TimescaleDB time-series database extension for PostgreSQL."
+msgstr ""
+
+#: app/views/administration.housekeeping.edit.php:178
+msgid "Unable to retrieve version of TimescaleDB time-series database extension for PostgreSQL."
+msgstr ""
+
 #: include/views/mfa.login.php:65
 #, c-format
 msgid "Unable to scan? You can use %1$s secret key to manually configure your authenticator app:"
@@ -21866,6 +22047,11 @@ msgstr "Версия %1$s сервера базы данных не поддер
 #, c-format
 msgid "Unsupported %1$s database server version. Must not be higher than %2$s."
 msgstr "Версия %1$s сервера базы данных не поддерживается. Необходима версия не выше %2$s."
+
+#: app/partials/administration.system.info.php:206
+#: app/views/administration.housekeeping.edit.php:169
+msgid "Unsupported TimescaleDB time-series database extension for PostgreSQL is used."
+msgstr ""
 
 #: app/views/administration.housekeeping.edit.php:190
 #, c-format
@@ -22218,7 +22404,7 @@ msgstr "Пользователь не может добавить себя в о
 #: include/classes/api/services/CUserGroup.php:673
 #: include/classes/api/services/CUser.php:843
 msgid "User cannot add oneself to a disabled group or a group with disabled GUI access."
-msgstr ""
+msgstr "Пользователь не может добавить себя в отключенную группу или в группу с отключенным доступом к Веб-интерфейсу."
 
 #: app/views/administration.user.edit.php:461
 #: include/classes/api/services/CUser.php:980
@@ -22361,7 +22547,7 @@ msgstr "Пользователю не разрешается удалять са
 
 #: include/classes/api/services/CUser.php:1837
 msgid "User is not allowed to delete oneself."
-msgstr ""
+msgstr "Пользователю запрещено удалять самого себя."
 
 #: app/views/administration.authentication.edit.php:462
 #: app/views/popup.ldap.edit.php:222
@@ -22375,7 +22561,7 @@ msgstr "Пользовательские макросы"
 
 #: app/views/popup.mediatypemapping.edit.php:73
 msgid "User media"
-msgstr "Оповещения"
+msgstr "Пользовательские оповещения"
 
 #: app/partials/layout.htmlpage.aside.php:94
 msgid "User menu"
@@ -22847,7 +23033,7 @@ msgstr "Состояние питания виртуальной машины VM
 
 #: include/classes/data/CItemData.php:2490
 msgid "VMware virtual machine private memory size, \"url\" - VMware service URL, \"uuid\" - VMware virtual machine global unique identifier"
-msgstr ""
+msgstr "Размер собственной памяти виртуальной машины VMware, \"url\" - URL службы VMware, \"uuid\" - глобальный уникальный идентификатор виртуальной машины VMware"
 
 #: include/classes/data/CItemData.php:2359
 msgid "VMware virtual machine private memory size, \"url\" - VMware service URL, \"uuid\" - VMware virtual machine global unique identifierr"
@@ -23238,7 +23424,7 @@ msgstr "Просмотр как"
 
 #: jsLoader.php:417
 msgid "View related reports"
-msgstr ""
+msgstr "Просмотр связанных отчетов"
 
 #: include/classes/data/CItemData.php:1735
 msgid "Virtual space size in bytes or in percentage from total. Returns integer for bytes; float for percentage"
@@ -23286,6 +23472,11 @@ msgstr "Предупреждение"
 #: include/func.inc.php:1775 jsLoader.php:216
 msgid "Warning message"
 msgstr "Предупреждающее сообщение"
+
+#: app/partials/administration.system.info.php:243
+#: app/partials/administration.system.info.php:262
+msgid "Warning!"
+msgstr ""
 
 #: app/partials/administration.system.info.php:198
 msgid "Warning! Support for Oracle DB is deprecated since Zabbix 7.0 and will be removed in future versions."
@@ -23454,7 +23645,7 @@ msgstr "Виджет слишком маленький для заданного
 
 #: jsLoader.php:205
 msgid "Widgets"
-msgstr ""
+msgstr "Виджеты"
 
 #: graphs.php:39 include/views/configuration.graph.edit.php:100
 #: include/views/configuration.graph.list.php:170
@@ -23673,7 +23864,7 @@ msgstr "d.m.Y H:i:s"
 
 #: include/translateDefines.inc.php:40
 msgid "Y-n-d"
-msgstr "d-n-Y"
+msgstr "d.m.Y"
 
 #: include/views/js/monitoring.sysmaps.js.php:448
 msgid "Y1"
@@ -23830,7 +24021,7 @@ msgstr "Для просмотра этой страницы вы должны в
 
 #: jsLoader.php:287
 msgid "You need to have at least one image uploaded to create map element. Images can be uploaded in Administration->General->Images section."
-msgstr ""
+msgstr "Вам необходимо загрузить хотя бы одно изображение для создания элемента карты сети. Изображения можно загрузить в разделе Администрирование->Основные->Изображения."
 
 #: include/classes/db/DB.php:133
 msgid "Your database is not working properly. Please wait a few minutes and try to repeat this action. If the problem still persists, please contact system administrator. The problem might be caused by long running transaction or row level lock accomplished by your database management system."
@@ -24099,6 +24290,41 @@ msgstr "abs() - Абсолютное значение"
 msgid "acos() - The arccosine of a value as an angle, expressed in radians"
 msgstr "acos() - Арккосинус значения в виде угла, в радианах."
 
+#: include/classes/api/services/CDRule.php:774
+#, c-format
+msgid "action \"%1$s\" uses this discovery check"
+msgstr "действие \"%1$s\" использует эту проверку обнаружения"
+
+#: include/classes/api/services/CDRule.php:981
+#, c-format
+msgid "action \"%1$s\" uses this discovery rule"
+msgstr "действие \"%1$s\" использует это правило обнаружения"
+
+#: include/classes/api/services/CHost.php:1637
+#, c-format
+msgid "action \"%1$s\" uses this host"
+msgstr "действие \"%1$s\" использует этот узел сети"
+
+#: include/classes/api/services/CHostGroup.php:770
+#, c-format
+msgid "action \"%1$s\" uses this host group"
+msgstr "действие \"%1$s\" использует эту группу узелов сети"
+
+#: include/classes/api/services/CService.php:487
+#, c-format
+msgid "action \"%1$s\" uses this service"
+msgstr "действие \"%1$s\" использует эту службу"
+
+#: include/classes/api/services/CTemplate.php:810
+#, c-format
+msgid "action \"%1$s\" uses this template"
+msgstr "действие \"%1$s\" использует этот шаблон"
+
+#: include/classes/api/managers/CTriggerManager.php:127
+#, c-format
+msgid "action \"%1$s\" uses this trigger"
+msgstr "действие \"%1$s\" использует этот триггер"
+
 #: app/partials/monitoring.charts.subfilter.php:182
 #: app/partials/monitoring.latest.subfilter.php:186 include/forms.inc.php:144
 msgid "affects only filtered data"
@@ -24228,7 +24454,7 @@ msgstr "и"
 #: include/classes/api/helpers/CApiPskHelper.php:160
 #: include/classes/api/helpers/CApiPskHelper.php:176
 msgid "another tls_psk value is already associated with given tls_psk_identity"
-msgstr ""
+msgstr "другое значение tls_psk уже связано с данным tls_psk_identity"
 
 #: include/forms.inc.php:1450 include/views/js/item.preprocessing.js.php:237
 msgid "any error"
@@ -24755,15 +24981,15 @@ msgstr "правило обнаружения \"%1$s\" на узле сети \"
 
 #: app/views/mediatype.list.php:78
 msgid "display all actions"
-msgstr ""
+msgstr "отобразить все действия"
 
 #: app/views/mediatype.list.php:80
 msgid "display only actions where All available media types are used in action operation"
-msgstr ""
+msgstr "отображать только действия, в которых используются все доступные способы оповещения в операции действия"
 
 #: app/views/mediatype.list.php:84
 msgid "display only actions where specific media type is used in action operation"
-msgstr ""
+msgstr "отображать только те действия, в которых в операции действия используется определенный способ оповещения"
 
 #: app/views/popup.lldoperation.php:65 include/actions.inc.php:27
 #: include/classes/helpers/CCorrelationHelper.php:37
@@ -24826,7 +25052,7 @@ msgstr "текст ошибки"
 
 #: include/forms.inc.php:1454 include/views/js/item.preprocessing.js.php:241
 msgid "error-matching"
-msgstr ""
+msgstr "сопоставление ошибок"
 
 #: app/views/popup.lldoverride.php:104
 #: include/views/configuration.host.discovery.edit.php:820
@@ -25510,11 +25736,11 @@ msgstr "не должен содержать имени, фамилии или �
 
 #: include/translateDefines.inc.php:41
 msgid "n-d"
-msgstr "d-n"
+msgstr "m.d"
 
 #: include/translateDefines.inc.php:39
 msgid "n-d h:i A"
-msgstr "d-n H:i"
+msgstr "m.d H:i"
 
 #: app/views/webscenario.step.edit.php:82
 #: app/views/webscenario.step.edit.php:131
@@ -25864,7 +26090,7 @@ msgstr "right() - Возвращает количество самых прав�
 
 #: widgets/navtree/Widget.php:41
 msgid "root"
-msgstr ""
+msgstr "root"
 
 #: app/controllers/CControllerPopupTriggerExpr.php:966
 msgid "round() - Rounds a value to decimal places"

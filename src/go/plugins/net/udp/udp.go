@@ -22,7 +22,6 @@ import (
 	"strconv"
 	"time"
 
-	"golang.zabbix.com/sdk/conf"
 	"golang.zabbix.com/sdk/errs"
 	"golang.zabbix.com/sdk/log"
 	"golang.zabbix.com/sdk/plugin"
@@ -51,14 +50,9 @@ const (
 
 var impl Plugin
 
-type Options struct {
-	plugin.SystemOptions `conf:"optional,name=System"`
-}
-
 // Plugin -
 type Plugin struct {
 	plugin.Base
-	options Options
 }
 
 func init() {
@@ -252,15 +246,4 @@ func (p *Plugin) Export(key string, params []string, ctx plugin.ContextProvider)
 
 	/* SHOULD_NEVER_HAPPEN */
 	return nil, errors.New(errorUnsupportedMetric)
-}
-
-func (p *Plugin) Configure(global *plugin.GlobalOptions, options interface{}) {
-	if err := conf.Unmarshal(options, &p.options); err != nil {
-		p.Warningf("cannot unmarshal configuration options: %s", err)
-	}
-}
-
-func (p *Plugin) Validate(options interface{}) error {
-	var o Options
-	return conf.Unmarshal(options, &o)
 }

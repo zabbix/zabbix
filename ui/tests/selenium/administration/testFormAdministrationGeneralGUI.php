@@ -14,7 +14,7 @@
 **/
 
 
-require_once dirname(__FILE__).'/../common/testFormAdministrationGeneral.php';
+require_once __DIR__.'/../common/testFormAdministrationGeneral.php';
 
 /**
  * @backup config
@@ -989,9 +989,11 @@ class testFormAdministrationGeneralGUI extends testFormAdministrationGeneral {
 		$this->resetConfiguration($form, $this->default_values, 'Reset defaults');
 		// Fill necessary settings.
 		$form->fill($data['field']);
-		$form->submit();
+		$form->submit()->waitUntilStalled();
+		$this->page->waitUntilReady();
+
 		// Check saved settings.
-		$this->page->open($data['link']);
+		$this->page->open($data['link'])->waitUntilReady();
 
 		switch ((array_keys($data['field']))[0]) {
 			case 'Default theme':

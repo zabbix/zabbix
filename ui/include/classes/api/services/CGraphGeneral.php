@@ -561,7 +561,7 @@ abstract class CGraphGeneral extends CApiService {
 	 *
 	 * @throws APIException
 	 */
-	private function validateItems(array $itemids, array $graphs, array &$db_items = null): void {
+	private function validateItems(array $itemids, array $graphs, ?array &$db_items = null): void {
 		$permission_options = ['nopermissions' => true];
 
 		foreach ($graphs as $graph) {
@@ -830,7 +830,7 @@ abstract class CGraphGeneral extends CApiService {
 	 *
 	 * @throws APIException
 	 */
-	private static function checkUuidDuplicates(array $graphs, array $db_graphs = null): void {
+	private static function checkUuidDuplicates(array $graphs, ?array $db_graphs = null): void {
 		$graph_indexes = [];
 
 		foreach ($graphs as $i => $graph) {
@@ -1063,7 +1063,7 @@ abstract class CGraphGeneral extends CApiService {
 	 *                             linked hosts or templates.
 	 * @throws APIException
 	 */
-	protected function inherit(array $graphs, array $hostids = null): void {
+	protected function inherit(array $graphs, ?array $hostids = null): void {
 		$graphs = array_column($graphs, null, 'graphid');
 
 		if ($hostids === null) {

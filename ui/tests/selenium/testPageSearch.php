@@ -16,8 +16,8 @@
 
 use Facebook\WebDriver\Exception\TimeoutException;
 
-require_once dirname(__FILE__).'/../include/CWebTest.php';
-require_once dirname(__FILE__).'/behaviors/CTableBehavior.php';
+require_once __DIR__.'/../include/CWebTest.php';
+require_once __DIR__.'/behaviors/CTableBehavior.php';
 
 /**
  * @backup hstgrp
@@ -619,7 +619,7 @@ class testPageSearch extends CWebTest {
 				continue;
 			}
 
-			$table_row = $this->query($widget_params['table_selector'])->asTable()->one()->getRow(0);
+			$table_row = $this->query($widget_params['table_selector'])->waitUntilVisible()->asTable()->one()->getRow(0);
 
 			// For each expected column.
 			foreach ($data[$widget_params['key']] as $column_name => $column_data) {
@@ -768,7 +768,7 @@ class testPageSearch extends CWebTest {
 	 * @param string  $search_string    text that will be entered in the search field
 	 */
 	protected function openSearchResults($search_string, $send_keyup = false) {
-		$this->page->login()->open('zabbix.php?action=dashboard.view');
+		$this->page->login()->open('zabbix.php?action=dashboard.view')->waitUntilReady();
 		$form = $this->query('class:form-search')->waitUntilVisible()->asForm()->one();
 		$form->fill(['id:search' => $search_string]);
 
@@ -778,5 +778,6 @@ class testPageSearch extends CWebTest {
 		}
 
 		$form->submit();
+		$this->page->waitUntilReady();
 	}
 }

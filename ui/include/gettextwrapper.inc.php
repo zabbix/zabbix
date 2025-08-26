@@ -206,7 +206,7 @@ function _params($format, array $arguments) {
  *
  * @return bool    Whether locale could be switched.
  */
-function setupLocale(string $language, string &$error = null): bool {
+function setupLocale(string $language, ?string &$error = null): bool {
 	$locale_variants = zbx_locale_variants($language);
 	$locale_set = false;
 
