@@ -25,8 +25,6 @@ use API,
 	CSettingsHelper,
 	CSeverityHelper;
 
-use Widgets\Geomap\Widget;
-
 class WidgetView extends CControllerDashboardWidgetView {
 
 	private const NO_PROBLEMS_MARKER_COLOR = '#009900';
