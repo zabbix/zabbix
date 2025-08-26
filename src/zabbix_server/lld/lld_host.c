@@ -31,6 +31,7 @@
 #include "zbxexpr.h"
 #include "zbxhash.h"
 #include "zbxinterface.h"
+#include "zbxip.h"
 #include "../server_constants.h"
 
 /* host macro discovery state */
@@ -5714,6 +5715,85 @@ static int	another_main_interface_exists(const zbx_vector_lld_interface_ptr_t *i
 	return FAIL;
 }
 
+static int	lld_interface_validate_fields(const zbx_lld_interface_t *interface, const char *hostname, char **error)
+{
+	const char	*op;
+
+	op = (0 == interface->interfaceid ? "create" : "update");
+
+	if (ZBX_INTERFACE_PORT_LEN_MAX < strlen(interface->port))
+	{
+		*error = zbx_strdcatf(*error, "Cannot %s \"%s\" interface on host \"%s\": "
+				"Port is too long.\n",
+				op, zbx_interface_type_string(interface->type_orig),
+				hostname);
+
+		return FAIL;
+	}
+	else if (NULL != interface->port && '\0' == *interface->port)
+	{
+		*error = zbx_strdcatf(*error, "Cannot %s \"%s\" interface on host \"%s\": "
+				"Port cannot be empty.\n",
+				op, zbx_interface_type_string(interface->type_orig),
+				hostname);
+
+		return FAIL;
+	}
+	else
+	{
+		int	port_n;
+
+		port_n = atoi(interface->port);
+
+		if (0 > port_n || 65535 < port_n)
+		{
+			*error = zbx_strdcatf(*error, "Cannot %s \"%s\" interface on host \"%s\": "
+					"Value of port must be one of 0-65535.\n",
+					op, zbx_interface_type_string(interface->type_orig),
+					hostname);
+
+			return FAIL;
+		}
+	}
+
+	if (0 == interface->useip)
+	{
+		if (NULL != interface->dns)
+		{
+			if ('\0' == *interface->dns)
+			{
+				*error = zbx_strdcatf(*error, "Cannot %s \"%s\" interface on host \"%s\": "
+						"DNS cannot be empty.\n",
+						op, zbx_interface_type_string(interface->type_orig),
+						hostname);
+
+				return FAIL;
+			}
+
+			if (ZBX_INTERFACE_DNS_LEN_MAX < strlen(interface->dns))
+			{
+				*error = zbx_strdcatf(*error, "Cannot %s \"%s\" interface on host \"%s\": "
+						"DNS is too long.\n",
+						op, zbx_interface_type_string(interface->type_orig),
+						hostname);
+
+				return FAIL;
+			}
+		}
+	}
+	else if (SUCCEED != zbx_is_ip(interface->ip))
+	{
+		*error = zbx_strdcatf(*error, "Cannot %s \"%s\" interface on host \"%s\": "
+				"IP Address is not valid.\n",
+				op, zbx_interface_type_string(interface->type_orig),
+				hostname);
+
+		return FAIL;
+	}
+
+	return SUCCEED;
+}
+
 /******************************************************************************
  *                                                                            *
  * Parameters: hosts - [IN/OUT]                                               *
@@ -5800,6 +5880,24 @@ static void	lld_interfaces_validate(zbx_vector_lld_host_ptr_t *hosts, char **err
 			}
 		}
 		zbx_db_free_result(result);
+	}
+
+	/* exclude interfaces with invalid fields */
+
+	for (int i = 0; i < hosts->values_num; i++)
+	{
+		host = hosts->values[i];
+
+		for (int j = 0; j < host->interfaces.values_num; j++)
+		{
+			interface = host->interfaces.values[j];
+
+			if (0 != (interface->flags & ZBX_FLAG_LLD_INTERFACE_REMOVE))
+				continue;
+
+			if (FAIL == lld_interface_validate_fields(interface, host->host, error))
+				zbx_vector_lld_interface_ptr_remove(&host->interfaces, j);
+		}
 	}
 
 	/* validate interfaces which should be deleted */
