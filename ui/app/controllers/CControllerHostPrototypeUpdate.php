@@ -61,7 +61,9 @@ class CControllerHostPrototypeUpdate extends CController {
 						'group_prototypeid' => ['string']
 					]
 				],
-				'custom_interfaces' => ['db hosts.custom_interfaces'],
+				'custom_interfaces' => ['db hosts.custom_interfaces', 'in' => [HOST_PROT_INTERFACES_INHERIT,
+					HOST_PROT_INTERFACES_CUSTOM
+				]],
 				'interfaces' => ['objects', 'fields' => [
 					'interfaceid' => ['db interface.interfaceid'],
 					'isNew' => [],

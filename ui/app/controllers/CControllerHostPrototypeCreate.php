@@ -56,7 +56,9 @@ class CControllerHostPrototypeCreate extends CController {
 						'group_prototypeid' => ['string']
 					]
 				],
-				'custom_interfaces' => ['db hosts.custom_interfaces'],
+				'custom_interfaces' => ['db hosts.custom_interfaces', 'in' => [HOST_PROT_INTERFACES_INHERIT,
+					HOST_PROT_INTERFACES_CUSTOM
+				]],
 				'interfaces' => ['objects', 'fields' => [
 					'isNew' => [],
 					'type' => ['db interface.type', 'required', 'in' => [INTERFACE_TYPE_AGENT, INTERFACE_TYPE_SNMP,
