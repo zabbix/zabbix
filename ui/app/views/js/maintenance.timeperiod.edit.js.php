@@ -163,8 +163,6 @@ window.maintenance_timeperiod_edit = new class {
 
 				this.form_element.parentNode.insertBefore(message_box, this.form_element);
 			})
-			.finally(() => {
-				this._overlay.unsetLoading();
-			});
+			.finally(() => this._overlay.unsetLoading());
 	}
-};
+}

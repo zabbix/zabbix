@@ -301,12 +301,12 @@ else {
 $output = [
 	'header' => $title,
 	'doc_url' => CDocHelper::getUrl(CDocHelper::DATA_COLLECTION_MAINTENANCE_EDIT),
-	'body' => $form->toString().$this->readJsFile('maintenance.edit.js.php'),
+	'body' => $form->toString(),
 	'buttons' => $buttons,
 	'dialogue_class' => 'modal-popup-large',
 	'script_inline' => getPagePostJs().
+		$this->readJsFile('maintenance.edit.js.php').
 		'maintenance_edit.init('.json_encode([
-			'maintenanceid' => $data['maintenanceid'],
 			'timeperiods' => $data['timeperiods'],
 			'tags' => $data['tags'],
 			'allowed_edit' => $data['allowed_edit'],

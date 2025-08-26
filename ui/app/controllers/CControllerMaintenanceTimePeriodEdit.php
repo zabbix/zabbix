@@ -128,7 +128,7 @@ class CControllerMaintenanceTimePeriodEdit extends CController {
 
 			$form['period_days'] = floor($this->getInput('period') / SEC_PER_DAY);
 			$form['period_hours'] = floor(($this->getInput('period') % SEC_PER_DAY) / SEC_PER_HOUR);
-			$form['period_minutes']= floor((($this->getInput('period') % SEC_PER_DAY) % SEC_PER_HOUR) / SEC_PER_MIN);
+			$form['period_minutes'] = floor((($this->getInput('period') % SEC_PER_DAY) % SEC_PER_HOUR) / SEC_PER_MIN);
 		}
 
 		$data = [
