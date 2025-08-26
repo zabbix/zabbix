@@ -26,7 +26,8 @@ class testPageUserGroups extends CLegacyWebTest {
 	 */
 	public function getBehaviors() {
 		return [
-			CTableBehavior::class
+			CTableBehavior::class,
+			CMessageBehavior::class
 		];
 	}
 
@@ -74,7 +75,7 @@ class testPageUserGroups extends CLegacyWebTest {
 		$this->zbxTestClickWait('update');
 		$this->zbxTestCheckHeader('User groups');
 		$this->zbxTestCheckTitle('Configuration of user groups');
-		$this->zbxTestWaitUntilMessageTextPresent('msg-good', 'User group updated');
+		$this->assertMessage(TEST_GOOD, 'User group updated');
 		$this->zbxTestTextPresent($name);
 
 		$this->assertEquals($oldHashGroup, CDBHelper::getHash($sqlHashGroup));
@@ -105,7 +106,7 @@ class testPageUserGroups extends CLegacyWebTest {
 			$this->zbxTestTextPresent('User cannot add oneself to a disabled group or a group with disabled GUI access.');
 		}
 		else {
-			$this->zbxTestTextPresent('User group updated');
+			$this->assertMessage(TEST_GOOD, 'User group updated');
 		}
 
 		$sql = "select * from usrgrp where usrgrpid=$usrgrpid and users_status=".GROUP_STATUS_DISABLED;
@@ -137,7 +138,7 @@ class testPageUserGroups extends CLegacyWebTest {
 
 		$this->zbxTestAcceptAlert();
 		$this->zbxTestCheckTitle('Configuration of user groups');
-		$this->zbxTestTextPresent('User group updated');
+		$this->assertMessage(TEST_GOOD, 'User group updated');
 
 		$sql="select * from usrgrp where usrgrpid=$usrgrpid and users_status=".GROUP_STATUS_ENABLED;
 		$this->assertEquals(1, CDBHelper::getCount($sql));
@@ -163,7 +164,7 @@ class testPageUserGroups extends CLegacyWebTest {
 		$this->zbxTestAcceptAlert();
 
 		$this->zbxTestCheckTitle('Configuration of user groups');
-		$this->zbxTestTextPresent('User group updated');
+		$this->assertMessage(TEST_GOOD, 'User group updated');
 
 		$sql="select * from usrgrp where usrgrpid=$usrgrpid and debug_mode=".GROUP_DEBUG_MODE_ENABLED;
 		$this->assertEquals(1, CDBHelper::getCount($sql));
@@ -189,7 +190,7 @@ class testPageUserGroups extends CLegacyWebTest {
 		$this->zbxTestAcceptAlert();
 
 		$this->zbxTestCheckTitle('Configuration of user groups');
-		$this->zbxTestTextPresent('User group updated');
+		$this->assertMessage(TEST_GOOD, 'User group updated');
 
 		$sql = "select * from usrgrp where usrgrpid=$usrgrpid and debug_mode=".GROUP_DEBUG_MODE_DISABLED;
 		$this->assertEquals(1, CDBHelper::getCount($sql));

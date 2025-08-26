@@ -205,7 +205,7 @@ class testFormMacrosAdministrationGeneral extends testFormMacros {
 		$this->openGlobalMacros();
 
 		$this->saveGlobalMacros();
-		$this->zbxTestTextPresent('Macros updated');
+		$this->assertMessage(TEST_GOOD, 'Macros updated');
 
 		$this->checkGlobalMacrosOrder();
 
@@ -253,8 +253,7 @@ class testFormMacrosAdministrationGeneral extends testFormMacros {
 		$this->zbxTestInputType('macros_'.$countGlobalMacros.'_description', self::NEW_DESCRIPTION);
 
 		$this->saveGlobalMacros();
-		$this->zbxTestTextPresent('Cannot update macros');
-		$this->zbxTestTextPresent('Invalid parameter "/1/macro": '.$error.'.');
+		$this->assertMessage(TEST_BAD, 'Cannot update macros', 'Invalid parameter "/1/macro": '.$error.'.');
 
 		$this->zbxTestAssertElementValue('macros_'.$countGlobalMacros.'_macro', $macro);
 		$this->zbxTestAssertElementValue('macros_'.$countGlobalMacros.'_value', self::NEW_VALUE);
@@ -885,7 +884,7 @@ class testFormMacrosAdministrationGeneral extends testFormMacros {
 		$this->page->login()->open('zabbix.php?action=macros.edit')->waitUntilReady();
 		$this->fillMacros([$data['fields']]);
 		$this->query('button:Update')->one()->click();
-		$this->page->waitUntilReady();
+		$this->assertMessage(TEST_GOOD, 'Macros updated');
 		$result = [];
 		foreach (['macro', 'value', 'description'] as $field) {
 			$result[] = $this->query('xpath://textarea[@id="macros_'.$data['fields']['index'].'_'.$field.'"]')->one()->getText();

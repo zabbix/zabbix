@@ -654,7 +654,7 @@ class testPageLowLevelDiscovery extends CWebTest {
 		// Delete all discovery rules.
 		$form = $this->query('name:zbx_filter')->one()->asForm();
 		$form->fill($data['filter']);
-		$form->submit();
+		$form->submit()->waitUntilStalled();
 		$this->selectTableRows($data['keys'], 'Key', self::SELECTOR);
 		$this->query('button:Delete')->one()->click();
 		$this->page->acceptAlert();

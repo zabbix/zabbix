@@ -2275,8 +2275,8 @@ class testFormItem extends CLegacyWebTest {
 	private function filterEntriesAndOpenItems() {
 		$form = $this->query('name:zbx_filter')->asForm()->waitUntilReady()->one();
 		$form->fill(['Name' => $this->host]);
+		$table = $this->query('xpath://table[@class="list-table"]')->asTable()->one();
 		$this->query('button:Apply')->one()->waitUntilClickable()->click();
-		$this->query('xpath://table[@class="list-table"]')->asTable()->one()->findRow('Name', $this->host)
-				->getColumn('Items')->query('link:Items')->one()->click();
+		$table->waitUntilReloaded()->findRow('Name', $this->host)->getColumn('Items')->query('link:Items')->one()->click();
 	}
 }

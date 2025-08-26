@@ -258,6 +258,9 @@ class testSystemInformation extends CWebTest {
 	public function assertServerStatusAfterFailover($dashboardid = null) {
 		$url = (!$dashboardid) ? 'zabbix.php?action=report.status' : 'zabbix.php?action=dashboard.view&dashboardid='.$dashboardid;
 		$this->page->login()->open($url)->waitUntilReady();
+		if ($dashboardid !== null) {
+			CDashboardElement::find()->waitUntilReady();
+		}
 		$table = $this->query('xpath://table[@class="list-table sticky-header"]')->asTable()->waitUntilVisible()->one();
 
 		// Check that before failover delay passes frontend thinks that Zabbix server is running.

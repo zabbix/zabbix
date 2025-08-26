@@ -82,7 +82,7 @@ class testTriggerDependencies extends CWebTest {
 			}
 		}
 
-		$form->submit();
+		$form->waitUntilStalled()->submit();
 		$this->page->waitUntilReady();
 
 		// Check error message and added dependencies.
