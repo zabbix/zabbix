@@ -161,7 +161,7 @@ class CMenu extends CTag {
 		foreach ($this->menu_items as $item) {
 			if ($item->setSelectedByAction($action_name, $request_params)) {
 				if ($expand && $item->hasSubMenu()) {
-					$item->addClass('is-expanded');
+					$item->addClass('is-expanded')->setAttribute('aria-expanded', 'true');
 				}
 				return true;
 			}
