@@ -1731,7 +1731,7 @@ static void 	lld_trigger_make(const zbx_lld_trigger_prototype_t *trigger_prototy
 	{
 		if (SUCCEED != lld_text_has_lld_macro(trigger->description))
 		{
-			*error = zbx_strdcatf(*error, "Cannot %s trigger \"%s\": description does not contain LLD"
+			*error = zbx_strdcatf(*error, "Cannot %s trigger \"%s\": name does not contain LLD"
 					" macro(s).\n", operation_msg, trigger->description);
 			goto out;
 		}
