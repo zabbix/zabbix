@@ -152,16 +152,16 @@ $form
 			->addItem(new CCol('#{type}'))
 			->addItem(new CCol('#{expression}'))
 			->addItem(new CCol((new CSpan('#{result}'))->addClass('#{result_class}')))
-	))
-	->addItem(
-		(new CScriptTag('regular_expression_edit.init('.json_encode([
-			'rules' => $data['js_validation_rules'],
-		]).');'))->setOnDocumentReady()
-	);
+	));
 
 (new CHtmlPage())
 	->setTitle(_('Regular expressions'))
 	->setTitleSubmenu(getAdministrationGeneralSubmenu())
 	->setDocUrl(CDocHelper::getUrl(CDocHelper::ADMINISTRATION_REGEX_EDIT))
 	->addItem($form)
+	->addItem(
+		(new CScriptTag('regular_expression_edit.init('.json_encode([
+			'rules' => $data['js_validation_rules'],
+		]).');'))->setOnDocumentReady()
+	)
 	->show();
