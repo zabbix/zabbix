@@ -17,7 +17,7 @@
 #include "zbxasyncpoller.h"
 #include "zbxpoller.h"
 #include "zbxtimekeeper.h"
-//#include "zbxcomms.h"
+#include "zbxcomms.h"
 #include "zbxself.h"
 #include "zbxsysinfo.h"
 #include "zbx_discoverer_constants.h"
