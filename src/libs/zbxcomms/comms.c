@@ -421,7 +421,7 @@ char	*zbx_socket_detach_buffer(zbx_socket_t *s)
  * Purpose: create socket poll error message                                  *
  *                                                                            *
  ******************************************************************************/
-char 	*socket_poll_error(short revents)
+char	*socket_poll_error(short revents)
 {
 	char	*str = NULL;
 	size_t	str_alloc = 0, str_offset = 0;
