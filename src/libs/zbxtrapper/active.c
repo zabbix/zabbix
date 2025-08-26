@@ -186,7 +186,7 @@ static int	get_hostid_by_host_or_autoregister(const zbx_socket_t *sock, const ch
 
 	char		*ch_error;
 	int		ret = FAIL;
-	int		autoreg = AUTOREG_ENABLED, change_flags = ZBX_AUTOREG_NO_CHANGES;
+	int		autoreg = AUTOREG_ENABLED, change_flags = 0;
 	unsigned char	status, monitored_by;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() host:'%s' metadata:'%s'", __func__, host, host_metadata);
