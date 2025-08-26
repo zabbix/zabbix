@@ -321,7 +321,7 @@ class testDashboardTopHostsWidget extends testWidgets {
 			'Max' => ['value' => '', 'placeholder' => 'calculated', 'maxlength' => 255, 'visible' => false, 'enabled' => false],
 			'id:sparkline_width' => ['value' => 1, 'maxlength' => 2, 'visible' => false, 'enabled' => false],
 			'id:sparkline_fill' => ['value' => 3, 'maxlength' => 2, 'visible' => false, 'enabled' => false],
-			self::PATH_TO_COLOR_PICKER.'"sparkline[color]"]' => ['color' => '42A5F5', 'visible' => false, 'enabled' => false],
+			self::PATH_TO_COLOR_PICKER.'"sparkline[color]"]/input' => ['value' => '42A5F5', 'visible' => false, 'enabled' => false],
 			'id:sparkline_time_period_data_source' => ['value' => 'Custom', 'labels' => ['Dashboard', 'Widget', 'Custom'],
 				'visible' => false, 'enabled' => false
 			],
