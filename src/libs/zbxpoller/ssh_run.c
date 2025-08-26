@@ -210,14 +210,11 @@ int	ssh_run(zbx_dc_item_t *item, AGENT_RESULT *result, const char *encoding, con
 
 	zbx_ts_get_deadline(&deadline, 0 == timeout ? SEC_PER_YEAR : timeout);
 
-	if (NULL != config_source_ip)
+	if (NULL != config_source_ip && 0 != ssh_options_set(session, SSH_OPTIONS_BINDADDR, config_source_ip))
 	{
-		if (0 != ssh_options_set(session, SSH_OPTIONS_BINDADDR, config_source_ip))
-		{
-			SET_MSG_RESULT(result, zbx_dsprintf(NULL, "Cannot set SSH address binding: %s",
-					ssh_get_error(session)));
-			goto session_free;
-		}
+		SET_MSG_RESULT(result, zbx_dsprintf(NULL, "Cannot set SSH address binding: %s",
+				ssh_get_error(session)));
+		goto session_free;
 	}
 
 	if (0 != ssh_options_set(session, SSH_OPTIONS_HOST, item->interface.addr) ||
