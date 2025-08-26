@@ -15,7 +15,6 @@
 package plugins
 
 import (
-	_ "golang.zabbix.com/agent2/plugins/ceph"
 	_ "golang.zabbix.com/agent2/plugins/docker"
 	_ "golang.zabbix.com/agent2/plugins/kernel"
 	_ "golang.zabbix.com/agent2/plugins/log"
