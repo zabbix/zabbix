@@ -6288,21 +6288,7 @@ static int	lld_check_prototype_groupname(const char *groupname, char **error)
 		return FAIL;
 	}
 
-	while (SUCCEED == zbx_token_find(groupname, (int)pos, &token, ZBX_TOKEN_SEARCH_BASIC))
-	{
-		if (ZBX_TOKEN_LLD_MACRO == token.type || ZBX_TOKEN_LLD_FUNC_MACRO == token.type)
-		{
-			pos = token.loc.r + 1;
-			macro_len += pos - token.loc.l;
-			lld_macro_num++;
-
-			continue;
-		}
-
-		pos++;
-	}
-
-	if (0 == lld_macro_num)
+	if (SUCCEED != lld_text_has_lld_macro(groupname))
 	{
 		*error = zbx_strdup(NULL, "name does not contain LLD macro(s)");
 		return FAIL;
