@@ -700,6 +700,7 @@ class testPageHostGraph extends CLegacyWebTest {
 		$this->openPageHostGraphs($data['host'], $context);
 
 		$filter = $this->query('name:zbx_filter')->asForm()->one();
+		$table = $this->query('xpath://table[@class="list-table"]')->asTable()->one();
 		if (array_key_exists('group', $data)) {
 			if ($data['group'] === 'all') {
 				$filter->getField('Host groups')->clear();
@@ -724,6 +725,7 @@ class testPageHostGraph extends CLegacyWebTest {
 			}
 		}
 		$filter->submit();
+		$table->waitUntilReloaded();
 
 		if ($data['host'] === 'all') {
 			$this->assertTrue($this->query('xpath://button[@id="form"][@disabled][text()="Create graph (select host first)"]')

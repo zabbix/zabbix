@@ -35,6 +35,15 @@ class testInheritanceItemPrototype extends CLegacyWebTest {
 	private $discoveryRuleId = 15011;	// 'testInheritanceDiscoveryRule'
 	private $discoveryRule = 'testInheritanceDiscoveryRule';
 
+	/**
+	 * Attach CMessageBehavior to the test.
+	 *
+	 * @return array
+	 */
+	public function getBehaviors() {
+		return [CMessageBehavior::class];
+	}
+
 	// returns list of item prototypes from a template
 	public static function update() {
 		return CDBHelper::getDataProvider(
@@ -56,8 +65,8 @@ class testInheritanceItemPrototype extends CLegacyWebTest {
 		$this->zbxTestLogin('disc_prototypes.php?form=update&context=host&itemid='.$data['itemid'].'&parent_discoveryid='.
 				$data['parent_itemid']);
 		$this->zbxTestClickWait('update');
+		$this->assertMessage(TEST_GOOD, 'Item prototype updated');
 		$this->zbxTestCheckTitle('Configuration of item prototypes');
-		$this->zbxTestTextPresent('Item prototype updated');
 
 		$this->assertEquals($oldHashItems, CDBHelper::getHash($sqlItems));
 	}
@@ -99,7 +108,7 @@ class testInheritanceItemPrototype extends CLegacyWebTest {
 		$this->zbxTestClickWait('add');
 		switch ($data['expected']) {
 			case TEST_GOOD:
-				$this->zbxTestWaitUntilMessageTextPresent('msg-good', 'Item prototype added');
+				$this->assertMessage(TEST_GOOD, 'Item prototype added');
 				$this->zbxTestTextPresent($data['name']);
 
 				$itemId = 0;
