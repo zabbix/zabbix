@@ -14,8 +14,8 @@
 **/
 
 
-require_once dirname(__FILE__).'/../../include/CWebTest.php';
-require_once dirname(__FILE__).'/../../include/helpers/CDataHelper.php';
+require_once __DIR__.'/../../include/CWebTest.php';
+require_once __DIR__.'/../../include/helpers/CDataHelper.php';
 
 /**
  * @backup settings, widget, hosts
@@ -28,6 +28,15 @@ require_once dirname(__FILE__).'/../../include/helpers/CDataHelper.php';
  * @ignoreBrowserErrors
  */
 class testDashboardGeomapWidgetScreenshots extends CWebTest {
+
+	/**
+	 * Attach MessageBehavior to the test.
+	 *
+	 * @return array
+	 */
+	public function getBehaviors() {
+		return [CMessageBehavior::class];
+	}
 
 	// Dashboard for zoom screenshot tests.
 	protected static $zoom_dashboardid;
@@ -283,13 +292,13 @@ class testDashboardGeomapWidgetScreenshots extends CWebTest {
 		$form = $this->query('id:geomaps-form')->asForm()->one();
 		$form->fill($data);
 		$form->submit();
+		$this->assertMessage(TEST_GOOD, 'Configuration updated');
 
 		$this->page->open('zabbix.php?action=dashboard.view&dashboardid='.self::$zoom_dashboardid);
 		CDashboardElement::find()->waitUntilReady();
 
 		$widgets = [
-			// TODO: temporarily commented out due to mouse pointer on first widget in Jenkins
-//			'Geomap for screenshots, 5',
+			'Geomap for screenshots, 5',
 			'Geomap for screenshots, 10',
 			'Geomap for screenshots, 30',
 			'Geomap for screenshots, no zoom',
@@ -324,7 +333,7 @@ class testDashboardGeomapWidgetScreenshots extends CWebTest {
 
 		foreach ($widgets as $widget) {
 			$id = $widget.' '.$data['Tile provider'];
-			$element = $this->query("xpath://div[@class=\"dashboard-grid-widget\"]//h4[text()=".
+			$element = $this->query("xpath://div[".CXPathHelper::fromClass('dashboard-grid-widget')."]//h4[text()=".
 					CXPathHelper::escapeQuotes($widget)."]/../..")->waitUntilVisible()->one();
 
 			$count = count($this->errors);

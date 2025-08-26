@@ -14,7 +14,7 @@ dnl
 
 dnl Process this file with autoconf to produce a configure script.
 
-AC_INIT([Zabbix], [7.4.0beta1])
+AC_INIT([Zabbix], [8.0.0alpha1])
 
 AC_MSG_NOTICE([Configuring $PACKAGE_NAME $PACKAGE_VERSION])
 
@@ -1638,8 +1638,8 @@ if test "x$server" = "xyes" || test "x$proxy" = "xyes"; then
 
 	AC_SUBST(SNMP_CFLAGS)
 
-	dnl Check for LIBSSH2 [by default - skip] at least of version 1.0.0.
-	LIBSSH2_CHECK_CONFIG([no])
+	dnl Check for LIBSSH2 [by default - skip]
+	LIBSSH2_CHECK_CONFIG([no],[1.8.0])
 	LIBSSH_CHECK_CONFIG([no])
 	if test "x$want_ssh2" = "xyes"; then
 		if test "x$want_ssh" != "xno"; then
@@ -1649,7 +1649,7 @@ if test "x$server" = "xyes" || test "x$proxy" = "xyes"; then
 		if test "x$found_ssh2" != "xyes"; then
 			AC_MSG_ERROR([SSH2 library not found])
 		elif test "x$accept_ssh2_version" != "xyes"; then
-			AC_MSG_ERROR([SSH2 library version requirement not met (>= 1.0.0)])
+			AC_MSG_ERROR([SSH2 library version requirement not met (>= 1.8.0)])
 		else
 			have_ssh="yes (libssh2)"
 		fi
@@ -2054,9 +2054,7 @@ if test "x$agent2" = "xyes"; then
 		\${abs_top_builddir}/src/libs/zbxcrypto/libzbxcrypto.a \
 		\${abs_top_builddir}/src/libs/zbxexec/libzbxexec.a \
 		\${abs_top_builddir}/src/libs/zbxhash/libzbxhash.a \
-		\${abs_top_builddir}/src/libs/zbxhttp/libzbxhttp.a \
 		\${abs_top_builddir}/src/libs/zbxjson/libzbxjson.a \
-		\${abs_top_builddir}/src/libs/zbxmutexs/libzbxmutexs.a \
 		\${abs_top_builddir}/src/libs/zbxprof/libzbxprof.a \
 		\${abs_top_builddir}/src/libs/zbxnix/libzbxnix.a \
 		\${abs_top_builddir}/src/libs/zbxregexp/libzbxregexp.a \
@@ -2067,15 +2065,12 @@ if test "x$agent2" = "xyes"; then
 		\${abs_top_builddir}/src/libs/zbxexpr/libzbxexpr.a \
 		\${abs_top_builddir}/src/libs/zbxtime/libzbxtime.a \
 		\${abs_top_builddir}/src/libs/zbxip/libzbxip.a \
-		\${abs_top_builddir}/src/libs/zbxsysinfo/"$ARCH"/libspechostnamesysinfo.a \
 		\${abs_top_builddir}/src/libs/zbxsysinfo/"$ARCH"/libspecsysinfo.a \
 		\${abs_top_builddir}/src/libs/zbxsysinfo/alias/libalias.a \
-		\${abs_top_builddir}/src/libs/zbxsysinfo/common/libcommonsysinfo.a \
 		\${abs_top_builddir}/src/libs/zbxsysinfo/libzbxagent2sysinfo.a \
 		\${abs_top_builddir}/src/libs/zbxsysinfo/simple/libsimplesysinfo.a \
 		\${abs_top_builddir}/src/libs/zbxthreads/libzbxthreads.a \
 		\${abs_top_builddir}/src/libs/zbxvariant/libzbxvariant.a \
-		\${abs_top_builddir}/src/libs/zbxxml/libzbxxml.a \
 		\${abs_top_builddir}/src/zabbix_agent/logfiles/libzbxlogfiles.a \
 		\${abs_top_builddir}/src/zabbix_agent/active_checks/libzbxactive_checks.a \
 		\${abs_top_builddir}/src/zabbix_agent/metrics/libzbxmetrics.a \

@@ -14,9 +14,9 @@
 **/
 
 
-require_once dirname(__FILE__).'/../../include/CWebTest.php';
-require_once dirname(__FILE__).'/../behaviors/CMessageBehavior.php';
-require_once dirname(__FILE__).'/../behaviors/CTableBehavior.php';
+require_once __DIR__.'/../../include/CWebTest.php';
+require_once __DIR__.'/../behaviors/CMessageBehavior.php';
+require_once __DIR__.'/../behaviors/CTableBehavior.php';
 
 /**
  * @backup dashboard, profiles
@@ -450,7 +450,7 @@ class testDashboardsForm extends CWebTest {
 		$dashboard->cancelEditing();
 
 		if (CTestArrayHelper::get($data, 'opened_dashboard', false)) {
-			$url = 'zabbix.php?action=dashboard.view&dashboardid=1';
+			$url = 'zabbix.php?action=dashboard.view&dashboardid=1&from=now-1h&to=now';
 			$title = $data['opened_dashboard'];
 		}
 		else {

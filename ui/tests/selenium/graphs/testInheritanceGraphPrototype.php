@@ -14,7 +14,7 @@
 **/
 
 
-require_once dirname(__FILE__).'/../../include/CLegacyWebTest.php';
+require_once __DIR__.'/../../include/CLegacyWebTest.php';
 
 /**
  * Test the creation of inheritance of new objects on a previously linked template.
@@ -33,7 +33,7 @@ class testInheritanceGraphPrototype extends CLegacyWebTest {
 
 	public static function update() {
 		return CDBHelper::getDataProvider(
-			'SELECT DISTINCT g.graphid,id.parent_itemid'.
+			'SELECT DISTINCT g.graphid,id.lldruleid'.
 			' FROM graphs g,graphs_items gi,item_discovery id'.
 			' WHERE g.graphid=gi.graphid'.
 				' AND gi.itemid=id.itemid'.
@@ -56,10 +56,14 @@ class testInheritanceGraphPrototype extends CLegacyWebTest {
 		$sqlGraphs = 'SELECT * FROM graphs ORDER BY graphid';
 		$oldHashGraphs = CDBHelper::getHash($sqlGraphs);
 
-		$this->zbxTestLogin('graphs.php?form=update&context=host&graphid='.$data['graphid'].'&parent_discoveryid='.
-				$data['parent_itemid']);
-		$this->zbxTestCheckTitle('Configuration of graph prototypes');
-		$this->zbxTestClickWait('update');
+		$this->zbxTestLogin('zabbix.php?action=popup&popup=graph.prototype.edit&context=host&parent_discoveryid='.
+				$data['lldruleid'].'&graphid='.$data['graphid']);
+		$this->zbxTestCheckTitle('Graph prototype edit');
+
+		$dialog = COverlayDialogElement::find()->one()->waitUntilReady();
+		$dialog->query('button', 'Update')->waitUntilClickable()->one()->click();
+		$dialog->ensureNotPresent();
+
 		$this->zbxTestWaitUntilMessageTextPresent('msg-good', 'Graph prototype updated');
 
 		$this->assertEquals($oldHashGraphs, CDBHelper::getHash($sqlGraphs));
@@ -87,10 +91,8 @@ class testInheritanceGraphPrototype extends CLegacyWebTest {
 					'addItemPrototypes' => [
 						['itemName' => 'testInheritanceItemPrototype1']
 					],
-					'errors'=> [
-						'Graph prototype "testInheritanceGraphPrototype4" already exists on the LLD rule with '.
-								'key "inheritance-discovery-rule" of the template "Inheritance test template".'
-					]
+					'errors'=> 'Graph prototype "testInheritanceGraphPrototype4" already exists on the LLD rule with'.
+						' key "inheritance-discovery-rule" of the template "Inheritance test template".'
 				]
 			]
 		];
@@ -100,23 +102,26 @@ class testInheritanceGraphPrototype extends CLegacyWebTest {
 	 * @dataProvider create
 	 */
 	public function testInheritanceGraphPrototype_SimpleCreate($data) {
-		$this->zbxTestLogin('graphs.php?form=Create+graph+prototype&context=template&parent_discoveryid='.$this->discoveryRuleId);
+		$this->zbxTestLogin('zabbix.php?action=popup&popup=graph.prototype.edit&context=template&parent_discoveryid='.
+				$this->discoveryRuleId
+		);
+		$dialog = COverlayDialogElement::find()->waitUntilReady()->one();
 
 		$this->zbxTestInputTypeWait('name', $data['name']);
 
 		if (isset($data['addItemPrototypes'])) {
 			foreach ($data['addItemPrototypes'] as $item) {
-				$this->zbxTestClick('add_protoitem');
+				$this->zbxTestClick('add_item_prototype');
 				$this->zbxTestLaunchOverlayDialog('Item prototypes');
 				$this->zbxTestClickLinkTextWait($item['itemName']);
 				$this->zbxTestTextPresent($this->template.': '.$item['itemName']);
 			}
+			$dialog->getFooter()->query('button:Add')->waitUntilClickable()->one()->click();
 		}
-
-		$this->zbxTestClickWait('add');
 
 		switch ($data['expected']) {
 			case TEST_GOOD:
+				$dialog->ensureNotPresent();
 				$this->zbxTestCheckTitle('Configuration of graph prototypes');
 				$this->zbxTestCheckHeader('Graph prototypes');
 				$this->zbxTestWaitUntilMessageTextPresent('msg-good', 'Graph prototype added');
@@ -124,13 +129,13 @@ class testInheritanceGraphPrototype extends CLegacyWebTest {
 				break;
 
 			case TEST_BAD:
-				$this->zbxTestCheckTitle('Configuration of graph prototypes');
-				$this->zbxTestCheckHeader('Graph prototypes');
-				$this->zbxTestWaitUntilMessageTextPresent('msg-bad', 'Cannot add graph prototype');
-				$this->zbxTestTextPresent($data['errors']);
+				$this->zbxTestCheckTitle('Graph prototype edit');
+				$message = CMessageElement::find()->waitUntilVisible()->one();
+				$this->assertTrue($message->isBad());
+				$this->assertEquals('Cannot add graph prototype', $message->getTitle());
+				$this->assertTrue($message->hasLine($data['errors']));
 				$this->zbxTestTextNotPresent('Graph prototype added');
 				break;
 		}
-
 	}
 }

@@ -22,6 +22,7 @@
 #define ZBX_DB_OK	0
 #define ZBX_DB_FAIL	-1
 #define ZBX_DB_DOWN	-2
+#define ZBX_DB_RONLY	-3
 
 #define ZBX_DB_TLS_CONNECT_REQUIRED_TXT		"required"
 #define ZBX_DB_TLS_CONNECT_VERIFY_CA_TXT	"verify_ca"
@@ -96,7 +97,7 @@ zbx_db_config_t;
 		if (SUCCEED == zbx_db_is_null(row))	\
 			uint = 0;			\
 		else					\
-			zbx_is_uint64(row, &uint);	\
+			ZBX_STR2UINT64(uint, row);	\
 	}						\
 	while (0)
 
@@ -129,6 +130,8 @@ zbx_err_codes_t;
 
 #ifdef HAVE_POSTGRESQL
 int	zbx_tsdb_get_version(void);
+	/* check that TimescaleDB version is greater than or equal to 2.18 */
+#	define ZBX_DB_TSDB_GE_V2_18	(21800 <= zbx_tsdb_get_version())
 #endif
 
 #if defined (HAVE_MYSQL)
@@ -237,6 +240,8 @@ void	zbx_tsdb_info_extract(struct zbx_db_version_info_t *version_info);
 void	zbx_tsdb_set_compression_availability(int compression_availabile);
 int	zbx_tsdb_get_compression_availability(void);
 void	zbx_tsdb_extract_compressed_chunk_flags(struct zbx_db_version_info_t *version_info);
+#elif defined(HAVE_MYSQL)
+int	zbx_mariadb_fork_get(void);
 #endif
 
 int	zbx_db_version_check(const char *database, zbx_uint32_t current_version, zbx_uint32_t min_version,
@@ -323,6 +328,7 @@ void	zbx_db_insert_clause(zbx_db_insert_t *self, const char *clause);
 zbx_uint64_t	zbx_db_insert_get_lastid(zbx_db_insert_t *self);
 void	zbx_db_insert_clean(zbx_db_insert_t *db_insert);
 void	zbx_db_insert_set_batch_size(zbx_db_insert_t *self, int batch_size);
+int	zbx_db_insert_get_row_count(zbx_db_insert_t *self);
 
 void	zbx_dbconn_extract_version_info(zbx_dbconn_t *db, struct zbx_db_version_info_t *version_info);
 
@@ -486,6 +492,5 @@ void	zbx_db_large_query_prepare_uint(zbx_db_large_query_t *query, char **sql,
 void	zbx_db_large_query_prepare_str(zbx_db_large_query_t *query, char **sql,
 		size_t *sql_alloc, size_t *sql_offset, const char *field, const zbx_vector_str_t *ids);
 void	zbx_db_large_query_append_sql(zbx_db_large_query_t *query, const char *sql);
-
 
 #endif

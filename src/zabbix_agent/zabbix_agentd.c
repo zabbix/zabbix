@@ -27,6 +27,7 @@
 #include "zbxcfg.h"
 #include "zbxmutexs.h"
 #include "zbxbincommon.h"
+#include "zbxtime.h"
 
 static char	*config_pid_file = NULL;
 
@@ -318,7 +319,7 @@ static zbx_config_log_t	log_file_cfg	= {NULL, NULL, ZBX_LOG_TYPE_UNDEFINED, 1};
 void	zbx_co_uninitialize();
 #endif
 
-void	zbx_free_service_resources(int ret);
+void	zbx_free_service_resources(void);
 
 static int	get_process_info_by_thread(int local_server_num, unsigned char *local_process_type,
 		int *local_process_num)
@@ -1194,7 +1195,7 @@ static void	zbx_on_exit(int ret, void *on_exit_args)
 			zbx_tcp_unlisten(args->listen_sock);
 	}
 #endif
-	zbx_free_service_resources(ret);
+	zbx_free_service_resources();
 
 #if defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
 	zbx_tls_free();
@@ -1251,33 +1252,6 @@ static void	signal_redirect_cb(int flags, zbx_signal_handler_f sigusr_handler)
 				sigusr_handler(flags);
 	}
 #endif
-}
-#endif
-
-#ifndef _WINDOWS
-static int	wait_for_children(const ZBX_THREAD_HANDLE *pids, size_t pids_num)
-{
-	int	ws;
-	pid_t	pid;
-
-	pid = wait(&ws);
-
-	if (-1 == pid)
-	{
-		if (EINTR != errno)
-		{
-			zabbix_log(LOG_LEVEL_ERR, "failed to wait on child processes: %s", zbx_strerror(errno));
-			zbx_set_exiting_with_fail();
-			return FAIL;
-		}
-
-		return SUCCEED;
-	}
-
-	if (FAIL == zbx_is_child_pid(pid, pids, pids_num))
-		return SUCCEED;
-
-	return FAIL;
 }
 #endif
 
@@ -1340,7 +1314,7 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 	if (SUCCEED != zbx_coredump_disable())
 	{
 		zabbix_log(LOG_LEVEL_CRIT, "cannot disable core dump, exiting...");
-		zbx_free_service_resources(FAIL);
+		zbx_free_service_resources();
 		exit(EXIT_FAILURE);
 	}
 #endif
@@ -1348,7 +1322,7 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 	if (FAIL == zbx_load_modules(config_load_module_path, config_load_module, zbx_config_timeout, 1))
 	{
 		zabbix_log(LOG_LEVEL_CRIT, "loading modules failed, exiting...");
-		zbx_free_service_resources(FAIL);
+		zbx_free_service_resources();
 		exit(EXIT_FAILURE);
 	}
 #endif
@@ -1357,7 +1331,7 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 	{
 		zabbix_log(LOG_LEVEL_CRIT, "cannot load user parameters: %s", error);
 		zbx_free(error);
-		zbx_free_service_resources(FAIL);
+		zbx_free_service_resources();
 		exit(EXIT_FAILURE);
 	}
 
@@ -1372,7 +1346,7 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 				zbx_config_timeout, config_tcp_max_backlog_size))
 		{
 			zabbix_log(LOG_LEVEL_CRIT, "listener failed: %s", zbx_socket_strerror());
-			zbx_free_service_resources(FAIL);
+			zbx_free_service_resources();
 			exit(EXIT_FAILURE);
 		}
 	}
@@ -1381,7 +1355,7 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 	{
 		zabbix_log(LOG_LEVEL_CRIT, "cannot initialize modbus: %s", error);
 		zbx_free(error);
-		zbx_free_service_resources(FAIL);
+		zbx_free_service_resources();
 		exit(EXIT_FAILURE);
 	}
 
@@ -1389,7 +1363,7 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 	{
 		zabbix_log(LOG_LEVEL_CRIT, "cannot initialize collector: %s", error);
 		zbx_free(error);
-		zbx_free_service_resources(FAIL);
+		zbx_free_service_resources();
 		exit(EXIT_FAILURE);
 	}
 
@@ -1417,7 +1391,7 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 	{
 		zabbix_log(LOG_LEVEL_CRIT, "Too many agent threads. Please reduce the StartAgents configuration"
 				" parameter or the number of active servers in ServerActive configuration parameter.");
-		zbx_free_service_resources(FAIL);
+		zbx_free_service_resources();
 		exit(EXIT_FAILURE);
 	}
 #endif
@@ -1498,8 +1472,30 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 	zbx_set_child_pids(zbx_threads, zbx_threads_num);
 	zbx_unset_exit_on_terminate();
 
-	while (ZBX_IS_RUNNING() && SUCCEED == wait_for_children(zbx_threads, zbx_threads_num))
-		;
+	while (ZBX_IS_RUNNING())
+	{
+		int	ws;
+		pid_t	pid;
+
+		zbx_sleep(1);
+		__zbx_update_env(zbx_time());
+
+		if (0 < (pid = waitpid((pid_t)-1, &ws, WNOHANG)))
+		{
+			if (SUCCEED == zbx_is_child_pid(pid, zbx_threads, zbx_threads_num))
+			{
+				zbx_set_exiting_with_fail();
+				break;
+			}
+		}
+
+		if (-1 == pid && EINTR != errno)
+		{
+			zabbix_log(LOG_LEVEL_ERR, "failed to wait on child processes: %s", zbx_strerror(errno));
+			zbx_set_exiting_with_fail();
+			break;
+		}
+	}
 
 	zbx_log_exit_signal();
 
@@ -1516,12 +1512,12 @@ int	MAIN_ZABBIX_ENTRY(int flags)
  * Purpose: frees service resources allocated by main thread                  *
  *                                                                            *
  ******************************************************************************/
-void	zbx_free_service_resources(int ret)
+void	zbx_free_service_resources(void)
 {
 	if (NULL != zbx_threads)
 	{
 		/* wait for all child processes to exit */
-		zbx_threads_kill_and_wait(zbx_threads, threads_flags, zbx_threads_num, ret);
+		zbx_threads_kill_and_wait(zbx_threads, threads_flags, zbx_threads_num);
 
 		zbx_free(zbx_threads);
 		zbx_free(threads_flags);

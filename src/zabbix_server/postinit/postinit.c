@@ -16,6 +16,8 @@
 
 #include "../db_lengths_constants.h"
 
+#include "zbxcommon.h"
+#include "zbxtypes.h"
 #include "zbxexpression.h"
 #include "zbxtasks.h"
 #include "zbxcachevalue.h"
@@ -26,6 +28,8 @@
 #include "zbxexpr.h"
 #include "zbxstr.h"
 #include "zbxnum.h"
+#include "zbxalgo.h"
+#include "audit/zbxaudit.h"
 
 #define ZBX_HIST_MACRO_NONE		(-1)
 #define ZBX_HIST_MACRO_ITEM_VALUE	0
@@ -431,6 +435,74 @@ out:
 
 /******************************************************************************
  *                                                                            *
+ * Purpose: copy nested host prototypes from templates to discovered hosts    *
+ *                                                                            *
+ ******************************************************************************/
+static void	copy_nested_host_prototypes(void)
+{
+	zbx_db_result_t		result;
+	zbx_db_row_t		row;
+	zbx_uint64_t		last_hostid = 0, hostid, templateid;
+	zbx_vector_uint64_t	templateids;
+	zbx_db_insert_t		db_insert;
+
+	zabbix_log(LOG_LEVEL_WARNING, "starting nested host prototype update forced by database upgrade");
+
+	zbx_vector_uint64_create(&templateids);
+
+	zbx_db_insert_prepare(&db_insert, "hosts_templates",  "hosttemplateid", "hostid", "templateid",
+			"link_type", (char *)NULL);
+
+	/* 4 - ZBX_FLAG_DISCOVERY_CREATED */
+	result = zbx_db_select("select h.hostid,ht.templateid"
+				" from hosts_templates ht"
+					" join hosts h on ht.hostid=h.hostid"
+				" where h.flags=4"
+					" and exists (select null from items i,host_discovery hd"
+							" where i.hostid=ht.templateid"
+								" and hd.lldruleid=i.itemid)"
+				" order by hostid");
+
+	while (NULL != (row = zbx_db_fetch(result)))
+	{
+		ZBX_STR2UINT64(hostid, row[0]);
+
+		if (hostid != last_hostid)
+		{
+			if (0 != last_hostid)
+			{
+				zbx_db_copy_template_host_prototypes(last_hostid, &templateids, ZBX_AUDIT_LLD_CONTEXT,
+						&db_insert);
+			}
+
+			last_hostid = hostid;
+			zbx_vector_uint64_clear(&templateids);
+		}
+
+		ZBX_STR2UINT64(templateid, row[1]);
+		zbx_vector_uint64_append(&templateids, templateid);
+	}
+	zbx_db_free_result(result);
+
+	if (0 != last_hostid)
+	{
+		if (0 != templateids.values_num)
+		{
+			zbx_db_copy_template_host_prototypes(last_hostid, &templateids, ZBX_AUDIT_LLD_CONTEXT,
+					&db_insert);
+		}
+
+		zbx_db_insert_execute(&db_insert);
+	}
+
+	zbx_db_insert_clean(&db_insert);
+	zbx_vector_uint64_destroy(&templateids);
+
+	zabbix_log(LOG_LEVEL_WARNING, "nested host prototype update completed");
+}
+
+/******************************************************************************
+ *                                                                            *
  * Purpose: processes post initialization tasks                               *
  *                                                                            *
  * Return value: SUCCEED - update was successful                              *
@@ -441,31 +513,45 @@ int	zbx_check_postinit_tasks(char **error)
 {
 	zbx_db_result_t	result;
 	zbx_db_row_t	row;
-	int		ret = SUCCEED;
+	int		type, ret = SUCCEED;
 
 	/* avoid filling value cache with unnecessary data during event name update */
 	zbx_vc_disable();
 
-	result = zbx_db_select("select taskid from task where type=%d and status=%d", ZBX_TM_TASK_UPDATE_EVENTNAMES,
+	result = zbx_db_select("select taskid,type from task where type in (%d,%d) and status=%d order by taskid",
+			ZBX_TM_TASK_UPDATE_EVENTNAMES, ZBX_TM_TASK_COPY_NESTED_HOST_PROTOTYPES,
 			ZBX_TM_STATUS_NEW);
 
-	if (NULL != (row = zbx_db_fetch(result)))
+	while (NULL != (row = zbx_db_fetch(result)))
 	{
 		zbx_db_begin();
 
-		if (SUCCEED == (ret = update_event_names()))
+		type = atoi(row[1]);
+
+		switch (type)
+		{
+			case ZBX_TM_TASK_UPDATE_EVENTNAMES:
+				if (FAIL == (ret = update_event_names()))
+					*error = zbx_strdup(*error, "cannot update event names");
+				break;
+			case ZBX_TM_TASK_COPY_NESTED_HOST_PROTOTYPES:
+				copy_nested_host_prototypes();
+				break;
+		}
+
+		if (SUCCEED == ret)
 		{
 			zbx_db_execute("delete from task where taskid=%s", row[0]);
 			zbx_db_commit();
 		}
 		else
+		{
 			zbx_db_rollback();
+			break;
+		}
 	}
 
 	zbx_db_free_result(result);
-
-	if (SUCCEED != ret)
-		*error = zbx_strdup(*error, "cannot update event names");
 
 	zbx_vc_enable();
 

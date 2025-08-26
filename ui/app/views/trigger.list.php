@@ -257,7 +257,7 @@ foreach ($data['triggers'] as $tnum => $trigger) {
 		->setArgument('action', 'popup')
 		->setArgument('popup', 'trigger.edit')
 		->setArgument('triggerid', $triggerid)
-		->setArgument('hostid', $data['single_selected_hostid'])
+		->setArgument('hostid', array_column($trigger['hosts'], 'hostid')[0])
 		->setArgument('context', $data['context'])
 		->getUrl();
 
@@ -292,8 +292,8 @@ foreach ($data['triggers'] as $tnum => $trigger) {
 		$description = array_merge($description, [(new CDiv($trigger_deps))->addClass('dependencies')]);
 	}
 
-	$disable_source = $trigger['status'] == TRIGGER_STATUS_DISABLED && $trigger['triggerDiscovery']
-		? $trigger['triggerDiscovery']['disable_source']
+	$disable_source = $trigger['status'] == TRIGGER_STATUS_DISABLED && $trigger['discoveryData']
+		? $trigger['discoveryData']['disable_source']
 		: '';
 
 	// info
@@ -303,9 +303,9 @@ foreach ($data['triggers'] as $tnum => $trigger) {
 			$info_icons[] = makeErrorIcon((new CDiv($trigger['error']))->addClass(ZBX_STYLE_WORDBREAK));
 		}
 
-		if ($trigger['triggerDiscovery'] && $trigger['triggerDiscovery']['status'] == ZBX_LLD_STATUS_LOST) {
-			$info_icons[] = getLldLostEntityIndicator(time(), $trigger['triggerDiscovery']['ts_delete'],
-				$trigger['triggerDiscovery']['ts_disable'], $disable_source,
+		if ($trigger['discoveryData'] && $trigger['discoveryData']['status'] == ZBX_LLD_STATUS_LOST) {
+			$info_icons[] = getLldLostEntityIndicator(time(), $trigger['discoveryData']['ts_delete'],
+				$trigger['discoveryData']['ts_disable'], $disable_source,
 				$trigger['status'] == TRIGGER_STATUS_DISABLED, _('trigger')
 			);
 		}

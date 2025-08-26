@@ -137,10 +137,6 @@ $max_levels: 10;
 		align-items: center;
 		white-space: pre;
 		line-height: 18px;
-
-		.navigation-tree-node-info-problems-hint-severity-color {
-			margin-right: 10px
-		}
 	}
 }
 
@@ -149,8 +145,7 @@ $max_levels: 10;
 @if $theme-name == 'blue' or $theme-name == 'dark' {
 	.navigation-tree-node-info-problems-hint {
 		.navigation-tree-node-info-problems-hint-severity-color {
-			width: 10px;
-			height: 10px;
+			@extend %indicator-color-box;
 		}
 	}
 }
@@ -160,6 +155,7 @@ $max_levels: 10;
 		.navigation-tree-node-info-problems-hint-severity-color {
 			width: $icon-medium-size;
 			height: $icon-medium-size;
+			margin-right: 10px;
 
 			&::before {
 				width: $icon-medium-size;

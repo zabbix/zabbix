@@ -16,6 +16,7 @@
 
 /**
  * @var CView $this
+ * @var array $data
  */
 
 $form = (new CForm())
@@ -68,21 +69,24 @@ $i = 0;
 foreach ($data['macros'] as $macro_name => $macro_value) {
 	$macros_table->addRow([
 		(new CCol(
-			(new CTextAreaFlexible('macro_rows['.$i++.']', $macro_name, ['readonly' => true]))
+			(new CTextAreaFlexible('macro_rows['.$i.']', $macro_name, ['readonly' => true]))
 				->setWidth(ZBX_TEXTAREA_MACRO_WIDTH)
 				->removeId()
 				->removeAttribute('name')
 		))->addClass(ZBX_STYLE_TEXTAREA_FLEXIBLE_PARENT),
 		(new CCol(RARR()))->addStyle('vertical-align: top;'),
-		(new CCol(
-			(new CTextAreaFlexible('macros['.$macro_name.']', $macro_value))
+		(new CCol([
+			new CVar('macro_names['.$i.']', $macro_name),
+			(new CTextAreaFlexible('macro_values['.$i.']', $macro_value))
 				->setWidth(ZBX_TEXTAREA_MACRO_VALUE_WIDTH)
 				->setMaxlength(CControllerPopupItemTest::INPUT_MAX_LENGTH)
 				->setAttribute('placeholder', _('value'))
 				->disableSpellcheck()
 				->removeId()
-		))->addClass(ZBX_STYLE_TEXTAREA_FLEXIBLE_PARENT)
+		]))->addClass(ZBX_STYLE_TEXTAREA_FLEXIBLE_PARENT)
 	]);
+
+	$i++;
 }
 
 $form_grid = (new CFormGrid())
@@ -370,7 +374,8 @@ if (count($data['steps']) > 0) {
 		->setHeader([
 			'',
 			(new CColHeader(_('Name')))->addStyle('width: 100%;'),
-			(new CColHeader(_('Result')))->addClass(ZBX_STYLE_RIGHT)
+			(new CColHeader(_('Result')))->addClass(ZBX_STYLE_RIGHT),
+			''
 		]);
 
 	foreach ($data['steps'] as $i => $step) {
@@ -394,7 +399,16 @@ if (count($data['steps']) > 0) {
 				->addClass(ZBX_STYLE_WORDBREAK),
 			(new CCol())
 				->addClass(ZBX_STYLE_RIGHT)
-				->setId('preproc-test-step-'.$i.'-result')
+				->setId('preproc-test-step-'.$i.'-result'),
+			(new CCol(
+				(new CButton('copy_button-'.$i))
+					->setTitle(_('Copy to clipboard'))
+					->addClass(ZBX_ICON_COPY)
+					->addClass(ZBX_STYLE_BTN_GREY_ICON)
+					->addClass('js-copy-button')
+					->setAttribute('data-index', $i)
+					->addStyle('display: none')
+			))->addClass('result-copy')
 		]);
 	}
 
@@ -411,7 +425,9 @@ if (count($data['steps']) > 0) {
 if ($data['show_final_result']) {
 	$form_grid->addItem([
 		(new CLabel(_('Result')))->addClass('js-final-result'),
-		(new CFormField())->addClass(CFormField::ZBX_STYLE_FORM_FIELD_FLUID)
+		(new CFormField())
+			->addClass(CFormField::ZBX_STYLE_FORM_FIELD_FLUID)
+			->addClass('item-final-result')
 	]);
 }
 

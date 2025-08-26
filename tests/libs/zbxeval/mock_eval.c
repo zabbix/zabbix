@@ -83,6 +83,14 @@ zbx_uint64_t	mock_eval_read_rules(const char *path)
 			rules |= ZBX_EVAL_PARSE_COMPOUND_CONST;
 		else if (0 == strcmp(flag, "ZBX_EVAL_PARSE_STR_V64_COMPAT"))
 			rules |= ZBX_EVAL_PARSE_STR_V64_COMPAT;
+		else if (0 == strcmp(flag, "ZBX_EVAL_PARSE_FUNCTION_NAME"))
+			rules |= ZBX_EVAL_PARSE_FUNCTION_NAME;
+		else if (0 == strcmp(flag, "ZBX_EVAL_TOKEN_ARG_QUERY"))
+			rules |= ZBX_EVAL_TOKEN_ARG_QUERY;
+		else if (0 == strcmp(flag, "ZBX_EVAL_PARSE_FUNCTION_ARGS"))
+			rules |= ZBX_EVAL_PARSE_FUNCTION_ARGS;
+		else if (0 == strcmp(flag, "ZBX_EVAL_PARSE_CALC_EXPRESSION"))
+			rules |= ZBX_EVAL_PARSE_CALC_EXPRESSION;
 		else
 			fail_msg("Unsupported flag: %s", flag);
 
@@ -323,4 +331,110 @@ void	mock_dump_stack(const zbx_eval_context_t *ctx)
 
 	for (i = 0; i < ctx->stack.values_num; i++)
 		dump_token(ctx, &ctx->stack.values[i]);
+}
+
+int	compare_vectors_uint64(zbx_vector_uint64_t *v1, zbx_vector_uint64_t *v2)
+{
+	if (v1->values_num != v2->values_num)
+		return FAIL;
+
+	for (int i = 0; i < v1->values_num; i++)
+	{
+		if (v1->values[i] != v2->values[i])
+			return FAIL;
+	}
+
+	return SUCCEED;
+}
+
+int	compare_ctx(zbx_eval_context_t *ctx1, zbx_eval_context_t *ctx2)
+{
+	if (SUCCEED != zbx_strcmp_natural(ctx1->expression, ctx2->expression))
+		return FAIL;
+
+	if (ctx1->rules != ctx2->rules)
+		return FAIL;
+
+	if (ctx1->stack.values_num != ctx2->stack.values_num)
+		return FAIL;
+
+	for (int i = 0; i < ctx1->stack.values_num; i++)
+	{
+		if (ctx1->stack.values[i].loc.l != ctx2->stack.values[i].loc.l)
+			return FAIL;
+
+		if (ctx1->stack.values[i].loc.r != ctx2->stack.values[i].loc.r)
+			return FAIL;
+
+		if (ctx1->stack.values[i].opt != ctx2->stack.values[i].opt)
+			return FAIL;
+
+		if (ctx1->stack.values[i].type != ctx2->stack.values[i].type)
+			return FAIL;
+
+		if (ctx1->stack.values[i].value.type != ctx2->stack.values[i].value.type)
+			return FAIL;
+
+		if (ZBX_VARIANT_STR == ctx1->stack.values[i].value.type)
+		{
+			if (FAIL == zbx_strcmp_natural(ctx1->stack.values[i].value.data.str,
+					ctx2->stack.values[i].value.data.str))
+				return FAIL;
+		}
+
+		if (ZBX_VARIANT_UI64 == ctx1->stack.values[i].value.type)
+		{
+			if (ctx1->stack.values[i].value.data.ui64 != ctx2->stack.values[i].value.data.ui64)
+				return FAIL;
+		}
+
+		if (ZBX_VARIANT_DBL == ctx1->stack.values[i].value.type)
+		{
+			if (ctx1->stack.values[i].value.data.dbl != ctx2->stack.values[i].value.data.dbl)
+				return FAIL;
+		}
+	}
+	return SUCCEED;
+}
+
+int	query_macro_resolver(zbx_token_type_t type, char **value, char **error, va_list args)
+{
+	const char	*macro = va_arg(args, const char *);
+	const char	*macro_data = va_arg(args, const char *);
+
+	ZBX_UNUSED(error);
+
+	switch(type)
+	{
+		case ZBX_EVAL_TOKEN_VAR_STR:
+		case ZBX_EVAL_TOKEN_VAR_USERMACRO:
+			if (0 == strcmp(*value, macro))
+			{
+				zbx_free(*value);
+				*value = zbx_strdup(NULL, macro_data);
+			}
+			else
+				return FAIL;
+			break;
+		default:
+			return FAIL;
+			break;
+	}
+	return SUCCEED;
+}
+
+void	extract_yaml_values_dbl(zbx_mock_handle_t hdata, zbx_vector_dbl_t *values)
+{
+	zbx_mock_error_t	err;
+	zbx_mock_handle_t	hvalue;
+
+	while (ZBX_MOCK_END_OF_VECTOR != zbx_mock_vector_element(hdata, &hvalue))
+	{
+		double	value;
+
+		if (ZBX_MOCK_SUCCESS != (err = zbx_mock_float(hvalue, &value)))
+			fail_msg("Cannot read vector member: %s", zbx_mock_error_string(err));
+
+		zbx_vector_dbl_append(values, value);
+	}
 }

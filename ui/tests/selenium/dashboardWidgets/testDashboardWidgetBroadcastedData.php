@@ -14,7 +14,7 @@
 **/
 
 
-require_once dirname(__FILE__).'/../common/testWidgetCommunication.php';
+require_once __DIR__.'/../common/testWidgetCommunication.php';
 
 /**
  * @backup profiles
@@ -407,12 +407,21 @@ class testDashboardWidgetBroadcastedData extends testWidgetCommunication {
 
 			// Prepare the expected feedback, containing both formatted and unixtime "From" and "To" time periods.
 			$from_unixtime = strtotime('today - 2 days - 12hours');
-			$to_unixtime = strtotime('yesterday 11:59:59');
 			$from_formatted = date('Y-m-d H:i:s', $from_unixtime);
+			$to_unixtime = strtotime('yesterday 11:59:59');
 			$to_formatted = date('Y-m-d H:i:s', $to_unixtime);
+			/*
+			 * TODO: "Daylight Saving Time" transitions can break test.
+			 * When clocks move forward/back, $to_unixtime and $to_formatted ('yesterday 11:59:59')
+			 * can land one hour later/earlier than expected. As a result the actual time
+			 * will be ('yesterday 12:59:59') or ('yesterday 10:59:59').
+			 * Won't fix ZBX-26299
+			 */
 			$expected = '_timeperiod | {"from":"'.$from_formatted.'","to":"'.$to_formatted.
 					'","from_ts":'.$from_unixtime.',"to_ts":'.$to_unixtime.'}';
 		}
+
+		$dashboard->waitUntilReady();
 
 		// Get the feedback value from the textarea, remove the timestamp and compare with the expected string.
 		$this->assertEquals($expected, substr($feedback_field->getValue(), 11));
@@ -649,6 +658,7 @@ class testDashboardWidgetBroadcastedData extends testWidgetCommunication {
 
 		// Select an element on the broadcaster widget to trigger a broadcast.
 		$this->getWidgetElement($data['select_element'], $broadcaster)->click();
+		$dashboard->waitUntilReady();
 
 		// Check the broadcasted value on the listener.
 		$selected_entity = CTestArrayHelper::get($data, 'selected_entity', $data['select_element']);

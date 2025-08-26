@@ -305,40 +305,6 @@ function hex2rgb($color) {
 	return [hexdec($r), hexdec($g), hexdec($b)];
 }
 
-function getColorVariations($color, $variations_requested = 1) {
-	if ($variations_requested <= 1) {
-		return [$color];
-	}
-
-	$change = hex2rgb('#ffffff'); // Color which is increased/decreased in variations.
-	$max = 50;
-
-	$color = hex2rgb($color);
-	$variations = [];
-
-	$range = range(-1 * $max, $max, $max * 2 / $variations_requested);
-
-	// Remove redundant values.
-	while (count($range) > $variations_requested) {
-		(count($range) % 2) ? array_shift($range) : array_pop($range);
-	}
-
-	// Calculate colors.
-	foreach ($range as $var) {
-		$r = $color[0] + ($change[0] / 100 * $var);
-		$g = $color[1] + ($change[1] / 100 * $var);
-		$b = $color[2] + ($change[2] / 100 * $var);
-
-		$variations[] = '#' . rgb2hex([
-			$r < 0 ? 0 : ($r > 255 ? 255 : (int) $r),
-			$g < 0 ? 0 : ($g > 255 ? 255 : (int) $g),
-			$b < 0 ? 0 : ($b > 255 ? 255 : (int) $b)
-		]);
-	}
-
-	return $variations;
-}
-
 /**
  * Convert suffixed string to decimal bytes ('10K' => 10240).
  * Note: this function must not depend on optional PHP libraries, since it is used in Zabbix setup.
@@ -1340,24 +1306,9 @@ function make_sorting_header($obj, $tabfield, $sortField, $sortOrder, $link = nu
 }
 
 /**
- * Get decimal point and thousands separator for number formatting according to the current locale.
- *
- * @return array  'decimal_point' and 'thousands_sep' values.
- */
-function getNumericFormatting(): array {
-	static $numeric_formatting = null;
-
-	if ($numeric_formatting === null) {
-		$numeric_formatting = array_intersect_key(localeconv(), array_flip(['decimal_point', 'thousands_sep']));
-	}
-
-	return $numeric_formatting;
-}
-
-/**
  * Format floating-point number in the best possible way for displaying.
  *
- * @param float $number   Valid number in decimal or scientific notation.
+ * @param float $number   Valid floating point number.
  * @param array $options  Formatting options.
  *
  * $options = [
@@ -1373,14 +1324,6 @@ function getNumericFormatting(): array {
  * @return string
  */
 function formatFloat(float $number, array $options = []): string {
-	if ($number == INF) {
-		return _('Infinity');
-	}
-
-	if ($number == -INF) {
-		return '-'._('Infinity');
-	}
-
 	$defaults = [
 		'precision' => ZBX_FLOAT_DIG,
 		'decimals' => 0,
@@ -1397,88 +1340,75 @@ function formatFloat(float $number, array $options = []): string {
 		'zero_as_zero' => $zero_as_zero
 	] = $options + $defaults;
 
-	if ($zero_as_zero && $number == 0) {
-		return '0';
-	}
+	$round_fn = static function (float $mantissa, int $exponent, int $decimals): array {
+		$mantissa_rounded = abs(round($mantissa, $decimals));
 
-	$number_original = $number;
-
-	$exponent = (int) explode('E', sprintf('%.'.($precision - 1).'E', $number))[1];
-
-	if ($exponent < 0) {
-		for ($i = 1; $i >= 0; $i--) {
-			$round_precision = $decimals - $exponent - $i;
-
-			// PHP rounding bug when precision is set more than 294.
-			if ($round_precision > 294) {
-				$decimal_shift = pow(10, $round_precision - 294);
-				$test = round($number * $decimal_shift, 294) / $decimal_shift;
-			}
-			else {
-				$test = round($number, $round_precision);
-			}
-
-			$test_number = sprintf('%.'.($precision - 1).'E', $test);
-			$test_digits = $precision == 1
-				? 1
-				: strlen(rtrim(explode('E', $test_number)[0], '0')) - ($test_number[0] === '-' ? 2 : 1);
-
-			if (!$small_scientific || $test_digits - $exponent < $precision) {
-				break;
-			}
-		}
-		$number = $test_number;
-		$digits = $test_digits;
-	}
-	else {
-		if ($exponent >= $precision) {
-			if ($exponent >= min(PHP_FLOAT_DIG, $precision + 3)
-					|| round($number, $precision - $exponent - 1) != $number) {
-				$number = round($number, $decimals - $exponent);
-			}
-		}
-		else {
-			$number = round($number, min($decimals, $precision - $exponent - 1));
+		if ($mantissa_rounded >= 10) {
+			$mantissa_rounded = 1;
+			$exponent++;
+			$decimals++;
 		}
 
-		$number = sprintf('%.'.($precision - 1).'E', $number);
-		$digits = $precision == 1 ? 1 : strlen(rtrim(explode('E', $number)[0], '0')) - ($number[0] === '-' ? 2 : 1);
-	}
+		$digits = $decimals >= 0
+			? rtrim(str_replace('.', '', sprintf('%.'.$decimals.'F', $mantissa_rounded)), '0')
+			: '';
+
+		return [$digits, $exponent, $mantissa_rounded == abs($mantissa)];
+	};
+
+	$format_fn = static function (string $sign, string $integer, string $fraction, ?int $exponent = null)
+			use ($decimals, $decimals_exact): string {
+		if ($decimals_exact) {
+			$fraction = str_pad($fraction, $decimals, '0');
+		}
+
+		return $sign.$integer.($fraction !== '' ? '.'.$fraction : '').
+			($exponent !== null ? 'E'.($exponent >= 0 ? '+' : '').$exponent : '');
+	};
 
 	if ($zero_as_zero && $number == 0) {
 		return '0';
 	}
-
-	[
-		'decimal_point' => $decimal_point,
-		'thousands_sep' => $thousands_sep
-	] = getNumericFormatting();
-
-	$exponent = (int) explode('E', sprintf('%.'.($precision - 1).'E', $number))[1];
-
-	if ($exponent < 0) {
-		if (!$small_scientific
-				|| $digits - $exponent <= ($decimals_exact ? min($decimals + 1, $precision) : $precision)) {
-			return number_format($number, $decimals_exact ? $decimals : $digits - $exponent - 1, $decimal_point,
-				$thousands_sep
-			);
-		}
-		else {
-			return str_replace('.', $decimal_point,
-				sprintf('%.'.($decimals_exact ? $decimals : min($digits - 1, $decimals)).'E', $number)
-			);
-		}
+	elseif ($number == INF) {
+		return _('Infinity');
 	}
-	elseif ($exponent >= min(PHP_FLOAT_DIG, $precision + 3)
-			|| ($exponent >= $precision && $number != $number_original)) {
-		return str_replace('.', $decimal_point,
-			sprintf('%.'.($decimals_exact ? $decimals : min($digits - 1, $decimals)).'E', $number)
+	elseif ($number == -INF) {
+		return '-'._('Infinity');
+	}
+
+	$sign = $number < 0 ? '-' : '';
+
+	[$mantissa, $exponent] = explode('E', sprintf('%.'.(PHP_FLOAT_DIG - 1).'E', $number));
+
+	$mantissa = (float) $mantissa;
+	$exponent = (int) $exponent;
+
+	[$digits_dec, $exponent_dec, $precise_dec] = $round_fn($mantissa, $exponent,
+		$exponent >= 0
+			? min($exponent + $decimals, $precision - 1)
+			: ($decimals_exact
+				? $exponent + $decimals
+				: $decimals - 1
+			)
+	);
+
+	[$digits_sci, $exponent_sci] = $round_fn($mantissa, $exponent, $decimals);
+
+	if ($exponent_dec >= ($precise_dec ? min(PHP_FLOAT_DIG, $precision + 3) : $precision)
+			|| $small_scientific && (
+				$decimals_exact && $exponent_sci < -1 && -$exponent_sci + strlen($digits_sci) > $decimals + 1
+					|| !$decimals_exact && -$exponent_sci + strlen($digits_sci) > min(PHP_FLOAT_DIG, $precision + 3))) {
+		return $format_fn($sign, $digits_sci[0], substr($digits_sci, 1), $exponent_sci);
+	}
+	elseif ($exponent_dec >= 0) {
+		return $format_fn($sign, str_pad(substr($digits_dec, 0, $exponent_dec + 1), $exponent_dec + 1, '0'),
+			substr($digits_dec, $exponent_dec + 1)
 		);
 	}
 	else {
-		return number_format($number, $decimals_exact ? $decimals : max(0, min($digits - $exponent - 1, $decimals)),
-			$decimal_point, $thousands_sep
-		);
+		return $digits_dec !== ''
+			? $format_fn($sign, '0', str_repeat('0', -$exponent_dec - 1).$digits_dec)
+			: $format_fn('', '0', '');
 	}
 }
 
@@ -1658,19 +1588,20 @@ function detect_page_type($default = PAGE_TYPE_HTML) {
  *                                            ZBX_STYLE_MSG_GOOD, ZBX_STYLE_MSG_BAD, ZBX_STYLE_MSG_WARNING.
  * @param array       $messages               An array of messages.
  * @param string      $messages[]['message']  Message text.
- * @param string|null $title                  (optional) Message box title.
+ * @param mixed       $title                  (optional) Message box title.
  * @param bool        $show_close_box         (optional) Show or hide close button in error message box.
  * @param bool        $show_details           (optional) Show or hide message details.
  *
  * @return CTag
  */
-function makeMessageBox(string $class, array $messages, ?string $title = null, bool $show_close_box = true,
+function makeMessageBox(string $class, array $messages, mixed $title = null, bool $show_close_box = true,
 		bool $show_details = false): CTag {
 
 	$aria_labels = [
 		ZBX_STYLE_MSG_GOOD => _('Success message'),
-		ZBX_STYLE_MSG_BAD => _('Error message'),
-		ZBX_STYLE_MSG_WARNING => _('Warning message')
+		ZBX_STYLE_MSG_INFO => _('Info message'),
+		ZBX_STYLE_MSG_WARNING => _('Warning message'),
+		ZBX_STYLE_MSG_BAD => _('Error message')
 	];
 
 	$message_box = (new CTag('output', true))
@@ -2598,18 +2529,6 @@ function getTileProviders(): array {
 			'geomaps_tile_url' => 'https://{s}.tile.opentopomap.org/{z}/{x}/{y}.png',
 			'geomaps_max_zoom' => '17',
 			'geomaps_attribution' => 'Map data: &copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors, <a href="http://viewfinderpanoramas.org">SRTM</a> | Map style: &copy; <a href="https://opentopomap.org">OpenTopoMap</a> (<a href="https://creativecommons.org/licenses/by-sa/3.0/">CC-BY-SA</a>)'
-		],
-		'Stamen.TonerLite' => [
-			'name' => 'Stamen Toner Lite',
-			'geomaps_tile_url' => 'https://stamen-tiles-{s}.a.ssl.fastly.net/toner-lite/{z}/{x}/{y}{r}.png',
-			'geomaps_max_zoom' => '20',
-			'geomaps_attribution' => 'Map tiles by <a href="http://stamen.com">Stamen Design</a>, <a href="http://creativecommons.org/licenses/by/3.0">CC BY 3.0</a> &mdash; Map data &copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
-		],
-		'Stamen.Terrain' => [
-			'name' => 'Stamen Terrain',
-			'geomaps_tile_url' => 'https://stamen-tiles-{s}.a.ssl.fastly.net/terrain/{z}/{x}/{y}{r}.png',
-			'geomaps_max_zoom' => '18',
-			'geomaps_attribution' => 'Map tiles by <a href="http://stamen.com">Stamen Design</a>, <a href="http://creativecommons.org/licenses/by/3.0">CC BY 3.0</a> &mdash; Map data &copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
 		],
 		'USGS.USTopo' => [
 			'name' => 'USGS US Topo',

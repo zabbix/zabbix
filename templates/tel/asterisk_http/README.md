@@ -9,7 +9,7 @@ All metrics are collected at once, thanks to Zabbix's bulk data collection.
 
 ## Requirements
 
-Zabbix version: 7.4 and higher.
+Zabbix version: 8.0 and higher.
 
 ## Tested versions
 
@@ -18,7 +18,7 @@ This template has been tested on:
 
 ## Configuration
 
-> Zabbix should be configured according to the instructions in the [Templates out of the box](https://www.zabbix.com/documentation/7.4/manual/config/templates_out_of_the_box) section.
+> Zabbix should be configured according to the instructions in the [Templates out of the box](https://www.zabbix.com/documentation/8.0/manual/config/templates_out_of_the_box) section.
 
 ## Setup
 
@@ -33,7 +33,7 @@ If there are errors, increase the logging to debug level and see the Zabbix serv
 |Name|Description|Default|
 |----|-----------|-------|
 |{$AMI.URL}|<p>The Asterisk Manager API URL in the format `<scheme>://<host>:<port>/<prefix>/rawman`.</p>|`http://asterisk:8088/asterisk/rawman`|
-|{$AMI.HOST}|<p>The hostname or IP address of the Asterisk Manager API host.</p>|`<SET AMI HOST>`|
+|{$AMI.HOST}|<p>The hostname or IP address of the Asterisk Manager API host.</p>||
 |{$AMI.PORT}|<p>AMI port number for checking service availability.</p>|`5038`|
 |{$AMI.USERNAME}|<p>The Asterisk Manager name.</p>|`zabbix`|
 |{$AMI.SECRET}|<p>The Asterisk Manager secret.</p>|`zabbix`|
@@ -83,9 +83,9 @@ If there are errors, increase the logging to debug level and see the Zabbix serv
 |Asterisk: Service is down||`last(/Asterisk by HTTP/net.tcp.service["tcp","{$AMI.HOST}","{$AMI.PORT}"])=0`|Average|**Manual close**: Yes|
 |Asterisk: Service response time is too high||`min(/Asterisk by HTTP/net.tcp.service.perf["tcp","{$AMI.HOST}","{$AMI.PORT}"],5m)>{$AMI.RESPONSE_TIME.MAX.WARN}`|Warning|**Manual close**: Yes<br>**Depends on**:<br><ul><li>Asterisk: Service is down</li></ul>|
 |Asterisk: Version has changed|<p>The Asterisk version has changed. Acknowledge to close the problem manually.</p>|`last(/Asterisk by HTTP/asterisk.version,#1)<>last(/Asterisk by HTTP/asterisk.version,#2) and length(last(/Asterisk by HTTP/asterisk.version))>0`|Info|**Manual close**: Yes|
-|Asterisk: Host has been restarted|<p>Uptime is less than 10 minutes.</p>|`last(/Asterisk by HTTP/asterisk.uptime)<10m`|Info|**Manual close**: Yes|
+|Asterisk: Service has been restarted|<p>Uptime is less than 10 minutes.</p>|`last(/Asterisk by HTTP/asterisk.uptime)<10m`|Info|**Manual close**: Yes|
 |Asterisk: Failed to fetch AMI page|<p>Zabbix has not received any data for items for the last 30 minutes.</p>|`nodata(/Asterisk by HTTP/asterisk.uptime,30m)=1`|Warning|**Manual close**: Yes<br>**Depends on**:<br><ul><li>Asterisk: Service is down</li></ul>|
-|Asterisk: has been reloaded|<p>Uptime is less than 10 minutes.</p>|`last(/Asterisk by HTTP/asterisk.uptime_reload)<10m`|Info|**Manual close**: Yes|
+|Asterisk: Configuration has been reloaded|<p>Uptime is less than 10 minutes.</p>|`last(/Asterisk by HTTP/asterisk.uptime_reload)<10m`|Info|**Manual close**: Yes|
 |Asterisk: Total number of active channels of SIP trunks is too high|<p>The SIP trunks may not be able to process new calls.</p>|`min(/Asterisk by HTTP/asterisk.sip.active_channels,10m)>={$AMI.TRUNK_ACTIVE_CHANNELS_TOTAL.MAX.WARN:"SIP"}`|Warning||
 |Asterisk: Total number of active channels of IAX trunks is too high|<p>The IAX trunks may not be able to process new calls.</p>|`min(/Asterisk by HTTP/asterisk.iax.active_channels,10m)>={$AMI.TRUNK_ACTIVE_CHANNELS_TOTAL.MAX.WARN:"IAX"}`|Warning||
 |Asterisk: Total number of active channels of PJSIP trunks is too high|<p>The PJSIP trunks may not be able to process new calls.</p>|`min(/Asterisk by HTTP/asterisk.pjsip.active_channels,10m)>={$AMI.TRUNK_ACTIVE_CHANNELS_TOTAL.MAX.WARN:"PJSIP"}`|Warning||

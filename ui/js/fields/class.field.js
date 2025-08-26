@@ -132,7 +132,7 @@ class CField {
 		}
 		else {
 			if (!document.body.contains(this._field)) {
-				this.setGlobalError(message);
+				console.log('Validation error for missing field "' + this.getName() + '": ' + message);
 			}
 			else if (this._error_level === -1 || this._error_level >= level) {
 				this._error_msg = message;
@@ -146,18 +146,27 @@ class CField {
 	}
 
 	showErrors() {
-		if (this.hasErrorHint()) {
-			this.removeErrorHint();
-		}
-
-		if (this._error_msg !== null) {
-			this._error_hint = this.errorHint();
-
-			if (this._error_container !== null) {
-				this._appendErrorToContainer(this._error_hint);
+		if (this._error_msg === null) {
+			if (this.hasErrorHint()) {
+				this.removeErrorHint();
 			}
-			else {
-				this._appendErrorHint(this._error_hint);
+		}
+		else {
+			const new_hint = this.errorHint();
+
+			if (!this.hasErrorHint() || this._error_hint.textContent !== new_hint.textContent) {
+				if (this.hasErrorHint()) {
+					this.removeErrorHint();
+				}
+
+				this._error_hint = new_hint;
+
+				if (this._error_container !== null) {
+					this._appendErrorToContainer(this._error_hint);
+				}
+				else {
+					this._appendErrorHint(this._error_hint);
+				}
 			}
 		}
 

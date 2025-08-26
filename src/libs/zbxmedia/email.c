@@ -18,9 +18,11 @@
 #include "zbxcomms.h"
 #include "zbxcrypto.h"
 #include "zbxalgo.h"
+#include "zbxtime.h"
 
 #ifdef HAVE_LIBCURL
 #	include "zbxcurl.h"
+#	include "zbxip.h"
 #endif
 
 /* number of characters per line when wrapping Base64 data in Email */
@@ -325,7 +327,7 @@ static char	*smtp_prepare_payload(zbx_vector_ptr_t *from_mails, zbx_vector_ptr_t
 	/* prepare date */
 
 	time(&email_time);
-	local_time = localtime(&email_time);
+	local_time = zbx_localtime(&email_time, NULL);
 	strftime(str_time, MAX_STRING_LEN, "%a, %d %b %Y %H:%M:%S %z", local_time);
 
 	for (i = 0; i < from_mails->values_num; i++)
@@ -700,6 +702,26 @@ out:
 #undef OK_354
 }
 
+#ifdef HAVE_LIBCURL
+static void	handle_curl_error(CURLcode err, unsigned char auth_type, const char *errbuf, char **error)
+{
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s(): err:%u", __func__, err);
+
+	if (CURLE_LOGIN_DENIED == err && SMTP_AUTHENTICATION_OAUTH == auth_type)
+	{
+		*error = zbx_dsprintf(*error, "%s (possible manual token revocation). "
+				"Please reauthorize from frontend.", curl_easy_strerror(err));
+	}
+	else
+	{
+		*error = zbx_dsprintf(*error, "%s%s%s", curl_easy_strerror(err), ('\0' != *errbuf ? ": " : ""),
+				errbuf);
+	}
+
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s(): error:%s", __func__, *error);
+}
+#endif
+
 /* SMTP security options */
 #define SMTP_SECURITY_NONE	0
 #define SMTP_SECURITY_STARTTLS	1
@@ -709,14 +731,14 @@ static int	send_email_curl(const char *smtp_server, unsigned short smtp_port, co
 		zbx_vector_ptr_t *from_mails, zbx_vector_ptr_t *to_mails, const char *inreplyto,
 		const char *mailsubject, const char *mailbody, unsigned char smtp_security, unsigned char
 		smtp_verify_peer, unsigned char smtp_verify_host, unsigned char smtp_authentication,
-		const char *username, const char *password, unsigned char message_format, int timeout,
+		const char *smtp_username, const char *smtp_password, unsigned char message_format, int timeout,
 		const char *config_source_ip, const char *config_ssl_ca_location, char **error)
 {
 #ifdef HAVE_LIBCURL
 	int			ret = FAIL, i;
 	CURL			*easyhandle;
 	CURLcode		err;
-	char			url[MAX_STRING_LEN], errbuf[CURL_ERROR_SIZE] = "";
+	char			url[MAX_STRING_LEN], errbuf[CURL_ERROR_SIZE] = "", server_port[MAX_STRING_LEN];
 	size_t			url_offset= 0;
 	struct curl_slist	*recipients = NULL;
 	smtp_payload_status_t	payload_status;
@@ -745,7 +767,8 @@ static int	send_email_curl(const char *smtp_server, unsigned short smtp_port, co
 	else
 		url_offset += zbx_snprintf(url + url_offset, sizeof(url) - url_offset, "smtp://");
 
-	url_offset += zbx_snprintf(url + url_offset, sizeof(url) - url_offset, "%s:%hu", smtp_server, smtp_port);
+	url_offset += zbx_snprintf(url + url_offset, sizeof(url) - url_offset, "%s",
+			zbx_join_hostport(server_port, sizeof(server_port), smtp_server, smtp_port));
 
 	if ('\0' != *smtp_helo)
 	{
@@ -808,10 +831,10 @@ static int	send_email_curl(const char *smtp_server, unsigned short smtp_port, co
 		}
 	}
 
-	if (SMTP_AUTHENTICATION_NORMAL_PASSWORD == smtp_authentication)
+	if (SMTP_AUTHENTICATION_PASSWORD == smtp_authentication)
 	{
-		if (CURLE_OK != (err = curl_easy_setopt(easyhandle, CURLOPT_USERNAME, username)) ||
-				CURLE_OK != (err = curl_easy_setopt(easyhandle, CURLOPT_PASSWORD, password)))
+		if (CURLE_OK != (err = curl_easy_setopt(easyhandle, CURLOPT_USERNAME, smtp_username)) ||
+				CURLE_OK != (err = curl_easy_setopt(easyhandle, CURLOPT_PASSWORD, smtp_password)))
 		{
 			goto error;
 		}
@@ -822,6 +845,20 @@ static int	send_email_curl(const char *smtp_server, unsigned short smtp_port, co
 		/*   - versions 7.20.0 to 7.30.0 do not support specifying login options                            */
 		/*   - versions 7.31.0 to 7.33.0 support login options in CURLOPT_USERPWD                           */
 		/*   - versions 7.34.0 and above support explicit CURLOPT_LOGIN_OPTIONS                             */
+	}
+	else if (SMTP_AUTHENTICATION_OAUTH == smtp_authentication)
+	{
+		/* OAuth 2.0 Bearer added in curl 7.33.0 */
+		if (SUCCEED != zbx_curl_has_oauth2_bearer(error))
+			goto clean;
+
+		if (CURLE_OK != (err = curl_easy_setopt(easyhandle, CURLOPT_XOAUTH2_BEARER, smtp_password)))
+			goto error;
+
+		/* Note: For IMAP, LDAP, POP3 and SMTP, the username used to generate the Bearer Token should be */
+		/* supplied via the CURLOPT_USERNAME option.                                                     */
+		if (CURLE_OK != (err = curl_easy_setopt(easyhandle, CURLOPT_USERNAME, smtp_username)))
+			goto error;
 	}
 
 	if (0 >= from_mails->values_num)
@@ -873,15 +910,13 @@ static int	send_email_curl(const char *smtp_server, unsigned short smtp_port, co
 
 	if (CURLE_OK != (err = curl_easy_perform(easyhandle)))
 	{
-		*error = zbx_dsprintf(*error, "%s%s%s", curl_easy_strerror(err), ('\0' != *errbuf ? ": " : ""),
-				errbuf);
-		goto clean;
+		goto error;
 	}
 
 	ret = SUCCEED;
 	goto clean;
 error:
-	*error = zbx_strdup(*error, curl_easy_strerror(err));
+	handle_curl_error(err, smtp_authentication, errbuf, error);
 clean:
 	zbx_free(payload_status.payload);
 
@@ -902,14 +937,15 @@ out:
 	ZBX_UNUSED(smtp_verify_peer);
 	ZBX_UNUSED(smtp_verify_host);
 	ZBX_UNUSED(smtp_authentication);
-	ZBX_UNUSED(username);
-	ZBX_UNUSED(password);
+	ZBX_UNUSED(smtp_username);
+	ZBX_UNUSED(smtp_password);
 	ZBX_UNUSED(message_format);
 	ZBX_UNUSED(timeout);
 	ZBX_UNUSED(config_source_ip);
 	ZBX_UNUSED(config_ssl_ca_location);
 
-	*error = zbx_strdup(*error, "Zabbix server was compiled without cURL library required for SMTP authentication");
+	*error = zbx_strdup(*error, "Zabbix server was compiled without cURL library required for OAuth, SMTP"
+			" authentication");
 
 	return FAIL;
 #endif
@@ -932,7 +968,7 @@ static void	zbx_mailaddr_free(zbx_mailaddr_t *mailaddr)
 int	send_email(const char *smtp_server, unsigned short smtp_port, const char *smtp_helo, const char *smtp_email,
 		const char *mailto, const char *inreplyto, const char *mailsubject, const char *mailbody,
 		unsigned char smtp_security, unsigned char smtp_verify_peer, unsigned char smtp_verify_host,
-		unsigned char smtp_authentication, const char *username, const char *password,
+		unsigned char smtp_authentication, const char *smtp_username, const char *smtp_password,
 		unsigned char message_format, int timeout, const char *config_source_ip,
 		const char *config_ssl_ca_location, char **error)
 {
@@ -962,8 +998,8 @@ int	send_email(const char *smtp_server, unsigned short smtp_port, const char *sm
 	{
 		ret = send_email_curl(smtp_server, smtp_port, smtp_helo, &from_mails, &to_mails, inreplyto, mailsubject,
 				mailbody, smtp_security, smtp_verify_peer, smtp_verify_host, smtp_authentication,
-				username, password, message_format, timeout, config_source_ip, config_ssl_ca_location,
-				error);
+				smtp_username, smtp_password, message_format, timeout, config_source_ip,
+				config_ssl_ca_location, error);
 	}
 
 clean:

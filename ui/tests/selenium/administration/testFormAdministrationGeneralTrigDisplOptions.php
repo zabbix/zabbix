@@ -14,7 +14,7 @@
 **/
 
 
-require_once dirname(__FILE__).'/../common/testFormAdministrationGeneral.php';
+require_once __DIR__.'/../common/testFormAdministrationGeneral.php';
 
 /**
  * @backup settings
@@ -38,16 +38,16 @@ class testFormAdministrationGeneralTrigDisplOptions extends testFormAdministrati
 		'Average' => 'Average',
 		'High' => 'High',
 		'Disaster' => 'Disaster',
-		'xpath://button[@id="lbl_problem_unack_color"]/..' => 'CC0000',
-		'xpath://button[@id="lbl_problem_ack_color"]/..'=> 'CC0000',
-		'xpath://button[@id="lbl_ok_unack_color"]/..'=> '009900',
-		'xpath://button[@id="lbl_ok_ack_color"]/..'=> '009900',
-		'xpath://button[@id="lbl_severity_color_0"]/..' => '97AAB3',
-		'xpath://button[@id="lbl_severity_color_1"]/..' => '7499FF',
-		'xpath://button[@id="lbl_severity_color_2"]/..' => 'FFC859' ,
-		'xpath://button[@id="lbl_severity_color_3"]/..' => 'FFA059',
-		'xpath://button[@id="lbl_severity_color_4"]/..' => 'E97659',
-		'xpath://button[@id="lbl_severity_color_5"]/..' => 'E45959'
+		'xpath://z-color-picker[@color-field-name="problem_unack_color"]' => 'CC0000',
+		'xpath://z-color-picker[@color-field-name="problem_ack_color"]' => 'CC0000',
+		'xpath://z-color-picker[@color-field-name="ok_unack_color"]' => '009900',
+		'xpath://z-color-picker[@color-field-name="ok_ack_color"]' => '009900',
+		'xpath://z-color-picker[@color-field-name="severity_color_0"]' => '97AAB3',
+		'xpath://z-color-picker[@color-field-name="severity_color_1"]' => '7499FF',
+		'xpath://z-color-picker[@color-field-name="severity_color_2"]' => 'FFC859' ,
+		'xpath://z-color-picker[@color-field-name="severity_color_3"]' => 'FFA059',
+		'xpath://z-color-picker[@color-field-name="severity_color_4"]' => 'E97659',
+		'xpath://z-color-picker[@color-field-name="severity_color_5"]' => 'E45959'
 	];
 
 	public $db_default_values = [
@@ -95,16 +95,16 @@ class testFormAdministrationGeneralTrigDisplOptions extends testFormAdministrati
 //		'xpath://button[@id="lbl_problem_ack_color"]/..' => 'F8BBD0',
 //		'xpath://button[@id="lbl_ok_unack_color"]/..' => '1A237E',
 //		'xpath://button[@id="lbl_ok_ack_color"]/..' => 'B3E5FC',
-		'xpath://button[@id="lbl_problem_unack_color"]/..' => 'CC0000',
-		'xpath://button[@id="lbl_problem_ack_color"]/..'=> 'CC0000',
-		'xpath://button[@id="lbl_ok_unack_color"]/..'=> '009900',
-		'xpath://button[@id="lbl_ok_ack_color"]/..'=> '009900',
-		'xpath://button[@id="lbl_severity_color_0"]/..' => 'E8EAF6',
-		'xpath://button[@id="lbl_severity_color_1"]/..' => 'D1C4E9',
-		'xpath://button[@id="lbl_severity_color_2"]/..' => 'B39DDB' ,
-		'xpath://button[@id="lbl_severity_color_3"]/..' => '9575CD',
-		'xpath://button[@id="lbl_severity_color_4"]/..' => '673AB7',
-		'xpath://button[@id="lbl_severity_color_5"]/..' => '4527A0'
+		'xpath://z-color-picker[@color-field-name="problem_unack_color"]' => 'CC0000',
+		'xpath://z-color-picker[@color-field-name="problem_ack_color"]' => 'CC0000',
+		'xpath://z-color-picker[@color-field-name="ok_unack_color"]' => '009900',
+		'xpath://z-color-picker[@color-field-name="ok_ack_color"]' => '009900',
+		'xpath://z-color-picker[@color-field-name="severity_color_0"]' => 'E8EAF6',
+		'xpath://z-color-picker[@color-field-name="severity_color_1"]' => 'D1C4E9',
+		'xpath://z-color-picker[@color-field-name="severity_color_2"]' => 'B39DDB' ,
+		'xpath://z-color-picker[@color-field-name="severity_color_3"]' => '9575CD',
+		'xpath://z-color-picker[@color-field-name="severity_color_4"]' => '673AB7',
+		'xpath://z-color-picker[@color-field-name="severity_color_5"]' => '4527A0'
 	];
 
 	/**
@@ -127,17 +127,17 @@ class testFormAdministrationGeneralTrigDisplOptions extends testFormAdministrati
 			'severity_name_5' => 32
 		];
 
-		$color_limits = [
-			'id:lbl_problem_unack_color' => 6,
-			'id:lbl_problem_ack_color' => 6,
-			'id:lbl_ok_unack_color' => 6,
-			'id:lbl_ok_ack_color' => 6,
-			'id:lbl_severity_color_0' => 6,
-			'id:lbl_severity_color_1' => 6,
-			'id:lbl_severity_color_2' => 6,
-			'id:lbl_severity_color_3' => 6,
-			'id:lbl_severity_color_4' => 6,
-			'id:lbl_severity_color_5' => 6
+		$color_pickers = [
+			'problem_unack_color',
+			'problem_ack_color',
+			'ok_unack_color',
+			'ok_ack_color',
+			'severity_color_0',
+			'severity_color_1',
+			'severity_color_2',
+			'severity_color_3',
+			'severity_color_4',
+			'severity_color_5'
 		];
 
 		foreach ($limits as $id => $limit) {
@@ -145,11 +145,12 @@ class testFormAdministrationGeneralTrigDisplOptions extends testFormAdministrati
 		}
 
 		$form->fill(['Use custom event status colours' => true]);
-		foreach ($color_limits as $selector => $limit) {
-			$form->query($selector)->one()->click()->waitUntilReady();
-			$color_pick = $this->query('xpath://div[@id="color_picker"]')->asColorPicker()->one();
-			$this->assertEquals($limit, $color_pick->getInput()->getAttribute('maxlength'));
-			$color_pick->close();
+		foreach ($color_pickers as $selector) {
+			$form->query('xpath:.//z-color-picker[@color-field-name='.CXPathHelper::escapeQuotes($selector).']')->one()
+					->click();
+			$color_picker_dialog = $this->query('class:color-picker-dialog')->asColorPicker()->one();
+			$this->assertEquals(6, $color_picker_dialog->query('class:color-picker-input')->one()->getAttribute('maxlength'));
+			$color_picker_dialog->close();
 		}
 
 		$checkboxes = [
@@ -647,7 +648,6 @@ class testFormAdministrationGeneralTrigDisplOptions extends testFormAdministrati
 				[
 					'expected' => TEST_BAD,
 					'fields' => [
-						'Use custom event status colours' => true,
 						'Display OK triggers for' => 'test',
 						'On status change triggers blink for' => 'test'
 					],
@@ -662,33 +662,12 @@ class testFormAdministrationGeneralTrigDisplOptions extends testFormAdministrati
 				[
 					'expected' => TEST_BAD,
 					'fields' => [
-						'Use custom event status colours' => true,
 						'Display OK triggers for' => '!@#$%^&*()_+',
-						'On status change triggers blink for' => '!@#$%^&*()_+',
-						'xpath://button[@id="lbl_problem_unack_color"]/..' => '!@#$%^&*()_+',
-						'xpath://button[@id="lbl_problem_ack_color"]/..' => '!@#$%^&*()_+',
-						'xpath://button[@id="lbl_ok_unack_color"]/..' => '!@#$%^&*()_+',
-						'xpath://button[@id="lbl_ok_ack_color"]/..' => '!@#$%^&*()_+',
-						'xpath://button[@id="lbl_severity_color_0"]/..' => '!@#$%^&*()_+',
-						'xpath://button[@id="lbl_severity_color_1"]/..' => '!@#$%^&*()_+',
-						'xpath://button[@id="lbl_severity_color_2"]/..' => '!@#$%^&*()_+' ,
-						'xpath://button[@id="lbl_severity_color_3"]/..' => '!@#$%^&*()_+',
-						'xpath://button[@id="lbl_severity_color_4"]/..' => '!@#$%^&*()_+',
-						'xpath://button[@id="lbl_severity_color_5"]/..' => '!@#$%^&*()_+'
+						'On status change triggers blink for' => '!@#$%^&*()_+'
 					],
 					'details' => [
-						'Incorrect value for field "problem_unack_color": a hexadecimal colour code (6 symbols) is expected.',
-						'Incorrect value for field "problem_ack_color": a hexadecimal colour code (6 symbols) is expected.',
-						'Incorrect value for field "ok_unack_color": a hexadecimal colour code (6 symbols) is expected.',
-						'Incorrect value for field "ok_ack_color": a hexadecimal colour code (6 symbols) is expected.',
 						'Incorrect value for field "ok_period": a time unit is expected.',
-						'Incorrect value for field "blink_period": a time unit is expected.',
-						'Incorrect value for field "severity_color_0": a hexadecimal colour code (6 symbols) is expected.',
-						'Incorrect value for field "severity_color_1": a hexadecimal colour code (6 symbols) is expected.',
-						'Incorrect value for field "severity_color_2": a hexadecimal colour code (6 symbols) is expected.',
-						'Incorrect value for field "severity_color_3": a hexadecimal colour code (6 symbols) is expected.',
-						'Incorrect value for field "severity_color_4": a hexadecimal colour code (6 symbols) is expected.',
-						'Incorrect value for field "severity_color_5": a hexadecimal colour code (6 symbols) is expected.'
+						'Incorrect value for field "blink_period": a time unit is expected.'
 					]
 				]
 			],
@@ -697,7 +676,6 @@ class testFormAdministrationGeneralTrigDisplOptions extends testFormAdministrati
 				[
 					'expected' => TEST_BAD,
 					'fields' => [
-						'Use custom event status colours' => true,
 						'Display OK triggers for' => '',
 						'On status change triggers blink for' => '',
 						'Not classified' => '',
@@ -705,37 +683,17 @@ class testFormAdministrationGeneralTrigDisplOptions extends testFormAdministrati
 						'Warning' => '',
 						'Average' => '',
 						'High' => '',
-						'Disaster' => '',
-						'xpath://button[@id="lbl_problem_unack_color"]/..' => '',
-						'xpath://button[@id="lbl_problem_ack_color"]/..'=> '',
-						'xpath://button[@id="lbl_ok_unack_color"]/..'=> '',
-						'xpath://button[@id="lbl_ok_ack_color"]/..'=> '',
-						'xpath://button[@id="lbl_severity_color_0"]/..' => '',
-						'xpath://button[@id="lbl_severity_color_1"]/..' => '',
-						'xpath://button[@id="lbl_severity_color_2"]/..' => '' ,
-						'xpath://button[@id="lbl_severity_color_3"]/..' => '',
-						'xpath://button[@id="lbl_severity_color_4"]/..' => '',
-						'xpath://button[@id="lbl_severity_color_5"]/..' => ''
+						'Disaster' => ''
 					],
 					'details' => [
-						'Incorrect value for field "problem_unack_color": a hexadecimal colour code (6 symbols) is expected.',
-						'Incorrect value for field "problem_ack_color": a hexadecimal colour code (6 symbols) is expected.',
-						'Incorrect value for field "ok_unack_color": a hexadecimal colour code (6 symbols) is expected.',
-						'Incorrect value for field "ok_ack_color": a hexadecimal colour code (6 symbols) is expected.',
 						'Incorrect value for field "ok_period": a time unit is expected.',
 						'Incorrect value for field "blink_period": a time unit is expected.',
 						'Incorrect value for field "severity_name_0": cannot be empty.',
-						'Incorrect value for field "severity_color_0": a hexadecimal colour code (6 symbols) is expected.',
 						'Incorrect value for field "severity_name_1": cannot be empty.',
-						'Incorrect value for field "severity_color_1": a hexadecimal colour code (6 symbols) is expected.',
 						'Incorrect value for field "severity_name_2": cannot be empty.',
-						'Incorrect value for field "severity_color_2": a hexadecimal colour code (6 symbols) is expected.',
 						'Incorrect value for field "severity_name_3": cannot be empty.',
-						'Incorrect value for field "severity_color_3": a hexadecimal colour code (6 symbols) is expected.',
 						'Incorrect value for field "severity_name_4": cannot be empty.',
-						'Incorrect value for field "severity_color_4": a hexadecimal colour code (6 symbols) is expected.',
-						'Incorrect value for field "severity_name_5": cannot be empty.',
-						'Incorrect value for field "severity_color_5": a hexadecimal colour code (6 symbols) is expected.'
+						'Incorrect value for field "severity_name_5": cannot be empty.'
 					]
 				]
 			],
@@ -744,33 +702,12 @@ class testFormAdministrationGeneralTrigDisplOptions extends testFormAdministrati
 				[
 					'expected' => TEST_BAD,
 					'fields' => [
-						'Use custom event status colours' => true,
 						'Display OK triggers for' => '-1',
-						'On status change triggers blink for' => '-1',
-						'xpath://button[@id="lbl_problem_unack_color"]/..' => '-1    ',
-						'xpath://button[@id="lbl_problem_ack_color"]/..'=> '-1    ',
-						'xpath://button[@id="lbl_ok_unack_color"]/..'=> '-1    ',
-						'xpath://button[@id="lbl_ok_ack_color"]/..'=> '-1    ',
-						'xpath://button[@id="lbl_severity_color_0"]/..' => '-1    ',
-						'xpath://button[@id="lbl_severity_color_1"]/..' => '-1    ',
-						'xpath://button[@id="lbl_severity_color_2"]/..' => '-1    ' ,
-						'xpath://button[@id="lbl_severity_color_3"]/..' => '-1    ',
-						'xpath://button[@id="lbl_severity_color_4"]/..' => '-1    ',
-						'xpath://button[@id="lbl_severity_color_5"]/..' => '-1    '
+						'On status change triggers blink for' => '-1'
 					],
 					'details' => [
-						'Incorrect value for field "problem_unack_color": a hexadecimal colour code (6 symbols) is expected.',
-						'Incorrect value for field "problem_ack_color": a hexadecimal colour code (6 symbols) is expected.',
-						'Incorrect value for field "ok_unack_color": a hexadecimal colour code (6 symbols) is expected.',
-						'Incorrect value for field "ok_ack_color": a hexadecimal colour code (6 symbols) is expected.',
 						'Incorrect value for field "ok_period": a time unit is expected.',
-						'Incorrect value for field "blink_period": a time unit is expected.',
-						'Incorrect value for field "severity_color_0": a hexadecimal colour code (6 symbols) is expected.',
-						'Incorrect value for field "severity_color_1": a hexadecimal colour code (6 symbols) is expected.',
-						'Incorrect value for field "severity_color_2": a hexadecimal colour code (6 symbols) is expected.',
-						'Incorrect value for field "severity_color_3": a hexadecimal colour code (6 symbols) is expected.',
-						'Incorrect value for field "severity_color_4": a hexadecimal colour code (6 symbols) is expected.',
-						'Incorrect value for field "severity_color_5": a hexadecimal colour code (6 symbols) is expected.'
+						'Incorrect value for field "blink_period": a time unit is expected.'
 					]
 				]
 			],
@@ -811,5 +748,50 @@ class testFormAdministrationGeneralTrigDisplOptions extends testFormAdministrati
 	 */
 	public function testFormAdministrationGeneralTrigDisplOptions_CheckForm($data) {
 		$this->executeCheckForm($data, false);
+	}
+
+	public function getCheckColorPickerValidationData() {
+		return [
+			[
+				[
+					'value' => '!@#$%^&*()_+'
+				]
+			],
+			[
+				[
+					'value' => ''
+				]
+			],
+			[
+				[
+					'value' => '-1    '
+				]
+			]
+		];
+	}
+
+	/**
+	 * Check the validation of color-picker field values.
+	 *
+	 * @dataProvider getCheckColorPickerValidationData
+	 */
+	public function testFormAdministrationGeneralTrigDisplOptions_ValidateColors($data) {
+		$this->page->login()->open($this->config_link);
+		$form = $this->query($this->form_selector)->waitUntilVisible()->asForm()->one();
+
+		// Enable custom event color-pickers.
+		$form->fill(['Use custom event status colours' => true]);
+
+		// Separately fill all color-pickers and check form behavior.
+		$color_picker_names = ['problem_unack_color', 'problem_ack_color', 'ok_unack_color', 'ok_ack_color', 'severity_color_0',
+			'severity_color_1', 'severity_color_2', 'severity_color_3', 'severity_color_4', 'severity_color_5'
+		];
+		foreach ($color_picker_names as $field_name) {
+			$xpath = 'xpath:.//z-color-picker[@color-field-name='.CXPathHelper::escapeQuotes($field_name).']';
+			$color_picker = $form->query($xpath)->one()->asColorPicker();
+			$color_picker->fill($data['value']);
+			$this->assertTrue($color_picker->isSubmittionDisabled());
+			$color_picker->close();
+		}
 	}
 }

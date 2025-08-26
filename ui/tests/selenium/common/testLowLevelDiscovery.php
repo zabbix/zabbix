@@ -14,7 +14,7 @@
 **/
 
 
-require_once dirname(__FILE__).'/../../include/CWebTest.php';
+require_once __DIR__.'/../../include/CWebTest.php';
 
 /**
  * Common class for LLD form testing.
@@ -81,7 +81,7 @@ class testLowLevelDiscovery extends CWebTest {
 			'Name' => ['maxlength' => 255],
 			'Type' => ['value' => 'Zabbix agent', 'options' => ['Zabbix agent', 'Zabbix agent (active)', 'Simple check',
 				'SNMP agent', 'Zabbix internal', 'Zabbix trapper', 'External check', 'Database monitor', 'HTTP agent',
-				'IPMI agent', 'SSH agent', 'TELNET agent', 'JMX agent', 'Dependent item', 'Script', 'Browser']
+				'IPMI agent', 'SSH agent', 'TELNET agent', 'JMX agent', 'Dependent item', 'Script', 'Browser', 'Nested']
 			],
 			'Key' => ['maxlength' => 2048],
 			'URL' => ['maxlength' => 2048],
@@ -333,7 +333,7 @@ class testLowLevelDiscovery extends CWebTest {
 					'fields' => ['URL', 'Query fields', 'Request type', 'Request body type', 'Request body', 'Headers',
 							'Required status codes', 'Follow redirects', 'Retrieve mode', 'HTTP proxy', 'HTTP authentication',
 							'SSL verify peer', 'SSL verify host', 'SSL certificate file', 'SSL key file', 'SSL key password',
-							'Host interface', 'Update interval', 'Custom intervals', 'Timeout', 'Enable trapping'
+							'Host interface', 'Update interval', 'Custom intervals', 'Timeout', 'Enable trapping', 'Convert to JSON'
 					]
 				]
 			],
@@ -2686,7 +2686,7 @@ class testLowLevelDiscovery extends CWebTest {
 		$form->query('button:Clone')->waitUntilClickable()->one()->click();
 		$form->invalidate();
 		$this->assertEquals(['Add', 'Test', 'Cancel'], $form->query('xpath:.//div[@class="form-actions"]/button')
-				->all()->filter(CElementFilter::CLICKABLE)->asText()
+				->waitUntilVisible()->all()->filter(CElementFilter::CLICKABLE)->asText()
 		);
 
 		if (CTestArrayHelper::get($data, 'fields')) {

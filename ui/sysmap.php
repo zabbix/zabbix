@@ -20,7 +20,11 @@ require_once dirname(__FILE__).'/include/forms.inc.php';
 
 $page['title'] = _('Configuration of network maps');
 $page['file'] = 'sysmap.php';
-$page['scripts'] = ['class.svg.canvas.js', 'class.svg.map.js', 'class.cmap.js', 'colorpicker.js'];
+$page['scripts'] = ['class.linkform.js', 'class.massshapeform.js', 'class.shapeform.js',
+	'class.massform.js', 'class.selementform.js', 'class.selement.js', 'class.shape.js', 'class.link.js',
+	'class.imagecache.js', 'class.svgcanvas.js', 'class.svgtextarea.js', 'class.svgelement.js', 'class.svgmap.js',
+	'class.svgmapelement.js', 'class.svgmaplink.js', 'class.svgmapshape.js', 'class.cmap.js', 'sysmap.js'
+];
 $page['type'] = detect_page_type();
 
 if (!CWebUser::checkAccess(CRoleHelper::ACTIONS_EDIT_MAPS)) {
@@ -54,6 +58,7 @@ if (isset($_REQUEST['favobj'])) {
 	if (getRequest('favobj') === 'sysmap' && hasRequest('action')) {
 		if (getRequest('action') === 'update') {
 			$sysmapid = getRequest('sysmapid', 0);
+			$result = false;
 
 			@ob_start();
 
@@ -76,6 +81,8 @@ if (isset($_REQUEST['favobj'])) {
 				$sysmapUpdate['lines'] = [];
 
 				if (array_key_exists('selements', $sysmapUpdate)) {
+					$sysmapUpdate['selements'] = array_values($sysmapUpdate['selements']);
+
 					foreach ($sysmapUpdate['selements'] as $element) {
 						if (!array_key_exists('tags', $element)) {
 							continue;
@@ -110,26 +117,122 @@ if (isset($_REQUEST['favobj'])) {
 					unset($shape);
 				}
 
-				$result = API::Map()->update($sysmapUpdate);
+				if (array_key_exists('links', $sysmapUpdate)) {
+					$sysmapUpdate['links'] = array_values($sysmapUpdate['links']);
 
-				if ($result !== false) {
-					$url = (new CUrl('sysmaps.php'))
-						->setArgument('page', CPagerHelper::loadPage('sysmaps.php', null))
-						->getUrl();
+					$itemids = array_filter(array_column($sysmapUpdate['links'], 'itemid'));
 
-					echo
-						'if (confirm('.json_encode(_('Map is updated! Return to map list?')).')) {'.
-							'location.href = "'.$url.'";'.
-						'}';
+					$db_items = $itemids
+						? API::Item()->get([
+							'output' => ['value_type'],
+							'itemids' => $itemids,
+							'webitems' => true,
+							'preservekeys' => true
+						])
+						: [];
+
+					foreach ($sysmapUpdate['links'] as &$link) {
+						$link_fields = ['selementid1', 'selementid2', 'label', 'show_label', 'drawtype', 'color',
+							'indicator_type'
+						];
+
+						if (array_key_exists('linkid', $link) && substr($link['linkid'], 0, 3) !== 'new') {
+							$link_fields[] = 'linkid';
+						}
+
+						$link += ['indicator_type' => MAP_INDICATOR_TYPE_STATIC_LINK];
+
+						switch ($link['indicator_type']) {
+							case MAP_INDICATOR_TYPE_TRIGGER:
+								if (!array_key_exists('linktriggers', $link)) {
+									break;
+								}
+
+								$link_fields[] = 'linktriggers';
+
+								$link['linktriggers'] = array_values($link['linktriggers']);
+
+								foreach ($link['linktriggers'] as &$link_trigger) {
+									$link_trigger = array_intersect_key($link_trigger,
+										array_flip(['triggerid', 'drawtype', 'color'])
+									);
+								}
+								unset($link_trigger);
+
+								break;
+
+							case MAP_INDICATOR_TYPE_ITEM_VALUE:
+								if (!array_key_exists('itemid', $link) || $link['itemid'] === null
+										|| !array_key_exists($link['itemid'], $db_items)
+										|| $db_items[$link['itemid']]['value_type'] == ITEM_VALUE_TYPE_BINARY) {
+									break;
+								}
+
+								$link_fields[] = 'itemid';
+
+								switch ($db_items[$link['itemid']]['value_type']) {
+									case ITEM_VALUE_TYPE_FLOAT:
+									case ITEM_VALUE_TYPE_UINT64:
+										if (!array_key_exists('thresholds', $link)) {
+											break;
+										}
+
+										$link_fields[] = 'thresholds';
+
+										$link['thresholds'] = array_values($link['thresholds']);
+
+										foreach ($link['thresholds'] as &$threshold) {
+											$threshold = array_intersect_key($threshold,
+												array_flip(['threshold', 'drawtype', 'color'])
+											);
+										}
+										unset($threshold);
+
+										break;
+
+									case ITEM_VALUE_TYPE_STR:
+									case ITEM_VALUE_TYPE_LOG:
+									case ITEM_VALUE_TYPE_TEXT:
+										if (!array_key_exists('highlights', $link)) {
+											break;
+										}
+
+										$link_fields[] = 'highlights';
+
+										$link['highlights'] = array_values($link['highlights']);
+
+										foreach ($link['highlights'] as $index => &$highlight) {
+											$highlight = array_intersect_key($highlight,
+												array_flip(['pattern', 'drawtype', 'color'])
+											);
+
+											$highlight['sortorder'] = $index + 1;
+										}
+										unset($highlight);
+								}
+						}
+
+						$link = array_intersect_key($link, array_flip($link_fields));
+					}
+					unset($link);
 				}
-				else {
+
+				$result = (bool) API::Map()->update($sysmapUpdate);
+
+				if (!$result) {
 					throw new Exception(_('Map update failed.'));
 				}
 
-				DBend(true);
+				$url = (new CUrl('sysmaps.php'))
+					->setArgument('page', CPagerHelper::loadPage('sysmaps.php', null))
+					->getUrl();
+
+				echo
+					'if (confirm('.json_encode(_('Map is updated! Return to map list?')).')) {'.
+						'location.href = "'.$url.'";'.
+					'}';
 			}
 			catch (Exception $e) {
-				DBend(false);
 				$msg = [$e->getMessage()];
 
 				foreach (get_and_clear_messages() as $errMsg) {
@@ -138,8 +241,10 @@ if (isset($_REQUEST['favobj'])) {
 
 				ob_clean();
 
-				echo 'alert('.zbx_jsvalue(implode("\r\n", $msg)).');';
+				echo 'alert('.json_encode(implode("\r\n", $msg)).');';
 			}
+
+			$result = DBend($result);
 
 			@ob_flush();
 			session_write_close();
@@ -207,9 +312,10 @@ if ($page['type'] != PAGE_TYPE_HTML) {
 if (isset($_REQUEST['sysmapid'])) {
 	$sysmap = API::Map()->get([
 		'output' => ['sysmapid', 'name', 'expand_macros', 'grid_show', 'grid_align', 'grid_size', 'width', 'height',
-			'iconmapid', 'backgroundid', 'label_location', 'label_type', 'label_format', 'label_type_host',
-			'label_type_hostgroup', 'label_type_trigger', 'label_type_map', 'label_type_image', 'label_string_host',
-			'label_string_hostgroup', 'label_string_trigger', 'label_string_map', 'label_string_image'
+			'iconmapid', 'backgroundid', 'background_scale', 'label_location', 'show_element_label', 'show_link_label',
+			'label_type', 'label_format', 'label_type_host', 'label_type_hostgroup', 'label_type_trigger',
+			'label_type_map', 'label_type_image', 'label_string_host', 'label_string_hostgroup',
+			'label_string_trigger', 'label_string_map', 'label_string_image'
 		],
 		'selectShapes' => ['sysmap_shapeid', 'type', 'x', 'y', 'width', 'height', 'text', 'font', 'font_size',
 			'font_color', 'text_halign', 'text_valign', 'border_type', 'border_width', 'border_color',
@@ -268,28 +374,62 @@ $selements_resolved = CMacrosResolverHelper::resolveMacrosInMapElements($data['s
 // Set extended and restore original labels.
 foreach ($data['sysmap']['selements'] as $selementid => &$selement) {
 	$selement['expanded'] = $selements_resolved[$selementid]['label'];
+
+	CArrayHelper::sort($selement['urls'], ['name']);
+	$selement['urls'] = array_values($selement['urls']);
 }
 unset($selement);
 
 // get links
-foreach ($data['sysmap']['links'] as &$link) {
-	foreach ($link['linktriggers'] as $lnum => $linkTrigger) {
-		$dbTrigger = API::Trigger()->get([
-			'triggerids' => $linkTrigger['triggerid'],
-			'output' => ['description', 'expression'],
-			'selectHosts' => API_OUTPUT_EXTEND,
-			'preservekeys' => true,
-			'expandDescription' => true
-		]);
-		$dbTrigger = reset($dbTrigger);
-		$host = reset($dbTrigger['hosts']);
+$itemids = [];
 
-		$link['linktriggers'][$lnum]['desc_exp'] = $host['name'].NAME_DELIMITER.$dbTrigger['description'];
+foreach ($data['sysmap']['links'] as &$link) {
+	if (array_key_exists('linktriggers', $link)) {
+		foreach ($link['linktriggers'] as $lnum => $linkTrigger) {
+			$dbTrigger = API::Trigger()->get([
+				'triggerids' => $linkTrigger['triggerid'],
+				'output' => ['description', 'expression'],
+				'selectHosts' => API_OUTPUT_EXTEND,
+				'preservekeys' => true,
+				'expandDescription' => true
+			]);
+			$dbTrigger = reset($dbTrigger);
+			$host = reset($dbTrigger['hosts']);
+
+			$link['linktriggers'][$lnum]['desc_exp'] = $host['name'].NAME_DELIMITER.$dbTrigger['description'];
+		}
+
+		order_result($link['linktriggers'], 'desc_exp');
 	}
 
-	order_result($link['linktriggers'], 'desc_exp');
+	if (array_key_exists('itemid', $link) && $link['itemid'] !== null) {
+		$itemids[] = $link['itemid'];
+	}
 }
 unset($link);
+
+$data['sysmap']['items'] = [];
+
+if ($itemids) {
+	$items = API::Item()->get([
+		'output' => ['name_resolved'],
+		'selectHosts' => ['name'],
+		'itemids' => $itemids,
+		'filter' => ['value_type' => [ITEM_VALUE_TYPE_FLOAT, ITEM_VALUE_TYPE_STR, ITEM_VALUE_TYPE_LOG,
+			ITEM_VALUE_TYPE_UINT64, ITEM_VALUE_TYPE_TEXT
+		]],
+		'webitems' => true,
+		'preservekeys' => true
+	]);
+
+	foreach ($items as $itemid => $item) {
+		$data['sysmap']['items'][$itemid] = [
+			'id' => $itemid,
+			'name' => $item['name_resolved'],
+			'prefix' => $item['hosts'][0]['name'].NAME_DELIMITER
+		];
+	}
+}
 
 // get iconmapping
 if ($data['sysmap']['iconmapid']) {

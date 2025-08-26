@@ -14,7 +14,7 @@
 **/
 
 
-require_once dirname(__FILE__).'/../common/testWidgetCommunication.php';
+require_once __DIR__.'/../common/testWidgetCommunication.php';
 
 /**
  * @backup profiles
@@ -1748,7 +1748,8 @@ class testDashboardWidgetCommunication extends testWidgetCommunication {
 		}
 		else {
 			if ($data['select']['widget'] === 'new') {
-				$broadcaster = $dashboard->query('class:new-widget')->waitUntilPresent()->one();
+				$broadcaster = $dashboard->query('xpath:(.//div[contains(@class, "dashboard-grid-widget-header")]'.
+						'/h4[text()='.CXPathHelper::escapeQuotes($data['copy']).'])[2]/../../..')->waitUntilPresent()->one();
 			}
 			else {
 				$broadcaster = $dashboard->getWidget($data['select']['widget']);
@@ -1756,10 +1757,12 @@ class testDashboardWidgetCommunication extends testWidgetCommunication {
 
 			$this->getWidgetElement($data['select']['element'], $broadcaster)->click();
 			$dashboard->waitUntilReady();
-			$this->checkDataOnListener($data['expected']);
+			$this->checkDataOnListener($data['expected'], array_key_exists('new', $data['expected']) ? $data['copy'] : null);
 		}
 
 		$dashboard->cancelEditing();
+		// Added waitUntilReady() to check for unstable test with js 32739:4 Uncaught error.
+		$dashboard->waitUntilReady();
 	}
 
 	/**
@@ -1818,14 +1821,16 @@ class testDashboardWidgetCommunication extends testWidgetCommunication {
 	/**
 	 * Locate the required listener widget and verify displayed data based on listener widget type.
 	 *
-	 * @param array $expected	expected content on listener widget
+	 * @param array $expected				expected content on listener widget
+	 * @param string $new_listener_name		widget name of new listener
 	 */
-	protected function checkDataOnListener($expected) {
+	protected function checkDataOnListener($expected, $new_listener_name = null) {
 		$dashboard = CDashboardElement::find()->one();
 
 		foreach ($expected as $listener_name => $values) {
 			if ($listener_name === 'new') {
-				$listener = $dashboard->query('class:new-widget')->waitUntilPresent()->one();
+				$listener = $dashboard->query('xpath:(.//div[contains(@class, "dashboard-grid-widget-header")]/h4[text()='.
+					CXPathHelper::escapeQuotes($new_listener_name).'])[2]/../../..')->waitUntilPresent()->one();
 			}
 			else {
 				$listener = $dashboard->getWidget($listener_name);
@@ -1856,7 +1861,7 @@ class testDashboardWidgetCommunication extends testWidgetCommunication {
 					}
 
 					$table_selector = ($listener_name === 'new')
-						? 'xpath://div[contains(@class, "new-widget")]//table'
+						? 'xpath:(//h4[text()='.CXPathHelper::escapeQuotes($new_listener_name).'])[2]/../..//table'
 						: 'xpath://h4[text()='.CXPathHelper::escapeQuotes($listener_name).']/../..//table';
 
 					$this->assertTableData($values, $table_selector);

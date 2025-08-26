@@ -255,7 +255,8 @@ foreach ($data['templates'] as $template) {
 		],
 		[
 			new CLink(_('Graphs'),
-				(new CUrl('graphs.php'))
+				(new CUrl('zabbix.php'))
+					->setArgument('action', 'graph.list')
 					->setArgument('filter_set', '1')
 					->setArgument('filter_hostids', [$template['templateid']])
 					->setArgument('context', 'template')
@@ -278,7 +279,7 @@ foreach ($data['templates'] as $template) {
 					->setArgument('filter_hostids', [$template['templateid']])
 					->setArgument('context', 'template')
 			),
-			CViewHelper::showNum($template['discoveries'])
+			CViewHelper::showNum($template['discoveryRules'])
 		],
 		[
 			new CLink(_('Web'),

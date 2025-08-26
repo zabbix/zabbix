@@ -13,7 +13,7 @@
 ** If not, see <https://www.gnu.org/licenses/>.
 **/
 
-require_once dirname(__FILE__).'/../../include/CWebTest.php';
+require_once __DIR__.'/../../include/CWebTest.php';
 
 /**
  * @backup profiles
@@ -56,7 +56,7 @@ class testMultiselects extends CWebTest {
 
 		// Cover proxy selection field, because it gets changed depending on proxy names' lengths in the dropdown.
 		$covered_region = ($query === 'host-form')
-			? [$element, ['x' => 111, 'y' => 317, 'width' => 452, 'height' => 22]]
+			? [$element, ['x' => 111, 'y' => 338, 'width' => 452, 'height' => 22]]
 			: [$element];
 
 		$this->assertScreenshotExcept($element->parents('class', (($query === 'host-form') ? 'form-grid' : 'table-forms'))

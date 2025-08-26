@@ -696,21 +696,21 @@ void	zbx_strsplit_last(const char *src, char delimiter, char **left, char **righ
 
 /*******************************************************************************
  *                                                                             *
- * Purpose: Appends src to string dst of size size (unlike strncat, size is    *
- *          the full size of dst, not space left). At most size - 1 characters *
+ * Purpose: Appends src to string dst of size siz (unlike strncat, size is     *
+ *          the full size of dst, not space left). At most siz - 1 characters  *
  *          will be copied. Always null terminates (unless                     *
- *          size <= strlen(dst)).                                              *
+ *          siz <= strlen(dst)).                                               *
  *                                                                             *
  *******************************************************************************/
-void	zbx_strlcat(char *dst, const char *src, size_t size)
+void	zbx_strlcat(char *dst, const char *src, size_t siz)
 {
 	while ('\0' != *dst)
 	{
 		dst++;
-		size--;
+		siz--;
 	}
 
-	zbx_strlcpy(dst, src, size);
+	zbx_strlcpy(dst, src, siz);
 }
 
 /******************************************************************************
@@ -796,18 +796,19 @@ char	*zbx_strdcat(char *dest, const char *src)
  * Comments: returns pointer to allocated memory                              *
  *                                                                            *
  ******************************************************************************/
-char	*zbx_strdcatf(char *dest, const char *f, ...)
+char	*zbx_strdcatf(char *dest, const char *fmt, ...)
 {
-	char	*string, *result;
 	va_list	args;
+	char	*result, *str = NULL;
+	size_t	str_len = 0, str_offset = 0;
 
-	va_start(args, f);
-	string = zbx_dvsprintf(NULL, f, args);
+	va_start(args, fmt);
+	zbx_vsnprintf_alloc(&str, &str_len, &str_offset, fmt, args);
 	va_end(args);
 
-	result = zbx_strdcat(dest, string);
+	result = zbx_strdcat(dest, str);
 
-	zbx_free(string);
+	zbx_free(str);
 
 	return result;
 }
@@ -1187,7 +1188,7 @@ char	*zbx_convert_to_utf8(char *in, size_t in_size, const char *encoding, char *
 		memcpy(out_utf8_string, in, in_size);
 		out_utf8_string[in_size] = '\0';
 
-		goto out;
+		return out_utf8_string;
 	}
 
 	if (FAIL == get_codepage(encoding, &codepage))
@@ -1195,7 +1196,7 @@ char	*zbx_convert_to_utf8(char *in, size_t in_size, const char *encoding, char *
 		*error = zbx_dsprintf(NULL, "Failed to convert from encoding %s to utf8. Failed to get codepage.",
 				encoding);
 
-		goto out;
+		return NULL;
 	}
 
 	zabbix_log(LOG_LEVEL_DEBUG, "zbx_convert_to_utf8() in_size:%d encoding:'%s' codepage:%u", in_size, encoding,
@@ -1247,9 +1248,19 @@ char	*zbx_convert_to_utf8(char *in, size_t in_size, const char *encoding, char *
 		for (i = 0; i < wide_size; i++)
 			wide_string[i] = ((wide_string_be[i] << 8) & 0xff00) | ((wide_string_be[i] >> 8) & 0xff);
 	}
+	else if (0 == in_size)
+	{
+		wide_string = wide_string_static;
+		wide_size = 0;
+	}
 	else
 	{
-		wide_size = MultiByteToWideChar(codepage, 0, in, (int)in_size, NULL, 0);
+		if (0 == (wide_size = MultiByteToWideChar(codepage, 0, in, (int)in_size, NULL, 0)))
+		{
+			zabbix_log(LOG_LEVEL_DEBUG, "zbx_convert_to_utf8() Failed to convert from encoding %s"
+					" in_size:%d to size of wide string. Error: %s", encoding, in_size,
+					zbx_strerror_from_system(GetLastError()));
+		}
 
 		if (wide_size > STATIC_SIZE)
 			wide_string = (wchar_t *)zbx_malloc(wide_string, (size_t)wide_size * sizeof(wchar_t));
@@ -1257,31 +1268,43 @@ char	*zbx_convert_to_utf8(char *in, size_t in_size, const char *encoding, char *
 			wide_string = wide_string_static;
 
 		/* convert from 'in' to 'wide_string' */
-		if (0 == MultiByteToWideChar(codepage, 0, in, (int)in_size, wide_string, wide_size))
-			goto utf8_convert_fail;
+		if (0 != wide_size && 0 == MultiByteToWideChar(codepage, 0, in, (int)in_size, wide_string, wide_size))
+		{
+			wide_size = 0;
+			zabbix_log(LOG_LEVEL_DEBUG, "zbx_convert_to_utf8() Failed to convert from encoding %s"
+					" in_size:%d to wide string. Error: %s", encoding, in_size,
+					zbx_strerror_from_system(GetLastError()));
+		}
 	}
 
-	if (0 == (utf8_size = WideCharToMultiByte(CP_UTF8, 0, wide_string, wide_size, NULL, 0, NULL, NULL)))
-		goto utf8_convert_fail;
+	if (0 != wide_size)
+	{
+		if (0 == (utf8_size = WideCharToMultiByte(CP_UTF8, 0, wide_string, wide_size, NULL, 0, NULL, NULL)))
+		{
+			zabbix_log(LOG_LEVEL_DEBUG, "zbx_convert_to_utf8() Failed to convert from encoding %s"
+					" in_size:%d to size of utf-8. Error: %s", encoding, in_size,
+					zbx_strerror_from_system(GetLastError()));
+		}
 
-	out_utf8_string = (char *)zbx_malloc(out_utf8_string, (size_t)utf8_size + 1/* '\0' */);
+		out_utf8_string = (char *)zbx_malloc(out_utf8_string, (size_t)utf8_size + 1/* '\0' */);
 
-	/* convert from 'wide_string' to 'utf8_string' */
-	if (0 == WideCharToMultiByte(CP_UTF8, 0, wide_string, wide_size, out_utf8_string, utf8_size, NULL, NULL))
-		goto utf8_convert_fail;
+		/* convert from 'wide_string' to 'utf8_string' */
+		if (0 != utf8_size && 0 == WideCharToMultiByte(CP_UTF8, 0, wide_string, wide_size, out_utf8_string,
+				utf8_size, NULL, NULL))
+		{
+			zabbix_log(LOG_LEVEL_DEBUG, "zbx_convert_to_utf8() Failed to convert from encoding %s"
+					" in_size:%d to utf-8. Error: %s", encoding, in_size,
+					zbx_strerror_from_system(GetLastError()));
+		}
 
-	out_utf8_string[utf8_size] = '\0';
+		out_utf8_string[utf8_size] = '\0';
+	}
+	else
+		out_utf8_string = (char *)zbx_calloc(out_utf8_string, 1/* '\0' */, sizeof(char));
 
 	if (wide_string != wide_string_static && wide_string != (wchar_t *)in)
 		zbx_free(wide_string);
 
-	goto out;
-utf8_convert_fail:
-	zbx_free(out_utf8_string);
-	out_utf8_string = NULL;
-	*error = zbx_dsprintf(NULL, "Failed to convert from encoding %s to utf8. Error: %s.", encoding,
-			zbx_strerror_from_system(GetLastError()));
-out:
 	return out_utf8_string;
 }
 #elif defined(HAVE_ICONV)

@@ -60,11 +60,17 @@ switch ($data['method']) {
 		break;
 
 	case 'zabbix.status':
-		if (!CSessionHelper::has('serverCheckResult')
-				|| (CSessionHelper::get('serverCheckTime') + SERVER_CHECK_INTERVAL) <= time()) {
+		global $ZBX_SERVER, $ZBX_SERVER_PORT;
+
+		$now = time();
+		$check_time = CSessionHelper::get('serverCheckTime') ?? 0;
+
+		if ($check_time + SERVER_CHECK_INTERVAL <= $now || $now < $check_time) {
+			$status = true;
+			$error_code = 0;
 
 			if ($ZBX_SERVER === null && $ZBX_SERVER_PORT === null) {
-				$is_running = false;
+				$status = false;
 			}
 			else {
 				$zabbix_server = new CZabbixServer($ZBX_SERVER, $ZBX_SERVER_PORT,
@@ -72,18 +78,29 @@ switch ($data['method']) {
 					timeUnitToSeconds(CSettingsHelper::get(CSettingsHelper::SOCKET_TIMEOUT)), 0
 				);
 
-				$is_running = $zabbix_server->isRunning(CSessionHelper::getId());
+				if (!$zabbix_server->isRunning() && !$zabbix_server->canConnect(CSessionHelper::getId())) {
+					$status = false;
+					$error_code = $zabbix_server->getErrorCode();
+				}
 			}
 
-			CSessionHelper::set('serverCheckResult', $is_running);
-			CSessionHelper::set('serverCheckTime', time());
+			CSessionHelper::set('serverCheckResult', $status);
+			CSessionHelper::set('serverCheckResultErrorCode', $error_code);
+			CSessionHelper::set('serverCheckTime', $now);
+		}
+
+		$server_status = CSessionHelper::get('serverCheckResult');
+		$message = '';
+
+		if ($server_status === false) {
+			$message = (CSessionHelper::get('serverCheckResultErrorCode') === CZabbixServer::ERROR_CODE_TLS)
+				? _('Unable to connect to the Zabbix server due to TLS settings. Some functions are unavailable.')
+				: _('Zabbix server is not running: the information displayed may not be current.');
 		}
 
 		$result = [
-			'result' => (bool) CSessionHelper::get('serverCheckResult'),
-			'message' => CSessionHelper::get('serverCheckResult')
-				? ''
-				: _('Zabbix server is not running: the information displayed may not be current.')
+			'result' => $server_status,
+			'message' => $message
 		];
 		break;
 
@@ -171,6 +188,7 @@ switch ($data['method']) {
 					'with_httptests' => array_key_exists('with_httptests', $data) ? $data['with_httptests'] : null,
 					'with_triggers' => array_key_exists('with_triggers', $data) ? $data['with_triggers'] : null,
 					'search' => array_key_exists('search', $data) ? ['name' => $data['search']] : null,
+					'filter' => array_key_exists('filter', $data) ? $data['filter'] : null,
 					'editable' => array_key_exists('editable', $data) ? $data['editable'] : false,
 					'limit' => $limit
 				];
@@ -270,6 +288,7 @@ switch ($data['method']) {
 
 				if ($data['object_name'] === 'graph_prototypes') {
 					$options['selectDiscoveryRule'] = ['hostid'];
+					$options['selectDiscoveryRulePrototype'] = ['hostid'];
 
 					$records = API::GraphPrototype()->get($options);
 				}
@@ -289,7 +308,8 @@ switch ($data['method']) {
 					}
 					else {
 						$host_names = array_column($record['hosts'], 'name', 'hostid');
-						$host_name = $host_names[$record['discoveryRule']['hostid']];
+						$parent_lld = $record['discoveryRule'] ?: $record['discoveryRulePrototype'];
+						$host_name = $host_names[$parent_lld['hostid']];
 					}
 
 					$result[] = [
@@ -948,6 +968,25 @@ switch ($data['method']) {
 				$result = $scripts[$data['eventid']][0];
 			}
 		}
+		break;
+
+	case 'link_thresholds.validate':
+		$result = [];
+
+		if (array_key_exists('thresholds', $data)) {
+			$validation_rules = ['type' => API_OBJECTS, 'fields' => [
+				'threshold' => ['type' => API_NUMERIC]
+			]];
+
+			CApiInputValidator::validate($validation_rules, $data['thresholds'], 'thresholds', $error);
+
+			if ($error !== '') {
+				$result = [
+					'error' => $error
+				];
+			}
+		}
+
 		break;
 
 	default:

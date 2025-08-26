@@ -67,6 +67,46 @@ in:
 out:
   params: '"1"'
 ---
+test case: Expand '{$A}' with {$A}=a\
+in:
+  macros:
+    - hostid: 1
+      name: '{$A}'
+      value: a\
+  params: '{$A}'
+out:
+  params: 'a\'
+---
+test case: Expand '"{$A}"' with {$A}=a\
+in:
+  macros:
+    - hostid: 1
+      name: '{$A}'
+      value: a\
+  params: '"{$A}"'
+out:
+  params: '"a\\"'
+---
+test case: Expand '{$A}' with {$A}=a\\
+in:
+  macros:
+    - hostid: 1
+      name: '{$A}'
+      value: a\\
+  params: '{$A}'
+out:
+  params: 'a\\'
+---
+test case: Expand '"{$A}"' with {$A}=a\\
+in:
+  macros:
+    - hostid: 1
+      name: '{$A}'
+      value: a\\
+  params: '"{$A}"'
+out:
+  params: '"a\\\\"'
+---
 test case: Expand '1 ,2 ,3 ' 
 in:
   macros: []
@@ -156,5 +196,3 @@ in:
 out:
   params: 'ab,cd'
 ...
-
-

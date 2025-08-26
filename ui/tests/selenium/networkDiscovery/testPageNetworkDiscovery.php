@@ -14,9 +14,9 @@
 **/
 
 
-require_once dirname(__FILE__).'/../../include/CWebTest.php';
-require_once dirname(__FILE__).'/../behaviors/CMessageBehavior.php';
-require_once dirname(__FILE__).'/../behaviors/CTableBehavior.php';
+require_once __DIR__.'/../../include/CWebTest.php';
+require_once __DIR__.'/../behaviors/CMessageBehavior.php';
+require_once __DIR__.'/../behaviors/CTableBehavior.php';
 
 /**
  * @backup drules
@@ -333,9 +333,11 @@ class testPageNetworkDiscovery extends CWebTest {
 	 */
 	public function testPageNetworkDiscovery_CheckFilter($data) {
 		$this->page->login()->open('zabbix.php?action=discovery.list&sort=name&sortorder=DESC');
+		$table = $this->query('class:list-table')->asTable()->one();
 		$form = $this->query('name:zbx_filter')->asForm()->waitUntilVisible()->one();
 		$form->fill(CTestArrayHelper::get($data, 'filter'));
 		$form->submit();
+		$table->waitUntilReloaded();
 		$this->page->waitUntilReady();
 		$this->assertTableDataColumn(CTestArrayHelper::get($data, 'expected'));
 		$this->assertTableStats(count($data['expected']));
@@ -346,7 +348,7 @@ class testPageNetworkDiscovery extends CWebTest {
 	 * Check Network Discovery pages reset buttons functionality.
 	 */
 	public function testPageNetworkDiscovery_ResetButton() {
-		$this->page->login()->open('zabbix.php?action=discovery.list&sort=name&sortorder=DESC');
+		$this->page->login()->open('zabbix.php?action=discovery.list&sort=name&sortorder=DESC&filter_rst=1');
 		$form = $this->query('name:zbx_filter')->asForm()->waitUntilVisible()->one();
 		$table = $this->query('class:list-table')->asTable()->one();
 

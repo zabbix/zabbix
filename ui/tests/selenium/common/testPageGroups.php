@@ -14,9 +14,9 @@
 **/
 
 
-require_once dirname(__FILE__).'/../../include/CWebTest.php';
-require_once dirname(__FILE__).'/../behaviors/CMessageBehavior.php';
-require_once dirname(__FILE__).'/../behaviors/CTableBehavior.php';
+require_once __DIR__.'/../../include/CWebTest.php';
+require_once __DIR__.'/../behaviors/CMessageBehavior.php';
+require_once __DIR__.'/../behaviors/CTableBehavior.php';
 
 /**
  * Base class for Host and Template groups page.
@@ -179,13 +179,14 @@ class testPageGroups extends CWebTest {
 		);
 		$this->page->assertHeader(ucfirst($this->object).'s');
 		CFilterElement::find()->one()->getForm()->checkValue([ucfirst($this->object).' groups' => $links['name']]);
-		$this->assertTableHasData([
-			[
-				'Name' => array_key_exists('lld', $links)
-					? $links['lld'].': '.$links['host_template']
-					: $links['host_template']
-			]
-		]);
+
+		// Host or template name.
+		$name = array_key_exists('lld', $links)
+			? $links['lld'].': '.$links['host_template']
+			: $links['host_template'];
+
+		$host_row = $this->query('class:list-table')->asTable()->one()->findRow('Name',  $name);
+		$this->assertEquals($name, $host_row->getColumn('Name')->getText());
 		$this->page->open($this->link)->waitUntilReady();
 
 		// Check link to host prototype from host group name.

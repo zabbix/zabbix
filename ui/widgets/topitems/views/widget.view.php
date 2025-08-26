@@ -28,41 +28,42 @@ use Widgets\TopItems\Includes\{
 use Widgets\TopItems\Widget;
 
 $table = new CTableInfo();
+$header = [];
+
+if ($data['show_column_header'] != WidgetForm::COLUMN_HEADER_OFF) {
+	$header[] = $data['layout'] == WidgetForm::LAYOUT_VERTICAL
+		? new CColHeader(_('Items'))
+		: new CColHeader(_('Hosts'));
+
+	$table->setHeader($header);
+}
 
 if ($data['error'] !== null) {
-	$table->setNoDataMessage($data['error']);
+	$table->setNoDataMessage($data['error'], null, ZBX_ICON_SEARCH_LARGE);
 }
 else {
 	if ($data['show_column_header'] != WidgetForm::COLUMN_HEADER_OFF) {
-		$column_title_class = $data['show_column_header'] == WidgetForm::COLUMN_HEADER_VERTICAL
-			? ZBX_STYLE_TEXT_VERTICAL
-			: null;
-
-		$header = [];
-
 		if ($data['layout'] == WidgetForm::LAYOUT_VERTICAL) {
-			$header[] = new CColHeader(_('Items'));
-
 			foreach ($data['rows'][0] as $cell) {
 				$hostid = $cell[Widget::CELL_HOSTID];
 				$title = $data['db_hosts'][$hostid]['name'];
 				['is_view_value_in_row' => $is_view_value] = $cell[Widget::CELL_METADATA];
 				$header[] = (new CColHeader(
-					(new CSpan($title))
-						->addClass($column_title_class)
-						->setTitle($title)
+					($data['show_column_header'] == WidgetForm::COLUMN_HEADER_VERTICAL
+						? (new CVertical($title))
+						: (new CSpan($title))
+					)->setTitle($title)
 				))->setColSpan($is_view_value ? 2 : 1);
 			}
 		}
 		else {
-			$header[] = new CColHeader(_('Hosts'));
-
 			foreach ($data['rows'][0] as $cell) {
 				['name' => $title, 'is_view_value_in_column' => $is_view_value] = $cell[Widget::CELL_METADATA];
 				$header[] = (new CColHeader(
-					(new CSpan($title))
-						->addClass($column_title_class)
-						->setTitle($title)
+					($data['show_column_header'] == WidgetForm::COLUMN_HEADER_VERTICAL
+						? (new CVertical($title))
+						: (new CSpan($title))
+					)->setTitle($title)
 				))->setColSpan($is_view_value ? 2 : 1);
 			}
 		}

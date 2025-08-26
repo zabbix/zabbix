@@ -224,6 +224,7 @@ $discoveryTable = (new CTableInfo())
 		_('Triggers'),
 		_('Graphs'),
 		_('Hosts'),
+		_('Discovery rules'),
 		make_sorting_header(_('Key'), 'key_', $data['sort'], $data['sortorder'], $url),
 		make_sorting_header(_('Interval'), 'delay', $data['sort'], $data['sortorder'], $url),
 		make_sorting_header(_('Type'), 'type', $data['sort'], $data['sortorder'], $url),
@@ -241,6 +242,29 @@ foreach ($data['discoveries'] as $discovery) {
 	$description[] = makeItemTemplatePrefix($discovery['itemid'], $data['parent_templates'], ZBX_FLAG_DISCOVERY_RULE,
 		$data['allowed_ui_conf_templates']
 	);
+
+	if ($discovery['flags'] & ZBX_FLAG_DISCOVERY_CREATED) {
+		if ($discovery['discoveryRule']) {
+			if ($discovery['is_discovery_rule_editable']) {
+				$description[] = (new CLink($discovery['discoveryRule']['name'],
+					(new CUrl('host_discovery.php'))
+						->setArgument('form', 'update')
+						->setArgument('itemid',  $discovery['discoveryRule']['itemid'])
+						->setArgument('context', 'host')
+				))
+					->addClass(ZBX_STYLE_LINK_ALT)
+					->addClass(ZBX_STYLE_ORANGE);
+			}
+			else {
+				$description[] = (new CSpan($discovery['discoveryRule']['name']))->addClass(ZBX_STYLE_ORANGE);
+			}
+		}
+		else {
+			$description[] = (new CSpan(_('Inaccessible discovery rule')))->addClass(ZBX_STYLE_ORANGE);
+		}
+
+		$description[] = NAME_DELIMITER;
+	}
 
 	if ($discovery['type'] == ITEM_TYPE_DEPENDENT) {
 		if ($discovery['master_item']['type'] == ITEM_TYPE_HTTPTEST) {
@@ -288,10 +312,9 @@ foreach ($data['discoveries'] as $discovery) {
 			->addClass(ZBX_STYLE_LINK_ACTION)
 			->addClass(itemIndicatorStyle($discovery['status'], $discovery['state']));
 
-	// Hide zeros for trapper, SNMP trap and dependent items.
-	if ($discovery['type'] == ITEM_TYPE_TRAPPER || $discovery['type'] == ITEM_TYPE_SNMPTRAP
-			|| $discovery['type'] == ITEM_TYPE_DEPENDENT || ($discovery['type'] == ITEM_TYPE_ZABBIX_ACTIVE
-				&& strncmp($discovery['key_'], 'mqtt.get', 8) == 0)) {
+	// Hide zeros for specific items.
+	if (in_array($discovery['type'], [ITEM_TYPE_TRAPPER, ITEM_TYPE_SNMPTRAP, ITEM_TYPE_DEPENDENT, ITEM_TYPE_NESTED])
+			|| ($discovery['type'] == ITEM_TYPE_ZABBIX_ACTIVE && strncmp($discovery['key_'], 'mqtt.get', 8) == 0)) {
 		$discovery['delay'] = '';
 	}
 	elseif ($update_interval_parser->parse($discovery['delay']) == CParser::PARSE_SUCCESS) {
@@ -347,22 +370,29 @@ foreach ($data['discoveries'] as $discovery) {
 		],
 		[
 			new CLink(_('Graph prototypes'),
-				(new CUrl('graphs.php'))
+				(new CUrl('zabbix.php'))
+					->setArgument('action', 'graph.prototype.list')
 					->setArgument('parent_discoveryid', $discovery['itemid'])
 					->setArgument('context', $data['context'])
 			),
 			CViewHelper::showNum($discovery['graphs'])
 		],
-		($discovery['hosts'][0]['flags'] == ZBX_FLAG_DISCOVERY_NORMAL)
-			? [
-				new CLink(_('Host prototypes'),
-					(new CUrl('host_prototypes.php'))
-						->setArgument('parent_discoveryid', $discovery['itemid'])
-						->setArgument('context', $data['context'])
-				),
-				CViewHelper::showNum($discovery['hostPrototypes'])
-			]
-			: '',
+		[
+			new CLink(_('Host prototypes'),
+				(new CUrl('host_prototypes.php'))
+					->setArgument('parent_discoveryid', $discovery['itemid'])
+					->setArgument('context', $data['context'])
+			),
+			CViewHelper::showNum($discovery['hostPrototypes'])
+		],
+		[
+			new CLink(_('Discovery prototypes'),
+				(new CUrl('host_discovery_prototypes.php'))
+					->setArgument('parent_discoveryid', $discovery['itemid'])
+					->setArgument('context', $data['context'])
+			),
+			CViewHelper::showNum($discovery['discoveryRulePrototypes'])
+		],
 		(new CDiv($discovery['key_']))->addClass(ZBX_STYLE_WORDWRAP),
 		$discovery['delay'],
 		item_type2str($discovery['type']),

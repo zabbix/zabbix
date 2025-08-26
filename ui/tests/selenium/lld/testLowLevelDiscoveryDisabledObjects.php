@@ -14,7 +14,7 @@
 **/
 
 
-require_once dirname(__FILE__).'/../../include/CWebTest.php';
+require_once __DIR__.'/../../include/CWebTest.php';
 
 /**
  * Test checks the objects created by LLD and then no more discovered or/and disabled.
@@ -321,9 +321,9 @@ class testLowLevelDiscoveryDisabledObjects extends CWebTest {
 
 		// Emulate host discovery in DB.
 		foreach ($discovered_hosts as $discovered_host) {
-			DBexecute('INSERT INTO hosts (hostid, host, name, status, flags, description) VALUES ('.
+			DBexecute('INSERT INTO hosts (hostid, host, name, status, flags, description, readme) VALUES ('.
 					zbx_dbstr($discovered_host['hostid']).', '.zbx_dbstr($discovered_host['discovered_host_name']).
-					', '.zbx_dbstr($discovered_host['discovered_host_name']).', '.$discovered_host['status'].', 4, \'\')'
+					', '.zbx_dbstr($discovered_host['discovered_host_name']).', '.$discovered_host['status'].', 4, \'\', \'\')'
 			);
 			DBexecute('INSERT INTO host_discovery (hostid, parent_hostid, lastcheck, ts_delete, disable_source, ts_disable, status)'.
 					' VALUES ('.zbx_dbstr($discovered_host['hostid']).', '.zbx_dbstr($discovered_host['host_prototypeid']).', '.
@@ -332,6 +332,48 @@ class testLowLevelDiscoveryDisabledObjects extends CWebTest {
 			);
 			DBexecute('INSERT INTO hosts_groups (hostgroupid, hostid, groupid) VALUES ('.zbx_dbstr($discovered_host['host_groupid']).
 					', '.zbx_dbstr($discovered_host['hostid']).', 4)'
+			);
+		}
+
+		// Create LLD rule prototypes for hint check.
+		$lld_rule_prototypes_data = [];
+		$n = 1;
+		foreach ($hosts['discoveryruleids'] as $lldid) {
+			$lld_rule_prototypes_data[] = [
+				'hostid' => self::$hint_hostid,
+				'ruleid' => $lldid,
+				'name' => '{#KEY} LLD rule prototype '.$n,
+				'key_' => 'lld_prototype'.$n.'[{#KEY}]',
+				'type' => ITEM_TYPE_NESTED
+			];
+			$n++;
+		}
+		$lld_rule_protototypes = CDataHelper::call('discoveryruleprototype.create', $lld_rule_prototypes_data);
+
+		// Create LLD rules discovery of which will be simulated.
+		$discovered_llds = [];
+		$s = 1;
+		foreach ($lld_rule_protototypes['itemids'] as $discovered_lldid) {
+			$discovered_llds[] = [
+				'name' => 'Discovered LLD rule prototype '.$s,
+				'key_' => 'lld_prototype'.$s.'[Discovered]',
+				'hostid' => self::$hint_hostid,
+				'type' => ITEM_TYPE_TRAPPER
+			];
+
+			$s++;
+		}
+		$discovered_lldids = CDataHelper::call('discoveryrule.create', $discovered_llds);
+
+		// Make previously created LLD rule a discovered LLD rule.
+		foreach ($discovered_lldids['itemids'] as $t => $discovered_lldid) {
+			DBExecute('UPDATE items SET flags=5 WHERE itemid='.$discovered_lldid);
+			DBexecute('INSERT INTO item_discovery (itemdiscoveryid, itemid, parent_itemid) values ('.
+					$discovered_lldid.', '.$discovered_lldid.', '.$lld_rule_protototypes['itemids'][$t].');'
+			);
+			DBExecute('UPDATE item_discovery SET status=1, lastcheck='.$statuses[$t]['lastcheck'].
+					', ts_delete='.$statuses[$t]['ts_delete'].', disable_source='.$statuses[$t]['disable_source'].
+					', ts_disable='.$statuses[$t]['ts_disable'].' WHERE itemid='.$discovered_lldid
 			);
 		}
 	}
@@ -363,9 +405,17 @@ class testLowLevelDiscoveryDisabledObjects extends CWebTest {
 			[
 				[
 					'object' => 'graph',
-					'url' => 'graphs.php?filter_set=1&context=host&filter_hostids%5B0%5D='
+					'url' => 'zabbix.php?action=graph.list&context=host&filter_set=1&filter_hostids%5B%5D='
 				]
 			]
+			// TODO: Uncomment the below case when ZBX-26644 if fixed.
+//			// #4.
+//			[
+//				[
+//					'object' => 'lld_rule',
+//					'url' => 'host_discovery.php?context=host&filter_set=1&filter_hostids%5B%5D='
+//				]
+//			]
 		];
 	}
 

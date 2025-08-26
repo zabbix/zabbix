@@ -14,7 +14,7 @@
 **/
 
 
-require_once dirname(__FILE__).'/../../include/CWebTest.php';
+require_once __DIR__.'/../../include/CWebTest.php';
 
 /**
  * @backup profiles
@@ -159,7 +159,7 @@ class testGraphAxis extends CWebTest {
 		}
 
 		$form->fill($data['settings']);
-		$form->submit();
+		$form->submit()->waitUntilStalled();
 
 		// Go to Graphs and set time period.
 		$this->page->open('zabbix.php?action=host.view')->waitUntilReady();

@@ -142,6 +142,12 @@ function cleanPreviousTestResults() {
 		.next()
 		.empty()
 		.hide();
+
+	for (const element of document.getElementById('preprocessing-test-form')
+			.querySelectorAll('.result-copy > .js-copy-button')) {
+		element.style.display = 'none';
+		element.closest('tr').classList.remove('display-icon');
+	}
 }
 
 /**
@@ -160,6 +166,12 @@ function itemGetValueTest(overlay) {
 	url.setArgument('action', 'popup.itemtest.getvalue');
 	url.setArgument(CSRF_TOKEN_NAME, <?= json_encode(CCsrfTokenHelper::get('itemtest')) ?>);
 
+	const macros = Object.fromEntries(
+		Object.values(form_data['macro_names'] || []).map(
+			(key, i) => [key, Object.values(form_data['macro_values'] || []).at(i)]
+		)
+	);
+
 	post_data = jQuery.extend(post_data, {
 		interface: {
 			address: interface ? interface['address'].trim() : '',
@@ -168,7 +180,7 @@ function itemGetValueTest(overlay) {
 			useip: interface ? interface['useip'] : null,
 			details: interface ? interface['details'] : null
 		},
-		macros: form_data['macros'],
+		macros: JSON.stringify(macros),
 		test_with: form_data['test_with'],
 		proxyid: form_data['proxyid'],
 		test_type: <?= $data['test_type'] ?>,
@@ -240,12 +252,20 @@ function itemGetValueTest(overlay) {
  * @param {object} overlay  Overlay dialog object.
  */
 function itemCompleteTest(overlay) {
-	var $body = overlay.$dialogue.$body,
-		$form = overlay.$dialogue.find('form'),
-		form_data = $form.serializeJSON(),
-		post_data = getItemTestProperties('#preprocessing-test-form'),
-		interface = (typeof form_data['interface'] !== 'undefined') ? form_data['interface'] : null,
-		url = new Curl('zabbix.php');
+	const $body = overlay.$dialogue.$body;
+	const $form = overlay.$dialogue.find('form');
+	const form_data = $form.serializeJSON();
+	let post_data = getItemTestProperties('#preprocessing-test-form');
+	const interface = (form_data['interface'] !== undefined) ? form_data['interface'] : null;
+	const url = new Curl('zabbix.php');
+
+	const macros = {};
+
+	if (form_data.macro_names !== undefined) {
+		for (const [macro_index, macro_name] of Object.entries(form_data.macro_names)) {
+			macros[macro_name] = form_data.macro_values[macro_index];
+		}
+	}
 
 	url.setArgument('action', 'popup.itemtest.send');
 	url.setArgument(CSRF_TOKEN_NAME, <?= json_encode(CCsrfTokenHelper::get('itemtest')) ?>);
@@ -260,7 +280,7 @@ function itemCompleteTest(overlay) {
 			useip: interface ? interface['useip'] : null,
 			details: interface ? interface['details'] : null
 		},
-		macros: form_data['macros'],
+		macros: JSON.stringify(macros),
 		test_with: form_data['test_with'],
 		proxyid: form_data['proxyid'],
 		show_final_result: <?= $data['show_final_result'] ? 1 : 0 ?>,
@@ -333,40 +353,65 @@ function itemCompleteTest(overlay) {
 				jQuery('#runtime_error', $form).multilineInput('value', ret.runtime_error);
 			}
 
-			if (typeof ret.eol !== 'undefined') {
+			if (ret.eol !== undefined) {
 				jQuery("input[value=" + ret.eol + "]", jQuery("#eol")).prop("checked", "checked");
 			}
 
-			if (typeof ret.final !== 'undefined') {
-				var result = makeStepResult(ret.final);
+			if (ret.final !== undefined) {
+				const result = makeStepResult(ret.final);
+				const result_row = document.createElement('div');
 
-				if (result !== null) {
-					$result = result.css('float', 'right');
+				result_row.classList.add('final-result-row');
+
+				const action_cell = document.createElement('span');
+				action_cell.innerHTML = ret.final.action;
+
+				const action_element = action_cell.firstChild;
+				action_element.classList.add('final-result-action');
+
+				result_row.append(action_element, result[0]);
+
+				if (ret.final.error === undefined && ret.final.result) {
+					const copy_button = createCopyButton(ret.final.result);
+
+					result_row.append(copy_button);
+					copy_button.parentElement.classList.add('display-icon');
 				}
 
-				$result_row = jQuery('<div>', {'class': '<?= ZBX_STYLE_TABLE_FORMS_SEPARATOR ?>'})
-					.css({whiteSpace: 'normal'})
-					.append(jQuery('<div>').append(ret.final.action, $result))
-					.css({display: 'block', width: '675px'});
+				let mapping_row;
 
-				if (typeof ret.mapped_value !== 'undefined') {
-					$mapped_value = makeStepResult({result: ret.mapped_value});
-					$mapped_value.css('float', 'right');
+				if (ret.mapped_value !== undefined) {
+					const mapped_value = makeStepResult({result: ret.mapped_value});
 
-					$result_row.append(jQuery('<div>')
-						.append(
-							jQuery('<span>', {'class': '<?= ZBX_STYLE_GREY ?>'})
-								.text(<?= json_encode(_('Result with value map applied')) ?>),
-							$mapped_value
-						)
-					);
+					mapping_row = document.createElement('div');
+					mapping_row.classList.add('final-result-row');
+
+					const action_element = document.createElement('span');
+
+					action_element.classList.add('<?= ZBX_STYLE_GREY ?>', 'final-result-action');
+					action_element.textContent = <?= json_encode(_('Result with value map applied')) ?>;
+
+					mapping_row.append(action_element, mapped_value[0]);
+
+					if (ret.final.error === undefined && ret.final.result) {
+						const copy_button = createCopyButton(ret.final.result);
+
+						mapping_row.append(copy_button);
+						copy_button.parentElement.classList.add('display-icon');
+					}
 				}
 
-				jQuery('.js-final-result')
-					.show()
-					.next()
-					.append($result_row)
-					.show();
+				const result_field = document.createElement('div');
+
+				result_field.classList.add('<?= ZBX_STYLE_TABLE_FORMS_SEPARATOR ?>');
+				result_field.append(result_row);
+				result_field.append(mapping_row ?? '');
+
+				const final_result = document.querySelector('.js-final-result');
+
+				final_result.style.display = '';
+				final_result.nextElementSibling.append(result_field);
+				final_result.nextElementSibling.style.display = '';
 			}
 		},
 		dataType: 'json',
@@ -376,17 +421,35 @@ function itemCompleteTest(overlay) {
 	return false;
 }
 
+function createCopyButton(result) {
+	const copy_button = document.createElement('button');
+
+	copy_button.type = 'button';
+	copy_button.setAttribute('title', <?= json_encode(_('Copy to clipboard')) ?>);
+	copy_button.classList.add(ZBX_STYLE_BTN_GREY_ICON, ZBX_ICON_COPY, 'js-copy-button');
+
+	copy_button.addEventListener('click', () => {
+		writeTextClipboard(result);
+		copy_button.focus();
+	});
+
+	return copy_button;
+}
+
 /**
  * Process test results and make visual changes in test dialog results block.
  *
  * @param {array} steps  Array of objects containing details about each preprocessing step test results.
  */
 function processItemPreprocessingTestResults(steps) {
-	var tmpl_gray_label = new Template(jQuery('#preprocessing-gray-label').html()),
-		tmpl_act_done = new Template(jQuery('#preprocessing-step-action-done').html());
+	const tmpl_gray_label = new Template(jQuery('#preprocessing-gray-label').html());
+	const tmpl_act_done = new Template(jQuery('#preprocessing-step-action-done').html());
+	const form = document.getElementById('preprocessing-test-form');
 
 	steps.forEach(function(step, i) {
-		if (typeof step.action !== 'undefined') {
+		const result = step.result;
+
+		if (step.action !== undefined) {
 			switch (step.action) {
 				case <?= ZBX_PREPROC_FAIL_DEFAULT ?>:
 					step.action = null;
@@ -413,9 +476,21 @@ function processItemPreprocessingTestResults(steps) {
 			}
 		}
 
+		if (step.error === undefined && result) {
+			const copy_button = form.querySelector(`.js-copy-button[data-index="${i}"]`);
+
+			copy_button.closest('tr').classList.add('display-icon');
+			copy_button.style.display = '';
+
+			copy_button.addEventListener('click', e => {
+				writeTextClipboard(result);
+				e.target.focus();
+			});
+		}
+
 		step.result = makeStepResult(step);
 
-		if (typeof step.action !== 'undefined' && step.action !== null) {
+		if (step.action !== undefined && step.action !== null) {
 			jQuery('#preproc-test-step-' + i + '-name').append(jQuery(tmpl_gray_label.evaluate(<?= json_encode([
 				'label' => _('Custom on fail')
 			]) ?>)));
@@ -466,11 +541,13 @@ function saveItemTestInputs() {
 		});
 	<?php endif ?>
 
-	jQuery('[name^=macros]').each(function(i, macro) {
-		var name = macro.name.toString();
-		macros[name.substr(7, name.length - 8)] = macro.value;
-	});
-	input_values.macros = macros;
+	if (form_data.macro_names !== undefined) {
+		for (const [macro_index, macro_name] of Object.entries(form_data.macro_names)) {
+			macros[macro_name] = form_data.macro_values[macro_index];
+		}
+	}
+
+	input_values.macros = JSON.stringify(macros);
 
 	<?php if ($data['step_obj'] == -2): ?>
 		$test_obj = jQuery('.overlay-dialogue-footer');
@@ -610,12 +687,12 @@ jQuery(document).ready(function($) {
 											break;
 									}
 
-									overlays_stack.end().centerDialog();
+									overlays_stack.end().fixPosition();
 								}).trigger('change');
 								break;
 						}
 
-						overlays_stack.end().centerDialog();
+						overlays_stack.end().fixPosition();
 					}).trigger('change');
 				<?php endif ?>
 			}

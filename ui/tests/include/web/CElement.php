@@ -15,12 +15,12 @@
 
 require_once 'vendor/autoload.php';
 
-require_once dirname(__FILE__).'/CBaseElement.php';
-require_once dirname(__FILE__).'/CElementQuery.php';
+require_once __DIR__.'/CBaseElement.php';
+require_once __DIR__.'/CElementQuery.php';
 
-require_once dirname(__FILE__).'/IWaitable.php';
-require_once dirname(__FILE__).'/WaitableTrait.php';
-require_once dirname(__FILE__).'/CastableTrait.php';
+require_once __DIR__.'/IWaitable.php';
+require_once __DIR__.'/WaitableTrait.php';
+require_once __DIR__.'/CastableTrait.php';
 
 use Facebook\WebDriver\WebDriverExpectedCondition;
 use Facebook\WebDriver\Remote\RemoteWebElement;
@@ -614,10 +614,29 @@ class CElement extends CBaseElement implements IWaitable {
 			throw new Exception('Cannot wait for element reload on element selected in multi-element query.');
 		}
 
+		$this->waitUntilStalled($timeout, true);
+
+		return $this;
+	}
+
+	/**
+	 * Wait until element changes it's state to stalled.
+	 *
+	 * @param integer $timeout    timeout in seconds
+	 * @param boolean $reload     if element need to be reloaded
+	 *
+	 * @return $this
+	 * @throws Exception
+	 */
+	public function waitUntilStalled($timeout = null, $reload = false) {
 		$element = $this;
 		$wait = forward_static_call_array([CElementQuery::class, 'wait'], $timeout !== null ? [$timeout] : []);
-		$wait->until(function () use ($element) {
+		$wait->until(function () use ($element, $reload) {
 			try {
+				if (!$reload) {
+					return $element->isStalled();
+				}
+
 				if ($element->isStalled()) {
 					$element->reload();
 
@@ -629,7 +648,7 @@ class CElement extends CBaseElement implements IWaitable {
 			}
 
 			return null;
-		}, 'Failed to wait until element reloaded.');
+		}, 'Failed to wait until element '.($reload ? 'reloaded' : 'stalled').'.');
 
 		return $this;
 	}
@@ -829,6 +848,16 @@ class CElement extends CBaseElement implements IWaitable {
 	public function hoverMouse() {
 		$mouse = CElementQuery::getDriver()->getMouse();
 		$mouse->mouseMove($this->getCoordinates());
+
+		return $this;
+	}
+
+	/**
+	 * Moves the mouse to the element.
+	 */
+	public function moveMouse() {
+		$actions = new WebDriverActions(CElementQuery::getDriver());
+		$actions->moveToElement($this)->perform();
 
 		return $this;
 	}

@@ -159,9 +159,7 @@ class CUser extends CApiService {
 		}
 
 		if ($options['userids'] !== null) {
-			if (self::$userData['type'] == USER_TYPE_SUPER_ADMIN || !$options['editable']) {
-				$sql_parts['where']['userid'] = dbConditionId('u.userid', $options['userids']);
-			}
+			$sql_parts['where'][] = dbConditionId('u.userid', $options['userids']);
 		}
 
 		if ($options['usrgrpids'] !== null) {
@@ -191,6 +189,13 @@ class CUser extends CApiService {
 		}
 
 		if ($options['filter'] !== null) {
+			if (array_key_exists('userid', $options['filter']) && $options['filter']['userid'] !== null
+					&& !$options['searchByAny']) {
+				$sql_parts['where'][] = dbConditionId('u.userid', $options['filter']['userid']);
+
+				unset($options['filter']['userid']);
+			}
+
 			if (array_key_exists('autologout', $options['filter']) && $options['filter']['autologout'] !== null) {
 				$options['filter']['autologout'] = getTimeUnitFilters($options['filter']['autologout']);
 			}
@@ -438,6 +443,16 @@ class CUser extends CApiService {
 			'usrgrps' =>		['type' => API_OBJECTS, 'uniq' => [['usrgrpid']], 'fields' => [
 				'usrgrpid' =>		['type' => API_ID, 'flags' => API_REQUIRED]
 			]],
+			'medias' =>			['type' => API_ANY]
+		]];
+
+		if (!CApiInputValidator::validate($api_input_rules, $users, '/', $error)) {
+			self::exception(ZBX_API_ERROR_PARAMETERS, $error);
+		}
+
+		self::canEditMedia($users);
+
+		$api_input_rules = ['type' => API_OBJECTS, 'flags' => API_ALLOW_UNEXPECTED, 'fields' => [
 			'medias' =>			['type' => API_OBJECTS, 'fields' => self::getMediaValidationFields()]
 		]];
 
@@ -469,6 +484,36 @@ class CUser extends CApiService {
 		self::checkEmptyPassword($users, $db_user_groups);
 		self::checkMediaTypes($users, $db_mediatypes);
 		self::checkMediaRecipients($users, $db_mediatypes);
+	}
+
+	private static function canEditMedia(array $users, bool $is_update = false): void {
+		$can_edit_own_media = self::checkAccess(CRoleHelper::ACTIONS_EDIT_OWN_MEDIA);
+		$can_edit_user_media = self::checkAccess(CRoleHelper::ACTIONS_EDIT_USER_MEDIA);
+
+		if ($can_edit_own_media && $can_edit_user_media) {
+			return;
+		}
+
+		foreach ($users as $i => $user) {
+			if (!array_key_exists('medias', $user)) {
+				continue;
+			}
+
+			$path = '/'.($i + 1).'/medias';
+
+			if ($is_update && bccomp($user['userid'], self::$userData['userid']) == 0) {
+				if (!$can_edit_own_media) {
+					self::exception(ZBX_API_ERROR_PARAMETERS,
+						_s('Invalid parameter "%1$s": %2$s.', $path, _('no permissions to create and edit own media'))
+					);
+				}
+			}
+			elseif (!$can_edit_user_media) {
+				self::exception(ZBX_API_ERROR_PARAMETERS,
+					_s('Invalid parameter "%1$s": %2$s.', $path, _('no permissions to create and edit user media'))
+				);
+			}
+		}
 	}
 
 	/**
@@ -513,6 +558,16 @@ class CUser extends CApiService {
 			'usrgrps' =>		['type' => API_OBJECTS, 'uniq' => [['usrgrpid']], 'fields' => [
 				'usrgrpid' =>		['type' => API_ID, 'flags' => API_REQUIRED]
 			]],
+			'medias' =>			['type' => API_ANY]
+		]];
+
+		if (!CApiInputValidator::validate($api_input_rules, $users, '/', $error)) {
+			self::exception(ZBX_API_ERROR_PARAMETERS, $error);
+		}
+
+		self::canEditMedia($users, true);
+
+		$api_input_rules = ['type' => API_OBJECTS, 'flags' => API_ALLOW_UNEXPECTED, 'fields' => [
 			'medias' =>			['type' => API_OBJECTS, 'flags' => API_ALLOW_UNEXPECTED, 'uniq' => [['mediaid']], 'fields' => [
 				'mediaid' =>		['type' => API_ID]
 			]]

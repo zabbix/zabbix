@@ -13,9 +13,9 @@
 ** If not, see <https://www.gnu.org/licenses/>.
 **/
 
-require_once dirname(__FILE__) . '/../include/CWebTest.php';
-require_once dirname(__FILE__).'/behaviors/CMessageBehavior.php';
-require_once dirname(__FILE__).'/behaviors/CTableBehavior.php';
+require_once __DIR__ . '/../include/CWebTest.php';
+require_once __DIR__.'/behaviors/CMessageBehavior.php';
+require_once __DIR__.'/behaviors/CTableBehavior.php';
 
 /**
  * @backup sessions
@@ -110,8 +110,6 @@ class testFormSetup extends CWebTest {
 
 		global $DB;
 		$php_version = $this->query('xpath://td[text()="PHP version"]/following-sibling::td')->one();
-		// TODO: Incorrect screenshot on Jenkins due to Chrome - need to remove mouse hover on row in table.
-		$this->query('tag:h1')->one()->hoverMouse();
 		$this->assertScreenshotExcept($this->query('xpath://form')->one(), $php_version, 'Prerequisites_'.$DB['TYPE']);
 	}
 
@@ -262,21 +260,23 @@ class testFormSetup extends CWebTest {
 	public function testFormSetup_settingsSection() {
 		// Open the Pre-installation summary section.
 		$this->openSpecifiedSection('Settings');
+
 		// Check GUI settings section.
 		$this->checkPageTextElements('Settings');
 		$this->checkButtons();
 		$form = $this->query('xpath://form')->asForm()->one();
+
 		// Check layout via screenshot for default theme.
 		$this->assertScreenshotExcept($form, $this->query('id:label-default-timezone')->one(), 'GUISettings_Default');
 
 		// Check Zabbix server name field.
-		$server_name = $form->getField('Zabbix server name');
+		$server_name = $this->query('id:zbx_server_name')->one();
 		$this->assertEquals(255, $server_name->getAttribute('maxlength'));
 		$this->assertEquals('', $server_name->getValue());
 
 		// Check timezone field.
-		$timezones_field = $form->getField('Default time zone');
-		$timezones = $timezones_field->getOptions()->asText();
+		$timezones_field = $this->query('name:default_timezone');
+		$timezones = $timezones_field->asDropdown()->one()->getOptions()->asText();
 
 		// Note that count of available timezones may differ based on the local environment configuration and php version.
 		$this->assertGreaterThan(415, count($timezones));
@@ -287,18 +287,21 @@ class testFormSetup extends CWebTest {
 			$this->assertContains($timezone, $timezones);
 		}
 		// Select a certain timezone.
-		$form->getField('Default time zone')->select(CDateTimeHelper::getTimeZoneFormat('Europe/Riga'));
+		$timezones_field->one()->select(CDateTimeHelper::getTimeZoneFormat('Europe/Riga'));
 
 		// Check Default theme field.
-		$themes = $form->getField('Default theme');
-		$this->assertEquals(['Blue', 'Dark', 'High-contrast light', 'High-contrast dark'], $themes->getOptions()->asText());
+		$this->assertEquals(['Blue', 'Dark', 'High-contrast light', 'High-contrast dark'], $this->query('id:default-theme')
+				->asDropdown()->one()->getOptions()->asText()
+		);
+
 		// Select Dark theme.
-		$form->getField('Default theme')->select('Dark');
+		$this->query('id:default-theme')->one()->asDropdown()->select('Dark');
 
 		// Check that default theme has changed.
 		$stylesheet = $this->query('xpath://link[@rel="stylesheet"]')->one();
 		$parts = explode('/', $stylesheet->getAttribute('href'));
 		$this->assertContains('dark-theme.css', explode('?', end($parts)));
+
 		// Check layout via screenshot for dark theme.
 		$this->assertScreenshotExcept($form, $this->query('id:label-default-timezone')->one(), 'GUISettings_Dark');
 
@@ -319,8 +322,9 @@ class testFormSetup extends CWebTest {
 		// Check that Zabbix server name field is not displayed if it is not populated.
 		$this->assertFalse($this->query('xpath://span[text()="Zabbix server name"]')->one(false)->isValid());
 		$this->query('button:Back')->one()->click();
+
 		// Fill in the Zabbix server name field and proceed with checking Pre-installation summary.
-		$this->query('id:setup-form')->asForm()->one()->getField('Zabbix server name')->fill('Zabbix server name');
+		$this->query('id:zbx_server_name')->one()->fill('Zabbix server name');
 		$this->query('button:Next step')->one()->click();
 		$db_parameters = $this->getDbParameters();
 		$text = 'Please check configuration parameters. If all is correct, press "Next step" button, or "Back" button '.
@@ -332,7 +336,8 @@ class testFormSetup extends CWebTest {
 			'Database name' => $db_parameters['Database name'],
 			'Database user' => $db_parameters['User'],
 			'Database password' => '******',
-			'Zabbix server name' => 'Zabbix server name'
+			'Zabbix server name' => 'Zabbix server name',
+			'Encrypt connections from Web interface' => 'false'
 		];
 
 		if ($db_parameters['Database type'] === 'PostgreSQL') {
@@ -348,6 +353,7 @@ class testFormSetup extends CWebTest {
 		$summary_fields['Database port'] = ($db_parameters['Database port'] === '0') ? 'default' : $db_parameters['Database port'];
 		foreach ($summary_fields as $field_name => $value) {
 			$xpath = 'xpath://span[text()='.CXPathHelper::escapeQuotes($field_name).']/../../div[@class="table-forms-td-right"]';
+
 			// Assert contains is used as Password length can differ.
 			if ($field_name === 'Database password') {
 				$this->assertStringContainsString($value, $this->query($xpath)->one()->getText());

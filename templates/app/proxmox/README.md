@@ -11,7 +11,7 @@ Check the [`API documentation`](https://pve.proxmox.com/pve-docs/api-viewer/inde
 
 ## Requirements
 
-Zabbix version: 7.4 and higher.
+Zabbix version: 8.0 and higher.
 
 ## Tested versions
 
@@ -20,7 +20,7 @@ This template has been tested on:
 
 ## Configuration
 
-> Zabbix should be configured according to the instructions in the [Templates out of the box](https://www.zabbix.com/documentation/7.4/manual/config/templates_out_of_the_box) section.
+> Zabbix should be configured according to the instructions in the [Templates out of the box](https://www.zabbix.com/documentation/8.0/manual/config/templates_out_of_the_box) section.
 
 ## Setup
 
@@ -40,7 +40,7 @@ Please provide the necessary access levels for both the User and the Token:
 
 |Name|Description|Default|
 |----|-----------|-------|
-|{$PVE.URL.HOST}|<p>The hostname or IP address of the Proxmox VE API host.</p>|`<SET PVE HOST>`|
+|{$PVE.URL.HOST}|<p>The hostname or IP address of the Proxmox VE API host.</p>||
 |{$PVE.URL.PORT}|<p>The API uses the HTTPS protocol and the server listens to port 8006 by default.</p>|`8006`|
 |{$PVE.TOKEN.ID}|<p>API tokens allow stateless access to most parts of the REST API by another system, software or API client.</p>|`USER@REALM!TOKENID`|
 |{$PVE.TOKEN.SECRET}|<p>Secret key.</p>|`xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx`|
@@ -124,7 +124,7 @@ Please provide the necessary access levels for both the User and the Token:
 |Name|Description|Expression|Severity|Dependencies and additional info|
 |----|-----------|----------|--------|--------------------------------|
 |Proxmox VE: Node [{#NODE.NAME}] offline|<p>Node offline.</p>|`last(/Proxmox VE by HTTP/proxmox.node.online[{#NODE.NAME}]) <> 1`|High||
-|Proxmox VE: Node [{#NODE.NAME}]: has been restarted|<p>Uptime is less than 10 minutes.</p>|`last(/Proxmox VE by HTTP/proxmox.node.uptime[{#NODE.NAME}])<10m`|Info|**Manual close**: Yes<br>**Depends on**:<br><ul><li>Proxmox VE: Node [{#NODE.NAME}] offline</li></ul>|
+|Proxmox VE: Node [{#NODE.NAME}] has been restarted|<p>Uptime is less than 10 minutes.</p>|`last(/Proxmox VE by HTTP/proxmox.node.uptime[{#NODE.NAME}])<10m`|Info|**Manual close**: Yes<br>**Depends on**:<br><ul><li>Proxmox VE: Node [{#NODE.NAME}] offline</li></ul>|
 |Proxmox VE: Node [{#NODE.NAME}]: PVE manager has changed|<p>Firmware version has changed. Acknowledge to close the problem manually.</p>|`last(/Proxmox VE by HTTP/proxmox.node.pveversion[{#NODE.NAME}],#1)<>last(/Proxmox VE by HTTP/proxmox.node.pveversion[{#NODE.NAME}],#2) and length(last(/Proxmox VE by HTTP/proxmox.node.pveversion[{#NODE.NAME}]))>0`|Info|**Manual close**: Yes|
 |Proxmox VE: Node [{#NODE.NAME}]: Kernel version has changed|<p>Firmware version has changed. Acknowledge to close the problem manually.</p>|`last(/Proxmox VE by HTTP/proxmox.node.kernelversion[{#NODE.NAME}],#1)<>last(/Proxmox VE by HTTP/proxmox.node.kernelversion[{#NODE.NAME}],#2) and length(last(/Proxmox VE by HTTP/proxmox.node.kernelversion[{#NODE.NAME}]))>0`|Info|**Manual close**: Yes|
 |Proxmox VE: Node [{#NODE.NAME}] high root filesystem space usage|<p>Root filesystem space usage.</p>|`min(/Proxmox VE by HTTP/proxmox.node.rootused[{#NODE.NAME}],5m) / last(/Proxmox VE by HTTP/proxmox.node.roottotal[{#NODE.NAME}]) * 100 >{$PVE.ROOT.PUSE.MAX.WARN:"{#NODE.NAME}"}`|Warning||
@@ -180,7 +180,7 @@ Please provide the necessary access levels for both the User and the Token:
 |----|-----------|----------|--------|--------------------------------|
 |Proxmox VE: VM [{#NODE.NAME}/{#QEMU.NAME} ({#QEMU.ID})] high memory usage|<p>Memory usage.</p>|`min(/Proxmox VE by HTTP/proxmox.qemu.mem[{#QEMU.ID}],5m) / last(/Proxmox VE by HTTP/proxmox.qemu.maxmem[{#QEMU.ID}]) * 100 >{$PVE.VM.MEMORY.PUSE.MAX.WARN:"{#QEMU.ID}"}`|Warning||
 |Proxmox VE: VM [{#NODE.NAME}/{#QEMU.NAME} ({#QEMU.ID})] high CPU usage|<p>CPU usage.</p>|`min(/Proxmox VE by HTTP/proxmox.qemu.cpu[{#QEMU.ID}],5m) > {$PVE.VM.CPU.PUSE.MAX.WARN:"{#QEMU.ID}"}`|Warning||
-|Proxmox VE: VM [{#NODE.NAME}/{#QEMU.NAME}]: has been restarted|<p>Uptime is less than 10 minutes.</p>|`last(/Proxmox VE by HTTP/proxmox.qemu.uptime[{#QEMU.ID}])<10m`|Info|**Manual close**: Yes<br>**Depends on**:<br><ul><li>Proxmox VE: VM [{#NODE.NAME}/{#QEMU.NAME} ({#QEMU.ID})]: Not running</li></ul>|
+|Proxmox VE: VM [{#NODE.NAME}/{#QEMU.NAME}] has been restarted|<p>Uptime is less than 10 minutes.</p>|`last(/Proxmox VE by HTTP/proxmox.qemu.uptime[{#QEMU.ID}])<10m`|Info|**Manual close**: Yes<br>**Depends on**:<br><ul><li>Proxmox VE: VM [{#NODE.NAME}/{#QEMU.NAME} ({#QEMU.ID})]: Not running</li></ul>|
 |Proxmox VE: VM [{#NODE.NAME}/{#QEMU.NAME} ({#QEMU.ID})]: Not running|<p>VM state is not "running".</p>|`last(/Proxmox VE by HTTP/proxmox.qemu.vmstatus[{#QEMU.ID}])<>"running"`|Average||
 
 ### LLD rule LXC discovery
@@ -210,7 +210,7 @@ Please provide the necessary access levels for both the User and the Token:
 
 |Name|Description|Expression|Severity|Dependencies and additional info|
 |----|-----------|----------|--------|--------------------------------|
-|Proxmox VE: LXC [{#NODE.NAME}/{#LXC.NAME}]: has been restarted|<p>Uptime is less than 10 minutes.</p>|`last(/Proxmox VE by HTTP/proxmox.lxc.uptime[{#LXC.ID}])<10m`|Info|**Manual close**: Yes<br>**Depends on**:<br><ul><li>Proxmox VE: LXC [{#NODE.NAME}/{#LXC.NAME} ({#LXC.ID})]: Not running</li></ul>|
+|Proxmox VE: LXC [{#NODE.NAME}/{#LXC.NAME}] has been restarted|<p>Uptime is less than 10 minutes.</p>|`last(/Proxmox VE by HTTP/proxmox.lxc.uptime[{#LXC.ID}])<10m`|Info|**Manual close**: Yes<br>**Depends on**:<br><ul><li>Proxmox VE: LXC [{#NODE.NAME}/{#LXC.NAME} ({#LXC.ID})]: Not running</li></ul>|
 |Proxmox VE: LXC [{#NODE.NAME}/{#LXC.NAME} ({#LXC.ID})]: Not running|<p>LXC state is not "running".</p>|`last(/Proxmox VE by HTTP/proxmox.lxc.vmstatus[{#LXC.ID}])<>"running"`|Average||
 |Proxmox VE: LXC [{#NODE.NAME}/{#LXC.NAME} ({#LXC.ID})]: high disk space usage|<p>Disk space usage.</p>|`min(/Proxmox VE by HTTP/proxmox.lxc.disk[{#LXC.ID}],5m) / last(/Proxmox VE by HTTP/proxmox.lxc.maxdisk[{#LXC.ID}]) * 100 > {$PVE.LXC.DISK.PUSE.MAX.WARN:"{#LXC.ID}"}`|Warning||
 |Proxmox VE: LXC [{#NODE.NAME}/{#LXC.NAME} ({#LXC.ID})] high memory usage|<p>Memory usage.</p>|`min(/Proxmox VE by HTTP/proxmox.lxc.mem[{#LXC.ID}],5m) / last(/Proxmox VE by HTTP/proxmox.lxc.maxmem[{#LXC.ID}]) * 100 >{$PVE.LXC.MEMORY.PUSE.MAX.WARN:"{#LXC.ID}"}`|Warning||

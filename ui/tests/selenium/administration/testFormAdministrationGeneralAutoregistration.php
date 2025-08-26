@@ -14,12 +14,21 @@
 **/
 
 
-require_once dirname(__FILE__) . '/../../include/CWebTest.php';
+require_once __DIR__ . '/../../include/CWebTest.php';
 
 /**
  * @backup settings
  */
 class testFormAdministrationGeneralAutoregistration extends CWebTest {
+
+	/**
+	 * Attach MessageBehavior to the test.
+	 *
+	 * @return array
+	 */
+	public function getBehaviors() {
+		return [CMessageBehavior::class];
+	}
 
 	/**
 	 * Check the default state of page elements, when first time open Autoregistration.
@@ -197,7 +206,7 @@ class testFormAdministrationGeneralAutoregistration extends CWebTest {
 				[
 					'uncheck_all' => true,
 					'fields' => [],
-					'error' => 'Incorrect value "0" for "tls_accept" field.'
+					'error' => ['id:tls_in_none' => 'At least one encryption level must be selected.']
 				]
 			],
 			// Autoregistration with empty PSK values.
@@ -206,7 +215,10 @@ class testFormAdministrationGeneralAutoregistration extends CWebTest {
 					'fields' => [
 						'Encryption level' => 'PSK'
 					],
-					'error' => 'Invalid parameter "/tls_psk_identity": cannot be empty.'
+					'error' => [
+						'PSK identity' => 'This field cannot be empty.',
+						'PSK' => 'This field cannot be empty.'
+					]
 				]
 			],
 			[
@@ -214,7 +226,10 @@ class testFormAdministrationGeneralAutoregistration extends CWebTest {
 					'fields' => [
 						'Encryption level' => ['No encryption', 'PSK']
 					],
-					'error' => 'Invalid parameter "/tls_psk_identity": cannot be empty.'
+					'error' => [
+						'PSK identity' => 'This field cannot be empty.',
+						'PSK' => 'This field cannot be empty.'
+					]
 				]
 			],
 			[
@@ -223,7 +238,7 @@ class testFormAdministrationGeneralAutoregistration extends CWebTest {
 						'Encryption level' => 'PSK',
 						'PSK' => '21df83bf21bf0be663090bb8d4128558ab9b95fba66a6dbf834f8b91ae5e08ae'
 					],
-					'error' => 'Invalid parameter "/tls_psk_identity": cannot be empty.'
+					'error' => ['PSK identity' => 'This field cannot be empty.']
 				]
 			],
 			[
@@ -232,27 +247,26 @@ class testFormAdministrationGeneralAutoregistration extends CWebTest {
 						'Encryption level' => ['No encryption', 'PSK'],
 						'PSK' => '21df83bf21bf0be663090bb8d4128558ab9b95fba66a6dbf834f8b91ae5e08ae'
 					],
-					'error' => 'Invalid parameter "/tls_psk_identity": cannot be empty.'
+					'error' => ['PSK identity' => 'This field cannot be empty.']
 				]
 			],
-//			TODO: wait fix ZBX-16742
-//			[
-//				[
-//					'fields' => [
-//						'Encryption level' => ['No encryption', 'PSK'],
-//						'PSK identity' => ' ',
-//						'PSK' => '21df83bf21bf0be663090bb8d4128558ab9b95fba66a6dbf834f8b91ae5e08ae'
-//					],
-//					'error' => 'Invalid parameter "/tls_psk_identity": cannot be empty.'
-//				]
-//			],
+			[
+				[
+					'fields' => [
+						'Encryption level' => ['No encryption', 'PSK'],
+						'PSK identity' => ' ',
+						'PSK' => '21df83bf21bf0be663090bb8d4128558ab9b95fba66a6dbf834f8b91ae5e08ae'
+					],
+					'error' => ['PSK identity' => 'This field cannot be empty.']
+				]
+			],
 			[
 				[
 					'fields' => [
 						'Encryption level' => 'PSK',
 						'PSK identity' => 'PSK001'
 					],
-					'error' => 'Invalid parameter "/tls_psk": cannot be empty.'
+					'error' => ['PSK' => 'This field cannot be empty.']
 				]
 			],
 			[
@@ -261,7 +275,7 @@ class testFormAdministrationGeneralAutoregistration extends CWebTest {
 						'Encryption level' => ['No encryption', 'PSK'],
 						'PSK identity' => 'PSK001'
 					],
-					'error' => 'Invalid parameter "/tls_psk": cannot be empty.'
+					'error' => ['PSK' => 'This field cannot be empty.']
 				]
 			],
 			// Check PSK field validation.
@@ -272,7 +286,7 @@ class testFormAdministrationGeneralAutoregistration extends CWebTest {
 						'PSK identity' => 'PSK001',
 						'PSK' => 'a'
 					],
-					'error' => 'Invalid parameter "/tls_psk": minimum length is 32 characters.'
+					'error' => ['PSK' => 'PSK must be at least 32 characters long.']
 				]
 			],
 			[
@@ -282,7 +296,7 @@ class testFormAdministrationGeneralAutoregistration extends CWebTest {
 						'PSK identity' => 'PSK001',
 						'PSK' => '1234567891234567891234567891234Z'
 					],
-					'error' => 'Invalid parameter "/tls_psk": an even number of hexadecimal characters is expected.'
+					'error' => ['PSK' => 'PSK must contain only hexadecimal characters.']
 				]
 			]
 		];
@@ -322,10 +336,8 @@ class testFormAdministrationGeneralAutoregistration extends CWebTest {
 		$form->submit();
 
 		// Check the result in frontend.
-		$message = CMessageElement::find()->waitUntilVisible()->one();
-		$this->assertTrue($message->isBad());
-		$this->assertEquals('Cannot update configuration', $message->getTitle());
-		$this->assertTrue($message->hasLine($data['error']));
+		$this->assertInlineError($form, $data['error']);
+
 		// Check that DB entries aren't changed.
 		$this->assertEquals($old_settings_hash, CDBHelper::getHash($sql_settings));
 		$this->assertEquals($old_autoreg_hash, CDBHelper::getHash($sql_autoreg));
@@ -362,7 +374,7 @@ class testFormAdministrationGeneralAutoregistration extends CWebTest {
 		if (in_array('No encryption', $data['fields']['Encryption level']) && count($data['fields']['Encryption level']) === 1) {
 			$this->assertFalse($form->query('id:tls_psk_identity')->one()->isDisplayed());
 			$this->assertFalse($form->query('id:tls_psk')->one()->isDisplayed());
-			$this->assertFalse($form->query('button:Change PSK')->one(false)->isValid());
+			$this->assertFalse($form->query('button:Change PSK')->one()->isDisplayed());
 
 			// Check encryption level and empty PSK values in DB.
 			$this->assertEquals(HOST_ENCRYPTION_NONE, CDBHelper::getValue($tls_accept_sql));
@@ -373,8 +385,8 @@ class testFormAdministrationGeneralAutoregistration extends CWebTest {
 		// Check the results, if selected PSK.
 		else {
 			$this->assertTrue($form->query('button:Change PSK')->one()->isDisplayed());
-			$this->assertFalse($form->query('id:tls_psk_identity')->one(false)->isValid());
-			$this->assertFalse($form->query('id:tls_psk')->one(false)->isValid());
+			$this->assertFalse($form->query('id:tls_psk_identity')->one()->isDisplayed());
+			$this->assertFalse($form->query('id:tls_psk')->one()->isDisplayed());
 
 			// Check encryption level in DB.
 			if (count($data['fields']['Encryption level']) === 1) {

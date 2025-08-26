@@ -14,7 +14,7 @@
 **/
 
 
-require_once dirname(__FILE__).'/../../include/CWebTest.php';
+require_once __DIR__.'/../../include/CWebTest.php';
 
 /**
  * @backup profiles
@@ -319,7 +319,7 @@ class testDashboardDynamicItemWidgets extends CWebTest {
 	 */
 	public function testDashboardDynamicItemWidgets_Layout($data) {
 		$this->page->login()->open('zabbix.php?action=dashboard.view&dashboardid='.
-				self::$dashboardids['Dashboard for Dynamic item']);
+				self::$dashboardids['Dashboard for Dynamic item'])->waitUntilReady();
 		$dashboard = CDashboardElement::find()->one();
 
 		if (CTestArrayHelper::get($data, 'host_filter', false)) {
@@ -349,7 +349,7 @@ class testDashboardDynamicItemWidgets extends CWebTest {
 	}
 
 	private function assertWidgetContent($data) {
-		$dashboard = CDashboardElement::find()->one();
+		$dashboard = CDashboardElement::find()->one()->waitUntilReady();
 		$widgets = $dashboard->getWidgets();
 		$this->assertEquals(count($data), $widgets->count());
 

@@ -14,9 +14,9 @@
 **/
 
 
-require_once dirname(__FILE__).'/../../include/CLegacyWebTest.php';
-require_once dirname(__FILE__).'/../../../include/items.inc.php';
-require_once dirname(__FILE__).'/../behaviors/CMessageBehavior.php';
+require_once __DIR__.'/../../include/CLegacyWebTest.php';
+require_once __DIR__.'/../../../include/items.inc.php';
+require_once __DIR__.'/../behaviors/CMessageBehavior.php';
 
 define('LONG_KEY', substr(STRING_6000, 0, 2038).'[{#MACRO}]');
 
@@ -311,9 +311,17 @@ class testFormTriggerPrototype extends CLegacyWebTest {
 		$this->zbxTestAssertElementPresentXpath("//a[@id='tab_triggersTab' and text()='Trigger prototype']");
 
 		if (isset($data['constructor'])) {
-			$dialog->query('button:Expression constructor')->waitUntilClickable()->one()->click();
+			// Fill name to avoid inline validation error when creating a new trigger prototype.
+			if (!isset($data['form'])) {
+				$dialog->asForm()->fill(['Name' => 'Layout test trigger']);
+			}
+
+			/* hoverMouse() added because #28 test case is unstable on Jenkins possibly due to scroll
+			 * fails with error - other element would receive the click.
+			 */
+			$dialog->query('button:Expression constructor')->waitUntilClickable()->one()->hoverMouse()->click();
 			// Wait for expression constructor to open, textarea is disabled and its id has changed to 'expr_temp'.
-			$dialog->query('id:expr_temp')->waitUntilVisible();
+			$dialog->query('xpath:.//textarea[@id="expr_temp"]')->waitUntilVisible();
 
 			if ($data['constructor'] === 'open_close') {
 				$dialog->query('button:Close expression constructor')->waitUntilClickable()->one()->click();
@@ -357,9 +365,9 @@ class testFormTriggerPrototype extends CLegacyWebTest {
 		}
 		else {
 			$this->zbxTestTextPresent('Expression');
-			$this->zbxTestAssertVisibleId('expr_temp');
-			$this->zbxTestAssertAttribute("//textarea[@id='expr_temp']", 'rows', 7);
-			$this->zbxTestAssertAttribute("//textarea[@id='expr_temp']", 'readonly');
+			$this->zbxTestAssertVisibleXpath('//textarea[@id="expr_temp"]');
+			$this->zbxTestAssertAttribute('//textarea[@id="expr_temp"]', 'rows', 7);
+			$this->zbxTestAssertAttribute('//textarea[@id="expr_temp"]', 'readonly');
 			$this->zbxTestTextPresent('Close expression constructor');
 			$this->zbxTestAssertNotVisibleXpath('//input[@name="expression"]');
 
@@ -408,6 +416,9 @@ class testFormTriggerPrototype extends CLegacyWebTest {
 		foreach (['placeholder' => 'Trigger URL', 'maxlength' => 64] as $attribute => $value) {
 			$this->assertEquals($value, $entry_name->getAttribute($attribute));
 		}
+
+		// Focus is removed to preventively trigger inline error that alters the HTML during click on icon.
+		$this->page->removeFocus();
 
 		// Check hintbox.
 		$this->query('class:zi-help-filled-small')->one()->click();
@@ -545,10 +556,9 @@ class testFormTriggerPrototype extends CLegacyWebTest {
 			[
 				[
 					'expected' => TEST_BAD,
-					'error_msg' => 'Cannot add trigger prototype',
-					'errors' => [
-						'Incorrect value for field "name": cannot be empty.',
-						'Incorrect value for field "expression": cannot be empty.'
+					'inline_errors' => [
+						'Name' => 'This field cannot be empty.',
+						'Expression' => 'This field cannot be empty.'
 					]
 				]
 			],
@@ -557,9 +567,8 @@ class testFormTriggerPrototype extends CLegacyWebTest {
 				[
 					'expected' => TEST_BAD,
 					'description' => 'MyTrigger',
-					'error_msg' => 'Cannot add trigger prototype',
-					'errors' => [
-						'Incorrect value for field "expression": cannot be empty.'
+					'inline_errors' => [
+						'Expression' => 'This field cannot be empty.'
 					]
 				]
 			],
@@ -568,9 +577,8 @@ class testFormTriggerPrototype extends CLegacyWebTest {
 				[
 					'expected' => TEST_BAD,
 					'expression' => '6 and 0 or 0',
-					'error_msg' => 'Cannot add trigger prototype',
-					'errors' => [
-						'Incorrect value for field "name": cannot be empty.'
+					'inline_errors' => [
+						'Name' => 'This field cannot be empty.'
 					]
 				]
 			],
@@ -580,9 +588,8 @@ class testFormTriggerPrototype extends CLegacyWebTest {
 					'expected' => TEST_BAD,
 					'description' => 'MyTrigger',
 					'expression' => '{Simple form test host}',
-					'error_msg' => 'Cannot add trigger prototype',
-					'errors' => [
-						'Invalid parameter "/1/expression": incorrect expression starting from "{Simple form test host}".'
+					'inline_errors' => [
+						'Expression' => 'Incorrect expression starting from "{Simple form test host}".'
 					]
 				]
 			],
@@ -715,8 +722,9 @@ class testFormTriggerPrototype extends CLegacyWebTest {
 					'expected' => TEST_BAD,
 					'description' => 'xmlxpath function error',
 					'expression' => 'xmlxpath(first(/Simple form test host/text_prototype[{#KEY}]),"/export/version/text()")=3',
-					'error_msg' => 'Cannot add trigger prototype',
-					'errors' => ['Invalid parameter "/1/expression": mandatory parameter is missing in function "first".']
+					'inline_errors' => [
+						'Expression' => 'Mandatory parameter is missing in function "first".'
+					]
 				]
 			],
 			// #19.
@@ -725,8 +733,9 @@ class testFormTriggerPrototype extends CLegacyWebTest {
 					'expected' => TEST_BAD,
 					'description' => 'xmlxpath function wrong params',
 					'expression' => 'xmlxpath(last(/Simple form test host/text_prototype[{#KEY}]))=0',
-					'error_msg' => 'Cannot add trigger prototype',
-					'errors' => ['Invalid parameter "/1/expression": invalid number of parameters in function "xmlxpath".']
+					'inline_errors' => [
+						'Expression' => 'Invalid number of parameters in function "xmlxpath".'
+					]
 				]
 			],
 			// #20.
@@ -751,8 +760,9 @@ class testFormTriggerPrototype extends CLegacyWebTest {
 					'expected' => TEST_BAD,
 					'description' => 'jsonpath function error',
 					'expression' => 'jsonpath(e(/Simple form test host/text_prototype[{#KEY}]),"$.path")=0',
-					'error_msg' => 'Cannot add trigger prototype',
-					'errors' => ['Invalid parameter "/1/expression": incorrect usage of function "e".']
+					'inline_errors' => [
+						'Expression' => 'Incorrect usage of function "e".'
+					]
 				]
 			],
 			// #23.
@@ -761,8 +771,9 @@ class testFormTriggerPrototype extends CLegacyWebTest {
 					'expected' => TEST_BAD,
 					'description' => 'jsonpath function wrong params',
 					'expression' => 'jsonpath(last(/Simple form test host/text_prototype[{#KEY}]))=0',
-					'error_msg' => 'Cannot add trigger prototype',
-					'errors' => ['Invalid parameter "/1/expression": invalid number of parameters in function "jsonpath".']
+					'inline_errors' => [
+						'Expression' => 'Invalid number of parameters in function "jsonpath".'
+					]
 				]
 			],
 			// #24.
@@ -781,9 +792,8 @@ class testFormTriggerPrototype extends CLegacyWebTest {
 					'description' => 'MyTrigger_CheckWrongUrl',
 					'expression' => 'last(/Simple form test host/someItem.uptime,#1)<0',
 					'url' => 'javascript:alert(123);',
-					'error_msg' => 'Cannot add trigger prototype',
-					'errors' => [
-						'Invalid parameter "/1/url": unacceptable URL.'
+					'inline_errors' => [
+						'Menu entry URL' => 'Unacceptable URL.'
 					]
 				]
 			],
@@ -805,16 +815,15 @@ class testFormTriggerPrototype extends CLegacyWebTest {
 					'expected' => TEST_BAD,
 					'description' => 'MyTrigger',
 					'expression' => 'somefunc(/Simple form test host/item-prototype-reuse,#1)<5',
-					'error_msg' => 'Cannot add trigger prototype',
-					'errors' => [
-						'Invalid parameter "/1/expression": unknown function "somefunc".'
+					'inline_errors' => [
+						'Expression' => 'Unknown function "somefunc".'
 					]
 				]
 			],
 			// #28.
 			[
 				[
-					'expected' => TEST_BAD,
+					'expected' => TEST_GOOD,
 					'description' => 'MyTrigger',
 					'expression' => 'last(/Simple form test host/item-prototype-reuse[{#KEY}],#1)<0 or {#MACRO}',
 					'constructor' => [
@@ -823,7 +832,7 @@ class testFormTriggerPrototype extends CLegacyWebTest {
 					]
 				]
 			],
-			// #29.
+			// #29. TODO: Move this check to inline validation once DEV-4259 is fixed
 			[
 				[
 					'expected' => TEST_BAD,
@@ -840,12 +849,13 @@ class testFormTriggerPrototype extends CLegacyWebTest {
 					]
 				]
 			],
-			// #30.
+			// #30. TODO: Move this check to inline validation once DEV-4259 is fixed
 			[
 				[
 					'expected' => TEST_BAD,
 					'description' => 'MyTrigger',
-					'expression' => 'last(/Simple form test host/someItem.uptime,#1)<0 or 8 and 9 + last(/Simple form test host/test-item-reuse,#1)',
+					'expression' => 'last(/Simple form test host/someItem.uptime,#1)<0 or 8 and 9 +'.
+							' last(/Simple form test host/test-item-reuse,#1)',
 					'constructor' => [
 						'text' => ['A or (B and C)', 'A', 'B', 'C'],
 						'elements' => ['expr_0_48', 'expr_53_53', 'expr_59_109'],
@@ -857,19 +867,19 @@ class testFormTriggerPrototype extends CLegacyWebTest {
 					]
 				]
 			],
-			// #31.
+			// #31. TODO: Move this check to inline validation once DEV-4259 is fixed
 			[
 				[
 					'expected' => TEST_BAD,
 					'description' => 'MyTrigger',
-					'expression' => 'lasta(/Simple form test host/item-prototype-reuse,#1)<0 or 8 and 9 + last(/Simple form test host/test-item-reuse2,#1)',
+					'expression' => 'last(/Simple form test host/item-prototype-reuse,#1)<0 or 8 and 9 +'.
+							' last(/Simple form test host/test-item-reuse2,#1)',
 					'constructor' => [
 						'text' => ['A or (B and C)', 'A', 'B', 'C'],
-						'elements' => ['expr_0_54', 'expr_59_59', 'expr_65_116'],
+						'elements' => ['expr_0_53', 'expr_58_58', 'expr_64_115'],
 						'elementError' => true,
 						'element_count' => 4,
 						'errors' => [
-							'lasta(/Simple form test host/item-prototype-reuse,#1): Incorrect function is used',
 							'last(/Simple form test host/test-item-reuse2,#1): Unknown host item, no such item in selected host'
 						]
 					]
@@ -881,12 +891,9 @@ class testFormTriggerPrototype extends CLegacyWebTest {
 					'expected' => TEST_BAD,
 					'description' => 'MyTrigger',
 					'expression' => 'last(/Simple form test host@/item-prototype-reuse,#1)<0',
-					'constructor' => [
-						'errors' => [
-							'header' => 'Expression syntax error.',
-							'details' => 'Cannot build expression tree: incorrect expression starting from'.
-									' "last(/Simple form test host@/item-prototype-reuse,#1)<0".'
-						]
+					'inline_errors' => [
+						'Expression' => 'Incorrect expression starting from "last(/Simple form test'.
+								' host@/item-prototype-reuse,#1)<0".'
 					]
 				]
 			],
@@ -896,12 +903,9 @@ class testFormTriggerPrototype extends CLegacyWebTest {
 					'expected' => TEST_BAD,
 					'description' => 'MyTrigger',
 					'expression' => 'last(/Simple form test host/system .uptime,#1)<0',
-					'constructor' => [
-						'errors' => [
-							'header' => 'Expression syntax error.',
-							'details' => 'Cannot build expression tree: incorrect expression starting from'.
-									' "last(/Simple form test host/system .uptime,#1)<0".'
-						]
+					'inline_errors' => [
+						'Expression' => 'Incorrect expression starting from "last(/Simple form test'.
+								' host/system .uptime,#1)<0".'
 					]
 				]
 			],
@@ -911,12 +915,9 @@ class testFormTriggerPrototype extends CLegacyWebTest {
 					'expected' => TEST_BAD,
 					'description' => 'MyTrigger',
 					'expression' => 'lastA(/Simple form test host/item-prototype-reuse,#1)<0',
-					'constructor' => [
-						'errors' => [
-							'header' => 'Expression syntax error.',
-							'details' => 'Cannot build expression tree: incorrect expression starting from'.
-									' "lastA(/Simple form test host/item-prototype-reuse,#1)<0".'
-						]
+					'inline_errors' => [
+						'Expression' => 'Incorrect expression starting from "lastA(/Simple form test'.
+								' host/item-prototype-reuse,#1)<0".'
 					]
 				]
 			],
@@ -1043,6 +1044,7 @@ class testFormTriggerPrototype extends CLegacyWebTest {
 		if (isset($data['constructor'])) {
 			$this->zbxTestClickButtonText('Expression constructor');
 			$constructor = $data['constructor'];
+			// TODO: If after DEV-4259 inline validation will cover all errors, the TEST_BAD case will not be required.
 			if (isset($constructor['errors']) && !array_key_exists('elementError', $constructor)) {
 				$this->assertMessage(TEST_BAD, $constructor['errors']['header'], $constructor['errors']['details']);
 				COverlayDialogElement::find()->one()->close();
@@ -1096,13 +1098,26 @@ class testFormTriggerPrototype extends CLegacyWebTest {
 					$this->zbxTestTextPresent(self::DISCOVERY_RULE);
 					break;
 				case TEST_BAD:
-					$this->assertMessage(TEST_BAD, $data['error_msg'], $data['errors']);
+					// TODO: Leave only inline error checks after DEV-4259 is fixed.
+					if (array_key_exists('inline_errors', $data)) {
+						$this->assertInlineError($dialog->asForm(), $data['inline_errors']);
+					}
+					else {
+						$this->assertMessage(TEST_BAD, $data['error_msg'], $data['errors']);
+					}
+
 					$this->zbxTestCheckTitle('Configuration of trigger prototypes');
 					$this->zbxTestAssertElementPresentXpath("//a[@id='tab_triggersTab' and text()='Trigger prototype']");
-					foreach ($data['errors'] as $msg) {
+
+					$errors = (array_key_exists('inline_errors', $data))
+						? array_values($data['inline_errors'])
+						: $data['errors'];
+
+					foreach ($errors as $msg) {
 						$msg = str_replace('<', '&lt;', $msg);
 						$this->zbxTestTextPresent($msg);
 					}
+
 					$this->zbxTestTextPresent(['Name', 'Expression', 'Description']);
 					COverlayDialogElement::find()->one()->close();
 					break;
@@ -1136,7 +1151,9 @@ class testFormTriggerPrototype extends CLegacyWebTest {
 			}
 			$this->zbxTestOpen(self::HOST_LIST_PAGE);
 			// TODO: temporarily commented out due webdriver issue, alert is not displayed while leaving page during test execution
-//			$this->zbxTestAcceptAlert();
+			if ($this->page->isAlertPresent()) {
+				$this->zbxTestAcceptAlert();
+			}
 			$form = $this->query('name:zbx_filter')->asForm()->waitUntilReady()->one();
 			$this->filterEntriesAndOpenDiscovery(self::HOST, $form);
 			$this->zbxTestClickLinkTextWait(self::DISCOVERY_RULE);

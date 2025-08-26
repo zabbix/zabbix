@@ -13,8 +13,8 @@
 ** If not, see <https://www.gnu.org/licenses/>.
 **/
 
-require_once dirname(__FILE__).'/../common/testFormPreprocessing.php';
-require_once dirname(__FILE__).'/../../include/helpers/CDataHelper.php';
+require_once __DIR__.'/../common/testFormPreprocessing.php';
+require_once __DIR__.'/../../include/helpers/CDataHelper.php';
 
 /**
  * @backup items
@@ -266,13 +266,8 @@ class testFormPreprocessingLowLevelDiscovery extends testFormPreprocessing {
 					'preprocessing' => [
 						['type' => 'Replace', 'parameter_1' => '   test text  ', 'parameter_2' => '   replacement 1  '],
 						['type' => 'Regular expression', 'parameter_1' => '  pattern    ', 'parameter_2' => '   \1   '],
-						['type' => 'XML XPath', 'parameter_1' => '   number(/values/Item)    '],
-						['type' => 'JSONPath', 'parameter_1' => '    $.data.key    '],
 						['type' => 'Matches regular expression', 'parameter_1' => '  expression    '],
-						['type' => 'Does not match regular expression', 'parameter_1' => '   not_expression   '],
-						['type' => 'JavaScript', 'parameter_1' => "   Test line 1  \n   Test line 2 \n   Test line  3   \n   \n "],
-						['type' => 'Check for error in JSON', 'parameter_1' => '   $.error     '],
-						['type' => 'Check for error in XML', 'parameter_1' => '   /tmp/path/   ']
+						['type' => 'Does not match regular expression', 'parameter_1' => '   not_expression   ']
 					]
 				]
 			]
@@ -292,8 +287,7 @@ class testFormPreprocessingLowLevelDiscovery extends testFormPreprocessing {
 						['type' => 'Prometheus to JSON', 'parameter_1' => '{#METRICNAME}==1']
 
 					],
-					'error' => 'Invalid parameter "/1/preprocessing/1/params/1": invalid Prometheus pattern.',
-					'lld_error' => 'Incorrect value for field "params": invalid Prometheus pattern.'
+					'error' => 'Invalid parameter "/1/preprocessing/1/params/1": invalid Prometheus pattern.'
 				]
 			]
 		]);
@@ -419,7 +413,7 @@ class testFormPreprocessingLowLevelDiscovery extends testFormPreprocessing {
 						'parameters' => [
 							['placeholder' => 'OID', 'value' => '', 'maxlength' => 255],
 							[
-								'selector' => 'xpath:.//z-select[@name="preprocessing[0][params][1]"]',
+								'selector' => 'xpath:.//z-select[@name="preprocessing[0][params_1]"]',
 								'options' => ['Unchanged', 'UTF-8 from Hex-STRING', 'MAC from Hex-STRING', 'Integer from BITS'],
 								'value' => 'Unchanged'
 							]
@@ -429,17 +423,17 @@ class testFormPreprocessingLowLevelDiscovery extends testFormPreprocessing {
 						'type' => 'SNMP walk to JSON',
 						'parameters' => [
 							[
-								'selector' => 'xpath:(.//input[@name="preprocessing[0][params][]"])[1]',
+								'selector' => 'xpath:.//input[@name="preprocessing[0][params_set_snmp][0][name]"]',
 								'placeholder' => 'Field name',
 								'maxlength' => 255
 							],
 							[
-								'selector' => 'xpath:(.//input[@name="preprocessing[0][params][]"])[2]',
+								'selector' => 'xpath:.//input[@name="preprocessing[0][params_set_snmp][0][oid_prefix]"]',
 								'placeholder' => 'OID prefix',
 								'maxlength' => 255
 							],
 							[
-								'selector' => 'xpath:.//z-select[@name="preprocessing[0][params][]"]',
+								'selector' => 'xpath:.//z-select[@name="preprocessing[0][params_set_snmp][0][format]"]',
 								'options' => ['Unchanged', 'UTF-8 from Hex-STRING', 'MAC from Hex-STRING', 'Integer from BITS'],
 								'value' => 'Unchanged'
 							]
@@ -449,7 +443,7 @@ class testFormPreprocessingLowLevelDiscovery extends testFormPreprocessing {
 						'type' => 'SNMP get value',
 						'parameters' => [
 							[
-								'selector' => 'xpath:.//z-select[@name="preprocessing[0][params][0]"]',
+								'selector' => 'xpath:.//z-select[@name="preprocessing[0][params_0]"]',
 								'options' => ['UTF-8 from Hex-STRING', 'MAC from Hex-STRING', 'Integer from BITS'],
 								'value' => 'UTF-8 from Hex-STRING'
 							]
