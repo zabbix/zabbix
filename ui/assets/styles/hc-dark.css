@@ -2861,7 +2861,7 @@ output {
       output.collapsible.collapsed > span {
         transform: scaleY(1) translateY(50%); }
       output.collapsible.collapsed .msg-details {
-        display: none;
+        max-height: 5px;
         padding-top: 0;
         border-top: none;
         opacity: 0;

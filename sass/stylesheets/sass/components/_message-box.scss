@@ -124,7 +124,7 @@ output {
 			}
 
 			.msg-details {
-				display: none;
+				max-height: 5px;
 				padding-top: 0;
 				border-top: none;
 				opacity: 0;
