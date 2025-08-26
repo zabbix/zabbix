@@ -210,17 +210,17 @@ $form_grid = (new CFormGrid())
 			(new CNumericBox('hour', $data['form']['hour'], 2, false, false, false))
 				->padWithZeroes(2)
 				->setWidth(ZBX_TEXTAREA_NUMERIC_STANDARD_WIDTH)
-				->setErrorContainer('hour_minute_error_container')
+				->setErrorContainer('hour-minute-error-container')
 				->setErrorLabel(_('Hour')),
 			' : ',
 			(new CNumericBox('minute', $data['form']['minute'], 2, false, false, false))
 				->padWithZeroes(2)
 				->setWidth(ZBX_TEXTAREA_NUMERIC_STANDARD_WIDTH)
-				->setErrorContainer('hour_minute_error_container')
+				->setErrorContainer('hour-minute-error-container')
 				->setErrorLabel(_('Minute')),
 			(new CDiv())
 				->addClass(ZBX_STYLE_ERROR_CONTAINER)
-				->setId('hour_minute_error_container')
+				->setId('hour-minute-error-container')
 		]))->addClass('js-hour-minute')
 	])
 	->addItem([
@@ -229,24 +229,27 @@ $form_grid = (new CFormGrid())
 			(new CDiv([
 				(new CNumericBox('period_days', $data['form']['period_days'], 3))
 					->setWidth(ZBX_TEXTAREA_NUMERIC_STANDARD_WIDTH)
-					->setErrorContainer('period_length_error_container'),
+					->setErrorLabel(_('Days'))
+					->setErrorContainer('period-length-error-container'),
 				new CLabel(_('Days'), 'period_days'),
 				(new CSelect('period_hours'))
 					->setFocusableElementId('period-hours-focusable')
 					->addOptions(CSelect::createOptionsFromArray(range(0, 23)))
 					->setValue($data['form']['period_hours'])
-					->setErrorContainer('period_length_error_container'),
+					->setErrorLabel(_('Hours'))
+					->setErrorContainer('period-length-error-container'),
 				new CLabel(_('Hours'), 'period-hours-focusable'),
 				(new CSelect('period_minutes'))
 					->setFocusableElementId('period-minutes-focusable')
 					->addOptions(CSelect::createOptionsFromArray(range(0, 59)))
 					->setValue($data['form']['period_minutes'])
-					->setErrorContainer('period_length_error_container'),
+					->setErrorLabel(_('Minutes'))
+					->setErrorContainer('period-length-error-container'),
 				new CLabel(_('Minutes'), 'period-minutes-focusable')
 			]))->addClass(ZBX_STYLE_FORM_FIELDS_INLINE),
 			(new CDiv())
 				->addClass(ZBX_STYLE_ERROR_CONTAINER)
-				->setId('period_length_error_container')
+				->setId('period-length-error-container')
 		]))
 	]);
 
