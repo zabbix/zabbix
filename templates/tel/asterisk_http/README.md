@@ -33,7 +33,7 @@ If there are errors, increase the logging to debug level and see the Zabbix serv
 |Name|Description|Default|
 |----|-----------|-------|
 |{$AMI.URL}|<p>The Asterisk Manager API URL in the format `<scheme>://<host>:<port>/<prefix>/rawman`.</p>|`http://asterisk:8088/asterisk/rawman`|
-|{$AMI.HOST}|<p>The hostname or IP address of the Asterisk Manager API host.</p>|`<SET AMI HOST>`|
+|{$AMI.HOST}|<p>The hostname or IP address of the Asterisk Manager API host.</p>||
 |{$AMI.PORT}|<p>AMI port number for checking service availability.</p>|`5038`|
 |{$AMI.USERNAME}|<p>The Asterisk Manager name.</p>|`zabbix`|
 |{$AMI.SECRET}|<p>The Asterisk Manager secret.</p>|`zabbix`|

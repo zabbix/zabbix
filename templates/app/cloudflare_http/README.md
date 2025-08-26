@@ -33,8 +33,8 @@ This template has been tested on:
 |Name|Description|Default|
 |----|-----------|-------|
 |{$CLOUDFLARE.API.URL}|<p>The URL of Cloudflare API endpoint.</p>|`https://api.cloudflare.com/client/v4`|
-|{$CLOUDFLARE.API.TOKEN}|<p>Your Cloudflare API Token.</p>|`<change>`|
-|{$CLOUDFLARE.ZONE_ID}|<p>Your Cloudflare Site Zone ID.</p>|`<change>`|
+|{$CLOUDFLARE.API.TOKEN}|<p>Your Cloudflare API Token.</p>||
+|{$CLOUDFLARE.ZONE_ID}|<p>Your Cloudflare Site Zone ID.</p>||
 |{$CLOUDFLARE.ERRORS.MAX.WARN}|<p>Maximum responses with errors in %.</p>|`30`|
 |{$CLOUDFLARE.CACHED_BANDWIDTH.MIN.WARN}|<p>Minimum of cached bandwidth in %.</p>|`50`|
 

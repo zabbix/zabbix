@@ -47,7 +47,7 @@ zabbix_export:
         - How to get all supported counters and [generate a path for the custom performance counter](https://www.zabbix.com/documentation/8.0/manual/appendix/items/perf_counters)
       vendor:
         name: Zabbix
-        version: 8.0-0
+        version: 8.0-1
       groups:
         - name: Templates/Applications
       items:
@@ -745,7 +745,7 @@ zabbix_export:
             description: 'Warning threshold of the datastore free space. In the range from 0 to 100 inclusive.'
             regex: '^-?([0-9]+|(([0-9]+)\.([0-9]+)))$'
         - macro: '{$VMWARE.HV.SENSOR.DISCOVERY}'
-          value: 'false'
+          value: 'FALSE'
           description: 'Set "true"/"false" to enable or disable monitoring of hardware sensors.'
           config:
             type: CHECKBOX
@@ -3684,7 +3684,7 @@ zabbix_export:
         Note: To enable discovery of hardware sensors of VMware hypervisors, set the host wizard configuration field `Monitoring of hardware sensors` to the selected state.
       vendor:
         name: Zabbix
-        version: 8.0-0
+        version: 8.0-1
       groups:
         - name: Templates/Applications
       items:
@@ -4659,7 +4659,7 @@ zabbix_export:
             description: 'Warning threshold of the datastore free space. In the range from 0 to 100 inclusive.'
             regex: '^-?([0-9]+|(([0-9]+)\.([0-9]+)))$'
         - macro: '{$VMWARE.HV.SENSOR.DISCOVERY}'
-          value: 'false'
+          value: 'FALSE'
           description: 'Set "true"/"false" to enable or disable the monitoring of hardware sensors.'
           config:
             type: CHECKBOX

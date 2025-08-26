@@ -17,33 +17,7 @@ package zbxlib
 /* cspell:disable */
 
 /*
-#cgo LDFLAGS: -Wl,--start-group
-#cgo LDFLAGS: ${SRCDIR}/../../../zabbix_agent/logfiles/libzbxlogfiles.a
-#cgo LDFLAGS: ${SRCDIR}/../../../libs/zbxnum/libzbxnum.a
-#cgo LDFLAGS: ${SRCDIR}/../../../libs/zbxstr/libzbxstr.a
-#cgo LDFLAGS: ${SRCDIR}/../../../libs/zbxfile/libzbxfile.a
-#cgo LDFLAGS: ${SRCDIR}/../../../libs/zbxparam/libzbxparam.a
-#cgo LDFLAGS: ${SRCDIR}/../../../libs/zbxexpr/libzbxexpr.a
-#cgo LDFLAGS: ${SRCDIR}/../../../libs/zbxip/libzbxip.a
-#cgo LDFLAGS: ${SRCDIR}/../../../libs/zbxcomms/libzbxcomms.a
-#cgo LDFLAGS: ${SRCDIR}/../../../libs/zbxcommon/libzbxcommon.a
-#cgo LDFLAGS: ${SRCDIR}/../../../libs/zbxcrypto/libzbxcrypto.a
-#cgo LDFLAGS: ${SRCDIR}/../../../libs/zbxthreads/libzbxthreads.a
-#cgo LDFLAGS: ${SRCDIR}/../../../libs/zbxmutexs/libzbxmutexs.a
-#cgo LDFLAGS: ${SRCDIR}/../../../libs/zbxnix/libzbxnix.a
-#cgo LDFLAGS: ${SRCDIR}/../../../libs/zbxhttp/libzbxhttp.a
-#cgo LDFLAGS: ${SRCDIR}/../../../libs/zbxcompress/libzbxcompress.a
-#cgo LDFLAGS: ${SRCDIR}/../../../libs/zbxregexp/libzbxregexp.a
-#cgo LDFLAGS: ${SRCDIR}/../../../libs/zbxsysinfo/libzbxagentsysinfo.a
-#cgo LDFLAGS: ${SRCDIR}/../../../libs/zbxsysinfo/common/libcommonsysinfo.a
-#cgo LDFLAGS: ${SRCDIR}/../../../libs/zbxsysinfo/simple/libsimplesysinfo.a
-#cgo LDFLAGS: ${SRCDIR}/../../../libs/zbxsysinfo/linux/libspechostnamesysinfo.a
-#cgo LDFLAGS: ${SRCDIR}/../../../libs/zbxsysinfo/linux/libspecsysinfo.a
-#cgo LDFLAGS: ${SRCDIR}/../../../libs/zbxexec/libzbxexec.a
-#cgo LDFLAGS: ${SRCDIR}/../../../libs/zbxalgo/libzbxalgo.a
-#cgo LDFLAGS: ${SRCDIR}/../../../libs/zbxjson/libzbxjson.a
 #cgo pcre2 LDFLAGS: -lz -lpcre2-8 -lresolv
-#cgo LDFLAGS: -Wl,--end-group
 
 #include "zbxsysinfo.h"
 #include "zbxcomms.h"
@@ -54,8 +28,6 @@ package zbxlib
 typedef zbx_active_metric_t* ZBX_ACTIVE_METRIC_LP;
 typedef zbx_vector_ptr_t * zbx_vector_ptr_lp_t;
 typedef zbx_vector_expression_t * zbx_vector_expression_lp_t;
-
-int	CONFIG_TCP_MAX_BACKLOG_SIZE	= SOMAXCONN;
 
 zbx_metric_t	parameters_agent[] = {NULL};
 zbx_metric_t	parameters_specific[] = {NULL};

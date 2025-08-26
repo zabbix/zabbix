@@ -1502,6 +1502,29 @@ out:
   return: SUCCEED
   value: 13
 ---
+test case: Evaluate timeleft(5m,wait infinite)
+in:
+  history:
+  - itemid: 1
+    value type: ITEM_VALUE_TYPE_FLOAT
+    data:
+    - value: 1.6e+30
+      ts: 2017-01-10 10:01:00.000000000 +00:00
+    - value: 1.5e+30
+      ts: 2017-01-10 10:02:00.000000000 +00:00
+    - value: 1.4e+30
+      ts: 2017-01-10 10:03:00.000000000 +00:00
+    - value: 1.3e+30
+      ts: 2017-01-10 10:04:00.000000000 +00:00
+    - value: 1.2e+30
+      ts: 2017-01-10 10:05:00.000000000 +00:00
+  time: 2017-01-10 10:05:00.000000000 +00:00
+  function: timeleft
+  params: '5m,1.7e+30'
+out:
+  return: SUCCEED
+  value: 1.7976931348623158e+308
+---
 test case: Evaluate timeleft(5m,65)
 in:
   history:
@@ -1524,6 +1547,29 @@ in:
 out:
   return: SUCCEED
   value: 3600
+---
+test case: Evaluate timeleft(5m,1.7976931348623158e+305)
+in:
+  history:
+  - itemid: 1
+    value type: ITEM_VALUE_TYPE_FLOAT
+    data:
+    - value: 1.1e+305
+      ts: 2017-01-10 10:01:00.000000000 +00:00
+    - value: 1.2e+305
+      ts: 2017-01-10 10:02:00.000000000 +00:00
+    - value: 1.3e+305
+      ts: 2017-01-10 10:03:00.000000000 +00:00
+    - value: 1.4e+305
+      ts: 2017-01-10 10:04:00.000000000 +00:00
+    - value: 1.5e+305
+      ts: 2017-01-10 10:05:00.000000000 +00:00
+  time: 2017-01-10 10:05:00.000000000 +00:00
+  function: timeleft
+  params: '5m,1.6e+305'
+out:
+  return: SUCCEED
+  value: 60
 ---
 test case: Evaluate timeleft(5m,65,test)
 in:

@@ -133,6 +133,10 @@ $fields = [
 									IN([ZBX_ITEM_CUSTOM_TIMEOUT_DISABLED, ZBX_ITEM_CUSTOM_TIMEOUT_ENABLED]),
 									null
 								],
+	'output_format' =>			[T_ZBX_INT, O_OPT, null,
+									IN([HTTPCHECK_STORE_RAW, HTTPCHECK_STORE_JSON]),
+									null
+								],
 	'timeout' =>				[T_ZBX_TU, O_OPT, P_ALLOW_USER_MACRO,	null,
 									'(isset({add}) || isset({update})) && isset({custom_timeout})'.
 									' && {custom_timeout} == '.ZBX_ITEM_CUSTOM_TIMEOUT_ENABLED.

@@ -33,7 +33,7 @@ The user must be included in the Administrators group.
 |----|-----------|-------|
 |{$NEXTCLOUD.SCHEMA}|<p>HTTP or HTTPS protocol of Nextcloud.</p>|`https`|
 |{$NEXTCLOUD.USER.NAME}|<p>Nextcloud username.</p>|`root`|
-|{$NEXTCLOUD.USER.PASSWORD}|<p>Nextcloud user password.</p>|`<Put the password here>`|
+|{$NEXTCLOUD.USER.PASSWORD}|<p>Nextcloud user password.</p>||
 |{$NEXTCLOUD.ADDRESS}|<p>IP or DNS name of Nextcloud server.</p>|`127.0.0.1`|
 |{$NEXTCLOUD.LLD.FILTER.USER.MATCHES}|<p>Filter of discoverable users by name.</p>|`.*`|
 |{$NEXTCLOUD.LLD.FILTER.USER.NOT_MATCHES}|<p>Filter to exclude discovered users by name.</p>|`CHANGE_IF_NEEDED`|

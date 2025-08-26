@@ -159,9 +159,7 @@ class CUser extends CApiService {
 		}
 
 		if ($options['userids'] !== null) {
-			if (self::$userData['type'] == USER_TYPE_SUPER_ADMIN || !$options['editable']) {
-				$sql_parts['where']['userid'] = dbConditionId('u.userid', $options['userids']);
-			}
+			$sql_parts['where'][] = dbConditionId('u.userid', $options['userids']);
 		}
 
 		if ($options['usrgrpids'] !== null) {
@@ -191,6 +189,13 @@ class CUser extends CApiService {
 		}
 
 		if ($options['filter'] !== null) {
+			if (array_key_exists('userid', $options['filter']) && $options['filter']['userid'] !== null
+					&& !$options['searchByAny']) {
+				$sql_parts['where'][] = dbConditionId('u.userid', $options['filter']['userid']);
+
+				unset($options['filter']['userid']);
+			}
+
 			if (array_key_exists('autologout', $options['filter']) && $options['filter']['autologout'] !== null) {
 				$options['filter']['autologout'] = getTimeUnitFilters($options['filter']['autologout']);
 			}
