@@ -683,7 +683,7 @@ static zbx_uint64_t	add_discovered_host(const zbx_db_event *event, int *status, 
 			{
 				zbx_uint64_t	proxy_groupid;
 				unsigned char	monitored_by;
-				int		host_tls_accept = 0;
+				int		host_tls_accept;
 
 				ZBX_STR2UINT64(hostid, row2[0]);
 				ZBX_DBROW2UINT64(host_proxyid, row2[1]);
