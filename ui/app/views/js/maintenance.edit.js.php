@@ -224,7 +224,9 @@ window.maintenance_edit = new class {
 			}
 
 			const curl = new Curl('zabbix.php');
-			const action = fields.maintenanceid === undefined ? 'maintenance.create' : 'maintenance.update';
+			const action = fields.maintenanceid === undefined || fields.maintenanceid == 0
+				? 'maintenance.create'
+				: 'maintenance.update';
 
 			curl.setArgument('action', action);
 
