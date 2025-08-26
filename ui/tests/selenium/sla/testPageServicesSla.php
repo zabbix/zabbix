@@ -721,7 +721,7 @@ class testPageServicesSla extends CWebTest {
 		if (CTestArrayHelper::get($data, 'Tags')) {
 			$this->setTags($data['Tags']);
 		}
-		$form->submit();
+		$form->submit()->waitUntilStalled();
 		$this->page->waitUntilReady();
 
 		if (!array_key_exists('expected', $data)) {
@@ -734,7 +734,7 @@ class testPageServicesSla extends CWebTest {
 		}
 
 		// Reset the filter and check that all SLAs are displayed.
-		$this->query('button:Reset')->one()->click();
+		$this->query('button:Reset')->one()->click()->waitUntilStalled();
 		$this->assertTableStats(count(CDataHelper::get('Sla.slaids')));
 	}
 
