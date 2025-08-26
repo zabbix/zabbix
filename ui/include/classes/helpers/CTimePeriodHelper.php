@@ -34,15 +34,10 @@ class CTimePeriodHelper {
 	 * @return int
 	 */
 	public static function getMaxPeriod(int $time, ?DateTimeZone $timezone = null): int {
-		static $max_period;
+		$range_time_parser = new CRangeTimeParser();
+		$range_time_parser->parse('now-'.CSettingsHelper::get(CSettingsHelper::MAX_PERIOD));
 
-		if ($max_period === null) {
-			$range_time_parser = new CRangeTimeParser();
-			$range_time_parser->parse('now-'.CSettingsHelper::get(CSettingsHelper::MAX_PERIOD));
-			$max_period = $time - $range_time_parser->getDateTime(true, $timezone, $time)->getTimestamp();
-		}
-
-		return $max_period;
+		return $time - $range_time_parser->getDateTime(true, $timezone, $time)->getTimestamp();
 	}
 
 	/**
