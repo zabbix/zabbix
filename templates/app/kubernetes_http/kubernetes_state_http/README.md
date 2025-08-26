@@ -35,9 +35,13 @@ Template needs to use authorization via API token.
 
 Set the `{$KUBE.API.URL}` such as `<scheme>://<host>:<port>`.
 
+Get the service account name. If a different release name is used.
+
+`kubectl get serviceaccounts -n monitoring`
+
 Get the generated service account token using the command:
 
-`kubectl get secret zabbix-service-account -n monitoring -o jsonpath={.data.token} | base64 -d`
+`kubectl get secret zabbix-zabbix-helm-chart -n monitoring -o jsonpath={.data.token} | base64 -d`
 
 Then set it to the macro `{$KUBE.API.TOKEN}`.
 Set `{$KUBE.STATE.ENDPOINT.NAME}` with Kube state metrics endpoint name. See `kubectl -n monitoring get ep`. Default: `zabbix-kube-state-metrics`.
@@ -114,7 +118,7 @@ You can also set up evaluation periods for replica mismatch triggers (Deployment
 |{$KUBE.API.COMPONENTSTATUSES.ENDPOINT}|<p>Kubernetes API componentstatuses endpoint /api/v1/componentstatuses</p>|`/api/v1/componentstatuses`|
 |{$KUBE.API.READYZ.ENDPOINT}|<p>Kubernetes API readyz endpoint /readyz</p>|`/readyz`|
 |{$KUBE.HTTP.PROXY}|<p>Sets the HTTP proxy to `http_proxy` value. If this parameter is empty, then no proxy is used.</p>||
-|{$KUBE.STATE.ENDPOINT.NAME}|<p>Kubernetes state endpoint name.</p>|`zabbix-kube-state-metrics`|
+|{$KUBE.STATE.ENDPOINT.NAME}|<p>Kubernetes state endpoint name. Get the endpoint name `kubectl get ep -A -owide`.</p>|`zabbix-kube-state-metrics`|
 |{$OPENSHIFT.STATE.ENDPOINT.NAME}|<p>OpenShift state endpoint name.</p>|`openshift-state-metrics`|
 |{$KUBE.API_SERVER.SCHEME}|<p>Kubernetes API servers metrics endpoint scheme. Used in ControlPlane LLD.</p>|`https`|
 |{$KUBE.API_SERVER.PORT}|<p>Kubernetes API servers metrics endpoint port. Used in ControlPlane LLD.</p>|`6443`|
