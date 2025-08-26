@@ -240,6 +240,7 @@ window.maintenance_edit = new class {
 
 	#post(url, data, success_callback) {
 		this._overlay.setLoading();
+		this.#clearMessages();
 
 		fetch(url, {
 			method: 'POST',
@@ -261,12 +262,6 @@ window.maintenance_edit = new class {
 				success_callback(response);
 			})
 			.catch((exception) => {
-				for (const element of this.form_element.parentNode.children) {
-					if (element.matches('.msg-good, .msg-bad, .msg-warning')) {
-						element.parentNode.removeChild(element);
-					}
-				}
-
 				let title, messages;
 
 				if (typeof exception === 'object' && 'error' in exception) {
@@ -288,5 +283,13 @@ window.maintenance_edit = new class {
 
 	#updateMultiselect($ms) {
 		$ms.multiSelect('setDisabledEntries', [...$ms.multiSelect('getData').map((entry) => entry.id)]);
+	}
+
+	#clearMessages() {
+		for (const element of this.form_element.parentNode.children) {
+			if (element.matches('.msg-good, .msg-bad, .msg-warning')) {
+				element.parentNode.removeChild(element);
+			}
+		}
 	}
 }
