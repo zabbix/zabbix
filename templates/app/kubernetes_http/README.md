@@ -35,7 +35,7 @@ Templates are of two types:
 * Get the token automatically created when you install Zabbix Helm Chart.
 
 ```bash
-kubectl get secret zabbix-service-account -n monitoring -o jsonpath={.data.token} | base64 -d
+kubectl get secret zabbix-zabbix-helm-chart -n monitoring -o jsonpath={.data.token} | base64 -d
 ```
 
 * Create a generic host for the nodes and assign to it the "Kubernetes nodes by HTTP" template.
