@@ -47,7 +47,7 @@ class CControllerMaintenanceTimePeriodCheck extends CController {
 			'month_date_type' => ['integer', 'required', 'in' => [0, 1],
 				'when' => ['timeperiod_type', 'in' => [TIMEPERIOD_TYPE_MONTHLY]]
 			],
-			'every_dow' => ['integer', 'in' => [1, 2, 3, 4, 5],
+			'every_dow' => ['integer', 'required', 'in' => [1, 2, 3, 4, 5],
 				'when' => [['timeperiod_type', 'in' => [TIMEPERIOD_TYPE_MONTHLY]], ['month_date_type', 'in' => [1]]]
 			],
 			'monthly_days' => ['array', 'required', 'not_empty',
