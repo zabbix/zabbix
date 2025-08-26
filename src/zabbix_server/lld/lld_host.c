@@ -6278,10 +6278,6 @@ static void	lld_host_group_prototypes_get(zbx_uint64_t parent_hostid, const zbx_
  ******************************************************************************/
 static int	lld_check_prototype_groupname(const char *groupname, char **error)
 {
-	zbx_token_t	token;
-	size_t		pos = 0, macro_len = 0;
-	int		lld_macro_num = 0;
-
 	if (FAIL == lld_validate_group_name(groupname))
 	{
 		*error = zbx_strdup(NULL, "invalid name");
