@@ -104,6 +104,32 @@ class CSeverityHelper {
 	}
 
 	/**
+	 * Get trigger severity full line height css style name.
+	 *
+	 * @param int $severity  Trigger severity.
+	 *
+	 * @return string|null
+	 */
+	public static function getSeverityFlhStyle($severity): ?string {
+		switch ($severity) {
+			case TRIGGER_SEVERITY_DISASTER:
+				return ZBX_STYLE_FLH_DISASTER_BG;
+			case TRIGGER_SEVERITY_HIGH:
+				return ZBX_STYLE_FLH_HIGH_BG;
+			case TRIGGER_SEVERITY_AVERAGE:
+				return ZBX_STYLE_FLH_AVERAGE_BG;
+			case TRIGGER_SEVERITY_WARNING:
+				return ZBX_STYLE_FLH_WARNING_BG;
+			case TRIGGER_SEVERITY_INFORMATION:
+				return ZBX_STYLE_FLH_INFO_BG;
+			case TRIGGER_SEVERITY_NOT_CLASSIFIED:
+				return ZBX_STYLE_FLH_NA_BG;
+			default:
+				return null;
+		}
+	}
+
+	/**
 	 * Get severity color from configuration.
 	 *
 	 * @param int $severity

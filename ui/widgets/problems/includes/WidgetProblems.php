@@ -493,7 +493,10 @@ class WidgetProblems extends CTableInfo {
 				])
 				->setAttribute('data-eventid', $problem['eventid']);
 
-			$this->addRow($row);
+			$this->addRow($row, $data['fields']['highlight_row'] == ZBX_HIGHLIGHT_ON && $value == TRIGGER_VALUE_TRUE
+				? CSeverityHelper::getSeverityFlhStyle($problem['severity'])
+				: null
+			);
 
 			if ($problem['cause_eventid'] == 0 && $problem['symptoms']) {
 				$this->addProblemsToTable($problem['symptoms'], $data, true);

@@ -1670,8 +1670,8 @@ class CScreenProblem extends CScreenBase {
 			]);
 
 			// Add table row.
-			$table->addRow($row, ($data['filter']['highlight_row'] && $value == TRIGGER_VALUE_TRUE)
-					? self::getSeverityFlhStyle($problem['severity'])
+			$table->addRow($row, ($data['filter']['highlight_row'] == ZBX_HIGHLIGHT_ON && $value == TRIGGER_VALUE_TRUE)
+					? CSeverityHelper::getSeverityFlhStyle($problem['severity'])
 					: null
 			);
 
@@ -1843,31 +1843,5 @@ class CScreenProblem extends CScreenBase {
 		}
 
 		return implode(', ', $latest_values);
-	}
-
-	/**
-	 * Get trigger severity full line height css style name.
-	 *
-	 * @param int $severity  Trigger severity.
-	 *
-	 * @return string|null
-	 */
-	private static function getSeverityFlhStyle($severity) {
-		switch ($severity) {
-			case TRIGGER_SEVERITY_DISASTER:
-				return ZBX_STYLE_FLH_DISASTER_BG;
-			case TRIGGER_SEVERITY_HIGH:
-				return ZBX_STYLE_FLH_HIGH_BG;
-			case TRIGGER_SEVERITY_AVERAGE:
-				return ZBX_STYLE_FLH_AVERAGE_BG;
-			case TRIGGER_SEVERITY_WARNING:
-				return ZBX_STYLE_FLH_WARNING_BG;
-			case TRIGGER_SEVERITY_INFORMATION:
-				return ZBX_STYLE_FLH_INFO_BG;
-			case TRIGGER_SEVERITY_NOT_CLASSIFIED:
-				return ZBX_STYLE_FLH_NA_BG;
-			default:
-				return null;
-		}
 	}
 }
