@@ -4663,9 +4663,7 @@ div.dashboard-widget-gauge {
 
 form.dashboard-widget-geomap .fields-group-clustering {
   display: flex;
-  gap: 3px;
-  border: none;
-  padding-left: 0; }
+  gap: 3px; }
 
 div.dashboard-widget-geomap {
   --hover-fill: #e0f7ff;
