@@ -467,7 +467,7 @@ class CZabbixServer {
 		$this->debug = [];
 
 		// Connect to the server.
-		if (!$this->clientConnect()) {
+		if (!$this->connect()) {
 			return false;
 		}
 
@@ -595,7 +595,7 @@ class CZabbixServer {
 	 *
 	 * @return bool|resource
 	 */
-	protected function clientConnect() {
+	protected function connect() {
 		if (!$this->socket) {
 			if ($this->host === null || $this->port === null) {
 				$this->error = _('Connection to Zabbix server failed. Incorrect configuration.');
