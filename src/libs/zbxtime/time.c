@@ -289,11 +289,21 @@ static struct tm	*zbx_localtime_r(const time_t *time)
 	time_t					time_zerro = (time_t)0;
 	static ZBX_THREAD_LOCAL struct tm	tm_safe;
 
+#if defined(_WINDOWS) || defined(__MINGW32__)
+	struct tm	*tm;
+
+	if (NULL == (tm = localtime(time)))
+	{
+		tm = localtime(&time_zerro);
+	}
+	tm_safe = *tm;
+#else
 	if (NULL == localtime_r(time, &tm_safe))
 	{
 		zabbix_log(LOG_LEVEL_DEBUG, "Wrong time value " ZBX_FS_TIME_T, (zbx_fs_time_t)(*time));
 		localtime_r(&time_zerro, &tm_safe);
 	}
+#endif
 
 	return &tm_safe;
 }
