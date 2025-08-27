@@ -485,7 +485,6 @@ class CZabbixServer {
 		$response = '';
 		$response_len = 0;
 		$expected_len = null;
-		$now = time();
 
 		// Reading data.
 		while (!feof($this->socket)) {
@@ -505,7 +504,7 @@ class CZabbixServer {
 			$info = stream_get_meta_data($this->socket);
 
 			// Handle client connection timeout.
-			if ($info['timed_out'] || (time() - $now) >= $this->timeout) {
+			if ($info['timed_out']) {
 				$this->error = _s(
 					'Response timeout of %1$s seconds exceeded when connecting to Zabbix server "%2$s".',
 					$this->timeout, $this->host
