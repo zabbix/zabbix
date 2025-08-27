@@ -43,7 +43,7 @@ class CControllerOauthAuthorize extends CController {
 		$result = $curl_status['result'] == CFrontendSetup::CHECK_OK;
 
 		if (!$result) {
-			error($curl_status['error']);
+			error($curl_status['error'], true);
 		}
 
 		return $result;
@@ -53,7 +53,7 @@ class CControllerOauthAuthorize extends CController {
 		$state = json_decode(base64_decode($state), true);
 
 		if (!is_array($state)) {
-			error(_('Invalid request.'));
+			error(_('Invalid request.'), true);
 
 			return false;
 		}
@@ -65,7 +65,7 @@ class CControllerOauthAuthorize extends CController {
 		$result = $result && array_intersect_key($mandatory_one, $state);
 
 		if (!$result) {
-			error(_('Invalid request.'));
+			error(_('Invalid request.'), true);
 		}
 
 		return $result;
@@ -101,8 +101,15 @@ class CControllerOauthAuthorize extends CController {
 			$token_url = substr($token_url, 0, $i);
 		}
 
+		$tokens = $this->exchangeCodeToTokens($token_url, $data);
+
+		if (array_key_exists('raw_response', $tokens)) {
+			error(_('Response')."\n".$tokens['raw_response'], true);
+			unset($tokens['raw_response']);
+		}
+
 		$this->setResponse(new CControllerResponseData([
-			'tokens' => $this->exchangeCodeToTokens($token_url, $data),
+			'tokens' => $tokens,
 			'user' => ['debug_mode' => $this->getDebugMode()]
 		]));
 	}
@@ -125,6 +132,7 @@ class CControllerOauthAuthorize extends CController {
 			CURLOPT_HTTPHEADER => ['Content-Type: application/x-www-form-urlencoded'],
 			CURLOPT_TIMEOUT => 30,
 			CURLOPT_MAXREDIRS => 10,
+			CURLOPT_FOLLOWLOCATION => true,
 			CURLOPT_SSL_VERIFYPEER => true,
 			CURLOPT_SSL_VERIFYHOST => 2
 		];
@@ -143,8 +151,7 @@ class CControllerOauthAuthorize extends CController {
 		$raw_response = curl_exec($handle);
 
 		if (curl_errno($handle)) {
-			CMessageHelper::setErrorTitle(_('CURL Error'));
-			CMessageHelper::addError(curl_error($handle));
+			error(curl_error($handle), true);
 			curl_close($handle);
 
 			return $result;
@@ -154,7 +161,7 @@ class CControllerOauthAuthorize extends CController {
 		curl_close($handle);
 
 		if ($http_code != 200) {
-			CMessageHelper::setErrorTitle(_('Unexpected HTTP response status code.'));
+			error(_('Unexpected HTTP response status code.'), true);
 
 			return $result + ['raw_response' => $raw_response];
 		}
@@ -163,7 +170,7 @@ class CControllerOauthAuthorize extends CController {
 		$mandatory_all = array_flip(['access_token', 'refresh_token', 'expires_in']);
 
 		if (!is_array($response) || array_diff_key($mandatory_all, $response)) {
-			CMessageHelper::setErrorTitle(_('OAuth response missing mandatory fields.'));
+			error(_('OAuth response missing mandatory fields.'), true);
 
 			return $result + ['raw_response' => $raw_response];
 		}
