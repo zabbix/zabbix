@@ -301,6 +301,7 @@ class testFormUserPermissions extends CWebTest {
 		$update_field = (array_key_exists('User type', $data['before'])) ? $data['after'] : $data['change'];
 		$role_form->fill($update_field);
 		$role_form->submit();
+		$this->assertMessage(TEST_GOOD, 'User role updated');
 
 		$this->page->open('zabbix.php?action=user.edit&userid='.self::$admin_user);
 		$form->selectTab('Permissions');
@@ -330,6 +331,7 @@ class testFormUserPermissions extends CWebTest {
 				$form = $this->query('id:userrole-form')->waitUntilPresent()->asForm()->one();
 				$form->fill($fields);
 				$form->submit();
+				$this->assertMessage(TEST_GOOD, 'User role updated');
 				$this->page->open('zabbix.php?action=user.edit&userid='.self::$admin_user);
 			}
 		}
@@ -388,6 +390,7 @@ class testFormUserPermissions extends CWebTest {
 								->setFillMode(CMultiselectElement::MODE_SELECT_MULTIPLE)->fill(['host.create', 'host.delete']);
 					}
 					$form->submit();
+					$this->assertMessage(TEST_GOOD, 'User role updated');
 					$this->page->open('zabbix.php?action=user.edit&userid='.self::$admin_user);
 				}
 			}
@@ -508,10 +511,11 @@ class testFormUserPermissions extends CWebTest {
 				$this->assertEquals('status-green', $this->query($modules_selector.'[text()="4th Module"]')->one()
 						->getAttribute('class')
 				);
-				$this->page->open('zabbix.php?action=userrole.edit&roleid='.self::$admin_roleid);
+				$this->page->open('zabbix.php?action=userrole.edit&roleid='.self::$admin_roleid)->waitUntilReady();
 				$form = $this->query('id:userrole-form')->waitUntilPresent()->asForm()->one();
 				$form->getField('4th Module')->uncheck();
 				$form->submit();
+				$this->assertMessage(TEST_GOOD, 'User role updated');
 			}
 			else {
 				$this->assertEquals('status-grey', $this->query($modules_selector.'[text()="4th Module"]')->one()

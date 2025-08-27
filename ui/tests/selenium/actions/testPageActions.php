@@ -185,7 +185,8 @@ class testPageActions extends CLegacyWebTest {
 		$this->calculateHash($action['actionid']);
 		$this->zbxTestLogin('zabbix.php?action=action.list&eventsource='.$action['eventsource']);
 		$this->zbxTestClickLinkText($action['name']);
-		$this->zbxTestClickButtonText('Update');
+		$this->query('button:Update')->waitUntilClickable()->one()->click();
+		$this->page->waitUntilReady();
 		$this->zbxTestCheckTitle('Configuration of actions');
 		$this->zbxTestWaitUntilMessageTextPresent('msg-good', 'Action updated');
 		$this->zbxTestTextPresent($action['name']);
