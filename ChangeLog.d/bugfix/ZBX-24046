@@ -1,1 +1,1 @@
-..F....... [ZBX-24046] fixed incorrect error display, if longer value is used for LDAP settings (kkuzmina)
+..F....... [ZBX-24046] fixed incorrect error message for field ldap_jit_interval in LDAP settings form (kkuzmina)
