@@ -1,0 +1,45 @@
+---
+test case: "ipv4 random port"
+in:
+  ip: "127.0.0.1"
+  port: 0
+  timeout: 1
+  backlog_size: 1
+out:
+  result: SUCCEED
+---
+test case: "invalid IP format"
+in:
+  ip: "999.999.999.999"
+  port: 12345
+  timeout: 1
+  backlog_size: 1
+out:
+  result: FAIL
+---
+test case: "mixture of valid and invalid IPs"
+in:
+  ip: "127.0.0.1,192.0.2.1"
+  port: 0
+  timeout: 1
+  backlog_size: 1
+out:
+  result: FAIL
+---
+test case: "localhost on reserved port"
+in:
+  ip: "127.0.0.1"
+  port: 80
+  timeout: 1
+  backlog_size: 1
+out:
+  result: FAIL
+---
+test case: "valid ip"
+in:
+  ip: "255.255.1.1"
+  port: 0
+  timeout: 1
+  backlog_size: 0
+out:
+  result: FAIL

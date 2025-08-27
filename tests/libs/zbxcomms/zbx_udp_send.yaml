@@ -1,0 +1,10 @@
+---
+test case: "Test"
+in:
+  source_ip: "0.0.0.0"
+  ip: "127.0.0.1"
+  port: 0
+  timeout: 1
+  fragments: connected
+out:
+  result: FAIL
