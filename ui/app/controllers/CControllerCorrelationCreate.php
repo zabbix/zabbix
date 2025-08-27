@@ -60,7 +60,7 @@ class CControllerCorrelationCreate extends CController {
 		]];
 	}
 
-	public static function getValidationRulesForConditionPopup() {
+	public static function getValidationRulesForConditionPopup(): array {
 		$rules = self::getValidationRules();
 
 		$rules['fields']['conditions']['fields']['groupid'] = ['array', 'field' => [
