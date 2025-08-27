@@ -741,10 +741,15 @@ void	zbx_db_flush_trends(ZBX_DC_TREND *trends, int *trends_num, zbx_vector_uint6
 		inserts_num++;
 
 		if (0 != trend->disable_from)
-			continue;
-
-		if (NULL != trends_diff)
-			uint64_array_add(&itemids, &itemids_alloc, &itemids_num, trend->itemid, 64);
+		{
+			if (clock >= trend->disable_from)
+				continue;
+		}
+		else
+		{
+			if (NULL != trends_diff)
+				uint64_array_add(&itemids, &itemids_alloc, &itemids_num, trend->itemid, 64);
+		}
 
 		selects_num++;
 		if (ZBX_HC_SYNC_MAX == selects_num)

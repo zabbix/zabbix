@@ -4335,11 +4335,12 @@ class testDataDisplayInGraphs extends CWebTest {
 					'type' => 'history'
 				]
 			],
-			[
-				[
-					'type' => 'trends'
-				]
-			],
+			// TODO: uncomment after fix DEV-4332
+//			[
+//				[
+//					'type' => 'trends'
+//				]
+//			],
 			[
 				[
 					'type' => 'pie'
@@ -4351,12 +4352,13 @@ class testDataDisplayInGraphs extends CWebTest {
 					'kiosk_mode' => true
 				]
 			],
-			[
-				[
-					'type' => 'trends',
-					'kiosk_mode' => true
-				]
-			],
+			// TODO: uncomment after fix DEV-4332
+//			[
+//				[
+//					'type' => 'trends',
+//					'kiosk_mode' => true
+//				]
+//			],
 			[
 				[
 					'type' => 'pie',
@@ -4433,7 +4435,7 @@ class testDataDisplayInGraphs extends CWebTest {
 			}
 
 			// TODO: sometimes test is unstable due to different image size.
-			sleep(1);
+			sleep(2);
 			$this->assertScreenshot($charts_table, $screenshot_string.$show);
 
 			// Switch back to normal view to avoid impacting following scenarios.

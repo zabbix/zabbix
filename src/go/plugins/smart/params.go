@@ -12,11 +12,26 @@
 ** If not, see <https://www.gnu.org/licenses/>.
 **/
 
-#ifndef ZABBIX_MACROFUNC_H
-#define ZABBIX_MACROFUNC_H
+package smart
 
-#include "zbxexpr.h"
+import "golang.zabbix.com/sdk/metric"
 
-char	*func_get_macro_from_func(const char *str, zbx_token_func_macro_t *fm, int *N_functionid);
+const (
+	typeParameterName     = "type"
+	pathParameterName     = "path"
+	raidTypeParameterName = "raid"
+)
 
-#endif
+//nolint:gochecknoglobals // global constants.
+var (
+	searchType = metric.NewParam(
+		typeParameterName, "type to search the smart device by",
+	).WithDefault(
+		"name",
+	).WithValidator(
+		metric.SetValidator{Set: []string{"name", "id"}, CaseInsensitive: false},
+	)
+
+	path     = metric.NewParam(pathParameterName, "path by which to search device")
+	raidType = metric.NewParam(raidTypeParameterName, "type to search the smart device by")
+)

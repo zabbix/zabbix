@@ -29,7 +29,7 @@ Refer to the vendor documentation.
 |{$SNMP.TIMEOUT}|<p>The time interval for SNMP agent availability trigger expression.</p>|`5m`|
 |{$BIGIP.LLD.FILTER.PART.NAME.MATCHES}|<p>Filter of discoverable mount point names.</p>|`.*`|
 |{$BIGIP.LLD.FILTER.PART.NAME.NOT_MATCHES}|<p>Filter to exclude discovered by mount point names.</p>|`CHANGE_IF_NEEDED`|
-|{$BIGIP.LLD.OVERRIDE.PART.FILTER_LOW_SPACE_TRIGGER}|<p>Partitions that low free space trigger should ignore.</p>|`^/usr$`|
+|{$BIGIP.LLD.OVERRIDE.PART.FILTER_LOW_SPACE_TRIGGER}|<p>Partitions that low free space trigger should ignore.</p>|`^(?:/usr\|/opt/\.sdm/(?:usr\|lib\|lib64))$`|
 |{$BIGIP.CERT.MIN}|<p>Minimum number of days before certificate expiration.</p>|`7`|
 |{$BIGIP.CPU.UTIL.WARN.MAX}|<p>The warning threshold of the CPU utilization expressed in %.</p>|`85`|
 |{$BIGIP.CPU.UTIL.WARN.MIN}|<p>The recovery threshold of the CPU utilization expressed in %.</p>|`65`|

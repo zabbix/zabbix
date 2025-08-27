@@ -339,7 +339,7 @@ class testFormAdministrationGeneralAutoregistration extends CWebTest {
 
 		// Modify existing PSK values.
 		if (array_key_exists('change_psk', $data)) {
-			$form->query('button:Change PSK')->one()->click();
+			$form->query('button:Change PSK')->one()->click()->waitUntilStalled();
 			// Check that PSK values are empty.
 			$this->assertEquals('', $form->getField('PSK identity')->getValue());
 			$this->assertEquals('', $form->getField('PSK')->getValue());
