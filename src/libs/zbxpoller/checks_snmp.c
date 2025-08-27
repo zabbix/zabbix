@@ -3377,7 +3377,7 @@ static int	async_task_process_task_snmp_cb(short event, void *data, int *fd, zbx
 		}
 		else
 		{
-			if (ZBX_IF_SNMP_VERSION_3 == snmp_context->snmp_version && 0 == snmp_context->probe)
+			if (ZBX_IF_SNMP_VERSION_3 == snmp_context->snmp_version && 1 == snmp_context->probe_processed)
 			{
 				err_detail = "Probe successful, cannot retrieve OID";
 				snmp_context->item.ret = CONFIG_ERROR;
@@ -3581,7 +3581,9 @@ stop:
 
 	if (ZBX_ASYNC_TASK_STOP == task_ret && ZBX_ISSET_MSG(&snmp_context->item.result))
 	{
-		snmp_identity_remove(addresses->values[0].ip);
+		if (1 == engineid_cache_initialized)
+			snmp_identity_remove(addresses->values[0].ip);
+
 		zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s itemid:" ZBX_FS_UI64 " %s event:%d fd:%d size:"
 				ZBX_FS_SIZE_T " error:%s",
 				__func__, zbx_result_string(snmp_context->item.ret), snmp_context->item.itemid,
