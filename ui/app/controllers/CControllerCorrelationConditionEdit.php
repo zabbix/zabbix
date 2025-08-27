@@ -61,7 +61,7 @@ class CControllerCorrelationConditionEdit extends CController {
 				'debug_mode' => $this->getDebugMode()
 			],
 			'js_validation_rules' => (new CFormValidator(
-				CControllerCorrelationCreate::getValidationRulesForConditionPopup()
+				CControllerCorrelationConditionCheck::getValidationRules()
 			))->getRules()
 		];
 

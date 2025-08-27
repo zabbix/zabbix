@@ -60,16 +60,6 @@ class CControllerCorrelationCreate extends CController {
 		]];
 	}
 
-	public static function getValidationRulesForConditionPopup(): array {
-		$rules = self::getValidationRules();
-
-		$rules['fields']['conditions']['fields']['groupid'] = ['array', 'field' => [
-			'db corr_condition_group.groupid', 'required'
-		], 'required', 'not_empty', 'when' => ['type', 'in' => [ZBX_CORR_CONDITION_NEW_EVENT_HOSTGROUP]]];
-
-		return ['object', 'fields' => $rules['fields']['conditions']['fields']];
-	}
-
 	protected function checkInput(): bool {
 		$ret = $this->validateInput(self::getValidationRules());
 
