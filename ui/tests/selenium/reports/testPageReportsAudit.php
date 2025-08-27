@@ -566,8 +566,8 @@ class testPageReportsAudit extends CWebTest {
 
 		$this->page->login()->open('zabbix.php?action=auditlog.list&filter_rst=1')->waitUntilReady();
 		$form = $this->query('name:zbx_filter')->asForm()->one();
-		$table = $this->query('class:list-table')->asTable()->one();
 		$form->query('button:Reset')->one()->click();
+		$table = $this->query('class:list-table')->asTable()->one();
 
 		$form->fill($data['fields'])->submit();
 
@@ -576,6 +576,7 @@ class testPageReportsAudit extends CWebTest {
 			$this->assertEquals(['No data found'], $table->getRows()->asText());
 		}
 		else {
+			$table->waitUntilReloaded();
 			foreach ($data['fields'] as $column => $values) {
 				if ($column === 'Users' || 'Actions') {
 					$column = rtrim($column, 's');

@@ -4,7 +4,7 @@ msgstr ""
 "Project-Id-Version: Zabbix 6.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2023-10-19 13:48+0300\n"
-"PO-Revision-Date: 2025-07-30 18:27+0000\n"
+"PO-Revision-Date: 2025-08-20 19:49+0000\n"
 "Last-Translator: ERIC <eric78.zabbix@orange.fr>\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
 "Language: fr\n"
@@ -6786,7 +6786,7 @@ msgstr "La licence TimescaleDB détectée ne prend pas en charge la compression.
 
 #: app/views/administration.housekeeping.edit.php:204
 msgid "Detected license does not support compression. Compression is supported in TimescaleDB Community Edition."
-msgstr ""
+msgstr "La licence TimescaleDB détectée ne prend pas en charge la compression. La compression est prise en charge dans TimescaleDB Community Edition."
 
 #: app/controllers/CControllerPopupTriggerExpr.php:1130
 msgid "Detection period"
@@ -13301,7 +13301,7 @@ msgstr "La version maximale requise de la base de données %1$s est %2$s."
 #: app/partials/administration.system.info.php:221
 #, c-format
 msgid "Maximum required version is %1$s."
-msgstr ""
+msgstr "La version maximale requise est %1$s."
 
 #: app/controllers/CControllerTimeSelectorUpdate.php:136
 #: include/classes/mvc/CController.php:320
@@ -13642,7 +13642,7 @@ msgstr "La taille minimale requise pour les post HTTP est %1$s (option \"post_ma
 #: app/views/administration.housekeeping.edit.php:183
 #, c-format
 msgid "Minimum required version is %1$s."
-msgstr ""
+msgstr "La version minimale requise est %1$s."
 
 #: app/views/monitoring.map.view.php:48
 #: include/views/monitoring.sysmap.edit.php:276
@@ -13875,12 +13875,12 @@ msgstr "Événements PROBLÈME multiples"
 #: app/partials/administration.system.info.php:235
 #, c-format
 msgid "Must be at least %1$s."
-msgstr ""
+msgstr "Doit être au moins %1$s."
 
 #: app/partials/administration.system.info.php:254
 #, c-format
 msgid "Must not be higher than %1$s."
-msgstr ""
+msgstr "Ne doit pas être supérieur à %1$s."
 
 #: jsLoader.php:284
 msgid "Mute"
@@ -14625,63 +14625,63 @@ msgstr "Aucune autorisation pour appeler \"%1$s.%2$s\"."
 
 #: include/classes/api/services/CConfiguration.php:312
 msgid "No permissions to import discovery rules."
-msgstr ""
+msgstr "Aucune autorisation pour importer des règles de découverte."
 
 #: include/classes/api/services/CConfiguration.php:313
 msgid "No permissions to import graphs."
-msgstr ""
+msgstr "Aucune autorisation pour importer des graphiques."
 
 #: include/classes/api/services/CConfiguration.php:314
 msgid "No permissions to import host groups."
-msgstr ""
+msgstr "Aucune autorisation pour importer des groupes d'hôtes."
 
 #: include/classes/api/services/CConfiguration.php:316
 msgid "No permissions to import hosts."
-msgstr ""
+msgstr "Aucune autorisation pour importer des hôtes."
 
 #: include/classes/api/services/CConfiguration.php:318
 msgid "No permissions to import images."
-msgstr ""
+msgstr "Aucune autorisation pour importer des images."
 
 #: include/classes/api/services/CConfiguration.php:319
 msgid "No permissions to import items."
-msgstr ""
+msgstr "Aucune autorisation pour importer des éléments."
 
 #: include/classes/api/services/CConfiguration.php:320
 msgid "No permissions to import maps."
-msgstr ""
+msgstr "Aucune autorisation pour importer des cartes."
 
 #: include/classes/api/services/CConfiguration.php:321
 msgid "No permissions to import media types."
-msgstr ""
+msgstr "Aucune autorisation pour importer des types de médias."
 
 #: include/classes/api/services/CConfiguration.php:324
 msgid "No permissions to import template dashboards."
-msgstr ""
+msgstr "Aucune autorisation pour importer des modèles de tableau de bord."
 
 #: include/classes/api/services/CConfiguration.php:315
 msgid "No permissions to import template groups."
-msgstr ""
+msgstr "Aucune autorisation pour importer des modèles de groupe."
 
 #: include/classes/api/services/CConfiguration.php:322
 msgid "No permissions to import template links."
-msgstr ""
+msgstr "Aucune autorisation pour importer des modèles de lien."
 
 #: include/classes/api/services/CConfiguration.php:323
 msgid "No permissions to import templates."
-msgstr ""
+msgstr "Aucune autorisation pour importer des modèles."
 
 #: include/classes/api/services/CConfiguration.php:325
 msgid "No permissions to import triggers."
-msgstr ""
+msgstr "Aucune autorisation pour importer des déclencheurs."
 
 #: include/classes/api/services/CConfiguration.php:326
 msgid "No permissions to import value maps."
-msgstr ""
+msgstr "Aucune autorisation pour importer des tables de correspondances."
 
 #: include/classes/api/services/CConfiguration.php:317
 msgid "No permissions to import web scenarios."
-msgstr ""
+msgstr "Aucune autorisation pour importer des scénarios Web."
 
 #: app/controllers/CControllerChartsView.php:133
 #: app/controllers/CControllerDashboardPrint.php:99
@@ -19008,13 +19008,13 @@ msgstr "Raccourci"
 #: app/views/administration.housekeeping.edit.php:187
 #, c-format
 msgid "Should be at least %1$s."
-msgstr ""
+msgstr "Devrait être au moins %1$s."
 
 #: app/partials/administration.system.info.php:262
 #: app/views/administration.housekeeping.edit.php:197
 #, c-format
 msgid "Should not be higher than %1$s."
-msgstr ""
+msgstr "Ne devrait pas être supérieur à %1$s."
 
 #: app/partials/monitoring.problem.filter.php:27
 #: app/views/monitoring.charts.view.php:80
@@ -20532,7 +20532,7 @@ msgstr "Le paramètre \"%1$s\" est absent des attributs de l'utilisateur."
 
 #: app/views/popup.ldap.edit.php:101
 msgid "The previous password was cleared due to a host change. Please enter the new password."
-msgstr "Le mot de passe précédent a été supprimé suite à un changement d'hébergeur. Veuillez saisir le nouveau mot de passe."
+msgstr "Le mot de passe précédent a été supprimé suite à un changement d'hôte. Veuillez saisir le nouveau mot de passe."
 
 #: include/classes/core/CJsonRpc.php:206
 msgid "The received JSON is not a valid JSON-RPC request."
@@ -21585,11 +21585,11 @@ msgstr "Impossible de récupérer la version de TimescaleDB."
 
 #: app/views/administration.housekeeping.edit.php:173
 msgid "Unable to retrieve compression support status of TimescaleDB time-series database extension for PostgreSQL."
-msgstr ""
+msgstr "Impossible de récupérer l'état de prise en charge de la compression de l'extension TimescaleDB pour PostgreSQL."
 
 #: app/views/administration.housekeeping.edit.php:178
 msgid "Unable to retrieve version of TimescaleDB time-series database extension for PostgreSQL."
-msgstr ""
+msgstr "Impossible de récupérer la version de l'extension TimescaleDB pour PostgreSQL."
 
 #: include/views/mfa.login.php:65
 #, c-format
@@ -21872,7 +21872,7 @@ msgstr "Version du serveur de base de données %1$s non supportée. Doit être d
 #: app/partials/administration.system.info.php:206
 #: app/views/administration.housekeeping.edit.php:169
 msgid "Unsupported TimescaleDB time-series database extension for PostgreSQL is used."
-msgstr ""
+msgstr "Extension TimescaleDB non prise en charge pour PostgreSQL est utilisée."
 
 #: app/views/administration.housekeeping.edit.php:190
 #, c-format
@@ -23291,7 +23291,7 @@ msgstr "Message d'alerte"
 #: app/partials/administration.system.info.php:243
 #: app/partials/administration.system.info.php:262
 msgid "Warning!"
-msgstr ""
+msgstr "Avertissement !"
 
 #: app/partials/administration.system.info.php:198
 msgid "Warning! Support for Oracle DB is deprecated since Zabbix 7.0 and will be removed in future versions."
