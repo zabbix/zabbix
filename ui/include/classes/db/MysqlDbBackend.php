@@ -31,18 +31,13 @@ class MysqlDbBackend extends DbBackend {
 			$table_exists = mysqli_query($DB['DB'], "select null from dbversion limit 1");
 		}
 		catch (mysqli_sql_exception $e) {
-			// Code is not missing here.
-		}
-
-		if (!$table_exists) {
 			$this->setError(_s('Unable to determine current Zabbix database version: %1$s.',
 				_s('the table "%1$s" was not found', 'dbversion')
 			));
-
-			return false;
+			$table_exists = false;
 		}
 
-		return true;
+		return $table_exists;
 	}
 
 	/**
@@ -176,13 +171,8 @@ class MysqlDbBackend extends DbBackend {
 	private function setCharset($charset) {
 		global $DB;
 
-		if (!array_key_exists('DB', $DB) || $DB['DB'] === null) {
-			return false;
-		}
-
-		try
-		{
-			$result = mysqli_set_charset($DB['DB'], $charset);
+		try {
+			mysqli_set_charset($DB['DB'], $charset);
 		}
 		catch (mysqli_sql_exception $e) {
 			return false;
