@@ -97,7 +97,7 @@ zbx_db_config_t;
 		if (SUCCEED == zbx_db_is_null(row))	\
 			uint = 0;			\
 		else					\
-			zbx_is_uint64(row, &uint);	\
+			ZBX_STR2UINT64(uint, row);	\
 	}						\
 	while (0)
 
@@ -240,6 +240,8 @@ void	zbx_tsdb_info_extract(struct zbx_db_version_info_t *version_info);
 void	zbx_tsdb_set_compression_availability(int compression_availabile);
 int	zbx_tsdb_get_compression_availability(void);
 void	zbx_tsdb_extract_compressed_chunk_flags(struct zbx_db_version_info_t *version_info);
+#elif defined(HAVE_MYSQL)
+int	zbx_mariadb_fork_get(void);
 #endif
 
 int	zbx_db_version_check(const char *database, zbx_uint32_t current_version, zbx_uint32_t min_version,

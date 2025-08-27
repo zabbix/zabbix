@@ -25,12 +25,12 @@
 typedef struct
 {
 	zbx_uint64_t	itemid;
-	zbx_uint64_t	hostid;
 	unsigned char	value_type;
 	unsigned char	flags;
 	unsigned char	state;
 	char		*posts;
 	char		*status_codes;
+	unsigned char	preprocessing;
 }
 zbx_dc_httpitem_context_t;
 

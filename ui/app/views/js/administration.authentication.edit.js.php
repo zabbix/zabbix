@@ -23,7 +23,10 @@
 	const view = new class {
 
 		init({ldap_servers, ldap_default_row_index, db_authentication_type, saml_provision_groups,
-				saml_provision_media, templates, mfa_methods, mfa_default_row_index, is_http_auth_allowed
+				saml_provision_media, templates, mfa_methods, mfa_default_row_index, is_http_auth_allowed,
+				saml_idp_certificate_exists, saml_sp_certificate_exists, saml_sp_private_key_exists,
+				saml_certificate_max_filesize, saml_private_key_max_filesize, saml_filesize_error_message,
+				saml_certs_editable
 		}) {
 			this.form = document.getElementById('authentication-form');
 			this.db_authentication_type = db_authentication_type;
@@ -40,6 +43,13 @@
 			this.jit_provision_interval = this.form.querySelector('[name="jit_provision_interval"]');
 			this.ldap_auth_enabled = this.form.querySelector('[type="checkbox"][name="ldap_auth_enabled"]');
 			this.mfa_table = document.getElementById('mfa-methods');
+			this.saml_idp_certificate_exists = saml_idp_certificate_exists;
+			this.saml_sp_certificate_exists = saml_sp_certificate_exists;
+			this.saml_sp_private_key_exists = saml_sp_private_key_exists;
+			this.saml_certificate_max_filesize = saml_certificate_max_filesize;
+			this.saml_private_key_max_filesize = saml_private_key_max_filesize;
+			this.saml_filesize_error_message = saml_filesize_error_message;
+			this.saml_certs_editable = saml_certs_editable;
 			const saml_readonly = !this.form.querySelector('[type="checkbox"][name="saml_auth_enabled"]').checked;
 			const ldap_disabled = this.ldap_auth_enabled === null || !this.ldap_auth_enabled.checked;
 			const mfa_readonly = !this.form.querySelector('[type="checkbox"][name="mfa_status"]').checked;
@@ -55,6 +65,10 @@
 			this.#addMfaMethods(mfa_methods, mfa_default_row_index);
 			this.#setTableVisiblityState(this.mfa_table, mfa_readonly);
 			this.#disableRemoveLinksWithUserGroups(this.mfa_table);
+
+			if (this.saml_certs_editable) {
+				this.#updateSpCertificateRequiredState();
+			}
 
 			this.form.querySelector('[type="checkbox"][name="saml_auth_enabled"]').dispatchEvent(new Event('change'));
 		}
@@ -126,6 +140,31 @@
 					field.classList.toggle('<?= ZBX_STYLE_DISPLAY_NONE ?>', !e.target.checked)
 				);
 			});
+
+			for (const button of this.form.querySelectorAll('.js-saml-cert-change-button')) {
+				button.addEventListener('click', e => {
+					const container = button.nextElementSibling.classList.contains('js-saml-cert-input') ? button.nextElementSibling : null;
+
+					if (container) {
+						const textarea = container.querySelector('textarea');
+						container.style.display = '';
+						textarea.classList.add('saml-enabled');
+						textarea.removeAttribute('disabled');
+						button.remove();
+					}
+				});
+			}
+
+			for (const button of this.form.querySelectorAll('.js-saml-cert-file-button')) {
+				button.addEventListener('click', e => {
+					const textarea = e.target.parentNode.querySelector('textarea');
+					const extension_filter = textarea.name === 'sp_private_key'
+						? '.key, .pem, .txt'
+						: '.cer, .crt, .pem, .txt';
+
+					this.#setSelectedFileContentTo(textarea, extension_filter);
+				});
+			}
 
 			this.saml_provision_groups_table.addEventListener('click', (e) => {
 				if (e.target.classList.contains('disabled')) {
@@ -211,6 +250,92 @@
 					default_index_hidden.value = default_index.value;
 				}
 			});
+
+			if (this.saml_certs_editable) {
+				[...this.#getSpCertificateCheckboxes()].forEach(checkbox => {
+					checkbox.addEventListener('change', () => {
+						this.#updateSpCertificateRequiredState();
+					})
+				});
+			}
+		}
+
+		#getSpCertificateCheckboxes() {
+			const selector = [
+				'sign_messages', 'sign_assertions', 'sign_authn_requests', 'sign_logout_requests',
+				'sign_logout_responses', 'encrypt_nameid', 'encrypt_assertions'
+			].map(n => `[name="${n}"]`).join(',');
+
+			return this.form.querySelectorAll(selector);
+		}
+
+		#isSpCertificateRequired() {
+			const checked = [...this.#getSpCertificateCheckboxes()].filter(checkbox => checkbox.checked);
+
+			return checked.length > 0;
+		}
+
+		#updateSpCertificateRequiredState() {
+			const required = this.#isSpCertificateRequired();
+
+			this.form.querySelector('label[for="sp_private_key"]')
+				.classList.toggle(ZBX_STYLE_FIELD_LABEL_ASTERISK, required);
+			this.form.querySelector('textarea[name="sp_private_key"]')
+				.toggleAttribute('aria-required', ZBX_STYLE_FIELD_LABEL_ASTERISK, required);
+			this.form.querySelector('label[for="sp_certificate"]')
+				.classList.toggle(ZBX_STYLE_FIELD_LABEL_ASTERISK, required);
+			this.form.querySelector('textarea[name="sp_certificate"]')
+				.toggleAttribute('aria-required', ZBX_STYLE_FIELD_LABEL_ASTERISK, required);
+		}
+
+		#setSelectedFileContentTo(textarea, extension_filter) {
+			const input = document.createElement('input');
+			const wrapper = textarea.parentElement;
+
+			input.type = 'file';
+			input.accept = extension_filter;
+
+			textarea.addEventListener('input', e => {
+				wrapper.querySelector('.error')?.remove();
+				textarea.classList.remove('has-error');
+			});
+
+			input.addEventListener('change', e => {
+				wrapper.querySelector('.error')?.remove();
+				textarea.classList.remove('has-error');
+
+				const file = e.target.files && e.target.files[0] ? e.target.files[0] : null;
+
+				if (!file) {
+					return;
+				}
+
+				const max_filesize = textarea.id === 'sp_private_key'
+					? this.saml_private_key_max_filesize
+					: this.saml_certificate_max_filesize;
+
+				if (file.size > max_filesize) {
+					const error_span = document.createElement('span');
+
+					error_span.className = 'error';
+					error_span.textContent = this.saml_filesize_error_message.replace('%1$s', max_filesize);
+					wrapper.append(error_span);
+
+					textarea.classList.add('has-error');
+					textarea.value = '';
+
+					return;
+				}
+
+				const reader = new FileReader();
+
+				reader.onload = function(e) {
+					textarea.value = e.target.result;
+				};
+
+				reader.readAsText(file);
+			});
+			input.dispatchEvent(new MouseEvent('click'));
 		}
 
 		#addLdapSettingsEventListeners() {
@@ -270,18 +395,39 @@
 		_authFormSubmit() {
 			const fields_to_trim = ['#http_strip_domains', '#idp_entityid', '#sso_url', '#slo_url',
 				'#username_attribute', '#sp_entityid', '#nameid_format', '#saml_group_name', '#saml_user_username',
-				'#saml_user_lastname'
+				'#saml_user_lastname', '#idp_certificate', '#sp_certificate', '#sp_private_key'
 			];
 			document.querySelectorAll(fields_to_trim.join(', ')).forEach((elem) => {
 				elem.value = elem.value.trim();
 			});
 
-			const auth_type = document.querySelector('[name=authentication_type]:checked').value;
-			const warning_msg = <?= json_encode(
-				_('Switching authentication method will reset all except this session! Continue?')
-			) ?>;
+			let warnings = [];
 
-			return (auth_type == this.db_authentication_type || confirm(warning_msg));
+			const auth_type = document.querySelector('[name=authentication_type]:checked').value;
+			if (auth_type != this.db_authentication_type) {
+				warnings.push(<?= json_encode(
+					_('Changing the authentication method will reset all sessions, except the current one.')
+				) ?>);
+			}
+
+			if (!this.#isSpCertificateRequired()) {
+				const sp_certificate_input = document.getElementById('sp_certificate');
+				const sp_private_key_input = document.getElementById('sp_private_key');
+
+				if (this.saml_sp_certificate_exists && !sp_certificate_input.disabled && sp_certificate_input.value === '') {
+					warnings.push(<?= json_encode(
+						_('Current SP certificate will be deleted.')
+					) ?>);
+				}
+
+				if (this.saml_sp_private_key_exists && !sp_private_key_input.disabled && sp_private_key_input.value === '') {
+					warnings.push(<?= json_encode(
+						_('Current SP private key will be deleted.')
+					) ?>);
+				}
+			}
+
+			return warnings.length > 0 ? confirm(warnings.join("\n")) : true;
 		}
 
 		_addLdapServers(ldap_servers, ldap_default_row_index) {

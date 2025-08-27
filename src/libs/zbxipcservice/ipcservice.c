@@ -73,8 +73,6 @@ ZBX_PTR_VECTOR_IMPL(ipc_client_ptr, zbx_ipc_client_t *)
  * Private API
  */
 
-#define ZBX_IPC_HEADER_SIZE	(int)(sizeof(zbx_uint32_t) * 2)
-
 #define ZBX_IPC_MESSAGE_CODE	0
 #define ZBX_IPC_MESSAGE_SIZE	1
 
