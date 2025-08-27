@@ -5721,7 +5721,7 @@ static int	lld_interface_validate_fields(const zbx_lld_interface_t *interface, c
 
 	op = (0 == interface->interfaceid ? "create" : "update");
 
-	if (ZBX_INTERFACE_PORT_LEN_MAX < strlen(interface->port))
+	if (ZBX_INTERFACE_PORT_LEN_MAX < zbx_utf8_char_len(interface->port))
 	{
 		*error = zbx_strdcatf(*error, "Cannot %s \"%s\" interface on host \"%s\": "
 				"Port is too long.\n",
@@ -5741,11 +5741,10 @@ static int	lld_interface_validate_fields(const zbx_lld_interface_t *interface, c
 	}
 	else
 	{
-		int	port_n;
+		unsigned short	port_n;
 
-		port_n = atoi(interface->port);
-
-		if (0 > port_n || 65535 < port_n)
+		if (0 != strncmp(interface->port, "{$", ZBX_CONST_STRLEN("{$")) &&
+				FAIL == zbx_is_ushort(interface->port, &port_n))
 		{
 			*error = zbx_strdcatf(*error, "Cannot %s \"%s\" interface on host \"%s\": "
 					"Value of port must be one of 0-65535.\n",
@@ -5770,7 +5769,7 @@ static int	lld_interface_validate_fields(const zbx_lld_interface_t *interface, c
 				return FAIL;
 			}
 
-			if (ZBX_INTERFACE_DNS_LEN_MAX < strlen(interface->dns))
+			if (ZBX_INTERFACE_DNS_LEN_MAX < zbx_utf8_char_len(interface->dns))
 			{
 				*error = zbx_strdcatf(*error, "Cannot %s \"%s\" interface on host \"%s\": "
 						"DNS is too long.\n",
@@ -5888,7 +5887,7 @@ static void	lld_interfaces_validate(zbx_vector_lld_host_ptr_t *hosts, char **err
 	{
 		host = hosts->values[i];
 
-		for (int j = 0; j < host->interfaces.values_num; j++)
+		for (int j = 0; j < host->interfaces.values_num; )
 		{
 			interface = host->interfaces.values[j];
 
@@ -5896,7 +5895,12 @@ static void	lld_interfaces_validate(zbx_vector_lld_host_ptr_t *hosts, char **err
 				continue;
 
 			if (FAIL == lld_interface_validate_fields(interface, host->host, error))
+			{
+				lld_interface_free(interface);
 				zbx_vector_lld_interface_ptr_remove(&host->interfaces, j);
+			}
+
+			j++;
 		}
 	}
 
