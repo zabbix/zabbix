@@ -501,7 +501,13 @@ static int	zbx_snmp_cache_handle_engineid(netsnmp_session *session, zbx_dc_item_
 			d.revision = item_context->interface.revision;
 
 			zbx_vector_engineid_device_append(&ptr->devices, d);
-			snmp_identity_insert(d.address, local_record.engineid, local_record.engineid_len, item_context);
+		}
+
+		/* sync devices with identity hashset */
+		for (int i = 0; i < ptr->devices.values_num; i++)
+		{
+			snmp_identity_insert(ptr->devices.values[i].address, local_record.engineid,
+					local_record.engineid_len, item_context);
 		}
 
 		if (1 == diff_engineboots)
@@ -3575,6 +3581,7 @@ stop:
 
 	if (ZBX_ASYNC_TASK_STOP == task_ret && ZBX_ISSET_MSG(&snmp_context->item.result))
 	{
+		snmp_identity_remove(addresses->values[0].ip);
 		zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s itemid:" ZBX_FS_UI64 " %s event:%d fd:%d size:"
 				ZBX_FS_SIZE_T " error:%s",
 				__func__, zbx_result_string(snmp_context->item.ret), snmp_context->item.itemid,
