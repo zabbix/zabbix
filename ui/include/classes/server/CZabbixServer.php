@@ -467,11 +467,11 @@ class CZabbixServer {
 		$this->debug = [];
 
 		// Connect to the server.
-		if (!$this->connect()) {
+		if (!$this->clientConnect()) {
 			return false;
 		}
 
-		// Set timeout.
+		// Set client timeout.
 		stream_set_timeout($this->socket, $this->timeout);
 
 		// Send the command.
@@ -487,57 +487,73 @@ class CZabbixServer {
 		$expected_len = null;
 		$now = time();
 
-		while (true) {
-			if ((time() - $now) >= $this->timeout) {
+		// Reading data.
+		while (!feof($this->socket)) {
+			$buffer = fread($this->socket, self::READ_BYTES_LIMIT);
+
+			// Handle data read error.
+			if ($buffer === false) {
 				$this->error = _s(
-					'Connection timeout of %1$s seconds exceeded when connecting to Zabbix server "%2$s".',
-					$this->timeout, $this->host
+					'Cannot read response from Zabbix server "%1$s". Connection have been interrupted.',
+					$this->host
 				);
+				fclose($this->socket);
+
 				return false;
 			}
 
-			if (!feof($this->socket) && ($buffer = fread($this->socket, self::READ_BYTES_LIMIT)) !== false) {
-				$response_len += strlen($buffer);
-				$response .= $buffer;
+			$info = stream_get_meta_data($this->socket);
 
-				if ($expect == self::ZBX_TCP_EXPECT_HEADER) {
-					if (strncmp($response, ZBX_TCP_HEADER, min($response_len, ZBX_TCP_HEADER_LEN)) != 0) {
-						$this->error = _s('Incorrect response received from Zabbix server "%1$s".', $this->host);
-						return false;
-					}
+			// Handle client connection timeout.
+			if ($info['timed_out'] || (time() - $now) >= $this->timeout) {
+				$this->error = _s(
+					'Response timeout of %1$s seconds exceeded when connecting to Zabbix server "%2$s".',
+					$this->timeout, $this->host
+				);
+				fclose($this->socket);
 
-					if ($response_len < ZBX_TCP_HEADER_LEN) {
-						continue;
-					}
+				return false;
+			}
 
-					$expect = self::ZBX_TCP_EXPECT_DATA;
+			$response_len += strlen($buffer);
+			$response .= $buffer;
+
+			if ($expect == self::ZBX_TCP_EXPECT_HEADER) {
+				if (strncmp($response, ZBX_TCP_HEADER, min($response_len, ZBX_TCP_HEADER_LEN)) != 0) {
+					$this->error = _s('Incorrect response received from Zabbix server "%1$s".', $this->host);
+					fclose($this->socket);
+
+					return false;
 				}
 
-				if ($response_len < ZBX_TCP_HEADER_LEN + ZBX_TCP_DATALEN_LEN) {
+				if ($response_len < ZBX_TCP_HEADER_LEN) {
 					continue;
 				}
 
-				if ($expected_len === null) {
-					$expected_len = unpack('Vlen', substr($response, ZBX_TCP_HEADER_LEN, 4))['len'];
-					$expected_len += ZBX_TCP_HEADER_LEN + ZBX_TCP_DATALEN_LEN;
+				$expect = self::ZBX_TCP_EXPECT_DATA;
+			}
 
-					if ($this->totalBytesLimit != 0 && $expected_len >= $this->totalBytesLimit) {
-						$this->error = _s(
-							'Size of the response received from Zabbix server "%1$s" exceeds the allowed size of %2$s bytes. This value can be increased in the ZBX_SOCKET_BYTES_LIMIT constant in include/defines.inc.php.',
-							$this->host, $this->totalBytesLimit
-						);
-						return false;
-					}
-				}
+			if ($response_len < ZBX_TCP_HEADER_LEN + ZBX_TCP_DATALEN_LEN) {
+				continue;
+			}
 
-				if ($response_len >= $expected_len) {
-					break;
+			if ($expected_len === null) {
+				$expected_len = unpack('Vlen', substr($response, ZBX_TCP_HEADER_LEN, 4))['len'];
+				$expected_len += ZBX_TCP_HEADER_LEN + ZBX_TCP_DATALEN_LEN;
+
+				if ($this->totalBytesLimit != 0 && $expected_len >= $this->totalBytesLimit) {
+					$this->error = _s(
+						'Size of the response received from Zabbix server "%1$s" exceeds the allowed size of %2$s bytes. This value can be increased in the ZBX_SOCKET_BYTES_LIMIT constant in include/defines.inc.php.',
+						$this->host, $this->totalBytesLimit
+					);
+					fclose($this->socket);
+
+					return false;
 				}
 			}
-			else {
-				$this->error =
-					_s('Cannot read the response, check connection with the Zabbix server "%1$s".', $this->host);
-				return false;
+
+			if ($response_len >= $expected_len) {
+				break;
 			}
 		}
 
@@ -580,7 +596,7 @@ class CZabbixServer {
 	 *
 	 * @return bool|resource
 	 */
-	protected function connect() {
+	protected function clientConnect() {
 		if (!$this->socket) {
 			if ($this->host === null || $this->port === null) {
 				$this->error = _('Connection to Zabbix server failed. Incorrect configuration.');
