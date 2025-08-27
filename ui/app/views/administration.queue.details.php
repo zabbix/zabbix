@@ -65,8 +65,7 @@ foreach ($data['queue_data'] as $itemid => $item_queue_data) {
 	}
 	else {
 		$proxy =
-			(new CSpan(_('Proxy is not assigned yet.')))
-			->addClass(ZBX_STYLE_GREY);
+			(new CSpan(_('Proxy is not assigned yet.')))->addClass(ZBX_STYLE_GREY);
 	}
 
 	$table->addRow([
