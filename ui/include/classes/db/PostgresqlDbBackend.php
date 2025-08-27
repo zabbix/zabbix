@@ -243,7 +243,7 @@ class PostgresqlDbBackend extends DbBackend {
 		$res = DBfetch(DBselect(
 			'SELECT extversion'.
 			' FROM pg_extension'.
-			' WHERE '.zbx_dbstr('extname', ZBX_DB_EXTENSION_TIMESCALEDB)
+			' WHERE extname='.zbx_dbstr(ZBX_DB_EXTENSION_TIMESCALEDB)
 		));
 
 		$stats_function = version_compare($res['extversion'], '2.18.0', '<')
