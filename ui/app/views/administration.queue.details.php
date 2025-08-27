@@ -43,7 +43,7 @@ $table = (new CTableInfo())->setHeader([
 	_('Delayed by'),
 	_('Host'),
 	_('Name'),
-	_('Proxy'),
+	_('Proxy')
 ]);
 
 foreach ($data['queue_data'] as $itemid => $item_queue_data) {
@@ -53,12 +53,17 @@ foreach ($data['queue_data'] as $itemid => $item_queue_data) {
 
 	$item = $data['items'][$itemid];
 	$host = reset($item['hosts']);
+	$item_host = $data['hosts'][$item['hostid']];
 
-	if (array_key_exists($data['hosts'][$item['hostid']]['proxyid'], $data['proxies'])) {
-		$proxy = $data['proxies'][$data['hosts'][$item['hostid']]['proxyid']]['name'];
-	} else if ($data['hosts'][$item['hostid']]['proxy_groupid']) {
-		$proxy = $data['proxies'][$data['hosts'][$item['hostid']]['assigned_proxyid']]['name'];
-	} else {
+	$proxy = null;
+
+	if (array_key_exists($item_host['proxyid'], $data['proxies'])) {
+		$proxy = $data['proxies'][$item_host['proxyid']];
+	}
+	elseif ($item_host['proxy_groupid'] != 0) {
+		$proxy = $data['proxies'][$item_host['assigned_proxyid']];
+	}
+	else {
 		$proxy =
 			(new CSpan(_('Proxy is not assigned yet.')))
 			->addClass(ZBX_STYLE_GREY);
@@ -69,7 +74,7 @@ foreach ($data['queue_data'] as $itemid => $item_queue_data) {
 		zbx_date2age($item_queue_data['nextcheck']),
 		$host['name'],
 		$item['name'],
-		$proxy
+		$proxy !== null ? $proxy['name'] : (new CSpan(_('Proxy is not assigned yet.')))->addClass(ZBX_STYLE_GREY)
 	]);
 }
 
