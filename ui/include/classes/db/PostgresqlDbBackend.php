@@ -252,13 +252,13 @@ class PostgresqlDbBackend extends DbBackend {
 		$chunk_queries = [];
 
 		foreach ($tables as $table) {
-			$chunk_queries[] = 'SELECT number_compressed_chunks chunks'.
+			$chunk_queries[] = 'SELECT number_compressed_chunks'.
 				' FROM '.$stats_function.'('.zbx_dbstr($table).')'.
 				' WHERE number_compressed_chunks != 0';
 		}
 
 		$result = DBfetch(DBselect(implode(' UNION ', $chunk_queries)));
 
-		return $result && $result['chunks'];
+		return (bool) $result;
 	}
 }
