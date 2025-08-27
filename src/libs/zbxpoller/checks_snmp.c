@@ -598,7 +598,7 @@ void	zbx_init_snmp_engineid_cache(void)
 {
 	zbx_hashset_create(&engineid_cache, 100, snmp_engineid_cache_hash, snmp_engineid_cache_compare);
 	zbx_hashset_create_ext(&identity_cache, 100, snmp_identity_hash, snmp_identity_compare, NULL,
-		ZBX_DEFAULT_MEM_MALLOC_FUNC, ZBX_DEFAULT_MEM_REALLOC_FUNC, ZBX_DEFAULT_MEM_FREE_FUNC);
+			ZBX_DEFAULT_MEM_MALLOC_FUNC, ZBX_DEFAULT_MEM_REALLOC_FUNC, ZBX_DEFAULT_MEM_FREE_FUNC);
 	engineid_cache_initialized = 1;
 }
 
