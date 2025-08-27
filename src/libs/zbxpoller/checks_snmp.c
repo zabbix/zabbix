@@ -399,6 +399,9 @@ static int	zbx_snmp_cache_handle_engineid(netsnmp_session *session, zbx_dc_item_
 	u_int				current_engineboots = 0;
 	int				ret = SUCCEED;
 
+	if (0 == session->securityEngineIDLen)
+		return SUCCEED;
+
 	if (0 == engineid_cache_initialized)
 		return SUCCEED;
 
@@ -3570,6 +3573,9 @@ static int	async_task_process_task_snmp_cb(short event, void *data, int *fd, zbx
 					"zbx_snmp_open_session() failed"));
 			goto stop;
 		}
+
+		if (FAIL == zbx_snmp_cache_handle_engineid(snmp_sess_session(snmp_context->ssp), &snmp_context->item))
+			goto stop;
 	}
 
 	if (SUCCEED != (ret = snmp_bulkwalk_add(snmp_context, fd, error, sizeof(error))))
