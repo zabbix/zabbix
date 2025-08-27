@@ -166,6 +166,15 @@ class testMediatype extends CAPITest {
 					'gsm_modem' => '/dev/ttyS0'
 				]],
 				null
+			],
+			'Update access_token_updated within the appropriate range' => [
+				[[
+					'mediatypeid' => ':media_type:OAuth with tokens',
+					'access_token' => 'token',
+					'access_token_updated' => time() - SEC_PER_MIN,
+					'access_expires_in' => 600
+				]],
+				null
 			]
 		];
 	}
@@ -331,6 +340,22 @@ class testMediatype extends CAPITest {
 					'smtp_authentication' => SMTP_AUTHENTICATION_NONE
 				]],
 				false
+			],
+			'access_token_updated is within the appropriate range' =>
+			[
+				[[
+					'redirection_url' => 'http://example.com',
+					'client_id' => 'clientid',
+					'client_secret' => 'clientsecret',
+					'authorization_url' => 'http://example.com',
+					'token_url' => 'http://example.com',
+					'tokens_status' => OAUTH_REFRESH_TOKEN_VALID,
+					'refresh_token' => 'refreshtoken',
+					'access_token' => 'updated',
+					'access_token_updated' => time() - SEC_PER_MIN,
+					'access_expires_in' => 600
+				]],
+				true
 			]
 		];
 	}
