@@ -753,28 +753,25 @@ static zbx_uint64_t	add_discovered_host(const zbx_db_event *event, int *status, 
 
 					if (host_tls_accept != tls_accepted)
 					{
-						char	psk_identity[HOST_TLS_PSK_IDENTITY_LEN_MAX],
-							psk[HOST_TLS_PSK_LEN_MAX], *esc_psk_identity, *esc_psk;
+						char	*esc_psk_identity = NULL, *esc_psk = NULL;
 
 						if (ZBX_TCP_SEC_TLS_PSK == tls_accepted)
 						{
+							char	psk_identity[HOST_TLS_PSK_IDENTITY_LEN_MAX],
+								psk[HOST_TLS_PSK_LEN_MAX];
+
 							zbx_dc_get_autoregistration_psk(psk_identity,
 									sizeof(psk_identity), (unsigned char *)psk,
 									sizeof(psk));
+							esc_psk_identity = zbx_db_dyn_escape_string(psk_identity);
+							esc_psk = zbx_db_dyn_escape_string(psk);
 						}
-						else
-						{
-							*psk_identity = '\0';
-							*psk = '\0';
-						}
-
-						esc_psk_identity = zbx_db_dyn_escape_string(psk_identity);
-						esc_psk = zbx_db_dyn_escape_string(psk);
 
 						zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "%ctls_connect=%d,"
 								"tls_accept=%d,tls_psk_identity='%s',tls_psk='%s'",
-								delim, tls_accepted, tls_accepted, esc_psk_identity,
-								esc_psk);
+								delim, tls_accepted, tls_accepted,
+								ZBX_NULL2EMPTY_STR(esc_psk_identity),
+								ZBX_NULL2EMPTY_STR(esc_psk));
 
 						zbx_free(esc_psk_identity);
 						zbx_free(esc_psk);
