@@ -2961,7 +2961,7 @@ static int	snmp_bulkwalk_handle_response(int status, struct snmp_pdu *response,
 			}
 
 			if (bulkwalk_context->pdu_type == SNMP_MSG_GET)
-				bulkwalk_context->error_msgget = zbx_strdup(NULL, errmsg);
+				bulkwalk_context->error_msgget = zbx_strdup(bulkwalk_context->error_msgget, errmsg);
 
 			zbx_free(errmsg);
 			bulkwalk_context->running = 0;
@@ -3148,21 +3148,13 @@ static int	snmp_bulkwalk_add(zbx_snmp_context_t *snmp_context, int *fd, char *er
 	int				ret, numfds = 0, block = 0;
 	struct timeval			timeout = {0};
 	fd_set				fdset;
-	netsnmp_session			*session;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() itemid:" ZBX_FS_UI64 " fd:%d", __func__, snmp_context->item.itemid, *fd);
 
-	session = snmp_sess_session(snmp_context->ssp);
-
-	if (1 == snmp_context->probe && 0 != session->securityEngineIDLen)
-	{
-		snmp_context->probe = 0;
-		zabbix_log(LOG_LEVEL_DEBUG, "itemid:" ZBX_FS_UI64 " EngineID already discovered, skipping probe",
-				snmp_context->item.itemid);
-	}
-
 	if (1 == snmp_context->probe)
 	{
+		netsnmp_session	*session = snmp_sess_session(snmp_context->ssp);
+
 		session->flags |= SNMP_FLAGS_DONT_PROBE;
 
 		if (NULL == (pdu = usm_probe_pdu_create()))
@@ -3360,6 +3352,20 @@ static int	async_task_process_task_snmp_cb(short event, void *data, int *fd, zbx
 
 				evtimer_add(timeout_event, &tv);
 
+				if (ZBX_IF_SNMP_VERSION_3 == snmp_context->snmp_version &&
+						0 == snmp_context->probe_processed && 0 == snmp_context->probe)
+				{
+					snmp_context->probe = 1;
+
+					snmp_sess_close(snmp_context->ssp);
+
+					if (1 == engineid_cache_initialized)
+						snmp_identity_remove(addresses->values[0].ip);
+
+					return async_task_process_task_snmp_cb(0, data, fd, addresses, reverse_dns,
+							dnserr, timeout_event);
+
+				}
 				task_ret = ZBX_ASYNC_TASK_READ;
 				goto stop;
 			}
@@ -3544,6 +3550,9 @@ static int	async_task_process_task_snmp_cb(short event, void *data, int *fd, zbx
 			{
 				securityEngineID = identity_ptr->engineid;
 				securityEngineIDLen = identity_ptr->engineid_len;
+				snmp_context->probe = 0;
+				zabbix_log(LOG_LEVEL_DEBUG, "itemid:" ZBX_FS_UI64 " EngineID already discovered,"
+						" skipping probe", snmp_context->item.itemid);
 			}
 		}
 
