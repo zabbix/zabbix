@@ -170,7 +170,7 @@ static void	DCdump_autoreg_hosts(void)
 	while (NULL != (autoreg_host = (ZBX_DC_AUTOREG_HOST *)zbx_hashset_iter_next(&iter)))
 	{
 		zabbix_log(LOG_LEVEL_TRACE, " host:'%s' listen_ip:'%s' listen_dns:'%s' host_metadata:'%s' flags:%d"
-				" timestamp:%d listen_port:%u connection_type:%d",
+				" timestamp:%d listen_port:%u connection_type:%u",
 				autoreg_host->host, autoreg_host->listen_ip, autoreg_host->listen_dns,
 				autoreg_host->host_metadata, autoreg_host->flags, autoreg_host->timestamp,
 				autoreg_host->listen_port, autoreg_host->connection_type);
