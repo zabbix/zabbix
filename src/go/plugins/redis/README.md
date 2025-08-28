@@ -25,6 +25,19 @@ The Zabbix Agent's configuration file is used to configure plugins.
 *Default value:* equals the global Timeout configuration parameter.  
 *Limits:* 1-30
 
+**Plugins.Mysql.Sessions.TLSConnect** — Encryption type for the MySQL connection.  
+*Default value:*  
+*Limits:* `required`, `verify_ca`, `verify_full`
+
+**Plugins.Mysql.Sessions.TLSCAFile** — Full pathname of a file containing the top-level CA certificates for MySQL.  
+*Default value:*
+
+**Plugins.Mysql.Sessions.TLSCertFile** — Full pathname of a file containing the MySQL certificate or certificate chain.  
+*Default value:*
+
+**Plugins.Mysql.Sessions.TLSKeyFile** — Full pathname of a file containing the MySQL private key.  
+*Default value:*
+
 ### Configuring connection
 A connection can be configured using either keys' parameters or named sessions.     
 
@@ -61,16 +74,24 @@ Named sessions allow you to define specific parameters for each Redis instance. 
 supported parameters: Uri, Password and User. It's a bit more secure way to store credentials compared to item keys or
 macros.  
 
-E.g: suppose you have two Redis instances: "Prod" and "Test". 
+E.g: suppose you have two Redis instances: "Prod" and "Test" and server is configured to authenticate clients.
 You should add the following options to the agent configuration file:   
 
     Plugins.Redis.Sessions.Prod.Uri=tcp://192.168.1.1:6379  
     Plugins.Redis.Sessions.Prod.Password=<PasswordForProd>  
     Plugins.Redis.Sessions.Prod.User=<UserForProd>
+    Plugins.Redis.Sessions.Prod.TLSConnect=verify_full
+    Plugins.Redis.Sessions.Prod.TLSCAFile=/path/to/ca_file
+    Plugins.Redis.Sessions.Prod.TLSCertFile=/path/to/cert_file
+    Plugins.Redis.Sessions.Prod.TLSKeyFile=/path/to/key_file
 
     Plugins.Redis.Sessions.Test.Uri=tcp://192.168.0.1:6379   
     Plugins.Redis.Sessions.Test.Password=<PasswordForTest>  
     Plugins.Redis.Sessions.Test.User=<UserForTest>
+    Plugins.Redis.Sessions.Test.TLSConnect=verify_ca
+    Plugins.Redis.Sessions.Test.TLSCAFile=/path/to/test/ca_file
+    Plugins.Redis.Sessions.Test.TLSCertFile=/path/to/test/cert_file
+    Plugins.Redis.Sessions.Test.TLSKeyFile=/path/to/test/key_file
 
 Then you will be able to use these names as the 1st parameter (ConnString) in keys instead of URIs, e.g:
 
