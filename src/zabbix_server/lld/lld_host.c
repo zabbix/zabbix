@@ -5897,6 +5897,7 @@ static void	lld_interfaces_validate(zbx_vector_lld_host_ptr_t *hosts, char **err
 				{
 					lld_interface_free(interface);
 					zbx_vector_lld_interface_ptr_remove(&host->interfaces, j);
+					continue;
 				}
 			}
 
