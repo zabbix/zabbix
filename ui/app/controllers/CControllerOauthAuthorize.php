@@ -112,7 +112,7 @@ class CControllerOauthAuthorize extends CController {
 	 *
 	 * @param array $oauth  OAuth data to be sent.
 	 *
-	 * @return array of 'tokens_status', 'access_token', 'access_expires_in' and 'refresh_token' or empty array son error.
+	 * @return array of 'tokens_status', 'access_token', 'access_expires_in' and 'refresh_token' or empty array on error.
 	 */
 	protected function exchangeCodeToTokens(string $token_url, array $data): array {
 		$handle = curl_init();
