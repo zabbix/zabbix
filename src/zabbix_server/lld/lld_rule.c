@@ -354,11 +354,10 @@ void	lld_rule_get_exported_macros(zbx_uint64_t ruleid, zbx_vector_lld_macro_t *m
 
 /******************************************************************************
  *                                                                            *
- * Purpose: Updates existing lld rule macro paths and creates new ones based  *
- *          on rule prototypes.                                               *
+ * Purpose: updates existing LLD rule macro paths and creates new ones based  *
+ *          on rule prototypes                                                *
  *                                                                            *
- * Parameters: item_prototypes - [IN]                                         *
- *             items           - [IN/OUT] sorted list of items                *
+ * Parameters: items - [IN/OUT] sorted list of items                          *
  *                                                                            *
  ******************************************************************************/
 void	lld_rule_macro_paths_make(zbx_vector_lld_item_full_ptr_t *items)
