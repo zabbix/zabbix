@@ -346,7 +346,9 @@ class testFormServicesServices extends CWebTest {
 					'fields' => [
 						'Name' => ''
 					],
-					'error' => 'Incorrect value for field "name": cannot be empty.'
+					'inline_errors' => [
+						'Name' => 'This field cannot be empty.'
+					]
 				]
 			],
 			[
@@ -356,7 +358,9 @@ class testFormServicesServices extends CWebTest {
 						'Name' => 'Letters in sort order',
 						'Sort order (0->999)' => 'zab'
 					],
-					'error' => 'Incorrect value "zab" for "sortorder" field.'
+					'inline_errors' => [
+						'Sort order (0->999)' => 'This value is not a valid integer.'
+					]
 				]
 			],
 			[
@@ -366,7 +370,9 @@ class testFormServicesServices extends CWebTest {
 						'Name' => 'Negative sort order',
 						'Sort order (0->999)' => '-1'
 					],
-					'error' => 'Incorrect value for field "sortorder": value must be no less than "0".'
+					'inline_errors' => [
+						'Sort order (0->999)' => 'This value must be within range 0:999.'
+					]
 				]
 			],
 			[
@@ -376,7 +382,9 @@ class testFormServicesServices extends CWebTest {
 						'Name' => 'Empty sort order',
 						'Sort order (0->999)' => ''
 					],
-					'error' => 'Incorrect value "" for "sortorder" field.'
+					'inline_errors' => [
+						'Sort order (0->999)' => 'This value is not a valid integer.'
+					]
 				]
 			],
 			[
@@ -387,7 +395,9 @@ class testFormServicesServices extends CWebTest {
 						'Advanced configuration' => true,
 						'Weight' => 'abc'
 					],
-					'error' => 'Incorrect value "abc" for "weight" field.'
+					'inline_errors' => [
+						'Weight' => 'This value is not a valid integer.'
+					]
 				]
 			],
 			[
@@ -398,7 +408,9 @@ class testFormServicesServices extends CWebTest {
 						'Advanced configuration' => true,
 						'Weight' => '-2'
 					],
-					'error' => 'Incorrect value for field "weight": value must be no less than "0".'
+					'inline_errors' => [
+						'Weight' => 'This value must be within range 0:1000000.'
+					]
 				]
 			],
 			[
@@ -409,7 +421,9 @@ class testFormServicesServices extends CWebTest {
 						'Advanced configuration' => true,
 						'Weight' => '9999999'
 					],
-					'error' => 'Incorrect value for field "weight": value must be no greater than "1000000".'
+					'inline_errors' => [
+						'Weight' => 'This value must be within range 0:1000000.'
+					]
 				]
 			],
 			[
@@ -427,7 +441,9 @@ class testFormServicesServices extends CWebTest {
 							'Status' => 'Average'
 						]
 					],
-					'error' => 'Incorrect value "two" for "limit_value" field.'
+					'inline_errors' => [
+						'name:limit_value' => 'This value is not a valid integer.'
+					]
 				]
 			],
 			[
@@ -445,7 +461,9 @@ class testFormServicesServices extends CWebTest {
 							'Status' => 'High'
 						]
 					],
-					'error' => 'Incorrect value for field "limit_value": value must be no less than "1".'
+					'inline_errors' => [
+						'name:limit_value' => 'This value must be no less than "1".'
+					]
 				]
 			],
 			[
@@ -463,7 +481,9 @@ class testFormServicesServices extends CWebTest {
 							'Status' => 'Disaster'
 						]
 					],
-					'error' => 'Incorrect value for field "N": value must be no greater than "100".'
+					'inline_errors' => [
+						'name:limit_value' => 'This value must be no greater than "100".'
+					]
 				]
 			],
 			[
@@ -481,7 +501,9 @@ class testFormServicesServices extends CWebTest {
 							'Status' => 'Not classified'
 						]
 					],
-					'error' => 'Incorrect value for field "limit_value": value must be no less than "1".'
+					'inline_errors' => [
+						'name:limit_value' => 'This value must be no less than "1".'
+					]
 				]
 			],
 			[
@@ -658,7 +680,9 @@ class testFormServicesServices extends CWebTest {
 							'Status' => 'High'
 						]
 					],
-					'error' => 'Incorrect value "five" for "limit_value" field.'
+					'inline_errors' => [
+						'name:limit_value' => 'This value is not a valid integer.'
+					]
 				]
 			],
 			[
@@ -677,7 +701,9 @@ class testFormServicesServices extends CWebTest {
 							'Status' => 'High'
 						]
 					],
-					'error' => 'Incorrect value for field "limit_value": value must be no less than "1".'
+					'inline_errors' => [
+						'name:limit_value' => 'This value must be no less than "1".'
+					]
 				]
 			],
 			[
@@ -696,7 +722,9 @@ class testFormServicesServices extends CWebTest {
 							'Status' => 'Disaster'
 						]
 					],
-					'error' => 'Incorrect value for field "N": value must be no greater than "100".'
+					'inline_errors' => [
+						'name:limit_value' => 'This value must be no greater than "100".'
+					]
 				]
 			],
 			[
@@ -715,7 +743,9 @@ class testFormServicesServices extends CWebTest {
 							'Status' => 'Not classified'
 						]
 					],
-					'error' => 'Incorrect value for field "limit_value": value must be no less than "1".'
+					'inline_errors' => [
+						'name:limit_value' => 'This value must be no less than "1".'
+					]
 				]
 			],
 			[
@@ -814,7 +844,7 @@ class testFormServicesServices extends CWebTest {
 			$rules_form->submit();
 
 			if ($expected === TEST_BAD) {
-				$this->assertMessage(TEST_BAD, null, $data['error']);
+				$this->assertInlineError($rules_form, $data['inline_errors']);
 				$rules_dialog->close();
 				$dialog->close();
 
@@ -840,7 +870,7 @@ class testFormServicesServices extends CWebTest {
 		$this->page->waitUntilReady();
 
 		if ($expected === TEST_BAD) {
-			$this->assertMessage(TEST_BAD, null, $data['error']);
+			$this->assertInlineError($form, $data['inline_errors']);
 			$this->assertEquals($old_hash, CDBHelper::getHash(self::$service_sql));
 			$dialog->close();
 		}
