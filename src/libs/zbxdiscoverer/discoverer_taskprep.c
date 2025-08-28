@@ -68,7 +68,9 @@ static zbx_ds_dcheck_t	*dcheck_clone_get(zbx_dc_dcheck_t *dcheck, zbx_vector_ds_
 	if (SVC_SNMPv1 == dcheck_ptr->type || SVC_SNMPv2c == dcheck_ptr->type ||
 			SVC_SNMPv3 == dcheck_ptr->type)
 	{
-		zbx_substitute_simple_macros_unmasked(NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL,
+		zbx_dc_um_handle_t	*um_handle = zbx_dc_open_user_macros_secure();
+
+		zbx_substitute_simple_macros(NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL,
 				NULL, NULL, NULL, NULL, &dcheck_ptr->snmp_community,
 				ZBX_MACRO_TYPE_COMMON, NULL, 0);
 		zbx_substitute_key_macros(&dcheck_ptr->key_, NULL, NULL, NULL, NULL,
@@ -76,23 +78,25 @@ static zbx_ds_dcheck_t	*dcheck_clone_get(zbx_dc_dcheck_t *dcheck, zbx_vector_ds_
 
 		if (SVC_SNMPv3 == dcheck_ptr->type)
 		{
-			zbx_substitute_simple_macros_unmasked(NULL, NULL, NULL, NULL, NULL, NULL,
+			zbx_substitute_simple_macros(NULL, NULL, NULL, NULL, NULL, NULL,
 					NULL, NULL, NULL, NULL, NULL, NULL,
 					&dcheck_ptr->snmpv3_securityname, ZBX_MACRO_TYPE_COMMON, NULL,
 					0);
-			zbx_substitute_simple_macros_unmasked(NULL, NULL, NULL, NULL, NULL, NULL,
+			zbx_substitute_simple_macros(NULL, NULL, NULL, NULL, NULL, NULL,
 					NULL, NULL, NULL, NULL, NULL, NULL,
 					&dcheck_ptr->snmpv3_authpassphrase, ZBX_MACRO_TYPE_COMMON, NULL,
 					0);
-			zbx_substitute_simple_macros_unmasked(NULL, NULL, NULL, NULL, NULL, NULL,
+			zbx_substitute_simple_macros(NULL, NULL, NULL, NULL, NULL, NULL,
 					NULL, NULL, NULL, NULL, NULL, NULL,
 					&dcheck_ptr->snmpv3_privpassphrase, ZBX_MACRO_TYPE_COMMON, NULL,
 					0);
-			zbx_substitute_simple_macros_unmasked(NULL, NULL, NULL, NULL, NULL, NULL,
+			zbx_substitute_simple_macros(NULL, NULL, NULL, NULL, NULL, NULL,
 					NULL, NULL, NULL, NULL, NULL, NULL,
 					&dcheck_ptr->snmpv3_contextname, ZBX_MACRO_TYPE_COMMON, NULL,
 					0);
 		}
+
+		zbx_dc_close_user_macros(um_handle);
 	}
 
 	zbx_vector_ds_dcheck_ptr_append(ds_dchecks_common, ds_dcheck);
@@ -173,6 +177,7 @@ static zbx_uint64_t	process_checks(const zbx_dc_drule_t *drule, int unique, zbx_
 		}
 
 		ds_dcheck_common = dcheck_clone_get(dcheck, ds_dchecks_common);
+
 		checks_count += process_check_range(drule, ds_dcheck_common, ipranges, tasks);
 	}
 

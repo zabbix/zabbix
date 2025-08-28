@@ -360,6 +360,7 @@ class testPageNetworkDiscovery extends CWebTest {
 		// Filling fields with needed discovery rules information.
 		$form->fill(['id:filter_name' => 'External network']);
 		$form->submit();
+		$table->waitUntilReloaded();
 		$this->page->waitUntilReady();
 
 		// Check that filtered count matches expected.

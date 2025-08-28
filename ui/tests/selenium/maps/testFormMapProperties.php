@@ -386,8 +386,8 @@ class testFormMapProperties extends CLegacyWebTest {
 		$this->getTable()->findRow('Name', $map['name'])->getColumn('Actions')->query('link:Properties')->one()->click();
 		$this->page->assertHeader('Network maps');
 		$this->query('button:Update')->one()->click()->waitUntilStalled();
-		$this->page->waitUntilReady();
 		$this->assertMessage(TEST_GOOD, 'Network map updated');
+		$this->page->waitUntilReady();
 		$this->page->assertHeader('Maps');
 
 		$hash_data = [

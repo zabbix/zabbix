@@ -713,7 +713,6 @@ class testPageHostGraph extends CLegacyWebTest {
 
 		$table = $this->query('class:list-table')->one();
 		$filter = $this->query('name:zbx_filter')->asForm()->one();
-		$table = $this->query('xpath://table[@class="list-table"]')->asTable()->one();
 		if (array_key_exists('group', $data)) {
 			if ($data['group'] === 'all') {
 				$filter->getField($group_field)->clear();

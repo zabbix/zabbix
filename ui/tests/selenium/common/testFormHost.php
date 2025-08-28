@@ -1998,6 +1998,7 @@ class testFormHost extends CWebTest {
 			}
 			else {
 				$button->waitUntilNotVisible();
+				$form->waitUntilStalled();
 			}
 		}
 
@@ -2005,7 +2006,7 @@ class testFormHost extends CWebTest {
 
 		// Check that the host creation page is open after cloning.
 		if ($data['action'] === 'Clone') {
-			$form_type->waitUntilStalled()->invalidate();
+			$form_type->invalidate();
 			$id = CDBHelper::getValue('SELECT hostid FROM hosts WHERE host='.zbx_dbstr($host));
 			$expected_url = PHPUNIT_URL.'zabbix.php?action=host.edit&hostid='.$id.'&clone=1';
 

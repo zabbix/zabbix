@@ -223,7 +223,7 @@ foreach ($data['items'] as $item) {
 			$status,
 			$disabled_by_lld ? makeDescriptionIcon(_('Disabled automatically by an LLD rule.')) : null
 		]))->addClass(ZBX_STYLE_NOWRAP),
-		$data['tags'][$item['itemid']],
+		(new CDiv($data['tags'][$item['itemid']]))->addClass(ZBX_STYLE_TAGS_WRAPPER),
 		$info_cell
 	];
 

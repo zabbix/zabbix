@@ -234,9 +234,6 @@ class testDashboardGraphPrototypeWidget extends testWidgets {
 		$form->fill(['Type' => CFormElement::RELOADABLE_FILL('Graph prototype')]);
 		$this->page->removeFocus();
 		$dialog = COverlayDialogElement::find()->waitUntilReady()->one();
-		// TODO: unstable screenshot on Jenkins. Remove border-radius from "Dynamic item" checkbox to stabilize the test.
-		$this->page->getDriver()->executeScript('arguments[0].style.borderRadius=0;',
-				[$dialog->query('xpath:.//input[@id="dynamic"]/following-sibling::label/span')->one()]);
 		$this->assertScreenshot($dialog);
 		$dialog->close();
 	}

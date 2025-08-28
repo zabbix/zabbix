@@ -857,8 +857,8 @@ static void	save_template_item(zbx_uint64_t hostid, zbx_uint64_t *itemid, zbx_te
 														\
 			zbx_audit_item_update_json_update_##field(audit_context_mode, item->itemid,		\
 					item->flags, (0 == strcmp("", item->field##_orig) ? "" :		\
-					ZBX_MACRO_SECRET_MASK), (0 == strcmp("", item->field) ? "" :		\
-					ZBX_MACRO_SECRET_MASK));						\
+					ZBX_SECRET_MASK), (0 == strcmp("", item->field) ? "" :		\
+					ZBX_SECRET_MASK));						\
 		}												\
 
 #define PREPARE_UPDATE_UC(FLAG_POSTFIX, field)				\

@@ -107,7 +107,7 @@ foreach ($data['hosts'] as $hostid => $host) {
 		[$host_name, $maintenance_icon],
 		(new CCol(getHostInterface($interface)))->addClass(ZBX_STYLE_NOWRAP),
 		getHostAvailabilityTable($host['interfaces']),
-		$host['tags'],
+		(new CDiv($host['tags']))->addClass(ZBX_STYLE_TAGS_WRAPPER),
 		$host['status'] == HOST_STATUS_MONITORED
 			? (new CSpan(_('Enabled')))->addClass(ZBX_STYLE_GREEN)
 			: (new CSpan(_('Disabled')))->addClass(ZBX_STYLE_RED),

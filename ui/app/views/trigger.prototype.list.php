@@ -158,7 +158,7 @@ foreach ($data['triggers'] as $trigger) {
 		(new CDiv($expression))->addClass(ZBX_STYLE_WORDBREAK),
 		$status,
 		$discover,
-		$data['tags'][$triggerid]
+		(new CDiv($data['tags'][$triggerid]))->addClass(ZBX_STYLE_TAGS_WRAPPER)
 	]);
 }
 
