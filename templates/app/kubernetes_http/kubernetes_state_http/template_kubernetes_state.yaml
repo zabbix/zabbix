@@ -4065,7 +4065,7 @@ zabbix_export:
                 text: HTTP
         - macro: '{$KUBE.STATE.ENDPOINT.NAME}'
           value: zabbix-kube-state-metrics
-          description: 'Kubernetes state endpoint name. Get the endpoint name `kubectl get ep -A -owide`.'
+          description: 'Endpoint name for kube-state-metrics service (check with `kubectl get ep -n monitoring -owide`).'
           config:
             type: TEXT
             priority: '7'
