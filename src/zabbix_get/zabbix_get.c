@@ -176,8 +176,6 @@ static const char	*help_message[] = {
 
 static zbx_config_tls_t	*zbx_config_tls = NULL;
 
-int	CONFIG_TCP_MAX_BACKLOG_SIZE	= SOMAXCONN;
-
 /* COMMAND LINE OPTIONS */
 
 /* long options */
