@@ -5891,13 +5891,13 @@ static void	lld_interfaces_validate(zbx_vector_lld_host_ptr_t *hosts, char **err
 		{
 			interface = host->interfaces.values[j];
 
-			if (0 != (interface->flags & ZBX_FLAG_LLD_INTERFACE_REMOVE))
-				continue;
-
-			if (FAIL == lld_interface_validate_fields(interface, host->host, error))
+			if (0 == (interface->flags & ZBX_FLAG_LLD_INTERFACE_REMOVE))
 			{
-				lld_interface_free(interface);
-				zbx_vector_lld_interface_ptr_remove(&host->interfaces, j);
+				if (FAIL == lld_interface_validate_fields(interface, host->host, error))
+				{
+					lld_interface_free(interface);
+					zbx_vector_lld_interface_ptr_remove(&host->interfaces, j);
+				}
 			}
 
 			j++;
