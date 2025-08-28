@@ -246,23 +246,7 @@ class CFormValidator {
 						break;
 
 					case 'api_uniq':
-						if (!is_array($value) || !array_key_exists(0, $value)) {
-							throw new Exception('[RULES ERROR] Rule "'.$key.'" should contain non-empty array (Path: '.$rule_path.')');
-						}
-
-						if (!is_array($value[0])) {
-							$value = [$value];
-						}
-
-						foreach ($value as &$api_uniq_check) {
-							if (count(explode('.', $api_uniq_check[0])) !== 2) {
-								throw new Exception('[RULES ERROR] Rule "'.$key.'" should contain a valid API call (Path: '.$rule_path.', API call:'.$api_uniq_check[0].')');
-							}
-							$api_uniq_check += [1 => [], 2 => null, 3 => null];
-						}
-						unset($api_uniq_check);
-
-						$result[$key] = $value;
+						$result[$key] = self::normalizeApiUniqRule($value, $rule_path);
 						break;
 
 					case 'regex':
@@ -513,6 +497,26 @@ class CFormValidator {
 		}
 
 		return $result;
+	}
+
+	private static function normalizeApiUniqRule(array $value, string $rule_path): array {
+		if (!is_array($value) || !array_key_exists(0, $value)) {
+			throw new Exception('[RULES ERROR] Rule "api_uniq" should contain non-empty array (Path: '.$rule_path.')');
+		}
+
+		if (!is_array($value[0])) {
+			$value = [$value];
+		}
+
+		foreach ($value as &$api_uniq_check) {
+			if (count(explode('.', $api_uniq_check[0])) !== 2) {
+				throw new Exception('[RULES ERROR] Rule "api_uniq" should contain a valid API call (Path: '.$rule_path.', API call:'.$api_uniq_check[0].')');
+			}
+			$api_uniq_check += [1 => [], 2 => null, 3 => null];
+		}
+		unset($api_uniq_check);
+
+		return $value;
 	}
 
 	/**
