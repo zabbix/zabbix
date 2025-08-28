@@ -1,3 +1,7 @@
+$line-height: 14px;
+$max-short-lines: 2;
+$threshold: $line-height * $max-short-lines;
+
 output {
 	position: relative;
 	box-sizing: border-box;
@@ -11,6 +15,10 @@ output {
 	border-style: solid;
 	border-width: 2px 2px 2px 60px;
 	border-radius: 4px;
+
+	&:has(.link-action) {
+		align-items: start;
+	}
 
 	&::before {
 		@extend %icons-font;
@@ -75,13 +83,21 @@ output {
 		}
 
 		.link-action {
-			line-height: 14px;
+			line-height: $line-height;
 
 			.arrow-down,
 			.arrow-up {
 				margin-left: 3px;
 				pointer-events: none;
 			}
+		}
+
+		.link-action,
+		.link-action + span {
+			display: flex;
+			align-items: center;
+			justify-content: flex-start;
+			padding-top: calc((#{$threshold} - #{$line-height}) / 2);
 		}
 
 		.msg-buttons,

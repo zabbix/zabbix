@@ -2865,6 +2865,8 @@ output {
   border-style: solid;
   border-width: 2px 2px 2px 60px;
   border-radius: 4px; }
+  output:has(.link-action) {
+    align-items: start; }
   output::before {
     position: absolute;
     top: 6px;
@@ -2904,6 +2906,12 @@ output {
       output.collapsible .link-action .arrow-up {
         margin-left: 3px;
         pointer-events: none; }
+    output.collapsible .link-action,
+    output.collapsible .link-action + span {
+      display: flex;
+      align-items: center;
+      justify-content: flex-start;
+      padding-top: calc((28px - 14px) / 2); }
     output.collapsible .msg-buttons,
     output.collapsible .msg-details {
       grid-column: 1 / -1; }
