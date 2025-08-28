@@ -372,7 +372,7 @@ class CFormValidator {
 			rule_set.api_uniq.forEach(api_uniq => {
 				const [method, api_params, id_field, error_msg] = api_uniq;
 				const referenced_fields = [];
-				const parameters = {};
+				const parameters = {filter: {}};
 				let exclude_id = null;
 
 				if (id_field !== null) {
@@ -380,7 +380,7 @@ class CFormValidator {
 					exclude_id = getFieldDataByPath(id_field_path);
 				}
 
-				Object.entries(api_params).forEach(([api_field, value]) => {
+				Object.entries(api_params.filter).forEach(([api_field, value]) => {
 					value = String(value);
 
 					if (value.startsWith('{') && value.endsWith('}')) {
@@ -389,10 +389,10 @@ class CFormValidator {
 						const param_data = getFieldDataByPath(param_field_path);
 
 						referenced_fields.push(param_field_path);
-						parameters[api_field] = param_data;
+						parameters.filter[api_field] = param_data;
 					}
 					else {
-						parameters[api_field] = value;
+						parameters.filter[api_field] = value;
 					}
 				});
 
@@ -537,7 +537,7 @@ class CFormValidator {
 			return {
 				api,
 				method: api_method,
-				options: {filter: parameters},
+				options: parameters,
 				exclude_id,
 				field: check.fields[0],
 				error_msg: check.error_msg

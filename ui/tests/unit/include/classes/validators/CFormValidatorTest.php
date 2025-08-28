@@ -670,7 +670,7 @@ class CFormValidatorTest extends TestCase {
 				],
 				['type' => 'object',
 					'api_uniq' => [
-						['host.get', [], [], []]
+						['host.get', ['filter' => []], [], []]
 					],
 					'fields' => [
 						'ip' => [['type' => 'string', 'messages' => [
@@ -690,7 +690,7 @@ class CFormValidatorTest extends TestCase {
 				],
 				['type' => 'object',
 					'api_uniq' => [
-						['host.get', ['host' => '{host}'], null, null]
+						['host.get', ['filter' => ['host' => '{host}']], null, null]
 					],
 					'fields' => [
 						'ip' => [['type' => 'string', 'messages' => [
@@ -710,8 +710,8 @@ class CFormValidatorTest extends TestCase {
 				],
 				['type' => 'object',
 					'api_uniq' => [
-						['host.get', [], null, null],
-						['host.get', [], null, null]
+						['host.get', ['filter' => []], null, null],
+						['host.get', ['filter' => []], null, null]
 					],
 					'fields' => [
 						'ip' => [['type' => 'string', 'messages' => [
