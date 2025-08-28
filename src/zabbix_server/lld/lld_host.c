@@ -5721,7 +5721,7 @@ static int	lld_interface_validate_fields(const zbx_lld_interface_t *interface, c
 
 	op = (0 == interface->interfaceid ? "create" : "update");
 
-	if (ZBX_INTERFACE_PORT_LEN_MAX < zbx_utf8_char_len(interface->port))
+	if (ZBX_INTERFACE_PORT_LEN < zbx_strlen_utf8(interface->port))
 	{
 		*error = zbx_strdcatf(*error, "Cannot %s \"%s\" interface on host \"%s\": "
 				"Port is too long.\n",
@@ -5730,7 +5730,8 @@ static int	lld_interface_validate_fields(const zbx_lld_interface_t *interface, c
 
 		return FAIL;
 	}
-	else if (NULL != interface->port && '\0' == *interface->port)
+
+	if (NULL != interface->port && '\0' == *interface->port)
 	{
 		*error = zbx_strdcatf(*error, "Cannot %s \"%s\" interface on host \"%s\": "
 				"Port cannot be empty.\n",
@@ -5739,53 +5740,70 @@ static int	lld_interface_validate_fields(const zbx_lld_interface_t *interface, c
 
 		return FAIL;
 	}
-	else
-	{
-		unsigned short	port_n;
 
-		if (0 != strncmp(interface->port, "{$", ZBX_CONST_STRLEN("{$")) &&
-				FAIL == zbx_is_ushort(interface->port, &port_n))
+	unsigned short	port_n;
+
+	if (FAIL == zbx_is_ushort(interface->port, &port_n) && FAIL == zbx_is_user_macro(interface->port))
+	{
+		*error = zbx_strdcatf(*error, "Cannot %s \"%s\" interface on host \"%s\": "
+				"Invalid port value.\n",
+				op, zbx_interface_type_string(interface->type_orig),
+				hostname);
+
+		return FAIL;
+	}
+
+	if (0 == interface->useip)
+	{
+		if (NULL == interface->dns || '\0' == *interface->dns)
 		{
 			*error = zbx_strdcatf(*error, "Cannot %s \"%s\" interface on host \"%s\": "
-					"Value of port must be one of 0-65535.\n",
+					"DNS name cannot be empty.\n",
+					op, zbx_interface_type_string(interface->type_orig),
+					hostname);
+
+			return FAIL;
+		}
+
+		if (ZBX_INTERFACE_DNS_LEN < zbx_strlen_utf8(interface->dns))
+		{
+			*error = zbx_strdcatf(*error, "Cannot %s \"%s\" interface on host \"%s\": "
+					"DNS name is too long.\n",
 					op, zbx_interface_type_string(interface->type_orig),
 					hostname);
 
 			return FAIL;
 		}
 	}
-
-	if (0 == interface->useip)
+	else
 	{
-		if (NULL != interface->dns)
+		if (NULL == interface->ip || '\0' == *interface->ip)
 		{
-			if ('\0' == *interface->dns)
-			{
-				*error = zbx_strdcatf(*error, "Cannot %s \"%s\" interface on host \"%s\": "
-						"DNS cannot be empty.\n",
-						op, zbx_interface_type_string(interface->type_orig),
-						hostname);
+			*error = zbx_strdcatf(*error, "Cannot %s \"%s\" interface on host \"%s\": "
+					"IP address cannot be empty.\n",
+					op, zbx_interface_type_string(interface->type_orig),
+					hostname);
 
-				return FAIL;
-			}
-
-			if (ZBX_INTERFACE_DNS_LEN_MAX < zbx_utf8_char_len(interface->dns))
-			{
-				*error = zbx_strdcatf(*error, "Cannot %s \"%s\" interface on host \"%s\": "
-						"DNS is too long.\n",
-						op, zbx_interface_type_string(interface->type_orig),
-						hostname);
-
-				return FAIL;
-			}
+			return FAIL;
 		}
-	}
-	else if (SUCCEED != zbx_is_ip(interface->ip))
-	{
-		*error = zbx_strdcatf(*error, "Cannot %s \"%s\" interface on host \"%s\": "
-				"IP Address is not valid.\n",
+
+		if (ZBX_INTERFACE_IP_LEN < zbx_strlen_utf8(interface->ip))
+		{
+			*error = zbx_strdcatf(*error, "Cannot %s \"%s\" interface on host \"%s\": "
+					"IP address is too long.\n",
+					op, zbx_interface_type_string(interface->type_orig),
+					hostname);
+
+			return FAIL;
+		}
+
+		if (SUCCEED != zbx_is_ip(interface->ip) && SUCCEED != zbx_is_user_macro(interface->ip))
+		{
+			*error = zbx_strdcatf(*error, "Cannot %s \"%s\" interface on host \"%s\": "
+				"Invalid IP Address.\n",
 				op, zbx_interface_type_string(interface->type_orig),
 				hostname);
+		}
 
 		return FAIL;
 	}
