@@ -31,16 +31,22 @@ class CControllerProxyCreate extends CController {
 
 		return ['object', 'api_uniq' => $api_uniq, 'fields' => [
 			'name' => ['db proxy.name', 'required', 'not_empty', 'regex' => '/^'.ZBX_PREG_HOST_FORMAT.'$/',
-				'messages' => ['regex' => _('Incorrect characters used for proxy name.')]],
+				'messages' => ['regex' => _('Incorrect characters used for proxy name.')]
+			],
 			'proxy_groupid' => ['db proxy.proxy_groupid'],
-			'operating_mode' => ['db proxy.operating_mode', 'required', 'in' => [PROXY_OPERATING_MODE_ACTIVE, PROXY_OPERATING_MODE_PASSIVE]],
+			'operating_mode' => ['db proxy.operating_mode', 'required',
+				'in' => [PROXY_OPERATING_MODE_ACTIVE, PROXY_OPERATING_MODE_PASSIVE]
+			],
 			'address' => [
-				['db proxy.address', 'use' => [CIPParser::class, [
-					'usermacros' => false, 'lldmacros' => false, 'macros' => true, 'v6' => ZBX_HAVE_IPV6
-				]],
+				['db proxy.address',
+					'use' => [CIPParser::class, [
+						'usermacros' => false, 'lldmacros' => false, 'macros' => true, 'v6' => ZBX_HAVE_IPV6
+					]],
 					'messages' => ['use' => _('Invalid address.')]
 				],
-				['db proxy.address', 'required', 'not_empty', 'when' => ['operating_mode', 'in' => [PROXY_OPERATING_MODE_PASSIVE]]]
+				['db proxy.address', 'required', 'not_empty',
+					'when' => ['operating_mode', 'in' => [PROXY_OPERATING_MODE_PASSIVE]]
+				]
 			],
 			'port' => ['db proxy.port', 'required', 'not_empty',
 				'use' => [CPortParser::class, ['usermacros' => true]], 'messages' => ['use' => _('Incorrect port.')],
@@ -56,18 +62,28 @@ class CControllerProxyCreate extends CController {
 				'when' => ['proxy_groupid', 'not_empty']
 			],
 			'allowed_addresses' => ['db proxy.allowed_addresses',
-				'use' => [CIPRangeParser::class, ['v6' => ZBX_HAVE_IPV6, 'dns' => true, 'usermacros' => true, 'macros' => false], 'messages' => ['use' => _('Invalid address.')]],
+				'use' => [CIPRangeParser::class, [
+					'v6' => ZBX_HAVE_IPV6, 'dns' => true, 'usermacros' => true, 'macros' => false
+				],
+					'messages' => ['use' => _('Invalid address.')]
+				],
 				'when' => ['operating_mode', 'in' => [PROXY_OPERATING_MODE_ACTIVE]]
 			],
 			'description' => ['db proxy.description'],
-			'tls_accept' => ['db proxy.tls_accept'],
 			'tls_accept_certificate' => ['boolean'],
 			'tls_accept_psk' =>	['boolean'],
 			'tls_accept_none' => [
 				['boolean'],
-				[
-					'integer', 'required', 'in 1', 'when' => [['tls_accept_certificate', 'in 0'], ['tls_accept_psk', 'in 0']],
-					'messages' => ['in' => _s('Incorrect value for field "%1$s": %2$s.', _('Connections from proxy'), _('cannot be empty'))]
+				['integer', 'required', 'in 1',
+					'when' => [
+						['tls_accept_certificate', 'in 0'], ['tls_accept_psk', 'in 0']
+					],
+					'messages' => [
+						'in' => _s(
+							'Incorrect value for field "%1$s": %2$s.',
+							_('Connections from proxy'), _('cannot be empty')
+						)
+					]
 				]
 			],
 			'tls_connect' => ['db proxy.tls_connect', 'required',
@@ -80,7 +96,7 @@ class CControllerProxyCreate extends CController {
 			],
 			'tls_psk' => [
 				['db proxy.tls_psk',
-					'regex' => '/^(.{2})+$/',
+					'regex' => ZBX_TLS_PSK_PATTERN,
 					'messages' => ['regex' => _('PSK must be an even number of characters.')]
 				],
 				['db proxy.tls_psk',
@@ -96,12 +112,14 @@ class CControllerProxyCreate extends CController {
 			],
 			'tls_issuer' => ['db proxy.tls_issuer', 'when' => ['tls_connect', 'in' => [HOST_ENCRYPTION_CERTIFICATE]]],
 			'tls_subject' => ['db proxy.tls_subject', 'when' => ['tls_connect', 'in' => [HOST_ENCRYPTION_CERTIFICATE]]],
-			'custom_timeouts' => ['db proxy.custom_timeouts', 'in' => [ZBX_PROXY_CUSTOM_TIMEOUTS_DISABLED, ZBX_PROXY_CUSTOM_TIMEOUTS_ENABLED]],
+			'custom_timeouts' => ['db proxy.custom_timeouts',
+				'in' => [ZBX_PROXY_CUSTOM_TIMEOUTS_DISABLED, ZBX_PROXY_CUSTOM_TIMEOUTS_ENABLED]
+			],
 			'timeout_zabbix_agent' => ['db proxy.timeout_zabbix_agent', 'required', 'not_empty',
 				'use' => [CTimeUnitValidator::class, ['max' => SEC_PER_DAY, 'usermacros' => true]],
 				'when' => ['custom_timeouts', 'in' => [ZBX_PROXY_CUSTOM_TIMEOUTS_ENABLED]]
 			],
-			'timeout_simple_check' =>	['db proxy.timeout_simple_check', 'required', 'not_empty',
+			'timeout_simple_check' => ['db proxy.timeout_simple_check', 'required', 'not_empty',
 				'use' => [CTimeUnitValidator::class, ['max' => SEC_PER_DAY, 'usermacros' => true]],
 				'when' => ['custom_timeouts', 'in' => [ZBX_PROXY_CUSTOM_TIMEOUTS_ENABLED]]
 			],

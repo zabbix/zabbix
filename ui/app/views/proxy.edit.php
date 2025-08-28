@@ -58,16 +58,16 @@ $interface = (new CTable())
 		(new CTextBox('address', $data['form']['address'], false, DB::getFieldLength('proxy', 'address')))
 			->setWidth(336)
 			->setErrorLabel(_('Address'))
-			->setErrorContainer('address_port_error_container'),
+			->setErrorContainer('address-port-error-container'),
 		(new CTextBox('port', $data['form']['port'], false, DB::getFieldLength('proxy', 'port')))
 			->setWidth(ZBX_TEXTAREA_INTERFACE_PORT_WIDTH)
 			->setErrorLabel(_('Port'))
-			->setErrorContainer('address_port_error_container')
+			->setErrorContainer('address-port-error-container')
 			->setAriaRequired()
 	])
 	->addRow(
 		(new CCol())
-			->setId('address_port_error_container')
+			->setId('address-port-error-container')
 			->addClass(ZBX_STYLE_ERROR_CONTAINER)
 	);
 
