@@ -396,6 +396,26 @@ class CFormValidator {
 					}
 				});
 
+				Object.entries(api_params).forEach(([api_field, value]) => {
+					if (api_field === 'filter') {
+						return;
+					}
+
+					value = String(value);
+
+					if (value.startsWith('{') && value.endsWith('}')) {
+						const param_field_name = value.substring(1, value.length - 1);
+						const param_field_path = this.#getFieldAbsolutePath(param_field_name, field_path);
+						const param_data = getFieldDataByPath(param_field_path);
+
+						referenced_fields.push(param_field_path);
+						parameters[api_field] = param_data;
+					}
+					else {
+						parameters[api_field] = value;
+					}
+				});
+
 				const validated_fields = referenced_fields.filter((path) => {
 					return pathInObject(data_to_validate, path);
 				});

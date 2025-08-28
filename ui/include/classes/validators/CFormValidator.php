@@ -512,8 +512,10 @@ class CFormValidator {
 			if (count(explode('.', $api_uniq_check[0])) !== 2) {
 				throw new Exception('[RULES ERROR] Rule "api_uniq" should contain a valid API call (Path: '.$rule_path.', API call:'.$api_uniq_check[0].')');
 			}
-			$api_uniq_check += [1 => [], 2 => null, 3 => null];
+			$api_uniq_check += [1 => [], 2 => null, 3 => null, 4 => []];
 			$api_uniq_check[1] = ['filter' => $api_uniq_check[1]];
+			$api_uniq_check[1] += $api_uniq_check[4];
+			unset($api_uniq_check[4]);
 		}
 		unset($api_uniq_check);
 
@@ -1290,6 +1292,25 @@ class CFormValidator {
 		}
 		unset($parameter);
 
+		// Replace field references by real values in API request parameters.
+		foreach ($parameters as $name => &$parameter) {
+			if ($name === 'filter') {
+				continue;
+			}
+
+			if (substr($parameter, 0, 1) === '{' && substr($parameter, -1, 1) === '}') {
+				$field_data = $this->getWhenFieldValue(substr($parameter, 1, -1), $path);
+
+				if (in_array($field_data['type'], ['id', 'integer', 'float', 'string'])) {
+					$parameter = $field_data['value'];
+					if ($field_path === null && $path === '') {
+						$field_path = $field_data['path'];
+					}
+				}
+			}
+		}
+		unset($parameter);
+
 		$parameters_set = !!array_filter($parameters);
 		if (!$parameters_set) {
 			// If all requested parameters are empty, skip this check.
@@ -1698,6 +1719,17 @@ class CFormValidator {
 		if (array_key_exists('api_uniq', $rules)) {
 			foreach ($rules['api_uniq'] as $api_check) {
 				foreach ($api_check[1]['filter'] as $param) {
+					if (substr($param, 0, 1) === '{' && substr($param, -1, 1) === '}') {
+						$this->when_resolved_data['fields_to_lookup'][]
+							= self::getWhenFieldAbsolutePath(substr($param, 1, -1), $path);
+					}
+				}
+
+				foreach ($api_check[1] as $name => $param) {
+					if ($name === 'filter') {
+						continue;
+					}
+
 					if (substr($param, 0, 1) === '{' && substr($param, -1, 1) === '}') {
 						$this->when_resolved_data['fields_to_lookup'][]
 							= self::getWhenFieldAbsolutePath(substr($param, 1, -1), $path);

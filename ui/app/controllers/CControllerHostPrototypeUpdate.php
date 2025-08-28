@@ -27,17 +27,17 @@ class CControllerHostPrototypeUpdate extends CController {
 		$api_uniq = [
 			[
 				'hostprototype.get',
-				[
-					'filter' => ['host' => '{host}'], 'params' => ['discoveryids' => '{parent_discoveryid}']
-				],
-				'hostid'
+				['host' => '{host}'],
+				'hostid',
+				null,
+				['discoveryids' => '{parent_discoveryid}']
 			],
 			[
 				'hostprototype.get',
-				[
-					'filter' => ['name' => '{name}'], 'params' => ['discoveryids' => '{parent_discoveryid}']
-				],
-				'hostid'
+				['name' => '{name}'],
+				'hostid',
+				null,
+				['discoveryids' => '{parent_discoveryid}']
 			]
 		];
 
