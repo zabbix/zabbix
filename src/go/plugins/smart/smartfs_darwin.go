@@ -1,4 +1,3 @@
-<?php
 /*
 ** Copyright (C) 2001-2025 Zabbix SIA
 **
@@ -13,24 +12,14 @@
 ** If not, see <https://www.gnu.org/licenses/>.
 **/
 
+package smart
 
-require_once dirname(__FILE__).'/../include/CAPITest.php';
+import "golang.zabbix.com/sdk/errs"
 
-class testAPIInfo extends CAPITest {
-	public function testAPIInfo_VersionWithAuth() {
-		$error = [
-			'code' => -32602,
-			'message' => 'Invalid params.',
-			'data' => 'The "apiinfo.version" method must be called without authorization header.'
-		];
-
-		$this->call('apiinfo.version', [], $error);
+func (p *Plugin) getOsDevices(byID bool) ([]deviceInfo, []deviceInfo, []deviceInfo, error) {
+	if byID {
+		return nil, nil, nil, errs.New("by id scan not supported on osx")
 	}
 
-	public function testAPIInfo_VersionWithoutAuth() {
-		$this->disableAuthorization();
-		$result = $this->call('apiinfo.version', []);
-
-		$this->assertSame('7.0.19', $result['result']);
-	}
+	return p.getDevices([]string{"--scan", "-j"}, []string{"--scan", "-d", "sat", "-j"})
 }
