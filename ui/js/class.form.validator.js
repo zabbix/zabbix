@@ -377,58 +377,37 @@ class CFormValidator {
 
 				if (id_field !== null) {
 					const id_field_path = this.#getFieldAbsolutePath(id_field, field_path);
-
 					exclude_id = getFieldDataByPath(id_field_path);
 				}
 
 				Object.entries(api_params).forEach(([api_field, value]) => {
-					if (typeof value === 'object') {
-						parameters[api_field] = {};
+					value = String(value);
 
-						Object.entries(value).forEach(([sub_key, sub_value]) => {
-							sub_value = String(sub_value);
+					if (value.startsWith('{') && value.endsWith('}')) {
+						const param_field_name = value.substring(1, value.length - 1);
+						const param_field_path = this.#getFieldAbsolutePath(param_field_name, field_path);
+						const param_data = getFieldDataByPath(param_field_path);
 
-							if (sub_value.startsWith('{') && sub_value.endsWith('}')) {
-								const param_field_name = sub_value.substring(1, sub_value.length - 1);
-								const param_field_path = this.#getFieldAbsolutePath(param_field_name, field_path);
-								const param_data = getFieldDataByPath(param_field_path);
-
-								referenced_fields.push(param_field_path);
-								parameters[api_field][sub_key] = param_data;
-							}
-							else {
-								parameters[api_field][sub_key] = sub_value;
-							}
-						});
+						referenced_fields.push(param_field_path);
+						parameters[api_field] = param_data;
 					}
 					else {
-						Object.entries(api_params).forEach(([api_field, value]) => {
-							value = String(value);
-
-							if (value.startsWith('{') && value.endsWith('}')) {
-								const param_field_name = value.substring(1, value.length - 1);
-								const param_field_path = this.#getFieldAbsolutePath(param_field_name, field_path);
-								const param_data = getFieldDataByPath(param_field_path);
-
-								referenced_fields.push(param_field_path);
-								parameters[api_field] = param_data;
-							}
-							else {
-								parameters[api_field] = value;
-							}
-						});
+						parameters[api_field] = value;
 					}
 				});
 
-				const validated_fields = referenced_fields.filter(path => pathInObject(data_to_validate, path));
+				const validated_fields = referenced_fields.filter((path) => {
+					return pathInObject(data_to_validate, path);
+				});
 
 				if (validated_fields.length) {
-					if (typeof parameters.params === 'object') {
-						Object.entries(parameters.params).forEach(([key, val]) => parameters[key] = val);
-						delete parameters.params;
-					}
-
-					api_uniq_rules.push({method, parameters, fields: referenced_fields, exclude_id, error_msg});
+					api_uniq_rules.push({
+						method: method,
+						parameters: parameters,
+						fields: referenced_fields,
+						exclude_id: exclude_id,
+						error_msg: error_msg
+					});
 				}
 			});
 		};
@@ -505,74 +484,78 @@ class CFormValidator {
 	}
 
 	/**
+	 * Call API request to validate all api based validations
+	 *
+	 * @param {Array} validatons
+	 *
+	 * @returns {Promise}
+	 */
+	#validateApiExists(validations) {
+		const url = new URL('zabbix.php', location.href);
+		url.searchParams.set('action', 'validate.api.exists');
+
+		return fetch(url.href, {
+			method: 'POST',
+			headers: {'Content-Type': 'application/json'},
+			body: JSON.stringify({validations}),
+		})
+			.then(response => response.json())
+			.then(response => {
+				if ('error' in response) {
+					throw {error: response.error};
+				}
+
+				return response;
+			})
+			.catch(exception => {
+				console.error(exception);
+				return { result: false };
+			});
+	}
+
+	/**
 	 * Check data uniqueness using JS API call.
 	 *
 	 * @returns {Promise}
 	 */
 	#validateApiUniqueness() {
 		const api_uniq_checks = this.#api_uniq_rules.filter((check) => {
-			let all_fields_valid = true;
-
 			// If at least one of involved (referenced in parameters) field has error, api_uniq check is not performed.
-			check.fields.forEach((field_path) => {
-				if (field_path in this.#errors && this.#errors[field_path].some((error) => error.message !== '')) {
-					all_fields_valid = false;
-				}
-			});
+			if(check.fields.some((field_path) => {
+				return (field_path in this.#errors && this.#errors[field_path].some((error) => error.message !== ''))
+			})) {
+				return false;
+			}
 
 			// If all requested parameters are empty, skip this check.
-			const parameters_set = Object.values(check.parameters).some((value) => value !== '');
-
-			return all_fields_valid && parameters_set;
+			return Object.values(check.parameters).some((value) => value !== '');
 		});
 
-		return new Promise(resolve_all => {
-			if (api_uniq_checks.length) {
-				const requests = [];
+		const api_validations = api_uniq_checks.map((check) => {
+			const {method, parameters, exclude_id} = check;
+			const [api, api_method] = method.split('.');
+			return {
+				api,
+				method: api_method,
+				options: {filter: parameters},
+				exclude_id,
+				field: check.fields[0],
+				error_msg: check.error_msg
+			};
+		});
 
-				for (const check of api_uniq_checks) {
-					const {method, parameters, exclude_id} = check;
-
-					const api_call = ApiCall(method, {
-						output: [],
-						...(parameters.filter !== undefined ? parameters : {filter: parameters}),
-						preservekeys: true
-					}).then(result => {
-						result = Object.keys(result.result);
-
-						if (exclude_id) {
-							const index = result.indexOf(exclude_id);
-
-							if (index !== -1) {
-								result.splice(index, 1);
-							}
-						}
-
-						check.result = result;
-					});
-
-					requests.push(api_call);
-				}
-
-				Promise.all(requests).then(() => {
-					let result_all = true;
-
-					api_uniq_checks.forEach((check) => {
-						if (check.result.length) {
-							const error_message = check.error_msg ?? t('This object already exists.');
-
-							this.#addError(check.fields[0], error_message, CFormValidator.ERROR_LEVEL_API);
-							result_all = false;
-						}
-					});
-
-					resolve_all(result_all);
+		if (api_validations.length) {
+			return this.#validateApiExists(api_validations)
+				.then(result => {
+					if (result.result === false && result.errors) {
+						result.errors.forEach((error) => {
+							this.#addError(error.field, error.message, CFormValidator.ERROR_LEVEL_API);
+						});
+					}
+					return result.result;
 				});
-			}
-			else {
-				resolve_all(true);
-			}
-		});
+		}
+		return Promise.resolve(true);
 	}
 
 	/**

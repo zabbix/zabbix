@@ -286,6 +286,7 @@ class testFormWebScenario extends CWebTest {
 
 		// Switch to Inherited and scenario tags and check tags table headers.
 		$tag_types->select('Inherited and scenario tags');
+		$this->query('xpath://thead/tr/th[text()="Parent templates"]')->one()->waitUntilVisible();
 		$tags_table->invalidate();
 		$this->assertEquals(['Name', 'Value', '', 'Parent templates'], $tags_table->getHeaders()->asText());
 

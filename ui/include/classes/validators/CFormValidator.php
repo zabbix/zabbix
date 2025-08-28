@@ -255,6 +255,9 @@ class CFormValidator {
 						}
 
 						foreach ($value as &$api_uniq_check) {
+							if (count(explode('.', $api_uniq_check[0])) !== 2) {
+								throw new Exception('[RULES ERROR] Rule "'.$key.'" should contain a valid API call (Path: '.$rule_path.', API call:'.$api_uniq_check[0].')');
+							}
 							$api_uniq_check += [1 => [], 2 => null, 3 => null];
 						}
 						unset($api_uniq_check);
@@ -1227,69 +1230,22 @@ class CFormValidator {
 		return true;
 	}
 
-	private function replaceParameterReference(string $parameter, string $path, ?string &$field_path): string {
-		if (substr($parameter, 0, 1) === '{' && substr($parameter, -1, 1) === '}') {
-			$field_data = $this->getWhenFieldValue(substr($parameter, 1, -1), $path);
-
-			if (in_array($field_data['type'], ['id', 'integer', 'float', 'string'])) {
-				$parameter = $field_data['value'];
-
-				if ($field_path === null && $path === '') {
-					$field_path = $field_data['path'];
-				}
-			}
-		}
-
-		return $parameter;
-	}
-
-	private function validateApiUniq(array $check, string &$path, ?string &$error = null): bool {
-		[$method, $parameters, $exclude_id] = $check;
-		[$api, $method] = explode('.', $method);
-
-		$field_path = null;
-
-		// Replace field references by real values in API request parameters.
-		foreach ($parameters as &$parameters_) {
-			if (is_array($parameters_)) {
-				foreach ($parameters_ as &$parameter) {
-					$parameter = $this->replaceParameterReference($parameter, $path, $field_path);
-				}
-				unset($parameter);
-			}
-			else {
-				$parameters_ = $this->replaceParameterReference($parameters_, $path, $field_path);
-			}
-		}
-		unset($parameters_);
-
-		$parameters_set = !!array_filter($parameters);
-		if (!$parameters_set) {
-			// If all requested parameters are empty, skip this check.
-			return true;
-		}
-
-		if (array_key_exists('params', $parameters)) {
-			$parameters = array_replace($parameters, $parameters['params']);
-			unset($parameters['params']);
-		}
-
-		$api_parameters = [
-			'output' => [],
-			'filter' => array_key_exists('filter', $parameters) ? $parameters['filter'] : $parameters,
-			'preservekeys' => true
-		];
-
-		if (array_key_exists('filter', $parameters)) {
-			$api_parameters += $parameters;
-		}
-
+	/**
+	 * Check via API if item exists, excluding provided id. Used for unique checks
+	 *
+	 * @param string $api
+	 * @param array $options
+	 * @param string|null $exclude_primary_id
+	 * @return bool
+	 */
+	public static function existsAPIObject(string $api, array $options, ?string $exclude_primary_id = null): bool {
+		$options['preservekeys'] = true;
 		$auth = [
 			'type' => CJsonRpc::AUTH_TYPE_COOKIE,
 			'auth' => CWebUser::$data['sessionid']
 		];
 
-		$response = API::getWrapper()->getClient()->callMethod($api, $method, $api_parameters, $auth);
+		$response = API::getWrapper()->getClient()->callMethod($api, 'get', $options, $auth);
 
 		if ($response->errorCode) {
 			throw new Exception($response->errorMessage);
@@ -1297,15 +1253,55 @@ class CFormValidator {
 
 		$result = $response->data;
 
-		if ($exclude_id !== null) {
-			$exclude_id_field_data = $this->getWhenFieldValue($exclude_id, $path);
+		if ($result) {
+			$matches = array_diff(array_keys($result), [$exclude_primary_id]);
 
-			if ($exclude_id_field_data['type'] === 'id') {
-				unset($result[$exclude_id_field_data['value']]);
+			if (count($matches) > 0) {
+				return true;
 			}
 		}
 
-		if (count($result)) {
+		return false;
+	}
+
+	private function validateApiUniq(array $check, string &$path, ?string &$error = null): bool {
+		[$method, $parameters, $exclude_id] = $check;
+		[$api] = explode('.', $method);
+
+		$field_path = null;
+
+		// Replace field references by real values in API request parameters.
+		foreach ($parameters as &$parameter) {
+			if (substr($parameter, 0, 1) === '{' && substr($parameter, -1, 1) === '}') {
+				$field_data = $this->getWhenFieldValue(substr($parameter, 1, -1), $path);
+
+				if (in_array($field_data['type'], ['id', 'integer', 'float', 'string'])) {
+					$parameter = $field_data['value'];
+					if ($field_path === null && $path === '') {
+						$field_path = $field_data['path'];
+					}
+				}
+			}
+		}
+		unset($parameter);
+
+		$parameters_set = !!array_filter($parameters);
+		if (!$parameters_set) {
+			// If all requested parameters are empty, skip this check.
+			return true;
+		}
+
+		if ($exclude_id !== null) {
+			$exclude_id_field_data = $this->getWhenFieldValue($exclude_id, $path);
+
+			$exclude_id = $exclude_id_field_data['type'] === 'id' ? $exclude_id_field_data['value'] : null;
+		}
+
+		$parameters = [
+			'filter' => $parameters
+		];
+
+		if (self::existsAPIObject($api, $parameters, $exclude_id)) {
 			$error = _('This object already exists.');
 
 			if ($path === '') {
@@ -1690,25 +1686,8 @@ class CFormValidator {
 	}
 
 	/**
-	 * Add field lookup path for API uniqueness check parameter.
-	 *
-	 * @param string $param  Single parameter.
-	 * @param string $path   Current validation path.
-	 */
-	private function addApiUniqLookupPath(string $param, string $path): void {
-		if (substr($param, 0, 1) === '{' && substr($param, -1, 1) === '}') {
-			$this->when_resolved_data['fields_to_lookup'][] =
-				self::getWhenFieldAbsolutePath(substr($param, 1, -1), $path);
-		}
-	}
-
-	/**
 	 * Function to walk through all rules. Meant to call self::checkField function for each rule regardless of its
 	 * depth. This is a helper function for resolveWhenFields.
-	 *
-	 * @param array  $rules  The validation rules array containing 'api_uniq' and/or 'fields' sections.
-	 * @param mixed  $data   The data to be validated against the rules.
-	 * @param string $path   The current path in the data structure being processed.
 	 */
 	private function scanObject(array $rules, $data, string $path): void {
 		if (!is_array($data)) {
@@ -1717,14 +1696,10 @@ class CFormValidator {
 
 		if (array_key_exists('api_uniq', $rules)) {
 			foreach ($rules['api_uniq'] as $api_check) {
-				foreach ($api_check[1] as $params) {
-					if (is_array($params)) {
-						foreach ($params as $param) {
-							$this->addApiUniqLookupPath($param, $path);
-						}
-					}
-					else {
-						$this->addApiUniqLookupPath($params, $path);
+				foreach ($api_check[1] as $param) {
+					if (substr($param, 0, 1) === '{' && substr($param, -1, 1) === '}') {
+						$this->when_resolved_data['fields_to_lookup'][]
+							= self::getWhenFieldAbsolutePath(substr($param, 1, -1), $path);
 					}
 				}
 
