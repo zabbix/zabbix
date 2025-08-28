@@ -21,7 +21,7 @@ zabbix_export:
         ## Overview
         
         Ciena’s 3906 Platform is a compact, smart CPE that delivers gigabit Ethernet service capability with virtual network function integration.
-        Learn more about Ciena 3906 Platform: https://www.ciena.com/products/3906
+        Learn more about the Ciena 3906 Platform here: https://www.ciena.com/products/3906
       vendor:
         name: Zabbix
         version: 7.4-0
@@ -37,7 +37,7 @@ zabbix_export:
           units: '%'
           description: |
             MIB: WWP-LEOS-SYSTEM-CONFIG-MIB
-            The 60 seconds CPU usage state.
+            CPU utilization over 60 seconds.
           tags:
             - tag: component
               value: cpu
@@ -62,7 +62,7 @@ zabbix_export:
           units: B
           description: |
             MIB: WWP-LEOS-SYSTEM-CONFIG-MIB
-            Current number of available memory in bytes.
+            Available memory in bytes.
           preprocessing:
             - type: MULTIPLIER
               parameters:
@@ -81,7 +81,7 @@ zabbix_export:
           units: B
           description: |
             MIB: WWP-LEOS-SYSTEM-CONFIG-MIB
-            Current number of used memory in bytes.
+            Used memory in bytes.
           preprocessing:
             - type: MULTIPLIER
               parameters:
@@ -99,7 +99,7 @@ zabbix_export:
           value_type: FLOAT
           units: '%'
           params: 'last(//ciena.memory.used) * 100 / (last(//ciena.memory.used) + last(//ciena.memory.available))'
-          description: 'Current memory utilization in percent.'
+          description: 'Memory utilization, in percent.'
           tags:
             - tag: component
               value: memory
@@ -120,6 +120,11 @@ zabbix_export:
           name: 'ICMP ping'
           type: SIMPLE
           key: icmpping
+          description: |
+            The host accessibility by ICMP ping.
+            
+            0 - ICMP ping fails;
+            1 - ICMP ping successful.
           valuemap:
             name: 'Service state'
           tags:
@@ -132,7 +137,7 @@ zabbix_export:
               expression: 'max(/Ciena 3906 by SNMP/icmpping,#3)=0'
               name: 'Ciena: Unavailable by ICMP ping'
               priority: HIGH
-              description: 'Last three attempts returned timeout.  Please check device connectivity.'
+              description: 'Last three attempts returned timeout. Please check device connectivity.'
               tags:
                 - tag: scope
                   value: availability
@@ -142,6 +147,7 @@ zabbix_export:
           key: icmppingloss
           value_type: FLOAT
           units: '%'
+          description: 'The percentage of lost packets.'
           tags:
             - tag: component
               value: health
@@ -153,6 +159,7 @@ zabbix_export:
               name: 'Ciena: High ICMP ping loss'
               opdata: 'Loss: {ITEM.LASTVALUE1}'
               priority: WARNING
+              description: 'ICMP packets loss detected.'
               dependencies:
                 - name: 'Ciena: Unavailable by ICMP ping'
                   expression: 'max(/Ciena 3906 by SNMP/icmpping,#3)=0'
@@ -167,6 +174,7 @@ zabbix_export:
           key: icmppingsec
           value_type: FLOAT
           units: s
+          description: 'The ICMP ping response time (in seconds).'
           tags:
             - tag: component
               value: health
@@ -196,7 +204,7 @@ zabbix_export:
           key: net.if.walk
           history: '0'
           value_type: TEXT
-          description: 'Discovering interfaces from IF-MIB.'
+          description: 'Used for discovering interfaces from IF-MIB.'
           tags:
             - tag: component
               value: raw
@@ -213,13 +221,13 @@ zabbix_export:
         - uuid: 8ad77109e14d4a7b900d179ec1b96438
           name: 'System contact details'
           type: SNMP_AGENT
-          snmp_oid: 1.3.6.1.2.1.1.4.0
+          snmp_oid: 'get[1.3.6.1.2.1.1.4.0]'
           key: 'system.contact[sysContact.0]'
           delay: 15m
           value_type: CHAR
           description: |
             MIB: SNMPv2-MIB
-            The textual identification of the contact person for this managed node, together with information on how to contact this person.  If no contact information is known, the value is the zero-length string.
+            The textual identification of the contact person for this managed node, together with information on how to contact this person. If no contact information is known, the value is the zero-length string.
           inventory_link: CONTACT
           preprocessing:
             - type: DISCARD_UNCHANGED_HEARTBEAT
@@ -231,7 +239,7 @@ zabbix_export:
         - uuid: 5ad8efff2bb8429ab122b97e834cce38
           name: 'System description'
           type: SNMP_AGENT
-          snmp_oid: 1.3.6.1.2.1.1.1.0
+          snmp_oid: 'get[1.3.6.1.2.1.1.1.0]'
           key: 'system.descr[sysDescr.0]'
           delay: 15m
           value_type: CHAR
@@ -256,7 +264,7 @@ zabbix_export:
           value_type: TEXT
           description: |
             MIB: WWP-LEOS-CHASSIS-MIB
-            Discovering system fans.
+            Used for discovering system fans.
           tags:
             - tag: component
               value: raw
@@ -269,7 +277,7 @@ zabbix_export:
           value_type: CHAR
           description: |
             MIB: WWP-LEOS-BLADE-MIB
-            The hardware version of the product.
+            Model name of the hardware.
           preprocessing:
             - type: DISCARD_UNCHANGED_HEARTBEAT
               parameters:
@@ -286,7 +294,7 @@ zabbix_export:
           value_type: CHAR
           description: |
             MIB: WWP-LEOS-BLADE-MIB
-            The Serial number of the product.
+            The serial number of the product.
           preprocessing:
             - type: DISCARD_UNCHANGED_HEARTBEAT
               parameters:
@@ -300,7 +308,7 @@ zabbix_export:
               name: 'Ciena: Device has been replaced'
               event_name: 'Ciena: Device has been replaced (new serial number received)'
               priority: INFO
-              description: 'Ciena serial number has changed. Acknowledge to close the problem manually.'
+              description: 'The Ciena device serial number has changed. Acknowledge to close the problem manually.'
               manual_close: 'YES'
               tags:
                 - tag: scope
@@ -308,7 +316,7 @@ zabbix_export:
         - uuid: 8fd398744d9c4f72b4e1c81d866d2932
           name: 'Uptime (hardware)'
           type: SNMP_AGENT
-          snmp_oid: 1.3.6.1.2.1.25.1.1.0
+          snmp_oid: 'get[1.3.6.1.2.1.25.1.1.0]'
           key: 'system.hw.uptime[hrSystemUptime.0]'
           delay: 30s
           trends: '0'
@@ -348,7 +356,7 @@ zabbix_export:
         - uuid: 06e7d638c8094542bf7773abadc0c2b4
           name: 'System location'
           type: SNMP_AGENT
-          snmp_oid: 1.3.6.1.2.1.1.6.0
+          snmp_oid: 'get[1.3.6.1.2.1.1.6.0]'
           key: 'system.location[sysLocation.0]'
           delay: 15m
           value_type: CHAR
@@ -366,13 +374,13 @@ zabbix_export:
         - uuid: cb271362beb143ec866e7cb0d58a27ca
           name: 'System name'
           type: SNMP_AGENT
-          snmp_oid: 1.3.6.1.2.1.1.5.0
+          snmp_oid: 'get[1.3.6.1.2.1.1.5.0]'
           key: system.name
           delay: 15m
           value_type: CHAR
           description: |
             MIB: SNMPv2-MIB
-            An administratively-assigned name for this managed node.By convention, this is the node's fully-qualified domain name.  If the name is unknown, the value is the zero-length string.
+            An administratively-assigned name for this managed node.By convention, this is the node's fully-qualified domain name. If the name is unknown, the value is the zero-length string.
           inventory_link: NAME
           preprocessing:
             - type: DISCARD_UNCHANGED_HEARTBEAT
@@ -397,7 +405,7 @@ zabbix_export:
         - uuid: ae5500f046e04d16b3f6a44f4ccdcf7d
           name: 'Uptime (network)'
           type: SNMP_AGENT
-          snmp_oid: 1.3.6.1.2.1.1.3.0
+          snmp_oid: 'get[1.3.6.1.2.1.1.3.0]'
           key: 'system.net.uptime[sysUpTime.0]'
           delay: 30s
           trends: '0'
@@ -415,13 +423,13 @@ zabbix_export:
         - uuid: 206707cf6c124a63a8dd231acb7f2995
           name: 'System object ID'
           type: SNMP_AGENT
-          snmp_oid: 1.3.6.1.2.1.1.2.0
+          snmp_oid: 'get[1.3.6.1.2.1.1.2.0]'
           key: 'system.objectid[sysObjectID.0]'
           delay: 15m
           value_type: CHAR
           description: |
             MIB: SNMPv2-MIB
-            The vendor's authoritative identification of the network management subsystem contained in the entity.  This value is allocated within the SMI enterprises subtree (1.3.6.1.4.1) and provides an easy and unambiguous means for determining`what kind of box' is being managed.  For example, if vendor`Flintstones, Inc.' was assigned the subtree1.3.6.1.4.1.4242, it could assign the identifier 1.3.6.1.4.1.4242.1.1 to its `Fred Router'.
+            The vendor's authoritative identification of the network management subsystem contained in the entity. This value is allocated within the SMI enterprises subtree (1.3.6.1.4.1) and provides an easy and unambiguous means for determining`what kind of box' is being managed.  For example, if vendor`Flintstones, Inc.' was assigned the subtree1.3.6.1.4.1.4242, it could assign the identifier 1.3.6.1.4.1.4242.1.1 to its `Fred Router'.
           preprocessing:
             - type: DISCARD_UNCHANGED_HEARTBEAT
               parameters:
@@ -438,7 +446,7 @@ zabbix_export:
           value_type: TEXT
           description: |
             MIB: WWP-LEOS-CHASSIS-MIB
-            Discovering system power supply.
+            Used for discovering the system power supply.
           tags:
             - tag: component
               value: raw
@@ -451,7 +459,7 @@ zabbix_export:
           value_type: TEXT
           description: |
             MIB: WWP-LEOS-CHASSIS-MIB
-            Discovering system temperature sensors.
+            Used for discovering system temperature sensors.
           tags:
             - tag: component
               value: raw
@@ -487,10 +495,10 @@ zabbix_export:
                   value: availability
       discovery_rules:
         - uuid: 33cb92289fcf4e34ba1c5f4d21b9aee4
-          name: 'Fan Discovery'
+          name: 'Fan discovery'
           type: DEPENDENT
           key: ciena.fan.discovery
-          description: 'Discovering fans from WWP-LEOS-CHASSIS-MIB.'
+          description: 'Used for discovering fans from WWP-LEOS-CHASSIS-MIB.'
           item_prototypes:
             - uuid: fb43685bb86f4620bf1cd44f9e5c2bae
               name: 'Fan [{#SNMPVALUE}]: Speed'
@@ -519,11 +527,11 @@ zabbix_export:
               key: 'ciena.fan.status[ChassisFanModuleStatus.{#SNMPINDEX}]'
               description: |
                 MIB: WWP-LEOS-CHASSIS-MIB
-                Denotes the fan modules status. 
+                Denotes the fan module status.
                 Possible values:
-                1 - 'ok' means fan is operational;
-                2 - 'pending' means fan is installed but statistics are not yet available;
-                3 - 'failure' means fan is not working.
+                1 - "ok"; means fan is operational;
+                2 - "pending"; means fan is installed but statistics are not yet available;
+                3 - "failure"; means fan is not working.
               valuemap:
                 name: 'WWP-LEOS-CHASSIS-MIB::wwpLeosChassisFanModuleStatus'
               preprocessing:
@@ -545,7 +553,7 @@ zabbix_export:
                   name: 'Ciena: Fan [{#SNMPVALUE}]: Fan status is Failure'
                   opdata: 'Current status: {ITEM.LASTVALUE}'
                   priority: AVERAGE
-                  description: 'The fan status is failure.'
+                  description: 'The fan status is "failure".'
                   tags:
                     - tag: scope
                       value: availability
@@ -564,10 +572,10 @@ zabbix_export:
               parameters:
                 - 1h
         - uuid: b6301c49acbc4b8cb73737ddea2af97a
-          name: 'PSU Discovery'
+          name: 'PSU discovery'
           type: DEPENDENT
           key: ciena.psu.discovery
-          description: 'Discovering PSU from WWP-LEOS-CHASSIS-MIB.'
+          description: 'Used for discovering PSU from WWP-LEOS-CHASSIS-MIB.'
           item_prototypes:
             - uuid: 07fa3745241049f989cc8b08718d5294
               name: 'PSU [{#SNMPVALUE}]: Status'
@@ -575,7 +583,7 @@ zabbix_export:
               key: 'ciena.psu.status[ChassisPowerSupplyState.{#SNMPINDEX}]'
               description: |
                 MIB: WWP-LEOS-CHASSIS-MIB
-                Denotes the PSU modules status. 
+                Denotes the PSU module status.
                 Possible values:
                 1 - online;
                 2 - offline;
@@ -601,7 +609,7 @@ zabbix_export:
                   name: 'Ciena: PSU [{#SNMPVALUE}]: Status is Faulted'
                   opdata: 'Current status: {ITEM.LASTVALUE}'
                   priority: AVERAGE
-                  description: 'The PSU status is faulted.'
+                  description: 'The PSU status is "faulted".'
                   tags:
                     - tag: scope
                       value: availability
@@ -618,10 +626,10 @@ zabbix_export:
               parameters:
                 - 1h
         - uuid: bc76e20f951648a49459b4541f812183
-          name: 'Temperature sensor Discovery'
+          name: 'Temperature sensor discovery'
           type: DEPENDENT
           key: ciena.temperature.sensor.discovery
-          description: 'Discovering temperature sensors from WWP-LEOS-CHASSIS-MIB.'
+          description: 'Used for discovering temperature sensors from WWP-LEOS-CHASSIS-MIB.'
           item_prototypes:
             - uuid: 83c809987bd84bc7bfd74ea25644706a
               name: 'Sensor [{#SNMPVALUE}]: Temperature'
@@ -630,7 +638,7 @@ zabbix_export:
               units: °C
               description: |
                 MIB: WWP-LEOS-CHASSIS-MIB
-                The value of temperature measured by the sensor inside the device in degrees C.
+                The value of temperature measured by the sensor inside the device in degrees Celsius.
               preprocessing:
                 - type: SNMP_WALK_VALUE
                   parameters:
@@ -650,7 +658,7 @@ zabbix_export:
                   name: 'Ciena: Sensor [{#SNMPVALUE}]: High chassis temperature'
                   event_name: 'Ciena: Sensor [{#SNMPVALUE}]: High chassis temperature (>{#CIENA.TEMPERATURE.HIGH} °C)'
                   priority: AVERAGE
-                  description: 'The current temp is greater than the threshold state.'
+                  description: 'The current temperature is higher than the threshold state.'
                   tags:
                     - tag: scope
                       value: availability
@@ -661,7 +669,7 @@ zabbix_export:
                   name: 'Ciena: Sensor [{#SNMPVALUE}]: Low chassis temperature'
                   event_name: 'Ciena: Sensor [{#SNMPVALUE}]: Low chassis temperature (<{#CIENA.TEMPERATURE.LOW} °C)'
                   priority: AVERAGE
-                  description: 'The current temp is less than the threshold state.'
+                  description: 'The current temperature is lower than the threshold state.'
                   tags:
                     - tag: scope
                       value: availability
