@@ -256,8 +256,6 @@ try {
 		);
 
 		if (CWebUser::$data['gui_access'] == GROUP_GUI_ACCESS_DISABLED) {
-			CSessionHelper::unset(['saml_data']);
-
 			throw new Exception(_('GUI access disabled.'));
 		}
 
@@ -271,6 +269,8 @@ try {
 	$auth->login();
 }
 catch (Exception $e) {
+	CSessionHelper::unset(['saml_data']);
+
 	error($e->getMessage());
 }
 
