@@ -101,15 +101,8 @@ class CControllerOauthAuthorize extends CController {
 			$token_url = substr($token_url, 0, $i);
 		}
 
-		$tokens = $this->exchangeCodeToTokens($token_url, $data);
-
-		if (array_key_exists('raw_response', $tokens)) {
-			error(_('Response')."\n".$tokens['raw_response'], true);
-			unset($tokens['raw_response']);
-		}
-
 		$this->setResponse(new CControllerResponseData([
-			'tokens' => $tokens,
+			'tokens' => $this->exchangeCodeToTokens($token_url, $data),
 			'user' => ['debug_mode' => $this->getDebugMode()]
 		]));
 	}
@@ -119,10 +112,9 @@ class CControllerOauthAuthorize extends CController {
 	 *
 	 * @param array $oauth  OAuth data to be sent.
 	 *
-	 * @return array of 'tokens_status', 'access_token', 'access_expires_in' and 'refresh_token'.
+	 * @return array of 'tokens_status', 'access_token', 'access_expires_in' and 'refresh_token' or empty array son error.
 	 */
 	protected function exchangeCodeToTokens(string $token_url, array $data): array {
-		$result = [];
 		$handle = curl_init();
 		$curl_options = [
 			CURLOPT_URL => $token_url,
@@ -154,7 +146,7 @@ class CControllerOauthAuthorize extends CController {
 			error(curl_error($handle), true);
 			curl_close($handle);
 
-			return $result;
+			return [];
 		}
 
 		$http_code = curl_getinfo($handle, CURLINFO_HTTP_CODE);
@@ -162,8 +154,9 @@ class CControllerOauthAuthorize extends CController {
 
 		if ($http_code != 200) {
 			error(_('Unexpected HTTP response status code.'), true);
+			error(_('Response')."\n".$raw_response, true);
 
-			return $result + ['raw_response' => $raw_response];
+			return [];
 		}
 
 		$response = json_decode($raw_response, true);
@@ -171,8 +164,9 @@ class CControllerOauthAuthorize extends CController {
 
 		if (!is_array($response) || array_diff_key($mandatory_all, $response)) {
 			error(_('OAuth response missing mandatory fields.'), true);
+			error(_('Response')."\n".$raw_response, true);
 
-			return $result + ['raw_response' => $raw_response];
+			return [];
 		}
 
 		return [
