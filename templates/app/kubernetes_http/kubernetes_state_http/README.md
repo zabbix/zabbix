@@ -118,7 +118,7 @@ You can also set up evaluation periods for replica mismatch triggers (Deployment
 |{$KUBE.API.COMPONENTSTATUSES.ENDPOINT}|<p>Kubernetes API componentstatuses endpoint /api/v1/componentstatuses</p>|`/api/v1/componentstatuses`|
 |{$KUBE.API.TOKEN}|<p>Service account bearer token.</p>||
 |{$KUBE.HTTP.PROXY}|<p>Sets the HTTP proxy to `http_proxy` value. If this parameter is empty, then no proxy is used.</p>||
-|{$KUBE.STATE.ENDPOINT.NAME}|<p>Kubernetes state endpoint name. Get the endpoint name `kubectl get ep -A -owide`.</p>|`zabbix-kube-state-metrics`|
+|{$KUBE.STATE.ENDPOINT.NAME}|<p>Endpoint name for kube-state-metrics service (check with `kubectl get ep -n monitoring -owide`).</p>|`zabbix-kube-state-metrics`|
 |{$OPENSHIFT.STATE.ENDPOINT.NAME}|<p>OpenShift state endpoint name.</p>|`openshift-state-metrics`|
 |{$KUBE.API_SERVER.SCHEME}|<p>Kubernetes API servers metrics endpoint scheme. Used in ControlPlane LLD.</p>|`https`|
 |{$KUBE.API_SERVER.PORT}|<p>Kubernetes API servers metrics endpoint port. Used in ControlPlane LLD.</p>|`6443`|
