@@ -66,6 +66,13 @@ func (*Plugin) Validate(options any) error {
 		return errs.Wrap(err, "plugin config validation failed on default configuration")
 	}
 
+	// Reuse the existing resolver to validate the default configuration's TLSConnect value.
+	// This keeps all validation and resolution logic centralized within a single function, albeit with a double check.
+	_, err = opts.Default.resolveTLSConnect(&opts.Default)
+	if err != nil {
+		return errs.Wrap(err, "plugin config validation failed on default configuration TLSConnect field")
+	}
+
 	for sessionName, s := range opts.Sessions {
 		err = s.validateSession(&opts.Default)
 		if err != nil {
