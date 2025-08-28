@@ -1731,7 +1731,8 @@ void	zbx_sync_history_cache_server(const zbx_events_funcs_t *events_cbs, zbx_ipc
  * Purpose: check status of a history cache usage, enqueue/dequeue proxy      *
  *          from priority list and accordingly enable or disable wait mode    *
  *                                                                            *
- * Parameters: proxyid   - [IN] the proxyid                                   *
+ * Parameters: proxyid           - [IN] the proxyid                           *
+ *             pending_history   - [IN] the "more" flag presence              *
  *                                                                            *
  * Return value: SUCCEED - proxy can be processed now                         *
  *               FAIL    - proxy cannot be processed now, it got enqueued     *
