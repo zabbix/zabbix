@@ -4,7 +4,7 @@ msgstr ""
 "Project-Id-Version: Zabbix 6.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2023-10-19 13:48+0300\n"
-"PO-Revision-Date: 2025-07-17 05:42+0000\n"
+"PO-Revision-Date: 2025-08-27 23:56+0000\n"
 "Last-Translator: Eiji Kawakita <age@cyber.email.ne.jp>\n"
 "Language-Team: Zabbix\n"
 "Language: ja\n"
@@ -14088,7 +14088,7 @@ msgstr "要求される%1$sデータベースの最大バージョンは%2$sで�
 #: app/partials/administration.system.info.php:221
 #, c-format
 msgid "Maximum required version is %1$s."
-msgstr ""
+msgstr "必要な最大バージョンは %1$s です。"
 
 #: app/controllers/CControllerTimeSelectorUpdate.php:136
 #: include/classes/mvc/CController.php:320
@@ -14433,7 +14433,7 @@ msgstr "PHPのpostサイズの最小値は%1$sです(\"post_max_size\"設定オ�
 #: app/views/administration.housekeeping.edit.php:183
 #, c-format
 msgid "Minimum required version is %1$s."
-msgstr ""
+msgstr "最低限必要なバージョンは%1$sです。"
 
 #: app/views/monitoring.map.view.php:48
 #: include/views/monitoring.sysmap.edit.php:276
@@ -14665,7 +14665,7 @@ msgstr "障害イベントを継続して生成"
 #: app/partials/administration.system.info.php:235
 #, c-format
 msgid "Must be at least %1$s."
-msgstr ""
+msgstr "少なくとも%1$sである必要があります。"
 
 #: include/classes/validators/CFormValidator.php:340
 msgid "Must be selected."
@@ -14674,7 +14674,7 @@ msgstr "選択する必要があります。"
 #: app/partials/administration.system.info.php:254
 #, c-format
 msgid "Must not be higher than %1$s."
-msgstr ""
+msgstr "%1$s より高くすることはできません。"
 
 #: jsLoader.php:284
 msgid "Mute"
@@ -15446,63 +15446,63 @@ msgstr "\"%1$s.%2$s\"を呼び出す権限がありません。"
 
 #: include/classes/api/services/CConfiguration.php:312
 msgid "No permissions to import discovery rules."
-msgstr ""
+msgstr "ディスカバリルールをインポートする権限がありません。"
 
 #: include/classes/api/services/CConfiguration.php:313
 msgid "No permissions to import graphs."
-msgstr ""
+msgstr "グラフをインポートする権限がありません。"
 
 #: include/classes/api/services/CConfiguration.php:314
 msgid "No permissions to import host groups."
-msgstr ""
+msgstr "ホスト グループをインポートする権限がありません。"
 
 #: include/classes/api/services/CConfiguration.php:316
 msgid "No permissions to import hosts."
-msgstr ""
+msgstr "ホストをインポートする権限がありません。"
 
 #: include/classes/api/services/CConfiguration.php:318
 msgid "No permissions to import images."
-msgstr ""
+msgstr "イメージをインポートする権限がありません。"
 
 #: include/classes/api/services/CConfiguration.php:319
 msgid "No permissions to import items."
-msgstr ""
+msgstr "アイテムをインポートする権限がありません。"
 
 #: include/classes/api/services/CConfiguration.php:320
 msgid "No permissions to import maps."
-msgstr ""
+msgstr "マップをインポートする権限がありません。"
 
 #: include/classes/api/services/CConfiguration.php:321
 msgid "No permissions to import media types."
-msgstr ""
+msgstr "メディア タイプをインポートする権限がありません。"
 
 #: include/classes/api/services/CConfiguration.php:324
 msgid "No permissions to import template dashboards."
-msgstr ""
+msgstr "テンプレートダッシュボードをインポートする権限がありません。"
 
 #: include/classes/api/services/CConfiguration.php:315
 msgid "No permissions to import template groups."
-msgstr ""
+msgstr "テンプレート グループをインポートする権限がありません。"
 
 #: include/classes/api/services/CConfiguration.php:322
 msgid "No permissions to import template links."
-msgstr ""
+msgstr "テンプレートリンクをインポートする権限がありません。"
 
 #: include/classes/api/services/CConfiguration.php:323
 msgid "No permissions to import templates."
-msgstr ""
+msgstr "テンプレートをインポートする権限がありません。"
 
 #: include/classes/api/services/CConfiguration.php:325
 msgid "No permissions to import triggers."
-msgstr ""
+msgstr "トリガーをインポートする権限がありません。"
 
 #: include/classes/api/services/CConfiguration.php:326
 msgid "No permissions to import value maps."
-msgstr ""
+msgstr "値マップをインポートする権限がありません。"
 
 #: include/classes/api/services/CConfiguration.php:317
 msgid "No permissions to import web scenarios."
-msgstr ""
+msgstr "Web シナリオをインポートする権限がありません。"
 
 #: app/controllers/CControllerChartsView.php:133
 #: app/controllers/CControllerDashboardPrint.php:99
