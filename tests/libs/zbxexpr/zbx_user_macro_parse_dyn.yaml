@@ -1,0 +1,7 @@
+---
+test case: "test buffer underflow when allcating memory for 'name' argument"
+in:
+  macro: "{$.:}"
+out:
+  result: SUCCEED
+...
