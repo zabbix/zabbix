@@ -466,10 +466,12 @@ class testPageMaps extends CWebTest {
 	public function testPageMaps_Filter($data) {
 		$this->page->login()->open('sysmaps.php?sort=name&sortorder=ASC');
 		$form = CFilterElement::find()->one()->getForm();
+		$table = $this->getTable();
 
 		// Fill filter fields if such present in data provider.
 		$form->fill(CTestArrayHelper::get($data, 'filter'));
 		$form->submit();
+		$table->waitUntilReloaded();
 		$this->page->waitUntilReady();
 
 		// Check that expected maps are returned in the list.

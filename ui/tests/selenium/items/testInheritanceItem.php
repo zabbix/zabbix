@@ -33,6 +33,15 @@ class testInheritanceItem extends CLegacyWebTest {
 	private $hostid = 15001;		// 'Template inheritance test host'
 	private $host = 'Template inheritance test host';
 
+	/**
+	 * Attach CMessageBehavior to the test.
+	 *
+	 * @return array
+	 */
+	public function getBehaviors() {
+		return [CMessageBehavior::class];
+	}
+
 	// returns list of items from a template
 	public static function update() {
 		return CDBHelper::getDataProvider(
@@ -53,8 +62,8 @@ class testInheritanceItem extends CLegacyWebTest {
 
 		$this->zbxTestLogin('items.php?form=update&context=host&itemid='.$data['itemid']);
 		$this->zbxTestClickWait('update');
+		$this->assertMessage(TEST_GOOD, 'Item updated');
 		$this->zbxTestCheckTitle('Configuration of items');
-		$this->zbxTestTextPresent('Item updated');
 
 		$this->assertEquals($oldHashItems, CDBHelper::getHash($sqlItems));
 	}

@@ -47,6 +47,18 @@ class testFormItem extends CLegacyWebTest {
 	 */
 	protected $item = 'testFormItem1';
 
+	/**
+	 * Attach MessageBehavior and TableBehavior to the test.
+	 *
+	 * @return array
+	 */
+	public function getBehaviors() {
+		return [
+			CMessageBehavior::class,
+			CTableBehavior::class
+		];
+	}
+
 	// Returns layout data
 	public static function layout() {
 		return [
@@ -982,8 +994,10 @@ class testFormItem extends CLegacyWebTest {
 		// Open hosts page.
 		$this->zbxTestLogin(self::HOST_LIST_PAGE);
 		// Find filter form and filter necessary host.
+		$table = $this->getTable();
 		$this->query('name:zbx_filter')->asForm()->waitUntilReady()->one()->fill(['Name' => $this->host]);
 		$this->query('button:Apply')->one()->waitUntilClickable()->click();
+		$table->waitUntilReloaded();
 		// Find Items link in host row and click it.
 		$this->query('xpath://table[@class="list-table"]')->asTable()->one()->findRow('Name', $this->host)
 				->getColumn('Items')->query('link:Items')->one()->click();

@@ -398,9 +398,11 @@ class testPageTemplates extends CLegacyWebTest {
 		$this->page->login()->open('templates.php?filter_name=template&filter_evaltype=0&filter_tags%5B0%5D%5Btag%5D='.
 				'&filter_tags%5B0%5D%5Boperator%5D=0&filter_tags%5B0%5D%5Bvalue%5D=&filter_set=1');
 		$form = $this->query('name:zbx_filter')->waitUntilPresent()->asForm()->one();
+		$table = $this->getTable();
 		$form->fill(['id:filter_evaltype' => $data['evaluation_type']]);
 		$this->setTags($data['tags']);
 		$form->submit();
+		$table->waitUntilReloaded();
 		$this->page->waitUntilReady();
 
 		// Check that correct result displayed.
