@@ -1,1 +1,1 @@
-.......PS. [ZBXNEXT-10068] added substitute LLD macros to 'LLD macros' and 'Filters' of nested LLD (MVekslers)
+.......PS. [ZBXNEXT-10068] added resolution of LLD macros in nested JSON when used in discovery prototypes (MVekslers)
