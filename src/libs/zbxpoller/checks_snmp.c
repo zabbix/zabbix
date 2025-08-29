@@ -3452,9 +3452,14 @@ static int	async_task_process_task_snmp_cb(short event, void *data, int *fd, zbx
 			{
 				SET_MSG_RESULT(&snmp_context->item.result, zbx_dsprintf(NULL, "cannot read from"
 						" session: %s", tmp_err_str));
+				zabbix_log(LOG_LEVEL_DEBUG, "itemid:" ZBX_FS_UI64 " cannot read from session: %s",
+						snmp_context->item.itemid, tmp_err_str);
 			}
 			else
 			{
+				zabbix_log(LOG_LEVEL_DEBUG, "itemid:" ZBX_FS_UI64 " cannot read from session",
+						snmp_context->item.itemid);
+
 				SET_MSG_RESULT(&snmp_context->item.result, zbx_dsprintf(NULL, "cannot read from"
 						" session"));
 			}
