@@ -256,7 +256,6 @@ typedef struct
 }
 zbx_snmp_identity_t;
 
-
 static zbx_hash_t	snmp_identity_hash(const void *d)
 {
 	const zbx_snmp_identity_t	*identity = (const zbx_snmp_identity_t *)d;
@@ -3367,7 +3366,6 @@ static int	async_task_process_task_snmp_cb(short event, void *data, int *fd, zbx
 
 					return async_task_process_task_snmp_cb(0, data, fd, addresses, reverse_dns,
 							dnserr, timeout_event);
-
 				}
 				task_ret = ZBX_ASYNC_TASK_READ;
 				goto stop;
@@ -3541,12 +3539,13 @@ static int	async_task_process_task_snmp_cb(short event, void *data, int *fd, zbx
 	}
 	else
 	{
-		zbx_snmp_identity_t	*identity_ptr, identity;
-		unsigned char		*securityEngineID = NULL;
-		size_t			securityEngineIDLen = 0;
+		unsigned char	*securityEngineID = NULL;
+		size_t		securityEngineIDLen = 0;
 
 		if (1 == engineid_cache_initialized)
 		{
+			zbx_snmp_identity_t	*identity_ptr, identity;
+
 			zbx_strlcpy(identity.address, addresses->values[0].ip, sizeof(identity.address));
 
 			if (NULL != (identity_ptr = zbx_hashset_search(&identity_cache, &identity)))
