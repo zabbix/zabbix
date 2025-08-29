@@ -4383,8 +4383,8 @@ static void	lld_item_prototypes_get(zbx_uint64_t lld_ruleid, zbx_vector_lld_item
 		zbx_hashset_create(&item_prototype->item_index, 0, lld_item_ref_key_hash_func,
 				lld_item_ref_key_compare_func);
 
-		zbx_sync_rowset_init(&item_prototype->macro_paths, ZBX_LLD_PROTOTYPE_MACRO_PATH_COLS_NUM);
-		zbx_sync_rowset_init(&item_prototype->filters, ZBX_LLD_PROTOTYPE_FILTERS_COLS_NUM);
+		zbx_sync_rowset_init(&item_prototype->macro_paths, ZBX_LLD_ITEM_PROTOTYPE_MACRO_PATH_COLS_NUM);
+		zbx_sync_rowset_init(&item_prototype->filters, ZBX_LLD_ITEM_PROTOTYPE_FILTERS_COLS_NUM);
 		zbx_sync_rowset_init(&item_prototype->overrides, 5);
 
 		zbx_vector_lld_item_prototype_ptr_append(item_prototypes, item_prototype);

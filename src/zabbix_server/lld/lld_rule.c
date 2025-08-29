@@ -368,7 +368,7 @@ void	lld_rule_macro_paths_make(zbx_vector_lld_item_full_ptr_t *items)
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
-	zbx_sync_rowset_init(&macro_paths_subst, ZBX_LLD_PROTOTYPE_MACRO_PATH_COLS_NUM);
+	zbx_sync_rowset_init(&macro_paths_subst, ZBX_LLD_ITEM_PROTOTYPE_MACRO_PATH_COLS_NUM);
 
 	for (int i = 0; i < items->values_num; i++)
 	{
@@ -765,7 +765,7 @@ void	lld_rule_filters_make(zbx_vector_lld_item_full_ptr_t *items, char **info)
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
-	zbx_sync_rowset_init(&filters_subst, ZBX_LLD_PROTOTYPE_FILTERS_COLS_NUM);
+	zbx_sync_rowset_init(&filters_subst, ZBX_LLD_ITEM_PROTOTYPE_FILTERS_COLS_NUM);
 
 	for (int i = 0; i < items->values_num; i++)
 	{
