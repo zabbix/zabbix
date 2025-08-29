@@ -3622,7 +3622,6 @@ stop:
 
 	if (ZBX_ASYNC_TASK_STOP == task_ret && ZBX_ISSET_MSG(&snmp_context->item.result))
 	{
-
 		if (1 == engineid_cache_initialized)
 			snmp_identity_remove(addresses->values[0].ip);
 
