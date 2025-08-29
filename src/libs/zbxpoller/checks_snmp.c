@@ -3358,6 +3358,7 @@ static int	async_task_process_task_snmp_cb(short event, void *data, int *fd, zbx
 						0 == snmp_context->probe_processed && 0 == snmp_context->probe)
 				{
 					snmp_context->probe = 1;
+					snmp_context->probe_processed = 0;
 
 					snmp_sess_close(snmp_context->ssp);
 
