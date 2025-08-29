@@ -1,8 +1,10 @@
 Changes for 6.0.42rc1
 
 New features:
+.......PS. [ZBXNEXT-10077] updated maximal supported MariaDB version to 12.0 (mprihodko)
 
 Bug fixes:
+..F....... [ZBX-21975] fixed user autologout not removing user SAML authentication data (gcalenko)
 
 --------------------------------------------------------------------------------
 Changes for 6.0.41
