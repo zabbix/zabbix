@@ -3573,11 +3573,12 @@ static int	async_task_process_task_snmp_cb(short event, void *data, int *fd, zbx
 	}
 	else
 	{
-		unsigned char	*securityEngineID = NULL;
-		size_t		securityEngineIDLen = 0;
+		unsigned char		*securityEngineID = NULL;
+		size_t			securityEngineIDLen = 0;
 		zbx_snmp_identity_t	*identity_ptr;
 
-		if (NULL != (identity_ptr = zbx_get_snmp_identity(addresses->values[0].ip,
+		if (ZBX_IF_SNMP_VERSION_3 == snmp_context->snmp_version &&
+				NULL != (identity_ptr = zbx_get_snmp_identity(addresses->values[0].ip,
 				snmp_context->item.interface.revision)))
 		{
 				securityEngineID = identity_ptr->engineid;
@@ -3621,8 +3622,28 @@ stop:
 
 	if (ZBX_ASYNC_TASK_STOP == task_ret && ZBX_ISSET_MSG(&snmp_context->item.result))
 	{
+
 		if (1 == engineid_cache_initialized)
 			snmp_identity_remove(addresses->values[0].ip);
+
+		if (ZBX_IF_SNMP_VERSION_3 == snmp_context->snmp_version &&
+				0 == snmp_context->probe_processed && 0 == snmp_context->probe)
+		{
+			zabbix_log(LOG_LEVEL_DEBUG, "itemid:" ZBX_FS_UI64 " cannot receive response from [[%s]:%hu]:"
+					" retrying with probe", snmp_context->item.itemid,
+					snmp_context->item.interface.addr, snmp_context->item.interface.port);
+
+			/* retry if failed with cached engine id */
+			struct timeval	tv = {snmp_context->config_timeout, 0};
+
+			evtimer_add(timeout_event, &tv);
+			snmp_context->probe = 1;
+
+			snmp_sess_close(snmp_context->ssp);
+
+			return async_task_process_task_snmp_cb(0, data, fd, addresses, reverse_dns,
+					dnserr, timeout_event);
+		}
 
 		zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s itemid:" ZBX_FS_UI64 " %s event:%d fd:%d size:"
 				ZBX_FS_SIZE_T " error:%s",
