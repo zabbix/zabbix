@@ -1,0 +1,1 @@
+..F.....S. [ZBX-25739] fixed timeleft() function to return 1.7976931348623157E+308 instead of making item unsupported in the case of the infinite time (arimdjonoks, averza)

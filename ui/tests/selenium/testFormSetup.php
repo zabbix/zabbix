@@ -355,10 +355,14 @@ class testFormSetup extends CWebTest {
 
 		// Check screenshot of the Pre-installation summary section.
 		$skip_fields = [];
-		foreach(['Database server', 'Database port', 'Database name'] as $skip_field) {
+		foreach(['Database server', 'Database port'] as $skip_field) {
 			$xpath = 'xpath://span[text()='.CXPathHelper::escapeQuotes($skip_field).']/../../div[@class="table-forms-td-right"]';
 			$skip_fields[] = $this->query($xpath)->one();
 		}
+		// Remove database name due to unstable screenshot, one pixel visible.
+		CElementQuery::getDriver()->executeScript("arguments[0].textContent = '';",
+				[$this->query('xpath://span[text()="Database name"]/../../div[@class="table-forms-td-right"]')->one()]
+		);
 		$this->assertScreenshotExcept($this->query('xpath://form')->one(), $skip_fields, 'PreInstall_'.$db_parameters['Database type']);
 	}
 
@@ -845,19 +849,19 @@ class testFormSetup extends CWebTest {
 		$this->openSpecifiedSection('Pre-installation summary');
 
 		// Proceed back to the 1st section of the setup form.
-		$this->query('button:Back')->one()->click();
+		$this->query('button:Back')->one()->click()->waitUntilStalled();
 		$this->assertEquals('Settings', $this->query('xpath://h1')->one()->getText());
-		$this->query('button:Back')->one()->click();
+		$this->query('button:Back')->one()->click()->waitUntilStalled();
 		$this->assertEquals('Configure DB connection', $this->query('xpath://h1')->one()->getText());
-		$this->query('button:Back')->one()->click();
+		$this->query('button:Back')->one()->click()->waitUntilStalled();
 		$this->assertEquals('Check of pre-requisites', $this->query('xpath://h1')->one()->getText());
-		$this->query('button:Back')->one()->click();
+		$this->query('button:Back')->one()->click()->waitUntilStalled();
 		$this->assertEquals("Welcome to\nZabbix ".ZABBIX_EXPORT_VERSION, $this->query('xpath://div[@class="setup-title"]')->one()->getText());
 		$this->checkSections('Welcome');
 		$this->checkButtons('first section');
 
 		// Cancel setup form update.
-		$this->query('button:Cancel')->one()->click();
+		$this->query('button:Cancel')->one()->click()->waitUntilStalled();
 		$this->assertStringContainsString('zabbix.php?action=dashboard.view', $this->page->getCurrentURL());
 	}
 
