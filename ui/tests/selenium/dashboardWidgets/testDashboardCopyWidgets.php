@@ -752,6 +752,8 @@ class testDashboardCopyWidgets extends CWebTest {
 		if ($this->page->isAlertPresent()) {
 			$this->page->acceptAlert();
 		}
+		// TODO: unstable test on Jenkins, appears js error 34749:5 Uncaught
+		CDashboardElement::find()->waitUntilReady();
 	}
 
 	/**

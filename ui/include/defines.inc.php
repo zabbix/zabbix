@@ -2254,6 +2254,7 @@ define('ZBX_STYLE_TAG_INHERITED', 'tag-inherited');
 define('ZBX_STYLE_TAG_INHERITED_DUPLICATE', 'tag-inherited-duplicate');
 define('ZBX_STYLE_TAG_INHERITED_TITLE', 'tag-inherited-title');
 define('ZBX_STYLE_TAGS_LIST', 'tags-list');
+define('ZBX_STYLE_TAGS_WRAPPER', 'tags-wrapper');
 define('ZBX_STYLE_TEXT_PLACEHOLDER', 'text-placeholder');
 define('ZBX_STYLE_TEXTAREA_FLEXIBLE', 'textarea-flexible');
 define('ZBX_STYLE_TEXTAREA_FLEXIBLE_CONTAINER', 'textarea-flexible-container');

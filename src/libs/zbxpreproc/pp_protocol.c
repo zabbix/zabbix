@@ -24,6 +24,7 @@
 #include "zbxstats.h"
 #include "zbxcacheconfig.h"
 #include "zbxcachehistory.h"
+#include "zbxjson.h"
 
 #define PACKED_FIELD_RAW	0
 #define PACKED_FIELD_STRING	1
@@ -299,7 +300,7 @@ static void     preprocessor_serialize_value(zbx_uint64_t itemid, unsigned char 
 	if (NULL != result && ZBX_ISSET_META(result))
 	{
 		ptr += zbx_serialize_value(ptr, result->lastlogsize);
-		ptr += zbx_serialize_value(ptr, result->mtime);
+		(void)zbx_serialize_value(ptr, result->mtime);
 	}
 
 	preproc_offset += data_len;
@@ -680,7 +681,8 @@ zbx_uint32_t	zbx_preprocessor_pack_test_result(unsigned char **data, const zbx_p
 zbx_uint32_t	zbx_preprocessor_pack_diag_stats(unsigned char **data, zbx_uint64_t preproc_num,
 		zbx_uint64_t pending_num, zbx_uint64_t finished_num, zbx_uint64_t sequences_num,
 		zbx_uint64_t queued_num, zbx_uint64_t queued_sz, zbx_uint64_t direct_num, zbx_uint64_t direct_sz,
-		zbx_uint64_t history_sz)
+		zbx_uint64_t history_sz, zbx_uint64_t finished_peak_num, zbx_uint64_t pending_peak_num,
+		zbx_uint64_t processed_num)
 {
 	unsigned char	*ptr;
 	zbx_uint32_t	data_len = 0;
@@ -694,6 +696,9 @@ zbx_uint32_t	zbx_preprocessor_pack_diag_stats(unsigned char **data, zbx_uint64_t
 	zbx_serialize_prepare_value(data_len, direct_num);
 	zbx_serialize_prepare_value(data_len, direct_sz);
 	zbx_serialize_prepare_value(data_len, history_sz);
+	zbx_serialize_prepare_value(data_len, finished_peak_num);
+	zbx_serialize_prepare_value(data_len, pending_peak_num);
+	zbx_serialize_prepare_value(data_len, processed_num);
 
 	*data = (unsigned char *)zbx_malloc(NULL, data_len);
 
@@ -706,7 +711,10 @@ zbx_uint32_t	zbx_preprocessor_pack_diag_stats(unsigned char **data, zbx_uint64_t
 	ptr += zbx_serialize_value(ptr, queued_sz);
 	ptr += zbx_serialize_value(ptr, direct_num);
 	ptr += zbx_serialize_value(ptr, direct_sz);
-	(void)zbx_serialize_value(ptr, history_sz);
+	ptr += zbx_serialize_value(ptr, history_sz);
+	ptr += zbx_serialize_value(ptr, finished_peak_num);
+	ptr += zbx_serialize_value(ptr, pending_peak_num);
+	(void)zbx_serialize_value(ptr, processed_num);
 
 	return data_len;
 }
@@ -894,6 +902,7 @@ void	zbx_preprocessor_unpack_test_result(zbx_vector_pp_result_ptr_t *results, zb
 void	zbx_preprocessor_unpack_diag_stats(zbx_uint64_t *preproc_num, zbx_uint64_t *pending_num,
 		zbx_uint64_t *finished_num, zbx_uint64_t *sequences_num, zbx_uint64_t *queued_num,
 		zbx_uint64_t *queued_sz, zbx_uint64_t *direct_num, zbx_uint64_t *direct_sz, zbx_uint64_t *history_sz,
+		zbx_uint64_t *finished_peak_num, zbx_uint64_t *pending_peak_num, zbx_uint64_t *processed_num,
 		const unsigned char *data)
 {
 	const unsigned char	*offset = data;
@@ -906,7 +915,10 @@ void	zbx_preprocessor_unpack_diag_stats(zbx_uint64_t *preproc_num, zbx_uint64_t 
 	offset += zbx_deserialize_value(offset, queued_sz);
 	offset += zbx_deserialize_value(offset, direct_num);
 	offset += zbx_deserialize_value(offset, direct_sz);
-	(void)zbx_deserialize_value(offset, history_sz);
+	offset += zbx_deserialize_value(offset, history_sz);
+	offset += zbx_deserialize_value(offset, finished_peak_num);
+	offset += zbx_deserialize_value(offset, pending_peak_num);
+	(void)zbx_deserialize_value(offset, processed_num);
 }
 
 /******************************************************************************
@@ -1326,6 +1338,7 @@ out:
 int	zbx_preprocessor_get_diag_stats(zbx_uint64_t *preproc_num, zbx_uint64_t *pending_num,
 		zbx_uint64_t *finished_num, zbx_uint64_t *sequences_num, zbx_uint64_t *queued_num,
 		zbx_uint64_t *queued_sz, zbx_uint64_t *direct_num, zbx_uint64_t *direct_sz, zbx_uint64_t *history_sz,
+		zbx_uint64_t *finished_peak_num, zbx_uint64_t *pending_peak_num, zbx_uint64_t *processed_num,
 		char **error)
 {
 	unsigned char	*result;
@@ -1337,7 +1350,8 @@ int	zbx_preprocessor_get_diag_stats(zbx_uint64_t *preproc_num, zbx_uint64_t *pen
 	}
 
 	zbx_preprocessor_unpack_diag_stats(preproc_num, pending_num, finished_num, sequences_num, queued_num,
-			queued_sz, direct_num, direct_sz, history_sz, result);
+			queued_sz, direct_num, direct_sz, history_sz, finished_peak_num, pending_peak_num,
+			processed_num, result);
 	zbx_free(result);
 
 	return SUCCEED;
