@@ -176,7 +176,9 @@ $translate_strings = [
 		'Edit' => _('Edit'),
 		'No refresh' => _('No refresh'),
 		'Paste' => _('Paste'),
-		'Refresh interval' => _('Refresh interval')
+		'Refresh interval' => _('Refresh interval'),
+		'Edit widget' => _('Edit widget settings'),
+		'Open widget actions' => _('Open widget actions')
 	],
 	'class.widget.inaccessible.js' => [
 		'No permissions to referred object or it does not exist!' =>
@@ -213,6 +215,7 @@ $translate_strings = [
 	],
 	'functions.js' => [
 		'Close' => _('Close'),
+		'Close notification' => _('Close notification'),
 		'Details' => _('Details'),
 		'S_YEAR_SHORT' => _x('y', 'year short'),
 		'S_MONTH_SHORT' => _x('M', 'month short'),
@@ -253,7 +256,11 @@ $translate_strings = [
 		'S_THURSDAY_SHORT_BIG' => _x('T', 'Thursday short'),
 		'S_FRIDAY_SHORT_BIG' => _x('F', 'Friday short'),
 		'S_SATURDAY_SHORT_BIG' => _x('S', 'Saturday short'),
-		'S_SUNDAY_SHORT_BIG' => _x('S', 'Sunday short')
+		'S_SUNDAY_SHORT_BIG' => _x('S', 'Sunday short'),
+		'Previous year' => _('Previous year'),
+		'Next year' => _('Next year'),
+		'Previous month' => _('Previous month'),
+		'Next month' => _('Next month')
 	],
 	'class.cmap.js' => [
 		'S_ON' => _('On'),
@@ -308,7 +315,9 @@ $translate_strings = [
 	],
 	'class.overlay.js' => [
 		'Help' => _('Help'),
-		'S_CLOSE' => _('Close')
+		'S_CLOSE' => _('Close'),
+		'Close modal window' => _('Close modal window'),
+		'Open Zabbix documentation in a new tab' => _('Open Zabbix documentation in a new tab')
 	],
 	'class.cookie.js' => [
 		'S_MAX_COOKIE_SIZE_REACHED' =>
@@ -463,6 +472,9 @@ $translate_strings = [
 		'Open URL' => _('Open URL'),
 		'Unexpected server error.' => _('Unexpected server error.'),
 		'URL opening confirmation' => _('URL opening confirmation')
+	],
+	'class.tabfilteritem.js' => [
+		'Edit filter properties' => _('Edit filter properties')
 	],
 	'class.navigationtree.js' => [
 		'Maintenance with data collection' => _('Maintenance with data collection'),

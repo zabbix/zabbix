@@ -377,7 +377,8 @@ class CTabFilter extends CDiv {
 		$nav_list = new CList([
 			(new CButtonIcon(ZBX_ICON_CHEVRON_DOWN))->setAttribute('data-action', 'toggleTabsList')
 				->setAttribute('aria-label', _('List of open filter tabs'))
-				->setAttribute('aria-expanded', 'false'),
+				->setAttribute('aria-expanded', 'false')
+				->setAttribute('aria-controls', bin2hex(random_bytes(16))),
 			(new CButtonIcon(ZBX_ICON_CHEVRON_RIGHT))->setAttribute('data-action', 'selectNextTab')
 				->setAttribute('aria-label', _('Go to next filter tab'))
 		]);

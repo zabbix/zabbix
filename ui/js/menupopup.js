@@ -1821,6 +1821,11 @@ jQuery(function($) {
 				$menu_popup.addClass(options.class);
 			}
 
+			// Add dynamic ID, if specified.
+			if ('dynamicId' in options) {
+				$menu_popup.prop('id', options.dynamicId);
+			}
+
 			$opener.data({
 				sections: sections,
 				menu_popup: $menu_popup

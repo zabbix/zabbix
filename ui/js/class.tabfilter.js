@@ -696,7 +696,8 @@ class CTabFilter extends CBaseComponent {
 					dropdown.push({items: dropdown_items});
 				}
 
-				$(this._target).menuPopup(dropdown, new jQuery.Event(ev));
+				const dynamicid = $(ev.target).attr('aria-controls');
+				$(this._target).menuPopup(dropdown, new jQuery.Event(ev), {dynamicId: dynamicid});
 				ev.target.setAttribute('aria-expanded', 'true');
 			},
 
