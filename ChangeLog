@@ -1,3 +1,15 @@
+Changes for 7.4.3rc1
+
+New features:
+
+Bug fixes:
+
+--------------------------------------------------------------------------------
+Changes for 7.4.2
+
+7.4.2rc2 was released as 7.4.2 without any changes
+
+--------------------------------------------------------------------------------
 Changes for 7.4.2rc2
 
 Bug fixes:
@@ -939,6 +951,18 @@ A.F....... [ZBX-23227] fixed issue where using an empty array or string value fo
 ...GI..PS. [ZBX-25140] updated configure to reject TLS-unaware compilers (jxl)
 ...G...... [ZBX-25149] fixed Zabbix agent build on AIX and Solaris (arimdjonoks)
 ....I..... [ZBX-23881] dropped preference list when searching for compiler (jxl)
+
+--------------------------------------------------------------------------------
+Changes for 7.0.19rc1
+
+New features:
+
+Bug fixes:
+
+--------------------------------------------------------------------------------
+Changes for 7.0.18
+
+7.0.18rc2 was released as 7.0.18 without any changes
 
 --------------------------------------------------------------------------------
 Changes for 7.0.18rc2
