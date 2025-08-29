@@ -113,6 +113,7 @@ typedef struct
 	zbx_hc_proxyqueue_t	proxyqueue;
 	int			processing_num;
 	double			last_error_ts;
+	double			last_warning_ts;
 	int			refcount;
 }
 ZBX_DC_CACHE;
@@ -3080,22 +3081,36 @@ static int	diag_compare_pair_second_desc(const void *d1, const void *d2)
  * Purpose: log history cache full message and top values                     *
  *                                                                            *
  ******************************************************************************/
-static void	hc_print_history_cache_full(zbx_vector_uint64_pair_t *items)
+static void	hc_log_history_cache_usage(zbx_vector_uint64_pair_t *items)
+{
+	const char	*log_msg = "History cache is full. Sleeping for 1 second.";
+	double		time_now = zbx_time();
+
+	if (SEC_PER_MIN > time_now - cache->last_error_ts)
+	{
+		zabbix_log(LOG_LEVEL_DEBUG, "%s", log_msg);
+		return;
+	}
+
+	cache->last_error_ts = time_now;
+
+	zabbix_log(LOG_LEVEL_WARNING, "%s", log_msg);
+	zbx_hc_log_high_cache_usage(items);
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: log items with highest number of values in history cache when     *
+ *          cache usage is high                                               *
+ *                                                                            *
+ * Parameters: items - [IN] vector of itemid/value count pairs                *
+ *                                                                            *
+ ******************************************************************************/
+void	zbx_hc_log_high_cache_usage(zbx_vector_uint64_pair_t *items)
 {
 	int	limit;
 	char	*str = NULL;
 	size_t	str_alloc = 0, str_offset = 0;
-	double	time_now = zbx_time();
-
-	if (SEC_PER_MIN > time_now - cache->last_error_ts)
-	{
-		zabbix_log(LOG_LEVEL_DEBUG, "History cache is full. Sleeping for 1 second.");
-		return;
-	}
-
-	zabbix_log(LOG_LEVEL_WARNING, "History cache is full. Sleeping for 1 second.");
-
-	cache->last_error_ts = time_now;
 
 	zbx_vector_uint64_pair_sort(items, diag_compare_pair_second_desc);
 
@@ -3169,7 +3184,7 @@ static void	hc_add_item_values(dc_item_value_t *values, int values_num)
 
 				UNLOCK_CACHE;
 
-				hc_print_history_cache_full(&items);
+				hc_log_history_cache_usage(&items);
 
 				zbx_vector_uint64_pair_destroy(&items);
 				sleep(1);
@@ -3537,6 +3552,7 @@ int	zbx_init_database_cache(zbx_get_program_type_f get_program_type,
 	cache->history_num_total = 0;
 	cache->history_progress_ts = 0;
 	cache->last_error_ts = 0;
+	cache->last_warning_ts = 0;
 	cache->trends_progress_ts = 0;
 
 	cache->db_trigger_queue_lock = 1;
@@ -3771,6 +3787,19 @@ static void	hc_get_items(zbx_vector_uint64_pair_t *items)
 	}
 }
 
+int	zbx_hc_check_high_usage_timer(void)
+{
+	double	now = zbx_time();
+
+	if (SEC_PER_MIN <= now - cache->last_warning_ts)
+	{
+		cache->last_warning_ts = now;
+		return SUCCEED;
+	}
+
+	return FAIL;
+}
+
 /******************************************************************************
  *                                                                            *
  * Purpose: get statistics of cached items                                    *
@@ -3783,6 +3812,11 @@ void	zbx_hc_get_items(zbx_vector_uint64_pair_t *items)
 	hc_get_items(items);
 
 	UNLOCK_CACHE;
+}
+
+void	zbx_hc_get_items_unlocked(zbx_vector_uint64_pair_t *items)
+{
+	hc_get_items(items);
 }
 
 void	zbx_hc_acquire(void)
