@@ -40,7 +40,13 @@ class CControllerProxyCreate extends CController {
 			'address' => [
 				['db proxy.address',
 					'use' => [CIPParser::class, [
-						'usermacros' => false, 'lldmacros' => false, 'macros' => true, 'v6' => ZBX_HAVE_IPV6
+						'usermacros' => true, 'lldmacros' => false, 'macros' => false, 'v6' => ZBX_HAVE_IPV6
+					]],
+					'messages' => ['use' => _('Invalid address.')]
+				],
+				['db proxy.address',
+					'use' => [CDnsParser::class, [
+						'usermacros' => true, 'lldmacros' => false, 'macros' => false
 					]],
 					'messages' => ['use' => _('Invalid address.')]
 				],
@@ -52,10 +58,20 @@ class CControllerProxyCreate extends CController {
 				'use' => [CPortParser::class, ['usermacros' => true]], 'messages' => ['use' => _('Incorrect port.')],
 				'when' => ['operating_mode', 'in' => [PROXY_OPERATING_MODE_PASSIVE]]
 			],
-			'local_address' => ['db proxy.local_address', 'required', 'not_empty',
-				'use' => [CIPParser::class, ['usermacros' => false, 'lldmacros' => false, 'macros' => true,
-					'v6' => ZBX_HAVE_IPV6]], 'messages' => ['use' => _('Invalid address.')],
-				'when' => ['proxy_groupid', 'not_empty']
+			'local_address' => [
+				['db proxy.local_address',
+					'use' => [CIPParser::class, [
+						'usermacros' => false, 'lldmacros' => false, 'macros' => false, 'v6' => ZBX_HAVE_IPV6
+					]],
+					'messages' => ['use' => _('Invalid address.')]
+				],
+				['db proxy.local_address',
+					'use' => [CDnsParser::class, [
+						'usermacros' => false, 'lldmacros' => false, 'macros' => false
+					]],
+					'messages' => ['use' => _('Invalid address.')]
+				],
+				['db proxy.local_address', 'required', 'not_empty', 'when' => ['proxy_groupid', 'not_empty']]
 			],
 			'local_port' =>	['db proxy.local_port', 'required', 'not_empty',
 				'use' => [CPortParser::class, ['usermacros' => true]], 'messages' => ['use' => _('Incorrect port.')],
@@ -91,8 +107,10 @@ class CControllerProxyCreate extends CController {
 				'when' => ['operating_mode', 'in' => [PROXY_OPERATING_MODE_PASSIVE]]
 			],
 			'tls_psk_identity' => [
-				['db proxy.tls_psk_identity', 'not_empty', 'when' => ['tls_accept_psk', true]],
-				['db proxy.tls_psk_identity', 'not_empty', 'when' => ['tls_connect', 'in' => [HOST_ENCRYPTION_PSK]]]
+				['db proxy.tls_psk_identity', 'required', 'not_empty', 'when' => ['tls_accept_psk', true]],
+				['db proxy.tls_psk_identity', 'required', 'not_empty',
+					'when' => ['tls_connect', 'in' => [HOST_ENCRYPTION_PSK]]
+				]
 			],
 			'tls_psk' => [
 				['db proxy.tls_psk',
@@ -107,8 +125,10 @@ class CControllerProxyCreate extends CController {
 					'regex' => '/^[0-9a-f]*$/i',
 					'messages' => ['regex' => _('PSK must contain only hexadecimal characters.')]
 				],
-				['db proxy.tls_psk', 'not_empty', 'when' => ['tls_accept_psk', true]],
-				['db proxy.tls_psk_identity', 'not_empty', 'when' => ['tls_connect', 'in' => [HOST_ENCRYPTION_PSK]]]
+				['db proxy.tls_psk', 'required', 'not_empty', 'when' => ['tls_accept_psk', true]],
+				['db proxy.tls_psk_identity', 'required', 'not_empty',
+					'when' => ['tls_connect', 'in' => [HOST_ENCRYPTION_PSK]]
+				]
 			],
 			'tls_issuer' => ['db proxy.tls_issuer', 'when' => ['tls_connect', 'in' => [HOST_ENCRYPTION_CERTIFICATE]]],
 			'tls_subject' => ['db proxy.tls_subject', 'when' => ['tls_connect', 'in' => [HOST_ENCRYPTION_CERTIFICATE]]],
@@ -116,43 +136,43 @@ class CControllerProxyCreate extends CController {
 				'in' => [ZBX_PROXY_CUSTOM_TIMEOUTS_DISABLED, ZBX_PROXY_CUSTOM_TIMEOUTS_ENABLED]
 			],
 			'timeout_zabbix_agent' => ['db proxy.timeout_zabbix_agent', 'required', 'not_empty',
-				'use' => [CTimeUnitValidator::class, ['max' => SEC_PER_DAY, 'usermacros' => true]],
+				'use' => [CTimeUnitValidator::class, ['min' => 1, 'max' => 10 * SEC_PER_MIN, 'usermacros' => true]],
 				'when' => ['custom_timeouts', 'in' => [ZBX_PROXY_CUSTOM_TIMEOUTS_ENABLED]]
 			],
 			'timeout_simple_check' => ['db proxy.timeout_simple_check', 'required', 'not_empty',
-				'use' => [CTimeUnitValidator::class, ['max' => SEC_PER_DAY, 'usermacros' => true]],
+				'use' => [CTimeUnitValidator::class, ['min' => 1, 'max' => 10 * SEC_PER_MIN, 'usermacros' => true]],
 				'when' => ['custom_timeouts', 'in' => [ZBX_PROXY_CUSTOM_TIMEOUTS_ENABLED]]
 			],
 			'timeout_snmp_agent' =>		['db proxy.timeout_snmp_agent', 'required', 'not_empty',
-				'use' => [CTimeUnitValidator::class, ['max' => SEC_PER_DAY, 'usermacros' => true]],
+				'use' => [CTimeUnitValidator::class, ['min' => 1, 'max' => 10 * SEC_PER_MIN, 'usermacros' => true]],
 				'when' => ['custom_timeouts', 'in' => [ZBX_PROXY_CUSTOM_TIMEOUTS_ENABLED]]
 			],
 			'timeout_external_check' =>	['db proxy.timeout_external_check', 'required', 'not_empty',
-				'use' => [CTimeUnitValidator::class, ['max' => SEC_PER_DAY, 'usermacros' => true]],
+				'use' => [CTimeUnitValidator::class, ['min' => 1, 'max' => 10 * SEC_PER_MIN, 'usermacros' => true]],
 				'when' => ['custom_timeouts', 'in' => [ZBX_PROXY_CUSTOM_TIMEOUTS_ENABLED]]
 			],
 			'timeout_db_monitor' =>		['db proxy.timeout_db_monitor', 'required', 'not_empty',
-				'use' => [CTimeUnitValidator::class, ['max' => SEC_PER_DAY, 'usermacros' => true]],
+				'use' => [CTimeUnitValidator::class, ['min' => 1, 'max' => 10 * SEC_PER_MIN, 'usermacros' => true]],
 				'when' => ['custom_timeouts', 'in' => [ZBX_PROXY_CUSTOM_TIMEOUTS_ENABLED]]
 			],
 			'timeout_http_agent' =>		['db proxy.timeout_http_agent', 'required', 'not_empty',
-				'use' => [CTimeUnitValidator::class, ['max' => SEC_PER_DAY, 'usermacros' => true]],
+				'use' => [CTimeUnitValidator::class, ['min' => 1, 'max' => 10 * SEC_PER_MIN, 'usermacros' => true]],
 				'when' => ['custom_timeouts', 'in' => [ZBX_PROXY_CUSTOM_TIMEOUTS_ENABLED]]
 			],
 			'timeout_ssh_agent' =>		['db proxy.timeout_ssh_agent', 'required', 'not_empty',
-				'use' => [CTimeUnitValidator::class, ['max' => SEC_PER_DAY, 'usermacros' => true]],
+				'use' => [CTimeUnitValidator::class, ['min' => 1, 'max' => 10 * SEC_PER_MIN, 'usermacros' => true]],
 				'when' => ['custom_timeouts', 'in' => [ZBX_PROXY_CUSTOM_TIMEOUTS_ENABLED]]
 			],
 			'timeout_telnet_agent' =>	['db proxy.timeout_telnet_agent', 'required', 'not_empty',
-				'use' => [CTimeUnitValidator::class, ['max' => SEC_PER_DAY, 'usermacros' => true]],
+				'use' => [CTimeUnitValidator::class, ['min' => 1, 'max' => 10 * SEC_PER_MIN, 'usermacros' => true]],
 				'when' => ['custom_timeouts', 'in' => [ZBX_PROXY_CUSTOM_TIMEOUTS_ENABLED]]
 			],
 			'timeout_script' =>			['db proxy.timeout_script', 'required', 'not_empty',
-				'use' => [CTimeUnitValidator::class, ['max' => SEC_PER_DAY, 'usermacros' => true]],
+				'use' => [CTimeUnitValidator::class, ['min' => 1, 'max' => 10 * SEC_PER_MIN, 'usermacros' => true]],
 				'when' => ['custom_timeouts', 'in' => [ZBX_PROXY_CUSTOM_TIMEOUTS_ENABLED]]
 			],
 			'timeout_browser' =>		['db proxy.timeout_browser', 'required', 'not_empty',
-				'use' => [CTimeUnitValidator::class, ['max' => SEC_PER_DAY, 'usermacros' => true]],
+				'use' => [CTimeUnitValidator::class, ['min' => 1, 'max' => 10 * SEC_PER_MIN, 'usermacros' => true]],
 				'when' => ['custom_timeouts', 'in' => [ZBX_PROXY_CUSTOM_TIMEOUTS_ENABLED]]
 			],
 			'clone_psk' => ['boolean'],
