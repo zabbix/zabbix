@@ -145,7 +145,8 @@ func (p *Plugin) EventSourceByKey(rawKey string) (watch.EventSource, error) {
 		return nil, err
 	}
 
-	if client, ok = p.mqttClients[b]; !ok {
+	client, ok = p.mqttClients[b]
+	if !ok {
 		impl.Tracef("creating client for [%s]", b.url)
 		client = &mqttClient{
 			client:    nil,
@@ -161,7 +162,11 @@ func (p *Plugin) EventSourceByKey(rawKey string) (watch.EventSource, error) {
 	if !ok {
 		impl.Tracef("creating new subscriber on topic '%s' for [%s]", topic, b.url)
 
-		sub = &mqttSub{b, topic, hasWildCards(topic)}
+		sub = &mqttSub{
+			broker:   b,
+			topic:    topic,
+			wildCard: hasWildCards(topic),
+		}
 		client.subs[topic] = sub
 	}
 
@@ -184,7 +189,9 @@ func (ms *mqttSub) Initialize() error {
 		if err != nil {
 			impl.Warningf("cannot establish connection to [%s]: %s", ms.broker.url, err)
 
-			return errs.Wrap(err, "cannot establish connection to broker")
+			ms.startAsyncEstablishingConnectionBackoff(mc)
+
+			return nil // the backoff system will try to make connection
 		}
 
 		impl.Debugf("established connection to [%s]", ms.broker.url)
@@ -263,6 +270,36 @@ func (f *respFilter) Process(v any) (*string, error) {
 	}
 
 	return &value, nil
+}
+
+func (ms *mqttSub) startAsyncEstablishingConnectionBackoff(mc *mqttClient) {
+	var (
+		// backoff by Fibonacci sequence
+		wait1 = 1 * time.Second
+		wait2 = 1 * time.Second
+	)
+
+	go func() {
+		for {
+			time.Sleep(wait1)
+
+			if wait1 <= 15*time.Minute {
+				wait2 += wait1
+				wait2, wait1 = wait1, wait2
+			}
+
+			var err error
+
+			mc.client, err = newClient(mc.opts)
+			if err != nil {
+				impl.Debugf("cannot establish connection to [%s]: %s", ms.broker.url, err)
+			}
+
+			if err == nil {
+				return
+			}
+		}
+	}()
 }
 
 func (p *Plugin) createOptions(
@@ -354,7 +391,6 @@ func getTLSConfig(d *tlsconfig.Details) (*tls.Config, error) {
 		},
 		false,
 	)
-
 	if err != nil {
 		return nil, errs.Wrap(err, "cannot create tls config")
 	}
