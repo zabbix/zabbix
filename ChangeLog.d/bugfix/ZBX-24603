@@ -1,1 +1,0 @@
-A......... [ZBX-24603] fixed MFA TOTP secrets not being deleted when deleting users from MFA-enabled user groups (agriscenko, jfreibergs)
