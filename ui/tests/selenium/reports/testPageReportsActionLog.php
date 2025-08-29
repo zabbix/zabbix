@@ -651,6 +651,7 @@ class testPageReportsActionLog extends CWebTest {
 
 		// Filter by time.
 		$form = $this->query('name:zbx_filter')->asForm()->one();
+		$table = $this->getTable();
 
 		if (array_key_exists('time', $data)) {
 			// Enable time tab.
@@ -677,6 +678,7 @@ class testPageReportsActionLog extends CWebTest {
 			$form->fill($data['fields'])->submit();
 		}
 
+		$table->waitUntilReloaded();
 		$this->page->waitUntilReady();
 		$this->assertTableHasData($data['result']);
 		$this->assertTableStats(count($data['result']));

@@ -399,6 +399,7 @@ class testPageTemplates extends CLegacyWebTest {
 		$this->page->login()->open('zabbix.php?action=template.list&filter_name=template+for+tags&filter_evaltype=0&filter_tags%5B0%5D%5Btag%5D='.
 				'&filter_tags%5B0%5D%5Boperator%5D=0&filter_tags%5B0%5D%5Bvalue%5D=&filter_set=1');
 		$form = $this->query('name:zbx_filter')->waitUntilPresent()->asForm()->one();
+		$table = $this->getTable();
 
 		if (array_key_exists('Name', $data)) {
 			$form->fill(['Name' => $data['Name']]);
@@ -407,6 +408,7 @@ class testPageTemplates extends CLegacyWebTest {
 		$form->fill(['id:filter_evaltype' => $data['evaluation_type']]);
 		$this->setTags($data['tags']);
 		$form->submit();
+		$table->waitUntilReloaded();
 		$this->page->waitUntilReady();
 
 		// Check that correct result displayed.
