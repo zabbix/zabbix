@@ -3639,6 +3639,7 @@ stop:
 			snmp_context->probe = 1;
 
 			snmp_sess_close(snmp_context->ssp);
+			zbx_free_agent_result(&snmp_context->item.result);
 
 			return async_task_process_task_snmp_cb(0, data, fd, addresses, reverse_dns,
 					dnserr, timeout_event);
