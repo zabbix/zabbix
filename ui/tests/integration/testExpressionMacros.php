@@ -72,7 +72,6 @@ class testExpressionMacros extends CIntegrationTest {
 	const SUBJECT_PREFIX_RECOVERY = 'recovery subject with expression macro ' . ALL_PRINTABLE_ASCII . ": ";
 	const EVENT_PREFIX = 'event name with expression macro ' . ALL_PRINTABLE_ASCII . ": ";
 
-	const TIMESTAMP_PREFIX = '/macro/timestamp:';
 	const VALUE_TO_FIRE_TRIGGER = 3;
 	const VALUE_TO_RECOVER_TRIGGER = 2147483647;
 	const TAG_NAME = 'tag_name_' . ALL_PRINTABLE_ASCII;
