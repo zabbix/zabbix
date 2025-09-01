@@ -37,7 +37,7 @@ class CControllerServiceUpdate extends CController {
 				]
 			],
 			'sortorder' => ['db services.sortorder', 'required', 'min' => 0, 'max' => 999],
-			'algorithm' => ['db services.algorithm', 'required', 'in' => [
+			'algorithm' => ['db services.algorithm', 'in' => [
 				ZBX_SERVICE_STATUS_CALC_SET_OK, ZBX_SERVICE_STATUS_CALC_MOST_CRITICAL_ALL,
 				ZBX_SERVICE_STATUS_CALC_MOST_CRITICAL_ONE
 			]],
