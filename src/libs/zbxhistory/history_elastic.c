@@ -656,8 +656,8 @@ static int	elastic_get_values_for_period(zbx_history_iface_t *hist, zbx_uint64_t
 	{
 		char	start_str[32], end_str[32];
 
-		strftime(start_str, sizeof(start_str), "%Y-%m-%d %H:%M:%S", localtime(&start));
-		strftime(end_str, sizeof(end_str), "%Y-%m-%d %H:%M:%S", localtime(&end));
+		strftime(start_str, sizeof(start_str), "%Y-%m-%d %H:%M:%S", zbx_localtime(&start, NULL));
+		strftime(end_str, sizeof(end_str), "%Y-%m-%d %H:%M:%S", zbx_localtime(&end, NULL));
 
 		zabbix_log(LOG_LEVEL_DEBUG, "In %s() window:(%s, %s] age: %s count:%d", __func__, start_str, end_str,
 				zbx_age2str(end - start), *count);

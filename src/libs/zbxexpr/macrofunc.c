@@ -559,7 +559,7 @@ static int	macrofunc_fmttime(char **params, size_t nparam, char **out)
 	}
 
 	time_new = time(&time_new);
-	localtime_r(&time_new, &local_time);
+	local_time = *zbx_localtime(&time_new, NULL);
 
 	if (NULL == strptime(*out, "%H:%M:%S", &local_time) &&
 			NULL == strptime(*out, "%Y-%m-%dT%H:%M:%S", &local_time) &&
@@ -568,7 +568,7 @@ static int	macrofunc_fmttime(char **params, size_t nparam, char **out)
 		if (0 == (time_new = atoi(*out)))
 			return FAIL;
 
-		localtime_r(&time_new, &local_time);
+		local_time = *zbx_localtime(&time_new, NULL);
 	}
 
 	if (2 == nparam)

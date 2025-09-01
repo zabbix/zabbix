@@ -140,6 +140,7 @@ class testPageLowLevelDiscovery extends CWebTest {
 		// Filling fields with needed discovery rule info.
 		$form->fill(['Name' => 'Discovery rule 3']);
 		$form->submit();
+		$table->waitUntilReloaded();
 
 		// Check that filtered count matches expected.
 		$this->assertEquals(1, $table->getRows()->count());
@@ -654,7 +655,7 @@ class testPageLowLevelDiscovery extends CWebTest {
 		// Delete all discovery rules.
 		$form = $this->query('name:zbx_filter')->one()->asForm();
 		$form->fill($data['filter']);
-		$form->submit();
+		$form->submit()->waitUntilStalled();
 		$this->selectTableRows($data['keys'], 'Key', self::SELECTOR);
 		$this->query('button:Delete')->one()->click();
 		$this->page->acceptAlert();

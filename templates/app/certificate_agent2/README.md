@@ -51,7 +51,7 @@ https://www.zabbix.com/documentation/8.0/manual/config/items/itemtypes/zabbix_ag
 |Name|Description|Default|
 |----|-----------|-------|
 |{$CERT.EXPIRY.WARN}|<p>Number of days until the certificate expires.</p>|`7`|
-|{$CERT.WEBSITE.HOSTNAME}|<p>The website's DNS name used for the connection.</p>|`<Enter DNS name>`|
+|{$CERT.WEBSITE.HOSTNAME}|<p>The website's DNS name used for the connection.</p>||
 |{$CERT.WEBSITE.PORT}|<p>The TLS/SSL port number of the website.</p>|`443`|
 |{$CERT.WEBSITE.IP}|<p>The website's IP address used for the connection.</p>||
 |{$CERT.PARAMS.CHECK}|<p>The type of verification of input parameters.</p><p>`STRICT` (default) - when an error occurs, the check stops.</p><p>Any other value - erroneous records are ignored.</p>|`STRICT`|

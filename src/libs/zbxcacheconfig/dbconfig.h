@@ -513,6 +513,8 @@ typedef struct
 
 	unsigned char			custom_timeouts;
 	zbx_config_item_type_timeouts_t	item_timeouts;
+
+	int				pending_history;
 }
 ZBX_DC_PROXY;
 
