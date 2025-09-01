@@ -446,8 +446,8 @@ window.service_edit_popup = new class {
 			}
 
 			for (const problem_tag of Object.values(fields.problem_tags)) {
-				problem_tag.tag = problem_tag.tag.trim();
-				problem_tag.value = problem_tag.value.trim();
+				problem_tag.tag = problem_tag.tag?.trim();
+				problem_tag.value = problem_tag.value?.trim();
 			}
 		}
 
