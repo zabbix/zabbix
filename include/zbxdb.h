@@ -97,7 +97,7 @@ zbx_db_config_t;
 		if (SUCCEED == zbx_db_is_null(row))	\
 			uint = 0;			\
 		else					\
-			zbx_is_uint64(row, &uint);	\
+			ZBX_STR2UINT64(uint, row);	\
 	}						\
 	while (0)
 

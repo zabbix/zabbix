@@ -53,6 +53,15 @@ class testDashboardGeomapWidgetScreenshots extends CWebTest {
 			]
 		];
 
+	/**
+	 * Attach MessageBehavior to the test.
+	 *
+	 * @return array
+	 */
+	public function getBehaviors() {
+		return ['class' => CMessageBehavior::class];
+	}
+
 	public function prepareZoomData() {
 		// Create hostgroup for hosts with items triggers.
 		$hostgroups = CDataHelper::call('hostgroup.create', [['name' => 'Baltics']]);
