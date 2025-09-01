@@ -451,6 +451,7 @@ window.service_edit_popup = new class {
 			}
 		}
 
+		this.overlay.$dialogue.find('.msg-bad').remove()
 		this.overlay.setLoading();
 
 		const curl = new Curl('zabbix.php');
