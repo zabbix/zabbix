@@ -49,12 +49,12 @@ func (s *session) getFieldValues() map[comms.ConfigSetting]string {
 func (s *session) validateSession(defaults *session) error {
 	tlsConnect, err := s.resolveTLSConnect(defaults)
 	if err != nil {
-		return errs.Wrap(err, "failed to resolve TLS Connect")
+		return err
 	}
 
 	err = s.runValidationRules(tlsConnect, defaults)
 	if err != nil {
-		return errs.Wrap(err, "configuration field validation failed")
+		return err
 	}
 
 	err = s.runSourceConsistencyValidation()
@@ -69,7 +69,7 @@ func (s *session) resolveTLSConnect(defaults *session) (tlsconfig.TLSConnectionT
 	if s.TLSConnect != "" {
 		connectionType, err := tlsconfig.NewTLSConnectionType(s.TLSConnect)
 		if err != nil {
-			return "", errs.Wrap(err, "Session TLS connection type is invalid")
+			return "", errs.Wrap(err, "TLS connection type is invalid")
 		}
 
 		return connectionType, nil
@@ -78,7 +78,7 @@ func (s *session) resolveTLSConnect(defaults *session) (tlsconfig.TLSConnectionT
 	if defaults.TLSConnect != "" {
 		connectionType, err := tlsconfig.NewTLSConnectionType(defaults.TLSConnect)
 		if err != nil {
-			return "", errs.Wrap(err, "Default TLS connection type is invalid")
+			return "", errs.Wrap(err, "default TLS connection type is invalid")
 		}
 
 		return connectionType, nil
