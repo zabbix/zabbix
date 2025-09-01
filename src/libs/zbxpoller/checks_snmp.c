@@ -496,6 +496,12 @@ static int	zbx_snmp_cache_handle_engineid(netsnmp_session *session, zbx_dc_item_
 			if ((0 == strcmp(item_context->interface.addr, ptr->devices.values[i].address) &&
 					0 == strcmp(item_context->host, ptr->devices.values[i].hostname)))
 			{
+				if (ptr->devices.values[i].engineboots != current_engineboots)
+				{
+					zabbix_log(LOG_LEVEL_DEBUG, "%s() itemid:" ZBX_FS_UI64 " engine boots changed"
+							" to:%u", __func__, item_context->itemid,
+							current_engineboots);
+				}
 				ptr->devices.values[i].engineboots = current_engineboots;
 				found = 1;
 				continue;
