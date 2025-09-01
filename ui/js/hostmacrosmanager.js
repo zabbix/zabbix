@@ -26,11 +26,10 @@ class HostMacrosManager {
 	static DISCOVERY_STATE_CONVERTING = 0x2;
 	static DISCOVERY_STATE_MANUAL = 0x3;
 
-	constructor({container, readonly, parent_hostid, show_inherited_macros_element}) {
+	constructor({container, readonly, parent_hostid}) {
 		this.$container = container;
 		this.readonly = readonly;
 		this.parent_hostid = parent_hostid ?? null;
-		this.show_inherited_macros_element = show_inherited_macros_element;
 		this.xhr = null;
 	}
 
@@ -277,20 +276,8 @@ class HostMacrosManager {
 		return $('.inherited-macros-table, .host-macros-table', this.$container).eq(0);
 	}
 
-	#disableRadioShowInheritedMacros() {
-		this.show_inherited_macros_element.querySelectorAll('input').forEach(radio_input =>
-			radio_input.setAttribute('readonly', 'readonly')
-		);
-	}
-
-	#enableRadioShowInheritedMacros() {
-		this.show_inherited_macros_element.querySelectorAll('input').forEach(radio_input =>
-			radio_input.removeAttribute('readonly')
-		);
-	}
-
 	loaderStart() {
-		this.#disableRadioShowInheritedMacros();
+		this.$container.trigger('loader.start');
 		this.$preloader = $('<span>', {class: 'is-loading'});
 
 		const macros_table = this.$container.find('table');
@@ -305,7 +292,7 @@ class HostMacrosManager {
 		const macros_table = this.$container.find('table');
 
 		macros_table.show();
-		this.#enableRadioShowInheritedMacros();
+		this.$container.trigger('loader.stop');
 	}
 
 	macroToUpperCase($element) {

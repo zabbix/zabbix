@@ -107,13 +107,23 @@
 
 		initMacrosTab() {
 			const show_inherited_macros_element = document.getElementById('show_inherited_macros');
+			const container = $('#macros_container .table-forms-td-right')
 
 			this.macros_manager = new HostMacrosManager({
-				container: $('#macros_container .table-forms-td-right'),
+				container,
 				readonly: this.readonly,
-				parent_hostid: this.parent_hostid,
-				show_inherited_macros_element
+				parent_hostid: this.parent_hostid
 			});
+
+			container.bind('loader.start', () =>
+				show_inherited_macros_element.querySelectorAll('input').forEach(radio_input =>
+					radio_input.setAttribute('readonly', 'readonly')
+				)
+			).bind('loader.stop', () =>
+				show_inherited_macros_element.querySelectorAll('input').forEach(radio_input =>
+					radio_input.removeAttribute('readonly')
+				)
+			);
 
 			this.show_inherited_macros = show_inherited_macros_element.querySelector('input:checked').value == 1;
 
