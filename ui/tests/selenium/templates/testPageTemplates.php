@@ -145,11 +145,13 @@ class testPageTemplates extends CLegacyWebTest {
 	public function testPageTemplates_FilterNone() {
 		$this->zbxTestLogin('zabbix.php?action=template.list');
 		$filter = $this->query('name:zbx_filter')->asForm()->one();
+		$table = $this->getTable();
 		$filter->fill([
 			'Template groups' => 'Templates',
 			'Name' => '123template!@#$%^&*()_"='
 		]);
 		$filter->submit();
+		$table->waitUntilReloaded();
 		$this->assertTableStats(0);
 		$this->zbxTestInputTypeOverwrite('filter_name', '%');
 		$this->zbxTestClickButtonText('Apply');
