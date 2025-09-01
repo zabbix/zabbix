@@ -673,8 +673,9 @@ class testPageReportsActionLog extends CWebTest {
 			if ($filter_tab->exists()) {
 				$filter_tab->one()->click();
 			}
-
+			$table = $this->getTable();
 			$form->fill($data['fields'])->submit();
+			$table->waitUntilReloaded();
 		}
 
 		$this->page->waitUntilReady();

@@ -73,6 +73,9 @@ class testDashboardsViewMode extends CLegacyWebTest {
 					'No data found');
 			$this->zbxTestAssertElementText("//div[@class='dashboard-grid']/div[3]//div[@class='no-data-message']",
 					'No permissions to referred object or it does not exist!');
+
+			// Check that no bad messages are displayed.
+			$this->assertFalse($this->query('class:msg-bad')->one(false)->isValid());
 		}
 		else {
 			$this->zbxTestCheckNoRealHostnames();
