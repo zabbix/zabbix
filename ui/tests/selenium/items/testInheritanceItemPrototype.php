@@ -65,8 +65,8 @@ class testInheritanceItemPrototype extends CLegacyWebTest {
 		$this->query('link:'.CDBHelper::getValue('SELECT name from items WHERE itemid='.$data['itemid']))->one()->click();
 		COverlayDialogElement::find()->one()->waitUntilready()->getFooter()->query('button:Update')->one()->click();
 		COverlayDialogElement::ensureNotPresent();
+		$this->assertMessage(TEST_GOOD, 'Item prototype updated');
 		$this->zbxTestCheckTitle('Configuration of item prototypes');
-		$this->zbxTestTextPresent('Item prototype updated');
 
 		$this->assertEquals($oldHashItems, CDBHelper::getHash($sqlItems));
 	}
@@ -114,7 +114,7 @@ class testInheritanceItemPrototype extends CLegacyWebTest {
 		switch ($data['expected']) {
 			case TEST_GOOD:
 				COverlayDialogElement::ensureNotPresent();
-				$this->zbxTestWaitUntilMessageTextPresent('msg-good', 'Item prototype added');
+				$this->assertMessage(TEST_GOOD, 'Item prototype added');
 				$this->zbxTestTextPresent($data['name']);
 
 				$itemId = 0;

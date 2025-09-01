@@ -459,7 +459,7 @@ class testFormGroups extends CWebTest {
 		$form = $this->openForm($data['name'], CTestArrayHelper::get($data, 'discovered', false));
 		$footer = ($this->standalone) ? $form : COverlayDialogElement::find()->one()->waitUntilReady()->getFooter();
 		$footer->query('button:Clone')->one()->waitUntilClickable()->click();
-		$form->invalidate();
+		$form->waitUntilStalled()->invalidate();
 
 		// Check that the group creation form is open after cloning.
 		$title = 'New '.$this->object.' group';
