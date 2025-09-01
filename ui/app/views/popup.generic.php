@@ -169,18 +169,11 @@ if ($data['multiselect'] && $form !== null) {
 	$table_columns[] = $ch_box;
 }
 
-$table_header = new CRowHeader();
+$table = (new CTableInfo())->setHeader(array_merge($table_columns, $data['table_columns']));
 
-foreach (array_merge($table_columns, $data['table_columns']) as $column) {
-	$table_header->addItem(
-		$column instanceof CColHeader ?
-			$column :
-			(new CColHeader($column))
-				->addStyle($data['popup_type'] === 'help_items' && $column === '' ? 'width: 18px;' : '')
-	);
+if ($data['popup_type'] === 'help_items') {
+	$table->addClass(ZBX_STYLE_LIST_TABLE_HELP_ITEMS);
 }
-
-$table = (new CTableInfo())->setHeader($table_header);
 
 if ($data['preselect_required']) {
 	$table->setNoDataMessage(_('Filter is not set'), _('Use the filter to display results'), ZBX_ICON_FILTER_LARGE);

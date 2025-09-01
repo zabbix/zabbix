@@ -4,6 +4,20 @@
 	border-collapse: separate;
 	border: 1px solid $ui-border-color;
 
+	&.list-table-help-items {
+		thead {
+			th {
+				&:first-child {
+					min-width: 210px;
+				}
+
+				&:last-child {
+					width: 18px;
+				}
+			}
+		}
+	}
+
 	&.fixed {
 		table-layout: fixed;
 	}
