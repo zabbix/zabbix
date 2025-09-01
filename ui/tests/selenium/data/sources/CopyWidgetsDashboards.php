@@ -3234,8 +3234,8 @@ class CopyWidgetsDashboards {
 							[
 								'type'=> 'itemcard',
 								'name'=> 'Item card widget',
-								'x'=> 42,
-								'y'=> 12,
+								'x'=> 44,
+								'y'=> 8,
 								'width'=> 12,
 								'height'=> 5,
 								'view_mode' => '0',
@@ -3270,8 +3270,8 @@ class CopyWidgetsDashboards {
 							[
 								'type' => 'web',
 								'name' => 'Web monitoring widget',
-								'x' => 44,
-								'y' => 16,
+								'x' => 52,
+								'y' => 14,
 								'width' => 12,
 								'height' => 4,
 								'view_mode' => 0,
