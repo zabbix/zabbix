@@ -189,7 +189,7 @@ class testDashboardItemCardWidget extends testWidgets {
 								'value' => STRING_128
 							],
 							[
-								'tag' => 'ItemCardTag',
+								'tag' => 'ITC',
 								'value' => 'ItemCardTag'
 							],
 							[
@@ -1645,7 +1645,7 @@ class testDashboardItemCardWidget extends testWidgets {
 						]
 					],
 					'Host inventory' => 'OS (Full details)',
-					'Tags' => ['ItemCardTag: ItemCardTag', 'long_text: '.STRING_128, 'numeric: 10', 'target: linux',
+					'Tags' => ['ICT: ItemCardTag', 'long_text: '.STRING_128, 'numeric: 10', 'target: linux',
 							'target: postgresql', 'target: zabbix'],
 					'Context menu' => [
 						'VIEW' => [
@@ -1992,8 +1992,8 @@ class testDashboardItemCardWidget extends testWidgets {
 			}
 
 			foreach ($data['Tags'] as $i => $tag) {
-				// Only the first 3 tags (0-2) are visible for these test cases due to the widget width.
-				if ($i >= 3) {
+				// Only the first tag is visible for these test cases due to the widget width.
+				if ($i >= 1) {
 					$this->assertTrue($tags->get($i)->isVisible(false));
 					continue;
 				}
