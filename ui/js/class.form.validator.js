@@ -1422,7 +1422,7 @@ class CFormValidator {
 	 * @returns {boolean}
 	 */
 	#isTypeInt32(value) {
-		if (value.match(/^[-]?\d+$/) === null) {
+		if (String(value).match(/^[-]?\d+$/) === null) {
 			return false;
 		}
 
