@@ -473,10 +473,12 @@ class testPageAdministrationScripts extends CWebTest {
 	public function testPageAdministrationScripts_Filter($data) {
 		$this->page->login()->open('zabbix.php?action=script.list');
 		$form = $this->query('name:zbx_filter')->asForm()->waitUntilVisible()->one();
+		$table = $this->getTable();
 
 		// Fill filter fields if such present in data provider.
 		$form->fill(CTestArrayHelper::get($data, 'filter'));
 		$form->submit();
+		$table->waitUntilReloaded();
 		$this->page->waitUntilReady();
 
 		// Check that expected Scripts are returned in the list.

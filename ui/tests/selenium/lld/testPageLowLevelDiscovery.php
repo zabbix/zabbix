@@ -127,6 +127,7 @@ class testPageLowLevelDiscovery extends CWebTest {
 		// Filling fields with needed discovery rule info.
 		$form->fill(['Name' => 'Discovery rule 3']);
 		$form->submit();
+		$table->waitUntilReloaded();
 
 		// Check that filtered count matches expected.
 		$this->assertEquals(1, $table->getRows()->count());

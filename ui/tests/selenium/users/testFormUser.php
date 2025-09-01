@@ -533,7 +533,7 @@ class testFormUser extends CWebTest {
 
 		if (array_key_exists('role', $data)) {
 			$form->selectTab('Permissions');
-			$form->fill(['Role' => $data['role']]);
+			$form->fill(['Role' => $data['role']])->waitUntilStalled();
 		}
 
 		$form->submit();
