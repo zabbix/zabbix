@@ -1264,7 +1264,7 @@ window.host_wizard_edit = new class {
 				})();
 
 				let server_host = '';
-				let hostname = this.#getHostName();
+				let hostname = this.#getHostName(false);
 				let psk_identity = '';
 				let psk = '';
 
