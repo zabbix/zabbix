@@ -1424,7 +1424,8 @@ button {
 .btn-tag {
   height: auto;
   outline: none;
-  border: none; }
+  border: none;
+  box-sizing: content-box; }
   .btn-tag:hover {
     text-decoration: underline;
     background-color: #768d99; }
@@ -7741,16 +7742,29 @@ z-select[disabled] .focusable, input[disabled], textarea[disabled], select optio
   background-size: 100% 40px, 100% 40px, 100% 4px, 100% 4px;
   background-attachment: local, local, scroll, scroll; }
 
+.tags-wrapper {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 2px 3px; }
+  @media screen and (min-width: 1200px) {
+    .tags-wrapper {
+      max-width: 266px; } }
+  @media screen and (min-width: 1400px) {
+    .tags-wrapper {
+      max-width: 359px; } }
+  @media screen and (min-width: 1600px) {
+    .tags-wrapper {
+      max-width: 452px; } }
+
 .tag {
   display: inline-block;
   color: #ffffff;
   background-color: #768d99;
-  margin: 1px 3px 1px 0;
   padding: 2px 3px;
   line-height: 1em;
-  max-width: 133px;
   vertical-align: middle;
-  border-radius: 2px; }
+  border-radius: 2px;
+  box-sizing: border-box; }
   .tag a.link-action {
     color: inherit !important;
     border-bottom: none; }

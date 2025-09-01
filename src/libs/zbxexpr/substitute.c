@@ -124,7 +124,7 @@ static int	substitute_macros_args(zbx_token_search_t search, char **data, char *
 			case ZBX_TOKEN_USER_FUNC_MACRO:
 				p.raw_value = 1;
 				/* user macros are not indexed */
-				if (NULL == (m_ptr = zbx_get_macro_from_func(*data, &p.token.data.func_macro, &p.index))
+				if (NULL == (m_ptr = zbx_get_macro_from_func(*data, &p.token.data.func_macro, NULL))
 						|| SUCCEED != zbx_token_find(*data, p.token.data.func_macro.macro.l,
 						&p.inner_token, p.token_search))
 				{

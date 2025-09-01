@@ -308,8 +308,8 @@ out:
 
 void	zbx_dbconn_tsdb_extract_compressed_chunk_flags(zbx_dbconn_t *db, struct zbx_db_version_info_t *version_info)
 {
-#define ZBX_TSDB_HISTORY_TABLES "'history_uint','history_log','history_str','history_text','history'"
-#define ZBX_TSDB_TRENDS_TABLES "'history_bin','trends','trends_uint'"
+#define ZBX_TSDB_HISTORY_TABLES "'history_uint','history_log','history_str','history_text','history','history_bin'"
+#define ZBX_TSDB_TRENDS_TABLES "'trends','trends_uint'"
 
 	version_info->history_compressed_chunks =
 			(SUCCEED == dbconn_tsdb_table_has_compressed_chunks(db, ZBX_TSDB_HISTORY_TABLES)) ? 1 : 0;
@@ -446,3 +446,17 @@ int	zbx_tsdb_get_compression_availability(void)
 
 #endif
 
+#if defined(HAVE_MYSQL)
+/******************************************************************************
+ *                                                                            *
+ * Purpose: retrieves MariaDB fork info                                       *
+ *                                                                            *
+ * Return value: 0 (OFF): MySQL detected                                      *
+ *               1 (ON):  MariaDB fork detected                               *
+ *                                                                            *
+ ******************************************************************************/
+int	zbx_mariadb_fork_get(void)
+{
+	return ZBX_MARIADB_SFORK;
+}
+#endif
