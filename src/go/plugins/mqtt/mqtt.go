@@ -189,7 +189,7 @@ func (ms *mqttSub) Initialize() error {
 		if err != nil {
 			impl.Warningf("cannot establish connection to [%s]: %s", ms.broker.url, err)
 
-			ms.startAsyncEstablishingConnectionBackoff(mc)
+			ms.startAsyncEstablishingConnectionBackoff()
 
 			return nil // the backoff system will try to make connection
 		}
@@ -272,20 +272,32 @@ func (f *respFilter) Process(v any) (*string, error) {
 	return &value, nil
 }
 
-func (ms *mqttSub) startAsyncEstablishingConnectionBackoff(mc *mqttClient) {
-	var (
-		// backoff by Fibonacci sequence
-		wait1 = 1 * time.Second
-		wait2 = 1 * time.Second
+func (ms *mqttSub) startAsyncEstablishingConnectionBackoff() {
+	const (
+		baseBackoff = 1 * time.Second
+		maxBackoff  = 15 * time.Minute
+		factor      = 2
 	)
+
+	wait := baseBackoff
 
 	go func() {
 		for {
-			time.Sleep(wait1)
+			//nolint:gosec // no security related random.
+			time.Sleep(wait + time.Duration(rand.Intn(1000))*time.Millisecond)
 
-			if wait1 <= 15*time.Minute {
-				wait2 += wait1
-				wait2, wait1 = wait1, wait2
+			// since there is no way to provide context or any other way to control this routine from outside
+			//  due to manager structure, only checking if the topic still exists and if the client exists
+			//  can provide information if we still need to try to connect to the server.
+			if ms == nil {
+				return
+			}
+
+			mc, ok := impl.mqttClients[ms.broker]
+			if !ok || mc == nil {
+				impl.Warningf("finished attempting to establish connection to [%s]", ms.broker.url)
+
+				return
 			}
 
 			var err error
@@ -293,11 +305,18 @@ func (ms *mqttSub) startAsyncEstablishingConnectionBackoff(mc *mqttClient) {
 			mc.client, err = newClient(mc.opts)
 			if err != nil {
 				impl.Debugf("cannot establish connection to [%s]: %s", ms.broker.url, err)
+
+				wait *= factor
+				if wait > maxBackoff {
+					wait = maxBackoff
+				}
+
+				continue
 			}
 
-			if err == nil {
-				return
-			}
+			impl.Debugf("established connection to [%s]", ms.broker.url)
+
+			return
 		}
 	}()
 }
