@@ -93,6 +93,7 @@ window.service_edit_popup = new class {
 					this.#editStatusRule(e.target.closest('tr'));
 				}
 				else if (e.target.classList.contains('js-remove')) {
+					e.target.closest('tr').nextSibling.remove();
 					e.target.closest('tr').remove();
 				}
 			});
@@ -107,7 +108,7 @@ window.service_edit_popup = new class {
 				const $tags = $panel.find('.tags-table');
 
 				$tags
-					.dynamicRows({template: '#tag-row-tmpl', allow_empty: true})
+					.dynamicRows({template: '#tag-row-tmpl', allow_empty: true, remove_next_sibling: true})
 					.on('afteradd.dynamicRows', () => {
 						$tags
 							.find('.<?= ZBX_STYLE_TEXTAREA_FLEXIBLE ?>')
