@@ -36,7 +36,7 @@ class CControllerServiceUpdate extends CController {
 					'tag' => ['db service_problem_tag.tag', 'required', 'not_empty', 'when' => ['value', 'not_empty']]
 				]
 			],
-			'sortorder' => ['db services.sortorder', 'required', 'in 0:999'],
+			'sortorder' => ['db services.sortorder', 'required', 'min' => 0, 'max' => 999],
 			'algorithm' => ['db services.algorithm', 'required', 'in' => [
 				ZBX_SERVICE_STATUS_CALC_SET_OK, ZBX_SERVICE_STATUS_CALC_MOST_CRITICAL_ALL,
 				ZBX_SERVICE_STATUS_CALC_MOST_CRITICAL_ONE
@@ -73,7 +73,7 @@ class CControllerServiceUpdate extends CController {
 			'propagation_value_status' => ['integer', 'required', 'in' => array_keys(CServiceHelper::getStatusNames()),
 				'when' => ['propagation_rule', 'in' => [ZBX_SERVICE_STATUS_PROPAGATION_FIXED]]
 			],
-			'weight' => ['db services.weight', 'required', 'in 0:1000000'],
+			'weight' => ['db services.weight', 'required', 'min' => 0, 'max' => 1000000],
 			'tags' => ['objects', 'uniq' => ['tag', 'value'],
 				'messages' => ['uniq' => _('Tag name and value combination is not unique.')],
 				'fields' => [
