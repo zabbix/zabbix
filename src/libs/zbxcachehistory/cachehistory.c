@@ -2596,26 +2596,27 @@ void	zbx_dc_add_history_variant(zbx_uint64_t itemid, unsigned char value_type, u
 
 size_t	zbx_dc_flush_history(void)
 {
-	int	processing_num;
+	LOCK_CACHE;
 
 	if (0 == item_values_num)
+	{
+		UNLOCK_CACHE;
 		return 0;
-
-	LOCK_CACHE;
+	}
 
 	hc_add_item_values(item_values, item_values_num);
 
 	cache->history_num += item_values_num;
-	processing_num = cache->processing_num;
 
-	UNLOCK_CACHE;
-
-	zbx_vps_monitor_add_collected((zbx_uint64_t)item_values_num);
-
+	int	processing_num = cache->processing_num;
 	size_t	count = item_values_num;
 
 	item_values_num = 0;
 	string_values_offset = 0;
+
+	UNLOCK_CACHE;
+
+	zbx_vps_monitor_add_collected((zbx_uint64_t)count);
 
 	if (0 != processing_num)
 		return 0;
