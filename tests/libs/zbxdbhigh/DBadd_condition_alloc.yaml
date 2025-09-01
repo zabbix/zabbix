@@ -79,7 +79,7 @@ in:
   field_name: itemid
   sql_where: select * from items where
 out:
-  sql_regex: select \* from items where \(itemid in \(100,(?:\d++,){998}1099\) or itemid in \(1100,(?:\d++,){998}2099\)\)
+  sql_regex: select \* from items where itemid in \(100,(?:\d++,){1998}2099\)
   sqlora_regex: select \* from items where itemid between 100 and 2099
   sqlite_regex: select \* from items where \(itemid in \(100,(?:\d++,){948}1049\) or itemid in \(1050,(?:\d++,){948}1999\) or itemid in \(2000,(?:\d++,){98}2099\)\)
 ---
@@ -93,7 +93,7 @@ in:
   field_name: itemid
   sql_where: select * from items where
 out:
-  sql_regex: select \* from items where \((?:itemid in \((?:\d++,)++\d++\) or ){902}itemid in \((?:\d++,){500}902500\)\)
+  sql_regex: select \* from items where itemid in \(0,[0-9,]*,902500\)
   sqlora_regex: select \* from items where itemid between 0 and 902500
   sqlite_regex: select \* from items where \((?:\((?:itemid in \((?:\d++,)++\d++\) or ){949}itemid in \((?:\d++,)++\d++\)\) or ){1}\(itemid in \(902500\)\)\)
 ---
