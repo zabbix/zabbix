@@ -17,35 +17,28 @@
 class CControllerPopupServiceStatusRuleEdit extends CController {
 
 	protected function init(): void {
-		$this->setInputValidationMethod(self::INPUT_VALIDATION_FORM);
 		$this->disableCsrfValidation();
 	}
 
-	private static function getValidationRules(): array {
-		return ['objects', 'fields' => [
-			'form_refresh' => ['integer', 'in' => ['0', '1']],
-			'edit' => ['integer', 'in 1'],
-			'row_index' => ['integer', 'required'],
-			'new_status' => ['integer', 'in' => array_keys(CServiceHelper::getProblemStatusNames())],
-			'type' => ['integer', 'in' => array_keys(CServiceHelper::getStatusRuleTypeOptions())],
-			'limit_value' => ['integer'],
-			'limit_status' => ['integer', 'in' => array_keys(CServiceHelper::getStatusNames())]
-		]];
-	}
-
 	protected function checkInput(): bool {
-		$ret = $this->validateInput(self::getValidationRules());
+		$fields = [
+			'edit' => 			'in 1',
+			'row_index' =>		'required|int32',
+			'new_status' =>		'in '.implode(',', array_keys(CServiceHelper::getProblemStatusNames())),
+			'type' =>			'in '.implode(',', array_keys(CServiceHelper::getStatusRuleTypeOptions())),
+			'limit_value' =>	'int32',
+			'limit_status' =>	'in '.implode(',', array_keys(CServiceHelper::getStatusNames()))
+		];
+
+		$ret = $this->validateInput($fields);
 
 		if (!$ret) {
-			$form_errors = $this->getValidationError();
-			$response = $form_errors
-				? ['form_errors' => $form_errors]
-				: ['error' => [
-					'messages' => array_column(get_and_clear_messages(), 'message')
-				]];
-
 			$this->setResponse(
-				(new CControllerResponseData(['main_block' => json_encode($response)]))->disableView()
+				(new CControllerResponseData(['main_block' => json_encode([
+					'error' => [
+						'messages' => array_column(get_and_clear_messages(), 'message')
+					]
+				])]))->disableView()
 			);
 		}
 
