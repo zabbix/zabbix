@@ -22,11 +22,7 @@ class CControllerServiceUpdate extends CController {
 	}
 
 	public static function getValidationRules(): array {
-		$api_uniq = [
-			['service.get', ['name' => '{name}'], 'serviceid']
-		];
-
-		return ['object', 'api_uniq' => $api_uniq, 'fields' => [
+		return ['object', 'fields' => [
 			'serviceid' => ['db services.serviceid', 'required'],
 			'name' => ['db services.name', 'required', 'not_empty'],
 			'parent_serviceids' => ['array', 'field' => ['db services.serviceid']],

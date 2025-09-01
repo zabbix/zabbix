@@ -22,11 +22,7 @@ class CControllerServiceCreate extends CController {
 	}
 
 	public static function getValidationRules(): array {
-		$api_uniq = [
-			['service.get', ['name' => '{name}']]
-		];
-
-		return ['object', 'api_uniq' => $api_uniq, 'fields' => [
+		return ['object', 'fields' => [
 			'name' => ['db services.name', 'required', 'not_empty'],
 			'parent_serviceids' => ['array', 'field' => ['db services.serviceid']],
 			'problem_tags' => ['objects', 'uniq' => ['tag', 'value'],
