@@ -72,7 +72,10 @@ window.service_edit_popup = new class {
 		table.addEventListener('click', (e) => {
 			if (e.target.classList.contains('element-table-add')) {
 				this.form.validateSubmit(this.form.getAllValues());
-
+				this.#update();
+			}
+			else if (e.target.classList.contains('element-table-remove')) {
+				this.form.validateSubmit(this.form.getAllValues());
 				this.#update();
 			}
 		});
