@@ -1,4 +1,4 @@
-<?php declare(strict_types = 0);
+<?php declare(strict_types=1);
 /*
 ** Copyright (C) 2001-2025 Zabbix SIA
 **
@@ -164,7 +164,7 @@ class CControllerChartsView extends CControllerCharts {
 	/**
 	 * Get used filters.
 	 *
-	 * @param bool $use_profile Set true to load filters from profile if there aren't any input filters.
+	 * @param bool $use_profile  Set true to load filters from profile if there aren't any input filters.
 	 *
 	 * @return array
 	 */

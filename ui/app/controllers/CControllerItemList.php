@@ -126,6 +126,7 @@ class CControllerItemList extends CControllerItem {
 		array_map([$view_url, 'setArgument'], array_keys($view_url_params), $view_url_params);
 
 		$data['paging'] = CPagerHelper::paginate($page, $items, $filter['sortorder'], $view_url);
+		$data['filter_values'] = array_merge($filter, $selected_filters);
 
 		$triggers = $this->getItemsTriggers($items);
 
@@ -826,27 +827,27 @@ class CControllerItemList extends CControllerItem {
 		return $this->getInput('context') === 'host' ? 'web.hosts.items.list.' : 'web.templates.items.list.';
 	}
 
-	protected function getProfiles(): array {
+	private function getProfiles(): array {
 		$prefix = $this->getContextPrefix();
 		$filter = [
-			'filter_evaltype'		=> CProfile::get($prefix.'filter.evaltype', TAG_EVAL_TYPE_AND_OR),
-			'filter_groupids'		=> CProfile::getArray($prefix.'filter_groupids', []),
-			'filter_hostids'		=> CProfile::getArray($prefix.'filter_hostids', []),
-			'filter_name'			=> CProfile::get($prefix.'filter_name', ''),
-			'filter_type'			=> CProfile::get($prefix.'filter_type', -1),
-			'filter_key'			=> CProfile::get($prefix.'filter_key', ''),
-			'filter_snmp_oid'		=> CProfile::get($prefix.'filter_snmp_oid', ''),
-			'filter_value_type'		=> CProfile::get($prefix.'filter_value_type', -1),
-			'filter_delay'			=> CProfile::get($prefix.'filter_delay', ''),
-			'filter_history'		=> CProfile::get($prefix.'filter_history', ''),
-			'filter_trends'			=> CProfile::get($prefix.'filter_trends', ''),
-			'filter_status'			=> CProfile::get($prefix.'filter_status', -1),
-			'filter_state'			=> CProfile::get($prefix.'filter_state', -1),
-			'filter_inherited'		=> CProfile::get($prefix.'filter_inherited', -1),
-			'filter_discovered'		=> CProfile::get($prefix.'filter_discovered', -1),
-			'filter_with_triggers'	=> CProfile::get($prefix.'filter_with_triggers', -1),
-			'filter_valuemapids'	=> CProfile::getArray($prefix.'filter_valuemapids', []),
-			'filter_tags'			=> []
+			'filter_evaltype' => CProfile::get($prefix.'filter.evaltype', TAG_EVAL_TYPE_AND_OR),
+			'filter_groupids' => CProfile::getArray($prefix.'filter_groupids', []),
+			'filter_hostids' => CProfile::getArray($prefix.'filter_hostids', []),
+			'filter_name' => CProfile::get($prefix.'filter_name', ''),
+			'filter_type' => CProfile::get($prefix.'filter_type', -1),
+			'filter_key' => CProfile::get($prefix.'filter_key', ''),
+			'filter_snmp_oid' => CProfile::get($prefix.'filter_snmp_oid', ''),
+			'filter_value_type' => CProfile::get($prefix.'filter_value_type', -1),
+			'filter_delay' => CProfile::get($prefix.'filter_delay', ''),
+			'filter_history' => CProfile::get($prefix.'filter_history', ''),
+			'filter_trends' => CProfile::get($prefix.'filter_trends', ''),
+			'filter_status' => CProfile::get($prefix.'filter_status', -1),
+			'filter_state' => CProfile::get($prefix.'filter_state', -1),
+			'filter_inherited' => CProfile::get($prefix.'filter_inherited', -1),
+			'filter_discovered' => CProfile::get($prefix.'filter_discovered', -1),
+			'filter_with_triggers' => CProfile::get($prefix.'filter_with_triggers', -1),
+			'filter_valuemapids' => CProfile::getArray($prefix.'filter_valuemapids', []),
+			'filter_tags' => []
 		];
 
 		$tags = CProfile::getArray($prefix.'filter.tags.tag', []);
@@ -854,17 +855,17 @@ class CControllerItemList extends CControllerItem {
 		$operators = CProfile::getArray($prefix.'filter.tags.operator', []);
 		foreach ($tags as $i => $tag) {
 			$filter['filter_tags'][] = [
-				'tag'		=> $tag,
-				'value'		=> $values[$i],
-				'operator'	=> $operators[$i]
+				'tag' => $tag,
+				'value' => $values[$i],
+				'operator' => $operators[$i]
 			];
 		}
 
 		$filter += [
-			'filter_profile'	=> $prefix.'filter',
-			'filter_tab'		=> CProfile::get($prefix.'filter.active', 1),
-			'sort'				=> CProfile::get($prefix.'sort', 'name'),
-			'sortorder' 		=> CProfile::get($prefix.'sortorder', ZBX_SORT_UP)
+			'filter_profile' => $prefix.'filter',
+			'filter_tab' => CProfile::get($prefix.'filter.active', 1),
+			'sort' => CProfile::get($prefix.'sort', 'name'),
+			'sortorder' => CProfile::get($prefix.'sortorder', ZBX_SORT_UP)
 		];
 
 		return $filter;
@@ -917,10 +918,10 @@ class CControllerItemList extends CControllerItem {
 		else {
 			$prefix = $this->getContextPrefix();
 			$input_filters += [
-				'filter_profile'	=> $prefix.'filter',
-				'filter_tab'		=> CProfile::get($prefix.'filter.active', 1),
-				'sort'				=> $this->getInput('sort', CProfile::get($prefix.'sort', 'name')),
-				'sortorder'			=> $this->getInput('sortorder', CProfile::get($prefix.'sortorder', ZBX_SORT_UP))
+				'filter_profile' => $prefix.'filter',
+				'filter_tab' => CProfile::get($prefix.'filter.active', 1),
+				'sort' => $this->getInput('sort', CProfile::get($prefix.'sort', 'name')),
+				'sortorder' => $this->getInput('sortorder', CProfile::get($prefix.'sortorder', ZBX_SORT_UP))
 			];
 		}
 
@@ -954,7 +955,7 @@ class CControllerItemList extends CControllerItem {
 		$this->updateProfileSort();
 	}
 
-	protected function updateProfileSort(): void {
+	private function updateProfileSort(): void {
 		$prefix = $this->getContextPrefix();
 
 		if ($this->hasInput('sort')) {
@@ -966,7 +967,7 @@ class CControllerItemList extends CControllerItem {
 		}
 	}
 
-	protected function deleteProfiles(): void {
+	private function deleteProfiles(): void {
 		$prefix = $this->getContextPrefix();
 
 		CProfile::deleteIdx($prefix.'filter_hostids');

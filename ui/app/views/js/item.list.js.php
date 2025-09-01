@@ -27,7 +27,7 @@
 <script>
 	const view = new class {
 
-		init({context, confirm_messages, field_switches, form_name, hostids, token}) {
+		init({context, confirm_messages, field_switches, form_name, hostids, token, filter_values}) {
 			this.confirm_messages = confirm_messages;
 			this.token = token;
 			this.context = context;
@@ -38,6 +38,7 @@
 
 			this.initForm(field_switches);
 			this.initEvents();
+			this._init_filter_values = this.getInitFilterValues(filter_values);
 		}
 
 		initForm(field_switches) {
@@ -61,21 +62,17 @@
 				const target = e.target;
 
 				if (target.matches('.link-action') && target.closest('.subfilter') !== null) {
+					const url = this.getPageUrl();
 					const subfilter = target.closest('.subfilter');
-					const search_params = new URLSearchParams(window.location.search);
-					const url = new URL(window.location.href);
 
 					if (subfilter.matches('.subfilter-enabled')) {
-						search_params.delete(target.getAttribute('data-name'), target.getAttribute('data-value'));
+						url.searchParams.delete(target.getAttribute('data-name'), target.getAttribute('data-value'));
 					}
 					else {
-						search_params.append(target.getAttribute('data-name'), target.getAttribute('data-value'));
+						url.searchParams.append(target.getAttribute('data-name'), target.getAttribute('data-value'));
 					}
 
-					search_params.delete('filter_set');
-					search_params.delete('filter_rst');
-
-					window.location.href = url.origin + url.pathname + '?' + search_params.toString();
+					this.#loadPageWithFilters(url, {subfilter_set: 1});
 				}
 				else if (target.matches('[name="filter_state"]')) {
 					const disabled = e.target.getAttribute('value') != -1;
@@ -89,15 +86,25 @@
 			this.filter_form.addEventListener('submit', e => {
 				e.preventDefault();
 				const search_params = new URLSearchParams(new FormData(e.target));
-				const url = new URL(window.location.href);
+				const url = new URL('zabbix.php', window.location.origin);
+				url.searchParams.set('filter_set', '1');
 
-				Array.from(search_params.keys()).forEach(filter_key => {
-					if (filter_key.startsWith('subfilter_')) {
-						search_params.delete(filter_key);
+				search_params.forEach((filter_value, filter_key) => {
+					if (!filter_key.startsWith('subfilter_')) {
+						url.searchParams.append(filter_key, filter_value);
 					}
 				});
 
-				window.location.href = url.origin + url.pathname + '?' + search_params.toString();
+				this.#loadPageWithFilters(url, {filter_set: 1}, false);
+			});
+
+			this.form.querySelectorAll('.list-table thead th a').forEach(link => {
+				link.addEventListener('click', (e) => {
+					e.preventDefault();
+					const search_params = new URLSearchParams(e.currentTarget.href);
+					this.#loadPageWithFilters(this.getPageUrl(),
+						{subfilter_set: 1, sort: search_params.get('sort'), sortorder: search_params.get('sortorder')});
+				});
 			});
 
 			this.form.addEventListener('click', (e) => {
@@ -141,6 +148,7 @@
 					this.editTemplate(e, target.dataset.hostid);
 				}
 			});
+
 			document.addEventListener('click', e => {
 				const target = e.target;
 
@@ -151,6 +159,41 @@
 					this.editTrigger(target.dataset);
 				}
 			});
+		}
+
+		getInitFilterValues(filter_values) {
+			const filters = Object.keys(filter_values).reduce((filtered, filter_key) => {
+				if (filter_key.includes('filter_') || filter_key.startsWith('sort')) {
+					if (Array.isArray(filter_values[filter_key])) {
+						filter_values[filter_key].forEach(value => filtered.push({key: `${filter_key}[]`, value}));
+					}
+					else if (typeof filter_values[filter_key] === 'object') {
+						Object.keys(filter_values[filter_key]).forEach(key =>
+							filter_values[filter_key][key].forEach(value =>
+								filtered.push({key: `${filter_key}[${key}][]`, value})
+							)
+						)
+					}
+					else {
+						filtered.push({key: filter_key, value: filter_values[filter_key]});
+					}
+				}
+				return filtered;
+			}, []);
+
+			return filters;
+		}
+
+		getPageUrl() {
+			const url = new URL('zabbix.php', window.location.origin);
+			url.searchParams.set('action', 'item.list');
+			url.searchParams.set('context', this.context);
+
+			this._init_filter_values.forEach(filter => {
+				url.searchParams.append(filter.key, filter.value);
+			});
+
+			return url;
 		}
 
 		editItem(target, data) {
@@ -214,6 +257,17 @@
 			});
 
 			overlay.$dialogue[0].addEventListener('dialogue.submit', this.elementSuccess.bind(this), {once: true});
+		}
+
+		#loadPageWithFilters (url, overwriteFilters = {}) {
+			const clear_keys = ['filter_set', 'filter_rst', 'page', 'subfilter_set'];
+			clear_keys.forEach(key => url.searchParams.delete(key));
+
+			Object.keys(overwriteFilters).forEach(filter_key => {
+				url.searchParams.set(filter_key, overwriteFilters[filter_key]);
+			});
+
+			window.location.href = url.href;
 		}
 
 		#edit(target, parameters = {}) {
