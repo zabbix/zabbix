@@ -7,7 +7,7 @@ memory usage. Best for use in conjunction with the official
 You can extend it or create your template for your specific needs. 
 
 ## Supported versions
-* Redis, version 3.0+
+* Redis, version 3.0+ (TLS support starting 6.0.0)
 
 ## Installation
 The plugin is supplied as a part of Zabbix Agent 2, and it does not require any special installation steps. Once 
