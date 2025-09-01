@@ -590,7 +590,7 @@ static void	store_settings(const zbx_setting_value_t *values, int found, zbx_uin
 
 	if (config->config->hk.events_mode != value_int)
 	{
-		UPDATE_REVISION(revision, "hk_audit_mode", "%d", config->config->hk.events_mode, value_int);
+		UPDATE_REVISION(revision, "hk_events_mode", "%d", config->config->hk.events_mode, value_int);
 		config->config->hk.events_mode = value_int;
 	}
 
@@ -620,7 +620,7 @@ static void	store_settings(const zbx_setting_value_t *values, int found, zbx_uin
 
 		if (1 != config->config->hk.history)
 		{
-			UPDATE_REVISION(revision, "hk_history_global", "%d", config->config->hk.history, 1);
+			UPDATE_REVISION(revision, "hk_history", "%d", config->config->hk.history, 1);
 			config->config->hk.history = 1;	/* just enough to make 0 == items[i].history condition fail */
 		}
 	}
@@ -676,7 +676,7 @@ static void	store_settings(const zbx_setting_value_t *values, int found, zbx_uin
 
 	if (config->config->hk.sessions_mode != value_int)
 	{
-		UPDATE_REVISION(revision, "hk_services_mode", "%d", config->config->hk.sessions_mode, value_int);
+		UPDATE_REVISION(revision, "hk_sessions_mode", "%d", config->config->hk.sessions_mode, value_int);
 		config->config->hk.sessions_mode = value_int;
 	}
 
@@ -687,7 +687,7 @@ static void	store_settings(const zbx_setting_value_t *values, int found, zbx_uin
 
 	if (config->config->hk.trends_global != value_int)
 	{
-		UPDATE_REVISION(revision, "hk_services_mode", "%d", config->config->hk.trends_global, value_int);
+		UPDATE_REVISION(revision, "hk_trends_global", "%d", config->config->hk.trends_global, value_int);
 		config->config->hk.trends_global = value_int;
 	}
 
@@ -722,7 +722,7 @@ static void	store_settings(const zbx_setting_value_t *values, int found, zbx_uin
 
 	if (config->config->hk.trends_mode != value_int)
 	{
-		UPDATE_REVISION(revision, "hk_trends_mode", "%d", config->config->hk.trends, value_int);
+		UPDATE_REVISION(revision, "hk_trends", "%d", config->config->hk.trends, value_int);
 		config->config->hk.trends_mode = value_int;
 	}
 
@@ -764,11 +764,6 @@ static void	store_settings(const zbx_setting_value_t *values, int found, zbx_uin
 
 	store_int_setting(values, "proxy_secrets_provider", defaults_log_level, &config->config->proxy_secrets_provider,
 			revision);
-
-	/*
-	 * Final checks
-	 */
-
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 }
