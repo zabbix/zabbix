@@ -2264,7 +2264,31 @@ class testDashboardsTemplatedDashboardForm extends CWebTest {
 					]
 				]
 			],
-			// #24 Item card widget.
+			// #24 Host card widget.
+			[
+				[
+					'type' => CFormElement::RELOADABLE_FILL('Host card'),
+					'refresh_interval' => 'Default (1 minute)',
+					'fields' => [
+						[
+							'field' => 'Show suppressed problems',
+							'type' => 'checkbox',
+							'value' => false
+						],
+						[
+							'field' => 'Show',
+							'type' => 'show_section',
+							'field_locator' => 'id:sections-table',
+							'show_sections' => [
+								['section' => 'Monitoring'],
+								['section' => 'Availability'],
+								['section' => 'Monitored by']
+							]
+						]
+					]
+				]
+			],
+			// #25 Item card widget.
 			[
 				[
 					'type' => CFormElement::RELOADABLE_FILL('Item card'),
@@ -2274,6 +2298,17 @@ class testDashboardsTemplatedDashboardForm extends CWebTest {
 							'field' => 'Item',
 							'type' => 'multiselect',
 							'mandatory' => true,
+						],
+						[
+							'field' => 'Show',
+							'type' => 'show_section',
+							'field_locator' => 'id:sections-table',
+							'show_sections' => [
+								['section' => 'Metrics'],
+								['section' => 'Type of information'],
+								['section' => 'Host interface'],
+								['section' => 'Type']
+							]
 						]
 					]
 				]
@@ -2570,6 +2605,12 @@ class testDashboardsTemplatedDashboardForm extends CWebTest {
 			case 'indicator':
 				$this->assertTrue($field->isDisplayed());
 				$this->assertEquals('', $field->query('tag:polygon')->one()->getAttribute('style'));
+				break;
+
+			case 'show_section':
+				// Check default and available options in 'Show' section.
+				$show_form = $widget_form->getFieldContainer($field_details['field'])->asMultifieldTable(['mapping' => ['' => 'section']]);
+				$show_form->checkValue($field_details['show_sections']);
 				break;
 		}
 
