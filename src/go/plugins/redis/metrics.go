@@ -21,6 +21,7 @@ import (
 	"golang.zabbix.com/sdk/metric"
 	"golang.zabbix.com/sdk/plugin"
 	"golang.zabbix.com/sdk/plugin/comms"
+	"golang.zabbix.com/sdk/tlsconfig"
 	"golang.zabbix.com/sdk/uri"
 )
 
@@ -45,8 +46,12 @@ var (
 
 	//nolint:gochecknoglobals // just a runtime constant
 	paramURI = metric.NewConnParam("URI", "URI to connect or session name.").
-			WithDefault(uriDefaults.Scheme + "://localhost:" + uriDefaults.Port).WithSession().
-			WithValidator(uri.URIValidator{Defaults: uriDefaults, AllowedSchemes: []string{"tcp", "unix"}})
+			WithDefault(uriDefaults.Scheme + "://localhost:" + uriDefaults.Port).
+			WithSession().
+			WithValidator(uri.URIValidator{
+			Defaults:       uriDefaults,
+			AllowedSchemes: []string{"tcp", "unix"}},
+		)
 	//nolint:gochecknoglobals // just a runtime constant
 	paramPassword = metric.NewConnParam("Password", "Redis password.").WithDefault("").
 			WithValidator(metric.LenValidator{Max: &maxAuthPassLen})
@@ -57,7 +62,16 @@ var (
 	paramTLSConnect = metric.NewSessionOnlyParam(
 		string(comms.TLSConnect),
 		"DB connection encryption type.").
-		WithDefault("")
+		WithDefault("").
+		WithValidator(metric.SetValidator{
+			Set: []string{
+				"",
+				string(tlsconfig.Disabled),
+				string(tlsconfig.Required),
+				string(tlsconfig.VerifyCA),
+				string(tlsconfig.VerifyFull),
+			},
+		})
 
 	//nolint:gochecknoglobals // just a runtime constant
 	paramTLSCaFile = metric.NewSessionOnlyParam(
