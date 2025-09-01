@@ -2297,7 +2297,7 @@ class testDashboardsTemplatedDashboardForm extends CWebTest {
 						[
 							'field' => 'Item',
 							'type' => 'multiselect',
-							'mandatory' => true,
+							'mandatory' => true
 						],
 						[
 							'field' => 'Show',
@@ -2609,7 +2609,8 @@ class testDashboardsTemplatedDashboardForm extends CWebTest {
 
 			case 'show_section':
 				// Check default and available options in 'Show' section.
-				$show_form = $widget_form->getFieldContainer($field_details['field'])->asMultifieldTable(['mapping' => ['' => 'section']]);
+				$show_form = $widget_form->getFieldContainer($field_details['field'])
+						->asMultifieldTable(['mapping' => ['' => 'section']]);
 				$show_form->checkValue($field_details['show_sections']);
 				break;
 		}
