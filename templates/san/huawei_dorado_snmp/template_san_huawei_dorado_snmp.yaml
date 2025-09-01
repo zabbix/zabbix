@@ -26,7 +26,7 @@ zabbix_export:
         This template is developed to monitor SAN Huawei OceanStor Dorado via the Zabbix SNMP agent.
       vendor:
         name: Zabbix
-        version: 8.0-2
+        version: 8.0-3
       groups:
         - name: Templates/SAN
       items:
@@ -1592,10 +1592,10 @@ zabbix_export:
               filter:
                 conditions:
                   - macro: '{#NODE.DELAY}'
-                    value: '.*'
+                    operator: NOT_EXISTS
               operations:
                 - operator: LIKE
-                  value: '.*Average latency&'
+                  value: 'Average latency'
                   discover: NO_DISCOVER
         - uuid: eb0e35cdc3014b3898ad5a6720715ce6
           name: 'Storage pool discovery'
@@ -1766,16 +1766,18 @@ zabbix_export:
               filter:
                 conditions:
                   - macro: '{#POOL.USED.CAPACITY}'
-                    value: '.*'
+                    operator: NOT_EXISTS
               operations:
                 - operator: LIKE
-                  value: '.*Capacity used&'
+                  value: 'Capacity used'
                   discover: NO_DISCOVER
       tags:
         - tag: class
           value: hardware
         - tag: class
           value: storage
+        - tag: subclass
+          value: server
         - tag: target
           value: huawei
         - tag: target
