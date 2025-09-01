@@ -341,7 +341,13 @@ class testDashboardCopyWidgets extends CWebTest {
 			],
 			[
 				[
-				'name' => 'Item card widget',
+					'name' => 'Item card widget',
+					'copy to' => 'same page'
+				]
+			],
+			[
+				[
+					'name' => 'Web monitoring widget',
 					'copy to' => 'same page'
 				]
 			],
@@ -431,6 +437,12 @@ class testDashboardCopyWidgets extends CWebTest {
 			],
 			[
 				[
+					'name' => 'Web monitoring widget',
+					'copy to' => 'another page'
+				]
+			],
+			[
+				[
 					'name' => 'Clock widget',
 					'copy to' => 'another dashboard'
 				]
@@ -480,6 +492,12 @@ class testDashboardCopyWidgets extends CWebTest {
 			[
 				[
 					'name' => 'Item value widget',
+					'copy to' => 'another dashboard'
+				]
+			],
+			[
+				[
+					'name' => 'Web monitoring widget',
 					'copy to' => 'another dashboard'
 				]
 			],
@@ -782,6 +800,8 @@ class testDashboardCopyWidgets extends CWebTest {
 		if ($this->page->isAlertPresent()) {
 			$this->page->acceptAlert();
 		}
+		// TODO: unstable test on Jenkins, appears js error 34749:5 Uncaught
+		CDashboardElement::find()->waitUntilReady();
 	}
 
 	/**
