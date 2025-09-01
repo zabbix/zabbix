@@ -308,9 +308,7 @@ static int	process_services(void *handle, zbx_uint64_t druleid, zbx_db_dhost *dh
 	{
 		zbx_discoverer_dservice_t	*service = services->values[unique_index];
 
-		if ((-1 == host_status || DOBJECT_STATUS_UP == service->status) && host_status != service->status)
-				host_status = service->status;
-
+		host_status = service->status;
 		discovery_update_service_cb(handle, druleid, service->dcheckid, unique_dcheckid, dhost,
 				ip, dns, service->port, service->status, service->value, now, &dserviceids,
 				add_event_cb);
