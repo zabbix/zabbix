@@ -27,7 +27,7 @@ require_once __DIR__.'/../../include/helpers/CDataHelper.php';
  * Failed to load resource: the server responded with a status of 404 (Not Found)
  * @ignoreBrowserErrors
  */
-class testDashboardGeomapWidgetScreenshots extends CWebTest {
+class t extends CWebTest {
 
 	/**
 	 * Attach MessageBehavior to the test.
@@ -52,15 +52,6 @@ class testDashboardGeomapWidgetScreenshots extends CWebTest {
 				'Bergen' => null
 			]
 		];
-
-	/**
-	 * Attach MessageBehavior to the test.
-	 *
-	 * @return array
-	 */
-	public function getBehaviors() {
-		return ['class' => CMessageBehavior::class];
-	}
 
 	public function prepareZoomData() {
 		// Create hostgroup for hosts with items triggers.
