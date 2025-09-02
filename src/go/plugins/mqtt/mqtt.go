@@ -279,16 +279,17 @@ func (ms *mqttSub) startAsyncEstablishingConnectionBackoff() {
 		factor      = 2
 	)
 
-	wait := baseBackoff
+	//nolint:gosec // This use of math/rand is not for a security-sensitive context.
+	wait := baseBackoff + time.Duration(rand.Intn(1000))*time.Millisecond
+	ticker := time.NewTicker(wait)
 
 	go func() {
-		for {
-			//nolint:gosec // no security related random.
-			time.Sleep(wait + time.Duration(rand.Intn(1000))*time.Millisecond)
+		defer ticker.Stop()
 
-			// since there is no way to provide context or any other way to control this routine from outside
-			//  due to manager structure, only checking if the topic still exists and if the client exists
-			//  can provide information if we still need to try to connect to the server.
+		for {
+			<-ticker.C
+
+			// This check ensures the routine stops if the parent object is destroyed.
 			if ms == nil {
 				return
 			}
@@ -310,6 +311,11 @@ func (ms *mqttSub) startAsyncEstablishingConnectionBackoff() {
 				if wait > maxBackoff {
 					wait = maxBackoff
 				}
+
+				// Reset the ticker with the new, longer backoff duration plus jitter.
+				//nolint:gosec // This use of math/rand is not for a security-sensitive context.
+				newDuration := wait + time.Duration(rand.Intn(1000))*time.Millisecond
+				ticker.Reset(newDuration)
 
 				continue
 			}
