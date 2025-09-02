@@ -902,7 +902,7 @@ class testFormWebScenario extends CWebTest {
 					->getValue();
 		}
 
-		$form->query('button:Clone')->one()->click();
+		$form->query('button:Clone')->one()->click()->waitUntilNotVisible();
 		$form->invalidate();
 		$form->getField('Name')->fill('Clone of '.self::CLONE_SCENARIO);
 		$form->submit();

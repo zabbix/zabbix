@@ -1407,8 +1407,10 @@ class testPageServicesSlaReport extends testSlaReport {
 		// Usage of Select mode is required as in Type mode a service that contains the name of required service is chosen.
 		CMultiselectElement::setDefaultFillMode(CMultiselectElement::MODE_SELECT);
 		$filter_form->query('button:Reset')->one()->click();
+		$table = $this->query('class:list-table')->asTable()->one();
 		$filter_form->fill($filter_data);
 		$filter_form->submit();
+		$table->waitUntilReloaded();
 		CMultiselectElement::setDefaultFillMode(CMultiselectElement::MODE_TYPE);
 	}
 
