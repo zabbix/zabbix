@@ -16,11 +16,15 @@
 
 namespace Widgets\ScatterPlot\Includes;
 
-use CSvgCircle;
-use CSvgGraph;
-use CSvgGroup;
-use CSvgRect;
-use CSvgTag;
+use CSvgCircle,
+	CSvgCross,
+	CSvgDiamond,
+	CSvgGraph,
+	CSvgGroup,
+	CSvgRect,
+	CSvgStar,
+	CSvgTag,
+	CSvgTriangle;
 
 class CScatterPlotMetricPoint extends CSvgGroup {
 
@@ -63,10 +67,13 @@ class CScatterPlotMetricPoint extends CSvgGroup {
 			->addClass(self::ZBX_STYLE_CLASS)
 			->addClass(self::ZBX_STYLE_CLASS.'-'.$this->options['order']);
 
+		$color = $this->point ? $this->point[4] : $this->options['color'];
+
 		return [
 			'.'.self::ZBX_STYLE_CLASS.'-'.$this->options['order'] => [
 				'fill-opacity' => 1,
-				'fill' => $this->options['color']
+				'fill' => $color,
+				'stroke' => $color
 			]
 		];
 	}
@@ -76,53 +83,83 @@ class CScatterPlotMetricPoint extends CSvgGroup {
 			return;
 		}
 
+		$empty_group = (new CSvgGroup())->setAttribute('transform',
+			'translate('.self::X_OUT_OF_RANGE.', '.self::Y_OUT_OF_RANGE.')'
+		);
+
+		$point_group = (new CSvgGroup())->setAttribute('transform',
+			'translate('.$this->point[0].', '.$this->point[1].')'
+		);
+
 		$point = null;
 		$size = $this->options['marker_size'];
 
 		switch ($this->options['marker']) {
 			case self::MARKER_TYPE_ELLIPSIS:
-				$this->addItem(
-					(new CSvgCircle(-10, self::Y_OUT_OF_RANGE, $size + 4))
-						->addClass(CSvgTag::ZBX_STYLE_GRAPH_HIGHLIGHTED_VALUE)
+				$empty_group->addItem(
+					(new CSvgCircle(0, 0, $size + 4))->addClass(CSvgTag::ZBX_STYLE_GRAPH_HIGHLIGHTED_VALUE)
 				);
 
-				$point = new CSvgCircle($this->point[0], $this->point[1], $size);
+				$point = new CSvgCircle(0, 0, $size);
+
 				break;
 
 			case self::MARKER_TYPE_SQUARE:
-				$this->addItem(
-					(new CSvgRect(self::X_OUT_OF_RANGE, self::Y_OUT_OF_RANGE, $size + 4, $size + 4))
+				$empty_coordinated = 0 - ($size + 4) / 2;
+				$empty_group->addItem(
+					(new CSvgRect($empty_coordinated, $empty_coordinated, $size + 4, $size + 4))
 						->addClass(CSvgTag::ZBX_STYLE_GRAPH_HIGHLIGHTED_VALUE)
 				);
 
-				if ($this->point) {
-					$x = $this->point[0] - ($size / 2);
-					$y = $this->point[1] - ($size / 2);
-					$point = new CSvgRect($x, $y, $size, $size);
-				}
+				$x = 0 - ($size / 2);
+				$y = 0 - ($size / 2);
+				$point = new CSvgRect($x, $y, $size, $size);
+
+				break;
+
+			case self::MARKER_TYPE_TRIANGLE:
+				$empty_group->addItem(
+					(new CSvgTriangle(0, 0, $size + 4, $size + 4))->addClass(CSvgTag::ZBX_STYLE_GRAPH_HIGHLIGHTED_VALUE)
+				);
+
+				$point = new CSvgTriangle(0, 0, $size, $size);
 				break;
 
 			case self::MARKER_TYPE_DIAMOND:
+				$empty_group->addItem(
+					(new CSvgDiamond(0, 0, $size + 4))->addClass(CSvgTag::ZBX_STYLE_GRAPH_HIGHLIGHTED_VALUE)
+				);
+
+				$point = new CSvgDiamond(0, 0, $size);
 				break;
 
 			case self::MARKER_TYPE_STAR:
-				break;
+				$empty_group->addItem(
+					(new CSvgStar(0, 0, $size + 4))->addClass(CSvgTag::ZBX_STYLE_GRAPH_HIGHLIGHTED_VALUE)
+				);
 
-			case self::DATASET_MARKER_TYPE_DIAMOND:
+				$point = new CSvgStar(0, 0, $size);
 				break;
-			case self::DATASET_MARKER_TYPE_CROSS:
+			case self::MARKER_TYPE_CROSS:
+				$empty_group->addItem(
+					(new CSvgCross(0, 0, $size + 4))->addClass(CSvgTag::ZBX_STYLE_GRAPH_HIGHLIGHTED_VALUE)
+				);
+
+				$point = new CSvgCross(0, 0, $size);
 				break;
 		}
 
 		if ($point !== null) {
+			$this->addItem($empty_group);
 			$this->addItem(
-				$point
+				$point_group
 					->addClass('metric-point')
 					->setAttribute('value_x', $this->point[2])
 					->setAttribute('value_y', $this->point[3])
 					->setAttribute('color', $this->point[4])
 					->setAttribute('time_from', $this->point[5])
 					->setAttribute('time_to', $this->point[6])
+					->addItem($point)
 			);
 		}
 	}

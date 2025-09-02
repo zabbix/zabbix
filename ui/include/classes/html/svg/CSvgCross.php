@@ -14,22 +14,16 @@
 **/
 
 
-class CSvgStar extends CSvgPolygon {
-	public function __construct($x, $y, $size, $points_count = 5)
-	{
-		$radius_outer = $size / 2;          // star fits in size × size
-		$radius_inner = $radius_outer * 0.5; // inner radius (can be parameterized)
+class CSvgCross extends CSvgGroup {
 
-		$points = [];
-		$angle_step = M_PI / $points_count; // half-step for alternating outer/inner points
+	public function __construct($x, $y, $size) {
+		parent::__construct();
 
-		for ($i = 0; $i < 2 * $points_count; $i++) {
-			$r = ($i % 2 === 0) ? $radius_outer : $radius_inner;
-			$px = $x + $r * cos($i * $angle_step - M_PI / 2);
-			$py = $y + $r * sin($i * $angle_step - M_PI / 2);
-			$points[] = [round($px, 1), round($py, 1)];
-		}
+		$half = $size / 2;
 
-		parent::__construct($points);
+		$this
+			->addItem(new CSvgLine($x - $half, $y - $half, $x + $half, $y + $half))
+			->addItem(new CSvgLine($x - $half, $y + $half, $x + $half, $y - $half))
+			->setAttribute('stroke-width', $size / 3);
 	}
 }

@@ -14,22 +14,17 @@
 **/
 
 
-class CSvgStar extends CSvgPolygon {
-	public function __construct($x, $y, $size, $points_count = 5)
-	{
-		$radius_outer = $size / 2;          // star fits in size × size
-		$radius_inner = $radius_outer * 0.5; // inner radius (can be parameterized)
+class CSvgDiamond extends CSvgPolygon {
 
-		$points = [];
-		$angle_step = M_PI / $points_count; // half-step for alternating outer/inner points
-
-		for ($i = 0; $i < 2 * $points_count; $i++) {
-			$r = ($i % 2 === 0) ? $radius_outer : $radius_inner;
-			$px = $x + $r * cos($i * $angle_step - M_PI / 2);
-			$py = $y + $r * sin($i * $angle_step - M_PI / 2);
-			$points[] = [round($px, 1), round($py, 1)];
-		}
+	public function __construct($x, $y, $size) {
+		$half = $size / 2;
+		$points = [
+			[$x, $y - $half], // top
+			[$x + $half, $y],  // right
+			[$x, $y + $half], // bottom
+			[$x - $half, $y],  // left
+		];
 
 		parent::__construct($points);
 	}
-}
+};

@@ -106,7 +106,17 @@
 	// Hide vertical helper line and highlighted data points.
 	function hideHelper(graph) {
 		graph.find('.svg-helper').attr({'x1': -10, 'x2': -10});
-		graph.find('.svg-point-highlight').attr({'cx': -10, 'cy': -10});
+
+		if (graph.data('options').hintbox_type === GRAPH_HINTBOX_TYPE_SCATTERPLOT) {
+			const highlighted_points = graph[0].querySelectorAll('g:has(.svg-point-highlight)');
+
+			for (const highlighted_point of highlighted_points) {
+				highlighted_point.setAttribute('transform', 'translate(-10, -10)');
+			}
+		}
+		else {
+			graph.find('.svg-point-highlight').attr({'cx': -10, 'cy': -10});
+		}
 	}
 
 	// Create a new hintbox and stick it to certain position where user has clicked.
@@ -491,17 +501,21 @@
 	 * actual data point and adds N pixels to all sides. Then looks if mouse is in calculated area. N is calculated by
 	 * this function. Tolerance is used to find exactly matched point only.
 	 */
-	function getDataPointTolerance(ds) {
-		var data_tag = ds.querySelector(':not(.svg-point-highlight)');
+	function getDataPointTolerance(ds, hintbox_type) {
+		if (hintbox_type === GRAPH_HINTBOX_TYPE_SVGGRAPH) {
+			const data_tag = ds.querySelector(':not(.svg-point-highlight)');
 
-		if (data_tag.tagName.toLowerCase() === 'circle') {
-			return +ds.childNodes[1].getAttribute('r');
-		}
-		else if (data.classList.contains('metric-point')) {
-			return +ds.childNodes[1].getAttribute('width');
+			if (data_tag.tagName.toLowerCase() === 'circle') {
+				return +ds.childNodes[1].getAttribute('r');
+			}
+			else {
+				return +window.getComputedStyle(data_tag)['strokeWidth'];
+			}
 		}
 		else {
-			return +window.getComputedStyle(data_tag)['strokeWidth'];
+			const data_tag = ds.querySelector("g:not(:has(.svg-point-highlight))");
+
+			return data_tag.getBBox().width / 2;
 		}
 	}
 
@@ -524,23 +538,26 @@
 		hbox.css({'left': l, 'top': t});
 	}
 
-	function getPointsNearX(graph, x, tolerance = 6) {
+	function getPointsNearX(graph, x) {
 		const nodes = graph.querySelectorAll('[data-set]');
-
 		const points = [];
 
 		for (let i = 0; i < nodes.length; i++) {
 			const point = nodes[i].querySelectorAll('.metric-point');
 
 			for (let c = 0; c < point.length; c++) {
-				const cx = parseInt(point[c].getAttribute('cx'), 10);
+				const ctm = point[c].getCTM();
+				const bbox = point[c].getBBox();
+				const cx = ctm.e;
+				const cy = ctm.f;
 
-				if (Math.abs(cx - x) <= tolerance) {
+				if (Math.abs(cx - x) <= bbox.width / 2) {
 					if (point[c].getAttribute('value_x') !== null || point[c].getAttribute('value_y') !== null) {
 						points.push({
 							g: nodes[i],
 							x: cx,
-							y: point[c].getAttribute('cy'),
+							y: cy,
+							transform: point[c].getAttribute('transform'),
 							vx: point[c].getAttribute('value_x'),
 							vy: point[c].getAttribute('value_y'),
 							color: point[c].getAttribute('color'),
@@ -632,11 +649,9 @@
 					: findValues(graph[0], offsetX),
 				points_total = points.length,
 				show_hint = false,
-				xy_point = false,
-				tolerance;
+				xy_point = false;
 
 			const xy_points = [];
-
 			/**
 			 * Decide if one specific value or list of all matching Xs should be highlighted and either to show or
 			 * hide hintbox.
@@ -647,7 +662,8 @@
 						show_hint = true;
 					}
 
-					tolerance = getDataPointTolerance(point.g);
+					const tolerance = getDataPointTolerance(point.g, hintbox_type);
+
 					if (!xy_point && (hintbox_type === GRAPH_HINTBOX_TYPE_SCATTERPLOT || point.v !== null)
 							&& (+point.x + tolerance) > e.offsetX && e.offsetX > (+point.x - tolerance)
 							&& (+point.y + tolerance) > e.offsetY && e.offsetY > (+point.y - tolerance)) {
@@ -664,24 +680,35 @@
 			}
 
 			if (hintbox_type === GRAPH_HINTBOX_TYPE_SCATTERPLOT) {
-				graph.find('.svg-point-highlight').attr({'cx': -10, 'cy': -10});
+				const highlighted_points = graph[0].querySelectorAll('g:has(.svg-point-highlight)');
+
+				for (const highlighted_point of highlighted_points) {
+					highlighted_point.setAttribute('transform', 'translate(-10, -10)');
+				}
 			}
 
 			// Make html for hintbox.
 			if (show_hint) {
 				html = jQuery('<ul>');
 			}
-			var rows_added = 0;
+			let rows_added = 0;
 			points.forEach(function(point) {
-				var point_highlight = point.g.querySelectorAll('.svg-point-highlight')[0];
+				const point_highlight = hintbox_type === GRAPH_HINTBOX_TYPE_SCATTERPLOT
+					? point.g.querySelector('g:has(.svg-point-highlight)')
+					: point.g.querySelector('.svg-point-highlight');
 
 				const include_point = hintbox_type === GRAPH_HINTBOX_TYPE_SCATTERPLOT
 					? xy_points.includes(point) || xy_points.length === 0
 					: point.v !== null && (xy_point === false || xy_point === point);
 
 				if (include_point) {
-					point_highlight.setAttribute('cx', point.x);
-					point_highlight.setAttribute('cy', point.y);
+					if (hintbox_type === GRAPH_HINTBOX_TYPE_SCATTERPLOT) {
+						point_highlight.setAttribute('transform', point.transform);
+					}
+					else {
+						point_highlight.setAttribute('cx', point.x);
+						point_highlight.setAttribute('cy', point.y);
+					}
 
 					if (point.p > 0) {
 						point_highlight.setAttribute('cx', parseInt(point.x) + parseInt(point.p));
@@ -730,8 +757,13 @@
 					}
 				}
 				else {
-					point_highlight.setAttribute('cx', -10);
-					point_highlight.setAttribute('cy', -10);
+					if (hintbox_type === GRAPH_HINTBOX_TYPE_SCATTERPLOT) {
+						point_highlight.setAttribute('transform', 'translate(-10, -10)');
+					}
+					else {
+						point_highlight.setAttribute('cx', -10);
+						point_highlight.setAttribute('cy', -10);
+					}
 				}
 			});
 

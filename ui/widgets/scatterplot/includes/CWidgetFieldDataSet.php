@@ -261,6 +261,8 @@ class CWidgetFieldDataSet extends CWidgetField {
 			'host_tags_evaltype' => ZBX_WIDGET_FIELD_TYPE_INT32,
 			'aggregate_function' => ZBX_WIDGET_FIELD_TYPE_INT32,
 			'aggregate_interval' => ZBX_WIDGET_FIELD_TYPE_STR,
+			'marker' => ZBX_WIDGET_FIELD_TYPE_INT32,
+			'marker_size' => ZBX_WIDGET_FIELD_TYPE_INT32
 		];
 
 		$dataset_defaults = self::getDefaults();

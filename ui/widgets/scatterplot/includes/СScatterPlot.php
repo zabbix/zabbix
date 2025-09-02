@@ -529,7 +529,6 @@ class СScatterPlot extends CSvg {
 	}
 
 	private function drawMetricsPoint(): void {
-		sdff($this->paths, '/home/test/work/logs/zabbix.log');
 		foreach ($this->metrics as $index => $metric) {
 			if (array_key_exists($index, $this->paths)) {
 				foreach ($this->paths[$index] as $path) {
