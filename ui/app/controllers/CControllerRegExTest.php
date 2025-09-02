@@ -55,6 +55,7 @@ class CControllerRegExTest extends CController {
 				$result['final'] = $result['final'] && $result['expressions'][$id];
 			}
 			catch (Exception $e) {
+				$result['expressions'][$id] = null;
 				$result['errors'][$id] = $e->getMessage();
 				$result['final'] = false;
 			}
