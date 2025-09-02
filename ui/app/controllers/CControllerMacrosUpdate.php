@@ -42,7 +42,8 @@ class CControllerMacrosUpdate extends CController {
 							'messages' => ['use' => _('Expected user macro format is "{$MACRO}".')]
 						],
 						['db globalmacro.macro', 'required', 'not_empty', 'when' => ['value', 'not_empty']],
-						['db globalmacro.macro', 'required', 'not_empty', 'when' => ['description', 'not_empty']]
+						['db globalmacro.macro', 'required', 'not_empty', 'when' => ['description', 'not_empty']],
+						['db globalmacro.macro', 'required', 'not_empty', 'when' => ['globalmacroid', 'not_empty']]
 					]
 				],
 				'messages' => [
