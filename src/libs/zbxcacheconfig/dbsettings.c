@@ -538,7 +538,7 @@ static void	store_settings(const zbx_setting_value_t *values, int found, zbx_uin
 		config->config->discovery_groupid = value_uint64;
 	}
 
-	/* housekeeper audit */
+	/* housekeeper settings for audit */
 
 	if (SUCCEED != setting_get_int(values, "hk_audit_mode", defaults_log_level, &value_int))
 		value_int = ZBX_HK_OPTION_DISABLED;
@@ -566,7 +566,7 @@ static void	store_settings(const zbx_setting_value_t *values, int found, zbx_uin
 		config->config->hk.audit_mode = value_int;
 	}
 
-	/* housekeeper events */
+	/* housekeeper settings for events */
 
 	if (SUCCEED != setting_get_int(values, "hk_events_mode", defaults_log_level, &value_int))
 		value_int = ZBX_HK_OPTION_DISABLED;
@@ -594,7 +594,7 @@ static void	store_settings(const zbx_setting_value_t *values, int found, zbx_uin
 		config->config->hk.events_mode = value_int;
 	}
 
-	/* housekeeper history */
+	/* housekeeper settings for history data */
 
 	if (SUCCEED != setting_get_int(values, "hk_history_global", defaults_log_level, &value_int))
 		value_int = ZBX_HK_OPTION_DISABLED;
@@ -641,7 +641,7 @@ static void	store_settings(const zbx_setting_value_t *values, int found, zbx_uin
 		config->config->hk.history_mode = value_int;
 	}
 
-	/* housekeeper services */
+	/* housekeeper settings for services */
 
 	if (SUCCEED != setting_get_int(values, "hk_services_mode", defaults_log_level, &value_int))
 		value_int = ZBX_HK_OPTION_DISABLED;
@@ -660,7 +660,7 @@ static void	store_settings(const zbx_setting_value_t *values, int found, zbx_uin
 		config->config->hk.services_mode = value_int;
 	}
 
-	/* housekeeper sessions */
+	/* housekeeper settings for user sessions data */
 
 	if (SUCCEED != setting_get_int(values, "hk_sessions_mode", defaults_log_level, &value_int))
 		value_int = ZBX_HK_OPTION_DISABLED;
@@ -680,7 +680,7 @@ static void	store_settings(const zbx_setting_value_t *values, int found, zbx_uin
 		config->config->hk.sessions_mode = value_int;
 	}
 
-	/* housekeeper trends */
+	/* housekeeper settings for trends */
 
 	if (SUCCEED != setting_get_int(values, "hk_trends_global", defaults_log_level, &value_int))
 		value_int = ZBX_HK_OPTION_DISABLED;
