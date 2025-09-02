@@ -27,8 +27,6 @@
 #include "zbxstr.h"
 #include "zbxtime.h"
 
-#define ZBX_IPC_PATH_MAX	sizeof(((struct sockaddr_un *)0)->sun_path)
-
 #define ZBX_IPC_DATA_DUMP_SIZE		128
 
 static char	ipc_path[ZBX_IPC_PATH_MAX] = {0};
