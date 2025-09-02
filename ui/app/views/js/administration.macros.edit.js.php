@@ -63,7 +63,6 @@
 <script type="text/javascript">
 	$(function() {
 		const table = $('#tbl_macros');
-
 		const form_element = document.forms.macrosForm;
 		const form = new CForm(form_element, <?= json_encode($data['js_validation_rules']) ?>);
 		const macros_count_filtered = () => Object.values(form.getAllValues().macros)
@@ -80,7 +79,7 @@
 			const removed = macros_count - macros_count_filtered();
 
 			form.validateSubmit(fields)
-				.then((result) => {
+				.then(result => {
 					if (result) {
 						let empty_removed = 0;
 						fields.macros = Object.values(fields.macros).filter((macro) => {
@@ -101,7 +100,7 @@
 
 					return result;
 				})
-				.then((result) => {
+				.then(result => {
 					if (!result) {
 						return;
 					}
@@ -111,8 +110,8 @@
 						headers: {'Content-Type': 'application/json'},
 						body: JSON.stringify(fields)
 					})
-						.then((response) => response.json())
-						.then((response) => {
+						.then(response => response.json())
+						.then(response => {
 							if ('error' in response) {
 								throw {error: response.error};
 							}
@@ -133,15 +132,15 @@
 							postMessageOk(response.success.title);
 							location.href = location.href;
 						})
-						.catch((exception) => {
+						.catch(exception => {
 							for (const element of form_element.parentNode.children) {
 								if (element.matches('.msg-good, .msg-bad, .msg-warning')) {
 									element.parentNode.removeChild(element);
 								}
 							}
 
-							let title,
-								messages;
+							let title;
+							let	messages;
 
 							if (typeof exception === 'object' && 'error' in exception) {
 								title = exception.error.title;

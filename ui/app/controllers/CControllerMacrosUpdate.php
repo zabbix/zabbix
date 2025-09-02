@@ -27,11 +27,15 @@ class CControllerMacrosUpdate extends CController {
 				'uniq' => [['macro']],
 				'fields' => [
 					'globalmacroid' => ['db globalmacro.globalmacroid'],
-					'type' => ['db globalmacro.type', 'required', 'in' => [ZBX_MACRO_TYPE_TEXT, ZBX_MACRO_TYPE_SECRET, ZBX_MACRO_TYPE_VAULT]],
+					'type' => ['db globalmacro.type', 'required',
+						'in' => [ZBX_MACRO_TYPE_TEXT, ZBX_MACRO_TYPE_SECRET, ZBX_MACRO_TYPE_VAULT]
+					],
 					'value' => [
 						['db globalmacro.value'],
 						['db globalmacro.value', 'required', 'not_empty',
-							'use' => [CVaultSecretParser::class, ['provider' => CSettingsHelper::get(CSettingsHelper::VAULT_PROVIDER)]],
+							'use' => [CVaultSecretParser::class,
+								['provider' => CSettingsHelper::get(CSettingsHelper::VAULT_PROVIDER)]
+							],
 							'when' => ['type', 'in' => [ZBX_MACRO_TYPE_VAULT]]
 						]
 					],
