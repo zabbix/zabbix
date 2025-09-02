@@ -938,8 +938,6 @@ ZBX_THREAD_ENTRY(poller_thread, args)
 
 	update_selfmon_counter(ZBX_PROCESS_STATE_BUSY);
 
-	scriptitem_es_engine_init();
-
 #if defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
 	zbx_tls_init_child();
 #endif
@@ -1007,8 +1005,6 @@ ZBX_THREAD_ENTRY(poller_thread, args)
 				break;
 		}
 	}
-
-	scriptitem_es_engine_destroy();
 
 	zbx_setproctitle("%s #%d [terminated]", get_process_type_string(process_type), process_num);
 

@@ -21,23 +21,11 @@
 #include "zbxembed.h"
 #include "log.h"
 
-static zbx_es_t	es_engine;
-
-void	scriptitem_es_engine_init(void)
-{
-	zbx_es_init(&es_engine);
-}
-
-void	scriptitem_es_engine_destroy(void)
-{
-	if (SUCCEED == zbx_es_is_env_initialized(&es_engine))
-		zbx_es_destroy(&es_engine);
-}
-
 int	get_value_script(DC_ITEM *item, AGENT_RESULT *result)
 {
 	char		*error = NULL, *script_bin = NULL, *output = NULL;
 	int		script_bin_sz, timeout_seconds, ret = NOTSUPPORTED;
+	zbx_es_t	es_engine;
 
 	if (FAIL == is_time_suffix(item->timeout, &timeout_seconds, strlen(item->timeout)))
 	{
@@ -45,7 +33,9 @@ int	get_value_script(DC_ITEM *item, AGENT_RESULT *result)
 		return ret;
 	}
 
-	if (SUCCEED != zbx_es_is_env_initialized(&es_engine) && SUCCEED != zbx_es_init_env(&es_engine, &error))
+	zbx_es_init(&es_engine);
+
+	if (SUCCEED != zbx_es_init_env(&es_engine, &error))
 	{
 		SET_MSG_RESULT(result, zbx_dsprintf(NULL, "Cannot initialize scripting environment: %s", error));
 		return ret;
@@ -69,18 +59,7 @@ int	get_value_script(DC_ITEM *item, AGENT_RESULT *result)
 	ret = SUCCEED;
 	SET_TEXT_RESULT(result, NULL != output ? output : zbx_strdup(NULL, ""));
 err:
-	if (SUCCEED == zbx_es_fatal_error(&es_engine))
-	{
-		char	*errlog = NULL;
-
-		if (SUCCEED != zbx_es_destroy_env(&es_engine, &errlog))
-		{
-			zabbix_log(LOG_LEVEL_WARNING,
-					"Cannot destroy embedded scripting engine environment: %s", errlog);
-			zbx_free(errlog);
-		}
-	}
-
+	zbx_es_destroy(&es_engine);
 	zbx_free(script_bin);
 	zbx_free(error);
 
