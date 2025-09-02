@@ -58,7 +58,7 @@ static void	DBmass_update_trends(const ZBX_DC_TREND *trends, int trends_num,
 		qsort(trends_tmp, trends_num, sizeof(ZBX_DC_TREND), zbx_trend_compare);
 
 		while (0 < trends_num)
-			zbx_db_flush_trends(trends_tmp, &trends_num, trends_diff);
+			zbx_db_flush_trends(trends_tmp, &trends_num, trends_diff, ZBX_DC_SYNC_TREND_MODE_NORMAL);
 
 		zbx_free(trends_tmp);
 	}
