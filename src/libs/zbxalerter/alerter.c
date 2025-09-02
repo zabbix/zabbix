@@ -255,8 +255,6 @@ static void	alerter_process_email(zbx_ipc_socket_t *socket, zbx_ipc_message_t *i
 
 	alerter_send_result(socket, NULL, ret, (SUCCEED == ret ? NULL : error), NULL);
 
-	zbx_free(expression);
-	zbx_free(recovery_expression);
 	zbx_free(error);
 	zbx_free(inreplyto);
 	zbx_free(sendto);
