@@ -711,7 +711,7 @@ function yieldGraphScaleInterval(float $min, float $max, string $units, int $pow
  *
  * @return Generator
  */
-function yieldGraphScaleIntervalForSUnits(float $min, float $max, int $power, int $rows): Generator {
+function yieldGraphScaleIntervalForSUnits(float $min, float $max, int $power, int $rows, string $axis): Generator {
 	static $power_multipliers = [
 		0 => [1, 2, 5, 10, 15, 20, 30],
 		1 => [1, 2, 5, 10, 15, 20, 30],

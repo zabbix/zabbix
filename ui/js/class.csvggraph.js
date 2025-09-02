@@ -497,6 +497,9 @@
 		if (data_tag.tagName.toLowerCase() === 'circle') {
 			return +ds.childNodes[1].getAttribute('r');
 		}
+		else if (data.classList.contains('metric-point')) {
+			return +ds.childNodes[1].getAttribute('width');
+		}
 		else {
 			return +window.getComputedStyle(data_tag)['strokeWidth'];
 		}
@@ -521,6 +524,39 @@
 		hbox.css({'left': l, 'top': t});
 	}
 
+	function getPointsNearX(graph, x, tolerance = 6) {
+		const nodes = graph.querySelectorAll('[data-set]');
+
+		const points = [];
+
+		for (let i = 0; i < nodes.length; i++) {
+			const point = nodes[i].querySelectorAll('.metric-point');
+
+			for (let c = 0; c < point.length; c++) {
+				const cx = parseInt(point[c].getAttribute('cx'), 10);
+
+				if (Math.abs(cx - x) <= tolerance) {
+					if (point[c].getAttribute('value_x') !== null || point[c].getAttribute('value_y') !== null) {
+						points.push({
+							g: nodes[i],
+							x: cx,
+							y: point[c].getAttribute('cy'),
+							vx: point[c].getAttribute('value_x'),
+							vy: point[c].getAttribute('value_y'),
+							color: point[c].getAttribute('color'),
+							time_from: point[c].getAttribute('time_from'),
+							time_to: point[c].getAttribute('time_to'),
+							p: 0,
+							s: 0
+						});
+					}
+				}
+			}
+		}
+
+		return points;
+	}
+
 	// Show problem or value hintbox.
 	function showHintbox(e, graph) {
 		var graph = graph || e.data.graph,
@@ -531,6 +567,8 @@
 			in_x = false,
 			in_values_area = false,
 			in_problem_area = false;
+
+		const hintbox_type = data.hintbox_type;
 
 		if (graph.data('simpleTriggersHintbox') || data.isTriggerHintBoxFrozen === true) {
 			return;
@@ -589,11 +627,15 @@
 			setHelperPosition(e, graph);
 
 			// Find values.
-			var points = findValues(graph[0], offsetX),
+			var points = hintbox_type === 1
+					? getPointsNearX(graph[0], offsetX)
+					: findValues(graph[0], offsetX),
 				points_total = points.length,
 				show_hint = false,
 				xy_point = false,
 				tolerance;
+
+			const xy_points = [];
 
 			/**
 			 * Decide if one specific value or list of all matching Xs should be highlighted and either to show or
@@ -601,18 +643,28 @@
 			 */
 			if (data.isHintBoxFrozen === false) {
 				points.forEach(function(point) {
-					if (!show_hint && point.v !== null) {
+					if (!show_hint && (hintbox_type === GRAPH_HINTBOX_TYPE_SCATTERPLOT || point.v !== null)) {
 						show_hint = true;
 					}
 
 					tolerance = getDataPointTolerance(point.g);
-					if (!xy_point && point.v !== null
+					if (!xy_point && (hintbox_type === GRAPH_HINTBOX_TYPE_SCATTERPLOT || point.v !== null)
 							&& (+point.x + tolerance) > e.offsetX && e.offsetX > (+point.x - tolerance)
 							&& (+point.y + tolerance) > e.offsetY && e.offsetY > (+point.y - tolerance)) {
-						xy_point = point;
-						points_total = 1;
+						if (hintbox_type === GRAPH_HINTBOX_TYPE_SCATTERPLOT) {
+							xy_points.push(point);
+							points_total = xy_points.length;
+						}
+						else {
+							xy_point = point;
+							points_total = 1;
+						}
 					}
 				});
+			}
+
+			if (hintbox_type === GRAPH_HINTBOX_TYPE_SCATTERPLOT) {
+				graph.find('.svg-point-highlight').attr({'cx': -10, 'cy': -10});
 			}
 
 			// Make html for hintbox.
@@ -623,7 +675,11 @@
 			points.forEach(function(point) {
 				var point_highlight = point.g.querySelectorAll('.svg-point-highlight')[0];
 
-				if (point.v !== null && (xy_point === false || xy_point === point)) {
+				const include_point = hintbox_type === GRAPH_HINTBOX_TYPE_SCATTERPLOT
+					? xy_points.includes(point) || xy_points.length === 0
+					: point.v !== null && (xy_point === false || xy_point === point);
+
+				if (include_point) {
 					point_highlight.setAttribute('cx', point.x);
 					point_highlight.setAttribute('cy', point.y);
 
@@ -632,14 +688,44 @@
 					}
 
 					if (show_hint && data.hintMaxRows > rows_added) {
-						jQuery('<li>')
-							.text(point.g.getAttribute('data-metric') + ': ' + point.v)
-							.append(
-								jQuery('<span>')
-									.css('background-color', point.g.getAttribute('data-color'))
-									.addClass('svg-graph-hintbox-item-color')
-							)
-							.appendTo(html);
+						if (data.hintbox_type === 1) {
+							const time_from = new CDate(point.time_from * 1000);
+							const time_to = new CDate(point.time_to * 1000);
+
+							jQuery('<li>')
+								.css('margin-top', rows_added > 0 ? '10px' : null)
+								.text(point.g.getAttribute('data-metric-x') + ': ' + point.vx)
+								.append(
+									jQuery('<span>')
+										.css('background-color', point.color)
+										.addClass('svg-graph-hintbox-item-color')
+								)
+								.appendTo(html);
+
+							jQuery('<li>')
+								.text(point.g.getAttribute('data-metric-y') + ': ' + point.vy)
+								.append(
+									jQuery('<span>')
+										.css('background-color', point.color)
+										.addClass('svg-graph-hintbox-item-color')
+								)
+								.appendTo(html);
+
+							jQuery('<div>')
+								.text(time_from.format(PHP_ZBX_FULL_DATE_TIME) + ' - ' + time_to.format(PHP_ZBX_FULL_DATE_TIME))
+								.appendTo(html);
+						}
+						else {
+							jQuery('<li>')
+								.text(point.g.getAttribute('data-metric') + ': ' + point.v)
+								.append(
+									jQuery('<span>')
+										.css('background-color', point.g.getAttribute('data-color'))
+										.addClass('svg-graph-hintbox-item-color')
+								)
+								.appendTo(html);
+						}
+
 						rows_added++;
 					}
 				}
@@ -650,21 +736,27 @@
 			});
 
 			if (show_hint) {
-				// Calculate time at mouse position.
-				const time = new CDate((data.timePeriod.from_ts + (offsetX - data.dimX) * data.spp) * 1000);
+				const element = jQuery('<div>').addClass('svg-graph-hintbox');
 
-				html = jQuery('<div>')
-					.addClass('svg-graph-hintbox')
-					.append(
+				if (data.hintbox_type === 0) {
+					// Calculate time at mouse position.
+					const time = new CDate((data.timePeriod.from_ts + (offsetX - data.dimX) * data.spp) * 1000);
+
+					element.append(
 						jQuery('<div>')
 							.addClass('header')
 							.html(time.format(PHP_ZBX_FULL_DATE_TIME))
-					)
+					);
+				}
+
+				element
 					.append(html)
 					.append(points_total > data.hintMaxRows
 						? makeHintBoxFooter(data.hintMaxRows, points_total)
 						: null
 					);
+
+				html = element;
 			}
 		}
 		else {
@@ -727,7 +819,8 @@
 						spp: widget._svg_options.spp || null,
 						timePeriod: widget._svg_options.time_period,
 						minPeriod: widget._svg_options.min_period,
-						boxing: false
+						boxing: false,
+						hintbox_type: widget._svg_options.hintbox_type
 					})
 					.data('widget', widget)
 					.attr('unselectable', 'on')

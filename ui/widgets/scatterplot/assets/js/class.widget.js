@@ -13,7 +13,7 @@
 **/
 
 
-class CWidgetSvgGraph extends CWidget {
+class CWidgetScatterPlot extends CWidget {
 
 	static DATASET_TYPE_SINGLE_ITEM = 0;
 
@@ -70,20 +70,20 @@ class CWidgetSvgGraph extends CWidget {
 
 			const dataset_new = {
 				...dataset,
-				itemids: [],
-				color: []
+				x_axis_itemids: [],
+				y_axis_itemids: []
 			};
 
-			for (const [item_index, itemid] of dataset.itemids.entries()) {
-				if (Array.isArray(itemid)) {
-					if (itemid.length === 1) {
-						dataset_new.itemids.push(itemid[0]);
-						dataset_new.color.push(dataset.color[item_index]);
+			for (const key of ['x_axis_itemids', 'y_axis_itemids']) {
+				for (const itemid of dataset[key].values()) {
+					if (Array.isArray(itemid)) {
+						if (itemid.length === 1) {
+							dataset_new[key].push(itemid[0]);
+						}
 					}
-				}
-				else {
-					dataset_new.itemids.push(itemid);
-					dataset_new.color.push(dataset.color[item_index]);
+					else {
+						dataset_new[key].push(itemid);
+					}
 				}
 			}
 
@@ -107,10 +107,8 @@ class CWidgetSvgGraph extends CWidget {
 
 			this._initGraph({
 				sbox: false,
-				show_problems: true,
-				show_simple_triggers: true,
 				hint_max_rows: 20,
-				hintbox_type: GRAPH_HINTBOX_TYPE_SVGGRAPH,
+				hintbox_type: GRAPH_HINTBOX_TYPE_SCATTERPLOT,
 				min_period: 60,
 				...response.svg_options.data
 			});
