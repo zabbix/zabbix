@@ -56,9 +56,7 @@
 				->setId('macro_#{rowNum}_error_container')
 				->addClass(ZBX_STYLE_ERROR_CONTAINER)
 				->setColSpan(4)
-		]))
-			->addClass('form_row')
-			->toString()
+		]))->toString()
 	?>
 </script>
 

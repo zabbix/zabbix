@@ -91,8 +91,7 @@ foreach ($data['macros'] as $i => $macro) {
 				->addClass(ZBX_STYLE_TEXTAREA_FLEXIBLE_PARENT)
 				->addClass(ZBX_STYLE_ERROR_CONTAINER)
 				->setId('macro_'.$i.'_error_container')
-				->setColSpan(4),
-			'form_row'
+				->setColSpan(4)
 		);
 }
 
