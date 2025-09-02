@@ -631,7 +631,7 @@ window.host_wizard_edit = new class {
 
 		const view = this.#view_templates.step_add_host_interface.evaluateToElement({
 			template_name: this.#getSelectedTemplate()?.name,
-			host_name: this.#getHostName(),
+			host_name: this.#getVisibleHostName(),
 			interfaces_long: interfaces_long.join(' / '),
 			interfaces_short: interfaces_short.join('/')
 		});
@@ -1264,7 +1264,7 @@ window.host_wizard_edit = new class {
 				})();
 
 				let server_host = '';
-				let hostname = this.#getHostName(false);
+				let hostname = this.#getHostName();
 				let psk_identity = '';
 				let psk = '';
 
@@ -1552,10 +1552,12 @@ window.host_wizard_edit = new class {
 		return selected && this.#templates.get(selected.split(':').pop());
 	}
 
-	#getHostName(visible_name = true) {
-		return this.#data.host_new !== null
-			? this.#data.host_new.id
-			: (visible_name ? this.#data.host.name : this.#data.host.host);
+	#getHostName() {
+		return this.#data.host_new?.id || this.#data.host.host;
+	}
+
+	#getVisibleHostName() {
+		return this.#data.host_new?.id || this.#data.host.name;
 	}
 
 	#isRequiredAddHostInterface() {
@@ -1567,7 +1569,7 @@ window.host_wizard_edit = new class {
 	#generatePSKIdentity() {
 		const host_field_length = <?= DB::getFieldLength('hosts', 'host') ?>;
 
-		return `${this.#getHostName(false).substring(0, host_field_length - 4)} PSK`;
+		return `${this.#getHostName().substring(0, host_field_length - 4)} PSK`;
 	}
 
 	#generatePSK() {
