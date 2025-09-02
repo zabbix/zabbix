@@ -615,8 +615,7 @@ static void	store_settings(const zbx_setting_value_t *values, int found, zbx_uin
 		zabbix_log(LOG_LEVEL_WARNING, "history data housekeeping will be disabled and all items will"
 				" store their history due to invalid global override settings");
 
-		if (ZBX_HK_MODE_DISABLED != value_int)
-			value_int = ZBX_HK_MODE_DISABLED;
+		value_int = ZBX_HK_MODE_DISABLED;
 
 		if (1 != config->config->hk.history)
 		{
@@ -630,8 +629,7 @@ static void	store_settings(const zbx_setting_value_t *values, int found, zbx_uin
 			ZBX_HK_OPTION_ENABLED == config->config->hk.history_global &&
 			0 == zbx_strcmp_null(config->config->db.extension, ZBX_DB_EXTENSION_TIMESCALEDB))
 	{
-		if (ZBX_HK_MODE_PARTITION != value_int)
-			value_int = ZBX_HK_MODE_PARTITION;
+		value_int = ZBX_HK_MODE_PARTITION;
 	}
 #endif
 
