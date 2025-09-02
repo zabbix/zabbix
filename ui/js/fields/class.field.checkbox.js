@@ -18,6 +18,7 @@ class CFieldCheckBox extends CField {
 	init() {
 		super.init();
 
+		this._field.setAttribute('data-disabled-uncheck-handler', '');
 		this._field.addEventListener('change', () => this.onBlur());
 	}
 
