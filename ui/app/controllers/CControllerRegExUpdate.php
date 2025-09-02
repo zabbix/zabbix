@@ -31,28 +31,30 @@ class CControllerRegExUpdate extends CController {
 			'name' => ['db regexps.name', 'required', 'not_empty'],
 			'test_string' => ['db regexps.test_string'],
 			'expressions' => ['objects', 'required', 'not_empty', 'uniq' => [['expression_type', 'expression']],
-				'messages' => [
-					'uniq' => _('Expression and expression type combination is not unique.'),
-					'not_empty' => _('At least one expression must be added.')
-				], 'fields' => [
+				'fields' => [
 					'expression_type' => ['db expressions.expression_type', 'required',
 						'in' => [EXPRESSION_TYPE_INCLUDED, EXPRESSION_TYPE_ANY_INCLUDED, EXPRESSION_TYPE_NOT_INCLUDED,
 							EXPRESSION_TYPE_TRUE, EXPRESSION_TYPE_FALSE
 						]
 					],
-				'expression' => [
-					['db expressions.expression', 'required', 'not_empty', 'use' => [CRegexValidator::class, []],
-						'when' => ['expression_type', 'in' => [EXPRESSION_TYPE_TRUE, EXPRESSION_TYPE_FALSE]]
+					'expression' => [
+						['db expressions.expression', 'required', 'not_empty', 'use' => [CRegexValidator::class, []],
+							'when' => ['expression_type', 'in' => [EXPRESSION_TYPE_TRUE, EXPRESSION_TYPE_FALSE]]
+						],
+						['db expressions.expression', 'required', 'not_empty', 'when' => ['expression_type', 'in' => [
+							EXPRESSION_TYPE_INCLUDED, EXPRESSION_TYPE_ANY_INCLUDED, EXPRESSION_TYPE_NOT_INCLUDED
+						]]]
 					],
-					['db expressions.expression', 'required', 'not_empty', 'when' => ['expression_type', 'in' => [
-						EXPRESSION_TYPE_INCLUDED, EXPRESSION_TYPE_ANY_INCLUDED, EXPRESSION_TYPE_NOT_INCLUDED
-					]]]
+					'exp_delimiter' => ['db expressions.exp_delimiter', 'in' => [',', '.', '/'], 'when' => [
+						'expression_type', 'in' => [EXPRESSION_TYPE_ANY_INCLUDED]
+					]],
+					'case_sensitive' => ['db expressions.case_sensitive', 'in' => [0, 1]]
 				],
-				'exp_delimiter' => ['db expressions.exp_delimiter', 'in' => [',', '.', '/'], 'when' => [
-					'expression_type', 'in' => [EXPRESSION_TYPE_ANY_INCLUDED]
-				]],
-				'case_sensitive' => ['db expressions.case_sensitive', 'in' => [0, 1]]
-			]]
+				'messages' => [
+					'uniq' => _('Expression and expression type combination is not unique.'),
+					'not_empty' => _('At least one expression must be added.')
+				]
+			]
 		]];
 	}
 
