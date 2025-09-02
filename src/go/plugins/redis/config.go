@@ -63,20 +63,20 @@ func (*Plugin) Validate(options any) error {
 
 	err = opts.Default.runSourceConsistencyValidation()
 	if err != nil {
-		return errs.Wrap(err, "failed on default configuration")
+		return errs.Wrap(err, "invalid 'Default' configuration")
 	}
 
 	// Reuse the existing resolver to validate the default configuration's TLSConnect value.
 	// This keeps all validation and resolution logic centralized within a single function, albeit with a double check.
 	_, err = opts.Default.resolveTLSConnect(&opts.Default)
 	if err != nil {
-		return errs.Wrap(err, "failed on default configuration")
+		return errs.Wrap(err, "invalid 'Default' configuration")
 	}
 
 	for sessionName, s := range opts.Sessions {
 		err = s.validateSession(&opts.Default)
 		if err != nil {
-			return errs.Wrap(err, "failed on session "+sessionName)
+			return errs.Wrap(err, "invalid session '"+sessionName+"' configuration")
 		}
 	}
 

@@ -69,7 +69,7 @@ func (s *session) resolveTLSConnect(defaults *session) (tlsconfig.TLSConnectionT
 	if s.TLSConnect != "" {
 		connectionType, err := tlsconfig.NewTLSConnectionType(s.TLSConnect)
 		if err != nil {
-			return "", errs.Wrap(err, "TLS connection type is invalid")
+			return "", errs.Wrap(err, "invalid 'TLSConnection'")
 		}
 
 		return connectionType, nil
@@ -78,7 +78,7 @@ func (s *session) resolveTLSConnect(defaults *session) (tlsconfig.TLSConnectionT
 	if defaults.TLSConnect != "" {
 		connectionType, err := tlsconfig.NewTLSConnectionType(defaults.TLSConnect)
 		if err != nil {
-			return "", errs.Wrap(err, "default TLS connection type is invalid")
+			return "", errs.Wrap(err, "default invalid 'TLSConnection'")
 		}
 
 		return connectionType, nil
