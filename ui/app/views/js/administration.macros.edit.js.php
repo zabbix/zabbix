@@ -72,6 +72,7 @@
 
 		form_element.addEventListener('submit', (e) => {
 			e.preventDefault();
+			clearMessages();
 
 			const fields = form.getAllValues();
 			const curl = new Curl(form_element.action);
@@ -136,9 +137,7 @@
 								messages = [<?= json_encode(_('Unexpected server error.')) ?>];
 							}
 
-							const message_box = makeMessageBox('bad', messages, title)[0];
-
-							form_element.parentNode.insertBefore(message_box, form_element);
+							addMessage(makeMessageBox('bad', messages, title)[0]);
 						});
 				});
 		});
