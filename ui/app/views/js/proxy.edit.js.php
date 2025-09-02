@@ -200,17 +200,14 @@ window.proxy_edit_popup = new class {
 
 	submit() {
 		const fields = this.form.getAllValues();
+		fields.update_psk = 0
 
 		if (this.proxyid !== null) {
 			fields.proxyid = this.proxyid;
-			fields.update_psk = !this.display_change_psk;
+			fields.update_psk = !this.display_change_psk ? 1 : 0;
 		}
 		else if (this.clone_proxyid !== null) {
 			fields.clone_proxyid = this.clone_proxyid;
-			fields.clone_psk = 1;
-		}
-		else {
-			fields.clone_psk = 0;
 		}
 
 		const curl = new Curl('zabbix.php');

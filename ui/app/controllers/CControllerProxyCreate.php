@@ -88,28 +88,18 @@ class CControllerProxyCreate extends CController {
 			'description' => ['db proxy.description'],
 			'tls_accept_certificate' => ['boolean'],
 			'tls_accept_psk' =>	['boolean'],
-			'tls_accept_none' => [
-				['boolean'],
-				['integer', 'required', 'in 1',
-					'when' => [
-						['tls_accept_certificate', 'in 0'], ['tls_accept_psk', 'in 0']
-					],
-					'messages' => [
-						'in' => _s(
-							'Incorrect value for field "%1$s": %2$s.',
-							_('Connections from proxy'), _('cannot be empty')
-						)
-					]
-				]
-			],
+			'tls_accept_none' => ['boolean'],
 			'tls_connect' => ['db proxy.tls_connect', 'required',
 				'in' => [HOST_ENCRYPTION_NONE, HOST_ENCRYPTION_PSK, HOST_ENCRYPTION_CERTIFICATE],
 				'when' => ['operating_mode', 'in' => [PROXY_OPERATING_MODE_PASSIVE]]
 			],
+			'update_psk' => ['boolean'],
 			'tls_psk_identity' => [
-				['db proxy.tls_psk_identity', 'required', 'not_empty', 'when' => ['tls_accept_psk', true]],
-				['db proxy.tls_psk_identity', 'required', 'not_empty',
-					'when' => ['tls_connect', 'in' => [HOST_ENCRYPTION_PSK]]
+				['db proxy.tls_psk_identity', 'not_empty', 'required',
+					'when' => [['tls_accept_psk', true], ['update_psk', true]]
+				],
+				['db proxy.tls_psk_identity', 'not_empty', 'required',
+					'when' => [['tls_connect', 'in' => [HOST_ENCRYPTION_PSK]], ['update_psk', true]]
 				]
 			],
 			'tls_psk' => [
@@ -125,9 +115,9 @@ class CControllerProxyCreate extends CController {
 					'regex' => '/^[0-9a-f]*$/i',
 					'messages' => ['regex' => _('PSK must contain only hexadecimal characters.')]
 				],
-				['db proxy.tls_psk', 'required', 'not_empty', 'when' => ['tls_accept_psk', true]],
+				['db proxy.tls_psk', 'required', 'not_empty', 'when' => [['tls_accept_psk', true], ['update_psk', true]]],
 				['db proxy.tls_psk_identity', 'required', 'not_empty',
-					'when' => ['tls_connect', 'in' => [HOST_ENCRYPTION_PSK]]
+					'when' => [['tls_connect', 'in' => [HOST_ENCRYPTION_PSK]], ['update_psk', true]]
 				]
 			],
 			'tls_issuer' => ['db proxy.tls_issuer', 'when' => ['tls_connect', 'in' => [HOST_ENCRYPTION_CERTIFICATE]]],
@@ -175,8 +165,7 @@ class CControllerProxyCreate extends CController {
 				'use' => [CTimeUnitValidator::class, ['min' => 1, 'max' => 10 * SEC_PER_MIN, 'usermacros' => true]],
 				'when' => ['custom_timeouts', 'in' => [ZBX_PROXY_CUSTOM_TIMEOUTS_ENABLED]]
 			],
-			'clone_psk' => ['boolean'],
-			'clone_proxyid' => ['db proxy.proxyid']
+			'clone_proxyid' => ['string']
 		]];
 	}
 
@@ -205,7 +194,9 @@ class CControllerProxyCreate extends CController {
 			return false;
 		}
 
-		if ($this->getInput('clone_psk')) {
+		if ($this->hasInput('clone_proxyid')
+			&& ($this->getInput('tls_connect', HOST_ENCRYPTION_NONE) == HOST_ENCRYPTION_PSK
+				|| $this->getInput('tls_accept_psk', 0))) {
 			$this->clone_proxy = API::Proxy()->get([
 				'output' => ['tls_psk_identity', 'tls_psk'],
 				'proxyids' => $this->getInput('clone_proxyid')
@@ -238,11 +229,11 @@ class CControllerProxyCreate extends CController {
 			case PROXY_OPERATING_MODE_ACTIVE:
 				$proxy['allowed_addresses'] = $this->getInput('allowed_addresses', '');
 
-				$proxy['tls_accept'] = ($this->getInput('tls_accept_none', 0) ? HOST_ENCRYPTION_NONE : 0)
-					| ($this->getInput('tls_accept_psk', 0) ? HOST_ENCRYPTION_PSK : 0)
-					| ($this->getInput('tls_accept_certificate', 0) ? HOST_ENCRYPTION_CERTIFICATE : 0);
+				$proxy['tls_accept'] = ($this->hasInput('tls_accept_none') ? HOST_ENCRYPTION_NONE : 0)
+					| ($this->hasInput('tls_accept_psk') ? HOST_ENCRYPTION_PSK : 0)
+					| ($this->hasInput('tls_accept_certificate') ? HOST_ENCRYPTION_CERTIFICATE : 0);
 
-				if ($this->getInput('clone_psk') && $this->hasInput('tls_accept_psk')) {
+				if ($this->getInput('clone_proxyid') && $this->hasInput('tls_accept_psk')) {
 					$proxy['tls_psk_identity'] = $this->clone_proxy['tls_psk_identity'];
 					$proxy['tls_psk'] = $this->clone_proxy['tls_psk'];
 				}
@@ -253,7 +244,7 @@ class CControllerProxyCreate extends CController {
 				$proxy['address'] = $this->getInput('address','');
 				$proxy['port'] = $this->getInput('port','');
 
-				if ($this->getInput('clone_psk') && $this->getInput('tls_connect', 0) == HOST_ENCRYPTION_PSK) {
+				if ($this->getInput('clone_proxyid') && $this->getInput('tls_connect', 0) == HOST_ENCRYPTION_PSK) {
 					$proxy['tls_psk_identity'] = $this->clone_proxy['tls_psk_identity'];
 					$proxy['tls_psk'] = $this->clone_proxy['tls_psk'];
 				}
@@ -269,6 +260,22 @@ class CControllerProxyCreate extends CController {
 				'timeout_ssh_agent', 'timeout_telnet_agent', 'timeout_script', 'timeout_browser'
 			]);
 		}
+
+		$tls_accept = 0x00;
+		if ($this->getInput('tls_accept_none', 0)) {
+			$tls_accept |= HOST_ENCRYPTION_NONE;
+		}
+		if ($this->getInput('tls_accept_psk', 0)) {
+			$tls_accept |= HOST_ENCRYPTION_PSK;
+		}
+		if ($this->getInput('tls_accept_certificate', 0)) {
+			$tls_accept |= HOST_ENCRYPTION_CERTIFICATE;
+		}
+
+		if (!($tls_accept & HOST_ENCRYPTION_PSK) && !($tls_accept & HOST_ENCRYPTION_CERTIFICATE)) {
+			$tls_accept = HOST_ENCRYPTION_NONE;
+		}
+		$proxy['tls_accept'] = $tls_accept;
 
 		$result = API::Proxy()->create($proxy);
 
