@@ -35,7 +35,7 @@ This template has been tested on:
 |----|-----------|-------|
 |{$ELASTICSEARCH.USERNAME}|<p>The username of the Elasticsearch.</p>||
 |{$ELASTICSEARCH.PASSWORD}|<p>The password of the Elasticsearch.</p>||
-|{$ELASTICSEARCH.HOST}|<p>The hostname or IP address of the Elasticsearch host.</p>|`<SET ELASTICSEARCH HOST>`|
+|{$ELASTICSEARCH.HOST}|<p>The hostname or IP address of the Elasticsearch host.</p>||
 |{$ELASTICSEARCH.PORT}|<p>The port of the Elasticsearch host.</p>|`9200`|
 |{$ELASTICSEARCH.SCHEME}|<p>The scheme of the Elasticsearch (http/https).</p>|`http`|
 |{$ELASTICSEARCH.RESPONSE_TIME.MAX.WARN}|<p>The ES cluster maximum response time in seconds for trigger expression.</p>|`10s`|

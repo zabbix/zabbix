@@ -388,6 +388,8 @@ typedef struct
 #endif
 	char				allowed_addresses[ZBX_HOST_PROXY_ADDRESS_LEN_MAX];
 	time_t				last_version_error_time;
+
+	int				pending_history;
 }
 zbx_dc_proxy_t;
 
@@ -1010,6 +1012,9 @@ size_t	zbx_dc_get_psk_by_identity(const unsigned char *psk_identity, unsigned ch
 void	zbx_dc_get_autoregistration_psk(char *psk_identity_buf, size_t psk_identity_buf_len,
 		unsigned char *psk_buf, size_t psk_buf_len);
 
+#define ZBX_PROXY_PENDING_HISTORY_NO	0
+#define ZBX_PROXY_PENDING_HISTORY_YES	1
+
 #define ZBX_MACRO_ENV_SECURE	0
 #define ZBX_MACRO_ENV_NONSECURE	1
 #define ZBX_MACRO_ENV_DEFAULT	2
@@ -1582,6 +1587,7 @@ int	zbx_dc_sync_lock(void);
 void	zbx_dc_sync_unlock(void);
 
 int	zbx_dc_get_proxy_version(zbx_uint64_t proxyid);
+void	zbx_dc_update_proxy_pending_history(zbx_dc_proxy_t *proxy, int flag);
 
 int	zbx_macro_field_params_resolv(zbx_macro_resolv_data_t *p, va_list args, char **replace_to, char **data,
 		char *error, size_t maxerrlen);

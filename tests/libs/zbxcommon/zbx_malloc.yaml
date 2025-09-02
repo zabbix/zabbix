@@ -1,0 +1,46 @@
+---
+test case: 'Typical use case'
+in:
+  size: 16
+  old: 0
+out:
+  size: 16
+---
+test case: 'Allocation on not-NULL pointer and out of memory'
+in:
+  size: 1
+  old: 1
+  out_of_mem: "Yes"
+exit code: failure
+---
+test case: 'Allocation size 0'
+in:
+  size: 0
+  old: 0
+out:
+  w1: "allocating 0 bytes"
+  size: 1
+---
+test case: 'Allocation on not-NULL pointer and size 0'
+in:
+  size: 0
+  old: 1
+out:
+  w1: "allocating already allocated memory"
+  w2: "allocating 0 bytes"
+  size: 1
+---
+test case: 'Typical use case - out of memory'
+in:
+  size: 1
+  old: 0
+  out_of_mem: "Yes"
+exit code: failure
+---
+test case: 'Allocation on not-NULL pointer, size 0 and out of memory'
+in:
+  size: 0
+  old: 1
+  out_of_mem: "Yes"
+exit code: failure
+...

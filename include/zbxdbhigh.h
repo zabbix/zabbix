@@ -595,7 +595,7 @@ typedef struct
 	time_t				lastaccess;
 	time_t				last_version_error_time;
 	int				proxy_delay;
-	int				more_data;
+	int				pending_history;
 	zbx_proxy_suppress_t		nodata_win;
 
 #define ZBX_FLAGS_PROXY_DIFF_UNSET				__UINT64_C(0x0000)
@@ -605,6 +605,7 @@ typedef struct
 #define ZBX_FLAGS_PROXY_DIFF_UPDATE_PROXYDELAY			__UINT64_C(0x0010)
 #define ZBX_FLAGS_PROXY_DIFF_UPDATE_SUPPRESS_WIN		__UINT64_C(0x0020)
 #define ZBX_FLAGS_PROXY_DIFF_UPDATE_CONFIG			__UINT64_C(0x0080)
+#define ZBX_FLAGS_PROXY_DIFF_UPDATE_PENDING_HISTORY		__UINT64_C(0x0100)
 #define ZBX_FLAGS_PROXY_DIFF_UPDATE (			\
 		ZBX_FLAGS_PROXY_DIFF_UPDATE_VERSION |	\
 		ZBX_FLAGS_PROXY_DIFF_UPDATE_LASTACCESS)

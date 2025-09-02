@@ -37,7 +37,7 @@ Also, see the Macros section for a list of macros used to set trigger values.
 
 |Name|Description|Default|
 |----|-----------|-------|
-|{$COCKROACHDB.API.HOST}|<p>The hostname or IP address of the CockroachDB host.</p>|`<SET COCKROACHDB HOST>`|
+|{$COCKROACHDB.API.HOST}|<p>The hostname or IP address of the CockroachDB host.</p>||
 |{$COCKROACHDB.API.PORT}|<p>The port of CockroachDB API and Prometheus endpoint.</p>|`8080`|
 |{$COCKROACHDB.API.SCHEME}|<p>Request scheme which may be http or https.</p>|`http`|
 |{$COCKROACHDB.STORE.USED.MIN.WARN}|<p>The warning threshold of the available disk space in percent.</p>|`20`|

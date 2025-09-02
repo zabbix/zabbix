@@ -1385,12 +1385,12 @@ static int	es_browser_create_prototype(duk_context *ctx)
 	duk_push_c_function(ctx, es_browser_ctor, 1);
 	duk_push_object(ctx);
 
-	duk_put_function_list(ctx, -1, browser_methods);
+	es_put_function_list(ctx, -1, browser_methods);
 
 	if (1 != duk_put_prop_string(ctx, -2, "prototype"))
 		return FAIL;
 
-	duk_put_function_list(ctx, -1, browser_static_methods);
+	es_put_function_list(ctx, -1, browser_static_methods);
 
 	if (1 != duk_put_global_string(ctx, "Browser"))
 		return FAIL;

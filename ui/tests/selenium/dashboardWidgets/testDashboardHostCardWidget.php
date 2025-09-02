@@ -1567,7 +1567,7 @@ class testDashboardHostCardWidget extends testWidgets {
 		}
 
 		// Check links with existing objects.
-		$widget = $dashboard::find()->one()->getWidget('Fully filled host card widget');
+		$widget = $dashboard->getWidget('Fully filled host card widget');
 
 		if ($data['header'] === 'Problems') {
 			$widget->query('class:sections-header')->query('class:problem-icon-link')->one()->click();

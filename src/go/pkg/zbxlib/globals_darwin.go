@@ -53,8 +53,6 @@ typedef zbx_active_metric_t* ZBX_ACTIVE_METRIC_LP;
 typedef zbx_vector_ptr_t * zbx_vector_ptr_lp_t;
 typedef zbx_vector_expression_t * zbx_vector_expression_lp_t;
 
-int	CONFIG_TCP_MAX_BACKLOG_SIZE	= SOMAXCONN;
-
 zbx_metric_t	parameters_agent[] = {NULL};
 zbx_metric_t	parameters_specific[] = {NULL};
 

@@ -196,7 +196,8 @@ char	*zbx_str_printable_dyn(const char *text)
 		}
 	}
 
-	out = zbx_malloc(NULL, ++out_alloc);
+	++out_alloc;
+	out = zbx_malloc(NULL, out_alloc);
 
 	for (pin = text, pout = out; '\0' != *pin; pin++)
 	{

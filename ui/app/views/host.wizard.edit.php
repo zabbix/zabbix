@@ -319,6 +319,7 @@ function stepCreateHost($form): CTemplateTag {
 							'new_item_name' => 'host_new',
 							'object_name' => 'hosts',
 							'add_new' => true,
+							'maxlength' => DB::getFieldLength('hosts', 'host'),
 							'multiple' => false,
 							'popup' => [
 								'parameters' => [
@@ -345,6 +346,7 @@ function stepCreateHost($form): CTemplateTag {
 							'new_item_name' => 'groups_new[]',
 							'object_name' => 'hostGroup',
 							'add_new' => (CWebUser::$data['type'] == USER_TYPE_SUPER_ADMIN),
+							'maxlength' => DB::getFieldLength('hstgrp', 'name'),
 							'popup' => [
 								'parameters' => [
 									'srctbl' => 'host_groups',

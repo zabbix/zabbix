@@ -37,9 +37,9 @@ This template has been tested on:
 
 |Name|Description|Default|
 |----|-----------|-------|
-|{$YUGABYTEDB.ACCOUNT.ID}|<p>YugabyteDB account ID.</p>|`<Put your account ID here>`|
-|{$YUGABYTEDB.PROJECT.ID}|<p>YugabyteDB project ID.</p>|`<Put your project ID here>`|
-|{$YUGABYTEDB.ACCESS.TOKEN}|<p>Access token for the YugabyteDB API.</p>|`<Put your access token here>`|
+|{$YUGABYTEDB.ACCOUNT.ID}|<p>YugabyteDB account ID.</p>||
+|{$YUGABYTEDB.PROJECT.ID}|<p>YugabyteDB project ID.</p>||
+|{$YUGABYTEDB.ACCESS.TOKEN}|<p>Access token for the YugabyteDB API.</p>||
 |{$YUGABYTEDB.PROXY}|<p>Sets the HTTP proxy value. If this macro is empty, then no proxy is used.</p>||
 
 ### Items
@@ -67,8 +67,8 @@ This template has been tested on:
 
 |Name|Description|Default|
 |----|-----------|-------|
-|{$YUGABYTEDB.CLUSTER.NAME}|<p>Name of cluster.</p>|`<Put your cluster name here>`|
-|{$YUGABYTEDB.CLUSTER.ID}|<p>ID of cluster.</p>|`<Put your cluster ID here>`|
+|{$YUGABYTEDB.CLUSTER.NAME}|<p>Name of cluster.</p>||
+|{$YUGABYTEDB.CLUSTER.ID}|<p>ID of cluster.</p>||
 |{$YUGABYTEDB.MEMORY.CLUSTER.UTILIZATION.WARN}|<p>The percentage of memory use on the cluster - for the Warning trigger expression.</p>|`70`|
 |{$YUGABYTEDB.MEMORY.CLUSTER.UTILIZATION.CRIT}|<p>The percentage of memory use on the cluster - for the High trigger expression.</p>|`90`|
 |{$YUGABYTEDB.DISK.UTILIZATION.WARN}|<p>The percentage of disk use in the cluster - for the Warning trigger expression.</p>|`75`|

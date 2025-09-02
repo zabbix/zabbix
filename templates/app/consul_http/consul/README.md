@@ -45,7 +45,7 @@ In case of Open Source version service namespace will be set to 'None'.
 |Name|Description|Default|
 |----|-----------|-------|
 |{$CONSUL.NODE.API.URL}|<p>Consul instance URL.</p>|`http://localhost:8500`|
-|{$CONSUL.TOKEN}|<p>Consul auth token.</p>|`<PUT YOUR AUTH TOKEN>`|
+|{$CONSUL.TOKEN}|<p>Consul auth token.</p>||
 |{$CONSUL.OPEN.FDS.MAX.WARN}|<p>Maximum percentage of used file descriptors.</p>|`90`|
 |{$CONSUL.LLD.FILTER.LOCAL_SERVICE_NAME.MATCHES}|<p>Filter of discoverable discovered services on local node.</p>|`.*`|
 |{$CONSUL.LLD.FILTER.LOCAL_SERVICE_NAME.NOT_MATCHES}|<p>Filter to exclude discovered services on local node.</p>|`CHANGE IF NEEDED`|

@@ -14,6 +14,8 @@
 
 #include "dc_item_poller_type_update_test.h"
 
+#include "../../src/libs/zbxcacheconfig/dbconfig.c"
+
 void	DCitem_poller_type_update_test(ZBX_DC_ITEM *dc_item, const ZBX_DC_HOST *dc_host, int flags)
 {
 	DCitem_poller_type_update(dc_item, dc_host, flags);
