@@ -105,7 +105,7 @@ zabbix_export:
           trends: '0'
           description: |
             MIB: ARUBAWIRED-POWERSUPPLY-MIB
-            Used for discovering system power supply.
+            Used for discovering the system power supply.
           tags:
             - tag: component
               value: raw
@@ -180,7 +180,7 @@ zabbix_export:
               name: 'Aruba: High ICMP ping loss'
               opdata: 'Loss: {ITEM.LASTVALUE1}'
               priority: WARNING
-              description: 'ICMP packets loss detected.'
+              description: 'ICMP packet loss detected.'
               dependencies:
                 - name: 'Aruba: Unavailable by ICMP ping'
                   expression: 'max(/Aruba CX 8300s by SNMP/icmpping,#3)=0'
@@ -195,7 +195,7 @@ zabbix_export:
           key: icmppingsec
           value_type: FLOAT
           units: s
-          description: 'The ICMP ping response time (in seconds).'
+          description: 'ICMP ping response time (in seconds).'
           tags:
             - tag: component
               value: health
@@ -424,7 +424,7 @@ zabbix_export:
                   value: availability
       discovery_rules:
         - uuid: 8b55d9f865a44b07899ee773989ee976
-          name: 'Fan Discovery'
+          name: 'Fan discovery'
           type: DEPENDENT
           key: aruba.fan.discovery
           delay: '0'
@@ -439,7 +439,7 @@ zabbix_export:
               units: '!RPM'
               description: |
                 MIB: ARUBAWIRED-FAN-MIB
-                Current RPM read for the fan. RPM of -1 indicates fan does not have RPM readback capability.
+                Current RPM read for the fan. RPM of -1 indicates the fan does not have RPM readback capability.
               preprocessing:
                 - type: SNMP_WALK_VALUE
                   parameters:
@@ -462,7 +462,7 @@ zabbix_export:
               delay: '0'
               description: |
                 MIB: ARUBAWIRED-FAN-MIB
-                Current status for the fan expressed as an enumerated value.
+                Current status of the fan.
                 Possible values:
                 1 - Unknown;
                 2 - Empty;
@@ -492,7 +492,7 @@ zabbix_export:
                   name: 'Aruba: Fan [{#SNMPVALUE}]: Status is not "Ok"'
                   opdata: 'Current status: {ITEM.LASTVALUE1}'
                   priority: AVERAGE
-                  description: 'The fan status is not "OK".'
+                  description: 'The fan status is not "Ok".'
                   tags:
                     - tag: scope
                       value: availability
@@ -511,7 +511,7 @@ zabbix_export:
               parameters:
                 - 1h
         - uuid: 28d8f26183e842d89664160b43e643e4
-          name: 'OSPF area discovery'
+          name: 'OSPF Area discovery'
           type: DEPENDENT
           key: aruba.ospf.area.discovery
           delay: '0'
@@ -524,7 +524,7 @@ zabbix_export:
               delay: '0'
               description: |
                 MIB: OSPF-MIB
-                The 32-bit sum of the link state advertisements' LS checksums contained in this area's link state database.
+                The 32-bit sum of the checksums of the LSAs contained in this area's link state database.
                 This sum excludes external (LS type-5) link state advertisements. The sum can be used to determine if there has
                 been a change in a router's link state database, and to compare the link state database of two routers.
                 The value should be treated as unsigned when comparing two sums of checksums.
@@ -578,14 +578,14 @@ zabbix_export:
               delay: '0'
               description: |
                 MIB: OSPF-MIB
-                Indicates if and how an NSSA border router is performing NSSA translation of type-7 LSAs into type-5 LSAs.
-                When this object is set to enabled, the NSSA Border router's OspfAreaNssaExtTranslatorRole has been set to
-                always. When this object is set to elected, a candidate NSSA Border router is Translating type-7 LSAs into type-5.
-                When this object is set to disabled, a candidate NSSA border router is NOT translating type-7 LSAs into type-5.
+                Indicates NSSA border router translation state of type-7 LSAs into type-5 LSAs.
                 Possible values:
                 1 - Enabled;
                 2 - Elected;
                 3 - Disabled.
+                When `Enabled`, the NSSA Border router's `OspfAreaNssaExtTranslatorRole` is `Always`.
+                When `Elected`, a candidate NSSA border router is translating type-7 LSAs into type-5.
+                When `Disabled`, a candidate NSSA border router is not translating type-7 LSAs into type-5.
               valuemap:
                 name: 'OSPF translator state'
               preprocessing:
@@ -604,7 +604,7 @@ zabbix_export:
                 - tag: component
                   value: network
             - uuid: a1a4bc6d7bf04706aadf41875c7c609a
-              name: 'OSPF area [{#SNMPVALUE}]: Lsa count'
+              name: 'OSPF area [{#SNMPVALUE}]: LSA count'
               type: DEPENDENT
               key: 'aruba.ospf.area.lsa[ospfAreaLsaCount.{#SNMPINDEX}]'
               delay: '0'
@@ -634,9 +634,9 @@ zabbix_export:
               delay: '0'
               description: |
                 MIB: OSPF-MIB
-                The number of times that the intra-area route table has been calculated using this area's
-                link state database. This is typically done using Dijkstra's algorithm.
-                Discontinuities in the value of this counter can occur at re-initialization of the management system, and at other
+                The number of times that the intra-area route table has been calculated using this area's link state database.
+                This is typically done using Dijkstra's algorithm.
+                Discontinuities in the value of this counter may occur at re-initialization of the management system, and at other
                 times as indicated by the value of ospfDiscontinuityTime.
               preprocessing:
                 - type: SNMP_WALK_VALUE
@@ -751,9 +751,8 @@ zabbix_export:
               delay: '0'
               description: |
                 MIB: OSPF-MIB
-                The OSPF interface's administrative status. The value formed on the interface, and the interface
-                will be advertised as an internal route to some area. The value 'disabled' denotes that the interface is
-                external to OSPF.
+                The OSPF interface's administrative status. If enabled, the interface is advertised as an internal route to an area.
+                The value 'disabled' denotes that the interface is external to OSPF.
                 Possible values:
                 1 - Enabled;
                 2 - Disabled.
@@ -783,7 +782,7 @@ zabbix_export:
               trends: '0'
               description: |
                 MIB: OSPF-MIB
-                A 32-bit integer uniquely identifying the area to which the interface connects.  Area ID 0.0.0.0 is used for the OSPF backbone.
+                A 32-bit integer uniquely identifying the area to which the interface connects. Area ID 0.0.0.0 is used for the OSPF backbone.
               preprocessing:
                 - type: SNMP_WALK_VALUE
                   parameters:
@@ -919,8 +918,7 @@ zabbix_export:
                 MIB: OSPF-MIB
                 The OSPF interface type. By way of a default, this field may be intuited from the corresponding value of ifType.
                 Broadcast LANs, such as Ethernet and IEEE 802.5, take the value 'broadcast', X.25 and similar
-                technologies take the value 'nbma', and links that are definitively point to point take the
-                value 'pointToPoint'.
+                technologies take the value 'nbma', and links that are definitively point-to-point take the value 'pointToPoint'.
                 Possible values:
                 1 - Broadcast;
                 2 - NBMA;
@@ -950,7 +948,7 @@ zabbix_export:
               name: 'Aruba: OSPF Interface [{#SNMPVALUE}]: State is "Down" or "Waiting"'
               opdata: 'Current state: {ITEM.LASTVALUE1}'
               priority: AVERAGE
-              description: 'The OSPF Interface state "Down" or "Waiting".'
+              description: 'The OSPF Interface state is "Down" or "Waiting".'
               tags:
                 - tag: scope
                   value: availability
@@ -980,7 +978,7 @@ zabbix_export:
               parameters:
                 - 1h
         - uuid: 2221a4910f56484fa1e4c0388e69c072
-          name: 'OSPF neighbor discovery'
+          name: 'OSPF Neighbor discovery'
           type: DEPENDENT
           key: aruba.ospf.neighbor.discovery
           delay: '0'
@@ -1021,18 +1019,16 @@ zabbix_export:
                 MIB: OSPF-MIB
                 A bit mask corresponding to the neighbor's options field.
                 
-                Bit 0, if set, indicates that the system will operate on Type of Service metrics other than
-                TOS 0.  If zero, the neighbor will ignore all metrics except the TOS 0 metric.
+                Bit 0, if set, indicates that the system will operate on Type of Service metrics other than TOS 0.
+                If zero, the neighbor will ignore all metrics except the TOS 0 metric.
                 
                 Bit 1, if set, indicates that the associated area accepts and operates on external
                 information; if zero, it is a stub area.
                 
-                Bit 2, if set, indicates that the system is capable of routing IP multicast datagrams, that is
-                that it implements the multicast extensions to OSPF.
+                Bit 2, if set, indicates that the system is capable of routing IP multicast datagrams – it implements the multicast extensions to OSPF.
                 
-                Bit 3, if set, indicates that the associated area is an NSSA. These areas are capable of
-                carrying type-7 external advertisements, which are translated into type-5 external advertisements
-                at NSSA borders.
+                Bit 3, if set, indicates that the associated area is an NSSA. These areas are capable of carrying type-7 external advertisements,
+                which are translated into type-5 external advertisements at NSSA borders.
               preprocessing:
                 - type: SNMP_WALK_VALUE
                   parameters:
@@ -1104,8 +1100,7 @@ zabbix_export:
               trends: '0'
               description: |
                 MIB: OSPF-MIB
-                A 32-bit integer (represented as a type IpAddress) uniquely identifying the neighboring router in the
-                Autonomous System.
+                A 32-bit integer (represented as a type IpAddress) uniquely identifying the neighboring router in the Autonomous System.
               preprocessing:
                 - type: SNMP_WALK_VALUE
                   parameters:
@@ -1222,21 +1217,21 @@ zabbix_export:
               parameters:
                 - 1h
         - uuid: eb9c0879dff343d488f12e3860649edf
-          name: 'PSU Discovery'
+          name: 'PSU discovery'
           type: DEPENDENT
           key: aruba.psu.discovery
           delay: '0'
           description: 'Used for discovering PSU from ARUBAWIRED-POWERSUPPLY-MIB.'
           item_prototypes:
             - uuid: 97a068f9b8dd4aae855098677816bdc2
-              name: 'PSU [{#SNMPVALUE}]: Instantaneous Power'
+              name: 'PSU [{#SNMPVALUE}]: Instantaneous power'
               type: DEPENDENT
               key: 'aruba.psu.power[arubaWiredPSUInstantaneousPower.{#SNMPINDEX}]'
               delay: '0'
               units: W
               description: |
                 MIB: ARUBAWIRED-POWERSUPPLY-MIB
-                Total instantaneous power supplied by the power supply in Watts.
+                Total instantaneous power supplied by the power supply in watts.
               preprocessing:
                 - type: SNMP_WALK_VALUE
                   parameters:
@@ -1272,7 +1267,7 @@ zabbix_export:
               delay: '0'
               description: |
                 MIB: ARUBAWIRED-POWERSUPPLY-MIB
-                Current status for the power supply as an enumerated value.
+                Current status for the power supply.
                 Possible values:
                 1 - Ok;
                 2 - Fault Absent;
@@ -1311,7 +1306,7 @@ zabbix_export:
                   name: 'Aruba: PSU [{#SNMPVALUE}]: State is not "Ok"'
                   opdata: 'Current state: {ITEM.LASTVALUE1}'
                   priority: AVERAGE
-                  description: 'The PSU status is not "OK".'
+                  description: 'The PSU status is not "Ok".'
                   tags:
                     - tag: scope
                       value: availability
@@ -1333,21 +1328,21 @@ zabbix_export:
               parameters:
                 - 1h
         - uuid: fe04a84c30e4476fb9f1d3543f4ca031
-          name: 'Resource Discovery'
+          name: 'Resource discovery'
           type: DEPENDENT
           key: aruba.resource.discovery
           delay: '0'
           description: 'Used for discovering system resources from ARUBAWIRED-SYSTEMINFO-MIB.'
           item_prototypes:
             - uuid: c4011281ee2f4d38883ebfcff48325b6
-              name: 'Module [{#SNMPVALUE}]: CPU Load average 1 min'
+              name: 'Module [{#SNMPVALUE}]: CPU load average 1 min'
               type: DEPENDENT
               key: 'aruba.system.cpu.la1[arubaWiredSystemInfoCpuAvgOneMin.{#SNMPINDEX}]'
               delay: '0'
               units: '%'
               description: |
                 MIB: ARUBAWIRED-SYSTEMINFO-MIB
-                The percentage of CPU utilization of the subsystem averaged across all the CPUs of the system period of one minute.
+                The percentage of CPU utilization of the subsystem averaged across all the CPUs of the system over a one-minute period.
               preprocessing:
                 - type: SNMP_WALK_VALUE
                   parameters:
@@ -1362,7 +1357,7 @@ zabbix_export:
                 - tag: component
                   value: cpu
             - uuid: f140efa0c906458d968b20773c5397ca
-              name: 'Module [{#SNMPVALUE}]: CPU Load average 5 min'
+              name: 'Module [{#SNMPVALUE}]: CPU load average 5 min'
               type: DEPENDENT
               key: 'aruba.system.cpu.la5[arubaWiredSystemInfoCpuAvgFiveMin.{#SNMPINDEX}]'
               delay: '0'
@@ -1423,7 +1418,7 @@ zabbix_export:
               units: '%'
               description: |
                 MIB: ARUBAWIRED-SYSTEMINFO-MIB
-                The memory usage of subsystem in percentage.
+                Subsystem memory usage in percent.
               preprocessing:
                 - type: SNMP_WALK_VALUE
                   parameters:
@@ -1455,7 +1450,7 @@ zabbix_export:
               units: '%'
               description: |
                 MIB: ARUBAWIRED-SYSTEMINFO-MIB
-                The percentage of utilization of core dump storage partition.
+                Utilization of core dump storage partition in percent.
               preprocessing:
                 - type: SNMP_WALK_VALUE
                   parameters:
@@ -1477,7 +1472,7 @@ zabbix_export:
               units: '%'
               description: |
                 MIB: ARUBAWIRED-SYSTEMINFO-MIB
-                The percentage of utilization of logs storage partition.
+                Utilization of log storage partition in percent.
               preprocessing:
                 - type: SNMP_WALK_VALUE
                   parameters:
@@ -1499,7 +1494,7 @@ zabbix_export:
               units: '%'
               description: |
                 MIB: ARUBAWIRED-SYSTEMINFO-MIB
-                The percentage of utilization of network operating system storage partition.
+                Utilization of network operating system storage partition in percent.
               preprocessing:
                 - type: SNMP_WALK_VALUE
                   parameters:
@@ -1521,7 +1516,7 @@ zabbix_export:
               units: '%'
               description: |
                 MIB: ARUBAWIRED-SYSTEMINFO-MIB
-                The percentage of utilization of security storage partition.
+                Utilization of security storage partition in percent.
               preprocessing:
                 - type: SNMP_WALK_VALUE
                   parameters:
@@ -1543,7 +1538,7 @@ zabbix_export:
               units: '%'
               description: |
                 MIB: ARUBAWIRED-SYSTEMINFO-MIB
-                The percentage of utilization of self test storage partition.
+                Utilization of self test storage partition in percent.
               preprocessing:
                 - type: SNMP_WALK_VALUE
                   parameters:
@@ -1637,7 +1632,7 @@ zabbix_export:
               parameters:
                 - 1h
         - uuid: 24498833e71d4106ac6c590ee08a3dc3
-          name: 'Sensor Discovery'
+          name: 'Sensor discovery'
           type: DEPENDENT
           key: aruba.sensor.discovery
           delay: '0'
@@ -2274,7 +2269,7 @@ zabbix_export:
           description: 'Warning threshold of ICMP packet loss in %.'
         - macro: '{$ICMP_RESPONSE_TIME_WARN}'
           value: '0.15'
-          description: 'Warning threshold of the average ICMP response time in seconds.'
+          description: 'Warning threshold of average ICMP response time in seconds.'
         - macro: '{$IF.ERRORS.WARN}'
           value: '2'
           description: 'Warning threshold of error packet rate. Can be used with interface name as context.'
@@ -2709,7 +2704,7 @@ zabbix_export:
             - name: 'Aruba: OSPF'
               widgets:
                 - type: honeycomb
-                  name: 'OSPF area status'
+                  name: 'OSPF Area status'
                   width: '24'
                   height: '6'
                   fields:
@@ -2765,7 +2760,7 @@ zabbix_export:
                       name: thresholds.5.threshold
                       value: '6'
                 - type: honeycomb
-                  name: 'OSPF interface state'
+                  name: 'OSPF Interface state'
                   'y': '6'
                   width: '36'
                   height: '6'
@@ -2834,7 +2829,7 @@ zabbix_export:
                       name: thresholds.7.threshold
                       value: '8'
                 - type: honeycomb
-                  name: 'OSPF neighbor state'
+                  name: 'OSPF Neighbor state'
                   x: '24'
                   width: '24'
                   height: '6'
@@ -2903,7 +2898,7 @@ zabbix_export:
                       name: thresholds.7.threshold
                       value: '8'
                 - type: honeycomb
-                  name: 'OSPF interface status'
+                  name: 'OSPF Interface status'
                   x: '36'
                   'y': '6'
                   width: '36'
@@ -2961,7 +2956,7 @@ zabbix_export:
                       name: thresholds.5.threshold
                       value: '6'
                 - type: honeycomb
-                  name: 'OSPF neighbor status'
+                  name: 'OSPF Neighbor status'
                   x: '48'
                   width: '24'
                   height: '6'
