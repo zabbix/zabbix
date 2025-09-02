@@ -20,6 +20,7 @@ import (
 	"golang.zabbix.com/sdk/metric"
 	"golang.zabbix.com/sdk/plugin"
 	"golang.zabbix.com/sdk/uri"
+	"golang.zabbix.com/sdk/zbxsync"
 )
 
 const (
@@ -54,7 +55,7 @@ var metrics = metric.MetricSet{ //nolint:gochecknoglobals // used as a static co
 //nolint:gochecknoinits //legacy implementation
 func init() {
 	impl.manager = watch.NewManager(&impl)
-	impl.mqttClients = make(map[broker]*mqttClient)
+	impl.mqttClients = zbxsync.SyncMap[broker, *mqttClient]{}
 
 	err := plugin.RegisterMetrics(&impl, pluginName, metrics.List()...)
 	if err != nil {

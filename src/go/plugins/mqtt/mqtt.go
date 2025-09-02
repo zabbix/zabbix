@@ -27,6 +27,7 @@ import (
 	"math/rand"
 	"net/url"
 	"strings"
+	"sync"
 	"time"
 
 	mqtt "github.com/eclipse/paho.mqtt.golang"
@@ -37,10 +38,20 @@ import (
 	"golang.zabbix.com/sdk/plugin/itemutil"
 	"golang.zabbix.com/sdk/tlsconfig"
 	"golang.zabbix.com/sdk/zbxerr"
+	"golang.zabbix.com/sdk/zbxsync"
 )
 
 const (
 	pluginName = "MQTT"
+)
+
+const (
+	// The backoff goroutine is not running.
+	stateIdle backoffState = iota
+	// The backoff goroutine is active and trying to connect.
+	stateRetrying
+	// The Release method has been called, and the goroutine is shutting down.
+	stateStopping
 )
 
 var _ plugin.Watcher = (*Plugin)(nil)
@@ -57,7 +68,7 @@ type Plugin struct {
 
 	options     options
 	manager     *watch.Manager
-	mqttClients map[broker]*mqttClient
+	mqttClients zbxsync.SyncMap[broker, *mqttClient]
 }
 
 type mqttClient struct {
@@ -72,6 +83,10 @@ type mqttSub struct {
 	broker   broker
 	topic    string
 	wildCard bool
+
+	stateLock    sync.Mutex
+	backoffState backoffState
+	stopCh       chan struct{}
 }
 
 type broker struct {
@@ -83,6 +98,8 @@ type broker struct {
 type respFilter struct {
 	wildcard bool
 }
+
+type backoffState int
 
 // Watch implements plugin.Watcher interface.
 func (p *Plugin) Watch(items []*plugin.Item, ctx plugin.ContextProvider) {
@@ -126,7 +143,11 @@ func (p *Plugin) EventSourceByKey(rawKey string) (watch.EventSource, error) {
 	var (
 		client *mqttClient
 		ok     bool
-		b      = broker{u.String(), username, password}
+		b      = broker{
+			url:      u.String(),
+			username: username,
+			password: password,
+		}
 	)
 
 	opt, err := p.createOptions(
@@ -145,9 +166,9 @@ func (p *Plugin) EventSourceByKey(rawKey string) (watch.EventSource, error) {
 		return nil, err
 	}
 
-	client, ok = p.mqttClients[b]
+	client, ok = p.mqttClients.Load(b)
 	if !ok {
-		impl.Tracef("creating client for [%s]", b.url)
+		impl.Debugf("creating client for [%s]", b.url)
 		client = &mqttClient{
 			client:    nil,
 			broker:    b,
@@ -155,12 +176,12 @@ func (p *Plugin) EventSourceByKey(rawKey string) (watch.EventSource, error) {
 			opts:      opt,
 			connected: false,
 		}
-		p.mqttClients[b] = client
+		p.mqttClients.Store(b, client)
 	}
 
 	sub, ok := client.subs[topic]
 	if !ok {
-		impl.Tracef("creating new subscriber on topic '%s' for [%s]", topic, b.url)
+		impl.Debugf("creating new subscriber on topic '%s' for [%s]", topic, b.url)
 
 		sub = &mqttSub{
 			broker:   b,
@@ -175,7 +196,7 @@ func (p *Plugin) EventSourceByKey(rawKey string) (watch.EventSource, error) {
 
 // Initialize implements watch.EventSource interface methods.
 func (ms *mqttSub) Initialize() error {
-	mc, ok := impl.mqttClients[ms.broker]
+	mc, ok := impl.mqttClients.Load(ms.broker)
 	if !ok || mc == nil {
 		return errs.New(fmt.Sprintf("Cannot connect to [%s]: broker could not be initialized", ms.broker.url))
 	}
@@ -189,9 +210,20 @@ func (ms *mqttSub) Initialize() error {
 		if err != nil {
 			impl.Warningf("cannot establish connection to [%s]: %s", ms.broker.url, err)
 
-			ms.startAsyncEstablishingConnectionBackoff()
+			ms.stateLock.Lock()
+			// Only start a new backoff goroutine if we are in the idle state.
+			if ms.backoffState == stateIdle {
+				ms.backoffState = stateRetrying
+				ms.stopCh = make(chan struct{})
+				// Pass the channel as an argument to avoid a data race on ms.stopCh
+				go ms.startAsyncEstablishingConnectionBackoff(ms.stopCh)
+			}
 
-			return nil // the backoff system will try to make connection
+			ms.stateLock.Unlock()
+
+			// the backoff system will try to make connection so the manager system would know that connection is
+			//  being created
+			return nil
 		}
 
 		impl.Debugf("established connection to [%s]", ms.broker.url)
@@ -208,7 +240,16 @@ func (ms *mqttSub) Initialize() error {
 
 // Release implements watch.EventSource interface methods.
 func (ms *mqttSub) Release() {
-	mc, ok := impl.mqttClients[ms.broker]
+	ms.stateLock.Lock()
+	// Only close the channel if the goroutine is currently running.
+	if ms.backoffState == stateRetrying {
+		ms.backoffState = stateStopping
+		close(ms.stopCh)
+	}
+
+	ms.stateLock.Unlock()
+
+	mc, ok := impl.mqttClients.Load(ms.broker)
 	if !ok || mc == nil || mc.client == nil {
 		impl.Errf("cannot release [%s]: broker was not initialized", ms.broker.url)
 
@@ -233,7 +274,7 @@ func (ms *mqttSub) Release() {
 	if len(mc.subs) == 0 {
 		impl.Debugf("disconnecting from [%s]", ms.broker.url)
 		mc.client.Disconnect(200)
-		delete(impl.mqttClients, mc.broker)
+		impl.mqttClients.Delete(ms.broker)
 	}
 }
 
@@ -272,10 +313,10 @@ func (f *respFilter) Process(v any) (*string, error) {
 	return &value, nil
 }
 
-func (ms *mqttSub) startAsyncEstablishingConnectionBackoff() {
+func (ms *mqttSub) startAsyncEstablishingConnectionBackoff(stopCh <-chan struct{}) {
 	const (
 		baseBackoff = 1 * time.Second
-		maxBackoff  = 15 * time.Minute
+		maxBackoff  = 10 * time.Minute
 		factor      = 2
 	)
 
@@ -283,46 +324,57 @@ func (ms *mqttSub) startAsyncEstablishingConnectionBackoff() {
 	wait := baseBackoff + time.Duration(rand.Intn(1000))*time.Millisecond
 	ticker := time.NewTicker(wait)
 
+	defer func() {
+		ms.stateLock.Lock()
+		ms.backoffState = stateIdle
+		ms.stopCh = nil
+		ms.stateLock.Unlock()
+	}()
+
 	go func() {
 		defer ticker.Stop()
 
 		for {
-			<-ticker.C
-
-			// This check ensures the routine stops if the parent object is destroyed.
-			if ms == nil {
+			select {
+			case <-stopCh:
+				// Exit signal received from Release.
 				return
-			}
-
-			mc, ok := impl.mqttClients[ms.broker]
-			if !ok || mc == nil {
-				impl.Warningf("finished attempting to establish connection to [%s]", ms.broker.url)
-
-				return
-			}
-
-			var err error
-
-			mc.client, err = newClient(mc.opts)
-			if err != nil {
-				impl.Debugf("cannot establish connection to [%s]: %s", ms.broker.url, err)
-
-				wait *= factor
-				if wait > maxBackoff {
-					wait = maxBackoff
+			case <-ticker.C:
+				// This check ensures the routine stops if the parent object is destroyed.
+				if ms == nil {
+					return
 				}
 
-				// Reset the ticker with the new, longer backoff duration plus jitter.
-				//nolint:gosec // This use of math/rand is not for a security-sensitive context.
-				newDuration := wait + time.Duration(rand.Intn(1000))*time.Millisecond
-				ticker.Reset(newDuration)
+				mc, ok := impl.mqttClients.Load(ms.broker)
+				if !ok || mc == nil {
+					impl.Warningf("finished attempting to establish connection to [%s]", ms.broker.url)
 
-				continue
+					return
+				}
+
+				var err error
+
+				mc.client, err = newClient(mc.opts)
+				if err != nil {
+					impl.Debugf("cannot establish connection to [%s]: %s", ms.broker.url, err)
+
+					wait *= factor
+					if wait > maxBackoff {
+						wait = maxBackoff
+					}
+
+					// Reset the ticker with the new, longer backoff duration plus jitter.
+					//nolint:gosec // This use of math/rand is not for a security-sensitive context.
+					newDuration := wait + time.Duration(rand.Intn(1000))*time.Millisecond
+					ticker.Reset(newDuration)
+
+					continue
+				}
+
+				impl.Debugf("established connection to [%s]", ms.broker.url)
+
+				return
 			}
-
-			impl.Debugf("established connection to [%s]", ms.broker.url)
-
-			return
 		}
 	}()
 }
@@ -351,13 +403,21 @@ func (p *Plugin) createOptions(
 		p.Warningf("connection lost to [%s]: %s", b.url, reason.Error())
 	}
 
+	var connectionEstablished bool
+
 	opts.OnConnect = func(_ mqtt.Client) {
-		p.Debugf("connected to [%s]", b.url)
+		if !connectionEstablished {
+			p.Debugf("connected to [%s]", b.url)
+
+			connectionEstablished = true
+		} else {
+			p.Warningf("reconnected to [%s]", b.url)
+		}
 
 		p.manager.Lock()
 		defer p.manager.Unlock()
 
-		mc, ok := p.mqttClients[b]
+		mc, ok := p.mqttClients.Load(b)
 		if !ok || mc == nil || mc.client == nil {
 			p.Warningf("cannot subscribe to [%s]: broker is not connected", b.url)
 
