@@ -25,8 +25,8 @@ class CControllerValidateApiExists extends CController {
 	public static function getValidationRules(): array {
 		$api_services = ['dashboard', 'discoveryrule', 'discoveryruleprototype', 'host', 'hostgroup', 'hostprototype',
 			'httptest', 'image', 'iconmap', 'item', 'itemprototype', 'maintenance', 'mediatype', 'proxy', 'proxygroup',
-			'report', 'regexp', 'role', 'service', 'sla', 'template', 'templatedashboard', 'templategroup', 'token',
-			'user', 'usergroup', 'usermacro'
+			'report', 'regexp', 'role', 'script', 'service', 'sla', 'template', 'templatedashboard', 'templategroup',
+			'token', 'user', 'usergroup', 'usermacro'
 		];
 
 		return ['object', 'fields' => [
