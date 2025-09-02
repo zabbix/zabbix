@@ -83,9 +83,9 @@ class CScatterPlotMetricPoint extends CSvgGroup {
 			return;
 		}
 
-		$empty_group = (new CSvgGroup())->setAttribute('transform',
-			'translate('.self::X_OUT_OF_RANGE.', '.self::Y_OUT_OF_RANGE.')'
-		);
+		$empty_group = (new CSvgGroup())
+			->setAttribute('transform', 'translate('.self::X_OUT_OF_RANGE.', '.self::Y_OUT_OF_RANGE.')')
+			->addClass('js-svg-highlight-group');
 
 		$point_group = (new CSvgGroup())->setAttribute('transform',
 			'translate('.$this->point[0].', '.$this->point[1].')'

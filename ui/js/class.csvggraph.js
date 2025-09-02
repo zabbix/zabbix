@@ -108,7 +108,7 @@
 		graph.find('.svg-helper').attr({'x1': -10, 'x2': -10});
 
 		if (graph.data('options').hintbox_type === GRAPH_HINTBOX_TYPE_SCATTERPLOT) {
-			const highlighted_points = graph[0].querySelectorAll('g:has(.svg-point-highlight)');
+			const highlighted_points = graph[0].querySelectorAll('g.js-svg-highlight-group');
 
 			for (const highlighted_point of highlighted_points) {
 				highlighted_point.setAttribute('transform', 'translate(-10, -10)');
@@ -513,7 +513,7 @@
 			}
 		}
 		else {
-			const data_tag = ds.querySelector("g:not(:has(.svg-point-highlight))");
+			const data_tag = ds.querySelector("g:not(.js-svg-highlight-group)");
 
 			return data_tag.getBBox().width / 2;
 		}
@@ -680,7 +680,7 @@
 			}
 
 			if (hintbox_type === GRAPH_HINTBOX_TYPE_SCATTERPLOT) {
-				const highlighted_points = graph[0].querySelectorAll('g:has(.svg-point-highlight)');
+				const highlighted_points = graph[0].querySelectorAll('g.js-svg-highlight-group');
 
 				for (const highlighted_point of highlighted_points) {
 					highlighted_point.setAttribute('transform', 'translate(-10, -10)');
@@ -694,7 +694,7 @@
 			let rows_added = 0;
 			points.forEach(function(point) {
 				const point_highlight = hintbox_type === GRAPH_HINTBOX_TYPE_SCATTERPLOT
-					? point.g.querySelector('g:has(.svg-point-highlight)')
+					? point.g.querySelector('g.js-svg-highlight-group')
 					: point.g.querySelector('.svg-point-highlight');
 
 				const include_point = hintbox_type === GRAPH_HINTBOX_TYPE_SCATTERPLOT
