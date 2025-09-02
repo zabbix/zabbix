@@ -722,7 +722,7 @@ static void	store_settings(const zbx_setting_value_t *values, int found, zbx_uin
 
 	if (config->config->hk.trends_mode != value_int)
 	{
-		UPDATE_REVISION(revision, "hk_trends", "%d", config->config->hk.trends, value_int);
+		UPDATE_REVISION(revision, "hk_trends_mode", "%d", config->config->hk.trends_mode, value_int);
 		config->config->hk.trends_mode = value_int;
 	}
 
