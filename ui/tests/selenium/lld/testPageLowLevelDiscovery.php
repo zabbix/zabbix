@@ -168,13 +168,14 @@ class testPageLowLevelDiscovery extends CWebTest {
 		$discovery_status = ['Enabled' => 1, 'Disabled' => 0];
 		foreach ($discovery_status as $action => $expected_status) {
 			$row->query('link', $action)->one()->click();
+			$message_action = ($action === 'Enabled') ? 'disabled' : 'enabled';
+			$this->assertMessage(TEST_GOOD, 'Discovery rule '.$message_action);
 			$status = CDBHelper::getValue('SELECT status FROM items WHERE name='.zbx_dbstr('Discovery rule 2').' and hostid='
 				.self::HOST_ID);
 			$this->assertEquals($expected_status, $status);
-			$message_action = ($action === 'Enabled') ? 'disabled' : 'enabled';
-			$this->assertEquals('Discovery rule '.$message_action, CMessageElement::find()->one()->getTitle());
 			$link_color = ($action === 'Enabled') ? 'red' : 'green';
 			$this->assertTrue($row->query('xpath://td/a[@class="link-action '.$link_color.'"]')->one()->isPresent());
+			CMessageElement::find()->one()->close();
 		}
 	}
 
