@@ -334,22 +334,6 @@ class СScatterPlot extends CSvg {
 			$this->x_max = $this->x_max_value ?: 1;
 		}
 
-		$calc_power = $this->x_units === '' || $this->x_units[0] !== '!';
-
-		$rows_min = (int) max(1, floor($this->canvas_width / 100));
-		$rows_max = (int) max(1, floor($this->canvas_width / 100));
-
-		$result = calculateGraphScaleExtremes($this->x_min, $this->x_max, $this->x_units, $calc_power,
-			$this->x_min_calculated, $this->x_max_calculated, $rows_min, $rows_max
-		);
-
-		[
-			'min' => $this->x_min,
-			'max' => $this->x_max,
-			'interval' => $this->x_interval,
-			'power' => $this->x_power
-		] = $result;
-
 		$calc_power = $this->y_units === '' || $this->y_units[0] !== '!';
 
 		$rows_min = (int) max(1, floor($this->canvas_height / $this->cell_height_min / 1.5));
@@ -368,7 +352,7 @@ class СScatterPlot extends CSvg {
 
 		// Define canvas dimensions and offsets, except canvas height and bottom offset.
 		if ($this->show_y_axis) {
-			$values = $this->getValuesGridWithPosition(!$this->points);
+			$values = $this->getValuesGridWithPosition(GRAPH_YAXIS_SIDE_LEFT, !$this->points);
 
 			if ($values) {
 				$approx_width = 0;
@@ -383,8 +367,24 @@ class СScatterPlot extends CSvg {
 			}
 		}
 
+		$calc_power = $this->x_units === '' || $this->x_units[0] !== '!';
+
 		$this->canvas_width = max(0, $this->width - $this->offset_left - $this->offset_right);
 		$this->canvas_x = $this->offset_left;
+
+		$rows_min = (int) max(1, floor($this->canvas_width / 100));
+		$rows_max = (int) max(1, floor($this->canvas_width / 100));
+
+		$result = calculateGraphScaleExtremes($this->x_min, $this->x_max, $this->x_units, $calc_power,
+			$this->x_min_calculated, $this->x_max_calculated, $rows_min, $rows_max
+		);
+
+		[
+			'min' => $this->x_min,
+			'max' => $this->x_max,
+			'interval' => $this->x_interval,
+			'power' => $this->x_power
+		] = $result;
 	}
 
 	/**
@@ -478,12 +478,12 @@ class СScatterPlot extends CSvg {
 	 * @throws Exception
 	 */
 	private function drawGrid(): void {
-		$time_points = $this->show_x_axis ? $this->getTimeGridWithPosition() : [];
+		$time_points = $this->show_x_axis ? $this->getValuesGridWithPosition(GRAPH_YAXIS_SIDE_BOTTOM, !$this->points) : [];
 
 		$value_points = [];
 
 		if ($this->show_y_axis) {
-			$value_points = $this->getValuesGridWithPosition(!$this->points);
+			$value_points = $this->getValuesGridWithPosition(GRAPH_YAXIS_SIDE_LEFT, !$this->points);
 
 			unset($time_points[0]);
 		}
@@ -501,7 +501,11 @@ class СScatterPlot extends CSvg {
 	}
 
 	private function drawYAxes(): void {
-		$grid_values = $this->getValuesGridWithPosition(!$this->points);
+		if (!$this->show_y_axis) {
+			return;
+		}
+
+		$grid_values = $this->getValuesGridWithPosition(GRAPH_YAXIS_SIDE_LEFT, !$this->points);
 		$this->addItem(
 			(new CSvgGraphAxis($grid_values, GRAPH_YAXIS_SIDE_LEFT))
 				->setPosition($this->canvas_x - $this->offset_left, $this->canvas_y)
@@ -520,7 +524,9 @@ class СScatterPlot extends CSvg {
 		}
 
 		$this->addItem(
-			(new CSvgGraphAxis($this->getTimeGridWithPosition(), GRAPH_YAXIS_SIDE_BOTTOM))
+			(new CSvgGraphAxis($this->getValuesGridWithPosition(GRAPH_YAXIS_SIDE_BOTTOM, !$this->points),
+				GRAPH_YAXIS_SIDE_BOTTOM)
+			)
 				->setPosition($this->canvas_x, $this->canvas_y + $this->canvas_height)
 				->setSize($this->canvas_width, $this->xaxis_height)
 				->setLineColor('#'.$this->graph_theme['gridcolor'])
@@ -553,11 +559,12 @@ class СScatterPlot extends CSvg {
 	 * Get array of X points with labels, for grid and X/Y axes. Array key is Y coordinate for SVG, value is label with
 	 * axis units.
 	 *
+	 * @param int  $axis       Axis for which to get the values.
 	 * @param bool $empty_set  Return defaults for empty side.
 	 *
 	 * @return array
 	 */
-	private function getValuesGridWithPosition(bool $empty_set = false): array {
+	private function getValuesGridWithPosition(int $axis, bool $empty_set = false): array {
 		$min = 0;
 		$max = 1;
 		$min_calculated = true;
@@ -567,13 +574,24 @@ class СScatterPlot extends CSvg {
 		$power = 0;
 
 		if (!$empty_set) {
-			$min = $this->y_min;
-			$max = $this->y_max;
-			$min_calculated = $this->y_min_calculated;
-			$max_calculated = $this->y_max_calculated;
-			$interval = $this->y_interval;
-			$units = $this->y_units;
-			$power = $this->y_power;
+			if ($axis == GRAPH_YAXIS_SIDE_LEFT) {
+				$min = $this->y_min;
+				$max = $this->y_max;
+				$min_calculated = $this->y_min_calculated;
+				$max_calculated = $this->y_max_calculated;
+				$interval = $this->y_interval;
+				$units = $this->y_units;
+				$power = $this->y_power;
+			}
+			else {
+				$min = $this->x_min;
+				$max = $this->x_max;
+				$min_calculated = $this->x_min_calculated;
+				$max_calculated = $this->x_max_calculated;
+				$interval = $this->x_interval;
+				$units = $this->x_units;
+				$power = $this->x_power;
+			}
 		}
 
 		$relative_values = calculateGraphScaleValues($min, $max, $min_calculated, $max_calculated, $interval,
@@ -582,43 +600,14 @@ class СScatterPlot extends CSvg {
 
 		$absolute_values = [];
 
+		$size = $axis == GRAPH_YAXIS_SIDE_LEFT
+			? $this->canvas_height
+			: $this->canvas_width;
+
 		foreach ($relative_values as ['relative_pos' => $relative_pos, 'value' => $value]) {
-			$absolute_values[(int) round($this->canvas_height * $relative_pos)] = $value;
+			$absolute_values[(int) round($size * $relative_pos)] = $value;
 		}
 
 		return $absolute_values;
-	}
-
-	/**
-	 * Return array of horizontal labels with positions. Array key will be position, value will be labeled.
-	 *
-	 * @throws Exception
-	 * @return array
-	 */
-	private function getTimeGridWithPosition(): array {
-		$period = $this->x_max - $this->x_min;
-		$step = round($period / $this->canvas_width * 100); // Grid cell (100px) in seconds.
-
-		/*
-		 * In case if requested time period is so small that it is rounded to zero, we are displaying only two
-		 * milestones on X axis - the start and the end of period.
-		 */
-		if ($step == 0) {
-			return [
-				0 => $this->x_min,
-				$this->canvas_width => $this->x_max
-			];
-		}
-
-		$start = $this->x_min + $step - $this->x_min % $step;
-
-		$grid_values = [];
-
-		for ($clock = $start; $this->x_max >= $clock; $clock += $step) {
-			$relative_pos = round($this->canvas_width - $this->canvas_width * ($this->x_max - $clock) / $period);
-			$grid_values[$relative_pos] = (string) $clock;
-		}
-
-		return $grid_values;
 	}
 }
