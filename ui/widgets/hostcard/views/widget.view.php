@@ -411,7 +411,7 @@ function makeSectionTags(array $host_tags): CDiv {
 	}
 
 	return (new CDiv(
-		(new CDiv($tags))->addClass('tags')
+		(new CDiv($tags))->addClass('tags')->addClass(ZBX_STYLE_TAGS_WRAPPER)
 	))
 		->addClass(Widget::ZBX_STYLE_SECTION)
 		->addClass('section-tags');
