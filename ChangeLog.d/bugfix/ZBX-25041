@@ -1,1 +1,1 @@
-..F....... [ZBX-25041] fixed item validation in SVG graph and Pie chart widgets when the referred in item widget is unavailable (isharha)
+..F....... [ZBX-25041] improved configuration form validation in Graph and Pie chart widgets when referenced item widget is unavailable (isharha)
