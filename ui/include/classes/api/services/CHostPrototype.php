@@ -577,26 +577,18 @@ class CHostPrototype extends CHostBase {
 		self::updateInterfaces($hosts);
 		self::updateGroupLinks($hosts);
 		self::updateGroupPrototypes($hosts);
-		$this->updateTemplates($hosts);
+		self::updateTemplates($hosts);
+		self::updateHostTemplateCache($hosts);
 		$this->updateTags($hosts);
 		self::updateMacros($hosts);
 		self::updateHostInventories($hosts);
 
 		self::addAuditLog(CAudit::ACTION_ADD, CAudit::RESOURCE_HOST_PROTOTYPE, $hosts);
 
-		$ins_host_template_cache = [];
-
 		foreach ($hosts as &$host) {
 			$host['host_status'] = array_shift($host_statuses);
-
-			$ins_host_template_cache[] = [
-				'hostid' => $host['hostid'],
-				'link_hostid' => $host['hostid']
-			];
 		}
 		unset($host);
-
-		DB::insertBatch('host_template_cache', $ins_host_template_cache, false);
 	}
 
 	/**
@@ -961,7 +953,8 @@ class CHostPrototype extends CHostBase {
 		self::updateInterfaces($hosts, $db_hosts, $upd_hostids);
 		self::updateGroupLinks($hosts, $db_hosts, $upd_hostids);
 		self::updateGroupPrototypes($hosts, $db_hosts, $upd_hostids);
-		$this->updateTemplates($hosts, $db_hosts, $upd_hostids);
+		self::updateTemplates($hosts, $db_hosts, $upd_hostids);
+		self::updateHostTemplateCache($hosts, $db_hosts);
 		$this->updateTags($hosts, $db_hosts, $upd_hostids);
 		self::updateMacros($hosts, $db_hosts, $upd_hostids);
 		self::updateHostInventories($hosts, $db_hosts, $upd_hostids);
@@ -2583,7 +2576,6 @@ class CHostPrototype extends CHostBase {
 		self::deleteDiscoveredHostPrototypes($hostids);
 		self::deleteDiscoveredHosts($hostids);
 
-		DB::delete('host_template_cache', ['hostid' => $hostids]);
 		DB::delete('host_tag', ['hostid' => $hostids]);
 		DB::update('hosts', [
 			'values' => ['templateid' => 0],

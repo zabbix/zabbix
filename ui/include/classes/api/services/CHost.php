@@ -721,7 +721,6 @@ class CHost extends CHostGeneral {
 		$hosts_rtdata = [];
 		$hosts_interfaces = [];
 		$hosts_inventory = [];
-		$ins_host_template_cache = [];
 
 		foreach ($hosts as $host) {
 			$hosts_rtdata[] = ['hostid' => $host['hostid']];
@@ -745,25 +744,21 @@ class CHost extends CHostGeneral {
 			if (array_key_exists('inventory_mode', $host_inventory)) {
 				$hosts_inventory[] = ['hostid' => $host['hostid']] + $host_inventory;
 			}
-
-			$ins_host_template_cache[] = [
-				'hostid' => $host['hostid'],
-				'link_hostid' => $host['hostid']
-			];
 		}
 
 		if ($hosts_interfaces) {
 			API::HostInterface()->create($hosts_interfaces);
 		}
 
-		$this->updateTemplates($hosts);
+		self::updateTemplates($hosts);
+		self::updateHostTemplateCache($hosts);
+		self::inheritTemplateObjects($hosts);
 
 		if ($hosts_inventory) {
 			DB::insert('host_inventory', $hosts_inventory, false);
 		}
 
 		DB::insertBatch('host_rtdata', $hosts_rtdata, false);
-		DB::insertBatch('host_template_cache', $ins_host_template_cache, false);
 
 		$this->addAuditBulk(CAudit::ACTION_ADD, CAudit::RESOURCE_HOST, $hosts);
 
@@ -890,7 +885,9 @@ class CHost extends CHostGeneral {
 		self::addHostGroupAuditLog($hosts, $db_hosts);
 
 		$this->updateHgSets($hosts, $db_hosts);
-		$this->updateTemplates($hosts, $db_hosts);
+		self::updateTemplates($hosts, $db_hosts);
+		self::updateHostTemplateCache($hosts, $db_hosts);
+		self::inheritTemplateObjects($hosts, $db_hosts);
 	}
 
 	/**
@@ -1764,7 +1761,6 @@ class CHost extends CHostGeneral {
 
 		// delete host
 		DB::delete('host_proxy', ['hostid' => $hostids]);
-		DB::delete('host_template_cache', ['hostid' => $hostids]);
 		DB::delete('host_tag', ['hostid' => $hostids]);
 		DB::delete('hosts', ['hostid' => $hostids]);
 

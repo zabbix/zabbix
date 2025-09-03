@@ -340,13 +340,13 @@ class CTemplate extends CHostGeneral {
 
 		$this->checkTemplatesLinks($templates);
 
-		DB::insertBatch('host_template_cache', $ins_host_template_cache, false);
-
 		$this->updateGroups($templates);
 		$this->updateHgSets($templates);
 		$this->updateTags($templates);
 		self::updateMacros($templates);
-		$this->updateTemplates($templates);
+		self::updateTemplates($templates);
+		self::updateHostTemplateCache($templates);
+		self::inheritTemplateObjects($templates);
 
 		self::addAuditLog(CAudit::ACTION_ADD, CAudit::RESOURCE_TEMPLATE, $templates);
 
@@ -702,7 +702,9 @@ class CTemplate extends CHostGeneral {
 		$this->updateHgSets($templates, $db_templates);
 		$this->updateTags($templates, $db_templates);
 		self::updateMacros($templates, $db_templates);
-		$this->updateTemplates($templates, $db_templates);
+		self::updateTemplates($templates, $db_templates);
+		self::updateHostTemplateCache($templates, $db_templates);
+		self::inheritTemplateObjects($templates, $db_templates);
 
 		self::addAuditLog(CAudit::ACTION_UPDATE, CAudit::RESOURCE_TEMPLATE, $templates, $db_templates);
 	}
@@ -822,9 +824,6 @@ class CTemplate extends CHostGeneral {
 
 		self::deleteHgSets($db_templates);
 
-		// Finally delete the template.
-		DB::delete('host_template_cache', ['link_hostid' => $templateids]);
-		DB::delete('host_template_cache', ['hostid' => $templateids]);
 		DB::delete('host_tag', ['hostid' => $templateids]);
 		DB::delete('hosts', ['hostid' => $templateids]);
 

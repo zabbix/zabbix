@@ -486,17 +486,8 @@ abstract class CHostGeneral extends CHostBase {
 		}
 	}
 
-	/**
-	 * Update table "hosts_templates" and change objects of linked or unliked templates on target hosts or templates.
-	 *
-	 * @param array      $hosts
-	 * @param array|null $db_hosts
-	 * @param array|null $upd_hostids
-	 */
-	protected function updateTemplates(array &$hosts, ?array &$db_hosts = null, ?array &$upd_hostids = null): void {
-		$id_field_name = $this instanceof CTemplate ? 'templateid' : 'hostid';
-
-		parent::updateTemplates($hosts, $db_hosts);
+	protected static function inheritTemplateObjects(array &$hosts, ?array &$db_hosts = null): void {
+		$id_field_name = self::isTemplate() ? 'templateid' : 'hostid';
 
 		$ins_links = [];
 		$del_links = [];
