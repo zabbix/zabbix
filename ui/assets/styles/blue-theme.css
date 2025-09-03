@@ -5635,6 +5635,9 @@ form.dashboard-widget-scatterplot {
     top: 0;
     background: #ffffff;
     z-index: 3; }
+  form.dashboard-widget-scatterplot .thresholds-tab-grid {
+    display: grid;
+    gap: 10px; }
   form.dashboard-widget-scatterplot .table-forms-container, form.dashboard-widget-scatterplot .browser-warning-container {
     border: 1px solid #dfe4e7;
     border-top: none; }

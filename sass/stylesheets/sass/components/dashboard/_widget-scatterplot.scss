@@ -22,6 +22,11 @@ form.dashboard-widget-scatterplot {
 		}
 	}
 
+	.thresholds-tab-grid {
+		display: grid;
+		gap: 10px;
+	}
+
 	.table-forms-container {
 		border: 1px solid $ui-border-color;
 		border-top: none;

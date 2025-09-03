@@ -217,12 +217,12 @@ function getLegendTab(CWidgetFormView $form, array $fields): CDiv {
 		);
 }
 
-function getThresholdsTab(CWidgetFormView $form, array $fields): CDiv {
+function getThresholdsTab(CWidgetFormView $form, array $fields): CTag {
 	$interpolation = $form->registerField(new CWidgetFieldCheckBoxView($fields['interpolation']));
 	$thresholds = $form->registerField(new CWidgetFieldAxisThresholdsView($fields['thresholds']));
 
 	return (new CDiv())
-		->addClass(ZBX_STYLE_GRID_COLUMNS)
+		->addClass('thresholds-tab-grid')
 		->addItem([
 			$interpolation->getView(),
 			$thresholds->getView()
