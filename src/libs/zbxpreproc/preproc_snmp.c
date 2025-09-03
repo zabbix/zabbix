@@ -258,8 +258,8 @@ static size_t	preproc_snmp_pair_parse_oid(const char *ptr, zbx_snmp_parse_contex
 
 	if (0 != (len = (size_t)(ptr - start)))
 	{
-		ctx->oid_buf_offset = 0;
-		zbx_strncpy_alloc(&ctx->oid_buf, &ctx->oid_buf_alloc, &ctx->oid_buf_offset, start, len);
+		size_t	buf_offset = 0;
+		zbx_strncpy_alloc(&ctx->oid_buf, &ctx->oid_buf_alloc, &buf_offset, start, len);
 	}
 
 	return len;
@@ -268,7 +268,7 @@ static size_t	preproc_snmp_pair_parse_oid(const char *ptr, zbx_snmp_parse_contex
 static size_t	preproc_snmp_parse_type(const char *ptr, zbx_snmp_parse_context_t *ctx)
 {
 	const char	*start = ptr++;
-	size_t		len;
+	size_t		len, type_buf_offset = 0;
 
 	while (0 != isalnum(*ptr) || '-' == *ptr)
 	{
@@ -276,7 +276,7 @@ static size_t	preproc_snmp_parse_type(const char *ptr, zbx_snmp_parse_context_t 
 	}
 
 	len = (size_t)(ptr - start);
-	zbx_strncpy_alloc(&ctx->type_buf, &ctx->type_buf_alloc, &ctx->type_buf_offset, start, len);
+	zbx_strncpy_alloc(&ctx->type_buf, &ctx->type_buf_alloc, &type_buf_offset, start, len);
 
 	return len;
 }
@@ -284,7 +284,7 @@ static size_t	preproc_snmp_parse_type(const char *ptr, zbx_snmp_parse_context_t 
 static size_t	preproc_snmp_parse_value(const char *ptr, zbx_snmp_type_t type, zbx_snmp_parse_context_t *ctx)
 {
 	const char	*start = ptr;
-	size_t		len;
+	size_t		len, val_buf_offset = 0;
 
 	if ('"' != *ptr)
 	{
@@ -309,7 +309,7 @@ static size_t	preproc_snmp_parse_value(const char *ptr, zbx_snmp_type_t type, zb
 			len = (size_t)(ptr - start);
 		}
 
-		zbx_strncpy_alloc(&ctx->val_buf, &ctx->val_buf_alloc, &ctx->val_buf_offset, start, len);
+		zbx_strncpy_alloc(&ctx->val_buf, &ctx->val_buf_alloc, &val_buf_offset, start, len);
 
 		if (ZBX_SNMP_TYPE_HEX == type || ZBX_SNMP_TYPE_BITS == type)
 		{
@@ -345,7 +345,7 @@ static size_t	preproc_snmp_parse_value(const char *ptr, zbx_snmp_type_t type, zb
 		}
 
 		len = (size_t)(++ptr - start);
-		zbx_strncpy_alloc(&ctx->val_buf, &ctx->val_buf_alloc, &ctx->val_buf_offset, start, len - 1);
+		zbx_strncpy_alloc(&ctx->val_buf, &ctx->val_buf_alloc, &val_buf_offset, start, len - 1);
 		out = ctx->val_buf;
 
 		ptr = start + 1;
@@ -364,7 +364,7 @@ static size_t	preproc_snmp_parse_value(const char *ptr, zbx_snmp_type_t type, zb
 	}
 }
 
-static int	preproc_snmp_parse_line(const char *data, zbx_snmp_value_pair_t *p, size_t *line_len, char **error,
+static int	preproc_snmp_parse_line(const char *data, size_t *line_len, char **error,
 		zbx_snmp_parse_context_t *ctx)
 {
 	int		ret = FAIL;
@@ -380,8 +380,6 @@ static int	preproc_snmp_parse_line(const char *data, zbx_snmp_value_pair_t *p, s
 		return FAIL;
 	}
 
-	p->oid = ctx->oid_buf;
-
 	data += len;
 	while (' ' == *data)
 		data++;
@@ -394,8 +392,6 @@ static int	preproc_snmp_parse_line(const char *data, zbx_snmp_value_pair_t *p, s
 
 	data++;
 reparse_type:
-	ctx->type_buf_offset = 0;
-
 	while (' ' == *data)
 		data++;
 
@@ -417,8 +413,9 @@ reparse_type:
 
 			if (0 == strcmp(ctx->type_buf, "NULL") && ('\n' == *data || '\0' == *data))
 			{
-				p->type = ZBX_SNMP_TYPE_UNDEFINED;
-				p->value = NULL;
+				ctx->type = ZBX_SNMP_TYPE_UNDEFINED;
+				zbx_free(ctx->val_buf);
+				ctx->val_buf_alloc = 0;
 
 				goto eol;
 			}
@@ -432,7 +429,6 @@ reparse_type:
 				if (':' == *data)
 				{
 					data++;
-					ctx->type_buf_offset = 0;
 					goto reparse_type;
 				}
 			}
@@ -446,36 +442,30 @@ reparse_type:
 			data++;
 
 		if (0 == strcmp(ctx->type_buf, "Opaque"))
-		{
-			ctx->type_buf_offset = 0;
 			goto reparse_type;
-		}
 	}
 
 	if (NULL != ctx->type_buf)
 	{
 		if (0 == strcmp(ctx->type_buf, "Hex-STRING"))
 		{
-			p->type = ZBX_SNMP_TYPE_HEX;
+			ctx->type = ZBX_SNMP_TYPE_HEX;
 		}
 		else if (0 == strcmp(ctx->type_buf, "BITS"))
 		{
-			p->type = ZBX_SNMP_TYPE_BITS;
+			ctx->type = ZBX_SNMP_TYPE_BITS;
 		}
 		else if (0 == strcmp(ctx->type_buf, "STRING"))
 		{
-			p->type = ZBX_SNMP_TYPE_STRING;
+			ctx->type = ZBX_SNMP_TYPE_STRING;
 		}
 		else
-			p->type = ZBX_SNMP_TYPE_UNDEFINED;
+			ctx->type = ZBX_SNMP_TYPE_UNDEFINED;
 	}
 	else
-		p->type = ZBX_SNMP_TYPE_UNDEFINED;
+		ctx->type = ZBX_SNMP_TYPE_UNDEFINED;
 
-	ctx->val_buf_offset = 0;
-	len = preproc_snmp_parse_value(data, p->type, ctx);
-
-	p->value = ctx->val_buf;
+	len = preproc_snmp_parse_value(data, ctx->type, ctx);
 
 	data += len;
 eol:
@@ -501,41 +491,42 @@ out:
 static int preproc_snmp_walk_to_pairs(zbx_hashset_t *pairs, const char *data, char **error)
 {
 	zbx_snmp_parse_context_t	ctx = {0};
-	zbx_snmp_value_pair_t		p = {0};
 	size_t				len;
+	int				ret;
 
-	while (FAIL != preproc_snmp_parse_line(data, &p, &len, error, &ctx))
+	while (FAIL != (ret = preproc_snmp_parse_line(data, &len, error, &ctx)))
 	{
-		zbx_snmp_value_pair_t p_copy;
+		zbx_snmp_value_pair_t	p_copy;
+		int			num_old;
 
-		p_copy.oid = zbx_strdup(NULL, p.oid);
-		p_copy.value = (NULL != p.value ? zbx_strdup(NULL, p.value) : zbx_strdup(NULL, "NULL"));
-		p_copy.type = p.type;
+		p_copy.oid = zbx_strdup(NULL, ctx.oid_buf);
+		p_copy.value = (NULL != ctx.val_buf ? zbx_strdup(NULL, ctx.val_buf) : zbx_strdup(NULL, "NULL"));
+		p_copy.type = ctx.type;
+
+		num_old = pairs->num_data;
 
 		if (NULL == zbx_hashset_insert(pairs, &p_copy, sizeof(zbx_snmp_value_pair_t)))
 		{
+			THIS_SHOULD_NEVER_HAPPEN_MSG("Cannot insert value pair into a hashset, allocation failed");
+		}
+
+		if (num_old == pairs->num_data)
+		{
+			zabbix_log(LOG_LEVEL_TRACE, "duplicate OID detected: %s", p_copy.oid);
+
 			zbx_free(p_copy.oid);
 			zbx_free(p_copy.value);
-
-			*error = zbx_dsprintf(*error, "duplicate OID detected: %s", p_copy.oid);
-			snmp_parse_context_clear(&ctx);
-
-			return FAIL;
 		}
 
 		data += len;
 	}
 
-	if (NULL != *error)
-	{
-		snmp_parse_context_clear(&ctx);
-
-		return FAIL;
-	}
+	if (NULL == *error)
+		ret = SUCCEED;
 
 	snmp_parse_context_clear(&ctx);
 
-	return SUCCEED;
+	return ret;
 }
 
 static void	zbx_vector_snmp_walk_to_json_param_clear_ext(zbx_vector_snmp_walk_to_json_param_t *v)
@@ -681,15 +672,14 @@ static int	preproc_snmp_convert_value(const char *in, char **out, zbx_snmp_type_
 
 static int	preproc_snmp_value_from_walk(const char *data, const char *params, char **output, char **error)
 {
-	int			ret = FAIL;
-	size_t			len, offset;
-	zbx_snmp_value_pair_t	p = {0};
+	int				ret = FAIL;
+	size_t				len, offset;
 	zbx_snmp_parse_context_t	ctx = {0};
-	char			*oid_needle = NULL;
-	int			format_flag = 0;
+	char				*oid_needle = NULL;
+	int				format_flag = 0;
 #ifdef HAVE_NETSNMP
-	char			*oid_tr_tmp = NULL;
-	const char		*oid_tr;
+	char				*oid_tr_tmp = NULL;
+	const char			*oid_tr;
 #endif
 	if (FAIL == preproc_parse_value_from_walk_params(params, &oid_needle, &format_flag))
 	{
@@ -708,22 +698,22 @@ static int	preproc_snmp_value_from_walk(const char *data, const char *params, ch
 	offset = ('.' == oid_needle[0] ? 0 : 1);
 #endif
 
-	while (FAIL != preproc_snmp_parse_line(data, &p, &len, error, &ctx))
+	while (FAIL != preproc_snmp_parse_line(data, &len, error, &ctx))
 	{
 #ifdef HAVE_NETSNMP
-		if (0 == strcmp(oid_tr, p.oid + offset))
+		if (0 == strcmp(oid_tr, ctx.oid_buf + offset))
 #else
-		if (0 == strcmp(oid_needle, p.oid + offset))
+		if (0 == strcmp(oid_needle, ctx.oid_buf + offset))
 #endif
 		{
-			if (NULL == p.value)
+			if (NULL == ctx.val_buf)
 			{
 				*output = zbx_strdup(NULL, "NULL");
 				ret = SUCCEED;
 				goto out;
 			}
 
-			if (SUCCEED != preproc_snmp_convert_value(p.value, output, p.type, format_flag, error))
+			if (SUCCEED != preproc_snmp_convert_value(ctx.val_buf, output, ctx.type, format_flag, error))
 				goto out;
 
 			ret = SUCCEED;
@@ -965,8 +955,7 @@ int	item_preproc_snmp_walk_to_json(zbx_variant_t *value, const char *params, cha
 	zbx_hashset_t				grouped_prefixes;
 	size_t					len;
 	zbx_vector_snmp_walk_to_json_param_t	parsed_params;
-	zbx_snmp_value_pair_t			p = {0};
-	zbx_snmp_parse_context_t		parse_ctx = {0};
+	zbx_snmp_parse_context_t		ctx = {0};
 
 	if (FAIL == item_preproc_convert_value(value, ZBX_VARIANT_STR, errmsg))
 		return FAIL;
@@ -985,9 +974,8 @@ int	item_preproc_snmp_walk_to_json(zbx_variant_t *value, const char *params, cha
 	}
 
 	data = value->data.str;
-	memset(&p, 0, sizeof(zbx_snmp_value_pair_t));
 
-	while (FAIL != preproc_snmp_parse_line(data, &p, &len, errmsg, &parse_ctx))
+	while (FAIL != preproc_snmp_parse_line(data, &len, errmsg, &ctx))
 	{
 		zbx_snmp_walk_to_json_param_t	param_field;
 		size_t				prefix_len;
@@ -1008,18 +996,18 @@ int	item_preproc_snmp_walk_to_json(zbx_variant_t *value, const char *params, cha
 
 			if ('.' != param_field.oid_prefix[0])
 			{
-				if (0 != strncmp(param_field.oid_prefix, p.oid + 1, prefix_len))
+				if (0 != strncmp(param_field.oid_prefix, ctx.oid_buf + 1, prefix_len))
 					continue;
 
 				prefix_len++;
 			}
-			else if (0 != strncmp(param_field.oid_prefix, p.oid, prefix_len))
+			else if (0 != strncmp(param_field.oid_prefix, ctx.oid_buf, prefix_len))
 				continue;
 
-			if ('.' != p.oid[prefix_len])
+			if ('.' != ctx.oid_buf[prefix_len])
 				continue;
 
-			if (SUCCEED != preproc_snmp_convert_value(p.value, &output_value.value, p.type,
+			if (SUCCEED != preproc_snmp_convert_value(ctx.val_buf, &output_value.value, ctx.type,
 					param_field.format_flag, errmsg))
 			{
 				ret = FAIL;
@@ -1028,7 +1016,7 @@ int	item_preproc_snmp_walk_to_json(zbx_variant_t *value, const char *params, cha
 
 			output_value.oid = param_field.field_name;
 
-			oobj_local.key = prefix_len + p.oid + 1;
+			oobj_local.key = prefix_len + ctx.oid_buf + 1;
 			zbx_rtrim(oobj_local.key, " ");
 
 			if (NULL == (oobj_cached = zbx_hashset_search(&grouped_prefixes, &oobj_local)))
@@ -1038,7 +1026,7 @@ int	item_preproc_snmp_walk_to_json(zbx_variant_t *value, const char *params, cha
 				output_value.oid = zbx_strdup(NULL, param_field.field_name);
 				zbx_vector_snmp_value_pair_append(&oobj_local.values, output_value);
 
-				oobj_local.key = zbx_strdup(NULL, prefix_len + p.oid + 1);
+				oobj_local.key = zbx_strdup(NULL, prefix_len + ctx.oid_buf + 1);
 				zbx_hashset_insert(&grouped_prefixes, &oobj_local, sizeof(oobj_local));
 			}
 			else
@@ -1082,7 +1070,7 @@ out:
 	zbx_vector_snmp_walk_to_json_param_destroy(&parsed_params);
 	zbx_hashset_destroy(&grouped_prefixes);
 
-	snmp_parse_context_clear(&parse_ctx);
+	snmp_parse_context_clear(&ctx);
 
 	if (SUCCEED == ret)
 	{

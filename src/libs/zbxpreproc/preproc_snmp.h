@@ -79,15 +79,14 @@ typedef struct
 {
 	char *oid_buf;
 	size_t oid_buf_alloc;
-	size_t oid_buf_offset;
 
 	char *val_buf;
 	size_t val_buf_alloc;
-	size_t val_buf_offset;
 
 	char *type_buf;
 	size_t type_buf_alloc;
-	size_t type_buf_offset;
+
+	zbx_snmp_type_t	type;
 }
 zbx_snmp_parse_context_t;
 
