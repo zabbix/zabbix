@@ -209,7 +209,7 @@ class CWidgetFieldDataSetView extends CWidgetFieldView {
 					$host_group_html[] = $label;
 					$host_group_html[] = (new CFormField($view))
 						->addClass($class)
-						->addClass('override-host-field-view');
+						->addClass('select-field-view');
 				}
 
 				$host_group_html[] = implode('', $host_group_multiselect_view->getTemplates());
@@ -236,7 +236,7 @@ class CWidgetFieldDataSetView extends CWidgetFieldView {
 					$host_pattern_html[] = $label;
 					$host_pattern_html[] = (new CFormField($view))
 						->addClass($class)
-						->addClass('override-host-field-view');
+						->addClass('select-field-view');
 				}
 
 				$host_pattern_html[] = implode('', $host_pattern_view->getTemplates());
@@ -266,7 +266,7 @@ class CWidgetFieldDataSetView extends CWidgetFieldView {
 						$item_pattern_html[] = $label;
 						$item_pattern_html[] = (new CFormField($view))
 							->addClass($class)
-							->addClass('override-host-field-view');
+							->addClass('select-field-view');
 					}
 
 					$item_pattern_html[] = implode('', $item_pattern_view->getTemplates());
@@ -386,7 +386,7 @@ class CWidgetFieldDataSetView extends CWidgetFieldView {
 				$override_host_html[] = $label;
 				$override_host_html[] = (new CFormField($view))
 					->addClass($class)
-					->addClass('override-host-field-view');
+					->addClass('select-field-view');
 			}
 
 			$override_host_html[] = implode('', $override_host_field_view->getTemplates());

@@ -5701,11 +5701,11 @@ form.dashboard-widget-scatterplot {
     color: #9f9f9f; }
   form.dashboard-widget-scatterplot .single-item-table .unavailable-widget a {
     color: #9f9f9f; }
-  form.dashboard-widget-scatterplot .override-host-field-view {
+  form.dashboard-widget-scatterplot .select-field-view {
     overflow: hidden;
     margin: -2px;
     padding: 2px; }
-    form.dashboard-widget-scatterplot .override-host-field-view .multiselect {
+    form.dashboard-widget-scatterplot .select-field-view .multiselect {
       overflow: hidden;
       flex-grow: 1; }
   form.dashboard-widget-scatterplot .no-items-message {
