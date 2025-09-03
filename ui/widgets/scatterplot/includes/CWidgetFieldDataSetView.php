@@ -164,7 +164,9 @@ class CWidgetFieldDataSetView extends CWidgetFieldView {
 					$item_pattern = (new CWidgetFieldPatternSelectItem(
 						$field_name.'['.$row_num.']['.$key.']',
 						$key === 'x_axis_items' ? _('X Axis') : _('Y Axis'),
-					))->setValue($value[$key]);
+					))
+						->setTemplateId($this->field->getTemplateId())
+						->setValue($value[$key]);
 
 					$item_pattern_view = (new CWidgetFieldPatternSelectItemView($item_pattern))
 						->setPopupParameter('numeric', true)
