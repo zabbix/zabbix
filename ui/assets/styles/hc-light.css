@@ -4612,6 +4612,10 @@ div.dashboard-widget-gauge {
 div.dashboard-widget-gauge .dashboard-grid-widget-body a:link {
   border: 0; }
 
+form.dashboard-widget-geomap .fields-group-clustering {
+  display: flex;
+  gap: 3px; }
+
 div.dashboard-widget-geomap {
   --hover-fill: #e8e9ed;
   --selected-fill: #d9d9d9;

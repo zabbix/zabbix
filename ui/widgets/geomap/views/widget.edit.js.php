@@ -14,30 +14,25 @@
 **/
 
 
-namespace Widgets\Geomap;
+use Widgets\Geomap\Widget;
 
-use Zabbix\Core\CWidget;
+?>
 
-class Widget extends CWidget {
+window.widget_form = new class extends CWidgetForm {
 
-	// Clustering options.
-	public const CLUSTERING_MODE_AUTO = 0;
-	public const CLUSTERING_MODE_MANUAL = 1;
+	init() {
+		this._form = this.getForm();
+		document.getElementById('clustering_mode').addEventListener('change', () => this.#updateForm());
 
-	public function getDefaultName(): string {
-		return _('Geomap');
+		this.#updateForm();
+		this.ready();
 	}
 
-	public function getTranslationStrings(): array {
-		return [
-			'class.widget.js' => [
-				'Actions' => _('Actions'),
-				'Set this view as default' => _('Set this view as default'),
-				'Reset to initial view' => _('Reset to initial view'),
-				'Host' => _('Host'),
-				'Navigate to default view' => _('Navigate to default view'),
-				'Navigate to initial view' => _('Navigate to initial view')
-			]
-		];
+	#updateForm() {
+		const is_clustering_mode_auto = this._form.querySelector('[name="clustering_mode"]:checked')
+			.value === '<?= Widget::CLUSTERING_MODE_AUTO ?>';
+
+		this._form.querySelector('.js-zoom-level-field').hidden = is_clustering_mode_auto;
+		document.getElementById('clustering_zoom_level').disabled = is_clustering_mode_auto;
 	}
 }
