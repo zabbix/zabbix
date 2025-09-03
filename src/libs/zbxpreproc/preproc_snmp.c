@@ -965,6 +965,13 @@ int	item_preproc_snmp_walk_to_json(zbx_variant_t *value, const char *params, cha
 			snmp_walk_json_output_obj_compare_func, (zbx_clean_func_t)snmp_walk_json_output_obj_clear,
 			ZBX_DEFAULT_MEM_MALLOC_FUNC, ZBX_DEFAULT_MEM_REALLOC_FUNC, ZBX_DEFAULT_MEM_FREE_FUNC);
 
+
+	if ('\0' == *(data = value->data.str))
+	{
+		result = zbx_strdup(NULL, "[]");
+		goto out;
+	}
+
 	if (FAIL == preproc_snmp_walk_to_json_params(params, &parsed_params))
 	{
 		*errmsg = zbx_dsprintf(*errmsg, "failed to parse step parameters");

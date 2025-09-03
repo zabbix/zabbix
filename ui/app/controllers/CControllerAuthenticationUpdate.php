@@ -76,6 +76,14 @@ class CControllerAuthenticationUpdate extends CController {
 			'mfa_removed_mfaids' =>				'array_id'
 		];
 
+		if (CAuthenticationHelper::isSamlCertsStorageDatabase()) {
+			$fields += [
+				'idp_certificate' => 'db userdirectory_saml.idp_certificate',
+				'sp_certificate' => 'db userdirectory_saml.sp_certificate',
+				'sp_private_key' => 'db userdirectory_saml.sp_private_key'
+			];
+		}
+
 		if ($ALLOW_HTTP_AUTH) {
 			$fields += [
 				'http_auth_enabled' =>		'in '.ZBX_AUTH_HTTP_DISABLED.','.ZBX_AUTH_HTTP_ENABLED,
@@ -551,6 +559,14 @@ class CControllerAuthenticationUpdate extends CController {
 			'scim_status' => ZBX_AUTH_SCIM_PROVISIONING_DISABLED
 		];
 		$this->getInputs($saml_data, array_keys($saml_data));
+
+		if (CAuthenticationHelper::isSamlCertsStorageDatabase()) {
+			$this->getInputs($saml_data, [
+				'idp_certificate',
+				'sp_certificate',
+				'sp_private_key'
+			]);
+		}
 
 		if ($this->getInput('saml_provision_status', JIT_PROVISIONING_DISABLED) == JIT_PROVISIONING_ENABLED) {
 			$provisioning_fields = [

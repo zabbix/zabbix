@@ -512,6 +512,8 @@ typedef struct
 
 	unsigned char			custom_timeouts;
 	zbx_config_item_type_timeouts_t	item_timeouts;
+
+	int				pending_history;
 }
 ZBX_DC_PROXY;
 
@@ -570,6 +572,7 @@ typedef struct
 	/* item statistics per interface */
 	int		items_num;
 	int		version;
+	zbx_uint64_t	revision;
 }
 ZBX_DC_INTERFACE;
 
