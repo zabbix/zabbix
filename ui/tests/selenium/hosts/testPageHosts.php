@@ -864,9 +864,11 @@ class testPageHosts extends CLegacyWebTest {
 			->getUrl()
 		);
 		$form = $this->query('name:zbx_filter')->waitUntilPresent()->asForm()->one();
+		$table = $this->getTable();
 		$form->fill(['id:filter_evaltype' => $data['evaluation_type']]);
 		$this->setTags($data['tags']);
 		$form->submit();
+		$table->waitUntilReloaded();
 		$this->page->waitUntilReady();
 		// Check filtered result.
 		$this->assertTableData(CTestArrayHelper::get($data, 'result', []));

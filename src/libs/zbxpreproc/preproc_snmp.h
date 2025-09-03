@@ -60,7 +60,7 @@ typedef struct
 }
 zbx_snmp_value_pair_t;
 
-ZBX_PTR_VECTOR_DECL(snmp_value_pair, zbx_snmp_value_pair_t *)
+ZBX_VECTOR_DECL(snmp_value_pair, zbx_snmp_value_pair_t)
 
 typedef struct
 {
@@ -74,6 +74,21 @@ typedef struct
 	zbx_vector_snmp_value_pair_t	values;
 }
 zbx_snmp_walk_json_output_obj_t;
+
+typedef struct
+{
+	char *oid_buf;
+	size_t oid_buf_alloc;
+
+	char *val_buf;
+	size_t val_buf_alloc;
+
+	char *type_buf;
+	size_t type_buf_alloc;
+
+	zbx_snmp_type_t	type;
+}
+zbx_snmp_parse_context_t;
 
 int	zbx_snmp_value_cache_init(zbx_snmp_value_cache_t *cache, const char *data, char **error);
 void	zbx_snmp_value_cache_clear(zbx_snmp_value_cache_t *cache);

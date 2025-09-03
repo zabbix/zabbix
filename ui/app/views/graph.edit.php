@@ -111,7 +111,6 @@ $graph_form
 					'graphtype' => $data['graphtype'],
 					'hostid' => $data['hostid'],
 					'is_template' => $data['is_template'],
-					'normal_only' => $data['normal_only'],
 					'parent_discoveryid' => null
 				],
 				'readonly' => $readonly,

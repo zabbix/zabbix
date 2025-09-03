@@ -377,7 +377,7 @@ class testDashboardsForm extends CWebTest {
 			// Open dashboard from dashboard list.
 			$this->page->login()->open('zabbix.php?action=dashboard.list')->waitUntilReady();
 			$this->query('link', $title)->one()->waitUntilClickable()->click();
-			$this->page->waitUntilReady();
+			$dashboard = CDashboardElement::find()->one()->waitUntilReady();
 			$dashboard->edit();
 
 			if (empty($data['dashboard_properties'])) {

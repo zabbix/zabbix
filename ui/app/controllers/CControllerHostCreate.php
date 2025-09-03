@@ -152,7 +152,10 @@ class CControllerHostCreate extends CControllerHostUpdateGeneral {
 			'tls_subject' => ['db hosts.tls_subject'],
 			'tls_issuer' => ['db hosts.tls_issuer'],
 			'tls_psk_identity' => [
-				['db hosts.tls_psk_identity'],
+				['db hosts.tls_psk_identity',
+					'regex' => '/^'.ZBX_PREG_PSK_IDENTITY_FORMAT.'$/',
+					'messages' => ['regex' => _('This value does not match pattern.')]
+				],
 				['db hosts.tls_psk_identity', 'not_empty', 'when' => ['tls_in_psk', true]],
 				['db hosts.tls_psk_identity', 'not_empty', 'when' => ['tls_connect', 'in' => [HOST_ENCRYPTION_PSK]]]
 			],

@@ -27,6 +27,15 @@ class testInheritanceDiscoveryRule extends CLegacyWebTest {
 	private $hostid = 15001;		// 'Template inheritance test host'
 	private $host = 'Template inheritance test host';
 
+	/**
+	 * Attach Behaviors to the test.
+	 *
+	 * @return array
+	 */
+	public function getBehaviors() {
+		return ['class' => CMessageBehavior::class];
+	}
+
 	// Returns list of discovery rules from a template.
 	public static function update() {
 		return CDBHelper::getDataProvider(
@@ -47,7 +56,8 @@ class testInheritanceDiscoveryRule extends CLegacyWebTest {
 		$this->zbxTestLogin('host_discovery.php?form=update&context=host&itemid='.$data['itemid']);
 		$this->zbxTestClickWait('update');
 		$this->zbxTestCheckTitle('Configuration of discovery rules');
-		$this->zbxTestTextPresent('Discovery rule updated');
+		$this->assertMessage(TEST_GOOD, 'Discovery rule updated');
+
 		$this->assertEquals($oldHashDiscovery, CDBHelper::getHash($sqlDiscovery));
 	}
 

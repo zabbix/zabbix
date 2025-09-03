@@ -69,8 +69,6 @@ $table = (new CTableInfo())
 	])
 	->setPageNavigation($data['paging']);
 
-$current_time = time();
-
 foreach ($data['groups'] as $group) {
 	$templates_output = [];
 	$n = 0;

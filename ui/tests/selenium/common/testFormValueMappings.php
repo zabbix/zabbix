@@ -134,7 +134,7 @@ class testFormValueMappings extends CWebTest {
 	public function checkClone($source) {
 		// Create a clone of an existing host/template with value mappings.
 		$this->openValueMappingTab($source, true, false);
-		$this->query('button', 'Clone')->one()->click();
+		$this->query('button', 'Clone')->one()->click()->waitUntilNotVisible();
 		$form = COverlayDialogElement::find()->asForm()->waitUntilReady()->one();
 		$form->getField(ucfirst($source).' name')->fill('Clone Valuemap Test');
 		$form->submit();

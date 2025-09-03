@@ -69,13 +69,13 @@ zabbix_export:
         Plugin [parameters list](https://www.zabbix.com/documentation/8.0/manual/appendix/config/zabbix_agent2_plugins/smart_plugin).
       vendor:
         name: Zabbix
-        version: 8.0-2
+        version: 8.0-3
       groups:
         - name: 'Templates/Server hardware'
       discovery_rules:
         - uuid: 4575af2717ec4bf78645edb84a966c84
           name: 'Disk discovery'
-          key: smart.disk.discovery
+          key: 'smart.disk.discovery[{$SMART.DISK.DISCOVERY.TYPE}]'
           delay: 1h
           filter:
             evaltype: AND
@@ -880,12 +880,25 @@ zabbix_export:
         - tag: target
           value: ssd
       macros:
+        - macro: '{$SMART.DISK.DISCOVERY.TYPE}'
+          value: name
+          description: 'This macro is responsible for changing how SMART disks get discovered. Only "name" or "id" values allowed.'
+          config:
+            type: LIST
+            priority: '1'
+            label: 'SMART disk discovery type'
+            description: 'This macro is responsible for changing how SMART disks get discovered.'
+            options:
+              - value: name
+                text: Name
+              - value: id
+                text: ID
         - macro: '{$SMART.DISK.NAME.MATCHES}'
           value: '^.*$'
           description: 'This macro is used in the filter of attribute and disk discoveries. It can be overridden on the host or linked on the template level.'
           config:
             type: TEXT
-            priority: '3'
+            priority: '4'
             section_name: Filters
             label: 'Disk name filter (include)'
             description: 'This macro is used in the filter of attribute and disk discoveries. It can be overridden on the host or linked on the template level.'
@@ -894,7 +907,7 @@ zabbix_export:
           description: 'This macro is used in the filter of attribute and disk discoveries. It can be overridden on the host or linked on the template level.'
           config:
             type: TEXT
-            priority: '4'
+            priority: '5'
             section_name: Filters
             label: 'Disk name filter (exclude)'
             description: 'This macro is used in the filter of attribute and disk discoveries. It can be overridden on the host or linked on the template level.'
@@ -903,7 +916,7 @@ zabbix_export:
           description: 'This macro is used for trigger expression. It can be overridden on the host or linked on the template level.'
           config:
             type: TEXT
-            priority: '2'
+            priority: '3'
             section_name: Thresholds
             label: 'Temperature maximum (critical)'
             description: 'This macro is used for trigger expression. It can be overridden on the host or linked on the template level.'
@@ -913,7 +926,7 @@ zabbix_export:
           description: 'This macro is used for trigger expression. It can be overridden on the host or linked on the template level.'
           config:
             type: TEXT
-            priority: '1'
+            priority: '2'
             section_name: Thresholds
             label: 'Temperature maximum (warning)'
             description: 'This macro is used for trigger expression. It can be overridden on the host or linked on the template level.'

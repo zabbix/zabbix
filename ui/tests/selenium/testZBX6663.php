@@ -82,13 +82,14 @@ class testZBX6663 extends CLegacyWebTest {
 					'checkbox' => 'triggers'
 				]
 			],
-			[
+			// TODO: uncomment test case once issue ZBX-26548 is resolved
+/*			[
 				[
 					'host' => 'Host ZBX6663',
 					'discoveryRule' => 'Graph prototypes',
 					'checkbox' => 'graphs'
 				]
-			],
+			],*/
 			[
 				[
 					'host' => 'Host ZBX6663',
@@ -138,13 +139,14 @@ class testZBX6663 extends CLegacyWebTest {
 					'checkbox' => 'triggers'
 				]
 			],
-			[
+			// TODO: uncomment test case once issue ZBX-26548 is resolved
+/*			[
 				[
 					'template' => 'Template ZBX6663 First',
 					'discoveryRule' => 'Graph prototypes',
 					'checkbox' => 'graphs'
 				]
-			],
+			],*/
 			[
 				[
 					'template' => 'Template ZBX6663 First',

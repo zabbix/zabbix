@@ -20,8 +20,6 @@
  */
 
 $this->addJsFile('layout.mode.js');
-$this->addJsFile('class.tabfilter.js');
-$this->addJsFile('class.tabfilteritem.js');
 
 $this->includeJsFile('monitoring.host.view.js.php');
 

@@ -46,12 +46,12 @@ zabbix_export:
         API IP
         API port
         ```
-        5. Set the host host wizard configuration fields with the login and password of the Nutanix user created earlier:
+        5. Set the host wizard configuration fields with the login and password of the Nutanix user created earlier:
         ```text
         API username
         API password
         ```
-        6. Set the host host wizard configuration fields with the UUID of the Nutanix Cluster:
+        6. Set the host wizard configuration fields with the UUID of the Nutanix Cluster:
         ```text
         Cluster UUID
         ```
@@ -4646,17 +4646,17 @@ zabbix_export:
         1. Create a new Nutanix user and add the role "Viewer"
         2. Create a new host
         3. Link the template to the host created earlier
-        4. Set the host host wizard configuration fields required for getting data:
+        4. Set the host wizard configuration fields required for getting data:
         ```text
         API IP
         API port
         ```
-        5. Set the host host wizard configuration fields with the login and password of the Nutanix user created earlier:
+        5. Set the host wizard configuration fields with the login and password of the Nutanix user created earlier:
         ```text
         API username
         API password
         ```
-        6. Set the host host wizard configuration fields with the UUID of the Nutanix Host:
+        6. Set the host wizard configuration fields with the UUID of the Nutanix Host:
         ```text
         Host UUID
         ```
@@ -10545,12 +10545,12 @@ zabbix_export:
         1. Create a new Nutanix user and add the role "Viewer"
         2. Create a new host
         3. Link the template to host created earlier
-        4. Set the host host wizard configuration fields required for getting data:
+        4. Set the host wizard configuration fields required for getting data:
         ```text
         API IP
         API port
         ```
-        5. Set the host host wizard configuration fields with the login and password of the Nutanix user created earlier:
+        5. Set the host wizard configuration fields with the login and password of the Nutanix user created earlier:
         ```text
         API username
         API password

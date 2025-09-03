@@ -58,7 +58,10 @@ void	zbx_service_serialize_event(unsigned char **data, size_t *data_alloc, size_
 		}
 	}
 	else
-		*data = (unsigned char *)zbx_malloc(NULL, (*data_alloc = MAX(1024, data_len)));
+	{
+		*data_alloc = MAX(1024, data_len);
+		*data = (unsigned char *)zbx_malloc(NULL, *data_alloc);
+	}
 
 	ptr = *data + *data_offset;
 	*data_offset += data_len;
@@ -80,7 +83,7 @@ void	zbx_service_serialize_event(unsigned char **data, size_t *data_alloc, size_
 
 	if (NULL == maintenanceids)
 	{
-		ptr += zbx_serialize_value(ptr, maintenance_num);
+		(void)zbx_serialize_value(ptr, maintenance_num);
 	}
 	else
 	{
@@ -182,7 +185,10 @@ void	zbx_service_serialize_problem_tags(unsigned char **data, size_t *data_alloc
 		}
 	}
 	else
-		*data = (unsigned char *)zbx_malloc(NULL, (*data_alloc = MAX(1024, data_len)));
+	{
+		*data_alloc = MAX(1024, data_len);
+		*data = (unsigned char *)zbx_malloc(NULL, *data_alloc);
+	}
 
 	ptr = *data + *data_offset;
 	*data_offset += data_len;
@@ -254,7 +260,10 @@ void	zbx_service_serialize_id(unsigned char **data, size_t *data_alloc, size_t *
 		}
 	}
 	else
-		*data = (unsigned char *)zbx_malloc(NULL, (*data_alloc = MAX(1024, data_len)));
+	{
+		*data_alloc = MAX(1024, data_len);
+		*data = (unsigned char *)zbx_malloc(NULL, *data_alloc);
+	}
 
 	ptr = *data + *data_offset;
 	*data_offset += data_len;
@@ -313,7 +322,10 @@ void	zbx_service_serialize_rootcause(unsigned char **data, size_t *data_alloc, s
 		}
 	}
 	else
-		*data = (unsigned char *)zbx_malloc(NULL, (*data_alloc = MAX(1024, data_len)));
+	{
+		*data_alloc = MAX(1024, data_len);
+		*data = (unsigned char *)zbx_malloc(NULL, *data_alloc);
+	}
 
 	ptr = *data + *data_offset;
 	*data_offset += data_len;

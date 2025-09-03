@@ -509,6 +509,10 @@ class CScript extends CApiService {
 			if (($script['scope'] == ZBX_SCRIPT_SCOPE_HOST || $script['scope'] == ZBX_SCRIPT_SCOPE_EVENT)
 					&& $script['manualinput'] == ZBX_SCRIPT_MANUALINPUT_ENABLED) {
 				if ($script['manualinput_validator_type'] == ZBX_SCRIPT_MANUALINPUT_TYPE_STRING) {
+					if ($script['manualinput_default_value'] === '') {
+						continue;
+					}
+
 					$regular_expression = '/'.str_replace('/', '\/', $script['manualinput_validator']).'/';
 
 					if (!preg_match($regular_expression, $script['manualinput_default_value'])) {

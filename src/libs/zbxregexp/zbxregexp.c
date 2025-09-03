@@ -49,6 +49,9 @@ zbx_match_t;
 ZBX_PTR_VECTOR_DECL(match, zbx_match_t *)
 ZBX_PTR_VECTOR_IMPL(match, zbx_match_t *)
 
+static ZBX_THREAD_LOCAL zbx_regexp_t	*curr_regexp = NULL;
+static ZBX_THREAD_LOCAL char		*curr_pattern = NULL;
+
 #ifdef HAVE_PCRE2_H
 static void	zbx_match_free(zbx_match_t *match)
 {
@@ -205,8 +208,6 @@ int	zbx_regexp_compile_ext(const char *pattern, zbx_regexp_t **regexp,
  ****************************************************************************************************/
 static int	regexp_prepare(const char *pattern, uint32_t flags, zbx_regexp_t **regexp, char **err_msg)
 {
-	static ZBX_THREAD_LOCAL zbx_regexp_t	*curr_regexp = NULL;
-	static ZBX_THREAD_LOCAL char		*curr_pattern = NULL;
 	static ZBX_THREAD_LOCAL uint32_t	curr_flags = 0;
 	int					ret = SUCCEED;
 
@@ -254,6 +255,15 @@ void	zbx_init_regexp_env(void)
 	if (REGEXP_RECURSION_LIMIT * REGEXP_RECURSION_STEP < (rxp_stacklimit = HAVE_STACKSIZE * ZBX_KIBIBYTE))
 		rxp_stacklimit = REGEXP_RECURSION_LIMIT * REGEXP_RECURSION_STEP;
 #endif
+}
+
+void	zbx_deinit_regexp_env(void)
+{
+	if (NULL != curr_regexp)
+	{
+		zbx_regexp_free(curr_regexp);
+		zbx_free(curr_pattern);
+	}
 }
 
 static unsigned long	compute_match_recursion_limit(void)

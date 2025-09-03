@@ -16,6 +16,8 @@
 
 #include "zbxalgo.h"
 
+#include "../../src/libs/zbxprometheus/zbxprometheus.c"
+
 ZBX_PTR_VECTOR_IMPL(prometheus_condition_test, zbx_prometheus_condition_test_t *)
 
 static zbx_prometheus_condition_test_t	*prometheus_condition_dup(zbx_prometheus_condition_t *condition)

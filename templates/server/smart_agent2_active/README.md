@@ -51,6 +51,7 @@ Plugin [parameters list](https://www.zabbix.com/documentation/8.0/manual/appendi
 
 |Name|Description|Default|
 |----|-----------|-------|
+|{$SMART.DISK.DISCOVERY.TYPE}|<p>This macro is responsible for changing how SMART disks get discovered. Only "name" or "id" values allowed.</p>|`name`|
 |{$SMART.TEMPERATURE.MAX.WARN}|<p>This macro is used for trigger expression. It can be overridden on the host or linked on the template level.</p>|`50`|
 |{$SMART.TEMPERATURE.MAX.CRIT}|<p>This macro is used for trigger expression. It can be overridden on the host or linked on the template level.</p>|`65`|
 |{$SMART.DISK.NAME.MATCHES}|<p>This macro is used in the filter of attribute and disk discoveries. It can be overridden on the host or linked on the template level.</p>|`^.*$`|
@@ -60,7 +61,7 @@ Plugin [parameters list](https://www.zabbix.com/documentation/8.0/manual/appendi
 
 |Name|Description|Type|Key and additional info|
 |----|-----------|----|-----------------------|
-|Disk discovery|<p>Discovery SMART disks.</p>|Zabbix agent (active)|smart.disk.discovery|
+|Disk discovery|<p>Discovery SMART disks.</p>|Zabbix agent (active)|smart.disk.discovery[{$SMART.DISK.DISCOVERY.TYPE}]|
 
 ### Item prototypes for Disk discovery
 

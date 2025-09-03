@@ -34,7 +34,7 @@ zabbix_export:
         
         1. Setup and configure zabbix-agent2 compiled with the MongoDB monitoring plugin.
         2. Set the `Connection string` such as <protocol(host:port)> or named session of mongos proxy(router).
-        3. Set the user name and password in host host wizard configuration fields (`Username`, `Password`) if you want to override parameters from the Zabbix agent configuration file.
+        3. Set the user name and password in host wizard configuration fields (`Username`, `Password`) if you want to override parameters from the Zabbix agent configuration file.
         
         **Note**, depending on the number of DBs and collections discovery operation may be expensive. Use filters with host wizard configuration fields `Databases filter (include)`, `Databases filter (exclude)`, `Collections filter (include)`, `Collections filter (exclude)`.
         

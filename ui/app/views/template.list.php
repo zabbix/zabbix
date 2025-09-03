@@ -294,7 +294,7 @@ foreach ($data['templates'] as $template) {
 		$template['vendor_version'],
 		$linked_templates_output,
 		$linked_to_output,
-		$data['tags'][$template['templateid']]
+		(new CDiv($data['tags'][$template['templateid']]))->addClass(ZBX_STYLE_TAGS_WRAPPER)
 	]);
 }
 

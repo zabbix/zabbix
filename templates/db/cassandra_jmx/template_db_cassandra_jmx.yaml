@@ -25,7 +25,7 @@ zabbix_export:
         
         1. Enable and configure JMX access to Apache cassandra.
          See documentation for [instructions](https://cassandra.apache.org/doc/latest/operating/security.html#jmx-access).
-        2. Set the user name and password in host host wizard configuration fields `Username` and `Password`.
+        2. Set the user name and password in host wizard configuration fields `Username` and `Password`.
       vendor:
         name: Zabbix
         version: 8.0-1
@@ -1615,7 +1615,7 @@ zabbix_export:
             type: TEXT
             priority: '5'
             section_name: Thresholds
-            label: 'Pending tasks hight threshold'
+            label: 'Pending tasks high threshold'
         - macro: '{$CASSANDRA.PENDING_TASKS.MAX.WARN}'
           value: '350'
           config:

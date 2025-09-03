@@ -83,6 +83,13 @@ class CFormValidatorTest extends TestCase {
 				'[RULES ERROR] Rule "type" is mandatory (Path: /host)'
 			],
 			[
+				['object',
+					'api_uniq' => ['hostget', ['host' => '{host}']]
+				],
+				null,
+				'[RULES ERROR] Rule "api_uniq" should contain a valid API call (Path: , API call:hostget)'
+			],
+			[
 				['object', 'fields' => [
 					'host' => ['not_empty', 'string']
 				]],

@@ -21,11 +21,19 @@
  * @var array $data
  */
 
+$form = new CWidgetFormView($data);
+
 $groupids = array_key_exists('groupids', $data['fields'])
 	? new CWidgetFieldMultiSelectGroupView($data['fields']['groupids'])
 	: null;
 
-(new CWidgetFormView($data))
+$clustering_mode_field = new CWidgetFieldRadioButtonListView($data['fields']['clustering_mode']);
+$clustering_zoom_level_field = (new CWidgetFieldIntegerBoxView($data['fields']['clustering_zoom_level']));
+
+$form->registerField($clustering_mode_field);
+$form->registerField($clustering_zoom_level_field);
+
+$form
 	->addField($groupids)
 	->addField(array_key_exists('hostids', $data['fields'])
 		? (new CWidgetFieldMultiSelectHostView($data['fields']['hostids']))
@@ -47,4 +55,13 @@ $groupids = array_key_exists('groupids', $data['fields'])
 	->addField(
 		(new CWidgetFieldLatLngView($data['fields']['default_view']))->setPlaceholder('40.6892494,-74.0466891')
 	)
+	->addItem([
+		new CLabel(_('Clustering')),
+		(new CDiv())
+			->addItem($clustering_mode_field->getView())
+			->addItem($clustering_zoom_level_field->getView()->addClass('js-zoom-level-field'))
+			->addClass('fields-group-clustering')
+	])
+	->includeJsFile('widget.edit.js.php')
+	->initFormJs('widget_form.init();')
 	->show();

@@ -179,7 +179,7 @@ static duk_ret_t	es_zabbix_sleep(duk_context *ctx)
 
 static const duk_function_list_entry	zabbix_methods[] = {
 	{"Log",		es_zabbix_log,		2},
-	{"log",		es_zabbix_log, 		2},
+	{"log",		es_zabbix_log,		2},
 	{"sleep",	es_zabbix_sleep,	1},
 	{NULL, NULL, 0}
 };
@@ -189,7 +189,7 @@ static int	es_zabbix_create_object(duk_context *ctx)
 	duk_push_c_function(ctx, es_zabbix_ctor, 0);
 	duk_push_object(ctx);
 
-	duk_put_function_list(ctx, -1, zabbix_methods);
+	es_put_function_list(ctx, -1, zabbix_methods);
 
 	if (1 != duk_put_prop_string(ctx, -2, "prototype"))
 		return FAIL;
