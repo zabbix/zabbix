@@ -15,6 +15,7 @@
 package sw
 
 import (
+	"golang.zabbix.com/agent2/pkg/zbxcmd"
 	"golang.zabbix.com/sdk/errs"
 	"golang.zabbix.com/sdk/plugin"
 	"golang.zabbix.com/sdk/zbxerr"
@@ -25,6 +26,7 @@ var impl Plugin
 // Plugin -
 type Plugin struct {
 	plugin.Base
+	executor zbxcmd.Executor
 }
 
 func init() {
@@ -48,11 +50,27 @@ func (p *Plugin) Configure(global *plugin.GlobalOptions, options interface{}) {
 func (p *Plugin) Validate(options interface{}) error { return nil }
 
 // Export -
-func (p *Plugin) Export(key string, params []string, ctx plugin.ContextProvider) (result interface{}, err error) {
+//
+//nolint:cyclop
+func (p *Plugin) Export(key string, params []string, ctx plugin.ContextProvider) (any, error) {
 	const (
 		maxSwPackagesParams = 3
 		maxSwOSParams       = 1
 		maxSwOSGetParams    = 0
+	)
+
+	if p.executor == nil {
+		var err error
+
+		p.executor, err = zbxcmd.InitExecutor()
+		if err != nil {
+			return nil, errs.Wrap(err, "command init failed")
+		}
+	}
+
+	var (
+		result any
+		err    error
 	)
 
 	switch key {
@@ -79,5 +97,9 @@ func (p *Plugin) Export(key string, params []string, ctx plugin.ContextProvider)
 		return nil, plugin.UnsupportedMetricError
 	}
 
-	return
+	if err != nil {
+		return nil, errs.Wrap(err, "failed to read sw value")
+	}
+
+	return result, nil
 }

@@ -70,6 +70,8 @@ static int		config_log_slow_queries;
 
 static int		db_auto_increment;
 
+static zbx_db_query_mask_t	db_log_masked_values = ZBX_DB_DONT_MASK_QUERIES;
+
 #if defined(HAVE_MYSQL)
 static MYSQL			*conn = NULL;
 static int			mysql_err_cnt = 0;
@@ -588,6 +590,13 @@ int	zbx_db_connect_basic(const zbx_config_dbhigh_t *cfg)
 		ret = ZBX_DB_FAIL;
 	}
 
+	/* innodb_snapshot_isolation variable became ON by default in MariaDB 11.6.2, we need it to be OFF */
+	if (ZBX_DB_OK == ret && ON == ZBX_MARIADB_SFORK && 110602 <= ZBX_MYSQL_SVERSION)
+	{
+		if (0 < (ret = zbx_db_execute_basic("set innodb_snapshot_isolation='OFF'")))
+			ret = ZBX_DB_OK;
+	}
+
 	if (ZBX_DB_OK == ret)
 	{
 		/* in contrast to "set names utf8" results of this call will survive auto-reconnects */
@@ -849,6 +858,26 @@ int	zbx_db_connect_basic(const zbx_config_dbhigh_t *cfg)
 	if (NULL != (row = zbx_db_fetch_basic(result)))
 	{
 		if (0 == strcmp(row[0], "on"))
+		{
+			zbx_db_free_result(result);
+			ret = ZBX_DB_RONLY;
+			goto out;
+		}
+	}
+
+	zbx_db_free_result(result);
+
+	result = zbx_db_select_basic("select pg_is_in_recovery();");
+
+	if ((zbx_db_result_t)ZBX_DB_DOWN == result || NULL == result)
+	{
+		ret = (NULL == result) ? ZBX_DB_FAIL : ZBX_DB_DOWN;
+		goto out;
+	}
+
+	if (NULL != (row = zbx_db_fetch_basic(result)))
+	{
+		if (0 == strcmp(row[0], "t"))
 		{
 			zbx_db_free_result(result);
 			ret = ZBX_DB_RONLY;
@@ -1479,12 +1508,62 @@ void	zbx_postgresql_escape_bin(const char *src, char **dst, size_t size)
 }
 #endif
 
+static char	*mask_skip_whitespace(char *s)
+{
+	while ('\0' != *s && 0 != isspace((unsigned char)*s))
+		s++;
+
+	return s;
+}
+
+static char	*mask_skip_tablename(char *s)
+{
+	while ('\0' != *s && (0 != isalnum((unsigned char)*s) || '_' == *s || '.' == *s))
+		s++;
+
+	return s;
+}
+
+static void	db_mask_printable_sql_values(char **sql)
+{
+#define	DB_MASK	"..."
+	char	*p, *end;
+
+	if (0 == strncmp(*sql, "insert into", ZBX_CONST_STRLEN("insert into")))
+	{
+		p = *sql + ZBX_CONST_STRLEN("insert into");
+	}
+	else if (0 == strncmp(*sql, "update", ZBX_CONST_STRLEN("update")))
+	{
+		p = *sql + ZBX_CONST_STRLEN("update");
+	}
+	else if (0 == strncmp(*sql, "select", ZBX_CONST_STRLEN("select")))
+	{
+		if (NULL == (p = strstr(*sql, " from ")))
+			return;
+
+		p += ZBX_CONST_STRLEN(" from ");
+	}
+	else
+		return;
+
+	p = mask_skip_whitespace(p);
+	end = mask_skip_tablename(p);
+	*end = '\0';
+
+	zbx_strlcpy(end, DB_MASK, ZBX_CONST_STRLEN(DB_MASK) + 1);
+#undef DB_MASK
+}
+
 static char	*db_replace_nonprintable_chars(const char *sql, char **sql_printable)
 {
 	if (NULL == *sql_printable)
 	{
 		*sql_printable = zbx_strdup(NULL, sql);
 		zbx_replace_invalid_utf8_and_nonprintable(*sql_printable);
+
+		if (ZBX_DB_MASK_QUERIES == db_log_masked_values)
+			db_mask_printable_sql_values(sql_printable);
 	}
 
 	return *sql_printable;
@@ -1696,7 +1775,7 @@ clean:
  ******************************************************************************/
 zbx_db_result_t	zbx_db_vselect(const char *fmt, va_list args)
 {
-	char		*sql = NULL;
+	char		*sql = NULL, *sql_printable = NULL;
 	zbx_db_result_t	result = NULL;
 	double		sec = 0;
 #if defined(HAVE_ORACLE)
@@ -1718,11 +1797,13 @@ zbx_db_result_t	zbx_db_vselect(const char *fmt, va_list args)
 
 	if (ZBX_DB_OK != txn_error)
 	{
-		zabbix_log(LOG_LEVEL_DEBUG, "ignoring query [txnlev:%d] [%s] within failed transaction", txn_level, sql);
+		zabbix_log(LOG_LEVEL_DEBUG, "ignoring query [txnlev:%d] [%s] within failed transaction", txn_level,
+				db_replace_nonprintable_chars(sql, &sql_printable));
 		goto clean;
 	}
 
-	zabbix_log(LOG_LEVEL_DEBUG, "query [txnlev:%d] [%s]", txn_level, sql);
+	zabbix_log(LOG_LEVEL_DEBUG, "query [txnlev:%d] [%s]", txn_level,
+			db_replace_nonprintable_chars(sql, &sql_printable));
 
 #if defined(HAVE_MYSQL)
 	result = (zbx_db_result_t)zbx_malloc(NULL, sizeof(struct zbx_db_result));
@@ -1983,15 +2064,20 @@ lbl_get_table:
 	{
 		sec = zbx_time() - sec;
 		if (sec > (double)config_log_slow_queries / 1000.0)
-			zabbix_log(LOG_LEVEL_WARNING, "slow query: " ZBX_FS_DBL " sec, \"%s\"", sec, sql);
+		{
+			zabbix_log(LOG_LEVEL_WARNING, "slow query: " ZBX_FS_DBL " sec, \"%s\"", sec,
+					db_replace_nonprintable_chars(sql, &sql_printable));
+		}
 	}
 
 	if (NULL == result && 0 < txn_level)
 	{
-		zabbix_log(LOG_LEVEL_DEBUG, "query [%s] failed, setting transaction as failed", sql);
+		zabbix_log(LOG_LEVEL_DEBUG, "query [%s] failed, setting transaction as failed",
+				db_replace_nonprintable_chars(sql, &sql_printable));
 		txn_error = ZBX_DB_FAIL;
 	}
 clean:
+	zbx_free(sql_printable);
 	zbx_free(sql);
 
 	return result;
@@ -3099,3 +3185,27 @@ void	zbx_db_clear_last_errcode(void)
 }
 
 #endif
+
+zbx_db_query_mask_t	zbx_db_set_log_masked_values(zbx_db_query_mask_t flag)
+{
+#ifdef ZBX_DEBUG
+	ZBX_UNUSED(flag);
+	return ZBX_DB_DONT_MASK_QUERIES;
+#else
+	zbx_db_query_mask_t	prev_flag = db_log_masked_values;
+
+	db_log_masked_values = flag;
+
+	return prev_flag;
+#endif
+}
+
+zbx_db_query_mask_t	zbx_db_get_log_masked_values(void)
+{
+#ifdef ZBX_DEBUG
+	return ZBX_DB_DONT_MASK_QUERIES;
+#else
+	return db_log_masked_values;
+#endif
+}
+

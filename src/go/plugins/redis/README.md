@@ -6,10 +6,6 @@ memory usage. Best for use in conjunction with the official
 [Redis template.](https://git.zabbix.com/projects/ZBX/repos/zabbix/browse/templates/db/redis)
 You can extend it or create your template for your specific needs. 
 
-## Requirements
-* Zabbix Agent 2
-* Go >= 1.21 (required only to build from source)
-
 ## Supported versions
 * Redis, version 3.0+
 

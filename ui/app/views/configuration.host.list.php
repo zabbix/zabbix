@@ -540,7 +540,7 @@ foreach ($data['hosts'] as $host) {
 		getHostAvailabilityTable($host['interfaces']),
 		$encryption,
 		makeInformationList($info_icons),
-		$data['tags'][$host['hostid']]
+		(new CDiv($data['tags'][$host['hostid']]))->addClass(ZBX_STYLE_TAGS_WRAPPER)
 	]);
 }
 

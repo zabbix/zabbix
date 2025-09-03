@@ -250,7 +250,7 @@ func run() error {
 			return errs.Wrap(err, "cannot send remote command")
 		}
 
-		fmt.Fprintf(os.Stderr, "%s\n", reply)
+		fmt.Fprintf(os.Stdout, "%s\n", reply)
 
 		return nil
 	}
@@ -796,7 +796,7 @@ func processRemoteCommand(c *runtimecontrol.Client) (err error) {
 	switch len(params) {
 	case 0:
 		return errors.New("Empty command")
-	case 2: //nolint:gomnd
+	case 2: //nolint:mnd
 		return errors.New("Too many commands")
 	default:
 	}

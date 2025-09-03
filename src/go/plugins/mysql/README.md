@@ -6,11 +6,6 @@ The plugin can monitor several remote or local MySQL instances simultaneously vi
 
 The plugin keeps connections in the open state to reduce network congestion, latency, CPU, and memory usage. It can be used in conjunction with the official [Zabbix MySQL template](https://git.zabbix.com/projects/ZBX/repos/zabbix/browse/templates/db/mysql_agent2), which you can extend; alternatively, you can create your own template for your specific needs.
 
-## Requirements
-
-* Zabbix agent 2
-* Go >= 1.21 (required only to build from source)
-
 ## Supported versions
 
 * MySQL, version 5.7+

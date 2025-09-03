@@ -16,145 +16,248 @@ package serverlistener
 
 import (
 	"encoding/json"
-	"fmt"
 	"time"
 
 	"golang.zabbix.com/agent2/internal/agent"
 	"golang.zabbix.com/agent2/internal/agent/scheduler"
 	"golang.zabbix.com/agent2/pkg/version"
+	"golang.zabbix.com/agent2/pkg/zbxcomms"
+	"golang.zabbix.com/sdk/errs"
 	"golang.zabbix.com/sdk/log"
 )
 
 const notsupported = "ZBX_NOTSUPPORTED"
 
-type passiveCheckRequestData struct {
-	Key     string `json:"key"`
-	Timeout any    `json:"timeout"`
+func formatError(msg string) []byte {
+	data := make([]byte, 0, len(notsupported)+len(msg)+1)
+	data = append(data, notsupported...)
+	data = append(data, 0)
+	data = append(data, msg...)
+
+	return data
 }
 
-type passiveChecksRequest struct {
-	Request string                    `json:"request"`
-	Data    []passiveCheckRequestData `json:"data"`
-}
+func handleConnection(
+	sched scheduler.Scheduler,
+	conn zbxcomms.ConnectionInterface,
+) {
+	defer conn.Close() //nolint:errcheck
 
-type passiveChecksResponseData struct {
-	Value *string `json:"value"`
-}
-
-type passiveChecksErrorResponseData struct {
-	Error *string `json:"error"`
-}
-
-type passiveChecksResponse struct {
-	Version string  `json:"version"`
-	Variant int     `json:"variant"`
-	Data    []any   `json:"data,omitempty"`
-	Error   *string `json:"error,omitempty"`
-}
-
-type passiveCheck struct {
-	conn      *passiveConnection
-	scheduler scheduler.Scheduler
-}
-
-func (pc *passiveCheck) formatError(msg string) (data []byte) {
-	data = make([]byte, len(notsupported)+len(msg)+1)
-	copy(data, notsupported)
-	copy(data[len(notsupported)+1:], msg)
-	return
-}
-
-// handleCheckJSON handles json formatted passive check request.
-// False is returned if the json parsing failed and request must
-// be treated as plain text format request.
-func (pc *passiveCheck) handleCheckJSON(data []byte) (errJson error) {
-	var request passiveChecksRequest
-	var timeout int
-	var err error
-
-	errJson = json.Unmarshal(data, &request)
-	if errJson != nil {
-		return errJson
-	}
-
-	if len(request.Data) == 0 {
-		err = fmt.Errorf("received empty \"data\" tag")
-	} else if request.Request != "passive checks" {
-		err = fmt.Errorf("unknown request \"%s\"", request.Request)
-	}
-
-	var response passiveChecksResponse
-
+	rawRequest, err := conn.Read()
 	if err != nil {
-		errString := err.Error()
-		response = passiveChecksResponse{
-			Version: version.Long(),
-			Variant: agent.Variant,
-			Error:   &errString,
-		}
-	} else {
-		var value *string
+		log.Warningf("failed to read request from %s: %s", conn.RemoteIP(), err.Error())
 
-		if timeout, err = scheduler.ParseItemTimeoutAny(request.Data[0].Timeout); err == nil {
-			// direct passive check timeout is handled by the scheduler
-			value, err = pc.scheduler.PerformTask(request.Data[0].Key, time.Second*time.Duration(timeout), agent.PassiveChecksClientID)
-		}
-
-		if err != nil {
-			errString := err.Error()
-			response = passiveChecksResponse{
-				Version: version.Long(),
-				Variant: agent.Variant,
-				Data:    []any{passiveChecksErrorResponseData{Error: &errString}},
-			}
-		} else {
-			response = passiveChecksResponse{
-				Version: version.Long(),
-				Variant: agent.Variant,
-				Data:    []any{passiveChecksResponseData{Value: value}},
-			}
-		}
-	}
-
-	out, err := json.Marshal(response)
-	if err == nil {
-		log.Debugf("sending passive check response: '%s' to '%s'", string(out), pc.conn.Address())
-		_, err = pc.conn.Write(out)
-	}
-
-	if err != nil {
-		log.Debugf("could not send response to server '%s': %s", pc.conn.Address(), err.Error())
-	}
-
-	return nil
-}
-
-func (pc *passiveCheck) handleCheck(data []byte) {
-	// the timeout is one minute to allow see any timeout problem with passive checks
-	const timeoutForSinglePassiveChecks = time.Minute
-	var checkTimeout time.Duration
-
-	err := pc.handleCheckJSON(data)
-	if err == nil {
 		return
 	}
 
-	checkTimeout = timeoutForSinglePassiveChecks
+	log.Debugf(
+		"received passive check request from %q: %q",
+		string(rawRequest),
+		conn.RemoteIP(),
+	)
 
-	// direct passive check timeout is handled by the scheduler
-	taskResult, err := pc.scheduler.PerformTask(string(data), checkTimeout, agent.PassiveChecksClientID)
-
-	if err != nil {
-		log.Debugf("sending passive check response: %s: '%s' to '%s'", notsupported, err.Error(), pc.conn.Address())
-		_, err = pc.conn.Write(pc.formatError(err.Error()))
-	} else if taskResult != nil {
-		log.Debugf("sending passive check response: '%s' to '%s'", *taskResult, pc.conn.Address())
-		_, err = pc.conn.Write([]byte(*taskResult))
+	if json.Valid(rawRequest) {
+		processJSONRequest(conn, sched, rawRequest)
 	} else {
-		log.Debugf("got nil value, skipping sending of response")
+		processPlainTextRequest(conn, sched, string(rawRequest))
+	}
+}
+
+func parsePassiveCheckJSONRequest(rawRequest []byte) (string, time.Duration, error) {
+	type passiveCheckRequestData struct {
+		Key     string `json:"key"`
+		Timeout any    `json:"timeout"`
 	}
 
+	type passiveChecksRequest struct {
+		Request string                    `json:"request"`
+		Data    []passiveCheckRequestData `json:"data"`
+	}
+
+	var request passiveChecksRequest
+
+	err := json.Unmarshal(rawRequest, &request)
 	if err != nil {
-		log.Debugf("could not send response to server '%s': %s", pc.conn.Address(), err.Error())
+		return "", 0, errs.New(`failed to unmarshall json request into passiveChecksRequest`)
+	}
+
+	if len(request.Data) == 0 {
+		return "", 0, errs.New(`received empty "data" tag`)
+	}
+
+	if request.Request != "passive checks" {
+		return "", 0, errs.Errorf("unknown request type %q", request.Request)
+	}
+
+	timeout, err := scheduler.ParseItemTimeoutAny(request.Data[0].Timeout)
+	if err != nil {
+		return "", 0, errs.Wrap(err, "failed to parse passive check timeout")
+	}
+
+	return request.Data[0].Key, time.Duration(timeout) * time.Second, nil
+}
+
+func formatJSONCheckDataPayload(checkResult string) ([]byte, error) {
+	type valueData struct {
+		Value string `json:"value"`
+	}
+
+	type passiveCheckError struct {
+		Version string      `json:"version"`
+		Variant int         `json:"variant"`
+		Data    []valueData `json:"data"`
+	}
+
+	response := passiveCheckError{
+		Version: version.Long(),
+		Variant: agent.Variant,
+		Data: []valueData{
+			{
+				Value: checkResult,
+			},
+		},
+	}
+
+	out, err := json.Marshal(response)
+	if err != nil {
+		return nil, errs.New("failed to marshall JSON")
+	}
+
+	return out, nil
+}
+
+func formatCheckErrorPayload(errText string, isJSON bool) ([]byte, error) {
+	if !isJSON {
+		return formatError(errText), nil
+	}
+
+	type errorData struct {
+		Error string `json:"error"`
+	}
+
+	type passiveCheckError struct {
+		Version string      `json:"version"`
+		Variant int         `json:"variant"`
+		Data    []errorData `json:"data"`
+	}
+
+	response := passiveCheckError{
+		Version: version.Long(),
+		Variant: agent.Variant,
+		Data: []errorData{
+			{
+				Error: errText,
+			},
+		},
+	}
+
+	out, err := json.Marshal(response)
+	if err != nil {
+		return nil, errs.New("failed to marshall JSON")
+	}
+
+	return out, nil
+}
+
+func formatJSONParsingError(errText string) ([]byte, error) {
+	type parsingError struct {
+		Version string `json:"version"`
+		Variant int    `json:"variant"`
+		Error   string `json:"error"`
+	}
+
+	response := parsingError{
+		Version: version.Long(),
+		Variant: agent.Variant,
+		Error:   errText,
+	}
+
+	out, err := json.Marshal(response)
+	if err != nil {
+		return nil, errs.New("failed to marshall JSON")
+	}
+
+	return out, nil
+}
+
+func processPlainTextRequest(conn zbxcomms.ConnectionInterface, sched scheduler.Scheduler, key string) {
+	result, err := sched.PerformTask(key, time.Minute, agent.PassiveChecksClientID)
+	if err != nil {
+		sendTaskErrorResponse(conn, err.Error(), false)
+
+		return
+	}
+
+	if result == nil {
+		log.Debugf("got nil value, skipping sending of response")
+
+		return
+	}
+
+	err = conn.Write([]byte(*result))
+	if err != nil {
+		log.Debugf("could not send response to server '%s': %s", conn.RemoteIP(), err.Error())
+	}
+}
+
+func processJSONRequest(conn zbxcomms.ConnectionInterface, sched scheduler.Scheduler, rawRequest []byte) {
+	key, timeout, err := parsePassiveCheckJSONRequest(rawRequest)
+	if err != nil {
+		sendJSONParsingErrorResponse(conn, err.Error())
+
+		return
+	}
+
+	result, err := sched.PerformTask(key, timeout, agent.PassiveChecksClientID)
+	if err != nil {
+		sendTaskErrorResponse(conn, err.Error(), true)
+
+		return
+	}
+
+	if result == nil {
+		log.Debugf("got nil value, skipping sending of response")
+
+		return
+	}
+
+	payload, err := formatJSONCheckDataPayload(*result)
+	if err != nil {
+		log.Debugf("could not format JSON response: %s", err.Error())
+
+		return
+	}
+
+	err = conn.Write(payload)
+	if err != nil {
+		log.Debugf("could not send response to server '%s': %s", conn.RemoteIP(), err.Error())
+	}
+}
+
+func sendJSONParsingErrorResponse(conn zbxcomms.ConnectionInterface, errText string) {
+	payload, err := formatJSONParsingError(errText)
+	if err != nil {
+		log.Debugf("could not format parse error response: %s", err.Error())
+
+		return
+	}
+
+	err = conn.Write(payload)
+	if err != nil {
+		log.Debugf("could not send response to server '%s': %s", conn.RemoteIP(), err.Error())
+	}
+}
+
+func sendTaskErrorResponse(conn zbxcomms.ConnectionInterface, errText string, isJSON bool) {
+	payload, err := formatCheckErrorPayload(errText, isJSON)
+	if err != nil {
+		log.Debugf("could not format error response: %s", err.Error())
+
+		return
+	}
+
+	err = conn.Write(payload)
+	if err != nil {
+		log.Debugf("could not send response to server '%s': %s", conn.RemoteIP(), err.Error())
 	}
 }
