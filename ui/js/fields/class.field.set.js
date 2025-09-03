@@ -28,21 +28,25 @@ class CFieldSet extends CField {
 		this.#discoverAllFields();
 
 		const observer = new MutationObserver(observations => {
-			const node_change = observations.some(obs => {
-				return obs.type === 'childList'
-					&& [...obs.addedNodes, ...obs.removedNodes]
-						.filter(node => node.nodeType == Node.ELEMENT_NODE)
+			let node_change = false;
+			let attribute_change = false;
+
+			for (const obs of observations) {
+				if (obs.type === 'childList') {
+					node_change = [...obs.addedNodes, ...obs.removedNodes]
 						.some(node => {
-							const is_field = n => [...n.attributes]
-								.some(attr => attr.name === 'data-field-type');
+							return [...node.attributes].some(attr => attr.name === 'data-field-type')
+								|| node.querySelector('[data-field-type]');
+						});
 
-							return is_field(node)
-								|| [...node.querySelectorAll('*')].some(is_field);
-						})
-			});
-
-			const attribute_change = observations
-				.some(obs => obs.type === 'attributes' && obs.attributeName === 'data-skip-from-submit');
+					if (node_change) {
+						break;
+					}
+				}
+				else if (obs.type === 'attributes') {
+					attribute_change = attribute_change || obs.attributeName === 'data-skip-from-submit';
+				}
+			}
 
 			if (node_change) {
 				this.#discoverAllFields();
