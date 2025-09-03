@@ -1207,7 +1207,8 @@ abstract class CTriggerGeneral extends CApiService {
 				|| $trigger['recovery_expression'] !== $db_trigger['recovery_expression']
 				|| $trigger['description'] !== $db_trigger['description'];
 
-			if ($name_updated || array_key_exists('uuid', $trigger)) {
+			if ($name_updated || array_key_exists('uuid', $trigger)
+					|| !array_key_exists('host_status', $trigger)) {
 				$descriptions[$trigger['description']][] = [
 					'index' => $index,
 					'expression' => $trigger['expression'],
