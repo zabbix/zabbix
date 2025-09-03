@@ -315,6 +315,7 @@ if ($data['correlation']['correlationid'] === null) {
 	$buttons = [
 		[
 			'title' => _('Add'),
+			'class' => '',
 			'keepOpen' => true,
 			'isSubmit' => true,
 			'action' => 'correlation_edit_popup.submit();'
@@ -325,13 +326,14 @@ else {
 	$buttons = [
 		[
 			'title' => _('Update'),
+			'class' => '',
 			'keepOpen' => true,
 			'isSubmit' => true,
 			'action' => 'correlation_edit_popup.submit();'
 		],
 		[
 			'title' => _('Clone'),
-			'class' => ZBX_STYLE_BTN_ALT, 'js-clone',
+			'class' => ZBX_STYLE_BTN_ALT,
 			'keepOpen' => true,
 			'isSubmit' => false,
 			'action' => 'correlation_edit_popup.clone('.json_encode([
@@ -339,7 +341,7 @@ else {
 				'buttons' => [
 					[
 						'title' => _('Add'),
-						'class' => 'js-add',
+						'class' => '',
 						'keepOpen' => true,
 						'isSubmit' => true,
 						'action' => 'correlation_edit_popup.submit();'
