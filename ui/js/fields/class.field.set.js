@@ -28,30 +28,27 @@ class CFieldSet extends CField {
 		this.#discoverAllFields();
 
 		const observer = new MutationObserver(observations => {
-			/*
-			 * Observer is launched also when error message node is added (because childList is observer).
-			 * This must be skipped.
-			 */
-			const skip = observations.some((obs) => {
+			const node_change = observations.some(obs => {
 				return obs.type === 'childList'
-						&& [...obs.addedNodes, ...obs.removedNodes]
-								.filter((n) => n.nodeType == Node.ELEMENT_NODE)
-								.every((n) => n.classList.contains('error') || n.classList.contains('error-list'));
+					&& [...obs.addedNodes, ...obs.removedNodes]
+						.filter(node => node.nodeType == Node.ELEMENT_NODE)
+						.some(node => {
+							const is_field = n => [...n.attributes]
+								.some(attr => attr.name === 'data-field-type');
+
+							return is_field(node)
+								|| [...node.querySelectorAll('*')].some(is_field);
+						})
 			});
 
-			let force_validate = Object.values(this.#fields).length == 0;
+			const attribute_change = observations
+				.some(obs => obs.type === 'attributes' && obs.attributeName === 'data-skip-from-submit');
 
-			// Later discovered fields are automatically made changed to allow it to show errors immediately.
-			this.#discoverAllFields();
+			if (node_change) {
+				this.#discoverAllFields();
+			}
 
-			// Validate anyway if there were no fields and now some are made.
-			force_validate = force_validate && Object.values(this.#fields).length != 0;
-
-			// Validate anyway if some of field has received or lost 'data-skip-from-submit' attribute.
-			force_validate = force_validate
-				|| observations.some(obs => obs.type === 'attributes' && obs.attributeName === 'data-skip-from-submit');
-
-			if (force_validate || !skip) {
+			if (node_change || attribute_change) {
 				this.onBlur();
 			}
 		});
