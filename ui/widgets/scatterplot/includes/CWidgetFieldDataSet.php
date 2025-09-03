@@ -279,7 +279,7 @@ class CWidgetFieldDataSet extends CWidgetField {
 				}
 				else {
 					$widget_fields[] = [
-						'type' => ZBX_WIDGET_FIELD_TYPE_ITEM,
+						'type' => ZBX_WIDGET_FIELD_TYPE_GROUP,
 						'name' => $this->name.'.'.$index.'.hostgroupids.'.$group_index,
 						'value' => $group_spec
 					];

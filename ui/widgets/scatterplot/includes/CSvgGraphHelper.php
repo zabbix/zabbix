@@ -181,6 +181,7 @@ class CSvgGraphHelper
 							'search' => [
 								'name' => self::processPattern($data_set['hosts'])
 							],
+							'groupids' => $data_set['hostgroupids'] ?: null,
 							'searchWildcardsEnabled' => true,
 							'searchByAny' => true,
 							'preservekeys' => true
