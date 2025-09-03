@@ -281,7 +281,7 @@ static size_t	preproc_snmp_parse_type(const char *ptr, zbx_snmp_parse_context_t 
 	return len;
 }
 
-static size_t	preproc_snmp_parse_value(const char *ptr, zbx_snmp_type_t type, zbx_snmp_parse_context_t *ctx)
+static size_t	preproc_snmp_parse_value(const char *ptr, zbx_snmp_parse_context_t *ctx)
 {
 	const char	*start = ptr;
 	size_t		len, val_buf_offset = 0;
@@ -294,12 +294,12 @@ static size_t	preproc_snmp_parse_value(const char *ptr, zbx_snmp_type_t type, zb
 		}
 		else
 		{
-			if (ZBX_SNMP_TYPE_HEX == type || ZBX_SNMP_TYPE_BITS == type)
+			if (ZBX_SNMP_TYPE_HEX == ctx->type || ZBX_SNMP_TYPE_BITS == ctx->type)
 			{
 				while ('.' != *(ptr + 1) && '\0' != *(ptr + 1))
 					ptr++;
 			}
-			else if (ZBX_SNMP_TYPE_STRING == type)
+			else if (ZBX_SNMP_TYPE_STRING == ctx->type)
 			{
 				while ('\0' != *(ptr + 1) &&
 						('\n' != *ptr || '.' != *(ptr + 1) || 0 == isdigit(*(ptr + 2))))
@@ -311,7 +311,7 @@ static size_t	preproc_snmp_parse_value(const char *ptr, zbx_snmp_type_t type, zb
 
 		zbx_strncpy_alloc(&ctx->val_buf, &ctx->val_buf_alloc, &val_buf_offset, start, len);
 
-		if (ZBX_SNMP_TYPE_HEX == type || ZBX_SNMP_TYPE_BITS == type)
+		if (ZBX_SNMP_TYPE_HEX == ctx->type || ZBX_SNMP_TYPE_BITS == ctx->type)
 		{
 			zbx_remove_chars(ctx->val_buf, "\n");
 			zbx_rtrim(ctx->val_buf, " ");
@@ -465,7 +465,7 @@ reparse_type:
 	else
 		ctx->type = ZBX_SNMP_TYPE_UNDEFINED;
 
-	len = preproc_snmp_parse_value(data, ctx->type, ctx);
+	len = preproc_snmp_parse_value(data, ctx);
 
 	data += len;
 eol:
