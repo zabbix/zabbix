@@ -306,23 +306,35 @@ window.widget_form = new class extends CWidgetForm {
 		const cloned_dataset = this._getOpenedDataset();
 
 		if (dataset.dataset.type == <?= CWidgetFieldDataSet::DATASET_TYPE_SINGLE_ITEM ?>) {
-			for (const row of dataset.querySelectorAll('.single-item-table-row')) {
-				this._addSingleItem({
-					itemid: row.querySelector(`[name$='[itemids][]`).value,
-					reference: row.querySelector(`[name$='[references][]`).value,
-					name: row.querySelector('.table-col-name a').textContent
-				});
+			for (const key of ['x_axis', 'y_axis']) {
+				const table = dataset.querySelector(`table.single-item-table[data-key="${key}_itemids"]`);
+
+				for (const row of table.querySelectorAll('.single-item-table-row')) {
+					this._addSingleItem({
+						itemid: row.querySelector(`[name$='[${key}_itemids][]`).value,
+						reference: row.querySelector(`[name$='[${key}_references][]`).value,
+						name: row.querySelector('.table-col-name a').textContent,
+						key: `${key}_itemids`
+					});
+				}
 			}
 		}
 		else {
 			if (this._templateid === null) {
+				jQuery('.js-hostgroups-multiselect', cloned_dataset).multiSelect('addData',
+					jQuery('.js-hostgroups-multiselect', dataset).multiSelect('getData')
+				);
+
 				jQuery('.js-hosts-multiselect', cloned_dataset).multiSelect('addData',
 					jQuery('.js-hosts-multiselect', dataset).multiSelect('getData')
 				);
 			}
 
-			jQuery('.js-items-multiselect', cloned_dataset).multiSelect('addData',
-				jQuery('.js-items-multiselect', dataset).multiSelect('getData')
+			jQuery('.js-x-items-multiselect', cloned_dataset).multiSelect('addData',
+				jQuery('.js-x-items-multiselect', dataset).multiSelect('getData')
+			);
+			jQuery('.js-y-items-multiselect', cloned_dataset).multiSelect('addData',
+				jQuery('.js-y-items-multiselect', dataset).multiSelect('getData')
 			);
 		}
 

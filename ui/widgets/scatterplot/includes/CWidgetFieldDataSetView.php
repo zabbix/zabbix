@@ -161,35 +161,44 @@ class CWidgetFieldDataSetView extends CWidgetFieldView {
 
 			if ($this->field->isTemplateDashboard()) {
 				foreach (['x_axis_items', 'y_axis_items'] as $key) {
-					$dataset_head[] = (new CPatternSelect([
-						'name' => $field_name.'['.$row_num.']['.$key.'][]',
-						'object_name' => 'items',
-						'data' => $value[$key],
-						'placeholder' => _('item patterns'),
-						'wildcard_allowed' => 1,
-						'popup' => [
-							'parameters' => [
-								'srctbl' => 'items',
-								'srcfld1' => 'name',
-								'hostid' => $this->field->getTemplateId(),
-								'hide_host_filter' => true,
-								'numeric' => 1,
-								'dstfrm' => $this->form_name,
-								'dstfld1' => zbx_formatDomId($field_name.'['.$row_num.']['.$key.'][]')
-							]
-						],
-						'add_post_js' => false
-					]))->addClass('js-items-multiselect');
+					$item_pattern = (new CWidgetFieldPatternSelectItem(
+						$field_name.'['.$row_num.']['.$key.']',
+						$key === 'x_axis_items' ? _('X Axis') : _('Y Axis'),
+					))->setValue($value[$key]);
+
+					$item_pattern_view = (new CWidgetFieldPatternSelectItemView($item_pattern))
+						->setPopupParameter('numeric', true)
+						->setPlaceholder(_('item patterns'))
+						->setFormName($this->form_name);
+
+					$item_pattern_html = [];
+
+					foreach ($item_pattern_view->getViewCollection() as
+							['label' => $label, 'view' => $view, 'class' => $class]) {
+						$item_pattern_html[] = $label;
+						$item_pattern_html[] = (new CFormField(
+							$view->addClass('js-'.($key === 'x_axis_items' ? 'x-items' : 'y-items').'-multiselect')
+						))
+							->addClass($class)
+							->addClass('select-field-view');
+					}
+
+					$item_pattern_html[] = implode('', $item_pattern_view->getTemplates());
+					$item_pattern_html[] = new CScriptTag($item_pattern_view->getJavaScript());
+
+					$dataset_head[] = (new CDiv())
+						->addClass('head-row')
+						->addItem($item_pattern_html);
 				}
 			}
 			else {
+				// Host group
 				$captions = [];
 
 				if (array_key_exists('hostgroupids', $value)) {
 					$captions = CWidgetFieldDataSet::getHostGroupCaptions($value['hostgroupids']);
 				}
 
-				// Host group
 				$host_group_multiselect = (new CWidgetFieldMultiSelectGroup(
 					$field_name.'['.$row_num.'][hostgroupids]', _('Host groups')
 				))
@@ -207,7 +216,9 @@ class CWidgetFieldDataSetView extends CWidgetFieldView {
 				foreach ($host_group_multiselect_view->getViewCollection() as
 						['label' => $label, 'view' => $view, 'class' => $class]) {
 					$host_group_html[] = $label;
-					$host_group_html[] = (new CFormField($view))
+					$host_group_html[] = (new CFormField(
+						$view->addClass('js-hostgroups-multiselect')
+					))
 						->addClass($class)
 						->addClass('select-field-view');
 				}
@@ -234,7 +245,9 @@ class CWidgetFieldDataSetView extends CWidgetFieldView {
 				foreach ($host_pattern_view->getViewCollection() as
 						['label' => $label, 'view' => $view, 'class' => $class]) {
 					$host_pattern_html[] = $label;
-					$host_pattern_html[] = (new CFormField($view))
+					$host_pattern_html[] = (new CFormField(
+						$view->addClass('js-hosts-multiselect')
+					))
 						->addClass($class)
 						->addClass('select-field-view');
 				}
@@ -264,7 +277,9 @@ class CWidgetFieldDataSetView extends CWidgetFieldView {
 					foreach ($item_pattern_view->getViewCollection() as
 							['label' => $label, 'view' => $view, 'class' => $class]) {
 						$item_pattern_html[] = $label;
-						$item_pattern_html[] = (new CFormField($view))
+						$item_pattern_html[] = (new CFormField(
+							$view->addClass('js-'.($key === 'x_axis_items' ? 'x-items' : 'y-items').'-multiselect')
+						))
 							->addClass($class)
 							->addClass('select-field-view');
 					}
@@ -495,7 +510,7 @@ class CWidgetFieldDataSetView extends CWidgetFieldView {
 	}
 
 	private function getItemRowTemplate($ds_num = '#{dsNum}', $row_num = '#{rowNum}', $itemid = '#{itemid}',
-			$reference = '#{reference}', $name = '#{name}', $key = '#{key}', $reference_key = '#{key_reference}'): CRow {
+			$reference = '#{reference}', $name = '#{name}', $key = '#{key}', $ref_key = '#{key_reference}'): CRow {
 
 		return (new CRow([
 			(new CCol([
@@ -515,7 +530,7 @@ class CWidgetFieldDataSetView extends CWidgetFieldView {
 				new CVar($this->field->getName().'['.$ds_num.']['.$key.'][]', $itemid,
 					$key.'_'.$ds_num.'_'.$row_num.'_itemid'
 				),
-				new CVar($this->field->getName().'['.$ds_num.']['.$reference_key.'][]', $reference,
+				new CVar($this->field->getName().'['.$ds_num.']['.$ref_key.'][]', $reference,
 					$key.'_'.$ds_num.'_'.$row_num.'_reference'
 				)
 			]))
