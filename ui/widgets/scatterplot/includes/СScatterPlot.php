@@ -460,7 +460,7 @@ class СScatterPlot extends CSvg {
 						'units' => $this->x_units
 					]),convertUnits([
 						'value' => $point['y_axis'],
-						'units' => $this->x_units
+						'units' => $this->y_units
 					]),
 					$point['color'],
 					$time_before,
