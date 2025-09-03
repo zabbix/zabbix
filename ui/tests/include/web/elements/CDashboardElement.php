@@ -237,7 +237,7 @@ class CDashboardElement extends CElement {
 	 */
 	public function pasteWidget() {
 		$this->checkIfEditable();
-		$this->getControls()->query('id:dashboard-add')->asPopupButton()->one()->select('Paste widget');
+		$this->getControls()->query('id:dashboard-add')->asPopupButton()->one()->hoverMouse()->select('Paste widget');
 
 		return $this;
 	}

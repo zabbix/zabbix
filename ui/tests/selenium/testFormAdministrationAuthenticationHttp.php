@@ -32,6 +32,15 @@ class testFormAdministrationAuthenticationHttp extends CLegacyWebTest {
 	const LOGIN_USER		= 2;
 	const LOGIN_HTTP		= 3;
 
+	/**
+	 * Attach MessageBehavior to the test.
+	 *
+	 * @return array
+	 */
+	public function getBehaviors() {
+		return [CMessageBehavior::class];
+	}
+
 	public function testFormAdministrationAuthenticationHttp_Layout() {
 		$this->page->login()->open('zabbix.php?action=authentication.edit');
 		$form = $this->query('name:form_auth')->asForm()->one();
