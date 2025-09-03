@@ -424,8 +424,6 @@ window.widget_form = new class extends CWidgetForm {
 				srcfld1: 'itemid',
 				srcfld2: 'name',
 				dstfrm: this._form.id,
-				dstfld1: `${this._key}_${dataset_index}_${row_index}_itemid`,
-				dstfld2: `${this._key}_${dataset_index}_${row_index}_name`,
 				numeric: 1,
 				writeonly: 1,
 				multiselect: 1,
