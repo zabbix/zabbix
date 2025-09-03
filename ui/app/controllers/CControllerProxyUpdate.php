@@ -69,7 +69,7 @@ class CControllerProxyUpdate extends CController {
 				],
 				['db proxy.local_address', 'required', 'not_empty', 'when' => ['proxy_groupid', 'not_empty']]
 			],
-			'local_port' =>	['db proxy.local_port', 'required', 'not_empty',
+			'local_port' => ['db proxy.local_port', 'required', 'not_empty',
 				'use' => [CPortParser::class, ['usermacros' => true]], 'messages' => ['use' => _('Incorrect port.')],
 				'when' => ['proxy_groupid', 'not_empty']
 			],
@@ -83,7 +83,7 @@ class CControllerProxyUpdate extends CController {
 			],
 			'description' => ['db proxy.description'],
 			'tls_accept_certificate' => ['boolean'],
-			'tls_accept_psk' =>	['boolean'],
+			'tls_accept_psk' => ['boolean'],
 			'tls_accept_none' => ['boolean'],
 			'tls_connect' => ['db proxy.tls_connect', 'required',
 				'in' => [HOST_ENCRYPTION_NONE, HOST_ENCRYPTION_PSK, HOST_ENCRYPTION_CERTIFICATE],
@@ -131,35 +131,35 @@ class CControllerProxyUpdate extends CController {
 				'use' => [CTimeUnitValidator::class, ['min' => 1, 'max' => 10 * SEC_PER_MIN, 'usermacros' => true]],
 				'when' => ['custom_timeouts', 'in' => [ZBX_PROXY_CUSTOM_TIMEOUTS_ENABLED]]
 			],
-			'timeout_snmp_agent' =>		['db proxy.timeout_snmp_agent', 'required', 'not_empty',
+			'timeout_snmp_agent' => ['db proxy.timeout_snmp_agent', 'required', 'not_empty',
 				'use' => [CTimeUnitValidator::class, ['min' => 1, 'max' => 10 * SEC_PER_MIN, 'usermacros' => true]],
 				'when' => ['custom_timeouts', 'in' => [ZBX_PROXY_CUSTOM_TIMEOUTS_ENABLED]]
 			],
-			'timeout_external_check' =>	['db proxy.timeout_external_check', 'required', 'not_empty',
+			'timeout_external_check' => ['db proxy.timeout_external_check', 'required', 'not_empty',
 				'use' => [CTimeUnitValidator::class, ['min' => 1, 'max' => 10 * SEC_PER_MIN, 'usermacros' => true]],
 				'when' => ['custom_timeouts', 'in' => [ZBX_PROXY_CUSTOM_TIMEOUTS_ENABLED]]
 			],
-			'timeout_db_monitor' =>		['db proxy.timeout_db_monitor', 'required', 'not_empty',
+			'timeout_db_monitor' => ['db proxy.timeout_db_monitor', 'required', 'not_empty',
 				'use' => [CTimeUnitValidator::class, ['min' => 1, 'max' => 10 * SEC_PER_MIN, 'usermacros' => true]],
 				'when' => ['custom_timeouts', 'in' => [ZBX_PROXY_CUSTOM_TIMEOUTS_ENABLED]]
 			],
-			'timeout_http_agent' =>		['db proxy.timeout_http_agent', 'required', 'not_empty',
+			'timeout_http_agent' => ['db proxy.timeout_http_agent', 'required', 'not_empty',
 				'use' => [CTimeUnitValidator::class, ['min' => 1, 'max' => 10 * SEC_PER_MIN, 'usermacros' => true]],
 				'when' => ['custom_timeouts', 'in' => [ZBX_PROXY_CUSTOM_TIMEOUTS_ENABLED]]
 			],
-			'timeout_ssh_agent' =>		['db proxy.timeout_ssh_agent', 'required', 'not_empty',
+			'timeout_ssh_agent' => ['db proxy.timeout_ssh_agent', 'required', 'not_empty',
 				'use' => [CTimeUnitValidator::class, ['min' => 1, 'max' => 10 * SEC_PER_MIN, 'usermacros' => true]],
 				'when' => ['custom_timeouts', 'in' => [ZBX_PROXY_CUSTOM_TIMEOUTS_ENABLED]]
 			],
-			'timeout_telnet_agent' =>	['db proxy.timeout_telnet_agent', 'required', 'not_empty',
+			'timeout_telnet_agent' => ['db proxy.timeout_telnet_agent', 'required', 'not_empty',
 				'use' => [CTimeUnitValidator::class, ['min' => 1, 'max' => 10 * SEC_PER_MIN, 'usermacros' => true]],
 				'when' => ['custom_timeouts', 'in' => [ZBX_PROXY_CUSTOM_TIMEOUTS_ENABLED]]
 			],
-			'timeout_script' =>			['db proxy.timeout_script', 'required', 'not_empty',
+			'timeout_script' => ['db proxy.timeout_script', 'required', 'not_empty',
 				'use' => [CTimeUnitValidator::class, ['min' => 1, 'max' => 10 * SEC_PER_MIN, 'usermacros' => true]],
 				'when' => ['custom_timeouts', 'in' => [ZBX_PROXY_CUSTOM_TIMEOUTS_ENABLED]]
 			],
-			'timeout_browser' =>		['db proxy.timeout_browser', 'required', 'not_empty',
+			'timeout_browser' => ['db proxy.timeout_browser', 'required', 'not_empty',
 				'use' => [CTimeUnitValidator::class, ['min' => 1, 'max' => 10 * SEC_PER_MIN, 'usermacros' => true]],
 				'when' => ['custom_timeouts', 'in' => [ZBX_PROXY_CUSTOM_TIMEOUTS_ENABLED]]
 			]
