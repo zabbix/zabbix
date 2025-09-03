@@ -713,8 +713,7 @@ static void	store_settings(const zbx_setting_value_t *values, int found, zbx_uin
 	if (ZBX_HK_MODE_DISABLED != value_int && ZBX_HK_OPTION_ENABLED == config->config->hk.trends_global &&
 			0 == zbx_strcmp_null(config->config->db.extension, ZBX_DB_EXTENSION_TIMESCALEDB))
 	{
-		if (ZBX_HK_MODE_PARTITION != value_int)
-			value_int = ZBX_HK_MODE_PARTITION;
+		value_int = ZBX_HK_MODE_PARTITION;
 	}
 #endif
 
