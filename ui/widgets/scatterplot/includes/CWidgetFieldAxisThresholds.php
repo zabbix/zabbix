@@ -52,7 +52,7 @@ class CWidgetFieldAxisThresholds extends CWidgetField {
 			$threshold['x_axis_threshold'] = trim($threshold['x_axis_threshold']);
 			$threshold['y_axis_threshold'] = trim($threshold['y_axis_threshold']);
 
-			if ($threshold['x_axis_threshold'] !== '' && $threshold['y_axis_threshold'] !== '') {
+			if ($threshold['x_axis_threshold'] !== '' || $threshold['y_axis_threshold'] !== '') {
 				$thresholds[] = $threshold;
 			}
 		}
