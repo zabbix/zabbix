@@ -102,6 +102,9 @@ const ZBX_ICON_CHEVRON_RIGHT = 'zi-chevron-right';
 const ZBX_ICON_CHEVRON_UP = 'zi-chevron-up';
 const ZBX_ICON_COG_FILLED = 'zi-cog-filled';
 const ZBX_ICON_COPY = 'zi-copy';
+const ZBX_ICON_CROSS = 'zi-cross';
+const ZBX_ICON_DIAMOND = 'zi-diamond';
+const ZBX_ICON_ELLIPSE = 'zi-ellipse';
 const ZBX_ICON_EYE_OFF = 'zi-eye-off';
 const ZBX_ICON_FILTER = 'zi-filter';
 const ZBX_ICON_HELP_SMALL = 'zi-help-small';
@@ -118,7 +121,10 @@ const ZBX_ICON_REMOVE_SMALLER = 'zi-remove-smaller';
 const ZBX_ICON_SEARCH_LARGE = 'zi-search-large';
 const ZBX_ICON_SPEAKER = 'zi-speaker';
 const ZBX_ICON_SPEAKER_OFF = 'zi-speaker-off';
+const ZBX_ICON_STAR_FILLED = 'zi-star-filled';
+const ZBX_ICON_SQUARE = 'zi-square';
 const ZBX_ICON_TEXT = 'zi-text';
+const ZBX_ICON_TRIANGLE = 'zi-triangle';
 const ZBX_ICON_WIDGET_AWAITING_DATA_LARGE = 'zi-widget-awaiting-data-large';
 const ZBX_ICON_WIDGET_EMPTY_REFERENCES_LARGE = 'zi-widget-empty-references-large';
 const ZBX_ICON_WIDGET_NOT_CONFIGURED_LARGE = ZBX_ICON_WIDGET_EMPTY_REFERENCES_LARGE;
@@ -260,7 +266,7 @@ const NAME_DELIMITER = ': ';
 
 const WRAPPER_PADDING_RIGHT = 10;
 
-const GRAPH_HINTBOX_TYPE_SVGGRAPH = 0;
+const GRAPH_HINTBOX_TYPE_SVG_GRAPH = 0;
 const GRAPH_HINTBOX_TYPE_SCATTERPLOT = 1;
 
 const METRIC_POINT_MARKER_TYPE_ELLIPSIS = 0;

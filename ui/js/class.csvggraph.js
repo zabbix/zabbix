@@ -466,79 +466,8 @@
 		return data_sets;
 	}
 
-	// Find what problems matches in time to the given x.
-	function findProblems(graph, x) {
-		var problems = [],
-			problem_start,
-			problem_width,
-			nodes = graph.querySelectorAll('[data-info]');
-
-		for (var i = 0, l = nodes.length; l > i; i++) {
-			problem_start = +nodes[i].getAttribute('x');
-			problem_width = +nodes[i].getAttribute('width');
-
-			if (x > problem_start && problem_start + problem_width > x) {
-				problems.push(JSON.parse(nodes[i].getAttribute('data-info')));
-			}
-		}
-
-		return problems;
-	}
-
-	// Set position of vertical helper line.
-	function setHelperPosition(e, graph) {
-		var data = graph.data('options');
-		graph.find('.svg-helper').attr({
-			'x1': e.clientX - graph.offset().left,
-			'y1': data.dimY,
-			'x2': e.clientX - graph.offset().left,
-			'y2': data.dimY + data.dimH
-		});
-	}
-
-	/**
-	 * Get tolerance for given data set. Tolerance is used to find which elements are hovered by mouse. Script takes
-	 * actual data point and adds N pixels to all sides. Then looks if mouse is in calculated area. N is calculated by
-	 * this function. Tolerance is used to find exactly matched point only.
-	 */
-	function getDataPointTolerance(ds, hintbox_type) {
-		if (hintbox_type === GRAPH_HINTBOX_TYPE_SVGGRAPH) {
-			const data_tag = ds.querySelector(':not(.svg-point-highlight)');
-
-			if (data_tag.tagName.toLowerCase() === 'circle') {
-				return +ds.childNodes[1].getAttribute('r');
-			}
-			else {
-				return +window.getComputedStyle(data_tag)['strokeWidth'];
-			}
-		}
-		else {
-			const data_tag = ds.querySelector("g:not(.js-svg-highlight-group)");
-
-			return data_tag.getBBox().width / 2;
-		}
-	}
-
-	// Position hintbox near current mouse position.
-	function repositionHintBox(e, graph) {
-		// Use closest positioned ancestor for offset calculation.
-		var offset = graph.closest('.dashboard-grid-widget-container').offsetParent().offset(),
-			hbox = jQuery(graph.hintBoxItem),
-			page_bottom = jQuery(window.top).scrollTop() + jQuery(window.top).height(),
-			mouse_distance = 15,
-			l = (document.body.clientWidth >= e.clientX + hbox.outerWidth() + mouse_distance)
-				? e.clientX + mouse_distance - offset.left
-				: e.clientX - mouse_distance - hbox.outerWidth() - offset.left,
-			t = e.pageY - offset.top,
-			t = page_bottom >= t + offset.top + hbox.outerHeight() + mouse_distance
-				? t + mouse_distance
-				: t - mouse_distance - hbox.outerHeight(),
-			t = (t + offset.top < 0) ? -offset.top : t;
-
-		hbox.css({'left': l, 'top': t});
-	}
-
-	function getPointsNearX(graph, x) {
+	// Find metric points that touches the given x.
+	function findPointsNearX(graph, x) {
 		const nodes = graph.querySelectorAll('[data-set]');
 		const points = [];
 
@@ -575,22 +504,94 @@
 		return points;
 	}
 
+	// Find what problems matches in time to the given x.
+	function findProblems(graph, x) {
+		var problems = [],
+			problem_start,
+			problem_width,
+			nodes = graph.querySelectorAll('[data-info]');
+
+		for (var i = 0, l = nodes.length; l > i; i++) {
+			problem_start = +nodes[i].getAttribute('x');
+			problem_width = +nodes[i].getAttribute('width');
+
+			if (x > problem_start && problem_start + problem_width > x) {
+				problems.push(JSON.parse(nodes[i].getAttribute('data-info')));
+			}
+		}
+
+		return problems;
+	}
+
+	// Set position of vertical helper line.
+	function setHelperPosition(e, graph) {
+		var data = graph.data('options');
+		graph.find('.svg-helper').attr({
+			'x1': e.clientX - graph.offset().left,
+			'y1': data.dimY,
+			'x2': e.clientX - graph.offset().left,
+			'y2': data.dimY + data.dimH
+		});
+	}
+
+	/**
+	 * Get tolerance for given data set. Tolerance is used to find which elements are hovered by mouse. Script takes
+	 * actual data point and adds N pixels to all sides. Then looks if mouse is in calculated area. N is calculated by
+	 * this function. Tolerance is used to find exactly matched point only.
+	 */
+	function getDataPointTolerance(ds, hintbox_type) {
+		if (hintbox_type === GRAPH_HINTBOX_TYPE_SVG_GRAPH) {
+			const data_tag = ds.querySelector(':not(.svg-point-highlight)');
+
+			if (data_tag.tagName.toLowerCase() === 'circle') {
+				return +ds.childNodes[1].getAttribute('r');
+			}
+			else {
+				return +window.getComputedStyle(data_tag)['strokeWidth'];
+			}
+		}
+		else {
+			const data_tag = ds.querySelector("g:not(.js-svg-highlight-group)");
+
+			return data_tag.getBBox().width / 2;
+		}
+	}
+
+	// Position hintbox near current mouse position.
+	function repositionHintBox(e, graph) {
+		// Use closest positioned ancestor for offset calculation.
+		var offset = graph.closest('.dashboard-grid-widget-container').offsetParent().offset(),
+			hbox = jQuery(graph.hintBoxItem),
+			page_bottom = jQuery(window.top).scrollTop() + jQuery(window.top).height(),
+			mouse_distance = 15,
+			l = (document.body.clientWidth >= e.clientX + hbox.outerWidth() + mouse_distance)
+				? e.clientX + mouse_distance - offset.left
+				: e.clientX - mouse_distance - hbox.outerWidth() - offset.left,
+			t = e.pageY - offset.top,
+			t = page_bottom >= t + offset.top + hbox.outerHeight() + mouse_distance
+				? t + mouse_distance
+				: t - mouse_distance - hbox.outerHeight(),
+			t = (t + offset.top < 0) ? -offset.top : t;
+
+		hbox.css({'left': l, 'top': t});
+	}
+
 	function getIconClassByMarker(marker) {
 		marker = parseInt(marker);
 
 		switch (marker) {
 			case METRIC_POINT_MARKER_TYPE_ELLIPSIS:
-				return 'zi-ellipse';
+				return ZBX_ICON_ELLIPSE;
 			case METRIC_POINT_MARKER_TYPE_SQUARE:
-				return 'zi-square';
+				return ZBX_ICON_SQUARE;
 			case METRIC_POINT_MARKER_TYPE_TRIANGLE:
-				return 'zi-triangle';
+				return ZBX_ICON_TRIANGLE;
 			case METRIC_POINT_MARKER_TYPE_DIAMOND:
-				return 'zi-diamond';
+				return ZBX_ICON_DIAMOND;
 			case METRIC_POINT_MARKER_TYPE_STAR:
-				return 'zi-star-filled';
+				return ZBX_ICON_STAR_FILLED;
 			case METRIC_POINT_MARKER_TYPE_CROSS:
-				return 'zi-cross';
+				return ZBX_ICON_CROSS;
 		}
 	}
 
@@ -665,7 +666,7 @@
 
 			// Find values.
 			var points = hintbox_type === 1
-					? getPointsNearX(graph[0], offsetX)
+					? findPointsNearX(graph[0], offsetX)
 					: findValues(graph[0], offsetX),
 				points_total = points.length,
 				show_hint = false,

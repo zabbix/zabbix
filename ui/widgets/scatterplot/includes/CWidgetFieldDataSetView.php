@@ -345,7 +345,9 @@ class CWidgetFieldDataSetView extends CWidgetFieldView {
 					else {
 						$itemid = $item_spec;
 						$item_reference = '';
-						$item_name = array_key_exists($itemid, $value['item_names']) ? $value['item_names'][$itemid] : '';
+						$item_name = array_key_exists($itemid, $value['item_names'])
+							? $value['item_names'][$itemid] :
+							'';
 					}
 
 					$item_rows[] = $this->getItemRowTemplate($row_num, ($i + 1), $itemid, $item_reference, $item_name,
@@ -433,20 +435,24 @@ class CWidgetFieldDataSetView extends CWidgetFieldView {
 								new CFormField(
 									(new CRadioButtonList($field_name.'['.$row_num.'][marker]', (int) $value['marker']))
 										->setId($field_name.'_'.$row_num.'_marker')
-										->addValue(new CIcon('zi-ellipse'),
+										->addValue(new CIcon(ZBX_ICON_ELLIPSE),
 											CScatterPlotMetricPoint::MARKER_TYPE_ELLIPSIS
 										)
-										->addValue(new CIcon('zi-square'), CScatterPlotMetricPoint::MARKER_TYPE_SQUARE)
-										->addValue(new CIcon('zi-triangle'),
+										->addValue(new CIcon(ZBX_ICON_SQUARE),
+											CScatterPlotMetricPoint::MARKER_TYPE_SQUARE
+										)
+										->addValue(new CIcon(ZBX_ICON_TRIANGLE),
 											CScatterPlotMetricPoint::MARKER_TYPE_TRIANGLE
 										)
-										->addValue(new CIcon('zi-diamond'),
+										->addValue(new CIcon(ZBX_ICON_DIAMOND),
 											CScatterPlotMetricPoint::MARKER_TYPE_DIAMOND
 										)
-										->addValue(new CIcon('zi-star-filled'),
+										->addValue(new CIcon(ZBX_ICON_STAR_FILLED),
 											CScatterPlotMetricPoint::MARKER_TYPE_STAR
 										)
-										->addValue(new CIcon('zi-cross'), CScatterPlotMetricPoint::MARKER_TYPE_CROSS)
+										->addValue(new CIcon(ZBX_ICON_CROSS),
+											CScatterPlotMetricPoint::MARKER_TYPE_CROSS
+										)
 										->setModern()
 								),
 								(new CDiv([
