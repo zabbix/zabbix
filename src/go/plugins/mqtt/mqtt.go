@@ -216,7 +216,7 @@ func (ms *mqttSub) Initialize() error {
 				ms.backoffState = stateRetrying
 				ms.stopCh = make(chan struct{})
 				// Pass the channel as an argument to avoid a data race on ms.stopCh
-				go ms.startAsyncEstablishingConnectionBackoff(ms.stopCh)
+				go ms.startAsyncEstablishingConnectionBackoff()
 			}
 
 			ms.stateLock.Unlock()
@@ -250,30 +250,35 @@ func (ms *mqttSub) Release() {
 	ms.stateLock.Unlock()
 
 	mc, ok := impl.mqttClients.Load(ms.broker)
-	if !ok || mc == nil || mc.client == nil {
+	if !ok || mc == nil {
 		impl.Errf("cannot release [%s]: broker was not initialized", ms.broker.url)
 
 		return
 	}
 
-	impl.Tracef("unsubscribing topic '%s' from [%s]", ms.topic, ms.broker.url)
+	if mc.client != nil && !mc.client.IsConnected() {
+		impl.Tracef("unsubscribing topic '%s' from [%s]", ms.topic, ms.broker.url)
 
-	token := mc.client.Unsubscribe(ms.topic)
-	if !token.WaitTimeout(time.Duration(impl.options.Timeout) * time.Second) {
-		impl.Errf("cannot unsubscribe topic '%s' from [%s]: timed out", ms.topic, ms.broker.url)
-	}
+		token := mc.client.Unsubscribe(ms.topic)
+		if !token.WaitTimeout(time.Duration(impl.options.Timeout) * time.Second) {
+			impl.Errf("cannot unsubscribe topic '%s' from [%s]: timed out", ms.topic, ms.broker.url)
+		}
 
-	if token.Error() != nil {
-		impl.Errf("cannot unsubscribe topic '%s' from [%s]: %s", ms.topic, ms.broker.url, token.Error())
+		if token.Error() != nil {
+			impl.Errf("cannot unsubscribe topic '%s' from [%s]: %s", ms.topic, ms.broker.url, token.Error())
+		}
 	}
 
 	delete(mc.subs, ms.topic)
-
 	impl.Tracef("unsubscribed topic '%s' from [%s]", ms.topic, ms.broker.url)
 
 	if len(mc.subs) == 0 {
 		impl.Debugf("disconnecting from [%s]", ms.broker.url)
-		mc.client.Disconnect(200)
+
+		if mc.client != nil {
+			mc.client.Disconnect(200)
+		}
+
 		impl.mqttClients.Delete(ms.broker)
 	}
 }
@@ -313,7 +318,7 @@ func (f *respFilter) Process(v any) (*string, error) {
 	return &value, nil
 }
 
-func (ms *mqttSub) startAsyncEstablishingConnectionBackoff(stopCh <-chan struct{}) {
+func (ms *mqttSub) startAsyncEstablishingConnectionBackoff() {
 	const (
 		baseBackoff = 1 * time.Second
 		maxBackoff  = 10 * time.Minute
@@ -324,19 +329,12 @@ func (ms *mqttSub) startAsyncEstablishingConnectionBackoff(stopCh <-chan struct{
 	wait := baseBackoff + time.Duration(rand.Intn(1000))*time.Millisecond
 	ticker := time.NewTicker(wait)
 
-	defer func() {
-		ms.stateLock.Lock()
-		ms.backoffState = stateIdle
-		ms.stopCh = nil
-		ms.stateLock.Unlock()
-	}()
-
 	go func() {
 		defer ticker.Stop()
 
 		for {
 			select {
-			case <-stopCh:
+			case <-ms.stopCh:
 				// Exit signal received from Release.
 				return
 			case <-ticker.C:
@@ -370,6 +368,11 @@ func (ms *mqttSub) startAsyncEstablishingConnectionBackoff(stopCh <-chan struct{
 
 					continue
 				}
+
+				ms.stateLock.Lock()
+				ms.backoffState = stateIdle
+				ms.stopCh = nil
+				ms.stateLock.Unlock()
 
 				impl.Debugf("established connection to [%s]", ms.broker.url)
 
