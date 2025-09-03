@@ -364,8 +364,7 @@ static size_t	preproc_snmp_parse_value(const char *ptr, zbx_snmp_parse_context_t
 	}
 }
 
-static int	preproc_snmp_parse_line(const char *data, size_t *line_len, char **error,
-		zbx_snmp_parse_context_t *ctx)
+static int	preproc_snmp_parse_line(const char *data, size_t *line_len, zbx_snmp_parse_context_t *ctx, char **error)
 {
 	int		ret = FAIL;
 	size_t		len;
@@ -494,7 +493,7 @@ static int preproc_snmp_walk_to_pairs(zbx_hashset_t *pairs, const char *data, ch
 	size_t				len;
 	int				ret;
 
-	while (FAIL != (ret = preproc_snmp_parse_line(data, &len, error, &ctx)))
+	while (FAIL != (ret = preproc_snmp_parse_line(data, &len, &ctx, error)))
 	{
 		zbx_snmp_value_pair_t	p_copy;
 		int			num_old;
@@ -698,7 +697,7 @@ static int	preproc_snmp_value_from_walk(const char *data, const char *params, ch
 	offset = ('.' == oid_needle[0] ? 0 : 1);
 #endif
 
-	while (FAIL != preproc_snmp_parse_line(data, &len, error, &ctx))
+	while (FAIL != preproc_snmp_parse_line(data, &len, &ctx, error))
 	{
 #ifdef HAVE_NETSNMP
 		if (0 == strcmp(oid_tr, ctx.oid_buf + offset))
@@ -975,7 +974,7 @@ int	item_preproc_snmp_walk_to_json(zbx_variant_t *value, const char *params, cha
 
 	data = value->data.str;
 
-	while (FAIL != preproc_snmp_parse_line(data, &len, errmsg, &ctx))
+	while (FAIL != preproc_snmp_parse_line(data, &len, &ctx, errmsg))
 	{
 		zbx_snmp_walk_to_json_param_t	param_field;
 		size_t				prefix_len;
