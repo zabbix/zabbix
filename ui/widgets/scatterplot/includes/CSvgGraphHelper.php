@@ -22,10 +22,8 @@ use API,
 	CHousekeepingHelper,
 	CItemHelper,
 	CMacrosResolverHelper,
-	CMathHelper,
 	CParser,
 	CSimpleIntervalParser,
-	CSvgGraph,
 	Exception,
 	Manager;
 
@@ -110,9 +108,16 @@ class CSvgGraphHelper
 
 	private static function getMetricsPattern(array &$metrics, array $data_sets, string $templateid,
 		string $override_hostid): void {
-		$max_metrics = SVG_GRAPH_MAX_NUMBER_OF_METRICS;
+		$max_metrics = [
+			'x_axis_items' => SVG_GRAPH_MAX_NUMBER_OF_METRICS,
+			'y_axis_items' => SVG_GRAPH_MAX_NUMBER_OF_METRICS
+		];
 
 		foreach ($data_sets as $index => $data_set) {
+			if ($max_metrics['x_axis_items'] <= 0 || $max_metrics['y_axis_items'] <= 0) {
+				break;
+			}
+
 			if ($data_set['dataset_type'] == CWidgetFieldDataSet::DATASET_TYPE_SINGLE_ITEM) {
 				continue;
 			}
@@ -133,11 +138,10 @@ class CSvgGraphHelper
 				: 0;
 
 			$items_by_hosts = [];
-			$host_colors = [];
+
+			$resolve_macros = $templateid === '' || $override_hostid !== '';
 
 			foreach (['x_axis_items', 'y_axis_items'] as $key) {
-				$resolve_macros = $templateid === '' || $override_hostid !== '';
-
 				$options = [
 					'output' => ['itemid', 'hostid', 'history', 'trends', 'units', 'value_type'],
 					'selectHosts' => ['name'],
@@ -149,7 +153,7 @@ class CSvgGraphHelper
 					'searchByAny' => true,
 					'sortfield' => 'name',
 					'sortorder' => ZBX_SORT_UP,
-					'limit' => $max_metrics
+					'limit' => $max_metrics[$key],
 				];
 
 				if ($resolve_macros) {
@@ -207,21 +211,24 @@ class CSvgGraphHelper
 
 				unset($data_set[$key]);
 
-				$colors = array_key_exists('color', $data_set)
-					? CColorPicker::getColorVariations($data_set['color'], count($items[$key]))
-					: CColorPicker::getPaletteColors($data_set['color_palette'], count($items[$key]));
-
 				foreach ($items[$key] as $item) {
-					if (!array_key_exists($item['hostid'], $host_colors)) {
-						$host_colors[$item['hostid']] = array_shift($colors);
-					}
-
 					$items_by_hosts[$item['hostid']][$key][] = $item;
+
+					$max_metrics[$key] --;
 				}
 			}
 
-			foreach ($items_by_hosts as $hostid => $items_by_host) {
-				$data_set['color'] = $host_colors[$hostid];
+			$colors = array_key_exists('color', $data_set)
+				? CColorPicker::getColorVariations($data_set['color'])
+				: CColorPicker::getPaletteColors($data_set['color_palette'], count($items_by_hosts));
+
+			foreach ($items_by_hosts as $items_by_host) {
+				if (!array_key_exists('x_axis_items', $items_by_host)
+						|| !array_key_exists('y_axis_items', $items_by_host)) {
+					continue;
+				}
+
+				$data_set['color'] = array_key_exists('color', $data_set) ? $colors[0] : array_shift($colors);
 				$metrics[] = [
 					'x_axis_items' => $items_by_host['x_axis_items'],
 					'y_axis_items' => $items_by_host['y_axis_items'],
@@ -236,9 +243,16 @@ class CSvgGraphHelper
 
 	private static function getMetricsItems(array &$metrics, array $data_sets, string $templateid,
 			string $override_hostid): void {
-		$max_metrics = SVG_GRAPH_MAX_NUMBER_OF_METRICS;
+		$max_metrics = [
+			'x_axis_itemids' => SVG_GRAPH_MAX_NUMBER_OF_METRICS,
+			'y_axis_itemids' => SVG_GRAPH_MAX_NUMBER_OF_METRICS
+		];
 
 		foreach ($data_sets as $index => $data_set) {
+			if ($max_metrics['x_axis_itemids'] <= 0 || $max_metrics['y_axis_itemids'] <= 0) {
+				break;
+			}
+
 			if ($data_set['dataset_type'] == CWidgetFieldDataSet::DATASET_TYPE_PATTERN_ITEM) {
 				continue;
 			}
@@ -316,7 +330,7 @@ class CSvgGraphHelper
 					],
 					'itemids' => $data_set[$key],
 					'preservekeys' => true,
-					'limit' => $max_metrics
+					'limit' => $max_metrics[$key]
 				]);
 
 				if (!$db_items) {
@@ -338,6 +352,8 @@ class CSvgGraphHelper
 							: $db_items[$itemid];
 
 						$result[$key][] = $item;
+
+						$max_metrics[$key]--;
 					}
 				}
 			}
