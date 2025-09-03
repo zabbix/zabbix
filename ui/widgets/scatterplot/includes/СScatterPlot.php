@@ -537,8 +537,8 @@ class СScatterPlot extends CSvg {
 	private function drawMetricsPoint(): void {
 		foreach ($this->metrics as $index => $metric) {
 			if (array_key_exists($index, $this->paths)) {
-				foreach ($this->paths[$index] as $path) {
-					$this->addItem(new CScatterPlotMetricPoint($path, $metric));
+				foreach ($this->paths[$index] as $key => $path) {
+					$this->addItem(new CScatterPlotMetricPoint($path, $metric + ['order' => $index, 'key' => $key]));
 				}
 			}
 		}

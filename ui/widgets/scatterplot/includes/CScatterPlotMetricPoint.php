@@ -58,19 +58,20 @@ class CScatterPlotMetricPoint extends CSvgGroup {
 
 		$this->options = $metric['options'] + [
 			'color' => CSvgGraph::SVG_GRAPH_DEFAULT_COLOR,
-			'order' => 1
+			'order' => $metric['order'],
+			'key' => $metric['key']
 		];
 	}
 
 	public function makeStyles(): array {
 		$this
 			->addClass(self::ZBX_STYLE_CLASS)
-			->addClass(self::ZBX_STYLE_CLASS.'-'.$this->options['order']);
+			->addClass(self::ZBX_STYLE_CLASS.'-'.$this->options['order'].'-'.$this->options['key']);
 
 		$color = $this->point ? $this->point[4] : $this->options['color'];
 
 		return [
-			'.'.self::ZBX_STYLE_CLASS.'-'.$this->options['order'] => [
+			'.'.self::ZBX_STYLE_CLASS.'-'.$this->options['order'].'-'.$this->options['key'] => [
 				'fill-opacity' => 1,
 				'fill' => $color,
 				'stroke' => $color
