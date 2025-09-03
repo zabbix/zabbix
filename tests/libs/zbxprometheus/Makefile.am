@@ -19,7 +19,7 @@ PROMETHEUS_LIBS = \
 	$(MOCK_TEST_DEPS)
 
 prometheus_filter_init_SOURCES = \
-	prometheus_filter_init.c
+	prometheus_filter_init.c prometheus_test.c
 
 prometheus_filter_init_CFLAGS = \
 	-I@top_srcdir@/tests \
@@ -52,7 +52,7 @@ zbx_prometheus_to_json_LDADD = $(PROMETHEUS_LIBS) @SERVER_LIBS@
 zbx_prometheus_to_json_LDFLAGS = @SERVER_LDFLAGS@ $(CMOCKA_LDFLAGS) $(YAML_LDFLAGS)
 
 prometheus_parse_row_SOURCES = \
-	prometheus_parse_row.c
+	prometheus_parse_row.c prometheus_test.c
 
 prometheus_parse_row_CFLAGS = \
 	-I@top_srcdir@/tests \
