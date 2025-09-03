@@ -46,7 +46,7 @@ class CDocHelper {
 	const ALERTS_SCRIPT_EDIT =									'web_interface/frontend_sections/alerts/scripts#configuring-a-global-script';
 	const ALERTS_SCRIPT_LIST =									'web_interface/frontend_sections/alerts/scripts';
 	const CONFIGURATION_DASHBOARDS_EDIT =						'web_interface/frontend_sections/dashboards#creating-a-dashboard';
-	const CONFIGURATION_DASHBOARDS_LIST =						'config/visualization/host_screens';
+	const CONFIGURATION_DASHBOARDS_LIST =						'web_interface/frontend_sections/monitoring/hosts/dashboards';
 	const DASHBOARDS_LIST =										'web_interface/frontend_sections/dashboards';
 	const DASHBOARDS_VIEW =										'web_interface/frontend_sections/dashboards';
 	const DASHBOARDS_PAGE_PROPERTIES_EDIT =						'web_interface/frontend_sections/dashboards#adding-pages';
@@ -105,7 +105,7 @@ class CDocHelper {
 	const ITEM_TYPES_ZABBIX_INTERNAL =							'config/items/itemtypes/internal';
 	const MONITORING_CHARTS_VIEW =								'web_interface/frontend_sections/monitoring/hosts/graphs';
 	const MONITORING_DISCOVERY_VIEW =							'web_interface/frontend_sections/monitoring/discovery';
-	const MONITORING_HOST_DASHBOARD_VIEW =						'config/visualization/host_screens';
+	const MONITORING_HOST_DASHBOARD_VIEW =						'web_interface/frontend_sections/monitoring/hosts/dashboards';
 	const MONITORING_HOST_VIEW =								'web_interface/frontend_sections/monitoring/hosts';
 	const MONITORING_HISTORY =									'web_interface/frontend_sections/monitoring/latest_data#graphs';
 	const MONITORING_LATEST_VIEW =								'web_interface/frontend_sections/monitoring/latest_data';

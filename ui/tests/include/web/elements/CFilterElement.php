@@ -122,8 +122,8 @@ class CFilterElement extends CElement {
 						->one();
 			}
 
-			// TODO: fix formatting after git-hook improvements DEV-2396
-			$tab = $this->query('xpath:.//a[('.CXPathHelper::fromClass('tabfilter-item-link').') and text()='.CXPathHelper::escapeQuotes($name).']')->one(false);
+			$tab = $this->query('xpath:.//a[('.CXPathHelper::fromClass('tabfilter-item-link').
+					') and text()='.CXPathHelper::escapeQuotes($name).']')->one(false);
 
 			if (!$tab->isValid() && is_numeric($name)) {
 				$tab = $this->query('xpath:(.//a[@class="tabfilter-item-link"])['.$name.']')->one(false);

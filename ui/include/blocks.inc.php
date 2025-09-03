@@ -203,10 +203,12 @@ function getSystemStatusData(array $filter) {
 			}
 		}
 
-		$visible_problems = [];
+		CArrayHelper::sort($problems, [
+			['field' => 'clock', 'order' => ZBX_SORT_DOWN],
+			['field' => 'ns', 'order' => ZBX_SORT_DOWN]
+		]);
 
-		$limit = CSettingsHelper::get(CSettingsHelper::SEARCH_LIMIT);
-		$problems = CScreenProblem::sortData(['problems' => $problems], $limit, 'clock', ZBX_SORT_DOWN)['problems'];
+		$visible_problems = [];
 
 		foreach ($problems as $eventid => $problem) {
 			$trigger = $data['triggers'][$problem['objectid']];

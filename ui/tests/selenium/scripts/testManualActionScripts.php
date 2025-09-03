@@ -2242,7 +2242,7 @@ class testManualActionScripts extends CWebTest {
 				$table = CDashboardElement::find()->one()->getWidget('Current problems');
 			}
 			else {
-				$table = $this->query('class:list-table')->asTable()->one();
+				$table = $this->query('class:list-table')->asTable()->waitUntilVisible()->one();
 			}
 
 			$table->query('link', $data[$scope])->one()->click();

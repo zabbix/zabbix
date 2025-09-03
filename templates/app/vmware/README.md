@@ -193,6 +193,7 @@ Additional resources:
 |Uncommitted storage space|<p>Additional storage space, in bytes, potentially used by this VM on all datastores.</p>|Simple check|vmware.vm.storage.uncommitted[{$VMWARE.URL},{$VMWARE.VM.UUID}]|
 |Unshared storage space|<p>Total storage space, in bytes, occupied by the VM across all datastores that is not shared with any other VM.</p>|Simple check|vmware.vm.storage.unshared[{$VMWARE.URL},{$VMWARE.VM.UUID}]|
 |Uptime|<p>System uptime.</p>|Simple check|vmware.vm.uptime[{$VMWARE.URL},{$VMWARE.VM.UUID}]|
+|Boot time|<p>System boot time.</p>|Simple check|vmware.vm.property[{$VMWARE.URL},{$VMWARE.VM.UUID},runtime.bootTime]<p>**Preprocessing**</p><ul><li><p>JavaScript: `return Math.floor(Date.parse(value)/1000);`</p></li><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
 |Guest memory swapped|<p>Amount of guest physical memory that is swapped out to the swap space.</p>|Simple check|vmware.vm.guest.memory.size.swapped[{$VMWARE.URL},{$VMWARE.VM.UUID}]|
 |Host memory consumed|<p>Amount of host physical memory consumed for backing up guest physical memory pages.</p>|Simple check|vmware.vm.memory.size.consumed[{$VMWARE.URL},{$VMWARE.VM.UUID}]|
 |Host memory usage in percent|<p>Percentage of host physical memory that has been consumed.</p>|Simple check|vmware.vm.memory.usage[{$VMWARE.URL},{$VMWARE.VM.UUID}]|
@@ -200,7 +201,7 @@ Additional resources:
 |CPU latency in percent|<p>Percentage of time the VM is unable to run because it is contending for access to the physical CPU(s).</p>|Simple check|vmware.vm.cpu.latency[{$VMWARE.URL},{$VMWARE.VM.UUID}]|
 |CPU readiness latency in percent|<p>Percentage of time that the virtual machine was ready, but was unable to get scheduled to run on the physical CPU.</p>|Simple check|vmware.vm.cpu.readiness[{$VMWARE.URL},{$VMWARE.VM.UUID}]|
 |CPU swap-in latency in percent|<p>Percentage of CPU time spent waiting for a swap-in.</p>|Simple check|vmware.vm.cpu.swapwait[{$VMWARE.URL},{$VMWARE.VM.UUID}]|
-|Uptime of guest OS|<p>Total time elapsed since the last operating system boot-up (in seconds).</p>|Simple check|vmware.vm.guest.osuptime[{$VMWARE.URL},{$VMWARE.VM.UUID}]|
+|Uptime of guest OS|<p>Total time elapsed since the last operating system boot-up (in seconds). Data is collected if Guest OS Add-ons (VMware Tools) are installed.</p>|Simple check|vmware.vm.guest.osuptime[{$VMWARE.URL},{$VMWARE.VM.UUID}]<p>**Preprocessing**</p><ul><li><p>Check for not supported value: `error matches "Performance counter data is not available."`</p><p>⛔️Custom on fail: Discard value</p></li></ul>|
 
 ### Triggers
 
@@ -209,7 +210,7 @@ Additional resources:
 |VMware Guest: Snapshot consolidation needed|<p>Snapshot consolidation needed.</p>|`last(/VMware Guest/vmware.vm.consolidationneeded[{$VMWARE.URL},{$VMWARE.VM.UUID}])=0`|Average|**Manual close**: Yes|
 |VMware Guest: VM is not running|<p>VMware virtual machine is not running.</p>|`last(/VMware Guest/vmware.vm.state[{$VMWARE.URL},{$VMWARE.VM.UUID}]) <> 2`|Average||
 |VMware Guest: VMware Tools is not running|<p>VMware Tools is not running on the VM.</p>|`last(/VMware Guest/vmware.vm.tools[{$VMWARE.URL},{$VMWARE.VM.UUID},status]) = 1`|Warning|**Depends on**:<br><ul><li>VMware Guest: VM is not running</li></ul>|
-|VMware Guest: VM has been restarted|<p>Uptime is less than 10 minutes.</p>|`(between(last(/VMware Guest/vmware.vm.guest.osuptime[{$VMWARE.URL},{$VMWARE.VM.UUID}]),1,10m)=1 or between(last(/VMware Guest/vmware.vm.uptime[{$VMWARE.URL},{$VMWARE.VM.UUID}]),1,10m)=1) and last(/VMware Guest/vmware.vm.powerstate[{$VMWARE.URL},{$VMWARE.VM.UUID}]) = 1`|Warning|**Manual close**: Yes|
+|VMware Guest: VM has been restarted|<p>Uptime is less than 10 minutes.</p>|`(now() - last(/VMware Guest/vmware.vm.property[{$VMWARE.URL},{$VMWARE.VM.UUID},runtime.bootTime]) < 10m) and last(/VMware Guest/vmware.vm.powerstate[{$VMWARE.URL},{$VMWARE.VM.UUID}]) = 1`|Warning|**Manual close**: Yes|
 
 ### LLD rule Network device discovery
 
@@ -250,7 +251,7 @@ Additional resources:
 
 |Name|Description|Type|Key and additional info|
 |----|-----------|----|-----------------------|
-|Mounted filesystem discovery|<p>Discovery of all guest file systems.</p>|Simple check|vmware.vm.vfs.fs.discovery[{$VMWARE.URL},{$VMWARE.VM.UUID}]<p>**Preprocessing**</p><ul><li><p>JavaScript: `The text is too long. Please see the template.`</p></li></ul>|
+|Mounted filesystem discovery|<p>Discovery of all guest file systems.</p>|Simple check|vmware.vm.vfs.fs.discovery[{$VMWARE.URL},{$VMWARE.VM.UUID}]|
 
 ### Item prototypes for Mounted filesystem discovery
 

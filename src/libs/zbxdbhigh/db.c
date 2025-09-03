@@ -24,7 +24,8 @@
 #	include "zbx_dbversion_constants.h"
 #endif
 
-#define ZBX_DB_WAIT_DOWN	10
+#define ZBX_DB_WAIT_DOWN		10
+#define ZBX_DB_WAIT_AFTER_RECONNECT	3
 
 #define ZBX_MAX_SQL_SIZE	262144	/* 256KB */
 #ifndef ZBX_MAX_OVERFLOW_SQL_SIZE
@@ -225,6 +226,13 @@ void	zbx_db_validate_config(const zbx_config_dbhigh_t *config_dbhigh)
 				" \"DBTLSKeyFile\", \"DBTLSCertFile\" or \"DBTLSCAFile\" is not defined");
 		exit(EXIT_FAILURE);
 	}
+
+	if (NULL != config_dbhigh->config_dbsocket && 0 != config_dbhigh->config_dbport)
+	{
+		zabbix_log(LOG_LEVEL_CRIT, "Both parameters \"DBPort\" and \"DBSocket\" are defined. Either one of "
+				"them can be defined, or neither.");
+		exit(EXIT_FAILURE);
+	}
 }
 #endif
 
@@ -298,6 +306,8 @@ int	zbx_db_connect(int flag)
 
 	if (0 != connection_failure)
 	{
+		/* wait ZBX_DB_WAIT_AFTER_RECONNECT to allow HA manager recover */
+		zbx_sleep(ZBX_DB_WAIT_AFTER_RECONNECT);
 		zabbix_log(LOG_LEVEL_ERR, "database connection re-established");
 		connection_failure = 0;
 #if defined(HAVE_POSTGRESQL)
@@ -1418,6 +1428,22 @@ void	zbx_db_add_condition_alloc(char **sql, size_t *sql_alloc, size_t *sql_offse
 #ifdef HAVE_ORACLE
 #undef MIN_NUM_BETWEEN
 #endif
+}
+
+void	add_batch_select_condition(char **sql, size_t *sql_alloc, size_t *sql_offset, const char* column,
+		const zbx_vector_uint64_t *itemids, int *index)
+{
+#define ZBX_SELECT_BATCH_SIZE	1000
+	int	new_index = *index + ZBX_SELECT_BATCH_SIZE;
+#undef ZBX_LLD_ITEMS_BATCH_SIZE
+
+	if (new_index > itemids->values_num)
+		new_index = itemids->values_num;
+
+	zbx_db_add_condition_alloc(sql, sql_alloc, sql_offset, column,
+			itemids->values + *index, new_index - *index);
+
+	*index = new_index;
 }
 
 /*********************************************************************************
@@ -3175,15 +3201,26 @@ retry_oracle:
 
 	if (SUCCEED == ZBX_CHECK_LOG_LEVEL(LOG_LEVEL_DEBUG))
 	{
-		for (i = 0; i < self->rows.values_num; i++)
+		if (ZBX_DB_MASK_QUERIES == zbx_db_get_log_masked_values())
 		{
-			zbx_db_value_t	*values = (zbx_db_value_t *)self->rows.values[i];
-			char	*str;
+			zabbix_log(LOG_LEVEL_DEBUG, "insert [txnlev:%d] %d value(s)", zbx_db_txn_level(),
+					self->rows.values_num);
+		}
+		else
+		{
+			for (i = 0; i < self->rows.values_num; i++)
+			{
+				zbx_db_value_t	*values = (zbx_db_value_t *)self->rows.values[i];
+				char	*str;
 
-			str = zbx_db_format_values((zbx_db_field_t **)self->fields.values, values,
-					self->fields.values_num);
-			zabbix_log(LOG_LEVEL_DEBUG, "insert [txnlev:%d] [%s]", zbx_db_txn_level(), ZBX_NULL2EMPTY_STR(str));
-			zbx_free(str);
+				str = zbx_db_format_values((zbx_db_field_t **)self->fields.values, values,
+						self->fields.values_num);
+
+				zabbix_log(LOG_LEVEL_DEBUG, "insert [txnlev:%d] [%s]", zbx_db_txn_level(),
+						ZBX_NULL2EMPTY_STR(str));
+
+				zbx_free(str);
+			}
 		}
 	}
 
@@ -3594,9 +3631,11 @@ int	zbx_db_get_user_by_active_session(const char *sessionid, zbx_user_t *user)
 	zbx_db_result_t	result;
 	zbx_db_row_t	row;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s() sessionid:%s", __func__, sessionid);
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s() sessionid:%s", __func__, ZBX_STRMASK(sessionid));
 
 	sessionid_esc = zbx_db_dyn_escape_string(sessionid);
+
+	zbx_db_query_mask_t	old_queries = zbx_db_set_log_masked_values(ZBX_DB_MASK_QUERIES);
 
 	if (NULL == (result = zbx_db_select(
 			"select u.userid,u.roleid,u.username,r.type"
@@ -3622,6 +3661,7 @@ int	zbx_db_get_user_by_active_session(const char *sessionid, zbx_user_t *user)
 out:
 	zbx_db_free_result(result);
 	zbx_free(sessionid_esc);
+	zbx_db_set_log_masked_values(old_queries);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __func__, zbx_result_string(ret));
 

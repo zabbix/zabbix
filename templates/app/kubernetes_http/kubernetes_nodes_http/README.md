@@ -16,9 +16,13 @@ For example:
 
 Set the `{$KUBE.API.URL}` such as `<scheme>://<host>:<port>`.
 
-Get the generated service account token using the command
+Get the service account name. If a different release name is used.
 
-`kubectl get secret zabbix-service-account -n monitoring -o jsonpath={.data.token} | base64 -d`
+`kubectl get serviceaccounts -n monitoring`
+
+Get the generated service account token using the command:
+
+`kubectl get secret zabbix-zabbix-helm-chart -n monitoring -o jsonpath={.data.token} | base64 -d`
 
 Then set it to the macro `{$KUBE.API.TOKEN}`.
 
@@ -46,10 +50,10 @@ Set the `{$KUBE.API.URL}` such as `<scheme>://<host>:<port>`.
 
 Get the generated service account token using the command
 
-`kubectl get secret zabbix-service-account -n monitoring -o jsonpath={.data.token} | base64 -d`
+`kubectl get secret zabbix-zabbix-helm-chart -n monitoring -o jsonpath={.data.token} | base64 -d`
 
 Then set it to the macro `{$KUBE.API.TOKEN}`.
-Set `{$KUBE.NODES.ENDPOINT.NAME}` with Zabbix agent's endpoint name. See `kubectl -n monitoring get ep`. Default: `zabbix-zabbix-helm-chrt-agent`.
+Set `{$KUBE.NODES.ENDPOINT.NAME}` with Zabbix agent's endpoint name. See `kubectl -n monitoring get ep`. Default: `zabbix-zabbix-helm-chart-agent`.
 
 Set up the macros to filter the metrics of discovered nodes and host creation based on host prototypes:
 
@@ -93,7 +97,7 @@ See the Kubernetes documentation for details about labels and annotations:
 |{$KUBE.API.URL}|<p>Kubernetes API endpoint URL in the format <scheme>://<host>:<port></p>|`https://kubernetes.default.svc.cluster.local:443`|
 |{$KUBE.API.TOKEN}|<p>Service account bearer token.</p>||
 |{$KUBE.HTTP.PROXY}|<p>Sets the HTTP proxy to `http_proxy` value. If this parameter is empty, then no proxy is used.</p>||
-|{$KUBE.NODES.ENDPOINT.NAME}|<p>Kubernetes nodes endpoint name. See "kubectl -n monitoring get ep".</p>|`zabbix-zabbix-helm-chrt-agent`|
+|{$KUBE.NODES.ENDPOINT.NAME}|<p>Kubernetes nodes endpoint name. See "kubectl -n monitoring get ep".</p>|`zabbix-zabbix-helm-chart-agent`|
 |{$KUBE.LLD.FILTER.NODE.MATCHES}|<p>Filter of discoverable nodes.</p>|`.*`|
 |{$KUBE.LLD.FILTER.NODE.NOT_MATCHES}|<p>Filter to exclude discovered nodes.</p>|`CHANGE_IF_NEEDED`|
 |{$KUBE.LLD.FILTER.NODE.ROLE.MATCHES}|<p>Filter of discoverable nodes by role.</p>|`.*`|
@@ -174,7 +178,7 @@ See the Kubernetes documentation for details about labels and annotations:
 |Kubernetes nodes: Node [{#NAME}] Requests: Total CPU requests are too high||`last(/Kubernetes nodes by HTTP/kube.node.requests.cpu[{#NAME}]) / last(/Kubernetes nodes by HTTP/kube.node.allocatable.cpu[{#NAME}]) > 0.8`|Average||
 |Kubernetes nodes: Node [{#NAME}] Requests: Total memory requests are too high||`last(/Kubernetes nodes by HTTP/kube.node.requests.memory[{#NAME}]) / last(/Kubernetes nodes by HTTP/kube.node.allocatable.memory[{#NAME}]) > 0.5`|Warning|**Depends on**:<br><ul><li>Kubernetes nodes: Node [{#NAME}] Requests: Total memory requests are too high</li></ul>|
 |Kubernetes nodes: Node [{#NAME}] Requests: Total memory requests are too high||`last(/Kubernetes nodes by HTTP/kube.node.requests.memory[{#NAME}]) / last(/Kubernetes nodes by HTTP/kube.node.allocatable.memory[{#NAME}]) > 0.8`|Average||
-|Kubernetes nodes: Node [{#NAME}]: Has been restarted|<p>Uptime is less than 10 minutes.</p>|`last(/Kubernetes nodes by HTTP/kube.node.uptime[{#NAME}])<10`|Info||
+|Kubernetes nodes: Node [{#NAME}] has been restarted|<p>Uptime is less than 10 minutes.</p>|`last(/Kubernetes nodes by HTTP/kube.node.uptime[{#NAME}])<10`|Info||
 |Kubernetes nodes: Node [{#NAME}] Used: Kubelet too many pods|<p>Kubelet is running at capacity.</p>|`last(/Kubernetes nodes by HTTP/kube.node.used.pods[{#NAME}])/ last(/Kubernetes nodes by HTTP/kube.node.capacity.pods[{#NAME}]) > 0.9`|Warning||
 
 ### LLD rule Pod discovery

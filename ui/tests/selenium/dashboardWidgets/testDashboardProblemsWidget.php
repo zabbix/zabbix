@@ -642,6 +642,9 @@ class testDashboardProblemsWidget extends CWebTest {
 		}
 
 		COverlayDialogElement::find()->one()->close();
+		// Change dashboard from cancelEditing() to save() to check deadlock issue.
+		$dashboard->save();
+		$this->assertMessage(TEST_GOOD, 'Dashboard updated');
 	}
 
 	public function testDashboardProblemsWidget_SimpleUpdate() {

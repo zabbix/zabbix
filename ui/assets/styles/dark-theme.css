@@ -1362,7 +1362,8 @@ button {
 .btn-tag {
   height: auto;
   outline: none;
-  border: none; }
+  border: none;
+  box-sizing: content-box; }
   .btn-tag:hover {
     text-decoration: underline;
     background-color: #4f4f4f; }
@@ -2505,6 +2506,17 @@ button {
   @media screen and (min-width: 1600px) {
     .list-table thead th.column-tags-3 {
       width: 452px; } }
+.list-table .tags-wrapper {
+  width: 124px; }
+  @media screen and (min-width: 1200px) {
+    .list-table .tags-wrapper {
+      width: 186px; } }
+  @media screen and (min-width: 1400px) {
+    .list-table .tags-wrapper {
+      width: 248px; } }
+  @media screen and (min-width: 1600px) {
+    .list-table .tags-wrapper {
+      width: 310px; } }
 .list-table.compact-view .tag {
   max-width: 40px; }
   @media screen and (min-width: 1200px) {
@@ -4180,12 +4192,10 @@ z-select {
 
 form.dashboard-widget-clock .fields-group.fields-group-date, form.dashboard-widget-clock .fields-group.fields-group-time, form.dashboard-widget-clock .fields-group.fields-group-tzone {
   display: grid;
-  grid-template-columns: repeat(3, minmax(80px, max-content) 1fr);
+  grid-template-columns: repeat(2, minmax(80px, max-content) 1fr);
   align-items: center;
   column-gap: 10px;
   row-gap: 5px; }
-  form.dashboard-widget-clock .fields-group.fields-group-date .field-size input, form.dashboard-widget-clock .fields-group.fields-group-time .field-size input, form.dashboard-widget-clock .fields-group.fields-group-tzone .field-size input {
-    margin-right: 5px; }
 form.dashboard-widget-clock .fields-group.fields-group-time .field-format {
   grid-column: 4 / -1; }
 form.dashboard-widget-clock .fields-group.fields-group-tzone .form-field.field-tzone-timezone, form.dashboard-widget-clock .fields-group.fields-group-tzone .form-field.field-tzone-format {
@@ -4193,7 +4203,7 @@ form.dashboard-widget-clock .fields-group.fields-group-tzone .form-field.field-t
 
 div.dashboard-widget-clock .clock-digital {
   box-sizing: border-box;
-  min-height: 100%;
+  height: 100%;
   padding: 10px;
   display: flex;
   flex-direction: column;
@@ -4207,8 +4217,16 @@ div.dashboard-widget-clock .clock-digital {
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
-    font-size: calc(max(12px, var(--content-height) * var(--widget-clock-font) / 1.14));
     line-height: 1.14; }
+  div.dashboard-widget-clock .clock-digital .clock-time-zone span:first-of-type {
+    margin-right: 0.2em; }
+  div.dashboard-widget-clock .clock-digital .clock-time-zone.separated {
+    text-align: center; }
+    div.dashboard-widget-clock .clock-digital .clock-time-zone.separated span {
+      display: block;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      margin-right: 0; }
   div.dashboard-widget-clock .clock-digital .bold {
     font-weight: bold; }
   div.dashboard-widget-clock .clock-digital .clock-disabled {
@@ -6676,16 +6694,20 @@ z-select[disabled] .focusable, input[disabled], textarea[disabled], select optio
   background-size: 100% 40px, 100% 40px, 100% 4px, 100% 4px;
   background-attachment: local, local, scroll, scroll; }
 
+.tags-wrapper {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 2px 3px; }
+
 .tag {
   display: inline-block;
   color: #f2f2f2;
   background-color: #4f4f4f;
-  margin: 1px 3px 1px 0;
   padding: 2px 3px;
   line-height: 1em;
-  max-width: 133px;
   vertical-align: middle;
-  border-radius: 2px; }
+  border-radius: 2px;
+  box-sizing: border-box; }
   .tag a.link-action {
     color: inherit !important;
     border-bottom: none; }

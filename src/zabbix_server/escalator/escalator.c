@@ -2888,7 +2888,10 @@ static void	get_services_rootcause_eventids(const zbx_vector_uint64_t *serviceid
 
 	zbx_ipc_message_init(&response);
 	zbx_service_send(ZBX_IPC_SERVICE_SERVICE_ROOTCAUSE, data, (zbx_uint32_t)data_offset, &response);
-	zbx_service_deserialize_rootcause(response.data, (zbx_uint32_t)response.size, services);
+
+	if (NULL != response.data)
+		zbx_service_deserialize_rootcause(response.data, (zbx_uint32_t)response.size, services);
+
 	zbx_ipc_message_clean(&response);
 
 	zbx_free(data);
@@ -3832,7 +3835,7 @@ ZBX_THREAD_ENTRY(escalator_thread, args)
 			{
 				case ZBX_RTC_SHUTDOWN:
 					zbx_set_exiting_with_succeed();
-					break;
+					goto out;
 				case ZBX_RTC_ESCALATOR_NOTIFY:
 					deserialize_escalationids(&escalationids, rtc_data);
 					zbx_free(rtc_data);
@@ -3850,8 +3853,11 @@ ZBX_THREAD_ENTRY(escalator_thread, args)
 #		undef STAT_INTERVAL
 	}
 
+out:
+	zbx_ipc_async_socket_close(&rtc);
 	zbx_vector_uint64_destroy(&escalationids);
 	notify_alerter(ALERTER_CLOSE);
+	zbx_db_close();
 
 	zbx_setproctitle("%s #%d [terminated]", get_process_type_string(process_type), process_num);
 

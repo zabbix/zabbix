@@ -121,7 +121,8 @@ type Scheduler interface {
 		commands []*agent.RemoteCommand,
 		now time.Time,
 	)
-	FinishTask(task performer)
+	// FinishTask executes task finishing on given Performer.
+	FinishTask(task Performer)
 	PerformTask(
 		key string,
 		timeout time.Duration,
@@ -489,7 +490,7 @@ func (m *Manager) processAndFlushUserParamQueue(now time.Time) {
 }
 
 // processFinishRequest handles finished tasks
-func (m *Manager) processFinishRequest(task performer) {
+func (m *Manager) processFinishRequest(task Performer) {
 	m.activeTasksNum--
 	p := task.getPlugin()
 	p.releaseCapacity(task)
@@ -611,7 +612,7 @@ run:
 			case *commandRequest:
 				m.processCommandRequest(v)
 				m.processQueue(time.Now())
-			case performer:
+			case Performer:
 				m.processFinishRequest(v)
 				if m.shutdownSeconds != shutdownInactive && m.activeTasksNum+len(m.pluginQueue) == 0 {
 					break run
@@ -776,7 +777,8 @@ func (m *Manager) PerformTask(
 	return r.Value, r.Error
 }
 
-func (m *Manager) FinishTask(task performer) {
+// FinishTask executes task finishing on given Performer.
+func (m *Manager) FinishTask(task Performer) {
 	m.input <- task
 }
 
@@ -926,7 +928,7 @@ func (m *Manager) addUserParamsPlugin(key string) {
 	m.plugins[key] = pagent
 }
 
-func peekTask(tasks performerHeap) performer {
+func peekTask(tasks performerHeap) Performer {
 	if len(tasks) == 0 {
 		return nil
 	}
