@@ -207,9 +207,7 @@
 
 		<!-- Binaries for integration tests -->
 		<exec executable="./configure" failonerror="on">
-			<arg line="CFLAGS='-g -std=gnu99 -Wenum-conversion -fsanitize=leak,address,undefined -fno-omit-frame-pointer'"/>
-			<arg line="CC='clang'"/>
-			<arg line="LDFLAGS='-fsanitize=leak,address,undefined -fno-omit-frame-pointer'"/>
+			<arg line="CONFIG_SITE='share/config.site.d/clang-debug-sanitize'"/>
 			<arg line="--quiet"/>
 			<arg line="--enable-server"/>
 			<arg line="--enable-proxy"/>
@@ -432,9 +430,7 @@
 
 		<!-- Binaries for integration tests -->
 		<exec executable="./configure" failonerror="on">
-			<arg line="CFLAGS='-g -std=gnu99 -Wenum-conversion -fsanitize=leak,address,undefined -fno-omit-frame-pointer '"/>
-			<arg line="CC='clang'"/>
-			<arg line="LDFLAGS='-fsanitize=leak,address,undefined -fno-omit-frame-pointer '"/>
+			<arg line="CONFIG_SITE='share/config.site.d/clang-debug-sanitize'"/>
 			<arg line="--quiet"/>
 			<arg line="--enable-server"/>
 			<arg line="--enable-proxy"/>

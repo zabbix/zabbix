@@ -24,6 +24,7 @@
 #include "zbxstr.h"
 #include "zbxjson.h"
 #include "zbxnum.h"
+#include "zbxtime.h"
 
 #ifdef HAVE_SYS_UTSNAME_H
 #	include <sys/utsname.h>
@@ -311,8 +312,8 @@ static void	rpm_details(const char *manager, const char *line, const char *regex
 	if (NULL != regex && NULL == zbx_regexp_match(name, regex, NULL))
 		return;
 
-	strftime(buildtime_value, sizeof(buildtime_value), TIME_FMT, localtime(&buildtime_timestamp));
-	strftime(installtime_value, sizeof(installtime_value), TIME_FMT, localtime(&installtime_timestamp));
+	strftime(buildtime_value, sizeof(buildtime_value), TIME_FMT, zbx_localtime(&buildtime_timestamp, NULL));
+	strftime(installtime_value, sizeof(installtime_value), TIME_FMT, zbx_localtime(&installtime_timestamp, NULL));
 
 	add_package_to_json(json, name, manager, version, size, arch, buildtime_timestamp, buildtime_value,
 			installtime_timestamp, installtime_value);
