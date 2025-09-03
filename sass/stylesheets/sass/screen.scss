@@ -2485,6 +2485,17 @@ div {
 	li {
 		padding-left: 23px;
 
+		.svg-graph-hintbox-icon-color {
+			@extend %icon-small;
+
+			display: inline-block;
+			float: left;
+			width: 12px;
+			height: 12px;
+			margin-left: -20px;
+			margin-top: -1px;
+		}
+
 		.svg-graph-hintbox-item-color,
 		.svg-graph-hintbox-trigger-color {
 			margin: 3px 10px 3px -20px;

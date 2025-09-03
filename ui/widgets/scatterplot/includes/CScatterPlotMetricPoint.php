@@ -160,6 +160,7 @@ class CScatterPlotMetricPoint extends CSvgGroup {
 					->setAttribute('color', $this->point[4])
 					->setAttribute('time_from', $this->point[5])
 					->setAttribute('time_to', $this->point[6])
+					->setAttribute('marker', $this->options['marker'])
 					->addItem($point)
 			);
 		}

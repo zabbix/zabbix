@@ -563,6 +563,7 @@
 							color: point[c].getAttribute('color'),
 							time_from: point[c].getAttribute('time_from'),
 							time_to: point[c].getAttribute('time_to'),
+							marker: point[c].getAttribute('marker'),
 							p: 0,
 							s: 0
 						});
@@ -572,6 +573,25 @@
 		}
 
 		return points;
+	}
+
+	function getIconClassByMarker(marker) {
+		marker = parseInt(marker);
+
+		switch (marker) {
+			case METRIC_POINT_MARKER_TYPE_ELLIPSIS:
+				return 'zi-ellipse';
+			case METRIC_POINT_MARKER_TYPE_SQUARE:
+				return 'zi-square';
+			case METRIC_POINT_MARKER_TYPE_TRIANGLE:
+				return 'zi-triangle';
+			case METRIC_POINT_MARKER_TYPE_DIAMOND:
+				return 'zi-diamond';
+			case METRIC_POINT_MARKER_TYPE_STAR:
+				return 'zi-star-filled';
+			case METRIC_POINT_MARKER_TYPE_CROSS:
+				return 'zi-cross';
+		}
 	}
 
 	// Show problem or value hintbox.
@@ -719,13 +739,16 @@
 							const time_from = new CDate(point.time_from * 1000);
 							const time_to = new CDate(point.time_to * 1000);
 
+							const icon_class = getIconClassByMarker(point.marker);
+
 							jQuery('<li>')
 								.css('margin-top', rows_added > 0 ? '10px' : null)
 								.text(point.g.getAttribute('data-metric-x') + ': ' + point.vx)
 								.append(
 									jQuery('<span>')
-										.css('background-color', point.color)
-										.addClass('svg-graph-hintbox-item-color')
+										.css('color', point.color)
+										.addClass('svg-graph-hintbox-icon-color')
+										.addClass(icon_class)
 								)
 								.appendTo(html);
 
@@ -733,8 +756,9 @@
 								.text(point.g.getAttribute('data-metric-y') + ': ' + point.vy)
 								.append(
 									jQuery('<span>')
-										.css('background-color', point.color)
-										.addClass('svg-graph-hintbox-item-color')
+										.css('color', point.color)
+										.addClass('svg-graph-hintbox-icon-color')
+										.addClass(icon_class)
 								)
 								.appendTo(html);
 
