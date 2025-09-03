@@ -1595,6 +1595,14 @@ class CApiInputValidator {
 				$rules['in'] = $rule['in'];
 			}
 
+			if (array_key_exists('deprecated_fields', $rule)) {
+				foreach ($rule['deprecated_fields'] as $deprecated_field) {
+					if (in_array($deprecated_field, $data)) {
+						trigger_error(_s('Parameter "%1$s" is deprecated.', $deprecated_field), E_USER_DEPRECATED);
+					}
+				}
+			}
+
 			return self::validateData($rules, $data, $path, $error)
 				&& self::validateDataUniqueness($rules, $data, $path, $error);
 		}
