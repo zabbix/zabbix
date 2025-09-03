@@ -36,8 +36,7 @@ class CFieldSet extends CField {
 			// Check that only a temporary element was created or deleted.
 			const has_not_direct_temp_field = observations.some((obs) => {
 				return [...obs.addedNodes, ...obs.removedNodes]
-					.filter((n) => n.nodeType == Node.ELEMENT_NODE)
-					.some((n) =>  !n.hasAttribute('data-temp-field'))
+					.some((n) => n.nodeType == Node.ELEMENT_NODE && !n.hasAttribute('data-temp-field'))
 			});
 
 			if (!has_not_direct_temp_field) {
