@@ -161,17 +161,7 @@ window.proxy_edit_popup = new class {
 		curl.setArgument('action', 'proxy.config.refresh');
 		curl.setArgument(CSRF_TOKEN_NAME, <?= json_encode(CCsrfTokenHelper::get('proxy')) ?>);
 
-		this._post(curl.getUrl(), {proxyids: [this.proxyid]}, (response) => {
-			for (const element of this.form_element.parentNode.children) {
-				if (element.matches('.msg-good, .msg-bad, .msg-warning')) {
-					element.parentNode.removeChild(element);
-				}
-			}
-
-			const message_box = makeMessageBox('good', response.success.messages, response.success.title)[0];
-
-			this.form_element.parentNode.insertBefore(message_box, this.form_element);
-		});
+		this._post(curl.getUrl(), {proxyids: [this.proxyid]}, true);
 	}
 
 	clone({title, buttons, rules}) {
@@ -191,11 +181,7 @@ window.proxy_edit_popup = new class {
 		curl.setArgument('action', 'proxy.delete');
 		curl.setArgument(CSRF_TOKEN_NAME, <?= json_encode(CCsrfTokenHelper::get('proxy')) ?>);
 
-		this._post(curl.getUrl(), {proxyids: [this.proxyid]}, (response) => {
-			overlayDialogueDestroy(this.overlay.dialogueid);
-
-			this.dialogue.dispatchEvent(new CustomEvent('dialogue.submit', {detail: response}));
-		});
+		this._post(curl.getUrl(), {proxyids: [this.proxyid]});
 	}
 
 	submit() {
@@ -221,15 +207,11 @@ window.proxy_edit_popup = new class {
 					return;
 				}
 
-				this._post(curl.getUrl(), fields, (response) => {
-					overlayDialogueDestroy(this.overlay.dialogueid);
-
-					this.dialogue.dispatchEvent(new CustomEvent('dialogue.submit', {detail: response}));
-				});
+				this._post(curl.getUrl(), fields);
 			});
 	}
 
-	_post(url, data, success_callback) {
+	_post(url, data, keep_open = false) {
 		fetch(url, {
 			method: 'POST',
 			headers: {'Content-Type': 'application/json'},
@@ -241,9 +223,28 @@ window.proxy_edit_popup = new class {
 					throw {error: response.error};
 				}
 
-				return response;
+				if ('form_errors' in response) {
+					this.form.setErrors(response.form_errors, true, true);
+					this.form.renderErrors();
+
+					return;
+				}
+
+				if (keep_open) {
+					const message_box = makeMessageBox('good', response.success.messages, response.success.title)[0];
+
+					this.form_element.parentNode.querySelectorAll('.msg-good,.msg-bad,.msg-warning')
+						.forEach(node => node.remove());
+					this.form_element.parentNode.insertBefore(message_box, this.form_element);
+				}
+				else {
+					const action = (new Curl(url)).getArgument('action');
+
+					overlayDialogueDestroy(this.overlay.dialogueid);
+
+					this.dialogue.dispatchEvent(new CustomEvent('dialogue.submit', {detail: {action, ...response}}));
+				}
 			})
-			.then(success_callback)
 			.catch((exception) => {
 				for (const element of this.form_element.parentNode.children) {
 					if (element.matches('.msg-good, .msg-bad, .msg-warning')) {
