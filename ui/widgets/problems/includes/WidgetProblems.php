@@ -30,6 +30,7 @@ use CButtonIcon,
 	CSeverityHelper,
 	CSpan,
 	CTableInfo,
+	CDiv,
 	CUrl;
 
 class WidgetProblems extends CTableInfo {
@@ -489,7 +490,9 @@ class WidgetProblems extends CTableInfo {
 					))->addClass(ZBX_STYLE_NOWRAP),
 					$problem_update_link,
 					makeEventActionsIcons($problem['eventid'], $data['actions'], $data['users'], $is_acknowledged),
-					$data['fields']['show_tags'] ? $data['tags'][$problem['eventid']] : null
+					$data['fields']['show_tags']
+						? (new CDiv($data['tags'][$problem['eventid']] ))->addClass(ZBX_STYLE_TAGS_WRAPPER)
+						: null
 				])
 				->setAttribute('data-eventid', $problem['eventid']);
 

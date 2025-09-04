@@ -1666,7 +1666,7 @@ class CScreenProblem extends CScreenBase {
 					: zbx_date2age($problem['clock']),
 				$problem_update_link,
 				makeEventActionsIcons($problem['eventid'], $data['actions'], $data['users'], $is_acknowledged),
-				$data['filter']['show_tags'] ? $data['tags'][$problem['eventid']] : null
+				$data['filter']['show_tags'] ? (new CDiv($data['tags'][$problem['eventid']]))->addClass(ZBX_STYLE_TAGS_WRAPPER) : null
 			]);
 
 			// Add table row.
@@ -1821,8 +1821,7 @@ class CScreenProblem extends CScreenBase {
 						? _('binary value')
 						: $last_value['value']
 				))
-					->addClass('hint-item')
-					->setAttribute('data-hintbox', '1');
+					->setHint($hint_table);
 				$latest_values[] = ', ';
 			}
 			else {
@@ -1834,10 +1833,6 @@ class CScreenProblem extends CScreenBase {
 
 		if ($html) {
 			array_pop($latest_values);
-			array_unshift($latest_values, (new CDiv())
-				->addClass('main-hint')
-				->setHint($hint_table)
-			);
 
 			return $latest_values;
 		}

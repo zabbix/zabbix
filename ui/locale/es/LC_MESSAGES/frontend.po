@@ -4,7 +4,7 @@ msgstr ""
 "Project-Id-Version: Zabbix 6.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2023-10-19 13:48+0300\n"
-"PO-Revision-Date: 2025-08-12 20:38+0000\n"
+"PO-Revision-Date: 2025-08-28 15:03+0000\n"
 "Last-Translator: Vicente Salvador <vicentesalvadorcubedo@gmail.com>\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
 "Language: es\n"
@@ -5352,7 +5352,7 @@ msgstr "Crear regla de descubrimiento dependiente"
 
 #: jsLoader.php:352
 msgid "Create dependent item"
-msgstr "Crear elemento dependiente"
+msgstr "Crear métrica dependiente"
 
 #: app/views/trigger.prototype.list.php:181
 #: include/views/configuration.host.prototype.list.php:200
@@ -5446,7 +5446,7 @@ msgstr "Crear asignación de iconos"
 
 #: include/views/configuration.item.list.php:40
 msgid "Create item"
-msgstr "Crear monitor"
+msgstr "Crear métrica"
 
 #: include/views/configuration.item.list.php:48
 msgid "Create item (select host first)"
@@ -6687,7 +6687,7 @@ msgstr "Dependiente"
 
 #: include/items.inc.php:102
 msgid "Dependent item"
-msgstr "Elemento dependiente"
+msgstr "Métrica dependiente"
 
 #: app/views/popup.generic.php:364 app/views/trigger.list.php:266
 #: app/views/trigger.prototype.list.php:94 include/triggers.inc.php:2013
@@ -11923,11 +11923,11 @@ msgstr "Italiano (it_IT)"
 #: widgets/item/includes/WidgetForm.php:122
 #: widgets/tophosts/views/column.edit.php:120
 msgid "Item"
-msgstr "Monitor"
+msgstr "Métrica"
 
 #: items.php:667
 msgid "Item added"
-msgstr "Monitor añadido"
+msgstr "Métrica añadida"
 
 #: app/views/popup.itemtestedit.view.php:433
 msgid "Item contains user-defined macros with secret values. Values of these macros should be entered manually."
@@ -12247,7 +12247,7 @@ msgstr "Kerberos"
 #: include/views/configuration.item.prototype.edit.php:121
 #: include/views/configuration.item.prototype.list.php:68 items.php:44
 msgid "Key"
-msgstr "Monitor"
+msgstr "Clave"
 
 #: app/views/administration.script.edit.php:172
 #: include/views/js/common.item.edit.js.php:56
@@ -17189,7 +17189,7 @@ msgstr "Actualizar"
 #: app/views/administration.proxy.list.php:206
 #: app/views/popup.proxy.edit.php:334
 msgid "Refresh configuration"
-msgstr "Configuración de recarga"
+msgstr "Actualizar configuración"
 
 #: app/views/js/administration.proxy.list.js.php:98
 msgid "Refresh configuration of the selected proxies?"
