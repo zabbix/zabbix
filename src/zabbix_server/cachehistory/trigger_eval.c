@@ -257,11 +257,9 @@ static void	evaluate_item_functions(zbx_hashset_t *funcs, const zbx_vector_uint6
 		zbx_vector_uint64_uniq(&itemids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
 
 		*items_num = itemids.values_num;
-		*items = (zbx_history_sync_item_t *)zbx_malloc(NULL, sizeof(zbx_history_sync_item_t) *
+		*items = (zbx_history_sync_item_t *)zbx_calloc(NULL, 1, sizeof(zbx_history_sync_item_t) *
 				(size_t)itemids.values_num);
 		*items_err = (int *)zbx_malloc(NULL, sizeof(int) * (size_t)itemids.values_num);
-
-		memset(*items, 0, sizeof(zbx_history_sync_item_t) * (size_t)itemids.values_num);
 
 		zbx_dc_config_history_sync_get_items_by_itemids(*items, itemids.values, *items_err,
 				(size_t)itemids.values_num, ZBX_ITEM_GET_SYNC);
