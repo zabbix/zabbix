@@ -177,8 +177,6 @@ class CMediatype extends CApiService {
 		}
 
 		if ($options['filter'] !== null) {
-			$this->dbFilter('media_type mt', $options, $sql_parts);
-
 			$oauth_filter = array_intersect_key($options['filter'], array_flip(self::OAUTH_OUTPUT_FIELDS));
 
 			if ($oauth_filter) {
@@ -191,8 +189,6 @@ class CMediatype extends CApiService {
 		}
 
 		if ($options['search'] !== null) {
-			zbx_db_search('media_type mt', $options, $sql_parts);
-
 			$oauth_search = array_intersect_key($options['search'], array_flip(self::OAUTH_OUTPUT_FIELDS));
 
 			if ($oauth_search) {
