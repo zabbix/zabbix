@@ -27,7 +27,7 @@ class MysqlDbBackend extends DbBackend {
 		global $DB;
 
 		try {
-			$table_exists = mysqli_query($DB['DB'], "select null from dbversion limit 1");
+			mysqli_query($DB['DB'], "select null from dbversion limit 1");
 		}
 		catch (mysqli_sql_exception $e) {
 			$this->setError(_s('Unable to determine current Zabbix database version: %1$s.',
