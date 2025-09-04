@@ -2069,6 +2069,10 @@ msgstr "Priemerný počet nevybavených požiadaviek na zápis na virtuálny dis
 msgid "Avoid easy-to-guess passwords"
 msgstr "Vyhnite sa ľahko uhádnuteľným heslám"
 
+#: app/views/host.wizard.edit.php:473
+msgid "Avoid including sensitive data."
+msgstr ""
+
 #: jsLoader.php:172
 msgid "Awaiting data"
 msgstr "Čaká sa na dáta"
@@ -8666,6 +8670,10 @@ msgstr "Anglicky (en_US)"
 #: app/views/host.wizard.edit.php:399
 msgid "Enter a non-secret pre-shared key identity string. Avoid including sensitive data."
 msgstr "Zadajte reťazec identifikácie (identity string) vopred zdieľaného kľúča (PSK key), ktorý nie je tajný. Neuvádzajte citlivé údaje."
+
+#: app/views/host.wizard.edit.php:470
+msgid "Enter a unique name that Zabbix components will use to recognize the pre-shared key."
+msgstr ""
 
 #: app/views/host.wizard.edit.php:609
 msgid "Enter the IP/DNS address and port of the Zabbix agent installed on your monitoring target."

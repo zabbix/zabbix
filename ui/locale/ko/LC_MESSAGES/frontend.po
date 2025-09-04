@@ -2018,6 +2018,10 @@ msgstr "수집 간격 동안 가상 디스크에 대한 미해결 쓰기 요청�
 msgid "Avoid easy-to-guess passwords"
 msgstr "추측하기 쉬운 암호를 피하십시오"
 
+#: app/views/host.wizard.edit.php:473
+msgid "Avoid including sensitive data."
+msgstr ""
+
 #: jsLoader.php:172
 msgid "Awaiting data"
 msgstr "데이터 대기 중"
@@ -8427,6 +8431,10 @@ msgstr "영어 (en_US)"
 
 #: app/views/host.wizard.edit.php:399
 msgid "Enter a non-secret pre-shared key identity string. Avoid including sensitive data."
+msgstr ""
+
+#: app/views/host.wizard.edit.php:470
+msgid "Enter a unique name that Zabbix components will use to recognize the pre-shared key."
 msgstr ""
 
 #: app/views/host.wizard.edit.php:609
