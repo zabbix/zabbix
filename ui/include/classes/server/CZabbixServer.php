@@ -471,13 +471,16 @@ class CZabbixServer {
 			return false;
 		}
 
-		// Set client timeout.
+		// Set timeout.
 		stream_set_timeout($this->socket, $this->timeout);
 
 		// Send the command.
 		$json = json_encode($params);
 		if (fwrite($this->socket, ZBX_TCP_HEADER.pack('V', strlen($json))."\x00\x00\x00\x00".$json) === false) {
 			$this->error = _s('Cannot send command, check connection with Zabbix server "%1$s".', $this->host);
+
+			fclose($this->socket);
+
 			return false;
 		}
 
@@ -486,29 +489,22 @@ class CZabbixServer {
 		$response_len = 0;
 		$expected_len = null;
 
-		// Reading data.
 		while (!feof($this->socket)) {
-			$buffer = fread($this->socket, self::READ_BYTES_LIMIT);
+			if (($buffer = fread($this->socket, self::READ_BYTES_LIMIT)) === false) {
+				$info = stream_get_meta_data($this->socket);
 
-			// Handle data read error.
-			if ($buffer === false) {
-				$this->error = _s(
-					'Cannot read response from Zabbix server "%1$s". Connection have been interrupted.',
-					$this->host
-				);
-				fclose($this->socket);
+				if ($info['timed_out']) {
+					$this->error = _s(
+						'Response timeout of %1$s seconds exceeded when connecting to Zabbix server "%2$s".',
+						$this->timeout, $this->host
+					);
+				} else {
+					$this->error = _s(
+						'Cannot read response from Zabbix server "%1$s". Connection have been interrupted.',
+						$this->host
+					);
+				}
 
-				return false;
-			}
-
-			$info = stream_get_meta_data($this->socket);
-
-			// Handle client connection timeout.
-			if ($info['timed_out']) {
-				$this->error = _s(
-					'Response timeout of %1$s seconds exceeded when connecting to Zabbix server "%2$s".',
-					$this->timeout, $this->host
-				);
 				fclose($this->socket);
 
 				return false;
@@ -520,6 +516,7 @@ class CZabbixServer {
 			if ($expect == self::ZBX_TCP_EXPECT_HEADER) {
 				if (strncmp($response, ZBX_TCP_HEADER, min($response_len, ZBX_TCP_HEADER_LEN)) != 0) {
 					$this->error = _s('Incorrect response received from Zabbix server "%1$s".', $this->host);
+
 					fclose($this->socket);
 
 					return false;
