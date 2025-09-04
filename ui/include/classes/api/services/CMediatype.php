@@ -37,9 +37,9 @@ class CMediatype extends CApiService {
 
 	public const OUTPUT_FIELDS = ['mediatypeid', 'type', 'name', 'smtp_server', 'smtp_helo', 'smtp_email',
 		'exec_path', 'gsm_modem', 'username', 'passwd', 'status', 'smtp_port', 'smtp_security', 'smtp_verify_peer',
-		'smtp_verify_host', 'smtp_authentication', 'maxsessions', 'maxattempts', 'attempt_interval', 'content_type',
-		'message_format', 'script', 'timeout', 'process_tags', 'show_event_menu', 'event_menu_url', 'event_menu_name',
-		'description', 'provider', 'parameters',
+		'smtp_verify_host', 'smtp_authentication', 'maxsessions', 'maxattempts', 'attempt_interval', 'message_format',
+		'script', 'timeout', 'process_tags', 'show_event_menu', 'event_menu_url', 'event_menu_name', 'description',
+		'provider', 'parameters',
 
 		// OAuth output fields.
 		'redirection_url', 'client_id', 'client_secret', 'authorization_url', 'token_url', 'tokens_status',
@@ -68,11 +68,6 @@ class CMediatype extends CApiService {
 		$db_media_types = [];
 
 		// Return count or grouped counts via direct SQL count.
-		if (!$options['countOutput']) {
-			$add_content_type = in_array('content_type', $options['output']);
-			$remove_message_format = !in_array('message_format', $options['output']);
-		}
-
 		while ($row = DBfetch($resource)) {
 			if ($options['countOutput']) {
 				if ($options['groupCount']) {
@@ -83,14 +78,6 @@ class CMediatype extends CApiService {
 				}
 			}
 			else {
-				if ($add_content_type) {
-					$row['content_type'] = $row['message_format'];
-
-					if ($remove_message_format) {
-						unset($row['message_format']);
-					}
-				}
-
 				$db_media_types[$row['mediatypeid']] = $row;
 			}
 		}
@@ -102,7 +89,7 @@ class CMediatype extends CApiService {
 
 		if ($db_media_types) {
 			$db_media_types = $this->addRelatedObjects($options, $db_media_types);
-			$db_media_types = $this->unsetExtraFields($db_media_types, ['type'], $options['output']);
+			$db_media_types = $this->unsetExtraFields($db_media_types, ['mediatypeid', 'type'], $options['output']);
 
 			if (!$options['preservekeys']) {
 				$db_media_types = array_values($db_media_types);
@@ -115,44 +102,42 @@ class CMediatype extends CApiService {
 	/**
 	 * @throws APIException
 	 */
-	private function validateGet(array &$options): void	{
+	static function validateGet(array &$options): void {
 		if (self::$userData['type'] == USER_TYPE_SUPER_ADMIN) {
 			$output_fields = self::OUTPUT_FIELDS;
 			$user_output_fields = CUser::OUTPUT_FIELDS;
-			$deprecated_fields =  ['content_type'];
 		}
 		else {
 			$output_fields = self::LIMITED_OUTPUT_FIELDS;
 			$user_output_fields = CUser::OWN_LIMITED_OUTPUT_FIELDS;
-			$deprecated_fields =  [];
 		}
 
 		$api_input_rules = ['type' => API_OBJECT, 'fields' => [
-			// Filters
+			// Filters.
 			'mediatypeids' =>			['type' => API_IDS, 'flags' => API_ALLOW_NULL | API_NORMALIZE, 'default' => null],
 			'mediaids' =>				['type' => API_IDS, 'flags' => API_ALLOW_NULL | API_NORMALIZE, 'default' => null],
 			'userids' =>				['type' => API_IDS, 'flags' => API_ALLOW_NULL | API_NORMALIZE, 'default' => null],
 			'filter' =>					['type' => API_FILTER, 'flags' => API_ALLOW_NULL, 'default' => null, 'fields' => array_merge(DB::getFilterFields('media_type', $output_fields), DB::getFilterFields('media_type_oauth', $output_fields))],
-			'search' =>					['type' => API_FILTER, 'flags' => API_ALLOW_NULL, 'default' => null, 'fields' => array_merge(DB::getFilterFields('media_type', $output_fields), DB::getFilterFields('media_type_oauth', $output_fields))],
+			'search' =>					['type' => API_FILTER, 'flags' => API_ALLOW_NULL, 'default' => null, 'fields' => array_merge(DB::getSearchFields('media_type', $output_fields), DB::getSearchFields('media_type_oauth', $output_fields))],
 			'searchByAny' =>			['type' => API_BOOLEAN, 'default' => false],
-			'startSearch' =>			['type' => API_FLAG, 'default' => false],
-			'excludeSearch' =>			['type' => API_FLAG, 'default' => false],
-			'searchWildcardsEnabled' => ['type' => API_BOOLEAN, 'default' => false],
-			// Output
-			'output' =>					['type' => API_OUTPUT, 'flags' => API_NORMALIZE, 'in' => implode(',', $output_fields), 'deprecated_fields' => $deprecated_fields, 'default' => API_OUTPUT_EXTEND],
-			'countOutput' =>			['type' => API_FLAG, 'default' => false],
-			'groupCount' =>				['type' => API_FLAG, 'default' => false],
-			'selectMessageTemplates' => ['type' => API_MULTIPLE, 'rules' => [
-				['if' => static fn(): bool => self::$userData['type'] == USER_TYPE_SUPER_ADMIN, 'type' => API_OUTPUT, 'flags' => API_ALLOW_NULL | API_NORMALIZE, 'in' => implode(',', ['eventsource', 'recovery', 'subject', 'message']), 'default' => null],
-				['else' => true, 'type' => API_UNEXPECTED]
+			'startSearch' =>			['type' => API_BOOLEAN, 'default' => false],
+			'excludeSearch' =>			['type' => API_BOOLEAN, 'default' => false],
+			'searchWildcardsEnabled' =>	['type' => API_BOOLEAN, 'default' => false],
+			// Output.
+			'output' =>					['type' => API_OUTPUT, 'flags' => API_NORMALIZE, 'in' => implode(',', $output_fields), 'default' => API_OUTPUT_EXTEND],
+			'countOutput' =>			['type' => API_BOOLEAN, 'default' => false],
+			'groupCount' =>				['type' => API_BOOLEAN, 'default' => false],
+			'selectMessageTemplates' =>	['type' => API_MULTIPLE, 'rules' => [
+											['if' => static fn(): bool => self::$userData['type'] == USER_TYPE_SUPER_ADMIN, 'type' => API_OUTPUT, 'flags' => API_ALLOW_NULL | API_NORMALIZE, 'in' => implode(',', ['eventsource', 'recovery', 'subject', 'message']), 'default' => null],
+											['else' => true, 'type' => API_UNEXPECTED]
 			]],
 			'selectActions' =>			['type' => API_OUTPUT, 'flags' => API_ALLOW_NULL | API_NORMALIZE, 'in' => implode(',', CAction::OUTPUT_FIELDS), 'default' => null],
 			'selectUsers' =>			['type' => API_OUTPUT, 'flags' => API_ALLOW_NULL | API_NORMALIZE, 'in' => implode(',', $user_output_fields), 'default' => null],
-			// Sort and limit
+			// Sort and limit.
 			'sortfield' =>				['type' => API_STRINGS_UTF8, 'flags' => API_NORMALIZE, 'in' => implode(',', ['mediatypeid']), 'uniq' => true, 'default' => []],
 			'sortorder' =>				['type' => API_SORTORDER, 'default' => []],
 			'limit' =>					['type' => API_INT32, 'flags' => API_ALLOW_NULL, 'in' => '1:'.ZBX_MAX_INT32, 'default' => null],
-			// Flags
+			// Flags.
 			'editable' =>				['type' => API_BOOLEAN, 'default' => false],
 			'preservekeys' =>			['type' => API_BOOLEAN, 'default' => false]
 		]];
@@ -191,7 +176,6 @@ class CMediatype extends CApiService {
 			$sql_parts['where']['mmt'] = 'm.mediatypeid=mt.mediatypeid';
 		}
 
-		// Filter and search for OAUTH
 		if ($options['filter'] !== null) {
 			$this->dbFilter('media_type mt', $options, $sql_parts);
 
@@ -224,15 +208,6 @@ class CMediatype extends CApiService {
 	}
 
 	protected function applyQueryOutputOptions($table_name, $table_alias, array $options, array $sql_parts): array {
-		if (!$options['countOutput'] && ($i = array_search('content_type', $options['output'])) !== false) {
-			if (in_array('message_format', $options['output'])) {
-				unset($options['output'][$i]);
-			}
-			else {
-				$options['output'][$i] = 'message_format';
-			}
-		}
-
 		$sql_parts = parent::applyQueryOutputOptions($table_name, $table_alias, $options, $sql_parts);
 
 		if ($options['countOutput']) {
@@ -253,22 +228,20 @@ class CMediatype extends CApiService {
 			}
 		}
 
-		if ($this->outputIsRequested('parameters', $options['output'])) {
+		if (in_array('parameters', $options['output'])) {
 			$sql_parts = $this->addQuerySelect($this->fieldId('type'), $sql_parts);
 		}
 
 		return $sql_parts;
 	}
 
-	protected function addRelatedObjects(array $options, array $result): array {
-		$result = parent::addRelatedObjects($options, $result);
+	protected function addRelatedObjects(array $options, array $mediatypes): array {
+		self::addRelatedParameters($options, $mediatypes);
+		self::addRelatedMessageTemplates($options, $mediatypes);
+		self::addRelatedActions($options, $mediatypes);
+		self::addRelatedUsers($options, $mediatypes);
 
-		self::addRelatedParameters($options, $result);
-		self::addRelatedMessageTemplates($options, $result);
-		self::addRelatedActions($options, $result);
-		self::addRelatedUsers($options, $result);
-
-		return $result;
+		return $mediatypes;
 	}
 
 	private static function addRelatedParameters(array $options, array &$mediatypes): void {
@@ -351,7 +324,7 @@ class CMediatype extends CApiService {
 			' FROM opmessage om'.
 			' JOIN operations o ON om.operationid=o.operationid'.
 			' WHERE '.dbConditionId('om.mediatypeid', array_keys($mediatypes)).
-			' OR om.mediatypeid IS NULL'
+				' OR om.mediatypeid IS NULL'
 		);
 
 		$action_mediatypeids = [];
