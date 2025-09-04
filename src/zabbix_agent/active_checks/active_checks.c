@@ -745,14 +745,6 @@ static int	parse_list_of_commands(char *str, int config_timeout)
 				continue;
 			}
 
-			if (SUCCEED != zbx_json_value_by_name(&jp_row, ZBX_PROTO_TAG_WAIT, tmp, sizeof(tmp), NULL) ||
-					'\0' == *tmp)
-			{
-				zabbix_log(LOG_LEVEL_WARNING, "cannot retrieve value of tag \"%s\"",
-						ZBX_PROTO_TAG_WAIT);
-				continue;
-			}
-
 			if (SUCCEED != zbx_json_value_by_name(&jp_row, ZBX_PROTO_TAG_TIMEOUT, tmp, sizeof(tmp), NULL) ||
 				'\0' == *tmp)
 			{
@@ -773,20 +765,25 @@ static int	parse_list_of_commands(char *str, int config_timeout)
 				continue;
 			}
 
-			if (0 == atoi(tmp))
-			{
-				zbx_snprintf_alloc(&key, &key_alloc, &offset, "system.run[%s,nowait]",
-						cmd);
-			}
-			else
-				zbx_snprintf_alloc(&key, &key_alloc, &offset, "system.run[%s,wait]",cmd);
-
 			if (SUCCEED != zbx_json_value_by_name(&jp_row, ZBX_PROTO_TAG_ID, tmp, sizeof(tmp), NULL) ||
 							SUCCEED != zbx_is_uint64(tmp, &command_id))
 			{
 				zabbix_log(LOG_LEVEL_WARNING, "cannot retrieve value of tag \"%s\"", ZBX_PROTO_TAG_ID);
 				continue;
 			}
+
+			if (SUCCEED != zbx_json_value_by_name(&jp_row, ZBX_PROTO_TAG_WAIT, tmp, sizeof(tmp), NULL) ||
+					'\0' == *tmp)
+			{
+				zabbix_log(LOG_LEVEL_WARNING, "cannot retrieve value of tag \"%s\"",
+						ZBX_PROTO_TAG_WAIT);
+				continue;
+			}
+
+			if (0 == atoi(tmp))
+				zbx_snprintf_alloc(&key, &key_alloc, &offset, "system.run[%s,nowait]", cmd);
+			else
+				zbx_snprintf_alloc(&key, &key_alloc, &offset, "system.run[%s,wait]", cmd);
 
 			add_command(key, command_id, timeout);
 		}

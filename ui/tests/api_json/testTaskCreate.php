@@ -39,6 +39,28 @@ class testTaskCreate extends CAPITest {
 	private static $clear_taskids = [];
 
 	public function prepareItemsData() {
+		/**
+		 * Permission-related records missing in test SQL data. Force recalculation for zabbix-user and zabbix-admin by
+		 * removing them from, and then adding back to a common user group.
+		 */
+		$usergrpid = 14; // "API user group for update with user and rights", assigned for both test users.
+
+		$result = CDataHelper::call('usergroup.get', [
+			'output' => [],
+			'usrgrpids' => $usergrpid,
+			'selectUsers' => ['userid']
+		]);
+		$usergroup_users = $result[0]['users'];
+
+		CDataHelper::call('usergroup.update', [
+			'usrgrpid' => $usergrpid,
+			'users' => []
+		]);
+		CDataHelper::call('usergroup.update', [
+			'usrgrpid' => $usergrpid,
+			'users' => $usergroup_users
+		]);
+
 		// Create template group.
 		$templategroups = CDataHelper::call('templategroup.create', [
 			[
@@ -57,7 +79,7 @@ class testTaskCreate extends CAPITest {
 		$this->assertArrayHasKey('groupids', $hostgroups);
 		self::$data['hostgroupid'] = $hostgroups['groupids'][0];
 
-		// Create monitored host and not monitored host.
+		// Create monitored and not monitored host; another for "execute now" permission check.
 		$hosts_data = [
 			[
 				'host' => 'api_test_task_create_monitored',
@@ -77,13 +99,23 @@ class testTaskCreate extends CAPITest {
 					]
 				],
 				'status' => HOST_STATUS_NOT_MONITORED
+			],
+			[
+				'host' => 'api_test_task_create_execute_now',
+				'name' => 'API test task.create execute_now',
+				'groups' => [
+					[
+						'groupid' => 50016 // "API group for hosts" with read-only access to zabbix-user & zabbix-admin.
+					]
+				]
 			]
 		];
 		$hosts = CDataHelper::call('host.create', $hosts_data);
 		$this->assertArrayHasKey('hostids', $hosts);
 		self::$data['hostids'] = [
 			'monitored' => $hosts['hostids'][0],
-			'not_monitored' => $hosts['hostids'][1]
+			'not_monitored' => $hosts['hostids'][1],
+			'execute_now' => $hosts['hostids'][2]
 		];
 
 		// Create host interfaces separately.
@@ -105,12 +137,22 @@ class testTaskCreate extends CAPITest {
 				'ip' => '192.168.3.2',
 				'dns' => '',
 				'port' => '10060'
+			],
+			[
+				'hostid' => self::$data['hostids']['execute_now'],
+				'type' => INTERFACE_TYPE_AGENT,
+				'main' => INTERFACE_PRIMARY,
+				'useip' => INTERFACE_USE_IP,
+				'ip' => '192.168.3.1',
+				'dns' => '',
+				'port' => '10050'
 			]
 		];
 		$interfaces = CDataHelper::call('hostinterface.create', $interfaces_data);
 		$this->assertArrayHasKey('interfaceids', $interfaces);
 		$interfaceid_monitored = $interfaces['interfaceids'][0];
 		$interfaceid_not_monitored = $interfaces['interfaceids'][1];
+		$interfaceid_execute_now = $interfaces['interfaceids'][2];
 
 		// Create template.
 		$templates_data = [[
@@ -184,6 +226,16 @@ class testTaskCreate extends CAPITest {
 				'type' => ITEM_TYPE_ZABBIX,
 				'value_type' => ITEM_VALUE_TYPE_FLOAT,
 				'delay' => '30'
+			],
+			// Sample item for "execute now" permission check.
+			[
+				'hostid' => self::$data['hostids']['execute_now'],
+				'name' => '7 Item (execute_now)',
+				'key_' => '7_item_execute_now',
+				'type' => ITEM_TYPE_ZABBIX,
+				'value_type' => ITEM_VALUE_TYPE_FLOAT,
+				'delay' => '30',
+				'interfaceid' => $interfaceid_execute_now
 			]
 		];
 		$items = CDataHelper::call('item.create', $items_data);
@@ -193,7 +245,8 @@ class testTaskCreate extends CAPITest {
 			'3_item_101' => $items['itemids'][2],
 			'4_item_110' => $items['itemids'][3],
 			'5_item_011' => $items['itemids'][4],
-			'6_item_t_011' => $items['itemids'][5]
+			'6_item_t_011' => $items['itemids'][5],
+			'7_item_execute_now' => $items['itemids'][6]
 		];
 
 		// Create dependent items.
@@ -303,6 +356,15 @@ class testTaskCreate extends CAPITest {
 				'key_' => '5_lld_t_011',
 				'type' => ITEM_TYPE_ZABBIX,
 				'delay' => '30'
+			],
+			// Sample LLD rule for "execute now" permission check.
+			[
+				'hostid' => self::$data['hostids']['execute_now'],
+				'name' => '6 LLD (execute_now)',
+				'key_' => '6_lld_execute_now',
+				'type' => ITEM_TYPE_ZABBIX,
+				'delay' => '30',
+				'interfaceid' => $interfaceid_execute_now
 			]
 		];
 		$discovery_rules = CDataHelper::call('discoveryrule.create', $discovery_rules_data);
@@ -311,7 +373,8 @@ class testTaskCreate extends CAPITest {
 			'2_lld_101' => $discovery_rules['itemids'][1],
 			'3_lld_110' => $discovery_rules['itemids'][2],
 			'4_lld_011' => $discovery_rules['itemids'][3],
-			'5_lld_t_011' => $discovery_rules['itemids'][4]
+			'5_lld_t_011' => $discovery_rules['itemids'][4],
+			'6_lld_execute_now' => $discovery_rules['itemids'][5]
 		];
 
 		// Create dependent LLD rules (they depend on other items).
@@ -1254,32 +1317,88 @@ class testTaskCreate extends CAPITest {
 	 * @return array
 	 */
 	public static function getDataPermissions() {
-		// Valid and existing item ID (host monitored, item monitored and type allowed).
-		$itemid = '1_item_111';
-
 		return [
 			// Test check now.
-			'Test check now (admin)' => [
+			'Test check now (item not accessible to admin)' => [
 				'user' => ['user' => 'zabbix-admin', 'password' => 'zabbix'],
 				'task' => [
 					'type' => ZBX_TM_TASK_CHECK_NOW,
 					'request' => [
-						'itemid' => $itemid
+						'itemid' => '1_item_111'
 					]
 				],
-				'expected_error' => 'No permissions to call "task.create".'
+				'expected_error' => 'No permissions to referred object or it does not exist!'
 			],
-			'Test check now (user)' => [
+			'Test check now (item not accessible to user)' => [
 				'user' => ['user' => 'zabbix-user', 'password' => 'zabbix'],
 				'task' => [
 					'type' => ZBX_TM_TASK_CHECK_NOW,
 					'request' => [
-						'itemid' => $itemid
+						'itemid' => '1_item_111'
 					]
 				],
-				'expected_error' => 'No permissions to call "task.create".'
+				'expected_error' => 'No permissions to referred object or it does not exist!'
 			],
-
+			'Test check now (LLD rule not accessible to admin)' => [
+				'user' => ['user' => 'zabbix-admin', 'password' => 'zabbix'],
+				'task' => [
+					'type' => ZBX_TM_TASK_CHECK_NOW,
+					'request' => [
+						'itemid' => '1_lld_111'
+					]
+				],
+				'expected_error' => 'No permissions to referred object or it does not exist!'
+			],
+			'Test check now (LLD rule not accessible to user)' => [
+				'user' => ['user' => 'zabbix-user', 'password' => 'zabbix'],
+				'task' => [
+					'type' => ZBX_TM_TASK_CHECK_NOW,
+					'request' => [
+						'itemid' => '1_lld_111'
+					]
+				],
+				'expected_error' => 'No permissions to referred object or it does not exist!'
+			],
+			'Test check now (item accessible to admin)' => [
+				'user' => ['user' => 'zabbix-admin', 'password' => 'zabbix'],
+				'task' => [
+					'type' => ZBX_TM_TASK_CHECK_NOW,
+					'request' => [
+						'itemid' => '7_item_execute_now'
+					]
+				],
+				'expected_error' => null
+			],
+			'Test check now (item accessible to user)' => [
+				'user' => ['user' => 'zabbix-user', 'password' => 'zabbix'],
+				'task' => [
+					'type' => ZBX_TM_TASK_CHECK_NOW,
+					'request' => [
+						'itemid' => '7_item_execute_now'
+					]
+				],
+				'expected_error' => null
+			],
+			'Test check now (LLD rule accessible to admin)' => [
+				'user' => ['user' => 'zabbix-admin', 'password' => 'zabbix'],
+				'task' => [
+					'type' => ZBX_TM_TASK_CHECK_NOW,
+					'request' => [
+						'itemid' => '6_lld_execute_now'
+					]
+				],
+				'expected_error' => null
+			],
+			'Test check now (LLD rule accessible to user)' => [
+				'user' => ['user' => 'zabbix-user', 'password' => 'zabbix'],
+				'task' => [
+					'type' => ZBX_TM_TASK_CHECK_NOW,
+					'request' => [
+						'itemid' => '6_lld_execute_now'
+					]
+				],
+				'expected_error' => 'No permissions to referred object or it does not exist!'
+			],
 			// Test diagnostic info.
 			'Test diagnostic info (admin)' => [
 				'user' => ['user' => 'zabbix-admin', 'password' => 'zabbix'],
@@ -1303,7 +1422,7 @@ class testTaskCreate extends CAPITest {
 					],
 					'proxyid' => 0
 				],
-				'expected_error' => 'No permissions to call "task.create".'
+				'expected_error' => 'You do not have permission to perform this operation.'
 			],
 			'Test diagnostic info (user)' => [
 				'user' => ['user' => 'zabbix-user', 'password' => 'zabbix'],
@@ -1327,7 +1446,7 @@ class testTaskCreate extends CAPITest {
 					],
 					'proxyid' => 0
 				],
-				'expected_error' => 'No permissions to call "task.create".'
+				'expected_error' => 'You do not have permission to perform this operation.'
 			]
 		];
 	}
@@ -1345,7 +1464,19 @@ class testTaskCreate extends CAPITest {
 		$old_hash_diag_info_tasks = CDBHelper::getHash($sql_diag_info_task);
 
 		$this->authorize($user['user'], $user['password']);
-		$this->call('task.create', $task, $expected_error);
+
+		// Replace ID placeholders with real IDs for "check now" tasks.
+		if ($task['type'] == ZBX_TM_TASK_CHECK_NOW) {
+			$task['request']['itemid'] = self::$data['itemids'][$task['request']['itemid']];
+		}
+
+		$result = $this->call('task.create', $task, $expected_error);
+
+		if ($expected_error === null) {
+			self::$clear_taskids += array_flip($result['result']['taskids']);
+
+			return;
+		}
 
 		// Check if no changes were made in DB.
 		$this->assertSame($old_hash_check_now_tasks, CDBHelper::getHash($sql_check_now_task));
@@ -1359,7 +1490,8 @@ class testTaskCreate extends CAPITest {
 		// Delete hosts and templates.
 		CDataHelper::call('host.delete', [
 			self::$data['hostids']['monitored'],
-			self::$data['hostids']['not_monitored']
+			self::$data['hostids']['not_monitored'],
+			self::$data['hostids']['execute_now']
 		]);
 		CDataHelper::call('template.delete', [
 			self::$data['hostids']['template']

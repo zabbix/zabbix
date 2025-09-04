@@ -2875,6 +2875,7 @@ class testUsersAuthenticationLdap extends testFormAuthentication {
 		$this->page->open('zabbix.php?action=usergroup.edit&usrgrpid='.$usrgrpid)->waitUntilReady();
 		$this->query('name:userdirectoryid')->asDropdown()->one()->fill($ldap_name);
 		$this->query('button:Update')->one()->click();
+		$this->assertMessage(TEST_GOOD, 'User group updated');
 
 		// Check that value in table is changed and display that there exists group with LDAP server.
 		$this->page->open('zabbix.php?action=authentication.edit')->waitUntilReady();
@@ -2946,7 +2947,7 @@ class testUsersAuthenticationLdap extends testFormAuthentication {
 	 * @param string $auth    default authentication field value
 	 */
 	private function openLdapForm($auth = 'Internal') {
-		$this->page->login()->open('zabbix.php?action=authentication.edit');
+		$this->page->login()->open('zabbix.php?action=authentication.edit')->waitUntilReady();
 		$form = $this->query('id:authentication-form')->asForm()->one();
 		$form->fill(['Default authentication' => $auth]);
 		$form->selectTab('LDAP settings');
@@ -2962,7 +2963,7 @@ class testUsersAuthenticationLdap extends testFormAuthentication {
 	 * @param string $values    simple LDAP server values
 	 */
 	private function setLdap($data, $query, $values = null) {
-		$form = $this->query('id:authentication-form')->asForm()->one();
+		$form = $this->query('id:authentication-form')->waitUntilVisible()->asForm()->one();
 
 		// Select LDAP setting tab if it is not selected.
 		if ($form->getSelectedTab() !== 'LDAP settings') {
