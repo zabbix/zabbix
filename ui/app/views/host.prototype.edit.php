@@ -725,7 +725,7 @@ $form
 
 $output = [
 	'header' => $data['hostid'] == 0 ? _('New host prototype') : _('Host prototype'),
-	'doc_url' => CDocHelper::getUrl(CDocHelper::DATA_COLLECTION_HOST_EDIT),
+	'doc_url' => CDocHelper::getUrl(CDocHelper::DATA_COLLECTION_HOST_PROTOTYPE_EDIT),
 	'body' => $form->toString(),
 	'script_inline' => getPagePostJs().$this->readJsFile('host.prototype.edit.js.php'),
 	'buttons' => $buttons,
