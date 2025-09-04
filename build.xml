@@ -207,7 +207,7 @@
 
 		<!-- Binaries for integration tests -->
 		<exec executable="./configure" failonerror="on">
-			<arg line="CFLAGS='-g -std=gnu99 -Wenum-conversion -fsanitize=leak,address,undefined -fno-omit-frame-pointer'"/>
+			<arg line="CFLAGS='-g -std=gnu99 -Wenum-conversion -fsanitize=leak,address,undefined -fno-omit-frame-pointer -DZBX_DEBUG'"/>
 			<arg line="CC='clang'"/>
 			<arg line="LDFLAGS='-fsanitize=leak,address,undefined -fno-omit-frame-pointer'"/>
 			<arg line="--quiet"/>
@@ -217,7 +217,7 @@
 			<arg line="--with-postgresql"/>
 			<arg line="--prefix=${basedir}"/>
 			<arg line="--with-libcurl"/>
-			<arg line="--with-stacksize=128"/>
+			<arg line="--with-stacksize=512"/>
 			<arg line="--with-openssl"/>
 			<arg line="--with-net-snmp"/>
 			<arg line="--with-ssh2"/>
@@ -442,7 +442,7 @@
 			<arg line="--with-mysql"/>
 			<arg line="--prefix=${basedir}"/>
 			<arg line="--with-libcurl"/>
-			<arg line="--with-stacksize=128"/>
+			<arg line="--with-stacksize=512"/>
 			<arg line="--with-openssl"/>
 			<arg line="--with-net-snmp"/>
 			<arg line="--with-ssh2"/>

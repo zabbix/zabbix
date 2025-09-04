@@ -7,7 +7,7 @@ msgstr ""
 "Project-Id-Version: Zabbix 6.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2023-10-19 13:48+0300\n"
-"PO-Revision-Date: 2025-06-03 03:25+0000\n"
+"PO-Revision-Date: 2025-07-02 10:07+0000\n"
 "Last-Translator: NoYoWiFi <1284524409@qq.com>\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
 "Language: zh_CN\n"
@@ -1137,11 +1137,11 @@ msgstr "后值"
 
 #: include/events.inc.php:339
 msgid "Age"
-msgstr "持续时间"
+msgstr "总时长"
 
 #: app/partials/monitoring.problem.filter.php:120
 msgid "Age less than"
-msgstr "持续时间小于"
+msgstr "总时长小于"
 
 #: app/views/administration.script.list.php:196 include/hosts.inc.php:1195
 #: include/items.inc.php:350 include/views/configuration.httpconf.edit.php:109
@@ -6676,6 +6676,10 @@ msgstr "Web 场景详情"
 #: app/views/administration.housekeeping.edit.php:206
 msgid "Detected TimescaleDB license does not support compression. Compression is supported in TimescaleDB Community Edition."
 msgstr "检测到的 TimescaleDB 许可证不支持压缩。 TimescaleDB 社区版支持压缩。"
+
+#: app/views/administration.housekeeping.edit.php:204
+msgid "Detected license does not support compression. Compression is supported in TimescaleDB Community Edition."
+msgstr ""
 
 #: app/controllers/CControllerPopupTriggerExpr.php:1130
 msgid "Detection period"
@@ -13153,6 +13157,11 @@ msgstr "最大行数"
 msgid "Maximum required %1$s database version is %2$s."
 msgstr "所需的最大 %1$s 数据库版本为 %2$s。"
 
+#: app/partials/administration.system.info.php:221
+#, c-format
+msgid "Maximum required version is %1$s."
+msgstr ""
+
 #: app/controllers/CControllerTimeSelectorUpdate.php:136
 #: include/classes/mvc/CController.php:320
 #: include/classes/widgets/fields/CWidgetFieldTimePeriod.php:203
@@ -13484,6 +13493,12 @@ msgstr "所要求的PHP脚本最小解析时间是%1$s (配置项\"max_input_tim
 msgid "Minimum required size of PHP post is %1$s (configuration option \"post_max_size\")."
 msgstr "所要求的最小PHP post大小是%1$s (配置项\"post_max_size\")。"
 
+#: app/partials/administration.system.info.php:212
+#: app/views/administration.housekeeping.edit.php:183
+#, c-format
+msgid "Minimum required version is %1$s."
+msgstr ""
+
 #: app/views/monitoring.map.view.php:48
 #: include/views/monitoring.sysmap.edit.php:276
 msgid "Minimum severity"
@@ -13613,7 +13628,7 @@ msgstr "周一"
 
 #: app/views/configuration.host.list.php:145
 msgid "Monitored by"
-msgstr "要监控什么"
+msgstr "从哪监控"
 
 #: app/partials/configuration.host.edit.html.php:255
 #: app/views/popup.massupdate.host.php:124
@@ -13706,6 +13721,16 @@ msgstr "多重"
 #: include/triggers.inc.php:611
 msgid "Multiple PROBLEM events"
 msgstr "多重问题事件"
+
+#: app/partials/administration.system.info.php:235
+#, c-format
+msgid "Must be at least %1$s."
+msgstr ""
+
+#: app/partials/administration.system.info.php:254
+#, c-format
+msgid "Must not be higher than %1$s."
+msgstr ""
 
 #: jsLoader.php:284
 msgid "Mute"
@@ -14446,6 +14471,66 @@ msgstr "没有系统访问权限。"
 #, c-format
 msgid "No permissions to call \"%1$s.%2$s\"."
 msgstr "没有调用“%1$s.%2$s”的权限。"
+
+#: include/classes/api/services/CConfiguration.php:312
+msgid "No permissions to import discovery rules."
+msgstr ""
+
+#: include/classes/api/services/CConfiguration.php:313
+msgid "No permissions to import graphs."
+msgstr ""
+
+#: include/classes/api/services/CConfiguration.php:314
+msgid "No permissions to import host groups."
+msgstr ""
+
+#: include/classes/api/services/CConfiguration.php:316
+msgid "No permissions to import hosts."
+msgstr ""
+
+#: include/classes/api/services/CConfiguration.php:318
+msgid "No permissions to import images."
+msgstr ""
+
+#: include/classes/api/services/CConfiguration.php:319
+msgid "No permissions to import items."
+msgstr ""
+
+#: include/classes/api/services/CConfiguration.php:320
+msgid "No permissions to import maps."
+msgstr ""
+
+#: include/classes/api/services/CConfiguration.php:321
+msgid "No permissions to import media types."
+msgstr ""
+
+#: include/classes/api/services/CConfiguration.php:324
+msgid "No permissions to import template dashboards."
+msgstr ""
+
+#: include/classes/api/services/CConfiguration.php:315
+msgid "No permissions to import template groups."
+msgstr ""
+
+#: include/classes/api/services/CConfiguration.php:322
+msgid "No permissions to import template links."
+msgstr ""
+
+#: include/classes/api/services/CConfiguration.php:323
+msgid "No permissions to import templates."
+msgstr ""
+
+#: include/classes/api/services/CConfiguration.php:325
+msgid "No permissions to import triggers."
+msgstr ""
+
+#: include/classes/api/services/CConfiguration.php:326
+msgid "No permissions to import value maps."
+msgstr ""
+
+#: include/classes/api/services/CConfiguration.php:317
+msgid "No permissions to import web scenarios."
+msgstr ""
 
 #: app/controllers/CControllerChartsView.php:133
 #: app/controllers/CControllerDashboardPrint.php:99
@@ -16401,7 +16486,7 @@ msgstr "问题显示"
 
 #: app/views/js/trigger.edit.js.php:268 include/triggers.inc.php:603
 msgid "Problem expression"
-msgstr "问题表现形式"
+msgstr "问题表达式"
 
 #: widgets/problemhosts/Widget.php:29
 #: widgets/svggraph/includes/WidgetForm.php:386
@@ -18756,6 +18841,18 @@ msgstr "短针"
 msgid "Shortened"
 msgstr "精简"
 
+#: app/partials/administration.system.info.php:243
+#: app/views/administration.housekeeping.edit.php:187
+#, c-format
+msgid "Should be at least %1$s."
+msgstr ""
+
+#: app/partials/administration.system.info.php:262
+#: app/views/administration.housekeeping.edit.php:197
+#, c-format
+msgid "Should not be higher than %1$s."
+msgstr ""
+
 #: app/partials/monitoring.problem.filter.php:27
 #: app/views/monitoring.charts.view.php:80
 #: app/views/monitoring.dashboard.list.php:64
@@ -19286,7 +19383,7 @@ msgstr "代理内存缓冲区的统计信息和可用性。模式（模式：pfr
 
 #: include/classes/data/CItemData.php:2854
 msgid "Statistics of values received by the preprocessing manager."
-msgstr " preprocessing manager接收的值的统计信息。"
+msgstr "preprocessing manager接收的值的统计信息。"
 
 #: app/controllers/CControllerPopupGeneric.php:237
 #: app/controllers/CControllerPopupGeneric.php:251
@@ -20265,6 +20362,10 @@ msgstr "进程数。返回整数"
 msgid "The parameter \"%1$s\" is missing from the user attributes."
 msgstr "用户属性中缺少参数“%1$s”。"
 
+#: app/views/popup.ldap.edit.php:101
+msgid "The previous password was cleared due to a host change. Please enter the new password."
+msgstr ""
+
 #: include/classes/core/CJsonRpc.php:206
 msgid "The received JSON is not a valid JSON-RPC request."
 msgstr "收到的 JSON 不是有效的 JSON-RPC 请求。"
@@ -20319,7 +20420,7 @@ msgstr "由于先前删除的对象，此操作缺少条件或操作。"
 #, c-format
 msgid "This check cannot be removed, as it is used as a condition in %1$s discovery action."
 msgid_plural "This check cannot be removed, as it is used as a condition in %1$s discovery actions."
-msgstr[0] ""
+msgstr[0] "此检查无法删除，因为它在%1$s发现操作中被用作一个条件。"
 
 #: include/func.inc.php:2566
 msgid "This day last week"
@@ -21306,6 +21407,14 @@ msgstr "无法检索 TimescaleDB 压缩支持状态。"
 msgid "Unable to retrieve TimescaleDB version."
 msgstr "无法检索 TimescaleDB 版本。"
 
+#: app/views/administration.housekeeping.edit.php:173
+msgid "Unable to retrieve compression support status of TimescaleDB time-series database extension for PostgreSQL."
+msgstr ""
+
+#: app/views/administration.housekeeping.edit.php:178
+msgid "Unable to retrieve version of TimescaleDB time-series database extension for PostgreSQL."
+msgstr ""
+
 #: include/views/mfa.login.php:65
 #, c-format
 msgid "Unable to scan? You can use %1$s secret key to manually configure your authenticator app:"
@@ -21583,6 +21692,11 @@ msgstr "不支持的 %1$s 数据库服务版本。必须至少为 %2$s。"
 #, c-format
 msgid "Unsupported %1$s database server version. Must not be higher than %2$s."
 msgstr "不支持的 %1$s 数据库服务版本。不得高于 %2$s。"
+
+#: app/partials/administration.system.info.php:206
+#: app/views/administration.housekeeping.edit.php:169
+msgid "Unsupported TimescaleDB time-series database extension for PostgreSQL is used."
+msgstr ""
 
 #: app/views/administration.housekeeping.edit.php:190
 #, c-format
@@ -22992,6 +23106,11 @@ msgstr "告警"
 msgid "Warning message"
 msgstr "告警信息"
 
+#: app/partials/administration.system.info.php:243
+#: app/partials/administration.system.info.php:262
+msgid "Warning!"
+msgstr ""
+
 #: app/partials/administration.system.info.php:198
 msgid "Warning! Support for Oracle DB is deprecated since Zabbix 7.0 and will be removed in future versions."
 msgstr "警告！自 Zabbix 7.0 起已弃用对 Oracle DB 的支持，并将在未来版本中删除。"
@@ -23360,15 +23479,15 @@ msgstr "Y轴"
 
 #: include/translateDefines.inc.php:34
 msgid "Y-m-d"
-msgstr "Y/m/d"
+msgstr "Y-m-d"
 
 #: include/translateDefines.inc.php:32
 msgid "Y-m-d h:i A"
-msgstr "Y/m/d H:i:s"
+msgstr "Y-m-d h:i A"
 
 #: include/translateDefines.inc.php:31
 msgid "Y-m-d h:i:s A"
-msgstr "Y-m-d H:i:s"
+msgstr "Y-m-d h:i:s A"
 
 #: include/translateDefines.inc.php:40
 msgid "Y-n-d"
