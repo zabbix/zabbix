@@ -1272,6 +1272,9 @@ static int	lld_items_preproc_step_validate(const zbx_lld_item_preproc_t * pp, zb
 		case ZBX_PREPROC_JSONPATH:
 			/* break; is not missing here */
 		case ZBX_PREPROC_ERROR_FIELD_JSON:
+			if (0 != (ZBX_FLAG_DISCOVERY_PROTOTYPE & item->item_flags))
+				break;
+
 			if (FAIL == (ret = zbx_jsonpath_compile(pp->params, &jsonpath)))
 				zbx_strlcpy(err, zbx_json_strerror(), sizeof(err));
 			else
