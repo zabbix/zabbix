@@ -102,7 +102,7 @@ class CMediatype extends CApiService {
 	/**
 	 * @throws APIException
 	 */
-	static function validateGet(array &$options): void {
+	private static function validateGet(array &$options): void {
 		if (self::$userData['type'] == USER_TYPE_SUPER_ADMIN) {
 			$output_fields = self::OUTPUT_FIELDS;
 			$user_output_fields = CUser::OUTPUT_FIELDS;
