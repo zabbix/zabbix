@@ -91,6 +91,13 @@ class testMediatype extends CAPITest {
 					'smtp_authentication' => SMTP_AUTHENTICATION_PASSWORD
 				]],
 				'Invalid parameter "/1/smtp_authentication": value must be 0.'
+			],
+			'invalid access_token_updated' => [
+				[[
+					'mediatypeid' => ':media_type:OAuth with tokens',
+					'access_token_updated' => 3600,
+				]],
+				'Invalid parameter "/1/access_token_updated": value must be one of ' . date('Y-m-d H:i:s', time()-600) . '-' . date('Y-m-d H:i:s', time()) . '.'
 			]
 		];
 	}
@@ -295,6 +302,28 @@ class testMediatype extends CAPITest {
 					'redirection_url' => 'http://example.com'
 				]],
 				'Invalid parameter "/1/redirection_url": value must be empty.'
+			],
+			'invalid create' =>
+			[
+				[[
+					'name' => 'testing2',
+					'type' => MEDIA_TYPE_EMAIL,
+					'smtp_server' => 'smtp.gmail.com',
+					'smtp_helo' => 'example.com',
+					'smtp_email' => 'zabbix@example.com',
+					'smtp_authentication' => SMTP_AUTHENTICATION_OAUTH,
+					'redirection_url' => 'http://example.com',
+					'client_id' => 'clientid',
+					'client_secret' => 'clientsecret',
+					'authorization_url' => 'http://example.com',
+					'token_url' => 'http://example.com',
+					'tokens_status' => OAUTH_REFRESH_TOKEN_VALID,
+					'refresh_token' => 'refreshtoken',
+					'access_token' => 'updated',
+					'access_token_updated' => time() - SEC_PER_HOUR,
+					'access_expires_in' => 600
+				]],
+				'Invalid parameter "/1/access_token_updated": value must be one of ' . date('Y-m-d H:i:s', time()-600) . '-' . date('Y-m-d H:i:s', time()) . '.'
 			]
 		];
 	}
