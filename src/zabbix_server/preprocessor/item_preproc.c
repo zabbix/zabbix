@@ -1472,6 +1472,9 @@ static int	item_preproc_script(zbx_variant_t *value, const char *params, zbx_var
 	{
 		if (SUCCEED != zbx_es_init_env(&es_engine, errmsg))
 			return FAIL;
+
+		if (SUCCEED != zbx_es_globals_make_readonly(&es_engine, errmsg))
+					return FAIL;
 	}
 
 	if (ZBX_VARIANT_BIN != bytecode->type)
