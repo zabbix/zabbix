@@ -1,1 +1,1 @@
-..F....... [ZBX-24720] added 'period' field to trim fields ldap auth media type mapping edit popup (dpankins)
+..F....... [ZBX-24720] fixed LDAP media type mapping "When active" field trimming (dpankins)
