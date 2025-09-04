@@ -1,1 +1,1 @@
-..F....... [ZBX-26440] fixed JMX endpoint field cannot be changed for inherited item and item prototypes (kkuzmina)
+..F....... [ZBX-26440] fixed inability to update JMX endpoint field in item, item prototype and LLD forms (kkuzmina)
