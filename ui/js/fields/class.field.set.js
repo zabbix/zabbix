@@ -51,7 +51,8 @@ class CFieldSet extends CField {
 						.some(node => {
 							const is_field = '[data-field-type]:not([data-temp-field])';
 
-							return node.matches(is_field) || node.querySelector(is_field);
+							return node.nodeType == Node.ELEMENT_NODE
+								&& (node.matches(is_field) || node.querySelector(is_field));
 						});
 
 					if (node_change) {
