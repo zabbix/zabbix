@@ -161,7 +161,7 @@ foreach ($data['host_prototypes'] as $host_prototype) {
 		$host_templates,
 		$status_toggle->addClass(itemIndicatorStyle($host_prototype['status'])),
 		$discover_toggle->addClass($no_discover ? ZBX_STYLE_RED : ZBX_STYLE_GREEN),
-		(new CDiv($data['tags'][$hostPrototype['hostid']]))->addClass(ZBX_STYLE_TAGS_WRAPPER)
+		(new CDiv($data['tags'][$host_prototype['hostid']]))->addClass(ZBX_STYLE_TAGS_WRAPPER)
 	]);
 }
 
