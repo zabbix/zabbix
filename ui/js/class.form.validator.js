@@ -512,6 +512,7 @@ class CFormValidator {
 	 */
 	#validateApiExists(validations) {
 		const url = new URL('zabbix.php', location.href);
+
 		url.searchParams.set('action', 'validate.api.exists');
 
 		return fetch(url.href, {
