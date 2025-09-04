@@ -170,6 +170,8 @@ ZBX_THREAD_ENTRY(trigger_housekeeper_thread, args)
 				trigger_housekeeper_args_in->config_problemhousekeeping_frequency);
 	}
 
+	zbx_ipc_async_socket_close(&rtc);
+
 	zbx_db_close();
 
 	zbx_setproctitle("%s #%d [terminated]", get_process_type_string(process_type), process_num);

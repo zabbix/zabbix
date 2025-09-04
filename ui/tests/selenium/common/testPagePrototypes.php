@@ -47,6 +47,8 @@ class testPagePrototypes extends CWebTest {
 	 */
 	public $tag;
 
+	const PROTOTYPE_WITH_PROTOTYPES = 'LLD prototype with its own prototypes';
+
 	/**
 	 * Layouts of prototype pages.
 	 */
@@ -89,6 +91,18 @@ class testPagePrototypes extends CWebTest {
 				'Mass update' => false,
 				'Delete' => false,
 				'Create trigger prototype' => true
+			]
+		],
+		'discovery' => [
+			'headers' => ['', 'Name', 'Items', 'Triggers', 'Graphs', 'Hosts', 'Discovery rules', 'Key', 'Interval',
+					'Type', 'Create enabled', 'Discover'
+			],
+			'clickable_headers' => ['Name', 'Key', 'Interval', 'Type', 'Create enabled', 'Discover'],
+			'buttons' => [
+				'Create enabled' => false,
+				'Create disabled' => false,
+				'Delete' => false,
+				'Create discovery prototype' => true
 			]
 		]
 	];
@@ -192,10 +206,40 @@ class testPagePrototypes extends CWebTest {
 				);
 				$this->assertTrue($trigger_row->getColumn('Expression')->isClickable());
 				break;
+
+			case 'discovery':
+				// Check the count of each type of prototypes under the LLD prototype.
+				$row = $table->findRow('Name', self::PROTOTYPE_WITH_PROTOTYPES);
+
+				$prototype_columns = [
+					'Items' => 'Item prototypes 3',
+					'Triggers' => 'Trigger prototypes 4',
+					'Graphs' => 'Graph prototypes 2',
+					'Hosts' => 'Host prototypes 1',
+					'Discovery rules' => 'Discovery prototypes 1',
+					'Key' => 'with_prototypes[{#KEY}]',
+					'Interval' => '',
+					'Type' => 'Nested',
+					'Create enabled' => 'Yes',
+					'Discover' => 'Yes'
+				];
+
+				foreach ($prototype_columns as $table_column => $column_text) {
+					$column_value = $row->getColumn($table_column);
+					$this->assertEquals($column_text, $column_value->getText());
+
+					if (in_array($table_column, ['Key', 'Interval', 'Type'])) {
+						$this->assertFalse($column_value->query('tag:a')->one(false)->isValid());
+					}
+					else {
+						$this->assertTrue($column_value->query('tag:a')->one()->isValid());
+					}
+				}
+				break;
 		}
 
-		// Check tags (Graph prototypes doesn't have any tags).
-		if ($this->source !== 'graph') {
+		// Check tags (Graph prototypes and Discovery prototypes do not have tags).
+		if (!in_array($this->source, ['graph', 'discovery'])) {
 			$tags = $table->findRow('Name', $this->tag)->getColumn('Tags')->query('class:tag')->all();
 			$this->assertEquals(['name_1: value_1', 'name_2: value_2'], $tags->asText());
 
@@ -496,6 +540,110 @@ class testPagePrototypes extends CWebTest {
 	}
 
 	/**
+	 * Discovery prototype sorting.
+	 */
+	public static function getDiscoveryPrototypesSortingData() {
+		return [
+			// #0 Sort by Name column.
+			[
+				[
+					'sort_by' => 'Name',
+					'sort' => 'name',
+					'result' => [
+						'4 Disabled LLD prototype with Discover set to No',
+						'Master item prototype: {#KEY}: 12a2 Dependent LLD prototype',
+						'123 Disabled LLD prototype with interval',
+						'LLD prototype with its own prototypes',
+						'The LLD prototype with Discover set to No',
+						'Linked template for LLD prototypes test: {#KEY} inherited LLD prototype',
+						'🙃 良い一日を zēma līmeņa atklājuma prototips'
+					]
+				]
+			],
+			// #1 Sort by Key column.
+			[
+				[
+					'sort_by' => 'Key',
+					'sort' => 'key_',
+					'result' => [
+						'4_disabled_with_no_discover[{#KEY}]',
+						'12a2_dependent[{#KEY}]',
+						'123_disabled_with_interval[{#KEY}]',
+						'inherited_prototype[{#KEY}]',
+						'the.symbols.key[{#KEY}]',
+						'the_disabled_prototype_with[{#KEY}]',
+						'with_prototypes[{#KEY}]'
+					]
+				]
+			],
+			// #2 Sort by Interval column.
+			[
+				[
+					'sort_by' => 'Interval',
+					'sort' => 'delay',
+					'result' => [
+						'',
+						'',
+						'5s',
+						'333s',
+						'20m',
+						'59m',
+						'1h'
+					]
+				]
+			],
+			// #3 Sort by Type column.
+			[
+				[
+					'sort_by' => 'Type',
+					'sort' => 'type',
+					'result' => [
+						'Zabbix agent',
+						'Simple check',
+						'Zabbix internal',
+						'Zabbix agent (active)',
+						'Dependent item',
+						'Script',
+						'Nested'
+					]
+				]
+			],
+			// #4 Sort by Create enabled column.
+			[
+				[
+					'sort_by' => 'Create enabled',
+					'sort' => 'status',
+					'result' => [
+						'Yes',
+						'Yes',
+						'Yes',
+						'Yes',
+						'Yes',
+						'No',
+						'No'
+					]
+				]
+			],
+			// #5 Sort by Discover column.
+			[
+				[
+					'sort_by' => 'Discover',
+					'sort' => 'discover',
+					'result' => [
+						'Yes',
+						'Yes',
+						'Yes',
+						'Yes',
+						'Yes',
+						'No',
+						'No'
+					]
+				]
+			]
+		];
+	}
+
+	/**
 	 * Check available sorting on prototype page.
 	 *
 	 * @param array $data		data from data provider
@@ -776,6 +924,92 @@ class testPagePrototypes extends CWebTest {
 	}
 
 	/**
+	 * Discovery prototype create enabled/disabled by link and button.
+	 */
+	public static function getDiscoveryPrototypesButtonLinkData() {
+		return [
+			// #0 Click on Create disabled button.
+			[
+				[
+					'name' => 'LLD prototype with its own prototypes',
+					'button' => 'Create disabled',
+					'column_check' => 'Create enabled',
+					'before' => 'Yes',
+					'after' => 'No',
+					'message' => 'Discovery prototype disabled'
+				]
+			],
+			// #1 Click on Create enabled button.
+			[
+				[
+					'name' => '123 Disabled LLD prototype with interval',
+					'button' => 'Create enabled',
+					'column_check' => 'Create enabled',
+					'before' => 'No',
+					'after' => 'Yes',
+					'message' => 'Discovery prototype enabled'
+				]
+			],
+			// #2 Enabled clicking on link in Create enabled column.
+			[
+				[
+					'name' => '4 Disabled LLD prototype with Discover set to No',
+					'column_check' => 'Create enabled',
+					'before' => 'No',
+					'after' => 'Yes',
+					'message' => 'Discovery prototype enabled'
+				]
+			],
+			// #3 Disabled clicking on link in Create enabled column.
+			[
+				[
+					'name' => 'The LLD prototype with Discover set to No',
+					'column_check' => 'Create enabled',
+					'before' => 'Yes',
+					'after' => 'No',
+					'message' => 'Discovery prototype disabled'
+				]
+			],
+			// #4 Enable discovering clicking on link in Discover column.
+			[
+				[
+					'name' => '4 Disabled LLD prototype with Discover set to No',
+					'column_check' => 'Discover',
+					'before' => 'No',
+					'after' => 'Yes'
+				]
+			],
+			// #5 Disable discovering clicking on link in Discover column.
+			[
+				[
+					'name' => 'LLD prototype with its own prototypes',
+					'column_check' => 'Discover',
+					'before' => 'Yes',
+					'after' => 'No'
+				]
+			],
+			// #6 Enable all host prototypes clicking on Create enabled button.
+			[
+				[
+					'button' => 'Create enabled',
+					'column_check' => 'Create enabled',
+					'after' => ['Yes', 'Yes', 'Yes', 'Yes', 'Yes', 'Yes', 'Yes'],
+					'message' => 'Discovery prototypes enabled'
+				]
+			],
+			// #7 Disable all host prototypes clicking on Create disabled button.
+			[
+				[
+					'button' => 'Create disabled',
+					'column_check' => 'Create enabled',
+					'after' => ['No', 'No', 'No', 'No', 'No', 'No', 'No'],
+					'message' => 'Discovery prototypes disabled'
+				]
+			]
+		];
+	}
+
+	/**
 	 * Check Create enabled/disabled buttons and links from Create enabled and Discover columns.
 	 *
 	 * @param array $data		data from data provider
@@ -804,13 +1038,20 @@ class testPagePrototypes extends CWebTest {
 			$this->page->waitUntilReady();
 		}
 
+		if (array_key_exists('message', $data)) {
+			$message = $data['message'];
+		}
+		else {
+			$message = ucfirst($this->source).((array_key_exists('name', $data)) ? ' prototype updated' : ' prototypes updated');
+		}
+
+		$this->assertMessage(TEST_GOOD, $message);
+
 		// Check column value for one or for all prototypes.
 		if (array_key_exists('name', $data)) {
-			$this->assertMessage(TEST_GOOD, ucfirst($this->source).' prototype updated');
 			$this->assertEquals($data['after'], $row->getColumn($data['column_check'])->getText());
 		}
 		else {
-			$this->assertMessage(TEST_GOOD, ucfirst($this->source).' prototypes updated');
 			$this->assertTableDataColumn($data['after'], $data['column_check']);
 		}
 	}
@@ -944,12 +1185,68 @@ class testPagePrototypes extends CWebTest {
 	}
 
 	/**
+	 * Discovery prototype delete.
+	 */
+	public static function getDiscoveryPrototypesDeleteData() {
+		return [
+			// #0 Attempt to delete an inherited LLD prototype.
+			[
+				[
+					'expected' => TEST_BAD,
+					'name' => [
+						'Linked template for LLD prototypes test: {#KEY} inherited LLD prototype'
+					],
+					'error_title' => 'Cannot delete discovery prototype',
+					'error' => 'Invalid parameter "/1": cannot delete inherited LLD rule prototype.'
+				]
+			],
+			// #1 Attempt to delete multiple LLD prototypes including inherited LLD prototype.
+			[
+				[
+					'expected' => TEST_BAD,
+					'name' => [
+						'LLD prototype with its own prototypes',
+						'Linked template for LLD prototypes test: {#KEY} inherited LLD prototype'
+					],
+					'error_title' => 'Cannot delete discovery prototypes',
+					'error' => 'Invalid parameter "/1": cannot delete inherited LLD rule prototype.'
+				]
+			],
+			// #2 Cancel delete.
+			[
+				[
+					'name' => ['123 Disabled LLD prototype with interval'],
+					'cancel' => true
+				]
+			],
+			// #3 Delete one.
+			[
+				[
+					'name' => ['The LLD prototype with Discover set to No'],
+					'message' => 'Discovery prototype deleted'
+				]
+			],
+			// #4 Delete more than 1.
+			[
+				[
+					'name' => [
+						'Master item prototype: {#KEY}: 12a2 Dependent LLD prototype',
+						'🙃 良い一日を zēma līmeņa atklājuma prototips'
+					],
+					'message' => 'Discovery prototypes deleted'
+				]
+			]
+		];
+	}
+
+	/**
 	 * Check Delete scenarios.
 	 *
 	 * @param array $data    data provider
 	 * @param array $ids     ID's of deleted entity
 	 */
 	public function checkDelete($data, $ids) {
+		$expected = CTestArrayHelper::get($data, 'expected', TEST_GOOD);
 		// Check that prototype exists and displayed in prototype table.
 		$prototype_names = $this->getTableColumnData('Name');
 		foreach ($data['name'] as $name) {
@@ -967,6 +1264,16 @@ class testPagePrototypes extends CWebTest {
 				$this->assertTrue(in_array($name, $prototype_names));
 			}
 		}
+		elseif ($expected === TEST_BAD) {
+			$this->page->acceptAlert();
+			$this->page->waitUntilReady();
+			$this->assertMessage(TEST_BAD, $data['error_title'], $data['error']);
+
+			// Check that prototype still exist and displayed in prototype table.
+			foreach ($data['name'] as $name) {
+				$this->assertTrue(in_array($name, $prototype_names));
+			}
+		}
 		else {
 			$this->page->acceptAlert();
 			$this->page->waitUntilReady();
@@ -978,11 +1285,13 @@ class testPagePrototypes extends CWebTest {
 			}
 		}
 
-		$count = (array_key_exists('cancel', $data)) ? 1 : 0;
+		$count = (array_key_exists('cancel', $data) || $expected === TEST_BAD) ? 1 : 0;
 
 		// Check prototype in DB.
+		$entity_type = ($this->source === 'discovery') ? 'item' : $this->source;
+
 		foreach ($ids as $id) {
-			$this->assertEquals($count, CDBHelper::getCount('SELECT null FROM '.$this->source.'s WHERE '.$this->source.'id='.
+			$this->assertEquals($count, CDBHelper::getCount('SELECT null FROM '.$entity_type.'s WHERE '.$entity_type.'id='.
 					zbx_dbstr($id))
 			);
 		}

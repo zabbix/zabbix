@@ -471,6 +471,7 @@ unsigned int	zbx_tls_get_psk_usage(void);
 #define ZBX_REDIRECT_ADDRESS_LEN	255
 #define ZBX_REDIRECT_ADDRESS_LEN_MAX	(ZBX_REDIRECT_ADDRESS_LEN + 1)
 
+#define ZBX_REDIRECT_FAIL		-1
 #define ZBX_REDIRECT_NONE		0
 #define ZBX_REDIRECT_RESET		1
 #define ZBX_REDIRECT_RETRY		2

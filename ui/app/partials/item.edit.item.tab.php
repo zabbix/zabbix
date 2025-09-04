@@ -846,7 +846,9 @@ $formgrid
 	->addItem([
 		(new CLabel(_('Allowed hosts'), 'trapper_hosts'))->setId('js-item-trapper-hosts-label'),
 		(new CFormField(
-			(new CTextBox('trapper_hosts', $item['trapper_hosts'], false, DB::getFieldLength('items', 'trapper_hosts')))
+			(new CTextBox('trapper_hosts', $item['trapper_hosts'], $item['discovered'],
+				DB::getFieldLength('items', 'trapper_hosts')
+			))
 				->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 		))->setId('js-item-trapper-hosts-field')
 	]);

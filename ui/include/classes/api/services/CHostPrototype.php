@@ -2572,12 +2572,7 @@ class CHostPrototype extends CHostBase {
 		self::deleteDiscoveredHostPrototypes($hostids);
 		self::deleteDiscoveredHosts($hostids);
 
-		DB::delete('interface', ['hostid' => $hostids]);
-		DB::delete('hosts_templates', ['hostid' => $hostids]);
 		DB::delete('host_tag', ['hostid' => $hostids]);
-		DB::delete('hostmacro', ['hostid' => $hostids]);
-		DB::delete('host_inventory', ['hostid' => $hostids]);
-		DB::delete('host_discovery', ['hostid' => $hostids]);
 		DB::update('hosts', [
 			'values' => ['templateid' => 0],
 			'where' => ['hostid' => $hostids]

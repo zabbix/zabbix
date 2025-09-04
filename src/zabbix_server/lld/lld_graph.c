@@ -251,22 +251,42 @@ static void	lld_graphs_free(zbx_vector_lld_graph_ptr_t *graphs)
 static void	lld_graphs_get(zbx_uint64_t parent_graphid, zbx_vector_lld_graph_ptr_t *graphs, int width, int height,
 		double yaxismin, double yaxismax, unsigned char show_work_period, unsigned char show_triggers,
 		unsigned char graphtype, unsigned char show_legend, unsigned char show_3d, double percent_left,
-		double percent_right, unsigned char ymin_type, unsigned char ymax_type, unsigned char discover)
+		double percent_right, unsigned char ymin_type, unsigned char ymax_type, unsigned char discover,
+		const zbx_vector_uint64_t *ruleids)
 {
 	zbx_db_result_t	result;
 	zbx_db_row_t	row;
+	char		*sql = NULL;
+	size_t		sql_alloc = 0, sql_offset = 0;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
-	result = zbx_db_select(
-			"select g.graphid,g.name,g.width,g.height,g.yaxismin,g.yaxismax,g.show_work_period,"
-				"g.show_triggers,g.graphtype,g.show_legend,g.show_3d,g.percent_left,g.percent_right,"
-				"g.ymin_type,g.ymin_itemid,g.ymax_type,g.ymax_itemid,gd.lastcheck,gd.status,"
-				"gd.ts_delete,g.discover"
-			" from graphs g,graph_discovery gd"
-			" where g.graphid=gd.graphid"
-				" and gd.parent_graphid=" ZBX_FS_UI64,
-			parent_graphid);
+	zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
+		"select g.graphid,g.name,g.width,g.height,g.yaxismin,g.yaxismax,g.show_work_period,"
+			"g.show_triggers,g.graphtype,g.show_legend,g.show_3d,g.percent_left,g.percent_right,"
+			"g.ymin_type,g.ymin_itemid,g.ymax_type,g.ymax_itemid,gd.lastcheck,gd.status,"
+			"gd.ts_delete,g.discover"
+		" from graphs g,graph_discovery gd"
+		" where g.graphid=gd.graphid"
+			" and gd.parent_graphid=" ZBX_FS_UI64,
+		parent_graphid);
+
+	if (NULL != ruleids)
+	{
+		zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, " and exists"
+				" (select null from graphs_items gi,item_discovery id"
+				" where g.graphid=gi.graphid"
+					" and gi.itemid=id.itemid"
+					" and");
+
+		zbx_db_add_condition_alloc(&sql, &sql_alloc, &sql_offset, "id.lldruleid", ruleids->values,
+				ruleids->values_num);
+
+		zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, ")");
+	}
+
+	result = zbx_db_select("%s", sql);
+	zbx_free(sql);
 
 	while (NULL != (row = zbx_db_fetch(result)))
 	{
@@ -1619,7 +1639,8 @@ static void	lld_process_lost_graphs(zbx_vector_lld_graph_ptr_t *graphs, const zb
  *                                                                            *
  ******************************************************************************/
 int	lld_update_graphs(zbx_uint64_t hostid, zbx_uint64_t lld_ruleid, const zbx_vector_lld_row_ptr_t *lld_rows,
-		char **error, const zbx_lld_lifetime_t *lifetime, int lastcheck, int dflags)
+		char **error, const zbx_lld_lifetime_t *lifetime, int lastcheck, int dflags,
+		const zbx_vector_uint64_t *ruleids)
 {
 	int				ret = SUCCEED;
 	zbx_db_result_t			result;
@@ -1639,10 +1660,9 @@ int	lld_update_graphs(zbx_uint64_t hostid, zbx_uint64_t lld_ruleid, const zbx_ve
 			"select distinct g.graphid,g.name,g.width,g.height,g.yaxismin,g.yaxismax,g.show_work_period,"
 				"g.show_triggers,g.graphtype,g.show_legend,g.show_3d,g.percent_left,g.percent_right,"
 				"g.ymin_type,g.ymin_itemid,g.ymax_type,g.ymax_itemid,g.discover"
-			" from graphs g,graphs_items gi,items i,item_discovery id"
+			" from graphs g,graphs_items gi,item_discovery id"
 			" where g.graphid=gi.graphid"
-				" and gi.itemid=i.itemid"
-				" and i.itemid=id.itemid"
+				" and gi.itemid=id.itemid"
 				" and id.lldruleid=" ZBX_FS_UI64,
 			lld_ruleid);
 
@@ -1676,7 +1696,7 @@ int	lld_update_graphs(zbx_uint64_t hostid, zbx_uint64_t lld_ruleid, const zbx_ve
 
 		lld_graphs_get(parent_graphid, &graphs, width, height, yaxismin, yaxismax, show_work_period,
 				show_triggers, graphtype, show_legend, show_3d, percent_left, percent_right,
-				ymin_type, ymax_type, discover_proto);
+				ymin_type, ymax_type, discover_proto, ruleids);
 
 		lld_gitems_get(parent_graphid, &gitems_proto, &graphs);
 

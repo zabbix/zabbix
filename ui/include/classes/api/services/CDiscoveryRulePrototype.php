@@ -1255,14 +1255,8 @@ class CDiscoveryRulePrototype extends CDiscoveryRuleGeneral {
 		self::deleteAffectedLldRulePrototypes($db_items);
 		self::deleteDiscoveredLldRulePrototypes($db_items);
 		self::deleteDiscoveredLldRules($del_itemids);
-		self::deleteAffectedOverrides($del_itemids);
 
-		DB::delete('item_parameter', ['itemid' => $del_itemids]);
 		DB::delete('item_preproc', ['itemid' => $del_itemids]);
-		DB::delete('lld_macro_export', ['itemid' => $del_itemids]);
-		DB::delete('lld_macro_path', ['itemid' => $del_itemids]);
-		DB::delete('item_condition', ['itemid' => $del_itemids]);
-		DB::delete('item_discovery', ['itemid' => $del_itemids]);
 		DB::update('items', [
 			'values' => ['templateid' => 0],
 			'where' => ['itemid' => $del_itemids]

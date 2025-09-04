@@ -79,6 +79,10 @@ typedef struct
 	zbx_uint64_t	mediaid;
 	zbx_uint64_t	mediatypeid;
 	char		*sendto;
+
+	/* cached data */
+	int		mediatype_type;
+	char		*mediatype_params;
 }
 zbx_am_media_t;
 

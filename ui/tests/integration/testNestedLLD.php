@@ -1675,6 +1675,9 @@ class testNestedLLD extends CIntegrationTest{
 			$db = $dbs[$i];
 			$host = $response['result'][$i];
 
+			// Sort items on host by 'key_'
+			usort($host['items'], static fn(array $a, array $b): int => strnatcasecmp($a['key_'], $b['key_']));
+
 			$expected_hostname = 'Host for database ' . $db;
 			$this->assertEquals($expected_hostname, $host['host']);
 
@@ -1697,7 +1700,7 @@ class testNestedLLD extends CIntegrationTest{
 				]
 			];
 
-			$this->assertEquals($expected_items, $host['items']);
+			$this->assertEqualsCanonicalizing($expected_items, $host['items']);
 		}
 	}
 

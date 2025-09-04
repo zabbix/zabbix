@@ -21,6 +21,7 @@ require_once __DIR__.'/../../include/CLegacyWebTest.php';
  * @backup users
  */
 class testUrlUserPermissions extends CLegacyWebTest {
+
 	public function prepareUserData() {
 		CDataHelper::call('user.create', [
 			[
@@ -28,6 +29,27 @@ class testUrlUserPermissions extends CLegacyWebTest {
 				'passwd' => 'zabbix12345',
 				'roleid' => USER_TYPE_ZABBIX_ADMIN,
 				'usrgrps' => [['usrgrpid' => 7]] // Zabbix administrators.
+			],
+			// Add new admin user without any group
+			[
+				'username' => 'admin-no-group',
+				'passwd' => 'zabbix12345',
+				'roleid' => USER_TYPE_ZABBIX_ADMIN,
+				'usrgrps' => [] // No user group
+			],
+			// Add new super admin user without any group
+			[
+				'username' => 'super-no-group',
+				'passwd' => 'zabbix12345',
+				'roleid' => USER_TYPE_SUPER_ADMIN,
+				'usrgrps' => [] // No user group
+			],
+			// Add new user without any group
+			[
+				'username' => 'user-no-group',
+				'passwd' => 'zabbix12345',
+				'roleid' => USER_TYPE_ZABBIX_USER,
+				'usrgrps' => [] // No user group
 			]
 		]);
 	}
@@ -45,7 +67,7 @@ class testUrlUserPermissions extends CLegacyWebTest {
 
 	public static function data() {
 		return [
-			// #0 Monitoring.
+			// #0 Dashboards.
 			[[
 				'url' => 'zabbix.php?action=dashboard.view',
 				'title' =>	'Dashboard',
@@ -53,10 +75,23 @@ class testUrlUserPermissions extends CLegacyWebTest {
 				'users' => [
 					'guest' => true,
 					'user-zabbix' => true,
-					'test-admin' => true
+					'test-admin' => true,
+					'admin-no-group' => true,
+					'user-no-group' => true
 				]
 			]],
-			// #1.
+			// #1 Super admin has access to more dashboards than other users, so the default opened
+			// dashboard differs for this user. To ensure the default dashboard check for other users,
+			// the super admin check is moved to a separate case with the dashboardid hardcoded in the URL.
+			[[
+				'url' => 'zabbix.php?action=dashboard.view&dashboardid=1',
+				'title' =>	'Dashboard',
+				'header' =>	'Global view',
+				'users' => [
+					'super-no-group' => true
+				]
+			]],
+			// #2. Monitoring
 			[[
 				'url' => 'zabbix.php?action=problem.view',
 				'title' =>	'Problems',
@@ -64,10 +99,13 @@ class testUrlUserPermissions extends CLegacyWebTest {
 				'users' => [
 					'guest' => true,
 					'user-zabbix' => true,
-					'test-admin' => true
+					'test-admin' => true,
+					'admin-no-group' => true,
+					'super-no-group' => true,
+					'user-no-group' => true
 				]
 			]],
-			// #2.
+			// #3.
 			[[
 				'url' => 'zabbix.php?action=web.view',
 				'title' =>	'Web monitoring',
@@ -75,10 +113,13 @@ class testUrlUserPermissions extends CLegacyWebTest {
 				'users' => [
 					'guest' => true,
 					'user-zabbix' => true,
-					'test-admin' => true
+					'test-admin' => true,
+					'admin-no-group' => true,
+					'super-no-group' => true,
+					'user-no-group' => true
 				]
 			]],
-			// #3.
+			// #4.
 			[[
 				'url' => 'httpdetails.php?httptestid=94',
 				'title' =>	'Details of web scenario',
@@ -86,10 +127,13 @@ class testUrlUserPermissions extends CLegacyWebTest {
 				'users' => [
 					'guest' => true,
 					'user-zabbix' => true,
-					'test-admin' => true
+					'test-admin' => true,
+					'admin-no-group' => true,
+					'super-no-group' => true,
+					'user-no-group' => true
 				]
 			]],
-			// #4.
+			// #5.
 			[[
 				'url' => 'zabbix.php?action=latest.view',
 				'title' =>	'Latest data',
@@ -97,10 +141,13 @@ class testUrlUserPermissions extends CLegacyWebTest {
 				'users' => [
 					'guest' => true,
 					'user-zabbix' => true,
-					'test-admin' => true
+					'test-admin' => true,
+					'admin-no-group' => true,
+					'super-no-group' => true,
+					'user-no-group' => true
 				]
 			]],
-			// #5.
+			// #6.
 			[[
 				'url' => 'history.php?action=showgraph&itemids[]=23296',
 				'title' =>	'History [refreshed every 30 sec.]',
@@ -108,10 +155,13 @@ class testUrlUserPermissions extends CLegacyWebTest {
 				'users' => [
 					'guest' => true,
 					'user-zabbix' => true,
-					'test-admin' => true
+					'test-admin' => true,
+					'admin-no-group' => true,
+					'super-no-group' => true,
+					'user-no-group' => true
 				]
 			]],
-			// #6.
+			// #7.
 			[[
 				'url' => 'zabbix.php?action=charts.view',
 				'title' =>	'Custom graphs',
@@ -119,21 +169,27 @@ class testUrlUserPermissions extends CLegacyWebTest {
 				'users' => [
 					'guest' => true,
 					'user-zabbix' => true,
-					'test-admin' => true
-				]
-			]],
-			// #7.
-			[[
-				'url' => 'zabbix.php?action=charts.view&filter_hostids%5B0%5D=10084&filter_show=1&filter_set=1',
-				'title' =>	'Custom graphs',
-				'no_permissions_to_object' => true,
-				'users' => [
-					'guest' => true,
-					'user-zabbix' => true,
-					'test-admin' => true
+					'test-admin' => true,
+					'admin-no-group' => true,
+					'super-no-group' => true,
+					'user-no-group' => true
 				]
 			]],
 			// #8.
+			[[
+				'url' => 'zabbix.php?action=charts.view&filter_hostids%5B0%5D=10084&filter_show=1&filter_set=1',
+				'title' =>	'Custom graphs',
+				'header' => 'Graphs',
+				'users' => [
+					'guest' => true,
+					'user-zabbix' => true,
+					'test-admin' => true,
+					'admin-no-group' => true,
+					'super-no-group' => true,
+					'user-no-group' => true
+				]
+			]],
+			// #9.
 			[[
 				'url' => 'zabbix.php?action=map.view',
 				'title' =>	'Configuration of network maps',
@@ -141,10 +197,13 @@ class testUrlUserPermissions extends CLegacyWebTest {
 				'users' => [
 					'guest' => true,
 					'user-zabbix' => true,
-					'test-admin' => true
+					'test-admin' => true,
+					'admin-no-group' => true,
+					'super-no-group' => true,
+					'user-no-group' => true
 				]
 			]],
-			// #9.
+			// #10.
 			[[
 				'url' => 'sysmaps.php',
 				'title' =>	'Configuration of network maps',
@@ -152,19 +211,27 @@ class testUrlUserPermissions extends CLegacyWebTest {
 				'users' => [
 					'guest' => true,
 					'user-zabbix' => true,
-					'test-admin' => true
-				]
-			]],
-			// #10.
-			[[
-				'url' => 'zabbix.php?action=map.view&sysmapid=1',
-				'users' => [
-					'guest' => false,
-					'user-zabbix' => false,
-					'test-admin' => false
+					'test-admin' => true,
+					'admin-no-group' => true,
+					'super-no-group' => true,
+					'user-no-group' => true
 				]
 			]],
 			// #11.
+			[[
+				'url' => 'zabbix.php?action=map.view&sysmapid=1',
+				'title' => 'Network maps',
+				'header' => 'Maps',
+				'users' => [
+					'guest' => false,
+					'user-zabbix' => false,
+					'test-admin' => false,
+					'admin-no-group' => false,
+					'super-no-group' => true,
+					'user-no-group' => false
+				]
+			]],
+			// #12.
 			[[
 				'url' => 'zabbix.php?action=discovery.view',
 				'title' =>	'Status of discovery',
@@ -172,10 +239,13 @@ class testUrlUserPermissions extends CLegacyWebTest {
 				'users' => [
 					'guest' => false,
 					'user-zabbix' => false,
-					'test-admin' => true
+					'test-admin' => true,
+					'admin-no-group' => true,
+					'super-no-group' => true,
+					'user-no-group' => false
 				]
 			]],
-			// #12.
+			// #13. Services
 			[[
 				'url' => 'zabbix.php?action=service.list',
 				'title' =>	'Services',
@@ -183,10 +253,13 @@ class testUrlUserPermissions extends CLegacyWebTest {
 				'users' => [
 					'guest' => true,
 					'user-zabbix' => true,
-					'test-admin' => true
+					'test-admin' => true,
+					'admin-no-group' => true,
+					'super-no-group' => true,
+					'user-no-group' => true
 				]
 			]],
-			// #13 Inventory.
+			// #14 Inventory.
 			[[
 				'url' => 'hostinventoriesoverview.php',
 				'title' =>	'Host inventory overview',
@@ -194,10 +267,13 @@ class testUrlUserPermissions extends CLegacyWebTest {
 				'users' => [
 					'guest' => true,
 					'user-zabbix' => true,
-					'test-admin' => true
+					'test-admin' => true,
+					'admin-no-group' => true,
+					'super-no-group' => true,
+					'user-no-group' => true
 				]
 			]],
-			// #14.
+			// #15.
 			[[
 				'url' => 'hostinventories.php',
 				'title' =>	'Host inventory',
@@ -205,20 +281,27 @@ class testUrlUserPermissions extends CLegacyWebTest {
 				'users' => [
 					'guest' => true,
 					'user-zabbix' => true,
-					'test-admin' => true
+					'test-admin' => true,
+					'admin-no-group' => true,
+					'super-no-group' => true,
+					'user-no-group' => true
 				]
 			]],
-			// #15 Reports.
+			// #16 Reports.
 			[[
 				'url' => 'zabbix.php?action=report.status',
 				'title' =>	'System information',
+				'header' => 'System information',
 				'users' => [
 					'guest' => false,
 					'user-zabbix' => false,
-					'test-admin' => false
+					'test-admin' => false,
+					'admin-no-group' => false,
+					'super-no-group' => true,
+					'user-no-group' => false
 				]
 			]],
-			// #16.
+			// #17.
 			[[
 				'url' => 'zabbix.php?action=availabilityreport.list',
 				'title' =>	'Availability report',
@@ -226,10 +309,13 @@ class testUrlUserPermissions extends CLegacyWebTest {
 				'users' => [
 					'guest' => true,
 					'user-zabbix' => true,
-					'test-admin' => true
+					'test-admin' => true,
+					'admin-no-group' => true,
+					'super-no-group' => true,
+					'user-no-group' => true
 				]
 			]],
-			// #17.
+			// #18.
 			[[
 				'url' => 'zabbix.php?action=toptriggers.list',
 				'title' =>	'Top 100 triggers',
@@ -237,30 +323,41 @@ class testUrlUserPermissions extends CLegacyWebTest {
 				'users' => [
 					'guest' => true,
 					'user-zabbix' => true,
-					'test-admin' => true
-				]
-			]],
-			// #18.
-			[[
-				'url' => 'zabbix.php?action=auditlog.list',
-				'title' =>	'Audit log',
-				'users' => [
-					'guest' => false,
-					'user-zabbix' => false,
-					'test-admin' => false
+					'test-admin' => true,
+					'admin-no-group' => true,
+					'super-no-group' => true,
+					'user-no-group' => true
 				]
 			]],
 			// #19.
 			[[
-				'url' => 'zabbix.php?action=actionlog.list',
-				'title' =>	'Action log',
+				'url' => 'zabbix.php?action=auditlog.list',
+				'title' =>	'Audit log',
+				'header' =>	'Audit log',
 				'users' => [
 					'guest' => false,
 					'user-zabbix' => false,
-					'test-admin' => false
+					'test-admin' => false,
+					'admin-no-group' => false,
+					'super-no-group' => true,
+					'user-no-group' => false
 				]
 			]],
 			// #20.
+			[[
+				'url' => 'zabbix.php?action=actionlog.list',
+				'title' =>	'Action log',
+				'header' =>	'Action log',
+				'users' => [
+					'guest' => false,
+					'user-zabbix' => false,
+					'test-admin' => false,
+					'admin-no-group' => false,
+					'super-no-group' => true,
+					'user-no-group' => false
+				]
+			]],
+			// #21.
 			[[
 				'url' => 'report4.php',
 				'title' =>	'Notification report',
@@ -268,10 +365,13 @@ class testUrlUserPermissions extends CLegacyWebTest {
 				'users' => [
 					'guest' => false,
 					'user-zabbix' => false,
-					'test-admin' => true
+					'test-admin' => true,
+					'admin-no-group' => true,
+					'super-no-group' => true,
+					'user-no-group' => false
 				]
 			]],
-			// #21 Configuration.
+			// #22 Configuration.
 			[[
 				'url' => 'zabbix.php?action=hostgroup.list',
 				'title' => 'Configuration of host groups',
@@ -279,22 +379,41 @@ class testUrlUserPermissions extends CLegacyWebTest {
 				'users' => [
 					'guest' => false,
 					'user-zabbix' => false,
-					'test-admin' => true
+					'test-admin' => true,
+					'admin-no-group' => true,
+					'super-no-group' => true,
+					'user-no-group' => false
 				]
 			]],
-			// #22.
+			// #23.
 			[[
 				'url' => 'zabbix.php?action=popup&popup=hostgroup.edit&groupid=4',
-				'title' => 'Configuration of host groups',
+				'title' => 'Host group edit',
+				'header' => 'Host group',
 				'users' => [
 					'guest' => false,
 					'user-zabbix' => false,
-					'test-admin' => false
+					'test-admin' => false,
+					'admin-no-group' => false,
+					'super-no-group' => true,
+					'user-no-group' => false
 				]
 			]],
-			/* #23. TODO: In this test we getting expected Access denied message, but test fails with
-			 * Uncaught TypeError: Cannot read properties of null (reading 'addEventListener') error
-			 * Need to fix ZBX-25755
+			// #24. Admin users should be uncommented after the bugfix: https://support.zabbix.com/browse/ZBX-26649
+			[[
+				'url' => 'zabbix.php?action=popup&popup=hostgroup.edit&groupid=0',
+				'title' => 'Host group edit',
+				'header' => 'New host group',
+				'users' => [
+					'guest' => false,
+					'user-zabbix' => false,
+					//'test-admin' => false,
+					//'admin-no-group' => false,
+					'super-no-group' => true,
+					'user-no-group' => false
+				]
+			]],
+			// #25.
 			[[
 				'url' => 'zabbix.php?action=templategroup.list',
 				'title' => 'Configuration of template groups',
@@ -302,21 +421,41 @@ class testUrlUserPermissions extends CLegacyWebTest {
 				'users' => [
 					'guest' => false,
 					'user-zabbix' => false,
-					'test-admin' => true
+					'test-admin' => true,
+					'admin-no-group' => true,
+					'super-no-group' => true,
+					'user-no-group' => false
 				]
 			]],
-			 */
-			// #23.
+			// #26.
 			[[
 				'url' => 'zabbix.php?action=popup&popup=templategroup.edit&groupid=1',
-				'title' => 'Configuration of template groups',
+				'title' => 'Template group edit',
+				'header' => 'Template group',
 				'users' => [
 					'guest' => false,
 					'user-zabbix' => false,
-					'test-admin' => false
+					'test-admin' => false,
+					'admin-no-group' => false,
+					'super-no-group' => true,
+					'user-no-group' => false
 				]
 			]],
-			// #24.
+			// #27. Admin users should be uncommented after the bugfix: https://support.zabbix.com/browse/ZBX-26649
+			[[
+				'url' => 'zabbix.php?action=popup&popup=templategroup.edit&groupid=0',
+				'title' =>	'Template group edit',
+				'header' => 'New template group',
+				'users' => [
+					'guest' => false,
+					'user-zabbix' => false,
+					//'test-admin' => false,
+					//'admin-no-group' => false,
+					'super-no-group' => true,
+					'user-no-group' => false
+				]
+			]],
+			// #28.
 			[[
 				'url' => 'zabbix.php?action=template.list',
 				'title' =>	'Configuration of templates',
@@ -324,10 +463,13 @@ class testUrlUserPermissions extends CLegacyWebTest {
 				'users' => [
 					'guest' => false,
 					'user-zabbix' => false,
-					'test-admin' => true
+					'test-admin' => true,
+					'admin-no-group' => true,
+					'super-no-group' => true,
+					'user-no-group' => false
 				]
 			]],
-			// #25.
+			// #29.
 			[[
 				'url' => self::HOST_LIST_PAGE,
 				'title' =>	'Configuration of hosts',
@@ -335,10 +477,27 @@ class testUrlUserPermissions extends CLegacyWebTest {
 				'users' => [
 					'guest' => false,
 					'user-zabbix' => false,
-					'test-admin' => true
+					'test-admin' => true,
+					'admin-no-group' => true,
+					'super-no-group' => true,
+					'user-no-group' => false
 				]
 			]],
-			// #26.
+			// #30.
+			[[
+				'url' => 'zabbix.php?action=popup&popup=host.edit',
+				'title' =>	'Host edit',
+				'header' => 'New host',
+				'users' => [
+					'guest' => false,
+					'user-zabbix' => false,
+					'test-admin' => true,
+					'admin-no-group' => true,
+					'super-no-group' => true,
+					'user-no-group' => false
+				]
+			]],
+			// #31.
 			[[
 				'url' => 'zabbix.php?action=item.list&context=host',
 				'title' =>	'Configuration of items',
@@ -346,10 +505,13 @@ class testUrlUserPermissions extends CLegacyWebTest {
 				'users' => [
 					'guest' => false,
 					'user-zabbix' => false,
-					'test-admin' => true
+					'test-admin' => true,
+					'admin-no-group' => true,
+					'super-no-group' => true,
+					'user-no-group' => false
 				]
 			]],
-			// #27.
+			// #32.
 			[[
 				'url' => 'zabbix.php?action=trigger.list&context=host',
 				'title' =>	'Configuration of triggers',
@@ -357,10 +519,13 @@ class testUrlUserPermissions extends CLegacyWebTest {
 				'users' => [
 					'guest' => false,
 					'user-zabbix' => false,
-					'test-admin' => true
+					'test-admin' => true,
+					'admin-no-group' => true,
+					'super-no-group' => true,
+					'user-no-group' => false
 				]
 			]],
-			// #28.
+			// #33.
 			[[
 				'url' => 'zabbix.php?action=graph.list&context=host',
 				'title' =>	'Configuration of graphs',
@@ -368,10 +533,13 @@ class testUrlUserPermissions extends CLegacyWebTest {
 				'users' => [
 					'guest' => false,
 					'user-zabbix' => false,
-					'test-admin' => true
+					'test-admin' => true,
+					'admin-no-group' => true,
+					'super-no-group' => true,
+					'user-no-group' => false
 				]
 			]],
-			// #29.
+			// #34.
 			[[
 				'url' => 'host_discovery.php?context=host&hostid=10084',
 				'title' =>	'Configuration of discovery rules',
@@ -379,10 +547,23 @@ class testUrlUserPermissions extends CLegacyWebTest {
 				'users' => [
 					'guest' => false,
 					'user-zabbix' => false,
-					'test-admin' => true
+					'test-admin' => true,
+					'admin-no-group' => true,
+					'user-no-group' => false
 				]
 			]],
-			// #30.
+			// #35. The super admin user was moved to a separate test case because this user has
+			// special permissions that other users don't have.
+			// This user can access the "Discovery rules" section, which regular users can't see.
+			[[
+				'url' => 'host_discovery.php?context=host&hostid=10084',
+				'title' =>	'Configuration of discovery rules',
+				'header' => 'Discovery rules',
+				'users' => [
+					'super-no-group' => true
+				]
+			]],
+			// #36.
 			[[
 				'url' => 'httpconf.php?context=host',
 				'title' =>	'Configuration of web monitoring',
@@ -390,10 +571,13 @@ class testUrlUserPermissions extends CLegacyWebTest {
 				'users' => [
 					'guest' => false,
 					'user-zabbix' => false,
-					'test-admin' => true
+					'test-admin' => true,
+					'admin-no-group' => true,
+					'super-no-group' => true,
+					'user-no-group' => false
 				]
 			]],
-			// #31.
+			// #37.
 			[[
 				'url' => 'zabbix.php?action=maintenance.list',
 				'title' =>	'Configuration of maintenance periods',
@@ -401,10 +585,13 @@ class testUrlUserPermissions extends CLegacyWebTest {
 				'users' => [
 					'guest' => false,
 					'user-zabbix' => false,
-					'test-admin' => true
+					'test-admin' => true,
+					'admin-no-group' => true,
+					'super-no-group' => true,
+					'user-no-group' => false
 				]
 			]],
-			// #32.
+			// #38.
 			[[
 				'url' => 'zabbix.php?action=action.list&eventsource=0',
 				'title' =>	'Configuration of actions',
@@ -412,10 +599,13 @@ class testUrlUserPermissions extends CLegacyWebTest {
 				'users' => [
 					'guest' => false,
 					'user-zabbix' => false,
-					'test-admin' => true
+					'test-admin' => true,
+					'admin-no-group' => true,
+					'super-no-group' => true,
+					'user-no-group' => false
 				]
 			]],
-			// #33.
+			// #39.
 			[[
 				'url' => 'zabbix.php?action=action.list&eventsource=1',
 				'title' =>	'Configuration of actions',
@@ -423,10 +613,13 @@ class testUrlUserPermissions extends CLegacyWebTest {
 				'users' => [
 					'guest' => false,
 					'user-zabbix' => false,
-					'test-admin' => true
+					'test-admin' => true,
+					'admin-no-group' => true,
+					'super-no-group' => true,
+					'user-no-group' => false
 				]
 			]],
-			// #34.
+			// #40.
 			[[
 				'url' => 'zabbix.php?action=action.list&eventsource=2',
 				'title' =>	'Configuration of actions',
@@ -434,10 +627,13 @@ class testUrlUserPermissions extends CLegacyWebTest {
 				'users' => [
 					'guest' => false,
 					'user-zabbix' => false,
-					'test-admin' => true
+					'test-admin' => true,
+					'admin-no-group' => true,
+					'super-no-group' => true,
+					'user-no-group' => false
 				]
 			]],
-			// #35.
+			// #41.
 			[[
 				'url' => 'zabbix.php?action=action.list&eventsource=3',
 				'title' =>	'Configuration of actions',
@@ -445,10 +641,13 @@ class testUrlUserPermissions extends CLegacyWebTest {
 				'users' => [
 					'guest' => false,
 					'user-zabbix' => false,
-					'test-admin' => true
+					'test-admin' => true,
+					'admin-no-group' => true,
+					'super-no-group' => true,
+					'user-no-group' => false
 				]
 			]],
-			// #36.
+			// #42.
 			[[
 				'url' => 'zabbix.php?action=action.list&eventsource=4',
 				'title' =>	'Configuration of actions',
@@ -456,10 +655,13 @@ class testUrlUserPermissions extends CLegacyWebTest {
 				'users' => [
 					'guest' => false,
 					'user-zabbix' => false,
-					'test-admin' => true
+					'test-admin' => true,
+					'admin-no-group' => true,
+					'super-no-group' => true,
+					'user-no-group' => false
 				]
 			]],
-			// #37.
+			// #43.
 			[[
 				'url' => 'zabbix.php?action=correlation.list',
 				'title' =>	'Event correlation rules',
@@ -467,10 +669,13 @@ class testUrlUserPermissions extends CLegacyWebTest {
 				'users' => [
 					'guest' => false,
 					'user-zabbix' => false,
-					'test-admin' => false
+					'test-admin' => false,
+					'admin-no-group' => false,
+					'super-no-group' => true,
+					'user-no-group' => false
 				]
 			]],
-			// #38.
+			// #44.
 			[[
 				'url' => 'zabbix.php?action=discovery.list',
 				'title' =>	'Configuration of discovery rules',
@@ -478,10 +683,13 @@ class testUrlUserPermissions extends CLegacyWebTest {
 				'users' => [
 					'guest' => false,
 					'user-zabbix' => false,
-					'test-admin' => true
+					'test-admin' => true,
+					'admin-no-group' => true,
+					'super-no-group' => true,
+					'user-no-group' => false
 				]
 			]],
-			// #39.
+			// #45.
 			[[
 				'url' => 'zabbix.php?action=service.list.edit',
 				'title' =>	'Services',
@@ -489,160 +697,223 @@ class testUrlUserPermissions extends CLegacyWebTest {
 				'users' => [
 					'guest' => false,
 					'user-zabbix' => false,
-					'test-admin' => true
+					'test-admin' => true,
+					'admin-no-group' => true,
+					'super-no-group' => true,
+					'user-no-group' => false
 				]
 			]],
-			// #40 Administration.
+			// #46 Administration.
 			[[
 				'url' => 'zabbix.php?action=gui.edit',
 				'title' =>	'Configuration of GUI',
+				'header' => 'GUI',
 				'users' => [
 					'guest' => false,
 					'user-zabbix' => false,
-					'test-admin' => false
-				]
-			]],
-			// #41.
-			[[
-				'url' => 'zabbix.php?action=housekeeping.edit',
-				'title' =>	'Configuration of housekeeping',
-				'users' => [
-					'guest' => false,
-					'user-zabbix' => false,
-					'test-admin' => false
-				]
-			]],
-			// #42.
-			[[
-				'url' => 'zabbix.php?action=image.list',
-				'title' =>	'Configuration of images',
-				'users' => [
-					'guest' => false,
-					'user-zabbix' => false,
-					'test-admin' => false
-				]
-			]],
-			// #43.
-			[[
-				'url' => 'zabbix.php?action=iconmap.list',
-				'title' =>	'Configuration of icon mapping',
-				'users' => [
-					'guest' => false,
-					'user-zabbix' => false,
-					'test-admin' => false
-				]
-			]],
-			// #44.
-			[[
-				'url' => 'zabbix.php?action=regex.list',
-				'title' =>	'Configuration of regular expressions',
-				'users' => [
-					'guest' => false,
-					'user-zabbix' => false,
-					'test-admin' => false
-				]
-			]],
-			// #45.
-			[[
-				'url' => 'zabbix.php?action=macros.edit',
-				'title' =>	'Configuration of macros',
-				'users' => [
-					'guest' => false,
-					'user-zabbix' => false,
-					'test-admin' => false
-				]
-			]],
-			// #46.
-			[[
-				'url' => 'zabbix.php?action=trigdisplay.edit',
-				'title' =>	'Configuration of trigger displaying options',
-				'users' => [
-					'guest' => false,
-					'user-zabbix' => false,
-					'test-admin' => false
+					'test-admin' => false,
+					'admin-no-group' => false,
+					'super-no-group' => true,
+					'user-no-group' => false
 				]
 			]],
 			// #47.
 			[[
-				'url' => 'zabbix.php?action=miscconfig.edit',
-				'title' =>	'Other configuration parameters',
+				'url' => 'zabbix.php?action=housekeeping.edit',
+				'title' =>	'Configuration of housekeeping',
+				'header' =>	'Housekeeping',
 				'users' => [
 					'guest' => false,
 					'user-zabbix' => false,
-					'test-admin' => false
+					'test-admin' => false,
+					'admin-no-group' => false,
+					'super-no-group' => true,
+					'user-no-group' => false
 				]
 			]],
 			// #48.
 			[[
-				'url' => 'zabbix.php?action=proxy.list',
-				'title' =>	'Configuration of proxies',
+				'url' => 'zabbix.php?action=image.list',
+				'title' =>	'Configuration of images',
+				'header' =>	'Images',
 				'users' => [
 					'guest' => false,
 					'user-zabbix' => false,
-					'test-admin' => false
+					'test-admin' => false,
+					'admin-no-group' => false,
+					'super-no-group' => true,
+					'user-no-group' => false
 				]
 			]],
 			// #49.
 			[[
-				'url' => 'zabbix.php?action=authentication.edit',
-				'title' =>	'Authentication',
+				'url' => 'zabbix.php?action=iconmap.list',
+				'title' =>	'Configuration of icon mapping',
+				'header' =>	'Icon mapping',
 				'users' => [
 					'guest' => false,
 					'user-zabbix' => false,
-					'test-admin' => false
+					'test-admin' => false,
+					'admin-no-group' => false,
+					'super-no-group' => true,
+					'user-no-group' => false
 				]
 			]],
 			// #50.
 			[[
-				'url' => 'zabbix.php?action=usergroup.list',
-				'title' =>	'Configuration of user groups',
+				'url' => 'zabbix.php?action=regex.list',
+				'title' =>	'Configuration of regular expressions',
+				'header' =>	'Regular expressions',
 				'users' => [
 					'guest' => false,
 					'user-zabbix' => false,
-					'test-admin' => false
+					'test-admin' => false,
+					'admin-no-group' => false,
+					'super-no-group' => true,
+					'user-no-group' => false
 				]
 			]],
 			// #51.
 			[[
-				'url' => 'zabbix.php?action=user.list',
-				'title' =>	'Configuration of users',
+				'url' => 'zabbix.php?action=macros.edit',
+				'title' =>	'Configuration of macros',
+				'header' =>	'Macros',
 				'users' => [
 					'guest' => false,
 					'user-zabbix' => false,
-					'test-admin' => false
+					'test-admin' => false,
+					'admin-no-group' => false,
+					'super-no-group' => true,
+					'user-no-group' => false
 				]
 			]],
 			// #52.
 			[[
-				'url' => 'zabbix.php?action=mediatype.list',
-				'title' =>	'Configuration of media types',
+				'url' => 'zabbix.php?action=trigdisplay.edit',
+				'title' =>	'Configuration of trigger displaying options',
+				'header' =>	'Trigger displaying options',
 				'users' => [
 					'guest' => false,
 					'user-zabbix' => false,
-					'test-admin' => false
+					'test-admin' => false,
+					'admin-no-group' => false,
+					'super-no-group' => true,
+					'user-no-group' => false
 				]
 			]],
 			// #53.
 			[[
-				'url' => 'zabbix.php?action=script.list',
-				'title' =>	'Configuration of scripts',
+				'url' => 'zabbix.php?action=miscconfig.edit',
+				'title' =>	'Other configuration parameters',
+				'header' =>	'Other configuration parameters',
 				'users' => [
 					'guest' => false,
 					'user-zabbix' => false,
-					'test-admin' => false
+					'test-admin' => false,
+					'admin-no-group' => false,
+					'super-no-group' => true,
+					'user-no-group' => false
 				]
 			]],
 			// #54.
 			[[
-				'url' => 'zabbix.php?action=queue.overview',
-				'title' =>	'Queue [refreshed every 30 sec.]',
+				'url' => 'zabbix.php?action=proxy.list',
+				'title' =>	'Configuration of proxies',
+				'header' =>	'Proxies',
 				'users' => [
 					'guest' => false,
 					'user-zabbix' => false,
-					'test-admin' => false
+					'test-admin' => false,
+					'admin-no-group' => false,
+					'super-no-group' => true,
+					'user-no-group' => false
 				]
 			]],
-			// #55 Misc.
+			// #55.
+			[[
+				'url' => 'zabbix.php?action=authentication.edit',
+				'title' =>	'Configuration of authentication',
+				'header' =>	'Authentication',
+				'users' => [
+					'guest' => false,
+					'user-zabbix' => false,
+					'test-admin' => false,
+					'admin-no-group' => false,
+					'super-no-group' => true,
+					'user-no-group' => false
+				]
+			]],
+			// #56.
+			[[
+				'url' => 'zabbix.php?action=usergroup.list',
+				'title' =>	'Configuration of user groups',
+				'header' =>	'User groups',
+				'users' => [
+					'guest' => false,
+					'user-zabbix' => false,
+					'test-admin' => false,
+					'admin-no-group' => false,
+					'super-no-group' => true,
+					'user-no-group' => false
+				]
+			]],
+			// #57.
+			[[
+				'url' => 'zabbix.php?action=user.list',
+				'title' =>	'Configuration of users',
+				'header' =>	'Users',
+				'users' => [
+					'guest' => false,
+					'user-zabbix' => false,
+					'test-admin' => false,
+					'admin-no-group' => false,
+					'super-no-group' => true,
+					'user-no-group' => false
+				]
+			]],
+			// #58.
+			[[
+				'url' => 'zabbix.php?action=mediatype.list',
+				'title' =>	'Configuration of media types',
+				'header' =>	'Media types',
+				'users' => [
+					'guest' => false,
+					'user-zabbix' => false,
+					'test-admin' => false,
+					'admin-no-group' => false,
+					'super-no-group' => true,
+					'user-no-group' => false
+				]
+			]],
+			// #59.
+			[[
+				'url' => 'zabbix.php?action=script.list',
+				'title' =>	'Configuration of scripts',
+				'header' =>	'Scripts',
+				'users' => [
+					'guest' => false,
+					'user-zabbix' => false,
+					'test-admin' => false,
+					'admin-no-group' => false,
+					'super-no-group' => true,
+					'user-no-group' => false
+				]
+			]],
+			// #60.
+			[[
+				'url' => 'zabbix.php?action=queue.overview',
+				'title' =>	'Queue [refreshed every 30 sec.]',
+				'header' =>	'Queue overview',
+				'users' => [
+					'guest' => false,
+					'user-zabbix' => false,
+					'test-admin' => false,
+					'admin-no-group' => false,
+					'super-no-group' => true,
+					'user-no-group' => false
+				]
+			]],
+			// #61 Misc.
 			[[
 				'url' => 'zabbix.php?action=search&search=server',
 				'title' =>	'Search',
@@ -650,18 +921,24 @@ class testUrlUserPermissions extends CLegacyWebTest {
 				'users' => [
 					'guest' => true,
 					'user-zabbix' => true,
-					'test-admin' => true
+					'test-admin' => true,
+					'admin-no-group' => true,
+					'super-no-group' => true,
+					'user-no-group' => true
 				]
 			]],
-			// #56.
+			// #62.
 			[[
 				'url' => 'zabbix.php?action=userprofile.edit',
-				'title' => 'Profile',
+				'title' =>	'Profile',
 				'header' => 'Profile',
 				'users' => [
 					'guest' => false,
 					'user-zabbix' => true,
-					'test-admin' => true
+					'test-admin' => true,
+					'admin-no-group' => true,
+					'super-no-group' => true,
+					'user-no-group' => true
 				]
 			]]
 		];
@@ -672,23 +949,26 @@ class testUrlUserPermissions extends CLegacyWebTest {
 	 */
 	public function testUrlUserPermissions_Users($data) {
 		foreach ($data['users'] as $alias => $user) {
-			switch ($alias) {
-				case 'test-admin':
-					$this->page->userLogin('test-admin', 'zabbix12345');
-					break;
-				case 'user-zabbix':
-					$this->page->userLogin('user-zabbix', 'zabbix');
-					break;
+			if ($alias !== 'guest') {
+				$password = ($alias === 'user-zabbix') ? 'zabbix' : 'zabbix12345';
+				$this->page->userLogin($alias, $password);
 			}
+
 			if ($user && !array_key_exists('no_permissions_to_object', $data)) {
 				$this->zbxTestOpen($data['url']);
 
 				if ($alias === 'guest') {
 					$this->guestLogin();
 				}
-
 				$this->zbxTestCheckTitle($data['title']);
-				$this->zbxTestCheckHeader($data['header']);
+				if (strpos($data['url'], 'action=popup')) {
+					$dialog = COverlayDialogElement::find()->waitUntilReady()->one();
+					$this->assertEquals($data['header'], $dialog->getTitle());
+					$dialog->close();
+				}
+				else {
+					$this->zbxTestCheckHeader($data['header']);
+				}
 			}
 			elseif ($user && array_key_exists('no_permissions_to_object', $data) ) {
 				$this->zbxTestOpen($data['url']);
@@ -698,7 +978,9 @@ class testUrlUserPermissions extends CLegacyWebTest {
 				}
 
 				$this->zbxTestCheckTitle($data['title']);
-				$this->zbxTestWaitUntilMessageTextPresent('msg-bad', 'No permissions to referred object or it does not exist!');
+				$this->zbxTestWaitUntilMessageTextPresent('msg-bad', 'No permissions to referred object or it'.
+						' does not exist!'
+				);
 			}
 			else {
 				$this->zbxTestOpen($data['url']);
@@ -708,8 +990,12 @@ class testUrlUserPermissions extends CLegacyWebTest {
 				}
 
 				$this->zbxTestWaitUntilMessageTextPresent('msg-bad', 'Access denied');
-				$this->zbxTestAssertElementText("//ul/li[1]", 'You are logged in as "'.$alias.'". You have no permissions to access this page.');
-				$this->zbxTestAssertElementText("//ul/li[2]", 'If you think this message is wrong, please consult your administrators about getting the necessary permissions.');
+				$this->zbxTestAssertElementText("//ul/li[1]", 'You are logged in as "'.$alias.'". You have no'.
+						' permissions to access this page.'
+				);
+				$this->zbxTestAssertElementText("//ul/li[2]", 'If you think this message is wrong, please consult your'.
+						' administrators about getting the necessary permissions.'
+				);
 			}
 
 			$this->page->logout();
@@ -726,7 +1012,9 @@ class testUrlUserPermissions extends CLegacyWebTest {
 		$this->zbxTestWaitUntilMessageTextPresent('msg-bad', 'You are not logged in');
 		$this->zbxTestAssertElementText("//ul/li[1]", 'You must login to view this page.');
 		$this->zbxTestAssertElementText("//ul/li[2]", 'Possibly the session has expired or the password was changed.');
-		$this->zbxTestAssertElementText("//ul/li[3]", 'If you think this message is wrong, please consult your administrators about getting the necessary permissions.');
+		$this->zbxTestAssertElementText("//ul/li[3]", 'If you think this message is wrong, please consult your'.
+				' administrators about getting the necessary permissions.'
+		);
 	}
 
 	/**
