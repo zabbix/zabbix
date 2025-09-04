@@ -52,14 +52,9 @@ class CAbsoluteDateParser extends CParser {
 			return self::PARSE_FAIL;
 		}
 
-		if (PHP_VERSION_ID < 82000) {
-			$errors = $datetime->getLastErrors();
+		$errors = $datetime->getLastErrors();
 
-			if ($errors['errors'] || $errors['warnings']) {
-				return self::PARSE_FAIL;
-			}
-		}
-		elseif ($datetime->getLastErrors() !== false) {
+		if ($errors !== false && ($errors['errors'] || $errors['warnings'])) {
 			return self::PARSE_FAIL;
 		}
 
