@@ -724,6 +724,8 @@ class testDashboardURLWidget extends CWebTest {
 				$other_form = $this->query('name:otherForm')->waitUntilVisible()->asForm()->one();
 				$other_form->fill(['id:iframe_sandboxing_enabled' => !$state]);
 				$other_form->submit();
+				$this->assertMessage(TEST_GOOD, 'Configuration updated');
+
 				$this->page->open('zabbix.php?action=dashboard.view&dashboardid='.self::$dashboardid)->waitUntilReady();
 			}
 		}
@@ -735,6 +737,7 @@ class testDashboardURLWidget extends CWebTest {
 				'id:iframe_sandboxing_exceptions' => 'allow-scripts allow-same-origin allow-forms'
 		]);
 		$other_form->submit();
+		$this->assertMessage(TEST_GOOD, 'Configuration updated');
 		$this->page->open('zabbix.php?action=dashboard.view&dashboardid='.self::$dashboardid)->waitUntilReady();
 		$this->page->switchTo($widget->query('id:iframe')->one());
 		$this->query('button:Update')->one()->click();
