@@ -509,8 +509,11 @@ class CFormValidator {
 		}
 
 		foreach ($value as &$api_uniq_check) {
-			if (count(explode('.', $api_uniq_check[0])) !== 2) {
-				throw new Exception('[RULES ERROR] Rule "api_uniq" should contain a valid API call (Path: '.$rule_path.', API call:'.$api_uniq_check[0].')');
+			if (count(explode('.', $api_uniq_check[0])) != 2) {
+				throw new Exception(
+					'[RULES ERROR] Rule "api_uniq" should contain a valid API call (Path: '.$rule_path.', API call:'.
+					$api_uniq_check[0].')'
+				);
 			}
 			$api_uniq_check += [1 => [], 2 => null, 3 => null, 4 => []];
 			$api_uniq_check[1] = ['filter' => $api_uniq_check[1]];
@@ -1238,11 +1241,12 @@ class CFormValidator {
 	}
 
 	/**
-	 * Check via API if item exists, excluding provided id. Used for unique checks
+	 * Check via API if item exists, excluding provided ID. Used for unique checks.
 	 *
-	 * @param string $api
-	 * @param array $options
+	 * @param string      $api
+	 * @param array       $options
 	 * @param string|null $exclude_primary_id
+	 *
 	 * @return bool
 	 */
 	public static function existsAPIObject(string $api, array $options, ?string $exclude_primary_id = null): bool {
@@ -1271,6 +1275,20 @@ class CFormValidator {
 		return false;
 	}
 
+	private function resolveFieldReference(&$parameter, ?string &$field_path, string $path): void {
+		if (substr($parameter, 0, 1) === '{' && substr($parameter, -1, 1) === '}') {
+			$field_data = $this->getWhenFieldValue(substr($parameter, 1, -1), $path);
+
+			if (in_array($field_data['type'], ['id', 'integer', 'float', 'string'])) {
+				$parameter = $field_data['value'];
+
+				if ($field_path === null && $path === '') {
+					$field_path = $field_data['path'];
+				}
+			}
+		}
+	}
+
 	private function validateApiUniq(array $check, string &$path, ?string &$error = null): bool {
 		[$method, $parameters, $exclude_id] = $check;
 		[$api] = explode('.', $method);
@@ -1279,35 +1297,16 @@ class CFormValidator {
 
 		// Replace field references by real values in API request parameters.
 		foreach ($parameters['filter'] as &$parameter) {
-			if (substr($parameter, 0, 1) === '{' && substr($parameter, -1, 1) === '}') {
-				$field_data = $this->getWhenFieldValue(substr($parameter, 1, -1), $path);
-
-				if (in_array($field_data['type'], ['id', 'integer', 'float', 'string'])) {
-					$parameter = $field_data['value'];
-					if ($field_path === null && $path === '') {
-						$field_path = $field_data['path'];
-					}
-				}
-			}
+			$this->resolveFieldReference($parameter, $field_path, $path);
 		}
 		unset($parameter);
 
-		// Replace field references by real values in API request parameters.
 		foreach ($parameters as $name => &$parameter) {
 			if ($name === 'filter') {
 				continue;
 			}
 
-			if (substr($parameter, 0, 1) === '{' && substr($parameter, -1, 1) === '}') {
-				$field_data = $this->getWhenFieldValue(substr($parameter, 1, -1), $path);
-
-				if (in_array($field_data['type'], ['id', 'integer', 'float', 'string'])) {
-					$parameter = $field_data['value'];
-					if ($field_path === null && $path === '') {
-						$field_path = $field_data['path'];
-					}
-				}
-			}
+			$this->resolveFieldReference($parameter, $field_path, $path);
 		}
 		unset($parameter);
 
