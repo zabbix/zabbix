@@ -25,7 +25,6 @@ class MysqlDbBackend extends DbBackend {
 	 */
 	protected function checkDbVersionTable() {
 		global $DB;
-		$table_exists = null;
 
 		try {
 			$table_exists = mysqli_query($DB['DB'], "select null from dbversion limit 1");
@@ -34,10 +33,10 @@ class MysqlDbBackend extends DbBackend {
 			$this->setError(_s('Unable to determine current Zabbix database version: %1$s.',
 				_s('the table "%1$s" was not found', 'dbversion')
 			));
-			$table_exists = false;
+			return false;
 		}
 
-		return $table_exists;
+		return true;
 	}
 
 	/**
@@ -192,7 +191,7 @@ class MysqlDbBackend extends DbBackend {
 		}
 
 		if (!$this->setCharset("utf8mb4") && !$this->setCharset("utf8") && !$this->setCharset("utf8mb3")) {
-			trigger_error('Cannot set charset', E_USER_WARNING);
+			$this->setWarning(_s('Cannot set charset.'));
 		}
 	}
 }
