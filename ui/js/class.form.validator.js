@@ -84,7 +84,7 @@ class CFormValidator {
 	 * @param {Array}  fields  Typically this will be array of one field (but may be multiple fields) that has been
 	 *                         changed and have to be validated.
 	 *
-	 * @returns {Promise}
+	 * @return {Promise}
 	 */
 	validateChanges(values, fields) {
 		return new Promise(async (resolve_whole, reject_whole) => {
@@ -123,7 +123,7 @@ class CFormValidator {
 	 * @param {Object} values  Object of form fields as keys and fields values as object values. Typically collected
 	 *                         using CForm.getAllValues() method. All known (included in #rules) fields are validated.
 	 *
-	 * @returns {Promise}
+	 * @return {Promise}
 	 */
 	validateSubmit(values) {
 		return new Promise(async (resolve_whole) => {
@@ -161,7 +161,7 @@ class CFormValidator {
 	 * @param {Object}            value  Values to validate.
 	 * @param {Object | boolean}  rules  Rules to use for validation.
 	 *
-	 * @returns {boolean}  Returns true if validation passes. False otherwise.
+	 * @return {boolean}  Returns true if validation passes. False otherwise.
 	 */
 	#validate(value, rules) {
 		this.#errors = {};
@@ -416,18 +416,10 @@ class CFormValidator {
 					}
 				});
 
-				const validated_fields = referenced_fields.filter((path) => {
-					return pathInObject(data_to_validate, path);
-				});
+				const validated_fields = referenced_fields.filter(path => pathInObject(data_to_validate, path));
 
 				if (validated_fields.length) {
-					api_uniq_rules.push({
-						method: method,
-						parameters: parameters,
-						fields: referenced_fields,
-						exclude_id: exclude_id,
-						error_msg: error_msg
-					});
+					api_uniq_rules.push({method, parameters, fields: referenced_fields, exclude_id, error_msg});
 				}
 			});
 		};
@@ -504,11 +496,11 @@ class CFormValidator {
 	}
 
 	/**
-	 * Call API request to validate all api based validations
+	 * Call API request to validate all api based validations.
 	 *
 	 * @param {Array} validatons
 	 *
-	 * @returns {Promise}
+	 * @return {Promise}
 	 */
 	#validateApiExists(validations) {
 		const url = new URL('zabbix.php', location.href);
@@ -530,31 +522,33 @@ class CFormValidator {
 			})
 			.catch(exception => {
 				console.error(exception);
-				return { result: false };
+
+				return {result: false};
 			});
 	}
 
 	/**
 	 * Check data uniqueness using JS API call.
 	 *
-	 * @returns {Promise}
+	 * @return {Promise}
 	 */
 	#validateApiUniqueness() {
-		const api_uniq_checks = this.#api_uniq_rules.filter((check) => {
+		const api_uniq_checks = this.#api_uniq_rules.filter(check => {
 			// If at least one of involved (referenced in parameters) field has error, api_uniq check is not performed.
-			if(check.fields.some((field_path) => {
-				return (field_path in this.#errors && this.#errors[field_path].some((error) => error.message !== ''))
-			})) {
+			if (check.fields.some(field_path => (field_path in this.#errors
+					&& this.#errors[field_path].some(error => error.message !== '')))) {
+
 				return false;
 			}
 
 			// If all requested parameters are empty, skip this check.
-			return Object.values(check.parameters).some((value) => value !== '');
+			return Object.values(check.parameters).some(value => value !== '');
 		});
 
-		const api_validations = api_uniq_checks.map((check) => {
+		const api_validations = api_uniq_checks.map(check => {
 			const {method, parameters, exclude_id} = check;
 			const [api, api_method] = method.split('.');
+
 			return {
 				api,
 				method: api_method,
@@ -569,20 +563,22 @@ class CFormValidator {
 			return this.#validateApiExists(api_validations)
 				.then(result => {
 					if (result.result === false && result.errors) {
-						result.errors.forEach((error) => {
-							this.#addError(error.field, error.message, CFormValidator.ERROR_LEVEL_API);
-						});
+						result.errors.forEach(
+							error => this.#addError(error.field, error.message, CFormValidator.ERROR_LEVEL_API)
+						);
 					}
+
 					return result.result;
 				});
 		}
+
 		return Promise.resolve(true);
 	}
 
 	/**
 	 * Function to perform delayed "use" checks that involves server-side parsers and validators.
 	 *
-	 * @returns {Promise}
+	 * @return {Promise}
 	 */
 	#validateDelayed() {
 		const delayed_checks = this.#use_checks.filter((check) => {
@@ -656,7 +652,7 @@ class CFormValidator {
 	 * @param {string} check_name       Check name.
 	 * @param {string} default_message  Default message used when no custom message is defined.
 	 *
-	 * @returns {string}
+	 * @return {string}
 	 */
 	#getMessage(rules, check_name, default_message) {
 		return rules?.messages?.[check_name] || default_message;
@@ -705,7 +701,7 @@ class CFormValidator {
 	/**
 	 * Function to return all collected errors grouped by fields.
 	 *
-	 * @returns {Object}
+	 * @return {Object}
 	 */
 	getErrors() {
 		return this.#errors;
@@ -716,7 +712,7 @@ class CFormValidator {
 	 *
 	 * @param {Array} fields  Fields to find validation rules for.
 	 *
-	 * @returns {Object}
+	 * @return {Object}
 	 */
 	#getRelatedRules(fields) {
 		fields = fields.map((field) => field.split('/').filter(part => /^\d+$/.test(part) === false).join('/'));
@@ -927,7 +923,7 @@ class CFormValidator {
 	 * @param {string|number} field  Field name used in rules and data object.
 	 * @param {string} path   Absolute path of particular field.
 	 *
-	 * @returns {Object}
+	 * @return {Object}
 	 */
 	#validateField(rules, data, field, path) {
 		if ('when' in rules && this.#testWhenCondition(rules.when, path) === false) {
@@ -978,7 +974,7 @@ class CFormValidator {
 	 * @param {Object} rules  Ruleset object to use for validation.
 	 * @param {any}    value  Expected to be ID.
 	 *
-	 * @returns {Object}
+	 * @return {Object}
 	 */
 	#validateId(rules, value) {
 		if (!this.#isTypeId(value)) {
@@ -997,7 +993,7 @@ class CFormValidator {
 	 * @param {Object} rules  Ruleset object to use for validation.
 	 * @param {any}    value  Expected to be integer.
 	 *
-	 * @returns {Object}
+	 * @return {Object}
 	 */
 	#validateInt32(rules, value) {
 		if (!this.#isTypeInt32(value)) {
@@ -1086,7 +1082,7 @@ class CFormValidator {
 	 * @param {Object} rules  Ruleset object to use for validation.
 	 * @param {any}    value  Expected to be a number.
 	 *
-	 * @returns {Object}
+	 * @return {Object}
 	 */
 	#validateFloat(rules, value) {
 		if (!this.#isTypeFloat(value)) {
@@ -1175,7 +1171,7 @@ class CFormValidator {
 	 * @param {Object} rules  Ruleset object to use for validation.
 	 * @param {any}    value  Expected to be a string.
 	 *
-	 * @returns {Object}
+	 * @return {Object}
 	 */
 	#validateStringUtf8(rules, value) {
 		if (typeof value !== 'string') {
@@ -1247,7 +1243,7 @@ class CFormValidator {
 	 *
 	 * @param {string} regex  Regular expression string.
 	 *
-	 * @returns {Object}
+	 * @return {Object}
 	 */
 	#extractRegex(regex) {
 		const flags = regex.split('/').pop();
@@ -1263,7 +1259,7 @@ class CFormValidator {
 	 * @param {any}    data   Data to validate.
 	 * @param {string} path   Path of field.
 	 *
-	 * @returns {Object}
+	 * @return {Object}
 	 */
 	#validateObject(rules, data, path) {
 		if (Array.isArray(data) && !data.length) {
@@ -1320,7 +1316,7 @@ class CFormValidator {
 	 * @param {any}    objects_values  Data to validate.
 	 * @param {string} path            Path of field.
 	 *
-	 * @returns {Object}
+	 * @return {Object}
 	 */
 	#validateObjects(rules, objects_values, path) {
 		if (!this.#isTypeObject(objects_values) && !Array.isArray(objects_values)) {
@@ -1381,7 +1377,7 @@ class CFormValidator {
 	 * @param {any}    array_values  Data to validate.
 	 * @param {string} path          Path of field.
 	 *
-	 * @returns {Object}
+	 * @return {Object}
 	 */
 	#validateArray(rules, array_values, path) {
 		/*
@@ -1437,7 +1433,7 @@ class CFormValidator {
 	 *
 	 * @param {any} value  Value to validate.
 	 *
-	 * @returns {boolean}
+	 * @return {boolean}
 	 */
 	#isTypeId(value) {
 		return /^\d+$/.test(value);
@@ -1448,7 +1444,7 @@ class CFormValidator {
 	 *
 	 * @param {any} value  Value to validate.
 	 *
-	 * @returns {boolean}
+	 * @return {boolean}
 	 */
 	#isTypeInt32(value) {
 		value = parseInt(value);
@@ -1461,7 +1457,7 @@ class CFormValidator {
 	 *
 	 * @param {any} value  Value to validate.
 	 *
-	 * @returns {boolean}
+	 * @return {boolean}
 	 */
 	#isTypeFloat(value) {
 		return isFinite(value);
@@ -1472,7 +1468,7 @@ class CFormValidator {
 	 *
 	 * @param {any} value  Value to validate.
 	 *
-	 * @returns {boolean}
+	 * @return {boolean}
 	 */
 	#isTypeObject(value) {
 		return typeof value === 'object' && !Array.isArray(value) && value !== null;
@@ -1484,7 +1480,7 @@ class CFormValidator {
 	 * @param {Object} rules  Ruleset to use for validation.
 	 * @param {any}    value  Value to validate.
 	 *
-	 * @returns {boolean}
+	 * @return {boolean}
 	 */
 	#checkNumericIn(rules, value) {
 		if (!('in' in rules)) {
@@ -1502,7 +1498,7 @@ class CFormValidator {
 	 * @param {Object} rules  Ruleset to use for validation.
 	 * @param {any}    value  Value to validate.
 	 *
-	 * @returns {boolean}
+	 * @return {boolean}
 	 */
 	#checkNumericNotIn(rules, value) {
 		if (!('not_in' in rules)) {
@@ -1520,7 +1516,7 @@ class CFormValidator {
 	 * @param {number} value     Value to validate.
 	 * @param {Object} in_rules  Normalized "in" condition.
 	 *
-	 * @returns {boolean}
+	 * @return {boolean}
 	 */
 	#isInRange(value, in_rules) {
 		const [from, to] = in_rules;
@@ -1542,7 +1538,7 @@ class CFormValidator {
 	 * @param {Object} rules  Ruleset to use for validation.
 	 * @param {any}    value  Value to validate.
 	 *
-	 * @returns {boolean}
+	 * @return {boolean}
 	 */
 	#checkStringIn(rules, value) {
 		if (!('in' in rules)) {
@@ -1558,7 +1554,7 @@ class CFormValidator {
 	 * @param {Object} rules  Ruleset to use for validation.
 	 * @param {any}    value  Value to validate.
 	 *
-	 * @returns {boolean}
+	 * @return {boolean}
 	 */
 	#checkStringNotIn(rules, value) {
 		if (!('not_in' in rules)) {
@@ -1573,7 +1569,7 @@ class CFormValidator {
 	 *
 	 * @param {string} value  Value to check.
 	 *
-	 * @returns {boolean}
+	 * @return {boolean}
 	 */
 	#isUserMacro(value) {
 		return value.match(/^\{\$[A-Z0-9._]+(:.*)?\}$/) !== null;
@@ -1585,7 +1581,7 @@ class CFormValidator {
 	 * @param {Array}  when_rules  Array of 'when' condition objects.
 	 * @param {string} field_path  Absolute path of field.
 	 *
-	 * @returns {boolean}
+	 * @return {boolean}
 	 */
 	#testWhenCondition(when_rules, field_path) {
 		return when_rules.every(when => {
@@ -1602,7 +1598,7 @@ class CFormValidator {
 	 * @param {string} when_field  Field name (or relative path) that is defined in 'when' condition.
 	 * @param {string} field_path  Field path which has 'when' condition defined.
 	 *
-	 * @returns {object}  Returns object containing type and value for requested field.
+	 * @return {object}  Returns object containing type and value for requested field.
 	 */
 	#getWhenFieldValue(when_field, field_path) {
 		const target_path = this.#getFieldAbsolutePath(when_field, field_path);
@@ -1616,7 +1612,7 @@ class CFormValidator {
 	 * @param {string} field_name  Target field name, e.g., 'host'.
 	 * @param {string} field_path  Path where field is defined in rules.
 	 *
-	 * @returns {string}
+	 * @return {string}
 	 */
 	#getFieldAbsolutePath(field_name, field_path) {
 		const target_path = [...field_path.split('/').slice(0, -1), field_name];
@@ -1630,7 +1626,7 @@ class CFormValidator {
 	 * @param {Object} rule_set  Ruleset of validated field.
 	 * @param {Object} data      Value to validate.
 	 *
-	 * @returns {boolean}
+	 * @return {boolean}
 	 */
 	#checkValue(rule_set, data) {
 		if ('exist' in rule_set) {
@@ -1677,7 +1673,7 @@ class CFormValidator {
 	 * @param {Object} data_all  Whole data array.
 	 * @param {Object} rules     Rules to use for validation.
 	 *
-	 * @returns {boolean}
+	 * @return {boolean}
 	 */
 	#validateDistinctness(data_all, rules) {
 		const getValueByPath = (field_path) => {
