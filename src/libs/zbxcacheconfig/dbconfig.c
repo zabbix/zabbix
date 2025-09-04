@@ -7329,6 +7329,7 @@ static void	DCsync_proxies(zbx_dbsync_t *sync, zbx_uint64_t revision, const zbx_
 			proxy->nodata_win.values_num = 0;
 			proxy->nodata_win.period_end = 0;
 			proxy->proxy_groupid = 0;
+			proxy->pending_history = ZBX_PROXY_PENDING_HISTORY_NO;
 
 			zbx_vector_dc_host_ptr_create_ext(&proxy->hosts, __config_shmem_malloc_func,
 					__config_shmem_realloc_func, __config_shmem_free_func);
@@ -8594,6 +8595,12 @@ size_t	zbx_maintenance_update_flags_num(void)
 			/ (sizeof(uint64_t) * 8));
 }
 
+static void	config_unlock_shmem_on_oom(void)
+{
+	if (1 == zbx_get_sync_in_progress())
+		FINISH_SYNC;
+}
+
 /******************************************************************************
  *                                                                            *
  * Purpose: Allocate shared memory for configuration cache                    *
@@ -8620,6 +8627,8 @@ int	zbx_init_configuration_cache(zbx_get_program_type_f get_program_type, zbx_ge
 	{
 		goto out;
 	}
+
+	config_mem->unlock_shmem_on_oom = config_unlock_shmem_on_oom;
 
 	config = (zbx_dc_config_t *)__config_shmem_malloc_func(NULL, sizeof(zbx_dc_config_t) +
 			(size_t)get_config_forks_cb(ZBX_PROCESS_TYPE_TIMER) * sizeof(zbx_vector_ptr_t));
@@ -10047,7 +10056,7 @@ void	zbx_dc_config_get_preprocessable_items(zbx_hashset_t *items, zbx_dc_um_shar
 		return;
 
 	zbx_vector_dc_item_ptr_create(&items_sync);
-	zbx_vector_dc_item_ptr_reserve(&items_sync, 100);
+	zbx_vector_dc_item_ptr_reserve(&items_sync, MAX(items->num_data, 100));
 
 	RDLOCK_CACHE;
 
@@ -12405,6 +12414,7 @@ static void	DCget_proxy(zbx_dc_proxy_t *dst_proxy, const ZBX_DC_PROXY *src_proxy
 	dst_proxy->version_int = src_proxy->version_int;
 	dst_proxy->compatibility = src_proxy->compatibility;
 	dst_proxy->lastaccess = src_proxy->lastaccess;
+	dst_proxy->pending_history = src_proxy->pending_history;
 	dst_proxy->last_version_error_time = src_proxy->last_version_error_time;
 
 	zbx_strscpy(dst_proxy->name, src_proxy->name);
@@ -15044,6 +15054,12 @@ void	zbx_dc_update_proxy(zbx_proxy_diff_t *diff)
 			diff->flags &= (~ZBX_FLAGS_PROXY_DIFF_UPDATE_SUPPRESS_WIN);
 		}
 
+		if (0 != (diff->flags & ZBX_FLAGS_PROXY_DIFF_UPDATE_PENDING_HISTORY))
+		{
+			proxy->pending_history = diff->pending_history;
+			diff->flags &= (~ZBX_FLAGS_PROXY_DIFF_UPDATE_PENDING_HISTORY);
+		}
+
 		if (0 != notify)
 		{
 			lastaccess = proxy->lastaccess;
@@ -17004,11 +17020,6 @@ void	zbx_dc_get_unused_macro_templates(zbx_hashset_t *templates, const zbx_vecto
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s() templateids_num:%d", __func__, templateids->values_num);
 }
 
-#ifdef HAVE_TESTS
-#	include "../../../tests/libs/zbxcacheconfig/dc_item_poller_type_update_test.c"
-#	include "../../../tests/libs/zbxcacheconfig/dc_function_calculate_nextcheck_test.c"
-#endif
-
 void	zbx_recalc_time_period(time_t *ts_from, int table_group)
 {
 #define HK_CFG_UPDATE_INTERVAL	5
@@ -17188,6 +17199,21 @@ int	zbx_dc_get_proxy_version(zbx_uint64_t proxyid)
 	return version;
 }
 
+void	zbx_dc_update_proxy_pending_history(zbx_dc_proxy_t *proxy, int flag)
+{
+	ZBX_DC_PROXY	*dc_proxy;
+
+	if (proxy->pending_history == flag)
+		return;
+
+	WRLOCK_CACHE;
+
+	if (NULL != (dc_proxy = (ZBX_DC_PROXY *)zbx_hashset_search(&config->proxies, &proxy->proxyid)))
+		dc_proxy->pending_history = flag;
+
+	UNLOCK_CACHE;
+}
+
 /******************************************************************************
  *                                                                            *
  * Purpose: update sync_status in configuration cache                         *
@@ -17224,4 +17250,16 @@ int	zbx_dc_sync_lock(void)
 	UNLOCK_CACHE;
 
 	return ret;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: get the number of items in configuration cache                    *
+ *                                                                            *
+ * Return value: number of items                                              *
+ *                                                                            *
+ ******************************************************************************/
+zbx_uint64_t	zbx_dc_get_cache_size(void)
+{
+	return config_mem->total_size;
 }
