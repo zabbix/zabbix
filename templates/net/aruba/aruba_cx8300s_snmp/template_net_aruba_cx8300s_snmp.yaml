@@ -25,7 +25,7 @@ zabbix_export:
         The Aruba CX 8300 series is designed for core and aggregation in enterprise campus networks as well as top-of-rack/data center environments. These are high-performance fixed switches offering port speeds from 1 GbE up to 100 GbE, with maximum switching capacity up to 6.4 Tbps.
       vendor:
         name: Zabbix
-        version: 7.4-0
+        version: 7.4-1
       groups:
         - name: 'Templates/Network devices'
       items:
@@ -1511,7 +1511,7 @@ zabbix_export:
                   item:
                     host: 'Aruba CX 8300s by SNMP'
                     key: 'aruba.system.cpu.utilization[arubaWiredSystemInfoCpu.{#SNMPINDEX}]'
-            - uuid: 376c15f14b414caab715650ce9c86e0f
+            - uuid: ef659d7d40ba4d77aedbaf57e6a2c04f
               name: 'Generic SNMP: Module [{#SNMPVALUE}]: Memory utilization'
               ymin_type_1: FIXED
               ymax_type_1: FIXED
