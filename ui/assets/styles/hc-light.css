@@ -6659,6 +6659,15 @@ form.is-loading {
   position: relative; }
   .table-forms-separator .wordbreak {
     white-space: normal; }
+  @media screen and (min-width: 1200px) {
+    .table-forms-separator .tags-wrapper {
+      max-width: 266px; } }
+  @media screen and (min-width: 1400px) {
+    .table-forms-separator .tags-wrapper {
+      max-width: 359px; } }
+  @media screen and (min-width: 1600px) {
+    .table-forms-separator .tags-wrapper {
+      max-width: 452px; } }
 
 .border-left {
   border-left: 1px solid #888888; }

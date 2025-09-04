@@ -678,7 +678,7 @@ function getActionOperationDescriptions(array $operations, int $eventsource, arr
 					}
 				}
 
-				$result[$i][] = (New CDiv([$operation_title, $tags]))->addClass(ZBX_STYLE_TAGS_WRAPPER);
+				$result[$i][] = (new CDiv([$operation_title, $tags]))->addClass(ZBX_STYLE_TAGS_WRAPPER);
 				break;
 
 			case OPERATION_TYPE_HOST_ENABLE:
