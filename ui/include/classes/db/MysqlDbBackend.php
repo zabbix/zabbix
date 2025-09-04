@@ -27,12 +27,13 @@ class MysqlDbBackend extends DbBackend {
 		global $DB;
 
 		try {
-			mysqli_query($DB['DB'], "select null from dbversion limit 1");
+			mysqli_query($DB['DB'], 'SELECT NULL FROM dbversion LIMIT 1');
 		}
 		catch (mysqli_sql_exception $e) {
 			$this->setError(_s('Unable to determine current Zabbix database version: %1$s.',
 				_s('the table "%1$s" was not found', 'dbversion')
 			));
+
 			return false;
 		}
 
@@ -190,8 +191,8 @@ class MysqlDbBackend extends DbBackend {
 			DBexecute("SET innodb_snapshot_isolation='OFF'");
 		}
 
-		if (!$this->setCharset("utf8mb4") && !$this->setCharset("utf8") && !$this->setCharset("utf8mb3")) {
-			$this->setWarning(_s('Cannot set charset.'));
+		if (!$this->setCharset('utf8mb4') && !$this->setCharset('utf8') && !$this->setCharset('utf8mb3')) {
+			$this->setError(_('Cannot set charset.'));
 		}
 	}
 }
