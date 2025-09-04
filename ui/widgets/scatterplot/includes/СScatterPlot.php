@@ -288,30 +288,14 @@ class СScatterPlot extends CSvg {
 		// Determine units for y axis.
 
 		if ($this->y_units === null) {
-			$this->y_units = '';
-			foreach ($this->metrics as $metric) {
-				foreach ($metric['y_axis_items'] as $item) {
-					$this->y_units = $item['units'];
-
-					break 2;
-				}
-			}
+			$this->y_units = reset(reset($this->metrics)['y_axis_items'])['units'];
 		}
 
 		// Determine units for x axis.
 
 		if ($this->x_units === null) {
-			$this->x_units = '';
-			foreach ($this->metrics as $metric) {
-				foreach ($metric['x_axis_items'] as $item) {
-					$this->x_units = $item['units'];
-
-					break 2;
-				}
-			}
+			$this->x_units = reset(reset($this->metrics)['x_axis_items'])['units'];
 		}
-
-		// Calculate vertical scale parameters for left side.
 
 		$this->y_min_calculated = $this->y_min === null;
 		$this->y_max_calculated = $this->y_max === null;

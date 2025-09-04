@@ -69,6 +69,37 @@ function make_decoration($haystack, $needle, $class = null) {
 	return $result;
 }
 
+/**
+ * Interpolate between two colors
+ *
+ * @param string $color1  Hex color (e.g. "#ff0000")
+ * @param string $color2  Hex color (e.g. "#0000ff")
+ * @param float  $position  Value between 0 and 1 (0 = color1, 1 = color2)
+ * @return string         Interpolated hex color
+ */
+function interpolateColor(string $color1, string $color2, float $position): string {
+	// Remove #
+	$color1 = ltrim($color1, '#');
+	$color2 = ltrim($color2, '#');
+
+	// Convert to RGB
+	$r1 = hexdec(substr($color1, 0, 2));
+	$g1 = hexdec(substr($color1, 2, 2));
+	$b1 = hexdec(substr($color1, 4, 2));
+
+	$r2 = hexdec(substr($color2, 0, 2));
+	$g2 = hexdec(substr($color2, 2, 2));
+	$b2 = hexdec(substr($color2, 4, 2));
+
+	// Interpolate
+	$r = (int) round($r1 + ($r2 - $r1) * $position);
+	$g = (int) round($g1 + ($g2 - $g1) * $position);
+	$b = (int) round($b1 + ($b2 - $b1) * $position);
+
+	// Return as hex
+	return sprintf("#%02x%02x%02x", $r, $g, $b);
+}
+
 function prepareUrlParam($value, $name = null): string {
 	if (is_array($value)) {
 		$result = '';

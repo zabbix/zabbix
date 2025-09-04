@@ -30,7 +30,7 @@ use API,
 /**
  * Class calculates graph data and makes SVG graph.
  */
-class CSvgGraphHelper
+class CScatterPlotHelper
 {
 
 	/**
@@ -70,7 +70,7 @@ class CSvgGraphHelper
 		// Find what data source (history or trends) will be used for each metric.
 		self::getGraphDataSource($metrics, $errors, $options['data_source'], $width);
 		// Load aggregated Data for each dataset.
-		self::getMetricsAggregatedData($metrics, $width, $options['thresholds']);
+		self::getMetricsAggregatedData($metrics, $width, $options['grouped_thresholds'], $options['interpolation']);
 
 		$legend = self::getLegend($metrics, $options['legend']);
 
@@ -553,7 +553,8 @@ class CSvgGraphHelper
 	/**
 	 * Select aggregated data to show in graph for each metric.
 	 */
-	private static function getMetricsAggregatedData(array &$metrics, int $width, array $thresholds): void {
+	private static function getMetricsAggregatedData(array &$metrics, int $width, array $grouped_thresholds,
+			bool $interpolation): void {
 		foreach ($metrics as &$metric) {
 			$aggregation_name = CItemHelper::getAggregateFunctionName($metric['options']['aggregate_function']);
 
@@ -679,29 +680,14 @@ class CSvgGraphHelper
 						break;
 				}
 
-				$y_units = '';
-				$x_units = '';
-
-				foreach ($metric['y_axis_items'] as $item) {
-					$y_units = $item['units'];
-
-					break;
-				}
-
-				foreach ($metric['x_axis_items'] as $item) {
-					$x_units = $item['units'];
-
-					break;
-				}
+				$x_units = reset($metric['x_axis_items'])['units'];
+				$y_units = reset($metric['y_axis_items'])['units'];
 			}
 
 			foreach ($metric['points'] as $tick => &$point) {
-				$point['color'] = $metric['options']['color'];
-
 				if (array_key_exists('x_axis',$point) && array_key_exists('y_axis', $point)) {
-					self::calculatePointColorByThresholds($point['color'],
-						$point['x_axis'], $point['y_axis'], $x_units, $y_units,
-						$thresholds
+					$point['color'] = self::calculatePointColorByThresholds($metric['options']['color'],
+						$point['x_axis'], $point['y_axis'], $x_units, $y_units, $grouped_thresholds, $interpolation
 					);
 				}
 				else {
@@ -718,51 +704,96 @@ class CSvgGraphHelper
 		}
 	}
 
-	private static function calculatePointColorByThresholds(string &$color, $value_x, $value_y, string $units_x,
-			string $units_y, array $thresholds): void {
+	private static function calculatePointColorByThresholds(string $color, $value_x, $value_y, string $units_x,
+			string $units_y, array $grouped_thresholds, bool $interpolation): string {
+		if (!$grouped_thresholds) {
+			return $color;
+		}
+
+		$apply_interpolation = $interpolation;
+		$prev = null;
+		$current = null;
+
 		$is_binary_x_units = isBinaryUnits($units_x);
 		$is_binary_y_units = isBinaryUnits($units_y);
 
-		foreach ($thresholds as $threshold) {
-			if (array_key_exists('x_axis_threshold', $threshold) && array_key_exists('y_axis_threshold', $threshold)) {
-				$threshold_value_x = $is_binary_x_units
-					? $threshold['x_axis_threshold_binary']
-					: $threshold['x_axis_threshold'];
+		$x_key = $is_binary_x_units ? 'x_binary' : 'x';
+		$y_key = $is_binary_y_units ? 'y_binary' : 'y';
 
-				$threshold_value_y = $is_binary_y_units
-					? $threshold['y_axis_threshold_binary']
-					: $threshold['y_axis_threshold'];
-
-				if ($value_x > $threshold_value_x && $value_y > $threshold_value_y) {
-					$color = $threshold['color'];
-
-					break;
-				}
+		foreach ($grouped_thresholds as $group => $thresholds) {
+			if ($prev !== null) {
+				break;
 			}
-			elseif (array_key_exists('x_axis_threshold', $threshold)) {
-				$threshold_value_x = $is_binary_x_units
-					? $threshold['x_axis_threshold_binary']
-					: $threshold['x_axis_threshold'];
 
-				if ($value_x > $threshold_value_x) {
-					$color = $threshold['color'];
+			foreach ($thresholds as $threshold) {
+				$current = $threshold;
+
+				if ($group === 'both') {
+					if ($value_x < $threshold[$x_key] || $value_y < $threshold[$y_key]) {
+						break;
+					}
 				}
-			}
-			elseif (array_key_exists('y_axis_threshold', $threshold)) {
-				$threshold_value_y = $is_binary_y_units
-					? $threshold['y_axis_threshold_binary']
-					: $threshold['y_axis_threshold'];
-
-				if ($value_y > $threshold_value_y) {
-					$color = $threshold['color'];
-
-					break;
+				elseif ($group === 'only_x') {
+					if ($value_x < $threshold[$x_key]) {
+						break;
+					}
 				}
+				elseif ($group === 'only_y') {
+					if ($value_y < $threshold[$y_key]) {
+						break;
+					}
+				}
+
+				$prev = $threshold;
 			}
 		}
+
+		if ($prev === null) {
+			return $color;
+		}
+
+		if ($apply_interpolation) {
+			$prev_threshold = [
+				'x' => array_key_exists($x_key, $prev) ? $prev[$x_key] : $value_x,
+				'y' => array_key_exists($y_key, $prev) ? $prev[$y_key] : $value_y,
+			];
+
+			$current_threshold = [
+				'x' => array_key_exists($x_key, $current) ? $current[$x_key] : $value_x,
+				'y' => array_key_exists($y_key, $current) ? $current[$y_key] : $value_y,
+			];
+
+			$position = self::calculateInterpolationPosition($prev_threshold, $current_threshold, $value_x, $value_y);
+
+			return interpolateColor($prev['color'], $current['color'], $position);
+		}
+
+		return $prev['color'];
 	}
 
-	private static function getLegend(array $metrics, array $legend_options): ?CSvgGraphLegend {
+	private static function calculateInterpolationPosition(array $threshold_1, array $threshold_2, float $x,
+				float $y): float {
+		// Vector from threshold_1 to threshold_2
+		$vx = $threshold_2['x'] - $threshold_1['x'];
+		$vy = $threshold_2['y'] - $threshold_1['y'];
+
+		// Vector from threshold_1 to current point
+		$wx = $x - $threshold_1['x'];
+		$wy = $y - $threshold_1['y'];
+
+		// Dot product and magnitude squared of v
+		$dot_product = $wx * $vx + $wy * $vy;
+		$magnitude_square = $vx * $vx + $vy * $vy;
+
+		if ($magnitude_square == 0) {
+			return 0.0; // Avoid division by zero (thresholds are the same point)
+		}
+
+		// Projection factor = (w·v) / |v|^2
+		return $dot_product / $magnitude_square;
+	}
+
+	private static function getLegend(array $metrics, array $legend_options): ?CScatterPlotLegend {
 		if ($legend_options['show_legend'] != WidgetForm::LEGEND_ON) {
 			return null;
 		}
@@ -778,7 +809,7 @@ class CSvgGraphHelper
 			$items[] = $item;
 		}
 
-		return (new CSvgGraphLegend($items))
+		return (new CScatterPlotLegend($items))
 			->setColumnsCount($legend_options['legend_columns'])
 			->setLinesCount($legend_options['legend_lines'])
 			->setLinesMode($legend_options['legend_lines_mode']);

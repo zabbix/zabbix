@@ -18,7 +18,7 @@ namespace Widgets\ScatterPlot\Includes;
 use CDiv,
 	CSpan;
 
-class CSvgGraphLegend extends CDiv {
+class CScatterPlotLegend extends CDiv {
 
 	// Legend single line height is 18px. Value should be synchronized with $svg-legend-line-height in scss.
 	private const LINE_HEIGHT = 18;

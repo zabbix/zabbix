@@ -22,7 +22,7 @@ use CControllerDashboardWidgetView,
 	CParser;
 
 use Widgets\ScatterPlot\Includes\{
-	CSvgGraphHelper,
+	CScatterPlotHelper,
 	WidgetForm
 };
 
@@ -51,7 +51,6 @@ class WidgetView extends CControllerDashboardWidgetView {
 		$preview = $this->hasInput('preview'); // Configuration preview.
 
 		$parser = new CNumberParser(['with_size_suffix' => true, 'with_time_suffix' => true]);
-		$binary_parser = new CNumberParser(['with_size_suffix' => true, 'with_time_suffix' => true, 'is_binary' => true]);
 
 		$x_axis_min = $parser->parse($this->fields_values['x_axis_min']) == CParser::PARSE_SUCCESS
 			? $parser->calcValue()
@@ -69,33 +68,6 @@ class WidgetView extends CControllerDashboardWidgetView {
 			? $parser->calcValue()
 			: null;
 
-		$thresholds = $this->fields_values['thresholds'];
-
-		foreach ($thresholds as &$threshold) {
-			$threshold_parsed_values = [];
-
-			if ($parser->parse($threshold['x_axis_threshold']) === CParser::PARSE_SUCCESS) {
-				$threshold_parsed_values['x_axis_threshold'] = $parser->calcValue();
-			}
-
-			if ($binary_parser->parse($threshold['x_axis_threshold']) === CParser::PARSE_SUCCESS) {
-				$threshold_parsed_values['x_axis_threshold_binary'] = $binary_parser->calcValue();
-			}
-
-			if ($parser->parse($threshold['y_axis_threshold']) === CParser::PARSE_SUCCESS) {
-				$threshold_parsed_values['y_axis_threshold'] = $parser->calcValue();
-			}
-
-			if ($binary_parser->parse($threshold['y_axis_threshold']) === CParser::PARSE_SUCCESS) {
-				$threshold_parsed_values['y_axis_threshold_binary'] = $binary_parser->calcValue();
-			}
-
-			$threshold = $threshold_parsed_values + [
-				'color' => '#'.$threshold['color']
-			];
-		}
-		unset($threshold);
-
 		$graph_data = [
 			'data_sets' => array_values($this->fields_values['ds']),
 			'data_source' => $this->fields_values['source'],
@@ -105,7 +77,8 @@ class WidgetView extends CControllerDashboardWidgetView {
 				'time_from' => $this->fields_values['time_period']['from_ts'],
 				'time_to' => $this->fields_values['time_period']['to_ts']
 			],
-			'thresholds' => $thresholds,
+			'grouped_thresholds' => $this->prepareGroupedThresholds($this->fields_values['thresholds']),
+			'interpolation' => (bool) $this->fields_values['interpolation'],
 			'axes' => [
 				'show_x_axis' => $this->fields_values['x_axis'] == SVG_GRAPH_AXIS_ON,
 				'x_axis_min' => $x_axis_min,
@@ -133,7 +106,7 @@ class WidgetView extends CControllerDashboardWidgetView {
 				: ''
 		];
 
-		$svg_options = CSvgGraphHelper::get($graph_data, $width, $height);
+		$svg_options = CScatterPlotHelper::get($graph_data, $width, $height);
 		if ($svg_options['errors']) {
 			error($svg_options['errors']);
 		}
@@ -155,6 +128,51 @@ class WidgetView extends CControllerDashboardWidgetView {
 				'debug_mode' => $this->getDebugMode()
 			]
 		]));
+	}
+
+	private function prepareGroupedThresholds(array $thresholds): array {
+		$grouped_thresholds = [];
+
+		$parser = new CNumberParser(['with_size_suffix' => true, 'with_time_suffix' => true]);
+		$binary_parser = new CNumberParser(['with_size_suffix' => true, 'with_time_suffix' => true,
+			'is_binary' => true
+		]);
+
+		foreach ($thresholds as $threshold) {
+			$threshold_parsed_values = [];
+
+			if ($parser->parse($threshold['x_axis_threshold']) === CParser::PARSE_SUCCESS) {
+				$threshold_parsed_values['x'] = $parser->calcValue();
+
+				if ($binary_parser->parse($threshold['x_axis_threshold']) === CParser::PARSE_SUCCESS) {
+					$threshold_parsed_values['x_binary'] = $binary_parser->calcValue();
+				}
+			}
+
+			if ($parser->parse($threshold['y_axis_threshold']) === CParser::PARSE_SUCCESS) {
+				$threshold_parsed_values['y'] = $parser->calcValue();
+
+				if ($binary_parser->parse($threshold['y_axis_threshold']) === CParser::PARSE_SUCCESS) {
+					$threshold_parsed_values['y_binary'] = $binary_parser->calcValue();
+				}
+			}
+
+			$threshold = $threshold_parsed_values + [
+				'color' => '#'.$threshold['color']
+			];
+
+			if (array_key_exists('x', $threshold) && array_key_exists('y', $threshold)) {
+				$grouped_thresholds['both'][] = $threshold;
+			}
+			elseif (array_key_exists('x', $threshold)) {
+				$grouped_thresholds['only_x'][] = $threshold;
+			}
+			elseif (array_key_exists('y', $threshold)) {
+				$grouped_thresholds['only_y'][] = $threshold;
+			}
+		}
+
+		return $grouped_thresholds;
 	}
 
 	/**
