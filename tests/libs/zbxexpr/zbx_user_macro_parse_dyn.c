@@ -58,7 +58,7 @@ void	zbx_mock_test_entry(void **state)
 	{
 		int	exp_context_op = zbx_mock_get_parameter_int("out.context_op");
 
-		zbx_mock_assert_int_eq("exptected context op", exp_context_op, got_context_op);
+		zbx_mock_assert_int_eq("expected context op", exp_context_op, got_context_op);
 	}
 
 	zbx_free(got_name);
