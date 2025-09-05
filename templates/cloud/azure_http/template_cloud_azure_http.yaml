@@ -44,10 +44,10 @@ zabbix_export:
         > See [Azure documentation](https://docs.microsoft.com/en-us/cli/azure/create-an-azure-service-principal-azure-cli) for more details.
         
         2. Link the template to a host.
-        3. Configure the macros: `Azure App ID`, `Azure password`, `Azure tenant ID`, `Azure subscription ID`, `Azure Vault ID` and `Backup jobs period`.
+        3. Configure the host wizard configuration fields: `Azure App ID`, `Azure password`, `Azure tenant ID`, `Azure subscription ID`, `Azure Vault ID` and `Backup jobs period`.
       vendor:
         name: Zabbix
-        version: 8.0-0
+        version: 8.0-1
       groups:
         - name: Templates/Cloud
       items:
@@ -1297,10 +1297,10 @@ zabbix_export:
         > See [Azure documentation](https://docs.microsoft.com/en-us/cli/azure/create-an-azure-service-principal-azure-cli) for more details.
         
         2. Link the template to a host.
-        3. Configure the macros: `Azure App ID`, `Azure password`, `Azure tenant ID`, `Azure subscription ID`.
+        3. Configure the host wizard configuration fields: `Azure App ID`, `Azure password`, `Azure tenant ID`, `Azure subscription ID`.
       vendor:
         name: Zabbix
-        version: 8.0-0
+        version: 8.0-1
       groups:
         - name: Templates/Cloud
       items:
@@ -4277,10 +4277,10 @@ zabbix_export:
         > See [Azure documentation](https://docs.microsoft.com/en-us/cli/azure/create-an-azure-service-principal-azure-cli) for more details.
         
         2. Link the template to a host.
-        3. Configure the macros: `Azure App ID`, `Azure password`, `Azure tenant ID`, `Azure subscription ID`, and `Azure Cosmos DB ID`.
+        3. Configure the host wizard configuration fields: `Azure App ID`, `Azure password`, `Azure tenant ID`, `Azure subscription ID`, and `Azure Cosmos DB ID`.
       vendor:
         name: Zabbix
-        version: 8.0-0
+        version: 8.0-1
       groups:
         - name: Templates/Cloud
       items:
@@ -5017,10 +5017,10 @@ zabbix_export:
         > See [Azure documentation](https://docs.microsoft.com/en-us/cli/azure/create-an-azure-service-principal-azure-cli) for more details.
         
         2. Link the template to a host.
-        3. Configure the macros: `Azure App ID`, `Azure password`, `Azure tenant ID`, `Azure subscription ID`.
+        3. Configure the host wizard configuration fields: `Azure App ID`, `Azure password`, `Azure tenant ID`, `Azure subscription ID`.
       vendor:
         name: Zabbix
-        version: 8.0-0
+        version: 8.0-1
       groups:
         - name: Templates/Cloud
       items:
@@ -6171,10 +6171,10 @@ zabbix_export:
         > See [Azure documentation](https://docs.microsoft.com/en-us/cli/azure/create-an-azure-service-principal-azure-cli) for more details.
         
         2. Link the template to a host.
-        3. Configure the macros: `Azure App ID`, `Azure password`, `Azure tenant ID`, `Azure subscription ID`, and `Azure MSSQL database ID`.
+        3. Configure the host wizard configuration fields: `Azure App ID`, `Azure password`, `Azure tenant ID`, `Azure subscription ID`, and `Azure MSSQL database ID`.
       vendor:
         name: Zabbix
-        version: 8.0-0
+        version: 8.0-1
       groups:
         - name: Templates/Cloud
       items:
@@ -7417,10 +7417,10 @@ zabbix_export:
         > See [Azure documentation](https://docs.microsoft.com/en-us/cli/azure/create-an-azure-service-principal-azure-cli) for more details.
         
         2. Link the template to a host.
-        3. Configure the macros: `Azure App ID`, `Azure password`, `Azure tenant ID`, `Azure subscription ID` and `Azure SQL DTU-based database ID`.
+        3. Configure the host wizard configuration fields: `Azure App ID`, `Azure password`, `Azure tenant ID`, `Azure subscription ID` and `Azure SQL DTU-based database ID`.
       vendor:
         name: Zabbix
-        version: 8.0-0
+        version: 8.0-1
       groups:
         - name: Templates/Cloud
       items:
@@ -8634,10 +8634,10 @@ zabbix_export:
         > See [Azure documentation](https://docs.microsoft.com/en-us/cli/azure/create-an-azure-service-principal-azure-cli) for more details.
         
         2. Link the template to a host.
-        3. Configure the macros: `Azure App ID`, `Azure password`, `Azure tenant ID`, `Azure subscription ID`, and `Azure MSSQL database ID`.
+        3. Configure the host wizard configuration fields: `Azure App ID`, `Azure password`, `Azure tenant ID`, `Azure subscription ID`, and `Azure MSSQL database ID`.
       vendor:
         name: Zabbix
-        version: 8.0-0
+        version: 8.0-1
       groups:
         - name: Templates/Cloud
       items:
@@ -9846,10 +9846,10 @@ zabbix_export:
         > See [Azure documentation](https://docs.microsoft.com/en-us/cli/azure/create-an-azure-service-principal-azure-cli) for more details.
         
         2. Link the template to a host.
-        3. Configure the macros: `Azure App ID`, `Azure password`, `Azure tenant ID`, `Azure subscription ID`, and `Azure MySQL server ID.`.
+        3. Configure the host wizard configuration fields: `Azure App ID`, `Azure password`, `Azure tenant ID`, `Azure subscription ID`, and `Azure MySQL server ID.`.
       vendor:
         name: Zabbix
-        version: 8.0-0
+        version: 8.0-1
       groups:
         - name: Templates/Cloud
       items:
@@ -10945,10 +10945,10 @@ zabbix_export:
         > See [Azure documentation](https://docs.microsoft.com/en-us/cli/azure/create-an-azure-service-principal-azure-cli) for more details.
         
         2. Link the template to a host.
-        3. Configure the macros: `Azure App ID`, `Azure password`, `Azure tenant ID`, `Azure subscription ID`, and `Azure MySQL server ID`.
+        3. Configure the host wizard configuration fields: `Azure App ID`, `Azure password`, `Azure tenant ID`, `Azure subscription ID`, and `Azure MySQL server ID`.
       vendor:
         name: Zabbix
-        version: 8.0-0
+        version: 8.0-1
       groups:
         - name: Templates/Cloud
       items:
@@ -11992,10 +11992,10 @@ zabbix_export:
         > See [Azure documentation](https://docs.microsoft.com/en-us/cli/azure/create-an-azure-service-principal-azure-cli) for more details.
         
         2. Link the template to a host.
-        3. Configure the macros: `Azure App ID`, `Azure password`, `Azure tenant ID`, `Azure subscription ID`, and `Azure PostgreSQL server ID`.
+        3. Configure the host wizard configuration fields: `Azure App ID`, `Azure password`, `Azure tenant ID`, `Azure subscription ID`, and `Azure PostgreSQL server ID`.
       vendor:
         name: Zabbix
-        version: 8.0-0
+        version: 8.0-1
       groups:
         - name: Templates/Cloud
       items:
@@ -13186,10 +13186,10 @@ zabbix_export:
         > See [Azure documentation](https://docs.microsoft.com/en-us/cli/azure/create-an-azure-service-principal-azure-cli) for more details.
         
         2. Link the template to a host.
-        3. Configure the macros: `Azure App ID`, `Azure password`, `Azure tenant ID`, `Azure subscription ID`, and `Azure PostgreSQL server ID`.
+        3. Configure the host wizard configuration fields: `Azure App ID`, `Azure password`, `Azure tenant ID`, `Azure subscription ID`, and `Azure PostgreSQL server ID`.
       vendor:
         name: Zabbix
-        version: 8.0-0
+        version: 8.0-1
       groups:
         - name: Templates/Cloud
       items:
@@ -14231,10 +14231,10 @@ zabbix_export:
         > See [Azure documentation](https://docs.microsoft.com/en-us/cli/azure/create-an-azure-service-principal-azure-cli) for more details.
         
         2. Link the template to a host.
-        3. Configure the macros: `Azure App ID`, `Azure password`, `Azure tenant ID`, `Azure subscription ID`, and `Azure SQL managed instance ID`.
+        3. Configure the host wizard configuration fields: `Azure App ID`, `Azure password`, `Azure tenant ID`, `Azure subscription ID`, and `Azure SQL managed instance ID`.
       vendor:
         name: Zabbix
-        version: 8.0-0
+        version: 8.0-1
       groups:
         - name: Templates/Cloud
       items:
@@ -15284,10 +15284,10 @@ zabbix_export:
         > See [Azure documentation](https://docs.microsoft.com/en-us/cli/azure/create-an-azure-service-principal-azure-cli) for more details.
         
         2. Link the template to a host.
-        3. Configure the macros: `Azure App ID`, `Azure password`, `Azure tenant ID`, `Azure subscription ID`, and `Azure virtual machine ID`.
+        3. Configure the host wizard configuration fields: `Azure App ID`, `Azure password`, `Azure tenant ID`, `Azure subscription ID`, and `Azure virtual machine ID`.
       vendor:
         name: Zabbix
-        version: 8.0-0
+        version: 8.0-1
       groups:
         - name: Templates/Cloud
       items:
@@ -17005,10 +17005,10 @@ zabbix_export:
         > See [Azure documentation](https://docs.microsoft.com/en-us/cli/azure/create-an-azure-service-principal-azure-cli) for more details.
         
         2. Link the template to a host.
-        3. Configure the macros: `Azure App ID`, `Azure password`, `Azure tenant ID`, `Azure subscription ID`, and `Azure scale set ID`.
+        3. Configure the host wizard configuration fields: `Azure App ID`, `Azure password`, `Azure tenant ID`, `Azure subscription ID`, and `Azure scale set ID`.
       vendor:
         name: Zabbix
-        version: 8.0-0
+        version: 8.0-1
       groups:
         - name: Templates/Cloud
       items:

@@ -380,6 +380,15 @@ $item_tab
 			->setModern()
 		))->setId('js-item-retrieve-mode-field')
 	])
+	// Append ITEM_TYPE_HTTPAGENT Convert to JSON to form list.
+	->addItem([
+		(new CLabel(_('Convert to JSON'), 'output_format'))->setId('js-item-output-format-label'),
+		(new CFormField(
+			(new CCheckBox('output_format', HTTPCHECK_STORE_JSON))
+				->setReadonly($readonly)
+				->setChecked($data['output_format'] == HTTPCHECK_STORE_JSON)
+		))->setId('js-item-output-format-field')
+	])
 	// Append ITEM_TYPE_HTTPAGENT HTTP proxy to form list.
 	->addItem([
 		(new CLabel(_('HTTP proxy'), 'http_proxy'))->setId('js-item-http-proxy-label'),
