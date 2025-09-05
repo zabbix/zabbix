@@ -291,20 +291,20 @@ static void	rtc_process_db_status(char **result)
 	zbx_strlog_alloc(LOG_LEVEL_INFORMATION, result, &result_alloc, &result_offset,
 			"database connection pool configuration");
 	zbx_strlog_alloc(LOG_LEVEL_INFORMATION, result, &result_alloc, &result_offset,
-			"  maximum idle connection limit: %d", cfg.max_idle);
+			"  %30s: %d", "maximum idle connection limit", cfg.max_idle);
 	zbx_strlog_alloc(LOG_LEVEL_INFORMATION, result, &result_alloc, &result_offset,
-			"  maximum connection limit: %d", cfg.max_open);
+			"  %30s: %d", "maximum connection limit", cfg.max_open);
 	zbx_strlog_alloc(LOG_LEVEL_INFORMATION, result, &result_alloc, &result_offset,
-			"              idle timeout: %d", cfg.idle_timeout);
+			"  %30s: %d", "idle timeout", cfg.idle_timeout);
 
 	zbx_strlog_alloc(LOG_LEVEL_INFORMATION, result, &result_alloc, &result_offset,
 			"database connection pool statistics");
 	zbx_strlog_alloc(LOG_LEVEL_INFORMATION, result, &result_alloc, &result_offset,
-			"  provided connections: " ZBX_FS_UI64, stats.provided_num);
+			"  %30s: " ZBX_FS_UI64, "provided connections", stats.provided_num);
 	zbx_strlog_alloc(LOG_LEVEL_INFORMATION, result, &result_alloc, &result_offset,
-			"       total wait time: %.3f" , stats.time_wait);
+			"  %30s: %.3f" , "total wait time", stats.time_wait);
 	zbx_strlog_alloc(LOG_LEVEL_INFORMATION, result, &result_alloc, &result_offset,
-			"       total idle time: %.3f" , stats.time_idle);
+			"  %30s: %.3f" , "total idle time", stats.time_idle);
 }
 
 /******************************************************************************
