@@ -605,14 +605,14 @@ class CScatterPlotHelper
 				continue;
 			}
 
-			$metric_points = [];
-
 			$period = $metric['time_period']['time_to'] - $metric['time_period']['time_from'];
 			$approximation_tick_delta = ($period / $metric['options']['aggregate_interval']) > $width
 				? ceil($period / $width)
 				: 0;
 
 			foreach (['x_axis', 'y_axis'] as $key) {
+				$metric_points = [];
+
 				foreach ($result[$key] as $points) {
 					$tick = 0;
 					usort($points['data'],
@@ -622,11 +622,11 @@ class CScatterPlotHelper
 					);
 
 					foreach ($points['data'] as $point) {
-						if ($point['tick'] > ($tick + $approximation_tick_delta)) {
+						if ($point['tick'] > $tick + $approximation_tick_delta) {
 							$tick = $point['tick'];
 						}
 
-						$metric_points[$tick][$key] = $point;
+						$metric_points[$tick][] = $point;
 					}
 				}
 
@@ -679,10 +679,10 @@ class CScatterPlotHelper
 						}
 						break;
 				}
-
-				$x_units = reset($metric['x_axis_items'])['units'];
-				$y_units = reset($metric['y_axis_items'])['units'];
 			}
+
+			$x_units = reset($metric['x_axis_items'])['units'];
+			$y_units = reset($metric['y_axis_items'])['units'];
 
 			foreach ($metric['points'] as $tick => &$point) {
 				if (array_key_exists('x_axis',$point) && array_key_exists('y_axis', $point)) {
