@@ -77,7 +77,7 @@ window.media_type_mapping_edit_popup = new class {
 	}
 
 	trimFields(fields) {
-		const fields_to_trim = ['name', 'attribute'];
+		const fields_to_trim = ['name', 'attribute', 'period'];
 
 		for (const field of fields_to_trim) {
 			if (field in fields) {

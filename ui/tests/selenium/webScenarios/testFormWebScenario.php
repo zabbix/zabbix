@@ -894,7 +894,7 @@ class testFormWebScenario extends CWebTest {
 			$table_fields[$field_name] = $form->getField($field_name)->asMultifieldTable()->getValue();
 		}
 
-		$form->query('button:Clone')->one()->click();
+		$form->query('button:Clone')->one()->click()->waitUntilNotVisible();
 		$form->invalidate();
 		$form->getField('Name')->fill('Clone of '.self::CLONE_SCENARIO);
 		$form->submit();

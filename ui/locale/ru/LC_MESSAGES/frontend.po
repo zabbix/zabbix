@@ -2068,6 +2068,10 @@ msgstr "Среднее количество ожидающих запросов 
 msgid "Avoid easy-to-guess passwords"
 msgstr "Избегать легко угадываемых паролей"
 
+#: app/views/host.wizard.edit.php:473
+msgid "Avoid including sensitive data."
+msgstr ""
+
 #: jsLoader.php:172
 msgid "Awaiting data"
 msgstr "Ожидание данных"
@@ -8665,6 +8669,10 @@ msgstr "Английский (en_US)"
 #: app/views/host.wizard.edit.php:399
 msgid "Enter a non-secret pre-shared key identity string. Avoid including sensitive data."
 msgstr "Введите строку идентификатора PSK (pre-shared key). Это не секретная строка, избегайте использование личных или конфиденциальных данных."
+
+#: app/views/host.wizard.edit.php:470
+msgid "Enter a unique name that Zabbix components will use to recognize the pre-shared key."
+msgstr ""
 
 #: app/views/host.wizard.edit.php:609
 msgid "Enter the IP/DNS address and port of the Zabbix agent installed on your monitoring target."

@@ -2021,6 +2021,10 @@ msgstr "收集间隔期间对虚拟磁盘的平均未完成写入请求数，\"u
 msgid "Avoid easy-to-guess passwords"
 msgstr "避免弱密码"
 
+#: app/views/host.wizard.edit.php:473
+msgid "Avoid including sensitive data."
+msgstr ""
+
 #: jsLoader.php:172
 msgid "Awaiting data"
 msgstr "等待数据"
@@ -8430,6 +8434,10 @@ msgstr "英语(en_US)"
 #: app/views/host.wizard.edit.php:399
 msgid "Enter a non-secret pre-shared key identity string. Avoid including sensitive data."
 msgstr "输入非机密的预共享密钥标识字符串，避免包含敏感数据"
+
+#: app/views/host.wizard.edit.php:470
+msgid "Enter a unique name that Zabbix components will use to recognize the pre-shared key."
+msgstr ""
 
 #: app/views/host.wizard.edit.php:609
 msgid "Enter the IP/DNS address and port of the Zabbix agent installed on your monitoring target."

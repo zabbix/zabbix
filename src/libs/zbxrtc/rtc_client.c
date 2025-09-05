@@ -330,7 +330,7 @@ void	zbx_rtc_subscribe(unsigned char proc_type, int proc_num, zbx_uint32_t *msgs
 
 /******************************************************************************
  *                                                                            *
- * Purpose: subscribe process for RTC notifications                           *
+ * Purpose: subscribe service for RTC notifications                           *
  *                                                                            *
  * Parameters:                                                                *
  *      proc_type      - [IN]                                                 *
@@ -383,6 +383,40 @@ void	zbx_rtc_subscribe_service(unsigned char proc_type, int proc_num, zbx_uint32
 	}
 
 	zbx_free(data);
+	zbx_ipc_socket_close(&sock);
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: unsubsribe service from RTC notifications                         *
+ *                                                                            *
+ * Parameters:                                                                *
+ *      config_timeout - [IN]                                                 *
+ *      service        - [IN] the subscriber IPC service                      *
+ *                                                                            *
+ ******************************************************************************/
+void	zbx_rtc_unsubscribe_service(int config_timeout, const char *service)
+{
+	zbx_ipc_socket_t	sock;
+	char			*error = NULL;
+	zbx_uint32_t		service_len;
+	unsigned char		data[ZBX_IPC_PATH_MAX], *ptr = data;
+
+	service_len = (zbx_uint32_t)strlen(service);
+	if (ZBX_IPC_PATH_MAX <= service_len + sizeof(zbx_uint32_t))
+		return;
+
+	if (FAIL == zbx_ipc_socket_open(&sock, ZBX_IPC_SERVICE_RTC, config_timeout, &error))
+	{
+		zabbix_log(LOG_LEVEL_DEBUG, "cannot connect to RTC service: %s", error);
+		return;
+	}
+
+	ptr += zbx_serialize_str(ptr, service, service_len);
+
+	if (FAIL == zbx_ipc_socket_write(&sock, ZBX_RTC_UNSUBSCRIBE_SERVICE, data, (zbx_uint32_t)(ptr - data)))
+		zabbix_log(LOG_LEVEL_DEBUG, "cannot unsubscribe from RTC service notifications: %s", error);
+
 	zbx_ipc_socket_close(&sock);
 }
 

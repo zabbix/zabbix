@@ -219,7 +219,7 @@ foreach ($http_tests as $httpTestId => $httpTest) {
 			->addCsrfToken($csrf_token)
 			->addClass(ZBX_STYLE_LINK_ACTION)
 			->addClass(httptest_status2style($httpTest['status'])),
-		$data['tags'][$httpTest['httptestid']],
+		(new CDiv($data['tags'][$httpTest['httptestid']]))->addClass(ZBX_STYLE_TAGS_WRAPPER),
 		($data['context'] === 'host') ? makeInformationList($info_icons) : null
 	]);
 }

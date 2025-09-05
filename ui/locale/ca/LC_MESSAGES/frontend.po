@@ -2042,6 +2042,10 @@ msgstr "El nombre mitjà de sol·licituds d'escriptura pendents al disc virtual 
 msgid "Avoid easy-to-guess passwords"
 msgstr "Eviteu paraules de pas fàcils d'endevinar"
 
+#: app/views/host.wizard.edit.php:473
+msgid "Avoid including sensitive data."
+msgstr ""
+
 #: jsLoader.php:172
 msgid "Awaiting data"
 msgstr "Esperant dades"
@@ -8545,6 +8549,10 @@ msgstr "Anglès (en_US)"
 #: app/views/host.wizard.edit.php:399
 msgid "Enter a non-secret pre-shared key identity string. Avoid including sensitive data."
 msgstr "Entreu una cadena d'identitat de clau compartida prèviament que no sigui secreta. Eviteu incloure-hi dades sensibles."
+
+#: app/views/host.wizard.edit.php:470
+msgid "Enter a unique name that Zabbix components will use to recognize the pre-shared key."
+msgstr ""
 
 #: app/views/host.wizard.edit.php:609
 msgid "Enter the IP/DNS address and port of the Zabbix agent installed on your monitoring target."

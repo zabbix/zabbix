@@ -27,8 +27,6 @@ static const char	*help_message[] = {NULL};
 
 unsigned char	program_type	= ZBX_PROGRAM_TYPE_SENDER;
 
-int	CONFIG_TCP_MAX_BACKLOG_SIZE	= SOMAXCONN;
-
 static int	add_serveractive_host_sender_cb(const zbx_vector_addr_ptr_t *addrs, zbx_vector_str_t *hostnames,
 		void *data)
 {

@@ -370,8 +370,10 @@ class testPageAdministrationProxyGroups extends CWebTest {
 		$form->query('button:Reset')->one()->click();
 
 		// Fill filter form with data.
+		$table = $this->getTable();
 		$form->fill($data['filter']);
 		$form->submit();
+		$table->waitUntilReloaded();
 		$this->page->waitUntilReady();
 
 		// Check filtered result.

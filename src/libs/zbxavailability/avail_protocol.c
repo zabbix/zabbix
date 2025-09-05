@@ -31,7 +31,10 @@ void	zbx_availability_serialize_interface(unsigned char **data, size_t *data_all
 	zbx_serialize_prepare_str_len(data_len, interface_availability->agent.error, error_len);
 
 	if (NULL == *data)
-		*data = (unsigned char *)zbx_calloc(NULL, (*data_alloc = MAX(1024, data_len)), 1);
+	{
+		*data_alloc = MAX(1024, data_len);
+		*data = (unsigned char *)zbx_calloc(NULL, *data_alloc, 1);
+	}
 
 	while (data_len > *data_alloc - *data_offset)
 	{

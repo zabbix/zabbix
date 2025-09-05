@@ -286,10 +286,10 @@ class testFormTemplate extends CLegacyWebTest {
 	public function filterAndOpenTemplate($name) {
 		$this->query('button:Reset')->one()->click();
 		$form = $this->query('name:zbx_filter')->asForm()->waitUntilVisible()->one();
+		$table = $this->query('xpath://table[@class="list-table"]')->asTable()->one();
 		$form->fill(['Name' => $name]);
 		$this->query('button:Apply')->one()->waitUntilClickable()->click();
-		$this->query('xpath://table[@class="list-table"]')->asTable()->one()->findRow('Name', $name)
-				->getColumn('Name')->query('link', $name)->one()->click();
+		$table->waitUntilReloaded()->findRow('Name', $name)->getColumn('Name')->query('link', $name)->one()->click();
 		$this->page->waitUntilReady();
 	}
 

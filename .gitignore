@@ -147,6 +147,9 @@ tests/libs/zbxalgo/zbx_int128
 tests/libs/zbxalgo/zbx_vector
 tests/libs/zbxcfg/parse_cfg_file
 tests/libs/zbxcommon/init_library_common
+tests/libs/zbxcommon/zbx_calloc
+tests/libs/zbxcommon/zbx_malloc
+tests/libs/zbxcommon/zbx_realloc
 tests/libs/zbxcomms/zbx_tcp_check_allowed_peers
 tests/libs/zbxcomms/zbx_tcp_check_allowed_peers_ipv4
 tests/libs/zbxcommshigh/zbx_tcp_recv_ext

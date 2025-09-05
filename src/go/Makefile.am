@@ -63,6 +63,7 @@ clean: clean-go-build clean-sbom
 
 clean-go-build:
 	-$(GO) clean ./...
+	-$(GO) clean -cache
 	-rm -f bin/mock_server
 	-rm -f bin/zabbix_agent2
 	-rm -f bin/zabbix_web_service

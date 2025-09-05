@@ -250,7 +250,7 @@ class testFormTotp extends CWebTest {
 		// Enter the incorrect TOTP several times to get blocked.
 		for ($i = 1; $i <= self::BLOCK_COUNT; $i++) {
 			$form->getField('id:verification_code')->fill('999999');
-			$form->query('button:Sign in')->one()->click();
+			$form->query('button:Sign in')->one()->click()->waitUntilStalled();
 
 			if ($i !== self::BLOCK_COUNT) {
 				// Validate the validation error message first n-1 times.

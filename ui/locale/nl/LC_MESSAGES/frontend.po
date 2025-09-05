@@ -2044,6 +2044,10 @@ msgstr "Gemiddeld aantal uitstaande schrijfverzoeken naar de virtuele schijf ged
 msgid "Avoid easy-to-guess passwords"
 msgstr "Vermijd gemakkelijk te raden wachtwoorden"
 
+#: app/views/host.wizard.edit.php:473
+msgid "Avoid including sensitive data."
+msgstr ""
+
 #: jsLoader.php:172
 msgid "Awaiting data"
 msgstr "Wachten op gegevens"
@@ -8543,6 +8547,10 @@ msgstr "Engels (en_US)"
 
 #: app/views/host.wizard.edit.php:399
 msgid "Enter a non-secret pre-shared key identity string. Avoid including sensitive data."
+msgstr ""
+
+#: app/views/host.wizard.edit.php:470
+msgid "Enter a unique name that Zabbix components will use to recognize the pre-shared key."
 msgstr ""
 
 #: app/views/host.wizard.edit.php:609

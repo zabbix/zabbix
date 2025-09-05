@@ -37,7 +37,7 @@ char	zabbix_event_source[ZBX_SERVICE_NAME_LEN] = APPLICATION_NAME;
 #undef ZBX_SERVICE_NAME_LEN
 
 #define JS_TIMEOUT_MIN		1
-#define JS_TIMEOUT_MAX		60
+#define JS_TIMEOUT_MAX		600
 #define JS_TIMEOUT_DEF		ZBX_ES_TIMEOUT
 #define JS_TIMEOUT_MIN_STR	ZBX_STR(JS_TIMEOUT_MIN)
 #define JS_TIMEOUT_MAX_STR	ZBX_STR(JS_TIMEOUT_MAX)
@@ -161,6 +161,15 @@ static int	execute_script(const char *command, const char *param, int timeout, c
 	if (NULL != webdriver && FAIL == zbx_es_init_browser_env(&es, webdriver, &errmsg))
 	{
 		zbx_snprintf(error, max_error_len, "cannot initialize Browser object: %s", errmsg);
+		zbx_free(errmsg);
+		ret = FAIL;
+
+		goto failure;
+	}
+
+	if (SUCCEED != zbx_es_globals_make_readonly(&es, &errmsg))
+	{
+		zbx_snprintf(error, max_error_len, "cannot initialize read-only environment: %s", errmsg);
 		zbx_free(errmsg);
 		ret = FAIL;
 

@@ -31,7 +31,10 @@ void	zbx_connector_serialize_object(unsigned char **data, size_t *data_alloc, si
 	zbx_serialize_prepare_vector_uint64_len(data_len, (&connector_object->ids), vector_uint64_len);
 
 	if (NULL == *data)
-		*data = (unsigned char *)zbx_calloc(NULL, (*data_alloc = MAX(1024, data_len)), 1);
+	{
+		*data_alloc = MAX(1024, data_len);
+		*data = (unsigned char *)zbx_calloc(NULL, *data_alloc, 1);
+	}
 
 	while (data_len > *data_alloc - *data_offset)
 	{
@@ -80,7 +83,10 @@ void	zbx_connector_serialize_data_point(unsigned char **data, size_t *data_alloc
 	zbx_serialize_prepare_str_len(data_len, connector_data_point->str, str_len);
 
 	if (NULL == *data)
-		*data = (unsigned char *)zbx_calloc(NULL, (*data_alloc = MAX(1024, data_len)), 1);
+	{
+		*data_alloc = MAX(1024, data_len);
+		*data = (unsigned char *)zbx_calloc(NULL, *data_alloc, 1);
+	}
 
 	while (data_len > *data_alloc - *data_offset)
 	{
@@ -139,7 +145,10 @@ void	zbx_connector_serialize_connector(unsigned char **data, size_t *data_alloc,
 	zbx_serialize_prepare_str_len(data_len, connector->attempt_interval, attempt_interval_len);
 
 	if (NULL == *data)
-		*data = (unsigned char *)zbx_calloc(NULL, (*data_alloc = MAX(1024, data_len)), 1);
+	{
+		*data_alloc = MAX(1024, data_len);
+		*data = (unsigned char *)zbx_calloc(NULL, *data_alloc, 1);
+	}
 
 	while (data_len > *data_alloc - *data_offset)
 	{

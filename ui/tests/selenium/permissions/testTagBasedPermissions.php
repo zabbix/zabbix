@@ -730,7 +730,7 @@ class testTagBasedPermissions extends CLegacyWebTest {
 						[
 							'Host' => 'First Host for tag filter permission test',
 							'Problem' => 'Third trigger for tag filter permission check',
-							'Tags' => implode(['item OS: Linux', 'trigger OS: Windows'])
+							'Tags' => implode("\n", ['item OS: Linux', 'trigger OS: Windows'])
 						],
 						[
 
@@ -765,7 +765,7 @@ class testTagBasedPermissions extends CLegacyWebTest {
 						[
 							'Host' => 'First Host for tag filter permission test',
 							'Problem' => 'Third trigger for tag filter permission check',
-							'Tags' => implode(['item OS: Linux', 'trigger OS: Windows'])
+							'Tags' => implode("\n", ['item OS: Linux', 'trigger OS: Windows'])
 						],
 						[
 							'Host' => 'Second Host for tag filter permission test',
@@ -799,7 +799,7 @@ class testTagBasedPermissions extends CLegacyWebTest {
 						[
 							'Host' => 'First Host for tag filter permission test',
 							'Problem' => 'Third trigger for tag filter permission check',
-							'Tags' => implode(['item OS: Linux', 'trigger OS: Windows'])
+							'Tags' => implode("\n", ['item OS: Linux', 'trigger OS: Windows'])
 						],
 						[
 							'Host' => 'Second Host for tag filter permission test',

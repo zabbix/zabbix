@@ -435,7 +435,7 @@ class testInheritanceHostPrototype extends CLegacyWebTest {
 	 */
 	public function testInheritanceHostPrototype_Clone($data) {
 		$this->selectHostPrototypeForUpdate('host', $data);
-		$this->zbxTestClickWait('clone');
+		$this->query('button:Clone')->waitUntilVisible()->one()->click()->waitUntilNotVisible();
 
 		if (array_key_exists('cloned_name', $data)) {
 			$this->zbxTestInputTypeOverwrite('host', $data['cloned_name']);
