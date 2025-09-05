@@ -92,12 +92,12 @@ class testMediatype extends CAPITest {
 				]],
 				'Invalid parameter "/1/smtp_authentication": value must be 0.'
 			],
-			'invalid access_token_updated' => [
+			'access_token_updated is out of range' => [
 				[[
 					'mediatypeid' => ':media_type:OAuth with tokens',
-					'access_token_updated' => 3600,
+					'access_token_updated' => ':time'
 				]],
-				'Invalid parameter "/1/access_token_updated": value must be one of ' . date('Y-m-d H:i:s', time()-600) . '-' . date('Y-m-d H:i:s', time()) . '.'
+				'Invalid parameter "/1/access_token_updated": value must be one of :interval.'
 			]
 		];
 	}
@@ -191,6 +191,17 @@ class testMediatype extends CAPITest {
 	 * @dataProvider updateValidDataProvider
 	 */
 	public function testMediatypeUpdate(array $mediatypes, $expected_error) {
+		if (array_key_exists('access_token_updated', $mediatypes[0])
+				&& $mediatypes[0]['access_token_updated'] === ':time') {
+			$mediatypes[0]['access_token_updated'] =  time() - SEC_PER_HOUR;
+
+			if ($expected_error !== null) {
+				$time_from = date('Y-m-d H:i:s',  time() - 600);
+				$time_to = date('Y-m-d H:i:s',  time());
+				$expected_error = str_replace(':interval', $time_from . '-' . $time_to, $expected_error);
+			}
+		}
+
 		CTestDataHelper::convertMediatypesReferences($mediatypes);
 		$this->call('mediatype.update', $mediatypes, $expected_error);
 	}
@@ -303,10 +314,10 @@ class testMediatype extends CAPITest {
 				]],
 				'Invalid parameter "/1/redirection_url": value must be empty.'
 			],
-			'invalid create' =>
+			'access_token_updated is out of range' =>
 			[
 				[[
-					'name' => 'testing2',
+					'name' => 'access_token_updated is out of range',
 					'type' => MEDIA_TYPE_EMAIL,
 					'smtp_server' => 'smtp.gmail.com',
 					'smtp_helo' => 'example.com',
@@ -320,10 +331,10 @@ class testMediatype extends CAPITest {
 					'tokens_status' => OAUTH_REFRESH_TOKEN_VALID,
 					'refresh_token' => 'refreshtoken',
 					'access_token' => 'updated',
-					'access_token_updated' => time() - SEC_PER_HOUR,
+					'access_token_updated' => ':time',
 					'access_expires_in' => 600
 				]],
-				'Invalid parameter "/1/access_token_updated": value must be one of ' . date('Y-m-d H:i:s', time()-600) . '-' . date('Y-m-d H:i:s', time()) . '.'
+				'Invalid parameter "/1/access_token_updated": value must be one of :interval.'
 			]
 		];
 	}
@@ -332,6 +343,17 @@ class testMediatype extends CAPITest {
 	 * @dataProvider createInvalidDataProvider
 	 */
 	public function testMediatypeCreate(array $mediatypes, $expected_error) {
+		if (array_key_exists('access_token_updated', $mediatypes[0])
+				&& $mediatypes[0]['access_token_updated'] === ':time') {
+			$mediatypes[0]['access_token_updated'] = time() - SEC_PER_HOUR;
+
+			if ($expected_error !== null) {
+				$time_from = date('Y-m-d H:i:s', time() - $mediatypes[0]['access_expires_in']);
+				$time_to = date('Y-m-d H:i:s', time());
+				$expected_error = str_replace(':interval', $time_from . '-' . $time_to, $expected_error);
+			}
+		}
+
 		$this->call('mediatype.create', $mediatypes, $expected_error);
 	}
 
