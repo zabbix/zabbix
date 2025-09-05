@@ -106,7 +106,7 @@ $service_tab = (new CFormGrid())
 	->addItem([
 		(new CLabel(_('Sort order (0->999)'), 'sortorder'))->setAsteriskMark(),
 		new CFormField(
-			(new CNumericBox('sortorder', $data['form']['sortorder'], 3))
+			(new CNumericBox('sortorder', $data['form']['sortorder'], 3, allow_negative: false))
 				->setWidth(ZBX_TEXTAREA_TINY_WIDTH)
 				->setAriaRequired()
 		)
@@ -264,7 +264,7 @@ $service_tab->addItem(
 		->addItem([
 			(new CLabel(_('Weight'), 'weight'))->setAsteriskMark(),
 			new CFormField(
-				(new CNumericBox('weight', $data['form']['weight'], 7))
+				(new CNumericBox('weight', $data['form']['weight'], 7, allow_negative: false))
 					->setWidth(ZBX_TEXTAREA_TINY_WIDTH)
 					->setAriaRequired()
 			)
