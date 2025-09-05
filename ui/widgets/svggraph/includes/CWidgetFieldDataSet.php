@@ -78,6 +78,10 @@ class CWidgetFieldDataSet extends CWidgetField {
 		$data_sets = [];
 
 		foreach ((array) $value as $data_set) {
+			if (array_key_exists('itemids', $data_set)) {
+				$data_set['itemids'] = array_values($data_set['itemids']);
+			}
+
 			$data_sets[] = $data_set + self::getDefaults();
 		}
 
@@ -181,6 +185,13 @@ class CWidgetFieldDataSet extends CWidgetField {
 			if ($data['dataset_type'] == self::DATASET_TYPE_SINGLE_ITEM) {
 				foreach ($data['itemids'] as $i => &$item_spec) {
 					if ($item_spec == 0) {
+						if ($data['references'][$i] === '') {
+							$errors[] = _s('Invalid parameter "%1$s": %2$s.', $label.'/'.($index + 1),
+								_('referred widget is unavailable')
+							);
+							break;
+						}
+
 						$item_spec = [CWidgetField::FOREIGN_REFERENCE_KEY => $data['references'][$i]];
 					}
 				}
