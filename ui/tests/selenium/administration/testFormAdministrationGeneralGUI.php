@@ -989,9 +989,9 @@ class testFormAdministrationGeneralGUI extends testFormAdministrationGeneral {
 		$this->resetConfiguration($form, $this->default_values, 'Reset defaults');
 		// Fill necessary settings.
 		$form->fill($data['field']);
-		$form->submit();
-		// Wait for Successful configuration update message before opening page affected by settings update.
-		CMessageElement::find()->waituntilVisible();
+		$form->submit()->waitUntilStalled();
+		$this->page->waitUntilReady();
+
 		// Check saved settings.
 		$this->page->open($data['link'])->waitUntilReady();
 

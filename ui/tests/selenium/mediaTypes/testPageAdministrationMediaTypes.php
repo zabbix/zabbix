@@ -62,6 +62,20 @@ class testPageAdministrationMediaTypes extends CWebTest {
 				]
 			]
 		]);
+
+		CDataHelper::call('mediatype.create', [
+			[
+				'type' => MEDIA_TYPE_EXEC,
+				'name' => 'Test script',
+				'exec_path' => 'selenium_test_script.sh',
+				'parameters' => [
+					[
+						'sortorder' => '0',
+						'value' => '{ALERT.SUBJECT}'
+					]
+				]
+			]
+		]);
 	}
 
 	/**
@@ -270,6 +284,7 @@ class testPageAdministrationMediaTypes extends CWebTest {
 	public function testPageAdministrationMediaTypes_Filter($data) {
 		$this->page->login()->open('zabbix.php?action=mediatype.list');
 		$this->query('button:Reset')->waitUntilClickable()->one()->click();
+		$table = $this->query('class:list-table')->asTable()->one();
 
 		$form = $this->query('name:zbx_filter')->asForm()->one();
 		$form->fill($data['filter']);
@@ -296,6 +311,7 @@ class testPageAdministrationMediaTypes extends CWebTest {
 			$this->assertEquals(CDBHelper::getColumn($sql, 'name'), explode(', ', $actions));
 		}
 		else {
+			$table->waitUntilReloaded();
 			$this->assertTableDataColumn(CTestArrayHelper::get($data, 'result', []));
 		}
 	}
