@@ -212,12 +212,11 @@ class CAlert extends CApiService {
 				$sql_parts['where'][] = 'NOT EXISTS ('.
 					'SELECT NULL'.
 					' FROM functions f1'.
-					' JOIN items i1 ON f1.itemid=i1.itemid'.
+					' JOIN items i1 ON f1.triggerid=f.triggerid AND f1.itemid=i1.itemid'.
 					' JOIN host_hgset hh1 ON i1.hostid=hh1.hostid'.
 					' LEFT JOIN permission p1 ON hh1.hgsetid=p1.hgsetid'.
 						' AND p1.ugsetid=p.ugsetid'.
-					' WHERE e.objectid=f1.triggerid'.
-						' AND p1.permission IS NULL'.
+					' WHERE p1.permission IS NULL'.
 				')';
 			}
 			elseif (in_array($options['eventobject'], [EVENT_OBJECT_ITEM, EVENT_OBJECT_LLDRULE])) {
