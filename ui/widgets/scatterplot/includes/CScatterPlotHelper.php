@@ -705,12 +705,11 @@ class CScatterPlotHelper
 	}
 
 	private static function calculatePointColorByThresholds(string $color, $value_x, $value_y, string $units_x,
-			string $units_y, array $grouped_thresholds, bool $interpolation): string {
+			string $units_y, array $grouped_thresholds, bool $apply_interpolation): string {
 		if (!$grouped_thresholds) {
 			return $color;
 		}
 
-		$apply_interpolation = $interpolation;
 		$prev = null;
 		$current = null;
 
@@ -786,7 +785,7 @@ class CScatterPlotHelper
 		$magnitude_square = $vx * $vx + $vy * $vy;
 
 		if ($magnitude_square == 0) {
-			return 0.0; // Avoid division by zero (thresholds are the same point)
+			return 0.0;
 		}
 
 		// Projection factor = (w·v) / |v|^2
