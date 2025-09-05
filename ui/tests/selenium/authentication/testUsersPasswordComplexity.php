@@ -1038,7 +1038,7 @@ class testUsersPasswordComplexity extends CWebTest {
 
 		if ($update === false) {
 			$user_form->selectTab('Permissions');
-			$user_form->fill(['Role' => 'User role']);
+			$user_form->fill(['Role' => 'User role'])->waitUntilReloaded();
 		}
 
 		$user_form->submit();
@@ -1046,6 +1046,8 @@ class testUsersPasswordComplexity extends CWebTest {
 		if ($this->page->isAlertPresent()) {
 			$this->page->acceptAlert();
 		}
+		$user_form->waitUntilStalled();
+		$this->page->waitUntilReady();
 
 		if (CTestArrayHelper::get($data, 'expected', TEST_GOOD) === TEST_BAD) {
 			$this->assertMessage(TEST_BAD, 'Cannot '.($update ? 'update' : 'add').' user', $data['error']);
@@ -1059,7 +1061,6 @@ class testUsersPasswordComplexity extends CWebTest {
 			}
 			else {
 				$this->assertMessage(TEST_GOOD, 'User '.($update ? 'updated' : 'added'));
-				$this->page->logout();
 			}
 
 			// Check user saved in db.
@@ -1070,7 +1071,6 @@ class testUsersPasswordComplexity extends CWebTest {
 			$this->assertTrue($this->query('xpath://a[@title='.zbx_dbstr(($userid === 1) ? 'Admin (Zabbix Administrator)'
 					: $username).' and text()="User settings"]')->exists()
 			);
-			$this->page->logout();
 
 			// Write new password for next case.
 			if (($userid === 1) && ($own || $update)) {

@@ -287,9 +287,10 @@ class testPageScheduledReport extends CWebTest {
 	 */
 	public function testPageScheduledReport_Filter($data) {
 		$this->page->login()->open('zabbix.php?action=scheduledreport.list');
-
+		$table = $this->getTable();
 		$form = $this->query('name:zbx_filter')->asForm()->one();
 		$form->fill($data['filter'])->submit();
+		$table->waitUntilReloaded();
 		$this->page->waitUntilReady();
 
 		$this->assertTableDataColumn(CTestArrayHelper::get($data, 'result', []));
