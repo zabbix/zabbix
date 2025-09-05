@@ -295,11 +295,12 @@ abstract class CHostGeneral extends CHostBase {
 	private static function createHostHgSets(array $hgsets): void {
 		$ins_host_hgsets = [];
 
-		$options = [
-			'output' => ['hgsetid', 'hash'],
-			'filter' => ['hash' => array_keys($hgsets)]
-		];
-		$result = DBselect(DB::makeSql('hgset', $options));
+		$result = DBselect(
+			'SELECT hs.hash,MIN(hs.hgsetid) AS hgsetid'.
+			' FROM hgset hs'.
+			' WHERE '.dbConditionString('hs.hash', array_keys($hgsets)).
+			' GROUP BY hs.hash'
+		);
 
 		while ($row = DBfetch($result)) {
 			foreach ($hgsets[$row['hash']]['hostids'] as $hostid) {
@@ -341,11 +342,12 @@ abstract class CHostGeneral extends CHostBase {
 		}
 
 		if ($hgsets) {
-			$options = [
-				'output' => ['hgsetid', 'hash'],
-				'filter' => ['hash' => array_keys($hgsets)]
-			];
-			$result = DBselect(DB::makeSql('hgset', $options));
+			$result = DBselect(
+				'SELECT hs.hash,MIN(hs.hgsetid) AS hgsetid'.
+				' FROM hgset hs'.
+				' WHERE '.dbConditionString('hs.hash', array_keys($hgsets)).
+				' GROUP BY hs.hash'
+			);
 
 			while ($row = DBfetch($result)) {
 				$upd_host_hgsets[] = [
