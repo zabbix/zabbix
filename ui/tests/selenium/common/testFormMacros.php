@@ -2401,6 +2401,7 @@ abstract class testFormMacros extends CLegacyWebTest {
 		$setting_form = $this->query('name:otherForm')->asForm()->one();
 		$setting_form->fill(['Vault provider' => 'CyberArk Vault']);
 		$setting_form->submit();
+		$this->assertMessage(TEST_GOOD, 'Configuration updated');
 
 		// Try to create macros with Vault type different from settings.
 		$form = $this->openMacrosTab($url, $source, false, $name);
@@ -2422,6 +2423,7 @@ abstract class testFormMacros extends CLegacyWebTest {
 		// Change Vault in settings to correct one.
 		$this->page->open('zabbix.php?action=miscconfig.edit')->waitUntilReady();
 		$setting_form->fill(['Vault provider' => 'HashiCorp Vault'])->submit();
+		$this->assertMessage(TEST_GOOD, 'Configuration updated');
 
 		// Check simple update.
 		$this->openMacrosTab($url, $source, false, $name);
