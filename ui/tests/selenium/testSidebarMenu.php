@@ -436,7 +436,7 @@ class testSidebarMenu extends CWebTest {
 					'" and @href="'.$data['link'].'"]')->one()->isVisible());
 		}
 		else {
-			$this->query('xpath://ul[@class="menu-user"]//a[text()="'.$data['section'].'"]')->one()->click();
+			$this->query('xpath://ul[@class="menu-user"]//a[text()="'.$data['section'].'"]')->one()->click()->waitUntilStalled();
 			$this->page->waitUntilReady();
 			$this->page->assertTitle('Zabbix');
 		}
