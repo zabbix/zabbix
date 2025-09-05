@@ -31,7 +31,8 @@ class CControllerIconMapUpdate extends CController {
 			'name' => ['db icon_map.name', 'required', 'not_empty'],
 			'mappings' => ['objects', 'uniq' => [['inventory_link', 'expression']], 'required', 'not_empty', 'fields' => [
 				'inventory_link' => ['db icon_mapping.inventory_link', 'required'],
-				'expression' => ['db icon_mapping.expression', 'required', 'not_empty'],
+				'expression' => ['db icon_mapping.expression', 'required', 'not_empty',
+					'use' => [CRegexValidator::class, []]],
 				'iconid' => ['db icon_mapping.iconid', 'required'],
 				'sortorder' => ['integer']
 			]],
