@@ -188,7 +188,7 @@ int	substitute_message_macros(char **data, char *error, int maxerrlen, int messa
 		const zbx_db_alert *alert, const zbx_service_alarm_t *service_alarm, const zbx_db_service *service,
 		const char *tz, const zbx_db_acknowledge *ack)
 {
-	int	ret;
+	int			ret = FAIL;
 	zbx_token_search_t	token_search = ZBX_TOKEN_SEARCH_BASIC;
 
 	/* Shared data between resolver calls */
