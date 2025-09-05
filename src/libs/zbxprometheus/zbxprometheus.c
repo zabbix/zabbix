@@ -2104,7 +2104,7 @@ static void	prometheus_to_json(zbx_vector_prometheus_row_t *rows, zbx_hashset_t 
  ******************************************************************************/
 int	zbx_prometheus_to_json_ex(zbx_prometheus_t *prom, const char *filter_data, char **value, char **error)
 {
-	zbx_vector_prometheus_row_t	rows;
+	zbx_vector_prometheus_row_t	rows, *prows;
 	zbx_prometheus_filter_t		filter;
 	char				*errmsg = NULL;
 	int				ret = FAIL;
@@ -2120,7 +2120,10 @@ int	zbx_prometheus_to_json_ex(zbx_prometheus_t *prom, const char *filter_data, c
 
 	zbx_vector_prometheus_row_create(&rows);
 
-	prometheus_filter_rows(&prom->rows, &filter, &rows);
+	if (SUCCEED != prometheus_get_indexed_rows_by_label(prom, &filter, &prows) || NULL == prows)
+		prows = &prom->rows;
+
+	prometheus_filter_rows(prows, &filter, &rows);
 
 	prometheus_to_json(&rows, &prom->hints, value);
 	zbx_vector_prometheus_row_destroy(&rows);
