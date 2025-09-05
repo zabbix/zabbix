@@ -499,10 +499,7 @@ class CZabbixServer {
 						$this->timeout, $this->host
 					);
 				} else {
-					$this->error = _s(
-						'Cannot read response from Zabbix server "%1$s". Connection have been interrupted.',
-						$this->host
-					);
+					$this->error = _s('Cannot read response from Zabbix server "%1$s".', $this->host);
 				}
 
 				fclose($this->socket);
