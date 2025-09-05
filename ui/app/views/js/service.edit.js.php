@@ -69,12 +69,8 @@ window.service_edit_popup = new class {
 
 		const table = document.getElementById('problem_tags');
 
-		table.addEventListener('click', (e) => {
-			if (e.target.classList.contains('element-table-add')) {
-				this.form.validateSubmit(this.form.getAllValues());
-				this.#update();
-			}
-			else if (e.target.classList.contains('element-table-remove')) {
+		table.addEventListener('click', e => {
+			if (['element-table-add', 'element-table-remove'].some(cls => e.target.classList.contains(cls))) {
 				this.form.validateSubmit(this.form.getAllValues());
 				this.#update();
 			}
