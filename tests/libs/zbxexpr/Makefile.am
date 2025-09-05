@@ -34,7 +34,8 @@ BINARIES_tests = \
 	zbx_custom_interval_is_scheduling \
 	zbx_user_macro_quote_context_dyn \
 	zbx_substitute_item_key_params \
-	zbx_substitute_snmp_oid_params
+	zbx_substitute_snmp_oid_params \
+	zbx_user_macro_parse_dyn
 
 if HAVE_PCRE2
 BINARIES_tests += macro_regrepl
@@ -630,6 +631,21 @@ zbx_substitute_snmp_oid_params_LDADD += @SERVER_LIBS@
 zbx_substitute_snmp_oid_params_LDFLAGS = @SERVER_LDFLAGS@
 
 zbx_substitute_snmp_oid_params_CFLAGS = $(EXPR_COMPILER_FLAGS)
+
+
+zbx_user_macro_parse_dyn_SOURCES = \
+	zbx_user_macro_parse_dyn.c \
+	$(COMMON_SRC_FILES)
+
+zbx_user_macro_parse_dyn_LDADD = \
+	$(EXPR_LIBS)
+
+zbx_user_macro_parse_dyn_LDADD += @SERVER_LIBS@
+
+zbx_user_macro_parse_dyn_LDFLAGS = @SERVER_LDFLAGS@
+
+zbx_user_macro_parse_dyn_CFLAGS = $(EXPR_COMPILER_FLAGS)
+
 
 if SERVER
 zbx_calculate_macro_function_SOURCES = \

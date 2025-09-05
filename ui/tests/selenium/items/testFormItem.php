@@ -2102,8 +2102,9 @@ class testFormItem extends CLegacyWebTest {
 					$this->zbxTestInputType('delay_flex_'.$itemCount.'_delay', $period['flexDelay']);
 				}
 				$itemCount ++;
+				// Unstable test on Jenkins, added hoverMouse()
 				$form->query("xpath://div[@id='js-item-flex-intervals-field']//button[@class='btn-link element-table-add']")
-						->one()->click();
+						->one()->hoverMouse()->click();
 
 				$this->zbxTestAssertVisibleId('delay_flex_'.$itemCount.'_delay');
 				$this->zbxTestAssertVisibleId('delay_flex_'.$itemCount.'_period');
@@ -2278,6 +2279,7 @@ class testFormItem extends CLegacyWebTest {
 		$this->zbxTestInputType('hk_trends', '455d');
 
 		$this->zbxTestClickWait('update');
+		$this->assertMessage(TEST_GOOD, 'Configuration updated');
 
 		$this->zbxTestOpen(self::HOST_LIST_PAGE);
 		$this->filterEntriesAndOpenItems();
