@@ -1947,10 +1947,11 @@ int	zbx_prometheus_pattern_ex(zbx_prometheus_t *prom, const char *filter_data, c
 	if (SUCCEED != prometheus_validate_request(request, output, error))
 		goto cleanup;
 
-	if (SUCCEED != prometheus_get_indexed_rows_by_label(prom, &filter, &prows) || NULL == prows)
+	if (SUCCEED != prometheus_get_indexed_rows_by_label(prom, &filter, &prows))
 		prows = &prom->rows;
 
-	prometheus_filter_rows(prows, &filter, &rows);
+	if (NULL != prows)
+		prometheus_filter_rows(prows, &filter, &rows);
 
 	if (FAIL == (ret = prometheus_query_rows(&rows, request, output, value, &errmsg)))
 	{
@@ -2120,10 +2121,11 @@ int	zbx_prometheus_to_json_ex(zbx_prometheus_t *prom, const char *filter_data, c
 
 	zbx_vector_prometheus_row_create(&rows);
 
-	if (SUCCEED != prometheus_get_indexed_rows_by_label(prom, &filter, &prows) || NULL == prows)
+	if (SUCCEED != prometheus_get_indexed_rows_by_label(prom, &filter, &prows))
 		prows = &prom->rows;
 
-	prometheus_filter_rows(prows, &filter, &rows);
+	if (NULL != prows)
+		prometheus_filter_rows(prows, &filter, &rows);
 
 	prometheus_to_json(&rows, &prom->hints, value);
 	zbx_vector_prometheus_row_destroy(&rows);
