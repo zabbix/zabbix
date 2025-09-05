@@ -62,7 +62,7 @@
 	?>
 </script>
 
-<script type="text/javascript">
+//<script type="text/javascript">
 	$(function() {
 		const table = $('#tbl_macros');
 		let removed = 0;
@@ -79,10 +79,22 @@
 
 			form.validateSubmit(fields)
 				.then((result) => {
-					if (result && removed) {
-						return confirm(<?= json_encode(_('Are you sure you want to delete?')) ?> + ' ' + removed + ' '
-							+ <?= json_encode(_('macro(s)')) ?> + '?'
-						);
+					if (result) {
+						let empty_removed = 0;
+						fields.macros = Object.values(fields.macros).filter((macro) => {
+							if (macro.macro === '' && macro.globalmacroid) {
+								empty_removed += 1;
+							}
+
+							return macro.macro !== '';
+						});
+
+						if (removed || empty_removed) {
+							return confirm(<?= json_encode(_('Are you sure you want to delete?')) ?> + ' '
+								+ (removed + empty_removed) + ' '
+								+ <?= json_encode(_('macro(s)')) ?> + '?'
+							);
+						}
 					}
 
 					return result;
