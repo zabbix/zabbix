@@ -651,7 +651,7 @@ class testPageProblems extends CWebTest {
 							'Host' => 'ЗАББИКС Сервер',
 							'Problem' => 'Test trigger to check tag filter on problem page',
 							'Update' => 'Update',
-							'Tags' => 'DatabaseService: abcservice: abcdef'
+							'Tags' => "Database\nService: abc\nservice: abcdef"
 						]
 					]
 				]
@@ -704,7 +704,7 @@ class testPageProblems extends CWebTest {
 							'Host' => 'ЗАББИКС Сервер',
 							'Problem' => 'Test trigger to check tag filter on problem page',
 							'Update' => 'Update',
-							'Tags' => 'DatabaseService: abcservice: abcdef'
+							'Tags' => "Database\nService: abc\nservice: abcdef"
 						]
 					]
 				]
@@ -726,7 +726,7 @@ class testPageProblems extends CWebTest {
 							'Host' => 'ЗАББИКС Сервер',
 							'Problem' => 'Test trigger to check tag filter on problem page',
 							'Update' => 'Update',
-							'Tags' => 'service: abcdefDatabaseService: abc'
+							'Tags' => "service: abcdef\nDatabase\nService: abc"
 						]
 					]
 				]
@@ -1152,14 +1152,14 @@ class testPageProblems extends CWebTest {
 							'Operational data' => '*UNKNOWN*',
 							'Update' => 'Update',
 							'Actions' => '',
-							'Tags' => 'TagSer: abcDat'
+							'Tags' => "Tag\nSer: abc\nDat"
 						]
 					],
 					'check_tags' => [
 						'Tag' => 'Tag4',
 						'Ser: abc' => 'Service: abc',
 						'Dat' => 'Database',
-						'...' => 'DatabaseService: abcservice: abcdefTag4Tag5: 5'
+						'...' => "Database\nService: abc\nservice: abcdef\nTag4\nTag5: 5"
 					]
 				]
 			],
@@ -1175,13 +1175,13 @@ class testPageProblems extends CWebTest {
 					'result' => [
 						[
 							'Problem' => 'Test trigger to check tag filter on problem page',
-							'Tags' => 'DatabaseService: abc'
+							'Tags' => "Database\nService: abc"
 						]
 					],
 					'check_tags' => [
 						'Database' => 'Database',
 						'Service: abc' => 'Service: abc',
-						'...' => 'DatabaseService: abcservice: abcdefTag4Tag5: 5'
+						'...' => "Database\nService: abc\nservice: abcdef\nTag4\nTag5: 5"
 					]
 				]
 			],
@@ -1202,7 +1202,7 @@ class testPageProblems extends CWebTest {
 					],
 					'check_tags' => [
 						'abc' => 'Service: abc',
-						'...' => 'DatabaseService: abcservice: abcdefTag4Tag5: 5'
+						'...' => "Database\nService: abc\nservice: abcdef\nTag4\nTag5: 5"
 					]
 				]
 			],
@@ -1232,19 +1232,19 @@ class testPageProblems extends CWebTest {
 					'result' => [
 						[
 							'Problem' => 'Fourth test trigger with tag priority',
-							'Tags' => 'Delta: tEta: eGamma: g'
+							'Tags' => "Delta: t\nEta: e\nGamma: g"
 						],
 						[
 							'Problem' => 'Third test trigger with tag priority',
-							'Tags' => 'Kappa: kAlpha: aIota: i'
+							'Tags' => "Kappa: k\nAlpha: a\nIota: i"
 						],
 						[
 							'Problem' => 'Second test trigger with tag priority',
-							'Tags' => 'Beta: bEpsilon: eEta: e'
+							'Tags' => "Beta: b\nEpsilon: e\nEta: e"
 						],
 						[
 							'Problem' => 'First test trigger with tag priority',
-							'Tags' => 'Alpha: aBeta: bDelta: d'
+							'Tags' => "Alpha: a\nBeta: b\nDelta: d"
 						]
 					]
 				]
@@ -1260,19 +1260,19 @@ class testPageProblems extends CWebTest {
 					'result' => [
 						[
 							'Problem' => 'Fourth test trigger with tag priority',
-							'Tags' => 'Delta: tEta: eGamma: g'
+							'Tags' => "Delta: t\nEta: e\nGamma: g"
 						],
 						[
 							'Problem' => 'Third test trigger with tag priority',
-							'Tags' => 'Kappa: kAlpha: aIota: i'
+							'Tags' => "Kappa: k\nAlpha: a\nIota: i"
 						],
 						[
 							'Problem' => 'Second test trigger with tag priority',
-							'Tags' => 'Beta: bEpsilon: eEta: e'
+							'Tags' => "Beta: b\nEpsilon: e\nEta: e"
 						],
 						[
 							'Problem' => 'First test trigger with tag priority',
-							'Tags' => 'Beta: bAlpha: aDelta: d'
+							'Tags' => "Beta: b\nAlpha: a\nDelta: d"
 						]
 					]
 				]
@@ -1288,19 +1288,19 @@ class testPageProblems extends CWebTest {
 					'result' => [
 						[
 							'Problem' => 'Fourth test trigger with tag priority',
-							'Tags' => 'Gamma: gDelta: tEta: e'
+							'Tags' => "Gamma: g\nDelta: t\nEta: e"
 						],
 						[
 							'Problem' => 'Third test trigger with tag priority',
-							'Tags' => 'Kappa: kAlpha: aIota: i'
+							'Tags' => "Kappa: k\nAlpha: a\nIota: i"
 						],
 						[
 							'Problem' => 'Second test trigger with tag priority',
-							'Tags' => 'Beta: bEpsilon: eEta: e'
+							'Tags' => "Beta: b\nEpsilon: e\nEta: e"
 						],
 						[
 							'Problem' => 'First test trigger with tag priority',
-							'Tags' => 'Gamma: gBeta: bAlpha: a'
+							'Tags' => "Gamma: g\nBeta: b\nAlpha: a"
 						]
 					]
 				]
@@ -1877,7 +1877,8 @@ class testPageProblems extends CWebTest {
 					]
 				]
 			],
-			'Two metrics in operational data pop-up window' => [
+			// TODO: uncomment test case once issue ZBX-25103 is resolved
+/*			'Two metrics in operational data pop-up window' => [
 				[
 					'filter' => [
 						'Problem' => 'Two trigger expressions',
@@ -1900,7 +1901,7 @@ class testPageProblems extends CWebTest {
 						]
 					]
 				]
-			],
+			],*/
 			'Filled opdata with macros' => [
 				[
 					'custom data' => 'Operational data - (150),150, [*UNKNOWN*]',
