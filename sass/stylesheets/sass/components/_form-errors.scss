@@ -86,6 +86,20 @@ div[data-field-type="set"] {
 	}
 }
 
+.checkbox-list {
+	&.has-error [type="checkbox"] {
+		& + label span {
+			border: 1px solid $error;
+			color: $white;
+		}
+
+		&:checked + label span::after {
+			border-left-color: $error;
+			border-bottom-color: $error;
+		}
+	}
+}
+
 .checkbox-radio[type="checkbox"] {
 	&.has-error {
 		& + label span {
