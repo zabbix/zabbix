@@ -1,3 +1,25 @@
+Changes for 7.0.19rc1
+
+New features:
+...G.J.... [ZBXNEXT-9902] changed timeout range for Zabbix JS and Zabbix get utilities (askolmeisters)
+.......PS. [ZBXNEXT-10077] updated maximal supported MariaDB version to 12.0 (mprihodko)
+
+Bug fixes:
+..F....... [ZBX-26482] fixed TypeError after deleting datasets in Graph and Pie chart widgets (isharha)
+A.F....... [ZBX-26202] fixed inability to create "Execute now" tasks for users of Admin user type (jfreibergs)
+A......... [ZBX-24603] fixed MFA TOTP secrets not being deleted when deleting users from MFA-enabled user groups (agriscenko, jfreibergs)
+..F.....S. [ZBX-25739] fixed timeleft() function to return 1.7976931348623157E+308 instead of making item unsupported in the case of the infinite time (arimdjonoks, averza)
+........S. [ZBX-26863] fixed duplicate host creation in network discovery with multiple checks for hosts found on several IP addresses when uniqueness criteria is not set to IP address (aetatsu)
+..F....... [ZBX-24885] fixed inconsistent tag display and unnecessary ellipsis on Latest data page (msnihach)
+..F....... [ZBX-21975] fixed user autologout not removing user SAML authentication data (gcalenko)
+.........T [ZBX-24495] fixed Kubernetes templates after updates in zabbix-helm-chart (egordymov)
+.......... [ZBX-26879] removed unused ListenBacklog parameter from Zabbix sender (rtrizna)
+..F....... [ZBX-26463] fixed issues with maximum length when creating group in host/template edit form (gberzina)
+..F....... [ZBX-25103] replaced legacy hintbox generation for trigger operational data with current (dpankins)
+A......... [ZBX-26025] fixed validation error for default input string value in Scripts advanced configuration (kkuzmina)
+..F....... [ZBX-25972] optimized the items page performance on hosts with a large number of elements (msnihach)
+
+--------------------------------------------------------------------------------
 Changes for 7.0.18
 
 7.0.18rc2 was released as 7.0.18 without any changes
@@ -3710,8 +3732,10 @@ A.F....PS. [ZBXNEXT-7402,ZBXNEXT-7413] added support for CyberArk Vault (acikuns
 Changes for 6.0.42rc1
 
 New features:
+.......PS. [ZBXNEXT-10077] updated maximal supported MariaDB version to 12.0 (mprihodko)
 
 Bug fixes:
+..F....... [ZBX-21975] fixed user autologout not removing user SAML authentication data (gcalenko)
 
 --------------------------------------------------------------------------------
 Changes for 6.0.41
