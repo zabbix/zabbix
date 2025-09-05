@@ -32,6 +32,7 @@ class CHostGroupNameValidatorTest extends TestCase {
 
 			// Valid host group prototype names.
 			['valid-{#HOSTGROUPPROTOTYPE}-name',	['lldmacros' => true],	null],
+			['valid-{{#HOSTGROUPPROTOTYPE}.regsub("^([a-z]+)", \1)}-name',	['lldmacros' => true],  null],
 			['valid/{#HOSTGROUPPROTOTYPE}/name',	['lldmacros' => true],	null],
 
 			// // Invalid host prototype names.

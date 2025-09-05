@@ -30,6 +30,7 @@ class CHostNameValidatorTest extends TestCase {
 
 			// Valid host prototype names.
 			['valid-{#HOSTPROTOTYPE}-name',			['lldmacros' => true],	null],
+			['valid-{{#HOSTPROTOTYPE}.regsub("^([a-z]+)", \1)}-name',	['lldmacros' => true],	null],
 			['vAl1d  -  {#HOSTPROTOTYPE} .  n4mE',	['lldmacros' => true],	null],
 
 			// Invalid host prototype names.
