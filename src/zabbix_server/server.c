@@ -1249,6 +1249,8 @@ static void	zbx_on_exit(int ret, void *on_exit_args)
 		zbx_vmware_destroy();
 	}
 
+	zbx_db_deinit();
+
 	zbx_free_selfmon_collector();
 
 	zbx_uninitialize_events();
@@ -2145,13 +2147,6 @@ static int	server_startup(zbx_socket_t *listen_sock, int *ha_stat, int *ha_failo
 		zbx_free(error);
 	}
 
-	if (SUCCEED != zbx_db_init(&error))
-	{
-		zabbix_log(LOG_LEVEL_CRIT, "cannot initialize database: %s", error);
-		zbx_free(error);
-		exit(EXIT_FAILURE);
-	}
-
 out:
 	zbx_unset_exit_on_terminate();
 
@@ -2236,7 +2231,7 @@ static void	server_teardown(zbx_rtc_t *rtc, zbx_socket_t *listen_sock)
 	zbx_free_configuration_cache();
 	zbx_free_database_cache(ZBX_SYNC_NONE, &events_cbs, config_history_storage_pipelines);
 	zbx_deinit_remote_commands_cache();
-	zbx_db_deinit();
+	zbx_db_clear_idcache();
 
 #ifdef HAVE_PTHREAD_PROCESS_SHARED
 	zbx_locks_enable();
