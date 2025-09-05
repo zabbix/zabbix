@@ -107,7 +107,7 @@
 		}
 
 		#clone() {
-			this.setLoadingStatus(['clone']);
+			this.#setLoadingStatus(['clone']);
 
 			const curl = new Curl(this.form_element.getAttribute('action')),
 				{name, mappings, default_iconid} = this.form.getAllValues();
