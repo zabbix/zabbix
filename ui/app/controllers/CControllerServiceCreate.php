@@ -44,26 +44,34 @@ class CControllerServiceCreate extends CController {
 			'status_rules' => ['objects', 'uniq' => ['type', 'limit_value', 'limit_status'],
 				'messages' => ['uniq' => _('Condition, limit and status combination is not unique.')],
 				'fields' => [
-					'new_status' => ['integer', 'in' => array_keys(CServiceHelper::getProblemStatusNames())],
-					'type' => ['integer', 'in' => array_keys(CServiceHelper::getStatusRuleTypeOptions())],
+					'type' => ['db service_status_rule.type', 'required',
+						'in' => array_keys(CServiceHelper::getStatusRuleTypeOptions())
+					],
 					'limit_value' => [
-						['integer', 'required', 'min' => 1, 'max' => 1000000,
+						['db service_status_rule.limit_value', 'required', 'min' => 1, 'max' => 1000000,
 							'when' => ['type', 'in' => [
 								ZBX_SERVICE_STATUS_RULE_TYPE_N_GE, ZBX_SERVICE_STATUS_RULE_TYPE_N_L,
 								ZBX_SERVICE_STATUS_RULE_TYPE_W_GE, ZBX_SERVICE_STATUS_RULE_TYPE_W_L
 							]]
 						],
-						['integer', 'required', 'min' => 1, 'max' => 100,
+						['db service_status_rule.limit_value', 'required', 'min' => 1, 'max' => 100,
 							'when' => ['type', 'in' => [
 								ZBX_SERVICE_STATUS_RULE_TYPE_NP_GE, ZBX_SERVICE_STATUS_RULE_TYPE_NP_L,
 								ZBX_SERVICE_STATUS_RULE_TYPE_WP_GE, ZBX_SERVICE_STATUS_RULE_TYPE_WP_L
 							]]
 						]
 					],
-					'limit_status' => ['integer', 'in' => array_keys(CServiceHelper::getStatusNames())]
+					'limit_status' => ['db service_status_rule.limit_status',
+						'in' => array_keys(CServiceHelper::getStatusNames())
+					],
+					'new_status' => ['db service_status_rule.new_status', 'required',
+						'in' => array_keys(CServiceHelper::getProblemStatusNames())
+					]
 				]
 			],
-			'propagation_rule' => ['db services.propagation_rule', 'required', 'in' => array_keys(CServiceHelper::getStatusPropagationNames())],
+			'propagation_rule' => ['db services.propagation_rule', 'required',
+				'in' => array_keys(CServiceHelper::getStatusPropagationNames())
+			],
 			'propagation_value_number' => ['integer', 'required', 'in 1:'.(TRIGGER_SEVERITY_COUNT - 1),
 				'when' => ['propagation_rule', 'in' => [
 					ZBX_SERVICE_STATUS_PROPAGATION_INCREASE, ZBX_SERVICE_STATUS_PROPAGATION_DECREASE

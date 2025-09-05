@@ -25,23 +25,29 @@ class CControllerServiceStatusRuleValidate extends CController {
 	public static function getValidationRules(): array {
 		return ['object', 'fields' => [
 			'row_index' => ['integer', 'required'],
-			'type' => ['integer', 'required', 'in' => array_keys(CServiceHelper::getStatusRuleTypeOptions())],
+			'type' => ['db service_status_rule.type', 'required',
+				'in' => array_keys(CServiceHelper::getStatusRuleTypeOptions())
+			],
 			'limit_value' => [
-				['integer', 'required', 'min' => 1, 'max' => 1000000,
+				['db service_status_rule.limit_value', 'required', 'min' => 1, 'max' => 1000000,
 					'when' => ['type', 'in' => [
 						ZBX_SERVICE_STATUS_RULE_TYPE_N_GE, ZBX_SERVICE_STATUS_RULE_TYPE_N_L,
 						ZBX_SERVICE_STATUS_RULE_TYPE_W_GE, ZBX_SERVICE_STATUS_RULE_TYPE_W_L
 					]]
 				],
-				['integer', 'required', 'min' => 1, 'max' => 100,
+				['db service_status_rule.limit_value', 'required', 'min' => 1, 'max' => 100,
 					'when' => ['type', 'in' => [
 						ZBX_SERVICE_STATUS_RULE_TYPE_NP_GE, ZBX_SERVICE_STATUS_RULE_TYPE_NP_L,
 						ZBX_SERVICE_STATUS_RULE_TYPE_WP_GE, ZBX_SERVICE_STATUS_RULE_TYPE_WP_L
 					]]
 				]
 			],
-			'limit_status' => ['integer', 'required', 'in' => array_keys(CServiceHelper::getStatusNames())],
-			'new_status' => ['integer', 'required', 'in' => array_keys(CServiceHelper::getProblemStatusNames())]
+			'limit_status' => ['db service_status_rule.limit_status', 'required',
+				'in' => array_keys(CServiceHelper::getStatusNames())
+			],
+			'new_status' => ['db service_status_rule.new_status', 'required',
+				'in' => array_keys(CServiceHelper::getProblemStatusNames())
+			]
 		]];
 	}
 
