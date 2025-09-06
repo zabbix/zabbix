@@ -213,6 +213,7 @@
 			<arg line="--enable-proxy"/>
 			<arg line="--enable-agent"/>
 			<arg line="--with-postgresql"/>
+			<arg line="--with-libpcre2"/>
 			<arg line="--prefix=${basedir}"/>
 			<arg line="--with-libcurl"/>
 			<arg line="--with-stacksize=512"/>
@@ -436,6 +437,7 @@
 			<arg line="--enable-proxy"/>
 			<arg line="--enable-agent"/>
 			<arg line="--with-mysql"/>
+			<arg line="--with-libpcre2"/>
 			<arg line="--prefix=${basedir}"/>
 			<arg line="--with-libcurl"/>
 			<arg line="--with-stacksize=512"/>
