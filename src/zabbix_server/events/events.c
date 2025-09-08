@@ -2623,7 +2623,7 @@ static void	get_open_problems(const zbx_vector_uint64_t *triggerids, zbx_vector_
 	for (int i = 0; i < problems->values_num && eventids.values_num != problems->values_num; i++)
 	{
 		problem = (zbx_event_problem_t *)problems->values[i];
-	
+
 		if (SUCCEED == zbx_vector_uint64_bsearch(&eventids, problem->eventid, ZBX_DEFAULT_UINT64_COMPARE_FUNC))
 			continue;
 
@@ -3175,7 +3175,7 @@ int	zbx_close_problem(zbx_uint64_t triggerid, zbx_uint64_t eventid, zbx_uint64_t
 
 		}
 		zbx_db_free_result(result);
-	
+
 		if (ZBX_DB_OK == zbx_db_commit() && NULL != r_event)
 		{
 			int				event_export_enabled;
