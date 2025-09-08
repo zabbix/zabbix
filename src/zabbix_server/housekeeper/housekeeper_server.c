@@ -1081,7 +1081,7 @@ static int	housekeeping_cleanup(int config_max_hk_delete)
 						" from events"
 						" where source=%d"
 							" and object=%d"
-							" and objectid=" ZBX_FS_UI64,
+							" and objectid=" ZBX_FS_UI64 " order by eventid",
 						EVENT_SOURCE_TRIGGERS, EVENT_OBJECT_TRIGGER, objectid);
 
 				deleted += zbx_housekeep_problems_events(query, config_max_hk_delete, &more);

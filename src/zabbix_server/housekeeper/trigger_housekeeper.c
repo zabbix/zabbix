@@ -48,12 +48,9 @@ static void	housekeep_service_problems(const zbx_vector_uint64_t *eventids)
 
 static int	housekeep_problems_events(zbx_vector_uint64_t *eventids)
 {
-	char			*sql = NULL;
-	size_t			sql_alloc = 0, sql_offset = 0;
-	int			offset = 0;
-	zbx_vector_uint64_t	r_eventids;
-
-	zbx_vector_uint64_create(&r_eventids);
+	char	*sql = NULL;
+	size_t	sql_alloc = 0, sql_offset = 0;
+	int	offset = 0;
 
 	while (offset < eventids->values_num)
 	{
@@ -77,39 +74,12 @@ static int	housekeep_problems_events(zbx_vector_uint64_t *eventids)
 		zbx_db_begin();
 
 		zbx_db_execute("delete from problem where%s", sql);
-
-		zbx_db_result_t	result;
-		zbx_db_row_t	row;
-
-		result = zbx_db_select("select r_eventid from event_recovery where%s", sql);
-
-		while (NULL != (row = zbx_db_fetch(result)))
-		{
-			zbx_uint64_t	r_eventid;
-
-			ZBX_STR2UINT64(r_eventid, row[0]);
-			zbx_vector_uint64_append(&r_eventids, r_eventid);
-		}
-		zbx_db_free_result(result);
-
 		zbx_db_execute("delete from event_recovery where%s", sql);
 		zbx_db_execute("delete from events where%s", sql);
 
-		if (0 != r_eventids.values_num)
-		{
-			sql_offset = 0;
-			zbx_db_add_condition_alloc(&sql, &sql_alloc, &sql_offset, "eventid", r_eventids.values,
-					r_eventids.values_num);
-			zbx_db_execute("delete from events where%s", sql);
-		}
-
 		if (ZBX_DB_OK != zbx_db_commit())
 			zabbix_log(LOG_LEVEL_WARNING, "Failed to delete a problems without a trigger");
-
-		zbx_vector_uint64_clear(&r_eventids);
 	}
-
-	zbx_vector_uint64_destroy(&r_eventids);
 
 	housekeep_service_problems(eventids);
 
