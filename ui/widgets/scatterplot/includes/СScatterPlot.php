@@ -234,15 +234,15 @@ class СScatterPlot extends CSvg {
 				];
 
 				foreach ($this->points[$index] as $point) {
-					foreach (['x_axis', 'y_axis'] as $key) {
-						$point_min = $point[$key];
-						$point_max = $point[$key];
+					foreach (['x_axis', 'y_axis'] as $axis) {
+						$point_min = $point[$axis];
+						$point_max = $point[$axis];
 
-						if ($min_max[$key]['min'] === null || $min_max[$key]['min'] > $point_min) {
-							$min_max[$key]['min'] = (float) $point_min;
+						if ($min_max[$axis]['min'] === null || $min_max[$axis]['min'] > $point_min) {
+							$min_max[$axis]['min'] = (float) $point_min;
 						}
-						if ($min_max[$key]['max'] === null || $min_max[$key]['max'] < $point_max) {
-							$min_max[$key]['max'] = (float) $point_max;
+						if ($min_max[$axis]['max'] === null || $min_max[$axis]['max'] < $point_max) {
+							$min_max[$axis]['max'] = (float) $point_max;
 						}
 					}
 				}
@@ -366,10 +366,6 @@ class СScatterPlot extends CSvg {
 	 * Calculate paths for metric elements.
 	 */
 	private function calculatePaths(): void {
-		// Metric having very big values of y outside visible area will fail to render.
-		$y_max = 2 ** 16;
-		$y_min = -$y_max;
-
 		foreach ($this->metrics as $index => $metric) {
 			if (!array_key_exists($index, $this->points)) {
 				continue;
@@ -404,25 +400,25 @@ class СScatterPlot extends CSvg {
 			foreach ($this->points[$index] as $time => $point) {
 				$coordinates = [];
 
-				foreach ($params as $key => $options) {
-					$value = $point[$key];
+				foreach ($params as $axis => $options) {
+					$value = $point[$axis];
 
-					if ($min_max[$key]['max'] - $min_max[$key]['min'] == INF) {
-						$coordinates[$key] = $options['start_position'] + CMathHelper::safeMul([
+					if ($min_max[$axis]['max'] - $min_max[$axis]['min'] == INF) {
+						$coordinates[$axis] = $options['start_position'] + CMathHelper::safeMul([
 							$options['size'],
-							$min_max[$key]['max'] / 10 - $value / 10,
-							1 / ($min_max[$key]['max'] / 10 - $min_max[$key]['min']/ 10)
+							$min_max[$axis]['max'] / 10 - $value / 10,
+							1 / ($min_max[$axis]['max'] / 10 - $min_max[$axis]['min'] / 10)
 						]);
 					}
 					else {
-						$coordinates[$key] = $options['start_position'] + CMathHelper::safeMul([
-								$options['size'],
-								$min_max[$key]['max'] - $value,
-								1 / ($min_max[$key]['max'] - $min_max[$key]['min'])
-							]);
+						$coordinates[$axis] = $options['start_position'] + CMathHelper::safeMul([
+							$options['size'],
+							$min_max[$axis]['max'] - $value,
+							1 / ($min_max[$axis]['max'] - $min_max[$axis]['min'])
+						]);
 					}
 
-					if ($value < $min_max[$key]['min'] || $value > $min_max[$key]['max']) {
+					if ($value < $min_max[$axis]['min'] || $value > $min_max[$axis]['max']) {
 						continue 2;
 					}
 				}

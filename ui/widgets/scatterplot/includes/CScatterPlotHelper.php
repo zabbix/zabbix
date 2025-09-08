@@ -141,7 +141,7 @@ class CScatterPlotHelper
 
 			$resolve_macros = $templateid === '' || $override_hostid !== '';
 
-			foreach (['x_axis_items', 'y_axis_items'] as $key) {
+			foreach (['x_axis_items', 'y_axis_items'] as $axis) {
 				$options = [
 					'output' => ['itemid', 'hostid', 'history', 'trends', 'units', 'value_type'],
 					'selectHosts' => ['name'],
@@ -153,22 +153,22 @@ class CScatterPlotHelper
 					'searchByAny' => true,
 					'sortfield' => 'name',
 					'sortorder' => ZBX_SORT_UP,
-					'limit' => $max_metrics[$key],
+					'limit' => $max_metrics[$axis],
 				];
 
 				if ($resolve_macros) {
 					$options['output'][] = 'name_resolved';
 
 					if ($templateid === '') {
-						$options['search']['name_resolved'] = self::processPattern($data_set[$key]);
+						$options['search']['name_resolved'] = self::processPattern($data_set[$axis]);
 					}
 					else {
-						$options['search']['name'] = self::processPattern($data_set[$key]);
+						$options['search']['name'] = self::processPattern($data_set[$axis]);
 					}
 				}
 				else {
 					$options['output'][] = 'name';
-					$options['search']['name'] = self::processPattern($data_set[$key]);
+					$options['search']['name'] = self::processPattern($data_set[$axis]);
 				}
 
 				if ($templateid === '') {
@@ -196,26 +196,26 @@ class CScatterPlotHelper
 					$options['hostids'] = $override_hostid !== '' ? $override_hostid : $templateid;
 				}
 
-				$items[$key] = [];
+				$items[$axis] = [];
 
 				if (array_key_exists('hostids', $options) && $options['hostids']) {
-					$items[$key] = API::Item()->get($options);
+					$items[$axis] = API::Item()->get($options);
 				}
 
-				if (!$items[$key]) {
+				if (!$items[$axis]) {
 					continue;
 				}
 
 				if ($resolve_macros) {
-					$items[$key] = CArrayHelper::renameObjectsKeys($items[$key], ['name_resolved' => 'name']);
+					$items[$axis] = CArrayHelper::renameObjectsKeys($items[$axis], ['name_resolved' => 'name']);
 				}
 
-				unset($data_set[$key]);
+				unset($data_set[$axis]);
 
-				foreach ($items[$key] as $item) {
-					$items_by_hosts[$item['hostid']][$key][] = $item;
+				foreach ($items[$axis] as $item) {
+					$items_by_hosts[$item['hostid']][$axis][] = $item;
 
-					$max_metrics[$key] --;
+					$max_metrics[$axis] --;
 				}
 			}
 
@@ -277,13 +277,13 @@ class CScatterPlotHelper
 
 			$resolve_macros = $templateid === '' || $override_hostid !== '';
 
-			foreach (['x_axis_itemids', 'y_axis_itemids'] as $key) {
-				$result[$key] = [];
+			foreach (['x_axis_itemids', 'y_axis_itemids'] as $axis) {
+				$result[$axis] = [];
 
 				if ($dataset_override_hostid !== null) {
 					$tmp_items = API::Item()->get([
 						'output' => ['key_'],
-						'itemids' => $data_set[$key],
+						'itemids' => $data_set[$axis],
 						'webitems' => true,
 						'preservekeys' => true
 					]);
@@ -291,7 +291,7 @@ class CScatterPlotHelper
 					if ($tmp_items) {
 						$keys_index = [];
 
-						foreach ($data_set[$key] as $item_index => $itemid) {
+						foreach ($data_set[$axis] as $item_index => $itemid) {
 							if (array_key_exists($itemid, $tmp_items)) {
 								$keys_index[$tmp_items[$itemid]['key_']] = $item_index;
 							}
@@ -310,13 +310,13 @@ class CScatterPlotHelper
 							continue;
 						}
 
-						$data_set[$key] = [];
+						$data_set[$axis] = [];
 
 						foreach ($items as $item) {
-							$data_set[$key][$keys_index[$item['key_']]] = $item['itemid'];
+							$data_set[$axis][$keys_index[$item['key_']]] = $item['itemid'];
 						}
 
-						ksort($data_set[$key]);
+						ksort($data_set[$axis]);
 					}
 				}
 
@@ -329,9 +329,9 @@ class CScatterPlotHelper
 					'filter' => [
 						'value_type' => [ITEM_VALUE_TYPE_UINT64, ITEM_VALUE_TYPE_FLOAT]
 					],
-					'itemids' => $data_set[$key],
+					'itemids' => $data_set[$axis],
 					'preservekeys' => true,
-					'limit' => $max_metrics[$key]
+					'limit' => $max_metrics[$axis]
 				]);
 
 				if (!$db_items) {
@@ -342,9 +342,9 @@ class CScatterPlotHelper
 					? (int) timeUnitToSeconds($data_set['timeshift'])
 					: 0;
 
-				$itemids = $data_set[$key];
+				$itemids = $data_set[$axis];
 
-				unset($data_set[$key]);
+				unset($data_set[$axis]);
 
 				foreach ($itemids as $itemid) {
 					if (array_key_exists($itemid, $db_items)) {
@@ -352,9 +352,9 @@ class CScatterPlotHelper
 							? CArrayHelper::renameKeys($db_items[$itemid], ['name_resolved' => 'name'])
 							: $db_items[$itemid];
 
-						$result[$key][] = $item;
+						$result[$axis][] = $item;
 
-						$max_metrics[$key]--;
+						$max_metrics[$axis]--;
 					}
 				}
 			}
@@ -429,8 +429,8 @@ class CScatterPlotHelper
 
 			if (CHousekeepingHelper::get(CHousekeepingHelper::HK_HISTORY_GLOBAL)) {
 				foreach ($metrics as &$metric) {
-					foreach (['x_axis_items', 'y_axis_items'] as $key) {
-						foreach ($metric[$key] as &$item) {
+					foreach (['x_axis_items', 'y_axis_items'] as $axis) {
+						foreach ($metric[$axis] as &$item) {
 							if ($item['history'] != 0) {
 								$item['history'] = timeUnitToSeconds(
 									CHousekeepingHelper::get(CHousekeepingHelper::HK_HISTORY)
@@ -448,8 +448,8 @@ class CScatterPlotHelper
 
 			if (CHousekeepingHelper::get(CHousekeepingHelper::HK_TRENDS_GLOBAL)) {
 				foreach ($metrics as &$metric) {
-					foreach (['x_axis_items', 'y_axis_items'] as $key) {
-						foreach ($metric[$key] as &$item) {
+					foreach (['x_axis_items', 'y_axis_items'] as $axis) {
+						foreach ($metric[$axis] as &$item) {
 							if ($item['trends'] != 0) {
 								$item['trends'] = timeUnitToSeconds(CHousekeepingHelper::get(CHousekeepingHelper::HK_TRENDS));
 							}
@@ -466,8 +466,8 @@ class CScatterPlotHelper
 			// If no global history and trend override enabled, resolve 'history' and/or 'trends' values for given $metric.
 			if ($to_resolve) {
 				foreach ($metrics as &$metric) {
-					foreach (['x_axis_items', 'y_axis_items'] as $key) {
-						foreach ($metric[$key] as &$item) {
+					foreach (['x_axis_items', 'y_axis_items'] as $axis) {
+						foreach ($metric[$axis] as &$item) {
 							[$item] = CMacrosResolverHelper::resolveTimeUnitMacros([$item], $to_resolve);
 						}
 						unset($item);
@@ -478,8 +478,8 @@ class CScatterPlotHelper
 				$simple_interval_parser = new CSimpleIntervalParser();
 
 				foreach ($metrics as &$metric) {
-					foreach (['x_axis_items', 'y_axis_items'] as $key) {
-						foreach ($metric[$key] as $num => &$item) {
+					foreach (['x_axis_items', 'y_axis_items'] as $axis) {
+						foreach ($metric[$axis] as $num => &$item) {
 							// Convert its values to seconds.
 							if (!CHousekeepingHelper::get(CHousekeepingHelper::HK_HISTORY_GLOBAL)) {
 								if ($simple_interval_parser->parse($item['history']) != CParser::PARSE_SUCCESS) {
@@ -512,8 +512,8 @@ class CScatterPlotHelper
 			}
 
 			foreach ($metrics as &$metric) {
-				foreach (['x_axis_items', 'y_axis_items'] as $key) {
-					foreach ($metric[$key] as &$item) {
+				foreach (['x_axis_items', 'y_axis_items'] as $axis) {
+					foreach ($metric[$axis] as &$item) {
 						/**
 						 * History as a data source is used in 2 cases:
 						 * 1) if trends are disabled (set to 0) either for particular $metric item or globally;
@@ -538,8 +538,8 @@ class CScatterPlotHelper
 		}
 		else {
 			foreach ($metrics as &$metric) {
-				foreach (['x_axis_items', 'y_axis_items'] as $key) {
-					foreach ($metric[$key] as &$item) {
+				foreach (['x_axis_items', 'y_axis_items'] as $axis) {
+					foreach ($metric[$axis] as &$item) {
 						$item['source'] = $data_source;
 					}
 					unset($item);
@@ -558,12 +558,12 @@ class CScatterPlotHelper
 		foreach ($metrics as &$metric) {
 			$aggregation_name = CItemHelper::getAggregateFunctionName($metric['options']['aggregate_function']);
 
-			foreach (['x_axis_items', 'y_axis_items'] as $key) {
+			foreach (['x_axis_items', 'y_axis_items'] as $axis) {
 				$name = $aggregation_name.'(';
 
 				$count = 0;
 
-				foreach ($metric[$key] as &$item) {
+				foreach ($metric[$axis] as &$item) {
 					if ($count > 0) {
 						$name .= ', ';
 					}
@@ -577,7 +577,7 @@ class CScatterPlotHelper
 				unset($item);
 
 				$name .= ')';
-				$metric[$key.'_name'] = $name;
+				$metric[$axis.'_name'] = $name;
 			}
 		}
 		unset($metric);
@@ -610,10 +610,10 @@ class CScatterPlotHelper
 				? ceil($period / $width)
 				: 0;
 
-			foreach (['x_axis', 'y_axis'] as $key) {
+			foreach (['x_axis', 'y_axis'] as $axis) {
 				$metric_points = [];
 
-				foreach ($result[$key] as $points) {
+				foreach ($result[$axis] as $points) {
 					$tick = 0;
 					usort($points['data'],
 						static function (array $point_a, array $point_b): int {
@@ -633,13 +633,13 @@ class CScatterPlotHelper
 				switch ($metric['options']['aggregate_function']) {
 					case AGGREGATE_MIN:
 						foreach ($metric_points as $tick => $points) {
-							$metric['points'][$tick][$key] = min(array_column($points, 'value'));
+							$metric['points'][$tick][$axis] = min(array_column($points, 'value'));
 						}
 						break;
 
 					case AGGREGATE_MAX:
 						foreach ($metric_points as $tick => $points) {
-							$metric['points'][$tick][$key] = max(array_column($points, 'value'));
+							$metric['points'][$tick][$axis] = max(array_column($points, 'value'));
 						}
 						break;
 
@@ -653,7 +653,7 @@ class CScatterPlotHelper
 								$num_sum += $point['num'];
 							}
 
-							$metric['points'][$tick][$key] = $value_sum / $num_sum;
+							$metric['points'][$tick][$axis] = $value_sum / $num_sum;
 						}
 						break;
 
@@ -663,7 +663,7 @@ class CScatterPlotHelper
 							$value = array_sum(array_column($points, 'value'));
 
 							if ($metric['options']['aggregate_function'] == AGGREGATE_SUM || $value !== 0) {
-								$metric['points'][$tick][$key] = $value;
+								$metric['points'][$tick][$axis] = $value;
 							}
 						}
 						break;
@@ -679,7 +679,7 @@ class CScatterPlotHelper
 								? $points[0]
 								: $points[count($points) - 1];
 
-							$metric['points'][$tick][$key] = $point['value'];
+							$metric['points'][$tick][$axis] = $point['value'];
 						}
 						break;
 				}
