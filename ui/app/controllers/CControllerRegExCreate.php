@@ -50,7 +50,7 @@ class CControllerRegExCreate extends CController {
 					'case_sensitive' => ['db expressions.case_sensitive', 'in' => [0, 1]]
 				],
 				'messages' => [
-					'uniq' => _('Expression and expression type combination is not unique.'),
+					'uniq' => _('Expression type and expression combination is not unique.'),
 					'not_empty' => _('At least one expression must be added.')
 				]
 			]
