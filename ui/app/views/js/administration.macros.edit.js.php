@@ -78,7 +78,8 @@
 				.then(result => {
 					if (result) {
 						let empty_removed = 0;
-						fields.macros = Object.values(fields.macros).filter((macro) => {
+
+						fields.macros = Object.values(fields.macros).filter(macro => {
 							if (macro.macro === '' && macro.globalmacroid) {
 								empty_removed += 1;
 							}
@@ -153,7 +154,7 @@
 
 		table
 			.on('click', 'button.element-table-remove', function() {
-				// check if the macro has an hidden ID element, if it does - increment the deleted macro counter
+				// Check if the macro has a hidden ID element. If it does - increment the deleted macro counter.
 				removed += $('#macros_' + $(this).attr('id').split('_')[1] + '_globalmacroid').length;
 			})
 			.dynamicRows({template: '#macro-row-tmpl', allow_empty: true, counter: <?= count($data['macros']) ?>})
