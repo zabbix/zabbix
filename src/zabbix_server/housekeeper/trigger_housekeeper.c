@@ -125,20 +125,17 @@ int	zbx_housekeep_problems_events(const char *query, int config_max_hk_delete, i
 
 static int	housekeep_problems_without_triggers(int config_max_hk_delete, int *more)
 {
-	char	*sql = NULL;
-	size_t	sql_alloc = 0, sql_offset = 0;
 	int	deleted;
+	char	query[MAX_STRING_LEN];
 
-	zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,"select eventid"
+	zbx_snprintf(query, sizeof(query), "select eventid"
 			" from problem"
 			" where source=%d"
 				" and object=%d"
 				" and not exists (select NULL from triggers where triggerid=objectid) order by eventid",
 				EVENT_SOURCE_TRIGGERS, EVENT_OBJECT_TRIGGER);
 
-	deleted = zbx_housekeep_problems_events(sql, config_max_hk_delete, more);
-
-	zbx_free(sql);
+	deleted = zbx_housekeep_problems_events(query, config_max_hk_delete, more);
 
 	return deleted;
 }
