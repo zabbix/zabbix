@@ -24,8 +24,8 @@
 
 #include "mocks/valuecache/valuecache_mock.h"
 
-#include "../../../src/libs/zbxexpression/anomalystl.h"
-#include "../../../src/libs/zbxexpression/funcparam.h"
+#include "../../../src/libs/zbxcalc/anomalystl.h"
+#include "../../../src/libs/zbxcalc/funcparam.h"
 
 int	__wrap_substitute_simple_macros(zbx_uint64_t *actionid, const zbx_db_event *event, const zbx_db_event *r_event,
 		zbx_uint64_t *userid, const zbx_uint64_t *hostid, const zbx_dc_host_t *dc_host,

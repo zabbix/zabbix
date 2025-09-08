@@ -9829,6 +9829,30 @@ void	zbx_dc_config_get_items_by_itemids(zbx_dc_item_t *items, const zbx_uint64_t
 	UNLOCK_CACHE;
 }
 
+/******************************************************************************
+ *                                                                            *
+ * Purpose: find host identifier referenced by item or lld-rule.              *
+ *                                                                            *
+ * Parameters: hostids - [OUT] vector with found host identifier. Caller      *
+ *                             should pass empty vector.                      *
+ *             itemid  - [IN]  item identifier                                *
+ *                                                                            *
+ ******************************************************************************/
+void	zbx_dc_config_get_hostid_by_itemid(zbx_vector_uint64_t *hostids, zbx_uint64_t itemid)
+{
+	if (0 == hostids->values_num)
+	{
+		const ZBX_DC_ITEM	*dc_item;
+
+		RDLOCK_CACHE;
+
+		if (NULL != (dc_item = (ZBX_DC_ITEM *)zbx_hashset_search(&config->items, &itemid)))
+			zbx_vector_uint64_append(hostids, dc_item->hostid);
+
+		UNLOCK_CACHE;
+	}
+}
+
 int	zbx_dc_config_get_active_items_count_by_hostid(zbx_uint64_t hostid)
 {
 	ZBX_DC_HOST		*dc_host;
