@@ -22,6 +22,7 @@
 #include "zbxhttp.h"
 #include "zbxcomms.h"
 #include "zbxcurl.h"
+#include "zbxip.h"
 
 #define HTTP_SCHEME_STR		"http://"
 
@@ -122,12 +123,15 @@ static int	curl_page_get(char *url, int timeout, char **buffer, char **error)
 	int			ret = SYSINFO_RET_FAIL;
 	zbx_http_response_t	body = {0}, header = {0};
 	char			errbuf[CURL_ERROR_SIZE];
+	struct curl_slist	*headers = NULL;
 
 	if (NULL == (easyhandle = curl_easy_init()))
 	{
 		*error = zbx_strdup(*error, "Cannot initialize cURL library.");
 		return SYSINFO_RET_FAIL;
 	}
+
+	headers = curl_slist_append(headers, "Connection: close");
 
 	if (CURLE_OK != (err = curl_easy_setopt(easyhandle, CURLOPT_USERAGENT, "Zabbix " ZABBIX_VERSION)) ||
 			CURLE_OK != (err = curl_easy_setopt(easyhandle, CURLOPT_SSL_VERIFYPEER, 0L)) ||
@@ -139,6 +143,7 @@ static int	curl_page_get(char *url, int timeout, char **buffer, char **error)
 					sysinfo_get_config_source_ip()))) ||
 			CURLE_OK != (err = curl_easy_setopt(easyhandle, CURLOPT_TIMEOUT,
 					(long)timeout)) ||
+			CURLE_OK != (err = curl_easy_setopt(easyhandle, CURLOPT_HTTPHEADER, headers)) ||
 			CURLE_OK != (err = curl_easy_setopt(easyhandle, CURLOPT_ACCEPT_ENCODING, "")))
 	{
 		*error = zbx_dsprintf(*error, "Cannot set cURL option: %s.", curl_easy_strerror(err));
@@ -187,6 +192,7 @@ static int	curl_page_get(char *url, int timeout, char **buffer, char **error)
 				curl_easy_strerror(err) : errbuf);
 	}
 out:
+	curl_slist_free_all(headers);
 	curl_easy_cleanup(easyhandle);
 	zbx_free(header.data);
 	zbx_free(body.data);
@@ -214,6 +220,7 @@ static int	get_http_page(const char *host, const char *path, const char *port, i
 		/* URL is not detected - compose URL using host, port and path */
 
 		unsigned short	port_n = ZBX_DEFAULT_HTTP_PORT;
+		char		host_port[MAX_STRING_LEN];
 
 		if (NULL != port && '\0' != *port)
 		{
@@ -224,10 +231,8 @@ static int	get_http_page(const char *host, const char *path, const char *port, i
 			}
 		}
 
-		if (NULL != strchr(host, ':'))
-			url = zbx_dsprintf(url, HTTP_SCHEME_STR "[%s]:%u/", host, port_n);
-		else
-			url = zbx_dsprintf(url, HTTP_SCHEME_STR "%s:%u/", host, port_n);
+		url = zbx_dsprintf(url, HTTP_SCHEME_STR "%s/", zbx_join_hostport(host_port, sizeof(host_port), host,
+				port_n));
 
 		if (NULL != path)
 			url = zbx_strdcat(url, path + ('/' == *path ? 1 : 0));

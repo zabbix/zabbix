@@ -14,7 +14,7 @@
 **/
 
 
-require_once dirname(__FILE__).'/../common/testWidgets.php';
+require_once __DIR__.'/../common/testWidgets.php';
 
 /**
  * @dataSource AllItemValueTypes, ItemValueWidget, GlobalMacros, TopHostsWidget
@@ -3948,14 +3948,14 @@ class testDashboardTopHostsWidget extends testWidgets {
 					],
 					'result' => [
 						[
-							'Min' => 'Down (0)',
-							'Max' => 'Up (1)',
-							'Avg' => 'Up (1)',
+							'Min' => 'Down (0.00)',
+							'Max' => 'Up (1.00)',
+							'Avg' => 'Up (1.00)',
 							'Avg 2' => '0.50', // Value mapping is ignored if value doesn't equals 0 or 1.
 							'Count' => '3.00', // Mapping is not used if aggregation function is 'sum' or 'count'.
 							'Sum' => '2.00',
-							'First' => 'Up (1)',
-							'Last' => 'Down (0)'
+							'First' => 'Up (1.00)',
+							'Last' => 'Down (0.00)'
 						]
 					]
 				]
@@ -3963,7 +3963,7 @@ class testDashboardTopHostsWidget extends testWidgets {
 			// Value mapping with aggregation function 'not used'.
 			[
 				[
-					'widget_name' => 'Value mapping with aggreagation Not used',
+					'widget_name' => 'Value mapping with aggregation Not used',
 					'column_fields' => [
 						[
 							// 'not used' is default value for aggregation function field.
@@ -3990,7 +3990,7 @@ class testDashboardTopHostsWidget extends testWidgets {
 					],
 					'result' => [
 						[
-							'Value mapping with aggregation function not used' => 'Up (1)'
+							'Value mapping with aggregation function not used' => 'Up (1.00)'
 						]
 					]
 

@@ -18,14 +18,14 @@
 			white-space: nowrap;
 			vertical-align: bottom;
 
-			.text-vertical {
+			z-vertical {
+				display: inline-block;
+				position: relative;
 				max-height: 150px;
 				min-width: 22px;
 				overflow: hidden;
 				text-overflow: ellipsis;
-				writing-mode: vertical-lr;
 				line-height: 22px;
-				transform: rotate(180deg);
 			}
 
 			.arrow-up {

@@ -48,7 +48,7 @@ class CAPIHelper {
 	 *
 	 * @throws Exception      if API call fails.
 	 */
-	public static function callRaw($data, string $sessionid = null) {
+	public static function callRaw($data, ?string $sessionid = null) {
 		global $URL;
 		if (!is_string($URL)) {
 			$URL = PHPUNIT_URL.'api_jsonrpc.php';

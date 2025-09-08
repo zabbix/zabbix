@@ -83,8 +83,8 @@ final class CModuleManager {
 	 *
 	 * @return array|null  Either manifest data or null if manifest file had errors or IDs didn't match.
 	 */
-	public function addModule(string $relative_path, string $moduleid = null, string $id = null,
-			array $config = null): ?array {
+	public function addModule(string $relative_path, ?string $moduleid = null, ?string $id = null,
+			?array $config = null): ?array {
 
 		$manifest = $this->loadManifest($relative_path);
 

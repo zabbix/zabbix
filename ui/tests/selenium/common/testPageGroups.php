@@ -14,9 +14,9 @@
 **/
 
 
-require_once dirname(__FILE__).'/../../include/CWebTest.php';
-require_once dirname(__FILE__).'/../behaviors/CMessageBehavior.php';
-require_once dirname(__FILE__).'/../behaviors/CTableBehavior.php';
+require_once __DIR__.'/../../include/CWebTest.php';
+require_once __DIR__.'/../behaviors/CMessageBehavior.php';
+require_once __DIR__.'/../behaviors/CTableBehavior.php';
 
 /**
  * Base class for Host and Template groups page.
@@ -97,7 +97,7 @@ class testPageGroups extends CWebTest {
 		$this->assertTrue($filter->isExpanded());
 		foreach ([false, true] as $state) {
 			$filter->expand($state);
-			// Leave the page and reopen the previous page to make sure the filter state is still saved..
+			// Leave the page and reopen the previous page to make sure the filter state is still saved.
 			$this->page->open('zabbix.php?action=report.status')->waitUntilReady();
 			$this->page->open($this->link)->waitUntilReady();
 			$this->assertTrue($filter->isExpanded($state));

@@ -80,6 +80,10 @@ class CWidgetHoneycomb extends CWidget {
 		this.#items_max_count = this.#getItemsMaxCount();
 	}
 
+	onDeactivate() {
+		clearTimeout(this.#resize_timeout_id);
+	}
+
 	isUserInteracting() {
 		return this.#user_interacting || super.isUserInteracting();
 	}

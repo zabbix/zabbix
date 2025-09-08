@@ -54,7 +54,7 @@ class CTimezoneHelper {
 	 *
 	 * @return string
 	 */
-	public static function getTitle(string $timezone, string $prefix = null): string {
+	public static function getTitle(string $timezone, ?string $prefix = null): string {
 		$timezone_title = self::getList()[$timezone];
 
 		if ($prefix === null) {

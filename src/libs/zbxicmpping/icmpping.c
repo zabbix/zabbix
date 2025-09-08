@@ -222,7 +222,7 @@ out:
  *                                      down                                  *
  *                                   1: redirected response is not treated    *
  *                                      as host                               *
- *             linebuf        - [IN]    bufuer containing fping output line   *
+ *             linebuf        - [IN]    buffer containing fping output line   *
  *                                                                            *
  * Return value: SUCCEED - no redirect was detected or                        *
  *                         redirect was detected and redirect is allowed      *

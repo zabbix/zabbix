@@ -14,8 +14,8 @@
 **/
 
 
-require_once dirname(__FILE__) . '/../../include/CWebTest.php';
-require_once dirname(__FILE__).'/../../include/helpers/CDataHelper.php';
+require_once __DIR__ . '/../../include/CWebTest.php';
+require_once __DIR__.'/../../include/helpers/CDataHelper.php';
 
 /**
  * Test for checking Proxy groups page.
@@ -371,8 +371,10 @@ class testPageAdministrationProxyGroups extends CWebTest {
 		$form->query('button:Reset')->one()->click();
 
 		// Fill filter form with data.
+		$table = $this->getTable();
 		$form->fill($data['filter']);
 		$form->submit();
+		$table->waitUntilReloaded();
 		$this->page->waitUntilReady();
 
 		// Check filtered result.

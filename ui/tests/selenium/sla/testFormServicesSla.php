@@ -14,9 +14,9 @@
 **/
 
 
-require_once dirname(__FILE__).'/../../include/CWebTest.php';
-require_once dirname(__FILE__).'/../behaviors/CMessageBehavior.php';
-require_once dirname(__FILE__).'/../behaviors/CTableBehavior.php';
+require_once __DIR__.'/../../include/CWebTest.php';
+require_once __DIR__.'/../behaviors/CMessageBehavior.php';
+require_once __DIR__.'/../behaviors/CTableBehavior.php';
 
 /**
  * @backup sla
@@ -70,8 +70,10 @@ class testFormServicesSla extends CWebTest {
 		];
 		$form->checkValue($default_values);
 
-		// Note that count of available timezones may differ based on the local environment configuration.
-		$this->assertEquals(420, count($form->getField('Time zone')->getOptions()->asText()));
+		// Note that count of available timezones may differ based on the local environment configuration and php version.
+		$timezones = $form->getField('Time zone')->getOptions()->asText();
+		$this->assertGreaterThan(415, count($timezones));
+		$this->assertContains(CDateTimeHelper::getTimeZoneFormat('Europe/Riga'), $timezones);
 
 		// Check that mandatory fields are marked accordingly.
 		foreach (['Name', 'SLO', 'Effective date', 'Service tags'] as $sla_label) {

@@ -70,7 +70,7 @@ function getLocales(): array {
  *
  * @return string
  */
-function getSupportUrl(string $language = null): string {
+function getSupportUrl(?string $language = null): string {
 	$urls = [
 		'cs' => 'https://www.zabbix.com/cz/support',
 		'fr' => 'https://www.zabbix.com/fr/support',
@@ -90,7 +90,7 @@ function getSupportUrl(string $language = null): string {
  *
  * @return string
  */
-function getIntegrationsUrl(string $language = null): string {
+function getIntegrationsUrl(?string $language = null): string {
 	$urls = [
 		'cs' => 'https://www.zabbix.com/cz/integrations',
 		'fr' => 'https://www.zabbix.com/fr/integrations',

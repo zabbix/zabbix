@@ -14,10 +14,10 @@
 **/
 
 
-require_once dirname(__FILE__).'/../../include/CWebTest.php';
-require_once dirname(__FILE__).'/../behaviors/CMessageBehavior.php';
-require_once dirname(__FILE__).'/../behaviors/CTableBehavior.php';
-require_once dirname(__FILE__).'/../../include/helpers/CDataHelper.php';
+require_once __DIR__.'/../../include/CWebTest.php';
+require_once __DIR__.'/../behaviors/CMessageBehavior.php';
+require_once __DIR__.'/../behaviors/CTableBehavior.php';
+require_once __DIR__.'/../../include/helpers/CDataHelper.php';
 
 use Facebook\WebDriver\WebDriverKeys;
 
@@ -1621,7 +1621,7 @@ class testUserRolesPermissions extends CWebTest {
 
 		$services_mode = $this->query('id:list_mode')->asSegmentedRadio()->one(false);
 
-		// Check that table service list content and edit mode in not available if the user doest have permissions.
+		// Check that table service list content and edit mode in not available if the user does not have permissions.
 		if ($data['services'] === null) {
 			$this->assertTableData();
 			$this->assertFalse($services_mode->isValid());

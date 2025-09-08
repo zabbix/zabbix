@@ -13,7 +13,7 @@
 ** If not, see <https://www.gnu.org/licenses/>.
 **/
 
-require_once dirname(__FILE__).'/../common/testFormFilter.php';
+require_once __DIR__.'/../common/testFormFilter.php';
 
 /**
  * @backup profiles

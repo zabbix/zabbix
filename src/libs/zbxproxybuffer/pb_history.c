@@ -208,7 +208,7 @@ try_again:
 	if (ZBX_MAX_HRECORDS != rows->values_num)
 		*more = ZBX_PROXY_DATA_DONE;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s() rows:" ZBX_FS_SIZE_T, __func__, rows->values_num);
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s() rows:%d", __func__, rows->values_num);
 
 	return rows->values_num;
 }
@@ -374,7 +374,7 @@ static int	pb_history_get_db(struct zbx_json *j, zbx_uint64_t *lastid, int *more
 	zbx_vector_pb_history_ptr_destroy(&rows);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s() lastid:" ZBX_FS_UI64 " records_num:%d size:~" ZBX_FS_SIZE_T " more:%d",
-			__func__, *lastid, records_num, j->buffer_offset, *more);
+			__func__, *lastid, records_num, (zbx_fs_size_t)j->buffer_offset, *more);
 
 	return records_num;
 }
@@ -451,7 +451,8 @@ static int	pb_history_add_row_mem(zbx_pb_t *pb, zbx_pb_history_t *src)
 	int			ret = FAIL;
 
 	zabbix_log(LOG_LEVEL_TRACE, "In %s() free:" ZBX_FS_SIZE_T " request:" ZBX_FS_SIZE_T, __func__,
-			pb_get_free_size(), pb_history_estimate_row_size(src->value, src->source));
+			(zbx_fs_size_t)pb_get_free_size(),
+			(zbx_fs_size_t)pb_history_estimate_row_size(src->value, src->source));
 
 	if (NULL == (row = (zbx_pb_history_t *)pb_malloc(sizeof(zbx_pb_history_t))))
 		goto out;
@@ -475,7 +476,7 @@ out:
 		pb_list_free_history(&pb->history, row);
 
 	zabbix_log(LOG_LEVEL_TRACE, "End of %s() ret:%s free:" ZBX_FS_SIZE_T , __func__, zbx_result_string(ret),
-			pb_get_free_size());
+			(zbx_fs_size_t)pb_get_free_size());
 
 	return ret;
 }
@@ -541,7 +542,8 @@ static zbx_list_item_t	*pb_history_add_rows_mem(zbx_pb_t *pb, zbx_list_t *rows)
 			if (FAIL == pb_free_space(get_pb_data(), size))
 			{
 				zabbix_log(LOG_LEVEL_WARNING, "history record with size " ZBX_FS_SIZE_T
-						" is too large for proxy memory buffer, discarding", size);
+						" is too large for proxy memory buffer, discarding",
+						(zbx_fs_size_t)size);
 				break;
 			}
 		}
@@ -549,7 +551,7 @@ static zbx_list_item_t	*pb_history_add_rows_mem(zbx_pb_t *pb, zbx_list_t *rows)
 		rows_num++;
 	}
 out:
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s() rows_num:%d next:%p", __func__, rows_num, li.current);
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s() rows_num:%d next:%p", __func__, rows_num, (void *)li.current);
 
 	return li.current;
 }
@@ -569,7 +571,7 @@ static void	pb_history_add_rows_db(zbx_list_t *rows, zbx_list_item_t *next, zbx_
 	zbx_pb_history_t	*row;
 	int			rows_num = 0;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s() next:%p", __func__, next);
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s() next:%p", __func__, (void *)next);
 
 	if (SUCCEED == zbx_list_iterator_init_with(rows, next, &li))
 	{
@@ -595,7 +597,6 @@ static void	pb_history_add_rows_db(zbx_list_t *rows, zbx_list_item_t *next, zbx_
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s() rows_num:%d", __func__, rows_num);
 }
-
 
 void	pb_history_flush(zbx_pb_t *pb)
 {

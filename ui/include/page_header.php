@@ -133,12 +133,6 @@ if ($page['type'] == PAGE_TYPE_HTML) {
 
 				if (CSettingsHelper::isSoftwareUpdateCheckEnabled()) {
 					$page['scripts'][] = 'class.software-version-check.js';
-
-					$check_data = CSettingsHelper::getSoftwareUpdateCheckData() + ['nextcheck' => 0];
-					$now = time();
-					$delay = $check_data['nextcheck'] > $now ? $check_data['nextcheck'] - $now : 0;
-
-					$page_header->addJavaScript('const ZBX_SOFTWARE_VERSION_CHECK_DELAY = '.$delay.';');
 				}
 			}
 		}

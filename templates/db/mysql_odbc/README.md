@@ -31,6 +31,14 @@ GRANT REPLICATION CLIENT,PROCESS,SHOW DATABASES,SHOW VIEW ON *.* TO 'zbx_monitor
 
 For more information, please see MySQL documentation https://dev.mysql.com/doc/refman/8.0/en/grant.html
 
+**NOTE:** In order to collect replication metrics, MariaDB Enterprise Server 10.5.8-5 and above and MariaDB Community Server 10.5.9 and above require the `SLAVE MONITOR` privilege to be set for the monitoring user:
+
+```text
+GRANT REPLICATION CLIENT,PROCESS,SHOW DATABASES,SHOW VIEW,SLAVE MONITOR ON *.* TO 'zbx_monitor'@'%';
+```
+
+For more information please read the MariaDB documentation https://mariadb.com/docs/server/ref/mdb/privileges/SLAVE_MONITOR/
+
 2. Set the username and password in the host macros `{$MYSQL.USER}` and `{$MYSQL.PASSWORD}`.
 
 

@@ -38,9 +38,32 @@ class CopyWidgetsDashboards {
 						'value_type' => ITEM_VALUE_TYPE_UINT64
 					]
 				]
+			],
+			[
+				'host' => 'Host with map for copy widgets',
+				'groups' => ['groupid' => CDataHelper::call('hostgroup.create',
+						[['name' => 'Group with maps for copy']])['groupids'][0]
+				]
 			]
 		]);
 		$itemid = $hosts['itemids']['Host with widgets items:key[1]'];
+		$hostid = $hosts['hostids']['Host with map for copy widgets'];
+
+		$maps = CDataHelper::call('map.create', [
+			[
+				'name' => 'Map for widget copies',
+				'width' => 500,
+				'height' => 500,
+				'selements' => [
+					[
+						'elements' => [['hostid' => $hostid]],
+						'elementtype' => SYSMAP_ELEMENT_TYPE_HOST,
+						'iconid_off' => 186
+					]
+				]
+			]
+		]);
+		$mapid = $maps['sysmapids'][0];
 
 		$templates = CDataHelper::createTemplates([
 			[
@@ -110,17 +133,17 @@ class CopyWidgetsDashboards {
 								'view_mode' => 0,
 								'fields' => [
 									[
-										'type' => 0,
+										'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
 										'name' => 'rf_rate',
 										'value' => '10'
 									],
 									[
-										'type' => 0,
+										'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
 										'name' => 'show_lines',
 										'value' => 3
 									],
 									[
-										'type' => 0,
+										'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
 										'name' => 'sort_triggers',
 										'value' => 7
 									]
@@ -136,17 +159,17 @@ class CopyWidgetsDashboards {
 								'view_mode' => 0,
 								'fields' => [
 									[
-										'type' => 0,
+										'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
 										'name' => 'rf_rate',
 										'value' => '60'
 									],
 									[
-										'type' => 0,
+										'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
 										'name' => 'time_type',
 										'value' => 2
 									],
 									[
-										'type' => 4,
+										'type' => ZBX_WIDGET_FIELD_TYPE_ITEM,
 										'name' => 'itemid',
 										'value' => 42229
 									]
@@ -162,32 +185,32 @@ class CopyWidgetsDashboards {
 								'view_mode' => 0,
 								'fields' => [
 									[
-										'type' => 0,
+										'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
 										'name' => 'rf_rate',
 										'value' => '0'
 									],
 									[
-										'type' => 0,
+										'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
 										'name' => 'show_suppressed',
 										'value' => 1
 									],
 									[
-										'type' => 0,
+										'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
 										'name' => 'style',
 										'value' => 1
 									],
 									[
-										'type' => 1,
+										'type' => ZBX_WIDGET_FIELD_TYPE_STR,
 										'name' => 'application',
 										'value' => '3'
 									],
 									[
-										'type' => 2,
+										'type' => ZBX_WIDGET_FIELD_TYPE_GROUP,
 										'name' => 'groupids',
 										'value' => 50011
 									],
 									[
-										'type' => 3,
+										'type' => ZBX_WIDGET_FIELD_TYPE_HOST,
 										'name' => 'hostids',
 										'value' => 50012
 									]
@@ -203,32 +226,32 @@ class CopyWidgetsDashboards {
 								'view_mode' => 0,
 								'fields' => [
 									[
-										'type' => 0,
+										'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
 										'name' => 'rf_rate',
 										'value' => '30'
 									],
 									[
-										'type' => 0,
+										'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
 										'name' => 'dynamic',
 										'value' => 10
 									],
 									[
-										'type' => 0,
+										'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
 										'name' => 'show_legend',
 										'value' => 1
 									],
 									[
-										'type' => 0,
+										'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
 										'name' => 'source_type',
 										'value' => 1
 									],
 									[
-										'type' => 4,
+										'type' => ZBX_WIDGET_FIELD_TYPE_ITEM,
 										'name' => 'itemid',
 										'value' => 99088
 									],
 									[
-										'type' => 1,
+										'type' => ZBX_WIDGET_FIELD_TYPE_STR,
 										'name' => 'reference',
 										'value' => 'ABCDE'
 									]
@@ -244,7 +267,7 @@ class CopyWidgetsDashboards {
 								'view_mode' => 0,
 								'fields' => [
 									[
-										'type' => 0,
+										'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
 										'name' => 'rf_rate',
 										'value' => '30'
 									]
@@ -260,7 +283,7 @@ class CopyWidgetsDashboards {
 								'view_mode' => 0,
 								'fields' => [
 									[
-										'type' => 0,
+										'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
 										'name' => 'rf_rate',
 										'value' => '600'
 									]
@@ -276,7 +299,7 @@ class CopyWidgetsDashboards {
 								'view_mode' => 0,
 								'fields' => [
 									[
-										'type' => 0,
+										'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
 										'name' => 'rf_rate',
 										'value' => '900'
 									]
@@ -302,7 +325,7 @@ class CopyWidgetsDashboards {
 										'value' => 2
 									],
 									[
-										'type' => 1,
+										'type' => ZBX_WIDGET_FIELD_TYPE_STR,
 										'name' => 'override_hostid._reference',
 										'value' => 'DASHBOARD._hostid'
 									],
@@ -317,12 +340,12 @@ class CopyWidgetsDashboards {
 										'value' => 0
 									],
 									[
-										'type' => '7',
+										'type' => ZBX_WIDGET_FIELD_TYPE_GRAPH_PROTOTYPE,
 										'name' => 'graphid',
 										'value' => 600000
 									],
 									[
-										'type' => 1,
+										'type' => ZBX_WIDGET_FIELD_TYPE_STR,
 										'name' => 'reference',
 										'value' => 'BCDEF'
 									]
@@ -338,37 +361,37 @@ class CopyWidgetsDashboards {
 								'view_mode' => 0,
 								'fields' => [
 									[
-										'type' => 0,
+										'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
 										'name' => 'interface_type',
 										'value' => 1
 									],
 									[
-										'type' => 0,
+										'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
 										'name' => 'interface_type',
 										'value' => 2
 									],
 									[
-										'type' => 0,
+										'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
 										'name' => 'interface_type',
 										'value' => 3
 									],
 									[
-										'type' => 0,
+										'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
 										'name' => 'layout',
 										'value' => 1
 									],
 									[
-										'type' => 0,
+										'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
 										'name' => 'maintenance',
 										'value' => 1
 									],
 									[
-										'type' => 0,
+										'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
 										'name' => 'rf_rate',
 										'value' => '60'
 									],
 									[
-										'type' => 2,
+										'type' => ZBX_WIDGET_FIELD_TYPE_GROUP,
 										'name' => 'groupids',
 										'value' => 50013
 									]
@@ -384,9 +407,9 @@ class CopyWidgetsDashboards {
 								'view_mode' => 0,
 								'fields' => [
 									[
-										'type' => 8,
+										'type' => ZBX_WIDGET_FIELD_TYPE_MAP,
 										'name' => 'sysmapid',
-										'value' => 3
+										'value' => $mapid
 									]
 								]
 							],
@@ -400,12 +423,12 @@ class CopyWidgetsDashboards {
 								'view_mode' => 0,
 								'fields' => [
 									[
-										'type' => 0,
+										'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
 										'name' => 'rf_rate',
 										'value' => '120'
 									],
 									[
-										'type' => 1,
+										'type' => ZBX_WIDGET_FIELD_TYPE_STR,
 										'name' => 'sysmapid._reference',
 										'value' => 'STZDI._mapid'
 									]
@@ -421,42 +444,42 @@ class CopyWidgetsDashboards {
 								'view_mode' => 0,
 								'fields' => [
 									[
-										'type' => 0,
+										'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
 										'name' => 'navtree.2.order',
 										'value' => 2
 									],
 									[
-										'type' => 0,
+										'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
 										'name' => 'rf_rate',
 										'value' => '60'
 									],
 									[
-										'type' => 0,
+										'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
 										'name' => 'show_unavailable',
 										'value' => 1
 									],
 									[
-										'type' => 1,
+										'type' => ZBX_WIDGET_FIELD_TYPE_STR,
 										'name' => 'navtree.1.name',
 										'value' => 'Map with icon mapping'
 									],
 									[
-										'type' => 1,
+										'type' => ZBX_WIDGET_FIELD_TYPE_STR,
 										'name' => 'navtree.2.name',
 										'value' => 'Public map with image'
 									],
 									[
-										'type' => 1,
+										'type' => ZBX_WIDGET_FIELD_TYPE_STR,
 										'name' => 'reference',
 										'value' => 'STZDI'
 									],
 									[
-										'type' => 8,
+										'type' => ZBX_WIDGET_FIELD_TYPE_MAP,
 										'name' => 'navtree.1.sysmapid',
 										'value' => 6
 									],
 									[
-										'type' => 8,
+										'type' => ZBX_WIDGET_FIELD_TYPE_MAP,
 										'name' => 'navtree.2.sysmapid',
 										'value' => 10
 									]
@@ -472,127 +495,127 @@ class CopyWidgetsDashboards {
 								'view_mode' => 0,
 								'fields' => [
 									[
-										'type' => 0,
+										'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
 										'name' => 'severities',
 										'value' => 0
 									],
 									[
-										'type' => 0,
+										'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
 										'name' => 'severities',
 										'value' => 4
 									],
 									[
-										'type' => 0,
+										'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
 										'name' => 'severities',
 										'value' => 2
 									],
 									[
-										'type' => 0,
+										'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
 										'name' => 'evaltype',
 										'value' => 2
 									],
 									[
-										'type' => 0,
+										'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
 										'name' => 'rf_rate',
 										'value' => '900'
 									],
 									[
-										'type' => 0,
+										'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
 										'name' => 'show',
 										'value' => 3
 									],
 									[
-										'type' => 0,
+										'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
 										'name' => 'show_lines',
 										'value' => 12
 									],
 									[
-										'type' => 0,
+										'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
 										'name' => 'show_opdata',
 										'value' => 1
 									],
 									[
-										'type' => 0,
+										'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
 										'name' => 'show_suppressed',
 										'value' => 1
 									],
 									[
-										'type' => 0,
+										'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
 										'name' => 'show_tags',
 										'value' => 2
 									],
 									[
-										'type' => 0,
+										'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
 										'name' => 'sort_triggers',
 										'value' => 15
 									],
 									[
-										'type' => 0,
+										'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
 										'name' => 'show_timeline',
 										'value' => 0
 									],
 									[
-										'type' => 0,
+										'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
 										'name' => 'tag_name_format',
 										'value' => 1
 									],
 									[
-										'type' => 0,
+										'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
 										'name' => 'tags.0.operator',
 										'value' => 1
 									],
 									[
-										'type' => 0,
+										'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
 										'name' => 'tags.1.operator',
 										'value' => 1
 									],
 									[
-										'type' => 0,
+										'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
 										'name' => 'acknowledgement_status',
 										'value' => 1
 									],
 									[
-										'type' => 1,
+										'type' => ZBX_WIDGET_FIELD_TYPE_STR,
 										'name' => 'problem',
 										'value' => 'test2'
 									],
 									[
-										'type' => 1,
+										'type' => ZBX_WIDGET_FIELD_TYPE_STR,
 										'name' => 'tags.0.value',
 										'value' => '2'
 									],
 									[
-										'type' => 1,
+										'type' => ZBX_WIDGET_FIELD_TYPE_STR,
 										'name' => 'tags.1.value',
 										'value' => '33'
 									],
 									[
-										'type' => 1,
+										'type' => ZBX_WIDGET_FIELD_TYPE_STR,
 										'name' => 'tag_priority',
 										'value' => '1,2'
 									],
 									[
-										'type' => 1,
+										'type' => ZBX_WIDGET_FIELD_TYPE_STR,
 										'name' => 'tags.0.tag',
 										'value' => 'tag2'
 									],
 									[
-										'type' => 1,
+										'type' => ZBX_WIDGET_FIELD_TYPE_STR,
 										'name' => 'tags.1.tag',
 										'value' => 'tagg33'
 									],
 									[
-										'type' => 2,
+										'type' => ZBX_WIDGET_FIELD_TYPE_GROUP,
 										'name' => 'exclude_groupids',
 										'value' => 50014
 									],
 									[
-										'type' => 2,
+										'type' => ZBX_WIDGET_FIELD_TYPE_GROUP,
 										'name' => 'groupids',
 										'value' => 50005
 									],
 									[
-										'type' => 3,
+										'type' => ZBX_WIDGET_FIELD_TYPE_HOST,
 										'name' => 'hostids',
 										'value' => 99026
 									]
@@ -608,82 +631,82 @@ class CopyWidgetsDashboards {
 								'view_mode' => 0,
 								'fields' => [
 									[
-										'type' => 0,
+										'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
 										'name' => 'evaltype',
 										'value' => 2
 									],
 									[
-										'type' => 0,
+										'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
 										'name' => 'ext_ack',
 										'value' => 1
 									],
 									[
-										'type' => 0,
+										'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
 										'name' => 'layout',
 										'value' => 1
 									],
 									[
-										'type' => 0,
+										'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
 										'name' => 'rf_rate',
 										'value' => '30'
 									],
 									[
-										'type' => 0,
+										'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
 										'name' => 'severities',
 										'value' => 2
 									],
 									[
-										'type' => 0,
+										'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
 										'name' => 'severities',
 										'value' => 3
 									],
 									[
-										'type' => 0,
+										'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
 										'name' => 'show_opdata',
 										'value' => 2
 									],
 									[
-										'type' => 0,
+										'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
 										'name' => 'show_timeline',
 										'value' => 0
 									],
 									[
-										'type' => 0,
+										'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
 										'name' => 'show_type',
 										'value' => 1
 									],
 									[
-										'type' => 0,
+										'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
 										'name' => 'tags.0.operator',
 										'value' => 1
 									],
 									[
-										'type' => 1,
+										'type' => ZBX_WIDGET_FIELD_TYPE_STR,
 										'name' => 'problem',
 										'value' => 'test problem'
 									],
 									[
-										'type' => 1,
+										'type' => ZBX_WIDGET_FIELD_TYPE_STR,
 										'name' => 'tags.0.tag',
 										'value' => 'tag5'
 									],
 									[
-										'type' => 1,
+										'type' => ZBX_WIDGET_FIELD_TYPE_STR,
 										'name' => 'tags.0.value',
 										'value' => '5'
 									],
 									[
-										'type' => 2,
+										'type' => ZBX_WIDGET_FIELD_TYPE_GROUP,
 										'name' => 'exclude_groupids',
 										'value' => 50008
 									],
 									[
-										'type' => 2,
+										'type' => ZBX_WIDGET_FIELD_TYPE_GROUP,
 										'name' => 'groupids',
 										'value' => 50011
 									],
 									[
-										'type' => 3,
+										'type' => ZBX_WIDGET_FIELD_TYPE_HOST,
 										'name' => 'hostids',
 										'value' => 99012
 									]
@@ -714,7 +737,7 @@ class CopyWidgetsDashboards {
 								'view_mode' => 0,
 								'fields' => [
 									[
-										'type' => 0,
+										'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
 										'name' => 'rf_rate',
 										'value' => '30'
 									]
@@ -730,37 +753,37 @@ class CopyWidgetsDashboards {
 								'view_mode' => 0,
 								'fields' => [
 									[
-										'type' => 0,
+										'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
 										'name' => 'rf_rate',
 										'value' => '120'
 									],
 									[
-										'type' => 0,
+										'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
 										'name' => 'show',
 										'value' => 2
 									],
 									[
-										'type' => 0,
+										'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
 										'name' => 'show_suppressed',
 										'value' => 1
 									],
 									[
-										'type' => 0,
+										'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
 										'name' => 'style',
 										'value' => 1
 									],
 									[
-										'type' => 1,
+										'type' => ZBX_WIDGET_FIELD_TYPE_STR,
 										'name' => 'application',
 										'value' => 'Inventory'
 									],
 									[
-										'type' => 2,
+										'type' => ZBX_WIDGET_FIELD_TYPE_GROUP,
 										'name' => 'groupids',
 										'value' => 50011
 									],
 									[
-										'type' => 3,
+										'type' => ZBX_WIDGET_FIELD_TYPE_HOST,
 										'name' => 'hostids',
 										'value' => 99012
 									]
@@ -776,107 +799,107 @@ class CopyWidgetsDashboards {
 								'view_mode' => 0,
 								'fields' => [
 									[
-										'type' => 0,
+										'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
 										'name' => 'rf_rate',
 										'value' => '60'
 									],
 									[
-										'type' => 0,
+										'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
 										'name' => 'show',
 										'value' => 2
 									],
 									[
-										'type' => 0,
+										'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
 										'name' => 'show_lines',
 										'value' => 5
 									],
 									[
-										'type' => 0,
+										'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
 										'name' => 'show_opdata',
 										'value' => 2
 									],
 									[
-										'type' => 0,
+										'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
 										'name' => 'show_suppressed',
 										'value' => 1
 									],
 									[
-										'type' => 0,
+										'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
 										'name' => 'show_tags',
 										'value' => 3
 									],
 									[
-										'type' => 0,
+										'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
 										'name' => 'show_timeline',
 										'value' => 0
 									],
 									[
-										'type' => 0,
+										'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
 										'name' => 'sort_triggers',
 										'value' => 3
 									],
 									[
-										'type' => 0,
+										'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
 										'name' => 'tag_name_format',
 										'value' => 2
 									],
 									[
-										'type' => 0,
+										'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
 										'name' => 'tags.0.operator',
 										'value' => 0
 									],
 									[
-										'type' => 0,
+										'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
 										'name' => 'tags.1.operator',
 										'value' => 0
 									],
 									[
-										'type' => 0,
+										'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
 										'name' => 'acknowledgement_status',
 										'value' => 1
 									],
 									[
-										'type' => 1,
+										'type' => ZBX_WIDGET_FIELD_TYPE_STR,
 										'name' => 'problem',
 										'value' => 'test4'
 									],
 									[
-										'type' => 1,
+										'type' => ZBX_WIDGET_FIELD_TYPE_STR,
 										'name' => 'tags.0.value',
 										'value' => '3'
 									],
 									[
-										'type' => 1,
+										'type' => ZBX_WIDGET_FIELD_TYPE_STR,
 										'name' => 'tags.1.value',
 										'value' => '44'
 									],
 									[
-										'type' => 1,
+										'type' => ZBX_WIDGET_FIELD_TYPE_STR,
 										'name' => 'tag_priority',
 										'value' => 'test5, test6'
 									],
 									[
-										'type' => 1,
+										'type' => ZBX_WIDGET_FIELD_TYPE_STR,
 										'name' => 'tags.0.tag',
 										'value' => 'tag3'
 									],
 									[
-										'type' => 1,
+										'type' => ZBX_WIDGET_FIELD_TYPE_STR,
 										'name' => 'tags.1.tag',
 										'value' => 'tag44'
 									],
 									[
-										'type' => 2,
+										'type' => ZBX_WIDGET_FIELD_TYPE_GROUP,
 										'name' => 'exclude_groupids',
 										'value' => 50014
 									],
 									[
-										'type' => 2,
+										'type' => ZBX_WIDGET_FIELD_TYPE_GROUP,
 										'name' => 'groupids',
 										'value' => 50006
 									],
 									[
-										'type' => 3,
+										'type' => ZBX_WIDGET_FIELD_TYPE_HOST,
 										'name' => 'hostids',
 										'value' => 99015
 									]
@@ -892,17 +915,17 @@ class CopyWidgetsDashboards {
 								'view_mode' => 0,
 								'fields' => [
 									[
-										'type' => 1,
+										'type' => ZBX_WIDGET_FIELD_TYPE_STR,
 										'name' => 'override_hostid._reference',
 										'value' => 'DASHBOARD._hostid'
 									],
 									[
-										'type' => 0,
+										'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
 										'name' => 'rf_rate',
 										'value' => '120'
 									],
 									[
-										'type' => 1,
+										'type' => ZBX_WIDGET_FIELD_TYPE_STR,
 										'name' => 'url',
 										'value' => 'https://www.zabbix.com/integrations'
 									]
@@ -979,77 +1002,77 @@ class CopyWidgetsDashboards {
 								'view_mode' => 0,
 								'fields' => [
 									[
-										'type' => 0,
+										'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
 										'name' => 'evaltype',
 										'value' => 2
 									],
 									[
-										'type' => 0,
+										'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
 										'name' => 'ext_ack',
 										'value' => 2
 									],
 									[
-										'type' => 0,
+										'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
 										'name' => 'hide_empty_groups',
 										'value' => 1
 									],
 									[
-										'type' => 0,
+										'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
 										'name' => 'rf_rate',
 										'value' => '30'
 									],
 									[
-										'type' => 0,
+										'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
 										'name' => 'severities',
 										'value' => 1
 									],
 									[
-										'type' => 0,
+										'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
 										'name' => 'severities',
 										'value' => 3
 									],
 									[
-										'type' => 0,
+										'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
 										'name' => 'severities',
 										'value' => 5
 									],
 									[
-										'type' => 0,
+										'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
 										'name' => 'show_suppressed',
 										'value' => 1
 									],
 									[
-										'type' => 0,
+										'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
 										'name' => 'tags.0.operator',
 										'value' => 1
 									],
 									[
-										'type' => 1,
+										'type' => ZBX_WIDGET_FIELD_TYPE_STR,
 										'name' => 'problem',
 										'value' => 'Test'
 									],
 									[
-										'type' => 1,
+										'type' => ZBX_WIDGET_FIELD_TYPE_STR,
 										'name' => 'tags.0.tag',
 										'value' => 'Tag1'
 									],
 									[
-										'type' => 1,
+										'type' => ZBX_WIDGET_FIELD_TYPE_STR,
 										'name' => 'tags.0.value',
 										'value' => '1'
 									],
 									[
-										'type' => 2,
+										'type' => ZBX_WIDGET_FIELD_TYPE_GROUP,
 										'name' => 'exclude_groupids',
 										'value' => 50014
 									],
 									[
-										'type' => 2,
+										'type' => ZBX_WIDGET_FIELD_TYPE_GROUP,
 										'name' => 'groupids',
 										'value' => 50011
 									],
 									[
-										'type' => 4,
+										'type' => ZBX_WIDGET_FIELD_TYPE_ITEM,
 										'name' => 'itemids',
 										'value' => 42230
 									]
@@ -1065,27 +1088,27 @@ class CopyWidgetsDashboards {
 								'view_mode' => 0,
 								'fields' => [
 									[
-										'type' => 0,
+										'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
 										'name' => 'maintenance',
 										'value' => 0
 									],
 									[
-										'type' => 0,
+										'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
 										'name' => 'rf_rate',
 										'value' => '120'
 									],
 									[
-										'type' => 2,
+										'type' => ZBX_WIDGET_FIELD_TYPE_GROUP,
 										'name' => 'exclude_groupids',
 										'value' => 50008
 									],
 									[
-										'type' => 2,
+										'type' => ZBX_WIDGET_FIELD_TYPE_GROUP,
 										'name' => 'groupids',
 										'value' => 50016
 									],
 									[
-										'type' => 3,
+										'type' => ZBX_WIDGET_FIELD_TYPE_HOST,
 										'name' => 'hostids',
 										'value' => 99133
 									]
@@ -1101,122 +1124,122 @@ class CopyWidgetsDashboards {
 								'view_mode' => 0,
 								'fields' => [
 									[
-										'type' => 0,
+										'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
 										'name' => 'evaltype',
 										'value' => 2
 									],
 									[
-										'type' => 0,
+										'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
 										'name' => 'rf_rate',
 										'value' => '60'
 									],
 									[
-										'type' => 0,
+										'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
 										'name' => 'severities',
 										'value' => 0
 									],
 									[
-										'type' => 0,
+										'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
 										'name' => 'severities',
 										'value' => 1
 									],
 									[
-										'type' => 0,
+										'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
 										'name' => 'severities',
 										'value' => 2
 									],
 									[
-										'type' => 0,
+										'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
 										'name' => 'severities',
 										'value' => 3
 									],
 									[
-										'type' => 0,
+										'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
 										'name' => 'severities',
 										'value' => 4
 									],
 									[
-										'type' => 0,
+										'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
 										'name' => 'severities',
 										'value' => 5
 									],
 									[
-										'type' => 0,
+										'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
 										'name' => 'show',
 										'value' => 2
 									],
 									[
-										'type' => 0,
+										'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
 										'name' => 'show_lines',
 										'value' => 5
 									],
 									[
-										'type' => 0,
+										'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
 										'name' => 'show_opdata',
 										'value' => 2
 									],
 									[
-										'type' => 0,
+										'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
 										'name' => 'show_suppressed',
 										'value' => 1
 									],
 									[
-										'type' => 0,
+										'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
 										'name' => 'show_tags',
 										'value' => 3
 									],
 									[
-										'type' => 0,
+										'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
 										'name' => 'sort_triggers',
 										'value' => 3
 									],
 									[
-										'type' => 0,
+										'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
 										'name' => 'tags.0.operator',
 										'value' => 1
 									],
 									[
-										'type' => 0,
+										'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
 										'name' => 'tag_name_format',
 										'value' => 2
 									],
 									[
-										'type' => 0,
+										'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
 										'name' => 'acknowledgement_status',
 										'value' => 1
 									],
 									[
-										'type' => 1,
+										'type' => ZBX_WIDGET_FIELD_TYPE_STR,
 										'name' => 'problem',
 										'value' => 'test5'
 									],
 									[
-										'type' => 1,
+										'type' => ZBX_WIDGET_FIELD_TYPE_STR,
 										'name' => 'tag_priority',
 										'value' => 'test7, test8'
 									],
 									[
-										'type' => 1,
+										'type' => ZBX_WIDGET_FIELD_TYPE_STR,
 										'name' => 'tags.0.tag',
 										'value' => 'tag9'
 									],
 									[
-										'type' => 1,
+										'type' => ZBX_WIDGET_FIELD_TYPE_STR,
 										'name' => 'tags.0.value',
 										'value' => '9'
 									],
 									[
-										'type' => 2,
+										'type' => ZBX_WIDGET_FIELD_TYPE_GROUP,
 										'name' => 'exclude_groupids',
 										'value' => 50014
 									],
 									[
-										'type' => 2,
+										'type' => ZBX_WIDGET_FIELD_TYPE_GROUP,
 										'name' => 'groupids',
 										'value' => 50006
 									],
 									[
-										'type' => 3,
+										'type' => ZBX_WIDGET_FIELD_TYPE_HOST,
 										'name' => 'hostids',
 										'value' => 99015
 									]
@@ -1232,27 +1255,27 @@ class CopyWidgetsDashboards {
 								'view_mode' => 0,
 								'fields' => [
 									[
-										'type' => 0,
+										'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
 										'name' => 'show_legend',
 										'value' => 0
 									],
 									[
-										'type' => 0,
+										'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
 										'name' => 'columns',
 										'value' => 20
 									],
 									[
-										'type' => 0,
+										'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
 										'name' => 'rows',
 										'value' => 5
 									],
 									[
-										'type' => 1,
+										'type' => ZBX_WIDGET_FIELD_TYPE_STR,
 										'name' => 'override_hostid._reference',
 										'value' => 'DASHBOARD._hostid'
 									],
 									[
-										'type' => 0,
+										'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
 										'name' => 'rf_rate',
 										'value' => '600'
 									],
@@ -1262,7 +1285,7 @@ class CopyWidgetsDashboards {
 										'value' => 600000
 									],
 									[
-										'type' => 1,
+										'type' => ZBX_WIDGET_FIELD_TYPE_STR,
 										'name' => 'reference',
 										'value' => 'CDEFG'
 									]
@@ -1278,97 +1301,97 @@ class CopyWidgetsDashboards {
 								'view_mode' => 0,
 								'fields' => [
 									[
-										'type' => 4,
+										'type' => ZBX_WIDGET_FIELD_TYPE_ITEM,
 										'name' => 'itemid',
 										'value' => 42230
 									],
 									[
-										'type' => 0,
+										'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
 										'name' => 'columns',
 										'value' => 20
 									],
 									[
-										'type' => 0,
+										'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
 										'name' => 'rf_rate',
 										'value' => 60
 									],
 									[
-										'type' => 0,
+										'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
 										'name' => 'adv_conf',
 										'value' => 1
 									],
 									[
-										'type' => 0,
+										'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
 										'name' => 'desc_h_pos',
 										'value' => 0
 									],
 									[
-										'type' => 0,
+										'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
 										'name' => 'desc_v_pos',
 										'value' => 1
 									],
 									[
-										'type' => 0,
+										'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
 										'name' => 'desc_bold',
 										'value' => 1
 									],
 									[
-										'type' => 0,
+										'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
 										'name' => 'time_h_pos',
 										'value' => 0
 									],
 									[
-										'type' => 0,
+										'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
 										'name' => 'time_v_pos',
 										'value' => 2
 									],
 									[
-										'type' => 0,
+										'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
 										'name' => 'time_bold',
 										'value' => 1
 									],
 									[
-										'type' => 0,
+										'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
 										'name' => 'time_size',
 										'value' => 16
 									],
 									[
-										'type' => 0,
+										'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
 										'name' => 'units_size',
 										'value' => 34
 									],
 									[
-										'type' => 1,
+										'type' => ZBX_WIDGET_FIELD_TYPE_STR,
 										'name' => 'units',
 										'value' => 'some'
 									],
 									[
-										'type' => 1,
+										'type' => ZBX_WIDGET_FIELD_TYPE_STR,
 										'name' => 'bg_color',
 										'value' => 'E1E1E1'
 									],
 									[
-										'type' => 1,
+										'type' => ZBX_WIDGET_FIELD_TYPE_STR,
 										'name' => 'updown_color',
 										'value' => 'FFB300'
 									],
 									[
-										'type' => 1,
+										'type' => ZBX_WIDGET_FIELD_TYPE_STR,
 										'name' => 'up_color',
 										'value' => 'CE93D8'
 									],
 									[
-										'type' => 1,
+										'type' => ZBX_WIDGET_FIELD_TYPE_STR,
 										'name' => 'down_color',
 										'value' => '29B6F6'
 									],
 									[
-										'type' => 0,
+										'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
 										'name' => 'value_v_pos',
 										'value' => 0
 									],
 									[
-										'type' => 1,
+										'type' => ZBX_WIDGET_FIELD_TYPE_STR,
 										'name' => 'override_hostid._reference',
 										'value' => 'DASHBOARD._hostid'
 									]
@@ -1384,47 +1407,47 @@ class CopyWidgetsDashboards {
 								'view_mode' => 0,
 								'fields' => [
 									[
-										'type' => 2,
+										'type' => ZBX_WIDGET_FIELD_TYPE_GROUP,
 										'name' => 'groupids',
 										'value' => 4
 									],
 									[
-										'type' => 3,
+										'type' => ZBX_WIDGET_FIELD_TYPE_HOST,
 										'name' => 'hostids',
 										'value' => 99136
 									],
 									[
-										'type' => 0,
+										'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
 										'name' => 'evaltype',
 										'value' => 2
 									],
 									[
-										'type' => 1,
+										'type' => ZBX_WIDGET_FIELD_TYPE_STR,
 										'name' => 'tags.0.tag',
 										'value' => 'tag'
 									],
 									[
-										'type' => 0,
+										'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
 										'name' => 'tags.0.operator',
 										'value' => 0
 									],
 									[
-										'type' => 1,
+										'type' => ZBX_WIDGET_FIELD_TYPE_STR,
 										'name' => 'tags.0.value',
 										'value' => 'value'
 									],
 									[
-										'type' => 1,
+										'type' => ZBX_WIDGET_FIELD_TYPE_STR,
 										'name' => 'tags.1.tag',
 										'value' => 'tag2'
 									],
 									[
-										'type' => 0,
+										'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
 										'name' => 'tags.1.operator',
 										'value' => 3
 									],
 									[
-										'type' => 1,
+										'type' => ZBX_WIDGET_FIELD_TYPE_STR,
 										'name' => 'tags.1.value',
 										'value' => 'value2'
 									]
@@ -1440,142 +1463,142 @@ class CopyWidgetsDashboards {
 								'view_mode' => 0,
 								'fields' => [
 									[
-										'type' => 2,
+										'type' => ZBX_WIDGET_FIELD_TYPE_GROUP,
 										'name' => 'groupids',
 										'value' => 50011
 									],
 									[
-										'type' => 3,
+										'type' => ZBX_WIDGET_FIELD_TYPE_HOST,
 										'name' => 'hostids',
 										'value' => 50012
 									],
 									[
-										'type' => 1,
+										'type' => ZBX_WIDGET_FIELD_TYPE_STR,
 										'name' => 'tags.0.tag',
 										'value' => 'tag_name'
 									],
 									[
-										'type' => 0,
+										'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
 										'name' => 'tags.0.operator',
 										'value' => 0
 									],
 									[
-										'type' => 1,
+										'type' => ZBX_WIDGET_FIELD_TYPE_STR,
 										'name' => 'tags.0.value',
 										'value' => 'tag_value'
 									],
 									[
-										'type' => 1,
+										'type' => ZBX_WIDGET_FIELD_TYPE_STR,
 										'name' => 'columns.0.name',
 										'value' => 'Item name'
 									],
 									[
-										'type' => 0,
+										'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
 										'name' => 'columns.0.data',
 										'value' => 1
 									],
 									[
-										'type' => 1,
+										'type' => ZBX_WIDGET_FIELD_TYPE_STR,
 										'name' => 'columns.0.item',
 										'value' => '3_item'
 									],
 									[
-										'type' => 1,
+										'type' => ZBX_WIDGET_FIELD_TYPE_STR,
 										'name' => 'columns.0.time_period.from',
 										'value' => 'now-1h'
 									],
 									[
-										'type' => 1,
+										'type' => ZBX_WIDGET_FIELD_TYPE_STR,
 										'name' => 'columns.0.time_period.to',
 										'value' => 'now'
 									],
 									[
-										'type' => 0,
+										'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
 										'name' => 'columns.0.aggregate_function',
 										'value' => 2
 									],
 									[
-										'type' => 1,
+										'type' => ZBX_WIDGET_FIELD_TYPE_STR,
 										'name' => 'columns.0.min',
 										'value' => '10'
 									],
 									[
-										'type' => 1,
+										'type' => ZBX_WIDGET_FIELD_TYPE_STR,
 										'name' => 'columns.0.max',
 										'value' =>  '50'
 									],
 									[
-										'type' => 0,
+										'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
 										'name' => 'columns.0.display',
 										'value' => 2
 									],
 									[
-										'type' => 0,
+										'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
 										'name' => 'columns.0.history',
 										'value' => 2
 									],
 									[
-										'type' => 1,
+										'type' => ZBX_WIDGET_FIELD_TYPE_STR,
 										'name' => 'columns.0.base_color',
 										'value' => 'FF0000'
 									],
 									[
-										'type' => 1,
+										'type' => ZBX_WIDGET_FIELD_TYPE_STR,
 										'name' => 'columnsthresholds.0.color.0',
 										'value' => 'FF465C'
 									],
 									[
-										'type' => 1,
+										'type' => ZBX_WIDGET_FIELD_TYPE_STR,
 										'name' => 'columnsthresholds.0.threshold.0',
 										'value' => '100'
 									],
 									[
-										'type' => 1,
+										'type' => ZBX_WIDGET_FIELD_TYPE_STR,
 										'name' => 'columns.1.name',
 										'value' => 'Host name'
 									],
 									[
-										'type' => 0,
+										'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
 										'name' => 'columns.1.data',
 										'value' => 2
 									],
 									[
-										'type' => 0,
+										'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
 										'name' => 'columns.1.aggregate_function',
 										'value' => 0
 									],
 									[
-										'type' => 1,
+										'type' => ZBX_WIDGET_FIELD_TYPE_STR,
 										'name' => 'columns.1.base_color',
 										'value' => 'BF00FF'
 									],
 									[
-										'type' => 1,
+										'type' => ZBX_WIDGET_FIELD_TYPE_STR,
 										'name' => 'columns.2.name',
 										'value' => 'Text name'
 									],
 									[
-										'type' => 0,
+										'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
 										'name' => 'columns.2.data',
 										'value' => 3
 									],
 									[
-										'type' => 0,
+										'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
 										'name' => 'columns.2.aggregate_function',
 										'value' => 0
 									],
 									[
-										'type' => 1,
+										'type' => ZBX_WIDGET_FIELD_TYPE_STR,
 										'name' => 'columns.2.base_color',
 										'value' => '00BFFF'
 									],
 									[
-										'type' => 1,
+										'type' => ZBX_WIDGET_FIELD_TYPE_STR,
 										'name' => 'columns.2.text',
 										'value' => 'text_here'
 									],
 									[
-										'type' => 0,
+										'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
 										'name' => 'column',
 										'value' => 0
 									]
@@ -1790,7 +1813,7 @@ class CopyWidgetsDashboards {
 										'value' => 25
 									],
 									[
-										'type' =>ZBX_WIDGET_FIELD_TYPE_STR,
+										'type' => ZBX_WIDGET_FIELD_TYPE_STR,
 										'name' => 'tags.0.tag',
 										'value' => 'top trigger tag1'
 									],
@@ -1805,7 +1828,7 @@ class CopyWidgetsDashboards {
 										'value' => 'top trigger tag value1'
 									],
 									[
-										'type' =>ZBX_WIDGET_FIELD_TYPE_STR,
+										'type' => ZBX_WIDGET_FIELD_TYPE_STR,
 										'name' => 'tags.1.tag',
 										'value' => 'top trigger tag2'
 									],
@@ -2201,122 +2224,122 @@ class CopyWidgetsDashboards {
 								'view_mode' => 0,
 								'fields' => [
 									[
-										'type' => 2,
+										'type' => ZBX_WIDGET_FIELD_TYPE_GROUP,
 										'name' => 'groupids.0',
 										'value' => 4
 									],
 									[
-										'type' => 3,
+										'type' => ZBX_WIDGET_FIELD_TYPE_HOST,
 										'name' => 'hostids.0',
 										'value' => 10084
 									],
 									[
-										'type' => 1,
+										'type' => ZBX_WIDGET_FIELD_TYPE_STR,
 										'name' => 'host_tags.0.tag',
 										'value' => 'tag1'
 									],
 									[
-										'type' => 0,
+										'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
 										'name' => 'host_tags.0.operator',
 										'value' => 0
 									],
 									[
-										'type' => 1,
+										'type' => ZBX_WIDGET_FIELD_TYPE_STR,
 										'name' => 'host_tags.0.value',
 										'value' => 'val1'
 									],
 									[
-										'type' => 1,
+										'type' => ZBX_WIDGET_FIELD_TYPE_STR,
 										'name' => 'items.0',
 										'value' => 'Linux: Available memory'
 									],
 									[
-										'type' => 1,
+										'type' => ZBX_WIDGET_FIELD_TYPE_STR,
 										'name' => 'item_tags.0.tag',
 										'value' => 'tag2'
 									],
 									[
-										'type' => 0,
+										'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
 										'name' => 'item_tags.0.operator',
 										'value' => 0
 									],
 									[
-										'type' => 1,
+										'type' => ZBX_WIDGET_FIELD_TYPE_STR,
 										'name' => 'item_tags.0.value',
 										'value' => 'val2'
 									],
 									[
-										'type' => 0,
+										'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
 										'name' => 'maintenance',
 										'value' => 1
 									],
 									[
-										'type' => 1,
+										'type' => ZBX_WIDGET_FIELD_TYPE_STR,
 										'name' => 'primary_label',
 										'value' => 'TEXT'
 									],
 									[
-										'type' => 0,
+										'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
 										'name' => 'primary_label_size_type',
 										'value' => 1
 									],
 									[
-										'type' => 0,
+										'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
 										'name' => 'primary_label_size',
 										'value' => 22
 									],
 									[
-										'type' => 0,
+										'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
 										'name' => 'primary_label_bold',
 										'value' => 1
 									],
 									[
-										'type' => 1,
+										'type' => ZBX_WIDGET_FIELD_TYPE_STR,
 										'name' => 'primary_label_color',
 										'value' => 'E1BEE7'
 									],
 									[
-										'type' => 0,
+										'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
 										'name' => 'secondary_label_decimal_places',
 										'value' => 3
 									],
 									[
-										'type' => 1,
+										'type' => ZBX_WIDGET_FIELD_TYPE_STR,
 										'name' => 'secondary_label_color',
 										'value' => '00BCD4'
 									],
 									[
-										'type' => 1,
+										'type' => ZBX_WIDGET_FIELD_TYPE_STR,
 										'name' => 'secondary_label_units',
 										'value' => 'after'
 									],
 									[
-										'type' => 1,
+										'type' => ZBX_WIDGET_FIELD_TYPE_STR,
 										'name' => 'bg_color',
 										'value' => '9575CD'
 									],
 									[
-										'type' => 1,
+										'type' => ZBX_WIDGET_FIELD_TYPE_STR,
 										'name' => 'thresholds.0.color',
 										'value' => 'FF465C'
 									],
 									[
-										'type' => 1,
+										'type' => ZBX_WIDGET_FIELD_TYPE_STR,
 										'name' => 'thresholds.0.threshold',
 										'value' => '100'
 									],
 									[
-										'type' => 1,
+										'type' => ZBX_WIDGET_FIELD_TYPE_STR,
 										'name' => 'thresholds.1.color',
 										'value' => 'FFD54F'
 									],
 									[
-										'type' => 1,
+										'type' => ZBX_WIDGET_FIELD_TYPE_STR,
 										'name' => 'thresholds.1.threshold',
 										'value' => '200'
 									],
 									[
-										'type' => 1,
+										'type' => ZBX_WIDGET_FIELD_TYPE_STR,
 										'name' => 'reference',
 										'value' => 'ENJSC'
 									]
@@ -2347,7 +2370,7 @@ class CopyWidgetsDashboards {
 								'view_mode' => 0,
 								'fields' => [
 									[
-										'type' => 1,
+										'type' => ZBX_WIDGET_FIELD_TYPE_STR,
 										'name' => 'reference',
 										'value' => 'FYKXG'
 									]
@@ -2383,14 +2406,6 @@ class CopyWidgetsDashboards {
 								'height' => 4
 							],
 							[
-								'type' => 'discovery',
-								'name' => 'Discovery status widget',
-								'x' => 5,
-								'y' => 10,
-								'width' => 12,
-								'height' => 4
-							],
-							[
 								'type' => 'graph',
 								'name' => 'Graph (classic) widget',
 								'x' => 19,
@@ -2399,17 +2414,17 @@ class CopyWidgetsDashboards {
 								'height' => 4,
 								'fields' => [
 									[
-										'type' => 0,
+										'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
 										'name' => 'source_type',
 										'value' => 1
 									],
 									[
-										'type' => 4,
+										'type' => ZBX_WIDGET_FIELD_TYPE_ITEM,
 										'name' => 'itemid',
 										'value' => $template_itemid
 									],
 									[
-										'type' => 1,
+										'type' => ZBX_WIDGET_FIELD_TYPE_STR,
 										'name' => 'reference',
 										'value' => 'EFGHI'
 									]
@@ -2444,7 +2459,7 @@ class CopyWidgetsDashboards {
 								'height' => 4,
 								'fields' => [
 									[
-										'type' => 1,
+										'type' => ZBX_WIDGET_FIELD_TYPE_STR,
 										'name' => 'url',
 										'value' => 'http://zabbix.com'
 									]
@@ -2464,7 +2479,7 @@ class CopyWidgetsDashboards {
 										'value' => $graph_prototypeid
 									],
 									[
-										'type' => 1,
+										'type' => ZBX_WIDGET_FIELD_TYPE_STR,
 										'name' => 'reference',
 										'value' => 'FGHIJ'
 									]
@@ -2479,7 +2494,7 @@ class CopyWidgetsDashboards {
 								'height' => 4,
 								'fields' => [
 									[
-										'type' => 0,
+										'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
 										'name' => 'itemid',
 										'value' => $template_itemid
 									]
@@ -2684,7 +2699,7 @@ class CopyWidgetsDashboards {
 										'value' => 25
 									],
 									[
-										'type' =>ZBX_WIDGET_FIELD_TYPE_STR,
+										'type' => ZBX_WIDGET_FIELD_TYPE_STR,
 										'name' => 'tags.0.tag',
 										'value' => 'top trigger tag1'
 									],
@@ -2699,7 +2714,7 @@ class CopyWidgetsDashboards {
 										'value' => 'top trigger tag value1'
 									],
 									[
-										'type' =>ZBX_WIDGET_FIELD_TYPE_STR,
+										'type' => ZBX_WIDGET_FIELD_TYPE_STR,
 										'name' => 'tags.1.tag',
 										'value' => 'top trigger tag2'
 									],
@@ -2961,108 +2976,152 @@ class CopyWidgetsDashboards {
 								]
 							],
 							[
+								'type' => 'discovery',
+								'name' => 'Discovery status widget',
+								'x' => 19,
+								'y' => 8,
+								'width' => 13,
+								'height' => 4
+							],
+							[
 								'type' => 'honeycomb',
 								'name' => 'Honeycomb widget',
-								'x' => 17,
-								'y' => 10,
-								'width' => 5,
-								'height' => 5,
+								'x' => 32,
+								'y' => 8,
+								'width' => 12,
+								'height' => 4,
 								'view_mode' => 0,
 								'fields' => [
 									[
-										'type' => 1,
+										'type' => ZBX_WIDGET_FIELD_TYPE_STR,
 										'name' => 'items.0',
 										'value' => 'item_pattern'
 									],
 									[
-										'type' => 1,
+										'type' => ZBX_WIDGET_FIELD_TYPE_STR,
 										'name' => 'item_tags.0.tag',
 										'value' => 'tag1'
 									],
 									[
-										'type' => 0,
+										'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
 										'name' => 'item_tags.0.operator',
 										'value' => 0
 									],
 									[
-										'type' => 1,
+										'type' => ZBX_WIDGET_FIELD_TYPE_STR,
 										'name' => 'item_tags.0.value',
 										'value' => 'val1'
 									],
 									[
-										'type' => 0,
+										'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
 										'name' => 'maintenance',
 										'value' => 1
 									],
 									[
-										'type' => 1,
+										'type' => ZBX_WIDGET_FIELD_TYPE_STR,
 										'name' => 'primary_label',
 										'value' => 'TEXT'
 									],
 									[
-										'type' => 0,
+										'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
 										'name' => 'primary_label_size_type',
 										'value' => 1
 									],
 									[
-										'type' => 0,
+										'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
 										'name' => 'primary_label_size',
 										'value' => 22
 									],
 									[
-										'type' => 0,
+										'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
 										'name' => 'primary_label_bold',
 										'value' => 1
 									],
 									[
-										'type' => 1,
+										'type' => ZBX_WIDGET_FIELD_TYPE_STR,
 										'name' => 'primary_label_color',
 										'value' => 'E1BEE7'
 									],
 									[
-										'type' => 0,
+										'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
 										'name' => 'secondary_label_decimal_places',
 										'value' => 3
 									],
 									[
-										'type' => 1,
+										'type' => ZBX_WIDGET_FIELD_TYPE_STR,
 										'name' => 'secondary_label_color',
 										'value' => '00BCD4'
 									],
 									[
-										'type' => 1,
+										'type' => ZBX_WIDGET_FIELD_TYPE_STR,
 										'name' => 'secondary_label_units',
 										'value' => 'test_unit'
 									],
 									[
-										'type' => 1,
+										'type' => ZBX_WIDGET_FIELD_TYPE_STR,
 										'name' => 'bg_color',
 										'value' => '9575CD'
 									],
 									[
-										'type' => 1,
+										'type' => ZBX_WIDGET_FIELD_TYPE_STR,
 										'name' => 'thresholds.0.color',
 										'value' => 'FF465C'
 									],
 									[
-										'type' => 1,
+										'type' => ZBX_WIDGET_FIELD_TYPE_STR,
 										'name' => 'thresholds.0.threshold',
 										'value' => '100'
 									],
 									[
-										'type' => 1,
+										'type' => ZBX_WIDGET_FIELD_TYPE_STR,
 										'name' => 'thresholds.1.color',
 										'value' => 'FFD54F'
 									],
 									[
-										'type' => 1,
+										'type' => ZBX_WIDGET_FIELD_TYPE_STR,
 										'name' => 'thresholds.1.threshold',
 										'value' => '200'
 									],
 									[
-										'type' => 1,
+										'type' => ZBX_WIDGET_FIELD_TYPE_STR,
 										'name' => 'reference',
 										'value' => 'FAXKO'
+									]
+								]
+							],
+							[
+								'name' => 'Web monitoring widget',
+								'type' => 'web',
+								'x' => 44,
+								'y' => 8,
+								'width' => 12,
+								'height' => 4,
+								'view_mode' => 0,
+								'fields' => [
+									[
+										'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
+										'name' => 'maintenance',
+										'value' => 0
+									],
+									[
+										'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
+										'name' => 'rf_rate',
+										'value' => '120'
+									],
+									[
+										'type' => ZBX_WIDGET_FIELD_TYPE_GROUP,
+										'name' => 'exclude_groupids',
+										'value' => 50008 // Group to copy all graph.
+									],
+									[
+										'type' => ZBX_WIDGET_FIELD_TYPE_GROUP,
+										'name' => 'groupids',
+										'value' => 50016 // Group in maintenance for Host availability widget.
+									],
+									[
+										'type' => ZBX_WIDGET_FIELD_TYPE_HOST,
+										'name' => 'hostids',
+										'value' => 99133 // Unknown host in maintenance.
 									]
 								]
 							]

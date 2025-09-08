@@ -14,10 +14,10 @@
 **/
 
 
-require_once dirname(__FILE__) . '/../include/CWebTest.php';
-require_once dirname(__FILE__).'/common/testFormPreprocessing.php';
-require_once dirname(__FILE__).'/../include/helpers/CDataHelper.php';
-require_once dirname(__FILE__).'/behaviors/CPreprocessingBehavior.php';
+require_once __DIR__ . '/../include/CWebTest.php';
+require_once __DIR__.'/common/testFormPreprocessing.php';
+require_once __DIR__.'/../include/helpers/CDataHelper.php';
+require_once __DIR__.'/behaviors/CPreprocessingBehavior.php';
 
 /**
  * @dataSource Services, EntitiesTags
@@ -524,6 +524,15 @@ class testFormTabIndicators extends CWebTest {
 								'old_value' => false
 							],
 							'field_type' => 'general_field'
+						],
+						[
+							'name' => 'MFA settings',
+							'entries' => [
+								'selector' => 'id:mfa_status',
+								'value' => true,
+								'old_value' => false
+							],
+							'field_type' => 'general_field'
 						]
 					]
 				]
@@ -744,6 +753,9 @@ class testFormTabIndicators extends CWebTest {
 
 	/**
 	 * @dataProvider getTabData
+	 *
+	 * TODO: remove ignoreBrowserErrors after DEV-4233
+	 * @ignoreBrowserErrors
 	 */
 	public function testFormTabIndicators_CheckGeneralForms($data) {
 		$this->page->login()->open($data['url'])->waitUntilReady();

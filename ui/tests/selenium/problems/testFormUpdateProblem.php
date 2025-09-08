@@ -14,8 +14,8 @@
 **/
 
 
-require_once dirname(__FILE__).'/../../include/CWebTest.php';
-require_once dirname(__FILE__).'/../../include/helpers/CDataHelper.php';
+require_once __DIR__.'/../../include/CWebTest.php';
+require_once __DIR__.'/../../include/helpers/CDataHelper.php';
 
 /**
  * @backup hosts
@@ -875,8 +875,8 @@ class testFormUpdateProblem extends CWebTest {
 		$row = $table->findRow('Problem', 'Trigger for icon test');
 		$row->getColumn('Update')->query('tag:a')->waitUntilClickable()->one()->click();
 
-		$dialog = COverlayDialogElement::find()->one()->waitUntilReady();
-		$form = $dialog->query('id:acknowledge_form')->asForm()->one();
+		$dialog = COverlayDialogElement::find()->one();
+		$form = $dialog->waitUntilReady()->query('id:acknowledge_form')->asForm()->one();
 		$form->fill(['id:suppress_problem' => true, 'id:suppress_time_option' => 'Indefinitely']);
 		$form->submit();
 		$dialog->ensureNotPresent();
@@ -897,8 +897,13 @@ class testFormUpdateProblem extends CWebTest {
 		$this->page->refresh();
 		$this->assertTrue($row->getColumn('Info')->query('xpath:.//button[not(contains(@class, "js-blink"))]')->exists());
 
+		// TODO: Remove sleep after fix ZBX-26128. Sometimes suppress and unsuppress events have the same acknowledege time and
+		// are displayed in the wrong order in history table in the acknowledege popup. Failure in checkHistoryTable()
+		sleep(1);
+
 		// Unsuppress problem.
 		$row->getColumn('Update')->query('tag:a')->waitUntilClickable()->one()->click();
+		$dialog->waitUntilReady();
 		$form->fill(['id:unsuppress_problem' => true]);
 		$form->submit();
 		$dialog->ensureNotPresent();

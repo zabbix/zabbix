@@ -1474,6 +1474,7 @@ class GraphLegendTabIndicatorItem extends TabIndicatorItem {
 
 	static SVG_GRAPH_LEGEND_LINES_MIN = 1;
 	static SVG_GRAPH_LEGEND_COLUMNS_MAX = 4;
+	static SVG_GRAPH_LEGEND_LINES_MODE_FIXED = 0;
 
 	constructor() {
 		super(TAB_INDICATOR_TYPE_MARK);
@@ -1495,6 +1496,13 @@ class GraphLegendTabIndicatorItem extends TabIndicatorItem {
 		const legend_aggregation = document.getElementById('legend_aggregation');
 
 		if (legend_aggregation !== null && legend_aggregation.checked && !legend_aggregation.disabled) {
+			return true;
+		}
+
+		const legend_lines_mode = document.querySelector('[name="legend_lines_mode"]:checked');
+
+		if (legend_lines_mode !== null
+				&& legend_lines_mode.value != GraphLegendTabIndicatorItem.SVG_GRAPH_LEGEND_LINES_MODE_FIXED) {
 			return true;
 		}
 
@@ -1773,6 +1781,7 @@ class PieLegendTabIndicatorItem extends TabIndicatorItem {
 
 	static PIE_CHART_LEGEND_LINES_MIN = 1;
 	static PIE_CHART_LEGEND_COLUMNS_MAX = 4;
+	static PIE_CHART_LEGEND_LINES_MODE_FIXED = 0;
 
 	constructor() {
 		super(TAB_INDICATOR_TYPE_MARK);
@@ -1797,6 +1806,13 @@ class PieLegendTabIndicatorItem extends TabIndicatorItem {
 			return true;
 		}
 
+		const legend_lines_mode = document.querySelector('[name="legend_lines_mode"]:checked');
+
+		if (legend_lines_mode !== null
+				&& legend_lines_mode.value != PieLegendTabIndicatorItem.PIE_CHART_LEGEND_LINES_MODE_FIXED) {
+			return true;
+		}
+
 		const legend_lines = document.getElementById('legend_lines');
 
 		if (legend_lines !== null && legend_lines.value != PieLegendTabIndicatorItem.PIE_CHART_LEGEND_LINES_MIN) {
@@ -1806,7 +1822,7 @@ class PieLegendTabIndicatorItem extends TabIndicatorItem {
 		const legend_columns = document.getElementById('legend_columns');
 
 		if (legend_columns !== null
-			&& legend_columns.value != PieLegendTabIndicatorItem.PIE_CHART_LEGEND_COLUMNS_MAX) {
+				&& legend_columns.value != PieLegendTabIndicatorItem.PIE_CHART_LEGEND_COLUMNS_MAX) {
 			return true;
 		}
 

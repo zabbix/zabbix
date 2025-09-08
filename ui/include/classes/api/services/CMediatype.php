@@ -192,8 +192,7 @@ class CMediatype extends CApiService {
 			$add_content_type = $options['output'] === API_OUTPUT_EXTEND
 				|| (is_array($options['output']) && in_array('content_type', $options['output']));
 
-			$remove_message_format = $options['output'] !== API_OUTPUT_EXTEND || !is_array($options['output'])
-				|| !in_array('message_format', $options['output']);
+			$remove_message_format = is_array($options['output']) && !in_array('message_format', $options['output']);
 		}
 
 		while ($mediatype = DBfetch($res)) {
@@ -208,6 +207,7 @@ class CMediatype extends CApiService {
 			else {
 				if ($add_content_type) {
 					$mediatype['content_type'] = $mediatype['message_format'];
+
 					if ($remove_message_format) {
 						unset($mediatype['message_format']);
 					}
@@ -447,7 +447,7 @@ class CMediatype extends CApiService {
 	 *
 	 * @throws APIException if a media type name is not unique.
 	 */
-	private static function checkDuplicates(array $mediatypes, array $db_mediatypes = null): void {
+	private static function checkDuplicates(array $mediatypes, ?array $db_mediatypes = null): void {
 		$names = [];
 
 		foreach ($mediatypes as $mediatype) {
@@ -483,7 +483,7 @@ class CMediatype extends CApiService {
 	 *
 	 * @throws APIException
 	 */
-	private static function validateByType(array &$mediatypes, array $db_mediatypes = null): void {
+	private static function validateByType(array &$mediatypes, ?array $db_mediatypes = null): void {
 		$method = ($db_mediatypes === null) ? 'create' : 'update';
 
 		$db_defaults = DB::getDefaults('media_type');
@@ -728,7 +728,7 @@ class CMediatype extends CApiService {
 	 * @param string     $method
 	 * @param array|null $db_mediatypes
 	 */
-	private static function updateParameters(array &$mediatypes, string $method, array $db_mediatypes = null): void {
+	private static function updateParameters(array &$mediatypes, string $method, ?array $db_mediatypes = null): void {
 		$ins_params = [];
 		$upd_params = [];
 		$del_paramids = [];
@@ -807,7 +807,8 @@ class CMediatype extends CApiService {
 	 * @param string     $method
 	 * @param array|null $db_mediatypes
 	 */
-	private static function updateMessageTemplates(array &$mediatypes, string $method, array $db_mediatypes = null): void {
+	private static function updateMessageTemplates(array &$mediatypes, string $method,
+			?array $db_mediatypes = null): void {
 		$ins_messages = [];
 		$upd_messages = [];
 		$del_messageids = [];

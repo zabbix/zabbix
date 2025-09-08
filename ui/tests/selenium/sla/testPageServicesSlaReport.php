@@ -14,7 +14,7 @@
 **/
 
 
-require_once dirname(__FILE__).'/../common/testSlaReport.php';
+require_once __DIR__.'/../common/testSlaReport.php';
 
 /**
  * @backup profiles
@@ -37,14 +37,20 @@ class testPageServicesSlaReport extends testSlaReport {
 		}
 
 		// Check displaying and hiding the filter.
-		$filter_form = $this->query('name:zbx_filter')->asForm()->one();
-		$filter_tab = $this->query('xpath://a[contains(text(), "Filter")]')->one();
-		$filter = $filter_form->query('id:tab_0')->one();
-		$this->assertTrue($filter->isDisplayed());
-		$filter_tab->click();
-		$this->assertFalse($filter->isDisplayed());
-		$filter_tab->click();
-		$this->assertTrue($filter->isDisplayed());
+		$filter = CFilterElement::find()->one();
+		$filter_form = $filter->getForm();
+		$this->assertEquals('Filter', $filter->getSelectedTabName());
+		// Check that filter is expanded by default.
+		$this->assertTrue($filter->isExpanded());
+		// Check that filter is collapsing/expanding on click.
+		foreach ([false, true] as $status) {
+			$filter->expand($status);
+			$this->assertTrue($filter->isExpanded($status));
+
+			// Refresh the page to make sure the filter state is still saved.
+			$this->page->refresh()->waitUntilReady();
+			$this->assertTrue($filter->isExpanded($status));
+		}
 
 		// Check the list of available SLAs (disabled SLAs should not be present).
 		$sla_data = [
@@ -1399,8 +1405,11 @@ class testPageServicesSlaReport extends testSlaReport {
 		// Usage of Select mode is required as in Type mode a service that contains the name of required service is chosen.
 		CMultiselectElement::setDefaultFillMode(CMultiselectElement::MODE_SELECT);
 		$filter_form->query('button:Reset')->one()->click();
+		$table = $this->getTable();
 		$filter_form->fill($filter_data);
 		$filter_form->submit();
+		$table->waitUntilReloaded();
+
 		CMultiselectElement::setDefaultFillMode(CMultiselectElement::MODE_TYPE);
 	}
 
@@ -1441,13 +1450,12 @@ class testPageServicesSlaReport extends testSlaReport {
 
 			return;
 		}
-		$table = $this->query('class:list-table')->asTable()->one();
 
 		if (array_key_exists('Service', $data['fields'])) {
 			$this->assertTableDataColumn($data['expected_periods'], self::$period_headers[$data['reporting_period']]);
 		}
 		else {
-			$headers = $table->getHeadersText();
+			$headers = $this->getTable()->getHeadersText();
 
 			unset($headers[0], $headers[1]);
 			$this->assertEquals($data['expected_periods'], array_values($headers));

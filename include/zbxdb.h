@@ -21,6 +21,7 @@
 #define ZBX_DB_OK	0
 #define ZBX_DB_FAIL	-1
 #define ZBX_DB_DOWN	-2
+#define ZBX_DB_RONLY	-3
 
 #define ZBX_DB_TLS_CONNECT_REQUIRED_TXT		"required"
 #define ZBX_DB_TLS_CONNECT_VERIFY_CA_TXT	"verify_ca"
@@ -105,6 +106,9 @@ zbx_err_codes_t	zbx_db_last_errcode(void);
 
 #ifdef HAVE_POSTGRESQL
 int	zbx_tsdb_get_version(void);
+void	zbx_db_clear_last_errcode(void);
+	/* check that TimescaleDB version is greater than or equal to 2.18 */
+#	define ZBX_DB_TSDB_GE_V2_18	(21800 <= zbx_tsdb_get_version())
 #endif
 
 #ifdef HAVE_ORACLE
@@ -249,6 +253,13 @@ struct zbx_db_version_info_t
 #endif
 };
 
+typedef enum
+{
+	ZBX_DB_MASK_QUERIES,
+	ZBX_DB_DONT_MASK_QUERIES
+}
+zbx_db_query_mask_t;
+
 void	zbx_dbms_version_info_extract(struct zbx_db_version_info_t *version_info);
 #ifdef HAVE_POSTGRESQL
 void	zbx_tsdb_info_extract(struct zbx_db_version_info_t *version_info);
@@ -276,5 +287,8 @@ void	zbx_db_version_json_create(struct zbx_json *json, struct zbx_db_version_inf
 #endif
 
 #define ZBX_DB_LARGE_QUERY_BATCH_SIZE	1000
+
+zbx_db_query_mask_t	zbx_db_set_log_masked_values(zbx_db_query_mask_t flag);
+zbx_db_query_mask_t	zbx_db_get_log_masked_values(void);
 
 #endif

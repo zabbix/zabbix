@@ -13,9 +13,9 @@
 ** If not, see <https://www.gnu.org/licenses/>.
 **/
 
-require_once dirname(__FILE__) . '/../include/CWebTest.php';
-require_once dirname(__FILE__).'/behaviors/CMessageBehavior.php';
-require_once dirname(__FILE__).'/behaviors/CTableBehavior.php';
+require_once __DIR__ . '/../include/CWebTest.php';
+require_once __DIR__.'/behaviors/CMessageBehavior.php';
+require_once __DIR__.'/behaviors/CTableBehavior.php';
 
 /**
  * @backup sessions
@@ -65,54 +65,53 @@ class testFormSetup extends CWebTest {
 		$this->assertScreenshotExcept($form, $this->query('id:default-lang')->one(), 'Welcome_Rus');
 	}
 
-// Commented until Jenkins issue investigated.
-//	public function testFormSetup_prerequisitesSectionLayout() {
-//		$this->page->login()->open('setup.php')->waitUntilReady();
-//		$this->query('button:Next step')->one()->click();
-//
-//		// Check Pre-requisites section.
-//		$this->checkPageTextElements('Check of pre-requisites');
-//		$headers = $this->query('class:list-table')->asTable()->one()->getHeadersText();
-//		$this->assertEquals(['', 'Current value', 'Required', ''], $headers);
-//
-//		$prerequisites = [
-//			'PHP version',
-//			'PHP option "memory_limit"',
-//			'PHP option "post_max_size"',
-//			'PHP option "upload_max_filesize"',
-//			'PHP option "max_execution_time"',
-//			'PHP option "max_input_time"',
-//			'PHP databases support',
-//			'PHP bcmath',
-//			'PHP mbstring',
-//			'PHP option "mbstring.func_overload"',
-//			'PHP sockets',
-//			'PHP gd',
-//			'PHP gd PNG support',
-//			'PHP gd JPEG support',
-//			'PHP gd GIF support',
-//			'PHP gd FreeType support',
-//			'PHP libxml',
-//			'PHP xmlwriter',
-//			'PHP xmlreader',
-//			'PHP LDAP',
-//			'PHP OpenSSL',
-//			'PHP ctype',
-//			'PHP session',
-//			'PHP option "session.auto_start"',
-//			'PHP gettext',
-//			'PHP option "arg_separator.output"',
-//			'PHP curl',
-//			'System locale'
-//		];
-//		$this->assertTableDataColumn($prerequisites, '');
-//		$this->checkSections('Check of pre-requesties');
-//		$this->checkButtons();
-//
-//		global $DB;
-//		$php_version = $this->query('xpath://td[text()="PHP version"]/following-sibling::td')->one();
-//		$this->assertScreenshotExcept($this->query('xpath://form')->one(), $php_version, 'Prerequisites_'.$DB['TYPE']);
-//	}
+	public function testFormSetup_prerequisitesSectionLayout() {
+		$this->page->login()->open('setup.php')->waitUntilReady();
+		$this->query('button:Next step')->one()->click();
+
+		// Check Pre-requisites section.
+		$this->checkPageTextElements('Check of pre-requisites');
+		$headers = $this->query('class:list-table')->asTable()->one()->getHeadersText();
+		$this->assertEquals(['', 'Current value', 'Required', ''], $headers);
+
+		$prerequisites = [
+			'PHP version',
+			'PHP option "memory_limit"',
+			'PHP option "post_max_size"',
+			'PHP option "upload_max_filesize"',
+			'PHP option "max_execution_time"',
+			'PHP option "max_input_time"',
+			'PHP databases support',
+			'PHP bcmath',
+			'PHP mbstring',
+			'PHP option "mbstring.func_overload"',
+			'PHP sockets',
+			'PHP gd',
+			'PHP gd PNG support',
+			'PHP gd JPEG support',
+			'PHP gd GIF support',
+			'PHP gd FreeType support',
+			'PHP libxml',
+			'PHP xmlwriter',
+			'PHP xmlreader',
+			'PHP LDAP',
+			'PHP OpenSSL',
+			'PHP ctype',
+			'PHP session',
+			'PHP option "session.auto_start"',
+			'PHP gettext',
+			'PHP option "arg_separator.output"',
+			'PHP curl',
+			'System locale'
+		];
+		$this->assertTableDataColumn($prerequisites, '');
+		$this->checkSections('Check of pre-requesties');
+		$this->checkButtons();
+
+		global $DB;
+		$php_version = $this->query('xpath://td[text()="PHP version"]/following-sibling::td')->one();
+		$this->assertScreenshotExcept($this->query('xpath://form')->one(), $php_version, 'Prerequisites_'.$DB['TYPE']);
+	}
 
 	public function testFormSetup_dbConnectionSectionLayout() {
 		$this->openSpecifiedSection('Configure DB connection');
@@ -277,8 +276,9 @@ class testFormSetup extends CWebTest {
 		$timezones_field = $form->getField('Default time zone');
 		$timezones = $timezones_field->getOptions()->asText();
 
-		// Note that count of available timezones may differ based on the local environment configuration.
-		$this->assertEquals(420, count($timezones));
+		// Note that count of available timezones may differ based on the local environment configuration and php version.
+		$this->assertGreaterThan(415, count($timezones));
+		$this->assertContains(CDateTimeHelper::getTimeZoneFormat('Europe/Riga'), $timezones);
 
 		foreach (['System', 'Europe/Riga'] as $timezone_value) {
 			$timezone = CDateTimeHelper::getTimeZoneFormat($timezone_value);
@@ -316,7 +316,7 @@ class testFormSetup extends CWebTest {
 		$this->query('button:Back')->one()->click();
 		// Fill in the Zabbix server name field and proceed with checking Pre-installation summary.
 		$this->query('id:setup-form')->asForm()->one()->getField('Zabbix server name')->fill('Zabbix server name');
-		$this->query('button:Next step')->one()->click();
+		$this->query('button:Next step')->one()->click()->waitUntilStalled();
 		$db_parameters = $this->getDbParameters();
 		$text = 'Please check configuration parameters. If all is correct, press "Next step" button, or "Back" button '.
 				'to change configuration parameters.';
@@ -355,10 +355,14 @@ class testFormSetup extends CWebTest {
 
 		// Check screenshot of the Pre-installation summary section.
 		$skip_fields = [];
-		foreach(['Database server', 'Database port', 'Database name'] as $skip_field) {
+		foreach(['Database server', 'Database port'] as $skip_field) {
 			$xpath = 'xpath://span[text()='.CXPathHelper::escapeQuotes($skip_field).']/../../div[@class="table-forms-td-right"]';
 			$skip_fields[] = $this->query($xpath)->one();
 		}
+		// Remove database name due to unstable screenshot, one pixel visible.
+		CElementQuery::getDriver()->executeScript("arguments[0].textContent = '';",
+				[$this->query('xpath://span[text()="Database name"]/../../div[@class="table-forms-td-right"]')->one()]
+		);
 		$this->assertScreenshotExcept($this->query('xpath://form')->one(), $skip_fields, 'PreInstall_'.$db_parameters['Database type']);
 	}
 
@@ -657,7 +661,7 @@ class testFormSetup extends CWebTest {
 		}
 
 		// Check the outcome for the specified database configuration.
-		$this->query('button:Next step')->one()->click();
+		$this->query('button:Next step')->one()->click()->waitUntilStalled();
 		if (CTestArrayHelper::get($data, 'expected', TEST_GOOD) === TEST_BAD) {
 			// Define the reference error message details and assert error message.
 			if (array_key_exists('error_details', $data)) {
@@ -845,19 +849,19 @@ class testFormSetup extends CWebTest {
 		$this->openSpecifiedSection('Pre-installation summary');
 
 		// Proceed back to the 1st section of the setup form.
-		$this->query('button:Back')->one()->click();
+		$this->query('button:Back')->one()->click()->waitUntilStalled();
 		$this->assertEquals('Settings', $this->query('xpath://h1')->one()->getText());
-		$this->query('button:Back')->one()->click();
+		$this->query('button:Back')->one()->click()->waitUntilStalled();
 		$this->assertEquals('Configure DB connection', $this->query('xpath://h1')->one()->getText());
-		$this->query('button:Back')->one()->click();
+		$this->query('button:Back')->one()->click()->waitUntilStalled();
 		$this->assertEquals('Check of pre-requisites', $this->query('xpath://h1')->one()->getText());
-		$this->query('button:Back')->one()->click();
+		$this->query('button:Back')->one()->click()->waitUntilStalled();
 		$this->assertEquals("Welcome to\nZabbix ".ZABBIX_EXPORT_VERSION, $this->query('xpath://div[@class="setup-title"]')->one()->getText());
 		$this->checkSections('Welcome');
 		$this->checkButtons('first section');
 
 		// Cancel setup form update.
-		$this->query('button:Cancel')->one()->click();
+		$this->query('button:Cancel')->one()->click()->waitUntilStalled();
 		$this->assertStringContainsString('zabbix.php?action=dashboard.view', $this->page->getCurrentURL());
 	}
 
@@ -954,7 +958,7 @@ class testFormSetup extends CWebTest {
 	private function openSpecifiedSection($section) {
 		$this->page->login()->open('setup.php')->waitUntilReady();
 		$this->query('button:Next step')->one()->click();
-		$this->query('button:Next step')->one()->click();
+		$this->query('button:Next step')->one()->click()->waitUntilStalled();
 		// No actions required in case of Configure DB connection section.
 		if ($section === 'Configure DB connection') {
 			return;

@@ -643,6 +643,7 @@ int	zbx_rtc_wait_for_sync_finish(zbx_rtc_t *rtc, zbx_rtc_process_request_ex_func
 				case ZBX_RTC_LOG_LEVEL_DECREASE:
 				case ZBX_RTC_LOG_LEVEL_INCREASE:
 				case ZBX_RTC_SUBSCRIBE:
+				case ZBX_RTC_SUBSCRIBE_SERVICE:
 					zbx_rtc_dispatch(rtc, client, message, cb_proc_req);
 					break;
 				default:

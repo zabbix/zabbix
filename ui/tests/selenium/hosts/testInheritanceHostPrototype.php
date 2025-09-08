@@ -14,8 +14,8 @@
 **/
 
 
-require_once dirname(__FILE__).'/../../include/CLegacyWebTest.php';
-require_once dirname(__FILE__).'/../behaviors/CMacrosBehavior.php';
+require_once __DIR__.'/../../include/CLegacyWebTest.php';
+require_once __DIR__.'/../behaviors/CMacrosBehavior.php';
 
 /**
  * Test the creation of inheritance of new objects on a previously linked template.
@@ -432,7 +432,7 @@ class testInheritanceHostPrototype extends CLegacyWebTest {
 	 */
 	public function testInheritanceHostPrototype_Clone($data) {
 		$this->selectHostPrototypeForUpdate('host', $data);
-		$this->zbxTestClickWait('clone');
+		$this->query('button:Clone')->waitUntilVisible()->one()->click()->waitUntilNotVisible();
 
 		if (array_key_exists('cloned_name', $data)) {
 			$this->zbxTestInputTypeOverwrite('host', $data['cloned_name']);

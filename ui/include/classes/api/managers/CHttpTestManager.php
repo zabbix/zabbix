@@ -727,7 +727,7 @@ class CHttpTestManager {
 	 * @param array      $httptests
 	 * @param array|null $db_httptests
 	 */
-	private static function updateFields(array &$httptests, array $db_httptests = null): void {
+	private static function updateFields(array &$httptests, ?array $db_httptests = null): void {
 		$ins_fields = [];
 		$upd_fields = [];
 		$del_fieldids = [];
@@ -815,7 +815,7 @@ class CHttpTestManager {
 	 * @param array      $httptests
 	 * @param array|null $db_httptests
 	 */
-	private static function updateSteps(array &$httptests, array $db_httptests = null): void {
+	private static function updateSteps(array &$httptests, ?array $db_httptests = null): void {
 		$ins_steps = [];
 		$upd_steps = [];
 		$update_step_items = false;
@@ -1268,7 +1268,7 @@ class CHttpTestManager {
 	 * @param array      $httptests
 	 * @param array|null $db_httptests
 	 */
-	private static function updateTags(array &$httptests, array $db_httptests = null): void {
+	private static function updateTags(array &$httptests, ?array $db_httptests = null): void {
 		$ins_tags = [];
 		$del_tagids = [];
 

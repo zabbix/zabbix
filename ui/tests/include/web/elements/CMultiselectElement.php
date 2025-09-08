@@ -15,7 +15,7 @@
 
 require_once 'vendor/autoload.php';
 
-require_once dirname(__FILE__).'/../CElement.php';
+require_once __DIR__.'/../CElement.php';
 
 use Facebook\WebDriver\Remote\RemoteWebElement;
 use Facebook\WebDriver\Exception\StaleElementReferenceException;
@@ -117,7 +117,7 @@ class CMultiselectElement extends CElement {
 			return $this->clear();
 		}
 
-		$this->edit($context)->query('link:'.$label)->waitUntilVisible(3)->one()->click()->waitUntilNotPresent();
+		$this->edit($context)->query('link:'.$label)->waitUntilVisible(10)->one()->click()->waitUntilNotPresent();
 
 		return $this;
 	}

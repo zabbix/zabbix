@@ -40,9 +40,8 @@ class CControllerGuiUpdate extends CController {
 		if (!$ret) {
 			switch ($this->GetValidationError()) {
 				case self::VALIDATION_ERROR:
-					$response = new CControllerResponseRedirect((new CUrl('zabbix.php'))
-						->setArgument('action', 'gui.edit')
-						->getUrl()
+					$response = new CControllerResponseRedirect(
+						(new CUrl('zabbix.php'))->setArgument('action', 'gui.edit')
 					);
 					$response->setFormData($this->getInputAll());
 					CMessageHelper::setErrorTitle(_('Cannot update configuration'));
@@ -83,9 +82,8 @@ class CControllerGuiUpdate extends CController {
 
 		$result = API::Settings()->update($settings);
 
-		$response = new CControllerResponseRedirect((new CUrl('zabbix.php'))
-			->setArgument('action', 'gui.edit')
-			->getUrl()
+		$response = new CControllerResponseRedirect(
+			(new CUrl('zabbix.php'))->setArgument('action', 'gui.edit')
 		);
 
 		if ($result) {

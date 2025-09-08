@@ -14,7 +14,7 @@
 **/
 
 
-require_once dirname(__FILE__).'/../../include/CWebTest.php';
+require_once __DIR__.'/../../include/CWebTest.php';
 
 /**
  * @backup media_type
@@ -58,6 +58,20 @@ class testPageAdministrationMediaTypes extends CWebTest {
 						'operationtype' => OPERATION_TYPE_MESSAGE,
 						'opmessage' => ['mediatypeid' => self::EMAIL_MEDIATYPEID],
 						'opmessage_grp' => [['usrgrpid' => self::ZABBIX_ADMIN_GROUPID]]
+					]
+				]
+			]
+		]);
+
+		CDataHelper::call('mediatype.create', [
+			[
+				'type' => MEDIA_TYPE_EXEC,
+				'name' => 'Test script',
+				'exec_path' => 'selenium_test_script.sh',
+				'parameters' => [
+					[
+						'sortorder' => '0',
+						'value' => '{ALERT.SUBJECT}'
 					]
 				]
 			]
@@ -143,12 +157,12 @@ class testPageAdministrationMediaTypes extends CWebTest {
 
 			// Sort column contents ascending.
 			usort($values_asc, function($a, $b) {
-				return strcasecmp($a, $b);
+				return strnatcasecmp($a, $b);
 			});
 
 			// Sort column contents descending.
 			usort($values_desc, function($a, $b) {
-				return strcasecmp($b, $a);
+				return strnatcasecmp($b, $a);
 			});
 
 			// Check ascending and descending sorting in column.
@@ -176,7 +190,7 @@ class testPageAdministrationMediaTypes extends CWebTest {
 					'filter' => [
 						'Name' => 'Jira '
 					],
-					'result' => ['Jira ServiceDesk']
+					'result' => ['Jira Service Management']
 				]
 			],
 			[
@@ -191,7 +205,7 @@ class testPageAdministrationMediaTypes extends CWebTest {
 					'filter' => [
 						'Name' => 'a S'
 					],
-					'result' => ['Jira ServiceDesk']
+					'result' => ['Jira Service Management']
 				]
 			],
 			// Filter by status.
@@ -270,6 +284,7 @@ class testPageAdministrationMediaTypes extends CWebTest {
 	public function testPageAdministrationMediaTypes_Filter($data) {
 		$this->page->login()->open('zabbix.php?action=mediatype.list');
 		$this->query('button:Reset')->waitUntilClickable()->one()->click();
+		$table = $this->query('class:list-table')->asTable()->one();
 
 		$form = $this->query('name:zbx_filter')->asForm()->one();
 		$form->fill($data['filter']);
@@ -296,6 +311,7 @@ class testPageAdministrationMediaTypes extends CWebTest {
 			$this->assertEquals(CDBHelper::getColumn($sql, 'name'), explode(', ', $actions));
 		}
 		else {
+			$table->waitUntilReloaded();
 			$this->assertTableDataColumn(CTestArrayHelper::get($data, 'result', []));
 		}
 	}
@@ -765,10 +781,10 @@ class testPageAdministrationMediaTypes extends CWebTest {
 			// #1 Used in action operation directly.
 			[
 				[
-					'name' => 'Github',
+					'name' => 'GitHub',
 					'actions' => [
 						[
-							'name' => 'Github action operation',
+							'name' => 'GitHub action operation',
 							'operation' => 'operations'
 						]
 					]
@@ -817,14 +833,14 @@ class testPageAdministrationMediaTypes extends CWebTest {
 			// #5 Used in two actions update operations directly.
 			[
 				[
-					'name' => 'OTRS',
+					'name' => 'OTRS CE',
 					'actions' => [
 						[
-							'name' => 'OTRS acton update operation 1',
+							'name' => 'OTRS CE acton update operation 1',
 							'operation' => 'update_operations'
 						],
 						[
-							'name' => 'OTRS acton update operation 2',
+							'name' => 'OTRS CE acton update operation 2',
 							'operation' => 'update_operations'
 						]
 					]

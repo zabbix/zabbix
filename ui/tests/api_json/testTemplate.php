@@ -264,7 +264,7 @@ class testTemplate extends CAPITest {
 	/**
 	 * @dataProvider dataProviderCreate
 	 */
-	public function testTemplate_Create(array $request, string $expected_error = null, array $user = null) {
+	public function testTemplate_Create(array $request, ?string $expected_error = null, ?array $user = null) {
 		if ($user !== null) {
 			$this->authorize($user['user'], $user['password']);
 		}
@@ -573,7 +573,7 @@ class testTemplate extends CAPITest {
 	/**
 	 * @dataProvider dataProviderUpdate
 	 */
-	public function testTemplate_Update(array $request, string $expected_error = null, array $user = null) {
+	public function testTemplate_Update(array $request, ?string $expected_error = null, ?array $user = null) {
 		if ($user !== null) {
 			$this->authorize($user['user'], $user['password']);
 		}

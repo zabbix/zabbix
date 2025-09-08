@@ -19,14 +19,21 @@ import (
 	"errors"
 	"fmt"
 	"io"
+	"net"
+	"net/url"
 	"os"
+	"regexp"
+	"slices"
 	"strings"
 	"unicode"
 	"unicode/utf8"
 
 	"golang.zabbix.com/agent2/pkg/tls"
+	"golang.zabbix.com/sdk/conf"
+	"golang.zabbix.com/sdk/errs"
 	"golang.zabbix.com/sdk/log"
 	"golang.zabbix.com/sdk/plugin"
+	"golang.zabbix.com/sdk/zbxnet"
 )
 
 var Options AgentOptions
@@ -40,6 +47,9 @@ const (
 )
 
 var (
+	hostnameRegex *regexp.Regexp = regexp.MustCompile(
+		`^([a-zA-Z0-9_]{1}[a-zA-Z0-9_-]{0,62}){1}(\.[a-zA-Z0-9_]{1}[a-zA-Z0-9_-]{0,62})*[\._]?$`)
+
 	errInvalidTLSConnect = errors.New("invalid TLSConnect configuration parameter")
 	errInvalidTLSAccept  = errors.New("invalid TLSAccept configuration parameter")
 	errCipherCertAndAll  = errors.New(`TLSCipherCert configuration parameter cannot be used when the combined list` +
@@ -78,8 +88,36 @@ var (
 	errInvalidTLSPSKFile = errors.New("invalid TLSPSKFile configuration parameter")
 )
 
-func invalidTLSPSKFileError(e error) error {
-	return fmt.Errorf("%w: %w", errInvalidTLSPSKFile, e)
+// PluginSystemOptions collection of system options for all plugins, map key are plugin names.
+type PluginSystemOptions map[string]SystemOptions
+
+// SystemOptions holds reserved plugin options.
+type SystemOptions struct {
+	Path                     *string `conf:"optional"`
+	ForceActiveChecksOnStart *int    `conf:"optional,range=0:1"`
+	Capacity                 int     `conf:"optional,range=1:1000"`
+}
+
+type pluginOptions struct {
+	System SystemOptions `conf:"optional"`
+}
+
+// RemovePluginSystemOptions removes system configuration from plugin options and returns them as separate
+// PluginSystemOptions that is a map where map key is the option name and map value is the corresponding value.
+func (a *AgentOptions) RemovePluginSystemOptions() (PluginSystemOptions, error) {
+	out := make(PluginSystemOptions)
+
+	for name, p := range a.Plugins {
+		var o pluginOptions
+		if err := conf.Unmarshal(p, &o); err != nil {
+			return nil, errs.Wrapf(err, "failed to unmarshal options for plugin %s ", name)
+		}
+
+		a.Plugins[name] = removeSystem(p)
+		out[name] = o.System
+	}
+
+	return out, nil
 }
 
 // CutAfterN returns the whole string s, if it is not longer then n runes (not bytes). Otherwise it returns the
@@ -326,6 +364,118 @@ func GlobalOptions(all *AgentOptions) (options *plugin.GlobalOptions) {
 	return
 }
 
+func isValidHostname(hostname string) bool {
+	isValid := hostnameRegex.MatchString(hostname)
+
+	return isValid
+}
+
+func validateHost(host string) error {
+	host = strings.TrimSpace(host)
+
+	if net.ParseIP(host) != nil || isValidHostname(host) {
+		return nil
+	}
+
+	return errs.Errorf("failed to validate host: %q", host)
+}
+
+func elementsUnique(array [][]string) (bool, string) {
+	seen := make(map[string]struct{})
+
+	for _, row := range array {
+		for _, element := range row {
+			_, exists := seen[element]
+			if exists {
+				return false, element
+			}
+
+			seen[element] = struct{}{}
+		}
+	}
+
+	return true, ""
+}
+
+func normalizeAddress(address string) (string, error) {
+	address = strings.TrimSpace(address)
+	u := url.URL{Host: address}
+	ip := net.ParseIP(address)
+
+	if ip == nil && strings.TrimSpace(u.Hostname()) == "" {
+		return "", errs.Errorf("failed to parse address %q: empty value", address)
+	}
+
+	var checkAddr string
+
+	switch {
+	case ip != nil:
+		checkAddr = net.JoinHostPort(address, "10051")
+	case u.Port() == "":
+		checkAddr = net.JoinHostPort(u.Hostname(), "10051")
+	default:
+		checkAddr = address
+	}
+
+	h, p, err := net.SplitHostPort(checkAddr)
+	if err != nil {
+		return "", errs.Wrapf(err, "failed to parse address %q", address)
+	}
+
+	err = validateHost(h)
+	if err != nil {
+		return "", err
+	}
+
+	return net.JoinHostPort(strings.TrimSpace(h), strings.TrimSpace(p)), nil
+}
+
+func clusterToAddresses(cluster string) ([]string, error) {
+	rawAddresses := strings.Split(cluster, ";")
+
+	parsedAddresses := make([]string, len(rawAddresses)) //nolint:makezero
+
+	for i, rawAddress := range rawAddresses {
+		address, err := normalizeAddress(rawAddress)
+
+		if err != nil {
+			return nil, err
+		}
+
+		parsedAddresses[i] = address
+	}
+
+	return parsedAddresses, nil
+}
+
+// ParseServerActive validates address list of zabbix Server or Proxy for ActiveCheck.
+func ParseServerActive(optionServerActive string) ([][]string, error) {
+	if strings.TrimSpace(optionServerActive) == "" {
+		return [][]string{}, nil
+	}
+
+	clusters := strings.Split(optionServerActive, ",")
+
+	resultAddresses := make([][]string, len(clusters)) //nolint:makezero
+
+	for i, cluster := range clusters {
+		clusterAddresses, err := clusterToAddresses(cluster)
+		if err != nil {
+			return nil, err
+		}
+
+		resultAddresses[i] = clusterAddresses
+	}
+
+	elementsUniqueRes, duplicateElement := elementsUnique(resultAddresses)
+
+	if !elementsUniqueRes {
+		return nil, errs.Errorf("address %q specified more than once", duplicateElement)
+	}
+
+	return resultAddresses, nil
+}
+
 func ValidateOptions(options *AgentOptions) error {
 	var err error
 	var maxLen int
@@ -351,7 +501,21 @@ func ValidateOptions(options *AgentOptions) error {
 			" characters", HostInterfaceLen)
 	}
 
+	_, err = zbxnet.GetAllowedPeers(options.Server)
+	if err != nil {
+		return errs.Wrap(err, `failed to validate "Server" configuration parameter`)
+	}
+
+	_, err = ParseServerActive(options.ServerActive)
+	if err != nil {
+		return errs.Wrap(err, `failed to validate "ServerActive" configuration parameter`)
+	}
+
 	return nil
+}
+
+func invalidTLSPSKFileError(e error) error {
+	return fmt.Errorf("%w: %w", errInvalidTLSPSKFile, e)
 }
 
 func requireNoCipherCert(options *AgentOptions) error {
@@ -376,4 +540,26 @@ func requireNoCipherAll(options *AgentOptions) error {
 	}
 
 	return nil
+}
+
+func removeSystem(privateOptions any) any {
+	root, ok := privateOptions.(*conf.Node)
+	if !ok {
+		return privateOptions
+	}
+
+	for i, v := range root.Nodes {
+		node, ok := v.(*conf.Node)
+		if !ok {
+			continue
+		}
+
+		if node.Name == "System" {
+			root.Nodes = slices.Delete(root.Nodes, i, i+1)
+
+			return root
+		}
+	}
+
+	return privateOptions
 }

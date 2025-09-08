@@ -13,7 +13,7 @@
 ** If not, see <https://www.gnu.org/licenses/>.
 **/
 
-require_once dirname(__FILE__).'/../include/CWebTest.php';
+require_once __DIR__.'/../include/CWebTest.php';
 
 /**
  * @onBefore prepareItemsData, prepareMapsData, writeValuesToItems
@@ -252,11 +252,10 @@ class testExpandExpressionMacros extends CWebTest {
 							['hostid' => self::$data['hostids']['min']]
 						],
 						'elementtype' => 0,
-						'iconid_off' => 151,
+						'iconid_off' => 141,
 						'label' => '{?min(/{HOST.HOST}/trapper,1d)}',
 						'x' => 89,
-						'y' => 377,
-						'iconid_off' => 141
+						'y' => 377
 					]
 				],
 				'links' => [

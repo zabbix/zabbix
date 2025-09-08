@@ -22,7 +22,7 @@ class CWidgetFieldNavTree extends CWidgetField {
 
 	public const DEFAULT_VALUE = [];
 
-	public function __construct(string $name, string $label = null) {
+	public function __construct(string $name, ?string $label = null) {
 		parent::__construct($name, $label);
 
 		$this

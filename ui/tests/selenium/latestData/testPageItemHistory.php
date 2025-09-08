@@ -14,7 +14,7 @@
 **/
 
 
-require_once dirname(__FILE__).'/../../include/CLegacyWebTest.php';
+require_once __DIR__.'/../../include/CLegacyWebTest.php';
 
 class testPageItemHistory extends CLegacyWebTest {
 
@@ -54,7 +54,8 @@ class testPageItemHistory extends CLegacyWebTest {
 		$this->zbxTestCheckTitle('History [refreshed every 30 sec.]');
 		$this->zbxTestCheckHeader('testPageItemHistory_CheckLayout: '.$item['name']);
 
-		$this->zbxTestClickWait('plaintext');
+		$this->query('button:As plain text')->one()->click()->waitUntilNotVisible();
+		$this->page->waitUntilReady();
 		$this->zbxTestTextPresent('testPageItemHistory_CheckLayout: '.$item['name']);
 
 		$this->zbxTestOpen('history.php?action=showvalues&itemids[]='.$item['itemid']);
@@ -62,7 +63,8 @@ class testPageItemHistory extends CLegacyWebTest {
 		$view_as->select('Values');
 		$this->zbxTestCheckHeader('testPageItemHistory_CheckLayout: '.$item['name']);
 
-		$this->zbxTestClickWait('plaintext');
+		$this->query('button:As plain text')->one()->click()->waitUntilNotVisible();
+		$this->page->waitUntilReady();
 		$this->zbxTestTextPresent('testPageItemHistory_CheckLayout: '.$item['name']);
 	}
 }

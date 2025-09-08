@@ -25,7 +25,7 @@ class CFormActions extends CTag {
 	 * @param CButtonInterface|null $main_button
 	 * @param CButtonInterface[]    $other_buttons
 	 */
-	public function __construct(CButtonInterface $main_button = null, array $other_buttons = []) {
+	public function __construct(?CButtonInterface $main_button = null, array $other_buttons = []) {
 		parent::__construct('div', true);
 
 		foreach ($other_buttons as $other_button) {

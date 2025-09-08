@@ -286,7 +286,7 @@ class testUserParametersReload extends CIntegrationTest {
 	 * @param int    $state
 	 * @param string $lastvalue
 	 */
-	public function checkItemState(string $name, int $state, string $lastvalue = null) {
+	public function checkItemState(string $name, int $state, ?string $lastvalue = null) {
 		$wait_iterations = 20;
 		$wait_iteration_delay = 1;
 

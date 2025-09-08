@@ -500,7 +500,7 @@ class CSla extends CApiService {
 	 *
 	 * @throws APIException
 	 */
-	private static function checkDuplicates(array $slas, array $db_slas = null): void {
+	private static function checkDuplicates(array $slas, ?array $db_slas = null): void {
 		$names = [];
 
 		foreach ($slas as $sla) {
@@ -529,7 +529,7 @@ class CSla extends CApiService {
 	 *
 	 * @throws APIException
 	 */
-	private static function checkSlo(array $slas, array $db_slas = null): void {
+	private static function checkSlo(array $slas, ?array $db_slas = null): void {
 		foreach ($slas as $sla) {
 			$name = $db_slas !== null ? $db_slas[$sla['slaid']]['name'] : $sla['name'];
 
@@ -547,7 +547,7 @@ class CSla extends CApiService {
 	 *
 	 * @throws APIException
 	 */
-	private static function checkSchedule(array &$slas, array $db_slas = null): void {
+	private static function checkSchedule(array &$slas, ?array $db_slas = null): void {
 		foreach ($slas as &$sla) {
 			if (!array_key_exists('schedule', $sla)) {
 				continue;
@@ -574,7 +574,7 @@ class CSla extends CApiService {
 	 *
 	 * @throws APIException
 	 */
-	private static function checkExcludedDowntimes(array $slas, array $db_slas = null): void {
+	private static function checkExcludedDowntimes(array $slas, ?array $db_slas = null): void {
 		foreach ($slas as $sla) {
 			if (!array_key_exists('excluded_downtimes', $sla)) {
 				continue;
@@ -695,7 +695,7 @@ class CSla extends CApiService {
 	 * @param array      $slas
 	 * @param array|null $db_slas
 	 */
-	private static function updateServiceTags(array &$slas, array $db_slas = null): void {
+	private static function updateServiceTags(array &$slas, ?array $db_slas = null): void {
 		$ins_service_tags = [];
 		$del_service_tags = [];
 
@@ -765,7 +765,7 @@ class CSla extends CApiService {
 	 * @param array      $slas
 	 * @param array|null $db_slas
 	 */
-	private static function updateSchedule(array &$slas, array $db_slas = null): void {
+	private static function updateSchedule(array &$slas, ?array $db_slas = null): void {
 		$ins_schedule = [];
 		$del_schedule = [];
 
@@ -832,7 +832,7 @@ class CSla extends CApiService {
 	 * @param array      $slas
 	 * @param array|null $db_slas
 	 */
-	private static function updateExcludedDowntimes(array &$slas, array $db_slas = null): void {
+	private static function updateExcludedDowntimes(array &$slas, ?array $db_slas = null): void {
 		$ins_excluded_downtimes = [];
 		$upd_excluded_downtimes = [];
 		$del_excluded_downtimes = [];

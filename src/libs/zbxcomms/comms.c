@@ -239,11 +239,11 @@ int	zbx_inet_pton(int af, const char *src, void *dst)
 	return FAIL;
 }
 
-int	zbx_inet_ntop(struct addrinfo *ai, char *ip, socklen_t len)
+int	zbx_inet_ntop(struct sockaddr *ai_addr, char *ip, socklen_t len)
 {
-	if (AF_INET == ai->ai_addr->sa_family)
+	if (AF_INET == ai_addr->sa_family)
 	{
-		const struct sockaddr_in	*sin = (const struct sockaddr_in *) (void *)ai->ai_addr;
+		const struct sockaddr_in	*sin = (const struct sockaddr_in *) (void *)ai_addr;
 
 		if (NULL == inet_ntop(AF_INET, &sin->sin_addr, ip, len))
 		{
@@ -253,9 +253,9 @@ int	zbx_inet_ntop(struct addrinfo *ai, char *ip, socklen_t len)
 
 		return SUCCEED;
 	}
-	else if (AF_INET6 == ai->ai_addr->sa_family)
+	else if (AF_INET6 == ai_addr->sa_family)
 	{
-		const struct sockaddr_in6	*sin6 = (const struct sockaddr_in6 *) (void *)ai->ai_addr;
+		const struct sockaddr_in6	*sin6 = (const struct sockaddr_in6 *) (void *)ai_addr;
 
 		if (NULL == inet_ntop(AF_INET6, &sin6->sin6_addr, ip, len))
 		{
@@ -266,7 +266,7 @@ int	zbx_inet_ntop(struct addrinfo *ai, char *ip, socklen_t len)
 		return SUCCEED;
 	}
 
-	zabbix_log(LOG_LEVEL_DEBUG, "unknown address family:%d", ai->ai_addr->sa_family);
+	zabbix_log(LOG_LEVEL_DEBUG, "unknown address family:%d", ai_addr->sa_family);
 	return FAIL;
 }
 
@@ -290,7 +290,7 @@ void	zbx_getip_by_host(const char *host, char *ip, size_t iplen)
 		goto out;
 	}
 
-	if (FAIL == zbx_inet_ntop(ai, ip, (socklen_t)iplen))
+	if (FAIL == zbx_inet_ntop(ai->ai_addr, ip, (socklen_t)iplen))
 		ip[0] = '\0';
 out:
 	if (NULL != ai)
@@ -2140,8 +2140,20 @@ ssize_t	zbx_tcp_recv_context(zbx_socket_t *s, zbx_tcp_recv_context_t *context, u
 			}
 			else
 			{
+				char	*buffer;
+
+				if (NULL == (buffer = (char *)malloc(context->expected_len + 1)))
+				{
+					zbx_set_socket_strerror("cannot allocate memory: out of memory");
+					zabbix_log(LOG_LEVEL_WARNING, "Message size " ZBX_FS_UI64
+							" from %s exceeds the available memory size."
+							" Message ignored.", context->expected_len, s->peer);
+					nbytes = ZBX_PROTO_ERROR;
+					goto out;
+				}
+
 				s->buf_type = ZBX_BUF_TYPE_DYN;
-				s->buffer = (char *)zbx_malloc(NULL, context->expected_len + 1);
+				s->buffer = buffer;
 				context->buf_dyn_bytes = context->buf_stat_bytes - context->offset;
 				context->buf_stat_bytes = 0;
 				memcpy(s->buffer, s->buf_stat + context->offset, context->buf_dyn_bytes);
@@ -2162,8 +2174,17 @@ ssize_t	zbx_tcp_recv_context(zbx_socket_t *s, zbx_tcp_recv_context_t *context, u
 			{
 				char	*out;
 				size_t	out_size = context->reserved;
+				if (NULL == (out = (char *)malloc(context->reserved + 1)))
+				{
+					zbx_set_socket_strerror("cannot allocate memory to uncompress data:"
+							" out of memory");
+					zabbix_log(LOG_LEVEL_WARNING, "Uncompressed message size " ZBX_FS_UI64
+							" from %s exceeds the available memory size."
+							" Message ignored.", context->reserved, s->peer);
+					nbytes = ZBX_PROTO_ERROR;
+					goto out;
+				}
 
-				out = (char *)zbx_malloc(NULL, context->reserved + 1);
 				if (FAIL == zbx_uncompress(s->buffer, context->buf_stat_bytes + context->buf_dyn_bytes,
 						out, &out_size))
 				{

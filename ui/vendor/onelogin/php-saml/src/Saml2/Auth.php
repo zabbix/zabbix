@@ -172,7 +172,7 @@ class Auth
      * @throws Exception
      * @throws Error
      */
-    public function __construct(array $settings = null)
+    public function __construct(?array $settings = null)
     {
         $this->_settings = new Settings($settings);
     }

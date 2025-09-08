@@ -629,7 +629,7 @@ function make_trigger_details($trigger, $eventid) {
  *
  * @return array|bool
  */
-function analyzeExpression(string $expression, int $type, string &$error = null) {
+function analyzeExpression(string $expression, int $type, ?string &$error = null) {
 	if ($expression === '') {
 		return ['', null];
 	}
@@ -993,7 +993,7 @@ function getExpressionTree(CExpressionParser $expression_parser, int $start, int
  *
  * @return bool|string  Returns new expression or false if expression is incorrect.
  */
-function remakeExpression($expression, $expression_id, $action, $new_expression, string &$error = null) {
+function remakeExpression($expression, $expression_id, $action, $new_expression, ?string &$error = null) {
 	if ($expression === '') {
 		return false;
 	}
@@ -1645,7 +1645,7 @@ function makeTriggersHostsList(array $triggers_hosts) {
 /**
  * Get parent templates for each given trigger.
  *
- * @param $array $triggers                  An array of triggers.
+ * @param array  $triggers                  An array of triggers.
  * @param string $triggers[]['triggerid']   ID of a trigger.
  * @param string $triggers[]['templateid']  ID of parent template trigger.
  * @param int    $flag                      Origin of the trigger (ZBX_FLAG_DISCOVERY_NORMAL or

@@ -1,0 +1,59 @@
+div.dashboard-widget-testbroadcaster .js-view {
+	height: 100%;
+	display: grid;
+	grid-template-rows: max-content auto;
+}
+div.dashboard-widget-testbroadcaster .sections {
+	display: grid;
+	align-items: baseline;
+	grid-template-columns: max-content minmax(200px, auto) max-content max-content;
+	gap: 15px 10px;
+	padding: 10px;
+}
+div.dashboard-widget-testbroadcaster .js-section {
+	display: contents;
+}
+div.dashboard-widget-testbroadcaster .js-label {
+	text-align: right;
+}
+div.dashboard-widget-testbroadcaster .js-objects {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 2px;
+}
+div.dashboard-widget-testbroadcaster .js-objects button {
+	display: block;
+	max-width: 250px;
+	overflow: hidden;
+	white-space: nowrap;
+	text-overflow: ellipsis;
+	color: #1f2c33;
+	border-color: #acbbc2;
+	background-color: #ffffff;
+}
+div.dashboard-widget-testbroadcaster .js-objects button.on {
+	color: #ffffff;
+	background-color: #768d99;
+	border-color: #768d99;
+}
+div.dashboard-widget-testbroadcaster .js-buffer {
+	margin-right: -10px;
+	width: 300px;
+	font-family: monospace;
+	font-size: 1.2em;
+}
+div.dashboard-widget-testbroadcaster .js-buffer.has-errors {
+	border-color: #dc3838;
+}
+div.dashboard-widget-testbroadcaster .feedbacks {
+	padding: 10px;
+	box-sizing: border-box;
+	height: 100%;
+	display: grid;
+	grid-template-rows: max-content auto;
+}
+div.dashboard-widget-testbroadcaster .feedbacks textarea {
+	font-family: monospace;
+	font-size: 1.2em;
+	text-wrap: nowrap;
+}

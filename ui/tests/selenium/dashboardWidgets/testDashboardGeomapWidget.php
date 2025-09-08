@@ -13,9 +13,9 @@
 ** If not, see <https://www.gnu.org/licenses/>.
 **/
 
-require_once dirname(__FILE__).'/../../include/CWebTest.php';
-require_once dirname(__FILE__).'/../../include/helpers/CDataHelper.php';
-require_once dirname(__FILE__).'/../behaviors/CMessageBehavior.php';
+require_once __DIR__.'/../../include/CWebTest.php';
+require_once __DIR__.'/../../include/helpers/CDataHelper.php';
+require_once __DIR__.'/../behaviors/CMessageBehavior.php';
 
 /**
  * @backup config, widget
@@ -575,7 +575,7 @@ class testDashboardGeomapWidget extends CWebTest {
 			$values = $form->getFields()->asValues();
 		}
 		else {
-			$form->fill(['Type' => 'Geomap']);
+			$form->fill(['Type' => CFormElement::RELOADABLE_FILL('Geomap')]);
 		}
 
 		if ($cancel || !$save_dashboard) {

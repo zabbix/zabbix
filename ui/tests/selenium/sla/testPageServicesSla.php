@@ -14,10 +14,10 @@
 **/
 
 
-require_once dirname(__FILE__).'/../../include/CWebTest.php';
-require_once dirname(__FILE__).'/../behaviors/CMessageBehavior.php';
-require_once dirname(__FILE__).'/../behaviors/CTableBehavior.php';
-require_once dirname(__FILE__).'/../behaviors/CTagBehavior.php';
+require_once __DIR__.'/../../include/CWebTest.php';
+require_once __DIR__.'/../behaviors/CMessageBehavior.php';
+require_once __DIR__.'/../behaviors/CTableBehavior.php';
+require_once __DIR__.'/../behaviors/CTagBehavior.php';
 
 /**
  * @backup sla, profiles
@@ -234,14 +234,16 @@ class testPageServicesSla extends CWebTest {
 		}
 
 		// Check displaying and hiding the filter.
-		$filter_form = $this->query('name:zbx_filter')->asForm()->one();
-		$filter_tab = $this->query('xpath://a[contains(text(), "Filter")]')->one();
-		$filter = $filter_form->query('id:tab_0')->one();
-		$this->assertTrue($filter->isDisplayed());
-		$filter_tab->click();
-		$this->assertFalse($filter->isDisplayed());
-		$filter_tab->click();
-		$this->assertTrue($filter->isDisplayed());
+		$filter = CFilterElement::find()->one();
+		$filter_form = $filter->getForm();
+		$this->assertEquals('Filter', $filter->getSelectedTabName());
+		// Check that filter is expanded by default.
+		$this->assertTrue($filter->isExpanded());
+		// Check that filter is collapsing/expanding on click.
+		foreach ([false, true] as $status) {
+			$filter->expand($status);
+			$this->assertTrue($filter->isExpanded($status));
+		}
 
 		// Check that all filter fields are present.
 		$this->assertEquals(['Name', 'Status', 'Service tags'], $filter_form->getLabels()->asText());
@@ -719,7 +721,7 @@ class testPageServicesSla extends CWebTest {
 		if (CTestArrayHelper::get($data, 'Tags')) {
 			$this->setTags($data['Tags']);
 		}
-		$form->submit();
+		$form->submit()->waitUntilStalled();
 		$this->page->waitUntilReady();
 
 		if (!array_key_exists('expected', $data)) {
@@ -732,7 +734,7 @@ class testPageServicesSla extends CWebTest {
 		}
 
 		// Reset the filter and check that all SLAs are displayed.
-		$this->query('button:Reset')->one()->click();
+		$this->query('button:Reset')->one()->click()->waitUntilStalled();
 		$this->assertTableStats(count(CDataHelper::get('Sla.slaids')));
 	}
 

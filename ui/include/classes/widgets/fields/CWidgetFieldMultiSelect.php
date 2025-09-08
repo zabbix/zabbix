@@ -25,7 +25,7 @@ abstract class CWidgetFieldMultiSelect extends CWidgetField {
 	// Is selecting multiple objects or a single one?
 	private bool $is_multiple = true;
 
-	public function __construct(string $name, string $label = null) {
+	public function __construct(string $name, ?string $label = null) {
 		parent::__construct($name, $label);
 
 		$this->setDefault(self::DEFAULT_VALUE);

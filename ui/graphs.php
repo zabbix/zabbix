@@ -300,7 +300,7 @@ elseif (getRequest('graphid', '') && getRequest('action', '') === 'graph.updated
 	}
 
 	if (hasRequest('backurl')) {
-		$response = new CControllerResponseRedirect(getRequest('backurl'));
+		$response = new CControllerResponseRedirect(new CUrl(getRequest('backurl')));
 		$response->redirect();
 	}
 }

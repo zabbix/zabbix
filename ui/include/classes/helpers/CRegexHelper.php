@@ -16,7 +16,7 @@
 
 class CRegexHelper {
 
-	public static function expression_type2str(int $type = null) {
+	public static function expression_type2str(?int $type = null) {
 		$types = [
 			EXPRESSION_TYPE_INCLUDED => _('Character string included'),
 			EXPRESSION_TYPE_ANY_INCLUDED => _('Any character string included'),

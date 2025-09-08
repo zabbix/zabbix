@@ -21,4 +21,5 @@ libzbxdiscoverer_a_SOURCES = \
 	discoverer_int.h
 
 libzbxdiscoverer_a_CFLAGS = \
-	$(TLS_CFLAGS)
+	$(TLS_CFLAGS) \
+	$(ARES_CFLAGS)

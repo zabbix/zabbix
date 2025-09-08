@@ -7,11 +7,7 @@ memory usage. It is highly recommended to use in conjunction with the official
 [Oracle template.](https://git.zabbix.com/projects/ZBX/repos/zabbix/browse/templates/db/oracle_agent2) 
 You can extend it or create your own template to cater specific needs.
 
-## Requirements
-
-* Zabbix Agent 2
-* Go >= 1.21 (required only to build from source)
-* Oracle Instant Client >= 12
+**Important! This integration queries the `V$ACTIVE_SESSION_HISTORY` dynamic performance view which is part of the Oracle Diagnostics Pack. Please make sure that you have the licence required for using this management pack.**
 
 ## Supported versions
 
@@ -192,7 +188,7 @@ In order to be able to monitor tablespaces across multiple containers, the Oracl
 
 Common parameters for all the keys are: [ConnString][User][Password][Service] where `ConnString` can be either a URI or a session name.
 `ConnString` will be treated as a URI if no session with the given name is found.
-User can contain sysdba, sysoper, sysasm privileges. It must be used with `as` as a separator
+User can contain sysdba, sysoper, sysasm, sysbackup, sysdg, syskm, sysrac privileges. It must be used with `as` as a separator
 e.g `user as sysdba`, privilege can be upper or lowercase, and must be at the end of username string.
 If you use `ConnString` as a session name, you can skip the rest of the connection parameters.
  
@@ -254,7 +250,7 @@ Note: session names are case-sensitive.
 
 **oracle.instance.info[\<commonParams\>]** — returns instance statistics.
 
-**oracle.pdb.info[\<commonParams\>,\<database\>]** — returns the Plugable Databases (PDBs) information.
+**oracle.pdb.info[\<commonParams\>,\<database\>]** — returns the Pluggable Databases (PDBs) information.
 *Parameters:*  
 `database` (optional) — the name of the database.
 
@@ -342,6 +338,10 @@ WHERE
 ``` 
 
     oracle.custom.query[<commonParams>,payment,"John Doe",1,"10/25/2020"]
+
+### Notes:
+ * Returned data is automatically converted into JSON.
+ * Avoid returning JSON directly from queries, as it will become corrupted when the plugin attempts to convert it into JSON again.
 
 ## Current limitations
 

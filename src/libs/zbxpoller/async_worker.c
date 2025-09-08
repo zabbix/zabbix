@@ -239,7 +239,7 @@ static void	*async_worker_entry(void *args)
 			poller_item = dc_config_async_get_poller_items(processing_num, poller_type, config_timeout,
 					processing_limit);
 
-			zabbix_log(LOG_LEVEL_DEBUG, "queue processing_num:" ZBX_FS_UI64 " pending:%d",
+			zabbix_log(LOG_LEVEL_DEBUG, "queue processing_num:" ZBX_FS_UI64 " pending:" ZBX_FS_UI64,
 					processing_num, queue_poller_items_values_num);
 		}
 

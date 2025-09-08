@@ -198,6 +198,9 @@ typedef struct
 	/* timestamp of the last low memory warning message */
 	int		last_warning_time;
 
+	/* timestamp of the last warning message when item couldn't be allocated due to insufficient space */
+	time_t		last_alloc_warning_time;
+
 	/* the minimum number of bytes to be freed when cache runs out of space */
 	size_t		min_free_request;
 
@@ -735,6 +738,29 @@ static void	vc_dump_items_statistics(void)
 
 /******************************************************************************
  *                                                                            *
+ * Purpose: logs warning when item allocation in cache failed due to          *
+ *          insufficient space.                                               *
+ *                                                                            *
+ * Comments: The failed alloc warning is written to log every 5 minutes.      *
+ *                                                                            *
+ ******************************************************************************/
+static void	vc_warn_alloc(const zbx_vc_item_t *item, size_t requested_bytes)
+{
+	time_t	now;
+
+	now = time(NULL);
+
+	if (now - vc_cache->last_alloc_warning_time > ZBX_VC_LOW_MEMORY_WARNING_PERIOD)
+	{
+		vc_cache->last_alloc_warning_time = now;
+
+		zabbix_log(LOG_LEVEL_WARNING, "cannot allocate " ZBX_FS_SIZE_T " bytes for itemid:" ZBX_FS_UI64
+				" in value cache", (zbx_fs_size_t)requested_bytes, item->itemid);
+	}
+}
+
+/******************************************************************************
+ *                                                                            *
  * Purpose: logs low memory warning                                           *
  *                                                                            *
  * Comments: The low memory warning is written to log every 5 minutes when    *
@@ -838,6 +864,7 @@ static void	vc_release_space(zbx_vc_item_t *source_item, size_t space)
 	vc_cache->mode_time = (int)time(NULL);
 
 	vc_warn_low_memory();
+	vc_warn_alloc(source_item, space);
 
 	/* remove items with least hits/size ratio */
 	zbx_vector_vc_itemweight_create(&items);
@@ -2493,6 +2520,7 @@ void	zbx_vc_reset(void)
 		vc_cache->mode = ZBX_VC_MODE_NORMAL;
 		vc_cache->mode_time = 0;
 		vc_cache->last_warning_time = 0;
+		vc_cache->last_alloc_warning_time = 0;
 
 		UNLOCK_CACHE;
 	}
@@ -2538,7 +2566,8 @@ int	zbx_vc_add_values(zbx_vector_dc_history_ptr_t *history, int *ret_flush, int 
 			zbx_vc_item_t	item_local = {
 					.itemid = h->itemid,
 					.value_type = h->value_type,
-					.last_accessed = (int)time(NULL)
+					.last_accessed = (int)time(NULL),
+					.active_range = VC_MIN_RANGE
 
 			};
 
@@ -2909,6 +2938,7 @@ void	zbx_vc_add_new_items(const zbx_vector_uint64_pair_t *items)
 					.itemid = items->values[i].first,
 					.value_type = (unsigned char)items->values[i].second,
 					.status = ZBX_ITEM_STATUS_CACHED_ALL,
+					.active_range = VC_MIN_RANGE,
 					.last_accessed = (int)time(NULL)
 
 			};

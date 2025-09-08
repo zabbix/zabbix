@@ -14,16 +14,16 @@
 **/
 
 
-require_once dirname(__FILE__).'/../../include/CWebTest.php';
-require_once dirname(__FILE__).'/../../include/helpers/CDataHelper.php';
-require_once dirname(__FILE__).'/../behaviors/CMessageBehavior.php';
-require_once dirname(__FILE__).'/../behaviors/CTableBehavior.php';
-require_once dirname(__FILE__).'/../behaviors/CTagBehavior.php';
+require_once __DIR__.'/../../include/CWebTest.php';
+require_once __DIR__.'/../../include/helpers/CDataHelper.php';
+require_once __DIR__.'/../behaviors/CMessageBehavior.php';
+require_once __DIR__.'/../behaviors/CTableBehavior.php';
+require_once __DIR__.'/../behaviors/CTagBehavior.php';
 
 /**
  * @backup hosts, httptest
  *
- * @dataSource WebScenarios, DiscoveredHosts, EntitiesTags, ExecuteNowAction
+ * @dataSource WebScenarios, DiscoveredHosts, EntitiesTags, ExecuteNowAction, WidgetCommunication
  *
  * @onBefore getContextData
  */
@@ -302,6 +302,9 @@ class testPageMonitoringWeb extends CWebTest {
 						'testInheritanceWeb2',
 						'testInheritanceWeb3',
 						'testInheritanceWeb4',
+						'Web scenario 1st host for widget communication',
+						'Web scenario 2nd host for widget communication',
+						'Web scenario 3rd host for widget communication',
 						'Web scenario for execute now',
 						'Web scenario for removing tags',
 						'Web scenario with tags for cloning',
@@ -331,6 +334,9 @@ class testPageMonitoringWeb extends CWebTest {
 						'testInheritanceWeb2',
 						'testInheritanceWeb3',
 						'testInheritanceWeb4',
+						'Web scenario 1st host for widget communication',
+						'Web scenario 2nd host for widget communication',
+						'Web scenario 3rd host for widget communication',
 						'Web scenario for execute now',
 						'Web scenario for removing tags',
 						'Web scenario with tags for cloning',
@@ -361,6 +367,9 @@ class testPageMonitoringWeb extends CWebTest {
 						'testInheritanceWeb2',
 						'testInheritanceWeb3',
 						'testInheritanceWeb4',
+						'Web scenario 1st host for widget communication',
+						'Web scenario 2nd host for widget communication',
+						'Web scenario 3rd host for widget communication',
 						'Web scenario for execute now',
 						'Web scenario for removing tags',
 						'Web scenario with tags for cloning',
@@ -391,6 +400,9 @@ class testPageMonitoringWeb extends CWebTest {
 						'testInheritanceWeb2',
 						'testInheritanceWeb3',
 						'testInheritanceWeb4',
+						'Web scenario 1st host for widget communication',
+						'Web scenario 2nd host for widget communication',
+						'Web scenario 3rd host for widget communication',
 						'Web scenario for execute now',
 						'Web scenario for removing tags',
 						'Web scenario with tags for cloning',
@@ -420,6 +432,9 @@ class testPageMonitoringWeb extends CWebTest {
 						'testInheritanceWeb2',
 						'testInheritanceWeb3',
 						'testInheritanceWeb4',
+						'Web scenario 1st host for widget communication',
+						'Web scenario 2nd host for widget communication',
+						'Web scenario 3rd host for widget communication',
 						'Web scenario for execute now',
 						'Web scenario for removing tags',
 						'Web scenario with tags for cloning',

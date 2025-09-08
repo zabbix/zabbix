@@ -1,0 +1,27 @@
+{
+	"manifest_version": 2.0,
+	"id": "testlistener",
+	"type": "widget",
+	"name": "Test Listener",
+	"namespace": "TestListener",
+	"version": "1.0",
+	"author": "Zabbix",
+	"description": "Allows to test broadcasting functionality of other widgets.",
+	"widget": {
+		"size": {
+			"width": 32,
+			"height": 8
+		},
+		"js_class": "CTestListener",
+		"refresh_rate": 0
+	},
+	"actions": {
+		"widget.testlistener.view": {
+			"class": "WidgetView"
+		}
+	},
+	"assets": {
+		"js": ["class.widget.js"],
+		"css": ["widget.css"]
+	}
+}

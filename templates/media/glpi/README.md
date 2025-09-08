@@ -1,67 +1,152 @@
+![](images/logo.png?raw=true)
+# GLPi webhook
 
-# GLPi webhook 
+## Overview
 
-## About webhook
+This guide describes how to integrate your Zabbix installation with your GLPi installation using the Zabbix webhook feature, providing instructions on setting up a media type, user, and action in Zabbix.
 
-This webhook creates problems in GLPi Assistance section. Created problems have the next severity mapping:
+This webhook creates problem records in the GLPi Assistance section. Created problems have the following urgency mapping:
 
-|Severity In zabbix|Urgency in GLPi|
+|Severity in Zabbix|Urgency in GLPi|
 |-|-|
 0 - Not classified| Medium (default)|
 1 - Information| Very low|
 2 - Warning| Low|
 3 - Average| Medium|
 4 - High| High|
-5 - Disaster| Very High|
+5 - Disaster| Very high|
 
-On Update action in zabbix, webhook updates created problem's title, severity and creates followup with update comment.
+- When a problem is updated in Zabbix, the webhook updates the problem's title and urgency in GLPi and adds a follow-up entry with the update comment.
+- When a problem is resolved in Zabbix, the webhook updates the problem's title and adds a follow-up entry with resolution details.
+- Created problems have the status "New" and resolved problems – "Solved".
+- Due to the specifics of the webhook, the number of retries is, by default, set to 1. We recommend not changing this setting; should a transaction error occur, additional duplicate objects (problems, followups) may be created during the retry.
 
-On resolve action, webhook updates created problem title and creates followup with resolve information.
+## Tested on
+ - GLPI 10.0.18
 
-Created problems have "New" status, and resolved - "Solved" status.
+## Requirements
 
-Due to the specifics of the webhook, the number of retries is set to 1 by default. We recommend that you do not change this setting, because in case of a transaction error, additional duplicate objects (problems, followups) may be created during the retry.
+Zabbix version: 7.0 and higher.
 
-## Installation guide
+## Parameters
 
-This guide describes how to integrate your Zabbix installation with GLPi problems using the Zabbix webhook feature. This guide provides instructions on setting up a media type, a user and an action in Zabbix.
-<br/><br/>
-## In GLPi
+After importing the webhook, you can configure it using webhook parameters.
 
-1\. Create or use existing user in GLPi with permission to create problems and followups. 
-[![](images/1.thumb.png?raw=true)](images/1.png)
-[![](images/2.thumb.png?raw=true)](images/2.png)
+### Configurable parameters
 
-2\. Please create an **API token**. For that you should go into user profile and set tick in "Regenerate" field against "API token" and hit save.
-[![](images/3.thumb.png?raw=true)](images/3.png)
+The configurable parameters are intended to be changed according to the webhook setup as well as the user's preferences and environment.
 
+|Name|Value|Description|
+|----|-----|-----------|
+|zabbix_url|\{$ZABBIX\.URL\}|Current Zabbix URL.|
+|glpi_app_token||GLPi application token (optional; specify if the token is set in the API client settings).|
+|glpi_user_token|\<PLACE GLPI USER TOKEN\>|GLPi user token.|
+|glpi_url|\<PLACE GLPI URL\>|URL of GLPi installation.|
 
-3\. Copy the **API token** of your new integration to use it in Zabbix.
-<br/><br/>
-## In Zabbix
+### Internal parameters
 
-The configuration consists of a _media type_ in Zabbix, which will invoke the webhook to send alerts to GLPi problems through the GLPi Rest API.
+Internal parameters are reserved for predefined macros that are not meant to be changed.
 
+|Name|Value|Description|
+|----|-----|-----------|
+|event_source|\{EVENT\.SOURCE\}|Numeric value of the event source. Possible values: 0 - Trigger, 1 - Discovery, 2 - Autoregistration, 3 - Internal, 4 - Service.|
+|event_value|\{EVENT\.VALUE\}|Numeric value of the event that triggered an action (1 for problem, 0 for recovering).|
+|event_severity|\{EVENT\.SEVERITY\}|Name of the event severity.|
+|event_nseverity|\{EVENT\.NSEVERITY\}|Numeric value of the event severity. Possible values: 0 - Not classified, 1 - Information, 2 - Warning, 3 - Average, 4 - High, 5 - Disaster.|
+|event_update_nseverity|\{EVENT\.UPDATE\.NSEVERITY\}|Numeric value of the event update severity. Possible values: 0 - Not classified, 1 - Information, 2 - Warning, 3 - Average, 4 - High, 5 - Disaster.|
+|event_update_severity|\{EVENT\.UPDATE\.SEVERITY\}|Name of the event update severity.|
+|event_update_status|\{EVENT\.UPDATE\.STATUS\}|Numeric value of the problem update status. Possible values: 0 - Webhook was called because of problem/recovery event, 1 - Update operation.|
+|alert_subject|\{ALERT\.SUBJECT\}|'Default subject' value from action configuration.|
+|alert_message|\{ALERT\.MESSAGE\}|'Default message' value from action configuration.|
+|event_id|\{EVENT\.ID\}|Numeric ID of the event that triggered an action.|
+|trigger_id|\{TRIGGER\.ID\}|Numeric ID of the trigger of this action.|
+|glpi_problem_id|\{EVENT\.TAGS\.\_\_zbx\_glpi\_problem\_id\}|GLPi problem ID.|
 
-1\. [Import](https://www.zabbix.com/documentation/7.0/manual/web_interface/frontend_sections/administration/mediatypes) the GLPi media type from file [media_glpi.yaml](media_glpi.yaml).
+> Please be aware that each webhook supports an HTTP proxy. To use this feature, add a new media type parameter with the name `http_proxy` and set its value to the proxy URL.
 
-2\. Change in the imported media the values of the variable *glpi_token* and *glpi_url*.
+## Service setup
 
+1. Enable access to the GLPi REST API:
+  - In the GLPi web interface, go to *Setup* > *General* > *API*.
+  - Set the *Enable Rest API* and *Enable Rest API* options to *Yes* and click the *Save* button.
 
-For more information about the Zabbix Webhook configuration, please see the [documentation](https://www.zabbix.com/documentation/7.0/manual/config/notifications/media/webhook).
+[![](images/thumb.1.png?raw=true)](images/1.png)
 
-3\. Create a **Zabbix user** and add **Media** with the **GLPi** media type. 
-Though a "Send to" field is not used in GLPi webhook, it cannot be empty. To comply with frontend requirements, you can put any symbol there.
-Make sure this user has access to all hosts for which you would like problem notifications to be converted into GLPi problems.
+2. Add a new API client:
+  - Click the *Add API client* button.
+  - Specify the API client name and set the *Active* option to *Yes*.
+  - For security reasons, you may want to restrict the API client to the IP address of Zabbix server and/or create an additional application token (will be generated by default; you can uncheck the *Regenerate* checkbox if you don't want to use it).
+  - Click the *Add* button.
+  - If you've opted to create an application token, open the settings of the created API client, and then copy and save the generated application token.
 
-4\. Set up a global macro {$ZABBIX.URL} with URL of current zabbix. Please notice that HTTPS will be used by default if HTTP/HTTPS schema is not present in the URL.
+[![](images/thumb.2.png?raw=true)](images/2.png)
+[![](images/thumb.3.png?raw=true)](images/3.png)
 
-For more information, please see [Zabbix](https://www.zabbix.com/documentation/7.0/manual/config/notifications) and [GLPi](https://glpi-project.org/DOC/EN/) documentation.
-<br/><br/>
+3. Create a new [user profile](https://glpi-user-documentation.readthedocs.io/fr/latest/modules/administration/profiles/profiles.html) with permissions to create problems and followups (alternatively, you can use an existing profile with sufficient privileges):
+  - Go to *Administration* > *Profiles* and click the *Add* button on the top of the page.
+  - Specify the profile name and set the *Profile's Interface* option to *Standard Interface*, and then click the *Add* button.
+  - Open the created profile and click the *Assistance* tab.
+  - Set the *Add followup (requester)* permission for the *Followups* line in the *Followups/Tasks* section.
+  - Set the *Update*, *Create*, and *See all* permissions in the *Problems* section.
+  - Click the *Save* button.
 
-## Tested on 
-GLPI 9.5.7
-<br/><br/>
-## Supported Versions
+[![](images/thumb.4.png?raw=true)](images/4.png)
+[![](images/thumb.5.png?raw=true)](images/5.png)
+[![](images/thumb.6.png?raw=true)](images/6.png)
 
-Zabbix 7.0
+4. Create a new [user](https://glpi-user-documentation.readthedocs.io/fr/latest/modules/administration/users/users.html):
+  - Go to *Administration* > *Users* and click the *Add User* button on the top of the page.
+  - Specify the user login and set the *Profiles* option to the profile that you created in the previous step (or any other existing profile with permissions to create problems and followups).
+  - Click the *Add* button.
+  - Open the profile of the created user and check the *Regenerate* checkbox of the *API token* option; click *Save*.
+  - Copy and save the generated user API token.
+
+[![](images/thumb.7.png?raw=true)](images/7.png)
+[![](images/thumb.8.png?raw=true)](images/8.png)
+[![](images/thumb.9.png?raw=true)](images/9.png)
+
+## Zabbix configuration
+
+1. Before you can start using the **GLPi** webhook, you need to set up the global macro `{$ZABBIX.URL}`:
+  - In the Zabbix web interface, go to *Administration* > *Macros* in the top-left drop-down menu.
+  - Set up the global macro `{$ZABBIX.URL}` which will contain the URL to the Zabbix frontend. The URL should be either an IP address, a fully qualified domain name, or a localhost.
+  - Specifying a protocol is mandatory, whereas the port is optional. Depending on the web server configuration, you might also need to append `/zabbix` to the end of URL. Good examples:
+    - `http://zabbix.com`
+    - `https://zabbix.lan/zabbix`
+    - `http://server.zabbix.lan/`
+    - `http://localhost`
+    - `http://127.0.0.1:8080`
+  - Bad examples:
+    - `zabbix.com`
+    - `http://zabbix/`
+
+[![](images/thumb.10.png?raw=true)](images/10.png)
+
+2. Import the media type:
+  - In the *Alerts* > *Media types* section, import the [`media_glpi.yaml`](media_glpi.yaml) file.
+
+3. Open the imported **GLPi** media type and set the following webhook parameters:
+  - `glpi_app_token` - if you've opted to use an application token during the creation of API client, specify it here; otherwise leave it empty
+  - `glpi_url` - the frontend URL of your **GLPi** installation
+  - `glpi_user_token` - the user token that was generated during creation of **GLPi** user
+
+[![](images/thumb.11.png?raw=true)](images/11.png)
+
+4. Click the *Enabled* checkbox to enable the media type and click the *Update* button to save the webhook settings.
+
+5. Create a Zabbix user and add media:
+  - To create a new user,  go to the *Users* > *Users* section and click the *Create user* button in the top-right corner. In the *User* tab, fill in all the required fields (marked with red asterisks).
+  - In the *Media* tab, click *Add* and select **GLPi** from the *Type* drop-down list. Though the *Send to* field is not used in the **GLPi** webhook, it cannot be left empty. To comply with frontend requirements, enter any symbol in the field.
+  - Make sure this user has access to all the hosts for which you would like problem notifications to be sent to **GLPi**.
+
+[![](images/thumb.12.png?raw=true)](images/12.png)
+
+6. Done! You can now start using this media type in actions and create problem items in **GLPi**.
+
+For more information, please see [Zabbix](https://www.zabbix.com/documentation/7.0/manual/config/notifications) and [GLPi](https://glpi-user-documentation.readthedocs.io/fr/latest/) documentation.
+
+## Feedback
+
+Please report any issues with the media type at [`https://support.zabbix.com`](https://support.zabbix.com).
+
+You can also provide feedback, discuss the media type, or ask for help at [`ZABBIX forums`](https://www.zabbix.com/forum/zabbix-suggestions-and-feedback).

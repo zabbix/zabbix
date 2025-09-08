@@ -39,7 +39,7 @@
 		_updateForm() {
 			document
 				.getElementById('notificationsTab')
-				.querySelectorAll('input:not([name="messages[enabled]"]),button')
+				.querySelectorAll('input:not([name="messages[enabled]"]),button,z-select')
 				.forEach((elem) => {
 					elem.toggleAttribute('disabled', !document.getElementById('messages_enabled').checked);
 				});

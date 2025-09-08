@@ -62,7 +62,7 @@ abstract class CWidgetField {
 	 * @param string      $name   Field name in form.
 	 * @param string|null $label  Label for the field in form.
 	 */
-	public function __construct(string $name, string $label = null) {
+	public function __construct(string $name, ?string $label = null) {
 		$this->name = $name;
 		$this->label = $label;
 		$this->value = null;

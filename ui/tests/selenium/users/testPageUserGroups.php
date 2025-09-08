@@ -14,12 +14,23 @@
 **/
 
 
-require_once dirname(__FILE__).'/../../include/CLegacyWebTest.php';
+require_once __DIR__.'/../../include/CLegacyWebTest.php';
 
 /**
  * @backup usrgrp
  */
 class testPageUserGroups extends CLegacyWebTest {
+
+	/**
+	 * Attach MessageBehavior, TableBehavior and TagBehavior to the test.
+	 */
+	public function getBehaviors() {
+		return [
+			CTableBehavior::class,
+			CMessageBehavior::class
+		];
+	}
+
 	public static function allGroups() {
 		return CDBHelper::getDataProvider("select * from usrgrp where name<>'Disabled' and name<>'Internal' order by usrgrpid");
 	}
@@ -64,7 +75,7 @@ class testPageUserGroups extends CLegacyWebTest {
 		$this->zbxTestClickWait('update');
 		$this->zbxTestCheckHeader('User groups');
 		$this->zbxTestCheckTitle('Configuration of user groups');
-		$this->zbxTestWaitUntilMessageTextPresent('msg-good', 'User group updated');
+		$this->assertMessage(TEST_GOOD, 'User group updated');
 		$this->zbxTestTextPresent($name);
 
 		$this->assertEquals($oldHashGroup, CDBHelper::getHash($sqlHashGroup));
@@ -95,7 +106,7 @@ class testPageUserGroups extends CLegacyWebTest {
 			$this->zbxTestTextPresent('User cannot add oneself to a disabled group or a group with disabled GUI access.');
 		}
 		else {
-			$this->zbxTestTextPresent('User group updated');
+			$this->assertMessage(TEST_GOOD, 'User group updated');
 		}
 
 		$sql = "select * from usrgrp where usrgrpid=$usrgrpid and users_status=".GROUP_STATUS_DISABLED;
@@ -127,7 +138,7 @@ class testPageUserGroups extends CLegacyWebTest {
 
 		$this->zbxTestAcceptAlert();
 		$this->zbxTestCheckTitle('Configuration of user groups');
-		$this->zbxTestTextPresent('User group updated');
+		$this->assertMessage(TEST_GOOD, 'User group updated');
 
 		$sql="select * from usrgrp where usrgrpid=$usrgrpid and users_status=".GROUP_STATUS_ENABLED;
 		$this->assertEquals(1, CDBHelper::getCount($sql));
@@ -153,7 +164,7 @@ class testPageUserGroups extends CLegacyWebTest {
 		$this->zbxTestAcceptAlert();
 
 		$this->zbxTestCheckTitle('Configuration of user groups');
-		$this->zbxTestTextPresent('User group updated');
+		$this->assertMessage(TEST_GOOD, 'User group updated');
 
 		$sql="select * from usrgrp where usrgrpid=$usrgrpid and debug_mode=".GROUP_DEBUG_MODE_ENABLED;
 		$this->assertEquals(1, CDBHelper::getCount($sql));
@@ -179,7 +190,7 @@ class testPageUserGroups extends CLegacyWebTest {
 		$this->zbxTestAcceptAlert();
 
 		$this->zbxTestCheckTitle('Configuration of user groups');
-		$this->zbxTestTextPresent('User group updated');
+		$this->assertMessage(TEST_GOOD, 'User group updated');
 
 		$sql = "select * from usrgrp where usrgrpid=$usrgrpid and debug_mode=".GROUP_DEBUG_MODE_DISABLED;
 		$this->assertEquals(1, CDBHelper::getCount($sql));
@@ -189,38 +200,47 @@ class testPageUserGroups extends CLegacyWebTest {
 
 	public function testPageUserGroups_FilterByName() {
 		$this->zbxTestLogin('zabbix.php?action=usergroup.list');
+		$table = $this->getTable();
 		$this->zbxTestInputTypeOverwrite('filter_name', 'Zabbix administrators');
 		$this->zbxTestClickButtonText('Apply');
+		$table->waitUntilReloaded();
 		$this->zbxTestAssertElementText("//tbody/tr[1]/td[2]/a", 'Zabbix administrators');
+		$this->page->waitUntilReady();
 		$this->zbxTestTextNotPresent('Displaying 0 of 0 found');
 	}
 
 	public function testPageUserGroups_FilterNone() {
 		$this->zbxTestLogin('zabbix.php?action=usergroup.list');
+		$table = $this->getTable();
 		$this->zbxTestInputTypeOverwrite('filter_name', '1928379128ksdhksdjfh');
 		$this->zbxTestClickButtonText('Apply');
+		$table->waitUntilReloaded();
 		$this->assertFalse($this->query('xpath://div[@class="table-stats"]')->one(false)->isValid());
 		$this->zbxTestTextNotPresent('Displaying 0 of 0 found');
 		$this->zbxTestInputTypeOverwrite('filter_name', '%');
 		$this->zbxTestClickButtonText('Apply');
-		$this->assertFalse($this->query('xpath://div[@class="table-stats"]')->one(false)->isValid());
-		$this->zbxTestTextNotPresent('Displaying 0 of 0 found');
+		$this->page->waitUntilReady();
+		$this->assertTableStats(0);
 	}
 
 	public function testPageUserGroups_FilterByStatus() {
 		$this->zbxTestLogin('zabbix.php?action=usergroup.list');
+		$table = $this->getTable();
 		$this->zbxTestInputTypeOverwrite('filter_name', 'Zabbix administrators');
 		$this->zbxTestClickXpathWait("//label[@for='filter_user_status_1']");
 		$this->zbxTestClickButtonText('Apply');
-		$this->assertTrue($this->query('xpath://div[@class="table-stats"][text()="Displaying 1 of 1 found"]')
-				->one()->isVisible()
-		);
+		$table->waitUntilReloaded();
+		$this->page->waitUntilReady();
+		$this->assertTableStats(1);
 	}
 
 	public function testPageUserGroups_FilterReset() {
 		$this->zbxTestLogin('zabbix.php?action=usergroup.list');
 		$this->zbxTestClickButtonText('Reset');
+		$table = $this->getTable();
 		$this->zbxTestClickButtonText('Apply');
+		$table->waitUntilReloaded();
+		$this->page->waitUntilReady();
 		$this->zbxTestTextNotPresent('Displaying 0 of 0 found');
 	}
 }

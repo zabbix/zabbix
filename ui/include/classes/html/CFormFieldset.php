@@ -18,7 +18,7 @@ class CFormFieldset extends CTag {
 
 	protected ?string $caption;
 
-	public function __construct(string $caption = null, $body = null) {
+	public function __construct(?string $caption = null, $body = null) {
 		parent::__construct('fieldset', true, $body);
 
 		$this->caption = $caption;

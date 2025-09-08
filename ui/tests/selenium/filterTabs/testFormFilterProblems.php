@@ -14,12 +14,12 @@
 **/
 
 
-require_once dirname(__FILE__).'/../common/testFormFilter.php';
+require_once __DIR__.'/../common/testFormFilter.php';
 
 /**
  * @backup profiles, hosts
  *
- * @dataSource UserPermissions
+ * @dataSource UserPermissions, WidgetCommunication
  *
  * @onBefore prepareProblemsData
  */
@@ -149,7 +149,8 @@ class testFormFilterProblems extends testFormFilter {
 				[
 					'expected' => TEST_GOOD,
 					'filter_form' => [
-						'Hosts' => ['Host for tag permissions']
+						'Hosts' => ['Host for tag permissions'],
+						'Show timeline' => true
 					],
 					'filter' => [
 						'Show number of records' => true

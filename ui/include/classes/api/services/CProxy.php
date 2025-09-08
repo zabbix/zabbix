@@ -359,7 +359,7 @@ class CProxy extends CApiService {
 	 * @param array      $proxies
 	 * @param array|null $db_proxies
 	 */
-	private static function updateHosts(array $proxies, array $db_proxies = null): void {
+	private static function updateHosts(array $proxies, ?array $db_proxies = null): void {
 		$upd_hosts = [];
 
 		foreach ($proxies as $proxy) {
@@ -643,7 +643,7 @@ class CProxy extends CApiService {
 	 *
 	 * @throws APIException
 	 */
-	private static function checkDuplicates(array $proxies, array $db_proxies = null): void {
+	private static function checkDuplicates(array $proxies, ?array $db_proxies = null): void {
 		$names = [];
 
 		foreach ($proxies as $proxy) {
@@ -673,7 +673,7 @@ class CProxy extends CApiService {
 		}
 	}
 
-	private static function checkProxyGroups(array $proxies, array $db_proxies = null): void {
+	private static function checkProxyGroups(array $proxies, ?array $db_proxies = null): void {
 		$proxy_indexes = [];
 
 		foreach ($proxies as $i => $proxy) {
@@ -714,7 +714,7 @@ class CProxy extends CApiService {
 	 *
 	 * @throws APIException
 	 */
-	private static function checkTlsPskPairs(array $proxies, array $db_proxies = null): void {
+	private static function checkTlsPskPairs(array $proxies, ?array $db_proxies = null): void {
 		$tls_psk_fields = array_flip(['tls_psk_identity', 'tls_psk']);
 		$psk_pairs = [];
 		$psk_proxyids = $db_proxies !== null ? [] : null;
@@ -753,7 +753,7 @@ class CProxy extends CApiService {
 	 *
 	 * @throws APIException
 	 */
-	private static function checkHosts(array $proxies, array $db_proxies = null): void {
+	private static function checkHosts(array $proxies, ?array $db_proxies = null): void {
 		$host_indexes = [];
 
 		foreach ($proxies as $i1 => $proxy) {

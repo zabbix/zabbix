@@ -14,7 +14,7 @@
 **/
 
 
-require_once dirname(__FILE__).'/../common/testMultiselectDialogs.php';
+require_once __DIR__.'/../common/testMultiselectDialogs.php';
 
 /**
  * Test for checking empty multiselects' overlays.
@@ -759,6 +759,9 @@ class testMultiselectsWithoutData extends testMultiselectDialogs {
 	 * Test function for checking the cases where no any item available for creating the entity like trigger, graph, etc.
 	 *
 	 * @dataProvider getCheckEmptyItemsData
+	 *
+	 * TODO: remove ignoreBrowserErrors after DEV-4233
+	 * @ignoreBrowserErrors
 	 */
 	public function testMultiselectsWithoutData_CheckEmptyItems($data) {
 		$context_host = str_contains($data['url'], 'context=host');

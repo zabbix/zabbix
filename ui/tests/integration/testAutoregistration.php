@@ -67,9 +67,9 @@ class testAutoregistration extends CIntegrationTest {
 				$this->assertArrayHasKey('result', $response,
 						'Failed to autoregister host before timeout');
 				$this->assertCount(1, $response['result'],
-						'Failed to autoregister host before timeout');
+						'Failed to autoregister host before timeout, response result: '. json_encode($response['result']));
 				$this->assertArrayHasKey('tags', $response['result'][0],
-						'Failed to autoregister host before timeout');
+						'Failed to autoregister host before timeout: response result: '. json_encode($response['result']));
 
 				$autoregHost = $response['result'][0];
 				$this->assertArrayHasKey('hostid', $autoregHost,
@@ -365,5 +365,4 @@ class testAutoregistration extends CIntegrationTest {
 			['tag' => 'tag1', 'value' => 'value 1']
 		]);
 	}
-
 }

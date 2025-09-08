@@ -35,7 +35,7 @@ class API {
 	 *
 	 * @param CApiWrapper|null $wrapper
 	 */
-	public static function setWrapper(CApiWrapper $wrapper = null) {
+	public static function setWrapper(?CApiWrapper $wrapper = null) {
 		self::$wrapper = $wrapper;
 	}
 
@@ -241,6 +241,13 @@ class API {
 	 */
 	public static function Host() {
 		return self::getApi('host');
+	}
+
+	/**
+	 * @return CHostDashboard
+	 */
+	public static function HostDashboard() {
+		return self::getApi('hostdashboard');
 	}
 
 	/**

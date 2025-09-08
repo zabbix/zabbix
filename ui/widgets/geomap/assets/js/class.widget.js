@@ -236,10 +236,10 @@ class CWidgetGeoMap extends CWidget {
 			hintbox.style.maxHeight = `${node.getBoundingClientRect().top - 27}px`;
 			hintbox.append(this.makePopupContent(cluster.layer.getAllChildMarkers().map(o => o.feature)));
 
-			node.hintBoxItem = hintBox.createBox(e, node, hintbox, '', true);
+			node.hintBoxItem = hintBox.createBox(cluster.originalEvent, node, hintbox, '', true);
 
 			// Adjust hintbox size in case if scrollbar is necessary.
-			hintBox.positionElement(e, node, node.hintBoxItem);
+			hintBox.positionElement(cluster.originalEvent, node, node.hintBoxItem);
 
 			// Center hintbox relative to node.
 			node.hintBoxItem.position({
@@ -270,6 +270,7 @@ class CWidgetGeoMap extends CWidget {
 				if (e.originalEvent.key !== ' ' && e.originalEvent.key !== 'Enter') {
 					return;
 				}
+
 				e.originalEvent.preventDefault();
 			}
 
@@ -278,11 +279,11 @@ class CWidgetGeoMap extends CWidget {
 			hintbox.style.maxHeight = `${node.getBoundingClientRect().top - 27}px`;
 			hintbox.append(this.makePopupContent([e.layer.feature]));
 
-			node.hintBoxItem = hintBox.createBox(e, node, hintbox, '', true);
+			node.hintBoxItem = hintBox.createBox(e.originalEvent, node, hintbox, '', true);
 			e.layer.hintBoxItem = node.hintBoxItem;
 
 			// Adjust hintbox size in case if scrollbar is necessary.
-			hintBox.positionElement(e, node, node.hintBoxItem);
+			hintBox.positionElement(e.originalEvent, node, node.hintBoxItem);
 
 			// Center hintbox relative to node.
 			node.hintBoxItem.position({
@@ -457,26 +458,27 @@ class CWidgetGeoMap extends CWidget {
 		});
 
 		// Transform 'clusterclick' event as 'cluster.click' and 'cluster.dblclick' events.
-		clusters.on('clusterclick clusterkeypress', (c) => {
-			if (c.type === 'clusterkeypress') {
-				if (c.originalEvent.key !== ' ' && c.originalEvent.key !== 'Enter') {
+		clusters.on('clusterclick clusterkeypress', (e) => {
+			if (e.type === 'clusterkeypress') {
+				if (e.originalEvent.key !== ' ' && e.originalEvent.key !== 'Enter') {
 					return;
 				}
-				c.originalEvent.preventDefault();
+
+				e.originalEvent.preventDefault();
 			}
 
 			if ('event_click' in clusters) {
 				clearTimeout(clusters.event_click);
 				delete clusters.event_click;
 				this._map.getContainer().dispatchEvent(
-					new CustomEvent('cluster.dblclick', {detail: c})
+					new CustomEvent('cluster.dblclick', {detail: e})
 				);
 			}
 			else {
 				clusters.event_click = setTimeout(() => {
 					delete clusters.event_click;
 					this._map.getContainer().dispatchEvent(
-						new CustomEvent('cluster.click', {detail: c})
+						new CustomEvent('cluster.click', {detail: e})
 					);
 				}, 300);
 			}

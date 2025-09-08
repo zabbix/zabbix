@@ -123,12 +123,10 @@ function make_event_details(array $event, array $allowed) {
 
 			if ($correlations) {
 				if ($allowed['ui_correlation']) {
-					$correlation_name = (new CLink($correlations[0]['name'],
-						(new CUrl('zabbix.php'))
-							->setArgument('action', 'correlation.edit')
-							->setArgument('correlationid', $correlations[0]['correlationid'])
-							->getUrl()
-					))->addClass(ZBX_STYLE_LINK_ALT);
+					$correlation_name = (new CLink($correlations[0]['name']))
+						->addClass(ZBX_STYLE_LINK_ALT)
+						->addClass('js-correlation_edit')
+						->setAttribute('data-correlationid', $correlations[0]['correlationid']);
 				}
 				else {
 					$correlation_name = $correlations[0]['name'];
@@ -170,7 +168,7 @@ function make_event_details(array $event, array $allowed) {
 	$tags = makeTags([$event]);
 
 	$table
-		->addRow([_('Tags'), $tags[$event['eventid']]])
+		->addRow([_('Tags'), (new CDiv($tags[$event['eventid']]))->addClass(ZBX_STYLE_TAGS_WRAPPER)])
 		->addRow([_('Description'), (new CDiv(zbx_str2links($event['comments'])))->addClass(ZBX_STYLE_WORDBREAK)]);
 
 	if ($event['cause_eventid'] == 0) {
@@ -758,7 +756,7 @@ function makeTags(array $list, bool $html = true, string $key = 'eventid', int $
 				}
 
 				$tags[$element[$key]][] = (new CButtonIcon(ZBX_ICON_MORE))
-					->setHint($hint_content, ZBX_STYLE_HINTBOX_WRAP);
+					->setHint($hint_content, ZBX_STYLE_HINTBOX_WRAP . ' ' . ZBX_STYLE_TAGS_WRAPPER);
 			}
 		}
 		else {

@@ -946,6 +946,26 @@ int	get_value_internal(const zbx_dc_item_t *item, AGENT_RESULT *result, const zb
 
 		SET_UI64_RESULT(result, zbx_preprocessor_get_queue_size());
 	}
+	else if (0 == strcmp(tmp, "preprocessing"))			/* zabbix[preprocessing] */
+	{
+		struct zbx_json	json;
+
+		if (1 != nparams)
+		{
+			SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid number of parameters."));
+			goto out;
+		}
+
+		zbx_json_init(&json, ZBX_JSON_STAT_BUF_LEN);
+		zbx_json_addobject(&json, ZBX_PROTO_TAG_DATA);
+
+		zbx_preprocessor_get_size(&json);
+
+		zbx_json_close(&json);
+		zbx_set_agent_result_type(result, ITEM_VALUE_TYPE_TEXT, json.buffer);
+		zbx_json_free(&json);
+
+	}
 	else if (0 == strcmp(tmp, "discovery_queue"))			/* zabbix[discovery_queue] */
 	{
 		zbx_uint64_t	size;

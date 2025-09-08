@@ -32,8 +32,7 @@ import (
 var impl Plugin
 
 type Options struct {
-	plugin.SystemOptions `conf:"optional"`
-	MaxLinesPerSecond    int `conf:"range=1:1000,default=20"`
+	MaxLinesPerSecond int `conf:"range=1:1000,default=20"`
 }
 
 // Plugin -
@@ -64,7 +63,7 @@ func init() {
 }
 
 func (p *Plugin) Configure(global *plugin.GlobalOptions, options interface{}) {
-	if err := conf.Unmarshal(options, &p.options); err != nil {
+	if err := conf.UnmarshalStrict(options, &p.options); err != nil {
 		p.Warningf("cannot unmarshal configuration options: %s", err)
 	}
 
@@ -73,7 +72,13 @@ func (p *Plugin) Configure(global *plugin.GlobalOptions, options interface{}) {
 
 func (p *Plugin) Validate(options interface{}) error {
 	var o Options
-	return conf.Unmarshal(options, &o)
+
+	err := conf.UnmarshalStrict(options, &o)
+	if err != nil {
+		return errs.Errorf("plugin config validation failed, %s", err.Error())
+	}
+
+	return nil
 }
 
 func (p *Plugin) Export(key string, params []string, ctx plugin.ContextProvider) (result interface{}, err error) {
@@ -117,6 +122,7 @@ func (p *Plugin) Export(key string, params []string, ctx plugin.ContextProvider)
 	logitem := zbxlib.LogItem{Results: make([]*zbxlib.LogResult, 0), Output: ctx.Output()}
 	grxp := ctx.GlobalRegexp().(*glexpr.Bundle)
 	zbxlib.ProcessLogCheck(data.blob, &logitem, nextcheck, grxp.Cblob, ctx.ItemID())
+	runtime.KeepAlive(grxp)
 
 	if len(logitem.Results) != 0 {
 		results := make([]plugin.Result, len(logitem.Results))

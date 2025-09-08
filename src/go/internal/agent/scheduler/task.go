@@ -550,7 +550,7 @@ func (t *configuratorTask) isItemKeyEqual(itemkey string) bool {
 	return false
 }
 
-// commandTask executes remote commands received with active requestes
+// commandTask executes remote commands received with active requests
 type commandTask struct {
 	taskBase
 	id      uint64

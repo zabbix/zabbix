@@ -98,6 +98,7 @@ class CWidgetFieldMultiselect {
 	#is_selected_typed_reference = false;
 
 	constructor({
+		multiselect_id,
 		field_name,
 		field_value,
 		in_type,
@@ -120,7 +121,7 @@ class CWidgetFieldMultiselect {
 			this.#is_multiple = this.#selected_limit != 1;
 		}
 
-		this.#initField();
+		this.#initField(multiselect_id);
 
 		if (CWidgetBase.FOREIGN_REFERENCE_KEY in field_value) {
 			this.#selectTypedReference(field_value[CWidgetBase.FOREIGN_REFERENCE_KEY]);
@@ -142,10 +143,10 @@ class CWidgetFieldMultiselect {
 		}
 	}
 
-	#initField() {
+	#initField(multiselect_id) {
 		const has_optional_sources = this.#widget_accepted && (!this.#default_prevented || this.#dashboard_accepted);
 
-		const $multiselect = jQuery(`#${this.#field_name}${this.#is_multiple ? '_' : ''}`);
+		const $multiselect = jQuery(`#${multiselect_id}`);
 
 		$multiselect[0].dataset.params = JSON.stringify(this.#multiselect_params);
 

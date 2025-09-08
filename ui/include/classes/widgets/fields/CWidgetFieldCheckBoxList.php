@@ -27,7 +27,7 @@ class CWidgetFieldCheckBoxList extends CWidgetField {
 
 	private array $values;
 
-	public function __construct(string $name, string $label = null, array $values = []) {
+	public function __construct(string $name, ?string $label = null, array $values = []) {
 		parent::__construct($name, $label);
 
 		$this->values = $values;

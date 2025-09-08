@@ -79,7 +79,7 @@ class testGraphLinking extends CIntegrationTest {
 		$response = $this->call('action.create', [
 			'name' => 'create_host',
 			'eventsource' => EVENT_SOURCE_AUTOREGISTRATION,
-			'status' => 0,
+			'status' => ACTION_STATUS_ENABLED,
 			'operations' => [
 				[
 					'operationtype' => OPERATION_TYPE_HOST_ADD
@@ -99,7 +99,7 @@ class testGraphLinking extends CIntegrationTest {
 		$response = $this->call('action.create', [
 			'name' => 'link_templates',
 			'eventsource' => EVENT_SOURCE_AUTOREGISTRATION,
-			'status' => 0,
+			'status' => ACTION_STATUS_ENABLED,
 			'operations' => [
 				[
 					'operationtype' => OPERATION_TYPE_TEMPLATE_ADD,
@@ -209,12 +209,12 @@ class testGraphLinking extends CIntegrationTest {
 	public function agentConfigurationProvider() {
 		return [
 			self::COMPONENT_AGENT => [
-				'Hostname'		=>  self::HOST_NAME,
+				'Hostname'	=>	self::HOST_NAME,
 				'ServerActive'	=>
 						'127.0.0.1:'.self::getConfigurationValue(self::COMPONENT_SERVER, 'ListenPort', 10051),
-				'DebugLevel'    => 4,
-				'LogFileSize'   => 0,
-				'PidFile' => PHPUNIT_COMPONENT_DIR.'zabbix_agent.pid'
+				'DebugLevel'	=>	4,
+				'LogFileSize'	=>	0,
+				'PidFile'	=>	PHPUNIT_COMPONENT_DIR.'zabbix_agent.pid'
 			]
 		];
 	}
