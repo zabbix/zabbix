@@ -79,33 +79,7 @@ class CScatterPlotLegend extends CDiv {
 
 	private function draw(): void {
 		foreach ($this->legend_items as $item) {
-			$icon = null;
-
-			switch ($item['marker']) {
-				case CScatterPlotMetricPoint::MARKER_TYPE_ELLIPSIS:
-					$icon = ZBX_ICON_ELLIPSE;
-					break;
-
-				case CScatterPlotMetricPoint::MARKER_TYPE_SQUARE:
-					$icon = ZBX_ICON_SQUARE;
-					break;
-
-				case CScatterPlotMetricPoint::MARKER_TYPE_TRIANGLE:
-					$icon = ZBX_ICON_TRIANGLE;
-					break;
-
-				case CScatterPlotMetricPoint::MARKER_TYPE_DIAMOND:
-					$icon = ZBX_ICON_DIAMOND;
-					break;
-
-				case CScatterPlotMetricPoint::MARKER_TYPE_STAR:
-					$icon = ZBX_ICON_STAR_FILLED;
-					break;
-
-				case CScatterPlotMetricPoint::MARKER_TYPE_CROSS:
-					$icon = ZBX_ICON_CROSS;
-					break;
-			}
+			$icon = CScatterPlotMetricPoint::MARKER_ICONS[$item['marker']];
 
 			$this->addItem(
 				(new CDiv([

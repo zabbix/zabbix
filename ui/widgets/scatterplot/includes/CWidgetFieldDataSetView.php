@@ -409,6 +409,13 @@ class CWidgetFieldDataSetView extends CWidgetFieldView {
 			$override_host_html[] = new CScriptTag($override_host_field_view->getJavaScript());
 		}
 
+		$marker_radio = (new CRadioButtonList($field_name.'['.$row_num.'][marker]', (int) $value['marker']))
+			->setId($field_name.'_'.$row_num.'_marker');
+
+		foreach (CScatterPlotMetricPoint::MARKER_ICONS as $marker_type => $icon) {
+			$marker_radio->addValue(new CIcon($icon), $marker_type);
+		}
+
 		return (new CListItem([
 			(new CDiv())
 				->addClass(ZBX_STYLE_DRAG_ICON)
@@ -429,29 +436,7 @@ class CWidgetFieldDataSetView extends CWidgetFieldView {
 						->addItem([
 							new CLabel(_('Marker'), $field_name.'_'.$row_num.'_marker'),
 							(new CDiv([
-								new CFormField(
-									(new CRadioButtonList($field_name.'['.$row_num.'][marker]', (int) $value['marker']))
-										->setId($field_name.'_'.$row_num.'_marker')
-										->addValue(new CIcon(ZBX_ICON_ELLIPSE),
-											CScatterPlotMetricPoint::MARKER_TYPE_ELLIPSIS
-										)
-										->addValue(new CIcon(ZBX_ICON_SQUARE),
-											CScatterPlotMetricPoint::MARKER_TYPE_SQUARE
-										)
-										->addValue(new CIcon(ZBX_ICON_TRIANGLE),
-											CScatterPlotMetricPoint::MARKER_TYPE_TRIANGLE
-										)
-										->addValue(new CIcon(ZBX_ICON_DIAMOND),
-											CScatterPlotMetricPoint::MARKER_TYPE_DIAMOND
-										)
-										->addValue(new CIcon(ZBX_ICON_STAR_FILLED),
-											CScatterPlotMetricPoint::MARKER_TYPE_STAR
-										)
-										->addValue(new CIcon(ZBX_ICON_CROSS),
-											CScatterPlotMetricPoint::MARKER_TYPE_CROSS
-										)
-										->setModern()
-								),
+								new CFormField($marker_radio),
 								(new CDiv([
 									new CLabel(_('Marker size'), $field_name.'_'.$row_num.'_marker_size'),
 									new CFormField(

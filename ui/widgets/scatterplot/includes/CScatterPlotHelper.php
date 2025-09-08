@@ -18,6 +18,7 @@ namespace Widgets\ScatterPlot\Includes;
 
 use API,
 	CArrayHelper,
+	CColorHelper,
 	CColorPicker,
 	CHousekeepingHelper,
 	CItemHelper,
@@ -25,7 +26,7 @@ use API,
 	CParser,
 	CSimpleIntervalParser,
 	Exception,
-	Manager;
+	Manager;;
 
 /**
  * Class calculates graph data and makes Scatter plot graph.
@@ -37,14 +38,18 @@ class CScatterPlotHelper
 	 * Calculate graph data and draw Scatter plot graph based on given graph configuration.
 	 *
 	 * @param array $options  Options for graph.
-	 *                        array  $options['data_sets']        Graph data set options.
-	 *                        int    $options['data_source']      Data source of graph.
-	 *                        array  $options['time_period']      Graph time period used.
-	 *                        bool   $options['fix_time_period']  Whether to keep time period fixed.
-	 *                        array  $options['y_axis']           Options for graph Y axis.
-	 *                        array  $options['x_axis']           Options for graph X axis.
-	 *                        array  $options['legend']           Options for graph legend.
-	 *                        int    $options['legend_lines']     Number of lines in the legend.
+	 *                        array   $options['data_sets']           Graph data set options.
+	 *                        string  $options['templateid']          Template id used by the graph.
+	 *                        string  $options['override_hostid']     Host id used for overriding hosts.
+	 *                        int     $options['data_source']         Data source of graph.
+	 *                        array   $options['time_period']         Graph time period used.
+	 *                        bool    $options['fix_time_period']     Whether to keep time period fixed.
+	 *                        array   $options['axes']                Options for graph X and Y axis.
+	 *                        array   $options['grouped_thresholds']  Thresholds used by graph to modify the color
+	 *                                                                based on the value of the metric.
+	 *                        bool    $options['interpolation']       Apply interpolation to threshold color.
+	 *                        array   $options['legend']              Options for graph legend.
+	 *                        int     $options['legend_lines']        Number of lines in the legend.
 	 *
 	 * @param int   $width
 	 * @param int   $height
@@ -61,6 +66,7 @@ class CScatterPlotHelper
 		self::getMetricsPattern($metrics, $options['data_sets'], $options['templateid'], $options['override_hostid']);
 		self::getMetricsItems($metrics, $options['data_sets'], $options['templateid'], $options['override_hostid']);
 		self::sortByDataset($metrics);
+		self::setMetricNames($metrics);
 		self::applyUnits($metrics, $options['axes']);
 		// Apply time periods for each $metric, based on graph/dashboard time as well as metric level time shifts.
 		self::getTimePeriods($metrics, $options['time_period']);
@@ -448,7 +454,9 @@ class CScatterPlotHelper
 					foreach (['x_axis_items', 'y_axis_items'] as $axis) {
 						foreach ($metric[$axis] as &$item) {
 							if ($item['trends'] != 0) {
-								$item['trends'] = timeUnitToSeconds(CHousekeepingHelper::get(CHousekeepingHelper::HK_TRENDS));
+								$item['trends'] = timeUnitToSeconds(
+									CHousekeepingHelper::get(CHousekeepingHelper::HK_TRENDS)
+								);
 							}
 						}
 						unset($item);
@@ -460,23 +468,16 @@ class CScatterPlotHelper
 				$to_resolve[] = 'trends';
 			}
 
-			// If no global history and trend override enabled, resolve 'history' and/or 'trends' values for given $metric.
+			// If no global history and trend override enabled, resolve 'history' and/or 'trends' values for given
+			// $metric.
 			if ($to_resolve) {
-				foreach ($metrics as &$metric) {
-					foreach (['x_axis_items', 'y_axis_items'] as $axis) {
-						foreach ($metric[$axis] as &$item) {
-							[$item] = CMacrosResolverHelper::resolveTimeUnitMacros([$item], $to_resolve);
-						}
-						unset($item);
-					}
-				}
-				unset($metric);
-
 				$simple_interval_parser = new CSimpleIntervalParser();
 
 				foreach ($metrics as &$metric) {
 					foreach (['x_axis_items', 'y_axis_items'] as $axis) {
 						foreach ($metric[$axis] as $num => &$item) {
+							[$item] = CMacrosResolverHelper::resolveTimeUnitMacros([$item], $to_resolve);
+
 							// Convert its values to seconds.
 							if (!CHousekeepingHelper::get(CHousekeepingHelper::HK_HISTORY_GLOBAL)) {
 								if ($simple_interval_parser->parse($item['history']) != CParser::PARSE_SUCCESS) {
@@ -514,8 +515,8 @@ class CScatterPlotHelper
 						/**
 						 * History as a data source is used in 2 cases:
 						 * 1) if trends are disabled (set to 0) either for particular $metric item or globally;
-						 * 2) if period for requested data is newer than the period of keeping history for particular $metric
-						 *    item.
+						 * 2) if period for requested data is newer than the period of keeping history for particular
+						 * $metric item.
 						 *
 						 * Use trends otherwise.
 						 */
@@ -526,18 +527,19 @@ class CScatterPlotHelper
 
 						$item['source'] = ($trends == 0 || (time() - $history < $time_from
 								&& $period / $width <= ZBX_MAX_TREND_DIFF / ZBX_GRAPH_MAX_SKIP_CELL))
-							? SVG_GRAPH_DATA_SOURCE_HISTORY
-							: SVG_GRAPH_DATA_SOURCE_TRENDS;
+							? 'history'
+							: 'trends';
 					}
 					unset($item);
 				}
 			}
+			unset($metric);
 		}
 		else {
 			foreach ($metrics as &$metric) {
 				foreach (['x_axis_items', 'y_axis_items'] as $axis) {
 					foreach ($metric[$axis] as &$item) {
-						$item['source'] = $data_source;
+						$item['source'] = $data_source == SVG_GRAPH_DATA_SOURCE_HISTORY ? 'history' : 'trends';
 					}
 					unset($item);
 				}
@@ -548,10 +550,9 @@ class CScatterPlotHelper
 	}
 
 	/**
-	 * Select aggregated data to show in scatter plot for each metric and adjust color base on the thresholds.
+	 * Set metric names from X axis and Y axis items and aggregation function used.
 	 */
-	private static function getMetricsAggregatedData(array &$metrics, int $width, array $grouped_thresholds,
-			bool $interpolation): void {
+	private static function setMetricNames(array &$metrics): void {
 		foreach ($metrics as &$metric) {
 			$aggregation_name = CItemHelper::getAggregateFunctionName($metric['options']['aggregate_function']);
 
@@ -567,8 +568,6 @@ class CScatterPlotHelper
 
 					$name .= $item['hosts'][0]['name'].NAME_DELIMITER.$item['name'];
 
-					$item['source'] = ($item['source'] == SVG_GRAPH_DATA_SOURCE_HISTORY) ? 'history' : 'trends';
-
 					$count++;
 				}
 				unset($item);
@@ -578,7 +577,13 @@ class CScatterPlotHelper
 			}
 		}
 		unset($metric);
+	}
 
+	/**
+	 * Select aggregated data to show in scatter plot for each metric and adjust color base on the thresholds.
+	 */
+	private static function getMetricsAggregatedData(array &$metrics, int $width, array $grouped_thresholds,
+			bool $interpolation): void {
 		foreach ($metrics as &$metric) {
 			$aggregate_interval = timeUnitToSeconds($metric['options']['aggregate_interval'], true);
 
@@ -668,9 +673,8 @@ class CScatterPlotHelper
 					case AGGREGATE_FIRST:
 					case AGGREGATE_LAST:
 						foreach ($metric_points as $tick => $points) {
-							usort($points,
-								static fn(array $point_a, array $point_b): int => [$point_a['clock'], $point_a['ns']] <=> [$point_b['clock'], $point_b['ns']]
-							);
+							usort($points, static fn(array $point_a, array $point_b): int =>
+								[$point_a['clock'], $point_a['ns']] <=> [$point_b['clock'], $point_b['ns']]);
 
 							$point = $metric['options']['aggregate_function'] == AGGREGATE_FIRST
 								? $points[0]
@@ -760,7 +764,7 @@ class CScatterPlotHelper
 
 			$position = self::calculateInterpolationPosition($prev_threshold, $current_threshold, $value_x, $value_y);
 
-			return interpolateColor($prev['color'], $current['color'], $position);
+			return CColorHelper::interpolateColor($prev['color'], $current['color'], $position);
 		}
 
 		return $prev['color'];

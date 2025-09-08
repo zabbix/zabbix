@@ -45,6 +45,15 @@ class CScatterPlotMetricPoint extends CSvgGroup {
 	public const MARKER_TYPE_STAR = 4;
 	public const MARKER_TYPE_CROSS = 5;
 
+	public const MARKER_ICONS = [
+		self::MARKER_TYPE_ELLIPSIS => ZBX_ICON_ELLIPSE,
+		self::MARKER_TYPE_SQUARE => ZBX_ICON_SQUARE,
+		self::MARKER_TYPE_TRIANGLE => ZBX_ICON_TRIANGLE,
+		self::MARKER_TYPE_DIAMOND => ZBX_ICON_DIAMOND,
+		self::MARKER_TYPE_STAR => ZBX_ICON_STAR_FILLED,
+		self::MARKER_TYPE_CROSS => ZBX_ICON_CROSS
+	];
+
 	private const ZBX_STYLE_CLASS = 'svg-graph-points';
 
 	private ?array $point;
@@ -160,7 +169,7 @@ class CScatterPlotMetricPoint extends CSvgGroup {
 					->setAttribute('color', $this->point[4])
 					->setAttribute('time_from', $this->point[5])
 					->setAttribute('time_to', $this->point[6])
-					->setAttribute('marker', $this->options['marker'])
+					->setAttribute('marker_class', self::MARKER_ICONS[$this->options['marker']])
 					->addItem($point)
 			);
 		}
