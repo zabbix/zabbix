@@ -127,17 +127,17 @@ class СScatterPlot extends CSvg {
 
 		$this->time_from = $options['time_period']['time_from'];
 
-		$this->show_y_axis = $options['axes']['show_y_axis'];
-		$this->y_min = $options['axes']['y_axis_min'];
-		$this->y_max = $options['axes']['y_axis_max'];
-		$this->y_units = $options['axes']['y_axis_units'] !== null
-			? trim(preg_replace('/\s+/', ' ', $options['axes']['y_axis_units']))
-			: null;
-
 		$this->show_x_axis = $options['axes']['show_x_axis'];
 		$this->x_min = $options['axes']['x_axis_min'];
 		$this->x_max = $options['axes']['x_axis_max'];
 		$this->x_units = $options['axes']['x_axis_units'] !== null
+			? trim(preg_replace('/\s+/', ' ', $options['axes']['x_axis_units']))
+			: null;
+
+		$this->show_y_axis = $options['axes']['show_y_axis'];
+		$this->y_min = $options['axes']['y_axis_min'];
+		$this->y_max = $options['axes']['y_axis_max'];
+		$this->y_units = $options['axes']['y_axis_units'] !== null
 			? trim(preg_replace('/\s+/', ' ', $options['axes']['y_axis_units']))
 			: null;
 
@@ -168,6 +168,8 @@ class СScatterPlot extends CSvg {
 				'y_axis_name' => $metric['y_axis_items_name'],
 				'x_axis_items' => $metric['x_axis_items'],
 				'y_axis_items' => $metric['y_axis_items'],
+				'x_units' => $metric['x_units'],
+				'y_units' => $metric['y_units'],
 				'options' => ['order' => $index] + $metric['options'],
 			];
 
@@ -178,20 +180,6 @@ class СScatterPlot extends CSvg {
 			$this->metrics[$index]['points'] = $metric['points'];
 			$this->points[$index] = $metric['points'];
 		}
-
-		return $this;
-	}
-
-	/**
-	 * Add UI selection box element to graph.
-	 *
-	 * @return self
-	 */
-	public function addSBox(): self {
-		$this->addItem([
-			(new CSvgRect(0, 0, 0, 0))->addClass('svg-graph-selection'),
-			(new CSvgText(''))->addClass('svg-graph-selection-text')
-		]);
 
 		return $this;
 	}
@@ -288,27 +276,20 @@ class СScatterPlot extends CSvg {
 		// Determine units for x axis.
 
 		if ($this->x_units === null) {
-			$this->x_units = reset(reset($this->metrics)['x_axis_items'])['units'];
+			$this->x_units = reset($this->metrics)['x_units'];
 		}
 
 		// Determine units for y axis.
 
 		if ($this->y_units === null) {
-			$this->y_units = reset(reset($this->metrics)['y_axis_items'])['units'];
+			$this->y_units = reset($this->metrics)['y_units'];
 		}
 
-		$this->y_min_calculated = $this->y_min === null;
-		$this->y_max_calculated = $this->y_max === null;
 		$this->x_min_calculated = $this->x_min === null;
 		$this->x_max_calculated = $this->x_max === null;
 
-		if ($this->y_min_calculated) {
-			$this->y_min = $this->y_min_value ?: 0;
-		}
-
-		if ($this->y_max_calculated) {
-			$this->y_max = $this->y_max_value ?: 1;
-		}
+		$this->y_min_calculated = $this->y_min === null;
+		$this->y_max_calculated = $this->y_max === null;
 
 		if ($this->x_min_calculated) {
 			$this->x_min = $this->x_min_value ?: 0;
@@ -318,6 +299,15 @@ class СScatterPlot extends CSvg {
 			$this->x_max = $this->x_max_value ?: 1;
 		}
 
+		if ($this->y_min_calculated) {
+			$this->y_min = $this->y_min_value ?: 0;
+		}
+
+		if ($this->y_max_calculated) {
+			$this->y_max = $this->y_max_value ?: 1;
+		}
+
+		// Calculate scale extremes for Y axis
 		$calc_power = $this->y_units === '' || $this->y_units[0] !== '!';
 
 		$rows_min = (int) max(1, floor($this->canvas_height / $this->cell_height_min / 1.5));
@@ -351,6 +341,7 @@ class СScatterPlot extends CSvg {
 			}
 		}
 
+		// Calculate scale extremes for X axis
 		$calc_power = $this->x_units === '' || $this->x_units[0] !== '!';
 
 		$this->canvas_width = max(0, $this->width - $this->offset_left - $this->offset_right);
@@ -462,22 +453,16 @@ class СScatterPlot extends CSvg {
 	 * @throws Exception
 	 */
 	private function drawGrid(): void {
-		$time_points = $this->show_x_axis ? $this->getValuesGridWithPosition(GRAPH_YAXIS_SIDE_BOTTOM, !$this->points) : [];
+		$x_points = $this->show_x_axis ? $this->getValuesGridWithPosition(GRAPH_YAXIS_SIDE_BOTTOM, !$this->points) : [];
 
-		$value_points = [];
+		$y_points = [];
 
 		if ($this->show_y_axis) {
-			$value_points = $this->getValuesGridWithPosition(GRAPH_YAXIS_SIDE_LEFT, !$this->points);
-
-			unset($time_points[0]);
-		}
-
-		if ($this->show_x_axis) {
-			unset($value_points[0]);
+			$y_points = $this->getValuesGridWithPosition(GRAPH_YAXIS_SIDE_LEFT, !$this->points);
 		}
 
 		$this->addItem(
-			(new CSvgGraphGrid($value_points, $time_points))
+			(new CSvgGraphGrid($y_points, $x_points))
 				->setPosition($this->canvas_x, $this->canvas_y)
 				->setSize($this->canvas_width, $this->canvas_height)
 				->setColor('#'.$this->graph_theme['gridcolor'])
@@ -490,6 +475,7 @@ class СScatterPlot extends CSvg {
 		}
 
 		$grid_values = $this->getValuesGridWithPosition(GRAPH_YAXIS_SIDE_LEFT, !$this->points);
+
 		$this->addItem(
 			(new CSvgGraphAxis($grid_values, GRAPH_YAXIS_SIDE_LEFT))
 				->setPosition($this->canvas_x - $this->offset_left, $this->canvas_y)
@@ -507,10 +493,10 @@ class СScatterPlot extends CSvg {
 			return;
 		}
 
+		$grid_values = $this->getValuesGridWithPosition(GRAPH_YAXIS_SIDE_BOTTOM, !$this->points);
+
 		$this->addItem(
-			(new CSvgGraphAxis($this->getValuesGridWithPosition(GRAPH_YAXIS_SIDE_BOTTOM, !$this->points),
-				GRAPH_YAXIS_SIDE_BOTTOM)
-			)
+			(new CSvgGraphAxis($grid_values,GRAPH_YAXIS_SIDE_BOTTOM))
 				->setPosition($this->canvas_x, $this->canvas_y + $this->canvas_height)
 				->setSize($this->canvas_width, $this->xaxis_height)
 				->setLineColor('#'.$this->graph_theme['gridcolor'])
@@ -522,7 +508,7 @@ class СScatterPlot extends CSvg {
 		foreach ($this->metrics as $index => $metric) {
 			if (array_key_exists($index, $this->paths)) {
 				foreach ($this->paths[$index] as $key => $path) {
-					$this->addItem(new CScatterPlotMetricPoint($path, $metric + ['order' => $index, 'key' => $key]));
+					$this->addItem(new CScatterPlotMetricPoint($path, $metric + ['key' => $key]));
 				}
 			}
 		}

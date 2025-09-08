@@ -382,13 +382,13 @@ class CScatterPlotHelper
 	 */
 	private static function applyUnits(array &$metrics, array $axis_options): void {
 		foreach ($metrics as &$metric) {
-			if ($axis_options['x_axis_units'] !== null) {
-				$metric['units'] = trim(preg_replace('/\s+/', ' ', $axis_options['left_y_units']));
-			}
+			$metric['x_units'] = $axis_options['x_axis_units'] !== null
+				? trim(preg_replace('/\s+/', ' ', $axis_options['x_axis_units']))
+				: reset($metric['x_axis_items'])['units'];
 
-			if ($axis_options['y_axis_units'] !== null) {
-				$metric['units'] = trim(preg_replace('/\s+/', ' ', $axis_options['right_y_units']));
-			}
+			$metric['y_units'] = $axis_options['y_axis_units'] !== null
+				? trim(preg_replace('/\s+/', ' ', $axis_options['y_axis_units']))
+				: reset($metric['y_axis_items'])['units'];
 		}
 		unset($metric);
 	}
@@ -660,7 +660,11 @@ class CScatterPlotHelper
 					case AGGREGATE_COUNT:
 					case AGGREGATE_SUM:
 						foreach ($metric_points as $tick => $points) {
-							$metric['points'][$tick][$key] = array_sum(array_column($points, 'value'));
+							$value = array_sum(array_column($points, 'value'));
+
+							if ($metric['options']['aggregate_function'] == AGGREGATE_SUM || $value !== 0) {
+								$metric['points'][$tick][$key] = $value;
+							}
 						}
 						break;
 
@@ -681,13 +685,11 @@ class CScatterPlotHelper
 				}
 			}
 
-			$x_units = reset($metric['x_axis_items'])['units'];
-			$y_units = reset($metric['y_axis_items'])['units'];
-
 			foreach ($metric['points'] as $tick => &$point) {
 				if (array_key_exists('x_axis',$point) && array_key_exists('y_axis', $point)) {
 					$point['color'] = self::calculatePointColorByThresholds($metric['options']['color'],
-						$point['x_axis'], $point['y_axis'], $x_units, $y_units, $grouped_thresholds, $interpolation
+						$point['x_axis'], $point['y_axis'], $metric['x_units'], $metric['y_units'], $grouped_thresholds,
+						$interpolation
 					);
 				}
 				else {
@@ -697,11 +699,8 @@ class CScatterPlotHelper
 			unset($point);
 
 			ksort($metric['points'], SORT_NUMERIC);
-
-			if (!$metric['points']) {
-				unset($metric);
-			}
 		}
+		unset($metric);
 	}
 
 	private static function calculatePointColorByThresholds(string $color, $value_x, $value_y, string $units_x,

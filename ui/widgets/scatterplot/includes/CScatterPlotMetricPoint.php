@@ -56,13 +56,13 @@ class CScatterPlotMetricPoint extends CSvgGroup {
 	public function __construct(array $point, array $metric) {
 		parent::__construct();
 
-		$this->point = $point ? : null;
+		$this->point = $point;
 		$this->item_x_name = $metric['x_axis_name'];
 		$this->item_y_name = $metric['y_axis_name'];
 
 		$this->options = $metric['options'] + [
 			'color' => CSvgGraph::SVG_GRAPH_DEFAULT_COLOR,
-			'order' => $metric['order'],
+			'order' => 1,
 			'key' => $metric['key']
 		];
 	}
@@ -84,11 +84,7 @@ class CScatterPlotMetricPoint extends CSvgGroup {
 	}
 
 	protected function draw(): void {
-		if ($this->point === null) {
-			return;
-		}
-
-		$empty_group = (new CSvgGroup())
+		$highlight_point_group = (new CSvgGroup())
 			->setAttribute('transform', 'translate('.self::X_OUT_OF_RANGE.', '.self::Y_OUT_OF_RANGE.')')
 			->addClass('js-svg-highlight-group');
 
@@ -101,7 +97,7 @@ class CScatterPlotMetricPoint extends CSvgGroup {
 
 		switch ($this->options['marker']) {
 			case self::MARKER_TYPE_ELLIPSIS:
-				$empty_group->addItem(
+				$highlight_point_group->addItem(
 					(new CSvgCircle(0, 0, $size + 4))->addClass(CSvgTag::ZBX_STYLE_GRAPH_HIGHLIGHTED_VALUE)
 				);
 
@@ -111,7 +107,7 @@ class CScatterPlotMetricPoint extends CSvgGroup {
 
 			case self::MARKER_TYPE_SQUARE:
 				$empty_coordinated = 0 - ($size + 4) / 2;
-				$empty_group->addItem(
+				$highlight_point_group->addItem(
 					(new CSvgRect($empty_coordinated, $empty_coordinated, $size + 4, $size + 4))
 						->addClass(CSvgTag::ZBX_STYLE_GRAPH_HIGHLIGHTED_VALUE)
 				);
@@ -123,7 +119,7 @@ class CScatterPlotMetricPoint extends CSvgGroup {
 				break;
 
 			case self::MARKER_TYPE_TRIANGLE:
-				$empty_group->addItem(
+				$highlight_point_group->addItem(
 					(new CSvgTriangle(0, 0, $size + 4, $size + 4))->addClass(CSvgTag::ZBX_STYLE_GRAPH_HIGHLIGHTED_VALUE)
 				);
 
@@ -131,7 +127,7 @@ class CScatterPlotMetricPoint extends CSvgGroup {
 				break;
 
 			case self::MARKER_TYPE_DIAMOND:
-				$empty_group->addItem(
+				$highlight_point_group->addItem(
 					(new CSvgDiamond(0, 0, $size + 4))->addClass(CSvgTag::ZBX_STYLE_GRAPH_HIGHLIGHTED_VALUE)
 				);
 
@@ -139,14 +135,14 @@ class CScatterPlotMetricPoint extends CSvgGroup {
 				break;
 
 			case self::MARKER_TYPE_STAR:
-				$empty_group->addItem(
+				$highlight_point_group->addItem(
 					(new CSvgStar(0, 0, $size + 4))->addClass(CSvgTag::ZBX_STYLE_GRAPH_HIGHLIGHTED_VALUE)
 				);
 
 				$point = new CSvgStar(0, 0, $size);
 				break;
 			case self::MARKER_TYPE_CROSS:
-				$empty_group->addItem(
+				$highlight_point_group->addItem(
 					(new CSvgCross(0, 0, $size + 4))->addClass(CSvgTag::ZBX_STYLE_GRAPH_HIGHLIGHTED_VALUE)
 				);
 
@@ -155,7 +151,7 @@ class CScatterPlotMetricPoint extends CSvgGroup {
 		}
 
 		if ($point !== null) {
-			$this->addItem($empty_group);
+			$this->addItem($highlight_point_group);
 			$this->addItem(
 				$point_group
 					->addClass('metric-point')
