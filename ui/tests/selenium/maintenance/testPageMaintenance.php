@@ -489,7 +489,7 @@ class testPageMaintenance extends CWebTest {
 
 		// Fill filter fields if such present in data provider.
 		$form->fill(CTestArrayHelper::get($data, 'filter'));
-		$form->submit();
+		$form->submit()->waitUntilStalled();
 		$this->page->waitUntilReady();
 
 		// Check that expected maintenances are returned in the list.
