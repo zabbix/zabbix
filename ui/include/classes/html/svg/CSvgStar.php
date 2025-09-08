@@ -15,6 +15,7 @@
 
 
 class CSvgStar extends CSvgPolygon {
+
 	public function __construct($x, $y, $size, $points_count = 5)
 	{
 		$radius_outer = $size / 2;          // star fits in size × size
