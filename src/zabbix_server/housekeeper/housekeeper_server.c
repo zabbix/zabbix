@@ -30,6 +30,7 @@
 #include "zbxdb.h"
 #include "zbxipcservice.h"
 #include "zbxstr.h"
+#include "trigger_housekeeper.h"
 
 #ifdef HAVE_POSTGRESQL
 #include "zbxjson.h"
@@ -1071,8 +1072,19 @@ static int	housekeeping_cleanup(int config_max_hk_delete)
 
 			if (0 == strcmp(row[2], "triggerid"))
 			{
+				char	query[MAX_STRING_LEN];
+
 				deleted += hk_problem_cleanup(table_name, EVENT_SOURCE_INTERNAL, EVENT_OBJECT_TRIGGER,
 						objectid, config_max_hk_delete, &more);
+
+				zbx_snprintf(query, sizeof(query), "select eventid"
+						" from events"
+						" where source=%d"
+							" and object=%d"
+							" and objectid=" ZBX_FS_UI64,
+						EVENT_SOURCE_TRIGGERS, EVENT_OBJECT_TRIGGER, objectid);
+
+				deleted += zbx_housekeep_problems_events(query, config_max_hk_delete, &more);
 			}
 			else if (0 == strcmp(row[2], "itemid"))
 			{

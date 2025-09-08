@@ -2563,6 +2563,18 @@ static void	process_internal_events_without_actions(zbx_vector_ptr_t *internal_p
 
 /******************************************************************************
  *                                                                            *
+ * Purpose: frees cached problem event                                        *
+ *                                                                            *
+ ******************************************************************************/
+static void	event_problem_free(zbx_event_problem_t *problem)
+{
+	zbx_vector_tags_ptr_clear_ext(&problem->tags, zbx_free_tag);
+	zbx_vector_tags_ptr_destroy(&problem->tags);
+	zbx_free(problem);
+}
+
+/******************************************************************************
+ *                                                                            *
  * Purpose: gets open problems created by the specified triggers              *
  *                                                                            *
  * Parameters: triggerids - [IN] trigger identifiers (sorted)                 *
@@ -2604,10 +2616,25 @@ static void	get_open_problems(const zbx_vector_uint64_t *triggerids, zbx_vector_
 	}
 	zbx_db_free_result(result);
 
+	zbx_vector_uint64_sort(&eventids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
+	/* make sure that problem and problem event is not deleted during recovery */
+	zbx_db_lock_ids("problem", "eventid", &eventids);
+
+	for (int i = 0; i < problems->values_num && eventids.values_num != problems->values_num; i++)
+	{
+		problem = (zbx_event_problem_t *)problems->values[i];
+	
+		if (SUCCEED == zbx_vector_uint64_bsearch(&eventids, problem->eventid, ZBX_DEFAULT_UINT64_COMPARE_FUNC))
+			continue;
+
+		event_problem_free(problem);
+		zbx_vector_ptr_remove(problems, i);
+		i--;
+	}
+
 	if (0 != problems->values_num)
 	{
 		zbx_vector_ptr_sort(problems, ZBX_DEFAULT_UINT64_PTR_COMPARE_FUNC);
-		zbx_vector_uint64_sort(&eventids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
 
 		sql_offset = 0;
 		zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, "select eventid,tag,value from problem_tag where");
@@ -2638,18 +2665,6 @@ static void	get_open_problems(const zbx_vector_uint64_t *triggerids, zbx_vector_
 	zbx_free(sql);
 
 	zbx_vector_uint64_destroy(&eventids);
-}
-
-/******************************************************************************
- *                                                                            *
- * Purpose: frees cached problem event                                        *
- *                                                                            *
- ******************************************************************************/
-static void	event_problem_free(zbx_event_problem_t *problem)
-{
-	zbx_vector_tags_ptr_clear_ext(&problem->tags, zbx_free_tag);
-	zbx_vector_tags_ptr_destroy(&problem->tags);
-	zbx_free(problem);
 }
 
 /******************************************************************************
@@ -3122,7 +3137,7 @@ int	zbx_close_problem(zbx_uint64_t triggerid, zbx_uint64_t eventid, zbx_uint64_t
 	zbx_dc_trigger_t	trigger;
 	int			errcode, processed_num = 0;
 	zbx_timespec_t		ts;
-	zbx_db_event		*r_event;
+	zbx_db_event		*r_event = NULL;
 
 	zbx_dc_config_get_triggers_by_triggerids(&trigger, &triggerid, &errcode, 1);
 
@@ -3142,17 +3157,26 @@ int	zbx_close_problem(zbx_uint64_t triggerid, zbx_uint64_t eventid, zbx_uint64_t
 
 		zbx_db_begin();
 
-		r_event = close_trigger_event(eventid, triggerid, &ts, userid, 0, 0, trigger.description,
+		zbx_db_result_t	result = zbx_db_select("select null from problem where eventid=" ZBX_FS_UI64
+				" and r_eventid is null" ZBX_FOR_UPDATE, eventid);
+
+		/* check if the task hasn't been already closed by another process */
+		if (NULL != zbx_db_fetch(result))
+		{
+			r_event = close_trigger_event(eventid, triggerid, &ts, userid, 0, 0, trigger.description,
 				trigger.expression, trigger.recovery_expression, trigger.priority,
 				trigger.type, trigger.opdata, trigger.event_name);
 
-		r_event->eventid = zbx_db_get_maxid_num("events", 1);
+			r_event->eventid = zbx_db_get_maxid_num("events", 1);
 
-		processed_num = flush_events(&escalations);
-		update_trigger_changes(&trigger_diff);
-		zbx_db_save_trigger_changes(&trigger_diff);
+			processed_num = flush_events(&escalations);
+			update_trigger_changes(&trigger_diff);
+			zbx_db_save_trigger_changes(&trigger_diff);
 
-		if (ZBX_DB_OK == zbx_db_commit())
+		}
+		zbx_db_free_result(result);
+	
+		if (ZBX_DB_OK == zbx_db_commit() && NULL != r_event)
 		{
 			int				event_export_enabled;
 			zbx_vector_connector_filter_t	connector_filters_events;

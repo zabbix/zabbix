@@ -12,6 +12,7 @@
 ** If not, see <https://www.gnu.org/licenses/>.
 **/
 
+#include "trigger_housekeeper.h"
 #include "housekeeper_server.h"
 
 #include "zbxtimekeeper.h"
@@ -45,69 +46,128 @@ static void	housekeep_service_problems(const zbx_vector_uint64_t *eventids)
 	zbx_free(data);
 }
 
-static int	housekeep_problems_without_triggers(void)
+static int	housekeep_problems_events(zbx_vector_uint64_t *eventids)
 {
+	char			*sql = NULL;
+	size_t			sql_alloc = 0, sql_offset = 0;
+	int			offset = 0;
+	zbx_vector_uint64_t	r_eventids;
+
+	zbx_vector_uint64_create(&r_eventids);
+
+	while (offset < eventids->values_num)
+	{
+		const zbx_uint64_t	*eventids_offset = eventids->values + offset;
+		int			count = MIN(ZBX_DB_LARGE_QUERY_BATCH_SIZE, eventids->values_num - offset);
+
+		offset += count;
+
+		sql_offset = 0;
+		zbx_db_add_condition_alloc(&sql, &sql_alloc, &sql_offset, "cause_eventid", eventids_offset, count);
+
+		if (ZBX_DB_OK > zbx_db_execute("update problem set cause_eventid=null where%s", sql))
+			continue;
+
+		if (ZBX_DB_OK > zbx_db_execute("delete from event_symptom where%s", sql))
+			continue;
+
+		sql_offset = 0;
+		zbx_db_add_condition_alloc(&sql, &sql_alloc, &sql_offset, "eventid", eventids_offset, count);
+
+		zbx_db_begin();
+
+		zbx_db_execute("delete from problem where%s", sql);
+
+		zbx_db_result_t	result;
+		zbx_db_row_t	row;
+
+		result = zbx_db_select("select r_eventid from event_recovery where%s", sql);
+
+		while (NULL != (row = zbx_db_fetch(result)))
+		{
+			zbx_uint64_t	r_eventid;
+
+			ZBX_STR2UINT64(r_eventid, row[0]);
+			zbx_vector_uint64_append(&r_eventids, r_eventid);
+		}
+		zbx_db_free_result(result);
+
+		zbx_db_execute("delete from event_recovery where%s", sql);
+		zbx_db_execute("delete from events where%s", sql);
+
+		if (0 != r_eventids.values_num)
+		{
+			sql_offset = 0;
+			zbx_db_add_condition_alloc(&sql, &sql_alloc, &sql_offset, "eventid", r_eventids.values,
+					r_eventids.values_num);
+			zbx_db_execute("delete from events where%s", sql);
+		}
+
+		if (ZBX_DB_OK != zbx_db_commit())
+			zabbix_log(LOG_LEVEL_WARNING, "Failed to delete a problems without a trigger");
+
+		zbx_vector_uint64_clear(&r_eventids);
+	}
+
+	zbx_vector_uint64_destroy(&r_eventids);
+
+	housekeep_service_problems(eventids);
+
+	return offset;
+}
+
+int	zbx_housekeep_problems_events(const char *query, int config_max_hk_delete, int *more)
+{
+	zbx_vector_uint64_t	eventids;
+	int			deleted = 0;
 	zbx_db_result_t		result;
 	zbx_db_row_t		row;
-	zbx_vector_uint64_t	ids;
-	int			deleted = 0;
 
-	zbx_vector_uint64_create(&ids);
+	zbx_vector_uint64_create(&eventids);
 
-	result = zbx_db_select("select eventid"
+	if (0 == config_max_hk_delete)
+		result = zbx_db_select(query);
+	else
+		result = zbx_db_select_n(query, config_max_hk_delete);
+
+	while (NULL != (row = zbx_db_fetch(result)))
+	{
+		zbx_uint64_t	eventid;
+
+		ZBX_STR2UINT64(eventid, row[0]);
+		zbx_vector_uint64_append(&eventids, eventid);
+	}
+	zbx_db_free_result(result);
+
+	zbx_vector_uint64_sort(&eventids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
+
+	if (0 != eventids.values_num)
+		deleted = housekeep_problems_events(&eventids);
+
+	zbx_vector_uint64_destroy(&eventids);
+
+	if (0 != config_max_hk_delete && deleted >= config_max_hk_delete)
+		*more = 1;
+
+	return deleted;
+}
+
+static int	housekeep_problems_without_triggers(int config_max_hk_delete, int *more)
+{
+	char	*sql = NULL;
+	size_t	sql_alloc = 0, sql_offset = 0;
+	int	deleted;
+
+	zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,"select eventid"
 			" from problem"
 			" where source=%d"
 				" and object=%d"
 				" and not exists (select NULL from triggers where triggerid=objectid)",
 				EVENT_SOURCE_TRIGGERS, EVENT_OBJECT_TRIGGER);
 
-	while (NULL != (row = zbx_db_fetch(result)))
-	{
-		zbx_uint64_t	id;
+	deleted = zbx_housekeep_problems_events(sql, config_max_hk_delete, more);
 
-		ZBX_STR2UINT64(id, row[0]);
-		zbx_vector_uint64_append(&ids, id);
-	}
-	zbx_db_free_result(result);
-
-	zbx_vector_uint64_sort(&ids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
-
-	if (0 != ids.values_num)
-	{
-		if (SUCCEED != zbx_db_execute_multiple_query(
-				"update problem"
-				" set cause_eventid=null"
-				" where", "cause_eventid", &ids))
-		{
-			zabbix_log(LOG_LEVEL_WARNING, "Failed to unlink problem symptoms while housekeeping a cause"
-					" problem without a trigger");
-			goto fail;
-		}
-
-		if (SUCCEED != zbx_db_execute_multiple_query(
-				"delete"
-				" from event_symptom"
-				" where", "cause_eventid", &ids))
-		{
-			zabbix_log(LOG_LEVEL_WARNING, "Failed to unlink event symptoms while housekeeping a cause"
-					" problem without a trigger");
-			goto fail;
-		}
-
-		if (SUCCEED != zbx_db_execute_multiple_query(
-				"delete"
-				" from problem"
-				" where", "eventid", &ids))
-		{
-			zabbix_log(LOG_LEVEL_WARNING, "Failed to delete a problem without a trigger");
-		}
-		else
-			deleted = ids.values_num;
-
-		housekeep_service_problems(&ids);
-	}
-fail:
-	zbx_vector_uint64_destroy(&ids);
+	zbx_free(sql);
 
 	return deleted;
 }
@@ -163,7 +223,7 @@ ZBX_THREAD_ENTRY(trigger_housekeeper_thread, args)
 		zbx_setproctitle("%s [removing deleted triggers problems]", get_process_type_string(process_type));
 
 		double	sec = zbx_time();
-		int	deleted = housekeep_problems_without_triggers();
+		int	more = 0, deleted = housekeep_problems_without_triggers(0, &more);
 
 		zbx_setproctitle("%s [deleted %d problems records in " ZBX_FS_DBL " sec, idle for %d second(s)]",
 				get_process_type_string(process_type), deleted, zbx_time() - sec,
