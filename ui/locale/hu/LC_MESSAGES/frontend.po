@@ -63,6 +63,10 @@ msgstr "\"%1$s\" üresnek kell lennie, vagy nagyobbnak kell lennie, mint \"%2$s\
 msgid "\"host:key\" pair is expected"
 msgstr "\"host:key\" páros elvárt"
 
+#: app/views/host.wizard.edit.php:1024
+msgid "#{section_name}"
+msgstr ""
+
 #: include/forms.inc.php:1330
 #: include/views/configuration.host.discovery.edit.php:932
 #: include/views/js/configuration.host.discovery.edit.js.php:87
@@ -2040,6 +2044,10 @@ msgstr ""
 msgid "Avoid easy-to-guess passwords"
 msgstr ""
 
+#: app/views/host.wizard.edit.php:473
+msgid "Avoid including sensitive data."
+msgstr ""
+
 #: jsLoader.php:172
 msgid "Awaiting data"
 msgstr ""
@@ -2231,6 +2239,10 @@ msgstr "Alúl"
 
 #: widgets/tophosts/includes/WidgetForm.php:146
 msgid "Bottom N"
+msgstr ""
+
+#: app/views/host.wizard.edit.php:429
+msgid "Brackets to specify IPv6 addresses"
 msgstr ""
 
 #: jsLoader.php:266
@@ -5053,6 +5065,10 @@ msgstr ""
 msgid "Collapse sidebar"
 msgstr ""
 
+#: app/views/host.wizard.edit.php:426
+msgid "Colon to separate IP/DNS address from port"
+msgstr ""
+
 #: include/views/configuration.graph.edit.php:398
 #: include/views/js/monitoring.sysmaps.js.php:383
 #: include/views/js/monitoring.sysmaps.js.php:404
@@ -5106,6 +5122,10 @@ msgstr "Kombinált eredmény"
 msgid "Comma separated center coordinates and zoom level to display when the widget is initially loaded."
 msgstr ""
 
+#: app/views/host.wizard.edit.php:427
+msgid "Comma to separate multiple Zabbix servers, proxies, or clusters"
+msgstr ""
+
 #: app/views/administration.script.edit.php:199
 #: app/views/reports.actionlog.list.csv.php:45
 #: app/views/reports.actionlog.list.php:140 include/actions.inc.php:1864
@@ -5123,6 +5143,10 @@ msgstr ""
 
 #: app/views/host.wizard.edit.php:375
 msgid "Communication between Zabbix agent and server/proxy is secured with a unique user-defined pre-shared key identity and a secret pre-shared key linked to it."
+msgstr ""
+
+#: app/views/host.wizard.edit.php:414
+msgid "Communication between Zabbix agent and server/proxy is secured with the pre-shared key (PSK) encryption method."
 msgstr ""
 
 #: include/items.inc.php:946
@@ -6149,6 +6173,10 @@ msgstr ""
 msgid "Custom size"
 msgstr ""
 
+#: app/views/host.wizard.edit.php:138
+msgid "Custom templates are not supported."
+msgstr ""
+
 #: app/views/administration.miscconfig.edit.php:103
 #: include/classes/setup/CSetupWizard.php:561
 msgid "CyberArk Vault"
@@ -6315,6 +6343,10 @@ msgstr ""
 #: include/classes/graphdraw/CPieGraphDraw.php:793
 #, c-format
 msgid "Data from %1$s. Generated in %2$s sec."
+msgstr ""
+
+#: app/views/host.wizard.edit.php:168
+msgid "Data is collected by Zabbix agent, a lightweight software `component installed on your monitoring target."
 msgstr ""
 
 #: app/views/js/host.wizard.edit.js.php:89
@@ -7256,6 +7288,10 @@ msgstr ""
 
 #: app/views/administration.housekeeping.edit.php:206
 msgid "Detected TimescaleDB license does not support compression. Compression is supported in TimescaleDB Community Edition."
+msgstr ""
+
+#: app/views/administration.housekeeping.edit.php:204
+msgid "Detected license does not support compression. Compression is supported in TimescaleDB Community Edition."
 msgstr ""
 
 #: app/controllers/CControllerPopupTriggerExpr.php:1130
@@ -8516,6 +8552,10 @@ msgstr ""
 msgid "Enter a non-secret pre-shared key identity string. Avoid including sensitive data."
 msgstr ""
 
+#: app/views/host.wizard.edit.php:470
+msgid "Enter a unique name that Zabbix components will use to recognize the pre-shared key."
+msgstr ""
+
 #: app/views/host.wizard.edit.php:609
 msgid "Enter the IP/DNS address and port of the Zabbix agent installed on your monitoring target."
 msgstr ""
@@ -8526,6 +8566,10 @@ msgstr ""
 
 #: app/views/host.wizard.edit.php:847
 msgid "Enter the IP/DNS address and port of your JMX-enabled monitoring target."
+msgstr ""
+
+#: app/views/host.wizard.edit.php:412
+msgid "Enter the IP/DNS address and port of your Zabbix server, proxy, or cluster configuration."
 msgstr ""
 
 #: app/views/host.wizard.edit.php:642
@@ -8730,6 +8774,10 @@ msgstr "Minden héten"
 
 #: app/views/administration.geomaps.edit.php:33
 msgid "Example"
+msgstr ""
+
+#: app/views/host.wizard.edit.php:417
+msgid "Example:"
 msgstr ""
 
 #: app/views/administration.miscconfig.edit.php:38
@@ -12032,6 +12080,10 @@ msgstr ""
 msgid "Install Zabbix agent 2 and its plugins on your monitoring target by following the installation instructions below."
 msgstr ""
 
+#: app/views/host.wizard.edit.php:551 app/views/host.wizard.edit.php:574
+msgid "Install Zabbix agent and its plugins on your monitoring target by following the installation instructions below."
+msgstr ""
+
 #: setup.php:163
 msgid "Installation"
 msgstr "Telepítés"
@@ -14197,6 +14249,11 @@ msgstr ""
 msgid "Maximum required %1$s database version is %2$s."
 msgstr ""
 
+#: app/partials/administration.system.info.php:221
+#, c-format
+msgid "Maximum required version is %1$s."
+msgstr ""
+
 #: app/controllers/CControllerTimeSelectorUpdate.php:136
 #: include/classes/mvc/CController.php:320
 #: include/classes/widgets/fields/CWidgetFieldTimePeriod.php:203
@@ -14540,6 +14597,12 @@ msgstr ""
 msgid "Minimum required size of PHP post is %1$s (configuration option \"post_max_size\")."
 msgstr ""
 
+#: app/partials/administration.system.info.php:212
+#: app/views/administration.housekeeping.edit.php:183
+#, c-format
+msgid "Minimum required version is %1$s."
+msgstr ""
+
 #: app/views/monitoring.map.view.php:48
 #: include/views/monitoring.sysmap.edit.php:276
 msgid "Minimum severity"
@@ -14772,8 +14835,18 @@ msgstr ""
 msgid "Multiple PROBLEM events"
 msgstr ""
 
+#: app/partials/administration.system.info.php:235
+#, c-format
+msgid "Must be at least %1$s."
+msgstr ""
+
 #: include/classes/validators/CFormValidator.php:340
 msgid "Must be selected."
+msgstr ""
+
+#: app/partials/administration.system.info.php:254
+#, c-format
+msgid "Must not be higher than %1$s."
 msgstr ""
 
 #: jsLoader.php:284
@@ -15544,6 +15617,66 @@ msgstr ""
 #: include/classes/api/services/CUser.php:252
 #, c-format
 msgid "No permissions to call \"%1$s.%2$s\"."
+msgstr ""
+
+#: include/classes/api/services/CConfiguration.php:312
+msgid "No permissions to import discovery rules."
+msgstr ""
+
+#: include/classes/api/services/CConfiguration.php:313
+msgid "No permissions to import graphs."
+msgstr ""
+
+#: include/classes/api/services/CConfiguration.php:314
+msgid "No permissions to import host groups."
+msgstr ""
+
+#: include/classes/api/services/CConfiguration.php:316
+msgid "No permissions to import hosts."
+msgstr ""
+
+#: include/classes/api/services/CConfiguration.php:318
+msgid "No permissions to import images."
+msgstr ""
+
+#: include/classes/api/services/CConfiguration.php:319
+msgid "No permissions to import items."
+msgstr ""
+
+#: include/classes/api/services/CConfiguration.php:320
+msgid "No permissions to import maps."
+msgstr ""
+
+#: include/classes/api/services/CConfiguration.php:321
+msgid "No permissions to import media types."
+msgstr ""
+
+#: include/classes/api/services/CConfiguration.php:324
+msgid "No permissions to import template dashboards."
+msgstr ""
+
+#: include/classes/api/services/CConfiguration.php:315
+msgid "No permissions to import template groups."
+msgstr ""
+
+#: include/classes/api/services/CConfiguration.php:322
+msgid "No permissions to import template links."
+msgstr ""
+
+#: include/classes/api/services/CConfiguration.php:323
+msgid "No permissions to import templates."
+msgstr ""
+
+#: include/classes/api/services/CConfiguration.php:325
+msgid "No permissions to import triggers."
+msgstr ""
+
+#: include/classes/api/services/CConfiguration.php:326
+msgid "No permissions to import value maps."
+msgstr ""
+
+#: include/classes/api/services/CConfiguration.php:317
+msgid "No permissions to import web scenarios."
 msgstr ""
 
 #: app/controllers/CControllerChartsView.php:133
@@ -19589,6 +19722,10 @@ msgstr ""
 msgid "Security name"
 msgstr ""
 
+#: app/views/host.wizard.edit.php:132
+msgid "See"
+msgstr ""
+
 #: app/views/popup.condition.edit.php:402 app/views/popup.generic.php:874
 #: app/views/popup.massupdate.item.php:440 app/views/popup.services.php:92
 #: app/views/popup.triggerexpr.php:88 include/classes/html/CMultiSelect.php:70
@@ -19656,6 +19793,10 @@ msgstr ""
 #, c-format
 msgctxt "screen reader"
 msgid "Selected, %1$s, read only, in position %2$d of %3$d"
+msgstr ""
+
+#: app/views/host.wizard.edit.php:428
+msgid "Semicolon to separate clusters (one or more server addresses)"
 msgstr ""
 
 #: jsLoader.php:267
@@ -20069,6 +20210,18 @@ msgstr ""
 #: app/partials/monitoring.problem.filter.php:263
 #: widgets/problems/includes/WidgetForm.php:106
 msgid "Shortened"
+msgstr ""
+
+#: app/partials/administration.system.info.php:243
+#: app/views/administration.housekeeping.edit.php:187
+#, c-format
+msgid "Should be at least %1$s."
+msgstr ""
+
+#: app/partials/administration.system.info.php:262
+#: app/views/administration.housekeeping.edit.php:197
+#, c-format
+msgid "Should not be higher than %1$s."
 msgstr ""
 
 #: app/partials/monitoring.problem.filter.php:27
@@ -20487,6 +20640,11 @@ msgstr ""
 msgid "Some templates (%1$s) are hidden. Custom templates are not supported."
 msgstr ""
 
+#: app/views/host.wizard.edit.php:130
+#, c-format
+msgid "Some templates (%1$s) are incompatible with the Host Wizard."
+msgstr ""
+
 #: widgets/actionlog/includes/WidgetForm.php:79
 #: widgets/problems/includes/WidgetForm.php:145
 msgid "Sort entries by"
@@ -20540,6 +20698,10 @@ msgstr ""
 
 #: app/views/popup.generic.php:180 include/views/monitoring.history.php:293
 msgid "Specify some filter condition to see the values."
+msgstr ""
+
+#: app/views/host.wizard.edit.php:365
+msgid "Specifying new or existing host groups will add the host to these groups without removing it from any current groups."
 msgstr ""
 
 #: httpdetails.php:107 include/classes/screens/CScreenHttpTestDetails.php:82
@@ -21716,6 +21878,10 @@ msgstr ""
 msgid "The parameter \"%1$s\" is missing from the user attributes."
 msgstr ""
 
+#: app/views/popup.ldap.edit.php:101
+msgid "The previous password was cleared due to a host change. Please enter the new password."
+msgstr ""
+
 #: include/classes/core/CJsonRpc.php:206
 msgid "The received JSON is not a valid JSON-RPC request."
 msgstr ""
@@ -21796,6 +21962,10 @@ msgid "This check cannot be removed, as it is used as a condition in %1$s discov
 msgid_plural "This check cannot be removed, as it is used as a condition in %1$s discovery actions."
 msgstr[0] ""
 msgstr[1] ""
+
+#: app/views/host.wizard.edit.php:384
+msgid "This configuration will overwrite all existing encryption settings on the host."
+msgstr ""
 
 #: include/func.inc.php:2566
 msgid "This day last week"
@@ -22915,6 +23085,14 @@ msgstr ""
 msgid "Unable to retrieve TimescaleDB version."
 msgstr ""
 
+#: app/views/administration.housekeeping.edit.php:173
+msgid "Unable to retrieve compression support status of TimescaleDB time-series database extension for PostgreSQL."
+msgstr ""
+
+#: app/views/administration.housekeeping.edit.php:178
+msgid "Unable to retrieve version of TimescaleDB time-series database extension for PostgreSQL."
+msgstr ""
+
 #: include/views/mfa.login.php:65
 #, c-format
 msgid "Unable to scan? You can use %1$s secret key to manually configure your authenticator app:"
@@ -23204,6 +23382,11 @@ msgstr ""
 msgid "Unsupported %1$s database server version. Must not be higher than %2$s."
 msgstr ""
 
+#: app/partials/administration.system.info.php:206
+#: app/views/administration.housekeeping.edit.php:169
+msgid "Unsupported TimescaleDB time-series database extension for PostgreSQL is used."
+msgstr ""
+
 #: app/views/administration.housekeeping.edit.php:190
 #, c-format
 msgid "Unsupported TimescaleDB version. Should be at least %1$s."
@@ -23465,6 +23648,10 @@ msgstr ""
 #: app/partials/monitoring.latest.view.html.php:36
 #: app/views/popup.generic.php:180
 msgid "Use the filter to display results"
+msgstr ""
+
+#: app/views/host.wizard.edit.php:424
+msgid "Use:"
 msgstr ""
 
 #: app/views/administration.script.list.php:93 app/views/mediatype.list.php:98
@@ -24541,6 +24728,10 @@ msgstr ""
 msgid "Verification code"
 msgstr ""
 
+#: app/views/host.wizard.edit.php:407
+msgid "Verify Zabbix server, proxy, or cluster address"
+msgstr ""
+
 #: include/classes/setup/CSetupWizard.php:655
 msgid "Verify database certificate"
 msgstr ""
@@ -24644,6 +24835,11 @@ msgstr ""
 
 #: include/func.inc.php:1775 jsLoader.php:216
 msgid "Warning message"
+msgstr ""
+
+#: app/partials/administration.system.info.php:243
+#: app/partials/administration.system.info.php:262
+msgid "Warning!"
 msgstr ""
 
 #: app/partials/administration.system.info.php:198
@@ -25261,6 +25457,10 @@ msgstr ""
 
 #: app/views/js/host.wizard.edit.js.php:91
 msgid "Zabbix agent initiates connections to Zabbix server or proxy to send data. Recommended for monitoring targets behind a firewall."
+msgstr ""
+
+#: app/views/host.wizard.edit.php:422
+msgid "Zabbix agent must be able to connect to the specified address or list of addresses."
 msgstr ""
 
 #: app/views/host.wizard.edit.php:863
@@ -26473,6 +26673,10 @@ msgstr ""
 msgid "host trigger ID is expected"
 msgstr ""
 
+#: app/views/host.wizard.edit.php:134
+msgid "how to update them"
+msgstr ""
+
 #: include/classes/api/services/CMap.php:844
 #: include/classes/api/services/CMap.php:1311
 msgid "icon"
@@ -26836,6 +27040,10 @@ msgstr ""
 #: include/translateDefines.inc.php:33
 msgid "m-d h:i A"
 msgstr "m-d H:i"
+
+#: app/views/host.wizard.edit.php:589
+msgid "macOS"
+msgstr ""
 
 #: include/classes/parsers/CUserMacroParser.php:37
 msgid "macro is empty"

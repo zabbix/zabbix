@@ -81,8 +81,8 @@ class CControllerHostWizardGet extends CController {
 
 		if ($this->hasInput('hostid')) {
 			$hosts = API::Host()->get([
-				'output' => ['hostid', 'name', 'ipmi_authtype', 'ipmi_privilege', 'ipmi_username', 'ipmi_password',
-					'tls_connect', 'tls_accept'
+				'output' => ['hostid', 'host', 'name', 'ipmi_authtype', 'ipmi_privilege', 'ipmi_username',
+					'ipmi_password', 'tls_connect', 'tls_accept'
 				],
 				'selectHostGroups' => ['groupid'],
 				'selectInterfaces' => ['type', 'ip', 'dns', 'port', 'useip', 'details'],
@@ -95,7 +95,9 @@ class CControllerHostWizardGet extends CController {
 			$host['groups'] = $host['hostgroups'];
 			unset($host['hostgroups']);
 
+			$host['tls_in_none'] = (bool)($host['tls_accept'] & HOST_ENCRYPTION_NONE);
 			$host['tls_in_psk'] = (bool)($host['tls_accept'] & HOST_ENCRYPTION_PSK);
+			$host['tls_in_cert'] = (bool)($host['tls_accept'] & HOST_ENCRYPTION_CERTIFICATE);
 			unset($host['tls_accept']);
 
 			// Take only first interface from each type if possible.

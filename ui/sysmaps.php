@@ -358,6 +358,8 @@ if (hasRequest('form')) {
 		$data['sysmap'] = $sysmap;
 	}
 
+	CArrayHelper::sort($data['sysmap']['urls'], ['name']);
+
 	$data['current_user_userid'] = $current_userid;
 	$data['form_refresh'] = getRequest('form_refresh', 0);
 

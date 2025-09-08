@@ -100,7 +100,7 @@ $graph_form
 					'form_name' => $graph_form->getName()
 				]))
 			)
-			->addTab('preview-tab', _('Preview'), $preview_table)
+			->addTab('graph-preview-tab', _('Preview'), $preview_table)
 			->setSelected(0)
 	)
 	->addItem(
@@ -114,7 +114,6 @@ $graph_form
 					'graphtype' => $data['graphtype'],
 					'hostid' => $data['hostid'],
 					'is_template' => $data['is_template'],
-					'normal_only' => $data['normal_only'],
 					'parent_discoveryid' => $data['parent_discoveryid']
 				],
 				'readonly' => $readonly,

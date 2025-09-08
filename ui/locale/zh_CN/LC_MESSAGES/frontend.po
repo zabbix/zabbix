@@ -7,7 +7,7 @@ msgstr ""
 "Project-Id-Version: Zabbix 6.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2023-10-19 13:48+0300\n"
-"PO-Revision-Date: 2025-06-04 08:46+0000\n"
+"PO-Revision-Date: 2025-07-02 10:08+0000\n"
 "Last-Translator: NoYoWiFi <1284524409@qq.com>\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
 "Language: zh_CN\n"
@@ -65,6 +65,10 @@ msgstr "\"%1$s\" 必须为空或大于 \"%2$s\"。"
 #: include/classes/import/validators/C10XmlValidator.php:404
 msgid "\"host:key\" pair is expected"
 msgstr "需要“主机:键值” 对形式"
+
+#: app/views/host.wizard.edit.php:1024
+msgid "#{section_name}"
+msgstr "#{section_name}"
 
 #: include/forms.inc.php:1330
 #: include/views/configuration.host.discovery.edit.php:932
@@ -1176,11 +1180,11 @@ msgstr "后值"
 
 #: include/events.inc.php:339
 msgid "Age"
-msgstr "持续时间"
+msgstr "总时长"
 
 #: app/partials/monitoring.problem.filter.php:120
 msgid "Age less than"
-msgstr "持续时间小于"
+msgstr "总时长小于"
 
 #: app/views/administration.script.list.php:196 include/hosts.inc.php:1195
 #: include/items.inc.php:350 include/views/configuration.httpconf.edit.php:109
@@ -2017,6 +2021,10 @@ msgstr "收集间隔期间对虚拟磁盘的平均未完成写入请求数，\"u
 msgid "Avoid easy-to-guess passwords"
 msgstr "避免弱密码"
 
+#: app/views/host.wizard.edit.php:473
+msgid "Avoid including sensitive data."
+msgstr ""
+
 #: jsLoader.php:172
 msgid "Awaiting data"
 msgstr "等待数据"
@@ -2209,6 +2217,10 @@ msgstr "底部"
 #: widgets/tophosts/includes/WidgetForm.php:146
 msgid "Bottom N"
 msgstr "倒数N"
+
+#: app/views/host.wizard.edit.php:429
+msgid "Brackets to specify IPv6 addresses"
+msgstr "括号用于指定 IPv6 地址"
 
 #: jsLoader.php:266
 msgid "Bring forward"
@@ -4938,6 +4950,10 @@ msgstr "折叠"
 msgid "Collapse sidebar"
 msgstr "隐藏侧边栏"
 
+#: app/views/host.wizard.edit.php:426
+msgid "Colon to separate IP/DNS address from port"
+msgstr "冒号将 IP/DNS 地址与端口分隔开"
+
 #: include/views/configuration.graph.edit.php:398
 #: include/views/js/monitoring.sysmaps.js.php:383
 #: include/views/js/monitoring.sysmaps.js.php:404
@@ -4991,6 +5007,10 @@ msgstr "合并的结果"
 msgid "Comma separated center coordinates and zoom level to display when the widget is initially loaded."
 msgstr "初始加载小组件时显示的逗号分隔中心坐标和缩放级别。"
 
+#: app/views/host.wizard.edit.php:427
+msgid "Comma to separate multiple Zabbix servers, proxies, or clusters"
+msgstr "用逗号分隔多个 Zabbix servers, proxies 或 clusters"
+
 #: app/views/administration.script.edit.php:199
 #: app/views/reports.actionlog.list.csv.php:45
 #: app/views/reports.actionlog.list.php:140 include/actions.inc.php:1864
@@ -5009,6 +5029,10 @@ msgstr "通讯"
 #: app/views/host.wizard.edit.php:375
 msgid "Communication between Zabbix agent and server/proxy is secured with a unique user-defined pre-shared key identity and a secret pre-shared key linked to it."
 msgstr "Zabbix agent与server/proxy之间的通信通过唯一的用户定义预共享密钥标识和与之关联的密钥进行加密保护"
+
+#: app/views/host.wizard.edit.php:414
+msgid "Communication between Zabbix agent and server/proxy is secured with the pre-shared key (PSK) encryption method."
+msgstr "Zabbix agent 和 server/proxy 之间的通信通过预共享密钥 (PSK) 加密方法进行保护。"
 
 #: include/items.inc.php:946
 msgctxt "SNMP Community"
@@ -6039,6 +6063,10 @@ msgstr "自定义的严重性的名称影响所有的语系而必须手动翻译
 msgid "Custom size"
 msgstr "自定义大小"
 
+#: app/views/host.wizard.edit.php:138
+msgid "Custom templates are not supported."
+msgstr "不支持自定义模板。"
+
 #: app/views/administration.miscconfig.edit.php:103
 #: include/classes/setup/CSetupWizard.php:561
 msgid "CyberArk Vault"
@@ -6205,6 +6233,10 @@ msgstr "数据采集"
 #, c-format
 msgid "Data from %1$s. Generated in %2$s sec."
 msgstr "数据来自 %1$s. 产生于 %2$s 秒."
+
+#: app/views/host.wizard.edit.php:168
+msgid "Data is collected by Zabbix agent, a lightweight software `component installed on your monitoring target."
+msgstr "数据由安装在监控目标上的轻量级组件Zabbix agent收集"
 
 #: app/views/js/host.wizard.edit.js.php:89
 msgid "Data is collected by Zabbix agent, a lightweight software component installed on your monitoring target."
@@ -7146,6 +7178,10 @@ msgstr "Web 场景详情"
 #: app/views/administration.housekeeping.edit.php:206
 msgid "Detected TimescaleDB license does not support compression. Compression is supported in TimescaleDB Community Edition."
 msgstr "检测到的 TimescaleDB 许可证不支持压缩。 TimescaleDB 社区版支持压缩。"
+
+#: app/views/administration.housekeeping.edit.php:204
+msgid "Detected license does not support compression. Compression is supported in TimescaleDB Community Edition."
+msgstr ""
 
 #: app/controllers/CControllerPopupTriggerExpr.php:1130
 msgid "Detection period"
@@ -8399,6 +8435,10 @@ msgstr "英语(en_US)"
 msgid "Enter a non-secret pre-shared key identity string. Avoid including sensitive data."
 msgstr "输入非机密的预共享密钥标识字符串，避免包含敏感数据"
 
+#: app/views/host.wizard.edit.php:470
+msgid "Enter a unique name that Zabbix components will use to recognize the pre-shared key."
+msgstr ""
+
 #: app/views/host.wizard.edit.php:609
 msgid "Enter the IP/DNS address and port of the Zabbix agent installed on your monitoring target."
 msgstr "输入安装在监控目标上的Zabbix agent的IP/DNS地址和端口"
@@ -8410,6 +8450,10 @@ msgstr "输入支持IPMI的监控目标的IP/DNS地址和端口"
 #: app/views/host.wizard.edit.php:847
 msgid "Enter the IP/DNS address and port of your JMX-enabled monitoring target."
 msgstr "输入支持JMX的监控目标的IP/DNS地址和端口"
+
+#: app/views/host.wizard.edit.php:412
+msgid "Enter the IP/DNS address and port of your Zabbix server, proxy, or cluster configuration."
+msgstr "输入您的  Zabbix server, proxy 或 cluster 配置的 IP/DNS 地址和端口。"
 
 #: app/views/host.wizard.edit.php:642
 msgid "Enter the IP/DNS address, port, and authentication details of your SNMP-enabled monitoring target."
@@ -8610,6 +8654,10 @@ msgstr "每周"
 #: app/views/administration.geomaps.edit.php:33
 msgid "Example"
 msgstr "示例"
+
+#: app/views/host.wizard.edit.php:417
+msgid "Example:"
+msgstr "示例："
 
 #: app/views/administration.miscconfig.edit.php:38
 msgid "Example: https://localhost/zabbix/ui/"
@@ -11895,6 +11943,10 @@ msgstr "安装Zabbix agent"
 msgid "Install Zabbix agent 2 and its plugins on your monitoring target by following the installation instructions below."
 msgstr "按照以下安装说明在监控目标上安装Zabbix agent 2及其插件"
 
+#: app/views/host.wizard.edit.php:551 app/views/host.wizard.edit.php:574
+msgid "Install Zabbix agent and its plugins on your monitoring target by following the installation instructions below."
+msgstr "按照以下安装说明在监控目标上安装Zabbix agent 及其插件"
+
 #: setup.php:163
 msgid "Installation"
 msgstr "安装"
@@ -14044,6 +14096,11 @@ msgstr "最大行数"
 msgid "Maximum required %1$s database version is %2$s."
 msgstr "所需的最大 %1$s 数据库版本为 %2$s。"
 
+#: app/partials/administration.system.info.php:221
+#, c-format
+msgid "Maximum required version is %1$s."
+msgstr ""
+
 #: app/controllers/CControllerTimeSelectorUpdate.php:136
 #: include/classes/mvc/CController.php:320
 #: include/classes/widgets/fields/CWidgetFieldTimePeriod.php:203
@@ -14383,6 +14440,12 @@ msgstr "所要求的PHP脚本最小解析时间是%1$s (配置项\"max_input_tim
 msgid "Minimum required size of PHP post is %1$s (configuration option \"post_max_size\")."
 msgstr "所要求的最小PHP post大小是%1$s (配置项\"post_max_size\")。"
 
+#: app/partials/administration.system.info.php:212
+#: app/views/administration.housekeeping.edit.php:183
+#, c-format
+msgid "Minimum required version is %1$s."
+msgstr ""
+
 #: app/views/monitoring.map.view.php:48
 #: include/views/monitoring.sysmap.edit.php:276
 msgid "Minimum severity"
@@ -14516,7 +14579,7 @@ msgstr "周一"
 
 #: app/views/configuration.host.list.php:145
 msgid "Monitored by"
-msgstr "要监控什么"
+msgstr "从哪监控"
 
 #: app/partials/configuration.host.edit.html.php:255
 #: app/views/popup.massupdate.host.php:124
@@ -14610,9 +14673,19 @@ msgstr "多重"
 msgid "Multiple PROBLEM events"
 msgstr "多重问题事件"
 
+#: app/partials/administration.system.info.php:235
+#, c-format
+msgid "Must be at least %1$s."
+msgstr ""
+
 #: include/classes/validators/CFormValidator.php:340
 msgid "Must be selected."
 msgstr "必须选择"
+
+#: app/partials/administration.system.info.php:254
+#, c-format
+msgid "Must not be higher than %1$s."
+msgstr ""
 
 #: jsLoader.php:284
 msgid "Mute"
@@ -15381,6 +15454,66 @@ msgstr "没有系统访问权限。"
 #, c-format
 msgid "No permissions to call \"%1$s.%2$s\"."
 msgstr "没有调用“%1$s.%2$s”的权限。"
+
+#: include/classes/api/services/CConfiguration.php:312
+msgid "No permissions to import discovery rules."
+msgstr ""
+
+#: include/classes/api/services/CConfiguration.php:313
+msgid "No permissions to import graphs."
+msgstr ""
+
+#: include/classes/api/services/CConfiguration.php:314
+msgid "No permissions to import host groups."
+msgstr ""
+
+#: include/classes/api/services/CConfiguration.php:316
+msgid "No permissions to import hosts."
+msgstr ""
+
+#: include/classes/api/services/CConfiguration.php:318
+msgid "No permissions to import images."
+msgstr ""
+
+#: include/classes/api/services/CConfiguration.php:319
+msgid "No permissions to import items."
+msgstr ""
+
+#: include/classes/api/services/CConfiguration.php:320
+msgid "No permissions to import maps."
+msgstr ""
+
+#: include/classes/api/services/CConfiguration.php:321
+msgid "No permissions to import media types."
+msgstr ""
+
+#: include/classes/api/services/CConfiguration.php:324
+msgid "No permissions to import template dashboards."
+msgstr ""
+
+#: include/classes/api/services/CConfiguration.php:315
+msgid "No permissions to import template groups."
+msgstr ""
+
+#: include/classes/api/services/CConfiguration.php:322
+msgid "No permissions to import template links."
+msgstr ""
+
+#: include/classes/api/services/CConfiguration.php:323
+msgid "No permissions to import templates."
+msgstr ""
+
+#: include/classes/api/services/CConfiguration.php:325
+msgid "No permissions to import triggers."
+msgstr ""
+
+#: include/classes/api/services/CConfiguration.php:326
+msgid "No permissions to import value maps."
+msgstr ""
+
+#: include/classes/api/services/CConfiguration.php:317
+msgid "No permissions to import web scenarios."
+msgstr ""
 
 #: app/controllers/CControllerChartsView.php:133
 #: app/controllers/CControllerDashboardPrint.php:99
@@ -17446,7 +17579,7 @@ msgstr "问题显示"
 
 #: app/views/js/trigger.edit.js.php:268 include/triggers.inc.php:603
 msgid "Problem expression"
-msgstr "问题表现形式"
+msgstr "问题表达式"
 
 #: widgets/problemhosts/Widget.php:29
 #: widgets/svggraph/includes/WidgetForm.php:386
@@ -19414,6 +19547,10 @@ msgstr "安全级别"
 msgid "Security name"
 msgstr "安全名称"
 
+#: app/views/host.wizard.edit.php:132
+msgid "See"
+msgstr "看"
+
 #: app/views/popup.condition.edit.php:402 app/views/popup.generic.php:874
 #: app/views/popup.massupdate.item.php:440 app/views/popup.services.php:92
 #: app/views/popup.triggerexpr.php:88 include/classes/html/CMultiSelect.php:70
@@ -19482,6 +19619,10 @@ msgstr "已选择，%1$s 在 %2$d 位置的 %3$d"
 msgctxt "screen reader"
 msgid "Selected, %1$s, read only, in position %2$d of %3$d"
 msgstr "已选择，%1$s，只读，位于 %3$d 的位置 %2$d"
+
+#: app/views/host.wizard.edit.php:428
+msgid "Semicolon to separate clusters (one or more server addresses)"
+msgstr "用分号分隔 clusters（一个或多个 server 地址）"
 
 #: jsLoader.php:267
 msgid "Send backward"
@@ -19894,6 +20035,18 @@ msgstr "短针"
 #: widgets/problems/includes/WidgetForm.php:106
 msgid "Shortened"
 msgstr "精简"
+
+#: app/partials/administration.system.info.php:243
+#: app/views/administration.housekeeping.edit.php:187
+#, c-format
+msgid "Should be at least %1$s."
+msgstr ""
+
+#: app/partials/administration.system.info.php:262
+#: app/views/administration.housekeeping.edit.php:197
+#, c-format
+msgid "Should not be higher than %1$s."
+msgstr ""
 
 #: app/partials/monitoring.problem.filter.php:27
 #: app/views/monitoring.charts.view.php:80
@@ -20311,6 +20464,11 @@ msgstr "此监控项的某些历史记录可能会被压缩，无法删除。"
 msgid "Some templates (%1$s) are hidden. Custom templates are not supported."
 msgstr "部分模板(%1$s)已隐藏。不支持自定义模板"
 
+#: app/views/host.wizard.edit.php:130
+#, c-format
+msgid "Some templates (%1$s) are incompatible with the Host Wizard."
+msgstr "某些模板（%1$s）与主机向导不兼容。"
+
 #: widgets/actionlog/includes/WidgetForm.php:79
 #: widgets/problems/includes/WidgetForm.php:145
 msgid "Sort entries by"
@@ -20365,6 +20523,10 @@ msgstr "查看指定主机图形。"
 #: app/views/popup.generic.php:180 include/views/monitoring.history.php:293
 msgid "Specify some filter condition to see the values."
 msgstr "指定过滤器条件以用于查看值"
+
+#: app/views/host.wizard.edit.php:365
+msgid "Specifying new or existing host groups will add the host to these groups without removing it from any current groups."
+msgstr "指定新的或现有的主机组将把主机添加到这些组中，而不会将其从任何当前组中删除。"
 
 #: httpdetails.php:107 include/classes/screens/CScreenHttpTestDetails.php:82
 msgid "Speed"
@@ -21533,6 +21695,10 @@ msgstr "进程数。返回整数"
 msgid "The parameter \"%1$s\" is missing from the user attributes."
 msgstr "用户属性中缺少参数“%1$s”。"
 
+#: app/views/popup.ldap.edit.php:101
+msgid "The previous password was cleared due to a host change. Please enter the new password."
+msgstr ""
+
 #: include/classes/core/CJsonRpc.php:206
 msgid "The received JSON is not a valid JSON-RPC request."
 msgstr "收到的 JSON 不是有效的 JSON-RPC 请求。"
@@ -21612,6 +21778,10 @@ msgstr "由于先前删除的对象，此操作缺少条件或操作。"
 msgid "This check cannot be removed, as it is used as a condition in %1$s discovery action."
 msgid_plural "This check cannot be removed, as it is used as a condition in %1$s discovery actions."
 msgstr[0] "此检查无法删除，因为它在%1$s发现操作中被用作一个条件。"
+
+#: app/views/host.wizard.edit.php:384
+msgid "This configuration will overwrite all existing encryption settings on the host."
+msgstr "此配置将覆盖主机上所有现有的加密设置。"
 
 #: include/func.inc.php:2566
 msgid "This day last week"
@@ -22720,6 +22890,14 @@ msgstr "无法检索 TimescaleDB 压缩支持状态。"
 msgid "Unable to retrieve TimescaleDB version."
 msgstr "无法检索 TimescaleDB 版本。"
 
+#: app/views/administration.housekeeping.edit.php:173
+msgid "Unable to retrieve compression support status of TimescaleDB time-series database extension for PostgreSQL."
+msgstr ""
+
+#: app/views/administration.housekeeping.edit.php:178
+msgid "Unable to retrieve version of TimescaleDB time-series database extension for PostgreSQL."
+msgstr ""
+
 #: include/views/mfa.login.php:65
 #, c-format
 msgid "Unable to scan? You can use %1$s secret key to manually configure your authenticator app:"
@@ -23008,6 +23186,11 @@ msgstr "不支持的 %1$s 数据库服务版本。必须至少为 %2$s。"
 msgid "Unsupported %1$s database server version. Must not be higher than %2$s."
 msgstr "不支持的 %1$s 数据库服务版本。不得高于 %2$s。"
 
+#: app/partials/administration.system.info.php:206
+#: app/views/administration.housekeeping.edit.php:169
+msgid "Unsupported TimescaleDB time-series database extension for PostgreSQL is used."
+msgstr ""
+
 #: app/views/administration.housekeeping.edit.php:190
 #, c-format
 msgid "Unsupported TimescaleDB version. Should be at least %1$s."
@@ -23269,6 +23452,10 @@ msgstr "使用等宽字体"
 #: app/views/popup.generic.php:180
 msgid "Use the filter to display results"
 msgstr "使用过滤器显示结果"
+
+#: app/views/host.wizard.edit.php:424
+msgid "Use:"
+msgstr "用途:.使用："
 
 #: app/views/administration.script.list.php:93 app/views/mediatype.list.php:98
 msgid "Used in actions"
@@ -24339,6 +24526,10 @@ msgstr "冗余"
 msgid "Verification code"
 msgstr "验证码"
 
+#: app/views/host.wizard.edit.php:407
+msgid "Verify Zabbix server, proxy, or cluster address"
+msgstr "用途:.验证 server, proxy 或 cluster 地址 agent 必须能够连接到指定的地址或地址列表。验证server, proxy 或 cluster 地址"
+
 #: include/classes/setup/CSetupWizard.php:655
 msgid "Verify database certificate"
 msgstr "验证数据库证书"
@@ -24443,6 +24634,11 @@ msgstr "告警"
 #: include/func.inc.php:1775 jsLoader.php:216
 msgid "Warning message"
 msgstr "告警信息"
+
+#: app/partials/administration.system.info.php:243
+#: app/partials/administration.system.info.php:262
+msgid "Warning!"
+msgstr ""
 
 #: app/partials/administration.system.info.php:198
 msgid "Warning! Support for Oracle DB is deprecated since Zabbix 7.0 and will be removed in future versions."
@@ -25057,6 +25253,10 @@ msgstr "Zabbix agent(被动检查)"
 #: app/views/js/host.wizard.edit.js.php:91
 msgid "Zabbix agent initiates connections to Zabbix server or proxy to send data. Recommended for monitoring targets behind a firewall."
 msgstr "Zabbix agent主动连接Zabbix server/proxy发送数据，推荐用于防火墙后的监控目标"
+
+#: app/views/host.wizard.edit.php:422
+msgid "Zabbix agent must be able to connect to the specified address or list of addresses."
+msgstr "Zabbix agent 必须能够连接到指定的地址或地址列表。"
 
 #: app/views/host.wizard.edit.php:863
 msgid "Zabbix documentation"
@@ -26271,6 +26471,10 @@ msgstr "具有相同 UUID 的主机原型已存在"
 msgid "host trigger ID is expected"
 msgstr "需要主机触发器ID"
 
+#: app/views/host.wizard.edit.php:134
+msgid "how to update them"
+msgstr "如何更新它们"
+
 #: include/classes/api/services/CMap.php:844
 #: include/classes/api/services/CMap.php:1311
 msgid "icon"
@@ -26634,6 +26838,10 @@ msgstr "m-d"
 #: include/translateDefines.inc.php:33
 msgid "m-d h:i A"
 msgstr "m-d H:i"
+
+#: app/views/host.wizard.edit.php:589
+msgid "macOS"
+msgstr "macOS"
 
 #: include/classes/parsers/CUserMacroParser.php:37
 msgid "macro is empty"

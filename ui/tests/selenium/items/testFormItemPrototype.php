@@ -2171,7 +2171,6 @@ class testFormItemPrototype extends CLegacyWebTest {
 		$this->zbxTestContentControlButtonClickTextWait('Create item prototype');
 		$dialog = COverlayDialogElement::find()->one()->waitUntilReady();
 		$form = $dialog->asForm();
-		$dialog_footer = $dialog->getFooter();
 
 		if (isset($data['type'])) {
 			$type = $data['type'];
@@ -2190,7 +2189,6 @@ class testFormItemPrototype extends CLegacyWebTest {
 			}
 			$this->zbxTestAssertElementValue('name', $data['name']);
 		}
-		$name = $this->zbxTestGetValue("//input[@id='name']");
 
 		if (isset($data['key'])) {
 			$this->zbxTestInputTypeOverwrite('key', $data['key']);
@@ -2199,7 +2197,6 @@ class testFormItemPrototype extends CLegacyWebTest {
 			}
 			$this->zbxTestAssertElementValue('key', $data['key']);
 		}
-		$key = $this->zbxTestGetValue("//input[@id='key']");
 
 		if (isset($data['username'])) {
 			$this->zbxTestInputType('username', $data['username']);
@@ -2265,14 +2262,14 @@ class testFormItemPrototype extends CLegacyWebTest {
 					$this->zbxTestInputTypeOverwrite('delay_flex_'.$itemCount.'_delay', $period['flexDelay']);
 				}
 				$itemCount ++;
-				$form->getFieldContainer('Custom intervals')->query('button:Add')->one()->click();
+				// Unstable test on Jenkins - hoverMouse() required.
+				$form->getFieldContainer('Custom intervals')->query('button:Add')->one()->hoverMouse()->click();
 
 				$this->assertTrue($this->query('id', 'delay_flex_'.$itemCount.'_delay')->waitUntilVisible()->one()->isValid());
 				$this->assertTrue($this->query('id', 'delay_flex_'.$itemCount.'_period')->waitUntilVisible()->one()->isValid());
 
 				if (isset($period['remove'])) {
-					$form->query("xpath://table[@id='delay-flex-table']/tbody/tr[1]/td[4]/button")->one()
-						->click();
+					$form->query("xpath://table[@id='delay-flex-table']/tbody/tr[1]/td[4]/button")->one()->click();
 				}
 			}
 		}
@@ -2438,9 +2435,10 @@ class testFormItemPrototype extends CLegacyWebTest {
 	 */
 	private function filterEntriesAndOpenDiscovery($name) {
 		$form = $this->query('name:zbx_filter')->asForm()->waitUntilReady()->one();
+		$table = $this->query('xpath:(//table[@class="list-table"])[1]')->asTable()->one();
 		$form->fill(['Name' => $name]);
 		$this->query('button:Apply')->one()->waitUntilClickable()->click();
-		$this->query('xpath://table[@class="list-table"]')->asTable()->one()->findRow('Name', $name)
-				->getColumn('Discovery')->query('link:Discovery')->one()->click();
+		$table->waitUntilReloaded();
+		$table->findRow('Name', $name)->getColumn('Discovery')->query('link:Discovery')->one()->click();
 	}
 }

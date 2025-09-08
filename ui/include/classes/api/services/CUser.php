@@ -159,9 +159,7 @@ class CUser extends CApiService {
 		}
 
 		if ($options['userids'] !== null) {
-			if (self::$userData['type'] == USER_TYPE_SUPER_ADMIN || !$options['editable']) {
-				$sql_parts['where']['userid'] = dbConditionId('u.userid', $options['userids']);
-			}
+			$sql_parts['where'][] = dbConditionId('u.userid', $options['userids']);
 		}
 
 		if ($options['usrgrpids'] !== null) {
@@ -191,6 +189,13 @@ class CUser extends CApiService {
 		}
 
 		if ($options['filter'] !== null) {
+			if (array_key_exists('userid', $options['filter']) && $options['filter']['userid'] !== null
+					&& !$options['searchByAny']) {
+				$sql_parts['where'][] = dbConditionId('u.userid', $options['filter']['userid']);
+
+				unset($options['filter']['userid']);
+			}
+
 			if (array_key_exists('autologout', $options['filter']) && $options['filter']['autologout'] !== null) {
 				$options['filter']['autologout'] = getTimeUnitFilters($options['filter']['autologout']);
 			}
@@ -1412,6 +1417,7 @@ class CUser extends CApiService {
 	private static function updateGroups(array &$users, ?array $db_users = null): void {
 		$ins_groups = [];
 		$del_groupids = [];
+		$changed_user_groups = [];
 
 		foreach ($users as &$user) {
 			if (!array_key_exists('usrgrps', $user)) {
@@ -1432,11 +1438,18 @@ class CUser extends CApiService {
 						'userid' => $user['userid'],
 						'usrgrpid' => $group['usrgrpid']
 					];
+
+					if ($db_users !== null) {
+						$changed_user_groups[$user['userid']] = $user['usrgrps'];
+					}
 				}
 			}
 			unset($group);
 
-			$del_groupids = array_merge($del_groupids, array_column($db_groups, 'id'));
+			if ($db_groups) {
+				$del_groupids = array_merge($del_groupids, array_column($db_groups, 'id'));
+				$changed_user_groups[$user['userid']] = $user['usrgrps'];
+			}
 		}
 		unset($user);
 
@@ -1446,6 +1459,10 @@ class CUser extends CApiService {
 
 		if ($ins_groups) {
 			$groupids = DB::insert('users_groups', $ins_groups);
+		}
+
+		if ($changed_user_groups) {
+			self::deleteInactiveMfaTotpSecrets($changed_user_groups);
 		}
 
 		foreach ($users as &$user) {
@@ -1461,6 +1478,111 @@ class CUser extends CApiService {
 			unset($group);
 		}
 		unset($user);
+	}
+
+	private static function deleteInactiveMfaTotpSecrets(array $user_groups): void {
+		$db_mfa_totp_secretids = [];
+
+		$options = [
+			'output' => ['userid', 'mfaid', 'mfa_totp_secretid'],
+			'filter' => ['userid' => array_keys($user_groups)]
+		];
+		$resource = DBselect(DB::makeSql('mfa_totp_secret', $options));
+
+		while ($row = DBfetch($resource)) {
+			$db_mfa_totp_secretids[$row['userid']][$row['mfaid']] = $row['mfa_totp_secretid'];
+		}
+
+		if (!$db_mfa_totp_secretids) {
+			return;
+		}
+
+		$user_groups = array_intersect_key($user_groups, $db_mfa_totp_secretids);
+		$groupids = [];
+
+		foreach ($user_groups as $groups) {
+			foreach ($groups as $group) {
+				$groupids[$group['usrgrpid']] = true;
+			}
+		}
+
+		if ($groupids) {
+			$db_mfa_user_groups = DB::select('usrgrp', [
+				'output' => ['mfaid'],
+				'filter' => [
+					'mfa_status' => GROUP_MFA_ENABLED,
+					'usrgrpid' => array_keys($groupids)
+				],
+				'preservekeys' => true
+			]);
+
+			if ($db_mfa_user_groups) {
+				$default_mfaid = CAuthenticationHelper::getPublic(CAuthenticationHelper::MFAID);
+				$direct_mfaids = [];
+
+				foreach ($db_mfa_user_groups as $group) {
+					if ($group['mfaid'] != 0) {
+						$direct_mfaids[$group['mfaid']] = true;
+					}
+				}
+
+				$db_direct_mfas = $direct_mfaids
+					? DB::select('mfa', [
+						'output' => [],
+						'mfaids' => array_keys($direct_mfaids),
+						'sortfield' => ['name'],
+						'preservekeys' => true
+					])
+					: [];
+
+				foreach ($user_groups as $userid => $groups) {
+					$user_direct_mfaids = [];
+
+					foreach ($groups as $group) {
+						if (!array_key_exists($group['usrgrpid'], $db_mfa_user_groups)) {
+							continue;
+						}
+
+						$db_mfa_user_group = $db_mfa_user_groups[$group['usrgrpid']];
+
+						if ($db_mfa_user_group['mfaid'] != 0) {
+							$user_direct_mfaids[$db_mfa_user_group['mfaid']] = true;
+						}
+						else {
+							unset($db_mfa_totp_secretids[$userid][$default_mfaid]);
+
+							if (!$db_mfa_totp_secretids[$userid]) {
+								unset($db_mfa_totp_secretids[$userid]);
+							}
+
+							continue 2;
+						}
+					}
+
+					if ($user_direct_mfaids) {
+						$primary_mfaid = key(array_intersect_key($db_direct_mfas, $user_direct_mfaids));
+
+						unset($db_mfa_totp_secretids[$userid][$primary_mfaid]);
+
+						if (!$db_mfa_totp_secretids[$userid]) {
+							unset($db_mfa_totp_secretids[$userid]);
+						}
+					}
+				}
+			}
+		}
+
+		if ($db_mfa_totp_secretids) {
+			$del_mfa_totp_secretids = [];
+
+			foreach ($db_mfa_totp_secretids as $mfa_totp_secretids) {
+				foreach ($mfa_totp_secretids as $mfa_totp_secretid) {
+					$del_mfa_totp_secretids[] = $mfa_totp_secretid;
+				}
+			}
+
+			DB::delete('mfa_totp_secret', ['mfa_totp_secretid' => $del_mfa_totp_secretids]);
+		}
 	}
 
 	private static function updateUgSets(array $users, ?array $db_users = null): void {

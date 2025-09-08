@@ -313,7 +313,9 @@ final class CHistFunctionData {
 		'avg_foreach' => [
 			[
 				'type' => 'require_math_parent',
-				'in' => ['avg', 'max', 'min', 'sum'],
+				'in' => ['avg', 'kurtosis', 'mad', 'max', 'min', 'skewness', 'stddevpop', 'stddevsamp', 'sum',
+					'sumofsquares', 'varpop', 'varsamp'
+				],
 				'parameters' => ['count' => 1],
 				'position' => 0
 			],
@@ -333,7 +335,9 @@ final class CHistFunctionData {
 		'count_foreach' => [
 			[
 				'type' => 'require_math_parent',
-				'in' => ['avg', 'max', 'min', 'sum'],
+				'in' => ['avg', 'kurtosis', 'mad', 'max', 'min', 'skewness', 'stddevpop', 'stddevsamp', 'sum',
+					'sumofsquares', 'varpop', 'varsamp'
+				],
 				'parameters' => ['count' => 1],
 				'position' => 0
 			],
@@ -347,7 +351,9 @@ final class CHistFunctionData {
 		'exists_foreach' => [
 			[
 				'type' => 'require_math_parent',
-				'in' => ['avg', 'max', 'min', 'sum'],
+				'in' => ['avg', 'kurtosis', 'mad', 'max', 'min', 'skewness', 'stddevpop', 'stddevsamp', 'sum',
+					'sumofsquares', 'varpop', 'varsamp'
+				],
 				'parameters' => ['count' => 1],
 				'position' => 0
 			],
@@ -377,7 +383,9 @@ final class CHistFunctionData {
 		'max_foreach' => [
 			[
 				'type' => 'require_math_parent',
-				'in' => ['avg', 'max', 'min', 'sum'],
+				'in' => ['avg', 'kurtosis', 'mad', 'max', 'min', 'skewness', 'stddevpop', 'stddevsamp', 'sum',
+					'sumofsquares', 'varpop', 'varsamp'
+				],
 				'parameters' => ['count' => 1],
 				'position' => 0
 			],
@@ -391,7 +399,9 @@ final class CHistFunctionData {
 		'min_foreach' => [
 			[
 				'type' => 'require_math_parent',
-				'in' => ['avg', 'max', 'min', 'sum'],
+				'in' => ['avg', 'kurtosis', 'mad', 'max', 'min', 'skewness', 'stddevpop', 'stddevsamp', 'sum',
+					'sumofsquares', 'varpop', 'varsamp'
+				],
 				'parameters' => ['count' => 1],
 				'position' => 0
 			],
@@ -405,7 +415,9 @@ final class CHistFunctionData {
 		'sum_foreach' => [
 			[
 				'type' => 'require_math_parent',
-				'in' => ['avg', 'max', 'min', 'sum'],
+				'in' => ['avg', 'kurtosis', 'mad', 'max', 'min', 'skewness', 'stddevpop', 'stddevsamp', 'sum',
+					'sumofsquares', 'varpop', 'varsamp'
+				],
 				'parameters' => ['count' => 1],
 				'position' => 0
 			],

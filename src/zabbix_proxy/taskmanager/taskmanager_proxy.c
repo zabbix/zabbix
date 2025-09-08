@@ -636,6 +636,8 @@ ZBX_THREAD_ENTRY(taskmanager_thread, args)
 				(zbx_fs_time_t)sleeptime);
 	}
 
+	zbx_ipc_async_socket_close(&rtc);
+
 	zbx_setproctitle("%s #%d [terminated]", get_process_type_string(process_type), process_num);
 
 	while (1)

@@ -67,6 +67,9 @@ static zbx_db_idcache_t	*idcache = NULL;
 
 int	zbx_db_init(char **error)
 {
+	if (NULL != idcache_mem)
+		return SUCCEED;
+
 	qsort(idcache_tables, ZBX_IDS_SIZE, sizeof(idcache_tables[0]), compare_table_names);
 
 	if (SUCCEED != dbconn_init(error))
@@ -75,11 +78,14 @@ int	zbx_db_init(char **error)
 	if (SUCCEED != zbx_mutex_create(&idcache_mutex, ZBX_MUTEX_CACHE_IDS, error))
 		return FAIL;
 
-	if (SUCCEED != zbx_shmem_create_min(&idcache_mem, sizeof(zbx_db_idcache_t), "table ids cache", NULL, 0, error))
+	if (SUCCEED != zbx_shmem_create_min(&idcache_mem, sizeof(zbx_db_idcache_t), "table ids cache", "TidsCache", 0,
+			error))
+	{
 		return FAIL;
+	}
 
-	idcache = idcache_mem->base;
-	memset(idcache, 0, sizeof(zbx_db_idcache_t));
+	idcache = zbx_shmem_malloc(idcache_mem, NULL, sizeof(zbx_db_idcache_t));
+	memset(idcache->lastids, 0, sizeof(idcache->lastids));
 
 	return SUCCEED;
 }
@@ -92,6 +98,21 @@ void	zbx_db_deinit(void)
 	idcache_mem = NULL;
 
 	zbx_mutex_destroy(&idcache_mutex);
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: invalidate idcache                                                *
+ *                                                                            *
+ ******************************************************************************/
+void	zbx_db_clear_idcache(void)
+{
+	zbx_mutex_lock(idcache_mutex);
+
+	if (NULL != idcache)
+		memset(idcache->lastids, 0, sizeof(idcache->lastids));
+
+	zbx_mutex_unlock(idcache_mutex);
 }
 
 /******************************************************************************
@@ -1144,11 +1165,43 @@ int	zbx_dbconn_lock_ids(zbx_dbconn_t *db, const char *table_name, const char *fi
 }
 
 #if defined(HAVE_MYSQL) || defined(HAVE_POSTGRESQL)
-#define MAX_EXPRESSIONS	1000	/* tune according to batch size to avoid unnecessary or conditions */
+/******************************************************************************
+ *                                                                            *
+ * Purpose: Takes an initial part of SQL query and appends a generated        *
+ *          WHERE condition. The WHERE condition is generated from the given  *
+ *          list of values.                                                   *
+ *                                                                            *
+ * Parameters: sql        - [IN/OUT] buffer for SQL query construction        *
+ *             sql_alloc  - [IN/OUT] size of the 'sql' buffer                 *
+ *             sql_offset - [IN/OUT] current position in the 'sql' buffer     *
+ *             fieldname  - [IN] field name to be used in SQL WHERE condition *
+ *             values     - [IN] array of numerical values sorted in          *
+ *                               ascending order to be included in WHERE      *
+ *             num        - [IN] number of elements in 'values' array         *
+ *                                                                            *
+ ******************************************************************************/
+void	zbx_db_add_condition_alloc(char **sql, size_t *sql_alloc, size_t *sql_offset, const char *fieldname,
+		const zbx_uint64_t *values, const int num)
+{
+	if (0 == num)
+		return;
+
+	if (1 == num)
+	{
+		zbx_snprintf_alloc(sql, sql_alloc, sql_offset, " %s=" ZBX_FS_UI64, fieldname, values[0]);
+		return;
+	}
+
+	zbx_snprintf_alloc(sql, sql_alloc, sql_offset, " %s in (", fieldname);
+
+	for (int i = 0; i < num; i++)
+		zbx_snprintf_alloc(sql, sql_alloc, sql_offset, ZBX_FS_UI64 ",", values[i]);
+
+	(*sql_offset)--;
+	zbx_chrcpy_alloc(sql, sql_alloc, sql_offset, ')');
+}
 #else
 #define MAX_EXPRESSIONS	950
-#endif
-
 /******************************************************************************
  *                                                                            *
  * Purpose: Takes an initial part of SQL query and appends a generated        *
@@ -1169,9 +1222,7 @@ void	zbx_db_add_condition_alloc(char **sql, size_t *sql_alloc, size_t *sql_offse
 		const zbx_uint64_t *values, const int num)
 {
 	int		i, in_cnt;
-#if defined(HAVE_SQLITE3)
 	int		expr_num, expr_cnt = 0;
-#endif
 	if (0 == num)
 		return;
 
@@ -1179,12 +1230,10 @@ void	zbx_db_add_condition_alloc(char **sql, size_t *sql_alloc, size_t *sql_offse
 	if (MAX_EXPRESSIONS < num)
 		zbx_chrcpy_alloc(sql, sql_alloc, sql_offset, '(');
 
-#if defined(HAVE_SQLITE3)
 	expr_num = (num + MAX_EXPRESSIONS - 1) / MAX_EXPRESSIONS;
 
 	if (MAX_EXPRESSIONS < expr_num)
 		zbx_chrcpy_alloc(sql, sql_alloc, sql_offset, '(');
-#endif
 
 	if (1 < num)
 		zbx_snprintf_alloc(sql, sql_alloc, sql_offset, "%s in (", fieldname);
@@ -1204,7 +1253,7 @@ void	zbx_db_add_condition_alloc(char **sql, size_t *sql_alloc, size_t *sql_offse
 			{
 				in_cnt = 0;
 				(*sql_offset)--;
-#if defined(HAVE_SQLITE3)
+
 				if (MAX_EXPRESSIONS == ++expr_cnt)
 				{
 					zbx_snprintf_alloc(sql, sql_alloc, sql_offset, ")) or (%s in (",
@@ -1213,12 +1262,9 @@ void	zbx_db_add_condition_alloc(char **sql, size_t *sql_alloc, size_t *sql_offse
 				}
 				else
 				{
-#endif
 					zbx_snprintf_alloc(sql, sql_alloc, sql_offset, ") or %s in (",
 							fieldname);
-#if defined(HAVE_SQLITE3)
 				}
-#endif
 			}
 
 			in_cnt++;
@@ -1233,16 +1279,15 @@ void	zbx_db_add_condition_alloc(char **sql, size_t *sql_alloc, size_t *sql_offse
 		zbx_chrcpy_alloc(sql, sql_alloc, sql_offset, ')');
 	}
 
-#if defined(HAVE_SQLITE3)
 	if (MAX_EXPRESSIONS < expr_num)
 		zbx_chrcpy_alloc(sql, sql_alloc, sql_offset, ')');
-#endif
+
 	if (MAX_EXPRESSIONS < num)
 		zbx_chrcpy_alloc(sql, sql_alloc, sql_offset, ')');
 
 #undef MAX_EXPRESSIONS
 }
-
+#endif
 /*********************************************************************************
  *                                                                               *
  * Purpose: This function is similar to the zbx_db_add_condition_alloc(), except *
@@ -1261,13 +1306,11 @@ void	zbx_db_add_condition_alloc(char **sql, size_t *sql_alloc, size_t *sql_offse
 void	zbx_db_add_str_condition_alloc(char **sql, size_t *sql_alloc, size_t *sql_offset, const char *fieldname,
 		const char * const *values, const int num)
 {
-#if defined(HAVE_MYSQL) || defined(HAVE_POSTGRESQL)
-#define MAX_EXPRESSIONS	1000	/* tune according to batch size to avoid unnecessary or conditions */
-#else
+#if defined(HAVE_SQLITE3)
 #define MAX_EXPRESSIONS	950
 #endif
 
-	int	i, cnt = 0;
+	int	i;
 	char	*value_esc;
 	int	values_num = 0, empty_num = 0;
 
@@ -1283,8 +1326,13 @@ void	zbx_db_add_str_condition_alloc(char **sql, size_t *sql_alloc, size_t *sql_o
 		else
 			values_num++;
 	}
+#if defined(HAVE_SQLITE3)
+	int	cnt = 0;
 
 	if (MAX_EXPRESSIONS < values_num || (0 != values_num && 0 != empty_num))
+#else
+	if (0 != values_num && 0 != empty_num)
+#endif
 		zbx_chrcpy_alloc(sql, sql_alloc, sql_offset, '(');
 
 	if (0 != empty_num)
@@ -1321,7 +1369,7 @@ void	zbx_db_add_str_condition_alloc(char **sql, size_t *sql_alloc, size_t *sql_o
 	{
 		if ('\0' == *values[i])
 			continue;
-
+#if defined(HAVE_SQLITE3)
 		if (MAX_EXPRESSIONS == cnt)
 		{
 			cnt = 0;
@@ -1330,20 +1378,22 @@ void	zbx_db_add_str_condition_alloc(char **sql, size_t *sql_alloc, size_t *sql_o
 			zbx_strcpy_alloc(sql, sql_alloc, sql_offset, fieldname);
 			zbx_strcpy_alloc(sql, sql_alloc, sql_offset, " in (");
 		}
-
+		cnt++;
+#endif
 		value_esc = zbx_db_dyn_escape_string(values[i]);
 		zbx_chrcpy_alloc(sql, sql_alloc, sql_offset, '\'');
 		zbx_strcpy_alloc(sql, sql_alloc, sql_offset, value_esc);
 		zbx_strcpy_alloc(sql, sql_alloc, sql_offset, "',");
 		zbx_free(value_esc);
-
-		cnt++;
 	}
 
 	(*sql_offset)--;
 	zbx_chrcpy_alloc(sql, sql_alloc, sql_offset, ')');
-
+#if defined(HAVE_SQLITE3)
 	if (MAX_EXPRESSIONS < values_num || 0 != empty_num)
+#else
+	if (0 != empty_num)
+#endif
 		zbx_chrcpy_alloc(sql, sql_alloc, sql_offset, ')');
 
 #undef MAX_EXPRESSIONS

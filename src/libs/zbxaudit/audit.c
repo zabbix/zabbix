@@ -756,6 +756,9 @@ static void	audit_entry_make_key(const zbx_audit_entry_t *entry, const char *nam
 		case ZBX_AUDIT_RESOURCE_LLD_RULE_PROTOTYPE:
 			owner = "discoveryruleprototype";
 			break;
+		case ZBX_AUDIT_RESOURCE_MEDIATYPE:
+			owner = "mediatype";
+			break;
 		default:
 			THIS_SHOULD_NEVER_HAPPEN_MSG("Unknown resource type: %d", entry->resource_type);
 			exit(EXIT_FAILURE);

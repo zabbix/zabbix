@@ -42,7 +42,7 @@ class WidgetView extends CControllerDashboardWidgetView {
 
 		// Editing template dashboard?
 		if ($this->isTemplateDashboard() && !$this->fields_values['override_hostid']) {
-			$data['error'] = _('No data.');
+			$data['error'] = _('No data found');
 		}
 		else {
 			$data['triggers'] = $this->getTriggers();

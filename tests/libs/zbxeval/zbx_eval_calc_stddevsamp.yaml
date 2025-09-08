@@ -1,0 +1,55 @@
+---
+test case: "values: 2, 4, 4, 4, 5, 5, 7, 9"
+in:
+  values: [2, 4, 4, 4, 5, 5, 7, 9]
+out:
+  return: SUCCEED
+  result: 2.13808993529939517231
+---
+test case: "values: 3, 3, 3, 3, 3"
+in:
+  values: [3, 3, 3, 3, 3]
+out:
+  return: SUCCEED
+  result: 0
+---
+test case: "values: 1, 4"
+in:
+  values: [1, 4]
+out:
+  return: SUCCEED
+  result: 2.12132034355964238515
+---
+test case: "values: 42"
+in:
+  values: [42]
+out:
+  return: FAIL
+---
+test case: "values: 1, 2, 3, 4, 5"
+in:
+  values: [1, 2, 3, 4, 5]
+out:
+  return: SUCCEED
+  result: 1.58113883008418976139
+---
+test case: "values: 10.5, 20.1, 30.2"
+in:
+  values: [10.5, 20.1, 30.2]
+out:
+  return: SUCCEED
+  result: 9.85105747284692867538
+---
+test case: "values: --2, -4, -6, -8"
+in:
+  values: [-2, -4, -6, -8]
+out:
+  return: SUCCEED
+  result: 2.58198889747161119956
+---
+test case: "values: 1.7976931348623157e+308, 1.7976931348623157e+308"
+in:
+  values: [1.7976931348623157e+308, 1.7976931348623157e+308]
+out:
+  return: FAIL
+...

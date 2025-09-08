@@ -129,8 +129,12 @@ if (hasRequest('httptestid')) {
 	if (!$httptests) {
 		access_deny();
 	}
+
+	if (hasRequest('hostid') && !isWritableHostTemplates([getRequest('hostid')])) {
+		access_deny();
+	}
 }
-elseif (getRequest('hostid') && !isWritableHostTemplates([getRequest('hostid')])) {
+elseif (hasRequest('hostid') && !isWritableHostTemplates([getRequest('hostid')])) {
 	access_deny();
 }
 

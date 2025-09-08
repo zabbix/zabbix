@@ -1051,9 +1051,9 @@ class testItem extends CAPITest {
 			[
 				'item' => ['400720'],
 				'data' => [
-					'discovered_triggerids' => ['30002'],
+					'discovered_triggerids' => ['300002'],
 					'dependent_item' => ['400740'],
-					'dependent_item_disc_triggerids' => ['30004']
+					'dependent_item_disc_triggerids' => ['300004']
 				],
 				'expected_error' => null
 			]

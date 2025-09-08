@@ -1502,6 +1502,29 @@ out:
   return: SUCCEED
   value: 13
 ---
+test case: Evaluate timeleft(5m,wait infinite)
+in:
+  history:
+  - itemid: 1
+    value type: ITEM_VALUE_TYPE_FLOAT
+    data:
+    - value: 1.6e+30
+      ts: 2017-01-10 10:01:00.000000000 +00:00
+    - value: 1.5e+30
+      ts: 2017-01-10 10:02:00.000000000 +00:00
+    - value: 1.4e+30
+      ts: 2017-01-10 10:03:00.000000000 +00:00
+    - value: 1.3e+30
+      ts: 2017-01-10 10:04:00.000000000 +00:00
+    - value: 1.2e+30
+      ts: 2017-01-10 10:05:00.000000000 +00:00
+  time: 2017-01-10 10:05:00.000000000 +00:00
+  function: timeleft
+  params: '5m,1.7e+30'
+out:
+  return: SUCCEED
+  value: 1.7976931348623158e+308
+---
 test case: Evaluate timeleft(5m,65)
 in:
   history:
@@ -1524,6 +1547,29 @@ in:
 out:
   return: SUCCEED
   value: 3600
+---
+test case: Evaluate timeleft(5m,1.7976931348623158e+305)
+in:
+  history:
+  - itemid: 1
+    value type: ITEM_VALUE_TYPE_FLOAT
+    data:
+    - value: 1.1e+305
+      ts: 2017-01-10 10:01:00.000000000 +00:00
+    - value: 1.2e+305
+      ts: 2017-01-10 10:02:00.000000000 +00:00
+    - value: 1.3e+305
+      ts: 2017-01-10 10:03:00.000000000 +00:00
+    - value: 1.4e+305
+      ts: 2017-01-10 10:04:00.000000000 +00:00
+    - value: 1.5e+305
+      ts: 2017-01-10 10:05:00.000000000 +00:00
+  time: 2017-01-10 10:05:00.000000000 +00:00
+  function: timeleft
+  params: '5m,1.6e+305'
+out:
+  return: SUCCEED
+  value: 60
 ---
 test case: Evaluate timeleft(5m,65,test)
 in:
@@ -4690,4 +4736,162 @@ in:
 out:
   return: SUCCEED
   value: 1733907600
+---
+test case: Evaluate kurtosis with huge float values (mean = inf)
+in:
+  history:
+  - itemid: 1
+    value type: ITEM_VALUE_TYPE_FLOAT
+    data:
+    - value: 1.7976931348623157e+308  # DBL_MAX
+      ts: 2021-03-27 10:01:00.000000000 +00:00
+    - value: 1.7976931348623157e+308
+      ts: 2021-03-27 10:02:00.000000000 +00:00
+    - value: 1.7976931348623157e+308
+      ts: 2021-03-27 10:03:00.000000000 +00:00
+  time: 2021-03-27 10:07:00.000000000 +00:00
+  function: kurtosis
+  params: 6m
+out:
+  return: FAIL
+---
+test case: Evaluate mad with huge float values (mean = inf)
+in:
+  history:
+  - itemid: 1
+    value type: ITEM_VALUE_TYPE_FLOAT
+    data:
+    - value: 1.7976931348623157e+308  # DBL_MAX
+      ts: 2021-03-27 10:01:00.000000000 +00:00
+    - value: 1.7976931348623157e+308
+      ts: 2021-03-27 10:02:00.000000000 +00:00
+    - value: 1.7976931348623157e+308
+      ts: 2021-03-27 10:03:00.000000000 +00:00
+  time: 2021-03-27 10:07:00.000000000 +00:00
+  function: mad
+  params: 6m
+out:
+  return: FAIL
+---
+test case: Evaluate skewness with huge float values (mean = inf)
+in:
+  history:
+  - itemid: 1
+    value type: ITEM_VALUE_TYPE_FLOAT
+    data:
+    - value: 1.7976931348623157e+308  # DBL_MAX
+      ts: 2021-03-27 10:01:00.000000000 +00:00
+    - value: 1.7976931348623157e+308
+      ts: 2021-03-27 10:02:00.000000000 +00:00
+    - value: 1.7976931348623157e+308
+      ts: 2021-03-27 10:03:00.000000000 +00:00
+  time: 2021-03-27 10:07:00.000000000 +00:00
+  function: skewness
+  params: 6m
+out:
+  return: FAIL
+---
+test case: Evaluate stddevpop with huge float values (mean = inf)
+in:
+  history:
+  - itemid: 1
+    value type: ITEM_VALUE_TYPE_FLOAT
+    data:
+    - value: 1.7976931348623157e+308  # DBL_MAX
+      ts: 2021-03-27 10:01:00.000000000 +00:00
+    - value: 1.7976931348623157e+308
+      ts: 2021-03-27 10:02:00.000000000 +00:00
+    - value: 1.7976931348623157e+308
+      ts: 2021-03-27 10:03:00.000000000 +00:00
+  time: 2021-03-27 10:07:00.000000000 +00:00
+  function: stddevpop
+  params: 6m
+out:
+  return: FAIL
+---
+test case: Evaluate stddevsamp with huge float values (mean = inf)
+in:
+  history:
+  - itemid: 1
+    value type: ITEM_VALUE_TYPE_FLOAT
+    data:
+    - value: 1.7976931348623157e+308  # DBL_MAX
+      ts: 2021-03-27 10:01:00.000000000 +00:00
+    - value: 1.7976931348623157e+308
+      ts: 2021-03-27 10:02:00.000000000 +00:00
+    - value: 1.7976931348623157e+308
+      ts: 2021-03-27 10:03:00.000000000 +00:00
+  time: 2021-03-27 10:07:00.000000000 +00:00
+  function: stddevsamp
+  params: 6m
+out:
+  return: FAIL
+---
+test case: Evaluate stddevsamp with 1 data value
+in:
+  history:
+  - itemid: 1
+    value type: ITEM_VALUE_TYPE_FLOAT
+    data:
+    - value: 1.7976931348623157e+308  # DBL_MAX
+      ts: 2021-03-27 10:01:00.000000000 +00:00
+  time: 2021-03-27 10:07:00.000000000 +00:00
+  function: stddevsamp
+  params: 6m
+out:
+  return: FAIL
+---
+test case: Evaluate sumofsquares with huge float values (mean = inf)
+in:
+  history:
+  - itemid: 1
+    value type: ITEM_VALUE_TYPE_FLOAT
+    data:
+    - value: 1.7976931348623157e+308  # DBL_MAX
+      ts: 2021-03-27 10:01:00.000000000 +00:00
+    - value: 1.7976931348623157e+308
+      ts: 2021-03-27 10:02:00.000000000 +00:00
+    - value: 1.7976931348623157e+308
+      ts: 2021-03-27 10:03:00.000000000 +00:00
+  time: 2021-03-27 10:07:00.000000000 +00:00
+  function: sumofsquares
+  params: 6m
+out:
+  return: FAIL
+---
+test case: Evaluate varpop with huge float values (mean = inf)
+in:
+  history:
+  - itemid: 1
+    value type: ITEM_VALUE_TYPE_FLOAT
+    data:
+    - value: 1.7976931348623157e+308  # DBL_MAX
+      ts: 2021-03-27 10:01:00.000000000 +00:00
+    - value: 1.7976931348623157e+308
+      ts: 2021-03-27 10:02:00.000000000 +00:00
+    - value: 1.7976931348623157e+308
+      ts: 2021-03-27 10:03:00.000000000 +00:00
+  time: 2021-03-27 10:07:00.000000000 +00:00
+  function: varpop
+  params: 6m
+out:
+  return: FAIL
+---
+test case: Evaluate varsamp with huge float values (mean = inf)
+in:
+  history:
+  - itemid: 1
+    value type: ITEM_VALUE_TYPE_FLOAT
+    data:
+    - value: 1.7976931348623157e+308  # DBL_MAX
+      ts: 2021-03-27 10:01:00.000000000 +00:00
+    - value: 1.7976931348623157e+308
+      ts: 2021-03-27 10:02:00.000000000 +00:00
+    - value: 1.7976931348623157e+308
+      ts: 2021-03-27 10:03:00.000000000 +00:00
+  time: 2021-03-27 10:07:00.000000000 +00:00
+  function: varsamp
+  params: 6m
+out:
+  return: FAIL
 ...

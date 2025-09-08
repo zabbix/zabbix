@@ -91,6 +91,12 @@ class CPage {
 
 		if (!defined('PHPUNIT_BROWSER_NAME') || PHPUNIT_BROWSER_NAME === 'chrome') {
 			$options = new ChromeOptions();
+
+			$prefs = [
+				'profile.password_manager_leak_detection' => false
+			];
+			$options->setExperimentalOption('prefs', $prefs);
+
 			$options->addArguments([
 				'--no-sandbox',
 				'--enable-font-antialiasing=false',
@@ -145,8 +151,8 @@ class CPage {
 			}
 		}
 
-		$this->driver->manage()->deleteAllCookies();
 		try {
+			$this->logout();
 			$this->driver->executeScript('sessionStorage.clear();');
 		} catch (Exception $exception) {
 			// Code is not missing here.
@@ -247,7 +253,7 @@ class CPage {
 	public function logout() {
 		try {
 			// Before logout open page without any scripts, otherwise session might be restored and logout won't work.
-			$this->open('setup.php');
+			$this->open('setup.php')->waitUntilReady();
 
 			$session = null;
 
@@ -264,7 +270,9 @@ class CPage {
 			}
 
 			if ($session !== null) {
-				DBExecute('DELETE FROM sessions WHERE sessionid='.zbx_dbstr($session));
+				DBExecute('DELETE FROM sessions WHERE sessionid='.zbx_dbstr(
+						CTestArrayHelper::get(json_decode(base64_decode(urldecode($session)), true), 'sessionid')
+				));
 			}
 
 			$this->driver->manage()->deleteAllCookies();
@@ -607,26 +615,42 @@ class CPage {
 	/**
 	 * Allows to login with user credentials.
 	 *
-	 * @param string $alias     Username on login screen
-	 * @param string $password  Password on login screen
-	 * @param int $scenario  	Scenario TEST_BAD means that passed credentials are invalid, TEST_GOOD - user successfully logged in
-	 * @param string $url		Direct link to certain Zabbix page
+	 * @param string $alias          Username on login screen
+	 * @param string $password       Password on login screen
+	 * @param int $scenario  	     TEST_BAD - expected bad credentials, TEST_GOOD - user successfully logged in
+	 * @param string $url		     Direct link to certain Zabbix page
+	 * @param bool $check_logged_in  Check if the user is logged in
 	 *
 	 * @return $this
 	 */
-	public function userLogin($alias, $password, $scenario = TEST_GOOD, $url = 'index.php') {
+	public function userLogin($alias, $password, $scenario = TEST_GOOD, $url = 'index.php', $check_logged_in = true) {
 		if (self::$cookie === null) {
 			$this->driver->get(PHPUNIT_URL);
+			$this->waitUntilReady();
 		}
 
 		$this->logout();
 		$this->open($url);
 		$this->query('id:name')->waitUntilVisible()->one()->fill($alias);
 		$this->query('id:password')->one()->fill($password);
-		$this->query('id:enter')->one()->click();
+		$this->query('id:enter')->one()->click()->waitUntilStalled();
 		$this->waitUntilReady();
 
-		// Check login result.
+		if ($check_logged_in) {
+			$this->assertUserIsLoggedIn($scenario);
+		}
+
+		return $this;
+	}
+
+	/**
+	 * Checks if currently any user is logged in.
+	 *
+	 * @param int $scenario  TEST_BAD - it is expected to not be logged in, TEST_GOOD - expected to be logged in
+	 *
+	 * @return $this
+	 */
+	public function assertUserIsLoggedIn($scenario = TEST_GOOD) {
 		$sign_out = $this->query('class:zi-sign-out')->exists();
 
 		if ($scenario === TEST_GOOD && !$sign_out) {
