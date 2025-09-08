@@ -263,6 +263,7 @@ window.service_edit_popup = new class {
 	#removeErrorContainer(row) {
 		const error_row = row.parentElement
 			.querySelector(`#additional_rules_error_container_${row.getAttribute('data-row_index')}`);
+
 		error_row.parentElement.remove();
 	}
 
