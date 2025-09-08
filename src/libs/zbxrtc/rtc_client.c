@@ -257,9 +257,15 @@ int	zbx_rtc_parse_options(const char *opt, zbx_uint32_t *code, struct zbx_json *
 		const char	*param = opt + ZBX_CONST_STRLEN(ZBX_DBPOOL_SET_MAX_IDLE);
 		zbx_uint64_t	limit;
 
-		if ('=' != *param || FAIL == zbx_is_uint64(param + 1, &limit))
+		if ('=' != *param)
 		{
 			*error = zbx_strdup(NULL, "missing maximum idle connection limit parameter");
+			return FAIL;
+		}
+
+		if (FAIL == zbx_is_uint64(param + 1, &limit))
+		{
+			*error = zbx_strdup(NULL, "invalid maximum idle connection limit parameter");
 			return FAIL;
 		}
 
@@ -274,9 +280,15 @@ int	zbx_rtc_parse_options(const char *opt, zbx_uint32_t *code, struct zbx_json *
 		const char	*param = opt + ZBX_CONST_STRLEN(ZBX_DBPOOL_SET_MAX_OPEN);
 		zbx_uint64_t	limit;
 
-		if ('=' != *param || FAIL == zbx_is_uint64(param + 1, &limit))
+		if ('=' != *param)
 		{
 			*error = zbx_strdup(NULL, "missing maximum connection limit parameter");
+			return FAIL;
+		}
+
+		if (FAIL == zbx_is_uint64(param + 1, &limit))
+		{
+			*error = zbx_strdup(NULL, "invalid maximum connection limit parameter");
 			return FAIL;
 		}
 
@@ -291,9 +303,15 @@ int	zbx_rtc_parse_options(const char *opt, zbx_uint32_t *code, struct zbx_json *
 		const char	*param = opt + ZBX_CONST_STRLEN(ZBX_DBPOOL_SET_IDLE_TIMEOUT);
 		int		timeout;
 
-		if ('=' != *param || FAIL == zbx_is_time_suffix(param + 1, &timeout, ZBX_LENGTH_UNLIMITED))
+		if ('=' != *param)
 		{
 			*error = zbx_strdup(NULL, "missing idle timeout parameter");
+			return FAIL;
+		}
+
+		if (FAIL == zbx_is_time_suffix(param + 1, &timeout, ZBX_LENGTH_UNLIMITED))
+		{
+			*error = zbx_strdup(NULL, "invalid idle timeout parameter");
 			return FAIL;
 		}
 
