@@ -13,6 +13,8 @@
 **/
 
 #include "dbupgrade.h"
+
+#include "zbxdb.h"
 #include "zbxdbschema.h"
 
 /*
