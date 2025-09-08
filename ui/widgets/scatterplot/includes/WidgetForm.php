@@ -76,7 +76,7 @@ class WidgetForm extends CWidgetForm {
 				: null;
 
 			if ($x_axis_min !== null && $x_axis_max !== null && $x_axis_min >= $x_axis_max) {
-				$errors[] = _s('Invalid parameter "%1$s": %2$s.', _('Axis X').': '._('Max'),
+				$errors[] = _s('Invalid parameter "%1$s": %2$s.', _('X axis').': '._('Max'),
 					_('X axis MAX value must be greater than X axis MIN value')
 				);
 			}
@@ -92,7 +92,7 @@ class WidgetForm extends CWidgetForm {
 				: null;
 
 			if ($y_axis_min !== null && $y_axis_max !== null && $y_axis_min >= $y_axis_max) {
-				$errors[] = _s('Invalid parameter "%1$s": %2$s.', _('Axis Y').': '._('Max'),
+				$errors[] = _s('Invalid parameter "%1$s": %2$s.', _('Y axis').': '._('Max'),
 					_('Y axis MAX value must be greater than Y axis MIN value')
 				);
 			}
@@ -187,7 +187,7 @@ class WidgetForm extends CWidgetForm {
 	private function initAxesFields(): self {
 		return $this
 			->addField(
-				(new CWidgetFieldCheckBox('x_axis', _('X axis'), _('Show')))->setDefault(SVG_GRAPH_AXIS_ON)
+				(new CWidgetFieldCheckBox('x_axis', _('X-Axis'), _('Show')))->setDefault(SVG_GRAPH_AXIS_ON)
 			)
 			->addField(
 				(new CWidgetFieldNumericBox('x_axis_min', _('Min')))
@@ -213,7 +213,7 @@ class WidgetForm extends CWidgetForm {
 					->setMaxLength(255)
 			)
 			->addField(
-				(new CWidgetFieldCheckBox('y_axis', _('Y axis'), _('Show')))->setDefault(SVG_GRAPH_AXIS_ON)
+				(new CWidgetFieldCheckBox('y_axis', _('Y-Axis'), _('Show')))->setDefault(SVG_GRAPH_AXIS_ON)
 			)
 			->addField(
 				(new CWidgetFieldSelect('y_axis_scale', _('Scale'), [

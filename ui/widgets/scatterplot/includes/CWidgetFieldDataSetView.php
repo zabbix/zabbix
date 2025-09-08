@@ -161,9 +161,8 @@ class CWidgetFieldDataSetView extends CWidgetFieldView {
 
 			if ($this->field->isTemplateDashboard()) {
 				foreach (['x_axis_items', 'y_axis_items'] as $key) {
-					$item_pattern = (new CWidgetFieldPatternSelectItem(
-						$field_name.'['.$row_num.']['.$key.']',
-						$key === 'x_axis_items' ? _('X Axis') : _('Y Axis'),
+					$item_pattern = (new CWidgetFieldPatternSelectItem($field_name.'['.$row_num.']['.$key.']',
+						$key === 'x_axis_items' ? _('X-Axis') : _('Y-Axis'),
 					))
 						->setTemplateId($this->field->getTemplateId())
 						->setValue($value[$key]);
@@ -259,9 +258,8 @@ class CWidgetFieldDataSetView extends CWidgetFieldView {
 
 				// Item pattern
 				foreach (['x_axis_items', 'y_axis_items'] as $key) {
-					$item_pattern = (new CWidgetFieldPatternSelectItem(
-						$field_name.'['.$row_num.']['.$key.']',
-						$key === 'x_axis_items' ? _('X Axis') : _('Y Axis'),
+					$item_pattern = (new CWidgetFieldPatternSelectItem($field_name.'['.$row_num.']['.$key.']',
+						$key === 'x_axis_items' ? _('X-Axis') : _('Y-Axis'),
 					))->setValue($value[$key]);
 
 					$item_pattern_view = (new CWidgetFieldPatternSelectItemView($item_pattern))
@@ -302,7 +300,7 @@ class CWidgetFieldDataSetView extends CWidgetFieldView {
 					->addItem($item_pattern_fields);
 
 				// Host tags
-				$tags_field = (new CWidgetFieldTags($field_name.'['.$row_num.'][host_tags]', _('Host Tags')))
+				$tags_field = (new CWidgetFieldTags($field_name.'['.$row_num.'][host_tags]', _('Host tags')))
 					->setValue($value['host_tags']);
 
 				$tags_field_view = (new CWidgetFieldTagsView($tags_field))->setFormName($this->form_name);
@@ -362,7 +360,7 @@ class CWidgetFieldDataSetView extends CWidgetFieldView {
 					->setAttribute('data-key', $key)
 					->setAttribute('data-set', $row_num)
 					->setColumns([
-						(new CTableColumn($key === 'x_axis_itemids' ? _('Axis X') : _('Axis Y')))
+						(new CTableColumn($key === 'x_axis_itemids' ? _('X-Axis') : _('Y-Axis')))
 							->addClass('table-col-name'),
 						new CTableColumn()
 					])
