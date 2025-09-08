@@ -37,10 +37,7 @@ class CScatterPlotLegend extends CDiv {
 	 * @param array  $legend_items
 	 * @param string $legend_items[]['name']
 	 * @param string $legend_items[]['color']
-	 * @param string $legend_items[]['units']
-	 * @param string $legend_items[]['min']
-	 * @param string $legend_items[]['avg']
-	 * @param string $legend_items[]['max']
+	 * @param string $legend_items[]['marker']
 	 */
 	public function __construct(array $legend_items) {
 		parent::__construct();

@@ -29,7 +29,7 @@ class CWidgetFieldAxisThresholds extends CWidgetField {
 	private bool $is_binary_units;
 
 	/**
-	 * Create widget field for Thresholds selection.
+	 * Create widget field for Axis thresholds selection.
 	 */
 	public function __construct(string $name, ?string $label = null, bool $is_binary_units = false) {
 		parent::__construct($name, $label);

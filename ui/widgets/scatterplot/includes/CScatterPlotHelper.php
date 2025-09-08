@@ -28,26 +28,23 @@ use API,
 	Manager;
 
 /**
- * Class calculates graph data and makes SVG graph.
+ * Class calculates graph data and makes Scatter plot graph.
  */
 class CScatterPlotHelper
 {
 
 	/**
-	 * Calculate graph data and draw SVG graph based on given graph configuration.
+	 * Calculate graph data and draw Scatter plot graph based on given graph configuration.
 	 *
 	 * @param array $options  Options for graph.
 	 *                        array  $options['data_sets']        Graph data set options.
 	 *                        int    $options['data_source']      Data source of graph.
 	 *                        array  $options['time_period']      Graph time period used.
 	 *                        bool   $options['fix_time_period']  Whether to keep time period fixed.
-	 *                        array  $options['left_y_axis']      Options for graph left Y axis.
-	 *                        array  $options['right_y_axis']     Options for graph right Y axis.
+	 *                        array  $options['y_axis']           Options for graph Y axis.
 	 *                        array  $options['x_axis']           Options for graph X axis.
 	 *                        array  $options['legend']           Options for graph legend.
 	 *                        int    $options['legend_lines']     Number of lines in the legend.
-	 *                        array  $options['problems']         Graph problems options.
-	 *                        array  $options['overrides']        Graph override options.
 	 *
 	 * @param int   $width
 	 * @param int   $height
@@ -551,7 +548,7 @@ class CScatterPlotHelper
 	}
 
 	/**
-	 * Select aggregated data to show in graph for each metric.
+	 * Select aggregated data to show in scatter plot for each metric and adjust color base on the thresholds.
 	 */
 	private static function getMetricsAggregatedData(array &$metrics, int $width, array $grouped_thresholds,
 			bool $interpolation): void {

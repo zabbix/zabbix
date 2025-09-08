@@ -40,7 +40,7 @@ class СScatterPlot extends CSvg {
 	private array $graph_theme;
 
 	/**
-	 * Graph metrics.
+	 * Scatter plot metrics.
 	 *
 	 * @var array
 	 */

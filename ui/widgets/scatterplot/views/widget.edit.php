@@ -15,7 +15,7 @@
 
 
 /**
- * Graph widget form view.
+ * Scatter plot widget form view.
  *
  * @var CView $this
  * @var array $data

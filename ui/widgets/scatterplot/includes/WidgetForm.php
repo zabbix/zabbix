@@ -37,7 +37,7 @@ use Zabbix\Widgets\Fields\{
 };
 
 /**
- * Graph widget form view.
+ * Scatter plot widget form view.
  */
 class WidgetForm extends CWidgetForm {
 
