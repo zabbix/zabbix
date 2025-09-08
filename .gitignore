@@ -189,6 +189,7 @@ tests/libs/zbxexpr/zbx_get_report_nextcheck
 tests/libs/zbxexpr/zbx_interval_preproc
 tests/libs/zbxexpr/zbx_token_find
 tests/libs/zbxexpr/zbx_user_macro_parse
+tests/libs/zbxexpr/zbx_user_macro_parse_dyn
 tests/libs/zbxexpr/zbx_validate_interval
 tests/libs/zbxexpression/evaluate
 tests/libs/zbxexpression/evaluate_function

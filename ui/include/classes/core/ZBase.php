@@ -553,7 +553,10 @@ class ZBase {
 			throw new Exception(_('Session initialization error.'));
 		}
 
-		CSessionHelper::set('sessionid', CWebUser::$data['sessionid']);
+		if (CSessionHelper::get('sessionid') !== CWebUser::$data['sessionid']) {
+			CSessionHelper::unset(['saml_data']);
+			CSessionHelper::set('sessionid', CWebUser::$data['sessionid']);
+		}
 
 		// Set the authentication token for the API.
 		API::getWrapper()->auth = [

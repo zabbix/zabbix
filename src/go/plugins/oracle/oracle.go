@@ -22,7 +22,9 @@ import (
 	"strings"
 	"time"
 
+	"github.com/godror/godror/dsn"
 	"github.com/omeid/go-yarn"
+	"golang.zabbix.com/sdk/errs"
 	"golang.zabbix.com/sdk/metric"
 	"golang.zabbix.com/sdk/plugin"
 	"golang.zabbix.com/sdk/uri"
@@ -33,15 +35,18 @@ const (
 	pluginName = "Oracle"
 	hkInterval = 10
 	sqlExt     = ".sql"
-
-	sysdbaExtension  = " as sysdba"
-	sysasmExtension  = " as sysoper"
-	sysoperExtension = " as sysasm"
-
-	sysdbaPrivelege  = "sysdba"
-	sysasmPrivelege  = "sysoper"
-	sysoperPrivelege = "sysasm"
 )
+
+var validAdminRoles = map[dsn.AdminRole]bool{
+	dsn.SysDBA:    true,
+	dsn.SysOPER:   true,
+	dsn.SysBACKUP: true,
+	dsn.SysDG:     true,
+	dsn.SysKM:     true,
+	dsn.SysRAC:    true,
+	dsn.SysASM:    true,
+	dsn.NoRole:    true,
+}
 
 // Plugin inherits plugin.Base and store plugin-specific data.
 type Plugin struct {
@@ -67,7 +72,7 @@ func (p *Plugin) Export(key string, rawParams []string, _ plugin.ContextProvider
 
 	service := url.QueryEscape(params["Service"])
 
-	user, privilege, err := splitUserPrivilege(params)
+	user, adminRole, err := splitUserAndPrivilege(params)
 	if err != nil {
 		return nil, zbxerr.ErrorInvalidParams.Wrap(err)
 	}
@@ -82,7 +87,7 @@ func (p *Plugin) Export(key string, rawParams []string, _ plugin.ContextProvider
 		return nil, zbxerr.ErrorUnsupportedMetric
 	}
 
-	conn, err := p.connMgr.GetConnection(connDetails{*uri, privilege})
+	conn, err := p.connMgr.getConnection(&connDetails{*uri, adminRole})
 	if err != nil {
 		// Special logic of processing connection errors should be used if oracle.ping is requested
 		// because it must return pingFailed if any error occurred.
@@ -139,26 +144,44 @@ func (p *Plugin) Stop() {
 	p.connMgr = nil
 }
 
-func splitUserPrivilege(params map[string]string) (user, privilege string, err error) {
-	var ok bool
-	user, ok = params["User"]
+// splitUserAndPrivilege parses a user string that may contain a privilege role.
+// It accepts formats like "system", "system as sysdba", or "SYSTEM AS SYSDBA".
+// It returns the clean username, a validated dsn.AdminRole, and an error if the
+// format is invalid or the role is unknown.
+func splitUserAndPrivilege(params map[string]string) (string, dsn.AdminRole, error) {
+	userStr, ok := params["User"]
 	if !ok {
+		// No 'User' parameter provided.
 		return "", "", errors.New("missing parameter 'User'")
 	}
 
-	var extension string
+	// strings.Fields is robust against multiple spaces and leading/trailing whitespace.
+	parts := strings.Fields(userStr)
 
-	switch true {
-	case strings.HasSuffix(strings.ToLower(user), sysdbaExtension):
-		privilege = sysdbaPrivelege
-		extension = sysdbaExtension
-	case strings.HasSuffix(strings.ToLower(user), sysoperExtension):
-		privilege = sysoperPrivelege
-		extension = sysoperExtension
-	case strings.HasSuffix(strings.ToLower(user), sysasmExtension):
-		privilege = sysasmPrivelege
-		extension = sysasmExtension
+	switch len(parts) {
+	case 0:
+		// The user string was empty or just whitespace.
+		return "", "", nil // returning nil to keep backwards compatible code
+	case 1:
+		// A simple username with no privilege, e.g., "myuser". This is valid.
+		return parts[0], dsn.NoRole, nil
+	case 3:
+		// Potential "user as privilege" format.
+		// Use strings.EqualFold for a case-insensitive "as" check.
+		if !strings.EqualFold(parts[1], "as") {
+			return userStr, dsn.NoRole, nil // returning given string and no error to keep backwards compatible code
+		}
+
+		role := dsn.AdminRole(strings.ToUpper(parts[2]))
+
+		if validAdminRoles[role] {
+			return parts[0], role, nil
+		}
+
+		return userStr, dsn.NoRole, nil
 	}
 
-	return user[:len(user)-len(extension)], privilege, nil
+	// All other formats (e.g., "user sysdba", "user as", "user as sysdba extra") are invalid.
+	return "", dsn.NoRole,
+		errs.Wrap(errs.New("invalid user format: expected 'user' or 'user as <privilege>', but got :"), userStr)
 }

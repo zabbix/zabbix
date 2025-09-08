@@ -132,10 +132,12 @@ class CApiTagHelper {
 	 * @param int    $tags[]['operator']
 	 * @param string $tags[]['value']
 	 * @param int    $evaltype
+	 * @param string $parent_alias
 	 *
 	 * @return string
 	 */
-	public static function addInheritedHostTagsWhereCondition(array $tags, int $evaltype): string {
+	public static function addInheritedHostTagsWhereCondition(array $tags, int $evaltype,
+			string $parent_alias): string {
 		// Swap tag operators to select templates normally should be excluded.
 		$swapped_filter = array_map(function ($tag) {
 			$swapping_map = [
@@ -220,17 +222,13 @@ class CApiTagHelper {
 				foreach ($negated_tags[$tag_name] as $tag) {
 					$where['templateids'] += self::getMatchingTemplateids($tag, $db_template_tags);
 
-					if ($tag['operator'] == TAG_OPERATOR_NOT_EXISTS) {
-						$where['values'] = false;
-					}
-					elseif (is_array($where['values'])) {
-						$where['values'][] = self::makeTagWhereCondition($tag);
-					}
+					$where['values'][] = self::makeTagWhereCondition($tag);
 				}
 			}
 		});
 
-		$negated_where_conditions = [];
+		$where_conditions = [];
+
 		foreach ($negated_conditions as $tag => $tag_where) {
 
 			$templateids_in = [];
@@ -245,32 +243,23 @@ class CApiTagHelper {
 				]);
 			}
 
-			$negated_where_conditions[] = '(NOT EXISTS ('.
+			$where_conditions[] = '(NOT EXISTS ('.
 				'SELECT NULL'.
 				' FROM host_tag'.
-				' WHERE (h.hostid=host_tag.hostid'.
+				' WHERE ('.$parent_alias.'.hostid=host_tag.hostid'.
 					' AND host_tag.tag='.zbx_dbstr($tag).
-						($tag_where['values'] ? ' AND ('.implode(' OR ', $tag_where['values']).')' : '').
-					')'.
-					($templateids_in
-						? ' OR '.dbConditionInt('ht2.templateid', array_keys($templateids_in)).''
-						: ''
-					).
+					($tag_where['values'] ? ' AND ('.implode(' OR ', $tag_where['values']).')' : '').
 				')'.
+			')'.
+			($templateids_in
+				? ' AND NOT EXISTS ('.
+					'SELECT NULL'.
+					' FROM hosts_templates'.
+					' WHERE '.$parent_alias.'.hostid=hosts_templates.hostid'.
+						' AND '.dbConditionInt('hosts_templates.templateid', array_keys($templateids_in)).
+				')'
+				: '').
 			')';
-		}
-
-		$where_conditions = [];
-
-		if ($negated_where_conditions) {
-			if ($evaltype == TAG_EVAL_TYPE_AND_OR) {
-				$where_conditions[] = implode(' AND ', $negated_where_conditions);
-			}
-			else {
-				$where_conditions = array_map(function ($condition) {
-					return $condition;
-				}, $negated_where_conditions);
-			}
 		}
 
 		// Make 'where' conditions for inclusive filter tags.
@@ -279,20 +268,14 @@ class CApiTagHelper {
 			$values = [];
 
 			if ($tag_values === false) {
-				$templateids += self::getMatchingTemplateids(['tag' => $tag_name, 'operator' => TAG_OPERATOR_EXISTS],
-					$db_template_tags
-				);
+				$tag = ['tag' => $tag_name, 'operator' => TAG_OPERATOR_EXISTS];
+				$templateids += self::getMatchingTemplateids($tag, $db_template_tags);
 			}
 			else {
 				foreach ($tag_values as $tag) {
 					$templateids += self::getMatchingTemplateids($tag, $db_template_tags);
 
-					if ($tag['operator'] == TAG_OPERATOR_EXISTS) {
-						$values = false;
-					}
-					elseif (is_array($values)) {
-						$values[] = self::makeTagWhereCondition($tag);
-					}
+					$values[] = self::makeTagWhereCondition($tag);
 				}
 			}
 
@@ -311,11 +294,18 @@ class CApiTagHelper {
 			$where_conditions[] = '(EXISTS ('.
 				'SELECT NULL'.
 				' FROM host_tag'.
-				' WHERE h.hostid=host_tag.hostid'.
+				' WHERE '.$parent_alias.'.hostid=host_tag.hostid'.
 					' AND host_tag.tag='.zbx_dbstr($tag_name).
 					($values ? ' AND ('.implode(' OR ', $values).')' : '').
 				')'.
-				($templateids_in ? ' OR '.dbConditionInt('ht2.templateid', array_keys($templateids_in)) : '').
+				($templateids_in
+					? ' OR EXISTS ('.
+						'SELECT NULL'.
+						' FROM hosts_templates'.
+						' WHERE '.$parent_alias.'.hostid=hosts_templates.hostid'.
+							' AND '.dbConditionInt('hosts_templates.templateid', array_keys($templateids_in)).
+					')'
+					: '').
 			')';
 		}
 
