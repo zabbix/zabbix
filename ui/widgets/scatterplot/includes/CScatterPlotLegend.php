@@ -82,7 +82,6 @@ class CScatterPlotLegend extends CDiv {
 
 	private function draw(): void {
 		foreach ($this->legend_items as $item) {
-			// border-color is for legend element ::before pseudo element.
 			$icon = null;
 
 			switch ($item['marker']) {
