@@ -71,14 +71,15 @@ static int	housekeep_problems_events(zbx_vector_uint64_t *eventids)
 		sql_offset = 0;
 		zbx_db_add_condition_alloc(&sql, &sql_alloc, &sql_offset, "eventid", eventids_offset, count);
 
-		zbx_db_begin();
+		do
+		{
+			zbx_db_begin();
 
-		zbx_db_execute("delete from problem where%s", sql);
-		zbx_db_execute("delete from event_recovery where%s", sql);
-		zbx_db_execute("delete from events where%s", sql);
-
-		if (ZBX_DB_OK != zbx_db_commit())
-			zabbix_log(LOG_LEVEL_WARNING, "Failed to delete a problems without a trigger");
+			zbx_db_execute("delete from problem where%s", sql);
+			zbx_db_execute("delete from event_recovery where%s", sql);
+			zbx_db_execute("delete from events where%s", sql);
+		}
+		while (ZBX_DB_DOWN == zbx_db_commit());
 	}
 
 	housekeep_service_problems(eventids);
@@ -132,7 +133,7 @@ static int	housekeep_problems_without_triggers(int config_max_hk_delete, int *mo
 			" from problem"
 			" where source=%d"
 				" and object=%d"
-				" and not exists (select NULL from triggers where triggerid=objectid)",
+				" and not exists (select NULL from triggers where triggerid=objectid) order by eventid",
 				EVENT_SOURCE_TRIGGERS, EVENT_OBJECT_TRIGGER);
 
 	deleted = zbx_housekeep_problems_events(sql, config_max_hk_delete, more);
