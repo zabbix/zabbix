@@ -170,7 +170,7 @@ class СScatterPlot extends CSvg {
 				'y_axis_items' => $metric['y_axis_items'],
 				'x_units' => $metric['x_units'],
 				'y_units' => $metric['y_units'],
-				'options' => ['order' => $index] + $metric['options'],
+				'options' => ['order' => $index] + $metric['options']
 			];
 
 			if (!array_key_exists('points', $metric) || !$metric['points']) {

@@ -21,9 +21,9 @@ class CSvgTriangle extends CSvgPolygon {
 		$half_height = $height / 2;
 
 		$points = [
-			[$x, $y - $half_height],     // top middle
-			[$x - $half_width, $y + $half_height], // bottom left
-			[$x + $half_width, $y + $half_height], // bottom right
+			[$x, $y - $half_height],                // top middle
+			[$x - $half_width, $y + $half_height],  // bottom left
+			[$x + $half_width, $y + $half_height]   // bottom right
 		];
 
 		parent::__construct($points);

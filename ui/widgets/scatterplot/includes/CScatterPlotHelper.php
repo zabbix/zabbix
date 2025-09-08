@@ -153,7 +153,7 @@ class CScatterPlotHelper
 					'searchByAny' => true,
 					'sortfield' => 'name',
 					'sortorder' => ZBX_SORT_UP,
-					'limit' => $max_metrics[$axis],
+					'limit' => $max_metrics[$axis]
 				];
 
 				if ($resolve_macros) {
@@ -709,14 +709,14 @@ class CScatterPlotHelper
 			return $color;
 		}
 
-		$prev = null;
-		$current = null;
-
 		$is_binary_x_units = isBinaryUnits($units_x);
 		$is_binary_y_units = isBinaryUnits($units_y);
 
 		$x_key = $is_binary_x_units ? 'x_binary' : 'x';
 		$y_key = $is_binary_y_units ? 'y_binary' : 'y';
+
+		$prev = null;
+		$current = null;
 
 		foreach ($grouped_thresholds as $group => $thresholds) {
 			if ($prev !== null) {
@@ -753,12 +753,12 @@ class CScatterPlotHelper
 		if ($apply_interpolation) {
 			$prev_threshold = [
 				'x' => array_key_exists($x_key, $prev) ? $prev[$x_key] : $value_x,
-				'y' => array_key_exists($y_key, $prev) ? $prev[$y_key] : $value_y,
+				'y' => array_key_exists($y_key, $prev) ? $prev[$y_key] : $value_y
 			];
 
 			$current_threshold = [
 				'x' => array_key_exists($x_key, $current) ? $current[$x_key] : $value_x,
-				'y' => array_key_exists($y_key, $current) ? $current[$y_key] : $value_y,
+				'y' => array_key_exists($y_key, $current) ? $current[$y_key] : $value_y
 			];
 
 			$position = self::calculateInterpolationPosition($prev_threshold, $current_threshold, $value_x, $value_y);

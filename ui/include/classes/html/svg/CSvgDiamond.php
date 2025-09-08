@@ -19,10 +19,10 @@ class CSvgDiamond extends CSvgPolygon {
 	public function __construct($x, $y, $size) {
 		$half = $size / 2;
 		$points = [
-			[$x, $y - $half], // top
+			[$x, $y - $half],  // top
 			[$x + $half, $y],  // right
-			[$x, $y + $half], // bottom
-			[$x - $half, $y],  // left
+			[$x, $y + $half],  // bottom
+			[$x - $half, $y]   // left
 		];
 
 		parent::__construct($points);

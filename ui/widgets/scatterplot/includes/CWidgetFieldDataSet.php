@@ -160,7 +160,7 @@ class CWidgetFieldDataSet extends CWidgetField {
 		foreach ($hostgroups as $hostgroup) {
 			$captions[ZBX_WIDGET_FIELD_TYPE_GROUP][$hostgroup['groupid']] = [
 				'id' => $hostgroup['groupid'],
-				'name' => $hostgroup['name'],
+				'name' => $hostgroup['name']
 			];
 		}
 

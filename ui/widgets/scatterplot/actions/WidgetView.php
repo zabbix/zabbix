@@ -107,7 +107,7 @@ class WidgetView extends CControllerDashboardWidgetView {
 				'y_axis_max' => $y_axis_max,
 				'y_axis_units' => $this->fields_values['y_axis_units'] == SVG_GRAPH_AXIS_UNITS_STATIC
 					? $this->fields_values['y_axis_static_units']
-					: null,
+					: null
 			],
 			'legend' => [
 				'show_legend' => $this->fields_values['legend'] == WidgetForm::LEGEND_ON,
