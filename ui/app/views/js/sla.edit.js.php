@@ -167,11 +167,7 @@ window.sla_edit_popup = new class {
 		curl.setArgument('action', 'sla.delete');
 		curl.setArgument(CSRF_TOKEN_NAME, <?= json_encode(CCsrfTokenHelper::get('sla')) ?>);
 
-		this._post(curl.getUrl(), {slaids: [this.slaid]}, (response) => {
-			overlayDialogueDestroy(this.overlay.dialogueid);
-
-			this.dialogue.dispatchEvent(new CustomEvent('dialogue.submit', {detail: response}));
-		});
+		this._post(curl.getUrl(), {slaids: [this.slaid]});
 	}
 
 	submit() {
@@ -202,7 +198,8 @@ window.sla_edit_popup = new class {
 			}
 		}
 
-		const curl = new Curl(this.form_element.getAttribute('action'));
+		const curl = new Curl('zabbix.php');
+		curl.setArgument('action', this.slaid !== null ? 'sla.update' : 'sla.create');
 
 		this.form.validateSubmit(fields)
 			.then((result) => {
@@ -212,22 +209,11 @@ window.sla_edit_popup = new class {
 					return;
 				}
 
-				this._post(curl.getUrl(), fields, (response) => {
-					if ('form_errors' in response) {
-						this.form.setErrors(response.form_errors, true, true);
-						this.form.renderErrors();
-
-						return;
-					}
-
-					overlayDialogueDestroy(this.overlay.dialogueid);
-
-					this.dialogue.dispatchEvent(new CustomEvent('dialogue.submit', {detail: response}));
-				});
+				this._post(curl.getUrl(), fields);
 			});
 	}
 
-	_post(url, data, success_callback) {
+	_post(url, data) {
 		fetch(url, {
 			method: 'POST',
 			headers: {'Content-Type': 'application/json'},
@@ -239,9 +225,17 @@ window.sla_edit_popup = new class {
 					throw {error: response.error};
 				}
 
-				return response;
+				if ('form_errors' in response) {
+					this.form.setErrors(response.form_errors, true, true);
+					this.form.renderErrors();
+
+					return;
+				}
+
+				overlayDialogueDestroy(this.overlay.dialogueid);
+
+				this.dialogue.dispatchEvent(new CustomEvent('dialogue.submit', {detail: response}));
 			})
-			.then(success_callback)
 			.catch((exception) => {
 				this._ajaxExceptionHandler(exception)
 			})
@@ -259,8 +253,9 @@ window.sla_edit_popup = new class {
 	}
 
 	_ajaxExceptionHandler(exception) {
-		let title;
-		let messages;
+		this._removePopupMessages();
+
+		let title, messages;
 
 		if (typeof exception === 'object' && 'error' in exception) {
 			title = exception.error.title;
@@ -270,20 +265,18 @@ window.sla_edit_popup = new class {
 			messages = [<?= json_encode(_('Unexpected server error.')) ?>];
 		}
 
-		this._addMessageBox(makeMessageBox('bad', messages, title)[0]);
+		const message_box = makeMessageBox('bad', messages, title)[0];
+
+		this._addMessageBox(message_box);
 	}
 
 	_addMessageBox(message_box) {
 		this._removeMessageBoxes();
 
-		const step_form = this.dialogue.querySelector('.step-form');
-
-		step_form.parentNode.insertBefore(message_box, step_form);
+		this.form_element.parentNode.insertBefore(message_box, this.form_element);
 	}
 
 	_removeMessageBoxes() {
 		this.dialogue.querySelectorAll('.overlay-dialogue-body .msg-bad').forEach(message_box => message_box.remove());
 	}
 };
-
-//# sourceURL=media.test.edit.js.php
