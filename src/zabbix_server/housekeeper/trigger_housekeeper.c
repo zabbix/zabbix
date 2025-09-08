@@ -88,6 +88,7 @@ static int	housekeep_problems_events(zbx_vector_uint64_t *eventids)
 	}
 
 	housekeep_service_problems(eventids);
+	zbx_free(sql);
 
 	return offset;
 }
