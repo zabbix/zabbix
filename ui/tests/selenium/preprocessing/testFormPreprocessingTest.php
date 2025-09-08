@@ -28,12 +28,12 @@ require_once dirname(__FILE__).'/../behaviors/CPreprocessingBehavior.php';
 class testFormPreprocessingTest extends CWebTest {
 
 	/**
-	 * Attach PreprocessingBehavior to the test.
+	 * Attach PreprocessingBehavior and MessageBehavior to the test.
 	 *
 	 * @return array
 	 */
 	public function getBehaviors() {
-		return [CPreprocessingBehavior::class];
+		return [CPreprocessingBehavior::class, CMessageBehavior::class];
 	}
 
 	const HOST_ID = 40001;		//'Simple form test host'
@@ -500,6 +500,7 @@ class testFormPreprocessingTest extends CWebTest {
 		$dialog->close();
 
 		$form->submit();
+		$this->assertMessage(TEST_GOOD, 'Item added');
 
 		// Assert right steps order after item saving.
 		$id = CDBHelper::getValue('SELECT itemid FROM items WHERE key_='.zbx_dbstr(self::$key));

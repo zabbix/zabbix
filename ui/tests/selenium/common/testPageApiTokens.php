@@ -190,6 +190,7 @@ class testPageApiTokens extends CWebTest {
 		$this->assertMessage(TEST_GOOD, $message_title );
 		$this->assertEquals($column_status, $row->getColumn('Status')->getText());
 		$this->assertEquals($db_status, CDBHelper::getValue('SELECT status FROM token WHERE name='.zbx_dbstr($token)));
+		CMessageElement::find()->one()->close();
 	}
 
 	/**

@@ -62,6 +62,15 @@ class testFormAdministrationGeneralMacros extends testFormMacros {
 	public $update_vault_macro = '{$1_VAULT_MACRO_CHANGED}';
 	public $vault_macro_index = 1;
 
+	/**
+	 * Attach MessageBehavior to the test.
+	 *
+	 * @return array
+	 */
+	public function getBehaviors() {
+		return [CMessageBehavior::class];
+	}
+
 	private function openGlobalMacros() {
 		$this->zbxTestLogin('zabbix.php?action=macros.edit');
 		$this->query('id:page-title-general')->asPopupButton()->one()->select('Macros');
@@ -390,8 +399,7 @@ class testFormAdministrationGeneralMacros extends testFormMacros {
 		$this->zbxTestInputType('macros_0_description', $this->updDescription);
 
 		$this->saveGlobalMacros();
-		$this->zbxTestTextPresent('Cannot update macros');
-		$this->zbxTestTextPresent('Invalid parameter "/1/macro": '.$error.'.');
+		$this->assertMessage(TEST_BAD, 'Cannot update macros', 'Invalid parameter "/1/macro": '.$error.'.');
 
 		$this->zbxTestAssertElementValue('macros_0_macro', $macro);
 		$this->zbxTestAssertElementValue('macros_0_value', $this->updValue);

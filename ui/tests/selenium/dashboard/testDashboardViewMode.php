@@ -70,6 +70,7 @@ class testDashboardViewMode extends CLegacyWebTest {
 		$userid = CDBHelper::getValue('SELECT userid FROM users WHERE username='.zbx_dbstr($data['username']));
 		$this->authenticateUser($data['sessionid'], $userid);
 		$this->zbxTestOpen('zabbix.php?action=dashboard.view&dashboardid=1');
+		CDashboardElement::find()->one()->waitUntilReady();
 		$this->zbxTestCheckTitle('Dashboard');
 		$this->zbxTestCheckHeader('Global view');
 

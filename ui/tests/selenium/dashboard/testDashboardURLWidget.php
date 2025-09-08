@@ -698,7 +698,7 @@ class testDashboardURLWidget extends CWebTest {
 	 */
 	public function testDashboardURLWidget_IframeSandboxing() {
 		$this->page->login()->open('zabbix.php?action=dashboard.view&dashboardid='.self::$dashboardid)->waitUntilReady();
-		$dashboard = CDashboardElement::find()->one();
+		$dashboard = CDashboardElement::find()->one()->waitUntilReady();
 		$widget = $dashboard->getWidget(self::$frame_widget)->getContent();
 
 		// Update host in widget.
