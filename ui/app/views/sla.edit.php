@@ -169,18 +169,23 @@ $sla_tab = (new CFormGrid())
 							))
 								->setAttribute('placeholder', _('tag'))
 								->setWidth(ZBX_TEXTAREA_FILTER_SMALL_WIDTH)
+								->setErrorLabel(_('Name'))
 								->setErrorContainer('service_tags_#{rowNum}_error_container'),
 							(new CSelect('service_tags[#{rowNum}][operator]'))
 								->addOptions(CSelect::createOptionsFromArray([
 									ZBX_SLA_SERVICE_TAG_OPERATOR_EQUAL => _('Equals'),
 									ZBX_SLA_SERVICE_TAG_OPERATOR_LIKE => _('Contains')
 								]))
-								->setValue(ZBX_SLA_SERVICE_TAG_OPERATOR_EQUAL),
+								->setValue(ZBX_SLA_SERVICE_TAG_OPERATOR_EQUAL)
+								->setErrorLabel(_('Operation'))
+								->setErrorContainer('service_tags_#{rowNum}_error_container'),
 							(new CTextBox('service_tags[#{rowNum}][value]', '#{value}', false,
 								DB::getFieldLength('sla_service_tag', 'value')
 							))
 								->setAttribute('placeholder', _('value'))
-								->setWidth(ZBX_TEXTAREA_FILTER_SMALL_WIDTH),
+								->setWidth(ZBX_TEXTAREA_FILTER_SMALL_WIDTH)
+								->setErrorLabel(_('Value'))
+								->setErrorContainer('service_tags_#{rowNum}_error_container'),
 							(new CButtonLink(_('Remove')))->addClass('element-table-remove')
 						]))->addClass('form_row'),
 						(new CRow([
