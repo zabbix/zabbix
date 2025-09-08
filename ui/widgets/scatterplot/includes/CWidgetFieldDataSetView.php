@@ -410,7 +410,8 @@ class CWidgetFieldDataSetView extends CWidgetFieldView {
 		}
 
 		$marker_radio = (new CRadioButtonList($field_name.'['.$row_num.'][marker]', (int) $value['marker']))
-			->setId($field_name.'_'.$row_num.'_marker');
+			->setId($field_name.'_'.$row_num.'_marker')
+			->setModern();
 
 		foreach (CScatterPlotMetricPoint::MARKER_ICONS as $marker_type => $icon) {
 			$marker_radio->addValue(new CIcon($icon), $marker_type);

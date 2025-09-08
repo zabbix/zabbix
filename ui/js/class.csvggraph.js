@@ -107,7 +107,7 @@
 	function hideHelper(graph) {
 		graph.find('.svg-helper').attr({'x1': -10, 'x2': -10});
 
-		if (graph.data('options').hintbox_type === GRAPH_HINTBOX_TYPE_SCATTERPLOT) {
+		if (graph.data('options').hintbox_type === GRAPH_HINTBOX_TYPE_SCATTER_PLOT) {
 			const highlighted_points = graph[0].querySelectorAll('g.js-svg-highlight-group');
 
 			for (const highlighted_point of highlighted_points) {
@@ -660,16 +660,16 @@
 			 */
 			if (data.isHintBoxFrozen === false) {
 				points.forEach(function(point) {
-					if (!show_hint && (hintbox_type === GRAPH_HINTBOX_TYPE_SCATTERPLOT || point.v !== null)) {
+					if (!show_hint && (hintbox_type === GRAPH_HINTBOX_TYPE_SCATTER_PLOT || point.v !== null)) {
 						show_hint = true;
 					}
 
 					const tolerance = getDataPointTolerance(point.g, hintbox_type);
 
-					if (!xy_point && (hintbox_type === GRAPH_HINTBOX_TYPE_SCATTERPLOT || point.v !== null)
+					if (!xy_point && (hintbox_type === GRAPH_HINTBOX_TYPE_SCATTER_PLOT || point.v !== null)
 							&& (+point.x + tolerance) > e.offsetX && e.offsetX > (+point.x - tolerance)
 							&& (+point.y + tolerance) > e.offsetY && e.offsetY > (+point.y - tolerance)) {
-						if (hintbox_type === GRAPH_HINTBOX_TYPE_SCATTERPLOT) {
+						if (hintbox_type === GRAPH_HINTBOX_TYPE_SCATTER_PLOT) {
 							xy_points.push(point);
 							points_total = xy_points.length;
 						}
@@ -681,7 +681,7 @@
 				});
 			}
 
-			if (hintbox_type === GRAPH_HINTBOX_TYPE_SCATTERPLOT) {
+			if (hintbox_type === GRAPH_HINTBOX_TYPE_SCATTER_PLOT) {
 				const highlighted_points = graph[0].querySelectorAll('g.js-svg-highlight-group');
 
 				for (const highlighted_point of highlighted_points) {
@@ -695,16 +695,16 @@
 			}
 			let rows_added = 0;
 			points.forEach(function(point) {
-				const point_highlight = hintbox_type === GRAPH_HINTBOX_TYPE_SCATTERPLOT
+				const point_highlight = hintbox_type === GRAPH_HINTBOX_TYPE_SCATTER_PLOT
 					? point.g.querySelector('g.js-svg-highlight-group')
 					: point.g.querySelector('.svg-point-highlight');
 
-				const include_point = hintbox_type === GRAPH_HINTBOX_TYPE_SCATTERPLOT
+				const include_point = hintbox_type === GRAPH_HINTBOX_TYPE_SCATTER_PLOT
 					? xy_points.includes(point) || xy_points.length === 0
 					: point.v !== null && (xy_point === false || xy_point === point);
 
 				if (include_point) {
-					if (hintbox_type === GRAPH_HINTBOX_TYPE_SCATTERPLOT) {
+					if (hintbox_type === GRAPH_HINTBOX_TYPE_SCATTER_PLOT) {
 						point_highlight.setAttribute('transform', point.transform);
 					}
 					else {
@@ -717,7 +717,7 @@
 					}
 
 					if (show_hint && data.hintMaxRows > rows_added) {
-						if (data.hintbox_type === 1) {
+						if (data.hintbox_type === GRAPH_HINTBOX_TYPE_SCATTER_PLOT) {
 							const time_from = new CDate(point.time_from * 1000);
 							const time_to = new CDate(point.time_to * 1000);
 
@@ -761,7 +761,7 @@
 					}
 				}
 				else {
-					if (hintbox_type === GRAPH_HINTBOX_TYPE_SCATTERPLOT) {
+					if (hintbox_type === GRAPH_HINTBOX_TYPE_SCATTER_PLOT) {
 						point_highlight.setAttribute('transform', 'translate(-10, -10)');
 					}
 					else {
