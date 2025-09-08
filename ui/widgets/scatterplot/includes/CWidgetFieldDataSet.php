@@ -23,7 +23,7 @@ use Zabbix\Widgets\CWidgetField;
 use Zabbix\Widgets\Fields\CWidgetFieldMultiSelectOverrideHost;
 
 /**
- * Class for data set widget field used in Graph widget configuration Data set tab.
+ * Class for data set widget field used in Scatter plot widget configuration Data set tab.
  */
 class CWidgetFieldDataSet extends CWidgetField {
 
@@ -33,9 +33,9 @@ class CWidgetFieldDataSet extends CWidgetField {
 	public const DATASET_TYPE_SINGLE_ITEM = 0;
 	public const DATASET_TYPE_PATTERN_ITEM = 1;
 
-	public const DATASET_MARKER_SIZE_SMALL = 6;
-	public const DATASET_MARKER_SIZE_MEDIUM = 9;
-	public const DATASET_MARKER_SIZE_LARGE = 12;
+	public const DATASET_MARKER_SIZE_SMALL = 0;
+	public const DATASET_MARKER_SIZE_MEDIUM = 1;
+	public const DATASET_MARKER_SIZE_LARGE = 2;
 
 	// Predefined colors for data-sets in JSON format. Each next data set takes next sequential value from palette.
 	public const DEFAULT_COLOR_PALETTE = [

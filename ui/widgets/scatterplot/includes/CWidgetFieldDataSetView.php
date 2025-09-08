@@ -378,9 +378,8 @@ class CWidgetFieldDataSetView extends CWidgetFieldView {
 						))
 					);
 
-				$dataset_head = array_merge($dataset_head, [
-					(new CDiv([$empty_msg_block, $items_list]))->addClass('items-list table-forms-separator')
-				]);
+				$dataset_head[] = (new CDiv([$empty_msg_block, $items_list]))
+					->addClass('items-list table-forms-separator');
 			}
 		}
 

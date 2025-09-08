@@ -285,16 +285,16 @@ class СScatterPlot extends CSvg {
 		$this->canvas_height = max(0, $this->height - $offset_top - $offset_bottom);
 		$this->canvas_y = $offset_top;
 
-		// Determine units for y axis.
-
-		if ($this->y_units === null) {
-			$this->y_units = reset(reset($this->metrics)['y_axis_items'])['units'];
-		}
-
 		// Determine units for x axis.
 
 		if ($this->x_units === null) {
 			$this->x_units = reset(reset($this->metrics)['x_axis_items'])['units'];
+		}
+
+		// Determine units for y axis.
+
+		if ($this->y_units === null) {
+			$this->y_units = reset(reset($this->metrics)['y_axis_items'])['units'];
 		}
 
 		$this->y_min_calculated = $this->y_min === null;
@@ -540,8 +540,8 @@ class СScatterPlot extends CSvg {
 	}
 
 	/**
-	 * Get array of X points with labels, for grid and X/Y axes. Array key is Y coordinate for SVG, value is label with
-	 * axis units.
+	 * Get array of X/Y points with labels, for grid and X/Y axes. Array key is Y coordinate for SVG, value is label
+	 * with axis units.
 	 *
 	 * @param int  $axis       Axis for which to get the values.
 	 * @param bool $empty_set  Return defaults for empty side.

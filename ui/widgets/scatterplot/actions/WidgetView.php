@@ -23,6 +23,7 @@ use CControllerDashboardWidgetView,
 
 use Widgets\ScatterPlot\Includes\{
 	CScatterPlotHelper,
+	CWidgetFieldDataSet,
 	WidgetForm
 };
 
@@ -32,6 +33,12 @@ class WidgetView extends CControllerDashboardWidgetView {
 	private const GRAPH_WIDTH_MAX = 65535;
 	private const GRAPH_HEIGHT_MIN = 1;
 	private const GRAPH_HEIGHT_MAX = 65535;
+
+	private const MARKER_SIZES = [
+		CWidgetFieldDataSet::DATASET_MARKER_SIZE_SMALL => 6,
+		CWidgetFieldDataSet::DATASET_MARKER_SIZE_MEDIUM => 9,
+		CWidgetFieldDataSet::DATASET_MARKER_SIZE_LARGE => 12
+	];
 
 	protected function init(): void {
 		parent::init();
@@ -68,8 +75,17 @@ class WidgetView extends CControllerDashboardWidgetView {
 			? $parser->calcValue()
 			: null;
 
+		$data_sets = array_values($this->fields_values['ds']);
+
+		foreach ($data_sets as &$data_set) {
+			$data_set['marker_size'] = array_key_exists($data_set['marker_size'], self::MARKER_SIZES)
+				? self::MARKER_SIZES[$data_set['marker_size']]
+				: self::MARKER_SIZES[CWidgetFieldDataSet::DATASET_MARKER_SIZE_SMALL];
+		}
+		unset($data_set);
+
 		$graph_data = [
-			'data_sets' => array_values($this->fields_values['ds']),
+			'data_sets' => $data_sets,
 			'data_source' => $this->fields_values['source'],
 			'fix_time_period' => ($this->isTemplateDashboard() && !$this->fields_values['override_hostid'])
 				|| $has_custom_time_period,

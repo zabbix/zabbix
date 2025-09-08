@@ -29,10 +29,14 @@ use CSvgCircle,
 class CScatterPlotMetricPoint extends CSvgGroup {
 
 	/**
+	 * Horizontal position of points, which must be hidden, yet still rendered.
+	 */
+	public const X_OUT_OF_RANGE = -10;
+
+	/**
 	 * Vertical position of points, which must be hidden, yet still rendered.
 	 */
 	public const Y_OUT_OF_RANGE = -10;
-	public const X_OUT_OF_RANGE = -10;
 
 	public const MARKER_TYPE_ELLIPSIS = 0;
 	public const MARKER_TYPE_SQUARE = 1;
