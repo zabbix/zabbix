@@ -92,10 +92,6 @@ jQuery(function($) {
 	}
 
 	function uncheckedHandler($checkbox) {
-		if ($checkbox[0].hasAttribute('data-disabled-uncheck-handler')) {
-			return;
-		}
-
 		var $hidden = $checkbox.prev('input[type=hidden][name="' + $checkbox.prop('name') + '"]');
 
 		if ($checkbox.is(':checked') || $checkbox.prop('disabled')) {
