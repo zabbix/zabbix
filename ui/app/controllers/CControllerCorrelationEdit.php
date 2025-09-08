@@ -63,36 +63,37 @@ class CControllerCorrelationEdit extends CController {
 			}
 
 			$this->correlation = $correlations[0];
-
-			$op_types = array_column($this->correlation['operations'], 'type', 'type');
-			$this->correlation['op_close_old'] = array_key_exists(ZBX_CORR_OPERATION_CLOSE_OLD, $op_types);
-			$this->correlation['op_close_new'] = array_key_exists(ZBX_CORR_OPERATION_CLOSE_NEW, $op_types);
-			$this->correlation += $this->correlation['filter'];
-			unset($this->correlation['filter']);
 		}
 
 		return true;
 	}
 
 	protected function doAction(): void {
-		$correlation = $this->correlation + DB::getDefaults('correlation') + [
-			'correlationid' => null,
-			'op_close_new' => false,
-			'op_close_old' => false,
-			'conditions' => []
+		$correlation = $this->correlation + DB::getDefaults('correlation');
+
+		$js_validation_rules = array_key_exists('correlationid', $correlation) && $correlation['correlationid']
+			? CControllerCorrelationUpdate::getValidationRules()
+			: CControllerCorrelationCreate::getValidationRules();
+
+		$data = [
+			'correlation' => $correlation,
+			'hostgroup_names' => $this->fetchHostGroupNames($correlation),
+			'js_validation_rules' => (new CFormValidator($js_validation_rules))->getRules(),
+			'user' => ['debug_mode' => $this->getDebugMode()]
 		];
 
-		foreach ($correlation['conditions'] as &$condition) {
-			$condition += [
-				'operator' => array_key_exists('operator', $condition)
-					? (int) $condition['operator']
-					: CONDITION_OPERATOR_EQUAL
-			];
-			$condition['operator_name'] = CCorrelationHelper::getLabelByOperator($condition['operator']);
-		}
-		unset($condition);
+		$response = new CControllerResponseData($data);
+		$response->setTitle(_('Event correlation rules'));
+		$this->setResponse($response);
+	}
 
-		$groupids = array_column($correlation['conditions'], 'groupid', 'groupid');
+	/**
+	 * @param array $correlation  API structure.
+	 *
+	 * @return array<string, string>  Group names keyed by group ID.
+	 */
+	protected function fetchHostGroupNames(array $correlation): array {
+		$groupids = array_column($correlation['filter']['conditions'], 'groupid', 'groupid');
 		$group_names = [];
 
 		if ($groupids) {
@@ -105,28 +106,6 @@ class CControllerCorrelationEdit extends CController {
 			$group_names = array_column($groups, 'name', 'groupid');
 		}
 
-		foreach ($correlation['conditions'] as &$condition) {
-			if (array_key_exists('groupid', $condition)
-					&& array_key_exists($condition['groupid'], $group_names)) {
-				$condition['groupid'] = [$condition['groupid'] => $group_names[$condition['groupid']]];
-			}
-		}
-		unset($condition);
-
-		$correlation['conditions'] = array_values($correlation['conditions']);
-
-		$js_validation_rules = array_key_exists('correlationid', $correlation) && $correlation['correlationid']
-			? CControllerCorrelationUpdate::getValidationRules()
-			: CControllerCorrelationCreate::getValidationRules();
-
-		$data = [
-			'correlation' => $correlation,
-			'js_validation_rules' => (new CFormValidator($js_validation_rules))->getRules(),
-			'user' => ['debug_mode' => $this->getDebugMode()]
-		];
-
-		$response = new CControllerResponseData($data);
-		$response->setTitle(_('Event correlation rules'));
-		$this->setResponse($response);
+		return $group_names;
 	}
 }

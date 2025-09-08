@@ -42,151 +42,7 @@ $form_grid = (new CFormGrid())
 		)
 	]);
 
-$remove_button = (new CButtonLink(_('Remove')))->addClass('js-condition-remove');
-
-$condition_tag_template = (new CTemplateTag('condition-tag-row-tmpl'))
-	->addItem(
-		(new CRow([
-			(new CCol('#{label}'))
-				->addClass('label')
-				->setAttribute('data-conditiontype', '#{type}')
-				->setAttribute('data-formulaid', '#{label}'),
-			(new CCol([
-				'#{condition_name}', ' ', new CTag('em', true, '#{data}')
-			]))
-				->addClass(ZBX_STYLE_WORDWRAP)
-				->addStyle(ZBX_TEXTAREA_BIG_WIDTH.'px;'),
-			(new CCol([
-				$remove_button,
-				(new CInput('hidden'))
-					->setAttribute('value', '#{type}')
-					->setName('conditions[#{row_index}][type]')
-					->setAttribute('data-field-type', 'hidden'),
-				(new CInput('hidden'))
-					->setAttribute('value', '#{operator}')
-					->setName('conditions[#{row_index}][operator]')
-					->setAttribute('data-field-type', 'hidden'),
-				(new CInput('hidden'))
-					->setAttribute('value', '#{tag}')
-					->setName('conditions[#{row_index}][tag]')
-					->setAttribute('data-field-type', 'hidden'),
-				(new CInput('hidden'))
-					->setAttribute('value', '#{label}')
-					->setName('conditions[#{row_index}][formulaid]')
-					->setAttribute('data-field-type', 'hidden')
-			]))
-		]))->setId('conditions_#{row_index}')
-	);
-
-$condition_hostgroup_template = (new CTemplateTag('condition-hostgr-row-tmpl'))->addItem(
-	(new CRow([
-		(new CCol('#{label}'))
-			->addClass('label')
-			->setAttribute('data-conditiontype', '#{type}')
-			->setAttribute('data-formulaid', '#{label}'),
-		(new CCol([
-			'#{condition_name}', ' ', new CTag('em', true, '#{data}')
-		]))
-			->addClass(ZBX_STYLE_WORDWRAP)
-			->addStyle(ZBX_TEXTAREA_BIG_WIDTH.'px;'),
-		(new CCol([
-			$remove_button,
-			(new CInput('hidden'))
-				->setAttribute('value', '#{type}')
-				->setName('conditions[#{row_index}][type]')
-				->setAttribute('data-field-type', 'hidden'),
-			(new CInput('hidden'))
-				->setAttribute('value', '#{operator}')
-				->setName('conditions[#{row_index}][operator]')
-				->setAttribute('data-field-type', 'hidden'),
-			(new CInput('hidden'))
-				->setAttribute('value', '#{groupid}')
-				->setName('conditions[#{row_index}][groupid]')
-				->setAttribute('data-field-type', 'hidden'),
-			(new CInput('hidden'))
-				->setAttribute('value', '#{label}')
-				->setName('conditions[#{row_index}][formulaid]')
-				->setAttribute('data-field-type', 'hidden')
-		]))
-	]))->setId('conditions_#{row_index}')
-);
-
-$condition_tag_pair_template = (new CTemplateTag('condition-tag-pair-row-tmpl'))->addItem(
-	(new CRow([
-		(new CCol('#{label}'))
-			->addClass('label')
-			->setAttribute('data-conditiontype', '#{type}')
-			->setAttribute('data-formulaid', '#{label}'),
-		(new CCol([
-			'#{condition_name}', ' ', new CTag('em', true, '#{data_old_tag}'), ' ', '#{condition_operator}', ' ',
-			'#{condition_name2}', ' ', new CTag('em', true, '#{data_new_tag}')
-		]))
-			->addClass(ZBX_STYLE_WORDWRAP)
-			->addStyle(ZBX_TEXTAREA_BIG_WIDTH.'px;'),
-		(new CCol([
-			$remove_button,
-			(new CInput('hidden'))
-				->setAttribute('value', '#{type}')
-				->setName('conditions[#{row_index}][type]')
-				->setAttribute('data-field-type', 'hidden'),
-			(new CInput('hidden'))
-				->setAttribute('value', '#{operator}')
-				->setName('conditions[#{row_index}][operator]')
-				->setAttribute('data-field-type', 'hidden'),
-			(new CInput('hidden'))
-				->setAttribute('value', '#{oldtag}')
-				->setName('conditions[#{row_index}][oldtag]')
-				->setAttribute('data-field-type', 'hidden'),
-			(new CInput('hidden'))
-				->setAttribute('value', '#{newtag}')
-				->setName('conditions[#{row_index}][newtag]')
-				->setAttribute('data-field-type', 'hidden'),
-			(new CInput('hidden'))
-				->setAttribute('value', '#{label}')
-				->setName('conditions[#{row_index}][formulaid]')
-				->setAttribute('data-field-type', 'hidden')
-		]))
-	]))->setId('conditions_#{row_index}')
-);
-
-$condition_old_new_tag_template = (new CTemplateTag('condition-old-new-tag-row-tmpl'))->addItem(
-	(new CRow([
-		(new CCol('#{label}'))
-			->addClass('label')
-			->setAttribute('data-conditiontype', '#{type}')
-			->setAttribute('data-formulaid', '#{label}'),
-		(new CCol([
-			'#{condition_name}', ' ', new CTag('em', true, '#{tag}'), ' ',
-			'#{condition_operator}', ' ', new CTag('em', true, '#{value}')
-		]))
-			->addClass(ZBX_STYLE_WORDWRAP)
-			->addStyle(ZBX_TEXTAREA_BIG_WIDTH),
-		(new CCol([
-			$remove_button,
-			(new CInput('hidden'))
-				->setAttribute('value', '#{type}')
-				->setName('conditions[#{row_index}][type]')
-				->setAttribute('data-field-type', 'hidden'),
-			(new CInput('hidden'))
-				->setAttribute('value', '#{operator}')
-				->setName('conditions[#{row_index}][operator]')
-				->setAttribute('data-field-type', 'hidden'),
-			(new CInput('hidden'))
-				->setAttribute('value', '#{tag}')
-				->setName('conditions[#{row_index}][tag]')
-				->setAttribute('data-field-type', 'hidden'),
-			(new CInput('hidden'))
-				->setAttribute('value', '#{value}')
-				->setName('conditions[#{row_index}][value]')
-				->setAttribute('data-field-type', 'hidden'),
-			(new CInput('hidden'))
-				->setAttribute('value', '#{label}')
-				->setName('conditions[#{row_index}][formulaid]')
-				->setAttribute('data-field-type', 'hidden')
-		]))
-	]))->setId('conditions_#{row_index}')
-);
-
+$id_prefix = 'condition-row-tmpl-';
 $form_grid
 	->addItem([
 		(new CLabel(_('Type of calculation'), 'evaltype_select'))->setId('label-evaltype'),
@@ -195,7 +51,7 @@ $form_grid
 				(new CDiv(
 					(new CSelect('evaltype'))
 						->setId('evaltype')
-						->setValue($data['correlation']['evaltype'])
+						->setValue($data['correlation']['filter']['evaltype'])
 						->setFocusableElementId('evaltype_select')
 						->addOptions(CSelect::createOptionsFromArray([
 							CONDITION_EVAL_TYPE_AND_OR => _('And/Or'),
@@ -207,7 +63,7 @@ $form_grid
 				))->addClass(ZBX_STYLE_CELL),
 				(new CDiv([
 					(new CSpan())->setId('expression'),
-					(new CTextBox('formula', $data['correlation']['formula']))
+					(new CTextBox('formula', $data['correlation']['filter']['formula']))
 						->addStyle('width: 100%;')
 						->setId('formula')
 						->setAttribute('placeholder', 'A or (B and C) ...')
@@ -226,12 +82,262 @@ $form_grid
 					->setId('condition_table')
 					->addClass(ZBX_STYLE_TABLE_FORMS)
 					->setHeader([_('Label'), _('Name'), _('Action')])
-					->addItem([
-						$condition_tag_template,
-						$condition_hostgroup_template,
-						$condition_tag_pair_template,
-						$condition_old_new_tag_template
-					])
+					->addItem(
+						(new CTemplateTag($id_prefix.ZBX_CORR_CONDITION_OLD_EVENT_TAG))->addItem((new CRow())
+							->addItem((new CCol('#{formulaid}'))
+								->setAttribute('data-formulaid', '#{formulaid}')
+								->setAttribute('data-conditiontype', ZBX_CORR_CONDITION_OLD_EVENT_TAG)
+								->setAttribute('data-row-index', '#{row_index}')
+							)
+							->addItem((new CCol())
+								->addClass(ZBX_STYLE_WORDWRAP)
+								->addStyle(ZBX_TEXTAREA_BIG_WIDTH.'px;')
+								->addItem(_('Old event tag name'))
+								->addItem(' ')
+								->addItem(_('equals'))
+								->addItem(' ')
+								->addItem(new CTag('em', true, '#{tag}'))
+							)
+							->addItem((new CCol())
+								->addItem((new CButtonLink(_('Remove')))->addClass('js-condition-remove'))
+								->addItem((new CInput('hidden'))
+									->setAttribute('value', '#{formulaid}')
+									->setName('conditions[#{row_index}][formulaid]')
+									->setAttribute('data-field-type', 'hidden')
+								)
+								->addItem((new CInput('hidden'))
+									->setAttribute('value', '#{type}')
+									->setName('conditions[#{row_index}][type]')
+									->setAttribute('data-field-type', 'hidden')
+								)
+								->addItem((new CInput('hidden'))
+									->setAttribute('value', '#{tag}')
+									->setName('conditions[#{row_index}][tag]')
+									->setAttribute('data-field-type', 'hidden')
+								)
+							)
+						)
+					)
+					->addItem(
+						(new CTemplateTag($id_prefix.ZBX_CORR_CONDITION_NEW_EVENT_TAG))->addItem((new CRow())
+							->addItem((new CCol('#{formulaid}'))
+								->setAttribute('data-formulaid', '#{formulaid}')
+								->setAttribute('data-conditiontype', ZBX_CORR_CONDITION_NEW_EVENT_TAG)
+								->setAttribute('data-row-index', '#{row_index}')
+							)
+							->addItem((new CCol())
+								->addClass(ZBX_STYLE_WORDWRAP)
+								->addStyle(ZBX_TEXTAREA_BIG_WIDTH.'px;')
+								->addItem(_('New event tag name'))
+								->addItem(' ')
+								->addItem(_('equals'))
+								->addItem(' ')
+								->addItem(new CTag('em', true, '#{tag}'))
+							)
+							->addItem((new CCol())
+								->addItem((new CButtonLink(_('Remove')))->addClass('js-condition-remove'))
+								->addItem((new CInput('hidden'))
+									->setAttribute('value', '#{formulaid}')
+									->setName('conditions[#{row_index}][formulaid]')
+									->setAttribute('data-field-type', 'hidden')
+								)
+								->addItem((new CInput('hidden'))
+									->setAttribute('value', '#{type}')
+									->setName('conditions[#{row_index}][type]')
+									->setAttribute('data-field-type', 'hidden')
+								)
+								->addItem((new CInput('hidden'))
+									->setAttribute('value', '#{tag}')
+									->setName('conditions[#{row_index}][tag]')
+									->setAttribute('data-field-type', 'hidden')
+								)
+							)
+						)
+					)
+					->addItem(
+						(new CTemplateTag($id_prefix.ZBX_CORR_CONDITION_NEW_EVENT_HOSTGROUP))->addItem((new CRow())
+							->addItem((new CCol('#{formulaid}'))
+								->setAttribute('data-formulaid', '#{formulaid}')
+								->setAttribute('data-conditiontype', ZBX_CORR_CONDITION_NEW_EVENT_HOSTGROUP)
+								->setAttribute('data-row-index', '#{row_index}')
+							)
+							->addItem((new CCol())
+								->addClass(ZBX_STYLE_WORDWRAP)
+								->addStyle(ZBX_TEXTAREA_BIG_WIDTH.'px;')
+								->addItem(_('New event host group'))
+								->addItem(' ')
+								->addItem('#{operator_name}')
+								->addItem(' ')
+								->addItem(new CTag('em', true, '#{group_name}'))
+							)
+							->addItem((new CCol())
+								->addItem((new CButtonLink(_('Remove')))->addClass('js-condition-remove'))
+								->addItem((new CInput('hidden'))
+									->setAttribute('value', '#{formulaid}')
+									->setName('conditions[#{row_index}][formulaid]')
+									->setAttribute('data-field-type', 'hidden')
+								)
+								->addItem((new CInput('hidden'))
+									->setAttribute('value', '#{type}')
+									->setName('conditions[#{row_index}][type]')
+									->setAttribute('data-field-type', 'hidden')
+								)
+								->addItem(
+									(new CInput('hidden'))
+										->setAttribute('value', '#{operator}')
+										->setName('conditions[#{row_index}][operator]')
+										->setAttribute('data-field-type', 'hidden'),
+								)
+								->addItem(
+									(new CInput('hidden'))
+										->setAttribute('value', '#{groupid}')
+										->setName('conditions[#{row_index}][groupid]')
+										->setAttribute('data-field-type', 'hidden'),
+								)
+							)
+						)
+					)
+					->addItem(
+						(new CTemplateTag($id_prefix.ZBX_CORR_CONDITION_EVENT_TAG_PAIR))->addItem((new CRow())
+							->addItem((new CCol('#{formulaid}'))
+								->setAttribute('data-formulaid', '#{formulaid}')
+								->setAttribute('data-conditiontype', ZBX_CORR_CONDITION_EVENT_TAG_PAIR)
+								->setAttribute('data-row-index', '#{row_index}')
+							)
+							->addItem((new CCol())
+								->addClass(ZBX_STYLE_WORDWRAP)
+								->addStyle(ZBX_TEXTAREA_BIG_WIDTH.'px;')
+								->addItem(_('Value of old event tag'))
+								->addItem(' ')
+								->addItem(new CTag('em', true, '#{oldtag}'))
+								->addItem(' ')
+								->addItem(_('equals'))
+								->addItem(' ')
+								->addItem(_('value of new event tag'))
+								->addItem(' ')
+								->addItem(new CTag('em', true, '#{newtag}'))
+							)
+							->addItem((new CCol())
+								->addItem((new CButtonLink(_('Remove')))->addClass('js-condition-remove'))
+								->addItem((new CInput('hidden'))
+									->setAttribute('value', '#{formulaid}')
+									->setName('conditions[#{row_index}][formulaid]')
+									->setAttribute('data-field-type', 'hidden')
+								)
+								->addItem((new CInput('hidden'))
+									->setAttribute('value', '#{type}')
+									->setName('conditions[#{row_index}][type]')
+									->setAttribute('data-field-type', 'hidden')
+								)
+								->addItem((new CInput('hidden'))
+									->setAttribute('value', '#{oldtag}')
+									->setName('conditions[#{row_index}][oldtag]')
+									->setAttribute('data-field-type', 'hidden')
+								)
+								->addItem((new CInput('hidden'))
+									->setAttribute('value', '#{newtag}')
+									->setName('conditions[#{row_index}][newtag]')
+									->setAttribute('data-field-type', 'hidden')
+								)
+							)
+						)
+					)
+					->addItem(
+						(new CTemplateTag($id_prefix.ZBX_CORR_CONDITION_OLD_EVENT_TAG_VALUE))->addItem((new CRow())
+							->addItem((new CCol('#{formulaid}'))
+								->setAttribute('data-formulaid', '#{formulaid}')
+								->setAttribute('data-conditiontype', ZBX_CORR_CONDITION_OLD_EVENT_TAG_VALUE)
+								->setAttribute('data-row-index', '#{row_index}')
+							)
+							->addItem((new CCol())
+								->addClass(ZBX_STYLE_WORDWRAP)
+								->addStyle(ZBX_TEXTAREA_BIG_WIDTH.'px;')
+								->addItem(_('Value of old event tag'))
+								->addItem(' ')
+								->addItem(new CTag('em', true, '#{tag}'))
+								->addItem(' ')
+								->addItem('#{operator_name}')
+								->addItem(' ')
+								->addItem(new CTag('em', true, '#{value}'))
+							)
+							->addItem((new CCol())
+								->addItem((new CButtonLink(_('Remove')))->addClass('js-condition-remove'))
+								->addItem((new CInput('hidden'))
+									->setAttribute('value', '#{formulaid}')
+									->setName('conditions[#{row_index}][formulaid]')
+									->setAttribute('data-field-type', 'hidden')
+								)
+								->addItem((new CInput('hidden'))
+									->setAttribute('value', '#{type}')
+									->setName('conditions[#{row_index}][type]')
+									->setAttribute('data-field-type', 'hidden')
+								)
+								->addItem((new CInput('hidden'))
+									->setAttribute('value', '#{tag}')
+									->setName('conditions[#{row_index}][tag]')
+									->setAttribute('data-field-type', 'hidden')
+								)
+								->addItem((new CInput('hidden'))
+									->setAttribute('value', '#{operator}')
+									->setName('conditions[#{row_index}][operator]')
+									->setAttribute('data-field-type', 'hidden')
+								)
+								->addItem((new CInput('hidden'))
+									->setAttribute('value', '#{value}')
+									->setName('conditions[#{row_index}][value]')
+									->setAttribute('data-field-type', 'hidden')
+								)
+							)
+						)
+					)
+					->addItem(
+						(new CTemplateTag($id_prefix.ZBX_CORR_CONDITION_NEW_EVENT_TAG_VALUE))->addItem((new CRow())
+							->addItem((new CCol('#{formulaid}'))
+								->setAttribute('data-formulaid', '#{formulaid}')
+								->setAttribute('data-conditiontype', ZBX_CORR_CONDITION_NEW_EVENT_TAG_VALUE)
+								->setAttribute('data-row-index', '#{row_index}')
+							)
+							->addItem((new CCol())
+								->addClass(ZBX_STYLE_WORDWRAP)
+								->addStyle(ZBX_TEXTAREA_BIG_WIDTH.'px;')
+								->addItem(_('Value of new event tag'))
+								->addItem(' ')
+								->addItem(new CTag('em', true, '#{tag}'))
+								->addItem(' ')
+								->addItem('#{operator_name}')
+								->addItem(' ')
+								->addItem(new CTag('em', true, '#{value}'))
+							)
+							->addItem((new CCol())
+								->addItem((new CButtonLink(_('Remove')))->addClass('js-condition-remove'))
+								->addItem((new CInput('hidden'))
+									->setAttribute('value', '#{formulaid}')
+									->setName('conditions[#{row_index}][formulaid]')
+									->setAttribute('data-field-type', 'hidden')
+								)
+								->addItem((new CInput('hidden'))
+									->setAttribute('value', '#{type}')
+									->setName('conditions[#{row_index}][type]')
+									->setAttribute('data-field-type', 'hidden')
+								)
+								->addItem((new CInput('hidden'))
+									->setAttribute('value', '#{tag}')
+									->setName('conditions[#{row_index}][tag]')
+									->setAttribute('data-field-type', 'hidden')
+								)
+								->addItem((new CInput('hidden'))
+									->setAttribute('value', '#{operator}')
+									->setName('conditions[#{row_index}][operator]')
+									->setAttribute('data-field-type', 'hidden')
+								)
+								->addItem((new CInput('hidden'))
+									->setAttribute('value', '#{value}')
+									->setName('conditions[#{row_index}][value]')
+									->setAttribute('data-field-type', 'hidden')
+								)
+							)
+						)
+					)
 					->addItem(
 						(new CTag('tfoot', true))
 							->addItem(
@@ -245,11 +351,12 @@ $form_grid
 				))
 				->setAttribute('data-field-type', 'set')
 				->setAttribute('data-field-name', 'conditions')
+				->setAttribute('data-error-container', 'conditions-error-container')
 				->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
 				->addStyle('min-width: '.ZBX_TEXTAREA_STANDARD_WIDTH.'px;')
 				->addStyle('max-width: '.ZBX_TEXTAREA_STANDARD_WIDTH.'px;')
 				->setAriaRequired()
-		))
+		))->addItem((new CDiv())->setId('conditions-error-container')->addClass(ZBX_STYLE_ERROR_CONTAINER))
 	])
 	->addItem([
 		new CLabel(_('Description'), 'description'),
@@ -260,36 +367,34 @@ $form_grid
 		)
 	])
 	->addItem([
-		new CLabel(_('Operations')),
+		(new CLabel(_('Operations')))->setAsteriskMark(),
 		new CFormField([
 			(new CCheckBoxList())
+				->setAttribute('data-field-name', 'operations')
+				->setAttribute('data-field-type', 'array')
+				->setAttribute('data-error-container', 'operations-error-container')
 				->setOptions([
 					[
 						'label' => _('Close old events'),
-						'checked' => $data['correlation']['op_close_old'],
-						'name' => 'op_close_old',
-						'id' => 'operation_0_type',
-						'value' => '1',
-						'unchecked_value' => 0,
-						'error_container' => 'operations_error_container'
+						'name' => 'operations['.ZBX_CORR_OPERATION_CLOSE_OLD.']',
+						'value' => ZBX_CORR_OPERATION_CLOSE_OLD,
+						'checked' => boolval(array_filter($data['correlation']['operations'], fn (array $operation) =>
+							$operation['type'] == ZBX_CORR_OPERATION_CLOSE_OLD
+						))
 					],
 					[
 						'label' => _('Close new event'),
-						'checked' => $data['correlation']['op_close_new'],
-						'name' => 'op_close_new',
-						'id' => 'operation_1_type',
-						'value' => '1',
-						'unchecked_value' => 0,
-						'error_container' => 'operations_error_container'
+						'name' => 'operations['.ZBX_CORR_OPERATION_CLOSE_NEW.']',
+						'value' => ZBX_CORR_OPERATION_CLOSE_NEW,
+						'checked' => boolval(array_filter($data['correlation']['operations'], fn (array $operation) =>
+							$operation['type'] == ZBX_CORR_OPERATION_CLOSE_NEW
+						))
 					]
 				]),
 			(new CDiv())
-				->setId('operations_error_container')
+				->setId('operations-error-container')
 				->addClass(ZBX_STYLE_ERROR_CONTAINER)
 		])
-	])
-	->addItem([
-		new CFormField((new CLabel(_('At least one operation must be selected.')))->setAsteriskMark())
 	])
 	->addItem([
 		new CLabel(_('Enabled'), 'status'),
@@ -300,13 +405,52 @@ $form_grid
 		)
 	]);
 
+$templates_data = [];
+foreach ($data['correlation']['filter']['conditions'] as $index => $condition) {
+	$type = (int) $condition['type'];
+
+	$template_data = [
+		'row_index' => $index,
+		'type' => $condition['type'],
+		'formulaid' => $condition['formulaid'],
+	];
+
+	$templates_data[] = $template_data + match ($type) {
+		ZBX_CORR_CONDITION_OLD_EVENT_TAG,
+		ZBX_CORR_CONDITION_NEW_EVENT_TAG => [
+			'tag' => $condition['tag'],
+		],
+		ZBX_CORR_CONDITION_NEW_EVENT_HOSTGROUP => [
+			'groupid' => $condition['groupid'],
+			'group_name' => $data['hostgroup_names'][$condition['groupid']],
+			'operator' => $condition['operator'],
+			'operator_name' => CCorrelationHelper::getLabelByOperator($condition['operator'])
+		],
+		ZBX_CORR_CONDITION_EVENT_TAG_PAIR => [
+			'oldtag' => $condition['oldtag'],
+			'newtag' => $condition['newtag']
+		],
+		ZBX_CORR_CONDITION_OLD_EVENT_TAG_VALUE,
+		ZBX_CORR_CONDITION_NEW_EVENT_TAG_VALUE => [
+			'tag' => $condition['tag'],
+			'value' => $condition['value'],
+			'operator' => $condition['operator'],
+			'operator_name' => CCorrelationHelper::getLabelByOperator($condition['operator'])
+		]
+	};
+}
+
 $form
 	->addItem($form_grid)
 	->addItem(
 		(new CScriptTag(
 			'correlation_edit_popup.init('.json_encode([
 				'rules' => $data['js_validation_rules'],
-				'correlation' => $data['correlation']
+				'templates_data' => $templates_data,
+				'templates_types' => [ZBX_CORR_CONDITION_OLD_EVENT_TAG, ZBX_CORR_CONDITION_NEW_EVENT_TAG,
+					ZBX_CORR_CONDITION_NEW_EVENT_HOSTGROUP, ZBX_CORR_CONDITION_EVENT_TAG_PAIR,
+					ZBX_CORR_CONDITION_OLD_EVENT_TAG_VALUE, ZBX_CORR_CONDITION_NEW_EVENT_TAG_VALUE
+				]
 			], JSON_THROW_ON_ERROR).');'
 		))->setOnDocumentReady()
 	);
