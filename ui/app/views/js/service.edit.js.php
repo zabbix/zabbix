@@ -255,8 +255,15 @@ window.service_edit_popup = new class {
 	}
 
 	#updateStatusRule(row, status_rule) {
+		this.#removeErrorContainer(row);
 		row.insertAdjacentHTML('afterend', this.status_rule_template.evaluate(status_rule));
 		row.remove();
+	}
+
+	#removeErrorContainer(row) {
+		const error_row = row.parentElement
+			.querySelector(`#additional_rules_error_container_${row.getAttribute('data-row_index')}`);
+		error_row.parentElement.remove();
 	}
 
 	#renderChild(service) {
@@ -427,26 +434,6 @@ window.service_edit_popup = new class {
 		const fields = this.form.getAllValues();
 
 		fields.child_serviceids = [...this.children.keys()];
-
-		if ('tags' in fields) {
-			for (const tag of Object.values(fields.tags)) {
-				tag.tag = tag.tag.trim();
-				tag.value = tag.value.trim();
-			}
-		}
-
-		if ('problem_tags' in fields) {
-			for (const key in fields.problem_tags) {
-				if (fields.problem_tags[key].tag === null) {
-					delete fields.problem_tags[key];
-				}
-			}
-
-			for (const problem_tag of Object.values(fields.problem_tags)) {
-				problem_tag.tag = problem_tag.tag?.trim();
-				problem_tag.value = problem_tag.value?.trim();
-			}
-		}
 
 		this.overlay.$dialogue.find('.msg-bad').remove();
 		this.overlay.setLoading();
