@@ -478,7 +478,8 @@ static int	rtc_db_set_idle_timeout(const char *data, int *timeout, char **error)
 
 	if (DBPOOL_MAXIMUM_IDLE_TIMEOUT < *timeout)
 	{
-		*error = zbx_dsprintf(NULL, "idle timeout must be less than %d seconds", DBPOOL_MAXIMUM_IDLE_TIMEOUT);
+		*error = zbx_dsprintf(NULL, "idle timeout must be less than or equal to %d seconds",
+				DBPOOL_MAXIMUM_IDLE_TIMEOUT);
 		return FAIL;
 	}
 
