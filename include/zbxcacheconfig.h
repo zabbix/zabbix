@@ -75,6 +75,7 @@ typedef struct
 	char		error[ZBX_INTERFACE_ERROR_LEN_MAX];
 	int		errors_from;
 	int		version;
+	zbx_uint64_t	revision;
 }
 zbx_dc_interface_t;
 
@@ -93,6 +94,9 @@ typedef struct
 }
 zbx_dc_interface2_t;
 
+#define ZBX_ITEM_REQUIRES_PREPROCESSING_NO	0
+#define ZBX_ITEM_REQUIRES_PREPROCESSING_YES	1
+
 typedef struct
 {
 	zbx_uint64_t		itemid;
@@ -106,6 +110,7 @@ typedef struct
 	int			ret;
 	int			version;
 	AGENT_RESULT		result;
+	unsigned char		preprocessing;
 }
 zbx_dc_item_context_t;
 
@@ -202,6 +207,7 @@ typedef struct
 	char			*error;
 	unsigned char		*formula_bin;
 	int			snmp_max_repetitions;
+	unsigned char		preprocessing;
 }
 zbx_dc_item_t;
 
@@ -279,6 +285,7 @@ typedef struct
 	char			key_orig[ZBX_ITEM_KEY_LEN * ZBX_MAX_BYTES_IN_UTF8_CHAR + 1], *key;
 	char			trapper_hosts[ZBX_ITEM_TRAPPER_HOSTS_LEN_MAX];
 	char			logtimefmt[ZBX_ITEM_LOGTIMEFMT_LEN_MAX];
+	unsigned char		preprocessing;
 }
 zbx_history_recv_item_t;
 
@@ -940,7 +947,8 @@ int	zbx_dc_config_get_snmp_interfaceids_by_addr(const char *addr, zbx_uint64_t *
 size_t	zbx_dc_config_get_snmp_items_by_interfaceid(zbx_uint64_t interfaceid, zbx_dc_item_t **items);
 
 void	zbx_dc_config_update_autoreg_host(const char *host, const char *listen_ip, const char *listen_dns,
-		unsigned short listen_port, const char *host_metadata, zbx_conn_flags_t flags, int now);
+		unsigned short listen_port, const char *host_metadata, zbx_conn_flags_t flags,
+		unsigned int connection_type, int now);
 void	zbx_dc_config_delete_autoreg_host(const zbx_vector_str_t *autoreg_hosts);
 
 #define ZBX_HK_OPTION_DISABLED		0
@@ -993,9 +1001,18 @@ void	zbx_dc_requeue_proxy(zbx_uint64_t proxyid, unsigned char update_nextcheck, 
 		int proxyconfig_frequency, int proxydata_frequency);
 int	zbx_dc_check_host_conn_permissions(const char *host, const zbx_socket_t *sock, zbx_uint64_t *hostid,
 		unsigned char *status, unsigned char *monitored_by, zbx_uint64_t *revision,
-		zbx_comms_redirect_t *redirect, char **error);
+		zbx_comms_redirect_t *redirect, int change_flags, char **error);
+
+#define	ZBX_AUTOREG_NO_CHANGES			0x00
+#define	ZBX_AUTOREG_NOT_FOUND			0x01
+#define	ZBX_AUTOREG_CHANGED_HOST_METADATA	0x02
+#define	ZBX_AUTOREG_CHANGED_FLAGS		0x04
+#define	ZBX_AUTOREG_CHANGED_INTERFACE_IP	0x08
+#define	ZBX_AUTOREG_CHANGED_INTERFACE_DNS	0x10
+#define	ZBX_AUTOREG_CHANGED_HEARTBEAT		0x20
+#define	ZBX_AUTOREG_CHANGED_CONNECTION_TYPE	0x40
 int	zbx_dc_is_autoreg_host_changed(const char *host, unsigned short port, const char *host_metadata,
-		zbx_conn_flags_t flag, const char *interface, int now);
+		zbx_conn_flags_t flag, const char *interface, unsigned int connection_type, int now);
 
 #if defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
 size_t	zbx_dc_get_psk_by_identity(const unsigned char *psk_identity, unsigned char *psk_buf, unsigned int *psk_usage);

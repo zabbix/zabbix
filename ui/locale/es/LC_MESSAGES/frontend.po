@@ -4,7 +4,7 @@ msgstr ""
 "Project-Id-Version: Zabbix 6.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2023-10-19 13:48+0300\n"
-"PO-Revision-Date: 2025-06-25 20:44+0000\n"
+"PO-Revision-Date: 2025-09-01 20:03+0000\n"
 "Last-Translator: Vicente Salvador <vicentesalvadorcubedo@gmail.com>\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
 "Language: es\n"
@@ -2043,6 +2043,10 @@ msgstr "Número promedio de solicitudes de escritura pendientes en el disco virt
 msgid "Avoid easy-to-guess passwords"
 msgstr "Evite contraseñas fáciles de adivinar"
 
+#: app/views/host.wizard.edit.php:473
+msgid "Avoid including sensitive data."
+msgstr ""
+
 #: jsLoader.php:172
 msgid "Awaiting data"
 msgstr "En espera de datos"
@@ -2547,12 +2551,12 @@ msgstr "No se puede agregar un grupo de plantillas"
 #: app/controllers/CControllerTriggerCreate.php:57
 #: app/controllers/CControllerTriggerCreate.php:131
 msgid "Cannot add trigger"
-msgstr "No se pudo agregar el disparador"
+msgstr "No se pudo agregar el iniciador"
 
 #: app/controllers/CControllerTriggerPrototypeCreate.php:59
 #: app/controllers/CControllerTriggerPrototypeCreate.php:134
 msgid "Cannot add trigger prototype"
-msgstr "No se pudo agregar el prototipo de disparador"
+msgstr "No se pudo agregar el prototipo de iniciador"
 
 #: app/controllers/CControllerUserCreate.php:63
 #: app/controllers/CControllerUserCreate.php:119
@@ -2626,7 +2630,7 @@ msgstr "No se pudo clonar los prototipos de gráfico."
 
 #: include/classes/api/services/CDiscoveryRule.php:3908
 msgid "Cannot clone trigger prototypes."
-msgstr "No se pudo clonar los prototipos de disparador."
+msgstr "No se pudo clonar los prototipos de iniciador."
 
 #: include/classes/api/services/CEvent.php:1684
 #, c-format
@@ -2731,7 +2735,7 @@ msgstr "No se puede copiar el iniciador \"%1$s\", porque tiene varios equipos en
 #: include/classes/helpers/CTriggerHelper.php:75
 #, c-format
 msgid "Cannot copy trigger \"%1$s\", because it has multiple templates in the expression."
-msgstr "No se pudo copiar el disparador \"%1$s\", porque tiene muchas plantillas en la expresión."
+msgstr "No se pudo copiar el iniciador \"%1$s\", porque tiene muchas plantillas en la expresión."
 
 #: app/controllers/CControllerSlaCreate.php:69
 #: app/controllers/CControllerSlaCreate.php:127
@@ -3093,7 +3097,7 @@ msgstr "No se puede eliminar la plantilla de gráfico."
 #: include/classes/api/services/CTrigger.php:618
 #, c-format
 msgid "Cannot delete templated trigger \"%1$s:%2$s\"."
-msgstr "No se pudo eliminar el disparador \"%1$s:%2$s\" de la plantilla."
+msgstr "No se pudo eliminar el iniciador \"%1$s:%2$s\" de la plantilla."
 
 #: include/classes/api/services/CTriggerPrototype.php:510
 #, c-format
@@ -3243,8 +3247,8 @@ msgstr[1] "No se pueden desactivar los informes programados"
 #: app/controllers/CControllerTriggerDisable.php:75
 msgid "Cannot disable trigger"
 msgid_plural "Cannot disable triggers"
-msgstr[0] "No se pudo desactivar el disparador"
-msgstr[1] "No se pudo desactivar los disparadores"
+msgstr[0] "No se pudo desactivar el iniciador"
+msgstr[1] "No se pudieron desactivar los iniciadores"
 
 #: httpconf.php:389
 msgid "Cannot disable web scenario"
@@ -3339,8 +3343,8 @@ msgstr[1] "No se pueden activar los informes programados"
 #: app/controllers/CControllerTriggerEnable.php:75
 msgid "Cannot enable trigger"
 msgid_plural "Cannot enable triggers"
-msgstr[0] "No se pudo habilitar el disparador"
-msgstr[1] "No se pudo habilitar los disparadores"
+msgstr[0] "No se pudo habilitar el iniciador"
+msgstr[1] "No se pudieron habilitar los iniciadores"
 
 #: httpconf.php:388
 msgid "Cannot enable web scenario"
@@ -3558,7 +3562,7 @@ msgstr "No se puede encontrar la plantilla \"%1$s\" para anular \"%2$s\" de la r
 #: include/classes/import/importers/CMapImporter.php:229
 #, c-format
 msgid "Cannot find trigger \"%1$s\" used in map \"%2$s\"."
-msgstr "No se pudo encontrar el disparador \"%1$s\" usado en el mapa \"%2$s\"."
+msgstr "No se pudo encontrar el iniciador \"%1$s\" usado en el mapa \"%2$s\"."
 
 #: include/classes/import/importers/CTemplateDashboardImporter.php:229
 #, c-format
@@ -3928,7 +3932,7 @@ msgstr "No se pueden heredar métricas con la clave \"%1$s\" de las plantillas \
 #: app/controllers/CControllerPopupTriggerExpr.php:1263
 #: app/controllers/CControllerPopupTriggerExpr.php:1644
 msgid "Cannot insert trigger expression"
-msgstr "No se pudo insertar la expresión del disparador"
+msgstr "No se pudo insertar la expresión del iniciador"
 
 #: include/classes/api/services/CHost.php:1168
 msgid "Cannot link template"
@@ -4324,7 +4328,7 @@ msgstr "No se pudo actualizar \"%2$s\" en el equipo descubierto \"%1$s\"."
 #: include/classes/api/services/CTriggerGeneral.php:1142
 #, c-format
 msgid "Cannot update \"%2$s\" for a discovered trigger \"%1$s\"."
-msgstr "No se pudo actualizar \"%2$s\" en el disparador descubierto \"%1$s\"."
+msgstr "No se pudo actualizar \"%2$s\" en el iniciador descubierto \"%1$s\"."
 
 #: app/controllers/CControllerTokenUpdate.php:66
 #: app/controllers/CControllerTokenUpdate.php:142
@@ -5340,7 +5344,7 @@ msgstr "Configuración de visualización de iniciadores"
 
 #: app/controllers/CControllerTriggerPrototypeList.php:173
 msgid "Configuration of trigger prototypes"
-msgstr "Configuración de prototipos de disparadores"
+msgstr "Configuración de prototipos de iniciador"
 
 #: app/controllers/CControllerTriggerList.php:440
 msgid "Configuration of triggers"
@@ -5813,7 +5817,7 @@ msgstr "Crear regla de descubrimiento dependiente"
 
 #: jsLoader.php:352
 msgid "Create dependent item"
-msgstr "Crear elemento dependiente"
+msgstr "Crear métrica dependiente"
 
 #: app/views/trigger.prototype.list.php:181
 #: include/views/configuration.host.prototype.list.php:200
@@ -5911,7 +5915,7 @@ msgstr "Crear asignación de iconos"
 
 #: include/views/configuration.item.list.php:40
 msgid "Create item"
-msgstr "Crear monitor"
+msgstr "Crear métrica"
 
 #: include/views/configuration.item.list.php:48
 msgid "Create item (select host first)"
@@ -6000,7 +6004,7 @@ msgstr "Crear iniciador"
 
 #: app/views/trigger.list.php:185
 msgid "Create trigger (select host first)"
-msgstr "Crear disparador (seleccione un equipo primero)"
+msgstr "Crear iniciador (seleccione un equipo primero)"
 
 #: app/views/trigger.list.php:186
 msgid "Create trigger (select template first)"
@@ -6008,7 +6012,7 @@ msgstr "Crear iniciador (seleccione primero la plantilla)"
 
 #: app/views/trigger.prototype.list.php:42 jsLoader.php:351
 msgid "Create trigger prototype"
-msgstr "Crear prototipo de disparador"
+msgstr "Crear prototipo de iniciador"
 
 #: app/views/js/trigger.prototype.list.js.php:127
 msgid "Create triggers from selected prototype as disabled?"
@@ -7092,7 +7096,7 @@ msgstr "¿Eliminar el prototipo de iniciador seleccionado?"
 
 #: app/views/js/trigger.prototype.list.js.php:151
 msgid "Delete selected trigger prototypes?"
-msgstr "¿Desea eliminar los prototipos de disparadores seleccionados?"
+msgstr "¿Desea eliminar los prototipos de iniciadores seleccionados?"
 
 #: app/views/js/trigger.list.js.php:191
 msgid "Delete selected trigger?"
@@ -7100,7 +7104,7 @@ msgstr "¿Eliminar el iniciador seleccionado?"
 
 #: app/views/js/trigger.list.js.php:190
 msgid "Delete selected triggers?"
-msgstr "¿Desea eliminar los disparadores seleccionados?"
+msgstr "¿Desea eliminar los iniciadores seleccionados?"
 
 #: app/views/administration.user.edit.php:838
 #: app/views/administration.user.list.php:316
@@ -7125,11 +7129,11 @@ msgstr "¿Desea eliminar la plantilla?"
 
 #: app/views/trigger.prototype.edit.php:107
 msgid "Delete trigger prototype?"
-msgstr "¿Desea eliminar el prototipo de disparador?"
+msgstr "¿Desea eliminar el prototipo de iniciador?"
 
 #: app/views/trigger.edit.php:110
 msgid "Delete trigger?"
-msgstr "¿Desea eliminar el disparador?"
+msgstr "¿Desea eliminar el iniciador?"
 
 #: include/views/configuration.httpconf.edit.php:403
 msgid "Delete web scenario?"
@@ -7184,7 +7188,7 @@ msgstr "Dependiente"
 
 #: include/items.inc.php:102
 msgid "Dependent item"
-msgstr "Elemento dependiente"
+msgstr "Métrica dependiente"
 
 #: app/views/popup.generic.php:364 app/views/trigger.list.php:266
 #: app/views/trigger.prototype.list.php:94 include/triggers.inc.php:2013
@@ -7284,6 +7288,10 @@ msgstr "Detalles del escenario web"
 #: app/views/administration.housekeeping.edit.php:206
 msgid "Detected TimescaleDB license does not support compression. Compression is supported in TimescaleDB Community Edition."
 msgstr "La licencia de TimescaleDB detectada no admite la compresión. La compresión es compatible con TimescaleDB Community Edition."
+
+#: app/views/administration.housekeeping.edit.php:204
+msgid "Detected license does not support compression. Compression is supported in TimescaleDB Community Edition."
+msgstr "La licencia detectada no admite la compresión. TimescaleDB Community Edition admite la compresión."
 
 #: app/controllers/CControllerPopupTriggerExpr.php:1130
 msgid "Detection period"
@@ -7492,7 +7500,7 @@ msgstr "¿Desactivar el iniciador seleccionado?"
 
 #: app/views/js/trigger.list.js.php:174
 msgid "Disable selected triggers?"
-msgstr "¿Desea desactivar los disparadores seleccionados?"
+msgstr "¿Desea desactivar los iniciadores seleccionados?"
 
 #: include/views/configuration.httpconf.list.php:228
 msgid "Disable selected web scenario?"
@@ -8432,7 +8440,7 @@ msgstr "¿Activar el iniciador seleccionado?"
 
 #: app/views/js/trigger.list.js.php:157
 msgid "Enable selected triggers?"
-msgstr "¿Desea activar los disparadores seleccionados?"
+msgstr "¿Desea activar los iniciadores seleccionados?"
 
 #: include/views/configuration.httpconf.list.php:222
 msgid "Enable selected web scenario?"
@@ -8542,6 +8550,10 @@ msgstr "Inglés (en_US)"
 #: app/views/host.wizard.edit.php:399
 msgid "Enter a non-secret pre-shared key identity string. Avoid including sensitive data."
 msgstr "Introduzca una cadena de identidad de clave precompartida no secreta. Evite incluir datos confidenciales."
+
+#: app/views/host.wizard.edit.php:470
+msgid "Enter a unique name that Zabbix components will use to recognize the pre-shared key."
+msgstr ""
 
 #: app/views/host.wizard.edit.php:609
 msgid "Enter the IP/DNS address and port of the Zabbix agent installed on your monitoring target."
@@ -12752,11 +12764,11 @@ msgstr "Italiano (it_IT)"
 #: widgets/item/includes/WidgetForm.php:122
 #: widgets/tophosts/views/column.edit.php:120
 msgid "Item"
-msgstr "Monitor"
+msgstr "Métrica"
 
 #: items.php:667
 msgid "Item added"
-msgstr "Monitor añadido"
+msgstr "Métrica añadida"
 
 #: widgets/itemcard/Widget.php:32
 msgid "Item card"
@@ -13114,7 +13126,7 @@ msgstr "Kerberos"
 #: include/views/configuration.item.prototype.edit.php:121
 #: include/views/configuration.item.prototype.list.php:68 items.php:44
 msgid "Key"
-msgstr "Monitor"
+msgstr "Clave"
 
 #: app/views/administration.script.edit.php:172
 #: include/views/js/common.item.edit.js.php:56
@@ -14231,6 +14243,11 @@ msgstr "Número máximo de filas"
 msgid "Maximum required %1$s database version is %2$s."
 msgstr "La versión máxima requerida de la base de datos de %1$s es %2$s."
 
+#: app/partials/administration.system.info.php:221
+#, c-format
+msgid "Maximum required version is %1$s."
+msgstr "La versión máxima requerida es %1$s."
+
 #: app/controllers/CControllerTimeSelectorUpdate.php:136
 #: include/classes/mvc/CController.php:320
 #: include/classes/widgets/fields/CWidgetFieldTimePeriod.php:203
@@ -14574,6 +14591,12 @@ msgstr "El límite mínimo requerido en el tiempo de análisis de entrada para s
 msgid "Minimum required size of PHP post is %1$s (configuration option \"post_max_size\")."
 msgstr "El tamaño mínimo requerido de una publicación PHP es %1$s (opción de configuración \"post_max_size\")."
 
+#: app/partials/administration.system.info.php:212
+#: app/views/administration.housekeeping.edit.php:183
+#, c-format
+msgid "Minimum required version is %1$s."
+msgstr "La versión mínima requerida es %1$s."
+
 #: app/views/monitoring.map.view.php:48
 #: include/views/monitoring.sysmap.edit.php:276
 msgid "Minimum severity"
@@ -14806,9 +14829,19 @@ msgstr "Múltiple"
 msgid "Multiple PROBLEM events"
 msgstr "Múltiples eventos PROBLEMA"
 
+#: app/partials/administration.system.info.php:235
+#, c-format
+msgid "Must be at least %1$s."
+msgstr "Debe ser al menos %1$s."
+
 #: include/classes/validators/CFormValidator.php:340
 msgid "Must be selected."
 msgstr "Debe ser seleccionado"
+
+#: app/partials/administration.system.info.php:254
+#, c-format
+msgid "Must not be higher than %1$s."
+msgstr "No debe ser mayor que %1$s."
 
 #: jsLoader.php:284
 msgid "Mute"
@@ -15071,7 +15104,7 @@ msgstr "Aguja"
 
 #: include/items.inc.php:100
 msgid "Nested"
-msgstr ""
+msgstr "Anidado"
 
 #: app/views/administration.housekeeping.edit.php:77
 msgid "Network discovery data storage period"
@@ -15235,7 +15268,7 @@ msgstr "Nuevo mapeo de tipos de medio"
 
 #: app/views/oauth.edit.php:237
 msgid "New oauth"
-msgstr ""
+msgstr "Nueva oauth"
 
 #: app/controllers/CControllerPopupLldOperation.php:350
 msgid "New operation"
@@ -15578,6 +15611,66 @@ msgstr "Sin permisos para acceder al sistema."
 #, c-format
 msgid "No permissions to call \"%1$s.%2$s\"."
 msgstr "No hay permisos para llamar a \"%1$s.%2$s\"."
+
+#: include/classes/api/services/CConfiguration.php:312
+msgid "No permissions to import discovery rules."
+msgstr "No hay permisos para importar reglas de descubrimiento."
+
+#: include/classes/api/services/CConfiguration.php:313
+msgid "No permissions to import graphs."
+msgstr "No hay permisos para importar gráficos."
+
+#: include/classes/api/services/CConfiguration.php:314
+msgid "No permissions to import host groups."
+msgstr "No hay permisos para importar grupos de equipos."
+
+#: include/classes/api/services/CConfiguration.php:316
+msgid "No permissions to import hosts."
+msgstr "No hay permisos para importar equipos."
+
+#: include/classes/api/services/CConfiguration.php:318
+msgid "No permissions to import images."
+msgstr "No hay permisos para importar imágenes."
+
+#: include/classes/api/services/CConfiguration.php:319
+msgid "No permissions to import items."
+msgstr "No hay permisos para importar métricas."
+
+#: include/classes/api/services/CConfiguration.php:320
+msgid "No permissions to import maps."
+msgstr "No hay permisos para importar mapas."
+
+#: include/classes/api/services/CConfiguration.php:321
+msgid "No permissions to import media types."
+msgstr "No hay permisos para importar tipos de medios."
+
+#: include/classes/api/services/CConfiguration.php:324
+msgid "No permissions to import template dashboards."
+msgstr "No hay permisos para importar plantillas de paneles."
+
+#: include/classes/api/services/CConfiguration.php:315
+msgid "No permissions to import template groups."
+msgstr "No hay permisos para importar grupos de plantillas."
+
+#: include/classes/api/services/CConfiguration.php:322
+msgid "No permissions to import template links."
+msgstr "No hay permisos para importar enlaces de plantillas."
+
+#: include/classes/api/services/CConfiguration.php:323
+msgid "No permissions to import templates."
+msgstr "No hay permisos para importar plantillas."
+
+#: include/classes/api/services/CConfiguration.php:325
+msgid "No permissions to import triggers."
+msgstr "No hay permisos para importar iniciadores."
+
+#: include/classes/api/services/CConfiguration.php:326
+msgid "No permissions to import value maps."
+msgstr "No hay permisos para importar mapas de valores."
+
+#: include/classes/api/services/CConfiguration.php:317
+msgid "No permissions to import web scenarios."
+msgstr "No hay permisos para importar escenarios web."
 
 #: app/controllers/CControllerChartsView.php:133
 #: app/controllers/CControllerDashboardPrint.php:99
@@ -18215,7 +18308,7 @@ msgstr "Actualizar"
 #: app/views/administration.proxy.list.php:206
 #: app/views/popup.proxy.edit.php:334
 msgid "Refresh configuration"
-msgstr "Configuración de recarga"
+msgstr "Actualizar configuración"
 
 #: app/views/js/administration.proxy.list.js.php:98
 msgid "Refresh configuration of the selected proxies?"
@@ -19999,7 +20092,7 @@ msgstr "Configure el agente Zabbix en su objetivo de monitoreo ejecutando el sig
 
 #: app/views/host.wizard.edit.php:477
 msgid "Set up Zabbix agent on your monitoring target by executing the following script [bash under root]:"
-msgstr ""
+msgstr "Configure el agente Zabbix en su objetivo de monitoreo ejecutando el siguiente script [bash bajo root]:"
 
 #: app/views/js/popup.itemtestedit.view.js.php:383 include/forms.inc.php:1599
 #: include/views/js/item.preprocessing.js.php:67
@@ -20111,6 +20204,18 @@ msgstr "Corto"
 #: widgets/problems/includes/WidgetForm.php:106
 msgid "Shortened"
 msgstr "Acortado"
+
+#: app/partials/administration.system.info.php:243
+#: app/views/administration.housekeeping.edit.php:187
+#, c-format
+msgid "Should be at least %1$s."
+msgstr "Debería ser al menos %1$s."
+
+#: app/partials/administration.system.info.php:262
+#: app/views/administration.housekeeping.edit.php:197
+#, c-format
+msgid "Should not be higher than %1$s."
+msgstr "No debe ser mayor que %1$s."
 
 #: app/partials/monitoring.problem.filter.php:27
 #: app/views/monitoring.charts.view.php:80
@@ -20361,7 +20466,7 @@ msgstr "Sencillo"
 
 #: app/views/js/host.wizard.edit.js.php:97
 msgid "Simple Network Management Protocol (SNMP) interface"
-msgstr ""
+msgstr "Interfaz del Protocolo simple de administración de red (SNMP)"
 
 #: include/items.inc.php:1578
 msgid "Simple change"
@@ -20464,7 +20569,7 @@ msgstr "El tamaño de la respuesta recibida del servidor Zabbix \"%1$s\" excede 
 
 #: app/views/host.wizard.edit.php:355
 msgid "Skip OS selection if you already have Zabbix agent installed."
-msgstr ""
+msgstr "Omita la selección del sistema operativo si ya tiene instalado el agente Zabbix."
 
 #: include/locales.inc.php:61
 msgid "Slovak (sk_SK)"
@@ -20526,12 +20631,12 @@ msgstr "Es posible que parte del historial de esta métrica esté comprimido; la
 #: app/views/host.wizard.edit.php:129
 #, c-format
 msgid "Some templates (%1$s) are hidden. Custom templates are not supported."
-msgstr ""
+msgstr "Algunas plantillas (%1$s) están ocultas. No se admiten plantillas personalizadas."
 
 #: app/views/host.wizard.edit.php:130
 #, c-format
 msgid "Some templates (%1$s) are incompatible with the Host Wizard."
-msgstr ""
+msgstr "Algunas plantillas (%1$s) son incompatibles con el Asistente de equipo."
 
 #: widgets/actionlog/includes/WidgetForm.php:79
 #: widgets/problems/includes/WidgetForm.php:145
@@ -20590,7 +20695,7 @@ msgstr "Especifique alguna condición de filtro para ver los valores."
 
 #: app/views/host.wizard.edit.php:365
 msgid "Specifying new or existing host groups will add the host to these groups without removing it from any current groups."
-msgstr ""
+msgstr "Al especificar grupos de equipos nuevos o existentes, se agregará el equipo a estos grupos sin eliminarlo de ningún grupo actual."
 
 #: httpdetails.php:107 include/classes/screens/CScreenHttpTestDetails.php:82
 msgid "Speed"
@@ -20658,11 +20763,11 @@ msgstr "La hora de inicio debe ser menor que la hora de finalización para el ti
 
 #: app/views/host.wizard.edit.php:310
 msgid "Start typing or click Select to choose an existing host, or enter a new host name."
-msgstr ""
+msgstr "Comience a escribir o haga clic en Seleccionar para elegir un equipo existente o ingrese un nuevo nombre de equipo."
 
 #: app/views/host.wizard.edit.php:334
 msgid "Start typing or click Select to choose existing host groups, or enter a new host group name."
-msgstr ""
+msgstr "Comience a escribir o haga clic en Seleccionar para elegir grupos de equipos existentes o ingrese un nuevo nombre de grupo de equipos."
 
 #: app/views/popup.ldap.edit.php:287
 msgid "StartTLS"
@@ -21640,7 +21745,7 @@ msgstr "El %1$s ya no se descubre más y %2$s."
 
 #: app/views/host.wizard.edit.php:101
 msgid "The Host Wizard will help you set up your monitoring target (device, application, service, etc.) in Zabbix."
-msgstr ""
+msgstr "El Asistente de equipo le ayudará a configurar su objetivo de monitoreo (dispositivo, aplicación, servicio, etc.) en Zabbix."
 
 #: app/views/oauth.edit.php:48
 msgid "The URL must comply with the OAuth provider's policy."
@@ -21753,7 +21858,7 @@ msgstr "El nivel de zoom máximo es \"%1$s\"."
 #: include/classes/api/services/CDiscoveryRule.php:962
 #, c-format
 msgid "The nested LLD rule with key \"%1$s\" of the template \"%2$s\" cannot be inherited to non-discovered host \"%3$s\"."
-msgstr ""
+msgstr "La regla LLD anidada con clave \"%1$s\" de la plantilla \"%2$s\" no se puede heredar del equipo no descubierto \"%3$s\"."
 
 #: include/classes/data/CItemData.php:1281
 msgid "The number of processes. Returns integer"
@@ -21763,6 +21868,10 @@ msgstr "El número de procesos. Devuelve un número entero"
 #, c-format
 msgid "The parameter \"%1$s\" is missing from the user attributes."
 msgstr "Falta el parámetro \"%1$s\" en los atributos del usuario."
+
+#: app/views/popup.ldap.edit.php:101
+msgid "The previous password was cleared due to a host change. Please enter the new password."
+msgstr "La contraseña anterior se borró debido a un cambio de equipo. Ingrese la nueva contraseña."
 
 #: include/classes/core/CJsonRpc.php:206
 msgid "The received JSON is not a valid JSON-RPC request."
@@ -21779,22 +21888,22 @@ msgstr "La plantilla que se está clonando pertenece a un grupo de plantillas pa
 #: app/views/host.wizard.edit.php:275
 #, c-format
 msgid "The template you selected (%1$s) must be linked to a host - an entity in Zabbix that represents your monitoring target."
-msgstr ""
+msgstr "La plantilla que seleccionó (%1$s) debe estar vinculada a un equipo: una entidad en Zabbix que representa su objetivo de monitoreo."
 
 #: app/views/host.wizard.edit.php:353
 #, c-format
 msgid "The template you selected (%1$s) requires Zabbix agent to be installed and running on your monitoring target."
-msgstr ""
+msgstr "La plantilla que seleccionó (%1$s) requiere que el agente Zabbix esté instalado y ejecutándose en su objetivo de monitoreo."
 
 #: app/views/host.wizard.edit.php:899
 #, c-format
 msgid "The template you selected (%1$s) requires additional configuration."
-msgstr ""
+msgstr "La plantilla que seleccionó (%1$s) requiere configuración adicional."
 
 #: app/views/host.wizard.edit.php:573
 #, c-format
 msgid "The template you selected (%1$s) requires the %2$s to be added to the host (%3$s)."
-msgstr ""
+msgstr "La plantilla que seleccionó (%1$s) requiere que %2$s se agregue al equipo (%3$s)."
 
 #: app/views/popup.token.view.php:62
 msgid "The token has expired. Please update the expiry date to use the token."
@@ -21811,7 +21920,7 @@ msgstr "El iniciador no fue descubierto nuevamente y será eliminado la próxima
 
 #: app/views/js/host.wizard.edit.js.php:722
 msgid "The value does not match the existing value on the selected host."
-msgstr ""
+msgstr "El valor no coincide con el valor existente en el equipo seleccionado."
 
 #: include/views/configuration.host.discovery.edit.php:712
 msgid "The value should be greater than LLD rule update interval."
@@ -21847,7 +21956,7 @@ msgstr[1] "Estas verificaciones no se pueden eliminar, ya que se utilizan como c
 
 #: app/views/host.wizard.edit.php:384
 msgid "This configuration will overwrite all existing encryption settings on the host."
-msgstr ""
+msgstr "Esta configuración sobrescribirá todas las configuraciones de cifrado existentes en el equipo."
 
 #: include/func.inc.php:2566
 msgid "This day last week"
@@ -22965,6 +23074,14 @@ msgstr "No se puede recuperar el estado de soporte de compresión de TimescaleDB
 msgid "Unable to retrieve TimescaleDB version."
 msgstr "No se puede recuperar la versión de TimescaleDB."
 
+#: app/views/administration.housekeeping.edit.php:173
+msgid "Unable to retrieve compression support status of TimescaleDB time-series database extension for PostgreSQL."
+msgstr "No se puede recuperar el estado de soporte de compresión de la extensión de base de datos de series de tiempo TimescaleDB para PostgreSQL."
+
+#: app/views/administration.housekeeping.edit.php:178
+msgid "Unable to retrieve version of TimescaleDB time-series database extension for PostgreSQL."
+msgstr "No se puede recuperar la versión de la extensión de base de datos de series temporales TimescaleDB para PostgreSQL."
+
 #: include/views/mfa.login.php:65
 #, c-format
 msgid "Unable to scan? You can use %1$s secret key to manually configure your authenticator app:"
@@ -23254,6 +23371,11 @@ msgstr "Versión del servidor de base de datos %1$s no compatible. Debe ser al m
 msgid "Unsupported %1$s database server version. Must not be higher than %2$s."
 msgstr "Versión del servidor de base de datos %1$s no compatible. No debe ser superior a %2$s."
 
+#: app/partials/administration.system.info.php:206
+#: app/views/administration.housekeeping.edit.php:169
+msgid "Unsupported TimescaleDB time-series database extension for PostgreSQL is used."
+msgstr "Se utiliza la extensión de base de datos de series temporales TimescaleDB no compatible con PostgreSQL."
+
 #: app/views/administration.housekeeping.edit.php:190
 #, c-format
 msgid "Unsupported TimescaleDB version. Should be at least %1$s."
@@ -23519,7 +23641,7 @@ msgstr "Utilizar el filtro para mostrar resultados"
 
 #: app/views/host.wizard.edit.php:424
 msgid "Use:"
-msgstr ""
+msgstr "Usar:"
 
 #: app/views/administration.script.list.php:93 app/views/mediatype.list.php:98
 msgid "Used in actions"
@@ -24597,7 +24719,7 @@ msgstr "Código de verificación"
 
 #: app/views/host.wizard.edit.php:407
 msgid "Verify Zabbix server, proxy, or cluster address"
-msgstr ""
+msgstr "Verificar la dirección del servidor, proxy o clúster de Zabbix"
 
 #: include/classes/setup/CSetupWizard.php:655
 msgid "Verify database certificate"
@@ -24703,6 +24825,11 @@ msgstr "Advertencia"
 #: include/func.inc.php:1775 jsLoader.php:216
 msgid "Warning message"
 msgstr "Mensaje de advertencia"
+
+#: app/partials/administration.system.info.php:243
+#: app/partials/administration.system.info.php:262
+msgid "Warning!"
+msgstr "¡Advertencia!"
 
 #: app/partials/administration.system.info.php:198
 msgid "Warning! Support for Oracle DB is deprecated since Zabbix 7.0 and will be removed in future versions."
@@ -25323,7 +25450,7 @@ msgstr "El agente Zabbix inicia conexiones con el servidor o proxy Zabbix para e
 
 #: app/views/host.wizard.edit.php:422
 msgid "Zabbix agent must be able to connect to the specified address or list of addresses."
-msgstr ""
+msgstr "El agente Zabbix debe poder conectarse a la dirección o lista de direcciones especificada."
 
 #: app/views/host.wizard.edit.php:863
 msgid "Zabbix documentation"

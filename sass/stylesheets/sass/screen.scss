@@ -2569,17 +2569,34 @@ div {
 	background-attachment: local, local, scroll, scroll;
 }
 
+.tags-wrapper {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 2px 3px;
+
+	@media screen and (min-width: 1200px) {
+		max-width: 266px;
+	}
+
+	@media screen and (min-width: 1400px) {
+		max-width: 359px;
+	}
+
+	@media screen and (min-width: 1600px) {
+		max-width: 452px;
+	}
+}
+
 .tag {
 	display: inline-block;
 	color: $font-selected-color;
 	background-color: $ui-bg-selected-color;
-	margin: 1px 3px 1px 0;
 	padding: 2px 3px;
 	line-height: 1em;
-	max-width: 133px;
 	vertical-align: middle;
 	@extend %overflow-ellipsis;
 	border-radius: 2px;
+	box-sizing: border-box;
 
 	a.link-action {
 		color: inherit !important;
@@ -3905,6 +3922,10 @@ svg {
 	.graph-items {
 		max-width: 750px;
 	}
+}
+
+#graph-preview-tab {
+	overflow: auto;
 }
 
 .z-select,

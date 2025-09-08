@@ -34,17 +34,15 @@ class CEncryptHelper {
 	/**
 	 * Return session key.
 	 *
-	 * @return string|null
+	 * @return string
 	 */
-	private static function getKey(): ?string {
+	private static function getKey(): string {
 		if (!self::$key) {
 			// This if contain copy in CEncryptedCookieSession class.
 			if (CSettingsHelper::getPrivate(CSettingsHelper::SESSION_KEY) === '') {
 				self::$key = self::generateKey();
 
-				if (!self::updateKey(self::$key)) {
-					return null;
-				}
+				self::updateKey(self::$key);
 
 				return self::$key;
 			}
@@ -75,9 +73,7 @@ class CEncryptHelper {
 	 * @return string
 	 */
 	public static function sign(string $data): string {
-		$key = self::getKey() ?? '';
-
-		return hash_hmac(self::SIGN_ALGO, $data, $key);
+		return hash_hmac(self::SIGN_ALGO, $data, self::getKey());
 	}
 
 	/**
@@ -93,11 +89,9 @@ class CEncryptHelper {
 	 * Update secret session key.
 	 *
 	 * @param string $key
-	 *
-	 * @return bool
 	 */
-	public static function updateKey(string $key): bool {
-		return DB::update('settings', [
+	public static function updateKey(string $key): void {
+		DB::update('settings', [
 			'values' => ['value_str' => $key],
 			'where' => ['name' => 'session_key']
 		]);

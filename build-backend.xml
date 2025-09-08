@@ -3,9 +3,6 @@
 
 	<taskdef resource="net/sf/antcontrib/antlib.xml" />
 
-	<!-- oracle oci library has functions declarations without arguments: f() instead of f(void), so it triggers -Wstrict-prototypes warning -->
-	<property name="COMP_FLAGS_DEFAULT" value="-g -std=gnu99 -pedantic -Wall -Wextra -Wunused -Wshadow -Wpointer-arith -Wno-null-pointer-subtraction -Wno-overlength-strings -Wno-maybe-uninitialized -Wformat -Wmissing-prototypes -Wunreachable-code -Wformat-extra-args -Wmissing-field-initializers -Wincompatible-pointer-types -Wnull-dereference -Wold-style-definition -Wmissing-declarations -Wunused-parameter -Winit-self -Wnested-externs -Wjump-misses-init -Wdangling-else -Wformat-signedness -Wfloat-conversion -Wredundant-decls"/>
-	<property name="COMP_FLAGS" value="-Wstrict-prototypes ${COMP_FLAGS_DEFAULT}"/>
 	<property name="ZBX_BASE_FLAGS" value="--enable-server --enable-agent --enable-proxy --with-libxml2 --with-unixodbc --with-net-snmp --with-ssh2 --with-libevent  --with-ldap  --with-libcurl"/>
 
 	<!-- Initialize database related options based on the database type -->
@@ -110,16 +107,14 @@
 		<attribute name="target" default=""/>
 		<attribute name="post-action" default=""/>
 		<sequential>
-			<!-- initialize cflags depending on used compiler -->
-			<local name="common.cflags"/>
-			<local name="cc.cflags"/>
-			<property name="common.cflags" value="-O2 -g"/>
+			<!-- initialize profile depending on used compiler -->
+			<local name="common.profile"/>
 			<switch value="@{cc}">
 				<case value="gcc">
-					<property name="cc.cflags" value="${COMP_FLAGS_DEFAULT}"/>
+					<property name="common.profile" value="../share/config.site.d/gcc-debug"/>
 				</case>
 				<case value="clang">
-					<property name="cc.cflags" value=""/>
+					<property name="common.profile" value="../share/config.site.d/clang-debug"/>
 				</case>
 				<default>
 					<fail>Unknown compiler type: @{cc}</fail>
@@ -131,7 +126,7 @@
 				<env key="CC" value="@{cc}"/>
 				<arg line="@{args}"/>
 				<arg line="--prefix=$(pwd)/install"/>
-				<arg line="CFLAGS=&quot;${common.cflags} ${cc.cflags}&quot;"/>
+				<arg line="CONFIG_SITE=&quot;${common.profile}&quot;"/>
 			</exec>
 			<trycatch>
 				<try>
@@ -216,11 +211,11 @@
 		<!-- Zabbix various configuration parameters for cmocka tests -->
 		<!-- Configuration option name must consist of prefix 'cmocka-', configuration order number
 			and configuration title: cmocka-<number>-<title> -->
-		<property name="cmocka-1-default" value="-q CFLAGS='${COMP_FLAGS}' ${ZBX_BASE_FLAGS} --enable-ipv6 --with-mysql --with-openipmi --with-openssl --with-iconv --with-libpcre2"/>
-		<property name="cmocka-2-agent-only" value="-q CFLAGS='${COMP_FLAGS}' --enable-agent"/>
-		<property name="cmocka-3-server-only" value="-q CFLAGS='${COMP_FLAGS}' --enable-server --with-mysql --with-libcurl --with-libpcre2"/>
-		<property name="cmocka-4-proxy-only" value="-q CFLAGS='${COMP_FLAGS}' --enable-proxy --with-sqlite3 --with-libcurl"/>
-		<property name="cmocka-5-sanitizer" value="CC=clang CFLAGS='${COMP_FLAGS} -Wenum-conversion -fsanitize=leak,address,undefined -fsanitize-address-use-after-scope' LDFLAGS='-fsanitize=leak,address,undefined -fsanitize-address-use-after-scope' -q ${ZBX_BASE_FLAGS} --with-openssl --with-openipmi --enable-ipv6 --with-mysql --with-iconv --with-libpcre"/>
+		<property name="cmocka-1-default" value="CONFIG_SITE='share/config.site.d/gcc-debug' -q ${ZBX_BASE_FLAGS} --enable-ipv6 --with-mysql --with-openipmi --with-openssl --with-iconv"/>
+		<property name="cmocka-2-agent-only" value="CONFIG_SITE='share/config.site.d/gcc-debug' -q --enable-agent"/>
+		<property name="cmocka-3-server-only" value="CONFIG_SITE='share/config.site.d/gcc-debug' -q --enable-server --with-mysql --with-libcurl"/>
+		<property name="cmocka-4-proxy-only" value="CONFIG_SITE='share/config.site.d/gcc-debug' -q --enable-proxy --with-sqlite3 --with-libcurl"/>
+		<property name="cmocka-5-sanitizer" value="CONFIG_SITE='share/config.site.d/clang-debug-sanitize' -q ${ZBX_BASE_FLAGS} --with-openssl --with-openipmi --enable-ipv6 --with-mysql --with-iconv"/>
 
 	</target>
 
@@ -289,6 +284,7 @@
 		<!-- Create & build Zabbix distribution -->
 		<exec executable="./bootstrap.sh" failonerror="on"/>
 		<exec executable="./configure" failonerror="on">
+			<env key="CONFIG_SITE" value="share/config.site.d/gcc-release"/>
 			<arg line="--quiet"/>
 		</exec>
 		<exec executable="make" failonerror="on">

@@ -915,6 +915,32 @@ static void	am_db_remove_expired_mediatypes(zbx_am_db_t *amdb)
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s() removed:%d", __func__, num);
 }
 
+static void	get_mediatype_params(zbx_uint64_t mediatypeid, int mediatype_type, char **params)
+{
+	zbx_db_result_t		result;
+	zbx_db_row_t		row;
+	struct zbx_json		json;
+
+	result = zbx_db_select("select name,value from media_type_param where mediatypeid=" ZBX_FS_UI64, mediatypeid);
+
+	zbx_json_initarray(&json, 1024);
+
+	while (NULL != (row = zbx_db_fetch(result)))
+	{
+		if (MEDIA_TYPE_EXEC == mediatype_type)
+			zbx_json_addstring(&json, NULL, row[1], ZBX_JSON_TYPE_STRING);
+		else
+			zbx_json_addstring(&json, row[0], row[1], ZBX_JSON_TYPE_STRING);
+	}
+
+	zbx_json_close(&json);
+
+	zbx_db_free_result(result);
+
+	*params = zbx_strdup(NULL, json.buffer);
+	zbx_json_free(&json);
+}
+
 /******************************************************************************
  *                                                                            *
  * Purpose: updates watchdog recipients                                       *
@@ -937,7 +963,7 @@ static void	am_db_update_watchdog(zbx_am_db_t *amdb, uint64_t alert_usrgrpid)
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
 	result = zbx_db_select(
-			"select m.mediaid,m.mediatypeid,m.sendto"
+			"select m.mediaid,m.mediatypeid,m.sendto,mt.type"
 			" from media m,users_groups u,media_type mt"
 			" where m.userid=u.userid"
 				" and u.usrgrpid=" ZBX_FS_UI64
@@ -962,6 +988,10 @@ static void	am_db_update_watchdog(zbx_am_db_t *amdb, uint64_t alert_usrgrpid)
 		ZBX_STR2UINT64(media->mediaid, row[0]);
 		ZBX_STR2UINT64(media->mediatypeid, row[1]);
 		media->sendto = zbx_strdup(NULL, row[2]);
+		media->mediatype_type = atoi(row[3]);
+
+		get_mediatype_params(media->mediatypeid, media->mediatype_type, &media->mediatype_params);
+
 		zbx_vector_am_media_ptr_append(&medias, media);
 		zbx_vector_uint64_append(&mediatypeids, media->mediatypeid);
 	}

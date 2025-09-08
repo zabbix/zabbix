@@ -1194,8 +1194,6 @@ function calculateGraphScaleValues(float $min, float $max, bool $min_calculated,
 		'power' => $power,
 		'ignore_milliseconds' => $min <= -1 || $max >= 1
 	];
-	$options_fixed = $options;
-	$options_calculated = $options;
 
 	$pre_conversion = convertUnitsRaw($options);
 
@@ -1221,13 +1219,7 @@ function calculateGraphScaleValues(float $min, float $max, bool $min_calculated,
 			}
 		}
 
-		$options_fixed += [
-			'precision' => $precision,
-			'decimals' => $precision - 1,
-			'decimals_exact' => false
-		];
-
-		$options_calculated += [
+		$options += [
 			'precision' => $precision,
 			'decimals' => $decimals,
 			'decimals_exact' => $decimals_exact
@@ -1240,7 +1232,7 @@ function calculateGraphScaleValues(float $min, float $max, bool $min_calculated,
 		'relative_pos' => 0,
 		'value' => convertUnits([
 			'value' => $min
-		] + ($min_calculated ? $options_calculated : $options_fixed))
+		] + $options)
 	];
 
 	foreach ($rows as $value) {
@@ -1250,7 +1242,7 @@ function calculateGraphScaleValues(float $min, float $max, bool $min_calculated,
 				: ($value - $min) / ($max - $min),
 			'value' => convertUnits([
 				'value' => $value
-			] + $options_calculated)
+			] + $options)
 		];
 	}
 
@@ -1258,7 +1250,7 @@ function calculateGraphScaleValues(float $min, float $max, bool $min_calculated,
 		'relative_pos' => 1,
 		'value' => convertUnits([
 			'value' => $max
-		] + ($max_calculated ? $options_calculated : $options_fixed))
+		] + $options)
 	];
 
 	return $scale_values;

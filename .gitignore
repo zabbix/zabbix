@@ -147,6 +147,9 @@ tests/libs/zbxalgo/zbx_int128
 tests/libs/zbxalgo/zbx_vector
 tests/libs/zbxcfg/parse_cfg_file
 tests/libs/zbxcommon/init_library_common
+tests/libs/zbxcommon/zbx_calloc
+tests/libs/zbxcommon/zbx_malloc
+tests/libs/zbxcommon/zbx_realloc
 tests/libs/zbxcomms/zbx_tcp_check_allowed_peers
 tests/libs/zbxcomms/zbx_tcp_check_allowed_peers_ipv4
 tests/libs/zbxcommshigh/zbx_tcp_recv_ext
@@ -233,6 +236,7 @@ tests/libs/zbxexpr/zbx_token_find
 tests/libs/zbxexpr/zbx_uint64match_condition
 tests/libs/zbxexpr/zbx_user_macro_parse
 tests/libs/zbxexpr/zbx_url_encode_decode
+tests/libs/zbxexpr/zbx_user_macro_parse_dyn
 tests/libs/zbxexpr/zbx_user_macro_quote_context_dyn
 tests/libs/zbxexpr/zbx_substitute_item_key_params
 tests/libs/zbxexpr/zbx_validate_interval
@@ -258,6 +262,7 @@ tests/libs/zbxip/zbx_iprange_uniq_iter
 tests/libs/zbxip/zbx_iprange_uniq_next
 tests/libs/zbxip/zbx_parse_serveractive_element
 tests/libs/zbxip/zbx_portrange_uniq_next
+tests/libs/zbxip/zbx_join_hostport
 tests/libs/zbxicmpping/get_interval_option
 tests/libs/zbxicmpping/line_process
 tests/libs/zbxjson/zbx_json_decodevalue

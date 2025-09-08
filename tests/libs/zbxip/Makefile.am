@@ -10,7 +10,8 @@ BINARIES_tests = \
 	zbx_iprange_volume \
 	zbx_iprange_ip2str \
 	zbx_iprange_uniq_next \
-	zbx_portrange_uniq_next
+	zbx_portrange_uniq_next \
+	zbx_join_hostport
 
 noinst_PROGRAMS = $(BINARIES_tests)
 
@@ -179,3 +180,18 @@ zbx_portrange_uniq_next_LDADD += @SERVER_LIBS@
 zbx_portrange_uniq_next_LDFLAGS = @SERVER_LDFLAGS@ $(CMOCKA_LDFLAGS)
 
 zbx_portrange_uniq_next_CFLAGS = $(IP_COMPILER_FLAGS)
+
+#zbx_join_hostport
+
+zbx_join_hostport_SOURCES = \
+	zbx_join_hostport.c \
+	$(COMMON_SRC_FILES)
+
+zbx_join_hostport_LDADD = \
+	$(IP_LIBS)
+
+zbx_join_hostport_LDADD += @SERVER_LIBS@
+
+zbx_join_hostport_LDFLAGS = @SERVER_LDFLAGS@ $(CMOCKA_LDFLAGS)
+
+zbx_join_hostport_CFLAGS = $(IP_COMPILER_FLAGS)

@@ -74,13 +74,13 @@ window.graph_edit_popup = new class {
 
 		document.getElementById('items-table').addEventListener('click', (e) => {
 			if (e.target.classList.contains('js-item-name')) {
-				this.#openItemPopup(e.target);
+				this.#openEditItemPopup(e.target);
 			}
 			else if (e.target.classList.contains('js-add-item')) {
-				this.#openItemSelectPopup();
+				this.#openAddItemPopup();
 			}
 			else if (e.target.classList.contains('js-add-item-prototype')) {
-				this.#openItemPrototypeSelectPopup({writeonly: '1', multiselect: '1', graphtype: this.graph_type});
+				this.#openAddItemPopup(true);
 			}
 			else if (e.target.classList.contains('js-remove')) {
 				this.#removeItem(e.target);
@@ -221,13 +221,9 @@ window.graph_edit_popup = new class {
 
 	#initPreviewTab() {
 		$('#tabs').on('tabscreate tabsactivate', (event, ui) => {
-			document.querySelector('#preview-tab').style.overflow = document.getElementById('width').value > 900
-				? 'auto'
-				: ''
-
 			const $panel = (event.type === 'tabscreate') ? ui.panel : ui.newPanel;
 
-			if ($panel.attr('id') === 'preview-tab') {
+			if ($panel.attr('id') === 'graph-preview-tab') {
 				const $preview_chart = $('#preview-chart');
 				const src = new Curl('chart3.php');
 
@@ -348,42 +344,59 @@ window.graph_edit_popup = new class {
 		});
 	}
 
-	#openItemPopup(target) {
+	#openEditItemPopup(target) {
 		const item_num = target.id.match(/\d+/g);
+		const is_prototype = document.getElementById('items_' + item_num + '_flags').value == <?= ZBX_FLAG_DISCOVERY_PROTOTYPE ?>;
+		const parameters = this.#getItemPopupParameters(item_num, is_prototype);
+
+		PopUp('popup.generic', parameters, {dialogue_class: "modal-popup-generic", trigger_element: target});
+	}
+
+	#openAddItemPopup(is_prototype = false) {
+		const parameters = this.#getItemPopupParameters(null, is_prototype);
+
+		PopUp('popup.generic', parameters, {dialogue_class: 'modal-popup-generic'});
+	}
+
+	#getItemPopupParameters(item_num = null, is_prototype = false) {
 		const parameters = {
 			srcfld1: 'itemid',
 			srcfld2: 'name',
 			dstfrm: this.form_name,
-			dstfld1: 'items_' + item_num + '_itemid',
-			dstfld2: 'items_' + item_num + '_name',
 			numeric: 1,
-			writeonly: 1,
-			normal_only: 1
+			writeonly: 1
 		};
 
-		if (document.getElementById('items_' + item_num + '_flags').value == <?= ZBX_FLAG_DISCOVERY_PROTOTYPE ?>) {
-			parameters['srctbl'] = 'item_prototypes';
-			parameters['srcfld3'] = 'flags';
-			parameters['dstfld3'] = 'items_' + item_num + '_flags';
-			parameters['parent_discoveryid'] = this.graph.parent_discoveryid;
+		if (item_num === null) {
+			parameters.multiselect = 1;
 		}
 		else {
-			parameters['srctbl'] = 'items';
+			parameters.dstfld1 = 'items_' + item_num + '_itemid';
+			parameters.dstfld2 = 'items_' + item_num + '_name';
 		}
 
-		if (!this.graph.parent_discoveryid && this.graph.hostid) {
-			parameters['hostid'] = this.graph.hostid;
+		if (is_prototype) {
+			parameters.srctbl = 'item_prototypes';
+			parameters.parent_discoveryid = this.graph.parent_discoveryid;
+
+			if (item_num !== null) {
+				parameters.srcfld3 = 'flags';
+				parameters.dstfld3 = 'items_' + item_num + '_flags';
+			}
+		}
+		else {
+			parameters.srctbl = 'items';
 		}
 
 		if (this.graph.is_template) {
-			parameters['only_hostid'] = this.graph.hostid
+			parameters.only_hostid = this.graph.hostid
 		}
 		else {
-			parameters['real_hosts'] = '1';
-			parameters['hostid'] = this.graph.hostid;
+			parameters.real_hosts = 1;
+			parameters.hostid = this.graph.hostid;
 		}
 
-		PopUp('popup.generic', parameters, {dialogue_class: "modal-popup-generic", trigger_element: target});
+		return parameters;
 	}
 
 	#removeItem(target) {
@@ -435,25 +448,6 @@ window.graph_edit_popup = new class {
 		$('#item-buttons-row').before($row);
 	}
 
-	#openItemSelectPopup() {
-		const parameters = {
-			srctbl: 'items',
-			srcfld1: 'itemid',
-			srcfld2: 'name',
-			dstfrm: this.form_name,
-			numeric: 1,
-			writeonly: 1,
-			multiselect: 1,
-			hostid: this.hostid
-		};
-
-		if (this.graph.normal_only == 1) {
-			parameters['normal_only'] = this.graph.normal_only;
-		}
-
-		PopUp('popup.generic', parameters, {dialogue_class: 'modal-popup-generic'});
-	}
-
 	#openItemPrototypeSelectPopup(popup_parameters = {}) {
 		const parameters = {
 			srctbl: 'item_prototypes',
@@ -465,10 +459,6 @@ window.graph_edit_popup = new class {
 		}
 
 		Object.assign(parameters, popup_parameters);
-
-		if (this.graph.normal_only == 1) {
-			parameters['normal_only'] = this.graph.normal_only;
-		}
 
 		PopUp('popup.generic', parameters, {dialogue_class: 'modal-popup-generic'});
 	}
