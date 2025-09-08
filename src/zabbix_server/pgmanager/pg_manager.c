@@ -515,12 +515,18 @@ ZBX_THREAD_ENTRY(pg_manager_thread, args)
 
 	pgm_init(&cache);
 
+	sigset_t	orig_mask;
+
+	zbx_block_thread_signals(&orig_mask);
+
 	if (FAIL == pg_service_init(&pgs, &cache, &error))
 	{
 		zabbix_log(LOG_LEVEL_CRIT, "cannot start proxy group manager service: %s", error);
 		zbx_free(error);
 		exit(EXIT_FAILURE);
 	}
+
+	zbx_unblock_signals(&orig_mask);
 
 	pgm_update(&cache);
 	pgm_db_get_hosts(&cache);

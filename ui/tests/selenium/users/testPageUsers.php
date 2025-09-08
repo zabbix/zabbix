@@ -123,8 +123,8 @@ class testPageUsers extends CLegacyWebTest {
 		$this->zbxTestTextPresent($alias);
 		$this->zbxTestClickLinkText($alias);
 		$this->zbxTestClickWait('update');
-		$this->zbxTestCheckHeader('Users');
 		$this->zbxTestWaitUntilMessageTextPresent('msg-good', 'User updated');
+		$this->zbxTestCheckHeader('Users');
 		$this->zbxTestTextPresent($alias);
 
 		$this->assertEquals($oldHashUser, CDBHelper::getHash($sqlHashUser));
@@ -144,10 +144,12 @@ class testPageUsers extends CLegacyWebTest {
 
 	public function testPageUsers_FilterNone() {
 		$this->zbxTestLogin('zabbix.php?action=user.list');
+		$table = $this->query('class:list-table')->asTable()->one();
 		$form = $this->query('name:zbx_filter')->asForm()->waitUntilVisible()->one();
 		$form->query('button:Reset')->waitUntilClickable()->one()->click();
 		$form->fill(['Username' => '1928379128ksdhksdjfh']);
 		$form->submit();
+		$table->waitUntilReloaded();
 		$this->assertFalse($this->query('xpath://div[@class="table-stats"]')->one(false)->isValid());
 		$this->zbxTestTextNotPresent('Displaying 0 of 0 found');
 		$this->zbxTestInputTypeOverwrite('filter_username', '%');
