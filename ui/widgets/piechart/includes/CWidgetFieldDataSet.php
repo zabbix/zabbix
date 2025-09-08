@@ -185,6 +185,10 @@ class CWidgetFieldDataSet extends CWidgetField {
 				unset($item_spec);
 
 				unset($data['references']);
+
+				if ($errors) {
+					break;
+				}
 			}
 		}
 		unset($data);
