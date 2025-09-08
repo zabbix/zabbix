@@ -11,7 +11,7 @@ Check the [`API documentation`](https://pve.proxmox.com/pve-docs/api-viewer/inde
 
 ## Requirements
 
-Zabbix version: 7.4 and higher.
+Zabbix version: 8.0 and higher.
 
 ## Tested versions
 
@@ -20,7 +20,7 @@ This template has been tested on:
 
 ## Configuration
 
-> Zabbix should be configured according to the instructions in the [Templates out of the box](https://www.zabbix.com/documentation/7.4/manual/config/templates_out_of_the_box) section.
+> Zabbix should be configured according to the instructions in the [Templates out of the box](https://www.zabbix.com/documentation/8.0/manual/config/templates_out_of_the_box) section.
 
 ## Setup
 
@@ -40,7 +40,7 @@ Please provide the necessary access levels for both the User and the Token:
 
 |Name|Description|Default|
 |----|-----------|-------|
-|{$PVE.URL.HOST}|<p>The hostname or IP address of the Proxmox VE API host.</p>|`<SET PVE HOST>`|
+|{$PVE.URL.HOST}|<p>The hostname or IP address of the Proxmox VE API host.</p>||
 |{$PVE.URL.PORT}|<p>The API uses the HTTPS protocol and the server listens to port 8006 by default.</p>|`8006`|
 |{$PVE.TOKEN.ID}|<p>API tokens allow stateless access to most parts of the REST API by another system, software or API client.</p>|`USER@REALM!TOKENID`|
 |{$PVE.TOKEN.SECRET}|<p>Secret key.</p>|`xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx`|

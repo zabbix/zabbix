@@ -50,13 +50,13 @@ class CControllerTriggerPrototypeList extends CController {
 			'editable' => true
 		];
 
-		$this->parent_discovery = API::DiscoveryRule()->get($options) ?: API::DiscoveryRulePrototype()->get($options);
+		$parent_discovery = API::DiscoveryRule()->get($options) ?: API::DiscoveryRulePrototype()->get($options);
 
-		if (!$this->parent_discovery) {
+		if (!$parent_discovery) {
 			return false;
 		}
 
-		$this->parent_discovery = reset($this->parent_discovery);
+		$this->parent_discovery = reset($parent_discovery);
 
 		return $this->getInput('context') === 'host'
 			? $this->checkAccess(CRoleHelper::UI_CONFIGURATION_HOSTS)

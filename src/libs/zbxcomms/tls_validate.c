@@ -499,10 +499,7 @@ void	zbx_tls_validate_config(zbx_config_tls_t *config_tls, int config_active_for
 			zbx_tls_validation_error(ZBX_TLS_VALIDATION_INVALID, &(config_tls->frontend_accept), NULL,
 					config_tls);
 		}
-	} else {
-		config_tls->frontend_accept_modes = 0;
 	}
-
 	/* parse and validate 'TLSConnect' parameter (in zabbix_proxy.conf, zabbix_agentd.conf) and '--tls-connect' */
 	/* parameter (in zabbix_get and zabbix_sender) */
 
@@ -535,8 +532,6 @@ void	zbx_tls_validate_config(zbx_config_tls_t *config_tls, int config_active_for
 	/* parse and validate 'TLSAccept' parameter (in zabbix_proxy.conf, zabbix_agentd.conf) */
 	if (NULL != config_tls->accept)
 		config_tls->accept_modes = tls_config_parse_accept(config_tls, &(config_tls->accept));
-	else
-		config_tls->accept_modes = 0;
 
 	/* either both a certificate and a private key must be defined or none of them */
 

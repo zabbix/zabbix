@@ -1,5 +1,5 @@
 zabbix_export:
-  version: '7.4'
+  version: '8.0'
   media_types:
     - name: Redmine
       type: WEBHOOK

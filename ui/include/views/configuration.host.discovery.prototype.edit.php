@@ -380,6 +380,15 @@ $item_tab
 			->setModern()
 		))->setId('js-item-retrieve-mode-field')
 	])
+	// Append ITEM_TYPE_HTTPAGENT Convert to JSON to form list.
+	->addItem([
+		(new CLabel(_('Convert to JSON'), 'output_format'))->setId('js-item-output-format-label'),
+		(new CFormField(
+			(new CCheckBox('output_format', HTTPCHECK_STORE_JSON))
+				->setReadonly($readonly)
+				->setChecked($data['output_format'] == HTTPCHECK_STORE_JSON)
+		))->setId('js-item-output-format-field')
+	])
 	// Append ITEM_TYPE_HTTPAGENT HTTP proxy to form list.
 	->addItem([
 		(new CLabel(_('HTTP proxy'), 'http_proxy'))->setId('js-item-http-proxy-label'),
@@ -1071,16 +1080,6 @@ if ($data['form_refresh'] == 0) {
 // Append buttons to form.
 if (!empty($data['itemid'])) {
 	$buttons = [(new CSubmit('clone', _('Clone')))->setEnabled(!$data['discovered_lld'])];
-
-	if ($data['host']['status'] != HOST_STATUS_TEMPLATE) {
-		$buttons[] = (new CSimpleButton(_('Execute now')))
-			->setEnabled(in_array($data['item']['type'], checkNowAllowedTypes())
-					&& $data['item']['status'] == ITEM_STATUS_ACTIVE
-					&& $data['host']['status'] == HOST_STATUS_MONITORED
-			)
-			->addClass('js-execute-item');
-	}
-
 	$buttons[] = (new CSimpleButton(_('Test')))->setId('test_item');
 	$buttons[] = (new CButtonDelete(
 		_('Delete discovery prototype?'),

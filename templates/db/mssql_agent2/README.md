@@ -7,7 +7,7 @@ This template is designed for the effortless deployment of MSSQL monitoring by Z
 
 ## Requirements
 
-Zabbix version: 7.4 and higher.
+Zabbix version: 8.0 and higher.
 
 ## Tested versions
 
@@ -16,7 +16,7 @@ This template has been tested on:
 
 ## Configuration
 
-> Zabbix should be configured according to the instructions in the [Templates out of the box](https://www.zabbix.com/documentation/7.4/manual/config/templates_out_of_the_box) section.
+> Zabbix should be configured according to the instructions in the [Templates out of the box](https://www.zabbix.com/documentation/8.0/manual/config/templates_out_of_the_box) section.
 
 ## Setup
 
@@ -24,7 +24,7 @@ This template has been tested on:
 
 **Important!** Starting with version 7.4-1 of this template, the MSSQL plugin must be updated to a version equal to or above 7.4.0. (You can check the version of the template in its YAML file under the "vendor" section.)
 
-Loadable plugin requires installation of a separate package or binary file or [compilation from sources](https://www.zabbix.com/documentation/7.4/manual/extensions/plugins/build).
+Loadable plugin requires installation of a separate package or binary file or [compilation from sources](https://www.zabbix.com/documentation/8.0/manual/extensions/plugins/build).
 
 2. Create an MSSQL user for monitoring. For example, "zbx_monitor".
 

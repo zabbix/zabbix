@@ -55,7 +55,6 @@ class CControllerGraphPrototypeEdit extends CController {
 			'discover' =>			'db graphs.discover|in '.implode(',', [
 				ZBX_PROTOTYPE_DISCOVER, ZBX_PROTOTYPE_NO_DISCOVER
 			]),
-			'normal_only' =>		'in 1',
 			'clone' =>				'in 1',
 			'visible' =>			'array'
 		];
@@ -82,13 +81,13 @@ class CControllerGraphPrototypeEdit extends CController {
 			'editable' => true
 		];
 
-		$this->parent_discovery = API::DiscoveryRule()->get($options) ?: API::DiscoveryRulePrototype()->get($options);
+		$parent_discovery = API::DiscoveryRule()->get($options) ?: API::DiscoveryRulePrototype()->get($options);
 
-		if (!$this->parent_discovery) {
+		if (!$parent_discovery) {
 			return false;
 		}
 
-		$this->parent_discovery = reset($this->parent_discovery);
+		$this->parent_discovery = reset($parent_discovery);
 
 		if ($this->hasInput('graphid')) {
 			$graphid = $this->getInput('graphid');
@@ -118,7 +117,6 @@ class CControllerGraphPrototypeEdit extends CController {
 			'parent_discoveryid' => $this->getInput('parent_discoveryid'),
 			'hostid' => $this->parent_discovery['hostid'],
 			'context' => $this->getInput('context'),
-			'normal_only' => $this->getInput('normal_only', 0),
 			'readonly' => $this->getInput('readonly', 0),
 			'discovered' => false,
 			'is_discovered_prototype' => false

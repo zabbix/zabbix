@@ -132,7 +132,7 @@ void	zbx_audit_item_create_entry(int audit_context_mode, int audit_action, zbx_u
 void	zbx_audit_item_update_json_update_##resource(int audit_context_mode, zbx_uint64_t itemid, int flags,	\
 		type1 resource##_old, type1 resource##_new)							\
 {														\
-	char	prop[AUDIT_MAX_KEY_LEN];									\
+	char	prop[AUDIT_DETAILS_KEY_LEN];									\
 														\
 	RETURN_IF_AUDIT_OFF(audit_context_mode);								\
 														\
@@ -820,7 +820,7 @@ void	zbx_audit_item_update_json_add_query_fields_json(int audit_context_mode, zb
 {
 	struct zbx_json_parse	jp_array, jp_object;
 	const char		*element = NULL;
-	char			prop[AUDIT_MAX_KEY_LEN];
+	char			prop[AUDIT_DETAILS_KEY_LEN];
 	zbx_uint64_t		index = 0;
 
 	RETURN_IF_AUDIT_OFF(audit_context_mode);
@@ -892,7 +892,7 @@ void	zbx_audit_item_update_json_update_query_fields(int audit_context_mode, zbx_
 {
 	struct zbx_json_parse	jp_array_old, jp_object_old, jp_array_new, jp_object_new;
 	char			name_old[MAX_STRING_LEN], value_old[MAX_STRING_LEN], name_new[MAX_STRING_LEN],
-				value_new[MAX_STRING_LEN], prop[AUDIT_MAX_KEY_LEN];
+				value_new[MAX_STRING_LEN], prop[AUDIT_DETAILS_KEY_LEN];
 	const char		*member_old, *element_old = NULL, *member_new, *element_new = NULL;
 
 	RETURN_IF_AUDIT_OFF(audit_context_mode);
@@ -1064,7 +1064,7 @@ void	zbx_audit_item_update_json_update_query_fields(int audit_context_mode, zbx_
 void	zbx_audit_item_update_json_add_headers(int audit_context_mode, zbx_uint64_t itemid, int flags,
 		const char *val)
 {
-	char		*val_tmp, *val_mut, *element = NULL, prop[AUDIT_MAX_KEY_LEN];
+	char		*val_tmp, *val_mut, *element = NULL, prop[AUDIT_DETAILS_KEY_LEN];
 	zbx_uint64_t	index = 0;
 
 	RETURN_IF_AUDIT_OFF(audit_context_mode);
@@ -1129,7 +1129,7 @@ void	zbx_audit_item_update_json_update_headers(int audit_context_mode, zbx_uint6
 		const char *val_old, const char *val_new)
 {
 	char		*val_old_tmp, *val_new_tmp, *val_old_mut, *val_new_mut, *element_old = NULL,
-			*element_new = NULL, prop[AUDIT_MAX_KEY_LEN];
+			*element_new = NULL, prop[AUDIT_DETAILS_KEY_LEN];
 	zbx_uint64_t	index = 0;
 
 	RETURN_IF_AUDIT_OFF(audit_context_mode);
@@ -1270,6 +1270,60 @@ out:
 	zbx_free(val_old_mut);
 	zbx_free(val_new_mut);
 }
+
+void	zbx_audit_entry_update_json_add_headers(zbx_audit_entry_t* audit_entry, const char *val)
+{
+#define KEY(s) zbx_audit_item_headers(index, s, key, sizeof(key))
+#define AUDIT_TABLE_NAME	"lld_override"
+
+	char	*val_tmp, *val_mut, *element = NULL, key[AUDIT_DETAILS_KEY_LEN];
+	int	index = 0;
+
+	if (NULL == audit_entry)
+		return;
+
+	if (SUCCEED == audit_field_value_matches_db_default("items", "headers", val, 0))
+		return;
+
+	val_mut = zbx_strdup(NULL, val);
+
+	if (NULL == (element = strtok_r(val_mut, "\r\n", &val_tmp)))
+	{
+		zabbix_log(LOG_LEVEL_ERR, "cannot parse headers for itemid: " ZBX_FS_UI64 ", array is empty",
+				audit_entry->id);
+
+		goto out;
+	}
+
+	do
+	{
+		index++;
+
+		char	*val_tmp2, *name, *value;
+
+		if (NULL == (name = strtok_r(element, ":", &val_tmp2)))
+		{
+			zabbix_log(LOG_LEVEL_ERR, "cannot parse headers for itemid: " ZBX_FS_UI64 " for element %s",
+					audit_entry->id, element);
+
+			goto out;
+		}
+
+		value = strtok_r(NULL, ":", &val_tmp2);
+
+		zbx_audit_entry_add_string(audit_entry, NULL, NULL, KEY(NULL), "Added");
+		zbx_audit_entry_add_string(audit_entry, NULL, NULL, KEY("name"), name);
+		zbx_audit_entry_add_string(audit_entry, NULL, NULL, KEY("value"), ZBX_NULL2EMPTY_STRTOK_R_VALUE(value));
+		zbx_audit_entry_add_int(audit_entry, NULL, NULL, KEY("sortorder"), index);
+	}
+	while (NULL != (element = strtok_r(NULL, "\r\n", &val_tmp)));
+out:
+	zbx_free(val_mut);
+
+#undef AUDIT_TABLE_NAME
+#undef KEY
+}
+
 #undef ZBX_NULL2EMPTY_STRTOK_R_VALUE
 
 /******************************************************************************
@@ -1430,6 +1484,26 @@ const char	*zbx_audit_lldrule_override_operation_optemplate(zbx_uint64_t overrid
 	offset = strlen(key);
 
 	offset += zbx_snprintf(key + offset, key_size - offset, ".optemplates[" ZBX_FS_UI64 "]", optemplateid);
+
+	if (NULL != field)
+		zbx_snprintf(key + offset, key_size - offset, ".%s", field);
+
+	return key;
+}
+
+const char	*zbx_audit_item_query_fields(int index, const char *field, char *key, size_t key_size)
+{
+	size_t	offset = zbx_snprintf(key, key_size, "query_fields[%d]", index);
+
+	if (NULL != field)
+		zbx_snprintf(key + offset, key_size - offset, ".%s", field);
+
+	return key;
+}
+
+const char	*zbx_audit_item_headers(int index, const char *field, char *key, size_t key_size)
+{
+	size_t	offset = zbx_snprintf(key, key_size, "headers[%d]", index);
 
 	if (NULL != field)
 		zbx_snprintf(key + offset, key_size - offset, ".%s", field);
@@ -1685,6 +1759,67 @@ void	zbx_audit_entry_update_json_add_lld_override_filter(zbx_audit_entry_t *audi
 	zbx_audit_entry_add(audit_entry, KEY(NULL));
 	zbx_audit_entry_add_int(audit_entry, AUDIT_TABLE_NAME, "evaltype", KEY("evaltype"), evaltype);
 	zbx_audit_entry_add_string(audit_entry, AUDIT_TABLE_NAME, "formula", KEY("formula"), formula);
+
+#undef AUDIT_TABLE_NAME
+#undef KEY
+}
+
+void	zbx_audit_entry_update_json_add_query_fields_json(zbx_audit_entry_t *audit_entry, const char *val)
+{
+#define KEY(s) zbx_audit_item_query_fields(index, s, key, sizeof(key))
+#define AUDIT_TABLE_NAME	"lld_override"
+
+	struct zbx_json_parse	jp_array, jp_object;
+	const char		*element = NULL;
+	char			key[AUDIT_DETAILS_KEY_LEN];
+	int			index = 0;
+
+	if (NULL == audit_entry)
+		return;
+
+	if (SUCCEED == audit_field_value_matches_db_default("items", "query_fields", val, 0))
+		return;
+
+	if (SUCCEED != zbx_json_open(val, &jp_array))
+	{
+		zabbix_log(LOG_LEVEL_ERR, "cannot parse query fields for itemid: " ZBX_FS_UI64 ", error: %s",
+				audit_entry->id, zbx_json_strerror());
+
+		return;
+	}
+
+	if (NULL == (element = zbx_json_next(&jp_array, element)))
+	{
+		zabbix_log(LOG_LEVEL_ERR, "cannot parse query fields for itemid: " ZBX_FS_UI64 ", array is empty",
+				audit_entry->id);
+
+		return;
+	}
+
+	do
+	{
+		char		name[MAX_STRING_LEN], value[MAX_STRING_LEN];
+		const char	*member;
+
+		index++;
+
+		if (SUCCEED != zbx_json_brackets_open(element, &jp_object) ||
+				NULL == (member = zbx_json_pair_next(&jp_object, NULL, name, sizeof(name))) ||
+				NULL == zbx_json_decodevalue(member, value, sizeof(value), NULL))
+		{
+			zabbix_log(LOG_LEVEL_ERR, "cannot parse query fields for itemid: " ZBX_FS_UI64 ", %s",
+					audit_entry->id, zbx_json_strerror());
+
+			return;
+		}
+
+		zbx_audit_entry_add_string(audit_entry, NULL, NULL, KEY(NULL), "Added");
+		zbx_audit_entry_add_string(audit_entry, NULL, NULL, KEY("name"), name);
+		zbx_audit_entry_add_string(audit_entry, NULL, NULL, KEY("value"), value);
+		zbx_audit_entry_add_int(audit_entry, NULL, NULL, KEY("sortorder"), index);
+
+	}
+	while (NULL != (element = zbx_json_next(&jp_array, element)));
 
 #undef AUDIT_TABLE_NAME
 #undef KEY

@@ -311,8 +311,15 @@ class testFormTriggerPrototype extends CLegacyWebTest {
 		$this->zbxTestAssertElementPresentXpath("//a[@id='tab_triggersTab' and text()='Trigger prototype']");
 
 		if (isset($data['constructor'])) {
-			$dialog->asForm()->fill(['Name' => 'Layout test trigger']);
-			$dialog->query('button:Expression constructor')->waitUntilClickable()->one()->click();
+			// Fill name to avoid inline validation error when creating a new trigger prototype.
+			if (!isset($data['form'])) {
+				$dialog->asForm()->fill(['Name' => 'Layout test trigger']);
+			}
+
+			/* hoverMouse() added because #28 test case is unstable on Jenkins possibly due to scroll
+			 * fails with error - other element would receive the click.
+			 */
+			$dialog->query('button:Expression constructor')->waitUntilClickable()->one()->hoverMouse()->click();
 			// Wait for expression constructor to open, textarea is disabled and its id has changed to 'expr_temp'.
 			$dialog->query('xpath:.//textarea[@id="expr_temp"]')->waitUntilVisible();
 
@@ -1035,7 +1042,8 @@ class testFormTriggerPrototype extends CLegacyWebTest {
 		}
 
 		if (isset($data['constructor'])) {
-			$this->zbxTestClickButtonText('Expression constructor');
+			$button = $this->query('button:Expression constructor')->one()->click();
+
 			$constructor = $data['constructor'];
 			// TODO: If after DEV-4259 inline validation will cover all errors, the TEST_BAD case will not be required.
 			if (isset($constructor['errors']) && !array_key_exists('elementError', $constructor)) {
@@ -1043,6 +1051,7 @@ class testFormTriggerPrototype extends CLegacyWebTest {
 				COverlayDialogElement::find()->one()->close();
 			}
 			else {
+				$button->waitUntilNotVisible();
 				$this->query('xpath://*[@id="expression-table"]/div[1]')->waitUntilVisible()->one();
 				$this->zbxTestAssertElementPresentXpath("//button[@name='test_expression']");
 				$this->zbxTestAssertVisibleXpath("//div[@id='expression-row']//button[@id='and_expression']");
@@ -1236,10 +1245,12 @@ class testFormTriggerPrototype extends CLegacyWebTest {
 	 * @param string $name name of a host or template where triggers are opened
 	 */
 	private function filterEntriesAndOpenDiscovery($name, $form) {
+		$table = $this->query('xpath://table[@class="list-table"]')->asTable()->one();
 		$this->query('button:Reset')->one()->click();
 		$form->fill(['Name' => $name]);
 		$this->query('button:Apply')->one()->waitUntilClickable()->click();
-		$this->query('xpath://table[@class="list-table"]')->asTable()->one()->findRow('Name', $name)
-				->getColumn('Discovery')->query('link:Discovery')->one()->click();
+		$form->waitUntilStalled();
+		$table->waitUntilReloaded();
+		$table->findRow('Name', $name)->getColumn('Discovery')->query('link:Discovery')->one()->click();
 	}
 }

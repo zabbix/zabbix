@@ -20,7 +20,9 @@
 #include "zbxalgo.h"
 #include "zbxdbhigh.h"
 
-#define ZBX_WATCHDOG_ALERT_FREQUENCY	(15 * SEC_PER_MIN)
+#define ZBX_WATCHDOG_ALERT_PERIOD	(15 * SEC_PER_MIN)
+#define ZBX_DB_PING_PERIOD		SEC_PER_MIN
+#define ZBX_WATCHDOG_EXPIRE_PERIOD	(ZBX_WATCHDOG_ALERT_PERIOD + ZBX_DB_PING_PERIOD)
 #define ZBX_ALERT_NO_DEBUG		0
 #define ZBX_ALERT_DEBUG			1
 
@@ -50,6 +52,7 @@ typedef struct
 	char			*gsm_modem;
 	char			*username;
 	char			*passwd;
+	int			passwd_expires;
 	char			*script;
 	char			*script_bin;
 	char			*error;
@@ -76,6 +79,10 @@ typedef struct
 	zbx_uint64_t	mediaid;
 	zbx_uint64_t	mediatypeid;
 	char		*sendto;
+
+	/* cached data */
+	int		mediatype_type;
+	char		*mediatype_params;
 }
 zbx_am_media_t;
 

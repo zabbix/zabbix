@@ -78,7 +78,7 @@ zbx_config_tls_t	*zbx_config_tls_new(void)
 	config_tls->frontend_accept	= NULL;
 	config_tls->frontend_cert_issuer	= NULL;
 	config_tls->frontend_cert_subject	= NULL;
-	config_tls->frontend_accept_modes	= ZBX_TCP_SEC_UNENCRYPTED | ZBX_TCP_SEC_TLS_CERT;
+	config_tls->frontend_accept_modes	= ZBX_TCP_SEC_UNENCRYPTED;
 
 	return config_tls;
 }

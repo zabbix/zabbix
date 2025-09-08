@@ -22,10 +22,10 @@ import (
 
 	"golang.zabbix.com/agent2/internal/agent"
 	"golang.zabbix.com/agent2/internal/monitor"
-	"golang.zabbix.com/agent2/pkg/itemutil"
 	"golang.zabbix.com/agent2/pkg/version"
 	"golang.zabbix.com/sdk/log"
 	"golang.zabbix.com/sdk/plugin"
+	"golang.zabbix.com/sdk/plugin/itemutil"
 )
 
 type MemoryCache struct {
@@ -68,11 +68,11 @@ func (c *MemoryCache) upload(u Uploader) (err error) {
 	if timeout > 60 {
 		timeout = 60
 	}
-	var (
-		upload bool
-		errs   []error
-	)
-	if upload, errs = u.Write(data, time.Duration(timeout)*time.Second); errs != nil {
+
+	upload, errs := u.Write(data, time.Duration(timeout)*time.Second)
+	c.EnableUpload(upload)
+
+	if errs != nil {
 		if !reflect.DeepEqual(errs, c.lastErrors) {
 			for i := 0; i < len(errs); i++ {
 				c.Warningf("%s", errs[i])
@@ -83,8 +83,6 @@ func (c *MemoryCache) upload(u Uploader) (err error) {
 
 		return errors.New("history upload failed")
 	}
-
-	c.EnableUpload(upload)
 
 	if c.lastErrors != nil {
 		c.Warningf("history upload to [%s] [%s] is working again", u.Addr(), u.Hostname())

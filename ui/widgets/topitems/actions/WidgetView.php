@@ -51,6 +51,8 @@ class WidgetView extends CControllerDashboardWidgetView {
 	protected function doAction(): void {
 		$data = [
 			'name' => $this->getInput('name', $this->widget->getDefaultName()),
+			'layout' => $this->fields_values['layout'],
+			'show_column_header' => $this->fields_values['show_column_header'],
 			'user' => [
 				'debug_mode' => $this->getDebugMode()
 			]
@@ -58,7 +60,7 @@ class WidgetView extends CControllerDashboardWidgetView {
 
 		// Editing template dashboard?
 		if ($this->isTemplateDashboard() && !$this->fields_values['override_hostid']) {
-			$data['error'] = _('No data.');
+			$data['error'] = _('No data found');
 		}
 		else {
 			$data += $this->getData();
@@ -72,7 +74,9 @@ class WidgetView extends CControllerDashboardWidgetView {
 		$db_hosts = $this->getHosts();
 
 		if (!$db_hosts) {
-			return ['error' => _('No data.')];
+			return [
+				'error' => _('No data found')
+			];
 		}
 
 		$db_items = [];
@@ -112,7 +116,9 @@ class WidgetView extends CControllerDashboardWidgetView {
 		$table = self::concatenateTables($column_tables);
 
 		if (!$table) {
-			return ['error' => _('No data.')];
+			return [
+				'error' => _('No data found')
+			];
 		}
 
 		$this->applyHostOrdering($table, $db_hosts);
@@ -132,8 +138,6 @@ class WidgetView extends CControllerDashboardWidgetView {
 
 		$data = [
 			'error' => null,
-			'layout' => $this->fields_values['layout'],
-			'show_column_header' => $this->fields_values['show_column_header'],
 			'configuration' => $columns,
 			'rows' => $this->fields_values['layout'] == WidgetForm::LAYOUT_VERTICAL
 				? self::transposeTable($table)

@@ -297,7 +297,7 @@ class testDashboardGraphWidget extends testWidgets {
 
 			$this->page->removeFocus();
 			sleep(1);
-			$this->assertScreenshotExcept($overlay, [$add_button], 'tab_'.$tab);
+			$this->assertScreenshotExcept($overlay, $add_button, 'tab_'.$tab);
 		}
 
 		$overlay->close();

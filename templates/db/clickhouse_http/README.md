@@ -7,7 +7,7 @@ This template is designed for the effortless deployment of ClickHouse monitoring
 
 ## Requirements
 
-Zabbix version: 7.4 and higher.
+Zabbix version: 8.0 and higher.
 
 ## Tested versions
 
@@ -16,7 +16,7 @@ This template has been tested on:
 
 ## Configuration
 
-> Zabbix should be configured according to the instructions in the [Templates out of the box](https://www.zabbix.com/documentation/7.4/manual/config/templates_out_of_the_box) section.
+> Zabbix should be configured according to the instructions in the [Templates out of the box](https://www.zabbix.com/documentation/8.0/manual/config/templates_out_of_the_box) section.
 
 ## Setup
 
@@ -49,7 +49,7 @@ This template has been tested on:
 |{$CLICKHOUSE.USER}||`zabbix`|
 |{$CLICKHOUSE.PASSWORD}||`zabbix_pass`|
 |{$CLICKHOUSE.NETWORK.ERRORS.MAX.WARN}|<p>Maximum number of network errors for trigger expression</p>|`5`|
-|{$CLICKHOUSE.HOST}|<p>The hostname or IP address of the ClickHouse HTTP endpoint.</p>|`<SET CLICKHOUSE HOST>`|
+|{$CLICKHOUSE.HOST}|<p>The hostname or IP address of the ClickHouse HTTP endpoint.</p>||
 |{$CLICKHOUSE.PORT}|<p>The port of ClickHouse HTTP endpoint</p>|`8123`|
 |{$CLICKHOUSE.SCHEME}|<p>Request scheme which may be http or https</p>|`http`|
 |{$CLICKHOUSE.LLD.FILTER.DB.MATCHES}|<p>Filter of discoverable databases</p>|`.*`|

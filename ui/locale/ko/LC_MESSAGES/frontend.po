@@ -63,6 +63,10 @@ msgstr "\"%1$s\"는 빈 문자열이거나 \"%2$s\"보다 커야 합니다."
 msgid "\"host:key\" pair is expected"
 msgstr "\"host:key\"의 페어로 지정해 주십시오"
 
+#: app/views/host.wizard.edit.php:1024
+msgid "#{section_name}"
+msgstr ""
+
 #: include/forms.inc.php:1330
 #: include/views/configuration.host.discovery.edit.php:932
 #: include/views/js/configuration.host.discovery.edit.js.php:87
@@ -2206,6 +2210,10 @@ msgstr "아래쪽"
 #: widgets/tophosts/includes/WidgetForm.php:146
 msgid "Bottom N"
 msgstr "하단 N"
+
+#: app/views/host.wizard.edit.php:429
+msgid "Brackets to specify IPv6 addresses"
+msgstr ""
 
 #: jsLoader.php:266
 msgid "Bring forward"
@@ -4935,6 +4943,10 @@ msgstr "축소"
 msgid "Collapse sidebar"
 msgstr "사이드바 접기"
 
+#: app/views/host.wizard.edit.php:426
+msgid "Colon to separate IP/DNS address from port"
+msgstr ""
+
 #: include/views/configuration.graph.edit.php:398
 #: include/views/js/monitoring.sysmaps.js.php:383
 #: include/views/js/monitoring.sysmaps.js.php:404
@@ -4988,6 +5000,10 @@ msgstr "최종결과"
 msgid "Comma separated center coordinates and zoom level to display when the widget is initially loaded."
 msgstr "위젯이 처음 로드될 때 표시할 쉼표로 구분된 중심 좌표 및 확대/축소 수준입니다."
 
+#: app/views/host.wizard.edit.php:427
+msgid "Comma to separate multiple Zabbix servers, proxies, or clusters"
+msgstr ""
+
 #: app/views/administration.script.edit.php:199
 #: app/views/reports.actionlog.list.csv.php:45
 #: app/views/reports.actionlog.list.php:140 include/actions.inc.php:1864
@@ -5005,6 +5021,10 @@ msgstr "커뮤니케이션"
 
 #: app/views/host.wizard.edit.php:375
 msgid "Communication between Zabbix agent and server/proxy is secured with a unique user-defined pre-shared key identity and a secret pre-shared key linked to it."
+msgstr ""
+
+#: app/views/host.wizard.edit.php:414
+msgid "Communication between Zabbix agent and server/proxy is secured with the pre-shared key (PSK) encryption method."
 msgstr ""
 
 #: include/items.inc.php:946
@@ -6036,6 +6056,10 @@ msgstr "커스텀 심각도의 이름은 모두 언어에 영향을 받기 때�
 msgid "Custom size"
 msgstr "사용자 정의 사이즈"
 
+#: app/views/host.wizard.edit.php:138
+msgid "Custom templates are not supported."
+msgstr ""
+
 #: app/views/administration.miscconfig.edit.php:103
 #: include/classes/setup/CSetupWizard.php:561
 msgid "CyberArk Vault"
@@ -6202,6 +6226,10 @@ msgstr "데이터 수집"
 #, c-format
 msgid "Data from %1$s. Generated in %2$s sec."
 msgstr "Data from %1$s. Generated in %2$s sec."
+
+#: app/views/host.wizard.edit.php:168
+msgid "Data is collected by Zabbix agent, a lightweight software `component installed on your monitoring target."
+msgstr ""
 
 #: app/views/js/host.wizard.edit.js.php:89
 msgid "Data is collected by Zabbix agent, a lightweight software component installed on your monitoring target."
@@ -8409,6 +8437,10 @@ msgstr ""
 msgid "Enter the IP/DNS address and port of your JMX-enabled monitoring target."
 msgstr ""
 
+#: app/views/host.wizard.edit.php:412
+msgid "Enter the IP/DNS address and port of your Zabbix server, proxy, or cluster configuration."
+msgstr ""
+
 #: app/views/host.wizard.edit.php:642
 msgid "Enter the IP/DNS address, port, and authentication details of your SNMP-enabled monitoring target."
 msgstr ""
@@ -8608,6 +8640,10 @@ msgstr "반복 기간(주)"
 #: app/views/administration.geomaps.edit.php:33
 msgid "Example"
 msgstr "예시"
+
+#: app/views/host.wizard.edit.php:417
+msgid "Example:"
+msgstr ""
 
 #: app/views/administration.miscconfig.edit.php:38
 msgid "Example: https://localhost/zabbix/ui/"
@@ -11891,6 +11927,10 @@ msgstr ""
 
 #: app/views/host.wizard.edit.php:512 app/views/host.wizard.edit.php:535
 msgid "Install Zabbix agent 2 and its plugins on your monitoring target by following the installation instructions below."
+msgstr ""
+
+#: app/views/host.wizard.edit.php:551 app/views/host.wizard.edit.php:574
+msgid "Install Zabbix agent and its plugins on your monitoring target by following the installation instructions below."
 msgstr ""
 
 #: setup.php:163
@@ -19412,6 +19452,10 @@ msgstr "보안 레벨"
 msgid "Security name"
 msgstr "보안 이름"
 
+#: app/views/host.wizard.edit.php:132
+msgid "See"
+msgstr ""
+
 #: app/views/popup.condition.edit.php:402 app/views/popup.generic.php:874
 #: app/views/popup.massupdate.item.php:440 app/views/popup.services.php:92
 #: app/views/popup.triggerexpr.php:88 include/classes/html/CMultiSelect.php:70
@@ -19480,6 +19524,10 @@ msgstr "%3$d의 %2$d위치에 있는 %1$s를 선택하였습니다"
 msgctxt "screen reader"
 msgid "Selected, %1$s, read only, in position %2$d of %3$d"
 msgstr "%3$d의 %2$d 위치에 있는 읽기 전용 %1$s를 선택하였습니다"
+
+#: app/views/host.wizard.edit.php:428
+msgid "Semicolon to separate clusters (one or more server addresses)"
+msgstr ""
 
 #: jsLoader.php:267
 msgid "Send backward"
@@ -20309,6 +20357,11 @@ msgstr "이 항목의 내역 중 일부가 압축되어 있을 수 있으므로 
 msgid "Some templates (%1$s) are hidden. Custom templates are not supported."
 msgstr ""
 
+#: app/views/host.wizard.edit.php:130
+#, c-format
+msgid "Some templates (%1$s) are incompatible with the Host Wizard."
+msgstr ""
+
 #: widgets/actionlog/includes/WidgetForm.php:79
 #: widgets/problems/includes/WidgetForm.php:145
 msgid "Sort entries by"
@@ -20363,6 +20416,10 @@ msgstr "그래프를 보려면 호스트를 지정하십시오."
 #: app/views/popup.generic.php:180 include/views/monitoring.history.php:293
 msgid "Specify some filter condition to see the values."
 msgstr "값을 표시하기 위해 몇가지 필터조건을 지정해 주십시오."
+
+#: app/views/host.wizard.edit.php:365
+msgid "Specifying new or existing host groups will add the host to these groups without removing it from any current groups."
+msgstr ""
 
 #: httpdetails.php:107 include/classes/screens/CScreenHttpTestDetails.php:82
 msgid "Speed"
@@ -21610,6 +21667,10 @@ msgstr ""
 msgid "This check cannot be removed, as it is used as a condition in %1$s discovery action."
 msgid_plural "This check cannot be removed, as it is used as a condition in %1$s discovery actions."
 msgstr[0] ""
+
+#: app/views/host.wizard.edit.php:384
+msgid "This configuration will overwrite all existing encryption settings on the host."
+msgstr ""
 
 #: include/func.inc.php:2566
 msgid "This day last week"
@@ -23268,6 +23329,10 @@ msgstr "고정 폭 글꼴 사용"
 msgid "Use the filter to display results"
 msgstr "필터를 사용하여 결과 표시"
 
+#: app/views/host.wizard.edit.php:424
+msgid "Use:"
+msgstr ""
+
 #: app/views/administration.script.list.php:93 app/views/mediatype.list.php:98
 msgid "Used in actions"
 msgstr "액션에서 사용"
@@ -24337,6 +24402,10 @@ msgstr "Verbose"
 msgid "Verification code"
 msgstr "확인 코드"
 
+#: app/views/host.wizard.edit.php:407
+msgid "Verify Zabbix server, proxy, or cluster address"
+msgstr ""
+
 #: include/classes/setup/CSetupWizard.php:655
 msgid "Verify database certificate"
 msgstr "데이터베이스 인증서 확인"
@@ -25054,6 +25123,10 @@ msgstr "Zabbix 에이전트(패시브 검사)"
 
 #: app/views/js/host.wizard.edit.js.php:91
 msgid "Zabbix agent initiates connections to Zabbix server or proxy to send data. Recommended for monitoring targets behind a firewall."
+msgstr ""
+
+#: app/views/host.wizard.edit.php:422
+msgid "Zabbix agent must be able to connect to the specified address or list of addresses."
 msgstr ""
 
 #: app/views/host.wizard.edit.php:863
@@ -26270,6 +26343,10 @@ msgstr "동일한 UUID를 가진 호스트 프로토타입이 이미 존재함"
 msgid "host trigger ID is expected"
 msgstr ""
 
+#: app/views/host.wizard.edit.php:134
+msgid "how to update them"
+msgstr ""
+
 #: include/classes/api/services/CMap.php:844
 #: include/classes/api/services/CMap.php:1311
 msgid "icon"
@@ -26633,6 +26710,10 @@ msgstr "m/d"
 #: include/translateDefines.inc.php:33
 msgid "m-d h:i A"
 msgstr "m/d H:i"
+
+#: app/views/host.wizard.edit.php:589
+msgid "macOS"
+msgstr ""
 
 #: include/classes/parsers/CUserMacroParser.php:37
 msgid "macro is empty"

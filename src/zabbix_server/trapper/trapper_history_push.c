@@ -356,8 +356,8 @@ static void	push_item_value_to_history(const zbx_history_recv_item_t *item, zbx_
 	SET_TEXT_RESULT(&result, value->value);
 	value->value = NULL;
 
-	zbx_preprocess_item_value(item->itemid, item->host.hostid, item->value_type, item->flags, &result, &value->ts,
-			ITEM_STATE_NORMAL, NULL);
+	zbx_preprocess_item_value(item->itemid, item->value_type, item->flags, item->preprocessing, &result,
+			&value->ts, ITEM_STATE_NORMAL, NULL);
 
 	zbx_free_agent_result(&result);
 }

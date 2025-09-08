@@ -14,7 +14,7 @@ It also uses Zabbix agent to collect `php-fpm` Linux process statistics, such as
 
 ## Requirements
 
-Zabbix version: 7.4 and higher.
+Zabbix version: 8.0 and higher.
 
 ## Tested versions
 
@@ -24,7 +24,7 @@ This template has been tested on:
 
 ## Configuration
 
-> Zabbix should be configured according to the instructions in the [Templates out of the box](https://www.zabbix.com/documentation/7.4/manual/config/templates_out_of_the_box) section.
+> Zabbix should be configured according to the instructions in the [Templates out of the box](https://www.zabbix.com/documentation/8.0/manual/config/templates_out_of_the_box) section.
 
 ## Setup
 
@@ -124,7 +124,7 @@ If you use Apache, edit the configuration file of the virtual host and add the f
   curl -L 127.0.0.1/ping
   ```
 
-Depending on your OS distribution, the PHP-FPM process name may vary as well. Please check the actual name in the line "Name" from /proc/\<pid\>/status file (https://www.zabbix.com/documentation/7.4/manual/appendix/items/proc_mem_num_notes) and change the {$PHP_FPM.PROCESS.NAME.PARAMETER} macro if needed.
+Depending on your OS distribution, the PHP-FPM process name may vary as well. Please check the actual name in the line "Name" from /proc/\<pid\>/status file (https://www.zabbix.com/documentation/8.0/manual/appendix/items/proc_mem_num_notes) and change the {$PHP_FPM.PROCESS.NAME.PARAMETER} macro if needed.
 
 If you use another location of the status/ping pages, don't forget to change the `{$PHP_FPM.STATUS.PAGE}/{$PHP_FPM.PING.PAGE}` macro.
 

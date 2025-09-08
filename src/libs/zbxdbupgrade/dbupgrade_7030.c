@@ -622,21 +622,6 @@ static int	DBpatch_7030048(void)
 
 	return DBadd_foreign_key("hostmacro_config", 1, &field);
 }
-
-
-static int  DBpatch_7030049(void)
-{
-	if (0 == (DBget_program_type() & ZBX_PROGRAM_TYPE_SERVER))
-		return SUCCEED;
-
-	if (ZBX_DB_OK > zbx_db_execute("insert into module (moduleid,id,relative_path,status,config) values"
-		" (" ZBX_FS_UI64 ",'scatterplot','widgets/scatterplot',%d,'[]')", zbx_db_get_maxid("module"), 1))
-	{
-		return FAIL;
-	}
-
-	return SUCCEED;
-}
 #endif
 
 DBPATCH_START(7030)
@@ -692,6 +677,5 @@ DBPATCH_ADD(7030045, 0, 1)
 DBPATCH_ADD(7030046, 0, 1)
 DBPATCH_ADD(7030047, 0, 1)
 DBPATCH_ADD(7030048, 0, 1)
-DBPATCH_ADD(7030049, 0, 1)
 
 DBPATCH_END()

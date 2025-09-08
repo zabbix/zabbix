@@ -353,16 +353,17 @@ zbx_user_permission_t;
 #	define MIN(a, b) ((a) < (b) ? (a) : (b))
 #endif
 
-#define zbx_calloc(old, nmemb, size)	zbx_calloc2(__FILE__, __LINE__, old, nmemb, size)
-#define zbx_malloc(old, size)		zbx_malloc2(__FILE__, __LINE__, old, size)
-#define zbx_realloc(src, size)		zbx_realloc2(__FILE__, __LINE__, src, size)
+#define zbx_calloc(old, nmemb, size)	\
+		zbx_calloc2(__FILE__, __LINE__, old, nmemb, size, calloc(MAX(nmemb, 1), MAX(size, 1)))
+#define zbx_malloc(old, size)		zbx_malloc2(__FILE__, __LINE__, old, size, malloc(MAX(size, 1)))
+#define zbx_realloc(src, size)		zbx_realloc2(__FILE__, __LINE__, size, realloc(src, MAX(size, 1)))
 #define zbx_strdup(old, str)		zbx_strdup2(__FILE__, __LINE__, old, str)
 
 #define ZBX_STRDUP(var, str)	(var = zbx_strdup(var, str))
 
-void	*zbx_calloc2(const char *filename, int line, void *old, size_t nmemb, size_t size);
-void	*zbx_malloc2(const char *filename, int line, void *old, size_t size);
-void	*zbx_realloc2(const char *filename, int line, void *old, size_t size);
+void	*zbx_calloc2(const char *filename, int line, void *old, size_t nmemb, size_t size, void *new_ptr);
+void	*zbx_malloc2(const char *filename, int line, void *old, size_t size, void *new_ptr);
+void	*zbx_realloc2(const char *filename, int line, size_t size, void *new_ptr);
 char	*zbx_strdup2(const char *filename, int line, char *old, const char *str);
 
 void	*zbx_guaranteed_memset(void *v, int c, size_t n);
@@ -578,6 +579,7 @@ size_t	zbx_snprintf(char *str, size_t count, const char *fmt, ...) __zbx_attr_fo
 /* could be moved into libzbxstr.a but it seems to be logically grouped with surrounding functions */
 void	zbx_snprintf_alloc(char **str, size_t *alloc_len, size_t *offset, const char *fmt, ...)
 		__zbx_attr_format_printf(4, 5);
+void	zbx_vsnprintf_alloc(char **str, size_t *alloc_len, size_t *offset, const char *fmt, va_list args);
 
 #if defined(__hpux)
 int	zbx_hpux_vsnprintf_is_c99(void);
@@ -593,9 +595,6 @@ char	*zbx_dsprintf(char *dest, const char *f, ...) __zbx_attr_format_printf(2, 3
 
 /* used by zbxcommon, setproctitle */
 size_t	zbx_strlcpy(char *dst, const char *src, size_t siz);
-
-/* used by dsprintf, which is used by log */
-char	*zbx_dvsprintf(char *dest, const char *f, va_list args);
 
 #define VALUE_ERRMSG_MAX	128
 #define ZBX_LENGTH_UNLIMITED	0x7fffffff

@@ -53,15 +53,7 @@ if (!is_array($SSO)) {
 }
 
 $SSO += ['SETTINGS' => []];
-$certs = [
-	'SP_KEY'	=> 'conf/certs/sp.key',
-	'SP_CERT'	=> 'conf/certs/sp.crt',
-	'IDP_CERT'	=> 'conf/certs/idp.crt'
-];
-$certs = array_merge($certs, array_intersect_key($SSO, $certs));
-$certs = array_filter($certs, 'is_readable');
-$certs = array_map('file_get_contents', $certs);
-$certs += array_fill_keys(['SP_KEY', 'SP_CERT', 'IDP_CERT'], '');
+
 /** @var CUser $service */
 $service = API::getApiService('user');
 $userdirectoryid = CAuthenticationHelper::getSamlUserdirectoryid();
@@ -82,6 +74,35 @@ if (array_key_exists('use_proxy_headers', $SSO['SETTINGS']) && (bool) $SSO['SETT
 $baseurl = Utils::getSelfURLNoQuery();
 $relay_state = null;
 $saml_settings = $provisioning->getIdpConfig();
+
+if (CAuthenticationHelper::isSamlCertsStorageDatabase()) {
+	$certs = [
+		'SP_KEY' => $saml_settings['sp_private_key'],
+		'SP_CERT' => $saml_settings['sp_certificate'],
+		'IDP_CERT' => $saml_settings['idp_certificate']
+	];
+}
+else {
+	$certs = [
+		'SP_KEY'	=> 'conf/certs/sp.key',
+		'SP_CERT'	=> 'conf/certs/sp.crt',
+		'IDP_CERT'	=> 'conf/certs/idp.crt'
+	];
+	$certs = array_merge($certs, array_intersect_key($SSO, $certs));
+	$certs = array_filter($certs, 'is_readable');
+	$certs = array_map('file_get_contents', $certs);
+	$certs += array_fill_keys(['SP_KEY', 'SP_CERT', 'IDP_CERT'], '');
+}
+
+foreach ($certs as $key => $cert) {
+	if ($cert === '' || $key === 'SP_KEY') {
+		continue;
+	}
+
+	$cert_value = Utils::getStringBetween($cert, '-----BEGIN CERTIFICATE-----', '-----END CERTIFICATE-----');
+	$certs[$key] = Utils::formatCert($cert_value !== '' ? $cert_value : $cert);
+}
+
 $settings = [
 	'sp' => [
 		'entityId' => $saml_settings['sp_entityid'],

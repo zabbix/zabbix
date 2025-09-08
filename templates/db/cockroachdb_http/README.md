@@ -16,7 +16,7 @@ The template doesn't require usage of session token.
 
 ## Requirements
 
-Zabbix version: 7.4 and higher.
+Zabbix version: 8.0 and higher.
 
 ## Tested versions
 
@@ -25,7 +25,7 @@ This template has been tested on:
 
 ## Configuration
 
-> Zabbix should be configured according to the instructions in the [Templates out of the box](https://www.zabbix.com/documentation/7.4/manual/config/templates_out_of_the_box) section.
+> Zabbix should be configured according to the instructions in the [Templates out of the box](https://www.zabbix.com/documentation/8.0/manual/config/templates_out_of_the_box) section.
 
 ## Setup
 
@@ -37,7 +37,7 @@ Also, see the Macros section for a list of macros used to set trigger values.
 
 |Name|Description|Default|
 |----|-----------|-------|
-|{$COCKROACHDB.API.HOST}|<p>The hostname or IP address of the CockroachDB host.</p>|`<SET COCKROACHDB HOST>`|
+|{$COCKROACHDB.API.HOST}|<p>The hostname or IP address of the CockroachDB host.</p>||
 |{$COCKROACHDB.API.PORT}|<p>The port of CockroachDB API and Prometheus endpoint.</p>|`8080`|
 |{$COCKROACHDB.API.SCHEME}|<p>Request scheme which may be http or https.</p>|`http`|
 |{$COCKROACHDB.STORE.USED.MIN.WARN}|<p>The warning threshold of the available disk space in percent.</p>|`20`|

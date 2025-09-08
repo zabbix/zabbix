@@ -7,7 +7,7 @@ This guide describes how to integrate your Zabbix installation with GitHub using
 
 ## Requirements
 
-Zabbix version: 7.4 and higher.
+Zabbix version: 8.0 and higher.
 
 ## Parameters
 
@@ -23,7 +23,7 @@ The configurable parameters are intended to be changed according to the webhook 
 |github_api_version|2022\-11\-28|The API version that is used in the headers of HTTP requests.|
 |github_token|\<PLACE GITHUB TOKEN\>|The API access token.|
 |github_url|https://api\.github\.com|The API URL.|
-|github_user_agent|Zabbix/7\.4|The user agent that is used in the headers of HTTP requests.|
+|github_user_agent|Zabbix/8\.0|The user agent that is used in the headers of HTTP requests.|
 |github_zabbix_event_priority_label_prefix|Zabbix Event Priority: |The prefix that is used in event priority issue labels. It is set to "Zabbix Event Priority: " by default.|
 |github_zabbix_event_source_label_prefix|Zabbix Event Source: |The prefix that is used in event source issue labels. It is set to "Zabbix Event Source: " by default.|
 |github_zabbix_event_status_label_prefix|Zabbix Event Status: |The prefix that is used in event status issue labels. It is set to "Zabbix Event Status: " by default.|
@@ -117,7 +117,7 @@ Note that the webhook will reuse the labels with the same name that already exis
 
 6. Done! You can now start using this media type in actions and create GitHub issues.
 
-For more information, please see [Zabbix](https://www.zabbix.com/documentation/7.4/manual/config/notifications) and [GitHub](https://docs.github.com/en/rest?apiVersion=2022-11-28) documentation.
+For more information, please see [Zabbix](https://www.zabbix.com/documentation/8.0/manual/config/notifications) and [GitHub](https://docs.github.com/en/rest?apiVersion=2022-11-28) documentation.
 
 ## Feedback
 

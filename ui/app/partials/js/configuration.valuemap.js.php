@@ -40,9 +40,7 @@
 
 	}
 })();
-</script>
 
-<script type="text/javascript">
 var valuemap_number = 0;
 
 var AddValueMap = class {
@@ -70,7 +68,7 @@ var AddValueMap = class {
 	render(edit) {
 		if (edit instanceof Element) {
 			edit.replaceWith(this.row);
-			this.row.querySelector(`input[value="${this.data.name}"] ~ a`).focus();
+			this.row.querySelector('.js-label').focus();
 		}
 		else {
 			document.querySelector(`#${'<?= $data['table_id'] ?>'} tbody`).append(this.row);
@@ -81,7 +79,7 @@ var AddValueMap = class {
 		const cell = document.createElement('td');
 		const link = document.createElement('a');
 		link.textContent = this.data.name;
-		link.classList.add('wordbreak');
+		link.classList.add('wordbreak', 'js-label');
 		link.href = 'javascript:void(0);';
 		link.addEventListener('click', e => {
 			const valuemap_names = [];

@@ -307,11 +307,13 @@ static void	add_batch_select_condition(char **sql, size_t *sql_alloc, size_t *sq
  * Purpose: Retrieves existing items for the specified item prototypes.       *
  *                                                                            *
  * Parameters: item_prototypes - [IN]                                         *
+ *             linked_ruleids  - [IN] discovery rule ids when discovering     *
+ *                                    prototypes (optional)                   *
  *             items           - [OUT]                                        *
  *                                                                            *
  ******************************************************************************/
 static void	lld_items_get(const zbx_vector_lld_item_prototype_ptr_t *item_prototypes,
-		zbx_vector_lld_item_full_ptr_t *items)
+		const zbx_vector_uint64_t *linked_ruleids, zbx_vector_lld_item_full_ptr_t *items)
 {
 	zbx_db_result_t			result;
 	zbx_db_row_t			row;
@@ -349,6 +351,14 @@ static void	lld_items_get(const zbx_vector_lld_item_prototype_ptr_t *item_protot
 
 	zbx_db_add_condition_alloc(&sql, &sql_alloc, &sql_offset, "parent_itemid", parent_itemids.values,
 			parent_itemids.values_num);
+
+	/* limit to prototypes belonging to the LLD rule prototypes being processed */
+	if (NULL != linked_ruleids)
+	{
+		zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, " and");
+		zbx_db_add_condition_alloc(&sql, &sql_alloc, &sql_offset, "lldruleid", linked_ruleids->values,
+				linked_ruleids->values_num);
+	}
 
 	result = zbx_db_select("%s", sql);
 
@@ -1062,12 +1072,13 @@ static char	*lld_item_description(int item_flags)
  ******************************************************************************/
 static void	lld_item_add_error(const zbx_lld_item_full_t *item, char **error, const char *format, ...)
 {
-	char		*message, key[ZBX_ITEM_KEY_LEN * ZBX_MAX_BYTES_IN_UTF8_CHAR + 1], *desc;
+	char		key[ZBX_ITEM_KEY_LEN * ZBX_MAX_BYTES_IN_UTF8_CHAR + 1], *desc, *msg = NULL;
 	const char	*pkey;
+	size_t		msg_len = 0, msg_offset = 0;
 	va_list	args;
 
 	va_start(args, format);
-	message = zbx_dvsprintf(NULL, format, args);
+	zbx_vsnprintf_alloc(&msg, &msg_len, &msg_offset, format, args);
 	va_end(args);
 
 	if (ZBX_ITEM_NAME_LEN < zbx_strlen_utf8(item->name))
@@ -1080,10 +1091,10 @@ static void	lld_item_add_error(const zbx_lld_item_full_t *item, char **error, co
 
 	desc = lld_item_description(item->item_flags);
 	*error = zbx_strdcatf(*error, "Cannot %s %s \"%s\": %s.\n", (0 != item->itemid ? "update" : "create"),
-			desc, pkey, message);
+			desc, pkey, msg);
 
 	zbx_free(desc);
-	zbx_free(message);
+	zbx_free(msg);
 }
 
 static void	lld_validate_item_field(zbx_lld_item_full_t *item, char **field, char **field_orig, zbx_uint64_t flag,
@@ -4759,7 +4770,7 @@ static void	lld_item_prototype_dump(zbx_lld_item_prototype_t *item_prototype)
  ******************************************************************************/
 int	lld_update_items(zbx_uint64_t hostid, zbx_uint64_t lld_ruleid, zbx_vector_lld_row_ptr_t *lld_rows, char **error,
 		const zbx_lld_lifetime_t *lifetime, const zbx_lld_lifetime_t *enabled_lifetime, int lastcheck,
-		int dflags, zbx_hashset_t *rule_index)
+		int dflags, zbx_hashset_t *rule_index, const zbx_vector_uint64_t *ruleids)
 {
 	zbx_vector_lld_item_prototype_ptr_t	item_prototypes;
 	zbx_hashset_t				items_index;
@@ -4785,7 +4796,7 @@ int	lld_update_items(zbx_uint64_t hostid, zbx_uint64_t lld_ruleid, zbx_vector_ll
 	zbx_hashset_create(&items_index, item_prototypes.values_num * lld_rows->values_num, lld_item_index_hash_func,
 			lld_item_index_compare_func);
 	zbx_db_begin();
-	lld_items_get(&item_prototypes, &items);
+	lld_items_get(&item_prototypes, ruleids, &items);
 	zbx_db_commit();
 
 	lld_items_make(&item_prototypes, lld_rows, &items, &items_index, lastcheck, error);

@@ -7,7 +7,7 @@ This template is designed for the effortless deployment of PostgreSQL monitoring
 
 ## Requirements
 
-Zabbix version: 7.4 and higher.
+Zabbix version: 8.0 and higher.
 
 ## Tested versions
 
@@ -16,7 +16,7 @@ This template has been tested on:
 
 ## Configuration
 
-> Zabbix should be configured according to the instructions in the [Templates out of the box](https://www.zabbix.com/documentation/7.4/manual/config/templates_out_of_the_box) section.
+> Zabbix should be configured according to the instructions in the [Templates out of the box](https://www.zabbix.com/documentation/8.0/manual/config/templates_out_of_the_box) section.
 
 ## Setup
 
@@ -38,7 +38,7 @@ GRANT pg_monitor TO zbx_monitor;
 
 For more information please read the PostgreSQL documentation `https://www.postgresql.org/docs/current/auth-pg-hba-conf.html`.
 
-3. Install the PostgreSQL ODBC driver. Check the [`Zabbix documentation`](https://www.zabbix.com/documentation/7.4/manual/config/items/itemtypes/odbc_checks/) for details about ODBC checks and [`recommended parameters page`](https://www.zabbix.com/documentation/7.4/manual/config/items/itemtypes/odbc_checks/unixodbc_postgresql).
+3. Install the PostgreSQL ODBC driver. Check the [`Zabbix documentation`](https://www.zabbix.com/documentation/8.0/manual/config/items/itemtypes/odbc_checks/) for details about ODBC checks and [`recommended parameters page`](https://www.zabbix.com/documentation/8.0/manual/config/items/itemtypes/odbc_checks/unixodbc_postgresql).
 
 4. Set up the connection string with the `{$PG.CONNSTRING.ODBC}` macro. The minimum required parameters are:
 

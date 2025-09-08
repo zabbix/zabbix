@@ -1761,6 +1761,8 @@ class testDashboardWidgetCommunication extends testWidgetCommunication {
 		}
 
 		$dashboard->cancelEditing();
+		// Added waitUntilReady() to check for unstable test with js 32739:4 Uncaught error.
+		$dashboard->waitUntilReady();
 	}
 
 	/**
@@ -1798,6 +1800,7 @@ class testDashboardWidgetCommunication extends testWidgetCommunication {
 					$this->assertEquals('Unavailable widget', $widget_form->query('xpath:.//td[contains(@class,"table-col-name")]')
 							->one()->getText()
 					);
+					$error_field = 'Data set/1';
 				}
 				else {
 					if ($listener_name === 'Host card listener') {
@@ -1805,11 +1808,11 @@ class testDashboardWidgetCommunication extends testWidgetCommunication {
 					}
 
 					$this->assertEquals(['Unavailable widget'], $widget_form->getField($field)->getValue());
-
-					// TODO: Move the below code right before closing the dialog after ZBX-25041 is fixed.
-					$widget_form->submit();
-					$this->assertMessage(TEST_BAD, null, 'Invalid parameter "'.$field.'": referred widget is unavailable.');
+					$error_field = $field;
 				}
+
+				$widget_form->submit();
+				$this->assertMessage(TEST_BAD, null, 'Invalid parameter "'.$error_field.'": referred widget is unavailable.');
 
 				COverlayDialogElement::find()->one()->close();
 			}

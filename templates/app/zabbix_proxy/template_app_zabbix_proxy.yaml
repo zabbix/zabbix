@@ -1,5 +1,5 @@
 zabbix_export:
-  version: '7.4'
+  version: '8.0'
   template_groups:
     - uuid: a571c0d144b14fd4a87a9d9b2aa9fcd6
       name: Templates/Applications
@@ -24,7 +24,7 @@ zabbix_export:
         Specify the address of the remote Zabbix proxy as the values for the `Zabbix proxy Address` and `Zabbix proxy Port` configuration fields. Don't forget to adjust the `StatsAllowedIP` parameter in the remote proxy's configuration file to allow the collection of statistics.
       vendor:
         name: Zabbix
-        version: 7.4-3
+        version: 8.0-0
       groups:
         - name: Templates/Applications
       items:
@@ -2278,7 +2278,7 @@ zabbix_export:
         Link this template to the local Zabbix proxy host.
       vendor:
         name: Zabbix
-        version: 7.4-3
+        version: 8.0-0
       groups:
         - name: Templates/Applications
       items:
@@ -4192,7 +4192,7 @@ zabbix_export:
         Specify the address of the remote Zabbix proxy as the values for the `Zabbix proxy Address` and `Zabbix proxy Port` configuration fields. Don't forget to adjust the `StatsAllowedIP` parameter in the remote proxy's configuration file to allow the collection of statistics.
       vendor:
         name: Zabbix
-        version: 7.4-3
+        version: 8.0-0
       groups:
         - name: Templates/Applications
       items:
@@ -6443,7 +6443,7 @@ zabbix_export:
         Specify the address of the remote Zabbix proxy as the values for the `Zabbix proxy Address` and `Zabbix proxy Port` configuration fields. Don't forget to adjust the `StatsAllowedIP` parameter in the remote proxy's configuration file to allow the collection of statistics.
       vendor:
         name: Zabbix
-        version: 7.4-3
+        version: 8.0-0
       groups:
         - name: Templates/Applications
       items:

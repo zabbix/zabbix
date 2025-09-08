@@ -3,7 +3,7 @@
 
 ## Overview
 
-This is an official Linux template. It requires Zabbix agent 7.4 or newer.
+This is an official Linux template. It requires Zabbix agent 8.0 or newer.
 
 #### Notes on filesystem (FS) discovery:
 - The ext4/3/2 FS reserves space for privileged usage, typically set at 5% by default.
@@ -14,7 +14,7 @@ This is an official Linux template. It requires Zabbix agent 7.4 or newer.
 
 ## Requirements
 
-Zabbix version: 7.4 and higher.
+Zabbix version: 8.0 and higher.
 
 ## Tested versions
 
@@ -23,11 +23,11 @@ This template has been tested on:
 
 ## Configuration
 
-> Zabbix should be configured according to the instructions in the [Templates out of the box](https://www.zabbix.com/documentation/7.4/manual/config/templates_out_of_the_box) section.
+> Zabbix should be configured according to the instructions in the [Templates out of the box](https://www.zabbix.com/documentation/8.0/manual/config/templates_out_of_the_box) section.
 
 ## Setup
 
-Install Zabbix agent on Linux OS following Zabbix [documentation](https://www.zabbix.com/documentation/7.4/manual/concepts/agent#agent-on-unix-like-systems).
+Install Zabbix agent on Linux OS following Zabbix [documentation](https://www.zabbix.com/documentation/8.0/manual/concepts/agent#agent-on-unix-like-systems).
 
 ### Macros used
 

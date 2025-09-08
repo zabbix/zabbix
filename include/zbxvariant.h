@@ -74,8 +74,10 @@ int		zbx_variant_convert(zbx_variant_t *value, int type);
 const char	*zbx_get_variant_type_desc(unsigned char type);
 const char	*zbx_variant_value_desc(const zbx_variant_t *value);
 const char	*zbx_variant_type_desc(const zbx_variant_t *value);
+zbx_uint64_t	zbx_variant_size(const zbx_variant_t *value);
 
-int		zbx_variant_compare(const zbx_variant_t *value1, const zbx_variant_t *value2);
+int	zbx_variant_compare(const zbx_variant_t *value1, const zbx_variant_t *value2);
+int	zbx_variant_same(const zbx_variant_t *value1, const zbx_variant_t *value2);
 
 void		*zbx_variant_data_bin_create(const void *data, zbx_uint32_t size);
 zbx_uint32_t	zbx_variant_data_bin_get(const void *bin, const void ** const data);

@@ -152,4 +152,15 @@ class CAuthenticationHelper {
 
 		return ($timestamp + $jit_interval) < time();
 	}
+
+	/**
+	 * Determines if SAML certificates storage set to 'database'.
+	 *
+	 * @return bool
+	 */
+	public static function isSamlCertsStorageDatabase(): bool {
+		global $SSO;
+
+		return is_array($SSO) && array_key_exists('CERT_STORAGE', $SSO) && ($SSO['CERT_STORAGE'] === 'database');
+	}
 }

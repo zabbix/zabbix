@@ -360,7 +360,7 @@ class CControllerMenuPopup extends CController {
 	 */
 	private static function getMenuDataItemPrototype(array $data) {
 		$db_item_prototypes = API::ItemPrototype()->get([
-			'output' => ['name', 'key_', 'value_type'],
+			'output' => ['name', 'key_', 'value_type', 'flags'],
 			'selectDiscoveryRule' => ['itemid'],
 			'selectDiscoveryRulePrototype' => ['itemid'],
 			'selectHosts' => ['host'],
@@ -379,6 +379,7 @@ class CControllerMenuPopup extends CController {
 				'name' => $db_item_prototype['name'],
 				'key' => $db_item_prototype['key_'],
 				'is_binary_value_type' => $db_item_prototype['value_type'] == ITEM_VALUE_TYPE_BINARY,
+				'is_discovered_prototype' => $db_item_prototype['flags'] & ZBX_FLAG_DISCOVERY_CREATED,
 				'hostid' => $db_item_prototype['hosts'][0]['hostid'],
 				'host' => $db_item_prototype['hosts'][0]['host'],
 				'parent_discoveryid' => $parent_lld['itemid'],

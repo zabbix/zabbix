@@ -11,7 +11,7 @@ The template `RabbitMQ Cluster` — collects metrics by polling [RabbitMQ manage
 
 ## Requirements
 
-Zabbix version: 7.4 and higher.
+Zabbix version: 8.0 and higher.
 
 ## Tested versions
 
@@ -20,7 +20,7 @@ This template has been tested on:
 
 ## Configuration
 
-> Zabbix should be configured according to the instructions in the [Templates out of the box](https://www.zabbix.com/documentation/7.4/manual/config/templates_out_of_the_box) section.
+> Zabbix should be configured according to the instructions in the [Templates out of the box](https://www.zabbix.com/documentation/8.0/manual/config/templates_out_of_the_box) section.
 
 ## Setup
 
@@ -44,7 +44,7 @@ In the case of a single-node installation, you can assign the `cluster` template
 
 If you use another API endpoint, then don't forget to change `{$RABBITMQ.API.CLUSTER_HOST}` macro.
 
-Install and setup [Zabbix agent](https://www.zabbix.com/documentation/7.4/manual/installation/install_from_packages).
+Install and setup [Zabbix agent](https://www.zabbix.com/documentation/8.0/manual/installation/install_from_packages).
 
 
 ### Macros used
@@ -157,7 +157,7 @@ Most of the metrics are collected in one go, thanks to Zabbix bulk data collecti
 
 ## Requirements
 
-Zabbix version: 7.4 and higher.
+Zabbix version: 8.0 and higher.
 
 ## Tested versions
 
@@ -166,7 +166,7 @@ This template has been tested on:
 
 ## Configuration
 
-> Zabbix should be configured according to the instructions in the [Templates out of the box](https://www.zabbix.com/documentation/7.4/manual/config/templates_out_of_the_box) section.
+> Zabbix should be configured according to the instructions in the [Templates out of the box](https://www.zabbix.com/documentation/8.0/manual/config/templates_out_of_the_box) section.
 
 ## Setup
 
@@ -186,7 +186,7 @@ A login name and password are also supported in macros functions:
 - {$RABBITMQ.API.PASSWORD}
 
 If you use another API endpoint, then don't forget to change `{$RABBITMQ.API.HOST}` macro.
-Install and setup [Zabbix agent](https://www.zabbix.com/documentation/7.4/manual/installation/install_from_packages).
+Install and setup [Zabbix agent](https://www.zabbix.com/documentation/8.0/manual/installation/install_from_packages).
 
 
 ### Macros used

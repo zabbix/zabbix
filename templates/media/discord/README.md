@@ -7,7 +7,7 @@ This guide describes how to integrate your Zabbix installation with Discord usin
 
 ## Requirements
 
-Zabbix version: 7.4 and higher.
+Zabbix version: 8.0 and higher.
 
 ## Parameters
 
@@ -20,7 +20,7 @@ The configurable parameters are intended to be changed according to the webhook 
 |Name|Value|Description|
 |----|-----|-----------|
 |zabbix_url|\{$ZABBIX\.URL\}|The URL of the Zabbix frontend.|
-|user_agent|ZabbixServer \(zabbix\.com, 7\.4\)|The user agent to use in the request.|
+|user_agent|ZabbixServer \(zabbix\.com, 8\.0\)|The user agent to use in the request.|
 
 ### Internal parameters
 
@@ -92,7 +92,7 @@ You can copy the Discord webhook URL now by pressing *Copy Webhook URL*, or you 
 
 4. Done! You can now start using this media type in actions and receive alerts.
 
-For more information, please see [Zabbix](https://www.zabbix.com/documentation/7.4/manual/config/notifications) and [Discord](https://discordapp.com/developers/docs/resources/webhook#execute-webhook) documentation.
+For more information, please see [Zabbix](https://www.zabbix.com/documentation/8.0/manual/config/notifications) and [Discord](https://discordapp.com/developers/docs/resources/webhook#execute-webhook) documentation.
 
 ## Feedback
 

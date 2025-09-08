@@ -35,14 +35,10 @@
 #include "zbxalgo.h"
 #include "zbxdbhigh.h"
 #include "zbxthreads.h"
-#include "audit/zbxaudit.h"
-#include "zbxdb.h"
 
 #define	ALARM_ACTION_TIMEOUT	40
 
 ZBX_PTR_VECTOR_IMPL(am_source_stats_ptr, zbx_am_source_stats_t *)
-
-static zbx_es_t	es_engine;
 
 /******************************************************************************
  *                                                                            *
@@ -162,90 +158,51 @@ static char	*create_email_inreplyto(zbx_uint64_t mediatypeid, const char *sendto
 static void	alerter_process_email(zbx_ipc_socket_t *socket, zbx_ipc_message_t *ipc_message,
 		const char *config_source_ip, const char *config_ssl_ca_location)
 {
-#define EXPIRE_OFFSET	SEC_PER_MIN	/* offset before we will renew access token for OAuth2 */
-
 	zbx_uint64_t	alertid, mediatypeid, eventid, objectid;
-	char		*sendto, *subject, *message, *smtp_server, *smtp_helo, *smtp_email, *inreplyto = NULL,
-			*expression, *recovery_expression, *mediatype_name, *error = NULL;
+	char		*sendto, *subject, *message, *smtp_server, *smtp_helo, *smtp_email, *smtp_username,
+			*smtp_password, *inreplyto = NULL, *expression, *recovery_expression, *mediatype_name,
+			*error = NULL;
 	unsigned short	smtp_port;
-	unsigned char	smtp_security, smtp_verify_peer, smtp_verify_host, message_format;
+	unsigned char	smtp_authentication, smtp_security, smtp_verify_peer, smtp_verify_host, message_format;
 	int		maxattempts, object, source, ret;
-
-	zbx_media_auth_t	mailauth = {0};
-	zbx_oauth_data_t	data = {0};
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
 	zbx_alerter_deserialize_email(ipc_message->data, &alertid, &mediatypeid, &mediatype_name, &maxattempts,
 			&eventid, &source, &object, &objectid, &sendto, &subject, &message, &smtp_server, &smtp_port,
-			&smtp_helo, &smtp_email, &smtp_security, &smtp_verify_peer, &smtp_verify_host, &mailauth.type,
-			&mailauth.username, &mailauth.password, &message_format, &expression, &recovery_expression);
+			&smtp_helo, &smtp_email, &smtp_security, &smtp_verify_peer, &smtp_verify_host,
+			&smtp_authentication, &smtp_username, &smtp_password, &message_format, &expression,
+			&recovery_expression);
 
-	switch (mailauth.type)
+	if (SMTP_AUTHENTICATION_PASSWORD == smtp_authentication)
 	{
-		case SMTP_AUTHENTICATION_PASSWORD:
-		{
-			/* fill data required by substitute_simple_macros_unmasked() for ZBX_MACRO_TYPE_ALERT_EMAIL */
+		/* fill data required by substitute_simple_macros_unmasked() for ZBX_MACRO_TYPE_ALERT_EMAIL */
 
-			zbx_db_event	event = {.eventid = eventid, .source = source, .object = object,
-					.objectid = objectid};
+		zbx_db_event	event = {.eventid = eventid, .source = source, .object = object, .objectid = objectid};
 
-			memset(&event.trigger, 0, sizeof(zbx_db_trigger));
-			event.trigger.expression = expression;
-			event.trigger.recovery_expression = recovery_expression;
+		memset(&event.trigger, 0, sizeof(zbx_db_trigger));
+		event.trigger.expression = expression;
+		expression = NULL;
+		event.trigger.recovery_expression = recovery_expression;
+		recovery_expression = NULL;
+		zbx_dc_um_handle_t	*um_handle = zbx_dc_open_user_macros();
 
-			zbx_dc_um_handle_t	*um_handle = zbx_dc_open_user_macros();
+		zbx_substitute_simple_macros_unmasked(NULL, &event, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL,
+				NULL, NULL, &smtp_username, ZBX_MACRO_TYPE_ALERT_EMAIL, NULL, 0);
+		zbx_substitute_simple_macros_unmasked(NULL, &event, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL,
+				NULL, NULL, &smtp_password, ZBX_MACRO_TYPE_ALERT_EMAIL, NULL, 0);
 
-			zbx_substitute_simple_macros_unmasked(NULL, &event, NULL, NULL, NULL, NULL, NULL, NULL, NULL,
-					NULL, NULL, NULL, &mailauth.username, ZBX_MACRO_TYPE_ALERT_EMAIL, NULL, 0);
-			zbx_substitute_simple_macros_unmasked(NULL, &event, NULL, NULL, NULL, NULL, NULL, NULL, NULL,
-					NULL, NULL, NULL, &mailauth.password, ZBX_MACRO_TYPE_ALERT_EMAIL, NULL, 0);
-
-			zbx_dc_close_user_macros(um_handle);
-			zbx_db_trigger_clean(&event.trigger);
-			break;
-		}
-		case SMTP_AUTHENTICATION_OAUTH:
-		{
-			if (SUCCEED != (ret = zbx_oauth_fetch_from_db(mediatypeid, mediatype_name, &data, &error)))
-				goto out;
-
-			if (data.access_token_updated + data.access_expires_in - EXPIRE_OFFSET < time(NULL))
-			{
-				char	*suberror = NULL;
-
-				do
-				{
-					zbx_free(suberror);	/* clear last error */
-
-					ret = zbx_oauth_access_refresh(&data, mediatype_name, ALARM_ACTION_TIMEOUT,
-							config_source_ip, config_ssl_ca_location, &suberror);
-				}
-				while (0 < maxattempts-- && NETWORK_ERROR == ret);
-
-				zbx_oauth_update(mediatypeid, &data, ret);
-				zbx_oauth_audit(ZBX_AUDIT_ALL_CONTEXT, mediatypeid, mediatype_name, &data, ret);
-
-				if (SUCCEED != ret)
-				{
-					error = suberror;
-					goto out;
-				}
-			}
-
-			mailauth.oauthbearer = zbx_strdup(NULL, data.access_token);
-			mailauth.username = zbx_strdup(mailauth.username, smtp_email);
-			break;
-		}
+		zbx_dc_close_user_macros(um_handle);
+		zbx_db_trigger_clean(&event.trigger);
 	}
 
 	inreplyto = create_email_inreplyto(mediatypeid, sendto, eventid);
 
 	ret = send_email(smtp_server, smtp_port, smtp_helo, smtp_email, sendto, inreplyto, subject, message,
-			smtp_security, smtp_verify_peer, smtp_verify_host, &mailauth, message_format,
-			ALARM_ACTION_TIMEOUT, config_source_ip, config_ssl_ca_location, &error);
+			smtp_security, smtp_verify_peer, smtp_verify_host, smtp_authentication, smtp_username,
+			smtp_password, message_format, ALARM_ACTION_TIMEOUT, config_source_ip, config_ssl_ca_location,
+			&error);
 
-out:
 	alerter_send_result(socket, NULL, ret, (SUCCEED == ret ? NULL : error), NULL);
 
 	zbx_free(expression);
@@ -259,13 +216,10 @@ out:
 	zbx_free(smtp_server);
 	zbx_free(smtp_helo);
 	zbx_free(smtp_email);
-	zbx_free(mailauth.username);
-	zbx_free(mailauth.password);
-	zbx_free(mailauth.oauthbearer);
-	zbx_oauth_clean(&data);
+	zbx_free(smtp_username);
+	zbx_free(smtp_password);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __func__, zbx_result_string(ret));
-#undef EXPIRE_OFFSET
 }
 
 /******************************************************************************
@@ -342,14 +296,14 @@ static void	alerter_process_webhook(zbx_ipc_socket_t *socket, zbx_ipc_message_t 
 {
 	char		*script_bin = NULL, *params = NULL, *error = NULL, *output = NULL;
 	int		script_bin_sz, ret, timeout;
+	zbx_es_t	es_engine;
 	unsigned char	debug;
 
 	zbx_alerter_deserialize_webhook(ipc_message->data, &script_bin, &script_bin_sz, &timeout, &params, &debug);
 
-	if (SUCCEED != (ret = zbx_es_is_env_initialized(&es_engine)))
-		ret = zbx_es_init_env(&es_engine, config_source_ip, &error);
+	zbx_es_init(&es_engine);
 
-	if (SUCCEED == ret)
+	if (SUCCEED == (ret = zbx_es_init_env(&es_engine, config_source_ip, &error)))
 	{
 		zbx_es_set_timeout(&es_engine, timeout);
 
@@ -367,20 +321,10 @@ static void	alerter_process_webhook(zbx_ipc_socket_t *socket, zbx_ipc_message_t 
 	else
 		alerter_send_result(socket, output, ret, error, NULL);
 
-	if (SUCCEED == zbx_es_fatal_error(&es_engine))
-	{
-		char	*errmsg = NULL;
-		if (SUCCEED != zbx_es_destroy_env(&es_engine, &errmsg))
-		{
-			zabbix_log(LOG_LEVEL_WARNING,
-					"Cannot destroy embedded scripting engine environment: %s", errmsg);
-			zbx_free(errmsg);
-		}
-	}
-
 	zbx_free(output);
 	zbx_free(error);
 	zbx_free(params);
+	zbx_es_destroy(&es_engine);
 	zbx_free(script_bin);
 }
 
@@ -407,8 +351,6 @@ ZBX_THREAD_ENTRY(zbx_alerter_thread, args)
 
 	zbx_update_selfmon_counter(info, ZBX_PROCESS_STATE_BUSY);
 
-	zbx_es_init(&es_engine);
-
 	zbx_ipc_message_init(&message);
 
 	if (FAIL == zbx_ipc_socket_open(&alerter_socket, ZBX_IPC_SERVICE_ALERTER, SEC_PER_MIN, &error))
@@ -421,6 +363,8 @@ ZBX_THREAD_ENTRY(zbx_alerter_thread, args)
 	alerter_register(&alerter_socket);
 
 	time_stat = zbx_time();
+
+	/* alerter should not have access to database to be able to send "DB down" alerts */
 
 	zbx_setproctitle("%s #%d started", get_process_type_string(process_type), process_num);
 
@@ -458,11 +402,6 @@ ZBX_THREAD_ENTRY(zbx_alerter_thread, args)
 
 		zbx_update_selfmon_counter(info, ZBX_PROCESS_STATE_BUSY);
 
-		zbx_setproctitle("%s [connecting to the database]", get_process_type_string(process_type));
-		zbx_db_connect(ZBX_DB_CONNECT_NORMAL);
-
-		zbx_audit_prepare(ZBX_AUDIT_ALL_CONTEXT);
-
 		time_read = zbx_time();
 		time_idle += time_read - time_now;
 		zbx_update_env(get_process_type_string(process_type), time_read);
@@ -485,9 +424,6 @@ ZBX_THREAD_ENTRY(zbx_alerter_thread, args)
 		}
 
 		zbx_ipc_message_clean(&message);
-
-		zbx_audit_flush(ZBX_AUDIT_ALL_CONTEXT);
-		zbx_db_close();
 	}
 
 	zbx_setproctitle("%s #%d [terminated]", get_process_type_string(process_type), process_num);

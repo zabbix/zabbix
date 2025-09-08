@@ -176,7 +176,7 @@ class testUsersAuthentication extends CWebTest {
 		$form->submit();
 
 		if (CTestArrayHelper::get($data, 'check_alert')) {
-			$this->assertEquals('Switching authentication method will reset all except this session! Continue?',
+			$this->assertEquals('Changing the authentication method will reset all sessions, except the current one.',
 					$this->page->getAlertText()
 			);
 		}

@@ -560,6 +560,8 @@ static void	dc_get_history_recv_item(zbx_history_recv_item_t *dst_item, const ZB
 	const ZBX_DC_TRAPITEM	*trapitem;
 	const ZBX_DC_HTTPITEM	*httpitem;
 
+	dst_item->preprocessing = zbx_dc_item_requires_preprocessing(src_item);
+
 	dst_item->type = src_item->type;
 	dst_item->value_type = src_item->value_type;
 	dst_item->state = ITEM_STATE_NORMAL;

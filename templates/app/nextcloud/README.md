@@ -10,7 +10,7 @@ For more information, see the [`official documentation`](https://docs.nextcloud.
 
 ## Requirements
 
-Zabbix version: 7.4 and higher.
+Zabbix version: 8.0 and higher.
 
 ## Tested versions
 
@@ -19,7 +19,7 @@ This template has been tested on:
 
 ## Configuration
 
-> Zabbix should be configured according to the instructions in the [Templates out of the box](https://www.zabbix.com/documentation/7.4/manual/config/templates_out_of_the_box) section.
+> Zabbix should be configured according to the instructions in the [Templates out of the box](https://www.zabbix.com/documentation/8.0/manual/config/templates_out_of_the_box) section.
 
 ## Setup
 
@@ -33,7 +33,7 @@ The user must be included in the Administrators group.
 |----|-----------|-------|
 |{$NEXTCLOUD.SCHEMA}|<p>HTTP or HTTPS protocol of Nextcloud.</p>|`https`|
 |{$NEXTCLOUD.USER.NAME}|<p>Nextcloud username.</p>|`root`|
-|{$NEXTCLOUD.USER.PASSWORD}|<p>Nextcloud user password.</p>|`<Put the password here>`|
+|{$NEXTCLOUD.USER.PASSWORD}|<p>Nextcloud user password.</p>||
 |{$NEXTCLOUD.ADDRESS}|<p>IP or DNS name of Nextcloud server.</p>|`127.0.0.1`|
 |{$NEXTCLOUD.LLD.FILTER.USER.MATCHES}|<p>Filter of discoverable users by name.</p>|`.*`|
 |{$NEXTCLOUD.LLD.FILTER.USER.NOT_MATCHES}|<p>Filter to exclude discovered users by name.</p>|`CHANGE_IF_NEEDED`|

@@ -8,7 +8,7 @@ It works without any external scripts and uses the script item.
 
 ## Requirements
 
-Zabbix version: 7.4 and higher.
+Zabbix version: 8.0 and higher.
 
 ## Tested versions
 
@@ -17,7 +17,7 @@ This template has been tested on:
 
 ## Configuration
 
-> Zabbix should be configured according to the instructions in the [Templates out of the box](https://www.zabbix.com/documentation/7.4/manual/config/templates_out_of_the_box) section.
+> Zabbix should be configured according to the instructions in the [Templates out of the box](https://www.zabbix.com/documentation/8.0/manual/config/templates_out_of_the_box) section.
 
 ## Setup
 
@@ -42,7 +42,7 @@ This template has been tested on:
 |{$HPE.PRIMERA.LLD.FILTER.TASK.TYPE.NOT_MATCHES}|<p>Filter to exclude discovered tasks by type.</p>|`CHANGE_IF_NEEDED`|
 |{$HPE.PRIMERA.DATA.TIMEOUT}|<p>Response timeout for WSAPI.</p>|`15s`|
 |{$HPE.PRIMERA.API.SCHEME}|<p>The WSAPI scheme (http/https).</p>|`https`|
-|{$HPE.PRIMERA.API.HOST}|<p>The hostname or IP address of the API host.</p>|`<SET API HOST>`|
+|{$HPE.PRIMERA.API.HOST}|<p>The hostname or IP address of the API host.</p>||
 |{$HPE.PRIMERA.API.PORT}|<p>The WSAPI port.</p>|`443`|
 |{$HPE.PRIMERA.VOLUME.NAME.MATCHES}|<p>This macro is used in filters of volume discovery rule.</p>|`.*`|
 |{$HPE.PRIMERA.VOLUME.NAME.NOT_MATCHES}|<p>This macro is used in filters of volume discovery rule.</p>|`^(admin\|.srdata\|.mgmtdata)$`|
