@@ -801,7 +801,8 @@ class CScatterPlotHelper
 		foreach ($metrics as $metric) {
 			$item = [
 				'name' => $metric['x_axis_items_name'].', '.$metric['y_axis_items_name'],
-				'color' => $metric['options']['color']
+				'color' => $metric['options']['color'],
+				'marker' => $metric['options']['marker']
 			];
 
 			$items[] = $item;

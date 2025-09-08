@@ -16,7 +16,7 @@
 namespace Widgets\ScatterPlot\Includes;
 
 use CDiv,
-	CSpan;
+	CIcon;
 
 class CScatterPlotLegend extends CDiv {
 
@@ -25,7 +25,7 @@ class CScatterPlotLegend extends CDiv {
 
 	private const ZBX_STYLE_CLASS = 'svg-graph-legend';
 
-	private const ZBX_STYLE_GRAPH_LEGEND_ITEM = 'svg-graph-legend-item';
+	private const ZBX_STYLE_SCATTER_PLOT_LEGEND_ITEM = 'scatter-plot-legend-item';
 
 	private array $legend_items;
 
@@ -83,10 +83,39 @@ class CScatterPlotLegend extends CDiv {
 	private function draw(): void {
 		foreach ($this->legend_items as $item) {
 			// border-color is for legend element ::before pseudo element.
+			$icon = null;
+
+			switch ($item['marker']) {
+				case CScatterPlotMetricPoint::MARKER_TYPE_ELLIPSIS:
+					$icon = ZBX_ICON_ELLIPSE;
+					break;
+
+				case CScatterPlotMetricPoint::MARKER_TYPE_SQUARE:
+					$icon = ZBX_ICON_SQUARE;
+					break;
+
+				case CScatterPlotMetricPoint::MARKER_TYPE_TRIANGLE:
+					$icon = ZBX_ICON_TRIANGLE;
+					break;
+
+				case CScatterPlotMetricPoint::MARKER_TYPE_DIAMOND:
+					$icon = ZBX_ICON_DIAMOND;
+					break;
+
+				case CScatterPlotMetricPoint::MARKER_TYPE_STAR:
+					$icon = ZBX_ICON_STAR_FILLED;
+					break;
+
+				case CScatterPlotMetricPoint::MARKER_TYPE_CROSS:
+					$icon = ZBX_ICON_CROSS;
+					break;
+			}
+
 			$this->addItem(
-				(new CDiv(new CSpan($item['name'])))
-					->addClass(self::ZBX_STYLE_GRAPH_LEGEND_ITEM)
-					->setAttribute('style', '--color: '.$item['color'])
+				(new CDiv([
+					(new CIcon($icon))->addStyle('color: '.$item['color'].';'),
+					$item['name']
+				]))->addClass(self::ZBX_STYLE_SCATTER_PLOT_LEGEND_ITEM)
 			);
 		}
 	}
