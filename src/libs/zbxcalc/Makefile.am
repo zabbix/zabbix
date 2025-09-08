@@ -12,3 +12,7 @@ libzbxcalc_a_SOURCES = \
 	funcparam.h \
 	expression_names.c \
 	expr_eval.c
+
+libzbxcalc_a_CFLAGS = \
+	$(LIBXML2_CFLAGS) \
+	$(TLS_CFLAGS)
