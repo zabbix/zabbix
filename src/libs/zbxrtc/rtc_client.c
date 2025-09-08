@@ -246,7 +246,7 @@ int	zbx_rtc_parse_options(const char *opt, zbx_uint32_t *code, struct zbx_json *
 		}
 	}
 
-	if (0 == strncmp(opt, ZBX_DBPOOL_STATUS, ZBX_CONST_STRLEN(ZBX_DBPOOL_STATUS)))
+	if (0 == strcmp(opt, ZBX_DBPOOL_STATUS))
 	{
 		*code = ZBX_RTC_DBPOOL_STATUS;
 		return SUCCEED;
