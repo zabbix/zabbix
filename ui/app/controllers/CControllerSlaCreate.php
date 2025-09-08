@@ -69,9 +69,15 @@ class CControllerSlaCreate extends CController {
 			'excluded_downtimes' => ['objects', 'uniq' => ['period_from', 'period_to'],
 				'messages' => ['uniq' => _('Excluded downtime periods must be unique.')],
 				'fields' => [
-					'name' => ['string'],
-					'period_from' => ['string'],
-					'period_to' => ['string']
+					'name' => ['db sla_excluded_downtime.name'],
+					'period_from' => ['db sla_excluded_downtime.period_from', 'required', 'not_empty',
+						'use' => [CTimeUnitValidator::class, ['min' => 1, 'max' => ZBX_MAX_DATE]],
+						'when' => ['name', 'not_empty']
+					],
+					'period_to' => ['db sla_excluded_downtime.period_to', 'required', 'not_empty',
+						'use' => [CTimeUnitValidator::class, ['min' => 1, 'max' => ZBX_MAX_DATE]],
+						'when' => ['name', 'not_empty']
+					]
 				]
 			],
 			'status' => ['db sla.status', 'in' => [ZBX_SLA_STATUS_DISABLED, ZBX_SLA_STATUS_ENABLED]]
