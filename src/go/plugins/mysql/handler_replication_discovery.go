@@ -18,30 +18,29 @@ import (
 	"context"
 	"encoding/json"
 
+	"golang.zabbix.com/sdk/errs"
 	"golang.zabbix.com/sdk/zbxerr"
 )
 
-func replicationDiscoveryHandler(ctx context.Context, conn MyClient, _ map[string]string,
-	_ ...string) (interface{}, error) {
-	res := make([]map[string]string, 0)
+func replicationDiscoveryHandler(ctx context.Context, conn MyClient, params map[string]string,
+	_ ...string) (any, error) {
+	query := getReplicationQuery(params[versionParam])
 
-	rows, err := conn.Query(ctx, `SHOW SLAVE STATUS`)
+	rows, err := conn.Query(ctx, string(query))
 	if err != nil {
-		return nil, zbxerr.ErrorCannotFetchData.Wrap(err)
+		return nil, errs.WrapConst(err, zbxerr.ErrorCannotFetchData)
 	}
 
 	data, err := rows2data(rows)
 	if err != nil {
-		return nil, zbxerr.ErrorCannotFetchData.Wrap(err)
+		return nil, errs.WrapConst(err, zbxerr.ErrorCannotFetchData)
 	}
 
-	for _, row := range data {
-		res = append(res, map[string]string{"Master_Host": row["Master_Host"]})
-	}
+	res := extractMasterHost(data)
 
 	jsonRes, err := json.Marshal(res)
 	if err != nil {
-		return nil, zbxerr.ErrorCannotMarshalJSON.Wrap(err)
+		return nil, errs.WrapConst(err, zbxerr.ErrorCannotMarshalJSON)
 	}
 
 	return string(jsonRes), nil

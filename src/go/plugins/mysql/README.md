@@ -122,31 +122,36 @@ Note that session names are case-sensitive.
 
 ## Supported keys
 
-`mysql.custom.query[\<commonParams\>,queryName,<args...>]`—Returns the result of a custom query.
+`mysql.custom.query[<commonParams>,queryName,<args...>] `— Returns the result of a custom query.
 <br>Parameters:
 <br>`queryName` (required)—the name of a custom query (must be equal to the name of an `sql` file without an extension).
 <br>`args` (optional)—one or more arguments to pass to a query.
 
-`mysql.db.discovery[\<commonParams\>]`—Returns a list of databases in LLD format.
+`mysql.db.discovery[<commonParams>]` — Returns a list of databases in LLD format.
 
-`mysql.db.size[\<commonParams\>,database]`—Returns the size of a given database in bytes.
+`mysql.db.size[<commonParams>,database]`— Returns the size of a given database in bytes.
 <br>Parameters:
 <br>`database` (required) — database name.
 
-`mysql.ping[\<commonParams\>]`—Tests if a connection is alive or not.
+`mysql.ping[<commonParams>]` — Tests if a connection is alive or not.
 <br>Returns:
 <br>- `1` if the connection is alive;
 <br>- `0` if the connection is broken (returned if there was any error during the test, including authentication and configuration issues).
 
-`mysql.replication.discovery[\<commonParams\>]`—Returns replication information in LLD format.
-
-`mysql.replication.get_slave_status[\<commonParams\>,\<masterHost\>]`—Returns the replication status.
+`mysql.replication.discovery[<commonParams>,<version>]` — Returns replication information in LLD format.
 <br>Parameters:
-<br>`masterHost` (optional)—The name of the master host.
+<br>`version` (optional) — MySQL server version*.
 
-`mysql.get_status_variables[\<commonParams\>]`—Returns values of global status variables.
+`mysql.replication.get_slave_status[<commonParams>,<masterHost>,<version>]` — Returns the replication status.
+<br>Parameters:
+<br>`masterHost` (optional) — The name of a master host.
+<br>`version` (optional) — MySQL server version*.
 
-`mysql.version[\<commonParams\>]`—Returns the MySQL version.
+`mysql.get_status_variables[<commonParams>]` — Returns values of global status variables.
+
+`mysql.version[<commonParams>]` — Returns the MySQL version.
+
+> \* Since MySQL v8.4, the query for obtaining replication status has changed. To handle this difference, the `<version>` must be specified in the `mysql.replication.*` keys, e.g., 8.5. If no version is specified, the query variant prior to MySQL v8.4 will be applied.
 
 ## Custom queries
 

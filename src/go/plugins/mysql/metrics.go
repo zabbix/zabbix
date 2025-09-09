@@ -39,17 +39,22 @@ const (
 	tlsCertParam    = "TLSCertFile"
 	tlsKeyParam     = "TLSKeyFile"
 	masterHostParam = "Master"
+	versionParam    = "Version"
 )
 
 var (
 	uriDefaults = &uri.Defaults{Scheme: "tcp", Port: "3306"}
 
-	// Common params: [URI|Session][,User][,Password]
+	// Common params: [URI|Session][,User][,Password].
 	paramURI = metric.NewConnParam(uriParam, "URI to connect or session name.").
-			WithDefault(uriDefaults.Scheme + "://localhost:" + uriDefaults.Port).WithSession().
-			WithValidator(uri.URIValidator{Defaults: uriDefaults, AllowedSchemes: []string{"tcp", "unix"}})
-	paramUsername    = metric.NewConnParam("User", "MySQL user.").WithDefault("root")
-	paramPassword    = metric.NewConnParam("Password", "User's password.").WithDefault("")
+		WithDefault(uriDefaults.Scheme + "://localhost:" + uriDefaults.Port).WithSession().
+		WithValidator(uri.URIValidator{Defaults: uriDefaults, AllowedSchemes: []string{"tcp", "unix"}})
+	paramUsername = metric.NewConnParam("User", "MySQL user.").WithDefault("root")
+	paramPassword = metric.NewConnParam("Password", "User's password.").WithDefault("")
+
+	paramMasterHost = metric.NewParam(masterHostParam, "Master host.")
+	paramVersion    = metric.NewParam(versionParam, "Database server version.")
+
 	paramTLSConnect  = metric.NewSessionOnlyParam("TLSConnect", "DB connection encryption type.").WithDefault("")
 	paramTLSCaFile   = metric.NewSessionOnlyParam("TLSCAFile", "TLS ca file path.").WithDefault("")
 	paramTLSCertFile = metric.NewSessionOnlyParam("TLSCertFile", "TLS cert file path.").WithDefault("")
@@ -66,8 +71,8 @@ var (
 
 		keyDatabasesDiscovery: metric.New("Returns list of databases in LLD format.",
 			[]*metric.Param{
-				paramURI, paramUsername, paramPassword, paramTLSConnect, paramTLSCaFile, paramTLSCertFile,
-				paramTLSKeyFile,
+				paramURI, paramUsername, paramPassword,
+				paramTLSConnect, paramTLSCaFile, paramTLSCertFile, paramTLSKeyFile,
 			}, false),
 
 		keyDatabaseSize: metric.New("Returns size of given database in bytes.",
@@ -79,32 +84,34 @@ var (
 
 		keyPing: metric.New("Tests if connection is alive or not.",
 			[]*metric.Param{
-				paramURI, paramUsername, paramPassword, paramTLSConnect, paramTLSCaFile, paramTLSCertFile,
-				paramTLSKeyFile,
+				paramURI, paramUsername, paramPassword,
+				paramTLSConnect, paramTLSCaFile, paramTLSCertFile, paramTLSKeyFile,
 			}, false),
 
 		keyReplicationDiscovery: metric.New("Returns replication information in LLD format.",
 			[]*metric.Param{
-				paramURI, paramUsername, paramPassword, paramTLSConnect, paramTLSCaFile, paramTLSCertFile,
-				paramTLSKeyFile,
+				paramURI, paramUsername, paramPassword,
+				paramVersion,
+				paramTLSConnect, paramTLSCaFile, paramTLSCertFile, paramTLSKeyFile,
 			}, false),
 
 		keyReplicationSlaveStatus: metric.New("Returns replication status.",
 			[]*metric.Param{
-				paramURI, paramUsername, paramPassword, metric.NewParam(masterHostParam, "Master host."),
+				paramURI, paramUsername, paramPassword,
+				paramMasterHost, paramVersion,
 				paramTLSConnect, paramTLSCaFile, paramTLSCertFile, paramTLSKeyFile,
 			}, false),
 
 		keyStatusVars: metric.New("Returns values of global status variables.",
 			[]*metric.Param{
-				paramURI, paramUsername, paramPassword, paramTLSConnect, paramTLSCaFile, paramTLSCertFile,
-				paramTLSKeyFile,
+				paramURI, paramUsername, paramPassword,
+				paramTLSConnect, paramTLSCaFile, paramTLSCertFile, paramTLSKeyFile,
 			}, false),
 
 		keyVersion: metric.New("Returns MySQL version.",
 			[]*metric.Param{
-				paramURI, paramUsername, paramPassword, paramTLSConnect, paramTLSCaFile, paramTLSCertFile,
-				paramTLSKeyFile,
+				paramURI, paramUsername, paramPassword,
+				paramTLSConnect, paramTLSCaFile, paramTLSCertFile, paramTLSKeyFile,
 			}, false),
 	}
 )
@@ -112,7 +119,7 @@ var (
 // handlerFunc defines an interface must be implemented by handlers.
 type handlerFunc func(
 	ctx context.Context, conn MyClient, params map[string]string, extraParams ...string,
-) (res interface{}, err error)
+) (res any, err error)
 
 func init() {
 	err := plugin.RegisterMetrics(&impl, pluginName, metrics.List()...)
