@@ -368,13 +368,13 @@ static void	rtc_process_db_set_max_idle(const char *data, char **result)
 	if (SUCCEED != rtc_db_set_max_idle(data, &limit, &error))
 	{
 		zbx_strlog_alloc(LOG_LEVEL_ERR, result, &result_alloc, &result_offset,
-				"cannot set maxium idle connection limit: %s", error);
+				"cannot set maximum idle connection limit: %s", error);
 		zbx_free(error);
 		return;
 	}
 
 	zbx_strlog_alloc(LOG_LEVEL_INFORMATION, result, &result_alloc, &result_offset,
-			"updated maxium idle connection limit to %d", limit);
+			"updated maximum idle connection limit to %d", limit);
 }
 
 /******************************************************************************
