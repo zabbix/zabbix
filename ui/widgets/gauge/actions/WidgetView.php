@@ -86,6 +86,10 @@ class WidgetView extends CControllerDashboardWidgetView {
 
 		$data['vars']['url'] = $this->getHistoryUrl($item);
 
+		if (in_array(Widget::SHOW_DESCRIPTION, $this->fields_values['show'])) {
+			$data['vars']['description'] = $this->getDescription($item);
+		}
+
 		if ($this->hasInput('with_config')) {
 			$data['vars']['config'] = $this->getConfig($item);
 		}
@@ -192,19 +196,8 @@ class WidgetView extends CControllerDashboardWidgetView {
 		}
 
 		if (array_key_exists(Widget::SHOW_DESCRIPTION, $show)) {
-			$widget_description = $this->fields_values['description'];
-
-			if (!$this->isTemplateDashboard() || $this->fields_values['override_hostid']) {
-				$items = CMacrosResolverHelper::resolveItemBasedWidgetMacros(
-					[$item['itemid'] => $item + ['widget_description' => $widget_description]],
-					['widget_description' => 'widget_description']
-				);
-				$widget_description = $items[$item['itemid']]['widget_description'];
-			}
-
 			$config['description'] = [
 				'show' => true,
-				'text' => $widget_description,
 				'position' => $this->fields_values['desc_v_pos'],
 				'size' => $this->fields_values['desc_size'],
 				'is_bold' => $this->fields_values['desc_bold'] == 1,
@@ -345,6 +338,20 @@ class WidgetView extends CControllerDashboardWidgetView {
 			->setArgument('action', HISTORY_GRAPH)
 			->setArgument('itemids[]', $item['itemid'])
 			->getUrl();
+	}
+
+	private function getDescription(array $item): string {
+		$widget_description = $this->fields_values['description'];
+
+		if (!$this->isTemplateDashboard() || $this->fields_values['override_hostid']) {
+			$items = CMacrosResolverHelper::resolveItemBasedWidgetMacros(
+				[$item['itemid'] => $item + ['widget_description' => $widget_description]],
+				['widget_description' => 'widget_description']
+			);
+			$widget_description = $items[$item['itemid']]['widget_description'];
+		}
+
+		return $widget_description;
 	}
 
 	private static function makeValueLabels(array $item, $value, int $decimal_places): array {
