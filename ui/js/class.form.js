@@ -203,7 +203,6 @@ class CForm {
 	}
 
 	validateChanges(fields, force_display_errors = false) {
-		console.log('validateChanges');
 		// Let form finish its transformations before doing validation.
 		this.#validate_changes_call = () => {
 			if (!this.#form_ready) {
