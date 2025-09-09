@@ -26,13 +26,12 @@ use API,
 	CParser,
 	CSimpleIntervalParser,
 	Exception,
-	Manager;;
+	Manager;
 
 /**
  * Class calculates graph data and makes Scatter plot graph.
  */
-class CScatterPlotHelper
-{
+class CScatterPlotHelper {
 
 	/**
 	 * Calculate graph data and draw Scatter plot graph based on given graph configuration.
@@ -179,11 +178,15 @@ class CScatterPlotHelper
 						$options['hostids'] = $data_set['override_hostid'];
 					}
 					else {
+						$tags = $data_set['host_tags'];
+
 						$hosts = API::Host()->get([
 							'output' => [],
 							'search' => [
 								'name' => self::processPattern($data_set['hosts'])
 							],
+							'evaltype' => $tags ? $data_set['host_tags_evaltype'] : null,
+							'tags' => $tags ?: null,
 							'groupids' => $data_set['hostgroupids'] ?: null,
 							'searchWildcardsEnabled' => true,
 							'searchByAny' => true,

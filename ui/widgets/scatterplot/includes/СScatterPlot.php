@@ -21,9 +21,7 @@ use CMathHelper,
 	CSvgGraphClipArea,
 	CSvgGraphGrid,
 	CSvgLine,
-	CSvgRect,
 	CSvgTag,
-	CSvgText,
 	Exception;
 
 class СScatterPlot extends CSvg {
@@ -276,13 +274,13 @@ class СScatterPlot extends CSvg {
 		// Determine units for x axis.
 
 		if ($this->x_units === null) {
-			$this->x_units = reset($this->metrics)['x_units'];
+			$this->x_units = $this->metrics ? reset($this->metrics)['x_units'] : '';
 		}
 
 		// Determine units for y axis.
 
 		if ($this->y_units === null) {
-			$this->y_units = reset($this->metrics)['y_units'];
+			$this->y_units = $this->metrics ? reset($this->metrics)['y_units'] : '';
 		}
 
 		$this->x_min_calculated = $this->x_min === null;

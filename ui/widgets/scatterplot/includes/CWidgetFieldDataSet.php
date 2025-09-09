@@ -83,14 +83,6 @@ class CWidgetFieldDataSet extends CWidgetField {
 
 		foreach ((array) $value as $data_set) {
 			$data_sets[] = $data_set + self::getDefaults();
-
-			if (array_key_exists('host_tags', $data_set)) {
-				foreach ($data_set['host_tags'] as $index => $tag) {
-					if ($tag['tag'] === '' && $tag['value'] === '') {
-						unset($data_set[$index]['host_tags']);
-					}
-				}
-			}
 		}
 
 		return parent::setValue($data_sets);
@@ -339,6 +331,28 @@ class CWidgetFieldDataSet extends CWidgetField {
 					'name' => $this->name.'.'.$index.'.color_palette',
 					'value' => $value['color_palette']
 				];
+			}
+
+			if (array_key_exists('host_tags', $value)) {
+				foreach ($value['host_tags'] as $key => $tag) {
+					if ($tag['tag'] !== '' && $tag['value'] !== '') {
+						$widget_fields[] = [
+							'type' => ZBX_WIDGET_FIELD_TYPE_STR,
+							'name' => $this->name.'.'.$index.'.host_tags.'.$key.'.'.'tag',
+							'value' => $tag['tag']
+						];
+						$widget_fields[] = [
+							'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
+							'name' => $this->name.'.'.$index.'.host_tags.'.$key.'.'.'operator',
+							'value' => $tag['operator']
+						];
+						$widget_fields[] = [
+							'type' => ZBX_WIDGET_FIELD_TYPE_STR,
+							'name' => $this->name.'.'.$index.'.host_tags.'.$key.'.'.'value',
+							'value' => $tag['value']
+						];
+					}
+				}
 			}
 
 			if (array_key_exists(CWidgetField::FOREIGN_REFERENCE_KEY, $value['override_hostid'])) {

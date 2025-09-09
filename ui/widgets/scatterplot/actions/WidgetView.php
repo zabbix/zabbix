@@ -81,6 +81,12 @@ class WidgetView extends CControllerDashboardWidgetView {
 			$data_set['marker_size'] = array_key_exists($data_set['marker_size'], self::MARKER_SIZES)
 				? self::MARKER_SIZES[$data_set['marker_size']]
 				: self::MARKER_SIZES[CWidgetFieldDataSet::DATASET_MARKER_SIZE_SMALL];
+
+			foreach ($data_set['host_tags'] as $index => $tag) {
+				if ($tag['tag'] === '' && $tag['value'] === '') {
+					unset($data_set['host_tags'][$index]);
+				}
+			}
 		}
 		unset($data_set);
 
