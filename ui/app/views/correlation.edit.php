@@ -24,7 +24,7 @@ $form = (new CForm())
 	->setId('correlation-form')
 	->addItem((new CInput('submit', null))->addStyle('display: none;'));
 
-if ($data['correlation']['correlationid']) {
+if ($data['correlation']['correlationid'] !== null) {
 	$form->addItem(
 		(new CInput('hidden', 'correlationid', $data['correlation']['correlationid']))
 			->setAttribute('data-field-type', 'hidden')

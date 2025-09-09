@@ -26,7 +26,6 @@ window.correlation_edit_popup = new class {
 		this.dialogue = this.overlay.$dialogue[0];
 		this.form_element = this.overlay.$dialogue.$body[0].querySelector('form');
 		this.form = new CForm(this.form_element, rules);
-		this.correlationid = document.getElementById('correlationid1')?.value;
 
 		this.row_templates = {}
 		for (const type of templates_types) {
@@ -195,8 +194,7 @@ window.correlation_edit_popup = new class {
 	}
 
 	clone({title, buttons, rules}) {
-		this.correlationid = null;
-
+		document.getElementById('correlationid').remove();
 		this.form.reload(rules);
 
 		this.overlay.setProperties({title, buttons});
@@ -210,7 +208,8 @@ window.correlation_edit_popup = new class {
 		curl.setArgument('action', 'correlation.delete');
 		curl.setArgument(CSRF_TOKEN_NAME, <?= json_encode(CCsrfTokenHelper::get('correlation')) ?>);
 
-		this.#post(curl.getUrl(), {correlationids: [this.correlationid]}, (response) => {
+		const correlationid = this.form.findFieldByName('correlationid').getValue();
+		this.#post(curl.getUrl(), {correlationids: [correlationid]}, (response) => {
 			overlayDialogueDestroy(this.overlay.dialogueid);
 
 			this.dialogue.dispatchEvent(new CustomEvent('dialogue.submit', {detail: response}));
@@ -221,7 +220,7 @@ window.correlation_edit_popup = new class {
 		const fields = this.form.getAllValues();
 		const curl = new Curl('zabbix.php');
 
-		curl.setArgument('action', this.correlationid === null ? 'correlation.create' : 'correlation.update');
+		curl.setArgument('action', fields.correlationid ? 'correlation.update' : 'correlation.create');
 
 		this.form.validateSubmit(fields)
 			.then((result) => {
