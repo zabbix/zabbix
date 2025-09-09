@@ -216,7 +216,7 @@ class CAlert extends CApiService {
 					' JOIN host_hgset hh1 ON i1.hostid=hh1.hostid'.
 					' LEFT JOIN permission p1 ON hh1.hgsetid=p1.hgsetid'.
 						' AND p1.ugsetid=p.ugsetid'.
-					' WHERE p1.permission IS NULL'.
+					' WHERE p1.hgsetid IS NULL'.
 				')';
 			}
 			elseif (in_array($options['eventobject'], [EVENT_OBJECT_ITEM, EVENT_OBJECT_LLDRULE])) {
