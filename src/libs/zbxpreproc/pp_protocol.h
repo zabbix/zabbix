@@ -20,6 +20,7 @@
 #include "zbxtime.h"
 #include "zbxalgo.h"
 #include "zbxpreprocbase.h"
+#include "zbxcachehistory.h"
 
 #define ZBX_IPC_SERVICE_PREPROCESSING	"preprocessing"
 
@@ -37,20 +38,9 @@
 #define ZBX_IPC_PREPROCESSOR_SIZE			10011
 #define ZBX_IPC_PREPROCESSOR_TOP_VALUES_NUM		10012
 #define ZBX_IPC_PREPROCESSOR_TOP_VALUES_SZ		10013
+#define ZBX_IPC_PREPROCESSOR_TOP_TIME_MS		10014
+#define ZBX_IPC_PREPROCESSOR_TOP_TOTAL_MS		10015
 
-/* item value data used in preprocessing manager */
-typedef struct
-{
-	zbx_uint64_t		itemid;		 /* item id */
-	zbx_uint64_t		hostid;		 /* host id */
-	unsigned char		item_value_type; /* item value type */
-	AGENT_RESULT		*result;	 /* item value (if any) */
-	zbx_timespec_t		*ts;		 /* timestamp of a value */
-	char			*error;		 /* error message (if any) */
-	unsigned char		item_flags;	 /* item flags */
-	unsigned char		state;		 /* item state */
-}
-zbx_preproc_item_value_t;
 
 ZBX_PTR_VECTOR_DECL(ipcmsg, zbx_ipc_message_t *)
 
@@ -63,8 +53,6 @@ typedef struct
 }
 zbx_packed_field_t;
 
-zbx_uint32_t	zbx_preprocessor_unpack_value(zbx_preproc_item_value_t *value, unsigned char *data);
-
 void	zbx_preprocessor_unpack_test_request(zbx_pp_item_preproc_t *preproc, zbx_variant_t *value, zbx_timespec_t *ts,
 		const unsigned char *data);
 
@@ -76,14 +64,17 @@ void	zbx_preprocessor_unpack_test_result(zbx_vector_pp_result_ptr_t *results, zb
 
 zbx_uint32_t	zbx_preprocessor_pack_diag_stats(unsigned char **data, zbx_uint64_t preproc_num,
 		zbx_uint64_t pending_num, zbx_uint64_t finished_num, zbx_uint64_t sequences_num,
-		zbx_uint64_t queued_num, zbx_uint64_t queued_sz, zbx_uint64_t direct_num, zbx_uint64_t direct_sz);
+		zbx_uint64_t queued_num, zbx_uint64_t queued_sz, zbx_uint64_t direct_num, zbx_uint64_t direct_sz,
+		zbx_uint64_t history_sz, zbx_uint64_t finished_peak_num, zbx_uint64_t pending_peak_num,
+		zbx_uint64_t processed_num);
 
 zbx_uint32_t	zbx_preprocessor_pack_values_stats(unsigned char **data, zbx_uint64_t queued_num,
 		zbx_uint64_t queued_sz, zbx_uint64_t direct_num, zbx_uint64_t direct_sz, zbx_uint64_t enqueued_num);
 
 void	zbx_preprocessor_unpack_diag_stats(zbx_uint64_t *preproc_num, zbx_uint64_t *pending_num,
 		zbx_uint64_t *finished_num, zbx_uint64_t *sequences_num, zbx_uint64_t *queued_num,
-		zbx_uint64_t *queued_sz, zbx_uint64_t *direct_num, zbx_uint64_t *direct_sz,
+		zbx_uint64_t *queued_sz, zbx_uint64_t *direct_num, zbx_uint64_t *direct_sz, zbx_uint64_t *history_sz,
+		zbx_uint64_t *finished_peak_num, zbx_uint64_t *pending_peak_num, zbx_uint64_t *processed_num,
 		const unsigned char *data);
 
 void	zbx_preprocessor_unpack_values_stats(zbx_uint64_t *queued_num, zbx_uint64_t *queued_sz,
@@ -100,5 +91,9 @@ zbx_uint32_t	zbx_preprocessor_pack_top_stats_result(unsigned char **data,
 void	zbx_preprocessor_unpack_top_stats_result(zbx_vector_pp_top_stats_ptr_t *stats, const unsigned char *data);
 
 zbx_uint32_t	zbx_preprocessor_pack_usage_stats(unsigned char **data, const zbx_vector_dbl_t *usage, int count);
+
+zbx_uint32_t    zbx_preprocessor_deserialize_value(const unsigned char *data, zbx_uint64_t *itemid,
+		unsigned char *value_type, unsigned char *item_flags, zbx_variant_t *value, zbx_timespec_t *ts,
+		zbx_pp_value_opt_t *opt);
 
 #endif

@@ -18,7 +18,7 @@ zabbix_export:
         Set `Threshold of ICMP packet loss` and `Threshold of the average ICMP response`
       vendor:
         name: Zabbix
-        version: 8.0-0
+        version: 8.0-1
       groups:
         - name: 'Templates/Network devices'
       items:
@@ -26,6 +26,11 @@ zabbix_export:
           name: 'ICMP ping'
           type: SIMPLE
           key: icmpping
+          description: |
+            The host accessibility by ICMP ping.
+            
+            0 - ICMP ping fails;
+            1 - ICMP ping successful.
           valuemap:
             name: 'Service state'
           tags:
@@ -38,7 +43,7 @@ zabbix_export:
               expression: 'max(/ICMP Ping/icmpping,#3)=0'
               name: 'ICMP Ping: Unavailable by ICMP ping'
               priority: HIGH
-              description: 'Last three attempts returned timeout.  Please check device connectivity.'
+              description: 'Last three attempts returned timeout. Please check device connectivity.'
               tags:
                 - tag: scope
                   value: availability
@@ -48,6 +53,7 @@ zabbix_export:
           key: icmppingloss
           value_type: FLOAT
           units: '%'
+          description: 'The percentage of lost packets.'
           tags:
             - tag: component
               value: health
@@ -59,6 +65,7 @@ zabbix_export:
               name: 'ICMP Ping: High ICMP ping loss'
               opdata: 'Loss: {ITEM.LASTVALUE1}'
               priority: WARNING
+              description: 'ICMP packets loss detected.'
               dependencies:
                 - name: 'ICMP Ping: Unavailable by ICMP ping'
                   expression: 'max(/ICMP Ping/icmpping,#3)=0'
@@ -73,6 +80,7 @@ zabbix_export:
           key: icmppingsec
           value_type: FLOAT
           units: s
+          description: 'The ICMP ping response time (in seconds).'
           tags:
             - tag: component
               value: health

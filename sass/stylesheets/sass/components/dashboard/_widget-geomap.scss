@@ -1,3 +1,14 @@
+// Widget configuration.
+
+form.dashboard-widget-geomap {
+	.fields-group-clustering {
+		display: flex;
+		gap: 3px;
+	}
+}
+
+// Widget view.
+
 div.dashboard-widget-geomap {
 	--hover-fill: #{$geomap-marker-hover-fill};
 	--selected-fill: #{$geomap-marker-selected-fill};

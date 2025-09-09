@@ -38,7 +38,19 @@ class CSystemInfoHelper {
 		];
 
 		if ($data['is_software_update_check_enabled']) {
-			$data['software_update_check_data'] = static::getSoftwareUpdateCheckData();
+			$data['software_update_check_data'] = [];
+			$check_data = CSettingsHelper::getSoftwareUpdateCheckData();
+
+			if ($check_data) {
+				$data['software_update_check_data']['lastcheck'] = $check_data['lastcheck'];
+
+				if ($check_data['versions']) {
+					$data['software_update_check_data'] += self::getSoftwareUpdateVersionDetails(
+						$check_data['versions'],
+						ZABBIX_VERSION
+					);
+				}
+			}
 		}
 
 		$db_backend = DB::getDbBackend();
@@ -127,6 +139,46 @@ class CSystemInfoHelper {
 	}
 
 	/**
+	 * Get version details from versions list supplied by software update request.
+	 *
+	 * @param array  $versions  Array of versions supplied by software update request.
+	 * @param string $version   Version number string, should be in form "<minor>.<major>.<patch>"
+	 *                          Version minor and major numbers required, patch is optional.
+	 */
+	public static function getSoftwareUpdateVersionDetails(array $versions, string $version): array {
+		$data = [];
+		$lts_version = [];
+		$current_version = [];
+		$major_minor = implode('.', sscanf($version, '%d.%d'));
+		CArrayHelper::sort($versions, [['field' => 'version', 'order' => ZBX_SORT_DOWN]]);
+
+		foreach ($versions as $version) {
+			if (version_compare($version['version'], $major_minor, '<')) {
+				break;
+			}
+
+			if (!$lts_version && explode('.', $version['version'])[1] === '0') {
+				$lts_version = $version;
+			}
+
+			if ($version['version'] === $major_minor) {
+				$current_version = $version;
+
+				break;
+			}
+		}
+
+		if ($current_version) {
+			$data['end_of_full_support'] = $current_version['end_of_full_support'];
+			$data['latest_release'] = $current_version['end_of_full_support'] && $lts_version
+				? $lts_version['latest_release']['release']
+				: $current_version['latest_release']['release'];
+		}
+
+		return $data;
+	}
+
+	/**
 	 * Get a summary of running server stats.
 	 *
 	 * @param string|null  $ZBX_SERVER
@@ -149,9 +201,16 @@ class CSystemInfoHelper {
 			timeUnitToSeconds(CSettingsHelper::get(CSettingsHelper::SOCKET_TIMEOUT)), ZBX_SOCKET_BYTES_LIMIT
 		);
 
-		$status['is_running'] = $server->isRunning() && $server->canConnect(CSessionHelper::getId());
+		$status['is_running'] = $server->isRunning() || $server->canConnect(CSessionHelper::getId());
 
-		if ($status['is_running'] === false || CWebUser::getType() != USER_TYPE_SUPER_ADMIN) {
+		if (CWebUser::getType() != USER_TYPE_SUPER_ADMIN) {
+			return $status;
+		}
+
+		if ($status['is_running'] === false) {
+			if ($server->getErrorCode() === CZabbixServer::ERROR_CODE_TLS) {
+				error($server->getError());
+			}
 			return $status;
 		}
 
@@ -285,53 +344,5 @@ class CSystemInfoHelper {
 		$status['server_version'] = $server_status['server stats']['version'];
 
 		return $status;
-	}
-
-	private static function getSoftwareUpdateCheckData(): array {
-		$check_data = CSettingsHelper::getSoftwareUpdateCheckData();
-
-		if (!$check_data) {
-			return [];
-		}
-
-		$data = [
-			'lastcheck' => $check_data['lastcheck']
-		];
-
-		if (!$check_data['versions']) {
-			return $data;
-		}
-
-		CArrayHelper::sort($check_data['versions'], [['field' => 'version', 'order' => ZBX_SORT_DOWN]]);
-
-		$latest_release = null;
-		$is_lts_version = explode('.', ZABBIX_EXPORT_VERSION)[1] === '0';
-
-		foreach ($check_data['versions'] as $version) {
-			if (version_compare($version['version'], ZABBIX_EXPORT_VERSION, '<')) {
-				break;
-			}
-
-			if ($version['version'] === ZABBIX_EXPORT_VERSION) {
-				if (!$version['end_of_full_support']) {
-					$data['end_of_full_support'] = $version['end_of_full_support'];
-					$data['latest_release'] = $version['latest_release']['release'];
-				}
-				elseif ($latest_release !== null) {
-					$data['end_of_full_support'] = $version['end_of_full_support'];
-					$data['latest_release'] = $latest_release;
-				}
-
-				break;
-			}
-
-			if ($latest_release === null && !$version['end_of_full_support']) {
-				if (!$is_lts_version || explode('.', $version['version'])[1] === '0') {
-					$latest_release = $version['latest_release']['release'];
-				}
-			}
-		}
-
-		return $data;
 	}
 }

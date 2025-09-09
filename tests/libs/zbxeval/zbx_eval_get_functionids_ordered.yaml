@@ -31,4 +31,16 @@ out:
   - 9874562345678901235
   - 0
   - 0
+---
+test case: test with variant ui64
+in:
+  rules: [ZBX_EVAL_PARSE_FUNCTIONID,ZBX_EVAL_PARSE_MATH]
+  expression: "{1}+{2}+{3}"
+  variant: "ZBX_VARIAN_UI64"
+  variant_data: 123
+out:
+  ids:
+  - 123
+  - 123
+  - 123
 ...

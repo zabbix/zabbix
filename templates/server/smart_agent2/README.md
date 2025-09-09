@@ -51,6 +51,7 @@ Plugin [parameters list](https://www.zabbix.com/documentation/8.0/manual/appendi
 
 |Name|Description|Default|
 |----|-----------|-------|
+|{$SMART.DISK.DISCOVERY.TYPE}|<p>This macro is responsible for changing how SMART disks get discovered. Only "name" or "id" values allowed.</p>|`name`|
 |{$SMART.TEMPERATURE.MAX.WARN}|<p>This macro is used for trigger expression. It can be overridden on the host or linked on the template level.</p>|`50`|
 |{$SMART.TEMPERATURE.MAX.CRIT}|<p>This macro is used for trigger expression. It can be overridden on the host or linked on the template level.</p>|`65`|
 |{$SMART.DISK.NAME.MATCHES}|<p>This macro is used in the filter of attribute and disk discoveries. It can be overridden on the host or linked on the template level.</p>|`^.*$`|
@@ -60,7 +61,7 @@ Plugin [parameters list](https://www.zabbix.com/documentation/8.0/manual/appendi
 
 |Name|Description|Type|Key and additional info|
 |----|-----------|----|-----------------------|
-|Disk discovery|<p>Discovery SMART disks.</p>|Zabbix agent|smart.disk.discovery|
+|Disk discovery|<p>Discovery SMART disks.</p>|Zabbix agent|smart.disk.discovery[{$SMART.DISK.DISCOVERY.TYPE}]|
 
 ### Item prototypes for Disk discovery
 
@@ -70,7 +71,8 @@ Plugin [parameters list](https://www.zabbix.com/documentation/8.0/manual/appendi
 |[{#NAME}]: Get disk attributes||Zabbix agent|smart.disk.get[{#PATH},"{#RAIDTYPE}"]|
 |[{#NAME}]: Device model||Dependent item|smart.disk.model[{#NAME}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.model_name`</p></li><li><p>Discard unchanged with heartbeat: `6h`</p></li></ul>|
 |[{#NAME}]: Serial number||Dependent item|smart.disk.sn[{#NAME}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.serial_number`</p></li><li><p>Discard unchanged with heartbeat: `6h`</p></li></ul>|
-|[{#NAME}]: Self-test passed|<p>The disk is passed the SMART self-test or not.</p>|Dependent item|smart.disk.test[{#NAME}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.self_test_passed`</p></li><li><p>Discard unchanged with heartbeat: `6h`</p></li></ul>|
+|[{#NAME}]: Self-test passed|<p>The disk is passed the SMART self-test or not.</p>|Dependent item|smart.disk.test[{#NAME}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.self_test_passed`</p></li><li><p>JavaScript: `The text is too long. Please see the template.`</p></li><li><p>Discard unchanged with heartbeat: `6h`</p></li></ul>|
+|[{#NAME}]: Self-test in progress|<p>Reports if disk currently is executing SMART self-test.</p>|Dependent item|smart.disk.test.progress[{#NAME}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.self_test_in_progress`</p></li><li><p>JavaScript: `The text is too long. Please see the template.`</p></li><li><p>Discard unchanged with heartbeat: `6h`</p></li></ul>|
 |[{#NAME}]: Temperature|<p>Current drive temperature.</p>|Dependent item|smart.disk.temperature[{#NAME}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.temperature`</p></li><li><p>Discard unchanged with heartbeat: `6h`</p></li></ul>|
 |[{#NAME}]: Power on hours|<p>Count of hours in power-on state. The raw value of this attribute</p><p>shows total count of hours (or minutes, or seconds, depending on manufacturer)</p><p>in power-on state. "By default, the total expected lifetime of a hard disk</p><p>in perfect condition is defined as 5 years (running every day and night on</p><p>all days). This is equal to 1825 days in 24/7 mode or 43800 hours." On some</p><p>pre-2005 drives, this raw value may advance erratically and/or "wrap around"</p><p>(reset to zero periodically). https://en.wikipedia.org/wiki/S.M.A.R.T.#Known_ATA_S.M.A.R.T._attributes</p>|Dependent item|smart.disk.hours[{#NAME}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.power_on_time`</p></li><li><p>Discard unchanged with heartbeat: `6h`</p></li></ul>|
 |[{#NAME}]: Percentage used|<p>Contains a vendor specific estimate of the percentage of NVM subsystem</p><p>life used based on the actual usage and the manufacturer's prediction of NVM</p><p>life. A value of 100 indicates that the estimated endurance of the NVM in</p><p>the NVM subsystem has been consumed, but may not indicate an NVM subsystem</p><p>failure. The value is allowed to exceed 100. Percentages greater than 254</p><p>shall be represented as 255. This value shall be updated once per power-on</p><p>hour (when the controller is not in a sleep state).</p>|Dependent item|smart.disk.percentage_used[{#NAME}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.percentage_used`</p></li><li><p>Discard unchanged with heartbeat: `6h`</p></li></ul>|
@@ -92,7 +94,7 @@ Plugin [parameters list](https://www.zabbix.com/documentation/8.0/manual/appendi
 |Name|Description|Expression|Severity|Dependencies and additional info|
 |----|-----------|----------|--------|--------------------------------|
 |SMART: [{#NAME}]: Disk has been replaced|<p>Device serial number has changed. Acknowledge to close the problem manually.</p>|`last(/SMART by Zabbix agent 2/smart.disk.sn[{#NAME}],#1)<>last(/SMART by Zabbix agent 2/smart.disk.sn[{#NAME}],#2) and length(last(/SMART by Zabbix agent 2/smart.disk.sn[{#NAME}]))>0`|Info|**Manual close**: Yes|
-|SMART: [{#NAME}]: Disk self-test is not passed||`last(/SMART by Zabbix agent 2/smart.disk.test[{#NAME}])="false"`|High||
+|SMART: [{#NAME}]: Disk self-test is not passed||`last(/SMART by Zabbix agent 2/smart.disk.test[{#NAME}])=2 and last(/SMART by Zabbix agent 2/smart.disk.test.progress[{#NAME}])=2`|High||
 |SMART: [{#NAME}]: Average disk temperature is too high||`avg(/SMART by Zabbix agent 2/smart.disk.temperature[{#NAME}],5m)>{$SMART.TEMPERATURE.MAX.WARN}`|Warning|**Depends on**:<br><ul><li>SMART: [{#NAME}]: Average disk temperature is critical</li></ul>|
 |SMART: [{#NAME}]: Average disk temperature is critical||`avg(/SMART by Zabbix agent 2/smart.disk.temperature[{#NAME}],5m)>{$SMART.TEMPERATURE.MAX.CRIT}`|Average||
 |SMART: [{#NAME}]: NVMe disk percentage using is over 90% of estimated endurance||`last(/SMART by Zabbix agent 2/smart.disk.percentage_used[{#NAME}])>90`|Average||

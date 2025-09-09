@@ -486,6 +486,13 @@ static int	dbconn_open(zbx_dbconn_t *db)
 		ret = ZBX_DB_FAIL;
 	}
 
+	/* innodb_snapshot_isolation variable became ON by default in MariaDB 11.6.2, we need it to be OFF */
+	if (ZBX_DB_OK == ret && ON == zbx_mariadb_fork_get() && 110602 <= db_get_server_version())
+	{
+		if (0 < (ret = dbconn_execute(db, "set innodb_snapshot_isolation='OFF'")))
+			ret = ZBX_DB_OK;
+	}
+
 	if (ZBX_DB_OK == ret)
 	{
 		/* in contrast to "set names utf8" results of this call will survive auto-reconnects */
@@ -644,6 +651,26 @@ static int	dbconn_open(zbx_dbconn_t *db)
 	if (NULL != (row = zbx_db_fetch(result)))
 	{
 		if (0 == strcmp(row[0], "on"))
+		{
+			zbx_db_free_result(result);
+			ret = ZBX_DB_RONLY;
+			goto out;
+		}
+	}
+
+	zbx_db_free_result(result);
+
+	result = dbconn_select(db, "select pg_is_in_recovery();");
+
+	if ((zbx_db_result_t)ZBX_DB_DOWN == result || NULL == result)
+	{
+		ret = (NULL == result) ? ZBX_DB_FAIL : ZBX_DB_DOWN;
+		goto out;
+	}
+
+	if (NULL != (row = zbx_db_fetch(result)))
+	{
+		if (0 == strcmp(row[0], "t"))
 		{
 			zbx_db_free_result(result);
 			ret = ZBX_DB_RONLY;
@@ -2392,22 +2419,18 @@ int	zbx_dbconn_execute_multiple_query_str(zbx_dbconn_t *db, const char *query, c
 
 /******************************************************************************
  *                                                                            *
- * Purpose: selects next batch of ids from database                           *
+ * Purpose: select next chunk of values for large query processing            *
+ *                                                                            *
+ * Parameters: query      - [IN/OUT] large query object                       *
+ *             values_num - [IN] total number of id values to select          *
+ *                                                                            *
+ * Return value: number of values in the next chunk or FAIL if when all       *
+ *               values have been processed                                   *
  *                                                                            *
  ******************************************************************************/
-static int	db_large_query_select(zbx_db_large_query_t *query)
+static int	db_large_query_select_chunk(zbx_db_large_query_t *query, int values_num)
 {
-	int	values_num, size = ZBX_DB_LARGE_QUERY_BATCH_SIZE;
-
-	switch (query->type)
-	{
-		case ZBX_DB_LARGE_QUERY_UI64:
-			values_num = query->ids.ui64->values_num;
-			break;
-		case ZBX_DB_LARGE_QUERY_STR:
-			values_num = query->ids.str->values_num;
-			break;
-	}
+	int	size = ZBX_DB_LARGE_QUERY_BATCH_SIZE;
 
 	if (query->offset >= values_num)
 		return FAIL;
@@ -2423,22 +2446,45 @@ static int	db_large_query_select(zbx_db_large_query_t *query)
 
 	*query->sql_offset = query->sql_reset;
 
+	return size;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: selects next batch of ids from database                           *
+ *                                                                            *
+ ******************************************************************************/
+static int	db_large_query_select(zbx_db_large_query_t *query)
+{
+	int	size = 0;
+
 	switch (query->type)
 	{
 		case ZBX_DB_LARGE_QUERY_UI64:
+			if (FAIL == (size = db_large_query_select_chunk(query, query->ids.ui64->values_num)))
+				return FAIL;
+
 			zbx_db_add_condition_alloc(query->sql, query->sql_alloc, query->sql_offset, query->field,
 					query->ids.ui64->values + query->offset, size);
 			break;
 		case ZBX_DB_LARGE_QUERY_STR:
+			if (FAIL == (size = db_large_query_select_chunk(query, query->ids.str->values_num)))
+				return FAIL;
+
 			zbx_db_add_str_condition_alloc(query->sql, query->sql_alloc, query->sql_offset, query->field,
 					(const char * const *)&query->ids.str->values[query->offset], size);
 			break;
+		case ZBX_DB_LARGE_QUERY:
+			if (NULL != query->result)
+				return SUCCEED;
+			break;
 	}
+
+	query->offset += size;
 
 	if (NULL != query->suffix)
 		zbx_strcpy_alloc(query->sql, query->sql_alloc, query->sql_offset, query->suffix);
 
-	query->offset += size;
 	query->result = dbconn_select(query->db, "%s", *query->sql);
 
 	return SUCCEED;
@@ -2525,6 +2571,35 @@ void	zbx_dbconn_large_query_prepare_str(zbx_db_large_query_t *query, zbx_dbconn_
 
 /******************************************************************************
  *                                                                            *
+ * Purpose: prepare large SQL query without IDs                               *
+ *                                                                            *
+ * Parameters: query      - [IN] large query object                           *
+ *             db         - [IN] database connection object                   *
+ *             sql        - [IN/OUT] first part of the query, can be modified *
+ *                              or reallocated                                *
+ *             sql_alloc  - [IN/OUT] size of allocated SQL string             *
+ *             sql_offset - [IN/OUT] length of the SQL string                 *
+ *                                                                            *
+ * Comments: Large query object 'borrows' the SQL buffer with the query part, *
+ *           meaning:                                                         *
+ *             - caller must not free/modify this SQL buffer while the        *
+ *               prepared large query object is being used                    *
+ *             - caller must free this SQL buffer afterwards - it's not freed *
+ *               when large query object is cleared.                          *
+ *                                                                            *
+ ******************************************************************************/
+void	zbx_dbconn_large_query_prepare(zbx_db_large_query_t *query, zbx_dbconn_t *db, char **sql, size_t *sql_alloc,
+		size_t *sql_offset)
+{
+	query->type = ZBX_DB_LARGE_QUERY;
+	query->ids.ui64 = NULL;
+	query->ids.str = NULL;
+
+	db_large_query_prepare(query, db, sql, sql_alloc, sql_offset, NULL);
+}
+
+/******************************************************************************
+ *                                                                            *
  * Purpose: fetch next row from large SQL query                               *
  *                                                                            *
  * Parameters: query      - [IN] large query object                           *
@@ -2552,6 +2627,11 @@ zbx_db_row_t	zbx_db_large_query_fetch(zbx_db_large_query_t *query)
 		case ZBX_DB_LARGE_QUERY_STR:
 			values_num = query->ids.str->values_num;
 			break;
+		case ZBX_DB_LARGE_QUERY:
+			if (SUCCEED != db_large_query_select(query))
+				return NULL;
+
+			return zbx_db_fetch(query->result);
 	}
 
 	while (NULL == (row = zbx_db_fetch(query->result)) && query->offset < values_num)

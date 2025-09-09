@@ -65,7 +65,7 @@ zabbix_export:
         http://www.net-snmp.org/wiki/index.php/TUT:snmpd_configuration
       vendor:
         name: Zabbix
-        version: 8.0-0
+        version: 8.0-1
       groups:
         - name: 'Templates/Operating systems'
       items:
@@ -73,6 +73,11 @@ zabbix_export:
           name: 'ICMP ping'
           type: SIMPLE
           key: icmpping
+          description: |
+            The host accessibility by ICMP ping.
+            
+            0 - ICMP ping fails;
+            1 - ICMP ping successful.
           valuemap:
             name: 'Service state'
           tags:
@@ -85,7 +90,7 @@ zabbix_export:
               expression: 'max(/Linux by SNMP/icmpping,#3)=0'
               name: 'Linux: Unavailable by ICMP ping'
               priority: HIGH
-              description: 'Last three attempts returned timeout.  Please check device connectivity.'
+              description: 'Last three attempts returned timeout. Please check device connectivity.'
               tags:
                 - tag: scope
                   value: availability
@@ -95,6 +100,7 @@ zabbix_export:
           key: icmppingloss
           value_type: FLOAT
           units: '%'
+          description: 'The percentage of lost packets.'
           tags:
             - tag: component
               value: health
@@ -106,6 +112,7 @@ zabbix_export:
               name: 'Linux: High ICMP ping loss'
               opdata: 'Loss: {ITEM.LASTVALUE1}'
               priority: WARNING
+              description: 'ICMP packets loss detected.'
               dependencies:
                 - name: 'Linux: Unavailable by ICMP ping'
                   expression: 'max(/Linux by SNMP/icmpping,#3)=0'
@@ -120,6 +127,7 @@ zabbix_export:
           key: icmppingsec
           value_type: FLOAT
           units: s
+          description: 'The ICMP ping response time (in seconds).'
           tags:
             - tag: component
               value: health
@@ -177,13 +185,13 @@ zabbix_export:
         - uuid: e45c4b2df4a640a1a36154cb2b717e9d
           name: 'System contact details'
           type: SNMP_AGENT
-          snmp_oid: 1.3.6.1.2.1.1.4.0
+          snmp_oid: 'get[1.3.6.1.2.1.1.4.0]'
           key: 'system.contact[sysContact.0]'
           delay: 15m
           value_type: CHAR
           description: |
             MIB: SNMPv2-MIB
-            The textual identification of the contact person for this managed node, together with information on how to contact this person.  If no contact information is known, the value is the zero-length string.
+            The textual identification of the contact person for this managed node, together with information on how to contact this person. If no contact information is known, the value is the zero-length string.
           inventory_link: CONTACT
           preprocessing:
             - type: DISCARD_UNCHANGED_HEARTBEAT
@@ -195,7 +203,7 @@ zabbix_export:
         - uuid: fdb0807c4a9a452f8a3cbab01a4ddb2e
           name: 'Interrupts per second'
           type: SNMP_AGENT
-          snmp_oid: 1.3.6.1.4.1.2021.11.59.0
+          snmp_oid: 'get[1.3.6.1.4.1.2021.11.59.0]'
           key: 'system.cpu.intr[ssRawInterrupts.0]'
           value_type: FLOAT
           description: 'Number of interrupts processed.'
@@ -206,34 +214,73 @@ zabbix_export:
               value: cpu
         - uuid: eeaba506dee342518660c03d422faa2a
           name: 'Load average (1m avg)'
-          type: SNMP_AGENT
-          snmp_oid: '1.3.6.1.4.1.2021.10.1.3["index","1.3.6.1.4.1.2021.10.1.2", "Load-1"]'
+          type: DEPENDENT
           key: 'system.cpu.load.avg1[laLoad.1]'
           value_type: FLOAT
           description: 'MIB: UCD-SNMP-MIB'
+          preprocessing:
+            - type: JSONPATH
+              parameters:
+                - '$[?(@.laName == ''Load-1'')].laLoad.first()'
+          master_item:
+            key: system.cpu.load.walk
           tags:
             - tag: component
               value: cpu
         - uuid: e0c8a351d59f42b78e6db4a0c50aa5d2
           name: 'Load average (5m avg)'
-          type: SNMP_AGENT
-          snmp_oid: '1.3.6.1.4.1.2021.10.1.3["index","1.3.6.1.4.1.2021.10.1.2", "Load-5"]'
+          type: DEPENDENT
           key: 'system.cpu.load.avg5[laLoad.2]'
           value_type: FLOAT
           description: 'MIB: UCD-SNMP-MIB'
+          preprocessing:
+            - type: JSONPATH
+              parameters:
+                - '$[?(@.laName == ''Load-5'')].laLoad.first()'
+          master_item:
+            key: system.cpu.load.walk
           tags:
             - tag: component
               value: cpu
         - uuid: 0a5c406d4e434dbba248a18318f6a869
           name: 'Load average (15m avg)'
-          type: SNMP_AGENT
-          snmp_oid: '1.3.6.1.4.1.2021.10.1.3["index","1.3.6.1.4.1.2021.10.1.2", "Load-15"]'
+          type: DEPENDENT
           key: 'system.cpu.load.avg15[laLoad.3]'
           value_type: FLOAT
           description: 'MIB: UCD-SNMP-MIB'
+          preprocessing:
+            - type: JSONPATH
+              parameters:
+                - '$[?(@.laName == ''Load-15'')].laLoad.first()'
+          master_item:
+            key: system.cpu.load.walk
           tags:
             - tag: component
               value: cpu
+        - uuid: 063a77f98871429e81d46691bf61c09f
+          name: 'SNMP walk CPU load averages'
+          type: SNMP_AGENT
+          snmp_oid: 'walk[1.3.6.1.4.1.2021.10.1.2,1.3.6.1.4.1.2021.10.1.3]'
+          key: system.cpu.load.walk
+          history: '0'
+          value_type: TEXT
+          description: |
+            MIB: UCD-SNMP-MIB
+            SNMP walk through laTable. The collected data used in dependent CPU load average items.
+          preprocessing:
+            - type: SNMP_WALK_TO_JSON
+              parameters:
+                - laName
+                - 1.3.6.1.4.1.2021.10.1.2
+                - '0'
+                - laLoad
+                - 1.3.6.1.4.1.2021.10.1.3
+                - '0'
+          tags:
+            - tag: component
+              value: cpu
+            - tag: component
+              value: raw
         - uuid: f835f2d2e65c4efc8934a61870d907ca
           name: 'Number of CPUs'
           type: DEPENDENT
@@ -256,7 +303,7 @@ zabbix_export:
         - uuid: e10a890dc6724cbda96f7c40c49cd730
           name: 'Context switches per second'
           type: SNMP_AGENT
-          snmp_oid: 1.3.6.1.4.1.2021.11.60.0
+          snmp_oid: 'get[1.3.6.1.4.1.2021.11.60.0]'
           key: 'system.cpu.switches[ssRawContexts.0]'
           value_type: FLOAT
           description: 'The combined rate at which all processors on the computer are switched from one thread to another.'
@@ -277,11 +324,13 @@ zabbix_export:
             Discovering system CPUs.
           tags:
             - tag: component
+              value: cpu
+            - tag: component
               value: raw
         - uuid: abd4d4b7097644478329b578dfa7bf09
           name: 'System description'
           type: SNMP_AGENT
-          snmp_oid: 1.3.6.1.2.1.1.1.0
+          snmp_oid: 'get[1.3.6.1.2.1.1.1.0]'
           key: 'system.descr[sysDescr.0]'
           delay: 15m
           value_type: CHAR
@@ -300,7 +349,7 @@ zabbix_export:
         - uuid: d1a9af129dbb4fed8e67efcca383aeae
           name: 'Uptime (hardware)'
           type: SNMP_AGENT
-          snmp_oid: 1.3.6.1.2.1.25.1.1.0
+          snmp_oid: 'get[1.3.6.1.2.1.25.1.1.0]'
           key: 'system.hw.uptime[hrSystemUptime.0]'
           delay: 30s
           trends: '0'
@@ -323,7 +372,7 @@ zabbix_export:
         - uuid: 9f2b3de3245e4ffea5aefc636e0f3da1
           name: 'System location'
           type: SNMP_AGENT
-          snmp_oid: 1.3.6.1.2.1.1.6.0
+          snmp_oid: 'get[1.3.6.1.2.1.1.6.0]'
           key: 'system.location[sysLocation.0]'
           delay: 15m
           value_type: CHAR
@@ -341,13 +390,13 @@ zabbix_export:
         - uuid: 3ee68ecd1edc4f5d9cddefa78f8d502e
           name: 'System name'
           type: SNMP_AGENT
-          snmp_oid: 1.3.6.1.2.1.1.5.0
+          snmp_oid: 'get[1.3.6.1.2.1.1.5.0]'
           key: system.name
           delay: 15m
           value_type: CHAR
           description: |
             MIB: SNMPv2-MIB
-            An administratively-assigned name for this managed node.By convention, this is the node's fully-qualified domain name.  If the name is unknown, the value is the zero-length string.
+            An administratively-assigned name for this managed node.By convention, this is the node's fully-qualified domain name. If the name is unknown, the value is the zero-length string.
           inventory_link: NAME
           preprocessing:
             - type: DISCARD_UNCHANGED_HEARTBEAT
@@ -372,7 +421,7 @@ zabbix_export:
         - uuid: d3fba18851db4be08df04ab85536bb14
           name: 'Uptime (network)'
           type: SNMP_AGENT
-          snmp_oid: 1.3.6.1.2.1.1.3.0
+          snmp_oid: 'get[1.3.6.1.2.1.1.3.0]'
           key: 'system.net.uptime[sysUpTime.0]'
           delay: 30s
           trends: '0'
@@ -390,13 +439,13 @@ zabbix_export:
         - uuid: 5b17833c4646423d8fd4115fa19d2ffe
           name: 'System object ID'
           type: SNMP_AGENT
-          snmp_oid: 1.3.6.1.2.1.1.2.0
+          snmp_oid: 'get[1.3.6.1.2.1.1.2.0]'
           key: 'system.objectid[sysObjectID.0]'
           delay: 15m
           value_type: CHAR
           description: |
             MIB: SNMPv2-MIB
-            The vendor's authoritative identification of the network management subsystem contained in the entity.  This value is allocated within the SMI enterprises subtree (1.3.6.1.4.1) and provides an easy and unambiguous means for determining`what kind of box' is being managed.  For example, if vendor`Flintstones, Inc.' was assigned the subtree1.3.6.1.4.1.4242, it could assign the identifier 1.3.6.1.4.1.4242.1.1 to its `Fred Router'.
+            The vendor's authoritative identification of the network management subsystem contained in the entity. This value is allocated within the SMI enterprises subtree (1.3.6.1.4.1) and provides an easy and unambiguous means for determining`what kind of box' is being managed.  For example, if vendor`Flintstones, Inc.' was assigned the subtree1.3.6.1.4.1.4242, it could assign the identifier 1.3.6.1.4.1.4242.1.1 to its `Fred Router'.
           preprocessing:
             - type: DISCARD_UNCHANGED_HEARTBEAT
               parameters:
@@ -407,7 +456,7 @@ zabbix_export:
         - uuid: a8ad10709a6e457187f58695de20b027
           name: 'Free swap space'
           type: SNMP_AGENT
-          snmp_oid: 1.3.6.1.4.1.2021.4.4.0
+          snmp_oid: 'get[1.3.6.1.4.1.2021.4.4.0]'
           key: 'system.swap.free[memAvailSwap.0]'
           units: B
           description: |
@@ -438,7 +487,7 @@ zabbix_export:
         - uuid: 7db5193027794961840c228c6280fe5b
           name: 'Total swap space'
           type: SNMP_AGENT
-          snmp_oid: 1.3.6.1.4.1.2021.4.3.0
+          snmp_oid: 'get[1.3.6.1.4.1.2021.4.3.0]'
           key: 'system.swap.total[memTotalSwap.0]'
           units: B
           description: |
@@ -525,7 +574,7 @@ zabbix_export:
         - uuid: c071dae605b64cce886df7d2865e77e0
           name: 'Memory (buffers)'
           type: SNMP_AGENT
-          snmp_oid: 1.3.6.1.4.1.2021.4.14.0
+          snmp_oid: 'get[1.3.6.1.4.1.2021.4.14.0]'
           key: 'vm.memory.buffers[memBuffer.0]'
           units: B
           description: |
@@ -541,7 +590,7 @@ zabbix_export:
         - uuid: d5e0a99bfd9844108c3d26d53d1a3d0c
           name: 'Memory (cached)'
           type: SNMP_AGENT
-          snmp_oid: 1.3.6.1.4.1.2021.4.15.0
+          snmp_oid: 'get[1.3.6.1.4.1.2021.4.15.0]'
           key: 'vm.memory.cached[memCached.0]'
           units: B
           description: |
@@ -557,7 +606,7 @@ zabbix_export:
         - uuid: fc3fb5310e8f4af7a093b9df9eede403
           name: 'Free memory'
           type: SNMP_AGENT
-          snmp_oid: 1.3.6.1.4.1.2021.4.6.0
+          snmp_oid: 'get[1.3.6.1.4.1.2021.4.6.0]'
           key: 'vm.memory.free[memAvailReal.0]'
           units: B
           description: 'MIB: UCD-SNMP-MIB'
@@ -571,7 +620,7 @@ zabbix_export:
         - uuid: de35484e53b24894aa050f15e1941106
           name: 'Total memory'
           type: SNMP_AGENT
-          snmp_oid: 1.3.6.1.4.1.2021.4.5.0
+          snmp_oid: 'get[1.3.6.1.4.1.2021.4.5.0]'
           key: 'vm.memory.total[memTotalReal.0]'
           units: B
           description: |

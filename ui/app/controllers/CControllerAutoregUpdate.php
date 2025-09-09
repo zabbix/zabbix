@@ -16,57 +16,108 @@
 
 class CControllerAutoregUpdate extends CController {
 
-	protected function checkInput() {
-		$fields = [
-			'tls_accept' =>				'in '.HOST_ENCRYPTION_NONE.','.HOST_ENCRYPTION_PSK.','.(HOST_ENCRYPTION_NONE | HOST_ENCRYPTION_PSK),
-			'tls_psk_identity' =>		'db config_autoreg_tls.tls_psk_identity',
-			'tls_psk' =>				'db config_autoreg_tls.tls_psk'
-		];
+	protected function init(): void {
+		$this->setInputValidationMethod(self::INPUT_VALIDATION_FORM);
+		$this->setPostContentType(self::POST_CONTENT_TYPE_JSON);
+	}
 
-		$ret = $this->validateInput($fields);
+	public static function getValidationRules(): array {
+		return ['object', 'fields' => [
+			'tls_in_psk' => ['boolean'],
+			'tls_in_none' => [
+				['boolean'],
+				['boolean', 'required', 'when' => ['tls_in_psk', false],
+					'messages' => ['in' => _('At least one encryption level must be selected.')]
+				]
+			],
+			'psk_required' => ['boolean'],
+			'tls_psk_identity' => [
+				['db config_autoreg_tls.tls_psk_identity'],
+				['db config_autoreg_tls.tls_psk_identity', 'required', 'not_empty',
+					'when' => [['tls_in_psk', true], ['psk_required', true]]
+				]
+			],
+			'tls_psk' => [
+				['db config_autoreg_tls.tls_psk',
+					'regex' => '/^(.{2}){1,}$/',
+					'messages' => ['regex' => _('PSK must be an even number of characters.')]
+				],
+				['db config_autoreg_tls.tls_psk',
+					'regex' => '/.{32,}/',
+					'messages' => ['regex' => _('PSK must be at least 32 characters long.')]
+				],
+				['db config_autoreg_tls.tls_psk',
+					'regex' => '/^[0-9a-f]*$/i',
+					'messages' => ['regex' => _('PSK must contain only hexadecimal characters.')]
+				],
+				['db config_autoreg_tls.tls_psk', 'required', 'not_empty',
+					'when' => [['tls_in_psk', true], ['psk_required', true]]
+				]
+			]
+		]];
+	}
+
+	protected function checkInput(): bool {
+		$ret = $this->validateInput(self::getValidationRules());
 
 		if (!$ret) {
-			switch ($this->getValidationResult()) {
-				case self::VALIDATION_ERROR:
-					$response = new CControllerResponseRedirect(
-						(new CUrl('zabbix.php'))->setArgument('action', 'autoreg.edit')
-					);
-					$response->setFormData($this->getInputAll());
-					CMessageHelper::setErrorTitle(_('Cannot update configuration'));
-					$this->setResponse($response);
-					break;
-				case self::VALIDATION_FATAL_ERROR:
-					$this->setResponse(new CControllerResponseFatal());
-					break;
-			}
+			$form_errors = $this->getValidationError();
+			$response = $form_errors
+				? ['form_errors' => $form_errors]
+				: ['error' => [
+					'title' => _('Cannot update configuration'),
+					'messages' => array_column(get_and_clear_messages(), 'message')
+				]];
+
+			$this->setResponse(
+				new CControllerResponseData(['main_block' => json_encode($response)])
+			);
 		}
 
 		return $ret;
 	}
 
-	protected function checkPermissions() {
+	protected function checkPermissions(): bool {
 		return $this->checkAccess(CRoleHelper::UI_ADMINISTRATION_GENERAL);
 	}
 
-	protected function doAction() {
-		$autoreg = [];
+	protected function doAction(): void {
+		$data = [
+			'tls_accept' => 0x00
+		];
 
-		$this->getInputs($autoreg, ['tls_accept', 'tls_psk_identity', 'tls_psk']);
+		if ($this->getInput('tls_in_none', 0)) {
+			$data['tls_accept'] |= HOST_ENCRYPTION_NONE;
+		}
 
-		$result = (bool) API::Autoregistration()->update($autoreg);
+		if ($this->getInput('tls_in_psk', 0)) {
+			$data['tls_accept'] |= HOST_ENCRYPTION_PSK;
 
-		$response = new CControllerResponseRedirect(
-			(new CUrl('zabbix.php'))->setArgument('action', 'autoreg.edit')
-		);
+			foreach (['tls_psk_identity', 'tls_psk'] as $field) {
+				if ($this->hasInput($field) && $this->getInput($field, '') !== '') {
+					$data[$field] = $this->getInput($field);
+				}
+			}
+		}
+
+		$result = (bool) API::Autoregistration()->update($data);
+
+		$output = [];
 
 		if ($result) {
-			CMessageHelper::setSuccessTitle(_('Configuration updated'));
+			$output['success']['title'] = _('Configuration updated');
+
+			if ($messages = get_and_clear_messages()) {
+				$output['success']['messages'] = array_column($messages, 'message');
+			}
 		}
 		else {
-			$response->setFormData($this->getInputAll());
-			CMessageHelper::setErrorTitle(_('Cannot update configuration'));
+			$output['error'] = [
+				'title' => _('Cannot update configuration'),
+				'messages' => array_column(get_and_clear_messages(), 'message')
+			];
 		}
 
-		$this->setResponse($response);
+		$this->setResponse(new CControllerResponseData(['main_block' => json_encode($output)]));
 	}
 }

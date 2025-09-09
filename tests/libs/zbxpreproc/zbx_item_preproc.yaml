@@ -3127,6 +3127,35 @@ in:
 out:
   return: FAIL
 ---
+test case: SNMP walk to JSON - Empty snmp data
+in:
+  value:
+    value_type: ITEM_VALUE_TYPE_STR
+    time: 2017-10-29 03:15:00 +03:00
+    data: |
+  step:
+    type: ZBX_PREPROC_SNMP_WALK_TO_JSON
+    params: |-
+      MACRO1
+      .1.3.6.1
+      0
+out:
+  return: SUCCEED
+  value: '[]'
+---
+test case: SNMP walk to JSON - Empty snmp data and empty params
+in:
+  value:
+    value_type: ITEM_VALUE_TYPE_STR
+    time: 2017-10-29 03:15:00 +03:00
+    data: |
+  step:
+    type: ZBX_PREPROC_SNMP_WALK_TO_JSON
+    params: |-
+out:
+  return: SUCCEED
+  value: '[]'
+---
 test case: SNMP walk to JSON - STRING type
 in:
   value:
@@ -4581,4 +4610,21 @@ in:
 out:
   value: "0"
   return: SUCCEED
+---
+  test case: SNMP walk to value - duplicate oids
+  in:
+    value:
+      value_type: ITEM_VALUE_TYPE_STR
+      time: 2017-10-29 03:15:00 +03:00
+      data: |
+        .1.3.6.1.1 = STRING: "AAA"
+        .1.3.6.1.1 = STRING: "AAA"
+    step:
+      type: ZBX_PREPROC_SNMP_WALK_VALUE
+      params: |-
+        .1.3.6.1.1
+        0
+  out:
+    return: SUCCEED
+    value: "AAA"
 ...

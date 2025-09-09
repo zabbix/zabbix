@@ -179,4 +179,7 @@ typedef struct
 }
 zbx_poller_config_t;
 
+#define ZBX_SNMP_POLLER_CLEAR_CACHE	1
+#define ZBX_SNMP_POLLER_HOUSEKEEP_CACHE	2
+
 #endif /* ZABBIX_ZBX_POLLER_H*/

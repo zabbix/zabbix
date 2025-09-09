@@ -35,6 +35,8 @@
 #include "zbxxml.h"
 #include "zbxjson.h"
 #include "audit/zbxaudit.h"
+#include "zbxexpr.h"
+#include "zbx_expression_constants.h"
 #include "zbx_rtc_constants.h"
 #include "zbxrtc.h"
 
@@ -999,6 +1001,7 @@ static void	am_register_alerter(zbx_am_t *manager, zbx_ipc_client_t *client, zbx
 
 		alerter = (zbx_am_alerter_t *)manager->alerters.values[manager->next_alerter_index++];
 		alerter->client = client;
+		zbx_ipc_client_addref(client);
 
 		/* sizeof(zbx_am_alerter_t *) in the following line returns size of 'alerter' pointer. */
 		/* sizeof(alerter) is not used to avoid analyzer warning */
@@ -1023,7 +1026,10 @@ static void	am_register_alert_syncer(zbx_am_t *manager, zbx_ipc_client_t *client
 		zabbix_log(LOG_LEVEL_DEBUG, "refusing connection from foreign process");
 	}
 	else
+	{
 		manager->syncer_client = client;
+		zbx_ipc_client_addref(client);
+	}
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 }
@@ -1102,6 +1108,71 @@ static char	*am_create_db_alert_message(const zbx_db_config_t *db_config)
 
 #undef ZBX_DATABASE_TYPE
 
+static int	mediatype_params_macro_resolv(zbx_macro_resolv_data_t *p, va_list args, char **replace_to, char **data,
+		char *error, size_t maxerrlen)
+{
+	/* Passed arguments */
+	const char	*subject = va_arg(args, const char *);
+	const char	*message = va_arg(args, const char *);
+
+	ZBX_UNUSED(data);
+	ZBX_UNUSED(error);
+	ZBX_UNUSED(maxerrlen);
+
+	if (0 == p->indexed)
+	{
+		if (0 == strcmp(p->macro, MVAR_ALERT_SUBJECT))
+			*replace_to = zbx_strdup(*replace_to, subject);
+		else if (0 == strcmp(p->macro, MVAR_ALERT_MESSAGE))
+			*replace_to = zbx_strdup(*replace_to, message);
+	}
+
+	return SUCCEED;
+}
+
+static char	*am_substitute_mediatype_params(const char *mediatype_params, const char *subject, const char *message)
+{
+	char	*alert_params = NULL;
+
+	if (NULL != mediatype_params)
+	{
+		struct zbx_json		json;
+
+		const char		*p;
+		struct zbx_json_parse	jp;
+		char			*buf = NULL;
+		size_t			buf_alloc = 0;
+
+		if (SUCCEED != zbx_json_open(mediatype_params, &jp))
+		{
+			zabbix_log(LOG_LEVEL_DEBUG, "cannot parse mediatype parameters: %s", zbx_json_strerror());
+
+			return NULL;
+		}
+
+		zbx_json_initarray(&json, 1024);
+
+		for (p = NULL; NULL != (p = zbx_json_next_value_dyn(&jp, p, &buf, &buf_alloc, NULL));)
+		{
+			char	*value = zbx_strdup(NULL, buf);
+
+			zbx_substitute_macros(&value, NULL, 0, &mediatype_params_macro_resolv, subject, message);
+
+			zbx_json_addstring(&json, NULL, value, ZBX_JSON_TYPE_STRING);
+
+			zbx_free(value);
+		}
+
+		zbx_free(buf);
+		zbx_json_close(&json);
+
+		alert_params = zbx_strdup(NULL, json.buffer);
+		zbx_json_free(&json);
+	}
+
+	return alert_params;
+}
+
 /******************************************************************************
  *                                                                            *
  * Purpose: queues 'database down' watchdog alerts                            *
@@ -1122,6 +1193,7 @@ static void	am_queue_watchdog_alerts(zbx_am_t *manager, const zbx_db_config_t *d
 		zbx_am_alert_t		*alert;
 		const char		*alert_subject = "Zabbix database is not available.";
 		char			*alert_message;
+		char			*alert_params = NULL;
 
 		if (NULL == (mediatype = am_get_mediatype(manager, media->mediatypeid)))
 		{
@@ -1142,8 +1214,10 @@ static void	am_queue_watchdog_alerts(zbx_am_t *manager, const zbx_db_config_t *d
 			zbx_free(am_esc);
 		}
 
+		alert_params = am_substitute_mediatype_params(media->mediatype_params, alert_subject, alert_message);
+
 		alert = am_create_alert(0, media->mediatypeid, 0, 0, 0, media->sendto, alert_subject,
-				shared_str_new(alert_message), NULL, mediatype->message_format, 0, 0, 0);
+				shared_str_new(alert_message), alert_params, mediatype->message_format, 0, 0, 0);
 
 		alertpool = am_get_alertpool(manager, alert->mediatypeid, alert->alertpoolid);
 		alertpool->refcount++;
@@ -1153,6 +1227,7 @@ static void	am_queue_watchdog_alerts(zbx_am_t *manager, const zbx_db_config_t *d
 		am_push_mediatype(manager, mediatype);
 
 		zbx_free(alert_message);
+		zbx_free(alert_params);
 	}
 }
 
@@ -1334,18 +1409,17 @@ static void	am_sync_watchdog(zbx_am_t *manager, zbx_am_media_t **medias, int med
 	{
 		if (NULL == (media = (zbx_am_media_t *)zbx_hashset_search(&manager->watchdog, &medias[i]->mediaid)))
 		{
-			zbx_am_media_t	media_local;
+			zbx_am_media_t	media_local = {.mediaid = medias[i]->mediaid};
 
-			media_local.mediaid = medias[i]->mediaid;
-			media_local.mediatypeid = 0;
-			media_local.sendto = NULL;
 			media = (zbx_am_media_t *)zbx_hashset_insert(&manager->watchdog, &media_local,
 					sizeof(media_local));
-			media->sendto = NULL;
+
 			zbx_vector_am_media_ptr_append(&media_new, media);
 		}
 		media->mediatypeid = medias[i]->mediatypeid;
 		ZBX_UPDATE_STR(media->sendto,  medias[i]->sendto);
+		media->mediatype_type = medias[i]->mediatype_type;
+		ZBX_UPDATE_STR(media->mediatype_params, medias[i]->mediatype_params);
 
 		zbx_am_mediatype_t	*mediatype = am_get_mediatype(manager, media->mediatypeid);
 
@@ -1374,7 +1448,8 @@ static void	am_sync_watchdog(zbx_am_t *manager, zbx_am_media_t **medias, int med
 		if (NULL != zbx_hashset_search(&mediaids, &media->mediaid))
 			continue;
 
-		zbx_free(media->sendto);
+		zbx_am_media_clear(media);
+
 		zbx_hashset_iter_remove(&iter);
 	}
 

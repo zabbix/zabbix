@@ -195,7 +195,7 @@ In order to be able to monitor tablespaces across multiple containers, the Oracl
 
 Common parameters for all the keys are: [ConnString][User][Password][Service] where `ConnString` can be either a URI or a session name.
 `ConnString` will be treated as a URI if no session with the given name is found.
-User can contain sysdba, sysoper, sysasm privileges. It must be used with `as` as a separator
+User can contain sysdba, sysoper, sysasm, sysbackup, sysdg, syskm, sysrac privileges. It must be used with `as` as a separator
 e.g `user as sysdba`, privilege can be upper or lowercase, and must be at the end of username string.
 If you use `ConnString` as a session name, you can skip the rest of the connection parameters.
  

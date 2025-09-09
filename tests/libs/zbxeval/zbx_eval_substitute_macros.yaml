@@ -1,0 +1,95 @@
+---
+test case: 'macro replacement ZBX_EVAL_TOKEN_VAR_MACRO'
+in:
+  rules: [ZBX_EVAL_PARSE_MACRO]
+  expression: '{MACRO}'
+  macro: '{MACRO}'
+  macro_data: 'macro_data'
+out:
+  result: SUCCEED
+---
+test case: 'usermacro replacement ZBX_EVAL_TOKEN_VAR_STR'
+in:
+  rules: [ZBX_EVAL_PARSE_MACRO, ZBX_EVAL_PARSE_MATH,ZBX_EVAL_PARSE_FUNCTION,ZBX_EVAL_PARSE_GROUP,ZBX_EVAL_PARSE_VAR]
+  expression: 'min(1,"{$USER}")'
+  macro: '{$USER}'
+  macro_data: 'macro_data'
+out:
+  result: SUCCEED
+---
+test case: 'usermacro in ctx ZBX_EVAL_TOKEN_VAR_STR with ZBX_VARIANT_ERR'
+in:
+  rules: [ZBX_EVAL_PARSE_MACRO, ZBX_EVAL_PARSE_MATH,ZBX_EVAL_PARSE_FUNCTION,ZBX_EVAL_PARSE_GROUP,ZBX_EVAL_PARSE_VAR]
+  expression: 'min(1,"{$USER}")'
+  variant: "ERROR"
+  variant_data: "error"
+  macro: '{$USER}'
+  macro_data: 'macro_data'
+out:
+  result: FAIL
+---
+test case: 'usermacro in ctx ZBX_EVAL_TOKEN_VAR_STR with ZBX_VARIANT_UI64'
+in:
+  rules: [ZBX_EVAL_PARSE_MACRO, ZBX_EVAL_PARSE_MATH,ZBX_EVAL_PARSE_FUNCTION,ZBX_EVAL_PARSE_GROUP,ZBX_EVAL_PARSE_VAR]
+  expression: 'min(1,"{$MACRO}")'
+  variant: "UI64"
+  variant_data: "64"
+  macro: "{$MACRO}"
+  macro_data: 'macro_data'
+out:
+  result: SUCCEED
+---
+test case: 'usermacro in ctx ZBX_EVAL_TOKEN_ARG_PERIOD'
+in:
+  rules: [ZBX_EVAL_PARSE_ITEM_QUERY,ZBX_EVAL_PARSE_FUNCTION,ZBX_EVAL_PARSE_GROUP,ZBX_EVAL_PARSE_VAR,ZBX_EVAL_PARSE_MATH]
+  expression: 'min(/host/key,{$TIME})'
+  macro: '{$TIME}'
+  macro_data: 'macro_data'
+out:
+  result: SUCCEED
+---
+test case: 'ZBX_EVAL_TOKEN_ARG_PERIOD without macro'
+in:
+  rules: [ZBX_EVAL_PARSE_ITEM_QUERY,ZBX_EVAL_PARSE_FUNCTION,ZBX_EVAL_PARSE_GROUP,ZBX_EVAL_PARSE_VAR,ZBX_EVAL_PARSE_MATH]
+  expression: 'min(/host/key,1h)'
+  macro: '{$TIME}'
+  macro_data: 'macro_data'
+out:
+  result: SUCCEED
+---
+test case: 'usermacro in ctx ZBX_EVAL_TOKEN_VAR_NUM'
+in:
+  rules: [ZBX_EVAL_PARSE_ITEM_QUERY,ZBX_EVAL_PARSE_FUNCTION,ZBX_EVAL_PARSE_GROUP,ZBX_EVAL_PARSE_MATH,ZBX_EVAL_PARSE_VAR]
+  expression: 'count(//trap[1],#5,,0) + count(/Trapper/trap[1] ,5m ,"1h","1")'
+  macro: '{$NUM}'
+  macro_data: 'macro_data'
+out:
+  result: SUCCEED
+---
+test case: 'ZBX_EVAL_TOKEN_VAR_NUM without macro'
+in:
+  rules: [ZBX_EVAL_PARSE_ITEM_QUERY,ZBX_EVAL_PARSE_FUNCTION,ZBX_EVAL_PARSE_GROUP,ZBX_EVAL_PARSE_MATH,ZBX_EVAL_PARSE_VAR]
+  expression: 'count(//trap[1],#5,,{$NUM}) + count(/Trapper/trap[1] ,5m ,"1h","1")'
+  macro: '{$NUM}'
+  macro_data: 'macro_data'
+out:
+  result: SUCCEED
+---
+test case: 'usermacro in ctx ZBX_EVAL_TOKEN_ARG_QUERY'
+in:
+  rules: [ZBX_EVAL_PARSE_ITEM_QUERY,ZBX_EVAL_PARSE_FUNCTION,ZBX_EVAL_PARSE_GROUP]
+  expression: 'kurtosis(avg_foreach(/*/some.zabbix.key[{{$QUERY}}]?[group="{HOSTGROUPLLD}"],1d))'
+  macro: '{$QUERY}'
+  macro_data: 'macro_data'
+out:
+  result: SUCCEED
+---
+test case: 'ZBX_EVAL_TOKEN_ARG_QUERY without macro'
+in:
+  rules: [ZBX_EVAL_PARSE_ITEM_QUERY,ZBX_EVAL_PARSE_FUNCTION,ZBX_EVAL_PARSE_GROUP]
+  expression: 'kurtosis(avg_foreach(/*/some.zabbix.key[{$QUERY}]?[group="{HOSTGROUPLLD}"],1d))'
+  macro: '{$QUERY}'
+  macro_data: 'macro_data'
+out:
+  result: SUCCEED
+...

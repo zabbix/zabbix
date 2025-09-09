@@ -124,7 +124,7 @@ static int	substitute_macros_args(zbx_token_search_t search, char **data, char *
 			case ZBX_TOKEN_USER_FUNC_MACRO:
 				p.raw_value = 1;
 				/* user macros are not indexed */
-				if (NULL == (m_ptr = zbx_get_macro_from_func(*data, &p.token.data.func_macro, &p.index))
+				if (NULL == (m_ptr = zbx_get_macro_from_func(*data, &p.token.data.func_macro, NULL))
 						|| SUCCEED != zbx_token_find(*data, p.token.data.func_macro.macro.l,
 						&p.inner_token, p.token_search))
 				{
@@ -288,6 +288,21 @@ int	zbx_substitute_macros(char **data, char *error, size_t maxerrlen, zbx_macro_
 	va_start(args, resolver);
 
 	ret = substitute_macros_args(ZBX_TOKEN_SEARCH_BASIC, data, error, maxerrlen, resolver, args);
+
+	va_end(args);
+
+	return ret;
+}
+
+int	zbx_substitute_macros_ext_search(zbx_token_search_t search, char **data, char *error, size_t maxerrlen,
+		zbx_macro_resolv_func_t resolver, ...)
+{
+	int	ret;
+	va_list	args;
+
+	va_start(args, resolver);
+
+	ret = substitute_macros_args(search, data, error, maxerrlen, resolver, args);
 
 	va_end(args);
 

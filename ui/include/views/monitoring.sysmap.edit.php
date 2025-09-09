@@ -178,6 +178,7 @@ $map_tab
 	->addRow(null,
 		(new CTextArea('label_string_hostgroup', $data['sysmap']['label_string_hostgroup']))
 			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+			->setAttribute('maxlength', DB::getFieldLength('sysmaps', 'label_string_hostgroup'))
 			->disableSpellcheck()
 	);
 
@@ -193,6 +194,7 @@ $map_tab
 	->addRow(null,
 		(new CTextArea('label_string_host', $data['sysmap']['label_string_host']))
 			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+			->setAttribute('maxlength', DB::getFieldLength('sysmaps', 'label_string_host'))
 			->disableSpellcheck()
 	);
 
@@ -208,6 +210,7 @@ $map_tab
 	->addRow(null,
 		(new CTextArea('label_string_trigger', $data['sysmap']['label_string_trigger']))
 			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+			->setAttribute('maxlength', DB::getFieldLength('sysmaps', 'label_string_trigger'))
 			->disableSpellcheck()
 	);
 
@@ -223,6 +226,7 @@ $map_tab
 	->addRow(null,
 		(new CTextArea('label_string_map', $data['sysmap']['label_string_map']))
 			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+			->setAttribute('maxlength', DB::getFieldLength('sysmaps', 'label_string_map'))
 			->disableSpellcheck()
 	);
 
@@ -238,6 +242,7 @@ $map_tab
 	->addRow(null,
 		(new CTextArea('label_string_image', $data['sysmap']['label_string_image']))
 			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+			->setAttribute('maxlength', DB::getFieldLength('sysmaps', 'label_string_image'))
 			->disableSpellcheck()
 	);
 

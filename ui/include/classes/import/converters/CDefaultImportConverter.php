@@ -68,8 +68,6 @@ class CDefaultImportConverter extends CConverter {
 				}
 
 				if ($tag_rules['type'] & XML_IGNORE_TAG) {
-					unset($data[$tag]);
-
 					continue;
 				}
 
