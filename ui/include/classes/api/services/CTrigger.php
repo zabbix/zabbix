@@ -156,7 +156,7 @@ class CTrigger extends CTriggerGeneral {
 				' JOIN host_hgset hh1 ON i1.hostid=hh1.hostid'.
 				' LEFT JOIN permission p1 ON hh1.hgsetid=p1.hgsetid'.
 					' AND p1.ugsetid=p.ugsetid'.
-				' WHERE p1.hgsetid IS NULL'.
+				' WHERE p1.ugsetid IS NULL'.
 			')';
 		}
 
