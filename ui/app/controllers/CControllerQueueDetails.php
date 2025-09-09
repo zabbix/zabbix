@@ -75,7 +75,7 @@ class CControllerQueueDetails extends CController {
 				'preservekeys' => true
 			]);
 
-			$proxyids = array_flip(array_column($hosts, 'proxyid'));
+			$proxyids = array_flip(array_merge(array_column($hosts, 'proxyid'), array_column($hosts, 'assigned_proxyid')));
 			unset($proxyids[0]);
 
 			$proxies = $proxyids

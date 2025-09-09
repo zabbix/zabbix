@@ -55,17 +55,14 @@ foreach ($data['queue_data'] as $itemid => $item_queue_data) {
 	$host = reset($item['hosts']);
 	$item_host = $data['hosts'][$item['hostid']];
 
-	$proxy = null;
-
 	if (array_key_exists($item_host['proxyid'], $data['proxies'])) {
-		$proxy = $data['proxies'][$item_host['proxyid']];
+		$proxy_name = $data['proxies'][$item_host['proxyid']]['name'];
 	}
-	elseif ($item_host['proxy_groupid'] != 0) {
-		$proxy = $data['proxies'][$item_host['assigned_proxyid']];
+	elseif (array_key_exists($item_host['assigned_proxyid'], $data['proxies'])) {
+		$proxy_name = $data['proxies'][$item_host['assigned_proxyid']]['name'];
 	}
 	else {
-		$proxy =
-			(new CSpan(_('Proxy is not assigned yet.')))->addClass(ZBX_STYLE_GREY);
+		$proxy_name = (new CSpan(_('Proxy is not assigned yet.')))->addClass(ZBX_STYLE_GREY);
 	}
 
 	$table->addRow([
@@ -73,7 +70,7 @@ foreach ($data['queue_data'] as $itemid => $item_queue_data) {
 		zbx_date2age($item_queue_data['nextcheck']),
 		$host['name'],
 		$item['name'],
-		$proxy !== null ? $proxy['name'] : (new CSpan(_('Proxy is not assigned yet.')))->addClass(ZBX_STYLE_GREY)
+		$proxy_name
 	]);
 }
 
