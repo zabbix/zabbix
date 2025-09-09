@@ -46,7 +46,7 @@ static void	housekeep_service_problems(const zbx_vector_uint64_t *eventids)
 	zbx_free(data);
 }
 
-static int	housekeep_problems_events(zbx_vector_uint64_t *eventids)
+static int	housekeep_problems_events(const zbx_vector_uint64_t *eventids)
 {
 	char	*sql = NULL;
 	size_t	sql_alloc = 0, sql_offset = 0;
