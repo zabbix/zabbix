@@ -1043,7 +1043,9 @@ class CScreenProblem extends CScreenBase {
 				$header[] = $header_clock;
 			}
 
-			$table = (new CTableInfo())->setPageNavigation($paging);
+			$table = (new CTableInfo())
+				->setPageNavigation($paging)
+				->addClass($this->data['filter']['highlight_row'] == ZBX_HIGHLIGHT_ON ? 'has-highlighted-rows' : null);
 
 			// Create table.
 			if ($this->data['filter']['compact_view']) {

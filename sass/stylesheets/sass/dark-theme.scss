@@ -202,7 +202,8 @@ $toc-title-bg-color: #4f4f4f;
 		border-color: lighten($table-border-color, 3%);
 	}
 
-	&.compact-view {
+	&.compact-view,
+	&.has-highlighted-rows {
 		tr {
 			&:hover {
 				td {

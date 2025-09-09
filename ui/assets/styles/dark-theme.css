@@ -2437,13 +2437,14 @@ button {
   .list-table.compact-view td {
     padding-top: 2px;
     padding-bottom: 2px;
-    border-bottom: 0;
-    box-shadow: inset 0 -1px 0 0 rgba(242, 242, 242, 0.1);
     white-space: nowrap; }
     .list-table.compact-view td .rel-container span {
       margin: 0; }
     .list-table.compact-view td.nowrap {
       text-overflow: clip; }
+  .list-table.compact-view td, .list-table.has-highlighted-rows td {
+    border-bottom: 0;
+    box-shadow: inset 0 -1px 0 0 rgba(242, 242, 242, 0.1); }
   .list-table.no-data tbody tr td {
     height: auto;
     color: #737373;
@@ -2506,17 +2507,6 @@ button {
   @media screen and (min-width: 1600px) {
     .list-table thead th.column-tags-3 {
       width: 452px; } }
-.list-table .tags-wrapper {
-  width: 124px; }
-  @media screen and (min-width: 1200px) {
-    .list-table .tags-wrapper {
-      width: 186px; } }
-  @media screen and (min-width: 1400px) {
-    .list-table .tags-wrapper {
-      width: 248px; } }
-  @media screen and (min-width: 1600px) {
-    .list-table .tags-wrapper {
-      width: 310px; } }
 .list-table.compact-view .tag {
   max-width: 40px; }
   @media screen and (min-width: 1200px) {
@@ -2586,21 +2576,26 @@ button {
     font-size: 12px; }
 .list-table.compact-view .problem-nested:not([class*='flh-']):not(.row-selected) td,
 .list-table.compact-view .problem-nested:not([class*='flh-']):not(.row-selected) .timeline-axis,
-.list-table.compact-view .problem-nested:not([class*='flh-']):not(.row-selected) .timeline-td {
+.list-table.compact-view .problem-nested:not([class*='flh-']):not(.row-selected) .timeline-td, .list-table.has-highlighted-rows .problem-nested:not([class*='flh-']):not(.row-selected) td,
+.list-table.has-highlighted-rows .problem-nested:not([class*='flh-']):not(.row-selected) .timeline-axis,
+.list-table.has-highlighted-rows .problem-nested:not([class*='flh-']):not(.row-selected) .timeline-td {
   border-bottom-style: none; }
 .list-table.compact-view [class*='flh-']:not(.row-selected):not(:hover) a,
 .list-table.compact-view [class*='flh-']:not(.row-selected):not(:hover) td,
-.list-table.compact-view [class*='flh-']:not(.row-selected):not(:hover) sup {
+.list-table.compact-view [class*='flh-']:not(.row-selected):not(:hover) sup, .list-table.has-highlighted-rows [class*='flh-']:not(.row-selected):not(:hover) a,
+.list-table.has-highlighted-rows [class*='flh-']:not(.row-selected):not(:hover) td,
+.list-table.has-highlighted-rows [class*='flh-']:not(.row-selected):not(:hover) sup {
   color: #000000; }
-.list-table.compact-view [class*='flh-']:not(.row-selected):not(:hover) .link-alt {
+.list-table.compact-view [class*='flh-']:not(.row-selected):not(:hover) .link-alt, .list-table.has-highlighted-rows [class*='flh-']:not(.row-selected):not(:hover) .link-alt {
   border-bottom-color: #000000; }
-.list-table.compact-view [class*='flh-']:not(.row-selected):not(:hover) .tag {
+.list-table.compact-view [class*='flh-']:not(.row-selected):not(:hover) .tag, .list-table.has-highlighted-rows [class*='flh-']:not(.row-selected):not(:hover) .tag {
   color: #ffffff;
   background-color: #4f4f4f; }
 .list-table.compact-view [class*='flh-']:not(.row-selected):not(:hover) .btn-icon,
-.list-table.compact-view [class*='flh-']:not(.row-selected):not(:hover) .icon {
+.list-table.compact-view [class*='flh-']:not(.row-selected):not(:hover) .icon, .list-table.has-highlighted-rows [class*='flh-']:not(.row-selected):not(:hover) .btn-icon,
+.list-table.has-highlighted-rows [class*='flh-']:not(.row-selected):not(:hover) .icon {
   background-color: #2b2b2b; }
-.list-table.compact-view [class*='flh-']:not(.row-selected):not(:hover) .entity-count {
+.list-table.compact-view [class*='flh-']:not(.row-selected):not(:hover) .entity-count, .list-table.has-highlighted-rows [class*='flh-']:not(.row-selected):not(:hover) .entity-count {
   margin-top: 0;
   margin-bottom: 0;
   border: 1px solid #2b2b2b; }
@@ -6698,6 +6693,15 @@ z-select[disabled] .focusable, input[disabled], textarea[disabled], select optio
   display: flex;
   flex-wrap: wrap;
   gap: 2px 3px; }
+  @media screen and (min-width: 1200px) {
+    .tags-wrapper {
+      max-width: 266px; } }
+  @media screen and (min-width: 1400px) {
+    .tags-wrapper {
+      max-width: 359px; } }
+  @media screen and (min-width: 1600px) {
+    .tags-wrapper {
+      max-width: 452px; } }
 
 .tag {
   display: inline-block;
@@ -7778,11 +7782,11 @@ z-select.z-select-host-interface li[disabled] .description:not(:empty) {
 
 .list-table thead th {
   border-color: #404040; }
-.list-table.compact-view tr:hover td.na-bg, .list-table.compact-view tr:hover td.info-bg, .list-table.compact-view tr:hover td.warning-bg, .list-table.compact-view tr:hover td.average-bg, .list-table.compact-view tr:hover td.high-bg, .list-table.compact-view tr:hover td.disaster-bg {
+.list-table.compact-view tr:hover td.na-bg, .list-table.compact-view tr:hover td.info-bg, .list-table.compact-view tr:hover td.warning-bg, .list-table.compact-view tr:hover td.average-bg, .list-table.compact-view tr:hover td.high-bg, .list-table.compact-view tr:hover td.disaster-bg, .list-table.has-highlighted-rows tr:hover td.na-bg, .list-table.has-highlighted-rows tr:hover td.info-bg, .list-table.has-highlighted-rows tr:hover td.warning-bg, .list-table.has-highlighted-rows tr:hover td.average-bg, .list-table.has-highlighted-rows tr:hover td.high-bg, .list-table.has-highlighted-rows tr:hover td.disaster-bg {
   color: #000000; }
-.list-table.compact-view tr[class*='flh-'] td {
+.list-table.compact-view tr[class*='flh-'] td, .list-table.has-highlighted-rows tr[class*='flh-'] td {
   box-shadow: inset 0 -1px 0 0 rgba(0, 0, 0, 0.1); }
-.list-table.compact-view td.na-bg, .list-table.compact-view td.info-bg, .list-table.compact-view td.warning-bg, .list-table.compact-view td.average-bg, .list-table.compact-view td.high-bg, .list-table.compact-view td.disaster-bg {
+.list-table.compact-view td.na-bg, .list-table.compact-view td.info-bg, .list-table.compact-view td.warning-bg, .list-table.compact-view td.average-bg, .list-table.compact-view td.high-bg, .list-table.compact-view td.disaster-bg, .list-table.has-highlighted-rows td.na-bg, .list-table.has-highlighted-rows td.info-bg, .list-table.has-highlighted-rows td.warning-bg, .list-table.has-highlighted-rows td.average-bg, .list-table.has-highlighted-rows td.high-bg, .list-table.has-highlighted-rows td.disaster-bg {
   color: #000000;
   box-shadow: inset 0 -1px 0 0 rgba(0, 0, 0, 0.1); }
 .list-table.sticky-footer tfoot tr:first-of-type td {
