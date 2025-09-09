@@ -15,13 +15,7 @@
 #include "zbxdb.h"
 #include "dbconn.h"
 #include "zbxcommon.h"
-#include "zbxcfg.h"
-#include "zbxmutexs.h"
-#include "zbxshmem.h"
 #include "zbxalgo.h"
-#include "zbxdbschema.h"
-#include "zbxnum.h"
-#include "zbxstr.h"
 #include "zbxtypes.h"
 #include "zbxtime.h"
 
