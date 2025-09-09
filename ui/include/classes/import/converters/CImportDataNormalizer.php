@@ -88,6 +88,8 @@ class CImportDataNormalizer {
 				$tag_rules = $this->getResultRule($tag_rules, $data, $rules['rules']);
 
 				if ($tag_rules['type'] & XML_IGNORE_TAG) {
+					unset($data[$tag]);
+
 					continue;
 				}
 

@@ -669,14 +669,24 @@ class CControllerItemList extends CControllerItem {
 		$subfilters_input = [];
 
 		foreach ($schema as &$subfilter) {
-			$values = array_column($items_values, $subfilter['key']);
-			$values = array_reduce($values, 'array_merge', []);
+			$subfilter_key = $subfilter['key'];
+			$values = [];
 
-			if ($subfilter['selected']) {
-				$subfilters_input[$subfilter['key']] = array_keys($subfilter['selected']);
+			foreach ($items_values as $item_values) {
+				if (!array_key_exists($subfilter_key, $item_values)) {
+					continue;
+				}
+
+				foreach ($item_values[$subfilter_key] as $subfilter_value) {
+					$values[$subfilter_value] = 0;
+				}
 			}
 
-			$subfilter['values'] = array_fill_keys($values, 0);
+			if ($subfilter['selected']) {
+				$subfilters_input[$subfilter_key] = array_keys($subfilter['selected']);
+			}
+
+			$subfilter['values'] = $values;
 		}
 		unset($subfilter);
 

@@ -203,6 +203,7 @@ $host_tab
 				'object_name' => 'hostGroup',
 				'readonly' => $host_is_discovered,
 				'add_new' => (CWebUser::$data['type'] == USER_TYPE_SUPER_ADMIN),
+				'maxlength' => DB::getFieldLength('hstgrp', 'name'),
 				'data' => $data['groups_ms'],
 				'popup' => [
 					'parameters' => [
