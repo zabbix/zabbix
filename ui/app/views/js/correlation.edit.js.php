@@ -199,7 +199,6 @@ window.correlation_edit_popup = new class {
 
 		this.overlay.setProperties({title, buttons});
 		this.overlay.unsetLoading();
-		this.form.findFieldByName('name')._field.focus();
 	}
 
 	delete() {
