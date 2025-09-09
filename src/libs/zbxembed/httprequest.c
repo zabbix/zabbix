@@ -815,7 +815,7 @@ static duk_ret_t	es_httprequest_set_httpauth(duk_context *ctx)
 		goto out;
 	}
 
-	ZBX_CURL_SETOPT(ctx, request->handle, CURLOPT_HTTPAUTH, mask, err);
+	ZBX_CURL_SETOPT(ctx, request->handle, CURLOPT_HTTPAUTH, (long)mask, err);
 
 	if (NULL != username)
 		ZBX_CURL_SETOPT(ctx, request->handle, CURLOPT_USERNAME, username, err);
