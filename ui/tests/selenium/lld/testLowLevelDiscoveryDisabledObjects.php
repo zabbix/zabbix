@@ -408,7 +408,7 @@ class testLowLevelDiscoveryDisabledObjects extends CWebTest {
 					'url' => 'zabbix.php?action=graph.list&context=host&filter_set=1&filter_hostids%5B%5D='
 				]
 			],
-			// TODO: Uncomment the below case when ZBX-26644 if fixed.
+			// #4.
 			[
 				[
 					'object' => 'discovery rule',
