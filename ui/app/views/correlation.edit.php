@@ -372,7 +372,6 @@ $form_grid
 			(new CCheckBoxList())
 				->setAttribute('data-field-name', 'operations')
 				->setAttribute('data-field-type', 'array')
-				->setAttribute('data-error-container', 'operations-error-container')
 				->setOptions([
 					[
 						'label' => _('Close old events'),
@@ -390,10 +389,7 @@ $form_grid
 							$operation['type'] == ZBX_CORR_OPERATION_CLOSE_NEW
 						))
 					]
-				]),
-			(new CDiv())
-				->setId('operations-error-container')
-				->addClass(ZBX_STYLE_ERROR_CONTAINER)
+				])
 		])
 	])
 	->addItem([
