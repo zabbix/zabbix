@@ -730,7 +730,7 @@ class CFrontendSetup {
 			'current' => $current_version,
 			'required' => self::MIN_PHP_CURL_VERSION,
 			'result' => $enabled ? self::CHECK_OK : self::CHECK_WARNING,
-			'error' => _('PHP curl extension missing.')
+			'error' => _('PHP curl extension is missing or outdated.')
 		];
 	}
 }
