@@ -440,6 +440,7 @@ typedef struct
 	int		flags;
 	int		timestamp;
 	unsigned short	listen_port;
+	unsigned int	connection_type;
 }
 ZBX_DC_AUTOREG_HOST;
 
@@ -570,6 +571,7 @@ typedef struct
 	/* item statistics per interface */
 	int		items_num;
 	int		version;
+	zbx_uint64_t	revision;
 }
 ZBX_DC_INTERFACE;
 

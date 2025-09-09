@@ -772,7 +772,7 @@ class testUsersAuthenticationSaml extends testFormAuthentication {
 			$this->page->waitUntilReady();
 			$this->query('id:username')->one()->waitUntilVisible()->fill($data['username']);
 			$this->query('id:password')->one()->waitUntilVisible()->fill('zabbix');
-			$this->query('button:Login')-> one()->click();
+			$this->query('button:Login')-> one()->click()->waitUntilStalled();
 		}
 
 		$this->page->waitUntilReady();
@@ -789,6 +789,7 @@ class testUsersAuthenticationSaml extends testFormAuthentication {
 		// Make sure that it is possible to log out.
 		$this->query('link:Sign out')->one()->click();
 		$this->page->waitUntilReady();
+		$this->query('class:signin-logo')->waitUntilVisible()->one();
 		$this->assertStringContainsString('index.php', $this->page->getCurrentUrl());
 	}
 

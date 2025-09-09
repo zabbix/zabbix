@@ -180,7 +180,7 @@ class ZSelect extends HTMLElement {
 
 		li._index = this._options_map.size;
 		li.setAttribute('value', value);
-		li.setAttribute('title', label.trim());
+		li.setAttribute('title', label.trim().replace(/<[^>]*>/g, ''));
 		li.innerHTML = new Template(template || this._option_template).evaluate(
 			Object.assign({label: label.trim()}, extra || {})
 		);
