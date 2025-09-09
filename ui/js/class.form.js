@@ -174,8 +174,8 @@ class CForm {
 
 				if (i === key_parts.length - 1) {
 					if (typeof field.getExtraFields === 'function') {
-						for (const [extra_key, values] of Object.entries(field.getExtraFields())) {
-							if (values !== null) {
+						if (field.isEnabled()) {
+							for (const [extra_key, values] of Object.entries(field.getExtraFields())) {
 								key_fields[extra_key] = values;
 							}
 						}
@@ -203,6 +203,7 @@ class CForm {
 	}
 
 	validateChanges(fields, force_display_errors = false) {
+		console.log('validateChanges');
 		// Let form finish its transformations before doing validation.
 		this.#validate_changes_call = () => {
 			if (!this.#form_ready) {

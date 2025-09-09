@@ -82,7 +82,7 @@ class CFieldMultiselect extends CField {
 				[this.getName()]: return_id ? null : []
 			};
 
-		if ($(this._field).multiSelect('getOption', 'disabled') === false) {
+		if (this.isEnabled()) {
 			$(this._field).multiSelect('getData').forEach((value) => {
 				const field_name = value.isNew ? this.getName() + '_new' : this.getName();
 
@@ -96,6 +96,10 @@ class CFieldMultiselect extends CField {
 		}
 
 		return values;
+	}
+
+	isEnabled () {
+		return $(this._field).multiSelect('getOption', 'disabled') === false;
 	}
 
 	_appendErrorHint(error_hint) {
