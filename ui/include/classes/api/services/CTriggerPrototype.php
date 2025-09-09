@@ -128,7 +128,7 @@ class CTriggerPrototype extends CTriggerGeneral {
 				' LEFT JOIN permission p1 ON hh1.hgsetid=p1.hgsetid'.
 					' AND p1.ugsetid=p.ugsetid'.
 				' WHERE t.triggerid=f1.triggerid'.
-					' AND p1.ugsetid IS NULL'.
+					' AND p1.hgsetid IS NULL'.
 			')';
 		}
 

@@ -244,7 +244,7 @@ class CEvent extends CApiService {
 					' JOIN host_hgset hh1 ON i1.hostid=hh1.hostid'.
 					' LEFT JOIN permission p1 ON p1.hgsetid=hh1.hgsetid'.
 						' AND p1.ugsetid=p.ugsetid'.
-					' WHERE p1.ugsetid IS NULL'.
+					' WHERE p1.hgsetid IS NULL'.
 				')';
 
 				if ($options['source'] == EVENT_SOURCE_TRIGGERS) {
