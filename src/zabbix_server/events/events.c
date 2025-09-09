@@ -2865,6 +2865,7 @@ static void	process_trigger_events(const zbx_vector_ptr_t *trigger_events,
 			continue;
 
 		/* attempt to recover problem events/triggers */
+		event->flags = ZBX_FLAGS_DB_EVENT_UNSET;
 
 		if (ZBX_TRIGGER_CORRELATION_NONE == event->trigger.correlation_mode)
 		{
@@ -2879,6 +2880,7 @@ static void	process_trigger_events(const zbx_vector_ptr_t *trigger_events,
 				{
 					recover_event(problem->eventid, EVENT_SOURCE_TRIGGERS, EVENT_OBJECT_TRIGGER,
 							event->objectid);
+					event->flags = ZBX_FLAGS_DB_EVENT_CREATE;
 				}
 			}
 
@@ -2893,7 +2895,6 @@ static void	process_trigger_events(const zbx_vector_ptr_t *trigger_events,
 			/* problem events were recovered.                                  */
 
 			value = TRIGGER_VALUE_OK;
-			event->flags = ZBX_FLAGS_DB_EVENT_UNSET;
 
 			for (j = 0; j < problems.values_num; j++)
 			{
@@ -2910,7 +2911,6 @@ static void	process_trigger_events(const zbx_vector_ptr_t *trigger_events,
 					}
 					else
 						value = TRIGGER_VALUE_PROBLEM;
-
 				}
 			}
 
