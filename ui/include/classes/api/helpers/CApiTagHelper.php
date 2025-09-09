@@ -66,8 +66,8 @@ class CApiTagHelper {
 							case 'host_tag':
 								$where[] = $prefix.' ('.
 									'SELECT NULL'.
-									' FROM host_template_cache htc'.
-									' JOIN host_tag tag ON htc.link_hostid=tag.hostid'.
+									' FROM host_tag tag'.
+									' JOIN host_template_cache htc ON tag.hostid=htc.link_hostid'.
 									' WHERE h.hostid=htc.hostid'.
 										' AND '.$tag_conditions.
 								')';
@@ -83,9 +83,10 @@ class CApiTagHelper {
 									')'.
 									($prefix === 'EXISTS' ? ' OR ' : ' AND ').$prefix.' ('.
 										'SELECT NULL'.
-										' FROM httptest_template_cache htc'.
-										' JOIN host_tag tag ON htc.link_hostid=tag.hostid'.
-										' WHERE ht.httptestid=htc.httptestid'.
+										' FROM host_tag tag'.
+										' JOIN item_template_cache itc ON tag.hostid=itc.link_hostid'.
+										' JOIN httptestitem hi ON itc.itemid=hi.itemid'.
+										' WHERE ht.httptestid=hi.httptestid'.
 											' AND '.$tag_conditions.
 									')'.
 								')';
@@ -101,8 +102,8 @@ class CApiTagHelper {
 									')'.
 									($prefix === 'EXISTS' ? ' OR ' : ' AND ').$prefix.' ('.
 										'SELECT NULL'.
-										' FROM item_template_cache itc'.
-										' JOIN host_tag tag ON itc.link_hostid=tag.hostid'.
+										' FROM host_tag tag'.
+										' JOIN item_template_cache itc ON tag.hostid=itc.link_hostid'.
 										' WHERE i.itemid=itc.itemid'.
 											' AND '.$tag_conditions.
 									')'.
@@ -125,8 +126,8 @@ class CApiTagHelper {
 									')'.
 									($prefix === 'EXISTS' ? ' OR ' : ' AND ').$prefix.' ('.
 										'SELECT NULL'.
-										' FROM item_template_cache itc'.
-										' JOIN host_tag tag ON itc.link_hostid=tag.hostid'.
+										' FROM host_tag tag'.
+										' JOIN item_template_cache itc ON tag.hostid=itc.link_hostid'.
 										' WHERE f.itemid=itc.itemid'.
 											' AND '.$tag_conditions.
 									')'.

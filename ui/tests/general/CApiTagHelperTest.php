@@ -40,8 +40,8 @@ class CApiTagHelperTest extends CTest {
 
 		$select_host_tags_where =
 			'SELECT NULL'.
-			' FROM host_template_cache htc'.
-			' JOIN host_tag tag ON htc.link_hostid=tag.hostid'.
+			' FROM host_tag tag'.
+			' JOIN host_template_cache htc ON tag.hostid=htc.link_hostid'.
 			' WHERE h.hostid=htc.hostid';
 
 		$select_httptest_tags_where =
@@ -50,9 +50,10 @@ class CApiTagHelperTest extends CTest {
 			' WHERE ht.httptestid=tag.httptestid';
 		$select_httptest_host_tags_where =
 			'SELECT NULL'.
-			' FROM httptest_template_cache htc'.
-			' JOIN host_tag tag ON htc.link_hostid=tag.hostid'.
-			' WHERE ht.httptestid=htc.httptestid';
+			' FROM host_tag tag'.
+			' JOIN item_template_cache itc ON tag.hostid=itc.link_hostid'.
+			' JOIN httptestitem hi ON itc.itemid=hi.itemid'.
+			' WHERE ht.httptestid=hi.httptestid';
 
 		$select_item_tags_where =
 			'SELECT NULL'.
@@ -60,8 +61,8 @@ class CApiTagHelperTest extends CTest {
 			' WHERE i.itemid=tag.itemid';
 		$select_item_host_tags_where =
 			'SELECT NULL'.
-			' FROM item_template_cache itc'.
-			' JOIN host_tag tag ON itc.link_hostid=tag.hostid'.
+			' FROM host_tag tag'.
+			' JOIN item_template_cache itc ON tag.hostid=itc.link_hostid'.
 			' WHERE i.itemid=itc.itemid';
 
 		$select_trigger_tags_where =
@@ -74,8 +75,8 @@ class CApiTagHelperTest extends CTest {
 			' WHERE f.itemid=tag.itemid';
 		$select_trigger_host_tags_where =
 			'SELECT NULL'.
-			' FROM item_template_cache itc'.
-			' JOIN host_tag tag ON itc.link_hostid=tag.hostid'.
+			' FROM host_tag tag'.
+			' JOIN item_template_cache itc ON tag.hostid=itc.link_hostid'.
 			' WHERE f.itemid=itc.itemid';
 
 		return [

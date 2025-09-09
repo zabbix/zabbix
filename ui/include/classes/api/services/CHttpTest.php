@@ -273,13 +273,13 @@ class CHttpTest extends CApiService {
 		}
 		unset($httptest);
 
-		$output = ['htc.httptestid'];
+		$output = ['hi.httptestid'];
 
 		foreach ($options['selectInheritedTags'] as $field) {
 			$output[] = match ($field) {
 				'tag', 'value' => 'ht.'.$field,
 				'object' => ZBX_TAG_OBJECT_TEMPLATE.' AS '.$field,
-				'objectid' => 'htc.link_hostid AS '.$field
+				'objectid' => 'itc.link_hostid AS '.$field
 			};
 		}
 
@@ -288,10 +288,11 @@ class CHttpTest extends CApiService {
 
 			$resource = DBselect(
 				'SELECT '.implode(',', $output).
-				' FROM httptest_template_cache htc'.
-				' JOIN host_tag ht ON htc.link_hostid=ht.hostid'.
-				' JOIN hosts h ON htc.link_hostid=h.hostid'.
-				' WHERE '.dbConditionId('htc.httptestid', array_keys($httptests))
+				' FROM host_tag ht'.
+				' JOIN item_template_cache itc ON ht.hostid=itc.link_hostid'.
+				' JOIN httptestitem hi ON itc.itemid=hi.itemid'.
+				' JOIN hosts h ON itc.link_hostid=h.hostid'.
+				' WHERE '.dbConditionId('hi.httptestid', array_keys($httptests))
 			);
 
 			while ($row = DBfetch($resource)) {
@@ -306,9 +307,10 @@ class CHttpTest extends CApiService {
 		else {
 			$resource = DBselect(
 				'SELECT '.implode(',', $output).
-				' FROM httptest_template_cache htc'.
-				' JOIN host_tag ht ON htc.link_hostid=ht.hostid'.
-				' WHERE '.dbConditionId('htc.httptestid', array_keys($httptests))
+				' FROM host_tag ht'.
+				' JOIN item_template_cache itc ON ht.hostid=itc.link_hostid'.
+				' JOIN httptestitem hi ON itc.itemid=hi.itemid'.
+				' WHERE '.dbConditionId('hi.httptestid', array_keys($httptests))
 			);
 
 			while ($row = DBfetch($resource)) {
