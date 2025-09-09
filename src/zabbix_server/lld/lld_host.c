@@ -5803,9 +5803,9 @@ static int	lld_interface_validate_fields(const zbx_lld_interface_t *interface, c
 				"Invalid IP Address.\n",
 				op, zbx_interface_type_string(interface->type_orig),
 				hostname);
-		}
 
-		return FAIL;
+			return FAIL;
+		}
 	}
 
 	return SUCCEED;
