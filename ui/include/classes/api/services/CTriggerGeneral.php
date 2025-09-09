@@ -612,8 +612,12 @@ abstract class CTriggerGeneral extends CApiService {
 			]]
 		]];
 
-		if (!CApiInputValidator::validate($api_input_rules, $triggers, '/', $error)) {
-			self::exception(ZBX_API_ERROR_PARAMETERS, $error);
+		foreach ($triggers as $trigger) {
+			if (array_key_exists('uuid', $trigger)) {
+				if (!CApiInputValidator::validate($api_input_rules, $trigger, '/', $error)) {
+					self::exception(ZBX_API_ERROR_PARAMETERS, $error);
+				}
+			}
 		}
 	}
 
@@ -1207,8 +1211,7 @@ abstract class CTriggerGeneral extends CApiService {
 				|| $trigger['recovery_expression'] !== $db_trigger['recovery_expression']
 				|| $trigger['description'] !== $db_trigger['description'];
 
-			if ($name_updated || array_key_exists('uuid', $trigger)
-					|| !array_key_exists('host_status', $trigger)) {
+			if ($name_updated || array_key_exists('uuid', $trigger)) {
 				$descriptions[$trigger['description']][] = [
 					'index' => $index,
 					'expression' => $trigger['expression'],
