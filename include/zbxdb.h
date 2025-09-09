@@ -542,9 +542,13 @@ void	zbx_db_large_query_append_sql(zbx_db_large_query_t *query, const char *sql)
 #define ZBX_SETTING_TYPE_MAX			7
 
 #define DBPOOL_MINIMUM_MAX_IDLE	0
+#define DBPOOL_MAXIMUM_MAX_IDLE	10000
+
 #define DBPOOL_MINIMUM_MAX_OPEN	1
+#define DBPOOL_MAXIMUM_MAX_OPEN	10000
 
 #define DBPOOL_MINIMUM_IDLE_TIMEOUT	SEC_PER_MIN
 #define DBPOOL_MAXIMUM_IDLE_TIMEOUT	SEC_PER_DAY
 
 #endif
+
