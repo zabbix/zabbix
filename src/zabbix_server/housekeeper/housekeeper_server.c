@@ -1004,6 +1004,30 @@ static int	hk_table_cleanup(const char *table, const char *field, zbx_uint64_t f
 	return ZBX_DB_OK <= ret ? ret : 0;
 }
 
+static int	housekeep_events_by_triggerid(zbx_uint64_t triggerid, int config_max_hk_delete, int *more)
+{
+	char	query[MAX_STRING_LEN];
+	int	deleted = 0;
+
+	if (SUCCEED == zbx_dc_config_trigger_exists(triggerid))
+	{
+		*more = 1;
+		return 0;
+	}
+
+	zbx_snprintf(query, sizeof(query), "select eventid"
+			" from events"
+			" where source=%d"
+				" and object=%d"
+				" and objectid=" ZBX_FS_UI64 " order by eventid",
+			EVENT_SOURCE_TRIGGERS, EVENT_OBJECT_TRIGGER, triggerid);
+			
+	deleted = zbx_housekeep_problems_events(query, config_max_hk_delete, more);
+
+	return deleted;
+}
+
+
 /******************************************************************************
  *                                                                            *
  * Purpose: remove deleted items/triggers data                                *
@@ -1072,22 +1096,11 @@ static int	housekeeping_cleanup(int config_max_hk_delete)
 
 			if (0 == strcmp(row[2], "triggerid"))
 			{
-				char	query[MAX_STRING_LEN];
-
 				deleted += hk_problem_cleanup(table_name, EVENT_SOURCE_INTERNAL, EVENT_OBJECT_TRIGGER,
 						objectid, config_max_hk_delete, &more);
 
-				if (ZBX_HK_OPTION_ENABLED == cfg.hk.events_mode)
-				{
-					zbx_snprintf(query, sizeof(query), "select eventid"
-							" from events"
-							" where source=%d"
-								" and object=%d"
-								" and objectid=" ZBX_FS_UI64 " order by eventid",
-							EVENT_SOURCE_TRIGGERS, EVENT_OBJECT_TRIGGER, objectid);
-
-					deleted += zbx_housekeep_problems_events(query, config_max_hk_delete, &more);
-				}
+				if (ZBX_HK_OPTION_ENABLED == cfg.hk.events_mode)	
+					deleted += housekeep_events_by_triggerid(objectid, config_max_hk_delete, &more);
 			}
 			else if (0 == strcmp(row[2], "itemid"))
 			{
