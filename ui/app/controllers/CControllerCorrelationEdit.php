@@ -64,6 +64,12 @@ class CControllerCorrelationEdit extends CController {
 
 			$this->correlation = $correlations[0];
 		}
+		else {
+			$this->correlation = [
+				'correlationid' => null, 'operations' => [],
+				'filter' => ['formula' => '', 'conditions' => [], 'evaltype' => CONDITION_EVAL_TYPE_AND_OR]
+			];
+		}
 
 		return true;
 	}
@@ -71,7 +77,7 @@ class CControllerCorrelationEdit extends CController {
 	protected function doAction(): void {
 		$correlation = $this->correlation + DB::getDefaults('correlation');
 
-		$js_validation_rules = array_key_exists('correlationid', $correlation) && $correlation['correlationid']
+		$js_validation_rules = $correlation['correlationid']
 			? CControllerCorrelationUpdate::getValidationRules()
 			: CControllerCorrelationCreate::getValidationRules();
 
