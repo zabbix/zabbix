@@ -1021,7 +1021,7 @@ static int	housekeep_events_by_triggerid(zbx_uint64_t triggerid, int config_max_
 				" and object=%d"
 				" and objectid=" ZBX_FS_UI64 " order by eventid",
 			EVENT_SOURCE_TRIGGERS, EVENT_OBJECT_TRIGGER, triggerid);
-			
+
 	deleted = zbx_housekeep_problems_events(query, config_max_hk_delete, more);
 
 	return deleted;
@@ -1099,7 +1099,7 @@ static int	housekeeping_cleanup(int config_max_hk_delete)
 				deleted += hk_problem_cleanup(table_name, EVENT_SOURCE_INTERNAL, EVENT_OBJECT_TRIGGER,
 						objectid, config_max_hk_delete, &more);
 
-				if (ZBX_HK_OPTION_ENABLED == cfg.hk.events_mode)	
+				if (ZBX_HK_OPTION_ENABLED == cfg.hk.events_mode)
 					deleted += housekeep_events_by_triggerid(objectid, config_max_hk_delete, &more);
 			}
 			else if (0 == strcmp(row[2], "itemid"))
