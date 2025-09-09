@@ -25,17 +25,17 @@ The Zabbix Agent's configuration file is used to configure plugins.
 *Default value:* equals the global Timeout configuration parameter.  
 *Limits:* 1-30
 
-**Plugins.Mysql.Sessions.TLSConnect** — Encryption type for the MySQL connection.  
+**Plugins.Redis.Sessions.TLSConnect** — Encryption type for the Redis connection.  
 *Default value:*  
 *Limits:* `required`, `verify_ca`, `verify_full`
 
-**Plugins.Mysql.Sessions.TLSCAFile** — Full pathname of a file containing the top-level CA certificates for MySQL.  
+**Plugins.Redis.Sessions.TLSCAFile** — Full pathname of a file containing the top-level CA certificates for Redis.  
 *Default value:*
 
-**Plugins.Mysql.Sessions.TLSCertFile** — Full pathname of a file containing the MySQL certificate or certificate chain.  
+**Plugins.Redis.Sessions.TLSCertFile** — Full pathname of a file containing the Redis certificate or certificate chain.  
 *Default value:*
 
-**Plugins.Mysql.Sessions.TLSKeyFile** — Full pathname of a file containing the MySQL private key.  
+**Plugins.Redis.Sessions.TLSKeyFile** — Full pathname of a file containing the Redis private key.  
 *Default value:*
 
 ### Configuring connection
