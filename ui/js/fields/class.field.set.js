@@ -22,20 +22,6 @@ class CFieldSet extends CField {
 	 */
 	#fields = {};
 
-	/**
-	 * On frequent MutationObserver delay changed field discovery.
-	 *
-	 * @type {Number|Null}
-	 */
-	#discover_debounce = null;
-
-	/**
-	 * On frequent MutationObserver delay "field.change" event.
-	 *
-	 * @type {Number|Null}
-	 */
-	#blur_debounce = null;
-
 	init() {
 		super.init();
 
@@ -65,21 +51,11 @@ class CFieldSet extends CField {
 			}
 
 			if (node_change) {
-				clearTimeout(this.#discover_debounce);
-				clearTimeout(this.#blur_debounce);
-
-				this.#discover_debounce = setTimeout(() => {
-					this.#discover_debounce = null;
-					this.#discoverAllFields();
-					this.onBlur();
-				}, 50);
+				this.#discoverAllFields();
 			}
 
-			if (attribute_change && this.#discover_debounce === null) {
-				clearTimeout(this.#blur_debounce);
-				this.#blur_debounce = setTimeout(() => {
-					this.onBlur();
-				}, 50);
+			if (node_change || attribute_change) {
+				this.onBlur();
 			}
 		});
 
