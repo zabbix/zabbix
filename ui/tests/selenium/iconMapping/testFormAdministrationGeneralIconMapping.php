@@ -129,7 +129,7 @@ class testFormAdministrationGeneralIconMapping extends CLegacyWebTest {
 					],
 					'error' => [
 						'Global regular expression "" does not exist.'
-					]	
+					]
 				]
 			],
 			[
