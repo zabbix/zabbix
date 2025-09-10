@@ -613,10 +613,14 @@ abstract class CTriggerGeneral extends CApiService {
 		]];
 
 		foreach ($triggers as $trigger) {
-			if (array_key_exists('uuid', $trigger)) {
-				if (!CApiInputValidator::validate($api_input_rules, $trigger, '/', $error)) {
-					self::exception(ZBX_API_ERROR_PARAMETERS, $error);
-				}
+			if (!array_key_exists('uuid', $trigger)) {
+				continue;
+			}
+
+			$trigger_uuid = [$trigger];
+
+			if (!CApiInputValidator::validate($api_input_rules, $trigger_uuid, '/', $error)) {
+				self::exception(ZBX_API_ERROR_PARAMETERS, $error);
 			}
 		}
 	}
