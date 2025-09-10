@@ -407,9 +407,9 @@ class HostPrototypeMacrosTabIndicatorItem extends TabIndicatorItem {
 			.filter((row) => {
 				const macro = row.querySelector('textarea[name$="[macro]"]');
 				const inherited_type = row.querySelector('input[name$="[inherited_type]"]');
-				const inherited = HostPrototypeMacrosTabIndicatorItem.ZBX_PROPERTY_INHERITED;
 
-				if (inherited_type !== null && parseInt(inherited_type.value, 10) == inherited) {
+				if (inherited_type !== null
+						&& parseInt(inherited_type.value, 10) == HostMacrosTabIndicatorItem.ZBX_PROPERTY_INHERITED) {
 					return false;
 				}
 
@@ -449,9 +449,9 @@ class TemplateMacrosTabIndicatorItem extends TabIndicatorItem {
 			.filter((row) => {
 				const macro = row.querySelector('textarea[name$="[macro]"]');
 				const inherited_type = row.querySelector('input[name$="[inherited_type]"]');
-				const inherited = TemplateMacrosTabIndicatorItem.ZBX_PROPERTY_INHERITED;
 
-				if (inherited_type !== null && parseInt(inherited_type.value, 10) == inherited) {
+				if (inherited_type !== null
+						&& parseInt(inherited_type.value, 10) == HostMacrosTabIndicatorItem.ZBX_PROPERTY_INHERITED) {
 					return false;
 				}
 
