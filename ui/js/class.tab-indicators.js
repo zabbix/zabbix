@@ -361,13 +361,13 @@ class HostMacrosTabIndicatorItem extends TabIndicatorItem {
 	}
 
 	getValue() {
-		return [...document.querySelectorAll(this.getElement().getAttribute('href') + ' #tbl_macros .form_row')]
+		return [...document.querySelectorAll('#tbl_macros .form_row')]
 			.filter((row) => {
 				const macro = row.querySelector('textarea[name$="[macro]"]');
 				const inherited_type = row.querySelector('input[name$="[inherited_type]"]');
-				const inherited = HostMacrosTabIndicatorItem.ZBX_PROPERTY_INHERITED;
 
-				if (inherited_type !== null && parseInt(inherited_type.value, 10) == inherited) {
+				if (inherited_type !== null
+						&& parseInt(inherited_type.value, 10) == HostMacrosTabIndicatorItem.ZBX_PROPERTY_INHERITED) {
 					return false;
 				}
 
