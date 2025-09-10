@@ -1,0 +1,26 @@
+---
+test case: "default usage"
+in:
+  poll_mode: "no error"
+  len: 100
+  socket_blocking_error: "No"
+out:
+  result: 100
+---
+test case: "write error"
+in:
+  poll_mode: "no error"
+  len: 0
+  write_error: yes
+  socket_blocking_error: "yes"
+out:
+  result: -1
+---
+test case: "revents error"
+in:
+  poll_mode: "revents error"
+  len: 0
+  write_error: yes
+  socket_blocking_error: "no"
+out:
+  result: -1

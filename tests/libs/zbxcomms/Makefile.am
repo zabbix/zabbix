@@ -13,15 +13,34 @@ COMMS_tests = zbx_validate_peer_list \
 	zbx_gethost_by_ip \
 	zbx_getip_by_host \
 	zbx_tcp_listen \
-	zbx_udp_send
+	zbx_udp_send \
+	zbx_tcp_recv_line \
+	zbx_socket_pollout \
+	zbx_tcp_write \
+	zbx_tcp_send_context \
+	zbx_tcp_accept
 
 COMMON_SRC_FILES = \
 	../../zbxmocktest.h
 
 COMMS_LIBS = \
-	$(COMMS_DEPS) \
+	$(top_srcdir)/src/libs/zbxcomms/libzbxcomms.a \
+	$(top_srcdir)/src/libs/zbxcommon/libzbxcommon.a \
+	$(top_srcdir)/src/libs/zbxlog/libzbxlog.a \
+	$(top_srcdir)/src/libs/zbxmutexs/libzbxmutexs.a \
+	$(top_srcdir)/src/libs/zbxprof/libzbxprof.a \
+	$(top_srcdir)/src/libs/zbxalgo/libzbxalgo.a \
+	$(top_srcdir)/src/libs/zbxip/libzbxip.a \
+	$(top_srcdir)/src/libs/zbxtime/libzbxtime.a \
+	$(CRYPTO_DEPS) \
+	$(top_srcdir)/src/libs/zbxcompress/libzbxcompress.a \
+	$(top_srcdir)/src/libs/zbxthreads/libzbxthreads.a \
+	$(top_srcdir)/src/libs/zbxnum/libzbxnum.a \
 	$(MOCK_DATA_DEPS) \
-	$(MOCK_TEST_DEPS)
+	$(top_srcdir)/tests/libzbxmocktest.a \
+	$(top_srcdir)/src/libs/zbxnix/libzbxnix.a \
+	$(top_srcdir)/tests/libzbxmockdata.a
+
 
 COMMS_COMPILER_FLAGS = -DZABBIX_DAEMON -I@top_srcdir@/tests $(CMOCKA_CFLAGS) $(YAML_CFLAGS)
 
@@ -143,9 +162,98 @@ zbx_udp_send_LDADD = \
 
 zbx_udp_send_LDADD += @AGENT_LIBS@
 
-zbx_udp_send_LDFLAGS = @AGENT_LDFLAGS@ $(CMOCKA_LDFLAGS) $(YAML_LDFLAGS)
+zbx_udp_send_LDFLAGS = @AGENT_LDFLAGS@ \
+	-Wl,--wrap=sendto \
+	$(CMOCKA_LDFLAGS) $(YAML_LDFLAGS)
 
 zbx_udp_send_CFLAGS = $(COMMS_COMPILER_FLAGS)
+
+#zbx_tcp_recv_line
+
+zbx_tcp_recv_line_SOURCES = \
+	zbx_tcp_recv_line.c \
+	$(COMMON_SRC_FILES)
+
+zbx_tcp_recv_line_LDADD = \
+	$(COMMS_LIBS)
+
+zbx_tcp_recv_line_LDADD += @AGENT_LIBS@
+
+zbx_tcp_recv_line_LDFLAGS = @AGENT_LDFLAGS@ $(CMOCKA_LDFLAGS) $(YAML_LDFLAGS)
+
+zbx_tcp_recv_line_CFLAGS = $(COMMS_COMPILER_FLAGS)
+
+#zbx_socket_pollout
+
+zbx_socket_pollout_SOURCES = \
+	zbx_socket_pollout.c \
+	zbx_comms_common.c \
+	$(COMMON_SRC_FILES)
+
+zbx_socket_pollout_LDADD = \
+	$(COMMS_LIBS)
+
+zbx_socket_pollout_LDADD += @AGENT_LIBS@
+
+zbx_socket_pollout_LDFLAGS = @AGENT_LDFLAGS@ \
+	$(CMOCKA_LDFLAGS) $(YAML_LDFLAGS) \
+	-Wl,--wrap=zbx_ts_check_deadline
+
+zbx_socket_pollout_CFLAGS = $(COMMS_COMPILER_FLAGS)
+
+#zbx_tcp_write
+
+zbx_tcp_write_SOURCES = \
+	zbx_tcp_write.c \
+	$(COMMON_SRC_FILES)
+
+zbx_tcp_write_LDADD = \
+	$(COMMS_LIBS)
+
+zbx_tcp_write_LDADD += @AGENT_LIBS@
+
+zbx_tcp_write_LDFLAGS = @AGENT_LDFLAGS@ \
+	$(CMOCKA_LDFLAGS) $(YAML_LDFLAGS) \
+	-Wl,--wrap=SSL_write \
+	-Wl,--wrap=write
+
+zbx_tcp_write_CFLAGS = $(COMMS_COMPILER_FLAGS)
+
+#zbx_tcp_send_context
+
+zbx_tcp_send_context_SOURCES = \
+	zbx_tcp_send_context.c \
+	$(COMMON_SRC_FILES)
+
+zbx_tcp_send_context_LDADD = \
+	$(COMMS_LIBS)
+
+zbx_tcp_send_context_LDADD += @AGENT_LIBS@
+
+zbx_tcp_send_context_LDFLAGS = @AGENT_LDFLAGS@ $(CMOCKA_LDFLAGS) $(YAML_LDFLAGS)
+
+zbx_tcp_send_context_CFLAGS = $(COMMS_COMPILER_FLAGS)
+
+#zbx_tcp_accept
+
+zbx_tcp_accept_SOURCES = \
+	zbx_tcp_accept.c \
+	zbx_comms_common.c \
+	$(COMMON_SRC_FILES)
+
+zbx_tcp_accept_LDADD = \
+	$(COMMS_LIBS)
+
+zbx_tcp_accept_LDADD += @AGENT_LIBS@
+
+zbx_tcp_accept_LDFLAGS = @AGENT_LDFLAGS@ \
+	$(CMOCKA_LDFLAGS) $(YAML_LDFLAGS) \
+	-Wl,--wrap=accept \
+	-Wl,--wrap=fcntl \
+	-Wl,--wrap=getpeername \
+	-Wl,--wrap=recv
+
+zbx_tcp_accept_CFLAGS = $(COMMS_COMPILER_FLAGS)
 
 if IPV6
 zbx_tcp_check_allowed_peers_SOURCES = \

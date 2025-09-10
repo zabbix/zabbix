@@ -470,7 +470,7 @@ int	zbx_socket_pollout(zbx_socket_t *s, int timeout, char **error)
 	pd.events = POLLOUT;
 
 	while (0 >= (rc = zbx_socket_poll(&pd, 1, timeout)))
-	{
+	{	printf("ERRNO: %d\n", errno);
 		if (-1 == rc && SUCCEED != zbx_socket_had_nonblocking_error())
 		{
 			if (NULL != error)
@@ -1121,7 +1121,7 @@ static int	socket_set_nonblocking(ZBX_SOCKET s)
  * Purpose: check if the last socket error was because of non-blocking socket *
  *                                                                            *
  ******************************************************************************/
-int	zbx_socket_had_nonblocking_error(void)
+int	__zbx_attr_weak zbx_socket_had_nonblocking_error(void)
 {
 #ifndef _WINDOWS
 	switch (errno)

@@ -73,5 +73,8 @@ zbx_mock_error_t	zbx_timespec_to_strtime(const zbx_timespec_t *ts, char *buffer,
 
 /* miscelanious functions */
 void	zbx_set_fopen_mock_callback(FILE *(*fopen_callback)(const char *, const char *));
+void	mock_poll_set_mode_from_param(const char *param);
+void	zbx_mock_set_fragments(const char *data, size_t size);
+
 
 #endif	/* ZABBIX_MOCK_DATA_H */

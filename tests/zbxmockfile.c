@@ -66,6 +66,7 @@ int	__real_fstat(int __fildes, struct stat *__stat_buf);
 #ifdef HAVE_FXSTAT
 int	__real___fxstat(int __ver, int __fildes, struct stat *__stat_buf);
 #endif
+void	zbx_mock_set_fragments(const char *data, size_t size);
 
 static int	is_profiler_path(const char *path)
 {
@@ -197,14 +198,45 @@ int	__wrap_connect(int socket, void *addr, socklen_t address_len)
 	return 0;
 }
 
+#define MOCK_POLL_DEFAULT        0
+#define MOCK_POLL_TIMEOUT        1
+#define MOCK_POLL_ERROR          2
+#define MOCK_POLL_REVENTS_ERROR  3
+
+static int	g_mock_poll_mode = MOCK_POLL_DEFAULT;
+
+void	mock_poll_set_mode_from_param(const char *param)
+{
+	if (0 == strcmp(param, "timeout"))
+		g_mock_poll_mode = MOCK_POLL_TIMEOUT;
+	else if (0 == strcmp(param, "error"))
+		g_mock_poll_mode = MOCK_POLL_ERROR;
+	else if (0 == strcmp(param, "revents error"))
+		g_mock_poll_mode = MOCK_POLL_REVENTS_ERROR;
+	else
+		g_mock_poll_mode = MOCK_POLL_DEFAULT;
+}
+
 int	__wrap_poll(struct pollfd *pds, int nfds, int timeout)
 {
 	ZBX_UNUSED(timeout);
 
-	for (int i = 0; i < nfds; i++)
-		pds[i].revents = (POLLIN | POLLOUT);
-
-	return nfds;
+	switch (g_mock_poll_mode)
+	{
+		case MOCK_POLL_TIMEOUT:
+			return 0;
+		case MOCK_POLL_ERROR:
+			return -1;
+		case MOCK_POLL_REVENTS_ERROR:
+			for (int i = 0; i < nfds; i++)
+				pds[i].revents = POLLERR;
+			return nfds;
+		case MOCK_POLL_DEFAULT:
+		default:
+			for (int i = 0; i < nfds; i++)
+				pds[i].revents = (POLLIN | POLLOUT);
+			return nfds;
+	}
 }
 
 static const char	*frag_data = NULL;
@@ -276,6 +308,13 @@ ssize_t	__wrap_read(int fildes, void *buf, size_t nbyte)
 	frag_pos += mv_len;
 
 	return mv_len;
+}
+
+void	zbx_mock_set_fragments(const char *data, size_t size)
+{
+	frag_data = data;
+	frag_sz = size;
+	frag_pos = data;
 }
 
 off_t	__wrap_lseek(int fd, off_t offset, int whence)

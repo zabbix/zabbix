@@ -6,5 +6,19 @@ in:
   port: 0
   timeout: 1
   fragments: connected
+  data: len
+  data_len: 5
 out:
-  result: FAIL
+  result: SUCCEED
+---
+test case: "Test2"
+in:
+  source_ip: "0.0.0.0"
+  ip: "127.0.0.1"
+  port: 0
+  timeout: 0
+  fragments: connected
+  data: len
+  data_len: 5
+out:
+  result: SUCCEED
