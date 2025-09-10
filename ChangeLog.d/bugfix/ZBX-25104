@@ -1,1 +1,0 @@
-.........T [ZBX-25104] converted SNMP templates to get[OID] method of polling of single OIDs; converted dynamic indexes items to walk[OID] method; converted TrueNAS, pfSense and OPNsense templates to walk[OID] method (drasikhov)

@@ -13,19 +13,29 @@
 ** If not, see <https://www.gnu.org/licenses/>.
 **/
 
+
 require_once __DIR__.'/../../include/CWebTest.php';
 require_once __DIR__.'/../../include/helpers/CDataHelper.php';
 
 class testSystemInformation extends CWebTest {
 
-	const FAILOVER_DELAY = 20;
+	/**
+	 * Attach MessageBehavior and CTableBehavior to the test.
+	 */
+	public function getBehaviors() {
+		return [
+			CMessageBehavior::class,
+			CTableBehavior::class
+		];
+	}
+
+	const FAILOVER_DELAY = 60;
 
 	public static $active_lastaccess;
 	public static $update_timestamp;
 	public static $standby_lastaccess;
 	public static $stopped_lastaccess;
 	public static $unavailable_lastaccess;
-
 	public static $skip_fields;
 
 	/**
@@ -96,6 +106,37 @@ class testSystemInformation extends CWebTest {
 		self::$update_timestamp = time();
 	}
 
+	public function prepareUsersData() {
+		CDataHelper::call('user.create', [
+			[
+				'username' => 'admin for system information test',
+				'passwd' => 'z@$$ix!#%1',
+				'roleid' => USER_TYPE_ZABBIX_ADMIN,
+				'usrgrps' => [
+					['usrgrpid' => 7] // Zabbix administrators.
+				]
+			],
+			[
+				'username' => 'user for system information test',
+				'passwd' => 'z@$$ix!#%2',
+				'roleid' => USER_TYPE_ZABBIX_USER,
+				'usrgrps' => [
+					['usrgrpid' => 7] // Zabbix administrators.
+				]
+			]
+		]);
+
+		// Enable guest role for system information permissions test.
+		CDataHelper::call('user.update', [
+			[
+				'userid' => 2, // guest.
+				'usrgrps' => [
+					['usrgrpid' => 8] // Guests.
+				]
+			]
+		]);
+	}
+
 	// Change failover delay not to wait too long for server to update its status.
 	public static function changeFailoverDelay() {
 		DBexecute('UPDATE settings SET value_str='.self::FAILOVER_DELAY.' WHERE name=\'ha_failover_delay\'');
@@ -110,6 +151,7 @@ class testSystemInformation extends CWebTest {
 		global $DB;
 		self::$skip_fields = [];
 		$url = (!$dashboardid) ? 'zabbix.php?action=report.status' : 'zabbix.php?action=dashboard.view&dashboardid='.$dashboardid;
+
 		// Wait for frontend to get the new config from updated zabbix.conf.php file.
 		sleep((int) ini_get('opcache.revalidate_freq') + 1);
 
@@ -165,11 +207,25 @@ class testSystemInformation extends CWebTest {
 			}
 		}
 
+		// Check fields that are not checked in screenshot with enabled HA.
+		$data = [
+			[
+				'Parameter' => 'Zabbix server is running',
+				'Value' => 'Yes',
+				'Details' => $DB['SERVER'].':0'
+			],
+			[
+				'Parameter' => 'Zabbix frontend version',
+				'Value' => ZABBIX_VERSION,
+				'Details' => ''
+			]
+		];
+		$this->assertTableHasData($data);
+
 		/**
-		 * Check and hide the active Zabbix server address in widget that is working in System stats mode or in the part
+		 * Hide the active Zabbix server address in widget that is working in System stats mode or in the part
 		 * of the report that displays the overall system statistics.
 		 */
-		$this->assertEquals($DB['SERVER'].':0', $server_address->getText());
 		self::$skip_fields[] = $server_address;
 
 		// Hide the footer of the report as it contains Zabbix version.
@@ -181,6 +237,21 @@ class testSystemInformation extends CWebTest {
 		CElementQuery::getDriver()->executeScript("arguments[0].textContent = '';",
 				[$this->query('xpath://table[@class="list-table sticky-header"]/tbody/tr[3]/td[1]')->one()]
 		);
+
+		// Check and hide the text of messages, because they contain ip addresses of the current host.
+		$error_text = "Connection to Zabbix server \"".$DB['SERVER'].":0\" refused. Possible reasons:\n".
+				"1. Incorrect \"NodeAddress\" or \"ListenPort\" in the \"zabbix_server.conf\" or server IP/DNS override".
+				" in the \"zabbix.conf.php\";\n".
+				"2. Security environment (for example, SELinux) is blocking the connection;\n".
+				"3. Zabbix server daemon not running;\n".
+				"4. Firewall is blocking TCP connection.\n".
+				"Connection refused";
+
+		$messages = CMessageElement::find()->all();
+		foreach ($messages as $message) {
+			$this->assertTrue($message->hasLine($error_text));
+			self::$skip_fields[] = $message;
+		}
 	}
 
 	/**
@@ -191,11 +262,13 @@ class testSystemInformation extends CWebTest {
 	public function assertServerStatusAfterFailover($dashboardid = null) {
 		$url = (!$dashboardid) ? 'zabbix.php?action=report.status' : 'zabbix.php?action=dashboard.view&dashboardid='.$dashboardid;
 		$this->page->login()->open($url)->waitUntilReady();
+		if ($dashboardid !== null) {
+			CDashboardElement::find()->waitUntilReady();
+		}
 		$table = $this->query('xpath://table[@class="list-table sticky-header"]')->asTable()->waitUntilVisible()->one();
 
 		// Check that before failover delay passes frontend thinks that Zabbix server is running.
-		// TODO: should be changed to 'No' or uncommented after ZBXNEXT-8698
-//		$this->assertEquals('Yes', $table->findRow('Parameter', 'Zabbix server is running')->getColumn('Value')->getText());
+		$this->assertEquals('Yes', $table->findRow('Parameter', 'Zabbix server is running')->getColumn('Value')->getText());
 
 		// Wait for failover delay to pass.
 		sleep(self::$update_timestamp + self::FAILOVER_DELAY - time());

@@ -379,6 +379,8 @@ class CTriggerGeneralHelper {
 
 		foreach ($data['db_dependencies'] as &$dependency) {
 			order_result($dependency['hosts'], 'name', ZBX_SORT_UP);
+
+			$dependency['hosts'] = array_values($dependency['hosts']);
 		}
 		unset($dependency);
 

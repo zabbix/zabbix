@@ -534,3 +534,24 @@
 		display: contents;
 	}
 }
+
+.temp-tags-list {
+	visibility: hidden;
+	position: absolute;
+	display: flex;
+	flex-wrap: wrap;
+	gap: 8px;
+	width: 195px;
+	pointer-events: none;
+	z-index: -1;
+
+	.tag {
+		margin: 0;
+	}
+
+	.btn-icon {
+		min-width: 16px;
+		height: 16px;
+		line-height: 16px;
+	}
+}
