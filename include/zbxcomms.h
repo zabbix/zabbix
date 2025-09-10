@@ -78,7 +78,7 @@ typedef struct pollfd zbx_pollfd_t;
 
 void	zbx_tcp_init_hints(struct addrinfo *hints, int socktype, int flags);
 
-int	__zbx_attr_weak zbx_socket_had_nonblocking_error(void);
+int	zbx_socket_had_nonblocking_error(void);
 
 #ifdef _WINDOWS
 typedef SOCKET	ZBX_SOCKET;
