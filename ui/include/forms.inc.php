@@ -245,6 +245,7 @@ JAVASCRIPT;
 		$data['http_proxy'] = $data['item']['http_proxy'];
 		$data['headers'] = $data['item']['headers'];
 		$data['retrieve_mode'] = $data['item']['retrieve_mode'];
+		$data['output_format'] = $data['item']['output_format'];
 		$data['request_method'] = $data['item']['request_method'];
 		$data['allow_traps'] = $data['item']['allow_traps'];
 		$data['ssl_cert_file'] = $data['item']['ssl_cert_file'];
