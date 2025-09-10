@@ -20,9 +20,9 @@
 #include "zbxcommon.h"
 #include "zbxcomms.h"
 
-ssize_t	__wrap_sendto(int __fd, const void *__buf, size_t __n, int __flags, const struct sockaddr *__addr, socklen_t __addr_len);
+ssize_t	__wrap_sendto(int fd, const void *buf, size_t n, int flags, const struct sockaddr *addr, socklen_t addr_len);
 
-ssize_t	__wrap_sendto(int __fd, const void *__buf, size_t __n, int __flags, const struct sockaddr *__addr, socklen_t __addr_len)
+ssize_t	__wrap_sendto(int fd, const void *buf, size_t n, int flags, const struct sockaddr *addr, socklen_t addr_len)
 {
 	return 1;
 }
