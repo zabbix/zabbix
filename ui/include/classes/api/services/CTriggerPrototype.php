@@ -123,7 +123,8 @@ class CTriggerPrototype extends CTriggerGeneral {
 			$sqlParts['where'][] = 'NOT EXISTS ('.
 				'SELECT NULL'.
 				' FROM functions f1'.
-				' JOIN items i1 ON f1.itemid=i1.itemid and f1.itemid!=i.itemid'.
+				' JOIN items i1 ON f1.itemid=i1.itemid'.
+					' AND f1.itemid!=i.itemid'.
 				' JOIN host_hgset hh1 ON i1.hostid=hh1.hostid'.
 				' LEFT JOIN permission p1 ON hh1.hgsetid=p1.hgsetid'.
 					' AND p1.ugsetid=p.ugsetid'.

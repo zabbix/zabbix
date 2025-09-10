@@ -149,7 +149,8 @@ class CProblem extends CApiService {
 				$sql_parts['where'][] = 'NOT EXISTS ('.
 					'SELECT NULL'.
 					' FROM functions f1'.
-					' JOIN items i1 ON f1.itemid=i1.itemid and f1.itemid!=i.itemid'.
+					' JOIN items i1 ON f1.itemid=i1.itemid'.
+						' AND f1.itemid!=i.itemid'.
 					' JOIN host_hgset hh1 ON i1.hostid=hh1.hostid'.
 					' LEFT JOIN permission pp1 ON hh1.hgsetid=pp1.hgsetid'.
 						' AND pp1.ugsetid=pp.ugsetid'.
