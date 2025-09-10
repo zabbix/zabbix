@@ -143,11 +143,12 @@ One way to do this is using **pipelined table functions**:
 To configure plugins, Zabbix agent 2 configuration file is used.
 
 **Plugins.Oracle.CallTimeout** — the maximum time in seconds for waiting when a request has to be done.  
-*Default value:* equals the global Timeout configuration parameter.  
+Global item-type timeout (or individual item timeout) will override this value if it is greater.
+*Default value:* equals the global Timeout configuration parameter defined in Zabbix agent 2 configuration file.
 *Limits:* 1-30
 
 **Plugins.Oracle.ConnectTimeout** — the maximum time in seconds for waiting when a connection has to be established.  
-*Default value:* equals the global Timeout configuration parameter.  
+*Default value:* equals the global Timeout configuration parameter defined in Zabbix agent 2 configuration file.
 *Limits:* 1-30
 
 **Plugins.Oracle.CustomQueriesPath** — the full pathname of a directory containing *.sql* files with custom queries.  
