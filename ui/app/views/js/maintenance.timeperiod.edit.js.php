@@ -14,7 +14,6 @@
 **/
 ?>
 
-
 window.maintenance_timeperiod_edit = new class {
 
 	/**
@@ -34,9 +33,9 @@ window.maintenance_timeperiod_edit = new class {
 		this.form = new CForm(this.form_element, rules);
 
 		// Update form field state according to the form data.
-		document.querySelectorAll('[name="timeperiod_type"], [name="month_date_type"]').forEach((element) => {
-			element.addEventListener('change', () => this.#update());
-		});
+		document.querySelectorAll('[name="timeperiod_type"], [name="month_date_type"]').forEach((element) =>
+			element.addEventListener('change', () => this.#update())
+		);
 
 		this.#update();
 
@@ -48,50 +47,37 @@ window.maintenance_timeperiod_edit = new class {
 		const timeperiod_type_value = this.form_element.querySelector('[name="timeperiod_type"]').value,
 			month_date_type_value = this.form_element.querySelector('[name="month_date_type"]:checked').value;
 
-		this.form_element.querySelectorAll('.js-every-day').forEach((element) => {
-			element.hidden = timeperiod_type_value != <?= TIMEPERIOD_TYPE_DAILY ?>;
-		});
+		this.form_element.querySelectorAll('.js-every-day').forEach((element) =>
+			element.hidden = timeperiod_type_value != <?= TIMEPERIOD_TYPE_DAILY ?>
+		);
 
-		this.form_element.querySelectorAll('.js-every-week').forEach((element) => {
-			element.hidden = timeperiod_type_value != <?= TIMEPERIOD_TYPE_WEEKLY ?>;
-		});
+		this.form_element.querySelectorAll('.js-every-week, .js-weekly-days').forEach((element) =>
+			element.hidden = timeperiod_type_value != <?= TIMEPERIOD_TYPE_WEEKLY ?>
+		);
 
-		this.form_element.querySelectorAll('.js-weekly-days').forEach((element) => {
-			element.hidden = timeperiod_type_value != <?= TIMEPERIOD_TYPE_WEEKLY ?>;
-		});
-
-		this.form_element.querySelectorAll('.js-months').forEach((element) => {
-			element.hidden = timeperiod_type_value != <?= TIMEPERIOD_TYPE_MONTHLY ?>;
-		});
-
-		this.form_element.querySelectorAll('.js-month-date-type').forEach((element) => {
-			element.hidden = timeperiod_type_value != <?= TIMEPERIOD_TYPE_MONTHLY ?>;
-		});
-
-		this.form_element.querySelectorAll('.js-every-dow').forEach((element) => {
+		this.form_element.querySelectorAll('.js-months, .js-month-date-type').forEach((element) =>
 			element.hidden = timeperiod_type_value != <?= TIMEPERIOD_TYPE_MONTHLY ?>
-				|| month_date_type_value != 1;
-		});
+		);
 
-		this.form_element.querySelectorAll('.js-monthly-days').forEach((element) => {
+		this.form_element.querySelectorAll('.js-every-dow, .js-monthly-days').forEach((element) =>
 			element.hidden = timeperiod_type_value != <?= TIMEPERIOD_TYPE_MONTHLY ?>
-				|| month_date_type_value != 1;
-		});
+				|| month_date_type_value != 1
+		);
 
-		this.form_element.querySelectorAll('.js-day').forEach((element) => {
+		this.form_element.querySelectorAll('.js-day').forEach((element) =>
 			element.hidden = timeperiod_type_value != <?= TIMEPERIOD_TYPE_MONTHLY ?>
-				|| month_date_type_value != 0;
-		});
+				|| month_date_type_value != 0
+		);
 
-		this.form_element.querySelectorAll('.js-start-date').forEach((element) => {
-			element.hidden = timeperiod_type_value != <?= TIMEPERIOD_TYPE_ONETIME ?>;
-		});
+		this.form_element.querySelectorAll('.js-start-date').forEach((element) =>
+			element.hidden = timeperiod_type_value != <?= TIMEPERIOD_TYPE_ONETIME ?>
+		);
 
-		this.form_element.querySelectorAll('.js-hour-minute').forEach((element) => {
+		this.form_element.querySelectorAll('.js-hour-minute').forEach((element) =>
 			element.hidden = timeperiod_type_value != <?= TIMEPERIOD_TYPE_DAILY ?>
 				&& timeperiod_type_value != <?= TIMEPERIOD_TYPE_WEEKLY ?>
-				&& timeperiod_type_value != <?= TIMEPERIOD_TYPE_MONTHLY ?>;
-		});
+				&& timeperiod_type_value != <?= TIMEPERIOD_TYPE_MONTHLY ?>
+		);
 	}
 
 	submit() {
@@ -127,6 +113,7 @@ window.maintenance_timeperiod_edit = new class {
 
 	#post(url, data, success_callback) {
 		this._overlay.setLoading();
+		this.#clearMessages();
 
 		fetch(url, {
 			method: 'POST',
@@ -142,27 +129,31 @@ window.maintenance_timeperiod_edit = new class {
 				return response;
 			})
 			.then(success_callback)
-			.catch((exception) => {
-				for (const element of this.form_element.parentNode.children) {
-					if (element.matches('.msg-good, .msg-bad, .msg-warning')) {
-						element.parentNode.removeChild(element);
-					}
-				}
-
-				let title, messages;
-
-				if (typeof exception === 'object' && 'error' in exception) {
-					title = exception.error.title;
-					messages = exception.error.messages;
-				}
-				else {
-					messages = [<?= json_encode(_('Unexpected server error.')) ?>];
-				}
-
-				const message_box = makeMessageBox('bad', messages, title)[0];
-
-				this.form_element.parentNode.insertBefore(message_box, this.form_element);
-			})
+			.catch((exception) => this.#ajaxExceptionHandler(exception))
 			.finally(() => this._overlay.unsetLoading());
+	}
+
+	#clearMessages() {
+		for (const element of this.form_element.parentNode.children) {
+			if (element.matches('.msg-good, .msg-bad, .msg-warning')) {
+				element.parentNode.removeChild(element);
+			}
+		}
+	}
+
+	#ajaxExceptionHandler(exception) {
+		let title, messages;
+
+		if (typeof exception === 'object' && 'error' in exception) {
+			title = exception.error.title;
+			messages = exception.error.messages;
+		}
+		else {
+			messages = t('Unexpected server error.');
+		}
+
+		const message_box = makeMessageBox('bad', messages, title)[0];
+
+		this.form_element.parentNode.insertBefore(message_box, this.form_element);
 	}
 }

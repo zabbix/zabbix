@@ -31,22 +31,19 @@ window.maintenance_edit = new class {
 	 */
 	form;
 
-	init({timeperiods, tags, allowed_edit, rules, rules_for_clone = null}) {
+	init({rules, timeperiods, tags, allowed_edit}) {
 		this._overlay = overlays_stack.getById('maintenance.edit');
 		this._dialogue = this._overlay.$dialogue[0];
 		this.form_element = this._overlay.$dialogue.$body[0].querySelector('form');
 		this.form = new CForm(this.form_element, rules);
 		this._allowed_edit = allowed_edit;
-		this.rules_for_clone = rules_for_clone;
 
 		const return_url = new URL('zabbix.php', location.href);
 
 		return_url.searchParams.set('action', 'maintenance.list');
 		ZABBIX.PopupManager.setReturnUrl(return_url.href);
 
-		timeperiods.forEach((timeperiod, row_index) => {
-			this.#addTimePeriod({row_index, ...timeperiod});
-		});
+		timeperiods.forEach((timeperiod, row_index) => this.#addTimePeriod({row_index, ...timeperiod}));
 
 		// Setup Tags.
 		jQuery(document.getElementById('tags')).dynamicRows({
@@ -109,21 +106,21 @@ window.maintenance_edit = new class {
 		const tags_evaltypes = this.form_element.querySelectorAll('[name="tags_evaltype"]'),
 			tags_operators = tags_container.querySelectorAll('[name$="[operator]"]');
 
-		[...tags_evaltypes, ...tags_operators].forEach((radio_button) => {
-			radio_button.disabled = !tags_enabled || !this._allowed_edit;
-		});
+		[...tags_evaltypes, ...tags_operators].forEach((radio_button) =>
+			radio_button.disabled = !tags_enabled || !this._allowed_edit
+		);
 
-		tags_container.querySelectorAll('.element-table-add, .element-table-remove').forEach((button) => {
-			button.disabled = !tags_enabled || !this._allowed_edit;
-		});
+		tags_container.querySelectorAll('.element-table-add, .element-table-remove').forEach((button) =>
+			button.disabled = !tags_enabled || !this._allowed_edit
+		);
 
-		tags_container.querySelectorAll('[name$="[tag]"]').forEach((tag_text_input) => {
-			tag_text_input.placeholder = tags_enabled ? <?= json_encode(_('tag')) ?> : '';
-		});
+		tags_container.querySelectorAll('[name$="[tag]"]').forEach((tag_text_input) =>
+			tag_text_input.placeholder = tags_enabled ? <?= json_encode(_('tag')) ?> : ''
+		);
 
-		tags_container.querySelectorAll('[name$="[value]"]').forEach((value_text_input) => {
-			value_text_input.placeholder = tags_enabled ? <?= json_encode(_('value')) ?> : '';
-		});
+		tags_container.querySelectorAll('[name$="[value]"]').forEach((value_text_input) =>
+			value_text_input.placeholder = tags_enabled ? <?= json_encode(_('value')) ?> : ''
+		);
 	}
 
 	#editTimePeriod(row = null) {
@@ -185,9 +182,9 @@ window.maintenance_edit = new class {
 		row.remove();
 	}
 
-	clone({title, buttons}) {
+	clone({rules, title, buttons}) {
 		document.getElementById('maintenanceid').remove();
-		this.form.reload(this.rules_for_clone);
+		this.form.reload(rules);
 
 		this._overlay.unsetLoading();
 		this._overlay.setProperties({title, buttons});
@@ -195,8 +192,7 @@ window.maintenance_edit = new class {
 		this._overlay.containFocus();
 	}
 
-	delete() {
-		const maintenanceid = this.form.getAllValues().maintenanceid;
+	delete(maintenanceid) {
 		const post_data = {
 			maintenanceids: [maintenanceid],
 			[CSRF_TOKEN_NAME]: <?= json_encode(CCsrfTokenHelper::get('maintenance')) ?>
@@ -261,24 +257,8 @@ window.maintenance_edit = new class {
 
 				success_callback(response);
 			})
-			.catch((exception) => {
-				let title, messages;
-
-				if (typeof exception === 'object' && 'error' in exception) {
-					title = exception.error.title;
-					messages = exception.error.messages;
-				}
-				else {
-					messages = [<?= json_encode(_('Unexpected server error.')) ?>];
-				}
-
-				const message_box = makeMessageBox('bad', messages, title)[0];
-
-				this.form_element.parentNode.insertBefore(message_box, this.form_element);
-			})
-			.finally(() => {
-				this._overlay.unsetLoading();
-			});
+			.catch((exception) => this.#ajaxExceptionHandler(exception))
+			.finally(() => this._overlay.unsetLoading());
 	}
 
 	#updateMultiselect($ms) {
@@ -291,5 +271,21 @@ window.maintenance_edit = new class {
 				element.parentNode.removeChild(element);
 			}
 		}
+	}
+
+	#ajaxExceptionHandler(exception) {
+		let title, messages;
+
+		if (typeof exception === 'object' && 'error' in exception) {
+			title = exception.error.title;
+			messages = exception.error.messages;
+		}
+		else {
+			messages = t('Unexpected server error.');
+		}
+
+		const message_box = makeMessageBox('bad', messages, title)[0];
+
+		this.form_element.parentNode.insertBefore(message_box, this.form_element);
 	}
 }

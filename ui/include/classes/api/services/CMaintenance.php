@@ -30,7 +30,7 @@ class CMaintenance extends CApiService {
 	protected $tableAlias = 'm';
 	protected $sortColumns = ['maintenanceid', 'name', 'maintenance_type', 'active_till', 'active_since'];
 
-	private const MAX_TIMEPERIOD = 999 * SEC_PER_DAY + 23 * SEC_PER_HOUR + 59 * SEC_PER_MIN;
+	public const MAX_TIMEPERIOD = 999 * SEC_PER_DAY + 23 * SEC_PER_HOUR + 59 * SEC_PER_MIN;
 
 	/**
 	 * Get maintenances data.

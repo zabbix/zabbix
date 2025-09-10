@@ -23,7 +23,7 @@ $form = (new CForm())
 	->addItem((new CVar(CSRF_TOKEN_NAME, CCsrfTokenHelper::get('maintenance')))->removeId())
 	->setId('maintenance-form')
 	->setName('maintenance_form')
-	->addVar('maintenanceid', $data['maintenanceid'] ?: 0)
+	->addVar('maintenanceid', $data['maintenanceid'])
 	->addItem(getMessages())
 	->addStyle('display: none;');
 
@@ -256,6 +256,7 @@ if ($data['maintenanceid'] !== null) {
 			'isSubmit' => false,
 			'enabled' => $data['allowed_edit'],
 			'action' => 'maintenance_edit.clone('.json_encode([
+				'rules' => $data['js_clone_validation_rules'],
 				'title' => _('New maintenance period'),
 				'buttons' => [
 					[
@@ -281,7 +282,7 @@ if ($data['maintenanceid'] !== null) {
 			'keepOpen' => true,
 			'isSubmit' => false,
 			'enabled' => $data['allowed_edit'],
-			'action' => 'maintenance_edit.delete();'
+			'action' => 'maintenance_edit.delete('.json_encode($data['maintenanceid']).');'
 		]
 	];
 }
@@ -310,8 +311,7 @@ $output = [
 			'timeperiods' => $data['timeperiods'],
 			'tags' => $data['tags'],
 			'allowed_edit' => $data['allowed_edit'],
-			'rules' => $data['js_validation_rules'],
-			'rules_for_clone' => $data['js_clone_validation_rules']
+			'rules' => $data['js_validation_rules']
 		]).');'
 ];
 

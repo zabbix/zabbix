@@ -47,7 +47,8 @@ class CControllerMaintenanceTimePeriodCheck extends CController {
 			'month_date_type' => ['integer', 'required', 'in' => [0, 1],
 				'when' => ['timeperiod_type', 'in' => [TIMEPERIOD_TYPE_MONTHLY]]
 			],
-			'every_dow' => ['integer', 'required', 'in' => [1, 2, 3, 4, 5],
+			'every_dow' => ['integer', 'required', 'in' => [MONTH_WEEK_FIRST, MONTH_WEEK_SECOND, MONTH_WEEK_THIRD,
+				MONTH_WEEK_FOURTH, MONTH_WEEK_LAST],
 				'when' => [['timeperiod_type', 'in' => [TIMEPERIOD_TYPE_MONTHLY]], ['month_date_type', 'in' => [1]]]
 			],
 			'monthly_days' => ['array', 'required', 'not_empty',
@@ -55,7 +56,7 @@ class CControllerMaintenanceTimePeriodCheck extends CController {
 				'when' => [['month_date_type', 'in' => [1]], ['timeperiod_type', 'in' => [TIMEPERIOD_TYPE_MONTHLY]]],
 				'messages' => ['not_empty' => _('At least one weekday must be selected.')]
 			],
-			'day' => ['integer', 'required', 'min' => 1, 'max' => 31,
+			'day' => ['integer', 'required', 'min' => 1, 'max' => MONTH_MAX_DAY,
 				'when' => [['month_date_type', 'in' => [0]], ['timeperiod_type', 'in' => [TIMEPERIOD_TYPE_MONTHLY]]]
 			],
 			'start_date' => ['string', 'required', 'not_empty',
@@ -64,10 +65,12 @@ class CControllerMaintenanceTimePeriodCheck extends CController {
 				'messages' => ['use' => _('Invalid date.')]
 			],
 			'hour' => ['integer', 'required', 'min' => 0, 'max' => 23,
-				'when' => ['timeperiod_type', 'in' => [TIMEPERIOD_TYPE_DAILY, TIMEPERIOD_TYPE_WEEKLY, TIMEPERIOD_TYPE_MONTHLY]]
+				'when' => ['timeperiod_type',
+					'in' => [TIMEPERIOD_TYPE_DAILY, TIMEPERIOD_TYPE_WEEKLY, TIMEPERIOD_TYPE_MONTHLY]]
 			],
 			'minute' =>	['integer', 'required', 'min' => 0, 'max' => 59,
-				'when' => ['timeperiod_type', 'in' => [TIMEPERIOD_TYPE_DAILY, TIMEPERIOD_TYPE_WEEKLY, TIMEPERIOD_TYPE_MONTHLY]]
+				'when' => ['timeperiod_type',
+					'in' => [TIMEPERIOD_TYPE_DAILY, TIMEPERIOD_TYPE_WEEKLY,TIMEPERIOD_TYPE_MONTHLY]]
 			],
 			'period_days' => ['integer', 'required', 'min' => 0, 'max' => 999],
 			'period_hours' => ['integer', 'required', 'min' => 0, 'max' => 23],
@@ -75,7 +78,8 @@ class CControllerMaintenanceTimePeriodCheck extends CController {
 				['integer', 'required', 'min' => 0, 'max' => 59],
 				['integer', 'required', 'min' => 5,
 					'when' => [['period_days', 'in' => [0]], ['period_hours', 'in' => [0]]],
-					'messages' => ['min' => _s('Minimum value of "%1$s" is %2$d %3$s.', _('Maintenance period length'), 5, _('minutes'))]
+					'messages' => ['min' =>
+						_s('Minimum value of "%1$s" is %2$d %3$s.', _('Maintenance period length'), 5, _('minutes'))]
 				]
 			]
 		]];
