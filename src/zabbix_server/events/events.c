@@ -2470,6 +2470,8 @@ static void	process_internal_ok_events(const zbx_vector_ptr_t *ok_events)
 		if (ZBX_FLAGS_DB_EVENT_UNSET == event->flags)
 			continue;
 
+		event->flags = ZBX_FLAGS_DB_EVENT_UNSET;
+
 		switch (event->object)
 		{
 			case EVENT_OBJECT_TRIGGER:
