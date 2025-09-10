@@ -46,7 +46,7 @@ static void	housekeep_service_problems(const zbx_vector_uint64_t *eventids)
 	zbx_free(data);
 }
 
-static int	housekeep_problems_events(const zbx_vector_uint64_t *eventids)
+static int	housekeep_problems_events(const zbx_vector_uint64_t *eventids, int events_mode)
 {
 	char	*sql = NULL;
 	size_t	sql_alloc = 0, sql_offset = 0;
@@ -73,8 +73,12 @@ static int	housekeep_problems_events(const zbx_vector_uint64_t *eventids)
 			zbx_db_add_condition_alloc(&sql, &sql_alloc, &sql_offset, "eventid", eventids_offset, count);
 
 			zbx_db_execute("delete from problem where%s", sql);
-			zbx_db_execute("delete from event_recovery where%s", sql);
-			zbx_db_execute("delete from events where%s", sql);
+
+			if (ZBX_HK_OPTION_DISABLED != events_mode)
+			{
+				zbx_db_execute("delete from event_recovery where%s", sql);
+				zbx_db_execute("delete from events where%s", sql);
+			}
 		}
 		while (ZBX_DB_DOWN == (txn_rc = zbx_db_commit()));
 
@@ -90,7 +94,7 @@ static int	housekeep_problems_events(const zbx_vector_uint64_t *eventids)
 	return offset;
 }
 
-int	zbx_housekeep_problems_events(const char *query, int config_max_hk_delete, int *more)
+int	zbx_housekeep_problems_events(const char *query, int config_max_hk_delete, int events_mode, int *more)
 {
 	zbx_vector_uint64_t	eventids;
 	int			deleted = 0;
@@ -116,7 +120,7 @@ int	zbx_housekeep_problems_events(const char *query, int config_max_hk_delete, i
 	zbx_vector_uint64_sort(&eventids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
 
 	if (0 != eventids.values_num)
-		deleted = housekeep_problems_events(&eventids);
+		deleted = housekeep_problems_events(&eventids, events_mode);
 
 	zbx_vector_uint64_destroy(&eventids);
 
@@ -138,7 +142,7 @@ static int	housekeep_problems_without_triggers(int config_max_hk_delete, int *mo
 				" and not exists (select NULL from triggers where triggerid=objectid) order by eventid",
 				EVENT_SOURCE_TRIGGERS, EVENT_OBJECT_TRIGGER);
 
-	deleted = zbx_housekeep_problems_events(query, config_max_hk_delete, more);
+	deleted = zbx_housekeep_problems_events(query, config_max_hk_delete, ZBX_HK_OPTION_DISABLED, more);
 
 	return deleted;
 }

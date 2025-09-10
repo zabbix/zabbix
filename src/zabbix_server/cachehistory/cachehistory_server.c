@@ -206,6 +206,7 @@ static int	process_trigger(zbx_dc_trigger_t *trigger, zbx_add_event_func_t add_e
 
 		if (0 != (event_flags & ZBX_FLAGS_TRIGGER_CREATE_INTERNAL_EVENT))
 		{
+			/* zbx_add_event() */
 			add_event_cb(EVENT_SOURCE_INTERNAL, EVENT_OBJECT_TRIGGER, trigger->triggerid,
 					&trigger->timespec, new_state, NULL, trigger->expression,
 					trigger->recovery_expression, 0, 0, &trigger->tags, 0, NULL, 0, NULL, NULL,
