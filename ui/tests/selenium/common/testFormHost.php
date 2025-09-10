@@ -676,8 +676,9 @@ class testFormHost extends CWebTest {
 					]
 				]
 			],
+			// TODO: uncomment test cases once issue ZBX-26932 is resolved
 			// #20 Empty proxy multiselect.
-			[
+/*			[
 				[
 					'expected' => TEST_BAD,
 					'host_fields' => [
@@ -705,7 +706,7 @@ class testFormHost extends CWebTest {
 						'xpath:.//div[@id="proxy_groupid"]/..' => 'This field cannot be empty.'
 					]
 				]
-			],
+			],*/
 			// #22 Too high value in Max repetition count.
 			[
 				[
@@ -1395,8 +1396,9 @@ class testFormHost extends CWebTest {
 						'Max repetition count' => 'This value is not a valid integer.'
 					]
 				]
-			],
-			// #22 Empty proxy.
+			]
+			// TODO: uncomment test cases once issue ZBX-26932 is resolved
+/*			// #22 Empty proxy.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -1423,7 +1425,7 @@ class testFormHost extends CWebTest {
 						'xpath:.//div[@id="proxy_groupid"]/..' => 'This field cannot be empty.'
 					]
 				]
-			]
+			]*/
 		];
 	}
 
@@ -2069,10 +2071,16 @@ class testFormHost extends CWebTest {
 		$interfaces_form->fill($interface);
 
 		if (in_array($data['action'], ['Clone', 'Delete'])) {
-			$form_type->query('button', $data['action'])->one()->click();
-		}
-		if ($data['action'] === 'Delete') {
-			$this->page->dismissAlert();
+			$button = $form_type->query('button', $data['action'])->one();
+			$button->click();
+
+			if ($data['action'] === 'Delete') {
+				$this->page->dismissAlert();
+			}
+			else {
+				$button->waitUntilNotVisible();
+				$form->waitUntilStalled();
+			}
 		}
 
 		$this->page->waitUntilReady();

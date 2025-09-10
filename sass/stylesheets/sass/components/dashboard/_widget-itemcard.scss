@@ -98,7 +98,7 @@ div.dashboard-widget-itemcard {
 					--line-clamp: 2;
 				}
 
-				&.section-metrics, &.section-latest-data {
+				&.section-interval-and-storage, &.section-latest-data {
 					grid-template-columns: repeat(3, 1fr);
 					column-gap: 10px;
 
