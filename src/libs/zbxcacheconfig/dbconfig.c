@@ -1123,6 +1123,7 @@ static void	DCsync_autoreg_host(zbx_dbsync_t *sync)
 		dc_strpool_replace(found, &autoreg_host->host_metadata, row[3]);
 		autoreg_host->flags = atoi(row[4]);
 		autoreg_host->listen_port = atoi(row[5]);
+		autoreg_host->connection_type = atoi(row[6]);
 		autoreg_host->timestamp = 0;
 	}
 
@@ -3502,7 +3503,7 @@ static void	DCsync_items(zbx_dbsync_t *sync, zbx_uint64_t revision, zbx_synced_n
 
 		/* SNMP trap items for current server/proxy */
 
-		if (ITEM_TYPE_SNMPTRAP == item->type && 0 == host->proxyid)
+		if (ITEM_TYPE_SNMPTRAP == item->type)
 		{
 			interface_snmpitem = (ZBX_DC_INTERFACE_ITEM *)DCfind_id(&config->interface_snmpitems,
 					item->interfaceid, sizeof(ZBX_DC_INTERFACE_ITEM), &found);
@@ -8597,6 +8598,12 @@ size_t	zbx_maintenance_update_flags_num(void)
 			/ (sizeof(uint64_t) * 8));
 }
 
+static void	config_unlock_shmem_on_oom(void)
+{
+	if (1 == zbx_get_sync_in_progress())
+		FINISH_SYNC;
+}
+
 /******************************************************************************
  *                                                                            *
  * Purpose: Allocate shared memory for configuration cache                    *
@@ -8623,6 +8630,8 @@ int	zbx_init_configuration_cache(zbx_get_program_type_f get_program_type, zbx_ge
 	{
 		goto out;
 	}
+
+	config_mem->unlock_shmem_on_oom = config_unlock_shmem_on_oom;
 
 	config = (zbx_dc_config_t *)__config_shmem_malloc_func(NULL, sizeof(zbx_dc_config_t) +
 			(size_t)get_config_forks_cb(ZBX_PROCESS_TYPE_TIMER) * sizeof(zbx_vector_ptr_t));
@@ -8981,6 +8990,7 @@ int	zbx_dc_get_host_by_hostid(zbx_dc_host_t *host, zbx_uint64_t hostid)
  *     monitored_by - [OUT]                                                   *
  *     revision     - [OUT] host configuration revision                       *
  *     redirect     - [OUT] host redirection information (optional)           *
+ *     change_flags - [IN] host change flags                                  *
  *     error        - [OUT] error message why access was denied               *
  *                                                                            *
  * Return value:                                                              *
@@ -8994,7 +9004,7 @@ int	zbx_dc_get_host_by_hostid(zbx_dc_host_t *host, zbx_uint64_t hostid)
  ******************************************************************************/
 int	zbx_dc_check_host_conn_permissions(const char *host, const zbx_socket_t *sock, zbx_uint64_t *hostid,
 		unsigned char *status, unsigned char *monitored_by, zbx_uint64_t *revision,
-		zbx_comms_redirect_t *redirect, char **error)
+		zbx_comms_redirect_t *redirect, int change_flags, char **error)
 {
 	const ZBX_DC_HOST	*dc_host = NULL;
 #if defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
@@ -9028,24 +9038,31 @@ int	zbx_dc_check_host_conn_permissions(const char *host, const zbx_socket_t *soc
 		return SUCCEED;
 	}
 
-	if (0 == ((unsigned int)dc_host->tls_accept & sock->connection_type))
+	/* Skip connection type check and TLS validation if connection type changed during autoregistration */
+	if (0 == (change_flags & ZBX_AUTOREG_CHANGED_CONNECTION_TYPE))
 	{
-		UNLOCK_CACHE;
-		*error = zbx_dsprintf(NULL, "connection of type \"%s\" is not allowed for host \"%s\"",
-				zbx_tcp_connection_type_name(sock->connection_type), host);
-		return FAIL;
-	}
-#if defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
-	const char	*msg;
+		if (0 == ((unsigned int)dc_host->tls_accept & sock->connection_type))
+		{
+			UNLOCK_CACHE;
+			*error = zbx_dsprintf(NULL, "connection of type \"%s\" is not allowed for host \"%s\"",
+					zbx_tcp_connection_type_name(sock->connection_type), host);
 
-	if (FAIL == zbx_tls_validate_attr(&attr, dc_host->tls_issuer, dc_host->tls_subject,
-			NULL == dc_host->tls_dc_psk ? NULL : dc_host->tls_dc_psk->tls_psk_identity, &msg))
-	{
-		UNLOCK_CACHE;
-		*error = zbx_dsprintf(NULL, "host \"%s\": %s", host, msg);
-		return FAIL;
-	}
+			return FAIL;
+		}
+#if defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
+		const char	*msg;
+
+		if (FAIL == zbx_tls_validate_attr(&attr, dc_host->tls_issuer, dc_host->tls_subject,
+				NULL == dc_host->tls_dc_psk ? NULL : dc_host->tls_dc_psk->tls_psk_identity, &msg))
+		{
+			UNLOCK_CACHE;
+			*error = zbx_dsprintf(NULL, "host \"%s\": %s", host, msg);
+
+			return FAIL;
+		}
 #endif
+	}
+
 	*status = dc_host->status;
 	*monitored_by = dc_host->monitored_by;
 	*hostid = dc_host->hostid;
@@ -9064,51 +9081,62 @@ int	zbx_dc_check_host_conn_permissions(const char *host, const zbx_socket_t *soc
 }
 
 int	zbx_dc_is_autoreg_host_changed(const char *host, unsigned short port, const char *host_metadata,
-		zbx_conn_flags_t flag, const char *interface, int now)
+		zbx_conn_flags_t flag, const char *interface, unsigned int connection_type, int now)
 {
 #define AUTO_REGISTRATION_HEARTBEAT	120
 
 	const ZBX_DC_AUTOREG_HOST	*dc_autoreg_host;
-	int				ret;
+	int				change_flags = ZBX_AUTOREG_NO_CHANGES;
 
 	RDLOCK_CACHE;
 
-	if (NULL == (dc_autoreg_host = DCfind_autoreg_host(host)))
+	if (NULL != (dc_autoreg_host = DCfind_autoreg_host(host)))
 	{
-		ret = SUCCEED;
-	}
-	else if (0 != strcmp(dc_autoreg_host->host_metadata, host_metadata))
-	{
-		ret = SUCCEED;
-	}
-	else if (dc_autoreg_host->flags != (int)flag)
-	{
-		ret = SUCCEED;
-	}
-	else if (ZBX_CONN_IP == flag && (0 != strcmp(dc_autoreg_host->listen_ip, interface) ||
-			dc_autoreg_host->listen_port != port))
-	{
-		ret = SUCCEED;
-	}
-	else if (ZBX_CONN_DNS == flag && (0 != strcmp(dc_autoreg_host->listen_dns, interface) ||
-			dc_autoreg_host->listen_port != port))
-	{
-		ret = SUCCEED;
-	}
-	else if (AUTO_REGISTRATION_HEARTBEAT < now - dc_autoreg_host->timestamp)
-	{
-		ret = SUCCEED;
+		if (0 != strcmp(dc_autoreg_host->host_metadata, host_metadata))
+		{
+			change_flags |= ZBX_AUTOREG_CHANGED_HOST_METADATA;
+		}
+
+		if (dc_autoreg_host->flags != (int)flag)
+		{
+			change_flags |= ZBX_AUTOREG_CHANGED_FLAGS;
+		}
+
+		if (ZBX_CONN_IP == flag && (0 != strcmp(dc_autoreg_host->listen_ip, interface) ||
+				dc_autoreg_host->listen_port != port))
+		{
+			change_flags |= ZBX_AUTOREG_CHANGED_INTERFACE_IP;
+		}
+
+		if (ZBX_CONN_DNS == flag && (0 != strcmp(dc_autoreg_host->listen_dns, interface) ||
+				dc_autoreg_host->listen_port != port))
+		{
+			change_flags |= ZBX_AUTOREG_CHANGED_INTERFACE_DNS;
+		}
+
+		if (AUTO_REGISTRATION_HEARTBEAT < now - dc_autoreg_host->timestamp)
+		{
+			change_flags |= ZBX_AUTOREG_CHANGED_HEARTBEAT;
+		}
+
+		if (dc_autoreg_host->connection_type != connection_type)
+		{
+			change_flags |= ZBX_AUTOREG_CHANGED_CONNECTION_TYPE;
+		}
 	}
 	else
-		ret = FAIL;
+	{
+		change_flags |= ZBX_AUTOREG_NOT_FOUND;
+	}
 
 	UNLOCK_CACHE;
 
-	return ret;
+	return change_flags;
 }
 
 void	zbx_dc_config_update_autoreg_host(const char *host, const char *listen_ip, const char *listen_dns,
-		unsigned short listen_port, const char *host_metadata, zbx_conn_flags_t flags, int now)
+		unsigned short listen_port, const char *host_metadata, zbx_conn_flags_t flags,
+		unsigned int connection_type, int now)
 {
 	ZBX_DC_AUTOREG_HOST	*dc_autoreg_host, dc_autoreg_host_local = {.host = host};
 	int			found;
@@ -9133,6 +9161,7 @@ void	zbx_dc_config_update_autoreg_host(const char *host, const char *listen_ip, 
 	dc_autoreg_host->flags = flags;
 	dc_autoreg_host->timestamp = now;
 	dc_autoreg_host->listen_port = listen_port;
+	dc_autoreg_host->connection_type = connection_type;
 
 	UNLOCK_CACHE;
 }
@@ -9800,6 +9829,30 @@ void	zbx_dc_config_get_items_by_itemids(zbx_dc_item_t *items, const zbx_uint64_t
 	}
 
 	UNLOCK_CACHE;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: find host identifier referenced by item or lld-rule.              *
+ *                                                                            *
+ * Parameters: hostids - [OUT] vector with found host identifier. Caller      *
+ *                             should pass empty vector.                      *
+ *             itemid  - [IN]  item identifier                                *
+ *                                                                            *
+ ******************************************************************************/
+void	zbx_dc_config_get_hostid_by_itemid(zbx_vector_uint64_t *hostids, zbx_uint64_t itemid)
+{
+	if (0 == hostids->values_num)
+	{
+		const ZBX_DC_ITEM	*dc_item;
+
+		RDLOCK_CACHE;
+
+		if (NULL != (dc_item = (ZBX_DC_ITEM *)zbx_hashset_search(&config->items, &itemid)))
+			zbx_vector_uint64_append(hostids, dc_item->hostid);
+
+		UNLOCK_CACHE;
+	}
 }
 
 int	zbx_dc_config_get_active_items_count_by_hostid(zbx_uint64_t hostid)
@@ -11596,6 +11649,9 @@ size_t	zbx_dc_config_get_snmp_items_by_interfaceid(zbx_uint64_t interfaceid, zbx
 		goto unlock;
 
 	if (HOST_STATUS_MONITORED != dc_host->status)
+		goto unlock;
+
+	if (dc_host->proxyid != 0)
 		goto unlock;
 
 	if (NULL == (dc_interface_snmpitem = (const ZBX_DC_INTERFACE_ITEM *)zbx_hashset_search(
@@ -17013,11 +17069,6 @@ void	zbx_dc_get_unused_macro_templates(zbx_hashset_t *templates, const zbx_vecto
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s() templateids_num:%d", __func__, templateids->values_num);
 }
-
-#ifdef HAVE_TESTS
-#	include "../../../tests/libs/zbxcacheconfig/dc_item_poller_type_update_test.c"
-#	include "../../../tests/libs/zbxcacheconfig/dc_function_calculate_nextcheck_test.c"
-#endif
 
 void	zbx_recalc_time_period(time_t *ts_from, int table_group)
 {
