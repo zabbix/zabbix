@@ -5119,8 +5119,7 @@ static void	DBsave_httptests(zbx_uint64_t hostid, const zbx_vector_ptr_t *httpte
 				num_httptestfields = 0, num_httpstepfields = 0, num_httptesttags = 0, num_httptests = 0;
 	zbx_db_insert_t		db_insert_htest, db_insert_hstep, db_insert_htitem, db_insert_hsitem, db_insert_tfield,
 				db_insert_sfield, db_insert_httag;
-	zbx_vector_uint64_t	httpupdtestids, httpupdstepids, deletefieldsids, deletestepfieldsids, deletetagids,
-				new_httptestids;
+	zbx_vector_uint64_t	httpupdtestids, httpupdstepids, deletefieldsids, deletestepfieldsids, deletetagids;
 	zbx_db_result_t		result;
 	zbx_db_row_t		row;
 
@@ -5134,7 +5133,6 @@ static void	DBsave_httptests(zbx_uint64_t hostid, const zbx_vector_ptr_t *httpte
 	zbx_vector_uint64_create(&deletefieldsids);
 	zbx_vector_uint64_create(&deletestepfieldsids);
 	zbx_vector_uint64_create(&deletetagids);
-	zbx_vector_uint64_create(&new_httptestids);
 
 	for (i = 0; i < httptests->values_num; i++)
 	{
@@ -5347,7 +5345,6 @@ static void	DBsave_httptests(zbx_uint64_t hostid, const zbx_vector_ptr_t *httpte
 
 		if (0 == httptest->httptestid)
 		{
-			zbx_vector_uint64_append(&new_httptestids, httptestid);
 			httptest->httptestid = httptestid++;
 
 			zbx_audit_httptest_create_entry(audit_context_mode, ZBX_AUDIT_ACTION_ADD, httptest->httptestid,
@@ -5601,7 +5598,6 @@ static void	DBsave_httptests(zbx_uint64_t hostid, const zbx_vector_ptr_t *httpte
 	{
 		zbx_db_insert_execute(&db_insert_htest);
 		zbx_db_insert_clean(&db_insert_htest);
-		zbx_db_save_httptest_template_cache(hostid, &new_httptestids);
 	}
 
 	if (0 != num_httpsteps)
@@ -5649,7 +5645,6 @@ static void	DBsave_httptests(zbx_uint64_t hostid, const zbx_vector_ptr_t *httpte
 	zbx_vector_uint64_destroy(&deletefieldsids);
 	zbx_vector_uint64_destroy(&deletestepfieldsids);
 	zbx_vector_uint64_destroy(&deletetagids);
-	zbx_vector_uint64_destroy(&new_httptestids);
 }
 
 static void	clean_httptests(zbx_vector_ptr_t *httptests)

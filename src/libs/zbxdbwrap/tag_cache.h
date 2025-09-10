@@ -16,5 +16,4 @@
 
 int	zbx_db_delete_host_template_cache(zbx_uint64_t hostid, zbx_vector_uint64_t *del_templateids);
 int	zbx_db_copy_host_template_cache(zbx_uint64_t hostid, zbx_vector_uint64_t *lnk_templateids);
-void	zbx_db_save_httptest_template_cache(zbx_uint64_t hostid, zbx_vector_uint64_t *new_httptestids);
 void	zbx_db_save_item_template_cache(zbx_uint64_t hostid, zbx_vector_uint64_t *new_itemids);

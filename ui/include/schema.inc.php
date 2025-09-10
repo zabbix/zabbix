@@ -8510,25 +8510,6 @@ return [
 			]
 		]
 	],
-	'httptest_template_cache' => [
-		'key' => 'httptestid,link_hostid',
-		'fields' => [
-			'httptestid' => [
-				'null' => false,
-				'type' => DB::FIELD_TYPE_ID,
-				'length' => 20,
-				'ref_table' => 'httptest',
-				'ref_field' => 'httptestid'
-			],
-			'link_hostid' => [
-				'null' => false,
-				'type' => DB::FIELD_TYPE_ID,
-				'length' => 20,
-				'ref_table' => 'hosts',
-				'ref_field' => 'hostid'
-			]
-		]
-	],
 	'sysmaps_element_tag' => [
 		'key' => 'selementtagid',
 		'fields' => [

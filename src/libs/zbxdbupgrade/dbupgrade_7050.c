@@ -200,72 +200,6 @@ static int	DBpatch_7050016(void)
 	return SUCCEED;
 }
 
-static int	DBpatch_7050017(void)
-{
-	const zbx_db_table_t	table =
-			{"httptest_template_cache", "httptestid, link_hostid", 0,
-				{
-					{"httptestid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, ZBX_NOTNULL, 0},
-					{"link_hostid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, ZBX_NOTNULL, 0},
-					{0}
-				},
-				NULL
-			};
-
-	return DBcreate_table(&table);
-}
-
-static int	DBpatch_7050018(void)
-{
-	const zbx_db_field_t	field = {"httptestid", NULL, "httptest", "httptestid", 0, 0, 0,
-			ZBX_FK_CASCADE_DELETE};
-
-	return DBadd_foreign_key("httptest_template_cache", 1, &field);
-}
-
-static int	DBpatch_7050019(void)
-{
-	const zbx_db_field_t	field = {"link_hostid", NULL, "hosts", "hostid", 0, 0, 0,
-			ZBX_FK_CASCADE_DELETE};
-
-	return DBadd_foreign_key("httptest_template_cache", 2, &field);
-}
-
-static int	DBpatch_7050020(void)
-{
-	return DBcreate_index("httptest_template_cache", "httptest_template_cache_1", "link_hostid", 0);
-}
-
-static int	DBpatch_7050021(void)
-{
-	if (ZBX_DB_OK > zbx_db_execute(
-			"insert into httptest_template_cache ("
-				"with recursive cte as ("
-					"select ht0.templateid,ht0.httptestid from httptest ht0"
-					" union all "
-					"select ht1.templateid,c.httptestid from cte c"
-					" join httptest ht1 on c.templateid=ht1.httptestid"
-					" where ht1.templateid is not null"
-				")"
-				" select cte.httptestid,ht.hostid from cte,hosts h,httptest ht"
-				" where cte.templateid=ht.httptestid and ht.hostid=h.hostid"
-			")"))
-	{
-		return FAIL;
-	}
-
-	if (ZBX_DB_OK > zbx_db_execute(
-			"insert into httptest_template_cache ("
-				"select ht.httptestid,h.hostid from httptest ht,hosts h"
-				" where ht.hostid=h.hostid"
-			")"))
-	{
-		return FAIL;
-	}
-
-	return SUCCEED;
-}
-
 #endif
 
 DBPATCH_START(7050)
@@ -289,10 +223,5 @@ DBPATCH_ADD(7050013, 0, 1)
 DBPATCH_ADD(7050014, 0, 1)
 DBPATCH_ADD(7050015, 0, 1)
 DBPATCH_ADD(7050016, 0, 1)
-DBPATCH_ADD(7050017, 0, 1)
-DBPATCH_ADD(7050018, 0, 1)
-DBPATCH_ADD(7050019, 0, 1)
-DBPATCH_ADD(7050020, 0, 1)
-DBPATCH_ADD(7050021, 0, 1)
 
 DBPATCH_END()

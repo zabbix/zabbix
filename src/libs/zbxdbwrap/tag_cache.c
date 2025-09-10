@@ -171,32 +171,3 @@ clean:
 
 	return ret;
 }
-
-void	zbx_db_save_httptest_template_cache(zbx_uint64_t hostid, zbx_vector_uint64_t *new_httptestids)
-{
-	zbx_db_insert_t	db_insert_httptest_template_cache_host_itself;
-
-	zbx_db_execute_multiple_query(
-			"insert into httptest_template_cache"
-				" with recursive cte as ("
-					"select i0.templateid,i0.httptestid,i0.hostid from httptest i0"
-					" union all "
-					"select i1.templateid,c.httptestid,c.hostid from cte c"
-					" join httptest i1 on c.templateid=i1.httptestid"
-					" where i1.templateid is not null"
-				")"
-				" select cte.httptestid,ii.hostid from cte,httptest ii"
-				" where cte.templateid=ii.httptestid and", "cte.httptestid", new_httptestids);
-
-	zbx_db_insert_prepare(&db_insert_httptest_template_cache_host_itself, "httptest_template_cache",
-			"httptestid", "link_hostid", (char *)NULL);
-
-	for (int i = 0; i < new_httptestids->values_num; i++)
-	{
-		zbx_db_insert_add_values(&db_insert_httptest_template_cache_host_itself, new_httptestids->values[i],
-				hostid);
-	}
-
-	zbx_db_insert_execute(&db_insert_httptest_template_cache_host_itself);
-	zbx_db_insert_clean(&db_insert_httptest_template_cache_host_itself);
-}
