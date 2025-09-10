@@ -943,7 +943,7 @@ class testFormAdministrationGeneralIconMapping extends CLegacyWebTest {
 		foreach ($rows as $i => $mapping_row) {
 			switch (CTestArrayHelper::get($mapping_row, 'action', 'add')) {
 				case 'add':
-					// After removing last icon mapping and adding new one - it has index 0. 
+					// After removing last icon mapping and adding new one - it has index 0.
 					if (isset($rows[0]['action']) && $rows[0]['action'] === 'remove') {
 						$i--;
 					}
