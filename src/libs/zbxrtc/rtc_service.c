@@ -349,7 +349,7 @@ static int	rtc_db_set_max_idle(const char *data, int *limit, char **error)
 	if (DBPOOL_MAXIMUM_MAX_IDLE < *limit)
 	{
 		*error = zbx_dsprintf(NULL, "maximum idle connection limit must be less than or equal to %d",
-				DBPOOL_MINIMUM_MAX_IDLE);
+				DBPOOL_MAXIMUM_MAX_IDLE);
 		return FAIL;
 	}
 
@@ -426,7 +426,7 @@ static int	rtc_db_set_max_open(const char *data, int *limit, char **error)
 	if (DBPOOL_MAXIMUM_MAX_OPEN < *limit)
 	{
 		*error = zbx_dsprintf(NULL, "maximum open connection limit must be less than or equal to %d",
-				DBPOOL_MINIMUM_MAX_OPEN);
+				DBPOOL_MAXIMUM_MAX_OPEN);
 		return FAIL;
 	}
 
