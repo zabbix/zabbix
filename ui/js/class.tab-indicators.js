@@ -403,7 +403,7 @@ class HostPrototypeMacrosTabIndicatorItem extends TabIndicatorItem {
 	}
 
 	getValue() {
-		return [...document.querySelectorAll(this.getElement().getAttribute('href') + ' #tbl_macros .form_row')]
+		return [...document.querySelectorAll('#tbl_macros .form_row')]
 			.filter((row) => {
 				const macro = row.querySelector('textarea[name$="[macro]"]');
 				const inherited_type = row.querySelector('input[name$="[inherited_type]"]');
@@ -445,7 +445,7 @@ class TemplateMacrosTabIndicatorItem extends TabIndicatorItem {
 	}
 
 	getValue() {
-		return [...document.querySelectorAll(this.getElement().getAttribute('href') + ' #tbl_macros .form_row')]
+		return [...document.querySelectorAll('#tbl_macros .form_row')]
 			.filter((row) => {
 				const macro = row.querySelector('textarea[name$="[macro]"]');
 				const inherited_type = row.querySelector('input[name$="[inherited_type]"]');
