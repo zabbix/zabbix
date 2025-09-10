@@ -15,6 +15,7 @@
 
 
 require_once __DIR__.'/../../include/CLegacyWebTest.php';
+require_once __DIR__.'/../behaviors/CMessageBehavior.php';
 
 use Facebook\WebDriver\WebDriverBy;
 
@@ -23,12 +24,25 @@ use Facebook\WebDriver\WebDriverBy;
  */
 class testFormAdministrationGeneralIconMapping extends CLegacyWebTest {
 
+	/**
+	 * Attach MessageBehavior to the test.
+	 *
+	 * @return array
+	 */
+	public function getBehaviors() {
+		return [
+			CMessageBehavior::class
+		];
+	}
+
 	public function getCreateValidationData() {
 		return [
 			// Create icon mapping with empty name
 			[
 				[
-					'error' => 'Invalid parameter "/1/name": cannot be empty.',
+					'error' => [
+						'Name' => 'This field cannot be empty.'
+					],
 					'check_db' => false
 				]
 			],
@@ -36,7 +50,9 @@ class testFormAdministrationGeneralIconMapping extends CLegacyWebTest {
 			[
 				[
 					'name' => ' ',
-					'error' => 'Invalid parameter "/1/name": cannot be empty.'
+					'error' => [
+						'Name' => 'This field cannot be empty.'
+					]
 				]
 			],
 			[
@@ -45,7 +61,9 @@ class testFormAdministrationGeneralIconMapping extends CLegacyWebTest {
 					'mappings' => [
 						['expression' => 'Create with existing name']
 					],
-					'error' => 'Icon map "Icon mapping one" already exists.',
+					'error' => [
+						'Name' => 'This object already exists.'
+					],
 					'check_db' => false
 				]
 			],
@@ -55,13 +73,17 @@ class testFormAdministrationGeneralIconMapping extends CLegacyWebTest {
 					'mappings' => [
 						['expression' => '\\']
 					],
-					'error' => 'Invalid parameter "/1/mappings/1/expression": invalid regular expression.'
+					'error' => [
+						'id:mappings_0_expression' => 'Expression: Invalid regular expression.'
+					]
 				]
 			],
 			[
 				[
 					'name' => 'Create with empty expression',
-					'error' => 'Invalid parameter "/1/mappings/1/expression": cannot be empty.'
+					'error' => [
+						'id:mappings_0_expression' => 'Expression: This field cannot be empty.'
+					]
 				]
 			],
 			[
@@ -71,7 +93,9 @@ class testFormAdministrationGeneralIconMapping extends CLegacyWebTest {
 						['expression' => 'first expression'],
 						['expression' => 'first expression']
 					],
-					'error' => 'Invalid parameter "/1/mappings/2": value (inventory_link, expression)=(1, first expression) already exists.'
+					'error' => [
+						'name:mappings[1][inventory_link]' => 'Entry "inventory_link=1, expression=first expression" is not unique.'
+					]
 				]
 			],
 			[
@@ -81,7 +105,9 @@ class testFormAdministrationGeneralIconMapping extends CLegacyWebTest {
 						['expression' => 'first expression'],
 						['expression' => '']
 					],
-					'error' => 'Invalid parameter "/1/mappings/2/expression": cannot be empty.'
+					'error' => [
+						'id:mappings_1_expression' => 'Expression: This field cannot be empty.'
+					]
 				]
 			],
 			[
@@ -90,7 +116,9 @@ class testFormAdministrationGeneralIconMapping extends CLegacyWebTest {
 					'mappings' => [
 						['expression' => '@regexpnotexist']
 					],
-					'error' => 'Global regular expression "regexpnotexist" does not exist.'
+					'error' => [
+						'Global regular expression "regexpnotexist" does not exist.'
+					]
 				]
 			],
 			[
@@ -99,7 +127,9 @@ class testFormAdministrationGeneralIconMapping extends CLegacyWebTest {
 					'mappings' => [
 						['expression' => '@']
 					],
-					'error' => 'Global regular expression "" does not exist.'
+					'error' => [
+						'Global regular expression "" does not exist.'
+					]	
 				]
 			],
 			[
@@ -108,7 +138,9 @@ class testFormAdministrationGeneralIconMapping extends CLegacyWebTest {
 					'mappings' => [
 						['action' => 'remove']
 					],
-					'error' => 'Invalid parameter "/1": the parameter "mappings" is missing.'
+					'error' => [
+						'Mappings' => 'This field cannot be empty.'
+					]
 				]
 			]
 		];
@@ -123,7 +155,7 @@ class testFormAdministrationGeneralIconMapping extends CLegacyWebTest {
 		$this->zbxTestLogin('zabbix.php?action=iconmap.edit');
 
 		if (array_key_exists('name', $data)) {
-			$this->zbxTestInputTypeWait('iconmap_name', $data['name']);
+			$this->zbxTestInputTypeWait('name', $data['name']);
 		}
 
 		// Input new row for Icon mapping
@@ -131,11 +163,11 @@ class testFormAdministrationGeneralIconMapping extends CLegacyWebTest {
 			$this->processExpressionRows($data['mappings']);
 		}
 
-		$this->zbxTestClick('add');
+		$form = $this->query('id:iconmap')->asForm()->one();
+		$this->zbxTestClickXpath('//button[@value="Add"]');
 
 		// Check the results in frontend.
-		$this->zbxTestWaitUntilMessageTextPresent('msg-bad', 'Cannot create icon map');
-		$this->zbxTestTextPresent($data['error']);
+		$this->assertInlineError($form, $data['error']);
 
 		// Check the results in DB
 		if (!array_key_exists('check_db', $data) || $data['check_db'] === true) {
@@ -231,18 +263,18 @@ class testFormAdministrationGeneralIconMapping extends CLegacyWebTest {
 	public function testFormAdministrationGeneralIconMapping_Create($data) {
 		$this->zbxTestLogin('zabbix.php?action=iconmap.edit');
 
-		$this->zbxTestInputTypeWait('iconmap_name', $data['name']);
+		$this->zbxTestInputTypeWait('name', $data['name']);
 
 		if (array_key_exists('inventory', $data)) {
-			$this->zbxTestDropdownSelect('iconmap_mappings_new0_inventory_link', $data['inventory']);
+			$this->zbxTestDropdownSelect('mappings[0][inventory_link]', $data['inventory']);
 		}
 
 		if (array_key_exists('icon', $data)) {
-			$this->zbxTestDropdownSelect('iconmap_mappings_new0_iconid', $data['icon']);
+			$this->zbxTestDropdownSelect('mappings[0][iconid]', $data['icon']);
 		}
 
 		if (array_key_exists('default_icon', $data)) {
-			$this->zbxTestDropdownSelect('iconmap[default_iconid]', $data['default_icon']);
+			$this->zbxTestDropdownSelect('default-mapping-icon', $data['default_icon']);
 		}
 
 		// Input new row for Icon mapping.
@@ -254,10 +286,10 @@ class testFormAdministrationGeneralIconMapping extends CLegacyWebTest {
 		if (array_key_exists('screenshot', $data)) {
 			$form = $this->query('id:iconmap')->waitUntilVisible()->one()->asForm();
 			$this->page->removeFocus();
-			$this->assertScreenshot($form->query('id:iconmap_list')->waitUntilPresent()->one(), 'Icon mapping');
+			$this->assertScreenshot($form->query('id:iconmap-edit')->waitUntilPresent()->one(), 'Icon mapping');
 		}
 
-		$this->zbxTestClick('add');
+		$this->zbxTestClickXpath('//button[@value="Add"]');
 
 		// Check the results in frontend.
 		$this->zbxTestWaitUntilMessageTextPresent('msg-good', 'Icon map created');
@@ -900,41 +932,40 @@ class testFormAdministrationGeneralIconMapping extends CLegacyWebTest {
 
 	private function checkFormFields($data) {
 		$this->zbxTestClickLinkTextWait($data['name']);
-		$this->zbxTestAssertElementValue('iconmap_name', $data['name']);
-		$this->zbxTestAssertElementValue('iconmap_mappings_0_expression', $data['mappings'][0]['expression']);
-		$this->zbxTestDropdownAssertSelected('iconmap[mappings][0][inventory_link]', $data['inventory']);
-		$this->zbxTestDropdownAssertSelected('iconmap[mappings][0][iconid]', $data['icon']);
-		$this->zbxTestDropdownAssertSelected('iconmap[default_iconid]', $data['default_icon']);
+		$this->zbxTestAssertElementValue('name', $data['name']);
+		$this->zbxTestAssertElementValue('mappings_0_expression', $data['mappings'][0]['expression']);
+		$this->zbxTestDropdownAssertSelected('mappings[0][inventory_link]', $data['inventory']);
+		$this->zbxTestDropdownAssertSelected('mappings[0][iconid]', $data['icon']);
+		$this->zbxTestDropdownAssertSelected('default-mapping-icon', $data['default_icon']);
 	}
 
 	private function processExpressionRows($rows) {
 		foreach ($rows as $i => $mapping_row) {
 			switch (CTestArrayHelper::get($mapping_row, 'action', 'add')) {
 				case 'add':
-					if (!$this->zbxTestElementPresentId('iconmap_mappings_new'.$i.'_expression')) {
-						$this->zbxTestClick('addMapping');
+					// After removing last icon mapping and adding new one - it has index 0. 
+					if (isset($rows[0]['action']) && $rows[0]['action'] === 'remove') {
+						$i--;
 					}
-					$this->zbxTestInputTypeWait('iconmap_mappings_new'.$i.'_expression', $mapping_row['expression']);
+					if (!$this->zbxTestElementPresentId('mappings_'.$i.'_expression')) {
+						$this->zbxTestClickXpath('//button[@id="add" and @type="button"]');
+					}
+					$this->zbxTestInputTypeWait('mappings_'.$i.'_expression', $mapping_row['expression']);
 					break;
 
 				case 'update':
 					if (!$this->zbxTestElementPresentId('iconmap_mappings_'.$i.'_expression')) {
-						$this->zbxTestClick('addMapping');
+						$this->zbxTestClickXpath('//button[@id="add" and @type="button"]');
 						$this->zbxTestWaitUntilElementVisible(WebDriverBy::id('iconmap_mappings_'.$i.'_expression'));
 					}
-					$this->zbxTestInputType('iconmap_mappings_'.$i.'_expression', $mapping_row['expression']);
+					$this->zbxTestInputType('mappings_'.$i.'_expression', $mapping_row['expression']);
 					break;
 
 				case 'remove':
-					if ($this->zbxTestIsElementPresent('//tr[@id="iconmapidRow_new'.$i.'"]//button[@name="remove"]')) {
-						$this->zbxTestClickXpathWait('//tr[@id="iconmapidRow_new'.$i.'"]//button[@name="remove"]');
-					}
-					else {
-						$this->zbxTestClickXpathWait('//tr[@id="iconmapidRow_'.$i.'"]//button[@name="remove"]');
-					}
+					$this->zbxTestClickXpathWait('//input[@id="mappings_'.$i.'_expression"]/../../td/button');
+
 					break;
 			}
 		}
 	}
-
 }
