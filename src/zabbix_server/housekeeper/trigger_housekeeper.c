@@ -58,19 +58,19 @@ static int	housekeep_problems_events(const zbx_vector_uint64_t *eventids, int ev
 		int			count = MIN(ZBX_DB_LARGE_QUERY_BATCH_SIZE, eventids->values_num - offset);
 		int			txn_rc;
 
+		sql_offset = 0;
+		zbx_db_add_condition_alloc(&sql, &sql_alloc, &sql_offset, "cause_eventid", eventids_offset,
+				count);
+
+		zbx_db_execute("update problem set cause_eventid=null where%s", sql);
+		zbx_db_execute("delete from event_symptom where%s", sql);
+
+		sql_offset = 0;
+		zbx_db_add_condition_alloc(&sql, &sql_alloc, &sql_offset, "eventid", eventids_offset, count);
+
 		do
 		{
 			zbx_db_begin();
-
-			sql_offset = 0;
-			zbx_db_add_condition_alloc(&sql, &sql_alloc, &sql_offset, "cause_eventid", eventids_offset,
-					count);
-
-			zbx_db_execute("update problem set cause_eventid=null where%s", sql);
-			zbx_db_execute("delete from event_symptom where%s", sql);
-
-			sql_offset = 0;
-			zbx_db_add_condition_alloc(&sql, &sql_alloc, &sql_offset, "eventid", eventids_offset, count);
 
 			zbx_db_execute("delete from problem where%s", sql);
 
