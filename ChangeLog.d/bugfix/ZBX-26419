@@ -1,1 +1,1 @@
-..F....... [ZBX-26419] improved performance of problem and event views by optimizing SQL queries to join only the necessary triggers, eliminating redundant post-join filtering (vso)
+A......... [ZBX-26419] improved performance of problem and event views by optimizing SQL queries to join only the necessary triggers, eliminating redundant post-join filtering (vso)
