@@ -79,6 +79,19 @@ static int	db_is_threadsafe(void)
 #endif
 }
 
+/******************************************************************************
+ *                                                                            *
+ * Purpose: initialize database library                                       *
+ *                                                                            *
+ * Parameters: error - [OUT] error message                                    *
+ *                                                                            *
+ * Return value: SUCCEED - database library initialized successfully          *
+ *               FAIL    - otherwise                                          *
+ *                                                                            *
+ * Comments: this function must be called only once during application        *
+ *           startup before spawning other processes/threads                  *
+ *                                                                            *
+ ******************************************************************************/
 int	zbx_db_library_init(char **error)
 {
 #if defined(HAVE_MYSQL)
@@ -93,6 +106,19 @@ int	zbx_db_library_init(char **error)
 	return SUCCEED;
 }
 
+/******************************************************************************
+ *                                                                            *
+ * Purpose: initialize database subsystem                                     *
+ *                                                                            *
+ * Parameters: error - [OUT] error message                                    *
+ *                                                                            *
+ * Return value: SUCCEED - database subsystem initialized successfully        *
+ *               FAIL    - otherwise                                          *
+ *                                                                            *
+ * Comments: this function must be called before server startup and after     *
+ *           it has been deinitialized during teardown                        *
+ *                                                                            *
+ ******************************************************************************/
 int	zbx_db_init(char **error)
 {
 	if (NULL != idcache_mem)
