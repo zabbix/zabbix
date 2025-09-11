@@ -150,11 +150,11 @@ class CProblem extends CApiService {
 					'SELECT NULL'.
 					' FROM functions f1'.
 					' JOIN items i1 ON f1.itemid=i1.itemid'.
-						' AND f1.itemid!=i.itemid'.
 					' JOIN host_hgset hh1 ON i1.hostid=hh1.hostid'.
 					' LEFT JOIN permission pp1 ON hh1.hgsetid=pp1.hgsetid'.
 						' AND pp1.ugsetid=pp.ugsetid'.
 					' WHERE f.triggerid=f1.triggerid'.
+						' AND i.itemid!=f1.itemid'.
 						' AND pp1.hgsetid IS NULL'.
 				')';
 

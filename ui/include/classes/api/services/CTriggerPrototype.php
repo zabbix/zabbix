@@ -124,11 +124,11 @@ class CTriggerPrototype extends CTriggerGeneral {
 				'SELECT NULL'.
 				' FROM functions f1'.
 				' JOIN items i1 ON f1.itemid=i1.itemid'.
-					' AND f1.itemid!=i.itemid'.
 				' JOIN host_hgset hh1 ON i1.hostid=hh1.hostid'.
 				' LEFT JOIN permission p1 ON hh1.hgsetid=p1.hgsetid'.
 					' AND p1.ugsetid=p.ugsetid'.
 				' WHERE f.triggerid=f1.triggerid'.
+					' AND i.itemid!=f1.itemid'.
 					' AND p1.hgsetid IS NULL'.
 			')';
 		}
