@@ -873,8 +873,6 @@ class testFormServicesServices extends CWebTest {
 			$this->assertTableData([$data['children']['Child services']], 'id:children');
 		}
 
-		
-
 		if ($expected === TEST_BAD) {
 			$this->page->removeFocus();
 			$this->assertInlineError($form, $data['inline_errors']);
