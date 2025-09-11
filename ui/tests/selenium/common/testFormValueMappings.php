@@ -624,8 +624,8 @@ class testFormValueMappings extends CWebTest {
 						[
 							'action' => USER_ACTION_UPDATE,
 							'index' => 0,
-							'type' => 'in range',
 							'value' => '5---10',
+							'type' => 'in range',
 							'newvalue' => 'several symbols'
 						]
 					],
@@ -743,8 +743,8 @@ class testFormValueMappings extends CWebTest {
 						[
 							'action' => USER_ACTION_UPDATE,
 							'index' => 0,
-							'type' => 'in range',
 							'value' => '1-10',
+							'type' => 'in range',
 							'newvalue' => ''
 						]
 					],
@@ -762,8 +762,8 @@ class testFormValueMappings extends CWebTest {
 						[
 							'action' => USER_ACTION_UPDATE,
 							'index' => 0,
-							'type' => 'is less than or equals',
 							'value' => '11',
+							'type' => 'is less than or equals',
 							'newvalue' => ''
 						]
 					],
@@ -781,8 +781,8 @@ class testFormValueMappings extends CWebTest {
 						[
 							'action' => USER_ACTION_UPDATE,
 							'index' => 0,
-							'type' => 'is greater than or equals',
 							'value' => '12',
+							'type' => 'is greater than or equals',
 							'newvalue' => ''
 						]
 					],
@@ -800,8 +800,8 @@ class testFormValueMappings extends CWebTest {
 						[
 							'action' => USER_ACTION_UPDATE,
 							'index' => 0,
-							'type' => 'regexp',
 							'value' => 'regexp',
+							'type' => 'regexp',
 							'newvalue' => ''
 						]
 					],
@@ -875,7 +875,7 @@ class testFormValueMappings extends CWebTest {
 		$this->query(($action === 'create')
 			? 'name:valuemap_add'
 			: 'link:'.($expected === TEST_GOOD ? self::$previous_valuemap_name : self::UPDATE_VALUEMAP2
-		))->one()->click();
+		))->WaitUntilVisible()->one()->click();
 
 		// Fill in the name of the valuemap and the parameters of its mappings.
 		$dialog = COverlayDialogElement::find()->waitUntilVisible()->all()->last();

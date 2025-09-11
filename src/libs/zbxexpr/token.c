@@ -14,6 +14,8 @@
 
 #include "zbxexpr.h"
 
+#include "zbx_expression_constants.h"
+
 /******************************************************************************
  *                                                                            *
  * Parameters: expression - [IN]                                              *
@@ -964,6 +966,25 @@ int	zbx_token_parse_nested_macro(const char *expression, const char *macro, zbx_
 	}
 	else if (0 != (token_search & ZBX_TOKEN_SEARCH_SIMPLE_MACRO) && '#' != macro[2] && ':' == ptr[1])
 		return token_parse_simple_macro_key(expression, macro, ptr + 2, token);
+
+	return FAIL;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: check if token macro is a user macro.                             *
+ *                                                                            *
+ ******************************************************************************/
+int	zbx_token_is_user_macro(const char *macro, const zbx_token_t *token)
+{
+	if (ZBX_TOKEN_USER_MACRO == token->type)
+		return SUCCEED;
+
+	if (ZBX_TOKEN_USER_FUNC_MACRO == token->type &&
+			0 == strncmp(macro, MVAR_USER_MACRO, ZBX_CONST_STRLEN(MVAR_USER_MACRO)))
+	{
+		return SUCCEED;
+	}
 
 	return FAIL;
 }

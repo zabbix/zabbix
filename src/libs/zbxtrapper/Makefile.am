@@ -5,6 +5,7 @@ noinst_LIBRARIES = libzbxtrapper.a
 libzbxtrapper_a_SOURCES = \
 	active.c \
 	active.h \
+	macro_ctx_scripts.c \
 	trapper_auth.c \
 	nodecommand.c \
 	nodecommand.h \

@@ -18,7 +18,6 @@
 #include "zbx_trigger_constants.h"
 #include "zbx_item_constants.h"
 #include "zbx_host_constants.h"
-#include "zbxexpression.h"
 #include "zbxcachevalue.h"
 #include "zbxdbwrap.h"
 #include "zbxvariant.h"
@@ -28,6 +27,7 @@
 #include "zbxeval.h"
 #include "zbxdbhigh.h"
 #include "zbxalgo.h"
+#include "zbxcalc.h"
 
 static void	extract_functionids(zbx_vector_uint64_t *functionids, zbx_vector_dc_trigger_t *triggers)
 {
@@ -257,7 +257,7 @@ static void	evaluate_item_functions(zbx_hashset_t *funcs, const zbx_vector_uint6
 		zbx_vector_uint64_uniq(&itemids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
 
 		*items_num = itemids.values_num;
-		*items = (zbx_history_sync_item_t *)zbx_malloc(NULL, sizeof(zbx_history_sync_item_t) *
+		*items = (zbx_history_sync_item_t *)zbx_calloc(NULL, 1, sizeof(zbx_history_sync_item_t) *
 				(size_t)itemids.values_num);
 		*items_err = (int *)zbx_malloc(NULL, sizeof(int) * (size_t)itemids.values_num);
 
@@ -350,7 +350,7 @@ static void	evaluate_item_functions(zbx_hashset_t *funcs, const zbx_vector_uint6
 		}
 
 		if (ITEM_STATE_NOTSUPPORTED == item->state &&
-				FAIL == zbx_evaluatable_for_notsupported(func->function))
+				FAIL == zbx_evaluable_for_notsupported(func->function))
 		{
 			/* set 'unknown' error value */
 			zbx_variant_set_error(&func->value,

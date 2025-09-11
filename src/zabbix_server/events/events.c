@@ -34,6 +34,7 @@
 #include "zbxtagfilter.h"
 #include "zbxescalations.h"
 #include "zbx_expression_constants.h"
+#include "zbxcalc.h"
 
 /* event recovery data */
 typedef struct

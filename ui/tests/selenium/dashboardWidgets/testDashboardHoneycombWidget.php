@@ -1923,6 +1923,7 @@ class testDashboardHoneycombWidget extends testWidgets {
 		// Save or cancel widget.
 		if (CTestArrayHelper::get($data, 'save_widget', false)) {
 			$form->submit();
+			$dashboard->waitUntilReady();
 
 			// Check that changes took place on the unsaved dashboard.
 			$this->assertTrue($dashboard->getWidget($new_name)->isVisible());

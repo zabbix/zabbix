@@ -20,7 +20,6 @@
 #include "zbxdb.h"
 #include "zbxexpr.h"
 #include "zbxcacheconfig.h"
-#include "zbxexpression.h"
 #include "zbxregexp.h"
 #include "audit/zbxaudit.h"
 #include "zbxnum.h"
@@ -31,6 +30,7 @@
 #include "zbx_trigger_constants.h"
 #include "zbx_item_constants.h"
 #include "zbxescalations.h"
+#include "zbxcalc.h"
 
 void	zbx_ack_task_free(zbx_ack_task_t *ack_task)
 {

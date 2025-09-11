@@ -50,7 +50,7 @@ zabbix_export:
         * Check: ["perm","/storage",["Datastore.Audit"]]
         * Check: ["perm","/vms",["VM.Audit"]]
         
-        2. Copy the resulting Token ID and Secret into the host host wizard configuration fields `API token` and `Secret key`.
+        2. Copy the resulting Token ID and Secret into the host wizard configuration fields `API token` and `Secret key`.
         
         3. Set the hostname or IP address of the Proxmox API VE host in the `Address` host wizard configuration field. You can also change the API port in the `Port` host wizard configuration field if necessary.
       vendor:

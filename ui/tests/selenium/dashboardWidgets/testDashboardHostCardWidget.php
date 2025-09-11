@@ -1691,7 +1691,8 @@ class testDashboardHostCardWidget extends testWidgets {
 
 	public static function getWidgetName() {
 		return [
-			[
+			// TODO: uncomment test cases once issue ZBX-24885 is resolved
+/*			[
 				[
 					'Name' => 'Fully filled host card widget'
 				]
@@ -1700,7 +1701,7 @@ class testDashboardHostCardWidget extends testWidgets {
 				[
 					'Name' => 'Host card'
 				]
-			],
+			],*/
 			[
 				[
 					'Name' => 'Default host card widget'

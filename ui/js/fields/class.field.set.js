@@ -32,6 +32,17 @@ class CFieldSet extends CField {
 			 * Observer is launched also when error message node is added (because childList is observer).
 			 * This must be skipped.
 			 */
+
+			// Check that only a temporary element was created or deleted.
+			const has_not_direct_temp_field = observations.some((obs) => {
+				return [...obs.addedNodes, ...obs.removedNodes]
+					.some((n) => n.nodeType == Node.ELEMENT_NODE && !n.hasAttribute('data-temp-field'))
+			});
+
+			if (!has_not_direct_temp_field) {
+				return;
+			}
+
 			const skip = observations.some((obs) => {
 				return obs.type === 'childList'
 						&& [...obs.addedNodes, ...obs.removedNodes]

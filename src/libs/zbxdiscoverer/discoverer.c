@@ -1226,25 +1226,16 @@ int	dcheck_is_async(zbx_ds_dcheck_t *ds_dcheck)
 static void	*discoverer_worker_entry(void *net_check_worker)
 {
 	int			err;
-	sigset_t		mask;
 	zbx_discoverer_worker_t	*worker = (zbx_discoverer_worker_t*)net_check_worker;
 	zbx_discoverer_queue_t	*queue = worker->queue;
 
+	log_worker_id = worker->worker_id;
+
+	if (0 != (err = zbx_init_thread_signal_handler()))
+		zabbix_log(LOG_LEVEL_WARNING, "cannot block signals: %s", zbx_strerror(err));
+
 	zabbix_log(LOG_LEVEL_INFORMATION, "thread started [%s #%d]",
 			get_process_type_string(ZBX_PROCESS_TYPE_DISCOVERER), worker->worker_id);
-
-	log_worker_id = worker->worker_id;
-	sigemptyset(&mask);
-	sigaddset(&mask, SIGQUIT);
-	sigaddset(&mask, SIGALRM);
-	sigaddset(&mask, SIGTERM);
-	sigaddset(&mask, SIGUSR1);
-	sigaddset(&mask, SIGUSR2);
-	sigaddset(&mask, SIGHUP);
-	sigaddset(&mask, SIGINT);
-
-	if (0 > (err = pthread_sigmask(SIG_BLOCK, &mask, NULL)))
-		zabbix_log(LOG_LEVEL_WARNING, "cannot block the signals: %s", zbx_strerror(err));
 
 	zbx_init_icmpping_env(get_process_type_string(ZBX_PROCESS_TYPE_DISCOVERER), worker->worker_id);
 	worker->stop = 0;
@@ -1514,6 +1505,9 @@ static int	discoverer_manager_init(zbx_discoverer_manager_t *manager, zbx_thread
 	manager->workers_num = args_in->workers_num;
 	manager->workers = (zbx_discoverer_worker_t*)zbx_calloc(NULL, (size_t)args_in->workers_num,
 			sizeof(zbx_discoverer_worker_t));
+	sigset_t	orig_mask;
+
+	zbx_block_thread_signals(&orig_mask);
 
 	for (i = 0; i < args_in->workers_num; i++)
 	{
@@ -1560,6 +1554,8 @@ out:
 		zbx_timekeeper_free(manager->timekeeper);
 		discoverer_libs_destroy();
 	}
+
+	zbx_unblock_signals(&orig_mask);
 
 	return ret;
 
@@ -1870,6 +1866,10 @@ ZBX_THREAD_ENTRY(zbx_discoverer_thread, args)
 	}
 
 	zbx_setproctitle("%s #%d [terminating]", get_process_type_string(info->process_type), info->process_num);
+
+	/* on normal exit the shutdown message already has been processed and no more messages will be sent */
+	if (SUCCEED != ZBX_EXIT_STATUS())
+		zbx_rtc_unsubscribe_service(discoverer_args_in->config_timeout, ZBX_IPC_SERVICE_DISCOVERER);
 
 	zbx_vector_uint64_pair_destroy(&revisions);
 	zbx_vector_uint64_destroy(&del_druleids);
