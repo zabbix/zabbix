@@ -736,6 +736,35 @@ void	zbx_db_large_query_prepare_str(zbx_db_large_query_t *query, char **sql, siz
 
 	zbx_dbconn_large_query_prepare_str(query, dbconn, sql, sql_alloc, sql_offset, field, ids);
 }
+/******************************************************************************
+ *                                                                            *
+ * Purpose: prepare large SQL query without IDs                               *
+ *                                                                            *
+ * Parameters: query      - [IN] large query object                           *
+ *             sql        - [IN/OUT] first part of the query, can be modified *
+ *                              or reallocated                                *
+ *             sql_alloc  - [IN/OUT] size of allocated sql string             *
+ *             sql_offset - [IN/OUT] length of the sql string                 *
+ *                                                                            *
+ * Comments: Large query object 'borrows' the sql buffer with the query part, *
+ *           meaning:                                                         *
+ *             - caller must not free/modify this sql buffer while the        *
+ *               prepared large query object is being used                    *
+ *             - caller must free this sql buffer afterwards - it's not freed *
+ *               when large query object is cleared.                          *
+ *                                                                            *
+ ******************************************************************************/
+void	zbx_db_large_query_prepare(zbx_db_large_query_t *query, char **sql, size_t *sql_alloc, size_t *sql_offset)
+{
+	if (NULL == dbconn)
+	{
+		memset(query, 0, sizeof(zbx_db_large_query_t));
+		THIS_SHOULD_NEVER_HAPPEN;
+		return;
+	}
+
+	zbx_dbconn_large_query_prepare(query, dbconn, sql, sql_alloc, sql_offset);
+}
 
 /******************************************************************************
  *                                                                            *

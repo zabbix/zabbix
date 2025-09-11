@@ -13,17 +13,31 @@
 ** If not, see <https://www.gnu.org/licenses/>.
 **/
 
+
 require_once __DIR__.'/../common/testSystemInformation.php';
 
 /**
- * @backup ha_node, settings
+ * @backup ha_node, profiles
  *
  * @backupConfig
+ *
+ * @onBefore prepareUsersData
  */
 class testPageReportsSystemInformation extends testSystemInformation {
 
 	public function testPageReportsSystemInformation_checkDisabledHA() {
 		$this->page->login()->open('zabbix.php?action=report.status')->waitUntilReady();
+
+		// Check field that is skipped in screenshot assertion.
+		$data = [
+			[
+				'Parameter' => 'Zabbix frontend version',
+				'Value' => ZABBIX_VERSION,
+				'Details' => ''
+			]
+		];
+		$this->assertTableHasData($data);
+
 		// Remove zabbix version due to unstable screenshot which depends on column width with different version length.
 		CElementQuery::getDriver()->executeScript("arguments[0].textContent = '';",
 				[$this->query('xpath://table[@class="list-table sticky-header"]/tbody/tr[3]/td[1]')->one()]

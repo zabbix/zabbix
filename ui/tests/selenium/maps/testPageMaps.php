@@ -485,7 +485,9 @@ class testPageMaps extends CWebTest {
 
 		// Fill filter fields if such present in data provider.
 		$form->fill(CTestArrayHelper::get($data, 'filter'));
+		$table = $this->getTable();
 		$form->submit();
+		$table->waitUntilReloaded();
 		$this->page->waitUntilReady();
 
 		// Check that expected maps are returned in the list.

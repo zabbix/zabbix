@@ -26,9 +26,10 @@
 #define ZBX_EXIT_SUCCESS	1
 #define ZBX_EXIT_FAILURE	2
 
-static int	sig_parent_pid = -1;
+static int				sig_parent_pid = -1;
+static ZBX_THREAD_LOCAL unsigned long	sig_thread;
 
-static const pid_t	*child_pids = NULL;
+static pid_t	*child_pids = NULL;
 static size_t		child_pid_count = 0;
 
 void	set_sig_parent_pid(int in)
@@ -39,6 +40,23 @@ void	set_sig_parent_pid(int in)
 int	get_sig_parent_pid(void)
 {
 	return sig_parent_pid;
+}
+
+int	zbx_init_thread_signal_handler(void)
+{
+	sigset_t	mask;
+
+	sig_thread = 1;
+
+	sigemptyset(&mask);
+	sigaddset(&mask, SIGTERM);
+	sigaddset(&mask, SIGUSR1);
+	sigaddset(&mask, SIGUSR2);
+	sigaddset(&mask, SIGHUP);
+	sigaddset(&mask, SIGQUIT);
+	sigaddset(&mask, SIGINT);
+
+	return pthread_sigmask(SIG_BLOCK, &mask, NULL);
 }
 
 typedef struct
@@ -114,6 +132,14 @@ static void	fatal_signal_handler(int sig, siginfo_t *siginfo, void *context)
 {
 	log_fatal_signal(sig, siginfo, context);
 	zbx_log_fatal_info(context, ZBX_FATAL_LOG_FULL_INFO);
+
+	if (1 == sig_thread)
+	{
+		zbx_set_exiting_with_fail();
+		int	ret = EXIT_FAILURE;
+
+		pthread_exit(&ret);
+	}
 
 	exit_with_failure();
 }
@@ -237,7 +263,16 @@ static void	child_signal_handler(int sig, siginfo_t *siginfo, void *context)
 {
 	SIG_CHECK_PARAMS(sig, siginfo, context);
 
-	if (FAIL == zbx_is_child_pid(siginfo->si_pid, child_pids, child_pid_count))
+	pid_t	pid;
+	int	status;
+
+	if (0 < (pid = waitpid((pid_t)-1, &status, WNOHANG)))
+	{
+		if (FAIL == zbx_child_cleanup(pid, child_pids, child_pid_count))
+			return;
+	}
+
+	if (0 >= pid)
 		return;
 
 	if (!SIG_PARENT_PROCESS)
@@ -245,7 +280,10 @@ static void	child_signal_handler(int sig, siginfo_t *siginfo, void *context)
 
 	if (ZBX_EXIT_NONE == sig_exiting)
 	{
-		sig_exiting = ZBX_EXIT_FAILURE;
+		if (0 == WIFEXITED(status) || 0 != WEXITSTATUS(status))
+			sig_exiting = ZBX_EXIT_FAILURE;
+		else
+			sig_exiting = ZBX_EXIT_SUCCESS;
 
 		if (-1 == siginfo_exit.sig)
 			set_siginfo_exit(sig, siginfo);
@@ -363,6 +401,27 @@ void 	zbx_set_metric_thread_signal_handler(void)
  * Purpose: block signals to avoid interruption                               *
  *                                                                            *
  ******************************************************************************/
+void	zbx_block_thread_signals(sigset_t *orig_mask)
+{
+	sigset_t	mask;
+
+	sigemptyset(&mask);
+	sigaddset(&mask, SIGTERM);
+	sigaddset(&mask, SIGUSR1);
+	sigaddset(&mask, SIGUSR2);
+	sigaddset(&mask, SIGHUP);
+	sigaddset(&mask, SIGQUIT);
+	sigaddset(&mask, SIGINT);
+
+	if (0 > zbx_sigmask(SIG_BLOCK, &mask, orig_mask))
+		zabbix_log(LOG_LEVEL_WARNING, "cannot set signal mask to block the signal");
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: block signals to avoid interruption                               *
+ *                                                                            *
+ ******************************************************************************/
 void	zbx_block_signals(sigset_t *orig_mask)
 {
 	sigset_t	mask;
@@ -394,7 +453,7 @@ void	zbx_set_on_exit_args(void *args)
 	zbx_on_exit_args = args;
 }
 
-void	zbx_set_child_pids(const pid_t *pids, size_t pid_num)
+void	zbx_set_child_pids(pid_t *pids, size_t pid_num)
 {
 	child_pids = pids;
 	child_pid_count = pid_num;

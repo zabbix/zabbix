@@ -370,7 +370,7 @@ static int	zbx_snmp_cache_handle_engineid(netsnmp_session *session, zbx_dc_item_
 		zbx_vector_engineid_device_append(&local_record.devices, d);
 		local_record.lastlog = 0;
 		local_record.lastseen = time(NULL);
-		zbx_hashset_insert(&engineid_cache, &local_record, sizeof(local_record));
+		ptr = zbx_hashset_insert(&engineid_cache, &local_record, sizeof(local_record));
 		snmp_remove_user_by_engineid(ptr);
 
 		goto out;

@@ -385,9 +385,10 @@ class testFormMapProperties extends CLegacyWebTest {
 		$this->page->login()->open('sysmaps.php')->waitUntilReady();
 		$this->getTable()->findRow('Name', $map['name'])->getColumn('Actions')->query('link:Properties')->one()->click();
 		$this->page->assertHeader('Network maps');
-		$this->query('button:Update')->one()->click();
-		$this->page->assertHeader('Maps');
+		$this->query('button:Update')->one()->click()->waitUntilStalled();
 		$this->assertMessage(TEST_GOOD, 'Network map updated');
+		$this->page->waitUntilReady();
+		$this->page->assertHeader('Maps');
 
 		$hash_data = [
 			$hash_maps_elements => $sql_maps_elements,

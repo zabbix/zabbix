@@ -1001,6 +1001,7 @@ static void	am_register_alerter(zbx_am_t *manager, zbx_ipc_client_t *client, zbx
 
 		alerter = (zbx_am_alerter_t *)manager->alerters.values[manager->next_alerter_index++];
 		alerter->client = client;
+		zbx_ipc_client_addref(client);
 
 		/* sizeof(zbx_am_alerter_t *) in the following line returns size of 'alerter' pointer. */
 		/* sizeof(alerter) is not used to avoid analyzer warning */
@@ -1025,7 +1026,10 @@ static void	am_register_alert_syncer(zbx_am_t *manager, zbx_ipc_client_t *client
 		zabbix_log(LOG_LEVEL_DEBUG, "refusing connection from foreign process");
 	}
 	else
+	{
 		manager->syncer_client = client;
+		zbx_ipc_client_addref(client);
+	}
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 }

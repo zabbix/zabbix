@@ -244,7 +244,6 @@ func (h *handler) report(w http.ResponseWriter, r *http.Request) {
 			Name:     cookie.Name,
 			Value:    cookie.Value,
 			URL:      req.URL,
-			Domain:   u.Hostname(),
 			SameSite: network.CookieSameSiteStrict,
 			HTTPOnly: true,
 		}

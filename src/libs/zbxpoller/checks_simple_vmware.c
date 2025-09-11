@@ -1269,7 +1269,7 @@ int	check_vcenter_eventlog(AGENT_REQUEST *request, const zbx_dc_item_t *item, AG
 		SET_MSG_RESULT(result, zbx_strdup(NULL, service->eventlog.data->error));
 		goto unlock;
 	}
-	else if (80 < (hc_pused = zbx_hc_mem_pused_lock()))
+	else if (95 < (hc_pused = zbx_hc_mem_pused_lock()))
 	{
 		zabbix_log(LOG_LEVEL_DEBUG,"%s():eventlog data is suspended due to history cache is overloaded:%.2f%%",
 				__func__, hc_pused);

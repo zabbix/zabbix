@@ -2688,8 +2688,7 @@ class testDashboardTopHostsWidget extends testWidgets {
 
 				$form->query('xpath:(.//button[@name="edit"])['.$row_number.']')->one()->click();
 
-				$column_dialog = COverlayDialogElement::find()->waitUntilReady()->all()->last();
-				$this->assertEquals('Update column', $column_dialog->getTitle());
+				$column_dialog = COverlayDialogElement::get('Update column')->waitUntilReady();
 
 				// Check Thresholds values.
 				if (array_key_exists('Thresholds', $values)) {
@@ -2711,7 +2710,7 @@ class testDashboardTopHostsWidget extends testWidgets {
 				// Advanced configuration in saved form is always false.
 				$values['Advanced configuration'] = false;
 				$column_dialog->asForm()->checkValue($values);
-				$this->query('xpath:(//button[text()="Cancel"])[2]')->one()->click();
+				$column_dialog->close();
 
 				// Check next row in a column table.
 				if ($row_number < $row_amount) {

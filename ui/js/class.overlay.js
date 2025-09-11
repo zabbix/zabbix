@@ -507,7 +507,7 @@ Overlay.prototype.mount = function() {
 		this._body_mutation_observer.observe(observable_element, {
 			childList: true,
 			subtree: true,
-			attributeFilter: ['style', 'class']
+			attributeFilter: ['style', 'class', 'hidden']
 		});
 	}
 

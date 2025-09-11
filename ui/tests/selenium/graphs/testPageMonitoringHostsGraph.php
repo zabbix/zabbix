@@ -851,22 +851,25 @@ class testPageMonitoringHostsGraph extends CWebTest {
 		}
 
 		$form = $this->query('name:zbx_filter')->asForm()->one();
-		$form->query('button:Reset')->one()->click();
+		$form->query('button:Reset')->one()->click()->waitUntilStalled();
 
 		// Filter using tags.
 		if (array_key_exists('subfilter', $data)) {
 			$table = $this->getTable();
-			$form->fill(['Hosts' => 'Host_for_monitoring_graphs_1', 'Show' => 'All graphs'])->submit();
+			$form->fill(['Hosts' => 'Host_for_monitoring_graphs_1', 'Show' => 'All graphs'])->submit()->waitUntilStalled();
 			$table->waitUntilReloaded();
 			$this->page->waitUntilReady();
 
 			// Click on subfilter.
 			foreach ($data['subfilter'] as $header => $values) {
 				foreach ($values as $value) {
-					$this->query("xpath://h3[text()=".CXPathHelper::escapeQuotes($header)."]/..//a[text()=".
-							CXPathHelper::escapeQuotes($value)."]")->waitUntilClickable()->one()->click();
-					$this->query("xpath://h3[text()=".CXPathHelper::escapeQuotes($header)."]/..//a[text()=".
-							CXPathHelper::escapeQuotes($value)."]/ancestor::span")->one()->
+					// TODO: need to figure out why the table needs to be initialized again
+					$table = $this->getTable();
+					$xpath = 'xpath://h3[text()='.CXPathHelper::escapeQuotes($header).']/..//a[text()='.
+							CXPathHelper::escapeQuotes($value).']';
+					$this->query($xpath)->waitUntilClickable()->one()->click();
+					$table->waitUntilReloaded();
+					$this->query($xpath.'/ancestor::span')->one()->
 							waitUntilAttributesPresent(['class' => 'subfilter subfilter-enabled']);
 					$this->page->waitUntilReady();
 				}
@@ -874,7 +877,7 @@ class testPageMonitoringHostsGraph extends CWebTest {
 		}
 
 		$table = $this->getTable();
-		$form->fill($data['filter'])->submit();
+		$form->fill($data['filter'])->submit()->waitUntilStalled();
 		$table->waitUntilReloaded();
 		$this->page->waitUntilReady();
 

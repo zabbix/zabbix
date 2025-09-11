@@ -154,7 +154,7 @@ foreach ($data['items'] as $item) {
 		item_type2str($item['type']),
 		$status_toggle->addClass(itemIndicatorStyle($item['status'])),
 		$discover_toggle->addClass($item['discover'] == ZBX_PROTOTYPE_NO_DISCOVER ? ZBX_STYLE_RED : ZBX_STYLE_GREEN),
-		$data['tags'][$item['itemid']]
+		(new CDiv($data['tags'][$item['itemid']]))->addClass(ZBX_STYLE_TAGS_WRAPPER)
 	]);
 }
 

@@ -529,8 +529,10 @@ static int	rm_get_report_range(int report_time, unsigned char period, struct tm 
 	zbx_time_unit_t	period2unit[] = {ZBX_TIME_UNIT_DAY, ZBX_TIME_UNIT_WEEK, ZBX_TIME_UNIT_MONTH,
 						ZBX_TIME_UNIT_YEAR};
 
-	if (ARRSIZE(period2unit) <= period || NULL == (tm = localtime(&from_time)))
+	if (ARRSIZE(period2unit) <= period)
 		return FAIL;
+
+	tm = zbx_localtime(&from_time, NULL);
 
 	*to = *tm;
 	zbx_tm_round_down(to, period2unit[period]);
@@ -575,11 +577,9 @@ static char	*rm_get_report_name(const char *name, int report_time)
 		}
 	}
 
-	if (NULL == (tm = localtime(&rtime)))
-		name_full = zbx_dsprintf(NULL, "%s.pdf", name_esc);
-	else
-		name_full = zbx_dsprintf(NULL, "%s_%04d-%02d-%02d_%02d-%02d.pdf", name_esc, tm->tm_year + 1900,
-				tm->tm_mon + 1, tm->tm_mday, tm->tm_hour, tm->tm_min);
+	tm = zbx_localtime(&rtime, NULL);
+	name_full = zbx_dsprintf(NULL, "%s_%04d-%02d-%02d_%02d-%02d.pdf", name_esc, tm->tm_year + 1900,
+			tm->tm_mon + 1, tm->tm_mday, tm->tm_hour, tm->tm_min);
 
 	zbx_free(name_esc);
 
@@ -1125,7 +1125,7 @@ static void	rm_update_cache_reports_params(zbx_rm_t *manager)
 	}
 	zbx_db_free_result(result);
 
-	if (0 != params.values_num)
+	if (NULL != report && 0 != params.values_num)
 		rm_report_update_params(report, &params);
 
 	report_destroy_params(&params);
@@ -1198,7 +1198,7 @@ static void	rm_update_cache_reports_users(zbx_rm_t *manager)
 	}
 	zbx_db_free_result(result);
 
-	if (0 != users.values_num || 0 != users_excl.values_num)
+	if (NULL != report && (0 != users.values_num || 0 != users_excl.values_num))
 		rm_report_update_users(report, &users, &users_excl);
 
 	zbx_vector_uint64_destroy(&users_excl);
@@ -1262,7 +1262,7 @@ static void	rm_update_cache_reports_usergroups(zbx_rm_t *manager)
 	}
 	zbx_db_free_result(result);
 
-	if (0 != usergroups.values_num)
+	if (NULL != report && 0 != usergroups.values_num)
 		rm_report_update_usergroups(report, &usergroups);
 
 	zbx_vector_recipient_destroy(&usergroups);

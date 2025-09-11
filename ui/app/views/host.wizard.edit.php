@@ -319,6 +319,7 @@ function stepCreateHost($form): CTemplateTag {
 							'new_item_name' => 'host_new',
 							'object_name' => 'hosts',
 							'add_new' => true,
+							'maxlength' => DB::getFieldLength('hosts', 'host'),
 							'multiple' => false,
 							'popup' => [
 								'parameters' => [
@@ -345,6 +346,7 @@ function stepCreateHost($form): CTemplateTag {
 							'new_item_name' => 'groups_new[]',
 							'object_name' => 'hostGroup',
 							'add_new' => (CWebUser::$data['type'] == USER_TYPE_SUPER_ADMIN),
+							'maxlength' => DB::getFieldLength('hstgrp', 'name'),
 							'popup' => [
 								'parameters' => [
 									'srctbl' => 'host_groups',
@@ -465,7 +467,10 @@ function stepInstallAgent($agent_script_data): array {
 											DB::getFieldLength('hosts', 'tls_psk_identity')
 										))->setAriaRequired(),
 										(new CDiv(
-											_('Enter a non-secret pre-shared key identity string. Avoid including sensitive data.')
+											_('Enter a unique name that Zabbix components will use to recognize the pre-shared key.')
+										))->addClass(ZBX_STYLE_FORM_FIELDS_HINT),
+										(new CDiv(
+											_('Avoid including sensitive data.')
 										))->addClass(ZBX_STYLE_FORM_FIELDS_HINT)
 									]))->addClass('js-tls-input'),
 									(new CFormField([

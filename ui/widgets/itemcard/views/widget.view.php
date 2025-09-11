@@ -41,8 +41,8 @@ elseif ($data['item']) {
 				$sections[] = makeSectionError($item['error']);
 				break;
 
-			case CWidgetFieldItemSections::SECTION_METRICS:
-				$sections[] = makeSectionMetrics($item);
+			case CWidgetFieldItemSections::SECTION_INTERVAL_AND_STORAGE:
+				$sections[] = makeSectionIntervalAndStorage($item);
 				break;
 
 			case CWidgetFieldItemSections::SECTION_TYPE_OF_INFORMATION:
@@ -368,7 +368,7 @@ function makeSectionTriggers(array $item_triggers, string $hostid, array $trigge
 		->addClass('section-triggers');
 }
 
-function makeSectionMetrics(array $item): CDiv {
+function makeSectionIntervalAndStorage(array $item): CDiv {
 	$help_icon = null;
 
 	if ($item['custom_intervals']) {
@@ -414,7 +414,7 @@ function makeSectionMetrics(array $item): CDiv {
 		]))->addClass('right-column')
 	]))
 		->addClass(Widget::ZBX_STYLE_SECTION)
-		->addClass('section-metrics');
+		->addClass('section-interval-and-storage');
 }
 
 function makeSectionLatestData(array $item, string $context): CDiv {

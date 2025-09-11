@@ -191,7 +191,7 @@ foreach ($data['triggers'] as $trigger) {
 		(new CDiv($expression))->addClass(ZBX_STYLE_WORDBREAK),
 		$status_toggle->addClass(triggerIndicatorStyle($trigger['status'])),
 		$discover_toggle->addClass($no_discover ? ZBX_STYLE_RED : ZBX_STYLE_GREEN),
-		$data['tags'][$triggerid]
+		(new CDiv($data['tags'][$triggerid]))->addClass(ZBX_STYLE_TAGS_WRAPPER)
 	]);
 }
 

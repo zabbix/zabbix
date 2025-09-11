@@ -55,7 +55,6 @@ class CControllerGraphPrototypeEdit extends CController {
 			'discover' =>			'db graphs.discover|in '.implode(',', [
 				ZBX_PROTOTYPE_DISCOVER, ZBX_PROTOTYPE_NO_DISCOVER
 			]),
-			'normal_only' =>		'in 1',
 			'clone' =>				'in 1',
 			'visible' =>			'array'
 		];
@@ -118,7 +117,6 @@ class CControllerGraphPrototypeEdit extends CController {
 			'parent_discoveryid' => $this->getInput('parent_discoveryid'),
 			'hostid' => $this->parent_discovery['hostid'],
 			'context' => $this->getInput('context'),
-			'normal_only' => $this->getInput('normal_only', 0),
 			'readonly' => $this->getInput('readonly', 0),
 			'discovered' => false,
 			'is_discovered_prototype' => false

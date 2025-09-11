@@ -1688,7 +1688,7 @@ class CLineGraphDraw extends CGraphDraw {
 		$avg_from = $data['avg'][$from] + $shift_avg_from;
 		$avg_to = $data['avg'][$to] + $shift_avg_to;
 
-		$x1 = $from + $this->shiftXleft;
+		$x1 = $from + $this->shiftXleft - 1;
 		$x2 = $to + $this->shiftXleft;
 
 		$y1min = (int) round($zero - ($min_from - $oxy) / $unit2px);
@@ -1779,7 +1779,7 @@ class CLineGraphDraw extends CGraphDraw {
 
 				if ($calc_fnc == CALC_FNC_ALL) {
 					if (PHP_VERSION_ID >= 80100) {
-						imagefilledpolygon($this->im, $a, $avg_color);
+						imagefilledpolygon($this->im, $a, $minmax_color);
 					}
 					else {
 						imagefilledpolygon($this->im, $a, 4, $minmax_color);
