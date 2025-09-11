@@ -350,6 +350,10 @@ func (ms *mqttSub) startAsyncEstablishingConnectionBackoff() {
 					return
 				}
 
+				if mc.connected {
+					return
+				}
+
 				var err error
 
 				mc.client, err = newClient(mc.opts)
@@ -394,6 +398,7 @@ func (p *Plugin) createOptions(
 		SetClientID(clientid).
 		SetCleanSession(true).
 		SetConnectTimeout(time.Duration(impl.options.Timeout) * time.Second)
+
 	if username != "" {
 		opts.SetUsername(username)
 
@@ -410,7 +415,7 @@ func (p *Plugin) createOptions(
 
 	opts.OnConnect = func(_ mqtt.Client) {
 		if !connectionEstablished {
-			p.Debugf("connected to [%s]", b.url)
+			p.Warningf("connected to [%s]", b.url)
 
 			connectionEstablished = true
 		} else {
