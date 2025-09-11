@@ -67,7 +67,7 @@ static int	DBpatch_7050006(void)
 	return DBadd_foreign_key("problem", 2, &field);
 }
 
-static int  DBpatch_7050007(void)
+static int	DBpatch_7050007(void)
 {
 	if (0 == (DBget_program_type() & ZBX_PROGRAM_TYPE_SERVER))
 		return SUCCEED;
