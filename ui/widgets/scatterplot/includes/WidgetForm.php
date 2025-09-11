@@ -281,6 +281,6 @@ class WidgetForm extends CWidgetForm {
 	private function initThresholdsFields(): self {
 		return $this
 			->addField(new CWidgetFieldCheckBox('interpolation', '', _('Color interpolation')))
-			->addField(new CWidgetFieldAxisThresholds('thresholds', '', true));
+			->addField(new CWidgetFieldAxisThresholds('thresholds'));
 	}
 }
