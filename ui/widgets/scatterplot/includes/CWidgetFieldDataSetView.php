@@ -382,7 +382,7 @@ class CWidgetFieldDataSetView extends CWidgetFieldView {
 		}
 
 		$dataset_head[] = (new CDiv(
-			(new CButtonIcon(ZBX_ICON_REMOVE_SMALLER, _('Delete')))->addClass('js-remove')
+			(new CButtonIcon(ZBX_ICON_REMOVE_SMALLER, _('Delete')))->addClass('js-dataset-remove')
 		))->addClass('list-item-actions');
 
 		$override_host_html = [];
@@ -517,7 +517,7 @@ class CWidgetFieldDataSetView extends CWidgetFieldView {
 			(new CCol([
 				(new CButton('button', _('Remove')))
 					->addClass(ZBX_STYLE_BTN_LINK)
-					->addClass('element-table-remove'),
+					->addClass('js-single-item-row-remove'),
 				new CVar($this->field->getName().'['.$ds_num.']['.$key.'][]', $itemid,
 					$key.'_'.$ds_num.'_'.$row_num.'_itemid'
 				),

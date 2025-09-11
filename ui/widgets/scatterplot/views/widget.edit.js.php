@@ -173,11 +173,11 @@ window.widget_form = new class extends CWidgetForm {
 				this._editItem(e.target);
 			}
 
-			if (e.target.classList.contains('element-table-remove')) {
+			if (e.target.classList.contains('js-single-item-row-remove')) {
 				this._removeSingleItem(e.target);
 			}
 
-			if (e.target.classList.contains('js-remove')) {
+			if (e.target.classList.contains('js-dataset-remove')) {
 				this._removeDataSet(e.target);
 			}
 		});
