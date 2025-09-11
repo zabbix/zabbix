@@ -120,7 +120,7 @@ class CWidgetFieldDataSet extends CWidgetField {
 		if (!$strict) {
 			return [];
 		}
-		
+
 		$total_item_count = 0;
 
 		$validation_rules = $this->getValidationRules($strict);
