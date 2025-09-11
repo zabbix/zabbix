@@ -503,3 +503,4 @@ int	zbx_is_user_macro(const char *str)
 
 	return SUCCEED;
 }
+

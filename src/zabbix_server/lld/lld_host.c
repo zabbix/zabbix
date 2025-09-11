@@ -5715,6 +5715,66 @@ static int	another_main_interface_exists(const zbx_vector_lld_interface_ptr_t *i
 	return FAIL;
 }
 
+/******************************************************************************
+ *                                                                            *
+ * Purpose: validate DNS name containing macros                               *
+ *                                                                            *
+ * Parameters: dns - [IN] DNS name string to validate                         *
+ *                                                                            *
+ * Return value: SUCCEED - DNS name is valid                                  *
+ *               FAIL    - otherwise                                          *
+ *                                                                            *
+ * Comments: Possible macro values are ignored.                               *
+ *                                                                            *
+ ******************************************************************************/
+static int	lld_validate_dns(const char *dns)
+{
+	zbx_token_t	token;
+	int		pos = 0, start = 0, len = 0, end = 0;
+
+	while (SUCCEED == zbx_token_find(dns, pos, &token, ZBX_TOKEN_SEARCH_REFERENCES))
+	{
+		switch (token.type)
+		{
+			case ZBX_TOKEN_MACRO:
+			case ZBX_TOKEN_FUNC_MACRO:
+			case ZBX_TOKEN_USER_MACRO:
+			case ZBX_TOKEN_USER_FUNC_MACRO:
+				if (0 != start && '.' == dns[start])
+				{
+					start++;
+					len++;
+				}
+				if ((int)token.loc.l != start)
+				{
+					if (SUCCEED != zbx_validate_hostname_len(dns + start, (int)token.loc.l - start))
+						return FAIL;
+				}
+
+				len += (int)token.loc.l - start;
+				pos = (int)token.loc.r + 1;
+				start = pos;
+				continue;
+			default:
+				pos++;
+				continue;
+		}
+	}
+
+	if (0 != start && '.' == dns[start])
+		start++;
+
+	end = (int)strlen(dns);
+
+	if (ZBX_MAX_DNSNAME_LEN < len + end - start)
+		return FAIL;
+
+	if (start >= end)
+		return SUCCEED;
+
+	return zbx_validate_hostname_len(dns + start, end - start);
+}
+
 static int	lld_interface_validate_fields(const zbx_lld_interface_t *interface, const char *hostname, char **error)
 {
 	const char	*op;
@@ -5724,7 +5784,7 @@ static int	lld_interface_validate_fields(const zbx_lld_interface_t *interface, c
 	if (ZBX_INTERFACE_PORT_LEN < zbx_strlen_utf8(interface->port))
 	{
 		*error = zbx_strdcatf(*error, "Cannot %s \"%s\" interface on host \"%s\": "
-				"Port is too long.\n",
+				"port is too long.\n",
 				op, zbx_interface_type_string(interface->type_orig),
 				hostname);
 
@@ -5734,7 +5794,7 @@ static int	lld_interface_validate_fields(const zbx_lld_interface_t *interface, c
 	if (NULL != interface->port && '\0' == *interface->port)
 	{
 		*error = zbx_strdcatf(*error, "Cannot %s \"%s\" interface on host \"%s\": "
-				"Port cannot be empty.\n",
+				"port cannot be empty.\n",
 				op, zbx_interface_type_string(interface->type_orig),
 				hostname);
 
@@ -5746,7 +5806,7 @@ static int	lld_interface_validate_fields(const zbx_lld_interface_t *interface, c
 	if (FAIL == zbx_is_ushort(interface->port, &port_n) && FAIL == zbx_is_user_macro(interface->port))
 	{
 		*error = zbx_strdcatf(*error, "Cannot %s \"%s\" interface on host \"%s\": "
-				"Invalid port value.\n",
+				"invalid port value.\n",
 				op, zbx_interface_type_string(interface->type_orig),
 				hostname);
 
@@ -5768,9 +5828,19 @@ static int	lld_interface_validate_fields(const zbx_lld_interface_t *interface, c
 		if (ZBX_INTERFACE_DNS_LEN < zbx_strlen_utf8(interface->dns))
 		{
 			*error = zbx_strdcatf(*error, "Cannot %s \"%s\" interface on host \"%s\": "
-					"DNS name is too long.\n",
+					"invalid DNS name is too long.\n",
 					op, zbx_interface_type_string(interface->type_orig),
 					hostname);
+
+			return FAIL;
+		}
+
+		if (FAIL == lld_validate_dns(interface->dns))
+		{
+			*error = zbx_strdcatf(*error, "Cannot %s \"%s\" interface on host \"%s\": "
+				"invalid DNS name.\n",
+				op, zbx_interface_type_string(interface->type_orig),
+				hostname);
 
 			return FAIL;
 		}
@@ -5800,7 +5870,7 @@ static int	lld_interface_validate_fields(const zbx_lld_interface_t *interface, c
 		if (SUCCEED != zbx_is_ip(interface->ip) && SUCCEED != zbx_is_user_macro(interface->ip))
 		{
 			*error = zbx_strdcatf(*error, "Cannot %s \"%s\" interface on host \"%s\": "
-				"Invalid IP Address.\n",
+				"invalid IP Address.\n",
 				op, zbx_interface_type_string(interface->type_orig),
 				hostname);
 
