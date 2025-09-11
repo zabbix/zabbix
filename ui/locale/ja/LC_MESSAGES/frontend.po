@@ -4,7 +4,7 @@ msgstr ""
 "Project-Id-Version: Zabbix 6.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2023-10-19 13:48+0300\n"
-"PO-Revision-Date: 2025-08-27 23:56+0000\n"
+"PO-Revision-Date: 2025-08-29 03:19+0000\n"
 "Last-Translator: Eiji Kawakita <age@cyber.email.ne.jp>\n"
 "Language-Team: Zabbix\n"
 "Language: ja\n"
@@ -2017,6 +2017,10 @@ msgstr "収集間隔内の仮想ディスクへの未処理の書き込みリク
 #: app/views/administration.authentication.edit.php:131
 msgid "Avoid easy-to-guess passwords"
 msgstr "推測されやすいパスワードの回避"
+
+#: app/views/host.wizard.edit.php:473
+msgid "Avoid including sensitive data."
+msgstr ""
 
 #: jsLoader.php:172
 msgid "Awaiting data"
@@ -7174,7 +7178,7 @@ msgstr "検出されたTimescaleDBのライセンスは、圧縮をサポート�
 
 #: app/views/administration.housekeeping.edit.php:204
 msgid "Detected license does not support compression. Compression is supported in TimescaleDB Community Edition."
-msgstr ""
+msgstr "検出されたライセンスは圧縮をサポートしていません。TimescaleDB Community Editionでは圧縮がサポートされています。"
 
 #: app/controllers/CControllerPopupTriggerExpr.php:1130
 msgid "Detection period"
@@ -8427,6 +8431,10 @@ msgstr "英語 (en_US)"
 #: app/views/host.wizard.edit.php:399
 msgid "Enter a non-secret pre-shared key identity string. Avoid including sensitive data."
 msgstr "非秘密の事前共有キーID文字列を入力してください。機密データは含めないでください。"
+
+#: app/views/host.wizard.edit.php:470
+msgid "Enter a unique name that Zabbix components will use to recognize the pre-shared key."
+msgstr ""
 
 #: app/views/host.wizard.edit.php:609
 msgid "Enter the IP/DNS address and port of the Zabbix agent installed on your monitoring target."
