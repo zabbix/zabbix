@@ -381,7 +381,11 @@ class testPermissionsWithoutCSRF extends CWebTest {
 				[
 					'db' => 'SELECT * FROM icon_map',
 					'link' => 'zabbix.php?action=iconmap.edit',
-					'return_button' => true
+					'return_button' => true,
+					'fields' => [
+						'id:name' => 'CSRF icon test name',
+						'id:mappings_0_expression' => 'CSRF_test'
+					]
 				]
 			],
 			// #35 Regular expression update.
