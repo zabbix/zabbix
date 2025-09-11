@@ -32,6 +32,7 @@
 	->addItem((new CTextBox('expressions['.$data['index'].'][expression]', $data['expression'], false,
 		DB::getFieldLength('expressions', 'expression'))
 	)
+		->setAttribute('data-notrim', '')
 		->setWidth(ZBX_TEXTAREA_MEDIUM_WIDTH)
 		->setAriaRequired()
 		->setErrorContainer('expressions-'.$data['index'].'-error-container')
