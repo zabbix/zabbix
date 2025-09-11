@@ -694,105 +694,90 @@ class CFormValidator {
 			unset($data[$field]);
 		}
 
-		if (array_key_exists('type', $rules) && $rules['type'] == 'file') {
-			if (array_key_exists($field, $files) && $files[$field] == null) {
-				unset($files[$field]);
-			}
+		$field_exists = $rules['type'] == 'file'
+			? array_key_exists($field, $files)
+			: array_key_exists($field, $data);
 
-			if (!array_key_exists($field, $files)) {
-				if (array_key_exists('required', $rules)) {
-					$this->addError(self::ERROR, $path,
-						self::getMessage($rules, 'required', _('Required field is missing.')), self::ERROR_LEVEL_PRIMARY
-					);
-				}
-
-				return;
-			}
-		}
-		else if (!array_key_exists($field, $data)) {
-			if (array_key_exists('required', $rules)) {
-				$this->addError(self::ERROR, $path,
-					self::getMessage($rules, 'required', _('Required field is missing.')), self::ERROR_LEVEL_PRIMARY
-				);
-			}
+		if (!$field_exists && array_key_exists('required', $rules)) {
+			$this->addError(self::ERROR, $path,
+				self::getMessage($rules, 'required', _('Required field is missing.')), self::ERROR_LEVEL_PRIMARY
+			);
 
 			return;
 		}
 
-		if (array_key_exists('type', $rules)) {
-			switch ($rules['type']) {
-				case 'id':
-					if (!self::validateId($rules, $data[$field], $error)) {
-						$this->addError(self::ERROR, $path, $error, self::ERROR_LEVEL_PRIMARY);
+		switch ($rules['type']) {
+			case 'id':
+				if (!self::validateId($rules, $data[$field], $error)) {
+					$this->addError(self::ERROR, $path, $error, self::ERROR_LEVEL_PRIMARY);
 
-						return;
-					}
-					break;
+					return;
+				}
+				break;
 
-				case 'integer':
-					if (!self::validateInt32($rules, $data[$field], $error)) {
-						$this->addError(self::ERROR, $path, $error, self::ERROR_LEVEL_PRIMARY);
+			case 'integer':
+				if (!self::validateInt32($rules, $data[$field], $error)) {
+					$this->addError(self::ERROR, $path, $error, self::ERROR_LEVEL_PRIMARY);
 
-						return;
-					}
-					break;
+					return;
+				}
+				break;
 
-				case 'float':
-					if (!self::validateFloat($rules, $data[$field], $error)) {
-						$this->addError(self::ERROR, $path, $error, self::ERROR_LEVEL_PRIMARY);
+			case 'float':
+				if (!self::validateFloat($rules, $data[$field], $error)) {
+					$this->addError(self::ERROR, $path, $error, self::ERROR_LEVEL_PRIMARY);
 
-						return;
-					}
-					break;
+					return;
+				}
+				break;
 
-				case 'string':
-					if (!self::validateStringUtf8($rules, $data[$field], $error)) {
-						$this->addError(self::ERROR, $path, $error, self::ERROR_LEVEL_PRIMARY);
+			case 'string':
+				if (!self::validateStringUtf8($rules, $data[$field], $error)) {
+					$this->addError(self::ERROR, $path, $error, self::ERROR_LEVEL_PRIMARY);
 
-						return;
-					}
+					return;
+				}
 
-					if (!self::validateUse($rules, $data[$field], $error)) {
-						$error = self::getMessage($rules, 'use', $error);
+				if (!self::validateUse($rules, $data[$field], $error)) {
+					$error = self::getMessage($rules, 'use', $error);
 
-						$this->addError(self::ERROR, $path, $error, self::ERROR_LEVEL_DELAYED);
+					$this->addError(self::ERROR, $path, $error, self::ERROR_LEVEL_DELAYED);
 
-						return;
-					}
-					break;
+					return;
+				}
+				break;
 
-				case 'array':
-					if (!$this->validateArray($rules, $data[$field], $error, $path)) {
-						$this->addError(self::ERROR, $path, $error, self::ERROR_LEVEL_PRIMARY);
+			case 'array':
+				if (!$this->validateArray($rules, $data[$field], $error, $path)) {
+					$this->addError(self::ERROR, $path, $error, self::ERROR_LEVEL_PRIMARY);
 
-						return;
-					}
-					break;
+					return;
+				}
+				break;
 
-				case 'object':
-					if (!$this->validateObject($rules, $data[$field], $error, $path)) {
-						$this->addError(self::ERROR, $path, $error, self::ERROR_LEVEL_PRIMARY);
+			case 'object':
+				if (!$this->validateObject($rules, $data[$field], $error, $path)) {
+					$this->addError(self::ERROR, $path, $error, self::ERROR_LEVEL_PRIMARY);
 
-						return;
-					}
-					break;
+					return;
+				}
+				break;
 
-				case 'objects':
-					if (!$this->validateObjects($rules, $data[$field], $error, $path)) {
-						$this->addError(self::ERROR, $path, $error, self::ERROR_LEVEL_PRIMARY);
+			case 'objects':
+				if (!$this->validateObjects($rules, $data[$field], $error, $path)) {
+					$this->addError(self::ERROR, $path, $error, self::ERROR_LEVEL_PRIMARY);
 
-						return;
-					}
-					break;
+					return;
+				}
+				break;
 
-				case 'file':
-					if (!$this->validateFile($rules, $files[$field], $error)) {
-						$this->addError(self::ERROR, $path, $error, self::ERROR_LEVEL_PRIMARY);
+			case 'file':
+				if (!$this->validateFile($rules, $files[$field], $error)) {
+					$this->addError(self::ERROR, $path, $error, self::ERROR_LEVEL_PRIMARY);
 
-						return;
-					}
-					break;
-			}
+					return;
+				}
+				break;
 		}
 	}
 
@@ -1145,7 +1130,7 @@ class CFormValidator {
 		}
 
 		$value = array_intersect_key($value, $rules['fields']);
-		$files = $files ? array_intersect_key($files, $rules['fields']) : $files;
+		$files = array_intersect_key($files, $rules['fields']);
 
 		if (array_key_exists('api_uniq', $rules)) {
 			foreach ($rules['api_uniq'] as $api_check) {

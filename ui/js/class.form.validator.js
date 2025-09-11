@@ -1350,7 +1350,7 @@ class CFormValidator {
 	 * Function to validate data that according to the rules is expected to be a file.
 	 *
 	 * @param {Object} rules  Ruleset to use for validation.
-	 * @param {any}    value  Data to validate (upploaded file).
+	 * @param {any}    value  Data to validate (an uploaded file).
 	 *
 	 * @returns {Object}
 	 */
@@ -1368,7 +1368,7 @@ class CFormValidator {
 			if (!value.type.startsWith(`${rules.file['type']}/`)) {
 				return {
 					result: CFormValidator.ERROR,
-					error: this.#getMessage(rules, 'type', t('File format is unsupported.'))
+					error: this.#getMessage(rules, 'file-type', t('File format is unsupported.'))
 				};
 			}
 		}

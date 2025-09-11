@@ -118,7 +118,7 @@ class CUploadFile {
 	 * @param int $max_file_size	maximum size in B
 	 * @param string $file_type		affects exception text
 	 *
-	 * @throws Exception if file size is over provided limit
+	 * @throws Exception if file size is over the provided limit
 	 */
 	public function validateFileSize(int $max_file_size, string $file_type = 'file') {
 		$exception_message = ($file_type == 'image') ?
