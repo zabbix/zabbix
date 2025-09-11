@@ -79,11 +79,11 @@ class CScatterPlotLegend extends CDiv {
 
 	private function draw(): void {
 		foreach ($this->legend_items as $item) {
-			$icon = CScatterPlotMetricPoint::MARKER_ICONS[$item['marker']];
+			$icon_class = CScatterPlotMetricPoint::MARKER_ICONS[$item['marker']];
 
 			$this->addItem(
 				(new CDiv([
-					(new CIcon($icon))->addStyle('color: '.$item['color'].';'),
+					(new CIcon($icon_class))->addStyle('color: '.$item['color'].';'),
 					$item['name']
 				]))->addClass(self::ZBX_STYLE_SCATTER_PLOT_LEGEND_ITEM)
 			);

@@ -71,65 +71,52 @@ class CWidgetFieldAxisThresholds extends CWidgetField {
 			'is_binary_size' => $this->is_binary_units
 		]);
 
-		$thresholds_both_axes = [];
-		$thresholds_x_axis = [];
-		$thresholds_y_axis = [];
+		$both_axes = [];
+		$x_axis = [];
+		$y_axis = [];
 
 		foreach ($this->getValue() as $threshold) {
-			$threshold_parsed_values = [];
+			$parsed_values = [];
 
 			if ($number_parser->parse($threshold['x_axis_threshold']) === CParser::PARSE_SUCCESS) {
-				$threshold_parsed_values['x_axis_threshold'] = $number_parser->calcValue();
+				$parsed_values['x_axis'] = $number_parser->calcValue();
 			}
 
 			if ($number_parser->parse($threshold['y_axis_threshold']) === CParser::PARSE_SUCCESS) {
-				$threshold_parsed_values['y_axis_threshold'] = $number_parser->calcValue();
+				$parsed_values['y_axis'] = $number_parser->calcValue();
 			}
 
-			if (array_key_exists('x_axis_threshold', $threshold_parsed_values)
-					&& array_key_exists('y_axis_threshold', $threshold_parsed_values)) {
-				$thresholds_both_axes[] = $threshold + [
-					'x_threshold_value' => $threshold_parsed_values['x_axis_threshold'],
-					'y_threshold_value' => $threshold_parsed_values['y_axis_threshold']
+			if (array_key_exists('x_axis', $parsed_values) && array_key_exists('y_axis', $parsed_values)) {
+				$both_axes[] = $threshold + [
+					'x_threshold_order' => $parsed_values['x_axis'],
+					'y_threshold_order' => $parsed_values['y_axis']
 				];
 			}
-			elseif (array_key_exists('x_axis_threshold', $threshold_parsed_values)) {
-				$thresholds_x_axis[] = $threshold + [
-					'x_threshold_value' => $threshold_parsed_values['x_axis_threshold']
-				];
+			elseif (array_key_exists('x_axis', $parsed_values)) {
+				$x_axis[] = ['x_threshold_order' => $parsed_values['x_axis']] + $threshold;
 			}
-			elseif (array_key_exists('y_axis_threshold', $threshold_parsed_values)) {
-				$thresholds_y_axis[] = $threshold + [
-					'y_threshold_value' => $threshold_parsed_values['y_axis_threshold']
-				];
+			elseif (array_key_exists('y_axis', $parsed_values)) {
+				$y_axis[] = ['y_threshold_order' => $parsed_values['y_axis']] + $threshold;
 			}
 		}
 
-		usort($thresholds_both_axes, static function(array $threshold_1, array $threshold_2): int {
-			// First sort by x (ascending)
-			if ($threshold_1['x_threshold_value'] === $threshold_2['x_threshold_value']) {
-				// If x is the same, sort by y (ascending)
-				return $threshold_1['y_threshold_value'] <=> $threshold_2['y_threshold_value'];
+		usort($both_axes, static function(array $t1, array $t2): int {
+			// First sort by X (ascending)
+			if ($t1['x_threshold_order'] === $t2['x_threshold_order']) {
+				// If X is the same, sort by Y (ascending)
+				return $t1['y_threshold_order'] <=> $t2['y_threshold_order'];
 			}
-			return $threshold_1['x_threshold_value'] <=> $threshold_2['x_threshold_value'];
+
+			return $t1['x_threshold_order'] <=> $t2['x_threshold_order'];
 		});
 
-		uasort($thresholds_x_axis,
-			static function (array $threshold_1, array $threshold_2): int {
-				return $threshold_1['x_threshold_value'] <=> $threshold_2['x_threshold_value'];
-			}
-		);
+		uasort($x_axis, static fn (array $t1, array $t2) => $t1['x_threshold_order'] <=> $t2['x_threshold_order']);
+		uasort($y_axis,	static fn (array $t1, array $t2) => $t1['y_threshold_order'] <=> $t2['y_threshold_order']);
 
-		uasort($thresholds_y_axis,
-			static function (array $threshold_1, array $threshold_2): int {
-				return $threshold_1['y_threshold_value'] <=> $threshold_2['y_threshold_value'];
-			}
-		);
-
-		$thresholds = array_merge($thresholds_both_axes, $thresholds_x_axis, $thresholds_y_axis);
+		$thresholds = array_merge($both_axes, $x_axis, $y_axis);
 
 		foreach ($thresholds as &$threshold) {
-			unset($threshold['x_threshold_value'], $threshold['y_threshold_value']);
+			unset($threshold['x_threshold_order'], $threshold['y_threshold_order']);
 		}
 		unset($threshold);
 

@@ -160,10 +160,6 @@ class CWidgetFieldDataSet extends CWidgetField {
 	}
 
 	public function validate(bool $strict = false): array {
-		if (!$strict) {
-			return [];
-		}
-
 		$errors = [];
 
 		$validation_rules = $this->getValidationRules($strict);
