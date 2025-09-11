@@ -21,8 +21,6 @@
 #include "zbxtypes.h"
 #include "zbxtime.h"
 
-#define DBPOOL_HOUSEKEEP_INTERVAL	60
-
 #define DBPOOL_DEFAULT_MAX_IDLE		10
 #define DBPOOL_DEFAULT_MAX_OPEN		100
 #define DBPOOL_DEFAULT_IDLE_TIMEOUT	(SEC_PER_HOUR)
@@ -206,6 +204,8 @@ static void	dbconn_pool_apply_config(zbx_dbconn_pool_t *pool, zbx_dbconn_pool_co
  ******************************************************************************/
 static void	dbconn_pool_sync_cache(zbx_dbconn_pool_t *pool, double now)
 {
+#define DBPOOL_HOUSEKEEP_INTERVAL	60
+
 	if (now - pool->time_housekeep > DBPOOL_HOUSEKEEP_INTERVAL)
 	{
 		zbx_dbconn_pool_config_t	config;
@@ -224,6 +224,8 @@ static void	dbconn_pool_sync_cache(zbx_dbconn_pool_t *pool, double now)
 
 		pool->time_housekeep = now;
 	}
+
+#undef DBPOOL_HOUSEKEEP_INTERVAL
 }
 
 /******************************************************************************
@@ -354,9 +356,7 @@ static int	dbconn_pool_sync_settings(zbx_dbconn_pool_config_t *cfg, char **error
  *                                                                            *
  * Purpose: create database connection pool                                   *
  *                                                                            *
- * Parameters: cache    - [IN] shared cache to exchange config and stats      *
- *             conn_num - [IN] total number of threads with db access         *
- *             error    - [OUT] error message                                 *
+ * Parameters: error - [OUT] error message                                    *
  *                                                                            *
  ******************************************************************************/
 zbx_dbconn_pool_t	*zbx_dbconn_pool_create(char **error)
