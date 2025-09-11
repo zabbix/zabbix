@@ -144,6 +144,12 @@ window.sla_edit_popup = new class {
 	}
 
 	_updateExcludedDowntime(row, excluded_downtime) {
+		const next_sibling = row.nextElementSibling;
+
+		if (next_sibling && next_sibling.classList.contains('error-container-row')) {
+			next_sibling.remove();
+		}
+
 		row.insertAdjacentHTML('afterend', this.excluded_downtime_template.evaluate(excluded_downtime));
 		row.remove();
 	}

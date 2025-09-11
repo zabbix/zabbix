@@ -103,9 +103,7 @@ window.sla_excluded_downtime_edit_popup = new class {
 	_addMessageBox(message_box) {
 		this._removeMessageBoxes();
 
-		const step_form = this.dialogue.querySelector('.step-form');
-
-		step_form.parentNode.insertBefore(message_box, step_form);
+		this.form_element.parentNode.insertBefore(message_box, this.form_element);
 	}
 
 	_removeMessageBoxes() {
