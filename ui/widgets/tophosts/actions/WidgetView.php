@@ -549,7 +549,8 @@ class WidgetView extends CControllerDashboardWidgetView {
 	private static function getItemValues(array $items, array $column): array {
 		static $history_period_s;
 
-		if ($history_period_s === null) {
+		if ($history_period_s === null && in_array($column['display'], [CWidgetFieldColumnsList::DISPLAY_AS_IS,
+				CWidgetFieldColumnsList::DISPLAY_BAR, CWidgetFieldColumnsList::DISPLAY_INDICATORS])) {
 			$history_period_s = timeUnitToSeconds(CSettingsHelper::get(CSettingsHelper::HISTORY_PERIOD));
 		}
 
