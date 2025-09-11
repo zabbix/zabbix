@@ -2629,6 +2629,8 @@ abstract class testFormMacros extends CLegacyWebTest {
 			$this->page->open('zabbix.php?action=macros.edit')->waitUntilReady();
 			$this->getValueField($this->macro_resolve)->changeInputType(CInputGroupElement::TYPE_SECRET);
 			$this->query('button:Update')->one()->click();
+			$this->page->waitUntilReady();
+			$this->assertMessage(TEST_GOOD, 'Macros updated');
 		}
 
 		$this->checkItemFields($url, $data['name'], $data['key_secret']);
