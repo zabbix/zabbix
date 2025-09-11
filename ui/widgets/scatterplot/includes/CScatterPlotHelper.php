@@ -78,7 +78,7 @@ class CScatterPlotHelper {
 
 		$svg_height = max(0, $height - ($legend !== null ? $legend->getHeight() : 0));
 
-		$graph = (new СScatterPlot([
+		$scatter_plot = (new CScatterPlot([
 			'time_period' => $options['time_period'],
 			'axes' => $options['axes']
 		]))
@@ -87,22 +87,22 @@ class CScatterPlotHelper {
 			->draw();
 
 		// Add mouse following helper line.
-		$graph->addHelper();
+		$scatter_plot->addHelper();
 
 		return [
-			'svg' => $graph,
+			'svg' => $scatter_plot,
 			'legend' => $legend ?? '',
 			'data' => [
 				'dims' => [
-					'x' => $graph->getCanvasX(),
-					'y' => $graph->getCanvasY(),
-					'w' => $graph->getCanvasWidth(),
-					'h' => $graph->getCanvasHeight()
+					'x' => $scatter_plot->getCanvasX(),
+					'y' => $scatter_plot->getCanvasY(),
+					'w' => $scatter_plot->getCanvasWidth(),
+					'h' => $scatter_plot->getCanvasHeight()
 				],
-				'spp' => $graph->getCanvasWidth() === 0
+				'spp' => $scatter_plot->getCanvasWidth() === 0
 					? 0
 					: ($options['time_period']['time_to'] - $options['time_period']['time_from'])
-					/ $graph->getCanvasWidth()
+					/ $scatter_plot->getCanvasWidth()
 			],
 			'errors' => $errors
 		];

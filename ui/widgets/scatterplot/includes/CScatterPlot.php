@@ -24,7 +24,7 @@ use CMathHelper,
 	CSvgTag,
 	Exception;
 
-class СScatterPlot extends CSvg {
+class CScatterPlot extends CSvg {
 
 	public const SVG_GRAPH_X_AXIS_HEIGHT = 20;
 
@@ -158,7 +158,7 @@ class СScatterPlot extends CSvg {
 		return $this->canvas_height;
 	}
 
-	public function addMetrics(array $metrics): СScatterPlot {
+	public function addMetrics(array $metrics): self {
 		foreach ($metrics as $index => $metric) {
 			$this->metrics[$index] = [
 				'data_set' => $metric['data_set'],
