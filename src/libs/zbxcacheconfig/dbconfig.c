@@ -3501,7 +3501,7 @@ static void	DCsync_items(zbx_dbsync_t *sync, zbx_uint64_t revision, zbx_synced_n
 
 		/* SNMP trap items for current server/proxy */
 
-		if (ITEM_TYPE_SNMPTRAP == item->type && 0 == host->proxyid)
+		if (ITEM_TYPE_SNMPTRAP == item->type)
 		{
 			interface_snmpitem = (ZBX_DC_INTERFACE_ITEM *)DCfind_id(&config->interface_snmpitems,
 					item->interfaceid, sizeof(ZBX_DC_INTERFACE_ITEM), &found);
@@ -9829,6 +9829,30 @@ void	zbx_dc_config_get_items_by_itemids(zbx_dc_item_t *items, const zbx_uint64_t
 	UNLOCK_CACHE;
 }
 
+/******************************************************************************
+ *                                                                            *
+ * Purpose: find host identifier referenced by item or lld-rule.              *
+ *                                                                            *
+ * Parameters: hostids - [OUT] vector with found host identifier. Caller      *
+ *                             should pass empty vector.                      *
+ *             itemid  - [IN]  item identifier                                *
+ *                                                                            *
+ ******************************************************************************/
+void	zbx_dc_config_get_hostid_by_itemid(zbx_vector_uint64_t *hostids, zbx_uint64_t itemid)
+{
+	if (0 == hostids->values_num)
+	{
+		const ZBX_DC_ITEM	*dc_item;
+
+		RDLOCK_CACHE;
+
+		if (NULL != (dc_item = (ZBX_DC_ITEM *)zbx_hashset_search(&config->items, &itemid)))
+			zbx_vector_uint64_append(hostids, dc_item->hostid);
+
+		UNLOCK_CACHE;
+	}
+}
+
 int	zbx_dc_config_get_active_items_count_by_hostid(zbx_uint64_t hostid)
 {
 	ZBX_DC_HOST		*dc_host;
@@ -11623,6 +11647,9 @@ size_t	zbx_dc_config_get_snmp_items_by_interfaceid(zbx_uint64_t interfaceid, zbx
 		goto unlock;
 
 	if (HOST_STATUS_MONITORED != dc_host->status)
+		goto unlock;
+
+	if (dc_host->proxyid != 0)
 		goto unlock;
 
 	if (NULL == (dc_interface_snmpitem = (const ZBX_DC_INTERFACE_ITEM *)zbx_hashset_search(

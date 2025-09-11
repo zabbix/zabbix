@@ -21,7 +21,7 @@
 
 #include "zbxexpression.h"
 #include "zbxlog.h"
-#include "evalfunc.h"
+#include "../../../src/libs/zbxcalc/eval.h"
 
 void	zbx_mock_test_entry(void **state)
 {

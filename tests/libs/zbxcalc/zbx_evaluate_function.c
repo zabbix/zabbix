@@ -19,11 +19,11 @@
 
 #include "zbxcachevalue.h"
 #include "zbxexpression.h"
-#include "../../src/libs/zbxexpression/evalfunc.h"
 #include "zbxvariant.h"
 #include "zbxtime.h"
 #include "zbxdbhigh.h"
 #include "zbxcacheconfig.h"
+#include "zbxcalc.h"
 
 #include "zbxnum.h"
 

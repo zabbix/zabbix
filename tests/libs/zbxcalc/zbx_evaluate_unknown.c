@@ -19,6 +19,7 @@
 #include "zbxexpression.h"
 #include "zbxalgo.h"
 #include "zbxnum.h"
+#include "zbxcalc.h"
 
 void	zbx_mock_test_entry(void **state)
 {
