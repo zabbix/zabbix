@@ -313,7 +313,7 @@ static void	rtc_process_db_status(char **result)
  *                                                                            *
  * Parameters: data   - [IN] runtime control parameter (optional)             *
  *             limit  - [OUT] new maximal idle connection limit               *
- *             result - [OUT] runtime control result                          *
+ *             error  - [OUT] error message                                   *
  *                                                                            *
  ******************************************************************************/
 static int	rtc_db_set_max_idle(const char *data, int *limit, char **error)
@@ -390,7 +390,7 @@ static void	rtc_process_db_set_max_idle(const char *data, char **result)
  *                                                                            *
  * Parameters: data   - [IN] runtime control parameter (optional)             *
  *             limit  - [OUT] new maximum connection limit                    *
- *             result - [OUT] runtime control result                          *
+ *             error  - [OUT] error message                                   *
  *                                                                            *
  ******************************************************************************/
 static int	rtc_db_set_max_open(const char *data, int *limit, char **error)
@@ -467,7 +467,7 @@ static void	rtc_process_db_set_max_open(const char *data, char **result)
  *                                                                            *
  * Parameters: data    - [IN] runtime control parameter (optional)            *
  *             timeout - [OUT] new maximum connection limit                   *
- *             result  - [OUT] runtime control result                         *
+ *             error   - [OUT] error message                                  *
  *                                                                            *
  ******************************************************************************/
 static int	rtc_db_set_idle_timeout(const char *data, int *timeout, char **error)
