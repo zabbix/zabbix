@@ -13,7 +13,9 @@
 **/
 
 #include "zbxdb.h"
+
 #include "dbconn.h"
+
 #include "zbxcommon.h"
 #include "zbxalgo.h"
 #include "zbxtypes.h"
@@ -39,6 +41,24 @@ struct zbx_dbconn_pool
 	double			time_modified;	// time when statistics were updated (connection acquired/released)
 	double			time_housekeep;	// time when pool housekeeping was performed
 };
+
+static void	dbconn_pool_lock(zbx_dbconn_pool_t *pool)
+{
+	if (0 != pthread_mutex_lock(&pool->lock))
+	{
+		zabbix_log(LOG_LEVEL_CRIT, "cannot lock database connection pool mutex: %s", zbx_strerror(errno));
+		exit(EXIT_FAILURE);
+	}
+}
+
+static void	dbconn_pool_unlock(zbx_dbconn_pool_t *pool)
+{
+	if (0 != pthread_mutex_unlock(&pool->lock))
+	{
+		zabbix_log(LOG_LEVEL_CRIT, "cannot unlock database connection pool mutex: %s", zbx_strerror(errno));
+		exit(EXIT_FAILURE);
+	}
+}
 
 /******************************************************************************
  *                                                                            *
@@ -175,7 +195,6 @@ static void	dbconn_pool_apply_config(zbx_dbconn_pool_t *pool, zbx_dbconn_pool_co
 
 	zabbix_log(LOG_LEVEL_DEBUG, "reduced database pool limit from %d to %d and removed %d connections",
 			old_limit, pool->cfg.max_open, removed_num);
-
 }
 
 /******************************************************************************
@@ -421,7 +440,7 @@ zbx_dbconn_t	*zbx_dbconn_pool_acquire_connection(zbx_dbconn_pool_t *pool)
 	double	start, now;
 
 	start = zbx_time();
-	pthread_mutex_lock(&pool->lock);
+	dbconn_pool_lock(pool);
 
 	while (0 == pool->available.values_num)
 		pthread_cond_wait(&pool->event, &pool->lock);
@@ -434,7 +453,7 @@ zbx_dbconn_t	*zbx_dbconn_pool_acquire_connection(zbx_dbconn_pool_t *pool)
 	dbconn_pool_update_stats(pool, now, now - start, 1, db);
 
 	zbx_vector_dbconn_ptr_remove_noorder(&pool->available, last);
-	pthread_mutex_unlock(&pool->lock);
+	dbconn_pool_unlock(pool);
 
 	if (SUCCEED != dbconn_is_open(db))
 		dbconn_open_retry(db);
@@ -452,7 +471,7 @@ zbx_dbconn_t	*zbx_dbconn_pool_acquire_connection(zbx_dbconn_pool_t *pool)
  ******************************************************************************/
 void	zbx_dbconn_pool_release_connection(zbx_dbconn_pool_t *pool, zbx_dbconn_t *db)
 {
-	pthread_mutex_lock(&pool->lock);
+	dbconn_pool_lock(pool);
 
 	dbconn_pool_update_stats(pool, zbx_time(), 0.0, 0, db);
 
@@ -467,7 +486,7 @@ void	zbx_dbconn_pool_release_connection(zbx_dbconn_pool_t *pool, zbx_dbconn_t *d
 		zabbix_log(LOG_LEVEL_DEBUG, "removed connection from database pool due to exceeding connection limit");
 	}
 
-	pthread_mutex_unlock(&pool->lock);
+	dbconn_pool_unlock(pool);
 }
 
 /******************************************************************************
@@ -477,7 +496,7 @@ void	zbx_dbconn_pool_release_connection(zbx_dbconn_pool_t *pool, zbx_dbconn_t *d
  ******************************************************************************/
 void	zbx_dbconn_pool_sync(zbx_dbconn_pool_t *pool)
 {
-	pthread_mutex_lock(&pool->lock);
+	dbconn_pool_lock(pool);
 	dbconn_pool_sync_cache(pool, zbx_time());
-	pthread_mutex_unlock(&pool->lock);
+	dbconn_pool_unlock(pool);
 }
