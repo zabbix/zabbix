@@ -58,8 +58,6 @@ class CScatterPlot extends CSvg {
 	 */
 	private array $paths = [];
 
-	private $time_from;
-
 	private $show_x_axis;
 	private $x_min;
 	private $x_min_calculated;
@@ -122,8 +120,6 @@ class CScatterPlot extends CSvg {
 		parent::__construct();
 
 		$this->graph_theme = getUserGraphTheme();
-
-		$this->time_from = $options['time_period']['time_from'];
 
 		$this->show_x_axis = $options['axes']['show_x_axis'];
 		$this->x_min = $options['axes']['x_axis_min'];
@@ -391,8 +387,6 @@ class CScatterPlot extends CSvg {
 				]
 			];
 
-			$time_before = $this->time_from;
-
 			$path_points = [];
 
 			foreach ($this->points[$index] as $time => $point) {
@@ -400,6 +394,10 @@ class CScatterPlot extends CSvg {
 
 				foreach ($params as $axis => $options) {
 					$value = $point[$axis];
+
+					if ($value < $min_max[$axis]['min'] || $value > $min_max[$axis]['max']) {
+						continue 2;
+					}
 
 					if ($min_max[$axis]['max'] - $min_max[$axis]['min'] == INF) {
 						$coordinates[$axis] = $options['start_position'] + CMathHelper::safeMul([
@@ -415,10 +413,6 @@ class CScatterPlot extends CSvg {
 							1 / ($min_max[$axis]['max'] - $min_max[$axis]['min'])
 						]);
 					}
-
-					if ($value < $min_max[$axis]['min'] || $value > $min_max[$axis]['max']) {
-						continue 2;
-					}
 				}
 
 				$path_points[] = [
@@ -432,11 +426,9 @@ class CScatterPlot extends CSvg {
 						'units' => $this->y_units
 					]),
 					$point['color'],
-					$time_before,
-					$time
+					$time,
+					$time + $metric['options']['aggregate_interval']
 				];
-
-				$time_before = $time;
 			}
 
 			$this->paths[$index] = $path_points;

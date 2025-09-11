@@ -610,16 +610,10 @@ class CScatterPlotHelper {
 				continue;
 			}
 
-			$period = $metric['time_period']['time_to'] - $metric['time_period']['time_from'];
-			$approximation_tick_delta = ($period / $metric['options']['aggregate_interval']) > $width
-				? ceil($period / $width)
-				: 0;
-
 			foreach (['x_axis', 'y_axis'] as $axis) {
 				$metric_points = [];
 
 				foreach ($result[$axis] as $points) {
-					$tick = 0;
 					usort($points['data'],
 						static function (array $point_a, array $point_b): int {
 							return $point_a['clock'] <=> $point_b['clock'];
@@ -627,11 +621,7 @@ class CScatterPlotHelper {
 					);
 
 					foreach ($points['data'] as $point) {
-						if ($point['tick'] > $tick + $approximation_tick_delta) {
-							$tick = $point['tick'];
-						}
-
-						$metric_points[$tick][] = $point;
+						$metric_points[$point['tick']][] = $point;
 					}
 				}
 
