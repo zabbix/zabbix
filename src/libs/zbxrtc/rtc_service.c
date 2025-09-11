@@ -228,8 +228,8 @@ static void	rtc_process_profiler_option(zbx_uint32_t code, const char *data, cha
  *                                                                            *
  * Purpose: process diaginfo runtime control option                           *
  *                                                                            *
- * Parameters: data   - [IN] the runtime control parameter (optional)         *
- *             result - [OUT] the runtime control result                      *
+ * Parameters: data   - [IN] runtime control parameter (optional)             *
+ *             result - [OUT] runtime control result                          *
  *                                                                            *
  ******************************************************************************/
 static void	rtc_process_diaginfo(const char *data, char **result)
@@ -276,7 +276,7 @@ static void	rtc_process_diaginfo(const char *data, char **result)
  *                                                                            *
  * Purpose: process db_status runtime control option                          *
  *                                                                            *
- * Parameters: result - [OUT] the runtime control result                      *
+ * Parameters: result - [OUT] runtime control result                          *
  *                                                                            *
  ******************************************************************************/
 static void	rtc_process_db_status(char **result)
@@ -362,8 +362,8 @@ static int	rtc_db_set_max_idle(const char *data, int *limit, char **error)
  *                                                                            *
  * Purpose: process db_set_min_limit runtime control option                   *
  *                                                                            *
- * Parameters: data   - [IN] the runtime control parameter (optional)         *
- *             result - [OUT] the runtime control result                      *
+ * Parameters: data   - [IN] runtime control parameter (optional)             *
+ *             result - [OUT] runtime control result                          *
  *                                                                            *
  ******************************************************************************/
 static void	rtc_process_db_set_max_idle(const char *data, char **result)
@@ -439,8 +439,8 @@ static int	rtc_db_set_max_open(const char *data, int *limit, char **error)
  *                                                                            *
  * Purpose: process db_set_max_limit runtime control option                   *
  *                                                                            *
- * Parameters: data   - [IN] the runtime control parameter (optional)         *
- *             result - [OUT] the runtime control result                      *
+ * Parameters: data   - [IN] runtime control parameter (optional)             *
+ *             result - [OUT] runtime control result                          *
  *                                                                            *
  ******************************************************************************/
 static void	rtc_process_db_set_max_open(const char *data, char **result)
@@ -465,9 +465,9 @@ static void	rtc_process_db_set_max_open(const char *data, char **result)
  *                                                                            *
  * Purpose: process db_set_idle_timeout runtime control option                *
  *                                                                            *
- * Parameters: data   - [IN] runtime control parameter (optional)             *
- *             timeout  - [OUT] new maximum connection limit                  *
- *             result - [OUT] runtime control result                          *
+ * Parameters: data    - [IN] runtime control parameter (optional)            *
+ *             timeout - [OUT] new maximum connection limit                   *
+ *             result  - [OUT] runtime control result                         *
  *                                                                            *
  ******************************************************************************/
 static int	rtc_db_set_idle_timeout(const char *data, int *timeout, char **error)
@@ -507,8 +507,8 @@ static int	rtc_db_set_idle_timeout(const char *data, int *timeout, char **error)
  *                                                                            *
  * Purpose: process db_set_idle_timeout runtime control option                *
  *                                                                            *
- * Parameters: data   - [IN] the runtime control parameter (optional)         *
- *             result - [OUT] the runtime control result                      *
+ * Parameters: data   - [IN] runtime control parameter (optional)             *
+ *             result - [OUT] runtime control result                          *
  *                                                                            *
  ******************************************************************************/
 static void	rtc_process_db_set_idle_timeout(const char *data, char **result)
@@ -737,10 +737,10 @@ static void	rtc_subscribe_service(zbx_rtc_t *rtc, const unsigned char *data)
  *                                                                            *
  * Purpose: process runtime control option                                    *
  *                                                                            *
- * Parameters: rtc    - [IN] the RTC service                                  *
- *             code   - [IN] the request code                                 *
- *             data   - [IN] the runtime control parameter (optional)         *
- *             result - [OUT] the runtime control result                      *
+ * Parameters: rtc    - [IN] RTC service                                      *
+ *             code   - [IN] request code                                     *
+ *             data   - [IN] runtime control parameter (optional)             *
+ *             result - [OUT] runtime control result                          *
  *                                                                            *
  ******************************************************************************/
 static void	rtc_process_request(zbx_rtc_t *rtc, zbx_uint32_t code, const unsigned char *data,
