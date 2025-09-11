@@ -3832,7 +3832,7 @@ class CMap extends CMapElement {
 				), 'linkthresholdid');
 
 				if ($link_thresholds) {
-					filterAndSortThresholds($link_thresholds);
+					$link_thresholds = filterAndSortThresholds($link_thresholds);
 				}
 
 				$link_threshold_relation_map = $this->createRelationMap($link_thresholds, 'linkid', 'linkthresholdid');

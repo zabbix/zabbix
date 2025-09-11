@@ -126,8 +126,7 @@ class ColumnEdit extends CController {
 		}
 		else {
 			if (array_key_exists('thresholds', $input)) {
-				filterAndSortThresholds($input['thresholds']);
-				$input['thresholds'] = array_values($input['thresholds']);
+				$input['thresholds'] = array_values(filterAndSortThresholds($input['thresholds']));
 			}
 
 			$this->setResponse(

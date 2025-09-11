@@ -65,8 +65,7 @@ class CWidgetFieldThresholds extends CWidgetField {
 
 		$thresholds = $this->getValue();
 
-		filterAndSortThresholds($thresholds, $this->is_binary_units);
-		$thresholds = array_values($thresholds);
+		$thresholds = array_values(filterAndSortThresholds($thresholds, $this->is_binary_units));
 
 		$this->setValue($thresholds);
 
