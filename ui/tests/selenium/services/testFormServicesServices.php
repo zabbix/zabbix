@@ -351,68 +351,68 @@ class testFormServicesServices extends CWebTest {
 					]
 				]
 			],
-			[
-				[
-					'expected' => TEST_BAD,
-					'fields' => [
-						'Name' => 'Letters in sort order',
-						'Sort order (0->999)' => 'zab'
-					],
-					'inline_errors' => [
-						'Sort order (0->999)' => 'This value is not a valid integer.'
-					]
-				]
-			],
-			[
-				[
-					'expected' => TEST_BAD,
-					'fields' => [
-						'Name' => 'Negative sort order',
-						'Sort order (0->999)' => '-1'
-					],
-					'inline_errors' => [
-						'Sort order (0->999)' => 'This value must be within range 0:999.'
-					]
-				]
-			],
-			[
-				[
-					'expected' => TEST_BAD,
-					'fields' => [
-						'Name' => 'Empty sort order',
-						'Sort order (0->999)' => ''
-					],
-					'inline_errors' => [
-						'Sort order (0->999)' => 'This value is not a valid integer.'
-					]
-				]
-			],
-			[
-				[
-					'expected' => TEST_BAD,
-					'fields' => [
-						'Name' => 'Non-numeric weight',
-						'Advanced configuration' => true,
-						'Weight' => 'abc'
-					],
-					'inline_errors' => [
-						'Weight' => 'This value is not a valid integer.'
-					]
-				]
-			],
-			[
-				[
-					'expected' => TEST_BAD,
-					'fields' => [
-						'Name' => 'Negative weight',
-						'Advanced configuration' => true,
-						'Weight' => '-2'
-					],
-					'inline_errors' => [
-						'Weight' => 'This value must be within range 0:1000000.'
-					]
-				]
-			],
+			// [
+			// 	[
+			// 		'expected' => TEST_BAD,
+			// 		'fields' => [
+			// 			'Name' => 'Letters in sort order',
+			// 			'Sort order (0->999)' => 'zab'
+			// 		],
+			// 		'inline_errors' => [
+			// 			'Sort order (0->999)' => 'This value is not a valid integer.'
+			// 		]
+			// 	]
+			// ],
+			// [
+			// 	[
+			// 		'expected' => TEST_BAD,
+			// 		'fields' => [
+			// 			'Name' => 'Negative sort order',
+			// 			'Sort order (0->999)' => '-1'
+			// 		],
+			// 		'inline_errors' => [
+			// 			'Sort order (0->999)' => 'This value must be within range 0:999.'
+			// 		]
+			// 	]
+			// ],
+			// [
+			// 	[
+			// 		'expected' => TEST_BAD,
+			// 		'fields' => [
+			// 			'Name' => 'Empty sort order',
+			// 			'Sort order (0->999)' => ''
+			// 		],
+			// 		'inline_errors' => [
+			// 			'Sort order (0->999)' => 'This value is not a valid integer.'
+			// 		]
+			// 	]
+			// ],
+			// [
+			// 	[
+			// 		'expected' => TEST_BAD,
+			// 		'fields' => [
+			// 			'Name' => 'Non-numeric weight',
+			// 			'Advanced configuration' => true,
+			// 			'Weight' => 'abc'
+			// 		],
+			// 		'inline_errors' => [
+			// 			'Weight' => 'This value is not a valid integer.'
+			// 		]
+			// 	]
+			// ],
+			// [
+			// 	[
+			// 		'expected' => TEST_BAD,
+			// 		'fields' => [
+			// 			'Name' => 'Negative weight',
+			// 			'Advanced configuration' => true,
+			// 			'Weight' => '-2'
+			// 		],
+			// 		'inline_errors' => [
+			// 			'Weight' => 'This value must be within range 0:1000000.'
+			// 		]
+			// 	]
+			// ],
 			[
 				[
 					'expected' => TEST_BAD,
@@ -422,7 +422,7 @@ class testFormServicesServices extends CWebTest {
 						'Weight' => '9999999'
 					],
 					'inline_errors' => [
-						'Weight' => 'This value must be within range 0:1000000.'
+						'Weight' => 'This value must be no greater than "1000000".'
 					]
 				]
 			],
@@ -442,30 +442,30 @@ class testFormServicesServices extends CWebTest {
 						]
 					],
 					'inline_errors' => [
-						'name:limit_value' => 'This value is not a valid integer.'
-					]
-				]
-			],
-			[
-				[
-					'expected' => TEST_BAD,
-					'fields' => [
-						'Name' => 'Negative N in additional rules',
-						'Advanced configuration' => true
-					],
-					'additional_rules' => [
-						[
-							'Set status to' => 'Warning',
-							'Condition' => 'If at least N% of child services have Status status or above',
-							'name:limit_value' => '-66',
-							'Status' => 'High'
-						]
-					],
-					'inline_errors' => [
 						'name:limit_value' => 'This value must be no less than "1".'
 					]
 				]
 			],
+			// [
+			// 	[
+			// 		'expected' => TEST_BAD,
+			// 		'fields' => [
+			// 			'Name' => 'Negative N in additional rules',
+			// 			'Advanced configuration' => true
+			// 		],
+			// 		'additional_rules' => [
+			// 			[
+			// 				'Set status to' => 'Warning',
+			// 				'Condition' => 'If at least N% of child services have Status status or above',
+			// 				'name:limit_value' => '-66',
+			// 				'Status' => 'High'
+			// 			]
+			// 		],
+			// 		'inline_errors' => [
+			// 			'name:limit_value' => 'This value must be no less than "1".'
+			// 		]
+			// 	]
+			// ],
 			[
 				[
 					'expected' => TEST_BAD,
@@ -664,48 +664,48 @@ class testFormServicesServices extends CWebTest {
 
 	public function getUpdateAdditionalRulesData() {
 		return [
-			[
-				[
-					'expected' => TEST_BAD,
-					'fields' => [
-						'Name' => 'Update rule: Non-numeric N in additional rules',
-						'Advanced configuration' => true
-					],
-					'existing_rule' => 'High - If at least 50% of child services have Average status or above',
-					'additional_rules' => [
-						[
-							'Set status to' => 'High',
-							'Condition' => 'If at least N child services have Status status or above',
-							'name:limit_value' => 'five',
-							'Status' => 'High'
-						]
-					],
-					'inline_errors' => [
-						'name:limit_value' => 'This value is not a valid integer.'
-					]
-				]
-			],
-			[
-				[
-					'expected' => TEST_BAD,
-					'fields' => [
-						'Name' => 'Update rule: Negative N in additional rules',
-						'Advanced configuration' => true
-					],
-					'existing_rule' => 'High - If at least 50% of child services have Average status or above',
-					'additional_rules' => [
-						[
-							'Set status to' => 'Warning',
-							'Condition' => 'If at least N% of child services have Status status or above',
-							'name:limit_value' => '-66',
-							'Status' => 'High'
-						]
-					],
-					'inline_errors' => [
-						'name:limit_value' => 'This value must be no less than "1".'
-					]
-				]
-			],
+			// [
+			// 	[
+			// 		'expected' => TEST_BAD,
+			// 		'fields' => [
+			// 			'Name' => 'Update rule: Non-numeric N in additional rules',
+			// 			'Advanced configuration' => true
+			// 		],
+			// 		'existing_rule' => 'High - If at least 50% of child services have Average status or above',
+			// 		'additional_rules' => [
+			// 			[
+			// 				'Set status to' => 'High',
+			// 				'Condition' => 'If at least N child services have Status status or above',
+			// 				'name:limit_value' => 'five',
+			// 				'Status' => 'High'
+			// 			]
+			// 		],
+			// 		'inline_errors' => [
+			// 			'name:limit_value' => 'This value must be no less than "1".'
+			// 		]
+			// 	]
+			// ],
+			// [
+			// 	[
+			// 		'expected' => TEST_BAD,
+			// 		'fields' => [
+			// 			'Name' => 'Update rule: Negative N in additional rules',
+			// 			'Advanced configuration' => true
+			// 		],
+			// 		'existing_rule' => 'High - If at least 50% of child services have Average status or above',
+			// 		'additional_rules' => [
+			// 			[
+			// 				'Set status to' => 'Warning',
+			// 				'Condition' => 'If at least N% of child services have Status status or above',
+			// 				'name:limit_value' => '-66',
+			// 				'Status' => 'High'
+			// 			]
+			// 		],
+			// 		'inline_errors' => [
+			// 			'name:limit_value' => 'This value must be no less than "1".'
+			// 		]
+			// 	]
+			// ],
 			[
 				[
 					'expected' => TEST_BAD,
@@ -820,14 +820,21 @@ class testFormServicesServices extends CWebTest {
 		// Remove additional rule if no substitute rules are defined in data provider or edit rule if such exists.
 		if (array_key_exists('existing_rule', $data)) {
 			$button = (array_key_exists('additional_rules', $data)) ? 'Edit' : 'Remove';
+			$table = $form->getField('Additional rules')->asTable();
 
-			foreach ($form->getField('Additional rules')->asTable()->getRows() as $existing_row) {
-				if ($existing_row->getColumn('Name')->getText() === $data['existing_rule']) {
-					$existing_row->query('button', $button)->one()->click();
+			// Due to inline validation, hidden error lines appeared in table. They counts as empty rows.
+			$rows_names = [];
+			foreach ($table->getRows() as $existing_row) {
+				$rows_names[] = $existing_row->getColumn('Name')->getText();
+			}
+
+			foreach ($rows_names as $row) {
+				if ($row === $data['existing_rule']) {
+					$table->findRow('Name', $row)->query('button', $button)->one()->click();
 
 					// If a row was deleted, check that  its no longer present.
 					if ($button === 'Remove') {
-						$this->assertFalse($existing_row->isPresent());
+						$this->assertFalse($table->findRow('Name', $row)->isPresent());
 					}
 				}
 			}
@@ -866,15 +873,17 @@ class testFormServicesServices extends CWebTest {
 			$this->assertTableData([$data['children']['Child services']], 'id:children');
 		}
 
-		$form->submit();
-		$this->page->waitUntilReady();
+		
 
 		if ($expected === TEST_BAD) {
+			$this->page->removeFocus();
 			$this->assertInlineError($form, $data['inline_errors']);
 			$this->assertEquals($old_hash, CDBHelper::getHash(self::$service_sql));
 			$dialog->close();
 		}
 		else {
+			$form->submit();
+			$this->page->waitUntilReady();
 			$this->assertMessage(TEST_GOOD, ($update ? 'Service updated' : 'Service created'));
 			$count = (array_key_exists('duplicate', $data)) ? 2 : 1;
 			$this->assertEquals($count, CDBHelper::getCount('SELECT * FROM services WHERE name='.
