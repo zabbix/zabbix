@@ -194,6 +194,10 @@
 		}
 
 		#testExpression() {
+			Object.values(this.form.findFieldByName('expressions').getFields())
+				.forEach(field => field.setChanged());
+			this.form.validateChanges(['expressions']);
+
 			const {expressions, test_string} = this.form.getAllValues();
 			const curl = new Curl(this.form_element.getAttribute('action'));
 
