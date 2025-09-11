@@ -3603,6 +3603,10 @@ msgstr "Δεν βρίσκω αντιστοίχιση τιμής \"%1$s\" με χ
 msgid "Cannot find value map \"%1$s\" used for item prototype \"%2$s\" of discovery rule prototype \"%3$s\" on \"%4$s\"."
 msgstr ""
 
+#: app/views/oauth.authorize.php:33
+msgid "Cannot get authentication tokens"
+msgstr ""
+
 #: app/views/oauth.edit.php:230
 msgid "Cannot get authorization code."
 msgstr ""
@@ -12224,6 +12228,10 @@ msgstr "Internet Explorer"
 msgid "Interval"
 msgstr "Χρονικό διάστημα"
 
+#: widgets/itemcard/includes/CWidgetFieldItemSectionsView.php:76
+msgid "Interval and storage"
+msgstr ""
+
 #: include/classes/api/services/CRole.php:731
 #, c-format
 msgid "Invalid API method \"%2$s\" for user role \"%1$s\"."
@@ -16897,6 +16905,10 @@ msgstr "Απουσία επέκτασης PHP ctype (παράμετρος ρύθ
 
 #: include/classes/setup/CFrontendSetup.php:687
 msgid "PHP curl"
+msgstr ""
+
+#: include/classes/setup/CFrontendSetup.php:733
+msgid "PHP curl extension is missing or outdated."
 msgstr ""
 
 #: include/classes/setup/CFrontendSetup.php:691
@@ -26450,6 +26462,10 @@ msgstr ""
 
 #: include/classes/validators/CApiInputValidator.php:1985
 msgid "directory cannot be empty"
+msgstr ""
+
+#: include/views/configuration.host.discovery.list.php:340
+msgid "discovery rule"
 msgstr ""
 
 #: app/controllers/CControllerItemMassCheckNow.php:138
