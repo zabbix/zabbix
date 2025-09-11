@@ -1410,8 +1410,8 @@ class testFormUserRoles extends CWebTest {
 			],
 			[
 				'Name' => 'Service for delete 2',
-				'Tags' => ['3rd_tag: 3rd_value' . "\n", '4th_tag: 4th_value' . "\n", 'remove_tag_1: remove_value_1', 'remove_tag_2: remove_value_2'],
-				'Problem tags' => ['tag1: value1' . "\n", 'tag2: value2' . "\n", 'tag3: value3', 'tag4: value4']
+				'Tags' => ["3rd_tag: 3rd_value\n", "4th_tag: 4th_value\n", 'remove_tag_1: remove_value_1', 'remove_tag_2: remove_value_2'],
+				'Problem tags' => ["tag1: value1\n", "tag2: value2\n", 'tag3: value3', 'tag4: value4']
 			]
 		];
 
@@ -1447,11 +1447,11 @@ class testFormUserRoles extends CWebTest {
 							$table->findRow('Name', $service['Name'])->getColumn($tag_type)
 									->query('class:zi-more')->one()->click();
 							$popup = $this->query('xpath://div[@data-hintboxid]')->one()->waitUntilReady();
-							// Create a temporary array without newlines for the XPath query.
-							$tagsForXPath = array_map(function($tag) {
-								return str_replace("\n", '', $tag);
-							}, $tags);
-							foreach ($tagsForXPath as $tag) {
+
+							// Create a temporary array without newlines for checking if tag exists.
+							$expected_tags = str_replace("\n", '', $tags);
+
+							foreach ($expected_tags as $tag) {
 								$this->assertTrue($popup->query("xpath:.//span[text()=".CXPathHelper::escapeQuotes($tag)."]")
 										->one(false)->isValid()
 								);
