@@ -5813,18 +5813,20 @@ static int	lld_interface_validate_fields(const zbx_lld_interface_t *interface, c
 		return FAIL;
 	}
 
-	if (0 == interface->useip)
+	if (NULL == interface->dns || '\0' == *interface->dns)
 	{
-		if (NULL == interface->dns || '\0' == *interface->dns)
+		if (0 == interface->useip)
 		{
 			*error = zbx_strdcatf(*error, "Cannot %s \"%s\" interface on host \"%s\": "
 					"DNS name cannot be empty.\n",
 					op, zbx_interface_type_string(interface->type_orig),
 					hostname);
-
-			return FAIL;
 		}
 
+		return FAIL;
+	}
+	else
+	{
 		if (ZBX_INTERFACE_DNS_LEN < zbx_strlen_utf8(interface->dns))
 		{
 			*error = zbx_strdcatf(*error, "Cannot %s \"%s\" interface on host \"%s\": "
@@ -5845,9 +5847,10 @@ static int	lld_interface_validate_fields(const zbx_lld_interface_t *interface, c
 			return FAIL;
 		}
 	}
-	else
+
+	if (NULL == interface->ip || '\0' == *interface->ip)
 	{
-		if (NULL == interface->ip || '\0' == *interface->ip)
+		if (0 != interface->useip)
 		{
 			*error = zbx_strdcatf(*error, "Cannot %s \"%s\" interface on host \"%s\": "
 					"IP address cannot be empty.\n",
@@ -5856,7 +5859,9 @@ static int	lld_interface_validate_fields(const zbx_lld_interface_t *interface, c
 
 			return FAIL;
 		}
-
+	}
+	else
+	{
 		if (ZBX_INTERFACE_IP_LEN < zbx_strlen_utf8(interface->ip))
 		{
 			*error = zbx_strdcatf(*error, "Cannot %s \"%s\" interface on host \"%s\": "
