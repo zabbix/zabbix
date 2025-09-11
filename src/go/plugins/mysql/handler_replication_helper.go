@@ -14,7 +14,13 @@
 
 package mysql
 
-import "golang.org/x/mod/semver"
+import (
+	"fmt"
+	"strings"
+
+	"golang.org/x/mod/semver"
+	"golang.zabbix.com/sdk/errs"
+)
 
 // In MySQL 8.4, `Master_Host` was fully replaced by `Source_Host`.
 const (
@@ -24,21 +30,43 @@ const (
 
 // In MySQL 8.4, `SHOW SLAVE STATUS` was fully replaced by `SHOW REPLICA STATUS`.
 const (
-	replicaQueryOld replicQuery = `SHOW SLAVE STATUS`
-	replicaQueryNew replicQuery = `SHOW REPLICA STATUS`
+	replicaQueryOld replicaQuery = `SHOW SLAVE STATUS`
+	replicaQueryNew replicaQuery = `SHOW REPLICA STATUS`
 )
 
 const versionThreshold = "8.4"
 
-type replicQuery string
+type replicaQuery string
 
-// getReplicationQuery function returns right query depending on the MySQL server versionThreshold.
-func getReplicationQuery(version string) replicQuery {
-	if semver.Compare("v"+versionThreshold, "v"+version) <= 0 {
-		return replicaQueryNew
+var errGettingReplicationQuery = errs.New("error getting replication query")
+
+// getReplicationQuery function returns right query depending on the MySQL server versionThreshold and specified
+// version.
+func getReplicationQuery(threshold, version string) (replicaQuery, error) {
+	thrRefined := "v" + strings.TrimSpace(threshold)
+	verRefined := "v" + strings.TrimSpace(version)
+
+	// If version was passed empty, return old, threshold not important anymore
+	if verRefined == "v" {
+		return replicaQueryOld, nil
 	}
 
-	return replicaQueryOld
+	if thrRefined == "v" {
+		return "", fmt.Errorf("threshold version must be specified: %s", threshold)
+	}
+
+	if !semver.IsValid(thrRefined) {
+		return "", fmt.Errorf("invalid semver format of threshold version: %s", threshold)
+	}
+	if !semver.IsValid(verRefined) {
+		return "", fmt.Errorf("invalid semver format of current version: %s", version)
+	}
+
+	if semver.Compare(thrRefined, verRefined) <= 0 {
+		return replicaQueryNew, nil
+	}
+
+	return replicaQueryOld, nil
 }
 
 // extractMasterHost function extracts master or source host (depending on the MySQL server versionThreshold)

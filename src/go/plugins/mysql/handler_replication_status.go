@@ -25,7 +25,10 @@ import (
 func replicationSlaveStatusHandler(
 	ctx context.Context, conn MyClient, params map[string]string, _ ...string,
 ) (any, error) {
-	query := getReplicationQuery(params[versionParam])
+	query, err := getReplicationQuery(versionThreshold, params[versionParam])
+	if err != nil {
+		return nil, errs.WrapConst(err, errGettingReplicationQuery)
+	}
 
 	rows, err := conn.Query(ctx, string(query))
 	if err != nil {

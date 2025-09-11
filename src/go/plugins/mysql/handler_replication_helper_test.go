@@ -24,43 +24,118 @@ func Test_getReplicationQuery(t *testing.T) {
 	t.Parallel()
 
 	type args = struct {
-		vers string
+		threshold string
+		vers      string
 	}
 
 	tests := []struct {
-		name string
-		args args
-		want replicQuery
+		name    string
+		args    args
+		want    replicaQuery
+		wantErr bool
 	}{
 		{
 			"+equal",
-			args{versionThreshold},
+			args{"8.4", "8.4"},
 			replicaQueryNew,
+			false,
 		},
 		{
-			"+higher",
-			args{"8.5"},
+			"+patchEqual",
+			args{"8.4", "8.4.0"},
 			replicaQueryNew,
+			false,
+		},
+		{
+			"+RcEqual",
+			args{"8.4.1-rc.2", "8.4.1-rc.2"},
+			replicaQueryNew,
+			false,
 		},
 		{
 			"+lower",
-			args{"8.3"},
+			args{"8.4", "8.3"},
 			replicaQueryOld,
+			false,
+		},
+
+		{
+			"+emptyLower", //todo trim in function
+			args{"8.4", "  "},
+			replicaQueryOld,
+			false,
 		},
 		{
-			"+emptyLower",
-			args{""},
+			"+RcLower",
+			args{"8.4.1-rc.2", "8.4.1-rc.1"},
 			replicaQueryOld,
+			false,
 		},
 		{
-			"+totalRubbishLower",
-			args{"rubbish"},
+			"+majorLower",
+			args{"8.4", "7"},
 			replicaQueryOld,
+			false,
 		},
 		{
-			"+withPrefixLower",
-			args{"v8.5"},
+			"+alphaLower",
+			args{"8.4.1", "8.4.1-alpha"},
 			replicaQueryOld,
+			false,
+		},
+		{
+			"+higher",
+			args{"8.4", "8.5"},
+			replicaQueryNew,
+			false,
+		},
+		{
+			"+majorHigher",
+			args{"8.4", "9"},
+			replicaQueryNew,
+			false,
+		},
+		{
+			"+rcMajorHigher",
+			args{"8.2.0-rc.1", "8.2"},
+			replicaQueryNew,
+			false,
+		},
+		{
+			"+alphaNumHigher",
+			args{"8.2.0-alpha", "8.2.0-alpha.1"},
+			replicaQueryNew,
+			false,
+		},
+		{
+			"+buildHigher",
+			args{"8.2.0+1234", "8.2.0+1235"},
+			replicaQueryNew,
+			false,
+		},
+		{
+			"-rubbish",
+			args{"8.4", "rubbish"},
+			"",
+			true,
+		},
+		{
+			"-withPrefix",
+			args{"8.4", "v8.5"},
+			"",
+			true,
+		},
+		{
+			"-alphaMinor", // Pre-release tags allowed only if all elements - x.y.z specified.
+			args{"8.4", "8.4-alpha"},
+			"",
+			true,
+		},
+		{
+			"-thresholdEmpty", // Pre-release tags allowed only if all elements - x.y.z specified.
+			args{" ", "8.4"},
+			"",
+			true,
 		},
 	}
 
@@ -68,7 +143,10 @@ func Test_getReplicationQuery(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			t.Parallel()
 
-			got := getReplicationQuery(tt.args.vers)
+			got, err := getReplicationQuery(tt.args.threshold, tt.args.vers)
+			if tt.wantErr != (err != nil) {
+				t.Fatalf("getReplicationQuery() error = %v, wantErr %v", err, tt.wantErr)
+			}
 
 			if diff := cmp.Diff(tt.want, got); diff != "" {
 				t.Errorf("getReplicationQuery(): %s", diff)
