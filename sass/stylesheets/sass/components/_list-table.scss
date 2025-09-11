@@ -461,7 +461,7 @@
 
 		[class*='flh-'] {
 			&:not(.row-selected):not(:hover) {
-				a,
+				a:not(.green),
 				td,
 				sup {
 					color: $compact-view-color;

@@ -1668,13 +1668,15 @@ class CScreenProblem extends CScreenBase {
 					: zbx_date2age($problem['clock']),
 				$problem_update_link,
 				makeEventActionsIcons($problem['eventid'], $data['actions'], $data['users'], $is_acknowledged),
-				$data['filter']['show_tags'] ? (new CDiv($data['tags'][$problem['eventid']]))->addClass(ZBX_STYLE_TAGS_WRAPPER) : null
+				$data['filter']['show_tags']
+					? (new CDiv($data['tags'][$problem['eventid']]))->addClass(ZBX_STYLE_TAGS_WRAPPER)
+					: null
 			]);
 
 			// Add table row.
-			$table->addRow($row, ($data['filter']['highlight_row'] == ZBX_HIGHLIGHT_ON && $value == TRIGGER_VALUE_TRUE)
-					? CSeverityHelper::getSeverityFlhStyle($problem['severity'])
-					: null
+			$table->addRow($row, $data['filter']['highlight_row'] == ZBX_HIGHLIGHT_ON && $value == TRIGGER_VALUE_TRUE
+				? CSeverityHelper::getSeverityFlhStyle($problem['severity'])
+				: null
 			);
 
 			if ($problem['cause_eventid'] == 0 && $problem['symptoms']) {

@@ -36,13 +36,19 @@ use CButtonIcon,
 class WidgetProblems extends CTableInfo {
 	private array $data;
 
+	private bool $highlight_rows;
+
 	public function __construct(array $data) {
 		$this->data = $data;
+
+		$this->highlight_rows = $this->data['fields']['highlight_row'] == ZBX_HIGHLIGHT_ON;
 
 		parent::__construct();
 	}
 
 	private function build(): void {
+		$this->addClass($this->highlight_rows ? 'has-highlighted-rows' : null);
+
 		$sort_div = (new CSpan())->addClass(
 			($this->data['sortorder'] === ZBX_SORT_DOWN) ? ZBX_STYLE_ARROW_DOWN : ZBX_STYLE_ARROW_UP
 		);
@@ -496,7 +502,7 @@ class WidgetProblems extends CTableInfo {
 				])
 				->setAttribute('data-eventid', $problem['eventid']);
 
-			$this->addRow($row, $data['fields']['highlight_row'] == ZBX_HIGHLIGHT_ON && $value == TRIGGER_VALUE_TRUE
+			$this->addRow($row, $this->highlight_rows && $value == TRIGGER_VALUE_TRUE
 				? CSeverityHelper::getSeverityFlhStyle($problem['severity'])
 				: null
 			);

@@ -2611,23 +2611,6 @@ div {
 	background-color: $alt-yellow;
 }
 
-// Severity statuses.
-@if $theme-name == 'blue' or $theme-name == 'dark' {
-	td[class] {
-		+ {
-			td.na-bg,
-			td.normal-bg,
-			td.info-bg,
-			td.average-bg,
-			td.warning-bg,
-			td.high-bg,
-			td.disaster-bg {
-				border-left: 1px dotted $table-border-color;
-			}
-		}
-	}
-}
-
 @each $severity-type, $color in (
 	na-bg: $alt-blue-grey,
 	normal-bg: $alt-green,
