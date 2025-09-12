@@ -435,6 +435,9 @@ window.service_edit_popup = new class {
 		const fields = this.form.getAllValues();
 
 		fields.child_serviceids = [...this.children.keys()];
+		if (fields.child_serviceids.length) {
+			delete fields.problem_tags;
+		}
 
 		this.overlay.$dialogue.find('.msg-bad').remove();
 		this.overlay.setLoading();
