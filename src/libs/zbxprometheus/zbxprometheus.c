@@ -888,8 +888,12 @@ static int	condition_match_metric_value(const char *pattern, const char *value)
 static int	prometheus_metric_parse_labels(const char *data, size_t pos, zbx_vector_prometheus_label_t *labels,
 		zbx_strloc_t *loc, char **error)
 {
+#define PROMETHEUS_LABEL_NUM_RESERVE	2
+
 	zbx_strloc_t		loc_key, loc_value, loc_op;
 	zbx_prometheus_label_t	*label;
+
+	zbx_vector_prometheus_label_reserve(labels, PROMETHEUS_LABEL_NUM_RESERVE);
 
 	pos = skip_spaces(data, pos + 1);
 	loc->l = pos;
@@ -933,6 +937,8 @@ static int	prometheus_metric_parse_labels(const char *data, size_t pos, zbx_vect
 	loc->r = pos;
 
 	return SUCCEED;
+
+#undef PROMETHEUS_LABEL_NUM_RESERVE
 }
 
 /******************************************************************************
