@@ -82,11 +82,6 @@ class CField {
 		return this._changed;
 	}
 
-	setGlobalError(message, level) {
-		this._global_errors[this.getName()] = message;
-		this._error_level = level;
-	}
-
 	getGlobalErrors() {
 		return this._global_errors;
 	}
