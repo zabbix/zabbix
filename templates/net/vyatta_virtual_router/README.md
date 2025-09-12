@@ -102,7 +102,7 @@ Refer to the vendor documentation.
 
 |Name|Description|Type|Key and additional info|
 |----|-----------|----|-----------------------|
-|Storage [{#STORAGE_NAME}]: Total size||Dependent item|storage.size[hrStorageSize.{#SNMPINDEX}]<p>**Preprocessing**</p><ul><li><p>SNMP walk value: `1.3.6.1.2.1.25.2.3.1.5.{#SNMPINDEX}`</p></li><li><p>Custom multiplier: `1024`</p></li></ul>|
+|Storage [{#STORAGE_NAME}]: Total size||Dependent item|storage.size[hrStorageSize.{#SNMPINDEX}]<p>**Preprocessing**</p><ul><li><p>SNMP walk value: `1.3.6.1.2.1.25.2.3.1.5.{#SNMPINDEX}`</p></li><li><p>Custom multiplier: `1024`</p></li><li><p>Discard unchanged with heartbeat: `6h`</p></li></ul>|
 |Storage [{#STORAGE_NAME}]: Used size||Dependent item|storage.used[hrStorageUsed.{#SNMPINDEX}]<p>**Preprocessing**</p><ul><li><p>SNMP walk value: `1.3.6.1.2.1.25.2.3.1.6.{#SNMPINDEX}`</p></li><li><p>Custom multiplier: `1024`</p></li></ul>|
 |Storage [{#STORAGE_NAME}]: Storage utilization, %||Calculated|storage.size.percent[hrStorageUsed.{#SNMPINDEX}]<p>**Preprocessing**</p><ul><li><p>JavaScript: `return Math.round(value * 100) / 100;`</p></li></ul>|
 

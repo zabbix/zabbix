@@ -32,7 +32,7 @@ zabbix_export:
         - uuid: e61652a7ede744b886289e3b30c50078
           name: 'SNMP walk host devices'
           type: SNMP_AGENT
-          snmp_oid: 'walk[ 1.3.6.1.2.1.25.3.2.1.2, 1.3.6.1.2.1.25.3.2.1.3, 1.3.6.1.2.1.25.3.2.1.5, 1.3.6.1.2.1.25.3.3.1.2]'
+          snmp_oid: 'walk[1.3.6.1.2.1.25.3.2.1.2, 1.3.6.1.2.1.25.3.2.1.3, 1.3.6.1.2.1.25.3.2.1.5, 1.3.6.1.2.1.25.3.3.1.2]'
           key: devices.walk
           history: '0'
           value_type: TEXT
@@ -121,7 +121,7 @@ zabbix_export:
         - uuid: 180899a053a14a40897ad12d588fb9cf
           name: 'SNMP walk network interfaces'
           type: SNMP_AGENT
-          snmp_oid: 'walk[ 1.3.6.1.2.1.2.2.1.2, 1.3.6.1.2.1.2.2.1.3, 1.3.6.1.2.1.2.2.1.7, 1.3.6.1.2.1.2.2.1.8, 1.3.6.1.2.1.2.2.1.13, 1.3.6.1.2.1.2.2.1.14, 1.3.6.1.2.1.2.2.1.19, 1.3.6.1.2.1.2.2.1.20, 1.3.6.1.2.1.31.1.1.1.1, 1.3.6.1.2.1.31.1.1.1.6, 1.3.6.1.2.1.31.1.1.1.10, 1.3.6.1.2.1.31.1.1.1.15, 1.3.6.1.2.1.31.1.1.1.18]'
+          snmp_oid: 'walk[1.3.6.1.2.1.2.2.1.2, 1.3.6.1.2.1.2.2.1.3, 1.3.6.1.2.1.2.2.1.7, 1.3.6.1.2.1.2.2.1.8, 1.3.6.1.2.1.2.2.1.13, 1.3.6.1.2.1.2.2.1.14, 1.3.6.1.2.1.2.2.1.19, 1.3.6.1.2.1.2.2.1.20, 1.3.6.1.2.1.31.1.1.1.1, 1.3.6.1.2.1.31.1.1.1.6, 1.3.6.1.2.1.31.1.1.1.10, 1.3.6.1.2.1.31.1.1.1.15, 1.3.6.1.2.1.31.1.1.1.18]'
           key: net.if.walk
           history: '0'
           value_type: TEXT
@@ -144,7 +144,7 @@ zabbix_export:
         - uuid: 13a09af7f2b74335a3bf94c05a5ae0d7
           name: 'SNMP walk storage'
           type: SNMP_AGENT
-          snmp_oid: 'walk[ 1.3.6.1.2.1.25.2.3.1.2, 1.3.6.1.2.1.25.2.3.1.3, 1.3.6.1.2.1.25.2.3.1.5, 1.3.6.1.2.1.25.2.3.1.6]'
+          snmp_oid: 'walk[1.3.6.1.2.1.25.2.3.1.2, 1.3.6.1.2.1.25.2.3.1.3, 1.3.6.1.2.1.25.2.3.1.5, 1.3.6.1.2.1.25.2.3.1.6]'
           key: storage.walk
           history: '0'
           value_type: TEXT
@@ -268,6 +268,9 @@ zabbix_export:
             - type: JAVASCRIPT
               parameters:
                 - 'return Math.round(value * 100) / 100;'
+          tags:
+            - tag: component
+              value: memory
           triggers:
             - uuid: a56dca7d427d43f8958325a5f9152a09
               expression: 'min(/Vyatta Virtual Router by SNMP/system.memory.util, 5m) > {$VYATTA.MEMORY.USED.WARN}'
@@ -404,7 +407,6 @@ zabbix_export:
               name: 'CPU [{#DESCRIPTION}][{#SNMPINDEX}]: Status'
               type: DEPENDENT
               key: 'cpu.status[hrDeviceStatus.{#SNMPINDEX}]'
-              value_type: CHAR
               description: |
                 MIB: HOST-RESOURCES-MIB
                 The current operational state of the device described by this row of the table.
@@ -422,6 +424,9 @@ zabbix_export:
                     - '0'
               master_item:
                 key: devices.walk
+              tags:
+                - tag: component
+                  value: network
               trigger_prototypes:
                 - uuid: 121927a633ba4d1d95d38457c7dca003
                   expression: 'last(/Vyatta Virtual Router by SNMP/cpu.status[hrDeviceStatus.{#SNMPINDEX}]) <> 2'
@@ -448,6 +453,9 @@ zabbix_export:
                     - '0'
               master_item:
                 key: devices.walk
+              tags:
+                - tag: component
+                  value: network
               trigger_prototypes:
                 - uuid: 7948f5b2eaf44f3f99672fb4be7e3b6a
                   expression: 'min(/Vyatta Virtual Router by SNMP/cpu.utilization[hrProcessorLoad.{#SNMPINDEX}], 5m) > {$VYATTA.CPU.USED.WARN}'
@@ -986,6 +994,9 @@ zabbix_export:
                 - type: JAVASCRIPT
                   parameters:
                     - 'return Math.round(value * 100) / 100;'
+              tags:
+                - tag: component
+                  value: storage
               trigger_prototypes:
                 - uuid: 7cc45fc012b64650a4705fec30ed539d
                   expression: 'min(/Vyatta Virtual Router by SNMP/storage.size.percent[hrStorageUsed.{#SNMPINDEX}], 5m) > {$VYATTA.STORAGE.USED.WARN}'
@@ -1021,8 +1032,14 @@ zabbix_export:
                 - type: MULTIPLIER
                   parameters:
                     - '1024'
+                - type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 6h
               master_item:
                 key: storage.walk
+              tags:
+                - tag: component
+                  value: storage
             - uuid: 64d1791c1ad545f6aa56314b37a27072
               name: 'Storage [{#STORAGE_NAME}]: Used size'
               type: DEPENDENT
@@ -1038,6 +1055,9 @@ zabbix_export:
                     - '1024'
               master_item:
                 key: storage.walk
+              tags:
+                - tag: component
+                  value: storage
           graph_prototypes:
             - uuid: b8d837f4ca7440dd81d1da5af7d7a087
               name: 'Storage [{#STORAGE_NAME}]: Storage utilization'
@@ -1345,14 +1365,8 @@ zabbix_export:
                   hide_header: 'YES'
                   fields:
                     - type: STRING
-                      name: bg_color
-                      value: 0B466A
-                    - type: STRING
                       name: description
                       value: 'System name'
-                    - type: STRING
-                      name: desc_color
-                      value: FFFFFF
                     - type: INTEGER
                       name: desc_size
                       value: '10'
@@ -1373,9 +1387,6 @@ zabbix_export:
                     - type: INTEGER
                       name: units_show
                       value: '0'
-                    - type: STRING
-                      name: value_color
-                      value: FFFFFF
                     - type: INTEGER
                       name: value_size
                       value: '20'
@@ -1387,14 +1398,8 @@ zabbix_export:
                   hide_header: 'YES'
                   fields:
                     - type: STRING
-                      name: bg_color
-                      value: 0B466A
-                    - type: STRING
                       name: description
                       value: 'System location'
-                    - type: STRING
-                      name: desc_color
-                      value: FFFFFF
                     - type: INTEGER
                       name: desc_v_pos
                       value: '0'
@@ -1412,9 +1417,6 @@ zabbix_export:
                     - type: INTEGER
                       name: units_show
                       value: '0'
-                    - type: STRING
-                      name: value_color
-                      value: FFFFFF
                     - type: INTEGER
                       name: value_size
                       value: '25'
@@ -1426,14 +1428,8 @@ zabbix_export:
                   hide_header: 'YES'
                   fields:
                     - type: STRING
-                      name: bg_color
-                      value: 0B466A
-                    - type: STRING
                       name: description
                       value: 'System contact'
-                    - type: STRING
-                      name: desc_color
-                      value: FFFFFF
                     - type: INTEGER
                       name: desc_v_pos
                       value: '0'
@@ -1451,9 +1447,6 @@ zabbix_export:
                     - type: INTEGER
                       name: units_show
                       value: '0'
-                    - type: STRING
-                      name: value_color
-                      value: FFFFFF
                     - type: INTEGER
                       name: value_size
                       value: '25'
@@ -1465,14 +1458,8 @@ zabbix_export:
                   hide_header: 'YES'
                   fields:
                     - type: STRING
-                      name: bg_color
-                      value: 0B466A
-                    - type: STRING
                       name: description
                       value: 'System description'
-                    - type: STRING
-                      name: desc_color
-                      value: FFFFFF
                     - type: INTEGER
                       name: desc_v_pos
                       value: '0'
@@ -1490,9 +1477,6 @@ zabbix_export:
                     - type: INTEGER
                       name: units_show
                       value: '0'
-                    - type: STRING
-                      name: value_color
-                      value: FFFFFF
                     - type: INTEGER
                       name: value_size
                       value: '25'
@@ -1504,14 +1488,8 @@ zabbix_export:
                   hide_header: 'YES'
                   fields:
                     - type: STRING
-                      name: bg_color
-                      value: 0B466A
-                    - type: STRING
                       name: description
                       value: 'Uptime (hardware)'
-                    - type: STRING
-                      name: desc_color
-                      value: FFFFFF
                     - type: INTEGER
                       name: desc_v_pos
                       value: '0'
@@ -1526,15 +1504,9 @@ zabbix_export:
                     - type: INTEGER
                       name: show.1
                       value: '1'
-                    - type: STRING
-                      name: units_color
-                      value: FFFFFF
                     - type: INTEGER
                       name: units_size
                       value: '25'
-                    - type: STRING
-                      name: value_color
-                      value: FFFFFF
                     - type: INTEGER
                       name: value_size
                       value: '25'
@@ -1547,14 +1519,8 @@ zabbix_export:
                   hide_header: 'YES'
                   fields:
                     - type: STRING
-                      name: bg_color
-                      value: 0B466A
-                    - type: STRING
                       name: description
                       value: 'Uptime (network)'
-                    - type: STRING
-                      name: desc_color
-                      value: FFFFFF
                     - type: INTEGER
                       name: desc_v_pos
                       value: '0'
@@ -1569,15 +1535,9 @@ zabbix_export:
                     - type: INTEGER
                       name: show.1
                       value: '1'
-                    - type: STRING
-                      name: units_color
-                      value: FFFFFF
                     - type: INTEGER
                       name: units_size
                       value: '25'
-                    - type: STRING
-                      name: value_color
-                      value: FFFFFF
                     - type: INTEGER
                       name: value_size
                       value: '25'
@@ -1589,14 +1549,8 @@ zabbix_export:
                   hide_header: 'YES'
                   fields:
                     - type: STRING
-                      name: bg_color
-                      value: 0B466A
-                    - type: STRING
                       name: description
                       value: 'SNMP agent availability'
-                    - type: STRING
-                      name: desc_color
-                      value: FFFFFF
                     - type: INTEGER
                       name: desc_v_pos
                       value: '0'
@@ -1613,28 +1567,25 @@ zabbix_export:
                       value: '1'
                     - type: STRING
                       name: thresholds.0.color
-                      value: D40100
+                      value: FF465C
                     - type: STRING
                       name: thresholds.0.threshold
                       value: '0'
                     - type: STRING
                       name: thresholds.1.color
-                      value: 8BCC3A
+                      value: 0EC9AC
                     - type: STRING
                       name: thresholds.1.threshold
                       value: '1'
                     - type: STRING
                       name: thresholds.2.color
-                      value: 0B466A
+                      value: FFD54F
                     - type: STRING
                       name: thresholds.2.threshold
                       value: '2'
                     - type: INTEGER
                       name: units_show
                       value: '0'
-                    - type: STRING
-                      name: value_color
-                      value: FFFFFF
                     - type: INTEGER
                       name: value_size
                       value: '35'
@@ -1645,18 +1596,12 @@ zabbix_export:
                   width: '20'
                   hide_header: 'YES'
                   fields:
-                    - type: STRING
-                      name: bg_color
-                      value: 0B466A
                     - type: INTEGER
                       name: decimal_size
                       value: '20'
                     - type: STRING
                       name: description
                       value: 'ICMP ping'
-                    - type: STRING
-                      name: desc_color
-                      value: FFFFFF
                     - type: INTEGER
                       name: desc_v_pos
                       value: '0'
@@ -1673,25 +1618,19 @@ zabbix_export:
                       value: '1'
                     - type: STRING
                       name: thresholds.0.color
-                      value: D40100
+                      value: FF465C
                     - type: STRING
                       name: thresholds.0.threshold
                       value: '0'
                     - type: STRING
                       name: thresholds.1.color
-                      value: 8BCC3A
+                      value: 0EC9AC
                     - type: STRING
                       name: thresholds.1.threshold
                       value: '1'
-                    - type: STRING
-                      name: units_color
-                      value: FFFFFF
                     - type: INTEGER
                       name: units_size
                       value: '25'
-                    - type: STRING
-                      name: value_color
-                      value: FFFFFF
                     - type: INTEGER
                       name: value_size
                       value: '35'
@@ -1703,18 +1642,12 @@ zabbix_export:
                   height: '3'
                   hide_header: 'YES'
                   fields:
-                    - type: STRING
-                      name: bg_color
-                      value: 0B466A
                     - type: INTEGER
                       name: decimal_size
                       value: '20'
                     - type: STRING
                       name: description
                       value: 'ICMP response time'
-                    - type: STRING
-                      name: desc_color
-                      value: FFFFFF
                     - type: INTEGER
                       name: desc_size
                       value: '12'
@@ -1732,15 +1665,9 @@ zabbix_export:
                     - type: INTEGER
                       name: show.1
                       value: '1'
-                    - type: STRING
-                      name: units_color
-                      value: FFFFFF
                     - type: INTEGER
                       name: units_size
                       value: '25'
-                    - type: STRING
-                      name: value_color
-                      value: FFFFFF
                     - type: INTEGER
                       name: value_size
                       value: '25'
@@ -1752,18 +1679,12 @@ zabbix_export:
                   height: '3'
                   hide_header: 'YES'
                   fields:
-                    - type: STRING
-                      name: bg_color
-                      value: 0B466A
                     - type: INTEGER
                       name: decimal_size
                       value: '20'
                     - type: STRING
                       name: description
                       value: 'ICMP loss'
-                    - type: STRING
-                      name: desc_color
-                      value: FFFFFF
                     - type: INTEGER
                       name: desc_size
                       value: '12'
@@ -1781,15 +1702,9 @@ zabbix_export:
                     - type: INTEGER
                       name: show.1
                       value: '1'
-                    - type: STRING
-                      name: units_color
-                      value: FFFFFF
                     - type: INTEGER
                       name: units_size
                       value: '25'
-                    - type: STRING
-                      name: value_color
-                      value: FFFFFF
                     - type: INTEGER
                       name: value_size
                       value: '25'
@@ -1801,14 +1716,8 @@ zabbix_export:
                   hide_header: 'YES'
                   fields:
                     - type: STRING
-                      name: bg_color
-                      value: 0B466A
-                    - type: STRING
                       name: description
                       value: 'Memory utilization'
-                    - type: STRING
-                      name: desc_color
-                      value: FFFFFF
                     - type: INTEGER
                       name: desc_v_pos
                       value: '0'
@@ -1841,18 +1750,12 @@ zabbix_export:
                     - type: INTEGER
                       name: units_bold
                       value: '1'
-                    - type: STRING
-                      name: units_color
-                      value: FFFFFF
                     - type: INTEGER
                       name: value_arc_size
                       value: '35'
                     - type: INTEGER
                       name: value_bold
                       value: '1'
-                    - type: STRING
-                      name: value_color
-                      value: FFFFFF
                 - type: item
                   name: 'Total memory'
                   x: '43'
@@ -1861,18 +1764,12 @@ zabbix_export:
                   height: '4'
                   hide_header: 'YES'
                   fields:
-                    - type: STRING
-                      name: bg_color
-                      value: 0B466A
                     - type: INTEGER
                       name: decimal_size
                       value: '15'
                     - type: STRING
                       name: description
                       value: 'Total memory'
-                    - type: STRING
-                      name: desc_color
-                      value: FFFFFF
                     - type: INTEGER
                       name: desc_size
                       value: '10'
@@ -1890,15 +1787,9 @@ zabbix_export:
                     - type: INTEGER
                       name: show.1
                       value: '1'
-                    - type: STRING
-                      name: units_color
-                      value: FFFFFF
                     - type: INTEGER
                       name: units_size
                       value: '15'
-                    - type: STRING
-                      name: value_color
-                      value: FFFFFF
                     - type: INTEGER
                       name: value_size
                       value: '20'
@@ -1923,19 +1814,19 @@ zabbix_export:
                       value: '%'
                     - type: STRING
                       name: thresholds.0.color
-                      value: 8BCC3A
+                      value: 0EC9AC
                     - type: STRING
                       name: thresholds.0.threshold
                       value: '0'
                     - type: STRING
                       name: thresholds.1.color
-                      value: CC7C3A
+                      value: FFD54F
                     - type: STRING
                       name: thresholds.1.threshold
                       value: '80'
                     - type: STRING
                       name: thresholds.2.color
-                      value: D40100
+                      value: FF465C
                     - type: STRING
                       name: thresholds.2.threshold
                       value: '95'
@@ -1947,18 +1838,12 @@ zabbix_export:
                   height: '4'
                   hide_header: 'YES'
                   fields:
-                    - type: STRING
-                      name: bg_color
-                      value: 0B466A
                     - type: INTEGER
                       name: decimal_size
                       value: '15'
                     - type: STRING
                       name: description
                       value: 'Free memory'
-                    - type: STRING
-                      name: desc_color
-                      value: FFFFFF
                     - type: INTEGER
                       name: desc_size
                       value: '10'
@@ -1976,15 +1861,9 @@ zabbix_export:
                     - type: INTEGER
                       name: show.1
                       value: '1'
-                    - type: STRING
-                      name: units_color
-                      value: FFFFFF
                     - type: INTEGER
                       name: units_size
                       value: '15'
-                    - type: STRING
-                      name: value_color
-                      value: FFFFFF
                     - type: INTEGER
                       name: value_size
                       value: '20'
@@ -1996,14 +1875,8 @@ zabbix_export:
                   hide_header: 'YES'
                   fields:
                     - type: STRING
-                      name: bg_color
-                      value: 0B466A
-                    - type: STRING
                       name: description
                       value: 'Cached memory'
-                    - type: STRING
-                      name: desc_color
-                      value: FFFFFF
                     - type: INTEGER
                       name: desc_v_pos
                       value: '0'
@@ -2018,15 +1891,9 @@ zabbix_export:
                     - type: INTEGER
                       name: show.1
                       value: '1'
-                    - type: STRING
-                      name: units_color
-                      value: FFFFFF
                     - type: INTEGER
                       name: units_size
                       value: '25'
-                    - type: STRING
-                      name: value_color
-                      value: FFFFFF
                     - type: INTEGER
                       name: value_size
                       value: '35'
@@ -2038,14 +1905,8 @@ zabbix_export:
                   hide_header: 'YES'
                   fields:
                     - type: STRING
-                      name: bg_color
-                      value: 0B466A
-                    - type: STRING
                       name: description
                       value: 'Buffer memory'
-                    - type: STRING
-                      name: desc_color
-                      value: FFFFFF
                     - type: INTEGER
                       name: desc_v_pos
                       value: '0'
@@ -2060,15 +1921,9 @@ zabbix_export:
                     - type: INTEGER
                       name: show.1
                       value: '1'
-                    - type: STRING
-                      name: units_color
-                      value: FFFFFF
                     - type: INTEGER
                       name: units_size
                       value: '25'
-                    - type: STRING
-                      name: value_color
-                      value: FFFFFF
                     - type: INTEGER
                       name: value_size
                       value: '35'
@@ -2102,45 +1957,39 @@ zabbix_export:
                       value: '0'
                     - type: STRING
                       name: thresholds.0.color
-                      value: EBEBEB
+                      value: 0EC9AC
                     - type: STRING
                       name: thresholds.0.threshold
-                      value: '0'
-                    - type: STRING
-                      name: thresholds.1.color
-                      value: 8BCC3A
-                    - type: STRING
-                      name: thresholds.1.threshold
                       value: '1'
                     - type: STRING
-                      name: thresholds.2.color
-                      value: D40100
+                      name: thresholds.1.color
+                      value: FF465C
                     - type: STRING
-                      name: thresholds.2.threshold
+                      name: thresholds.1.threshold
                       value: '2'
                     - type: STRING
-                      name: thresholds.3.color
-                      value: EBEBEB
+                      name: thresholds.2.color
+                      value: FFD54F
                     - type: STRING
-                      name: thresholds.3.threshold
+                      name: thresholds.2.threshold
                       value: '4'
                     - type: STRING
-                      name: thresholds.4.color
-                      value: CC7C3A
+                      name: thresholds.3.color
+                      value: FFD54F
                     - type: STRING
-                      name: thresholds.4.threshold
+                      name: thresholds.3.threshold
                       value: '5'
                     - type: STRING
-                      name: thresholds.5.color
-                      value: CC7C3A
+                      name: thresholds.4.color
+                      value: FFD54F
                     - type: STRING
-                      name: thresholds.5.threshold
+                      name: thresholds.4.threshold
                       value: '6'
                     - type: STRING
-                      name: thresholds.6.color
-                      value: CC7C3A
+                      name: thresholds.5.color
+                      value: FFD54F
                     - type: STRING
-                      name: thresholds.6.threshold
+                      name: thresholds.5.threshold
                       value: '7'
                 - type: honeycomb
                   name: 'Bits received'
@@ -2171,15 +2020,9 @@ zabbix_export:
                       value: bps
                     - type: STRING
                       name: thresholds.0.color
-                      value: EBEBEB
+                      value: 0EC9AC
                     - type: STRING
                       name: thresholds.0.threshold
-                      value: '0'
-                    - type: STRING
-                      name: thresholds.1.color
-                      value: 8BCC3A
-                    - type: STRING
-                      name: thresholds.1.threshold
                       value: '100'
                 - type: honeycomb
                   name: 'Bits sent'
@@ -2210,15 +2053,9 @@ zabbix_export:
                       value: bps
                     - type: STRING
                       name: thresholds.0.color
-                      value: EBEBEB
-                    - type: STRING
-                      name: thresholds.0.threshold
-                      value: '0'
-                    - type: STRING
-                      name: thresholds.1.color
                       value: 00A2E5
                     - type: STRING
-                      name: thresholds.1.threshold
+                      name: thresholds.0.threshold
                       value: '100'
                 - type: svggraph
                   name: 'Network interfaces traffic'
@@ -2228,7 +2065,7 @@ zabbix_export:
                   fields:
                     - type: STRING
                       name: ds.0.color.0
-                      value: 8BCC3A
+                      value: 0EC9AC
                     - type: STRING
                       name: ds.0.color.1
                       value: 00A2E5
@@ -2280,45 +2117,39 @@ zabbix_export:
                       value: '0'
                     - type: STRING
                       name: thresholds.0.color
-                      value: EBEBEB
+                      value: 0EC9AC
                     - type: STRING
                       name: thresholds.0.threshold
-                      value: '0'
-                    - type: STRING
-                      name: thresholds.1.color
-                      value: 8BCC3A
-                    - type: STRING
-                      name: thresholds.1.threshold
                       value: '1'
                     - type: STRING
-                      name: thresholds.2.color
-                      value: D40100
+                      name: thresholds.1.color
+                      value: FF465C
                     - type: STRING
-                      name: thresholds.2.threshold
+                      name: thresholds.1.threshold
                       value: '2'
                     - type: STRING
-                      name: thresholds.3.color
-                      value: EBEBEB
+                      name: thresholds.2.color
+                      value: FFD54F
                     - type: STRING
-                      name: thresholds.3.threshold
+                      name: thresholds.2.threshold
                       value: '4'
                     - type: STRING
-                      name: thresholds.4.color
-                      value: CC7C3A
+                      name: thresholds.3.color
+                      value: FFD54F
                     - type: STRING
-                      name: thresholds.4.threshold
+                      name: thresholds.3.threshold
                       value: '5'
                     - type: STRING
-                      name: thresholds.5.color
-                      value: CC7C3A
+                      name: thresholds.4.color
+                      value: FFD54F
                     - type: STRING
-                      name: thresholds.5.threshold
+                      name: thresholds.4.threshold
                       value: '6'
                     - type: STRING
-                      name: thresholds.6.color
-                      value: CC7C3A
+                      name: thresholds.5.color
+                      value: FFD54F
                     - type: STRING
-                      name: thresholds.6.threshold
+                      name: thresholds.5.threshold
                       value: '7'
                 - type: honeycomb
                   name: 'Inbound packets with errors'
@@ -2349,15 +2180,9 @@ zabbix_export:
                       value: '0'
                     - type: STRING
                       name: thresholds.0.color
-                      value: EBEBEB
+                      value: FF465C
                     - type: STRING
                       name: thresholds.0.threshold
-                      value: '0'
-                    - type: STRING
-                      name: thresholds.1.color
-                      value: D40100
-                    - type: STRING
-                      name: thresholds.1.threshold
                       value: '1'
                 - type: honeycomb
                   name: 'Outbound packets with errors'
@@ -2388,15 +2213,9 @@ zabbix_export:
                       value: '0'
                     - type: STRING
                       name: thresholds.0.color
-                      value: EBEBEB
+                      value: FF465C
                     - type: STRING
                       name: thresholds.0.threshold
-                      value: '0'
-                    - type: STRING
-                      name: thresholds.1.color
-                      value: D40100
-                    - type: STRING
-                      name: thresholds.1.threshold
                       value: '1'
                 - type: svggraph
                   name: 'Network interfaces packets with errors'
@@ -2406,7 +2225,7 @@ zabbix_export:
                   fields:
                     - type: STRING
                       name: ds.0.color.0
-                      value: 8BCC3A
+                      value: 0EC9AC
                     - type: STRING
                       name: ds.0.color.1
                       value: 00A2E5
@@ -2458,45 +2277,39 @@ zabbix_export:
                       value: '0'
                     - type: STRING
                       name: thresholds.0.color
-                      value: EBEBEB
+                      value: 0EC9AC
                     - type: STRING
                       name: thresholds.0.threshold
-                      value: '0'
-                    - type: STRING
-                      name: thresholds.1.color
-                      value: 8BCC3A
-                    - type: STRING
-                      name: thresholds.1.threshold
                       value: '1'
                     - type: STRING
-                      name: thresholds.2.color
-                      value: D40100
+                      name: thresholds.1.color
+                      value: FF465C
                     - type: STRING
-                      name: thresholds.2.threshold
+                      name: thresholds.1.threshold
                       value: '2'
                     - type: STRING
-                      name: thresholds.3.color
-                      value: EBEBEB
+                      name: thresholds.2.color
+                      value: FFD54F
                     - type: STRING
-                      name: thresholds.3.threshold
+                      name: thresholds.2.threshold
                       value: '4'
                     - type: STRING
-                      name: thresholds.4.color
-                      value: CC7C3A
+                      name: thresholds.3.color
+                      value: FFD54F
                     - type: STRING
-                      name: thresholds.4.threshold
+                      name: thresholds.3.threshold
                       value: '5'
                     - type: STRING
-                      name: thresholds.5.color
-                      value: CC7C3A
+                      name: thresholds.4.color
+                      value: FFD54F
                     - type: STRING
-                      name: thresholds.5.threshold
+                      name: thresholds.4.threshold
                       value: '6'
                     - type: STRING
-                      name: thresholds.6.color
-                      value: CC7C3A
+                      name: thresholds.5.color
+                      value: FFD54F
                     - type: STRING
-                      name: thresholds.6.threshold
+                      name: thresholds.5.threshold
                       value: '7'
                 - type: honeycomb
                   name: 'Inbound packets discarded'
@@ -2527,15 +2340,9 @@ zabbix_export:
                       value: '0'
                     - type: STRING
                       name: thresholds.0.color
-                      value: EBEBEB
+                      value: FF465C
                     - type: STRING
                       name: thresholds.0.threshold
-                      value: '0'
-                    - type: STRING
-                      name: thresholds.1.color
-                      value: D40100
-                    - type: STRING
-                      name: thresholds.1.threshold
                       value: '1'
                 - type: honeycomb
                   name: 'Outbound packets discarded'
@@ -2566,15 +2373,9 @@ zabbix_export:
                       value: '0'
                     - type: STRING
                       name: thresholds.0.color
-                      value: EBEBEB
+                      value: FF465C
                     - type: STRING
                       name: thresholds.0.threshold
-                      value: '0'
-                    - type: STRING
-                      name: thresholds.1.color
-                      value: D40100
-                    - type: STRING
-                      name: thresholds.1.threshold
                       value: '1'
                 - type: svggraph
                   name: 'Network interfaces packets discarded'
@@ -2584,7 +2385,7 @@ zabbix_export:
                   fields:
                     - type: STRING
                       name: ds.0.color.0
-                      value: 8BCC3A
+                      value: 0EC9AC
                     - type: STRING
                       name: ds.0.color.1
                       value: 00A2E5
@@ -2633,19 +2434,19 @@ zabbix_export:
                       value: '%'
                     - type: STRING
                       name: thresholds.0.color
-                      value: 8BCC3A
+                      value: 0EC9AC
                     - type: STRING
                       name: thresholds.0.threshold
                       value: '0'
                     - type: STRING
                       name: thresholds.1.color
-                      value: CC7C3A
+                      value: FFD54F
                     - type: STRING
                       name: thresholds.1.threshold
                       value: '80'
                     - type: STRING
                       name: thresholds.2.color
-                      value: D40100
+                      value: FF465C
                     - type: STRING
                       name: thresholds.2.threshold
                       value: '95'
@@ -2705,7 +2506,7 @@ zabbix_export:
                   fields:
                     - type: STRING
                       name: ds.0.color.0
-                      value: 8BCC3A
+                      value: 0EC9AC
                     - type: STRING
                       name: ds.0.color.1
                       value: 00A2E5
@@ -2719,6 +2520,9 @@ zabbix_export:
                       name: ds.0.itemids.1._reference
                       value: STOUS._itemid
                     - type: INTEGER
+                      name: ds.0.missingdatafunc
+                      value: '3'
+                    - type: INTEGER
                       name: ds.0.width
                       value: '2'
                     - type: INTEGER
@@ -2726,13 +2530,16 @@ zabbix_export:
                       value: '1'
                     - type: STRING
                       name: ds.1.color.0
-                      value: D40100
+                      value: FF465C
                     - type: INTEGER
                       name: ds.1.dataset_type
                       value: '0'
                     - type: STRING
                       name: ds.1.itemids.0._reference
                       value: STOUT._itemid
+                    - type: INTEGER
+                      name: ds.1.missingdatafunc
+                      value: '3'
                     - type: INTEGER
                       name: ds.1.width
                       value: '2'
