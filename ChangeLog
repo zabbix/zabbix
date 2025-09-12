@@ -1,6 +1,7 @@
 Changes for 7.4.3rc1
 
 New features:
+...G...... [ZBXNEXT-9933] added TNS names support for Zabbix agent 2 Oracle plugin (lsurvilo)
 .........T [ZBXNEXT-10107] improved device coverage in Huawei OceanStor Dorado by SNMP template (abrosimovs)
 .........T [ZBXNEXT-10123] added Aruba CX 8300s by SNMP template (akotsegubov)
 ..F....... [ZBXNEXT-10112] added PSK identity pre-fill for Host Wizard (gklavins)
@@ -12,6 +13,17 @@ A......... [ZBXNEXT-10027] prepared for removal of TimescaleDB API call deprecat
 .......PS. [ZBXNEXT-10077] updated maximal supported MariaDB version to 12.0 (mprihodko)
 
 Bug fixes:
+........S. [ZBX-20207] fixed unexpected interface connection mode change during autoregistration (vso)
+....I..... [ZBX-26908] added Zabbix agent compile profile with proper options for Solaris 11 (aetatsu)
+...G...... [ZBX-19267] fixed wmi.get items sometimes incorectly returning "Empty WMI search result" with Zabbix agent 2 (aetatsu)
+..F....... [ZBX-25795] fixed shapes not being displayed on maps (gklavins)
+.........T [ZBX-25448] fixed token-based authentication method in FortiGate by HTTP template (egordymov)
+...G...... [ZBX-26847] explicitly defined oracle connection timezone in agent 2 (opucka)
+..F....... [ZBX-26472] fixed clearing of elements when the imported file contains no background image or icon map (rgontarski)
+..F....... [ZBX-26611] changed misleading label 'Metrics' in Item card widget into 'Interval and storage' (rgontarski)
+..F....... [ZBX-26644] fixed ability to see info icons for no longer discovered LLD rules in the list of host LLD rules (gberzina)
+..F....... [ZBX-26694] fixed media type test parameter maxlength (gberzina)
+........S. [ZBX-26416] fixed SNMP trap items processing issue occurred after host monitored by changes (sboidenko)
 ........S. [ZBX-26909] fixed crash on HA node recovery after standby with Zabbix proxy (sboidenko)
 ..F....... [ZBX-20964] removed the Problems link in the Monitoring Hosts page for user who does not have access (msnihach)
 ........S. [ZBX-26621] added TLS host parameters update in autoregistration mode (vsmelovs)
@@ -414,6 +426,7 @@ New features:
 .......PS. [ZBXNEXT-10077] updated maximal supported MariaDB version to 12.0 (mprihodko)
 
 Bug fixes:
+...G...... [ZBX-19267] fixed wmi.get items sometimes incorectly returning "Empty WMI search result" with Zabbix agent 2 (aetatsu)
 ........S. [ZBX-26909] fixed crash on HA node recovery after standby with Zabbix proxy (sboidenko)
 ...G...... [ZBX-26920] fixed wrong time in Zabbix agent for Windows (sboidenko)
 ..F....... [ZBX-22786] fixed trends graph line colors issue with PHP 8.1 (isharha)
@@ -1005,6 +1018,7 @@ A.F....... [ZBX-23227] fixed issue where using an empty array or string value fo
 Changes for 7.0.19rc1
 
 New features:
+...G...... [ZBXNEXT-9933] added TNS names support for Zabbix agent 2 Oracle plugin (lsurvilo)
 .........T [ZBXNEXT-10107] improved device coverage in Huawei OceanStor Dorado by SNMP template (abrosimovs)
 .........T [ZBXNEXT-10123] added Aruba CX 8300s by SNMP template (akotsegubov)
 .........T [ZBXNEXT-10152] added a new macro for disk discovery type selection in both SMART by Zabbix agent 2 templates (knaglis)
@@ -1015,6 +1029,14 @@ A......... [ZBXNEXT-10027] prepared for removal of TimescaleDB API call deprecat
 .......PS. [ZBXNEXT-10077] updated maximal supported MariaDB version to 12.0 (mprihodko)
 
 Bug fixes:
+........S. [ZBX-20207] fixed unexpected interface connection mode change during autoregistration (vso)
+...G...... [ZBX-19267] fixed wmi.get items sometimes incorectly returning "Empty WMI search result" with Zabbix agent 2 (aetatsu)
+.........T [ZBX-25448] fixed token-based authentication method in FortiGate by HTTP template (egordymov)
+...G...... [ZBX-26847] explicitly defined oracle connection timezone in agent 2 (opucka)
+..F....... [ZBX-26472] fixed clearing of elements when the imported file contains no background image or icon map (rgontarski)
+..F....... [ZBX-26694] fixed media type test parameter maxlength (gberzina)
+........S. [ZBX-26416] fixed SNMP trap items processing issue occurred after host monitored by changes (sboidenko)
+..F....... [ZBX-26801] fixed ability to select discovered items when editing graph items (gberzina)
 ..F....... [ZBX-20964] removed the Problems link in the Monitoring Hosts page for user who does not have access (msnihach)
 ........S. [ZBX-26621] added TLS host parameters update in autoregistration mode (vsmelovs)
 ..F....... [ZBX-26440] fixed inability to update JMX endpoint field in item, item prototype and LLD forms (kkuzmina)
@@ -4756,6 +4778,7 @@ New features:
 .......PS. [ZBXNEXT-10077] updated maximal supported MariaDB version to 12.0 (mprihodko)
 
 Bug fixes:
+...G...... [ZBX-19267] fixed wmi.get items sometimes incorectly returning "Empty WMI search result" with Zabbix agent 2 (aetatsu)
 ...G...... [ZBX-26920] fixed wrong time in Zabbix agent for Windows (sboidenko)
 ..F....... [ZBX-22786] fixed trends graph line colors issue with PHP 8.1 (isharha)
 ..F....... [ZBX-21975] fixed user autologout not removing user SAML authentication data (gcalenko)
