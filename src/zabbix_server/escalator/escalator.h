@@ -17,6 +17,12 @@
 
 #include "zbxthreads.h"
 #include "zbxcomms.h"
+#include "zbxcacheconfig.h"
+#include "zbxdbhigh.h"
+
+#define ZBX_MESSAGE_TYPE_NORMAL		1
+#define ZBX_MESSAGE_TYPE_UPDATE		2
+#define ZBX_MESSAGE_TYPE_RECOVERY	3
 
 typedef struct
 {
@@ -32,5 +38,11 @@ typedef struct
 zbx_thread_escalator_args;
 
 ZBX_THREAD_ENTRY(escalator_thread, args);
+
+int	substitute_message_macros(char **data, char *error, int maxerrlen, int message_type,
+		zbx_dc_um_handle_t * um_handle, zbx_uint64_t *actionid, const zbx_db_event *event,
+		const zbx_db_event *r_event, zbx_uint64_t *userid, const zbx_dc_host_t *dc_host,
+		const zbx_db_alert *alert, const zbx_service_alarm_t *service_alarm, const zbx_db_service *service,
+		const char *tz, const zbx_db_acknowledge *ack);
 
 #endif

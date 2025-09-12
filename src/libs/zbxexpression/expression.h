@@ -26,6 +26,4 @@ int	substitute_simple_macros_impl(const zbx_uint64_t *actionid, const zbx_db_eve
 		const char *tz, zbx_history_recv_item_t *history_data_item, char **data, int macro_type, char *error,
 		int maxerrlen);
 
-int	zbx_expr_macro_index(const char *macro);
-
 #endif
