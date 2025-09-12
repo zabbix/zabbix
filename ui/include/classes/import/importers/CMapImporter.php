@@ -278,6 +278,9 @@ class CMapImporter extends CImporter {
 				}
 				$map['iconmapid'] = $iconmapid;
 			}
+			else {
+				$map['iconmapid'] = null;
+			}
 
 			if (array_key_exists('background', $map) && array_key_exists('name', $map['background'])
 					&& $map['background']['name'] !== '') {
@@ -289,6 +292,9 @@ class CMapImporter extends CImporter {
 					));
 				}
 				$map['backgroundid'] = $imageid;
+			}
+			else {
+				$map['backgroundid'] = null;
 			}
 		}
 		unset($map);

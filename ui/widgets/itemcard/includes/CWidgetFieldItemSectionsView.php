@@ -73,7 +73,7 @@ class CWidgetFieldItemSectionsView extends CWidgetFieldView {
 						->addOptions(CSelect::createOptionsFromArray([
 							CWidgetFieldItemSections::SECTION_DESCRIPTION => _('Description'),
 							CWidgetFieldItemSections::SECTION_ERROR_TEXT => _('Error text'),
-							CWidgetFieldItemSections::SECTION_METRICS => _('Metrics'),
+							CWidgetFieldItemSections::SECTION_INTERVAL_AND_STORAGE => _('Interval and storage'),
 							CWidgetFieldItemSections::SECTION_LATEST_DATA => _('Latest data'),
 							CWidgetFieldItemSections::SECTION_TYPE_OF_INFORMATION => _('Type of information'),
 							CWidgetFieldItemSections::SECTION_TRIGGERS => _('Triggers'),
