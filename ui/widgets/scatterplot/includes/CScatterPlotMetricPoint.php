@@ -24,7 +24,8 @@ use CSvgCircle,
 	CSvgRect,
 	CSvgStar,
 	CSvgTag,
-	CSvgTriangle;
+	CSvgTriangle,
+	InvalidArgumentException;
 
 class CScatterPlotMetricPoint extends CSvgGroup {
 
@@ -107,7 +108,9 @@ class CScatterPlotMetricPoint extends CSvgGroup {
 
 		$this
 			->addItem(
-				$highlight_point_group->addItem($highlight)
+				$highlight_point_group->addItem(
+					$highlight->addClass(CSvgTag::ZBX_STYLE_GRAPH_HIGHLIGHTED_VALUE)
+				)
 			)
 			->addItem(
 				$point_group
@@ -126,7 +129,7 @@ class CScatterPlotMetricPoint extends CSvgGroup {
 		switch ($marker_type) {
 			case self::MARKER_TYPE_ELLIPSIS:
 				return [
-					(new CSvgCircle(0, 0, $size + 4))->addClass(CSvgTag::ZBX_STYLE_GRAPH_HIGHLIGHTED_VALUE),
+					new CSvgCircle(0, 0, $size + 4),
 					new CSvgCircle(0, 0, $size)
 				];
 
@@ -135,38 +138,36 @@ class CScatterPlotMetricPoint extends CSvgGroup {
 				$zero_coordinates = 0 - ($size / 2);
 
 				return [
-					(new CSvgRect($empty_coordinates, $empty_coordinates, $size + 4, $size + 4))
-						->addClass(CSvgTag::ZBX_STYLE_GRAPH_HIGHLIGHTED_VALUE),
+					new CSvgRect($empty_coordinates, $empty_coordinates, $size + 4, $size + 4),
 					new CSvgRect($zero_coordinates, $zero_coordinates, $size, $size)
 				];
 
 			case self::MARKER_TYPE_TRIANGLE:
 				return [
-					(new CSvgTriangle(0, 0, $size + 4, $size + 4))
-						->addClass(CSvgTag::ZBX_STYLE_GRAPH_HIGHLIGHTED_VALUE),
+					new CSvgTriangle(0, 0, $size + 4, $size + 4),
 					new CSvgTriangle(0, 0, $size, $size)
 				];
 
 			case self::MARKER_TYPE_DIAMOND:
 				return [
-					(new CSvgDiamond(0, 0, $size + 4))->addClass(CSvgTag::ZBX_STYLE_GRAPH_HIGHLIGHTED_VALUE),
+					new CSvgDiamond(0, 0, $size + 4),
 					new CSvgDiamond(0, 0, $size)
 				];
 
 			case self::MARKER_TYPE_STAR:
 				return [
-					(new CSvgStar(0, 0, $size + 4))->addClass(CSvgTag::ZBX_STYLE_GRAPH_HIGHLIGHTED_VALUE),
+					new CSvgStar(0, 0, $size + 4),
 					new CSvgStar(0, 0, $size)
 				];
 
 			case self::MARKER_TYPE_CROSS:
 				return [
-					(new CSvgCross(0, 0, $size + 4))->addClass(CSvgTag::ZBX_STYLE_GRAPH_HIGHLIGHTED_VALUE),
+					new CSvgCross(0, 0, $size + 4),
 					new CSvgCross(0, 0, $size)
 				];
 		}
 
-		return [null, null];
+		throw new InvalidArgumentException();
 	}
 
 	public function toString($destroy = true): string {
