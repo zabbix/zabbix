@@ -298,21 +298,17 @@ final class CSlaHelper {
 			$weekday_schedule_periods = trim($schedule_periods[$weekday]);
 
 			foreach (explode(',', $weekday_schedule_periods) as $schedule_period) {
-				preg_match('/^\s*(?<from_h>\d{1,2}):(?<from_m>\d{2})\s*-\s*(?<to_h>\d{1,2}):(?<to_m>\d{2})\s*$/',
-					$schedule_period, $matches);
+				$period_time_parser = new CPeriodTimeParser();
+				if ($period_time_parser->parse($schedule_period) !== $period_time_parser::PARSE_FAIL) {
 
-				$from_h = $matches['from_h'];
-				$from_m = $matches['from_m'];
-				$to_h = $matches['to_h'];
-				$to_m = $matches['to_m'];
+					$day_period_from = $period_time_parser->getDayPeriodFrom();
+					$day_period_to = $period_time_parser->getDayPeriodTo();
 
-				$day_period_from = SEC_PER_HOUR * $from_h + SEC_PER_MIN * $from_m;
-				$day_period_to = SEC_PER_HOUR * $to_h + SEC_PER_MIN * $to_m;
-
-				$result[] = [
-					'period_from' => SEC_PER_DAY * $weekday + $day_period_from,
-					'period_to' => SEC_PER_DAY * $weekday + $day_period_to
-				];
+					$result[] = [
+						'period_from' => SEC_PER_DAY * $weekday + $day_period_from,
+						'period_to' => SEC_PER_DAY * $weekday + $day_period_to
+					];
+				}
 			}
 		}
 

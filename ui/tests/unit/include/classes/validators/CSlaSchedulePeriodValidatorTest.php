@@ -72,7 +72,7 @@ class CSlaSchedulePeriodValidatorTest extends TestCase {
 	 * @dataProvider dataProvider
 	 */
 	public function testValidate(string $source, string $expected_error = '') {
-		$validator = new CSlaSchedulePeriodValidator();
+		$validator = new CPeriodTimeRangeValidator();
 		$result = $validator->validate($source);
 
 		if ($expected_error === '') {

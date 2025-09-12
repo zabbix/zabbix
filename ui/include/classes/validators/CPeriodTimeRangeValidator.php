@@ -14,27 +14,33 @@
 **/
 
 
-class CSlaSchedulePeriodValidator extends CValidator {
+class CPeriodTimeRangeValidator extends CValidator {
+
+	private CPeriodTimeParser $period_time_parser;
+
+	public function __construct(array $options = [])
+	{
+		parent::__construct($options);
+		$this->period_time_parser = new CPeriodTimeParser();
+	}
 
 	public function validate($value) {
 		$result = [];
 		$value = trim($value);
 
 		foreach (explode(',', $value) as $schedule_period) {
-			if (!preg_match('/^\s*(?<from_h>\d{1,2}):(?<from_m>\d{2})\s*-\s*(?<to_h>\d{1,2}):(?<to_m>\d{2})\s*$/',
-					$schedule_period, $matches)) {
-				$this->setError(_('a time period is expected'));
+			if ($this->period_time_parser->parse($schedule_period) == $this->period_time_parser::PARSE_FAIL) {
+				$this->setError(_('comma separated list of time periods is expected'));
 
 				return false;
 			}
+			$matches = $this->period_time_parser->getMatches();
 
-			$from_h = $matches['from_h'];
 			$from_m = $matches['from_m'];
-			$to_h = $matches['to_h'];
 			$to_m = $matches['to_m'];
 
-			$day_period_from = SEC_PER_HOUR * $from_h + SEC_PER_MIN * $from_m;
-			$day_period_to = SEC_PER_HOUR * $to_h + SEC_PER_MIN * $to_m;
+			$day_period_from = $this->period_time_parser->getDayPeriodFrom();
+			$day_period_to = $this->period_time_parser->getDayPeriodTo();
 
 			if ($from_m > 59 || $to_m > 59 || $day_period_to > SEC_PER_DAY) {
 				$this->setError(_('a time period is expected'));
