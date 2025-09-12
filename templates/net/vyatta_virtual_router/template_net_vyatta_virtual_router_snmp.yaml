@@ -426,7 +426,7 @@ zabbix_export:
                 key: devices.walk
               tags:
                 - tag: component
-                  value: network
+                  value: cpu
               trigger_prototypes:
                 - uuid: 121927a633ba4d1d95d38457c7dca003
                   expression: 'last(/Vyatta Virtual Router by SNMP/cpu.status[hrDeviceStatus.{#SNMPINDEX}]) <> 2'
@@ -455,7 +455,7 @@ zabbix_export:
                 key: devices.walk
               tags:
                 - tag: component
-                  value: network
+                  value: cpu
               trigger_prototypes:
                 - uuid: 7948f5b2eaf44f3f99672fb4be7e3b6a
                   expression: 'min(/Vyatta Virtual Router by SNMP/cpu.utilization[hrProcessorLoad.{#SNMPINDEX}], 5m) > {$VYATTA.CPU.USED.WARN}'
