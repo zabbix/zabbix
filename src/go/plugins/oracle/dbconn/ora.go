@@ -194,6 +194,7 @@ func createDriverConnector(hostOrTNS, user, pwd string, privilege dsn.AdminRole)
 	params.Username, params.Password = user, godror.NewPassword(pwd)
 	params.ConnectString = hostOrTNS
 	params.ConnParams = connParams
+	params.Timezone = time.Local
 
 	connector := godror.NewConnector(params)
 
