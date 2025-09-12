@@ -178,8 +178,7 @@ class testMediatype extends CAPITest {
 				[[
 					'mediatypeid' => ':media_type:OAuth with tokens',
 					'access_token' => 'token',
-					'access_token_updated' => time() - SEC_PER_MIN,
-					'access_expires_in' => 600
+					'access_token_updated' => time() - SEC_PER_MIN
 				]],
 				null
 			]
@@ -193,12 +192,13 @@ class testMediatype extends CAPITest {
 	public function testMediatypeUpdate(array $mediatypes, $expected_error) {
 		if (array_key_exists('access_token_updated', $mediatypes[0])
 				&& $mediatypes[0]['access_token_updated'] === ':time') {
-			$mediatypes[0]['access_token_updated'] =  time() - SEC_PER_HOUR;
+			$now = time();
+			$mediatypes[0]['access_token_updated'] =  $now - SEC_PER_HOUR;
 
 			if ($expected_error !== null) {
-				$time_from = date('Y-m-d H:i:s',  time() - 600);
-				$time_to = date('Y-m-d H:i:s',  time());
-				$expected_error = str_replace(':interval', $time_from . '-' . $time_to, $expected_error);
+				$time_from =date('Y-m-d H:i:s',$now - 600);
+				$time_to = date('Y-m-d H:i:s', $now);
+				$expected_error = str_replace(':interval', $time_from.'-'.$time_to, $expected_error);
 			}
 		}
 
@@ -345,12 +345,13 @@ class testMediatype extends CAPITest {
 	public function testMediatypeCreate(array $mediatypes, $expected_error) {
 		if (array_key_exists('access_token_updated', $mediatypes[0])
 				&& $mediatypes[0]['access_token_updated'] === ':time') {
-			$mediatypes[0]['access_token_updated'] = time() - SEC_PER_HOUR;
+			$now = time();
+			$mediatypes[0]['access_token_updated'] = $now - SEC_PER_HOUR;
 
 			if ($expected_error !== null) {
-				$time_from = date('Y-m-d H:i:s', time() - $mediatypes[0]['access_expires_in']);
-				$time_to = date('Y-m-d H:i:s', time());
-				$expected_error = str_replace(':interval', $time_from . '-' . $time_to, $expected_error);
+				$time_from = date('Y-m-d H:i:s', $now - $mediatypes[0]['access_expires_in']);
+				$time_to = date('Y-m-d H:i:s', $now);
+				$expected_error = str_replace(':interval', $time_from.'-'.$time_to, $expected_error);
 			}
 		}
 
