@@ -658,7 +658,8 @@ class CMediatype extends CApiService {
 		$is_update = $db_mediatype !== null;
 		$api_required = $is_update ? 0 : API_REQUIRED;
 
-		if (array_key_exists('access_token_updated', $mediatype)) {
+		if (array_key_exists('access_expires_in', $mediatype)
+				|| array_key_exists('access_token_updated', $mediatype)) {
 			$api_input_rules = ['type' => API_OBJECT, 'flags' => API_ALLOW_UNEXPECTED, 'fields' => [
 				'access_expires_in' =>	['type' => API_INT32, 'flags' => $api_required | API_NOT_EMPTY]
 			]];
@@ -666,9 +667,9 @@ class CMediatype extends CApiService {
 			if (!CApiInputValidator::validate($api_input_rules, $mediatype, $path, $error)) {
 				self::exception(ZBX_API_ERROR_PARAMETERS, $error);
 			}
-		}
 
-		$now = time();
+			$now = time();
+		}
 
 		$api_input_rules = ['type' => API_OBJECT, 'flags' => API_ALLOW_UNEXPECTED, 'fields' => [
 			'redirection_url' =>		['type' => API_STRING_UTF8, 'flags' => $api_required | API_NOT_EMPTY, 'length' => DB::getFieldLength('media_type_oauth', 'redirection_url')],
