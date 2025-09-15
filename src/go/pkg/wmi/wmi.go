@@ -163,12 +163,12 @@ func (r *valueResult) write(rs *ole.IDispatch) (err error) {
 			return stopErrorRow
 		}
 
-		return rowErr //nolint:wrapcheck // keeping "empty WMI search result" unwraped
+		return rowErr //nolint:wrapcheck // keeping "empty WMI search result" unwrapped
 	})
 
 	stop, ok := oleErr.(stopError) //nolint:errorlint // stopError type does not work with errors.As()
 	if !ok {
-		return oleErr //nolint:wrapcheck // keeping "empty WMI search result" unwraped
+		return oleErr //nolint:wrapcheck // keeping "empty WMI search result" unwrapped
 	}
 
 	if oleErr == nil || stop == stopErrorRow {
