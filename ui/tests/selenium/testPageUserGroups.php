@@ -204,8 +204,10 @@ class testPageUserGroups extends CLegacyWebTest {
 
 	public function testPageUserGroups_FilterByName() {
 		$this->zbxTestLogin('zabbix.php?action=usergroup.list');
+		$table = $this->getTable();
 		$this->zbxTestInputTypeOverwrite('filter_name', 'Zabbix administrators');
 		$this->zbxTestClickButtonText('Apply');
+		$table->waitUntilReloaded();
 		$this->zbxTestAssertElementText("//tbody/tr[1]/td[2]/a", 'Zabbix administrators');
 		$this->page->waitUntilReady();
 		$this->zbxTestTextNotPresent('Displaying 0 of 0 found');
@@ -213,8 +215,10 @@ class testPageUserGroups extends CLegacyWebTest {
 
 	public function testPageUserGroups_FilterNone() {
 		$this->zbxTestLogin('zabbix.php?action=usergroup.list');
+		$table = $this->getTable();
 		$this->zbxTestInputTypeOverwrite('filter_name', '1928379128ksdhksdjfh');
 		$this->zbxTestClickButtonText('Apply');
+		$table->waitUntilReloaded();
 		$this->page->waitUntilReady();
 		$this->assertTableStats(0);
 		$this->zbxTestInputTypeOverwrite('filter_name', '%');
@@ -225,9 +229,11 @@ class testPageUserGroups extends CLegacyWebTest {
 
 	public function testPageUserGroups_FilterByStatus() {
 		$this->zbxTestLogin('zabbix.php?action=usergroup.list');
+		$table = $this->getTable();
 		$this->zbxTestInputTypeOverwrite('filter_name', 'Zabbix administrators');
 		$this->zbxTestClickXpathWait("//label[@for='filter_user_status_1']");
 		$this->zbxTestClickButtonText('Apply');
+		$table->waitUntilReloaded();
 		$this->page->waitUntilReady();
 		$this->assertTableStats(1);
 	}
@@ -235,7 +241,9 @@ class testPageUserGroups extends CLegacyWebTest {
 	public function testPageUserGroups_FilterReset() {
 		$this->zbxTestLogin('zabbix.php?action=usergroup.list');
 		$this->zbxTestClickButtonText('Reset');
+		$table = $this->getTable();
 		$this->zbxTestClickButtonText('Apply');
+		$table->waitUntilReloaded();
 		$this->page->waitUntilReady();
 		$this->zbxTestTextNotPresent('Displaying 0 of 0 found');
 	}

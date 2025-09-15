@@ -111,16 +111,15 @@ class testInheritanceTrigger extends CLegacyWebTest {
 
 		switch ($data['expected']) {
 			case TEST_GOOD:
+				$this->assertMessage(TEST_GOOD, 'Trigger added');
 				$this->zbxTestCheckTitle('Configuration of triggers');
 				$this->zbxTestCheckHeader('Triggers');
-				$this->zbxTestTextPresent('Trigger added');
 				$this->zbxTestTextPresent($data['description']);
 				break;
 			case TEST_BAD:
+				$this->assertMessage(TEST_BAD, 'Cannot add trigger', $data['errors']);
 				$this->zbxTestCheckTitle('Configuration of triggers');
 				$this->zbxTestCheckHeader('Triggers');
-				$this->zbxTestTextPresent('Cannot add trigger');
-				$this->zbxTestTextPresent($data['errors']);
 				break;
 		}
 	}

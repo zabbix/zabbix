@@ -154,6 +154,7 @@ class testPageDashboardList extends CWebTest {
 		$form = $this->query('name:zbx_filter')->asForm()->one();
 		$form->fill($data['fields']);
 		$form->submit();
+		$table->waitUntilReloaded();
 
 		// Check that filtered count matches expected.
 		if ($data['result_count'] !== 0) {
@@ -161,6 +162,7 @@ class testPageDashboardList extends CWebTest {
 		}
 		$this->assertTableStats($data['result_count']);
 		$form->query('button:Reset')->one()->click();
+		$table->waitUntilReloaded();
 		$this->assertEquals($start_rows_count, $table->getRows()->count());
 	}
 
@@ -168,7 +170,7 @@ class testPageDashboardList extends CWebTest {
 	 * Check that My and Sharing tags displays correctly in Dashboard Lists for Admin.
 	 */
 	public function testPageDashboardList_CheckOwners() {
-		$this->page->login()->open('zabbix.php?action=dashboard.list');
+		$this->page->login()->open('zabbix.php?action=dashboard.list&filter_rst=1');
 		$table = $this->query('class:list-table')->asTable()->one();
 
 		$dashboards = CDBHelper::getAll('SELECT name, userid, private, dashboardid FROM dashboard');
@@ -194,7 +196,7 @@ class testPageDashboardList extends CWebTest {
 	}
 
 	public function testPageDashboardList_DeleteSingleDashboard() {
-		$this->page->login()->open('zabbix.php?action=dashboard.list');
+		$this->page->login()->open('zabbix.php?action=dashboard.list&filter_rst=1');
 		$dashboard_name = 'Testing share dashboard';
 		$table = $this->query('class:list-table')->asTable()->one();
 
@@ -213,7 +215,7 @@ class testPageDashboardList extends CWebTest {
 	}
 
 	public function testPageDashboardList_DeleteAllDashboards() {
-		$this->page->login()->open('zabbix.php?action=dashboard.list');
+		$this->page->login()->open('zabbix.php?action=dashboard.list&filter_rst=1');
 		$this->selectTableRows();
 		$this->query('button:Delete')->one()->click();
 		$this->page->acceptAlert();

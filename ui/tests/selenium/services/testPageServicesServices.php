@@ -669,6 +669,7 @@ class testPageServicesServices extends CWebTest {
 		// Filling fields with needed services info.
 		$form->fill(['id:filter_name' => 'Parent for 2 levels of child services']);
 		$form->submit();
+		$table->waitUntilReloaded();
 
 		// Check that filtered count matches expected.
 		$this->assertEquals(1, $table->getRows()->count());

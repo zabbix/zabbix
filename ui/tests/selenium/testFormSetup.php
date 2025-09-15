@@ -71,7 +71,7 @@ class testFormSetup extends CWebTest {
 
 	public function testFormSetup_prerequisitesSectionLayout() {
 		$this->page->login()->open('setup.php')->waitUntilReady();
-		$this->query('button:Next step')->one()->click();
+		$this->query('button:Next step')->one()->click()->waitUntilStalled();
 
 		// Check Pre-requisites section.
 		$this->checkPageTextElements('Check of pre-requisites');
@@ -635,7 +635,7 @@ class testFormSetup extends CWebTest {
 		}
 
 		// Check the outcome for the specified database configuration.
-		$this->query('button:Next step')->one()->click();
+		$this->query('button:Next step')->one()->click()->waitUntilStalled();
 		if (CTestArrayHelper::get($data, 'expected', TEST_GOOD) === TEST_BAD) {
 			// Define the reference error message details and assert error message.
 			if (array_key_exists('error_details', $data)) {
@@ -931,8 +931,8 @@ class testFormSetup extends CWebTest {
 	 */
 	private function openSpecifiedSection($section) {
 		$this->page->login()->open('setup.php')->waitUntilReady();
-		$this->query('button:Next step')->one()->click();
-		$this->query('button:Next step')->one()->click();
+		$this->query('button:Next step')->one()->click()->waitUntilStalled();
+		$this->query('button:Next step')->one()->click()->waitUntilStalled();
 		// No actions required in case of Configure DB connection section.
 		if ($section === 'Configure DB connection') {
 			return;

@@ -36,6 +36,15 @@ class testInheritanceTriggerPrototype extends CLegacyWebTest {
 	private $discoveryRuleId = 15011;	// 'testInheritanceDiscoveryRule'
 	private $discoveryRule = 'testInheritanceDiscoveryRule';
 
+	/**
+	 * Attach MessageBehavior to the test.
+	 *
+	 * @return array
+	 */
+	public function getBehaviors() {
+		return [CMessageBehavior::class];
+	}
+
 	// Returns update data
 	public static function update() {
 		return CDBHelper::getDataProvider(
@@ -65,8 +74,8 @@ class testInheritanceTriggerPrototype extends CLegacyWebTest {
 		$this->zbxTestLogin('trigger_prototypes.php?form=update&context=host&triggerid='.$data['triggerid'].
 				'&parent_discoveryid='.$data['parent_itemid']);
 		$this->zbxTestClickWait('update');
+		$this->assertMessage(TEST_GOOD, 'Trigger prototype updated');
 		$this->zbxTestCheckTitle('Configuration of trigger prototypes');
-		$this->zbxTestTextPresent('Trigger prototype updated');
 
 		$this->assertEquals($oldHashTriggers, CDBHelper::getHash($sqlTriggers));
 	}
@@ -87,7 +96,6 @@ class testInheritanceTriggerPrototype extends CLegacyWebTest {
 					'description' => 'testInheritanceTriggerPrototype1',
 					'expression' => 'last(/Inheritance test template/key-item-inheritance-test)=0',
 					'errors' => [
-						'Cannot add trigger prototype',
 						'Trigger prototype "testInheritanceTriggerPrototype1" must contain at least one item prototype.'
 					]
 				]
@@ -110,16 +118,16 @@ class testInheritanceTriggerPrototype extends CLegacyWebTest {
 
 		switch ($data['expected']) {
 			case TEST_GOOD:
+				$this->assertMessage(TEST_GOOD, 'Trigger prototype added');
 				$this->zbxTestCheckTitle('Configuration of trigger prototypes');
 				$this->zbxTestCheckHeader('Trigger prototypes');
-				$this->zbxTestTextPresent('Trigger prototype added');
 				$this->zbxTestTextPresent($data['description']);
 				break;
 
 			case TEST_BAD:
+				$this->assertMessage(TEST_BAD, 'Cannot add trigger prototype', $data['errors']);
 				$this->zbxTestCheckTitle('Configuration of trigger prototypes');
 				$this->zbxTestCheckHeader('Trigger prototypes');
-				$this->zbxTestTextPresent($data['errors']);
 				break;
 		}
 	}

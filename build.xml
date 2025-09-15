@@ -160,6 +160,7 @@
 			<arg line="--enable-agent"/>
 			<arg line="--enable-agent2"/>
 			<arg line="--with-postgresql"/>
+			<arg line="--with-libpcre2"/>
 			<arg line="--prefix=${basedir}"/>
 		</exec>
 		<exec executable="make" failonerror="on">
@@ -347,6 +348,7 @@
 			<arg line="--enable-agent"/>
 			<arg line="--enable-agent2"/>
 			<arg line="--with-mysql"/>
+			<arg line="--with-libpcre2"/>
 			<arg line="--prefix=${basedir}"/>
 		</exec>
 		<exec executable="make" failonerror="on">

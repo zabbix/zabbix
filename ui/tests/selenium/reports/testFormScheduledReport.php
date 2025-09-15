@@ -770,7 +770,7 @@ class testFormScheduledReport extends CWebTest {
 	 */
 	public function testFormScheduledReport_CreateInDashboard($data) {
 		$this->page->login()->open('zabbix.php?action=dashboard.view&dashboardid=1')->waitUntilReady();
-		$this->query('id:dashboard-actions')->one()->waitUntilClickable()->click();
+		$this->query('id:dashboard-actions')->one()->waitUntilClickable()->hoverMouse()->click();
 		CPopupMenuElement::find()->waitUntilVisible()->one()->select('Create new report');
 
 		$this->executeAction($data, 'dashboard', 'Scheduled report created');

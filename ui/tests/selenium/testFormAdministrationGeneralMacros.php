@@ -390,8 +390,7 @@ class testFormAdministrationGeneralMacros extends testFormMacros {
 		$this->zbxTestInputType('macros_0_description', $this->updDescription);
 
 		$this->saveGlobalMacros();
-		$this->zbxTestTextPresent('Cannot update macros');
-		$this->zbxTestTextPresent('Invalid parameter "/1/macro": '.$error.'.');
+		$this->assertMessage(TEST_BAD, 'Cannot update macros', 'Invalid parameter "/1/macro": '.$error.'.');
 
 		$this->zbxTestAssertElementValue('macros_0_macro', $macro);
 		$this->zbxTestAssertElementValue('macros_0_value', $this->updValue);

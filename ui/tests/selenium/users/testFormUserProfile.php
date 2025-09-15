@@ -28,6 +28,15 @@ use Facebook\WebDriver\WebDriverBy;
  */
 class testFormUserProfile extends CLegacyWebTest {
 
+	/**
+	 * Attach MessageBehavior to the test.
+	 *
+	 * @return array
+	 */
+	public function getBehaviors() {
+		return [CMessageBehavior::class];
+	}
+
 	public function testFormUserProfile_SimpleUpdate() {
 		$sqlHashUsers = 'select userid,username,name,surname,passwd,url,autologin,lang,refresh,roleid,theme,attempt_failed,attempt_clock,rows_per_page'
 				. ' from users order by userid';
@@ -108,6 +117,7 @@ class testFormUserProfile extends CLegacyWebTest {
 
 		switch ($data['expected']) {
 			case TEST_GOOD:
+				$this->assertMessage(TEST_GOOD, 'User updated');
 				$this->zbxTestCheckHeader('Global view');
 				$this->zbxTestWaitUntilMessageTextPresent('msg-good' , 'User updated');
 				break;
@@ -217,6 +227,7 @@ class testFormUserProfile extends CLegacyWebTest {
 
 		switch ($data['expected']) {
 			case TEST_GOOD:
+				$this->assertMessage(TEST_GOOD, 'User updated');
 				$this->zbxTestCheckHeader('Global view');
 				$row = DBfetch(DBselect("select refresh from users where username='".PHPUNIT_LOGIN_NAME."'"));
 				$this->assertEquals($data['refresh'] , $row['refresh']);
@@ -325,6 +336,7 @@ class testFormUserProfile extends CLegacyWebTest {
 
 		switch ($data['expected']) {
 			case TEST_GOOD:
+				$this->assertMessage(TEST_GOOD, 'User updated');
 				$this->zbxTestCheckHeader('Global view');
 				$row = DBfetch(DBselect("select autologout from users where username='".PHPUNIT_LOGIN_NAME."'"));
 				$this->assertEquals($data['autologout'] , $row['autologout']);
@@ -474,6 +486,7 @@ class testFormUserProfile extends CLegacyWebTest {
 
 		switch ($data['expected']) {
 			case TEST_GOOD:
+				$this->assertMessage(TEST_GOOD, 'User updated');
 				$this->zbxTestCheckHeader('Global view');
 				break;
 			case TEST_BAD:
@@ -556,6 +569,7 @@ class testFormUserProfile extends CLegacyWebTest {
 				$this->zbxTestWaitForPageToLoad();
 				COverlayDialogElement::ensureNotPresent();
 				$this->zbxTestClickWait('update');
+				$this->assertMessage(TEST_GOOD, 'User updated');
 				$this->zbxTestCheckHeader('Global view');
 				$sql = "SELECT * FROM media WHERE sendto = '".$data['send_to']."'";
 				$this->assertEquals(1, CDBHelper::getCount($sql));

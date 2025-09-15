@@ -4,6 +4,9 @@ New features:
 .......PS. [ZBXNEXT-10077] updated maximal supported MariaDB version to 12.0 (mprihodko)
 
 Bug fixes:
+...G...... [ZBX-19267] fixed wmi.get items sometimes incorectly returning "Empty WMI search result" with Zabbix agent 2 (aetatsu)
+...G...... [ZBX-26920] fixed wrong time in Zabbix agent for Windows (sboidenko)
+..F....... [ZBX-22786] fixed trends graph line colors issue with PHP 8.1 (isharha)
 ..F....... [ZBX-21975] fixed user autologout not removing user SAML authentication data (gcalenko)
 
 --------------------------------------------------------------------------------

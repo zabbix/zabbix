@@ -505,6 +505,7 @@ class testPageReportsAudit extends CWebTest {
 		$form->query('button:Reset')->one()->click();
 
 		$form->fill($data['fields'])->submit();
+		$table->waitUntilReloaded();
 
 		// If there is no result - "No data found" displayed in table.
 		if (CTestArrayHelper::get($data, 'no_data')) {

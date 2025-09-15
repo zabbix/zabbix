@@ -58,7 +58,7 @@ class testPageHistory extends CLegacyWebTest {
 		$this->zbxTestCheckTitle('History [refreshed every 30 sec.]');
 		$this->zbxTestCheckHeader('testPageHistory_CheckLayout: '.$item['name']);
 
-		$this->zbxTestClickWait('plaintext');
+		$this->query('button:As plain text')->one()->click()->waitUntilNotVisible();
 		$this->page->waitUntilReady();
 		$this->zbxTestTextPresent('testPageHistory_CheckLayout: '.$item['name']);
 
@@ -67,7 +67,7 @@ class testPageHistory extends CLegacyWebTest {
 		$view_as->select('Values');
 		$this->zbxTestCheckHeader('testPageHistory_CheckLayout: '.$item['name']);
 
-		$this->zbxTestClickWait('plaintext');
+		$this->query('button:As plain text')->one()->click()->waitUntilNotVisible();
 		$this->page->waitUntilReady();
 		$this->zbxTestTextPresent('testPageHistory_CheckLayout: '.$item['name']);
 	}
