@@ -1347,25 +1347,51 @@ class CFormValidator {
 	 * @return bool
 	 */
 	private static function validateFile($rules, &$value, ?string &$error = null): bool {
-		if ($rules['file']['max-size']) {
-			try {
-				$value->validateFileSize($rules['file']['max-size'], $rules['file']['type']);
-			}
-			catch (Exception $e) {
-				$error =  self::getMessage($rules, 'file', $e->getMessage());
-				return false;
-			}
+		$file = null;
+
+		try {
+			$file = new CUploadFile($value);
+		}
+		catch (Exception $e) {
+			$error = $e->getMessage();
+
+			return false;
 		}
 
-		if ($rules['file']['type'] == 'image') {
+		if ($file->wasUploaded() || array_key_exists('required', $rules)) {
+			$file_content = null;
+
 			try {
-				if (@imageCreateFromString($value->getContent()) === false) {
-					throw new Exception(_('File format is unsupported.'));
-				}
+				$file_content = $file->getContent();
 			}
 			catch (Exception $e) {
-				$error =  self::getMessage($rules, 'type', $e->getMessage());
+				$error = $e->getMessage();
+
 				return false;
+			}
+
+			if ($rules['file']['max-size']) {
+				try {
+					$file->validateFileSize($rules['file']['max-size'], $rules['file']['type']);
+				}
+				catch (Exception $e) {
+					$error = self::getMessage($rules, 'file', $e->getMessage());
+
+					return false;
+				}
+			}
+
+			if ($rules['file']['type'] == 'image') {
+				try {
+					if (@imageCreateFromString($file_content) === false) {
+						throw new Exception(_('File format is unsupported.'));
+					}
+				}
+				catch (Exception $e) {
+					$error = self::getMessage($rules, 'file.type', $e->getMessage());
+
+					return false;
+				}
 			}
 		}
 

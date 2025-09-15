@@ -282,13 +282,7 @@ abstract class CController {
 	 * @throws Exception
 	 */
 	private static function getFileInput(): array {
-		$files = [];
-
-		foreach ($_FILES as $file_key => $file) {
-			$files[$file_key] = $file ? new CUploadFile($file) : null;
-		}
-
-		return $files;
+		return $_FILES;
 	}
 
 	/**
@@ -523,10 +517,8 @@ abstract class CController {
 	 * Get single file by parameter.
 	 *
 	 * @param string $var
-	 *
-	 * @return CUploadFile
 	 */
-	protected function getFile($var): ?CUploadFile {
+	protected function getFile($var) {
 		return $this->files[$var];
 	}
 

@@ -79,7 +79,7 @@ class CControllerImageUpdate extends CController {
 	protected function uploadImage(&$error) {
 		try {
 			if ($this->hasFile('image')) {
-				$file = $this->getFile('image');
+				$file = new CUploadFile($this->getFile('image'));
 
 				if ($file->wasUploaded()) {
 					return base64_encode($file->getContent());
