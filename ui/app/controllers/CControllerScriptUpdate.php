@@ -16,11 +16,6 @@
 
 class CControllerScriptUpdate extends CController {
 
-	/**
-	 * @var array  Script data.
-	 */
-	private array $script = [];
-
 	protected function init(): void {
 		$this->setInputValidationMethod(self::INPUT_VALIDATION_FORM);
 		$this->setPostContentType(self::POST_CONTENT_TYPE_JSON);
