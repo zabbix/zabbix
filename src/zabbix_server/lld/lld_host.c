@@ -4985,6 +4985,8 @@ static void	lld_groups_remove(const zbx_vector_lld_group_ptr_t *groups, const zb
 							" set ts_delete=%d"
 							" where groupdiscoveryid=" ZBX_FS_UI64 ";\n",
 							ts_delete, discovery->groupdiscoveryid);
+
+					zbx_db_execute_overflowed_sql(&sql, &sql_alloc, &sql_offset);
 				}
 			}
 			else
