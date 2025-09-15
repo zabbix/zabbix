@@ -283,7 +283,6 @@ class CWidgetFormView {
 		}
 
 		$this->form_grid = (new CFormGrid())
-			->addClass('bla')
 			->addItem([
 				new CLabel(
 					[

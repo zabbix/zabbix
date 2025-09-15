@@ -207,7 +207,7 @@ CViewSwitcher.prototype = {
 				obj.style.display = 'inline-grid';
 				break
 			default:
-				obj.style.display = 'inline-block';
+				obj.style.display = 'inline';
 		}
 	},
 

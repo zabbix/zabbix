@@ -22,6 +22,7 @@
 $filter_view_data = array_key_exists('filter_view_data', $data) ? $data['filter_view_data'] : [];
 
 $left_column = (new CFormGrid())
+	->addClass(CFormGrid::ZBX_STYLE_FORM_GRID_LABEL_WIDTH_TRUE)
 	->addItem([
 		new CLabel(_('Host groups'), 'groupids_#{uniqid}_ms'),
 		new CFormField(
@@ -158,6 +159,7 @@ $tag_format_line = (new CHorList())
 	);
 
 $right_column = (new CFormGrid())
+	->addClass(CFormGrid::ZBX_STYLE_FORM_GRID_LABEL_WIDTH_TRUE)
 	->addItem([
 		new CLabel(_('Tags')),
 		new CFormField($filter_tags_table)

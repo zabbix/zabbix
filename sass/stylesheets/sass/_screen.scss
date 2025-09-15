@@ -619,7 +619,7 @@ form {
 
 	.cell {
 		text-align: left;
-		padding: 0 10px 5px;
+		padding: 0 20px 5px;
 
 		&:first-child {
 			padding-left: 0;
@@ -649,12 +649,6 @@ form {
 
 	select {
 		vertical-align: top;
-	}
-
-	.table-forms .table-forms-td-left {
-		label {
-			max-width: 85px;
-		}
 	}
 
 	.table-forms .table-forms-td-right {
@@ -1564,25 +1558,6 @@ div {
 	margin-left: 200px;
 }
 
-%hint-icon-ellipsis {
-	white-space: nowrap;
-	overflow: hidden;
-	text-overflow: ellipsis;
-
-	& > inlinetext {
-		max-width: calc(var(--label-width) - 21px);
-		overflow: hidden;
-		text-overflow: ellipsis;
-		display: inline-block;
-		vertical-align: bottom;
-
-		& + .btn-icon.btn-small {
-			vertical-align: top;
-			top: 3px;
-		}
-	}
-}
-
 .setup-right-body {
 	padding-right: 5px;
 	max-height: 345px;
@@ -1596,32 +1571,13 @@ div {
 		margin: 25% 0 .4em;
 	}
 
+	.table-forms-td-left {
+		label {
+			max-width: 170px;
+		}
+	}
+
 	@extend %webkit-scrollbar;
-}
-
-#preprocessing_tab,
-.setup-right-body {
-	.table-forms-td-left {
-		--label-width: 170px;
-
-		label {
-			max-width: var(--label-width);
-
-			@extend %hint-icon-ellipsis;
-		}
-	}
-}
-
-#preprocessing_tab {
-	.table-forms-td-left {
-		label {
-			--label-width: 150px;
-
-			& > inlinetext {
-				max-width: calc(var(--label-width) - 45px);
-			}
-		}
-	}
 }
 
 .setup-title {
@@ -4107,14 +4063,6 @@ z-select {
 }
 
 .form-grid {
-	label {
-		@extend %hint-icon-ellipsis;
-	}
-
-	li > label {
-		overflow: unset;
-	}
-
 	.subscriptions-table {
 		th {
 			color: $font-alt-color;

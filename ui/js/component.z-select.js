@@ -488,7 +488,7 @@ class ZSelect extends HTMLElement {
 
 		container.remove();
 
-		return Math.min(width, 150);
+		return Math.min(width, 453);
 	}
 
 	_isVisible() {

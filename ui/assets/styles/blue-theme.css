@@ -5675,7 +5675,7 @@ div.dashboard-widget-problemsbysv .list-table tr[data-hostgroupid] {
   cursor: pointer; }
 
 form.dashboard-widget-svggraph {
-  max-width: 1360px;
+  max-width: 1330px;
   min-width: 1120px;
   width: 100vw; }
   form.dashboard-widget-svggraph .graph-widget-config-tabs {
@@ -6624,7 +6624,7 @@ form.is-loading {
   background-color: #ffffff; }
   .filter-forms .cell {
     text-align: left;
-    padding: 0 10px 5px; }
+    padding: 0 20px 5px; }
     .filter-forms .cell:first-child {
       padding-left: 0; }
     .filter-forms .cell:last-child {
@@ -6640,8 +6640,6 @@ form.is-loading {
     margin: 10px 5px 0; }
   .filter-forms select {
     vertical-align: top; }
-  .filter-forms .table-forms .table-forms-td-left label {
-    max-width: 85px; }
   .filter-forms .table-forms .table-forms-td-right td {
     padding: 0 5px 5px 0;
     vertical-align: middle; }
@@ -7153,23 +7151,6 @@ z-select[disabled] .focusable, input[disabled], textarea[disabled], select optio
   width: auto;
   margin-left: 200px; }
 
-#preprocessing_tab .table-forms-td-left label,
-.setup-right-body .table-forms-td-left label, .form-grid label {
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis; }
-  #preprocessing_tab .table-forms-td-left label > inlinetext,
-  .setup-right-body .table-forms-td-left label > inlinetext, .form-grid label > inlinetext {
-    max-width: calc(var(--label-width) - 21px);
-    overflow: hidden;
-    text-overflow: ellipsis;
-    display: inline-block;
-    vertical-align: bottom; }
-    #preprocessing_tab .table-forms-td-left label > inlinetext + .btn-icon.btn-small,
-    .setup-right-body .table-forms-td-left label > inlinetext + .btn-icon.btn-small, .form-grid label > inlinetext + .btn-icon.btn-small {
-      vertical-align: top;
-      top: 3px; }
-
 .setup-right-body {
   padding-right: 5px;
   max-height: 345px;
@@ -7178,18 +7159,8 @@ z-select[disabled] .focusable, input[disabled], textarea[disabled], select optio
     border: 0; }
   .setup-right-body h1 {
     margin: 25% 0 .4em; }
-
-#preprocessing_tab .table-forms-td-left,
-.setup-right-body .table-forms-td-left {
-  --label-width: 170px; }
-  #preprocessing_tab .table-forms-td-left label,
   .setup-right-body .table-forms-td-left label {
-    max-width: var(--label-width); }
-
-#preprocessing_tab .table-forms-td-left label {
-  --label-width: 150px; }
-  #preprocessing_tab .table-forms-td-left label > inlinetext {
-    max-width: calc(var(--label-width) - 45px); }
+    max-width: 170px; }
 
 .setup-title {
   margin: 109px 0 16px 0;
@@ -8810,8 +8781,6 @@ z-select.z-select-host-interface li[disabled] .description:not(:empty) {
 .overlay-dialogue .valuemap-list-table td {
   vertical-align: top; }
 
-.form-grid li > label {
-  overflow: unset; }
 .form-grid .subscriptions-table th {
   color: #768d99; }
 .form-grid .subscriptions-table .icon {

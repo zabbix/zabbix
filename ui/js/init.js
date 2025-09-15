@@ -59,7 +59,7 @@ document.addEventListener('click', e => {
 document.addEventListener('mouseover', e => {
 	const element = e.target;
 
-	if (element.matches('label, inlinetext') && element.scrollWidth > element.clientWidth) {
+	if (element?.tagName?.toLowerCase() === 'label' && element.scrollWidth > element.clientWidth) {
 		element.title = element.textContent;
 	}
 });
