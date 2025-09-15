@@ -60,7 +60,10 @@ class CControllerScriptUpdate extends CController {
 			'port' => ['db scripts.port', 'use' => [CPortParser::class, ['usermacros' => true]], 'messages' => ['use' => _('Incorrect port.')]],
 			'command' => ['db scripts.command', 'required', 'not_empty', 'when' => ['type', 'in' => [ZBX_SCRIPT_TYPE_CUSTOM_SCRIPT, ZBX_SCRIPT_TYPE_SSH, ZBX_SCRIPT_TYPE_TELNET]]],
 			'commandipmi' => ['db scripts.command', 'required', 'not_empty', 'when' => ['type', 'in' => [ZBX_SCRIPT_TYPE_IPMI]]],
-			'parameters' =>	['object', 'fields' => ['name' => ['array'], 'value' => ['array']],
+			'parameters' => ['objects', 'uniq' => ['name'], 'fields' => [
+					'name' => ['db script_param.name', 'required', 'not_empty'],
+					'value' => ['db script_param.value']
+				],
 				'when' => ['type', 'in' => [ZBX_SCRIPT_TYPE_WEBHOOK]]
 			],
 			'script' => ['db scripts.command', 'required', 'not_empty', 'when' => ['type', 'in' => [ZBX_SCRIPT_TYPE_WEBHOOK]]],
@@ -159,17 +162,7 @@ class CControllerScriptUpdate extends CController {
 			case ZBX_SCRIPT_TYPE_WEBHOOK:
 				$script['command'] = $this->getInput('script', '');
 				$script['timeout'] = $this->getInput('timeout', DB::getDefault('scripts', 'timeout'));
-				$script['parameters'] = [];
-				$parameters = $this->getInput('parameters', []);
-
-				if (array_key_exists('name', $parameters) && array_key_exists('value', $parameters)) {
-					$script['parameters'] = array_map(function ($name, $value) {
-							return compact('name', 'value');
-						},
-						$parameters['name'],
-						$parameters['value']
-					);
-				}
+				$script['parameters'] = $this->getInput('parameters', []);
 				break;
 
 			case ZBX_SCRIPT_TYPE_URL:

@@ -27,6 +27,8 @@ $form = (new CForm())
 	->addItem((new CInput('submit', null))->addStyle('display: none;'));
 
 $parameters_table = (new CTable())
+	->setAttribute('data-field-type', 'set')
+	->setAttribute('data-field-name', 'parameters')
 	->setId('parameters-table')
 	->setHeader([
 		(new CColHeader(_('Name')))->setWidth('50%'),
@@ -46,16 +48,27 @@ $parameters_table = (new CTable())
 $row_template = (new CTemplateTag('script-parameter-template'))
 	->addItem(
 		(new CRow([
-			(new CTextBox('parameters[name][]', '', false, DB::getFieldLength('script_param', 'name')))
+			(new CTextBox('parameters[#{row_index}][name]', '', false, DB::getFieldLength('script_param', 'name')))
+				->setAttribute('data-error-label', _('Name'))
+				->setAttribute('data-error-container', 'parameter-#{row_index}-error-container')
 				->setAttribute('style', 'width: 100%;')
 				->setAttribute('value', '#{name}')
 				->removeId(),
-			(new CTextBox('parameters[value][]', '', false, DB::getFieldLength('script_param', 'value')))
+			(new CTextBox('parameters[#{row_index}][value]', '', false, DB::getFieldLength('script_param', 'value')))
+				->setAttribute('data-error-label', _('Value'))
+				->setAttribute('data-error-container', 'parameter-#{row_index}-error-container')
 				->setAttribute('style', 'width: 100%;')
 				->setAttribute('value', '#{value}')
 				->removeId(),
 			(new CButtonLink(_('Remove')))->addClass('js-remove')
 		]))->addClass('form_row')
+	)
+	->addItem(
+		(new CRow())->addItem((new CCol())
+			->setColSpan(3)
+			->setId('parameter-#{row_index}-error-container')
+			->addClass(ZBX_STYLE_ERROR_CONTAINER)
+		)
 	);
 
 $form_grid = (new CFormGrid())

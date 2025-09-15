@@ -50,15 +50,17 @@ window.script_edit_popup = new class {
 
 		this.form_element.querySelector('.js-parameter-add').addEventListener('click', () => {
 			const template = new Template(this.form_element.querySelector('#script-parameter-template').innerHTML);
+			const target = this.form_element.querySelector('#parameters-table tbody');
+			const row_index = target.querySelectorAll('tr.form_row').length;
 
-			this.form_element
-				.querySelector('#parameters-table tbody')
-				.insertAdjacentHTML('beforeend', template.evaluate({}));
+			target.insertAdjacentHTML('beforeend', template.evaluate({row_index}));
 		});
 
 		this.dialogue.addEventListener('click', (e) => {
 			if (e.target.classList.contains('js-remove')) {
-				e.target.closest('tr').remove();
+				const row = e.target.closest('tr');
+				row.nextSibling.remove();
+				row.remove();
 			}
 		});
 	}
@@ -70,10 +72,10 @@ window.script_edit_popup = new class {
 	 */
 	#addParameter(parameter) {
 		const template = new Template(this.form_element.querySelector('#script-parameter-template').innerHTML);
+		const target = this.form_element.querySelector('#parameters-table tbody');
+		const row_index = target.querySelectorAll('tr.form_row').length;
 
-		this.form_element
-			.querySelector('#parameters-table tbody')
-			.insertAdjacentHTML('beforeend', template.evaluate(parameter));
+		target.insertAdjacentHTML('beforeend', template.evaluate({row_index, ...parameter}));
 	}
 
 	/**
@@ -219,11 +221,6 @@ window.script_edit_popup = new class {
 			if (typeof fields[key] === 'string' && key !== 'confirmation') {
 				fields[key] = fields[key].trim();
 			}
-		}
-
-		if (typeof fields.parameters !== 'undefined') {
-			fields.parameters.name = fields.parameters.name.map(name => name.trim());
-			fields.parameters.value = fields.parameters.value.map(value => value.trim());
 		}
 
 		const curl = new Curl('zabbix.php');
