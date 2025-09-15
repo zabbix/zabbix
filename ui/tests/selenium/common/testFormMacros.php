@@ -1952,6 +1952,7 @@ abstract class testFormMacros extends CLegacyWebTest {
 
 	public function getCreateVaultMacrosData() {
 		return [
+			#0
 			[
 				[
 					'expected' => TEST_GOOD,
@@ -1967,6 +1968,7 @@ abstract class testFormMacros extends CLegacyWebTest {
 					'vault' => 'Hashicorp'
 				]
 			],
+			#1
 			[
 				[
 					'expected' => TEST_GOOD,
@@ -1982,6 +1984,7 @@ abstract class testFormMacros extends CLegacyWebTest {
 					'vault' => 'Hashicorp'
 				]
 			],
+			#2
 			[
 				[
 					'expected' => TEST_GOOD,
@@ -1997,6 +2000,7 @@ abstract class testFormMacros extends CLegacyWebTest {
 					'vault' => 'Hashicorp'
 				]
 			],
+			#3
 			[
 				[
 					'expected' => TEST_BAD,
@@ -2008,14 +2012,13 @@ abstract class testFormMacros extends CLegacyWebTest {
 						],
 						'description' => 'vault description2'
 					],
-					'title' => 'Cannot update '.$this->vault_object,
-					'message' => 'Invalid parameter "'.$this->hashi_error_field.'": incorrect syntax near ":".',
 					'vault' => 'Hashicorp',
 					'inline_error' => [
 						'id:macros_{index}_value' => 'Value: Incorrect syntax near ":".'
 					]
 				]
 			],
+			#4
 			[
 				[
 					'expected' => TEST_BAD,
@@ -2027,14 +2030,13 @@ abstract class testFormMacros extends CLegacyWebTest {
 						],
 						'description' => 'vault description3'
 					],
-					'title' => 'Cannot update '.$this->vault_object,
-					'message' => 'Invalid parameter "'.$this->hashi_error_field.'": incorrect syntax near "/path:key".',
 					'vault' => 'Hashicorp',
 					'inline_error' => [
 						'id:macros_{index}_value' => 'Value: Incorrect syntax near "/path:key".'
 					]
 				]
 			],
+			#5
 			[
 				[
 					'expected' => TEST_BAD,
@@ -2046,14 +2048,13 @@ abstract class testFormMacros extends CLegacyWebTest {
 						],
 						'description' => 'vault description5'
 					],
-					'title' => 'Cannot update '.$this->vault_object,
-					'message' => 'Invalid parameter "'.$this->hashi_error_field.'": incorrect syntax near ":key".',
 					'vault' => 'Hashicorp',
 					'inline_error' => [
 						'id:macros_{index}_value' => 'Value: Incorrect syntax near ":key".'
 					]
 				]
 			],
+			#6
 			[
 				[
 					'expected' => TEST_BAD,
@@ -2065,14 +2066,13 @@ abstract class testFormMacros extends CLegacyWebTest {
 						],
 						'description' => 'vault description6'
 					],
-					'title' => 'Cannot update '.$this->vault_object,
-					'message' => 'Invalid parameter "'.$this->hashi_error_field.'": incorrect syntax near "secret/path".',
 					'vault' => 'Hashicorp',
 					'inline_error' => [
 						'id:macros_{index}_value' => 'Value: Incorrect syntax near "secret/path".'
 					]
 				]
 			],
+			#7
 			[
 				[
 					'expected' => TEST_BAD,
@@ -2084,14 +2084,13 @@ abstract class testFormMacros extends CLegacyWebTest {
 						],
 						'description' => 'vault description8'
 					],
-					'title' => 'Cannot update '.$this->vault_object,
-					'message' => 'Invalid parameter "'.$this->hashi_error_field.'": incorrect syntax near "/secret/path:key".',
 					'vault' => 'Hashicorp',
 					'inline_error' => [
 						'id:macros_{index}_value' => 'Value: Incorrect syntax near "/secret/path:key".'
 					]
 				]
 			],
+			#8
 			[
 				[
 					'expected' => TEST_BAD,
@@ -2103,14 +2102,13 @@ abstract class testFormMacros extends CLegacyWebTest {
 						],
 						'description' => 'vault description9'
 					],
-					'title' => 'Cannot update '.$this->vault_object,
-					'message' => 'Invalid parameter "'.$this->hashi_error_field.'": cannot be empty.',
 					'vault' => 'Hashicorp',
 					'inline_error' => [
 						'id:macros_{index}_value' => 'Value: This field cannot be empty.'
 					]
 				]
 			],
+			#9
 			[
 				[
 					'expected' => TEST_GOOD,
@@ -2123,9 +2121,11 @@ abstract class testFormMacros extends CLegacyWebTest {
 						'description' => 'cyberark description10'
 					],
 					'title' => ucfirst($this->vault_object).' updated',
-					'vault' => 'Cyberark'
+					'vault' => 'Cyberark',
+					'clear_globalmacros' => true
 				]
 			],
+			#10
 			[
 				[
 					'expected' => TEST_GOOD,
@@ -2141,6 +2141,7 @@ abstract class testFormMacros extends CLegacyWebTest {
 					'vault' => 'Cyberark'
 				]
 			],
+			#11
 			[
 				[
 					'expected' => TEST_GOOD,
@@ -2156,6 +2157,7 @@ abstract class testFormMacros extends CLegacyWebTest {
 					'vault' => 'Cyberark'
 				]
 			],
+			#12
 			[
 				[
 					'expected' => TEST_BAD,
@@ -2167,14 +2169,13 @@ abstract class testFormMacros extends CLegacyWebTest {
 						],
 						'description' => 'vault description13'
 					],
-					'title' => 'Cannot update '.$this->vault_object,
-					'message' => 'Invalid parameter "'.$this->cyber_error_field.'": cannot be empty.',
 					'vault' => 'Cyberark',
 					'inline_error' => [
 						'id:macros_{index}_value' => 'Value: This field cannot be empty.'
 					]
 				]
 			],
+			#13
 			[
 				[
 					'expected' => TEST_BAD,
@@ -2186,14 +2187,13 @@ abstract class testFormMacros extends CLegacyWebTest {
 						],
 						'description' => 'vault description14'
 					],
-					'title' => 'Cannot update '.$this->vault_object,
-					'message' => 'Invalid parameter "'.$this->cyber_error_field.'": mandatory key is missing.',
 					'vault' => 'Cyberark',
 					'inline_error' => [
 						'id:macros_{index}_value' => 'Value: Mandatory key is missing.'
 					]
 				]
 			],
+			#14
 			[
 				[
 					'expected' => TEST_BAD,
@@ -2205,14 +2205,13 @@ abstract class testFormMacros extends CLegacyWebTest {
 						],
 						'description' => 'vault description15'
 					],
-					'title' => 'Cannot update '.$this->vault_object,
-					'message' => 'Invalid parameter "'.$this->cyber_error_field.'": incorrect syntax near "AppID:key".',
 					'vault' => 'Cyberark',
 					'inline_error' => [
 						'id:macros_{index}_value' => 'Value: Incorrect syntax near "AppID:key".'
 					]
 				]
 			],
+			#15
 			[
 				[
 					'expected' => TEST_BAD,
@@ -2224,14 +2223,13 @@ abstract class testFormMacros extends CLegacyWebTest {
 						],
 						'description' => 'vault description16'
 					],
-					'title' => 'Cannot update '.$this->vault_object,
-					'message' => 'Invalid parameter "'.$this->cyber_error_field.'": mandatory parameter "AppID" is missing.',
 					'vault' => 'Cyberark',
 					'inline_error' => [
 						'id:macros_{index}_value' => 'Value: Mandatory parameter "AppID" is missing.'
 					]
 				]
 			],
+			#16
 			[
 				[
 					'expected' => TEST_BAD,
@@ -2243,14 +2241,13 @@ abstract class testFormMacros extends CLegacyWebTest {
 						],
 						'description' => 'vault description17'
 					],
-					'title' => 'Cannot update '.$this->vault_object,
-					'message' => 'Invalid parameter "'.$this->cyber_error_field.'": mandatory parameter "AppID" is missing.',
 					'vault' => 'Cyberark',
 					'inline_error' => [
 						'id:macros_{index}_value' => 'Value: Mandatory parameter "AppID" is missing.'
 					]
 				]
 			],
+			#17
 			[
 				[
 					'expected' => TEST_BAD,
@@ -2262,8 +2259,6 @@ abstract class testFormMacros extends CLegacyWebTest {
 						],
 						'description' => 'vault description18'
 					],
-					'title' => 'Cannot update '.$this->vault_object,
-					'message' => 'Invalid parameter "'.$this->cyber_error_field.'": mandatory parameter "AppID" is missing.',
 					'vault' => 'Cyberark',
 					'inline_error' => [
 						'id:macros_{index}_value' => 'Value: Mandatory parameter "AppID" is missing.'

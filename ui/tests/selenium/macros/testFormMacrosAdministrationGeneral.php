@@ -757,6 +757,7 @@ class testFormMacrosAdministrationGeneral extends testFormMacros {
 
 		$value_field = $this->getValueField($data['macro']);
 		$value_field->invalidate();
+
 		if (CTestArrayHelper::get($data['value'], 'type', CInputGroupElement::TYPE_SECRET) === CInputGroupElement::TYPE_SECRET) {
 			$this->assertEquals(CInputGroupElement::TYPE_SECRET, $value_field->getInputType());
 			$this->assertEquals('******', $value_field->getValue());
@@ -835,23 +836,49 @@ class testFormMacrosAdministrationGeneral extends testFormMacros {
 
 	/**
 	 * @dataProvider getCreateVaultMacrosData
+	 *
+	 * @backupOnce globalmacro
 	 */
 	public function testFormMacrosAdministrationGeneral_CreateVaultMacros($data) {
 		$this->selectVault($data['vault']);
 		$this->page->login()->open('zabbix.php?action=macros.edit')->waitUntilReady();
-		$this->fillMacros([$data['macro_fields']]);
+
+		if (CTestArrayHelper::get($data, 'clear_globalmacros')) {
+	    //this is required for smooth transition when HashiCorp is switched to CyberArk.
+		$this->removeAllMacros();
 		$this->query('button:Update')->one()->click();
+		$this->page->acceptAlert();
+		$this->assertMessage(TEST_GOOD, 'Macros updated');
+
+		$this->fillMacros([$data['macro_fields']]);
+
 		if ($data['expected'] == TEST_BAD) {
-			$this->assertMessage($data['expected'], $data['title'], $data['message']);
+			$this->page->removeFocus();
 		}
 		else {
-			$this->assertMessage($data['expected'], $data['title']);
-			$sql = 'SELECT value, description, type FROM globalmacro WHERE macro='.zbx_dbstr($data['macro_fields']['macro']);
-			$this->assertEquals([$data['macro_fields']['value']['text'], $data['macro_fields']['description'], ZBX_MACRO_TYPE_VAULT],
-				array_values(CDBHelper::getRow($sql)));
-			$value_field = $this->getValueField($data['macro_fields']['macro']);
-			$this->assertEquals($data['macro_fields']['value']['text'], $value_field->getValue());
+			$this->saveGlobalMacros();
+			$this->zbxTestWaitUntilElementVisible(WebDriverBy::className('msg-good'));
+			$this->zbxTestAssertElementPresentXpath('//output[@class="msg-good"]/span[contains(text(),"Macros updated")]');
 		}
+
+		if ($data['expected'] == TEST_BAD) {
+			if ($inline_valiation) {
+				$inline_error = [];
+				$key = array_key_first($data['inline_error']);
+
+				if (str_contains($key, '{index}')) {
+					// Index of last macro is by 1 less than the count of macros.
+					$new_key = str_replace('{index}', count($this->getMacros()) - 1, $key);
+					$inline_error[$new_key] = $data['inline_error'][$key];
+				}
+				else {
+					$inline_error = $data['inline_error'];
+				}
+
+				$this->assertInlineError($form, $inline_error);
+			}
+		}
+	}
 	}
 
 	public function prepareUpdateData() {
@@ -878,8 +905,9 @@ class testFormMacrosAdministrationGeneral extends testFormMacros {
 		$this->selectVault($data['vault']);
 		$this->page->login()->open('zabbix.php?action=macros.edit')->waitUntilReady();
 		$this->fillMacros([$data['fields']]);
-		$this->query('button:Update')->one()->click();
-		$this->page->waitUntilReady();
+		$this->saveGlobalMacros();
+		$this->assertMessage(TEST_GOOD, 'Macros updated');
+
 		$result = [];
 		foreach (['macro', 'value', 'description'] as $field) {
 			$result[] = $this->query('xpath://textarea[@id="macros_'.$data['fields']['index'].'_'.$field.'"]')->one()->getText();
@@ -906,23 +934,27 @@ class testFormMacrosAdministrationGeneral extends testFormMacros {
 				],
 				'description' => 'HashiCorp vault description'
 			],
-			'error' => 'Invalid parameter "/1/value": incorrect syntax near "secret/path:key".'
 		];
 
-		$this->page->login();
-
-		$this->page->open('zabbix.php?action=miscconfig.edit')->waitUntilReady();
+		$this->page->login()->open('zabbix.php?action=miscconfig.edit')->waitUntilReady();
 
 		// Check in setting what Vault is enabled.
 		$setting_form = $this->query('name:otherForm')->asForm()->one();
 		$setting_form->fill(['Vault provider' => 'CyberArk Vault']);
 		$setting_form->submit();
+		$this->assertMessage(TEST_GOOD, 'Configuration updated');
 
 		// Try to create macros with Vault type different from settings.
 		$this->page->open('zabbix.php?action=macros.edit')->waitUntilReady();
+
+		$last_index = count($this->getMacros());
+
 		$this->fillMacros([$hashicorp['fields']]);
 		$this->query('button:Update')->one()->click();
-		$this->assertMessage(TEST_BAD, 'Cannot update macros', $hashicorp['error']);
+
+		$inline_error = ['id:macros_'.$last_index.'_value' => 'Value: Incorrect syntax near "secret/path:key".'];
+
+		$this->assertInlineError($this->query('name:macrosForm')->asForm()->one(), $inline_error);
 
 		// Change Vault in settings to correct one and create macros with this Vault.
 		$this->page->open('zabbix.php?action=miscconfig.edit')->waitUntilReady();
