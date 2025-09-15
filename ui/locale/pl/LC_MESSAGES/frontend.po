@@ -2068,6 +2068,10 @@ msgstr "Średnia liczba pozostających zapytań zapisu do dysku wirtualnego podc
 msgid "Avoid easy-to-guess passwords"
 msgstr "Unikaj haseł, które są łatwe do odgadnięcia"
 
+#: app/views/host.wizard.edit.php:473
+msgid "Avoid including sensitive data."
+msgstr ""
+
 #: jsLoader.php:172
 msgid "Awaiting data"
 msgstr "Oczekiwanie na dane"
@@ -3674,6 +3678,10 @@ msgstr "Nie można znaleźć mapy wartości \"%1$s\" użytej dla prototypu pozyc
 #: include/classes/import/CConfigurationImport.php:1243
 #, c-format
 msgid "Cannot find value map \"%1$s\" used for item prototype \"%2$s\" of discovery rule prototype \"%3$s\" on \"%4$s\"."
+msgstr ""
+
+#: app/views/oauth.authorize.php:33
+msgid "Cannot get authentication tokens"
 msgstr ""
 
 #: app/views/oauth.edit.php:230
@@ -8666,6 +8674,10 @@ msgstr "Angielski (en_US)"
 msgid "Enter a non-secret pre-shared key identity string. Avoid including sensitive data."
 msgstr ""
 
+#: app/views/host.wizard.edit.php:470
+msgid "Enter a unique name that Zabbix components will use to recognize the pre-shared key."
+msgstr ""
+
 #: app/views/host.wizard.edit.php:609
 msgid "Enter the IP/DNS address and port of the Zabbix agent installed on your monitoring target."
 msgstr ""
@@ -12332,6 +12344,10 @@ msgstr "Internet Explorer"
 #: include/views/configuration.item.prototype.list.php:69
 msgid "Interval"
 msgstr "Interwał"
+
+#: widgets/itemcard/includes/CWidgetFieldItemSectionsView.php:76
+msgid "Interval and storage"
+msgstr ""
 
 #: include/classes/api/services/CRole.php:731
 #, c-format
@@ -17026,6 +17042,10 @@ msgstr "Nie znaleziono rozszerzenia PHP ctype (parametr konfiguracji PHP --enabl
 #: include/classes/setup/CFrontendSetup.php:687
 msgid "PHP curl"
 msgstr "Curl PHP"
+
+#: include/classes/setup/CFrontendSetup.php:733
+msgid "PHP curl extension is missing or outdated."
+msgstr ""
 
 #: include/classes/setup/CFrontendSetup.php:691
 msgid "PHP curl extension missing."
@@ -26607,6 +26627,10 @@ msgstr "opis"
 #: include/classes/validators/CApiInputValidator.php:1985
 msgid "directory cannot be empty"
 msgstr "folder nie może być pusty"
+
+#: include/views/configuration.host.discovery.list.php:340
+msgid "discovery rule"
+msgstr ""
 
 #: app/controllers/CControllerItemMassCheckNow.php:138
 #: include/classes/api/services/CTask.php:562

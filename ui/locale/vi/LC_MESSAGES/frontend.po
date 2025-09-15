@@ -2018,6 +2018,10 @@ msgstr "Số lượng trung bình các yêu cầu ghi đột biến gửi đến
 msgid "Avoid easy-to-guess passwords"
 msgstr "Tránh mật khẩu dễ đoán"
 
+#: app/views/host.wizard.edit.php:473
+msgid "Avoid including sensitive data."
+msgstr ""
+
 #: jsLoader.php:172
 msgid "Awaiting data"
 msgstr ""
@@ -3490,6 +3494,10 @@ msgstr "Không thể tìm thấy giá trị sơ đồ \"%1$s\"  được s
 #: include/classes/import/CConfigurationImport.php:1243
 #, c-format
 msgid "Cannot find value map \"%1$s\" used for item prototype \"%2$s\" of discovery rule prototype \"%3$s\" on \"%4$s\"."
+msgstr ""
+
+#: app/views/oauth.authorize.php:33
+msgid "Cannot get authentication tokens"
 msgstr ""
 
 #: app/views/oauth.edit.php:230
@@ -8420,6 +8428,10 @@ msgstr "English (en_US)"
 msgid "Enter a non-secret pre-shared key identity string. Avoid including sensitive data."
 msgstr ""
 
+#: app/views/host.wizard.edit.php:470
+msgid "Enter a unique name that Zabbix components will use to recognize the pre-shared key."
+msgstr ""
+
 #: app/views/host.wizard.edit.php:609
 msgid "Enter the IP/DNS address and port of the Zabbix agent installed on your monitoring target."
 msgstr ""
@@ -12057,6 +12069,10 @@ msgstr "Internet Explorer"
 #: include/views/configuration.item.prototype.list.php:69
 msgid "Interval"
 msgstr "Khoảng thời gian"
+
+#: widgets/itemcard/includes/CWidgetFieldItemSectionsView.php:76
+msgid "Interval and storage"
+msgstr ""
 
 #: include/classes/api/services/CRole.php:731
 #, c-format
@@ -16704,6 +16720,10 @@ msgstr "Phần mở rộng PHP ctype lỗi (cấu hình tham số PHP --k
 
 #: include/classes/setup/CFrontendSetup.php:687
 msgid "PHP curl"
+msgstr ""
+
+#: include/classes/setup/CFrontendSetup.php:733
+msgid "PHP curl extension is missing or outdated."
 msgstr ""
 
 #: include/classes/setup/CFrontendSetup.php:691
@@ -26217,6 +26237,10 @@ msgstr ""
 
 #: include/classes/validators/CApiInputValidator.php:1985
 msgid "directory cannot be empty"
+msgstr ""
+
+#: include/views/configuration.host.discovery.list.php:340
+msgid "discovery rule"
 msgstr ""
 
 #: app/controllers/CControllerItemMassCheckNow.php:138
