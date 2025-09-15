@@ -125,9 +125,10 @@ window.script_edit_popup = new class {
 		const hgstype = this.form_element.querySelector('#hgstype-select');
 		const hostgroup_selection = this.form_element.querySelector('#host-group-selection');
 
-		hgstype.addEventListener('change', () =>
-			hostgroup_selection.style.display = hgstype.value === '1' ? '' : 'none'
-		);
+		hgstype.addEventListener('change', () => {
+			jQuery(document.getElementById('groupid')).multiSelect(hgstype.value == '1' ? 'enable' : 'disable');
+			hostgroup_selection.style.display = hgstype.value == '1' ? '' : 'none';
+		});
 
 		hgstype.dispatchEvent(new Event('change'));
 		this.form_element.removeAttribute('style');

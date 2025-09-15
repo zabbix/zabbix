@@ -73,7 +73,6 @@ class CControllerScriptUpdate extends CController {
 			'host_access' => ['db scripts.host_access', 'in' => [PERM_READ, PERM_READ_WRITE]],
 			'groupid' => ['db scripts.groupid'],
 			'usrgrpid' => ['db scripts.usrgrpid'],
-			'hgstype' => ['boolean'],
 			'manualinput' => ['db scripts.manualinput', 'in' => [ZBX_SCRIPT_MANUALINPUT_DISABLED, ZBX_SCRIPT_MANUALINPUT_ENABLED]],
 			'manualinput_prompt' => ['db scripts.manualinput_prompt', 'required', 'not_empty', 'when' => ['manualinput', 'in' => [ZBX_SCRIPT_MANUALINPUT_ENABLED]]],
 			'manualinput_validator_type' =>	['db scripts.manualinput_validator_type', 'in' => [ZBX_SCRIPT_MANUALINPUT_TYPE_STRING, ZBX_SCRIPT_MANUALINPUT_TYPE_LIST]],
@@ -92,8 +91,9 @@ class CControllerScriptUpdate extends CController {
 	protected function doAction(): void {
 		$script = [];
 
-		$this->getInputs($script, ['scriptid', 'name', 'description', 'groupid']);
+		$this->getInputs($script, ['scriptid', 'name', 'description']);
 
+		$script['groupid'] = $this->getInput('groupid', 0);
 		$script['scope'] = $this->getInput('scope', ZBX_SCRIPT_SCOPE_ACTION);
 		$script['type'] = $this->getInput('type', ZBX_SCRIPT_TYPE_WEBHOOK);
 
@@ -178,10 +178,6 @@ class CControllerScriptUpdate extends CController {
 						? ZBX_SCRIPT_URL_NEW_WINDOW_YES
 						: ZBX_SCRIPT_URL_NEW_WINDOW_NO;
 					break;
-		}
-
-		if ($this->getInput('hgstype', 1) == 0) {
-			$script['groupid'] = 0;
 		}
 
 		$result = (bool) API::Script()->update($script);
