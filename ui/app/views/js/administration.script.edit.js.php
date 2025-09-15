@@ -231,7 +231,7 @@ window.script_edit_popup = new class {
 		this.form.validateSubmit(fields)
 			.then((result) => {
 				if (!result) {
-				this.overlay.unsetLoading();
+					this.overlay.unsetLoading();
 
 					return;
 				}
@@ -259,13 +259,17 @@ window.script_edit_popup = new class {
 		})
 			.then((response) => response.json())
 			.then((response) => {
-				if ('error' in response) {
+				if ('form_errors' in response) {
+					this.form.setErrors(response.form_errors, true, true);
+					this.form.renderErrors();
+				}
+				else if ('error' in response) {
 					throw {error: response.error};
 				}
-
-				return response;
+				else {
+					success_callback(response);
+				}
 			})
-			.then(success_callback)
 			.catch((exception) => {
 				for (const element of this.form_element.parentNode.children) {
 					if (element.matches('.msg-good, .msg-bad, .msg-warning')) {
