@@ -21,7 +21,7 @@
 
 window.script_edit_popup = new class {
 
-	init({script, rules}) {
+	init({rules, script}) {
 		this.overlay = overlays_stack.getById('script.edit');
 		this.dialogue = this.overlay.$dialogue[0];
 		this.form_element = this.overlay.$dialogue.$body[0].querySelector('form');
