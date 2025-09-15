@@ -186,13 +186,14 @@ static int	macro_normal_script_resolv(zbx_macro_resolv_data_t *p, va_list args, 
 	int				*user_names_found = va_arg(args, int *);
 	zbx_user_names_t		**user_names = va_arg(args, zbx_user_names_t **);
 	zbx_vector_uint64_t		*item_hosts = va_arg(args, zbx_vector_uint64_t *);
-	const zbx_vector_uint64_t	**trigger_hosts = va_arg(args, const zbx_vector_uint64_t **);
+	const zbx_vector_uint64_t	**c_event_hosts = va_arg(args, const zbx_vector_uint64_t **);
+	const zbx_vector_uint64_t	**event_hosts = va_arg(args, const zbx_vector_uint64_t **);
 	zbx_db_event			**cause_event = va_arg(args, zbx_db_event **);
 	zbx_db_event			**cause_recovery_event = va_arg(args, zbx_db_event **);
 
 	ret = zbx_macro_message_common_resolv(p, um_handle, NULL, event, r_event, userid, dc_host, NULL, NULL, NULL,
-			tz, item_hosts, trigger_hosts, cause_event, cause_recovery_event, replace_to, data, error,
-			maxerrlen);
+			tz, item_hosts, c_event_hosts, event_hosts, cause_event, cause_recovery_event, replace_to,
+			data, error, maxerrlen);
 
 	if (SUCCEED == ret && NULL != p->macro)
 	{

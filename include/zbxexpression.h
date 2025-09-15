@@ -19,7 +19,6 @@
 #include "zbxvariant.h"
 #include "zbx_discoverer_constants.h"
 
-#define ZBX_MACRO_TYPE_TRIGGER_URL		0x00000004
 #define ZBX_MACRO_TYPE_TRIGGER_DESCRIPTION	0x00000010	/* name */
 #define ZBX_MACRO_TYPE_TRIGGER_COMMENTS		0x00000020	/* description */
 #define ZBX_MACRO_TYPE_JMX_ENDPOINT		0x00008000
