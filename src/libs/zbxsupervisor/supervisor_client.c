@@ -108,7 +108,7 @@ void	zbx_supervisor_wait_for_runlevel(int runlevel)
 void	zbx_supervisor_get_process_info(int process_type, zbx_proc_owner_t *owner, int *runlevel)
 {
 	*owner = PROCESS_OWNER_MAIN;
-	*runlevel = ZBX_RUNLEVEL_MAX;
+	*runlevel = ZBX_RUNLEVEL_DEFAULT;
 
 	switch (process_type)
 	{

@@ -72,7 +72,7 @@ static int	runlevel_index_compare(const void *d1, const void *d2)
 typedef struct
 {
 	int				runlevel;
-	zbx_proc_startup_state_t	states[ZBX_RUNLEVEL_MAX + 1];
+	zbx_proc_startup_state_t	states[ZBX_RUNLEVEL_DEFAULT + 1];
 	zbx_hashset_t			runlevel_index;
 
 	zbx_vector_runlevel_sub_t	runlevel_subs;
@@ -98,9 +98,9 @@ zbx_proc_startup_t	*zbx_proc_startup_create(int threads_num,
 {
 	zbx_proc_startup_t	*runlevels;
 
-	runlevels = (zbx_proc_startup_t *)zbx_malloc(NULL, sizeof(zbx_proc_startup_t) * (ZBX_RUNLEVEL_MAX + 1));
+	runlevels = (zbx_proc_startup_t *)zbx_malloc(NULL, sizeof(zbx_proc_startup_t) * (ZBX_RUNLEVEL_DEFAULT + 1));
 
-	for (int i = 0; i <= ZBX_RUNLEVEL_MAX; i++)
+	for (int i = 0; i <= ZBX_RUNLEVEL_DEFAULT; i++)
 		zbx_vector_proc_info_create(&runlevels[i].processes);
 
 	for (int i = 0; i < threads_num; i++)
@@ -116,7 +116,7 @@ zbx_proc_startup_t	*zbx_proc_startup_create(int threads_num,
 
 		zbx_supervisor_get_process_info(info.type, &info.owner, &runlevel);
 
-		if (ZBX_RUNLEVEL_MAX < runlevel)
+		if (ZBX_RUNLEVEL_DEFAULT < runlevel)
 		{
 			THIS_SHOULD_NEVER_HAPPEN_MSG("process runlevel %d exceeds maximum", runlevel);
 			exit(EXIT_FAILURE);
@@ -135,7 +135,7 @@ zbx_proc_startup_t	*zbx_proc_startup_create(int threads_num,
  ******************************************************************************/
 void        zbx_proc_startup_free(zbx_proc_startup_t *runlevels)
 {
-	for (int i = 0; i <= ZBX_RUNLEVEL_MAX; i++)
+	for (int i = 0; i <= ZBX_RUNLEVEL_DEFAULT; i++)
 		zbx_vector_proc_info_destroy(&runlevels[i].processes);
 
 	zbx_free(runlevels);
@@ -157,7 +157,7 @@ static int	supervisor_update_runlevel(zbx_supervisor_t *sv)
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() runlevel:%d", __func__, sv->runlevel);
 
-	for (i = sv->runlevel; i <= ZBX_RUNLEVEL_MAX; i++)
+	for (i = sv->runlevel; i <= ZBX_RUNLEVEL_DEFAULT; i++)
 	{
 		if (0 != sv->states[i].pending_external_num || 0 != sv->states[i].pending_local_num)
 			break;
@@ -192,7 +192,7 @@ static void	supervisor_init(zbx_supervisor_t *sv, const zbx_proc_startup_t *runl
 	memset(sv->states, 0, sizeof(sv->states));
 	sv->runlevel = 0;
 
-	for (int i = 0; i <= ZBX_RUNLEVEL_MAX; i++)
+	for (int i = 0; i <= ZBX_RUNLEVEL_DEFAULT; i++)
 	{
 		for (int j = 0; j < runlevels[i].processes.values_num; j++)
 		{

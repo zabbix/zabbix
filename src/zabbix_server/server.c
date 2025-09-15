@@ -2115,7 +2115,7 @@ static int	server_startup(zbx_socket_t *listen_sock, int *ha_stat, int *ha_failo
 
 	runlevels = zbx_proc_startup_create(zbx_threads_num, get_process_info_by_thread);
 
-	for (int i = 0; i <= ZBX_RUNLEVEL_MAX; i++)
+	for (int i = 0; i <= ZBX_RUNLEVEL_DEFAULT; i++)
 	{
 		zabbix_log(LOG_LEVEL_DEBUG, "waiting for runlevel %d ...", i);
 		zbx_supervisor_wait_for_runlevel(i);
