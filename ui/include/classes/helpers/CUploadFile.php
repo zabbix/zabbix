@@ -126,7 +126,7 @@ class CUploadFile {
 			_('File size must be less than %1$s.');
 
 		if ($this->error === UPLOAD_ERR_INI_SIZE || $this->size > $max_file_size) {
-			throw new Exception(_s($exception_message, convertUnits(['value' => ZBX_MAX_IMAGE_SIZE, 'units' => 'B'])));
+			throw new Exception(_s($exception_message, convertUnits(['value' => $max_file_size, 'units' => 'B'])));
 		}
 	}
 
