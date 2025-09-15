@@ -79,7 +79,7 @@ class CControllerMaintenanceTimePeriodCheck extends CController {
 				['integer', 'required', 'min' => 5,
 					'when' => [['period_days', 'in' => [0]], ['period_hours', 'in' => [0]]],
 					'messages' => ['min' =>
-						_s('Minimum value of "%1$s" is %2$d %3$s.', _('Maintenance period length'), 5, _('minutes'))]
+						_s('Minimum value of "Maintenance period length" is %1$d minutes.', 5)]
 				]
 			]
 		]];
