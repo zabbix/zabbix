@@ -104,7 +104,6 @@ window.script_edit_popup = new class {
 		this.form_element.querySelector('#manualinput').addEventListener('change', (e) => this.#loadUserInputFields(e));
 		this.form_element.querySelector('#manualinput').dispatchEvent(new Event('change'));
 
-
 		// Update confirmation fields.
 		this.form_element.querySelector('#enable_confirmation').addEventListener('change', (e) =>
 			this.#loadConfirmationFields(e)
@@ -149,13 +148,13 @@ window.script_edit_popup = new class {
 
 				if (this.input_type == <?= ZBX_SCRIPT_MANUALINPUT_TYPE_STRING ?>) {
 					this.#updateManualinputFields(test_user_input, input_prompt,
-						this.form_element.querySelector('#manualinput_validator'), this.input_type
+						this.form_element.querySelector('#manualinput_validator')
 					);
 				}
 				else {
 					dropdown_options.disabled = !this.user_input_checked;
 
-					this.#updateManualinputFields(test_user_input, input_prompt, dropdown_options, this.input_type);
+					this.#updateManualinputFields(test_user_input, input_prompt, dropdown_options);
 				}
 			});
 		}
@@ -490,7 +489,7 @@ window.script_edit_popup = new class {
 
 		this.input_type = this.form_element.querySelector('input[name="manualinput_validator_type"]:checked').value;
 
-		this.#updateManualinputFields(test_user_input, input_prompt, input_validation, this.input_type);
+		this.#updateManualinputFields(test_user_input, input_prompt, input_validation);
 
 		const elements = [input_prompt, test_user_input, default_input, input_validation, dropdown_options];
 
@@ -510,7 +509,7 @@ window.script_edit_popup = new class {
 			? this.form_element.querySelector('#manualinput_validator')
 			: this.form_element.querySelector('#dropdown_options');
 
-		this.#updateManualinputFields(test_user_input, input_prompt, validator, this.input_type);
+		this.#updateManualinputFields(test_user_input, input_prompt, validator);
 	}
 
 	#updateManualinputFields(test_user_input, input_prompt, validator) {
