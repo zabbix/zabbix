@@ -495,8 +495,8 @@ class CZabbixServer {
 
 				if ($info['timed_out']) {
 					$this->error = _s(
-						'Response timeout of %1$s seconds exceeded when connecting to Zabbix server "%2$s".',
-						$this->timeout, $this->host
+						'Response timeout of %1$s exceeded when connecting to Zabbix server "%2$s".',
+						secondsToPeriod($this->timeout), $this->host
 					);
 				} else {
 					$this->error = _s('Cannot read response from Zabbix server "%1$s".', $this->host);
