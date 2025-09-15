@@ -2068,6 +2068,10 @@ msgstr "Průměrný počet nevyřízených požadavků na zápis na virtuální 
 msgid "Avoid easy-to-guess passwords"
 msgstr "Vyhnout se snadno uhodnutelným heslům"
 
+#: app/views/host.wizard.edit.php:473
+msgid "Avoid including sensitive data."
+msgstr ""
+
 #: jsLoader.php:172
 msgid "Awaiting data"
 msgstr "Čekání na data"
@@ -3675,6 +3679,10 @@ msgstr "Nelze nalézt mapu hodnot \"%1$s\" použitou pro prototyp položky \"%2$
 #, c-format
 msgid "Cannot find value map \"%1$s\" used for item prototype \"%2$s\" of discovery rule prototype \"%3$s\" on \"%4$s\"."
 msgstr "Nelze najít mapu hodnot \"%1$s\" použitou pro prototyp itemu \"%2$s\" prototypu pravidla vyhledávání \"%3$s\" na \"%4$s\"."
+
+#: app/views/oauth.authorize.php:33
+msgid "Cannot get authentication tokens"
+msgstr ""
 
 #: app/views/oauth.edit.php:230
 msgid "Cannot get authorization code."
@@ -8666,6 +8674,10 @@ msgstr "Anglicky (en_US)"
 msgid "Enter a non-secret pre-shared key identity string. Avoid including sensitive data."
 msgstr "Zadejte řetězec identity sdíleného klíče, který není tajný. Nevkládejte citlivá data."
 
+#: app/views/host.wizard.edit.php:470
+msgid "Enter a unique name that Zabbix components will use to recognize the pre-shared key."
+msgstr ""
+
 #: app/views/host.wizard.edit.php:609
 msgid "Enter the IP/DNS address and port of the Zabbix agent installed on your monitoring target."
 msgstr "Zadejte IP/DNS adresu a port Zabbix agenta nainstalovaného na vašem cílovém zařízení k monitoringu."
@@ -12332,6 +12344,10 @@ msgstr "Internet Explorer"
 #: include/views/configuration.item.prototype.list.php:69
 msgid "Interval"
 msgstr "Interval"
+
+#: widgets/itemcard/includes/CWidgetFieldItemSectionsView.php:76
+msgid "Interval and storage"
+msgstr ""
 
 #: include/classes/api/services/CRole.php:731
 #, c-format
@@ -17026,6 +17042,10 @@ msgstr "PHP modul ctype chybí (PHP parametr --enable-ctype)."
 #: include/classes/setup/CFrontendSetup.php:687
 msgid "PHP curl"
 msgstr "PHP curl"
+
+#: include/classes/setup/CFrontendSetup.php:733
+msgid "PHP curl extension is missing or outdated."
+msgstr ""
 
 #: include/classes/setup/CFrontendSetup.php:691
 msgid "PHP curl extension missing."
@@ -26607,6 +26627,10 @@ msgstr "popis"
 #: include/classes/validators/CApiInputValidator.php:1985
 msgid "directory cannot be empty"
 msgstr "adresář nemůže být prázdný"
+
+#: include/views/configuration.host.discovery.list.php:340
+msgid "discovery rule"
+msgstr ""
 
 #: app/controllers/CControllerItemMassCheckNow.php:138
 #: include/classes/api/services/CTask.php:562

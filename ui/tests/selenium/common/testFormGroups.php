@@ -492,7 +492,7 @@ class testFormGroups extends CWebTest {
 
 		if (in_array($data['action'], ['Clone', 'Delete'])) {
 			COverlayDialogElement::find()->one()->waitUntilReady()->getFooter()->query('button', $data['action'])
-					->one()->click();
+					->one()->waitUntilClickable()->click();
 		}
 
 		if ($data['action'] === 'Delete') {
