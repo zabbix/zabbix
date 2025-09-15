@@ -131,15 +131,6 @@ class CUploadFile {
 	}
 
 	/**
-	 * Validate image size.
-	 *
-	 * @throws Exception if image size is 1MB or greater.
-	 */
-	public function validateImageSize() {
-		return $this->validateFileSize(intval(ZBX_MAX_IMAGE_SIZE), 'image');
-	}
-
-	/**
 	 * Return true if file was uploaded, maybe with errors.
 	 *
 	 * @return bool
