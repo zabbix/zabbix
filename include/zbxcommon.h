@@ -300,15 +300,30 @@ const char	*get_program_type_string(unsigned char program_type);
 #define ZBX_PROCESS_TYPE_PG_MANAGER		45
 #define ZBX_PROCESS_TYPE_BROWSERPOLLER		46
 #define ZBX_PROCESS_TYPE_HA_MANAGER		47
-#define ZBX_PROCESS_TYPE_COUNT			48	/* number of process types */
+#define ZBX_PROCESS_TYPE_SUPERVISOR		48
+#define ZBX_PROCESS_TYPE_COUNT			49	/* number of process types */
 
 /* special processes that are not present worker list */
 #define ZBX_PROCESS_TYPE_MAIN			126
 
 #define ZBX_PROCESS_TYPE_UNKNOWN		255
 
+#define ZBX_RUNLEVEL_UNKNOWN		-1
+#define ZBX_RUNLEVEL_SUPERVISOR		0
+#define ZBX_RUNLEVEL_CACHESYNC		1
+#define ZBX_RUNLEVEL_TASKMANAGER	2
+#define ZBX_RUNLEVEL_MAX		3
+
 const char	*get_process_type_string(unsigned char proc_type);
 int		get_process_type_by_name(const char *proc_type_str);
+
+typedef enum
+{
+	PROCESS_OWNER_UNKNOWN,
+	PROCESS_OWNER_MAIN,
+	PROCESS_OWNER_SUPERVISOR,
+}
+zbx_proc_owner_t;
 
 /* user permissions */
 typedef enum

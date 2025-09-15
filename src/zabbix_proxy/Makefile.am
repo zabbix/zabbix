@@ -24,6 +24,7 @@ zabbix_proxy_LDADD = \
 	cachehistory/libzbxcachehistory_proxy.a \
 	diag/libzbxdiag_proxy.a \
 	$(top_builddir)/src/libs/zbxdbsyncer/libzbxdbsyncer.a \
+	$(top_builddir)/src/libs/zbxsupervisor/libzbxsupervisor.a \
 	$(top_builddir)/src/libs/zbxdiscoverer/libzbxdiscoverer.a \
 	housekeeper/libzbxhousekeeper_proxy.a \
 	proxyconfig/libzbxproxyconfig.a \
@@ -69,6 +70,7 @@ zabbix_proxy_LDADD = \
 	$(top_builddir)/src/libs/zbxcalc/libzbxcalc.a \
 	$(top_builddir)/src/libs/zbxcacheconfig/libzbxcacheconfig.a \
 	stats/libzbxstats_proxy.a \
+	$(top_builddir)/src/libs/zbxsupervisor/libzbxsupervisor_client.a \
 	$(top_builddir)/src/libs/zbxeval/libzbxeval.a \
 	$(top_builddir)/src/libs/zbxserialize/libzbxserialize.a \
 	$(top_builddir)/src/libs/zbxhistory/libzbxhistory.a \

@@ -126,7 +126,8 @@ const char	*get_process_type_string(unsigned char proc_type)
 			return "proxy group manager";
 		case ZBX_PROCESS_TYPE_BROWSERPOLLER:
 			return "browser poller";
-			break;
+		case ZBX_PROCESS_TYPE_SUPERVISOR:
+			return "supervisor";
 	}
 
 	THIS_SHOULD_NEVER_HAPPEN;

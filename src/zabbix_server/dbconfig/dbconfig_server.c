@@ -14,6 +14,7 @@
 
 #include "dbconfig_server.h"
 
+#include "../../../include/zbxsupervisor_client.h"
 #include "../dbconfigworker/dbconfigworker.h"
 
 #include "zbxtimekeeper.h"
@@ -74,10 +75,13 @@ ZBX_THREAD_ENTRY(dbconfig_thread, args)
 			get_process_type_string(process_type), (sec = zbx_time() - sec),
 			dbconfig_args_in->config_confsyncer_frequency);
 
-	zbx_rtc_notify_finished_sync(dbconfig_args_in->config_timeout, ZBX_RTC_CONFIG_SYNC_NOTIFY,
-			get_process_type_string(process_type), &rtc);
+
+	/* update maintenance states */
+	zbx_dc_update_maintenances(MAINTENANCE_TIMER_PENDING);
 
 	nextcheck = (int)time(NULL) + dbconfig_args_in->config_confsyncer_frequency;
+
+	zbx_supervisor_set_process_running(server_num);
 
 	while (ZBX_IS_RUNNING())
 	{

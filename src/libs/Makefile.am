@@ -75,6 +75,7 @@ DIST_SUBDIRS = \
 	zbxservice \
 	zbxshmem \
 	zbxsnmptrapper \
+	zbxsupervisor \
 	zbxsysinfo \
 	zbxstats \
 	zbxstr \
@@ -148,6 +149,7 @@ SERVER_SUBDIRS = \
 	zbxservice \
 	zbxshmem \
 	zbxsnmptrapper \
+	zbxsupervisor \
 	zbxstats \
 	zbxstr \
 	zbxtagfilter \
@@ -217,6 +219,7 @@ PROXY_SUBDIRS = \
 	zbxscripts \
 	zbxshmem \
 	zbxsnmptrapper \
+	zbxsupervisor \
 	zbxstats \
 	zbxstr \
 	zbxtagfilter \

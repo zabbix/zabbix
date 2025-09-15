@@ -2457,7 +2457,7 @@ int	zbx_vc_init(zbx_uint64_t value_cache_size, char **error)
 
 	ret = SUCCEED;
 out:
-	zbx_vc_disable();
+	zbx_vc_enable();
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 

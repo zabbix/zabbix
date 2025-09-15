@@ -81,7 +81,9 @@ void	zbx_signal_process_by_type(int proc_type, int proc_num, int flags, char **o
 	for (i = 0; i < threads_num; i++)
 	{
 		if (FAIL == nix_get_process_info_by_thread_func_cb()(i + 1, &process_type, &process_num))
+		{
 			break;
+		}
 
 		if (proc_type != process_type)
 		{
