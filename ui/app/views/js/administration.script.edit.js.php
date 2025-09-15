@@ -198,6 +198,7 @@ window.script_edit_popup = new class {
 	}
 
 	delete() {
+		this.#clearMessages();
 		const curl = new Curl('zabbix.php');
 
 		curl.setArgument('action', 'script.delete');
@@ -211,6 +212,7 @@ window.script_edit_popup = new class {
 	}
 
 	submit() {
+		this.#clearMessages();
 		const fields = this.form.getAllValues();
 
 		for (let key in fields) {
@@ -271,12 +273,6 @@ window.script_edit_popup = new class {
 				}
 			})
 			.catch((exception) => {
-				for (const element of this.form_element.parentNode.children) {
-					if (element.matches('.msg-good, .msg-bad, .msg-warning')) {
-						element.parentNode.removeChild(element);
-					}
-				}
-
 				let title;
 				let messages;
 
@@ -293,6 +289,14 @@ window.script_edit_popup = new class {
 				this.form_element.parentNode.insertBefore(message_box, this.form_element);
 			})
 			.finally(() => this.overlay.unsetLoading());
+	}
+
+	#clearMessages() {
+		for (const element of this.form_element.parentNode.children) {
+			if (element.matches('.msg-good, .msg-bad, .msg-warning')) {
+				element.parentNode.removeChild(element);
+			}
+		}
 	}
 
 	/**
