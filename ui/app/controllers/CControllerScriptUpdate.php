@@ -80,7 +80,10 @@ class CControllerScriptUpdate extends CController {
 			'manualinput_prompt' => ['db scripts.manualinput_prompt', 'required', 'not_empty', 'when' => ['manualinput', 'in' => [ZBX_SCRIPT_MANUALINPUT_ENABLED]]],
 			'manualinput_validator_type' =>	['db scripts.manualinput_validator_type', 'in' => [ZBX_SCRIPT_MANUALINPUT_TYPE_STRING, ZBX_SCRIPT_MANUALINPUT_TYPE_LIST]],
 			'manualinput_default_value' => ['db scripts.manualinput_default_value'],
-			'manualinput_validator' => ['db scripts.manualinput_validator', 'required', 'not_empty', 'when' => ['manualinput_validator_type', 'in' => [ZBX_SCRIPT_MANUALINPUT_TYPE_STRING]]],
+			'manualinput_validator' => ['db scripts.manualinput_validator', 'required', 'not_empty',
+				'use' => [CRegexValidator::class, []],
+				'when' => ['manualinput_validator_type', 'in' => [ZBX_SCRIPT_MANUALINPUT_TYPE_STRING]]
+			],
 			'dropdown_options' => ['db scripts.manualinput_validator', 'required', 'not_empty', 'when' => ['manualinput_validator_type', 'in' => [ZBX_SCRIPT_MANUALINPUT_TYPE_LIST]]],
 			'enable_confirmation' => ['boolean'],
 			'confirmation' => ['db scripts.confirmation', 'required', 'not_empty', 'when' => ['enable_confirmation', true]]
