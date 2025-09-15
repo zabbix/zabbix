@@ -844,7 +844,7 @@ class testFormMacrosAdministrationGeneral extends testFormMacros {
 		$this->page->login()->open('zabbix.php?action=macros.edit')->waitUntilReady();
 
 		if (CTestArrayHelper::get($data, 'clear_globalmacros')) {
-	    //this is required for smooth transition when HashiCorp is switched to CyberArk.
+		//this is required for smooth transition when HashiCorp is switched to CyberArk.
 		$this->removeAllMacros();
 		$this->query('button:Update')->one()->click();
 		$this->page->acceptAlert();
