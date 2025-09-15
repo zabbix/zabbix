@@ -309,10 +309,10 @@ static void	rtc_process_db_status(char **result)
 
 /******************************************************************************
  *                                                                            *
- * Purpose: process db_set_min_limit runtime control option                   *
+ * Purpose: process dbpool_set_max_idle runtime control option                *
  *                                                                            *
- * Parameters: data   - [IN] runtime control parameter (optional)             *
- *             limit  - [OUT] new maximal idle connection limit               *
+ * Parameters: data   - [IN] runtime control parameter                        *
+ *             limit  - [OUT] new maximum idle connection limit               *
  *             error  - [OUT] error message                                   *
  *                                                                            *
  ******************************************************************************/
@@ -360,9 +360,9 @@ static int	rtc_db_set_max_idle(const char *data, int *limit, char **error)
 
 /******************************************************************************
  *                                                                            *
- * Purpose: process db_set_min_limit runtime control option                   *
+ * Purpose: process dbpool_set_max_idle runtime control option                *
  *                                                                            *
- * Parameters: data   - [IN] runtime control parameter (optional)             *
+ * Parameters: data   - [IN] runtime control parameter                        *
  *             result - [OUT] runtime control result                          *
  *                                                                            *
  ******************************************************************************/
@@ -386,9 +386,9 @@ static void	rtc_process_db_set_max_idle(const char *data, char **result)
 
 /******************************************************************************
  *                                                                            *
- * Purpose: process db_set_max_limit runtime control option                   *
+ * Purpose: process dbpool_set_max_open runtime control option                *
  *                                                                            *
- * Parameters: data   - [IN] runtime control parameter (optional)             *
+ * Parameters: data   - [IN] runtime control parameter                        *
  *             limit  - [OUT] new maximum connection limit                    *
  *             error  - [OUT] error message                                   *
  *                                                                            *
@@ -437,9 +437,9 @@ static int	rtc_db_set_max_open(const char *data, int *limit, char **error)
 
 /******************************************************************************
  *                                                                            *
- * Purpose: process db_set_max_limit runtime control option                   *
+ * Purpose: process dbpool_set_max_open runtime control option                *
  *                                                                            *
- * Parameters: data   - [IN] runtime control parameter (optional)             *
+ * Parameters: data   - [IN] runtime control parameter                        *
  *             result - [OUT] runtime control result                          *
  *                                                                            *
  ******************************************************************************/
@@ -465,8 +465,8 @@ static void	rtc_process_db_set_max_open(const char *data, char **result)
  *                                                                            *
  * Purpose: process db_set_idle_timeout runtime control option                *
  *                                                                            *
- * Parameters: data    - [IN] runtime control parameter (optional)            *
- *             timeout - [OUT] new maximum connection limit                   *
+ * Parameters: data    - [IN] runtime control parameter                       *
+ *             timeout - [OUT] new idle timeout                               *
  *             error   - [OUT] error message                                  *
  *                                                                            *
  ******************************************************************************/

@@ -115,8 +115,8 @@ int	zbx_db_library_init(char **error)
  * Return value: SUCCEED - database subsystem initialized successfully        *
  *               FAIL    - otherwise                                          *
  *                                                                            *
- * Comments: this function must be called before server startup and after     *
- *           it has been deinitialized during teardown                        *
+ * Comments: This function must be called before server/proxy startup and     *
+ *           database subsystem has been deinitialized during server teardown.*
  *                                                                            *
  ******************************************************************************/
 int	zbx_db_init(char **error)
