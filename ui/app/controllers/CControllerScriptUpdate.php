@@ -45,7 +45,7 @@ class CControllerScriptUpdate extends CController {
 		$api_uniq = ['script.get', ['name' => '{name}', 'menu_path' => '{menu_path}'], 'scriptid'];
 
 		return ['object', 'api_uniq' => $api_uniq, 'fields' => [
-			'scriptid' => ['db scripts.scriptid'],
+			'scriptid' => ['db scripts.scriptid', 'required'],
 			'name' => ['db scripts.name', 'required', 'not_empty'],
 			'scope' => ['db scripts.scope', 'required', 'in' => [ZBX_SCRIPT_SCOPE_ACTION, ZBX_SCRIPT_SCOPE_HOST, ZBX_SCRIPT_SCOPE_EVENT]],
 			'type' => ['required','db scripts.type', 'in' => [ZBX_SCRIPT_TYPE_CUSTOM_SCRIPT, ZBX_SCRIPT_TYPE_IPMI, ZBX_SCRIPT_TYPE_SSH, ZBX_SCRIPT_TYPE_TELNET, ZBX_SCRIPT_TYPE_WEBHOOK, ZBX_SCRIPT_TYPE_URL]],
@@ -172,12 +172,12 @@ class CControllerScriptUpdate extends CController {
 				}
 				break;
 
-				case ZBX_SCRIPT_TYPE_URL:
-					$script['url'] = $this->getInput('url', '');
-					$script['new_window'] = $this->hasInput('new_window')
-						? ZBX_SCRIPT_URL_NEW_WINDOW_YES
-						: ZBX_SCRIPT_URL_NEW_WINDOW_NO;
-					break;
+			case ZBX_SCRIPT_TYPE_URL:
+				$script['url'] = $this->getInput('url', '');
+				$script['new_window'] = $this->hasInput('new_window')
+					? ZBX_SCRIPT_URL_NEW_WINDOW_YES
+					: ZBX_SCRIPT_URL_NEW_WINDOW_NO;
+				break;
 		}
 
 		$result = (bool) API::Script()->update($script);
