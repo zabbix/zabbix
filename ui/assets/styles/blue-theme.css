@@ -2462,8 +2462,7 @@ button {
 .list-table .btn-small,
 .list-table .problem-icon-link,
 .list-table .status-container,
-.list-table .entity-count,
-.list-table .tag {
+.list-table .entity-count {
   margin-top: 1px;
   margin-bottom: 1px;
   vertical-align: top; }
@@ -3395,7 +3394,8 @@ section {
     .service-info .service-info-grid .tags-wrapper {
       min-width: 1%; }
       .service-info .service-info-grid .tags-wrapper .btn-icon {
-        height: auto; }
+        height: 18px;
+        width: 18px; }
   .service-info .service-info-label::after {
     content: ':'; }
   .service-info .service-info-value .service-info-value-sla {
@@ -6701,6 +6701,9 @@ z-select[disabled] .focusable, input[disabled], textarea[disabled], select optio
   display: flex;
   flex-wrap: wrap;
   gap: 2px 3px; }
+  .tags-wrapper .tag {
+    margin-top: 1px;
+    margin-bottom: 1px; }
 
 .tag {
   display: inline-block;
