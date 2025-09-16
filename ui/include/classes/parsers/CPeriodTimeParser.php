@@ -27,9 +27,19 @@ class CPeriodTimeParser extends CParser {
 			return self::PARSE_FAIL;
 		}
 
-		$status = preg_match(self::REGEX_PATTERN, $source, $this->matches);
+		$this->length = 0;
+		$this->match = '';
 
-		if ($status) {
+		$p = $pos;
+
+		if (preg_match(self::REGEX_PATTERN, $source, $this->matches)) {
+			$p += strlen($this->matches[0]);
+		}
+		else {
+			return self::PARSE_FAIL;
+		}
+
+		if ($p == $pos) {
 			return self::PARSE_FAIL;
 		}
 
@@ -47,7 +57,10 @@ class CPeriodTimeParser extends CParser {
 			);
 		}
 
-		return self::PARSE_SUCCESS_CONT;
+		$this->length = $p - $pos;
+		$this->match = substr($source, $pos, $this->length);
+
+		return isset($source[$p]) ? self::PARSE_SUCCESS_CONT : self::PARSE_SUCCESS;
 	}
 
 	/**
