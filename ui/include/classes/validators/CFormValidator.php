@@ -698,10 +698,12 @@ class CFormValidator {
 			? array_key_exists($field, $files)
 			: array_key_exists($field, $data);
 
-		if (!$field_exists && array_key_exists('required', $rules)) {
-			$this->addError(self::ERROR, $path,
-				self::getMessage($rules, 'required', _('Required field is missing.')), self::ERROR_LEVEL_PRIMARY
-			);
+		if (!$field_exists) {
+			if (array_key_exists('required', $rules)) {
+				$this->addError(self::ERROR, $path,
+					self::getMessage($rules, 'required', _('Required field is missing.')), self::ERROR_LEVEL_PRIMARY
+				);
+			}
 
 			return;
 		}
