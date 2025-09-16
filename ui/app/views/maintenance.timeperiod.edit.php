@@ -65,7 +65,7 @@ foreach (range(0, 11) as $month) {
 
 $form_grid = (new CFormGrid())
 	->addItem([
-		new CLabel(_('Period type'), 'timeperiod_type-focusable'),
+		new CLabel(_('Period type'), 'timeperiod-type-focusable'),
 		(new CFormField(
 			(new CSelect('timeperiod_type'))
 				->setFocusableElementId('timeperiod-type-focusable')
