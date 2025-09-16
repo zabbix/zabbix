@@ -1,0 +1,25 @@
+---
+test case:  TLS event is null
+in:
+  tls_is_used: yes
+  event_is_null: yes
+  read_return: [0,1]
+  timeout: 1
+out:
+  result: FAIL
+---
+test case:  TLS partial read
+in:
+  tls_is_used: yes
+  read_return: [0,1]
+  timeout: 1
+out:
+  result: FAIL
+---
+test case: TLS read error
+in:
+  tls_is_used: yes
+  read_return: [-1]
+  timeout: 1
+out:
+  result: FAIL

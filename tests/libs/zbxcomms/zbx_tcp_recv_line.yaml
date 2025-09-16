@@ -3,6 +3,7 @@ test case: "line in buffer with newlines"
 in:
   buf_stat: "line1\nline2\n"
   mode: buffer contains next line
+  read_return: [0, 1]
 out:
   result: ["line1","line2","line3"]
 ---
@@ -11,6 +12,7 @@ in:
   buf_stat: "line1\nline2\nline3\n"
   mode: buffer not contains next line
   next_line_is_null: yes
+  read_return: [0, 1]
 out:
   result: [line1,line2,line3]
 ---
@@ -19,5 +21,6 @@ in:
   buf_stat: "line1"
   mode: buffer not contains next line
   next_line_is_null: yes
+  read_return: [0, 1]
 out:
   result: [line1]

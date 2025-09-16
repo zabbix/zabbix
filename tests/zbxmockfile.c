@@ -30,6 +30,7 @@
 #include "zbxmockutil.h"
 
 #include "zbxcommon.h"
+#include "zbxalgo.h"
 
 #define ZBX_MOCK_MAX_FILES	16
 
@@ -67,6 +68,8 @@ int	__real_fstat(int __fildes, struct stat *__stat_buf);
 int	__real___fxstat(int __ver, int __fildes, struct stat *__stat_buf);
 #endif
 void	zbx_mock_set_fragments(const char *data, size_t size);
+void	set_test_comms(int status);
+
 
 static int	is_profiler_path(const char *path)
 {
@@ -198,10 +201,11 @@ int	__wrap_connect(int socket, void *addr, socklen_t address_len)
 	return 0;
 }
 
-#define MOCK_POLL_DEFAULT        0
-#define MOCK_POLL_TIMEOUT        1
-#define MOCK_POLL_ERROR          2
-#define MOCK_POLL_REVENTS_ERROR  3
+#define MOCK_POLL_DEFAULT		0
+#define MOCK_POLL_TIMEOUT		1
+#define MOCK_POLL_ERROR			2
+#define MOCK_POLL_REVENTS_ERROR		3
+#define MOCK_POLL_SOCKET_BLOCKING_ERROR	4
 
 static int	g_mock_poll_mode = MOCK_POLL_DEFAULT;
 
@@ -213,6 +217,8 @@ void	mock_poll_set_mode_from_param(const char *param)
 		g_mock_poll_mode = MOCK_POLL_ERROR;
 	else if (0 == strcmp(param, "revents error"))
 		g_mock_poll_mode = MOCK_POLL_REVENTS_ERROR;
+	else if (0 == strcmp(param, "socket blocking error"))
+		g_mock_poll_mode = MOCK_POLL_SOCKET_BLOCKING_ERROR;
 	else
 		g_mock_poll_mode = MOCK_POLL_DEFAULT;
 }
@@ -231,6 +237,9 @@ int	__wrap_poll(struct pollfd *pds, int nfds, int timeout)
 			for (int i = 0; i < nfds; i++)
 				pds[i].revents = POLLERR;
 			return nfds;
+		case MOCK_POLL_SOCKET_BLOCKING_ERROR:
+			errno = EPERM;
+			return -1;
 		case MOCK_POLL_DEFAULT:
 		default:
 			for (int i = 0; i < nfds; i++)
@@ -242,6 +251,9 @@ int	__wrap_poll(struct pollfd *pds, int nfds, int timeout)
 static const char	*frag_data = NULL;
 static const char	*frag_pos = NULL;
 static size_t		frag_sz = 0;
+static int		test_comms = FAIL;
+static int		read_iter = 0;
+static int		read_ret[5];
 
 static int	next_fragment(void)
 {
@@ -292,6 +304,16 @@ ssize_t	__wrap_read(int fildes, void *buf, size_t nbyte)
 
 	ZBX_UNUSED(fildes);
 
+	if (SUCCEED == test_comms)
+	{
+		int ret;
+
+		ret = read_ret[read_iter];
+		read_iter++;
+
+		return ret;
+	}
+
 	if (frag_pos >= frag_data + frag_sz)
 	{
 		if (1 != next_fragment())
@@ -308,6 +330,17 @@ ssize_t	__wrap_read(int fildes, void *buf, size_t nbyte)
 	frag_pos += mv_len;
 
 	return mv_len;
+}
+
+void	set_test_comms(int status)
+{
+	test_comms = status;
+}
+
+void	setup_read(zbx_vector_int32_t *v)
+{
+	for (int i = 0; i < v->values_num; i++)
+		read_ret[i] = v->values[i];
 }
 
 void	zbx_mock_set_fragments(const char *data, size_t size)
@@ -355,6 +388,10 @@ error:
 
 int	__wrap_close(int fd)
 {
+#ifdef TEST_COMMS
+	return 0;
+#endif
+
 	if (fd != INT_MAX) return __real_close(fd);
 
 	frag_data = frag_pos = NULL;

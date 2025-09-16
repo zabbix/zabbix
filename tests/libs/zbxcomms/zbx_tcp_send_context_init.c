@@ -42,4 +42,6 @@ void	zbx_mock_test_entry(void **state)
 	result = zbx_tcp_send_context_init(data, len, reserved, flags, &context);
 
 	zbx_mock_assert_int_eq("return value", exp_result, result);
+
+	zbx_tcp_send_context_clear(&context);
 }

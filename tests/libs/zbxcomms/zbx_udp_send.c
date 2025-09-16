@@ -20,27 +20,29 @@
 #include "zbxcommon.h"
 #include "zbxcomms.h"
 
+#include "zbx_comms_common.h"
+
 ssize_t	__wrap_sendto(int fd, const void *buf, size_t n, int flags, const struct sockaddr *addr, socklen_t addr_len);
 
 ssize_t	__wrap_sendto(int fd, const void *buf, size_t n, int flags, const struct sockaddr *addr, socklen_t addr_len)
 {
-	return 1;
+	int	ret = zbx_mock_get_parameter_int("in.sendto_return");
+
+	return ret;
 }
 
 void	zbx_mock_test_entry(void **state)
 {
 	zbx_socket_t	s;
-	const char	*source_ip = zbx_mock_get_parameter_string("in.source_ip"),
-			*ip = zbx_mock_get_parameter_string("in.ip"),
-			*data = zbx_mock_get_parameter_string("in.data");
-	unsigned short	port = zbx_mock_get_parameter_uint64("in.port");
+	const char	*data = zbx_mock_get_parameter_string("in.data");
 	int		result, timeout = zbx_mock_get_parameter_int("in.timeout"),
 			exp_result = zbx_mock_str_to_return_code(zbx_mock_get_parameter_string("out.result"));
 	size_t		data_len = zbx_mock_get_parameter_uint64("in.data_len");
 
 	ZBX_UNUSED(state);
 
-	result = zbx_udp_connect(&s, source_ip, ip, port, timeout);
+	mock_poll_set_mode_from_param(zbx_mock_get_parameter_string("in.poll_mode"));
+	set_nonblocking_error();
 
 	result = zbx_udp_send(&s, data, data_len, timeout);
 

@@ -18,28 +18,18 @@ COMMS_tests = zbx_validate_peer_list \
 	zbx_socket_pollout \
 	zbx_tcp_write \
 	zbx_tcp_send_context \
-	zbx_tcp_accept
+	zbx_tcp_accept \
+	zbx_tcp_read_close_notify \
+	zbx_udp_recv \
+	zbx_tcp_recv_context_line
 
 COMMON_SRC_FILES = \
 	../../zbxmocktest.h
 
 COMMS_LIBS = \
-	$(top_srcdir)/src/libs/zbxcomms/libzbxcomms.a \
-	$(top_srcdir)/src/libs/zbxcommon/libzbxcommon.a \
-	$(top_srcdir)/src/libs/zbxlog/libzbxlog.a \
-	$(top_srcdir)/src/libs/zbxmutexs/libzbxmutexs.a \
-	$(top_srcdir)/src/libs/zbxprof/libzbxprof.a \
-	$(top_srcdir)/src/libs/zbxalgo/libzbxalgo.a \
-	$(top_srcdir)/src/libs/zbxip/libzbxip.a \
-	$(top_srcdir)/src/libs/zbxtime/libzbxtime.a \
-	$(CRYPTO_DEPS) \
-	$(top_srcdir)/src/libs/zbxcompress/libzbxcompress.a \
-	$(top_srcdir)/src/libs/zbxthreads/libzbxthreads.a \
-	$(top_srcdir)/src/libs/zbxnum/libzbxnum.a \
+	$(COMMS_DEPS) \
 	$(MOCK_DATA_DEPS) \
-	$(top_srcdir)/tests/libzbxmocktest.a \
-	$(top_srcdir)/src/libs/zbxnix/libzbxnix.a \
-	$(top_srcdir)/tests/libzbxmockdata.a
+	$(MOCK_TEST_DEPS)
 
 
 COMMS_COMPILER_FLAGS = -DZABBIX_DAEMON -I@top_srcdir@/tests $(CMOCKA_CFLAGS) $(YAML_CFLAGS)
@@ -155,6 +145,7 @@ zbx_tcp_listen_CFLAGS = $(COMMS_COMPILER_FLAGS)
 
 zbx_udp_send_SOURCES = \
 	zbx_udp_send.c \
+	zbx_comms_common.c \
 	$(COMMON_SRC_FILES)
 
 zbx_udp_send_LDADD = \
@@ -172,6 +163,7 @@ zbx_udp_send_CFLAGS = $(COMMS_COMPILER_FLAGS)
 
 zbx_tcp_recv_line_SOURCES = \
 	zbx_tcp_recv_line.c \
+	zbx_comms_common.c \
 	$(COMMON_SRC_FILES)
 
 zbx_tcp_recv_line_LDADD = \
@@ -254,6 +246,53 @@ zbx_tcp_accept_LDFLAGS = @AGENT_LDFLAGS@ \
 	-Wl,--wrap=recv
 
 zbx_tcp_accept_CFLAGS = $(COMMS_COMPILER_FLAGS)
+
+#zbx_tcp_read_close_notify
+
+zbx_tcp_read_close_notify_SOURCES = \
+	zbx_tcp_read_close_notify.c \
+	$(COMMON_SRC_FILES)
+
+zbx_tcp_read_close_notify_LDADD = \
+	$(COMMS_LIBS)
+
+zbx_tcp_read_close_notify_LDADD += @AGENT_LIBS@
+
+zbx_tcp_read_close_notify_LDFLAGS = @AGENT_LDFLAGS@ $(CMOCKA_LDFLAGS) $(YAML_LDFLAGS)
+
+zbx_tcp_read_close_notify_CFLAGS = $(COMMS_COMPILER_FLAGS)
+
+#zbx_udp_recv
+
+zbx_udp_recv_SOURCES = \
+	zbx_udp_recv.c \
+	zbx_comms_common.c \
+	$(COMMON_SRC_FILES)
+
+zbx_udp_recv_LDADD = \
+	$(COMMS_LIBS)
+
+zbx_udp_recv_LDADD += @AGENT_LIBS@
+
+zbx_udp_recv_LDFLAGS = @AGENT_LDFLAGS@ $(CMOCKA_LDFLAGS) $(YAML_LDFLAGS) \
+	-Wl,--wrap=recvfrom
+
+zbx_udp_recv_CFLAGS = $(COMMS_COMPILER_FLAGS)
+
+#zbx_tcp_recv_context_line
+
+zbx_tcp_recv_context_line_SOURCES = \
+	zbx_tcp_recv_context_line.c \
+	$(COMMON_SRC_FILES)
+
+zbx_tcp_recv_context_line_LDADD = \
+	$(COMMS_LIBS)
+
+zbx_tcp_recv_context_line_LDADD += @AGENT_LIBS@
+
+zbx_tcp_recv_context_line_LDFLAGS = @AGENT_LDFLAGS@ $(CMOCKA_LDFLAGS) $(YAML_LDFLAGS)
+
+zbx_tcp_recv_context_line_CFLAGS = $(COMMS_COMPILER_FLAGS)
 
 if IPV6
 zbx_tcp_check_allowed_peers_SOURCES = \

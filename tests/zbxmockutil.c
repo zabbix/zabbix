@@ -526,3 +526,25 @@ void	zbx_mock_extract_yaml_values_uint64(zbx_mock_handle_t hdata, zbx_vector_uin
 		zbx_vector_uint64_append(values, value);
 	}
 }
+
+/******************************************************************************
+ *                                                                            *
+ * Parameters: path   - [IN]  YAML path                                       *
+ *             values - [OUT]                                                 *
+ *                                                                            *
+ ******************************************************************************/
+void	zbx_mock_extract_yaml_values_int32(zbx_mock_handle_t hdata, zbx_vector_int32_t *values)
+{
+	zbx_mock_error_t	err;
+	zbx_mock_handle_t	hvalue;
+
+	while (ZBX_MOCK_END_OF_VECTOR != zbx_mock_vector_element(hdata, &hvalue))
+	{
+		int	value;
+
+		if (ZBX_MOCK_SUCCESS != (err = zbx_mock_int(hvalue, &value)))
+			fail_msg("Cannot read vector member: %s", zbx_mock_error_string(err));
+
+		zbx_vector_int32_append(values, value);
+	}
+}

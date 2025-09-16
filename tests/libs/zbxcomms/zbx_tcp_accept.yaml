@@ -1,14 +1,15 @@
 ---
-test case: "unencrypted | poll=no error | expect TIMEOUT_ERROR"
+test case: "unencrypted | poll=no error"
 in:
   tls_accept: 1 # ZBX_TCP_SEC_UNENCRYPTED
   poll_timeout: 10
   num_socks: 1
-  poll_mode: "no error"
+  poll_mode: "timeout"
+  accept_return: -1
 out:
   result: TIMEOUT_ERROR
 ---
-test case: "unencrypted | poll=error | expect TIMEOUT_ERROR"
+test case: "unencrypted | poll=error"
 in:
   tls_accept: 1 # ZBX_TCP_SEC_UNENCRYPTED
   poll_timeout: 10
@@ -16,3 +17,24 @@ in:
   poll_mode: "error"
 out:
   result: TIMEOUT_ERROR
+---
+test case: "unencrypted | poll=no error "
+in:
+  tls_accept: 1 # ZBX_TCP_SEC_UNENCRYPTED
+  poll_timeout: 10
+  num_socks: 1
+  poll_mode: "error"
+  accept_return: -1
+out:
+  result: TIMEOUT_ERROR
+---
+test case: "unencrypted | poll=no error"
+in:
+  tls_accept: 1 # ZBX_TCP_SEC_UNENCRYPTED
+  poll_timeout: 10
+  num_socks: 1
+  poll_mode: "no error"
+  recv_return: 2
+out:
+  result: SUCCEED
+
