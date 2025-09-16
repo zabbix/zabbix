@@ -114,14 +114,8 @@ $form_grid = (new CFormGrid())
 				->setColumns(3)
 				->setAttribute('data-field-type', 'array')
 				->setAttribute('data-field-name', 'weekly_days')
-				->setAttribute('data-error-container', 'weekly-days-error-container')
 		))->addClass('js-weekly-days')
 	])
-	->addItem(
-		(new CFormField())
-			->addClass(ZBX_STYLE_ERROR_CONTAINER)
-			->setId('weekly-days-error-container')
-	)
 	->addItem([
 		(new CLabel(_('Month'), 'months'))
 			->addClass('js-months')
@@ -134,14 +128,8 @@ $form_grid = (new CFormGrid())
 				->setColumns(3)
 				->setAttribute('data-field-type', 'array')
 				->setAttribute('data-field-name', 'months')
-				->setAttribute('data-error-container', 'months-error-container')
 		))->addClass('js-months')
 	])
-	->addItem(
-		(new CFormField())
-			->addClass(ZBX_STYLE_ERROR_CONTAINER)
-			->setId('months-error-container')
-	)
 	->addItem([
 		(new CLabel(_('Date'), 'month_date_type'))->addClass('js-month-date-type'),
 		(new CFormField(
@@ -175,13 +163,7 @@ $form_grid = (new CFormGrid())
 				->setColumns(3)
 				->setAttribute('data-field-type', 'array')
 				->setAttribute('data-field-name', 'monthly_days')
-				->setAttribute('data-error-container', 'monthly-days-error-container')
 		))->addClass('js-monthly-days')
-	)
-	->addItem(
-		(new CFormField())
-			->addClass(ZBX_STYLE_ERROR_CONTAINER)
-			->setId('monthly-days-error-container')
 	)
 	->addItem([
 		(new CLabel(_('Day of month'), 'day'))
