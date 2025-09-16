@@ -13,7 +13,6 @@
 **/
 
 #include "trapper_item_test.h"
-#include "zbxexpression.h"
 
 #include "zbxdb.h"
 #include "zbxtrapper.h"

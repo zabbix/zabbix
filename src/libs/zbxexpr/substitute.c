@@ -65,7 +65,7 @@ const char	**zbx_get_indexable_macros(void)
 	return ex_macros;
 }
 
-static int	substitute_macros_args(zbx_token_search_t search, char **data, char *error, size_t maxerrlen,
+int	zbx_substitute_macros_args(zbx_token_search_t search, char **data, char *error, size_t maxerrlen,
 		zbx_macro_resolv_func_t resolver, va_list args)
 {
 	zbx_macro_resolv_data_t	p = {0};
@@ -287,7 +287,7 @@ int	zbx_substitute_macros(char **data, char *error, size_t maxerrlen, zbx_macro_
 
 	va_start(args, resolver);
 
-	ret = substitute_macros_args(ZBX_TOKEN_SEARCH_BASIC, data, error, maxerrlen, resolver, args);
+	ret = zbx_substitute_macros_args(ZBX_TOKEN_SEARCH_BASIC, data, error, maxerrlen, resolver, args);
 
 	va_end(args);
 
@@ -302,7 +302,7 @@ int	zbx_substitute_macros_ext_search(zbx_token_search_t search, char **data, cha
 
 	va_start(args, resolver);
 
-	ret = substitute_macros_args(search, data, error, maxerrlen, resolver, args);
+	ret = zbx_substitute_macros_args(search, data, error, maxerrlen, resolver, args);
 
 	va_end(args);
 

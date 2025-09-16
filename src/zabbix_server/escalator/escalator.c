@@ -19,7 +19,6 @@
 #include "../actions/actions.h"
 
 #include "zbxtimekeeper.h"
-#include "zbxexpression.h"
 #include "zbxnix.h"
 #include "zbxself.h"
 #include "zbxscripts.h"

@@ -90,7 +90,6 @@ zabbix_server_LDADD = \
 	$(top_builddir)/src/libs/zbxpgservice/libzbxpgservice.a \
 	$(top_builddir)/src/libs/zbxcachehistory/libzbxcachehistory.a \
 	$(top_builddir)/src/libs/zbxcachevalue/libzbxcachevalue.a \
-	$(top_builddir)/src/libs/zbxexpression/libzbxexpression.a \
 	$(top_builddir)/src/libs/zbxevent/libzbxevent.a \
 	$(top_builddir)/src/libs/zbxcacheconfig/libzbxcacheconfig.a \
 	$(top_builddir)/src/libs/zbxcachehistory/libzbxcachehistory.a \

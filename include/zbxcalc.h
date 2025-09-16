@@ -17,6 +17,8 @@
 
 #include "zbxcacheconfig.h"
 
+#include "zbx_discoverer_constants.h"
+
 #define ZBX_EXPRESSION_NORMAL		0
 #define ZBX_EXPRESSION_AGGREGATE	1
 
@@ -101,5 +103,7 @@ int	zbx_evaluable_for_notsupported(const char *fn);
 
 void	zbx_format_value(char *value, size_t max_len, zbx_uint64_t valuemapid, const char *units,
 		unsigned char value_type);
+
+const char	*zbx_dservice_type_string(zbx_dservice_type_t service);
 
 #endif

@@ -20,7 +20,6 @@
 #include "zbxtime.h"
 #include "zbxthreads.h"
 #include "zbxcacheconfig.h"
-#include "zbxexpression.h"
 #include "zbx_availability_constants.h"
 #include "zbxpoller.h"
 #include "zbxavailability.h"
