@@ -587,7 +587,7 @@ abstract class CController {
 
 			case self::POST_CONTENT_TYPE_JSON:
 				$this->raw_input = self::getJsonInput();
-				$this->raw_files = self::getFileInput();
+				$this->raw_files = null;
 				break;
 
 			default:
