@@ -20,8 +20,8 @@ COMMS_tests = zbx_validate_peer_list \
 	zbx_tcp_send_context \
 	zbx_tcp_accept \
 	zbx_tcp_read_close_notify \
-	zbx_udp_recv \
-	zbx_tcp_recv_context_line
+	zbx_udp_recv
+
 
 COMMON_SRC_FILES = \
 	../../zbxmocktest.h

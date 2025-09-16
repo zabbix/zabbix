@@ -1,0 +1,50 @@
+---
+test case: default
+in:
+  timeout: 1
+  poll_mode: "no error"
+  recvfrom_return: [1,0]
+out:
+  result: SUCCEED
+---
+test case: connection shutdown
+in:
+  timeout: 1
+  poll_mode: "no error"
+  recvfrom_return: [0,0]
+out:
+  result: FAIL
+---
+test case: poll error
+in:
+  timeout: 1
+  poll_mode: "error"
+  recvfrom_return: [-1,0]
+out:
+  result: FAIL
+---
+test case: recvfrom > 2048
+in:
+  timeout: 1
+  poll_mode: "no error"
+  recvfrom_return: [2050,0]
+out:
+  result: SUCCEED
+---
+test case: socket had blocking error
+in:
+  timeout: 1
+  poll_mode: "no error"
+  recvfrom_return: [-1,0]
+  socket_had_nonblocking_error: yes
+out:
+  result: FAIL
+---
+test case: poll revents error
+in:
+  timeout: 1
+  poll_mode: "revents error"
+  recvfrom_return: [-1,0]
+out:
+  result: FAIL
+...
