@@ -28,12 +28,9 @@
 #include "zbxstr.h"
 #include "zbxhistory.h"
 #include "zbxexpr.h"
-#include "zbxdbhigh.h"
 #include "zbxdb.h"
 #include "zbxcacheconfig.h"
 #include "zbxalgo.h"
-#include "zbxdbwrap.h"
-#include "zbx_expression_constants.h"
 
 /* one item query data - index in hostkeys items */
 typedef struct
