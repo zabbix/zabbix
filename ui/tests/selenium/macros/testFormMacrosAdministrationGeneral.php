@@ -933,7 +933,7 @@ class testFormMacrosAdministrationGeneral extends testFormMacros {
 					'type' => 'Vault secret'
 				],
 				'description' => 'HashiCorp vault description'
-			],
+			]
 		];
 
 		$this->page->login()->open('zabbix.php?action=miscconfig.edit')->waitUntilReady();
