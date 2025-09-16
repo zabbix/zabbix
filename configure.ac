@@ -2292,7 +2292,6 @@ AC_CONFIG_FILES([
 	src/zabbix_server/audit/Makefile
 	src/zabbix_server/autoreg/Makefile
 	src/zabbix_server/actions/Makefile
-	src/zabbix_server/postinit/Makefile
 	src/zabbix_server/cachehistory/Makefile
 	src/zabbix_server/connector/Makefile
 	src/zabbix_server/dbconfigworker/Makefile
