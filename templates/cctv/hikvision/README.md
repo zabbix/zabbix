@@ -50,7 +50,7 @@ This template has been tested on:
 |Name|Description|Default|
 |----|-----------|-------|
 |{$CPU.UTIL.CRIT}||`90`|
-|{$HIKVISION_ISAPI_HOST}|<p>The hostname or IP address of the Hikvision ISAPI host.</p>|`<SET ISAPI HOST>`|
+|{$HIKVISION_ISAPI_HOST}|<p>The hostname or IP address of the Hikvision ISAPI host.</p>||
 |{$HIKVISION_ISAPI_PORT}|<p>ISAPI port on device</p>|`80`|
 |{$HIKVISION_MAIN_CHANNEL_ID}|<p>Main video stream ID</p>|`101`|
 |{$HIKVISION_STREAM_HEIGHT}|<p>Main video stream image height</p>|`1080`|

@@ -204,9 +204,7 @@ class testFormMacrosAdministrationGeneral extends testFormMacros {
 		$this->openGlobalMacros();
 
 		$this->saveGlobalMacros();
-
-		$this->zbxTestWaitUntilElementVisible(WebDriverBy::className('msg-good'));
-		$this->zbxTestAssertElementPresentXpath('//output[@class="msg-good"]/span[contains(text(),"Macros updated")]');
+		$this->assertMessage(TEST_GOOD, 'Macros updated');
 
 		$this->checkGlobalMacrosOrder();
 
@@ -907,7 +905,6 @@ class testFormMacrosAdministrationGeneral extends testFormMacros {
 		$this->fillMacros([$data['fields']]);
 		$this->saveGlobalMacros();
 		$this->assertMessage(TEST_GOOD, 'Macros updated');
-
 		$result = [];
 		foreach (['macro', 'value', 'description'] as $field) {
 			$result[] = $this->query('xpath://textarea[@id="macros_'.$data['fields']['index'].'_'.$field.'"]')->one()->getText();
@@ -959,6 +956,7 @@ class testFormMacrosAdministrationGeneral extends testFormMacros {
 		// Change Vault in settings to correct one and create macros with this Vault.
 		$this->page->open('zabbix.php?action=miscconfig.edit')->waitUntilReady();
 		$setting_form->fill(['Vault provider'=> 'HashiCorp Vault'])->submit();
+		$this->assertMessage(TEST_GOOD, 'Configuration updated');
 		$this->page->open('zabbix.php?action=macros.edit')->waitUntilReady();
 		$this->fillMacros([$hashicorp['fields']]);
 		$this->query('button:Update')->one()->click();

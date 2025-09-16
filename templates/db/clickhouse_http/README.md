@@ -49,7 +49,7 @@ This template has been tested on:
 |{$CLICKHOUSE.USER}||`zabbix`|
 |{$CLICKHOUSE.PASSWORD}||`zabbix_pass`|
 |{$CLICKHOUSE.NETWORK.ERRORS.MAX.WARN}|<p>Maximum number of network errors for trigger expression</p>|`5`|
-|{$CLICKHOUSE.HOST}|<p>The hostname or IP address of the ClickHouse HTTP endpoint.</p>|`<SET CLICKHOUSE HOST>`|
+|{$CLICKHOUSE.HOST}|<p>The hostname or IP address of the ClickHouse HTTP endpoint.</p>||
 |{$CLICKHOUSE.PORT}|<p>The port of ClickHouse HTTP endpoint</p>|`8123`|
 |{$CLICKHOUSE.SCHEME}|<p>Request scheme which may be http or https</p>|`http`|
 |{$CLICKHOUSE.LLD.FILTER.DB.MATCHES}|<p>Filter of discoverable databases</p>|`.*`|
