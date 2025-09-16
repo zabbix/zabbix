@@ -487,49 +487,53 @@ int	zbx_macro_event_name_resolv(zbx_macro_resolv_data_t *p, va_list args, char *
 
 	const zbx_vector_uint64_t	**phostids = va_arg(args, const zbx_vector_uint64_t **);
 
-	ret = macro_trigger_common_resolv(p, um_handle, event, tz, phostids, replace_to);
-
-	if (ret == SUCCEED && EVENT_OBJECT_TRIGGER == event->object)
+	if (ZBX_TOKEN_EXPRESSION_MACRO == p->inner_token.type)
 	{
-		if (0 == strcmp(p->macro, MVAR_TIME))
-		{
-			*replace_to = zbx_strdup(*replace_to, zbx_time2str(time(NULL), tz));
-		}
-		else if (0 == strcmp(p->macro, MVAR_TIMESTAMP))
-		{
-			*replace_to = zbx_dsprintf(*replace_to, "%ld", (long)time(NULL));
-		}
-		else if (0 == strcmp(p->macro, MVAR_TRIGGER_EXPRESSION_EXPLAIN))
-		{
-			zbx_db_trigger_explain_expression(&event->trigger, replace_to, zbx_evaluate_function, 0);
-		}
-		else if (0 == strcmp(p->macro, MVAR_FUNCTION_VALUE))
-		{
-			zbx_db_trigger_get_function_value(&event->trigger, p->index, replace_to,
-					zbx_evaluate_function, 0);
-		}
-		else if (0 == strcmp(p->macro, MVAR_FUNCTION_RECOVERY_VALUE))
-		{
-			zbx_db_trigger_get_function_value(&event->trigger, p->index, replace_to,
-					zbx_evaluate_function, 1);
-		}
-		else if (ZBX_TOKEN_EXPRESSION_MACRO == p->inner_token.type)
-		{
-			zbx_timespec_t	ts;
-			char		*errmsg = NULL;
+		zbx_timespec_t	ts;
+		char		*errmsg = NULL;
 
-			ts.sec = event->clock;
-			ts.ns = event->ns;
+		ts.sec = event->clock;
+		ts.ns = event->ns;
 
-			if (SUCCEED != (ret = zbx_db_get_expression_macro_result(event, *data,
-					&p->inner_token.data.expression_macro.expression, &ts,
-					replace_to, &errmsg)))
+		if (SUCCEED != (ret = zbx_db_get_expression_macro_result(event, *data,
+				&p->inner_token.data.expression_macro.expression, &ts,
+				replace_to, &errmsg)))
+		{
+			*errmsg = tolower(*errmsg);
+			zabbix_log(LOG_LEVEL_DEBUG, "%s() cannot evaluate expression macro: %s",
+					__func__, errmsg);
+			zbx_strlcpy(error, errmsg, maxerrlen);
+			zbx_free(errmsg);
+		}
+	}
+	else
+	{
+		ret = macro_trigger_common_resolv(p, um_handle, event, tz, phostids, replace_to);
+
+		if (ret == SUCCEED && EVENT_OBJECT_TRIGGER == event->object)
+		{
+			if (0 == strcmp(p->macro, MVAR_TIME))
 			{
-				*errmsg = tolower(*errmsg);
-				zabbix_log(LOG_LEVEL_DEBUG, "%s() cannot evaluate expression macro: %s",
-						__func__, errmsg);
-				zbx_strlcpy(error, errmsg, maxerrlen);
-				zbx_free(errmsg);
+				*replace_to = zbx_strdup(*replace_to, zbx_time2str(time(NULL), tz));
+			}
+			else if (0 == strcmp(p->macro, MVAR_TIMESTAMP))
+			{
+				*replace_to = zbx_dsprintf(*replace_to, "%ld", (long)time(NULL));
+			}
+			else if (0 == strcmp(p->macro, MVAR_TRIGGER_EXPRESSION_EXPLAIN))
+			{
+				zbx_db_trigger_explain_expression(&event->trigger, replace_to, zbx_evaluate_function,
+						0);
+			}
+			else if (0 == strcmp(p->macro, MVAR_FUNCTION_VALUE))
+			{
+				zbx_db_trigger_get_function_value(&event->trigger, p->index, replace_to,
+						zbx_evaluate_function, 0);
+			}
+			else if (0 == strcmp(p->macro, MVAR_FUNCTION_RECOVERY_VALUE))
+			{
+				zbx_db_trigger_get_function_value(&event->trigger, p->index, replace_to,
+						zbx_evaluate_function, 1);
 			}
 		}
 	}
