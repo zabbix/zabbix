@@ -690,7 +690,7 @@ class CFormValidator {
 		}
 
 		// Single value ID may be passed as null when value is not specified.
-		if (array_key_exists($field, $data) && $data[$field] === null) {
+		if ($rules['type'] != 'file' && array_key_exists($field, $data) && $data[$field] === null) {
 			unset($data[$field]);
 		}
 
@@ -1125,14 +1125,24 @@ class CFormValidator {
 			return false;
 		}
 
+		$value_fields = [];
+		$file_fields = [];
+
 		foreach ($rules['fields'] as $field => $rule_sets) {
 			foreach ($rule_sets as $rule_set) {
 				$this->validateField($rule_set, $value, $field, $path.'/'.$field, $files);
+
+				if ($rule_set['type'] == 'file') {
+					$file_fields[$field] = true;
+				}
+				else {
+					$value_fields[$field] = true;
+				}
 			}
 		}
 
-		$value = array_intersect_key($value, $rules['fields']);
-		$files = array_intersect_key($files, $rules['fields']);
+		$value = array_intersect_key($value, $value_fields);
+		$files = array_intersect_key($files, $file_fields);
 
 		if (array_key_exists('api_uniq', $rules)) {
 			foreach ($rules['api_uniq'] as $api_check) {
