@@ -93,7 +93,7 @@ class testFormGraphs extends CWebTest {
 				[
 					'check_defaults' => true,
 					'set_fields' => [
-						'Graph type' => 'Normal'
+						'Graph type' => CFormElement::RELOADABLE_FILL('Normal')
 					],
 					'check_fields' => [
 						'id:name' =>  ['value' => '', 'maxlength' => 128],
@@ -128,7 +128,7 @@ class testFormGraphs extends CWebTest {
 			[
 				[
 					'set_fields' => [
-						'Graph type' => 'Stacked'
+						'Graph type' => CFormElement::RELOADABLE_FILL('Stacked')
 					],
 					'check_fields' => [
 						'id:name' =>  ['value' => ''],
@@ -162,7 +162,7 @@ class testFormGraphs extends CWebTest {
 			[
 				[
 					'set_fields' => [
-						'Graph type' => 'Pie'
+						'Graph type' => CFormElement::RELOADABLE_FILL('Pie')
 					],
 					'check_fields' => [
 						'id:name' =>  ['value' => ''],
@@ -197,7 +197,7 @@ class testFormGraphs extends CWebTest {
 			[
 				[
 					'set_fields' => [
-						'Graph type' => 'Exploded'
+						'Graph type' => CFormElement::RELOADABLE_FILL('Exploded')
 					],
 					'check_fields' => [
 						'id:name' =>  ['value' => ''],
