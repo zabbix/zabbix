@@ -71,7 +71,7 @@ class CControllerMaintenanceCreate extends CControllerMaintenanceUpdateGeneral {
 						'when' => ['timeperiod_type',
 							'in' => [TIMEPERIOD_TYPE_DAILY, TIMEPERIOD_TYPE_WEEKLY, TIMEPERIOD_TYPE_MONTHLY]]],
 					'period' => ['db timeperiods.period', 'required',
-						'min' => 5 * SEC_PER_MIN, 'max' => CMaintenance::MAX_TIMEPERIOD],
+						'min' => 5 * SEC_PER_MIN, 'max' => CMaintenanceHelper::MAX_TIMEPERIOD],
 					'start_date' => ['db timeperiods.start_date', 'required',
 						'when' => ['timeperiod_type', 'in' => [TIMEPERIOD_TYPE_ONETIME]]]
 				]],
