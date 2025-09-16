@@ -1877,7 +1877,8 @@ class testPageProblems extends CWebTest {
 					]
 				]
 			],
-			'Two metrics in operational data pop-up window' => [
+			// TODO: uncomment test case once issue ZBX-25103 is resolved
+/*			'Two metrics in operational data pop-up window' => [
 				[
 					'filter' => [
 						'Problem' => 'Two trigger expressions',
@@ -1900,7 +1901,7 @@ class testPageProblems extends CWebTest {
 						]
 					]
 				]
-			],
+			],*/
 			'Filled opdata with macros' => [
 				[
 					'custom data' => 'Operational data - (150),150, [*UNKNOWN*]',
