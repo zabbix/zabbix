@@ -925,7 +925,7 @@ class testFormMapProperties extends CWebTest {
 						'Map label type' => 'Custom label',
 						'id:label_string_map' => STRING_512,
 						'Image label type' => 'Custom label',
-						'id:label_string_image' => STRING_512,
+						'id:label_string_image' => STRING_512
 					],
 					'urls' => [
 						[
