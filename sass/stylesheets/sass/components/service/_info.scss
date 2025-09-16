@@ -12,6 +12,14 @@
 		&:last-of-type {
 			padding-bottom: 10px;
 		}
+
+		.tags-wrapper {
+			min-width: 1%;
+
+			.btn-icon {
+				height: auto;
+			}
+		}
 	}
 
 	.service-info-label {
