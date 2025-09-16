@@ -3645,6 +3645,10 @@ section {
     padding: 10px 10px 0; }
     .service-info .service-info-grid:last-of-type {
       padding-bottom: 10px; }
+    .service-info .service-info-grid .tags-wrapper {
+      min-width: 1%; }
+      .service-info .service-info-grid .tags-wrapper .btn-icon {
+        height: auto; }
   .service-info .service-info-label::after {
     content: ':'; }
   .service-info .service-info-value .service-info-value-sla {
