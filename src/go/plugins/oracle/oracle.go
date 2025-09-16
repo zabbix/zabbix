@@ -89,7 +89,7 @@ func (p *Plugin) Export(key string, rawParams []string, pluginCtx plugin.Context
 		timeout = time.Second * time.Duration(pluginCtx.Timeout())
 	}
 
-	ctx, cancel := conn.GetContextWithTimeout()
+	ctx, cancel := conn.GetContextWithTimeout(timeout)
 	defer cancel()
 
 	result, err := handleMetric(ctx, conn, params, extraParams...)
