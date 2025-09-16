@@ -777,6 +777,14 @@ static	type2	get_##varname(void) \
 	return varname; \
 }
 
+/* loggger interface */
+
+typedef void (*zbx_log_cb_t)(int level, const char *fmt, ...);
+typedef int (*zbx_log_level_cb_t)(void);
+
+extern zbx_log_cb_t	zbx_log_handle  __zbx_attr_format_printf(2, 3);
+extern zbx_log_level_cb_t	zbx_get_log_level;
+
 #define LOG_LEVEL_EMPTY		0	/* printing nothing (if not LOG_LEVEL_INFORMATION set) */
 #define LOG_LEVEL_CRIT		1
 #define LOG_LEVEL_ERR		2
@@ -804,22 +812,6 @@ static	type2	get_##varname(void) \
 #	define zabbix_log zbx_log_handle
 #endif
 
-typedef void (*zbx_log_func_t)(int level, const char *fmt, va_list args);
-
-void	zbx_init_library_common(zbx_log_func_t log_func, zbx_get_progname_f get_progname, zbx_backtrace_f backtrace);
-void	zbx_log_handle(int level, const char *fmt, ...) __zbx_attr_format_printf(2, 3);
-int	zbx_get_log_level(void);
-void	zbx_set_log_level(int level);
-const char	*zbx_get_log_component_name(void);
-
-#ifndef _WINDOWS
-void		zabbix_increase_log_level(void);
-void		zabbix_decrease_log_level(void);
-void		zabbix_report_log_level_change(void);
-const char	*zabbix_get_log_level_string(void);
-
-#define ZBX_LOG_COMPONENT_NAME_LEN	64
-
 typedef struct
 {
 	int		level;
@@ -827,8 +819,7 @@ typedef struct
 }
 zbx_log_component_t;
 
-void	zbx_set_log_component(const char *name, zbx_log_component_t *component);
-void	zbx_change_component_log_level(zbx_log_component_t *component, int direction);
-#endif
+void	zbx_init_library_common(zbx_log_cb_t log_func, zbx_log_level_cb_t log_level_func,
+		zbx_get_progname_f get_progname, zbx_backtrace_f backtrace);
 
 #endif

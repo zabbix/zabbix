@@ -1447,7 +1447,7 @@ int	main(int argc, char **argv)
 
 	zbx_progname = get_program_name(argv[0]);
 
-	zbx_init_library_common(zbx_log_impl, get_zbx_progname, zbx_backtrace);
+	zbx_init_library_common(zabbix_log_impl, zbx_get_log_level_impl, get_zbx_progname, zbx_backtrace);
 #ifndef _WINDOWS
 	zbx_init_library_nix(get_zbx_progname, NULL);
 #endif

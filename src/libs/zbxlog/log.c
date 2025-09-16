@@ -29,6 +29,20 @@ static char		log_filename[MAX_STRING_LEN];
 static int		log_type = ZBX_LOG_TYPE_UNDEFINED;
 static zbx_mutex_t	log_access = ZBX_MUTEX_NULL;
 
+static int			log_level = LOG_LEVEL_WARNING;
+static ZBX_THREAD_LOCAL int	*plog_level = &log_level;
+
+#define LOG_LEVEL_DEC_FAIL	-2
+#define LOG_LEVEL_DEC_SUCCEED	-1
+#define LOG_LEVEL_UNCHANGED	0
+#define LOG_LEVEL_INC_SUCCEED	1
+#define LOG_LEVEL_INC_FAIL	2
+
+#define LOG_COMPONENT_NAME_LEN	64
+static ZBX_THREAD_LOCAL int	log_level_change = LOG_LEVEL_UNCHANGED;
+static ZBX_THREAD_LOCAL char	log_component_name[LOG_COMPONENT_NAME_LEN + 1];
+#undef LOG_COMPONENT_NAME_LEN
+
 static int		config_log_file_size = -1;	/* max log file size in MB */
 
 static int	get_config_log_file_size(void)
@@ -339,9 +353,10 @@ void	zbx_close_log(void)
 	log_type = ZBX_LOG_TYPE_UNDEFINED;
 }
 
-void	zbx_log_impl(int level, const char *fmt, va_list args)
+void	zabbix_log_impl(int level, const char *fmt, ...)
 {
 	char		message[MAX_BUFFER_LEN];
+	va_list		args;
 #ifdef _WINDOWS
 	WORD		wType;
 	wchar_t		thread_id[20], *strings[2];
@@ -353,6 +368,8 @@ void	zbx_log_impl(int level, const char *fmt, va_list args)
 	if (SUCCEED != ZBX_CHECK_LOG_LEVEL(level))
 		return;
 #endif
+
+	va_start(args, fmt);
 
 	if (ZBX_LOG_TYPE_FILE == log_type)
 	{
@@ -528,6 +545,8 @@ void	zbx_log_impl(int level, const char *fmt, va_list args)
 
 		UNLOCK_LOG;
 	}
+
+	va_end(args);
 }
 
 int	zbx_get_log_type(const char *logtype)
@@ -782,3 +801,167 @@ void	__zbx_update_env(double time_now)
 #endif
 	}
 }
+
+int	zbx_get_log_level_impl(void)
+{
+	return *plog_level;
+}
+
+void	zbx_set_log_level(int level)
+{
+	*plog_level = level;
+}
+
+const char	*zbx_get_log_component_name(void)
+{
+	return log_component_name;
+}
+
+#ifndef _WINDOWS
+static const char	*zabbix_get_log_level_ref_string(int loglevel)
+{
+	switch (loglevel)
+	{
+		case LOG_LEVEL_EMPTY:
+			return "0 (none)";
+		case LOG_LEVEL_CRIT:
+			return "1 (critical)";
+		case LOG_LEVEL_ERR:
+			return "2 (error)";
+		case LOG_LEVEL_WARNING:
+			return "3 (warning)";
+		case LOG_LEVEL_DEBUG:
+			return "4 (debug)";
+		case LOG_LEVEL_TRACE:
+			return "5 (trace)";
+	}
+
+	THIS_SHOULD_NEVER_HAPPEN;
+	exit(EXIT_FAILURE);
+}
+
+const char	*zabbix_get_log_level_string(void)
+{
+	return zabbix_get_log_level_ref_string(*plog_level);
+}
+
+void	zabbix_increase_log_level(void)
+{
+	if (LOG_LEVEL_TRACE == *plog_level)
+	{
+		log_level_change = LOG_LEVEL_INC_FAIL;
+		return;
+	}
+
+	log_level_change = LOG_LEVEL_INC_SUCCEED;
+
+	*plog_level = *plog_level + 1;
+
+	return;
+}
+
+void	zabbix_decrease_log_level(void)
+{
+	if (LOG_LEVEL_EMPTY == *plog_level)
+	{
+		log_level_change = LOG_LEVEL_DEC_FAIL;
+		return;
+	}
+
+	log_level_change = LOG_LEVEL_DEC_SUCCEED;
+
+	*plog_level = *plog_level - 1;
+
+	return;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: log last loglevel change result                                   *
+ *                                                                            *
+ * Comments: With consequent fast changes only the last attempt result would  *
+ *           be logged.                                                       *
+ *                                                                            *
+ ******************************************************************************/
+void	 zabbix_report_log_level_change(void)
+{
+	int	change;
+
+	if (0 == log_level_change)
+		return;
+
+	/* reset log level change history to avoid recursion */
+	change = log_level_change;
+	log_level_change = LOG_LEVEL_UNCHANGED;
+
+	switch (change)
+	{
+		case LOG_LEVEL_DEC_FAIL:
+			zabbix_log(LOG_LEVEL_INFORMATION, "cannot decrease log level:"
+					" minimum level has been already set");
+			break;
+		case LOG_LEVEL_DEC_SUCCEED:
+			zabbix_log(LOG_LEVEL_INFORMATION, "log level has been decreased to %s",
+					zabbix_get_log_level_string());
+			break;
+		case LOG_LEVEL_INC_SUCCEED:
+			zabbix_log(LOG_LEVEL_INFORMATION, "log level has been increased to %s",
+					zabbix_get_log_level_string());
+			break;
+		case LOG_LEVEL_INC_FAIL:
+			zabbix_log(LOG_LEVEL_INFORMATION, "cannot increase log level:"
+					" maximum level has been already set");
+			break;
+	}
+}
+
+void	zbx_set_log_component(const char *name, zbx_log_component_t *component)
+{
+	int	ll = *plog_level;
+
+	zbx_snprintf(log_component_name, sizeof(log_component_name), "[%s] ", name);
+
+	plog_level = &component->level;
+	component->level = ll;
+	component->name = log_component_name;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: change log level of the specified component                       *
+ *                                                                            *
+ * Comments: This function is used to change log level managed threads.       *
+ *                                                                            *
+ ******************************************************************************/
+void	zbx_change_component_log_level(zbx_log_component_t *component, int direction)
+{
+	if (0 > direction)
+	{
+		if (LOG_LEVEL_EMPTY == component->level)
+		{
+			zabbix_log(LOG_LEVEL_INFORMATION, "%scannot decrease log level:"
+					" minimum level has been already set", component->name);
+		}
+		else
+		{
+			component->level += direction;
+			zabbix_log(LOG_LEVEL_INFORMATION, "%slog level has been decreased to %s",
+					component->name, zabbix_get_log_level_ref_string(component->level));
+		}
+	}
+	else
+	{
+		if (LOG_LEVEL_TRACE == component->level)
+		{
+			zabbix_log(LOG_LEVEL_INFORMATION, "%scannot increase log level:"
+					" maximum level has been already set", component->name);
+		}
+		else
+		{
+			component->level += direction;
+			zabbix_log(LOG_LEVEL_INFORMATION, "%slog level has been increased to %s",
+					component->name, zabbix_get_log_level_ref_string(component->level));
+		}
+	}
+}
+#endif

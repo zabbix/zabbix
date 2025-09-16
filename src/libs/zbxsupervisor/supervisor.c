@@ -23,6 +23,7 @@
 #include "zbxipcservice.h"
 #include "zbxtimekeeper.h"
 #include "zbxself.h"
+#include "zbxlog.h"
 
 #include "zbxpreproc.h"
 

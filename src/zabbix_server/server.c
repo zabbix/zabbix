@@ -1330,7 +1330,7 @@ int	main(int argc, char **argv)
 	zbx_db_config = zbx_db_config_create();
 
 	/* initialize libraries before using */
-	zbx_init_library_common(zbx_log_impl, get_zbx_progname, zbx_backtrace);
+	zbx_init_library_common(zabbix_log_impl, zbx_get_log_level_impl, get_zbx_progname, zbx_backtrace);
 	zbx_init_library_nix(get_zbx_progname, get_process_info_by_thread);
 	zbx_init_library_dbupgrade(get_zbx_program_type, get_zbx_config_timeout);
 	zbx_init_library_dbwrap(zbx_lld_process_agent_result, zbx_preprocess_item_value, zbx_preprocessor_flush);

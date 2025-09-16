@@ -16,7 +16,19 @@
 
 #include "zbxcommon.h"
 
-void	zbx_mock_log_impl(int level, const char *fmt, va_list args)
+static int	mock_log_level = LOG_LEVEL_TRACE;
+
+int	zbx_mock_get_log_level_impl(void)
+{
+	return mock_log_level;
+}
+
+void	zbx_mock_set_log_level(int level)
+{
+	mock_log_level = level;
+}
+
+void	zbx_mock_log_impl(int level, const char *fmt, ...)
 {
 	fprintf(stdout, "[ LOG (");
 
@@ -47,7 +59,11 @@ void	zbx_mock_log_impl(int level, const char *fmt, va_list args)
 
 	fprintf(stdout, ") ] ");
 
+	va_list	args;
+
+	va_start(args, fmt);
 	vfprintf(stdout, fmt, args);
+	va_end(args);
 
 	fprintf(stdout, "\n");
 	fflush(stdout);

@@ -22,7 +22,6 @@
 
 void	*__wrap_malloc(size_t size);
 void	*__real_malloc(size_t size);
-void	__wrap_zbx_log_handle(int level, const char *fmt, ...);
 void	new_exit(int status);
 
 size_t		got_size;
@@ -49,7 +48,7 @@ void	*__wrap_malloc(size_t size)
 	return __real_malloc(size);
 }
 
-void	__wrap_zbx_log_handle(int level, const char *fmt, ...)
+static void	zabbix_log_stub(int level, const char *fmt, ...)
 {
 	ZBX_UNUSED(level);
 
@@ -83,6 +82,8 @@ void	zbx_mock_test_entry(void **state)
 		old = NULL;
 	else
 		old = (void *)1;
+
+	zbx_init_library_common(zabbix_log_stub, zbx_mock_get_log_level_impl, NULL, NULL);
 
 	is_testing = 1;
 	result = zbx_malloc(old, in_size);

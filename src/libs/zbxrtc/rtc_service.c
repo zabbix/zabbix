@@ -27,6 +27,7 @@
 #include "zbxprof.h"
 #include "zbxtime.h"
 #include "zbxcachehistory.h"
+#include "zbxlog.h"
 
 ZBX_PTR_VECTOR_IMPL(rtc_sub, zbx_rtc_sub_t *)
 ZBX_PTR_VECTOR_IMPL(rtc_hook, zbx_rtc_hook_t *)
