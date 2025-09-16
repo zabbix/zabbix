@@ -1346,7 +1346,7 @@ class CFormValidator {
 	 *
 	 * @return bool
 	 */
-	private static function validateFile($rules, &$value, ?string &$error = null): bool {
+	private static function validateFile(array $rules, &$value, ?string &$error = null): bool {
 		$file = null;
 
 		try {
