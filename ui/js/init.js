@@ -56,11 +56,9 @@ document.addEventListener('click', e => {
 	}
 });
 
-document.addEventListener('mouseover', e => {
-	const element = e.target;
-
-	if (element?.tagName?.toLowerCase() === 'label' && element.scrollWidth > element.clientWidth) {
-		element.title = element.textContent;
+document.addEventListener('mouseover', ({target}) => {
+	if (target.matches('label') && target.scrollWidth > target.clientWidth) {
+		target.title = target.textContent;
 	}
 });
 
