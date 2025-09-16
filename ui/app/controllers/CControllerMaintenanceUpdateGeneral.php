@@ -19,7 +19,7 @@ abstract class CControllerMaintenanceUpdateGeneral extends CController {
 	/**
 	 * Function to compare values from fields "Active since" and "Active till".
 	 */
-	protected function validateTimePeriods(): bool {
+	final protected function validateTimePeriods(): bool {
 		$absolute_time_parser = new CAbsoluteTimeParser();
 
 		$absolute_time_parser->parse($this->getInput('active_since'));
@@ -39,7 +39,7 @@ abstract class CControllerMaintenanceUpdateGeneral extends CController {
 		return true;
 	}
 
-	protected function processTimePeriods(array $timeperiods): array {
+	final protected function processTimePeriods(array $timeperiods): array {
 		$timeperiod_fields = [
 			TIMEPERIOD_TYPE_ONETIME => ['timeperiod_type', 'start_date', 'period'],
 			TIMEPERIOD_TYPE_DAILY => ['timeperiod_type', 'every', 'start_time', 'period'],
@@ -56,7 +56,7 @@ abstract class CControllerMaintenanceUpdateGeneral extends CController {
 		return $timeperiods;
 	}
 
-	protected function processMaintenance(array &$maintenance): void {
+	final protected function processMaintenance(array &$maintenance): void {
 		if ($maintenance['maintenance_type'] == MAINTENANCE_TYPE_NORMAL) {
 			$maintenance += [
 				'tags_evaltype' => $this->getInput('tags_evaltype'),
@@ -72,7 +72,7 @@ abstract class CControllerMaintenanceUpdateGeneral extends CController {
 		}
 	}
 
-	protected function parseActiveTime(string $active_time): int {
+	final protected function parseActiveTime(string $active_time): int {
 		$absolute_time_parser = new CAbsoluteTimeParser();
 		$absolute_time_parser->parse($active_time);
 
