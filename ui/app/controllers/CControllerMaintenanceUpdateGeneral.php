@@ -12,7 +12,10 @@
 ** You should have received a copy of the GNU Affero General Public License along with this program.
 ** If not, see <https://www.gnu.org/licenses/>.
 **/
+
+
 abstract class CControllerMaintenanceUpdateGeneral extends CController {
+
 	/**
 	 * Function to compare values from fields "Active since" and "Active till".
 	 */
@@ -74,6 +77,5 @@ abstract class CControllerMaintenanceUpdateGeneral extends CController {
 		$absolute_time_parser->parse($active_time);
 
 		return $absolute_time_parser->getDateTime(true)->getTimestamp();;
-
 	}
 }
