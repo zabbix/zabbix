@@ -917,22 +917,22 @@ class testFormMapProperties extends CWebTest {
 						'Height' => '65535',
 						'Advanced labels' => true,
 						'Host group label type' => 'Custom label',
-						'id:label_string_hostgroup' => STRING_6000,
+						'id:label_string_hostgroup' => STRING_512,
 						'Host label type' => 'Custom label',
-						'id:label_string_host' => STRING_6000,
+						'id:label_string_host' => STRING_512,
 						'Trigger label type' => 'Custom label',
-						'id:label_string_trigger' => STRING_6000,
+						'id:label_string_trigger' => STRING_512,
 						'Map label type' => 'Custom label',
-						'id:label_string_map' => STRING_6000,
+						'id:label_string_map' => STRING_512,
 						'Image label type' => 'Custom label',
-						'id:label_string_image' => STRING_6000,
+						'id:label_string_image' => STRING_512,
 					],
 					'urls' => [
 						[
 							'action' => USER_ACTION_UPDATE,
 							'index' => 0,
-							'Name' => STRING_6000,
-							'URL' => STRING_6000,
+							'Name' => STRING_512,
+							'URL' => STRING_2200,
 							'Element' => 'Host'
 						]
 					],
@@ -1616,7 +1616,7 @@ class testFormMapProperties extends CWebTest {
 			$form->query('class:table-forms-separator')->asMultifieldTable()->one()->fill($data['urls']);
 		}
 
-		$form->submit();
+		$form->submit()->waitUntilStalled();
 
 		if ($data['expected'] === TEST_BAD) {
 			$this->assertMessage(TEST_BAD, (array_key_exists('incorrect_data', $data)
@@ -2012,52 +2012,50 @@ class testFormMapProperties extends CWebTest {
 						'Height' => '65535',
 						'Advanced labels' => true,
 						'Host group label type' => 'Custom label',
-						'id:label_string_hostgroup' => STRING_6000,
+						'id:label_string_hostgroup' => STRING_512,
 						'Host label type' => 'Custom label',
-						'id:label_string_host' => STRING_6000,
+						'id:label_string_host' => STRING_512,
 						'Trigger label type' => 'Custom label',
-						'id:label_string_trigger' => STRING_6000,
+						'id:label_string_trigger' => STRING_512,
 						'Map label type' => 'Custom label',
-						'id:label_string_map' => STRING_6000,
+						'id:label_string_map' => STRING_512,
 						'Image label type' => 'Custom label',
-						'id:label_string_image' => STRING_6000,
-						'id:urls_0_name' => STRING_6000,
-						'id:urls_0_url' => STRING_6000
+						'id:label_string_image' => STRING_512
 					],
 					'urls' => [
 						[
 							'action' => USER_ACTION_UPDATE,
 							'index' => 0,
 							'Name' => STRING_128.' Host name test '.STRING_32.' test url name '.STRING_128,
-							'URL' => STRING_6000,
+							'URL' => STRING_2200,
 							'Element' => 'Host'
 						],
 						[
 							'action' => USER_ACTION_UPDATE,
 							'index' => 1,
 							'Name' => STRING_128.'Group name test '.STRING_32.' test url name '.STRING_128,
-							'URL' => STRING_6000,
+							'URL' => STRING_2200,
 							'Element' => 'Host group'
 						],
 						[
 							'action' => USER_ACTION_UPDATE,
 							'index' => 2,
 							'Name' => STRING_128.'Image name test '.STRING_32.' test url name '.STRING_128,
-							'URL' => STRING_6000,
+							'URL' => STRING_2200,
 							'Element' => 'Image'
 						],
 						[
 							'action' => USER_ACTION_UPDATE,
 							'index' => 3,
 							'Name' => STRING_128.'Map : name test '.STRING_32.' test url name '.STRING_128,
-							'URL' => STRING_6000,
+							'URL' => STRING_2200,
 							'Element' => 'Map'
 						],
 						[
 							'action' => USER_ACTION_UPDATE,
 							'index' => 4,
 							'Name' => STRING_128.'Trigger name test '.STRING_32.'test url name'.STRING_128,
-							'URL' => STRING_6000,
+							'URL' => STRING_2200,
 							'Element' => 'Trigger'
 						]
 					],
@@ -2283,7 +2281,7 @@ class testFormMapProperties extends CWebTest {
 			$form->query('class:table-forms-separator')->asMultifieldTable()->one()->fill($data['urls']);
 		}
 
-		$form->submit();
+		$form->submit()->waitUntilStalled();
 
 		if ($data['expected'] === TEST_BAD) {
 			$this->assertMessage(TEST_BAD, (array_key_exists('incorrect_data', $data)
@@ -2384,7 +2382,7 @@ class testFormMapProperties extends CWebTest {
 		$form = $this->query('id:sysmap-form')->waitUntilPresent()->asForm()->one();
 		$form->query('button:Clone')->one()->click();
 		$form->fill(['Name' => self::CLONED_MAP]);
-		$form->submit();
+		$form->submit()->waitUntilStalled();
 		$this->page->waitUntilReady();
 		$this->assertMessage(TEST_GOOD, 'Network map added');
 
