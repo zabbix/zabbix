@@ -94,9 +94,7 @@ class testFormMapProperties extends CWebTest {
 						'name' => '1 Host URL',
 						'url' => 'test',
 						'elementtype' => SYSMAP_ELEMENT_TYPE_HOST
-					]
-					/*
-					 * Uncomment additional URLs, when ZBX-26683 is fixed.
+					],
 					[
 						'name' => '2 Host group URL',
 						'url' => 'test',
@@ -117,7 +115,6 @@ class testFormMapProperties extends CWebTest {
 						'url' => 'test',
 						'elementtype' => SYSMAP_ELEMENT_TYPE_IMAGE
 					]
-					 */
 				]
 			],
 			[
@@ -144,9 +141,7 @@ class testFormMapProperties extends CWebTest {
 						'name' => '1 Host URL',
 						'url' => 'test',
 						'elementtype' => SYSMAP_ELEMENT_TYPE_HOST
-					]
-					/*
-					 * Uncomment additional URL check, when ZBX-26683 is fixed. Update test case, if necessary
+					],
 					[
 						'name' => '2 Host group URL',
 						'url' => 'test',
@@ -167,7 +162,6 @@ class testFormMapProperties extends CWebTest {
 						'url' => 'test',
 						'elementtype' => SYSMAP_ELEMENT_TYPE_IMAGE
 					]
-					 */
 				]
 			],
 			[
@@ -196,9 +190,7 @@ class testFormMapProperties extends CWebTest {
 						'name' => '1 Host URL 📰📰📰',
 						'url' => 'test 📰📰📰',
 						'elementtype' => SYSMAP_ELEMENT_TYPE_HOST
-					]
-					/*
-					 * Uncomment additional URL check, when ZBX-26683 is fixed. Update test case, if necessary
+					],
 					[
 						'name' => STRING_255,
 						'url' => STRING_2048,
@@ -219,7 +211,6 @@ class testFormMapProperties extends CWebTest {
 						'url' => 'test',
 						'elementtype' => SYSMAP_ELEMENT_TYPE_IMAGE
 					]
-					 */
 				]
 			]
 		]);
@@ -389,8 +380,7 @@ class testFormMapProperties extends CWebTest {
 			$field = $form->getField($xpath);
 			$this->assertEquals('', $field->getValue());
 			$this->assertEquals('false', $field->getAttribute('spellcheck'));
-			// TODO: When ZBX-26089 is merged, uncomment maxlength attribute check.
-//			$this->assertEquals(255, $field->getAttribute('maxlength'));
+			$this->assertEquals(255, $field->getAttribute('maxlength'));
 		}
 
 		// Check radio buttons.
@@ -899,40 +889,38 @@ class testFormMapProperties extends CWebTest {
 					]
 				]
 			],
-			/**
-			 * TODO: Uncomment test case, when ZBX-26089 is fixed. Update test case if necessary.
-			// # Create with string length which exceeds maximum allowed value.
+			// #23 Create with string length which exceeds maximum allowed value.
 			[
 				[
 					'expected' => TEST_GOOD,
 					'map_properties' => [
-						'Name' => STRING_6000,
+						'Name' => STRING_64.' Check that fields are limited: '.STRING_128,
 						'Width' => '65535',
 						'Height' => '65535',
 						'Advanced labels' => true,
 						'Host group label type' => 'Custom label',
-						'id:label_string_hostgroup' => STRING_6000,
+						'id:label_string_hostgroup' => STRING_512,
 						'Host label type' => 'Custom label',
-						'id:label_string_host' => STRING_6000,
+						'id:label_string_host' => STRING_512,
 						'Trigger label type' => 'Custom label',
-						'id:label_string_trigger' => STRING_6000,
+						'id:label_string_trigger' => STRING_512,
 						'Map label type' => 'Custom label',
-						'id:label_string_map' => STRING_6000,
+						'id:label_string_map' => STRING_512,
 						'Image label type' => 'Custom label',
-						'id:label_string_image' => STRING_6000,
+						'id:label_string_image' => STRING_512,
 					],
 					'urls' => [
 						[
 							'action' => USER_ACTION_UPDATE,
 							'index' => 0,
-							'Name' => STRING_6000,
-							'URL' => STRING_6000,
+							'Name' => STRING_512,
+							'URL' => STRING_2200,
 							'Element' => 'Host'
 						]
 					],
 					'result' => [
 						'Owner' => ['Admin (Zabbix Administrator)'],
-						'Name' => STRING_128,
+						'Name' => STRING_64.' Check that fields are limited: '.STRING_32,
 						'Width' => '65535',
 						'Height' => '65535',
 						'Background image' => 'No image',
@@ -965,8 +953,7 @@ class testFormMapProperties extends CWebTest {
 					]
 				]
 			],
-			 */
-			// #23 Create with non-default parameters #1.
+			// #24 Create with non-default parameters #1.
 			[
 				[
 					'expected' => TEST_GOOD,
@@ -1012,7 +999,7 @@ class testFormMapProperties extends CWebTest {
 					]
 				]
 			],
-			// #24 Create with non-default parameters #2.
+			// #25 Create with non-default parameters #2.
 			[
 				[
 					'expected' => TEST_GOOD,
@@ -1058,7 +1045,7 @@ class testFormMapProperties extends CWebTest {
 					]
 				]
 			],
-			// #25 Create with non-default parameters #3.
+			// #26 Create with non-default parameters #3.
 			[
 				[
 					'expected' => TEST_GOOD,
@@ -1103,7 +1090,7 @@ class testFormMapProperties extends CWebTest {
 					]
 				]
 			],
-			// #26 Create with non-default parameters #4.
+			// #27 Create with non-default parameters #4.
 			[
 				[
 					'expected' => TEST_GOOD,
@@ -1147,7 +1134,7 @@ class testFormMapProperties extends CWebTest {
 					]
 				]
 			],
-			// #27 Advanced labels - Nothing.
+			// #28 Advanced labels - Nothing.
 			[
 				[
 					'expected' => TEST_GOOD,
@@ -1191,7 +1178,7 @@ class testFormMapProperties extends CWebTest {
 					]
 				]
 			],
-			// #28 Advanced labels - Element name.
+			// #29 Advanced labels - Element name.
 			[
 				[
 					'expected' => TEST_GOOD,
@@ -1234,7 +1221,7 @@ class testFormMapProperties extends CWebTest {
 					]
 				]
 			],
-			// #29 Advanced labels - Status only.
+			// #30 Advanced labels - Status only.
 			[
 				[
 					'expected' => TEST_GOOD,
@@ -1277,7 +1264,7 @@ class testFormMapProperties extends CWebTest {
 					]
 				]
 			],
-			// #30 Advanced labels - Label.
+			// #31 Advanced labels - Label.
 			[
 				[
 					'expected' => TEST_GOOD,
@@ -1320,7 +1307,7 @@ class testFormMapProperties extends CWebTest {
 					]
 				]
 			],
-			// #31 Advanced labels - different label types.
+			// #32 Advanced labels - different label types.
 			[
 				[
 					'expected' => TEST_GOOD,
@@ -1365,7 +1352,7 @@ class testFormMapProperties extends CWebTest {
 					]
 				]
 			],
-			// #32 Check creation of different type URLs.
+			// #33 Check creation of different type URLs.
 			[
 				[
 					'expected' => TEST_GOOD,
@@ -1384,9 +1371,7 @@ class testFormMapProperties extends CWebTest {
 							'Name' => '2 Group URL',
 							'URL' => 'http://test2-url@zabbix.com',
 							'Element' => 'Host group'
-						]
-						/**
-						 * TODO: Uncomment test case, when ZBX-26683 is fixed. Update test case if necessary.
+						],
 						[
 							'action' => USER_ACTION_ADD,
 							'Name' => '3 Image URL',
@@ -1405,7 +1390,6 @@ class testFormMapProperties extends CWebTest {
 							'URL' => 'http://test5-url@zabbix.com',
 							'Element' => 'Trigger'
 						]
-						 */
 					],
 					'result' => [
 						'Owner' => ['Admin (Zabbix Administrator)'],
@@ -1433,9 +1417,7 @@ class testFormMapProperties extends CWebTest {
 								'Name' => '2 Group URL',
 								'URL' => 'http://test2-url@zabbix.com',
 								'Element' => 'Host group'
-							]
-							/**
-							 * TODO: Uncomment test case, when ZBX-26683 is fixed. Update test case if necessary.
+							],
 							[
 								'Name' => '3 Image URL',
 								'URL' => 'http://test3-url@zabbix.com',
@@ -1451,14 +1433,11 @@ class testFormMapProperties extends CWebTest {
 								'URL' => 'http://test5-url@zabbix.com',
 								'Element' => 'Trigger'
 							]
-							 */
 						]
 					]
 				]
-			]
-			/**
-			 * TODO: Uncomment test case, when ZBX-26683 is fixed. Update test case if necessary.
-			// #33 Check sorting by name of URLs.
+			],
+			// #34 Check sorting by name of URLs.
 			[
 				[
 					'expected' => TEST_GOOD,
@@ -1511,7 +1490,7 @@ class testFormMapProperties extends CWebTest {
 						'Show suppressed problems' => false,
 						'URLs' => [
 							[
-								'Name' => '012345',
+								'Name' => '9 sysmap',
 								'URL' => 'test',
 								'Element' => 'Host'
 							],
@@ -1521,7 +1500,7 @@ class testFormMapProperties extends CWebTest {
 								'Element' => 'Host'
 							],
 							[
-								'Name' => '9 sysmap',
+								'Name' => '012345',
 								'URL' => 'test',
 								'Element' => 'Host'
 							],
@@ -1539,7 +1518,6 @@ class testFormMapProperties extends CWebTest {
 					]
 				]
 			]
-			 */
 		];
 	}
 
@@ -1560,7 +1538,7 @@ class testFormMapProperties extends CWebTest {
 			$form->query('class:table-forms-separator')->asMultifieldTable()->one()->fill($data['urls']);
 		}
 
-		$form->submit();
+		$form->submit()->waitUntilStalled();
 
 		if ($data['expected'] === TEST_BAD) {
 			$this->assertMessage(TEST_BAD, (array_key_exists('incorrect_data', $data)
@@ -1622,9 +1600,7 @@ class testFormMapProperties extends CWebTest {
 							'Name' => ' URL ₥₳₽1 name 📡 ',
 							'URL' => ' URL ₥₳₽1 📡 ',
 							'Element' => 'Host'
-						]
-						/*
-						 * Uncomment additional URL check, when ZBX-26683 is fixed. Update test case, if necessary
+						],
 						[
 							'action' => USER_ACTION_UPDATE,
 							'index' => 1,
@@ -1653,7 +1629,6 @@ class testFormMapProperties extends CWebTest {
 							'URL' => ' URL ₥₳₽5 📡 ',
 							'Element' => 'Trigger'
 						]
-						 */
 					],
 					'result' => [
 						'Owner' => ['Admin (Zabbix Administrator)'],
@@ -1685,14 +1660,12 @@ class testFormMapProperties extends CWebTest {
 								'Name' => 'URL ₥₳₽1 name 📡',
 								'URL' => 'URL ₥₳₽1 📡',
 								'Element' => 'Host'
-							]
-							/*
-							 * Uncomment additional URL check, when ZBX-26683 is fixed. Update test case, if necessary
+							],
 							[
 								'Name' => 'URL ₥₳₽2 name 📡',
 								'URL' => 'URL ₥₳₽2 📡',
 								'Element' => 'Host group'
-							]
+							],
 							[
 								'Name' => 'URL ₥₳₽3 name 📡',
 								'URL' => 'URL ₥₳₽3 📡',
@@ -1708,7 +1681,6 @@ class testFormMapProperties extends CWebTest {
 								'URL' => 'URL ₥₳₽5 📡',
 								'Element' => 'Trigger'
 							]
-							 */
 						]
 					]
 				]
@@ -1721,7 +1693,6 @@ class testFormMapProperties extends CWebTest {
 						'Name' => 'Update: maximum possible sysmap name length 128 characters test:'.STRING_64,
 						'Width' => '65535',
 						'Height' => '65535',
-						'Display problems' => 'Number of problems',
 						'Advanced labels' => true,
 						'Host group label type' => 'Custom label',
 						'id:label_string_hostgroup' => STRING_255,
@@ -1741,9 +1712,7 @@ class testFormMapProperties extends CWebTest {
 							'Name' => STRING_64.'Update: maximum possible urlname length 255 characters test 1 :'.STRING_128,
 							'URL' => STRING_2048,
 							'Element' => 'Host'
-						]
-						/*
-						 * Uncomment additional URL check, when ZBX-26683 is fixed. Update test case, if necessary
+						],
 						[
 							'action' => USER_ACTION_UPDATE,
 							'index' => 1,
@@ -1772,7 +1741,6 @@ class testFormMapProperties extends CWebTest {
 							'URL' => STRING_2048,
 							'Element' => 'Trigger'
 						]
-						 */
 					],
 					'result' => [
 						'Owner' => ['Admin (Zabbix Administrator)'],
@@ -1783,7 +1751,7 @@ class testFormMapProperties extends CWebTest {
 						'Automatic icon mapping' => '<manual>',
 						'Icon highlight' => false,
 						'Mark elements on trigger status change' => false,
-						'Display problems' => 'Number of problems',
+						'Display problems' => 'Expand single problem',
 						'Advanced labels' => true,
 						'Host group label type' => 'Custom label',
 						'Host label type' => 'Custom label',
@@ -1805,9 +1773,7 @@ class testFormMapProperties extends CWebTest {
 									STRING_128,
 								'URL' => STRING_2048,
 								'Element' => 'Host'
-							]
-							/*
-							 * Uncomment additional URL check, when ZBX-26683 is fixed. Update test case, if necessary
+							],
 							[
 								'Name' => STRING_64.'Update: maximum possible urlname length 255 characters test 2 :'.
 									STRING_128,
@@ -1832,7 +1798,6 @@ class testFormMapProperties extends CWebTest {
 								'URL' => STRING_2048,
 								'Element' => 'Trigger'
 							]
-							 */
 						]
 					]
 				]
@@ -1845,7 +1810,6 @@ class testFormMapProperties extends CWebTest {
 						'Name' => self::XSS_EXAMPLE.' update',
 						'Width' => '1000',
 						'Height' => '1000',
-						'Display problems' => 'Number of problems',
 						'Advanced labels' => true,
 						'Host group label type' => 'Custom label',
 						'id:label_string_hostgroup' => self::XSS_EXAMPLE,
@@ -1865,9 +1829,7 @@ class testFormMapProperties extends CWebTest {
 							'Name' => self::XSS_EXAMPLE,
 							'URL' => self::XSS_EXAMPLE,
 							'Element' => 'Host'
-						]
-						/*
-						 * Uncomment additional URL check, when ZBX-26683 is fixed. Update test case, if necessary
+						],
 						[
 							'action' => USER_ACTION_UPDATE,
 							'index' => 1,
@@ -1896,7 +1858,6 @@ class testFormMapProperties extends CWebTest {
 							'URL' => self::XSS_EXAMPLE,
 							'Element' => 'Trigger'
 						]
-						 */
 					],
 					'result' => [
 						'Owner' => ['Admin (Zabbix Administrator)'],
@@ -1907,7 +1868,7 @@ class testFormMapProperties extends CWebTest {
 						'Automatic icon mapping' => '<manual>',
 						'Icon highlight' => false,
 						'Mark elements on trigger status change' => false,
-						'Display problems' => 'Number of problems',
+						'Display problems' => 'Expand single problem',
 						'Advanced labels' => true,
 						'Host group label type' => 'Custom label',
 						'Host label type' => 'Custom label',
@@ -1928,9 +1889,7 @@ class testFormMapProperties extends CWebTest {
 								'Name' => self::XSS_EXAMPLE,
 								'URL' => self::XSS_EXAMPLE,
 								'Element' => 'Host'
-							]
-							/*
-							 * Uncomment additional URL check, when ZBX-26683 is fixed. Update test case, if necessary
+							],
 							[
 								'Name' => self::XSS_EXAMPLE.' 1',
 								'URL' => self::XSS_EXAMPLE,
@@ -1951,14 +1910,11 @@ class testFormMapProperties extends CWebTest {
 								'URL' => self::XSS_EXAMPLE,
 								'Element' => 'Trigger'
 							]
-							 */
 						]
 					]
 				]
 			],
-			/**
-			 * TODO: Uncomment test case, when ZBX-26089 is fixed. Update test case if necessary.
-			// # Update with string length which exceeds maximum allowed value.
+			// #23 Update with string length which exceeds maximum allowed value.
 			[
 				[
 					'expected' => TEST_GOOD,
@@ -1968,52 +1924,50 @@ class testFormMapProperties extends CWebTest {
 						'Height' => '65535',
 						'Advanced labels' => true,
 						'Host group label type' => 'Custom label',
-						'id:label_string_hostgroup' => STRING_6000,
+						'id:label_string_hostgroup' => STRING_512,
 						'Host label type' => 'Custom label',
-						'id:label_string_host' => STRING_6000,
+						'id:label_string_host' => STRING_512,
 						'Trigger label type' => 'Custom label',
-						'id:label_string_trigger' => STRING_6000,
+						'id:label_string_trigger' => STRING_512,
 						'Map label type' => 'Custom label',
-						'id:label_string_map' => STRING_6000,
+						'id:label_string_map' => STRING_512,
 						'Image label type' => 'Custom label',
-						'id:label_string_image' => STRING_6000,
-						'id:urls_0_name' => STRING_6000,
-						'id:urls_0_url' => STRING_6000
+						'id:label_string_image' => STRING_512,
 					],
 					'urls' => [
 						[
 							'action' => USER_ACTION_UPDATE,
 							'index' => 0,
-							'Name' => STRING_6000,
-							'URL' => STRING_6000,
+							'Name' => STRING_128.' Host name test '.STRING_32.' test url name '.STRING_128,
+							'URL' => STRING_2200,
 							'Element' => 'Host'
 						],
 						[
 							'action' => USER_ACTION_UPDATE,
-							'index' => 0,
-							'Name' => STRING_6000,
-							'URL' => STRING_6000,
+							'index' => 1,
+							'Name' => STRING_128.'Group name test '.STRING_32.' test url name '.STRING_128,
+							'URL' => STRING_2200,
 							'Element' => 'Host group'
 						],
 						[
 							'action' => USER_ACTION_UPDATE,
-							'index' => 0,
-							'Name' => STRING_6000,
-							'URL' => STRING_6000,
+							'index' => 2,
+							'Name' => STRING_128.'Image name test '.STRING_32.' test url name '.STRING_128,
+							'URL' => STRING_2200,
 							'Element' => 'Image'
 						],
 						[
 							'action' => USER_ACTION_UPDATE,
-							'index' => 0,
-							'Name' => STRING_6000,
-							'URL' => STRING_6000,
+							'index' => 3,
+							'Name' => STRING_128.'Map : name test '.STRING_32.' test url name '.STRING_128,
+							'URL' => STRING_2200,
 							'Element' => 'Map'
 						],
 						[
 							'action' => USER_ACTION_UPDATE,
-							'index' => 0,
-							'Name' => STRING_6000,
-							'URL' => STRING_6000,
+							'index' => 4,
+							'Name' => STRING_128.'Trigger name test '.STRING_32.'test url name'.STRING_128,
+							'URL' => STRING_2200,
 							'Element' => 'Trigger'
 						]
 					],
@@ -2044,27 +1998,27 @@ class testFormMapProperties extends CWebTest {
 						'Show suppressed problems' => false,
 						'URLs' => [
 							[
-								'Name' => STRING_255,
-								'URL' => STRING_2048,
-								'Element' => 'Host'
-							],
-							[
-								'Name' => STRING_255,
+								'Name' => STRING_128.'Group name test '.STRING_32.' test url name '.STRING_64,
 								'URL' => STRING_2048,
 								'Element' => 'Host group'
 							],
 							[
-								'Name' => STRING_255,
+								'Name' => STRING_128.' Host name test '.STRING_32.' test url name '.STRING_64,
+								'URL' => STRING_2048,
+								'Element' => 'Host'
+							],
+							[
+								'Name' => STRING_128.'Image name test '.STRING_32.' test url name '.STRING_64,
 								'URL' => STRING_2048,
 								'Element' => 'Image'
 							],
 							[
-								'Name' => STRING_255,
+								'Name' => STRING_128.'Map : name test '.STRING_32.' test url name '.STRING_64,
 								'URL' => STRING_2048,
 								'Element' => 'Map'
 							],
 							[
-								'Name' => STRING_255,
+								'Name' => STRING_128.'Trigger name test '.STRING_32.'test url name'.STRING_64,
 								'URL' => STRING_2048,
 								'Element' => 'Trigger'
 							]
@@ -2072,8 +2026,7 @@ class testFormMapProperties extends CWebTest {
 					]
 				]
 			],
-			 */
-			// #23 Update - change advanced label fields of existing map.
+			// #24 Update - change advanced label fields of existing map.
 			[
 				[
 					'expected' => TEST_GOOD,
@@ -2112,9 +2065,7 @@ class testFormMapProperties extends CWebTest {
 								'Name' => '1 Host URL',
 								'URL' => 'test',
 								'Element' => 'Host'
-							]
-							/*
-							 * Uncomment additional URL check, when ZBX-26683 is fixed. Update test case, if necessary
+							],
 							[
 								'Name' => '2 Host group URL',
 								'URL' => 'test',
@@ -2135,12 +2086,11 @@ class testFormMapProperties extends CWebTest {
 								'URL' => 'test',
 								'Element' => 'Trigger'
 							]
-							 */
 						]
 					]
 				]
 			],
-			// #4 Update - change other possible fields.
+			// #25 Update - change other possible fields.
 			[
 				[
 					'expected' => TEST_GOOD,
@@ -2164,13 +2114,11 @@ class testFormMapProperties extends CWebTest {
 						[
 							'action' => USER_ACTION_REMOVE,
 							'index' => 0
-						]
-						/*
-						 * Uncomment additional URL check, when ZBX-26683 is fixed. Update test case, if necessary
+						],
 						[
 							'action' => USER_ACTION_REMOVE,
 							'index' => 0
-						]
+						],
 						[
 							'action' => USER_ACTION_REMOVE,
 							'index' => 0
@@ -2183,7 +2131,6 @@ class testFormMapProperties extends CWebTest {
 							'action' => USER_ACTION_REMOVE,
 							'index' => 0
 						]
-						 */
 					],
 					'result' => [
 						'Owner' => ['guest'],
@@ -2234,7 +2181,7 @@ class testFormMapProperties extends CWebTest {
 			$form->query('class:table-forms-separator')->asMultifieldTable()->one()->fill($data['urls']);
 		}
 
-		$form->submit();
+		$form->submit()->waitUntilStalled();
 
 		if ($data['expected'] === TEST_BAD) {
 			$this->assertMessage(TEST_BAD, (array_key_exists('incorrect_data', $data)
@@ -2301,9 +2248,7 @@ class testFormMapProperties extends CWebTest {
 						'Name' => '1 Host URL 📰📰📰',
 						'URL' => 'test 📰📰📰',
 						'Element' => 'Host'
-					]
-					/*
-					 * Uncomment additional URL check, when ZBX-26683 is fixed. Update test case, if necessary
+					],
 					[
 						'Name' => '2 Image URL',
 						'URL' => 'test',
@@ -2324,7 +2269,6 @@ class testFormMapProperties extends CWebTest {
 						'URL' => STRING_2048,
 						'Element' => 'Map'
 					]
-					 */
 				]
 			]
 		];
@@ -2335,7 +2279,7 @@ class testFormMapProperties extends CWebTest {
 		$form = $this->query('id:sysmap-form')->waitUntilPresent()->asForm()->one();
 		$form->query('button:Clone')->one()->click();
 		$form->fill(['Name' => self::CLONED_MAP]);
-		$form->submit();
+		$form->submit()->waitUntilStalled();
 		$this->page->waitUntilReady();
 		$this->assertMessage(TEST_GOOD, 'Network map added');
 
