@@ -1643,7 +1643,7 @@ class testFormMapProperties extends CWebTest {
 		$table = $this->query('class:list-table')->asTable()->one();
 		$table->findRow('Name', self::MAP_UPDATE)->query('link:Properties')->one()->click();
 		$form = $this->query('id:sysmap-form')->waitUntilPresent()->asForm()->one();
-		$form->submit();
+		$form->submit()->waitUntilStalled();
 		$this->assertMessage(TEST_GOOD, 'Network map updated');
 		$this->assertEquals($old_hash, CDBHelper::getHash(self::HASH_SQL));
 	}

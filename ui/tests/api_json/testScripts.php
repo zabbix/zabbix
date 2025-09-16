@@ -5944,14 +5944,6 @@ class testScripts extends CAPITest {
 				],
 				'expected_error' => 'Invalid parameter "/1/manualinput_default_value": input does not match the provided pattern: \d.'
 			],
-			'Test script.update invalid "manualinput_default_value" value (no value provided)' => [
-				'script' => [
-					'scriptid' => 'update_manualinput_params',
-					'manualinput_validator_type' => ZBX_SCRIPT_MANUALINPUT_TYPE_STRING,
-					'manualinput_validator' => '\d'
-				],
-				'expected_error' => 'Invalid parameter "/1/manualinput_default_value": input does not match the provided pattern: \d.'
-			],
 			'Test script.update invalid scope change with "manualinput" parameters' => [
 				'script' => [
 					'scriptid' => 'update_manualinput_params',
@@ -7103,6 +7095,14 @@ class testScripts extends CAPITest {
 						'manualinput_validator' => '^([1-9]|[1-9][0-9]{1,3}|[1-5][0-9]{4}|6[0-4][0-9]{3}|65[0-4][0-9]{2}|655[0-2][0-9]|6553[0-5])$',
 						'manualinput_default_value' => '80'
 					]
+				],
+				'expected_error' => null
+			],
+			'Test script.update successful "manualinput_default_value" value (no value provided)' => [
+				'script' => [
+					'scriptid' => 'update_manualinput_params',
+					'manualinput_validator_type' => ZBX_SCRIPT_MANUALINPUT_TYPE_STRING,
+					'manualinput_validator' => '\d'
 				],
 				'expected_error' => null
 			]

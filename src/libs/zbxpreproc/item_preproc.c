@@ -262,22 +262,21 @@ int	item_preproc_delta(unsigned char value_type, zbx_variant_t *value, const zbx
 		int op_type, const zbx_variant_t *history_value_in, zbx_variant_t *history_value_out,
 		zbx_timespec_t *history_ts, char **errmsg)
 {
-	zbx_variant_t	value_num;
+	zbx_variant_t	value_num, value_old;
 
 	if (FAIL == zbx_item_preproc_convert_value_to_numeric(&value_num, value, value_type, errmsg))
 		return FAIL;
 
-	zbx_variant_copy(history_value_out, history_value_in);
-
+	zbx_variant_copy(&value_old, history_value_in);
 	zbx_variant_clear(value);
 
-	if (ZBX_VARIANT_NONE != history_value_out->type)
+	if (ZBX_VARIANT_NONE != value_old.type)
 	{
 		int	ret;
 
 		zbx_variant_copy(value, &value_num);
 
-		if (ZBX_VARIANT_DBL == value->type || ZBX_VARIANT_DBL == history_value_out->type)
+		if (ZBX_VARIANT_DBL == value->type || ZBX_VARIANT_DBL == value_old.type)
 		{
 			if (FAIL == zbx_variant_convert(value, ZBX_VARIANT_DBL))
 			{
@@ -290,10 +289,10 @@ int	item_preproc_delta(unsigned char value_type, zbx_variant_t *value, const zbx
 				return FAIL;
 			}
 
-			if (FAIL == zbx_variant_convert(history_value_out, ZBX_VARIANT_DBL))
+			if (FAIL == zbx_variant_convert(&value_old, ZBX_VARIANT_DBL))
 			{
 				*errmsg = zbx_dsprintf(*errmsg, "cannot convert value from %s to %s",
-						zbx_variant_type_desc(history_value_out),
+						zbx_variant_type_desc(&value_old),
 						zbx_get_variant_type_desc(ZBX_VARIANT_DBL));
 
 				zabbix_log(LOG_LEVEL_CRIT, "%s", *errmsg);
@@ -301,7 +300,7 @@ int	item_preproc_delta(unsigned char value_type, zbx_variant_t *value, const zbx
 				return FAIL;
 			}
 
-			ret = item_preproc_delta_float(value, ts, op_type, history_value_out, history_ts);
+			ret = item_preproc_delta_float(value, ts, op_type, &value_old, history_ts);
 		}
 		else
 		{
@@ -316,10 +315,10 @@ int	item_preproc_delta(unsigned char value_type, zbx_variant_t *value, const zbx
 				return FAIL;
 			}
 
-			if (FAIL == zbx_variant_convert(history_value_out, ZBX_VARIANT_UI64))
+			if (FAIL == zbx_variant_convert(&value_old, ZBX_VARIANT_UI64))
 			{
 				*errmsg = zbx_dsprintf(*errmsg, "cannot convert value from %s to %s",
-						zbx_variant_type_desc(history_value_out),
+						zbx_variant_type_desc(&value_old),
 						zbx_get_variant_type_desc(ZBX_VARIANT_UI64));
 
 				zabbix_log(LOG_LEVEL_CRIT, "%s", *errmsg);
@@ -327,7 +326,7 @@ int	item_preproc_delta(unsigned char value_type, zbx_variant_t *value, const zbx
 				return FAIL;
 			}
 
-			ret = item_preproc_delta_uint64(value, ts, op_type, history_value_out, history_ts);
+			ret = item_preproc_delta_uint64(value, ts, op_type, &value_old, history_ts);
 		}
 
 		if (SUCCEED != ret)
@@ -335,9 +334,9 @@ int	item_preproc_delta(unsigned char value_type, zbx_variant_t *value, const zbx
 	}
 
 	*history_ts = *ts;
-	zbx_variant_clear(history_value_out);
 	zbx_variant_copy(history_value_out, &value_num);
 	zbx_variant_clear(&value_num);
+	zbx_variant_clear(&value_old);
 
 	return SUCCEED;
 }
@@ -1188,13 +1187,16 @@ int	item_preproc_throttle_value(zbx_variant_t *value, const zbx_timespec_t *ts,
 
 	ret = zbx_variant_compare(value, history_value_in);
 
-	zbx_variant_clear(history_value_out);
-	zbx_variant_copy(history_value_out, value);
-
 	if (0 == ret)
+	{
+		*history_value_out = *history_value_in;
 		zbx_variant_clear(value);
+	}
 	else
+	{
+		zbx_variant_copy(history_value_out, value);
 		*history_ts = *ts;
+	}
 
 	return SUCCEED;
 }
@@ -1219,7 +1221,7 @@ int	item_preproc_throttle_timed_value(zbx_variant_t *value, const zbx_timespec_t
 		const zbx_variant_t *history_value_in, zbx_variant_t *history_value_out, zbx_timespec_t *history_ts,
 		char **errmsg)
 {
-	int	ret, timeout, period = 0;
+	int	ret, timeout, period = INT_MAX;
 
 	if (FAIL == zbx_is_time_suffix(params, &timeout, (int)strlen(params)))
 	{
@@ -1228,18 +1230,21 @@ int	item_preproc_throttle_timed_value(zbx_variant_t *value, const zbx_timespec_t
 		return FAIL;
 	}
 
-	ret = zbx_variant_compare(value, history_value_in);
-
-	zbx_variant_clear(history_value_out);
-	zbx_variant_copy(history_value_out, value);
-
-	if (ZBX_VARIANT_NONE != history_value_out->type)
+	if (ZBX_VARIANT_NONE != history_value_in->type)
 		period = ts->sec - history_ts->sec;
 
-	if (0 == ret && period < timeout )
+	ret = zbx_variant_compare(value, history_value_in);
+
+	if (0 == ret && period < timeout)
+	{
 		zbx_variant_clear(value);
+		*history_value_out = *history_value_in;
+	}
 	else
+	{
+		zbx_variant_copy(history_value_out, value);
 		*history_ts = *ts;
+	}
 
 	return SUCCEED;
 }
@@ -1251,6 +1256,7 @@ int	item_preproc_throttle_timed_value(zbx_variant_t *value, const zbx_timespec_t
  * Parameters: es               - [IN] execution environment                  *
  *             value            - [IN/OUT] value to process                   *
  *             params           - [IN] script to execute                      *
+ *             user_macros      - [IN] 1 if parameter contained user macros   *
  *             bytecode         - [IN] precompiled bytecode, can be NULL      *
  *             bytecode_in      - [IN] historical (previous) bytecode         *
  *             bytecode_out     - [IN] historical (next) bytecode             *
@@ -1261,8 +1267,9 @@ int	item_preproc_throttle_timed_value(zbx_variant_t *value, const zbx_timespec_t
  *               FAIL - otherwise                                             *
  *                                                                            *
  ******************************************************************************/
-int	item_preproc_script(zbx_es_t *es, zbx_variant_t *value, const char *params, const zbx_variant_t *bytecode_in,
-		zbx_variant_t *bytecode_out, const char *config_source_ip, char **errmsg)
+int	item_preproc_script(zbx_es_t *es, zbx_variant_t *value, const char *params, int user_macros,
+		const zbx_variant_t *bytecode_in, zbx_variant_t *bytecode_out, const char *config_source_ip,
+		char **errmsg)
 {
 	char		*output = NULL, *error = NULL;
 	const char	*code2;
@@ -1275,6 +1282,9 @@ int	item_preproc_script(zbx_es_t *es, zbx_variant_t *value, const char *params, 
 	{
 		if (SUCCEED != zbx_es_init_env(es, config_source_ip, errmsg))
 			return FAIL;
+
+		if (SUCCEED != zbx_es_globals_make_readonly(es, errmsg))
+			return FAIL;
 	}
 
 	if (ZBX_VARIANT_BIN != bytecode_in->type)
@@ -1286,11 +1296,11 @@ int	item_preproc_script(zbx_es_t *es, zbx_variant_t *value, const char *params, 
 
 		zbx_variant_set_bin(bytecode_out, zbx_variant_data_bin_create(code, (zbx_uint32_t)size));
 		zbx_free(code);
+
+		size = (int)zbx_variant_data_bin_get(bytecode_out->data.bin, (const void ** const)&code2);
 	}
 	else
-		zbx_variant_copy(bytecode_out, bytecode_in);
-
-	size = (int)zbx_variant_data_bin_get(bytecode_out->data.bin, (const void ** const)&code2);
+		size = (int)zbx_variant_data_bin_get(bytecode_in->data.bin, (const void ** const)&code2);
 
 	if (SUCCEED == zbx_es_execute(es, params, code2, size, value->data.str, &output, errmsg))
 	{
@@ -1308,6 +1318,9 @@ int	item_preproc_script(zbx_es_t *es, zbx_variant_t *value, const char *params, 
 				zbx_free(error);
 			}
 		}
+
+		if (ZBX_VARIANT_BIN != bytecode_out->type && 0 == user_macros)
+			*bytecode_out = *bytecode_in;
 
 		return SUCCEED;
 	}
