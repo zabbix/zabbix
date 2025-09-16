@@ -103,10 +103,10 @@ static void	*pp_worker_entry(void *args)
 	zbx_pp_worker_t		*worker = (zbx_pp_worker_t *)args;
 	zbx_pp_queue_t		*queue = worker->queue;
 	zbx_pp_task_t		*in;
-	char			*error = NULL, component[MAX_ID_LEN + 1];
+	char			*error = NULL, component[ZBX_LOG_COMPONENT_NAME_LEN];
 	int			err;
 
-	zbx_snprintf(component, sizeof(component), "%d", worker->id);
+	zbx_snprintf(component, sizeof(component), "preprocessing worker #%d", worker->id);
 	zbx_set_log_component(component, &worker->logger);
 
 	zbx_init_regexp_env();
@@ -114,8 +114,7 @@ static void	*pp_worker_entry(void *args)
 	if (0 != (err = zbx_init_thread_signal_handler()))
 		zabbix_log(LOG_LEVEL_WARNING, "cannot block signals: %s", zbx_strerror(err));
 
-	zabbix_log(LOG_LEVEL_INFORMATION, "thread started [%s #%d]",
-			get_process_type_string(ZBX_PROCESS_TYPE_PREPROCESSOR), worker->id);
+	zabbix_log(LOG_LEVEL_INFORMATION, "thread started");
 	worker->stop = 0;
 
 	pp_context_init(&worker->execute_ctx);
@@ -176,8 +175,7 @@ static void	*pp_worker_entry(void *args)
 	pp_task_queue_unlock(queue);
 	zbx_deinit_regexp_env();
 
-	zabbix_log(LOG_LEVEL_INFORMATION, "thread stopped [%s #%d]",
-			get_process_type_string(ZBX_PROCESS_TYPE_PREPROCESSOR), worker->id);
+	zabbix_log(LOG_LEVEL_INFORMATION, "thread stopped");
 
 	return NULL;
 }

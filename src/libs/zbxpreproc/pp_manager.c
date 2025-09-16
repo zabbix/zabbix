@@ -35,6 +35,7 @@
 #include "zbxrtc.h"
 #include "zbxpreprocbase.h"
 #include "zbx_rtc_constants.h"
+#include "zbxsupervisor_client.h"
 
 #ifdef HAVE_LIBXML2
 #	include <libxml/xpath.h>
@@ -1209,7 +1210,7 @@ static void	preprocessor_change_loglevel(zbx_pp_manager_t *manager, int directio
 	pp_manager_change_worker_loglevel(manager, proc_num, direction);
 }
 
-ZBX_THREAD_ENTRY(zbx_pp_manager_thread, args)
+void	*zbx_pp_manager_thread(void *args)
 {
 #define PP_MANAGER_DELAY_SEC	0
 #define PP_MANAGER_DELAY_NS	5e8
@@ -1221,11 +1222,13 @@ ZBX_THREAD_ENTRY(zbx_pp_manager_thread, args)
 	double					time_stat, time_idle = 0, time_flush, time_vps_update, time_trim,
 						time_reset;
 	zbx_timespec_t				timeout = {PP_MANAGER_DELAY_SEC, PP_MANAGER_DELAY_NS};
-	const zbx_thread_info_t			*info = &((zbx_thread_args_t *)args)->info;
-	int					server_num = ((zbx_thread_args_t *)args)->info.server_num,
-						process_num = ((zbx_thread_args_t *)args)->info.process_num;
-	unsigned char				process_type = ((zbx_thread_args_t *)args)->info.process_type;
-	zbx_thread_pp_manager_args		*pp_args = ((zbx_thread_args_t *)args)->args;
+	zbx_supervisor_unit_args_t		*unit_args = (zbx_supervisor_unit_args_t *)args;
+	const zbx_thread_info_t			*info = &unit_args->args.info;
+	int					server_num = info->server_num,
+						process_num = info->process_num,
+						err;
+	unsigned char				process_type = info->process_type;
+	const zbx_thread_pp_manager_args_t	*pp_args = (const zbx_thread_pp_manager_args_t *)unit_args->args.args;
 	zbx_pp_manager_t			*manager;
 	zbx_vector_pp_task_ptr_t		tasks;
 	zbx_uint32_t				rtc_msgs[] = {ZBX_RTC_LOG_LEVEL_INCREASE, ZBX_RTC_LOG_LEVEL_DECREASE};
@@ -1234,11 +1237,11 @@ ZBX_THREAD_ENTRY(zbx_pp_manager_thread, args)
 						counter_direct_num = 0, counter_direct_sz = 0, finished_peak_num = 0,
 						pending_peak_num = 0, counter_processed_num = 0;
 
-	const zbx_thread_pp_manager_args	*pp_manager_args_in = (const zbx_thread_pp_manager_args *)
-						(((zbx_thread_args_t *)args)->args);
 
 #define	STAT_INTERVAL	5	/* if a process is busy and does not sleep then update status not faster than */
 				/* once in STAT_INTERVAL seconds */
+
+	zbx_set_log_component("preprocessing manager", unit_args->logger);
 
 	zbx_setproctitle("%s #%d starting", get_process_type_string(process_type), process_num);
 
@@ -1247,6 +1250,9 @@ ZBX_THREAD_ENTRY(zbx_pp_manager_thread, args)
 
 	zbx_update_selfmon_counter(info, ZBX_PROCESS_STATE_BUSY);
 
+	if (0 != (err = zbx_init_thread_signal_handler()))
+		zabbix_log(LOG_LEVEL_WARNING, "cannot block signals: %s", zbx_strerror(err));
+
 	if (FAIL == zbx_ipc_service_start(&service, ZBX_IPC_SERVICE_PREPROCESSING, &error))
 	{
 		zabbix_log(LOG_LEVEL_CRIT, "cannot start preprocessing service: %s", error);
@@ -1254,9 +1260,8 @@ ZBX_THREAD_ENTRY(zbx_pp_manager_thread, args)
 		exit(EXIT_FAILURE);
 	}
 
-	if (NULL == (manager = zbx_pp_manager_create(pp_args->workers_num, pp_finished_task_cb,
-			(void *)&service, pp_manager_args_in->config_source_ip, pp_manager_args_in->config_timeout,
-			&error)))
+	if (NULL == (manager = zbx_pp_manager_create(pp_args->workers_num, pp_finished_task_cb, (void *)&service,
+			pp_args->config_source_ip, pp_args->config_timeout, &error)))
 	{
 		zabbix_log(LOG_LEVEL_CRIT, "cannot initialize preprocessing manager: %s", error);
 		zbx_free(error);
@@ -1278,6 +1283,8 @@ ZBX_THREAD_ENTRY(zbx_pp_manager_thread, args)
 	time_reset = time_stat;
 
 	zbx_setproctitle("%s #%d started", get_process_type_string(process_type), process_num);
+
+	zbx_supervisor_set_process_running(server_num);
 
 	while (ZBX_IS_RUNNING())
 	{
@@ -1448,6 +1455,7 @@ ZBX_THREAD_ENTRY(zbx_pp_manager_thread, args)
 	zbx_pp_manager_free(manager);
 
 	zbx_ipc_service_close(&service);
+	zbx_free(args);
 
 	zbx_setproctitle("%s #%d [terminated]", get_process_type_string(process_type), process_num);
 

@@ -78,7 +78,7 @@ typedef struct
 	int		config_timeout;
 	const char	*config_source_ip;
 }
-zbx_thread_pp_manager_args;
+zbx_thread_pp_manager_args_t;
 
 typedef struct zbx_pp_manager	zbx_pp_manager_t;
 
@@ -133,6 +133,6 @@ int	zbx_preprocessor_test(unsigned char value_type, const char *value, const zbx
 		zbx_pp_history_t *history, char **error);
 int	zbx_get_usage_stats_preprocessor(zbx_vector_dbl_t *usage, int *count, char **error);
 
-ZBX_THREAD_ENTRY(zbx_pp_manager_thread, args);
+void	*zbx_pp_manager_thread(void *args);
 
 #endif

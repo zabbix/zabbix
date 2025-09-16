@@ -39,6 +39,9 @@ typedef struct
 {
 	zbx_proc_startup_t	*runlevels;
 	int			config_timeout;
+	unsigned char		program_type;
+
+	const void		*args_pp_manager;
 }
 zbx_thread_supervisor_args_t;
 

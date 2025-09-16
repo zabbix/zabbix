@@ -24,6 +24,8 @@
 #include "zbxtimekeeper.h"
 #include "zbxself.h"
 
+#include "zbxpreproc.h"
+
 ZBX_VECTOR_IMPL(proc_info, zbx_proc_info_t)
 
 typedef struct
@@ -71,11 +73,30 @@ static int	runlevel_index_compare(const void *d1, const void *d2)
 
 typedef struct
 {
+	pthread_t		handle;
+	unsigned char		running;
+	zbx_log_component_t	logger;
+}
+zbx_supervisor_unit_t;
+
+typedef struct
+{
+	zbx_supervisor_unit_t	*units;
+	int			unit_num;
+	unsigned char		process_type;
+}
+zbx_supervisor_unit_set_t;
+
+typedef struct
+{
 	int				runlevel;
 	zbx_proc_startup_state_t	states[ZBX_RUNLEVEL_DEFAULT + 1];
 	zbx_hashset_t			runlevel_index;
 
 	zbx_vector_runlevel_sub_t	runlevel_subs;
+
+	const zbx_proc_startup_t	*runlevels;
+	zbx_supervisor_unit_set_t	unitsets[ZBX_PROCESS_TYPE_COUNT];
 }
 zbx_supervisor_t;
 
@@ -189,8 +210,10 @@ static void	supervisor_init(zbx_supervisor_t *sv, const zbx_proc_startup_t *runl
 
 	zbx_hashset_create(&sv->runlevel_index, 0, runlevel_index_hash, runlevel_index_compare);
 	zbx_vector_runlevel_sub_create(&sv->runlevel_subs);
-	memset(sv->states, 0, sizeof(sv->states));
 	sv->runlevel = 0;
+	sv->runlevels = runlevels;
+	memset(sv->states, 0, sizeof(sv->states));
+	memset(sv->unitsets, 0, sizeof(sv->unitsets));
 
 	for (int i = 0; i <= ZBX_RUNLEVEL_DEFAULT; i++)
 	{
@@ -199,9 +222,14 @@ static void	supervisor_init(zbx_supervisor_t *sv, const zbx_proc_startup_t *runl
 			zbx_proc_info_t        *proc_info = &runlevels[i].processes.values[j];
 
 			if (PROCESS_OWNER_MAIN == proc_info->owner)
+			{
 				sv->states[i].pending_external_num++;
+			}
 			else if (PROCESS_OWNER_SUPERVISOR == proc_info->owner)
+			{
 				sv->states[i].pending_local_num++;
+				sv->unitsets[proc_info->type].unit_num++;
+			}
 
 			zbx_runlevel_index_t	ri_local = {
 					.proc_index = proc_info->index,
@@ -211,6 +239,20 @@ static void	supervisor_init(zbx_supervisor_t *sv, const zbx_proc_startup_t *runl
 
 			zbx_hashset_insert(&sv->runlevel_index, &ri_local, sizeof(ri_local));
 		}
+	}
+
+	for (int i = 0; i < ZBX_PROCESS_TYPE_COUNT; i++)
+	{
+		zbx_supervisor_unit_set_t	*set = &sv->unitsets[i];
+
+		if (0 == set->unit_num)
+			continue;
+
+		set->units = (zbx_supervisor_unit_t *)zbx_malloc(NULL, sizeof(zbx_supervisor_unit_t) *
+				(size_t)set->unit_num);
+		memset(set->units, 0, sizeof(zbx_supervisor_unit_t) * (size_t)set->unit_num);
+
+		set->process_type = i;
 	}
 
 	(void)supervisor_update_runlevel(sv);
@@ -230,6 +272,34 @@ static void	supervisor_clear(zbx_supervisor_t *sv)
 {
 	for (int i = 0; i < sv->runlevel_subs.values_num; i++)
 		zbx_ipc_client_release(sv->runlevel_subs.values[i].client);
+
+	for (size_t i = 0; i < ZBX_PROCESS_TYPE_COUNT; i++)
+	{
+		zbx_supervisor_unit_set_t	*set = &sv->unitsets[i];
+
+		if (0 == set->unit_num)
+			continue;
+
+		for (int j = 0; j < set->unit_num; j++)
+		{
+			zbx_supervisor_unit_t	*unit = &set->units[j];
+
+			if (0 == unit->running)
+				continue;
+
+			void	*retval;
+			int	err;
+
+			if (0 != (err = pthread_join(unit->handle, &retval)))
+			{
+				zabbix_log(LOG_LEVEL_WARNING, "Failed to join process #%lu thread: %s", i + 1,
+						zbx_strerror(err));
+			}
+
+		}
+
+		zbx_free(set->units);
+	}
 
 	zbx_vector_runlevel_sub_destroy(&sv->runlevel_subs);
 	zbx_hashset_destroy(&sv->runlevel_index);
@@ -337,6 +407,194 @@ static void	supervisor_handle_runlevel_sub(zbx_supervisor_t *sv, zbx_ipc_client_
 
 /******************************************************************************
  *                                                                            *
+ * Purpose: retrieve supervisor unit by process type and number               *
+ *                                                                            *
+ * Parameters: sv   - [IN] supervisor instance                                *
+ *             type - [IN] process type                                       *
+ *             num  - [IN] process number (1-based)                           *
+ *                                                                            *
+ * Return value: supervisor unit                                              *
+ *                                                                            *
+ ******************************************************************************/
+zbx_supervisor_unit_t	*supervisor_get_unit(zbx_supervisor_t *sv, unsigned char type, int num)
+{
+	if (ZBX_PROCESS_TYPE_COUNT <= type)
+	{
+		THIS_SHOULD_NEVER_HAPPEN_MSG("Unknown process type: %d", type);
+		exit(EXIT_FAILURE);
+	}
+
+	if (0 >= num || num > sv->unitsets[type].unit_num)
+	{
+		THIS_SHOULD_NEVER_HAPPEN_MSG("Process number %d, is outside configured range [%d, %d] for process of"
+				" type %d", num, 1, sv->unitsets[type].unit_num, type);
+		exit(EXIT_FAILURE);
+	}
+
+	return &sv->unitsets[type].units[num - 1];
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: start a unit thread with specified entry function and arguments   *
+ *                                                                            *
+ * Parameters: unit         - [IN] supervisor unit to start                   *
+ *             thread_entry - [IN] thread entry function                      *
+ *             args         - [IN] thread arguments structure                 *
+ *                                                                            *
+ ******************************************************************************/
+static void	supervisor_unit_start(zbx_supervisor_unit_t *unit, void *(*thread_entry)(void *),
+		const zbx_thread_args_t *args)
+{
+	int				err;
+	pthread_attr_t			attr;
+	zbx_supervisor_unit_args_t	*unit_args;
+
+	unit_args = (zbx_supervisor_unit_args_t *)zbx_malloc(NULL, sizeof(zbx_supervisor_unit_args_t));
+	unit_args->args = *args;
+	unit_args->logger = &unit->logger;
+
+	zbx_pthread_init_attr(&attr);
+	if (0 != (err = pthread_create(&unit->handle, &attr, thread_entry, (void *)unit_args)))
+	{
+		zabbix_log(LOG_LEVEL_CRIT, "cannot create thread: %s", zbx_strerror(err));
+		exit(EXIT_FAILURE);
+	}
+
+	unit->running = 1;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: start units threads to current runlevel                           *
+ *                                                                            *
+ * Parameters: sv            - [IN] supervisor instance                       *
+ *             args          - [IN] supervisor thread arguments               *
+ *             runlevel_last - [IN] previous runlevel                         *
+ *                                                                            *
+ ******************************************************************************/
+static void	supervisor_start_units(zbx_supervisor_t *sv, const zbx_thread_supervisor_args_t *args,
+		int runlevel_last)
+{
+	zbx_thread_args_t	thread_args;
+
+	thread_args.info.program_type = args->program_type;
+
+	for (int i = runlevel_last + 1; i <= sv->runlevel; i++)
+	{
+		const zbx_vector_proc_info_t	*processes = &sv->runlevels[i].processes;
+
+		for (int j = 0; j < processes->values_num; j++)
+		{
+			zbx_proc_info_t	*info = &processes->values[j];
+
+			if (PROCESS_OWNER_SUPERVISOR != info->owner)
+				continue;
+
+			zbx_supervisor_unit_t	*unit = supervisor_get_unit(sv, info->type, info->num);
+
+			thread_args.info.process_type = info->type;
+			thread_args.info.process_num = info->num;
+			thread_args.info.server_num = info->index;
+			thread_args.args = NULL;
+
+			switch (thread_args.info.process_type)
+			{
+				case ZBX_PROCESS_TYPE_PREPROCMAN:
+					thread_args.args = (void *)args->args_pp_manager;
+					supervisor_unit_start(unit, zbx_pp_manager_thread, &thread_args);
+					break;
+			}
+		}
+	}
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: change log level for a unit set representing one type of Zabbix   *
+ *          processes                                                         *
+ *                                                                            *
+ * Parameters: set       - [IN] supervisor unit set                           *
+ *             proc_num  - [IN] process number (0 for all processes)          *
+ *             direction - [IN] log level change direction (1 increase,       *
+ *                              -1 decrease)                                  *
+ *                                                                            *
+ ******************************************************************************/
+static void	supervisor_unitset_change_loglevel(zbx_supervisor_unit_set_t *set, int proc_num, int direction)
+{
+	if (0 == proc_num)
+	{
+		for (int i = 0; i < set->unit_num; i++)
+			zbx_change_component_log_level(&set->units[i].logger, direction);
+
+		return;
+	}
+
+	if (0 > proc_num || proc_num > set->unit_num)
+	{
+		zabbix_log(LOG_LEVEL_INFORMATION, "Cannot change log level for %s #%d:"
+				" no such instance", get_process_type_string(set->process_type), proc_num);
+	}
+
+	zbx_change_component_log_level(&set->units[proc_num - 1].logger, direction);
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: handle log level change request for supervisor managed threads    *
+ *                                                                            *
+ * Parameters: sv        - [IN] supervisor instance                           *
+ *             direction - [IN] log level change direction (1 increase,       *
+ *                              -1 decrease)                                  *
+ *             data      - [IN] serialized command target specification       *
+ *                                                                            *
+ ******************************************************************************/
+static void	supervisor_change_loglevel(zbx_supervisor_t *sv, int direction, const unsigned char *data)
+{
+	char	*error = NULL;
+	pid_t	pid;
+	int	proc_type, proc_num;
+
+	if (SUCCEED != zbx_rtc_get_command_target((const char *)data, &pid, &proc_type, &proc_num, NULL, &error))
+	{
+		zabbix_log(LOG_LEVEL_WARNING, "Cannot change log level: %s", error);
+		zbx_free(error);
+		return;
+	}
+
+	if (0 != pid)
+	{
+		zabbix_log(LOG_LEVEL_WARNING, "Cannot change log level for thread by pid");
+		return;
+	}
+
+	if (ZBX_PROCESS_TYPE_UNKNOWN == proc_type)
+	{
+		for (int i = 0; i < ZBX_PROCESS_TYPE_COUNT; i++)
+		{
+			zbx_supervisor_unit_set_t	*set = &sv->unitsets[i];
+
+			if (0 == set->unit_num)
+				continue;
+
+			supervisor_unitset_change_loglevel(set, proc_num, direction);
+		}
+	}
+	else
+	{
+		if (0 > proc_type || ZBX_PROCESS_TYPE_COUNT <= proc_type)
+		{
+			THIS_SHOULD_NEVER_HAPPEN_MSG("attempting to change log level of unknown process type: %d",
+					proc_type);
+			return;
+		}
+
+		supervisor_unitset_change_loglevel(&sv->unitsets[proc_type], proc_num, direction);
+	}
+}
+
+/******************************************************************************
+ *                                                                            *
  * Purpose: process entry function                                            *
  *                                                                            *
  ******************************************************************************/
@@ -345,16 +603,17 @@ ZBX_THREAD_ENTRY(zbx_supervisor_thread, args)
 #define DEFAULT_SLEEP_TIME	1
 
 	const zbx_thread_info_t		*info = &((zbx_thread_args_t *)args)->info;
-	int				server_num = ((zbx_thread_args_t *)args)->info.server_num,
-					process_num = ((zbx_thread_args_t *)args)->info.process_num;
-	unsigned char			process_type = ((zbx_thread_args_t *)args)->info.process_type;
+	int				server_num = info->server_num,
+					process_num = info->process_num;
+	unsigned char			process_type = info->process_type;
 	zbx_thread_supervisor_args_t	*local_args = (zbx_thread_supervisor_args_t *)((zbx_thread_args_t *)args)->args;
 	zbx_proc_startup_t		*runlevels = local_args->runlevels;
 	zbx_ipc_service_t		service;
 	char				*error = NULL;
-	zbx_uint32_t			rtc_msgs[] = {ZBX_RTC_SHUTDOWN};
+	zbx_uint32_t			rtc_msgs[] = {ZBX_RTC_LOG_LEVEL_INCREASE, ZBX_RTC_LOG_LEVEL_DECREASE};
 	zbx_timespec_t			sleeptime = {1, 0};
 	zbx_supervisor_t		sv;
+	int				runlevel_last = 0;
 
 	zbx_setproctitle("%s #%d starting", get_process_type_string(process_type), process_num);
 
@@ -368,15 +627,24 @@ ZBX_THREAD_ENTRY(zbx_supervisor_thread, args)
 		exit(EXIT_FAILURE);
 	}
 
-	zbx_rtc_subscribe_service(ZBX_PROCESS_TYPE_SUPERVISOR, 0, rtc_msgs, ARRSIZE(rtc_msgs),
-			local_args->config_timeout, ZBX_IPC_SERVICE_SUPERVISOR);
-
 	supervisor_init(&sv, runlevels);
 
-	zbx_supervisor_set_process_running(server_num);
+	for (int i = 0; i < ZBX_PROCESS_TYPE_COUNT; i++)
+	{
+		zbx_supervisor_unit_set_t	*set = &sv.unitsets[i];
+
+		if (0 == set->unit_num)
+			continue;
+
+		zbx_rtc_subscribe_service(i, 0, rtc_msgs, ARRSIZE(rtc_msgs), local_args->config_timeout,
+				ZBX_IPC_SERVICE_SUPERVISOR);
+
+	}
 
 	zbx_setproctitle("%s #%d started at runlevel %d", get_process_type_string(process_type), process_num,
 			sv.runlevel);
+
+	zbx_supervisor_set_process_running(server_num);
 
 	while (ZBX_IS_RUNNING())
 	{
@@ -404,6 +672,12 @@ ZBX_THREAD_ENTRY(zbx_supervisor_thread, args)
 				case ZBX_SUPERVISOR_RUNLEVEL_WAIT:
 					supervisor_handle_runlevel_sub(&sv, client, message->data);
 					break;
+				case ZBX_RTC_LOG_LEVEL_INCREASE:
+					supervisor_change_loglevel(&sv, 1, message->data);
+					break;
+				case ZBX_RTC_LOG_LEVEL_DECREASE:
+					supervisor_change_loglevel(&sv, -1, message->data);
+					break;
 				case ZBX_RTC_SHUTDOWN:
 					goto out;
 				default:
@@ -415,6 +689,12 @@ ZBX_THREAD_ENTRY(zbx_supervisor_thread, args)
 
 		if (NULL != client)
 			zbx_ipc_client_release(client);
+
+		if (runlevel_last != sv.runlevel)
+		{
+			supervisor_start_units(&sv, local_args, runlevel_last);
+			runlevel_last = sv.runlevel;
+		}
 	}
 
 out:

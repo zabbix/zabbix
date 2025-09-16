@@ -1728,7 +1728,7 @@ static void	start_processes(zbx_socket_t *listen_sock, zbx_proc_startup_t *runle
 			.config_timeout = zbx_config_timeout
 		};
 
-	zbx_thread_pp_manager_args	preproc_man_args =
+	zbx_thread_pp_manager_args_t	preproc_man_args =
 		{
 			.workers_num = config_forks[ZBX_PROCESS_TYPE_PREPROCESSOR],
 			.config_timeout = zbx_config_timeout,
@@ -1815,10 +1815,12 @@ static void	start_processes(zbx_socket_t *listen_sock, zbx_proc_startup_t *runle
 			.config_service_manager_sync_frequency = config_service_manager_sync_frequency
 		};
 
-	zbx_thread_supervisor_args_t	prochost_args =
+	zbx_thread_supervisor_args_t	supervisor_args =
 		{
 			.runlevels = runlevels,
-			.config_timeout = zbx_config_timeout
+			.config_timeout = zbx_config_timeout,
+			.program_type = zbx_program_type,
+			.args_pp_manager = &preproc_man_args
 		};
 
 	thread_args.info.program_type = zbx_program_type;
@@ -1842,7 +1844,7 @@ static void	start_processes(zbx_socket_t *listen_sock, zbx_proc_startup_t *runle
 		{
 			case ZBX_PROCESS_TYPE_SUPERVISOR:
 				threads_flags[i] = ZBX_THREAD_PRIORITY_NONE;
-				thread_args.args = &prochost_args;
+				thread_args.args = &supervisor_args;
 				zbx_thread_start(zbx_supervisor_thread, &thread_args, &zbx_threads[i]);
 				break;
 			case ZBX_PROCESS_TYPE_SERVICEMAN:
@@ -1925,11 +1927,6 @@ static void	start_processes(zbx_socket_t *listen_sock, zbx_proc_startup_t *runle
 			case ZBX_PROCESS_TYPE_TASKMANAGER:
 				thread_args.args = &taskmanager_args;
 				zbx_thread_start(taskmanager_thread, &thread_args, &zbx_threads[i]);
-				break;
-			case ZBX_PROCESS_TYPE_PREPROCMAN:
-				threads_flags[i] = ZBX_THREAD_PRIORITY_COLLECTOR;
-				thread_args.args = &preproc_man_args;
-				zbx_thread_start(zbx_pp_manager_thread, &thread_args, &zbx_threads[i]);
 				break;
 #ifdef HAVE_OPENIPMI
 			case ZBX_PROCESS_TYPE_IPMIMANAGER:

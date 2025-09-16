@@ -16,12 +16,21 @@
 #define ZABBIX_SUPERVISOR_CLIENT_H
 
 #include "zbxcommon.h"
+#include "zbxthreads.h"
+#include "zbx_rtc_constants.h"
 
 #define ZBX_IPC_SERVICE_SUPERVISOR	"supervisor"
 
-#define ZBX_SUPERVISOR_PROC_RUNNING	1
-#define ZBX_SUPERVISOR_RUNLEVEL_WAIT	10
-#define ZBX_SUPERVISOR_RUNLEVEL_OK	11
+#define ZBX_SUPERVISOR_PROC_RUNNING	(ZBX_IPC_RTC_MAX + 1)
+#define ZBX_SUPERVISOR_RUNLEVEL_WAIT	(ZBX_IPC_RTC_MAX + 10)
+#define ZBX_SUPERVISOR_RUNLEVEL_OK	(ZBX_IPC_RTC_MAX + 11)
+
+typedef struct
+{
+	zbx_thread_args_t	args;
+	zbx_log_component_t	*logger;
+}
+zbx_supervisor_unit_args_t;
 
 void	zbx_supervisor_set_process_running(int proc_index);
 void	zbx_supervisor_wait_for_runlevel(int runlevel);
