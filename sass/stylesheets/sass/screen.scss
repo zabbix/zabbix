@@ -2587,6 +2587,11 @@ div {
 	display: flex;
 	flex-wrap: wrap;
 	gap: 2px 3px;
+
+	.tag {
+		margin-top: 1px;
+		margin-bottom: 1px;
+	}
 }
 
 .tag {
