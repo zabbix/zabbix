@@ -438,7 +438,10 @@ $translate_strings = [
 		'within ranges %1$s' => _('within ranges %1$s'),
 		'one of %1$s' => _('one of %1$s'),
 		' or ' => _(' or '),
-		'%1$s: %2$s' => _('%1$s: %2$s')
+		'%1$s: %2$s' => _('%1$s: %2$s'),
+		'This value is not a valid file.' => _('This value is not a valid file.'),
+		'File size must be less than %1$s.' => _('File size must be less than %1$s.'),
+		'File format is unsupported.' => _('File format is unsupported.')
 	],
 	'main.js' => [
 		'S_EXPAND' => _('Expand'),
