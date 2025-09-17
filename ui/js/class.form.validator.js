@@ -1355,14 +1355,21 @@ class CFormValidator {
 	 * @returns {Object}
 	 */
 	#validateFile(rules, value) {
-		if (value && !(value instanceof File)) {
+		if (!(value instanceof File)) {
 			return {
 				result: CFormValidator.ERROR,
 				error: this.#getMessage(rules, 'type', t('This value is not a valid file.'))
 			};
 		}
 
-		if (rules.file['max-size'] && value && value.size > rules.file['max-size']) {
+		if ('required' in rules && value.size == 0) {
+			return {
+				result: CFormValidator.ERROR,
+				error: this.#getMessage(rules, 'required', t('This field cannot be empty.'))
+			};
+		}
+
+		if (rules.file['max-size'] && value.size > rules.file['max-size']) {
 			return {
 				result: CFormValidator.ERROR,
 				error: this.#getMessage(rules, 'file',
@@ -1370,8 +1377,7 @@ class CFormValidator {
 			};
 		}
 
-		if (rules.file.type !== 'file') {
-
+		if (rules.file.type !== 'file' && value.size > 0) {
 			if (!value.type.startsWith(`${rules.file['type']}/`)) {
 				return {
 					result: CFormValidator.ERROR,

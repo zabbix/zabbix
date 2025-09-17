@@ -30,7 +30,9 @@ class CFieldFile extends CField {
 			return null;
 		}
 
-		return this._field.files[0] ? this._field.files[0] : null;
+		return this._field.files[0]
+			? this._field.files[0]
+			: new File([], '');
 	}
 
 	focusErrorField() {

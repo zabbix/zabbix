@@ -55,14 +55,9 @@ const administration_image_edit = {
 					return;
 				}
 
-				const form_data = new FormData();
-				Object.keys(fields).forEach(key => {
-					form_data.append(key, fields[key]);
-				});
-
 				fetch(url.href, {
 					method: 'POST',
-					body: form_data
+					body: objectToFormData(fields)
 				})
 					.then((response) => response.json())
 					.then((response) => {
