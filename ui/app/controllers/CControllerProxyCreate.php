@@ -79,7 +79,7 @@ class CControllerProxyCreate extends CController {
 			],
 			'allowed_addresses' => ['db proxy.allowed_addresses',
 				'use' => [CIPRangeParser::class, [
-					'v6' => ZBX_HAVE_IPV6, 'dns' => true, 'usermacros' => true, 'macros' => false
+					'v6' => ZBX_HAVE_IPV6, 'dns' => true, 'usermacros' => false, 'macros' => false
 				],
 					'messages' => ['use' => _('Invalid address.')]
 				],
@@ -116,7 +116,7 @@ class CControllerProxyCreate extends CController {
 					'messages' => ['regex' => _('PSK must contain only hexadecimal characters.')]
 				],
 				['db proxy.tls_psk', 'required', 'not_empty', 'when' => [['tls_accept_psk', true], ['update_psk', true]]],
-				['db proxy.tls_psk_identity', 'required', 'not_empty',
+				['db proxy.tls_psk', 'required', 'not_empty',
 					'when' => [['tls_connect', 'in' => [HOST_ENCRYPTION_PSK]], ['update_psk', true]]
 				]
 			],
