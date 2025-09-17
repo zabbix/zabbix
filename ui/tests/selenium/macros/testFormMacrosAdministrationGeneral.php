@@ -960,8 +960,8 @@ class testFormMacrosAdministrationGeneral extends testFormMacros {
 		$this->query('button:Update')->one()->click();
 
 		// Inline error should be present in the last macro in the list, therefore the index is obtained by counting macros.
-		$count = count($this->getMacros()) - 1;
-		$inline_error = ['id:macros_'.$count.'_value' => 'Value: Incorrect syntax near "secret/path:key".'];
+		$index = count($this->getMacros()) - 1;
+		$inline_error = ['id:macros_'.$index.'_value' => 'Value: Incorrect syntax near "secret/path:key".'];
 
 		$this->assertInlineError($this->query('name:macrosForm')->asForm()->one(), $inline_error);
 
