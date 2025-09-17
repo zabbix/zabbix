@@ -66,9 +66,24 @@ void	zbx_supervisor_client_clear(zbx_supervisor_client_t *svc)
 	zbx_ipc_async_socket_close(&svc->asock);
 }
 
+/******************************************************************************
+ *                                                                            *
+ * Purpose: poll supervisor for the required runlevel completion             *
+ *                                                                            *
+ * Parameters: svc      - [IN/OUT] supervisor client connection               *
+ *             runlevel - [IN] target runlevel to wait for                    *
+ *             error    - [OUT] error message if operation fails              *
+ *                                                                            *
+ * Return value: SUCCEED - runlevel reached successfully                      *
+ *               FAIL    - runlevel not reached yet or communication error,   *
+ *                         in case of error the message will be stored in     *
+ *                         error                                              *
+ * Comments: This function will wait up to one second for supervisor response.*
+ *                                                                            *
+ ******************************************************************************/
 int	zbx_supervisor_client_poll(zbx_supervisor_client_t *svc, int runlevel, char **error)
 {
-	unsigned char		data[sizeof(runlevel)];
+	unsigned char	data[sizeof(runlevel)];
 
 	if (svc->last_runlevel != runlevel)
 	{
