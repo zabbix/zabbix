@@ -25,6 +25,7 @@ $form = (new CForm('post'))
 	->setName('proxy_form')
 	->addStyle('display: none;')
 	->addItem(getMessages())
+	->addVar('update_psk', '0')
 	->addVar('proxyid', $data['proxyid']);
 
 // Enable form submitting on Enter.

@@ -66,6 +66,8 @@ window.proxy_edit_popup = new class {
 	}
 
 	_changePsk() {
+		document.getElementById('update_psk').value = 1;
+
 		for (const element of this.form_element.querySelectorAll('.js-tls-psk-change')) {
 			element.remove();
 		}
@@ -124,6 +126,8 @@ window.proxy_edit_popup = new class {
 		}
 
 		if (this.display_change_psk) {
+			document.getElementById('update_psk').value = 0;
+
 			for (const id of ['tls_psk_identity', 'tls_psk']) {
 				document.getElementById(id).disabled = true;
 			}
@@ -136,6 +140,8 @@ window.proxy_edit_popup = new class {
 				!(operating_mode_active && tls_accept_psk || !operating_mode_active && tls_connect_psk);
 		}
 		else {
+			document.getElementById('update_psk').value = tls_connect_psk || tls_accept_psk ? 1 : 0;
+
 			for (const element of this.form_element.querySelectorAll('.js-tls-psk-identity, .js-tls-psk')) {
 				element.style.display = tls_connect_psk || tls_accept_psk ? '' : 'none';
 			}
@@ -186,11 +192,9 @@ window.proxy_edit_popup = new class {
 
 	submit() {
 		const fields = this.form.getAllValues();
-		fields.update_psk = 0
 
 		if (this.proxyid !== null) {
 			fields.proxyid = this.proxyid;
-			fields.update_psk = !this.display_change_psk ? 1 : 0;
 		}
 		else if (this.clone_proxyid !== null) {
 			fields.clone_proxyid = this.clone_proxyid;

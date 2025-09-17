@@ -89,7 +89,7 @@ class CControllerProxyUpdate extends CController {
 				'in' => [HOST_ENCRYPTION_NONE, HOST_ENCRYPTION_PSK, HOST_ENCRYPTION_CERTIFICATE],
 				'when' => ['operating_mode', 'in' => [PROXY_OPERATING_MODE_PASSIVE]]
 			],
-			'update_psk' => ['integer'],
+			'update_psk' => ['boolean'],
 			'tls_psk_identity' => [
 				['db proxy.tls_psk_identity', 'required', 'not_empty',
 					'when' => [['tls_accept_psk', true], ['update_psk', true]]
