@@ -63,7 +63,7 @@ int	zbx_process_history_data(zbx_history_recv_item_t *items, zbx_agent_value_t *
 		size_t values_num, zbx_proxy_suppress_t *nodata_win);
 
 void	zbx_update_proxy_data(zbx_dc_proxy_t *proxy, char *version_str, int version_int, time_t lastaccess,
-		zbx_uint64_t flags_add);
+		int pending_history, zbx_uint64_t flags_add);
 
 int	zbx_process_agent_history_data(zbx_socket_t *sock, struct zbx_json_parse *jp, zbx_timespec_t *ts, char **info);
 int	zbx_process_sender_history_data(zbx_socket_t *sock, struct zbx_json_parse *jp, zbx_timespec_t *ts, char **info);
@@ -187,6 +187,12 @@ int	zbx_db_with_trigger_itemid(const zbx_db_trigger *trigger, char **replace_to,
 
 int	zbx_macro_event_trigger_expr_resolv(zbx_macro_resolv_data_t *p, va_list args, char **replace_to,
 		char **data, char *error, size_t maxerrlen);
+int	zbx_macro_message_common_resolv(zbx_macro_resolv_data_t *p, zbx_dc_um_handle_t	*um_handle,
+		const zbx_uint64_t *actionid, const zbx_db_event *event, const zbx_db_event *r_event,
+		const zbx_uint64_t *userid, const zbx_dc_host_t *dc_host, const zbx_db_alert *alert,
+		const zbx_service_alarm_t *service_alarm, const zbx_db_service *service, const char *tz,
+		zbx_vector_uint64_t *item_hosts, const zbx_vector_uint64_t **trigger_hosts, zbx_db_event **cause_event,
+		zbx_db_event **cause_recovery_event, char **replace_to, char **data, char *error, size_t maxerrlen);
 
 int	zbx_db_trigger_recovery_user_and_func_macro_eval_resolv(zbx_token_type_t token_type, char **value,
 		char **error, va_list args);
@@ -194,6 +200,8 @@ int	zbx_db_trigger_supplement_eval_resolv(zbx_token_type_t token_type, char **va
 
 int	zbx_db_item_value_type_changed_category(unsigned char value_type_new, unsigned char value_type_old);
 void	zbx_db_update_item_map_links(const zbx_vector_uint64_t *itemids);
+int	zbx_db_get_expression_macro_result(const zbx_db_event *event, char *data, zbx_strloc_t *loc,
+		zbx_timespec_t *ts, char **replace_to, char **error);
 
 typedef struct
 {
