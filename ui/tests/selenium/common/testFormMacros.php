@@ -2020,7 +2020,7 @@ abstract class testFormMacros extends CLegacyWebTest {
 					]
 				]
 			],
-			// #4 Misssing path start - HashiCorp.
+			// #4 Missing path start - HashiCorp.
 			[
 				[
 					'expected' => TEST_BAD,
