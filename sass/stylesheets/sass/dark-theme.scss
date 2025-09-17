@@ -250,7 +250,13 @@ $toc-title-bg-color: #4f4f4f;
 		}
 
 		.link-alt.green {
-			color: #2f5932;
+			color: #017000;
+		}
+
+		tr:hover {
+			.link-alt.green {
+				color: #009900;
+			}
 		}
 	}
 

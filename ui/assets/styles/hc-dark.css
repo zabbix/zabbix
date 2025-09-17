@@ -2541,6 +2541,16 @@ button {
   margin-top: 0;
   margin-bottom: 0;
   border: 1px solid #000000; }
+.list-table.has-highlighted-rows .problem-unack-fg,
+.list-table.has-highlighted-rows .problem-ack-fg {
+  color: #cc0000; }
+.list-table.has-highlighted-rows .ok-unack-fg,
+.list-table.has-highlighted-rows .ok-ack-fg {
+  color: #009900; }
+.list-table.has-highlighted-rows .link-alt.green {
+  color: #017000; }
+.list-table.has-highlighted-rows tr:hover .link-alt.green {
+  color: #009900; }
 
 .no-data-message {
   display: grid;

@@ -2599,6 +2599,16 @@ button {
   margin-top: 0;
   margin-bottom: 0;
   border: 1px solid #2b2b2b; }
+.list-table.has-highlighted-rows .problem-unack-fg,
+.list-table.has-highlighted-rows .problem-ack-fg {
+  color: #cc0000; }
+.list-table.has-highlighted-rows .ok-unack-fg,
+.list-table.has-highlighted-rows .ok-ack-fg {
+  color: #009900; }
+.list-table.has-highlighted-rows .link-alt.green {
+  color: #017000; }
+.list-table.has-highlighted-rows tr:hover .link-alt.green {
+  color: #009900; }
 
 .no-data-message {
   display: grid;
@@ -7787,7 +7797,9 @@ z-select.z-select-host-interface li[disabled] .description:not(:empty) {
 .list-table.has-highlighted-rows .ok-ack-fg {
   color: #009900; }
 .list-table.has-highlighted-rows .link-alt.green {
-  color: #2f5932; }
+  color: #017000; }
+.list-table.has-highlighted-rows tr:hover .link-alt.green {
+  color: #009900; }
 .list-table.sticky-footer tfoot tr:first-of-type td {
   border-color: #404040; }
 

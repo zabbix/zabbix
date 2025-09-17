@@ -491,4 +491,26 @@
 			}
 		}
 	}
+
+	&.has-highlighted-rows {
+		.problem-unack-fg,
+		.problem-ack-fg {
+			color: #cc0000;
+		}
+
+		.ok-unack-fg,
+		.ok-ack-fg {
+			color: #009900;
+		}
+
+		.link-alt.green {
+			color: #017000;
+		}
+
+		tr:hover {
+			.link-alt.green {
+				color: #009900;
+			}
+		}
+	}
 }
