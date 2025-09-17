@@ -768,5 +768,5 @@ INSERT INTO hosts (hostid, host, name, status, flags, description, readme) VALUE
 INSERT INTO hstgrp (groupid, type, uuid, name) VALUES (50029, 0, '4d58962e533a4dbf9bfd1cb247f5b698', 'Host group for binary item');
 INSERT INTO hosts_groups (hostgroupid, hostid, groupid) VALUES (50025, 99015, 50029);
 INSERT INTO items (itemid, hostid, interfaceid, type, value_type, name, key_, delay, history, status, params,query_fields, description, posts, headers) VALUES (158738, 99015, 50022, 0, 0, 'master.for.binary', 'master.for.binary', '1d', '90d', 0, '','', '', '', '');
-INSERT INTO items (itemid, hostid, interfaceid, type, value_type, name, key_, delay, history, status, params,query_fields, description, master_itemid, posts, headers) VALUES (158739, 99015, NULL, 18, 5, 'dependent.valuetype.binary', 'dependent.valuetype.binary', 0, 0, 0, '','', '', 58738, '', '');
+INSERT INTO items (itemid, hostid, interfaceid, type, value_type, name, key_, delay, history, status, params,query_fields, description, master_itemid, posts, headers) VALUES (158739, 99015, NULL, 18, 5, 'dependent.valuetype.binary', 'dependent.valuetype.binary', 0, 0, 0, '','', '', 158738, '', '');
 INSERT INTO history_bin (itemid, clock, value, ns) VALUES (158739, 1549350962, 'This should be binary', 594538048);
