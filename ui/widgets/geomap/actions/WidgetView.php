@@ -58,7 +58,7 @@ class WidgetView extends CControllerDashboardWidgetView {
 			],
 			'unique_id' => $this->getInput('unique_id'),
 			'vars' => [
-				'hosts' => self::convertToRFC7946($this->getHosts()),
+				'hosts' => self::convertToRFC7946($this->getHosts())
 			]
 		];
 
