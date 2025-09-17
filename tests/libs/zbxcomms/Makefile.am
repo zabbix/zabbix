@@ -22,7 +22,6 @@ COMMS_tests = zbx_validate_peer_list \
 	zbx_tcp_read_close_notify \
 	zbx_udp_recv
 
-
 COMMON_SRC_FILES = \
 	../../zbxmocktest.h
 
@@ -197,6 +196,7 @@ zbx_socket_pollout_CFLAGS = $(COMMS_COMPILER_FLAGS)
 
 zbx_tcp_write_SOURCES = \
 	zbx_tcp_write.c \
+	zbx_comms_common.c \
 	$(COMMON_SRC_FILES)
 
 zbx_tcp_write_LDADD = \
@@ -281,18 +281,6 @@ zbx_udp_recv_CFLAGS = $(COMMS_COMPILER_FLAGS)
 
 #zbx_tcp_recv_context_line
 
-zbx_tcp_recv_context_line_SOURCES = \
-	zbx_tcp_recv_context_line.c \
-	$(COMMON_SRC_FILES)
-
-zbx_tcp_recv_context_line_LDADD = \
-	$(COMMS_LIBS)
-
-zbx_tcp_recv_context_line_LDADD += @AGENT_LIBS@
-
-zbx_tcp_recv_context_line_LDFLAGS = @AGENT_LDFLAGS@ $(CMOCKA_LDFLAGS) $(YAML_LDFLAGS)
-
-zbx_tcp_recv_context_line_CFLAGS = $(COMMS_COMPILER_FLAGS)
 
 if IPV6
 zbx_tcp_check_allowed_peers_SOURCES = \

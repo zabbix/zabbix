@@ -62,7 +62,7 @@ void	zbx_mock_test_entry(void **state)
 
 	for (int i = 0; exp_result_v.values_num < i; i++)
 	{
-		if (0 != strcmp(exp_result_v.values[i],result_v.values[i]));
+		if (0 != strcmp(exp_result_v.values[i], result_v.values[i]))
 		{
 			result = FAIL;
 			break;

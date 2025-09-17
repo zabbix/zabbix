@@ -20,6 +20,8 @@
 #include "zbxcommon.h"
 #include "zbxcomms.h"
 
+#include "zbx_comms_common.h"
+
 int	__wrap_SSL_write(SSL *ssl, const void *buf, int num);
 ssize_t	__wrap_write(int fd, const void *buf, size_t n);
 
@@ -42,21 +44,12 @@ ssize_t	__wrap_write(int fd, const void *buf, size_t n)
 	if (SUCCEED == zbx_mock_parameter_exists("in.write_error"))
 		return FAIL;
 	else
-		return n;
-}
-
-void	set_socket_blocking_error(const char *err)
-{
-	if (0 == strcmp(err, "yes"))
-		errno = EPERM;
-	else
-		errno = EINTR;
+		return (ssize_t)n;
 }
 
 void	zbx_mock_test_entry(void **state)
 {
 	zbx_socket_t	s;
-	char		*error, *exp_error;
 	ssize_t		offset;
 	int		exp_offset = zbx_mock_get_parameter_int("out.result");
 	size_t		len = zbx_mock_get_parameter_uint64("in.len");
@@ -66,8 +59,9 @@ void	zbx_mock_test_entry(void **state)
 
 	zbx_socket_clean(&s);
 	mock_poll_set_mode_from_param(zbx_mock_get_parameter_string("in.poll_mode"));
-	set_socket_blocking_error(zbx_mock_get_parameter_string("in.socket_blocking_error"));
+	set_nonblocking_error();
 
 	offset = zbx_tcp_write(&s, buf, len, NULL);
-	zbx_mock_assert_int_eq("return value:", exp_offset, offset);
+
+	zbx_mock_assert_int_eq("return value:", exp_offset, (int)offset);
 }

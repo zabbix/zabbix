@@ -25,7 +25,6 @@ void	zbx_mock_test_entry(void **state)
 	const char	*ip = zbx_mock_get_parameter_string("in.ip");
 	char		*host = zbx_malloc(NULL, ZBX_MAX_HOSTNAME_LEN),
 			*exp_host = zbx_strdup(NULL, zbx_mock_get_parameter_string("out.host"));
-	size_t		hostlen = sizeof(host);
 
 	ZBX_UNUSED(state);
 

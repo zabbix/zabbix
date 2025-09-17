@@ -22,8 +22,6 @@
 
 #include "zbx_comms_common.h"
 
-#define TEST_COMMS
-
 static int	accept_return, recv_return;
 
 int	__wrap_accept(int sockfd, struct sockaddr *addr, socklen_t *addrlen);
@@ -33,6 +31,7 @@ ssize_t	__wrap_recv (int d, void *buf, size_t n, int flags);
 
 int __wrap_accept(int sockfd, struct sockaddr *addr, socklen_t *addrlen)
 {
+	ZBX_UNUSED(sockfd);
 	ZBX_UNUSED(addr);
 	ZBX_UNUSED(addrlen);
 
@@ -60,6 +59,7 @@ int	__wrap_getpeername(int fd, struct sockaddr *addr, socklen_t *len)
 ssize_t	__wrap_recv (int d, void *buf, size_t n, int flags)
 {
 	ZBX_UNUSED(d);
+	ZBX_UNUSED(buf);
 	ZBX_UNUSED(n);
 	ZBX_UNUSED(flags);
 

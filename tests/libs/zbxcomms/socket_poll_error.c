@@ -26,6 +26,8 @@ void	zbx_mock_test_entry(void **state)
 	short	revents = (short)zbx_mock_get_parameter_int("in.revents");
 	char	*result, *exp_result = zbx_strdup(NULL, zbx_mock_get_parameter_string("out.result"));
 
+	ZBX_UNUSED(state);
+
 	result = socket_poll_error(revents);
 
 	zbx_mock_assert_str_eq("return value", exp_result, result);

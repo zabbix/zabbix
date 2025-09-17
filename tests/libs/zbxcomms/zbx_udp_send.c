@@ -26,6 +26,13 @@ ssize_t	__wrap_sendto(int fd, const void *buf, size_t n, int flags, const struct
 
 ssize_t	__wrap_sendto(int fd, const void *buf, size_t n, int flags, const struct sockaddr *addr, socklen_t addr_len)
 {
+	ZBX_UNUSED(fd);
+	ZBX_UNUSED(buf);
+	ZBX_UNUSED(n);
+	ZBX_UNUSED(flags);
+	ZBX_UNUSED(addr);
+	ZBX_UNUSED(addr_len);
+
 	int	ret = zbx_mock_get_parameter_int("in.sendto_return");
 
 	return ret;

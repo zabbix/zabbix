@@ -24,7 +24,7 @@ void	zbx_mock_test_entry(void **state)
 {
 	zbx_socket_t	s;
 	const char	*listen_ip = zbx_mock_get_parameter_string("in.ip");
-	unsigned short	listen_port = zbx_mock_get_parameter_uint64("in.port");
+	unsigned short	listen_port = (unsigned short)zbx_mock_get_parameter_uint64("in.port");
 	int		result, timeout = zbx_mock_get_parameter_int("in.timeout"),
 			config_tcp_max_backlog_size = zbx_mock_get_parameter_int("in.backlog_size"),
 			exp_result = zbx_mock_str_to_return_code(zbx_mock_get_parameter_string("out.result"));

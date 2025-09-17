@@ -22,10 +22,8 @@
 
 void	zbx_mock_test_entry(void **state)
 {
-	const char	*data;
 	int		result, exp_result = zbx_mock_str_to_return_code(zbx_mock_get_parameter_string("out.result"));
 	short		events;
-	unsigned char	flags;
 
 	zbx_tcp_send_context_t	context;
 	zbx_socket_t	s;
@@ -34,7 +32,7 @@ void	zbx_mock_test_entry(void **state)
 
 	context.compressed_data = NULL;
 	context.written = (ssize_t)zbx_mock_get_parameter_int("in.written");
-	context.written_header = (ssize_t)zbx_mock_get_parameter_int("in.written_header");;
+	context.written_header = (ssize_t)zbx_mock_get_parameter_int("in.written_header");
 	context.header_len = zbx_mock_get_parameter_uint64("in.header_len");
 	context.data = zbx_mock_get_parameter_string("in.data");
 	context.send_len = zbx_mock_get_parameter_uint64("in.send_len");

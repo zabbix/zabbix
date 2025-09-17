@@ -28,7 +28,6 @@ void	zbx_mock_test_entry(void **state)
 				exp_result = zbx_mock_str_to_return_code(zbx_mock_get_parameter_string("out.result"));
 	short			event;
 	zbx_vector_int32_t	read_return_seq;
-	zbx_config_tls_t	*config_tls;
 
 	ZBX_UNUSED(state);
 
