@@ -238,6 +238,22 @@ $toc-title-bg-color: #4f4f4f;
 		}
 	}
 
+	&.has-highlighted-rows {
+		.problem-unack-fg,
+		.problem-ack-fg {
+			color: #cc0000;
+		}
+
+		.ok-unack-fg,
+		.ok-ack-fg {
+			color: #009900;
+		}
+
+		.link-alt.green {
+			color: #429e47;
+		}
+	}
+
 	&.sticky-footer {
 		tfoot tr:first-of-type td {
 			border-color: lighten($table-border-color, 3%);

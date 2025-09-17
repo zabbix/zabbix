@@ -7780,6 +7780,14 @@ z-select.z-select-host-interface li[disabled] .description:not(:empty) {
 .list-table.compact-view td.na-bg, .list-table.compact-view td.info-bg, .list-table.compact-view td.warning-bg, .list-table.compact-view td.average-bg, .list-table.compact-view td.high-bg, .list-table.compact-view td.disaster-bg, .list-table.has-highlighted-rows td.na-bg, .list-table.has-highlighted-rows td.info-bg, .list-table.has-highlighted-rows td.warning-bg, .list-table.has-highlighted-rows td.average-bg, .list-table.has-highlighted-rows td.high-bg, .list-table.has-highlighted-rows td.disaster-bg {
   color: #000000;
   box-shadow: inset 0 -1px 0 0 rgba(0, 0, 0, 0.1); }
+.list-table.has-highlighted-rows .problem-unack-fg,
+.list-table.has-highlighted-rows .problem-ack-fg {
+  color: #cc0000; }
+.list-table.has-highlighted-rows .ok-unack-fg,
+.list-table.has-highlighted-rows .ok-ack-fg {
+  color: #009900; }
+.list-table.has-highlighted-rows .link-alt.green {
+  color: #429e47; }
 .list-table.sticky-footer tfoot tr:first-of-type td {
   border-color: #404040; }
 
