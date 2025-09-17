@@ -146,6 +146,7 @@
 
 		submit() {
 			this.#setLoadingStatus(['add', 'update']);
+			clearMessages();
 			const fields = this.form.getAllValues();
 
 			this.form.validateSubmit(fields)
@@ -198,12 +199,21 @@
 		}
 
 		#ajaxExceptionHandler(exception) {
-			this.form_element.parentElement.querySelectorAll('.msg-good, .msg-bad, .msg-warning')
-				.forEach(node => node.remove());
-			this.form_element.insertAdjacentElement('beforebegin',
-				makeMessageBox('bad', exception.error.title, exception.error.messages).get(0)
-			);
+			if (exception instanceof TypeError) {
+				throw exception;
+			}
 
+			let title, messages;
+
+			if (typeof exception === 'object' && 'error' in exception) {
+				title = exception.error.title;
+				messages = exception.error.messages;
+			}
+			else {
+				messages = [<?= json_encode(_('Unexpected server error.')) ?>];
+			}
+
+			addMessage(makeMessageBox('bad', messages, title));
 			this.#unsetLoadingStatus();
 
 			return Promise.reject();
