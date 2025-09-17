@@ -215,8 +215,6 @@
 
 			addMessage(makeMessageBox('bad', messages, title));
 			this.#unsetLoadingStatus();
-
-			return Promise.reject();
 		}
 
 		#setLoadingStatus(loading_ids) {
