@@ -16,10 +16,10 @@
 
 use PHPUnit\Framework\TestCase;
 
-class CSlaSchedulePeriodValidatorTest extends TestCase {
+class CPeriodTimeRangeValidatorTest extends TestCase {
 
 	public static function dataProvider() {
-		$error_syntax = _('a time period is expected');
+		$error_syntax = _('comma separated list of time periods is expected');
 		$error_start_end = _('start time must be less than end time');
 		$error_unique = _('periods must be unique');
 
@@ -32,6 +32,7 @@ class CSlaSchedulePeriodValidatorTest extends TestCase {
 			['8:00-17:00,7:00-18:00'],
 			['8:00-17:00,   7:00-18:00'],
 			['  8:00-17:00  ,   7:00-18:00  '],
+			['8:00 - 17:00, 7:00 - 18:00'],
 			['8:00-17:00, 7:00-18:00, 6:15-18:15, 5:30-9:47'],
 			['08:00-17:00, 07:00-18:00, 06:15-18:15, 5:30-19:47'],
 			// fail parsing
