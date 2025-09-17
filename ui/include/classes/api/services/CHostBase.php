@@ -1390,116 +1390,13 @@ abstract class CHostBase extends CApiService {
 		}
 	}
 
-	protected static function updateTemplates(array &$hosts, ?array &$db_hosts = null,
-			?array &$upd_hostids = null): void {
-		$id_field_name = self::isTemplate() ? 'templateid' : 'hostid';
-
-		$ins_hosts_templates = [];
-		$del_hosttemplateids = [];
-
-		foreach ($hosts as $i => &$host) {
-			if (!array_key_exists('templates', $host) && !array_key_exists('templates_clear', $host)) {
-				continue;
-			}
-
-			$db_templates = ($db_hosts !== null)
-				? array_column($db_hosts[$host[$id_field_name]]['templates'], null, 'templateid')
-				: [];
-			$changed = false;
-
-			if (array_key_exists('templates', $host)) {
-				foreach ($host['templates'] as &$template) {
-					if (array_key_exists($template['templateid'], $db_templates)) {
-						$template['hosttemplateid'] = $db_templates[$template['templateid']]['hosttemplateid'];
-						unset($db_templates[$template['templateid']]);
-					}
-					else {
-						$ins_hosts_templates[] = [
-							'hostid' => $host[$id_field_name],
-							'templateid' => $template['templateid']
-						];
-						$changed = true;
-					}
-				}
-				unset($template);
-
-				$templates_clear_indexes = [];
-
-				if (array_key_exists('templates_clear', $host)) {
-					foreach ($host['templates_clear'] as $index => $template) {
-						$templates_clear_indexes[$template['templateid']] = $index;
-					}
-				}
-
-				foreach ($db_templates as $del_template) {
-					$changed = true;
-					$del_hosttemplateids[] = $del_template['hosttemplateid'];
-
-					if (array_key_exists($del_template['templateid'], $templates_clear_indexes)) {
-						$index = $templates_clear_indexes[$del_template['templateid']];
-						$host['templates_clear'][$index]['hosttemplateid'] = $del_template['hosttemplateid'];
-					}
-				}
-			}
-			elseif (array_key_exists('templates_clear', $host)) {
-				foreach ($host['templates_clear'] as &$template) {
-					$template['hosttemplateid'] = $db_templates[$template['templateid']]['hosttemplateid'];
-					$del_hosttemplateids[] = $db_templates[$template['templateid']]['hosttemplateid'];
-				}
-				unset($template);
-			}
-
-			if ($db_hosts !== null) {
-				if ($changed) {
-					$upd_hostids[$i] = $host[$id_field_name];
-				}
-				else {
-					unset($host['templates'], $db_hosts[$host[$id_field_name]]['templates']);
-				}
-			}
-		}
-		unset($host);
-
-		if ($del_hosttemplateids) {
-			DB::delete('hosts_templates', ['hosttemplateid' => $del_hosttemplateids]);
-		}
-
-		if ($ins_hosts_templates) {
-			$hosttemplateids = DB::insertBatch('hosts_templates', $ins_hosts_templates);
-		}
-
-		foreach ($hosts as &$host) {
-			if (!array_key_exists('templates', $host)) {
-				continue;
-			}
-
-			foreach ($host['templates'] as &$template) {
-				if (!array_key_exists('hosttemplateid', $template)) {
-					$template['hosttemplateid'] = array_shift($hosttemplateids);
-				}
-			}
-			unset($template);
-		}
-		unset($host);
-	}
-
 	protected static function updateHostTemplateCache(array $hosts, ?array $db_hosts = null): void {
 		$id_field_name = self::isTemplate() ? 'templateid' : 'hostid';
-
-		$ins_host_template_cache = [];
-		$del_host_template_cache = [];
 
 		$ins_template_host_links = [];
 		$del_template_host_links = [];
 
 		foreach ($hosts as $host) {
-			if ($db_hosts === null) {
-				$ins_host_template_cache[] = [
-					'hostid' => $host[$id_field_name],
-					'link_hostid' => $host[$id_field_name]
-				];
-			}
-
 			if (array_key_exists('templates', $host)) {
 				$db_templates = ($db_hosts !== null)
 					? array_column($db_hosts[$host[$id_field_name]]['templates'], null, 'templateid')
@@ -1526,48 +1423,17 @@ abstract class CHostBase extends CApiService {
 		}
 
 		if ($del_template_host_links) {
-			self::fillDelTemplateHostLinks($del_template_host_links, $ins_template_host_links);
-
-			foreach ($del_template_host_links as $host_links) {
-				foreach ($host_links as $hostid => $links) {
-					if (!array_key_exists($hostid, $del_host_template_cache)) {
-						$del_host_template_cache[$hostid] = ['hostid' => $hostid];
-					}
-
-					foreach ($links as $link_hostid => $true) {
-						$del_host_template_cache[$hostid]['link_hostid'][] = $link_hostid;
-					}
-				}
-			}
-		}
-
-		if ($del_host_template_cache) {
-			foreach ($del_host_template_cache as $_del_host_template_cache) {
-				DB::delete('host_template_cache', $_del_host_template_cache);
-			}
+			self::deleteHostTemplateCache($del_template_host_links, $ins_template_host_links);
 		}
 
 		if ($ins_template_host_links) {
-			self::fillInsTemplateHostLinks($ins_template_host_links);
-
-			foreach ($ins_template_host_links as $host_links) {
-				foreach ($host_links as $hostid => $links) {
-					foreach ($links as $link_hostid => $true) {
-						$ins_host_template_cache[] = [
-							'hostid' => $hostid,
-							'link_hostid' => $link_hostid
-						];
-					}
-				}
-			}
-		}
-
-		if ($ins_host_template_cache) {
-			DB::insertBatch('host_template_cache', $ins_host_template_cache, false);
+			self::createHostTemplateCache($ins_template_host_links);
 		}
 	}
 
-	private static function fillDelTemplateHostLinks(array &$del_template_host_links, $ins_template_host_links): void {
+	private static function deleteHostTemplateCache(array $del_template_host_links,
+			array $ins_template_host_links): void {
+
 		self::loadAncestorLinks($del_template_host_links, $template_hosts, $vertices, $ins_template_host_links);
 
 		if (self::isTemplate()) {
@@ -1575,9 +1441,38 @@ abstract class CHostBase extends CApiService {
 		}
 
 		self::addTemplateHostLinks($del_template_host_links, $template_hosts, $vertices);
+
+		$del_host_template_cache = [];
+
+		foreach ($del_template_host_links as $host_links) {
+			foreach ($host_links as $hostid => $links) {
+				uksort($links, 'bccomp');
+				$key = implode('|', array_keys($links));
+
+				if (array_key_exists($key, $del_host_template_cache)) {
+					$del_host_template_cache[$key]['hostid'][] = $hostid;
+				}
+				else {
+					$del_host_template_cache[$key] = [
+						'hostid' => [$hostid],
+						'link_hostid' => []
+					];
+
+					foreach ($links as $templateid => $true) {
+						$del_host_template_cache[$hostid]['link_hostid'][] = $templateid;
+					}
+				}
+			}
+		}
+
+		foreach ($del_host_template_cache as $_del_host_template_cache) {
+			DB::delete('host_template_cache', $_del_host_template_cache);
+		}
 	}
 
-	private static function fillInsTemplateHostLinks(array &$ins_template_host_links): void {
+	private static function createHostTemplateCache(array $ins_template_host_links): void {
+		$ins_host_template_cache = [];
+
 		self::loadAncestorLinks($ins_template_host_links, $template_hosts, $vertices);
 
 		if (self::isTemplate()) {
@@ -1585,6 +1480,21 @@ abstract class CHostBase extends CApiService {
 		}
 
 		self::addTemplateHostLinks($ins_template_host_links, $template_hosts, $vertices);
+
+		foreach ($ins_template_host_links as $host_links) {
+			foreach ($host_links as $hostid => $links) {
+				foreach ($links as $templateid => $true) {
+					$ins_host_template_cache[] = [
+						'hostid' => $hostid,
+						'link_hostid' => $templateid
+					];
+				}
+			}
+		}
+
+		if ($ins_host_template_cache) {
+			DB::insertBatch('host_template_cache', $ins_host_template_cache, false);
+		}
 	}
 
 	private static function loadAncestorLinks(array $template_host_links, ?array &$template_hosts = null,
@@ -1693,6 +1603,8 @@ abstract class CHostBase extends CApiService {
 
 	private static function addTemplateHostLinks(array &$template_host_links, array $template_hosts,
 			array $vertices): void {
+		$propagated_template_host_links = [];
+
 		do {
 			$_vertices = [];
 
@@ -1710,16 +1622,36 @@ abstract class CHostBase extends CApiService {
 
 					if (array_key_exists($templateid, $template_host_links)
 							&& array_key_exists($hostid, $template_host_links[$templateid])) {
+
 						$template_host_links[$templateid][$hostid] += $_vertices[$hostid];
 
 						if (array_key_exists($hostid, $template_hosts)) {
 							$_templateid = $hostid;
 
 							foreach ($template_hosts[$_templateid] as $_hostid => $true) {
-								if (!array_key_exists($_templateid, $template_host_links)
-										|| !array_key_exists($_hostid, $template_host_links[$_templateid])) {
-									$template_host_links[$_templateid][$_hostid] = [];
+								if (!array_key_exists($_templateid, $propagated_template_host_links)
+										|| !array_key_exists($_hostid, $propagated_template_host_links[$_templateid])) {
+									$propagated_template_host_links[$_templateid][$_hostid] =
+										$template_host_links[$templateid][$hostid];
 								}
+							}
+						}
+					}
+
+					if (array_key_exists($templateid, $propagated_template_host_links)
+							&& array_key_exists($hostid, $propagated_template_host_links[$templateid])
+							&& array_key_exists($hostid, $template_hosts)) {
+						$_templateid = $hostid;
+
+						foreach ($template_hosts[$_templateid] as $_hostid => $true) {
+							if (array_key_exists($_templateid, $propagated_template_host_links)
+									&& array_key_exists($_hostid, $propagated_template_host_links[$_templateid])) {
+								$propagated_template_host_links[$_templateid][$_hostid] +=
+									$propagated_template_host_links[$templateid][$hostid];
+							}
+							else {
+								$propagated_template_host_links[$_templateid][$_hostid] =
+									$propagated_template_host_links[$templateid][$hostid];
 							}
 						}
 					}
@@ -1728,6 +1660,18 @@ abstract class CHostBase extends CApiService {
 
 			$vertices = $_vertices;
 		} while ($vertices);
+
+		foreach ($propagated_template_host_links as $templateid => $host_links) {
+			foreach ($host_links as $hostid => $links) {
+				if (array_key_exists($templateid, $template_host_links)
+						&& array_key_exists($hostid, $template_host_links[$templateid])) {
+					$template_host_links[$templateid][$hostid] += $links;
+				}
+				else {
+					$template_host_links[$templateid][$hostid] = $links;
+				}
+			}
+		}
 	}
 
 	/**

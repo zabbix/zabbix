@@ -340,13 +340,14 @@ class CTemplate extends CHostGeneral {
 
 		$this->checkTemplatesLinks($templates);
 
+		DB::insertBatch('host_template_cache', $ins_host_template_cache, false);
+
 		$this->updateGroups($templates);
 		$this->updateHgSets($templates);
 		$this->updateTags($templates);
 		self::updateMacros($templates);
 		self::updateTemplates($templates);
 		self::updateHostTemplateCache($templates);
-		self::inheritTemplateObjects($templates);
 
 		self::addAuditLog(CAudit::ACTION_ADD, CAudit::RESOURCE_TEMPLATE, $templates);
 
@@ -704,7 +705,6 @@ class CTemplate extends CHostGeneral {
 		self::updateMacros($templates, $db_templates);
 		self::updateTemplates($templates, $db_templates);
 		self::updateHostTemplateCache($templates, $db_templates);
-		self::inheritTemplateObjects($templates, $db_templates);
 
 		self::addAuditLog(CAudit::ACTION_UPDATE, CAudit::RESOURCE_TEMPLATE, $templates, $db_templates);
 	}

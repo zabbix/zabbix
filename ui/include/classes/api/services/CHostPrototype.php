@@ -558,10 +558,16 @@ class CHostPrototype extends CHostBase {
 
 		$hostids = DB::insert('hosts', $hosts);
 
+		$ins_host_template_cache = [];
 		$host_statuses = [];
 
 		foreach ($hosts as &$host) {
 			$host['hostid'] = array_shift($hostids);
+
+			$ins_host_template_cache[] = [
+				'hostid' => $host['hostid'],
+				'link_hostid' => $host['hostid']
+			];
 
 			$host_statuses[] = $host['host_status'];
 			unset($host['host_status']);
@@ -571,6 +577,8 @@ class CHostPrototype extends CHostBase {
 		if (!$inherited) {
 			$this->checkTemplatesLinks($hosts);
 		}
+
+		DB::insertBatch('host_template_cache', $ins_host_template_cache, false);
 
 		self::createHostDiscoveries($hosts);
 
@@ -1791,6 +1799,97 @@ class CHostPrototype extends CHostBase {
 				}
 			}
 			unset($group_prototype);
+		}
+		unset($host);
+	}
+
+	private static function updateTemplates(array &$hosts, ?array &$db_hosts = null,
+			?array &$upd_hostids = null): void {
+		$ins_hosts_templates = [];
+		$del_hosttemplateids = [];
+
+		foreach ($hosts as $i => &$host) {
+			if (!array_key_exists('templates', $host) && !array_key_exists('templates_clear', $host)) {
+				continue;
+			}
+
+			$db_templates = ($db_hosts !== null)
+				? array_column($db_hosts[$host['hostid']]['templates'], null, 'templateid')
+				: [];
+			$changed = false;
+
+			if (array_key_exists('templates', $host)) {
+				foreach ($host['templates'] as &$template) {
+					if (array_key_exists($template['templateid'], $db_templates)) {
+						$template['hosttemplateid'] = $db_templates[$template['templateid']]['hosttemplateid'];
+						unset($db_templates[$template['templateid']]);
+					}
+					else {
+						$ins_hosts_templates[] = [
+							'hostid' => $host['hostid'],
+							'templateid' => $template['templateid']
+						];
+						$changed = true;
+					}
+				}
+				unset($template);
+
+				$templates_clear_indexes = [];
+
+				if (array_key_exists('templates_clear', $host)) {
+					foreach ($host['templates_clear'] as $index => $template) {
+						$templates_clear_indexes[$template['templateid']] = $index;
+					}
+				}
+
+				foreach ($db_templates as $del_template) {
+					$changed = true;
+					$del_hosttemplateids[] = $del_template['hosttemplateid'];
+
+					if (array_key_exists($del_template['templateid'], $templates_clear_indexes)) {
+						$index = $templates_clear_indexes[$del_template['templateid']];
+						$host['templates_clear'][$index]['hosttemplateid'] = $del_template['hosttemplateid'];
+					}
+				}
+			}
+			elseif (array_key_exists('templates_clear', $host)) {
+				foreach ($host['templates_clear'] as &$template) {
+					$template['hosttemplateid'] = $db_templates[$template['templateid']]['hosttemplateid'];
+					$del_hosttemplateids[] = $db_templates[$template['templateid']]['hosttemplateid'];
+				}
+				unset($template);
+			}
+
+			if ($db_hosts !== null) {
+				if ($changed) {
+					$upd_hostids[$i] = $host['hostid'];
+				}
+				else {
+					unset($host['templates'], $db_hosts[$host['hostid']]['templates']);
+				}
+			}
+		}
+		unset($host);
+
+		if ($del_hosttemplateids) {
+			DB::delete('hosts_templates', ['hosttemplateid' => $del_hosttemplateids]);
+		}
+
+		if ($ins_hosts_templates) {
+			$hosttemplateids = DB::insertBatch('hosts_templates', $ins_hosts_templates);
+		}
+
+		foreach ($hosts as &$host) {
+			if (!array_key_exists('templates', $host)) {
+				continue;
+			}
+
+			foreach ($host['templates'] as &$template) {
+				if (!array_key_exists('hosttemplateid', $template)) {
+					$template['hosttemplateid'] = array_shift($hosttemplateids);
+				}
+			}
+			unset($template);
 		}
 		unset($host);
 	}

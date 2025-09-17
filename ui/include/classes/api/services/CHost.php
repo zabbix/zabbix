@@ -718,11 +718,17 @@ class CHost extends CHostGeneral {
 		$this->updateTags($hosts);
 		self::updateMacros($hosts);
 
+		$ins_host_template_cache = [];
 		$hosts_rtdata = [];
 		$hosts_interfaces = [];
 		$hosts_inventory = [];
 
 		foreach ($hosts as $host) {
+			$ins_host_template_cache[] = [
+				'hostid' => $host['hostid'],
+				'link_hostid' => $host['hostid']
+			];
+
 			$hosts_rtdata[] = ['hostid' => $host['hostid']];
 
 			if (array_key_exists('interfaces', $host)) {
@@ -746,13 +752,14 @@ class CHost extends CHostGeneral {
 			}
 		}
 
+		DB::insertBatch('host_template_cache', $ins_host_template_cache, false);
+
 		if ($hosts_interfaces) {
 			API::HostInterface()->create($hosts_interfaces);
 		}
 
 		self::updateTemplates($hosts);
 		self::updateHostTemplateCache($hosts);
-		self::inheritTemplateObjects($hosts);
 
 		if ($hosts_inventory) {
 			DB::insert('host_inventory', $hosts_inventory, false);
@@ -887,7 +894,6 @@ class CHost extends CHostGeneral {
 		$this->updateHgSets($hosts, $db_hosts);
 		self::updateTemplates($hosts, $db_hosts);
 		self::updateHostTemplateCache($hosts, $db_hosts);
-		self::inheritTemplateObjects($hosts, $db_hosts);
 	}
 
 	/**

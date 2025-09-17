@@ -1311,7 +1311,7 @@ class CHttpTest extends CApiService {
 		$hostids_condition = $hostids ? ' AND '.dbConditionId('hht.hostid', $hostids) : '';
 
 		$result = DBselect(
-			'SELECT hht.httptestid,hht.name,h.status AS host_status'.
+			'SELECT hht.httptestid,hht.name,hht.hostid,hht.templateid,h.status AS host_status'.
 			' FROM httptest ht,httptest hht,hosts h'.
 			' WHERE ht.httptestid=hht.templateid'.
 				' AND hht.hostid=h.hostid'.
@@ -1320,11 +1320,13 @@ class CHttpTest extends CApiService {
 		);
 
 		$httptests = [];
+		$db_httptests = [];
 
 		while ($row = DBfetch($result)) {
 			$httptest = [
 				'httptestid' => $row['httptestid'],
 				'name' => $row['name'],
+				'hostid' => $row['hostid'],
 				'templateid' => 0
 			];
 
@@ -1333,11 +1335,57 @@ class CHttpTest extends CApiService {
 			}
 
 			$httptests[] = $httptest;
+			$db_httptests[$row['httptestid']] = ['templateid' => $row['templateid']];
 		}
 
 		if ($httptests) {
-			Manager::HttpTest()->update($httptests);
+			self::addDelTemplateCaches($httptests, $db_httptests);
+
+			$httptests = Manager::HttpTest()->update($httptests);
+			Manager::HttpTest()->inherit($httptests);
 		}
+	}
+
+	public static function addInsTemplateCaches(array &$httptests): void {
+		$items = DBfetchArrayAssoc(DBselect(
+			'SELECT hti.httptestid,hti.itemid,i.hostid,i.templateid'.
+			' FROM httptestitem hti'.
+			' JOIN items i ON hti.itemid=i.itemid'.
+			' WHERE '.dbConditionId('hti.httptestid', array_column($httptests, 'httptestid')).
+				' AND hti.type='.HTTPSTEP_ITEM_TYPE_IN
+		), 'httptestid');
+
+		CItem::addInsTemplateCaches($items);
+
+		foreach ($httptests as &$httptest) {
+			$httptest['ins_template_cache'] = $items[$httptest['httptestid']]['ins_template_cache'];
+		}
+		unset($httptest);
+	}
+
+	public static function addDelTemplateCaches(array &$httptests, array $db_httptests): void {
+		$resource = DBselect(
+			'SELECT hti.httptestid,hti.itemid,i.templateid'.
+			' FROM httptestitem hti'.
+			' JOIN items i ON hti.itemid=i.itemid'.
+			' WHERE '.dbConditionId('hti.httptestid', array_keys($db_httptests)).
+				' AND hti.type='.HTTPSTEP_ITEM_TYPE_IN
+		);
+
+		$items = [];
+		$db_items = [];
+
+		while ($row = DBfetch($resource)) {
+			$items[$row['httptestid']] = ['itemid' => $row['itemid']];
+			$db_items[$row['itemid']] = ['templateid' => $row['templateid']];
+		}
+
+		CItem::addDelTemplateCaches($items, $db_items);
+
+		foreach ($httptests as &$httptest) {
+			$httptest['del_template_cache'] = $items[$httptest['httptestid']]['del_template_cache'];
+		}
+		unset($httptest);
 	}
 
 	/**

@@ -1626,129 +1626,6 @@ abstract class CItemGeneral extends CApiService {
 		unset($item);
 	}
 
-	protected static function deleteItemTemplateCache(array $tpl_itemids): void {
-		$resource = DBselect(
-			'SELECT itc.itemid,itc.link_hostid'.
-			' FROM item_template_cache itc'.
-			' WHERE '.dbConditionId('itc.itemid', array_keys($tpl_itemids))
-		);
-
-		$del_item_template_cache = [];
-
-		while ($row = DBfetch($resource)) {
-			foreach ($tpl_itemids[$row['itemid']] as $itemid => $foo) {
-				$del_item_template_cache[$itemid][] = $row['link_hostid'];
-			}
-		}
-
-		$sql_where = [];
-
-		foreach ($del_item_template_cache as $itemid => $link_hostids) {
-			$sql_where[] = dbConditionId('itemid', [$itemid]).
-				' AND '.dbConditionId('link_hostid', $link_hostids);
-		}
-
-		$sql_where = count($sql_where) == 1 ? $sql_where[0] : '('.implode(') OR (', $sql_where).')';
-
-		DBexecute(
-			'DELETE FROM item_template_cache'.
-			' WHERE '.$sql_where
-		);
-	}
-
-	protected static function createItemTemplateCache(array $tpl_itemids): void {
-		$resource = DBselect(
-			'SELECT itc.itemid,itc.link_hostid'.
-			' FROM item_template_cache itc'.
-			' WHERE '.dbConditionId('itc.itemid', array_keys($tpl_itemids))
-		);
-
-		$ins_item_template_cache = [];
-
-		while ($row = DBfetch($resource)) {
-			foreach ($tpl_itemids[$row['itemid']] as $itemid => $foo) {
-				$ins_item_template_cache[] = [
-					'itemid' => $itemid,
-					'link_hostid' => $row['link_hostid']
-				];
-			}
-		}
-
-		DB::insertBatch('item_template_cache', $ins_item_template_cache, false);
-	}
-
-	protected static function updateItemTemplateCache(array $items): void {
-		$link_hostids = [];
-
-		$resource = DBselect(
-			'SELECT itc.itemid,itc.link_hostid'.
-			' FROM item_template_cache itc'.
-			' WHERE '.dbConditionId('itc.itemid', array_keys($items))
-		);
-
-		while ($row = DBfetch($resource)) {
-			if ($row['link_hostid'] != $items[$row['itemid']]['hostid']) {
-				$link_hostids[$row['itemid']][$row['link_hostid']] = true;
-			}
-		}
-
-		$tpl_itemids = [];
-
-		foreach ($items as $itemid => $item) {
-			$tpl_itemids[$item['templateid']][$itemid] = true;
-		}
-
-		$tpl_link_hostids = [];
-
-		$resource = DBselect(
-			'SELECT itc.itemid,itc.link_hostid'.
-			' FROM item_template_cache itc'.
-			' WHERE '.dbConditionId('itc.itemid', array_keys($tpl_itemids))
-		);
-
-		while ($row = DBfetch($resource)) {
-			$tpl_link_hostids[$row['itemid']][$row['link_hostid']] = true;
-		}
-
-		$ins_item_template_cache = [];
-		$del_item_template_cache = [];
-
-		foreach ($tpl_itemids as $templateid => $itemids) {
-			foreach ($itemids as $itemid => $foo) {
-				foreach (array_diff_key($link_hostids[$itemid], $tpl_link_hostids[$templateid]) as $hostid => $foo) {
-					$del_item_template_cache[$itemid][] = $hostid;
-				}
-
-				foreach (array_diff_key($tpl_link_hostids[$templateid], $link_hostids[$itemid]) as $hostid => $foo) {
-					$ins_item_template_cache[] = [
-						'itemid' => $itemid,
-						'link_hostid' => $hostid
-					];
-				}
-			}
-		}
-
-		if ($del_item_template_cache) {
-			$sql_where = [];
-
-			foreach ($del_item_template_cache as $itemid => $link_hostids) {
-				$sql_where[] = dbConditionId('itemid', [$itemid]).
-					' AND '.dbConditionId('link_hostid', $link_hostids);
-			}
-
-			$sql_where = count($sql_where) == 1 ? $sql_where[0] : '('.implode(') OR (', $sql_where).')';
-
-			DBexecute(
-				'DELETE FROM item_template_cache'.
-				' WHERE '.$sql_where
-			);
-		}
-
-		if ($ins_item_template_cache) {
-			DB::insertBatch('item_template_cache', $ins_item_template_cache, false);
-		}
-	}
-
 	/**
 	 * @param array      $items
 	 * @param array|null $db_items
@@ -3041,5 +2918,126 @@ abstract class CItemGeneral extends CApiService {
 		unset($header);
 
 		return $headers ? implode("\r\n", $headers) : '';
+	}
+
+	public static function addInsTemplateCaches(array &$items): void {
+		$item_templates = [];
+		$item_template_links = [];
+		$item_indexes = [];
+
+		foreach ($items as $i => &$item) {
+			$item['ins_template_cache'] = [$item['hostid']];
+
+			$item_indexes[$item['itemid']] = $i;
+
+			if ($item['templateid'] != 0) {
+				$item_templates[$item['templateid']][$item['itemid']] = null;
+				$item_template_links[$item['templateid']][$item['itemid']] = [];
+			}
+		}
+		unset($item);
+
+		if ($item_templates) {
+			self::loadAncestorLinks($item_templates, $vertices);
+			self::addItemTemplateLinks($item_template_links, $item_templates, $vertices);
+
+			foreach ($item_template_links as $template_links) {
+				foreach ($template_links as $itemid => $links) {
+					$i = $item_indexes[$itemid];
+
+					$items[$i]['ins_template_cache'] =
+						array_merge($items[$i]['ins_template_cache'], array_keys($links));
+				}
+			}
+		}
+	}
+
+	public static function addDelTemplateCaches(array &$items, array $db_items): void {
+		$item_templates = [];
+		$item_template_links = [];
+		$item_indexes = [];
+
+		foreach ($items as $i => &$item) {
+			$item['del_template_cache'] = [];
+
+			$item_indexes[$item['itemid']] = $i;
+
+			$item_templates[$db_items[$item['itemid']]['templateid']][$item['itemid']] = null;
+			$item_template_links[$db_items[$item['itemid']]['templateid']][$item['itemid']] = [];
+		}
+		unset($item);
+
+		self::loadAncestorLinks($item_templates, $vertices);
+		self::addItemTemplateLinks($item_template_links, $item_templates, $vertices);
+
+		foreach ($item_template_links as $template_links) {
+			foreach ($template_links as $itemid => $links) {
+				$i = $item_indexes[$itemid];
+
+				$items[$i]['del_template_cache'] =
+					array_merge($items[$i]['del_template_cache'], array_keys($links));
+			}
+		}
+	}
+
+	protected static function loadAncestorLinks(array &$item_templates, ?array &$vertices = null): void {
+		$parent_itemids = $item_templates;
+
+		if ($vertices === null) {
+			$vertices = [];
+		}
+
+		do {
+			$options = [
+				'output' => ['itemid', 'hostid', 'templateid'],
+				'filter' => ['itemid' => array_keys($parent_itemids)]
+			];
+			$resource = DBselect(DB::makeSql('items', $options));
+
+			$parent_itemids = [];
+
+			while ($row = DBfetch($resource)) {
+				foreach ($item_templates[$row['itemid']] as &$templateid) {
+					$templateid = $row['hostid'];
+				}
+
+				if ($row['templateid'] != 0) {
+					$item_templates[$row['templateid']][$row['itemid']] = null;
+
+					$parent_itemids[$row['templateid']] = true;
+				}
+				else {
+					$vertices[$row['itemid']] = [];
+				}
+			}
+		} while ($parent_itemids);
+	}
+
+	protected static function addItemTemplateLinks(array &$item_template_links, array $item_templates,
+			array $vertices): void {
+		do {
+			$_vertices = [];
+
+			foreach ($vertices as $parent_itemid => $vertex_links) {
+				if (!array_key_exists($parent_itemid, $item_templates)) {
+					continue;
+				}
+
+				foreach ($item_templates[$parent_itemid] as $itemid => $templateid) {
+					if (!array_key_exists($itemid, $_vertices)) {
+						$_vertices[$itemid] = [];
+					}
+
+					$_vertices[$itemid] += [$templateid => true] + $vertex_links;
+
+					if (array_key_exists($parent_itemid, $item_template_links)
+							&& array_key_exists($itemid, $item_template_links[$parent_itemid])) {
+						$item_template_links[$parent_itemid][$itemid] = $_vertices[$itemid];
+					}
+				}
+			}
+
+			$vertices = $_vertices;
+		} while ($vertices);
 	}
 }
