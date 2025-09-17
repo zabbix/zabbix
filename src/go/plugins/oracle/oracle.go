@@ -45,7 +45,7 @@ type Plugin struct {
 
 // Export implements the Exporter interface.
 //
-//nolint:gocyclo,cyclop
+//nolint:gocyclo,cyclop // Complex code that currently has no unit tests and hence is not safe for refactoring.
 func (p *Plugin) Export(key string, rawParams []string, pluginCtx plugin.ContextProvider) (any, error) {
 	if strings.TrimSpace(key) == "" {
 		return nil, errs.Errorf("key cannot be empty")
