@@ -59,12 +59,6 @@ window.sla_edit_popup = new class {
 			allow_empty: true
 		});
 
-		tag_table.addEventListener('click', e => {
-			if (e.target.classList.contains('element-table-add')) {
-				this.form.validateSubmit(this.form.getAllValues());
-			}
-		});
-
 		// Setup Excluded downtimes.
 		document
 			.getElementById('excluded-downtimes')
