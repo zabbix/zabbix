@@ -92,6 +92,7 @@ $tabs = (new CTabView())
 				->setId('test-string')
 				->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 				->disableSpellcheck()
+				->setAttribute('data-notrim', '')
 			)
 		)
 		->addItem([
