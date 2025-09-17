@@ -859,7 +859,7 @@ static int	validate_nested_lldrules(zbx_uint64_t hostid, const zbx_vector_uint64
 	result = zbx_db_select("%s", sql);
 	zbx_free(sql);
 
-	if (NULL != (row = zbx_db_fetch(result)))
+	if (NULL != zbx_db_fetch(result))
 	{
 		zbx_strlcpy(error, "nested LLD rules are supported only on hosts created by LLD", max_error_len);
 		ret = FAIL;
@@ -6552,6 +6552,7 @@ void	zbx_db_add_interface_snmp(const zbx_uint64_t interfaceid, const unsigned ch
 		if (NULL == (tbl = zbx_db_get_table("interface_snmp")))
 		{
 			THIS_SHOULD_NEVER_HAPPEN;
+			exit(EXIT_FAILURE);
 		}
 
 		max_repetitions = atoi(zbx_db_get_field(tbl, "max_repetitions")->default_value);
