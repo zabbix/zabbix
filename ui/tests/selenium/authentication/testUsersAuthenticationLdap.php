@@ -386,8 +386,7 @@ class testUsersAuthenticationLdap extends testFormAuthentication {
 					],
 					'test_settings' => [
 						'Login' => 'employee',
-						// User password made complex to avoid the "insecure password" chrome popup in Jenkins.
-						'User password' => '!123Zabbix321!'
+						'User password' => 'Secret123'
 					],
 					'test_error' => 'Login failed',
 					'test_error_details' => [
@@ -2508,8 +2507,7 @@ class testUsersAuthenticationLdap extends testFormAuthentication {
 								'Base DN' => 'cn=users,cn=accounts,dc=demo1,dc=freeipa,dc=org',
 								'Search attribute' => 'uid',
 								'Bind DN' => 'uid=admin,cn=users,cn=accounts,dc=demo1,dc=freeipa,dc=org',
-								// Bind password made complex to avoid the "insecure password" chrome popup in Jenkins.
-								'Bind password' => '!321Zabbix123!',
+								'Bind password' => 'Secret123',
 								'Description' => 'description',
 								'Advanced configuration' => true,
 								'StartTLS' => true,
@@ -2527,7 +2525,7 @@ class testUsersAuthenticationLdap extends testFormAuthentication {
 								'port' => 389,
 								'base_dn' => 'cn=users,cn=accounts,dc=demo1,dc=freeipa,dc=org',
 								'bind_dn' => 'uid=admin,cn=users,cn=accounts,dc=demo1,dc=freeipa,dc=org',
-								'bind_password' => '!321Zabbix123!',
+								'bind_password' => 'Secret123',
 								'search_attribute' => 'uid',
 								'start_tls' => 1,
 								'search_filter' => 'filter'
@@ -2883,6 +2881,7 @@ class testUsersAuthenticationLdap extends testFormAuthentication {
 		$this->page->open('zabbix.php?action=usergroup.edit&usrgrpid='.$usrgrpid)->waitUntilReady();
 		$this->query('name:userdirectoryid')->asDropdown()->one()->fill($ldap_name);
 		$this->query('button:Update')->one()->click();
+		$this->assertMessage(TEST_GOOD, 'User group updated');
 
 		// Check that value in table is changed and display that there exists group with LDAP server.
 		$this->page->open('zabbix.php?action=authentication.edit')->waitUntilReady();
@@ -2972,7 +2971,7 @@ class testUsersAuthenticationLdap extends testFormAuthentication {
 	 * @param string $values    simple LDAP server values
 	 */
 	private function setLdap($data, $query, $values = null) {
-		$form = $this->query('id:authentication-form')->asForm()->one();
+		$form = $this->query('id:authentication-form')->waitUntilVisible()->asForm()->one();
 
 		// Select LDAP setting tab if it is not selected.
 		if ($form->getSelectedTab() !== 'LDAP settings') {

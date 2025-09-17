@@ -2301,9 +2301,7 @@ function getTypeItemFieldNames(array $input): array {
 			return ['params', 'delay'];
 
 		case ITEM_TYPE_JMX:
-			return $input['templateid'] == 0
-				? ['interfaceid', 'jmx_endpoint', 'username', 'password', 'delay']
-				: ['interfaceid', 'username', 'password', 'delay'];
+			return ['interfaceid', 'jmx_endpoint', 'username', 'password', 'delay'];
 
 		case ITEM_TYPE_SNMPTRAP:
 			return ['interfaceid'];
