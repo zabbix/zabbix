@@ -146,11 +146,11 @@ One way to do this is using **pipelined table functions**:
 To configure plugins, Zabbix agent 2 configuration file is used.
 
 **Plugins.Oracle.CallTimeout** — the maximum time in seconds for waiting when a request has to be done.
-*Default value:* equals the global<sup>[1](#footnote-1)</sup> Timeout configuration parameter.
+*Default value:* equals the global<sup>[1](#footnote-1)</sup> "Timeout" configuration option.
 *Limits:* 1-30
 
 **Plugins.Oracle.ConnectTimeout** — the maximum time in seconds for waiting when a connection has to be established.
-*Default value:* equals the global<sup>[1](#footnote-1)</sup> Timeout configuration parameter.
+*Default value:* equals the global<sup>[1](#footnote-1)</sup> "Timeout" configuration option.
 *Limits:* 1-30
 
 **Plugins.Oracle.CustomQueriesPath** — the full pathname of a directory containing *.sql* files with custom queries.
@@ -427,6 +427,6 @@ The environment variable DPI_DEBUG_LEVEL can be used to selectively turn on the 
 See [ODPI-C Debugging](https://oracle.github.io/odpi/doc/user_guide/debugging.html) for details.
 
 ## Footnotes
-<a name="footnote-1">1</a>: Global timeout is defined in Zabbix agent 2 configuration file zabbix_agent2.config the option Timeout.
+<a name="footnote-1">1</a>: Global timeout is defined in Zabbix agent 2 configuration file zabbix_agent2.conf the option "Timeout".
 
 <a name="footnote-2">2</a>: TNS or Transparent Network Substrate is a connection description format used by Oracle databases to manage communication between clients (like SQL*Plus, Oracle SQL Developer, etc.) and Oracle databases. TNS is part of Oracle Net Services, which is responsible for enabling communication between different systems in an Oracle environment.
