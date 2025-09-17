@@ -595,6 +595,7 @@ int	zbx_shmem_create(zbx_shmem_info_t **info, zbx_uint64_t size, const char *des
 	base = (void *)((char *)base + strlen(param) + 1);
 
 	(*info)->allow_oom = allow_oom;
+	(*info)->unlock_shmem_on_oom = NULL;
 
 	/* prepare shared memory for further allocation by creating one big chunk */
 	(*info)->lo_bound = ALIGN8(base);
@@ -695,6 +696,10 @@ void	*__zbx_shmem_malloc(const char *file, int line, zbx_shmem_info_t *info, con
 				file, line, __func__, (zbx_fs_size_t)size);
 		zabbix_log(LOG_LEVEL_CRIT, "[file:%s,line:%d] %s(): please increase %s configuration parameter",
 				file, line, __func__, info->mem_param);
+
+		if (NULL != info->unlock_shmem_on_oom)
+			info->unlock_shmem_on_oom();
+
 		exit(EXIT_FAILURE);
 	}
 
@@ -729,6 +734,10 @@ void	*__zbx_shmem_realloc(const char *file, int line, zbx_shmem_info_t *info, vo
 				file, line, __func__, (zbx_fs_size_t)size);
 		zabbix_log(LOG_LEVEL_CRIT, "[file:%s,line:%d] %s(): please increase %s configuration parameter",
 				file, line, __func__, info->mem_param);
+
+		if (NULL != info->unlock_shmem_on_oom)
+			info->unlock_shmem_on_oom();
+
 		exit(EXIT_FAILURE);
 	}
 

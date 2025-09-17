@@ -25,8 +25,6 @@ package zbxlib
 #cgo pcre2 LDFLAGS: -lpcre2-8
 #cgo openssl LDFLAGS: -lssl -lcrypto
 
-int	CONFIG_TCP_MAX_BACKLOG_SIZE	= SOMAXCONN;
-
 zbx_metric_t	parameters_common[] = {NULL};
 zbx_metric_t	*get_parameters_common(void)
 {
