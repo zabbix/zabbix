@@ -1312,7 +1312,7 @@ class testFormUserRoles extends CWebTest {
 	}
 
 	/**
-	 *  Checking layout after enabling modules.
+	 * Checking layout after enabling modules.
 	 */
 	public function testFormUserRoles_Modules() {
 		$this->page->login();
@@ -1324,6 +1324,7 @@ class testFormUserRoles extends CWebTest {
 				$this->assertTrue($form->query('xpath://label[text()="No enabled modules found."]')->one()->isDisplayed());
 				$this->page->open('zabbix.php?action=module.list')->waitUntilReady();
 				$this->query('button:Scan directory')->one()->click();
+				$this->assertMessage(TEST_GOOD, 'Modules updated');
 				$table = $this->query('class:list-table')->asTable()->one();
 				$table->findRows('Name', $modules)->select();
 				$this->query('button:Enable')->one()->click();

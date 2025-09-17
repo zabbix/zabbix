@@ -666,8 +666,7 @@ class testFormGraphs extends CWebTest {
 			$this->assertScreenshot($this->query('id:itemsTable')->one(), 'Graph'.CTestArrayHelper::get($data['items'][0], 'prototype'));
 		}
 
-		$form->submit();
-		$this->page->waitUntilReady();
+		$form->submit()->waitUntilReloaded();
 
 		if (CTestArrayHelper::get($data, 'expected', TEST_GOOD) === TEST_BAD) {
 			if (CTestArrayHelper::get($data, 'error')) {

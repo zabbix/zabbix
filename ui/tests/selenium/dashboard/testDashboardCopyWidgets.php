@@ -476,7 +476,7 @@ class testDashboardCopyWidgets extends CWebTest {
 				$this->page->open('zabbix.php?action=template.dashboard.edit&dashboardid='.self::$templated_empty_dashboardid);
 				$this->page->waitUntilReady();
 
-				$this->query('id:dashboard-add')->one()->click();
+				$this->query('id:dashboard-add')->one()->hoverMouse()->click();
 				CPopupMenuElement::find()->one()->waitUntilVisible()->select('Paste page');
 				$this->assertEquals(1, $dashboard->query('xpath://span[@title="Page with widgets"]')
 						->waitUntilVisible()->all()->count()

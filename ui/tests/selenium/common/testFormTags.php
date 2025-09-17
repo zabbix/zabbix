@@ -1086,6 +1086,7 @@ class testFormTags extends CWebTest {
 			$field_name = (strpos($object, 'prototype') !== false) ? str_replace(' prototype', '', $object) : $object;
 		}
 		$form->fill(['id:show_inherited_tags' => 'Inherited and '.$field_name.' tags']);
+		$tags_table->waitUntilStalled();
 		$this->page->waitUntilReady();
 		$tags_table->checkValue($this->prepareAllTags($data['tags'], $parent_tags));
 
