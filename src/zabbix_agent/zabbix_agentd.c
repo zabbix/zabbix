@@ -319,7 +319,7 @@ static zbx_config_log_t	log_file_cfg	= {NULL, NULL, ZBX_LOG_TYPE_UNDEFINED, 1};
 void	zbx_co_uninitialize();
 #endif
 
-void	zbx_free_service_resources(void);
+void	zbx_free_service_resources(int ret);
 
 static int	get_process_info_by_thread(int local_server_num, unsigned char *local_process_type,
 		int *local_process_num)
@@ -1194,7 +1194,7 @@ static void	zbx_on_exit(int ret, void *on_exit_args)
 			zbx_tcp_unlisten(args->listen_sock);
 	}
 #endif
-	zbx_free_service_resources();
+	zbx_free_service_resources(ret);
 
 #if defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
 	zbx_tls_free();
@@ -1313,7 +1313,7 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 	if (SUCCEED != zbx_coredump_disable())
 	{
 		zabbix_log(LOG_LEVEL_CRIT, "cannot disable core dump, exiting...");
-		zbx_free_service_resources();
+		zbx_free_service_resources(FAIL);
 		exit(EXIT_FAILURE);
 	}
 #endif
@@ -1321,7 +1321,7 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 	if (FAIL == zbx_load_modules(config_load_module_path, config_load_module, zbx_config_timeout, 1))
 	{
 		zabbix_log(LOG_LEVEL_CRIT, "loading modules failed, exiting...");
-		zbx_free_service_resources();
+		zbx_free_service_resources(FAIL);
 		exit(EXIT_FAILURE);
 	}
 #endif
@@ -1330,7 +1330,7 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 	{
 		zabbix_log(LOG_LEVEL_CRIT, "cannot load user parameters: %s", error);
 		zbx_free(error);
-		zbx_free_service_resources();
+		zbx_free_service_resources(FAIL);
 		exit(EXIT_FAILURE);
 	}
 
@@ -1345,7 +1345,7 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 				zbx_config_timeout, config_tcp_max_backlog_size))
 		{
 			zabbix_log(LOG_LEVEL_CRIT, "listener failed: %s", zbx_socket_strerror());
-			zbx_free_service_resources();
+			zbx_free_service_resources(FAIL);
 			exit(EXIT_FAILURE);
 		}
 	}
@@ -1354,7 +1354,7 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 	{
 		zabbix_log(LOG_LEVEL_CRIT, "cannot initialize modbus: %s", error);
 		zbx_free(error);
-		zbx_free_service_resources();
+		zbx_free_service_resources(FAIL);
 		exit(EXIT_FAILURE);
 	}
 
@@ -1362,7 +1362,7 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 	{
 		zabbix_log(LOG_LEVEL_CRIT, "cannot initialize collector: %s", error);
 		zbx_free(error);
-		zbx_free_service_resources();
+		zbx_free_service_resources(FAIL);
 		exit(EXIT_FAILURE);
 	}
 
@@ -1390,7 +1390,7 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 	{
 		zabbix_log(LOG_LEVEL_CRIT, "Too many agent threads. Please reduce the StartAgents configuration"
 				" parameter or the number of active servers in ServerActive configuration parameter.");
-		zbx_free_service_resources();
+		zbx_free_service_resources(FAIL);
 		exit(EXIT_FAILURE);
 	}
 #endif
@@ -1511,12 +1511,12 @@ int	MAIN_ZABBIX_ENTRY(int flags)
  * Purpose: frees service resources allocated by main thread                  *
  *                                                                            *
  ******************************************************************************/
-void	zbx_free_service_resources(void)
+void	zbx_free_service_resources(int ret)
 {
 	if (NULL != zbx_threads)
 	{
 		/* wait for all child processes to exit */
-		zbx_threads_kill_and_wait(zbx_threads, threads_flags, zbx_threads_num);
+		zbx_threads_kill_and_wait(zbx_threads, threads_flags, zbx_threads_num, ret);
 
 		zbx_free(zbx_threads);
 		zbx_free(threads_flags);
