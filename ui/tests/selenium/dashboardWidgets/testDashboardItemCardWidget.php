@@ -1053,7 +1053,7 @@ class testDashboardItemCardWidget extends testWidgets {
 		// Check default and available options in 'Show' section.
 		$show_form = $form->getFieldContainer('Show')->asMultifieldTable(['mapping' => ['' => 'section']]);
 		$show_form->checkValue([
-			['section' => 'Metrics'],
+			['section' => 'Interval and storage'],
 			['section' => 'Type of information'],
 			['section' => 'Host interface'],
 			['section' => 'Type']
@@ -1062,7 +1062,7 @@ class testDashboardItemCardWidget extends testWidgets {
 		// Clear all default options
 		$show_form->query('button:Remove')->all()->click();
 
-		$show_options = ['Description', 'Error text', 'Metrics', 'Latest data', 'Type of information', 'Triggers',
+		$show_options = ['Description', 'Error text', 'Interval and storage', 'Latest data', 'Type of information', 'Triggers',
 				'Host interface', 'Type', 'Host inventory', 'Tags'];
 		$disabled_result = [];
 		foreach ($show_options as $i => $option) {
@@ -1317,7 +1317,7 @@ class testDashboardItemCardWidget extends testWidgets {
 						['action' => USER_ACTION_REMOVE, 'index' => 1],
 						['action' => USER_ACTION_REMOVE, 'index' => 1],
 						['action' => USER_ACTION_REMOVE, 'index' => 1],
-						['section' => 'Metrics'],
+						['section' => 'Interval and storage'],
 						['section' => 'Error text'],
 						['section' => 'Description'],
 						['section' => 'Tags'],
@@ -1590,7 +1590,7 @@ class testDashboardItemCardWidget extends testWidgets {
 						'High' => 1,
 						'Disaster' => 2
 					],
-					'Metrics' => [
+					'Interval and storage' => [
 						'column' => '100m',
 						'center-column' => '17d',
 						'right-column' => '17d'
@@ -1691,7 +1691,7 @@ class testDashboardItemCardWidget extends testWidgets {
 					'Item' => 'Dependent item 1',
 					'Host' => 'Visible host name for Item Card widget',
 					'Depended entity' => STRING_255,
-					'Metrics' => [
+					'Interval and storage' => [
 						'column' => '',
 						'center-column' => '31d',
 						'right-column' => '365d'
@@ -1749,7 +1749,7 @@ class testDashboardItemCardWidget extends testWidgets {
 					'Item' => 'Master item from template',
 					'Host' => 'Visible host name for Item Card widget',
 					'Depended entity' => 'Template for item card widget',
-					'Metrics' => [
+					'Interval and storage' => [
 						'column' => '50m',
 						'center-column' => '31d',
 						'right-column' => ''
@@ -1774,7 +1774,7 @@ class testDashboardItemCardWidget extends testWidgets {
 					'Item' => '<img src=\"x\" onerror=\"alert("ERROR");\"/>',
 					'Host' => 'Visible host name for Item Card widget',
 					'Disabled' => true,
-					'Metrics' => [
+					'Interval and storage' => [
 						'column' => '13m',
 						'center-column' => '31d',
 						'right-column' => ''
@@ -1793,7 +1793,7 @@ class testDashboardItemCardWidget extends testWidgets {
 						'Not classified' => 1
 					],
 					'Host' => 'Visible host name for Item Card widget',
-					'Metrics' => [
+					'Interval and storage' => [
 						'column' => '15m',
 						'center-column' => '',
 						'right-column' => ''
@@ -1882,9 +1882,9 @@ class testDashboardItemCardWidget extends testWidgets {
 			$this->assertEquals($data['Host'], $hostname->getText());
 		}
 
-		if (array_key_exists('Metrics', $data)) {
-			foreach ($data['Metrics'] as $section => $value) {
-				$this->assertEquals($value, $widget->query('class:section-metrics')->query('class:'.$section)
+		if (array_key_exists('Interval and storage', $data)) {
+			foreach ($data['Interval and storage'] as $section => $value) {
+				$this->assertEquals($value, $widget->query('class:section-interval-and-storage')->query('class:'.$section)
 						->query('class:column-value')->one()->getText()
 				);
 			}
@@ -2457,7 +2457,7 @@ class testDashboardItemCardWidget extends testWidgets {
 	 */
 	protected function calculateShowResult($rows) {
 		$result = [
-			['section' => 'Metrics'],
+			['section' => 'Interval and storage'],
 			['section' => 'Type of information'],
 			['section' => 'Host interface'],
 			['section' => 'Type']
