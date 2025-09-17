@@ -53,7 +53,7 @@ class CControllerSlaCreate extends CController {
 				'when' => ['schedule_mode', 'in' => [CSlaHelper::SCHEDULE_MODE_CUSTOM]]
 			],
 			'effective_date' => ['string', 'required', 'not_empty',
-				'use' => [CAbsoluteDateParser::class, [], ['min' => 0, 'max' => ZBX_MAX_DATE]]
+				'use' => [CAbsoluteTimeParser::class, ['date_only' => true], ['min' => 0, 'max' => ZBX_MAX_DATE]]
 			],
 			'service_tags' => ['objects', 'required', 'not_empty', 'uniq' => ['tag', 'value'],
 				'messages' => ['uniq' => _('Tag name and value combination is not unique.')],
