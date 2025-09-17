@@ -97,7 +97,8 @@ func (p *Plugin) Export(key string, rawParams []string, pluginCtx plugin.Context
 		ctxErr := ctx.Err()
 		if ctxErr != nil && errors.Is(ctxErr, context.DeadlineExceeded) {
 			p.Errf(
-				"failed to handle metric: query execution timeout %s exceeded: %s",
+				"failed to handle metric %q: query execution timeout %s exceeded: %s",
+				key,
 				timeout.String(),
 				err.Error(),
 			)
@@ -110,7 +111,7 @@ func (p *Plugin) Export(key string, rawParams []string, pluginCtx plugin.Context
 		return nil, err
 	}
 
-	return result, err
+	return result, nil
 }
 
 // Start implements the Runner interface and performs an initialization when the plugin is activated.
