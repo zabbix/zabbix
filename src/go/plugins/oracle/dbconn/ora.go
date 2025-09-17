@@ -160,6 +160,11 @@ func (conn *OraConn) getLastAccessTime() time.Time {
 	return conn.lastAccessTime
 }
 
+// GetCallTimeout returns callTimeout.
+func (conn *OraConn) GetCallTimeout() time.Duration {
+	return conn.callTimeout
+}
+
 func (conn *OraConn) closeWithLog() {
 	if conn.Client == nil {
 		return
@@ -239,9 +244,4 @@ func prepareConnectString(tnsType TNSNameType, cd *ConnDetails, connectTimeout t
 	}
 
 	return connectString, nil
-}
-
-// GetCallTimeout returns callTimeout
-func (o *OraConn) GetCallTimeout() time.Duration {
-	return o.callTimeout
 }
