@@ -1132,6 +1132,11 @@ class CFormValidator {
 		$file_fields = [];
 
 		foreach ($rules['fields'] as $field => $rule_sets) {
+			if (empty($rule_sets)) {
+				$value_fields[$field] = true;
+				$file_fields[$field] = true;
+			}
+
 			foreach ($rule_sets as $rule_set) {
 				$this->validateField($rule_set, $value, $field, $path.'/'.$field, $files);
 
