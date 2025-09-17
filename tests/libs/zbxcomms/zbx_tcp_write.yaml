@@ -3,7 +3,6 @@ test case: "default usage"
 in:
   poll_mode: "no error"
   len: 100
-  socket_blocking_error: "No"
 out:
   result: 100
 ---
@@ -12,7 +11,7 @@ in:
   poll_mode: "no error"
   len: 0
   write_error: yes
-  socket_blocking_error: "yes"
+  socket_had_nonblocking_error: "no"
 out:
   result: -1
 ---
@@ -21,6 +20,5 @@ in:
   poll_mode: "revents error"
   len: 0
   write_error: yes
-  socket_blocking_error: "no"
 out:
   result: -1

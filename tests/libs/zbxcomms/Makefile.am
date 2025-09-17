@@ -279,9 +279,6 @@ zbx_udp_recv_LDFLAGS = @AGENT_LDFLAGS@ $(CMOCKA_LDFLAGS) $(YAML_LDFLAGS) \
 
 zbx_udp_recv_CFLAGS = $(COMMS_COMPILER_FLAGS)
 
-#zbx_tcp_recv_context_line
-
-
 if IPV6
 zbx_tcp_check_allowed_peers_SOURCES = \
 	zbx_tcp_check_allowed_peers.c \
