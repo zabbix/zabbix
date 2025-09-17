@@ -43,7 +43,7 @@ class CPeriodTimeRangeValidator extends CValidator {
 			$day_period_to = $this->period_time_parser->getDayPeriodTo();
 
 			if ($from_m > 59 || $to_m > 59 || $day_period_to > SEC_PER_DAY) {
-				$this->setError(_('a time period is expected'));
+				$this->setError(_('comma separated list of time periods is expected'));
 
 				return false;
 			}
