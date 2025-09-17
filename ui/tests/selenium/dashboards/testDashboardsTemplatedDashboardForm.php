@@ -2304,7 +2304,7 @@ class testDashboardsTemplatedDashboardForm extends CWebTest {
 							'type' => 'show_section',
 							'field_locator' => 'id:sections-table',
 							'show_sections' => [
-								['section' => 'Metrics'],
+								['section' => 'Interval and storage'],
 								['section' => 'Type of information'],
 								['section' => 'Host interface'],
 								['section' => 'Type']
