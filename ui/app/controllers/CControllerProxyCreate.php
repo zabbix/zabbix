@@ -37,41 +37,23 @@ class CControllerProxyCreate extends CController {
 			'operating_mode' => ['db proxy.operating_mode', 'required',
 				'in' => [PROXY_OPERATING_MODE_ACTIVE, PROXY_OPERATING_MODE_PASSIVE]
 			],
-			'address' => [
-				['db proxy.address',
-					'use' => [CIPParser::class, [
-						'usermacros' => true, 'lldmacros' => false, 'macros' => false, 'v6' => ZBX_HAVE_IPV6
-					]],
-					'messages' => ['use' => _('Invalid address.')]
-				],
-				['db proxy.address',
-					'use' => [CDnsParser::class, [
-						'usermacros' => true, 'lldmacros' => false, 'macros' => false
-					]],
-					'messages' => ['use' => _('Invalid address.')]
-				],
-				['db proxy.address', 'required', 'not_empty',
-					'when' => ['operating_mode', 'in' => [PROXY_OPERATING_MODE_PASSIVE]]
-				]
+			'address' => ['db proxy.address', 'required', 'not_empty',
+				'use' => [CIPRangeParser::class, ['v6' => ZBX_HAVE_IPV6, 'dns' => true, 'ranges' => false,
+					'max_ipv4_cidr' => 0, 'usermacros' => true
+				]],
+				'messages' => ['use' => _('Invalid address.')],
+				'when' => ['operating_mode', 'in' => [PROXY_OPERATING_MODE_PASSIVE]]
 			],
 			'port' => ['db proxy.port', 'required', 'not_empty',
 				'use' => [CPortParser::class, ['usermacros' => true]], 'messages' => ['use' => _('Incorrect port.')],
 				'when' => ['operating_mode', 'in' => [PROXY_OPERATING_MODE_PASSIVE]]
 			],
-			'local_address' => [
-				['db proxy.local_address',
-					'use' => [CIPParser::class, [
-						'usermacros' => false, 'lldmacros' => false, 'macros' => false, 'v6' => ZBX_HAVE_IPV6
-					]],
-					'messages' => ['use' => _('Invalid address.')]
-				],
-				['db proxy.local_address',
-					'use' => [CDnsParser::class, [
-						'usermacros' => false, 'lldmacros' => false, 'macros' => false
-					]],
-					'messages' => ['use' => _('Invalid address.')]
-				],
-				['db proxy.local_address', 'required', 'not_empty', 'when' => ['proxy_groupid', 'not_empty']]
+			'local_address' => ['db proxy.local_address', 'required', 'not_empty',
+				'use' => [CIPRangeParser::class, ['v6' => ZBX_HAVE_IPV6, 'dns' => true, 'ranges' => false,
+					'max_ipv4_cidr' => 0, 'usermacros' => false
+				]],
+				'messages' => ['use' => _('Invalid address.')],
+				'when' => ['proxy_groupid', 'not_empty']
 			],
 			'local_port' => ['db proxy.local_port', 'required', 'not_empty',
 				'use' => [CPortParser::class, ['usermacros' => true]], 'messages' => ['use' => _('Incorrect port.')],
