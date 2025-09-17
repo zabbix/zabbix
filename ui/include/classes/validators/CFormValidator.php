@@ -1275,7 +1275,7 @@ class CFormValidator {
 		return false;
 	}
 
-	private function resolveFieldReference(&$parameter, ?string &$field_path, string $path): void {
+	private function resolveFieldReference(string $parameter, ?string $field_path, string $path): array {
 		if (substr($parameter, 0, 1) === '{' && substr($parameter, -1, 1) === '}') {
 			$field_data = $this->getWhenFieldValue(substr($parameter, 1, -1), $path);
 
@@ -1287,6 +1287,8 @@ class CFormValidator {
 				}
 			}
 		}
+
+		return [$parameter, $field_path];
 	}
 
 	private function validateApiUniq(array $check, string &$path, ?string &$error = null): bool {
@@ -1297,7 +1299,7 @@ class CFormValidator {
 
 		// Replace field references by real values in API request parameters.
 		foreach ($parameters['filter'] as &$parameter) {
-			$this->resolveFieldReference($parameter, $field_path, $path);
+			[$parameter, $field_path] = $this->resolveFieldReference($parameter, $field_path, $path);
 		}
 		unset($parameter);
 
@@ -1306,7 +1308,7 @@ class CFormValidator {
 				continue;
 			}
 
-			$this->resolveFieldReference($parameter, $field_path, $path);
+			[$parameter, $field_path] = $this->resolveFieldReference($parameter, $field_path, $path);
 		}
 		unset($parameter);
 
