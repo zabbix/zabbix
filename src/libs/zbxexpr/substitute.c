@@ -16,6 +16,15 @@
 
 #include "zbx_expression_constants.h"
 #include "zbxstr.h"
+#include "zbxalgo.h"
+
+typedef struct
+{
+	const void		*obj;
+	void			*ptr;
+	zbx_rem_destroy_func_t	destroy_func;
+}
+zbx_expr_rem_t;
 
 /* macros that can be indexed */
 static const char	*ex_macros[] =
@@ -60,9 +69,34 @@ static const char	*ex_macros[] =
 	NULL
 };
 
+static ZBX_THREAD_LOCAL zbx_hashset_t	*expr_cache = NULL;
+
 const char	**zbx_get_indexable_macros(void)
 {
 	return ex_macros;
+}
+
+void	*zbx_expr_rem(const void *obj, size_t sz, zbx_rem_create_func_t create_func,
+		zbx_rem_destroy_func_t destroy_func)
+{
+	zbx_expr_rem_t	*entry;
+
+	if (NULL == (entry = (zbx_expr_rem_t *)zbx_hashset_search(expr_cache, &obj)))
+	{
+		entry = zbx_malloc(NULL, sizeof(zbx_expr_rem_t));
+
+		entry->obj = obj;
+		entry->ptr = zbx_malloc(NULL, sz);
+		memset(entry->ptr, 0, sz);
+		entry->destroy_func = destroy_func;
+
+		if (NULL != create_func)
+			create_func(entry->ptr);
+
+		zbx_hashset_insert(expr_cache, entry, sizeof(zbx_expr_rem_t));
+	}
+
+	return entry->ptr;
 }
 
 int	zbx_substitute_macros_args(zbx_token_search_t search, char **data, char *error, size_t maxerrlen,
@@ -85,6 +119,9 @@ int	zbx_substitute_macros_args(zbx_token_search_t search, char **data, char *err
 
 	if (SUCCEED != zbx_token_find(*data, p.pos, &p.token, p.token_search))
 		goto out;
+
+	expr_cache = zbx_malloc(expr_cache, sizeof(zbx_hashset_t));
+	zbx_hashset_create(expr_cache, 10, ZBX_DEFAULT_PTR_HASH_FUNC, ZBX_DEFAULT_PTR_COMPARE_FUNC);
 
 	data_alloc = data_len = strlen(*data) + 1;
 
@@ -231,6 +268,22 @@ int	zbx_substitute_macros_args(zbx_token_search_t search, char **data, char *err
 
 		p.pos++;
 	}
+
+	zbx_hashset_iter_t	iter;
+	zbx_expr_rem_t		*entry;
+
+	zbx_hashset_iter_reset(expr_cache, &iter);
+
+	while (NULL != (entry = (zbx_expr_rem_t *)zbx_hashset_iter_next(&iter)))
+	{
+		if (NULL != entry->destroy_func && NULL != entry->ptr)
+			entry->destroy_func(entry->ptr);
+		zbx_free(entry->ptr);
+		zbx_hashset_iter_remove(&iter);
+	}
+
+	zbx_hashset_destroy(expr_cache);
+	zbx_free(expr_cache);
 
 out:
 	zabbix_log(LOG_LEVEL_DEBUG, "End %s()", __func__);

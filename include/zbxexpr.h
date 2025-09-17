@@ -293,6 +293,12 @@ const char	*zbx_macro_in_list(const char *str, zbx_strloc_t strloc, const char *
 char		*zbx_get_macro_from_func(const char *str, zbx_token_func_macro_t *fm, int *N_functionid);
 const char	**zbx_get_indexable_macros(void);
 
+typedef void (*zbx_rem_create_func_t)(void *);
+typedef void (*zbx_rem_destroy_func_t)(void *);
+
+void	*zbx_expr_rem(const void *obj, size_t sz, zbx_rem_create_func_t create_func,
+		zbx_rem_destroy_func_t destroy_func);
+
 int	zbx_substitute_macros(char **data, char *error, size_t maxerrlen, zbx_macro_resolv_func_t resolver, ...);
 int	zbx_substitute_macros_ext_search(zbx_token_search_t search, char **data, char *error, size_t maxerrlen,
 		zbx_macro_resolv_func_t resolver, ...);

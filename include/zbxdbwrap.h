@@ -193,9 +193,7 @@ int	zbx_macro_message_common_resolv(zbx_macro_resolv_data_t *p, zbx_dc_um_handle
 		const zbx_uint64_t *actionid, const zbx_db_event *event, const zbx_db_event *r_event,
 		const zbx_uint64_t *userid, const zbx_dc_host_t *dc_host, const zbx_db_alert *alert,
 		const zbx_service_alarm_t *service_alarm, const zbx_db_service *service, const char *tz,
-		zbx_vector_uint64_t *item_hosts, const zbx_vector_uint64_t **c_event_hosts,
-		const zbx_vector_uint64_t **event_hosts, zbx_db_event **cause_event,
-		zbx_db_event **cause_recovery_event, char **replace_to, char **data, char *error, size_t maxerrlen);
+		char **replace_to, char **data, char *error, size_t maxerrlen);
 int	zbx_macro_trigger_desc_resolv(zbx_macro_resolv_data_t *p, va_list args, char **replace_to,
 		char **data, char *error, size_t maxerrlen);
 int	zbx_macro_event_name_resolv(zbx_macro_resolv_data_t *p, va_list args, char **replace_to,
