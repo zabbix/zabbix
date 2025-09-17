@@ -404,8 +404,7 @@ class testPermissionsWithoutCSRF extends CWebTest {
 			[
 				[
 					'db' => 'SELECT * FROM globalmacro',
-					'link' => 'zabbix.php?action=macros.edit',
-					'return_button' => true
+					'link' => 'zabbix.php?action=macros.edit'
 				]
 			],
 			// #38 Trigger displaying options update.
