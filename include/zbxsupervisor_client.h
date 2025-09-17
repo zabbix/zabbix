@@ -18,6 +18,7 @@
 #include "zbxcommon.h"
 #include "zbxthreads.h"
 #include "zbx_rtc_constants.h"
+#include "zbxipcservice.h"
 
 #define ZBX_IPC_SERVICE_SUPERVISOR	"supervisor"
 
@@ -33,7 +34,17 @@ typedef struct
 zbx_supervisor_unit_args_t;
 
 void	zbx_supervisor_set_process_running(int proc_index);
-void	zbx_supervisor_wait_for_runlevel(int runlevel);
+
+typedef struct
+{
+	zbx_ipc_async_socket_t	asock;
+	int		last_runlevel;
+}
+zbx_supervisor_client_t;
+
+int	zbx_supervisor_client_init(zbx_supervisor_client_t *svc, char **error);
+void	zbx_supervisor_client_clear(zbx_supervisor_client_t *svc);
+int	zbx_supervisor_client_poll(zbx_supervisor_client_t *svc, int runlevel, char **error);
 
 void	zbx_supervisor_get_process_info(int process_type, zbx_proc_owner_t *owner, int *runlevel);
 int	zbx_supervisor_get_process_count(const int *config_forks);

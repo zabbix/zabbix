@@ -2112,25 +2112,64 @@ static int	server_startup(zbx_socket_t *listen_sock, int *ha_stat, int *ha_failo
 
 	runlevels = zbx_proc_startup_create(zbx_threads_num, get_process_info_by_thread);
 
-	for (int i = 0; i <= ZBX_RUNLEVEL_DEFAULT; i++)
+	zbx_unset_child_signal_handler();
+	start_processes(listen_sock, runlevels, 0);
+
+	zbx_supervisor_client_t	svc;
+
+	if (FAIL == (ret = zbx_supervisor_client_init(&svc, &error)))
+	{
+		zabbix_log(LOG_LEVEL_CRIT, "cannot initialize supervisor client: %s", error);
+		zbx_free(error);
+
+		goto out;
+	}
+
+	for (int i = 1; SUCCEED == ret && i <= ZBX_RUNLEVEL_DEFAULT; i++)
 	{
 		zabbix_log(LOG_LEVEL_DEBUG, "waiting for runlevel %d ...", i);
-		zbx_supervisor_wait_for_runlevel(i);
 
-		if (SUCCEED != (ret = zbx_ha_get_status(CONFIG_HA_NODE_NAME, ha_stat, ha_failover,
-				&error)))
+		while (SUCCEED != (ret = zbx_supervisor_client_poll(&svc, i, &error)))
 		{
-			zabbix_log(LOG_LEVEL_CRIT, "cannot obtain HA status: %s", error);
-			zbx_free(error);
-			goto out;
-		}
+			if (NULL != error)
+			{
+				zabbix_log(LOG_LEVEL_CRIT, "failed to wait for the runlevel %d: %s", i, error);
+				zbx_free(error);
+				zbx_supervisor_client_clear(&svc);
+				break;
+			}
 
-		if (ZBX_NODE_STATUS_ACTIVE != *ha_stat)
-			goto out;
+			if (SUCCEED == zbx_waitpid_nohang(zbx_threads, zbx_threads_num))
+			{
+				zabbix_log(LOG_LEVEL_CRIT, "cannot continue server startup because of unexpected"
+						" process termination");
+				break;
+			}
+
+			if (SUCCEED != (ret = zbx_ha_get_status(CONFIG_HA_NODE_NAME, ha_stat, ha_failover,
+					&error)))
+			{
+				zabbix_log(LOG_LEVEL_CRIT, "cannot obtain HA status: %s", error);
+				zbx_free(error);
+				break;
+			}
+
+			if (ZBX_NODE_STATUS_ACTIVE != *ha_stat)
+			{
+				zabbix_log(LOG_LEVEL_CRIT, "HA node became inactive during server startup");
+				break;
+			}
+		}
 
 		zabbix_log(LOG_LEVEL_DEBUG, "starting processes at runlevel %d", i);
 		start_processes(listen_sock, runlevels, i);
 	}
+
+	zbx_set_child_signal_handler();
+	zbx_supervisor_client_clear(&svc);
+
+	if (FAIL == ret)
+		goto out;
 
 	/* startup/postinit tasks can take a long time, update status */
 	if (SUCCEED != (ret = zbx_ha_get_status(CONFIG_HA_NODE_NAME, ha_stat, ha_failover, &error)))

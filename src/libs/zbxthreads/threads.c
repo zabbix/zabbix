@@ -258,6 +258,23 @@ static int	zbx_thread_count(pid_t *threads, size_t threads_num, const int *threa
 	return count;
 }
 
+static int	log_exit_status(pid_t pid, int status)
+{
+	if (0 == WIFEXITED(status) || 0 != WEXITSTATUS(status))
+	{
+		if (WIFEXITED(status))
+		{
+			zbx_error("child process exited (PID:%d,exitcode:%d).",
+					pid, WEXITSTATUS(status));
+		}
+		else if (WIFSIGNALED(status))
+		{
+			zbx_error("child process killed by signal"
+					" (PID:%d,signal:%d).", pid, WTERMSIG(status));
+		}
+	}
+}
+
 static int	threads_kill_and_wait(ZBX_THREAD_HANDLE *threads, const int *threads_flags, int threads_num,
 		int priority, int ret, int timeout)
 {
@@ -291,19 +308,7 @@ static int	threads_kill_and_wait(ZBX_THREAD_HANDLE *threads, const int *threads_
 			if (SUCCEED != ret)
 				continue;
 
-			if (0 == WIFEXITED(status) || 0 != WEXITSTATUS(status))
-			{
-				if (WIFEXITED(status))
-				{
-					zbx_error("child process exited (PID:%d,exitcode:%d).",
-							pid, WEXITSTATUS(status));
-				}
-				else if (WIFSIGNALED(status))
-				{
-					zbx_error("child process killed by signal"
-							" (PID:%d,signal:%d).", pid, WTERMSIG(status));
-				}
-			}
+			log_exit_status(pid, status);
 		}
 
 		if (-1 == pid && EINTR != errno)
@@ -400,5 +405,35 @@ void	zbx_pthread_init_attr(pthread_attr_t *attr)
 		exit(EXIT_FAILURE);
 	}
 #endif
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: check for terminated direct child processes without blocking      *
+ *                                                                            *
+ * Parameters: threads     - [IN/OUT] array of direct process pids            *
+ *             threads_num - [IN] number of pids in the array                 *
+ *                                                                            *
+ * Return value: SUCCEED - a terminated child process was found               *
+ *               FAIL    - no child processes available                       *
+ *                                                                            *
+ * Comments: logs error messages for processes that exit with non-zero status *
+ *           or are terminated by signals                                     *
+ *                                                                            *
+ ******************************************************************************/
+int	zbx_waitpid_nohang(ZBX_THREAD_HANDLE *threads, size_t threads_num)
+{
+	int	status;
+	pid_t	pid;
+
+	if (0 >= (pid = waitpid((pid_t)-1, &status, WNOHANG)))
+		return FAIL;
+
+	if (SUCCEED != zbx_child_cleanup(pid, threads, threads_num))
+		return FAIL;
+
+	log_exit_status(pid, status);
+
+	return SUCCEED;
 }
 #endif

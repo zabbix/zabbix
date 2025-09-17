@@ -2032,18 +2032,53 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 	zbx_set_child_pids(zbx_threads, zbx_threads_num);
 
 	zbx_proc_startup_t	*runlevels = NULL;
+	int			ret;
 
 	runlevels = zbx_proc_startup_create(zbx_threads_num, get_process_info_by_thread);
 
-	for (i = 0; i <= ZBX_RUNLEVEL_DEFAULT; i++)
+	/* start supervisor */
+
+	zbx_unset_child_signal_handler();
+	start_processes(&listen_sock, &config_comms, runlevels, 0);
+
+	zbx_supervisor_client_t	svc;
+
+	if (FAIL == (ret = zbx_supervisor_client_init(&svc, &error)))
+	{
+		zabbix_log(LOG_LEVEL_CRIT, "cannot initialize supervisor client: %s", error);
+		zbx_free(error);
+
+		goto out;
+	}
+
+	for (i = 1; SUCCEED == ret && i <= ZBX_RUNLEVEL_DEFAULT; i++)
 	{
 		zabbix_log(LOG_LEVEL_DEBUG, "waiting for runlevel %d ...", i);
-		zbx_supervisor_wait_for_runlevel(i);
+
+		while (SUCCEED != (ret = zbx_supervisor_client_poll(&svc, i, &error)))
+		{
+			if (NULL != error)
+			{
+				zabbix_log(LOG_LEVEL_CRIT, "failed to wait for the runlevel %d: %s", i, error);
+				zbx_free(error);
+				zbx_supervisor_client_clear(&svc);
+				break;
+			}
+
+			if (SUCCEED != zbx_waitpid_nohang(zbx_threads, zbx_threads_num))
+			{
+				zabbix_log(LOG_LEVEL_CRIT, "cannot continue proxy startup because of unexpected"
+						" process termination");
+				break;
+			}
+		}
 
 		zabbix_log(LOG_LEVEL_DEBUG, "starting processes at runlevel %d", i);
 		start_processes(&listen_sock, &config_comms, runlevels, i);
 	}
 
+	zbx_set_child_signal_handler();
+	zbx_supervisor_client_clear(&svc);
 	zbx_unset_exit_on_terminate();
 
 	while (ZBX_IS_RUNNING())
@@ -2083,6 +2118,9 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 
 		__zbx_update_env(zbx_time());
 	}
+out:
+	if (SUCCEED != ret)
+		zbx_set_exiting_with_fail();
 
 	if (NULL != runlevels)
 		zbx_proc_startup_free(runlevels);
@@ -2094,5 +2132,5 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 
 	zbx_on_exit(ZBX_EXIT_STATUS(), &exit_args);
 
-	return SUCCEED;
+	return ret;
 }

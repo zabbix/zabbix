@@ -1826,8 +1826,8 @@ int	zbx_ipc_async_socket_open(zbx_ipc_async_socket_t *asocket, const char *servi
 
 	ret = SUCCEED;
 out:
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s() clientid:" ZBX_FS_UI64 " ret:%s", __func__, asocket->client->id,
-			zbx_result_string(ret));
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s() clientid:" ZBX_FS_UI64 " ret:%s", __func__,
+			(NULL != asocket->client ? asocket->client->id : 0), zbx_result_string(ret));
 
 	return ret;
 }
