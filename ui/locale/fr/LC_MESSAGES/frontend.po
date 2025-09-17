@@ -4,7 +4,7 @@ msgstr ""
 "Project-Id-Version: Zabbix 6.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2023-10-19 13:48+0300\n"
-"PO-Revision-Date: 2025-08-22 18:18+0000\n"
+"PO-Revision-Date: 2025-09-05 18:24+0000\n"
 "Last-Translator: ERIC <eric78.zabbix@orange.fr>\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
 "Language: fr\n"
@@ -65,7 +65,7 @@ msgstr "une paire \"hôte:clé\" est attendue"
 
 #: app/views/host.wizard.edit.php:1024
 msgid "#{section_name}"
-msgstr ""
+msgstr "#{section_name}"
 
 #: include/forms.inc.php:1330
 #: include/views/configuration.host.discovery.edit.php:932
@@ -2043,6 +2043,10 @@ msgstr "Nombre moyen de demandes d'écriture en attente sur le disque virtuel pe
 msgid "Avoid easy-to-guess passwords"
 msgstr "Évitez les mots de passe faciles à deviner"
 
+#: app/views/host.wizard.edit.php:473
+msgid "Avoid including sensitive data."
+msgstr "Évitez d’inclure des données sensibles."
+
 #: jsLoader.php:172
 msgid "Awaiting data"
 msgstr "En attente de données"
@@ -3462,7 +3466,7 @@ msgstr "Impossible de trouver l'interface \"%1$s\" utilisée pour le prototype d
 #: include/classes/import/CConfigurationImport.php:1220
 #, c-format
 msgid "Cannot find interface \"%1$s\" used for item prototype \"%2$s\" of discovery rule prototype \"%3$s\" on \"%4$s\"."
-msgstr ""
+msgstr "Impossible de trouver l'interface « %1$s » utilisée pour le prototype d'élément « %2$s » du prototype de règle de découverte « %3$s » sur « %4$s »."
 
 #: include/classes/import/CConfigurationImport.php:1852
 #, c-format
@@ -3477,7 +3481,7 @@ msgstr "Impossible de trouver l'élément \"%1$s\" sur \"%2$s\" utilisé comme v
 #: include/classes/import/CConfigurationImport.php:1515
 #, c-format
 msgid "Cannot find item \"%1$s\" on \"%2$s\" used as the Y axis MAX value for graph prototype \"%3$s\" of discovery rule prototype \"%4$s\" on \"%5$s\"."
-msgstr ""
+msgstr "Impossible de trouver l'élément « %1$s » sur « %2$s » utilisé comme valeur MAX de l'axe Y pour le prototype de graphique « %3$s » du prototype de règle de découverte « %4$s » sur « %5$s »."
 
 #: include/classes/import/CConfigurationImport.php:1834
 #, c-format
@@ -3492,7 +3496,7 @@ msgstr "Impossible de trouver l'élément \"%1$s\" sur \"%2$s\" utilisé comme v
 #: include/classes/import/CConfigurationImport.php:1490
 #, c-format
 msgid "Cannot find item \"%1$s\" on \"%2$s\" used as the Y axis MIN value for graph prototype \"%3$s\" of discovery rule prototype \"%4$s\" on \"%5$s\"."
-msgstr ""
+msgstr "Impossible de trouver l'élément « %1$s » sur « %2$s » utilisé comme valeur minimale de l'axe Y pour le prototype de graphique « %3$s » du prototype de règle de découverte « %4$s » sur « %5$s »."
 
 #: include/classes/import/importers/CMapImporter.php:244
 #, c-format
@@ -3512,7 +3516,7 @@ msgstr "Impossible de trouver l'élément \"%1$s\" sur \"%2$s\" utilisé dans le
 #: include/classes/import/CConfigurationImport.php:1540
 #, c-format
 msgid "Cannot find item \"%1$s\" on \"%2$s\" used in graph prototype \"%3$s\" of discovery rule prototype \"%4$s\" on \"%5$s\"."
-msgstr ""
+msgstr "Impossible de trouver l'élément « %1$s » sur « %2$s » utilisé dans le prototype de graphique « %3$s » du prototype de règle de découverte « %4$s » sur « %5$s »."
 
 #: include/classes/import/importers/CTemplateDashboardImporter.php:166
 #, c-format
@@ -3547,7 +3551,7 @@ msgstr "Impossible de trouver le modèle \"%1$s\" pour le prototype d'hôte \"%2
 #: include/classes/import/CConfigurationImport.php:1353
 #, c-format
 msgid "Cannot find template \"%1$s\" for host prototype \"%2$s\" of discovery rule prototype \"%3$s\" on \"%4$s\"."
-msgstr ""
+msgstr "Impossible de trouver le modèle « %1$s » pour le prototype d'hôte « %2$s » du prototype de règle de découverte « %3$s » sur « %4$s »."
 
 #: include/classes/import/CConfigurationImport.php:1182
 #, c-format
@@ -3582,6 +3586,10 @@ msgstr "Impossible de trouver la table de correspondances \"%1$s\" utilisée pou
 #: include/classes/import/CConfigurationImport.php:1243
 #, c-format
 msgid "Cannot find value map \"%1$s\" used for item prototype \"%2$s\" of discovery rule prototype \"%3$s\" on \"%4$s\"."
+msgstr "Impossible de trouver la table de correspondances « %1$s » utilisée pour le prototype d'élément « %2$s » du prototype de règle de découverte « %3$s » sur « %4$s »."
+
+#: app/views/oauth.authorize.php:33
+msgid "Cannot get authentication tokens"
 msgstr ""
 
 #: app/views/oauth.edit.php:230
@@ -3623,72 +3631,72 @@ msgstr "Impossible d'hériter des règles LDD avec la clé \"%1$s\" des modèles
 #: include/classes/api/services/CItemGeneral.php:1000
 #, c-format
 msgid "Cannot inherit LLD rule prototype with key \"%1$s\" of template \"%2$s\" and LLD rule \"%3$s\" to host \"%4$s\", because an LLD rule prototype with the same key already belongs to LLD rule \"%5$s\"."
-msgstr ""
+msgstr "Impossible d'hériter du prototype de règle LLD avec la clé « %1$s » du modèle « %2$s » et de la règle LLD « %3$s » pour l'hôte « %4$s », car un prototype de règle LLD avec la même clé appartient déjà à la règle LLD « %5$s »."
 
 #: include/classes/api/services/CItemGeneral.php:1001
 #, c-format
 msgid "Cannot inherit LLD rule prototype with key \"%1$s\" of template \"%2$s\" and LLD rule \"%3$s\" to template \"%4$s\", because an LLD rule prototype with the same key already belongs to LLD rule \"%5$s\"."
-msgstr ""
+msgstr "Impossible d'hériter du prototype de règle LLD avec la clé « %1$s » du modèle « %2$s » et de la règle LLD « %3$s » vers le modèle « %4$s », car un prototype de règle LLD avec la même clé appartient déjà à la règle LLD « %5$s »."
 
 #: include/classes/api/services/CItemGeneral.php:926
 #, c-format
 msgid "Cannot inherit LLD rule prototype with key \"%1$s\" of template \"%2$s\" to host \"%3$s\", because a discovered LLD rule prototype with the same key already exists."
-msgstr ""
+msgstr "Impossible d'hériter du prototype de règle LLD avec la clé « %1$s » du modèle « %2$s » pour l'hôte « %3$s », car un prototype de règle LLD découvert avec la même clé existe déjà."
 
 #: include/classes/api/services/CItemGeneral.php:1358
 #, c-format
 msgid "Cannot inherit LLD rule prototype with key \"%1$s\" of template \"%2$s\" to host \"%3$s\", because a host interface of type \"%4$s\" is required."
-msgstr ""
+msgstr "Impossible d'hériter du prototype de règle LLD avec la clé « %1$s » du modèle « %2$s » vers l'hôte « %3$s », car une interface hôte de type « %4$s » est requise."
 
 #: include/classes/api/services/CItemGeneral.php:969
 #, c-format
 msgid "Cannot inherit LLD rule prototype with key \"%1$s\" of template \"%2$s\" to host \"%3$s\", because an LLD rule prototype with the same key is already inherited from template \"%4$s\"."
-msgstr ""
+msgstr "Impossible d'hériter du prototype de règle LLD avec la clé « %1$s » du modèle « %2$s » pour l'hôte « %3$s », car un prototype de règle LLD avec la même clé est déjà hérité du modèle « %4$s »."
 
 #: include/classes/api/services/CItemGeneral.php:921
 #, c-format
 msgid "Cannot inherit LLD rule prototype with key \"%1$s\" of template \"%2$s\" to host \"%3$s\", because an LLD rule with the same key already exists."
-msgstr ""
+msgstr "Impossible d'hériter du prototype de règle LLD avec la clé « %1$s » du modèle « %2$s » pour l'hôte « %3$s », car une règle LLD avec la même clé existe déjà."
 
 #: include/classes/api/services/CItemGeneral.php:914
 #, c-format
 msgid "Cannot inherit LLD rule prototype with key \"%1$s\" of template \"%2$s\" to host \"%3$s\", because an item prototype with the same key already exists."
-msgstr ""
+msgstr "Impossible d'hériter du prototype de règle LLD avec la clé « %1$s » du modèle « %2$s » pour héberger « %3$s », car un prototype d'élément avec la même clé existe déjà."
 
 #: include/classes/api/services/CItemGeneral.php:907
 #, c-format
 msgid "Cannot inherit LLD rule prototype with key \"%1$s\" of template \"%2$s\" to host \"%3$s\", because an item with the same key already exists."
-msgstr ""
+msgstr "Impossible d'hériter du prototype de règle LLD avec la clé « %1$s » du modèle « %2$s » pour héberger « %3$s », car un élément avec la même clé existe déjà."
 
 #: include/classes/api/services/CItemGeneral.php:970
 #, c-format
 msgid "Cannot inherit LLD rule prototype with key \"%1$s\" of template \"%2$s\" to template \"%3$s\", because an LLD rule prototype with the same key is already inherited from template \"%4$s\"."
-msgstr ""
+msgstr "Impossible d'hériter du prototype de règle LLD avec la clé « %1$s » du modèle « %2$s » vers le modèle « %3$s », car un prototype de règle LLD avec la même clé est déjà hérité du modèle « %4$s »."
 
 #: include/classes/api/services/CItemGeneral.php:922
 #, c-format
 msgid "Cannot inherit LLD rule prototype with key \"%1$s\" of template \"%2$s\" to template \"%3$s\", because an LLD rule with the same key already exists."
-msgstr ""
+msgstr "Impossible d'hériter du prototype de règle LLD avec la clé « %1$s » du modèle « %2$s » vers le modèle « %3$s », car une règle LLD avec la même clé existe déjà."
 
 #: include/classes/api/services/CItemGeneral.php:915
 #, c-format
 msgid "Cannot inherit LLD rule prototype with key \"%1$s\" of template \"%2$s\" to template \"%3$s\", because an item prototype with the same key already exists."
-msgstr ""
+msgstr "Impossible d'hériter du prototype de règle LLD avec la clé « %1$s » du modèle « %2$s » vers le modèle « %3$s », car un prototype d'élément avec la même clé existe déjà."
 
 #: include/classes/api/services/CItemGeneral.php:908
 #, c-format
 msgid "Cannot inherit LLD rule prototype with key \"%1$s\" of template \"%2$s\" to template \"%3$s\", because an item with the same key already exists."
-msgstr ""
+msgstr "Impossible d'hériter du prototype de règle LLD avec la clé « %1$s » du modèle « %2$s » vers le modèle « %3$s », car un élément avec la même clé existe déjà."
 
 #: include/classes/api/services/CItemGeneral.php:717
 #, c-format
 msgid "Cannot inherit LLD rule prototypes with key \"%1$s\" of both \"%2$s\" and \"%3$s\" templates, because the key must be unique on host \"%4$s\"."
-msgstr ""
+msgstr "Impossible d'hériter des prototypes de règles LLD avec la clé « %1$s » des modèles « %2$s » et « %3$s », car la clé doit être unique sur l'hôte « %4$s »."
 
 #: include/classes/api/services/CItemGeneral.php:718
 #, c-format
 msgid "Cannot inherit LLD rule prototypes with key \"%1$s\" of both \"%2$s\" and \"%3$s\" templates, because the key must be unique on template \"%4$s\"."
-msgstr ""
+msgstr "Impossible d'hériter des prototypes de règles LLD avec la clé « %1$s » des modèles « %2$s » et « %3$s », car la clé doit être unique sur le modèle « %4$s »."
 
 #: include/classes/api/services/CItemGeneral.php:819
 #, c-format
@@ -3703,7 +3711,7 @@ msgstr "Impossible d'hériter de la règle LLD avec la clé \"%1$s\" du modèle 
 #: include/classes/api/services/CItemGeneral.php:897
 #, c-format
 msgid "Cannot inherit LLD rule with key \"%1$s\" of template \"%2$s\" to host \"%3$s\", because an LLD rule prototype with the same key already exists."
-msgstr ""
+msgstr "Impossible d'hériter de la règle LLD avec la clé « %1$s » du modèle « %2$s » pour l'hôte « %3$s », car un prototype de règle LLD avec la même clé existe déjà."
 
 #: include/classes/api/services/CItemGeneral.php:874
 #, c-format
@@ -3728,7 +3736,7 @@ msgstr "Impossible d'hériter de la règle LLD avec la clé \"%1$s\" du modèle 
 #: include/classes/api/services/CItemGeneral.php:898
 #, c-format
 msgid "Cannot inherit LLD rule with key \"%1$s\" of template \"%2$s\" to template \"%3$s\", because an LLD rule prototype with the same key already exists."
-msgstr ""
+msgstr "Impossible d'hériter de la règle LLD avec la clé « %1$s » du modèle « %2$s » vers le modèle « %3$s », car un prototype de règle LLD avec la même clé existe déjà."
 
 #: include/classes/api/services/CItemGeneral.php:875
 #, c-format
@@ -3768,7 +3776,7 @@ msgstr "Impossible d'hériter du prototype d'élément avec la clé \"%1$s\" du 
 #: include/classes/api/services/CItemGeneral.php:856
 #, c-format
 msgid "Cannot inherit item prototype with key \"%1$s\" of template \"%2$s\" to host \"%3$s\", because a discovered item prototype with the same key already exists."
-msgstr ""
+msgstr "Impossible d'hériter du prototype d'élément avec la clé « %1$s » du modèle « %2$s » pour héberger « %3$s », car un prototype d'élément découvert avec la même clé existe déjà."
 
 #: include/classes/api/services/CItemGeneral.php:841
 #, c-format
@@ -3783,7 +3791,7 @@ msgstr "Impossible d'hériter du prototype d'élément avec la clé \"%1$s\" du 
 #: include/classes/api/services/CItemGeneral.php:869
 #, c-format
 msgid "Cannot inherit item prototype with key \"%1$s\" of template \"%2$s\" to host \"%3$s\", because an LLD rule prototype with the same key already exists."
-msgstr ""
+msgstr "Impossible d'hériter du prototype d'élément avec la clé « %1$s » du modèle « %2$s » pour héberger « %3$s », car un prototype de règle LLD avec la même clé existe déjà."
 
 #: include/classes/api/services/CItemGeneral.php:835
 #, c-format
@@ -3808,7 +3816,7 @@ msgstr "Impossible d'hériter du prototype d'élément avec la clé \"%1$s\" du 
 #: include/classes/api/services/CItemGeneral.php:870
 #, c-format
 msgid "Cannot inherit item prototype with key \"%1$s\" of template \"%2$s\" to template \"%3$s\", because an LLD rule prototype with the same key already exists."
-msgstr ""
+msgstr "Impossible d'hériter du prototype d'élément avec la clé « %1$s » du modèle « %2$s » vers le modèle « %3$s », car un prototype de règle LLD avec la même clé existe déjà."
 
 #: include/classes/api/services/CItemGeneral.php:836
 #, c-format
@@ -3848,7 +3856,7 @@ msgstr "Impossible d'hériter de l'élément avec la clé \"%1$s\" du modèle \"
 #: include/classes/api/services/CItemGeneral.php:891
 #, c-format
 msgid "Cannot inherit item with key \"%1$s\" of template \"%2$s\" to host \"%3$s\", because a discovered LLD rule with the same key already exists."
-msgstr ""
+msgstr "Impossible d'hériter de l'élément avec la clé « %1$s » du modèle « %2$s » vers l'hôte « %3$s », car une règle LLD découverte avec la même clé existe déjà."
 
 #: include/classes/api/services/CItemGeneral.php:797
 #, c-format
@@ -3863,7 +3871,7 @@ msgstr "Impossible d'hériter de l'élément avec la clé \"%1$s\" du modèle \"
 #: include/classes/api/services/CItemGeneral.php:841
 #, c-format
 msgid "Cannot inherit item with key \"%1$s\" of template \"%2$s\" to host \"%3$s\", because an LLD rule prototype with the same key already exists."
-msgstr ""
+msgstr "Impossible d'hériter de l'élément avec la clé « %1$s » du modèle « %2$s » pour héberger « %3$s », car un prototype de règle LLD avec la même clé existe déjà."
 
 #: include/classes/api/services/CItemGeneral.php:785
 #, c-format
@@ -3893,7 +3901,7 @@ msgstr "Impossible d'hériter de l'élément avec la clé \"%1$s\" du modèle \"
 #: include/classes/api/services/CItemGeneral.php:842
 #, c-format
 msgid "Cannot inherit item with key \"%1$s\" of template \"%2$s\" to template \"%3$s\", because an LLD rule prototype with the same key already exists."
-msgstr ""
+msgstr "Impossible d'hériter de l'élément avec la clé « %1$s » du modèle « %2$s » vers le modèle « %3$s », car un prototype de règle LLD avec la même clé existe déjà."
 
 #: include/classes/api/services/CItemGeneral.php:786
 #, c-format
@@ -5127,7 +5135,7 @@ msgstr "Communication"
 
 #: app/views/host.wizard.edit.php:375
 msgid "Communication between Zabbix agent and server/proxy is secured with a unique user-defined pre-shared key identity and a secret pre-shared key linked to it."
-msgstr ""
+msgstr "La communication entre l'agent Zabbix et le serveur/proxy est sécurisée avec une identité de clé pré-partagée unique définie par l'utilisateur et une clé pré-partagée secrète qui lui est liée."
 
 #: app/views/host.wizard.edit.php:414
 msgid "Communication between Zabbix agent and server/proxy is secured with the pre-shared key (PSK) encryption method."
@@ -8546,6 +8554,10 @@ msgstr "Anglais (en_US)"
 #: app/views/host.wizard.edit.php:399
 msgid "Enter a non-secret pre-shared key identity string. Avoid including sensitive data."
 msgstr "Saisissez une chaîne d'identité de clé pré-partagée non secrète. Évitez d'inclure des données sensibles."
+
+#: app/views/host.wizard.edit.php:470
+msgid "Enter a unique name that Zabbix components will use to recognize the pre-shared key."
+msgstr "Saisissez un nom unique que les composants Zabbix utiliseront pour reconnaître la clé pré-partagée."
 
 #: app/views/host.wizard.edit.php:609
 msgid "Enter the IP/DNS address and port of the Zabbix agent installed on your monitoring target."
@@ -12196,6 +12208,10 @@ msgstr "Internet Explorer"
 #: include/views/configuration.item.prototype.list.php:69
 msgid "Interval"
 msgstr "Intervalle"
+
+#: widgets/itemcard/includes/CWidgetFieldItemSectionsView.php:76
+msgid "Interval and storage"
+msgstr ""
 
 #: include/classes/api/services/CRole.php:731
 #, c-format
@@ -16865,6 +16881,10 @@ msgstr "L'extension PHP ctype manque (Paramètre de configuration de PHP --enabl
 #: include/classes/setup/CFrontendSetup.php:687
 msgid "PHP curl"
 msgstr "PHP curl"
+
+#: include/classes/setup/CFrontendSetup.php:733
+msgid "PHP curl extension is missing or outdated."
+msgstr ""
 
 #: include/classes/setup/CFrontendSetup.php:691
 msgid "PHP curl extension missing."
@@ -21965,7 +21985,7 @@ msgstr "Ce champ ne peut pas être vide."
 #: app/controllers/CControllerItemPrototypeUpdate.php:228
 #: app/controllers/CControllerItemUpdate.php:228
 msgid "This field cannot be set to \"0\" without defining custom intervals."
-msgstr ""
+msgstr "Ce champ ne peut pas être défini sur « 0 » sans définir d’intervalles personnalisés."
 
 #: app/partials/configuration.host.edit.html.php:383
 #, c-format
@@ -26410,6 +26430,10 @@ msgstr "description"
 #: include/classes/validators/CApiInputValidator.php:1985
 msgid "directory cannot be empty"
 msgstr "le répertoire ne peut pas être vide"
+
+#: include/views/configuration.host.discovery.list.php:340
+msgid "discovery rule"
+msgstr ""
 
 #: app/controllers/CControllerItemMassCheckNow.php:138
 #: include/classes/api/services/CTask.php:562

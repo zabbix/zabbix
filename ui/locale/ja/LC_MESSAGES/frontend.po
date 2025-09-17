@@ -4,7 +4,7 @@ msgstr ""
 "Project-Id-Version: Zabbix 6.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2023-10-19 13:48+0300\n"
-"PO-Revision-Date: 2025-07-17 05:42+0000\n"
+"PO-Revision-Date: 2025-09-05 00:02+0000\n"
 "Last-Translator: Eiji Kawakita <age@cyber.email.ne.jp>\n"
 "Language-Team: Zabbix\n"
 "Language: ja\n"
@@ -2018,6 +2018,10 @@ msgstr "収集間隔内の仮想ディスクへの未処理の書き込みリク
 msgid "Avoid easy-to-guess passwords"
 msgstr "推測されやすいパスワードの回避"
 
+#: app/views/host.wizard.edit.php:473
+msgid "Avoid including sensitive data."
+msgstr "機密データを含めないようにしてください。"
+
 #: jsLoader.php:172
 msgid "Awaiting data"
 msgstr "データを待っています"
@@ -3491,6 +3495,10 @@ msgstr "\"%4$s\"上のディスカバリルール\"%3$s\"のアイテムのプ�
 #, c-format
 msgid "Cannot find value map \"%1$s\" used for item prototype \"%2$s\" of discovery rule prototype \"%3$s\" on \"%4$s\"."
 msgstr "\"%4$s\"上のディスカバリルールプロトタイプ\"%3$s\"のアイテムのプロトタイプ\"%2$s\"で使用されている値のマッピング\"%1$s\"がみつかりません。"
+
+#: app/views/oauth.authorize.php:33
+msgid "Cannot get authentication tokens"
+msgstr ""
 
 #: app/views/oauth.edit.php:230
 msgid "Cannot get authorization code."
@@ -7174,7 +7182,7 @@ msgstr "検出されたTimescaleDBのライセンスは、圧縮をサポート�
 
 #: app/views/administration.housekeeping.edit.php:204
 msgid "Detected license does not support compression. Compression is supported in TimescaleDB Community Edition."
-msgstr ""
+msgstr "検出されたライセンスは圧縮をサポートしていません。TimescaleDB Community Editionでは圧縮がサポートされています。"
 
 #: app/controllers/CControllerPopupTriggerExpr.php:1130
 msgid "Detection period"
@@ -8427,6 +8435,10 @@ msgstr "英語 (en_US)"
 #: app/views/host.wizard.edit.php:399
 msgid "Enter a non-secret pre-shared key identity string. Avoid including sensitive data."
 msgstr "非秘密の事前共有キーID文字列を入力してください。機密データは含めないでください。"
+
+#: app/views/host.wizard.edit.php:470
+msgid "Enter a unique name that Zabbix components will use to recognize the pre-shared key."
+msgstr "Zabbix コンポーネントが事前共有キーを認識するために使用する一意の名前を入力します。"
 
 #: app/views/host.wizard.edit.php:609
 msgid "Enter the IP/DNS address and port of the Zabbix agent installed on your monitoring target."
@@ -12061,6 +12073,10 @@ msgstr "Internet Explorer"
 msgid "Interval"
 msgstr "監視間隔"
 
+#: widgets/itemcard/includes/CWidgetFieldItemSectionsView.php:76
+msgid "Interval and storage"
+msgstr ""
+
 #: include/classes/api/services/CRole.php:731
 #, c-format
 msgid "Invalid API method \"%2$s\" for user role \"%1$s\"."
@@ -14088,7 +14104,7 @@ msgstr "要求される%1$sデータベースの最大バージョンは%2$sで�
 #: app/partials/administration.system.info.php:221
 #, c-format
 msgid "Maximum required version is %1$s."
-msgstr ""
+msgstr "必要な最大バージョンは %1$s です。"
 
 #: app/controllers/CControllerTimeSelectorUpdate.php:136
 #: include/classes/mvc/CController.php:320
@@ -14433,7 +14449,7 @@ msgstr "PHPのpostサイズの最小値は%1$sです(\"post_max_size\"設定オ�
 #: app/views/administration.housekeeping.edit.php:183
 #, c-format
 msgid "Minimum required version is %1$s."
-msgstr ""
+msgstr "最低限必要なバージョンは%1$sです。"
 
 #: app/views/monitoring.map.view.php:48
 #: include/views/monitoring.sysmap.edit.php:276
@@ -14665,7 +14681,7 @@ msgstr "障害イベントを継続して生成"
 #: app/partials/administration.system.info.php:235
 #, c-format
 msgid "Must be at least %1$s."
-msgstr ""
+msgstr "少なくとも%1$sである必要があります。"
 
 #: include/classes/validators/CFormValidator.php:340
 msgid "Must be selected."
@@ -14674,7 +14690,7 @@ msgstr "選択する必要があります。"
 #: app/partials/administration.system.info.php:254
 #, c-format
 msgid "Must not be higher than %1$s."
-msgstr ""
+msgstr "%1$s より高くすることはできません。"
 
 #: jsLoader.php:284
 msgid "Mute"
@@ -15446,63 +15462,63 @@ msgstr "\"%1$s.%2$s\"を呼び出す権限がありません。"
 
 #: include/classes/api/services/CConfiguration.php:312
 msgid "No permissions to import discovery rules."
-msgstr ""
+msgstr "ディスカバリルールをインポートする権限がありません。"
 
 #: include/classes/api/services/CConfiguration.php:313
 msgid "No permissions to import graphs."
-msgstr ""
+msgstr "グラフをインポートする権限がありません。"
 
 #: include/classes/api/services/CConfiguration.php:314
 msgid "No permissions to import host groups."
-msgstr ""
+msgstr "ホスト グループをインポートする権限がありません。"
 
 #: include/classes/api/services/CConfiguration.php:316
 msgid "No permissions to import hosts."
-msgstr ""
+msgstr "ホストをインポートする権限がありません。"
 
 #: include/classes/api/services/CConfiguration.php:318
 msgid "No permissions to import images."
-msgstr ""
+msgstr "イメージをインポートする権限がありません。"
 
 #: include/classes/api/services/CConfiguration.php:319
 msgid "No permissions to import items."
-msgstr ""
+msgstr "アイテムをインポートする権限がありません。"
 
 #: include/classes/api/services/CConfiguration.php:320
 msgid "No permissions to import maps."
-msgstr ""
+msgstr "マップをインポートする権限がありません。"
 
 #: include/classes/api/services/CConfiguration.php:321
 msgid "No permissions to import media types."
-msgstr ""
+msgstr "メディア タイプをインポートする権限がありません。"
 
 #: include/classes/api/services/CConfiguration.php:324
 msgid "No permissions to import template dashboards."
-msgstr ""
+msgstr "テンプレートダッシュボードをインポートする権限がありません。"
 
 #: include/classes/api/services/CConfiguration.php:315
 msgid "No permissions to import template groups."
-msgstr ""
+msgstr "テンプレート グループをインポートする権限がありません。"
 
 #: include/classes/api/services/CConfiguration.php:322
 msgid "No permissions to import template links."
-msgstr ""
+msgstr "テンプレートリンクをインポートする権限がありません。"
 
 #: include/classes/api/services/CConfiguration.php:323
 msgid "No permissions to import templates."
-msgstr ""
+msgstr "テンプレートをインポートする権限がありません。"
 
 #: include/classes/api/services/CConfiguration.php:325
 msgid "No permissions to import triggers."
-msgstr ""
+msgstr "トリガーをインポートする権限がありません。"
 
 #: include/classes/api/services/CConfiguration.php:326
 msgid "No permissions to import value maps."
-msgstr ""
+msgstr "値マップをインポートする権限がありません。"
 
 #: include/classes/api/services/CConfiguration.php:317
 msgid "No permissions to import web scenarios."
-msgstr ""
+msgstr "Web シナリオをインポートする権限がありません。"
 
 #: app/controllers/CControllerChartsView.php:133
 #: app/controllers/CControllerDashboardPrint.php:99
@@ -16704,6 +16720,10 @@ msgstr "PHP ctypeモジュールが存在しません (PHPのconfigure時のパ�
 #: include/classes/setup/CFrontendSetup.php:687
 msgid "PHP curl"
 msgstr "PHP curl"
+
+#: include/classes/setup/CFrontendSetup.php:733
+msgid "PHP curl extension is missing or outdated."
+msgstr ""
 
 #: include/classes/setup/CFrontendSetup.php:691
 msgid "PHP curl extension missing."
@@ -26213,6 +26233,10 @@ msgstr "説明"
 #: include/classes/validators/CApiInputValidator.php:1985
 msgid "directory cannot be empty"
 msgstr "ディレクトリを指定してください"
+
+#: include/views/configuration.host.discovery.list.php:340
+msgid "discovery rule"
+msgstr ""
 
 #: app/controllers/CControllerItemMassCheckNow.php:138
 #: include/classes/api/services/CTask.php:562

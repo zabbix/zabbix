@@ -4,7 +4,7 @@ msgstr ""
 "Project-Id-Version: Zabbix 6.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2023-10-19 13:48+0300\n"
-"PO-Revision-Date: 2025-08-12 20:37+0000\n"
+"PO-Revision-Date: 2025-09-07 23:22+0000\n"
 "Last-Translator: Vicente Salvador <vicentesalvadorcubedo@gmail.com>\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
 "Language: es\n"
@@ -2043,6 +2043,10 @@ msgstr "Número promedio de solicitudes de escritura pendientes en el disco virt
 msgid "Avoid easy-to-guess passwords"
 msgstr "Evite contraseñas fáciles de adivinar"
 
+#: app/views/host.wizard.edit.php:473
+msgid "Avoid including sensitive data."
+msgstr "Evite incluir datos sensibles."
+
 #: jsLoader.php:172
 msgid "Awaiting data"
 msgstr "En espera de datos"
@@ -2547,12 +2551,12 @@ msgstr "No se puede agregar un grupo de plantillas"
 #: app/controllers/CControllerTriggerCreate.php:57
 #: app/controllers/CControllerTriggerCreate.php:131
 msgid "Cannot add trigger"
-msgstr "No se pudo agregar el disparador"
+msgstr "No se pudo agregar el iniciador"
 
 #: app/controllers/CControllerTriggerPrototypeCreate.php:59
 #: app/controllers/CControllerTriggerPrototypeCreate.php:134
 msgid "Cannot add trigger prototype"
-msgstr "No se pudo agregar el prototipo de disparador"
+msgstr "No se pudo agregar el prototipo de iniciador"
 
 #: app/controllers/CControllerUserCreate.php:63
 #: app/controllers/CControllerUserCreate.php:119
@@ -2626,7 +2630,7 @@ msgstr "No se pudo clonar los prototipos de gráfico."
 
 #: include/classes/api/services/CDiscoveryRule.php:3908
 msgid "Cannot clone trigger prototypes."
-msgstr "No se pudo clonar los prototipos de disparador."
+msgstr "No se pudo clonar los prototipos de iniciador."
 
 #: include/classes/api/services/CEvent.php:1684
 #, c-format
@@ -2731,7 +2735,7 @@ msgstr "No se puede copiar el iniciador \"%1$s\", porque tiene varios equipos en
 #: include/classes/helpers/CTriggerHelper.php:75
 #, c-format
 msgid "Cannot copy trigger \"%1$s\", because it has multiple templates in the expression."
-msgstr "No se pudo copiar el disparador \"%1$s\", porque tiene muchas plantillas en la expresión."
+msgstr "No se pudo copiar el iniciador \"%1$s\", porque tiene muchas plantillas en la expresión."
 
 #: app/controllers/CControllerSlaCreate.php:69
 #: app/controllers/CControllerSlaCreate.php:127
@@ -3093,7 +3097,7 @@ msgstr "No se puede eliminar la plantilla de gráfico."
 #: include/classes/api/services/CTrigger.php:618
 #, c-format
 msgid "Cannot delete templated trigger \"%1$s:%2$s\"."
-msgstr "No se pudo eliminar el disparador \"%1$s:%2$s\" de la plantilla."
+msgstr "No se pudo eliminar el iniciador \"%1$s:%2$s\" de la plantilla."
 
 #: include/classes/api/services/CTriggerPrototype.php:510
 #, c-format
@@ -3243,8 +3247,8 @@ msgstr[1] "No se pueden desactivar los informes programados"
 #: app/controllers/CControllerTriggerDisable.php:75
 msgid "Cannot disable trigger"
 msgid_plural "Cannot disable triggers"
-msgstr[0] "No se pudo desactivar el disparador"
-msgstr[1] "No se pudo desactivar los disparadores"
+msgstr[0] "No se pudo desactivar el iniciador"
+msgstr[1] "No se pudieron desactivar los iniciadores"
 
 #: httpconf.php:389
 msgid "Cannot disable web scenario"
@@ -3339,8 +3343,8 @@ msgstr[1] "No se pueden activar los informes programados"
 #: app/controllers/CControllerTriggerEnable.php:75
 msgid "Cannot enable trigger"
 msgid_plural "Cannot enable triggers"
-msgstr[0] "No se pudo habilitar el disparador"
-msgstr[1] "No se pudo habilitar los disparadores"
+msgstr[0] "No se pudo habilitar el iniciador"
+msgstr[1] "No se pudieron habilitar los iniciadores"
 
 #: httpconf.php:388
 msgid "Cannot enable web scenario"
@@ -3558,7 +3562,7 @@ msgstr "No se puede encontrar la plantilla \"%1$s\" para anular \"%2$s\" de la r
 #: include/classes/import/importers/CMapImporter.php:229
 #, c-format
 msgid "Cannot find trigger \"%1$s\" used in map \"%2$s\"."
-msgstr "No se pudo encontrar el disparador \"%1$s\" usado en el mapa \"%2$s\"."
+msgstr "No se pudo encontrar el iniciador \"%1$s\" usado en el mapa \"%2$s\"."
 
 #: include/classes/import/importers/CTemplateDashboardImporter.php:229
 #, c-format
@@ -3583,6 +3587,10 @@ msgstr "No se pudo encontrar el mapa de valores \"%1$s\" usado en el prototipo d
 #, c-format
 msgid "Cannot find value map \"%1$s\" used for item prototype \"%2$s\" of discovery rule prototype \"%3$s\" on \"%4$s\"."
 msgstr "No se puede encontrar el mapa de valores \"%1$s\" usado para el prototipo de métrica \"%2$s\" del prototipo de regla de descubrimiento \"%3$s\" en \"%4$s\"."
+
+#: app/views/oauth.authorize.php:33
+msgid "Cannot get authentication tokens"
+msgstr ""
 
 #: app/views/oauth.edit.php:230
 msgid "Cannot get authorization code."
@@ -3928,7 +3936,7 @@ msgstr "No se pueden heredar métricas con la clave \"%1$s\" de las plantillas \
 #: app/controllers/CControllerPopupTriggerExpr.php:1263
 #: app/controllers/CControllerPopupTriggerExpr.php:1644
 msgid "Cannot insert trigger expression"
-msgstr "No se pudo insertar la expresión del disparador"
+msgstr "No se pudo insertar la expresión del iniciador"
 
 #: include/classes/api/services/CHost.php:1168
 msgid "Cannot link template"
@@ -4324,7 +4332,7 @@ msgstr "No se pudo actualizar \"%2$s\" en el equipo descubierto \"%1$s\"."
 #: include/classes/api/services/CTriggerGeneral.php:1142
 #, c-format
 msgid "Cannot update \"%2$s\" for a discovered trigger \"%1$s\"."
-msgstr "No se pudo actualizar \"%2$s\" en el disparador descubierto \"%1$s\"."
+msgstr "No se pudo actualizar \"%2$s\" en el iniciador descubierto \"%1$s\"."
 
 #: app/controllers/CControllerTokenUpdate.php:66
 #: app/controllers/CControllerTokenUpdate.php:142
@@ -5340,7 +5348,7 @@ msgstr "Configuración de visualización de iniciadores"
 
 #: app/controllers/CControllerTriggerPrototypeList.php:173
 msgid "Configuration of trigger prototypes"
-msgstr "Configuración de prototipos de disparadores"
+msgstr "Configuración de prototipos de iniciador"
 
 #: app/controllers/CControllerTriggerList.php:440
 msgid "Configuration of triggers"
@@ -5813,7 +5821,7 @@ msgstr "Crear regla de descubrimiento dependiente"
 
 #: jsLoader.php:352
 msgid "Create dependent item"
-msgstr "Crear elemento dependiente"
+msgstr "Crear métrica dependiente"
 
 #: app/views/trigger.prototype.list.php:181
 #: include/views/configuration.host.prototype.list.php:200
@@ -5911,7 +5919,7 @@ msgstr "Crear asignación de iconos"
 
 #: include/views/configuration.item.list.php:40
 msgid "Create item"
-msgstr "Crear monitor"
+msgstr "Crear métrica"
 
 #: include/views/configuration.item.list.php:48
 msgid "Create item (select host first)"
@@ -6000,7 +6008,7 @@ msgstr "Crear iniciador"
 
 #: app/views/trigger.list.php:185
 msgid "Create trigger (select host first)"
-msgstr "Crear disparador (seleccione un equipo primero)"
+msgstr "Crear iniciador (seleccione un equipo primero)"
 
 #: app/views/trigger.list.php:186
 msgid "Create trigger (select template first)"
@@ -6008,7 +6016,7 @@ msgstr "Crear iniciador (seleccione primero la plantilla)"
 
 #: app/views/trigger.prototype.list.php:42 jsLoader.php:351
 msgid "Create trigger prototype"
-msgstr "Crear prototipo de disparador"
+msgstr "Crear prototipo de iniciador"
 
 #: app/views/js/trigger.prototype.list.js.php:127
 msgid "Create triggers from selected prototype as disabled?"
@@ -7092,7 +7100,7 @@ msgstr "¿Eliminar el prototipo de iniciador seleccionado?"
 
 #: app/views/js/trigger.prototype.list.js.php:151
 msgid "Delete selected trigger prototypes?"
-msgstr "¿Desea eliminar los prototipos de disparadores seleccionados?"
+msgstr "¿Desea eliminar los prototipos de iniciadores seleccionados?"
 
 #: app/views/js/trigger.list.js.php:191
 msgid "Delete selected trigger?"
@@ -7100,7 +7108,7 @@ msgstr "¿Eliminar el iniciador seleccionado?"
 
 #: app/views/js/trigger.list.js.php:190
 msgid "Delete selected triggers?"
-msgstr "¿Desea eliminar los disparadores seleccionados?"
+msgstr "¿Desea eliminar los iniciadores seleccionados?"
 
 #: app/views/administration.user.edit.php:838
 #: app/views/administration.user.list.php:316
@@ -7125,11 +7133,11 @@ msgstr "¿Desea eliminar la plantilla?"
 
 #: app/views/trigger.prototype.edit.php:107
 msgid "Delete trigger prototype?"
-msgstr "¿Desea eliminar el prototipo de disparador?"
+msgstr "¿Desea eliminar el prototipo de iniciador?"
 
 #: app/views/trigger.edit.php:110
 msgid "Delete trigger?"
-msgstr "¿Desea eliminar el disparador?"
+msgstr "¿Desea eliminar el iniciador?"
 
 #: include/views/configuration.httpconf.edit.php:403
 msgid "Delete web scenario?"
@@ -7184,7 +7192,7 @@ msgstr "Dependiente"
 
 #: include/items.inc.php:102
 msgid "Dependent item"
-msgstr "Elemento dependiente"
+msgstr "Métrica dependiente"
 
 #: app/views/popup.generic.php:364 app/views/trigger.list.php:266
 #: app/views/trigger.prototype.list.php:94 include/triggers.inc.php:2013
@@ -7496,7 +7504,7 @@ msgstr "¿Desactivar el iniciador seleccionado?"
 
 #: app/views/js/trigger.list.js.php:174
 msgid "Disable selected triggers?"
-msgstr "¿Desea desactivar los disparadores seleccionados?"
+msgstr "¿Desea desactivar los iniciadores seleccionados?"
 
 #: include/views/configuration.httpconf.list.php:228
 msgid "Disable selected web scenario?"
@@ -8436,7 +8444,7 @@ msgstr "¿Activar el iniciador seleccionado?"
 
 #: app/views/js/trigger.list.js.php:157
 msgid "Enable selected triggers?"
-msgstr "¿Desea activar los disparadores seleccionados?"
+msgstr "¿Desea activar los iniciadores seleccionados?"
 
 #: include/views/configuration.httpconf.list.php:222
 msgid "Enable selected web scenario?"
@@ -8546,6 +8554,10 @@ msgstr "Inglés (en_US)"
 #: app/views/host.wizard.edit.php:399
 msgid "Enter a non-secret pre-shared key identity string. Avoid including sensitive data."
 msgstr "Introduzca una cadena de identidad de clave precompartida no secreta. Evite incluir datos confidenciales."
+
+#: app/views/host.wizard.edit.php:470
+msgid "Enter a unique name that Zabbix components will use to recognize the pre-shared key."
+msgstr "Ingrese un nombre único que los componentes de Zabbix usarán para reconocer la clave precompartida."
 
 #: app/views/host.wizard.edit.php:609
 msgid "Enter the IP/DNS address and port of the Zabbix agent installed on your monitoring target."
@@ -12197,6 +12209,10 @@ msgstr "Internet Explorer"
 msgid "Interval"
 msgstr "Intervalo"
 
+#: widgets/itemcard/includes/CWidgetFieldItemSectionsView.php:76
+msgid "Interval and storage"
+msgstr ""
+
 #: include/classes/api/services/CRole.php:731
 #, c-format
 msgid "Invalid API method \"%2$s\" for user role \"%1$s\"."
@@ -12756,11 +12772,11 @@ msgstr "Italiano (it_IT)"
 #: widgets/item/includes/WidgetForm.php:122
 #: widgets/tophosts/views/column.edit.php:120
 msgid "Item"
-msgstr "Monitor"
+msgstr "Métrica"
 
 #: items.php:667
 msgid "Item added"
-msgstr "Monitor añadido"
+msgstr "Métrica añadida"
 
 #: widgets/itemcard/Widget.php:32
 msgid "Item card"
@@ -13118,7 +13134,7 @@ msgstr "Kerberos"
 #: include/views/configuration.item.prototype.edit.php:121
 #: include/views/configuration.item.prototype.list.php:68 items.php:44
 msgid "Key"
-msgstr "Monitor"
+msgstr "Clave"
 
 #: app/views/administration.script.edit.php:172
 #: include/views/js/common.item.edit.js.php:56
@@ -16866,6 +16882,10 @@ msgstr "Extensión PHP ctype faltante (Parámetro de configuración PHP --enable
 msgid "PHP curl"
 msgstr "PHP curl"
 
+#: include/classes/setup/CFrontendSetup.php:733
+msgid "PHP curl extension is missing or outdated."
+msgstr ""
+
 #: include/classes/setup/CFrontendSetup.php:691
 msgid "PHP curl extension missing."
 msgstr "Falta la extensión PHP curl."
@@ -18300,7 +18320,7 @@ msgstr "Actualizar"
 #: app/views/administration.proxy.list.php:206
 #: app/views/popup.proxy.edit.php:334
 msgid "Refresh configuration"
-msgstr "Configuración de recarga"
+msgstr "Actualizar configuración"
 
 #: app/views/js/administration.proxy.list.js.php:98
 msgid "Refresh configuration of the selected proxies?"
@@ -26410,6 +26430,10 @@ msgstr "descripción"
 #: include/classes/validators/CApiInputValidator.php:1985
 msgid "directory cannot be empty"
 msgstr "el directorio no puede estar vacío"
+
+#: include/views/configuration.host.discovery.list.php:340
+msgid "discovery rule"
+msgstr ""
 
 #: app/controllers/CControllerItemMassCheckNow.php:138
 #: include/classes/api/services/CTask.php:562
