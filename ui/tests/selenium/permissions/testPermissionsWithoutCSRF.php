@@ -106,7 +106,10 @@ class testPermissionsWithoutCSRF extends CWebTest {
 			[
 				[
 					'db' => 'SELECT * FROM hstgrp',
-					'link' => 'zabbix.php?action=popup&popup=hostgroup.edit'
+					'link' => 'zabbix.php?action=popup&popup=hostgroup.edit',
+					'fields' => [
+						'id:name' => 'CSRF validation host group create'
+					]
 				]
 			],
 			// #3 Host group update.
@@ -120,7 +123,10 @@ class testPermissionsWithoutCSRF extends CWebTest {
 			[
 				[
 					'db' => 'SELECT * FROM hstgrp',
-					'link' => 'zabbix.php?action=popup&popup=templategroup.edit'
+					'link' => 'zabbix.php?action=popup&popup=templategroup.edit',
+					'fields' => [
+						'id:name' => 'CSRF validation template group create'
+					]
 				]
 			],
 			// #5 Template group update.
