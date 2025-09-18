@@ -1150,7 +1150,7 @@ class CFormValidator {
 		}
 
 		$value = array_intersect_key($value, $value_fields);
-		$files = array_intersect_key($files, $file_fields);
+		$files = $files ? array_intersect_key($files, $file_fields) : $files;
 
 		if (array_key_exists('api_uniq', $rules)) {
 			foreach ($rules['api_uniq'] as $api_check) {
