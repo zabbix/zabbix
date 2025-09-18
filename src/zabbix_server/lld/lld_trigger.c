@@ -1727,16 +1727,6 @@ static void 	lld_trigger_make(const zbx_lld_trigger_prototype_t *trigger_prototy
 		zbx_vector_lld_trigger_ptr_append(triggers, trigger);
 	}
 
-	if (0 != (trigger_prototype->trigger_flags & ZBX_FLAG_DISCOVERY_PROTOTYPE))
-	{
-		if (SUCCEED != lld_text_has_lld_macro(trigger->description))
-		{
-			*error = zbx_strdcatf(*error, "Cannot %s trigger \"%s\": name does not contain LLD"
-					" macro(s).\n", operation_msg, trigger->description);
-			goto out;
-		}
-	}
-
 	func_num = trigger->functions.values_num;
 
 	if (SUCCEED != lld_functions_make(&trigger_prototype->functions, &trigger->functions, items,
