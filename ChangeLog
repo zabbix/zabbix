@@ -45,7 +45,6 @@ A......... [ZBX-26419] improved performance of problem and event views by optimi
 ...G...... [ZBX-19267] fixed wmi.get items sometimes incorrectly returning "Empty WMI search result" with Zabbix agent 2 (aetatsu)
 ........S. [ZBX-20207] fixed unexpected interface connection mode change during autoregistration (vso)
 ....I..... [ZBX-26908] added Zabbix agent compile profile with proper options for Solaris 11 (aetatsu)
-...G...... [ZBX-19267] fixed wmi.get items sometimes incorectly returning "Empty WMI search result" with Zabbix agent 2 (aetatsu)
 ..F....... [ZBX-25795] fixed shapes not being displayed on maps (gklavins)
 .........T [ZBX-25448] fixed token-based authentication method in FortiGate by HTTP template (egordymov)
 ...G...... [ZBX-26847] explicitly defined oracle connection timezone in agent 2 (opucka)
@@ -211,7 +210,6 @@ A......... [ZBX-26419] improved performance of problem and event views by optimi
 ...G...... [ZBX-19267] fixed wmi.get items sometimes incorrectly returning "Empty WMI search result" with Zabbix agent 2 (aetatsu)
 ........S. [ZBX-20207] fixed unexpected interface connection mode change during autoregistration (vso)
 ....I..... [ZBX-26908] added Zabbix agent compile profile with proper options for Solaris 11 (aetatsu)
-...G...... [ZBX-19267] fixed wmi.get items sometimes incorectly returning "Empty WMI search result" with Zabbix agent 2 (aetatsu)
 ..F....... [ZBX-25795] fixed shapes not being displayed on maps (gklavins)
 .........T [ZBX-25448] fixed token-based authentication method in FortiGate by HTTP template (egordymov)
 ...G...... [ZBX-26847] explicitly defined oracle connection timezone in agent 2 (opucka)
@@ -624,7 +622,6 @@ New features:
 Bug fixes:
 A......... [ZBX-26419] improved performance of problem and event views by optimizing SQL queries to join only the necessary triggers, eliminating redundant post-join filtering (vso)
 ...G...... [ZBX-19267] fixed wmi.get items sometimes incorrectly returning "Empty WMI search result" with Zabbix agent 2 (aetatsu)
-...G...... [ZBX-19267] fixed wmi.get items sometimes incorectly returning "Empty WMI search result" with Zabbix agent 2 (aetatsu)
 ........S. [ZBX-26909] fixed crash on HA node recovery after standby with Zabbix proxy (sboidenko)
 ...G...... [ZBX-26920] fixed wrong time in Zabbix agent for Windows (sboidenko)
 ..F....... [ZBX-22786] fixed trends graph line colors issue with PHP 8.1 (isharha)
@@ -1233,7 +1230,6 @@ A......... [ZBX-26419] improved performance of problem and event views by optimi
 .......PS. [ZBX-26873] fixed support for SSH item proxy through configurations in SSH config file (aetatsu)
 ...G...... [ZBX-19267] fixed wmi.get items sometimes incorrectly returning "Empty WMI search result" with Zabbix agent 2 (aetatsu)
 ........S. [ZBX-20207] fixed unexpected interface connection mode change during autoregistration (vso)
-...G...... [ZBX-19267] fixed wmi.get items sometimes incorectly returning "Empty WMI search result" with Zabbix agent 2 (aetatsu)
 .........T [ZBX-25448] fixed token-based authentication method in FortiGate by HTTP template (egordymov)
 ...G...... [ZBX-26847] explicitly defined oracle connection timezone in agent 2 (opucka)
 ..F....... [ZBX-26472] fixed clearing of elements when the imported file contains no background image or icon map (rgontarski)
@@ -4982,7 +4978,6 @@ New features:
 
 Bug fixes:
 ...G...... [ZBX-19267] fixed wmi.get items sometimes incorrectly returning "Empty WMI search result" with Zabbix agent 2 (aetatsu)
-...G...... [ZBX-19267] fixed wmi.get items sometimes incorectly returning "Empty WMI search result" with Zabbix agent 2 (aetatsu)
 ...G...... [ZBX-26920] fixed wrong time in Zabbix agent for Windows (sboidenko)
 ..F....... [ZBX-22786] fixed trends graph line colors issue with PHP 8.1 (isharha)
 ..F....... [ZBX-21975] fixed user autologout not removing user SAML authentication data (gcalenko)
