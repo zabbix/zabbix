@@ -4,7 +4,7 @@ msgstr ""
 "Project-Id-Version: Zabbix 6.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2024-04-02 17:26+0300\n"
-"PO-Revision-Date: 2025-09-07 17:04+0000\n"
+"PO-Revision-Date: 2025-09-12 16:22+0000\n"
 "Last-Translator: Daniel Nylander <zabbix@danielnylander.se>\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
 "Language: sv_SE\n"
@@ -871,7 +871,7 @@ msgstr "Lägg till barntjänster"
 
 #: app/partials/configuration.valuemap.php:47
 msgid "Add from"
-msgstr ""
+msgstr "Lägg till från"
 
 #: include/actions.inc.php:686 include/actions.inc.php:1029
 msgid "Add host"
@@ -1097,7 +1097,7 @@ msgstr "Alla"
 
 #: app/views/monitoring.dashboard.view.php:186
 msgid "All dashboards"
-msgstr "Alla instrumentpaneler"
+msgstr "Alla kontrollpaneler"
 
 #: app/views/monitoring.charts.view.php:82
 msgid "All graphs"
@@ -1916,7 +1916,7 @@ msgstr ""
 #: jsLoader.php:134
 #, c-format
 msgid "Cannot add dashboard page: maximum number of %1$d dashboard pages has been added."
-msgstr "Kan inte lägga till instrumentpanelssida: maximalt antal %1$d instrumentpanelssidor har lagts till."
+msgstr "Kan inte lägga till kontrollpanelssida: maximalt antal %1$d kontrollpanelssidor har lagts till."
 
 #: host_discovery.php:735
 msgid "Cannot add discovery rule"
@@ -2043,7 +2043,7 @@ msgstr "Det går inte att lägga till webbscenario"
 
 #: jsLoader.php:135
 msgid "Cannot add widget: not enough free space on the dashboard."
-msgstr "Det går inte att lägga till widget: inte tillräckligt med ledigt utrymme på instrumentpanelen."
+msgstr "Det går inte att lägga till widget: inte tillräckligt med ledigt utrymme på kontrollpanelen."
 
 #: jsLoader.php:348
 msgctxt "screen reader"
@@ -2200,8 +2200,8 @@ msgstr[1] ""
 #: app/controllers/CControllerTemplateDashboardDelete.php:61
 msgid "Cannot delete dashboard"
 msgid_plural "Cannot delete dashboards"
-msgstr[0] "Det går inte att ta bort instrumentpanelen"
-msgstr[1] "Det går inte att ta bort instrumentpaneler"
+msgstr[0] "Det går inte att ta bort kontrollpanelen"
+msgstr[1] "Det går inte att ta bort kontrollpaneler"
 
 #: app/controllers/CControllerDiscoveryDelete.php:69 host_discovery.php:421
 msgid "Cannot delete discovery rule"
@@ -2614,7 +2614,7 @@ msgstr "Kan inte hitta bakgrundsbilden \"%1$s\" som används i kartan \"%2$s\"."
 #: include/classes/import/importers/CTemplateDashboardImporter.php:195
 #, c-format
 msgid "Cannot find graph \"%1$s\" used in dashboard \"%2$s\"."
-msgstr "Kan inte hitta grafen \"%1$s\" som används i instrumentpanelen \"%2$s\"."
+msgstr "Kan inte hitta grafen \"%1$s\" som används i kontrollpanelen \"%2$s\"."
 
 #: include/classes/import/importers/CMapImporter.php:152
 #, c-format
@@ -2626,7 +2626,7 @@ msgstr "Kan inte hitta gruppen \"%1$s\" som används i kartan \"%2$s\"."
 #: include/classes/import/importers/CTemplateDashboardImporter.php:187
 #, c-format
 msgid "Cannot find host \"%1$s\" used in dashboard \"%2$s\"."
-msgstr "Kan inte hitta värd \"%1$s\" som används i instrumentpanelen \"%2$s\"."
+msgstr "Kan inte hitta värd \"%1$s\" som används i kontrollpanelen \"%2$s\"."
 
 #: include/classes/import/importers/CMapImporter.php:164
 #, c-format
@@ -2704,7 +2704,7 @@ msgstr "Kan inte hitta objektet \"%1$s\" på \"%2$s\" som används i grafprototy
 #: include/classes/import/importers/CTemplateDashboardImporter.php:173
 #, c-format
 msgid "Cannot find item \"%1$s\" used in dashboard \"%2$s\"."
-msgstr "Kan inte hitta objektet \"%1$s\" som används i instrumentpanelen \"%2$s\"."
+msgstr "Kan inte hitta objektet \"%1$s\" som används i kontrollpanelen \"%2$s\"."
 
 #: include/classes/import/importers/CMapImporter.php:140
 #, c-format
@@ -2956,7 +2956,7 @@ msgstr "Det går inte att skicka kommandot, kontrollera anslutningen till Zabbix
 
 #: host_discovery.php:433 host_discovery.php:809 items.php:902 items.php:1017
 msgid "Cannot send request"
-msgstr ""
+msgstr "Kan inte skicka begäran"
 
 #: include/classes/api/services/CTask.php:441
 #: include/classes/api/services/CTask.php:454
@@ -3604,7 +3604,7 @@ msgstr "Klass %1$s hittades inte för åtgärd %2$s."
 
 #: include/classes/core/ZBase.php:510
 msgid "Class not found."
-msgstr ""
+msgstr "Klassen hittades inte."
 
 #: include/views/configuration.httpconf.edit.php:261
 #: include/views/configuration.httpconf.list.php:217
@@ -3700,7 +3700,7 @@ msgstr "Stäng ny händelse"
 
 #: app/views/configuration.correlation.edit.php:160
 msgid "Close new events"
-msgstr ""
+msgstr "Stäng nya händelser"
 
 #: app/views/configuration.correlation.edit.php:153
 #: include/classes/helpers/CCorrelationHelper.php:70
@@ -3772,7 +3772,7 @@ msgstr "Kommandon"
 
 #: app/views/administration.miscconfig.edit.php:163
 msgid "Communication with Zabbix server"
-msgstr ""
+msgstr "Kommunikation med Zabbix-server"
 
 #: include/items.inc.php:1358
 msgctxt "SNMP Community"
@@ -3799,7 +3799,7 @@ msgstr "Komprimera poster som är äldre än"
 
 #: app/views/administration.proxy.list.php:79
 msgid "Compression"
-msgstr ""
+msgstr "Komprimering"
 
 #: app/views/administration.housekeeping.edit.php:187
 #: app/views/administration.housekeeping.edit.php:192
@@ -3882,7 +3882,7 @@ msgstr "Konfiguration av autentisering"
 #: app/controllers/CControllerTemplateDashboardEdit.php:102
 #: app/controllers/CControllerTemplateDashboardList.php:93
 msgid "Configuration of dashboards"
-msgstr "Konfiguration av instrumentpaneler"
+msgstr "Konfiguration av kontrollpaneler"
 
 #: app/controllers/CControllerDiscoveryEdit.php:137
 #: app/controllers/CControllerDiscoveryList.php:128 host_discovery.php:27
@@ -4319,7 +4319,7 @@ msgstr "Skapa åtgärd"
 
 #: include/classes/helpers/CRoleHelper.php:453
 msgid "Create and edit dashboards"
-msgstr "Skapa och redigera instrumentpaneler"
+msgstr "Skapa och redigera kontrollpaneler"
 
 #: include/classes/helpers/CRoleHelper.php:458
 msgid "Create and edit maintenance"
@@ -4340,7 +4340,7 @@ msgstr ""
 #: app/views/configuration.dashboard.list.php:76
 #: app/views/monitoring.dashboard.list.php:41
 msgid "Create dashboard"
-msgstr "Skapa instrumentpanel"
+msgstr "Skapa kontrollpanel"
 
 #: jsLoader.php:364
 msgid "Create dependent discovery rule"
@@ -4704,12 +4704,12 @@ msgstr "Kontrollpanel"
 #: include/classes/api/services/CTemplateDashboard.php:508
 #, c-format
 msgid "Dashboard \"%1$s\" already exists."
-msgstr "Instrumentpanelen \"%1$s\" finns redan."
+msgstr "Kontrollpanelen \"%1$s\" finns redan."
 
 #: include/classes/api/services/CDashboardGeneral.php:91
 #, c-format
 msgid "Dashboard \"%1$s\" is used in report \"%2$s\"."
-msgstr "Instrumentpanelen \"%1$s\" används i rapporten \"%2$s\"."
+msgstr "Kontrollpanelen \"%1$s\" används i rapporten \"%2$s\"."
 
 #: app/controllers/CControllerDashboardUpdate.php:146
 #: app/controllers/CControllerTemplateDashboardUpdate.php:139
@@ -4720,8 +4720,8 @@ msgstr "Dashboard skapad"
 #: app/controllers/CControllerTemplateDashboardDelete.php:58
 msgid "Dashboard deleted"
 msgid_plural "Dashboards deleted"
-msgstr[0] "Instrumentpanelen raderad"
-msgstr[1] "Instrumentpaneler borttagna"
+msgstr[0] "Kontrollpanelen raderad"
+msgstr[1] "Kontrollpaneler borttagna"
 
 #: app/views/dashboard.page.properties.edit.php:60
 msgid "Dashboard page properties"
@@ -4729,11 +4729,11 @@ msgstr "Egenskaper för Dashboard-sidan"
 
 #: app/views/dashboard.properties.edit.php:88
 msgid "Dashboard properties"
-msgstr "Egenskaper för instrumentpanelen"
+msgstr "Egenskaper för kontrollpanelen"
 
 #: app/views/popup.dashboard.share.edit.php:151
 msgid "Dashboard sharing"
-msgstr "Delning av instrumentpanel"
+msgstr "Delning av kontrollpanel"
 
 #: app/controllers/CControllerDashboardShareUpdate.php:94
 #: app/controllers/CControllerDashboardUpdate.php:141
@@ -4744,7 +4744,7 @@ msgstr "Dashboard uppdaterad"
 #: include/classes/api/services/CReport.php:319
 #, c-format
 msgid "Dashboard with ID \"%1$s\" is not available."
-msgstr "Instrumentpanel med ID \"%1$s\" är inte tillgänglig."
+msgstr "Kontrollpanel med ID \"%1$s\" är inte tillgänglig."
 
 #: app/controllers/CControllerDashboardList.php:120
 #: app/controllers/CControllerHostDashboardView.php:122
@@ -4763,7 +4763,7 @@ msgstr "Instrumentpanel med ID \"%1$s\" är inte tillgänglig."
 #: include/views/inventory.host.view.php:168
 #: include/views/inventory.host.view.php:172 jsLoader.php:365
 msgid "Dashboards"
-msgstr "Instrumentpaneler"
+msgstr "Kontrollpaneler"
 
 #: include/graphs.inc.php:63 include/views/js/monitoring.sysmaps.js.php:774
 #: include/views/js/monitoring.sysmaps.js.php:864
@@ -5128,7 +5128,7 @@ msgstr ""
 
 #: jsLoader.php:367
 msgid "Delete dashboard?"
-msgstr "Ta bort instrumentpanelen?"
+msgstr "Ta bort kontrollpanelen?"
 
 #: app/views/configuration.discovery.edit.php:161
 #: include/views/configuration.host.discovery.edit.php:996
@@ -5180,7 +5180,7 @@ msgstr "Radera saknad"
 
 #: app/views/administration.proxy.edit.php:165
 msgid "Delete proxy?"
-msgstr ""
+msgstr "Ta bort proxy?"
 
 #: app/views/administration.regex.edit.php:156
 msgid "Delete regular expression?"
@@ -5219,7 +5219,7 @@ msgstr ""
 #: app/views/configuration.dashboard.list.php:68
 #: app/views/monitoring.dashboard.list.php:124
 msgid "Delete selected dashboards?"
-msgstr "Ta bort valda instrumentpaneler?"
+msgstr "Ta bort valda kontrollpaneler?"
 
 #: app/views/configuration.discovery.list.php:122
 #: include/views/configuration.host.discovery.list.php:333
@@ -5927,13 +5927,13 @@ msgstr "Division nämnare"
 #: include/views/configuration.item.edit.php:862
 #: include/views/configuration.item.prototype.edit.php:790
 msgid "Do not keep history"
-msgstr ""
+msgstr "Behåll inte historik"
 
 #: app/views/popup.lldoperation.php:201 app/views/popup.massupdate.item.php:295
 #: include/views/configuration.item.edit.php:902
 #: include/views/configuration.item.prototype.edit.php:805
 msgid "Do not keep trends"
-msgstr ""
+msgstr "Behåll inte trender"
 
 #: jsLoader.php:227 jsLoader.php:368
 msgid "Do you wish to replace the conditional expression?"
@@ -6075,11 +6075,11 @@ msgstr "Nederländska (nl_NL)"
 #: include/classes/widgets/forms/CWidgetFormItem.php:395
 #: include/classes/widgets/forms/CWidgetFormUrl.php:42
 msgid "Dynamic item"
-msgstr ""
+msgstr "Dynamiskt objekt"
 
 #: include/classes/widgets/forms/CWidgetFormPlainText.php:78
 msgid "Dynamic items"
-msgstr ""
+msgstr "Dynamiska objekt"
 
 #: jsLoader.php:289
 msgid "Each URL should have a unique name. Please make sure there is only one URL named"
@@ -6845,7 +6845,7 @@ msgstr "Misslyckad inloggning"
 #: app/views/js/configuration.dashboard.edit.js.php:154
 #: app/views/js/monitoring.dashboard.view.js.php:227
 msgid "Failed to create dashboard"
-msgstr "Misslyckades med att skapa instrumentpanel"
+msgstr "Misslyckades med att skapa kontrollpanel"
 
 #: include/views/js/common.item.edit.js.php:208
 #: include/views/js/configuration.httpconf.edit.js.php:182
@@ -6854,7 +6854,7 @@ msgstr "Misslyckades med att tolka URL."
 
 #: jsLoader.php:138
 msgid "Failed to paste dashboard page."
-msgstr "Misslyckades med att klistra in instrumentpanelssidan."
+msgstr "Misslyckades med att klistra in kontrollpanelssidan."
 
 #: jsLoader.php:139
 msgid "Failed to paste widget."
@@ -6865,15 +6865,15 @@ msgstr "Misslyckades med att klistra in widget."
 #: app/views/js/configuration.dashboard.edit.js.php:155
 #: app/views/js/monitoring.dashboard.view.js.php:228
 msgid "Failed to update dashboard"
-msgstr "Misslyckades med att uppdatera instrumentpanelen"
+msgstr "Misslyckades med att uppdatera kontrollpanelen"
 
 #: jsLoader.php:140
 msgid "Failed to update dashboard page properties."
-msgstr "Det gick inte att uppdatera egenskaperna för instrumentpanelens sida."
+msgstr "Det gick inte att uppdatera egenskaperna för kontrollpanelens sida."
 
 #: jsLoader.php:141
 msgid "Failed to update dashboard properties."
-msgstr "Det gick inte att uppdatera instrumentpanelens egenskaper."
+msgstr "Det gick inte att uppdatera kontrollpanelens egenskaper."
 
 #: app/views/js/popup.dashboard.share.edit.js.php:86
 msgid "Failed to update dashboard sharing."
@@ -7217,7 +7217,7 @@ msgstr "Full"
 #: include/views/configuration.template.edit.php:222
 #: include/views/monitoring.sysmap.edit.php:428
 msgid "Full clone"
-msgstr ""
+msgstr "Fullständig klon"
 
 #: app/views/popup.triggerexpr.php:137
 #: include/views/configuration.graph.edit.php:382
@@ -7837,7 +7837,7 @@ msgstr "Hem"
 
 #: app/views/administration.module.edit.php:45
 msgid "Homepage"
-msgstr ""
+msgstr "Webbsida"
 
 #: include/classes/widgets/forms/CWidgetFormHostAvail.php:49
 #: include/classes/widgets/forms/CWidgetFormProblemsBySv.php:122
@@ -8651,7 +8651,7 @@ msgstr "Otillgänglig SLA"
 #: app/controllers/CControllerPopupScheduledReportEdit.php:121
 #: app/controllers/CControllerScheduledReportEdit.php:303
 msgid "Inaccessible dashboard"
-msgstr "Otillgänglig instrumentpanel"
+msgstr "Otillgänglig kontrollpanel"
 
 #: app/partials/configuration.host.edit.html.php:65
 #: app/views/configuration.host.list.php:241
@@ -9125,7 +9125,7 @@ msgstr "Felaktig metod \"%1$s.%2$s\"."
 #: include/classes/api/services/CEvent.php:498
 #: include/classes/api/services/CProblem.php:363
 msgid "Incorrect object value."
-msgstr ""
+msgstr "Felaktigt objektvärde."
 
 #: include/classes/db/OracleDbBackend.php:141
 #, c-format
@@ -9158,7 +9158,7 @@ msgstr "Felaktigt schema: %1$s."
 #: include/classes/api/services/CEvent.php:491
 #: include/classes/api/services/CProblem.php:356
 msgid "Incorrect source value."
-msgstr ""
+msgstr "Felaktigt källvärde."
 
 #: include/classes/api/services/CHost.php:2003
 #: include/classes/api/services/CHost.php:2201
@@ -10574,7 +10574,7 @@ msgstr "LDAP"
 
 #: app/views/administration.authentication.edit.php:174
 msgid "LDAP host"
-msgstr ""
+msgstr "LDAP-värd"
 
 #: app/controllers/CControllerAuthenticationUpdate.php:104
 msgid "LDAP is not configured"
@@ -10582,7 +10582,7 @@ msgstr "LDAP är inte konfigurerat"
 
 #: app/controllers/CControllerAuthenticationUpdate.php:273
 msgid "LDAP login successful"
-msgstr ""
+msgstr "LDAP-inloggning lyckades"
 
 #: app/views/administration.authentication.edit.php:351
 msgid "LDAP settings"
@@ -10865,11 +10865,11 @@ msgstr "Länkmallar"
 
 #: include/actions.inc.php:1035
 msgid "Link to template"
-msgstr ""
+msgstr "Länk till mall"
 
 #: include/actions.inc.php:736
 msgid "Link to templates"
-msgstr ""
+msgstr "Länk till mallar"
 
 #: app/views/monitoring.widget.navtreeitem.edit.php:60
 msgid "Linked map"
@@ -11798,7 +11798,7 @@ msgstr "Modulen med ID \"%2$s\" är inte tillgänglig för användarrollen \"%1$
 #: include/classes/core/CModuleManager.php:222
 #, c-format
 msgid "Module.php class must extend %1$s for module located at %2$s."
-msgstr ""
+msgstr "Module.php-klassen måste utöka %1$s för modulen som finns på %2$s."
 
 #: app/controllers/CControllerModuleEdit.php:97
 #: app/controllers/CControllerModuleList.php:122
@@ -12217,7 +12217,7 @@ msgstr "Nytt skick"
 #: app/controllers/CControllerDashboardView.php:156
 #: app/controllers/CControllerTemplateDashboardEdit.php:80
 msgid "New dashboard"
-msgstr "Ny instrumentpanel"
+msgstr "Ny kontrollpanel"
 
 #: jsLoader.php:284
 msgid "New element"
@@ -12450,7 +12450,7 @@ msgstr "Inget gränssnitt hittades"
 
 #: include/classes/api/services/CItemGeneral.php:448
 msgid "No interface found."
-msgstr ""
+msgstr "Inga gränssnitt hittades."
 
 #: jsLoader.php:325
 msgid "No interfaces are defined."
@@ -13331,7 +13331,7 @@ msgstr "Endast tjänster utan problemtaggar"
 
 #: include/classes/api/services/CDashboard.php:405
 msgid "Only super admins can set dashboard owner."
-msgstr "Endast superadministratörer kan ange ägare för instrumentpanelen."
+msgstr "Endast superadministratörer kan ange ägare för kontrollpanelen."
 
 #: include/classes/api/services/CReport.php:354
 msgid "Only super admins can set report owner."
@@ -13568,7 +13568,7 @@ msgstr "Utmatning"
 #: include/classes/api/services/CDashboardGeneral.php:336
 #, c-format
 msgid "Overlapping widgets at X:%3$d, Y:%4$d on page #%2$d of dashboard \"%1$s\"."
-msgstr "Överlappande widgets på X:%3$d, Y:%4$d på sidan #%2$d i instrumentpanelen \"%1$s\"."
+msgstr "Överlappande widgetar på X:%3$d, Y:%4$d på sidan #%2$d i kontrollpanelen \"%1$s\"."
 
 #: include/views/configuration.item.edit.php:850
 #: include/views/configuration.item.edit.php:887
@@ -16029,7 +16029,7 @@ msgstr "Välj prototyp"
 
 #: include/classes/widgets/fields/CWidgetFieldWidgetSelect.php:71
 msgid "Select widget"
-msgstr ""
+msgstr "Välj widget"
 
 #: app/views/administration.script.edit.php:222
 #: include/views/monitoring.history.php:190
@@ -16726,7 +16726,7 @@ msgstr "Källa"
 
 #: include/classes/widgets/forms/CWidgetFormMap.php:40
 msgid "Source type"
-msgstr ""
+msgstr "Källtyp"
 
 #: include/locales.inc.php:62
 msgid "Spanish (es_ES)"
@@ -17009,7 +17009,7 @@ msgstr "Stoppat"
 #: include/views/configuration.item.prototype.edit.php:791
 #: include/views/configuration.item.prototype.edit.php:806
 msgid "Storage period"
-msgstr ""
+msgstr "Lagringstid"
 
 #: include/classes/setup/CSetupWizard.php:514
 msgid "Store credentials in"
@@ -17389,11 +17389,11 @@ msgstr "En mall kan inte länkas till en annan mall mer än en gång, inte ens g
 
 #: app/controllers/CControllerAuditLogList.php:240
 msgid "Template dashboard"
-msgstr "Mall för instrumentpanel"
+msgstr "Mall för kontrollpanel"
 
 #: app/views/popup.import.php:33
 msgid "Template dashboards"
-msgstr "Mall för instrumentpaneler"
+msgstr "Mall för kontrollpaneler"
 
 #: templates.php:491 templates.php:505 templates.php:571
 msgid "Template deleted"
@@ -19044,7 +19044,7 @@ msgstr "Användaren \"%1$s\" kan inte vara utan användargrupp."
 #: include/classes/api/services/CUser.php:1304
 #, c-format
 msgid "User \"%1$s\" is dashboard \"%2$s\" owner."
-msgstr "Användaren \"%1$s\" är ägare till instrumentpanelen \"%2$s\"."
+msgstr "Användaren \"%1$s\" är ägare till kontrollpanelen \"%2$s\"."
 
 #: include/classes/api/services/CUser.php:1289
 #, c-format
@@ -20051,7 +20051,7 @@ msgstr "När aktiv"
 #: include/classes/api/services/CDashboardGeneral.php:349
 #, c-format
 msgid "Widget at X:%3$d, Y:%4$d on page #%2$d of dashboard \"%1$s\" is out of bounds."
-msgstr "Widget på X:%3$d, Y:%4$d på sidan #%2$d i instrumentpanelen \"%1$s\" är utanför gränserna."
+msgstr "Widget på X:%3$d, Y:%4$d på sidan #%2$d i kontrollpanelen \"%1$s\" är utanför gränserna."
 
 #: include/classes/widgets/CWidgetHelper.php:68
 msgid "Widget is deprecated."
@@ -20109,7 +20109,7 @@ msgstr "Med problemnamn"
 
 #: app/views/monitoring.widget.problemhosts.view.php:33
 msgid "With problems"
-msgstr ""
+msgstr "Med problem"
 
 #: app/views/popup.tophosts.column.edit.php:119
 msgid "With this setting only numeric items will be displayed in this column."
@@ -20125,7 +20125,7 @@ msgstr "Utan data"
 
 #: app/views/monitoring.widget.problemhosts.view.php:32
 msgid "Without problems"
-msgstr ""
+msgstr "Utan problem"
 
 #: include/forms.inc.php:336
 msgid "Without triggers"
@@ -20257,11 +20257,11 @@ msgstr "Y-m-d"
 
 #: include/translateDefines.inc.php:32
 msgid "Y-m-d H:i"
-msgstr ""
+msgstr "Y-m-d H:i"
 
 #: include/translateDefines.inc.php:31
 msgid "Y-m-d H:i:s"
-msgstr ""
+msgstr "Y-m-d H:i:s"
 
 #: include/translateDefines.inc.php:40
 msgid "Y-n-d"
@@ -21456,7 +21456,7 @@ msgstr "insert() - Infogar angivna tecken eller mellanslag i en teckensträng, m
 #: include/events.inc.php:37
 msgctxt "event source"
 msgid "internal"
-msgstr ""
+msgstr "intern"
 
 #: include/classes/api/services/CItemGeneral.php:1705
 #: include/classes/api/services/CItemGeneral.php:1715
@@ -21687,7 +21687,7 @@ msgstr "m-d"
 
 #: include/translateDefines.inc.php:33
 msgid "m-d H:i"
-msgstr ""
+msgstr "m-d H:i"
 
 #: include/classes/parsers/CUserMacroParser.php:37
 msgid "macro is empty"
@@ -21810,7 +21810,7 @@ msgstr "måste vara %1$s tecken lång"
 
 #: app/views/administration.authentication.edit.php:212
 msgid "must be a valid LDAP user"
-msgstr ""
+msgstr "måste vara en giltig LDAP-användare"
 
 #: app/views/administration.user.edit.php:119
 #: include/classes/validators/CPasswordComplexityValidator.php:74
@@ -21859,7 +21859,7 @@ msgstr "n-d"
 
 #: include/translateDefines.inc.php:39
 msgid "n-d H:i"
-msgstr ""
+msgstr "n-d H:i"
 
 #: include/views/configuration.host.discovery.edit.php:205
 #: include/views/configuration.host.discovery.edit.php:363
@@ -22188,7 +22188,7 @@ msgstr "vald"
 
 #: include/events.inc.php:38 include/events.inc.php:66
 msgid "service"
-msgstr ""
+msgstr "tjänst"
 
 #: include/classes/api/services/CService.php:1411
 msgid "service with the same UUID already exists"
@@ -22314,7 +22314,7 @@ msgstr "mall-ID \"%1$s\" skickas %2$s gånger"
 
 #: include/classes/api/services/CTemplateDashboard.php:395
 msgid "template dashboard with the same UUID already exists"
-msgstr "mallinstrumentpanel med samma UUID finns redan"
+msgstr "mall för kontrollpanel med samma UUID finns redan"
 
 #: include/classes/api/services/CTemplate.php:449
 msgid "template with the same UUID already exists"

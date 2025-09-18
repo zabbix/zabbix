@@ -4,7 +4,7 @@ msgstr ""
 "Project-Id-Version: Zabbix 6.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2024-04-02 17:26+0300\n"
-"PO-Revision-Date: 2025-08-28 14:57+0000\n"
+"PO-Revision-Date: 2025-09-15 14:50+0000\n"
 "Last-Translator: Vicente Salvador <vicentesalvadorcubedo@gmail.com>\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
 "Language: es\n"
@@ -5900,7 +5900,7 @@ msgstr "Mostrar iniciadores OK para"
 
 #: app/partials/monitoring.latest.view.html.php:283
 msgid "Display graph"
-msgstr "Mostrar gráfica"
+msgstr "Mostrar gráfico"
 
 #: include/views/monitoring.sysmap.edit.php:151
 msgid "Display problems"
