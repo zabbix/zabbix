@@ -1634,10 +1634,23 @@ static void	start_processes(zbx_socket_t *listen_sock, const zbx_config_comms_ar
 			.runlevels = runlevels,
 			.config_timeout = zbx_config_timeout,
 			.program_type = zbx_program_type,
-			.args_pp_manager = &preproc_man_args
+			.unit_defs = {{0}}
 		};
 
 	thread_args.info.program_type = zbx_program_type;
+
+	/* prepare supervisor unit definitions */
+
+	supervisor_args.unit_defs[ZBX_PROCESS_TYPE_PREPROCMAN] = (zbx_supervisor_unit_def_t){
+			.entry = zbx_pp_manager_thread,
+			.args = &preproc_man_args
+	};
+
+	supervisor_args.unit_defs[ZBX_PROCESS_TYPE_CONFSYNCER] = (zbx_supervisor_unit_def_t){
+			.entry = zbx_proxyconfig_thread,
+			.args = &proxyconfig_args
+	};
+
 
 	zbx_vector_proc_info_t	*processes = &runlevels[runlevel].processes;
 
@@ -1660,10 +1673,6 @@ static void	start_processes(zbx_socket_t *listen_sock, const zbx_config_comms_ar
 				threads_flags[i] = ZBX_THREAD_PRIORITY_NONE;
 				thread_args.args = &supervisor_args;
 				zbx_thread_start(zbx_supervisor_thread, &thread_args, &zbx_threads[i]);
-				break;
-			case ZBX_PROCESS_TYPE_CONFSYNCER:
-				thread_args.args = &proxyconfig_args;
-				zbx_thread_start(proxyconfig_thread, &thread_args, &zbx_threads[i]);
 				break;
 			case ZBX_PROCESS_TYPE_TRAPPER:
 				thread_args.args = &trapper_args;

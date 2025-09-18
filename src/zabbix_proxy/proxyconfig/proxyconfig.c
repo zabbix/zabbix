@@ -269,7 +269,7 @@ static void	proxyconfig_update_vault_macros(zbx_thread_proxyconfig_args *proxyco
  * Comments: never returns                                                    *
  *                                                                            *
  ******************************************************************************/
-ZBX_THREAD_ENTRY(proxyconfig_thread, args)
+void	*zbx_proxyconfig_thread(void *args)
 {
 	zbx_thread_proxyconfig_args	*proxyconfig_args_in = (zbx_thread_proxyconfig_args *)
 							(((zbx_thread_args_t *)args)->args);
@@ -278,15 +278,22 @@ ZBX_THREAD_ENTRY(proxyconfig_thread, args)
 	zbx_ipc_async_socket_t		rtc;
 	int				sleeptime;
 	zbx_synced_new_config_t		synced = ZBX_SYNCED_NEW_CONFIG_NO;
-	zbx_thread_info_t		*info = &((zbx_thread_args_t *)args)->info;
-	int				server_num = ((zbx_thread_args_t *)args)->info.server_num;
-	int				process_num = ((zbx_thread_args_t *)args)->info.process_num;
-	unsigned char			process_type = ((zbx_thread_args_t *)args)->info.process_type;
+	zbx_supervisor_unit_args_t	*unit_args = (zbx_supervisor_unit_args_t *)args;
+	const zbx_thread_info_t		*info = &unit_args->args.info;
+	int				server_num = info->server_num;
+	int				process_num = info->process_num;
+	unsigned char			process_type = info->process_type;
 	zbx_uint32_t			rtc_msgs[] = {ZBX_RTC_CONFIG_CACHE_RELOAD};
+	char				*process_title;
 
-	zabbix_log(LOG_LEVEL_INFORMATION, "%s #%d started [%s #%d]", get_program_type_string(info->program_type),
-			server_num, get_process_type_string(process_type), process_num);
+	process_title = zbx_dsprintf(NULL, "%s #%d", get_process_type_string(process_type), process_num);
+	zbx_set_log_component(process_title, unit_args->logger);
+
+	zbx_setproctitle("%s starting", process_title);
+
+	zabbix_log(LOG_LEVEL_INFORMATION, "%s #%d started", get_program_type_string(info->program_type), server_num);
 	zbx_update_selfmon_counter(info, ZBX_PROCESS_STATE_BUSY);
+
 #if defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
 	zbx_tls_init_child(proxyconfig_args_in->config_tls, proxyconfig_args_in->zbx_get_program_type_cb_arg,
 			zbx_dc_get_psk_by_identity);
@@ -295,11 +302,11 @@ ZBX_THREAD_ENTRY(proxyconfig_thread, args)
 	zbx_rtc_subscribe(process_type, process_num, rtc_msgs, ARRSIZE(rtc_msgs), proxyconfig_args_in->config_timeout,
 			&rtc);
 
-	zbx_setproctitle("%s [connecting to the database]", get_process_type_string(process_type));
+	zbx_setproctitle("%s [connecting to the database]", process_title);
 
 	zbx_db_connect(ZBX_DB_CONNECT_NORMAL);
 
-	zbx_setproctitle("%s [syncing configuration]", get_process_type_string(process_type));
+	zbx_setproctitle("%s [syncing configuration]", process_title);
 	zbx_dc_sync_configuration(ZBX_DBSYNC_INIT, ZBX_SYNCED_NEW_CONFIG_NO, NULL, proxyconfig_args_in->config_vault,
 			proxyconfig_args_in->config_proxyconfig_frequency);
 
@@ -334,7 +341,7 @@ ZBX_THREAD_ENTRY(proxyconfig_thread, args)
 		{
 			if (0 != config_cache_reload)
 			{
-				zbx_setproctitle("%s [loading configuration]", get_process_type_string(process_type));
+				zbx_setproctitle("%s [loading configuration]", process_title);
 
 				zbx_dc_sync_configuration(ZBX_DBSYNC_UPDATE, synced, NULL,
 						proxyconfig_args_in->config_vault,
@@ -353,7 +360,7 @@ ZBX_THREAD_ENTRY(proxyconfig_thread, args)
 				}
 
 				zbx_setproctitle("%s [synced config in " ZBX_FS_DBL " sec]",
-						get_process_type_string(process_type), zbx_time() - sec);
+						process_title, zbx_time() - sec);
 			}
 
 			sleeptime = ZBX_IPC_WAIT_FOREVER;
@@ -371,7 +378,7 @@ ZBX_THREAD_ENTRY(proxyconfig_thread, args)
 		interval = zbx_time() - sec;
 
 		zbx_setproctitle("%s [synced config " ZBX_FS_SIZE_T " bytes in " ZBX_FS_DBL " sec, idle %d sec]",
-				get_process_type_string(process_type), (zbx_fs_size_t)data_size, interval,
+				process_title, (zbx_fs_size_t)data_size, interval,
 				proxyconfig_args_in->config_proxyconfig_frequency);
 
 		if (SEC_PER_HOUR < sec - last_template_cleanup_sec)
@@ -385,7 +392,9 @@ ZBX_THREAD_ENTRY(proxyconfig_thread, args)
 stop:
 	zbx_ipc_async_socket_close(&rtc);
 
-	zbx_setproctitle("%s #%d [terminated]", get_process_type_string(process_type), process_num);
+	zbx_setproctitle("%s [terminated]", process_title);
+
+	zbx_free(process_title);
 
 	while (1)
 		zbx_sleep(SEC_PER_MIN);

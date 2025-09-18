@@ -186,6 +186,7 @@ void	zbx_supervisor_get_process_info(int process_type, zbx_proc_owner_t *owner, 
 			break;
 
 		case ZBX_PROCESS_TYPE_CONFSYNCER:
+			*owner = PROCESS_OWNER_SUPERVISOR;
 			*runlevel = ZBX_RUNLEVEL_CACHESYNC;
 			break;
 
@@ -216,8 +217,6 @@ void	zbx_supervisor_get_process_info(int process_type, zbx_proc_owner_t *owner, 
 
 		case ZBX_PROCESS_TYPE_PREPROCMAN:
 			*owner = PROCESS_OWNER_SUPERVISOR;
-			// WDN test runlevel
-			*runlevel = ZBX_RUNLEVEL_TASKMANAGER;
 			break;
 
 		case ZBX_PROCESS_TYPE_PREPROCESSOR:

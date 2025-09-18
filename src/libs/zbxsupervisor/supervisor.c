@@ -494,15 +494,9 @@ static void	supervisor_start_units(zbx_supervisor_t *sv, const zbx_thread_superv
 			thread_args.info.process_type = info->type;
 			thread_args.info.process_num = info->num;
 			thread_args.info.server_num = info->index;
-			thread_args.args = NULL;
+			thread_args.args = args->unit_defs[info->type].args;
 
-			switch (thread_args.info.process_type)
-			{
-				case ZBX_PROCESS_TYPE_PREPROCMAN:
-					thread_args.args = (void *)args->args_pp_manager;
-					supervisor_unit_start(unit, zbx_pp_manager_thread, &thread_args);
-					break;
-			}
+			supervisor_unit_start(unit, args->unit_defs[info->type].entry, &thread_args);
 		}
 	}
 }
@@ -752,6 +746,8 @@ out:
 			zabbix_log(LOG_LEVEL_INFORMATION, "[%s #%d] stopped with unit failure",
 					get_process_type_string(process_type), process_num);
 		}
+
+		exit_ret = EXIT_FAILURE;
 	}
 	else
 	{
@@ -765,7 +761,7 @@ out:
 	zbx_ipc_service_close(&service);
 	zbx_proc_startup_free(runlevels);
 
-	exit(EXIT_FAILURE);
+	exit(exit_ret);
 
 #undef DEFAULT_SLEEP_TIME
 }

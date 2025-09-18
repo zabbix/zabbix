@@ -38,42 +38,47 @@
  * Comments: never returns                                                    *
  *                                                                            *
  ******************************************************************************/
-ZBX_THREAD_ENTRY(dbconfig_thread, args)
+void	*zbx_dbconfig_thread(void *args)
 {
 	double				sec = 0.0;
-	int				sleeptime, server_num = ((zbx_thread_args_t *)args)->info.server_num,
-					process_num = ((zbx_thread_args_t *)args)->info.process_num, nextcheck = 0,
+	int				sleeptime, nextcheck = 0,
 					secrets_reload = 0, cache_reload = 0;
 	zbx_ipc_async_socket_t		rtc;
-	const zbx_thread_info_t		*info = &((zbx_thread_args_t *)args)->info;
-	unsigned char			process_type = ((zbx_thread_args_t *)args)->info.process_type;
+	zbx_supervisor_unit_args_t	*unit_args = (zbx_supervisor_unit_args_t *)args;
+	const zbx_thread_info_t		*info = &unit_args->args.info;
+	unsigned char			process_type = info->process_type;
+	int				server_num = info->server_num;
+	int				process_num = info->process_num;
 	zbx_uint32_t			rtc_msgs[] = {ZBX_RTC_CONFIG_CACHE_RELOAD, ZBX_RTC_SECRETS_RELOAD};
 
-	zbx_thread_dbconfig_args	*dbconfig_args_in = (zbx_thread_dbconfig_args *)
-					(((zbx_thread_args_t *)args)->args);
+	zbx_thread_dbconfig_args	*dbconfig_args_in = (zbx_thread_dbconfig_args *)unit_args->args.args;
+	char				*process_title;
 
-	zabbix_log(LOG_LEVEL_INFORMATION, "%s #%d started [%s #%d]", get_program_type_string(info->program_type),
-			server_num, get_process_type_string(process_type), process_num);
+	process_title = zbx_dsprintf(NULL, "%s #%d", get_process_type_string(process_type), process_num);
+	zbx_set_log_component(process_title, unit_args->logger);
+
+	zbx_setproctitle("%s starting", process_title);
+
+	zabbix_log(LOG_LEVEL_INFORMATION, "%s #%d started", get_program_type_string(info->program_type), server_num);
 
 	zbx_update_selfmon_counter(info, ZBX_PROCESS_STATE_BUSY);
 
 	zbx_rtc_subscribe(process_type, process_num, rtc_msgs, ARRSIZE(rtc_msgs), dbconfig_args_in->config_timeout,
 			&rtc);
 
-	zbx_setproctitle("%s [connecting to the database]", get_process_type_string(process_type));
+	zbx_setproctitle("%s [connecting to the database]", process_title);
 
 	zbx_db_connect(ZBX_DB_CONNECT_NORMAL);
 
 	sec = zbx_time();
-	zbx_setproctitle("%s [syncing configuration]", get_process_type_string(process_type));
+	zbx_setproctitle("%s [syncing configuration]", process_title);
 	zbx_dc_sync_configuration(ZBX_DBSYNC_INIT, ZBX_SYNCED_NEW_CONFIG_NO, NULL, dbconfig_args_in->config_vault,
 			dbconfig_args_in->proxyconfig_frequency);
 	zbx_dc_sync_kvs_paths(NULL, dbconfig_args_in->config_vault, dbconfig_args_in->config_source_ip,
 			dbconfig_args_in->config_ssl_ca_location, dbconfig_args_in->config_ssl_cert_location,
 			dbconfig_args_in->config_ssl_key_location);
 	zbx_setproctitle("%s [synced configuration in " ZBX_FS_DBL " sec, idle %d sec]",
-			get_process_type_string(process_type), (sec = zbx_time() - sec),
-			dbconfig_args_in->config_confsyncer_frequency);
+			process_title, (sec = zbx_time() - sec), dbconfig_args_in->config_confsyncer_frequency);
 
 
 	/* update maintenance states */
@@ -125,7 +130,7 @@ ZBX_THREAD_ENTRY(dbconfig_thread, args)
 		}
 
 		zbx_setproctitle("%s [synced configuration in " ZBX_FS_DBL " sec, syncing configuration]",
-				get_process_type_string(process_type), sec);
+				process_title, sec);
 
 		sec = zbx_time();
 		zbx_update_env(get_process_type_string(process_type), sec);
@@ -175,14 +180,15 @@ ZBX_THREAD_ENTRY(dbconfig_thread, args)
 		sec = zbx_time() - sec;
 
 		zbx_setproctitle("%s [synced configuration in " ZBX_FS_DBL " sec, idle %d sec]",
-				get_process_type_string(process_type), sec,
-				dbconfig_args_in->config_confsyncer_frequency);
+				process_title, sec, dbconfig_args_in->config_confsyncer_frequency);
 	}
 stop:
 	zbx_ipc_async_socket_close(&rtc);
 	zbx_db_close();
 
-	zbx_setproctitle("%s #%d [terminated]", get_process_type_string(process_type), process_num);
+	zbx_setproctitle("%s [terminated]", process_title);
+
+	zbx_free(process_title);
 
 	while (1)
 		zbx_sleep(SEC_PER_MIN);

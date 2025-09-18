@@ -32,6 +32,6 @@ typedef struct
 }
 zbx_thread_dbconfig_args;
 
-ZBX_THREAD_ENTRY(dbconfig_thread, args);
+void	*zbx_dbconfig_thread(void *args);
 
 #endif

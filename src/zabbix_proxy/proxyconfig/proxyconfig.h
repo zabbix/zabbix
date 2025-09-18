@@ -36,6 +36,6 @@ typedef struct
 }
 zbx_thread_proxyconfig_args;
 
-ZBX_THREAD_ENTRY(proxyconfig_thread, args);
+void	*zbx_proxyconfig_thread(void *args);
 
 #endif

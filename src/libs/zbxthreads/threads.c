@@ -258,7 +258,7 @@ static int	zbx_thread_count(pid_t *threads, size_t threads_num, const int *threa
 	return count;
 }
 
-static int	log_exit_status(pid_t pid, int status)
+static void	log_exit_status(pid_t pid, int status)
 {
 	if (0 == WIFEXITED(status) || 0 != WEXITSTATUS(status))
 	{

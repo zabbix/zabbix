@@ -1216,7 +1216,7 @@ void	*zbx_pp_manager_thread(void *args)
 #define PP_MANAGER_DELAY_NS	5e8
 
 	zbx_ipc_service_t			service;
-	char					*error = NULL;
+	char					*error = NULL, *process_title;
 	zbx_ipc_client_t			*client;
 	zbx_ipc_message_t			*message;
 	double					time_stat, time_idle = 0, time_flush, time_vps_update, time_trim,
@@ -1241,12 +1241,12 @@ void	*zbx_pp_manager_thread(void *args)
 #define	STAT_INTERVAL	5	/* if a process is busy and does not sleep then update status not faster than */
 				/* once in STAT_INTERVAL seconds */
 
-	zbx_set_log_component("preprocessing manager", unit_args->logger);
+	process_title = zbx_dsprintf(NULL, "%s #%d", get_process_type_string(process_type), process_num);
+	zbx_set_log_component(process_title, unit_args->logger);
 
-	zbx_setproctitle("%s #%d starting", get_process_type_string(process_type), process_num);
+	zbx_setproctitle("%s starting", process_title);
 
-	zabbix_log(LOG_LEVEL_INFORMATION, "%s #%d started [%s #%d]", get_program_type_string(info->program_type),
-			server_num, get_process_type_string(process_type), process_num);
+	zabbix_log(LOG_LEVEL_INFORMATION, "%s #%d started", get_program_type_string(info->program_type), server_num);
 
 	zbx_update_selfmon_counter(info, ZBX_PROCESS_STATE_BUSY);
 
@@ -1294,10 +1294,9 @@ void	*zbx_pp_manager_thread(void *args)
 
 		if (STAT_INTERVAL < time_now - time_stat)
 		{
-			zbx_setproctitle("%s #%d [queued " ZBX_FS_UI64 ", processed " ZBX_FS_UI64 " values, idle "
+			zbx_setproctitle("%s [queued " ZBX_FS_UI64 ", processed " ZBX_FS_UI64 " values, idle "
 					ZBX_FS_DBL " sec during " ZBX_FS_DBL " sec]",
-					get_process_type_string(process_type), process_num,
-					queued_num, processed_num, time_idle, time_now - time_stat);
+					process_title, queued_num, processed_num, time_idle, time_now - time_stat);
 
 			time_stat = time_now;
 			time_idle = 0;
@@ -1445,7 +1444,7 @@ void	*zbx_pp_manager_thread(void *args)
 		}
 	}
 
-	zbx_setproctitle("%s #%d [terminating]", get_process_type_string(process_type), process_num);
+	zbx_setproctitle("%s [terminating]", process_title);
 
 	/* on normal exit the shutdown message already has been processed and no more messages will be sent */
 	if (SUCCEED != ZBX_EXIT_STATUS())
@@ -1457,7 +1456,8 @@ void	*zbx_pp_manager_thread(void *args)
 	zbx_ipc_service_close(&service);
 	zbx_free(args);
 
-	zbx_setproctitle("%s #%d [terminated]", get_process_type_string(process_type), process_num);
+	zbx_setproctitle("%s [terminated]", process_title);
+	zbx_free(process_title);
 
 	exit(EXIT_SUCCESS);
 #undef STAT_INTERVAL

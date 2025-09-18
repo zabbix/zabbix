@@ -1820,10 +1820,22 @@ static void	start_processes(zbx_socket_t *listen_sock, zbx_proc_startup_t *runle
 			.runlevels = runlevels,
 			.config_timeout = zbx_config_timeout,
 			.program_type = zbx_program_type,
-			.args_pp_manager = &preproc_man_args
+			.unit_defs = {{0}}
 		};
 
 	thread_args.info.program_type = zbx_program_type;
+
+	/* prepare supervisor unit definitions */
+
+	supervisor_args.unit_defs[ZBX_PROCESS_TYPE_PREPROCMAN] = (zbx_supervisor_unit_def_t){
+			.entry = zbx_pp_manager_thread,
+			.args = &preproc_man_args
+	};
+
+	supervisor_args.unit_defs[ZBX_PROCESS_TYPE_CONFSYNCER] = (zbx_supervisor_unit_def_t){
+			.entry = zbx_dbconfig_thread,
+			.args = &dbconfig_args
+	};
 
 	zbx_vector_proc_info_t	*processes = &runlevels[runlevel].processes;
 
@@ -1851,10 +1863,6 @@ static void	start_processes(zbx_socket_t *listen_sock, zbx_proc_startup_t *runle
 				threads_flags[i] = ZBX_THREAD_PRIORITY_WORKER;
 				thread_args.args = &service_manager_args;
 				zbx_thread_start(service_manager_thread, &thread_args, &zbx_threads[i]);
-				break;
-			case ZBX_PROCESS_TYPE_CONFSYNCER:
-				thread_args.args = &dbconfig_args;
-				zbx_thread_start(dbconfig_thread, &thread_args, &zbx_threads[i]);
 				break;
 			case ZBX_PROCESS_TYPE_POLLER:
 				poller_args.poller_type = ZBX_POLLER_TYPE_NORMAL;

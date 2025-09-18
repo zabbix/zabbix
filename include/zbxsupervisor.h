@@ -15,6 +15,7 @@
 #ifndef ZABBIX_SUPERVISOR_H
 #define ZABBIX_SUPERVISOR_H
 
+#include "zbxcommon.h"
 #include "zbxalgo.h"
 #include "zbxnix.h"
 
@@ -37,11 +38,20 @@ zbx_proc_startup_t;
 
 typedef struct
 {
-	zbx_proc_startup_t	*runlevels;
-	int			config_timeout;
-	unsigned char		program_type;
+	void *(*entry)(void *);
+	void	*args;
+}
+zbx_supervisor_unit_def_t;
 
-	const void		*args_pp_manager;
+typedef int (*zbx_get_unit_def_cb_t)(unsigned char process_type, zbx_supervisor_unit_def_t *entry);
+
+typedef struct
+{
+	zbx_proc_startup_t		*runlevels;
+	int				config_timeout;
+	unsigned char			program_type;
+
+	zbx_supervisor_unit_def_t	unit_defs[ZBX_PROCESS_TYPE_COUNT];
 }
 zbx_thread_supervisor_args_t;
 
