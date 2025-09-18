@@ -867,6 +867,18 @@ static void	log_client_timediff(int level, struct zbx_json_parse *jp, const zbx_
 	}
 }
 
+static void	adjust_time(zbx_timespec_t *unique_shift, zbx_agent_value_t *av)
+{
+	av->ts.sec += unique_shift->sec;
+	av->ts.ns = unique_shift->ns++;
+
+	if (unique_shift->ns > 999999999)
+	{
+		unique_shift->sec++;
+		unique_shift->ns = 0;
+	}
+}
+
 /******************************************************************************
  *                                                                            *
  * Purpose: parses agent value from history data json row                     *
@@ -894,21 +906,19 @@ static int	parse_history_data_row_value(const struct zbx_json_parse *jp_row, zbx
 		if (FAIL == zbx_is_uint31(tmp, &av->ts.sec))
 			goto out;
 
-		if (FAIL == zbx_json_value_by_name_dyn(jp_row, ZBX_PROTO_TAG_NS, &tmp, &tmp_alloc, NULL) ||
-				FAIL == zbx_is_uint_n_range(tmp, tmp_alloc, &av->ts.ns, sizeof(av->ts.ns), 1LL,
-				999999999LL))
+		if (FAIL == zbx_json_value_by_name_dyn(jp_row, ZBX_PROTO_TAG_NS, &tmp, &tmp_alloc, NULL))
 		{
 			/* ensure unique value timestamp (clock, ns) if only clock is available */
-
-			av->ts.sec += unique_shift->sec;
-			av->ts.ns = unique_shift->ns++;
-
-			if (unique_shift->ns > 999999999)
-			{
-				unique_shift->sec++;
-				unique_shift->ns = 0;
-			}
+			adjust_time(unique_shift, av);
 		}
+		else if (SUCCEED == zbx_is_uint_n_range(tmp, tmp_alloc, &av->ts.ns, sizeof(av->ts.ns), 0LL,
+				999999999LL))
+		{
+			/* adjust ns for older systems where sometimes ns == 0 */
+			if (av->ts.ns == 0) adjust_time(unique_shift, av);
+		}
+		else
+			goto out;
 	}
 	else
 		zbx_timespec(&av->ts);
@@ -1519,18 +1529,20 @@ static void	process_history_data_by_keys(zbx_socket_t *sock, zbx_client_item_val
 
 				errcodes[i] = FAIL;
 			}
-
-			item_timestamp_t	it = {.itemid = items[i].itemid, .ts = values[i].ts};
-			item_timestamp_t	*entry;
-
-			while (NULL != (entry = zbx_hashset_search(&timestamps, &it)))
+			else
 			{
-				values[i].ts.ns++;
-				zbx_timespec_normalize(&values[i].ts);
-				it.ts = values[i].ts;
-			}
+				item_timestamp_t	it = {.itemid = items[i].itemid, .ts = values[i].ts};
+				item_timestamp_t	*entry;
 
-			zbx_hashset_insert(&timestamps, &it, sizeof(item_timestamp_t));
+				while (NULL != (entry = zbx_hashset_search(&timestamps, &it)))
+				{
+					values[i].ts.ns++;
+					zbx_timespec_normalize(&values[i].ts);
+					it.ts = values[i].ts;
+				}
+
+				zbx_hashset_insert(&timestamps, &it, sizeof(item_timestamp_t));
+			}
 
 			if (NULL != session)
 				session->last_id = values[i].id;
@@ -1554,7 +1566,6 @@ static void	process_history_data_by_keys(zbx_socket_t *sock, zbx_client_item_val
 	zbx_hashset_destroy(&timestamps);
 	zbx_free(hostkeys);
 	zbx_free(items);
-
 
 	*info = zbx_dsprintf(*info, "processed: %d; failed: %d; total: %d; seconds spent: " ZBX_FS_DBL,
 			processed_num, total_num - processed_num, total_num, zbx_time() - sec);

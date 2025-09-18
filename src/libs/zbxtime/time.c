@@ -37,7 +37,7 @@ double	zbx_time(void)
 
 /******************************************************************************
  *                                                                            *
- * Purpose: Nanoseconds should always be in range 0 <= ns <= 1'000'000'000    *
+ * Purpose: Nanoseconds should always be in range 0 <= ns < 1'000'000'000     *
  *                                                                            *
  ******************************************************************************/
 void	zbx_timespec_normalize(zbx_timespec_t *ts)
@@ -50,7 +50,7 @@ void	zbx_timespec_normalize(zbx_timespec_t *ts)
 
 	while (0 > ts->ns)
 	{
-		ts->sec++;
+		ts->sec--;
 		ts->ns += 1000000000;
 	}
 }
