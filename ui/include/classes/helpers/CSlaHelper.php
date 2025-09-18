@@ -267,13 +267,18 @@ final class CSlaHelper {
 		];
 	}
 
+	/**
+	 * @param array $schedule
+	 *
+	 * @return array
+	 */
 	public static function prepareSchedulePeriods(array $schedule): array {
 		$result = [];
 
 		$schedule_periods = [];
 
 		foreach ($schedule as $key => $value) {
-			if (strpos($key, 'schedule_enabled_') == 0 && $value == '1') {
+			if (strpos($key, 'schedule_enabled_') == 0 && $value == 1) {
 				$index = substr($key, strrpos($key, '_') + 1);
 
 				if ($schedule["schedule_period_$index"]) {

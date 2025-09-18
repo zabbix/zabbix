@@ -70,7 +70,10 @@ window.sla_edit_popup = new class {
 					this._editExcludedDowntime(e.target.closest('tr'));
 				}
 				else if (e.target.classList.contains('js-remove')) {
-					e.target.closest('tr').remove();
+					const row = e.target.closest('tr');
+
+					this._removeRelatedErrorContainer(row);
+					row.remove();
 				}
 			});
 
@@ -138,14 +141,18 @@ window.sla_edit_popup = new class {
 	}
 
 	_updateExcludedDowntime(row, excluded_downtime) {
+		this._removeRelatedErrorContainer(row);
+
+		row.insertAdjacentHTML('afterend', this.excluded_downtime_template.evaluate(excluded_downtime));
+		row.remove();
+	}
+
+	_removeRelatedErrorContainer(row) {
 		const next_sibling = row.nextElementSibling;
 
 		if (next_sibling && next_sibling.classList.contains('error-container-row')) {
 			next_sibling.remove();
 		}
-
-		row.insertAdjacentHTML('afterend', this.excluded_downtime_template.evaluate(excluded_downtime));
-		row.remove();
 	}
 
 	clone({title, buttons, rules}) {
