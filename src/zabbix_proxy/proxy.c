@@ -2061,7 +2061,6 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 			{
 				zabbix_log(LOG_LEVEL_CRIT, "failed to wait for the runlevel %d: %s", i, error);
 				zbx_free(error);
-				zbx_supervisor_client_clear(&svc);
 				break;
 			}
 

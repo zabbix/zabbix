@@ -2135,7 +2135,6 @@ static int	server_startup(zbx_socket_t *listen_sock, int *ha_stat, int *ha_failo
 			{
 				zabbix_log(LOG_LEVEL_CRIT, "failed to wait for the runlevel %d: %s", i, error);
 				zbx_free(error);
-				zbx_supervisor_client_clear(&svc);
 				break;
 			}
 

@@ -129,6 +129,9 @@ void	zbx_set_on_exit_args(void *args);
 void	zbx_set_child_pids(pid_t *pids, size_t pid_num);
 /* sighandler end */
 
+void	zbx_exit(int status);
+int	zbx_is_exit_thread(pthread_t thread);
+
 int	zbx_parse_rtc_options(const char *opt, int *message);
 
 void	zbx_backtrace(void);

@@ -32,6 +32,8 @@ static ZBX_THREAD_LOCAL unsigned long	sig_thread;
 static pid_t	*child_pids = NULL;
 static size_t		child_pid_count = 0;
 
+static	pthread_t	exit_thread;
+
 void	set_sig_parent_pid(int in)
 {
 	sig_parent_pid = in;
@@ -457,4 +459,47 @@ void	zbx_set_child_pids(pid_t *pids, size_t pid_num)
 {
 	child_pids = pids;
 	child_pid_count = pid_num;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: exit process or thread depending on execution context             *
+ *                                                                            *
+ * Parameters: status - [IN] exit status code                                 *
+ *                                                                            *
+ ******************************************************************************/
+void	zbx_exit(int status)
+{
+	if (0 == sig_thread)
+		exit(status);
+
+	if (EXIT_SUCCESS != status)
+	{
+		zbx_set_exiting_with_fail();
+
+		/* This can be overwritten or even corrupted if two threads exit simultaneously. */
+		/* However since it will be used only for comparison and logging - it will not   */
+		/* cause any problems.                                                           */
+		exit_thread = pthread_self();
+	}
+
+	pthread_exit(&status);
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: check if specified thread is the one that initiated exit          *
+ *                                                                            *
+ * Parameters: thread - [IN] thread identifier to check                       *
+ *                                                                            *
+ * Return value: SUCCEED - thread is the exit thread                          *
+ *               FAIL    - otherwise                                          *
+ *                                                                            *
+ ******************************************************************************/
+int	zbx_is_exit_thread(pthread_t thread)
+{
+	if (0 != pthread_equal(thread, exit_thread))
+		return SUCCEED;
+
+	return FAIL;
 }
