@@ -467,10 +467,6 @@
 					color: $compact-view-color;
 				}
 
-				.link-alt {
-					border-bottom-color: $compact-view-color;
-				}
-
 				.tag {
 					color: $compact-view-tag-color;
 					background-color: $compact-view-tag-bg-color;
@@ -503,8 +499,11 @@
 			color: #009900;
 		}
 
-		.link-alt.green:not(:hover):not(:focus) {
-			color: #247b28;
+		.link-alt {
+			&:not(:hover):not(:focus) {
+				color: $compact-view-color;
+				border-bottom-color: $compact-view-color;
+			}
 		}
 	}
 }
