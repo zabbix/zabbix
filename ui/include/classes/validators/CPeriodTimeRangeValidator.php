@@ -18,8 +18,7 @@ class CPeriodTimeRangeValidator extends CValidator {
 
 	private CPeriodTimeParser $period_time_parser;
 
-	public function __construct(array $options = [])
-	{
+	public function __construct(array $options = []) {
 		parent::__construct($options);
 		$this->period_time_parser = new CPeriodTimeParser();
 	}
