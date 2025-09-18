@@ -86,14 +86,13 @@ function normalizeNumericBox(input, {allow_empty, allow_negative, min_length, de
 	const old_value = input.value;
 	let num = parseInt(input.value, 10);
 
-	if (default_value !== null) {
-		input.value = default_value;
-
-		return;
-	}
-
 	if (isNaN(num)) {
-		input.value = (input.value === '' && allow_empty) ? '' : '0'.repeat(Math.max(min_length, 1));
+		if (default_value !== null) {
+			input.value = default_value;
+		}
+		else {
+			input.value = (input.value === '' && allow_empty) ? '' : '0'.repeat(Math.max(min_length, 1));
+		}
 	}
 	else {
 		if (num < 0 && !allow_negative) {
