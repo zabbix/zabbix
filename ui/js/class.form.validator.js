@@ -1089,6 +1089,31 @@ class CFormValidator {
 			};
 		}
 
+		if (('decimal_limit' in rules) && value) {
+			const regex = /^[+-]?(?:(?<int>\d*)\.(?<frac>\d+)|\d+)(?:[eE](?<exp>[+-]?\d+))?$/; // ZBX_PREG_SCIENTIFIC
+
+			const match = value.match(regex);
+
+			if (match) {
+				const frac = match.groups.frac || '';
+				const exp = match.groups.exp ? parseInt(match.groups.exp) : 0;
+
+				const decimals_before_e = frac.length;
+				const decimal_count = Math.max(0, decimals_before_e - exp);
+
+				if (decimal_count > rules['decimal_limit']) {
+					return {
+						result: CFormValidator.ERROR,
+						error: this.#getMessage(rules, 'decimal_limit',
+							sprintf(
+								t('This value cannot have more than %1$s decimal places.'), rules['decimal_limit']
+							)
+						)
+					};
+				}
+			}
+		}
+
 		if (value && value.split('.')[1] && value.split('.')[1].length > rules['decimal_limit']) {
 			return {
 				result: CFormValidator.ERROR,

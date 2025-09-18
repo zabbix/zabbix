@@ -1509,6 +1509,7 @@ define('GEOMAP_LNG_MAX', 180);
 // Regular expressions.
 define('ZBX_PREG_INTERNAL_NAMES', '([0-9a-zA-Z_\. \-]+)'); // !!! Don't forget sync code with C !!!
 define('ZBX_PREG_NUMBER', '(?<number>-?(\d+(\.\d*)?|\.\d+)([Ee][+-]?\d+)?)');
+define('ZBX_PREG_SCIENTIFIC', '/^[+-]?(?:(?P<int>\d*)\.(?P<frac>\d+)|\d+)(?:[eE](?P<exp>[+-]?\d+))?$/');
 define('ZBX_PREG_INT', '(?<int>-?\d+)');
 define('ZBX_PREG_DEF_FONT_STRING', '/^[0-9\.:% ]+$/');
 define('ZBX_PREG_HOST_FORMAT', ZBX_PREG_INTERNAL_NAMES);

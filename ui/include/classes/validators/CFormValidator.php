@@ -937,25 +937,33 @@ class CFormValidator {
 			return false;
 		}
 
-		if (array_key_exists('min', $rules) && bccomp($value, $rules['min']) == -1) {
+		if (array_key_exists('min', $rules) && $value <= $rules['min']) {
 			$error = self::getMessage($rules, 'min', _s('This value must be no less than "%1$s".', $rules['min']));
 
 			return false;
 		}
 
-		if (array_key_exists('max', $rules) && bccomp($value, $rules['max']) == 1) {
+		if (array_key_exists('max', $rules) && $rules['max'] <= $value) {
 			$error = self::getMessage($rules, 'max', _s('This value must be no greater than "%1$s".', $rules['max']));
 
 			return false;
 		}
 
-		if (array_key_exists('decimal_limit', $rules)
-				&& preg_match('/\.\d{' . ($rules['decimal_limit'] + 1) . ',}$/', $value)) {
-			$error = self::getMessage($rules, 'decimal_limit',
-				_s('This value cannot have more than %1$s decimal places.', $rules['decimal_limit'])
-			);
+		if (array_key_exists('decimal_limit', $rules)) {
+			if (preg_match(ZBX_PREG_SCIENTIFIC, $value, $matches)) {
+				$decimals_before_e = array_key_exists('frac', $matches) ? strlen($matches['frac']) : 0;
+				$exponent = array_key_exists('exp', $matches) ? (int)$matches['exp'] : 0;
 
-			return false;
+				$decimal_count = max(0, $decimals_before_e - $exponent);
+
+				if ($decimal_count > $rules['decimal_limit']) {
+					$error = self::getMessage($rules, 'decimal_limit',
+						_s('This value cannot have more than %1$s decimal places.', $rules['decimal_limit'])
+					);
+
+					return false;
+				}
+			}
 		}
 
 		return true;
@@ -1058,7 +1066,6 @@ class CFormValidator {
 				if ($error === '') {
 					$error = match ($class_name) {
 						CAbsoluteTimeParser::class => _('Invalid date.'),
-						CAbsoluteDateParser::class => _('Invalid date.'),
 						default => _('Invalid string.')
 					};
 				}
@@ -1093,17 +1100,6 @@ class CFormValidator {
 				if (array_key_exists('max', $more_options)
 						&& $instance->getDateTime(true)->getTimestamp() > $more_options['max']) {
 					$error = _s('Value must be smaller than %1$s.', date(ZBX_FULL_DATE_TIME, $more_options['max']));
-				}
-			}
-			elseif ($instance instanceof CAbsoluteDateParser) {
-				if (array_key_exists('min', $more_options)
-						&& $instance->getDateTime()->getTimestamp() < $more_options['min']) {
-					$error = _s('Value must be greater than %1$s.', date(ZBX_DATE, $more_options['min']));
-				}
-
-				if (array_key_exists('max', $more_options)
-						&& $instance->getDateTime()->getTimestamp() > $more_options['max']) {
-					$error = _s('Value must be smaller than %1$s.', date(ZBX_DATE, $more_options['max']));
 				}
 			}
 			elseif ($instance instanceof CSimpleIntervalParser) {
