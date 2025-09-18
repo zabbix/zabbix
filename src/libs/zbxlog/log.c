@@ -353,10 +353,9 @@ void	zbx_close_log(void)
 	log_type = ZBX_LOG_TYPE_UNDEFINED;
 }
 
-void	zabbix_log_impl(int level, const char *fmt, ...)
+static void	log_impl(int level, const char *component, const char *fmt, va_list args)
 {
 	char		message[MAX_BUFFER_LEN];
-	va_list		args;
 #ifdef _WINDOWS
 	WORD		wType;
 	wchar_t		thread_id[20], *strings[2];
@@ -368,8 +367,6 @@ void	zabbix_log_impl(int level, const char *fmt, ...)
 	if (SUCCEED != ZBX_CHECK_LOG_LEVEL(level))
 		return;
 #endif
-
-	va_start(args, fmt);
 
 	if (ZBX_LOG_TYPE_FILE == log_type)
 	{
@@ -397,7 +394,7 @@ void	zabbix_log_impl(int level, const char *fmt, ...)
 					tm.tm_min,
 					tm.tm_sec,
 					milliseconds,
-					zbx_get_log_component_name()
+					component
 					);
 
 			vfprintf(log_file, fmt, args);
@@ -439,7 +436,7 @@ void	zabbix_log_impl(int level, const char *fmt, ...)
 				tm.tm_min,
 				tm.tm_sec,
 				milliseconds,
-				zbx_get_log_component_name()
+				component
 				);
 
 		vfprintf(stdout, fmt, args);
@@ -495,20 +492,20 @@ void	zabbix_log_impl(int level, const char *fmt, ...)
 		switch (level)
 		{
 			case LOG_LEVEL_CRIT:
-				syslog(LOG_CRIT, "%s%s", zbx_get_log_component_name(), message);
+				syslog(LOG_CRIT, "%s%s", component, message);
 				break;
 			case LOG_LEVEL_ERR:
-				syslog(LOG_ERR, "%s%s", zbx_get_log_component_name(), message);
+				syslog(LOG_ERR, "%s%s", component, message);
 				break;
 			case LOG_LEVEL_WARNING:
-				syslog(LOG_WARNING, "%s%s", zbx_get_log_component_name(), message);
+				syslog(LOG_WARNING, "%s%s", component, message);
 				break;
 			case LOG_LEVEL_DEBUG:
 			case LOG_LEVEL_TRACE:
-				syslog(LOG_DEBUG, "%s%s", zbx_get_log_component_name(), message);
+				syslog(LOG_DEBUG, "%s%s", component, message);
 				break;
 			case LOG_LEVEL_INFORMATION:
-				syslog(LOG_INFO, "%s%s", zbx_get_log_component_name(), message);
+				syslog(LOG_INFO, "%s%s", component, message);
 				break;
 			default:
 				/* LOG_LEVEL_EMPTY - print nothing */
@@ -524,28 +521,47 @@ void	zabbix_log_impl(int level, const char *fmt, ...)
 		switch (level)
 		{
 			case LOG_LEVEL_CRIT:
-				zbx_error("ERROR: %s%s", zbx_get_log_component_name(), message);
+				zbx_error("ERROR: %s%s", component, message);
 				break;
 			case LOG_LEVEL_ERR:
-				zbx_error("Error: %s%s", zbx_get_log_component_name(), message);
+				zbx_error("Error: %s%s", component, message);
 				break;
 			case LOG_LEVEL_WARNING:
-				zbx_error("Warning: %s%s", zbx_get_log_component_name(), message);
+				zbx_error("Warning: %s%s", component, message);
 				break;
 			case LOG_LEVEL_DEBUG:
-				zbx_error("DEBUG: %s%s", zbx_get_log_component_name(), message);
+				zbx_error("DEBUG: %s%s", component, message);
 				break;
 			case LOG_LEVEL_TRACE:
-				zbx_error("TRACE: %s%s", zbx_get_log_component_name(), message);
+				zbx_error("TRACE: %s%s", component, message);
 				break;
 			default:
-				zbx_error("%s%s", zbx_get_log_component_name(), message);
+				zbx_error("%s%s", component, message);
 				break;
 		}
 
 		UNLOCK_LOG;
 	}
+}
 
+void	zabbix_log_impl(int level, const char *fmt, ...)
+{
+	va_list	args;
+
+	va_start(args, fmt);
+	log_impl(level, zbx_get_log_component_name(), fmt, args);
+	va_end(args);
+}
+
+static void	log_component(int level, const char *component, const char *fmt, ...)
+{
+	va_list	args;
+
+	if (SUCCEED != ZBX_CHECK_LOG_LEVEL(level))
+		return;
+
+	va_start(args, fmt);
+	log_impl(level, component, fmt, args);
 	va_end(args);
 }
 
@@ -939,28 +955,28 @@ void	zbx_change_component_log_level(zbx_log_component_t *component, int directio
 	{
 		if (LOG_LEVEL_EMPTY == component->level)
 		{
-			zabbix_log(LOG_LEVEL_INFORMATION, "%scannot decrease log level:"
-					" minimum level has been already set", component->name);
+			log_component(LOG_LEVEL_INFORMATION, component->name, "cannot decrease log level:"
+					" minimum level has been already set");
 		}
 		else
 		{
 			component->level += direction;
-			zabbix_log(LOG_LEVEL_INFORMATION, "%slog level has been decreased to %s",
-					component->name, zabbix_get_log_level_ref_string(component->level));
+			log_component(LOG_LEVEL_INFORMATION, component->name, "log level has been decreased to %s",
+					zabbix_get_log_level_ref_string(component->level));
 		}
 	}
 	else
 	{
 		if (LOG_LEVEL_TRACE == component->level)
 		{
-			zabbix_log(LOG_LEVEL_INFORMATION, "%scannot increase log level:"
-					" maximum level has been already set", component->name);
+			log_component(LOG_LEVEL_INFORMATION, component->name, "cannot increase log level:"
+					" maximum level has been already set");
 		}
 		else
 		{
 			component->level += direction;
-			zabbix_log(LOG_LEVEL_INFORMATION, "%slog level has been increased to %s",
-					component->name, zabbix_get_log_level_ref_string(component->level));
+			log_component(LOG_LEVEL_INFORMATION, component->name, "log level has been increased to %s",
+					zabbix_get_log_level_ref_string(component->level));
 		}
 	}
 }
