@@ -40,7 +40,7 @@ class testFormAdministrationGeneralIconMapping extends CLegacyWebTest {
 			// Create icon mapping with empty name
 			[
 				[
-					'error' => [
+					'error_inline' => [
 						'Name' => 'This field cannot be empty.'
 					],
 					'check_db' => false
@@ -50,7 +50,7 @@ class testFormAdministrationGeneralIconMapping extends CLegacyWebTest {
 			[
 				[
 					'name' => ' ',
-					'error' => [
+					'error_inline' => [
 						'Name' => 'This field cannot be empty.'
 					]
 				]
@@ -61,7 +61,7 @@ class testFormAdministrationGeneralIconMapping extends CLegacyWebTest {
 					'mappings' => [
 						['expression' => 'Create with existing name']
 					],
-					'error' => [
+					'error_inline' => [
 						'Name' => 'This object already exists.'
 					],
 					'check_db' => false
@@ -73,7 +73,7 @@ class testFormAdministrationGeneralIconMapping extends CLegacyWebTest {
 					'mappings' => [
 						['expression' => '\\']
 					],
-					'error' => [
+					'error_inline' => [
 						'id:mappings_0_expression' => 'Expression: Invalid regular expression.'
 					]
 				]
@@ -81,7 +81,7 @@ class testFormAdministrationGeneralIconMapping extends CLegacyWebTest {
 			[
 				[
 					'name' => 'Create with empty expression',
-					'error' => [
+					'error_inline' => [
 						'id:mappings_0_expression' => 'Expression: This field cannot be empty.'
 					]
 				]
@@ -93,7 +93,7 @@ class testFormAdministrationGeneralIconMapping extends CLegacyWebTest {
 						['expression' => 'first expression'],
 						['expression' => 'first expression']
 					],
-					'error' => [
+					'error_inline' => [
 						'name:mappings[1][inventory_link]' => 'Entry "inventory_link=1, expression=first expression" is not unique.'
 					]
 				]
@@ -105,7 +105,7 @@ class testFormAdministrationGeneralIconMapping extends CLegacyWebTest {
 						['expression' => 'first expression'],
 						['expression' => '']
 					],
-					'error' => [
+					'error_inline' => [
 						'id:mappings_1_expression' => 'Expression: This field cannot be empty.'
 					]
 				]
@@ -138,7 +138,7 @@ class testFormAdministrationGeneralIconMapping extends CLegacyWebTest {
 					'mappings' => [
 						['action' => 'remove']
 					],
-					'error' => [
+					'error_inline' => [
 						'Mappings' => 'This field cannot be empty.'
 					]
 				]
@@ -167,8 +167,13 @@ class testFormAdministrationGeneralIconMapping extends CLegacyWebTest {
 		$this->zbxTestClickXpath('//button[@value="Add"]');
 
 		// Check the results in frontend.
-		$this->assertInlineError($form, $data['error']);
-
+		if (array_key_exists('error_inline', $data)) {
+			$this->assertInlineError($form, $data['error_inline']);
+		}
+		else {
+			$this->assertMessage(TEST_BAD, null, $data['error']);
+		}
+		
 		// Check the results in DB
 		if (!array_key_exists('check_db', $data) || $data['check_db'] === true) {
 			$this->assertEquals(0, CDBHelper::getCount('SELECT NULL FROM icon_map WHERE name='.zbx_dbstr($data['name'])));
@@ -378,7 +383,7 @@ class testFormAdministrationGeneralIconMapping extends CLegacyWebTest {
 			[
 				[
 					'name' => '',
-					'error' => [
+					'error_inline' => [
 						'Name' => 'This field cannot be empty.'
 					]
 				]
@@ -387,7 +392,7 @@ class testFormAdministrationGeneralIconMapping extends CLegacyWebTest {
 			[
 				[
 					'name' => 'Icon mapping one',
-					'error' => [
+					'error_inline' => [
 						'Name' => 'This object already exists.'
 					]
 				]
@@ -398,7 +403,7 @@ class testFormAdministrationGeneralIconMapping extends CLegacyWebTest {
 					'mappings' => [
 						['expression' => '\\', 'action' => 'update']
 					],
-					'error' => [
+					'error_inline' => [
 						'id:mappings_0_expression' => 'Expression: Invalid regular expression.'
 					]
 				]
@@ -409,7 +414,7 @@ class testFormAdministrationGeneralIconMapping extends CLegacyWebTest {
 					'mappings' => [
 						['expression' => '', 'action' => 'update']
 					],
-					'error' => [
+					'error_inline' => [
 						'id:mappings_0_expression' => 'Expression: This field cannot be empty.'
 					]
 				]
@@ -429,7 +434,7 @@ class testFormAdministrationGeneralIconMapping extends CLegacyWebTest {
 					'mappings' => [
 						['action' => 'remove']
 					],
-					'error' => [
+					'error_inline' => [
 						'Mappings' => 'This field cannot be empty.'
 					]
 				]
@@ -442,7 +447,7 @@ class testFormAdministrationGeneralIconMapping extends CLegacyWebTest {
 						['expression' => '(1!@#$%^-=2*)', 'action' => 'update'],
 						['expression' => '(1!@#$%^-=2*)']
 					],
-					'error' => [
+					'error_inline' => [
 						'name:mappings[1][inventory_link]' => 'Entry "inventory_link=4, expression=(1!@#$%^-=2*)" is not unique.'
 					]
 				]
@@ -466,7 +471,6 @@ class testFormAdministrationGeneralIconMapping extends CLegacyWebTest {
 		$this->zbxTestWaitForPageToLoad();
 
 		if (array_key_exists('name', $data)) {
-			$this->zbxTestWaitUntilElementVisible(WebDriverBy::id('name'));
 			$this->zbxTestInputType('name', $data['name']);
 		}
 
@@ -482,7 +486,12 @@ class testFormAdministrationGeneralIconMapping extends CLegacyWebTest {
 		$this->zbxTestClick('update');
 
 		// Check the results in frontend.
-		$this->assertInlineError($form, $data['error']);
+		if (array_key_exists('error_inline', $data)) {
+			$this->assertInlineError($form, $data['error_inline']);
+		}
+		else {
+			$this->assertMessage(TEST_BAD, null, $data['error']);
+		}
 
 		// Check the results in DB
 		$this->assertEquals($old_hash, CDBHelper::getHash($sql_hash));
@@ -736,8 +745,10 @@ class testFormAdministrationGeneralIconMapping extends CLegacyWebTest {
 			$this->processExpressionRows($data['mappings']);
 		}
 
-		$form = $this->query('id:iconmap')->asForm()->one();
 		$this->zbxTestClickXpath('//button[@value="Add"]');
+		$this->zbxTestWaitForPageToLoad();
+		$this->page->removeFocus();
+		$form = $this->query('id:iconmap')->asForm()->one();	
 
 		// Check the results in frontend.
 		$this->assertInlineError($form, $data['error']);
@@ -883,7 +894,7 @@ class testFormAdministrationGeneralIconMapping extends CLegacyWebTest {
 			$this->zbxTestInputTypeOverwrite('name', $iconmap['name'].' (cloned)');
 			$this->zbxTestClickWait('clone');
 			$this->zbxTestClick('cancel');
-
+			
 			// Check the results in frontend.
 			$this->zbxTestCheckTitle('Configuration of icon mapping');
 			$this->zbxTestCheckHeader('Icon mapping');
