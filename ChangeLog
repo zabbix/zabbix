@@ -12,6 +12,11 @@ A......... [ZBXNEXT-10027] prepared for removal of TimescaleDB API call deprecat
 .......PS. [ZBXNEXT-10077] updated maximal supported MariaDB version to 12.0 (mprihodko)
 
 Bug fixes:
+A......... [ZBX-26419] improved performance of problem and event views by optimizing SQL queries to join only the necessary triggers, eliminating redundant post-join filtering (vso)
+..F....... [ZBX-25796] fixed confusing error message on item test timeout (isharha)
+..F....... [ZBX-26337] removed unnecessary div elements for entries without problems in Item and Host Navigator widgets (msnihach)
+.......PS. [ZBX-26873] fixed support for SSH item proxy through configurations in SSH config file (aetatsu)
+...G...... [ZBX-19267] fixed wmi.get items sometimes incorrectly returning "Empty WMI search result" with Zabbix agent 2 (aetatsu)
 ........S. [ZBX-20207] fixed unexpected interface connection mode change during autoregistration (vso)
 ...G...... [ZBX-19267] fixed wmi.get items sometimes incorectly returning "Empty WMI search result" with Zabbix agent 2 (aetatsu)
 .........T [ZBX-25448] fixed token-based authentication method in FortiGate by HTTP template (egordymov)
@@ -3761,6 +3766,7 @@ New features:
 .......PS. [ZBXNEXT-10077] updated maximal supported MariaDB version to 12.0 (mprihodko)
 
 Bug fixes:
+...G...... [ZBX-19267] fixed wmi.get items sometimes incorrectly returning "Empty WMI search result" with Zabbix agent 2 (aetatsu)
 ...G...... [ZBX-19267] fixed wmi.get items sometimes incorectly returning "Empty WMI search result" with Zabbix agent 2 (aetatsu)
 ...G...... [ZBX-26920] fixed wrong time in Zabbix agent for Windows (sboidenko)
 ..F....... [ZBX-22786] fixed trends graph line colors issue with PHP 8.1 (isharha)
