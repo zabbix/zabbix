@@ -16,40 +16,26 @@
 
 class CControllerMacrosEdit extends CController {
 
-	protected function init() {
+	protected function init(): void {
 		$this->disableCsrfValidation();
 	}
 
-	protected function checkInput() {
-		$fields = [
-			'macros' => 'array'
-		];
-
-		$ret = $this->validateInput($fields);
-
-		if (!$ret) {
-			$this->setResponse(new CControllerResponseFatal());
-		}
-
-		return $ret;
+	protected function checkInput(): bool {
+		return true;
 	}
 
-	protected function checkPermissions() {
+	protected function checkPermissions(): bool {
 		return $this->checkAccess(CRoleHelper::UI_ADMINISTRATION_MACROS);
 	}
 
-	protected function doAction() {
-		$data = [];
-
-		if ($this->hasInput('macros')) {
-			$data['macros'] = $this->getInput('macros');
-		}
-		else {
-			$data['macros'] = array_values(order_macros(API::UserMacro()->get([
+	protected function doAction(): void {
+		$data = [
+			'macros' => array_values(order_macros(API::UserMacro()->get([
 				'output' => ['globalmacroid', 'macro', 'value', 'type', 'description'],
 				'globalmacro' => true
-			]), 'macro'));
-		}
+			]), 'macro')),
+			'js_validation_rules' => (new CFormValidator(CControllerMacrosUpdate::getValidationRules()))->getRules()
+		];
 
 		if (!$data['macros']) {
 			$data['macros'][] = ['macro' => '', 'value' => '', 'description' => '', 'type' => ZBX_MACRO_TYPE_TEXT];

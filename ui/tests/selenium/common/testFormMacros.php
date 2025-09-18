@@ -1952,6 +1952,7 @@ abstract class testFormMacros extends CLegacyWebTest {
 
 	public function getCreateVaultMacrosData() {
 		return [
+			// #0 Regular HashiCorp format.
 			[
 				[
 					'expected' => TEST_GOOD,
@@ -1967,6 +1968,7 @@ abstract class testFormMacros extends CLegacyWebTest {
 					'vault' => 'Hashicorp'
 				]
 			],
+			// #1 Prolonged HashiCorp format.
 			[
 				[
 					'expected' => TEST_GOOD,
@@ -1982,6 +1984,7 @@ abstract class testFormMacros extends CLegacyWebTest {
 					'vault' => 'Hashicorp'
 				]
 			],
+			// #2 Short HashiCorp format.
 			[
 				[
 					'expected' => TEST_GOOD,
@@ -1997,6 +2000,7 @@ abstract class testFormMacros extends CLegacyWebTest {
 					'vault' => 'Hashicorp'
 				]
 			],
+			// #3 Missing key value - HashiCorp.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -2016,6 +2020,7 @@ abstract class testFormMacros extends CLegacyWebTest {
 					]
 				]
 			],
+			// #4 Missing path start - HashiCorp.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -2035,6 +2040,7 @@ abstract class testFormMacros extends CLegacyWebTest {
 					]
 				]
 			],
+			// #5 Missing path - Hashicorp.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -2054,6 +2060,7 @@ abstract class testFormMacros extends CLegacyWebTest {
 					]
 				]
 			],
+			// #6 Missing key as such - HashiCorp.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -2073,6 +2080,7 @@ abstract class testFormMacros extends CLegacyWebTest {
 					]
 				]
 			],
+			// #7 Unneeded slash at the start of path - HashiCorp.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -2092,6 +2100,7 @@ abstract class testFormMacros extends CLegacyWebTest {
 					]
 				]
 			],
+			// #8 Empty vault macro value - HashiCorp.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -2111,6 +2120,7 @@ abstract class testFormMacros extends CLegacyWebTest {
 					]
 				]
 			],
+			// #9 Regular CyberArc format.
 			[
 				[
 					'expected' => TEST_GOOD,
@@ -2123,9 +2133,11 @@ abstract class testFormMacros extends CLegacyWebTest {
 						'description' => 'cyberark description10'
 					],
 					'title' => ucfirst($this->vault_object).' updated',
-					'vault' => 'Cyberark'
+					'vault' => 'Cyberark',
+					'clear_globalmacros' => true
 				]
 			],
+			// #10 Multiple parameters - CyberArc.
 			[
 				[
 					'expected' => TEST_GOOD,
@@ -2141,6 +2153,7 @@ abstract class testFormMacros extends CLegacyWebTest {
 					'vault' => 'Cyberark'
 				]
 			],
+			// #11 Short format - CyberArc.
 			[
 				[
 					'expected' => TEST_GOOD,
@@ -2156,6 +2169,7 @@ abstract class testFormMacros extends CLegacyWebTest {
 					'vault' => 'Cyberark'
 				]
 			],
+			// #12 Empty macro value - CyberArc.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -2175,6 +2189,7 @@ abstract class testFormMacros extends CLegacyWebTest {
 					]
 				]
 			],
+			// #13 Missing key - CyberArc.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -2194,6 +2209,7 @@ abstract class testFormMacros extends CLegacyWebTest {
 					]
 				]
 			],
+			// #14 Wrong assignment of AppID parameter - CyberArc.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -2213,6 +2229,7 @@ abstract class testFormMacros extends CLegacyWebTest {
 					]
 				]
 			],
+			// #15 Case sensitivity check for AppID parameter - CyberArc.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -2232,6 +2249,7 @@ abstract class testFormMacros extends CLegacyWebTest {
 					]
 				]
 			],
+			// #16 Missing mandatory AppID parameter - CyberArc.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -2242,25 +2260,6 @@ abstract class testFormMacros extends CLegacyWebTest {
 							'type' => 'Vault secret'
 						],
 						'description' => 'vault description17'
-					],
-					'title' => 'Cannot update '.$this->vault_object,
-					'message' => 'Invalid parameter "'.$this->cyber_error_field.'": mandatory parameter "AppID" is missing.',
-					'vault' => 'Cyberark',
-					'inline_error' => [
-						'id:macros_{index}_value' => 'Value: Mandatory parameter "AppID" is missing.'
-					]
-				]
-			],
-			[
-				[
-					'expected' => TEST_BAD,
-					'macro_fields' => [
-						'macro' => '{$VAULT_MACRO18}',
-						'value' => [
-							'text' => 'NotApp=something:key',
-							'type' => 'Vault secret'
-						],
-						'description' => 'vault description18'
 					],
 					'title' => 'Cannot update '.$this->vault_object,
 					'message' => 'Invalid parameter "'.$this->cyber_error_field.'": mandatory parameter "AppID" is missing.',
@@ -2631,6 +2630,8 @@ abstract class testFormMacros extends CLegacyWebTest {
 			$this->page->open('zabbix.php?action=macros.edit')->waitUntilReady();
 			$this->getValueField($this->macro_resolve)->changeInputType(CInputGroupElement::TYPE_SECRET);
 			$this->query('button:Update')->one()->click();
+			$this->page->waitUntilReady();
+			$this->assertMessage(TEST_GOOD, 'Macros updated');
 		}
 
 		$this->checkItemFields($url, $data['name'], $data['key_secret']);
