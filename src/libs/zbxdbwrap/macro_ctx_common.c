@@ -1785,7 +1785,7 @@ int	zbx_macro_message_common_resolv(zbx_macro_resolv_data_t *p, zbx_dc_um_handle
 	{
 		if (SUCCEED == zbx_token_is_user_macro(p->macro, &p->token))
 		{
-			const zbx_vector_uint64_t	**c_event_hosts = (const zbx_vector_uint64_t *)zbx_expr_rem(
+			const zbx_vector_uint64_t	**c_event_hosts = (const zbx_vector_uint64_t **)zbx_expr_rem(
 					&c_event->trigger, sizeof(const zbx_vector_uint64_t *), NULL, NULL);
 
 			if (SUCCEED == zbx_db_trigger_get_all_hostids(&c_event->trigger, c_event_hosts))
