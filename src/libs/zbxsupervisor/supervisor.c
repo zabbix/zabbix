@@ -489,6 +489,13 @@ static void	supervisor_start_units(zbx_supervisor_t *sv, const zbx_thread_superv
 			if (PROCESS_OWNER_SUPERVISOR != info->owner)
 				continue;
 
+			if (NULL == args->unit_defs[info->type].entry)
+			{
+				zabbix_log(LOG_LEVEL_CRIT, "no entry function specified for process type %d");
+				zbx_set_exiting_with_fail();
+				return;
+			}
+
 			zbx_supervisor_unit_t	*unit = supervisor_get_unit(sv, info->type, info->num);
 
 			thread_args.info.process_type = info->type;
