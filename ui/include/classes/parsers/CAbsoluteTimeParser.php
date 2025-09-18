@@ -97,7 +97,6 @@ class CAbsoluteTimeParser extends CParser {
 		$date = $this->buildDateString($matches);
 		$datetime = date_create($date);
 
-
 		if ($datetime === false) {
 			return false;
 		}

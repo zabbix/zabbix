@@ -32,7 +32,7 @@ window.sla_edit_popup = new class {
 		this.form = new CForm(this.form_element, rules);
 
 		this.excluded_downtime_template = new Template(
-			this.form_element.querySelector('#excluded-downtime-tmpl').innerHTML
+			document.getElementById('excluded-downtime-tmpl').innerHTML
 		);
 
 		const return_url = new URL('zabbix.php', location.href);

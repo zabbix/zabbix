@@ -60,7 +60,7 @@ class CPeriodTimeRangeValidator extends CValidator {
 				'period_to' => SEC_PER_DAY + $day_period_to
 			];
 
-			if (count($result) !== count(array_unique(array_map('json_encode', $result)))) {
+			if (count($result) != count(array_unique(array_map('json_encode', $result)))) {
 				$this->setError(_('periods must be unique'));
 
 				return false;

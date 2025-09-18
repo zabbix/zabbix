@@ -43,7 +43,7 @@ class CPeriodTimeParser extends CParser {
 			return self::PARSE_FAIL;
 		}
 
-		$expected_keys = ['from_h','from_m', 'to_h','to_m'];
+		$expected_keys = ['from_h', 'from_m', 'to_h', 'to_m'];
 
 		if (array_diff($expected_keys, array_keys($this->matches))) {
 			return self::PARSE_FAIL;
