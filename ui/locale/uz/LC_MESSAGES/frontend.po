@@ -4124,6 +4124,11 @@ msgstr ""
 msgid "Cannot read YAML: %1$s."
 msgstr ""
 
+#: include/classes/server/CZabbixServer.php:511
+#, c-format
+msgid "Cannot read response from Zabbix server \"%1$s\"."
+msgstr ""
+
 #: include/classes/server/CZabbixServer.php:567
 #, c-format
 msgid "Cannot read the response, check connection with the Zabbix server \"%1$s\"."
@@ -18842,6 +18847,11 @@ msgstr ""
 
 #: httpdetails.php:149 include/classes/screens/CScreenHttpTestDetails.php:83
 msgid "Response time"
+msgstr ""
+
+#: include/classes/server/CZabbixServer.php:507
+#, c-format
+msgid "Response timeout of %1$s exceeded when connecting to Zabbix server \"%2$s\"."
 msgstr ""
 
 #: app/controllers/CControllerMediatypeTestSend.php:182
