@@ -3024,11 +3024,11 @@ abstract class CItemGeneral extends CApiService {
 				}
 
 				foreach ($item_templates[$parent_itemid] as $itemid => $templateid) {
-					if (!array_key_exists($itemid, $_vertices)) {
-						$_vertices[$itemid] = [];
+					if (!array_key_exists($itemid, $_vertices) || !array_key_exists($templateid, $_vertices[$itemid])) {
+						$_vertices[$itemid][$templateid] = [];
 					}
 
-					$_vertices[$itemid] += [$templateid => true] + $vertex_links;
+					$_vertices[$itemid][$templateid] += [$templateid => true] + $vertex_links;
 
 					if (array_key_exists($parent_itemid, $item_template_links)
 							&& array_key_exists($itemid, $item_template_links[$parent_itemid])) {
@@ -3037,7 +3037,15 @@ abstract class CItemGeneral extends CApiService {
 				}
 			}
 
-			$vertices = $_vertices;
+			$vertices = [];
+
+			foreach ($_vertices as $itemid => $template_vertices) {
+				$vertices[$itemid] = [];
+
+				foreach ($template_vertices as $vertex_links) {
+					$vertices[$itemid] += $vertex_links;
+				}
+			}
 		} while ($vertices);
 	}
 }

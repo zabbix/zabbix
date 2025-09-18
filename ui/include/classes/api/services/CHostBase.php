@@ -1614,16 +1614,16 @@ abstract class CHostBase extends CApiService {
 				}
 
 				foreach ($template_hosts[$templateid] as $hostid => $true) {
-					if (!array_key_exists($hostid, $_vertices)) {
-						$_vertices[$hostid] = [];
+					if (!array_key_exists($hostid, $_vertices) || !array_key_exists($templateid, $_vertices[$hostid])) {
+						$_vertices[$hostid][$templateid] = [];
 					}
 
-					$_vertices[$hostid] += [$templateid => true] + $vertex_links;
+					$_vertices[$hostid][$templateid] += [$templateid => true] + $vertex_links;
 
 					if (array_key_exists($templateid, $template_host_links)
 							&& array_key_exists($hostid, $template_host_links[$templateid])) {
 
-						$template_host_links[$templateid][$hostid] += $_vertices[$hostid];
+						$template_host_links[$templateid][$hostid] += $_vertices[$hostid][$templateid];
 
 						if (array_key_exists($hostid, $template_hosts)) {
 							$_templateid = $hostid;
@@ -1658,7 +1658,15 @@ abstract class CHostBase extends CApiService {
 				}
 			}
 
-			$vertices = $_vertices;
+			$vertices = [];
+
+			foreach ($_vertices as $hostid => $template_vertices) {
+				$vertices[$hostid] = [];
+
+				foreach ($template_vertices as $vertex_links) {
+					$vertices[$hostid] += $vertex_links;
+				}
+			}
 		} while ($vertices);
 
 		foreach ($propagated_template_host_links as $templateid => $host_links) {

@@ -614,7 +614,7 @@ abstract class CHostGeneral extends CHostBase {
 							'hostid' => $hostid,
 							'templateid' => $templateid
 						];
-						$ins_templates = &$template;
+						$ins_templates[] = &$template;
 					}
 					unset($template);
 
