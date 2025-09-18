@@ -2600,10 +2600,8 @@ button {
 .list-table.has-highlighted-rows .ok-unack-fg,
 .list-table.has-highlighted-rows .ok-ack-fg {
   color: #009900; }
-.list-table.has-highlighted-rows .link-alt.green {
-  color: #017000; }
-.list-table.has-highlighted-rows tr:hover .link-alt.green {
-  color: #009900; }
+.list-table.has-highlighted-rows .link-alt.green:not(:hover):not(:focus) {
+  color: #247b28; }
 
 .no-data-message {
   display: grid;

@@ -249,14 +249,8 @@ $toc-title-bg-color: #4f4f4f;
 			color: #009900;
 		}
 
-		.link-alt.green {
+		.link-alt.green:not(:hover):not(:focus) {
 			color: #017000;
-		}
-
-		tr:hover {
-			.link-alt.green {
-				color: #009900;
-			}
 		}
 	}
 

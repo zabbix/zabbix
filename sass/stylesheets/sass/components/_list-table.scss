@@ -503,14 +503,8 @@
 			color: #009900;
 		}
 
-		.link-alt.green {
-			color: #017000;
-		}
-
-		tr:hover {
-			.link-alt.green {
-				color: #009900;
-			}
+		.link-alt.green:not(:hover):not(:focus) {
+			color: #247b28;
 		}
 	}
 }
