@@ -275,7 +275,7 @@ class testHistory extends CAPITest {
 	}
 
 	public static function history_clear_data() {
-		$binary_itemid = 158740;
+		$binary_itemid = 158739;
 
 		return [
 			[
