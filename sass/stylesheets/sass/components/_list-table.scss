@@ -272,11 +272,13 @@
 	.btn-small,
 	.problem-icon-link,
 	.status-container,
-	.entity-count,
+	.entity-count {
+		vertical-align: top;
+	}
+
 	.tag {
 		margin-top: 1px;
 		margin-bottom: 1px;
-		vertical-align: top;
 	}
 }
 
@@ -477,11 +479,6 @@
 				.btn-icon,
 				.icon {
 					background-color: $ui-bg-color;
-				}
-
-				.entity-count {
-					margin-top: 0;
-					margin-bottom: 0;
 				}
 			}
 		}

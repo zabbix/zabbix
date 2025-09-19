@@ -249,7 +249,8 @@ $toc-title-bg-color: #4f4f4f;
 			color: #009900;
 		}
 
-		tr:hover {
+		tr:hover,
+		tr:not([class*='flh-']) {
 			.link-alt {
 				&:not(:hover):not(:focus) {
 					color: $font-color;

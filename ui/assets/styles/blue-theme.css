@@ -2463,11 +2463,11 @@ button {
 .list-table .btn-small,
 .list-table .problem-icon-link,
 .list-table .status-container,
-.list-table .entity-count,
+.list-table .entity-count {
+  vertical-align: top; }
 .list-table .tag {
   margin-top: 1px;
-  margin-bottom: 1px;
-  vertical-align: top; }
+  margin-bottom: 1px; }
 
 .list-table thead th.column-tags-1 {
   width: 75px; }
@@ -2588,9 +2588,6 @@ button {
 .list-table.compact-view [class*='flh-']:not(.row-selected):not(:hover) .icon, .list-table.has-highlighted-rows [class*='flh-']:not(.row-selected):not(:hover) .btn-icon,
 .list-table.has-highlighted-rows [class*='flh-']:not(.row-selected):not(:hover) .icon {
   background-color: #ffffff; }
-.list-table.compact-view [class*='flh-']:not(.row-selected):not(:hover) .entity-count, .list-table.has-highlighted-rows [class*='flh-']:not(.row-selected):not(:hover) .entity-count {
-  margin-top: 0;
-  margin-bottom: 0; }
 .list-table.has-highlighted-rows .problem-unack-fg,
 .list-table.has-highlighted-rows .problem-ack-fg {
   color: #cc0000; }
