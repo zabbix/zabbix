@@ -278,13 +278,14 @@ class CHttpTest extends CApiService {
 		unset($httptest);
 
 		$sql_options = [
-			'output' => array_merge(['httptestid'], $options['selectTags']),
+			'output' => array_merge(['httptesttagid', 'httptestid'], $options['selectTags']),
 			'filter' => ['httptestid' => array_keys($httptests)]
 		];
 		$resource = DBselect(DB::makeSql('httptest_tag', $sql_options));
 
 		while ($row = DBfetch($resource)) {
-			$httptests[$row['httptestid']]['tags'][] = array_diff_key($row, array_flip(['httptestid']));
+			$httptests[$row['httptestid']]['tags'][] =
+				array_diff_key($row, array_flip(['httptesttagid', 'httptestid']));
 		}
 	}
 
