@@ -1877,7 +1877,6 @@ class testPageProblems extends CWebTest {
 					]
 				]
 			],
-			// TODO: uncomment test case once issue ZBX-25103 is resolved
 			'Two metrics in operational data pop-up window' => [
 				[
 					'filter' => [
@@ -1986,10 +1985,9 @@ class testPageProblems extends CWebTest {
 
 		$this->assertEquals($data_in_column, $opdata_column->getText());
 
-		// TODO: uncomment the lines below and add new screenshot references after ZBX-25103 is fixed.
-//		if (array_key_exists('screen_name', $data)) {
-//			$this->assertScreenshot($opdata_column, $data['screen_name']);
-//		}
+		if (array_key_exists('screen_name', $data)) {
+			$this->assertScreenshot($opdata_column, $data['screen_name']);
+		}
 
 		// Check data in popup.
 		foreach ($data['popup rows'] as $i => $popup_row) {
