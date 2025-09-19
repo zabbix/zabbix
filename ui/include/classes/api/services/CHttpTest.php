@@ -59,8 +59,6 @@ class CHttpTest extends CApiService {
 			'templated'      => null,
 			'monitored'      => null,
 			'nopermissions'  => null,
-			'evaltype'		=> TAG_EVAL_TYPE_AND_OR,
-			'tags'			=> null,
 			// filter
 			'filter'         => null,
 			'search'         => null,
@@ -73,7 +71,6 @@ class CHttpTest extends CApiService {
 			'expandStepName' => null,
 			'selectHosts'    => null,
 			'selectSteps'    => null,
-			'selectTags'	 => null,
 			'countOutput'    => false,
 			'groupCount'     => false,
 			'preservekeys'   => false,
@@ -253,13 +250,41 @@ class CHttpTest extends CApiService {
 	private static function validateGet(array &$options): void {
 		$api_input_rules = ['type' => API_OBJECT, 'flags' => API_ALLOW_UNEXPECTED, 'fields' => [
 			// Filters.
+			'evaltype' =>				['type' => API_INT32, 'in' => implode(',', [TAG_EVAL_TYPE_AND_OR, TAG_EVAL_TYPE_OR]), 'default' => TAG_EVAL_TYPE_AND_OR],
+			'tags' =>					['type' => API_OBJECTS, 'flags' => API_ALLOW_NULL | API_NORMALIZE, 'default' => null, 'fields' => [
+				'tag' =>					['type' => API_STRING_UTF8, 'flags' => API_REQUIRED],
+				'operator' =>				['type' => API_INT32, 'in' => implode(',', [TAG_OPERATOR_LIKE, TAG_OPERATOR_EQUAL, TAG_OPERATOR_NOT_LIKE, TAG_OPERATOR_NOT_EQUAL, TAG_OPERATOR_EXISTS, TAG_OPERATOR_NOT_EXISTS])],
+				'value' =>					['type' => API_STRING_UTF8]
+			]],
 			'inheritedTags' =>			['type' => API_BOOLEAN, 'default' => false],
 			// Output.
+			'selectTags' =>				['type' => API_OUTPUT, 'flags' => API_ALLOW_NULL | API_NORMALIZE, 'in' => implode(',', ['tag', 'value']), 'default' => null],
 			'selectInheritedTags' =>	['type' => API_OUTPUT, 'flags' => API_ALLOW_NULL | API_NORMALIZE, 'in' => implode(',', ['tag', 'value', 'object', 'objectid']), 'default' => null]
 		]];
 
 		if (!CApiInputValidator::validate($api_input_rules, $options, '/', $error)) {
 			self::exception(ZBX_API_ERROR_PARAMETERS, $error);
+		}
+	}
+
+	private static function addRelatedTags(array $options, array &$httptests): void {
+		if ($options['selectTags'] === null) {
+			return;
+		}
+
+		foreach ($httptests as &$httptest) {
+			$httptest['tags'] = [];
+		}
+		unset($httptest);
+
+		$sql_options = [
+			'output' => array_merge(['httptestid'], $options['selectTags']),
+			'filter' => ['httptestid' => array_keys($httptests)]
+		];
+		$resource = DBselect(DB::makeSql('httptest_tag', $sql_options));
+
+		while ($row = DBfetch($resource)) {
+			$httptests[$row['httptestid']]['tags'][] = array_diff_key($row, array_flip(['httptestid']));
 		}
 	}
 
@@ -1143,30 +1168,7 @@ class CHttpTest extends CApiService {
 			}
 		}
 
-		// Adding web scenario tags.
-		if ($options['selectTags'] !== null) {
-			$options['selectTags'] = ($options['selectTags'] !== API_OUTPUT_EXTEND)
-				? (array) $options['selectTags']
-				: ['tag', 'value'];
-
-			$options['selectTags'] = array_intersect(['tag', 'value'], $options['selectTags']);
-			$requested_output = array_flip($options['selectTags']);
-
-			$db_tags = DBselect(
-				'SELECT '.implode(',', array_merge($options['selectTags'], ['httptestid'])).
-				' FROM httptest_tag'.
-				' WHERE '.dbConditionInt('httptestid', $httpTestIds)
-			);
-
-			array_walk($result, function (&$http_test) {
-				$http_test['tags'] = [];
-			});
-
-			while ($db_tag = DBfetch($db_tags)) {
-				$result[$db_tag['httptestid']]['tags'][] = array_intersect_key($db_tag, $requested_output);
-			}
-		}
-
+		self::addRelatedTags($options, $result);
 		self::addRelatedInheritedTags($options, $result);
 
 		return $result;

@@ -126,8 +126,6 @@ class CHost extends CHostGeneral {
 			'editable'							=> false,
 			'nopermissions'						=> null,
 			// filter
-			'evaltype'							=> TAG_EVAL_TYPE_AND_OR,
-			'tags'								=> null,
 			'severities'						=> null,
 			'filter'							=> null,
 			'search'							=> null,
@@ -147,7 +145,6 @@ class CHost extends CHostGeneral {
 			'selectInterfaces'					=> null,
 			'selectInventory'					=> null,
 			'selectHttpTests'					=> null,
-			'selectTags'						=> null,
 			'selectValueMaps'					=> null,
 			'countOutput'						=> false,
 			'groupCount'						=> false,
@@ -554,12 +551,18 @@ class CHost extends CHostGeneral {
 	private static function validateGet(array &$options): void {
 		$api_input_rules = ['type' => API_OBJECT, 'flags' => API_ALLOW_UNEXPECTED, 'fields' => [
 			// Filters.
+			'evaltype' =>				['type' => API_INT32, 'in' => implode(',', [TAG_EVAL_TYPE_AND_OR, TAG_EVAL_TYPE_OR]), 'default' => TAG_EVAL_TYPE_AND_OR],
+			'tags' =>					['type' => API_OBJECTS, 'flags' => API_ALLOW_NULL | API_NORMALIZE, 'default' => null, 'fields' => [
+				'tag' =>					['type' => API_STRING_UTF8, 'flags' => API_REQUIRED],
+				'operator' =>				['type' => API_INT32, 'in' => implode(',', [TAG_OPERATOR_LIKE, TAG_OPERATOR_EQUAL, TAG_OPERATOR_NOT_LIKE, TAG_OPERATOR_NOT_EQUAL, TAG_OPERATOR_EXISTS, TAG_OPERATOR_NOT_EXISTS])],
+				'value' =>					['type' => API_STRING_UTF8]
+			]],
 			'inheritedTags' =>			['type' => API_BOOLEAN, 'default' => false],
 			'severities' =>				['type' => API_INTS32, 'flags' => API_ALLOW_NULL | API_NORMALIZE | API_NOT_EMPTY, 'in' => implode(',', range(TRIGGER_SEVERITY_NOT_CLASSIFIED, TRIGGER_SEVERITY_COUNT - 1)), 'uniq' => true],
 			'withProblemsSuppressed' =>	['type' => API_BOOLEAN, 'flags' => API_ALLOW_NULL],
 			// Output.
 			'selectParentTemplates' =>	['type' => API_OUTPUT, 'flags' => API_ALLOW_NULL | API_ALLOW_COUNT, 'in' => implode(',', ['templateid', 'host', 'name', 'description', 'uuid', 'link_type'])],
-			'selectTags' =>				['type' => API_OUTPUT, 'flags' => API_ALLOW_NULL, 'in' => implode(',', ['tag', 'value', 'automatic'])],
+			'selectTags' =>				['type' => API_OUTPUT, 'flags' => API_ALLOW_NULL | API_NORMALIZE, 'in' => implode(',', ['tag', 'value', 'automatic']), 'default' => null],
 			'selectInheritedTags' =>	['type' => API_OUTPUT, 'flags' => API_ALLOW_NULL | API_NORMALIZE, 'in' => implode(',', self::INHERITED_TAG_OUTPUT_FIELDS), 'default' => null],
 			'selectMacros' =>			['type' => API_OUTPUT, 'flags' => API_ALLOW_NULL | API_NORMALIZE, 'in' => implode(',', CUserMacro::getOutputFieldsOnHost()), 'default' => null],
 			'selectValueMaps' =>		['type' => API_OUTPUT, 'flags' => API_ALLOW_NULL, 'in' => implode(',', ['valuemapid', 'name', 'mappings'])],
@@ -1784,6 +1787,7 @@ class CHost extends CHostGeneral {
 	protected function addRelatedObjects(array $options, array $result) {
 		$result = parent::addRelatedObjects($options, $result);
 
+		self::addRelatedTags($options, $result);
 		self::addRelatedInheritedTags($options, $result);
 		self::addRelatedMacros($options, $result);
 		$this->addRelatedHostGroups($options, $result);
@@ -1881,34 +1885,6 @@ class CHost extends CHostGeneral {
 		self::addRelatedDiscoveryData($options, $result);
 		self::addRelatedChildDiscoveries($options, $result);
 		self::addRelatedChildDiscoveryRules($options, $result);
-
-		if ($options['selectTags'] !== null) {
-			foreach ($result as &$row) {
-				$row['tags'] = [];
-			}
-			unset($row);
-
-			if ($options['selectTags'] === API_OUTPUT_EXTEND) {
-				$output = ['hosttagid', 'hostid', 'tag', 'value', 'automatic'];
-			}
-			else {
-				$output = array_unique(array_merge(['hosttagid', 'hostid'], $options['selectTags']));
-			}
-
-			$sql_options = [
-				'output' => $output,
-				'filter' => ['hostid' => $hostids]
-			];
-			$db_tags = DBselect(DB::makeSql('host_tag', $sql_options));
-
-			while ($db_tag = DBfetch($db_tags)) {
-				$hostid = $db_tag['hostid'];
-
-				unset($db_tag['hosttagid'], $db_tag['hostid']);
-
-				$result[$hostid]['tags'][] = $db_tag;
-			}
-		}
 
 		return $result;
 	}

@@ -44,6 +44,27 @@ abstract class CHostBase extends CApiService {
 		return static::class === 'CHostPrototype';
 	}
 
+	protected static function addRelatedTags(array $options, array &$hosts): void {
+		if ($options['selectTags'] === null) {
+			return;
+		}
+
+		foreach ($hosts as &$host) {
+			$host['tags'] = [];
+		}
+		unset($host);
+
+		$sql_options = [
+			'output' => array_merge(['hosttagid', 'hostid'], $options['selectTags']),
+			'filter' => ['hostid' => array_keys($hosts)]
+		];
+		$resource = DBselect(DB::makeSql('host_tag', $sql_options));
+
+		while ($row = DBfetch($resource)) {
+			$hosts[$row['hostid']]['tags'][] = array_diff_key($row, array_flip(['hosttagid', 'hostid']));
+		}
+	}
+
 	protected static function addRelatedInheritedTags(array $options, array &$hosts): void {
 		if ($options['selectInheritedTags'] === null) {
 			return;

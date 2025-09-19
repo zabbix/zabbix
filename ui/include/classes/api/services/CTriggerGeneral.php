@@ -42,6 +42,27 @@ abstract class CTriggerGeneral extends CApiService {
 	 */
 	abstract public function get(array $options = []);
 
+	protected static function addRelatedTags(array $options, array &$triggers): void {
+		if ($options['selectTags'] === null) {
+			return;
+		}
+
+		foreach ($triggers as &$trigger) {
+			$trigger['tags'] = [];
+		}
+		unset($trigger);
+
+		$sql_options = [
+			'output' => array_merge(['triggertagid', 'triggerid'], $options['selectTags']),
+			'filter' => ['triggerid' => array_keys($triggers)]
+		];
+		$resource = DBselect(DB::makeSql('trigger_tag', $sql_options));
+
+		while ($row = DBfetch($resource)) {
+			$triggers[$row['triggerid']]['tags'][] = array_diff_key($row, array_flip(['triggertagid', 'triggerid']));
+		}
+	}
+
 	protected static function addRelatedInheritedTags(array $options, array &$triggers): void {
 		if ($options['selectInheritedTags'] === null) {
 			return;
@@ -881,19 +902,6 @@ abstract class CTriggerGeneral extends CApiService {
 
 			$functions = $this->unsetExtraFields($functions, ['triggerid', 'functionid'], $options['selectFunctions']);
 			$result = $relationMap->mapMany($result, $functions, 'functions');
-		}
-
-		// Adding trigger tags.
-		if ($options['selectTags'] !== null && $options['selectTags'] != API_OUTPUT_COUNT) {
-			$tags = API::getApiService()->select('trigger_tag', [
-				'output' => $this->outputExtend($options['selectTags'], ['triggerid']),
-				'filter' => ['triggerid' => $triggerids],
-				'preservekeys' => true
-			]);
-
-			$relationMap = $this->createRelationMap($tags, 'triggerid', 'triggertagid');
-			$tags = $this->unsetExtraFields($tags, ['triggertagid', 'triggerid'], []);
-			$result = $relationMap->mapMany($result, $tags, 'tags');
 		}
 
 		return $result;

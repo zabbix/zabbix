@@ -99,7 +99,6 @@ class CItemPrototype extends CItemGeneral {
 			'selectTriggers'				=> null,
 			'selectGraphs'					=> null,
 			'selectPreprocessing'			=> null,
-			'selectTags'					=> null,
 			'selectValueMap'				=> null,
 			'countOutput'					=> false,
 			'groupCount'					=> false,
@@ -313,6 +312,7 @@ class CItemPrototype extends CItemGeneral {
 		$api_input_rules = ['type' => API_OBJECT, 'flags' => API_ALLOW_UNEXPECTED, 'fields' => [
 			// Output.
 			'selectValueMap' =>					['type' => API_OUTPUT, 'flags' => API_ALLOW_NULL, 'in' => implode(',', ['valuemapid', 'name', 'mappings'])],
+			'selectTags' =>						['type' => API_OUTPUT, 'flags' => API_ALLOW_NULL | API_NORMALIZE, 'in' => implode(',', ['tag', 'value']), 'default' => null],
 			'selectInheritedTags' =>			['type' => API_OUTPUT, 'flags' => API_ALLOW_NULL | API_NORMALIZE, 'in' => implode(',', self::INHERITED_TAG_OUTPUT_FIELDS), 'default' => null],
 			'selectDiscoveryRule' =>			['type' => API_OUTPUT, 'flags' => API_ALLOW_NULL | API_NORMALIZE, 'in' => implode(',', CDiscoveryRule::OUTPUT_FIELDS), 'default' => null],
 			'selectDiscoveryRulePrototype' =>	['type' => API_OUTPUT, 'flags' => API_ALLOW_NULL | API_NORMALIZE, 'in' => implode(',', CDiscoveryRulePrototype::OUTPUT_FIELDS), 'default' => null],
@@ -1476,34 +1476,11 @@ class CItemPrototype extends CItemGeneral {
 			}
 		}
 
-		// Adding item tags.
-		if ($options['selectTags'] !== null) {
-			$options['selectTags'] = ($options['selectTags'] !== API_OUTPUT_EXTEND)
-				? (array) $options['selectTags']
-				: ['tag', 'value'];
-
-			$options['selectTags'] = array_intersect(['tag', 'value'], $options['selectTags']);
-			$requested_output = array_flip($options['selectTags']);
-
-			$db_tags = DBselect(
-				'SELECT '.implode(',', array_merge($options['selectTags'], ['itemid'])).
-				' FROM item_tag'.
-				' WHERE '.dbConditionInt('itemid', $itemids)
-			);
-
-			array_walk($result, function (&$item) {
-				$item['tags'] = [];
-			});
-
-			while ($db_tag = DBfetch($db_tags)) {
-				$result[$db_tag['itemid']]['tags'][] = array_intersect_key($db_tag, $requested_output);
-			}
-		}
-
+		self::addRelatedTags($options, $result);
+		self::addRelatedInheritedTags($options, $result);
 		self::addRelatedDiscoveryRules($options, $result);
 		self::addRelatedDiscoveryRulePrototypes($options, $result);
 		self::addRelatedDiscoveryData($options, $result);
-		self::addRelatedInheritedTags($options, $result);
 
 		return $result;
 	}

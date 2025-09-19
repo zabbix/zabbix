@@ -122,6 +122,27 @@ abstract class CItemGeneral extends CApiService {
 	 */
 	abstract public function get($options = []);
 
+	protected static function addRelatedTags(array $options, array &$items): void {
+		if ($options['selectTags'] === null) {
+			return;
+		}
+
+		foreach ($items as &$item) {
+			$item['tags'] = [];
+		}
+		unset($item);
+
+		$sql_options = [
+			'output' => array_merge(['itemtagid', 'itemid'], $options['selectTags']),
+			'filter' => ['itemid' => array_keys($items)]
+		];
+		$resource = DBselect(DB::makeSql('item_tag', $sql_options));
+
+		while ($row = DBfetch($resource)) {
+			$items[$row['itemid']]['tags'][] = array_diff_key($row, array_flip(['itemtagid', 'itemid']));
+		}
+	}
+
 	protected static function addRelatedInheritedTags(array $options, array &$items): void {
 		if ($options['selectInheritedTags'] === null) {
 			return;

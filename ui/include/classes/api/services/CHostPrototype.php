@@ -68,7 +68,7 @@ class CHostPrototype extends CHostBase {
 			'selectInterfaces' =>				['type' => API_OUTPUT, 'flags' => API_ALLOW_NULL, 'in' => implode(',', $interface_fields), 'default' => null],
 			'selectTemplates' =>				['type' => API_OUTPUT, 'flags' => API_ALLOW_NULL | API_ALLOW_COUNT, 'in' => implode(',', $hosts_fields), 'default' => null],
 			'selectMacros' =>					['type' => API_OUTPUT, 'flags' => API_ALLOW_NULL | API_NORMALIZE, 'in' => implode(',', CUserMacro::getOutputFieldsOnHostPrototype()), 'default' => null],
-			'selectTags' =>						['type' => API_OUTPUT, 'flags' => API_ALLOW_NULL, 'in' => implode(',', ['tag', 'value']), 'default' => null],
+			'selectTags' =>						['type' => API_OUTPUT, 'flags' => API_ALLOW_NULL | API_NORMALIZE, 'in' => implode(',', ['tag', 'value']), 'default' => null],
 			'selectInheritedTags' =>			['type' => API_OUTPUT, 'flags' => API_ALLOW_NULL | API_NORMALIZE, 'in' => implode(',', self::INHERITED_TAG_OUTPUT_FIELDS), 'default' => null],
 			// sort and limit
 			'sortfield' =>						['type' => API_STRINGS_UTF8, 'flags' => API_NORMALIZE, 'in' => implode(',', $this->sortColumns), 'uniq' => true, 'default' => []],
@@ -222,17 +222,16 @@ class CHostPrototype extends CHostBase {
 	protected function addRelatedObjects(array $options, array $result) {
 		$result = parent::addRelatedObjects($options, $result);
 
+		self::addRelatedTags($options, $result);
 		self::addRelatedInheritedTags($options, $result);
 		self::addRelatedMacros($options, $result);
-
-		$hostids = array_keys($result);
-
 		self::addRelatedDiscoveryRules($options, $result);
 		self::addRelatedDiscoveryRulePrototypes($options, $result);
 		self::addRelatedDiscoveryData($options, $result);
-
 		self::addRelatedGroupLinks($options, $result);
 		self::addRelatedGroupPrototypes($options, $result);
+
+		$hostids = array_keys($result);
 
 		if ($options['selectParentHost'] !== null) {
 			$hosts = [];
@@ -291,34 +290,6 @@ class CHostPrototype extends CHostBase {
 						? $templates[$hostid]['rowscount']
 						: '0';
 				}
-			}
-		}
-
-		if ($options['selectTags'] !== null) {
-			foreach ($result as &$row) {
-				$row['tags'] = [];
-			}
-			unset($row);
-
-			if ($options['selectTags'] === API_OUTPUT_EXTEND) {
-				$output = ['hosttagid', 'hostid', 'tag', 'value'];
-			}
-			else {
-				$output = array_unique(array_merge(['hosttagid', 'hostid'], $options['selectTags']));
-			}
-
-			$sql_options = [
-				'output' => $output,
-				'filter' => ['hostid' => $hostids]
-			];
-			$db_tags = DBselect(DB::makeSql('host_tag', $sql_options));
-
-			while ($db_tag = DBfetch($db_tags)) {
-				$hostid = $db_tag['hostid'];
-
-				unset($db_tag['hosttagid'], $db_tag['hostid']);
-
-				$result[$hostid]['tags'][] = $db_tag;
 			}
 		}
 

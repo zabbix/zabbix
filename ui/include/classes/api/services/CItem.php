@@ -115,8 +115,6 @@ class CItem extends CItemGeneral {
 			'group'						=> null,
 			'host'						=> null,
 			'with_triggers'				=> null,
-			'evaltype'					=> TAG_EVAL_TYPE_AND_OR,
-			'tags'						=> null,
 			// filter
 			'filter'					=> null,
 			'search'					=> null,
@@ -128,7 +126,6 @@ class CItem extends CItemGeneral {
 			'output'					=> API_OUTPUT_EXTEND,
 			'selectHosts'				=> null,
 			'selectInterfaces'			=> null,
-			'selectTags'				=> null,
 			'selectTriggers'			=> null,
 			'selectGraphs'				=> null,
 			'selectPreprocessing'		=> null,
@@ -455,10 +452,16 @@ class CItem extends CItemGeneral {
 	private static function validateGet(array &$options): void {
 		$api_input_rules = ['type' => API_OBJECT, 'flags' => API_ALLOW_UNEXPECTED, 'fields' => [
 			// Filters.
-			'evaltype' => 				['type' => API_INT32, 'in' => implode(',', [TAG_EVAL_TYPE_AND_OR, TAG_EVAL_TYPE_OR])],
+			'evaltype' =>				['type' => API_INT32, 'in' => implode(',', [TAG_EVAL_TYPE_AND_OR, TAG_EVAL_TYPE_OR]), 'default' => TAG_EVAL_TYPE_AND_OR],
+			'tags' =>					['type' => API_OBJECTS, 'flags' => API_ALLOW_NULL | API_NORMALIZE, 'default' => null, 'fields' => [
+				'tag' =>					['type' => API_STRING_UTF8, 'flags' => API_REQUIRED],
+				'operator' =>				['type' => API_INT32, 'in' => implode(',', [TAG_OPERATOR_LIKE, TAG_OPERATOR_EQUAL, TAG_OPERATOR_NOT_LIKE, TAG_OPERATOR_NOT_EQUAL, TAG_OPERATOR_EXISTS, TAG_OPERATOR_NOT_EXISTS])],
+				'value' =>					['type' => API_STRING_UTF8]
+			]],
 			'inheritedTags' =>			['type' => API_BOOLEAN, 'default' => false],
 			// Output.
 			'selectValueMap' =>			['type' => API_OUTPUT, 'flags' => API_ALLOW_NULL, 'in' => implode(',', ['valuemapid', 'name', 'mappings'])],
+			'selectTags' =>				['type' => API_OUTPUT, 'flags' => API_ALLOW_NULL | API_NORMALIZE, 'in' => implode(',', ['tag', 'value']), 'default' => null],
 			'selectInheritedTags' =>	['type' => API_OUTPUT, 'flags' => API_ALLOW_NULL | API_NORMALIZE, 'in' => implode(',', self::INHERITED_TAG_OUTPUT_FIELDS), 'default' => null],
 			'selectDiscoveryData' =>	['type' => API_OUTPUT, 'flags' => API_ALLOW_NULL | API_NORMALIZE, 'in' => implode(',', self::DISCOVERY_DATA_OUTPUT_FIELDS), 'default' => null],
 			'selectDiscoveryRule' =>	['type' => API_OUTPUT, 'flags' => API_ALLOW_NULL | API_NORMALIZE, 'in' => implode(',', CDiscoveryRule::OUTPUT_FIELDS), 'default' => null],
@@ -1813,6 +1816,8 @@ class CItem extends CItemGeneral {
 			}
 		}
 
+		self::addRelatedTags($options, $result);
+		self::addRelatedInheritedTags($options, $result);
 		self::addRelatedDiscoveryRules($options, $result);
 		self::addRelatedItemDiscovery($options, $result);
 		self::addRelatedDiscoveryData($options, $result);
@@ -1857,32 +1862,6 @@ class CItem extends CItemGeneral {
 			}
 			unset($item);
 		}
-
-		// Adding item tags.
-		if ($options['selectTags'] !== null) {
-			$options['selectTags'] = ($options['selectTags'] !== API_OUTPUT_EXTEND)
-				? (array) $options['selectTags']
-				: ['tag', 'value'];
-
-			$options['selectTags'] = array_intersect(['tag', 'value'], $options['selectTags']);
-			$requested_output = array_flip($options['selectTags']);
-
-			$db_tags = DBselect(
-				'SELECT '.implode(',', array_merge($options['selectTags'], ['itemid'])).
-				' FROM item_tag'.
-				' WHERE '.dbConditionInt('itemid', $itemids)
-			);
-
-			array_walk($result, function (&$item) {
-				$item['tags'] = [];
-			});
-
-			while ($db_tag = DBfetch($db_tags)) {
-				$result[$db_tag['itemid']]['tags'][] = array_intersect_key($db_tag, $requested_output);
-			}
-		}
-
-		self::addRelatedInheritedTags($options, $result);
 
 		return $result;
 	}

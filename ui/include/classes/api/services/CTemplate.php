@@ -55,8 +55,6 @@ class CTemplate extends CHostGeneral {
 			'editable'					=> false,
 			'nopermissions'				=> null,
 			// filter
-			'evaltype'					=> TAG_EVAL_TYPE_AND_OR,
-			'tags'						=> null,
 			'filter'					=> null,
 			'search'					=> '',
 			'searchByAny'				=> null,
@@ -74,7 +72,6 @@ class CTemplate extends CHostGeneral {
 			'selectGraphs'				=> null,
 			'selectDashboards'			=> null,
 			'selectHttpTests'			=> null,
-			'selectTags'				=> null,
 			'selectValueMaps'			=> null,
 			'countOutput'				=> false,
 			'groupCount'				=> false,
@@ -290,10 +287,16 @@ class CTemplate extends CHostGeneral {
 	private static function validateGet(array &$options): void {
 		$api_input_rules = ['type' => API_OBJECT, 'flags' => API_ALLOW_UNEXPECTED, 'fields' => [
 			// Filters.
+			'evaltype' =>				['type' => API_INT32, 'in' => implode(',', [TAG_EVAL_TYPE_AND_OR, TAG_EVAL_TYPE_OR]), 'default' => TAG_EVAL_TYPE_AND_OR],
+			'tags' =>					['type' => API_OBJECTS, 'flags' => API_ALLOW_NULL | API_NORMALIZE, 'default' => null, 'fields' => [
+				'tag' =>					['type' => API_STRING_UTF8, 'flags' => API_REQUIRED],
+				'operator' =>				['type' => API_INT32, 'in' => implode(',', [TAG_OPERATOR_LIKE, TAG_OPERATOR_EQUAL, TAG_OPERATOR_NOT_LIKE, TAG_OPERATOR_NOT_EQUAL, TAG_OPERATOR_EXISTS, TAG_OPERATOR_NOT_EXISTS])],
+				'value' =>					['type' => API_STRING_UTF8]
+			]],
 			'inheritedTags' =>			['type' => API_BOOLEAN, 'default' => false],
 			// Output.
 			'selectParentTemplates' =>	['type' => API_OUTPUT, 'flags' => API_ALLOW_NULL | API_ALLOW_COUNT, 'in' => implode(',', ['templateid', 'host', 'name', 'description', 'uuid'])],
-			'selectTags' =>				['type' => API_OUTPUT, 'flags' => API_ALLOW_NULL, 'in' => implode(',', ['tag', 'value'])],
+			'selectTags' =>				['type' => API_OUTPUT, 'flags' => API_ALLOW_NULL | API_NORMALIZE, 'in' => implode(',', ['tag', 'value']), 'default' => null],
 			'selectInheritedTags' =>	['type' => API_OUTPUT, 'flags' => API_ALLOW_NULL | API_NORMALIZE, 'in' => implode(',', self::INHERITED_TAG_OUTPUT_FIELDS), 'default' => null],
 			'selectMacros' =>			['type' => API_OUTPUT, 'flags' => API_ALLOW_NULL | API_NORMALIZE, 'in' => implode(',', CUserMacro::getOutputFieldsOnTemplate()), 'default' => null],
 			'selectValueMaps' =>		['type' => API_OUTPUT, 'flags' => API_ALLOW_NULL, 'in' => implode(',', ['valuemapid', 'name', 'mappings', 'uuid'])],
@@ -1205,6 +1208,7 @@ class CTemplate extends CHostGeneral {
 	protected function addRelatedObjects(array $options, array $result) {
 		$result = parent::addRelatedObjects($options, $result);
 
+		self::addRelatedTags($options, $result);
 		self::addRelatedInheritedTags($options, $result);
 		self::addRelatedMacros($options, $result);
 		$this->addRelatedTemplateGroups($options, $result);
@@ -1312,34 +1316,6 @@ class CTemplate extends CHostGeneral {
 						? $dashboards[$templateid]['rowscount']
 						: '0';
 				}
-			}
-		}
-
-		if ($options['selectTags'] !== null) {
-			foreach ($result as &$row) {
-				$row['tags'] = [];
-			}
-			unset($row);
-
-			if ($options['selectTags'] === API_OUTPUT_EXTEND) {
-				$output = ['hosttagid', 'hostid', 'tag', 'value'];
-			}
-			else {
-				$output = array_unique(array_merge(['hosttagid', 'hostid'], $options['selectTags']));
-			}
-
-			$sql_options = [
-				'output' => $output,
-				'filter' => ['hostid' => $templateids]
-			];
-			$db_tags = DBselect(DB::makeSql('host_tag', $sql_options));
-
-			while ($db_tag = DBfetch($db_tags)) {
-				$hostid = $db_tag['hostid'];
-
-				unset($db_tag['hosttagid'], $db_tag['hostid']);
-
-				$result[$hostid]['tags'][] = $db_tag;
 			}
 		}
 
