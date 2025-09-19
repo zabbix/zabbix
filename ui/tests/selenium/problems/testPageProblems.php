@@ -261,7 +261,7 @@ class testPageProblems extends CWebTest {
 			'Compact view' => ['value' => false],
 			'Show details' => ['value' => false],
 			'Show timeline' => ['value' => true],
-			'Highlight whole row' => ['value' => false, 'enabled' => false]
+			'Highlight whole row' => ['value' => false, 'enabled' => true]
 		];
 
 		foreach ($fields_values as $label => $attributes) {
@@ -404,7 +404,7 @@ class testPageProblems extends CWebTest {
 			foreach (['Show operational data', 'Show details', 'Show timeline'] as $field) {
 				$this->assertTrue($filter_form->getField($field)->isEnabled(!$state));
 			}
-			$this->assertTrue($filter_form->getField('Highlight whole row')->isEnabled($state));
+			$this->assertTrue($filter_form->getField('Highlight whole row')->isEnabled());
 		}
 
 		$this->assertEquals(3, $filter_tab->query('button', ['Save as', 'Apply', 'Reset'])

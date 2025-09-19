@@ -2379,13 +2379,14 @@ button {
   .list-table.compact-view td {
     padding-top: 2px;
     padding-bottom: 2px;
-    border-bottom: 0;
-    box-shadow: inset 0 -1px 0 0 rgba(0, 0, 0, 0.1);
     white-space: nowrap; }
     .list-table.compact-view td .rel-container span {
       margin: 0; }
     .list-table.compact-view td.nowrap {
       text-overflow: clip; }
+  .list-table.compact-view td, .list-table.has-highlighted-rows td {
+    border-bottom: 0;
+    box-shadow: inset 0 -1px 0 0 rgba(0, 0, 0, 0.1); }
   .list-table.no-data tbody tr td {
     height: auto;
     color: #333333;
@@ -2410,8 +2411,6 @@ button {
 .list-table .problem-icon-link,
 .list-table .status-container,
 .list-table .entity-count {
-  margin-top: 1px;
-  margin-bottom: 1px;
   vertical-align: top; }
 
 .list-table thead th.column-tags-1 {
@@ -2525,23 +2524,33 @@ button {
     font-size: 12px; }
 .list-table.compact-view .problem-nested:not([class*='flh-']):not(.row-selected) td,
 .list-table.compact-view .problem-nested:not([class*='flh-']):not(.row-selected) .timeline-axis,
-.list-table.compact-view .problem-nested:not([class*='flh-']):not(.row-selected) .timeline-td {
+.list-table.compact-view .problem-nested:not([class*='flh-']):not(.row-selected) .timeline-td, .list-table.has-highlighted-rows .problem-nested:not([class*='flh-']):not(.row-selected) td,
+.list-table.has-highlighted-rows .problem-nested:not([class*='flh-']):not(.row-selected) .timeline-axis,
+.list-table.has-highlighted-rows .problem-nested:not([class*='flh-']):not(.row-selected) .timeline-td {
   border-bottom-style: none; }
-.list-table.compact-view [class*='flh-']:not(.row-selected):not(:hover) a,
+.list-table.compact-view [class*='flh-']:not(.row-selected):not(:hover) a:not(.green):not(.green.btn-icon:not([disabled])):not(.green.btn-link:not([disabled])):not(.green.link-action:not(:hover):not(:focus)):not(.green.link-alt:not(:hover):not(:focus)),
 .list-table.compact-view [class*='flh-']:not(.row-selected):not(:hover) td,
-.list-table.compact-view [class*='flh-']:not(.row-selected):not(:hover) sup {
+.list-table.compact-view [class*='flh-']:not(.row-selected):not(:hover) sup, .list-table.has-highlighted-rows [class*='flh-']:not(.row-selected):not(:hover) a:not(.green):not(.green.btn-icon:not([disabled])):not(.green.btn-link:not([disabled])):not(.green.link-action:not(:hover):not(:focus)):not(.green.link-alt:not(:hover):not(:focus)),
+.list-table.has-highlighted-rows [class*='flh-']:not(.row-selected):not(:hover) td,
+.list-table.has-highlighted-rows [class*='flh-']:not(.row-selected):not(:hover) sup {
   color: #000000; }
-.list-table.compact-view [class*='flh-']:not(.row-selected):not(:hover) .link-alt {
-  border-bottom-color: #000000; }
-.list-table.compact-view [class*='flh-']:not(.row-selected):not(:hover) .tag {
+.list-table.compact-view [class*='flh-']:not(.row-selected):not(:hover) .tag, .list-table.has-highlighted-rows [class*='flh-']:not(.row-selected):not(:hover) .tag {
   color: #ffffff;
   background-color: #333333; }
 .list-table.compact-view [class*='flh-']:not(.row-selected):not(:hover) .btn-icon,
-.list-table.compact-view [class*='flh-']:not(.row-selected):not(:hover) .icon {
+.list-table.compact-view [class*='flh-']:not(.row-selected):not(:hover) .icon, .list-table.has-highlighted-rows [class*='flh-']:not(.row-selected):not(:hover) .btn-icon,
+.list-table.has-highlighted-rows [class*='flh-']:not(.row-selected):not(:hover) .icon {
   background-color: #ffffff; }
-.list-table.compact-view [class*='flh-']:not(.row-selected):not(:hover) .entity-count {
-  margin-top: 0;
-  margin-bottom: 0;
+.list-table.has-highlighted-rows .problem-unack-fg,
+.list-table.has-highlighted-rows .problem-ack-fg {
+  color: #cc0000; }
+.list-table.has-highlighted-rows .ok-unack-fg,
+.list-table.has-highlighted-rows .ok-ack-fg {
+  color: #009900; }
+.list-table.has-highlighted-rows .link-alt:active, .list-table.has-highlighted-rows .link-alt:not(:hover):not(:focus) {
+  color: #000000;
+  border-bottom-color: #000000; }
+.list-table.has-highlighted-rows .entity-count {
   border: 1px solid #ffffff; }
 
 .no-data-message {
@@ -7923,20 +7932,26 @@ z-select .list:focus, input[type="text"]:focus, input[type="password"]:focus, in
     border-bottom-color: transparent !important; }
 .list-table .action-container .link-action:active, .list-table .action-container .link-action:focus {
   margin-bottom: -3px; }
+.list-table.compact-view td.na-bg::before, .list-table.compact-view td.normal-bg::before, .list-table.compact-view td.info-bg::before, .list-table.compact-view td.warning-bg::before, .list-table.compact-view td.average-bg::before, .list-table.compact-view td.high-bg::before, .list-table.compact-view td.disaster-bg::before {
+  font-size: 22px;
+  padding-top: 0;
+  padding-bottom: 0; }
 .list-table.compact-view .flh-na-bg:not(.row-selected):not(:hover),
 .list-table.compact-view .flh-info-bg:not(.row-selected):not(:hover),
 .list-table.compact-view .flh-warning-bg:not(.row-selected):not(:hover),
 .list-table.compact-view .flh-average-bg:not(.row-selected):not(:hover),
 .list-table.compact-view .flh-high-bg:not(.row-selected):not(:hover),
-.list-table.compact-view .flh-disaster-bg:not(.row-selected):not(:hover) {
+.list-table.compact-view .flh-disaster-bg:not(.row-selected):not(:hover), .list-table.has-highlighted-rows .flh-na-bg:not(.row-selected):not(:hover),
+.list-table.has-highlighted-rows .flh-info-bg:not(.row-selected):not(:hover),
+.list-table.has-highlighted-rows .flh-warning-bg:not(.row-selected):not(:hover),
+.list-table.has-highlighted-rows .flh-average-bg:not(.row-selected):not(:hover),
+.list-table.has-highlighted-rows .flh-high-bg:not(.row-selected):not(:hover),
+.list-table.has-highlighted-rows .flh-disaster-bg:not(.row-selected):not(:hover) {
   background: none; }
-.list-table.compact-view td {
+.list-table.compact-view td, .list-table.has-highlighted-rows td {
   box-shadow: inset 0 -1px 0 0 #888888; }
-  .list-table.compact-view td.na-bg::before, .list-table.compact-view td.normal-bg::before, .list-table.compact-view td.info-bg::before, .list-table.compact-view td.warning-bg::before, .list-table.compact-view td.average-bg::before, .list-table.compact-view td.high-bg::before, .list-table.compact-view td.disaster-bg::before {
-    box-shadow: inset 0 -1px 0 0 #888888;
-    font-size: 22px;
-    padding-top: 0;
-    padding-bottom: 0; }
+  .list-table.compact-view td.na-bg::before, .list-table.compact-view td.normal-bg::before, .list-table.compact-view td.info-bg::before, .list-table.compact-view td.warning-bg::before, .list-table.compact-view td.average-bg::before, .list-table.compact-view td.high-bg::before, .list-table.compact-view td.disaster-bg::before, .list-table.has-highlighted-rows td.na-bg::before, .list-table.has-highlighted-rows td.normal-bg::before, .list-table.has-highlighted-rows td.info-bg::before, .list-table.has-highlighted-rows td.warning-bg::before, .list-table.has-highlighted-rows td.average-bg::before, .list-table.has-highlighted-rows td.high-bg::before, .list-table.has-highlighted-rows td.disaster-bg::before {
+    box-shadow: inset 0 -1px 0 0 #888888; }
 
 .filter-highlight-row-cb {
   display: none; }
