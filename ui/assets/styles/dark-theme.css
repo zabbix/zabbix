@@ -7791,8 +7791,7 @@ z-select.z-select-host-interface li[disabled] .description:not(:empty) {
 .list-table.has-highlighted-rows .ok-unack-fg,
 .list-table.has-highlighted-rows .ok-ack-fg {
   color: #009900; }
-.list-table.has-highlighted-rows tr:hover .link-alt:not(:hover):not(:focus),
-.list-table.has-highlighted-rows tr:not([class*='flh-']) .link-alt:not(:hover):not(:focus) {
+.list-table.has-highlighted-rows tr.row-selected .link-alt:not(:hover):not(:focus), .list-table.has-highlighted-rows tr:hover .link-alt:not(:hover):not(:focus), .list-table.has-highlighted-rows tr:not([class*='flh-']) .link-alt:not(:hover):not(:focus) {
   color: #f2f2f2;
   border-bottom-color: #f2f2f2; }
 .list-table.sticky-footer tfoot tr:first-of-type td {
