@@ -1830,7 +1830,8 @@ class CScreenProblem extends CScreenBase {
 						: $last_value['value']
 				))
 					->addClass('hint-item')
-					->setAttribute('data-hintbox', '1');
+					->setAttribute('data-hintbox', '1')
+					->addClass(ZBX_STYLE_NO_INDENT);
 				$latest_values[] = ', ';
 			}
 			else {
@@ -1841,16 +1842,11 @@ class CScreenProblem extends CScreenBase {
 		}
 
 		if ($html) {
-			$hint_container = (new CDiv())
-				->addClass(ZBX_STYLE_HINTBOX_WRAP)
-				->addItem($hint_table);
-
 			array_pop($latest_values);
 			array_unshift($latest_values, (new CDiv())
 				->addClass('main-hint')
-				->setHint($hint_container)
+				->setHint($hint_table)
 			);
-
 			return $latest_values;
 		}
 
