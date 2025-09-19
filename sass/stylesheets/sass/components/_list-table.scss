@@ -275,11 +275,6 @@
 	.entity-count {
 		vertical-align: top;
 	}
-
-	.tag {
-		margin-top: 1px;
-		margin-bottom: 1px;
-	}
 }
 
 // Tags.
@@ -333,6 +328,20 @@
 					width: 452px;
 				}
 			}
+		}
+	}
+
+	.tags-wrapper {
+		@media screen and (min-width: 1200px) {
+			max-width: 266px;
+		}
+
+		@media screen and (min-width: 1400px) {
+			max-width: 359px;
+		}
+
+		@media screen and (min-width: 1600px) {
+			max-width: 452px;
 		}
 	}
 

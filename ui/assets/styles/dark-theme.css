@@ -2470,9 +2470,6 @@ button {
 .list-table .status-container,
 .list-table .entity-count {
   vertical-align: top; }
-.list-table .tag {
-  margin-top: 1px;
-  margin-bottom: 1px; }
 
 .list-table thead th.column-tags-1 {
   width: 75px; }
@@ -2507,6 +2504,15 @@ button {
   @media screen and (min-width: 1600px) {
     .list-table thead th.column-tags-3 {
       width: 452px; } }
+@media screen and (min-width: 1200px) {
+  .list-table .tags-wrapper {
+    max-width: 266px; } }
+@media screen and (min-width: 1400px) {
+  .list-table .tags-wrapper {
+    max-width: 359px; } }
+@media screen and (min-width: 1600px) {
+  .list-table .tags-wrapper {
+    max-width: 452px; } }
 .list-table.compact-view .tag {
   max-width: 40px; }
   @media screen and (min-width: 1200px) {
@@ -3399,6 +3405,11 @@ section {
     padding: 10px 10px 0; }
     .service-info .service-info-grid:last-of-type {
       padding-bottom: 10px; }
+    .service-info .service-info-grid .tags-wrapper {
+      min-width: 1%; }
+      .service-info .service-info-grid .tags-wrapper .btn-icon {
+        height: 18px;
+        width: 18px; }
   .service-info .service-info-label::after {
     content: ':'; }
   .service-info .service-info-value .service-info-value-sla {
@@ -5672,6 +5683,15 @@ form.is-loading {
   position: relative; }
   .table-forms-separator .wordbreak {
     white-space: normal; }
+  @media screen and (min-width: 1200px) {
+    .table-forms-separator .tags-wrapper {
+      max-width: 266px; } }
+  @media screen and (min-width: 1400px) {
+    .table-forms-separator .tags-wrapper {
+      max-width: 359px; } }
+  @media screen and (min-width: 1600px) {
+    .table-forms-separator .tags-wrapper {
+      max-width: 452px; } }
 
 .border-left {
   border-left: 1px solid #383838; }
@@ -6698,15 +6718,9 @@ z-select[disabled] .focusable, input[disabled], textarea[disabled], select optio
   display: flex;
   flex-wrap: wrap;
   gap: 2px 3px; }
-  @media screen and (min-width: 1200px) {
-    .tags-wrapper {
-      max-width: 266px; } }
-  @media screen and (min-width: 1400px) {
-    .tags-wrapper {
-      max-width: 359px; } }
-  @media screen and (min-width: 1600px) {
-    .tags-wrapper {
-      max-width: 452px; } }
+  .tags-wrapper .tag {
+    margin-top: 1px;
+    margin-bottom: 1px; }
 
 .tag {
   display: inline-block;
