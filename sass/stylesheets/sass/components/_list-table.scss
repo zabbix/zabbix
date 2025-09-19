@@ -500,6 +500,7 @@
 		}
 
 		.link-alt {
+			&:active,
 			&:not(:hover):not(:focus) {
 				color: $compact-view-color;
 				border-bottom-color: $compact-view-color;
