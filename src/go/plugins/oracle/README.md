@@ -146,7 +146,7 @@ One way to do this is using **pipelined table functions**:
 To configure plugins, Zabbix agent 2 configuration file is used.
 
 **Plugins.Oracle.CallTimeout** — the maximum wait time in seconds for a request to be completed.
-If the timeout configured for an item exceeds CallTimeout, the item timeout will be used instead.
+Currently has no effect and the maximum wait time is determined by item timeout instead.
 *Default value:* equals the global<sup>[1](#footnote-1)</sup> "Timeout" configuration option.
 *Limits:* 1-30
 
