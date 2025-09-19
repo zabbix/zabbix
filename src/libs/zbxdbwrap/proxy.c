@@ -872,11 +872,7 @@ static void	adjust_time(zbx_timespec_t *unique_shift, zbx_agent_value_t *av)
 	av->ts.sec += unique_shift->sec;
 	av->ts.ns = unique_shift->ns++;
 
-	if (unique_shift->ns > 999999999)
-	{
-		unique_shift->sec++;
-		unique_shift->ns = 0;
-	}
+	zbx_timespec_normalize(unique_shift);
 }
 
 /******************************************************************************
@@ -915,7 +911,8 @@ static int	parse_history_data_row_value(const struct zbx_json_parse *jp_row, zbx
 				999999999LL))
 		{
 			/* adjust ns for older systems where sometimes ns == 0 */
-			if (av->ts.ns == 0) adjust_time(unique_shift, av);
+			if (av->ts.ns == 0)
+				adjust_time(unique_shift, av);
 		}
 		else
 			goto out;
