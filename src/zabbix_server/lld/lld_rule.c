@@ -759,13 +759,7 @@ static void	lld_rule_update_item_formula(zbx_vector_lld_item_full_ptr_t *items, 
  ******************************************************************************/
 void	lld_rule_filters_make(zbx_vector_lld_item_full_ptr_t *items, char **info)
 {
-#define LLD_PROTOTYPE_FILTERS_COL_VALUE	2
-
-	zbx_sync_rowset_t	filters_subst;
-
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
-
-	zbx_sync_rowset_init(&filters_subst, ZBX_LLD_ITEM_PROTOTYPE_FILTERS_COLS_NUM);
 
 	for (int i = 0; i < items->values_num; i++)
 	{
@@ -777,27 +771,13 @@ void	lld_rule_filters_make(zbx_vector_lld_item_full_ptr_t *items, char **info)
 		if (0 == (item->prototype->item_flags & ZBX_FLAG_DISCOVERY_RULE))
 			continue;
 
-		zbx_sync_rowset_copy(&filters_subst, &item->prototype->filters);
-
-		for (int j = 0; j < filters_subst.rows.values_num; j++)
-		{
-			zbx_sync_row_t	*row = filters_subst.rows.values[j];
-
-			zbx_substitute_lld_macros(&row->cols[LLD_PROTOTYPE_FILTERS_COL_VALUE], item->lld_row->data,
-					ZBX_MACRO_ANY, NULL, 0);
-		}
-
-		zbx_sync_rowset_merge(&item->filters, &filters_subst);
-		zbx_vector_sync_row_ptr_clear_ext(&filters_subst.rows, zbx_sync_row_free);
+		zbx_sync_rowset_merge(&item->filters, &item->prototype->filters);
 	}
 
-	zbx_sync_rowset_clear(&filters_subst);
 	lld_rule_filters_set_ids(items);
 	lld_rule_update_item_formula(items, info);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
-
-#undef LLD_PROTOTYPE_FILTERS_COL_VALUE
 }
 
 /******************************************************************************
