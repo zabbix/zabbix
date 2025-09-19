@@ -13,13 +13,14 @@
 ** If not, see <https://www.gnu.org/licenses/>.
 **/
 
+
 class CPeriodTimeParser extends CParser {
 
-	const REGEX_PATTERN = '/^\s*(?<from_h>\d{1,2}):(?<from_m>\d{2})\s*-\s*(?<to_h>\d{1,2}):(?<to_m>\d{2})\s*$/';
+	private const REGEX_PATTERN = '/^\s*(?<from_h>\d{1,2}):(?<from_m>\d{2})\s*-\s*(?<to_h>\d{1,2}):(?<to_m>\d{2})\s*$/';
 	private array $matches = [];
-
 	private int $day_period_from;
 	private int $day_period_to;
+
 	public function parse($source, $pos = 0): int {
 		if (strlen($source) == 0) {
 			$this->errorPos($source, 0);
@@ -63,11 +64,6 @@ class CPeriodTimeParser extends CParser {
 		return isset($source[$p]) ? self::PARSE_SUCCESS_CONT : self::PARSE_SUCCESS;
 	}
 
-	/**
-	 * Returns the matches.
-	 *
-	 * @return array
-	 */
 	public function getMatches(): array {
 		return $this->matches;
 	}
@@ -80,11 +76,6 @@ class CPeriodTimeParser extends CParser {
 		return $this->day_period_to;
 	}
 
-	/**
-	 * @param int $h
-	 * @param int $m
-	 * @return int
-	 */
 	private function prepareDayPeriod(int $h, int $m): int {
 		return SEC_PER_HOUR * $h + SEC_PER_MIN * $m;
 	}
