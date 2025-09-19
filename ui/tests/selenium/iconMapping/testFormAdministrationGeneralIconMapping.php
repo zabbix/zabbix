@@ -894,7 +894,7 @@ class testFormAdministrationGeneralIconMapping extends CLegacyWebTest {
 			$this->zbxTestInputTypeOverwrite('name', $iconmap['name'].' (cloned)');
 			$this->zbxTestClickWait('clone');
 			$this->zbxTestClick('cancel');
-	
+
 			// Check the results in frontend.
 			$this->zbxTestCheckTitle('Configuration of icon mapping');
 			$this->zbxTestCheckHeader('Icon mapping');
