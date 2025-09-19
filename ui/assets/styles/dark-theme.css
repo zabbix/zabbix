@@ -2555,13 +2555,14 @@ div[data-field-type="set"].has-error {
   .list-table.compact-view td {
     padding-top: 2px;
     padding-bottom: 2px;
-    border-bottom: 0;
-    box-shadow: inset 0 -1px 0 0 rgba(242, 242, 242, 0.1);
     white-space: nowrap; }
     .list-table.compact-view td .rel-container span {
       margin: 0; }
     .list-table.compact-view td.nowrap {
       text-overflow: clip; }
+  .list-table.compact-view td, .list-table.has-highlighted-rows td {
+    border-bottom: 0;
+    box-shadow: inset 0 -1px 0 0 rgba(242, 242, 242, 0.1); }
   .list-table.no-data tbody tr td {
     height: auto;
     color: #737373;
@@ -2586,8 +2587,6 @@ div[data-field-type="set"].has-error {
 .list-table .problem-icon-link,
 .list-table .status-container,
 .list-table .entity-count {
-  margin-top: 1px;
-  margin-bottom: 1px;
   vertical-align: top; }
 
 .list-table thead th.column-tags-1 {
@@ -2701,23 +2700,33 @@ div[data-field-type="set"].has-error {
     font-size: 12px; }
 .list-table.compact-view .problem-nested:not([class*='flh-']):not(.row-selected) td,
 .list-table.compact-view .problem-nested:not([class*='flh-']):not(.row-selected) .timeline-axis,
-.list-table.compact-view .problem-nested:not([class*='flh-']):not(.row-selected) .timeline-td {
+.list-table.compact-view .problem-nested:not([class*='flh-']):not(.row-selected) .timeline-td, .list-table.has-highlighted-rows .problem-nested:not([class*='flh-']):not(.row-selected) td,
+.list-table.has-highlighted-rows .problem-nested:not([class*='flh-']):not(.row-selected) .timeline-axis,
+.list-table.has-highlighted-rows .problem-nested:not([class*='flh-']):not(.row-selected) .timeline-td {
   border-bottom-style: none; }
-.list-table.compact-view [class*='flh-']:not(.row-selected):not(:hover) a,
+.list-table.compact-view [class*='flh-']:not(.row-selected):not(:hover) a:not(.green):not(.green.btn-icon:not([disabled])):not(.green.btn-link:not([disabled])):not(.green.link-action:not(:hover):not(:focus)):not(.green.link-alt:not(:hover):not(:focus)),
 .list-table.compact-view [class*='flh-']:not(.row-selected):not(:hover) td,
-.list-table.compact-view [class*='flh-']:not(.row-selected):not(:hover) sup {
+.list-table.compact-view [class*='flh-']:not(.row-selected):not(:hover) sup, .list-table.has-highlighted-rows [class*='flh-']:not(.row-selected):not(:hover) a:not(.green):not(.green.btn-icon:not([disabled])):not(.green.btn-link:not([disabled])):not(.green.link-action:not(:hover):not(:focus)):not(.green.link-alt:not(:hover):not(:focus)),
+.list-table.has-highlighted-rows [class*='flh-']:not(.row-selected):not(:hover) td,
+.list-table.has-highlighted-rows [class*='flh-']:not(.row-selected):not(:hover) sup {
   color: #000000; }
-.list-table.compact-view [class*='flh-']:not(.row-selected):not(:hover) .link-alt {
-  border-bottom-color: #000000; }
-.list-table.compact-view [class*='flh-']:not(.row-selected):not(:hover) .tag {
+.list-table.compact-view [class*='flh-']:not(.row-selected):not(:hover) .tag, .list-table.has-highlighted-rows [class*='flh-']:not(.row-selected):not(:hover) .tag {
   color: #ffffff;
   background-color: #4f4f4f; }
 .list-table.compact-view [class*='flh-']:not(.row-selected):not(:hover) .btn-icon,
-.list-table.compact-view [class*='flh-']:not(.row-selected):not(:hover) .icon {
+.list-table.compact-view [class*='flh-']:not(.row-selected):not(:hover) .icon, .list-table.has-highlighted-rows [class*='flh-']:not(.row-selected):not(:hover) .btn-icon,
+.list-table.has-highlighted-rows [class*='flh-']:not(.row-selected):not(:hover) .icon {
   background-color: #2b2b2b; }
-.list-table.compact-view [class*='flh-']:not(.row-selected):not(:hover) .entity-count {
-  margin-top: 0;
-  margin-bottom: 0;
+.list-table.has-highlighted-rows .problem-unack-fg,
+.list-table.has-highlighted-rows .problem-ack-fg {
+  color: #cc0000; }
+.list-table.has-highlighted-rows .ok-unack-fg,
+.list-table.has-highlighted-rows .ok-ack-fg {
+  color: #009900; }
+.list-table.has-highlighted-rows .link-alt:active, .list-table.has-highlighted-rows .link-alt:not(:hover):not(:focus) {
+  color: #000000;
+  border-bottom-color: #000000; }
+.list-table.has-highlighted-rows .entity-count {
   border: 1px solid #2b2b2b; }
 
 .no-data-message {
@@ -7811,15 +7820,6 @@ z-select[disabled] .focusable, input[disabled], textarea[disabled], select optio
 .yellow-bg {
   background-color: #ffc859; }
 
-td[class] + td.na-bg,
-td[class] + td.normal-bg,
-td[class] + td.info-bg,
-td[class] + td.average-bg,
-td[class] + td.warning-bg,
-td[class] + td.high-bg,
-td[class] + td.disaster-bg {
-  border-left: 1px dotted #383838; }
-
 .na-bg {
   color: #2a353a;
   position: relative; }
@@ -8901,13 +8901,22 @@ z-select.z-select-host-interface li[disabled] .description:not(:empty) {
 
 .list-table thead th {
   border-color: #404040; }
-.list-table.compact-view tr:hover td.na-bg, .list-table.compact-view tr:hover td.info-bg, .list-table.compact-view tr:hover td.warning-bg, .list-table.compact-view tr:hover td.average-bg, .list-table.compact-view tr:hover td.high-bg, .list-table.compact-view tr:hover td.disaster-bg {
+.list-table.compact-view tr:hover td.na-bg, .list-table.compact-view tr:hover td.info-bg, .list-table.compact-view tr:hover td.warning-bg, .list-table.compact-view tr:hover td.average-bg, .list-table.compact-view tr:hover td.high-bg, .list-table.compact-view tr:hover td.disaster-bg, .list-table.has-highlighted-rows tr:hover td.na-bg, .list-table.has-highlighted-rows tr:hover td.info-bg, .list-table.has-highlighted-rows tr:hover td.warning-bg, .list-table.has-highlighted-rows tr:hover td.average-bg, .list-table.has-highlighted-rows tr:hover td.high-bg, .list-table.has-highlighted-rows tr:hover td.disaster-bg {
   color: #000000; }
-.list-table.compact-view tr[class*='flh-'] td {
+.list-table.compact-view tr[class*='flh-'] td, .list-table.has-highlighted-rows tr[class*='flh-'] td {
   box-shadow: inset 0 -1px 0 0 rgba(0, 0, 0, 0.1); }
-.list-table.compact-view td.na-bg, .list-table.compact-view td.info-bg, .list-table.compact-view td.warning-bg, .list-table.compact-view td.average-bg, .list-table.compact-view td.high-bg, .list-table.compact-view td.disaster-bg {
+.list-table.compact-view td.na-bg, .list-table.compact-view td.info-bg, .list-table.compact-view td.warning-bg, .list-table.compact-view td.average-bg, .list-table.compact-view td.high-bg, .list-table.compact-view td.disaster-bg, .list-table.has-highlighted-rows td.na-bg, .list-table.has-highlighted-rows td.info-bg, .list-table.has-highlighted-rows td.warning-bg, .list-table.has-highlighted-rows td.average-bg, .list-table.has-highlighted-rows td.high-bg, .list-table.has-highlighted-rows td.disaster-bg {
   color: #000000;
   box-shadow: inset 0 -1px 0 0 rgba(0, 0, 0, 0.1); }
+.list-table.has-highlighted-rows .problem-unack-fg,
+.list-table.has-highlighted-rows .problem-ack-fg {
+  color: #cc0000; }
+.list-table.has-highlighted-rows .ok-unack-fg,
+.list-table.has-highlighted-rows .ok-ack-fg {
+  color: #009900; }
+.list-table.has-highlighted-rows tr.row-selected .link-alt:not(:hover):not(:focus), .list-table.has-highlighted-rows tr:hover .link-alt:not(:hover):not(:focus), .list-table.has-highlighted-rows tr:not([class*='flh-']) .link-alt:not(:hover):not(:focus) {
+  color: #f2f2f2;
+  border-bottom-color: #f2f2f2; }
 .list-table.sticky-footer tfoot tr:first-of-type td {
   border-color: #404040; }
 
