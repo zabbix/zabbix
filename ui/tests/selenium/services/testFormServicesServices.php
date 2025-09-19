@@ -351,18 +351,18 @@ class testFormServicesServices extends CWebTest {
 					]
 				]
 			],
-			// [
-			// 	[
-			// 		'expected' => TEST_BAD,
-			// 		'fields' => [
-			// 			'Name' => 'Letters in sort order',
-			// 			'Sort order (0->999)' => 'zab'
-			// 		],
-			// 		'inline_errors' => [
-			// 			'Sort order (0->999)' => 'This value is not a valid integer.'
-			// 		]
-			// 	]
-			// ],
+			[
+				[
+					'expected' => TEST_BAD,
+					'fields' => [
+						'Name' => 'Letters in sort order',
+						'Sort order (0->999)' => 'zab'
+					],
+					'inline_errors' => [
+						'Sort order (0->999)' => 'This value is not a valid integer.'
+					]
+				]
+			],
 			// [
 			// 	[
 			// 		'expected' => TEST_BAD,
