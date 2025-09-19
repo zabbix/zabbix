@@ -3163,6 +3163,9 @@ abstract class testFormPreprocessing extends CWebTest {
 		else {
 			if (array_key_exists('inline_errors', $data) && !$lld) {
 				COverlayDialogElement::find(0)->waitUntilReady();
+
+				// Added additional delay to get expected error message in inline validation.
+				sleep(2);
 				$this->assertInlineError($form, $data['inline_errors']);
 			}
 			else {
@@ -4126,7 +4129,7 @@ abstract class testFormPreprocessing extends CWebTest {
 						'type' => 'JavaScript',
 						'parameters' => [
 							[
-								'selector' => 'xpath:.//div[@class="multilineinput-control"]/input[@type="text"]',
+								'selector' => 'xpath:.//div[@class="multilineinput-control has-error"]/input[@type="text"]',
 								'placeholder' => 'script'
 							]
 						],
