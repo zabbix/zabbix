@@ -22,6 +22,13 @@ class CFieldSet extends CField {
 	 */
 	#fields = {};
 
+	/**
+	 * On frequent MutationObserver dispatching "field.change" event.
+	 *
+	 * @type {Number|Null}
+	 */
+	#on_blur_debounce = null;
+
 	init() {
 		super.init();
 
@@ -32,6 +39,17 @@ class CFieldSet extends CField {
 			 * Observer is launched also when error message node is added (because childList is observer).
 			 * This must be skipped.
 			 */
+
+			// Check that only a temporary element was created or deleted.
+			const has_not_direct_temp_field = observations.some((obs) => {
+				return [...obs.addedNodes, ...obs.removedNodes]
+					.some((n) => n.nodeType == Node.ELEMENT_NODE && !n.hasAttribute('data-temp-field'))
+			});
+
+			if (!has_not_direct_temp_field) {
+				return;
+			}
+
 			const skip = observations.some((obs) => {
 				return obs.type === 'childList'
 						&& [...obs.addedNodes, ...obs.removedNodes]
@@ -52,7 +70,8 @@ class CFieldSet extends CField {
 				|| observations.some(obs => obs.type === 'attributes' && obs.attributeName === 'data-skip-from-submit');
 
 			if (force_validate || !skip) {
-				this.onBlur();
+				clearTimeout(this.#on_blur_debounce);
+				this.#on_blur_debounce = setTimeout(() => this.onBlur(), 50);
 			}
 		});
 

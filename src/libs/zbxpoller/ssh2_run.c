@@ -467,7 +467,7 @@ int	ssh_run(zbx_dc_item_t *item, AGENT_RESULT *result, const char *encoding, con
 			goto channel_close;
 		}
 
-		if (0 > (rc = libssh2_channel_write(channel, item->params, strlen(item->params))))
+		if (0 > libssh2_channel_write(channel, item->params, strlen(item->params)))
 		{
 			char	*err;
 
