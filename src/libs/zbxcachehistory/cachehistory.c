@@ -2728,7 +2728,14 @@ static zbx_hc_item_t	*hc_get_item(zbx_uint64_t itemid)
  ******************************************************************************/
 static zbx_hc_item_t	*hc_add_item(zbx_uint64_t itemid, zbx_hc_data_t *data)
 {
-	zbx_hc_item_t	item_local = {itemid, ZBX_HC_ITEM_STATUS_NORMAL, 0, data, data};
+	/* without explicitly setting all bytes to 0 padding bytes are reported as uninitialized by valgrind */
+	zbx_hc_item_t	item_local = {0};
+
+	item_local.itemid = itemid;
+	item_local.status = ZBX_HC_ITEM_STATUS_NORMAL;
+	item_local.values_num = 0;
+	item_local.tail = data;
+	item_local.head = data;
 
 	return (zbx_hc_item_t *)zbx_hashset_insert(&cache->history_items, &item_local, sizeof(item_local));
 }
