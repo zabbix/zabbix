@@ -173,7 +173,7 @@ class testFormAdministrationGeneralIconMapping extends CLegacyWebTest {
 		else {
 			$this->assertMessage(TEST_BAD, null, $data['error']);
 		}
-		
+
 		// Check the results in DB
 		if (!array_key_exists('check_db', $data) || $data['check_db'] === true) {
 			$this->assertEquals(0, CDBHelper::getCount('SELECT NULL FROM icon_map WHERE name='.zbx_dbstr($data['name'])));
@@ -748,7 +748,7 @@ class testFormAdministrationGeneralIconMapping extends CLegacyWebTest {
 		$this->zbxTestClickXpath('//button[@value="Add"]');
 		$this->zbxTestWaitForPageToLoad();
 		$this->page->removeFocus();
-		$form = $this->query('id:iconmap')->asForm()->one();	
+		$form = $this->query('id:iconmap')->asForm()->one();
 
 		// Check the results in frontend.
 		$this->assertInlineError($form, $data['error']);
@@ -894,7 +894,7 @@ class testFormAdministrationGeneralIconMapping extends CLegacyWebTest {
 			$this->zbxTestInputTypeOverwrite('name', $iconmap['name'].' (cloned)');
 			$this->zbxTestClickWait('clone');
 			$this->zbxTestClick('cancel');
-			
+	
 			// Check the results in frontend.
 			$this->zbxTestCheckTitle('Configuration of icon mapping');
 			$this->zbxTestCheckHeader('Icon mapping');
