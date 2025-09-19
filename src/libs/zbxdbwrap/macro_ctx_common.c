@@ -2742,5 +2742,4 @@ int	zbx_macro_message_common_resolv(zbx_macro_resolv_data_t *p, zbx_dc_um_handle
 	}
 
 	return ret;
-#undef CEVENT_OBJECT_REM_ID
 }
