@@ -1990,14 +1990,17 @@ ZBX_THREAD_ENTRY(active_checks_thread, args)
 		{
 			zbx_setproctitle("active checks #%d [getting list of active checks]", process_num);
 
-			if (FAIL == refresh_active_checks(&activechk_args.addrs, activechks_args_in->zbx_config_tls,
+			/* refresh_active_checks() can return CONNECT_ERROR, SEND_ERROR and RECV_ERROR */
+			if (SUCCEED != refresh_active_checks(&activechk_args.addrs, activechks_args_in->zbx_config_tls,
 					&config_revision_local, activechks_args_in->config_timeout,
 					activechks_args_in->config_source_ip, activechks_args_in->config_listen_ip,
 					activechks_args_in->config_listen_port, config_hostname,
 					activechks_args_in->config_host_metadata,
 					activechks_args_in->config_host_metadata_item,
 					activechks_args_in->config_host_interface,
-					activechks_args_in->config_host_interface_item, activechks_args_in->config_buffer_send, activechks_args_in->config_buffer_size))
+					activechks_args_in->config_host_interface_item,
+					activechks_args_in->config_buffer_send,
+					activechks_args_in->config_buffer_size))
 			{
 				nextrefresh = time(NULL) + 60;
 			}
