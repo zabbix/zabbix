@@ -344,7 +344,9 @@ $form_grid
 		->addItem([
 			(new CLabel(_('Enable user input'), 'manualinput')),
 			new CFormField(
-				(new CCheckBox('manualinput'))->setChecked($data['form']['manualinput'] == ZBX_SCRIPT_MANUALINPUT_ENABLED)
+				(new CCheckBox('manualinput'))
+					->setChecked($data['form']['manualinput'] == ZBX_SCRIPT_MANUALINPUT_ENABLED)
+					->setUncheckedValue(0)
 			)
 		])
 		->addItem([
@@ -397,7 +399,9 @@ $form_grid
 		->addItem([
 			(new CLabel(_('Enable confirmation'), 'enable_confirmation')),
 			new CFormField(
-				(new CCheckBox('enable_confirmation'))->setChecked($data['form']['enable_confirmation'])
+				(new CCheckBox('enable_confirmation'))
+					->setChecked($data['form']['enable_confirmation'])
+					->setUncheckedValue(0)
 			)
 		])
 		->addItem([
