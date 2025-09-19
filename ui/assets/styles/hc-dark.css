@@ -2537,8 +2537,7 @@ button {
   background-color: #000000; }
 .list-table.compact-view [class*='flh-']:not(.row-selected):not(:hover) .entity-count, .list-table.has-highlighted-rows [class*='flh-']:not(.row-selected):not(:hover) .entity-count {
   margin-top: 0;
-  margin-bottom: 0;
-  border: 1px solid #000000; }
+  margin-bottom: 0; }
 .list-table.has-highlighted-rows .problem-unack-fg,
 .list-table.has-highlighted-rows .problem-ack-fg {
   color: #cc0000; }
@@ -2548,6 +2547,8 @@ button {
 .list-table.has-highlighted-rows .link-alt:active, .list-table.has-highlighted-rows .link-alt:not(:hover):not(:focus) {
   color: #f8f8f8;
   border-bottom-color: #f8f8f8; }
+.list-table.has-highlighted-rows .entity-count {
+  border: 1px solid #000000; }
 
 .no-data-message {
   display: grid;

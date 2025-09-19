@@ -482,7 +482,6 @@
 				.entity-count {
 					margin-top: 0;
 					margin-bottom: 0;
-					border: 1px solid $ui-bg-color;
 				}
 			}
 		}
@@ -505,6 +504,10 @@
 				color: $compact-view-color;
 				border-bottom-color: $compact-view-color;
 			}
+		}
+
+		.entity-count {
+			border: 1px solid $ui-bg-color;
 		}
 	}
 }
