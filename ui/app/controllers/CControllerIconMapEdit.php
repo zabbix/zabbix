@@ -107,7 +107,7 @@ class CControllerIconMapEdit extends CController {
 			'iconmap' => $this->iconmap,
 			'inventory_list' => $inventory_list,
 			'default_imageid' => $default_imageid,
-			'js_validation_rules' => $rules,
+			'js_validation_rules' => $rules
 		];
 
 		$response = new CControllerResponseData($data);

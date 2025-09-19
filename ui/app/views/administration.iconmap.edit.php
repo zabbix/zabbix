@@ -79,7 +79,7 @@ $form_grid = (new CFormGrid())
 				'iconid' => '#{iconid}',
 				'inventory_link' => '#{inventory_link}',
 				'options_inventory' => $options_inventory,
-				'options_icon' => $options_icon,
+				'options_icon' => $options_icon
 			]))
 			->addItem(getMappingEntryErrorView('#{sortorder}'))
 		)
