@@ -491,7 +491,8 @@ static void	supervisor_start_units(zbx_supervisor_t *sv, const zbx_thread_superv
 
 			if (NULL == args->unit_defs[info->type].entry)
 			{
-				zabbix_log(LOG_LEVEL_CRIT, "no entry function specified for process type %d");
+				zabbix_log(LOG_LEVEL_CRIT, "no entry function specified for process type %d",
+						info->type);
 				zbx_set_exiting_with_fail();
 				return;
 			}
@@ -618,7 +619,7 @@ int	supervisor_get_exit_thread_info(zbx_supervisor_t *sv, unsigned char *process
 			if (0 == unit->running)
 				continue;
 
-			if (SUCCEED == zbx_is_exit_thread(unit->handle))
+			if (SUCCEED == zbx_is_failed_thread(unit->handle))
 			{
 				*process_type = set->process_type;
 				*process_num = j + 1;
