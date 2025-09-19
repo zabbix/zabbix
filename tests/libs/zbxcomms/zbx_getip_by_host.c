@@ -33,4 +33,5 @@ void	zbx_mock_test_entry(void **state)
 	zbx_mock_assert_str_eq("return value", exp_ip, ip);
 
 	zbx_free(ip);
+	zbx_free(exp_ip);
 }

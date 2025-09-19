@@ -77,4 +77,6 @@ void	zbx_mock_test_entry(void **state)
 	zbx_vector_str_destroy(&exp_result_v);
 	zbx_vector_str_clear_ext(&result_v, zbx_str_free);
 	zbx_vector_str_destroy(&result_v);
+	zbx_vector_int32_clear(&read_return_seq);
+	zbx_vector_int32_destroy(&read_return_seq);
 }

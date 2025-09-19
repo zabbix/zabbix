@@ -69,5 +69,10 @@ void	zbx_mock_test_entry(void **state)
 
 	zbx_mock_assert_int_eq("return value:", exp_result, result);
 
+	if (ZBX_BUF_TYPE_DYN == s.buf_type)
+		zbx_free(s.buffer);
+
 	zbx_socket_clean(&s);
+	zbx_vector_int32_clear(&recvfrom_return_seq);
+	zbx_vector_int32_destroy(&recvfrom_return_seq);
 }

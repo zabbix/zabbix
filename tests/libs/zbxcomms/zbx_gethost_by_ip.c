@@ -33,4 +33,5 @@ void	zbx_mock_test_entry(void **state)
 	zbx_mock_assert_str_eq("return value", exp_host, host);
 
 	zbx_free(host);
+	zbx_free(exp_host);
 }
