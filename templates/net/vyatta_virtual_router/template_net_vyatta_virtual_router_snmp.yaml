@@ -1298,7 +1298,7 @@ zabbix_export:
             type: CHECKBOX
             priority: '10'
             label: 'Interfaces control'
-            description: 'Macro for operational state of the interface for link down trigger. Can be used with interface name as context.'
+            description: 'Macro for the operational state of the interface for the link down trigger. Can be used with the interface name as context.'
             options:
               - checked: '1'
                 unchecked: '0'
@@ -1310,7 +1310,7 @@ zabbix_export:
             priority: '5'
             section_name: Thresholds
             label: 'Memory usage (high)'
-            description: 'Warning threshold of memory utilization.'
+            description: 'High severity threshold of memory utilization.'
             regex: '^-?([0-9]+|(([0-9]+)\.([0-9]+)))$'
         - macro: '{$VYATTA.MEMORY.USED.WARN}'
           value: '80'
