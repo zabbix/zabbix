@@ -50,7 +50,7 @@ class CControllerScriptUpdate extends CController {
 			'scope' => ['db scripts.scope', 'required', 'in' => [ZBX_SCRIPT_SCOPE_ACTION, ZBX_SCRIPT_SCOPE_HOST, ZBX_SCRIPT_SCOPE_EVENT]],
 			'type' => ['required','db scripts.type', 'in' => [ZBX_SCRIPT_TYPE_CUSTOM_SCRIPT, ZBX_SCRIPT_TYPE_IPMI, ZBX_SCRIPT_TYPE_SSH, ZBX_SCRIPT_TYPE_TELNET, ZBX_SCRIPT_TYPE_WEBHOOK, ZBX_SCRIPT_TYPE_URL]],
 			'execute_on' =>	['db scripts.execute_on','in' => [ZBX_SCRIPT_EXECUTE_ON_AGENT, ZBX_SCRIPT_EXECUTE_ON_SERVER, ZBX_SCRIPT_EXECUTE_ON_PROXY]],
-			'menu_path' => ['db scripts.menu_path'],
+			'menu_path' => ['db scripts.menu_path', 'regex' => '/^(?:'.ZBX_PREG_MENU_PATH_FORMAT.')?$/'],
 			'authtype' => ['db scripts.authtype', 'in' => [ITEM_AUTHTYPE_PASSWORD, ITEM_AUTHTYPE_PUBLICKEY]],
 			'username' => ['db scripts.username', 'required', 'not_empty', 'when' => ['type', 'in' => [ZBX_SCRIPT_TYPE_SSH, ZBX_SCRIPT_TYPE_TELNET]]],
 			'password' => ['db scripts.password'],
