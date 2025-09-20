@@ -1,6 +1,9 @@
 Changes for 7.0.19rc1
 
 New features:
+..F....... [ZBXNEXT-10143] added "Highlight whole row" feature in non-compact mode in Problems (ashubin)
+.........T [ZBXNEXT-10106] extended preprocessor throughput monitoring in Zabbix server/proxy health templates (aiantsen)
+.........T [ZBXNEXT-9819] added a new template Vyatta Virtual Router by SNMP (knaglis)
 ...G...... [ZBXNEXT-9933] added TNS name support for Zabbix agent 2 Oracle plugin (lsurvilo)
 .........T [ZBXNEXT-10107] improved device coverage in Huawei OceanStor Dorado by SNMP template (abrosimovs)
 .........T [ZBXNEXT-10123] added Aruba CX 8300s by SNMP template (akotsegubov)
