@@ -1,6 +1,9 @@
 Changes for 7.4.3rc1
 
 New features:
+..F....... [ZBXNEXT-10143] added "Highlight whole row" feature in non-compact mode in Problems (ashubin)
+.........T [ZBXNEXT-10106] extended preprocessor throughput monitoring in Zabbix server/proxy health templates (aiantsen)
+.........T [ZBXNEXT-9819] added a new template Vyatta Virtual Router by SNMP (knaglis)
 ...G...... [ZBXNEXT-9933] added TNS name support for Zabbix agent 2 Oracle plugin (lsurvilo)
 .........T [ZBXNEXT-10107] improved device coverage in Huawei OceanStor Dorado by SNMP template (abrosimovs)
 .........T [ZBXNEXT-10123] added Aruba CX 8300s by SNMP template (akotsegubov)
@@ -13,6 +16,8 @@ A......... [ZBXNEXT-10027] prepared for removal of TimescaleDB API call deprecat
 .......PS. [ZBXNEXT-10077] updated maximum supported MariaDB version to 12.0 (mprihodko)
 
 Bug fixes:
+..F....... [ZBX-25103] replaced legacy hintbox generation for trigger operational data with current (dpankins)
+..F....... [ZBX-25796] fixed confusing error message on item test timeout (isharha)
 A......... [ZBX-26419] improved performance of problem and event views by optimizing SQL queries to join only necessary triggers, eliminating redundant post-join filtering (vso)
 ..F....... [ZBX-24885] fixed inconsistent tag display and unnecessary ellipsis on Latest data page (msnihach)
 ..F....... [ZBX-26337] removed unnecessary div elements for entries without problems in Item and Host navigator widgets (msnihach)
@@ -1023,6 +1028,9 @@ A.F....... [ZBX-23227] fixed issue where using an empty array or string value fo
 Changes for 7.0.19rc1
 
 New features:
+..F....... [ZBXNEXT-10143] added "Highlight whole row" feature in non-compact mode in Problems (ashubin)
+.........T [ZBXNEXT-10106] extended preprocessor throughput monitoring in Zabbix server/proxy health templates (aiantsen)
+.........T [ZBXNEXT-9819] added a new template Vyatta Virtual Router by SNMP (knaglis)
 ...G...... [ZBXNEXT-9933] added TNS name support for Zabbix agent 2 Oracle plugin (lsurvilo)
 .........T [ZBXNEXT-10107] improved device coverage in Huawei OceanStor Dorado by SNMP template (abrosimovs)
 .........T [ZBXNEXT-10123] added Aruba CX 8300s by SNMP template (akotsegubov)
