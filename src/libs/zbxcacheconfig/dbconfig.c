@@ -3501,7 +3501,7 @@ static void	DCsync_items(zbx_dbsync_t *sync, zbx_uint64_t revision, zbx_synced_n
 
 		/* SNMP trap items for current server/proxy */
 
-		if (ITEM_TYPE_SNMPTRAP == item->type && 0 == host->proxyid)
+		if (ITEM_TYPE_SNMPTRAP == item->type)
 		{
 			interface_snmpitem = (ZBX_DC_INTERFACE_ITEM *)DCfind_id(&config->interface_snmpitems,
 					item->interfaceid, sizeof(ZBX_DC_INTERFACE_ITEM), &found);
@@ -11647,6 +11647,9 @@ size_t	zbx_dc_config_get_snmp_items_by_interfaceid(zbx_uint64_t interfaceid, zbx
 		goto unlock;
 
 	if (HOST_STATUS_MONITORED != dc_host->status)
+		goto unlock;
+
+	if (dc_host->proxyid != 0)
 		goto unlock;
 
 	if (NULL == (dc_interface_snmpitem = (const ZBX_DC_INTERFACE_ITEM *)zbx_hashset_search(
