@@ -442,7 +442,7 @@ $button_list += [
 
 // Append table to form.
 $discoveryForm->addItem([
-	$discoveryTable,
+	$discoveryTable->addClass('js-chkbxrange-no-autocomplete'),
 	new CActionButtonList('action', 'g_hostdruleid', $button_list, $data['checkbox_hash'])
 ]);
 

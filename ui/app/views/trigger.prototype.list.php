@@ -236,7 +236,7 @@ $buttons['trigger.prototype.massdelete'] = [
 
 // append table to form
 $trigger_form->addItem([
-	$trigger_table,
+	$trigger_table->addClass('js-chkbxrange-no-autocomplete'),
 	new CActionButtonList('action', 'g_triggerid', $buttons, 'trigger_prototypes_'.$this->data['parent_discoveryid'])
 ]);
 

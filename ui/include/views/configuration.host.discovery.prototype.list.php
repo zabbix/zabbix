@@ -59,7 +59,9 @@ if ($data['hostid'] != 0) {
 $discoveryTable = (new CTableInfo())
 	->setHeader([
 		(new CColHeader(
-			(new CCheckBox('all_items'))->onClick("checkAll('".$discoveryForm->getName()."', 'all_items', 'g_hostdruleid');")
+			(new CCheckBox('all_items'))
+				->setAttribute('autocomplete', 'off')
+				->onClick("checkAll('".$discoveryForm->getName()."', 'all_items', 'g_hostdruleid');")
 		))->addClass(ZBX_STYLE_CELL_WIDTH),
 		make_sorting_header(_('Name'), 'name', $data['sort'], $data['sortorder'], $url),
 		_('Items'),
@@ -184,7 +186,8 @@ foreach ($data['discoveries'] as $discovery) {
 		$discovery['delay'] = $update_interval_parser->getDelay();
 	}
 
-	$checkbox = new CCheckBox('g_hostdruleid['.$discovery['itemid'].']', $discovery['itemid']);
+	$checkbox = (new CCheckBox('g_hostdruleid['.$discovery['itemid'].']', $discovery['itemid']))
+		->setAttribute('autocomplete', 'off');
 
 	if (in_array($discovery['type'], checkNowAllowedTypes())
 			&& $discovery['status'] == ITEM_STATUS_ACTIVE
@@ -284,7 +287,7 @@ $buttons['discoveryprototype.massdelete'] = [
 
 // Append table to form.
 $discoveryForm->addItem([
-	$discoveryTable,
+	$discoveryTable->addClass('js-chkbxrange-no-autocomplete'),
 	new CActionButtonList('action', 'g_hostdruleid', $buttons)
 ]);
 

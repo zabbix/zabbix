@@ -240,8 +240,6 @@ foreach ($data['items'] as $item) {
 	$item_list->addRow($row);
 }
 
-$form->addItem($item_list);
-
 $buttons = [
 	[
 		'content' => (new CSimpleButton(_('Enable')))
@@ -292,9 +290,12 @@ if ($data['context'] === 'template') {
 	unset($buttons['execute'], $buttons['clearhistory']);
 }
 
-$form->addItem(new CActionButtonList('action', 'itemids', $buttons,
-	'items_'.(array_key_exists('hostid', $data) ? $data['hostid'] : 0))
-);
+$form->addItem([
+	$item_list->addClass('js-chkbxrange-no-autocomplete'),
+	new CActionButtonList('action', 'itemids', $buttons,
+		'items_'.(array_key_exists('hostid', $data) ? $data['hostid'] : 0)
+	)
+]);
 
 (new CHtmlPage())
 	->setTitle(_('Items'))

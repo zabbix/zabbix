@@ -381,7 +381,7 @@ foreach ($data['triggers'] as $tnum => $trigger) {
 
 // append table to form
 $triggers_form->addItem([
-	$triggers_table,
+	$triggers_table->addClass('js-chkbxrange-no-autocomplete'),
 	new CActionButtonList('action', 'g_triggerid',
 		[
 			'trigger.massenable' => [

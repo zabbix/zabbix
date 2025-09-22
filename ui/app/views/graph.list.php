@@ -226,7 +226,10 @@ $buttons = new CActionButtonList('action', 'group_graphid', [
 	]
 ], 'graphs'.($data['checkbox_hash'] ? '_'.$data['checkbox_hash'] : ''));
 
-$graphs_form->addItem([$graphs_table, $buttons]);
+$graphs_form->addItem([
+	$graphs_table->addClass('js-chkbxrange-no-autocomplete'),
+	$buttons
+]);
 
 $html_page
 	->addItem($graphs_form)

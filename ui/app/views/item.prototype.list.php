@@ -161,8 +161,6 @@ foreach ($data['items'] as $item) {
 	]);
 }
 
-$form->addItem($table);
-
 $buttons = [
 	[
 		'content' => (new CSimpleButton(_('Create enabled')))
@@ -200,7 +198,10 @@ $buttons[] = [
 		->addClass('js-no-chkbxrange')
 ];
 
-$form->addItem(new CActionButtonList('action', 'itemids', $buttons, 'item_prototypes_'.$data['parent_discoveryid']));
+$form->addItem([
+	$table->addClass('js-chkbxrange-no-autocomplete'),
+	new CActionButtonList('action', 'itemids', $buttons, 'item_prototypes_'.$data['parent_discoveryid'])
+]);
 
 (new CHtmlPage())
 	->setTitle(_('Item prototypes'))

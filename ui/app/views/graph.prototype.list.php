@@ -156,7 +156,10 @@ $buttons = new CActionButtonList('action', 'group_graphid', [
 	]
 ], 'graph_prototypes_'.$data['parent_discoveryid']);
 
-$graphs_form->addItem([$graphs_table, $buttons]);
+$graphs_form->addItem([
+	$graphs_table->addClass('js-chkbxrange-no-autocomplete'),
+	$buttons
+]);
 
 $html_page
 	->addItem($graphs_form)
