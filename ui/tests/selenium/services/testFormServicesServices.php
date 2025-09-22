@@ -355,68 +355,6 @@ class testFormServicesServices extends CWebTest {
 				[
 					'expected' => TEST_BAD,
 					'fields' => [
-						'Name' => 'Letters in sort order',
-						'Sort order (0->999)' => 'zab'
-					],
-					'inline_errors' => [
-						'Sort order (0->999)' => 'This value is not a valid integer.'
-					]
-				]
-			],
-			// [
-			// 	[
-			// 		'expected' => TEST_BAD,
-			// 		'fields' => [
-			// 			'Name' => 'Negative sort order',
-			// 			'Sort order (0->999)' => '-1'
-			// 		],
-			// 		'inline_errors' => [
-			// 			'Sort order (0->999)' => 'This value must be within range 0:999.'
-			// 		]
-			// 	]
-			// ],
-			// [
-			// 	[
-			// 		'expected' => TEST_BAD,
-			// 		'fields' => [
-			// 			'Name' => 'Empty sort order',
-			// 			'Sort order (0->999)' => ''
-			// 		],
-			// 		'inline_errors' => [
-			// 			'Sort order (0->999)' => 'This value is not a valid integer.'
-			// 		]
-			// 	]
-			// ],
-			// [
-			// 	[
-			// 		'expected' => TEST_BAD,
-			// 		'fields' => [
-			// 			'Name' => 'Non-numeric weight',
-			// 			'Advanced configuration' => true,
-			// 			'Weight' => 'abc'
-			// 		],
-			// 		'inline_errors' => [
-			// 			'Weight' => 'This value is not a valid integer.'
-			// 		]
-			// 	]
-			// ],
-			// [
-			// 	[
-			// 		'expected' => TEST_BAD,
-			// 		'fields' => [
-			// 			'Name' => 'Negative weight',
-			// 			'Advanced configuration' => true,
-			// 			'Weight' => '-2'
-			// 		],
-			// 		'inline_errors' => [
-			// 			'Weight' => 'This value must be within range 0:1000000.'
-			// 		]
-			// 	]
-			// ],
-			[
-				[
-					'expected' => TEST_BAD,
-					'fields' => [
 						'Name' => 'Excessive weight',
 						'Advanced configuration' => true,
 						'Weight' => '9999999'
@@ -426,46 +364,6 @@ class testFormServicesServices extends CWebTest {
 					]
 				]
 			],
-			[
-				[
-					'expected' => TEST_BAD,
-					'fields' => [
-						'Name' => 'Non-numeric N in additional rules',
-						'Advanced configuration' => true
-					],
-					'additional_rules' => [
-						[
-							'Set status to' => 'Average',
-							'Condition' => 'If at least N child services have Status status or above',
-							'name:limit_value' => 'two',
-							'Status' => 'Average'
-						]
-					],
-					'inline_errors' => [
-						'name:limit_value' => 'This value must be no less than "1".'
-					]
-				]
-			],
-			// [
-			// 	[
-			// 		'expected' => TEST_BAD,
-			// 		'fields' => [
-			// 			'Name' => 'Negative N in additional rules',
-			// 			'Advanced configuration' => true
-			// 		],
-			// 		'additional_rules' => [
-			// 			[
-			// 				'Set status to' => 'Warning',
-			// 				'Condition' => 'If at least N% of child services have Status status or above',
-			// 				'name:limit_value' => '-66',
-			// 				'Status' => 'High'
-			// 			]
-			// 		],
-			// 		'inline_errors' => [
-			// 			'name:limit_value' => 'This value must be no less than "1".'
-			// 		]
-			// 	]
-			// ],
 			[
 				[
 					'expected' => TEST_BAD,
@@ -664,48 +562,6 @@ class testFormServicesServices extends CWebTest {
 
 	public function getUpdateAdditionalRulesData() {
 		return [
-			// [
-			// 	[
-			// 		'expected' => TEST_BAD,
-			// 		'fields' => [
-			// 			'Name' => 'Update rule: Non-numeric N in additional rules',
-			// 			'Advanced configuration' => true
-			// 		],
-			// 		'existing_rule' => 'High - If at least 50% of child services have Average status or above',
-			// 		'additional_rules' => [
-			// 			[
-			// 				'Set status to' => 'High',
-			// 				'Condition' => 'If at least N child services have Status status or above',
-			// 				'name:limit_value' => 'five',
-			// 				'Status' => 'High'
-			// 			]
-			// 		],
-			// 		'inline_errors' => [
-			// 			'name:limit_value' => 'This value must be no less than "1".'
-			// 		]
-			// 	]
-			// ],
-			// [
-			// 	[
-			// 		'expected' => TEST_BAD,
-			// 		'fields' => [
-			// 			'Name' => 'Update rule: Negative N in additional rules',
-			// 			'Advanced configuration' => true
-			// 		],
-			// 		'existing_rule' => 'High - If at least 50% of child services have Average status or above',
-			// 		'additional_rules' => [
-			// 			[
-			// 				'Set status to' => 'Warning',
-			// 				'Condition' => 'If at least N% of child services have Status status or above',
-			// 				'name:limit_value' => '-66',
-			// 				'Status' => 'High'
-			// 			]
-			// 		],
-			// 		'inline_errors' => [
-			// 			'name:limit_value' => 'This value must be no less than "1".'
-			// 		]
-			// 	]
-			// ],
 			[
 				[
 					'expected' => TEST_BAD,
@@ -1336,6 +1192,127 @@ class testFormServicesServices extends CWebTest {
 		$this->assertFalse($this->query('link', self::$delete_service)->one(false)->isValid());
 
 		$this->assertEquals(0, CDBHelper::getCount('SELECT * FROM services WHERE name='.zbx_dbstr(self::$delete_service)));
+	}
+
+	public function getDefaultValuesCheckData() {
+		return [
+			[
+				[
+					'field' => 'Sort order (0->999)',
+					'values' => [
+						'zab' => '0',
+						'000' => '0',
+						'1zb' => '1',
+						'009' => '9',
+						'zb7' => '0',
+						'-8d' => '8',
+						'-d5' => '0',
+						'' => '0'
+					]
+				]
+			],
+			[
+				[
+					'field' => 'Weight',
+					'advanced_configuration' => true,
+					'values' => [
+						'zab' => '0',
+						'000' => '0',
+						'1zb' => '1',
+						'009' => '9',
+						'zb7' => '0',
+						'-8d' => '8',
+						'-d5' => '0',
+						'' => '0'
+					]
+				]
+			],
+			[
+				[
+					'field' => 'name:limit_value',
+					'advanced_configuration' => true,
+					'additional_rule' => [
+						'Condition' => 'If at least N child services have Status status or above'
+					],
+					'values' => [
+						'zab' => '1',
+						'1zb' => '1',
+						'009' => '9',
+						'zb7' => '1',
+						'-8d' => '8',
+						'-d5' => '1',
+						'' => '1'
+					]
+				]
+			],
+			[
+				[
+					'field' => 'name:limit_value',
+					'advanced_configuration' => true,
+					'additional_rule' => [
+						'Condition' => 'If at least N% of child services have Status status or above'
+					],
+					'values' => [
+						'zab' => '1',
+						'1zb' => '1',
+						'009' => '9',
+						'zb7' => '1',
+						'-8d' => '8',
+						'-d5' => '1',
+						'' => '1'
+					]
+				]
+			],
+			[
+				[
+					'field' => 'name:limit_value',
+					'advanced_configuration' => true,
+					'additional_rule' => [
+						'Condition' => 'If weight of child services with Status status or above is at least W'
+					],
+					'values' => [
+						'zab' => '1',
+						'1zb' => '1',
+						'009' => '9',
+						'zb7' => '1',
+						'-8d' => '8',
+						'-d5' => '1',
+						'' => '1'
+					]
+				]
+			]
+		];
+	}
+
+	/**
+	 * @dataProvider getDefaultValuesCheckData
+	 *
+	 * Verifies that certain fields reset to their default values when incorrect data is entered.
+	 */
+	public function testFormServicesServices_DefaultValuesCheck($data) {
+		$this->page->login()->open('zabbix.php?action=service.list.edit');
+		$this->query('button:Create service')->waitUntilClickable()->one()->click();
+		$dialog = COverlayDialogElement::find()->one()->waitUntilReady();
+		$form = $dialog->query('id:service-form')->asForm()->one()->waitUntilReady();
+
+		if (array_key_exists('advanced_configuration', $data)) {
+			$form->fill(['Advanced configuration' => true]);
+		}
+
+		// Add Additional rule.
+		if (array_key_exists('additional_rule', $data)) {
+			$form->getFieldContainer('Additional rules')->query('button:Add')->waitUntilClickable()->one()->click();
+			$rules_dialog = COverlayDialogElement::find()->all()->last()->waitUntilReady();
+			$form = $rules_dialog->asForm();
+			$form->fill($data['additional_rule']);
+		}
+
+		// Add value and check that it autoaticaly changed to default.
+		foreach ($data['values'] as $value => $result) {
+			$form->fill([$data['field'] => $value]);
+			$this->page->removeFocus();
+			$form->checkValue([$data['field'] => $result]);
+		}
 	}
 
 	/**
