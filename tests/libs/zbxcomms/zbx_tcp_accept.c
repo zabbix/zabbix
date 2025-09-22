@@ -78,7 +78,10 @@ void	zbx_mock_test_entry(void **state)
 
 	ZBX_UNUSED(state);
 
+#ifdef HAVE_OPENSSL
 	s.tls_ctx = NULL;
+#endif
+
 	errno = 0;
 	s.num_socks = zbx_mock_get_parameter_int("in.num_socks");
 

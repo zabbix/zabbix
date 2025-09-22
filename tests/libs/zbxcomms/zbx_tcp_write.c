@@ -21,8 +21,9 @@
 #include "zbxcomms.h"
 
 #include "zbx_comms_common.h"
+#include <openssl/ssl.h>
 
-int	__wrap_SSL_write(SSL *ssl, const void *buf, int num);
+
 ssize_t	__wrap_write(int fd, const void *buf, size_t n);
 
 int	__wrap_SSL_write(SSL *ssl, const void *buf, int num)

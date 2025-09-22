@@ -1,11 +1,5 @@
 include ../Makefile.include
 
-if IPV6
-noinst_PROGRAMS = zbx_tcp_check_allowed_peers $(COMMS_tests)
-else
-noinst_PROGRAMS = zbx_tcp_check_allowed_peers_ipv4 $(COMMS_tests)
-endif
-
 COMMS_tests = zbx_validate_peer_list \
 	zbx_tcp_connection_type_name \
 	socket_poll_error \
@@ -16,11 +10,17 @@ COMMS_tests = zbx_validate_peer_list \
 	zbx_udp_send \
 	zbx_tcp_recv_line \
 	zbx_socket_pollout \
-	zbx_tcp_write \
 	zbx_tcp_send_context \
 	zbx_tcp_accept \
-	zbx_tcp_read_close_notify \
-	zbx_udp_recv
+	zbx_udp_recv \
+	zbx_tcp_write \
+	zbx_tcp_read_close_notify
+
+if IPV6
+noinst_PROGRAMS = zbx_tcp_check_allowed_peers $(COMMS_tests)
+else
+noinst_PROGRAMS = zbx_tcp_check_allowed_peers_ipv4 $(COMMS_tests)
+endif
 
 COMMON_SRC_FILES = \
 	../../zbxmocktest.h
@@ -192,8 +192,6 @@ zbx_socket_pollout_LDFLAGS = @AGENT_LDFLAGS@ \
 
 zbx_socket_pollout_CFLAGS = $(COMMS_COMPILER_FLAGS)
 
-#zbx_tcp_write
-
 zbx_tcp_write_SOURCES = \
 	zbx_tcp_write.c \
 	zbx_comms_common.c \
@@ -210,6 +208,20 @@ zbx_tcp_write_LDFLAGS = @AGENT_LDFLAGS@ \
 	-Wl,--wrap=write
 
 zbx_tcp_write_CFLAGS = $(COMMS_COMPILER_FLAGS)
+
+
+zbx_tcp_read_close_notify_SOURCES = \
+	zbx_tcp_read_close_notify.c \
+	$(COMMON_SRC_FILES)
+
+zbx_tcp_read_close_notify_LDADD = \
+	$(COMMS_LIBS)
+
+zbx_tcp_read_close_notify_LDADD += @AGENT_LIBS@
+
+zbx_tcp_read_close_notify_LDFLAGS = @AGENT_LDFLAGS@ $(CMOCKA_LDFLAGS) $(YAML_LDFLAGS)
+
+zbx_tcp_read_close_notify_CFLAGS = $(COMMS_COMPILER_FLAGS)
 
 #zbx_tcp_send_context
 
@@ -246,21 +258,6 @@ zbx_tcp_accept_LDFLAGS = @AGENT_LDFLAGS@ \
 	-Wl,--wrap=recv
 
 zbx_tcp_accept_CFLAGS = $(COMMS_COMPILER_FLAGS)
-
-#zbx_tcp_read_close_notify
-
-zbx_tcp_read_close_notify_SOURCES = \
-	zbx_tcp_read_close_notify.c \
-	$(COMMON_SRC_FILES)
-
-zbx_tcp_read_close_notify_LDADD = \
-	$(COMMS_LIBS)
-
-zbx_tcp_read_close_notify_LDADD += @AGENT_LIBS@
-
-zbx_tcp_read_close_notify_LDFLAGS = @AGENT_LDFLAGS@ $(CMOCKA_LDFLAGS) $(YAML_LDFLAGS)
-
-zbx_tcp_read_close_notify_CFLAGS = $(COMMS_COMPILER_FLAGS)
 
 #zbx_udp_recv
 

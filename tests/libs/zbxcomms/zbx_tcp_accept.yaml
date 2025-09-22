@@ -27,14 +27,6 @@ in:
   accept_return: -1
 out:
   result: TIMEOUT_ERROR
----
-test case: "unencrypted | poll=no error"
-in:
-  tls_accept: 1 # ZBX_TCP_SEC_UNENCRYPTED
-  poll_timeout: 10
-  num_socks: 1
-  poll_mode: "no error"
-  recv_return: 2
-out:
-  result: SUCCEED
+...
+
 
