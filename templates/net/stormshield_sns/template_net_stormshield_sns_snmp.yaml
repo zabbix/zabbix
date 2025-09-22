@@ -1131,16 +1131,25 @@ zabbix_export:
               type: DEPENDENT
               key: 'system.disk.result[snsDiskEntrySmartResult.{#SNMPINDEX}]'
               delay: '0'
-              value_type: CHAR
-              trends: '0'
               description: |
                 MIB: STORMSHIELD-SYSTEM-MONITOR-MIB
                 Result of the smart info tests.
+              valuemap:
+                name: 'STORMSHIELD-SYSTEM-MONITOR-MIB::snsDiskEntrySmartResult'
               preprocessing:
                 - type: SNMP_WALK_VALUE
                   parameters:
                     - '1.3.6.1.4.1.11256.1.10.5.1.3.{#SNMPINDEX}'
                     - '0'
+                - type: JAVASCRIPT
+                  parameters:
+                    - |
+                      const idx = {
+                      	'passed': 1,
+                      	'failed': 2
+                      };
+                      
+                      return typeof idx[value.toLowerCase()] === 'undefined' ? 0 : idx[value.toLowerCase()];
               master_item:
                 key: sns.disk.walk
               tags:
@@ -1151,16 +1160,26 @@ zabbix_export:
               type: DEPENDENT
               key: 'system.disk.status[snsDiskEntryRaidStatus.{#SNMPINDEX}]'
               delay: '0'
-              value_type: CHAR
-              trends: '0'
               description: |
                 MIB: STORMSHIELD-SYSTEM-MONITOR-MIB
                 RAID status.
+              valuemap:
+                name: 'STORMSHIELD-SYSTEM-MONITOR-MIB::snsDiskEntryRaidStatus'
               preprocessing:
                 - type: SNMP_WALK_VALUE
                   parameters:
                     - '1.3.6.1.4.1.11256.1.10.5.1.5.{#SNMPINDEX}'
                     - '0'
+                - type: JAVASCRIPT
+                  parameters:
+                    - |
+                      const idx = {
+                      	'degraded': 1,
+                      	'missing': 2,
+                      	'optimal': 3
+                      };
+                      
+                      return typeof idx[value.toLowerCase()] === 'undefined' ? 0 : idx[value.toLowerCase()];
               master_item:
                 key: sns.disk.walk
               tags:
@@ -1228,16 +1247,25 @@ zabbix_export:
               type: DEPENDENT
               key: 'system.fan.status[snsFanStatus.{#SNMPINDEX}]'
               delay: '0'
-              value_type: CHAR
-              trends: '0'
               description: |
                 MIB: STORMSHIELD-SYSTEM-MONITOR-MIB
                 Status of the Fan.
+              valuemap:
+                name: 'STORMSHIELD-SYSTEM-MONITOR-MIB::snsFanStatus'
               preprocessing:
                 - type: SNMP_WALK_VALUE
                   parameters:
                     - '1.3.6.1.4.1.11256.1.10.9.1.3.{#SNMPINDEX}'
                     - '0'
+                - type: JAVASCRIPT
+                  parameters:
+                    - |
+                      const idx = {
+                      	'failure': 1,
+                      	'running': 2,
+                      };
+                      
+                      return typeof idx[value.toLowerCase()] === 'undefined' ? 0 : idx[value.toLowerCase()];
               master_item:
                 key: sns.fan.walk
               tags:
@@ -1284,16 +1312,25 @@ zabbix_export:
               type: DEPENDENT
               key: 'ha.license[snsHALicence.{#SNMPINDEX}]'
               delay: '0'
-              value_type: CHAR
-              trends: '0'
               description: |
                 MIB: STORMSHIELD-HA-MIB
                 HA licence.
+              valuemap:
+                name: 'STORMSHIELD-HA-MIB::snsHALicence'
               preprocessing:
                 - type: SNMP_WALK_VALUE
                   parameters:
                     - '1.3.6.1.4.1.11256.1.11.7.1.6.{#SNMPINDEX}'
                     - '0'
+                - type: JAVASCRIPT
+                  parameters:
+                    - |
+                      const idx = {
+                      	'slave': 1,
+                      	'master': 2
+                      };
+                      
+                      return typeof idx[value.toLowerCase()] === 'undefined' ? 0 : idx[value.toLowerCase()];
               master_item:
                 key: sns.ha.members.walk
               tags:
@@ -1327,6 +1364,8 @@ zabbix_export:
               description: |
                 MIB: STORMSHIELD-HA-MIB
                 Firewall is online.
+              valuemap:
+                name: 'STORMSHIELD-HA-MIB::snsOnline'
               preprocessing:
                 - type: SNMP_WALK_VALUE
                   parameters:
@@ -1398,8 +1437,6 @@ zabbix_export:
               type: DEPENDENT
               key: 'ha.status[snsHAStatusForced.{#SNMPINDEX}]'
               delay: '0'
-              value_type: CHAR
-              trends: '0'
               description: |
                 MIB: STORMSHIELD-HA-MIB
                 HA status forced:
@@ -1463,16 +1500,30 @@ zabbix_export:
               type: DEPENDENT
               key: 'health.certificates.status[snsCertHealth.{#SNMPINDEX}]'
               delay: '0'
-              value_type: CHAR
-              trends: '0'
               description: |
                 MIB: STORMSHIELD-HEALTH-MONITOR-MIB
                 Stormshield Firewall certificates current health status.
+              valuemap:
+                name: 'STORMSHIELD-HEALTH-MONITOR-MIB::*'
               preprocessing:
                 - type: SNMP_WALK_VALUE
                   parameters:
                     - '1.3.6.1.4.1.11256.1.16.2.1.11.{#SNMPINDEX}'
                     - '0'
+                - type: JAVASCRIPT
+                  parameters:
+                    - |
+                      const idx = {
+                      	'n/a': 1,
+                      	'none': 2,
+                      	'active': 3,
+                      	'passive': 4,
+                      	'major': 5,
+                      	'minor': 6,
+                      	'good': 7
+                      };
+                      
+                      return typeof idx[value.toLowerCase()] === 'undefined' ? 0 : idx[value.toLowerCase()];
               master_item:
                 key: sns.health.walk
               tags:
@@ -1483,19 +1534,33 @@ zabbix_export:
               type: DEPENDENT
               key: 'health.cpu.status[snsCpuHealth.{#SNMPINDEX}]'
               delay: '0'
-              value_type: CHAR
-              trends: '0'
               description: |
                 MIB: STORMSHIELD-HEALTH-MONITOR-MIB
                 Current health status of Stormshield Firewall CPU:
                   - `Good if CPU load <= 90%
                   - `Minor` if CPU load > 90% during a time lower than 5 minutes
                   - `Major` if CPU load > 90% during a time higher than 5 minutes.
+              valuemap:
+                name: 'STORMSHIELD-HEALTH-MONITOR-MIB::*'
               preprocessing:
                 - type: SNMP_WALK_VALUE
                   parameters:
                     - '1.3.6.1.4.1.11256.1.16.2.1.7.{#SNMPINDEX}'
                     - '0'
+                - type: JAVASCRIPT
+                  parameters:
+                    - |
+                      const idx = {
+                      	'n/a': 1,
+                      	'none': 2,
+                      	'active': 3,
+                      	'passive': 4,
+                      	'major': 5,
+                      	'minor': 6,
+                      	'good': 7
+                      };
+                      
+                      return typeof idx[value.toLowerCase()] === 'undefined' ? 0 : idx[value.toLowerCase()];
               master_item:
                 key: sns.health.walk
               tags:
@@ -1506,19 +1571,33 @@ zabbix_export:
               type: DEPENDENT
               key: 'health.cpu.temperature[snsCpuTempHealth.{#SNMPINDEX}]'
               delay: '0'
-              value_type: CHAR
-              trends: '0'
               description: |
                 MIB: STORMSHIELD-HEALTH-MONITOR-MIB
                 Current health status of Stormshield Firewall CPU temperature:
                   - `Good` if CPU temperature is at least 20°C below max temperature
                   - `Minor` if CPU temperature is 20°C, or less, below max temperature
                   - `Major` if CPU temperature is 5°C below max temperature.
+              valuemap:
+                name: 'STORMSHIELD-HEALTH-MONITOR-MIB::*'
               preprocessing:
                 - type: SNMP_WALK_VALUE
                   parameters:
                     - '1.3.6.1.4.1.11256.1.16.2.1.15.{#SNMPINDEX}'
                     - '0'
+                - type: JAVASCRIPT
+                  parameters:
+                    - |
+                      const idx = {
+                      	'n/a': 1,
+                      	'none': 2,
+                      	'active': 3,
+                      	'passive': 4,
+                      	'major': 5,
+                      	'minor': 6,
+                      	'good': 7
+                      };
+                      
+                      return typeof idx[value.toLowerCase()] === 'undefined' ? 0 : idx[value.toLowerCase()];
               master_item:
                 key: sns.health.walk
               tags:
@@ -1539,16 +1618,30 @@ zabbix_export:
               type: DEPENDENT
               key: 'health.crl.status[snsCRLHealth.{#SNMPINDEX}]'
               delay: '0'
-              value_type: CHAR
-              trends: '0'
               description: |
                 MIB: STORMSHIELD-HEALTH-MONITOR-MIB
                 Current health status of Stormshield firewall CRLs.
+              valuemap:
+                name: 'STORMSHIELD-HEALTH-MONITOR-MIB::*'
               preprocessing:
                 - type: SNMP_WALK_VALUE
                   parameters:
                     - '1.3.6.1.4.1.11256.1.16.2.1.12.{#SNMPINDEX}'
                     - '0'
+                - type: JAVASCRIPT
+                  parameters:
+                    - |
+                      const idx = {
+                      	'n/a': 1,
+                      	'none': 2,
+                      	'active': 3,
+                      	'passive': 4,
+                      	'major': 5,
+                      	'minor': 6,
+                      	'good': 7
+                      };
+                      
+                      return typeof idx[value.toLowerCase()] === 'undefined' ? 0 : idx[value.toLowerCase()];
               master_item:
                 key: sns.health.walk
               tags:
@@ -1559,19 +1652,33 @@ zabbix_export:
               type: DEPENDENT
               key: 'health.disk.status[snsDiskHealth.{#SNMPINDEX}]'
               delay: '0'
-              value_type: CHAR
-              trends: '0'
               description: |
                 MIB: STORMSHIELD-HEALTH-MONITOR-MIB
                 Current health status of Stormshield Firewall disk:
                   - `Good` if the disks work correctly
                   - `Minor` if the disks do not work correctly
                   - `Major` if the disks do not work correctly and has raised an alarm.
+              valuemap:
+                name: 'STORMSHIELD-HEALTH-MONITOR-MIB::*'
               preprocessing:
                 - type: SNMP_WALK_VALUE
                   parameters:
                     - '1.3.6.1.4.1.11256.1.16.2.1.9.{#SNMPINDEX}'
                     - '0'
+                - type: JAVASCRIPT
+                  parameters:
+                    - |
+                      const idx = {
+                      	'n/a': 1,
+                      	'none': 2,
+                      	'active': 3,
+                      	'passive': 4,
+                      	'major': 5,
+                      	'minor': 6,
+                      	'good': 7
+                      };
+                      
+                      return typeof idx[value.toLowerCase()] === 'undefined' ? 0 : idx[value.toLowerCase()];
               master_item:
                 key: sns.health.walk
               tags:
@@ -1592,19 +1699,33 @@ zabbix_export:
               type: DEPENDENT
               key: 'health.fan.status[snsFanHealth.{#SNMPINDEX}]'
               delay: '0'
-              value_type: CHAR
-              trends: '0'
               description: |
                 MIB: STORMSHIELD-HEALTH-MONITOR-MIB
                 Current health status of Stormshield Firewall fans:
                   - `Good` if the fans work correctly
                   - `Minor` if the fans do not work correctly
                   - `Major` if the fans do not work correctly and have raised an alarm.
+              valuemap:
+                name: 'STORMSHIELD-HEALTH-MONITOR-MIB::*'
               preprocessing:
                 - type: SNMP_WALK_VALUE
                   parameters:
                     - '1.3.6.1.4.1.11256.1.16.2.1.6.{#SNMPINDEX}'
                     - '0'
+                - type: JAVASCRIPT
+                  parameters:
+                    - |
+                      const idx = {
+                      	'n/a': 1,
+                      	'none': 2,
+                      	'active': 3,
+                      	'passive': 4,
+                      	'major': 5,
+                      	'minor': 6,
+                      	'good': 7
+                      };
+                      
+                      return typeof idx[value.toLowerCase()] === 'undefined' ? 0 : idx[value.toLowerCase()];
               master_item:
                 key: sns.health.walk
               tags:
@@ -1625,19 +1746,33 @@ zabbix_export:
               type: DEPENDENT
               key: 'health.ha.link.status[snsHaLinkHealth.{#SNMPINDEX}]'
               delay: '0'
-              value_type: CHAR
-              trends: '0'
               description: |
                 MIB: STORMSHIELD-HEALTH-MONITOR-MIB
                 Current health status of Stormshield Firewall HA link:
                   - `Good` if the HA link works correctly
                   - `Minor` if the HA link does not work correctly (may be down)
                   - `Major` if the HA link does not work (down).
+              valuemap:
+                name: 'STORMSHIELD-HEALTH-MONITOR-MIB::*'
               preprocessing:
                 - type: SNMP_WALK_VALUE
                   parameters:
                     - '1.3.6.1.4.1.11256.1.16.2.1.4.{#SNMPINDEX}'
                     - '0'
+                - type: JAVASCRIPT
+                  parameters:
+                    - |
+                      const idx = {
+                      	'n/a': 1,
+                      	'none': 2,
+                      	'active': 3,
+                      	'passive': 4,
+                      	'major': 5,
+                      	'minor': 6,
+                      	'good': 7
+                      };
+                      
+                      return typeof idx[value.toLowerCase()] === 'undefined' ? 0 : idx[value.toLowerCase()];
               master_item:
                 key: sns.health.walk
               tags:
@@ -1658,19 +1793,29 @@ zabbix_export:
               type: DEPENDENT
               key: 'health.ha.mode.status[snsHaModeHealth.{#SNMPINDEX}]'
               delay: '0'
-              value_type: CHAR
-              trends: '0'
               description: |
                 MIB: STORMSHIELD-HEALTH-MONITOR-MIB
                 Current status of Stormshield Firewall HA mode:
                   - `None` if HA is not active
                   - `Active` if the firewall is the active one
                   - `Passive` if the firewall is the passive one.
+              valuemap:
+                name: 'STORMSHIELD-HEALTH-MONITOR-MIB::*'
               preprocessing:
                 - type: SNMP_WALK_VALUE
                   parameters:
                     - '1.3.6.1.4.1.11256.1.16.2.1.3.{#SNMPINDEX}'
                     - '0'
+                - type: JAVASCRIPT
+                  parameters:
+                    - |
+                      const idx = {
+                      	'none': 1,
+                      	'passive': 2,
+                      	'active': 3,
+                      };
+                      
+                      return typeof idx[value.toLowerCase()] === 'undefined' ? 0 : idx[value.toLowerCase()];
               master_item:
                 key: sns.health.walk
               tags:
@@ -1681,19 +1826,33 @@ zabbix_export:
               type: DEPENDENT
               key: 'health.memory.status[snsMemHealth.{#SNMPINDEX}]'
               delay: '0'
-              value_type: CHAR
-              trends: '0'
               description: |
                 MIB: STORMSHIELD-HEALTH-MONITOR-MIB
                 Current health status of Stormshield Firewall memory:
                   - `Good` if memory load <= 80%
                   - `Minor` if memory load > 80% during a time lower than 15 minutes
                   - `Major` if memory load > 80% during a time higher than 15 minutes.
+              valuemap:
+                name: 'STORMSHIELD-HEALTH-MONITOR-MIB::*'
               preprocessing:
                 - type: SNMP_WALK_VALUE
                   parameters:
                     - '1.3.6.1.4.1.11256.1.16.2.1.8.{#SNMPINDEX}'
                     - '0'
+                - type: JAVASCRIPT
+                  parameters:
+                    - |
+                      const idx = {
+                      	'n/a': 1,
+                      	'none': 2,
+                      	'active': 3,
+                      	'passive': 4,
+                      	'major': 5,
+                      	'minor': 6,
+                      	'good': 7
+                      };
+                      
+                      return typeof idx[value.toLowerCase()] === 'undefined' ? 0 : idx[value.toLowerCase()];
               master_item:
                 key: sns.health.walk
               tags:
@@ -1704,19 +1863,33 @@ zabbix_export:
               type: DEPENDENT
               key: 'health.password.status[snsPasswdHealth.{#SNMPINDEX}]'
               delay: '0'
-              value_type: CHAR
-              trends: '0'
               description: |
                 MIB: STORMSHIELD-HEALTH-MONITOR-MIB
                 Current health status of Stormshield Firewall Admin Password:
                   - `Good` if the date on which the admin password was last changed is less than a year ago
                   - `Minor` if the date on which the admin password was last changed is more than a year ago
                   - `Major` if the admin password is the default password.
+              valuemap:
+                name: 'STORMSHIELD-HEALTH-MONITOR-MIB::*'
               preprocessing:
                 - type: SNMP_WALK_VALUE
                   parameters:
                     - '1.3.6.1.4.1.11256.1.16.2.1.14.{#SNMPINDEX}'
                     - '0'
+                - type: JAVASCRIPT
+                  parameters:
+                    - |
+                      const idx = {
+                      	'n/a': 1,
+                      	'none': 2,
+                      	'active': 3,
+                      	'passive': 4,
+                      	'major': 5,
+                      	'minor': 6,
+                      	'good': 7
+                      };
+                      
+                      return typeof idx[value.toLowerCase()] === 'undefined' ? 0 : idx[value.toLowerCase()];
               master_item:
                 key: sns.health.walk
               tags:
@@ -1737,19 +1910,33 @@ zabbix_export:
               type: DEPENDENT
               key: 'health.power.status[snsPowerSupplyHealth.{#SNMPINDEX}]'
               delay: '0'
-              value_type: CHAR
-              trends: '0'
               description: |
                 MIB: STORMSHIELD-HEALTH-MONITOR-MIB
                 Current health status of Stormshield Firewall power supply:
                   - `Good` if the power supply works correctly
                   - `Minor` if the power supply does not work correctly
                   - `Major` if the power supply does not work correctly and has raised an alarm.
+              valuemap:
+                name: 'STORMSHIELD-HEALTH-MONITOR-MIB::*'
               preprocessing:
                 - type: SNMP_WALK_VALUE
                   parameters:
                     - '1.3.6.1.4.1.11256.1.16.2.1.5.{#SNMPINDEX}'
                     - '0'
+                - type: JAVASCRIPT
+                  parameters:
+                    - |
+                      const idx = {
+                      	'n/a': 1,
+                      	'none': 2,
+                      	'active': 3,
+                      	'passive': 4,
+                      	'major': 5,
+                      	'minor': 6,
+                      	'good': 7
+                      };
+                      
+                      return typeof idx[value.toLowerCase()] === 'undefined' ? 0 : idx[value.toLowerCase()];
               master_item:
                 key: sns.health.walk
               tags:
@@ -1770,19 +1957,33 @@ zabbix_export:
               type: DEPENDENT
               key: 'health.raid.status[snsRaidHealth.{#SNMPINDEX}]'
               delay: '0'
-              value_type: CHAR
-              trends: '0'
               description: |
                 MIB: STORMSHIELD-HEALTH-MONITOR-MIB
                 Current health status of Stormshield Firewall raid:
                   - `Good` if the raid works in optimal mode
                   - `Minor` if the raid does not work in optimal mode
                   - `Major` if the raid does not work in optimal mode and has raised an alarm.
+              valuemap:
+                name: 'STORMSHIELD-HEALTH-MONITOR-MIB::*'
               preprocessing:
                 - type: SNMP_WALK_VALUE
                   parameters:
                     - '1.3.6.1.4.1.11256.1.16.2.1.10.{#SNMPINDEX}'
                     - '0'
+                - type: JAVASCRIPT
+                  parameters:
+                    - |
+                      const idx = {
+                      	'n/a': 1,
+                      	'none': 2,
+                      	'active': 3,
+                      	'passive': 4,
+                      	'major': 5,
+                      	'minor': 6,
+                      	'good': 7
+                      };
+                      
+                      return typeof idx[value.toLowerCase()] === 'undefined' ? 0 : idx[value.toLowerCase()];
               master_item:
                 key: sns.health.walk
               tags:
@@ -2234,6 +2435,8 @@ zabbix_export:
               description: |
                 MIB: STORMSHIELD-SYSTEM-MONITOR-MIB
                 Metric that shows if the power supply is powered by electricity.
+              valuemap:
+                name: 'STORMSHIELD-SYSTEM-MONITOR-MIB::snsPowerSupplyPowered'
               preprocessing:
                 - type: SNMP_WALK_VALUE
                   parameters:
@@ -2249,16 +2452,28 @@ zabbix_export:
               type: DEPENDENT
               key: 'system.psu.status[snsPowerSupplyStatus.{#SNMPINDEX}]'
               delay: '0'
-              value_type: CHAR
-              trends: '0'
               description: |
                 MIB: STORMSHIELD-SYSTEM-MONITOR-MIB
                 Metric that shows what is the status of the power supply.
+              valuemap:
+                name: 'STORMSHIELD-SYSTEM-MONITOR-MIB::snsPowerSupplyStatus'
               preprocessing:
                 - type: SNMP_WALK_VALUE
                   parameters:
                     - '1.3.6.1.4.1.11256.1.10.6.1.3.{#SNMPINDEX}'
                     - '0'
+                - type: JAVASCRIPT
+                  parameters:
+                    - |
+                      const idx = {
+                      	'notfound': 1,
+                      	'dummy': 2,
+                      	'optional_not_powered': 3,
+                      	'failed': 4,
+                      	'ok': 5
+                      };
+                      
+                      return typeof idx[value.toLowerCase()] === 'undefined' ? 0 : idx[value.toLowerCase()];
               master_item:
                 key: sns.psu.walk
               tags:
@@ -2413,16 +2628,30 @@ zabbix_export:
               type: DEPENDENT
               key: 'system.update.state[snsAutoupdateState.{#SNMPINDEX}]'
               delay: '0'
-              value_type: CHAR
-              trends: '0'
               description: |
                 MIB: STORMSHIELD-AUTOUPDATE-MIB
                 State of the update of a subsystem.
+              valuemap:
+                name: 'STORMSHIELD-AUTOUPDATE-MIB::snsAutoupdateState'
               preprocessing:
                 - type: SNMP_WALK_VALUE
                   parameters:
                     - '1.3.6.1.4.1.11256.1.9.1.1.3.{#SNMPINDEX}'
                     - '0'
+                - type: JAVASCRIPT
+                  parameters:
+                    - |
+                      const idx = {
+                      	'never started': 1,
+                      	'not available': 2,
+                      	'running': 3,
+                      	'broken': 4,
+                      	'failed': 5,
+                      	'uptodate': 6,
+                      	'manually uptodate': 7
+                      };
+                      
+                      return typeof idx[value.toLowerCase()] === 'undefined' ? 0 : idx[value.toLowerCase()];
               master_item:
                 key: sns.update.auto.walk
               tags:
@@ -2509,6 +2738,7 @@ zabbix_export:
       dashboards:
         - uuid: 68b246ab40c24a9f9057d58bcea37cac
           name: Main
+          auto_start: 'NO'
           pages:
             - name: Overview
               display_period: '60'
@@ -3706,11 +3936,20 @@ zabbix_export:
                       name: secondary_label_decimal_places
                       value: '0'
                     - type: INTEGER
+                      name: secondary_label_size
+                      value: '25'
+                    - type: INTEGER
                       name: secondary_label_size_type
                       value: '1'
                     - type: INTEGER
                       name: secondary_label_units_show
                       value: '0'
+                    - type: STRING
+                      name: thresholds.0.color
+                      value: 0EC9AC
+                    - type: STRING
+                      name: thresholds.0.threshold
+                      value: '1'
                 - type: honeycomb
                   name: 'RAID status'
                   'y': '6'
@@ -3733,11 +3972,35 @@ zabbix_export:
                       name: reference
                       value: DSKRS
                     - type: INTEGER
+                      name: secondary_label_decimal_places
+                      value: '0'
+                    - type: INTEGER
+                      name: secondary_label_size
+                      value: '25'
+                    - type: INTEGER
                       name: secondary_label_size_type
                       value: '1'
                     - type: INTEGER
                       name: secondary_label_units_show
                       value: '0'
+                    - type: STRING
+                      name: thresholds.0.color
+                      value: FF465C
+                    - type: STRING
+                      name: thresholds.0.threshold
+                      value: '1'
+                    - type: STRING
+                      name: thresholds.1.color
+                      value: FFD54F
+                    - type: STRING
+                      name: thresholds.1.threshold
+                      value: '2'
+                    - type: STRING
+                      name: thresholds.2.color
+                      value: 0EC9AC
+                    - type: STRING
+                      name: thresholds.2.threshold
+                      value: '3'
                 - type: honeycomb
                   name: 'SMART info test result'
                   'y': '9'
@@ -3760,11 +4023,29 @@ zabbix_export:
                       name: reference
                       value: DSKSM
                     - type: INTEGER
+                      name: secondary_label_decimal_places
+                      value: '0'
+                    - type: INTEGER
+                      name: secondary_label_size
+                      value: '25'
+                    - type: INTEGER
                       name: secondary_label_size_type
                       value: '1'
                     - type: INTEGER
                       name: secondary_label_units_show
                       value: '0'
+                    - type: STRING
+                      name: thresholds.0.color
+                      value: 0EC9AC
+                    - type: STRING
+                      name: thresholds.0.threshold
+                      value: '1'
+                    - type: STRING
+                      name: thresholds.1.color
+                      value: FF465C
+                    - type: STRING
+                      name: thresholds.1.threshold
+                      value: '2'
             - name: Fan
               widgets:
                 - type: honeycomb
@@ -3788,11 +4069,29 @@ zabbix_export:
                       name: reference
                       value: FANST
                     - type: INTEGER
+                      name: secondary_label_decimal_places
+                      value: '0'
+                    - type: INTEGER
+                      name: secondary_label_size
+                      value: '25'
+                    - type: INTEGER
                       name: secondary_label_size_type
                       value: '1'
                     - type: INTEGER
                       name: secondary_label_units_show
                       value: '0'
+                    - type: STRING
+                      name: thresholds.0.color
+                      value: FF465C
+                    - type: STRING
+                      name: thresholds.0.threshold
+                      value: '1'
+                    - type: STRING
+                      name: thresholds.1.color
+                      value: 0EC9AC
+                    - type: STRING
+                      name: thresholds.1.threshold
+                      value: '2'
                 - type: honeycomb
                   name: 'Fan speed'
                   'y': '3'
@@ -3847,6 +4146,97 @@ zabbix_export:
                     - type: INTEGER
                       name: working_time
                       value: '1'
+            - name: PSU
+              widgets:
+                - type: honeycomb
+                  name: 'PSU power status'
+                  width: '72'
+                  height: '3'
+                  fields:
+                    - type: STRING
+                      name: items.0
+                      value: 'PSU*: Power status'
+                    - type: STRING
+                      name: primary_label
+                      value: '{{ITEM.NAME}.regsub("PSU\s\[(.+)\].*", PSU \1)}'
+                    - type: INTEGER
+                      name: primary_label_size
+                      value: '25'
+                    - type: INTEGER
+                      name: primary_label_size_type
+                      value: '1'
+                    - type: STRING
+                      name: reference
+                      value: PSUPS
+                    - type: INTEGER
+                      name: secondary_label_decimal_places
+                      value: '0'
+                    - type: INTEGER
+                      name: secondary_label_size
+                      value: '25'
+                    - type: INTEGER
+                      name: secondary_label_size_type
+                      value: '1'
+                    - type: INTEGER
+                      name: secondary_label_units_show
+                      value: '0'
+                    - type: STRING
+                      name: thresholds.0.color
+                      value: FF465C
+                    - type: STRING
+                      name: thresholds.0.threshold
+                      value: '0'
+                    - type: STRING
+                      name: thresholds.1.color
+                      value: 0EC9AC
+                    - type: STRING
+                      name: thresholds.1.threshold
+                      value: '1'
+                - type: honeycomb
+                  name: 'PSU status'
+                  'y': '3'
+                  width: '72'
+                  height: '3'
+                  fields:
+                    - type: STRING
+                      name: items.0
+                      value: 'PSU*: Status'
+                    - type: STRING
+                      name: primary_label
+                      value: '{{ITEM.NAME}.regsub("PSU\s\[(.+)\].*", PSU \1)}'
+                    - type: INTEGER
+                      name: primary_label_size
+                      value: '25'
+                    - type: INTEGER
+                      name: primary_label_size_type
+                      value: '1'
+                    - type: STRING
+                      name: reference
+                      value: PSUST
+                    - type: INTEGER
+                      name: secondary_label_decimal_places
+                      value: '0'
+                    - type: INTEGER
+                      name: secondary_label_size
+                      value: '25'
+                    - type: INTEGER
+                      name: secondary_label_size_type
+                      value: '1'
+                    - type: INTEGER
+                      name: secondary_label_units_show
+                      value: '0'
+                    - type: STRING
+                      name: thresholds.0.color
+                      value: FF465C
+                    - type: STRING
+                      name: thresholds.0.threshold
+                      value: '4'
+                    - type: STRING
+                      name: thresholds.1.color
+                      value: 0EC9AC
+                    - type: STRING
+                      name: thresholds.1.threshold
+                      value: '5'
             - name: HA
               widgets:
                 - type: item
@@ -4064,11 +4454,26 @@ zabbix_export:
                       name: reference
                       value: HAHON
                     - type: INTEGER
+                      name: secondary_label_decimal_places
+                      value: '0'
+                    - type: INTEGER
                       name: secondary_label_size_type
                       value: '1'
                     - type: INTEGER
                       name: secondary_label_units_show
                       value: '0'
+                    - type: STRING
+                      name: thresholds.0.color
+                      value: FF465C
+                    - type: STRING
+                      name: thresholds.0.threshold
+                      value: '0'
+                    - type: STRING
+                      name: thresholds.1.color
+                      value: 0EC9AC
+                    - type: STRING
+                      name: thresholds.1.threshold
+                      value: '1'
                 - type: honeycomb
                   name: 'HA quality'
                   x: '24'
@@ -4091,6 +4496,9 @@ zabbix_export:
                     - type: STRING
                       name: reference
                       value: HAHQL
+                    - type: INTEGER
+                      name: secondary_label_decimal_places
+                      value: '0'
                     - type: INTEGER
                       name: secondary_label_size_type
                       value: '1'
@@ -4120,6 +4528,9 @@ zabbix_export:
                       name: reference
                       value: HAHPR
                     - type: INTEGER
+                      name: secondary_label_decimal_places
+                      value: '0'
+                    - type: INTEGER
                       name: secondary_label_size_type
                       value: '1'
                     - type: INTEGER
@@ -4148,6 +4559,9 @@ zabbix_export:
                       name: reference
                       value: HAHFS
                     - type: INTEGER
+                      name: secondary_label_decimal_places
+                      value: '0'
+                    - type: INTEGER
                       name: secondary_label_units_show
                       value: '0'
             - name: Auto-update
@@ -4170,6 +4584,9 @@ zabbix_export:
                       name: reference
                       value: AUUST
                     - type: INTEGER
+                      name: secondary_label_decimal_places
+                      value: '0'
+                    - type: INTEGER
                       name: secondary_label_size
                       value: '20'
                     - type: INTEGER
@@ -4178,6 +4595,18 @@ zabbix_export:
                     - type: INTEGER
                       name: secondary_label_units_show
                       value: '0'
+                    - type: STRING
+                      name: thresholds.0.color
+                      value: FF465C
+                    - type: STRING
+                      name: thresholds.0.threshold
+                      value: '4'
+                    - type: STRING
+                      name: thresholds.1.color
+                      value: 0EC9AC
+                    - type: STRING
+                      name: thresholds.1.threshold
+                      value: '6'
                 - type: honeycomb
                   name: 'Last update date'
                   'y': '6'
@@ -4403,10 +4832,36 @@ zabbix_export:
                     - type: INTEGER
                       name: value_size
                       value: '25'
-            - name: 'ASQ & Filtering'
+            - name: 'Policies & ASQ'
               widgets:
                 - type: item
+                  name: Policies
+                  width: '14'
+                  hide_header: 'YES'
+                  fields:
+                    - type: STRING
+                      name: description
+                      value: Policies
+                    - type: INTEGER
+                      name: desc_bold
+                      value: '1'
+                    - type: INTEGER
+                      name: desc_size
+                      value: '35'
+                    - type: INTEGER
+                      name: desc_v_pos
+                      value: '1'
+                    - type: ITEM
+                      name: itemid.0
+                      value:
+                        host: 'Stormshield SNS by SNMP'
+                        key: 'policy.filter[snsPolicySlotName]'
+                    - type: INTEGER
+                      name: show.0
+                      value: '1'
+                - type: item
                   name: 'Active filtering policy name'
+                  'y': '2'
                   width: '14'
                   hide_header: 'YES'
                   fields:
@@ -4432,7 +4887,7 @@ zabbix_export:
                       value: '25'
                 - type: item
                   name: 'Active IPsec policy name'
-                  'y': '2'
+                  'y': '4'
                   width: '14'
                   hide_header: 'YES'
                   fields:
@@ -4457,8 +4912,35 @@ zabbix_export:
                       name: value_size
                       value: '25'
                 - type: item
+                  name: ASQ
+                  x: '16'
+                  width: '28'
+                  hide_header: 'YES'
+                  fields:
+                    - type: STRING
+                      name: description
+                      value: ASQ
+                    - type: INTEGER
+                      name: desc_bold
+                      value: '1'
+                    - type: INTEGER
+                      name: desc_size
+                      value: '35'
+                    - type: INTEGER
+                      name: desc_v_pos
+                      value: '1'
+                    - type: ITEM
+                      name: itemid.0
+                      value:
+                        host: 'Stormshield SNS by SNMP'
+                        key: 'asq.alarm.stateful[snsASQStatsStatefulMajorAlarm.0]'
+                    - type: INTEGER
+                      name: show.0
+                      value: '1'
+                - type: item
                   name: 'ASQ major alarm count'
-                  x: '14'
+                  x: '16'
+                  'y': '2'
                   width: '14'
                   hide_header: 'YES'
                   fields:
@@ -4487,8 +4969,8 @@ zabbix_export:
                       value: '25'
                 - type: item
                   name: 'ASQ minor alarm count'
-                  x: '14'
-                  'y': '2'
+                  x: '16'
+                  'y': '4'
                   width: '14'
                   hide_header: 'YES'
                   fields:
@@ -4517,7 +4999,8 @@ zabbix_export:
                       value: '25'
                 - type: item
                   name: 'ASQ TCP connection count'
-                  x: '28'
+                  x: '30'
+                  'y': '2'
                   width: '14'
                   hide_header: 'YES'
                   fields:
@@ -4546,8 +5029,8 @@ zabbix_export:
                       value: '25'
                 - type: item
                   name: 'ASQ UDP connection count'
-                  x: '28'
-                  'y': '2'
+                  x: '30'
+                  'y': '4'
                   width: '14'
                   hide_header: 'YES'
                   fields:
@@ -4577,13 +5060,13 @@ zabbix_export:
             - name: 'Health status'
               widgets:
                 - type: honeycomb
-                  name: 'Health status'
-                  width: '72'
-                  height: '9'
+                  name: 'Admin password'
+                  width: '24'
+                  height: '3'
                   fields:
                     - type: STRING
                       name: items.0
-                      value: 'Health status firewall [*]: *'
+                      value: 'Health status firewall [*]: Admin password'
                     - type: STRING
                       name: primary_label
                       value: '{{ITEM.NAME}.regsub("Health status firewall\s\[(.+)\]:\s(.*)", #\1 \2)}'
@@ -4592,7 +5075,10 @@ zabbix_export:
                       value: '1'
                     - type: STRING
                       name: reference
-                      value: HSTFW
+                      value: HSTAP
+                    - type: INTEGER
+                      name: secondary_label_decimal_places
+                      value: '0'
                     - type: INTEGER
                       name: secondary_label_size
                       value: '20'
@@ -4602,6 +5088,558 @@ zabbix_export:
                     - type: INTEGER
                       name: secondary_label_units_show
                       value: '0'
+                    - type: STRING
+                      name: thresholds.0.color
+                      value: FF465C
+                    - type: STRING
+                      name: thresholds.0.threshold
+                      value: '5'
+                    - type: STRING
+                      name: thresholds.1.color
+                      value: FFD54F
+                    - type: STRING
+                      name: thresholds.1.threshold
+                      value: '6'
+                    - type: STRING
+                      name: thresholds.2.color
+                      value: 0EC9AC
+                    - type: STRING
+                      name: thresholds.2.threshold
+                      value: '7'
+                - type: honeycomb
+                  name: Certificates
+                  'y': '3'
+                  width: '24'
+                  height: '3'
+                  fields:
+                    - type: STRING
+                      name: items.0
+                      value: 'Health status firewall [*]: Certificates'
+                    - type: STRING
+                      name: primary_label
+                      value: '{{ITEM.NAME}.regsub("Health status firewall\s\[(.+)\]:\s(.*)", #\1 \2)}'
+                    - type: INTEGER
+                      name: primary_label_size_type
+                      value: '1'
+                    - type: STRING
+                      name: reference
+                      value: HSTCR
+                    - type: INTEGER
+                      name: secondary_label_decimal_places
+                      value: '0'
+                    - type: INTEGER
+                      name: secondary_label_size
+                      value: '20'
+                    - type: INTEGER
+                      name: secondary_label_size_type
+                      value: '1'
+                    - type: INTEGER
+                      name: secondary_label_units_show
+                      value: '0'
+                    - type: STRING
+                      name: thresholds.0.color
+                      value: FF465C
+                    - type: STRING
+                      name: thresholds.0.threshold
+                      value: '5'
+                    - type: STRING
+                      name: thresholds.1.color
+                      value: FFD54F
+                    - type: STRING
+                      name: thresholds.1.threshold
+                      value: '6'
+                    - type: STRING
+                      name: thresholds.2.color
+                      value: 0EC9AC
+                    - type: STRING
+                      name: thresholds.2.threshold
+                      value: '7'
+                - type: honeycomb
+                  name: CPU
+                  'y': '6'
+                  width: '24'
+                  height: '3'
+                  fields:
+                    - type: STRING
+                      name: items.0
+                      value: 'Health status firewall [*]: CPU'
+                    - type: STRING
+                      name: primary_label
+                      value: '{{ITEM.NAME}.regsub("Health status firewall\s\[(.+)\]:\s(.*)", #\1 \2)}'
+                    - type: INTEGER
+                      name: primary_label_size_type
+                      value: '1'
+                    - type: STRING
+                      name: reference
+                      value: HSTCU
+                    - type: INTEGER
+                      name: secondary_label_decimal_places
+                      value: '0'
+                    - type: INTEGER
+                      name: secondary_label_size
+                      value: '20'
+                    - type: INTEGER
+                      name: secondary_label_size_type
+                      value: '1'
+                    - type: INTEGER
+                      name: secondary_label_units_show
+                      value: '0'
+                    - type: STRING
+                      name: thresholds.0.color
+                      value: FF465C
+                    - type: STRING
+                      name: thresholds.0.threshold
+                      value: '5'
+                    - type: STRING
+                      name: thresholds.1.color
+                      value: FFD54F
+                    - type: STRING
+                      name: thresholds.1.threshold
+                      value: '6'
+                    - type: STRING
+                      name: thresholds.2.color
+                      value: 0EC9AC
+                    - type: STRING
+                      name: thresholds.2.threshold
+                      value: '7'
+                - type: honeycomb
+                  name: 'CPU temperature'
+                  'y': '9'
+                  width: '24'
+                  height: '3'
+                  fields:
+                    - type: STRING
+                      name: items.0
+                      value: 'Health status firewall [*]: CPU temperature'
+                    - type: STRING
+                      name: primary_label
+                      value: '{{ITEM.NAME}.regsub("Health status firewall\s\[(.+)\]:\s(.*)", #\1 \2)}'
+                    - type: INTEGER
+                      name: primary_label_size_type
+                      value: '1'
+                    - type: STRING
+                      name: reference
+                      value: HSTCT
+                    - type: INTEGER
+                      name: secondary_label_decimal_places
+                      value: '0'
+                    - type: INTEGER
+                      name: secondary_label_size
+                      value: '20'
+                    - type: INTEGER
+                      name: secondary_label_size_type
+                      value: '1'
+                    - type: INTEGER
+                      name: secondary_label_units_show
+                      value: '0'
+                    - type: STRING
+                      name: thresholds.0.color
+                      value: FF465C
+                    - type: STRING
+                      name: thresholds.0.threshold
+                      value: '5'
+                    - type: STRING
+                      name: thresholds.1.color
+                      value: FFD54F
+                    - type: STRING
+                      name: thresholds.1.threshold
+                      value: '6'
+                    - type: STRING
+                      name: thresholds.2.color
+                      value: 0EC9AC
+                    - type: STRING
+                      name: thresholds.2.threshold
+                      value: '7'
+                - type: honeycomb
+                  name: CRLs
+                  x: '24'
+                  width: '24'
+                  height: '3'
+                  fields:
+                    - type: STRING
+                      name: items.0
+                      value: 'Health status firewall [*]: CRLs'
+                    - type: STRING
+                      name: primary_label
+                      value: '{{ITEM.NAME}.regsub("Health status firewall\s\[(.+)\]:\s(.*)", #\1 \2)}'
+                    - type: INTEGER
+                      name: primary_label_size_type
+                      value: '1'
+                    - type: STRING
+                      name: reference
+                      value: HSTCL
+                    - type: INTEGER
+                      name: secondary_label_decimal_places
+                      value: '0'
+                    - type: INTEGER
+                      name: secondary_label_size
+                      value: '20'
+                    - type: INTEGER
+                      name: secondary_label_size_type
+                      value: '1'
+                    - type: INTEGER
+                      name: secondary_label_units_show
+                      value: '0'
+                    - type: STRING
+                      name: thresholds.0.color
+                      value: FF465C
+                    - type: STRING
+                      name: thresholds.0.threshold
+                      value: '5'
+                    - type: STRING
+                      name: thresholds.1.color
+                      value: FFD54F
+                    - type: STRING
+                      name: thresholds.1.threshold
+                      value: '6'
+                    - type: STRING
+                      name: thresholds.2.color
+                      value: 0EC9AC
+                    - type: STRING
+                      name: thresholds.2.threshold
+                      value: '7'
+                - type: honeycomb
+                  name: Disk
+                  x: '24'
+                  'y': '3'
+                  width: '24'
+                  height: '3'
+                  fields:
+                    - type: STRING
+                      name: items.0
+                      value: 'Health status firewall [*]: Disk'
+                    - type: STRING
+                      name: primary_label
+                      value: '{{ITEM.NAME}.regsub("Health status firewall\s\[(.+)\]:\s(.*)", #\1 \2)}'
+                    - type: INTEGER
+                      name: primary_label_size_type
+                      value: '1'
+                    - type: STRING
+                      name: reference
+                      value: HSTDS
+                    - type: INTEGER
+                      name: secondary_label_decimal_places
+                      value: '0'
+                    - type: INTEGER
+                      name: secondary_label_size
+                      value: '20'
+                    - type: INTEGER
+                      name: secondary_label_size_type
+                      value: '1'
+                    - type: INTEGER
+                      name: secondary_label_units_show
+                      value: '0'
+                    - type: STRING
+                      name: thresholds.0.color
+                      value: FF465C
+                    - type: STRING
+                      name: thresholds.0.threshold
+                      value: '5'
+                    - type: STRING
+                      name: thresholds.1.color
+                      value: FFD54F
+                    - type: STRING
+                      name: thresholds.1.threshold
+                      value: '6'
+                    - type: STRING
+                      name: thresholds.2.color
+                      value: 0EC9AC
+                    - type: STRING
+                      name: thresholds.2.threshold
+                      value: '7'
+                - type: honeycomb
+                  name: Fans
+                  x: '24'
+                  'y': '6'
+                  width: '24'
+                  height: '3'
+                  fields:
+                    - type: STRING
+                      name: items.0
+                      value: 'Health status firewall [*]: Fans'
+                    - type: STRING
+                      name: primary_label
+                      value: '{{ITEM.NAME}.regsub("Health status firewall\s\[(.+)\]:\s(.*)", #\1 \2)}'
+                    - type: INTEGER
+                      name: primary_label_size_type
+                      value: '1'
+                    - type: STRING
+                      name: reference
+                      value: HSTFN
+                    - type: INTEGER
+                      name: secondary_label_decimal_places
+                      value: '0'
+                    - type: INTEGER
+                      name: secondary_label_size
+                      value: '20'
+                    - type: INTEGER
+                      name: secondary_label_size_type
+                      value: '1'
+                    - type: INTEGER
+                      name: secondary_label_units_show
+                      value: '0'
+                    - type: STRING
+                      name: thresholds.0.color
+                      value: FF465C
+                    - type: STRING
+                      name: thresholds.0.threshold
+                      value: '5'
+                    - type: STRING
+                      name: thresholds.1.color
+                      value: FFD54F
+                    - type: STRING
+                      name: thresholds.1.threshold
+                      value: '6'
+                    - type: STRING
+                      name: thresholds.2.color
+                      value: 0EC9AC
+                    - type: STRING
+                      name: thresholds.2.threshold
+                      value: '7'
+                - type: honeycomb
+                  name: 'HA link'
+                  x: '24'
+                  'y': '9'
+                  width: '24'
+                  height: '3'
+                  fields:
+                    - type: STRING
+                      name: items.0
+                      value: 'Health status firewall [*]: HA link'
+                    - type: STRING
+                      name: primary_label
+                      value: '{{ITEM.NAME}.regsub("Health status firewall\s\[(.+)\]:\s(.*)", #\1 \2)}'
+                    - type: INTEGER
+                      name: primary_label_size_type
+                      value: '1'
+                    - type: STRING
+                      name: reference
+                      value: HSTHL
+                    - type: INTEGER
+                      name: secondary_label_decimal_places
+                      value: '0'
+                    - type: INTEGER
+                      name: secondary_label_size
+                      value: '20'
+                    - type: INTEGER
+                      name: secondary_label_size_type
+                      value: '1'
+                    - type: INTEGER
+                      name: secondary_label_units_show
+                      value: '0'
+                    - type: STRING
+                      name: thresholds.0.color
+                      value: FF465C
+                    - type: STRING
+                      name: thresholds.0.threshold
+                      value: '5'
+                    - type: STRING
+                      name: thresholds.1.color
+                      value: FFD54F
+                    - type: STRING
+                      name: thresholds.1.threshold
+                      value: '6'
+                    - type: STRING
+                      name: thresholds.2.color
+                      value: 0EC9AC
+                    - type: STRING
+                      name: thresholds.2.threshold
+                      value: '7'
+                - type: honeycomb
+                  name: 'HA mode'
+                  x: '48'
+                  width: '24'
+                  height: '3'
+                  fields:
+                    - type: STRING
+                      name: items.0
+                      value: 'Health status firewall [*]: HA mode'
+                    - type: STRING
+                      name: primary_label
+                      value: '{{ITEM.NAME}.regsub("Health status firewall\s\[(.+)\]:\s(.*)", #\1 \2)}'
+                    - type: INTEGER
+                      name: primary_label_size_type
+                      value: '1'
+                    - type: STRING
+                      name: reference
+                      value: HSTHM
+                    - type: INTEGER
+                      name: secondary_label_decimal_places
+                      value: '0'
+                    - type: INTEGER
+                      name: secondary_label_size
+                      value: '20'
+                    - type: INTEGER
+                      name: secondary_label_size_type
+                      value: '1'
+                    - type: INTEGER
+                      name: secondary_label_units_show
+                      value: '0'
+                    - type: STRING
+                      name: thresholds.0.color
+                      value: FF465C
+                    - type: STRING
+                      name: thresholds.0.threshold
+                      value: '5'
+                    - type: STRING
+                      name: thresholds.1.color
+                      value: FFD54F
+                    - type: STRING
+                      name: thresholds.1.threshold
+                      value: '6'
+                    - type: STRING
+                      name: thresholds.2.color
+                      value: 0EC9AC
+                    - type: STRING
+                      name: thresholds.2.threshold
+                      value: '7'
+                - type: honeycomb
+                  name: Memory
+                  x: '48'
+                  'y': '3'
+                  width: '24'
+                  height: '3'
+                  fields:
+                    - type: STRING
+                      name: items.0
+                      value: 'Health status firewall [*]: Memory'
+                    - type: STRING
+                      name: primary_label
+                      value: '{{ITEM.NAME}.regsub("Health status firewall\s\[(.+)\]:\s(.*)", #\1 \2)}'
+                    - type: INTEGER
+                      name: primary_label_size_type
+                      value: '1'
+                    - type: STRING
+                      name: reference
+                      value: HSTMM
+                    - type: INTEGER
+                      name: secondary_label_decimal_places
+                      value: '0'
+                    - type: INTEGER
+                      name: secondary_label_size
+                      value: '20'
+                    - type: INTEGER
+                      name: secondary_label_size_type
+                      value: '1'
+                    - type: INTEGER
+                      name: secondary_label_units_show
+                      value: '0'
+                    - type: STRING
+                      name: thresholds.0.color
+                      value: FF465C
+                    - type: STRING
+                      name: thresholds.0.threshold
+                      value: '5'
+                    - type: STRING
+                      name: thresholds.1.color
+                      value: FFD54F
+                    - type: STRING
+                      name: thresholds.1.threshold
+                      value: '6'
+                    - type: STRING
+                      name: thresholds.2.color
+                      value: 0EC9AC
+                    - type: STRING
+                      name: thresholds.2.threshold
+                      value: '7'
+                - type: honeycomb
+                  name: 'Power supply'
+                  x: '48'
+                  'y': '6'
+                  width: '24'
+                  height: '3'
+                  fields:
+                    - type: STRING
+                      name: items.0
+                      value: 'Health status firewall [*]: Power supply'
+                    - type: STRING
+                      name: primary_label
+                      value: '{{ITEM.NAME}.regsub("Health status firewall\s\[(.+)\]:\s(.*)", #\1 \2)}'
+                    - type: INTEGER
+                      name: primary_label_size_type
+                      value: '1'
+                    - type: STRING
+                      name: reference
+                      value: HSTPS
+                    - type: INTEGER
+                      name: secondary_label_decimal_places
+                      value: '0'
+                    - type: INTEGER
+                      name: secondary_label_size
+                      value: '20'
+                    - type: INTEGER
+                      name: secondary_label_size_type
+                      value: '1'
+                    - type: INTEGER
+                      name: secondary_label_units_show
+                      value: '0'
+                    - type: STRING
+                      name: thresholds.0.color
+                      value: FF465C
+                    - type: STRING
+                      name: thresholds.0.threshold
+                      value: '5'
+                    - type: STRING
+                      name: thresholds.1.color
+                      value: FFD54F
+                    - type: STRING
+                      name: thresholds.1.threshold
+                      value: '6'
+                    - type: STRING
+                      name: thresholds.2.color
+                      value: 0EC9AC
+                    - type: STRING
+                      name: thresholds.2.threshold
+                      value: '7'
+                - type: honeycomb
+                  name: RAID
+                  x: '48'
+                  'y': '9'
+                  width: '24'
+                  height: '3'
+                  fields:
+                    - type: STRING
+                      name: items.0
+                      value: 'Health status firewall [*]: RAID'
+                    - type: STRING
+                      name: primary_label
+                      value: '{{ITEM.NAME}.regsub("Health status firewall\s\[(.+)\]:\s(.*)", #\1 \2)}'
+                    - type: INTEGER
+                      name: primary_label_size_type
+                      value: '1'
+                    - type: STRING
+                      name: reference
+                      value: HSTRD
+                    - type: INTEGER
+                      name: secondary_label_decimal_places
+                      value: '0'
+                    - type: INTEGER
+                      name: secondary_label_size
+                      value: '20'
+                    - type: INTEGER
+                      name: secondary_label_size_type
+                      value: '1'
+                    - type: INTEGER
+                      name: secondary_label_units_show
+                      value: '0'
+                    - type: STRING
+                      name: thresholds.0.color
+                      value: FF465C
+                    - type: STRING
+                      name: thresholds.0.threshold
+                      value: '5'
+                    - type: STRING
+                      name: thresholds.1.color
+                      value: FFD54F
+                    - type: STRING
+                      name: thresholds.1.threshold
+                      value: '6'
+                    - type: STRING
+                      name: thresholds.2.color
+                      value: 0EC9AC
+                    - type: STRING
+                      name: thresholds.2.threshold
+                      value: '7'
       valuemaps:
         - uuid: 1ba10b4dfec646359ae363d8c374667c
           name: 'Host availability'
@@ -4619,6 +5657,34 @@ zabbix_export:
               newvalue: Down
             - value: '1'
               newvalue: Up
+        - uuid: afd4fdd6212547a281a842b806f9b520
+          name: 'STORMSHIELD-AUTOUPDATE-MIB::snsAutoupdateState'
+          mappings:
+            - value: '0'
+              newvalue: Unknown
+            - value: '1'
+              newvalue: 'Never started'
+            - value: '2'
+              newvalue: 'Not available'
+            - value: '3'
+              newvalue: Running
+            - value: '4'
+              newvalue: Broken
+            - value: '5'
+              newvalue: Failed
+            - value: '6'
+              newvalue: 'Up to date'
+            - value: '7'
+              newvalue: 'Manually up to date'
+        - uuid: ee09eb3b1fa049b7bcd9ad51a49d39f4
+          name: 'STORMSHIELD-HA-MIB::snsHALicence'
+          mappings:
+            - value: '0'
+              newvalue: Unknown
+            - value: '1'
+              newvalue: Slave
+            - value: '2'
+              newvalue: Master
         - uuid: 2063c82a4fd54f228655d1c42dd249ce
           name: 'STORMSHIELD-HA-MIB::snsHAStatusForced'
           mappings:
@@ -4641,6 +5707,32 @@ zabbix_export:
               newvalue: 'Not synced'
             - value: '1'
               newvalue: Synced
+        - uuid: 0761fc9c63674cf6914d2d0c36df4391
+          name: 'STORMSHIELD-HA-MIB::snsOnline'
+          mappings:
+            - value: '0'
+              newvalue: 'Not online'
+            - value: '1'
+              newvalue: Online
+        - uuid: 278a31a580424daebcc73cc0f7f75764
+          name: 'STORMSHIELD-HEALTH-MONITOR-MIB::*'
+          mappings:
+            - value: '0'
+              newvalue: Unknown
+            - value: '1'
+              newvalue: N/A
+            - value: '2'
+              newvalue: None
+            - value: '3'
+              newvalue: Active
+            - value: '4'
+              newvalue: Passive
+            - value: '5'
+              newvalue: Major
+            - value: '6'
+              newvalue: Minor
+            - value: '7'
+              newvalue: Good
         - uuid: 0c3077b6a7ab46f29226e493fbf7f60a
           name: 'STORMSHIELD-SYSTEM-MONITOR-MIB::snsDiskEntryIsRaid'
           mappings:
@@ -4648,6 +5740,57 @@ zabbix_export:
               newvalue: 'Not in RAID'
             - value: '1'
               newvalue: 'In RAID'
+        - uuid: 72383baf0804476fb75d1451a344554d
+          name: 'STORMSHIELD-SYSTEM-MONITOR-MIB::snsDiskEntryRaidStatus'
+          mappings:
+            - value: '0'
+              newvalue: Unknown
+            - value: '1'
+              newvalue: Degraded
+            - value: '2'
+              newvalue: Missing
+            - value: '3'
+              newvalue: Optimal
+        - uuid: ac297c469fb348d4ab231e43f935f682
+          name: 'STORMSHIELD-SYSTEM-MONITOR-MIB::snsDiskEntrySmartResult'
+          mappings:
+            - value: '0'
+              newvalue: Unknown
+            - value: '1'
+              newvalue: Passed
+            - value: '2'
+              newvalue: Failed
+        - uuid: 5ae9550fd2cf4c3f8361ca95b82b3c2f
+          name: 'STORMSHIELD-SYSTEM-MONITOR-MIB::snsFanStatus'
+          mappings:
+            - value: '0'
+              newvalue: Unknown
+            - value: '1'
+              newvalue: Failure
+            - value: '2'
+              newvalue: Running
+        - uuid: fc9b6cf135884b0d8dcd4b159304751b
+          name: 'STORMSHIELD-SYSTEM-MONITOR-MIB::snsPowerSupplyPowered'
+          mappings:
+            - value: '0'
+              newvalue: 'Not powered'
+            - value: '1'
+              newvalue: Powered
+        - uuid: 5a30cfb4e78742b0bc421abc334b7953
+          name: 'STORMSHIELD-SYSTEM-MONITOR-MIB::snsPowerSupplyStatus'
+          mappings:
+            - value: '0'
+              newvalue: Unknown
+            - value: '1'
+              newvalue: 'Not found'
+            - value: '2'
+              newvalue: Dummy
+            - value: '3'
+              newvalue: 'Optional not powered'
+            - value: '4'
+              newvalue: Failed
+            - value: '5'
+              newvalue: OK
   graphs:
     - uuid: b975fcc533c24f2d99f03b424cf23779
       name: 'SNS: Memory usage'
