@@ -84,16 +84,21 @@ class CControllerSlaExcludedDowntimeValidate extends CController {
 		$period_from = $datetime_from->getTimestamp();
 		$period_to = $datetime_to->getTimestamp();
 
-		$data = [
-			'body' => [
-				'row_index' => $this->getInput('row_index'),
-				'name' => $this->getInput('name'),
-				'period_from' => $period_from,
-				'period_to' => $period_to,
-				'start_time' => zbx_date2str(DATE_TIME_FORMAT, $period_from),
-				'duration' => convertUnitsS($period_to - $period_from, true)
-			]
-		];
+		if ($period_to > ZBX_MAX_DATE) {
+			$data = ['error' => ['messages' => [_('Excluded downtime duration time exceeds upper limit.')]]];
+		}
+		else {
+			$data = [
+				'body' => [
+					'row_index' => $this->getInput('row_index'),
+					'name' => $this->getInput('name'),
+					'period_from' => $period_from,
+					'period_to' => $period_to,
+					'start_time' => zbx_date2str(DATE_TIME_FORMAT, $period_from),
+					'duration' => convertUnitsS($period_to - $period_from, true)
+				]
+			];
+		}
 
 		if ($this->getDebugMode() == GROUP_DEBUG_MODE_ENABLED) {
 			CProfiler::getInstance()->stop();
