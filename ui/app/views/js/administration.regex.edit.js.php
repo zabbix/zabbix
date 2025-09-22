@@ -334,15 +334,15 @@
 
 		#updateRow({target}) {
 			if (target.classList.contains('js-expression-type-select')) {
-				const delimeter = target.closest('tr').querySelector('.js-expression-delimiter-select');
+				const delimiter = target.closest('tr').querySelector('.js-expression-delimiter-select');
 
 				if (target.value == <?= EXPRESSION_TYPE_ANY_INCLUDED ?>) {
-					delimeter.removeAttribute('disabled');
-					delimeter.classList.remove('<?= ZBX_STYLE_DISPLAY_NONE ?>');
+					delimiter.removeAttribute('disabled');
+					delimiter.classList.remove('<?= ZBX_STYLE_DISPLAY_NONE ?>');
 				}
 				else {
-					delimeter.setAttribute('disabled', true);
-					delimeter.classList.add('<?= ZBX_STYLE_DISPLAY_NONE ?>');
+					delimiter.setAttribute('disabled', true);
+					delimiter.classList.add('<?= ZBX_STYLE_DISPLAY_NONE ?>');
 				}
 			}
 		}
