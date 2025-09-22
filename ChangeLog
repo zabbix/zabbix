@@ -5,7 +5,7 @@ New features:
 ..F....... [ZBXNEXT-9920] introduced the typeface with embedded fonts for current themes and new two themes with classic typeface (ashubin, wczerneha)
 ..F....... [ZBXNEXT-10143] added "Highlight whole row" feature in non-compact mode in Problems (ashubin)
 .........T [ZBXNEXT-10106] extended preprocessor throughput monitoring in Zabbix server/proxy health templates (aiantsen)
-.........T [ZBXNEXT-9819] added a new template Vyatta Virtual Router by SNMP (knaglis)
+.........T [ZBXNEXT-9819] added new template Vyatta Virtual Router by SNMP (knaglis)
 ..F....... [ZBXNEXT-9732] added inline validation to host and template group forms (rgontarski)
 ..F....... [ZBXNEXT-8798] implemented inline validation in macros form (esekace, miks)
 .........T [ZBXNEXT-10051] converted Proxmox VE by HTTP template to nested LLD (abakaldin)
@@ -200,7 +200,7 @@ Changes for 7.4.3rc1
 New features:
 ..F....... [ZBXNEXT-10143] added "Highlight whole row" feature in non-compact mode in Problems (ashubin)
 .........T [ZBXNEXT-10106] extended preprocessor throughput monitoring in Zabbix server/proxy health templates (aiantsen)
-.........T [ZBXNEXT-9819] added a new template Vyatta Virtual Router by SNMP (knaglis)
+.........T [ZBXNEXT-9819] added new template Vyatta Virtual Router by SNMP (knaglis)
 ...G...... [ZBXNEXT-9933] added TNS name support for Zabbix agent 2 Oracle plugin (lsurvilo)
 .........T [ZBXNEXT-10107] improved device coverage in Huawei OceanStor Dorado by SNMP template (abrosimovs)
 .........T [ZBXNEXT-10123] added Aruba CX 8300s by SNMP template (akotsegubov)
@@ -1227,7 +1227,7 @@ Changes for 7.0.19rc1
 New features:
 ..F....... [ZBXNEXT-10143] added "Highlight whole row" feature in non-compact mode in Problems (ashubin)
 .........T [ZBXNEXT-10106] extended preprocessor throughput monitoring in Zabbix server/proxy health templates (aiantsen)
-.........T [ZBXNEXT-9819] added a new template Vyatta Virtual Router by SNMP (knaglis)
+.........T [ZBXNEXT-9819] added new template Vyatta Virtual Router by SNMP (knaglis)
 ...G...... [ZBXNEXT-9933] added TNS name support for Zabbix agent 2 Oracle plugin (lsurvilo)
 .........T [ZBXNEXT-10107] improved device coverage in Huawei OceanStor Dorado by SNMP template (abrosimovs)
 .........T [ZBXNEXT-10123] added Aruba CX 8300s by SNMP template (akotsegubov)
