@@ -22,16 +22,15 @@ class CControllerIconMapEdit extends CController {
 	private $iconmap = [];
 
 	protected function init() {
+		$this->setInputValidationMethod(self::INPUT_VALIDATION_FORM);
 		$this->disableCsrfValidation();
 	}
 
 	protected function checkInput() {
-		$fields = [
-			'iconmapid' => 'db icon_map.iconmapid',
-			'iconmap'   => 'array'
-		];
-
-		$ret = $this->validateInput($fields);
+		$ret = $this->validateInput(['object', 'fields' => [
+			'iconmapid' => [],
+			'iconmap' => []
+		]]);
 
 		if (!$ret) {
 			$this->setResponse(new CControllerResponseFatal());
@@ -45,6 +44,12 @@ class CControllerIconMapEdit extends CController {
 			return false;
 		}
 
+		$this->iconmap = $this->getInput('iconmap', []) + [
+			'name' => '',
+			'default_iconid' => 0,
+			'mappings' => []
+		];
+
 		if ($this->hasInput('iconmapid')) {
 			$iconmaps = API::IconMap()->get([
 				'output' => ['iconmapid', 'name', 'default_iconid'],
@@ -56,14 +61,7 @@ class CControllerIconMapEdit extends CController {
 				return false;
 			}
 
-			$this->iconmap = $this->getInput('iconmap', []) + $iconmaps[0];
-		}
-		else {
-			$this->iconmap = $this->getInput('iconmap', []) + [
-				'name' => '',
-				'default_iconid' => 0,
-				'mappings' => []
-			];
+			$this->iconmap = $iconmaps[0];
 		}
 
 		return true;
@@ -71,6 +69,7 @@ class CControllerIconMapEdit extends CController {
 
 	protected function doAction() {
 		order_result($this->iconmap['mappings'], 'sortorder');
+		$this->iconmap['mappings'] = array_values($this->iconmap['mappings']);
 
 		$images = API::Image()->get([
 			'output' => ['imageid', 'name'],
@@ -81,17 +80,34 @@ class CControllerIconMapEdit extends CController {
 		$images = array_column($images, 'name', 'imageid');
 
 		$default_imageid = key($images);
+		$inventory_list = array_column(getHostInventories(), 'title', 'nr');
 
 		if (!$this->hasInput('iconmapid')) {
-			$this->iconmap['default_iconid'] = $default_imageid;
+			if ($this->iconmap['default_iconid'] == 0) {
+				$this->iconmap['default_iconid'] = $default_imageid;
+			}
+
+			if (!$this->iconmap['mappings']) {
+				$this->iconmap['mappings'] = [[
+					'inventory_link' => key($inventory_list),
+					'expression' => "",
+					'iconid' => $default_imageid,
+					'sortorder' => 0
+				]];
+			}
 		}
+
+		$rules = $this->hasInput('iconmapid')
+			? (new CFormValidator(CControllerIconMapUpdate::getValidationRules()))->getRules()
+			: (new CFormValidator(CControllerIconMapCreate::getValidationRules()))->getRules();
 
 		$data = [
 			'iconmapid' => $this->getInput('iconmapid', 0),
 			'icon_list' => $images,
 			'iconmap' => $this->iconmap,
-			'inventory_list' => array_column(getHostInventories(), 'title', 'nr'),
-			'default_imageid' => $default_imageid
+			'inventory_list' => $inventory_list,
+			'default_imageid' => $default_imageid,
+			'js_validation_rules' => $rules
 		];
 
 		$response = new CControllerResponseData($data);
