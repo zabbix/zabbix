@@ -267,11 +267,6 @@ final class CSlaHelper {
 		];
 	}
 
-	/**
-	 * @param array $schedule
-	 *
-	 * @return array
-	 */
 	public static function prepareSchedulePeriods(array $schedule): array {
 		$result = [];
 
@@ -304,10 +299,13 @@ final class CSlaHelper {
 
 			foreach (explode(',', $weekday_schedule_periods) as $schedule_period) {
 				$period_time_parser = new CPeriodTimeParser();
-				if ($period_time_parser->parse($schedule_period) !== $period_time_parser::PARSE_FAIL) {
 
-					$day_period_from = $period_time_parser->getDayPeriodFrom();
-					$day_period_to = $period_time_parser->getDayPeriodTo();
+				if ($period_time_parser->parse($schedule_period) != CParser::PARSE_FAIL) {
+
+					[$h_from, $m_from, $h_till, $m_till] = $period_time_parser->getTokens();
+
+					$day_period_from = $h_from * SEC_PER_HOUR + $m_from * SEC_PER_MIN;
+					$day_period_to = $h_till * SEC_PER_HOUR + $m_till * SEC_PER_MIN;
 
 					$result[] = [
 						'period_from' => SEC_PER_DAY * $weekday + $day_period_from,

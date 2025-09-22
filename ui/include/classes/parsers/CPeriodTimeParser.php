@@ -14,69 +14,131 @@
 **/
 
 
+/**
+ * Parses a time period in notation 00:00 - 24:00.
+ */
 class CPeriodTimeParser extends CParser {
 
-	private const REGEX_PATTERN = '/^\s*(?<from_h>\d{1,2}):(?<from_m>\d{2})\s*-\s*(?<to_h>\d{1,2}):(?<to_m>\d{2})\s*$/';
-	private array $matches = [];
-	private int $day_period_from;
-	private int $day_period_to;
+	private string $time_from = '';
+	private string $time_till = '';
 
 	public function parse($source, $pos = 0): int {
-		if (strlen($source) == 0) {
-			$this->errorPos($source, 0);
+		$size = strlen($source);
 
-			return self::PARSE_FAIL;
-		}
+		$time_from_pos = $pos;
+		if (self::PARSE_FAIL == $this->parseTime($source, $pos)) {
+			$this->errorPos($source, $pos);
 
-		$this->length = 0;
-		$this->match = '';
-
-		$p = $pos;
-
-		if (preg_match(self::REGEX_PATTERN, $source, $this->matches)) {
-			$p += strlen($this->matches[0]);
-		}
-		else {
-			return self::PARSE_FAIL;
-		}
-
-		if ($p == $pos) {
-			return self::PARSE_FAIL;
-		}
-
-		$expected_keys = ['from_h', 'from_m', 'to_h', 'to_m'];
-
-		if (array_diff($expected_keys, array_keys($this->matches))) {
 			return self::PARSE_FAIL;
 		}
 		else {
-			$this->day_period_from = $this->prepareDayPeriod(
-				(int) $this->matches['from_h'], (int) $this->matches['from_m']
-			);
-			$this->day_period_to = $this->prepareDayPeriod(
-				(int) $this->matches['to_h'], (int) $this->matches['to_m']
-			);
+			$this->time_from = substr($source, $time_from_pos, $pos - $time_from_pos);
 		}
 
-		$this->length = $p - $pos;
-		$this->match = substr($source, $pos, $this->length);
+		if (self::PARSE_FAIL == $this->parseSeparator($source, $pos, $size)) {
+			$this->errorPos($source, $pos);
 
-		return isset($source[$p]) ? self::PARSE_SUCCESS_CONT : self::PARSE_SUCCESS;
+			return self::PARSE_FAIL;
+		}
+
+		$time_till_pos = $pos;
+		if (self::PARSE_FAIL == $this->parseTime($source, $pos)) {
+			$this->errorPos($source, $pos);
+
+			return self::PARSE_FAIL;
+		}
+		else {
+			$this->time_till = substr($source, $time_till_pos, $pos - $time_till_pos);
+		}
+
+		return $size > $pos ? self::PARSE_SUCCESS_CONT : self::PARSE_SUCCESS;
 	}
 
-	public function getMatches(): array {
-		return $this->matches;
+	private function parseHours(string $source, int &$pos, ?string &$hours = null): int {
+		$hours = substr($source, $pos, 1);
+		$hour_lookahead = substr($source, $pos + 1, 1);
+
+		if (is_numeric($hour_lookahead)) {
+			$hours = $hours.$hour_lookahead;
+			$pos += 2;
+		}
+		else {
+			$pos += 1;
+		}
+
+		return $hours <= 24 && $hours >= 0 ? self::PARSE_SUCCESS : self::PARSE_FAIL;
 	}
 
-	public function getDayPeriodFrom(): int {
-		return $this->day_period_from;
+	private function parseMinutes(string $source, int &$pos, string $hours): int {
+		$minutes = substr($source, $pos, 2);
+		$length = strlen($minutes);
+		$pos += $length;
+
+		if ($length < 2) {
+			return self::PARSE_FAIL;
+		}
+
+		if ($hours == 24 && $minutes > 0) {
+			return self::PARSE_FAIL;
+		}
+
+		return $minutes < 60 && $minutes >= 0 ? self::PARSE_SUCCESS : self::PARSE_FAIL;
 	}
 
-	public function getDayPeriodTo(): int {
-		return $this->day_period_to;
+	private function parseTime(string $source, int &$pos): int {
+		if (self::PARSE_FAIL == $this->parseHours($source, $pos, $hours)) {
+			return self::PARSE_FAIL;
+		}
+
+		if (substr($source, $pos, 1) !== ':') {
+			return self::PARSE_FAIL;
+		}
+
+		$pos ++;
+
+		if (self::PARSE_FAIL == $this->parseMinutes($source, $pos, $hours)) {
+			return self::PARSE_FAIL;
+		}
+
+		return self::PARSE_SUCCESS;
 	}
 
-	private function prepareDayPeriod(int $h, int $m): int {
-		return SEC_PER_HOUR * $h + SEC_PER_MIN * $m;
+	private function parseSeparator(string $source, int &$pos, int $size): int {
+		while ($size > $pos) {
+			$char = $source[$pos];
+
+			if ($char === ' ') {
+				$pos ++;
+				continue;
+			}
+			elseif ($char === '-') {
+				$pos ++;
+				break;
+			}
+			else {
+				return self::PARSE_FAIL;
+			}
+		}
+
+		while ($size > $pos) {
+			$char = $source[$pos];
+
+			if ($char === ' ') {
+				$pos ++;
+				continue;
+			}
+			else {
+				return self::PARSE_SUCCESS_CONT;
+			}
+		}
+
+		return self::PARSE_SUCCESS;
+	}
+
+	public function getTokens(): array {
+		[$h_from, $m_from] = explode(':', $this->time_from);
+		[$h_till, $m_till] = explode(':', $this->time_till);
+
+		return [$h_from, $m_from, $h_till, $m_till];
 	}
 }

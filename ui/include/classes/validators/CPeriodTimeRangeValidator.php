@@ -25,27 +25,20 @@ class CPeriodTimeRangeValidator extends CValidator {
 
 	public function validate($value) {
 		$result = [];
-		$value = trim($value);
 
 		foreach (explode(',', $value) as $schedule_period) {
+			$schedule_period = trim($schedule_period);
+
 			if ($this->period_time_parser->parse($schedule_period) == $this->period_time_parser::PARSE_FAIL) {
 				$this->setError(_('comma separated list of time periods is expected'));
 
 				return false;
 			}
-			$matches = $this->period_time_parser->getMatches();
 
-			$from_m = $matches['from_m'];
-			$to_m = $matches['to_m'];
+			[$h_from, $m_from, $h_till, $m_till] = $this->period_time_parser->getTokens();
 
-			$day_period_from = $this->period_time_parser->getDayPeriodFrom();
-			$day_period_to = $this->period_time_parser->getDayPeriodTo();
-
-			if ($from_m > 59 || $to_m > 59 || $day_period_to > SEC_PER_DAY) {
-				$this->setError(_('comma separated list of time periods is expected'));
-
-				return false;
-			}
+			$day_period_from = $h_from * SEC_PER_HOUR + $m_from * SEC_PER_MIN;
+			$day_period_to = $h_till * SEC_PER_HOUR + $m_till * SEC_PER_MIN;
 
 			if ($day_period_from >= $day_period_to) {
 				$this->setError(_('start time must be less than end time'));
