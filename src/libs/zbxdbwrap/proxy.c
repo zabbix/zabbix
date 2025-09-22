@@ -1469,7 +1469,14 @@ static void	process_history_data_by_keys(zbx_socket_t *sock, zbx_client_item_val
 	zbx_agent_value_t	values[ZBX_HISTORY_VALUES_MAX];
 	int			errcodes[ZBX_HISTORY_VALUES_MAX];
 	double			sec;
+
+	/* hashset to ensure that triplets (itemid, timestamp seconds, timestamp nanoseconds) are unique */
 	zbx_hashset_t		timestamps;
+	int			timestamps_collision_num = 0;
+
+	/* Try to achieve uniqueness of triplets (itemid, timestamp seconds, timestamp nanoseconds) for up to */
+	/* N=1000 history records. Therefore, set a limit up to N*(N-1)/2 = 1000*(1000-1)/2 = ~ 500000 collisions. */
+	#define TIMESTAMPS_COLLISIONS_MAX 500000
 
 	sec = zbx_time();
 
@@ -1533,9 +1540,18 @@ static void	process_history_data_by_keys(zbx_socket_t *sock, zbx_client_item_val
 
 				while (NULL != (entry = zbx_hashset_search(&timestamps, &it)))
 				{
+					/* Triplet (itemid, timestamp seconds, timestamp nanoseconds) is not unique. */
+					/* Try again with next nanosecond.*/
 					values[i].ts.ns++;
 					zbx_timespec_normalize(&values[i].ts);
 					it.ts = values[i].ts;
+					timestamps_collision_num++;
+				}
+
+				if (TIMESTAMPS_COLLISIONS_MAX < timestamps_collision_num)
+				{
+					timestamps_collision_num = 0;
+					zbx_hashset_clear(&timestamps);
 				}
 
 				zbx_hashset_insert(&timestamps, &it, sizeof(item_timestamp_t));
@@ -1566,6 +1582,7 @@ static void	process_history_data_by_keys(zbx_socket_t *sock, zbx_client_item_val
 
 	*info = zbx_dsprintf(*info, "processed: %d; failed: %d; total: %d; seconds spent: " ZBX_FS_DBL,
 			processed_num, total_num - processed_num, total_num, zbx_time() - sec);
+#undef TIMESTAMPS_COLLISIONS_MAX
 }
 
 /******************************************************************************
