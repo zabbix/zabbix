@@ -203,7 +203,7 @@ class testDashboardSlaReportWidget extends testSlaReport {
 			'buttons' => ['Filter', 'Reset', 'Cancel'],
 			'check_row' => [
 				'Name' => 'Simple actions service',
-				'Tags' => 'problem: falsetest: test789',
+				'Tags' => "problem: false\ntest: test789",
 				'Problem tags' => 'problem: true'
 			]
 		];

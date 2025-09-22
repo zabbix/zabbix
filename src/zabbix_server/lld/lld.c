@@ -13,7 +13,6 @@
 **/
 
 #include "lld.h"
-#include "zbxexpression.h"
 
 #include "zbxregexp.h"
 #include "audit/zbxaudit.h"
@@ -26,6 +25,7 @@
 #include "zbxexpr.h"
 #include "zbxstr.h"
 #include "zbxtime.h"
+#include "zbxcalc.h"
 
 ZBX_PTR_VECTOR_IMPL(lld_item_link_ptr, zbx_lld_item_link_t*)
 ZBX_PTR_VECTOR_IMPL(lld_row_ptr, zbx_lld_row_t*)

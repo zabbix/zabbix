@@ -36,6 +36,7 @@
 #include "zbxvariant.h"
 #include "zbxescalations.h"
 #include "zbxprof.h"
+#include "zbxcalc.h"
 
 /******************************************************************************
  *                                                                            *

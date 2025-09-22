@@ -290,7 +290,7 @@ class testFormSetup extends CWebTest {
 		$timezones_field->one()->select(CDateTimeHelper::getTimeZoneFormat('Europe/Riga'));
 
 		// Check Default theme field.
-		$this->assertEquals(['Blue', 'Dark', 'High-contrast light', 'High-contrast dark'], $this->query('id:default-theme')
+		$this->assertEquals(['Blue', 'Blue (classic)', 'Dark', 'Dark (classic)', 'High-contrast light', 'High-contrast dark'], $this->query('id:default-theme')
 				->asDropdown()->one()->getOptions()->asText()
 		);
 
@@ -386,7 +386,7 @@ class testFormSetup extends CWebTest {
 		$this->assertScreenshotExcept($this->query('xpath://form')->one(), $this->query('xpath://p')->one(), 'Install');
 
 		// Check that Dashboard view is opened after completing the form.
-		$this->query('button:Finish')->one()->click();
+		$this->query('button:Finish')->one()->click()->waitUntilNotVisible();
 		$this->page->waitUntilReady();
 		$this->assertStringContainsString('index.php', $this->page->getCurrentURL());
 	}
@@ -672,7 +672,7 @@ class testFormSetup extends CWebTest {
 		}
 
 		// Check the outcome for the specified database configuration.
-		$this->query('button:Next step')->one()->click();
+		$this->query('button:Next step')->one()->click()->waitUntilStalled();
 		if (CTestArrayHelper::get($data, 'expected', TEST_GOOD) === TEST_BAD) {
 			// Define the reference error message details and assert error message.
 			if (array_key_exists('error_details', $data)) {

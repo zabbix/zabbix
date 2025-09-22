@@ -143,6 +143,7 @@ $output = [
 	'script_inline' => getPagePostJs().
 		$this->readJsFile('hostgroup.edit.js.php').
 		'hostgroup_edit_popup.init('.json_encode([
+			'rules' => $data['js_validation_rules'],
 			'groupid' => $data['groupid'],
 			'name' => $data['name']
 		]).');',

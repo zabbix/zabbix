@@ -753,6 +753,7 @@ class testDashboardURLWidget extends testWidgets {
 				$other_form = $this->query('name:otherForm')->waitUntilVisible()->asForm()->one();
 				$other_form->fill(['id:iframe_sandboxing_enabled' => !$state]);
 				$other_form->submit();
+				$this->assertMessage(TEST_GOOD, 'Configuration updated');
 				$this->page->open('zabbix.php?action=dashboard.view&dashboardid='.self::$dashboard_for_frame_widget)->waitUntilReady();
 			}
 		}

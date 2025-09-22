@@ -487,6 +487,9 @@ class CZabbixServer {
 		$json = json_encode($params);
 		if (fwrite($this->socket, ZBX_TCP_HEADER.pack('V', strlen($json))."\x00\x00\x00\x00".$json) === false) {
 			$this->error = _s('Cannot send command, check connection with Zabbix server "%1$s".', $this->host);
+
+			fclose($this->socket);
+
 			return false;
 		}
 
@@ -494,59 +497,65 @@ class CZabbixServer {
 		$response = '';
 		$response_len = 0;
 		$expected_len = null;
-		$now = time();
 
-		while (true) {
-			if ((time() - $now) >= $this->timeout) {
-				$this->error = _s(
-					'Connection timeout of %1$s seconds exceeded when connecting to Zabbix server "%2$s".',
-					$this->timeout, $this->host
-				);
+		while (!feof($this->socket)) {
+			if (($buffer = fread($this->socket, self::READ_BYTES_LIMIT)) === false) {
+				$info = stream_get_meta_data($this->socket);
+
+				if ($info['timed_out']) {
+					$this->error = _s(
+						'Response timeout of %1$s exceeded when connecting to Zabbix server "%2$s".',
+						secondsToPeriod($this->timeout), $this->host
+					);
+				} else {
+					$this->error = _s('Cannot read response from Zabbix server "%1$s".', $this->host);
+				}
+
+				fclose($this->socket);
+
 				return false;
 			}
 
-			if (!feof($this->socket) && ($buffer = fread($this->socket, self::READ_BYTES_LIMIT)) !== false) {
-				$response_len += strlen($buffer);
-				$response .= $buffer;
+			$response_len += strlen($buffer);
+			$response .= $buffer;
 
-				if ($expect == self::ZBX_TCP_EXPECT_HEADER) {
-					if (strncmp($response, ZBX_TCP_HEADER, min($response_len, ZBX_TCP_HEADER_LEN)) != 0) {
-						$this->error = _s('Incorrect response received from Zabbix server "%1$s".', $this->host);
-						return false;
-					}
+			if ($expect == self::ZBX_TCP_EXPECT_HEADER) {
+				if (strncmp($response, ZBX_TCP_HEADER, min($response_len, ZBX_TCP_HEADER_LEN)) != 0) {
+					$this->error = _s('Incorrect response received from Zabbix server "%1$s".', $this->host);
 
-					if ($response_len < ZBX_TCP_HEADER_LEN) {
-						continue;
-					}
+					fclose($this->socket);
 
-					$expect = self::ZBX_TCP_EXPECT_DATA;
+					return false;
 				}
 
-				if ($response_len < ZBX_TCP_HEADER_LEN + ZBX_TCP_DATALEN_LEN) {
+				if ($response_len < ZBX_TCP_HEADER_LEN) {
 					continue;
 				}
 
-				if ($expected_len === null) {
-					$expected_len = unpack('Vlen', substr($response, ZBX_TCP_HEADER_LEN, 4))['len'];
-					$expected_len += ZBX_TCP_HEADER_LEN + ZBX_TCP_DATALEN_LEN;
+				$expect = self::ZBX_TCP_EXPECT_DATA;
+			}
 
-					if ($this->total_bytes_limit != 0 && $expected_len >= $this->total_bytes_limit) {
-						$this->error = _s(
-							'Size of the response received from Zabbix server "%1$s" exceeds the allowed size of %2$s bytes. This value can be increased in the ZBX_SOCKET_BYTES_LIMIT constant in include/defines.inc.php.',
-							$this->host, $this->total_bytes_limit
-						);
-						return false;
-					}
-				}
+			if ($response_len < ZBX_TCP_HEADER_LEN + ZBX_TCP_DATALEN_LEN) {
+				continue;
+			}
 
-				if ($response_len >= $expected_len) {
-					break;
+			if ($expected_len === null) {
+				$expected_len = unpack('Vlen', substr($response, ZBX_TCP_HEADER_LEN, 4))['len'];
+				$expected_len += ZBX_TCP_HEADER_LEN + ZBX_TCP_DATALEN_LEN;
+
+				if ($this->total_bytes_limit != 0 && $expected_len >= $this->total_bytes_limit) {
+					$this->error = _s(
+						'Size of the response received from Zabbix server "%1$s" exceeds the allowed size of %2$s bytes. This value can be increased in the ZBX_SOCKET_BYTES_LIMIT constant in include/defines.inc.php.',
+						$this->host, $this->total_bytes_limit
+					);
+					fclose($this->socket);
+
+					return false;
 				}
 			}
-			else {
-				$this->error =
-					_s('Cannot read the response, check connection with the Zabbix server "%1$s".', $this->host);
-				return false;
+
+			if ($response_len >= $expected_len) {
+				break;
 			}
 		}
 
