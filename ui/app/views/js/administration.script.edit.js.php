@@ -36,6 +36,8 @@ window.script_edit_popup = new class {
 		this.#loadView(script);
 		this.#initActions();
 
+		this.#validateFieldsOnScopeListChange();
+
 		for (const parameter of script.parameters) {
 			this.#addParameter(parameter);
 		}
@@ -613,5 +615,26 @@ window.script_edit_popup = new class {
 		}
 
 		fields.forEach((field) => this.form_element.querySelector(field).style.display = 'none');
+	}
+
+	#validateFieldsOnScopeListChange() {
+		const scope_radio_list = document.getElementById('scope');
+		const menu_path = document.getElementById('menu-path');
+
+		scope_radio_list.addEventListener('click', e => {
+			if (e.target.type === 'radio') {
+				const had_menu_path = menu_path.style.display;
+
+				setTimeout(() => {
+					const has_menu_path = menu_path.style.display;
+
+					if (had_menu_path !== has_menu_path) {
+						let fields = this.form.getAllValues()
+						fields.menu_path = has_menu_path === 'none' ? '' : fields.menu_path
+						this.form.validateSubmit(fields);
+					}
+				}, 0);
+			}
+		});
 	}
 }

@@ -82,7 +82,10 @@ class CControllerScriptUpdate extends CController {
 			'manualinput_default_value' => ['db scripts.manualinput_default_value'],
 			'manualinput_validator' => ['db scripts.manualinput_validator', 'required', 'not_empty',
 				'use' => [CRegexValidator::class, []],
-				'when' => ['manualinput_validator_type', 'in' => [ZBX_SCRIPT_MANUALINPUT_TYPE_STRING]]
+				'when' => [
+					['manualinput', 'in' => [ZBX_SCRIPT_MANUALINPUT_ENABLED]],
+					['manualinput_validator_type', 'in' => [ZBX_SCRIPT_MANUALINPUT_TYPE_STRING]]
+				]
 			],
 			'dropdown_options' => ['db scripts.manualinput_validator', 'required', 'not_empty',
 				'when' => [
