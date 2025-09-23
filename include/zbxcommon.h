@@ -837,6 +837,9 @@ extern ZBX_THREAD_LOCAL zbx_exit_cb_t	zbx_exit_immediate;
 
 void	zbx_set_exit(zbx_exit_cb_t exit_cb);
 void	zbx_set_exit_immediate(zbx_exit_cb_t exit_cb);
+#else
+#	define zbx_exit(status)		exit(status)
+#	define zbx_exit_immediate(status)	_exit(status)
 #endif
 
 #endif
