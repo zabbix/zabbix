@@ -17,7 +17,7 @@ require (
 	github.com/goburrow/modbus v0.1.0
 	github.com/godbus/dbus/v5 v5.1.0
 	github.com/godror/godror v0.48.0
-	github.com/google/go-cmp v0.6.0
+	github.com/google/go-cmp v0.7.0
 	github.com/mattn/go-sqlite3 v1.14.19
 	github.com/mediocregopher/radix/v3 v3.8.1
 	github.com/memcachier/mc/v3 v3.0.3

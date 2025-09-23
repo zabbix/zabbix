@@ -4,7 +4,7 @@ msgstr ""
 "Project-Id-Version: Zabbix 6.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2023-10-19 13:48+0300\n"
-"PO-Revision-Date: 2025-08-12 18:34+0000\n"
+"PO-Revision-Date: 2025-09-12 20:34+0000\n"
 "Last-Translator: Xevi Noè i Nogueiras <xevi.noe@gmail.com>\n"
 "Language-Team: none\n"
 "Language: ca\n"
@@ -2044,7 +2044,7 @@ msgstr "Eviteu paraules de pas fàcils d'endevinar"
 
 #: app/views/host.wizard.edit.php:473
 msgid "Avoid including sensitive data."
-msgstr ""
+msgstr "Eviteu incloure dades sensibles."
 
 #: jsLoader.php:172
 msgid "Awaiting data"
@@ -3587,6 +3587,10 @@ msgstr "No es pot pas trobar el mapa de valors \"%1$s\" emprat al prototip d'ele
 msgid "Cannot find value map \"%1$s\" used for item prototype \"%2$s\" of discovery rule prototype \"%3$s\" on \"%4$s\"."
 msgstr "No es pot pas trobar el mapa de valors \"%1$s\" emprat al prototip d'element \"%2$s\" del prototip de regla de descoberta \"%3$s\" a \"%4$s\"."
 
+#: app/views/oauth.authorize.php:33
+msgid "Cannot get authentication tokens"
+msgstr "No es poden obtindre els tokens d'autenticació"
+
 #: app/views/oauth.edit.php:230
 msgid "Cannot get authorization code."
 msgstr "No es pot pas obtindre el codi d'autorització."
@@ -4117,6 +4121,11 @@ msgstr "No es pot pas llegir l'XML: %1$s."
 #, c-format
 msgid "Cannot read YAML: %1$s."
 msgstr "No es pot pas llegir el YAML: %1$s."
+
+#: include/classes/server/CZabbixServer.php:511
+#, c-format
+msgid "Cannot read response from Zabbix server \"%1$s\"."
+msgstr ""
 
 #: include/classes/server/CZabbixServer.php:567
 #, c-format
@@ -8552,7 +8561,7 @@ msgstr "Entreu una cadena d'identitat de clau compartida prèviament que no sigu
 
 #: app/views/host.wizard.edit.php:470
 msgid "Enter a unique name that Zabbix components will use to recognize the pre-shared key."
-msgstr ""
+msgstr "Introduïu un nom únic que els components de Zabbix utilitzaran per reconèixer la clau precompartida."
 
 #: app/views/host.wizard.edit.php:609
 msgid "Enter the IP/DNS address and port of the Zabbix agent installed on your monitoring target."
@@ -12203,6 +12212,10 @@ msgstr "Internet Explorer"
 #: include/views/configuration.item.prototype.list.php:69
 msgid "Interval"
 msgstr "Interval"
+
+#: widgets/itemcard/includes/CWidgetFieldItemSectionsView.php:76
+msgid "Interval and storage"
+msgstr "Interval i emmagatzematge"
 
 #: include/classes/api/services/CRole.php:731
 #, c-format
@@ -16873,6 +16886,10 @@ msgstr "Hi manca l'extensió PHP ctype (paràmetre de configuració PHP --enable
 msgid "PHP curl"
 msgstr "Curl PHP"
 
+#: include/classes/setup/CFrontendSetup.php:733
+msgid "PHP curl extension is missing or outdated."
+msgstr "L'extensió curl de PHP no hi és o és obsoleta."
+
 #: include/classes/setup/CFrontendSetup.php:691
 msgid "PHP curl extension missing."
 msgstr "Manca l'extensió curl PHP."
@@ -18840,6 +18857,11 @@ msgstr "Codi de resposta"
 #: httpdetails.php:149 include/classes/screens/CScreenHttpTestDetails.php:83
 msgid "Response time"
 msgstr "Hora de resposta"
+
+#: include/classes/server/CZabbixServer.php:507
+#, c-format
+msgid "Response timeout of %1$s exceeded when connecting to Zabbix server \"%2$s\"."
+msgstr ""
 
 #: app/controllers/CControllerMediatypeTestSend.php:182
 msgid "Response type: JSON"
@@ -26417,6 +26439,10 @@ msgstr "descripció"
 #: include/classes/validators/CApiInputValidator.php:1985
 msgid "directory cannot be empty"
 msgstr "el directori no pot pas ésser buit"
+
+#: include/views/configuration.host.discovery.list.php:340
+msgid "discovery rule"
+msgstr "regla de descoberta"
 
 #: app/controllers/CControllerItemMassCheckNow.php:138
 #: include/classes/api/services/CTask.php:562

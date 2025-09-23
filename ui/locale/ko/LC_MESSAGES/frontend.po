@@ -3496,6 +3496,10 @@ msgstr "\"%4$s\"상의 디스커버리 규칙 \"%3$s\"의 아이템 프로토타
 msgid "Cannot find value map \"%1$s\" used for item prototype \"%2$s\" of discovery rule prototype \"%3$s\" on \"%4$s\"."
 msgstr ""
 
+#: app/views/oauth.authorize.php:33
+msgid "Cannot get authentication tokens"
+msgstr ""
+
 #: app/views/oauth.edit.php:230
 msgid "Cannot get authorization code."
 msgstr ""
@@ -4023,6 +4027,11 @@ msgstr "XML: %1$s 을 읽을 수 없습니다."
 #, c-format
 msgid "Cannot read YAML: %1$s."
 msgstr "YAML을 읽을 수 없습니다: %1$s."
+
+#: include/classes/server/CZabbixServer.php:511
+#, c-format
+msgid "Cannot read response from Zabbix server \"%1$s\"."
+msgstr ""
 
 #: include/classes/server/CZabbixServer.php:567
 #, c-format
@@ -12070,6 +12079,10 @@ msgstr "Internet Explorer"
 msgid "Interval"
 msgstr "갱신 간격"
 
+#: widgets/itemcard/includes/CWidgetFieldItemSectionsView.php:76
+msgid "Interval and storage"
+msgstr ""
+
 #: include/classes/api/services/CRole.php:731
 #, c-format
 msgid "Invalid API method \"%2$s\" for user role \"%1$s\"."
@@ -16714,6 +16727,10 @@ msgstr "PHP ctype모듈이 존재하지 않습니다 (PHP 설정 파라미터 --
 msgid "PHP curl"
 msgstr "PHP curl"
 
+#: include/classes/setup/CFrontendSetup.php:733
+msgid "PHP curl extension is missing or outdated."
+msgstr ""
+
 #: include/classes/setup/CFrontendSetup.php:691
 msgid "PHP curl extension missing."
 msgstr "PHP curl 확장이 누락됨."
@@ -18678,6 +18695,11 @@ msgstr "응답 코드"
 #: httpdetails.php:149 include/classes/screens/CScreenHttpTestDetails.php:83
 msgid "Response time"
 msgstr "응답 시간"
+
+#: include/classes/server/CZabbixServer.php:507
+#, c-format
+msgid "Response timeout of %1$s exceeded when connecting to Zabbix server \"%2$s\"."
+msgstr ""
 
 #: app/controllers/CControllerMediatypeTestSend.php:182
 msgid "Response type: JSON"
@@ -26223,6 +26245,10 @@ msgstr "설명"
 #: include/classes/validators/CApiInputValidator.php:1985
 msgid "directory cannot be empty"
 msgstr "디렉토리는 비워둘 수 없음"
+
+#: include/views/configuration.host.discovery.list.php:340
+msgid "discovery rule"
+msgstr ""
 
 #: app/controllers/CControllerItemMassCheckNow.php:138
 #: include/classes/api/services/CTask.php:562

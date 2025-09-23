@@ -4,7 +4,7 @@ msgstr ""
 "Project-Id-Version: Zabbix 6.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2023-10-19 13:48+0300\n"
-"PO-Revision-Date: 2025-09-01 20:03+0000\n"
+"PO-Revision-Date: 2025-09-15 17:53+0000\n"
 "Last-Translator: Vicente Salvador <vicentesalvadorcubedo@gmail.com>\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
 "Language: es\n"
@@ -2045,7 +2045,7 @@ msgstr "Evite contraseñas fáciles de adivinar"
 
 #: app/views/host.wizard.edit.php:473
 msgid "Avoid including sensitive data."
-msgstr ""
+msgstr "Evite incluir datos sensibles."
 
 #: jsLoader.php:172
 msgid "Awaiting data"
@@ -3588,6 +3588,10 @@ msgstr "No se pudo encontrar el mapa de valores \"%1$s\" usado en el prototipo d
 msgid "Cannot find value map \"%1$s\" used for item prototype \"%2$s\" of discovery rule prototype \"%3$s\" on \"%4$s\"."
 msgstr "No se puede encontrar el mapa de valores \"%1$s\" usado para el prototipo de métrica \"%2$s\" del prototipo de regla de descubrimiento \"%3$s\" en \"%4$s\"."
 
+#: app/views/oauth.authorize.php:33
+msgid "Cannot get authentication tokens"
+msgstr "No se pueden obtener tokens de autenticación"
+
 #: app/views/oauth.edit.php:230
 msgid "Cannot get authorization code."
 msgstr "No se puede obtener el código de autorización."
@@ -4119,6 +4123,11 @@ msgstr "No se pudo leer el XML: %1$s."
 msgid "Cannot read YAML: %1$s."
 msgstr "No se puede leer YAML: %1$s."
 
+#: include/classes/server/CZabbixServer.php:511
+#, c-format
+msgid "Cannot read response from Zabbix server \"%1$s\"."
+msgstr ""
+
 #: include/classes/server/CZabbixServer.php:567
 #, c-format
 msgid "Cannot read the response, check connection with the Zabbix server \"%1$s\"."
@@ -4548,7 +4557,7 @@ msgstr "No se puede actualizar el alcance del script. El script \"%1$s\" se util
 #: app/controllers/CControllerServiceUpdate.php:78
 #: app/controllers/CControllerServiceUpdate.php:172
 msgid "Cannot update service"
-msgstr "No se puede actualizar el servicio"
+msgstr "No se puede modificar el servicio"
 
 #: include/classes/api/services/CService.php:2340
 #: include/classes/api/services/CService.php:2402
@@ -4556,43 +4565,43 @@ msgstr "No se puede actualizar el servicio"
 #: include/classes/api/services/CService.php:2460
 #, c-format
 msgid "Cannot update service \"%1$s\": %2$s."
-msgstr "No se puede actualizar el servicio \"%1$s\": %2$s."
+msgstr "No se puede modificar el servicio \"%1$s\": %2$s."
 
 #: app/controllers/CControllerPopupMassupdateService.php:161
 msgid "Cannot update services"
-msgstr "No se pueden actualizar los servicios"
+msgstr "No se pueden modificar los servicios"
 
 #: include/classes/api/services/CHttpTest.php:598
 #: include/classes/api/services/CHttpTest.php:892
 #, c-format
 msgid "Cannot update step for a templated web scenario \"%1$s\": %2$s."
-msgstr "No se puede actualizar el paso para la plantilla de un escenario web \"%1$s\": %2$s."
+msgstr "No se puede modificar el paso para la plantilla de un escenario web \"%1$s\": %2$s."
 
 #: app/controllers/CControllerTemplateMassupdate.php:353
 #: app/controllers/CControllerTemplateUpdate.php:49
 #: app/controllers/CControllerTemplateUpdate.php:196
 msgid "Cannot update template"
 msgid_plural "Cannot update templates"
-msgstr[0] "No se puede actualizar la plantilla"
-msgstr[1] "No se pueden actualizar las plantillas"
+msgstr[0] "No se puede modificar la plantilla"
+msgstr[1] "No se pueden modificar las plantillas"
 
 #: app/controllers/CControllerTemplateGroupUpdate.php:41
 #: app/controllers/CControllerTemplateGroupUpdate.php:94
 msgid "Cannot update template group"
-msgstr "No se puede actualizar el grupo de plantillas"
+msgstr "No se puede modificar el grupo de plantillas"
 
 #: app/controllers/CControllerTriggerMassupdate.php:212
 #: app/controllers/CControllerTriggerUpdate.php:58
 #: app/controllers/CControllerTriggerUpdate.php:155
 msgid "Cannot update trigger"
 msgid_plural "Cannot update triggers"
-msgstr[0] "No se puede actualizar el iniciador"
-msgstr[1] "No se pueden actualizar los iniciadores"
+msgstr[0] "No se puede modificar el iniciador"
+msgstr[1] "No se pueden modificar los iniciadores"
 
 #: include/classes/api/services/CTriggerGeneral.php:2305
 #, c-format
 msgid "Cannot update trigger \"%1$s\": %2$s."
-msgstr "No se pudo actualizar el iniciador \"%1$s\": %2$s."
+msgstr "No se pudo modificar el iniciador \"%1$s\": %2$s."
 
 #: app/controllers/CControllerTriggerMassupdate.php:211
 #: app/controllers/CControllerTriggerPrototypeDisable.php:86
@@ -4601,41 +4610,41 @@ msgstr "No se pudo actualizar el iniciador \"%1$s\": %2$s."
 #: app/controllers/CControllerTriggerPrototypeUpdate.php:164
 msgid "Cannot update trigger prototype"
 msgid_plural "Cannot update trigger prototypes"
-msgstr[0] "No se puede actualizar el prototipo del iniciador"
-msgstr[1] "No se pueden actualizar los prototipos de iniciador"
+msgstr[0] "No se puede modificar el prototipo del iniciador"
+msgstr[1] "No se pueden modificar los prototipos de iniciador"
 
 #: include/classes/api/services/CTriggerGeneral.php:2140
 #, c-format
 msgid "Cannot update trigger prototype \"%1$s\": %2$s."
-msgstr "No se pudo actualizar el prototipo de iniciador \"%1$s\": %2$s."
+msgstr "No se puede modificar el prototipo de iniciador \"%1$s\": %2$s."
 
 #: app/controllers/CControllerUserProfileUpdate.php:69
 #: app/controllers/CControllerUserProfileUpdate.php:127
 #: app/controllers/CControllerUserUpdate.php:76
 #: app/controllers/CControllerUserUpdate.php:150
 msgid "Cannot update user"
-msgstr "No es posible actualizar al usuario"
+msgstr "No es posible modificar el usuario"
 
 #: app/controllers/CControllerUsergroupMassUpdate.php:69
 #: app/controllers/CControllerUsergroupUpdate.php:52
 #: app/controllers/CControllerUsergroupUpdate.php:155
 msgid "Cannot update user group"
 msgid_plural "Cannot update user groups"
-msgstr[0] "No se puede actualizar el grupo de usuarios"
-msgstr[1] "No se pueden actualizar los grupos de usuarios"
+msgstr[0] "No se puede modificar el grupo de usuarios"
+msgstr[1] "No se pueden modificar los grupos de usuarios"
 
 #: app/controllers/CControllerUserroleUpdate.php:117
 #: app/controllers/CControllerUserroleUpdate.php:187
 msgid "Cannot update user role"
-msgstr "No se puede actualizar el rol de usuario"
+msgstr "No se puede modificar el rol de usuario"
 
 #: httpconf.php:195
 msgid "Cannot update web scenario"
-msgstr "No se pudo actualizar el escenario web"
+msgstr "No se pudo modificar el escenario web"
 
 #: app/controllers/CControllerWebScenarioStepCheck.php:57
 msgid "Cannot update web scenario step"
-msgstr "No se puede actualizar el paso del escenario web"
+msgstr "No se puede modificar el paso del escenario web"
 
 #: app/views/administration.regex.edit.php:55
 msgid "Case sensitive"
@@ -7840,7 +7849,7 @@ msgstr "Mostrar acciones"
 
 #: app/partials/monitoring.latest.view.html.php:309
 msgid "Display graph"
-msgstr "Mostrar gráfica"
+msgstr "Mostrar gráfico"
 
 #: widgets/tophosts/views/column.edit.php:136
 msgid "Display item value as"
@@ -8553,7 +8562,7 @@ msgstr "Introduzca una cadena de identidad de clave precompartida no secreta. Ev
 
 #: app/views/host.wizard.edit.php:470
 msgid "Enter a unique name that Zabbix components will use to recognize the pre-shared key."
-msgstr ""
+msgstr "Ingrese un nombre único que los componentes de Zabbix usarán para reconocer la clave precompartida."
 
 #: app/views/host.wizard.edit.php:609
 msgid "Enter the IP/DNS address and port of the Zabbix agent installed on your monitoring target."
@@ -12205,6 +12214,10 @@ msgstr "Internet Explorer"
 msgid "Interval"
 msgstr "Intervalo"
 
+#: widgets/itemcard/includes/CWidgetFieldItemSectionsView.php:76
+msgid "Interval and storage"
+msgstr "Intervalo y almacenamiento"
+
 #: include/classes/api/services/CRole.php:731
 #, c-format
 msgid "Invalid API method \"%2$s\" for user role \"%1$s\"."
@@ -12786,7 +12799,7 @@ msgstr[1] "Métricas copiadas"
 
 #: app/views/administration.proxy.list.php:92
 msgid "Item count"
-msgstr "Número de elementos"
+msgstr "Número de métricas"
 
 #: items.php:524 items.php:735
 msgid "Item deleted"
@@ -13540,15 +13553,15 @@ msgstr "Lista de servidores proxy de Zabbix con nombre, modo, cifrado, compresi�
 
 #: include/classes/data/CItemData.php:2877
 msgid "List of Zabbix proxies with name, mode, encryption, compression, version, last seen, host count, item count, required values per second (vps), compatibility (current/outdated/unsupported), timeouts, proxy group name if proxy belongs to group, state (unknown/offline/online). Returns JSON."
-msgstr "Lista de servidores proxy de Zabbix con nombre, modo, cifrado, compresión, versión, visto por última vez, recuento de equipos, recuento de métricas, valores requeridos por segundo (vps), compatibilidad (actual/obsoleto/no compatible), tiempos de espera, nombre del grupo de proxy si pertenece al proxy. grupo, estado (desconocido/fuera de línea/en línea). Devuelve JSON."
+msgstr "Lista de proxies Zabbix con nombre, modo, cifrado, compresión, versión, última conexión, número de equipos, número de métricas, valores requeridos por segundo (VPS), compatibilidad (actual/desactualizada/no compatible), tiempos de espera, nombre del grupo de proxy si pertenece al grupo, estado (desconocido/desconectado/conectado). Devuelve JSON."
 
 #: include/classes/data/CItemData.php:2905
 msgid "List of Zabbix proxies with name, mode, encryption, compression, version, last seen, host count, item count, required values per second (vps), compatibility (current/outdated/unsupported), timeouts, proxy group name, state (unknown/offline/online). Returns JSON."
-msgstr "Lista de servidores proxy de Zabbix con nombre, modo, cifrado, compresión, versión, visto por última vez, recuento de equipos, recuento de métricas, valores requeridos por segundo (vps), compatibilidad (actual/obsoleto/no compatible), tiempos de espera, nombre del grupo de proxy, estado (desconocido) /fuera de linea en linea). Devuelve JSON."
+msgstr "Lista de proxies Zabbix con nombre, modo, cifrado, compresión, versión, última conexión, número de equipos, número de métricas, valores requeridos por segundo (VPS), compatibilidad (actual/desactualizada/no compatible), tiempos de espera, nombre del grupo de proxys y estado (desconocido/desconectado/conectado). Devuelve JSON."
 
 #: include/classes/data/CItemData.php:2935
 msgid "List of Zabbix proxy groups configuration data and real-time data. Configuration data includes proxy group name, failover delay, and minimum number of online proxies required for the group to be online. Real-time data includes number of online proxies, percentage of online proxies, and state of proxy group (unknown, offline, recovering, online, degrading). This item does not return groupless proxies. Returns JSON."
-msgstr "Lista de datos de configuración de grupos de proxy de Zabbix y datos en tiempo real. Los datos de configuración incluyen el nombre del grupo de proxy, el retraso de conmutación por error y la cantidad mínima de servidores proxy en línea necesarios para que el grupo esté en línea. Los datos en tiempo real incluyen la cantidad de servidores proxy en línea, el porcentaje de servidores proxy en línea y el estado del grupo de servidores proxy (desconocido, fuera de línea, en recuperación, en línea, degradante). Esta métrica no devuelve proxies sin grupo. Devuelve JSON."
+msgstr "Lista de datos de configuración de grupos de proxy de Zabbix y datos en tiempo real. Los datos de configuración incluyen el nombre del grupo de proxy, el retardo de conmutación por error y el número mínimo de proxies en línea necesarios para que el grupo esté en línea. Los datos en tiempo real incluyen el número de proxies en línea, el porcentaje de proxies en línea y el estado del grupo de proxy (desconocido, sin conexión, en recuperación, en línea, en degradación). Este elemento no devuelve proxies sin grupo. Devuelve JSON."
 
 #: include/classes/data/CItemData.php:1559
 msgid "List of block devices and their type. Returns JSON"
@@ -14136,7 +14149,7 @@ msgstr "Máscara"
 #: include/views/configuration.item.list.php:343
 #: include/views/configuration.item.prototype.list.php:217
 msgid "Mass update"
-msgstr "Actualizar masivamente"
+msgstr "Modificar masivamente"
 
 #: include/views/js/monitoring.sysmaps.js.php:636
 msgid "Mass update elements"
@@ -16023,7 +16036,7 @@ msgstr "No está permitido configurar el tema para el usuario \"invitado\"."
 #: include/classes/api/services/CUser.php:469
 #, c-format
 msgid "Not allowed to update field \"%1$s\" for provisioned user."
-msgstr "No está permitido actualizar el campo \"%1$s\" para el usuario aprovisionado."
+msgstr "No está permitido modificar el campo \"%1$s\" para el usuario aprovisionado."
 
 #: include/classes/api/clients/CLocalApiClient.php:174
 #: include/classes/api/services/CUser.php:1769
@@ -16414,7 +16427,7 @@ msgstr "Versión anterior"
 #: include/views/monitoring.sysmap.constructor.php:51
 #: include/views/monitoring.sysmap.constructor.php:61 jsLoader.php:251
 msgid "On"
-msgstr "ACTIVO"
+msgstr "Activo"
 
 #: app/views/administration.trigdisplay.edit.php:95
 msgid "On status change triggers blink for"
@@ -16454,11 +16467,11 @@ msgstr "Sólo una vez"
 #: app/views/administration.proxygroup.list.php:107
 #: app/views/administration.proxy.list.php:170
 msgid "Online"
-msgstr "En línea"
+msgstr "Conectado"
 
 #: app/views/administration.proxygroup.list.php:80
 msgid "Online proxies"
-msgstr "Proxies en línea"
+msgstr "Proxies conectados"
 
 #: include/classes/api/services/CUser.php:874
 #: include/classes/api/services/CUser.php:882
@@ -16873,6 +16886,10 @@ msgstr "Extensión PHP ctype faltante (Parámetro de configuración PHP --enable
 #: include/classes/setup/CFrontendSetup.php:687
 msgid "PHP curl"
 msgstr "PHP curl"
+
+#: include/classes/setup/CFrontendSetup.php:733
+msgid "PHP curl extension is missing or outdated."
+msgstr "La extensión PHP curl falta o está desactualizada."
 
 #: include/classes/setup/CFrontendSetup.php:691
 msgid "PHP curl extension missing."
@@ -17303,7 +17320,7 @@ msgstr "Porcentaje de memoria física del equipo que se ha consumido, \"url\": U
 
 #: include/classes/data/CItemData.php:2898
 msgid "Percentage of online proxies. Returns float."
-msgstr "Porcentaje de proxies online. Retorna un número flotante."
+msgstr "Porcentaje de proxies conectados. Retorna un número flotante."
 
 #: include/classes/data/CItemData.php:2268
 msgid "Percentage of time that the virtual machine was ready, but could not get scheduled to run on the physical CPU, \"url\" - VMware service URL, \"uuid\" - VMware virtual machine global unique identifier, \"instance\" - CPU instance"
@@ -18841,6 +18858,11 @@ msgstr "Código de respuesta"
 #: httpdetails.php:149 include/classes/screens/CScreenHttpTestDetails.php:83
 msgid "Response time"
 msgstr "Tiempo de respuesta"
+
+#: include/classes/server/CZabbixServer.php:507
+#, c-format
+msgid "Response timeout of %1$s exceeded when connecting to Zabbix server \"%2$s\"."
+msgstr ""
 
 #: app/controllers/CControllerMediatypeTestSend.php:182
 msgid "Response type: JSON"
@@ -20792,7 +20814,7 @@ msgstr "Estado"
 
 #: include/classes/data/CItemData.php:2912
 msgid "State of proxy group. Returns integer: 0 - unknown; 1 - offline; 2 - recovering; 3 - online; 4 - degrading."
-msgstr "Estado del grupo proxy. Devuelve un número entero: 0 - desconocido; 1 - fuera de línea; 2 - recuperándose; 3 - en línea; 4 - degradado."
+msgstr "Estado del grupo proxy. Devuelve un número entero: 0 - desconocido; 1 - desconectado; 2 - recuperándose; 3 - conectado; 4 - degradado."
 
 #: include/classes/data/CItemData.php:2855
 msgid "State of proxy memory buffer."
@@ -23523,16 +23545,16 @@ msgstr "Actualizado"
 #: widgets/problems/includes/WidgetProblems.php:473
 #: widgets/tophosts/views/column.edit.php:305
 msgid "Update"
-msgstr "Actualizar"
+msgstr "Modificar"
 
 #: widgets/tophosts/views/column.edit.php:300
 msgid "Update column"
-msgstr "Actualizar columna"
+msgstr "Modificar columna"
 
 #: app/partials/massupdate.macros.tab.php:87
 #: app/partials/massupdate.valuemaps.tab.php:34 app/views/popup.import.php:142
 msgid "Update existing"
-msgstr "Actualizar existentes"
+msgstr "Modificar existentes"
 
 #: app/controllers/CControllerPopupLldOperation.php:152
 #: app/controllers/CControllerPopupLldOperation.php:207
@@ -26243,12 +26265,12 @@ msgstr "No se puede realizar la solicitud de API de desplazamiento, los datos po
 #: include/classes/validators/CApiInputValidator.php:3536
 #, c-format
 msgid "cannot update readonly parameter \"%1$s\" of discovered object"
-msgstr "no se puede actualizar el parámetro de solo lectura \"%1$s\" del objeto descubierto"
+msgstr "no se puede modificar el parámetro de solo lectura \"%1$s\" del objeto descubierto"
 
 #: include/classes/validators/CApiInputValidator.php:3530
 #, c-format
 msgid "cannot update readonly parameter \"%1$s\" of inherited object"
-msgstr "no se puede actualizar el parámetro de solo lectura \"%1$s\" del objeto heredado"
+msgstr "no se puede modificar el parámetro de solo lectura \"%1$s\" del objeto heredado"
 
 #: include/classes/api/services/CUserGroup.php:501
 #: include/classes/api/services/CUser.php:451
@@ -26257,7 +26279,7 @@ msgstr "no se puede actualizar el parámetro de solo lectura \"%1$s\" del objeto
 #: include/classes/api/services/CUser.php:1066
 #, c-format
 msgid "cannot update readonly parameter \"%1$s\" of provisioned user"
-msgstr "no se puede actualizar el parámetro de solo lectura \"%1$s\" del usuario aprovisionado."
+msgstr "no se puede modificar el parámetro de solo lectura \"%1$s\" del usuario aprovisionado."
 
 #: app/controllers/CControllerPopupTriggerExpr.php:491
 msgid "cbrt() - Cube root"
@@ -26418,6 +26440,10 @@ msgstr "descripción"
 #: include/classes/validators/CApiInputValidator.php:1985
 msgid "directory cannot be empty"
 msgstr "el directorio no puede estar vacío"
+
+#: include/views/configuration.host.discovery.list.php:340
+msgid "discovery rule"
+msgstr "regla de descubrimiento"
 
 #: app/controllers/CControllerItemMassCheckNow.php:138
 #: include/classes/api/services/CTask.php:562
@@ -26667,7 +26693,7 @@ msgstr "se espera el ID del iniciador del equipo"
 
 #: app/views/host.wizard.edit.php:134
 msgid "how to update them"
-msgstr "Cómo actualizarlos"
+msgstr "Cómo modificarlos"
 
 #: include/classes/api/services/CMap.php:844
 #: include/classes/api/services/CMap.php:1311
