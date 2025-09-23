@@ -17,63 +17,97 @@
 class CControllerServiceUpdate extends CController {
 
 	protected function init(): void {
+		$this->setInputValidationMethod(self::INPUT_VALIDATION_FORM);
 		$this->setPostContentType(self::POST_CONTENT_TYPE_JSON);
 	}
 
+	public static function getValidationRules(): array {
+		return ['object', 'fields' => [
+			'serviceid' => ['db services.serviceid', 'required'],
+			'name' => ['db services.name', 'required', 'not_empty'],
+			'parent_serviceids' => ['array', 'field' => ['db services.serviceid']],
+			'problem_tags' => ['objects', 'uniq' => ['tag', 'value'],
+				'messages' => ['uniq' => _('Tag name and value combination is not unique.')],
+				'fields' => [
+					'value' => ['db service_problem_tag.value'],
+					'operator' => ['db service_problem_tag.operator', 'in' => [
+						ZBX_SERVICE_PROBLEM_TAG_OPERATOR_EQUAL, ZBX_SERVICE_PROBLEM_TAG_OPERATOR_LIKE
+					]],
+					'tag' => ['db service_problem_tag.tag', 'required', 'not_empty', 'when' => ['value', 'not_empty']]
+				]
+			],
+			'sortorder' => ['db services.sortorder', 'required', 'min' => 0, 'max' => 999],
+			'algorithm' => ['db services.algorithm', 'in' => [
+				ZBX_SERVICE_STATUS_CALC_SET_OK, ZBX_SERVICE_STATUS_CALC_MOST_CRITICAL_ALL,
+				ZBX_SERVICE_STATUS_CALC_MOST_CRITICAL_ONE
+			]],
+			'description' => ['db services.description'],
+			'status_rules' => ['objects', 'uniq' => ['type', 'limit_value', 'limit_status'],
+				'messages' => ['uniq' => _('Condition, limit and status combination is not unique.')],
+				'fields' => [
+					'type' => ['db service_status_rule.type', 'required',
+						'in' => array_keys(CServiceHelper::getStatusRuleTypeOptions())
+					],
+					'limit_value' => [
+						['db service_status_rule.limit_value', 'required', 'min' => 1, 'max' => 1000000,
+							'when' => ['type', 'in' => [
+								ZBX_SERVICE_STATUS_RULE_TYPE_N_GE, ZBX_SERVICE_STATUS_RULE_TYPE_N_L,
+								ZBX_SERVICE_STATUS_RULE_TYPE_W_GE, ZBX_SERVICE_STATUS_RULE_TYPE_W_L
+							]]
+						],
+						['db service_status_rule.limit_value', 'required', 'min' => 1, 'max' => 100,
+							'when' => ['type', 'in' => [
+								ZBX_SERVICE_STATUS_RULE_TYPE_NP_GE, ZBX_SERVICE_STATUS_RULE_TYPE_NP_L,
+								ZBX_SERVICE_STATUS_RULE_TYPE_WP_GE, ZBX_SERVICE_STATUS_RULE_TYPE_WP_L
+							]]
+						]
+					],
+					'limit_status' => ['db service_status_rule.limit_status',
+						'in' => array_keys(CServiceHelper::getStatusNames())
+					],
+					'new_status' => ['db service_status_rule.new_status', 'required',
+						'in' => array_keys(CServiceHelper::getProblemStatusNames())
+					]
+				]
+			],
+			'propagation_rule' => ['db services.propagation_rule', 'required',
+				'in' => array_keys(CServiceHelper::getStatusPropagationNames())
+			],
+			'propagation_value_number' => ['integer', 'required', 'in 1:'.(TRIGGER_SEVERITY_COUNT - 1),
+				'when' => ['propagation_rule', 'in' => [
+					ZBX_SERVICE_STATUS_PROPAGATION_INCREASE, ZBX_SERVICE_STATUS_PROPAGATION_DECREASE
+				]]
+			],
+			'propagation_value_status' => ['integer', 'required', 'in' => array_keys(CServiceHelper::getStatusNames()),
+				'when' => ['propagation_rule', 'in' => [ZBX_SERVICE_STATUS_PROPAGATION_FIXED]]
+			],
+			'weight' => ['db services.weight', 'required', 'min' => 0, 'max' => 1000000],
+			'tags' => ['objects', 'uniq' => ['tag', 'value'],
+				'messages' => ['uniq' => _('Tag name and value combination is not unique.')],
+				'fields' => [
+					'value' => ['db service_tag.value'],
+					'tag' => ['db service_tag.tag', 'required', 'not_empty', 'when' => ['value', 'not_empty']]
+				]
+			],
+			'child_serviceids' => ['array', 'field' => ['db services.serviceid']]
+		]];
+	}
+
 	protected function checkInput(): bool {
-		$fields = [
-			'serviceid' =>					'required|id',
-			'name' =>						'required|db services.name|not_empty',
-			'parent_serviceids' =>			'array_db services.serviceid',
-			'problem_tags' =>				'array',
-			'sortorder' =>					'required|db services.sortorder|ge 0|le 999',
-			'algorithm' =>					'required|db services.algorithm|in '.implode(',', [ZBX_SERVICE_STATUS_CALC_SET_OK, ZBX_SERVICE_STATUS_CALC_MOST_CRITICAL_ALL, ZBX_SERVICE_STATUS_CALC_MOST_CRITICAL_ONE]),
-			'description' =>				'db services.description',
-			'status_rules' =>				'array',
-			'propagation_rule' =>			'required|db services.propagation_rule|in '.implode(',', array_keys(CServiceHelper::getStatusPropagationNames())),
-			'propagation_value_number' =>	'int32',
-			'propagation_value_status' =>	'int32',
-			'weight' =>						'required|db services.weight|ge 0|le 1000000',
-			'tags' =>						'array',
-			'child_serviceids' =>			'array_db services.serviceid'
-		];
-
-		$ret = $this->validateInput($fields);
-
-		if ($ret) {
-			$fields = [];
-
-			switch ($this->getInput('propagation_rule')) {
-				case ZBX_SERVICE_STATUS_PROPAGATION_INCREASE:
-				case ZBX_SERVICE_STATUS_PROPAGATION_DECREASE:
-					$fields['propagation_value_number'] = 'required|ge 1|le '.(TRIGGER_SEVERITY_COUNT - 1);
-					break;
-
-				case ZBX_SERVICE_STATUS_PROPAGATION_FIXED:
-					$fields['propagation_value_status'] =
-						'required|in '.implode(',', array_keys(CServiceHelper::getStatusNames()));
-					break;
-			}
-
-			if ($fields) {
-				$validator = new CNewValidator(array_intersect_key($this->getInputAll(), $fields), $fields);
-
-				foreach ($validator->getAllErrors() as $error) {
-					info($error);
-				}
-
-				$ret = !$validator->isErrorFatal() && !$validator->isError();
-			}
-		}
+		$ret = $this->validateInput(self::getValidationRules());
 
 		if (!$ret) {
+			$form_errors = $this->getValidationError();
+
+			$response = $form_errors
+				? ['form_errors' => $form_errors]
+				: ['error' => [
+					'title' => _('Cannot update service'),
+					'messages' => array_column(get_and_clear_messages(), 'message')
+				]];
+
 			$this->setResponse(
-				new CControllerResponseData(['main_block' => json_encode([
-					'error' => [
-						'title' => _('Cannot update service'),
-						'messages' => array_column(get_and_clear_messages(), 'message')
-					]
-				])])
+				new CControllerResponseData(['main_block' => json_encode($response, JSON_THROW_ON_ERROR)])
 			);
 		}
 
