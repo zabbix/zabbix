@@ -211,7 +211,7 @@ class testFormGroups extends CWebTest {
 			[
 				[
 					'expected' => TEST_BAD,
-					'error' => 'Invalid parameter "/1/name": cannot be empty.'
+					'error' => ['Group name' => 'This field cannot be empty.']
 				]
 			],
 			[
@@ -220,7 +220,7 @@ class testFormGroups extends CWebTest {
 					'fields' => [
 						'Group name' => ' '
 					],
-					'error' => 'Invalid parameter "/1/name": cannot be empty.'
+					'error' => ['Group name' => 'This field cannot be empty.']
 				]
 			],
 			[
@@ -229,8 +229,8 @@ class testFormGroups extends CWebTest {
 					'fields' => [
 						'Group name' => 'Test/Test/'
 					],
-					'error' => 'Invalid parameter "/1/name": invalid host group name.',
-					'template_error' => 'Invalid parameter "/1/name": invalid template group name.'
+					'error' => ['Group name' => 'Invalid host group name.'],
+					'template_error' => ['Group name' => 'Invalid template group name.']
 				]
 			],
 			[
@@ -239,8 +239,8 @@ class testFormGroups extends CWebTest {
 					'fields' => [
 						'Group name' => 'Test/Test\/'
 					],
-					'error' => 'Invalid parameter "/1/name": invalid host group name.',
-					'template_error' => 'Invalid parameter "/1/name": invalid template group name.'
+					'error' => ['Group name' => 'Invalid host group name.'],
+					'template_error' => ['Group name' => 'Invalid template group name.']
 				]
 			],
 			[
@@ -304,7 +304,6 @@ class testFormGroups extends CWebTest {
 	 */
 	protected function checkForm($data, $action) {
 		$good_message = ucfirst($this->object).' group '.(($action === 'create') ? 'added' : 'updated');
-		$bad_message = 'Cannot '.(($action === 'create') ? 'add' : 'update').' '.$this->object.' group';
 
 		if ($data['expected'] === TEST_BAD) {
 			$old_hash = CDBHelper::getHash(self::GROUPS_SQL);
@@ -341,10 +340,10 @@ class testFormGroups extends CWebTest {
 		else {
 			$this->assertEquals($old_hash, CDBHelper::getHash(self::GROUPS_SQL));
 			$this->assertEquals($permission_old_hash, CDBHelper::getHash(self::PERMISSION_SQL));
-			$error_details = ($this->object == 'template')
+			$error = ($this->object == 'template')
 				? CTestArrayHelper::get($data, 'template_error', $data['error'])
 				: $data['error'];
-			$this->assertMessage(TEST_BAD, $bad_message, $error_details);
+			$this->assertInlineError($form, $error);
 		}
 
 		COverlayDialogElement::find()->one()->close();
@@ -378,7 +377,7 @@ class testFormGroups extends CWebTest {
 				[
 					'expected' => TEST_BAD,
 					'name' => self::DELETE_GROUP,
-					'error' => ' group "'.self::DELETE_GROUP.'" already exists.'
+					'error' => ['Group name' => 'This object already exists.']
 				]
 			],
 			[
@@ -441,7 +440,7 @@ class testFormGroups extends CWebTest {
 		}
 		else {
 			$this->assertEquals($old_hash, CDBHelper::getHash(self::GROUPS_SQL));
-			$this->assertMessage(TEST_BAD, 'Cannot add '.$this->object.' group', ucfirst($this->object).$data['error']);
+			$this->assertInlineError($form, $data['error']);
 		}
 
 		COverlayDialogElement::find()->one()->close();
@@ -492,7 +491,7 @@ class testFormGroups extends CWebTest {
 
 		if (in_array($data['action'], ['Clone', 'Delete'])) {
 			COverlayDialogElement::find()->one()->waitUntilReady()->getFooter()->query('button', $data['action'])
-					->one()->click();
+					->one()->waitUntilClickable()->click();
 		}
 
 		if ($data['action'] === 'Delete') {

@@ -23,20 +23,11 @@ $form = (new CForm('post'))
 	->addItem((new CVar(CSRF_TOKEN_NAME, CCsrfTokenHelper::get('service')))->removeId())
 	->setId('service-form')
 	->setName('service_form')
-	->addItem(getMessages());
-
-// Enable form submitting on Enter.
-$form->addItem((new CSubmitButton())->addClass(ZBX_STYLE_FORM_SUBMIT_HIDDEN));
+	->addItem(getMessages())
+	->addItem((new CSubmitButton())->addClass(ZBX_STYLE_FORM_SUBMIT_HIDDEN))
+	->addItem((new CInput('hidden', 'serviceid', $data['serviceid']))->setAttribute('data-field-type', 'hidden'));
 
 // Service tab.
-
-$parent_services = (new CMultiSelect([
-	'name' => 'parent_serviceids[]',
-	'object_name' => 'services',
-	'data' => CArrayHelper::renameObjectsKeys($data['form']['parents'], ['serviceid' => 'id']),
-	'custom_select' => true
-]))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH);
-
 $service_tab = (new CFormGrid())
 	->addItem([
 		(new CLabel(_('Name'), 'name'))->setAsteriskMark(),
@@ -49,11 +40,18 @@ $service_tab = (new CFormGrid())
 	])
 	->addItem([
 		new CLabel(_('Parent services'), 'parent_serviceids__ms'),
-		new CFormField($parent_services)
+		new CFormField(
+			(new CMultiSelect([
+				'name' => 'parent_serviceids[]',
+				'object_name' => 'services',
+				'data' => CArrayHelper::renameObjectsKeys($data['form']['parents'], ['serviceid' => 'id']),
+				'custom_select' => true
+			]))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+		)
 	])
 	->addItem([
 		new CLabel(_('Problem tags')),
-		new CFormField(
+		(new CFormField(
 			(new CDiv([
 				(new CTable())
 					->setId('problem_tags')
@@ -68,7 +66,7 @@ $service_tab = (new CFormGrid())
 						))
 					),
 				(new CTemplateTag('problem-tag-row-tmpl'))
-					->addItem(
+					->addItem([
 						(new CRow([
 							(new CTextBox('problem_tags[#{rowNum}][tag]', '#{tag}', false,
 								DB::getFieldLength('service_problem_tag', 'tag')
@@ -76,7 +74,8 @@ $service_tab = (new CFormGrid())
 								->addClass('js-problem-tag-input')
 								->addClass('js-problem-tag-tag')
 								->setAttribute('placeholder', _('tag'))
-								->setWidth(ZBX_TEXTAREA_FILTER_SMALL_WIDTH),
+								->setWidth(ZBX_TEXTAREA_FILTER_SMALL_WIDTH)
+								->setErrorContainer('problem_tags_#{rowNum}_error_container'),
 							(new CSelect('problem_tags[#{rowNum}][operator]'))
 								->addClass('js-problem-tag-input')
 								->addOptions(CSelect::createOptionsFromArray([
@@ -91,15 +90,23 @@ $service_tab = (new CFormGrid())
 								->setAttribute('placeholder', _('value'))
 								->setWidth(ZBX_TEXTAREA_FILTER_SMALL_WIDTH),
 							(new CButtonLink(_('Remove')))->addClass('element-table-remove')
-						]))->addClass('form_row')
-					)
+						]))->addClass('form_row'),
+						(new CRow([
+							(new CCol())
+								->setId('problem_tags_#{rowNum}_error_container')
+								->addClass(ZBX_STYLE_ERROR_CONTAINER)
+								->setColSpan(3)
+						]))->addClass('error-container-row')
+					])
 			]))->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
-		)
+		))
+			->setAttribute('data-field-type', 'set')
+			->setAttribute('data-field-name', 'problem_tags')
 	])
 	->addItem([
 		(new CLabel(_('Sort order (0->999)'), 'sortorder'))->setAsteriskMark(),
 		new CFormField(
-			(new CNumericBox('sortorder', $data['form']['sortorder'], 3))
+			(new CNumericBox('sortorder', $data['form']['sortorder'], 3, allow_negative: false))
 				->setWidth(ZBX_TEXTAREA_TINY_WIDTH)
 				->setAriaRequired()
 		)
@@ -148,16 +155,64 @@ $additional_rules = (new CTable())
 	->setId('status_rules')
 	->setHeader(
 		(new CRowHeader([_('Name'), _('Actions')]))->addClass(ZBX_STYLE_GREY)
+	)
+	->addItem(
+		(new CTag('tfoot', true))
+			->addItem(
+				(new CCol(
+					(new CButtonLink(_('Add')))->addClass('js-add')
+				))->setColSpan(2)
+		)
 	);
 
-$additional_rules->addItem(
-	(new CTag('tfoot', true))
-		->addItem(
-			(new CCol(
-				(new CButtonLink(_('Add')))->addClass('js-add')
-			))->setColSpan(2)
-		)
-);
+$additional_rules_row = (new CTemplateTag('status-rule-tmpl'))->addItem([
+	(new CRow([
+		new CCol([
+			new CSpan('#{*name}'),
+			(new CInput('hidden'))
+				->setId('status_rules_#{row_index}_new_status')
+				->setAttribute('name', 'status_rules[#{row_index}][new_status]')
+				->setAttribute('value', '#{new_status}')
+				->setAttribute('data-field-type', 'hidden'),
+			(new CInput('hidden'))
+				->setId('status_rules_#{row_index}_type')
+				->setAttribute('name', 'status_rules[#{row_index}][type]')
+				->setAttribute('value', '#{type}')
+				->setAttribute('data-field-type', 'hidden')
+				->setErrorContainer('additional_rules_error_container_#{row_index}'),
+			(new CInput('hidden'))
+				->setId('status_rules_#{row_index}_limit_value')
+				->setAttribute('name', 'status_rules[#{row_index}][limit_value]')
+				->setAttribute('value', '#{limit_value}')
+				->setAttribute('data-field-type', 'hidden')
+				->setErrorContainer('additional_rules_error_container_#{row_index}'),
+			(new CInput('hidden'))
+				->setId('status_rules_#{row_index}_limit_status')
+				->setAttribute('name', 'status_rules[#{row_index}][limit_status]')
+				->setAttribute('value', '#{limit_status}')
+				->setAttribute('data-field-type', 'hidden')
+				->setErrorContainer('additional_rules_error_container_#{row_index}')
+		]),
+		new CCol([
+			(new CList([
+				(new CButton('edit', _('Edit')))
+					->addClass('js-edit')
+					->addClass(ZBX_STYLE_BTN_LINK)
+					->removeId(),
+				(new CButton('remove', _('Remove')))
+					->addClass('js-remove')
+					->addClass(ZBX_STYLE_BTN_LINK)
+					->removeId()
+			]))->addClass(ZBX_STYLE_HOR_LIST)
+		])
+	]))->setAttribute('data-row_index', '#{row_index}'),
+	(new CRow([
+		(new CCol())
+			->setId('additional_rules_error_container_#{row_index}')
+			->addClass(ZBX_STYLE_ERROR_CONTAINER)
+			->setColSpan(4)
+	]))->addClass('error-container-row')
+]);
 
 $propagation_value_number = (new CRadioButtonList('propagation_value_number',
 	$data['form']['propagation_value_number'] !== null ? (int) $data['form']['propagation_value_number'] : null
@@ -178,11 +233,17 @@ $service_tab->addItem(
 		->setId('advanced-configuration')
 		->addItem([
 			new CLabel(_('Additional rules')),
-			new CFormField(
+			(new CFormField([
 				(new CDiv($additional_rules))
 					->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
 					->addStyle('min-width: '.(ZBX_TEXTAREA_BIG_WIDTH - 27).'px;')
-			)
+					->setAttribute('data-field-type', 'set')
+					->setAttribute('data-field-name', 'status_rules'),
+				(new CDiv())
+					->setId('status_rules_error_container')
+					->addClass(ZBX_STYLE_ERROR_CONTAINER),
+				$additional_rules_row
+			]))
 		])
 		->addItem([
 			new CLabel(_('Status propagation rule'), 'propagation_rule_focusable'),
@@ -203,7 +264,7 @@ $service_tab->addItem(
 		->addItem([
 			(new CLabel(_('Weight'), 'weight'))->setAsteriskMark(),
 			new CFormField(
-				(new CNumericBox('weight', $data['form']['weight'], 7))
+				(new CNumericBox('weight', $data['form']['weight'], 7, allow_negative: false))
 					->setWidth(ZBX_TEXTAREA_TINY_WIDTH)
 					->setAriaRequired()
 			)
@@ -211,27 +272,29 @@ $service_tab->addItem(
 );
 
 // Tags tab.
-
 $tags_tab = (new CFormGrid())
 	->addItem([
 		new CLabel(_('Tags')),
-		new CFormField(
+		(new CFormField(
 			(new CDiv())
 				->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
 				->addStyle('min-width: '.ZBX_TEXTAREA_BIG_WIDTH.'px;')
 				->addItem([
-					renderTagTable($data['form']['tags'])
+					renderTagTable($data['form']['tags'], options: ['has_inline_validation' => true])
 						->addClass('tags-table')
 						->setHeader((new CRowHeader([_('Name'), _('Value'), '']))->addClass(ZBX_STYLE_GREY)),
 					(new CTemplateTag('tag-row-tmpl'))->addItem(
-						renderTagTableRow('#{rowNum}', ['tag' => '', 'value' => ''], ['add_post_js' => false])
+						renderTagTableRow('#{rowNum}', ['tag' => '', 'value' => ''], ['add_post_js' => false,
+							'has_inline_validation' => true
+						])
 					)
 				])
-		)
+		))
+			->setAttribute('data-field-type', 'set')
+			->setAttribute('data-field-name', 'tags')
 	]);
 
 // Child services tab.
-
 $child_services = (new CTable())
 	->setId('children')
 	->setAttribute('data-tab-indicator', count($data['form']['children']))
@@ -263,7 +326,7 @@ $child_services_filter = (new CList())
 	->addClass(ZBX_STYLE_INLINE_FILTER)
 	->addItem(new CLabel(_('Name'), 'children-filter-name'), ZBX_STYLE_INLINE_FILTER_LABEL)
 	->addItem(
-		(new CTextBox(null))
+		(new CTextBox('children-filter-name'))
 			->setId('children-filter-name')
 			->setWidth(ZBX_TEXTAREA_FILTER_STANDARD_WIDTH))
 	->addItem(
@@ -276,16 +339,33 @@ $child_services_filter = (new CList())
 			->addClass(ZBX_STYLE_BTN_ALT)
 	);
 
+$child_service_row = (new CTemplateTag('child-service-tmpl'))->addItem([
+	(new CRow([
+		(new CCol('#{*name}'))
+			->addClass(ZBX_STYLE_WORDWRAP)
+			->addStyle('max-width: '.ZBX_TEXTAREA_BIG_WIDTH.'px;'),
+		(new CCol('#{*problem_tags_html}'))->addClass(ZBX_STYLE_WORDWRAP)->addClass(ZBX_STYLE_TAGS_WRAPPER),
+		(new CCol(
+			(new CButton('edit', _('Remove')))
+				->addClass('js-remove')
+				->addClass(ZBX_STYLE_BTN_LINK)
+		))
+	]))->setAttribute('data-serviceid', '#{serviceid}')
+]);
+
 $child_services_tab = [
 	(new CFormGrid())
 		->addItem(new CFormField($child_services_filter))
 		->addItem([
 			new CLabel(_('Child services')),
-			new CFormField(
+			(new CFormField([
 				(new CDiv($child_services))
 					->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
-					->addStyle('min-width: '.ZBX_TEXTAREA_BIG_WIDTH.'px;')
-			)
+					->addStyle('min-width: '.ZBX_TEXTAREA_BIG_WIDTH.'px;'),
+				$child_service_row
+			]))
+				->setAttribute('data-field-type', 'set')
+				->setAttribute('data-field-name', 'child-services')
 		])
 ];
 
@@ -295,13 +375,12 @@ $tabs = (new CTabView())
 	->addTab('tags-tab', _('Tags'), $tags_tab, TAB_INDICATOR_TAGS)
 	->addTab('child-services-tab', _('Child services'), $child_services_tab, TAB_INDICATOR_CHILD_SERVICES);
 
-// Output.
-
 $form
 	->addItem($tabs)
 	->addItem(
 		(new CScriptTag('
 			service_edit_popup.init('.json_encode([
+				'rules' => $data['js_validation_rules'],
 				'tabs_id' => $tabs->getId(),
 				'serviceid' => $data['serviceid'],
 				'children' => $data['form']['children'],
@@ -344,7 +423,8 @@ if ($data['serviceid'] !== null) {
 						'cancel' => true,
 						'action' => ''
 					]
-				]
+				],
+				'rules' => (new CFormValidator(CControllerServiceCreate::getValidationRules()))->getRules()
 			]).');'
 		],
 		[

@@ -30,11 +30,11 @@
 #include "zbxself.h"
 #include "zbxstr.h"
 #include "zbxtime.h"
-#include "zbxexpression.h"
 #include "zbxdbwrap.h"
 #include "zbxalgo.h"
 #include "zbxdbhigh.h"
 #include "zbxthreads.h"
+#include "zbxexpr.h"
 
 #define	ALARM_ACTION_TIMEOUT	40
 
@@ -145,6 +145,54 @@ static char	*create_email_inreplyto(zbx_uint64_t mediatypeid, const char *sendto
 	return str;
 }
 
+static int	macro_alert_email_resolv(zbx_macro_resolv_data_t *p, va_list args, char **replace_to,
+		char **data, char *error, size_t maxerrlen)
+{
+	int	ret = SUCCEED;
+
+	/* Passed parameters */
+	const zbx_dc_um_handle_t	*um_handle = va_arg(args, const zbx_dc_um_handle_t *);
+	const zbx_db_event		*event = va_arg(args, const zbx_db_event *);
+
+	ZBX_UNUSED(data);
+	ZBX_UNUSED(error);
+	ZBX_UNUSED(maxerrlen);
+
+	if (0 == p->indexed && SUCCEED == zbx_token_is_user_macro(p->macro, &p->token))
+	{
+		if ((EVENT_SOURCE_INTERNAL == event->source && EVENT_OBJECT_TRIGGER == event->object) ||
+				EVENT_SOURCE_TRIGGERS == event->source)
+		{
+			const zbx_vector_uint64_t	*phostids;
+
+			if (NULL != event->trigger.expression && NULL != event->trigger.recovery_expression &&
+					SUCCEED == zbx_db_trigger_get_all_hostids(&event->trigger, &phostids))
+			{
+				zbx_dc_get_user_macro(um_handle, p->macro, phostids->values, phostids->values_num,
+						replace_to);
+			}
+		}
+		else if (EVENT_SOURCE_INTERNAL == event->source && (EVENT_OBJECT_ITEM == event->object ||
+				EVENT_OBJECT_LLDRULE == event->object))
+		{
+			zbx_vector_uint64_t	hostids;
+
+			zbx_vector_uint64_create(&hostids);
+
+			zbx_dc_config_get_hostid_by_itemid(&hostids, event->objectid);
+			zbx_dc_get_user_macro(um_handle, p->macro, hostids.values, hostids.values_num, replace_to);
+
+			zbx_vector_uint64_destroy(&hostids);
+		}
+		else
+			zbx_dc_get_user_macro(um_handle, p->macro, NULL, 0, replace_to);
+
+		p->pos = (int)p->token.loc.r;
+	}
+
+	return ret;
+}
+
 /****************************************************************************************
  *                                                                                      *
  * Purpose: processes email alert                                                       *
@@ -176,21 +224,21 @@ static void	alerter_process_email(zbx_ipc_socket_t *socket, zbx_ipc_message_t *i
 
 	if (SMTP_AUTHENTICATION_PASSWORD == smtp_authentication)
 	{
-		/* fill data required by substitute_simple_macros_unmasked() for ZBX_MACRO_TYPE_ALERT_EMAIL */
+		/* fill data required by macro_alert_email_resolv() */
 
-		zbx_db_event	event = {.eventid = eventid, .source = source, .object = object, .objectid = objectid};
+		zbx_db_event	event = {.eventid = eventid, .source = source, .object = object,
+				.objectid = objectid};
 
 		memset(&event.trigger, 0, sizeof(zbx_db_trigger));
 		event.trigger.expression = expression;
-		expression = NULL;
 		event.trigger.recovery_expression = recovery_expression;
-		recovery_expression = NULL;
+
 		zbx_dc_um_handle_t	*um_handle = zbx_dc_open_user_macros();
 
-		zbx_substitute_simple_macros_unmasked(NULL, &event, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL,
-				NULL, NULL, &smtp_username, ZBX_MACRO_TYPE_ALERT_EMAIL, NULL, 0);
-		zbx_substitute_simple_macros_unmasked(NULL, &event, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL,
-				NULL, NULL, &smtp_password, ZBX_MACRO_TYPE_ALERT_EMAIL, NULL, 0);
+		zbx_substitute_macros(&smtp_username, NULL, 0, &macro_alert_email_resolv, um_handle,
+				&event);
+		zbx_substitute_macros(&smtp_password, NULL, 0, &macro_alert_email_resolv, um_handle,
+				&event);
 
 		zbx_dc_close_user_macros(um_handle);
 		zbx_db_trigger_clean(&event.trigger);
@@ -205,8 +253,6 @@ static void	alerter_process_email(zbx_ipc_socket_t *socket, zbx_ipc_message_t *i
 
 	alerter_send_result(socket, NULL, ret, (SUCCEED == ret ? NULL : error), NULL);
 
-	zbx_free(expression);
-	zbx_free(recovery_expression);
 	zbx_free(error);
 	zbx_free(inreplyto);
 	zbx_free(sendto);
