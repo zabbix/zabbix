@@ -2038,8 +2038,10 @@ static void	start_processes(zbx_socket_t *listen_sock, zbx_proc_startup_t *runle
 
 static int	server_startup(zbx_socket_t *listen_sock, int *ha_stat, int *ha_failover, zbx_on_exit_args_t *exit_args)
 {
-	char				*error = NULL;
-	int				ret = FAIL;
+	char			*error = NULL;
+	int			ret = FAIL;
+	zbx_proc_startup_t	*runlevels = NULL;
+
 
 	if (SUCCEED != zbx_init_database_cache(get_zbx_program_type, zbx_sync_history_cache_server,
 			config_history_cache_size, config_history_index_cache_size, &config_trends_cache_size, &error))
@@ -2115,8 +2117,6 @@ static int	server_startup(zbx_socket_t *listen_sock, int *ha_stat, int *ha_failo
 
 	zbx_set_exit_on_terminate();
 	zbx_set_child_pids(zbx_threads, zbx_threads_num);
-
-	zbx_proc_startup_t	*runlevels = NULL;
 
 	runlevels = zbx_proc_startup_create(zbx_threads_num, get_process_info_by_thread);
 

@@ -414,7 +414,7 @@ static void	supervisor_handle_runlevel_sub(zbx_supervisor_t *sv, zbx_ipc_client_
  * Return value: supervisor unit                                              *
  *                                                                            *
  ******************************************************************************/
-zbx_supervisor_unit_t	*supervisor_get_unit(zbx_supervisor_t *sv, unsigned char type, int num)
+static zbx_supervisor_unit_t	*supervisor_get_unit(zbx_supervisor_t *sv, unsigned char type, int num)
 {
 	if (ZBX_PROCESS_TYPE_COUNT <= type)
 	{
@@ -606,7 +606,7 @@ static void	supervisor_change_loglevel(zbx_supervisor_t *sv, int direction, cons
  *               FAIL    - no matching unit found                             *
  *                                                                            *
  ******************************************************************************/
-int	supervisor_get_exit_thread_info(zbx_supervisor_t *sv, unsigned char *process_type, int *process_num)
+static int	supervisor_get_exit_thread_info(zbx_supervisor_t *sv, unsigned char *process_type, int *process_num)
 {
 	for (int i = 0; i < ZBX_PROCESS_TYPE_COUNT; i++)
 	{
