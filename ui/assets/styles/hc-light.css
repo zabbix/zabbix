@@ -2263,10 +2263,6 @@ button {
   background-color: #ffffff;
   border-collapse: separate;
   border: 1px solid #9f9f9f; }
-  .list-table.list-table-help-items thead th:first-child {
-    min-width: 210px; }
-  .list-table.list-table-help-items thead th:last-child {
-    width: 18px; }
   .list-table.fixed {
     table-layout: fixed; }
   .list-table thead th {

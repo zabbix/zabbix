@@ -169,11 +169,26 @@ if ($data['multiselect'] && $form !== null) {
 	$table_columns[] = $ch_box;
 }
 
-$table = (new CTableInfo())->setHeader(array_merge($table_columns, $data['table_columns']));
+$table_header = new CRowHeader();
+$table_columns = array_merge($table_columns, $data['table_columns']);
 
-if ($data['popup_type'] === 'help_items') {
-	$table->addClass(ZBX_STYLE_LIST_TABLE_HELP_ITEMS);
+foreach ($table_columns as $i => $column) {
+	$column = $column instanceof CColHeader ? $column : new CColHeader($column);
+
+	if ($data['popup_type'] === 'help_items') {
+		if ($i === array_key_first($table_columns)) {
+			$column->addStyle('min-width: 210px;');
+		}
+
+		if ($i === array_key_last($table_columns)) {
+			$column->addStyle('width: 18px;');
+		}
+	}
+
+	$table_header->addItem($column);
 }
+
+$table = (new CTableInfo())->setHeader($table_header);
 
 if ($data['preselect_required']) {
 	$table->setNoDataMessage(_('Filter is not set'), _('Use the filter to display results'), ZBX_ICON_FILTER_LARGE);
