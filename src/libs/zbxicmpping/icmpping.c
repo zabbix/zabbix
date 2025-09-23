@@ -818,6 +818,7 @@ static int	hosts_ping(zbx_fping_host_t *hosts, int hosts_count, int requests_cou
 	sigset_t	mask, orig_mask;
 	zbx_fping_args	fping_args;
 	zbx_fping_resp	fping_resp;
+	mode_t		old_umask = umask(0666 & ~0640);
 
 #ifdef HAVE_IPV6
 	int		family;
@@ -1106,8 +1107,6 @@ static int	hosts_ping(zbx_fping_host_t *hosts, int hosts_count, int requests_cou
 #else
 	zbx_snprintf(linebuf, linebuf_size, "%s %s 2>&1 <%s", config_icmpping->get_fping_location(), params, filename);
 #endif	/* HAVE_IPV6 */
-
-	mode_t	old_umask = umask(0666 & ~0640);
 
 	f = fopen(filename, "w");
 	umask(old_umask);

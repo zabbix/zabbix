@@ -130,11 +130,13 @@ static void	rotate_log(const char *filename)
 		if (0 != rename(filename, filename_old))
 		{
 			FILE	*log_file = NULL;
+#ifndef _WINDOWS
 			mode_t	old_umask = umask(0666 & ~0640);
-
+#endif
 			log_file = fopen(filename, "w");
+#ifndef _WINDOWS
 			umask(old_umask);
-
+#endif
 			if (NULL != log_file)
 			{
 				long		milliseconds;
