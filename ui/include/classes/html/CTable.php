@@ -99,9 +99,9 @@ class CTable extends CTag {
 	 *
 	 * @param mixed $value  Table header row or array with table header cells.
 	 *
-	 * @return static
+	 * @return CTable
 	 */
-	public function setHeader($value = null): static {
+	public function setHeader($value = null) {
 		if (!($value instanceof CRow)) {
 			$value = new CRowHeader($value);
 		}

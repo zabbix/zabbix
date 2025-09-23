@@ -30,9 +30,13 @@ else {
 	$table = (new CTable())
 		->setId('tbl_macros')
 		->addClass(ZBX_STYLE_TEXTAREA_FLEXIBLE_CONTAINER)
-		->addClass('inherited-macros-table')
-		->setAttribute('data-field-type', 'set')
-		->setAttribute('data-field-name', 'macros');
+		->addClass('inherited-macros-table');
+
+	if ($data['has_inline_validation']) {
+		$table
+			->setAttribute('data-field-type', 'set')
+			->setAttribute('data-field-name', 'macros');
+	}
 
 	if (CWebUser::getType() == USER_TYPE_SUPER_ADMIN) {
 		$link = (new CLink(_('configure'), (new CUrl('zabbix.php'))
@@ -56,7 +60,8 @@ else {
 	]);
 
 	foreach ($data['macros'] as $i => $macro) {
-		$skip_from_submit = !($macro['inherited_type'] & ZBX_PROPERTY_OWN) ? 1 : null;
+		$skip_from_submit = $data['has_inline_validation']
+			&& !($macro['inherited_type'] & ZBX_PROPERTY_OWN) ? 1 : null;
 
 		$value = array_key_exists('value', $macro) ? $macro['value'] : null;
 		$macro_value = (new CMacroValue($macro['type'], 'macros['.$i.']', $value, false))
@@ -64,8 +69,8 @@ else {
 				|| !($macro['discovery_state'] & CControllerHostMacrosList::DISCOVERY_STATE_CONVERTING)
 				|| !($macro['inherited_type'] & ZBX_PROPERTY_OWN)
 			)
-			->setErrorContainer('macros_'.$i.'_error_container')
-			->setErrorLabel(_('Effective value'))
+			->setErrorContainer($data['has_inline_validation'] ? 'macros_'.$i.'_error_container' : null)
+			->setErrorLabel($data['has_inline_validation'] ? _('Effective value') : null)
 			->setAttribute('data-skip-from-submit', $skip_from_submit);
 
 		$macro_cell = [
@@ -77,9 +82,9 @@ else {
 				->addClass('macro')
 				->setWidth(ZBX_TEXTAREA_MACRO_WIDTH)
 				->setAttribute('placeholder', '{$MACRO}')
-				->setErrorContainer('macros_'.$i.'_error_container')
+				->setErrorContainer($data['has_inline_validation'] ? 'macros_'.$i.'_error_container' : null)
 				->disableSpellcheck()
-				->setErrorLabel(_('Macro'))
+				->setErrorLabel($data['has_inline_validation'] ? _('Macro') : null)
 				->setAttribute('data-skip-from-submit', $skip_from_submit)
 		];
 
@@ -235,10 +240,12 @@ else {
 					->setColSpan(count($row))
 				]))->addClass('form_row')
 			)
-			->addRow((new CCol())
-				->addClass(ZBX_STYLE_ERROR_CONTAINER)
-				->setAttribute('colspan', count($row))
-				->setId('macros_'.$i.'_error_container')
+			->addRow($data['has_inline_validation']
+				? (new CCol())
+					->addClass(ZBX_STYLE_ERROR_CONTAINER)
+					->setAttribute('colspan', count($row))
+					->setId('macros_'.$i.'_error_container')
+				: null
 			);
 	}
 

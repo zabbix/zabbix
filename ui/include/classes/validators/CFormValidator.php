@@ -246,7 +246,23 @@ class CFormValidator {
 						break;
 
 					case 'api_uniq':
-						$result[$key] = self::normalizeApiUniqRule($value, $rule_path);
+						if (!is_array($value) || !array_key_exists(0, $value)) {
+							throw new Exception('[RULES ERROR] Rule "'.$key.'" should contain non-empty array (Path: '.$rule_path.')');
+						}
+
+						if (!is_array($value[0])) {
+							$value = [$value];
+						}
+
+						foreach ($value as &$api_uniq_check) {
+							if (count(explode('.', $api_uniq_check[0])) !== 2) {
+								throw new Exception('[RULES ERROR] Rule "'.$key.'" should contain a valid API call (Path: '.$rule_path.', API call:'.$api_uniq_check[0].')');
+							}
+							$api_uniq_check += [1 => [], 2 => null, 3 => null];
+						}
+						unset($api_uniq_check);
+
+						$result[$key] = $value;
 						break;
 
 					case 'regex':
@@ -497,32 +513,6 @@ class CFormValidator {
 		}
 
 		return $result;
-	}
-
-	private static function normalizeApiUniqRule(array $value, string $rule_path): array {
-		if (!is_array($value) || !array_key_exists(0, $value)) {
-			throw new Exception('[RULES ERROR] Rule "api_uniq" should contain non-empty array (Path: '.$rule_path.')');
-		}
-
-		if (!is_array($value[0])) {
-			$value = [$value];
-		}
-
-		foreach ($value as &$api_uniq_check) {
-			if (count(explode('.', $api_uniq_check[0])) != 2) {
-				throw new Exception(
-					'[RULES ERROR] Rule "api_uniq" should contain a valid API call (Path: '.$rule_path.', API call:'.
-					$api_uniq_check[0].')'
-				);
-			}
-			$api_uniq_check += [1 => [], 2 => null, 3 => null, 4 => []];
-			$api_uniq_check[1] = ['filter' => $api_uniq_check[1]];
-			$api_uniq_check[1] += $api_uniq_check[4];
-			unset($api_uniq_check[4]);
-		}
-		unset($api_uniq_check);
-
-		return $value;
 	}
 
 	/**
@@ -1241,12 +1231,11 @@ class CFormValidator {
 	}
 
 	/**
-	 * Check via API if item exists, excluding provided ID. Used for unique checks.
+	 * Check via API if item exists, excluding provided id. Used for unique checks
 	 *
-	 * @param string      $api
-	 * @param array       $options
+	 * @param string $api
+	 * @param array $options
 	 * @param string|null $exclude_primary_id
-	 *
 	 * @return bool
 	 */
 	public static function existsAPIObject(string $api, array $options, ?string $exclude_primary_id = null): bool {
@@ -1275,22 +1264,6 @@ class CFormValidator {
 		return false;
 	}
 
-	private function resolveFieldReference(string $parameter, ?string $field_path, string $path): array {
-		if (substr($parameter, 0, 1) === '{' && substr($parameter, -1, 1) === '}') {
-			$field_data = $this->getWhenFieldValue(substr($parameter, 1, -1), $path);
-
-			if (in_array($field_data['type'], ['id', 'integer', 'float', 'string'])) {
-				$parameter = $field_data['value'];
-
-				if ($field_path === null && $path === '') {
-					$field_path = $field_data['path'];
-				}
-			}
-		}
-
-		return [$parameter, $field_path];
-	}
-
 	private function validateApiUniq(array $check, string &$path, ?string &$error = null): bool {
 		[$method, $parameters, $exclude_id] = $check;
 		[$api] = explode('.', $method);
@@ -1298,17 +1271,17 @@ class CFormValidator {
 		$field_path = null;
 
 		// Replace field references by real values in API request parameters.
-		foreach ($parameters['filter'] as &$parameter) {
-			[$parameter, $field_path] = $this->resolveFieldReference($parameter, $field_path, $path);
-		}
-		unset($parameter);
+		foreach ($parameters as &$parameter) {
+			if (substr($parameter, 0, 1) === '{' && substr($parameter, -1, 1) === '}') {
+				$field_data = $this->getWhenFieldValue(substr($parameter, 1, -1), $path);
 
-		foreach ($parameters as $name => &$parameter) {
-			if ($name === 'filter') {
-				continue;
+				if (in_array($field_data['type'], ['id', 'integer', 'float', 'string'])) {
+					$parameter = $field_data['value'];
+					if ($field_path === null && $path === '') {
+						$field_path = $field_data['path'];
+					}
+				}
 			}
-
-			[$parameter, $field_path] = $this->resolveFieldReference($parameter, $field_path, $path);
 		}
 		unset($parameter);
 
@@ -1323,6 +1296,10 @@ class CFormValidator {
 
 			$exclude_id = $exclude_id_field_data['type'] === 'id' ? $exclude_id_field_data['value'] : null;
 		}
+
+		$parameters = [
+			'filter' => $parameters
+		];
 
 		if (self::existsAPIObject($api, $parameters, $exclude_id)) {
 			$error = _('This object already exists.');
@@ -1719,18 +1696,7 @@ class CFormValidator {
 
 		if (array_key_exists('api_uniq', $rules)) {
 			foreach ($rules['api_uniq'] as $api_check) {
-				foreach ($api_check[1]['filter'] as $param) {
-					if (substr($param, 0, 1) === '{' && substr($param, -1, 1) === '}') {
-						$this->when_resolved_data['fields_to_lookup'][]
-							= self::getWhenFieldAbsolutePath(substr($param, 1, -1), $path);
-					}
-				}
-
-				foreach ($api_check[1] as $name => $param) {
-					if ($name === 'filter') {
-						continue;
-					}
-
+				foreach ($api_check[1] as $param) {
 					if (substr($param, 0, 1) === '{' && substr($param, -1, 1) === '}') {
 						$this->when_resolved_data['fields_to_lookup'][]
 							= self::getWhenFieldAbsolutePath(substr($param, 1, -1), $path);

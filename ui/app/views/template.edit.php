@@ -187,7 +187,8 @@ $macros_tab = (new CFormList('macrosFormList'))
 	)
 	->addRow(null, new CPartial($macros_tmpl, [
 		'macros' => $data['macros'],
-		'readonly' => $data['readonly']
+		'readonly' => $data['readonly'],
+		'has_inline_validation' => true
 	]), 'template_macros_container');
 
 if (!$data['readonly']) {

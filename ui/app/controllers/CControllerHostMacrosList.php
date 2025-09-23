@@ -37,7 +37,8 @@ class CControllerHostMacrosList extends CController {
 			'show_inherited_macros' => 'required|in 0,1',
 			'templateids'			=> 'array_db hosts.hostid',
 			'readonly'				=> 'required|in 0,1',
-			'parent_hostid'			=> 'id'
+			'parent_hostid'			=> 'id',
+			'source'				=> 'required|in host,host_prototype,template'
 		];
 
 		$ret = $this->validateInput($fields);
@@ -124,6 +125,7 @@ class CControllerHostMacrosList extends CController {
 			'macros' => $macros,
 			'show_inherited_macros' => $show_inherited_macros,
 			'readonly' => $readonly,
+			'has_inline_validation' => $this->getInput('source') === 'host' || $this->getInput('source') === 'template',
 			'user' => [
 				'debug_mode' => $this->getDebugMode()
 			]

@@ -679,8 +679,7 @@ function makeHostPrototypeTemplatePrefix($host_prototypeid, array $parent_templa
 
 	if ($provide_links && $template['permission'] == PERM_READ_WRITE) {
 		$name = (new CLink($template['name'],
-			(new CUrl('zabbix.php'))
-				->setArgument('action', 'host.prototype.list')
+			(new CUrl('host_prototypes.php'))
 				->setArgument('parent_discoveryid', $parent_templates['links'][$host_prototypeid]['lld_ruleid'])
 				->setArgument('context', 'template')
 		))->addClass(ZBX_STYLE_LINK_ALT);
@@ -709,9 +708,8 @@ function makeHostPrototypeTemplatesHtml($host_prototypeid, array $parent_templat
 
 		if ($provide_links && $template['permission'] == PERM_READ_WRITE) {
 			$name = new CLink($template['name'],
-				(new CUrl('zabbix.php'))
-					->setArgument('action', 'popup')
-					->setArgument('popup', 'host.prototype.edit')
+				(new CUrl('host_prototypes.php'))
+					->setArgument('form', 'update')
 					->setArgument('parent_discoveryid', $parent_templates['links'][$host_prototypeid]['lld_ruleid'])
 					->setArgument('hostid', $parent_templates['links'][$host_prototypeid]['hostid'])
 					->setArgument('context', 'template')

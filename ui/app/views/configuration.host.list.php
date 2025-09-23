@@ -262,9 +262,8 @@ foreach ($data['hosts'] as $host) {
 		if ($host['discoveryRule']) {
 			if ($host['is_discovery_rule_editable']) {
 				$description[] = (new CLink($host['discoveryRule']['name'],
-					(new CUrl('zabbix.php'))
-						->setArgument('action', 'popup')
-						->setArgument('popup', 'host.prototype.edit')
+					(new CUrl('host_prototypes.php'))
+						->setArgument('form', 'update')
 						->setArgument('parent_discoveryid', $host['discoveryRule']['itemid'])
 						->setArgument('hostid', $host['discoveryData']['parent_hostid'])
 						->setArgument('context', 'host')
