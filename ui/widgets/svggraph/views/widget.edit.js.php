@@ -83,15 +83,16 @@ window.widget_form = new class extends CWidgetForm {
 					}
 				});
 
-				jQuery(`[name^="${var_prefix}["]`, this)
-					.filter(function () {
-						return jQuery(this).attr('name').match(/[a-z]+\[\d+]\[[a-z_]+]/);
-					})
-					.each(function () {
-						jQuery(this).attr('name',
-							jQuery(this).attr('name').replace(/([a-z]+\[)\d+(]\[[a-z_]+])/, `$1${k + i}$2`)
-						);
-					});
+				['name', 'color-field-name', 'palette-field-name'].forEach(attr => {
+					jQuery(`[${attr}^="${var_prefix}["]`, this)
+						.filter(function () {
+							return jQuery(this).attr(attr).match(/[a-z]+\[\d+]\[[a-z_]+]/);
+						})
+						.each(function () {
+							const $this = jQuery(this);
+							$this.attr(attr, $this.attr(attr).replace(/([a-z]+\[)\d+(]\[[a-z_]+])/, `$1${k + i}$2`));
+						});
+				});
 			});
 		}
 	}
@@ -388,8 +389,6 @@ window.widget_form = new class extends CWidgetForm {
 		const dataset_remove = obj.closest('.list-accordion-item');
 
 		dataset_remove.remove();
-
-		this.#dataset_row_unique_id--;
 
 		if (this.#single_items_sortable.has(dataset_remove)) {
 			this.#single_items_sortable.get(dataset_remove).enable(false);
