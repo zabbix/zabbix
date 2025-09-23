@@ -39,4 +39,42 @@ class CRegexHelper {
 			'/' => '/'
 		];
 	}
+
+	public static function preparePattern(string $expression): string {
+		$escaped_expression = '';
+		$prev_symbol = '';
+		$length = strlen($expression);
+
+		// Escape delimiter symbols within character class sequences: [(] => [\(].
+		for ($i = 0; $i < $length; $i++) {
+			$current_symbol = $expression[$i];
+			$escaped_expression .= $current_symbol;
+
+			if ($prev_symbol === '\\' || $current_symbol !== '[') {
+				$prev_symbol = $current_symbol;
+
+				continue;
+			}
+
+			$prev_symbol = $current_symbol;
+
+			while (++$i < $length) {
+				$current_symbol = $expression[$i];
+
+				if ($prev_symbol !== '\\' && strpos('()', $current_symbol) !== false) {
+					$escaped_expression .= '\\';
+				}
+
+				$escaped_expression .= $current_symbol;
+				$prev_symbol = $current_symbol;
+
+				if ($current_symbol === ']') {
+					break;
+				}
+			}
+		}
+
+		return '('.$escaped_expression.')';
+	}
 }
+

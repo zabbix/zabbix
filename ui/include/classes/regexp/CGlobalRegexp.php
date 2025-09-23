@@ -152,9 +152,8 @@ class CGlobalRegexp {
 	 * @return string
 	 */
 	private static function buildRegularExpression(array $expression) {
-		$expression['expression'] = str_replace('/', '\/', $expression['expression']);
+		$pattern = CRegexHelper::preparePattern($expression['expression']).'m';
 
-		$pattern = '/'.$expression['expression'].'/m';
 		if (!$expression['case_sensitive']) {
 			$pattern .= 'i';
 		}
