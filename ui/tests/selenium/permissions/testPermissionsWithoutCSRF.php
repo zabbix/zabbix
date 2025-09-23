@@ -622,7 +622,10 @@ class testPermissionsWithoutCSRF extends CWebTest {
 				[
 					'db' => 'SELECT * FROM services',
 					'link' => 'zabbix.php?action=service.list.edit',
-					'overlay' => 'create'
+					'overlay' => 'create',
+					'fields' => [
+						'id:name' => 'CSRF service create'
+					]
 				]
 			],
 			// #64 Service update.
