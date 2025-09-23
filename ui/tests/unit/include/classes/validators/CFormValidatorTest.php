@@ -1925,6 +1925,46 @@ class CFormValidatorTest extends TestCase {
 			],
 			[
 				['object', 'fields' => [
+					'value' => ['float', 'decimal_limit' => 4, 'messages' => ['decimal_limit' => 'Custom message.']]
+				]],
+				['value' => 5.0001],
+				['value' => 5.0001],
+				CFormValidator::SUCCESS,
+				[]
+			],
+			[
+				['object', 'fields' => [
+					'value' => ['float', 'decimal_limit' => 4, 'messages' => ['decimal_limit' => 'Custom message.']]
+				]],
+				['value' => '1.22E-2'],
+				['value' => 0.0122],
+				CFormValidator::SUCCESS,
+				[]
+			],
+			[
+				['object', 'fields' => [
+					'value' => ['float', 'decimal_limit' => 4, 'messages' => ['decimal_limit' => 'Custom message.']]
+				]],
+				['value' => 5.00001],
+				['value' => 5.00001],
+				CFormValidator::ERROR,
+				['/value' => [
+					['message' => 'Custom message.', 'level' => CFormValidator::ERROR_LEVEL_PRIMARY]
+				]]
+			],
+			[
+				['object', 'fields' => [
+					'value' => ['float', 'decimal_limit' => 4, 'messages' => ['decimal_limit' => 'Custom message.']]
+				]],
+				['value' => '1.22E-3'],
+				['value' => 0.00122],
+				CFormValidator::ERROR,
+				['/value' => [
+					['message' => 'Custom message.', 'level' => CFormValidator::ERROR_LEVEL_PRIMARY]
+				]]
+			],
+			[
+				['object', 'fields' => [
 					'value' => ['string', 'messages' => ['type' => 'Custom message.']]
 				]],
 				['value' => []],

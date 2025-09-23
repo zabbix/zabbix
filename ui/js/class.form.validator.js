@@ -1114,15 +1114,6 @@ class CFormValidator {
 			}
 		}
 
-		if (value && value.split('.')[1] && value.split('.')[1].length > rules['decimal_limit']) {
-			return {
-				result: CFormValidator.ERROR,
-				error: this.#getMessage(rules, 'decimal_limit',
-					sprintf(t('This value cannot have more than %1$s decimal places.'),  rules['decimal_limit'])
-				)
-			};
-		}
-
 		value = parseFloat(value);
 
 		if (!this.#checkNumericIn(rules, value)) {
