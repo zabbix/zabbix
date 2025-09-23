@@ -851,6 +851,7 @@ class CFormValidator {
 	 * Integers validator.
 	 *
 	 * @param array  $rules
+	 * @param bool   $rules['not_empty']  (optional) pass if value must be filled.
 	 * @param array  $rules['in']         (optional) allowed ranges or list of allowed values.
 	 * @param int    $rules['min']        (optional) minimal allowed value length.
 	 * @param int    $rules['max']        (optional) maximum allowed value length.
@@ -863,6 +864,12 @@ class CFormValidator {
 	private static function validateInt32(array $rules, &$value, ?string &$error = null): bool {
 		if (!self::isInt32($value)) {
 			$error = self::getMessage($rules, 'type', _('This value is not a valid integer.'));
+
+			return false;
+		}
+
+		if (array_key_exists('not_empty', $rules) && $value == 0) {
+			$error = self::getMessage($rules, 'not_empty', _('This field cannot be empty.'));
 
 			return false;
 		}
@@ -950,19 +957,19 @@ class CFormValidator {
 		}
 
 		if (array_key_exists('decimal_limit', $rules)) {
-			if (preg_match(ZBX_PREG_SCIENTIFIC, $value, $matches)) {
-				$decimals_before_e = array_key_exists('frac', $matches) ? strlen($matches['frac']) : 0;
-				$exponent = array_key_exists('exp', $matches) ? (int) $matches['exp'] : 0;
+			preg_match(ZBX_PREG_SCIENTIFIC, $value, $matches);
 
-				$decimal_count = max(0, $decimals_before_e - $exponent);
+			$decimals_before_e = array_key_exists('frac', $matches) ? strlen($matches['frac']) : 0;
+			$exponent = array_key_exists('exp', $matches) ? (int) $matches['exp'] : 0;
 
-				if ($decimal_count > $rules['decimal_limit']) {
-					$error = self::getMessage($rules, 'decimal_limit',
-						_s('This value cannot have more than %1$s decimal places.', $rules['decimal_limit'])
-					);
+			$decimal_count = max(0, $decimals_before_e - $exponent);
 
-					return false;
-				}
+			if ($decimal_count > $rules['decimal_limit']) {
+				$error = self::getMessage($rules, 'decimal_limit',
+					_s('This value cannot have more than %1$s decimal places.', $rules['decimal_limit'])
+				);
+
+				return false;
 			}
 		}
 
