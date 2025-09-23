@@ -2213,8 +2213,6 @@ static int	process_autoregistration_contents(struct zbx_json_parse *jp_data, con
 
 	zbx_vector_autoreg_host_ptr_t	autoreg_hosts;
 
-	zbx_conn_flags_t	flags = ZBX_CONN_DEFAULT;
-
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
 	if (0 == zbx_dc_get_auto_registration_action_count())
@@ -2229,7 +2227,8 @@ static int	process_autoregistration_contents(struct zbx_json_parse *jp_data, con
 
 	while (NULL != (p = zbx_json_next(jp_data, p)))
 	{
-		unsigned int	connection_type;
+		unsigned int		connection_type;
+		zbx_conn_flags_t	flags = ZBX_CONN_DEFAULT;
 
 		if (FAIL == (ret = zbx_json_brackets_open(p, &jp_row)))
 			break;
