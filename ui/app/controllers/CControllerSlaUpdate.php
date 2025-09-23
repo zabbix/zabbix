@@ -33,7 +33,7 @@ class CControllerSlaUpdate extends CController {
 				'schedule_period_'.$i => ['string', 'not_empty',
 					'use' => [CPeriodTimeRangeValidator::class, []],
 					'when' => ['schedule_enabled_'.$i, 'in 1']
-				],
+				]
 			];
 		}
 

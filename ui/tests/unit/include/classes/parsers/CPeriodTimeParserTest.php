@@ -60,7 +60,7 @@ class PeriodTimeParserTest extends TestCase {
 			[CParser::PARSE_SUCCESS_CONT, '___1:00-3:00__', 3],
 
 			// Parser for multibyte characters
-			[CParser::PARSE_FAIL, 'āā:āā-āā:āā'],
+			[CParser::PARSE_FAIL, 'āā:āā-āā:āā']
 		];
 	}
 

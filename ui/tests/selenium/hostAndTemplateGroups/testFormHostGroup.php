@@ -99,7 +99,7 @@ class testFormHostGroup extends testFormGroups {
 						'Group name' => 'Zabbix servers',
 						'Apply permissions and tag filters to all subgroups' => true
 					],
-					'error' => ['Group name' => 'This object already exists.'],
+					'error' => ['Group name' => 'This object already exists.']
 				]
 			],
 			[
