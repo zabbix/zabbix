@@ -670,7 +670,7 @@ class CFormValidatorTest extends TestCase {
 				],
 				['type' => 'object',
 					'api_uniq' => [
-						['host.get', [], [], []]
+						['host.get', ['filter' => []], [], []]
 					],
 					'fields' => [
 						'ip' => [['type' => 'string', 'messages' => [
@@ -690,7 +690,7 @@ class CFormValidatorTest extends TestCase {
 				],
 				['type' => 'object',
 					'api_uniq' => [
-						['host.get', ['host' => '{host}'], null, null]
+						['host.get', ['filter' => ['host' => '{host}']], null, null]
 					],
 					'fields' => [
 						'ip' => [['type' => 'string', 'messages' => [
@@ -710,8 +710,36 @@ class CFormValidatorTest extends TestCase {
 				],
 				['type' => 'object',
 					'api_uniq' => [
-						['host.get', [], null, null],
-						['host.get', [], null, null]
+						['host.get', ['filter' => []], null, null],
+						['host.get', ['filter' => []], null, null]
+					],
+					'fields' => [
+						'ip' => [['type' => 'string', 'messages' => [
+							'type' => 'String error.'
+						]]]
+					]
+				]
+			],
+			[
+				['object',
+					'api_uniq' => [
+						['host.get', [], null, null, ['param_1' => 'value_1']],
+						['host.get', ['filter_param_1' => 'filter_value_1'], null, null, ['param_1' => 'value_1']],
+						['host.get']
+					],
+					'fields' => [
+						'ip' => ['string', 'messages' => [
+							'type' => 'String error.'
+						]]
+					]
+				],
+				['type' => 'object',
+					'api_uniq' => [
+						['host.get', ['filter' => [], 'param_1' => 'value_1'], null, null],
+						['host.get', ['filter' => ['filter_param_1' => 'filter_value_1'], 'param_1' => 'value_1'],
+							null, null
+						],
+						['host.get', ['filter' => []], null, null]
 					],
 					'fields' => [
 						'ip' => [['type' => 'string', 'messages' => [
