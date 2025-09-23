@@ -3164,8 +3164,9 @@ abstract class testFormPreprocessing extends CWebTest {
 			if (array_key_exists('inline_errors', $data) && !$lld) {
 				COverlayDialogElement::find(0)->waitUntilReady();
 
-				// Added additional delay to get expected error message in inline validation.
-				sleep(2);
+				// Specific wait to get expected error message in inline validation.
+				$overlay = COverlayDialogElement::find(0)->waitUntilReady()->one();
+				$overlay->getFooter()->query('button:Add')->one()->waitUntilClassesNotPresent('is-loading');
 				$this->assertInlineError($form, $data['inline_errors']);
 			}
 			else {
