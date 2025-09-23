@@ -384,7 +384,7 @@ class CFormValidator {
 					value = String(value);
 
 					if (value.startsWith('{') && value.endsWith('}')) {
-						const param_field_name = value.substring(1, value.length - 1);
+						const param_field_name = value.slice(1, -1);
 						const param_field_path = this.#getFieldAbsolutePath(param_field_name, field_path);
 						const param_data = getFieldDataByPath(param_field_path);
 
@@ -404,7 +404,7 @@ class CFormValidator {
 					value = String(value);
 
 					if (value.startsWith('{') && value.endsWith('}')) {
-						const param_field_name = value.substring(1, value.length - 1);
+						const param_field_name = value.slice(1, -1);
 						const param_field_path = this.#getFieldAbsolutePath(param_field_name, field_path);
 						const param_data = getFieldDataByPath(param_field_path);
 
@@ -814,7 +814,7 @@ class CFormValidator {
 						rule_value.forEach((api_uniq) => {
 							let parameter_fields = Object.values(api_uniq[1])
 								.filter(value => String(value).startsWith('{') && String(value).endsWith('}'))
-								.map(field => field.substring(1, field.length - 1));
+								.map(field => field.slice(1, -1));
 
 							const has_match = parameter_fields.some((field) => {
 								return this.#getFieldAbsolutePath(field, current_rule_path + '/') === lookup_rule_path;
