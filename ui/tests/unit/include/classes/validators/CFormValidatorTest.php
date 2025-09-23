@@ -1934,12 +1934,123 @@ class CFormValidatorTest extends TestCase {
 			],
 			[
 				['object', 'fields' => [
-					'value' => ['float', 'decimal_limit' => 4, 'messages' => ['decimal_limit' => 'Custom message.']]
+					'value' => ['float', 'min' => 0, 'decimal_limit' => 4,
+						'messages' => ['min' => 'Custom message.', 'decimal_limit' => 'Custom message.']
+					]
+				]],
+				['value' => 0.0001],
+				['value' => 0.0001],
+				CFormValidator::SUCCESS,
+				[]
+			],
+			[
+				['object', 'fields' => [
+					'value' => ['float', 'min' => 0, 'decimal_limit' => 4,
+						'messages' => ['min' => 'Custom message.', 'decimal_limit' => 'Custom message.']
+					]
 				]],
 				['value' => '1.22E-2'],
 				['value' => 0.0122],
 				CFormValidator::SUCCESS,
 				[]
+			],
+			[
+				['object', 'fields' => [
+					'value' => ['float', 'min' => 1, 'decimal_limit' => 4,
+						'messages' => ['min' => 'Custom message.', 'decimal_limit' => 'Custom message.']
+					]
+				]],
+				['value' => 0.0001],
+				['value' => 0.0001],
+				CFormValidator::ERROR,
+				['/value' => [
+					['message' => 'Custom message.', 'level' => CFormValidator::ERROR_LEVEL_PRIMARY]
+				]]
+			],
+			[
+				['object', 'fields' => [
+					'value' => ['float', 'min' => 1, 'decimal_limit' => 4,
+						'messages' => ['min' => 'Custom message.', 'decimal_limit' => 'Custom message.']
+					]
+				]],
+				['value' => '1.22E-2'],
+				['value' => 0.0122],
+				CFormValidator::ERROR,
+				['/value' => [
+					['message' => 'Custom message.', 'level' => CFormValidator::ERROR_LEVEL_PRIMARY]
+				]]
+			],
+			[
+				['object', 'fields' => [
+					'value' => ['float', 'min' => 0, 'decimal_limit' => 4,
+						'messages' => ['min' => 'Custom message.', 'decimal_limit' => 'Custom message.']
+					]
+				]],
+				['value' => '1.22E-2'],
+				['value' => 0.0122],
+				CFormValidator::SUCCESS,
+				[]
+			],
+			[
+				['object', 'fields' => [
+					'value' => ['float', 'max' => 5, 'decimal_limit' => 4,
+						'messages' => ['max' => 'Custom message.', 'decimal_limit' => 'Custom message.']
+					]
+				]],
+				['value' => 4.9999],
+				['value' => 4.9999],
+				CFormValidator::SUCCESS,
+				[]
+			],
+			[
+				['object', 'fields' => [
+					'value' => ['float', 'max' => 5, 'decimal_limit' => 4,
+						'messages' => ['max' => 'Custom message.', 'decimal_limit' => 'Custom message.']
+					]
+				]],
+				['value' => '455.01E-2'],
+				['value' => 4.5501],
+				CFormValidator::SUCCESS,
+				[]
+			],
+			[
+				['object', 'fields' => [
+					'value' => ['float', 'max' => 5, 'decimal_limit' => 4,
+						'messages' => ['max' => 'Custom message.', 'decimal_limit' => 'Custom message.']
+					]
+				]],
+				['value' => '4.51E1'],
+				['value' => 45.1],
+				CFormValidator::ERROR,
+				['/value' => [
+					['message' => 'Custom message.', 'level' => CFormValidator::ERROR_LEVEL_PRIMARY]
+				]]
+			],
+			[
+				['object', 'fields' => [
+					'value' => ['float', 'min' => 1, 'decimal_limit' => 4,
+						'messages' => ['min' => 'Custom message.', 'decimal_limit' => 'Custom message.']
+					]
+				]],
+				['value' => 0.0001],
+				['value' => 0.0001],
+				CFormValidator::ERROR,
+				['/value' => [
+					['message' => 'Custom message.', 'level' => CFormValidator::ERROR_LEVEL_PRIMARY]
+				]]
+			],
+			[
+				['object', 'fields' => [
+					'value' => ['float', 'min' => 1, 'decimal_limit' => 4,
+						'messages' => ['min' => 'Custom message.', 'decimal_limit' => 'Custom message.']
+					]
+				]],
+				['value' => '1.22E-2'],
+				['value' => 0.0122],
+				CFormValidator::ERROR,
+				['/value' => [
+					['message' => 'Custom message.', 'level' => CFormValidator::ERROR_LEVEL_PRIMARY]
+				]]
 			],
 			[
 				['object', 'fields' => [
