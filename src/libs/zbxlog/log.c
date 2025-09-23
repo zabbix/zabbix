@@ -70,7 +70,7 @@ int	zbx_redirect_stdio(const char *filename)
 	else
 		filename = default_file;
 
-	if (-1 == (fd = open(filename, open_flags, 0666)))
+	if (-1 == (fd = open(filename, open_flags, 0640)))
 	{
 		zbx_error("cannot open \"%s\": %s", filename, zbx_strerror(errno));
 		return FAIL;
@@ -130,8 +130,12 @@ static void	rotate_log(const char *filename)
 		if (0 != rename(filename, filename_old))
 		{
 			FILE	*log_file = NULL;
+			mode_t	old_umask = umask(0666 & ~0640);
 
-			if (NULL != (log_file = fopen(filename, "w")))
+			log_file = fopen(filename, "w");
+			umask(old_umask);
+
+			if (NULL != log_file)
 			{
 				long		milliseconds;
 				struct tm	tm;
