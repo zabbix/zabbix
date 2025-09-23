@@ -204,13 +204,6 @@ static int	get_hostid_by_host_or_autoregister(const zbx_socket_t *sock, const ch
 			autoreg = AUTOREG_DISABLED;
 	}
 
-	/* if host does not exist then check autoregistration connection permissions */
-	if (0 == *hostid && AUTOREG_ENABLED == autoreg &&
-		SUCCEED != zbx_autoreg_host_check_permissions(host, ip, port, sock))
-	{
-		autoreg = AUTOREG_DISABLED;
-	}
-
 	/* First check if autoregistration host has changed */
 	if (AUTOREG_ENABLED == autoreg)
 	{
@@ -225,6 +218,13 @@ static int	get_hostid_by_host_or_autoregister(const zbx_socket_t *sock, const ch
 		zbx_snprintf(error, MAX_STRING_LEN, "%s", ch_error);
 		zbx_free(ch_error);
 		goto out;
+	}
+
+	/* if host does not exist then check autoregistration connection permissions */
+	if (0 == *hostid && AUTOREG_ENABLED == autoreg &&
+		SUCCEED != zbx_autoreg_host_check_permissions(host, ip, port, sock))
+	{
+		autoreg = AUTOREG_DISABLED;
 	}
 
 	/* Register host if autoregistration is enabled and host does not exist yet or has changed */

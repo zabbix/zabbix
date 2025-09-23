@@ -844,6 +844,20 @@ form {
 	.wordbreak {
 		white-space: normal;
 	}
+
+	.tags-wrapper {
+		@media screen and (min-width: 1200px) {
+			max-width: 266px;
+		}
+
+		@media screen and (min-width: 1400px) {
+			max-width: 359px;
+		}
+
+		@media screen and (min-width: 1600px) {
+			max-width: 452px;
+		}
+	}
 }
 
 .border-left {
@@ -2552,16 +2566,9 @@ div {
 	flex-wrap: wrap;
 	gap: 2px 3px;
 
-	@media screen and (min-width: 1200px) {
-		max-width: 266px;
-	}
-
-	@media screen and (min-width: 1400px) {
-		max-width: 359px;
-	}
-
-	@media screen and (min-width: 1600px) {
-		max-width: 452px;
+	.tag {
+		margin-top: 1px;
+		margin-bottom: 1px;
 	}
 }
 
@@ -2609,23 +2616,6 @@ div {
 
 .yellow-bg {
 	background-color: $alt-yellow;
-}
-
-// Severity statuses.
-@if $theme-name == 'blue' or $theme-name == 'dark' {
-	td[class] {
-		+ {
-			td.na-bg,
-			td.normal-bg,
-			td.info-bg,
-			td.average-bg,
-			td.warning-bg,
-			td.high-bg,
-			td.disaster-bg {
-				border-left: 1px dotted $table-border-color;
-			}
-		}
-	}
 }
 
 @each $severity-type, $color in (
