@@ -1476,7 +1476,7 @@ static void	process_history_data_by_keys(zbx_socket_t *sock, zbx_client_item_val
 
 	/* Try to achieve uniqueness of triplets (itemid, timestamp seconds, timestamp nanoseconds) for up to */
 	/* N=1000 history records. Therefore, set a limit up to N*(N-1)/2 = 1000*(1000-1)/2 = ~ 500000 collisions. */
-	#define TIMESTAMPS_COLLISIONS_MAX 500000
+#define TIMESTAMPS_COLLISIONS_MAX	500000
 
 	sec = zbx_time();
 
