@@ -37,37 +37,34 @@ class CRegexValidator extends CValidator
 	 *
 	 * @return bool
 	 */
-	public function validate($value) {
+	public function validate($value): bool {
 		if (!is_string($value) && !is_numeric($value)) {
-			$this->error($this->messageInvalid);
-			return false;
+			$error = $this->messageInvalid;
+
+			$this->error($error);
+		}
+		else {
+			self::isValidPattern((string) $value, $error);
+
+			if ($error !== '') {
+				$this->error($this->messageRegex, $value, str_replace('preg_match(): ', '', $error));
+			}
 		}
 
-		// escape '/' since Zabbix server treats them as literal characters.
-		$value = str_replace('/', '\/', $value);
+		return $error === '';
+	}
 
-		// validate through preg_match
-		$error = false;
+	public static function isValidPattern(string $expression, ?string &$error = null): bool {
+		$error = '';
 
-		set_error_handler(function ($errno, $errstr) use (&$error) {
-			if ($errstr != '') {
-				$error = $errstr;
-			}
+		set_error_handler(static function (int $foo, string $errstr) use (&$error) {
+			$error = $errstr;
 		});
 
-		preg_match('/'.$value.'/', '');
+		preg_match(CRegexHelper::preparePattern($expression), '');
 
 		restore_error_handler();
 
-		if ($error) {
-			$this->error(
-				$this->messageRegex,
-				$value,
-				str_replace('preg_match(): ', '', $error)
-			);
-			return false;
-		}
-
-		return true;
+		return $error === '';
 	}
 }
