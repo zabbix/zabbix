@@ -28,7 +28,7 @@ zabbix_export:
         ## Setup
         
         1. Create an admin token on [`OpenAI Platform`](https://platform.openai.com/settings/organization/admin-keys) page.
-        2. Put the admin token into `{$OPENAI.API.TOKEN}` macro.
+        2. Specify the admin token in the `API token` field.
       vendor:
         name: Zabbix
         version: 8.0-1
@@ -36,10 +36,9 @@ zabbix_export:
         - name: Templates/Applications
       items:
         - uuid: 9a98648edd6e485b9c617939f032e714
-          name: 'Item errors'
+          name: 'Get completions item errors'
           type: DEPENDENT
           key: openai.completions_data.errors
-          history: '0'
           value_type: TEXT
           description: 'Item for gathering all the data item errors.'
           preprocessing:
@@ -155,6 +154,7 @@ zabbix_export:
             		}
             
             		fetchPage();
+            
             		return final_data;
             	},
             }
@@ -199,10 +199,9 @@ zabbix_export:
             - tag: component
               value: raw
         - uuid: 7aea5f1d5f5a4f949dbce67f660d4f39
-          name: 'Item errors'
+          name: 'Get costs item errors'
           type: DEPENDENT
           key: openai.costs_data.errors
-          history: '0'
           value_type: TEXT
           description: 'Item for gathering all the data item errors.'
           preprocessing:
@@ -318,6 +317,7 @@ zabbix_export:
             		}
             
             		fetchPage();
+            
             		return final_data;
             	},
             }
@@ -362,7 +362,7 @@ zabbix_export:
           type: DEPENDENT
           key: openai.expenses.total
           value_type: FLOAT
-          units: USD
+          units: '!USD'
           description: 'Total amount of expenses for the past day.'
           preprocessing:
             - type: DISCARD_UNCHANGED_HEARTBEAT
@@ -391,10 +391,9 @@ zabbix_export:
                 - tag: scope
                   value: performance
         - uuid: bccec362e06947199c316f9996002e5c
-          name: 'Item errors'
+          name: 'Get data item errors'
           type: DEPENDENT
           key: openai.platform_data.errors
-          history: '0'
           value_type: TEXT
           description: 'Item for gathering all the data item errors.'
           preprocessing:
@@ -509,6 +508,7 @@ zabbix_export:
             		}
             
             		fetchPage();
+            
             		return final_data;
             	},
             }
@@ -552,6 +552,9 @@ zabbix_export:
               parameters:
                 - '$.headers["openai-version"]'
               error_handler: DISCARD_VALUE
+            - type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 12h
           master_item:
             key: openai.platform_data.get
           tags:
@@ -803,7 +806,7 @@ zabbix_export:
               type: DEPENDENT
               key: 'openai.expenses.amount[{#ID}]'
               value_type: FLOAT
-              units: USD
+              units: '!USD'
               description: 'Amount of expenses for the past day.'
               preprocessing:
                 - type: JSONPATH
@@ -1028,41 +1031,108 @@ zabbix_export:
       tags:
         - tag: class
           value: software
+        - tag: subclass
+          value: ai
         - tag: target
           value: openai
       macros:
         - macro: '{$OPENAI.API.URL}'
           value: 'https://api.openai.com/v1'
           description: 'OpenAI API URL.'
+          config:
+            type: TEXT
+            priority: '1'
+            label: 'API URL'
+            description: 'OpenAI API URL.'
         - macro: '{$OPENAI.API.USER.AGENT}'
           value: 'ZabbixServer/1.0 Zabbix'
           description: 'User-Agent used for requests to OpenAI API.'
+          config:
+            type: TEXT
+            priority: '10'
+            section_name: Other
+            label: 'User-Agent of API requests'
+            description: 'User-Agent used for requests to OpenAI API.'
         - macro: '{$OPENAI.DATA.TIMEOUT}'
           value: 15s
           description: 'Response timeout for an API.'
+          config:
+            type: TEXT
+            priority: '9'
+            section_name: Other
+            label: 'API response timeout'
+            description: 'Response timeout for an API.'
         - macro: '{$OPENAI.EXPENSES.MAX}'
           value: '100'
           description: 'Limit on daily expenses per project.'
+          config:
+            type: TEXT
+            priority: '4'
+            label: 'Max project daily expenses'
+            description: 'Limit on daily expenses per project. No less than 0.'
+            regex: '^-?([0-9]+|(([0-9]+)\.([0-9]+)))$'
         - macro: '{$OPENAI.HTTP_PROXY}'
           description: 'HTTP proxy for API requests. You can specify it using the format [protocol://][username[:password]@]proxy.example.com[:port]. See the documentation at https://www.zabbix.com/documentation/8.0/manual/config/items/itemtypes/http'
+          config:
+            type: TEXT
+            priority: '11'
+            section_name: Other
+            label: 'HTTP proxy for API requests'
+            description: 'HTTP proxy for API requests. You can specify it using the format [protocol://][username[:password]@]proxy.example.com[:port]. See the documentation at https://www.zabbix.com/documentation/8.0/manual/config/items/itemtypes/http'
         - macro: '{$OPENAI.MODEL.NAME.MATCHES}'
           value: '.*'
-          description: 'This macro is used in OpenAI Platform user discovery. Can be overridden on the host or linked template level.'
+          description: 'This macro is used in OpenAI Platform model discovery. Can be overridden on the host or linked template level.'
+          config:
+            type: TEXT
+            priority: '7'
+            section_name: Filters
+            label: 'Model discovery macro (include)'
+            description: 'This macro is used in model discovery. Can be overridden on the host or linked template level.'
         - macro: '{$OPENAI.MODEL.NAME.NOT_MATCHES}'
           value: CHANGE_IF_NEEDED
-          description: 'This macro is used in OpenAI Platform user discovery. Can be overridden on the host or linked template level.'
+          description: 'This macro is used in OpenAI Platform model discovery. Can be overridden on the host or linked template level.'
+          config:
+            type: TEXT
+            priority: '8'
+            section_name: Filters
+            label: 'Model discovery macro (exclude)'
+            description: 'This macro is used in model discovery. Can be overridden on the host or linked template level.'
         - macro: '{$OPENAI.PROJECT.NAME.MATCHES}'
           value: '.*'
           description: 'This macro is used in OpenAI Platform project discovery. Can be overridden on the host or linked template level.'
+          config:
+            type: TEXT
+            priority: '5'
+            section_name: Filters
+            label: 'Project discovery macro (include)'
+            description: 'This macro is used in project discovery. Can be overridden on the host or linked template level.'
         - macro: '{$OPENAI.PROJECT.NAME.NOT_MATCHES}'
           value: CHANGE_IF_NEEDED
           description: 'This macro is used in OpenAI Platform project discovery. Can be overridden on the host or linked template level.'
+          config:
+            type: TEXT
+            priority: '6'
+            section_name: Filters
+            label: 'Project discovery macro (exclude)'
+            description: 'This macro is used in project discovery. Can be overridden on the host or linked template level.'
         - macro: '{$OPENAI.TOKEN}'
           type: SECRET_TEXT
           description: 'OpenAI API token.'
+          config:
+            type: TEXT
+            priority: '2'
+            label: 'API token'
+            description: 'OpenAI API token.'
+            required: 'YES'
         - macro: '{$OPENAI.TOTAL_EXPENSES.MAX}'
           value: '1000'
-          description: 'Limit on total daily expenses.'
+          description: 'Limit on total daily expenses for the entire organization.'
+          config:
+            type: TEXT
+            priority: '3'
+            label: 'Max total daily expenses'
+            description: 'Limit on total daily expenses for the entire organization. No less than 0.'
+            regex: '^-?([0-9]+|(([0-9]+)\.([0-9]+)))$'
       dashboards:
         - uuid: ca4bba8a3a8f4ec1b9c5b50d6608eb69
           name: 'OpenAI Platform: General'

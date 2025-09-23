@@ -31,27 +31,27 @@ This template has been tested on:
 |----|-----------|-------|
 |{$OPENAI.API.URL}|<p>OpenAI API URL.</p>|`https://api.openai.com/v1`|
 |{$OPENAI.TOKEN}|<p>OpenAI API token.</p>||
-|{$OPENAI.DATA.TIMEOUT}|<p>Response timeout for an API.</p>|`15s`|
-|{$OPENAI.HTTP_PROXY}|<p>HTTP proxy for API requests. You can specify it using the format [protocol://][username[:password]@]proxy.example.com[:port]. See the documentation at https://www.zabbix.com/documentation/8.0/manual/config/items/itemtypes/http</p>||
-|{$OPENAI.API.USER.AGENT}|<p>User-Agent used for requests to OpenAI API.</p>|`ZabbixServer/1.0 Zabbix`|
-|{$OPENAI.TOTAL_EXPENSES.MAX}|<p>Limit on total daily expenses.</p>|`1000`|
+|{$OPENAI.TOTAL_EXPENSES.MAX}|<p>Limit on total daily expenses for the entire organization.</p>|`1000`|
 |{$OPENAI.EXPENSES.MAX}|<p>Limit on daily expenses per project.</p>|`100`|
 |{$OPENAI.PROJECT.NAME.MATCHES}|<p>This macro is used in OpenAI Platform project discovery. Can be overridden on the host or linked template level.</p>|`.*`|
 |{$OPENAI.PROJECT.NAME.NOT_MATCHES}|<p>This macro is used in OpenAI Platform project discovery. Can be overridden on the host or linked template level.</p>|`CHANGE_IF_NEEDED`|
-|{$OPENAI.MODEL.NAME.MATCHES}|<p>This macro is used in OpenAI Platform user discovery. Can be overridden on the host or linked template level.</p>|`.*`|
-|{$OPENAI.MODEL.NAME.NOT_MATCHES}|<p>This macro is used in OpenAI Platform user discovery. Can be overridden on the host or linked template level.</p>|`CHANGE_IF_NEEDED`|
+|{$OPENAI.MODEL.NAME.MATCHES}|<p>This macro is used in OpenAI Platform model discovery. Can be overridden on the host or linked template level.</p>|`.*`|
+|{$OPENAI.MODEL.NAME.NOT_MATCHES}|<p>This macro is used in OpenAI Platform model discovery. Can be overridden on the host or linked template level.</p>|`CHANGE_IF_NEEDED`|
+|{$OPENAI.DATA.TIMEOUT}|<p>Response timeout for an API.</p>|`15s`|
+|{$OPENAI.API.USER.AGENT}|<p>User-Agent used for requests to OpenAI API.</p>|`ZabbixServer/1.0 Zabbix`|
+|{$OPENAI.HTTP_PROXY}|<p>HTTP proxy for API requests. You can specify it using the format [protocol://][username[:password]@]proxy.example.com[:port]. See the documentation at https://www.zabbix.com/documentation/8.0/manual/config/items/itemtypes/http</p>||
 
 ### Items
 
 |Name|Description|Type|Key and additional info|
 |----|-----------|----|-----------------------|
 |Get data|<p>Item for gathering OpenAI Platform data.</p>|Script|openai.platform_data.get|
-|Item errors|<p>Item for gathering all the data item errors.</p>|Dependent item|openai.platform_data.errors<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.error`</p><p>⛔️Custom on fail: Discard value</p></li><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
+|Get data item errors|<p>Item for gathering all the data item errors.</p>|Dependent item|openai.platform_data.errors<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.error`</p><p>⛔️Custom on fail: Discard value</p></li><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
 |Get costs|<p>Item for gathering costs data from OpenAI Platform.</p>|Script|openai.costs_data.get|
-|Item errors|<p>Item for gathering all the data item errors.</p>|Dependent item|openai.costs_data.errors<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.error`</p><p>⛔️Custom on fail: Discard value</p></li><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
+|Get costs item errors|<p>Item for gathering all the data item errors.</p>|Dependent item|openai.costs_data.errors<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.error`</p><p>⛔️Custom on fail: Discard value</p></li><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
 |Get completions|<p>Item for gathering completions data from OpenAI Platform.</p>|Script|openai.completions_data.get|
-|Item errors|<p>Item for gathering all the data item errors.</p>|Dependent item|openai.completions_data.errors<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.error`</p><p>⛔️Custom on fail: Discard value</p></li><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
-|Version|<p>REST API version used for requests.</p>|Dependent item|openai.version<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.headers["openai-version"]`</p><p>⛔️Custom on fail: Discard value</p></li></ul>|
+|Get completions item errors|<p>Item for gathering all the data item errors.</p>|Dependent item|openai.completions_data.errors<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.error`</p><p>⛔️Custom on fail: Discard value</p></li><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
+|Version|<p>REST API version used for requests.</p>|Dependent item|openai.version<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.headers["openai-version"]`</p><p>⛔️Custom on fail: Discard value</p></li><li><p>Discard unchanged with heartbeat: `12h`</p></li></ul>|
 |Total daily expenses|<p>Total amount of expenses for the past day.</p>|Dependent item|openai.expenses.total<p>**Preprocessing**</p><ul><li><p>Discard unchanged with heartbeat: `1d`</p></li><li><p>JSON Path: `$.costs[0].results..amount.value.sum()`</p><p>⛔️Custom on fail: Set value to: `0`</p></li></ul>|
 
 ### Triggers
