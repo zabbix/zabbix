@@ -293,3 +293,18 @@ int	zbx_substitute_macros(char **data, char *error, size_t maxerrlen, zbx_macro_
 
 	return ret;
 }
+
+int	zbx_substitute_macros_ext_search(zbx_token_search_t search, char **data, char *error, size_t maxerrlen,
+		zbx_macro_resolv_func_t resolver, ...)
+{
+	int	ret;
+	va_list	args;
+
+	va_start(args, resolver);
+
+	ret = substitute_macros_args(search, data, error, maxerrlen, resolver, args);
+
+	va_end(args);
+
+	return ret;
+}

@@ -302,6 +302,7 @@ void	zbx_es_destroy(zbx_es_t *es)
 	if (SUCCEED == zbx_es_is_env_initialized(es) && SUCCEED != zbx_es_destroy_env(es, &error))
 	{
 		zabbix_log(LOG_LEVEL_WARNING, "Cannot destroy embedded scripting engine environment: %s", error);
+		zbx_free(error);
 	}
 }
 
@@ -359,8 +360,7 @@ int	zbx_es_init_env(zbx_es_t *es, const char *config_source_ip, char **error)
 
 	duk_push_string(es->env->ctx, "\xff""\xff""zbx_env");
 	duk_push_pointer(es->env->ctx, (void *)es->env);
-	duk_def_prop(es->env->ctx, -3, DUK_DEFPROP_HAVE_VALUE | DUK_DEFPROP_CLEAR_WRITABLE | DUK_DEFPROP_HAVE_ENUMERABLE |
-			DUK_DEFPROP_HAVE_CONFIGURABLE);
+	duk_def_prop(es->env->ctx, -3, ZBX_ES_DEFPROP_READONLY);
 
 	/* JSON parse/stringify is used internally, store them into stash to prevent them */
 	/* from being freed when assigning null to them in scripts                        */
@@ -369,15 +369,13 @@ int	zbx_es_init_env(zbx_es_t *es, const char *config_source_ip, char **error)
 	duk_get_prop_string(es->env->ctx, -2, "parse");			/* [stash,JSON,"_parse",JSON.parse] */
 	es->env->json_parse = duk_get_heapptr(es->env->ctx, -1);
 
-	duk_def_prop(es->env->ctx, -4, DUK_DEFPROP_HAVE_VALUE | DUK_DEFPROP_CLEAR_WRITABLE | DUK_DEFPROP_HAVE_ENUMERABLE |
-			DUK_DEFPROP_HAVE_CONFIGURABLE);	/* [stash,JSON] */
+	duk_def_prop(es->env->ctx, -4, ZBX_ES_DEFPROP_READONLY);	/* [stash,JSON] */
 
 	duk_push_string(es->env->ctx, "\xff""\xff""duk_json_stringify");	/* [stash,JSON,"_stringify"] */
 	duk_get_prop_string(es->env->ctx, -2, "stringify");	/* [stash,JSON,"_stringify",JSON.stringify] */
 	es->env->json_stringify = duk_get_heapptr(es->env->ctx, -1);
 
-	duk_def_prop(es->env->ctx, -4, DUK_DEFPROP_HAVE_VALUE | DUK_DEFPROP_CLEAR_WRITABLE | DUK_DEFPROP_HAVE_ENUMERABLE |
-			DUK_DEFPROP_HAVE_CONFIGURABLE);	/* [stash,JSON] */
+	duk_def_prop(es->env->ctx, -4, ZBX_ES_DEFPROP_READONLY);	/* [stash,JSON] */
 
 	duk_pop(es->env->ctx);
 
@@ -1023,4 +1021,168 @@ void	*es_obj_detach_data(zbx_es_env_t *env, void *objptr, zbx_es_obj_type_t type
 	}
 	else
 		return NULL;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: create read-only custom functions that are callable from JS       *
+ *                                                                            *
+ * Parameters: ctx     - [IN] duktape context                                 *
+ *             obj_idx - [IN] base stack index                                *
+ *             funcs   - [IN] list of function prototypes                     *
+ *                                                                            *
+ *  Comment: replace of duk_put_function_list(ctx, obj_idx, funcs)            *
+ *                                                                            *
+ ******************************************************************************/
+void	es_put_function_list(duk_context *ctx, duk_idx_t obj_idx, const duk_function_list_entry *funcs)
+{
+	for (int i = 0; NULL != funcs[i].key; i++)
+	{
+		duk_push_string(ctx, funcs[i].key);
+		duk_push_c_function(ctx, funcs[i].value, funcs[i].nargs);
+		duk_def_prop(ctx, obj_idx - 2, ZBX_ES_DEFPROP_READONLY);
+	}
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: retrieve 'enumerable' state of property from prototype            *
+ *                                                                            *
+ * Parameters: ctx - [IN] duktape context                                     *
+ *             key - [IN] property name                                       *
+ *                                                                            *
+ ******************************************************************************/
+static duk_bool_t	es_property_proto_is_enum(duk_context *ctx, const char *key)
+{
+	duk_bool_t	ret = 0;
+
+	duk_get_prop_string(ctx, -4, "__proto__");		/* [..., base, enum, key, desc ] */
+
+	if (0 == duk_is_object(ctx, -1))
+	{
+		duk_pop(ctx);					/* pop __proto__ value */
+		return ret;
+	}
+
+	duk_push_string(ctx, key);				/* [..., base, enum, key, desc, value] */
+	duk_get_prop_desc(ctx, -2, 0);			/* get descriptor; [..., base, enum, key, desc, value, key] */
+
+	if (0 != duk_is_object(ctx, -1))			/*  [..., base, enum, key, desc, value, desc] */
+	{
+		duk_get_prop_string(ctx, -1, "enumerable");
+
+		if (0 != (ret = duk_is_boolean(ctx, -1)))	/* to escape 'Undefined' */
+			ret = duk_get_boolean(ctx, -1);
+
+		duk_pop(ctx);					/* pop "enumerable" value */
+	}
+
+	duk_pop_2(ctx);						/* pop [..., base, enum, key, desc, value, desc */
+
+	return ret;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: recursively define read-only state for object and its properties  *
+ *                                                                            *
+ * Parameters: ctx     - [IN] duktape context                                 *
+ *             obj_idx - [IN] object index                                    *
+ *                                                                            *
+ ******************************************************************************/
+static void	es_object_deep_ro_set(duk_context *ctx, const char *parent_key)
+{
+#	define	RO_FLAGS	(DUK_DEFPROP_HAVE_VALUE | DUK_DEFPROP_CLEAR_WRITABLE | DUK_DEFPROP_CLEAR_CONFIGURABLE)
+
+	if (0 == duk_is_object(ctx, -1) || 0 != duk_is_function(ctx, -1))
+		return;
+
+	/* we don't use DUK_ENUM_OWN_PROPERTIES_ONLY because               */
+	/* duktape does not inherit conf of property from __proto__ object */
+	/* so we have to propagate conf to property directly               */
+	duk_enum(ctx, -1, DUK_ENUM_INCLUDE_NONENUMERABLE);
+
+	while (0 != duk_next(ctx, -1, 0))		/* get keys only */
+	{
+		duk_uint_t	flags = RO_FLAGS;
+		duk_bool_t	ret = 0, enm = 0;
+		const char	*key = duk_get_string(ctx, -1);	/* stack: [..., base, enum, key] */
+
+		if (NULL == key)
+		{
+			duk_pop(ctx);			/* pop key */
+			continue;
+		}
+
+		if (0 == strcmp(key, parent_key))	/* recursive object */
+		{
+			duk_pop(ctx);			/* pop key */
+			break;
+		}
+
+		duk_dup(ctx, -1); 			/* duplicate key */
+		duk_get_prop_desc(ctx, -4, 0);		/* get descriptor; [..., base, enum, key, key] */
+
+		if (0 != duk_is_object(ctx, -1))	/* enum state for existing objects is inherited */
+		{
+			duk_get_prop_string(ctx, -1, "configurable");
+
+			if (0 != (ret = duk_is_boolean(ctx, -1)))	/* to escape 'Undefined' */
+				ret = duk_get_boolean(ctx, -1);
+
+			duk_pop(ctx);					/* pop configurable value */
+
+			if (0 == ret)
+			{
+				duk_pop_2(ctx);				/* pop key, descriptor */
+				continue;
+			}
+		}
+		else if (0 != (enm = es_property_proto_is_enum(ctx, key))) /* get enum; [..., base, enum, key, desc] */
+			flags |= DUK_DEFPROP_SET_ENUMERABLE;
+
+		duk_pop(ctx);				/* pop property descriptor */
+		duk_dup(ctx, -1); 			/* duplicate key; [..., base, enum, key] */
+		duk_get_prop(ctx, -4);			/* get property value; [..., base, enum, key, key] */
+		duk_def_prop(ctx, -4, flags);		/* [..., base, enum, key, value ] */
+		duk_get_prop_string(ctx, -2, key);	/* [..., base, enum ] */
+		zabbix_log(LOG_LEVEL_TRACE, "%s() ret:%d enm:%d sz:%d object:%u function:%u parent_key:%s key:%s ",
+				__func__, (int)ret, (int)enm, (int)duk_get_top_index(ctx), duk_is_object(ctx, -1),
+				duk_is_function(ctx, -1), parent_key, key);
+
+		if (duk_get_top_index(ctx) < DUK_IDX_MAX)
+			es_object_deep_ro_set(ctx, key);/* [..., base, enum, value ] */
+
+		duk_pop(ctx);				/* pop value */
+	}
+
+	duk_pop(ctx);					/* pop enum */
+
+#	undef	RO_FLAGS
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: define as read-only all existing global objects                   *
+ *          and their properties                                              *
+ *                                                                            *
+ * Parameters: es    - [IN] embedded scripting engine                         *
+ *             error - [OUT]                                                  *
+ *                                                                            *
+ ******************************************************************************/
+int	zbx_es_globals_make_readonly(zbx_es_t *es, char **error)
+{
+	duk_context	*ctx = es->env->ctx;
+
+	if (0 != setjmp(es->env->loc))
+	{
+		*error = zbx_strdup(*error, es->env->error);
+		return FAIL;
+	}
+
+	duk_push_global_object(ctx);
+	es_object_deep_ro_set(ctx, "");
+	duk_pop(ctx);
+
+	return SUCCEED;
 }
