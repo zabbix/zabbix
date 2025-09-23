@@ -203,7 +203,7 @@ foreach ($this->data['hostPrototypes'] as $hostPrototype) {
 		$hostTemplates,
 		$status_toggle->addClass(itemIndicatorStyle($hostPrototype['status'])),
 		$discover_toggle->addClass($no_discover ? ZBX_STYLE_RED : ZBX_STYLE_GREEN),
-		$data['tags'][$hostPrototype['hostid']]
+		(new CDiv($data['tags'][$hostPrototype['hostid']]))->addClass(ZBX_STYLE_TAGS_WRAPPER)
 	]);
 }
 

@@ -2021,6 +2021,10 @@ msgstr "收集间隔期间对虚拟磁盘的平均未完成写入请求数，\"u
 msgid "Avoid easy-to-guess passwords"
 msgstr "避免弱密码"
 
+#: app/views/host.wizard.edit.php:473
+msgid "Avoid including sensitive data."
+msgstr ""
+
 #: jsLoader.php:172
 msgid "Awaiting data"
 msgstr "等待数据"
@@ -3495,6 +3499,10 @@ msgstr "无法在\"%4$s\"上找到由自动发现规则 \"%3$s\"上的 \"%2$s\"�
 msgid "Cannot find value map \"%1$s\" used for item prototype \"%2$s\" of discovery rule prototype \"%3$s\" on \"%4$s\"."
 msgstr "在'%4$s'上找不到发现规则原型'%3$s'的监控项原型'%2$s'所使用的值映射'%1$s'"
 
+#: app/views/oauth.authorize.php:33
+msgid "Cannot get authentication tokens"
+msgstr ""
+
 #: app/views/oauth.edit.php:230
 msgid "Cannot get authorization code."
 msgstr "无法获取授权码"
@@ -4022,6 +4030,11 @@ msgstr "无法读取XML： %1$s 。"
 #, c-format
 msgid "Cannot read YAML: %1$s."
 msgstr "无法读取YAML: %1$s。"
+
+#: include/classes/server/CZabbixServer.php:511
+#, c-format
+msgid "Cannot read response from Zabbix server \"%1$s\"."
+msgstr ""
 
 #: include/classes/server/CZabbixServer.php:567
 #, c-format
@@ -8431,6 +8444,10 @@ msgstr "英语(en_US)"
 msgid "Enter a non-secret pre-shared key identity string. Avoid including sensitive data."
 msgstr "输入非机密的预共享密钥标识字符串，避免包含敏感数据"
 
+#: app/views/host.wizard.edit.php:470
+msgid "Enter a unique name that Zabbix components will use to recognize the pre-shared key."
+msgstr ""
+
 #: app/views/host.wizard.edit.php:609
 msgid "Enter the IP/DNS address and port of the Zabbix agent installed on your monitoring target."
 msgstr "输入安装在监控目标上的Zabbix agent的IP/DNS地址和端口"
@@ -12063,6 +12080,10 @@ msgstr "IE浏览器"
 #: include/views/configuration.item.prototype.list.php:69
 msgid "Interval"
 msgstr "间隔"
+
+#: widgets/itemcard/includes/CWidgetFieldItemSectionsView.php:76
+msgid "Interval and storage"
+msgstr ""
 
 #: include/classes/api/services/CRole.php:731
 #, c-format
@@ -16708,6 +16729,10 @@ msgstr "PHP不支持ctype扩展(PHP配置参数--enable-ctype)."
 msgid "PHP curl"
 msgstr "PHP curl扩展"
 
+#: include/classes/setup/CFrontendSetup.php:733
+msgid "PHP curl extension is missing or outdated."
+msgstr ""
+
 #: include/classes/setup/CFrontendSetup.php:691
 msgid "PHP curl extension missing."
 msgstr "PHP curl扩展缺失。"
@@ -18672,6 +18697,11 @@ msgstr "响应代码"
 #: httpdetails.php:149 include/classes/screens/CScreenHttpTestDetails.php:83
 msgid "Response time"
 msgstr "响应时间"
+
+#: include/classes/server/CZabbixServer.php:507
+#, c-format
+msgid "Response timeout of %1$s exceeded when connecting to Zabbix server \"%2$s\"."
+msgstr ""
 
 #: app/controllers/CControllerMediatypeTestSend.php:182
 msgid "Response type: JSON"
@@ -26216,6 +26246,10 @@ msgstr "描述"
 #: include/classes/validators/CApiInputValidator.php:1985
 msgid "directory cannot be empty"
 msgstr "目录不能为空"
+
+#: include/views/configuration.host.discovery.list.php:340
+msgid "discovery rule"
+msgstr ""
 
 #: app/controllers/CControllerItemMassCheckNow.php:138
 #: include/classes/api/services/CTask.php:562

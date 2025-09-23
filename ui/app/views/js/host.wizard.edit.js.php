@@ -209,7 +209,7 @@ window.host_wizard_edit = new class {
 			tls_psk_identity: {
 				required: () => this.#data.tls_required,
 				maxlength: <?= DB::getFieldLength('hosts', 'tls_psk_identity') ?>,
-				regex: /^[^`']*$/
+				regex: /^<?= ZBX_PREG_PSK_IDENTITY_FORMAT ?>$/
 			}
 		},
 		[this.STEP_ADD_HOST_INTERFACE]: {},
@@ -283,6 +283,7 @@ window.host_wizard_edit = new class {
 		this.#dialogue.addEventListener('click', ({target}) => {
 			if (target.classList.contains('js-tls-key-change')) {
 				this.#data.tls_required = true;
+				this.#data.tls_psk_identity = this.#generatePSKIdentity();
 			}
 
 			if (target.classList.contains('js-generate-pre-shared-key')) {
@@ -630,7 +631,7 @@ window.host_wizard_edit = new class {
 
 		const view = this.#view_templates.step_add_host_interface.evaluateToElement({
 			template_name: this.#getSelectedTemplate()?.name,
-			host_name: this.#data.host_new !== null ? this.#data.host_new.id : this.#data.host.name,
+			host_name: this.#getVisibleHostName(),
 			interfaces_long: interfaces_long.join(' / '),
 			interfaces_short: interfaces_short.join('/')
 		});
@@ -806,6 +807,8 @@ window.host_wizard_edit = new class {
 		// Don't send request if template or host hasn't changed.
 		if (this.#template?.templateid === templateid
 				&& (this.#host?.hostid === hostid || (this.#host === null && hostid === null))) {
+			this.#data.tls_psk_identity = this.#data.tls_required ? this.#generatePSKIdentity() : '';
+
 			return Promise.resolve();
 		}
 
@@ -832,6 +835,7 @@ window.host_wizard_edit = new class {
 					this.#data.host = {
 						...this.#data.host,
 						id: this.#host.hostid,
+						host: this.#host.host,
 						name: this.#host.name
 					}
 				}
@@ -864,7 +868,7 @@ window.host_wizard_edit = new class {
 					this.#data.tls_warning = this.#data.install_agent_required && !no_encryption && !psk_encryption;
 				}
 
-				this.#data.tls_psk_identity = '';
+				this.#data.tls_psk_identity = this.#data.tls_required ? this.#generatePSKIdentity() : '';
 				this.#data.tls_psk = this.#data.tls_required ? this.#generatePSK() : '';
 
 				this.#data.interfaces = [];
@@ -1260,7 +1264,7 @@ window.host_wizard_edit = new class {
 				})();
 
 				let server_host = '';
-				let hostname = this.#data.host_new !== null ? this.#data.host_new.id : this.#data.host.name;
+				let hostname = this.#getHostName();
 				let psk_identity = '';
 				let psk = '';
 
@@ -1275,13 +1279,15 @@ window.host_wizard_edit = new class {
 
 					hostname = `--hostname '${hostname}'`;
 
-					psk_identity = this.#data.tls_psk_identity !== '' && !tls_psk_identity_has_error
-						? `--psk-identity '${this.#data.tls_psk_identity}'`
-						: `--psk-identity-stdin`;
+					if (this.#data.tls_required) {
+						psk_identity = this.#data.tls_psk_identity !== '' && !tls_psk_identity_has_error
+							? `--psk-identity '${this.#data.tls_psk_identity}'`
+							: `--psk-identity-stdin`;
 
-					psk = this.#data.tls_psk !== ''
-						? `--psk ${this.#data.tls_psk}`
-						: `--psk-stdin`;
+						psk = this.#data.tls_psk !== ''
+							? `--psk ${this.#data.tls_psk}`
+							: `--psk-stdin`;
+					}
 				}
 
 				if (this.#data.monitoring_os === 'windows') {
@@ -1291,13 +1297,15 @@ window.host_wizard_edit = new class {
 
 					hostname = `-hostName '${hostname.replace(/ /g, `\` `)}'`;
 
-					psk_identity = this.#data.tls_psk_identity !== '' && !tls_psk_identity_has_error
-						? `-pskIdentity '${this.#data.tls_psk_identity.replace(/ /g, `\` `)}'`
-						: `-pskIdentitySTDIN`;
+					if (this.#data.tls_required) {
+						psk_identity = this.#data.tls_psk_identity !== '' && !tls_psk_identity_has_error
+							? `-pskIdentity '${this.#data.tls_psk_identity.replace(/ /g, `\` `)}'`
+							: `-pskIdentitySTDIN`;
 
-					psk = this.#data.tls_psk !== ''
-						? `-psk ${this.#data.tls_psk}`
-						: `-pskSTDIN`;
+						psk = this.#data.tls_psk !== ''
+							? `-psk ${this.#data.tls_psk}`
+							: `-pskSTDIN`;
+					}
 				}
 
 				this.#dialogue.querySelector('.js-install-agent-readme').innerHTML = readme_template.evaluate({
@@ -1544,10 +1552,24 @@ window.host_wizard_edit = new class {
 		return selected && this.#templates.get(selected.split(':').pop());
 	}
 
+	#getHostName() {
+		return this.#data.host_new?.id || this.#data.host.host;
+	}
+
+	#getVisibleHostName() {
+		return this.#data.host_new?.id || this.#data.host.name;
+	}
+
 	#isRequiredAddHostInterface() {
 		return this.#data.interface_required.some(required_type =>
 			!this.#host?.interfaces.some(({type}) => Number(type) === required_type)
 		);
+	}
+
+	#generatePSKIdentity() {
+		const host_field_length = <?= DB::getFieldLength('hosts', 'host') ?>;
+
+		return `${this.#getHostName().substring(0, host_field_length - 4)} PSK`;
 	}
 
 	#generatePSK() {
@@ -1655,7 +1677,7 @@ window.host_wizard_edit = new class {
 				const subclasses_list = section.querySelector('.template-subfilter');
 				const subclasses = template_subclasses.get(category);
 
-				if (subclasses !== undefined) {
+				if (subclasses?.length > 1 && templateids.length > 1) {
 					for (const subclass of subclasses.sort()) {
 						const subfilter_button = this.#view_templates.subclass_filter_item.evaluateToElement({
 							label: subclass
@@ -2169,9 +2191,17 @@ window.host_wizard_edit = new class {
 
 		form_field.querySelectorAll(type === 'error' ? '.error' : '.warning').forEach(element => element.remove());
 
-		messages.forEach(message => form_field.appendChild(this.#view_templates[type].evaluateToElement({
-			message: `${type === 'error' && messages.length > 1 ? '- ' : ''}${message}`
-		})));
+		messages.forEach(message => {
+			const message_element = this.#view_templates[type].evaluateToElement({
+				message: `${type === 'error' && messages.length > 1 ? '- ' : ''}${message}`
+			});
+
+			if (field.parentElement.classList.contains(ZBX_STYLE_FORM_FIELD)) {
+				field.parentNode.insertBefore(message_element, field.nextSibling);
+			} else {
+				field.parentElement.parentNode.insertBefore(message_element, field.parentElement.nextSibling);
+			}
+		});
 	}
 
 	#initReactiveData(target_object, on_change_callback) {
