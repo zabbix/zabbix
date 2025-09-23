@@ -394,7 +394,7 @@ void	zbx_pthread_init_attr(pthread_attr_t *attr)
 	{
 		zabbix_log(LOG_LEVEL_CRIT, "cannot initialize thread attributes: %s", zbx_strerror(errno));
 		THIS_SHOULD_NEVER_HAPPEN;
-		exit(EXIT_FAILURE);
+		zbx_exit(EXIT_FAILURE);
 	}
 
 #ifdef HAVE_STACKSIZE
@@ -402,7 +402,7 @@ void	zbx_pthread_init_attr(pthread_attr_t *attr)
 	{
 		zabbix_log(LOG_LEVEL_CRIT, "cannot set thread stack size: %s", zbx_strerror(errno));
 		THIS_SHOULD_NEVER_HAPPEN;
-		exit(EXIT_FAILURE);
+		zbx_exit(EXIT_FAILURE);
 	}
 #endif
 }

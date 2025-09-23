@@ -51,7 +51,7 @@ static int	get_config_log_file_size(void)
 		return config_log_file_size;
 
 	THIS_SHOULD_NEVER_HAPPEN;
-	exit(EXIT_FAILURE);
+	zbx_exit(EXIT_FAILURE);
 }
 
 #ifdef _WINDOWS
@@ -726,7 +726,7 @@ void	zbx_strlog_alloc(int level, char **out, size_t *out_alloc, size_t *out_offs
 
 			zabbix_log(LOG_LEVEL_CRIT, "vsnprintf() returned %d", bytes_written);
 			THIS_SHOULD_NEVER_HAPPEN;
-			exit(EXIT_FAILURE);
+			zbx_exit(EXIT_FAILURE);
 #undef INITIAL_ALLOC_LEN
 		}
 	}
@@ -853,7 +853,7 @@ static const char	*zabbix_get_log_level_ref_string(int loglevel)
 	}
 
 	THIS_SHOULD_NEVER_HAPPEN;
-	exit(EXIT_FAILURE);
+	zbx_exit(EXIT_FAILURE);
 }
 
 const char	*zabbix_get_log_level_string(void)

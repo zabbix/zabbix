@@ -879,7 +879,7 @@ static void	zbx_validate_config(ZBX_TASK_EX *task)
 	}
 
 	if (0 != err)
-		exit(EXIT_FAILURE);
+		zbx_exit(EXIT_FAILURE);
 }
 
 /******************************************************************************
@@ -1297,7 +1297,7 @@ static void	zbx_on_exit(int ret, void *on_exit_args)
 	zbx_db_config_free(zbx_db_config);
 	zbx_deinit_library_export();
 
-	exit(EXIT_SUCCESS);
+	zbx_exit(EXIT_SUCCESS);
 }
 
 /******************************************************************************
@@ -1366,7 +1366,7 @@ int	main(int argc, char **argv)
 				break;
 			case 'h':
 				zbx_print_help(zbx_progname, help_message, usage_message, NULL);
-				exit(EXIT_SUCCESS);
+				zbx_exit(EXIT_SUCCESS);
 				break;
 			case 'V':
 				zbx_print_version(title_message);
@@ -1374,7 +1374,7 @@ int	main(int argc, char **argv)
 				printf("\n");
 				zbx_tls_version();
 #endif
-				exit(EXIT_SUCCESS);
+				zbx_exit(EXIT_SUCCESS);
 				break;
 			case 'f':
 				opt_f++;
@@ -1382,7 +1382,7 @@ int	main(int argc, char **argv)
 				break;
 			default:
 				zbx_print_usage(zbx_progname, usage_message);
-				exit(EXIT_FAILURE);
+				zbx_exit(EXIT_FAILURE);
 				break;
 		}
 	}
@@ -1399,13 +1399,13 @@ int	main(int argc, char **argv)
 		if (1 < opt_f)
 			zbx_error("option \"-f\" or \"--foreground\" specified multiple times");
 
-		exit(EXIT_FAILURE);
+		zbx_exit(EXIT_FAILURE);
 	}
 
 	if (0 != opt_t && 0 != opt_r)
 	{
 		zbx_error("option \"-T\" or \"--test-config\" cannot be specified with \"-R\"");
-		exit(EXIT_FAILURE);
+		zbx_exit(EXIT_FAILURE);
 	}
 
 	/* Parameters which are not option values are invalid. The check relies on zbx_getopt_internal() which */
@@ -1417,7 +1417,7 @@ int	main(int argc, char **argv)
 		for (i = zbx_optind; i < argc; i++)
 			zbx_error("invalid parameter \"%s\"", argv[i]);
 
-		exit(EXIT_FAILURE);
+		zbx_exit(EXIT_FAILURE);
 	}
 
 	if (NULL == config_file)
@@ -1435,7 +1435,7 @@ int	main(int argc, char **argv)
 	if (ZBX_TASK_TEST_CONFIG == t.task)
 	{
 		printf("Validation successful\n");
-		exit(EXIT_SUCCESS);
+		zbx_exit(EXIT_SUCCESS);
 	}
 
 	if (ZBX_TASK_RUNTIME_CONTROL == t.task)
@@ -1447,7 +1447,7 @@ int	main(int argc, char **argv)
 		{
 			zbx_error("cannot initialize IPC services: %s", error);
 			zbx_free(error);
-			exit(EXIT_FAILURE);
+			zbx_exit(EXIT_FAILURE);
 		}
 
 		if (SUCCEED != (ret = rtc_process(t.opts, zbx_config_timeout, &error)))
@@ -1456,7 +1456,7 @@ int	main(int argc, char **argv)
 			zbx_free(error);
 		}
 
-		exit(SUCCEED == ret ? EXIT_SUCCESS : EXIT_FAILURE);
+		zbx_exit(SUCCEED == ret ? EXIT_SUCCESS : EXIT_FAILURE);
 	}
 
 	zbx_init_escalations(config_forks[ZBX_PROCESS_TYPE_ESCALATOR], zbx_rtc_notify_generic);
@@ -2189,7 +2189,7 @@ static int	server_startup(zbx_socket_t *listen_sock, int *ha_stat, int *ha_failo
 	{
 		zabbix_log(LOG_LEVEL_CRIT, "cannot initialize database: %s", error);
 		zbx_free(error);
-		exit(EXIT_FAILURE);
+		zbx_exit(EXIT_FAILURE);
 	}
 out:
 	if (NULL != runlevels)
@@ -2265,7 +2265,7 @@ static void	server_teardown(zbx_rtc_t *rtc, zbx_socket_t *listen_sock)
 	{
 		zbx_error("cannot restart logger: %s", error);
 		zbx_free(error);
-		exit(EXIT_FAILURE);
+		zbx_exit(EXIT_FAILURE);
 	}
 
 	if (NULL != listen_sock)
@@ -2293,7 +2293,7 @@ static void	server_teardown(zbx_rtc_t *rtc, zbx_socket_t *listen_sock)
 	{
 		zabbix_log(LOG_LEVEL_CRIT, "cannot start HA manager: %s", error);
 		zbx_free(error);
-		exit(EXIT_FAILURE);
+		zbx_exit(EXIT_FAILURE);
 	}
 }
 
@@ -2323,7 +2323,7 @@ static void	server_restart_ha(zbx_rtc_t *rtc)
 	{
 		zbx_error("cannot restart logger: %s", error);
 		zbx_free(error);
-		exit(EXIT_FAILURE);
+		zbx_exit(EXIT_FAILURE);
 	}
 
 #ifdef HAVE_PTHREAD_PROCESS_SHARED
@@ -2340,7 +2340,7 @@ static void	server_restart_ha(zbx_rtc_t *rtc)
 	{
 		zabbix_log(LOG_LEVEL_CRIT, "cannot start HA manager: %s", error);
 		zbx_free(error);
-		exit(EXIT_FAILURE);
+		zbx_exit(EXIT_FAILURE);
 	}
 
 	ha_status = ZBX_NODE_STATUS_STANDBY;
@@ -2371,21 +2371,21 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 	{
 		zbx_error("cannot initialize IPC services: %s", error);
 		zbx_free(error);
-		exit(EXIT_FAILURE);
+		zbx_exit(EXIT_FAILURE);
 	}
 
 	if (SUCCEED != zbx_locks_create(&error))
 	{
 		zbx_error("cannot create locks: %s", error);
 		zbx_free(error);
-		exit(EXIT_FAILURE);
+		zbx_exit(EXIT_FAILURE);
 	}
 
 	if (SUCCEED != zbx_open_log(&log_file_cfg, config_log_level, syslog_app_name, NULL, &error))
 	{
 		zbx_error("cannot open log: %s", error);
 		zbx_free(error);
-		exit(EXIT_FAILURE);
+		zbx_exit(EXIT_FAILURE);
 	}
 
 	zbx_init_library_ha();
@@ -2462,7 +2462,7 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 	if (SUCCEED != zbx_coredump_disable())
 	{
 		zabbix_log(LOG_LEVEL_CRIT, "cannot disable core dump, exiting...");
-		exit(EXIT_FAILURE);
+		zbx_exit(EXIT_FAILURE);
 	}
 #endif
 	zbx_initialize_events();
@@ -2470,7 +2470,7 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 	if (FAIL == zbx_load_modules(CONFIG_LOAD_MODULE_PATH, CONFIG_LOAD_MODULE, zbx_config_timeout, 1))
 	{
 		zabbix_log(LOG_LEVEL_CRIT, "loading modules failed, exiting...");
-		exit(EXIT_FAILURE);
+		zbx_exit(EXIT_FAILURE);
 	}
 
 	zbx_free_config();
@@ -2479,7 +2479,7 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 	{
 		zabbix_log(LOG_LEVEL_CRIT, "cannot initialize runtime control service: %s", error);
 		zbx_free(error);
-		exit(EXIT_FAILURE);
+		zbx_exit(EXIT_FAILURE);
 	}
 
 	exit_args.rtc = &rtc;
@@ -2489,14 +2489,14 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 	{
 		zabbix_log(LOG_LEVEL_CRIT, "cannot initialize vault token: %s", error);
 		zbx_free(error);
-		exit(EXIT_FAILURE);
+		zbx_exit(EXIT_FAILURE);
 	}
 
 	if (SUCCEED != zbx_vault_init(&zbx_config_vault, &error))
 	{
 		zabbix_log(LOG_LEVEL_CRIT, "cannot initialize vault: %s", error);
 		zbx_free(error);
-		exit(EXIT_FAILURE);
+		zbx_exit(EXIT_FAILURE);
 	}
 
 	zbx_unblock_signals(&orig_mask);
@@ -2507,14 +2507,14 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 	{
 		zabbix_log(LOG_LEVEL_CRIT, "cannot initialize database credentials from vault: %s", error);
 		zbx_free(error);
-		exit(EXIT_FAILURE);
+		zbx_exit(EXIT_FAILURE);
 	}
 
 	if (SUCCEED != zbx_db_init(&error))
 	{
 		zabbix_log(LOG_LEVEL_CRIT, "cannot initialize database: %s", error);
 		zbx_free(error);
-		exit(EXIT_FAILURE);
+		zbx_exit(EXIT_FAILURE);
 	}
 	zbx_db_connect(ZBX_DB_CONNECT_NORMAL);
 
@@ -2560,7 +2560,7 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 	{
 		zabbix_log(LOG_LEVEL_CRIT, "cannot initialize export: %s", error);
 		zbx_free(error);
-		exit(EXIT_FAILURE);
+		zbx_exit(EXIT_FAILURE);
 	}
 
 	if (SUCCEED != zbx_history_init(config_history_storage_url, config_history_storage_opts,
@@ -2568,14 +2568,14 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 	{
 		zabbix_log(LOG_LEVEL_CRIT, "cannot initialize history storage: %s", error);
 		zbx_free(error);
-		exit(EXIT_FAILURE);
+		zbx_exit(EXIT_FAILURE);
 	}
 
 	if (SUCCEED != zbx_init_selfmon_collector(get_config_forks, &error))
 	{
 		zabbix_log(LOG_LEVEL_CRIT, "cannot initialize self-monitoring: %s", error);
 		zbx_free(error);
-		exit(EXIT_FAILURE);
+		zbx_exit(EXIT_FAILURE);
 	}
 
 	zbx_unset_exit_on_terminate();
@@ -2590,7 +2590,7 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 	{
 		zabbix_log(LOG_LEVEL_CRIT, "cannot start HA manager: %s", error);
 		zbx_free(error);
-		exit(EXIT_FAILURE);
+		zbx_exit(EXIT_FAILURE);
 	}
 
 	if (SUCCEED == zbx_is_export_enabled(ZBX_FLAG_EXPTYPE_EVENTS))
@@ -2796,5 +2796,5 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 	return SUCCEED;
 out:
 	zbx_db_close();
-	exit(EXIT_FAILURE);
+	zbx_exit(EXIT_FAILURE);
 }

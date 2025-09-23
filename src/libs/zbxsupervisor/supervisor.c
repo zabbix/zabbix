@@ -133,7 +133,7 @@ zbx_proc_startup_t	*zbx_proc_startup_create(int threads_num,
 		if (FAIL == get_process_info_by_thread_cb(i + 1, &info.type, &info.num))
 		{
 			THIS_SHOULD_NEVER_HAPPEN_MSG("process index %d exceeds maximum", i + 1);
-			exit(EXIT_FAILURE);
+			zbx_exit(EXIT_FAILURE);
 		}
 
 		zbx_supervisor_get_process_info(info.type, &info.owner, &runlevel);
@@ -141,7 +141,7 @@ zbx_proc_startup_t	*zbx_proc_startup_create(int threads_num,
 		if (ZBX_RUNLEVEL_DEFAULT < runlevel)
 		{
 			THIS_SHOULD_NEVER_HAPPEN_MSG("process runlevel %d exceeds maximum", runlevel);
-			exit(EXIT_FAILURE);
+			zbx_exit(EXIT_FAILURE);
 		}
 
 		zbx_vector_proc_info_append(&runlevels[runlevel].processes, info);
@@ -419,14 +419,14 @@ zbx_supervisor_unit_t	*supervisor_get_unit(zbx_supervisor_t *sv, unsigned char t
 	if (ZBX_PROCESS_TYPE_COUNT <= type)
 	{
 		THIS_SHOULD_NEVER_HAPPEN_MSG("Unknown process type: %d", type);
-		exit(EXIT_FAILURE);
+		zbx_exit(EXIT_FAILURE);
 	}
 
 	if (0 >= num || num > sv->unitsets[type].unit_num)
 	{
 		THIS_SHOULD_NEVER_HAPPEN_MSG("Process number %d, is outside configured range [%d, %d] for process of"
 				" type %d", num, 1, sv->unitsets[type].unit_num, type);
-		exit(EXIT_FAILURE);
+		zbx_exit(EXIT_FAILURE);
 	}
 
 	return &sv->unitsets[type].units[num - 1];
@@ -456,7 +456,7 @@ static void	supervisor_unit_start(zbx_supervisor_unit_t *unit, void *(*thread_en
 	if (0 != (err = pthread_create(&unit->handle, &attr, thread_entry, (void *)unit_args)))
 	{
 		zabbix_log(LOG_LEVEL_CRIT, "cannot create thread: %s", zbx_strerror(err));
-		exit(EXIT_FAILURE);
+		zbx_exit(EXIT_FAILURE);
 	}
 
 	unit->running = 1;
@@ -664,7 +664,7 @@ ZBX_THREAD_ENTRY(zbx_supervisor_thread, args)
 	{
 		zabbix_log(LOG_LEVEL_CRIT, "cannot start supervisor service: %s", error);
 		zbx_free(error);
-		exit(EXIT_FAILURE);
+		zbx_exit(EXIT_FAILURE);
 	}
 
 	supervisor_init(&sv, runlevels);
@@ -769,7 +769,7 @@ out:
 	zbx_ipc_service_close(&service);
 	zbx_proc_startup_free(runlevels);
 
-	exit(exit_ret);
+	zbx_exit(exit_ret);
 
 #undef DEFAULT_SLEEP_TIME
 }

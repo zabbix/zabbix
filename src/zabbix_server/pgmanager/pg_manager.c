@@ -523,7 +523,7 @@ ZBX_THREAD_ENTRY(pg_manager_thread, args)
 	{
 		zabbix_log(LOG_LEVEL_CRIT, "cannot start proxy group manager service: %s", error);
 		zbx_free(error);
-		exit(EXIT_FAILURE);
+		zbx_exit(EXIT_FAILURE);
 	}
 
 	zbx_unblock_signals(&orig_mask);

@@ -1458,7 +1458,7 @@ static void	DCexport_history(const zbx_dc_history_t *history, int history_num, z
 			case ITEM_VALUE_TYPE_NONE:
 			default:
 				THIS_SHOULD_NEVER_HAPPEN;
-				exit(EXIT_FAILURE);
+				zbx_exit(EXIT_FAILURE);
 		}
 
 		zbx_json_adduint64(&json, ZBX_PROTO_TAG_TYPE, h->value_type);
@@ -1827,7 +1827,7 @@ void	zbx_dc_history_clean_value(zbx_dc_history_t *history)
 		case ITEM_VALUE_TYPE_NONE:
 		default:
 			THIS_SHOULD_NEVER_HAPPEN;
-			exit(EXIT_FAILURE);
+			zbx_exit(EXIT_FAILURE);
 	}
 }
 
@@ -2679,7 +2679,7 @@ static void	hc_free_data(zbx_hc_data_t *data)
 				case ITEM_VALUE_TYPE_NONE:
 				default:
 					THIS_SHOULD_NEVER_HAPPEN;
-					exit(EXIT_FAILURE);
+					zbx_exit(EXIT_FAILURE);
 			}
 		}
 	}
@@ -2951,7 +2951,7 @@ static int	hc_clone_history_data(zbx_hc_data_t **data, const dc_item_value_t *it
 			case ITEM_VALUE_TYPE_NONE:
 			default:
 				THIS_SHOULD_NEVER_HAPPEN;
-				exit(EXIT_FAILURE);
+				zbx_exit(EXIT_FAILURE);
 		}
 
 		switch (item_value->item_value_type)
@@ -2977,7 +2977,7 @@ static int	hc_clone_history_data(zbx_hc_data_t **data, const dc_item_value_t *it
 			case ITEM_VALUE_TYPE_NONE:
 			default:
 				THIS_SHOULD_NEVER_HAPPEN;
-				exit(EXIT_FAILURE);
+				zbx_exit(EXIT_FAILURE);
 		}
 
 		cache->stats.history_counter++;
@@ -3199,7 +3199,7 @@ static void	hc_copy_history_data(zbx_dc_history_t *history, zbx_uint64_t itemid,
 			case ITEM_VALUE_TYPE_NONE:
 			default:
 				THIS_SHOULD_NEVER_HAPPEN;
-				exit(EXIT_FAILURE);
+				zbx_exit(EXIT_FAILURE);
 		}
 	}
 }
@@ -3582,7 +3582,7 @@ zbx_uint64_t	zbx_dc_get_nextid(const char *table_name, int num)
 	if (i == ZBX_IDS_SIZE)
 	{
 		zabbix_log(LOG_LEVEL_ERR, "insufficient shared memory for ids");
-		exit(EXIT_FAILURE);
+		zbx_exit(EXIT_FAILURE);
 	}
 
 	table = zbx_db_get_table(table_name);

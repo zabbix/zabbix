@@ -183,7 +183,7 @@ static zbx_lld_worker_t	*lld_get_worker_by_client(zbx_lld_manager_t *manager, zb
 	if (NULL == worker)
 	{
 		THIS_SHOULD_NEVER_HAPPEN;
-		exit(EXIT_FAILURE);
+		zbx_exit(EXIT_FAILURE);
 	}
 
 	return *worker;
@@ -218,7 +218,7 @@ static void	lld_register_worker(zbx_lld_manager_t *manager, zbx_ipc_client_t *cl
 		if (manager->next_worker_index == manager->workers.values_num)
 		{
 			THIS_SHOULD_NEVER_HAPPEN;
-			exit(EXIT_FAILURE);
+			zbx_exit(EXIT_FAILURE);
 		}
 
 		worker = manager->workers.values[manager->next_worker_index++];
@@ -621,7 +621,7 @@ ZBX_THREAD_ENTRY(lld_manager_thread, args)
 	{
 		zabbix_log(LOG_LEVEL_CRIT, "cannot start LLD manager service: %s", error);
 		zbx_free(error);
-		exit(EXIT_FAILURE);
+		zbx_exit(EXIT_FAILURE);
 	}
 
 	zbx_rtc_subscribe_service(ZBX_PROCESS_TYPE_LLDMANAGER, 0, NULL, 0, SEC_PER_MIN, ZBX_IPC_SERVICE_LLD);

@@ -263,7 +263,7 @@ int	main(int argc, char **argv)
 				{
 					zbx_error("Invalid timeout, valid range [" JS_TIMEOUT_MIN_STR ":"
 							JS_TIMEOUT_MAX_STR "] seconds");
-					exit(EXIT_FAILURE);
+					zbx_exit(EXIT_FAILURE);
 				}
 
 				break;

@@ -131,7 +131,7 @@ const char	*get_process_type_string(unsigned char proc_type)
 	}
 
 	THIS_SHOULD_NEVER_HAPPEN;
-	exit(EXIT_FAILURE);
+	zbx_exit(EXIT_FAILURE);
 }
 
 int	get_process_type_by_name(const char *proc_type_str)

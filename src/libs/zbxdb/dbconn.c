@@ -347,7 +347,7 @@ static int	dbconn_open(zbx_dbconn_t *db)
 	if (NULL == (db->conn = mysql_init(NULL)))
 	{
 		zabbix_log(LOG_LEVEL_CRIT, "cannot allocate or initialize MYSQL database connection object");
-		exit(EXIT_FAILURE);
+		zbx_exit(EXIT_FAILURE);
 	}
 
 	if (1 == db->autoincrement)
@@ -1388,7 +1388,7 @@ int	zbx_dbconn_open(zbx_dbconn_t *db)
 		if (ZBX_DB_FAIL == err || ZBX_DB_CONNECT_EXIT == db->connect_options)
 		{
 			zabbix_log(LOG_LEVEL_CRIT, "Cannot connect to the database. Exiting...");
-			exit(EXIT_FAILURE);
+			zbx_exit(EXIT_FAILURE);
 		}
 
 #if defined(HAVE_POSTGRESQL)
@@ -1397,7 +1397,7 @@ int	zbx_dbconn_open(zbx_dbconn_t *db)
 			if (0 == db->config->read_only_recoverable && 0 >= retries--)
 			{
 				zabbix_log(LOG_LEVEL_ERR, "database is read-only: Exiting...");
-				exit(EXIT_FAILURE);
+				zbx_exit(EXIT_FAILURE);
 			}
 
 			zabbix_log(LOG_LEVEL_ERR, "database is read-only: reconnecting in %d seconds",

@@ -833,7 +833,7 @@ static void	zbx_validate_config(ZBX_TASK_EX *task)
 	err |= (FAIL == zbx_db_config_validate_features(zbx_db_config, zbx_program_type));
 
 	if (0 != err)
-		exit(EXIT_FAILURE);
+		zbx_exit(EXIT_FAILURE);
 }
 
 static int	add_serveractive_host_proxy_cb(const zbx_vector_addr_ptr_t *addrs, zbx_vector_str_t *hostnames,
@@ -1133,7 +1133,7 @@ static void	zbx_load_config(ZBX_TASK_EX *task)
 				add_serveractive_host_proxy_cb, NULL, NULL, &error))
 		{
 			zbx_error("%s", error);
-			exit(EXIT_FAILURE);
+			zbx_exit(EXIT_FAILURE);
 		}
 	}
 
@@ -1218,7 +1218,7 @@ static void	zbx_on_exit(int ret, void *on_exit_args)
 	zbx_config_tls_free(zbx_config_tls);
 	zbx_db_config_free(zbx_db_config);
 
-	exit(EXIT_SUCCESS);
+	zbx_exit(EXIT_SUCCESS);
 }
 
 /******************************************************************************
@@ -1287,7 +1287,7 @@ int	main(int argc, char **argv)
 				break;
 			case 'h':
 				zbx_print_help(zbx_progname, help_message, usage_message, NULL);
-				exit(EXIT_SUCCESS);
+				zbx_exit(EXIT_SUCCESS);
 				break;
 			case 'V':
 				zbx_print_version(title_message);
@@ -1295,7 +1295,7 @@ int	main(int argc, char **argv)
 				printf("\n");
 				zbx_tls_version();
 #endif
-				exit(EXIT_SUCCESS);
+				zbx_exit(EXIT_SUCCESS);
 				break;
 			case 'f':
 				opt_f++;
@@ -1303,7 +1303,7 @@ int	main(int argc, char **argv)
 				break;
 			default:
 				zbx_print_usage(zbx_progname, usage_message);
-				exit(EXIT_FAILURE);
+				zbx_exit(EXIT_FAILURE);
 				break;
 		}
 	}
@@ -1320,13 +1320,13 @@ int	main(int argc, char **argv)
 		if (1 < opt_f)
 			zbx_error("option \"-f\" or \"--foreground\" specified multiple times");
 
-		exit(EXIT_FAILURE);
+		zbx_exit(EXIT_FAILURE);
 	}
 
 	if (0 != opt_t && 0 != opt_r)
 	{
 		zbx_error("option \"-T\" or \"--test-config\" cannot be specified with \"-R\"");
-		exit(EXIT_FAILURE);
+		zbx_exit(EXIT_FAILURE);
 	}
 
 	/* Parameters which are not option values are invalid. The check relies on zbx_getopt_internal() which */
@@ -1338,7 +1338,7 @@ int	main(int argc, char **argv)
 		for (i = zbx_optind; i < argc; i++)
 			zbx_error("invalid parameter \"%s\"", argv[i]);
 
-		exit(EXIT_FAILURE);
+		zbx_exit(EXIT_FAILURE);
 	}
 
 	if (NULL == config_file)
@@ -1356,7 +1356,7 @@ int	main(int argc, char **argv)
 	if (ZBX_TASK_TEST_CONFIG == t.task)
 	{
 		printf("Validation successful\n");
-		exit(EXIT_SUCCESS);
+		zbx_exit(EXIT_SUCCESS);
 	}
 
 	if (ZBX_TASK_RUNTIME_CONTROL == t.task)
@@ -1368,7 +1368,7 @@ int	main(int argc, char **argv)
 		{
 			zbx_error("cannot initialize IPC services: %s", error);
 			zbx_free(error);
-			exit(EXIT_FAILURE);
+			zbx_exit(EXIT_FAILURE);
 		}
 
 		if (SUCCEED != (ret = rtc_process(t.opts, zbx_config_timeout, &error)))
@@ -1377,7 +1377,7 @@ int	main(int argc, char **argv)
 			zbx_free(error);
 		}
 
-		exit(SUCCEED == ret ? EXIT_SUCCESS : EXIT_FAILURE);
+		zbx_exit(SUCCEED == ret ? EXIT_SUCCESS : EXIT_FAILURE);
 	}
 
 	return zbx_daemon_start(config_allow_root, config_user, t.flags, get_zbx_config_pid_file, zbx_on_exit,
@@ -1405,7 +1405,7 @@ static void	proxy_db_init(void)
 	{
 		zabbix_log(LOG_LEVEL_CRIT, "cannot initialize database: %s", error);
 		zbx_free(error);
-		exit(EXIT_FAILURE);
+		zbx_exit(EXIT_FAILURE);
 	}
 
 	zbx_db_init_autoincrement_options();
@@ -1442,7 +1442,7 @@ static void	proxy_db_init(void)
 		{
 			zabbix_log(LOG_LEVEL_CRIT, "cannot remove database file \"%s\": %s, exiting...",
 					zbx_db_config->dbname, zbx_strerror(errno));
-			exit(EXIT_FAILURE);
+			zbx_exit(EXIT_FAILURE);
 		}
 
 		proxy_db_init();
@@ -1459,7 +1459,7 @@ static void	proxy_db_init(void)
 	return;
 out:
 	zbx_db_close();
-	exit(EXIT_FAILURE);
+	zbx_exit(EXIT_FAILURE);
 }
 
 static void	start_processes(zbx_socket_t *listen_sock, const zbx_config_comms_args_t *config_comms,
@@ -1820,21 +1820,21 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 	{
 		zbx_error("cannot initialize IPC services: %s", error);
 		zbx_free(error);
-		exit(EXIT_FAILURE);
+		zbx_exit(EXIT_FAILURE);
 	}
 
 	if (SUCCEED != zbx_locks_create(&error))
 	{
 		zbx_error("cannot create locks: %s", error);
 		zbx_free(error);
-		exit(EXIT_FAILURE);
+		zbx_exit(EXIT_FAILURE);
 	}
 
 	if (SUCCEED != zbx_open_log(&log_file_cfg, config_log_level, syslog_app_name, NULL, &error))
 	{
 		zbx_error("cannot open log:%s", error);
 		zbx_free(error);
-		exit(EXIT_FAILURE);
+		zbx_exit(EXIT_FAILURE);
 	}
 
 #ifdef HAVE_NETSNMP
@@ -1899,13 +1899,13 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 	if (SUCCEED != zbx_coredump_disable())
 	{
 		zabbix_log(LOG_LEVEL_CRIT, "cannot disable core dump, exiting...");
-		exit(EXIT_FAILURE);
+		zbx_exit(EXIT_FAILURE);
 	}
 #endif
 	if (FAIL == zbx_load_modules(config_load_module_path, config_load_module, zbx_config_timeout, 1))
 	{
 		zabbix_log(LOG_LEVEL_CRIT, "loading modules failed, exiting...");
-		exit(EXIT_FAILURE);
+		zbx_exit(EXIT_FAILURE);
 	}
 
 	zbx_free_config();
@@ -1914,7 +1914,7 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 	{
 		zabbix_log(LOG_LEVEL_CRIT, "cannot initialize runtime control service: %s", error);
 		zbx_free(error);
-		exit(EXIT_FAILURE);
+		zbx_exit(EXIT_FAILURE);
 	}
 
 	exit_args.rtc = &rtc;
@@ -1927,14 +1927,14 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 	{
 		zabbix_log(LOG_LEVEL_CRIT, "cannot initialize database cache: %s", error);
 		zbx_free(error);
-		exit(EXIT_FAILURE);
+		zbx_exit(EXIT_FAILURE);
 	}
 
 	if (SUCCEED != init_proxy_history_lock(zbx_program_type, &error))
 	{
 		zabbix_log(LOG_LEVEL_CRIT, "cannot initialize lock for passive proxy history: %s", error);
 		zbx_free(error);
-		exit(EXIT_FAILURE);
+		zbx_exit(EXIT_FAILURE);
 	}
 
 	if (SUCCEED != zbx_init_configuration_cache(get_zbx_program_type, get_config_forks, config_conf_cache_size,
@@ -1942,35 +1942,35 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 	{
 		zabbix_log(LOG_LEVEL_CRIT, "cannot initialize configuration cache: %s", error);
 		zbx_free(error);
-		exit(EXIT_FAILURE);
+		zbx_exit(EXIT_FAILURE);
 	}
 
 	if (SUCCEED != zbx_init_selfmon_collector(get_config_forks, &error))
 	{
 		zabbix_log(LOG_LEVEL_CRIT, "cannot initialize self-monitoring: %s", error);
 		zbx_free(error);
-		exit(EXIT_FAILURE);
+		zbx_exit(EXIT_FAILURE);
 	}
 
 	if (0 != config_forks[ZBX_PROCESS_TYPE_VMWARE] && SUCCEED != zbx_vmware_init(&config_vmware_cache_size, &error))
 	{
 		zabbix_log(LOG_LEVEL_CRIT, "cannot initialize VMware cache: %s", error);
 		zbx_free(error);
-		exit(EXIT_FAILURE);
+		zbx_exit(EXIT_FAILURE);
 	}
 
 	if (SUCCEED != zbx_vault_token_from_env_get(&(zbx_config_vault.token), &error))
 	{
 		zabbix_log(LOG_LEVEL_CRIT, "cannot initialize vault token: %s", error);
 		zbx_free(error);
-		exit(EXIT_FAILURE);
+		zbx_exit(EXIT_FAILURE);
 	}
 
 	if (SUCCEED != zbx_vault_init(&zbx_config_vault, &error))
 	{
 		zabbix_log(LOG_LEVEL_CRIT, "cannot initialize vault: %s", error);
 		zbx_free(error);
-		exit(EXIT_FAILURE);
+		zbx_exit(EXIT_FAILURE);
 	}
 
 	if (SUCCEED != zbx_vault_db_credentials_get(&zbx_config_vault, &zbx_db_config->dbuser,
@@ -1979,7 +1979,7 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 	{
 		zabbix_log(LOG_LEVEL_CRIT, "cannot initialize database credentials from vault: %s", error);
 		zbx_free(error);
-		exit(EXIT_FAILURE);
+		zbx_exit(EXIT_FAILURE);
 	}
 
 	if (FAIL == zbx_pb_create(config_proxy_buffer_mode, config_proxy_memory_buffer_size,
@@ -1987,7 +1987,7 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 	{
 		zabbix_log(LOG_LEVEL_CRIT, "cannot initialize proxy buffer: %s", error);
 		zbx_free(error);
-		exit(EXIT_FAILURE);
+		zbx_exit(EXIT_FAILURE);
 	}
 	proxy_db_init();
 
@@ -2008,14 +2008,14 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 				zbx_config_timeout, config_tcp_max_backlog_size))
 		{
 			zabbix_log(LOG_LEVEL_CRIT, "listener failed: %s", zbx_socket_strerror());
-			exit(EXIT_FAILURE);
+			zbx_exit(EXIT_FAILURE);
 		}
 
 		if (SUCCEED != zbx_init_remote_commands_cache(&error))
 		{
 			zabbix_log(LOG_LEVEL_CRIT, "cannot initialize commands cache: %s", error);
 			zbx_free(error);
-			exit(EXIT_FAILURE);
+			zbx_exit(EXIT_FAILURE);
 		}
 
 		zbx_unblock_signals(&orig_mask);

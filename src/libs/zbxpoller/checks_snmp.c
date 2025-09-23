@@ -618,7 +618,7 @@ static char	*get_item_community_context(const zbx_dc_item_t *item)
 		return item->snmpv3_contextname;
 
 	THIS_SHOULD_NEVER_HAPPEN;
-	exit(EXIT_FAILURE);
+	zbx_exit(EXIT_FAILURE);
 }
 
 static char	*get_item_security_name(const zbx_dc_item_t *item)

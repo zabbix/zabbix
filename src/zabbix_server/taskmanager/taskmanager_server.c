@@ -1657,7 +1657,7 @@ ZBX_THREAD_ENTRY(taskmanager_thread, args)
 		zabbix_log(LOG_LEVEL_CRIT, "cannot complete post initialization tasks: %s",
 				error);
 		zbx_free(error);
-		exit(EXIT_FAILURE);
+		zbx_exit(EXIT_FAILURE);
 	}
 
 	if (SUCCEED == zbx_is_export_enabled(ZBX_FLAG_EXPTYPE_EVENTS))

@@ -37,7 +37,7 @@ void	zbx_supervisor_set_process_running(int proc_index)
 	{
 		zabbix_log(LOG_LEVEL_CRIT, "Cannot connect to supervisor service: %s", error);
 		zbx_free(error);
-		exit(EXIT_FAILURE);
+		zbx_exit(EXIT_FAILURE);
 	}
 
 	(void)zbx_serialize_int(data, proc_index);
@@ -45,7 +45,7 @@ void	zbx_supervisor_set_process_running(int proc_index)
 	{
 		zabbix_log(LOG_LEVEL_CRIT, "Cannot send message to supervisor service: %s", error);
 		zbx_free(error);
-		exit(EXIT_FAILURE);
+		zbx_exit(EXIT_FAILURE);
 	}
 
 	zbx_ipc_socket_close(&sock);
@@ -296,7 +296,7 @@ void	zbx_supervisor_get_process_info(int process_type, zbx_proc_owner_t *owner, 
 
 		default:
 			THIS_SHOULD_NEVER_HAPPEN_MSG("Unknow process type: %d", process_type);
-			exit(EXIT_FAILURE);
+			zbx_exit(EXIT_FAILURE);
 			break;
 		}
 

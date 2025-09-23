@@ -1068,7 +1068,7 @@ ZBX_THREAD_ENTRY(zbx_alert_syncer_thread, args)
 	{
 		zabbix_log(LOG_LEVEL_CRIT, "cannot initialize alert loader: %s", error);
 		zbx_free(error);
-		exit(EXIT_FAILURE);
+		zbx_exit(EXIT_FAILURE);
 	}
 
 	zbx_setproctitle("%s [connecting to the database]", get_process_type_string(process_type));
@@ -1101,7 +1101,7 @@ ZBX_THREAD_ENTRY(zbx_alert_syncer_thread, args)
 			zabbix_log(LOG_LEVEL_CRIT, "cannot read alert syncer request");
 			am_db_clear(&amdb);
 			zbx_db_close();
-			exit(EXIT_FAILURE);
+			zbx_exit(EXIT_FAILURE);
 		}
 		zbx_update_selfmon_counter(info, ZBX_PROCESS_STATE_BUSY);
 

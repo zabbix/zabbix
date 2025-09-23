@@ -44,6 +44,29 @@ int	get_sig_parent_pid(void)
 	return sig_parent_pid;
 }
 
+/******************************************************************************
+ *                                                                            *
+ * Purpose: exit thread with specified status code and update global exit    *
+ *          state if exiting with failure                                     *
+ *                                                                            *
+ * Parameters: status - [IN] exit status code                                 *
+ *                                                                            *
+ ******************************************************************************/
+static ZBX_NORETURN void	thread_exit(int status)
+{
+	if (EXIT_SUCCESS != status)
+	{
+		zbx_set_exiting_with_fail();
+
+		/* This can be overwritten or even corrupted if two threads exit simultaneously. */
+		/* However since it will be used only for comparison and logging - it will not   */
+		/* cause any problems.                                                           */
+		exit_thread = pthread_self();
+	}
+
+	pthread_exit(&status);
+}
+
 int	zbx_init_thread_signal_handler(void)
 {
 	sigset_t	mask;
@@ -57,6 +80,9 @@ int	zbx_init_thread_signal_handler(void)
 	sigaddset(&mask, SIGHUP);
 	sigaddset(&mask, SIGQUIT);
 	sigaddset(&mask, SIGINT);
+
+	zbx_set_exit(thread_exit);
+	zbx_set_exit_immediate(thread_exit);
 
 	return pthread_sigmask(SIG_BLOCK, &mask, NULL);
 }
@@ -122,7 +148,7 @@ static void	exit_with_failure(void)
 #if defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
 	zbx_tls_free_on_signal();
 #endif
-	_exit(EXIT_FAILURE);
+	zbx_exit_immediate(EXIT_FAILURE);
 }
 
 /******************************************************************************
@@ -459,59 +485,6 @@ void	zbx_set_child_pids(pid_t *pids, size_t pid_num)
 {
 	child_pids = pids;
 	child_pid_count = pid_num;
-}
-
-/******************************************************************************
- *                                                                            *
- * Purpose: exit thread with specified status code and update global exit    *
- *          state if exiting with failure                                     *
- *                                                                            *
- * Parameters: status - [IN] exit status code                                 *
- *                                                                            *
- ******************************************************************************/
-static void	thread_exit(int status)
-{
-	if (EXIT_SUCCESS != status)
-	{
-		zbx_set_exiting_with_fail();
-
-		/* This can be overwritten or even corrupted if two threads exit simultaneously. */
-		/* However since it will be used only for comparison and logging - it will not   */
-		/* cause any problems.                                                           */
-		exit_thread = pthread_self();
-	}
-
-	pthread_exit(&status);
-}
-
-/******************************************************************************
- *                                                                            *
- * Purpose: exit process or thread depending on execution context             *
- *                                                                            *
- * Parameters: status - [IN] exit status code                                 *
- *                                                                            *
- ******************************************************************************/
-void	zbx_exit(int status)
-{
-	if (0 == sig_thread)
-		exit(status);
-
-	thread_exit(status);
-}
-
-/******************************************************************************
- *                                                                            *
- * Purpose: exit process or thread depending on execution context             *
- *                                                                            *
- * Parameters: status - [IN] exit status code                                 *
- *                                                                            *
- ******************************************************************************/
-void	zbx_exit_immediate(int status)
-{
-	if (0 == sig_thread)
-		_exit(status);
-
-	thread_exit(status);
 }
 
 /******************************************************************************

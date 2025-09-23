@@ -252,7 +252,7 @@ static void	ipmi_poller_send_request(zbx_ipmi_poller_t *poller, zbx_ipmi_request
 			request->message.size))
 	{
 		zabbix_log(LOG_LEVEL_CRIT, "cannot send data to IPMI poller");
-		exit(EXIT_FAILURE);
+		zbx_exit(EXIT_FAILURE);
 	}
 
 	poller->request = request;
@@ -389,7 +389,7 @@ static zbx_ipmi_poller_t	*ipmi_manager_register_poller(zbx_ipmi_manager_t *manag
 		if (manager->next_poller_index == manager->pollers.values_num)
 		{
 			THIS_SHOULD_NEVER_HAPPEN;
-			exit(EXIT_FAILURE);
+			zbx_exit(EXIT_FAILURE);
 		}
 
 		poller = manager->pollers.values[manager->next_poller_index++];
@@ -420,7 +420,7 @@ static zbx_ipmi_poller_t	*ipmi_manager_get_poller_by_client(zbx_ipmi_manager_t *
 	if (NULL == poller)
 	{
 		THIS_SHOULD_NEVER_HAPPEN;
-		exit(EXIT_FAILURE);
+		zbx_exit(EXIT_FAILURE);
 	}
 
 	return *poller;
@@ -911,7 +911,7 @@ ZBX_THREAD_ENTRY(zbx_ipmi_manager_thread, args)
 	{
 		zabbix_log(LOG_LEVEL_CRIT, "cannot start IPMI service: %s", error);
 		zbx_free(error);
-		exit(EXIT_FAILURE);
+		zbx_exit(EXIT_FAILURE);
 	}
 
 	ipmi_manager_init(&ipmi_manager, ipmi_manager_args_in->get_config_forks);

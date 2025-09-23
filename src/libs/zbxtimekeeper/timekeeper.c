@@ -152,7 +152,7 @@ static zbx_timekeeper_sync_t	*timekeeper_create_thread_sync(void)
 	if (0 != (err = pthread_mutex_init(mutex, NULL)))
 	{
 		zabbix_log(LOG_LEVEL_CRIT, "cannot initialize timekeeper mutex: %s", zbx_strerror(err));
-		exit(EXIT_FAILURE);
+		zbx_exit(EXIT_FAILURE);
 	}
 
 	zbx_timekeeper_sync_init(sync, timekeeper_thread_lock, timekeeper_thread_unlock, (void *)mutex);

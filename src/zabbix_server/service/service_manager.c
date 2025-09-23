@@ -3540,7 +3540,7 @@ ZBX_THREAD_ENTRY(service_manager_thread, args)
 	{
 		zabbix_log(LOG_LEVEL_CRIT, "cannot start service manager service: %s", error);
 		zbx_free(error);
-		exit(EXIT_FAILURE);
+		zbx_exit(EXIT_FAILURE);
 	}
 
 	/* initialize statistics */
@@ -3755,7 +3755,7 @@ ZBX_THREAD_ENTRY(service_manager_thread, args)
 
 	zbx_setproctitle("%s #%d [terminated]", get_process_type_string(process_type), process_num);
 
-	exit(EXIT_SUCCESS);
+	zbx_exit(EXIT_SUCCESS);
 #undef STAT_INTERVAL
 }
 #undef ZBX_PROBLEM_CLEANUP_AGE

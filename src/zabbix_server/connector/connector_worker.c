@@ -175,7 +175,7 @@ skip:
 	if (FAIL == zbx_ipc_socket_write(socket, ZBX_IPC_CONNECTOR_RESULT, NULL, 0))
 	{
 		zabbix_log(LOG_LEVEL_CRIT, "cannot send preprocessing result");
-		exit(EXIT_FAILURE);
+		zbx_exit(EXIT_FAILURE);
 	}
 }
 
@@ -206,7 +206,7 @@ ZBX_THREAD_ENTRY(connector_worker_thread, args)
 	{
 		zabbix_log(LOG_LEVEL_CRIT, "cannot connect to connector service: %s", error);
 		zbx_free(error);
-		exit(EXIT_FAILURE);
+		zbx_exit(EXIT_FAILURE);
 	}
 
 	ppid = getppid();
@@ -248,7 +248,7 @@ ZBX_THREAD_ENTRY(connector_worker_thread, args)
 			if (ZBX_IS_RUNNING())
 			{
 				zabbix_log(LOG_LEVEL_CRIT, "cannot read connector service request");
-				exit(EXIT_FAILURE);
+				zbx_exit(EXIT_FAILURE);
 			}
 
 			break;
@@ -277,5 +277,5 @@ ZBX_THREAD_ENTRY(connector_worker_thread, args)
 	}
 
 	zbx_vector_connector_data_point_destroy(&connector_data_points);
-	exit(EXIT_SUCCESS);
+	zbx_exit(EXIT_SUCCESS);
 }

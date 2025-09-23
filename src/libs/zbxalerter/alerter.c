@@ -403,7 +403,7 @@ ZBX_THREAD_ENTRY(zbx_alerter_thread, args)
 	{
 		zabbix_log(LOG_LEVEL_CRIT, "cannot connect to alert manager service: %s", error);
 		zbx_free(error);
-		exit(EXIT_FAILURE);
+		zbx_exit(EXIT_FAILURE);
 	}
 
 	alerter_register(&alerter_socket);
@@ -443,7 +443,7 @@ ZBX_THREAD_ENTRY(zbx_alerter_thread, args)
 		{
 			if (ZBX_IS_RUNNING())
 				zabbix_log(LOG_LEVEL_CRIT, "cannot read alert manager service request");
-			exit(EXIT_FAILURE);
+			zbx_exit(EXIT_FAILURE);
 		}
 
 		zbx_update_selfmon_counter(info, ZBX_PROCESS_STATE_BUSY);

@@ -114,7 +114,7 @@ static zbx_history_value_t	history_str2value(char *str, unsigned char value_type
 		case ITEM_VALUE_TYPE_NONE:
 		default:
 			THIS_SHOULD_NEVER_HAPPEN;
-			exit(EXIT_FAILURE);
+			zbx_exit(EXIT_FAILURE);
 	}
 
 	return value;
@@ -141,7 +141,7 @@ static const char	*history_value2str(const zbx_dc_history_t *h)
 		case ITEM_VALUE_TYPE_NONE:
 		default:
 			THIS_SHOULD_NEVER_HAPPEN;
-			exit(EXIT_FAILURE);
+			zbx_exit(EXIT_FAILURE);
 	}
 
 	return buffer;
@@ -341,7 +341,7 @@ static void	elastic_writer_init(void)
 	if (NULL == (writer.handle = curl_multi_init()))
 	{
 		zbx_error("Cannot initialize cURL multi session");
-		exit(EXIT_FAILURE);
+		zbx_exit(EXIT_FAILURE);
 	}
 
 	writer.initialized = 1;

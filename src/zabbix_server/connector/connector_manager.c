@@ -168,7 +168,7 @@ static void	connector_register_worker(zbx_connector_manager_t *manager, zbx_ipc_
 		if (manager->worker_fork_count == manager->worker_count)
 		{
 			THIS_SHOULD_NEVER_HAPPEN;
-			exit(EXIT_FAILURE);
+			zbx_exit(EXIT_FAILURE);
 		}
 
 		worker = (zbx_connector_worker_t *)&manager->workers[manager->worker_count++];
@@ -323,7 +323,7 @@ static void	connector_assign_tasks(zbx_connector_manager_t *manager, int now, in
 					(zbx_uint32_t)data_offset))
 			{
 				zabbix_log(LOG_LEVEL_CRIT, "cannot send data to connector worker");
-				exit(EXIT_FAILURE);
+				zbx_exit(EXIT_FAILURE);
 			}
 
 			connector->senders++;
@@ -413,7 +413,7 @@ static zbx_connector_worker_t	*connector_get_worker_by_client(zbx_connector_mana
 	if (NULL == worker)
 	{
 		THIS_SHOULD_NEVER_HAPPEN;
-		exit(EXIT_FAILURE);
+		zbx_exit(EXIT_FAILURE);
 	}
 
 	return worker;
@@ -637,7 +637,7 @@ ZBX_THREAD_ENTRY(connector_manager_thread, args)
 	{
 		zabbix_log(LOG_LEVEL_CRIT, "cannot start connector manager service: %s", error);
 		zbx_free(error);
-		exit(EXIT_FAILURE);
+		zbx_exit(EXIT_FAILURE);
 	}
 
 	zbx_rtc_subscribe_service(ZBX_PROCESS_TYPE_CONNECTORMANAGER, 0, NULL, 0, SEC_PER_MIN,
@@ -755,6 +755,6 @@ ZBX_THREAD_ENTRY(connector_manager_thread, args)
 
 	zbx_setproctitle("%s #%d [terminated]", get_process_type_string(process_type), process_num);
 
-	exit(EXIT_SUCCESS);
+	zbx_exit(EXIT_SUCCESS);
 #undef STAT_INTERVAL
 }

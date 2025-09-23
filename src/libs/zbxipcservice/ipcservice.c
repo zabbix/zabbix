@@ -750,13 +750,13 @@ static void	ipc_service_add_client(zbx_ipc_service_t *service, int fd)
 	if (-1 == (flags = fcntl(fd, F_GETFL, 0)))
 	{
 		zabbix_log(LOG_LEVEL_CRIT, "cannot get IPC client socket flags");
-		exit(EXIT_FAILURE);
+		zbx_exit(EXIT_FAILURE);
 	}
 
 	if (-1 == fcntl(fd, F_SETFL, flags | O_NONBLOCK))
 	{
 		zabbix_log(LOG_LEVEL_CRIT, "cannot set non-blocking mode for IPC client socket");
-		exit(EXIT_FAILURE);
+		zbx_exit(EXIT_FAILURE);
 	}
 
 	client->csocket.fd = fd;
@@ -944,7 +944,7 @@ static void	ipc_service_accept(zbx_ipc_service_t *service)
 			/* If there is unaccepted connection libevent will call registered callback function over and */
 			/* over again. It is better to exit straight away and cause all other processes to stop. */
 			zabbix_log(LOG_LEVEL_CRIT, "cannot accept incoming IPC connection: %s", zbx_strerror(errno));
-			exit(EXIT_FAILURE);
+			zbx_exit(EXIT_FAILURE);
 		}
 	}
 
@@ -1805,13 +1805,13 @@ int	zbx_ipc_async_socket_open(zbx_ipc_async_socket_t *asocket, const char *servi
 	if (-1 == (flags = fcntl(asocket->client->csocket.fd, F_GETFL, 0)))
 	{
 		zabbix_log(LOG_LEVEL_CRIT, "cannot get IPC client socket flags");
-		exit(EXIT_FAILURE);
+		zbx_exit(EXIT_FAILURE);
 	}
 
 	if (-1 == fcntl(asocket->client->csocket.fd, F_SETFL, flags | O_NONBLOCK))
 	{
 		zabbix_log(LOG_LEVEL_CRIT, "cannot set non-blocking mode for IPC client socket");
-		exit(EXIT_FAILURE);
+		zbx_exit(EXIT_FAILURE);
 	}
 
 	asocket->ev = event_base_new();

@@ -80,6 +80,12 @@
 #	define ZBX_FALLTHROUGH
 #endif
 
+#if defined(__GNUC__) && __GNUC__ >= 3
+#	define ZBX_NORETURN	__attribute__ ((noreturn))
+#else
+#	define ZBX_NORETURN
+#endif
+
 #define SUCCEED_OR_FAIL(result) (FAIL != (result) ? SUCCEED : FAIL)
 const char	*zbx_sysinfo_ret_string(int ret);
 const char	*zbx_result_string(int result);
@@ -821,5 +827,16 @@ zbx_log_component_t;
 
 void	zbx_init_library_common(zbx_log_cb_t log_func, zbx_log_level_cb_t log_level_func,
 		zbx_get_progname_f get_progname, zbx_backtrace_f backtrace);
+
+#if !defined(_WINDOWS) && !defined(__MINGW32__)
+
+typedef void (*zbx_exit_cb_t)(int) ZBX_NORETURN;
+
+extern ZBX_THREAD_LOCAL zbx_exit_cb_t	zbx_exit;
+extern ZBX_THREAD_LOCAL zbx_exit_cb_t	zbx_exit_immediate;
+
+void	zbx_set_exit(zbx_exit_cb_t exit_cb);
+void	zbx_set_exit_immediate(zbx_exit_cb_t exit_cb);
+#endif
 
 #endif

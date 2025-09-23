@@ -1669,7 +1669,7 @@ ZBX_THREAD_ENTRY(zbx_discoverer_thread, args)
 	{
 		zabbix_log(LOG_LEVEL_CRIT, "cannot start discoverer service: %s", error);
 		zbx_free(error);
-		exit(EXIT_FAILURE);
+		zbx_exit(EXIT_FAILURE);
 	}
 
 	if (FAIL == discoverer_manager_init(&dmanager, discoverer_args_in, info, &error))
@@ -1677,7 +1677,7 @@ ZBX_THREAD_ENTRY(zbx_discoverer_thread, args)
 		zabbix_log(LOG_LEVEL_ERR, "Cannot initialize discovery manager: %s", error);
 		zbx_free(error);
 		zbx_ipc_service_close(&ipc_service);
-		exit(EXIT_FAILURE);
+		zbx_exit(EXIT_FAILURE);
 	}
 
 	zbx_rtc_subscribe_service(ZBX_PROCESS_TYPE_DISCOVERYMANAGER, 0, rtc_msgs, ARRSIZE(rtc_msgs),
@@ -1883,5 +1883,5 @@ ZBX_THREAD_ENTRY(zbx_discoverer_thread, args)
 
 	zbx_setproctitle("%s #%d [terminated]", get_process_type_string(info->process_type), info->process_num);
 
-	exit(EXIT_SUCCESS);
+	zbx_exit(EXIT_SUCCESS);
 }

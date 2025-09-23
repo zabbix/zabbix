@@ -300,6 +300,6 @@ ZBX_THREAD_ENTRY(zbx_dbsyncer_thread, args)
 
 	zbx_free(stats);
 
-	exit(EXIT_SUCCESS);
+	zbx_exit(EXIT_SUCCESS);
 #undef STAT_INTERVAL
 }

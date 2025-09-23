@@ -198,7 +198,7 @@ static void     preprocessor_serialize_value(zbx_uint64_t itemid, unsigned char 
 		else if (ZBX_ISSET_BIN(result))
 		{
 			THIS_SHOULD_NEVER_HAPPEN;
-			exit(EXIT_FAILURE);
+			zbx_exit(EXIT_FAILURE);
 		}
 	}
 
@@ -331,7 +331,7 @@ static zbx_uint32_t	preprocessor_deserialize_variant(const unsigned char *data, 
 			break;
 		default:
 			THIS_SHOULD_NEVER_HAPPEN_MSG("Unsupported variant type: %s", zbx_variant_type_desc(value));
-			exit(EXIT_FAILURE);
+			zbx_exit(EXIT_FAILURE);
 	}
 
 	return ptr - data;
@@ -515,7 +515,7 @@ static int	preprocessor_unpack_variant(const unsigned char *data, zbx_variant_t 
 			break;
 		default:
 			THIS_SHOULD_NEVER_HAPPEN;
-			exit(EXIT_FAILURE);
+			zbx_exit(EXIT_FAILURE);
 	}
 
 	return (int)(offset - data);
@@ -1044,19 +1044,19 @@ static void	preprocessor_send(zbx_uint32_t code, unsigned char *data, zbx_uint32
 			&error))
 	{
 		zabbix_log(LOG_LEVEL_CRIT, "cannot connect to preprocessing service: %s", error);
-		exit(EXIT_FAILURE);
+		zbx_exit(EXIT_FAILURE);
 	}
 
 	if (FAIL == zbx_ipc_socket_write(&socket, code, data, size))
 	{
 		zabbix_log(LOG_LEVEL_CRIT, "cannot send data to preprocessing service");
-		exit(EXIT_FAILURE);
+		zbx_exit(EXIT_FAILURE);
 	}
 
 	if (NULL != response && FAIL == zbx_ipc_socket_read(&socket, response))
 	{
 		zabbix_log(LOG_LEVEL_CRIT, "cannot receive data from preprocessing service");
-		exit(EXIT_FAILURE);
+		zbx_exit(EXIT_FAILURE);
 	}
 }
 
@@ -1103,7 +1103,7 @@ void	zbx_preprocess_item_value(zbx_uint64_t itemid, unsigned char item_value_typ
 		if (0 != ZBX_ISSET_BIN(result))
 		{
 			THIS_SHOULD_NEVER_HAPPEN;
-			exit(EXIT_FAILURE);
+			zbx_exit(EXIT_FAILURE);
 		}
 
 		if (ZBX_MAX_RECV_DATA_SIZE < value_len)

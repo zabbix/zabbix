@@ -996,7 +996,7 @@ static void	am_register_alerter(zbx_am_t *manager, zbx_ipc_client_t *client, zbx
 		if (manager->next_alerter_index == manager->alerters.values_num)
 		{
 			THIS_SHOULD_NEVER_HAPPEN;
-			exit(EXIT_FAILURE);
+			zbx_exit(EXIT_FAILURE);
 		}
 
 		alerter = (zbx_am_alerter_t *)manager->alerters.values[manager->next_alerter_index++];
@@ -1053,7 +1053,7 @@ static zbx_am_alerter_t	*am_get_alerter_by_client(zbx_am_t *manager, zbx_ipc_cli
 	if (NULL == alerter)
 	{
 		THIS_SHOULD_NEVER_HAPPEN;
-		exit(EXIT_FAILURE);
+		zbx_exit(EXIT_FAILURE);
 	}
 
 	return *alerter;
@@ -2487,7 +2487,7 @@ ZBX_THREAD_ENTRY(zbx_alert_manager_thread, args)
 	{
 		zabbix_log(LOG_LEVEL_CRIT, "cannot initialize alert manager: %s", error);
 		zbx_free(error);
-		exit(EXIT_FAILURE);
+		zbx_exit(EXIT_FAILURE);
 	}
 
 	manager.dbstatus = zbx_db_connect(ZBX_DB_CONNECT_ONCE);

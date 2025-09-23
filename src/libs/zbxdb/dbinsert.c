@@ -102,7 +102,7 @@ void	zbx_dbconn_prepare_insert_dyn(zbx_dbconn_t *db, zbx_db_insert_t *db_insert,
 	if (0 == fields_num)
 	{
 		THIS_SHOULD_NEVER_HAPPEN;
-		exit(EXIT_FAILURE);
+		zbx_exit(EXIT_FAILURE);
 	}
 
 	db_insert->db = db;
@@ -139,7 +139,7 @@ void	zbx_dbconn_prepare_vinsert(zbx_dbconn_t *db, zbx_db_insert_t *db_insert, co
 	if (NULL == (ptable = zbx_db_get_table(table)))
 	{
 		THIS_SHOULD_NEVER_HAPPEN;
-		exit(EXIT_FAILURE);
+		zbx_exit(EXIT_FAILURE);
 	}
 
 	zbx_vector_const_db_field_ptr_create(&fields);
@@ -151,7 +151,7 @@ void	zbx_dbconn_prepare_vinsert(zbx_dbconn_t *db, zbx_db_insert_t *db_insert, co
 			zabbix_log(LOG_LEVEL_ERR, "Cannot locate table \"%s\" field \"%s\" in database schema",
 					table, field);
 			THIS_SHOULD_NEVER_HAPPEN;
-			exit(EXIT_FAILURE);
+			zbx_exit(EXIT_FAILURE);
 		}
 
 		zbx_vector_const_db_field_ptr_append(&fields, pfield);
@@ -197,7 +197,7 @@ void	zbx_db_insert_add_values_dyn(zbx_db_insert_t *db_insert, zbx_db_value_t **v
 	if (values_num != db_insert->fields.values_num)
 	{
 		THIS_SHOULD_NEVER_HAPPEN;
-		exit(EXIT_FAILURE);
+		zbx_exit(EXIT_FAILURE);
 	}
 
 	if (0 != db_insert->batch_size && db_insert->batch_size <= db_insert->rows.values_num)
@@ -231,7 +231,7 @@ void	zbx_db_insert_add_values_dyn(zbx_db_insert_t *db_insert, zbx_db_value_t **v
 				break;
 			default:
 				THIS_SHOULD_NEVER_HAPPEN;
-				exit(EXIT_FAILURE);
+				zbx_exit(EXIT_FAILURE);
 		}
 	}
 
@@ -290,7 +290,7 @@ void	zbx_db_insert_add_values(zbx_db_insert_t *db_insert, ...)
 				break;
 			default:
 				THIS_SHOULD_NEVER_HAPPEN;
-				exit(EXIT_FAILURE);
+				zbx_exit(EXIT_FAILURE);
 		}
 
 		zbx_vector_ptr_append(&values, value);
@@ -519,7 +519,7 @@ int	zbx_db_insert_execute(zbx_db_insert_t *db_insert)
 					break;
 				default:
 					THIS_SHOULD_NEVER_HAPPEN;
-					exit(EXIT_FAILURE);
+					zbx_exit(EXIT_FAILURE);
 			}
 		}
 #ifdef HAVE_MYSQL
@@ -585,7 +585,7 @@ void	zbx_db_insert_autoincrement(zbx_db_insert_t *db_insert, const char *field_n
 	}
 
 	THIS_SHOULD_NEVER_HAPPEN;
-	exit(EXIT_FAILURE);
+	zbx_exit(EXIT_FAILURE);
 }
 
 /******************************************************************************

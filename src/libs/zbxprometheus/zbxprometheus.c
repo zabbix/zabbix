@@ -1710,7 +1710,7 @@ static void	prometheus_lock(zbx_prometheus_t *prom)
 	{
 		zabbix_log(LOG_LEVEL_CRIT, "Cannot lock prometheus cache: %s", zbx_strerror(errno));
 		THIS_SHOULD_NEVER_HAPPEN;
-		exit(EXIT_FAILURE);
+		zbx_exit(EXIT_FAILURE);
 	}
 }
 
@@ -1720,7 +1720,7 @@ static void	prometheus_unlock(zbx_prometheus_t *prom)
 	{
 		zabbix_log(LOG_LEVEL_CRIT, "Cannot unlock prometheus cache: %s", zbx_strerror(errno));
 		THIS_SHOULD_NEVER_HAPPEN;
-		exit(EXIT_FAILURE);
+		zbx_exit(EXIT_FAILURE);
 	}
 }
 

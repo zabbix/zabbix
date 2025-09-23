@@ -325,7 +325,7 @@ ZBX_THREAD_ENTRY(lld_worker_thread, args)
 	{
 		zabbix_log(LOG_LEVEL_CRIT, "cannot connect to lld manager service: %s", error);
 		zbx_free(error);
-		exit(EXIT_FAILURE);
+		zbx_exit(EXIT_FAILURE);
 	}
 
 	lld_register_worker(&lld_socket);
@@ -359,7 +359,7 @@ ZBX_THREAD_ENTRY(lld_worker_thread, args)
 		{
 			if (ZBX_IS_RUNNING())
 				zabbix_log(LOG_LEVEL_CRIT, "cannot read LLD manager service request");
-			exit(EXIT_FAILURE);
+			zbx_exit(EXIT_FAILURE);
 		}
 		zbx_update_selfmon_counter(info, ZBX_PROCESS_STATE_BUSY);
 

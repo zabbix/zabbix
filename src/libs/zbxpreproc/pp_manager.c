@@ -1257,7 +1257,7 @@ void	*zbx_pp_manager_thread(void *args)
 	{
 		zabbix_log(LOG_LEVEL_CRIT, "cannot start preprocessing service: %s", error);
 		zbx_free(error);
-		exit(EXIT_FAILURE);
+		zbx_exit(EXIT_FAILURE);
 	}
 
 	if (NULL == (manager = zbx_pp_manager_create(pp_args->workers_num, pp_finished_task_cb, (void *)&service,
@@ -1265,7 +1265,7 @@ void	*zbx_pp_manager_thread(void *args)
 	{
 		zabbix_log(LOG_LEVEL_CRIT, "cannot initialize preprocessing manager: %s", error);
 		zbx_free(error);
-		exit(EXIT_FAILURE);
+		zbx_exit(EXIT_FAILURE);
 	}
 
 	/* subscribe for worker log level rtc messages */
@@ -1459,7 +1459,7 @@ void	*zbx_pp_manager_thread(void *args)
 	zbx_setproctitle("%s [terminated]", process_title);
 	zbx_free(process_title);
 
-	exit(EXIT_SUCCESS);
+	zbx_exit(EXIT_SUCCESS);
 #undef STAT_INTERVAL
 #undef PP_MANAGER_DELAY_SEC
 #undef PP_MANAGER_DELAY_NS
