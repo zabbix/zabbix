@@ -726,6 +726,7 @@ New features:
 .........T [ZBXNEXT-9989] added supergroup topics support to Telegram media type, updated documentation (drasikhov)
 
 Bug fixes:
+A......... [ZBX-26988] fixed non-super admin user restriction working incorrectly for hostprototype.get api method (aluchko)
 .......PS. [ZBX-26537] fixed memory over-allocation in preprocessing manager (vso)
 ..F....... [ZBX-26422] added missing translation string for "Tags" label in "Tags" tab in configuration forms (solonkins)
 ..F....... [ZBX-21087] fixed not all aggregation functions working with foreach functions (aluchko)
@@ -871,6 +872,7 @@ New features:
 .........T [ZBXNEXT-9809] added refactored webhooks (abiba, aiantsen, drasikhov, egordymov, knaglis)
 
 Bug fixes:
+...G...... [ZBX-26987] added input parameter sanitization to prevent injection vulnerability for Zabbix agent 2 SMART plugin (lsurvilo)
 A.F....... [ZBX-26009] prevented reporting successful completion for several UI actions when database transaction commit fails; fixed inability to identify interruption of database connection when calling *.get API methods (vmaksimovs)
 ..F....... [ZBX-25717] fixed tag inheritance for discovered triggers (esekace)
 ..F....... [ZBX-24714] fixed broken custom on fail layout in item preprocessing form in some languages (agriscenko)
@@ -1428,6 +1430,7 @@ New features:
 .........T [ZBXNEXT-9989] added supergroup topics support to Telegram media type, updated documentation (drasikhov)
 
 Bug fixes:
+A......... [ZBX-26988] fixed non-super admin user restriction working incorrectly for hostprototype.get api method (aluchko)
 .......PS. [ZBX-26537] fixed memory over-allocation in preprocessing manager (vso)
 ..F....... [ZBX-26422] added missing translation string for "Tags" label in "Tags" tab in configuration forms (solonkins)
 .......PS. [ZBX-26294] improved logic of SNMP cache cleanup (dgoloscapov)
@@ -1574,6 +1577,7 @@ New features:
 .........T [ZBXNEXT-9809] added refactored webhooks (abiba, aiantsen, drasikhov, egordymov, knaglis)
 
 Bug fixes:
+...G...... [ZBX-26987] added input parameter sanitization to prevent injection vulnerability for Zabbix agent 2 SMART plugin (lsurvilo)
 A.F....... [ZBX-26009] prevented reporting successful completion for several UI actions when database transaction commit fails; fixed inability to identify interruption of database connection when calling *.get API methods (vmaksimovs)
 ..F....... [ZBX-25717] fixed tag inheritance for discovered triggers (esekace)
 ..F....... [ZBX-24714] fixed broken custom on fail layout in item preprocessing form in some languages (agriscenko)
@@ -1953,6 +1957,7 @@ New features:
 .........T [ZBXNEXT-9341] added AssumeRole authentication to AWS templates (egordymov)
 
 Bug fixes:
+........S. [ZBX-26986] fixed secondary-order SQL injection in Zabbix server when deleting autoregistered host (wiper)
 A......... [ZBX-25610] removed reliability on "sysmapelementurlid", "sysmapurlid" in URLs for map.create and map.update (Ivo)
 .......PS. [ZBX-25625] fixed crash in browser item on invalid response (vso)
 .......PS. [ZBX-25624] fixed crash in browser item on empty response (vso)
@@ -5033,6 +5038,7 @@ New features:
 .........T [ZBXNEXT-9703] updated existing Zabbix server/proxy health templates; added Zabbix server/proxy health templates by Zabbix agent passive/active (aiantsen)
 
 Bug fixes:
+...G...... [ZBX-26987] added input parameter sanitization to prevent injection vulnerability for Zabbix agent 2 SMART plugin (lsurvilo)
 .......PS. [ZBX-18703] fixed incorrect values returned by vmware.vm.vfs.fs.size item (MVekslers)
 A......... [ZBX-24383] fixed PHP fatal error when importing configuration from Zabbix 2.0 (Sasha)
 ........S. [ZBX-26038] added 10-second reconnect timeout for PostgreSQL read-only database (sboidenko)
@@ -5236,6 +5242,7 @@ New features:
 .........T [ZBXNEXT-9341] added assume role authorization in AWS templates (egordymov)
 
 Bug fixes:
+........S. [ZBX-26986] fixed secondary-order SQL injection in Zabbix server when deleting autoregistered host (wiper)
 A......... [ZBX-25610] removed reliability on "sysmapelementurlid", "sysmapurlid" in URLs for map.create and map.update (Ivo)
 .......PS. [ZBX-25626] added external data validation to prevent access to internal duktape properties through HttpRequest object (wiper)
 ........S. [ZBX-25629] fixed buffer over-read for broken UTF-8 mail data injection (sboidenko)
