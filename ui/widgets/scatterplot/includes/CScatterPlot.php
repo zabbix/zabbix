@@ -30,10 +30,10 @@ class CScatterPlot extends CSvg {
 
 	public const SVG_GRAPH_Y_AXIS_LABEL_MARGIN_OUTER = 10;
 
-	private $canvas_x;
-	private $canvas_y;
-	private $canvas_width;
-	private $canvas_height;
+	private ?int $canvas_x = null;
+	private ?int $canvas_y = null;
+	private ?int $canvas_width = null;
+	private ?int $canvas_height = null;
 
 	private array $graph_theme;
 
@@ -58,27 +58,27 @@ class CScatterPlot extends CSvg {
 	 */
 	private array $paths = [];
 
-	private $show_x_axis;
-	private $x_min;
-	private $x_min_calculated;
-	private $x_max;
-	private $x_max_calculated;
-	private $x_units;
-	private $x_power;
-	private $x_interval;
-	private $x_min_value;
-	private $x_max_value;
+	private bool $show_x_axis;
+	private ?float $x_min;
+	private bool $x_min_calculated = false;
+	private ?float $x_max;
+	private bool $x_max_calculated = false;
+	private ?string $x_units;
+	private ?int $x_power = null;
+	private float|int|null $x_interval = null;
+	private float|int|null $x_min_value = null;
+	private float|int|null $x_max_value = null;
 
-	private $show_y_axis;
-	private $y_min;
-	private $y_min_calculated;
-	private $y_max;
-	private $y_max_calculated;
-	private $y_units;
-	private $y_power;
-	private $y_interval;
-	private $y_min_value;
-	private $y_max_value;
+	private bool $show_y_axis;
+	private ?float $y_min;
+	private bool $y_min_calculated = false;
+	private ?float $y_max;
+	private bool $y_max_calculated = false;
+	private ?string $y_units;
+	private ?int $y_power = null;
+	private float|int|null $y_interval = null;
+	private float|int|null $y_min_value = null;
+	private float|int|null $y_max_value = null;
 
 	/**
 	 * Value for graph left offset. Is used as width for left Y axis container.

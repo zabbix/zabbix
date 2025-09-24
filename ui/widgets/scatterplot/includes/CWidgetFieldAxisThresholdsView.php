@@ -67,9 +67,9 @@ class CWidgetFieldAxisThresholdsView extends CWidgetFieldView {
 		return '
 			CWidgetForm.addField(
 				new CWidgetFieldAxisThresholds('.json_encode([
-				'name' => $this->field->getName(),
-				'form_name' => $this->form_name
-			]).')
+					'name' => $this->field->getName(),
+					'form_name' => $this->form_name
+				]).')
 			);
 		';
 	}
