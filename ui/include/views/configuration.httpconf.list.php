@@ -128,9 +128,7 @@ $httpForm = (new CForm('post', $url))
 $httpTable = (new CTableInfo())
 	->setHeader([
 		(new CColHeader(
-			(new CCheckBox('all_httptests'))
-				->setAttribute('autocomplete', 'off')
-				->onClick("checkAll('".$httpForm->getName()."', 'all_httptests', 'group_httptestid');")
+			(new CCheckBox('all_httptests'))->onClick("checkAll('".$httpForm->getName()."', 'all_httptests', 'group_httptestid');")
 		))->addClass(ZBX_STYLE_CELL_WIDTH),
 		($data['hostid'] == 0)
 			? make_sorting_header(($data['context'] === 'host') ? _('Host') : _('Template'), 'hostname', $data['sort'],
@@ -197,8 +195,7 @@ foreach ($http_tests as $httpTestId => $httpTest) {
 		: null;
 
 	$httpTable->addRow([
-		(new CCheckBox('group_httptestid['.$httpTest['httptestid'].']', $httpTest['httptestid']))
-			->setAttribute('autocomplete', 'off'),
+		new CCheckBox('group_httptestid['.$httpTest['httptestid'].']', $httpTest['httptestid']),
 		$host,
 		$name,
 		$httpTest['stepscnt'],
@@ -263,10 +260,7 @@ $button_list += [
 ];
 
 // Append table to form.
-$httpForm->addItem([
-	$httpTable->addClass('js-chkbxrange-no-autocomplete'),
-	new CActionButtonList('action', 'group_httptestid', $button_list, $data['hostid'])
-]);
+$httpForm->addItem([$httpTable, new CActionButtonList('action', 'group_httptestid', $button_list, $data['hostid'])]);
 
 $html_page
 	->addItem($httpForm)

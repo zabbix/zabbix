@@ -205,7 +205,6 @@ $triggers_table = (new CTableInfo())
 	->setHeader([
 		(new CColHeader(
 			(new CCheckBox('all_triggers'))
-				->setAttribute('autocomplete', 'off')
 				->onClick("checkAll('".$triggers_form->getName()."', 'all_triggers', 'g_triggerid');")
 		))->addClass(ZBX_STYLE_CELL_WIDTH),
 		make_sorting_header(_('Severity'), 'priority', $data['sort'], $data['sortorder'], $url),
@@ -362,8 +361,7 @@ foreach ($data['triggers'] as $tnum => $trigger) {
 	$disabled_by_lld = $disable_source == ZBX_DISABLE_SOURCE_LLD;
 
 	$triggers_table->addRow([
-		(new CCheckBox('g_triggerid['.$triggerid.']', $triggerid))
-			->setAttribute('autocomplete', 'off'),
+		new CCheckBox('g_triggerid['.$triggerid.']', $triggerid),
 		CSeverityHelper::makeSeverityCell((int) $trigger['priority']),
 		$data['show_value_column'] ? $trigger_value : null,
 		$hosts,
@@ -381,7 +379,7 @@ foreach ($data['triggers'] as $tnum => $trigger) {
 
 // append table to form
 $triggers_form->addItem([
-	$triggers_table->addClass('js-chkbxrange-no-autocomplete'),
+	$triggers_table,
 	new CActionButtonList('action', 'g_triggerid',
 		[
 			'trigger.massenable' => [

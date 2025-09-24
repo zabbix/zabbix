@@ -35,9 +35,7 @@ $list_url = (new CUrl('zabbix.php'))
 $table = (new CTableInfo())
 	->setHeader([
 		(new CColHeader(
-			(new CCheckBox('all_items'))
-				->setAttribute('autocomplete', 'off')
-				->onClick("checkAll('".$form->getName()."', 'all_items', 'itemids');")
+			(new CCheckBox('all_items'))->onClick("checkAll('".$form->getName()."', 'all_items', 'itemids');")
 		))->addClass(ZBX_STYLE_CELL_WIDTH),
 		'',
 		make_sorting_header(_('Name'),'name', $data['sort'], $data['sortorder'], $list_url),
@@ -139,8 +137,7 @@ foreach ($data['items'] as $item) {
 			->setAttribute('data-context', $data['context']);
 
 	$table->addRow([
-		(new CCheckBox('itemids['.$item['itemid'].']', $item['itemid']))
-			->setAttribute('autocomplete', 'off'),
+		new CCheckBox('itemids['.$item['itemid'].']', $item['itemid']),
 		(new CButtonIcon(ZBX_ICON_MORE))
 			->setMenuPopup(
 				CMenuPopupHelper::getItemPrototype([
@@ -160,6 +157,8 @@ foreach ($data['items'] as $item) {
 		(new CDiv($data['tags'][$item['itemid']]))->addClass(ZBX_STYLE_TAGS_WRAPPER)
 	]);
 }
+
+$form->addItem($table);
 
 $buttons = [
 	[
@@ -198,10 +197,7 @@ $buttons[] = [
 		->addClass('js-no-chkbxrange')
 ];
 
-$form->addItem([
-	$table->addClass('js-chkbxrange-no-autocomplete'),
-	new CActionButtonList('action', 'itemids', $buttons, 'item_prototypes_'.$data['parent_discoveryid'])
-]);
+$form->addItem(new CActionButtonList('action', 'itemids', $buttons, 'item_prototypes_'.$data['parent_discoveryid']));
 
 (new CHtmlPage())
 	->setTitle(_('Item prototypes'))

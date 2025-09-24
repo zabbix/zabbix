@@ -42,9 +42,7 @@ $list_url = (new CUrl('zabbix.php'))
 
 $header = [
 	(new CColHeader(
-		(new CCheckBox('all_items'))
-			->setAttribute('autocomplete', 'off')
-			->onClick("checkAll('item_list', 'all_items', 'itemids');")
+		(new CCheckBox('all_items'))->onClick("checkAll('item_list', 'all_items', 'itemids');")
 	))->addClass(ZBX_STYLE_CELL_WIDTH),
 	'',
 	($data['hostid'] != 0)
@@ -213,7 +211,6 @@ foreach ($data['items'] as $item) {
 
 	$row = [
 		(new CCheckBox('itemids['.$item['itemid'].']', $item['itemid']))
-			->setAttribute('autocomplete', 'off')
 			->setAttribute('data-actions', $can_execute ? 'execute' : null),
 		(new CButtonIcon(ZBX_ICON_MORE))
 			->setMenuPopup(
@@ -246,6 +243,8 @@ foreach ($data['items'] as $item) {
 
 	$item_list->addRow($row);
 }
+
+$form->addItem($item_list);
 
 $buttons = [
 	[
@@ -297,12 +296,9 @@ if ($data['context'] === 'template') {
 	unset($buttons['execute'], $buttons['clearhistory']);
 }
 
-$form->addItem([
-	$item_list->addClass('js-chkbxrange-no-autocomplete'),
-	new CActionButtonList('action', 'itemids', $buttons,
-		'items_'.(array_key_exists('hostid', $data) ? $data['hostid'] : 0)
-	)
-]);
+$form->addItem(new CActionButtonList('action', 'itemids', $buttons,
+	'items_'.(array_key_exists('hostid', $data) ? $data['hostid'] : 0))
+);
 
 (new CHtmlPage())
 	->setTitle(_('Items'))

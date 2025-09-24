@@ -58,9 +58,7 @@ $itemForm = (new CForm('post', $url))
 $hostTable = (new CTableInfo())
 	->setHeader([
 		(new CColHeader(
-			(new CCheckBox('all_hosts'))
-				->setAttribute('autocomplete', 'off')
-				->onClick("checkAll('".$itemForm->getName()."', 'all_hosts', 'group_hostid');")
+			(new CCheckBox('all_hosts'))->onClick("checkAll('".$itemForm->getName()."', 'all_hosts', 'group_hostid');")
 		))->addClass(ZBX_STYLE_CELL_WIDTH),
 		make_sorting_header(_('Name'), 'name', $data['sort'], $data['sortorder'], $url),
 		_('Templates'),
@@ -197,8 +195,7 @@ foreach ($this->data['hostPrototypes'] as $hostPrototype) {
 			->addClass(ZBX_STYLE_LINK_ACTION);
 
 	$hostTable->addRow([
-		(new CCheckBox('group_hostid['.$hostPrototype['hostid'].']', $hostPrototype['hostid']))
-			->setAttribute('autocomplete', 'off'),
+		new CCheckBox('group_hostid['.$hostPrototype['hostid'].']', $hostPrototype['hostid']),
 		$name,
 		$hostTemplates,
 		$status_toggle->addClass(itemIndicatorStyle($hostPrototype['status'])),
@@ -238,7 +235,7 @@ $buttons['hostprototype.massdelete'] = [
 
 // append table to form
 $itemForm->addItem([
-	$hostTable->addClass('js-chkbxrange-no-autocomplete'),
+	$hostTable,
 	new CActionButtonList('action', 'group_hostid', $buttons, $data['discovery_rule']['itemid'])
 ]);
 

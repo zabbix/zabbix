@@ -60,16 +60,6 @@ var chkbxRange = {
 
 			this.checkObjects(this.pageGoName, objectIds, true);
 			this.update(this.pageGoName);
-
-			// uncheck all checkboxes after back/forward navigation on persisted page
-			if (document.querySelector('.js-chkbxrange-no-autocomplete') !== null) {
-				window.addEventListener('pageshow', e => {
-					if (e.persisted) {
-						this.checkObjectAll(this.pageGoName, false);
-						this.update(this.pageGoName);
-					}
-				});
-			}
 		}
 
 		if (this.event_handlers === null) {
