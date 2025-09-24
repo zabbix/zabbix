@@ -296,14 +296,15 @@ static void	zbx_pp_manager_queue_test(zbx_pp_manager_t *manager, zbx_pp_item_pre
  * Purpose: queue value/value_sec preprocessing tasks                         *
  *                                                                            *
  ******************************************************************************/
-static void	zbx_pp_manager_queue_value_preproc(zbx_pp_manager_t *manager, zbx_vector_pp_task_ptr_t *tasks)
+static void	zbx_pp_manager_queue_value_preproc(zbx_pp_manager_t *manager, zbx_vector_pp_task_ptr_t *tasks,
+		unsigned char preprocessing)
 {
 	zbx_prof_start(__func__, ZBX_PROF_MUTEX);
 	pp_task_queue_lock(&manager->queue);
 	zbx_prof_end_wait();
 
 	for (int i = 0; i < tasks->values_num; i++)
-		pp_task_queue_push(&manager->queue, tasks->values[i]);
+		pp_task_queue_push(&manager->queue, tasks->values[i], preprocessing);
 
 	pp_task_queue_notify(&manager->queue);
 
@@ -650,8 +651,8 @@ static void	zbx_pp_manager_dump_items(zbx_pp_manager_t *manager)
 	while (NULL != (item = (zbx_pp_item_t *)zbx_hashset_iter_next(&iter)))
 	{
 		zabbix_log(LOG_LEVEL_TRACE, "itemid:" ZBX_FS_UI64 " hostid:" ZBX_FS_UI64 " revision:" ZBX_FS_UI64
-				" type:%u value_type:%u mode:%u flags:%x",
-				item->itemid, item->preproc->hostid, item->revision, item->preproc->type,
+				" value_type:%u mode:%u flags:%x",
+				item->itemid, item->preproc->hostid, item->revision,
 				item->preproc->value_type, item->preproc->mode, item->preproc->flags);
 
 		zabbix_log(LOG_LEVEL_TRACE, "  preprocessing steps:");
@@ -798,7 +799,8 @@ static zbx_uint64_t	preprocessor_add_request(zbx_pp_manager_t *manager, zbx_ipc_
 		zbx_uint64_t *direct_num, zbx_uint64_t *direct_sz, zbx_vector_pp_task_ptr_t *tasks)
 {
 	zbx_uint32_t	offset = 0;
-	zbx_uint64_t	queued_num;
+	zbx_uint64_t	queued_num = 0;
+	unsigned char	preprocessing_last = ZBX_ITEM_PREPROCESSING_NONE;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
@@ -814,10 +816,10 @@ static zbx_uint64_t	preprocessor_add_request(zbx_pp_manager_t *manager, zbx_ipc_
 		zbx_pp_task_t		*task;
 		zbx_pp_item_t		*item;
 		zbx_uint64_t		itemid;
-		unsigned char		value_type, item_flags;
+		unsigned char		value_type, item_flags, preprocessing;
 
 		offset += zbx_preprocessor_deserialize_value(message->data + offset, &itemid, &value_type, &item_flags,
-				&var, &ts, &var_opt);
+				&preprocessing, &var, &ts, &var_opt);
 
 		sz = offset - offset_prev;
 
@@ -832,7 +834,20 @@ static zbx_uint64_t	preprocessor_add_request(zbx_pp_manager_t *manager, zbx_ipc_
 			zbx_pp_value_opt_clear(&var_opt);
 		}
 		else
+		{
+			if (preprocessing_last != preprocessing)
+			{
+				if (0 != tasks->values_num)
+				{
+					zbx_pp_manager_queue_value_preproc(manager, tasks, preprocessing);
+					queued_num += (zbx_uint64_t)tasks->values_num;
+					zbx_vector_pp_task_ptr_clear(tasks);
+				}
+				preprocessing_last = preprocessing;
+			}
+
 			zbx_vector_pp_task_ptr_append(tasks, task);
+		}
 
 		if (NULL != (item = (zbx_pp_item_t *)zbx_hashset_search(&manager->items, &itemid)))
 		{
@@ -842,9 +857,9 @@ static zbx_uint64_t	preprocessor_add_request(zbx_pp_manager_t *manager, zbx_ipc_
 	}
 
 	if (0 != tasks->values_num)
-		zbx_pp_manager_queue_value_preproc(manager, tasks);
+		zbx_pp_manager_queue_value_preproc(manager, tasks, preprocessing_last);
 
-	queued_num = (zbx_uint64_t)tasks->values_num;
+	queued_num += (zbx_uint64_t)tasks->values_num;
 	zbx_vector_pp_task_ptr_clear(tasks);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
@@ -870,7 +885,7 @@ static void	preprocessor_add_test_request(zbx_pp_manager_t *manager, zbx_ipc_cli
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
-	preproc = zbx_pp_item_preproc_create(0, 0, 0, 0);
+	preproc = zbx_pp_item_preproc_create(0, 0, 0);
 	zbx_preprocessor_unpack_test_request(preproc, &value, &ts, message->data);
 	zbx_pp_manager_queue_test(manager, preproc, &value, ts, client);
 	zbx_pp_item_preproc_release(preproc);

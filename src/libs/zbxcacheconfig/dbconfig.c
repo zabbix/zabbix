@@ -9984,7 +9984,7 @@ static void	dc_preproc_sync_item(zbx_hashset_t *items, ZBX_DC_ITEM *dc_item, zbx
 		zbx_pp_item_preproc_release(pp_item->preproc);
 	}
 
-	pp_item->preproc = zbx_pp_item_preproc_create(dc_item->hostid, dc_item->type, dc_item->value_type, dc_item->flags);
+	pp_item->preproc = zbx_pp_item_preproc_create(dc_item->hostid, dc_item->value_type, dc_item->flags);
 	pp_item->revision = revision;
 
 	if (NULL != dc_item->master_item)
@@ -10042,9 +10042,6 @@ static int	dc_preproc_item_changed(ZBX_DC_ITEM *dc_item, zbx_pp_item_t *pp_item)
 	if (dc_item->value_type != pp_item->preproc->value_type)
 		return SUCCEED;
 
-	if (dc_item->type != pp_item->preproc->type)
-		return SUCCEED;
-
 	if (NULL != dc_item->master_item)
 	{
 		if (dc_item->master_item->revision > pp_item->revision)
@@ -10069,10 +10066,10 @@ unsigned char	zbx_dc_item_requires_preprocessing(const ZBX_DC_ITEM *dc_item)
 	if (NULL == dc_item->preproc_item && NULL == dc_item->master_item &&
 			0 == (dc_item->flags & ZBX_FLAG_DISCOVERY_RULE))
 	{
-		return ZBX_ITEM_REQUIRES_PREPROCESSING_NO;
+		return ZBX_ITEM_PREPROCESSING_NONE;
 	}
 
-	return ZBX_ITEM_REQUIRES_PREPROCESSING_YES;
+	return ITEM_TYPE_INTERNAL == dc_item->type ? ZBX_ITEM_PREPROCESSING_PRIORITY : ZBX_ITEM_PREPROCESSING_REGULAR;
 }
 
 /******************************************************************************
@@ -10124,7 +10121,7 @@ void	zbx_dc_config_get_preprocessable_items(zbx_hashset_t *items, zbx_dc_um_shar
 			if (ITEM_STATUS_ACTIVE != dc_item->status || ITEM_TYPE_DEPENDENT == dc_item->type)
 				continue;
 
-			if (ZBX_ITEM_REQUIRES_PREPROCESSING_NO == zbx_dc_item_requires_preprocessing(dc_item))
+			if (ZBX_ITEM_PREPROCESSING_NONE == zbx_dc_item_requires_preprocessing(dc_item))
 				continue;
 
 			if (HOST_MONITORED_BY_SERVER == dc_host->monitored_by ||

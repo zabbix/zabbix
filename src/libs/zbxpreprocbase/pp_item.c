@@ -30,8 +30,7 @@ ZBX_PTR_VECTOR_IMPL(pp_step_ptr, zbx_pp_step_t *)
  * Return value: The created item preprocessing data.                         *
  *                                                                            *
  ******************************************************************************/
-zbx_pp_item_preproc_t	*zbx_pp_item_preproc_create(zbx_uint64_t hostid, unsigned char type, unsigned char value_type,
-		unsigned char flags)
+zbx_pp_item_preproc_t	*zbx_pp_item_preproc_create(zbx_uint64_t hostid, unsigned char value_type, unsigned char flags)
 {
 	zbx_pp_item_preproc_t	*preproc = zbx_malloc(NULL, sizeof(zbx_pp_item_preproc_t));
 
@@ -44,7 +43,6 @@ zbx_pp_item_preproc_t	*zbx_pp_item_preproc_create(zbx_uint64_t hostid, unsigned 
 	preproc->dep_itemids = NULL;
 
 	preproc->hostid = hostid;
-	preproc->type = type;
 	preproc->value_type = value_type;
 	preproc->flags = flags;
 	preproc->history_cache = NULL;

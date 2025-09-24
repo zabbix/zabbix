@@ -133,7 +133,8 @@ static zbx_uint32_t	message_pack_data(zbx_ipc_message_t *message, zbx_packed_fie
 }
 
 static void     preprocessor_serialize_value(zbx_uint64_t itemid, unsigned char value_type, unsigned char item_flags,
-		AGENT_RESULT *result, zbx_timespec_t *ts, unsigned char state, const char *error)
+		unsigned char preprocessing, AGENT_RESULT *result, zbx_timespec_t *ts, unsigned char state,
+		const char *error)
 {
 	zbx_uint32_t	data_len = 0, value_len, source_len;
 	unsigned char	var_type = ZBX_VARIANT_NONE, opt_flags = 0;
@@ -151,6 +152,7 @@ static void     preprocessor_serialize_value(zbx_uint64_t itemid, unsigned char 
 	zbx_serialize_prepare_value(data_len, itemid);
 	zbx_serialize_prepare_value(data_len, value_type);
 	zbx_serialize_prepare_value(data_len, item_flags);
+	zbx_serialize_prepare_value(data_len, preprocessing);
 	zbx_serialize_prepare_value(data_len, var_type);
 
 	if (ITEM_STATE_NOTSUPPORTED == state)
@@ -264,6 +266,7 @@ static void     preprocessor_serialize_value(zbx_uint64_t itemid, unsigned char 
 	ptr += zbx_serialize_value(ptr, itemid);
 	ptr += zbx_serialize_value(ptr, value_type);
 	ptr += zbx_serialize_value(ptr, item_flags);
+	ptr += zbx_serialize_value(ptr, preprocessing);
 	ptr += zbx_serialize_value(ptr, var_type);
 
 	if (ITEM_STATE_NOTSUPPORTED == state)
@@ -338,8 +341,8 @@ static zbx_uint32_t	preprocessor_deserialize_variant(const unsigned char *data, 
 }
 
 zbx_uint32_t    zbx_preprocessor_deserialize_value(const unsigned char *data, zbx_uint64_t *itemid,
-		unsigned char *value_type, unsigned char *item_flags, zbx_variant_t *value, zbx_timespec_t *ts,
-		zbx_pp_value_opt_t *opt)
+		unsigned char *value_type, unsigned char *item_flags, unsigned char *preprocessing,
+		zbx_variant_t *value, zbx_timespec_t *ts, zbx_pp_value_opt_t *opt)
 {
 	const unsigned char	*ptr = data;
 	unsigned char		opt_flags;
@@ -347,6 +350,7 @@ zbx_uint32_t    zbx_preprocessor_deserialize_value(const unsigned char *data, zb
 	ptr += zbx_deserialize_value(ptr, itemid);
 	ptr += zbx_deserialize_value(ptr, value_type);
 	ptr += zbx_deserialize_value(ptr, item_flags);
+	ptr += zbx_deserialize_value(ptr, preprocessing);
 
 	ptr += preprocessor_deserialize_variant(ptr, value);
 	ptr += zbx_deserialize_value(ptr, &ts->sec);
@@ -1114,9 +1118,10 @@ void	zbx_preprocess_item_value(zbx_uint64_t itemid, unsigned char item_value_typ
 		}
 	}
 
-	if (ZBX_ITEM_REQUIRES_PREPROCESSING_YES == preprocessing)
+	if (ZBX_ITEM_PREPROCESSING_NONE != preprocessing)
 	{
-		preprocessor_serialize_value(itemid, item_value_type, item_flags, result, ts, state, error);
+		preprocessor_serialize_value(itemid, item_value_type, item_flags, preprocessing, result, ts, state,
+				error);
 
 		if (ZBX_PREPROCESSING_BATCH_SIZE < ++preproc_values)
 			zbx_preprocessor_flush();

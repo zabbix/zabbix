@@ -851,7 +851,7 @@ static void	ipmi_manager_process_value_result(zbx_ipmi_manager_t *manager, zbx_i
 				SET_TEXT_RESULT(&result, value);
 				value = NULL;
 				zbx_preprocess_item_value(itemid, ITEM_VALUE_TYPE_TEXT, flags,
-						ZBX_ITEM_REQUIRES_PREPROCESSING_YES, &result, &ts, state, NULL);
+						ZBX_ITEM_PREPROCESSING_REGULAR, &result, &ts, state, NULL);
 				zbx_free_agent_result(&result);
 			}
 			break;
@@ -861,7 +861,7 @@ static void	ipmi_manager_process_value_result(zbx_ipmi_manager_t *manager, zbx_i
 		case CONFIG_ERROR:
 			state = ITEM_STATE_NOTSUPPORTED;
 			zbx_preprocess_item_value(itemid, ITEM_VALUE_TYPE_TEXT, flags,
-					ZBX_ITEM_REQUIRES_PREPROCESSING_YES, NULL, &ts, state, value);
+					ZBX_ITEM_PREPROCESSING_REGULAR, NULL, &ts, state, value);
 			break;
 		default:
 			/* don't change item's state when network related error occurs */
