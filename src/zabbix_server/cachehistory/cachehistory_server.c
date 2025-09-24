@@ -954,6 +954,8 @@ static void	DCmass_prepare_history(zbx_dc_history_t *history, zbx_history_sync_i
 
 		item = &items[i];
 
+		zabbix_log(LOG_LEVEL_DEBUG, "In %s() itemid:" ZBX_FS_UI64, __func__, item->itemid);
+
 		if (ITEM_STATUS_ACTIVE != item->status || HOST_STATUS_MONITORED != item->host.status)
 		{
 			h->flags |= ZBX_DC_FLAG_UNDEF;
@@ -1343,6 +1345,8 @@ void	zbx_sync_server_history(int *values_num, int *triggers_num, const zbx_event
 		zbx_dbcache_lock();
 		zbx_hc_pop_items(&history_items);		/* select and take items out of history cache */
 		zbx_dbcache_unlock();
+
+		zabbix_log(LOG_LEVEL_DEBUG, "In %s() %d", __func__, history_items.values_num);
 
 		if (0 != history_items.values_num)
 		{
