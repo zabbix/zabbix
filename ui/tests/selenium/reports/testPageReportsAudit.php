@@ -570,13 +570,13 @@ class testPageReportsAudit extends CWebTest {
 		$table = $this->query('class:list-table')->asTable()->one();
 
 		$form->fill($data['fields'])->submit();
+		$table->waitUntilReloaded();
 
 		// If there is no result - "No data found" displayed in table.
 		if (CTestArrayHelper::get($data, 'no_data')) {
 			$this->assertEquals(['No data found'], $table->getRows()->asText());
 		}
 		else {
-			$table->waitUntilReloaded();
 			foreach ($data['fields'] as $column => $values) {
 				if ($column === 'Users' || 'Actions') {
 					$column = rtrim($column, 's');
