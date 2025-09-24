@@ -45,7 +45,6 @@ class CControllerQueueDetails extends CController {
 			$hosts = [];
 			$queue_data = [];
 			$proxies = [];
-			$proxy_groups = [];
 
 			error($zabbix_server->getError());
 			show_error_message(_('Cannot display item queue.'));
@@ -75,7 +74,9 @@ class CControllerQueueDetails extends CController {
 				'preservekeys' => true
 			]);
 
-			$proxyids = array_flip(array_merge(array_column($hosts, 'proxyid'), array_column($hosts, 'assigned_proxyid')));
+			$proxyids = array_flip(array_merge(array_column($hosts, 'proxyid'),
+				array_column($hosts, 'assigned_proxyid'))
+			);
 			unset($proxyids[0]);
 
 			$proxies = $proxyids
