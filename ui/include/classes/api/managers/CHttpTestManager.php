@@ -937,7 +937,7 @@ class CHttpTestManager {
 					continue;
 				}
 
-				foreach ($httptest['steps'] as $i => &$step) {
+				foreach ($httptest['steps'] as &$step) {
 					if (!array_key_exists('httpstepid', $step)) {
 						$step['httpstepid'] = current($stepids);
 						next($stepids);

@@ -1419,7 +1419,7 @@ abstract class CHostBase extends CApiService {
 
 		foreach ($hosts as $host) {
 			if (array_key_exists('templates', $host)) {
-				$db_templates = ($db_hosts !== null)
+				$db_templates = $db_hosts !== null
 					? array_column($db_hosts[$host[$id_field_name]]['templates'], null, 'templateid')
 					: [];
 
