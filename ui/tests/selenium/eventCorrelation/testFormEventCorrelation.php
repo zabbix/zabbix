@@ -154,7 +154,7 @@ class testFormEventCorrelation extends CWebTest {
 		}
 
 		// Check mandatory fields.
-		$this->assertEquals(['Name', 'Conditions'], $form->getRequiredLabels());
+		$this->assertEquals(['Name', 'Conditions', 'Operations'], $form->getRequiredLabels());
 
 		// Check input attributes.
 		$field_attributes = [
@@ -190,11 +190,6 @@ class testFormEventCorrelation extends CWebTest {
 		);
 		$this->assertEquals([], $operations_checkbox_list->getValue());
 		$this->assertTrue($operations_checkbox_list->isEnabled());
-
-		// Check that "one operation must be selected" text exists.
-		$this->assertTrue($dialog->query('xpath:.//label[text()="At least one operation must be selected."]')->one()
-				->hasClass('form-label-asterisk')
-		);
 
 		// Assert Enabled checkbox.
 		$enabled_checkbox = $form->getField('Enabled');
@@ -404,7 +399,7 @@ class testFormEventCorrelation extends CWebTest {
 						]
 					],
 					'inline_errors' => [
-						'Operations' => 'At least one option must be selected.'
+						'Operations' => 'At least one operation must be selected.'
 					]
 				]
 			],
@@ -618,7 +613,7 @@ class testFormEventCorrelation extends CWebTest {
 						]
 					],
 					'condition_errors' => [
-						'Value' => 'This field cannot be empty'
+						'Value' => 'This field cannot be empty.'
 					]
 				]
 			],
@@ -637,7 +632,7 @@ class testFormEventCorrelation extends CWebTest {
 						]
 					],
 					'condition_errors' => [
-						'Value' => 'This field cannot be empty'
+						'Value' => 'This field cannot be empty.'
 					]
 				]
 			],
@@ -673,7 +668,7 @@ class testFormEventCorrelation extends CWebTest {
 						]
 					],
 					'condition_errors' => [
-						'Value' => 'This field cannot be empty'
+						'Value' => 'This field cannot be empty.'
 					]
 				]
 			],
@@ -692,7 +687,7 @@ class testFormEventCorrelation extends CWebTest {
 						]
 					],
 					'condition_errors' => [
-						'Value' => 'This field cannot be empty'
+						'Value' => 'This field cannot be empty.'
 					]
 				]
 			],
@@ -1014,7 +1009,7 @@ class testFormEventCorrelation extends CWebTest {
 					'calculation' => 'Custom expression',
 					'formula' => 'NOT A and not B',
 					'inline_errors' => [
-						'id:formula' => 'Incorrect syntax near "A and not B".'
+						'id:formula' => 'Incorrect syntax near " A and not B".'
 					]
 				]
 			],
@@ -1038,7 +1033,7 @@ class testFormEventCorrelation extends CWebTest {
 					'calculation' => 'Custom expression',
 					'formula' => 'not A not B',
 					'inline_errors' => [
-						'id:formula' => 'Incorrect syntax near "not B".'
+						'id:formula' => 'Incorrect syntax near " not B".'
 					]
 				]
 			]

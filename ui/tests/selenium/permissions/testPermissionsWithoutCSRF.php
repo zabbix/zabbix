@@ -311,7 +311,7 @@ class testPermissionsWithoutCSRF extends CWebTest {
 					'overlay' => 'create',
 					'fields' => [
 						'id:name' => 'CSRF validation event correlation',
-						'id:operation_0_type' => true
+						'id:operations_0' => true
 					],
 					'dialog_actions' => [
 						[
