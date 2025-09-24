@@ -43,7 +43,7 @@ abstract class CControllerProblem extends CController {
 		'compact_view' => 0,
 		'show_timeline' => ZBX_TIMELINE_ON,
 		'details' => 0,
-		'highlight_row' => 0,
+		'highlight_row' => ZBX_HIGHLIGHT_OFF,
 		'show_opdata' => OPERATIONAL_DATA_SHOW_NONE,
 		'tag_name_format' => TAG_NAME_FULL,
 		'tag_priority' => '',

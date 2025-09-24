@@ -15,7 +15,6 @@
 package plugins
 
 import (
-	_ "golang.zabbix.com/agent2/plugins/ceph"
 	_ "golang.zabbix.com/agent2/plugins/log"
 	_ "golang.zabbix.com/agent2/plugins/memcached"
 	_ "golang.zabbix.com/agent2/plugins/modbus"
