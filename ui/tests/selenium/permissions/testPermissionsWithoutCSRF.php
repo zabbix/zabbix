@@ -378,7 +378,7 @@ class testPermissionsWithoutCSRF extends CWebTest {
 			[
 				[
 					'db' => 'SELECT * FROM icon_map',
-					'link' => 'zabbix.php?action=iconmap.edit&iconmapid=101',
+					'link' => 'zabbix.php?action=iconmap.edit&iconmapid=101'
 				]
 			],
 			// #34 Icon map create.
