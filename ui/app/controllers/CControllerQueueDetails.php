@@ -86,17 +86,6 @@ class CControllerQueueDetails extends CController {
 					'preservekeys' => true
 				])
 				: [];
-
-			$proxy_groupids = array_flip(array_column($hosts, 'proxy_groupid'));
-			unset($proxy_groupids[0]);
-
-			$proxy_groups = $proxy_groupids
-				? API::ProxyGroup()->get([
-					'output' => ['proxy_groupid', 'name'],
-					'proxy_groupids' => array_keys($proxy_groupids),
-					'preservekeys' => true
-				])
-				: [];
 		}
 
 		$total_count = $zabbix_server->getTotalCount();
@@ -105,7 +94,6 @@ class CControllerQueueDetails extends CController {
 			'items' => $items,
 			'hosts' => $hosts,
 			'proxies' => $proxies,
-			'proxy_groups' => $proxy_groups,
 			'queue_data' => $queue_data,
 			'total_count' => $total_count == null ? 0 : $total_count
 		]);
