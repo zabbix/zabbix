@@ -71,8 +71,8 @@ class CEvent extends CApiService {
 			'evaltype' =>				['type' => API_INT32, 'in' => implode(',', [TAG_EVAL_TYPE_AND_OR, TAG_EVAL_TYPE_OR]), 'default' => TAG_EVAL_TYPE_AND_OR],
 			'tags' =>					['type' => API_OBJECTS, 'flags' => API_ALLOW_NULL | API_NORMALIZE, 'default' => null, 'fields' => [
 				'tag' =>					['type' => API_STRING_UTF8, 'flags' => API_REQUIRED],
-				'operator' =>				['type' => API_INT32, 'in' => implode(',', [TAG_OPERATOR_LIKE, TAG_OPERATOR_EQUAL, TAG_OPERATOR_NOT_LIKE, TAG_OPERATOR_NOT_EQUAL, TAG_OPERATOR_EXISTS, TAG_OPERATOR_NOT_EXISTS])],
-				'value' =>					['type' => API_STRING_UTF8]
+				'operator' =>				['type' => API_INT32, 'in' => implode(',', [TAG_OPERATOR_LIKE, TAG_OPERATOR_EQUAL, TAG_OPERATOR_NOT_LIKE, TAG_OPERATOR_NOT_EQUAL, TAG_OPERATOR_EXISTS, TAG_OPERATOR_NOT_EXISTS]), 'default' => TAG_OPERATOR_LIKE],
+				'value' =>					['type' => API_STRING_UTF8, 'default' => '']
 			]],
 			'filter' =>					['type' => API_FILTER, 'flags' => API_ALLOW_NULL, 'default' => null, 'fields' => ['eventid', 'source', 'object', 'objectid', 'value', 'acknowledged', 'name', 'severity', 'cause_eventid']],
 			'search' =>					['type' => API_FILTER, 'flags' => API_ALLOW_NULL, 'default' => null, 'fields' => ['name']],
@@ -97,7 +97,7 @@ class CEvent extends CApiService {
 											['if' => ['field' => 'object', 'in' => EVENT_OBJECT_SERVICE], 'type' => API_OUTPUT, 'flags' => API_ALLOW_NULL, 'in' => implode(',', CService::OUTPUT_FIELDS)]
 			]],
 			'selectSuppressionData' =>		['type' => API_OUTPUT, 'flags' => API_ALLOW_NULL, 'in' => implode(',', ['maintenanceid', 'suppress_until', 'userid']), 'default' => null],
-			'selectTags' =>					['type' => API_OUTPUT, 'flags' => API_ALLOW_NULL, 'in' => implode(',', ['tag', 'value']), 'default' => null],
+			'selectTags' =>					['type' => API_OUTPUT, 'flags' => API_ALLOW_NULL | API_NORMALIZE, 'in' => implode(',', ['tag', 'value']), 'default' => null],
 			// sort and limit
 			'sortfield' =>					['type' => API_STRINGS_UTF8, 'flags' => API_NORMALIZE, 'in' => implode(',', array_merge($this->sortColumns, ['rowscount'])), 'uniq' => true, 'default' => []],
 			'sortorder' =>					['type' => API_SORTORDER, 'default' => []],
@@ -966,32 +966,24 @@ class CEvent extends CApiService {
 		}
 	}
 
-	private static function addRelatedTags(array $options, array &$result): void {
+	private static function addRelatedTags(array $options, array &$events): void {
 		if ($options['selectTags'] === null) {
 			return;
 		}
 
-		foreach ($result as &$row) {
-			$row['tags'] = [];
+		foreach ($events as &$event) {
+			$event['tags'] = [];
 		}
-		unset($row);
-
-		$output = $options['selectTags'] === API_OUTPUT_EXTEND
-			? ['eventtagid', 'eventid', 'tag', 'value']
-			: array_unique(array_merge(['eventtagid', 'eventid'], $options['selectTags']));
+		unset($event);
 
 		$sql_options = [
-			'output' => $output,
-			'filter' => ['eventid' => array_keys($result)]
+			'output' => array_merge(['eventtagid', 'eventid'], $options['selectTags']),
+			'filter' => ['eventid' => array_keys($events)]
 		];
-		$db_tags = DBselect(DB::makeSql('event_tag', $sql_options));
+		$resource = DBselect(DB::makeSql('event_tag', $sql_options));
 
-		while ($db_tag = DBfetch($db_tags)) {
-			$eventid = $db_tag['eventid'];
-
-			unset($db_tag['eventtagid'], $db_tag['eventid']);
-
-			$result[$eventid]['tags'][] = $db_tag;
+		while ($row = DBfetch($resource)) {
+			$events[$row['eventid']]['tags'][] = array_diff_key($row, array_flip(['eventtagid', 'eventid']));
 		}
 	}
 

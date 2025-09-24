@@ -471,7 +471,7 @@ class CHost extends CHostGeneral {
 		}
 
 		// tags
-		if ($options['tags'] !== null && $options['tags']) {
+		if ($options['tags'] !== null) {
 			$sqlParts['where'][] = CApiTagHelper::addWhereCondition($options['tags'], $options['evaltype'],
 				$options['inheritedTags'], 'host_tag', 'h', 'hostid'
 			);
@@ -554,8 +554,8 @@ class CHost extends CHostGeneral {
 			'evaltype' =>				['type' => API_INT32, 'in' => implode(',', [TAG_EVAL_TYPE_AND_OR, TAG_EVAL_TYPE_OR]), 'default' => TAG_EVAL_TYPE_AND_OR],
 			'tags' =>					['type' => API_OBJECTS, 'flags' => API_ALLOW_NULL | API_NORMALIZE, 'default' => null, 'fields' => [
 				'tag' =>					['type' => API_STRING_UTF8, 'flags' => API_REQUIRED],
-				'operator' =>				['type' => API_INT32, 'in' => implode(',', [TAG_OPERATOR_LIKE, TAG_OPERATOR_EQUAL, TAG_OPERATOR_NOT_LIKE, TAG_OPERATOR_NOT_EQUAL, TAG_OPERATOR_EXISTS, TAG_OPERATOR_NOT_EXISTS])],
-				'value' =>					['type' => API_STRING_UTF8]
+				'operator' =>				['type' => API_INT32, 'in' => implode(',', [TAG_OPERATOR_LIKE, TAG_OPERATOR_EQUAL, TAG_OPERATOR_NOT_LIKE, TAG_OPERATOR_NOT_EQUAL, TAG_OPERATOR_EXISTS, TAG_OPERATOR_NOT_EXISTS]), 'default' => TAG_OPERATOR_LIKE],
+				'value' =>					['type' => API_STRING_UTF8, 'default' => '']
 			]],
 			'inheritedTags' =>			['type' => API_BOOLEAN, 'default' => false],
 			'severities' =>				['type' => API_INTS32, 'flags' => API_ALLOW_NULL | API_NORMALIZE | API_NOT_EMPTY, 'in' => implode(',', range(TRIGGER_SEVERITY_NOT_CLASSIFIED, TRIGGER_SEVERITY_COUNT - 1)), 'uniq' => true],

@@ -237,7 +237,7 @@ class CItem extends CItemGeneral {
 		}
 
 		// tags
-		if ($options['tags'] !== null && $options['tags']) {
+		if ($options['tags'] !== null) {
 			$sqlParts['where'][] = CApiTagHelper::addWhereCondition($options['tags'], $options['evaltype'],
 				$options['inheritedTags'], 'item_tag', 'i', 'itemid'
 			);
@@ -455,8 +455,8 @@ class CItem extends CItemGeneral {
 			'evaltype' =>				['type' => API_INT32, 'in' => implode(',', [TAG_EVAL_TYPE_AND_OR, TAG_EVAL_TYPE_OR]), 'default' => TAG_EVAL_TYPE_AND_OR],
 			'tags' =>					['type' => API_OBJECTS, 'flags' => API_ALLOW_NULL | API_NORMALIZE, 'default' => null, 'fields' => [
 				'tag' =>					['type' => API_STRING_UTF8, 'flags' => API_REQUIRED],
-				'operator' =>				['type' => API_INT32, 'in' => implode(',', [TAG_OPERATOR_LIKE, TAG_OPERATOR_EQUAL, TAG_OPERATOR_NOT_LIKE, TAG_OPERATOR_NOT_EQUAL, TAG_OPERATOR_EXISTS, TAG_OPERATOR_NOT_EXISTS])],
-				'value' =>					['type' => API_STRING_UTF8]
+				'operator' =>				['type' => API_INT32, 'in' => implode(',', [TAG_OPERATOR_LIKE, TAG_OPERATOR_EQUAL, TAG_OPERATOR_NOT_LIKE, TAG_OPERATOR_NOT_EQUAL, TAG_OPERATOR_EXISTS, TAG_OPERATOR_NOT_EXISTS]), 'default' => TAG_OPERATOR_LIKE],
+				'value' =>					['type' => API_STRING_UTF8, 'default' => '']
 			]],
 			'inheritedTags' =>			['type' => API_BOOLEAN, 'default' => false],
 			// Output.
