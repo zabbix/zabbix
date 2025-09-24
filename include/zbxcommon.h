@@ -832,8 +832,8 @@ void	zbx_init_library_common(zbx_log_cb_t log_func, zbx_log_level_cb_t log_level
 
 typedef void (*zbx_exit_cb_t)(int) ZBX_NORETURN;
 
-extern ZBX_THREAD_LOCAL zbx_exit_cb_t	zbx_exit;
-extern ZBX_THREAD_LOCAL zbx_exit_cb_t	zbx_exit_immediate;
+extern ZBX_THREAD_LOCAL zbx_exit_cb_t	zbx_exit ZBX_NORETURN;
+extern ZBX_THREAD_LOCAL zbx_exit_cb_t	zbx_exit_immediate ZBX_NORETURN;
 
 void	zbx_set_exit(zbx_exit_cb_t exit_cb);
 void	zbx_set_exit_immediate(zbx_exit_cb_t exit_cb);
