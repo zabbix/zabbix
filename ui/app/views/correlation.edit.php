@@ -408,13 +408,13 @@ foreach ($data['correlation']['filter']['conditions'] as $index => $condition) {
 	$template_data = [
 		'row_index' => $index,
 		'type' => $condition['type'],
-		'formulaid' => $condition['formulaid'],
+		'formulaid' => $condition['formulaid']
 	];
 
 	$templates_data[] = $template_data + match ($type) {
 		ZBX_CORR_CONDITION_OLD_EVENT_TAG,
 		ZBX_CORR_CONDITION_NEW_EVENT_TAG => [
-			'tag' => $condition['tag'],
+			'tag' => $condition['tag']
 		],
 		ZBX_CORR_CONDITION_NEW_EVENT_HOSTGROUP => [
 			'groupid' => $condition['groupid'],
