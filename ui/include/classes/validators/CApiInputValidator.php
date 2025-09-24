@@ -1995,23 +1995,11 @@ class CApiInputValidator {
 			return false;
 		}
 
-		// If empty is allowed there is only root folder, return early.
-		if ($data === '/') {
-			return true;
-		}
+		$menu_path_validator = new CMenuPathValidator;
 
-		$folders = splitPath($data);
-		$folders = array_map('trim', $folders);
-		$count = count($folders);
-
-		// folder1/{empty}/name or folder1/folder2/{empty}
-		foreach ($folders as $num => $folder) {
-			// Allow the trailing slash.
-			if ($folder === '' && $num != ($count - 1) && $num != 0) {
-				$error = _s('Invalid parameter "%1$s": %2$s.', $path, _('directory cannot be empty'));
-
-				return false;
-			}
+		if (!$menu_path_validator->validate($data)) {
+			$error = _s('Invalid parameter "%1$s": %2$s.', $path, _('directory cannot be empty'));
+			return false;
 		}
 
 		return true;

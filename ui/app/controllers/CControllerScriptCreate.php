@@ -58,7 +58,9 @@ class CControllerScriptCreate extends CController {
 				]
 			],
 			'execute_on' =>	['db scripts.execute_on','in' => [ZBX_SCRIPT_EXECUTE_ON_AGENT, ZBX_SCRIPT_EXECUTE_ON_SERVER, ZBX_SCRIPT_EXECUTE_ON_PROXY]],
-			'menu_path' => ['db scripts.menu_path', 'regex' => ZBX_PREG_MENU_PATH_FORMAT],
+			'menu_path' => ['db scripts.menu_path',
+				'use' => [CMenuPathValidator::class], 'messages' => ['use' => _('Incorrect menu path.')]
+			],
 			'authtype' => ['db scripts.authtype', 'in' => [ITEM_AUTHTYPE_PASSWORD, ITEM_AUTHTYPE_PUBLICKEY]],
 			'username' => ['db scripts.username', 'required', 'not_empty', 'when' => ['type', 'in' => [ZBX_SCRIPT_TYPE_SSH, ZBX_SCRIPT_TYPE_TELNET]]],
 			'password' => ['db scripts.password'],
