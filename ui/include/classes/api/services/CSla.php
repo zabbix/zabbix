@@ -327,9 +327,9 @@ class CSla extends CApiService {
 	protected function applyQueryFilterOptions($table_name, $table_alias, array $options, array $sql_parts): array {
 		$sql_parts = parent::applyQueryFilterOptions($table_name, $table_alias, $options, $sql_parts);
 
-		if ($options['service_tags'] !== null) {
-			$sql_parts['where'][] = CApiTagHelper::addWhereCondition($options['service_tags'], $options['evaltype'],
-				false, 'sla_service_tag', 'sla', 'slaid'
+		if ($options['service_tags']) {
+			$sql_parts['where'][] = CApiTagHelper::getTagCondition($options['service_tags'], $options['evaltype'],
+				['sla'], 'sla_service_tag', 'slaid'
 			);
 		}
 

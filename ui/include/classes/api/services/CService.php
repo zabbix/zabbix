@@ -581,15 +581,15 @@ class CService extends CApiService {
 			$sql_parts['where'][] = dbConditionId('slc.servicedownid', $options['childids']);
 		}
 
-		if ($options['tags'] !== null) {
-			$sql_parts['where'][] = CApiTagHelper::addWhereCondition($options['tags'], $options['evaltype'], false,
-				'service_tag', 's', 'serviceid'
+		if ($options['tags']) {
+			$sql_parts['where'][] = CApiTagHelper::getTagCondition($options['tags'], $options['evaltype'], ['s'],
+				'service_tag', 'serviceid'
 			);
 		}
 
-		if ($options['problem_tags'] !== null) {
-			$sql_parts['where'][] = CApiTagHelper::addWhereCondition($options['problem_tags'], $options['evaltype'],
-				false, 'service_problem_tag', 's', 'serviceid'
+		if ($options['problem_tags']) {
+			$sql_parts['where'][] = CApiTagHelper::getTagCondition($options['problem_tags'], $options['evaltype'],
+				['s'], 'service_problem_tag', 'serviceid'
 			);
 		}
 		elseif ($options['without_problem_tags']) {

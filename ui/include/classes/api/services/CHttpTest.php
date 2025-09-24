@@ -131,9 +131,19 @@ class CHttpTest extends CApiService {
 
 		// tags
 		if ($options['tags'] !== null) {
-			$sqlParts['where'][] = CApiTagHelper::addWhereCondition($options['tags'], $options['evaltype'],
-				$options['inheritedTags'], 'httptest_tag', 'ht', 'httptestid'
-			);
+			if ($options['inheritedTags']) {
+				$sqlParts['from']['httptestitem'] = 'httptestitem hti';
+				$sqlParts['where']['ht-hti'] = 'ht.httptestid=hti.httptestid';
+
+				$sqlParts['where'][] = CApiTagHelper::getTagCondition($options['tags'], $options['evaltype'],
+					['ht', 'hti'], 'httptest_tag', 'httptestid', true
+				);
+			}
+			else {
+				$sqlParts['where'][] = CApiTagHelper::getTagCondition($options['tags'], $options['evaltype'], ['ht'],
+					'httptest_tag', 'httptestid'
+				);
+			}
 		}
 
 		// groupids

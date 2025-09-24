@@ -238,8 +238,8 @@ class CItem extends CItemGeneral {
 
 		// tags
 		if ($options['tags'] !== null) {
-			$sqlParts['where'][] = CApiTagHelper::addWhereCondition($options['tags'], $options['evaltype'],
-				$options['inheritedTags'], 'item_tag', 'i', 'itemid'
+			$sqlParts['where'][] = CApiTagHelper::getTagCondition($options['tags'], $options['evaltype'], ['i'],
+				'item_tag', 'itemid', $options['inheritedTags']
 			);
 		}
 

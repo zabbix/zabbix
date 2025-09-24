@@ -441,11 +441,17 @@ class CTrigger extends CTriggerGeneral {
 		if ($options['tags'] !== null) {
 			if ($options['inheritedTags']) {
 				$sqlParts['from']['functions'] = 'functions f';
-			}
+				$sqlParts['where']['ft'] = 'f.triggerid=t.triggerid';
 
-			$sqlParts['where'][] = CApiTagHelper::addWhereCondition($options['tags'], $options['evaltype'],
-				$options['inheritedTags'], 'trigger_tag', 't', 'triggerid'
-			);
+				$sqlParts['where'][] = CApiTagHelper::getTagCondition($options['tags'], $options['evaltype'],
+					['t', 'f'], 'trigger_tag', 'triggerid', true
+				);
+			}
+			else {
+				$sqlParts['where'][] = CApiTagHelper::getTagCondition($options['tags'], $options['evaltype'], ['t'],
+					'trigger_tag', 'triggerid'
+				);
+			}
 		}
 
 		// limit

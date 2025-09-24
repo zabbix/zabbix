@@ -472,8 +472,8 @@ class CHost extends CHostGeneral {
 
 		// tags
 		if ($options['tags'] !== null) {
-			$sqlParts['where'][] = CApiTagHelper::addWhereCondition($options['tags'], $options['evaltype'],
-				$options['inheritedTags'], 'host_tag', 'h', 'hostid'
+			$sqlParts['where'][] = CApiTagHelper::getTagCondition($options['tags'], $options['evaltype'], ['h'],
+				'host_tag', 'hostid', $options['inheritedTags']
 			);
 		}
 
