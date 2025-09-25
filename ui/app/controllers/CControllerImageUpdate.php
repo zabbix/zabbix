@@ -31,13 +31,14 @@ class CControllerImageUpdate extends CController {
 			'imagetype' => ['db images.imagetype', 'required', 'in '.IMAGE_TYPE_ICON.','.IMAGE_TYPE_BACKGROUND],
 			'name' => ['db images.name', 'required', 'not_empty'],
 			'image' => ['file' => [ZBX_MAX_IMAGE_SIZE, 'image'],
-				'messages' => ['file' => _s('Image size must be less than %1$s.', convertUnits(['value' =>
-					ZBX_MAX_IMAGE_SIZE, 'units' => 'B']))]
+				'messages' => ['file' => _s('Image size must be less than %1$s.',
+					convertUnits(['value' => ZBX_MAX_IMAGE_SIZE, 'units' => 'B'])
+				)]
 			]
 		]];
 	}
 
-	protected function checkInput() {
+	protected function checkInput(): bool {
 
 		$ret = $this->validateInput(self::getValidationRules());
 
@@ -58,12 +59,13 @@ class CControllerImageUpdate extends CController {
 		return $ret;
 	}
 
-	protected function checkPermissions() {
+	protected function checkPermissions(): bool {
 		if (!$this->checkAccess(CRoleHelper::UI_ADMINISTRATION_GENERAL)) {
 			return false;
 		}
 
 		$images = API::Image()->get(['imageids' => $this->getInput('imageid')]);
+
 		if (!$images) {
 			return false;
 		}
@@ -71,12 +73,7 @@ class CControllerImageUpdate extends CController {
 		return true;
 	}
 
-	/**
-	 * @param $error string
-	 *
-	 * @return string|null
-	 */
-	protected function uploadImage(&$error) {
+	protected function uploadImage(?string &$error): ?string {
 		try {
 			if ($this->hasFile('image')) {
 				$file = new CUploadFile($this->getFile('image'));
@@ -84,11 +81,6 @@ class CControllerImageUpdate extends CController {
 				if ($file->wasUploaded()) {
 					return base64_encode($file->getContent());
 				}
-
-				return null;
-			}
-			else {
-				return null;
 			}
 		}
 		catch (Exception $e) {
@@ -98,7 +90,7 @@ class CControllerImageUpdate extends CController {
 		return null;
 	}
 
-	protected function doAction() {
+	protected function doAction(): void {
 		$image = $this->uploadImage($error);
 
 		if ($error) {

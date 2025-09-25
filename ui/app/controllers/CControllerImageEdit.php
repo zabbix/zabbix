@@ -21,11 +21,11 @@ class CControllerImageEdit extends CController {
 	 */
 	private $image = [];
 
-	protected function init() {
+	protected function init(): void {
 		$this->disableCsrfValidation();
 	}
 
-	protected function checkInput() {
+	protected function checkInput(): bool {
 		$fields = [
 			'imageid'   => 'db images.imageid',
 			'imagetype' => 'db images.imagetype|in '.IMAGE_TYPE_ICON.','.IMAGE_TYPE_BACKGROUND,
@@ -45,7 +45,7 @@ class CControllerImageEdit extends CController {
 		return $ret;
 	}
 
-	protected function checkPermissions() {
+	protected function checkPermissions(): bool {
 		if (!$this->checkAccess(CRoleHelper::UI_ADMINISTRATION_GENERAL)) {
 			return false;
 		}
@@ -70,7 +70,7 @@ class CControllerImageEdit extends CController {
 		return true;
 	}
 
-	protected function doAction() {
+	protected function doAction(): void {
 		$data = $this->getInputAll() + $this->image;
 		$data['js_validation_rules'] = $this->image['imageid']
 			? CControllerImageUpdate::getValidationRules()

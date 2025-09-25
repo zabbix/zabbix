@@ -1381,7 +1381,7 @@ class CFormValidator {
 			return {
 				result: CFormValidator.ERROR,
 				error: this.#getMessage(rules, 'file',
-					sprintf(t('File size must be less than %1$s.'), rules.file['max-size-MB']))
+					sprintf(t('File size must be less than %1$s.'), rules.file['max-size-human-readable']))
 			};
 		}
 

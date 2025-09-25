@@ -53,7 +53,7 @@ class CFormValidator {
 	 * Supported rules:
 	 *   Data types:
 	 *     'boolean', 'string', 'integer', 'float', 'id', 'objects', 'object', 'array', 'db <table>.<field>',
-	 *     'image <size>', 'file <size>'
+	 *     'file'
 	 *   Constraints:
 	 *     'not_empty', 'required', 'length', 'api_uniq'
 	 *   Value comparisons:
@@ -291,7 +291,9 @@ class CFormValidator {
 
 						if (array_key_exists(0, $value)) {
 							$file_rules['max-size'] = (int) $value[0];
-							$file_rules['max-size-MB'] = convertUnits(['value' => $file_rules['max-size'], 'units' => 'B']);
+							$file_rules['max-size-human-readable'] = convertUnits(['value' => $file_rules['max-size'],
+								'units' => 'B'
+							]);
 						}
 
 						$result['file'] = $file_rules;
@@ -612,11 +614,15 @@ class CFormValidator {
 	 * Base validation function.
 	 *
 	 * @param array  $data  Form input data.
-	 * @param array  $files From files
+	 * @param ?array  $files From files
 	 *
 	 * @return int
 	 */
-	public function validate(&$data, &$files): int {
+	public function validate(&$data, ?array &$files = null): int {
+		if ($files === null) {
+			$files = [];
+		}
+
 		$this->errors = [];
 
 		$this->has_fatal = false;
@@ -693,7 +699,7 @@ class CFormValidator {
 		}
 
 		// Single value ID may be passed as null when value is not specified.
-		if ($rules['type'] != 'file' && array_key_exists($field, $data) && $data[$field] === null) {
+		if ($rules['type'] !== 'file' && array_key_exists($field, $data) && $data[$field] === null) {
 			unset($data[$field]);
 		}
 
@@ -1121,7 +1127,9 @@ class CFormValidator {
 	 *
 	 * @return bool
 	 */
-	public function validateObject(array $rules, &$value, ?string &$error = null, string &$path = '', ?array &$files = []): bool {
+	public function validateObject(array $rules, &$value, ?string &$error = null, string &$path = '',
+		?array &$files = []
+	): bool {
 		if (!is_array($value)) {
 			$error = self::getMessage($rules, 'type', _('An array is expected.'));
 
@@ -1132,7 +1140,7 @@ class CFormValidator {
 		$file_fields = [];
 
 		foreach ($rules['fields'] as $field => $rule_sets) {
-			if (empty($rule_sets)) {
+			if (!$rule_sets) {
 				$value_fields[$field] = true;
 				$file_fields[$field] = true;
 			}

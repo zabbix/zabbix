@@ -30,13 +30,14 @@ class CControllerImageCreate extends CController {
 			'imagetype' => ['db images.imagetype','required', 'in '.IMAGE_TYPE_ICON.','.IMAGE_TYPE_BACKGROUND],
 			'name' => ['db images.name', 'required', 'not_empty'],
 			'image' => ['file' => [ZBX_MAX_IMAGE_SIZE, 'image'], 'required',
-				'messages' => ['file' => _s('Image size must be less than %1$s.', convertUnits(['value' =>
-					ZBX_MAX_IMAGE_SIZE, 'units' => 'B']))]
+				'messages' => ['file' => _s('Image size must be less than %1$s.',
+					convertUnits(['value' => ZBX_MAX_IMAGE_SIZE, 'units' => 'B'])
+				)]
 			]
 		]];
 	}
 
-	protected function checkInput() {
+	protected function checkInput(): bool {
 
 		$ret = $this->validateInput(self::getValidationRules());
 
@@ -45,7 +46,7 @@ class CControllerImageCreate extends CController {
 			$response = $form_errors
 				? ['form_errors' => $form_errors]
 				: ['error' => [
-					'title' => _('Cannot update image'),
+					'title' => _('Cannot add image'),
 					'messages' => array_column(get_and_clear_messages(), 'message')
 				]];
 
@@ -57,7 +58,7 @@ class CControllerImageCreate extends CController {
 		return $ret;
 	}
 
-	protected function checkPermissions() {
+	protected function checkPermissions(): bool {
 		if (!$this->checkAccess(CRoleHelper::UI_ADMINISTRATION_GENERAL)) {
 			return false;
 		}
@@ -65,12 +66,7 @@ class CControllerImageCreate extends CController {
 		return true;
 	}
 
-	/**
-	 * @param $error string
-	 *
-	 * @return string|null
-	 */
-	protected function uploadImage(&$error) {
+	protected function uploadImage(?string &$error): ?string {
 		try {
 			if ($this->hasFile('image')) {
 				$file = new CUploadFile($this->getFile('image'));
@@ -78,11 +74,6 @@ class CControllerImageCreate extends CController {
 				if ($file->wasUploaded()) {
 					return base64_encode($file->getContent());
 				}
-
-				return null;
-			}
-			else {
-				return null;
 			}
 		}
 		catch (Exception $e) {
@@ -92,7 +83,7 @@ class CControllerImageCreate extends CController {
 		return null;
 	}
 
-	protected function doAction() {
+	protected function doAction(): void {
 		$image = $this->uploadImage($error);
 
 		if ($error) {

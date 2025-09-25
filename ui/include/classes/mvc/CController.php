@@ -87,14 +87,14 @@ abstract class CController {
 	 *
 	 * @var array|null
 	 */
-	private $raw_files;
+	private ?array $raw_files;
 
 	/**
 	 * Validated files parameters.
 	 *
-	 * @var array
+	 * @var array|null
 	 */
-	private $files = [];
+	private array $files = [];
 
 	/**
 	 * Validate CSRF token flag, if true CSRF token must be validated.
@@ -502,23 +502,11 @@ abstract class CController {
 		return $this->input;
 	}
 
-	/**
-	 * Check if file parameter exists.
-	 *
-	 * @param string $var
-	 *
-	 * @return bool
-	 */
-	protected function hasFile($var): bool {
+	protected function hasFile(string $var): bool {
 		return array_key_exists($var, $this->files);
 	}
 
-	/**
-	 * Get single file by parameter.
-	 *
-	 * @param string $var
-	 */
-	protected function getFile($var) {
+	protected function getFile(string $var): array {
 		return $this->files[$var];
 	}
 
