@@ -1992,13 +1992,15 @@ class CApiInputValidator {
 
 		if (array_key_exists('length', $rule) && mb_strlen($data) > $rule['length']) {
 			$error = _s('Invalid parameter "%1$s": %2$s.', $path, _('value is too long'));
+
 			return false;
 		}
 
-		$menu_path_validator = new CMenuPathValidator;
+		$menu_path_validator = new CMenuPathValidator();
 
 		if (!$menu_path_validator->validate($data)) {
 			$error = _s('Invalid parameter "%1$s": %2$s.', $path, _('directory cannot be empty'));
+
 			return false;
 		}
 
