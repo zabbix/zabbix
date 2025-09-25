@@ -74,7 +74,7 @@ class CApiTagHelper {
 		}
 
 		// The tag operator TAG_OPERATOR_EXISTS overrides filters with other operators within the tag.
-		foreach ($grouped_tags as $tag => &$operator_values) {
+		foreach ($grouped_tags as &$operator_values) {
 			if (array_key_exists(TAG_OPERATOR_EXISTS, $operator_values)) {
 				$operator_values = [TAG_OPERATOR_EXISTS => true];
 			}
@@ -151,7 +151,7 @@ class CApiTagHelper {
 		$subqueries = [];
 
 		if (array_key_exists(TAG_OPERATOR_EXISTS, $operator_values)) {
-			foreach ($tag_table_subqueries as $table => $subquery_sql) {
+			foreach ($tag_table_subqueries as $subquery_sql) {
 				$subqueries[] = self::getTagSubquery(self::SUBQUERY_TYPE_EXISTS, $subquery_sql);
 			}
 
@@ -178,7 +178,7 @@ class CApiTagHelper {
 		if (array_key_exists(TAG_OPERATOR_NOT_EXISTS, $operator_values)) {
 			$_subqueries = [];
 
-			foreach ($tag_table_subqueries as $table => $subquery_sql) {
+			foreach ($tag_table_subqueries as $subquery_sql) {
 				$_subqueries[] = self::getTagSubquery(self::SUBQUERY_TYPE_NOT_EXISTS, $subquery_sql);
 			}
 
@@ -214,7 +214,6 @@ class CApiTagHelper {
 
 	private static function getTagSubquery(string $subquery_type, string $subquery_sql,
 			array $conditions = []): string {
-
 		if ($conditions) {
 			$condition_string = count($conditions) == 1
 				? ' AND '.$conditions[0]
