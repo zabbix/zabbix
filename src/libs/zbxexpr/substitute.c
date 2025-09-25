@@ -278,6 +278,7 @@ int	zbx_substitute_macros_args(zbx_token_search_t search, char **data, char *err
 	{
 		if (NULL != entry->destroy_func && NULL != entry->ptr)
 			entry->destroy_func(entry->ptr);
+
 		zbx_free(entry->ptr);
 		zbx_hashset_iter_remove(&iter);
 	}
