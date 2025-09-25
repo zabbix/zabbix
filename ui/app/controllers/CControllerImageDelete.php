@@ -16,6 +16,8 @@
 
 class CControllerImageDelete extends CController {
 
+	private array $image;
+
 	protected function checkInput() {
 		$fields = [
 			'imageid'   => 'required|db images.imageid',
