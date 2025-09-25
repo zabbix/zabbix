@@ -447,10 +447,6 @@ zabbix_export:
           description: |
             MIB: STORMSHIELD-PROPERTY-MIB
             Stormshield Firewall system name.
-          preprocessing:
-            - type: DISCARD_UNCHANGED_HEARTBEAT
-              parameters:
-                - 6h
           tags:
             - tag: component
               value: hardware
@@ -461,6 +457,7 @@ zabbix_export:
               event_name: 'SNS: System name has changed (new name: {ITEM.VALUE})'
               priority: INFO
               description: 'The name of the system has changed. Acknowledge to close the problem manually.'
+              manual_close: 'YES'
               tags:
                 - tag: scope
                   value: notice
@@ -493,10 +490,6 @@ zabbix_export:
           description: |
             MIB: STORMSHIELD-PROPERTY-MIB
             Stormshield Firewall serial number.
-          preprocessing:
-            - type: DISCARD_UNCHANGED_HEARTBEAT
-              parameters:
-                - 6h
           tags:
             - tag: component
               value: hardware
@@ -507,6 +500,7 @@ zabbix_export:
               event_name: 'SNS: Device has been replaced (new serial number received)'
               priority: INFO
               description: 'Device serial number has changed. Acknowledge to close the problem manually.'
+              manual_close: 'YES'
               tags:
                 - tag: scope
                   value: notice
