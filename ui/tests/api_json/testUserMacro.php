@@ -215,7 +215,7 @@ class testUserMacro extends CAPITest {
 					'config' => [
 						'type' => ZBX_WIZARD_FIELD_TEXT,
 						'label' => 'Config',
-						'regex' => '/^[a-z(A-Z0-9_]+$/'
+						'regex' => '/^[a-z(A-Z0-9_]|+$/'
 					]
 				],
 				'expected_error' => 'Invalid parameter "/1/config/regex": invalid regular expression.'
