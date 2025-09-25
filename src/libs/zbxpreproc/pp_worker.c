@@ -48,11 +48,7 @@ static void	pp_task_process_value(zbx_pp_context_t *ctx, zbx_pp_task_t *task, co
 {
 	zbx_pp_task_value_t	*d = (zbx_pp_task_value_t *)PP_TASK_DATA(task);
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s() itemid:" ZBX_FS_UI64, __func__, task->itemid);
-
 	pp_execute(ctx, d->preproc, d->cache, d->um_handle, &d->value, d->ts, config_source_ip, &d->result, NULL, NULL);
-
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s() itemid:" ZBX_FS_UI64, __func__, task->itemid);
 }
 
 /******************************************************************************
@@ -65,12 +61,8 @@ static void	pp_task_process_dependent(zbx_pp_context_t *ctx, zbx_pp_task_t *task
 	zbx_pp_task_dependent_t	*d = (zbx_pp_task_dependent_t *)PP_TASK_DATA(task);
 	zbx_pp_task_value_t	*d_first = (zbx_pp_task_value_t *)PP_TASK_DATA(d->primary);
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s() itemid:" ZBX_FS_UI64, __func__, task->itemid);
-
 	pp_execute(ctx, d_first->preproc, d->cache, d_first->um_handle, &d_first->value, d_first->ts, config_source_ip,
 			&d_first->result, NULL, NULL);
-
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s() itemid:" ZBX_FS_UI64, __func__, task->itemid);
 }
 
 /******************************************************************************
