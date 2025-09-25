@@ -46,49 +46,80 @@ class CControllerScriptCreate extends CController {
 
 		return ['object', 'api_uniq' => $api_uniq, 'fields' => [
 			'name' => ['db scripts.name', 'required', 'not_empty'],
-			'scope' => ['db scripts.scope', 'required', 'in' => [ZBX_SCRIPT_SCOPE_ACTION, ZBX_SCRIPT_SCOPE_HOST, ZBX_SCRIPT_SCOPE_EVENT]],
+			'scope' => ['db scripts.scope', 'required', 'in' => [ZBX_SCRIPT_SCOPE_ACTION, ZBX_SCRIPT_SCOPE_HOST,
+				ZBX_SCRIPT_SCOPE_EVENT
+			]],
 			'type' => [
-				['required', 'db scripts.type',
-					'in' => [ZBX_SCRIPT_TYPE_CUSTOM_SCRIPT, ZBX_SCRIPT_TYPE_IPMI, ZBX_SCRIPT_TYPE_SSH, ZBX_SCRIPT_TYPE_TELNET, ZBX_SCRIPT_TYPE_WEBHOOK, ZBX_SCRIPT_TYPE_URL],
+				['db scripts.type', 'required',
+					'in' => [ZBX_SCRIPT_TYPE_CUSTOM_SCRIPT, ZBX_SCRIPT_TYPE_IPMI, ZBX_SCRIPT_TYPE_SSH,
+						ZBX_SCRIPT_TYPE_TELNET, ZBX_SCRIPT_TYPE_WEBHOOK, ZBX_SCRIPT_TYPE_URL
+					],
 					'when' => ['scope', 'in' => [ZBX_SCRIPT_SCOPE_HOST, ZBX_SCRIPT_SCOPE_EVENT]]
 				],
-				['required', 'db scripts.type',
-					'in' => [ZBX_SCRIPT_TYPE_CUSTOM_SCRIPT, ZBX_SCRIPT_TYPE_IPMI, ZBX_SCRIPT_TYPE_SSH, ZBX_SCRIPT_TYPE_TELNET, ZBX_SCRIPT_TYPE_WEBHOOK],
+				['db scripts.type', 'required',
+					'in' => [ZBX_SCRIPT_TYPE_CUSTOM_SCRIPT, ZBX_SCRIPT_TYPE_IPMI, ZBX_SCRIPT_TYPE_SSH,
+						ZBX_SCRIPT_TYPE_TELNET, ZBX_SCRIPT_TYPE_WEBHOOK
+					],
 					'when' => ['scope', 'in' => [ZBX_SCRIPT_SCOPE_ACTION]]
 				]
 			],
-			'execute_on' =>	['db scripts.execute_on','in' => [ZBX_SCRIPT_EXECUTE_ON_AGENT, ZBX_SCRIPT_EXECUTE_ON_SERVER, ZBX_SCRIPT_EXECUTE_ON_PROXY]],
+			'execute_on' => ['db scripts.execute_on','in' => [ZBX_SCRIPT_EXECUTE_ON_AGENT, ZBX_SCRIPT_EXECUTE_ON_SERVER,
+				ZBX_SCRIPT_EXECUTE_ON_PROXY
+			]],
 			'menu_path' => ['db scripts.menu_path',
 				'use' => [CMenuPathValidator::class], 'messages' => ['use' => _('Incorrect menu path.')]
 			],
 			'authtype' => ['db scripts.authtype', 'in' => [ITEM_AUTHTYPE_PASSWORD, ITEM_AUTHTYPE_PUBLICKEY]],
-			'username' => ['db scripts.username', 'required', 'not_empty', 'when' => ['type', 'in' => [ZBX_SCRIPT_TYPE_SSH, ZBX_SCRIPT_TYPE_TELNET]]],
+			'username' => ['db scripts.username', 'required', 'not_empty',
+				'when' => ['type', 'in' => [ZBX_SCRIPT_TYPE_SSH, ZBX_SCRIPT_TYPE_TELNET]]
+			],
 			'password' => ['db scripts.password'],
-			'publickey' => ['db scripts.publickey', 'required', 'not_empty', 'when' => ['authtype', 'in' => [ITEM_AUTHTYPE_PUBLICKEY]]],
-			'privatekey' => ['db scripts.privatekey', 'required', 'not_empty', 'when' => ['authtype', 'in' => [ITEM_AUTHTYPE_PUBLICKEY]]],
+			'publickey' => ['db scripts.publickey', 'required', 'not_empty',
+				'when' => ['authtype', 'in' => [ITEM_AUTHTYPE_PUBLICKEY]]
+			],
+			'privatekey' => ['db scripts.privatekey', 'required', 'not_empty',
+				'when' => ['authtype', 'in' => [ITEM_AUTHTYPE_PUBLICKEY]]
+			],
 			'passphrase' => ['db scripts.password'],
-			'port' => ['db scripts.port', 'use' => [CPortParser::class, ['usermacros' => true]], 'messages' => ['use' => _('Incorrect port.')]],
-			'command' => ['db scripts.command', 'required', 'not_empty', 'when' => ['type', 'in' => [ZBX_SCRIPT_TYPE_CUSTOM_SCRIPT, ZBX_SCRIPT_TYPE_SSH, ZBX_SCRIPT_TYPE_TELNET]]],
-			'commandipmi' => ['db scripts.command', 'required', 'not_empty', 'when' => ['type', 'in' => [ZBX_SCRIPT_TYPE_IPMI]]],
+			'port' => ['db scripts.port',
+				'use' => [CPortParser::class, ['usermacros' => true]],
+				'messages' => ['use' => _('Incorrect port.')]
+			],
+			'command' => ['db scripts.command', 'required', 'not_empty',
+				'when' => ['type', 'in' => [ZBX_SCRIPT_TYPE_CUSTOM_SCRIPT, ZBX_SCRIPT_TYPE_SSH, ZBX_SCRIPT_TYPE_TELNET]]
+			],
+			'commandipmi' => ['db scripts.command', 'required', 'not_empty',
+				'when' => ['type', 'in' => [ZBX_SCRIPT_TYPE_IPMI]]
+			],
 			'parameters' => ['objects', 'uniq' => ['name'], 'fields' => [
 					'name' => ['db script_param.name', 'required', 'not_empty'],
 					'value' => ['db script_param.value']
 				],
 				'when' => ['type', 'in' => [ZBX_SCRIPT_TYPE_WEBHOOK]]
 			],
-			'script' => ['db scripts.command', 'required', 'not_empty', 'when' => ['type', 'in' => [ZBX_SCRIPT_TYPE_WEBHOOK]]],
+			'script' => ['db scripts.command', 'required', 'not_empty',
+				'when' => ['type', 'in' => [ZBX_SCRIPT_TYPE_WEBHOOK]]
+			],
 			'timeout' => ['db scripts.timeout', 'required', 'not_empty',
 				'use' => [CTimeUnitValidator::class, ['min' => 1, 'max' => SEC_PER_MIN, 'usermacros' => true]]
 			],
 			'url' => ['db scripts.url', 'required', 'not_empty', 'when' => ['type', 'in' => [ZBX_SCRIPT_TYPE_URL]]],
-			'new_window' => ['db scripts.new_window', 'in' => [ZBX_SCRIPT_URL_NEW_WINDOW_NO, ZBX_SCRIPT_URL_NEW_WINDOW_YES]],
+			'new_window' => ['db scripts.new_window',
+				'in' => [ZBX_SCRIPT_URL_NEW_WINDOW_NO, ZBX_SCRIPT_URL_NEW_WINDOW_YES]
+			],
 			'description' => ['db scripts.description'],
 			'host_access' => ['db scripts.host_access', 'in' => [PERM_READ, PERM_READ_WRITE]],
 			'groupid' => ['db scripts.groupid'],
 			'usrgrpid' => ['db scripts.usrgrpid'],
-			'manualinput' => ['db scripts.manualinput', 'in' => [ZBX_SCRIPT_MANUALINPUT_DISABLED, ZBX_SCRIPT_MANUALINPUT_ENABLED]],
-			'manualinput_prompt' => ['db scripts.manualinput_prompt', 'required', 'not_empty', 'when' => ['manualinput', 'in' => [ZBX_SCRIPT_MANUALINPUT_ENABLED]]],
-			'manualinput_validator_type' =>	['db scripts.manualinput_validator_type', 'in' => [ZBX_SCRIPT_MANUALINPUT_TYPE_STRING, ZBX_SCRIPT_MANUALINPUT_TYPE_LIST]],
+			'manualinput' => ['db scripts.manualinput',
+				'in' => [ZBX_SCRIPT_MANUALINPUT_DISABLED, ZBX_SCRIPT_MANUALINPUT_ENABLED]
+			],
+			'manualinput_prompt' => ['db scripts.manualinput_prompt', 'required', 'not_empty',
+				'when' => ['manualinput', 'in' => [ZBX_SCRIPT_MANUALINPUT_ENABLED]]
+			],
+			'manualinput_validator_type' => ['db scripts.manualinput_validator_type',
+				'in' => [ZBX_SCRIPT_MANUALINPUT_TYPE_STRING, ZBX_SCRIPT_MANUALINPUT_TYPE_LIST]
+			],
 			'manualinput_default_value' => ['db scripts.manualinput_default_value'],
 			'manualinput_validator' => ['db scripts.manualinput_validator', 'required', 'not_empty',
 				'use' => [CRegexValidator::class, []],
@@ -101,13 +132,15 @@ class CControllerScriptCreate extends CController {
 				'when' => [
 					['manualinput', 'in' => [ZBX_SCRIPT_MANUALINPUT_ENABLED]],
 					['manualinput_validator_type', 'in' => [ZBX_SCRIPT_MANUALINPUT_TYPE_LIST]]
-				]],
+				]
+			],
 			'enable_confirmation' => ['boolean'],
 			'confirmation' => ['db scripts.confirmation', 'required', 'not_empty',
 				'when' => [
 					['scope', 'in' => [ZBX_SCRIPT_SCOPE_HOST, ZBX_SCRIPT_SCOPE_EVENT]],
 					['enable_confirmation', true]
-				]]
+				]
+			]
 		]];
 	}
 
