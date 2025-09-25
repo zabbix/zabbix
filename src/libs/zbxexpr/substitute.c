@@ -24,7 +24,7 @@ typedef struct
 	void			*ptr;
 	zbx_rem_destroy_func_t	destroy_func;
 }
-zbx_expr_rem_t;
+expr_cache_element_t;
 
 /* macros that can be indexed */
 static const char	*ex_macros[] =
@@ -79,9 +79,9 @@ const char	**zbx_get_indexable_macros(void)
 void	*zbx_expr_rem(const void *obj, size_t sz, zbx_rem_create_func_t create_func,
 		zbx_rem_destroy_func_t destroy_func)
 {
-	zbx_expr_rem_t	*entry, local_entry = {0};
+	expr_cache_element_t	*entry, local_entry = {0};
 
-	if (NULL == (entry = (zbx_expr_rem_t *)zbx_hashset_search(expr_cache, &obj)))
+	if (NULL == (entry = (expr_cache_element_t *)zbx_hashset_search(expr_cache, &obj)))
 	{
 		entry = &local_entry;
 
@@ -93,7 +93,7 @@ void	*zbx_expr_rem(const void *obj, size_t sz, zbx_rem_create_func_t create_func
 		if (NULL != create_func)
 			create_func(entry->ptr);
 
-		zbx_hashset_insert(expr_cache, entry, sizeof(zbx_expr_rem_t));
+		zbx_hashset_insert(expr_cache, entry, sizeof(expr_cache_element_t));
 	}
 
 	return entry->ptr;
@@ -270,11 +270,11 @@ int	zbx_substitute_macros_args(zbx_token_search_t search, char **data, char *err
 	}
 
 	zbx_hashset_iter_t	iter;
-	zbx_expr_rem_t		*entry;
+	expr_cache_element_t	*entry;
 
 	zbx_hashset_iter_reset(expr_cache, &iter);
 
-	while (NULL != (entry = (zbx_expr_rem_t *)zbx_hashset_iter_next(&iter)))
+	while (NULL != (entry = (expr_cache_element_t *)zbx_hashset_iter_next(&iter)))
 	{
 		if (NULL != entry->destroy_func && NULL != entry->ptr)
 			entry->destroy_func(entry->ptr);
