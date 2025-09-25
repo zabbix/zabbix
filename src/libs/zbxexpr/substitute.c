@@ -76,6 +76,18 @@ const char	**zbx_get_indexable_macros(void)
 	return ex_macros;
 }
 
+/********************************************************************************
+ *                                                                              *
+ * Purpose: request memory to be remembered between calls of resolver function  *
+ *                                                                              *
+ * Parameters: obj          - [IN] unique pointer to attach data to             *
+ *             sz           - [IN] size of required memory                      *
+ *             create_func  - [IN] function for initialize memory               *
+ *             destroy_func - [IN] callback to free related memory              *
+ *                                                                              *
+ * Return value: pointer to remembered memory                                   *
+ *                                                                              *
+ ********************************************************************************/
 void	*zbx_expr_cache_fetch_or_insert(const void *obj, size_t sz, zbx_rem_create_func_t create_func,
 		zbx_rem_destroy_func_t destroy_func)
 {
