@@ -86,13 +86,18 @@ class CFormValidator {
 
 					$result[$value] = true;
 				}
-				elseif (in_array($value, ['id', 'integer', 'float', 'string', 'object', 'objects', 'array'], true)) {
+				elseif (in_array($value, ['id', 'integer', 'float', 'string', 'object', 'objects', 'array', 'file'],
+					true)) {
 					if (array_key_exists('type', $result)) {
 						// "type" is specified multiple times.
 						throw new Exception('[RULES ERROR] Rule "type" is specified multiple times (Path: '.$rule_path.')');
 					}
 
 					$result['type'] = $value;
+
+					if ($value === 'file') {
+						$result['file-type'] = 'file';
+					}
 				}
 				elseif ($value === 'boolean') {
 					if (array_key_exists('type', $result)) {
@@ -171,10 +176,6 @@ class CFormValidator {
 					}
 
 					$result['not_in'] = self::parseIn(substr($value, 7));
-				}
-				elseif ($value === 'file') {
-					$result['type'] = 'file';
-					$result['file'] = ['max-size' => null, 'type' => 'file'];
 				}
 				else {
 					throw new Exception('[RULES ERROR] Unknown rule "'.$value.'" (Path: '.$rule_path.')');
@@ -282,21 +283,17 @@ class CFormValidator {
 						$result[$key] = $value;
 						break;
 
-					case 'file':
-						$result['type'] = 'file';
-						$file_rules = [
-							'max-size' => null,
-							'type' => array_key_exists(1, $value) ? $value[1] : 'file'
-						];
+					case 'max-size':
+						$result[$key] = (int) $value;
+						$result['max-size-human-readable'] = convertUnits(['value' => $result[$key], 'units' => 'B']);
 
-						if (array_key_exists(0, $value)) {
-							$file_rules['max-size'] = (int) $value[0];
-							$file_rules['max-size-human-readable'] = convertUnits(['value' => $file_rules['max-size'],
-								'units' => 'B'
-							]);
+						break;
+					case 'file-type':
+						if (!in_array($value, ['file', 'image'])) {
+							throw new Exception('[RULES ERROR] Rule "'.$key.'" contains invalid value (Path: ' .$rule_path.')');
 						}
 
-						$result['file'] = $file_rules;
+						$result[$key] = $value;
 
 						break;
 
@@ -312,7 +309,7 @@ class CFormValidator {
 		}
 
 		if (array_key_exists('not_empty', $result)) {
-			if (!in_array($result['type'], ['string', 'objects', 'array'])) {
+			if (!in_array($result['type'], ['string', 'objects', 'array', 'file'])) {
 				throw new Exception('[RULES ERROR] Rule "not_empty" is not compatible with type "'.$result['type'].'" (Path: '.$rule_path.')');
 			}
 		}
@@ -1403,7 +1400,7 @@ class CFormValidator {
 			return false;
 		}
 
-		if ($file->wasUploaded() || array_key_exists('required', $rules)) {
+		if ($file->wasUploaded() || array_key_exists('not_empty', $rules)) {
 			$file_content = null;
 
 			try {
@@ -1415,18 +1412,18 @@ class CFormValidator {
 				return false;
 			}
 
-			if ($rules['file']['max-size']) {
+			if ($rules['max-size']) {
 				try {
-					$file->validateFileSize($rules['file']['max-size'], $rules['file']['type']);
+					$file->validateFileSize($rules['max-size'], $rules['file-type']);
 				}
 				catch (Exception $e) {
-					$error = self::getMessage($rules, 'file', $e->getMessage());
+					$error = self::getMessage($rules, 'max-size', $e->getMessage());
 
 					return false;
 				}
 			}
 
-			if ($rules['file']['type'] == 'image') {
+			if ($rules['file-type'] == 'image') {
 				try {
 					if (@imageCreateFromString($file_content) === false) {
 						throw new Exception(_('File format is unsupported.'));

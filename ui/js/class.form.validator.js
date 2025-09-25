@@ -1370,23 +1370,28 @@ class CFormValidator {
 			};
 		}
 
-		if ('required' in rules && value.size == 0) {
+		if ('not_empty' in rules && value.size == 0) {
 			return {
 				result: CFormValidator.ERROR,
-				error: this.#getMessage(rules, 'required', t('This field cannot be empty.'))
+				error: this.#getMessage(rules, 'not_empty', t('This field cannot be empty.'))
 			};
 		}
 
-		if (rules.file['max-size'] && value.size > rules.file['max-size']) {
+		if (rules['max-size'] && value.size > rules['max-size']) {
+			const error_msg = rules['file-type'] === 'image'
+				? t('Image size must be less than %1$s.')
+				: t('File size must be less than %1$s.');
+
 			return {
 				result: CFormValidator.ERROR,
-				error: this.#getMessage(rules, 'file',
-					sprintf(t('File size must be less than %1$s.'), rules.file['max-size-human-readable']))
+				error: this.#getMessage(rules, 'max-size',
+					sprintf(error_msg, rules['max-size-human-readable'])
+				)
 			};
 		}
 
-		if (rules.file.type !== 'file' && value.size > 0) {
-			if (!value.type.startsWith(`${rules.file['type']}/`)) {
+		if (rules['file-type'] !== 'file' && value.size > 0) {
+			if (!value.type.startsWith(`${rules['file-type']}/`)) {
 				return {
 					result: CFormValidator.ERROR,
 					error: this.#getMessage(rules, 'file-type', t('File format is unsupported.'))

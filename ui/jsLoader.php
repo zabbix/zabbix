@@ -440,6 +440,7 @@ $translate_strings = [
 		' or ' => _(' or '),
 		'%1$s: %2$s' => _('%1$s: %2$s'),
 		'This value is not a valid file.' => _('This value is not a valid file.'),
+		'Image size must be less than %1$s.' => _('Image size must be less than %1$s.'),
 		'File size must be less than %1$s.' => _('File size must be less than %1$s.'),
 		'File format is unsupported.' => _('File format is unsupported.')
 	],
