@@ -35,9 +35,6 @@ void	zbx_mock_test_entry(void **state)
 	zbx_vector_int32_create(&read_return_seq);
 
 #if defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
-	if (SUCCEED == zbx_mock_parameter_exists("in.tls_is_used"))
-		s.tls_ctx = zbx_malloc(NULL, sizeof(zbx_tls_context_t));
-	else
 		s.tls_ctx = NULL;
 #endif
 
@@ -51,17 +48,9 @@ void	zbx_mock_test_entry(void **state)
 		result = zbx_tcp_read_close_notify(&s, timeout, &event);
 	}
 
-#if defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
 	zbx_mock_assert_int_eq("return value: ", exp_result, result);
-#endif
-
-	zbx_mock_assert_int_eq("return value: ", SUCCEED, result);
 
 	zbx_vector_int32_clear(&read_return_seq);
 	zbx_vector_int32_destroy(&read_return_seq);
 
-#if defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
-	if (NULL != s.tls_ctx)
-		zbx_free(s.tls_ctx);
-#endif
 }

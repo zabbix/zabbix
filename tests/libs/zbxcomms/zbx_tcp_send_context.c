@@ -30,6 +30,11 @@ void	zbx_mock_test_entry(void **state)
 
 	ZBX_UNUSED(state);
 
+#if defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
+	s.tls_ctx = NULL;
+#endif
+
+	s.connection_type = ZBX_TCP_SEC_UNENCRYPTED;
 	context.compressed_data = NULL;
 	context.written = (ssize_t)zbx_mock_get_parameter_int("in.written");
 	context.written_header = (ssize_t)zbx_mock_get_parameter_int("in.written_header");

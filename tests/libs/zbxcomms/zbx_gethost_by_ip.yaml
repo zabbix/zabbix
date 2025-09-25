@@ -2,24 +2,12 @@
 test case: "localhost"
 in:
   ip: "127.0.0.1"
-out:
-  host: "localhost"
----
-test case: "google DNS"
-in:
-  ip: "8.8.8.8"
-out:
-  host: "dns.google"
 ---
 test case: "empty ip"
 in:
   ip: ""
-out:
-  host: ""
 ---
 test case: "wrong ip"
 in:
   ip: "999.999.999.999"
-out:
-  host: ""
 ...

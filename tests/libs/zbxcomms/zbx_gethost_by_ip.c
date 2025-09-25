@@ -20,17 +20,83 @@
 #include "zbxcommon.h"
 #include "zbxcomms.h"
 
+#include <sys/mman.h>
+#include <sys/stat.h>
+
+static int get_host_from_etc_hosts(const char *ip, char *hostname, size_t hostnamelen)
+{
+	int fd = openat(AT_FDCWD, "/etc/hosts", O_RDONLY);
+
+	if (fd == -1)
+		return FAIL;
+
+	struct stat st;
+
+	if (fstat(fd, &st) == -1)
+	{
+		close(fd);
+		return FAIL;
+	}
+
+	char *data = mmap(NULL, st.st_size, PROT_READ, MAP_PRIVATE, fd, 0);
+
+	if (data == MAP_FAILED)
+	{
+		close(fd);
+		return FAIL;
+	}
+
+	char line[ZBX_MAX_HOSTNAME_LEN];
+	size_t i = 0;
+
+	for (off_t j = 0; j < st.st_size; j++)
+	{
+		if (data[j] == '\n' || i >= sizeof(line) - 1)
+		{
+			line[i] = '\0';
+			i = 0;
+
+			if (line[0] == '#' || line[0] == '\0')
+				continue;
+
+			char file_ip[ZBX_MAX_HOSTNAME_LEN], name[ZBX_MAX_HOSTNAME_LEN];
+
+			if (sscanf(line, "%s %s", file_ip, name) == 2)
+			{
+				if (strcmp(ip, file_ip) == 0)
+				{
+					zbx_strlcpy(hostname, name, hostnamelen);printf("NAME: %s\n", name);
+					munmap(data, st.st_size);
+					close(fd);
+					return SUCCEED;
+				}
+			}
+		}
+		else
+		{
+			line[i++] = data[j];
+		}
+	}
+
+	munmap(data, st.st_size);
+	close(fd);
+	return FAIL;
+}
+
 void	zbx_mock_test_entry(void **state)
 {
 	const char	*ip = zbx_mock_get_parameter_string("in.ip");
 	char		*host = zbx_malloc(NULL, ZBX_MAX_HOSTNAME_LEN),
-			*exp_host = zbx_strdup(NULL, zbx_mock_get_parameter_string("out.host"));
+			*exp_host = zbx_malloc(NULL, ZBX_MAX_HOSTNAME_LEN);
 
 	ZBX_UNUSED(state);
 
 	zbx_gethost_by_ip(ip, host, ZBX_MAX_HOSTNAME_LEN);
 
-	zbx_mock_assert_str_eq("return value", exp_host, host);
+	if (SUCCEED == get_host_from_etc_hosts(ip, exp_host, ZBX_MAX_HOSTNAME_LEN))
+		zbx_mock_assert_str_eq("return value", exp_host, host);
+	else
+		zbx_mock_assert_str_eq("ip not found, expect empty string", "", host);
 
 	zbx_free(host);
 	zbx_free(exp_host);

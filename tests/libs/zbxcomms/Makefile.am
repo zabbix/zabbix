@@ -227,6 +227,7 @@ zbx_tcp_read_close_notify_CFLAGS = $(COMMS_COMPILER_FLAGS)
 
 zbx_tcp_send_context_SOURCES = \
 	zbx_tcp_send_context.c \
+	zbx_comms_common.c \
 	$(COMMON_SRC_FILES)
 
 zbx_tcp_send_context_LDADD = \
@@ -234,7 +235,9 @@ zbx_tcp_send_context_LDADD = \
 
 zbx_tcp_send_context_LDADD += @AGENT_LIBS@
 
-zbx_tcp_send_context_LDFLAGS = @AGENT_LDFLAGS@ $(CMOCKA_LDFLAGS) $(YAML_LDFLAGS)
+zbx_tcp_send_context_LDFLAGS = @AGENT_LDFLAGS@ $(CMOCKA_LDFLAGS) $(YAML_LDFLAGS) \
+	-Wl,--wrap=SSL_write \
+	-Wl,--wrap=write
 
 zbx_tcp_send_context_CFLAGS = $(COMMS_COMPILER_FLAGS)
 

@@ -67,9 +67,6 @@ int	__real_fstat(int __fildes, struct stat *__stat_buf);
 #ifdef HAVE_FXSTAT
 int	__real___fxstat(int __ver, int __fildes, struct stat *__stat_buf);
 #endif
-void	zbx_mock_set_fragments(const char *data, size_t size);
-void	set_test_comms(int status);
-
 
 static int	is_profiler_path(const char *path)
 {

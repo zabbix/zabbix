@@ -18,7 +18,7 @@ in:
 out:
   result: TIMEOUT_ERROR
 ---
-test case: "unencrypted | poll=no error "
+test case: "unencrypted | accept failed"
 in:
   tls_accept: 1 # ZBX_TCP_SEC_UNENCRYPTED
   poll_timeout: 10

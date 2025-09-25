@@ -21,32 +21,6 @@
 #include "zbxcomms.h"
 
 #include "zbx_comms_common.h"
-#include <openssl/ssl.h>
-
-
-ssize_t	__wrap_write(int fd, const void *buf, size_t n);
-
-int	__wrap_SSL_write(SSL *ssl, const void *buf, int num)
-{
-	ZBX_UNUSED(ssl);
-	ZBX_UNUSED(buf);
-
-	if (SUCCEED == zbx_mock_parameter_exists("in.ssl_write_error"))
-		return 0;
-	else
-		return num;
-}
-
-ssize_t	__wrap_write(int fd, const void *buf, size_t n)
-{
-	ZBX_UNUSED(fd);
-	ZBX_UNUSED(buf);
-
-	if (SUCCEED == zbx_mock_parameter_exists("in.write_error"))
-		return FAIL;
-	else
-		return (ssize_t)n;
-}
 
 void	zbx_mock_test_entry(void **state)
 {

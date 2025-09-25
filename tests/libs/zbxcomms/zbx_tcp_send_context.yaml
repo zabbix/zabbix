@@ -6,6 +6,7 @@ in:
   written: 0
   written_header: 0
   header_len: 0
+  ssl_write_error: yes
 out:
   result: "SUCCEED"
 ---
@@ -16,6 +17,7 @@ in:
   written: 3
   written_header: 0
   header_len: 0
+  ssl_write_error: yes
 out:
   result: "SUCCEED"
 ---
@@ -26,6 +28,7 @@ in:
   written: 0
   written_header: 0
   header_len: 5
+  ssl_write_error: yes
 out:
   result: "SUCCEED"
 ---
@@ -36,6 +39,7 @@ in:
   written: 0
   written_header: 0
   header_len: 0
+  ssl_write_error: yes
 out:
   result: "SUCCEED"
 ---
@@ -46,6 +50,7 @@ in:
   written: 0
   written_header: 0
   header_len: 5
+  ssl_write_error: yes
 out:
   result: "SUCCEED"
 ...
