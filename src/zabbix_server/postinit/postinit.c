@@ -168,10 +168,9 @@ static void	preprocess_trigger_name(zbx_db_trigger *trigger, int *historical)
 	event.trigger = *trigger;
 
 	zbx_dc_um_handle_t		*um_handle = zbx_dc_open_user_macros_masked();
-	const zbx_vector_uint64_t	*trigger_hosts = NULL;
 
 	zbx_substitute_macros_ext_search(ZBX_TOKEN_SEARCH_REFERENCES, &trigger->description, NULL, 0,
-					&zbx_macro_trigger_desc_resolv, um_handle, &event, NULL, &trigger_hosts);
+			&zbx_macro_trigger_desc_resolv, um_handle, &event, NULL);
 
 	zbx_dc_close_user_macros(um_handle);
 
@@ -317,10 +316,8 @@ static int	process_event_update(const zbx_db_trigger *trigger, char **sql, size_
 
 		name = zbx_strdup(NULL, trigger->description);
 
-		const zbx_vector_uint64_t	*trigger_hosts = NULL;
-
 		zbx_substitute_macros_ext_search(ZBX_TOKEN_SEARCH_REFERENCES, &name, NULL, 0,
-				&zbx_macro_trigger_desc_resolv, um_handle, &event, NULL, &trigger_hosts);
+				&zbx_macro_trigger_desc_resolv, um_handle, &event, NULL);
 
 		name_esc = zbx_db_dyn_escape_string_len(name, EVENT_NAME_LEN);
 

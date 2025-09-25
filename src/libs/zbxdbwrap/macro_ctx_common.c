@@ -545,8 +545,6 @@ int	zbx_macro_event_name_resolv(zbx_macro_resolv_data_t *p, va_list args, char *
 int	zbx_macro_trigger_desc_resolv(zbx_macro_resolv_data_t *p, va_list args, char **replace_to,
 		char **data, char *error, size_t maxerrlen)
 {
-	int	ret = SUCCEED;
-
 	/* Passed arguments */
 	const zbx_dc_um_handle_t	*um_handle = va_arg(args, const zbx_dc_um_handle_t *);
 	const zbx_db_event		*event = va_arg(args, const zbx_db_event *);
@@ -601,11 +599,9 @@ static void	resolve_opdata(const zbx_db_event *event, zbx_dc_um_handle_t *um_han
 	}
 	else
 	{
-		const zbx_vector_uint64_t	*trigger_hosts = NULL;
-
 		*replace_to = zbx_strdup(*replace_to, event->trigger.opdata);
 		zbx_substitute_macros_ext_search(ZBX_TOKEN_SEARCH_REFERENCES, replace_to, error, maxerrlen,
-				&zbx_macro_trigger_desc_resolv, um_handle, event, tz, &trigger_hosts);
+				&zbx_macro_trigger_desc_resolv, um_handle, event, tz);
 	}
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
@@ -1721,11 +1717,9 @@ int	zbx_macro_message_common_resolv(zbx_macro_resolv_data_t *p, zbx_dc_um_handle
 		}
 		else if (0 == strcmp(p->macro, MVAR_TRIGGER_NAME))
 		{
-			const zbx_vector_uint64_t	*trigger_hosts = NULL;
-
 			*replace_to = zbx_strdup(*replace_to, c_event->trigger.description);
 			zbx_substitute_macros_ext_search(ZBX_TOKEN_SEARCH_REFERENCES, replace_to, error, maxerrlen,
-					&zbx_macro_trigger_desc_resolv, um_handle, event, tz, &trigger_hosts);
+					&zbx_macro_trigger_desc_resolv, um_handle, event, tz);
 		}
 		else if (0 == strcmp(p->macro, MVAR_TRIGGER_NAME_ORIG))
 		{
@@ -2002,11 +1996,9 @@ int	zbx_macro_message_common_resolv(zbx_macro_resolv_data_t *p, zbx_dc_um_handle
 		}
 		else if (0 == strcmp(p->macro, MVAR_TRIGGER_NAME))
 		{
-			const zbx_vector_uint64_t	*trigger_hosts = NULL;
-
 			*replace_to = zbx_strdup(*replace_to, c_event->trigger.description);
 			zbx_substitute_macros_ext_search(ZBX_TOKEN_SEARCH_REFERENCES, replace_to, error, maxerrlen,
-					&zbx_macro_trigger_desc_resolv, um_handle, event, tz, &trigger_hosts);
+					&zbx_macro_trigger_desc_resolv, um_handle, event, tz);
 		}
 		else if (0 == strcmp(p->macro, MVAR_TRIGGER_NAME_ORIG))
 		{

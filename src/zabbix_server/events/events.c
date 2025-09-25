@@ -440,13 +440,12 @@ zbx_db_event	*zbx_add_event(unsigned char source, unsigned char object, zbx_uint
 				um_handle, event, NULL);
 
 		zbx_token_search_t		search_token = ZBX_TOKEN_SEARCH_REFERENCES;
-		const zbx_vector_uint64_t	*trigger_hosts = NULL;
 
 		if (EVENT_SOURCE_TRIGGERS == event->source)
 			search_token |= ZBX_TOKEN_SEARCH_EXPRESSION_MACRO;
 
 		zbx_substitute_macros_ext_search(search_token, &event->name, err, sizeof(err),
-				&zbx_macro_event_name_resolv, um_handle, event, NULL, &trigger_hosts);
+				&zbx_macro_event_name_resolv, um_handle, event, NULL);
 
 		zbx_vector_tags_ptr_create(&event->tags);
 
