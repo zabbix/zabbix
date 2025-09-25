@@ -979,17 +979,17 @@ class CFormValidator {
 	 * @returns {Object}
 	 */
 	#validateInt32(rules, value) {
-		if (!this.#isTypeInt32(value)) {
-			return {
-				result: CFormValidator.ERROR,
-				error: this.#getMessage(rules, 'type', t('This value is not a valid integer.'))
-			};
-		}
-
 		if (('not_empty' in rules) && value === '') {
 			return {
 				result: CFormValidator.ERROR,
 				error: this.#getMessage(rules, 'not_empty', t('This field cannot be empty.'))
+			};
+		}
+
+		if (!this.#isTypeInt32(value)) {
+			return {
+				result: CFormValidator.ERROR,
+				error: this.#getMessage(rules, 'type', t('This value is not a valid integer.'))
 			};
 		}
 

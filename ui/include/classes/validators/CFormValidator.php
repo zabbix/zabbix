@@ -862,14 +862,14 @@ class CFormValidator {
 	 * @return bool
 	 */
 	private static function validateInt32(array $rules, &$value, ?string &$error = null): bool {
-		if (!self::isInt32($value)) {
-			$error = self::getMessage($rules, 'type', _('This value is not a valid integer.'));
+		if (array_key_exists('not_empty', $rules) && ($value === '' || $value === null)) {
+			$error = self::getMessage($rules, 'not_empty', _('This field cannot be empty.'));
 
 			return false;
 		}
 
-		if (array_key_exists('not_empty', $rules) && $value == 0) {
-			$error = self::getMessage($rules, 'not_empty', _('This field cannot be empty.'));
+		if (!self::isInt32($value)) {
+			$error = self::getMessage($rules, 'type', _('This value is not a valid integer.'));
 
 			return false;
 		}
