@@ -235,6 +235,9 @@ zabbix_export:
             - type: MULTIPLIER
               parameters:
                 - '1000'
+            - type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 1h
           tags:
             - tag: component
               value: memory
@@ -385,6 +388,14 @@ zabbix_export:
           description: |
             MIB: STORMSHIELD-POLICY-MIB
             Active filtering policy name.
+          preprocessing:
+            - type: NOT_MATCHES_REGEX
+              parameters:
+                - ^$
+              error_handler: DISCARD_VALUE
+            - type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 6h
           tags:
             - tag: component
               value: policy
@@ -398,6 +409,14 @@ zabbix_export:
           description: |
             MIB: STORMSHIELD-POLICY-MIB
             Active IPsec policy name.
+          preprocessing:
+            - type: NOT_MATCHES_REGEX
+              parameters:
+                - ^$
+              error_handler: DISCARD_VALUE
+            - type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 6h
           tags:
             - tag: component
               value: policy
@@ -411,6 +430,10 @@ zabbix_export:
           description: |
             MIB: STORMSHIELD-PROPERTY-MIB
             Firewall model.
+          preprocessing:
+            - type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 6h
           tags:
             - tag: component
               value: hardware
@@ -424,6 +447,10 @@ zabbix_export:
           description: |
             MIB: STORMSHIELD-PROPERTY-MIB
             Stormshield Firewall system name.
+          preprocessing:
+            - type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 6h
           tags:
             - tag: component
               value: hardware
@@ -449,6 +476,10 @@ zabbix_export:
           description: |
             MIB: STORMSHIELD-PROPERTY-MIB
             Stormshield Firewall system node name.
+          preprocessing:
+            - type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 6h
           tags:
             - tag: component
               value: hardware
@@ -462,6 +493,10 @@ zabbix_export:
           description: |
             MIB: STORMSHIELD-PROPERTY-MIB
             Stormshield Firewall serial number.
+          preprocessing:
+            - type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 6h
           tags:
             - tag: component
               value: hardware
@@ -485,6 +520,10 @@ zabbix_export:
           description: |
             MIB: STORMSHIELD-PROPERTY-MIB
             Stormshield Firewall version.
+          preprocessing:
+            - type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 6h
           tags:
             - tag: component
               value: hardware
@@ -644,28 +683,16 @@ zabbix_export:
           tags:
             - tag: component
               value: system
-        - uuid: b30b4b9ac98249e7887b9bd39e2c458f
+        - uuid: e48ced68e7584aeaacde9995d8d0c634
           name: Uptime
           type: SNMP_AGENT
           snmp_oid: 'get[1.3.6.1.4.1.11256.1.10.2.0]'
           key: 'system.hardware.uptime[snsUptime.0]'
-          value_type: CHAR
-          trends: '0'
-          description: |
-            MIB: STORMSHIELD-SYSTEM-MONITOR-MIB
-            Stormshield Firewall uptime in day:hour:min:sec.
-          tags:
-            - tag: component
-              value: hardware
-        - uuid: e48ced68e7584aeaacde9995d8d0c634
-          name: 'Uptime in seconds'
-          type: SNMP_AGENT
-          snmp_oid: 'get[1.3.6.1.4.1.11256.1.10.2.0]'
-          key: 'system.hardware.uptime_sec[snsUptime.0]'
           value_type: FLOAT
+          units: uptime
           description: |
             MIB: STORMSHIELD-SYSTEM-MONITOR-MIB
-            Stormshield Firewall uptime in seconds.
+            Stormshield Firewall uptime.
           preprocessing:
             - type: JAVASCRIPT
               parameters:
@@ -689,7 +716,7 @@ zabbix_export:
               value: hardware
           triggers:
             - uuid: baf8de16b11b4f408c7a34869ebf53b8
-              expression: 'last(/Stormshield SNS by SNMP/system.hardware.uptime_sec[snsUptime.0])<10m'
+              expression: 'last(/Stormshield SNS by SNMP/system.hardware.uptime[snsUptime.0])<10m'
               name: 'SNS: Device has been restarted'
               event_name: 'SNS: {HOST.NAME} has been restarted (uptime < 10m)'
               priority: INFO
@@ -1100,6 +1127,9 @@ zabbix_export:
                   parameters:
                     - '1.3.6.1.4.1.11256.1.10.5.1.2.{#SNMPINDEX}'
                     - '0'
+                - type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 6h
               master_item:
                 key: sns.disk.walk
               tags:
@@ -1121,6 +1151,9 @@ zabbix_export:
                   parameters:
                     - '1.3.6.1.4.1.11256.1.10.5.1.4.{#SNMPINDEX}'
                     - '0'
+                - type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 1h
               master_item:
                 key: sns.disk.walk
               tags:
@@ -1218,6 +1251,9 @@ zabbix_export:
                   parameters:
                     - '1.3.6.1.4.1.11256.1.10.9.1.2.{#SNMPINDEX}'
                     - '0'
+                - type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 6h
               master_item:
                 key: sns.fan.walk
               tags:
@@ -1266,6 +1302,9 @@ zabbix_export:
                       };
                       
                       return typeof idx[value.toLowerCase()] === 'undefined' ? 0 : idx[value.toLowerCase()];
+                - type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 1h
               master_item:
                 key: sns.fan.walk
               tags:
@@ -1351,6 +1390,9 @@ zabbix_export:
                   parameters:
                     - '1.3.6.1.4.1.11256.1.11.7.1.4.{#SNMPINDEX}'
                     - '0'
+                - type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 6h
               master_item:
                 key: sns.ha.members.walk
               tags:
@@ -1427,6 +1469,9 @@ zabbix_export:
                   parameters:
                     - '1.3.6.1.4.1.11256.1.11.7.1.2.{#SNMPINDEX}'
                     - '0'
+                - type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 6h
               master_item:
                 key: sns.ha.members.walk
               tags:
@@ -1452,6 +1497,9 @@ zabbix_export:
                   parameters:
                     - '1.3.6.1.4.1.11256.1.11.7.1.9.{#SNMPINDEX}'
                     - '0'
+                - type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 1h
               master_item:
                 key: sns.ha.members.walk
               tags:
@@ -2223,6 +2271,9 @@ zabbix_export:
                   parameters:
                     - '1.3.6.1.4.1.11256.1.4.1.1.3.{#SNMPINDEX}'
                     - '0'
+                - type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 6h
               master_item:
                 key: sns.net.if.walk
               tags:
@@ -2618,6 +2669,9 @@ zabbix_export:
                   parameters:
                     - '1.3.6.1.4.1.11256.1.9.1.1.4.{#SNMPINDEX}'
                     - '0'
+                - type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 6h
               master_item:
                 key: sns.update.auto.walk
               tags:
@@ -2652,6 +2706,9 @@ zabbix_export:
                       };
                       
                       return typeof idx[value.toLowerCase()] === 'undefined' ? 0 : idx[value.toLowerCase()];
+                - type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 6h
               master_item:
                 key: sns.update.auto.walk
               tags:
@@ -2998,6 +3055,9 @@ zabbix_export:
                   width: '12'
                   hide_header: 'YES'
                   fields:
+                    - type: INTEGER
+                      name: decimal_places
+                      value: '0'
                     - type: STRING
                       name: description
                       value: Uptime
@@ -3013,8 +3073,8 @@ zabbix_export:
                       name: show.1
                       value: '1'
                     - type: INTEGER
-                      name: units_show
-                      value: '0'
+                      name: units_size
+                      value: '25'
                     - type: INTEGER
                       name: value_size
                       value: '25'

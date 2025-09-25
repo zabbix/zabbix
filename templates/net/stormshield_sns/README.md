@@ -73,20 +73,19 @@ Refer to the vendor documentation.
 |Buffer memory|<p>MIB: UCD-SNMP-MIB</p><p>Buffer memory in bytes.</p>|SNMP agent|host.memory.buffer[memBuffer.0]<p>**Preprocessing**</p><ul><li><p>Custom multiplier: `1000`</p></li></ul>|
 |Cached memory|<p>MIB: UCD-SNMP-MIB</p><p>Cached memory in bytes.</p>|SNMP agent|host.memory.cached[memCached.0]<p>**Preprocessing**</p><ul><li><p>Custom multiplier: `1000`</p></li></ul>|
 |Free memory|<p>MIB: UCD-SNMP-MIB</p><p>Free memory in bytes.</p>|SNMP agent|host.memory.free[memAvailReal.0]<p>**Preprocessing**</p><ul><li><p>Custom multiplier: `1000`</p></li></ul>|
-|Total memory|<p>MIB: UCD-SNMP-MIB</p><p>Total physical memory (RAM) installed in bytes.</p>|SNMP agent|host.memory.total[memTotalReal.0]<p>**Preprocessing**</p><ul><li><p>Custom multiplier: `1000`</p></li></ul>|
+|Total memory|<p>MIB: UCD-SNMP-MIB</p><p>Total physical memory (RAM) installed in bytes.</p>|SNMP agent|host.memory.total[memTotalReal.0]<p>**Preprocessing**</p><ul><li><p>Custom multiplier: `1000`</p></li><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
 |Available memory|<p>Available memory in bytes</p><p>(Available = Free + Cached + Buffer).</p>|Calculated|host.memory.available|
 |Used memory|<p>Used memory in bytes.</p>|Calculated|host.memory.used|
 |Memory utilization|<p>Memory utilization in %.</p>|Calculated|host.memory.utilization|
-|Active IPsec policy name|<p>MIB: STORMSHIELD-POLICY-MIB</p><p>Active IPsec policy name.</p>|SNMP agent|policy.ipsec[snsPolicySlotNameIPsec]|
-|Active filtering policy name|<p>MIB: STORMSHIELD-POLICY-MIB</p><p>Active filtering policy name.</p>|SNMP agent|policy.filter[snsPolicySlotName]|
-|Model|<p>MIB: STORMSHIELD-PROPERTY-MIB</p><p>Firewall model.</p>|SNMP agent|property.hardware.model[snsModel.0]|
-|System name|<p>MIB: STORMSHIELD-PROPERTY-MIB</p><p>Stormshield Firewall system name.</p>|SNMP agent|property.hardware.name[snsSystemName.0]|
-|System node name|<p>MIB: STORMSHIELD-PROPERTY-MIB</p><p>Stormshield Firewall system node name.</p>|SNMP agent|property.hardware.node_name[snsSystemNodeName.0]|
-|Serial number|<p>MIB: STORMSHIELD-PROPERTY-MIB</p><p>Stormshield Firewall serial number.</p>|SNMP agent|property.hardware.serial[snsSerialNumber.0]|
-|Version|<p>MIB: STORMSHIELD-PROPERTY-MIB</p><p>Stormshield Firewall version.</p>|SNMP agent|property.hardware.version[snsVersion.0]|
+|Active IPsec policy name|<p>MIB: STORMSHIELD-POLICY-MIB</p><p>Active IPsec policy name.</p>|SNMP agent|policy.ipsec[snsPolicySlotNameIPsec]<p>**Preprocessing**</p><ul><li><p>Does not match regular expression: `^$`</p><p>⛔️Custom on fail: Discard value</p></li><li><p>Discard unchanged with heartbeat: `6h`</p></li></ul>|
+|Active filtering policy name|<p>MIB: STORMSHIELD-POLICY-MIB</p><p>Active filtering policy name.</p>|SNMP agent|policy.filter[snsPolicySlotName]<p>**Preprocessing**</p><ul><li><p>Does not match regular expression: `^$`</p><p>⛔️Custom on fail: Discard value</p></li><li><p>Discard unchanged with heartbeat: `6h`</p></li></ul>|
+|Model|<p>MIB: STORMSHIELD-PROPERTY-MIB</p><p>Firewall model.</p>|SNMP agent|property.hardware.model[snsModel.0]<p>**Preprocessing**</p><ul><li><p>Discard unchanged with heartbeat: `6h`</p></li></ul>|
+|System name|<p>MIB: STORMSHIELD-PROPERTY-MIB</p><p>Stormshield Firewall system name.</p>|SNMP agent|property.hardware.name[snsSystemName.0]<p>**Preprocessing**</p><ul><li><p>Discard unchanged with heartbeat: `6h`</p></li></ul>|
+|System node name|<p>MIB: STORMSHIELD-PROPERTY-MIB</p><p>Stormshield Firewall system node name.</p>|SNMP agent|property.hardware.node_name[snsSystemNodeName.0]<p>**Preprocessing**</p><ul><li><p>Discard unchanged with heartbeat: `6h`</p></li></ul>|
+|Serial number|<p>MIB: STORMSHIELD-PROPERTY-MIB</p><p>Stormshield Firewall serial number.</p>|SNMP agent|property.hardware.serial[snsSerialNumber.0]<p>**Preprocessing**</p><ul><li><p>Discard unchanged with heartbeat: `6h`</p></li></ul>|
+|Version|<p>MIB: STORMSHIELD-PROPERTY-MIB</p><p>Stormshield Firewall version.</p>|SNMP agent|property.hardware.version[snsVersion.0]<p>**Preprocessing**</p><ul><li><p>Discard unchanged with heartbeat: `6h`</p></li></ul>|
 |Date|<p>MIB: STORMSHIELD-SYSTEM-MONITOR-MIB</p><p>Stormshield Firewall current date (%Y-%m-%d %T).</p>|SNMP agent|system.date[snsDate.0]|
-|Uptime|<p>MIB: STORMSHIELD-SYSTEM-MONITOR-MIB</p><p>Stormshield Firewall uptime in day:hour:min:sec.</p>|SNMP agent|system.hardware.uptime[snsUptime.0]|
-|Uptime in seconds|<p>MIB: STORMSHIELD-SYSTEM-MONITOR-MIB</p><p>Stormshield Firewall uptime in seconds.</p>|SNMP agent|system.hardware.uptime_sec[snsUptime.0]<p>**Preprocessing**</p><ul><li><p>JavaScript: `The text is too long. Please see the template.`</p></li></ul>|
+|Uptime|<p>MIB: STORMSHIELD-SYSTEM-MONITOR-MIB</p><p>Stormshield Firewall uptime.</p>|SNMP agent|system.hardware.uptime[snsUptime.0]<p>**Preprocessing**</p><ul><li><p>JavaScript: `The text is too long. Please see the template.`</p></li></ul>|
 |SNMP agent availability|<p>Availability of SNMP checks on the host. The value of this item corresponds to availability icons in the host list.</p><p>Possible values:</p><p>0 - not available</p><p>1 - available</p><p>2 - unknown.</p>|Zabbix internal|zabbix[host,snmp,available]|
 |SNMP traps (fallback)|<p>Used for collecting all SNMP traps unmatched by other `snmptrap` items.</p>|SNMP trap|snmptrap.fallback|
 |ICMP ping|<p>Host accessibility by ICMP.</p><p>0 - ICMP ping failed.</p><p>1 - ICMP ping successful.</p>|Simple check|icmpping|
@@ -111,7 +110,7 @@ Refer to the vendor documentation.
 |SNS: High memory utilization|<p>The system is running out of free memory.</p>|`min(/Stormshield SNS by SNMP/host.memory.utilization,5m)>{$SNS.MEMORY.UTIL.MAX}`|Average||
 |SNS: System name has changed|<p>The name of the system has changed. Acknowledge to close the problem manually.</p>|`last(/Stormshield SNS by SNMP/property.hardware.name[snsSystemName.0],#1)<>last(/Stormshield SNS by SNMP/property.hardware.name[snsSystemName.0],#2) and length(last(/Stormshield SNS by SNMP/property.hardware.name[snsSystemName.0]))>0`|Info||
 |SNS: Device has been replaced|<p>Device serial number has changed. Acknowledge to close the problem manually.</p>|`last(/Stormshield SNS by SNMP/property.hardware.serial[snsSerialNumber.0],#1)<>last(/Stormshield SNS by SNMP/property.hardware.serial[snsSerialNumber.0],#2) and length(last(/Stormshield SNS by SNMP/property.hardware.serial[snsSerialNumber.0]))>0`|Info||
-|SNS: Device has been restarted|<p>Uptime is less than 10 minutes.</p>|`last(/Stormshield SNS by SNMP/system.hardware.uptime_sec[snsUptime.0])<10m`|Info||
+|SNS: Device has been restarted|<p>Uptime is less than 10 minutes.</p>|`last(/Stormshield SNS by SNMP/system.hardware.uptime[snsUptime.0])<10m`|Info||
 |SNS: No SNMP data collection|<p>SNMP is not available for polling. Please check device connectivity and SNMP settings.</p>|`max(/Stormshield SNS by SNMP/zabbix[host,snmp,available],{$SNS.SNMP.TIMEOUT})=0`|Warning|**Depends on**:<br><ul><li>SNS: Unavailable by ICMP ping</li></ul>|
 |SNS: Unavailable by ICMP ping|<p>Last three attempts returned timeout. Please check device connectivity.</p>|`max(/Stormshield SNS by SNMP/icmpping,#3)=0`|High||
 |SNS: High ICMP ping loss|<p>ICMP ping loss detected.</p>|`min(/Stormshield SNS by SNMP/icmppingloss,5m)>{$SNS.ICMP.LOSS.WARN} and min(/Stormshield SNS by SNMP/icmppingloss,5m)<100`|Warning|**Depends on**:<br><ul><li>SNS: Unavailable by ICMP ping</li></ul>|
@@ -127,8 +126,8 @@ Refer to the vendor documentation.
 
 |Name|Description|Type|Key and additional info|
 |----|-----------|----|-----------------------|
-|Auto-update [{#UPDATE_NAME}]: Last update date|<p>MIB: STORMSHIELD-AUTOUPDATE-MIB</p><p>Date of the last update of a subsystem.</p>|Dependent item|system.update.last[snsAutoupdateLast.{#SNMPINDEX}]<p>**Preprocessing**</p><ul><li><p>SNMP walk value: `1.3.6.1.4.1.11256.1.9.1.1.4.{#SNMPINDEX}`</p></li></ul>|
-|Auto-update [{#UPDATE_NAME}]: Update state|<p>MIB: STORMSHIELD-AUTOUPDATE-MIB</p><p>State of the update of a subsystem.</p>|Dependent item|system.update.state[snsAutoupdateState.{#SNMPINDEX}]<p>**Preprocessing**</p><ul><li><p>SNMP walk value: `1.3.6.1.4.1.11256.1.9.1.1.3.{#SNMPINDEX}`</p></li><li><p>JavaScript: `The text is too long. Please see the template.`</p></li></ul>|
+|Auto-update [{#UPDATE_NAME}]: Last update date|<p>MIB: STORMSHIELD-AUTOUPDATE-MIB</p><p>Date of the last update of a subsystem.</p>|Dependent item|system.update.last[snsAutoupdateLast.{#SNMPINDEX}]<p>**Preprocessing**</p><ul><li><p>SNMP walk value: `1.3.6.1.4.1.11256.1.9.1.1.4.{#SNMPINDEX}`</p></li><li><p>Discard unchanged with heartbeat: `6h`</p></li></ul>|
+|Auto-update [{#UPDATE_NAME}]: Update state|<p>MIB: STORMSHIELD-AUTOUPDATE-MIB</p><p>State of the update of a subsystem.</p>|Dependent item|system.update.state[snsAutoupdateState.{#SNMPINDEX}]<p>**Preprocessing**</p><ul><li><p>SNMP walk value: `1.3.6.1.4.1.11256.1.9.1.1.3.{#SNMPINDEX}`</p></li><li><p>JavaScript: `The text is too long. Please see the template.`</p></li><li><p>Discard unchanged with heartbeat: `6h`</p></li></ul>|
 
 ### Trigger prototypes for Auto-update discovery
 
@@ -177,8 +176,8 @@ Refer to the vendor documentation.
 
 |Name|Description|Type|Key and additional info|
 |----|-----------|----|-----------------------|
-|Disk [{#DISK_ID}]: Disk name|<p>MIB: STORMSHIELD-SYSTEM-MONITOR-MIB</p><p>Name of the disk.</p>|Dependent item|system.disk.name[snsDiskEntryDiskName.{#SNMPINDEX}]<p>**Preprocessing**</p><ul><li><p>SNMP walk value: `1.3.6.1.4.1.11256.1.10.5.1.2.{#SNMPINDEX}`</p></li></ul>|
-|Disk [{#DISK_ID}]: Member of a RAID array|<p>MIB: STORMSHIELD-SYSTEM-MONITOR-MIB</p><p>Metric that shows if the disk a member of a RAID array.</p>|Dependent item|system.disk.RAID[snsDiskEntryIsRaid.{#SNMPINDEX}]<p>**Preprocessing**</p><ul><li><p>SNMP walk value: `1.3.6.1.4.1.11256.1.10.5.1.4.{#SNMPINDEX}`</p></li></ul>|
+|Disk [{#DISK_ID}]: Disk name|<p>MIB: STORMSHIELD-SYSTEM-MONITOR-MIB</p><p>Name of the disk.</p>|Dependent item|system.disk.name[snsDiskEntryDiskName.{#SNMPINDEX}]<p>**Preprocessing**</p><ul><li><p>SNMP walk value: `1.3.6.1.4.1.11256.1.10.5.1.2.{#SNMPINDEX}`</p></li><li><p>Discard unchanged with heartbeat: `6h`</p></li></ul>|
+|Disk [{#DISK_ID}]: Member of a RAID array|<p>MIB: STORMSHIELD-SYSTEM-MONITOR-MIB</p><p>Metric that shows if the disk a member of a RAID array.</p>|Dependent item|system.disk.RAID[snsDiskEntryIsRaid.{#SNMPINDEX}]<p>**Preprocessing**</p><ul><li><p>SNMP walk value: `1.3.6.1.4.1.11256.1.10.5.1.4.{#SNMPINDEX}`</p></li><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
 |Disk [{#DISK_ID}]: RAID status|<p>MIB: STORMSHIELD-SYSTEM-MONITOR-MIB</p><p>RAID status.</p>|Dependent item|system.disk.status[snsDiskEntryRaidStatus.{#SNMPINDEX}]<p>**Preprocessing**</p><ul><li><p>SNMP walk value: `1.3.6.1.4.1.11256.1.10.5.1.5.{#SNMPINDEX}`</p></li><li><p>JavaScript: `The text is too long. Please see the template.`</p></li></ul>|
 |Disk [{#DISK_ID}]: SMART info test result|<p>MIB: STORMSHIELD-SYSTEM-MONITOR-MIB</p><p>Result of the smart info tests.</p>|Dependent item|system.disk.result[snsDiskEntrySmartResult.{#SNMPINDEX}]<p>**Preprocessing**</p><ul><li><p>SNMP walk value: `1.3.6.1.4.1.11256.1.10.5.1.3.{#SNMPINDEX}`</p></li><li><p>JavaScript: `The text is too long. Please see the template.`</p></li></ul>|
 
@@ -192,8 +191,8 @@ Refer to the vendor documentation.
 
 |Name|Description|Type|Key and additional info|
 |----|-----------|----|-----------------------|
-|Fan [{#FAN_ID}]: Fan name|<p>MIB: STORMSHIELD-SYSTEM-MONITOR-MIB</p><p>Name of the fan.</p>|Dependent item|system.fan.name[snsFanName.{#SNMPINDEX}]<p>**Preprocessing**</p><ul><li><p>SNMP walk value: `1.3.6.1.4.1.11256.1.10.9.1.2.{#SNMPINDEX}`</p></li></ul>|
-|Fan [{#FAN_ID}]: Fan status|<p>MIB: STORMSHIELD-SYSTEM-MONITOR-MIB</p><p>Status of the Fan.</p>|Dependent item|system.fan.status[snsFanStatus.{#SNMPINDEX}]<p>**Preprocessing**</p><ul><li><p>SNMP walk value: `1.3.6.1.4.1.11256.1.10.9.1.3.{#SNMPINDEX}`</p></li><li><p>JavaScript: `The text is too long. Please see the template.`</p></li></ul>|
+|Fan [{#FAN_ID}]: Fan name|<p>MIB: STORMSHIELD-SYSTEM-MONITOR-MIB</p><p>Name of the fan.</p>|Dependent item|system.fan.name[snsFanName.{#SNMPINDEX}]<p>**Preprocessing**</p><ul><li><p>SNMP walk value: `1.3.6.1.4.1.11256.1.10.9.1.2.{#SNMPINDEX}`</p></li><li><p>Discard unchanged with heartbeat: `6h`</p></li></ul>|
+|Fan [{#FAN_ID}]: Fan status|<p>MIB: STORMSHIELD-SYSTEM-MONITOR-MIB</p><p>Status of the Fan.</p>|Dependent item|system.fan.status[snsFanStatus.{#SNMPINDEX}]<p>**Preprocessing**</p><ul><li><p>SNMP walk value: `1.3.6.1.4.1.11256.1.10.9.1.3.{#SNMPINDEX}`</p></li><li><p>JavaScript: `The text is too long. Please see the template.`</p></li><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
 |Fan [{#FAN_ID}]: Fan speed|<p>MIB: STORMSHIELD-SYSTEM-MONITOR-MIB</p><p>Speed of the Fan.</p>|Dependent item|system.fan.speed[snsFanRpm.{#SNMPINDEX}]<p>**Preprocessing**</p><ul><li><p>SNMP walk value: `1.3.6.1.4.1.11256.1.10.9.1.4.{#SNMPINDEX}`</p></li></ul>|
 
 ### LLD rule HA members discovery
@@ -208,12 +207,12 @@ Refer to the vendor documentation.
 |----|-----------|----|-----------------------|
 |HA members [{#HA_ID}]: Firewall active/passive|<p>MIB: STORMSHIELD-HA-MIB</p><p>Metric that shows if the firewall is active.</p>|Dependent item|ha.active[snsHAActive.{#SNMPINDEX}]<p>**Preprocessing**</p><ul><li><p>SNMP walk value: `1.3.6.1.4.1.11256.1.11.7.1.10.{#SNMPINDEX}`</p></li></ul>|
 |HA members [{#HA_ID}]: HA licence|<p>MIB: STORMSHIELD-HA-MIB</p><p>HA licence.</p>|Dependent item|ha.license[snsHALicence.{#SNMPINDEX}]<p>**Preprocessing**</p><ul><li><p>SNMP walk value: `1.3.6.1.4.1.11256.1.11.7.1.6.{#SNMPINDEX}`</p></li><li><p>JavaScript: `The text is too long. Please see the template.`</p></li></ul>|
-|HA members [{#HA_ID}]: Firewall model|<p>MIB: STORMSHIELD-HA-MIB</p><p>Firewall model.</p>|Dependent item|ha.model[snsModel.{#SNMPINDEX}]<p>**Preprocessing**</p><ul><li><p>SNMP walk value: `1.3.6.1.4.1.11256.1.11.7.1.4.{#SNMPINDEX}`</p></li></ul>|
+|HA members [{#HA_ID}]: Firewall model|<p>MIB: STORMSHIELD-HA-MIB</p><p>Firewall model.</p>|Dependent item|ha.model[snsModel.{#SNMPINDEX}]<p>**Preprocessing**</p><ul><li><p>SNMP walk value: `1.3.6.1.4.1.11256.1.11.7.1.4.{#SNMPINDEX}`</p></li><li><p>Discard unchanged with heartbeat: `6h`</p></li></ul>|
 |HA members [{#HA_ID}]: Is online|<p>MIB: STORMSHIELD-HA-MIB</p><p>Firewall is online.</p>|Dependent item|ha.online[snsOnline.{#SNMPINDEX}]<p>**Preprocessing**</p><ul><li><p>SNMP walk value: `1.3.6.1.4.1.11256.1.11.7.1.3.{#SNMPINDEX}`</p></li></ul>|
 |HA members [{#HA_ID}]: HA priority|<p>MIB: STORMSHIELD-HA-MIB</p><p>HA priority.</p>|Dependent item|ha.priority[snsHAPriority.{#SNMPINDEX}]<p>**Preprocessing**</p><ul><li><p>SNMP walk value: `1.3.6.1.4.1.11256.1.11.7.1.8.{#SNMPINDEX}`</p></li></ul>|
 |HA members [{#HA_ID}]: HA quality|<p>MIB: STORMSHIELD-HA-MIB</p><p>HA quality.</p>|Dependent item|ha.quality[snsHAQuality.{#SNMPINDEX}]<p>**Preprocessing**</p><ul><li><p>SNMP walk value: `1.3.6.1.4.1.11256.1.11.7.1.7.{#SNMPINDEX}`</p></li></ul>|
-|HA members [{#HA_ID}]: Firewall serial|<p>MIB: STORMSHIELD-HA-MIB</p><p>Firewall serial.</p>|Dependent item|ha.serial[snsFwSerial.{#SNMPINDEX}]<p>**Preprocessing**</p><ul><li><p>SNMP walk value: `1.3.6.1.4.1.11256.1.11.7.1.2.{#SNMPINDEX}`</p></li></ul>|
-|HA members [{#HA_ID}]: Firewall status|<p>MIB: STORMSHIELD-HA-MIB</p><p>HA status forced:</p><p>  -2: Unknown forced status,</p><p>  -1: No peer found,</p><p>  0: No forced status,</p><p>  1: Forced active,</p><p>  2: Forced passive.</p>|Dependent item|ha.status[snsHAStatusForced.{#SNMPINDEX}]<p>**Preprocessing**</p><ul><li><p>SNMP walk value: `1.3.6.1.4.1.11256.1.11.7.1.9.{#SNMPINDEX}`</p></li></ul>|
+|HA members [{#HA_ID}]: Firewall serial|<p>MIB: STORMSHIELD-HA-MIB</p><p>Firewall serial.</p>|Dependent item|ha.serial[snsFwSerial.{#SNMPINDEX}]<p>**Preprocessing**</p><ul><li><p>SNMP walk value: `1.3.6.1.4.1.11256.1.11.7.1.2.{#SNMPINDEX}`</p></li><li><p>Discard unchanged with heartbeat: `6h`</p></li></ul>|
+|HA members [{#HA_ID}]: Firewall status|<p>MIB: STORMSHIELD-HA-MIB</p><p>HA status forced:</p><p>  -2: Unknown forced status,</p><p>  -1: No peer found,</p><p>  0: No forced status,</p><p>  1: Forced active,</p><p>  2: Forced passive.</p>|Dependent item|ha.status[snsHAStatusForced.{#SNMPINDEX}]<p>**Preprocessing**</p><ul><li><p>SNMP walk value: `1.3.6.1.4.1.11256.1.11.7.1.9.{#SNMPINDEX}`</p></li><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
 |HA members [{#HA_ID}]: Firewall uptime|<p>MIB: STORMSHIELD-HA-MIB</p><p>Firewall uptime.</p>|Dependent item|ha.uptime[snsHAUptime.{#SNMPINDEX}]<p>**Preprocessing**</p><ul><li><p>SNMP walk value: `1.3.6.1.4.1.11256.1.11.7.1.11.{#SNMPINDEX}`</p></li></ul>|
 
 ### LLD rule Health status discovery
@@ -261,7 +260,7 @@ Refer to the vendor documentation.
 
 |Name|Description|Type|Key and additional info|
 |----|-----------|----|-----------------------|
-|Interface [{#IF_NAME}]: System interface name|<p>MIB: STORMSHIELD-IF-MIB</p><p>System interface name.</p>|Dependent item|net.if.name[snsifName.{#SNMPINDEX}]<p>**Preprocessing**</p><ul><li><p>SNMP walk value: `1.3.6.1.4.1.11256.1.4.1.1.3.{#SNMPINDEX}`</p></li></ul>|
+|Interface [{#IF_NAME}]: System interface name|<p>MIB: STORMSHIELD-IF-MIB</p><p>System interface name.</p>|Dependent item|net.if.name[snsifName.{#SNMPINDEX}]<p>**Preprocessing**</p><ul><li><p>SNMP walk value: `1.3.6.1.4.1.11256.1.4.1.1.3.{#SNMPINDEX}`</p></li><li><p>Discard unchanged with heartbeat: `6h`</p></li></ul>|
 |Interface [{#IF_NAME}]: Interface protected|<p>MIB: STORMSHIELD-IF-MIB</p><p>Metric that shows if the interface is protected.</p>|Dependent item|net.if.protected[snsifProtected.{#SNMPINDEX}]<p>**Preprocessing**</p><ul><li><p>SNMP walk value: `1.3.6.1.4.1.11256.1.4.1.1.37.{#SNMPINDEX}`</p></li></ul>|
 |Interface [{#IF_NAME}]: Accepted packets|<p>MIB: STORMSHIELD-IF-MIB</p><p>Number of accepted packets.</p>|Dependent item|net.if.accepted[snsifPktAccepted.{#SNMPINDEX}]<p>**Preprocessing**</p><ul><li><p>SNMP walk value: `1.3.6.1.4.1.11256.1.4.1.1.11.{#SNMPINDEX}`</p></li></ul>|
 |Interface [{#IF_NAME}]: Blocked packets|<p>MIB: STORMSHIELD-IF-MIB</p><p>Number of packets that have been blocked.</p>|Dependent item|net.if.blocked[snsifPktBlocked.{#SNMPINDEX}]<p>**Preprocessing**</p><ul><li><p>SNMP walk value: `1.3.6.1.4.1.11256.1.4.1.1.12.{#SNMPINDEX}`</p></li></ul>|
