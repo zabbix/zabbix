@@ -556,9 +556,7 @@ int	zbx_macro_trigger_desc_resolv(zbx_macro_resolv_data_t *p, va_list args, char
 	ZBX_UNUSED(error);
 	ZBX_UNUSED(maxerrlen);
 
-	ret = macro_trigger_common_resolv(p, um_handle, event, tz, replace_to);
-
-	return ret;
+	return  macro_trigger_common_resolv(p, um_handle, event, tz, replace_to);
 }
 
 /******************************************************************************
