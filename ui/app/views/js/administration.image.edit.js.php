@@ -19,18 +19,18 @@
  */
 ?>
 <script>
-const administration_image_edit = {
-	form: null,
-	form_element: null,
-	rules: null,
+window.administration_image_edit = new class {
+	form = null;
+	form_element = null;
+	rules = null;
 
 	init({rules}) {
 		this.form_element = document.getElementById('image-form');
 		this.form = new CForm(this.form_element, rules);
 		this.rules = rules;
-	},
+	}
 
-	ajaxExceptionHandler(exception) {
+	#ajaxExceptionHandler(exception) {
 		let title, messages;
 
 		if (typeof exception === 'object' && 'error' in exception) {
@@ -42,16 +42,19 @@ const administration_image_edit = {
 		}
 
 		addMessage(makeMessageBox('bad', messages, title)[0]);
-	},
+	}
 
-	submit (e) {
+	submit(e) {
 		e.preventDefault();
+		this.#setLoadingStatus(['add', 'update']);
+		clearMessages();
 		const fields = this.form.getAllValues();
 		const url = new URL(this.form_element.getAttribute('action'), location.href);
 
 		this.form.validateSubmit(fields)
 			.then((result) => {
 				if (!result) {
+					this.#unsetLoadingStatus();
 					return;
 				}
 
@@ -82,8 +85,51 @@ const administration_image_edit = {
 							location.href = new URL(response.success.redirect, location.href).href;
 						}
 					})
-					.catch((exception) => this.ajaxExceptionHandler(exception));
+					.catch((exception) => this.#ajaxExceptionHandler(exception))
+					.finally(() => this.#unsetLoadingStatus());
 			});
+	}
+
+	delete() {
+		if (window.confirm('<?=_('Delete selected image?') ?>')) {
+			this.#setLoadingStatus(['delete']);
+			redirect(document.getElementById('delete').getAttribute('data-redirect-url'), 'post', 'action',
+				undefined, true
+			);
+		}
+	}
+
+
+	#setLoadingStatus(loading_ids) {
+		document.getElementById('imageFormList').classList.add('is-loading', 'is-loading-fadein');
+		[
+			document.getElementById('add'),
+			document.getElementById('update'),
+			document.getElementById('delete')
+		].forEach(button => {
+			if (button) {
+				button.setAttribute('disabled', true);
+
+				if (loading_ids.includes(button.id)) {
+					button.classList.add('is-loading');
+				}
+			}
+		});
+	}
+
+	#unsetLoadingStatus() {
+		[
+			document.getElementById('add'),
+			document.getElementById('update'),
+			document.getElementById('delete')
+		].forEach(button => {
+			if (button) {
+				button.classList.remove('is-loading');
+				button.removeAttribute('disabled');
+			}
+		});
+
+		document.getElementById('imageFormList').classList.remove('is-loading', 'is-loading-fadein');
 	}
 };
 </script>

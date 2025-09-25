@@ -34,7 +34,7 @@ $form = (new CForm())
 		->setArgument('action', ($data['imageid'] == 0) ? 'image.create' : 'image.update')
 		->getUrl()
 	)
-	->setAttribute('onsubmit', 'administration_image_edit.submit(event);')
+	->setAttribute('onsubmit', 'window.administration_image_edit.submit(event);')
 	->setId($data['form_name'])
 	->setName($data['form_name'])
 	->addItem((new CVar(CSRF_TOKEN_NAME, $csrf_token))->removeId())
@@ -82,13 +82,15 @@ if ($data['imageid'] != 0) {
 	$tab_view->setFooter(makeFormFooter(
 		new CSubmit('update', _('Update')),
 		[
-			(new CRedirectButton(_('Delete'), (new CUrl('zabbix.php'))
+			(new CSimpleButton(_('Delete')))
+				->setAttribute('data-redirect-url', (new CUrl('zabbix.php'))
 					->setArgument('action', 'image.delete')
 					->setArgument('imageid', $data['imageid'])
 					->setArgument('imagetype', $data['imagetype'])
-					->setArgument(CSRF_TOKEN_NAME, $csrf_token),
-				_('Delete selected image?')
-			))->setId('delete'),
+					->setArgument(CSRF_TOKEN_NAME, $csrf_token)
+				)
+				->onClick('window.administration_image_edit.delete()')
+				->setId('delete'),
 			(new CRedirectButton(_('Cancel'), (new CUrl('zabbix.php'))
 				->setArgument('action', 'image.list')
 				->setArgument('imagetype', $data['imagetype'])
@@ -98,7 +100,7 @@ if ($data['imageid'] != 0) {
 }
 else {
 	$tab_view->setFooter(makeFormFooter(
-		new CSubmit(null, _('Add')),
+		new CSubmit('add', _('Add')),
 		[
 			(new CRedirectButton(_('Cancel'), (new CUrl('zabbix.php'))
 				->setArgument('action', 'image.list')
@@ -111,7 +113,7 @@ else {
 $html_page->addItem($form->addItem($tab_view))->show();
 
 (new CScriptTag('
-	administration_image_edit.init('.json_encode([
+	window.administration_image_edit.init('.json_encode([
 		'rules' => $data['js_validation_rules']
 	]).');
 '))
