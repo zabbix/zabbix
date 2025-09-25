@@ -33,7 +33,7 @@ zabbix_export:
         3. Change the `API scheme` and `API port` host wizard configuration fields if needed.
       vendor:
         name: Zabbix
-        version: 8.0-1
+        version: 8.0-2
       groups:
         - name: 'Templates/Server hardware'
       items:
@@ -50,7 +50,7 @@ zabbix_export:
             	api_version: null,
             
             	setParams: function (params) {
-            		['username', 'password', 'base_url'].forEach(function (field) {
+            		['username', 'password', 'base_url', 'login_domain'].forEach(function (field) {
             			if (typeof params !== 'object' || typeof params[field] === 'undefined' || params[field] === '') {
             				throw 'Required param is not set: ' + field + '.';
             			}
@@ -70,7 +70,7 @@ zabbix_export:
             		var response, request = new HttpRequest();
             		request.addHeader('Content-Type: application/json');
             
-            		response = request.post(Synergy.params.base_url + 'rest/version');
+            		response = request.get(Synergy.params.base_url + 'rest/version');
             
             		if (request.getStatus() !== 200) {
             			throw 'Get version request failed with status code ' + request.getStatus() + ': ' + response;
@@ -110,7 +110,9 @@ zabbix_export:
             
             		response = request.post(Synergy.params.base_url + 'rest/login-sessions', JSON.stringify({
             			'userName': Synergy.params.username,
-            			'password': Synergy.params.password
+            			'password': Synergy.params.password,
+            			'authLoginDomain': Synergy.params.login_domain,
+            			"loginMsgAck": "true"
             		}));
             
             		if (request.getStatus() !== 200) {
@@ -141,6 +143,7 @@ zabbix_export:
             			var response, request = new HttpRequest();
             			request.addHeader('Content-Type: application/json');
             			request.addHeader('X-API-Version: ' + Synergy.api_version);
+            			request.addHeader('Auth: ' + Synergy.session_id);
             			response = request.delete(Synergy.params.base_url + 'rest/login-sessions');
             		}
             	},
@@ -256,6 +259,8 @@ zabbix_export:
           parameters:
             - name: base_url
               value: '{$HPE.SYNERGY.API.SCHEME}://{$HPE.SYNERGY.API.HOST}:{$HPE.SYNERGY.API.PORT}'
+            - name: login_domain
+              value: '{$HPE.SYNERGY.API.LOGIN_DOMAIN}'
             - name: password
               value: '{$HPE.SYNERGY.API.PASSWORD}'
             - name: username
@@ -6769,6 +6774,14 @@ zabbix_export:
             label: 'API host'
             description: 'The hostname or IP address of the API host.'
             required: 'YES'
+        - macro: '{$HPE.SYNERGY.API.LOGIN_DOMAIN}'
+          value: LOCAL
+          description: 'The user''s domain.'
+          config:
+            type: TEXT
+            priority: '7'
+            label: 'User''s domain'
+            description: 'The The user''s domain.'
         - macro: '{$HPE.SYNERGY.API.PASSWORD}'
           type: SECRET_TEXT
           description: 'Specify password for API.'
