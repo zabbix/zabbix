@@ -124,7 +124,9 @@ $service_url = (new CUrl('zabbix.php'))
 		])
 		->addItem([
 			(new CDiv(_('Tags')))->addClass(ZBX_STYLE_SERVICE_INFO_LABEL),
-			(new CDiv($data['service']['tags']))->addClass(ZBX_STYLE_SERVICE_INFO_VALUE)
+			(new CDiv($data['service']['tags']))
+				->addClass(ZBX_STYLE_SERVICE_INFO_VALUE)
+				->addClass(ZBX_STYLE_TAGS_WRAPPER)
 		])
 ]))
 	->addClass(ZBX_STYLE_SERVICE_INFO)

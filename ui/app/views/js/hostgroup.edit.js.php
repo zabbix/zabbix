@@ -16,7 +16,7 @@
 
 window.hostgroup_edit_popup = new class {
 
-	init({popup_url, groupid, name}) {
+	init({rules, popup_url, groupid, name}) {
 		history.replaceState({}, '', popup_url);
 
 		this.groupid = groupid;
@@ -24,7 +24,8 @@ window.hostgroup_edit_popup = new class {
 
 		this.overlay = overlays_stack.getById('hostgroup.edit');
 		this.dialogue = this.overlay.$dialogue[0];
-		this.form = this.overlay.$dialogue.$body[0].querySelector('form');
+		this.form_element = this.overlay.$dialogue.$body[0].querySelector('form');
+		this.form = new CForm(this.form_element, rules);
 		this.footer = this.overlay.$dialogue.$footer[0];
 
 		const return_url = new URL('zabbix.php', location.href);
@@ -33,45 +34,46 @@ window.hostgroup_edit_popup = new class {
 	}
 
 	submit() {
-		const fields = getFormFields(this.form);
+		const fields = this.form.getAllValues();
 		fields.name = fields.name.trim();
 
-		this.overlay.setLoading();
+		const submit_url = new URL('zabbix.php', location.href);
+		submit_url.searchParams.set('action', this.groupid !== null ? 'hostgroup.update' : 'hostgroup.create')
 
-		const curl = new Curl('zabbix.php');
-		curl.setArgument('action', this.groupid !== null ? 'hostgroup.update' : 'hostgroup.create');
+		this.form.validateSubmit(fields)
+			.then((result) => {
+				if (!result) {
+					this.overlay.unsetLoading();
 
-		this._post(curl.getUrl(), fields, (response) => {
-			overlayDialogueDestroy(this.overlay.dialogueid);
+					return;
+				}
 
-			this.dialogue.dispatchEvent(new CustomEvent('dialogue.submit', {detail: response}));
-		});
+				this.#post(submit_url.href, fields);
+			});
 	}
 
 	clone() {
 		this.overlay.setLoading();
-		const parameters = getFormFields(this.form);
+		const parameters = getFormFields(this.form_element);
 
 		this.overlay = ZABBIX.PopupManager.open('hostgroup.edit', {name: parameters.name});
 	}
 
 	delete() {
-		const curl = new Curl('zabbix.php');
-		curl.setArgument('action', 'hostgroup.delete');
-		curl.setArgument(CSRF_TOKEN_NAME, <?= json_encode(CCsrfTokenHelper::get('hostgroup')) ?>);
+		const url = new URL('zabbix.php', location.href);
+		url.searchParams.set('action', 'hostgroup.delete');
+		url.searchParams.set(CSRF_TOKEN_NAME, <?= json_encode(CCsrfTokenHelper::get('hostgroup')) ?>);
 
-		this._post(curl.getUrl(), {groupids: [this.groupid]}, (response) => {
-			overlayDialogueDestroy(this.overlay.dialogueid);
-
-			this.dialogue.dispatchEvent(new CustomEvent('dialogue.submit', {detail: response}));
-		});
+		this.#post(url.href, {groupids: [this.groupid]});
 	}
 
-	_post(url, data, success_callback) {
+	#post(url, fields) {
+		this.#removePopupMessages();
+
 		fetch(url, {
 			method: 'POST',
 			headers: {'Content-Type': 'application/json'},
-			body: JSON.stringify(data)
+			body: JSON.stringify(fields)
 		})
 			.then((response) => response.json())
 			.then((response) => {
@@ -79,32 +81,45 @@ window.hostgroup_edit_popup = new class {
 					throw {error: response.error};
 				}
 
-				return response;
-			})
-			.then(success_callback)
-			.catch((exception) => {
-				for (const element of this.form.parentNode.children) {
-					if (element.matches('.msg-good, .msg-bad, .msg-warning')) {
-						element.parentNode.removeChild(element);
-					}
-				}
-
-				let title, messages;
-
-				if (typeof exception === 'object' && 'error' in exception) {
-					title = exception.error.title;
-					messages = exception.error.messages;
+				if ('form_errors' in response) {
+					this.form.setErrors(response.form_errors, true, true);
+					this.form.renderErrors();
 				}
 				else {
-					messages = [<?= json_encode(_('Unexpected server error.')) ?>];
+					postMessageOk(response.success.title);
+					overlayDialogueDestroy(this.overlay.dialogueid);
+					this.dialogue.dispatchEvent(new CustomEvent('dialogue.submit', {detail: response}));
 				}
-
-				const message_box = makeMessageBox('bad', messages, title)[0];
-
-				this.form.parentNode.insertBefore(message_box, this.form);
+			})
+			.catch(exception => {
+				this.#ajaxExceptionHandler(exception);
 			})
 			.finally(() => {
 				this.overlay.unsetLoading();
 			});
+	}
+
+	#removePopupMessages() {
+		for (const el of this.form_element.parentNode.children) {
+			if (el.matches('.msg-good, .msg-bad, .msg-warning')) {
+				el.parentNode.removeChild(el);
+			}
+		}
+	}
+
+	#ajaxExceptionHandler(exception) {
+		let title, messages;
+
+		if (typeof exception === 'object' && 'error' in exception) {
+			title = exception.error.title;
+			messages = exception.error.messages;
+		}
+		else {
+			messages = [<?= json_encode(_('Unexpected server error.')) ?>];
+		}
+
+		const message_box = makeMessageBox('bad', messages, title)[0];
+
+		this.form_element.parentNode.insertBefore(message_box, this.form_element);
 	}
 }
