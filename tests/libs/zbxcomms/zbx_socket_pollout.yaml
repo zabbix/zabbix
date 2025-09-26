@@ -22,4 +22,4 @@ in:
 out:
   result: "FAIL"
   error: "connection error (POLLERR)"
-
+...

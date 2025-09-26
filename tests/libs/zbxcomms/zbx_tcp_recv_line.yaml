@@ -24,3 +24,4 @@ in:
   read_return: [0, 1]
 out:
   result: [line1]
+...

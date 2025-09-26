@@ -46,3 +46,4 @@ in:
   revents: 56   # 8 + 16 + 32
 out:
   result: "connection error (POLLERR,POLLHUP,POLLNVAL)"
+...

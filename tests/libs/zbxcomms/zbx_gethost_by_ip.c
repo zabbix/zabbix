@@ -25,7 +25,7 @@
 
 static int get_host_from_etc_hosts(const char *ip, char *hostname, size_t hostnamelen)
 {
-	int fd = openat(AT_FDCWD, "/etc/hosts", O_RDONLY);
+	int	fd = openat(AT_FDCWD, "/etc/hosts", O_RDONLY);
 
 	if (fd == -1)
 		return FAIL;
@@ -46,7 +46,7 @@ static int get_host_from_etc_hosts(const char *ip, char *hostname, size_t hostna
 		return FAIL;
 	}
 
-	char line[ZBX_MAX_HOSTNAME_LEN];
+	char	line[ZBX_MAX_HOSTNAME_LEN];
 	size_t i = 0;
 
 	for (off_t j = 0; j < st.st_size; j++)
@@ -59,13 +59,13 @@ static int get_host_from_etc_hosts(const char *ip, char *hostname, size_t hostna
 			if (line[0] == '#' || line[0] == '\0')
 				continue;
 
-			char file_ip[ZBX_MAX_HOSTNAME_LEN], name[ZBX_MAX_HOSTNAME_LEN];
+			char	file_ip[ZBX_MAX_HOSTNAME_LEN], name[ZBX_MAX_HOSTNAME_LEN];
 
-			if (sscanf(line, "%s %s", file_ip, name) == 2)
+			if (2 == sscanf(line, "%s %s", file_ip, name))
 			{
-				if (strcmp(ip, file_ip) == 0)
+				if (0 == strcmp(ip, file_ip))
 				{
-					zbx_strlcpy(hostname, name, hostnamelen);printf("NAME: %s\n", name);
+					zbx_strlcpy(hostname, name, hostnamelen);
 					munmap(data, st.st_size);
 					close(fd);
 					return SUCCEED;
