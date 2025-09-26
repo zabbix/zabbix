@@ -1041,13 +1041,15 @@ class testFormTriggerPrototype extends CLegacyWebTest {
 		}
 
 		if (isset($data['constructor'])) {
-			$this->zbxTestClickButtonText('Expression constructor');
+			$button = $this->query('button:Expression constructor')->one()->click();
+
 			$constructor = $data['constructor'];
 			if (isset($constructor['errors']) && !array_key_exists('elementError', $constructor)) {
 				$this->assertMessage(TEST_BAD, $constructor['errors']['header'], $constructor['errors']['details']);
 				COverlayDialogElement::find()->one()->close();
 			}
 			else {
+				$button->waitUntilNotVisible();
 				$this->query('xpath://*[@id="expression-table"]/div[1]')->waitUntilVisible()->one();
 				$this->zbxTestAssertElementPresentXpath("//button[@name='test_expression']");
 				$this->zbxTestAssertVisibleXpath("//div[@id='expression-row']//button[@id='and_expression']");

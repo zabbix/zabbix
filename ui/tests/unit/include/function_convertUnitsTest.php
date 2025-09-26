@@ -92,7 +92,9 @@ class function_convertUnitsTest extends TestCase {
 			[ 'in' => ['value' => '1.00000012345', 'decimals' => 4],							'out' => '1' ],
 			[ 'in' => ['value' => '1.00000012345', 'decimals' => 4, 'decimals_exact' => true],	'out' => '1.0000'],
 			[ 'in' => ['value' => '0.00000012345', 'decimals' => 4],							'out' => '0.0000001235' ],
-			[ 'in' => ['value' => '0.00000012345', 'decimals' => 4, 'decimals_exact' => true],	'out' => '1.2350E-7' ],
+			[ 'in' => ['value' => '0.00000012345', 'decimals' => 4, 'decimals_exact' => true],	'out' => '1.2345E-7' ],
+			[ 'in' => ['value' => '0.000000123456', 'decimals' => 4],							'out' => '0.0000001235' ],
+			[ 'in' => ['value' => '0.000000123456', 'decimals' => 4, 'decimals_exact' => true],	'out' => '1.2346E-7' ],
 
 			// Decimal units.
 
@@ -159,7 +161,9 @@ class function_convertUnitsTest extends TestCase {
 			[ 'in' => ['value' => '1.00000012345', 'units' => 'U', 'decimals' => 4],							'out' => '1 U' ],
 			[ 'in' => ['value' => '1.00000012345', 'units' => 'U', 'decimals' => 4, 'decimals_exact' => true],	'out' => '1.0000 U'],
 			[ 'in' => ['value' => '0.00000012345', 'units' => 'U', 'decimals' => 4],							'out' => '0.0000001235 U' ],
-			[ 'in' => ['value' => '0.00000012345', 'units' => 'U', 'decimals' => 4, 'decimals_exact' => true],	'out' => '1.2350E-7 U' ],
+			[ 'in' => ['value' => '0.00000012345', 'units' => 'U', 'decimals' => 4, 'decimals_exact' => true],	'out' => '1.2345E-7 U' ],
+			[ 'in' => ['value' => '0.000000123456', 'units' => 'U', 'decimals' => 4],							'out' => '0.0000001235 U' ],
+			[ 'in' => ['value' => '0.000000123456', 'units' => 'U', 'decimals' => 4, 'decimals_exact' => true],	'out' => '1.2346E-7 U' ],
 			[ 'in' => ['value' => '1.5555E+22', 'units' => 'U', 'power' => 7],									'out' => '15.56 ZU' ],
 			[ 'in' => ['value' => '1.5555E+22', 'units' => 'U', 'power' => 8],									'out' => '0.016 YU' ],
 
@@ -228,7 +232,9 @@ class function_convertUnitsTest extends TestCase {
 			[ 'in' => ['value' => '1.00000012345', 'units' => 'B', 'decimals' => 4],							'out' => '1 B' ],
 			[ 'in' => ['value' => '1.00000012345', 'units' => 'B', 'decimals' => 4, 'decimals_exact' => true],	'out' => '1.0000 B' ],
 			[ 'in' => ['value' => '0.00000012345', 'units' => 'B', 'decimals' => 4],							'out' => '0.0000001235 B' ],
-			[ 'in' => ['value' => '0.00000012345', 'units' => 'B', 'decimals' => 4, 'decimals_exact' => true],	'out' => '1.2350E-7 B' ],
+			[ 'in' => ['value' => '0.00000012345', 'units' => 'B', 'decimals' => 4, 'decimals_exact' => true],	'out' => '1.2345E-7 B' ],
+			[ 'in' => ['value' => '0.000000123456', 'units' => 'B', 'decimals' => 4],							'out' => '0.0000001235 B' ],
+			[ 'in' => ['value' => '0.000000123456', 'units' => 'B', 'decimals' => 4, 'decimals_exact' => true],	'out' => '1.2346E-7 B' ],
 			[ 'in' => ['value' => '15728640', 'units' => 'B', 'power' => 2],									'out' => '15 MB' ],
 			[ 'in' => ['value' => '15728640', 'units' => 'B', 'power' => 3],									'out' => '0.015 GB' ],
 
@@ -287,9 +293,9 @@ class function_convertUnitsTest extends TestCase {
 			// Time units with decimals (convertUnitsSWithDecimals), ignore milliseconds.
 
 			[ 'in' => ['value' => '0.0012345', 'units' => 's', 'decimals' => 4, 'decimals_exact' => false, 'ignore_milliseconds' => true],	'out' => '0.001235s' ],
-			[ 'in' => ['value' => '0.0012345', 'units' => 's', 'decimals' => 4, 'decimals_exact' => true, 'ignore_milliseconds' => true],	'out' => '1.2350E-3s' ],
+			[ 'in' => ['value' => '0.0012345', 'units' => 's', 'decimals' => 4, 'decimals_exact' => true, 'ignore_milliseconds' => true],	'out' => '1.2345E-3s' ],
 			[ 'in' => ['value' => '0.00012345', 'units' => 's', 'decimals' => 4, 'decimals_exact' => false, 'ignore_milliseconds' => true],	'out' => '0.0001235s' ],
-			[ 'in' => ['value' => '0.00012345', 'units' => 's', 'decimals' => 4, 'decimals_exact' => true, 'ignore_milliseconds' => true],	'out' => '1.2350E-4s' ],
+			[ 'in' => ['value' => '0.00012345', 'units' => 's', 'decimals' => 4, 'decimals_exact' => true, 'ignore_milliseconds' => true],	'out' => '1.2345E-4s' ],
 			[ 'in' => ['value' => '0.00012', 'units' => 's', 'decimals' => 4, 'decimals_exact' => false, 'ignore_milliseconds' => true],	'out' => '0.00012s' ],
 			[ 'in' => ['value' => '0.00012', 'units' => 's', 'decimals' => 4, 'decimals_exact' => true, 'ignore_milliseconds' => true],		'out' => '1.2000E-4s' ],
 			[ 'in' => ['value' => '1e-100', 'units' => 's', 'decimals' => 4, 'decimals_exact' => false, 'ignore_milliseconds' => false],	'out' => '1E-97ms' ],

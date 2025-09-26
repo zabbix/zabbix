@@ -932,6 +932,7 @@ class testFormMacrosAdministrationGeneral extends testFormMacros {
 		// Change Vault in settings to correct one and create macros with this Vault.
 		$this->page->open('zabbix.php?action=miscconfig.edit')->waitUntilReady();
 		$setting_form->fill(['Vault provider'=> 'HashiCorp Vault'])->submit();
+		$this->assertMessage(TEST_GOOD, 'Configuration updated');
 		$this->page->open('zabbix.php?action=macros.edit')->waitUntilReady();
 		$this->fillMacros([$hashicorp['fields']]);
 		$this->query('button:Update')->one()->click();
