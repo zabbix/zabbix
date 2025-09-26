@@ -1624,7 +1624,7 @@ abstract class CHostBase extends CApiService {
 
 	private static function addTemplateHostLinks(array &$template_host_links, array $template_hosts,
 			array $vertices): void {
-		$propagated_template_host_links = [];
+		$children_links = [];
 
 		do {
 			$_vertices = [];
@@ -1647,34 +1647,18 @@ abstract class CHostBase extends CApiService {
 						$template_host_links[$templateid][$hostid] += $_vertices[$hostid][$templateid];
 
 						if (array_key_exists($hostid, $template_hosts)) {
-							$_templateid = $hostid;
-
-							foreach ($template_hosts[$_templateid] as $_hostid => $true) {
-								if (!array_key_exists($_templateid, $propagated_template_host_links)
-										|| !array_key_exists($_hostid, $propagated_template_host_links[$_templateid])) {
-									$propagated_template_host_links[$_templateid][$_hostid] =
-										$template_host_links[$templateid][$hostid];
-								}
-							}
+							self::addOrSupplementChildrenLinks($children_links, $template_hosts, $hostid,
+								$template_host_links[$templateid][$hostid]
+							);
 						}
 					}
 
-					if (array_key_exists($templateid, $propagated_template_host_links)
-							&& array_key_exists($hostid, $propagated_template_host_links[$templateid])
+					if (array_key_exists($templateid, $children_links)
+							&& array_key_exists($hostid, $children_links[$templateid])
 							&& array_key_exists($hostid, $template_hosts)) {
-						$_templateid = $hostid;
-
-						foreach ($template_hosts[$_templateid] as $_hostid => $true) {
-							if (array_key_exists($_templateid, $propagated_template_host_links)
-									&& array_key_exists($_hostid, $propagated_template_host_links[$_templateid])) {
-								$propagated_template_host_links[$_templateid][$_hostid] +=
-									$propagated_template_host_links[$templateid][$hostid];
-							}
-							else {
-								$propagated_template_host_links[$_templateid][$_hostid] =
-									$propagated_template_host_links[$templateid][$hostid];
-							}
-						}
+						self::addOrSupplementChildrenLinks($children_links, $template_hosts, $hostid,
+							$children_links[$templateid][$hostid]
+						);
 					}
 				}
 			}
@@ -1690,7 +1674,7 @@ abstract class CHostBase extends CApiService {
 			}
 		} while ($vertices);
 
-		foreach ($propagated_template_host_links as $templateid => $host_links) {
+		foreach ($children_links as $templateid => $host_links) {
 			foreach ($host_links as $hostid => $links) {
 				if (array_key_exists($templateid, $template_host_links)
 						&& array_key_exists($hostid, $template_host_links[$templateid])) {
@@ -1699,6 +1683,19 @@ abstract class CHostBase extends CApiService {
 				else {
 					$template_host_links[$templateid][$hostid] = $links;
 				}
+			}
+		}
+	}
+
+	private static function addOrSupplementChildrenLinks(array &$children_links, array $template_hosts,
+			string $templateid, array $links): void {
+		foreach ($template_hosts[$templateid] as $hostid => $true) {
+			if (array_key_exists($templateid, $children_links)
+					&& array_key_exists($hostid, $children_links[$templateid])) {
+				$children_links[$templateid][$hostid] += $links;
+			}
+			else {
+				$children_links[$templateid][$hostid] = $links;
 			}
 		}
 	}
