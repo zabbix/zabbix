@@ -17,7 +17,6 @@
 namespace Widgets\Web\Actions;
 
 use API,
-	CApiTagHelper,
 	CArrayHelper,
 	CControllerDashboardWidgetView,
 	CControllerResponseData,
@@ -101,6 +100,7 @@ class WidgetView extends CControllerDashboardWidgetView {
 
 			$hosts = API::Host()->get([
 				'output' => [],
+				'selectHostGroups' => ['groupid'],
 				'groupids' => $groupids,
 				'hostids' => $filter_hostids,
 				'filter' => ['maintenance_status' => $filter_maintenance],
@@ -113,37 +113,34 @@ class WidgetView extends CControllerDashboardWidgetView {
 			}
 			unset($group);
 
-			// Fetch links between HTTP tests and host groups.
-			$where_tags = (array_key_exists('tags', $this->fields_values) && $this->fields_values['tags'])
-				? CApiTagHelper::addWhereCondition($this->fields_values['tags'], $this->fields_values['evaltype'], 'ht',
-					'httptest_tag', 'httptestid'
-				)
-				: '';
-
-			$result = DbFetchArray(DBselect(
-				'SELECT DISTINCT ht.httptestid,hg.groupid' .
-				' FROM httptest ht,hosts_groups hg' .
-				' WHERE ht.hostid=hg.hostid' .
-				' AND ' . dbConditionInt('hg.hostid', array_keys($hosts)) .
-				' AND ' . dbConditionInt('hg.groupid', $groupids) .
-				' AND ht.status=' . HTTPTEST_STATUS_ACTIVE .
-				(($where_tags !== '') ? ' AND ' . $where_tags : '')
-			));
+			$httptests = API::HttpTest()->get([
+				'output' => ['hostid'],
+				'groupids' => $groupids,
+				'hostids' => array_keys($hosts),
+				'evaltype' => $this->fields_values['evaltype'],
+				'tags' => $this->fields_values['tags'] ?: null,
+				'inheritedTags' => true,
+				'filter' => ['status' => HTTPTEST_STATUS_ACTIVE],
+				'preservekeys' => true
+			]);
 
 			// Fetch HTTP test execution data.
-			$httptest_data = Manager::HttpTest()->getLastData(array_column($result, 'httptestid'));
+			$httptest_data = Manager::HttpTest()->getLastData(array_keys($httptests));
 
-			foreach ($result as $row) {
-				$group = &$groups[$row['groupid']];
+			foreach ($httptests as $httptest) {
+				foreach ($hosts[$httptest['hostid']]['hostgroups'] as $group) {
+					$group = &$groups[$group['groupid']];
 
-				if (array_key_exists($row['httptestid'], $httptest_data)
-					&& $httptest_data[$row['httptestid']]['lastfailedstep'] !== null) {
-					$group[($httptest_data[$row['httptestid']]['lastfailedstep'] != 0) ? 'failed' : 'ok']++;
+					if (array_key_exists($httptest['httptestid'], $httptest_data)
+							&& $httptest_data[$httptest['httptestid']]['lastfailedstep'] !== null) {
+						$group[$httptest_data[$httptest['httptestid']]['lastfailedstep'] != 0 ? 'failed' : 'ok']++;
+					}
+					else {
+						$group['unknown']++;
+					}
+
+					unset($group);
 				}
-				else {
-					$group['unknown']++;
-				}
-				unset($group);
 			}
 
 			$data += [
