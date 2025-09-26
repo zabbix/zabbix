@@ -1,0 +1,81 @@
+services:
+  mysql-9.3-master:
+    image: mysql:9.3
+    container_name: mysql-9.3-master
+    environment:
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
+      #MYSQL_DATABASE: ${MYSQL_DATABASE}
+    command:
+      - --port=${MYSQL_MASTER_PORT}
+      - --server-id=1
+      - --log-bin=mysql-bin
+      - --gtid-mode=ON
+      - --enforce-gtid-consistency=ON
+    ports:
+      - ${MYSQL_MASTER_PORT}:${MYSQL_MASTER_PORT}
+    volumes:
+      - data-master:/var/lib/mysql
+    networks:
+      - zbxinttest-net
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "127.0.0.1", "-P", "${MYSQL_MASTER_PORT}", "-u", "${MYSQL_USER}", "-p${MYSQL_ROOT_PASSWORD}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  mysql-9.3-replica:
+    image: mysql:9.3
+    container_name: mysql-9.3-replica
+    environment:
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
+      #MYSQL_DATABASE: ${MYSQL_DATABASE}
+    command:
+      - --port=${MYSQL_REPLICA_PORT}
+      - --server-id=2
+      - --relay-log=mysql-relay
+      - --gtid-mode=ON
+      - --enforce-gtid-consistency=ON
+    ports:
+      - ${MYSQL_REPLICA_PORT}:${MYSQL_REPLICA_PORT}
+    volumes:
+      - data-replica:/var/lib/mysql
+    networks:
+      - zbxinttest-net
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "127.0.0.1", "-P", "${MYSQL_REPLICA_PORT}", "-u", "${MYSQL_USER}", "-p${MYSQL_ROOT_PASSWORD}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  mysql-9.3-setup:
+    container_name: mysql-9.3-setup
+    image: zbxinttest/mysql-9.3-setup
+    build:
+      context: ../
+      dockerfile: Dockerfile
+      args:
+        VERSION_FOLDER: ${VERSION_FOLDER}
+    environment:
+      MYSQL_HOSTNAMES: 'mysql-9.3-master mysql-9.3-replica'
+      MYSQL_PORTS: ${MYSQL_MASTER_PORT} ${MYSQL_REPLICA_PORT}
+      MYSQL_SQL_FILES: "master.sql replica.sql"
+      MYSQL_MASTER_PORT: ${MYSQL_MASTER_PORT}
+      MYSQL_ROOT_PASSWORD: $MYSQL_ROOT_PASSWORD
+      MYSQL_DB_USER: ${MYSQL_DB_USER}
+      MYSQL_DB_PASSWORD: ${MYSQL_DB_PASSWORD}
+    tty: true
+    stdin_open: true
+    networks:
+      - zbxinttest-net
+    depends_on:
+      mysql-9.3-master:
+        condition: service_healthy
+      mysql-9.3-replica:
+        condition: service_healthy
+
+volumes:
+  data-master:
+  data-replica:
+
+networks:
+  zbxinttest-net:
