@@ -157,18 +157,14 @@ class WidgetView extends CControllerDashboardWidgetView {
 
 		if ($this->isTemplateDashboard()) {
 			$hostids = $this->fields_values['override_hostid'];
+			$evaltype = TAG_EVAL_TYPE_AND_OR;
+			$tags = null;
 		}
 		else {
 			$hostids = $this->fields_values['hostids'] ?: null;
+			$evaltype = $this->fields_values['evaltype'];
+			$tags = $this->fields_values['tags'] ?: null;
 		}
-
-		$tags = !$this->isTemplateDashboard() && $this->fields_values['host_tags']
-			? $this->fields_values['host_tags']
-			: null;
-
-		$evaltype = !$this->isTemplateDashboard()
-			? $this->fields_values['host_tags_evaltype']
-			: null;
 
 		$options = [
 			'output' => ['name', 'hostid'],

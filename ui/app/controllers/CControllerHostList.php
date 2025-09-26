@@ -197,7 +197,7 @@ class CControllerHostList extends CController {
 		$hosts = API::Host()->get([
 			'output' => ['hostid', $sort_field],
 			'evaltype' => $filter['evaltype'],
-			'tags' => $filter['tags'],
+			'tags' => $filter['tags'] ?: null,
 			'inheritedTags' => true,
 			'groupids' => $filter_groupids,
 			'templateids' => $filter['templates'] ? array_keys($filter['templates']) : null,

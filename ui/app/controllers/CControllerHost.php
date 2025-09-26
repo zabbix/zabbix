@@ -64,7 +64,7 @@ abstract class CControllerHost extends CController {
 		return (int) API::Host()->get([
 			'countOutput' => true,
 			'evaltype' => $filter['evaltype'],
-			'tags' => $filter['tags'],
+			'tags' => $filter['tags'] ?: null,
 			'inheritedTags' => true,
 			'groupids' => $groupids,
 			'severities' => $filter['severities'] ? $filter['severities'] : null,
@@ -114,7 +114,7 @@ abstract class CControllerHost extends CController {
 		$hosts = API::Host()->get([
 			'output' => ['hostid', 'name', 'status'],
 			'evaltype' => $filter['evaltype'],
-			'tags' => $filter['tags'],
+			'tags' => $filter['tags'] ?: null,
 			'inheritedTags' => true,
 			'groupids' => $groupids,
 			'severities' => $filter['severities'] ? $filter['severities'] : null,

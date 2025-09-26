@@ -65,19 +65,15 @@ class WidgetView extends CControllerDashboardWidgetView {
 			return [];
 		}
 
-		$groupids = null;
-		$evaltype = null;
-		$tags = null;
-
-		if (!$this->isTemplateDashboard()) {
-			if ($this->fields_values['groupids']) {
-				$groupids = getSubGroups($this->fields_values['groupids']);
-			}
-
-			if ($this->fields_values['host_tags']) {
-				$evaltype = $this->fields_values['evaltype_host'];
-				$tags = $this->fields_values['host_tags'];
-			}
+		if ($this->isTemplateDashboard()) {
+			$groupids = null;
+			$evaltype = TAG_EVAL_TYPE_AND_OR;
+			$tags = null;
+		}
+		else {
+			$groupids = $this->fields_values['groupids'] ? getSubGroups($this->fields_values['groupids']) : null;
+			$evaltype = $this->fields_values['evaltype_host'];
+			$tags = $this->fields_values['host_tags'] ?: null;
 		}
 
 		$hostids = $this->fields_values['hostids'] ?: null;

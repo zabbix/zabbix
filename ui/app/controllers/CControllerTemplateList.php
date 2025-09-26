@@ -112,7 +112,7 @@ class CControllerTemplateList extends CController {
 		$templates = API::Template()->get([
 			'output' => ['templateid', $sort_field],
 			'evaltype' => $filter['evaltype'],
-			'tags' => $filter['tags'],
+			'tags' => $filter['tags'] ?: null,
 			'inheritedTags' => true,
 			'search' => array_filter([
 				'name' => $filter['name'],

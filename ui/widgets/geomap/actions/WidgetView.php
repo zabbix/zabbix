@@ -102,7 +102,7 @@ class WidgetView extends CControllerDashboardWidgetView {
 				'groupids' => $filter_groupids,
 				'hostids' => $this->fields_values['hostids'] ?: null,
 				'evaltype' => $this->fields_values['evaltype'],
-				'tags' => $this->fields_values['tags'],
+				'tags' => $this->fields_values['tags'] ?: null,
 				'inheritedTags' => true,
 				'filter' => [
 					'inventory_mode' => [HOST_INVENTORY_MANUAL, HOST_INVENTORY_AUTOMATIC]

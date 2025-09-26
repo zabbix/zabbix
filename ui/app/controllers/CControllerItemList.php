@@ -552,7 +552,7 @@ class CControllerItemList extends CControllerItem {
 			'selectInheritedTags' => ['tag', 'value'],
 			'sortfield' => $input['sort'],
 			'evaltype' => $input['filter_evaltype'],
-			'tags' => $input['filter_tags'],
+			'tags' => $input['filter_tags'] ?: null,
 			'inheritedTags' => true,
 			'limit' => CSettingsHelper::get(CSettingsHelper::SEARCH_LIMIT) + 1
 		];
