@@ -59,22 +59,16 @@ class CHost extends CHostGeneral {
 	 * @param bool          $options['withProblemsSuppressed']             Select hosts that have suppressed problems. (null - all, true - only suppressed, false - unsuppressed)
 	 * @param bool          $options['editable']                           Select hosts only with read-write permission. Ignored for Super admins.
 	 * @param bool          $options['nopermissions']                      Select hosts by ignoring all permissions. Only available inside API calls.
-	 * @param bool          $options['evaltype']                           Operator for tag filter 0 - AND/OR; 2 - OR.
-	 * @param bool          $options['tags']                               Select hosts by given tags.
 	 * @param bool          $options['severities']                         Select hosts that have only problems with given severities.
-	 * @param bool          $options['inheritedTags']                      Select hosts that have given tags also in their linked templates.
 	 * @param string|array  $options['selectHostGroups']                   Return a "hostgroups" property with host groups data that the host belongs to.
 	 * @param string|array  $options['selectParentTemplates']              Return a "parentTemplates" property with templates that the host is linked to.
 	 * @param string|array  $options['selectItems']                        Return an "items" property with host items.
 	 * @param string|array  $options['selectTriggers']                     Return a "triggers" property with host triggers.
 	 * @param string|array  $options['selectGraphs']                       Return a "graphs" property with host graphs.
-	 * @param string|array  $options['selectMacros']                       Return a "macros" property with host macros.
 	 * @param string|array  $options['selectDashboards']                   Return a "dashboards" property with host dashboards.
 	 * @param string|array  $options['selectInterfaces']                   Return an "interfaces" property with host interfaces.
 	 * @param string|array  $options['selectInventory']                    Return an "inventory" property with host inventory data.
 	 * @param string|array  $options['selectHttpTests']                    Return an "httpTests" property with host web scenarios.
-	 * @param string|array  $options['selectTags']                         Return a "tags" property with host tags.
-	 * @param string|array  $options['selectInheritedTags']                Return an "inheritedTags" property with tags that are on templates which are linked to host.
 	 * @param bool          $options['countOutput']                        Return host count as output.
 	 * @param bool          $options['groupCount']                         Group the host count.
 	 * @param bool          $options['preservekeys']                       Return host IDs as array keys.
