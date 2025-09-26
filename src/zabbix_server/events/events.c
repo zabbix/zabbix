@@ -439,7 +439,7 @@ zbx_db_event	*zbx_add_event(unsigned char source, unsigned char object, zbx_uint
 		zbx_substitute_macros(&event->trigger.correlation_tag, err, sizeof(err), &macro_trigger_tag_resolv,
 				um_handle, event, NULL);
 
-		zbx_token_search_t		search_token = ZBX_TOKEN_SEARCH_REFERENCES;
+		zbx_token_search_t	search_token = ZBX_TOKEN_SEARCH_REFERENCES;
 
 		if (EVENT_SOURCE_TRIGGERS == event->source)
 			search_token |= ZBX_TOKEN_SEARCH_EXPRESSION_MACRO;

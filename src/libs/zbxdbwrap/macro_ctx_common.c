@@ -376,7 +376,7 @@ static int	macro_trigger_common_resolv(zbx_macro_resolv_data_t *p, const zbx_dc_
 				zbx_dc_get_user_macro(um_handle, p->macro, (*phostids)->values,
 						(*phostids)->values_num, replace_to);
 			}
-			p->pos = p->token.loc.r;
+			p->pos = (int)p->token.loc.r;
 		}
 		else if (ZBX_TOKEN_REFERENCE == p->token.type)
 		{
@@ -498,12 +498,10 @@ int	zbx_macro_event_name_resolv(zbx_macro_resolv_data_t *p, va_list args, char *
 		ts.ns = event->ns;
 
 		if (SUCCEED != (ret = zbx_db_get_expression_macro_result(event, *data,
-				&p->inner_token.data.expression_macro.expression, &ts,
-				replace_to, &errmsg)))
+				&p->inner_token.data.expression_macro.expression, &ts, replace_to, &errmsg)))
 		{
-			*errmsg = tolower(*errmsg);
-			zabbix_log(LOG_LEVEL_DEBUG, "%s() cannot evaluate expression macro: %s",
-					__func__, errmsg);
+			*errmsg = (char)tolower(*errmsg);
+			zabbix_log(LOG_LEVEL_DEBUG, "%s() cannot evaluate expression macro: %s", __func__, errmsg);
 			zbx_strlcpy(error, errmsg, maxerrlen);
 			zbx_free(errmsg);
 		}
@@ -555,7 +553,7 @@ int	zbx_macro_trigger_desc_resolv(zbx_macro_resolv_data_t *p, va_list args, char
 	ZBX_UNUSED(error);
 	ZBX_UNUSED(maxerrlen);
 
-	return  macro_trigger_common_resolv(p, um_handle, event, tz, replace_to);
+	return macro_trigger_common_resolv(p, um_handle, event, tz, replace_to);
 }
 
 /******************************************************************************
@@ -564,7 +562,7 @@ int	zbx_macro_trigger_desc_resolv(zbx_macro_resolv_data_t *p, va_list args, char
  *                                                                            *
  ******************************************************************************/
 static void	resolve_opdata(const zbx_db_event *event, zbx_dc_um_handle_t *um_handle, char **replace_to,
-		const char *tz, char *error, int maxerrlen)
+		const char *tz, char *error, size_t maxerrlen)
 {
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
@@ -615,7 +613,7 @@ static void	resolve_opdata(const zbx_db_event *event, zbx_dc_um_handle_t *um_han
  ******************************************************************************/
 static int	get_event_cause_value(const char *macro, char **replace_to, zbx_dc_um_handle_t *um_handle,
 		const zbx_db_event *event, zbx_db_event **cause_event, zbx_db_event **cause_recovery_event,
-		const zbx_uint64_t *recipient_userid, const char *tz, char *error, int maxerrlen)
+		const zbx_uint64_t *recipient_userid, const char *tz, char *error, size_t maxerrlen)
 {
 	zbx_db_event	*c_event;
 	int		ret = FAIL;
@@ -1651,11 +1649,9 @@ int	zbx_macro_message_common_resolv(zbx_macro_resolv_data_t *p, zbx_dc_um_handle
 		else if (0 == strcmp(p->macro, MVAR_TRIGGER_DESCRIPTION) ||
 				0 == strcmp(p->macro, MVAR_TRIGGER_COMMENT))
 		{
-			const zbx_vector_uint64_t	*trigger_hosts = NULL;
-
 			*replace_to = zbx_strdup(*replace_to, c_event->trigger.comments);
 			zbx_substitute_macros(replace_to, error, maxerrlen, &zbx_macro_trigger_desc_resolv, um_handle,
-					c_event, tz, &trigger_hosts);
+					c_event, tz);
 		}
 		else if (0 == strcmp(p->macro, MVAR_TRIGGER_EVENTS_ACK))
 		{
@@ -1947,11 +1943,9 @@ int	zbx_macro_message_common_resolv(zbx_macro_resolv_data_t *p, zbx_dc_um_handle
 		else if (0 == strcmp(p->macro, MVAR_TRIGGER_DESCRIPTION) ||
 				0 == strcmp(p->macro, MVAR_TRIGGER_COMMENT))
 		{
-			const zbx_vector_uint64_t	*trigger_hosts = NULL;
-
 			*replace_to = zbx_strdup(*replace_to, c_event->trigger.comments);
 			zbx_substitute_macros(replace_to, error, maxerrlen, &zbx_macro_trigger_desc_resolv, um_handle,
-					c_event, tz, &trigger_hosts);
+					c_event, tz);
 		}
 		else if (0 == strcmp(p->macro, MVAR_TRIGGER_EXPRESSION))
 		{
