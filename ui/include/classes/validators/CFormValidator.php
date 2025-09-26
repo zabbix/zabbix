@@ -1125,8 +1125,7 @@ class CFormValidator {
 	 * @return bool
 	 */
 	public function validateObject(array $rules, &$value, ?string &$error = null, string &$path = '',
-		?array &$files = []
-	): bool {
+			?array &$files = []): bool {
 		if (!is_array($value)) {
 			$error = self::getMessage($rules, 'type', _('An array is expected.'));
 
@@ -1412,7 +1411,7 @@ class CFormValidator {
 				return false;
 			}
 
-			if ($rules['max-size']) {
+			if (array_key_exists('max-size', $rules)) {
 				try {
 					$file->validateFileSize($rules['max-size'], $rules['file-type']);
 				}
