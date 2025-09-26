@@ -36,7 +36,7 @@ in:
   timeout: 1
   poll_mode: "no error"
   recvfrom_return: [-1,0]
-  socket_had_nonblocking_error: yes
+  socket_had_blocking_error: yes
 out:
   result: FAIL
 ---

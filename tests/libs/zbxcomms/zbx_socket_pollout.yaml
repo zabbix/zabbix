@@ -9,19 +9,11 @@ out:
 test case: "cannot wait for connection"
 in:
   timeout: 1
-  socket_had_nonblocking_error: "yes"
+  socket_had_blocking_error: yes
   poll_mode: "error"
 out:
   result: FAIL
   error: "cannot wait for connection"
-# ---
-# test case: "timed out connection"
-# in:
-#   timeout: 1
-#   poll_mode: "error"
-# out:
-#   result: FAIL
-#   error: "connection timed out"
 ---
 test case: "revents error"
 in:

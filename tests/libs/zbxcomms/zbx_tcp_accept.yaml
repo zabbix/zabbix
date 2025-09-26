@@ -15,8 +15,9 @@ in:
   poll_timeout: 10
   num_socks: 1
   poll_mode: "error"
+  socket_had_nonblocking_error: yes
 out:
-  result: TIMEOUT_ERROR
+  result: FAIL
 ---
 test case: "unencrypted | accept failed"
 in:

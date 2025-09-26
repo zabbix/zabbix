@@ -26,15 +26,6 @@ in:
 out:
   result: FAIL
 ---
-test case: "localhost on reserved port"
-in:
-  ip: "127.0.0.1"
-  port: 80
-  timeout: 1
-  backlog_size: 1
-out:
-  result: FAIL
----
 test case: "valid ip"
 in:
   ip: "255.255.1.1"

@@ -46,7 +46,7 @@ int	__wrap_SSL_write(SSL *ssl, const void *buf, int num)
 
 void	set_nonblocking_error(void)
 {
-	if (SUCCEED == zbx_mock_parameter_exists("in.socket_had_nonblocking_error"))
+	if (SUCCEED == zbx_mock_parameter_exists("in.socket_had_blocking_error"))
 		errno = FAIL;
 	else
 		errno = EINTR;

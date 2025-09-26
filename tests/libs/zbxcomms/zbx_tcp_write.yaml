@@ -11,7 +11,7 @@ in:
   poll_mode: "no error"
   len: 0
   write_error: yes
-  socket_had_nonblocking_error: "no"
+  socket_had_blocking_error: "no"
 out:
   result: -1
 ---

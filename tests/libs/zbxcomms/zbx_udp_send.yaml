@@ -16,7 +16,7 @@ in:
   data_len: 5
   poll_mode: "no error"
   sendto_return: -1
-  socket_had_nonblocking_error: yes
+  socket_had_blocking_error: yes
 out:
   result: FAIL
 ---
