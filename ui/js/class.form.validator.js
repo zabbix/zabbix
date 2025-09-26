@@ -1479,6 +1479,10 @@ class CFormValidator {
 	 * @returns {boolean}
 	 */
 	#isTypeInt32(value) {
+		if (String(value).match(/^[-]?\d+$/) === null) {
+			return false;
+		}
+
 		value = parseInt(value);
 
 		return !isNaN(value) && value >= -2147483648 && value <= 2147483647;
