@@ -2570,9 +2570,7 @@ function mergeRegularAndInheritedTags(array $objects, ?int $object_type = null):
 			$unique_tags = [];
 
 			foreach ($object['inheritedTags'] as $tag) {
-				$unique_tags[$tag['tag']][$tag['value']] = $tag + [
-					'type' => ZBX_PROPERTY_INHERITED
-				];
+				$unique_tags[$tag['tag']][$tag['value']] = $tag + ['type' => ZBX_PROPERTY_INHERITED];
 			}
 
 			foreach ($object['tags'] as $tag) {
