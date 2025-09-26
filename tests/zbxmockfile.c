@@ -208,13 +208,13 @@ static int	g_mock_poll_mode = MOCK_POLL_DEFAULT;
 
 void	mock_poll_set_mode_from_param(const char *param)
 {
-	if (0 == strcmp(param, "timeout"))
+	if (0 == strcmp(param, "MOCK_POLL_TIMEOUT"))
 		g_mock_poll_mode = MOCK_POLL_TIMEOUT;
-	else if (0 == strcmp(param, "error"))
+	else if (0 == strcmp(param, "MOCK_POLL_ERROR"))
 		g_mock_poll_mode = MOCK_POLL_ERROR;
-	else if (0 == strcmp(param, "revents error"))
+	else if (0 == strcmp(param, "MOCK_POLL_REVENTS_ERROR"))
 		g_mock_poll_mode = MOCK_POLL_REVENTS_ERROR;
-	else if (0 == strcmp(param, "socket blocking error"))
+	else if (0 == strcmp(param, "MOCK_POLL_SOCKET_BLOCKING_ERROR"))
 		g_mock_poll_mode = MOCK_POLL_SOCKET_BLOCKING_ERROR;
 	else
 		g_mock_poll_mode = MOCK_POLL_DEFAULT;
@@ -340,13 +340,6 @@ void	setup_read(zbx_vector_int32_t *v)
 		read_ret[i] = v->values[i];
 }
 
-void	zbx_mock_set_fragments(const char *data, size_t size)
-{
-	frag_data = data;
-	frag_sz = size;
-	frag_pos = data;
-}
-
 off_t	__wrap_lseek(int fd, off_t offset, int whence)
 {
 	const char	*new_pos;
@@ -385,10 +378,6 @@ error:
 
 int	__wrap_close(int fd)
 {
-#ifdef TEST_COMMS
-	return 0;
-#endif
-
 	if (fd != INT_MAX) return __real_close(fd);
 
 	frag_data = frag_pos = NULL;

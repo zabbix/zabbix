@@ -16,7 +16,7 @@ in:
 out:
   result: [line1,line2,line3]
 ---
-test case: "incomplete_line_without_newline"
+test case: "incomplete line without newline"
 in:
   buf_stat: "line1"
   mode: buffer not contains next line

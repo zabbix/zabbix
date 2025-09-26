@@ -4,7 +4,7 @@ in:
   timeout: 1
   data: data
   data_len: 5
-  poll_mode: "no error"
+  poll_mode: "MOCK_POLL_DEFAULT"
   sendto_return: 1
 out:
   result: SUCCEED
@@ -14,7 +14,7 @@ in:
   timeout: 1
   data: data
   data_len: 5
-  poll_mode: "no error"
+  poll_mode: "MOCK_POLL_DEFAULT"
   sendto_return: -1
   socket_had_blocking_error: yes
 out:
@@ -25,7 +25,7 @@ in:
   timeout: 1
   data: data
   data_len: 5
-  poll_mode: "socket blocking error"
+  poll_mode: "MOCK_POLL_SOCKET_BLOCKING_ERROR"
   sendto_return: -1
 out:
   result: FAIL
@@ -35,7 +35,7 @@ in:
   timeout: 1
   data: data
   data_len: 5
-  poll_mode: "revents error"
+  poll_mode: "MOCK_POLL_REVENTS_ERROR"
   sendto_return: -1
 out:
   result: FAIL
