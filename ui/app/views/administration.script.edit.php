@@ -236,10 +236,10 @@ $form_grid = (new CFormGrid())
 		))->setId('url')
 	])
 	->addItem([
-		(new CLabel(_('Open in a new window')))->setId('new-window-label'),
+		(new CLabel(_('Open in a new window')))->setId('new-window-label')->setFor('new_window'),
 		(new CFormField(
-			(new CCheckBox('new_window'))
-				->setChecked($data['form']['new_window'])
+			(new CCheckBox('new_window', ZBX_SCRIPT_URL_NEW_WINDOW_YES))
+				->setChecked($data['form']['new_window'] == ZBX_SCRIPT_URL_NEW_WINDOW_YES)
 				->setUncheckedValue(ZBX_SCRIPT_URL_NEW_WINDOW_NO)
 		))->setId('new-window')
 	])

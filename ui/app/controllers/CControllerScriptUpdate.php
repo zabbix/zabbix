@@ -64,26 +64,38 @@ class CControllerScriptUpdate extends CController {
 					'when' => ['scope', 'in' => [ZBX_SCRIPT_SCOPE_ACTION]]
 				]
 			],
-			'execute_on' => ['db scripts.execute_on','in' => [ZBX_SCRIPT_EXECUTE_ON_AGENT, ZBX_SCRIPT_EXECUTE_ON_SERVER,
-				ZBX_SCRIPT_EXECUTE_ON_PROXY
-			]],
+			'execute_on' => ['db scripts.execute_on',
+				'in' => [ZBX_SCRIPT_EXECUTE_ON_AGENT, ZBX_SCRIPT_EXECUTE_ON_SERVER, ZBX_SCRIPT_EXECUTE_ON_PROXY],
+				'when' => ['type', 'in' => [ZBX_SCRIPT_TYPE_CUSTOM_SCRIPT]]
+			],
 			'menu_path' => ['db scripts.menu_path',
+				'when' => ['scope', 'in' => [ZBX_SCRIPT_SCOPE_HOST, ZBX_SCRIPT_SCOPE_EVENT]],
 				'use' => [CMenuPathValidator::class], 'messages' => ['use' => _('Incorrect menu path.')]
 			],
-			'authtype' => ['db scripts.authtype', 'in' => [ITEM_AUTHTYPE_PASSWORD, ITEM_AUTHTYPE_PUBLICKEY]],
+			'authtype' => ['db scripts.authtype', 'required',
+				'in' => [ITEM_AUTHTYPE_PASSWORD, ITEM_AUTHTYPE_PUBLICKEY],
+				'when' => ['type', 'in' => [ZBX_SCRIPT_TYPE_SSH]]
+			],
 			'username' => ['db scripts.username', 'required', 'not_empty',
 				'when' => ['type', 'in' => [ZBX_SCRIPT_TYPE_SSH, ZBX_SCRIPT_TYPE_TELNET]]
 			],
 			'password' => ['db scripts.password'],
 			'publickey' => ['db scripts.publickey', 'required', 'not_empty',
-				'when' => ['authtype', 'in' => [ITEM_AUTHTYPE_PUBLICKEY]]
+				'when' => [
+					['type', 'in' => [ZBX_SCRIPT_TYPE_SSH]],
+					['authtype', 'in' => [ITEM_AUTHTYPE_PUBLICKEY]]
+				]
 			],
 			'privatekey' => ['db scripts.privatekey', 'required', 'not_empty',
-				'when' => ['authtype', 'in' => [ITEM_AUTHTYPE_PUBLICKEY]]
+				'when' => [
+					['type', 'in' => [ZBX_SCRIPT_TYPE_SSH]],
+					['authtype', 'in' => [ITEM_AUTHTYPE_PUBLICKEY]]
+				]
 			],
 			'passphrase' => ['db scripts.password'],
 			'port' => ['db scripts.port',
 				'use' => [CPortParser::class, ['usermacros' => true]],
+				'when' => ['type', 'in' => [ZBX_SCRIPT_TYPE_SSH, ZBX_SCRIPT_TYPE_TELNET]],
 				'messages' => ['use' => _('Incorrect port.')]
 			],
 			'command' => ['db scripts.command', 'required', 'not_empty',
@@ -102,35 +114,61 @@ class CControllerScriptUpdate extends CController {
 				'when' => ['type', 'in' => [ZBX_SCRIPT_TYPE_WEBHOOK]]
 			],
 			'timeout' => ['db scripts.timeout', 'required', 'not_empty',
-				'use' => [CTimeUnitValidator::class, ['min' => 1, 'max' => SEC_PER_MIN, 'usermacros' => true]]
+				'use' => [CTimeUnitValidator::class, ['min' => 1, 'max' => SEC_PER_MIN]],
+				'when' => ['type', 'in' => [ZBX_SCRIPT_TYPE_WEBHOOK]]
 			],
-			'url' => ['db scripts.url', 'required', 'not_empty', 'when' => ['type', 'in' => [ZBX_SCRIPT_TYPE_URL]]],
+			'url' => ['db scripts.url', 'required', 'not_empty',
+				'use' => [CHtmlUrlValidator::class, ['allow_user_macro' => true, 'allow_manualinput_macro' => true]],
+				'messages' => ['use' => _('Invalid URL')],
+				'when' => ['type', 'in' => [ZBX_SCRIPT_TYPE_URL]]
+			],
 			'new_window' => ['db scripts.new_window',
-				'in' => [ZBX_SCRIPT_URL_NEW_WINDOW_NO, ZBX_SCRIPT_URL_NEW_WINDOW_YES]
+				'in' => [ZBX_SCRIPT_URL_NEW_WINDOW_NO, ZBX_SCRIPT_URL_NEW_WINDOW_YES],
+				'when' => ['type', 'in' => [ZBX_SCRIPT_URL_NEW_WINDOW_NO, ZBX_SCRIPT_URL_NEW_WINDOW_YES]]
 			],
 			'description' => ['db scripts.description'],
-			'host_access' => ['db scripts.host_access', 'in' => [PERM_READ, PERM_READ_WRITE]],
+			'host_access' => ['db scripts.host_access',
+				'in' => [PERM_READ, PERM_READ_WRITE],
+				'when' => ['scope', 'in' => [ZBX_SCRIPT_SCOPE_HOST, ZBX_SCRIPT_SCOPE_EVENT]]
+			],
 			'groupid' => ['db scripts.groupid'],
-			'usrgrpid' => ['db scripts.usrgrpid'],
-			'manualinput' => ['db scripts.manualinput',
+			'usrgrpid' => ['db scripts.usrgrpid',
+				'when' => ['scope', 'in' => [ZBX_SCRIPT_SCOPE_HOST, ZBX_SCRIPT_SCOPE_EVENT]]
+			],
+			'manualinput' => ['db scripts.manualinput', 'required',
+				'when' => ['scope', 'in' => [ZBX_SCRIPT_SCOPE_HOST, ZBX_SCRIPT_SCOPE_EVENT]],
 				'in' => [ZBX_SCRIPT_MANUALINPUT_DISABLED, ZBX_SCRIPT_MANUALINPUT_ENABLED]
 			],
 			'manualinput_prompt' => ['db scripts.manualinput_prompt', 'required', 'not_empty',
-				'when' => ['manualinput', 'in' => [ZBX_SCRIPT_MANUALINPUT_ENABLED]]
+				'when' => [
+					['scope', 'in' => [ZBX_SCRIPT_SCOPE_HOST, ZBX_SCRIPT_SCOPE_EVENT]],
+					['manualinput', 'in' => [ZBX_SCRIPT_MANUALINPUT_ENABLED]]
+				]
 			],
-			'manualinput_validator_type' => ['db scripts.manualinput_validator_type',
-				'in' => [ZBX_SCRIPT_MANUALINPUT_TYPE_STRING, ZBX_SCRIPT_MANUALINPUT_TYPE_LIST]
+			'manualinput_validator_type' => ['db scripts.manualinput_validator_type', 'required',
+				'in' => [ZBX_SCRIPT_MANUALINPUT_TYPE_STRING, ZBX_SCRIPT_MANUALINPUT_TYPE_LIST],
+				'when' => [
+					['scope', 'in' => [ZBX_SCRIPT_SCOPE_HOST, ZBX_SCRIPT_SCOPE_EVENT]],
+					['manualinput', 'in' => [ZBX_SCRIPT_MANUALINPUT_ENABLED]]
+				]
 			],
-			'manualinput_default_value' => ['db scripts.manualinput_default_value'],
+			'manualinput_default_value' => ['db scripts.manualinput_default_value', 'required',
+				'when' => [
+					['scope', 'in' => [ZBX_SCRIPT_SCOPE_HOST, ZBX_SCRIPT_SCOPE_EVENT]],
+					['manualinput', 'in' => [ZBX_SCRIPT_MANUALINPUT_ENABLED]]
+				]
+			],
 			'manualinput_validator' => ['db scripts.manualinput_validator', 'required', 'not_empty',
 				'use' => [CRegexValidator::class, []],
 				'when' => [
+					['scope', 'in' => [ZBX_SCRIPT_SCOPE_HOST, ZBX_SCRIPT_SCOPE_EVENT]],
 					['manualinput', 'in' => [ZBX_SCRIPT_MANUALINPUT_ENABLED]],
 					['manualinput_validator_type', 'in' => [ZBX_SCRIPT_MANUALINPUT_TYPE_STRING]]
 				]
 			],
 			'dropdown_options' => ['db scripts.manualinput_validator', 'required', 'not_empty',
 				'when' => [
+					['scope', 'in' => [ZBX_SCRIPT_SCOPE_HOST, ZBX_SCRIPT_SCOPE_EVENT]],
 					['manualinput', 'in' => [ZBX_SCRIPT_MANUALINPUT_ENABLED]],
 					['manualinput_validator_type', 'in' => [ZBX_SCRIPT_MANUALINPUT_TYPE_LIST]]
 				]
@@ -226,6 +264,7 @@ class CControllerScriptUpdate extends CController {
 			case ZBX_SCRIPT_TYPE_URL:
 				$script['url'] = $this->getInput('url', '');
 				$script['new_window'] = $this->hasInput('new_window')
+						&& $this->getInput('new_window') == ZBX_SCRIPT_URL_NEW_WINDOW_YES
 					? ZBX_SCRIPT_URL_NEW_WINDOW_YES
 					: ZBX_SCRIPT_URL_NEW_WINDOW_NO;
 				break;

@@ -1035,6 +1035,11 @@ class CFormValidator {
 				$error = $instance->getError() ?? _('Invalid string.');
 			}
 		}
+		elseif ($instance instanceof CHtmlUrlValidator) {
+			if ($instance->validate($value, $class_options) === false) {
+				$error = _('Invalid string.');
+			}
+		}
 		else {
 			throw new Exception('Method not found', -32601);
 		}
