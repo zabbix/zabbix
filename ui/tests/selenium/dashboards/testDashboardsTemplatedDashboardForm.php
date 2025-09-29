@@ -2277,12 +2277,23 @@ class testDashboardsTemplatedDashboardForm extends CWebTest {
 						],
 						[
 							'field' => 'Show',
-							'type' => 'show_section',
+							'type' => 'show_table',
+							'headers' => ['', '', 'Name', ''],
 							'field_locator' => 'id:sections-table',
-							'show_sections' => [
-								['section' => 'Monitoring'],
-								['section' => 'Availability'],
-								['section' => 'Monitored by']
+							'rows' => [
+								1 => 'Monitoring',
+								2 => 'Availability',
+								3 => 'Monitored by'
+							],
+							'option_states' => [
+								'Host groups' => true,
+								'Description' => true,
+								'Monitoring' => false,
+								'Availability' => false,
+								'Monitored by' => false,
+								'Templates' => true,
+								'Inventory' => true,
+								'Tags' => true
 							]
 						]
 					]
@@ -2301,13 +2312,26 @@ class testDashboardsTemplatedDashboardForm extends CWebTest {
 						],
 						[
 							'field' => 'Show',
-							'type' => 'show_section',
+							'type' => 'show_table',
+							'headers' => ['', '', 'Name', ''],
 							'field_locator' => 'id:sections-table',
-							'show_sections' => [
-								['section' => 'Interval and storage'],
-								['section' => 'Type of information'],
-								['section' => 'Host interface'],
-								['section' => 'Type']
+							'rows' => [
+								1 => 'Interval and storage',
+								2 => 'Type of information',
+								3 => 'Host interface',
+								4 => 'Type'
+							],
+							'option_states' => [
+								'Description' => true,
+								'Error text' => true,
+								'Interval and storage' => false,
+								'Latest data' => true,
+								'Type of information' => false,
+								'Triggers' => true,
+								'Host interface' => false,
+								'Type' => false,
+								'Host inventory' => true,
+								'Tags' => true
 							]
 						]
 					]
@@ -2607,11 +2631,36 @@ class testDashboardsTemplatedDashboardForm extends CWebTest {
 				$this->assertEquals('', $field->query('tag:polygon')->one()->getAttribute('style'));
 				break;
 
-			case 'show_section':
-				// Check default and available options in 'Show' section.
-				$show_form = $widget_form->getFieldContainer($field_details['field'])
-						->asMultifieldTable(['mapping' => ['' => 'section']]);
-				$show_form->checkValue($field_details['show_sections']);
+			case 'show_table':
+				$table = $field->asTable();
+				// TODO: Uncomment the below check after ZBX-27000 is merged.
+				// $this->assertEquals($field_details['headers'], $table->getHeadersText());
+				$this->assertTrue($table->query('id:add-row')->one()->isClickable());
+
+				// Check each default row in "Show" field and its contents.
+				$show_rows = $table->getRows()->filter(CElementFilter::CLASSES_PRESENT, 'form_row', true);
+				$i = 1;
+				foreach ($show_rows as $row) {
+					$this->assertTrue($row->getColumn(0)->query('class:drag-icon')->one()->isEnabled());
+
+					// TODO: after ZBX-27000 is merged, change column index "2" to column name "Name".
+					$dropdown = $row->getColumn(2)->query('tag:z-select')->one()->asDropdown();
+					$options = $dropdown->getOptions();
+					$this->assertEquals($field_details['rows'][$i], $dropdown->getText());
+					$this->assertEquals(array_keys($field_details['option_states']), $options->asText());
+
+					// IF option is selected in the dropdown, it appears in the list as enabled.
+					$reference_options = array_merge($field_details['option_states'], [$field_details['rows'][$i] => true]);
+
+					// If option does not have a "disabled" attribute, then it is considered enabled.
+					foreach ($options as $option) {
+						$this->assertEquals($reference_options[$option->getText()], !$option->isAttributePresent('disabled'));
+					}
+
+					$this->assertTrue($row->query('button:Remove')->one()->isClickable());
+
+					$i++;
+				}
 				break;
 		}
 
@@ -4433,6 +4482,197 @@ class testDashboardsTemplatedDashboardForm extends CWebTest {
 					],
 					'page' => '2nd page'
 				]
+			],
+			// #98 Item card widget with empty Item field
+			[
+				[
+					'expected' => TEST_BAD,
+					'fields' => [
+						'Type' => CFormElement::RELOADABLE_FILL('Item card'),
+						'Item' => ''
+					],
+					'error_message' => 'Invalid parameter "Item": cannot be empty.',
+					'page' => '2nd page'
+				]
+			],
+			// #99 Item card widget with empty sparkline date.
+			[
+				[
+					'expected' => TEST_BAD,
+					'fields' => [
+						'Type' => CFormElement::RELOADABLE_FILL('Item card'),
+						'Item' => self::TEMPLATE_ITEM
+					],
+					'swap_expected' => [
+						'Item' => self::TEMPLATE.': '.self::TEMPLATE_ITEM
+					],
+					'Show' => [
+						['action' => USER_ACTION_UPDATE, 'index' => 0, 'section' => 'Latest data']
+					],
+					'Sparkline' => [
+						'id:sparkline_time_period_from' => '',
+						'id:sparkline_time_period_to' => ''
+					],
+					'page' => '2nd page',
+					'error_message' => [
+						'Invalid parameter "Sparkline: Time period/From": cannot be empty.',
+						'Invalid parameter "Sparkline: Time period/To": cannot be empty.'
+					]
+				]
+			],
+			// #100 Item card widget with the wrong sparkline range.
+			[
+				[
+					'expected' => TEST_BAD,
+					'fields' => [
+						'Type' => CFormElement::RELOADABLE_FILL('Item card'),
+						'Name' => 'Selected more than 731 day for graph filter.',
+						'Item' => self::TEMPLATE_ITEM
+					],
+					'swap_expected' => [
+						'Item' => self::TEMPLATE.': '.self::TEMPLATE_ITEM
+					],
+					'Show' => [
+						['action' => USER_ACTION_UPDATE, 'index' => 0, 'section' => 'Latest data']
+					],
+					'Sparkline' => [
+						'id:sparkline_time_period_from' => 'now-1000d',
+						'id:sparkline_time_period_to' => 'now'
+					],
+					'page' => '2nd page',
+					'error_message' => [
+						'Maximum time period to display is 731 days.'
+					]
+				]
+			],
+			// #101 Item card widget with empty widget value.
+			[
+				[
+					'expected' => TEST_BAD,
+					'fields' => [
+						'Type' => CFormElement::RELOADABLE_FILL('Item card'),
+						'Name' => 'Empty widget value',
+						'Item' => self::TEMPLATE_ITEM
+					],
+					'swap_expected' => [
+						'Item' => self::TEMPLATE.': '.self::TEMPLATE_ITEM
+					],
+					'Show' => [
+						['action' => USER_ACTION_UPDATE, 'index' => 0, 'section' => 'Latest data']
+					],
+					'Sparkline' => [
+						'id:sparkline_time_period_data_source' => 'Widget'
+					],
+					'page' => '2nd page',
+					'error_message' => [
+						'Invalid parameter "Sparkline: Time period/Widget": cannot be empty.'
+					]
+				]
+			],
+			// #102 Item card widget with incorrect number for sparkline parameters.
+			[
+				[
+					'expected' => TEST_BAD,
+					'fields' => [
+						'Type' => CFormElement::RELOADABLE_FILL('Item card'),
+						'Show header' => false,
+						'Name' => 'Incorrect number for sparkline parameters',
+						'Refresh interval' => 'No refresh',
+						'Item' => self::TEMPLATE_ITEM
+					],
+					'swap_expected' => [
+						'Item' => self::TEMPLATE.': '.self::TEMPLATE_ITEM
+					],
+					'Show' => [
+						['action' => USER_ACTION_UPDATE, 'index' => 0, 'section' => 'Latest data']
+					],
+					'Sparkline' => [
+						'id:sparkline_width' => 5000,
+						'id:sparkline_fill' => -5
+					],
+					'page' => '2nd page',
+					'error_message' => [
+						'Invalid parameter "Sparkline: Width": value must be one of 0-10.',
+						'Invalid parameter "Sparkline: Fill": value must be one of 0-10.'
+					]
+				]
+			],
+			// #103 Item card widget with incorrect data type for time period fields.
+			[
+				[
+					'expected' => TEST_BAD,
+					'fields' => [
+						'Type' => CFormElement::RELOADABLE_FILL('Item card'),
+						'Name' => 'A time is expected',
+						'Item' => self::TEMPLATE_ITEM
+					],
+					'swap_expected' => [
+						'Item' => self::TEMPLATE.': '.self::TEMPLATE_ITEM
+					],
+					'Show' => [
+						['action' => USER_ACTION_UPDATE, 'index' => 0, 'section' => 'Latest data']
+					],
+					'Sparkline' => [
+						'id:sparkline_time_period_data_source' => 'Custom',
+						'id:sparkline_time_period_from' => 'dsa',
+						'id:sparkline_time_period_to' => '321'
+					],
+					'page' => '2nd page',
+					'error_message' => [
+						'Invalid parameter "Sparkline: Time period/From": a time is expected.',
+						'Invalid parameter "Sparkline: Time period/To": a time is expected.'
+					]
+				]
+			],
+			// #104 Item card widget with all values.
+			[
+				[
+					'fields' => [
+						'Type' => CFormElement::RELOADABLE_FILL('Item card'),
+						'Name' => 'Trying to fill all widget fields',
+						'Refresh interval' => '10 minutes',
+						'Item' => self::TEMPLATE_ITEM
+					],
+					'swap_expected' => [
+						'Item' => self::TEMPLATE.': '.self::TEMPLATE_ITEM
+					],
+					'Show' => [
+						['section' => 'Description'],
+						['section' => 'Error text'],
+						['section' => 'Latest data'],
+						['section' => 'Triggers'],
+						['section' => 'Host inventory'],
+						['section' => 'Tags']
+					],
+					'Sparkline' => [
+						'id:sparkline_width' => 5,
+						'id:sparkline_fill' => 3,
+						'id:sparkline_time_period_data_source' => 'Dashboard',
+						'id:sparkline_history' => 'History',
+						'color' => 'F48FB1'
+					],
+					'page' => '2nd page'
+				]
+			],
+			// #105 Item card widget with all values.
+			[
+				[
+					'fields' => [
+						'Type' => CFormElement::RELOADABLE_FILL('Host card'),
+						'Name' => 'Fully filled host card widget',
+						'Refresh interval' => '10 minutes',
+						'Show suppressed problems' => true,
+					],
+					'Show' => [
+						['section' => 'Host groups'],
+						['section' => 'Description'],
+						['section' => 'Templates'],
+						['section' => 'Inventory'],
+						['section' => 'Tags']
+					],
+					'Inventory' => ['Location latitude', 'Location longitude', 'Tag', 'Type'],
+					'page' => '2nd page'
+				]
 			]
 		];
 	}
@@ -4527,6 +4767,40 @@ class testDashboardsTemplatedDashboardForm extends CWebTest {
 			// Open Advanced config again because after column filling it becomes collapsed for Item history widget.
 			if ($container === 'Items') {
 				$form->fill(['Advanced configuration' => true]);
+			}
+		}
+
+		if (array_key_exists('Show', $data)) {
+			$this->query('id:sections-table')->asMultifieldTable([
+				'mapping' => [
+					'' => [
+						'name' => 'section',
+						'selector' => 'xpath:./z-select',
+						'class' => 'CDropdownElement'
+					]
+				]
+			])->one()->fill($data['Show']);
+
+			if (array_key_exists('Inventory', $data)) {
+				$form->getField('Inventory fields')->fill($data['Inventory']);
+			}
+		}
+
+		if (array_key_exists('Sparkline', $data)) {
+			foreach ($data['Sparkline'] as $field => $value) {
+				if ($field === 'color') {
+					$color_picker_dialog = $form->query('class:color-picker')->one()->asColorPicker();
+					$color_picker_dialog->fill($value);
+				}
+				else if ($field === 'widget') {
+					$sparkline = $form->query('class:widget-field-sparkline')->one()->waitUntilReady();
+					$sparkline->query('button', 'Select')->one()->waitUntilClickable()->click();
+					$dialog = COverlayDialogElement::find()->all()->last()->waitUntilReady();
+					$dialog->query('link:'. $value)->one()->click();
+				}
+				else {
+					$form->getField($field)->fill($value);
+				}
 			}
 		}
 

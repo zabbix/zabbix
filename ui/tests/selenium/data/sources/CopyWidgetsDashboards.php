@@ -2471,6 +2471,42 @@ class CopyWidgetsDashboards {
 										'value' => 10084 // Zabbix server.
 									]
 								]
+							],
+							[
+								'type'=> 'itemcard',
+								'name'=> 'Item card widget',
+								'x'=> 38,
+								'y'=> 17,
+								'width'=> 20,
+								'height'=> 5,
+								'view_mode' => '0',
+								'fields'=> [
+									[
+										'type'=> ZBX_WIDGET_FIELD_TYPE_ITEM,
+										'name'=> 'itemid.0',
+										'value'=> $template_itemid
+									],
+									[
+										'type'=> 0,
+										'name'=> 'sections.0',
+										'value'=> 2
+									],
+									[
+										'type'=> '0',
+										'name'=> 'sections.1',
+										'value'=> 4
+									],
+									[
+										'type'=> 0,
+										'name'=> 'sections.2',
+										'value'=> 6
+									],
+									[
+										'type'=> 0,
+										'name'=> 'sections.3',
+										'value'=> 7
+									]
+								]
 							]
 						]
 					],
