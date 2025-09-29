@@ -96,7 +96,7 @@ This template has been tested on:
 
 |Name|Description|Expression|Severity|Dependencies and additional info|
 |----|-----------|----------|--------|--------------------------------|
-|Ribbon: System status is Card Failed|<p>System status is Card Failed.</p>|`last(/Ribbon SBC 2000 by HTTP/ribbon.system.status)=9`|Average||
+|Ribbon: System status - Card Failed|<p>The current system status - Card Failed.</p>|`last(/Ribbon SBC 2000 by HTTP/ribbon.system.status)=9`|Average||
 |Ribbon: High CPU utilization|<p>CPU utilization is too high. The system might be slow to respond.</p>|`min(/Ribbon SBC 2000 by HTTP/ribbon.cpu.usage,5m)>{$RIBBON.CPU.UTIL.CRIT}`|Average||
 |Ribbon: High memory utilization|<p>Memory utilization is too high. The system might be slow to respond.</p>|`min(/Ribbon SBC 2000 by HTTP/ribbon.memory.usage,5m)>{$RIBBON.MEMORY.UTIL.CRIT}`|Average||
 
