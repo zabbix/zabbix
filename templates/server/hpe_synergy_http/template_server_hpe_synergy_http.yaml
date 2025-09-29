@@ -112,7 +112,7 @@ zabbix_export:
             			'userName': Synergy.params.username,
             			'password': Synergy.params.password,
             			'authLoginDomain': Synergy.params.login_domain,
-            			"loginMsgAck": "true"
+            			'loginMsgAck': 'true'
             		}));
             
             		if (request.getStatus() !== 200) {
