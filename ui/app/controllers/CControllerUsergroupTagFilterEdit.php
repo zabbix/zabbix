@@ -56,6 +56,9 @@ class CControllerUsergroupTagFilterEdit extends CController {
 		];
 		$this->getInputs($data, array_keys($data));
 
+		$data['js_validation_rules'] = CControllerUsergroupTagFilterCheck::getValidationRules();
+		$data['js_validation_rules'] = (new CFormValidator($data['js_validation_rules']))->getRules();
+
 		$data += [
 			'title' => $data['edit'] == 0 ? _('New tag filter') : _('Tag filter'),
 			'user' => [

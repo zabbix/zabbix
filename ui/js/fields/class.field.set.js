@@ -151,7 +151,17 @@ class CFieldSet extends CField {
 				name_parts.shift();
 			}
 
-			result = objectSetDeepValue(result, name_parts, trim_value ? field.getValueTrimmed() : field.getValue());
+			if (field instanceof CFieldMultiselect) {
+				const values = trim_value ? field.getValueTrimmed() : field.getValue();
+
+				for (const [name_part, value] of Object.entries(values)) {
+					name_parts[name_parts.length - 1] = name_part;
+					result = objectSetDeepValue(result, name_parts, value);
+				}
+			}
+			else {
+				result = objectSetDeepValue(result, name_parts, trim_value ? field.getValueTrimmed() : field.getValue());
+			}
 		}
 
 		return result;

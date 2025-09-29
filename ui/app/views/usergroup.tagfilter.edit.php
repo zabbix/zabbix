@@ -21,6 +21,11 @@
 
 $form = (new CForm())
 	->addItem((new CVar(CSRF_TOKEN_NAME, CCsrfTokenHelper::get('tagfilter')))->removeId())
+	->setAction((new CUrl('zabbix.php'))
+		->setArgument('action', 'usergroup.tagfilter.check')
+		->getUrl()
+	)
+	->setAttribute('onsubmit', 'window.tag_filter_edit.submit();')
 	->setId('tag-filter-add-form')
 	->setName('tag-filter-add-form');
 
@@ -37,14 +42,16 @@ $new_tag_filter_table = (new CTable())
 	->addItem(
 		(new CTag('tfoot', true))
 			->addItem(new CCol((new CButtonLink(_('Add')))->addClass('js-add-tag-filter-row')))
-	);
+	)
+	->setAttribute('data-field-type', 'set')
+	->setAttribute('data-field-name', 'new_tag_tag_filters');
 
 $form_grid
 	->addItem([
-		(new CLabel(_('Host groups'), 'ms_new_tag_filter_groupids__ms'))->setAsteriskMark(),
+		(new CLabel(_('Host groups'), 'new_tag_groups__ms'))->setAsteriskMark(),
 		new CFormField(
 			(new CMultiSelect([
-				'name' => 'ms_new_tag_filter[groupids][]',
+				'name' => 'new_tag_groups[]',
 				'object_name' => 'hostGroup',
 				'data' => $data['host_groups_ms'],
 				'popup' => [
@@ -52,7 +59,7 @@ $form_grid
 						'srctbl' => 'host_groups',
 						'srcfld1' => 'groupid',
 						'dstfrm' => $form->getName(),
-						'dstfld1' => 'ms_new_tag_filter_groupids_',
+						'dstfld1' => 'new_tag_groups_',
 						'disableids' => array_column($data['host_groups_ms'], 'id')
 					]
 				],
@@ -63,16 +70,16 @@ $form_grid
 		)
 	])
 	->addItem([
-		new CLabel(_('Filter'), 'filter_type'),
+		new CLabel(_('Filter'), 'new_tag_filter_type'),
 		new CFormField(
-			(new CRadioButtonList('filter_type', TAG_FILTER_ALL))
+			(new CRadioButtonList('new_tag_filter_type', TAG_FILTER_ALL))
 				->addValue(_('All tags'), TAG_FILTER_ALL)
 				->addValue(_('Tag list'), TAG_FILTER_LIST)
 				->setModern(true)
 		)
 	])
 	->addItem([
-		(new CLabel(_('Tags'), 'tag_filters'))->setAsteriskMark(),
+		(new CLabel(_('Tags'), 'new_tag_tag_filters'))->setAsteriskMark(),
 		(new CFormField(
 			(new CDiv($new_tag_filter_table))->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
 		))
@@ -81,12 +88,12 @@ $form_grid
 
 $tag_filter_row_template = (new CTemplateTag('tag-filter-row-template'))->addItem(
 	(new CRow([
-		(new CTextBox('new_tag_filter[#{rowid}][tag]', '#{tag}', false,
+		(new CTextBox('new_tag_tag_filters[#{rowid}][tag]', '#{tag}', false,
 			DB::getFieldLength('tag_filter', 'tag')
 		))
 			->setWidth(ZBX_TEXTAREA_FILTER_SMALL_WIDTH)
 			->setAttribute('placeholder', _('tag')),
-		(new CTextBox('new_tag_filter[#{rowid}][value]', '#{value}', false,
+		(new CTextBox('new_tag_tag_filters[#{rowid}][value]', '#{value}', false,
 			DB::getFieldLength('tag_filter', 'value')
 		))
 			->setWidth(ZBX_TEXTAREA_FILTER_SMALL_WIDTH)
@@ -101,7 +108,8 @@ $form
 	->addItem($form_grid)
 	->addItem(
 		(new CScriptTag('
-			tag_filter_edit.init('.json_encode([
+			window.tag_filter_edit.init('.json_encode([
+				'rules' => $data['js_validation_rules'],
 				'tag_filters' => $data['tag_filters'],
 				'groupid' => $data['groupid'] ?: 0
 			]).');
@@ -119,7 +127,7 @@ $output = [
 			'title' => $data['edit'] == 0 ? _('Add') : _('Update'),
 			'keepOpen' => true,
 			'isSubmit' => true,
-			'action' => 'tag_filter_edit.submit();'
+			'action' => 'window.tag_filter_edit.submit();'
 		]
 	]
 ];

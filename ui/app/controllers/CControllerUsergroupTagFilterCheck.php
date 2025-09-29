@@ -23,27 +23,55 @@ class CControllerUsergroupTagFilterCheck extends CController {
 
 	protected function init(): void {
 		$this->setPostContentType(self::POST_CONTENT_TYPE_JSON);
+		$this->setInputValidationMethod(self::INPUT_VALIDATION_FORM);
 		$this->disableCsrfValidation();
 	}
 
-	protected function checkInput(): bool {
-		$fields = [
-			'groupid' =>			'db hosts_groups.groupid',
-			'filter_type' =>		'in 1,0',
-			'tag_filters' =>		'array',
-			'ms_new_tag_filter' =>	'array',
-			'new_tag_filter' =>		'array'
-		];
+	public static function getValidationRules(): array {
+		return ['object', 'fields' => [
+			'groupid' => ['db hosts_groups.groupid'],
+			'new_tag_groups' => ['array', 'required', 'not_empty', 'field' => ['db hstgrp.groupid']],
+			'new_tag_filter_type' => ['boolean'],
+			'new_tag_tag_filters' => ['objects', 'required', 'not_empty',
+				'uniq' => ['tag', 'value'],
+				'messages' => ['uniq' => _('Tag name and value combination is not unique.')],
+				'fields' => [
+					'value' => ['db tag_filter.value'],
+					'tag' => ['db tag_filter.tag', 'required', 'not_empty', 'when' => ['value', 'not_empty']]
+				],
+				'when' => ['new_tag_filter_type', 'in' => [1]]
+			],
+			'tag_filters' => ['objects',
+				'fields' => [
+					'groupid' => ['db hosts_groups.groupid'],
+					'name' => ['string'],
+					'tags' => ['objects',
+						'uniq' => ['tag', 'value'],
+						'messages' => ['uniq' => _('Tag name and value combination is not unique.')],
+						'fields' => [
+							'value' => ['db tag_filter.value'],
+							'tag' => ['db tag_filter.tag', 'required', 'not_empty', 'when' => ['value', 'not_empty']]
+						]
+					]
+				]
+			]
+		]];
+	}
 
-		$ret = $this->validateInput($fields) && $this->validateTagFilters();
+	protected function checkInput(): bool {
+
+		$ret = $this->validateInput($this->getValidationRules()) && $this->validateHostGroups();
 
 		if (!$ret) {
+			$form_errors = $this->getValidationError();
+			$response = $form_errors
+				? ['form_errors' => $form_errors]
+				: ['error' => [
+					'messages' => array_column(get_and_clear_messages(), 'message')
+				]];
+
 			$this->setResponse(
-				new CControllerResponseData(['main_block' => json_encode([
-					'error' => [
-						'messages' => array_column(get_and_clear_messages(), 'message')
-					]
-				])])
+				new CControllerResponseData(['main_block' => json_encode($response)])
 			);
 		}
 
@@ -51,86 +79,24 @@ class CControllerUsergroupTagFilterCheck extends CController {
 	}
 
 	/**
-	 * Validates the tag filters provided in the input and checks if the host groups and tag values are provided.
+	 * Validates provided host groups
 	 *
 	 * @return bool
 	 */
-	protected function validateTagFilters(): bool {
-		$new_host_groups = $this->getInput('ms_new_tag_filter', []);
+	protected function validateHostGroups(): bool {
+		$host_groups = $this->getInput('new_tag_groups', []);
 		$db_hostgroups = API::HostGroup()->get([
 			'output' => ['groupid', 'name']
 		]);
 
 		$this->host_groups = $db_hostgroups ?: $this->host_groups;
 
-		if (array_key_exists('groupids', $new_host_groups)) {
-			foreach($new_host_groups['groupids'] as $groupid) {
-				if (!in_array($groupid, array_column($this->host_groups, 'groupid'))) {
-					error(_('No permissions to referred object or it does not exist!'));
-
-					return false;
-				}
-			}
-		}
-		else {
-			error(_s('Incorrect value for field "%1$s": %2$s.', _('Host groups'), _('cannot be empty')));
-
-			return false;
-		}
-
-		if ($this->hasInput('new_tag_filter')) {
-			$empty_tags = 0;
-			$unique_tag_filters = [];
-
-			foreach ($this->getInput('new_tag_filter') as $tag_filter) {
-				$tag = $tag_filter['tag'];
-				$value = $tag_filter['value'];
-
-				if ($tag === '' && $value !== '') {
-					error(_s('Incorrect value for field "%1$s": %2$s.', _('Tag'), _('cannot be empty')));
-
-					return false;
-				}
-
-				if (strlen($tag) > DB::getFieldLength('tag_filter', 'tag')) {
-					error(_s('Invalid parameter "%1$s": %2$s.', $tag, _('value is too long')));
-
-					return false;
-				}
-
-				if (strlen($value) > DB::getFieldLength('tag_filter', 'value')) {
-					error(_s('Invalid parameter "%1$s": %2$s.', $value, _('value is too long')));
-
-					return false;
-				}
-
-				if ($tag === '' && $value === '') {
-					$empty_tags++;
-					continue;
-				}
-
-				if (array_key_exists($tag, $unique_tag_filters) && $unique_tag_filters[$tag] === $value) {
-					error(_s('Incorrect value for field "%1$s": %2$s.', _('Tags'),
-						_s('value "%1$s" already exists', '(tag, value)=('.$tag.', '.$value.')'))
-					);
-
-					return false;
-				}
-				else {
-					$unique_tag_filters[$tag] = $value;
-				}
-			}
-
-			if (count($this->getInput('new_tag_filter')) == $empty_tags) {
-				error(_s('Incorrect value for field "%1$s": %2$s.', _('Tags'), _('cannot be empty')));
+		foreach($host_groups as $groupid) {
+			if (!in_array($groupid, array_column($this->host_groups, 'groupid'))) {
+				error(_('No permissions to referred object or it does not exist!'));
 
 				return false;
 			}
-		}
-		elseif ($this->getInput('filter_type') == TAG_FILTER_LIST) {
-			error(_s('Incorrect value for field "%1$s": %2$s.', _('Tags'), _('cannot be empty')));
-
-			return false;
 		}
 
 		return true;
@@ -142,13 +108,12 @@ class CControllerUsergroupTagFilterCheck extends CController {
 
 	protected function doAction(): void {
 		$data['tag_filters'] = $this->getInput('tag_filters', []);
-		$filter_type = $this->getInput('filter_type', TAG_FILTER_ALL);
+		$filter_type = $this->getInput('new_tag_filter_type', TAG_FILTER_ALL);
 		$opened_groupid = $this->getInput('groupid');
-		$ms_groups = $this->getInput('ms_new_tag_filter', []);
-		$groupids = $ms_groups['groupids'];
-		$new_tag_filters = $this->getInput('new_tag_filter', []);
+		$groupids = $this->getInput('new_tag_groups', []);
+		$new_tag_filters = $this->getInput('new_tag_tag_filters', []);
 
-		if (!in_array($opened_groupid, $groupids)) {
+		if (array_key_exists($opened_groupid, $data['tag_filters'])) {
 			unset($data['tag_filters'][$opened_groupid]);
 		}
 

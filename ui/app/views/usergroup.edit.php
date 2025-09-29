@@ -19,8 +19,6 @@
  * @var array $data
  */
 
-$this->includeJsFile('usergroup.edit.js.php');
-
 $html_page = (new CHtmlPage())
 	->setTitle(_('User groups'))
 	->setDocUrl(CDocHelper::getUrl(CDocHelper::USERS_USERGROUP_EDIT));
@@ -28,6 +26,11 @@ $html_page = (new CHtmlPage())
 $csrf_token = CCsrfTokenHelper::get('usergroup');
 
 $form = (new CForm())
+	->setAction((new CUrl('zabbix.php'))
+		->setArgument('action', ($data['usrgrpid'] == 0) ? 'usergroup.create' : 'usergroup.update')
+		->getUrl()
+	)
+	->setAttribute('onsubmit', 'window.usergroup_edit.submit(event);')
 	->addItem((new CVar('form_refresh', $data['form_refresh'] + 1))->removeId())
 	->addItem((new CVar(CSRF_TOKEN_NAME, $csrf_token))->removeId())
 	->setId('user-group-form')
@@ -206,6 +209,8 @@ $template_permissions_form_grid = (new CFormGrid())
 								)
 							)
 					)
+					->setAttribute('data-field-type', 'set')
+					->setAttribute('data-field-name', 'templategroup_rights')
 			))
 				->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
 				->setAttribute('style', 'min-width: '.ZBX_TEXTAREA_BIG_WIDTH.'px;')
@@ -215,20 +220,20 @@ $template_permissions_form_grid = (new CFormGrid())
 $templategroup_right_row_template = (new CTemplateTag('templategroup-right-row-template'))->addItem(
 	(new CRow([
 		(new CMultiSelect([
-			'name' => 'ms_templategroup_right[groupids][#{rowid}][]',
+			'name' => 'templategroup_rights[#{rowid}][groupids][]',
 			'object_name' => 'templateGroup',
 			'popup' => [
 				'parameters' => [
 					'srctbl' => 'template_groups',
 					'srcfld1' => 'groupid',
 					'dstfrm' => $form->getName(),
-					'dstfld1' => 'ms_templategroup_right_groupids_#{rowid}_'
+					'dstfld1' => 'templategroup_rights_#{rowid}_groupids_'
 				]
 			],
 			'add_post_js' => false
 		]))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH),
 		(new CCol(
-			(new CRadioButtonList('templategroup_right[permission][#{rowid}]', PERM_DENY))
+			(new CRadioButtonList('templategroup_rights[#{rowid}][permission]', PERM_DENY))
 				->addValue(_('Read-write'), PERM_READ_WRITE)
 				->addValue(_('Read'), PERM_READ)
 				->addValue(_('Deny'), PERM_DENY)
@@ -257,6 +262,8 @@ $host_permissions_form_grid = (new CFormGrid())
 						(new CTag('tfoot', true))
 							->addItem(new CCol((new CButtonLink(_('Add')))->addClass('js-add-hostgroup-right-row')))
 					)
+					->setAttribute('data-field-type', 'set')
+					->setAttribute('data-field-name', 'hostgroup_rights')
 			))
 				->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
 				->setAttribute('style', 'min-width: '.ZBX_TEXTAREA_BIG_WIDTH.'px;')
@@ -266,20 +273,20 @@ $host_permissions_form_grid = (new CFormGrid())
 $host_permissions_row_template = (new CTemplateTag('hostgroup-right-row-template'))->addItem(
 	(new CRow([
 		(new CMultiSelect([
-			'name' => 'ms_hostgroup_right[groupids][#{rowid}][]',
+			'name' => 'hostgroup_rights[#{rowid}][groupids][]',
 			'object_name' => 'hostGroup',
 			'popup' => [
 				'parameters' => [
 					'srctbl' => 'host_groups',
 					'srcfld1' => 'groupid',
 					'dstfrm' => $form->getName(),
-					'dstfld1' => 'ms_hostgroup_right_groupids_#{rowid}_'
+					'dstfld1' => 'hostgroup_rights_#{rowid}_groupids_'
 				]
 			],
 			'add_post_js' => false
 		]))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH),
 		(new CCol(
-			(new CRadioButtonList('hostgroup_right[permission][#{rowid}]', PERM_DENY))
+			(new CRadioButtonList('hostgroup_rights[#{rowid}][permission]', PERM_DENY))
 				->addValue(_('Read-write'), PERM_READ_WRITE)
 				->addValue(_('Read'), PERM_READ)
 				->addValue(_('Deny'), PERM_DENY)
@@ -331,7 +338,7 @@ $cancel_button = (new CRedirectButton(_('Cancel'), (new CUrl('zabbix.php'))
 
 if ($data['usrgrpid'] != 0) {
 	$tabs->setFooter(makeFormFooter(
-		(new CSubmitButton(_('Update'), 'action', 'usergroup.update'))->setId('update'),
+		new CSubmit('update', _('Update')),
 		[
 			(new CRedirectButton(_('Delete'),
 				(new CUrl('zabbix.php'))
@@ -346,7 +353,7 @@ if ($data['usrgrpid'] != 0) {
 }
 else {
 	$tabs->setFooter(makeFormFooter(
-		(new CSubmitButton(_('Add'), 'action', 'usergroup.create'))->setId('add'),
+		new CSubmit(null, _('Add')),
 		[
 			$cancel_button
 		]
@@ -356,14 +363,16 @@ else {
 $form
 	->addItem($tabs)
 	->addItem(
-		(new CScriptTag('view.init('.json_encode([
-			'templategroup_rights' => $data['templategroup_rights'],
-			'hostgroup_rights' => $data['hostgroup_rights'],
-			'tag_filters' => $data['tag_filters'],
-			'can_update_group' => $data['can_update_group'],
-			'ldap_status' => array_key_exists('ldap_status', $data) ? $data['ldap_status'] : 0,
-			'mfa_status' => $data['mfa_config_status']
-		]).');'))->setOnDocumentReady()
+		(new CScriptTag($this->readJsFile('usergroup.edit.js.php') .
+			'window.usergroup_edit.init('.json_encode([
+				'rules' => $data['js_validation_rules'],
+				'templategroup_rights' => $data['templategroup_rights'],
+				'hostgroup_rights' => $data['hostgroup_rights'],
+				'tag_filters' => $data['tag_filters'],
+				'can_update_group' => $data['can_update_group'],
+				'ldap_status' => array_key_exists('ldap_status', $data) ? $data['ldap_status'] : 0,
+				'mfa_status' => $data['mfa_config_status']
+			]).');'))->setOnDocumentReady()
 	);
 
 $html_page

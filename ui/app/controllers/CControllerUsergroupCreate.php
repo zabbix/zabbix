@@ -14,116 +14,84 @@
 **/
 
 
-class CControllerUsergroupCreate extends CController {
+class CControllerUsergroupCreate extends CControllerUsergroupUpdateGeneral {
 
-	protected function checkInput() {
-		$fields = [
-			'name' =>					'required|not_empty|db usrgrp.name',
-			'userids' =>				'array_db users.userid',
-			'gui_access' =>				'db usrgrp.gui_access|in '.implode(',', [GROUP_GUI_ACCESS_SYSTEM, GROUP_GUI_ACCESS_INTERNAL, GROUP_GUI_ACCESS_LDAP, GROUP_GUI_ACCESS_DISABLED]),
-			'users_status' =>			'db usrgrp.users_status|in '.GROUP_STATUS_ENABLED.','.GROUP_STATUS_DISABLED,
-			'debug_mode' =>				'db usrgrp.debug_mode|in '.GROUP_DEBUG_MODE_ENABLED.','.GROUP_DEBUG_MODE_DISABLED,
-			'userdirectoryid' =>		'db usrgrp.userdirectoryid',
-			'mfaid' =>					'int32',
-			'ms_hostgroup_right' =>		'array',
-			'hostgroup_right' =>		'array',
-			'ms_templategroup_right' =>	'array',
-			'templategroup_right' =>	'array',
-			'tag_filters' =>			'array',
-			'form_refresh' =>			'int32'
+	protected function init(): void {
+		$this->setInputValidationMethod(self::INPUT_VALIDATION_FORM);
+		$this->setPostContentType(self::POST_CONTENT_TYPE_JSON);
+	}
+
+	public static function getValidationRules(): array {
+		$api_uniq = [
+			['usergroup.get', ['name' => '{name}']]
 		];
 
-		$ret = $this->validateInput($fields);
+		return ['object', 'api_uniq' => $api_uniq, 'fields' => [
+			'userids' => ['array', 'field' => ['db users_groups.userid']],
+			'name' => ['db usrgrp.name', 'required', 'not_empty'],
+			'gui_access' => ['integer', 'required',
+				'in' => [GROUP_GUI_ACCESS_SYSTEM, GROUP_GUI_ACCESS_INTERNAL, GROUP_GUI_ACCESS_LDAP,
+					GROUP_GUI_ACCESS_DISABLED
+				]
+			],
+			'userdirectoryid' => ['db userdirectory.userdirectoryid',
+				'when' => ['gui_access', 'in' => [GROUP_GUI_ACCESS_SYSTEM, GROUP_GUI_ACCESS_LDAP]]
+			],
+			'mfaid' => ['integer'],
+			'users_status' => ['db usrgrp.users_status'],
+			'debug_mode' => ['db usrgrp.debug_mode'],
+			'templategroup_rights' => ['objects', 'fields' => [
+				'groupids' => ['array', 'field' => ['db rights.groupid']],
+				'permission' => ['integer', 'required', 'in' => [PERM_DENY, PERM_READ, PERM_READ_WRITE]]
+			]],
+			'hostgroup_rights' => ['objects', 'fields' => [
+				'groupids' => ['array', 'field' => ['db rights.groupid']],
+				'permission' => ['integer', 'required', 'in' => [PERM_DENY, PERM_READ, PERM_READ_WRITE]]
+			]],
+			'tag_filters' => ['objects',
+				'fields' => [
+					'groupid' => ['db tag_filter.groupid', 'required'],
+					'tags' => ['objects', 'fields' => [
+						'value' => ['db tag_filter.value'],
+						'tag' => ['db tag_filter.tag', 'required', 'not_empty', 'when' => ['value', 'not_empty']]
+					]]
+				]
+			]
+		]];
+	}
+
+	protected function checkInput(): bool {
+		$ret = $this->validateInput($this->getValidationRules());
 
 		if (!$ret) {
-			switch ($this->getValidationResult()) {
-				case self::VALIDATION_ERROR:
-					$response = new CControllerResponseRedirect(
-						(new CUrl('zabbix.php'))->setArgument('action', 'usergroup.edit')
-					);
-					$response->setFormData($this->getInputAll());
-					CMessageHelper::setErrorTitle(_('Cannot add user group'));
-					$this->setResponse($response);
-					break;
+			$form_errors = $this->getValidationError();
+			$response = $form_errors
+				? ['form_errors' => $form_errors]
+				: ['error' => [
+					'title' => _('Cannot add user group'),
+					'messages' => array_column(get_and_clear_messages(), 'message')
+				]];
 
-				case self::VALIDATION_FATAL_ERROR:
-					$this->setResponse(new CControllerResponseFatal());
-					break;
-			}
+			$this->setResponse(
+				new CControllerResponseData(['main_block' => json_encode($response)])
+			);
 		}
 
 		return $ret;
 	}
 
-	protected function checkPermissions() {
+	protected function checkPermissions(): bool {
 		return $this->checkAccess(CRoleHelper::UI_ADMINISTRATION_USER_GROUPS);
 	}
 
-	protected function doAction() {
-		$user_group = [
-			'users' => zbx_toObject($this->getInput('userids', []), 'userid'),
-			'hostgroup_rights' => [],
-			'templategroup_rights' => [],
-			'tag_filters' => []
-		];
+	protected function doAction(): void {
+		$this->loadDbGroups();
+		$user_group = [];
 
-		$this->getInputs($user_group, ['users_status', 'gui_access', 'debug_mode', 'userdirectoryid', 'mfaid']);
-		$user_group['name'] = trim($this->getInput('name'));
-
-		$db_hostgroups = API::HostGroup()->get([
-			'output' => ['groupid', 'name']
-		]);
-		$db_templategroups = API::TemplateGroup()->get([
-			'output' => ['groupid', 'name']
-		]);
-
-		$hostgroup_rights = [];
-		$templategroup_rigts = [];
-
-		$this->getInputs($hostgroup_rights, ['ms_hostgroup_right', 'hostgroup_right']);
-		$this->getInputs($templategroup_rigts, ['ms_templategroup_right', 'templategroup_right']);
-
-		if (!checkGroupsExist($hostgroup_rights, $db_hostgroups, 'ms_hostgroup_right')
-				|| !checkGroupsExist($templategroup_rigts, $db_templategroups, 'ms_templategroup_right')) {
-			$this->getErrorResponse(true);
+		if ($this->processUserGroupInputData($user_group) === false) {
+			$this->setErrorResponse();
 
 			return;
-		}
-
-		$user_group['hostgroup_rights'] = processRights($hostgroup_rights, 'ms_hostgroup_right', 'hostgroup_right');
-		$user_group['templategroup_rights'] = processRights($templategroup_rigts,'ms_templategroup_right',
-			'templategroup_right'
-		);
-
-		$tag_filters = $this->getInput('tag_filters', []);
-
-		foreach ($tag_filters as $hostgroup) {
-			if (in_array($hostgroup['groupid'], array_column($db_hostgroups, 'groupid'))) {
-				foreach ($hostgroup['tags'] as $tag_filter) {
-					if ($hostgroup['groupid'] != 0) {
-						$user_group['tag_filters'][] = [
-							'groupid' => $hostgroup['groupid'],
-							'tag' => $tag_filter['tag'],
-							'value' => $tag_filter['value']
-						];
-					}
-				}
-			}
-			else {
-				$this->getErrorResponse(true);
-
-				return;
-			}
-		}
-
-		if (array_key_exists('mfaid', $user_group)) {
-			if ($user_group['mfaid'] == -1) {
-				$user_group['mfa_status'] = GROUP_MFA_DISABLED;
-				unset($user_group['mfaid']);
-			}
-			else {
-				$user_group['mfa_status'] = GROUP_MFA_ENABLED;
-			}
 		}
 
 		$result = (bool) API::UserGroup()->create($user_group);
@@ -140,28 +108,20 @@ class CControllerUsergroupCreate extends CController {
 			$this->setResponse($response);
 		}
 		else {
-			$this->getErrorResponse();
+			$this->setErrorResponse();
 		}
 	}
 
-	/**
-	 * Creates and sets an error response when creating a user group fails.
-	 * Redirects to the 'usergroup.edit' action and optionally adds a specific error message.
-	 *
-	 * @param bool $add_message  Optional flag for adding a specific error message.
-	 */
-	private function getErrorResponse(bool $add_message = false): void {
-		$response = new CControllerResponseRedirect(
-			(new CUrl('zabbix.php'))->setArgument('action', 'usergroup.edit')
+	protected function setErrorResponse(?array $form_errors = null): void {
+		$response = $form_errors
+			? ['form_errors' => $form_errors]
+			: ['error' => [
+				'title' => _('Cannot create user group'),
+				'messages' => array_column(get_and_clear_messages(), 'message')
+			]];
+
+		$this->setResponse(
+			new CControllerResponseData(['main_block' => json_encode($response)])
 		);
-		CMessageHelper::setErrorTitle(_('Cannot add user group'));
-
-		if ($add_message) {
-			CMessageHelper::addError(_('No permissions to referred object or it does not exist!'));
-		}
-
-		$response->setFormData($this->getInputAll());
-
-		$this->setResponse($response);
 	}
 }
