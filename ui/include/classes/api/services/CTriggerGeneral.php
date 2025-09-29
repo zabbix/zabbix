@@ -83,6 +83,7 @@ abstract class CTriggerGeneral extends CApiService {
 					'CASE WHEN i.flags IN ('.
 						implode(',', [ZBX_FLAG_DISCOVERY_PROTOTYPE, ZBX_FLAG_DISCOVERY_PROTOTYPE_CREATED]).
 					')'.
+					' THEN '.ZBX_TAG_OBJECT_ITEM_PROTOTYPE.
 					' ELSE '.ZBX_TAG_OBJECT_ITEM.
 					' END AS object',
 				'objectid' => 'f.itemid AS objectid'
