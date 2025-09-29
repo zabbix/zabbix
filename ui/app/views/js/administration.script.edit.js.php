@@ -539,15 +539,20 @@ window.script_edit_popup = new class {
 				.remove('<?= ZBX_STYLE_FIELD_LABEL_ASTERISK ?>');
 		}
 
-		const updateTestUserInput = () => test_user_input.disabled = !(
-			input_prompt.value.trim() !== '' && validator.value.trim() !== '' && this.user_input_checked
-		);
+		const updateTestUserInput = () => this.user_input_checked && this.form
+			.validateFieldsForAction(['manualinput_validator', 'manualinput_prompt', 'dropdown_options'])
+			.then(result => {
+				if (result) {
+					test_user_input.disabled = false;
+				}
+				else {
+					test_user_input.disabled = true;
+				}
+			});
 
+		updateTestUserInput();
 		input_prompt.onkeyup = updateTestUserInput;
 		validator.onkeyup = updateTestUserInput;
-
-		input_prompt.dispatchEvent(new Event('keyup'));
-		validator.dispatchEvent(new Event('keyup'));
 	}
 
 	/**
