@@ -158,41 +158,25 @@ abstract class CItemGeneral extends CApiService {
 		foreach ($options['selectInheritedTags'] as $field) {
 			$output[] = match ($field) {
 				'tag', 'value' => 'ht.'.$field,
-				'object' => ZBX_TAG_OBJECT_TEMPLATE.' AS '.$field,
-				'objectid' => 'itc.link_hostid AS '.$field
+				'object' =>
+					'CASE WHEN h.status='.HOST_STATUS_TEMPLATE.
+					' THEN '.ZBX_TAG_OBJECT_TEMPLATE.
+					' ELSE '.ZBX_TAG_OBJECT_HOST.
+					' END AS object',
+				'objectid' => 'itc.link_hostid AS objectid'
 			};
 		}
 
-		if (in_array('object', $options['selectInheritedTags'])) {
-			$output[] = 'h.flags';
+		$resource = DBselect(
+			'SELECT '.implode(',', $output).
+			' FROM item_template_cache itc'.
+			' JOIN host_tag ht ON itc.link_hostid=ht.hostid'.
+			(in_array('object', $options['selectInheritedTags']) ? ' JOIN hosts h ON itc.link_hostid=h.hostid' : '').
+			' WHERE '.dbConditionId('itc.itemid', array_keys($items))
+		);
 
-			$resource = DBselect(
-				'SELECT '.implode(',', $output).
-				' FROM item_template_cache itc'.
-				' JOIN host_tag ht ON itc.link_hostid=ht.hostid'.
-				' JOIN hosts h ON itc.link_hostid=h.hostid'.
-				' WHERE '.dbConditionId('itc.itemid', array_keys($items))
-			);
-
-			while ($row = DBfetch($resource)) {
-				if ($row['flags'] == ZBX_FLAG_DISCOVERY_NORMAL || $row['flags'] == ZBX_FLAG_DISCOVERY_CREATED) {
-					$row['object'] = (string) ZBX_TAG_OBJECT_HOST;
-				}
-
-				$items[$row['itemid']]['inheritedTags'][] = array_diff_key($row, array_flip(['itemid', 'flags']));
-			}
-		}
-		else {
-			$resource = DBselect(
-				'SELECT '.implode(',', $output).
-				' FROM item_template_cache itc'.
-				' JOIN host_tag ht ON itc.link_hostid=ht.hostid'.
-				' WHERE '.dbConditionId('itc.itemid', array_keys($items))
-			);
-
-			while ($row = DBfetch($resource)) {
-				$items[$row['itemid']]['inheritedTags'][] = array_diff_key($row, array_flip(['itemid']));
-			}
+		while ($row = DBfetch($resource)) {
+			$items[$row['itemid']]['inheritedTags'][] = array_diff_key($row, array_flip(['itemid']));
 		}
 	}
 

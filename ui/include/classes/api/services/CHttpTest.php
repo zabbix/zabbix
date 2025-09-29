@@ -314,44 +314,26 @@ class CHttpTest extends CApiService {
 		foreach ($options['selectInheritedTags'] as $field) {
 			$output[] = match ($field) {
 				'tag', 'value' => 'ht.'.$field,
-				'object' => ZBX_TAG_OBJECT_TEMPLATE.' AS '.$field,
-				'objectid' => 'itc.link_hostid AS '.$field
+				'object' =>
+					'CASE WHEN h.status='.HOST_STATUS_TEMPLATE.
+					' THEN '.ZBX_TAG_OBJECT_TEMPLATE.
+					' ELSE '.ZBX_TAG_OBJECT_HOST.
+					' END AS object',
+				'objectid' => 'itc.link_hostid AS objectid'
 			};
 		}
 
-		if (in_array('object', $options['selectInheritedTags'])) {
-			$output[] = 'h.flags';
+		$resource = DBselect(
+			'SELECT DISTINCT '.implode(',', $output).
+			' FROM httptestitem hi'.
+			' JOIN item_template_cache itc ON hi.itemid=itc.itemid'.
+			' JOIN host_tag ht ON itc.link_hostid=ht.hostid'.
+			(in_array('object', $options['selectInheritedTags']) ? ' JOIN hosts h ON itc.link_hostid=h.hostid' : '').
+			' WHERE '.dbConditionId('hi.httptestid', array_keys($httptests))
+		);
 
-			$resource = DBselect(
-				'SELECT '.implode(',', $output).
-				' FROM host_tag ht'.
-				' JOIN item_template_cache itc ON ht.hostid=itc.link_hostid'.
-				' JOIN httptestitem hi ON itc.itemid=hi.itemid'.
-				' JOIN hosts h ON itc.link_hostid=h.hostid'.
-				' WHERE '.dbConditionId('hi.httptestid', array_keys($httptests))
-			);
-
-			while ($row = DBfetch($resource)) {
-				if ($row['flags'] == ZBX_FLAG_DISCOVERY_NORMAL || $row['flags'] == ZBX_FLAG_DISCOVERY_CREATED) {
-					$row['object'] = (string) ZBX_TAG_OBJECT_HOST;
-				}
-
-				$httptests[$row['httptestid']]['inheritedTags'][] =
-					array_diff_key($row, array_flip(['httptestid', 'flags']));
-			}
-		}
-		else {
-			$resource = DBselect(
-				'SELECT '.implode(',', $output).
-				' FROM host_tag ht'.
-				' JOIN item_template_cache itc ON ht.hostid=itc.link_hostid'.
-				' JOIN httptestitem hi ON itc.itemid=hi.itemid'.
-				' WHERE '.dbConditionId('hi.httptestid', array_keys($httptests))
-			);
-
-			while ($row = DBfetch($resource)) {
-				$httptests[$row['httptestid']]['inheritedTags'][] = array_diff_key($row, array_flip(['httptestid']));
-			}
+		while ($row = DBfetch($resource)) {
+			$httptests[$row['httptestid']]['inheritedTags'][] = array_diff_key($row, array_flip(['httptestid']));
 		}
 	}
 

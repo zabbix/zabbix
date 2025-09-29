@@ -73,78 +73,51 @@ abstract class CTriggerGeneral extends CApiService {
 		}
 		unset($trigger);
 
+		$item_tag_output = ['f.triggerid'];
+		$host_or_template_tag_output = ['f.triggerid'];
+
+		foreach ($options['selectInheritedTags'] as $field) {
+			$item_tag_output = match ($field) {
+				'tag', 'value' => 'it.'.$field,
+				'object' =>
+					'CASE WHEN i.flags IN ('.
+						implode(',', [ZBX_FLAG_DISCOVERY_PROTOTYPE, ZBX_FLAG_DISCOVERY_PROTOTYPE_CREATED]).
+					')'.
+					' ELSE '.ZBX_TAG_OBJECT_ITEM.
+					' END AS object',
+				'objectid' => 'f.itemid AS objectid'
+			};
+
+			$host_or_template_tag_output[] = match ($field) {
+				'tag', 'value' => 'ht.'.$field,
+				'object' =>
+					'CASE WHEN h.status='.HOST_STATUS_TEMPLATE.
+					' THEN '.ZBX_TAG_OBJECT_TEMPLATE.
+					' ELSE '.ZBX_TAG_OBJECT_HOST.
+					' END AS object',
+				'objectid' => 'itc.link_hostid AS objectid'
+			};
+		}
+
 		$triggerids = array_keys($triggers);
 
-		$output_item_tags = ['f.triggerid', 'it.tag', 'it.value', ZBX_TAG_OBJECT_ITEM.' AS object',
-			'f.itemid AS objectid'
-		];
-		$output_template_tags = ['f.triggerid', 'ht.tag', 'ht.value', ZBX_TAG_OBJECT_TEMPLATE.' AS object',
-			'ht.hostid AS objectid'
-		];
+		$resource = DBselect(
+			'SELECT '.implode(',', $item_tag_output).
+			' FROM functions f'.
+			' JOIN item_tag it ON f.itemid=it.itemid'.
+			(in_array('object', $options['selectInheritedTags']) ? ' JOIN items i ON f.itemid=i.itemid' : '').
+			' WHERE '.dbConditionId('f.triggerid', $triggerids).
+			' UNION ALL '.
+			'SELECT DISTINCT '.implode(',', $host_or_template_tag_output).
+			' FROM functions f'.
+			' JOIN item_template_cache itc ON f.itemid=itc.itemid'.
+			' JOIN host_tag ht ON itc.link_hostid=ht.hostid'.
+			(in_array('object', $options['selectInheritedTags']) ? ' JOIN hosts h ON itc.link_hostid=h.hostid' : '').
+			' WHERE '.dbConditionId('f.triggerid', $triggerids)
+		);
 
-		if (in_array('object', $options['selectInheritedTags'])) {
-			$output_item_tags[] = '"item_tag" AS tag_table';
-			$output_item_tags[] = 'i.flags';
-			$output_template_tags[] = '"host_tag" AS tag_table';
-			$output_template_tags[] = 'h.flags';
-
-			$resource = DBselect(
-				'SELECT '.implode(',', $output_item_tags).
-				' FROM functions f'.
-				' JOIN items i ON f.itemid=i.itemid'.
-				' JOIN item_tag it ON i.itemid=it.itemid'.
-				' WHERE '.dbConditionId('f.triggerid', $triggerids).
-				' UNION ALL '.
-				'SELECT DISTINCT '.implode(',', $output_template_tags).
-				' FROM functions f'.
-				' JOIN item_template_cache itc ON f.itemid=itc.itemid'.
-				' JOIN hosts h ON itc.link_hostid=h.hostid'.
-				' JOIN host_tag ht ON h.hostid=ht.hostid'.
-				' WHERE '.dbConditionId('f.triggerid', $triggerids)
-			);
-
-			while ($row = DBfetch($resource)) {
-				if ($row['tag_table'] === 'item_tag') {
-					if ($row['flags'] == ZBX_FLAG_DISCOVERY_PROTOTYPE) {
-						$row['object'] = (string) ZBX_TAG_OBJECT_ITEM_PROTOTYPE;
-					}
-				}
-				elseif ($row['flags'] == ZBX_FLAG_DISCOVERY_NORMAL || $row['flags'] == ZBX_FLAG_DISCOVERY_CREATED) {
-					$row['object'] = (string) ZBX_TAG_OBJECT_HOST;
-				}
-
-				$tag = [];
-
-				foreach ($options['selectInheritedTags'] as $field) {
-					$tag[$field] = $row[$field];
-				}
-
-				$triggers[$row['triggerid']]['inheritedTags'][] = $tag;
-			}
-		}
-		else {
-			$resource = DBselect(
-				'SELECT '.implode(',', $output_item_tags).
-				' FROM functions f'.
-				' JOIN item_tag it ON f.itemid=it.itemid'.
-				' WHERE '.dbConditionId('f.triggerid', $triggerids).
-				' UNION ALL '.
-				'SELECT DISTINCT '.implode(',', $output_template_tags).
-				' FROM functions f'.
-				' JOIN item_template_cache itc ON f.itemid=itc.itemid'.
-				' JOIN host_tag ht ON itc.link_hostid=ht.hostid'.
-				' WHERE '.dbConditionId('f.triggerid', $triggerids)
-			);
-
-			while ($row = DBfetch($resource)) {
-				$tag = [];
-
-				foreach ($options['selectInheritedTags'] as $field) {
-					$tag[$field] = $row[$field];
-				}
-
-				$triggers[$row['triggerid']]['inheritedTags'][] = $tag;
-			}
+		while ($row = DBfetch($resource)) {
+			$triggers[$row['triggerid']]['inheritedTags'][] = array_diff_key($row, array_flip(['triggerid']));
 		}
 	}
 

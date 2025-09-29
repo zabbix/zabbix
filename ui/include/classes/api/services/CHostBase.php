@@ -80,8 +80,8 @@ abstract class CHostBase extends CApiService {
 		foreach ($options['selectInheritedTags'] as $field) {
 			$output[] = match ($field) {
 				'tag', 'value' => 'ht.'.$field,
-				'object' => ZBX_TAG_OBJECT_TEMPLATE.' AS '.$field,
-				'objectid' => 'htc.link_hostid AS '.$field
+				'object' => ZBX_TAG_OBJECT_TEMPLATE.' AS object',
+				'objectid' => 'htc.link_hostid AS objectid'
 			};
 		}
 
