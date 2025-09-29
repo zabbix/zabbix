@@ -35,6 +35,7 @@ This template has been tested on:
 |{$HPE.SYNERGY.API.SCHEME}|<p>The API scheme (http/https).</p>|`https`|
 |{$HPE.SYNERGY.API.HOST}|<p>The hostname or IP address of the API host.</p>|`<SET API HOST>`|
 |{$HPE.SYNERGY.API.PORT}|<p>The API port.</p>|`443`|
+|{$HPE.SYNERGY.API.LOGIN_DOMAIN}|<p>The user's domain.</p>|`LOCAL`|
 
 ### Items
 
