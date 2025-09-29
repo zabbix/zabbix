@@ -4661,7 +4661,7 @@ class testDashboardsTemplatedDashboardForm extends CWebTest {
 						'Type' => CFormElement::RELOADABLE_FILL('Host card'),
 						'Name' => 'Fully filled host card widget',
 						'Refresh interval' => '10 minutes',
-						'Show suppressed problems' => true,
+						'Show suppressed problems' => true
 					],
 					'Show' => [
 						['section' => 'Host groups'],

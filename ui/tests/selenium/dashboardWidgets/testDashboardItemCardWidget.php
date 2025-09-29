@@ -1239,7 +1239,7 @@ class testDashboardItemCardWidget extends testWidgets {
 					]
 				]
 			],
-			// #1. Check mandotary sparkline time period fields erros messages.
+			// #1. Check mandotary sparkline time period fields errors messages.
 			[
 				[
 					'expected' => TEST_BAD,
