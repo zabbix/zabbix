@@ -165,6 +165,10 @@ window.maintenance_edit = new class {
 				this.#addTimePeriod(e.detail);
 			}
 		});
+
+		overlay.$dialogue[0].addEventListener('dialogue.close', () =>
+			this.form.validateChanges(['timeperiods'])
+		);
 	}
 
 	#addTimePeriod(timeperiod) {
