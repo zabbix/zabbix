@@ -96,6 +96,11 @@ class WidgetView extends CControllerDashboardWidgetView {
 
 			CArrayHelper::sort($groups, ['name']);
 
+			foreach ($groups as &$group) {
+				$group += ['ok' => 0, 'failed' => 0, 'unknown' => 0];
+			}
+			unset($group);
+
 			$groupids = array_keys($groups);
 
 			$hosts = API::Host()->get([
@@ -107,11 +112,6 @@ class WidgetView extends CControllerDashboardWidgetView {
 				'monitored_hosts' => true,
 				'preservekeys' => true
 			]);
-
-			foreach ($groups as &$group) {
-				$group += ['ok' => 0, 'failed' => 0, 'unknown' => 0];
-			}
-			unset($group);
 
 			$httptests = API::HttpTest()->get([
 				'output' => ['hostid'],
@@ -127,19 +127,20 @@ class WidgetView extends CControllerDashboardWidgetView {
 			// Fetch HTTP test execution data.
 			$httptest_data = Manager::HttpTest()->getLastData(array_keys($httptests));
 
-			foreach ($httptests as $httptest) {
+			foreach ($httptests as $httptestid => $httptest) {
 				foreach ($hosts[$httptest['hostid']]['hostgroups'] as $group) {
-					$group = &$groups[$group['groupid']];
+					if ($filter_groupids !== null && !in_array($group['groupid'], $filter_groupids)) {
+						continue;
+					}
 
-					if (array_key_exists($httptest['httptestid'], $httptest_data)
-							&& $httptest_data[$httptest['httptestid']]['lastfailedstep'] !== null) {
-						$group[$httptest_data[$httptest['httptestid']]['lastfailedstep'] != 0 ? 'failed' : 'ok']++;
+					if (array_key_exists($httptestid, $httptest_data)
+							&& $httptest_data[$httptestid]['lastfailedstep'] !== null) {
+						$status_name = $httptest_data[$httptestid]['lastfailedstep'] != 0 ? 'failed' : 'ok';
+						$groups[$group['groupid']][$status_name]++;
 					}
 					else {
-						$group['unknown']++;
+						$groups[$group['groupid']]['unknown']++;
 					}
-
-					unset($group);
 				}
 			}
 
