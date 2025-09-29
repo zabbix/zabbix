@@ -1105,9 +1105,9 @@ zabbix_export:
           triggers:
             - uuid: 01f76a527a4743618027c9dc972ce132
               expression: 'last(/Ribbon SBC 2000 by HTTP/ribbon.system.status)=9'
-              name: 'Ribbon: System status is Card Failed'
+              name: 'Ribbon: System status - Card Failed'
               priority: AVERAGE
-              description: 'System status is Card Failed.'
+              description: 'The current system status - Card Failed.'
               tags:
                 - tag: scope
                   value: availability
