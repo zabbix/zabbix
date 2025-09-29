@@ -16,13 +16,15 @@
 
 class CControllerRegExTest extends CController {
 
-	protected function init() {
+	protected function init(): void {
 		$this->disableCsrfValidation();
+		$this->setPostContentType(self::POST_CONTENT_TYPE_JSON);
 	}
 
-	protected function checkInput() {
+	protected function checkInput(): bool {
 		$fields = [
-			'ajaxdata' => 'array'
+			'expressions' => 'array',
+			'test_string' => 'string'
 		];
 
 		$ret = $this->validateInput($fields);
@@ -34,36 +36,32 @@ class CControllerRegExTest extends CController {
 		return $ret;
 	}
 
-	protected function checkPermissions() {
+	protected function checkPermissions(): bool {
 		return $this->checkAccess(CRoleHelper::UI_ADMINISTRATION_GENERAL);
 	}
 
-	protected function doAction() {
-		$response = new CAjaxResponse();
-		$data = $this->getInput('ajaxdata', []);
-
+	protected function doAction(): void {
 		$result = [
 			'expressions' => $this->getInput('expressions', []),
 			'errors' => [],
 			'final' => true
 		];
 
-		if (array_key_exists('expressions', $data)) {
-			foreach ($data['expressions'] as $id => $expression) {
-				try {
-					self::validateRegex($expression);
-					$result['expressions'][$id] = CGlobalRegexp::matchExpression($expression, $data['testString']);
-					$result['final'] = $result['final'] && $result['expressions'][$id];
-				}
-				catch (Exception $e) {
-					$result['errors'][$id] = $e->getMessage();
-					$result['final'] = false;
-				}
+		foreach ($this->getInput('expressions', []) as $id => $expression) {
+			try {
+				self::validateRegex($expression);
+				$is_match = CGlobalRegexp::matchExpression($expression, $this->getInput('test_string', ''));
+				$result['expressions'][$id] = $is_match;
+				$result['final'] = $result['final'] && $result['expressions'][$id];
+			}
+			catch (Exception $e) {
+				$result['expressions'][$id] = null;
+				$result['errors'][$id] = $e->getMessage();
+				$result['final'] = false;
 			}
 		}
 
-		$response->success($result);
-		$response->send();
+		$this->setResponse(new CControllerResponseData(['main_block' => json_encode($result)]));
 	}
 
 	private static function validateRegex(array $expression): void {
