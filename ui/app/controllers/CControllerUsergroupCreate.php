@@ -97,15 +97,17 @@ class CControllerUsergroupCreate extends CControllerUsergroupUpdateGeneral {
 		$result = (bool) API::UserGroup()->create($user_group);
 
 		if ($result) {
-			$response = new CControllerResponseRedirect(
-				(new CUrl('zabbix.php'))
-					->setArgument('action', 'usergroup.list')
-					->setArgument('page', CPagerHelper::loadPage('usergroup.list', null))
-			);
-			$response->setFormData(['uncheck' => '1']);
-			CMessageHelper::setSuccessTitle(_('User group added'));
+			$output['success']['title'] = _('User group added');
+			$output['success']['redirect'] = (new CUrl('zabbix.php'))
+				->setArgument('action', 'usergroup.list')
+				->setArgument('page', CPagerHelper::loadPage('usergroup.list', null))
+				->getUrl();
 
-			$this->setResponse($response);
+			if ($messages = get_and_clear_messages()) {
+				$output['success']['messages'] = array_column($messages, 'message');
+			}
+
+			$this->setResponse(new CControllerResponseData(['main_block' => json_encode($output)]));
 		}
 		else {
 			$this->setErrorResponse();
