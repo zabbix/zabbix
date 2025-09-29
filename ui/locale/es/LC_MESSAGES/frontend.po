@@ -4,7 +4,7 @@ msgstr ""
 "Project-Id-Version: Zabbix 6.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2024-04-02 17:26+0300\n"
-"PO-Revision-Date: 2025-09-15 14:50+0000\n"
+"PO-Revision-Date: 2025-09-26 12:03+0000\n"
 "Last-Translator: Vicente Salvador <vicentesalvadorcubedo@gmail.com>\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
 "Language: es\n"
@@ -13589,17 +13589,17 @@ msgstr "Reemplazado por"
 
 #: app/controllers/CControllerPopupLldOverride.php:144
 msgid "Override"
-msgstr "Remplazo"
+msgstr "Especificar"
 
 #: app/partials/administration.system.info.php:197
 #: app/views/administration.housekeeping.edit.php:127
 msgid "Override item history period"
-msgstr "Anular el período del historial de métricas"
+msgstr "Especificar el período del historial de métricas"
 
 #: app/partials/administration.system.info.php:211
 #: app/views/administration.housekeeping.edit.php:156
 msgid "Override item trend period"
-msgstr "Anular periodo de tendencias de métricas"
+msgstr "Especificar periodo de tendencias de métricas"
 
 #: app/controllers/CControllerPopupLldOverride.php:91
 #, c-format
