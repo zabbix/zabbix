@@ -65,14 +65,6 @@ class CFieldArray extends CField {
 		return this.getInnerValue(true);
 	}
 
-	_appendErrorHint(error_hint) {
-		this._field.parentNode.parentNode.appendChild(error_hint);
-	}
-
-	_toggleError() {
-		this._field.parentNode.classList.toggle('has-error', this.hasErrorHint());
-	}
-
 	#detectFieldChanges = () => {
 		this.#discoverAllFields();
 

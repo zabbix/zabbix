@@ -2443,6 +2443,17 @@ div[data-field-type="set"].has-error {
   width: min-content;
   border: 1px solid #ff5555; }
 
+div[data-field-type="array"].has-error {
+  padding-left: 5px;
+  width: min-content;
+  border: 1px solid #ff5555; }
+  div[data-field-type="array"].has-error input[type="checkbox"]:not([readonly]) + label span {
+    border: 1px solid #ff5555;
+    color: #ffffff; }
+  div[data-field-type="array"].has-error input[type="checkbox"]:not([readonly]):checked + label span::after {
+    border-left-color: #ff5555;
+    border-bottom-color: #ff5555; }
+
 .radio-list-control.has-error input[type="radio"] + label {
   border-color: #ff5555; }
 .radio-list-control.has-error input[type="radio"]:checked + label {

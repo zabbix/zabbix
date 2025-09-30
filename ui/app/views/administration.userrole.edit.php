@@ -19,8 +19,6 @@
  * @var array $data
  */
 
-$this->includeJsFile('administration.userrole.edit.js.php');
-
 $html_page = (new CHtmlPage())
 	->setTitle(_('User roles'))
 	->setDocUrl(CDocHelper::getUrl(CDocHelper::USERS_USERROLE_EDIT));
@@ -28,6 +26,12 @@ $html_page = (new CHtmlPage())
 $csrf_token = CCsrfTokenHelper::get('userrole');
 
 $form = (new CForm())
+	->setAction((new CUrl('zabbix.php'))
+		->setArgument('action', ($data['roleid'] == 0) ? 'userrole.create' : 'userrole.update')
+		->getUrl()
+	)
+	->addVar('action', ($data['roleid'] == 0) ? 'userrole.create' : 'userrole.update')
+	->setAttribute('onsubmit', 'window.userrole_edit.submit(event);')
 	->addItem((new CVar('form_refresh', $data['form_refresh'] + 1))->removeId())
 	->addItem((new CVar(CSRF_TOKEN_NAME, $csrf_token))->removeId())
 	->setId('userrole-form')
@@ -37,6 +41,8 @@ $form = (new CForm())
 if ($data['roleid'] !== null) {
 	$form->addVar('roleid', $data['roleid']);
 }
+
+$form_container = new CDiv();
 
 $form_grid = (new CFormGrid())
 	->addItem([
@@ -84,20 +90,27 @@ $form_grid->addItem(
 	)
 );
 
+$form_container->addItem($form_grid);
+
+$form_grid = (new CFormGrid())
+	->setAttribute('data-field-type', 'array')
+	->setAttribute('data-field-name', 'ui')
+	->setAttribute('data-error-container', 'ui-error-container')
+	->addStyle('width:100%');
+
 foreach ($data['labels']['sections'] as $section_key => $section_label) {
 	if (count($data['labels']['rules'][$section_key]) === 1) {
 		$first_rule_key = array_key_first($data['labels']['rules'][$section_key]);
 		$form_grid->addItem([
 			new CLabel($section_label, $first_rule_key),
 			new CFormField(
-				(new CCheckBox(str_replace('.', '_', $first_rule_key), 1))
+				(new CCheckBox('ui[]', $first_rule_key))
 					->setId($first_rule_key)
 					->setChecked(
 						array_key_exists($first_rule_key, $data['rules']['ui'])
 						&& $data['rules']['ui'][$first_rule_key]
 					)
 					->setReadonly($data['readonly'])
-					->setUncheckedValue(0)
 			)
 		]);
 	} else {
@@ -105,11 +118,10 @@ foreach ($data['labels']['sections'] as $section_key => $section_label) {
 		foreach ($data['labels']['rules'][$section_key] as $rule_key => $rule_label) {
 			$ui[] = [
 				'id' => $rule_key,
-				'name' => str_replace('.', '_', $rule_key),
+				'name' => 'ui[]',
 				'label' => $rule_label,
-				'value' => 1,
-				'checked' => array_key_exists($rule_key, $data['rules']['ui']) && $data['rules']['ui'][$rule_key],
-				'unchecked_value' => 0
+				'value' => $rule_key,
+				'checked' => array_key_exists($rule_key, $data['rules']['ui']) && $data['rules']['ui'][$rule_key]
 			];
 		}
 		$form_grid->addItem([
@@ -134,6 +146,10 @@ if (!$data['readonly']) {
 		)
 	);
 }
+
+$form_container->addItem($form_grid);
+$form_grid = (new CFormGrid());
+$form_grid->addItem([new CDiv(),(new CDiv())->setId('ui-error-container')]);
 
 $form_grid->addItem([
 	new CLabel(_('Default access to new UI elements'), $data['readonly'] ? '' : 'ui.default_access'),
@@ -236,9 +252,11 @@ $form_grid
 	]);
 
 $form_grid->addItem(
-	new CFormField(
+	(new CFormField(
 		(new CTag('h4', true, _('Access to modules')))->addClass('input-section-header')
-	)
+	))
+		->setAttribute('data-field-type', 'set')
+		->setAttribute('data-field-name', 'modules')
 );
 
 $modules = [];
@@ -310,7 +328,8 @@ $form_grid
 				->addValue(_('Allow list'), ZBX_ROLE_RULE_API_MODE_ALLOW)
 				->addValue(_('Deny list'), ZBX_ROLE_RULE_API_MODE_DENY)
 				->setModern(true)
-				->setReadonly($data['readonly'] || !$data['rules']['api.access'])
+				->setReadonly($data['readonly'])
+				->setEnabled($data['rules']['api.access'])
 				->addClass('js-userrole-apimode')
 		)
 	])
@@ -320,7 +339,8 @@ $form_grid
 				'name' => 'api_methods[]',
 				'object_name' => 'api_methods',
 				'data' => $data['rules']['api'],
-				'readonly' => $data['readonly'] || !$data['rules']['api.access'],
+				'readonly' => $data['readonly'],
+				'disabled' => !$data['rules']['api.access'],
 				'popup' => [
 					'parameters' => [
 						'srctbl' => 'api_methods',
@@ -344,19 +364,25 @@ $form_grid
 
 $actions = [];
 foreach ($data['labels']['actions'] as $action => $label) {
-	$actions[] = new CDiv(
-		(new CCheckBox(str_replace('.', '_', $action), 1))
+	$actions[] = (new CDiv(
+		(new CCheckBox('actions[]', $action))
 			->setId($action)
-			->setChecked(array_key_exists($action, $data['rules']['actions']) && $data['rules']['actions'][$action])
+			->setChecked(array_key_exists($action, $data['rules']['actions'])&& $data['rules']['actions'][$action])
 			->setReadonly($data['readonly'])
 			->setLabel($label)
-			->setUncheckedValue(0)
-	);
+	))
+		->addClass(ZBX_STYLE_NOWRAP);
 }
 
 $form_grid->addItem(
-	new CFormField($actions)
+	[(new CFormField($actions))
+		->setAttribute('data-field-type', 'array')
+		->setAttribute('data-field-name', 'actions')
+		->setAttribute('data-error-container', 'actions-error-container')
+	]
 );
+
+$form_grid->addItem([new CDiv(),(new CDiv())->setId('actions-error-container')]);
 
 $form_grid->addItem([
 	new CLabel(_('Default access to new actions'), $data['readonly'] ? '' : 'actions.default_access'),
@@ -380,12 +406,13 @@ $buttons = [$cancel_button];
 if ($data['roleid'] !== null) {
 	$buttons = [
 		(new CSimpleButton(_('Clone')))->setId('clone'),
-		(new CRedirectButton(_('Delete'),
-			(new CUrl('zabbix.php'))->setArgument('action', 'userrole.delete')
+		(new CSimpleButton(_('Delete')))
+			->setAttribute('data-redirect-url', (new CUrl('zabbix.php'))
+				->setArgument('action', 'userrole.delete')
 				->setArgument('roleids', [$data['roleid']])
-				->setArgument(CSRF_TOKEN_NAME, $csrf_token),
-			_('Delete selected role?')
-		))
+				->setArgument(CSRF_TOKEN_NAME, $csrf_token)
+			)
+			->onClick('window.userrole_edit.delete()')
 			->setId('delete')
 			->setEnabled(!$data['readonly']),
 		$cancel_button
@@ -403,16 +430,19 @@ $form_grid->addItem(
 	)
 );
 
-$tabs = (new CTabView())->addTab('user_role_tab', _('User role'), $form_grid);
+$form_container->addItem($form_grid);
+$tabs = (new CTabView())->addTab('user_role_tab', _('User role'), $form_container);
 
-$form->addItem((new CTabView())->addTab('user_role_tab', _('User role'), $form_grid));
+$form->addItem((new CTabView())->addTab('user_role_tab', _('User role'), $form_container));
 
 $html_page
 	->addItem($form)
 	->show();
 
-(new CScriptTag('
-	view.init('.json_encode([
+(new CScriptTag($this->readJsFile('administration.userrole.edit.js.php') .
+	'window.userrole_edit.init('.json_encode([
+		'rules' => $data['js_validation_rules'],
+		'rules_create' => $data['js_validation_rules_create'],
 		'readonly' => $data['readonly']
 	]).');
 '))

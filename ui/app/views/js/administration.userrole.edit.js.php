@@ -14,285 +14,394 @@
 **/
 
 
-/**
- * @var CView $this
- */
 ?>
 
-<script>
-	const view = {
-		readonly: false,
+window.userrole_edit = new class {
 
-		init({readonly}) {
-			this.readonly = readonly;
+	init({rules, rules_create, readonly}) {
+		this.form_element = document.getElementById('userrole-form');
+		this.form = new CForm(this.form_element, rules);
+		this.readonly = readonly;
 
-			const usertype_select = document.getElementById('user-type');
-			if (usertype_select !== null) {
-				usertype_select.addEventListener('change', this.events.usertypeChange);
+		const usertype_select = document.getElementById('user-type');
+		if (usertype_select !== null) {
+			usertype_select.addEventListener('change', (e) => this.usertypeChange(e));
 
-				this.updateAccessUiElementsFieldsGroup(usertype_select.value);
+			this.updateAccessUiElementsFieldsGroup(usertype_select.value);
+		}
+
+		document
+			.getElementById('api-access')
+			.addEventListener('change', (e) => this.apiaccessChange(e));
+
+		document
+			.getElementById('service-write-access')
+			.addEventListener('change', () => this.serviceWriteAccessChange());
+
+		this.updateServicesWriteAccessFields();
+
+		jQuery('#service_write_list_')
+			.multiSelect('getSelectButton')
+			.addEventListener('click', () => {
+				this.selectServiceAccessList(jQuery('#service_write_list_'));
+			});
+
+		document
+			.getElementById('service-read-access')
+			.addEventListener('change', () => this.serviceReadAccessChange());
+
+		this.updateServicesReadAccessFields();
+
+		jQuery('#service_read_list_')
+			.multiSelect('getSelectButton')
+			.addEventListener('click', () => {
+				this.selectServiceAccessList(jQuery('#service_read_list_'));
+			});
+
+		const clone_button = document.getElementById('clone');
+		if (clone_button !== null) {
+			clone_button.addEventListener('click', () => this.clone(rules_create));
+		}
+	}
+
+	updateAccessUiElementsFieldsGroup(user_type) {
+		if (this.readonly) {
+			return;
+		}
+
+		const access_min = <?= json_encode([
+			CRoleHelper::UI_MONITORING_DASHBOARD => USER_TYPE_ZABBIX_USER,
+			CRoleHelper::UI_MONITORING_PROBLEMS => USER_TYPE_ZABBIX_USER,
+			CRoleHelper::UI_MONITORING_HOSTS => USER_TYPE_ZABBIX_USER,
+			CRoleHelper::UI_MONITORING_LATEST_DATA => USER_TYPE_ZABBIX_USER,
+			CRoleHelper::UI_MONITORING_MAPS => USER_TYPE_ZABBIX_USER,
+			CRoleHelper::UI_MONITORING_DISCOVERY => USER_TYPE_ZABBIX_ADMIN,
+			CRoleHelper::UI_SERVICES_SERVICES => USER_TYPE_ZABBIX_USER,
+			CRoleHelper::UI_SERVICES_SLA => USER_TYPE_ZABBIX_ADMIN,
+			CRoleHelper::UI_SERVICES_SLA_REPORT => USER_TYPE_ZABBIX_USER,
+			CRoleHelper::UI_INVENTORY_OVERVIEW => USER_TYPE_ZABBIX_USER,
+			CRoleHelper::UI_INVENTORY_HOSTS => USER_TYPE_ZABBIX_USER,
+			CRoleHelper::UI_REPORTS_SYSTEM_INFO => USER_TYPE_SUPER_ADMIN,
+			CRoleHelper::UI_REPORTS_AVAILABILITY_REPORT => USER_TYPE_ZABBIX_USER,
+			CRoleHelper::UI_REPORTS_TOP_TRIGGERS => USER_TYPE_ZABBIX_USER,
+			CRoleHelper::UI_REPORTS_AUDIT => USER_TYPE_SUPER_ADMIN,
+			CRoleHelper::UI_REPORTS_ACTION_LOG => USER_TYPE_SUPER_ADMIN,
+			CRoleHelper::UI_REPORTS_NOTIFICATIONS => USER_TYPE_ZABBIX_ADMIN,
+			CRoleHelper::UI_REPORTS_SCHEDULED_REPORTS => USER_TYPE_ZABBIX_ADMIN,
+			CRoleHelper::UI_CONFIGURATION_HOST_GROUPS => USER_TYPE_ZABBIX_ADMIN,
+			CRoleHelper::UI_CONFIGURATION_TEMPLATE_GROUPS => USER_TYPE_ZABBIX_ADMIN,
+			CRoleHelper::UI_CONFIGURATION_TEMPLATES => USER_TYPE_ZABBIX_ADMIN,
+			CRoleHelper::UI_CONFIGURATION_HOSTS => USER_TYPE_ZABBIX_ADMIN,
+			CRoleHelper::UI_CONFIGURATION_MAINTENANCE => USER_TYPE_ZABBIX_ADMIN,
+			CRoleHelper::UI_CONFIGURATION_TRIGGER_ACTIONS => USER_TYPE_ZABBIX_ADMIN,
+			CRoleHelper::UI_CONFIGURATION_SERVICE_ACTIONS => USER_TYPE_ZABBIX_ADMIN,
+			CRoleHelper::UI_CONFIGURATION_DISCOVERY_ACTIONS => USER_TYPE_ZABBIX_ADMIN,
+			CRoleHelper::UI_CONFIGURATION_AUTOREGISTRATION_ACTIONS => USER_TYPE_ZABBIX_ADMIN,
+			CRoleHelper::UI_CONFIGURATION_INTERNAL_ACTIONS => USER_TYPE_ZABBIX_ADMIN,
+			CRoleHelper::UI_CONFIGURATION_EVENT_CORRELATION => USER_TYPE_SUPER_ADMIN,
+			CRoleHelper::UI_CONFIGURATION_DISCOVERY => USER_TYPE_ZABBIX_ADMIN,
+			CRoleHelper::UI_ADMINISTRATION_GENERAL => USER_TYPE_SUPER_ADMIN,
+			CRoleHelper::UI_ADMINISTRATION_AUDIT_LOG => USER_TYPE_SUPER_ADMIN,
+			CRoleHelper::UI_ADMINISTRATION_HOUSEKEEPING => USER_TYPE_SUPER_ADMIN,
+			CRoleHelper::UI_ADMINISTRATION_PROXY_GROUPS => USER_TYPE_SUPER_ADMIN,
+			CRoleHelper::UI_ADMINISTRATION_PROXIES => USER_TYPE_SUPER_ADMIN,
+			CRoleHelper::UI_ADMINISTRATION_MACROS => USER_TYPE_SUPER_ADMIN,
+			CRoleHelper::UI_ADMINISTRATION_AUTHENTICATION => USER_TYPE_SUPER_ADMIN,
+			CRoleHelper::UI_ADMINISTRATION_USER_GROUPS => USER_TYPE_SUPER_ADMIN,
+			CRoleHelper::UI_ADMINISTRATION_USER_ROLES => USER_TYPE_SUPER_ADMIN,
+			CRoleHelper::UI_ADMINISTRATION_USERS => USER_TYPE_SUPER_ADMIN,
+			CRoleHelper::UI_ADMINISTRATION_API_TOKENS => USER_TYPE_SUPER_ADMIN,
+			CRoleHelper::UI_ADMINISTRATION_MEDIA_TYPES => USER_TYPE_SUPER_ADMIN,
+			CRoleHelper::UI_ADMINISTRATION_SCRIPTS => USER_TYPE_SUPER_ADMIN,
+			CRoleHelper::UI_ADMINISTRATION_QUEUE => USER_TYPE_SUPER_ADMIN,
+			CRoleHelper::ACTIONS_EDIT_DASHBOARDS => USER_TYPE_ZABBIX_USER,
+			CRoleHelper::ACTIONS_EDIT_MAPS => USER_TYPE_ZABBIX_USER,
+			CRoleHelper::ACTIONS_EDIT_MAINTENANCE => USER_TYPE_ZABBIX_ADMIN,
+			CRoleHelper::ACTIONS_ACKNOWLEDGE_PROBLEMS => USER_TYPE_ZABBIX_USER,
+			CRoleHelper::ACTIONS_CLOSE_PROBLEMS => USER_TYPE_ZABBIX_USER,
+			CRoleHelper::ACTIONS_CHANGE_SEVERITY => USER_TYPE_ZABBIX_USER,
+			CRoleHelper::ACTIONS_ADD_PROBLEM_COMMENTS => USER_TYPE_ZABBIX_USER,
+			CRoleHelper::ACTIONS_EXECUTE_SCRIPTS => USER_TYPE_ZABBIX_USER,
+			CRoleHelper::ACTIONS_MANAGE_API_TOKENS => USER_TYPE_ZABBIX_USER,
+			CRoleHelper::ACTIONS_MANAGE_SCHEDULED_REPORTS => USER_TYPE_ZABBIX_ADMIN,
+			CRoleHelper::ACTIONS_MANAGE_SLA => USER_TYPE_ZABBIX_ADMIN,
+			CRoleHelper::ACTIONS_EDIT_OWN_MEDIA => USER_TYPE_ZABBIX_USER,
+			CRoleHelper::ACTIONS_EDIT_USER_MEDIA => USER_TYPE_SUPER_ADMIN
+		], JSON_FORCE_OBJECT) ?>;
+
+		for (const [id, value] of Object.entries(access_min)) {
+			const checkbox = document.getElementById(id);
+
+			if (user_type < value) {
+				checkbox.readOnly = true;
+				checkbox.checked = false;
 			}
-
-			document
-				.getElementById('api-access')
-				.addEventListener('change', this.events.apiaccessChange);
-
-			document
-				.getElementById('service-write-access')
-				.addEventListener('change', this.events.serviceWriteAccessChange);
-
-			this.updateServicesWriteAccessFields();
-
-			jQuery('#service_write_list_')
-				.multiSelect('getSelectButton')
-				.addEventListener('click', () => {
-					this.selectServiceAccessList(jQuery('#service_write_list_'));
-				});
-
-			document
-				.getElementById('service-read-access')
-				.addEventListener('change', this.events.serviceReadAccessChange);
-
-			this.updateServicesReadAccessFields();
-
-			jQuery('#service_read_list_')
-				.multiSelect('getSelectButton')
-				.addEventListener('click', () => {
-					this.selectServiceAccessList(jQuery('#service_read_list_'));
-				});
-
-			const clone_button = document.getElementById('clone');
-			if (clone_button !== null) {
-				clone_button.addEventListener('click', this.events.cloneClick);
-			}
-		},
-
-		updateAccessUiElementsFieldsGroup(user_type) {
-			if (this.readonly) {
-				return;
-			}
-
-			const access_min = <?= json_encode([
-				CRoleHelper::UI_MONITORING_DASHBOARD => USER_TYPE_ZABBIX_USER,
-				CRoleHelper::UI_MONITORING_PROBLEMS => USER_TYPE_ZABBIX_USER,
-				CRoleHelper::UI_MONITORING_HOSTS => USER_TYPE_ZABBIX_USER,
-				CRoleHelper::UI_MONITORING_LATEST_DATA => USER_TYPE_ZABBIX_USER,
-				CRoleHelper::UI_MONITORING_MAPS => USER_TYPE_ZABBIX_USER,
-				CRoleHelper::UI_MONITORING_DISCOVERY => USER_TYPE_ZABBIX_ADMIN,
-				CRoleHelper::UI_SERVICES_SERVICES => USER_TYPE_ZABBIX_USER,
-				CRoleHelper::UI_SERVICES_SLA => USER_TYPE_ZABBIX_ADMIN,
-				CRoleHelper::UI_SERVICES_SLA_REPORT => USER_TYPE_ZABBIX_USER,
-				CRoleHelper::UI_INVENTORY_OVERVIEW => USER_TYPE_ZABBIX_USER,
-				CRoleHelper::UI_INVENTORY_HOSTS => USER_TYPE_ZABBIX_USER,
-				CRoleHelper::UI_REPORTS_SYSTEM_INFO => USER_TYPE_SUPER_ADMIN,
-				CRoleHelper::UI_REPORTS_AVAILABILITY_REPORT => USER_TYPE_ZABBIX_USER,
-				CRoleHelper::UI_REPORTS_TOP_TRIGGERS => USER_TYPE_ZABBIX_USER,
-				CRoleHelper::UI_REPORTS_AUDIT => USER_TYPE_SUPER_ADMIN,
-				CRoleHelper::UI_REPORTS_ACTION_LOG => USER_TYPE_SUPER_ADMIN,
-				CRoleHelper::UI_REPORTS_NOTIFICATIONS => USER_TYPE_ZABBIX_ADMIN,
-				CRoleHelper::UI_REPORTS_SCHEDULED_REPORTS => USER_TYPE_ZABBIX_ADMIN,
-				CRoleHelper::UI_CONFIGURATION_HOST_GROUPS => USER_TYPE_ZABBIX_ADMIN,
-				CRoleHelper::UI_CONFIGURATION_TEMPLATE_GROUPS => USER_TYPE_ZABBIX_ADMIN,
-				CRoleHelper::UI_CONFIGURATION_TEMPLATES => USER_TYPE_ZABBIX_ADMIN,
-				CRoleHelper::UI_CONFIGURATION_HOSTS => USER_TYPE_ZABBIX_ADMIN,
-				CRoleHelper::UI_CONFIGURATION_MAINTENANCE => USER_TYPE_ZABBIX_ADMIN,
-				CRoleHelper::UI_CONFIGURATION_TRIGGER_ACTIONS => USER_TYPE_ZABBIX_ADMIN,
-				CRoleHelper::UI_CONFIGURATION_SERVICE_ACTIONS => USER_TYPE_ZABBIX_ADMIN,
-				CRoleHelper::UI_CONFIGURATION_DISCOVERY_ACTIONS => USER_TYPE_ZABBIX_ADMIN,
-				CRoleHelper::UI_CONFIGURATION_AUTOREGISTRATION_ACTIONS => USER_TYPE_ZABBIX_ADMIN,
-				CRoleHelper::UI_CONFIGURATION_INTERNAL_ACTIONS => USER_TYPE_ZABBIX_ADMIN,
-				CRoleHelper::UI_CONFIGURATION_EVENT_CORRELATION => USER_TYPE_SUPER_ADMIN,
-				CRoleHelper::UI_CONFIGURATION_DISCOVERY => USER_TYPE_ZABBIX_ADMIN,
-				CRoleHelper::UI_ADMINISTRATION_GENERAL => USER_TYPE_SUPER_ADMIN,
-				CRoleHelper::UI_ADMINISTRATION_AUDIT_LOG => USER_TYPE_SUPER_ADMIN,
-				CRoleHelper::UI_ADMINISTRATION_HOUSEKEEPING => USER_TYPE_SUPER_ADMIN,
-				CRoleHelper::UI_ADMINISTRATION_PROXY_GROUPS => USER_TYPE_SUPER_ADMIN,
-				CRoleHelper::UI_ADMINISTRATION_PROXIES => USER_TYPE_SUPER_ADMIN,
-				CRoleHelper::UI_ADMINISTRATION_MACROS => USER_TYPE_SUPER_ADMIN,
-				CRoleHelper::UI_ADMINISTRATION_AUTHENTICATION => USER_TYPE_SUPER_ADMIN,
-				CRoleHelper::UI_ADMINISTRATION_USER_GROUPS => USER_TYPE_SUPER_ADMIN,
-				CRoleHelper::UI_ADMINISTRATION_USER_ROLES => USER_TYPE_SUPER_ADMIN,
-				CRoleHelper::UI_ADMINISTRATION_USERS => USER_TYPE_SUPER_ADMIN,
-				CRoleHelper::UI_ADMINISTRATION_API_TOKENS => USER_TYPE_SUPER_ADMIN,
-				CRoleHelper::UI_ADMINISTRATION_MEDIA_TYPES => USER_TYPE_SUPER_ADMIN,
-				CRoleHelper::UI_ADMINISTRATION_SCRIPTS => USER_TYPE_SUPER_ADMIN,
-				CRoleHelper::UI_ADMINISTRATION_QUEUE => USER_TYPE_SUPER_ADMIN,
-				CRoleHelper::ACTIONS_EDIT_DASHBOARDS => USER_TYPE_ZABBIX_USER,
-				CRoleHelper::ACTIONS_EDIT_MAPS => USER_TYPE_ZABBIX_USER,
-				CRoleHelper::ACTIONS_EDIT_MAINTENANCE => USER_TYPE_ZABBIX_ADMIN,
-				CRoleHelper::ACTIONS_ACKNOWLEDGE_PROBLEMS => USER_TYPE_ZABBIX_USER,
-				CRoleHelper::ACTIONS_CLOSE_PROBLEMS => USER_TYPE_ZABBIX_USER,
-				CRoleHelper::ACTIONS_CHANGE_SEVERITY => USER_TYPE_ZABBIX_USER,
-				CRoleHelper::ACTIONS_ADD_PROBLEM_COMMENTS => USER_TYPE_ZABBIX_USER,
-				CRoleHelper::ACTIONS_EXECUTE_SCRIPTS => USER_TYPE_ZABBIX_USER,
-				CRoleHelper::ACTIONS_MANAGE_API_TOKENS => USER_TYPE_ZABBIX_USER,
-				CRoleHelper::ACTIONS_MANAGE_SCHEDULED_REPORTS => USER_TYPE_ZABBIX_ADMIN,
-				CRoleHelper::ACTIONS_MANAGE_SLA => USER_TYPE_ZABBIX_ADMIN,
-				CRoleHelper::ACTIONS_EDIT_OWN_MEDIA => USER_TYPE_ZABBIX_USER,
-				CRoleHelper::ACTIONS_EDIT_USER_MEDIA => USER_TYPE_SUPER_ADMIN
-			], JSON_FORCE_OBJECT) ?>;
-
-			for (const [id, value] of Object.entries(access_min)) {
-				const checkbox = document.getElementById(id);
-
-				if (user_type < value) {
-					checkbox.readOnly = true;
-					checkbox.checked = false;
-				}
-				else {
-					if (checkbox.readOnly) {
-						checkbox.checked = true;
-					}
-					checkbox.readOnly = false;
-				}
-			}
-
-			const access_max = <?= json_encode([
-					CRoleHelper::ACTIONS_INVOKE_EXECUTE_NOW => USER_TYPE_ZABBIX_ADMIN
-			], JSON_FORCE_OBJECT) ?>;
-
-			for (const [id, value] of Object.entries(access_max)) {
-				const checkbox = document.getElementById(id);
-				checkbox.readOnly = (user_type > value);
-
+			else {
 				if (checkbox.readOnly) {
 					checkbox.checked = true;
 				}
+				checkbox.readOnly = false;
 			}
-		},
+		}
 
-		updateApiMethodsMultiselect(user_type) {
-			if (this.readonly) {
-				return;
-			}
+		const access_max = <?= json_encode([
+				CRoleHelper::ACTIONS_INVOKE_EXECUTE_NOW => USER_TYPE_ZABBIX_ADMIN
+		], JSON_FORCE_OBJECT) ?>;
 
-			const $api_methods = $('#api_methods_');
-			const url = $api_methods.multiSelect('getOption', 'url');
-			const popup = $api_methods.multiSelect('getOption', 'popup');
+		for (const [id, value] of Object.entries(access_max)) {
+			const checkbox = document.getElementById(id);
+			checkbox.readOnly = (user_type > value);
 
-			const [pathname, search] = url.split('?', 2);
-
-			const params = new URLSearchParams(search);
-			params.set('user_type', user_type);
-
-			popup.parameters.user_type = user_type;
-
-			$api_methods.multiSelect('modify', {
-				url: pathname + '?' + params.toString(),
-				popup: popup
-			});
-		},
-
-		updateServicesWriteAccessFields() {
-			const service_write_access = document.querySelector('input[name="service_write_access"]:checked').value;
-
-			document
-				.querySelectorAll('.js-service-write-access')
-				.forEach((element) => {
-					element.style.display = service_write_access == <?= CRoleHelper::SERVICES_ACCESS_LIST ?>
-						? ''
-						: 'none';
-				});
-		},
-
-		updateServicesReadAccessFields() {
-			const service_read_access = document.querySelector('input[name="service_read_access"]:checked').value;
-
-			document
-				.querySelectorAll('.js-service-read-access')
-				.forEach((element) => {
-					element.style.display = service_read_access == <?= CRoleHelper::SERVICES_ACCESS_LIST ?>
-						? ''
-						: 'none';
-				});
-		},
-
-		updateApiAccessFieldsGroup(is_apiaccess_checked) {
-			if (this.readonly) {
-				return;
-			}
-
-			document.querySelectorAll('.js-userrole-apimode input').forEach((element) => {
-				element.disabled = !is_apiaccess_checked;
-			});
-
-			$('#api_methods_').multiSelect(is_apiaccess_checked ? 'enable' : 'disable');
-		},
-
-		selectServiceAccessList($multiselect) {
-			const exclude_serviceids = [];
-
-			for (const service of $multiselect.multiSelect('getData')) {
-				exclude_serviceids.push(service.id);
-			}
-
-			const overlay = PopUp('popup.services', {
-				title: <?= json_encode(_('Add services')) ?>,
-				exclude_serviceids
-			}, {dialogueid: 'services'});
-
-			overlay.$dialogue[0].addEventListener('dialogue.submit', (e) => {
-				const data = [];
-
-				for (const service of e.detail) {
-					data.push({id: service.serviceid, name: service.name});
-				}
-
-				$multiselect.multiSelect('addData', data);
-			});
-		},
-
-		events: {
-			usertypeChange(e) {
-				view.updateAccessUiElementsFieldsGroup(e.target.value);
-				view.updateApiMethodsMultiselect(e.target.value);
-			},
-
-			apiaccessChange(e) {
-				view.updateApiAccessFieldsGroup(e.target.checked);
-			},
-
-			serviceWriteAccessChange() {
-				if (!view.readonly) {
-					view.updateServicesWriteAccessFields();
-				}
-			},
-
-			serviceReadAccessChange() {
-				if (!view.readonly) {
-					view.updateServicesReadAccessFields();
-				}
-			},
-
-			cloneClick() {
-				if (view.readonly) {
-					const url = new Curl('zabbix.php');
-					url.setArgument('action', 'userrole.edit');
-					url.setArgument('super_admin_role_clone', 1);
-
-					document
-						.querySelectorAll('#name, #type')
-						.forEach((element) => {
-							url.setArgument(element.getAttribute('name'), element.getAttribute('value'));
-						});
-
-					redirect(url.getUrl(), 'post', 'action', undefined, true);
-				}
-
-				document
-					.querySelectorAll('#roleid, #delete, #clone')
-					.forEach((element) => {
-						element.remove();
-					});
-
-				const update_button = document.getElementById('update');
-				update_button.textContent = <?= json_encode(_('Add')) ?>;
-				update_button.setAttribute('id', 'add');
-				update_button.setAttribute('value', 'userrole.create');
-
-				document.getElementById('name').focus();
-				clearMessages();
+			if (checkbox.readOnly) {
+				checkbox.checked = true;
 			}
 		}
 	}
-</script>
+
+	updateApiMethodsMultiselect(user_type) {
+		if (this.readonly) {
+			return;
+		}
+
+		const $api_methods = $('#api_methods_');
+		const url = $api_methods.multiSelect('getOption', 'url');
+		const popup = $api_methods.multiSelect('getOption', 'popup');
+
+		const [pathname, search] = url.split('?', 2);
+
+		const params = new URLSearchParams(search);
+		params.set('user_type', user_type);
+
+		popup.parameters.user_type = user_type;
+
+		$api_methods.multiSelect('modify', {
+			url: pathname + '?' + params.toString(),
+			popup: popup
+		});
+	}
+
+	updateServicesWriteAccessFields() {
+		const service_write_access = document.querySelector('input[name="service_write_access"]:checked').value;
+
+		document
+			.querySelectorAll('.js-service-write-access')
+			.forEach((element) => {
+				element.style.display = service_write_access == <?= CRoleHelper::SERVICES_ACCESS_LIST ?>
+					? ''
+					: 'none';
+			});
+	}
+
+	updateServicesReadAccessFields() {
+		const service_read_access = document.querySelector('input[name="service_read_access"]:checked').value;
+
+		document
+			.querySelectorAll('.js-service-read-access')
+			.forEach((element) => {
+				element.style.display = service_read_access == <?= CRoleHelper::SERVICES_ACCESS_LIST ?>
+					? ''
+					: 'none';
+			});
+	}
+
+	updateApiAccessFieldsGroup(is_apiaccess_checked) {
+		if (this.readonly) {
+			return;
+		}
+
+		document.querySelectorAll('.js-userrole-apimode input').forEach((element) => {
+			element.disabled = !is_apiaccess_checked;
+		});
+
+		$('#api_methods_').multiSelect(is_apiaccess_checked ? 'enable' : 'disable');
+	}
+
+	selectServiceAccessList($multiselect) {
+		const exclude_serviceids = [];
+
+		for (const service of $multiselect.multiSelect('getData')) {
+			exclude_serviceids.push(service.id);
+		}
+
+		const overlay = PopUp('popup.services', {
+			title: <?= json_encode(_('Add services')) ?>,
+			exclude_serviceids
+		}, {dialogueid: 'services'});
+
+		overlay.$dialogue[0].addEventListener('dialogue.submit', (e) => {
+			const data = [];
+
+			for (const service of e.detail) {
+				data.push({id: service.serviceid, name: service.name});
+			}
+
+			$multiselect.multiSelect('addData', data);
+		});
+	}
+
+	usertypeChange(e) {
+		this.updateAccessUiElementsFieldsGroup(e.target.value);
+		this.updateApiMethodsMultiselect(e.target.value);
+		this.form.validateChanges(['ui', 'actions']);
+	}
+
+	apiaccessChange(e) {
+		this.updateApiAccessFieldsGroup(e.target.checked);
+	}
+
+	serviceWriteAccessChange() {
+		if (!this.readonly) {
+			this.updateServicesWriteAccessFields();
+		}
+	}
+
+	serviceReadAccessChange() {
+		if (!this.readonly) {
+			this.updateServicesReadAccessFields();
+		}
+	}
+
+	clone (rules) {
+		if (this.readonly) {
+			const url = new Curl('zabbix.php');
+			url.setArgument('action', 'userrole.edit');
+			url.setArgument('super_admin_role_clone', 1);
+
+			document
+				.querySelectorAll('#name, #type')
+				.forEach((element) => {
+					url.setArgument(element.getAttribute('name'), element.getAttribute('value'));
+				});
+
+			redirect(url.getUrl(), 'post', 'action', undefined, true);
+		}
+
+		document
+			.querySelectorAll('#roleid, #delete, #clone')
+			.forEach((element) => {
+				element.remove();
+			});
+
+		const update_button = document.getElementById('update');
+		update_button.textContent = <?= json_encode(_('Add')) ?>;
+		update_button.setAttribute('id', 'add');
+		document.getElementById('action').setAttribute('value', 'userrole.create');
+
+		document.getElementById('name').focus();
+		this.#removePopupMessages();
+		this.form.reload(rules);
+	}
+
+	submit(e) {
+		e.preventDefault();
+		this.#removePopupMessages();
+		this.#setLoadingStatus(['add', 'update']);
+		const fields = this.form.getAllValues();
+		const url = new URL(this.form_element.getAttribute('action'), location.href);
+		url.searchParams.set('action', fields.action);
+
+		this.form.validateSubmit(fields)
+			.then((result) => {
+				if (!result) {
+					this.#unsetLoadingStatus();
+					return;
+				}
+
+				fetch(url.href, {
+					method: 'POST',
+					headers: {'Content-Type': 'application/json'},
+					body: JSON.stringify(fields)
+				})
+					.then((response) => response.json())
+					.then((response) => {
+						if ('error' in response) {
+							throw {error: response.error};
+						}
+
+						if ('form_errors' in response) {
+							this.form.setErrors(response.form_errors, true, true);
+							this.form.renderErrors();
+							return;
+						}
+
+						if ('success' in response) {
+							postMessageOk(response.success.title);
+
+							if ('messages' in response.success) {
+								postMessageDetails('success', response.success.messages);
+							}
+
+							location.href = new URL(response.success.redirect, location.href).href;
+						}
+					})
+					.catch((exception) => this.#ajaxExceptionHandler(exception))
+					.finally(() => this.#unsetLoadingStatus());
+			});
+	}
+
+	delete() {
+		if (window.confirm('<?=_('Delete selected role?') ?>')) {
+			this.#setLoadingStatus(['delete']);
+			redirect(document.getElementById('delete').getAttribute('data-redirect-url'), 'post', 'action',
+				undefined, true
+			);
+		}
+	}
+
+	#removePopupMessages() {
+		for (const el of this.form_element.parentNode.children) {
+			if (el.matches('.msg-good, .msg-bad, .msg-warning')) {
+				el.parentNode.removeChild(el);
+			}
+		}
+	}
+
+	#ajaxExceptionHandler (exception) {
+		let title, messages;
+
+		if (typeof exception === 'object' && 'error' in exception) {
+			title = exception.error.title;
+			messages = exception.error.messages;
+		}
+		else {
+			messages = [<?= json_encode(_('Unexpected server error.')) ?>];
+		}
+
+		const message_box = makeMessageBox('bad', messages, title)[0];
+		this.form_element.parentNode.insertBefore(message_box, this.form_element);
+	}
+
+	#setLoadingStatus(loading_ids) {
+		this.form_element.classList.add('is-loading', 'is-loading-fadein');
+		[
+			document.getElementById('add'),
+			document.getElementById('clone'),
+			document.getElementById('update'),
+			document.getElementById('delete')
+		].forEach(button => {
+			if (button) {
+				button.setAttribute('disabled', true);
+
+				if (loading_ids.includes(button.id)) {
+					button.classList.add('is-loading');
+				}
+			}
+		});
+	}
+
+	#unsetLoadingStatus() {
+		[
+			document.getElementById('add'),
+			document.getElementById('clone'),
+			document.getElementById('update'),
+			document.getElementById('delete')
+		].forEach(button => {
+			if (button) {
+				button.classList.remove('is-loading');
+				button.removeAttribute('disabled');
+			}
+		});
+
+		this.form_element.classList.remove('is-loading', 'is-loading-fadein');
+	}
+};
