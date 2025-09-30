@@ -80,13 +80,19 @@ function escapeHtml(string) {
  * @param {bool}             allow_negative  If true, negative numbers are allowed; otherwise, negative numbers
  *                                           are converted to positive.
  * @param {number}           min_length      Pad number with zeroes to maintain min length.
+ * @param {number|null}      default_value
  */
-function normalizeNumericBox(input, {allow_empty, allow_negative, min_length}) {
+function normalizeNumericBox(input, {allow_empty, allow_negative, min_length, default_value}) {
 	const old_value = input.value;
 	let num = parseInt(input.value, 10);
 
 	if (isNaN(num)) {
-		input.value = (input.value === '' && allow_empty) ? '' : '0'.repeat(Math.max(min_length, 1));
+		if (default_value !== null) {
+			input.value = default_value;
+		}
+		else {
+			input.value = (input.value === '' && allow_empty) ? '' : '0'.repeat(Math.max(min_length, 1));
+		}
 	}
 	else {
 		if (num < 0 && !allow_negative) {

@@ -101,8 +101,8 @@ class testFormAdministrationGeneralRegexp extends CLegacyWebTest {
 		}
 
 		$this->zbxTestTabSwitchById('tab_test', 'Test');
-		$this->query('xpath://textarea[@id="test_string"][@disabled]')->waitUntilNotPresent();
-		$this->zbxTestInputTypeWait('test_string', $test_string);
+		$this->query('xpath://textarea[@id="test-string"][@disabled]')->waitUntilNotPresent();
+		$this->zbxTestInputTypeWait('test-string', $test_string);
 		$this->zbxTestClick('add');
 		$this->assertMessage(TEST_GOOD, 'Regular expression added');
 
@@ -115,12 +115,16 @@ class testFormAdministrationGeneralRegexp extends CLegacyWebTest {
 		$this->zbxTestCheckHeader('Regular expressions');
 		$this->zbxTestClickButtonText('New regular expression');
 
-		$this->zbxTestInputType('name', $this->regexp);
-		$this->zbxTestInputType('expressions_0_expression', 'first test string');
-		$this->zbxTestCheckboxSelect('expressions_0_case_sensitive');
+		$form = $this->query('id:regexp-form')->waitUntilVisible()->asForm()->one();
+		$fields = [
+			'Name' => $this->regexp,
+			'id:expressions_0_expression' => 'first test string',
+			'id:expressions_0_case_sensitive' => true
+		];
+		$form->fill($fields);
 		$this->zbxTestClickWait('add');
 
-		$this->assertMessage(TEST_BAD, 'Cannot add regular expression', 'Regular expression "'.$this->regexp.'" already exists.');
+		$this->assertInlineError($form, ['id:name' => 'This object already exists.']);
 	}
 
 	public function testFormAdministrationGeneralRegexp_AddIncorrect() {
@@ -129,10 +133,11 @@ class testFormAdministrationGeneralRegexp extends CLegacyWebTest {
 		$this->zbxTestCheckHeader('Regular expressions');
 
 		$this->zbxTestClickButtonText('New regular expression');
-		$this->zbxTestInputType('name', '1_regexp3');
+		$form = $this->query('id:regexp-form')->waitUntilVisible()->asForm()->one();
+		$form->fill(['Name' => '1_regexp3']);
 		$this->zbxTestClickWait('add');
 
-		$this->assertMessage(TEST_BAD, 'Cannot add regular expression', 'Invalid parameter "/1/expressions/1/expression": cannot be empty.');
+		$this->assertInlineError($form, ['id:expressions_0_expression' => 'Expression: This field cannot be empty.']);
 	}
 
 	public function testFormAdministrationGeneralRegexp_TestTrue() {
@@ -141,7 +146,7 @@ class testFormAdministrationGeneralRegexp extends CLegacyWebTest {
 		$this->zbxTestClickLinkText($this->regexp);
 
 		$this->zbxTestTabSwitchById('tab_test', 'Test');
-		$this->zbxTestWaitUntilElementVisible(WebDriverBy::xpath("//table[@id='testResultTable']//span[@class='green']"));
+		$this->zbxTestWaitUntilElementVisible(WebDriverBy::xpath("//table[@id='test-result-table']//span[@class='green']"));
 		$this->zbxTestTextPresent('TRUE');
 	}
 
@@ -151,10 +156,10 @@ class testFormAdministrationGeneralRegexp extends CLegacyWebTest {
 		$this->zbxTestClickLinkText($this->regexp);
 		$this->zbxTestTabSwitchById('tab_test', 'Test');
 
-		$this->query('xpath://textarea[@id="test_string"][@disabled]')->waitUntilNotPresent();
-		$this->zbxTestInputType('test_string', 'abcdef');
-		$this->zbxTestClick('testExpression');
-		$this->zbxTestWaitUntilElementVisible(WebDriverBy::xpath("//table[@id='testResultTable']//span[@class='red']"));
+		$this->query('xpath://textarea[@id="test-string"][@disabled]')->waitUntilNotPresent();
+		$this->zbxTestInputType('test-string', 'abcdef');
+		$this->zbxTestClick('test-expression');
+		$this->zbxTestWaitUntilElementVisible(WebDriverBy::xpath("//table[@id='test-result-table']//span[@class='red']"));
 		$this->zbxTestTextPresent('FALSE');
 	}
 
