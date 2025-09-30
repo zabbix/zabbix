@@ -77,7 +77,7 @@ abstract class CTriggerGeneral extends CApiService {
 		$host_or_template_tag_output = ['f.triggerid'];
 
 		foreach ($options['selectInheritedTags'] as $field) {
-			$item_tag_output = match ($field) {
+			$item_tag_output[] = match ($field) {
 				'tag', 'value' => 'it.'.$field,
 				'object' =>
 					'CASE WHEN i.flags IN ('.
