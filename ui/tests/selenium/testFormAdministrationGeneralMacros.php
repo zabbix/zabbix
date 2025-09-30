@@ -62,15 +62,6 @@ class testFormAdministrationGeneralMacros extends testFormMacros {
 	public $update_vault_macro = '{$1_VAULT_MACRO_CHANGED}';
 	public $vault_macro_index = 1;
 
-	/**
-	 * Attach MessageBehavior to the test.
-	 *
-	 * @return array
-	 */
-	public function getBehaviors() {
-		return [CMessageBehavior::class];
-	}
-
 	private function openGlobalMacros() {
 		$this->zbxTestLogin('zabbix.php?action=macros.edit');
 		$this->query('id:page-title-general')->asPopupButton()->one()->select('Macros');

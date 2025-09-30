@@ -405,7 +405,7 @@ class testPageHostDashboards extends CWebTest {
 		foreach ($api_dashboards as $dashboard) {
 			// If not already on the correct Dashboard, then switch.
 			if ($dashboard['name'] !== $form->getField('id:dashboardid')->getText()) {
-				$form->fill(['id:dashboardid' => $dashboard['name']]);
+				$form->fill(['id:dashboardid' => $dashboard['name']])->waitUntilReloaded();
 				$this->page->waitUntilReady();
 			}
 

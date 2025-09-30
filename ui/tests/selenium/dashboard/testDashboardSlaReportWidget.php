@@ -2350,6 +2350,15 @@ class testDashboardSlaReportWidget extends testSlaReport {
 			];
 			$multiplier = ($data['reporting_period'] === 'Quarterly') ? 3 : 1;
 
+			/**
+			 * For monthly, quarterly and annual reporting periods the "days" related information is not needed,
+			 * and even causes issues when tests run at the end of the month. Therefore, for this type of period the
+			 * "days" related information can be discarded.
+			 */
+			if (in_array($data['reporting_period'], ['Monthly', 'Quarterly', 'Annually'])) {
+				$data['fields']['From'] = date('Y-m', strtotime($data['fields']['From']));
+			}
+
 			$to_date = date('Y-m-d', strtotime($data['fields']['From'].' + '.($multiplier * ($show_periods - 1)).
 					' '.$units[$data['reporting_period']])
 			);

@@ -1,11 +1,17 @@
+Changes for 6.0.42
+
+6.0.42rc1 was released as 6.0.42 without any changes
+
+--------------------------------------------------------------------------------
 Changes for 6.0.42rc1
 
 New features:
-.......PS. [ZBXNEXT-10077] updated maximal supported MariaDB version to 12.0 (mprihodko)
+.......PS. [ZBXNEXT-10077] updated maximum supported MariaDB version to 12.0 (mprihodko)
 
 Bug fixes:
+...G...... [ZBX-19267] fixed wmi.get items sometimes incorrectly returning "Empty WMI search result" with Zabbix agent 2 (aetatsu)
 ...G...... [ZBX-26920] fixed wrong time in Zabbix agent for Windows (sboidenko)
-..F....... [ZBX-22786] fixed trends graph line colors issue with PHP 8.1 (isharha)
+..F....... [ZBX-22786] fixed trends graph line color issue with PHP 8.1 (isharha)
 ..F....... [ZBX-21975] fixed user autologout not removing user SAML authentication data (gcalenko)
 
 --------------------------------------------------------------------------------
@@ -44,6 +50,7 @@ New features:
 .........T [ZBXNEXT-9703] updated existing Zabbix server/proxy health templates; added Zabbix server/proxy health templates by Zabbix agent passive/active (aiantsen)
 
 Bug fixes:
+...G...... [ZBX-26987] added input parameter sanitization to prevent injection vulnerability for Zabbix agent 2 SMART plugin (lsurvilo)
 .......PS. [ZBX-18703] fixed incorrect values returned by vmware.vm.vfs.fs.size item (MVekslers)
 A......... [ZBX-24383] fixed PHP fatal error when importing configuration from Zabbix 2.0 (Sasha)
 ........S. [ZBX-26038] added 10-second reconnect timeout for PostgreSQL read-only database (sboidenko)
@@ -247,6 +254,7 @@ New features:
 .........T [ZBXNEXT-9341] added assume role authorization in AWS templates (egordymov)
 
 Bug fixes:
+........S. [ZBX-26986] fixed secondary-order SQL injection in Zabbix server when deleting autoregistered host (wiper)
 A......... [ZBX-25610] removed reliability on "sysmapelementurlid", "sysmapurlid" in URLs for map.create and map.update (Ivo)
 .......PS. [ZBX-25626] added external data validation to prevent access to internal duktape properties through HttpRequest object (wiper)
 ........S. [ZBX-25629] fixed buffer over-read for broken UTF-8 mail data injection (sboidenko)
