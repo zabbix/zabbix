@@ -1942,7 +1942,7 @@ class testUsersAuthenticationLdap extends testFormAuthentication {
 					'error' => 'At least one LDAP server must exist.'
 				]
 			],
-			// #20 LDAP form validation with time (in seconds) value below the boundary in Provisioning period
+			// #20 Time (in seconds) value below the boundary in Provisioning period.
 			[
 				[
 					'ldap_fields' => [
@@ -1953,7 +1953,7 @@ class testUsersAuthenticationLdap extends testFormAuthentication {
 					'error' => 'Incorrect value for field "jit_provision_interval": value must be one of 3600-788400000.'
 				]
 			],
-			// #21 LDAP form validation with time (in seconds) value below the boundary in Provisioning period
+			// #21 Time (in seconds) value above the boundary in Provisioning period.
 			[
 				[
 					'ldap_fields' => [
@@ -1964,7 +1964,7 @@ class testUsersAuthenticationLdap extends testFormAuthentication {
 					'error' => 'Incorrect value for field "jit_provision_interval": value must be one of 3600-788400000.'
 				]
 			],
-			// #22 LDAP form validation with time (in minutes) value below the boundary in Provisioning period
+			// #22 Time (in minutes) value below the boundary in Provisioning period.
 			[
 				[
 					'ldap_fields' => [
@@ -1975,7 +1975,7 @@ class testUsersAuthenticationLdap extends testFormAuthentication {
 					'error' => 'Incorrect value for field "jit_provision_interval": value must be one of 3600-788400000.'
 				]
 			],
-			// #23 LDAP form validation with invalid time unit used in Provisioning period
+			// #23 Invalid time unit used in Provisioning period.
 			[
 				[
 					'ldap_fields' => [
