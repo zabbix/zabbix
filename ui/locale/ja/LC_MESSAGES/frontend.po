@@ -4,7 +4,7 @@ msgstr ""
 "Project-Id-Version: Zabbix 6.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2023-10-19 13:48+0300\n"
-"PO-Revision-Date: 2025-08-29 03:19+0000\n"
+"PO-Revision-Date: 2025-09-12 04:39+0000\n"
 "Last-Translator: Eiji Kawakita <age@cyber.email.ne.jp>\n"
 "Language-Team: Zabbix\n"
 "Language: ja\n"
@@ -2020,7 +2020,7 @@ msgstr "推測されやすいパスワードの回避"
 
 #: app/views/host.wizard.edit.php:473
 msgid "Avoid including sensitive data."
-msgstr ""
+msgstr "機密データを含めないようにしてください。"
 
 #: jsLoader.php:172
 msgid "Awaiting data"
@@ -3496,6 +3496,10 @@ msgstr "\"%4$s\"上のディスカバリルール\"%3$s\"のアイテムのプ�
 msgid "Cannot find value map \"%1$s\" used for item prototype \"%2$s\" of discovery rule prototype \"%3$s\" on \"%4$s\"."
 msgstr "\"%4$s\"上のディスカバリルールプロトタイプ\"%3$s\"のアイテムのプロトタイプ\"%2$s\"で使用されている値のマッピング\"%1$s\"がみつかりません。"
 
+#: app/views/oauth.authorize.php:33
+msgid "Cannot get authentication tokens"
+msgstr "認証トークンを取得できません"
+
 #: app/views/oauth.edit.php:230
 msgid "Cannot get authorization code."
 msgstr "認可コードを取得できません。"
@@ -4023,6 +4027,11 @@ msgstr "XML: %1$sが読み込めません。"
 #, c-format
 msgid "Cannot read YAML: %1$s."
 msgstr "YAML: %1$sが読み込めません。"
+
+#: include/classes/server/CZabbixServer.php:511
+#, c-format
+msgid "Cannot read response from Zabbix server \"%1$s\"."
+msgstr ""
 
 #: include/classes/server/CZabbixServer.php:567
 #, c-format
@@ -8434,7 +8443,7 @@ msgstr "非秘密の事前共有キーID文字列を入力してください。�
 
 #: app/views/host.wizard.edit.php:470
 msgid "Enter a unique name that Zabbix components will use to recognize the pre-shared key."
-msgstr ""
+msgstr "Zabbix コンポーネントが事前共有キーを認識するために使用する一意の名前を入力します。"
 
 #: app/views/host.wizard.edit.php:609
 msgid "Enter the IP/DNS address and port of the Zabbix agent installed on your monitoring target."
@@ -12068,6 +12077,10 @@ msgstr "Internet Explorer"
 #: include/views/configuration.item.prototype.list.php:69
 msgid "Interval"
 msgstr "監視間隔"
+
+#: widgets/itemcard/includes/CWidgetFieldItemSectionsView.php:76
+msgid "Interval and storage"
+msgstr "周期と保存"
 
 #: include/classes/api/services/CRole.php:731
 #, c-format
@@ -16713,6 +16726,10 @@ msgstr "PHP ctypeモジュールが存在しません (PHPのconfigure時のパ�
 msgid "PHP curl"
 msgstr "PHP curl"
 
+#: include/classes/setup/CFrontendSetup.php:733
+msgid "PHP curl extension is missing or outdated."
+msgstr "PHP curl 拡張機能が見つからないか、失効しています。"
+
 #: include/classes/setup/CFrontendSetup.php:691
 msgid "PHP curl extension missing."
 msgstr "PHP curl拡張機能が存在しません。"
@@ -18677,6 +18694,11 @@ msgstr "レスポンスコード"
 #: httpdetails.php:149 include/classes/screens/CScreenHttpTestDetails.php:83
 msgid "Response time"
 msgstr "レスポンスタイム"
+
+#: include/classes/server/CZabbixServer.php:507
+#, c-format
+msgid "Response timeout of %1$s exceeded when connecting to Zabbix server \"%2$s\"."
+msgstr ""
 
 #: app/controllers/CControllerMediatypeTestSend.php:182
 msgid "Response type: JSON"
@@ -26221,6 +26243,10 @@ msgstr "説明"
 #: include/classes/validators/CApiInputValidator.php:1985
 msgid "directory cannot be empty"
 msgstr "ディレクトリを指定してください"
+
+#: include/views/configuration.host.discovery.list.php:340
+msgid "discovery rule"
+msgstr "ディスカバリルール"
 
 #: app/controllers/CControllerItemMassCheckNow.php:138
 #: include/classes/api/services/CTask.php:562
