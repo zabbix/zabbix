@@ -3136,9 +3136,9 @@ zabbix_export:
                   value: '{#JOBNAME}'
               trigger_prototypes:
                 - uuid: 7e45cb8f41114388ac8772006d929da2
-                  expression: 'last(/MSSQL by ODBC/mssql.job.run_duration["{#JOBNAME}"])>{$MSSQL.BACKUP_DURATION.WARN:"{#JOBNAME}"}'
+                  expression: 'last(/MSSQL by ODBC/mssql.job.run_duration["{#JOBNAME}"])>{$MSSQL.JOB_DURATION.WARN:"{#JOBNAME}"}'
                   name: 'MSSQL: Job ''{#JOBNAME}'': Job duration is high'
-                  event_name: 'MSSQL: Job ''{#JOBNAME}'': Job duration is greater than {$MSSQL.BACKUP_DURATION.WARN:"{#JOBNAME}"}'
+                  event_name: 'MSSQL: Job ''{#JOBNAME}'': Job duration is greater than {$MSSQL.JOB_DURATION.WARN:"{#JOBNAME}"}'
                   opdata: 'Job duration: {ITEM.LASTVALUE1}'
                   priority: WARNING
                   description: 'The job is taking too long.'
