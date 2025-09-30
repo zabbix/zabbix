@@ -7882,20 +7882,16 @@ z-select[disabled] .focusable, input[disabled], textarea[disabled], select optio
     color: #0e4123; }
   .tag.yellow-bg {
     color: #734d00; }
+  .tag.tag-inherited::before, .tag.tag-inherited-duplicate::before {
+    margin-right: 3px;
+    font-size: 10px;
+    line-height: 12px;
+    vertical-align: top;
+    opacity: .6; }
   .tag.tag-inherited::before {
-    content: "";
-    margin-right: 3px;
-    font-size: 10px;
-    line-height: 12px;
-    vertical-align: top;
-    opacity: .6; }
+    content: ""; }
   .tag.tag-inherited-duplicate::before {
-    content: "";
-    margin-right: 3px;
-    font-size: 10px;
-    line-height: 12px;
-    vertical-align: top;
-    opacity: .6; }
+    content: ""; }
 
 .tag-inherited-title {
   margin-bottom: 3px;
