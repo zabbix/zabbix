@@ -82,24 +82,26 @@ class CFieldMultiselect extends CField {
 				[this.getName()]: return_id ? null : []
 			};
 
-		if (this.isEnabled()) {
-			$(this._field).multiSelect('getData').forEach((value) => {
-				const field_name = value.isNew ? this.getName() + '_new' : this.getName();
-
-				if (!return_id) {
-					values[field_name].push(value.id);
-				}
-				else if (values[field_name] === null) {
-					values[field_name] = value.id;
-				}
-			});
+		if (this.isDisabled()) {
+			return null;
 		}
+
+		$(this._field).multiSelect('getData').forEach((value) => {
+			const field_name = value.isNew ? this.getName() + '_new' : this.getName();
+
+			if (!return_id) {
+				values[field_name].push(value.id);
+			}
+			else if (values[field_name] === null) {
+				values[field_name] = value.id;
+			}
+		});
 
 		return values;
 	}
 
-	isEnabled () {
-		return $(this._field).multiSelect('getOption', 'disabled') === false;
+	isDisabled () {
+		return $(this._field).multiSelect('getOption', 'disabled') === true;
 	}
 
 	_appendErrorHint(error_hint) {
