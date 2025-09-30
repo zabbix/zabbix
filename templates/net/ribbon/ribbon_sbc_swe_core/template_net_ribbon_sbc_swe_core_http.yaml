@@ -139,6 +139,10 @@ zabbix_export:
                   	}
                   }
                   
+                  if (count == 0) {
+                  	return 0;
+                  }
+                  
                   return sum / count;
           master_item:
             key: ribbon.server.data.get
@@ -225,15 +229,28 @@ zabbix_export:
             		return data;
             	},
             
-            	filterByServerName: function (data, param_name, param_value, key_field) {
-            		var result = {}
+            	filterByServerName: function (data, param_name, key_field) {
+            		var result = {};
+            
             		for (var key in data) {
-            			if (data[key][param_name] == param_value) {
-            				result[data[key][key_field]] = data[key];
+            			if (typeof data[key] === 'object' && data[key] !== null && data[key][param_name] !== 'undefined') {
+            				if (data[key][param_name] == Ribbon.params.server_name) {
+            					result[data[key][key_field]] = data[key];
+            				};
             			}
-            		}
+            		};
             
             		return result;
+            	},
+            
+            	getMetricsData: function (endpoints) {
+            		var data = {};
+            
+            		Object.keys(endpoints).forEach(function (key) {
+            			data[key] = Ribbon.getField(Ribbon.getRequest(endpoints[key]['url']), endpoints[key]['path']);
+            		});
+            
+            		return data;
             	}
             };
             
@@ -244,50 +261,44 @@ zabbix_export:
             
             	Ribbon.setParams(JSON.parse(value));
             
-            	result['serverStatus'] = Ribbon.getField(
-            		Ribbon.getRequest("/restconf/data/sonusSystem:system/serverStatus=" + Ribbon.params.server_name),
-            		'sonusSystem:serverStatus'
-            	);
+            	var endpoints = {
+            		'serverStatus': {
+            			'url': '/restconf/data/sonusSystem:system/serverStatus=' + Ribbon.params.server_name,
+            			'path': 'sonusSystem:serverStatus'},
+            		'memoryUtilCurrentStatistics': {
+            			'url': '/restconf/data/sonusSystem:system/memoryUtilCurrentStatistics=' + Ribbon.params.server_name,
+            			'path': 'sonusSystem:memoryUtilCurrentStatistics'},
+            		'cpuUtilCurrentStatistics': {
+            			'url': '/restconf/data/sonusSystem:system/cpuUtilCurrentStatistics',
+            			'path': 'sonusSystem:cpuUtilCurrentStatistics'},
+            		'hardDiskUsage': {
+            			'url': '/restconf/data/sonusSystem:system/hardDiskUsage',
+            			'path': 'sonusSystem:hardDiskUsage'},
+            		'ethernetPort': {
+            			'url': '/restconf/data/sonusSystem:system/sonusOrcaSystem:ethernetPort',
+            			'path': 'sonusOrcaSystem:ethernetPort'},
+            	};
             
-            	result['memoryUtilCurrentStatistics'] = Ribbon.getField(
-            		Ribbon.getRequest("/restconf/data/sonusSystem:system/memoryUtilCurrentStatistics=" + Ribbon.params.server_name),
-            		'sonusSystem:memoryUtilCurrentStatistics'
-            	);
+            	result = Ribbon.getMetricsData(endpoints);
             
-            	result['cpuUtilCurrentStatistics'] = Ribbon.filterByServerName(
-            		Ribbon.getField(
-            			Ribbon.getRequest("/restconf/data/sonusSystem:system/cpuUtilCurrentStatistics"),
-            			'sonusSystem:cpuUtilCurrentStatistics'),
-            		'ceName', Ribbon.params.server_name, 'cpu'
-            	);
-            
-            	result['hardDiskUsage'] = Ribbon.filterByServerName(
-            		Ribbon.getField(
-            			Ribbon.getRequest("/restconf/data/sonusSystem:system/hardDiskUsage"),
-            			'sonusSystem:hardDiskUsage'),
-            		'serverName', Ribbon.params.server_name, 'partition'
-            	);
-            
-            	var network_data = Ribbon.getField(
-            		Ribbon.getRequest("/restconf/data/sonusSystem:system/sonusOrcaSystem:ethernetPort"),
-            		'sonusOrcaSystem:ethernetPort');
-            	result['packetPortStatus'] = Ribbon.filterByServerName(
-            		Ribbon.getField(network_data, 'packetPortStatus'),
-            		'ceName', Ribbon.params.server_name, 'portName'
-            	);
-            	result['mgmtPortStatus'] = Ribbon.filterByServerName(
-            		Ribbon.getField(network_data, 'mgmtPortStatus'),
-            		'ceName', Ribbon.params.server_name, 'portName'
-            	);
-            	result['portRedundancyGroupStatus'] = Ribbon.filterByServerName(
-            		Ribbon.getField(network_data, 'portRedundancyGroupStatus'),
-            		'ceName', Ribbon.params.server_name, 'portName'
-            	);
-            	result['portMonitorStatus'] = Ribbon.filterByServerName(
-            		Ribbon.getField(network_data, 'portMonitorStatus'),
-            		'ceName', Ribbon.params.server_name, 'pmName'
-            	);
+            	var ethernet_fields = [
+            		'packetPortStatus',
+            		'mgmtPortStatus',
+            		'portRedundancyGroupStatus',
+            		'portMonitorStatus'
+            	]
             	
+            	for (var key in ethernet_fields) {
+            		var item = ethernet_fields[key];
+            		if (typeof result[item] === 'object' || typeof result[item] !== null) {
+            			result[item] = Ribbon.filterByServerName(result['ethernetPort'][item], 'ceName', 'portName');
+            		};
+            	};
+            
+            	result['cpuUtilCurrentStatistics'] = Ribbon.filterByServerName(result['cpuUtilCurrentStatistics'], 'ceName', 'cpu');
+            	result['hardDiskUsage'] = Ribbon.filterByServerName(result['hardDiskUsage'], 'serverName', 'partition');
+            	delete result['ethernetPort'];
+            
             	return JSON.stringify(result);
             }
             catch (error) {
@@ -333,7 +344,7 @@ zabbix_export:
         - uuid: 7688b74edba64cc6a85a153fd9aad473
           name: 'Server hardware type'
           type: DEPENDENT
-          key: ribbon.server.hwType
+          key: ribbon.server.hw.type
           value_type: CHAR
           description: 'Identifies the type of server module the indexed slot has been configured to accept. Server modules other than this type are rejected by the System Manager.'
           preprocessing:
@@ -576,6 +587,8 @@ zabbix_export:
               tags:
                 - tag: component
                   value: cpu
+                - tag: cpu
+                  value: '{#CPU.NUM}'
           master_item:
             key: ribbon.server.data.get
           preprocessing:
@@ -599,6 +612,14 @@ zabbix_export:
           name: 'FS discovery'
           type: DEPENDENT
           key: ribbon.fs.discovery
+          filter:
+            evaltype: AND
+            conditions:
+              - macro: '{#FS}'
+                value: '{$RIBBON.FS.DISCOVERY.NAME.MATCHES}'
+              - macro: '{#FS}'
+                value: '{$RIBBON.FS.DISCOVERY.NAME.NOT_MATCHES}'
+                operator: NOT_MATCHES_REGEX
           description: 'Used for discovering of disk.'
           item_prototypes:
             - uuid: 63e10a5cfd714ef4889a19b9bd009160
@@ -760,6 +781,14 @@ zabbix_export:
           name: 'Management port discovery'
           type: DEPENDENT
           key: ribbon.mgmt.port.discovery
+          filter:
+            evaltype: AND
+            conditions:
+              - macro: '{#PORT}'
+                value: '{$RIBBON.MANAGEMENT.PORT.DISCOVERY.NAME.MATCHES}'
+              - macro: '{#PORT}'
+                value: '{$RIBBON.MANAGEMENT.PORT.DISCOVERY.NAME.NOT_MATCHES}'
+                operator: NOT_MATCHES_REGEX
           description: 'Used for discovering of management port.'
           item_prototypes:
             - uuid: a46e3f7fb43b499189cdac13701c6203
@@ -782,6 +811,8 @@ zabbix_export:
                   value: mgmt-port
                 - tag: component
                   value: network
+                - tag: mgmt-port
+                  value: '{#PORT}'
             - uuid: e8859ed1e9a04b46b7a646d0a9111366
               name: 'Management port [{#PORT}]: Bits received'
               type: DEPENDENT
@@ -799,6 +830,8 @@ zabbix_export:
                   value: mgmt-port
                 - tag: component
                   value: network
+                - tag: mgmt-port
+                  value: '{#PORT}'
             - uuid: aab28dc7b149479ca4061527a3ae580a
               name: 'Management port [{#PORT}]: Link state'
               type: DEPENDENT
@@ -843,6 +876,8 @@ zabbix_export:
                   value: mgmt-port
                 - tag: component
                   value: network
+                - tag: mgmt-port
+                  value: '{#PORT}'
               trigger_prototypes:
                 - uuid: 6722ff0530a2403baf02a64ce197e86d
                   expression: 'last(/Ribbon SBC SWe CE by HTTP/ribbon.mgmt.port.link.state[{#PORT}])=2 or last(/Ribbon SBC SWe CE by HTTP/ribbon.mgmt.port.link.state[{#PORT}])=5 or last(/Ribbon SBC SWe CE by HTTP/ribbon.mgmt.port.link.state[{#PORT}])=6'
@@ -870,6 +905,8 @@ zabbix_export:
                   value: mgmt-port
                 - tag: component
                   value: network
+                - tag: mgmt-port
+                  value: '{#PORT}'
             - uuid: d530914bee3645e8b26a85703a78c22d
               name: 'Management port [{#PORT}]: Negotiated speed'
               type: DEPENDENT
@@ -910,6 +947,8 @@ zabbix_export:
                   value: mgmt-port
                 - tag: component
                   value: network
+                - tag: mgmt-port
+                  value: '{#PORT}'
           graph_prototypes:
             - uuid: c5e51691c6664520812ab3019ed51a68
               name: 'Management port [{#PORT}]: Usage'
@@ -950,6 +989,14 @@ zabbix_export:
           name: 'Port monitor discovery'
           type: DEPENDENT
           key: ribbon.monitor.port.discovery
+          filter:
+            evaltype: AND
+            conditions:
+              - macro: '{#PORT}'
+                value: '{$RIBBON.MONITOR.PORT.DISCOVERY.NAME.MATCHES}'
+              - macro: '{#PORT}'
+                value: '{$RIBBON.MONITOR.PORT.DISCOVERY.NAME.NOT_MATCHES}'
+                operator: NOT_MATCHES_REGEX
           description: 'Used for discovering of port monitor.'
           item_prototypes:
             - uuid: a58d013e850f43b6b3b17f996028ce2b
@@ -971,6 +1018,8 @@ zabbix_export:
                   value: network
                 - tag: component
                   value: port-monitor
+                - tag: port-monitor
+                  value: '{#PORT}'
             - uuid: cfdab9b29ee14646adeeff87544bfa3d
               name: 'Port monitor [{#PORT}]: Fault state'
               type: DEPENDENT
@@ -991,6 +1040,8 @@ zabbix_export:
                   value: network
                 - tag: component
                   value: port-monitor
+                - tag: port-monitor
+                  value: '{#PORT}'
             - uuid: d5b86019dfa34f4083b172396e422d56
               name: 'Port monitor [{#PORT}]: Group name'
               type: DEPENDENT
@@ -1011,6 +1062,8 @@ zabbix_export:
                   value: network
                 - tag: component
                   value: port-monitor
+                - tag: port-monitor
+                  value: '{#PORT}'
             - uuid: 0dcb5ae132b746ff9a4aeb65db577841
               name: 'Port monitor [{#PORT}]: Link failures'
               type: DEPENDENT
@@ -1030,6 +1083,8 @@ zabbix_export:
                   value: network
                 - tag: component
                   value: port-monitor
+                - tag: port-monitor
+                  value: '{#PORT}'
             - uuid: 803fc65d7a134ef1ba577eec3f6a4373
               name: 'Port monitor [{#PORT}]: Link state'
               type: DEPENDENT
@@ -1050,6 +1105,8 @@ zabbix_export:
                   value: network
                 - tag: component
                   value: port-monitor
+                - tag: port-monitor
+                  value: '{#PORT}'
             - uuid: e184efcae96748678a67135000dd51e1
               name: 'Port monitor [{#PORT}]: Name'
               type: DEPENDENT
@@ -1070,6 +1127,8 @@ zabbix_export:
                   value: network
                 - tag: component
                   value: port-monitor
+                - tag: port-monitor
+                  value: '{#PORT}'
             - uuid: 77f9fab4056546aa912ec7fadd80cb5e
               name: 'Port monitor [{#PORT}]: Physical name'
               type: DEPENDENT
@@ -1090,6 +1149,8 @@ zabbix_export:
                   value: network
                 - tag: component
                   value: port-monitor
+                - tag: port-monitor
+                  value: '{#PORT}'
             - uuid: 556ac689e8294d449a1694f131654406
               name: 'Port monitor [{#PORT}]: Role'
               type: DEPENDENT
@@ -1110,6 +1171,8 @@ zabbix_export:
                   value: network
                 - tag: component
                   value: port-monitor
+                - tag: port-monitor
+                  value: '{#PORT}'
           master_item:
             key: ribbon.server.data.get
           preprocessing:
@@ -1133,6 +1196,14 @@ zabbix_export:
           name: 'Packet port discovery'
           type: DEPENDENT
           key: ribbon.packet.port.discovery
+          filter:
+            evaltype: AND
+            conditions:
+              - macro: '{#PORT}'
+                value: '{$RIBBON.PACKET.PORT.DISCOVERY.NAME.MATCHES}'
+              - macro: '{#PORT}'
+                value: '{$RIBBON.PACKET.PORT.DISCOVERY.NAME.NOT_MATCHES}'
+                operator: NOT_MATCHES_REGEX
           description: 'Used for discovering of packet port.'
           item_prototypes:
             - uuid: 8ccfc427d4d64aef886cb1e05c30ce8c
@@ -1152,6 +1223,8 @@ zabbix_export:
                   value: network
                 - tag: component
                   value: packet-port
+                - tag: packet-port
+                  value: '{#PORT}'
             - uuid: 71872e6ceec74c1e8b88882a16ff5501
               name: 'Packet port [{#PORT}]: Link state'
               type: DEPENDENT
@@ -1196,6 +1269,8 @@ zabbix_export:
                   value: network
                 - tag: component
                   value: packet-port
+                - tag: packet-port
+                  value: '{#PORT}'
               trigger_prototypes:
                 - uuid: c43c708c4709464ca16b5e8840e0ebab
                   expression: 'last(/Ribbon SBC SWe CE by HTTP/ribbon.packet.port.link.state[{#PORT}])=2 or last(/Ribbon SBC SWe CE by HTTP/ribbon.packet.port.link.state[{#PORT}])=5 or last(/Ribbon SBC SWe CE by HTTP/ribbon.packet.port.link.state[{#PORT}])=6'
@@ -1223,6 +1298,8 @@ zabbix_export:
                   value: network
                 - tag: component
                   value: packet-port
+                - tag: packet-port
+                  value: '{#PORT}'
             - uuid: b5e0ec12b3d24e53a416efcd00f5820f
               name: 'Packet port [{#PORT}]: Negotiated speed'
               type: DEPENDENT
@@ -1260,6 +1337,8 @@ zabbix_export:
                   value: network
                 - tag: component
                   value: packet-port
+                - tag: packet-port
+                  value: '{#PORT}'
             - uuid: 058cbca2f7264418a627a373b9388ccf
               name: 'Packet port [{#PORT}]: Utilization'
               type: DEPENDENT
@@ -1277,6 +1356,8 @@ zabbix_export:
                   value: network
                 - tag: component
                   value: packet-port
+                - tag: packet-port
+                  value: '{#PORT}'
               trigger_prototypes:
                 - uuid: 75a8459f83074875bf9221ed1f1b2d31
                   expression: 'min(/Ribbon SBC SWe CE by HTTP/ribbon.packet.port.util[{#PORT}],5m) > {$RIBBON.PORT.UTIL.CRIT}'
@@ -1337,6 +1418,14 @@ zabbix_export:
           name: 'Port redundancy group discovery'
           type: DEPENDENT
           key: ribbon.redundancy.port.discovery
+          filter:
+            evaltype: AND
+            conditions:
+              - macro: '{#PORT}'
+                value: '{$RIBBON.REDUNDANCY.PORT.DISCOVERY.NAME.MATCHES}'
+              - macro: '{#PORT}'
+                value: '{$RIBBON.REDUNDANCY.PORT.DISCOVERY.NAME.NOT_MATCHES}'
+                operator: NOT_MATCHES_REGEX
           description: 'Used for discovering of port redundancy group.'
           item_prototypes:
             - uuid: 2977345b2dea4b7e9ab7a3ad6a8dfcfa
@@ -1358,6 +1447,8 @@ zabbix_export:
                   value: network
                 - tag: component
                   value: port-redundancy-group
+                - tag: port-redundancy-group
+                  value: '{#PORT}'
             - uuid: 584cd50cb78e4e8095b6bc9ddf0a2261
               name: 'Port redundancy group [{#PORT}]: Group name'
               type: DEPENDENT
@@ -1378,6 +1469,8 @@ zabbix_export:
                   value: network
                 - tag: component
                   value: port-redundancy-group
+                - tag: port-redundancy-group
+                  value: '{#PORT}'
             - uuid: f270fe8558044b56aa9720519163d3cb
               name: 'Port redundancy group [{#PORT}]: Redundancy mode'
               type: DEPENDENT
@@ -1398,6 +1491,8 @@ zabbix_export:
                   value: network
                 - tag: component
                   value: port-redundancy-group
+                - tag: port-redundancy-group
+                  value: '{#PORT}'
             - uuid: 83c514742beb4fe3a49ab1f6f743d267
               name: 'Port redundancy group [{#PORT}]: Port name'
               type: DEPENDENT
@@ -1418,6 +1513,8 @@ zabbix_export:
                   value: network
                 - tag: component
                   value: port-redundancy-group
+                - tag: port-redundancy-group
+                  value: '{#PORT}'
             - uuid: d99e6938b3a04771b68d14f7e976bfbb
               name: 'Port redundancy group [{#PORT}]: State'
               type: DEPENDENT
@@ -1438,13 +1535,15 @@ zabbix_export:
                   value: network
                 - tag: component
                   value: port-redundancy-group
+                - tag: port-redundancy-group
+                  value: '{#PORT}'
               trigger_prototypes:
                 - uuid: 2c00a80067284cb8a961e566248e5e81
                   expression: 'last(/Ribbon SBC SWe CE by HTTP/ribbon.redundancy.port.state[{#PORT}])<>"up"'
                   name: 'Ribbon: Port redundancy group [{#PORT}]: State is not "up"'
                   opdata: 'Current state: {ITEM.LASTVALUE}'
                   priority: AVERAGE
-                  description: 'Tht port redundancy group state is not up.'
+                  description: 'The port redundancy group state is not up.'
                   tags:
                     - tag: scope
                       value: availability
@@ -1468,6 +1567,8 @@ zabbix_export:
                   value: network
                 - tag: component
                   value: port-redundancy-group
+                - tag: port-redundancy-group
+                  value: '{#PORT}'
           master_item:
             key: ribbon.server.data.get
           preprocessing:
@@ -1516,14 +1617,50 @@ zabbix_export:
             regex: '^-?([0-9]+|(([0-9]+)\.([0-9]+)))$'
         - macro: '{$RIBBON.DISK.UTIL.CRIT}'
           value: '90'
-          description: 'The threshold of the swap usage in percent.'
+          description: 'The threshold of the disk usage in percent.'
           config:
             type: TEXT
             priority: '9'
             section_name: Thresholds
-            label: 'Warning swap usage threshold'
+            label: 'Warning disk usage threshold'
             description: 'In the range from 0 to 100 inclusive.'
             regex: '^-?([0-9]+|(([0-9]+)\.([0-9]+)))$'
+        - macro: '{$RIBBON.FS.DISCOVERY.NAME.MATCHES}'
+          value: '.*'
+          description: 'Sets the regex string of file system name to be allowed in discovery.'
+          config:
+            type: TEXT
+            priority: '11'
+            section_name: Filters
+            label: 'Include file system name filter'
+            description: 'Regex string to include file system by name.'
+        - macro: '{$RIBBON.FS.DISCOVERY.NAME.NOT_MATCHES}'
+          value: CHANGE_IF_NEEDED
+          description: 'Sets the regex string of file system name to be ignored in discovery.'
+          config:
+            type: TEXT
+            priority: '12'
+            section_name: Filters
+            label: 'Exclude file system name filter'
+            description: 'Regex string to exclude file system by name.'
+        - macro: '{$RIBBON.MANAGEMENT.PORT.DISCOVERY.NAME.MATCHES}'
+          value: '.*'
+          description: 'Sets the regex string of management port name to be allowed in discovery.'
+          config:
+            type: TEXT
+            priority: '15'
+            section_name: Filters
+            label: 'Include management port name filter'
+            description: 'Regex string to include management port by name.'
+        - macro: '{$RIBBON.MANAGEMENT.PORT.DISCOVERY.NAME.NOT_MATCHES}'
+          value: CHANGE_IF_NEEDED
+          description: 'Sets the regex string of management port name to be ignored in discovery.'
+          config:
+            type: TEXT
+            priority: '16'
+            section_name: Filters
+            label: 'Exclude management port name filter'
+            description: 'Regex string to exclude management port by name.'
         - macro: '{$RIBBON.MEMORY.UTIL.CRIT}'
           value: '90'
           description: 'The threshold of the memory usage in percent.'
@@ -1534,6 +1671,42 @@ zabbix_export:
             label: 'Warning memory usage threshold'
             description: 'In the range from 0 to 100 inclusive.'
             regex: '^-?([0-9]+|(([0-9]+)\.([0-9]+)))$'
+        - macro: '{$RIBBON.MONITOR.PORT.DISCOVERY.NAME.MATCHES}'
+          value: '.*'
+          description: 'Sets the regex string of monitor port name to be allowed in discovery.'
+          config:
+            type: TEXT
+            priority: '19'
+            section_name: Filters
+            label: 'Include monitor port name filter'
+            description: 'Regex string to include monitor port by name.'
+        - macro: '{$RIBBON.MONITOR.PORT.DISCOVERY.NAME.NOT_MATCHES}'
+          value: CHANGE_IF_NEEDED
+          description: 'Sets the regex string of monitor port name to be ignored in discovery.'
+          config:
+            type: TEXT
+            priority: '20'
+            section_name: Filters
+            label: 'Exclude monitor port name filter'
+            description: 'Regex string to exclude monitor port by name.'
+        - macro: '{$RIBBON.PACKET.PORT.DISCOVERY.NAME.MATCHES}'
+          value: '.*'
+          description: 'Sets the regex string of packet port name to be allowed in discovery.'
+          config:
+            type: TEXT
+            priority: '13'
+            section_name: Filters
+            label: 'Include packet port name filter'
+            description: 'Regex string to include packet port by name.'
+        - macro: '{$RIBBON.PACKET.PORT.DISCOVERY.NAME.NOT_MATCHES}'
+          value: CHANGE_IF_NEEDED
+          description: 'Sets the regex string of packet port name to be ignored in discovery.'
+          config:
+            type: TEXT
+            priority: '14'
+            section_name: Filters
+            label: 'Exclude packet port name filter'
+            description: 'Regex string to exclude packet port by name.'
         - macro: '{$RIBBON.PASSWORD}'
           type: SECRET_TEXT
           description: 'Ribbon SBC user password.'
@@ -1559,6 +1732,24 @@ zabbix_export:
             priority: '4'
             label: 'Proxy address'
             description: 'Set the proxy IP here.'
+        - macro: '{$RIBBON.REDUNDANCY.PORT.DISCOVERY.NAME.MATCHES}'
+          value: '.*'
+          description: 'Sets the regex string of port redundancy group name to be allowed in discovery.'
+          config:
+            type: TEXT
+            priority: '17'
+            section_name: Filters
+            label: 'Include port redundancy group name filter'
+            description: 'Regex string to include port redundancy group by name.'
+        - macro: '{$RIBBON.REDUNDANCY.PORT.DISCOVERY.NAME.NOT_MATCHES}'
+          value: CHANGE_IF_NEEDED
+          description: 'Sets the regex string of port redundancy group name to be ignored in discovery.'
+          config:
+            type: TEXT
+            priority: '18'
+            section_name: Filters
+            label: 'Exclude port redundancy group name filter'
+            description: 'Regex string to exclude port redundancy group by name.'
         - macro: '{$RIBBON.SWAP.UTIL.CRIT}'
           value: '90'
           description: 'The threshold of the swap usage in percent.'
@@ -1614,7 +1805,7 @@ zabbix_export:
                       value: '10'
                     - type: STRING
                       name: thresholds.0.color
-                      value: 0EC9AC
+                      value: 81C784
                     - type: STRING
                       name: thresholds.0.threshold
                       value: '0'
@@ -1665,7 +1856,7 @@ zabbix_export:
                       value: '0'
                     - type: STRING
                       name: thresholds.0.color
-                      value: 80FF00
+                      value: 81C784
                     - type: STRING
                       name: thresholds.0.threshold
                       value: '0'
@@ -1713,7 +1904,7 @@ zabbix_export:
                       value: '10'
                     - type: STRING
                       name: thresholds.0.color
-                      value: 0EC9AC
+                      value: 81C784
                     - type: STRING
                       name: thresholds.0.threshold
                       value: '0'
@@ -1764,7 +1955,7 @@ zabbix_export:
                       value: '10'
                     - type: STRING
                       name: thresholds.0.color
-                      value: 0EC9AC
+                      value: 81C784
                     - type: STRING
                       name: thresholds.0.threshold
                       value: '0'
@@ -1964,7 +2155,7 @@ zabbix_export:
                       name: itemid.0
                       value:
                         host: 'Ribbon SBC SWe CE by HTTP'
-                        key: ribbon.server.hwType
+                        key: ribbon.server.hw.type
                     - type: INTEGER
                       name: show.0
                       value: '1'
@@ -2544,34 +2735,50 @@ zabbix_export:
             		return data;
             	},
             
-            	filterByServerName: function (data, param_name, param_value, key_field) {
-            		var result = {}
+            	filterByServerName: function (data, param_name, key_field) {
+            		var result = {};
+            
             		for (var key in data) {
-            			if (data[key][param_name] == param_value) {
-            				result[data[key][key_field]] = data[key];
+            			if (typeof data[key] === 'object' && data[key] !== null && data[key][param_name] !== 'undefined') {
+            				if (data[key][param_name] == Ribbon.params.server_name) {
+            					result[data[key][key_field]] = data[key];
+            				};
             			}
-            		}
+            		};
             
             		return result;
+            	},
+            
+            	getMetricsData: function (endpoints) {
+            		var data = {};
+            
+            		Object.keys(endpoints).forEach(function (key) {
+            			data[key] = Ribbon.getField(Ribbon.getRequest(endpoints[key]['url']), endpoints[key]['path']);
+            		});
+            
+            		return data;
             	}
             };
             
             
             
             try {
-            	var result = {};
-            
             	Ribbon.setParams(JSON.parse(value));
             
-            	result['serverAdmin'] = Ribbon.getField(Ribbon.getRequest("/restconf/data/sonusSystem:system/serverAdmin"), 'sonusSystem:serverAdmin');
-            	result['admin'] = Ribbon.getField(Ribbon.getRequest("/restconf/data/sonusSystem:system/admin"), 'sonusSystem:admin');
-            	result['syncStatus'] = Ribbon.getField(Ribbon.getRequest("/restconf/data/sonusSystem:system/syncStatus"), 'sonusSystem:syncStatus');
-            	result['CongestionStatistics'] = Ribbon.getField(Ribbon.getRequest("/restconf/data/sonusSystem:system/sonusOrcaSystem:systemCongestionCurrentStatistics"), 'sonusOrcaSystem:systemCongestionCurrentStatistics');
-            	result['CongestionStatus'] = Ribbon.getField(Ribbon.getRequest("/restconf/data/sonusSystem:system/sonusOrcaSystem:systemCongestionStatus"), 'sonusOrcaSystem:systemCongestionStatus');
-            	result['callCountStatus'] = Ribbon.getField(Ribbon.getRequest("/restconf/data/sonusGlobal:global/sonusActiveCall:callCountStatus"), 'sonusActiveCall:callCountStatus');
-            	result['callCountCurrentStatistics'] = Ribbon.getField(Ribbon.getRequest("/restconf/data/sonusGlobal:global/callCountCurrentStatistics"), 'sonusGlobal:callCountCurrentStatistics');
+            	endpoints = {
+            		'serverAdmin': {'url': '/restconf/data/sonusSystem:system/serverAdmin', 'path': 'sonusSystem:serverAdmin'},
+            		'admin': {'url': '/restconf/data/sonusSystem:system/admin', 'path': 'sonusSystem:admin'},
+            		'syncStatus': {'url': '/restconf/data/sonusSystem:system/syncStatus', 'path': 'sonusSystem:syncStatus'},
+            		'CongestionStatistics': {
+            			'url': '/restconf/data/sonusSystem:system/sonusOrcaSystem:systemCongestionCurrentStatistics',
+            			'path': 'sonusOrcaSystem:systemCongestionCurrentStatistics'},
+            		'CongestionStatus': {'url': '/restconf/data/sonusSystem:system/sonusOrcaSystem:systemCongestionStatus', 'path': 'sonusOrcaSystem:systemCongestionStatus'},
+            		'callCountStatus': {'url': '/restconf/data/sonusGlobal:global/sonusActiveCall:callCountStatus', 'path': 'sonusActiveCall:callCountStatus'},
+            		'callCountCurrentStatistics': {'url': '/restconf/data/sonusGlobal:global/callCountCurrentStatistics', 'path': 'sonusGlobal:callCountCurrentStatistics'}
+            	};
             
-            	return JSON.stringify(result);
+            	
+            	return JSON.stringify(Ribbon.getMetricsData(endpoints));
             
             }
             catch (error) {
@@ -2823,7 +3030,7 @@ zabbix_export:
           preprocessing:
             - type: JSONPATH
               parameters:
-                - '$.callCountStatus[0].stableCallsNonUser'
+                - '$.callCountStatus[0].totalCallsNonUser'
             - type: DISCARD_UNCHANGED_HEARTBEAT
               parameters:
                 - 12h
@@ -2905,12 +3112,30 @@ zabbix_export:
           name: 'Call engine discovery'
           type: DEPENDENT
           key: ribbon.ce.discovery
+          filter:
+            evaltype: AND
+            conditions:
+              - macro: '{#CE.HW.TYPE}'
+                value: '{$RIBBON.CE.DISCOVERY.HW.TYPE.MATCHES}'
+              - macro: '{#CE.HW.TYPE}'
+                value: '{$RIBBON.CE.DISCOVERY.HW.TYPE.NOT_MATCHES}'
+                operator: NOT_MATCHES_REGEX
+              - macro: '{#CE.NAME}'
+                value: '{$RIBBON.CE.DISCOVERY.NAME.MATCHES}'
+              - macro: '{#CE.NAME}'
+                value: '{$RIBBON.CE.DISCOVERY.NAME.NOT_MATCHES}'
+                operator: NOT_MATCHES_REGEX
+              - macro: '{#CE.ROLE}'
+                value: '{$RIBBON.CE.DISCOVERY.ROLE.MATCHES}'
+              - macro: '{#CE.ROLE}'
+                value: '{$RIBBON.CE.DISCOVERY.ROLE.NOT_MATCHES}'
+                operator: NOT_MATCHES_REGEX
           description: 'Used for discovering of call engine.'
           item_prototypes:
             - uuid: 6dc847b33a0744da9f9830b1b4359f96
               name: 'Call engine [{#CE.NAME}]: HW sub-type'
               type: DEPENDENT
-              key: 'ribbon.ce.hwSubType[{#CE.NAME}]'
+              key: 'ribbon.ce.hw.sub.type[{#CE.NAME}]'
               value_type: CHAR
               description: 'HW sub-type of the server.'
               preprocessing:
@@ -3021,7 +3246,9 @@ zabbix_export:
                   
                   for (var entity in json_data) {
                   	output_data.push({
-                  		"{#CE.NAME}": json_data[entity]["name"]
+                  		"{#CE.NAME}": json_data[entity]["name"],
+                  		"{#CE.ROLE}": json_data[entity]["role"],
+                  		"{#CE.HW.TYPE}": json_data[entity]["hwType"]
                   	});
                   };
                   
@@ -3033,6 +3260,14 @@ zabbix_export:
           name: 'Sync module discovery'
           type: DEPENDENT
           key: ribbon.sync.module.discovery
+          filter:
+            evaltype: AND
+            conditions:
+              - macro: '{#SYNC.MODULE}'
+                value: '{$RIBBON.SYNC.MODULE.DISCOVERY.NAME.MATCHES}'
+              - macro: '{#SYNC.MODULE}'
+                value: '{$RIBBON.SYNC.MODULE.DISCOVERY.NAME.NOT_MATCHES}'
+                operator: NOT_MATCHES_REGEX
           description: 'Used for discovering of sync module.'
           item_prototypes:
             - uuid: 9478b97203694c498e8a88b2d2cd7c35
@@ -3061,7 +3296,7 @@ zabbix_export:
                   name: 'Ribbon: Module [{#SYNC.MODULE}]: Sync status is not "Completed"'
                   opdata: 'Current status: {ITEM.LASTVALUE}'
                   priority: AVERAGE
-                  description: 'Tht module sync status is not "Completed".'
+                  description: 'The module sync status is not "Completed".'
                   tags:
                     - tag: scope
                       value: availability
@@ -3094,6 +3329,60 @@ zabbix_export:
         - tag: target
           value: ribbon-swe-core
       macros:
+        - macro: '{$RIBBON.CE.DISCOVERY.HW.TYPE.MATCHES}'
+          value: '.*'
+          description: 'Sets the regex string of call engine hardware type to be allowed in discovery.'
+          config:
+            type: TEXT
+            priority: '11'
+            section_name: Filters
+            label: 'Include call engine hardware type filter'
+            description: 'Regex string to include call engine by hardware type.'
+        - macro: '{$RIBBON.CE.DISCOVERY.HW.TYPE.NOT_MATCHES}'
+          value: CHANGE_IF_NEEDED
+          description: 'Sets the regex string of call engine hardware type to be ignored in discovery.'
+          config:
+            type: TEXT
+            priority: '12'
+            section_name: Filters
+            label: 'Exclude call engine hardware type filter'
+            description: 'Regex string to exclude call engine by hardware type.'
+        - macro: '{$RIBBON.CE.DISCOVERY.NAME.MATCHES}'
+          value: '.*'
+          description: 'Sets the regex string of call engine name to be allowed in discovery.'
+          config:
+            type: TEXT
+            priority: '7'
+            section_name: Filters
+            label: 'Include call engine name filter'
+            description: 'Regex string to include call engine by name.'
+        - macro: '{$RIBBON.CE.DISCOVERY.NAME.NOT_MATCHES}'
+          value: CHANGE_IF_NEEDED
+          description: 'Sets the regex string of call engine name to be ignored in discovery.'
+          config:
+            type: TEXT
+            priority: '8'
+            section_name: Filters
+            label: 'Exclude call engine name filter'
+            description: 'Regex string to exclude call engine by name.'
+        - macro: '{$RIBBON.CE.DISCOVERY.ROLE.MATCHES}'
+          value: '.*'
+          description: 'Sets the regex string of call engine role to be allowed in discovery.'
+          config:
+            type: TEXT
+            priority: '9'
+            section_name: Filters
+            label: 'Include call engine role type filter'
+            description: 'Regex string to include call engine by role.'
+        - macro: '{$RIBBON.CE.DISCOVERY.ROLE.NOT_MATCHES}'
+          value: CHANGE_IF_NEEDED
+          description: 'Sets the regex string of call engine role to be ignored in discovery.'
+          config:
+            type: TEXT
+            priority: '10'
+            section_name: Filters
+            label: 'Exclude call engine role type filter'
+            description: 'Regex string to exclude call engine by role.'
         - macro: '{$RIBBON.CPU.UTIL.CRIT}'
           value: '90'
           description: 'The threshold of the CPU usage in percent.'
@@ -3129,6 +3418,24 @@ zabbix_export:
             priority: '4'
             label: 'Proxy address'
             description: 'Set the proxy IP here.'
+        - macro: '{$RIBBON.SYNC.MODULE.DISCOVERY.NAME.MATCHES}'
+          value: '.*'
+          description: 'Sets the regex string of sync module name to be allowed in discovery.'
+          config:
+            type: TEXT
+            priority: '13'
+            section_name: Filters
+            label: 'Include sync module name filter'
+            description: 'Regex string to include sync module by name.'
+        - macro: '{$RIBBON.SYNC.MODULE.DISCOVERY.NAME.NOT_MATCHES}'
+          value: CHANGE_IF_NEEDED
+          description: 'Sets the regex string of sync module name to be ignored in discovery.'
+          config:
+            type: TEXT
+            priority: '14'
+            section_name: Filters
+            label: 'Exclude sync module name filter'
+            description: 'Regex string to exclude sync module by name.'
         - macro: '{$RIBBON.URL}'
           description: 'Ribbon SBC API IP.'
           config:
@@ -3373,13 +3680,13 @@ zabbix_export:
                       value: '0'
                     - type: STRING
                       name: thresholds.0.color
-                      value: 80FF00
+                      value: 81C784
                     - type: STRING
                       name: thresholds.0.threshold
                       value: '0'
                     - type: STRING
                       name: thresholds.1.color
-                      value: 8BC34A
+                      value: CDDC39
                     - type: STRING
                       name: thresholds.1.threshold
                       value: '1'
