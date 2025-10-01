@@ -277,8 +277,8 @@ class CConfigurationImport {
 					$recovery_expression = $trigger['recovery_expression'];
 
 					$triggers_refs[$description][$expression][$recovery_expression] = array_key_exists('uuid', $trigger)
-						? ['uuid' => $trigger['uuid']]
-						: [];
+						? ['uuid' => $trigger['uuid'], 'host' => [$host => true]]
+						: ['host' => [$host => true]];
 
 					if (array_key_exists('dependencies', $trigger)) {
 						foreach ($trigger['dependencies'] as $dependency) {
@@ -442,8 +442,8 @@ class CConfigurationImport {
 		foreach ($this->getFormattedTriggers() as $trigger) {
 			$triggers_refs[$trigger['description']][$trigger['expression']][$trigger['recovery_expression']] =
 				array_key_exists('uuid', $trigger)
-					? ['uuid' => $trigger['uuid']]
-					: [];
+					? ['uuid' => $trigger['uuid'], 'host' => $trigger['host']]
+					: ['host' => $trigger['host']];
 
 			if (array_key_exists('dependencies', $trigger)) {
 				foreach ($trigger['dependencies'] as $dependency) {
@@ -1897,6 +1897,8 @@ class CConfigurationImport {
 				);
 			}
 
+			unset($trigger['host']);
+
 			if ($triggerid !== null) {
 				if ($this->options['triggers']['updateExisting']) {
 					$triggers_to_process_dependencies[] = $trigger;
@@ -1931,6 +1933,24 @@ class CConfigurationImport {
 	}
 
 	private function extractHostids(array $trigger): array {
+		$hosts = CConfigurationImport::extractHosts($trigger);
+
+		$hostids = [];
+
+		foreach (array_unique($hosts) as $host) {
+			$hostid = $this->referencer->findTemplateidOrHostidByHost($host);
+
+			if ($hostid === null) {
+				return [];
+			}
+
+			$hostids[] = $hostid;
+		}
+
+		return $hostids;
+	}
+
+	public static function extractHosts(array $trigger): array {
 		$expression_parser = new CExpressionParser(['usermacros' => true]);
 
 		if ($expression_parser->parse($trigger['expression']) != CParser::PARSE_SUCCESS) {
@@ -1947,18 +1967,7 @@ class CConfigurationImport {
 			$hosts = array_merge($hosts, $expression_parser->getResult()->getHosts());
 		}
 
-		$hostids = [];
-		foreach (array_unique($hosts) as $host) {
-			$hostid = $this->referencer->findTemplateidOrHostidByHost($host);
-
-			if ($hostid === null) {
-				return [];
-			}
-
-			$hostids[] = $hostid;
-		}
-
-		return $hostids;
+		return $hosts;
 	}
 
 	/**

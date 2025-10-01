@@ -1420,11 +1420,25 @@ class CImportReferencer {
 		}
 
 		$uuids = [];
+		$hosts = [];
+		$db_hosts = [];
 
 		foreach ($this->triggers as $trigger) {
 			foreach ($trigger as $expression) {
 				$uuids += array_flip(array_column($expression, 'uuid'));
+				$hosts += array_column($expression, 'host')[0];
 			}
+		}
+
+		if ($hosts) {
+			$db_hosts = API::Host()->get([
+				'output' => [],
+				'filter' => [
+					'host' => array_keys($hosts)
+				],
+				'templated_hosts' => true,
+				'preservekeys' => true
+			]);
 		}
 
 		$db_triggers = $uuids
@@ -1445,6 +1459,7 @@ class CImportReferencer {
 		$db_triggers += API::Trigger()->get([
 			'output' => ['uuid', 'description', 'expression', 'recovery_expression', 'templateid'],
 			'filter' => [
+				'hostid' => array_keys($db_hosts),
 				'description' => array_keys($this->triggers),
 				'flags' => [
 					ZBX_FLAG_DISCOVERY_NORMAL,
