@@ -24,8 +24,9 @@
 #include "zbxtimekeeper.h"
 #include "zbxself.h"
 #include "zbxlog.h"
-
-#include "zbxpreproc.h"
+#include "zbxnix.h"
+#include "zbxtime.h"
+#include "zbxtypes.h"
 
 ZBX_VECTOR_IMPL(proc_info, zbx_proc_info_t)
 

@@ -16,6 +16,7 @@
 #define ZABBIX_PP_PROTOCOL_H
 
 #include "zbxpreproc.h"
+#include "zbxtypes.h"
 #include "zbxipcservice.h"
 #include "zbxtime.h"
 #include "zbxalgo.h"

@@ -15,6 +15,7 @@
 #ifndef ZABBIX_DBCONFIG_H
 #define ZABBIX_DBCONFIG_H
 
+#include "zbxcommon.h"
 #include "zbxcacheconfig.h"
 #include "vps_monitor.h"
 #include "zbxalgo.h"
@@ -23,6 +24,7 @@
 #include "zbx_trigger_constants.h"
 #include "zbx_host_constants.h"
 #include "zbxmutexs.h"
+#include "zbxtypes.h"
 
 #define ZBX_MAINTENANCE_IDLE		0
 #define ZBX_MAINTENANCE_RUNNING		1
