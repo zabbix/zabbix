@@ -6776,12 +6776,12 @@ zabbix_export:
             required: 'YES'
         - macro: '{$HPE.SYNERGY.API.LOGIN_DOMAIN}'
           value: LOCAL
-          description: 'The user''s domain.'
+          description: 'User domain.'
           config:
             type: TEXT
             priority: '7'
-            label: 'User''s domain'
-            description: 'The The user''s domain.'
+            label: 'User domain'
+            description: 'User domain.'
         - macro: '{$HPE.SYNERGY.API.PASSWORD}'
           type: SECRET_TEXT
           description: 'Specify password for API.'
