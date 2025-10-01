@@ -35,6 +35,7 @@
 #include "zbxnum.h"
 #include "zbxjson.h"
 #include "zbxsupervisor_client.h"
+#include "zbxthreads.h"
 
 static void	process_configuration_sync(size_t *data_size, zbx_synced_new_config_t *synced,
 		const zbx_thread_info_t *thread_info, zbx_thread_proxyconfig_args *args)

@@ -30,6 +30,7 @@
 #include "zbxcacheconfig.h"
 #include "zbxdb.h"
 #include "zbxipcservice.h"
+#include "zbxthreads.h"
 
 /******************************************************************************
  *                                                                            *

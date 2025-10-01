@@ -16,7 +16,6 @@
 
 #include "zbxcommon.h"
 #include "zbxtypes.h"
-#include "zbxlog.h"
 #include "zbxserialize.h"
 #include "zbxipcservice.h"
 

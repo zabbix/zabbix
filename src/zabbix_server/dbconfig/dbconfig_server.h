@@ -15,7 +15,6 @@
 #ifndef ZABBIX_DBCONFIG_H
 #define ZABBIX_DBCONFIG_H
 
-#include "zbxthreads.h"
 #include "zbxvault.h"
 
 typedef struct
