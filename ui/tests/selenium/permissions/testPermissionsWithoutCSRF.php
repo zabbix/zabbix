@@ -276,7 +276,14 @@ class testPermissionsWithoutCSRF extends CWebTest {
 				[
 					'db' => 'SELECT * FROM maintenances',
 					'link' => 'zabbix.php?action=maintenance.list',
-					'overlay' => 'create'
+					'overlay' => 'create',
+					'fields' => [
+						'id:name' => 'CSRF maintenance test name',
+						'xpath://div[@id="groupids_"]/..' => 'Zabbix servers'
+					],
+					'period_fields' => [
+						'Period type' => 'One time only'
+					]
 				]
 			],
 			// #21 Maintenance update.
@@ -722,6 +729,16 @@ class testPermissionsWithoutCSRF extends CWebTest {
 			foreach ($data['fields'] as $field => $value) {
 				$this->query($field)->one()->detect()->fill($value);
 			}
+		}
+
+		// If test data specifies period fields, add a maintenance period.
+		if (array_key_exists('period_fields', $data)) {
+			$element->query('xpath://table[@id="timeperiods"]//button[text()="Add"]')->one()->click();
+
+			$period_dialog = COverlayDialogElement::find()->waitUntilReady()->all()->last()->asForm();
+			$period_dialog->fill($data['period_fields']);
+			$period_dialog->submit();
+			$period_dialog->waitUntilNotVisible();
 		}
 
 		// Delete hidden input with CSRF token.
