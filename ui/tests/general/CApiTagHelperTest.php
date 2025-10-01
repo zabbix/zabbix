@@ -500,11 +500,24 @@ class CApiTagHelperTest extends CTest {
 			' FROM item_tag'.
 			' WHERE f.itemid=item_tag.itemid';
 
+		$select_trigger_inherited_item_tags_where_not =
+			'SELECT NULL'.
+			' FROM functions'.
+			' JOIN item_tag ON functions.itemid=item_tag.itemid'.
+			' WHERE t.triggerid=functions.triggerid';
+
 		$select_trigger_inherited_host_tags_where =
 			'SELECT NULL'.
 			' FROM item_template_cache itc'.
 			' JOIN host_tag ON itc.link_hostid=host_tag.hostid'.
 			' WHERE f.itemid=itc.itemid';
+
+		$select_trigger_inherited_host_tags_where_not =
+			'SELECT NULL'.
+			' FROM functions'.
+			' JOIN item_template_cache itc ON functions.itemid=itc.itemid'.
+			' JOIN host_tag ON itc.link_hostid=host_tag.hostid'.
+			' WHERE t.triggerid=functions.triggerid';
 
 		yield 'Get host native tags only (AND/OR|1 tag (1 like)).' => [
 			[
@@ -766,13 +779,13 @@ class CApiTagHelperTest extends CTest {
 				')'.
 				' AND '.
 				'NOT EXISTS ('.
-					$select_trigger_inherited_item_tags_where.
+					$select_trigger_inherited_item_tags_where_not.
 						' AND item_tag.tag=\'Tag\''.
 						' AND item_tag.value IN (\'Value\',\'Value2\')'.
 				')'.
 				' AND '.
 				'NOT EXISTS ('.
-					$select_trigger_inherited_host_tags_where.
+					$select_trigger_inherited_host_tags_where_not.
 						' AND host_tag.tag=\'Tag\''.
 						' AND host_tag.value IN (\'Value\',\'Value2\')'.
 				')'.
@@ -786,13 +799,13 @@ class CApiTagHelperTest extends CTest {
 				')'.
 				' AND '.
 				'NOT EXISTS ('.
-					$select_trigger_inherited_item_tags_where.
+					$select_trigger_inherited_item_tags_where_not.
 						' AND item_tag.tag=\'Tag2\''.
 						' AND item_tag.value IN (\'Value\',\'Value2\')'.
 				')'.
 				' AND '.
 				'NOT EXISTS ('.
-					$select_trigger_inherited_host_tags_where.
+					$select_trigger_inherited_host_tags_where_not.
 						' AND host_tag.tag=\'Tag2\''.
 						' AND host_tag.value IN (\'Value\',\'Value2\')'.
 				')'.

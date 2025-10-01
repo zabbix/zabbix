@@ -28,11 +28,26 @@ class CApiTagHelper {
 			return '1=0';
 		}
 
+		$query_options = [
+			'evaltype' => $evaltype,
+			'parent_aliases' => $parent_aliases,
+			'table' => $table,
+			'field' => $field,
+			'inherited_tags' => $inherited_tags
+		];
+
 		$sql_where = [];
 
 		foreach (self::getGroupedTags($tags) as $tag => $operator_values) {
-			$tag_table_subqueries = self::getTagTableSubqueries($parent_aliases, $table, $field, $tag, $inherited_tags);
-			$subqueries = self::getTagSubqueries($operator_values, $tag_table_subqueries);
+			$subqueries = self::getTagSubqueriesByExistsOperator($tag, $operator_values, $query_options);
+
+			if (!$subqueries) {
+				$subqueries = array_merge(
+					self::getTagSubqueriesByLikeOrEqualOperator($tag, $operator_values, $query_options),
+					self::getTagSubqueriesByNotExistsOperator($tag, $operator_values, $query_options),
+					self::getTagSubqueriesByNotLikeOrNotEqualOperator($tag, $operator_values, $query_options)
+				);
+			}
 
 			if ($evaltype == TAG_EVAL_TYPE_AND_OR) {
 				$sql_where[] = count($subqueries) == 1 ? $subqueries[0] : '('.implode(' OR ', $subqueries).')';
@@ -84,8 +99,104 @@ class CApiTagHelper {
 		return $grouped_tags;
 	}
 
-	private static function getTagTableSubqueries(array $parent_aliases, string $table, string $field, string $tag,
-			bool $inherited_tags): array {
+	private static function getTagSubqueriesByExistsOperator(string $tag, array $operator_values,
+			array $query_options): array {
+		$subqueries = [];
+
+		if (array_key_exists(TAG_OPERATOR_EXISTS, $operator_values)) {
+			$tag_table_subqueries = self::getTagTableSubqueries($tag, self::SUBQUERY_TYPE_EXISTS, $query_options);
+
+			foreach ($tag_table_subqueries as $subquery_sql) {
+				$subqueries[] = self::getTagSubquery(self::SUBQUERY_TYPE_EXISTS, $subquery_sql);
+			}
+		}
+
+		return $subqueries;
+	}
+
+	private static function getTagSubqueriesByLikeOrEqualOperator(string $tag, array $operator_values,
+			array $query_options): array {
+		if (!array_key_exists(TAG_OPERATOR_LIKE, $operator_values)
+				&& !array_key_exists(TAG_OPERATOR_EQUAL, $operator_values)) {
+			return [];
+		}
+
+		$tag_table_subqueries = self::getTagTableSubqueries($tag, self::SUBQUERY_TYPE_EXISTS, $query_options);
+
+		$value_conditions = [];
+
+		self::supplementWithLikeConditions($value_conditions, $operator_values, TAG_OPERATOR_LIKE,
+			$tag_table_subqueries
+		);
+		self::supplementWithEqualConditions($value_conditions, $operator_values, TAG_OPERATOR_EQUAL,
+			$tag_table_subqueries
+		);
+
+		$subqueries = [];
+
+		foreach ($value_conditions as $table => $conditions) {
+			$subqueries[] =
+				self::getTagSubquery(self::SUBQUERY_TYPE_EXISTS, $tag_table_subqueries[$table], $conditions);
+		}
+
+		return $subqueries;
+	}
+
+	private static function getTagSubqueriesByNotExistsOperator(string $tag, array $operator_values,
+			array $query_options): array {
+		$subqueries = [];
+
+		if (array_key_exists(TAG_OPERATOR_NOT_EXISTS, $operator_values)) {
+			$tag_table_subqueries = self::getTagTableSubqueries($tag, self::SUBQUERY_TYPE_NOT_EXISTS, $query_options);
+
+			$_subqueries = [];
+
+			foreach ($tag_table_subqueries as $subquery_sql) {
+				$_subqueries[] = self::getTagSubquery(self::SUBQUERY_TYPE_NOT_EXISTS, $subquery_sql);
+			}
+
+			$subqueries[] = count($_subqueries) == 1 ? $_subqueries[0] : '('.implode(' AND ', $_subqueries).')';
+		}
+
+		return $subqueries;
+	}
+
+	private static function getTagSubqueriesByNotLikeOrNotEqualOperator(string $tag, array $operator_values,
+			array $query_options): array {
+		if (!array_key_exists(TAG_OPERATOR_NOT_LIKE, $operator_values)
+				&& !array_key_exists(TAG_OPERATOR_NOT_EQUAL, $operator_values)) {
+			return [];
+		}
+
+		$tag_table_subqueries = self::getTagTableSubqueries($tag, self::SUBQUERY_TYPE_NOT_EXISTS, $query_options);
+
+		$value_conditions = [];
+
+		self::supplementWithLikeConditions($value_conditions, $operator_values, TAG_OPERATOR_NOT_LIKE,
+			$tag_table_subqueries
+		);
+		self::supplementWithEqualConditions($value_conditions, $operator_values, TAG_OPERATOR_NOT_EQUAL,
+			$tag_table_subqueries
+		);
+
+		$subqueries = [];
+
+		foreach ($value_conditions as $table => $conditions) {
+			$subqueries[] =
+				self::getTagSubquery(self::SUBQUERY_TYPE_NOT_EXISTS, $tag_table_subqueries[$table], $conditions);
+		}
+
+		return count($subqueries) > 1 ? ['('.implode(' AND ', $subqueries).')'] : $subqueries;
+	}
+
+	private static function getTagTableSubqueries(string $tag, string $subquery_type, array $query_options): array {
+		[
+			'parent_aliases' => $parent_aliases,
+			'table' => $table,
+			'field' => $field,
+			'inherited_tags' => $inherited_tags
+		] = $query_options;
+
 		if ($inherited_tags && $table === 'host_tag') {
 			return [
 				'host_tag' =>
@@ -118,98 +229,59 @@ class CApiTagHelper {
 		if ($inherited_tags && $table === 'trigger_tag') {
 			return [
 				'trigger_tag' => $default_subquery,
-				'item_tag' =>
-					'SELECT NULL'.
-					' FROM item_tag'.
-					' WHERE '.$parent_aliases[1].'.itemid=item_tag.itemid'.
-						' AND item_tag.tag='.zbx_dbstr($tag),
-				'host_tag' =>
-					'SELECT NULL'.
-					' FROM item_template_cache itc'.
-					' JOIN host_tag ON itc.link_hostid=host_tag.hostid'.
-					' WHERE '.$parent_aliases[1].'.itemid=itc.itemid'.
-						' AND host_tag.tag='.zbx_dbstr($tag)
+				'item_tag' => match ($subquery_type) {
+					self::SUBQUERY_TYPE_EXISTS =>
+						'SELECT NULL'.
+						' FROM item_tag'.
+						' WHERE '.$parent_aliases[1].'.itemid=item_tag.itemid'.
+							' AND item_tag.tag='.zbx_dbstr($tag),
+					self::SUBQUERY_TYPE_NOT_EXISTS =>
+						'SELECT NULL'.
+						' FROM functions'.
+						' JOIN item_tag ON functions.itemid=item_tag.itemid'.
+						' WHERE '.$parent_aliases[0].'.triggerid=functions.triggerid'.
+							' AND item_tag.tag='.zbx_dbstr($tag)
+				},
+				'host_tag' => match ($subquery_type) {
+					self::SUBQUERY_TYPE_EXISTS =>
+						'SELECT NULL'.
+						' FROM item_template_cache itc'.
+						' JOIN host_tag ON itc.link_hostid=host_tag.hostid'.
+						' WHERE '.$parent_aliases[1].'.itemid=itc.itemid'.
+							' AND host_tag.tag='.zbx_dbstr($tag),
+					self::SUBQUERY_TYPE_NOT_EXISTS =>
+						'SELECT NULL'.
+						' FROM functions'.
+						' JOIN item_template_cache itc ON functions.itemid=itc.itemid'.
+						' JOIN host_tag ON itc.link_hostid=host_tag.hostid'.
+						' WHERE '.$parent_aliases[0].'.triggerid=functions.triggerid'.
+							' AND host_tag.tag='.zbx_dbstr($tag)
+				}
 			];
 		}
 
 		if ($inherited_tags && $table === 'httptest_tag') {
 			return [
 				'httptest_tag' => $default_subquery,
-				'host_tag' =>
-					'SELECT NULL'.
-					' FROM item_template_cache itc'.
-					' JOIN host_tag ON itc.link_hostid=host_tag.hostid'.
-					' WHERE '.$parent_aliases[1].'.itemid=itc.itemid'.
-						' AND host_tag.tag='.zbx_dbstr($tag)
+				'host_tag' => match ($subquery_type) {
+					self::SUBQUERY_TYPE_EXISTS =>
+						'SELECT NULL'.
+						' FROM item_template_cache itc'.
+						' JOIN host_tag ON itc.link_hostid=host_tag.hostid'.
+						' WHERE '.$parent_aliases[1].'.itemid=itc.itemid'.
+							' AND host_tag.tag='.zbx_dbstr($tag),
+					self::SUBQUERY_TYPE_NOT_EXISTS =>
+						'SELECT NULL'.
+						' FROM httptestitem'.
+						' JOIN item_template_cache itc ON httptestitem.itemid=itc.itemid'.
+						' JOIN host_tag ON itc.link_hostid=host_tag.hostid'.
+						' WHERE '.$parent_aliases[0].'.httptestid=httptestitem.httptestid'.
+							' AND host_tag.tag='.zbx_dbstr($tag),
+				}
 			];
 		}
 
 		return [$table => $default_subquery];
-	}
-
-	private static function getTagSubqueries(array $operator_values, array $tag_table_subqueries): array {
-		$subqueries = [];
-
-		if (array_key_exists(TAG_OPERATOR_EXISTS, $operator_values)) {
-			foreach ($tag_table_subqueries as $subquery_sql) {
-				$subqueries[] = self::getTagSubquery(self::SUBQUERY_TYPE_EXISTS, $subquery_sql);
-			}
-
-			return $subqueries;
-		}
-
-		$value_conditions = [];
-
-		if (array_key_exists(TAG_OPERATOR_LIKE, $operator_values)) {
-			self::addLikeConditions($value_conditions, $operator_values[TAG_OPERATOR_LIKE], $tag_table_subqueries);
-		}
-
-		if (array_key_exists(TAG_OPERATOR_EQUAL, $operator_values)) {
-			self::addEqualConditions($value_conditions, $operator_values[TAG_OPERATOR_EQUAL], $tag_table_subqueries);
-		}
-
-		if ($value_conditions) {
-			foreach ($tag_table_subqueries as $table => $subquery_sql) {
-				$subqueries[] =
-					self::getTagSubquery(self::SUBQUERY_TYPE_EXISTS, $subquery_sql, $value_conditions[$table]);
-			}
-		}
-
-		if (array_key_exists(TAG_OPERATOR_NOT_EXISTS, $operator_values)) {
-			$_subqueries = [];
-
-			foreach ($tag_table_subqueries as $subquery_sql) {
-				$_subqueries[] = self::getTagSubquery(self::SUBQUERY_TYPE_NOT_EXISTS, $subquery_sql);
-			}
-
-			$subqueries[] = count($_subqueries) == 1 ? $_subqueries[0] : '('.implode(' AND ', $_subqueries).')';
-		}
-
-		$value_conditions = [];
-
-		if (array_key_exists(TAG_OPERATOR_NOT_LIKE, $operator_values)) {
-			self::addLikeConditions($value_conditions, $operator_values[TAG_OPERATOR_NOT_LIKE], $tag_table_subqueries);
-		}
-
-		if (array_key_exists(TAG_OPERATOR_NOT_EQUAL, $operator_values)) {
-			self::addEqualConditions($value_conditions, $operator_values[TAG_OPERATOR_NOT_EQUAL],
-				$tag_table_subqueries
-			);
-		}
-
-		if ($value_conditions) {
-			$_subqueries = [];
-
-			foreach ($tag_table_subqueries as $table => $subquery_sql) {
-				$_subqueries[] = self::getTagSubquery(self::SUBQUERY_TYPE_NOT_EXISTS, $subquery_sql,
-					$value_conditions[$table]
-				);
-			}
-
-			$subqueries[] = count($_subqueries) == 1 ? $_subqueries[0] : '('.implode(' AND ', $_subqueries).')';
-		}
-
-		return $subqueries;
 	}
 
 	private static function getTagSubquery(string $subquery_type, string $subquery_sql,
@@ -230,9 +302,13 @@ class CApiTagHelper {
 		')';
 	}
 
-	private static function addLikeConditions(array &$value_conditions, array $values,
-			array $tag_table_subqueries): void {
-		foreach ($values as $value => $true) {
+	private static function supplementWithLikeConditions(array &$value_conditions, array $operator_values,
+			int $operator, array $tag_table_subqueries): void {
+		if (!array_key_exists($operator, $operator_values)) {
+			return;
+		}
+
+		foreach ($operator_values[$operator] as $value => $true) {
 			$value = str_replace(['!', '%', '_'], ['!!', '!%', '!_'], $value);
 			$value = '%'.$value.'%';
 
@@ -242,10 +318,14 @@ class CApiTagHelper {
 		}
 	}
 
-	private static function addEqualConditions(array &$value_conditions, array $values,
-			array $tag_table_subqueries): void {
+	private static function supplementWithEqualConditions(array &$value_conditions, array $operator_values,
+			int $operator, array $tag_table_subqueries): void {
+		if (!array_key_exists($operator, $operator_values)) {
+			return;
+		}
+
 		foreach ($tag_table_subqueries as $table => $subquery_sql) {
-			$value_conditions[$table][] = dbConditionString($table.'.value', array_keys($values));
+			$value_conditions[$table][] = dbConditionString($table.'.value', array_keys($operator_values[$operator]));
 		}
 	}
 }

@@ -440,12 +440,21 @@ class CTrigger extends CTriggerGeneral {
 		// tags
 		if ($options['tags'] !== null) {
 			if ($options['inheritedTags']) {
-				$sqlParts['from']['functions'] = 'functions f';
-				$sqlParts['where']['ft'] = 'f.triggerid=t.triggerid';
+				$positive_tag_operators = [TAG_OPERATOR_LIKE, TAG_OPERATOR_EQUAL, TAG_OPERATOR_EXISTS];
 
-				$sqlParts['where'][] = CApiTagHelper::getTagCondition($options['tags'], $options['evaltype'],
-					['t', 'f'], 'trigger_tag', 'triggerid', true
-				);
+				if (array_intersect(array_column($options['tags'], 'operator'), $positive_tag_operators)) {
+					$sqlParts['from']['functions'] = 'functions f';
+					$sqlParts['where']['ft'] = 'f.triggerid=t.triggerid';
+
+					$sqlParts['where'][] = CApiTagHelper::getTagCondition($options['tags'], $options['evaltype'],
+						['t', 'f'], 'trigger_tag', 'triggerid', true
+					);
+				}
+				else {
+					$sqlParts['where'][] = CApiTagHelper::getTagCondition($options['tags'], $options['evaltype'],
+						['t'], 'trigger_tag', 'triggerid', true
+					);
+				}
 			}
 			else {
 				$sqlParts['where'][] = CApiTagHelper::getTagCondition($options['tags'], $options['evaltype'], ['t'],

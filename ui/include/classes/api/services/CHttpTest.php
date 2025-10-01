@@ -132,12 +132,21 @@ class CHttpTest extends CApiService {
 		// tags
 		if ($options['tags'] !== null) {
 			if ($options['inheritedTags']) {
-				$sqlParts['from']['httptestitem'] = 'httptestitem hti';
-				$sqlParts['where']['ht-hti'] = 'ht.httptestid=hti.httptestid';
+				$positive_tag_operators = [TAG_OPERATOR_LIKE, TAG_OPERATOR_EQUAL, TAG_OPERATOR_EXISTS];
 
-				$sqlParts['where'][] = CApiTagHelper::getTagCondition($options['tags'], $options['evaltype'],
-					['ht', 'hti'], 'httptest_tag', 'httptestid', true
-				);
+				if (array_intersect(array_column($options['tags'], 'operator'), $positive_tag_operators)) {
+					$sqlParts['from']['httptestitem'] = 'httptestitem hti';
+					$sqlParts['where']['ht-hti'] = 'ht.httptestid=hti.httptestid';
+
+					$sqlParts['where'][] = CApiTagHelper::getTagCondition($options['tags'], $options['evaltype'],
+						['ht', 'hti'], 'httptest_tag', 'httptestid', true
+					);
+				}
+				else {
+					$sqlParts['where'][] = CApiTagHelper::getTagCondition($options['tags'], $options['evaltype'],
+						['ht'], 'httptest_tag', 'httptestid', true
+					);
+				}
 			}
 			else {
 				$sqlParts['where'][] = CApiTagHelper::getTagCondition($options['tags'], $options['evaltype'], ['ht'],
