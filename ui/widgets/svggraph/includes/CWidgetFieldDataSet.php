@@ -142,15 +142,13 @@ class CWidgetFieldDataSet extends CWidgetField {
 			return [];
 		}
 
-		$errors = [];
-
 		$validation_rules = $this->getValidationRules($strict);
 		$value = $this->getValue();
 		$label = $this->getErrorLabel();
 
-		if (!count($value)) {
+		if (!$value) {
 			if (!CApiInputValidator::validate($validation_rules, $value, $label, $error)) {
-				$errors[] = $error;
+				return [$error];
 			}
 		}
 		else {
@@ -178,13 +176,18 @@ class CWidgetFieldDataSet extends CWidgetField {
 			}
 
 			if (!CApiInputValidator::validate($validation_rules_by_type, $data, $label.'/'.($index + 1), $error)) {
-				$errors[] = $error;
-				break;
+				return [$error];
 			}
 
 			if ($data['dataset_type'] == self::DATASET_TYPE_SINGLE_ITEM) {
 				foreach ($data['itemids'] as $i => &$item_spec) {
 					if ($item_spec == 0) {
+						if ($data['references'][$i] === '') {
+							return [_s('Invalid parameter "%1$s": %2$s.', $label.'/'.($index + 1),
+								_('referred widget is unavailable')
+							)];
+						}
+
 						$item_spec = [CWidgetField::FOREIGN_REFERENCE_KEY => $data['references'][$i]];
 					}
 				}
@@ -195,11 +198,9 @@ class CWidgetFieldDataSet extends CWidgetField {
 		}
 		unset($data);
 
-		if (!$errors) {
-			$this->setValue($value);
-		}
+		$this->setValue($value);
 
-		return $errors;
+		return [];
 	}
 
 	public function toApi(array &$widget_fields = []): void {

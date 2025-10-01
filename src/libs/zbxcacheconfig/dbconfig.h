@@ -433,6 +433,7 @@ typedef struct
 	int		flags;
 	int		timestamp;
 	unsigned short	listen_port;
+	unsigned int	connection_type;
 }
 ZBX_DC_AUTOREG_HOST;
 
