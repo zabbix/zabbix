@@ -512,7 +512,10 @@ class CImportDataAdapterTest extends TestCase {
 				'url_name' => '',
 				'manual_close' => (string) ZBX_TRIGGER_MANUAL_CLOSE_NOT_ALLOWED,
 				'comments' => '',
-				'description' => 'trigger'
+				'description' => 'trigger',
+				'host' => [
+					'export-host' => 0
+				]
 			],
 			[
 				'uuid' => '6fbffaa155174cdd89e7f5a5999da9bf',
@@ -532,7 +535,10 @@ class CImportDataAdapterTest extends TestCase {
 				'url_name' => '',
 				'manual_close' => (string) ZBX_TRIGGER_MANUAL_CLOSE_NOT_ALLOWED,
 				'comments' => '',
-				'description' => 'trigger2'
+				'description' => 'trigger2',
+				'host' => [
+					'export-host' => 0
+				]
 			],
 			[
 				'uuid' => 'c1046f1cf0c3434b979a374f66a17dfa',
@@ -558,7 +564,10 @@ class CImportDataAdapterTest extends TestCase {
 				'url_name' => '',
 				'manual_close' => (string) ZBX_TRIGGER_MANUAL_CLOSE_NOT_ALLOWED,
 				'comments' => '',
-				'description' => 'trigger'
+				'description' => 'trigger',
+				'host' => [
+					'export-template' => 0
+				]
 			],
 			[
 				'uuid' => '3229895257e64d7399434434ccaa1f2d',
@@ -578,7 +587,10 @@ class CImportDataAdapterTest extends TestCase {
 				'url_name' => '',
 				'manual_close' => (string) ZBX_TRIGGER_MANUAL_CLOSE_NOT_ALLOWED,
 				'comments' => '',
-				'description' => 'trigger2'
+				'description' => 'trigger2',
+				'host' => [
+					'export-template' => 0
+				]
 			]
 		], $adapter->getTriggers());
 	}
@@ -1689,7 +1701,10 @@ class CImportDataAdapterTest extends TestCase {
 				'url_name' => '',
 				'tags' => [],
 				'manual_close' => (string) ZBX_TRIGGER_MANUAL_CLOSE_NOT_ALLOWED,
-				'dependencies' => []
+				'dependencies' => [],
+				'host' => [
+					'Template_Linux' => 0
+				]
 			],
 			[
 				'uuid' => '37d8550be8a64440a265004dfdad0a4a',
@@ -1709,7 +1724,10 @@ class CImportDataAdapterTest extends TestCase {
 				'url_name' => '',
 				'tags' => [],
 				'manual_close' => (string) ZBX_TRIGGER_MANUAL_CLOSE_NOT_ALLOWED,
-				'dependencies' => []
+				'dependencies' => [],
+				'host' => [
+					'Template_Simple' => 0
+				]
 			]
 		], $adapter->getTriggers());
 
