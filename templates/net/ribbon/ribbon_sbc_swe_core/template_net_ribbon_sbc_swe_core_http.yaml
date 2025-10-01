@@ -456,7 +456,7 @@ zabbix_export:
         - uuid: 31ee06ce57e8451fa5c98f7185ee6b3d
           name: 'Serial number'
           type: DEPENDENT
-          key: ribbon.server.serial.num
+          key: ribbon.server.serial.number
           value_type: CHAR
           description: 'Identifies the serial number of the server module. This is the serial number assigned to the server module at manufacture.'
           preprocessing:
@@ -1085,28 +1085,6 @@ zabbix_export:
                   value: port-monitor
                 - tag: port-monitor
                   value: '{#PORT}'
-            - uuid: 803fc65d7a134ef1ba577eec3f6a4373
-              name: 'Port monitor [{#PORT}]: Link state'
-              type: DEPENDENT
-              key: 'ribbon.monitor.port.link.state[{#PORT}]'
-              value_type: CHAR
-              description: 'The link state of the physical port.'
-              preprocessing:
-                - type: JSONPATH
-                  parameters:
-                    - '$.portMonitorStatus.["{#PORT}"].linkState'
-                - type: DISCARD_UNCHANGED_HEARTBEAT
-                  parameters:
-                    - 12h
-              master_item:
-                key: ribbon.server.data.get
-              tags:
-                - tag: component
-                  value: network
-                - tag: component
-                  value: port-monitor
-                - tag: port-monitor
-                  value: '{#PORT}'
             - uuid: e184efcae96748678a67135000dd51e1
               name: 'Port monitor [{#PORT}]: Name'
               type: DEPENDENT
@@ -1173,6 +1151,38 @@ zabbix_export:
                   value: port-monitor
                 - tag: port-monitor
                   value: '{#PORT}'
+            - uuid: 803fc65d7a134ef1ba577eec3f6a4373
+              name: 'Port monitor [{#PORT}]: State'
+              type: DEPENDENT
+              key: 'ribbon.monitor.port.state[{#PORT}]'
+              value_type: CHAR
+              description: 'The link state of the physical port.'
+              preprocessing:
+                - type: JSONPATH
+                  parameters:
+                    - '$.portMonitorStatus.["{#PORT}"].state'
+                - type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 12h
+              master_item:
+                key: ribbon.server.data.get
+              tags:
+                - tag: component
+                  value: network
+                - tag: component
+                  value: port-monitor
+                - tag: port-monitor
+                  value: '{#PORT}'
+              trigger_prototypes:
+                - uuid: 155d1f5ee1af400e8ba07cc03eb49e4a
+                  expression: 'last(/Ribbon SBC SWe CE by HTTP/ribbon.monitor.port.state[{#PORT}])<>"up"'
+                  name: 'Ribbon: Port monitor [{#PORT}]: State is not "up"'
+                  opdata: 'Current state: {ITEM.LASTVALUE}'
+                  priority: AVERAGE
+                  description: 'The port monitor state is not up.'
+                  tags:
+                    - tag: scope
+                      value: availability
           master_item:
             key: ribbon.server.data.get
           preprocessing:
@@ -2021,7 +2031,7 @@ zabbix_export:
                       name: itemid.0
                       value:
                         host: 'Ribbon SBC SWe CE by HTTP'
-                        key: ribbon.server.serial.num
+                        key: ribbon.server.serial.number
                     - type: INTEGER
                       name: show.0
                       value: '1'

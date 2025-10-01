@@ -208,7 +208,7 @@ This template has been tested on:
 |Server name|<p>Identifies the server.</p>|Dependent item|ribbon.server.name<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.serverStatus[0].name`</p></li><li><p>Discard unchanged with heartbeat: `12h`</p></li></ul>|
 |Server hardware type|<p>Identifies the type of server module the indexed slot has been configured to accept. Server modules other than this type are rejected by the System Manager.</p>|Dependent item|ribbon.server.hw.type<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.serverStatus[0].hwType`</p></li><li><p>Discard unchanged with heartbeat: `12h`</p></li></ul>|
 |Server hardware sub type|<p>Identifies the type of server module the indexed slot has been configured to accept. Server modules other than this type are rejected by the System Manager.</p>|Dependent item|ribbon.server.hw.sub.type<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.serverStatus[0].hwSubType`</p></li><li><p>Discard unchanged with heartbeat: `12h`</p></li></ul>|
-|Serial number|<p>Identifies the serial number of the server module. This is the serial number assigned to the server module at manufacture.</p>|Dependent item|ribbon.server.serial.num<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.serverStatus[0].serialNum`</p></li><li><p>Discard unchanged with heartbeat: `12h`</p></li></ul>|
+|Serial number|<p>Identifies the serial number of the server module. This is the serial number assigned to the server module at manufacture.</p>|Dependent item|ribbon.server.serial.number<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.serverStatus[0].serialNum`</p></li><li><p>Discard unchanged with heartbeat: `12h`</p></li></ul>|
 |Platform version|<p>Indicates the platform version currently running on server.</p>|Dependent item|ribbon.server.platform.version<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.serverStatus[0].platformVersion`</p></li><li><p>Discard unchanged with heartbeat: `12h`</p></li></ul>|
 |Application version|<p>Indicates the application version currently running on server.</p>|Dependent item|ribbon.server.application.version<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.serverStatus[0].applicationVersion`</p></li><li><p>Discard unchanged with heartbeat: `12h`</p></li></ul>|
 |Role|<p>Indicates the redundancy role of the server (for management entities).</p>|Dependent item|ribbon.server.role<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.serverStatus[0].mgmtRedundancyRole`</p></li><li><p>Discard unchanged with heartbeat: `12h`</p></li></ul>|
@@ -347,9 +347,15 @@ This template has been tested on:
 |Port monitor [{#PORT}]: Physical name|<p>The name of physical port.</p>|Dependent item|ribbon.monitor.port.physical.name[{#PORT}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.portMonitorStatus.["{#PORT}"].portName`</p></li><li><p>Discard unchanged with heartbeat: `12h`</p></li></ul>|
 |Port monitor [{#PORT}]: Role|<p>The role of the physical port.</p>|Dependent item|ribbon.monitor.port.role[{#PORT}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.portMonitorStatus.["{#PORT}"].role`</p></li><li><p>Discard unchanged with heartbeat: `12h`</p></li></ul>|
 |Port monitor [{#PORT}]: Fault state|<p>The fault state of the physical port.</p>|Dependent item|ribbon.monitor.port.fault.state[{#PORT}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.portMonitorStatus.["{#PORT}"].faultState`</p></li><li><p>Discard unchanged with heartbeat: `12h`</p></li></ul>|
-|Port monitor [{#PORT}]: Link state|<p>The link state of the physical port.</p>|Dependent item|ribbon.monitor.port.link.state[{#PORT}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.portMonitorStatus.["{#PORT}"].linkState`</p></li><li><p>Discard unchanged with heartbeat: `12h`</p></li></ul>|
+|Port monitor [{#PORT}]: State|<p>The link state of the physical port.</p>|Dependent item|ribbon.monitor.port.state[{#PORT}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.portMonitorStatus.["{#PORT}"].state`</p></li><li><p>Discard unchanged with heartbeat: `12h`</p></li></ul>|
 |Port monitor [{#PORT}]: Failures|<p>The current number failures of this port monitor.</p>|Dependent item|ribbon.monitor.port.failures[{#PORT}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.portMonitorStatus.["{#PORT}"].failures`</p></li><li><p>Discard unchanged with heartbeat: `12h`</p></li></ul>|
 |Port monitor [{#PORT}]: Link failures|<p>The current number of link failures of this port monitor.</p>|Dependent item|ribbon.monitor.port.link.failures[{#PORT}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.portMonitorStatus.["{#PORT}"].linkFailures`</p></li><li><p>Discard unchanged with heartbeat: `12h`</p></li></ul>|
+
+### Trigger prototypes for Port monitor discovery
+
+|Name|Description|Expression|Severity|Dependencies and additional info|
+|----|-----------|----------|--------|--------------------------------|
+|Ribbon: Port monitor [{#PORT}]: State is not "up"|<p>The port monitor state is not up.</p>|`last(/Ribbon SBC SWe CE by HTTP/ribbon.monitor.port.state[{#PORT}])<>"up"`|Average||
 
 ## Feedback
 
