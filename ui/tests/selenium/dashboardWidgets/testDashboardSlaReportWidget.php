@@ -1998,7 +1998,10 @@ class testDashboardSlaReportWidget extends testSlaReport {
 					],
 					'reporting_period' => 'Daily',
 					'equivalent_timestamps' => [
-						'From' => date('Y-m-d', strtotime('first day of this month'))
+						'From' => [
+							'format' => 'Y-m-d',
+							'string' => 'first day of this month'
+						]
 					]
 				]
 			],
@@ -2077,7 +2080,10 @@ class testDashboardSlaReportWidget extends testSlaReport {
 					],
 					'reporting_period' => 'Daily',
 					'equivalent_timestamps' => [
-						'To' => date('Y-m-d', strtotime('last day of this month'))
+						'To' => [
+							'format' => 'Y-m-d',
+							'string' => 'last day of this month'
+						]
 					]
 				]
 			],
@@ -2131,24 +2137,14 @@ class testDashboardSlaReportWidget extends testSlaReport {
 					],
 					'reporting_period' => 'Monthly',
 					'equivalent_timestamps' => [
-						'From' => date('Y-m', strtotime('first day of this month')).' - 1 month'
+						'From' => [
+							'format' => 'Y-m',
+							'string' => 'first day of this month',
+							'additional_string' => ' - 1 month'
+						]
 					]
 				]
 			],
-			// TODO: uncomment the below case when ZBX-21821 is fixed.
-//			[
-//				[
-//					'fields' => [
-//						'SLA' => 'SLA Monthly',
-//						'To' => 'now/M+1M',
-//						'Show periods' => 3
-//					],
-//					'reporting_period' => 'Monthly',
-//					'equivalent_timestamps' => [
-//						'To' => date('Y-m', strtotime('last day of this month')).' + 1 month'
-//					]
-//				]
-//			],
 			[
 				[
 					'fields' => [
@@ -2216,6 +2212,13 @@ class testDashboardSlaReportWidget extends testSlaReport {
 			$data_for_period = $data;
 			if (array_key_exists('equivalent_timestamps', $data)) {
 				foreach ($data_for_period['equivalent_timestamps'] as $field => $value) {
+					if (is_array($value)) {
+						$additional_string = (array_key_exists('additional_string', $value))
+							? $value['additional_string']
+							: '';
+						$value = date($value['format'], strtotime($value['string'])).$additional_string;
+					}
+
 					$data_for_period['fields'][$field] = $value;
 				}
 			}
