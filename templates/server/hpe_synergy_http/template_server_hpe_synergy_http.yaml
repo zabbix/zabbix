@@ -7021,7 +7021,7 @@ zabbix_export:
           description: 'The hostname or IP address of the API host.'
         - macro: '{$HPE.SYNERGY.API.LOGIN_DOMAIN}'
           value: LOCAL
-          description: 'The user''s domain.'
+          description: 'User domain.'
         - macro: '{$HPE.SYNERGY.API.PASSWORD}'
           type: SECRET_TEXT
           description: 'Specify password for API.'
