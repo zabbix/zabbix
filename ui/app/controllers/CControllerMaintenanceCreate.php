@@ -63,7 +63,7 @@ class CControllerMaintenanceCreate extends CControllerMaintenanceUpdateGeneral {
 						['db timeperiods.dayofweek', 'min' => 0b0000001, 'max' => 0b1111111,
 							'when' => ['timeperiod_type', 'in' => [TIMEPERIOD_TYPE_WEEKLY]],
 							'messages' => ['min' => _('At least one weekday must be selected.')]
-						],
+						]
 					],
 					'day' => ['db timeperiods.day', 'required', 'min' => 1, 'max' => MONTH_MAX_DAY,
 						'when' => [['dayofweek', 'in' => [0]], ['timeperiod_type', 'in' => [TIMEPERIOD_TYPE_MONTHLY]]]],
