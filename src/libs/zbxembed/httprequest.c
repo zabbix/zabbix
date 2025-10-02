@@ -383,10 +383,12 @@ static duk_ret_t	es_httprequest_query(duk_context *ctx, const char *http_request
 
 	ZBX_CURL_SETOPT(ctx, request->handle, CURLOPT_HTTPHEADER, request->headers, err);
 	ZBX_CURL_SETOPT(ctx, request->handle, CURLOPT_TIMEOUT_MS, timeout_ms - elapsed_ms, err);
-	/* For HEAD requests, skip CUSTOMREQUEST, POST fields and ACCEPT_ENCODING */
+
 	if (0 == strcmp(http_request, "HEAD"))
 	{
 		ZBX_CURL_SETOPT(ctx, request->handle, CURLOPT_NOBODY, 1L, err);
+		ZBX_CURL_SETOPT(ctx, request->handle, CURLOPT_POSTFIELDS, NULL, err);
+		ZBX_CURL_SETOPT(ctx, request->handle, CURLOPT_POSTFIELDSIZE, 0L, err);
 	}
 	else
 	{
