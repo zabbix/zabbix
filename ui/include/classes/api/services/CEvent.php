@@ -243,9 +243,10 @@ class CEvent extends CApiService {
 					' JOIN items i1 ON f1.itemid=i1.itemid'.
 					' JOIN host_hgset hh1 ON i1.hostid=hh1.hostid'.
 					' LEFT JOIN permission p1 ON p1.hgsetid=hh1.hgsetid'.
-						' AND p1.ugsetid=p.ugsetid'.
-					' WHERE e.objectid=f1.triggerid'.
-						' AND p1.permission IS NULL'.
+						' AND p1.ugsetid='.self::$userData['ugsetid'].
+					' WHERE f.triggerid=f1.triggerid'.
+						' AND i.itemid!=f1.itemid'.
+						' AND p1.hgsetid IS NULL'.
 				')';
 
 				if ($options['source'] == EVENT_SOURCE_TRIGGERS) {
