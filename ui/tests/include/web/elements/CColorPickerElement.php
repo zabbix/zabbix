@@ -99,7 +99,6 @@ class CColorPickerElement extends CElement {
 	/**
 	 * Press Escape key to close color picker.
 	 *
-	 * @return $this
 	 */
 	public static function close() {
 		CElementQuery::getPage()->pressKey(WebDriverKeys::ESCAPE);
