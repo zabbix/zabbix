@@ -189,6 +189,7 @@ class CWidgetHoneycomb extends CWidget {
 		for (let [itemid, cell] of this.#cells_data) {
 			if (cell.key_ === this.#selected_key_) {
 				this.#selected_itemid = itemid;
+				this.#selected_hostid = cell.hostid;
 
 				return true;
 			}
