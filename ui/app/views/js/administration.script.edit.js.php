@@ -33,22 +33,60 @@ window.script_edit_popup = new class {
 		return_url.searchParams.set('action', 'script.list');
 		ZABBIX.PopupManager.setReturnUrl(return_url.href);
 
-		this.#loadView(script);
-		this.#initActions();
+		this.#initView(script);
+		this.#initActions(rules);
+	}
 
-		this.#validateFieldsOnScopeListChange();
-
+	#initView(script) {
 		for (const parameter of script.parameters) {
 			this.#addParameter(parameter);
 		}
 
 		new CFormFieldsetCollapsible(document.getElementById('advanced-configuration'));
+
+		this.#updateForm();
+		this.form_element.removeAttribute('style');
+		this.overlay.recoverFocus();
 	}
 
-	#initActions() {
-		this.form_element.querySelector('#scope').dispatchEvent(new Event('change'));
-		this.form_element.querySelector('#type').dispatchEvent(new Event('change'));
-		this.form_element.querySelector('#enable_confirmation').dispatchEvent(new Event('change'));
+	#initActions(rules) {
+		this.form_element.querySelectorAll('#scope, #type, #hgstype-select, #manualinput, #manualinput_validator_type ,#enable_confirmation, #confirmation').forEach(
+			node => node.addEventListener('change', (e) => {
+				if (e.target.name === 'scope') {
+					const is_scope_action = this.form.findFieldByName('scope').getValue() == <?= ZBX_SCRIPT_SCOPE_ACTION ?>;
+					const is_type_url = this.form.findFieldByName('type').getValue() == <?= ZBX_SCRIPT_TYPE_URL ?>;
+
+					if (is_scope_action && is_type_url) {
+						this.form_element.querySelector(`#type [value="${<?= ZBX_SCRIPT_TYPE_WEBHOOK ?>}"]`)
+							.checked = true;
+					}
+				}
+				else if (e.target.name === 'type') {
+					const command_ipmi = document.getElementById('commandipmi');
+					const command = document.getElementById('command');
+
+					switch (this.form.findFieldByName('type').getValue()) {
+						case <?= ZBX_SCRIPT_TYPE_CUSTOM_SCRIPT ?>:
+						case <?= ZBX_SCRIPT_TYPE_SSH ?>:
+						case <?= ZBX_SCRIPT_TYPE_TELNET ?>:
+							if (command_ipmi.value !== '') {
+								command.value = command_ipmi.value;
+								command_ipmi.value = '';
+							}
+							break;
+
+						case <?= ZBX_SCRIPT_TYPE_IPMI ?>:
+							if (command.value !== '') {
+								command_ipmi.value = command.value;
+								command.value = '';
+							}
+							break;
+					}
+				}
+
+				this.#updateForm();
+			})
+		);
 
 		this.form_element.querySelector('.js-parameter-add').addEventListener('click', () => {
 			const template = new Template(this.form_element.querySelector('#script-parameter-template').innerHTML);
@@ -58,13 +96,160 @@ window.script_edit_popup = new class {
 			target.insertAdjacentHTML('beforeend', template.evaluate({row_index}));
 		});
 
-		this.dialogue.addEventListener('click', (e) => {
+		this.form_element.addEventListener('click', (e) => {
 			if (e.target.classList.contains('js-remove')) {
 				const row = e.target.closest('tr');
 				row.nextSibling.remove();
 				row.remove();
 			}
 		});
+
+		// Test user input button.
+		document.getElementById('test_user_input').addEventListener('click', () => {
+			this.overlay.setLoading();
+			this.form.findFieldByName('manualinput_prompt').setChanged();
+			this.form.findFieldByName('manualinput_validator').setChanged();
+			this.form.findFieldByName('dropdown_options').setChanged();
+			this.form.validateFieldsForAction(
+				['manualinput_prompt', 'manualinput_validator', 'dropdown_options'],
+				rules
+			).then((result) => {
+				this.overlay.unsetLoading();
+
+				if (result) {
+					this.#openManualinputTestPopup();
+				}
+			});
+		});
+
+		// Test confirmation button.
+		document.getElementById('test_confirmation').addEventListener('click', event => {
+			this.overlay.setLoading();
+			this.form.findFieldByName('confirmation').setChanged();
+			this.form.validateFieldsForAction(['confirmation'], rules)
+				.then((result) => {
+					this.overlay.unsetLoading();
+
+					if (result) {
+						if (this.form.findFieldByName('type').getValue() == <?= ZBX_SCRIPT_TYPE_URL ?>) {
+							Script.openUrl(null, this.form.findFieldByName('confirmation').getValue(), event.target);
+						}
+						else {
+							Script.execute(null, this.form.findFieldByName('confirmation').getValue(), event.target);
+						}
+					}
+				});
+		});
+	}
+
+	#updateForm() {
+		const data = this.form.getAllValues();
+		const is_scope_manual = data.scope == <?= ZBX_SCRIPT_SCOPE_HOST ?> || data.scope == <?= ZBX_SCRIPT_SCOPE_EVENT ?>;
+
+		const is_enable_user_input = data.manualinput == 1;
+		const is_enable_confirmation = data.enable_confirmation == 1;
+		// manualinput_validator_type radio might be disabled. In this case it's field return value as null.
+		const input_type_value = this.form_element.querySelector('input[name="manualinput_validator_type"]:checked').value;
+		const is_input_type_string = input_type_value == <?= ZBX_SCRIPT_MANUALINPUT_TYPE_STRING ?>;
+		const is_input_type_list = input_type_value == <?= ZBX_SCRIPT_MANUALINPUT_TYPE_LIST ?>;
+
+		this.form_element.querySelectorAll('#menu-path-label, #menu-path, #usergroup-label, #usergroup,' +
+				' #host-access-label, #host-access-field, #advanced-configuration').forEach(
+			node => node.style.display = is_scope_manual ? '' : 'none'
+		);
+
+		const type_url_radio_button = this.form_element.querySelector(
+			`#type input[type="radio"][value="${<?= ZBX_SCRIPT_TYPE_URL ?>}"]`
+		);
+
+		type_url_radio_button.closest('li').style.display = is_scope_manual ? '' : 'none';
+
+		this.form_element.querySelectorAll('#execute-on-label, #execute-on').forEach(
+			node => node.style.display = data.type == <?= ZBX_SCRIPT_TYPE_CUSTOM_SCRIPT ?> ? '' : 'none'
+		);
+
+		this.form_element.querySelectorAll('#auth-type-label, #auth-type').forEach(
+			node => node.style.display = data.type == <?= ZBX_SCRIPT_TYPE_SSH ?> ? '' : 'none'
+		);
+
+		this.form_element.querySelectorAll('#username-label, #username-field, #port-label, #port-field').forEach(
+			node => node.style.display =
+				data.type == <?= ZBX_SCRIPT_TYPE_SSH ?>
+					|| data.type == <?= ZBX_SCRIPT_TYPE_TELNET ?>
+				? '' : 'none'
+		);
+
+		this.form_element.querySelectorAll('#password-label, #password-field').forEach(
+			node => node.style.display =
+				data.type == <?= ZBX_SCRIPT_TYPE_TELNET ?>
+					|| (data.type == <?= ZBX_SCRIPT_TYPE_SSH ?>
+						&& data.authtype == <?= ITEM_AUTHTYPE_PASSWORD ?>)
+				? '' : 'none'
+		);
+
+		this.form_element.querySelectorAll('#publickey-label, #publickey-field, #privatekey-label, #privatekey-field,' +
+				' #passphrase-label, #passphrase-field').forEach(
+			node => node.style.display =
+				data.type == <?= ZBX_SCRIPT_TYPE_SSH ?>
+					&& data.authtype == <?= ITEM_AUTHTYPE_PUBLICKEY ?>
+				? '' : 'none'
+		);
+
+		this.form_element.querySelectorAll('#commands-label, #commands').forEach(
+			node => node.style.display =
+				data.type == <?= ZBX_SCRIPT_TYPE_CUSTOM_SCRIPT ?>
+					|| data.type == <?= ZBX_SCRIPT_TYPE_SSH ?>
+					|| data.type == <?= ZBX_SCRIPT_TYPE_TELNET ?>
+			? '' : 'none'
+		);
+
+		this.form_element.querySelectorAll('#command-ipmi-label, #command-ipmi').forEach(
+			node => node.style.display = data.type == <?= ZBX_SCRIPT_TYPE_IPMI ?> ? '' : 'none'
+		);
+
+		this.form_element.querySelectorAll('#webhook-parameters-label, #webhook-parameters, #script-label,' +
+				' #js-item-script-field, #timeout-label, #timeout-field').forEach(
+			node => node.style.display = data.type == <?= ZBX_SCRIPT_TYPE_WEBHOOK ?> ? '' : 'none'
+		);
+
+		this.form_element.querySelectorAll('#url-label, #url, #new-window-label, #new-window').forEach(
+			node => node.style.display = data.type == <?= ZBX_SCRIPT_TYPE_URL ?> ? '' : 'none'
+		);
+
+		document.getElementById('host-group-selection').style.display = data.hgstype == 1 ? '' : 'none';
+		jQuery(document.getElementById('groupid')).multiSelect(data.hgstype == 1 ? 'enable' : 'disable');
+
+		// Advanced configuration
+
+		this.form_element.querySelectorAll('label[for=manualinput_default_value], label[for=manualinput_validator]').forEach(
+			node => node.style.display = is_input_type_string ? '' : 'none'
+		);
+
+		this.form_element.querySelectorAll('#manualinput_default_value, #manualinput_validator').forEach(
+			node => node.parentNode.style.display = is_input_type_string ? '' : 'none'
+		);
+
+		this.form_element.querySelector('label[for=dropdown_options]').style.display = is_input_type_list ? '' : 'none';
+		this.form_element.querySelector('#dropdown_options').parentNode.style.display = is_input_type_list ? '' : 'none';
+
+
+		this.form_element.querySelectorAll('#manualinput_prompt, input[name=manualinput_validator_type],' +
+				' #manualinput_default_value, #manualinput_validator, #dropdown_options, #test_user_input').forEach(
+			node => node.disabled = !is_enable_user_input
+		);
+
+		this.form_element.querySelectorAll('#confirmation, #test_confirmation').forEach(
+			node => node.disabled = !is_enable_confirmation
+		);
+
+		document.querySelector(`label[for="manualinput_prompt"]`).classList
+			.toggle('<?= ZBX_STYLE_FIELD_LABEL_ASTERISK ?>', is_enable_user_input);
+		document.querySelector(`label[for="manualinput_validator"]`).classList
+			.toggle('<?= ZBX_STYLE_FIELD_LABEL_ASTERISK ?>', is_enable_user_input);
+		document.querySelector(`label[for="dropdown_options"]`).classList
+			.toggle('<?= ZBX_STYLE_FIELD_LABEL_ASTERISK ?>', is_enable_user_input);
+		document.querySelector(`label[for="confirmation"]`).classList
+			.toggle('<?= ZBX_STYLE_FIELD_LABEL_ASTERISK ?>', is_enable_confirmation);
 	}
 
 	/**
@@ -78,88 +263,6 @@ window.script_edit_popup = new class {
 		const row_index = target.querySelectorAll('tr.form_row').length;
 
 		target.insertAdjacentHTML('beforeend', template.evaluate({row_index, ...parameter}));
-	}
-
-	/**
-	 * Compiles necessary fields for popup based on scope, type, confirmation and host group type fields.
-	 *
-	 * @param {object} script  The script object.
-	 */
-	#loadView(script) {
-		this.scope = parseInt(script.scope);
-		this.type = parseInt(script.type);
-		this.confirmation = script.enable_confirmation;
-
-		const type = this.form_element.querySelector('#type');
-
-		// Load scope fields.
-		this.form_element.querySelector('#scope').addEventListener('change', (e) => {
-			this.#hideFormFields('all');
-			this.#loadScopeFields(e);
-			type.dispatchEvent(new Event('change'));
-		});
-
-		// Load type fields.
-		type.addEventListener('change', (e) => this.#loadTypeFields(script, e));
-
-		// Update user input fields.
-		this.form_element.querySelector('#manualinput').addEventListener('change', (e) => this.#loadUserInputFields(e));
-		this.form_element.querySelector('#manualinput').dispatchEvent(new Event('change'));
-
-		// Update confirmation fields.
-		this.form_element.querySelector('#enable_confirmation').addEventListener('change', (e) =>
-			this.#loadConfirmationFields(e)
-		);
-
-		// Test user input button.
-		this.form_element.querySelector('#test_user_input').addEventListener('click', () => this.#openManualinputTestPopup());
-
-		// Test confirmation button.
-		this.form_element.querySelector('#test_confirmation').addEventListener('click', (e) => {
-			if (this.form_element.querySelector('input[name="type"]:checked').value == <?= ZBX_SCRIPT_TYPE_URL ?>) {
-				Script.openUrl(null, this.form_element.querySelector('#confirmation').value, e.target);
-			}
-			else {
-				Script.execute(null, this.form_element.querySelector('#confirmation').value, e.target)
-			}
-		});
-
-		// Host group selection.
-		const hgstype = this.form_element.querySelector('#hgstype-select');
-		const hostgroup_selection = this.form_element.querySelector('#host-group-selection');
-
-		hgstype.addEventListener('change', () => {
-			jQuery(document.getElementById('groupid')).multiSelect(hgstype.value == '1' ? 'enable' : 'disable');
-			hostgroup_selection.style.display = hgstype.value == '1' ? '' : 'none';
-		});
-
-		hgstype.dispatchEvent(new Event('change'));
-		this.form_element.removeAttribute('style');
-		this.overlay.recoverFocus();
-
-		// Load manual input fields based on input type.
-		const input_prompt = this.form_element.querySelector('#manualinput_prompt');
-		const test_user_input = this.form_element.querySelector('#test_user_input');
-		const dropdown_options = this.form_element.querySelector('#dropdown_options');
-
-		for (const button of document.querySelectorAll('[name="manualinput_validator_type"]')) {
-			button.addEventListener('click', (e) => {
-				if (e.target.value != undefined) {
-					this.input_type = e.target.value;
-				}
-
-				if (this.input_type == <?= ZBX_SCRIPT_MANUALINPUT_TYPE_STRING ?>) {
-					this.#updateManualinputFields(test_user_input, input_prompt,
-						this.form_element.querySelector('#manualinput_validator')
-					);
-				}
-				else {
-					dropdown_options.disabled = !this.user_input_checked;
-
-					this.#updateManualinputFields(test_user_input, input_prompt, dropdown_options);
-				}
-			});
-		}
 	}
 
 	#openManualinputTestPopup() {
@@ -295,351 +398,5 @@ window.script_edit_popup = new class {
 				element.parentNode.removeChild(element);
 			}
 		}
-	}
-
-	/**
-	 * Displays or hides fields in the popup based on the value of selected scope.
-	 *
-	 * @param {object} event  The event object.
-	 */
-	#loadScopeFields(event) {
-		if (event.target.value) {
-			this.scope = parseInt(event.target.value);
-		}
-
-		const url_radio_button = this.form_element.querySelector(
-			`#type input[type="radio"][value="${<?= ZBX_SCRIPT_TYPE_URL ?>}"]`
-		);
-
-		switch (this.scope) {
-			case <?= ZBX_SCRIPT_SCOPE_HOST ?>:
-			case <?= ZBX_SCRIPT_SCOPE_EVENT ?>:
-				const show_fields = [
-					'#menu-path', '#menu-path-label', '#usergroup-label', '#usergroup', '#host-access-label',
-					'#host-access-field', '#advanced-configuration'
-				];
-
-				show_fields.forEach((field) => {
-					this.form_element.querySelector(field).style.display = '';
-				});
-
-				url_radio_button.closest('li').style.display = '';
-				break;
-
-			case <?= ZBX_SCRIPT_SCOPE_ACTION ?>:
-				const hide_fields = ['#menu-path', '#menu-path-label'];
-
-				hide_fields.forEach((field) => {
-					this.form_element.querySelector(field).style.display = 'none';
-				});
-
-				url_radio_button.closest('li').style.display = 'none';
-
-				if (this.form_element.querySelector('input[name="type"]:checked').value == <?= ZBX_SCRIPT_TYPE_URL ?>) {
-					const webhook = this.form_element.querySelector(`#type [value="${<?= ZBX_SCRIPT_TYPE_WEBHOOK ?>}"]`);
-
-					webhook.checked = true;
-					this.type = parseInt(<?= ZBX_SCRIPT_TYPE_WEBHOOK ?>);
-				}
-				break;
-		}
-	}
-
-	/**
-	 * Displays or hides fields in the popup based on the value of selected type.
-	 *
-	 * @param {object} script  The script object.
-	 * @param {object} event   The event object.
-	 */
-	#loadTypeFields(script, event) {
-		if (event.target.value) {
-			this.type = parseInt(event.target.value);
-		}
-
-		let show_fields = [];
-		const hide_fields = [
-			'#command-ipmi-label', '#command-ipmi', '#webhook-parameters', '#webhook-parameters-label',
-			'#js-item-script-field', '#script-label', '#timeout-label', '#timeout-field', '#auth-type-label',
-			'#auth-type', '#username-label', '#username-field', '#password-label', '#password-field',
-			'#publickey-label', '#publickey-field', '#privatekey-label', '#privatekey-field', '#passphrase-label',
-			'#passphrase-field', '#port-label', '#port-field', '#url', '#url-label', '#new-window-label', '#new-window',
-			'#execute-on-label', '#execute-on', '#commands-label', '#commands'
-		];
-
-		hide_fields.forEach((field) => {
-			this.form_element.querySelector(field).style.display = 'none';
-		})
-
-		const command_ipmi = this.form_element.querySelector('#commandipmi');
-		const command = this.form_element.querySelector('#command');
-
-		switch (this.type) {
-			case <?= ZBX_SCRIPT_TYPE_CUSTOM_SCRIPT ?>:
-				if (command_ipmi.value !== '') {
-					command.value = command_ipmi.value;
-					command_ipmi.value = '';
-				}
-
-				show_fields = ['#execute-on-label', '#execute-on', '#commands-label', '#commands'];
-				break;
-
-			case <?= ZBX_SCRIPT_TYPE_IPMI ?>:
-				if (command.value !== '') {
-					command_ipmi.value = command.value;
-					command.value = '';
-				}
-
-				show_fields = ['#command-ipmi-label', '#command-ipmi'];
-				break;
-
-			case <?= ZBX_SCRIPT_TYPE_SSH ?>:
-				if (command_ipmi.value !== '') {
-					command.value = command_ipmi.value;
-					command_ipmi.value = '';
-				}
-
-				show_fields = [
-					'#auth-type-label', '#auth-type', '#username-label', '#username-field', '#port-label',
-					'#port-field', '#commands-label', '#commands'
-				];
-
-				// Load authentication fields.
-				this.authtype = parseInt(script.authtype);
-
-				const authtype = this.form_element.querySelector('#authtype');
-
-				authtype.addEventListener('change', (e) => this.#loadAuthFields(e));
-				authtype.dispatchEvent(new Event('change'));
-				break;
-
-			case <?= ZBX_SCRIPT_TYPE_TELNET ?>:
-				if (command_ipmi.value !== '') {
-					command.value = command_ipmi.value;
-					command_ipmi.value = '';
-				}
-
-				show_fields = [
-					'#username-label', '#username-field', '#port-label', '#port-field', '#password-label',
-					'#password-field', '#commands-label', '#commands'
-				];
-				break;
-
-			case <?= ZBX_SCRIPT_TYPE_WEBHOOK ?>:
-				show_fields = [
-					'#webhook-parameters', '#webhook-parameters-label', '#js-item-script-field', '#script-label',
-					'#timeout-label', '#timeout-field'
-				];
-
-				break;
-
-			case <?= ZBX_SCRIPT_TYPE_URL ?>:
-				show_fields = ['#url', '#url-label', '#new-window-label', '#new-window'];
-				break;
-		}
-
-		show_fields.forEach((field) => this.form_element.querySelector(field).style.display = '');
-	}
-
-	/**
-	 * Displays or hides fields in the popup based on the value of selected authentication method.
-	 * This is relevant only when the script type is SSH.
-	 *
-	 * @param {object} event  The event object.
-	 */
-	#loadAuthFields(event) {
-		this.#hideFormFields('auth');
-
-		let show_fields = [];
-
-		if (event.target.value) {
-			this.authtype = parseInt(event.target.value);
-		}
-
-		switch (this.authtype) {
-			case <?= ITEM_AUTHTYPE_PASSWORD ?>:
-				show_fields = ['#password-label', '#password-field', '#commands-label', '#commands'];
-				break;
-
-			case <?= ITEM_AUTHTYPE_PUBLICKEY ?>:
-				show_fields = [
-					'#publickey-label', '#publickey-field', '#privatekey-label', '#privatekey-field',
-					'#passphrase-label', '#passphrase-field'
-				];
-				break;
-		}
-
-		show_fields.forEach((field) => this.form_element.querySelector(field).style.display = '');
-	}
-
-	/**
-	 * Displays or hides and enables or disables user input fields in the Advanced configuration.
-	 * This is relevant only when scope value is ZBX_SCRIPT_SCOPE_HOST or ZBX_SCRIPT_SCOPE_EVENTS.
-	 *
-	 * @param {object} event  The event object.
-	 */
-	#loadUserInputFields(event) {
-		if (event.target.value) {
-			this.user_input_checked = event.target.checked;
-		}
-
-		const input_prompt = this.form_element.querySelector('#manualinput_prompt');
-		const test_user_input = this.form_element.querySelector('#test_user_input');
-		const input_type = this.form_element.querySelector('#manualinput_validator_type');
-		const default_input = this.form_element.querySelector('#manualinput_default_value');
-		const input_validation = this.form_element.querySelector('#manualinput_validator');
-		const dropdown_options = this.form_element.querySelector('#dropdown_options');
-
-		this.input_type = this.form_element.querySelector('input[name="manualinput_validator_type"]:checked').value;
-
-		this.#updateManualinputFields(test_user_input, input_prompt, input_validation);
-
-		const elements = [input_prompt, test_user_input, default_input, input_validation, dropdown_options];
-
-		elements.forEach(element => element.disabled = !this.user_input_checked);
-		input_type.querySelectorAll('input').forEach((element) => element.disabled = !this.user_input_checked);
-
-		if (this.user_input_checked) {
-			this.form_element.querySelector('label[for="manualinput_prompt"]').classList
-				.add('<?= ZBX_STYLE_FIELD_LABEL_ASTERISK ?>');
-		}
-		else {
-			this.form_element.querySelector('label[for="manualinput_prompt"]').classList
-				.remove('<?= ZBX_STYLE_FIELD_LABEL_ASTERISK ?>');
-		}
-
-		const validator = this.input_type == <?= ZBX_SCRIPT_MANUALINPUT_DISABLED ?>
-			? this.form_element.querySelector('#manualinput_validator')
-			: this.form_element.querySelector('#dropdown_options');
-
-		this.#updateManualinputFields(test_user_input, input_prompt, validator);
-	}
-
-	#updateManualinputFields(test_user_input, input_prompt, validator) {
-		const is_input_type_string = this.input_type == <?= ZBX_SCRIPT_MANUALINPUT_TYPE_STRING ?>
-
-		this.form_element.querySelector('label[for=manualinput_default_value]').style.display = is_input_type_string
-			? ''
-			: 'none';
-		this.form_element.querySelector('#manualinput_default_value').parentNode.style.display = is_input_type_string
-			? ''
-			: 'none';
-
-		this.form_element.querySelector('label[for=manualinput_validator]').style.display = is_input_type_string ? '' : 'none';
-		this.form_element.querySelector('#manualinput_validator').parentNode.style.display = is_input_type_string ? '' : 'none';
-
-		this.form_element.querySelector('label[for=dropdown_options]').style.display = is_input_type_string ? 'none' : '';
-		this.form_element.querySelector('#dropdown_options').parentNode.style.display = is_input_type_string ? 'none' : '';
-
-		if (this.user_input_checked) {
-			document.querySelector(`label[for="${validator.name}"]`).classList
-				.add('<?= ZBX_STYLE_FIELD_LABEL_ASTERISK ?>');
-		}
-		else {
-			document.querySelector(`label[for="${validator.name}"]`).classList
-				.remove('<?= ZBX_STYLE_FIELD_LABEL_ASTERISK ?>');
-		}
-
-		const updateTestUserInput = () => this.user_input_checked && this.form
-			.validateFieldsForAction(['manualinput_validator', 'manualinput_prompt', 'dropdown_options'])
-			.then(result => {
-				if (result) {
-					test_user_input.disabled = false;
-				}
-				else {
-					test_user_input.disabled = true;
-				}
-			});
-
-		updateTestUserInput();
-		input_prompt.onkeyup = updateTestUserInput;
-		validator.onkeyup = updateTestUserInput;
-	}
-
-	/**
-	 * Displays or hides confirmation fields in the popup based on the value of selected scope.
-	 * This is relevant only when scope value is ZBX_SCRIPT_SCOPE_HOST or ZBX_SCRIPT_SCOPE_EVENT.
-	 *
-	 * @param {object} event  The event object.
-	 */
-	#loadConfirmationFields(event) {
-		if (event.target.value) {
-			this.confirmation = event.target.checked;
-		}
-
-		const confirmation = this.form_element.querySelector('#confirmation');
-		const test_confirmation = this.form_element.querySelector('#test_confirmation');
-
-		if (this.confirmation) {
-			this.form_element.querySelector('label[for="confirmation"]').classList.add('<?= ZBX_STYLE_FIELD_LABEL_ASTERISK ?>');
-
-			confirmation.removeAttribute('disabled');
-
-			confirmation.onkeyup = () => confirmation.value !== ''
-				? test_confirmation.removeAttribute('disabled')
-				: test_confirmation.setAttribute('disabled', 'disabled');
-
-			confirmation.dispatchEvent(new Event('keyup'));
-		}
-		else {
-			this.form_element.querySelector('label[for="confirmation"]').classList
-				.remove('<?= ZBX_STYLE_FIELD_LABEL_ASTERISK ?>');
-			confirmation.setAttribute('disabled', 'disabled');
-			test_confirmation.setAttribute('disabled', 'disabled');
-		}
-	}
-
-	/**
-	 * Hides the specified fields from the form based on input parameter type.
-	 *
-	 * @param {string} type  A string indicating the type of fields to hide.
-	 */
-	#hideFormFields(type) {
-		let fields = [];
-
-		if (type === 'auth') {
-			fields = [
-				'#privatekey-label', '#privatekey-field', '#privatekey-label', '#privatekey-field', '#passphrase-label',
-				'#passphrase-field', '#publickey-label', '#publickey-field', '#password-label', '#password-field'
-			];
-		}
-
-		if (type === 'all') {
-			this.form_element.querySelector(`#type input[type="radio"][value="${<?= ZBX_SCRIPT_TYPE_URL ?>}"]`)
-				.closest('li').style.display = 'none';
-
-			fields = [
-				'#menu-path', '#menu-path-label', '#url', '#url-label', '#new-window-label', '#new-window',
-				'#webhook-parameters', '#webhook-parameters-label', '#js-item-script-field', '#script-label',
-				'#timeout-label', '#timeout-field', '#commands-label', '#commands', '#command-ipmi-label',
-				'#command-ipmi', '#auth-type-label', '#auth-type', '#username-label', '#username-field',
-				'#password-label', '#password-field', '#port-label', '#port-field', '#publickey-label',
-				'#publickey-field', '#privatekey-label', '#privatekey-field', '#passphrase-label', '#passphrase-field',
-				'#usergroup-label', '#usergroup', '#host-access-label', '#host-access-field',
-				'#advanced-configuration'
-			];
-		}
-
-		fields.forEach((field) => this.form_element.querySelector(field).style.display = 'none');
-	}
-
-	#validateFieldsOnScopeListChange() {
-		const scope_radio_list = document.getElementById('scope');
-		const menu_path = document.getElementById('menu-path');
-
-		scope_radio_list.addEventListener('click', e => {
-			if (e.target.type === 'radio') {
-				const had_menu_path = menu_path.style.display;
-
-				setTimeout(() => {
-					const has_menu_path = menu_path.style.display;
-
-					if (had_menu_path !== has_menu_path) {
-						let fields = this.form.getAllValues()
-						fields.menu_path = has_menu_path === 'none' ? '' : fields.menu_path
-						this.form.validateSubmit(fields);
-					}
-				}, 0);
-			}
-		});
 	}
 }
