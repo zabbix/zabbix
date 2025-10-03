@@ -393,7 +393,7 @@ class testFormAdministrationMediaTypes extends CWebTest {
 				$this->assertEquals('', $param_field->getValue());
 				$this->assertEquals(255, $param_field->getAttribute('maxlength'));
 
-				// Check removal ofscript parameters.
+				// Check removal of script parameters.
 				$script_params->query('button:Remove')->one()->click();
 				$this->assertFalse($param_field->isVisible());
 				break;
@@ -769,7 +769,7 @@ class testFormAdministrationMediaTypes extends CWebTest {
 				[
 					'expected' => TEST_BAD,
 					'mediatype_tab' => [
-						'Name' => 'Email with 2h in inerval'
+						'Name' => 'Email with 2h in interval'
 					],
 					'options_tab' => [
 						'Attempt interval' => '2h'
