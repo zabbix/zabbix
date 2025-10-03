@@ -269,7 +269,7 @@ class testDashboardGaugeWidget extends testWidgets {
 		foreach ($fields as $label => $attributes) {
 			$field = $form->getField($label);
 			foreach ($attributes as $attribute => $value) {
-				if ($attribute === 'color' || $attribute === 'value') {
+				if ($attribute === 'value') {
 					$this->assertEquals($value, $field->getValue());
 				}
 
@@ -278,7 +278,7 @@ class testDashboardGaugeWidget extends testWidgets {
 				}
 
 				if ($attribute === 'labels') {
-					$this->assertEquals($value, $field->asSegmentedRadio()->getLabels()->asText());
+					$this->assertEquals($value, $field->getLabels()->asText());
 				}
 			}
 
