@@ -713,7 +713,7 @@ class testPageAdministrationGeneralModules extends CWebTest {
 		$this->query('link', $data['Name'])->waitUntilVisible()->one()->click();
 		$dialog = COverlayDialogElement::find()->one()->waitUntilReady();
 		$form = $dialog->asForm();
-		// Check value af every field in Module details form.
+		// Check value as every field in Module details form.
 		foreach ($data as $key => $value) {
 			$this->assertEquals($value, $form->getFieldContainer($key)->getText());
 		}
@@ -1370,7 +1370,7 @@ class testPageAdministrationGeneralModules extends CWebTest {
 		}
 
 		if ($status === 'enabled') {
-			// Check that widget with required name is shown and that is doesn't have the inaccessilbe widget string in it.
+			// Check that widget with required name is shown and that is doesn't have the inaccessible widget string in it.
 			$widget = $dashboard->getWidget($module['widget_name']);
 			$this->assertFalse($widget->query("xpath:.//div[text()=".CXPathHelper::escapeQuotes(self::INACCESSIBLE_TEXT).
 					"]")->one(false)->isValid()
