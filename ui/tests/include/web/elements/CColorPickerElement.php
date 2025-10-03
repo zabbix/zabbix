@@ -99,7 +99,7 @@ class CColorPickerElement extends CElement {
 	 * @throws Exception
 	 */
 	public function checkValue($expected, $raise_exception = true) {
-		if (str_starts_with($expected, 'palette:')) {
+		if (is_string($expected) && str_starts_with($expected, 'palette:')) {
 			$expected = str_replace('palette:', '', $expected);
 		}
 
