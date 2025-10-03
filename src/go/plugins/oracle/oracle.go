@@ -103,12 +103,18 @@ func (p *Plugin) Export(key string, rawParams []string, pluginCtx plugin.Context
 				err.Error(),
 			)
 
-			return nil, errs.New("query execution timeout exceeded")
+			return nil, errs.Wrap(ctxErr, "query execution timeout exceeded")
+		}
+
+		if ctxErr != nil {
+			p.Errf("failed to handle metric %q: %s", ctxErr, ctxErr.Error())
+
+			return nil, errs.Wrap(ctxErr, "failed to handle metric")
 		}
 
 		p.Errf("failed to handle metric %q: %s", key, err.Error())
 
-		return nil, err
+		return nil, errs.Wrap(err, "failed to handle metric")
 	}
 
 	return result, nil
