@@ -24,6 +24,8 @@ use Facebook\WebDriver\WebDriverKeys;
  */
 class CColorPickerElement extends CElement {
 
+	const USE_DEFAULT = null;
+
 	/**
 	 * Get input field of color pick form.
 	 *
@@ -41,37 +43,31 @@ class CColorPickerElement extends CElement {
 	 * @param string $color		color code
 	 */
 	public function overwrite($color) {
-		$this->query('xpath:./button['.CXPathHelper::fromClass('color-picker-preview').']')->one()->click();
-		$element = (new CElementQuery('id:color_picker'))->waitUntilReady()->asColorPicker()->one();
+		$overlay = $this->open();
+		$name = (str_starts_with($color, 'palette')) ? 'Palette' : 'Solid color';
 
-		$name = (is_int($color) && $color >= 0 && $color <= 11) ? 'Palette' : 'Solid color';
-		if ($color === null) {
-			$element->query('button:Use default')->one()->click();
+		if ($color === self::USE_DEFAULT) {
+			$overlay->query('button:Use default')->one()->click()->waitUntilNotVisible();
+			return $this;
 		}
 		else {
-			if ($element->query('xpath:.//li['.CXPathHelper::fromClass('color-picker-tab-selected').']/label')
+			if ($overlay->query('xpath:.//li['.CXPathHelper::fromClass('color-picker-tab-selected').']/label')
 					->waitUntilPresent()->one()->getText() !== $name) {
 				$tab_selector = ('xpath:.//label[text()='.CXPathHelper::escapeQuotes($name).']');
-				$element->query($tab_selector)->waitUntilPresent()->one()->click();
-				$element->query($tab_selector.'/..')->waitUntilClassesPresent('color-picker-tab-selected');
+				$overlay->query($tab_selector)->waitUntilPresent()->one()->click();
+				$overlay->query($tab_selector.'/..')->waitUntilClassesPresent('color-picker-tab-selected');
 			}
 
 			if ($name === 'Palette') {
-				$element->query('xpath:.//input[@id="color-picker-palette-input-'.$color.'"]')->waitUntilReady()->one()->click();
+				$overlay->query('xpath:.//input[@id="color-picker-palette-input-'.
+						str_replace('palette:', '', $color).'"]')->one()->click();
 			}
 			else {
-				$element->query('class:color-picker-input')->waitUntilVisible()->one()->overwrite($color);
-			}
-		}
+				$overlay->query('class:color-picker-input')->waitUntilVisible()->one()->overwrite($color);
 
-		if ($name !== 'Palette') {
-			if (preg_match('/^[a-fA-F0-9]+$/', $color) === 1 && strlen($color) === 6) {
-				CElementQuery::getPage()->pressKey(WebDriverKeys::ENTER);
-				$element->waitUntilNotVisible();
-			}
-			else {
-				if (!$element->query('button:Apply')->one()->isAttributePresent('disabled')) {
-					throw new \Exception('Passes value is not a valid hexadecimal value, but Apply button is not disabled.');
+				if (preg_match('/^[a-fA-F0-9]+$/', $color) === 1 && strlen($color) === 6) {
+					CElementQuery::getPage()->pressKey(WebDriverKeys::ENTER);
+					$overlay->waitUntilNotVisible();
 				}
 			}
 		}
@@ -82,8 +78,32 @@ class CColorPickerElement extends CElement {
 	/**
 	 * @inheritdoc
 	 */
+	public function isEnabled($enabled = true) {
+		return $this->getInput()->isEnabled($enabled);
+	}
+
+	/**
+	 * @inheritdoc
+	 */
 	public function getValue() {
 		return $this->getInput()->getValue();
+	}
+
+	/**
+	 * Check element value.
+	 *
+	 * @param mixed $expected    expected value of the element
+	 *
+	 * @return boolean
+	 *
+	 * @throws Exception
+	 */
+	public function checkValue($expected, $raise_exception = true) {
+		if (str_starts_with($expected, 'palette:')) {
+			$expected = str_replace('palette:', '', $expected);
+		}
+
+		return parent::checkValue($expected, $raise_exception);
 	}
 
 	/**
@@ -94,6 +114,16 @@ class CColorPickerElement extends CElement {
 	 */
 	public function getText() {
 		return $this->getValue();
+	}
+
+	/**
+	 * Open color picker.
+	 *
+	 * @return CElement
+	 */
+	public function open() {
+		$this->query('xpath:./button['.CXPathHelper::fromClass('color-picker-preview').']')->one()->click();
+		return (new CElementQuery('id:color_picker'))->waitUntilVisible()->one();
 	}
 
 	/**
@@ -119,9 +149,9 @@ class CColorPickerElement extends CElement {
 	 *
 	 * @param boolean	$submitable		should dialog submission be disabled or not
 	 *
-	 * @return type
+	 * @return boolean
 	 */
-	public function isSubmittionDisabled($submitable = false) {
+	public function isSubmitable($submitable = true) {
 		$dialog = (new CElementQuery('id:color_picker'))->one();
 		$clickable = $dialog->query('button:Apply')->one()->isClickable();
 
@@ -129,12 +159,5 @@ class CColorPickerElement extends CElement {
 		$displayed = $dialog->isDisplayed();
 
 		return ($clickable === $submitable && $displayed === !$submitable);
-	}
-
-	/**
-	 * @inheritdoc
-	 */
-	public static function find() {
-		return (new CElementQuery('id:color_picker'))->asColorPicker()->one();
 	}
 }
