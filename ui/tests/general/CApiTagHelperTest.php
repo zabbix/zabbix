@@ -417,6 +417,65 @@ class CApiTagHelperTest extends CTest {
 			[
 				[
 					[
+						['tag' => 'tag1', 'operator' => TAG_OPERATOR_NOT_EQUAL, 'value' => 'val'],
+						['tag' => 'tag1', 'operator' => TAG_OPERATOR_NOT_LIKE, 'value' => 'value']
+					],
+					TAG_EVAL_TYPE_AND_OR
+				] + $sql_args,
+				'NOT EXISTS ('.
+					'SELECT NULL'.
+					' FROM event_tag'.
+					' WHERE'.
+						' e.eventid=event_tag.eventid'.
+						' AND event_tag.tag=\'tag1\''.
+						' AND ('.
+							'UPPER(event_tag.value) LIKE \'%VALUE%\' ESCAPE \'!\''.
+							' OR event_tag.value=\'val\''.
+						')'.
+				')'
+			],
+			[
+				[
+					[
+						['tag' => 'tag1', 'operator' => TAG_OPERATOR_NOT_EXISTS]
+					],
+					TAG_EVAL_TYPE_AND_OR
+				] + $sql_args,
+				'NOT EXISTS ('.
+					'SELECT NULL'.
+					' FROM event_tag'.
+					' WHERE'.
+						' e.eventid=event_tag.eventid'.
+						' AND event_tag.tag=\'tag1\''.
+				')'
+			],
+			[
+				[
+					[
+						['tag' => 'tag1', 'operator' => TAG_OPERATOR_NOT_EXISTS],
+						['tag' => 'tag2', 'operator' => TAG_OPERATOR_NOT_EXISTS],
+					],
+					TAG_EVAL_TYPE_AND_OR
+				] + $sql_args,
+				'NOT EXISTS ('.
+					'SELECT NULL'.
+					' FROM event_tag'.
+					' WHERE'.
+						' e.eventid=event_tag.eventid'.
+						' AND event_tag.tag=\'tag1\''.
+				')'.
+				' AND '.
+				'NOT EXISTS ('.
+					'SELECT NULL'.
+					' FROM event_tag'.
+					' WHERE'.
+						' e.eventid=event_tag.eventid'.
+						' AND event_tag.tag=\'tag2\''.
+				')'
+			],
+			[
+				[
+					[
 						['tag' => 'tag1', 'operator' => TAG_OPERATOR_EQUAL, 'value' => 'val'],
 						['tag' => 'tag1', 'operator' => TAG_OPERATOR_LIKE, 'value' => 'value'],
 						['tag' => 'tag1', 'operator' => TAG_OPERATOR_NOT_EXISTS]
@@ -761,6 +820,90 @@ class CApiTagHelperTest extends CTest {
 			')'
 		];
 
+		yield 'Get trigger native tags and inherited tags (AND/OR|2 tag ((1 not exists), (1 not exists))).' => [
+			[
+				[
+					['tag' => 'Tag', 'operator' => TAG_OPERATOR_NOT_EXISTS],
+					['tag' => 'Tag2', 'operator' => TAG_OPERATOR_NOT_EXISTS]
+				],
+				TAG_EVAL_TYPE_AND_OR
+			] + $params_trigger_tags_inherited,
+			'NOT EXISTS ('.
+			$select_trigger_tags_where.
+				' AND trigger_tag.tag=\'Tag\''.
+			')'.
+			' AND '.
+			'NOT EXISTS ('.
+				$select_trigger_inherited_item_tags_where_not.
+					' AND item_tag.tag=\'Tag\''.
+			')'.
+			' AND '.
+			'NOT EXISTS ('.
+				$select_trigger_inherited_host_tags_where_not.
+					' AND host_tag.tag=\'Tag\''.
+			')'.
+			' AND '.
+			'NOT EXISTS ('.
+			$select_trigger_tags_where.
+				' AND trigger_tag.tag=\'Tag2\''.
+			')'.
+			' AND '.
+			'NOT EXISTS ('.
+				$select_trigger_inherited_item_tags_where_not.
+					' AND item_tag.tag=\'Tag2\''.
+			')'.
+			' AND '.
+			'NOT EXISTS ('.
+				$select_trigger_inherited_host_tags_where_not.
+					' AND host_tag.tag=\'Tag2\''.
+			')'
+		];
+
+		yield 'Get trigger native tags and inherited tags (OR|2 tag ((1 not exists), (1 not exists))).' => [
+			[
+				[
+					['tag' => 'Tag', 'operator' => TAG_OPERATOR_NOT_EXISTS],
+					['tag' => 'Tag2', 'operator' => TAG_OPERATOR_NOT_EXISTS]
+				],
+				TAG_EVAL_TYPE_OR
+			] + $params_trigger_tags_inherited,
+			'('.
+				'('.
+					'NOT EXISTS ('.
+					$select_trigger_tags_where.
+						' AND trigger_tag.tag=\'Tag\''.
+					')'.
+					' AND '.
+					'NOT EXISTS ('.
+						$select_trigger_inherited_item_tags_where_not.
+							' AND item_tag.tag=\'Tag\''.
+					')'.
+					' AND '.
+					'NOT EXISTS ('.
+						$select_trigger_inherited_host_tags_where_not.
+							' AND host_tag.tag=\'Tag\''.
+					')'.
+				')'.
+				' OR '.
+				'('.
+					'NOT EXISTS ('.
+					$select_trigger_tags_where.
+						' AND trigger_tag.tag=\'Tag2\''.
+					')'.
+					' AND '.
+					'NOT EXISTS ('.
+						$select_trigger_inherited_item_tags_where_not.
+							' AND item_tag.tag=\'Tag2\''.
+					')'.
+					' AND '.
+					'NOT EXISTS ('.
+						$select_trigger_inherited_host_tags_where_not.
+							' AND host_tag.tag=\'Tag2\''.
+					')'.
+				')'.
+			')'
+		];
+
 		yield 'Get trigger native tags and inherited tags (AND/OR|2 tag ((2 not equal), (2 not equal))).' => [
 			[
 				[
@@ -771,43 +914,162 @@ class CApiTagHelperTest extends CTest {
 				],
 				TAG_EVAL_TYPE_AND_OR
 			] + $params_trigger_tags_inherited,
+			'NOT EXISTS ('.
+			$select_trigger_tags_where.
+				' AND trigger_tag.tag=\'Tag\''.
+				' AND trigger_tag.value IN (\'Value\',\'Value2\')'.
+			')'.
+			' AND '.
+			'NOT EXISTS ('.
+				$select_trigger_inherited_item_tags_where_not.
+					' AND item_tag.tag=\'Tag\''.
+					' AND item_tag.value IN (\'Value\',\'Value2\')'.
+			')'.
+			' AND '.
+			'NOT EXISTS ('.
+				$select_trigger_inherited_host_tags_where_not.
+					' AND host_tag.tag=\'Tag\''.
+					' AND host_tag.value IN (\'Value\',\'Value2\')'.
+			')'.
+			' AND '.
+			'NOT EXISTS ('.
+			$select_trigger_tags_where.
+				' AND trigger_tag.tag=\'Tag2\''.
+				' AND trigger_tag.value IN (\'Value\',\'Value2\')'.
+			')'.
+			' AND '.
+			'NOT EXISTS ('.
+				$select_trigger_inherited_item_tags_where_not.
+					' AND item_tag.tag=\'Tag2\''.
+					' AND item_tag.value IN (\'Value\',\'Value2\')'.
+			')'.
+			' AND '.
+			'NOT EXISTS ('.
+				$select_trigger_inherited_host_tags_where_not.
+					' AND host_tag.tag=\'Tag2\''.
+					' AND host_tag.value IN (\'Value\',\'Value2\')'.
+			')'
+		];
+
+		yield 'Get trigger native tags and inherited tags (AND/OR|2 tag ((1 equal; 2 not equal), (2 not equal))).' => [
+			[
+				[
+					['tag' => 'Tag', 'operator' => TAG_OPERATOR_EQUAL, 'value' => 'Value0'],
+					['tag' => 'Tag', 'operator' => TAG_OPERATOR_NOT_EQUAL, 'value' => 'Value'],
+					['tag' => 'Tag', 'operator' => TAG_OPERATOR_NOT_EQUAL, 'value' => 'Value2'],
+					['tag' => 'Tag2', 'operator' => TAG_OPERATOR_NOT_EQUAL, 'value' => 'Value'],
+					['tag' => 'Tag2', 'operator' => TAG_OPERATOR_NOT_EQUAL, 'value' => 'Value2']
+				],
+				TAG_EVAL_TYPE_AND_OR
+			] + $params_trigger_tags_inherited,
 			'('.
-				'NOT EXISTS ('.
+				'EXISTS ('.
 				$select_trigger_tags_where.
 					' AND trigger_tag.tag=\'Tag\''.
-					' AND trigger_tag.value IN (\'Value\',\'Value2\')'.
+					' AND trigger_tag.value=\'Value0\''.
 				')'.
-				' AND '.
-				'NOT EXISTS ('.
-					$select_trigger_inherited_item_tags_where_not.
+				' OR '.
+				'EXISTS ('.
+					$select_trigger_inherited_item_tags_where.
 						' AND item_tag.tag=\'Tag\''.
-						' AND item_tag.value IN (\'Value\',\'Value2\')'.
+						' AND item_tag.value=\'Value0\''.
 				')'.
-				' AND '.
-				'NOT EXISTS ('.
-					$select_trigger_inherited_host_tags_where_not.
+				' OR '.
+				'EXISTS ('.
+					$select_trigger_inherited_host_tags_where.
 						' AND host_tag.tag=\'Tag\''.
-						' AND host_tag.value IN (\'Value\',\'Value2\')'.
+						' AND host_tag.value=\'Value0\''.
+				')'.
+				' OR '.
+				'('.
+					'NOT EXISTS ('.
+					$select_trigger_tags_where.
+						' AND trigger_tag.tag=\'Tag\''.
+						' AND trigger_tag.value IN (\'Value\',\'Value2\')'.
+					')'.
+					' AND '.
+					'NOT EXISTS ('.
+						$select_trigger_inherited_item_tags_where_not.
+							' AND item_tag.tag=\'Tag\''.
+							' AND item_tag.value IN (\'Value\',\'Value2\')'.
+					')'.
+					' AND '.
+					'NOT EXISTS ('.
+						$select_trigger_inherited_host_tags_where_not.
+							' AND host_tag.tag=\'Tag\''.
+							' AND host_tag.value IN (\'Value\',\'Value2\')'.
+					')'.
 				')'.
 			')'.
 			' AND '.
+			'NOT EXISTS ('.
+			$select_trigger_tags_where.
+				' AND trigger_tag.tag=\'Tag2\''.
+				' AND trigger_tag.value IN (\'Value\',\'Value2\')'.
+			')'.
+			' AND '.
+			'NOT EXISTS ('.
+				$select_trigger_inherited_item_tags_where_not.
+					' AND item_tag.tag=\'Tag2\''.
+					' AND item_tag.value IN (\'Value\',\'Value2\')'.
+			')'.
+			' AND '.
+			'NOT EXISTS ('.
+				$select_trigger_inherited_host_tags_where_not.
+					' AND host_tag.tag=\'Tag2\''.
+					' AND host_tag.value IN (\'Value\',\'Value2\')'.
+			')'
+		];
+
+		yield 'Get trigger native tags and inherited tags (OR|2 tag ((2 not equal), (2 not equal))).' => [
+			[
+				[
+					['tag' => 'Tag', 'operator' => TAG_OPERATOR_NOT_EQUAL, 'value' => 'Value'],
+					['tag' => 'Tag', 'operator' => TAG_OPERATOR_NOT_EQUAL, 'value' => 'Value2'],
+					['tag' => 'Tag2', 'operator' => TAG_OPERATOR_NOT_EQUAL, 'value' => 'Value'],
+					['tag' => 'Tag2', 'operator' => TAG_OPERATOR_NOT_EQUAL, 'value' => 'Value2']
+				],
+				TAG_EVAL_TYPE_OR
+			] + $params_trigger_tags_inherited,
 			'('.
-				'NOT EXISTS ('.
-				$select_trigger_tags_where.
-					' AND trigger_tag.tag=\'Tag2\''.
-					' AND trigger_tag.value IN (\'Value\',\'Value2\')'.
+				'('.
+					'NOT EXISTS ('.
+					$select_trigger_tags_where.
+						' AND trigger_tag.tag=\'Tag\''.
+						' AND trigger_tag.value IN (\'Value\',\'Value2\')'.
+					')'.
+					' AND '.
+					'NOT EXISTS ('.
+						$select_trigger_inherited_item_tags_where_not.
+							' AND item_tag.tag=\'Tag\''.
+							' AND item_tag.value IN (\'Value\',\'Value2\')'.
+					')'.
+					' AND '.
+					'NOT EXISTS ('.
+						$select_trigger_inherited_host_tags_where_not.
+							' AND host_tag.tag=\'Tag\''.
+							' AND host_tag.value IN (\'Value\',\'Value2\')'.
+					')'.
 				')'.
-				' AND '.
-				'NOT EXISTS ('.
-					$select_trigger_inherited_item_tags_where_not.
-						' AND item_tag.tag=\'Tag2\''.
-						' AND item_tag.value IN (\'Value\',\'Value2\')'.
-				')'.
-				' AND '.
-				'NOT EXISTS ('.
-					$select_trigger_inherited_host_tags_where_not.
-						' AND host_tag.tag=\'Tag2\''.
-						' AND host_tag.value IN (\'Value\',\'Value2\')'.
+				' OR '.
+				'('.
+					'NOT EXISTS ('.
+					$select_trigger_tags_where.
+						' AND trigger_tag.tag=\'Tag2\''.
+						' AND trigger_tag.value IN (\'Value\',\'Value2\')'.
+					')'.
+					' AND '.
+					'NOT EXISTS ('.
+						$select_trigger_inherited_item_tags_where_not.
+							' AND item_tag.tag=\'Tag2\''.
+							' AND item_tag.value IN (\'Value\',\'Value2\')'.
+					')'.
+					' AND '.
+					'NOT EXISTS ('.
+						$select_trigger_inherited_host_tags_where_not.
+							' AND host_tag.tag=\'Tag2\''.
+							' AND host_tag.value IN (\'Value\',\'Value2\')'.
+					')'.
 				')'.
 			')'
 		];

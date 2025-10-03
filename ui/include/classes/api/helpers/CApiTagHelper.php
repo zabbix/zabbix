@@ -50,7 +50,13 @@ class CApiTagHelper {
 			}
 
 			if ($evaltype == TAG_EVAL_TYPE_AND_OR) {
-				$sql_where[] = count($subqueries) == 1 ? $subqueries[0] : '('.implode(' OR ', $subqueries).')';
+				if (!array_diff_key($operator_values, array_flip([TAG_OPERATOR_NOT_LIKE, TAG_OPERATOR_NOT_EQUAL]))
+						|| !array_diff_key($operator_values, array_flip([TAG_OPERATOR_NOT_EXISTS]))) {
+					$sql_where[] = implode(' AND ', $subqueries);
+				}
+				else {
+					$sql_where[] = count($subqueries) == 1 ? $subqueries[0] : '('.implode(' OR ', $subqueries).')';
+				}
 			}
 			else {
 				$sql_where = array_merge($sql_where, $subqueries);
@@ -144,21 +150,24 @@ class CApiTagHelper {
 
 	private static function getTagSubqueriesByNotExistsOperator(string $tag, array $operator_values,
 			array $query_options): array {
-		$subqueries = [];
-
 		if (array_key_exists(TAG_OPERATOR_NOT_EXISTS, $operator_values)) {
 			$tag_table_subqueries = self::getTagTableSubqueries($tag, self::SUBQUERY_TYPE_NOT_EXISTS, $query_options);
 
-			$_subqueries = [];
+			$subqueries = [];
 
 			foreach ($tag_table_subqueries as $subquery_sql) {
-				$_subqueries[] = self::getTagSubquery(self::SUBQUERY_TYPE_NOT_EXISTS, $subquery_sql);
+				$subqueries[] = self::getTagSubquery(self::SUBQUERY_TYPE_NOT_EXISTS, $subquery_sql);
 			}
 
-			$subqueries[] = count($_subqueries) == 1 ? $_subqueries[0] : '('.implode(' AND ', $_subqueries).')';
+			if ($query_options['evaltype'] == TAG_EVAL_TYPE_AND_OR
+					&& !array_diff_key($operator_values, array_flip([TAG_OPERATOR_NOT_EXISTS]))) {
+				return $subqueries;
+			}
+
+			return count($subqueries) == 1 ? $subqueries : ['('.implode(' AND ', $subqueries).')'];
 		}
 
-		return $subqueries;
+		return [];
 	}
 
 	private static function getTagSubqueriesByNotLikeOrNotEqualOperator(string $tag, array $operator_values,
@@ -184,6 +193,12 @@ class CApiTagHelper {
 		foreach ($value_conditions as $table => $conditions) {
 			$subqueries[] =
 				self::getTagSubquery(self::SUBQUERY_TYPE_NOT_EXISTS, $tag_table_subqueries[$table], $conditions);
+		}
+
+		if ($query_options['evaltype'] == TAG_EVAL_TYPE_AND_OR) {
+			if (!array_diff_key($operator_values, array_flip([TAG_OPERATOR_NOT_LIKE, TAG_OPERATOR_NOT_EQUAL]))) {
+				return $subqueries;
+			}
 		}
 
 		return count($subqueries) > 1 ? ['('.implode(' AND ', $subqueries).')'] : $subqueries;
