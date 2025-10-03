@@ -181,7 +181,7 @@ $output = [
 			'class' => '',
 			'keepOpen' => true,
 			'isSubmit' => true,
-			 'action' => $data['submit_compare']
+			'action' => $data['submit_compare']
 				? 'popup_import.openImportComparePopup();'
 				: 'popup_import.submitPopup();'
 		]
