@@ -162,8 +162,8 @@ class WidgetView extends CControllerDashboardWidgetView {
 		}
 		else {
 			$hostids = $this->fields_values['hostids'] ?: null;
-			$evaltype = $this->fields_values['evaltype'];
-			$tags = $this->fields_values['tags'] ?: null;
+			$evaltype = $this->fields_values['host_tags_evaltype'];
+			$tags = $this->fields_values['host_tags'] ?: null;
 		}
 
 		$options = [
