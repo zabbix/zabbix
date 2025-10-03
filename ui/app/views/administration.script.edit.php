@@ -98,6 +98,7 @@ $form_grid = (new CFormGrid())
 			(new CTextBox('menu_path', $data['form']['menu_path'], false, DB::getFieldLength('scripts', 'menu_path')))
 				->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 				->setAttribute('placeholder', _('<sub-menu/sub-menu/...>'))
+				->setAttribute('data-field-type', 'menu-path')
 		))->setId('menu-path')
 	])
 	->addItem([
