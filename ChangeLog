@@ -3,6 +3,7 @@ Changes for 7.0.20rc1
 New features:
 
 Bug fixes:
+.........T [ZBX-26851] changed macro names in MSSQL templates (sbelakovs)
 
 --------------------------------------------------------------------------------
 Changes for 7.0.19
