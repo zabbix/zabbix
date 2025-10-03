@@ -28,6 +28,7 @@ window.script_edit_popup = new class {
 		this.form = new CForm(this.form_element, rules);
 		this.script = script;
 		this.scriptid = script.scriptid;
+		this.menu_path_value = '';
 
 		const return_url = new URL('zabbix.php', location.href);
 		return_url.searchParams.set('action', 'script.list');
@@ -50,15 +51,26 @@ window.script_edit_popup = new class {
 	}
 
 	#initActions(rules) {
-		this.form_element.querySelectorAll('#scope, #type, #hgstype-select, #manualinput, #manualinput_validator_type ,#enable_confirmation, #confirmation').forEach(
+		this.form_element.querySelectorAll('#scope, #type, #hgstype-select, #manualinput, #manualinput_validator_type' +
+				' ,#enable_confirmation, #confirmation').forEach(
 			node => node.addEventListener('change', (e) => {
 				if (e.target.name === 'scope') {
-					const is_scope_action = this.form.findFieldByName('scope').getValue() == <?= ZBX_SCRIPT_SCOPE_ACTION ?>;
-					const is_type_url = this.form.findFieldByName('type').getValue() == <?= ZBX_SCRIPT_TYPE_URL ?>;
+					const is_scope_action =
+						this.form.findFieldByName('scope').getValue() == <?= ZBX_SCRIPT_SCOPE_ACTION ?>;
+					const is_type_url =
+						this.form.findFieldByName('type').getValue() == <?= ZBX_SCRIPT_TYPE_URL ?>;
 
 					if (is_scope_action && is_type_url) {
 						this.form_element.querySelector(`#type [value="${<?= ZBX_SCRIPT_TYPE_WEBHOOK ?>}"]`)
 							.checked = true;
+					}
+
+					if (is_scope_action) {
+						this.menu_path_value = this.form.findFieldByName('menu_path').getValue();
+						this.form_element.querySelector('[name="menu_path"]').value = '';
+					}
+					else if (this.menu_path_value !== '') {
+						this.form_element.querySelector('[name="menu_path"]').value = this.menu_path_value;
 					}
 				}
 				else if (e.target.name === 'type') {
