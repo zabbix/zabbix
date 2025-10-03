@@ -16,19 +16,16 @@
 
 class CControllerRegExEdit extends CController {
 
-	protected $db_regex = [];
+	protected array $db_regexp = [];
 
-	protected function init() {
+	protected function init(): void {
 		$this->disableCsrfValidation();
 	}
 
-	protected function checkInput() {
+	protected function checkInput(): bool {
 		$fields = [
-			'name'         => 'db regexps.name',
-			'test_string'  => 'db regexps.test_string',
-			'regexid'      => 'db regexps.regexpid',
-			'expressions'  => 'array',
-			'form_refresh' => 'int32'
+			'regexpid' =>	'db regexps.regexpid',
+			'regexp' =>		'array'
 		];
 
 		$ret = $this->validateInput($fields);
@@ -40,67 +37,50 @@ class CControllerRegExEdit extends CController {
 		return $ret;
 	}
 
-	protected function checkPermissions() {
+	protected function checkPermissions(): bool {
 		if (!$this->checkAccess(CRoleHelper::UI_ADMINISTRATION_GENERAL)) {
 			return false;
 		}
 
-		if ($this->hasInput('regexid')) {
-			$db_regexs = API::Regexp()->get([
-				'output' => ['name', 'test_string'],
+		if ($this->hasInput('regexpid')) {
+			$db_regexps = API::Regexp()->get([
+				'output' => ['regexpid', 'name', 'test_string'],
 				'selectExpressions' => ['expression_type', 'expression', 'exp_delimiter', 'case_sensitive'],
-				'regexpids' => [$this->getInput('regexid')]
+				'regexpids' => $this->getInput('regexpid')
 			]);
 
-			if (!$db_regexs) {
+			if (!$db_regexps) {
 				return false;
 			}
 
-			$this->db_regex = $db_regexs[0];
+			$this->db_regexp = $db_regexps[0];
 		}
 
 		return true;
 	}
 
-	protected function doAction() {
-		$data = [
-			'regexid' => $this->getInput('regexid', 0),
-			'name' => $this->hasInput('regexid')
-				? $this->getInput('name', $this->db_regex['name'])
-				: $this->getInput('name', ''),
-			'test_string'  => $this->hasInput('regexid')
-				? $this->getInput('test_string', $this->db_regex['test_string'])
-				: $this->getInput('test_string', ''),
-			'expressions'  => [],
-			'form_refresh' => $this->getInput('form_refresh', 0)
+	protected function doAction(): void {
+		$regexp_default = [
+			'regexpid' => DB::getDefault('regexps', 'regexpid'),
+			'name' => DB::getDefault('regexps', 'name'),
+			'test_string' => DB::getDefault('regexps', 'test_string'),
+			'expressions' => [[
+				'expression_type' => DB::getDefault('expressions', 'expression_type'),
+				'expression' => DB::getDefault('expressions', 'expression'),
+				'exp_delimiter' => ',',
+				'case_sensitive' => DB::getDefault('expressions', 'case_sensitive')
+			]]
 		];
 
-		if ($data['form_refresh'] == 0) {
-			if ($data['regexid'] == 0) {
-				$data['expressions'] = [[
-					'expression_type' => EXPRESSION_TYPE_INCLUDED,
-					'expression' => '',
-					'exp_delimiter' => ',',
-					'case_sensitive' => 0
-				]];
-			}
-			else {
-				$data['expressions'] = $this->db_regex['expressions'];
-			}
-		}
-		else {
-			$data['expressions'] = $this->getInput('expressions', [[
-				'expression_type' => EXPRESSION_TYPE_INCLUDED,
-				'expression' => '',
-				'exp_delimiter' => ',',
-				'case_sensitive' => 0
-			]]);
+		$regexp = array_replace($regexp_default, $this->getInput('regexp', []), $this->db_regexp);
+		$js_validation_rules = $this->hasInput('regexpid')
+			? CControllerRegExUpdate::getValidationRules()
+			: CControllerRegExCreate::getValidationRules();
 
-			foreach ($data['expressions'] as &$expression) {
-				$expression += ['exp_delimiter' => ',', 'case_sensitive' => 0];
-			}
-			unset($expression);
-		}
+		$data = [
+			'regexp' => $regexp,
+			'js_validation_rules' => (new CFormValidator($js_validation_rules))->getRules()
+		];
 
 		$response = new CControllerResponseData($data);
 		$response->setTitle(_('Configuration of regular expressions'));

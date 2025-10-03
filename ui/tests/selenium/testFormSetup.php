@@ -290,7 +290,7 @@ class testFormSetup extends CWebTest {
 		$timezones_field->one()->select(CDateTimeHelper::getTimeZoneFormat('Europe/Riga'));
 
 		// Check Default theme field.
-		$this->assertEquals(['Blue', 'Dark', 'High-contrast light', 'High-contrast dark'], $this->query('id:default-theme')
+		$this->assertEquals(['Blue', 'Blue (classic)', 'Dark', 'Dark (classic)', 'High-contrast light', 'High-contrast dark'], $this->query('id:default-theme')
 				->asDropdown()->one()->getOptions()->asText()
 		);
 

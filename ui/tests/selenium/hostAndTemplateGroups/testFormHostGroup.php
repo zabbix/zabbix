@@ -45,7 +45,7 @@ class testFormHostGroup extends testFormGroups {
 					'fields' => [
 						'Group name' => self::DISCOVERED_GROUP
 					],
-					'error' => 'Host group "'.self::DISCOVERED_GROUP.'" already exists.'
+					'error' => ['Group name' => 'This object already exists.']
 				]
 			]
 		];
@@ -59,7 +59,7 @@ class testFormHostGroup extends testFormGroups {
 					'fields' => [
 						'Group name' => 'Zabbix servers'
 					],
-					'error' => 'Host group "Zabbix servers" already exists.'
+					'error' => ['Group name' => 'This object already exists.']
 				]
 			],
 			[
@@ -99,7 +99,7 @@ class testFormHostGroup extends testFormGroups {
 						'Group name' => 'Zabbix servers',
 						'Apply permissions and tag filters to all subgroups' => true
 					],
-					'error' => 'Host group "Zabbix servers" already exists.'
+					'error' => ['Group name' => 'This object already exists.']
 				]
 			],
 			[

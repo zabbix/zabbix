@@ -57,10 +57,15 @@ class CControllerHostGroupEdit extends CController{
 	}
 
 	protected function doAction(): void {
+		$js_validation_rules = $this->hasInput('groupid')
+			? CControllerHostGroupUpdate::getValidationRules()
+			: CControllerHostGroupCreate::getValidationRules();
+
 		$data = [
 			'groupid' => null,
 			'name' => '',
-			'subgroups' => 0
+			'subgroups' => 0,
+			'js_validation_rules' => (new CFormValidator($js_validation_rules))->getRules()
 		];
 
 		if ($this->getInput('groupid', 0)) {

@@ -83,7 +83,7 @@
 	}
 
 	code {
-		font-family: $font-stack-mono;
+		font-family: var(--font-stack-mono);
 		font-size: $font-mono-size;
 	}
 

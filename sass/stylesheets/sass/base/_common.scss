@@ -1,10 +1,8 @@
 body {
 	position: relative;
 	background-color: $body-bg-color;
-	font: {
-		size: $font-body-size;
-		family: $font-stack;
-	}
+	font-family: var(--font-stack);
+	font-size: var(--font-body-size);
 	line-height: $body-line-height;
 	color: $font-color;
 }
@@ -21,7 +19,7 @@ h2 {
 
 h3 {
 	font-size: $font-h3-size;
-	text-transform: $font-transform;
+	text-transform: uppercase;
 	color: $font-alt-color;
 	letter-spacing: .0688em;
 	text-rendering: optimizeLegibility;
@@ -64,10 +62,9 @@ p {
 }
 
 pre {
-	font: {
-		family: $font-stack-mono;
-		size: $font-mono-size;
-	}
+	font-family: var(--font-stack-mono);
+	font-size: $font-mono-size;
+
 	@extend %space-pre-wrap;
 
 	a {
@@ -152,7 +149,7 @@ svg a {
 }
 
 .monospace-font {
-	font-family: $font-stack-mono;
+	font-family: var(--font-stack-mono);
 }
 
 .float-left {

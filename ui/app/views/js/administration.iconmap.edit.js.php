@@ -20,97 +20,234 @@
  */
 ?>
 
-<script type="text/x-jquery-tmpl" id="iconMapRowTPL">
-<?=
-	(new CRow([
-		(new CCol((new CDiv())->addClass(ZBX_STYLE_DRAG_ICON)))->addClass(ZBX_STYLE_TD_DRAG_ICON),
-		(new CSpan(':'))->addClass(ZBX_STYLE_LIST_NUMBERED_ITEM),
-		(new CSelect('iconmap[mappings][#{iconmappingid}][inventory_link]'))
-			->addOptions(CSelect::createOptionsFromArray($data['inventory_list']))
-			->setId('iconmap_mappings_#{iconmappingid}_inventory_link'),
-		(new CTextBox('iconmap[mappings][#{iconmappingid}][expression]', '', false, 64))
-			->setId('iconmap_mappings_#{iconmappingid}_expression')
-			->setAriaRequired()
-			->setWidth(ZBX_TEXTAREA_SMALL_WIDTH),
-		(new CSelect('iconmap[mappings][#{iconmappingid}][iconid]'))
-			->addOptions(CSelect::createOptionsFromArray($data['icon_list']))
-			->setId('iconmap_mappings_#{iconmappingid}_iconid')
-			->addClass('js-mapping-icon'),
-		(new CCol(
-			(new CImg('imgstore.php?iconid='.$data['default_imageid'].'&width='.ZBX_ICON_PREVIEW_WIDTH.
-				'&height='.ZBX_ICON_PREVIEW_HEIGHT, _('Preview'))
-			)
-				->setAttribute('data-image-full', 'imgstore.php?iconid='.$data['default_imageid'])
-				->addClass(ZBX_STYLE_CURSOR_POINTER)
-				->addClass('preview')
-		))->addStyle('vertical-align: middle'),
-		(new CCol(
-			(new CButton('remove', _('Remove')))
-				->addClass(ZBX_STYLE_BTN_LINK)
-				->addClass('remove_mapping')
-				->removeId()
-		))->addClass(ZBX_STYLE_NOWRAP)
-	]))->setId('iconmapidRow_#{iconmappingid}')
-?>
-</script>
 <script type="text/javascript">
-	jQuery(function($) {
-		var $form = $('form#iconmap');
 
-		$form.on('submit', function() {
-			$form.trimValues(['#iconmap_name']);
-		});
+	window.iconmap_edit = new class {
 
-		$form.find('#clone').click(function() {
-			var url = new Curl('zabbix.php?action=iconmap.edit');
+		/**
+		 * @type {CForm}
+		 */
+		form;
 
-			$form.serializeArray().forEach(function(field) {
-				if (field.name !== 'iconmapid') {
-					url.setArgument(field.name, field.value);
+		/**
+		 * @type {HTMLElement}
+		 */
+		form_element;
+
+		/**
+		 * @type {string}
+		 */
+		#form_action;
+
+		/**
+		 * @type {string}
+		 */
+		#list_action;
+
+		/**
+		 * @type {Template}
+		 */
+		#row_template;
+
+		/**
+		 * @type {string}
+		 */
+		#default_imageid;
+
+		init({rules, default_imageid}) {
+			this.#default_imageid = default_imageid;
+			this.#row_template = new Template(document.getElementById('icon-mapping-template').innerHTML);
+
+			this.form_element = document.getElementById('iconmap');
+			this.form = new CForm(this.form_element, rules);
+
+			const table = document.getElementById('icon-mapping-table');
+			new CSortable(table.querySelector('tbody'), {
+				selector_span: ':not(.error-container-row)',
+				selector_handle: '.<?= ZBX_STYLE_DRAG_ICON ?>',
+				freeze_end: 1
+			}).on(CSortable.EVENT_SORT, e => table.querySelectorAll('[name*="sortorder"]')
+				.forEach((node, index) => node.value = index)
+			);
+
+			this.form_element.addEventListener('submit', e => {
+				e.preventDefault();
+				this.submit();
+			});
+
+			document.getElementById('icon-mapping-table').addEventListener('click', e => this.#processAction(e));
+			document.getElementById('icon-mapping-table').addEventListener('change', ({target}) => {
+				if (target instanceof ZSelect && target.classList.contains('js-mapping-icon')) {
+					this.#loadIcon(target.closest('tr').querySelector('img'), target.value);
+				}
+			});
+			document.getElementById('default-mapping-icon').addEventListener('change', ({target}) => {
+				this.#loadIcon(document.getElementById('default-mapping-icon-preview'), target.value);
+			});
+
+			document.getElementById('iconmap-edit').addEventListener('click', e => {
+				if (e.target.classList.contains('preview')) {
+					const img = document.createElement('img');
+					img.src = e.target.dataset.imageFull;
+					hintBox.showStaticHint(e, e.target, '', true, '', jQuery(img));
 				}
 			});
 
-			redirect(url.getUrl(), 'post', 'action', undefined, true);
-		});
+			const curl = new Curl(this.form_element.getAttribute('action'));
+			curl.setArgument('action', this.form.findFieldByName('iconmapid') === null ? 'iconmap.create' : 'iconmap.update');
+			this.#form_action = curl.getUrl();
+			curl.setArgument('action', 'iconmap.list');
+			this.#list_action = curl.getUrl();
 
-		var iconMapTable = $('#iconMapTable'),
-			addMappingButton = $('#addMapping');
+			const clone_btn = document.getElementById('clone');
+			clone_btn && clone_btn.addEventListener('click', () => this.#clone());
 
-		new CSortable(iconMapTable[0].querySelector('tbody'), {
-			selector_handle: 'div.<?= ZBX_STYLE_DRAG_ICON ?>',
-			freeze_end: 2
-		});
+			const delete_btn = document.getElementById('delete');
+			delete_btn && delete_btn.addEventListener('click', () => this.#delete(delete_btn.getAttribute('data-redirect-url')));
+		}
 
-		iconMapTable.find('tbody')
-			.on('click', '.remove_mapping', function() {
-				$(this).parent().parent().remove();
-			})
-			.on('change', 'z-select.js-mapping-icon, z-select#iconmap_default_iconid', function() {
-				$(this).closest('tr').find('.preview')
-					.attr('src', 'imgstore.php?&width=<?= ZBX_ICON_PREVIEW_WIDTH ?>&height=<?= ZBX_ICON_PREVIEW_HEIGHT ?>&iconid=' + $(this).val())
-					.data('imageFull', 'imgstore.php?iconid=' + $(this).val());
-			})
-			.on('click', 'img.preview', function(e) {
-				var img = $('<img>', {src: $(this).data('imageFull')});
-				hintBox.showStaticHint(e, this, '', true, '', img);
-			});
+		#clone() {
+			this.#setLoadingStatus(['clone']);
 
-		addMappingButton.click(function() {
-			var tpl = new Template($('#iconMapRowTPL').html()),
-				iconmappingid = getUniqueId(),
-				mapping = {};
+			const curl = new Curl(this.form_element.getAttribute('action')),
+				{name, mappings, default_iconid} = this.form.getAllValues();
 
-			// on error, whole page reloads and getUniqueId reset ids sequence which can cause in duplicate ids
-			while ($('#iconmapidRow_' + iconmappingid).length != 0) {
-				iconmappingid = getUniqueId();
+			curl.setArgument('action', 'iconmap.edit');
+			curl.setArgument('iconmap[name]', name);
+			curl.setArgument('iconmap[default_iconid]', default_iconid);
+
+			for (let mapping of Object.values(mappings || {})) {
+				const {expression, iconid, inventory_link, sortorder} = mapping;
+
+				curl.setArgument(`iconmap[mappings][${sortorder}][expression]`, expression);
+				curl.setArgument(`iconmap[mappings][${sortorder}][iconid]`, iconid);
+				curl.setArgument(`iconmap[mappings][${sortorder}][inventory_link]`, inventory_link);
+				curl.setArgument(`iconmap[mappings][${sortorder}][sortorder]`, sortorder);
 			}
 
-			mapping.iconmappingid = iconmappingid;
-			$('#iconMapListFooter').before(tpl.evaluate(mapping));
-		});
-
-		if (iconMapTable.find('tr[id^="iconmapidRow_"]').length === 0) {
-			addMappingButton.click();
+			redirect(curl.getUrl(), 'post', 'action', undefined, true);
 		}
-	});
+
+		#processAction(e) {
+			const action = e.target.getAttribute('name');
+
+			if (action === 'add') {
+				const keys = Object.keys(this.form.findFieldByName('mappings').getValue()),
+					sortorder = keys.length ? Math.max(...keys) + 1 : 0,
+					html = this.#row_template.evaluate({iconid: this.#default_imageid, sortorder});
+
+				document.getElementById('iconmap-list-footer').insertAdjacentHTML('beforebegin', html);
+			}
+			else if (action === 'remove') {
+				e.target.closest('tr').nextSibling.remove();
+				e.target.closest('tr').remove();
+			}
+		}
+
+		submit() {
+			this.#setLoadingStatus(['add', 'update']);
+			clearMessages();
+			const fields = this.form.getAllValues();
+
+			this.form.validateSubmit(fields)
+				.then((result) => {
+					if (!result) {
+						this.#unsetLoadingStatus();
+
+						return;
+					}
+
+					fetch(this.#form_action, {
+						method: 'POST',
+						headers: {'Content-Type': 'application/json'},
+						body: JSON.stringify(fields)
+					})
+						.then((response) => response.json())
+						.then((response) => {
+							if ('error' in response) {
+								this.#unsetLoadingStatus();
+
+								throw {error: response.error};
+							}
+
+							if ('form_errors' in response) {
+								this.form.setErrors(response.form_errors, true, true);
+								this.form.renderErrors();
+							}
+							else {
+								postMessageOk(response.success.title);
+								location.href = this.#list_action;
+							}
+						})
+						.catch((exception) => this.#ajaxExceptionHandler(exception));
+			});
+		}
+
+		#loadIcon(img, iconid) {
+			const src = 'imgstore.php?&width=<?= ZBX_ICON_PREVIEW_WIDTH ?>&height='
+					+ '<?= ZBX_ICON_PREVIEW_HEIGHT ?>&iconid=' + iconid;
+
+			img.setAttribute('src', src);
+			img.setAttribute('data-image-full', 'imgstore.php?iconid=' + iconid);
+		}
+
+		#delete(url) {
+			if (window.confirm('<?= _('Delete icon map?') ?>')) {
+				this.#setLoadingStatus(['delete']);
+				redirect(url, 'post', 'action', undefined, true);
+			}
+		}
+
+		#ajaxExceptionHandler(exception) {
+			if (exception instanceof TypeError) {
+				throw exception;
+			}
+
+			let title, messages;
+
+			if (typeof exception === 'object' && 'error' in exception) {
+				title = exception.error.title;
+				messages = exception.error.messages;
+			}
+			else {
+				messages = [<?= json_encode(_('Unexpected server error.')) ?>];
+			}
+
+			addMessage(makeMessageBox('bad', messages, title));
+			this.#unsetLoadingStatus();
+		}
+
+		#setLoadingStatus(loading_ids) {
+			[
+				document.getElementById('add'),
+				document.getElementById('clone'),
+				document.getElementById('delete'),
+				document.getElementById('update')
+			].forEach(button => {
+				if (button) {
+					button.setAttribute('disabled', true);
+
+					if (loading_ids.includes(button.id)) {
+						button.classList.add('is-loading');
+					}
+				}
+			});
+		}
+
+		#unsetLoadingStatus() {
+			[
+				document.getElementById('add'),
+				document.getElementById('clone'),
+				document.getElementById('delete'),
+				document.getElementById('update')
+			].forEach(button => {
+				if (button) {
+					button.classList.remove('is-loading');
+					button.removeAttribute('disabled');
+				}
+			});
+		}
+
+	}
+
 </script>

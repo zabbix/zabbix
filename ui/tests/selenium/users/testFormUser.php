@@ -207,6 +207,7 @@ class testFormUser extends CWebTest {
 			}
 
 			$form->query('button:Change password')->one()->click();
+			$form->waitUntilReloaded();
 			$this->assertFalse($form->query('button:Change password')->one(false)->isValid());
 		}
 

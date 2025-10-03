@@ -106,7 +106,10 @@ class testPermissionsWithoutCSRF extends CWebTest {
 			[
 				[
 					'db' => 'SELECT * FROM hstgrp',
-					'link' => 'zabbix.php?action=popup&popup=hostgroup.edit'
+					'link' => 'zabbix.php?action=popup&popup=hostgroup.edit',
+					'fields' => [
+						'id:name' => 'CSRF validation host group create'
+					]
 				]
 			],
 			// #3 Host group update.
@@ -120,7 +123,10 @@ class testPermissionsWithoutCSRF extends CWebTest {
 			[
 				[
 					'db' => 'SELECT * FROM hstgrp',
-					'link' => 'zabbix.php?action=popup&popup=templategroup.edit'
+					'link' => 'zabbix.php?action=popup&popup=templategroup.edit',
+					'fields' => [
+						'id:name' => 'CSRF validation template group create'
+					]
 				]
 			],
 			// #5 Template group update.
@@ -372,8 +378,7 @@ class testPermissionsWithoutCSRF extends CWebTest {
 			[
 				[
 					'db' => 'SELECT * FROM icon_map',
-					'link' => 'zabbix.php?action=iconmap.edit&iconmapid=101',
-					'return_button' => true
+					'link' => 'zabbix.php?action=iconmap.edit&iconmapid=101'
 				]
 			],
 			// #34 Icon map create.
@@ -381,15 +386,17 @@ class testPermissionsWithoutCSRF extends CWebTest {
 				[
 					'db' => 'SELECT * FROM icon_map',
 					'link' => 'zabbix.php?action=iconmap.edit',
-					'return_button' => true
+					'fields' => [
+						'id:name' => 'CSRF icon test name',
+						'id:mappings_0_expression' => 'CSRF_test'
+					]
 				]
 			],
 			// #35 Regular expression update.
 			[
 				[
 					'db' => 'SELECT * FROM regexps',
-					'link' => 'zabbix.php?action=regex.edit&regexid=2',
-					'return_button' => true
+					'link' => 'zabbix.php?action=regex.edit&regexpid=2'
 				]
 			],
 			// #36 Regular expression create.
@@ -397,15 +404,17 @@ class testPermissionsWithoutCSRF extends CWebTest {
 				[
 					'db' => 'SELECT * FROM regexps',
 					'link' => 'zabbix.php?action=regex.edit',
-					'return_button' => true
+					'fields' => [
+						'id:name' => 'CSRF test name',
+						'id:expressions_0_expression' => 'abc'
+					]
 				]
 			],
 			// #37 Macros update.
 			[
 				[
 					'db' => 'SELECT * FROM globalmacro',
-					'link' => 'zabbix.php?action=macros.edit',
-					'return_button' => true
+					'link' => 'zabbix.php?action=macros.edit'
 				]
 			],
 			// #38 Trigger displaying options update.
@@ -613,7 +622,10 @@ class testPermissionsWithoutCSRF extends CWebTest {
 				[
 					'db' => 'SELECT * FROM services',
 					'link' => 'zabbix.php?action=service.list.edit',
-					'overlay' => 'create'
+					'overlay' => 'create',
+					'fields' => [
+						'id:name' => 'CSRF service create'
+					]
 				]
 			],
 			// #64 Service update.

@@ -372,21 +372,21 @@ class testUsersAuthenticationLdap extends testFormAuthentication {
 					]
 				]
 			],
-			// #9 test with Bind DN and Bind password.
+			// #9 test with incorrect Bind DN.
 			[
 				[
 					'servers_settings' => [
 						'Name' => 'Test Name',
-						'Host' => 'ipa.demo1.freeipa.org',
-						'Base DN' => 'cn=users,cn=accounts,dc=demo1,dc=freeipa,dc=org',
+						'Host' => PHPUNIT_LDAP_HOST,
+						'Base DN' => 'dc=zbx,dc=local',
 						'Search attribute' => 'uid',
-						'Bind DN' => 'test_DN',
-						'Bind password' => 'test_password',
+						'Bind DN' => 'incorrect_bind',
+						'Bind password' => PHPUNIT_LDAP_BIND_PASSWORD,
 						'Description' => 'Test description'
 					],
 					'test_settings' => [
-						'Login' => 'employee',
-						'User password' => 'Secret123'
+						'Login' => PHPUNIT_LDAP_USERNAME,
+						'User password' => PHPUNIT_LDAP_USER_PASSWORD
 					],
 					'test_error' => 'Login failed',
 					'test_error_details' => [
@@ -394,7 +394,44 @@ class testUsersAuthenticationLdap extends testFormAuthentication {
 					]
 				]
 			],
-			// #10 test with correct LDAP settings and JIT settings.
+			// #10 test with incorrect Bind password.
+			[
+				[
+					'servers_settings' => [
+						'Name' => 'Test Name',
+						'Host' => PHPUNIT_LDAP_HOST,
+						'Base DN' => 'dc=zbx,dc=local',
+						'Search attribute' => 'uid',
+						'Bind DN' => 'cn=admin,dc=zbx,dc=local',
+						'Bind password' => 'zabbix'
+					],
+					'test_settings' => [
+						'Login' => PHPUNIT_LDAP_USERNAME,
+						'User password' => PHPUNIT_LDAP_USER_PASSWORD
+					],
+					'test_error' => 'Login failed',
+					'test_error_details' => [
+						'Cannot bind to LDAP server.'
+					]
+				]
+			],
+			// #11 test with minimum data.
+			[
+				[
+					'expected' => TEST_GOOD,
+					'servers_settings' => [
+						'Name' => 'Test Name',
+						'Host' => PHPUNIT_LDAP_HOST,
+						'Base DN' => 'dc=zbx,dc=local',
+						'Search attribute' => 'uid'
+					],
+					'test_settings' => [
+						'Login' => PHPUNIT_LDAP_USERNAME,
+						'User password' => PHPUNIT_LDAP_USER_PASSWORD
+					]
+				]
+			],
+			// #12 test with correct LDAP settings and JIT settings.
 			[
 				[
 					'expected' => TEST_GOOD,

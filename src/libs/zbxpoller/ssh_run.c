@@ -200,7 +200,6 @@ static int	ssh_nonblocking_error(ssh_session session, int errcode, int errcode_a
 int	ssh_run(zbx_dc_item_t *item, AGENT_RESULT *result, const char *encoding, const char *options, int timeout,
 		const char *config_source_ip, const char *config_ssh_key_location, const char *subsystem)
 {
-	zbx_socket_t	s;
 	ssh_session	session;
 	ssh_channel	channel;
 	ssh_key		privkey = NULL, pubkey = NULL;
@@ -223,22 +222,20 @@ int	ssh_run(zbx_dc_item_t *item, AGENT_RESULT *result, const char *encoding, con
 
 	zbx_ts_get_deadline(&deadline, 0 == timeout ? SEC_PER_YEAR : timeout);
 
-	if (FAIL == zbx_tcp_connect(&s, config_source_ip, item->interface.addr, item->interface.port, timeout,
-			ZBX_TCP_SEC_UNENCRYPTED, NULL, NULL))
+	if (NULL != config_source_ip && 0 != ssh_options_set(session, SSH_OPTIONS_BINDADDR, config_source_ip))
 	{
-		SET_MSG_RESULT(result, zbx_dsprintf(NULL, "Cannot connect to SSH server: %s", zbx_socket_strerror()));
+		SET_MSG_RESULT(result, zbx_dsprintf(NULL, "Cannot set SSH address binding: %s",
+				ssh_get_error(session)));
 		goto session_free;
 	}
 
-	/* create a session instance and start it up */
-	if (0 != ssh_options_set(session, SSH_OPTIONS_FD, &s.socket) ||
-			0 != ssh_options_set(session, SSH_OPTIONS_HOST, item->interface.addr) ||
+	if (0 != ssh_options_set(session, SSH_OPTIONS_HOST, item->interface.addr) ||
 			0 != ssh_options_set(session, SSH_OPTIONS_PORT, &item->interface.port) ||
 			0 != ssh_options_set(session, SSH_OPTIONS_USER, item->username))
 	{
 		SET_MSG_RESULT(result, zbx_dsprintf(NULL, "Cannot set SSH session options: %s",
 				ssh_get_error(session)));
-		goto tcp_session_free;
+		goto session_free;
 	}
 
 	ssh_set_blocking(session, 0);
@@ -251,13 +248,13 @@ int	ssh_run(zbx_dc_item_t *item, AGENT_RESULT *result, const char *encoding, con
 		{
 			SET_MSG_RESULT(result, zbx_dsprintf(NULL, "Cannot turn off SSH default config processing: %s",
 					ssh_get_error(session)));
-			goto tcp_session_free;
+			goto session_free;
 		}
 
 		if (SUCCEED != ssh_parse_options(session, options, &err_msg))
 		{
 			SET_MSG_RESULT(result, err_msg);
-			goto tcp_session_free;
+			goto session_free;
 		}
 	}
 
@@ -268,7 +265,7 @@ int	ssh_run(zbx_dc_item_t *item, AGENT_RESULT *result, const char *encoding, con
 			SET_MSG_RESULT(result, zbx_dsprintf(NULL, "Cannot establish SSH session: %s", err_msg));
 			zbx_free(err_msg);
 
-			goto tcp_session_free;
+			goto session_free;
 		}
 	}
 
@@ -593,8 +590,6 @@ session_close:
 	if (NULL != pubkey)
 		ssh_key_free(pubkey);
 	ssh_disconnect(session);
-tcp_session_free:
-	zbx_tcp_close(&s);
 session_free:
 	ssh_free(session);
 close:

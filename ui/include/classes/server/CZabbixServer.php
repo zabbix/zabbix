@@ -487,6 +487,9 @@ class CZabbixServer {
 		$json = json_encode($params);
 		if (fwrite($this->socket, ZBX_TCP_HEADER.pack('V', strlen($json))."\x00\x00\x00\x00".$json) === false) {
 			$this->error = _s('Cannot send command, check connection with Zabbix server "%1$s".', $this->host);
+
+			fclose($this->socket);
+
 			return false;
 		}
 
@@ -494,59 +497,65 @@ class CZabbixServer {
 		$response = '';
 		$response_len = 0;
 		$expected_len = null;
-		$now = time();
 
-		while (true) {
-			if ((time() - $now) >= $this->timeout) {
-				$this->error = _s(
-					'Connection timeout of %1$s seconds exceeded when connecting to Zabbix server "%2$s".',
-					$this->timeout, $this->host
-				);
+		while (!feof($this->socket)) {
+			if (($buffer = fread($this->socket, self::READ_BYTES_LIMIT)) === false) {
+				$info = stream_get_meta_data($this->socket);
+
+				if ($info['timed_out']) {
+					$this->error = _s(
+						'Response timeout of %1$s exceeded when connecting to Zabbix server "%2$s".',
+						secondsToPeriod($this->timeout), $this->host
+					);
+				} else {
+					$this->error = _s('Cannot read response from Zabbix server "%1$s".', $this->host);
+				}
+
+				fclose($this->socket);
+
 				return false;
 			}
 
-			if (!feof($this->socket) && ($buffer = fread($this->socket, self::READ_BYTES_LIMIT)) !== false) {
-				$response_len += strlen($buffer);
-				$response .= $buffer;
+			$response_len += strlen($buffer);
+			$response .= $buffer;
 
-				if ($expect == self::ZBX_TCP_EXPECT_HEADER) {
-					if (strncmp($response, ZBX_TCP_HEADER, min($response_len, ZBX_TCP_HEADER_LEN)) != 0) {
-						$this->error = _s('Incorrect response received from Zabbix server "%1$s".', $this->host);
-						return false;
-					}
+			if ($expect == self::ZBX_TCP_EXPECT_HEADER) {
+				if (strncmp($response, ZBX_TCP_HEADER, min($response_len, ZBX_TCP_HEADER_LEN)) != 0) {
+					$this->error = _s('Incorrect response received from Zabbix server "%1$s".', $this->host);
 
-					if ($response_len < ZBX_TCP_HEADER_LEN) {
-						continue;
-					}
+					fclose($this->socket);
 
-					$expect = self::ZBX_TCP_EXPECT_DATA;
+					return false;
 				}
 
-				if ($response_len < ZBX_TCP_HEADER_LEN + ZBX_TCP_DATALEN_LEN) {
+				if ($response_len < ZBX_TCP_HEADER_LEN) {
 					continue;
 				}
 
-				if ($expected_len === null) {
-					$expected_len = unpack('Vlen', substr($response, ZBX_TCP_HEADER_LEN, 4))['len'];
-					$expected_len += ZBX_TCP_HEADER_LEN + ZBX_TCP_DATALEN_LEN;
+				$expect = self::ZBX_TCP_EXPECT_DATA;
+			}
 
-					if ($this->total_bytes_limit != 0 && $expected_len >= $this->total_bytes_limit) {
-						$this->error = _s(
-							'Size of the response received from Zabbix server "%1$s" exceeds the allowed size of %2$s bytes. This value can be increased in the ZBX_SOCKET_BYTES_LIMIT constant in include/defines.inc.php.',
-							$this->host, $this->total_bytes_limit
-						);
-						return false;
-					}
-				}
+			if ($response_len < ZBX_TCP_HEADER_LEN + ZBX_TCP_DATALEN_LEN) {
+				continue;
+			}
 
-				if ($response_len >= $expected_len) {
-					break;
+			if ($expected_len === null) {
+				$expected_len = unpack('Vlen', substr($response, ZBX_TCP_HEADER_LEN, 4))['len'];
+				$expected_len += ZBX_TCP_HEADER_LEN + ZBX_TCP_DATALEN_LEN;
+
+				if ($this->total_bytes_limit != 0 && $expected_len >= $this->total_bytes_limit) {
+					$this->error = _s(
+						'Size of the response received from Zabbix server "%1$s" exceeds the allowed size of %2$s bytes. This value can be increased in the ZBX_SOCKET_BYTES_LIMIT constant in include/defines.inc.php.',
+						$this->host, $this->total_bytes_limit
+					);
+					fclose($this->socket);
+
+					return false;
 				}
 			}
-			else {
-				$this->error =
-					_s('Cannot read the response, check connection with the Zabbix server "%1$s".', $this->host);
-				return false;
+
+			if ($response_len >= $expected_len) {
+				break;
 			}
 		}
 
@@ -632,25 +641,19 @@ class CZabbixServer {
 			return null;
 		}
 
-		if (!self::checkTLSFile($this->tls_config['CA_FILE'])) {
-			$this->error = _('TLS fields are misconfigured or the files are not accessible.');
-			$this->error_code = self::ERROR_CODE_TLS;
+		$required_files = [
+			'CA_FILE' => $this->tls_config['CA_FILE'] ?? '',
+			'KEY_FILE' => $this->tls_config['KEY_FILE'] ?? '',
+			'CERT_FILE' => $this->tls_config['CERT_FILE'] ?? ''
+		];
 
-			return null;
-		}
-
-		if (!self::checkTLSFile($this->tls_config['KEY_FILE'])) {
-			$this->error = _('TLS fields are misconfigured or the files are not accessible.');
-			$this->error_code = self::ERROR_CODE_TLS;
-
-			return null;
-		}
-
-		if (!self::checkTLSFile($this->tls_config['CERT_FILE'])) {
-			$this->error = _('TLS fields are misconfigured or the files are not accessible.');
-			$this->error_code = self::ERROR_CODE_TLS;
-
-			return null;
+		if (CWebUser::getType() == USER_TYPE_SUPER_ADMIN) {
+			foreach ($required_files as $required_file => $path) {
+				if ($error_message = self::checkTLSFile($required_file, $path)) {
+					$this->error = $error_message;
+					$this->error_code = self::ERROR_CODE_TLS;
+				}
+			}
 		}
 
 		$capture_peer_cert = $this->tls_config['CERTIFICATE_ISSUER'] || $this->tls_config['CERTIFICATE_SUBJECT'];
@@ -725,12 +728,33 @@ class CZabbixServer {
 		);
 	}
 
-	protected static function checkTLSFile(string $file_path): bool {
-		if ($file_path === '' || !file_exists($file_path) || !is_readable($file_path)) {
-			return false;
+	protected static function checkTLSFile(string $type, string $path): ?string {
+		$configFields = [
+			'CA_FILE' => _('TLS CA file'),
+			'KEY_FILE' => _('TLS key file'),
+			'CERT_FILE' => _('TLS certificate file')
+		];
+		$error_message = null;
+
+		if ($path === '') {
+			$error_message = _s('%1$s: %2$s.', $configFields[$type], _('cannot be empty'));
+		}
+		elseif (!file_exists($path)) {
+			$error_message = _s('%1$s: invalid path or file not found.', $configFields[$type]);
+		}
+		elseif (!is_readable($path)) {
+			$error_message = _s('%1$s: file is not readable.', $configFields[$type]);
 		}
 
-		return true;
+		if ($error_message !== null) {
+			CMessageHelper::addMessage([
+				'type' => CMessageHelper::MESSAGE_TYPE_ERROR,
+				'message' => $error_message,
+				'is_technical_error' => false
+			]);
+		}
+
+		return $error_message;
 	}
 
 	/**
