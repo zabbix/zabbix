@@ -137,6 +137,11 @@ func (conn *OraConn) WhoAmI() string {
 	return conn.username
 }
 
+// GetCallTimeout returns callTimeout.
+func (conn *OraConn) GetCallTimeout() time.Duration {
+	return conn.callTimeout
+}
+
 // normalizeSpaces function replaces all whitespace from a username with one whitespace, if any, and
 // trims a username.
 func normalizeSpaces(s string) string {
@@ -158,11 +163,6 @@ func (conn *OraConn) getLastAccessTime() time.Time {
 	defer conn.lastAccessTimeMu.Unlock()
 
 	return conn.lastAccessTime
-}
-
-// GetCallTimeout returns callTimeout.
-func (conn *OraConn) GetCallTimeout() time.Duration {
-	return conn.callTimeout
 }
 
 func (conn *OraConn) closeWithLog() {
