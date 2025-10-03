@@ -146,11 +146,9 @@ class testFormAdministrationGeneralTrigDisplOptions extends testFormAdministrati
 
 		$form->fill(['Use custom event status colours' => true]);
 		foreach ($color_pickers as $selector) {
-			$form->query('xpath:.//z-color-picker[@color-field-name='.CXPathHelper::escapeQuotes($selector).']')->one()
-					->click();
-			$this->assertEquals(6, CColorPickerElement::find()->query('class:color-picker-input')
-				->one()->getAttribute('maxlength')
-			);
+			$overlay = $form->query('xpath:.//z-color-picker[@color-field-name='.CXPathHelper::escapeQuotes($selector).']')
+					->asColorPicker()->one()->open();
+			$this->assertEquals(6, $overlay->query('class:color-picker-input')->one()->getAttribute('maxlength'));
 			CColorPickerElement::close();
 		}
 
