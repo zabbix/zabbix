@@ -3,6 +3,8 @@ Changes for 7.4.4rc1
 New features:
 
 Bug fixes:
+.........T [ZBX-26851] changed macro names in MSSQL templates (sbelakovs)
+..F....... [ZBX-26882] fixed incorrect validation error when a new dataset is added in SVG graph widget (gklavins)
 
 --------------------------------------------------------------------------------
 Changes for 7.4.3
@@ -1055,6 +1057,7 @@ Changes for 7.0.20rc1
 New features:
 
 Bug fixes:
+.........T [ZBX-26851] changed macro names in MSSQL templates (sbelakovs)
 
 --------------------------------------------------------------------------------
 Changes for 7.0.19
