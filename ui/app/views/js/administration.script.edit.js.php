@@ -101,11 +101,7 @@ window.script_edit_popup = new class {
 		);
 
 		this.form_element.querySelector('.js-parameter-add').addEventListener('click', () => {
-			const template = new Template(this.form_element.querySelector('#script-parameter-template').innerHTML);
-			const target = this.form_element.querySelector('#parameters-table tbody');
-			const row_index = target.querySelectorAll('tr.form_row').length;
-
-			target.insertAdjacentHTML('beforeend', template.evaluate({row_index}));
+			this.#addParameter({name: '', value: ''});
 		});
 
 		this.form_element.addEventListener('click', (e) => {
@@ -271,10 +267,14 @@ window.script_edit_popup = new class {
 	 */
 	#addParameter(parameter) {
 		const template = new Template(this.form_element.querySelector('#script-parameter-template').innerHTML);
-		const target = this.form_element.querySelector('#parameters-table tbody');
-		const row_index = target.querySelectorAll('tr.form_row').length;
+		const parameters_table_element = this.form_element.querySelector('#parameters-table tbody');
+		let row_index = 0;
 
-		target.insertAdjacentHTML('beforeend', template.evaluate({row_index, ...parameter}));
+		while (parameters_table_element.querySelector(`[name="parameters[${row_index}][name]"`) !== null) {
+			row_index++;
+		}
+
+		parameters_table_element.insertAdjacentHTML('beforeend', template.evaluate({row_index, ...parameter}));
 	}
 
 	#openManualinputTestPopup() {
