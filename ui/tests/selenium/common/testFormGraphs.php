@@ -974,7 +974,8 @@ class testFormGraphs extends CWebTest {
 				if (array_key_exists('color', $item)) {
 					$this->assertEquals($item['color'], $item_row->query('xpath:.//z-color-picker')->asColorPicker()
 							->one()->getValue()
-					);				}
+					);
+				}
 			}
 		}
 		$dialog->close();
