@@ -5,7 +5,7 @@
 
 This template is designed for the effortless deployment of [OpenAI Platform](https://platform.openai.com) monitoring by Zabbix via HTTP and doesn't require any external scripts.
 
-Check the [`API documentation`](https://platform.openai.com/docs/api-reference/introduction) for details.
+Please consult the OpenAI [API documentation](https://platform.openai.com/docs/api-reference/introduction) for more details.
 
 ## Requirements
 
@@ -22,8 +22,8 @@ This template has been tested on:
 
 ## Setup
 
-1. Create an admin token on [OpenAI Platform](https://platform.openai.com/settings/organization/admin-keys) page.
-2. Put the admin token into {$OPENAI.API.TOKEN} macro.
+1. Create an admin token on the [OpenAI Platform](https://platform.openai.com/settings/organization/admin-keys) page.
+2. Enter the admin token into the `{$OPENAI.API.TOKEN}` macro.
 
 ### Macros used
 
@@ -47,10 +47,10 @@ This template has been tested on:
 |----|-----------|----|-----------------------|
 |Get data|<p>Item for gathering OpenAI Platform data.</p>|Script|openai.platform_data.get|
 |Get data item errors|<p>Item for gathering all the data item errors.</p>|Dependent item|openai.platform_data.errors<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.error`</p><p>⛔️Custom on fail: Discard value</p></li><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
-|Get costs|<p>Item for gathering costs data from OpenAI Platform.</p>|Script|openai.costs_data.get|
-|Get costs item errors|<p>Item for gathering all the data item errors.</p>|Dependent item|openai.costs_data.errors<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.error`</p><p>⛔️Custom on fail: Discard value</p></li><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
-|Get completions|<p>Item for gathering completions data from OpenAI Platform.</p>|Script|openai.completions_data.get|
-|Get completions item errors|<p>Item for gathering all the data item errors.</p>|Dependent item|openai.completions_data.errors<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.error`</p><p>⛔️Custom on fail: Discard value</p></li><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
+|Get costs|<p>Item for gathering cost data from the OpenAI Platform.</p>|Script|openai.costs_data.get|
+|Get cost item errors|<p>Item for gathering all the data item errors.</p>|Dependent item|openai.costs_data.errors<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.error`</p><p>⛔️Custom on fail: Discard value</p></li><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
+|Get completions|<p>Item for gathering completion data from the OpenAI Platform.</p>|Script|openai.completions_data.get|
+|Get completion item errors|<p>Item for gathering all the data item errors.</p>|Dependent item|openai.completions_data.errors<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.error`</p><p>⛔️Custom on fail: Discard value</p></li><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
 |Version|<p>REST API version used for requests.</p>|Dependent item|openai.version<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.headers["openai-version"]`</p><p>⛔️Custom on fail: Discard value</p></li><li><p>Discard unchanged with heartbeat: `12h`</p></li></ul>|
 |Total daily expenses|<p>Total amount of expenses for the past day.</p>|Dependent item|openai.expenses.total<p>**Preprocessing**</p><ul><li><p>Discard unchanged with heartbeat: `1d`</p></li><li><p>JSON Path: `$.costs[0].results..amount.value.sum()`</p><p>⛔️Custom on fail: Set value to: `0`</p></li></ul>|
 
@@ -67,15 +67,15 @@ This template has been tested on:
 
 |Name|Description|Type|Key and additional info|
 |----|-----------|----|-----------------------|
-|Project discovery|<p>Discovering projects on OpenAI Platform.</p>|Dependent item|openai.project.discovery<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.projects`</p><p>⛔️Custom on fail: Discard value</p></li></ul>|
+|Project discovery|<p>Used for discovering projects on the OpenAI Platform.</p>|Dependent item|openai.project.discovery<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.projects`</p><p>⛔️Custom on fail: Discard value</p></li></ul>|
 
 ### Item prototypes for Project discovery
 
 |Name|Description|Type|Key and additional info|
 |----|-----------|----|-----------------------|
-|[{#NAME}]: Get expenses data|<p>Item for gathering expenses data for the {#NAME} project.</p>|Dependent item|openai.expenses.get[{#ID}]<p>**Preprocessing**</p><ul><li><p>Discard unchanged with heartbeat: `1d`</p></li><li><p>JSON Path: `$.costs[0].results..[?(@.project_id == '{#ID}')]`</p><p>⛔️Custom on fail: Set value to: `{}`</p></li></ul>|
+|[{#NAME}]: Get expense data|<p>Item for gathering expense data for the {#NAME} project.</p>|Dependent item|openai.expenses.get[{#ID}]<p>**Preprocessing**</p><ul><li><p>Discard unchanged with heartbeat: `1d`</p></li><li><p>JSON Path: `$.costs[0].results..[?(@.project_id == '{#ID}')]`</p><p>⛔️Custom on fail: Set value to: `{}`</p></li></ul>|
 |[{#NAME}]: Daily expenses|<p>Amount of expenses for the past day.</p>|Dependent item|openai.expenses.amount[{#ID}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$..amount.value.sum()`</p><p>⛔️Custom on fail: Set value to: `0`</p></li></ul>|
-|[{#NAME}]: Get completions data|<p>Item for gathering completions data for the {#NAME} project.</p>|Dependent item|openai.completions.get[{#ID}]<p>**Preprocessing**</p><ul><li><p>Discard unchanged with heartbeat: `1h`</p></li><li><p>JSON Path: `$.completions..results..[?(@.project_id == '{#ID}')]`</p><p>⛔️Custom on fail: Set value to: `{}`</p></li></ul>|
+|[{#NAME}]: Get completion data|<p>Item for gathering completion data for the {#NAME} project.</p>|Dependent item|openai.completions.get[{#ID}]<p>**Preprocessing**</p><ul><li><p>Discard unchanged with heartbeat: `1h`</p></li><li><p>JSON Path: `$.completions..results..[?(@.project_id == '{#ID}')]`</p><p>⛔️Custom on fail: Set value to: `{}`</p></li></ul>|
 |[{#NAME}]: Input tokens|<p>Total number of input tokens received by all models in the project.</p>|Dependent item|openai.tokens.input[{#ID}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$..input_tokens.sum()`</p><p>⛔️Custom on fail: Set value to: `0`</p></li></ul>|
 |[{#NAME}]: Output tokens|<p>Total number of output tokens sent by all models in the project.</p>|Dependent item|openai.tokens.output[{#ID}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$..output_tokens.sum()`</p><p>⛔️Custom on fail: Set value to: `0`</p></li></ul>|
 |[{#NAME}]: Input cached tokens|<p>Total number of input cached tokens sent by all models in the project.</p>|Dependent item|openai.tokens.input_cached[{#ID}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$..input_cached_tokens.sum()`</p><p>⛔️Custom on fail: Set value to: `0`</p></li></ul>|
@@ -93,13 +93,13 @@ This template has been tested on:
 
 |Name|Description|Type|Key and additional info|
 |----|-----------|----|-----------------------|
-|[{#NAME}]: Model discovery|<p>Discovering models used in the {#NAME} project on OpenAI Platform.</p>|Dependent item|openai.model.discovery[{#ID}]<p>**Preprocessing**</p><ul><li><p>Discard unchanged with heartbeat: `1h`</p></li><li><p>JSON Path: `$.completions..results[?(@.project_id == '{#ID}')]`</p><p>⛔️Custom on fail: Discard value</p></li></ul>|
+|[{#NAME}]: Model discovery|<p>Used for discovering models used in the {#NAME} project on the OpenAI Platform.</p>|Dependent item|openai.model.discovery[{#ID}]<p>**Preprocessing**</p><ul><li><p>Discard unchanged with heartbeat: `1h`</p></li><li><p>JSON Path: `$.completions..results[?(@.project_id == '{#ID}')]`</p><p>⛔️Custom on fail: Discard value</p></li></ul>|
 
 ### Item prototypes for [{#NAME}]: Model discovery
 
 |Name|Description|Type|Key and additional info|
 |----|-----------|----|-----------------------|
-|[{#NAME}/{#MODEL}]: Get model data|<p>Item for gathering data of the '{#MODEL}' model.</p>|Dependent item|openai.model.get[{#ID},{#MODEL}]<p>**Preprocessing**</p><ul><li><p>Discard unchanged with heartbeat: `1h`</p></li><li><p>JSON Path: `The text is too long. Please see the template.`</p><p>⛔️Custom on fail: Set value to: `{}`</p></li></ul>|
+|[{#NAME}/{#MODEL}]: Get model data|<p>Item for gathering data of the {#MODEL} model.</p>|Dependent item|openai.model.get[{#ID},{#MODEL}]<p>**Preprocessing**</p><ul><li><p>Discard unchanged with heartbeat: `1h`</p></li><li><p>JSON Path: `The text is too long. Please see the template.`</p><p>⛔️Custom on fail: Set value to: `{}`</p></li></ul>|
 |[{#NAME}/{#MODEL}]: Input tokens|<p>Total number of input tokens received by the model {#MODEL} in the {#NAME} project.</p>|Dependent item|openai.tokens.input[{#ID},{#MODEL}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.input_tokens`</p><p>⛔️Custom on fail: Set value to: `0`</p></li></ul>|
 |[{#NAME}/{#MODEL}]: Output tokens|<p>Total number of output tokens sent by the model {#MODEL} in the {#NAME} project.</p>|Dependent item|openai.tokens.output[{#ID},{#MODEL}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.output_tokens`</p><p>⛔️Custom on fail: Set value to: `0`</p></li></ul>|
 |[{#NAME}/{#MODEL}]: Input cached tokens|<p>Total number of input cached tokens sent by the model {#MODEL} in the {#NAME} project.</p>|Dependent item|openai.tokens.input_cached[{#ID},{#MODEL}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.input_cached_tokens`</p><p>⛔️Custom on fail: Set value to: `0`</p></li></ul>|

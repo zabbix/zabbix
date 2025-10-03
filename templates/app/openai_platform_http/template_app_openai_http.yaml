@@ -12,7 +12,7 @@ zabbix_export:
         
         Setup:
         1. Create an admin token on https://platform.openai.com/settings/organization/admin-keys.
-        2. Put the admin token into {$OPENAI.API.TOKEN} macro.
+        2. Enter the admin token into the {$OPENAI.API.TOKEN} macro.
         
         You can discuss this template or leave feedback on our forum https://www.zabbix.com/forum/zabbix-suggestions-and-feedback.
         
@@ -23,12 +23,12 @@ zabbix_export:
         
         This template is designed for the effortless deployment of [`OpenAI Platform`](https://platform.openai.com) monitoring by Zabbix via HTTP and doesn't require any external scripts.
         
-        Check the [`API documentation`](https://platform.openai.com/docs/api-reference/introduction) for details.
+        Please consult the OpenAI [`API documentation`](https://platform.openai.com/docs/api-reference/introduction) for more details.
         
         ## Setup
         
-        1. Create an admin token on [`OpenAI Platform`](https://platform.openai.com/settings/organization/admin-keys) page.
-        2. Specify the admin token in the `API token` field.
+        1. Create an admin token on the [`OpenAI Platform`](https://platform.openai.com/settings/organization/admin-keys) page.
+        2. Enter the admin token into the `API token` field.
       vendor:
         name: Zabbix
         version: 8.0-1
@@ -36,7 +36,7 @@ zabbix_export:
         - name: Templates/Applications
       items:
         - uuid: 9a98648edd6e485b9c617939f032e714
-          name: 'Get completions item errors'
+          name: 'Get completion item errors'
           type: DEPENDENT
           key: openai.completions_data.errors
           value_type: TEXT
@@ -186,7 +186,7 @@ zabbix_export:
             }
             
             return JSON.stringify(result);
-          description: 'Item for gathering completions data from OpenAI Platform.'
+          description: 'Item for gathering completion data from the OpenAI Platform.'
           timeout: '{$OPENAI.DATA.TIMEOUT}'
           parameters:
             - name: api_token
@@ -199,7 +199,7 @@ zabbix_export:
             - tag: component
               value: raw
         - uuid: 7aea5f1d5f5a4f949dbce67f660d4f39
-          name: 'Get costs item errors'
+          name: 'Get cost item errors'
           type: DEPENDENT
           key: openai.costs_data.errors
           value_type: TEXT
@@ -345,7 +345,7 @@ zabbix_export:
             }
             
             return JSON.stringify(result);
-          description: 'Item for gathering costs data from OpenAI Platform.'
+          description: 'Item for gathering cost data from the OpenAI Platform.'
           timeout: '{$OPENAI.DATA.TIMEOUT}'
           parameters:
             - name: api_token
@@ -576,7 +576,7 @@ zabbix_export:
           lifetime: 30d
           enabled_lifetime_type: DISABLE_AFTER
           enabled_lifetime: 7d
-          description: 'Discovering models used in the {#NAME} project on OpenAI Platform.'
+          description: 'Used for discovering models used in the {#NAME} project on the OpenAI Platform.'
           item_prototypes:
             - uuid: 03057358da3f42c9bce9b3f9814e108a
               name: '[{#NAME}/{#MODEL}]: Get model data'
@@ -584,7 +584,7 @@ zabbix_export:
               key: 'openai.model.get[{#ID},{#MODEL}]'
               history: '0'
               value_type: TEXT
-              description: 'Item for gathering data of the ''{#MODEL}'' model.'
+              description: 'Item for gathering data of the {#MODEL} model.'
               preprocessing:
                 - type: DISCARD_UNCHANGED_HEARTBEAT
                   parameters:
@@ -776,15 +776,15 @@ zabbix_export:
               - macro: '{#NAME}'
                 value: '{$OPENAI.PROJECT.NAME.NOT_MATCHES}'
                 operator: NOT_MATCHES_REGEX
-          description: 'Discovering projects on OpenAI Platform.'
+          description: 'Used for discovering projects on the OpenAI Platform.'
           item_prototypes:
             - uuid: 93782ec08c734abd9a8bb7c6e8c157ab
-              name: '[{#NAME}]: Get completions data'
+              name: '[{#NAME}]: Get completion data'
               type: DEPENDENT
               key: 'openai.completions.get[{#ID}]'
               history: '0'
               value_type: TEXT
-              description: 'Item for gathering completions data for the {#NAME} project.'
+              description: 'Item for gathering completion data for the {#NAME} project.'
               preprocessing:
                 - type: DISCARD_UNCHANGED_HEARTBEAT
                   parameters:
@@ -836,12 +836,12 @@ zabbix_export:
                     - tag: scope
                       value: performance
             - uuid: c6e74fff343c4c0fbfee1704ba794d40
-              name: '[{#NAME}]: Get expenses data'
+              name: '[{#NAME}]: Get expense data'
               type: DEPENDENT
               key: 'openai.expenses.get[{#ID}]'
               history: '0'
               value_type: TEXT
-              description: 'Item for gathering expenses data for the {#NAME} project.'
+              description: 'Item for gathering expense data for the {#NAME} project.'
               preprocessing:
                 - type: DISCARD_UNCHANGED_HEARTBEAT
                   parameters:
