@@ -30,7 +30,7 @@ class CControllerPopupImportCompare extends CController {
 	protected function checkInput(): bool {
 		$fields = [
 			'import' => 'in 1',
-			'rules_preset' => 'in template',
+			'rules_preset' => 'in template,dashboard',
 			'rules' => 'array'
 		];
 
@@ -55,13 +55,15 @@ class CControllerPopupImportCompare extends CController {
 		switch ($this->getInput('rules_preset', '')) {
 			case 'template':
 				return ($user_type === USER_TYPE_ZABBIX_ADMIN || $user_type === USER_TYPE_SUPER_ADMIN);
-
+			case 'dashboard':
+				return $this->checkAccess(CRoleHelper::ACTIONS_EDIT_DASHBOARDS);
 			default:
 				return false;
 		}
 	}
 
 	protected function doAction(): void {
+		$returnMissingObjects = false;
 		$rules = [
 			'host_groups' => ['updateExisting' => false, 'createMissing' => false],
 			'template_groups' => ['updateExisting' => false, 'createMissing' => false],
@@ -77,7 +79,8 @@ class CControllerPopupImportCompare extends CController {
 			'maps' => ['updateExisting' => false, 'createMissing' => false],
 			'images' => ['updateExisting' => false, 'createMissing' => false],
 			'mediaTypes' => ['updateExisting' => false, 'createMissing' => false],
-			'valueMaps' => ['updateExisting' => false, 'createMissing' => false, 'deleteMissing' => false]
+			'valueMaps' => ['updateExisting' => false, 'createMissing' => false, 'deleteMissing' => false],
+			'dashboards' => ['updateExisting' => false, 'createMissing' => false]
 		];
 
 		// Adjust defaults for given rule preset, if specified.
@@ -98,6 +101,9 @@ class CControllerPopupImportCompare extends CController {
 				$rules['httptests'] = ['updateExisting' => true, 'createMissing' => true, 'deleteMissing' => false];
 				$rules['templateLinkage'] = ['createMissing' => true, 'deleteMissing' => false];
 				$rules['valueMaps'] = ['updateExisting' => true, 'createMissing' => true, 'deleteMissing' => false];
+				break;
+			case 'dashboard':
+				$returnMissingObjects = true;
 				break;
 		}
 
@@ -122,6 +128,7 @@ class CControllerPopupImportCompare extends CController {
 				$result = API::Configuration()->importcompare([
 					'format' => CImportReaderFactory::fileExt2ImportFormat($file->getExtension()),
 					'source' => $file->getContent(),
+					'returnMissingObjects' => $returnMissingObjects,
 					'rules' => $request_rules
 				]);
 			}
@@ -130,8 +137,14 @@ class CControllerPopupImportCompare extends CController {
 			}
 		}
 
+		$names = [
+			'dashboard' => _('Dashboards'),
+			'template' => _('Templates')
+		];
+
 		$data = [
-			'title' => _('Templates'),
+			'title' => $names[$this->getInput('rules_preset')],
+			'messages' => [],
 			'user' => [
 				'debug_mode' => $this->getDebugMode()
 			]
@@ -144,6 +157,15 @@ class CControllerPopupImportCompare extends CController {
 			];
 		}
 		else {
+			if (array_key_exists('missing', $result) && count($result['missing']) > 0) {
+				$data['messages'][] = [
+					'error' => 'warning',
+					'title' => _('Import file has references to missing objects:'),
+					'messages' => [CConfigurationImport::missingObjectsToDetailsInfo($result['missing'])]
+				];
+			}
+
+			unset($result['missing']);
 			$data['diff'] = $this->blocksToDiff($result, 1);
 			$data['diff_toc'] = $this->normalizeToc($this->toc);
 
@@ -178,7 +200,9 @@ class CControllerPopupImportCompare extends CController {
 			'item_prototypes' => _('Item prototypes'),
 			'trigger_prototypes' => _('Trigger prototypes'),
 			'graph_prototypes' => _('Graph prototypes'),
-			'host_prototypes' => _('Host prototypes')
+			'host_prototypes' => _('Host prototypes'),
+			'pages' => _('Pages'),
+			'widgets' => _('Widgets')
 		];
 
 		foreach ($toc as $toc_key => $changes) {
@@ -352,6 +376,7 @@ class CControllerPopupImportCompare extends CController {
 		}
 
 		unset($all_keys['uuid']);
+		unset($all_keys['_index']);
 
 		$rows = [];
 
@@ -460,6 +485,15 @@ class CControllerPopupImportCompare extends CController {
 				return array_key_exists('name', $object) ? $object['name'] : $object['template'];
 			case 'host_prototypes':
 				return array_key_exists('name', $object) ? $object['name'] : $object['host'];
+			case 'pages':
+				return array_key_exists('name', $object)
+					? $object['name']
+					: _s('Page %1$d', $object['_index'] + 1);
+			case 'widgets':
+				$x = array_key_exists('x', $object) ? $object['x'] : '0';
+				$y = array_key_exists('y', $object) ? $object['y'] : '0';
+
+				return $object['type'] . ' (' . $x . ',' . $y . ')';
 			default:
 				return $object['name'];
 		}

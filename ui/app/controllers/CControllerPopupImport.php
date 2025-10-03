@@ -19,7 +19,7 @@ class CControllerPopupImport extends CController {
 	protected function checkInput() {
 		$fields = [
 			'import' => 'in 1',
-			'rules_preset' => 'required|in host,template,mediatype,map',
+			'rules_preset' => 'required|in host,template,mediatype,map,dashboard',
 			'rules' => 'array'
 		];
 
@@ -51,6 +51,8 @@ class CControllerPopupImport extends CController {
 
 			case 'mediatype':
 				return $user_type === USER_TYPE_SUPER_ADMIN;
+			case 'dashboard':
+				return $this->checkAccess(CRoleHelper::ACTIONS_EDIT_DASHBOARDS);
 		}
 	}
 
@@ -121,6 +123,12 @@ class CControllerPopupImport extends CController {
 					];
 				}
 				break;
+			case 'dashboard':
+				$rules = [
+					'dashboards' => ['updateExisting' => true, 'createMissing' => true]
+				];
+
+				break;
 		}
 
 		if ($this->hasInput('import')) {
@@ -146,6 +154,7 @@ class CControllerPopupImport extends CController {
 					$result = API::Configuration()->import([
 						'format' => CImportReaderFactory::fileExt2ImportFormat($file->getExtension()),
 						'source' => $file->getContent(),
+						'returnMissingObjects' => true,
 						'rules' => $request_rules
 					]);
 				}
@@ -155,19 +164,23 @@ class CControllerPopupImport extends CController {
 			}
 
 			$output = [];
-
-			if ($result) {
+			if ($result === false) {
+				$output['error'] = [
+					'title' => _('Import failed'),
+					'messages' => array_column(get_and_clear_messages(), 'message')
+				];
+			}
+			else {
 				$output['success']['title'] = _('Imported successfully');
 
 				if ($messages = get_and_clear_messages()) {
 					$output['success']['messages'] = array_column($messages, 'message');
 				}
-			}
-			else {
-				$output['error'] = [
-					'title' => _('Import failed'),
-					'messages' => array_column(get_and_clear_messages(), 'message')
-				];
+
+				if (is_array($result) && count($result['missing']) > 0) {
+					$output['success']['messages'][] = _('Import file had references to missing objects:')."\n".
+						CConfigurationImport::missingObjectsToDetailsInfo($result['missing']);
+				}
 			}
 
 			$this->setResponse((new CControllerResponseData(['main_block' => json_encode($output)]))->disableView());
@@ -178,6 +191,7 @@ class CControllerPopupImport extends CController {
 				'rules' => $rules,
 				'rules_preset' => $this->getInput('rules_preset'),
 				'advanced_config' => in_array($this->getInput('rules_preset'), ['host', 'template']),
+				'submit_compare' => in_array($this->getInput('rules_preset'), ['template', 'dashboard']),
 				'user' => [
 					'debug_mode' => $this->getDebugMode()
 				]

@@ -642,6 +642,22 @@ function getMenuPopupDashboard(options, trigger_element) {
 		url_delete.setArgument('dashboardids', [options.dashboardid]);
 		url_delete.setArgument(CSRF_TOKEN_NAME, options.csrf_token);
 
+		const url_view = new Curl('zabbix.php');
+		url_view.setArgument('action', 'dashboard.view');
+
+		const url_export = new Curl('zabbix.php');
+		url_export.setArgument('action', 'export.dashboards');
+		url_export.setArgument('dashboardids', [options.dashboardid]);
+		url_export.setArgument(CSRF_TOKEN_NAME, options.csrf_token);
+		url_export.setArgument('backurl', url_view.getUrl());
+		url_export.setArgument('format', 'yaml');
+
+		const export_urls = { yaml: url_export.getUrl() };
+		url_export.setArgument('format', 'xml');
+		export_urls.xml = url_export.getUrl();
+		url_export.setArgument('format', 'json');
+		export_urls.json = url_export.getUrl();
+
 		sections.push({
 			label: t('Actions'),
 			items: [
@@ -678,7 +694,25 @@ function getMenuPopupDashboard(options, trigger_element) {
 						redirect(url_delete.getUrl(), 'post', CSRF_TOKEN_NAME, true);
 					},
 					disabled: !options.editable
-				}
+				},
+				{
+					label: t('Export'),
+					url: export_urls.yaml,
+					items: [
+						{
+							label: t('YAML'),
+							url: export_urls.yaml
+						},
+						{
+							label: t('XML'),
+							url: export_urls.xml
+						},
+						{
+							label: t('JSON'),
+							url: export_urls.json
+						}
+					]
+				},
 			]
 		});
 	}

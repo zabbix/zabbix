@@ -286,6 +286,29 @@ class CConfigurationExportBuilder {
 	}
 
 	/**
+	 * Format dashboards.
+	 *
+	 * @param array $schema           Tag schema from validation class.
+	 * @param array $dashboards       Export data.
+	 */
+	public function buildDashboards(array $schema, array $dashboards) {
+		$result = [];
+
+		CArrayHelper::sort($dashboards, ['name']);
+
+		foreach ($dashboards as $dashboard) {
+			$result[] = [
+				'name' => $dashboard['name'],
+				'display_period' => $dashboard['display_period'],
+				'auto_start' => $dashboard['auto_start'],
+				'pages' => $this->formatDashboardPages($dashboard['pages'])
+			];
+		}
+
+		$this->data['dashboards'] = self::build($schema, $result, 'dashboards');
+	}
+
+	/**
 	 * Separate simple triggers.
 	 *
 	 * @param array $triggers

@@ -26,6 +26,10 @@ class CConfiguration extends CApiService {
 	];
 
 	private const IMPORT_ACCESS_RULES = [
+		'dashboards' => [
+			'createMissing' => CDashboard::ACCESS_RULES['create'],
+			'updateExisting' => CDashboard::ACCESS_RULES['update'],
+		],
 		'discoveryRules' => [
 			'createMissing' => CDiscoveryRule::ACCESS_RULES['create'],
 			'updateExisting' => CDiscoveryRule::ACCESS_RULES['update'],
@@ -136,7 +140,8 @@ class CConfiguration extends CApiService {
 				'mediaTypes' =>			['type' => API_IDS],
 				'template_groups' =>	['type' => API_IDS],
 				'host_groups' => 		['type' => API_IDS],
-				'templates' =>			['type' => API_IDS]
+				'templates' =>			['type' => API_IDS],
+				'dashboards' =>			['type' => API_IDS]
 			]]
 		]];
 
@@ -200,9 +205,14 @@ class CConfiguration extends CApiService {
 	 */
 	protected function validateImport(array &$params): void {
 		$api_input_rules = ['type' => API_OBJECT, 'fields' => [
-			'format' =>				['type' => API_STRING_UTF8, 'flags' => API_REQUIRED, 'in' => implode(',', [CImportReaderFactory::YAML, CImportReaderFactory::XML, CImportReaderFactory::JSON])],
-			'source' =>				['type' => API_STRING_UTF8, 'flags' => API_REQUIRED],
+			'format' =>					['type' => API_STRING_UTF8, 'flags' => API_REQUIRED, 'in' => implode(',', [CImportReaderFactory::YAML, CImportReaderFactory::XML, CImportReaderFactory::JSON])],
+			'source' =>					['type' => API_STRING_UTF8, 'flags' => API_REQUIRED],
+			'returnMissingObjects' => 	['type' => API_BOOLEAN, 'default' => false],
 			'rules' =>				['type' => API_OBJECT, 'flags' => API_REQUIRED, 'fields' => [
+				'dashboards' =>			['type' => API_OBJECT, 'fields' => [
+					'createMissing' =>			['type' => API_BOOLEAN, 'default' => false],
+					'updateExisting' =>			['type' => API_BOOLEAN, 'default' => false]
+				]],
 				'discoveryRules' =>		['type' => API_OBJECT, 'fields' => [
 					'createMissing' =>		['type' => API_BOOLEAN, 'default' => false],
 					'updateExisting' =>		['type' => API_BOOLEAN, 'default' => false],
@@ -331,12 +341,7 @@ class CConfiguration extends CApiService {
 		}
 	}
 
-	/**
-	 * @param array $params
-	 *
-	 * @return bool
-	 */
-	public function import($params) {
+	private function getImportConfigurationData(array &$params): array {
 		$this->validateImport($params);
 
 		$import_reader = CImportReaderFactory::getReader($params['format']);
@@ -380,6 +385,16 @@ class CConfiguration extends CApiService {
 		// Normalize array keys and strings.
 		$data = (new CImportDataNormalizer($schema))->normalize($data);
 
+		return $data;
+	}
+
+	/**
+	 * @param array $params
+	 *
+	 * @return bool|array
+	 */
+	public function import($params): bool|array {
+		$data = $this->getImportConfigurationData($params);
 		$adapter = new CImportDataAdapter();
 		$adapter->load($data);
 
@@ -389,7 +404,28 @@ class CConfiguration extends CApiService {
 			new CImportedObjectContainer()
 		);
 
-		return $configuration_import->import($adapter);
+		$result = $configuration_import->import($adapter);
+
+		if ($result && $params['returnMissingObjects']) {
+			return ['result' => true, 'missing' => $configuration_import->getMissingObjects()];
+		}
+
+		return $result;
+	}
+
+	private function testimport(array $params): array {
+		$params['returnMissingObjects'] = true;
+		$data = $this->getImportConfigurationData($params);
+		$adapter = new CImportDataAdapter();
+		$adapter->load($data);
+
+		$configuration_import = new CConfigurationImport(
+			$params['rules'],
+			new CImportReferencer(),
+			new CImportedObjectContainer()
+		);
+
+		return $configuration_import->testimport($adapter);
 	}
 
 	/**
@@ -464,6 +500,10 @@ class CConfiguration extends CApiService {
 			}
 		}
 
+		if (array_key_exists('dashboards', $import)) {
+			$imported_entities['dashboards']['name'] = array_column($import['dashboards'], 'name');
+		}
+
 		$imported_ids = [];
 
 		foreach ($imported_entities as $entity => $data) {
@@ -514,6 +554,21 @@ class CConfiguration extends CApiService {
 					$db_templates = API::Template()->get($options);
 
 					$imported_ids['templates'] = array_keys($db_templates);
+					break;
+
+				case 'dashboards':
+					$options = [
+						'output' => ['name'],
+						'filter' => [
+							'name' => $data['name']
+						],
+						'selectPages' => ['dashboard_pageid', 'widgets'],
+						'preservekeys' => true
+					];
+
+					$db_dashboards = API::Dashboard()->get($options);
+					$imported_ids['dashboards'] = array_keys($db_dashboards);
+
 					break;
 
 				default:
@@ -572,8 +627,41 @@ class CConfiguration extends CApiService {
 
 		$export = $export['zabbix_export'];
 
+		if (array_key_exists('dashboards', $import)) {
+			$this->addDashboardDynamicIndexes($import['dashboards']);
+		}
+
+		if (array_key_exists('dashboards', $export)) {
+			$this->addDashboardDynamicIndexes($export['dashboards']);
+
+		}
+
 		$importcompare = new CConfigurationImportcompare($params['rules']);
 
-		return $importcompare->importcompare($export, $import);
+		$result = $importcompare->importcompare($export, $import);
+
+		if ($params['returnMissingObjects']) {
+			$result['missing'] = $this->testimport($params);
+		}
+
+		return $result;
+	}
+
+	private function addDashboardDynamicIndexes(array &$dashboards) {
+		foreach ($dashboards as &$dashboard) {
+			if (array_key_exists('pages', $dashboard)) {
+				foreach ($dashboard['pages'] as $key => &$page) {
+					$page['_index'] = $key;
+
+					if (array_key_exists('widgets', $page)) {
+						foreach ($page['widgets'] as &$widget) {
+							$x = array_key_exists('x', $widget) ? $widget['x'] : '0';
+							$y = array_key_exists('y', $widget) ? $widget['y'] : '0';
+							$widget['_index'] = $x.'_'.$y;
+						}
+					}
+				}
+			}
+		}
 	}
 }

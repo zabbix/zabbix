@@ -59,7 +59,12 @@ class CConfigurationImportcompare {
 				'valuemaps' => []
 			],
 			'triggers' => [],
-			'graphs' => []
+			'graphs' => [],
+			'dashboards' => [
+				'pages' => [
+					'widgets' => []
+				]
+			]
 		];
 
 		$this->unique_fields_keys_by_type = [
@@ -76,7 +81,9 @@ class CConfigurationImportcompare {
 			'trigger_prototypes' => ['name', 'expression', 'recovery_expression'],
 			'graph_prototypes' => ['name', ['graph_items' => ['numeric_keys' => ['item' => 'host']]]],
 			'host_prototypes' => ['host'],
-			'graphs' => ['name', ['graph_items' => ['numeric_keys' => ['item' => 'host']]]]
+			'graphs' => ['name', ['graph_items' => ['numeric_keys' => ['item' => 'host']]]],
+			'pages' => ['_index'],
+			'widgets' => ['_index']
 		];
 
 		$this->options = $options;
@@ -109,7 +116,8 @@ class CConfigurationImportcompare {
 	 *
 	 * @return array
 	 */
-	protected function compareByStructure(array $structure, array $before, array $after, array $options): array {
+	protected function compareByStructure(array $structure, array $before, array $after, array $options,
+			?string $parent_key = null): array {
 		$result = [];
 
 		foreach ($structure as $key => $sub_structure) {
@@ -124,29 +132,30 @@ class CConfigurationImportcompare {
 
 			$diff = $this->compareArrayByUniqueness($before[$key], $after[$key], $key);
 
-
 			if (array_key_exists('added', $diff)) {
 				foreach ($diff['added'] as &$entity) {
-					$entity = $this->compareByStructure($sub_structure, [], $entity, $options);
+					$entity = $this->compareByStructure($sub_structure, [], $entity, $options, $key);
 				}
 				unset($entity);
 			}
 
 			if (array_key_exists('removed', $diff)) {
 				foreach ($diff['removed'] as &$entity) {
-					$entity = $this->compareByStructure($sub_structure, $entity, [], $options);
+					$entity = $this->compareByStructure($sub_structure, $entity, [], $options, $key);
 				}
 				unset($entity);
 			}
 
 			if ($sub_structure && array_key_exists('updated', $diff)) {
 				foreach ($diff['updated'] as &$entity) {
-					$entity = $this->compareByStructure($sub_structure, $entity['before'], $entity['after'], $options);
+					$entity = $this->compareByStructure($sub_structure, $entity['before'], $entity['after'],
+						$options, $key
+					);
 				}
 				unset($entity);
 			}
 
-			$diff = $this->applyOptions($options, $key, $diff);
+			$diff = $this->applyOptions($options, $key, $diff, $parent_key);
 
 			unset($before[$key], $after[$key]);
 
@@ -198,14 +207,16 @@ class CConfigurationImportcompare {
 		$after = $this->addUniquenessParameterByEntityType($after, $type);
 
 		$same_entities = [];
+		$uniq_key = $this->getUniquenessKey($type);
+
 		foreach ($after as $a_key => $after_entity) {
-			if (!array_key_exists('uuid', $after_entity)) {
+			if (!array_key_exists($uniq_key, $after_entity)) {
 				unset($after[$a_key]);
 				continue;
 			}
 
 			foreach ($before as $b_key => $before_entity) {
-				if (array_key_exists('uuid', $before_entity) && $before_entity['uuid'] === $after_entity['uuid']) {
+				if (array_key_exists($uniq_key, $before_entity) && $before_entity[$uniq_key] === $after_entity[$uniq_key]) {
 					unset($before_entity['uniqueness'], $after_entity['uniqueness']);
 
 					$same_entities[$b_key]['before'] = $before_entity;
@@ -219,7 +230,7 @@ class CConfigurationImportcompare {
 			foreach ($before as $b_key => $before_entity) {
 				if ($before_entity['uniqueness'] === $after_entity['uniqueness']) {
 					unset($before_entity['uniqueness'], $after_entity['uniqueness']);
-					$before_entity['uuid'] = $after_entity['uuid'];
+					$before_entity[$uniq_key] = $after_entity[$uniq_key];
 
 					$same_entities[$b_key]['before'] = $before_entity;
 					$same_entities[$b_key]['after'] = $after_entity;
@@ -246,7 +257,7 @@ class CConfigurationImportcompare {
 		}
 
 		foreach ($same_entities as $entity) {
-			$uuid = ['uuid' => null];
+			$uuid = [$uniq_key => null];
 
 			if (array_diff_key($entity['before'], $uuid) != array_diff_key($entity['after'], $uuid)) {
 				$diff['updated'][] = [
@@ -356,31 +367,48 @@ class CConfigurationImportcompare {
 	 *
 	 * @return array
 	 */
-	protected function applyOptions(array $options, string $entity_key, array $diff): array {
+	protected function applyOptions(array $options, string $entity_key, array $diff,
+			?string $parent_key = null): array {
 		$option_key_map = [
-			'template_groups' => 'template_groups',
-			'host_groups' => 'host_groups',
-			'group_links' => 'host_groups',
-			'groups' => 'template_groups',
-			'templates' => 'templates',
-			'items' => 'items',
-			'triggers' => 'triggers',
-			'discovery_rules' => 'discoveryRules',
-			'item_prototypes' => 'discoveryRules',
-			'trigger_prototypes' => 'discoveryRules',
-			'graph_prototypes' => 'discoveryRules',
-			'host_prototypes' => 'discoveryRules',
-			'dashboards' => 'templateDashboards',
-			'httptests' => 'httptests',
-			'valuemaps' => 'valueMaps',
-			'graphs' => 'graphs'
+			'template_groups' => ['template_groups'],
+			'host_groups' => ['host_groups'],
+			'group_links' => ['host_groups'],
+			'groups' => ['template_groups'],
+			'templates' => ['templates'],
+			'items' => ['items'],
+			'triggers' => ['triggers'],
+			'discovery_rules' => ['discoveryRules'],
+			'item_prototypes' => ['discoveryRules'],
+			'trigger_prototypes' => ['discoveryRules'],
+			'graph_prototypes' => ['discoveryRules'],
+			'host_prototypes' => ['discoveryRules'],
+			'dashboards' => ['dashboards', 'templates' => 'templateDashboards'],
+			'httptests' => ['httptests'],
+			'valuemaps' => ['valueMaps'],
+			'graphs' => ['graphs']
 		];
 
-		if (!array_key_exists($option_key_map[$entity_key], $options)) {
-			return [];
+		$sub_entity_options = [
+			'pages' => ['dashboards' => ['updateExisting' => true, 'createMissing' => true, 'deleteMissing' => true]],
+			'widgets' => ['pages' => ['updateExisting' => true, 'createMissing' => true, 'deleteMissing' => true]]
+		];
+
+		if ($parent_key !== null && array_key_exists($entity_key, $sub_entity_options) &&
+				array_key_exists($parent_key, $sub_entity_options[$entity_key])) {
+			$entity_options = $sub_entity_options[$entity_key][$parent_key];
+		}
+		elseif (array_key_exists($entity_key, $option_key_map)) {
+			$option_key = array_key_exists($parent_key, $option_key_map[$entity_key])
+				? $option_key_map[$entity_key][$parent_key]
+				: $option_key_map[$entity_key][0];
+
+			if (!array_key_exists($option_key, $options)) {
+				return [];
+			}
+
+			$entity_options = $options[$option_key];
 		}
 
-		$entity_options = $options[$option_key_map[$entity_key]];
 		$stored_changes = [];
 
 		if ($entity_key === 'templates' && array_key_exists('updated', $diff)) {
@@ -555,5 +583,17 @@ class CConfigurationImportcompare {
 		}
 
 		return $new_after;
+	}
+
+	private function getUniquenessKey(string $type): string {
+		switch ($type) {
+			case 'dashboards':
+				return 'name';
+			case 'pages':
+			case 'widgets':
+				return '_index';
+			default:
+				return 'uuid';
+		}
 	}
 }

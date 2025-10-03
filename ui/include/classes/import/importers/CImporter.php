@@ -16,6 +16,8 @@
 
 abstract class CImporter {
 
+	protected const ALLOW_TESTMODE = false;
+
 	/**
 	 * @var CImportReferencer
 	 */
@@ -31,16 +33,38 @@ abstract class CImporter {
 	 */
 	protected $options = [];
 
+	protected bool $testmode = false;
+
+	private array $missing_objects = [
+		'items' => [],
+		'actions' => [],
+		'mediatypes' => [],
+		'host' => [],
+		'hostgroups' => [],
+		'graphs' => [],
+		'sysmaps' => [],
+		'sla' => [],
+		'services' => [],
+		'users' => []
+	];
+
 	/**
 	 * @param array						$options					import options "createMissing", "updateExisting" and "deleteMissing"
 	 * @param CImportReferencer			$referencer					class containing all importable objects
 	 * @param CImportedObjectContainer	$importedObjectContainer	class containing processed host and template IDs
+	 * @param bool						$testmode					skip calls to modify records in the database.
 	 */
 	public function __construct(array $options, CImportReferencer $referencer,
-			CImportedObjectContainer $importedObjectContainer) {
+			CImportedObjectContainer $importedObjectContainer, bool $testmode = false) {
 		$this->options = $options;
 		$this->referencer = $referencer;
 		$this->importedObjectContainer = $importedObjectContainer;
+
+		if ($testmode && !static::ALLOW_TESTMODE) {
+			throw new \Exception('Test mode for ' . static::class . ' import is not allowed.');
+		}
+
+		$this->testmode = $testmode;
 	}
 
 	/**
@@ -51,4 +75,22 @@ abstract class CImporter {
 	 * @return mixed
 	 */
 	abstract public function import(array $elements);
+
+	protected function appendMissingObject(string $object_type, array $uniq_config): void {
+		if (!array_key_exists($object_type, $this->missing_objects)) {
+			throw new \Exception('Unknown object type: '.$object_type);
+		}
+
+		$key = str_replace(' ', '_', implode('_', array_values($uniq_config)));
+		$this->missing_objects[$object_type][$key] = $uniq_config;
+	}
+
+	/**
+	 * Return array of missing objects that were skipped during import
+	 *
+	 * @return array|array[]
+	 */
+	public function getMissingObjects(): array {
+		return $this->missing_objects;
+	}
 }

@@ -54,10 +54,17 @@ else {
 				->toString()
 			: (new CForm())
 				->addClass('import-compare')
-				->addItem(drawToc($data['diff_toc']))
-				->addItem(drawDiff($data['diff']))
+				->addItem((new CDiv())->addClass('messages'))
+				->addItem((new CDiv())
+					->addClass('import-compare-blocks')
+					->addItem((new CDiv())
+						->addItem(drawToc($data['diff_toc']))
+						->addItem(drawDiff($data['diff']))
+					)
+				)
 				->addItem(
-					(new CScriptTag('popup_import_compare.init();'))->setOnDocumentReady()
+					(new CScriptTag('popup_import_compare.init('.json_encode(['messages' => $data['messages']]).');'))
+						->setOnDocumentReady()
 				)
 				->toString(),
 		'buttons' => $buttons,

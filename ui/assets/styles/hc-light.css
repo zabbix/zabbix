@@ -8790,17 +8790,30 @@ z-select.z-select-host-interface li[disabled] .description:not(:empty) {
     padding-top: 0; }
 
 .import-compare {
+  height: calc(100vh - 224px);
+  max-height: calc(100vh - 224px);
   display: flex;
-  max-height: calc(100vh - 220px); }
-  .import-compare .toc {
-    flex: 20%;
-    overflow-y: auto;
-    overflow-x: hidden; }
-  .import-compare .diff {
-    flex: 80%;
-    margin-left: 5px;
-    overflow: auto;
-    border: 1px dashed #888888; }
+  flex-direction: column; }
+  .import-compare .import-compare-blocks {
+    position: relative;
+    flex-grow: 1; }
+    .import-compare .import-compare-blocks > div {
+      position: absolute;
+      top: 0;
+      bottom: 0;
+      height: auto;
+      width: 100%;
+      display: flex;
+      flex-direction: row; }
+    .import-compare .import-compare-blocks .toc {
+      width: 20%;
+      overflow-y: auto;
+      overflow-x: hidden; }
+    .import-compare .import-compare-blocks .diff {
+      width: 80%;
+      margin-left: 5px;
+      overflow: auto;
+      border: 1px dashed #888888; }
 
 .list-dashed li {
   margin-left: 1em; }

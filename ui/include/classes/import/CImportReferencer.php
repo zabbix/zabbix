@@ -42,6 +42,7 @@ class CImportReferencer {
 	protected $actions = [];
 	protected $media_types = [];
 	protected $template_dashboards = [];
+	protected $dashboards = [];
 	protected $template_macros = [];
 	protected $host_macros = [];
 	protected $group_prototypes = [];
@@ -69,6 +70,7 @@ class CImportReferencer {
 	protected $db_actions;
 	protected $db_media_types;
 	protected $db_template_dashboards;
+	protected $db_dashboards;
 	protected $db_template_macros;
 	protected $db_host_macros;
 	protected $db_group_prototypes;
@@ -656,6 +658,20 @@ class CImportReferencer {
 		foreach ($this->db_template_dashboards as $dashboardid => $dashboard) {
 			if ($dashboard['name'] === $name && $dashboard['templateid'] == $templateid) {
 				return $dashboardid;
+			}
+		}
+
+		return null;
+	}
+
+	public function findDashboardByName(string $name): ?array {
+		if ($this->db_dashboards === null) {
+			$this->selectDashboards();
+		}
+
+		foreach ($this->db_dashboards as $dashboard) {
+			if ($dashboard['name'] === $name) {
+				return $dashboard;
 			}
 		}
 
@@ -1723,6 +1739,40 @@ class CImportReferencer {
 		]);
 
 		$this->template_dashboards = [];
+	}
+
+	/**
+	 * Select dashboard IDs for previously added dashboard names and template IDs.
+	 *
+	 * @throws APIException
+	 */
+	protected function selectDashboards(): void {
+		$this->db_dashboards = [];
+
+		$db_dashboards = API::Dashboard()->get([
+			'output' => ['dashboardid', 'name'],
+			'filter' => [],
+			'selectPages' => ['dashboard_pageid', 'widgets'],
+			'preservekeys' => true
+		]);
+
+		$this->db_dashboards = array_map(function ($dashboard) {
+			$pages = [];
+
+			foreach ($dashboard['pages'] as $page) {
+				$widgetids = [];
+
+				foreach ($page['widgets'] as $widget) {
+					$widgetids[$widget['x'].'_'.$widget['y']] = $widget['widgetid'];
+				}
+
+				$pages[] = ['dashboard_pageid' => $page['dashboard_pageid'], 'widgetids' => $widgetids];
+			}
+
+			return ['dashboardid' => $dashboard['dashboardid'], 'name' => $dashboard['name'], 'pages' => $pages];
+		}, $db_dashboards);
+
+		$this->dashboards = [];
 	}
 
 	/**

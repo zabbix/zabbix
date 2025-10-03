@@ -85,10 +85,6 @@ window.popup_import = new class {
 	}
 
 	submitPopup() {
-		if (document.getElementById('rules_preset').value === 'template') {
-			return this.openImportComparePopup();
-		}
-
 		if (this.isDeleteMissingChecked()) {
 			return this.confirmSubmit();
 		}

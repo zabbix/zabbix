@@ -49,6 +49,12 @@ class CConfigurationImport {
 	 */
 	protected $formattedData = [];
 
+
+	/**
+	 * @var array with missing references during import
+	 */
+	private array $missing_objects = [];
+
 	/**
 	 * Constructor.
 	 * Source string must be suitable for reader class,
@@ -133,6 +139,7 @@ class CConfigurationImport {
 		$this->processTemplates();
 		$this->processHostGroups();
 		$this->processHosts();
+		$this->processDashboards();
 
 		// Delete missing objects from processed hosts and templates.
 		$this->deleteMissingHttpTests();
@@ -154,6 +161,25 @@ class CConfigurationImport {
 		$this->processMediaTypes();
 
 		return true;
+	}
+
+	/**
+	 * Test import configuration data. Supported only for dashboards
+	 *
+	 * @param CImportDataAdapter $adapter an object to provide access to the imported data
+	 *
+	 * @return array
+	 *
+	 * @throws Exception
+	 */
+	public function testimport(CImportDataAdapter $adapter): array {
+		$this->adapter = $adapter;
+
+		// Parse all import for references to resolve them all together with less sql count.
+		$this->gatherReferences();
+		$this->processDashboards(true);
+
+		return $this->getMissingObjects();
 	}
 
 	/**
@@ -529,7 +555,7 @@ class CConfigurationImport {
 			}
 		}
 
-		foreach ($this->getFormattedTemplateDashboards() as $host => $dashboards) {
+		foreach ($this->getFormattedTemplateDashboards() as $dashboards) {
 			foreach ($dashboards as $dashboard) {
 				$template_dashboards_refs[$dashboard['uuid']]['name'] = $dashboard['name'];
 
@@ -537,76 +563,19 @@ class CConfigurationImport {
 					continue;
 				}
 
-				foreach ($dashboard['pages'] as $dashboard_page) {
-					if (!$dashboard_page['widgets']) {
-						continue;
-					}
+				$this->gatherDashboardReferences($dashboard, $items_refs, $graphs_refs, $maps_refs,
+					$services_refs, $slas_refs, $users_refs, $actions_refs, $media_types_refs,
+					$host_groups_refs, $hosts_refs, $templates_refs
+				);
 
-					foreach ($dashboard_page['widgets'] as $widget) {
-						foreach ($widget['fields'] as $field) {
-							$value = $field['value'];
-
-							switch ($field['type']) {
-								case ZBX_WIDGET_FIELD_TYPE_ITEM:
-								case ZBX_WIDGET_FIELD_TYPE_ITEM_PROTOTYPE:
-									$templates_refs += [$value['host'] => []];
-
-									if (!array_key_exists($value['host'], $items_refs)
-											|| !array_key_exists($value['key'], $items_refs[$value['host']])) {
-										$items_refs[$value['host']][$value['key']] = [];
-									}
-									break;
-
-								case ZBX_WIDGET_FIELD_TYPE_GRAPH:
-								case ZBX_WIDGET_FIELD_TYPE_GRAPH_PROTOTYPE:
-									$templates_refs += [$value['host'] => []];
-
-									if (!array_key_exists($value['host'], $graphs_refs)
-											|| !array_key_exists($value['name'], $graphs_refs[$value['host']])) {
-										$graphs_refs[$value['host']][$value['name']] = [];
-									}
-									break;
-
-								case ZBX_WIDGET_FIELD_TYPE_MAP:
-									if (!array_key_exists($value['name'], $maps_refs)) {
-										$maps_refs[$value['name']] = [];
-									}
-									break;
-
-								case ZBX_WIDGET_FIELD_TYPE_SERVICE:
-									if (!array_key_exists($value['name'], $services_refs)) {
-										$services_refs[$value['name']] = [];
-									}
-									break;
-
-								case ZBX_WIDGET_FIELD_TYPE_SLA:
-									if (!array_key_exists($value['name'], $slas_refs)) {
-										$slas_refs[$value['name']] = [];
-									}
-									break;
-
-								case ZBX_WIDGET_FIELD_TYPE_USER:
-									if (!array_key_exists($value['username'], $users_refs)) {
-										$users_refs[$value['username']] = [];
-									}
-									break;
-
-								case ZBX_WIDGET_FIELD_TYPE_ACTION:
-									if (!array_key_exists($value['name'], $actions_refs)) {
-										$actions_refs[$value['name']] = [];
-									}
-									break;
-
-								case ZBX_WIDGET_FIELD_TYPE_MEDIA_TYPE:
-									if (!array_key_exists($value['name'], $media_types_refs)) {
-										$media_types_refs[$value['name']] = [];
-									}
-									break;
-							}
-						}
-					}
-				}
 			}
+		}
+
+		foreach ($this->getFormattedDashboards() as $dashboard) {
+			$this->gatherDashboardReferences($dashboard, $items_refs, $graphs_refs, $maps_refs,
+				$services_refs, $slas_refs, $users_refs, $actions_refs, $media_types_refs,
+				$host_groups_refs, $hosts_refs
+			);
 		}
 
 		foreach ($this->getFormattedHttpTests() as $host => $httptests) {
@@ -655,6 +624,94 @@ class CConfigurationImport {
 		$this->referencer->addHostPrototypes($host_prototypes_refs);
 		$this->referencer->addHttpTests($httptests_refs);
 		$this->referencer->addHttpSteps($httpsteps_refs);
+	}
+
+	private function gatherDashboardReferences(array $dashboard, array &$items_refs, array &$graphs_refs,
+			array &$maps_refs, array &$services_refs, array &$slas_refs, array &$users_refs, array &$actions_refs,
+			array &$media_types_refs, array &$host_groups_refs = [], array &$hosts_refs = [],
+			array &$templates_refs = []): void {
+		if(!array_key_exists('pages', $dashboard)) {
+			return;
+		}
+
+		foreach ($dashboard['pages'] as $dashboard_page) {
+			if (!$dashboard_page['widgets']) {
+				continue;
+			}
+
+			foreach ($dashboard_page['widgets'] as $widget) {
+				foreach ($widget['fields'] as $field) {
+					$value = $field['value'];
+
+					switch ($field['type']) {
+						case ZBX_WIDGET_FIELD_TYPE_GROUP:
+							$host_groups_refs += [$value['name'] => []];
+							break;
+
+						case ZBX_WIDGET_FIELD_TYPE_HOST:
+							$hosts_refs += [$value['host'] => []];
+							break;
+
+						case ZBX_WIDGET_FIELD_TYPE_ITEM:
+						case ZBX_WIDGET_FIELD_TYPE_ITEM_PROTOTYPE:
+							$hosts_refs += [$value['host'] => []];
+							$templates_refs += [$value['host'] => []];
+
+							if (!array_key_exists($value['host'], $items_refs)
+								|| !array_key_exists($value['key'], $items_refs[$value['host']])) {
+								$items_refs[$value['host']][$value['key']] = [];
+							}
+							break;
+
+						case ZBX_WIDGET_FIELD_TYPE_GRAPH:
+						case ZBX_WIDGET_FIELD_TYPE_GRAPH_PROTOTYPE:
+							$templates_refs += [$value['host'] => []];
+
+							if (!array_key_exists($value['host'], $graphs_refs)
+								|| !array_key_exists($value['name'], $graphs_refs[$value['host']])) {
+								$graphs_refs[$value['host']][$value['name']] = [];
+							}
+							break;
+
+						case ZBX_WIDGET_FIELD_TYPE_MAP:
+							if (!array_key_exists($value['name'], $maps_refs)) {
+								$maps_refs[$value['name']] = [];
+							}
+							break;
+
+						case ZBX_WIDGET_FIELD_TYPE_SERVICE:
+							if (!array_key_exists($value['name'], $services_refs)) {
+								$services_refs[$value['name']] = [];
+							}
+							break;
+
+						case ZBX_WIDGET_FIELD_TYPE_SLA:
+							if (!array_key_exists($value['name'], $slas_refs)) {
+								$slas_refs[$value['name']] = [];
+							}
+							break;
+
+						case ZBX_WIDGET_FIELD_TYPE_USER:
+							if (!array_key_exists($value['username'], $users_refs)) {
+								$users_refs[$value['username']] = [];
+							}
+							break;
+
+						case ZBX_WIDGET_FIELD_TYPE_ACTION:
+							if (!array_key_exists($value['name'], $actions_refs)) {
+								$actions_refs[$value['name']] = [];
+							}
+							break;
+
+						case ZBX_WIDGET_FIELD_TYPE_MEDIA_TYPE:
+							if (!array_key_exists($value['name'], $media_types_refs)) {
+								$media_types_refs[$value['name']] = [];
+							}
+							break;
+					}
+				}
+			}
+		}
 	}
 
 	/**
@@ -784,6 +841,22 @@ class CConfigurationImport {
 				// Get list of imported host IDs and add them processed host ID list.
 				$hostids = $host_importer->getProcessedHostIds();
 				$this->importedObjectContainer->addHostIds($hostids);
+			}
+		}
+	}
+
+	protected function processDashboards(bool $testmode = false): void {
+		if (array_key_exists('dashboards', $this->options) &&
+			($this->options['dashboards']['updateExisting'] || $this->options['dashboards']['createMissing'])
+		) {
+			$dashboards = $this->getFormattedDashboards();
+
+			if ($dashboards) {
+				$dashboard_importer = new CDashboardImporter($this->options, $this->referencer,
+					$this->importedObjectContainer, $testmode
+				);
+				$dashboard_importer->import($dashboards);
+				$this->mergeMissingObjects($dashboard_importer->getMissingObjects());
 			}
 		}
 	}
@@ -2861,6 +2934,19 @@ class CConfigurationImport {
 	}
 
 	/**
+	 * Get formatted dashboards.
+	 *
+	 * @return array
+	 */
+	public function getFormattedDashboards(): array {
+		if (!array_key_exists('dashboards', $this->formattedData)) {
+			$this->formattedData['dashboards'] = $this->adapter->getDashboards();
+		}
+
+		return $this->formattedData['dashboards'];
+	}
+
+	/**
 	 * Get formatted items.
 	 *
 	 * @return array
@@ -3231,5 +3317,79 @@ class CConfigurationImport {
 		unset($item_indexes);
 
 		return $tree;
+	}
+
+	private function mergeMissingObjects(array $missing_objets) {
+		$result = [];
+
+		foreach ($missing_objets as $key => $object_data) {
+			$current = array_key_exists($key, $this->missing_objects) ? $this->missing_objects[$key] : [];
+
+			if (count($object_data) > 0) {
+				$result[$key] = array_merge($current, $object_data);
+			}
+			elseif ($current) {
+				$result[$key] = $current;
+			}
+		}
+
+		$this->missing_objects = $result;
+	}
+
+	/**
+	 * Get missing objects that were skipped during import
+	 *
+	 * @return array
+	 */
+	public function getMissingObjects() {
+		return $this->missing_objects;
+	}
+
+	/**
+	 *
+	 *
+	 * @param $missing_objects
+	 * @return string
+	 */
+	public static function missingObjectsToDetailsInfo($missing_objects): string {
+		$details = [];
+
+		$translation_map = [
+			'items' => _('Items'),
+			'actions' => _('Actions'),
+			'mediatypes' =>  _('Media types'),
+			'host' =>  _('Hosts'),
+			'hostgroups' =>  _('Host groups'),
+			'graphs' =>  _('Graphs'),
+			'sysmaps' =>  _('Maps'),
+			'sla' =>  _('SLA'),
+			'services' =>  _('Services'),
+			'users' =>  _('Users')
+		];
+
+		foreach ($missing_objects as $mode => $objects) {
+			$names = [];
+
+			foreach ($objects as $object) {
+				switch ($mode) {
+					case 'items':
+						$names[] = $object['host'].NAME_DELIMITER.$object['key'];
+						break;
+					case 'graphs':
+						$names[] = $object['host'].NAME_DELIMITER.$object['name'];
+						break;
+					case 'hosts':
+						$names[] = $object['host'];
+						break;
+					default:
+						$names[] = $object['name'];
+
+				}
+			}
+
+			$details[] = '- ' . $translation_map[$mode] . ': ' . implode(', ', $names);
+		}
+
+		return implode("\n", $details);
 	}
 }

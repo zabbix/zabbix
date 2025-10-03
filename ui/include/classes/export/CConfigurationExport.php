@@ -63,7 +63,8 @@ class CConfigurationExport {
 			'host_groups' => [],
 			'images' => [],
 			'maps' => [],
-			'mediaTypes' => []
+			'mediaTypes' => [],
+			'dashboards' => []
 		], $options);
 
 		$this->unlink_templates_data = $unlink_templates_data;
@@ -130,7 +131,8 @@ class CConfigurationExport {
 			'graphPrototypes' => [],
 			'images' => [],
 			'maps' => [],
-			'mediaTypes' => []
+			'mediaTypes' => [],
+			'dashboards' => []
 		];
 
 		$this->dataFields = [
@@ -261,6 +263,10 @@ class CConfigurationExport {
 				$this->builder->buildMediaTypes($schema['rules']['media_types'], $this->data['mediaTypes']);
 			}
 
+			if ($this->data['dashboards']) {
+				$this->builder->buildDashboards($schema['rules']['dashboards'], $this->data['dashboards']);
+			}
+
 			return $this->writer->write($this->builder->getExport());
 		}
 		catch (CConfigurationExportException $e) {
@@ -306,6 +312,10 @@ class CConfigurationExport {
 
 		if ($options['mediaTypes'] && CApiService::$userData['type'] == USER_TYPE_SUPER_ADMIN) {
 			$this->gatherMediaTypes($options['mediaTypes']);
+		}
+
+		if ($options['dashboards']) {
+			$this->gatherDashboards($options['dashboards']);
 		}
 	}
 
@@ -493,6 +503,26 @@ class CConfigurationExport {
 	}
 
 	/**
+	 * Get dashboards for export from database.
+	 *
+	 * @param array $dashboardids
+	 */
+	protected function gatherDashboards(array $dashboardids): void {
+		$dashboards = API::Dashboard()->get([
+			'output' => ['name', 'display_period', 'auto_start'],
+			'selectPages' => ['dashboard_pageid', 'name', 'display_period', 'widgets'],
+			'dashboardids' => $dashboardids,
+			'preservekeys' => true
+		]);
+
+		foreach ($dashboards as &$dashboard) {
+			$dashboard['pages'] = $this->prepareDashboardPages($dashboard['pages']);
+		}
+
+		$this->data['dashboards'] = $dashboards;
+	}
+
+	/**
 	 * Get dashboard pages' related objects from database.
 	 *
 	 * @param array $dashboard_pages
@@ -501,6 +531,7 @@ class CConfigurationExport {
 	 */
 	protected function prepareDashboardPages(array $dashboard_pages): array {
 		$hostids = [];
+		$hostgroupids = [];
 		$itemids = [];
 		$graphids = [];
 		$mapids = [];
@@ -515,6 +546,9 @@ class CConfigurationExport {
 			foreach ($dashboard_page['widgets'] as $widget) {
 				foreach ($widget['fields'] as $field) {
 					switch ($field['type']) {
+						case ZBX_WIDGET_FIELD_TYPE_GROUP:
+							$hostgroupids[$field['value']] = true;
+							break;
 						case ZBX_WIDGET_FIELD_TYPE_HOST:
 							$hostids[$field['value']] = true;
 							break;
@@ -558,6 +592,7 @@ class CConfigurationExport {
 		}
 
 		$hosts = $this->getHostsReferences(array_keys($hostids));
+		$host_groups = $this->getHostGroupsReferences(array_keys($hostgroupids));
 		$items = $this->getItemsReferences(array_keys($itemids));
 		$graphs = $this->getGraphsReferences(array_keys($graphids));
 		$sysmaps = $this->getMapsReferences(array_keys($mapids));
@@ -572,6 +607,9 @@ class CConfigurationExport {
 			foreach ($dashboard_page['widgets'] as &$widget) {
 				foreach ($widget['fields'] as &$field) {
 					switch ($field['type']) {
+						case ZBX_WIDGET_FIELD_TYPE_GROUP:
+							$field['value'] = $host_groups[$field['value']];
+							break;
 						case ZBX_WIDGET_FIELD_TYPE_HOST:
 							$field['value'] = $hosts[$field['value']];
 							break;
@@ -1770,6 +1808,34 @@ class CConfigurationExport {
 
 		foreach ($hosts as $id => $host) {
 			$ids[$id] = ['host' => $host['host']];
+		}
+
+		return $ids;
+	}
+
+	/**
+	 * Get host group references by host group IDs.
+	 *
+	 * @param array $groupIds
+	 *
+	 * @return array
+	 */
+	protected function getHostGroupsReferences(array $groupIds) {
+		$ids = [];
+
+		$groups = API::HostGroup()->get([
+			'groupids' => $groupIds,
+			'output' => ['name'],
+			'preservekeys' => true
+		]);
+
+		// Access denied for some objects?
+		if (count($groups) != count($groupIds)) {
+			throw new CConfigurationExportException();
+		}
+
+		foreach ($groups as $id => $group) {
+			$ids[$id] = ['name' => $group['name']];
 		}
 
 		return $ids;

@@ -4095,20 +4095,37 @@ z-select {
 }
 
 .import-compare {
+	height: calc(100vh - 224px);
+	max-height: calc(100vh - 224px);
 	display: flex;
-	max-height: calc(100vh - 220px);
+	flex-direction: column;
 
-	.toc {
-		flex: 20%;
-		overflow-y: auto;
-		overflow-x: hidden;
-	}
+	.import-compare-blocks {
+		position: relative;
+		flex-grow: 1;
 
-	.diff {
-		flex: 80%;
-		margin-left: 5px;
-		overflow: auto;
-		border: 1px dashed $form-border-color;
+		& > div {
+			position: absolute;
+			top: 0;
+			bottom: 0;
+			height: auto;
+			width: 100%;
+			display: flex;
+			flex-direction: row;
+		}
+
+		.toc {
+			width: 20%;
+			overflow-y: auto;
+			overflow-x: hidden;
+		}
+
+		.diff {
+			width: 80%;
+			margin-left: 5px;
+			overflow: auto;
+			border: 1px dashed $form-border-color;
+		}
 	}
 
 	.toc,

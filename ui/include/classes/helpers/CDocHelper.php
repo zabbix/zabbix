@@ -121,6 +121,7 @@ class CDocHelper {
 	const MONITORING_WEB_VIEW =									'web_interface/frontend_sections/monitoring/hosts/web';
 	const POPUP_ACKNOWLEDGMENT_EDIT =							'acknowledgment#updating-problems';
 	const POPUP_CONNECTOR_EDIT =								'config/export/streaming#configuration';
+	const POPUP_DASHBOARD_IMPORT =								'xml_export_import/dashboards#importing';
 	const POPUP_HOST_IMPORT =									'xml_export_import/hosts#importing';
 	const POPUP_HTTP_STEP_EDIT =								'web_monitoring#configuring-steps';
 	const POPUP_MAPS_IMPORT =									'xml_export_import/maps#importing';

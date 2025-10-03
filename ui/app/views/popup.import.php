@@ -38,7 +38,8 @@ $titles = [
 	'httptests' => _('Web scenarios'),
 	'maps' => _('Maps'),
 	'images' => _('Images'),
-	'mediaTypes' => _('Media types')
+	'mediaTypes' => _('Media types'),
+	'dashboards' => _('Dashboards')
 ];
 
 switch ($data['rules_preset']) {
@@ -53,6 +54,9 @@ switch ($data['rules_preset']) {
 		break;
 	case 'mediatype':
 		$doc_url = CDocHelper::POPUP_MEDIA_IMPORT;
+		break;
+	case 'dashboard':
+		$doc_url = CDocHelper::POPUP_DASHBOARD_IMPORT;
 		break;
 	}
 
@@ -177,7 +181,9 @@ $output = [
 			'class' => '',
 			'keepOpen' => true,
 			'isSubmit' => true,
-			'action' => 'popup_import.submitPopup();'
+			 'action' => $data['submit_compare']
+				? 'popup_import.openImportComparePopup();'
+				: 'popup_import.submitPopup();'
 		]
 	],
 	'script_inline' => getPagePostJs().
