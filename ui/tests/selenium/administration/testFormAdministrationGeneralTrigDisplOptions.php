@@ -786,10 +786,10 @@ class testFormAdministrationGeneralTrigDisplOptions extends testFormAdministrati
 			'severity_color_1', 'severity_color_2', 'severity_color_3', 'severity_color_4', 'severity_color_5'
 		];
 		foreach ($color_picker_names as $field_name) {
-			$this->query('xpath:.//z-color-picker[@color-field-name='.CXPathHelper::escapeQuotes($field_name).']')
-					->one()->click();
-			CColorPickerElement::find()->query('class:color-picker-input')->one()->fill($data['value']);
-			$this->assertTrue(CColorPickerElement::find()->isSubmittionDisabled());
+			$overlay = $form->query('xpath:.//z-color-picker[@color-field-name='.CXPathHelper::escapeQuotes($field_name).']')
+					->asColorPicker()->one()->open();
+			$overlay->query('class:color-picker-input')->one()->fill($data['value']);
+			$this->assertTrue(CColorPickerElement::isSubmitable(false));
 			CColorPickerElement::close();
 		}
 	}

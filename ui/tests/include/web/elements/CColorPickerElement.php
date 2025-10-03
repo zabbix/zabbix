@@ -151,7 +151,7 @@ class CColorPickerElement extends CElement {
 	 *
 	 * @return boolean
 	 */
-	public function isSubmitable($submitable = true) {
+	public static function isSubmitable($submitable = true) {
 		$dialog = (new CElementQuery('id:color_picker'))->one();
 		$clickable = $dialog->query('button:Apply')->one()->isClickable();
 
