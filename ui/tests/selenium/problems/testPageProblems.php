@@ -1123,7 +1123,7 @@ class testPageProblems extends CWebTest {
 						'Acknowledgement status' => 'Unacknowledged',
 						'Host inventory' => [
 							'action' => USER_ACTION_UPDATE, 'index' => 0,
-							'field' => 'Location latitude', 'value' => '56.95387'
+							'field' => 'Location latitude', 'value' => '56.97612'
 						],
 						'Show tags' => 3,
 						'id:tag_name_format_0' => 'Shortened',
