@@ -16,13 +16,12 @@
 
 class CControllerPopupServiceStatusRuleEdit extends CController {
 
-	protected function init() {
+	protected function init(): void {
 		$this->disableCsrfValidation();
 	}
 
 	protected function checkInput(): bool {
 		$fields = [
-			'form_refresh' => 	'int32',
 			'edit' => 			'in 1',
 			'row_index' =>		'required|int32',
 			'new_status' =>		'in '.implode(',', array_keys(CServiceHelper::getProblemStatusNames())),
@@ -64,7 +63,10 @@ class CControllerPopupServiceStatusRuleEdit extends CController {
 			'form' => $form,
 			'user' => [
 				'debug_mode' => $this->getDebugMode()
-			]
+			],
+			'js_validation_rules' => (new CFormValidator(
+				CControllerServiceStatusRuleValidate::getValidationRules())
+			)->getRules()
 		];
 
 		$this->setResponse(new CControllerResponseData($data));

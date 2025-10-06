@@ -174,7 +174,7 @@ class testFormGraphPrototype extends testFormGraphs {
 					'expected' => TEST_BAD,
 					'fields' => [
 						'Name' => 'Exploded graph prototype duplicated Graph sum type',
-						'Graph type' => 'Exploded'
+						'Graph type' => CFormElement::RELOADABLE_FILL('Exploded')
 					],
 					'items' => [
 						[
@@ -216,7 +216,7 @@ class testFormGraphPrototype extends testFormGraphs {
 					'expected' => TEST_BAD,
 					'fields' => [
 						'Name' => 'Exploded graph prototype duplicated Graph sum type mixed',
-						'Graph type' => 'Exploded'
+						'Graph type' => CFormElement::RELOADABLE_FILL('Exploded')
 					],
 					'items' => [
 						[

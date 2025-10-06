@@ -207,6 +207,7 @@ class testFormUser extends CWebTest {
 			}
 
 			$form->query('button:Change password')->one()->click();
+			$form->waitUntilReloaded();
 			$this->assertFalse($form->query('button:Change password')->one(false)->isValid());
 		}
 
@@ -902,7 +903,7 @@ class testFormUser extends CWebTest {
 
 		if (array_key_exists('role', $data)) {
 			$form->selectTab('Permissions');
-			$form->fill(['Role' => $data['role']]);
+			$form->fill(['Role' => $data['role']])->waitUntilStalled();
 		}
 
 		$form->submit();
