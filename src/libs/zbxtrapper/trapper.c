@@ -49,10 +49,8 @@
 #include "zbxvault.h"
 #include "zbxautoreg.h"
 #include "zbxrtc.h"
-
+#include "zbx_rtc_constants.h"
 #ifdef HAVE_NETSNMP
-
-#	include "zbx_rtc_constants.h"
 #	include "zbxipcservice.h"
 #endif
 
