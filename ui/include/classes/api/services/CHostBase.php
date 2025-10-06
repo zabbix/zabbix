@@ -1454,7 +1454,6 @@ abstract class CHostBase extends CApiService {
 
 	private static function deleteHostTemplateCache(array $del_template_host_links,
 			array $ins_template_host_links): void {
-
 		self::loadAncestorLinks($del_template_host_links, $template_hosts, $vertices, $ins_template_host_links);
 
 		if (self::isTemplate()) {
@@ -1480,7 +1479,7 @@ abstract class CHostBase extends CApiService {
 					];
 
 					foreach ($links as $templateid => $true) {
-						$del_host_template_cache[$hostid]['link_hostid'][] = $templateid;
+						$del_host_template_cache[$key]['link_hostid'][] = $templateid;
 					}
 				}
 			}
