@@ -15,6 +15,7 @@
 
 
 use Widgets\TopItems\Includes\CWidgetFieldColumnsList;
+use Widgets\TopItems\Widget;
 
 ?>
 
@@ -140,23 +141,22 @@ window.topitems_column_edit_form = new class {
 	 */
 	#updateForm() {
 		const display_value_as = parseInt(this.#form.querySelector('[name="display_value_as"]:checked').value);
+		const display_value_as_numeric = display_value_as === <?= CWidgetFieldColumnsList::DISPLAY_VALUE_AS_NUMERIC ?>;
 		const display = parseInt(this.#form.querySelector('[name="display"]:checked').value);
 		const aggregate_grouping = parseInt(this.#form.querySelector('[name="aggregate_grouping"]:checked').value);
 		const item_aggregate_function = parseInt(this.#form.querySelector('[name="aggregate_function"]').value);
 
 		// Display.
-		const display_show = display_value_as == <?= CWidgetFieldColumnsList::DISPLAY_VALUE_AS_NUMERIC ?>;
 		for (const element of this.#form.querySelectorAll('.js-display-row')) {
-			element.style.display = display_show ? '' : 'none';
+			element.style.display = display_value_as_numeric ? '' : 'none';
 
 			for (const input of element.querySelectorAll('input')) {
-				input.disabled = !display_show;
+				input.disabled = !display_value_as_numeric;
 			}
 		}
 
 		// Sparkline.
-		const sparkline_show = display_value_as == <?= CWidgetFieldColumnsList::DISPLAY_VALUE_AS_NUMERIC ?>
-			&& display == <?= CWidgetFieldColumnsList::DISPLAY_SPARKLINE ?>;
+		const sparkline_show = display_value_as_numeric && display === <?= CWidgetFieldColumnsList::DISPLAY_SPARKLINE ?>;
 
 		for (const element of this.#form.querySelectorAll('.js-sparkline-row')) {
 			element.style.display = sparkline_show ? '' : 'none';
@@ -165,14 +165,14 @@ window.topitems_column_edit_form = new class {
 				input.disabled = !sparkline_show;
 			}
 		}
-
 		this.#form.fields['sparkline[time_period]'].disabled = !sparkline_show;
 
 		// Min/Max.
-		const min_max_show = display_value_as == <?= CWidgetFieldColumnsList::DISPLAY_VALUE_AS_NUMERIC ?>  && [
-			'<?= CWidgetFieldColumnsList::DISPLAY_BAR ?>',
-			'<?= CWidgetFieldColumnsList::DISPLAY_INDICATORS ?>'
+		const min_max_show = display_value_as_numeric && [
+			<?= CWidgetFieldColumnsList::DISPLAY_BAR ?>,
+			<?= CWidgetFieldColumnsList::DISPLAY_INDICATORS ?>
 		].includes(display);
+
 		for (const element of this.#form.querySelectorAll('.js-min-max-row')) {
 			element.style.display = min_max_show ? '' : 'none';
 
@@ -182,45 +182,40 @@ window.topitems_column_edit_form = new class {
 		}
 
 		// Highlights.
-		const highlights_show = display_value_as == <?= CWidgetFieldColumnsList::DISPLAY_VALUE_AS_TEXT ?>;
 		for (const element of this.#form.querySelectorAll('.js-highlights-row')) {
-			element.style.display = highlights_show ? '' : 'none';
+			element.style.display = !display_value_as_numeric ? '' : 'none';
 
 			for (const input of element.querySelectorAll('input')) {
-				input.disabled = !highlights_show;
+				input.disabled = display_value_as_numeric;
 			}
 		}
 
 		// Thresholds.
-		const thresholds_show = display_value_as == <?= CWidgetFieldColumnsList::DISPLAY_VALUE_AS_NUMERIC ?>;
 		for (const element of this.#form.querySelectorAll('.js-thresholds-row')) {
-			element.style.display = thresholds_show ? '' : 'none';
+			element.style.display = display_value_as_numeric ? '' : 'none';
 
 			for (const input of element.querySelectorAll('input')) {
-				input.disabled = !thresholds_show;
+				input.disabled = !display_value_as_numeric;
 			}
 		}
 
 		// Decimal places.
-		const decimals_show = display_value_as == <?= CWidgetFieldColumnsList::DISPLAY_VALUE_AS_NUMERIC ?>;
 		for (const element of this.#form.querySelectorAll('.js-decimals-row')) {
-			element.style.display = decimals_show ? '' : 'none';
+			element.style.display = display_value_as_numeric ? '' : 'none';
 
 			for (const input of element.querySelectorAll('input')) {
-				input.disabled = !decimals_show;
+				input.disabled = !display_value_as_numeric;
 			}
 		}
 
 		// Aggregation function.
 		const aggregation_function_select = this.#form.querySelector('z-select[name=aggregate_function]');
-		[<?= AGGREGATE_MIN ?>, <?= AGGREGATE_MAX ?>, <?= AGGREGATE_AVG ?>, <?= AGGREGATE_SUM ?>].forEach(option => {
-			aggregation_function_select.getOptionByValue(option).disabled =
-				display_value_as != <?= CWidgetFieldColumnsList::DISPLAY_VALUE_AS_NUMERIC ?>;
-			aggregation_function_select.getOptionByValue(option).hidden =
-				display_value_as != <?= CWidgetFieldColumnsList::DISPLAY_VALUE_AS_NUMERIC ?>;
 
-			if (aggregation_function_select.value == option
-					&& display_value_as != <?= CWidgetFieldColumnsList::DISPLAY_VALUE_AS_NUMERIC ?>) {
+		[<?= AGGREGATE_MIN ?>, <?= AGGREGATE_MAX ?>, <?= AGGREGATE_AVG ?>, <?= AGGREGATE_SUM ?>].forEach(option => {
+			aggregation_function_select.getOptionByValue(option).disabled = !display_value_as_numeric;
+			aggregation_function_select.getOptionByValue(option).hidden = !display_value_as_numeric;
+
+			if (aggregation_function_select.value == option && !display_value_as_numeric) {
 				aggregation_function_select.value = <?= AGGREGATE_NONE ?>;
 			}
 		});
@@ -231,7 +226,7 @@ window.topitems_column_edit_form = new class {
 		this.#form.fields.time_period.hidden = !time_period_show;
 
 		// History data.
-		const history_show = display_value_as == <?= CWidgetFieldColumnsList::DISPLAY_VALUE_AS_NUMERIC ?>;
+		const history_show = display_value_as_numeric;
 		for (const element of this.#form.querySelectorAll('.js-history-row')) {
 			element.style.display = history_show ? '' : 'none';
 
@@ -243,9 +238,7 @@ window.topitems_column_edit_form = new class {
 		// Combined fields.
 		const display_sparkline = display === <?= CWidgetFieldColumnsList::DISPLAY_SPARKLINE ?>;
 		const aggregate_grouping_show = (item_aggregate_function === <?= AGGREGATE_COUNT ?> ||
-			(display_value_as === <?= CWidgetFieldColumnsList::DISPLAY_VALUE_AS_NUMERIC ?> &&
-			item_aggregate_function !== <?= AGGREGATE_NONE ?>)) &&
-			!display_sparkline;
+			(display_value_as_numeric && item_aggregate_function !== <?= AGGREGATE_NONE ?>)) && !display_sparkline;
 
 		for (const element of this.#form.querySelectorAll('.js-aggregate-grouping-row')) {
 			element.style.display = aggregate_grouping_show ? '' : 'none';
@@ -256,8 +249,7 @@ window.topitems_column_edit_form = new class {
 		}
 
 		const combined_fields_show = aggregate_grouping_show &&
-			aggregate_grouping === <?= TOP_ITEMS_AGGREGATE_COMBINED ?> &&
-			!display_sparkline;
+			aggregate_grouping === <?= Widget::TOP_ITEMS_AGGREGATE_COMBINED ?> && !display_sparkline;
 
 		for (const element of this.#form.querySelectorAll('.js-combined-row')) {
 			element.style.display = combined_fields_show ? '' : 'none';

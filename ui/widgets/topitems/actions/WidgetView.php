@@ -295,8 +295,8 @@ class WidgetView extends CControllerDashboardWidgetView {
 
 		$items = API::Item()->get($options);
 
-		if ($column['aggregate_grouping'] === TOP_ITEMS_AGGREGATE_COMBINED &&
-				$column['combined_aggregate_function'] !== AGGREGATE_NONE) {
+		if ($items && $column['aggregate_grouping'] === Widget::TOP_ITEMS_AGGREGATE_COMBINED
+				&& $column['combined_aggregate_function'] !== AGGREGATE_NONE) {
 			$itemid = array_key_first($items);
 
 			$items = [$itemid => $items[$itemid]];
@@ -326,8 +326,8 @@ class WidgetView extends CControllerDashboardWidgetView {
 				$column['time_period']['to_ts']
 			);
 
-			if ($values && $column['aggregate_grouping'] === TOP_ITEMS_AGGREGATE_COMBINED &&
-					$column['combined_aggregate_function'] !== AGGREGATE_NONE) {
+			if ($values && $column['aggregate_grouping'] === Widget::TOP_ITEMS_AGGREGATE_COMBINED
+					&& $column['combined_aggregate_function'] !== AGGREGATE_NONE) {
 				$itemid = array_key_first($values);
 				$values = array_column($values, 'value');
 

@@ -20,7 +20,7 @@
  */
 
 use Widgets\TopItems\Includes\CWidgetFieldColumnsList;
-use Zabbix\Widgets\Fields\CWidgetFieldRadioButtonList;
+use Widgets\TopItems\Widget;
 use Zabbix\Widgets\Fields\CWidgetFieldSparkline;
 
 $form = (new CForm())
@@ -224,17 +224,16 @@ $form_grid->addItem([
 $advanced_configuration = new CWidgetFormFieldsetCollapsibleView(_('Advanced configuration'));
 
 // History data.
-$advanced_configuration
-	->addItem([
-		(new CLabel(_('History data'), 'history'))->addClass('js-history-row'),
-		(new CFormField(
-			(new CRadioButtonList('history', (int) $data['history']))
-				->addValue(_('Auto'), CWidgetFieldColumnsList::HISTORY_DATA_AUTO)
-				->addValue(_('History'), CWidgetFieldColumnsList::HISTORY_DATA_HISTORY)
-				->addValue(_('Trends'), CWidgetFieldColumnsList::HISTORY_DATA_TRENDS)
-				->setModern()
-		))->addClass('js-history-row')
-	]);
+$advanced_configuration->addItem([
+	(new CLabel(_('History data'), 'history'))->addClass('js-history-row'),
+	(new CFormField(
+		(new CRadioButtonList('history', (int) $data['history']))
+			->addValue(_('Auto'), CWidgetFieldColumnsList::HISTORY_DATA_AUTO)
+			->addValue(_('History'), CWidgetFieldColumnsList::HISTORY_DATA_HISTORY)
+			->addValue(_('Trends'), CWidgetFieldColumnsList::HISTORY_DATA_TRENDS)
+			->setModern()
+	))->addClass('js-history-row')
+]);
 
 // Aggregation function.
 $advanced_configuration->addItem([
@@ -274,31 +273,32 @@ foreach ($time_period_field_view->getViewCollection() as ['label' => $label, 'vi
 	]);
 }
 
-// Aggregate.
-$aggregate_field_view = (new CWidgetFieldRadioButtonListView(
-	(new CWidgetFieldRadioButtonList('aggregate_grouping', _('Aggregate'), [
-		TOP_ITEMS_AGGREGATE_BY_ITEM => _('Each item'),
-		TOP_ITEMS_AGGREGATE_COMBINED => _('Combined')
-	]))->setValue($data['aggregate_grouping'])
-		->setDefault(TOP_ITEMS_AGGREGATE_BY_ITEM)
-))->setFieldHint(makeHelpIcon(new CDiv([
-	new CDiv(_('Each item - aggregates values for each item, with each result presented in a separate cell.')),
-	new CDiv(_('Combined - aggregates values for each item, then aggregates the results in a single value presented in a single cell.'))
-])));
+$advanced_configuration->addItem(new CScriptTag([
+	'document.forms.topitems_column.fields = {};',
+	$time_period_field_view->getJavaScript()
+]));
 
-foreach ($aggregate_field_view->getViewCollection() as ['label' => $label, 'view' => $view, 'class' => $class]) {
-	$advanced_configuration->addItem([
-		$label->addClass('js-aggregate-grouping-row'),
-		(new CFormField($view))->addClass($class)
-			->addClass('js-aggregate-grouping-row')
-	]);
-}
+// Aggregate.
+$advanced_configuration->addItem([
+	(new CLabel([
+		_('Aggregate'),
+		makeHelpIcon(new CDiv([
+			new CDiv(_('Each item - aggregates values for each item, with each result presented in a separate cell.')),
+			new CDiv(_('Combined - aggregates values for each item, then aggregates the results in a single value presented in a single cell.'))
+		]))
+	], 'aggregate_grouping'))->addClass('js-aggregate-grouping-row'),
+	(new CFormField(
+		(new CRadioButtonList('aggregate_grouping', (int) $data['aggregate_grouping']))
+			->addValue(_('Each item'), Widget::TOP_ITEMS_AGGREGATE_BY_ITEM)
+			->addValue(_('Combined'), Widget::TOP_ITEMS_AGGREGATE_COMBINED)
+			->setModern()
+	))->addClass('js-aggregate-grouping-row')
+]);
 
 // Combined aggregation function.
 $advanced_configuration->addItem([
-	(new CLabel(_('Combined aggregation function'), 'combined_aggregate_function'))
-		->addClass('js-combined-row'),
-	new CFormField(
+	(new CLabel(_('Combined aggregation function'), 'combined_aggregate_function'))->addClass('js-combined-row'),
+	(new CFormField(
 		(new CSelect('combined_aggregate_function'))
 			->setId('combined_aggregate_function')
 			->setValue($data['combined_aggregate_function'])
@@ -311,8 +311,7 @@ $advanced_configuration->addItem([
 				AGGREGATE_SUM => CItemHelper::getAggregateFunctionName(AGGREGATE_SUM)
 			]))
 			->setFocusableElementId('combined_aggregate_function')
-			->addClass('js-combined-row')
-	)
+	))->addClass('js-combined-row')
 ]);
 
 // Combined column name.
@@ -324,11 +323,6 @@ $advanced_configuration->addItem([
 		(new CTextBox('combined_column_name', $data['combined_column_name']))
 	))->addClass('js-combined-row')
 ]);
-
-$advanced_configuration->addItem(new CScriptTag([
-	'document.forms.topitems_column.fields = {};',
-	$time_period_field_view->getJavaScript()
-]));
 
 $form_grid->addItem($advanced_configuration);
 

@@ -28,6 +28,9 @@ class Widget extends CWidget {
 	public const CELL_METADATA = 3;
 	public const CELL_SPARKLINE_VALUE = 4;
 
+	public const TOP_ITEMS_AGGREGATE_BY_ITEM = 0;
+	public const TOP_ITEMS_AGGREGATE_COMBINED = 1;
+
 	public function getDefaultName(): string {
 		return _('Top items');
 	}

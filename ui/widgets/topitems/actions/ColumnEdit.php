@@ -23,6 +23,7 @@ use CController,
 	CWidgetsData;
 
 use Widgets\TopItems\Includes\CWidgetFieldColumnsList;
+use Widgets\TopItems\Widget;
 use Zabbix\Widgets\CWidgetField;
 
 use Zabbix\Widgets\Fields\{
@@ -210,7 +211,7 @@ class ColumnEdit extends CController {
 					)
 				],
 				'history' => CWidgetFieldColumnsList::HISTORY_DATA_AUTO,
-				'aggregate_grouping' => TOP_ITEMS_AGGREGATE_BY_ITEM,
+				'aggregate_grouping' => Widget::TOP_ITEMS_AGGREGATE_BY_ITEM,
 				'combined_aggregate_function' => AGGREGATE_SUM,
 				'combined_column_name' => ''
 			];

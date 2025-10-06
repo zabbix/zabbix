@@ -18,6 +18,7 @@ namespace Widgets\TopItems\Includes;
 
 use CWidgetsData;
 use DB;
+use Widgets\TopItems\Widget;
 use Zabbix\Widgets\CWidgetField;
 use Zabbix\Widgets\Fields\CWidgetFieldTimePeriod;
 use Zabbix\Widgets\Fields\CWidgetFieldSparkline;
@@ -193,7 +194,7 @@ class CWidgetFieldColumnsList extends CWidgetField {
 				)
 			],
 			'history' => CWidgetFieldColumnsList::HISTORY_DATA_AUTO,
-			'aggregate_grouping' => TOP_ITEMS_AGGREGATE_BY_ITEM,
+			'aggregate_grouping' => Widget::TOP_ITEMS_AGGREGATE_BY_ITEM,
 			'combined_aggregate_function' => AGGREGATE_SUM,
 			'combined_column_name' => ''
 		];
@@ -315,15 +316,15 @@ class CWidgetFieldColumnsList extends CWidgetField {
 				'color'							=> ['type' => API_COLOR, 'flags' => API_REQUIRED | API_NOT_EMPTY],
 				'threshold'						=> ['type' => API_NUMERIC]
 			]],
-			'aggregate_grouping'			=> ['type' => API_INT32, 'in' => implode(',', [TOP_ITEMS_AGGREGATE_BY_ITEM, TOP_ITEMS_AGGREGATE_COMBINED]), 'default' => TOP_ITEMS_AGGREGATE_BY_ITEM],
+			'aggregate_grouping'			=> ['type' => API_INT32, 'in' => implode(',', [Widget::TOP_ITEMS_AGGREGATE_BY_ITEM, Widget::TOP_ITEMS_AGGREGATE_COMBINED]), 'default' => Widget::TOP_ITEMS_AGGREGATE_BY_ITEM],
 			'combined_aggregate_function'	=> ['type' => API_MULTIPLE, 'rules' => [
-													['if' => ['field' => 'aggregate_grouping', 'type' => API_INT32, 'in' => TOP_ITEMS_AGGREGATE_COMBINED, 'default' => TOP_ITEMS_AGGREGATE_BY_ITEM],
+													['if' => ['field' => 'aggregate_grouping', 'type' => API_INT32, 'in' => Widget::TOP_ITEMS_AGGREGATE_COMBINED, 'default' => Widget::TOP_ITEMS_AGGREGATE_BY_ITEM],
 														'type' => API_INT32, 'in' => implode(',', [AGGREGATE_NONE, AGGREGATE_MIN, AGGREGATE_MAX, AGGREGATE_AVG, AGGREGATE_COUNT, AGGREGATE_SUM]), 'default' => AGGREGATE_SUM, 'flags' => API_REQUIRED | API_NOT_EMPTY],
 													['else' => AGGREGATE_NONE,
 														'type' => API_INT32]
 			]],
 			'combined_column_name'			=> ['type' => API_MULTIPLE, 'rules' => [
-													['if' => ['field' => 'aggregate_grouping', 'type' => API_INT32, 'in' => TOP_ITEMS_AGGREGATE_COMBINED, 'default' => TOP_ITEMS_AGGREGATE_BY_ITEM],
+													['if' => ['field' => 'aggregate_grouping', 'type' => API_INT32, 'in' => Widget::TOP_ITEMS_AGGREGATE_COMBINED, 'default' => Widget::TOP_ITEMS_AGGREGATE_BY_ITEM],
 														'type' => API_STRING_UTF8, 'default' => '', 'flags' => API_REQUIRED | API_NOT_EMPTY],
 													['else' => '',
 														'type' => API_STRING_UTF8]
