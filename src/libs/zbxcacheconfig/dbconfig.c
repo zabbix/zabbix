@@ -160,7 +160,12 @@ int	zbx_get_sync_in_progress(void)
 	return sync_in_progress;
 }
 
-#define START_SYNC	do { WRLOCK_CACHE_CONFIG_HISTORY; WRLOCK_CACHE; sync_in_progress = 1; } while(0)
+void	zbx_start_sync(void)
+{
+	sync_in_progress = 1;
+}
+
+#define START_SYNC	do { WRLOCK_CACHE_CONFIG_HISTORY; WRLOCK_CACHE; } while(0)
 #define FINISH_SYNC	do { sync_in_progress = 0; UNLOCK_CACHE; UNLOCK_CACHE_CONFIG_HISTORY; } while(0)
 
 #define ZBX_SNMP_OID_TYPE_NORMAL	0
