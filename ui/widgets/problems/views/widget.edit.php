@@ -83,6 +83,9 @@ $form
 		new CWidgetFieldCheckBoxView($data['fields']['show_timeline'])
 	)
 	->addField(
+		(new CWidgetFieldCheckBoxView($data['fields']['highlight_row']))->addRowClass(ZBX_STYLE_FILTER_HIGHLIGHT_ROW_CB)
+	)
+	->addField(
 		new CWidgetFieldIntegerBoxView($data['fields']['show_lines'])
 	)
 	->includeJsFile('widget.edit.js.php')

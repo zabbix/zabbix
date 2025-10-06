@@ -275,7 +275,7 @@ class testFormGraphs extends CWebTest {
 		$object = 'Graph'.$this->getGraphSuffix();
 		$this->query('button', 'Create '.lcfirst($object))->waitUntilClickable()->one()->click();
 		$this->page->assertTitle('Configuration of '.lcfirst($object).'s');
-		$dialog = COverlayDialogElement::find()->one();
+		$dialog = COverlayDialogElement::find()->one()->waitUntilReady();
 		$form = $dialog->query('id', $this->formid)->waitUntilVisible()->asForm()->one();
 
 		// Check default fields only for first case.

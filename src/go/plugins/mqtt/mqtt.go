@@ -156,10 +156,10 @@ func (p *Plugin) EventSourceByKey(rawKey string) (watch.EventSource, error) {
 		password,
 		b,
 		&tlsconfig.Details{
-			TlsCaFile:   params["TLSCAFile"],
-			TlsCertFile: params["TLSCertFile"],
-			TlsKeyFile:  params["TLSKeyFile"],
-			RawUri:      u.String(),
+			TLSCaFile:   params["TLSCAFile"],
+			TLSCertFile: params["TLSCertFile"],
+			TLSKeyFile:  params["TLSKeyFile"],
+			RawURI:      u.String(),
 		},
 	)
 	if err != nil {
@@ -471,16 +471,16 @@ func newClient(options *mqtt.ClientOptions) (mqtt.Client, error) {
 }
 
 func getTLSConfig(d *tlsconfig.Details) (*tls.Config, error) {
-	if d.TlsCaFile == "" && d.TlsCertFile == "" && d.TlsKeyFile == "" {
+	if d.TLSCaFile == "" && d.TLSCertFile == "" && d.TLSKeyFile == "" {
 		return nil, nil //nolint:nilnil // this case makes sense for such behavior because no tls should be created.
 	}
 
 	config, err := tlsconfig.CreateConfig(
 		tlsconfig.Details{
-			TlsCaFile:   d.TlsCaFile,
-			TlsCertFile: d.TlsCertFile,
-			TlsKeyFile:  d.TlsKeyFile,
-			RawUri:      d.RawUri,
+			TLSCaFile:   d.TLSCaFile,
+			TLSCertFile: d.TLSCertFile,
+			TLSKeyFile:  d.TLSKeyFile,
+			RawURI:      d.RawURI,
 		},
 		false,
 	)
