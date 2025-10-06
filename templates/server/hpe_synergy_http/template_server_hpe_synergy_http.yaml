@@ -7017,7 +7017,6 @@ zabbix_export:
           value: synergy
       macros:
         - macro: '{$HPE.SYNERGY.API.HOST}'
-          value: '<SET API HOST>'
           description: 'The hostname or IP address of the API host.'
         - macro: '{$HPE.SYNERGY.API.LOGIN_DOMAIN}'
           value: LOCAL
