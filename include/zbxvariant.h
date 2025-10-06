@@ -48,7 +48,7 @@ struct zbx_variant
 {
 	unsigned char		type;
 	zbx_variant_data_t	data;
-	unsigned char		flags;
+	unsigned char		flags; /* used for processing */
 };
 
 #define ZBX_VARIANT_NONE	0
@@ -59,6 +59,7 @@ struct zbx_variant
 #define ZBX_VARIANT_VECTOR	5
 #define ZBX_VARIANT_ERR		6
 
+/* Used for passing empty variant when there is a need to clear previous error. */
 #define ZBX_VARIANT_FLAG_CHANGED	1
 
 void		zbx_variant_clear(zbx_variant_t *value);

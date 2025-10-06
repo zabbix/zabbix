@@ -701,7 +701,8 @@ int	zbx_variant_compare(const zbx_variant_t *value1, const zbx_variant_t *value2
  *                                                                            *
  * Comments: This function checks if two variants are of the same type and    *
  *           have identical content. For string, error, binary, and vector    *
- *           types, it checks if they point to the same memory location.      *
+ *           types, it checks if they point to the same memory location. It   *
+ *           does not compare flags used in processing.                       *
  *                                                                            *
  ******************************************************************************/
 int	zbx_variant_same(const zbx_variant_t *value1, const zbx_variant_t *value2)
