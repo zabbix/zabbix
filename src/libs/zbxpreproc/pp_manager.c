@@ -1120,7 +1120,7 @@ static void	preprocessor_reply_top_stats(zbx_pp_manager_t *manager, zbx_ipc_clie
 	zbx_ipc_client_send(client, ZBX_IPC_PREPROCESSOR_TOP_STATS_RESULT, data, data_len);
 
 	zbx_free(data);
-	zbx_vector_pp_top_stats_ptr_clear_ext(&stats, (zbx_pp_top_stats_ptr_free_func_t)zbx_ptr_free);
+	zbx_vector_pp_top_stats_ptr_clear_ext(&stats, zbx_pp_top_stats_free);
 	zbx_vector_pp_top_stats_ptr_destroy(&stats);
 }
 

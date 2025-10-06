@@ -46,6 +46,11 @@ static void	diag_add_preproc_sequences(struct zbx_json *json, const char *field,
 	zbx_json_close(json);
 }
 
+void    zbx_pp_top_stats_free(zbx_pp_top_stats_t *pts)
+{
+	zbx_free(pts);
+}
+
 /******************************************************************************
  *                                                                            *
  * Purpose: add requested preprocessing diagnostic information to json data   *
@@ -174,8 +179,7 @@ int	zbx_diag_add_preproc_info(const struct zbx_json_parse *jp, struct zbx_json *
 
 				diag_add_preproc_sequences(json, map->name, name, &stats);
 
-				zbx_vector_pp_top_stats_ptr_clear_ext(&stats,
-						(zbx_pp_top_stats_ptr_free_func_t)(zbx_ptr_free));
+				zbx_vector_pp_top_stats_ptr_clear_ext(&stats, zbx_pp_top_stats_free);
 				zbx_vector_pp_top_stats_ptr_destroy(&stats);
 			}
 
