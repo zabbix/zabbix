@@ -959,6 +959,12 @@ const char	*dc_strpool_acquire(const char *str)
 
 int	dc_strpool_replace(int found, const char **curr, const char *new_str)
 {
+	if (0 == sync_in_progress)
+	{
+		THIS_SHOULD_NEVER_HAPPEN;
+		exit(EXIT_FAILURE);
+	}
+
 	if (1 == found && NULL != *curr)
 	{
 		if (0 == strcmp(*curr, new_str))
