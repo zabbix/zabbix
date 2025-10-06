@@ -279,6 +279,7 @@ class CControllerHostPrototypeEdit extends CController {
 			$data['host_prototype']['groupPrototypes'] = $group_prototypes;
 			$data['host_prototype']['tags'] = $this->getInput('tags', []);
 			$data['host_prototype']['status'] = $this->getInput('status', HOST_STATUS_NOT_MONITORED);
+			$data['host_prototype']['inventory_mode'] = $this->getInput('inventory_mode', HOST_INVENTORY_DISABLED);
 			$data['host_prototype']['discover'] = $this->getInput('discover', ZBX_PROTOTYPE_NO_DISCOVER);
 			$data['host_prototype']['custom_interfaces'] = $this->getInput('custom_interfaces',
 				DB::getDefault('hosts', 'custom_interfaces')
