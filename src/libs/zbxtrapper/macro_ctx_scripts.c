@@ -149,12 +149,12 @@ static int	macro_host_script_resolv(zbx_macro_resolv_data_t *p, va_list args, ch
 					0 == strcmp(p->macro, MVAR_USER_FULLNAME) ||
 					0 == strcmp(p->macro, MVAR_USER_ALIAS))
 			{
-				zbx_user_names_t	*user_names =
-						(zbx_user_names_t *)zbx_expr_rem(userid,
+				zbx_user_names_t	**user_names =
+						(zbx_user_names_t **)zbx_expr_rem(userid,
 						sizeof(zbx_user_names_t *), NULL,
 						(zbx_rem_destroy_func_t)zbx_user_names_clean);
 
-				resolve_user_macros(*userid, p->macro, &user_names, replace_to);
+				resolve_user_macros(*userid, p->macro, user_names, replace_to);
 			}
 		}
 	}
@@ -194,12 +194,12 @@ static int	macro_normal_script_resolv(zbx_macro_resolv_data_t *p, va_list args, 
 					0 == strcmp(p->macro, MVAR_USER_FULLNAME) ||
 					0 == strcmp(p->macro, MVAR_USER_ALIAS)))
 			{
-				zbx_user_names_t	*user_names =
-						(zbx_user_names_t *)zbx_expr_rem(userid,
+				zbx_user_names_t	**user_names =
+						(zbx_user_names_t **)zbx_expr_rem(userid,
 						sizeof(zbx_user_names_t *), NULL,
 						(zbx_rem_destroy_func_t)zbx_user_names_clean);
 
-				resolve_user_macros(*userid, p->macro, &user_names, replace_to);
+				resolve_user_macros(*userid, p->macro, user_names, replace_to);
 			}
 			else if (0 == strcmp(p->macro, MVAR_EVENT_UPDATE_STATUS))
 			{
