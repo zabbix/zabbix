@@ -29,7 +29,7 @@ require (
 	golang.org/x/sync v0.14.0
 	golang.org/x/sys v0.33.0
 	golang.org/x/text v0.25.0
-	golang.zabbix.com/sdk v1.2.2-0.20250812065452-6181f1673ffa
+	golang.zabbix.com/sdk v1.2.2-0.20251003101756-434e7c668e17
 )
 
 require (
@@ -37,7 +37,6 @@ require (
 	github.com/chromedp/sysutil v1.0.0 // indirect
 	github.com/davecgh/go-spew v1.1.1 // indirect
 	github.com/go-logfmt/logfmt v0.6.0 // indirect
-	github.com/go-logr/logr v1.2.4 // indirect
 	github.com/goburrow/serial v0.1.0 // indirect
 	github.com/gobwas/httphead v0.1.0 // indirect
 	github.com/gobwas/pool v0.2.1 // indirect
