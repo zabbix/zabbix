@@ -109,6 +109,11 @@ ZBX_PTR_VECTOR_IMPL(tag_filter_ptr, zbx_tag_filter_t*)
 ZBX_PTR_VECTOR_DECL(db_escalation_ptr, zbx_db_escalation*)
 ZBX_PTR_VECTOR_IMPL(db_escalation_ptr, zbx_db_escalation*)
 
+static void	db_escalation_free(zbx_db_escalation *de)
+{
+	zbx_free(de);
+}
+
 static void	zbx_tag_filter_free(zbx_tag_filter_t *tag_filter)
 {
 	zbx_free(tag_filter->tag);
@@ -3654,8 +3659,7 @@ static int	process_escalations(int now, int *nextcheck, unsigned int escalation_
 			ret += process_db_escalations(now, nextcheck, &escalations, &eventids, &problem_eventids,
 					&actionids, default_timezone, config_timeout, config_trapper_timeout,
 					config_source_ip, config_ssh_key_location, get_config_forks, config_enable_global_scripts, program_type);
-			zbx_vector_db_escalation_ptr_clear_ext(&escalations,
-					(void (*)(zbx_db_escalation *))zbx_ptr_free);
+			zbx_vector_db_escalation_ptr_clear_ext(&escalations, db_escalation_free);
 			zbx_vector_uint64_clear(&actionids);
 			zbx_vector_uint64_clear(&eventids);
 			zbx_vector_uint64_clear(&problem_eventids);
@@ -3670,7 +3674,7 @@ static int	process_escalations(int now, int *nextcheck, unsigned int escalation_
 		ret += process_db_escalations(now, nextcheck, &escalations, &eventids, &problem_eventids,
 				&actionids, default_timezone, config_timeout, config_trapper_timeout,
 				config_source_ip, config_ssh_key_location, get_config_forks, config_enable_global_scripts, program_type);
-		zbx_vector_db_escalation_ptr_clear_ext(&escalations, (void (*)(zbx_db_escalation *))zbx_ptr_free);
+		zbx_vector_db_escalation_ptr_clear_ext(&escalations, db_escalation_free);
 	}
 
 	zbx_vector_db_escalation_ptr_destroy(&escalations);

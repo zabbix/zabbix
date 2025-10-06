@@ -97,12 +97,19 @@ typedef enum
 }
 zbx_json_path_expression_index_t;
 
+
+typedef struct zbx_jsonpath_token zbx_jsonpath_token;
+
+ZBX_PTR_VECTOR_DECL(jsonpath_token_ptr, zbx_jsonpath_token *)
+
+
+
 /* expression tokens in postfix notation */
 typedef struct
 {
-	zbx_vector_ptr_t	tokens;
-	zbx_jsonpath_token_t	*index_token;	/* relative path token that is used to index parent object */
-	zbx_jsonpath_token_t	*value_token;	/* the index value token */
+	zbx_vector_jsonpath_token_ptr_t	tokens;
+	zbx_jsonpath_token_t		*index_token;	/* relative path token that is used to index parent object */
+	zbx_jsonpath_token_t		*value_token;	/* the index value token */
 }
 zbx_jsonpath_expression_t;
 

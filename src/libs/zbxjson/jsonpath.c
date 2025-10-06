@@ -26,6 +26,8 @@
 
 #define ZBX_VECTOR_ARRAY_RESERVE	3
 
+ZBX_PTR_VECTOR_IMPL(jsonpath_token_ptr, zbx_jsonpath_token *)
+
 typedef struct
 {
 	zbx_jsonpath_token_group_t	group;
@@ -498,9 +500,8 @@ static void	jsonpath_segment_clear(zbx_jsonpath_segment_t *segment)
 			jsonpath_list_free(segment->data.list.values);
 			break;
 		case ZBX_JSONPATH_SEGMENT_MATCH_EXPRESSION:
-			zbx_vector_ptr_clear_ext(&segment->data.expression.tokens,
-					(zbx_clean_func_t)jsonpath_token_free);
-			zbx_vector_ptr_destroy(&segment->data.expression.tokens);
+			zbx_vector_jsonpath_token_ptr_clear_ext(&segment->data.expression.tokens, jsonpath_token_free);
+			zbx_vector_jsonpath_token_ptr_destroy(&segment->data.expression.tokens);
 			break;
 		default:
 			break;
@@ -1161,8 +1162,9 @@ out:
 		jsonpath_reserve(jsonpath, 1);
 		segment = &jsonpath->segments[jsonpath->segments_num++];
 		segment->type = ZBX_JSONPATH_SEGMENT_MATCH_EXPRESSION;
-		zbx_vector_ptr_create(&segment->data.expression.tokens);
-		zbx_vector_ptr_append_array(&segment->data.expression.tokens, output.values, output.values_num);
+		zbx_vector_jsonpath_token_ptr_create(&segment->data.expression.tokens);
+		zbx_vector_jsonpath_token_ptr_append_array(&segment->data.expression.tokens, output.values,
+				output.values_num);
 
 		/* index only json path that has been definite until this point */
 		if (0 != jsonpath->definite)
