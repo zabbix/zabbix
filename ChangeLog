@@ -1,3 +1,17 @@
+Changes for 7.4.4rc1
+
+New features:
+
+Bug fixes:
+.........T [ZBX-26851] changed macro names in MSSQL templates (sbelakovs)
+..F....... [ZBX-26882] fixed incorrect validation error when a new dataset is added in SVG graph widget (gklavins)
+
+--------------------------------------------------------------------------------
+Changes for 7.4.3
+
+7.4.3rc1 was released as 7.4.3 without any changes
+
+--------------------------------------------------------------------------------
 Changes for 7.4.3rc1
 
 New features:
@@ -426,6 +440,18 @@ A.F....PS. [ZBXNEXT-9564] implemented vault macro resolution on proxies (esekace
 ........S. [ZBXNEXT-9582] added discarding of queued duplicate LLD rule values based on embedded and LLD macros (wiper)
 ..F....... [ZBXNEXT-9614] implemented scrolling down to bottom in Item history widget when New values parameter is set to "Bottom" (dfofanovs)
 ...G...... [ZBXNEXT-9508] added custom query path to MySQL and Oracle plugins for Zabbix agent 2 (esneiders)
+
+--------------------------------------------------------------------------------
+Changes for 7.2.14rc1
+
+New features:
+
+Bug fixes:
+
+--------------------------------------------------------------------------------
+Changes for 7.2.13
+
+7.2.13rc1 was released as 7.2.13 without any changes
 
 --------------------------------------------------------------------------------
 Changes for 7.2.13rc1
@@ -1024,6 +1050,19 @@ A.F....... [ZBX-23227] fixed issue where using an empty array or string value fo
 ...GI..PS. [ZBX-25140] updated configure to reject TLS-unaware compilers (jxl)
 ...G...... [ZBX-25149] fixed Zabbix agent build on AIX and Solaris (arimdjonoks)
 ....I..... [ZBX-23881] dropped preference list when searching for compiler (jxl)
+
+--------------------------------------------------------------------------------
+Changes for 7.0.20rc1
+
+New features:
+
+Bug fixes:
+.........T [ZBX-26851] changed macro names in MSSQL templates (sbelakovs)
+
+--------------------------------------------------------------------------------
+Changes for 7.0.19
+
+7.0.19rc1 was released as 7.0.19 without any changes
 
 --------------------------------------------------------------------------------
 Changes for 7.0.19rc1
@@ -4791,6 +4830,18 @@ A.F....PS. [ZBXNEXT-7402,ZBXNEXT-7413] added support for CyberArk Vault (acikuns
 ..F.I..... [ZBXNEXT-7397] removed support for MD5 user passwords (asestakovs, mkrisjanis)
 ........S. [ZBXNEXT-7488] removed zabbix[history*] and zabbix[trends*] internal items (akozlovs)
 ..F....... [ZBXNEXT-7138] added modal form for API tokens in User settings->API tokens and Administration->General->API tokens (epulke)
+
+--------------------------------------------------------------------------------
+Changes for 6.0.43rc1
+
+New features:
+
+Bug fixes:
+
+--------------------------------------------------------------------------------
+Changes for 6.0.42
+
+6.0.42rc1 was released as 6.0.42 without any changes
 
 --------------------------------------------------------------------------------
 Changes for 6.0.42rc1
