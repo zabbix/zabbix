@@ -6721,6 +6721,9 @@ z-select[disabled] .focusable, input[disabled], textarea[disabled], select optio
   .tags-wrapper .tag {
     margin-top: 1px;
     margin-bottom: 1px; }
+  .tags-wrapper.form-field .tag {
+    margin-top: 4px;
+    margin-bottom: 4px; }
 
 .tag {
   display: inline-block;
