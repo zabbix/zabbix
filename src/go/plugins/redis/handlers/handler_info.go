@@ -12,7 +12,7 @@
 ** If not, see <https://www.gnu.org/licenses/>.
 **/
 
-package redis
+package handlers
 
 import (
 	"bufio"
@@ -21,39 +21,45 @@ import (
 	"strings"
 
 	"github.com/mediocregopher/radix/v3"
+	"golang.zabbix.com/agent2/plugins/redis/conn"
+	"golang.zabbix.com/sdk/errs"
 	"golang.zabbix.com/sdk/zbxerr"
 )
 
+var redisSlaveMetricRE = regexp.MustCompile(`^slave\d+`)
+
 type infoSection string
 type infoKey string
-type infoKeySpace map[infoKey]interface{}
+type infoKeySpace map[infoKey]any
 type infoExtKey string
 type infoExtKeySpace map[infoExtKey]string
 type redisInfo map[infoSection]infoKeySpace
 
-var redisSlaveMetricRE = regexp.MustCompile(`^slave\d+`)
-
 // parseRedisInfo parses an output of 'INFO' command.
 // https://redis.io/commands/info
-func parseRedisInfo(info string) (res redisInfo, err error) {
+//
+//nolint:gocyclo,cyclop // this is a parser.
+func parseRedisInfo(info string) (redisInfo, error) {
 	var (
 		section infoSection
 	)
 
 	scanner := bufio.NewScanner(strings.NewReader(info))
-	res = make(redisInfo)
+	res := make(redisInfo)
 
 	for scanner.Scan() {
 		line := scanner.Text()
 
-		if len(line) == 0 {
+		if line == "" {
 			continue
 		}
 
 		// Names of sections are preceded by '#'.
 		if line[0] == '#' {
 			section = infoSection(line[2:])
-			if _, ok := res[section]; !ok {
+
+			_, ok := res[section]
+			if !ok {
 				res[section] = make(infoKeySpace)
 			}
 
@@ -92,8 +98,9 @@ func parseRedisInfo(info string) (res redisInfo, err error) {
 		res[section][key] = value
 	}
 
-	if err = scanner.Err(); err != nil {
-		return nil, err
+	err := scanner.Err()
+	if err != nil {
+		return nil, errs.Wrap(err, "failed to parse info")
 	}
 
 	if len(res) == 0 {
@@ -103,24 +110,25 @@ func parseRedisInfo(info string) (res redisInfo, err error) {
 	return res, nil
 }
 
-// infoHandler gets an output of 'INFO' command, parses it and returns it in JSON format.
-func infoHandler(conn redisClient, params map[string]string) (interface{}, error) {
+// InfoHandler gets an output of 'INFO' command, parses it and returns it in JSON format.
+func InfoHandler(redisClient conn.RedisClient, params map[string]string) (any, error) {
 	var res string
 
 	section := infoSection(strings.ToLower(params["Section"]))
 
-	if err := conn.Query(radix.Cmd(&res, "INFO", string(section))); err != nil {
-		return nil, zbxerr.ErrorCannotFetchData.Wrap(err)
+	err := redisClient.Query(radix.Cmd(&res, "INFO", string(section)))
+	if err != nil {
+		return nil, errs.WrapConst(err, zbxerr.ErrorCannotFetchData)
 	}
 
-	redisInfo, err := parseRedisInfo(res)
+	parsedRedisInfo, err := parseRedisInfo(res)
 	if err != nil {
 		return nil, err
 	}
 
-	jsonRes, err := json.Marshal(redisInfo)
+	jsonRes, err := json.Marshal(parsedRedisInfo)
 	if err != nil {
-		return nil, zbxerr.ErrorCannotMarshalJSON.Wrap(err)
+		return nil, errs.WrapConst(err, zbxerr.ErrorCannotMarshalJSON)
 	}
 
 	return string(jsonRes), nil
