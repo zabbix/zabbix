@@ -107,7 +107,7 @@ func (p *Plugin) Export(key string, rawParams []string, pluginCtx plugin.Context
 		}
 
 		if ctxErr != nil {
-			p.Errf("failed to handle metric %q: %s", ctxErr, ctxErr.Error())
+			p.Errf("failed to handle metric %q: %s", key, ctxErr.Error())
 
 			return nil, errs.Wrap(ctxErr, "failed to handle metric")
 		}
