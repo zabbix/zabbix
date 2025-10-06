@@ -1,6 +1,6 @@
 @charset "UTF-8";
 .sidebar .server-name, .dashboard-navigation-tabs .sortable li div span, .host-dashboard-header-navigation .host-dashboard-navigation .host-dashboard-navigation-tabs .sortable li div span, .dashboard-grid-widget-header h4, .dashboard-grid-iterator-header h4, .list-table .action-container .link-action, div.dashboard-widget-hostcard .host-card .sections-header .host-name .link-action, div.dashboard-widget-hostcard .host-card .sections .section .section-name, div.dashboard-widget-hostcard .host-card .sections .section.section-host-groups .host-groups .host-group .host-group-name, div.dashboard-widget-hostcard .host-card .sections .section.section-monitoring .monitoring .monitoring-item .monitoring-item-name, div.dashboard-widget-hostcard .host-card .sections .section.section-monitored-by .section-body, div.dashboard-widget-hostcard .host-card .sections .section.section-templates .templates .template .template-name, div.dashboard-widget-hostcard .host-card .sections .section.section-inventory .section-body .inventory-field-name,
-div.dashboard-widget-hostcard .host-card .sections .section.section-inventory .section-body .inventory-field-value, div.dashboard-widget-itemcard .item-card .sections-header .section-item .item-name .link-action, div.dashboard-widget-itemcard .item-card .sections-header .section-path, div.dashboard-widget-itemcard .item-card .sections-header .section-path .path-element, div.dashboard-widget-itemcard .item-card .sections .section .section-name, div.dashboard-widget-itemcard .item-card .sections .section.section-metrics .center-column, div.dashboard-widget-itemcard .item-card .sections .section.section-latest-data .center-column, div.dashboard-widget-itemcard .item-card .sections .section.section-metrics .column, div.dashboard-widget-itemcard .item-card .sections .section.section-metrics .right-column, div.dashboard-widget-itemcard .item-card .sections .section.section-latest-data .column, div.dashboard-widget-itemcard .item-card .sections .section.section-latest-data .right-column, div.dashboard-widget-itemcard .item-card .sections .section.section-metrics .column .column-header, div.dashboard-widget-itemcard .item-card .sections .section.section-metrics .column .column-value, div.dashboard-widget-itemcard .item-card .sections .section.section-metrics .right-column .column-header, div.dashboard-widget-itemcard .item-card .sections .section.section-metrics .right-column .column-value, div.dashboard-widget-itemcard .item-card .sections .section.section-latest-data .column .column-header, div.dashboard-widget-itemcard .item-card .sections .section.section-latest-data .column .column-value, div.dashboard-widget-itemcard .item-card .sections .section.section-latest-data .right-column .column-header, div.dashboard-widget-itemcard .item-card .sections .section.section-latest-data .right-column .column-value, div.dashboard-widget-itemcard .item-card .sections .section.section-triggers .triggers .trigger .trigger-name, div.dashboard-widget-itemcard .item-card .sections .section.section-single-parameter .section-body, div.dashboard-widget-map .btn-back-map-container a:focus .btn-back-map .btn-back-map-content, div.dashboard-widget-map .btn-back-map-container a:hover .btn-back-map .btn-back-map-content, form.dashboard-widget-tophosts #list_columns .text, form.dashboard-widget-topitems #list_columns .text, .menu-popup .menu-popup-item, .menu-popup h3, .notif-body h4, .overlay-descr-url, .tag, .overflow-ellipsis, .overflow-ellipsis td:not(.wordbreak, .wordwrap), .overflow-ellipsis th, .overflow-ellipsis th a, .preprocessing-list .preprocessing-list-head .step-on-fail, .totals-list.totals-list-horizontal .count,
+div.dashboard-widget-hostcard .host-card .sections .section.section-inventory .section-body .inventory-field-value, div.dashboard-widget-itemcard .item-card .sections-header .section-item .item-name .link-action, div.dashboard-widget-itemcard .item-card .sections-header .section-path, div.dashboard-widget-itemcard .item-card .sections-header .section-path .path-element, div.dashboard-widget-itemcard .item-card .sections .section .section-name, div.dashboard-widget-itemcard .item-card .sections .section.section-interval-and-storage .center-column, div.dashboard-widget-itemcard .item-card .sections .section.section-latest-data .center-column, div.dashboard-widget-itemcard .item-card .sections .section.section-interval-and-storage .column, div.dashboard-widget-itemcard .item-card .sections .section.section-interval-and-storage .right-column, div.dashboard-widget-itemcard .item-card .sections .section.section-latest-data .column, div.dashboard-widget-itemcard .item-card .sections .section.section-latest-data .right-column, div.dashboard-widget-itemcard .item-card .sections .section.section-interval-and-storage .column .column-header, div.dashboard-widget-itemcard .item-card .sections .section.section-interval-and-storage .column .column-value, div.dashboard-widget-itemcard .item-card .sections .section.section-interval-and-storage .right-column .column-header, div.dashboard-widget-itemcard .item-card .sections .section.section-interval-and-storage .right-column .column-value, div.dashboard-widget-itemcard .item-card .sections .section.section-latest-data .column .column-header, div.dashboard-widget-itemcard .item-card .sections .section.section-latest-data .column .column-value, div.dashboard-widget-itemcard .item-card .sections .section.section-latest-data .right-column .column-header, div.dashboard-widget-itemcard .item-card .sections .section.section-latest-data .right-column .column-value, div.dashboard-widget-itemcard .item-card .sections .section.section-triggers .triggers .trigger .trigger-name, div.dashboard-widget-itemcard .item-card .sections .section.section-single-parameter .section-body, div.dashboard-widget-map .btn-back-map-container a:focus .btn-back-map .btn-back-map-content, div.dashboard-widget-map .btn-back-map-container a:hover .btn-back-map .btn-back-map-content, form.dashboard-widget-tophosts #list_columns .text, form.dashboard-widget-topitems #list_columns .text, .menu-popup .menu-popup-item, .menu-popup h3, .notif-body h4, .overlay-descr-url, .tag, .overflow-ellipsis, .overflow-ellipsis td:not(.wordbreak, .wordwrap), .overflow-ellipsis th, .overflow-ellipsis th a, .preprocessing-list .preprocessing-list-head .step-on-fail, .totals-list.totals-list-horizontal .count,
 .totals-list.totals-list-horizontal .name {
   overflow: hidden;
   text-overflow: ellipsis;
@@ -2550,13 +2550,14 @@ div[data-field-type="set"].has-error {
   .list-table.compact-view td {
     padding-top: 2px;
     padding-bottom: 2px;
-    border-bottom: 0;
-    box-shadow: inset 0 -1px 0 0 rgba(31, 44, 51, 0.1);
     white-space: nowrap; }
     .list-table.compact-view td .rel-container span {
       margin: 0; }
     .list-table.compact-view td.nowrap {
       text-overflow: clip; }
+  .list-table.compact-view td, .list-table.has-highlighted-rows td {
+    border-bottom: 0;
+    box-shadow: inset 0 -1px 0 0 rgba(31, 44, 51, 0.1); }
   .list-table.no-data tbody tr td {
     height: auto;
     color: #768d99;
@@ -2580,10 +2581,7 @@ div[data-field-type="set"].has-error {
 .list-table .btn-small,
 .list-table .problem-icon-link,
 .list-table .status-container,
-.list-table .entity-count,
-.list-table .tag {
-  margin-top: 1px;
-  margin-bottom: 1px;
+.list-table .entity-count {
   vertical-align: top; }
 
 .list-table thead th.column-tags-1 {
@@ -2619,6 +2617,15 @@ div[data-field-type="set"].has-error {
   @media screen and (min-width: 1600px) {
     .list-table thead th.column-tags-3 {
       width: 452px; } }
+@media screen and (min-width: 1200px) {
+  .list-table .tags-wrapper {
+    max-width: 266px; } }
+@media screen and (min-width: 1400px) {
+  .list-table .tags-wrapper {
+    max-width: 359px; } }
+@media screen and (min-width: 1600px) {
+  .list-table .tags-wrapper {
+    max-width: 452px; } }
 .list-table.compact-view .tag {
   max-width: 40px; }
   @media screen and (min-width: 1200px) {
@@ -2688,23 +2695,33 @@ div[data-field-type="set"].has-error {
     font-size: 12px; }
 .list-table.compact-view .problem-nested:not([class*='flh-']):not(.row-selected) td,
 .list-table.compact-view .problem-nested:not([class*='flh-']):not(.row-selected) .timeline-axis,
-.list-table.compact-view .problem-nested:not([class*='flh-']):not(.row-selected) .timeline-td {
+.list-table.compact-view .problem-nested:not([class*='flh-']):not(.row-selected) .timeline-td, .list-table.has-highlighted-rows .problem-nested:not([class*='flh-']):not(.row-selected) td,
+.list-table.has-highlighted-rows .problem-nested:not([class*='flh-']):not(.row-selected) .timeline-axis,
+.list-table.has-highlighted-rows .problem-nested:not([class*='flh-']):not(.row-selected) .timeline-td {
   border-bottom-style: none; }
-.list-table.compact-view [class*='flh-']:not(.row-selected):not(:hover) a,
+.list-table.compact-view [class*='flh-']:not(.row-selected):not(:hover) a:not(.green):not(.green.btn-icon:not([disabled])):not(.green.btn-link:not([disabled])):not(.green.link-action:not(:hover):not(:focus)):not(.green.link-alt:not(:hover):not(:focus)),
 .list-table.compact-view [class*='flh-']:not(.row-selected):not(:hover) td,
-.list-table.compact-view [class*='flh-']:not(.row-selected):not(:hover) sup {
+.list-table.compact-view [class*='flh-']:not(.row-selected):not(:hover) sup, .list-table.has-highlighted-rows [class*='flh-']:not(.row-selected):not(:hover) a:not(.green):not(.green.btn-icon:not([disabled])):not(.green.btn-link:not([disabled])):not(.green.link-action:not(:hover):not(:focus)):not(.green.link-alt:not(:hover):not(:focus)),
+.list-table.has-highlighted-rows [class*='flh-']:not(.row-selected):not(:hover) td,
+.list-table.has-highlighted-rows [class*='flh-']:not(.row-selected):not(:hover) sup {
   color: #1f2c33; }
-.list-table.compact-view [class*='flh-']:not(.row-selected):not(:hover) .link-alt {
-  border-bottom-color: #1f2c33; }
-.list-table.compact-view [class*='flh-']:not(.row-selected):not(:hover) .tag {
+.list-table.compact-view [class*='flh-']:not(.row-selected):not(:hover) .tag, .list-table.has-highlighted-rows [class*='flh-']:not(.row-selected):not(:hover) .tag {
   color: #ffffff;
   background-color: rgba(31, 44, 51, 0.5); }
 .list-table.compact-view [class*='flh-']:not(.row-selected):not(:hover) .btn-icon,
-.list-table.compact-view [class*='flh-']:not(.row-selected):not(:hover) .icon {
+.list-table.compact-view [class*='flh-']:not(.row-selected):not(:hover) .icon, .list-table.has-highlighted-rows [class*='flh-']:not(.row-selected):not(:hover) .btn-icon,
+.list-table.has-highlighted-rows [class*='flh-']:not(.row-selected):not(:hover) .icon {
   background-color: #ffffff; }
-.list-table.compact-view [class*='flh-']:not(.row-selected):not(:hover) .entity-count {
-  margin-top: 0;
-  margin-bottom: 0;
+.list-table.has-highlighted-rows .problem-unack-fg,
+.list-table.has-highlighted-rows .problem-ack-fg {
+  color: #cc0000; }
+.list-table.has-highlighted-rows .ok-unack-fg,
+.list-table.has-highlighted-rows .ok-ack-fg {
+  color: #009900; }
+.list-table.has-highlighted-rows .link-alt:active, .list-table.has-highlighted-rows .link-alt:not(:hover):not(:focus) {
+  color: #1f2c33;
+  border-bottom-color: #1f2c33; }
+.list-table.has-highlighted-rows .entity-count {
   border: 1px solid #ffffff; }
 
 .no-data-message {
@@ -2750,15 +2767,15 @@ div[data-field-type="set"].has-error {
     margin-top: 0; }
   .markdown ul, .modal-popup-host-wizard .formated-text ul {
     list-style-type: disc; }
-  .markdown :is(dir, menu, ol, ul) ul, .modal-popup-host-wizard .formated-text :is(dir, menu, ol, ul) ul {
+  .markdown :is(ol, ul) ul, .modal-popup-host-wizard .formated-text :is(ol, ul) ul {
     list-style-type: circle; }
-  .markdown :is(dir, menu, ol, ul) :is(dir, menu, ol, ul) ul, .modal-popup-host-wizard .formated-text :is(dir, menu, ol, ul) :is(dir, menu, ol, ul) ul {
+  .markdown :is(ol, ul) :is(ol, ul) ul, .modal-popup-host-wizard .formated-text :is(ol, ul) :is(ol, ul) ul {
     list-style-type: square; }
   .markdown ol, .modal-popup-host-wizard .formated-text ol {
     list-style-type: decimal; }
-  .markdown :is(dir, menu, ol, ul) ol, .modal-popup-host-wizard .formated-text :is(dir, menu, ol, ul) ol {
+  .markdown :is(ol, ul) ol, .modal-popup-host-wizard .formated-text :is(ol, ul) ol {
     list-style-type: lower-latin; }
-  .markdown :is(dir, menu, ol, ul) :is(dir, menu, ol, ul) ol, .modal-popup-host-wizard .formated-text :is(dir, menu, ol, ul) :is(dir, menu, ol, ul) ol {
+  .markdown :is(ol, ul) :is(ol, ul) ol, .modal-popup-host-wizard .formated-text :is(ol, ul) :is(ol, ul) ol {
     list-style-type: lower-roman; }
   .markdown ol, .modal-popup-host-wizard .formated-text ol, .markdown ul, .modal-popup-host-wizard .formated-text ul {
     list-style-position: outside;
@@ -3636,6 +3653,11 @@ section {
     padding: 10px 10px 0; }
     .service-info .service-info-grid:last-of-type {
       padding-bottom: 10px; }
+    .service-info .service-info-grid .tags-wrapper {
+      min-width: 1%; }
+      .service-info .service-info-grid .tags-wrapper .btn-icon {
+        height: 18px;
+        width: 18px; }
   .service-info .service-info-label::after {
     content: ':'; }
   .service-info .service-info-value .service-info-value-sla {
@@ -5144,48 +5166,48 @@ div.dashboard-widget-itemcard .item-card {
         grid-template-columns: 1fr;
         word-break: break-word;
         --line-clamp: 2; }
-      div.dashboard-widget-itemcard .item-card .sections .section.section-metrics, div.dashboard-widget-itemcard .item-card .sections .section.section-latest-data {
+      div.dashboard-widget-itemcard .item-card .sections .section.section-interval-and-storage, div.dashboard-widget-itemcard .item-card .sections .section.section-latest-data {
         grid-template-columns: repeat(3, 1fr);
         column-gap: 10px; }
-        div.dashboard-widget-itemcard .item-card .sections .section.section-metrics .center-column, div.dashboard-widget-itemcard .item-card .sections .section.section-latest-data .center-column {
+        div.dashboard-widget-itemcard .item-card .sections .section.section-interval-and-storage .center-column, div.dashboard-widget-itemcard .item-card .sections .section.section-latest-data .center-column {
           display: flex;
           justify-content: center; }
-        div.dashboard-widget-itemcard .item-card .sections .section.section-metrics .column, div.dashboard-widget-itemcard .item-card .sections .section.section-metrics .right-column, div.dashboard-widget-itemcard .item-card .sections .section.section-latest-data .column, div.dashboard-widget-itemcard .item-card .sections .section.section-latest-data .right-column {
+        div.dashboard-widget-itemcard .item-card .sections .section.section-interval-and-storage .column, div.dashboard-widget-itemcard .item-card .sections .section.section-interval-and-storage .right-column, div.dashboard-widget-itemcard .item-card .sections .section.section-latest-data .column, div.dashboard-widget-itemcard .item-card .sections .section.section-latest-data .right-column {
           display: flex;
           flex-direction: column;
           gap: 5px; }
-          div.dashboard-widget-itemcard .item-card .sections .section.section-metrics .column .column-header:not(a), div.dashboard-widget-itemcard .item-card .sections .section.section-metrics .right-column .column-header:not(a), div.dashboard-widget-itemcard .item-card .sections .section.section-latest-data .column .column-header:not(a), div.dashboard-widget-itemcard .item-card .sections .section.section-latest-data .right-column .column-header:not(a) {
+          div.dashboard-widget-itemcard .item-card .sections .section.section-interval-and-storage .column .column-header:not(a), div.dashboard-widget-itemcard .item-card .sections .section.section-interval-and-storage .right-column .column-header:not(a), div.dashboard-widget-itemcard .item-card .sections .section.section-latest-data .column .column-header:not(a), div.dashboard-widget-itemcard .item-card .sections .section.section-latest-data .right-column .column-header:not(a) {
             color: #768d99; }
-          div.dashboard-widget-itemcard .item-card .sections .section.section-metrics .column .column-header, div.dashboard-widget-itemcard .item-card .sections .section.section-metrics .column .column-value, div.dashboard-widget-itemcard .item-card .sections .section.section-metrics .right-column .column-header, div.dashboard-widget-itemcard .item-card .sections .section.section-metrics .right-column .column-value, div.dashboard-widget-itemcard .item-card .sections .section.section-latest-data .column .column-header, div.dashboard-widget-itemcard .item-card .sections .section.section-latest-data .column .column-value, div.dashboard-widget-itemcard .item-card .sections .section.section-latest-data .right-column .column-header, div.dashboard-widget-itemcard .item-card .sections .section.section-latest-data .right-column .column-value {
+          div.dashboard-widget-itemcard .item-card .sections .section.section-interval-and-storage .column .column-header, div.dashboard-widget-itemcard .item-card .sections .section.section-interval-and-storage .column .column-value, div.dashboard-widget-itemcard .item-card .sections .section.section-interval-and-storage .right-column .column-header, div.dashboard-widget-itemcard .item-card .sections .section.section-interval-and-storage .right-column .column-value, div.dashboard-widget-itemcard .item-card .sections .section.section-latest-data .column .column-header, div.dashboard-widget-itemcard .item-card .sections .section.section-latest-data .column .column-value, div.dashboard-widget-itemcard .item-card .sections .section.section-latest-data .right-column .column-header, div.dashboard-widget-itemcard .item-card .sections .section.section-latest-data .right-column .column-value {
             display: block;
             position: relative;
             height: 17px;
             line-height: 17px;
             box-sizing: border-box; }
-          div.dashboard-widget-itemcard .item-card .sections .section.section-metrics .column .column-value .btn-icon, div.dashboard-widget-itemcard .item-card .sections .section.section-metrics .right-column .column-value .btn-icon, div.dashboard-widget-itemcard .item-card .sections .section.section-latest-data .column .column-value .btn-icon, div.dashboard-widget-itemcard .item-card .sections .section.section-latest-data .right-column .column-value .btn-icon {
+          div.dashboard-widget-itemcard .item-card .sections .section.section-interval-and-storage .column .column-value .btn-icon, div.dashboard-widget-itemcard .item-card .sections .section.section-interval-and-storage .right-column .column-value .btn-icon, div.dashboard-widget-itemcard .item-card .sections .section.section-latest-data .column .column-value .btn-icon, div.dashboard-widget-itemcard .item-card .sections .section.section-latest-data .right-column .column-value .btn-icon {
             height: 14px;
             margin-top: 2px; }
-          div.dashboard-widget-itemcard .item-card .sections .section.section-metrics .column .column-value z-sparkline, div.dashboard-widget-itemcard .item-card .sections .section.section-metrics .right-column .column-value z-sparkline, div.dashboard-widget-itemcard .item-card .sections .section.section-latest-data .column .column-value z-sparkline, div.dashboard-widget-itemcard .item-card .sections .section.section-latest-data .right-column .column-value z-sparkline {
+          div.dashboard-widget-itemcard .item-card .sections .section.section-interval-and-storage .column .column-value z-sparkline, div.dashboard-widget-itemcard .item-card .sections .section.section-interval-and-storage .right-column .column-value z-sparkline, div.dashboard-widget-itemcard .item-card .sections .section.section-latest-data .column .column-value z-sparkline, div.dashboard-widget-itemcard .item-card .sections .section.section-latest-data .right-column .column-value z-sparkline {
             position: absolute;
             top: 0;
             right: 0;
             left: 0;
             height: 17px; }
-        div.dashboard-widget-itemcard .item-card .sections .section.section-metrics .right-column, div.dashboard-widget-itemcard .item-card .sections .section.section-latest-data .right-column {
+        div.dashboard-widget-itemcard .item-card .sections .section.section-interval-and-storage .right-column, div.dashboard-widget-itemcard .item-card .sections .section.section-latest-data .right-column {
           align-items: flex-end;
           text-align: right; }
-          div.dashboard-widget-itemcard .item-card .sections .section.section-metrics .right-column .column-header, div.dashboard-widget-itemcard .item-card .sections .section.section-metrics .right-column .column-value, div.dashboard-widget-itemcard .item-card .sections .section.section-latest-data .right-column .column-header, div.dashboard-widget-itemcard .item-card .sections .section.section-latest-data .right-column .column-value {
+          div.dashboard-widget-itemcard .item-card .sections .section.section-interval-and-storage .right-column .column-header, div.dashboard-widget-itemcard .item-card .sections .section.section-interval-and-storage .right-column .column-value, div.dashboard-widget-itemcard .item-card .sections .section.section-latest-data .right-column .column-header, div.dashboard-widget-itemcard .item-card .sections .section.section-latest-data .right-column .column-value {
             width: 100%; }
-          div.dashboard-widget-itemcard .item-card .sections .section.section-metrics .right-column .btn-thumbnail, div.dashboard-widget-itemcard .item-card .sections .section.section-latest-data .right-column .btn-thumbnail {
+          div.dashboard-widget-itemcard .item-card .sections .section.section-interval-and-storage .right-column .btn-thumbnail, div.dashboard-widget-itemcard .item-card .sections .section.section-latest-data .right-column .btn-thumbnail {
             overflow: hidden; }
-            div.dashboard-widget-itemcard .item-card .sections .section.section-metrics .right-column .btn-thumbnail:not(.btn-link), div.dashboard-widget-itemcard .item-card .sections .section.section-latest-data .right-column .btn-thumbnail:not(.btn-link) {
+            div.dashboard-widget-itemcard .item-card .sections .section.section-interval-and-storage .right-column .btn-thumbnail:not(.btn-link), div.dashboard-widget-itemcard .item-card .sections .section.section-latest-data .right-column .btn-thumbnail:not(.btn-link) {
               width: 100px;
               height: 53px;
               background: transparent var(--thumbnail) no-repeat center;
               background-size: cover;
               border-color: transparent;
               text-indent: -9999px; }
-              div.dashboard-widget-itemcard .item-card .sections .section.section-metrics .right-column .btn-thumbnail:not(.btn-link):not(.is-loading), div.dashboard-widget-itemcard .item-card .sections .section.section-latest-data .right-column .btn-thumbnail:not(.btn-link):not(.is-loading) {
+              div.dashboard-widget-itemcard .item-card .sections .section.section-interval-and-storage .right-column .btn-thumbnail:not(.btn-link):not(.is-loading), div.dashboard-widget-itemcard .item-card .sections .section.section-latest-data .right-column .btn-thumbnail:not(.btn-link):not(.is-loading) {
                 border: 1px solid #dfe4e7;
                 border-radius: 3px; }
       div.dashboard-widget-itemcard .item-card .sections .section.section-triggers .triggers {
@@ -6721,6 +6743,15 @@ form.is-loading {
   position: relative; }
   .table-forms-separator .wordbreak {
     white-space: normal; }
+  @media screen and (min-width: 1200px) {
+    .table-forms-separator .tags-wrapper {
+      max-width: 266px; } }
+  @media screen and (min-width: 1400px) {
+    .table-forms-separator .tags-wrapper {
+      max-width: 359px; } }
+  @media screen and (min-width: 1600px) {
+    .table-forms-separator .tags-wrapper {
+      max-width: 452px; } }
 
 .border-left {
   border-left: 1px solid #ebeef0; }
@@ -7746,15 +7777,9 @@ z-select[disabled] .focusable, input[disabled], textarea[disabled], select optio
   display: flex;
   flex-wrap: wrap;
   gap: 2px 3px; }
-  @media screen and (min-width: 1200px) {
-    .tags-wrapper {
-      max-width: 266px; } }
-  @media screen and (min-width: 1400px) {
-    .tags-wrapper {
-      max-width: 359px; } }
-  @media screen and (min-width: 1600px) {
-    .tags-wrapper {
-      max-width: 452px; } }
+  .tags-wrapper .tag {
+    margin-top: 1px;
+    margin-bottom: 1px; }
 
 .tag {
   display: inline-block;
@@ -7786,15 +7811,6 @@ z-select[disabled] .focusable, input[disabled], textarea[disabled], select optio
 
 .yellow-bg {
   background-color: #ffc859; }
-
-td[class] + td.na-bg,
-td[class] + td.normal-bg,
-td[class] + td.info-bg,
-td[class] + td.average-bg,
-td[class] + td.warning-bg,
-td[class] + td.high-bg,
-td[class] + td.disaster-bg {
-  border-left: 1px dotted #ebeef0; }
 
 .na-bg {
   color: #2a353a;

@@ -102,6 +102,21 @@ void	zbx_db_deinit(void)
 
 /******************************************************************************
  *                                                                            *
+ * Purpose: invalidate idcache                                                *
+ *                                                                            *
+ ******************************************************************************/
+void	zbx_db_clear_idcache(void)
+{
+	zbx_mutex_lock(idcache_mutex);
+
+	if (NULL != idcache)
+		memset(idcache->lastids, 0, sizeof(idcache->lastids));
+
+	zbx_mutex_unlock(idcache_mutex);
+}
+
+/******************************************************************************
+ *                                                                            *
  * Purpose: get next id for requested table from cache                        *
  *                                                                            *
  ******************************************************************************/
