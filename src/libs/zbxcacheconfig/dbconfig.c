@@ -246,7 +246,7 @@ void	zbx_config_wlock_set_locked(void)
 	wlock_is_locked = 1;
 }
 
-int	zbx_config_wlock_set_unlocked(void)
+void	zbx_config_wlock_set_unlocked(void)
 {
 	wlock_is_locked = 0;
 }
@@ -938,6 +938,12 @@ const char	*dc_strpool_intern(const char *str)
 	zbx_uint32_t	*refcount;
 	size_t		size;
 
+	if (0 == zbx_config_wlock_is_locked())
+	{
+		THIS_SHOULD_NEVER_HAPPEN;
+		exit(EXIT_FAILURE);
+	}
+
 	if (NULL == str)
 		return NULL;
 
@@ -955,6 +961,12 @@ void	dc_strpool_release(const char *str)
 {
 	zbx_uint32_t	*refcount;
 
+	if (0 == zbx_config_wlock_is_locked())
+	{
+		THIS_SHOULD_NEVER_HAPPEN;
+		exit(EXIT_FAILURE);
+	}
+
 	refcount = (zbx_uint32_t *)(str - REFCOUNT_FIELD_SIZE);
 	if (0 == --(*refcount))
 		zbx_hashset_remove(&config->strpool, str - REFCOUNT_FIELD_SIZE);
@@ -963,6 +975,12 @@ void	dc_strpool_release(const char *str)
 const char	*dc_strpool_acquire(const char *str)
 {
 	zbx_uint32_t	*refcount;
+
+	if (0 == zbx_config_wlock_is_locked())
+	{
+		THIS_SHOULD_NEVER_HAPPEN;
+		exit(EXIT_FAILURE);
+	}
 
 	if (NULL == str)
 		return NULL;
