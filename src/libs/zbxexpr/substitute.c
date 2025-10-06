@@ -114,7 +114,7 @@ int	zbx_substitute_macros_args(zbx_token_search_t search, char **data, char *err
 		zbx_macro_resolv_func_t resolver, va_list args)
 {
 	zbx_macro_resolv_data_t	p = {0};
-	int			found, res = SUCCEED;
+	int			found, res = SUCCEED, is_expr_cache_owner = 0;
 	char			c, *m_ptr, *replace_to = NULL;
 	size_t			data_alloc, data_len;
 
@@ -131,8 +131,12 @@ int	zbx_substitute_macros_args(zbx_token_search_t search, char **data, char *err
 	if (SUCCEED != zbx_token_find(*data, p.pos, &p.token, p.token_search))
 		goto out;
 
-	expr_cache = zbx_malloc(expr_cache, sizeof(zbx_hashset_t));
-	zbx_hashset_create(expr_cache, 10, ZBX_DEFAULT_PTR_HASH_FUNC, ZBX_DEFAULT_PTR_COMPARE_FUNC);
+	if (NULL == expr_cache)
+	{
+		expr_cache = zbx_malloc(expr_cache, sizeof(zbx_hashset_t));
+		zbx_hashset_create(expr_cache, 10, ZBX_DEFAULT_PTR_HASH_FUNC, ZBX_DEFAULT_PTR_COMPARE_FUNC);
+		is_expr_cache_owner = 1;
+	}
 
 	data_alloc = data_len = strlen(*data) + 1;
 
@@ -281,22 +285,25 @@ int	zbx_substitute_macros_args(zbx_token_search_t search, char **data, char *err
 		p.pos++;
 	}
 
-	zbx_hashset_iter_t	iter;
-	expr_cache_element_t	*entry;
-
-	zbx_hashset_iter_reset(expr_cache, &iter);
-
-	while (NULL != (entry = (expr_cache_element_t *)zbx_hashset_iter_next(&iter)))
+	if (1 == is_expr_cache_owner)
 	{
-		if (NULL != entry->destroy_func && NULL != entry->ptr)
-			entry->destroy_func(entry->ptr);
+		zbx_hashset_iter_t	iter;
+		expr_cache_element_t	*entry;
 
-		zbx_free(entry->ptr);
-		zbx_hashset_iter_remove(&iter);
+		zbx_hashset_iter_reset(expr_cache, &iter);
+
+		while (NULL != (entry = (expr_cache_element_t *)zbx_hashset_iter_next(&iter)))
+		{
+			if (NULL != entry->destroy_func && NULL != entry->ptr)
+				entry->destroy_func(entry->ptr);
+
+			zbx_free(entry->ptr);
+			zbx_hashset_iter_remove(&iter);
+		}
+
+		zbx_hashset_destroy(expr_cache);
+		zbx_free(expr_cache);
 	}
-
-	zbx_hashset_destroy(expr_cache);
-	zbx_free(expr_cache);
 
 out:
 	zabbix_log(LOG_LEVEL_DEBUG, "End %s()", __func__);
