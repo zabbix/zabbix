@@ -384,11 +384,39 @@ static duk_ret_t	es_httprequest_query(duk_context *ctx, const char *http_request
 	ZBX_CURL_SETOPT(ctx, request->handle, CURLOPT_HTTPHEADER, request->headers, err);
 	ZBX_CURL_SETOPT(ctx, request->handle, CURLOPT_TIMEOUT_MS, timeout_ms - elapsed_ms, err);
 
-	if (0 == strcmp(http_request, "HEAD"))
+	ZBX_CURL_SETOPT(ctx, request->handle, CURLOPT_NOBODY, 0L, err);
+	ZBX_CURL_SETOPT(ctx, request->handle, CURLOPT_POSTFIELDS, NULL, err);
+	ZBX_CURL_SETOPT(ctx, request->handle, CURLOPT_POSTFIELDSIZE, 0L, err);
+
+	if (0 == strcmp(http_request, "GET"))
+	{
+		ZBX_CURL_SETOPT(ctx, request->handle, CURLOPT_HTTPGET, 1L, err);
+		ZBX_CURL_SETOPT(ctx, request->handle, CURLOPT_ACCEPT_ENCODING, "", err);
+	}
+	else if (0 == strcmp(http_request, "HEAD"))
 	{
 		ZBX_CURL_SETOPT(ctx, request->handle, CURLOPT_NOBODY, 1L, err);
-		ZBX_CURL_SETOPT(ctx, request->handle, CURLOPT_POSTFIELDS, NULL, err);
-		ZBX_CURL_SETOPT(ctx, request->handle, CURLOPT_POSTFIELDSIZE, 0L, err);
+		ZBX_CURL_SETOPT(ctx, request->handle, CURLOPT_CUSTOMREQUEST, NULL, err);
+	}
+	else if (0 == strcmp(http_request, "POST") || 0 == strcmp(http_request, "PUT") ||
+			0 == strcmp(http_request, "PATCH"))
+	{
+		ZBX_CURL_SETOPT(ctx, request->handle, CURLOPT_CUSTOMREQUEST, http_request, err);
+		ZBX_CURL_SETOPT(ctx, request->handle, CURLOPT_POSTFIELDS, ZBX_NULL2EMPTY_STR(contents), err);
+		ZBX_CURL_SETOPT(ctx, request->handle, CURLOPT_POSTFIELDSIZE, (long)contents_len, err);
+		ZBX_CURL_SETOPT(ctx, request->handle, CURLOPT_ACCEPT_ENCODING, "", err);
+	}
+	else if (0 == strcmp(http_request, "DELETE"))
+	{
+		ZBX_CURL_SETOPT(ctx, request->handle, CURLOPT_CUSTOMREQUEST, http_request, err);
+
+		if (NULL != contents && 0 < contents_len)
+		{
+			ZBX_CURL_SETOPT(ctx, request->handle, CURLOPT_POSTFIELDS, contents, err);
+			ZBX_CURL_SETOPT(ctx, request->handle, CURLOPT_POSTFIELDSIZE, (long)contents_len, err);
+		}
+
+		ZBX_CURL_SETOPT(ctx, request->handle, CURLOPT_ACCEPT_ENCODING, "", err);
 	}
 	else
 	{
