@@ -4,7 +4,7 @@ msgstr ""
 "Project-Id-Version: Zabbix 6.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2023-10-19 13:48+0300\n"
-"PO-Revision-Date: 2025-08-08 20:28+0000\n"
+"PO-Revision-Date: 2025-09-18 18:30+0000\n"
 "Last-Translator: ERIC <eric78.zabbix@orange.fr>\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
 "Language: fr\n"
@@ -3758,6 +3758,11 @@ msgstr "Impossible de lire du XML : %1$s."
 msgid "Cannot read YAML: %1$s."
 msgstr "Impossible de lire le YAML : %1$s."
 
+#: include/classes/server/CZabbixServer.php:502
+#, c-format
+msgid "Cannot read response from Zabbix server \"%1$s\"."
+msgstr "Impossible de lire la réponse du serveur Zabbix « %1$s »."
+
 #: include/classes/server/CZabbixServer.php:567
 #, c-format
 msgid "Cannot read the response, check connection with the Zabbix server \"%1$s\"."
@@ -6786,7 +6791,7 @@ msgstr "La licence TimescaleDB détectée ne prend pas en charge la compression.
 
 #: app/views/administration.housekeeping.edit.php:204
 msgid "Detected license does not support compression. Compression is supported in TimescaleDB Community Edition."
-msgstr ""
+msgstr "La licence TimescaleDB détectée ne prend pas en charge la compression. La compression est prise en charge dans TimescaleDB Community Edition."
 
 #: app/controllers/CControllerPopupTriggerExpr.php:1130
 msgid "Detection period"
@@ -10078,7 +10083,7 @@ msgstr "IPMI"
 
 #: include/items.inc.php:96
 msgid "IPMI agent"
-msgstr "agent IPMI"
+msgstr "Agent IPMI"
 
 #: include/views/inventory.host.view.php:67
 msgid "IPMI interfaces"
@@ -12137,7 +12142,7 @@ msgstr "JMX"
 
 #: include/items.inc.php:99
 msgid "JMX agent"
-msgstr "agent JMX"
+msgstr "Agent JMX"
 
 #: app/views/popup.massupdate.item.php:77
 #: include/views/configuration.host.discovery.edit.php:586
@@ -13880,7 +13885,7 @@ msgstr "Doit être au moins %1$s."
 #: app/partials/administration.system.info.php:254
 #, c-format
 msgid "Must not be higher than %1$s."
-msgstr ""
+msgstr "Ne doit pas être supérieur à %1$s."
 
 #: jsLoader.php:284
 msgid "Mute"
@@ -14625,63 +14630,63 @@ msgstr "Aucune autorisation pour appeler \"%1$s.%2$s\"."
 
 #: include/classes/api/services/CConfiguration.php:312
 msgid "No permissions to import discovery rules."
-msgstr ""
+msgstr "Aucune autorisation pour importer des règles de découverte."
 
 #: include/classes/api/services/CConfiguration.php:313
 msgid "No permissions to import graphs."
-msgstr ""
+msgstr "Aucune autorisation pour importer des graphiques."
 
 #: include/classes/api/services/CConfiguration.php:314
 msgid "No permissions to import host groups."
-msgstr ""
+msgstr "Aucune autorisation pour importer des groupes d'hôtes."
 
 #: include/classes/api/services/CConfiguration.php:316
 msgid "No permissions to import hosts."
-msgstr ""
+msgstr "Aucune autorisation pour importer des hôtes."
 
 #: include/classes/api/services/CConfiguration.php:318
 msgid "No permissions to import images."
-msgstr ""
+msgstr "Aucune autorisation pour importer des images."
 
 #: include/classes/api/services/CConfiguration.php:319
 msgid "No permissions to import items."
-msgstr ""
+msgstr "Aucune autorisation pour importer des éléments."
 
 #: include/classes/api/services/CConfiguration.php:320
 msgid "No permissions to import maps."
-msgstr ""
+msgstr "Aucune autorisation pour importer des cartes."
 
 #: include/classes/api/services/CConfiguration.php:321
 msgid "No permissions to import media types."
-msgstr ""
+msgstr "Aucune autorisation pour importer des types de médias."
 
 #: include/classes/api/services/CConfiguration.php:324
 msgid "No permissions to import template dashboards."
-msgstr ""
+msgstr "Aucune autorisation pour importer des modèles de tableau de bord."
 
 #: include/classes/api/services/CConfiguration.php:315
 msgid "No permissions to import template groups."
-msgstr ""
+msgstr "Aucune autorisation pour importer des modèles de groupe."
 
 #: include/classes/api/services/CConfiguration.php:322
 msgid "No permissions to import template links."
-msgstr ""
+msgstr "Aucune autorisation pour importer des modèles de lien."
 
 #: include/classes/api/services/CConfiguration.php:323
 msgid "No permissions to import templates."
-msgstr ""
+msgstr "Aucune autorisation pour importer des modèles."
 
 #: include/classes/api/services/CConfiguration.php:325
 msgid "No permissions to import triggers."
-msgstr ""
+msgstr "Aucune autorisation pour importer des déclencheurs."
 
 #: include/classes/api/services/CConfiguration.php:326
 msgid "No permissions to import value maps."
-msgstr ""
+msgstr "Aucune autorisation pour importer des tables de correspondances."
 
 #: include/classes/api/services/CConfiguration.php:317
 msgid "No permissions to import web scenarios."
-msgstr ""
+msgstr "Aucune autorisation pour importer des scénarios Web."
 
 #: app/controllers/CControllerChartsView.php:133
 #: app/controllers/CControllerDashboardPrint.php:99
@@ -17711,6 +17716,11 @@ msgstr "Code de réponse"
 msgid "Response time"
 msgstr "Temps de réponse"
 
+#: include/classes/server/CZabbixServer.php:498
+#, c-format
+msgid "Response timeout of %1$s exceeded when connecting to Zabbix server \"%2$s\"."
+msgstr "Délai de réponse de %1$s dépassé lors de la connexion au serveur Zabbix « %2$s »."
+
 #: app/controllers/CControllerMediatypeTestSend.php:182
 msgid "Response type: JSON"
 msgstr "Type de réponse : JSON"
@@ -19008,13 +19018,13 @@ msgstr "Raccourci"
 #: app/views/administration.housekeeping.edit.php:187
 #, c-format
 msgid "Should be at least %1$s."
-msgstr ""
+msgstr "Devrait être au moins %1$s."
 
 #: app/partials/administration.system.info.php:262
 #: app/views/administration.housekeeping.edit.php:197
 #, c-format
 msgid "Should not be higher than %1$s."
-msgstr ""
+msgstr "Ne devrait pas être supérieur à %1$s."
 
 #: app/partials/monitoring.problem.filter.php:27
 #: app/views/monitoring.charts.view.php:80
@@ -19961,7 +19971,7 @@ msgstr "TCP"
 #: app/views/administration.timeouts.edit.php:115
 #: app/views/popup.proxy.edit.php:283 include/items.inc.php:98
 msgid "TELNET agent"
-msgstr "agent TELNET"
+msgstr "Agent TELNET"
 
 #: include/classes/screens/CScreenHttpTestDetails.php:190
 msgid "TOTAL"
@@ -20532,7 +20542,7 @@ msgstr "Le paramètre \"%1$s\" est absent des attributs de l'utilisateur."
 
 #: app/views/popup.ldap.edit.php:101
 msgid "The previous password was cleared due to a host change. Please enter the new password."
-msgstr "Le mot de passe précédent a été supprimé suite à un changement d'hébergeur. Veuillez saisir le nouveau mot de passe."
+msgstr "Le mot de passe précédent a été supprimé suite à un changement d'hôte. Veuillez saisir le nouveau mot de passe."
 
 #: include/classes/core/CJsonRpc.php:206
 msgid "The received JSON is not a valid JSON-RPC request."
@@ -21585,11 +21595,11 @@ msgstr "Impossible de récupérer la version de TimescaleDB."
 
 #: app/views/administration.housekeeping.edit.php:173
 msgid "Unable to retrieve compression support status of TimescaleDB time-series database extension for PostgreSQL."
-msgstr ""
+msgstr "Impossible de récupérer l'état de prise en charge de la compression de l'extension TimescaleDB pour PostgreSQL."
 
 #: app/views/administration.housekeeping.edit.php:178
 msgid "Unable to retrieve version of TimescaleDB time-series database extension for PostgreSQL."
-msgstr ""
+msgstr "Impossible de récupérer la version de l'extension TimescaleDB pour PostgreSQL."
 
 #: include/views/mfa.login.php:65
 #, c-format
@@ -21872,7 +21882,7 @@ msgstr "Version du serveur de base de données %1$s non supportée. Doit être d
 #: app/partials/administration.system.info.php:206
 #: app/views/administration.housekeeping.edit.php:169
 msgid "Unsupported TimescaleDB time-series database extension for PostgreSQL is used."
-msgstr ""
+msgstr "Extension TimescaleDB non prise en charge pour PostgreSQL est utilisée."
 
 #: app/views/administration.housekeeping.edit.php:190
 #, c-format
@@ -23291,7 +23301,7 @@ msgstr "Message d'alerte"
 #: app/partials/administration.system.info.php:243
 #: app/partials/administration.system.info.php:262
 msgid "Warning!"
-msgstr ""
+msgstr "Avertissement !"
 
 #: app/partials/administration.system.info.php:198
 msgid "Warning! Support for Oracle DB is deprecated since Zabbix 7.0 and will be removed in future versions."
@@ -23860,7 +23870,7 @@ msgstr "Support Technique Zabbix"
 #: app/views/popup.proxy.edit.php:206 include/discovery.inc.php:56
 #: include/items.inc.php:86
 msgid "Zabbix agent"
-msgstr "agent Zabbix"
+msgstr "Agent Zabbix"
 
 #: widgets/hostavail/includes/WidgetForm.php:47
 msgid "Zabbix agent (active checks)"
@@ -23868,7 +23878,7 @@ msgstr "Agent Zabbix (contrôles actifs)"
 
 #: include/items.inc.php:87
 msgid "Zabbix agent (active)"
-msgstr "agent Zabbix (actif)"
+msgstr "Agent Zabbix (actif)"
 
 #: widgets/hostavail/includes/WidgetForm.php:48
 msgid "Zabbix agent (passive checks)"
