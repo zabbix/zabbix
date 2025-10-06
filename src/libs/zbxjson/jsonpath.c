@@ -1000,7 +1000,7 @@ static int	jsonpath_parse_expression(const char *expression, zbx_jsonpath_t *jso
 {
 	int				nesting = 1, ret = FAIL;
 	zbx_jsonpath_token_t		*optoken, *token;
-	zbx_vector_ptr_t		output, operators;
+	zbx_vector_jsonpath_token_ptr_t	output, operators;
 	zbx_strloc_t			loc = {0, 0};
 	zbx_jsonpath_token_type_t	token_type;
 	zbx_jsonpath_token_group_t	prev_group = ZBX_JSONPATH_TOKEN_GROUP_NONE;
@@ -1008,7 +1008,7 @@ static int	jsonpath_parse_expression(const char *expression, zbx_jsonpath_t *jso
 	if ('(' != *expression)
 		return zbx_jsonpath_error(expression);
 
-	zbx_vector_ptr_create(&output);
+	zbx_vector_jsonpath_token_ptr_create(&output);
 	zbx_vector_ptr_create(&operators);
 
 	while (SUCCEED == jsonpath_expression_next_token(expression, loc.r + 1, prev_group, &token_type, &loc))
@@ -1086,7 +1086,7 @@ static int	jsonpath_parse_expression(const char *expression, zbx_jsonpath_t *jso
 				if (ZBX_JSONPATH_TOKEN_PAREN_LEFT == optoken->type)
 					break;
 
-				zbx_vector_ptr_append(&output, optoken);
+				zbx_vector_jsonpath_token_ptr_append(&output, optoken);
 			}
 
 			if (NULL == (token = jsonpath_create_token(token_type, expression, &loc)))
@@ -1126,7 +1126,7 @@ static int	jsonpath_parse_expression(const char *expression, zbx_jsonpath_t *jso
 					break;
 				}
 
-				zbx_vector_ptr_append(&output, optoken);
+				zbx_vector_jsonpath_token_ptr_append(&output, optoken);
 			}
 
 			if (NULL == optoken)
@@ -1156,7 +1156,7 @@ out:
 				goto cleanup;
 			}
 
-			zbx_vector_ptr_append(&output, optoken);
+			zbx_vector_jsonpath_token_ptr_append(&output, optoken);
 		}
 
 		jsonpath_reserve(jsonpath, 1);
@@ -1176,11 +1176,11 @@ cleanup:
 	if (SUCCEED != ret)
 	{
 		zbx_vector_ptr_clear_ext(&operators, (zbx_clean_func_t)jsonpath_token_free);
-		zbx_vector_ptr_clear_ext(&output, (zbx_clean_func_t)jsonpath_token_free);
+		zbx_vector_jsonpath_token_ptr_clear_ext(&output, jsonpath_token_free);
 	}
 
 	zbx_vector_ptr_destroy(&operators);
-	zbx_vector_ptr_destroy(&output);
+	zbx_vector_jsonpath_token_ptr_destroy(&output);
 
 	return ret;
 }
