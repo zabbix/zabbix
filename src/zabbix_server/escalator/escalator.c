@@ -2799,6 +2799,18 @@ zbx_escalation_diff_t;
 ZBX_PTR_VECTOR_DECL(escalation_diff_ptr, zbx_escalation_diff_t*)
 ZBX_PTR_VECTOR_IMPL(escalation_diff_ptr, zbx_escalation_diff_t*)
 
+static void	zbx_escalation_diff_free(zbx_escalation_diff_t *ed)
+{
+	zbx_free(ed);
+}
+
+static int     zbx_escalation_diff_ptr_compare_func(const zbx_escalation_diff_t *ed1, const zbx_escalation_diff_t *ed2)
+{
+	ZBX_RETURN_IF_NOT_EQUAL(ed1->escalationid, ed2->escalationid);
+
+	return 0;
+}
+
 #define ZBX_DIFF_ESCALATION_UNSET			__UINT64_C(0x0000)
 #define ZBX_DIFF_ESCALATION_UPDATE_NEXTCHECK		__UINT64_C(0x0001)
 #define ZBX_DIFF_ESCALATION_UPDATE_ESC_STEP		__UINT64_C(0x0002)
@@ -3454,7 +3466,7 @@ static int	process_db_escalations(int now, int *nextcheck, zbx_vector_db_escalat
 out:
 	zbx_dc_close_user_macros(um_handle);
 
-	zbx_vector_escalation_diff_ptr_clear_ext(&diffs, (void (*)(zbx_escalation_diff_t *))zbx_ptr_free);
+	zbx_vector_escalation_diff_ptr_clear_ext(&diffs, zbx_escalation_diff_free);
 	zbx_vector_escalation_diff_ptr_destroy(&diffs);
 
 	zbx_vector_db_action_ptr_clear_ext(&actions, free_db_action);
