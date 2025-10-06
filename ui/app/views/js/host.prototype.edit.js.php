@@ -83,6 +83,7 @@ window.host_prototype_edit_popup = new class {
 					callback: ({event}) => {
 						if (!this.#isConfirmed()) {
 							event.preventDefault();
+							this.overlay.unsetLoading();
 						}
 					}
 				})
@@ -539,7 +540,10 @@ window.host_prototype_edit_popup = new class {
 		parameters.clone = 1;
 
 		this.form.release();
-		this.overlay = ZABBIX.PopupManager.open('host.prototype.edit', parameters);
+		const overlay = ZABBIX.PopupManager.open('host.prototype.edit', parameters);
+		if (overlay) {
+			this.overlay = overlay;
+		}
 	}
 
 	/**
