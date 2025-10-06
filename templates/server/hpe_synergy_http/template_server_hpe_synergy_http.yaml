@@ -7011,6 +7011,8 @@ zabbix_export:
       tags:
         - tag: class
           value: hardware
+        - tag: class
+          value: storage
         - tag: target
           value: hpe
         - tag: target
