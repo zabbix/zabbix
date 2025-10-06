@@ -98,8 +98,7 @@ void	*zbx_expr_cache_fetch_or_insert(const void *obj, size_t sz, zbx_rem_create_
 		entry = &local_entry;
 
 		entry->obj = obj;
-		entry->ptr = zbx_malloc(NULL, sz);
-		memset(entry->ptr, 0, sz);
+		entry->ptr = zbx_calloc(NULL, 1, sz);
 		entry->destroy_func = destroy_func;
 
 		if (NULL != create_func)
@@ -229,7 +228,8 @@ int	zbx_substitute_macros_args(zbx_token_search_t search, char **data, char *err
 
 			va_end(pargs);
 
-			if (SUCCEED < ret) continue; /* resolver did everything */
+			if (SUCCEED < ret) /* resolver did everything */
+				continue;
 
 			if ((ZBX_TOKEN_FUNC_MACRO == p.token.type || ZBX_TOKEN_USER_FUNC_MACRO == p.token.type) &&
 					NULL != replace_to)
