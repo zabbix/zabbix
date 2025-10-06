@@ -1082,12 +1082,10 @@ zbx_dc_config_t	*get_dc_config(void);
 void	set_dc_config(zbx_dc_config_t *in);
 
 int		zbx_get_sync_in_progress(void);
-void		zbx_start_sync(void);
 zbx_rwlock_t	zbx_get_config_lock(void);
 
 #define	RDLOCK_CACHE	do { if (0 == zbx_get_sync_in_progress()) zbx_rwlock_rdlock(zbx_get_config_lock()); } while(0)
-#define	WRLOCK_CACHE	do { if (0 == zbx_get_sync_in_progress()) zbx_rwlock_wrlock(zbx_get_config_lock()); \
-			zbx_start_sync(); } while(0)
+#define	WRLOCK_CACHE	do { if (0 == zbx_get_sync_in_progress()) zbx_rwlock_wrlock(zbx_get_config_lock()); } while(0)
 #define	UNLOCK_CACHE	do { if (0 == zbx_get_sync_in_progress()) zbx_rwlock_unlock(zbx_get_config_lock()); } while(0)
 
 zbx_rwlock_t	zbx_get_config_history_lock(void);
