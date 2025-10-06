@@ -296,7 +296,7 @@ const char	**zbx_get_indexable_macros(void);
 typedef void (*zbx_rem_create_func_t)(void *);
 typedef void (*zbx_rem_destroy_func_t)(void *);
 
-void	*zbx_expr_cache_fetch_or_insert(const void *obj, size_t sz, zbx_rem_create_func_t create_func,
+void	*zbx_expr_rem(const void *obj, size_t sz, zbx_rem_create_func_t create_func,
 		zbx_rem_destroy_func_t destroy_func);
 
 int	zbx_substitute_macros(char **data, char *error, size_t maxerrlen, zbx_macro_resolv_func_t resolver, ...);

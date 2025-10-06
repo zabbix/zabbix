@@ -88,7 +88,7 @@ const char	**zbx_get_indexable_macros(void)
  * Return value: pointer to remembered memory                                   *
  *                                                                              *
  ********************************************************************************/
-void	*zbx_expr_cache_fetch_or_insert(const void *obj, size_t sz, zbx_rem_create_func_t create_func,
+void	*zbx_expr_rem(const void *obj, size_t sz, zbx_rem_create_func_t create_func,
 		zbx_rem_destroy_func_t destroy_func)
 {
 	expr_cache_element_t	*entry, local_entry = {0};
