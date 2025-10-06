@@ -939,10 +939,7 @@ const char	*dc_strpool_intern(const char *str)
 	size_t		size;
 
 	if (0 == zbx_config_wlock_is_locked())
-	{
 		THIS_SHOULD_NEVER_HAPPEN;
-		exit(EXIT_FAILURE);
-	}
 
 	if (NULL == str)
 		return NULL;
@@ -962,10 +959,7 @@ void	dc_strpool_release(const char *str)
 	zbx_uint32_t	*refcount;
 
 	if (0 == zbx_config_wlock_is_locked())
-	{
 		THIS_SHOULD_NEVER_HAPPEN;
-		exit(EXIT_FAILURE);
-	}
 
 	refcount = (zbx_uint32_t *)(str - REFCOUNT_FIELD_SIZE);
 	if (0 == --(*refcount))
@@ -977,10 +971,7 @@ const char	*dc_strpool_acquire(const char *str)
 	zbx_uint32_t	*refcount;
 
 	if (0 == zbx_config_wlock_is_locked())
-	{
 		THIS_SHOULD_NEVER_HAPPEN;
-		exit(EXIT_FAILURE);
-	}
 
 	if (NULL == str)
 		return NULL;
@@ -994,10 +985,7 @@ const char	*dc_strpool_acquire(const char *str)
 int	dc_strpool_replace(int found, const char **curr, const char *new_str)
 {
 	if (0 == zbx_config_wlock_is_locked())
-	{
 		THIS_SHOULD_NEVER_HAPPEN;
-		exit(EXIT_FAILURE);
-	}
 
 	if (1 == found && NULL != *curr)
 	{
