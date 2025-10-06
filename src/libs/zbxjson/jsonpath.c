@@ -1009,7 +1009,7 @@ static int	jsonpath_parse_expression(const char *expression, zbx_jsonpath_t *jso
 		return zbx_jsonpath_error(expression);
 
 	zbx_vector_jsonpath_token_ptr_create(&output);
-	zbx_vector_ptr_create(&operators);
+	zbx_vector_jsonpath_token_ptr_create(&operators);
 
 	while (SUCCEED == jsonpath_expression_next_token(expression, loc.r + 1, prev_group, &token_type, &loc))
 	{
@@ -1049,7 +1049,7 @@ static int	jsonpath_parse_expression(const char *expression, zbx_jsonpath_t *jso
 			if (NULL == (token = jsonpath_create_token(token_type, expression, &loc)))
 				goto cleanup;
 
-			zbx_vector_ptr_append(&operators, token);
+			zbx_vector_jsonpath_token_ptr_append(&operators, token);
 			prev_group = jsonpath_token_group(token_type);
 			continue;
 		}
@@ -1092,7 +1092,7 @@ static int	jsonpath_parse_expression(const char *expression, zbx_jsonpath_t *jso
 			if (NULL == (token = jsonpath_create_token(token_type, expression, &loc)))
 				goto cleanup;
 
-			zbx_vector_ptr_append(&operators, token);
+			zbx_vector_jsonpath_token_ptr_append(&operators, token);
 			prev_group = jsonpath_token_group(token_type);
 			continue;
 		}
@@ -1102,7 +1102,7 @@ static int	jsonpath_parse_expression(const char *expression, zbx_jsonpath_t *jso
 			if (NULL == (token = jsonpath_create_token(token_type, expression, &loc)))
 				goto cleanup;
 
-			zbx_vector_ptr_append(&operators, token);
+			zbx_vector_jsonpath_token_ptr_append(&operators, token);
 			prev_group = ZBX_JSONPATH_TOKEN_GROUP_NONE;
 			continue;
 		}
@@ -1175,11 +1175,11 @@ out:
 cleanup:
 	if (SUCCEED != ret)
 	{
-		zbx_vector_ptr_clear_ext(&operators, (zbx_clean_func_t)jsonpath_token_free);
+		zbx_vector_jsonpath_token_ptr_clear_ext(&operators, jsonpath_token_free);
 		zbx_vector_jsonpath_token_ptr_clear_ext(&output, jsonpath_token_free);
 	}
 
-	zbx_vector_ptr_destroy(&operators);
+	zbx_vector_jsonpath_token_ptr_destroy(&operators);
 	zbx_vector_jsonpath_token_ptr_destroy(&output);
 
 	return ret;
