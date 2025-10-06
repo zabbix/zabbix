@@ -771,6 +771,11 @@ function getSelementsInfo(array $sysmap, array $options = []): array {
 		$selement_info['maintenance'] = getTriggerMaintenance($selement, $selement_info, $sysmaps_data, $trigger_hosts);
 
 		foreach ($selement['hosts'] as $hostid) {
+			// If selement host is not readable via API, it's maintenance information is also not readable.
+			if (!array_key_exists($hostid, $hosts)) {
+				continue;
+			}
+
 			$host = $hosts[$hostid];
 
 			if ($host['status'] == HOST_STATUS_NOT_MONITORED) {
