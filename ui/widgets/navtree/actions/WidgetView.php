@@ -296,13 +296,13 @@ class WidgetView extends CControllerDashboardWidgetView {
 			}
 
 			// Count problems in each submap included in navigation tree:
-			foreach ($navtree_items as $id => $navtree_item) {
+			foreach ($navtree_items as $nav_id => $navtree_item) {
 				$maps_need_to_count_in = $navtree_item['child_sysmapids'];
 				if ($navtree_item['sysmapid'] != 0) {
 					$maps_need_to_count_in[$navtree_item['sysmapid']] = true;
 				}
 
-				$response[$id] = $this->problems_per_severity_tpl;
+				$response[$nav_id] = $this->problems_per_severity_tpl;
 
 				foreach (array_keys($maps_need_to_count_in) as $sysmapid) {
 					if (array_key_exists($sysmapid, $sysmaps)) {
@@ -316,25 +316,25 @@ class WidgetView extends CControllerDashboardWidgetView {
 								);
 
 								if ($problems !== null) {
-									$response[$id] = self::sumProblems($response[$id], $problems);
+									$response[$nav_id] = self::sumProblems($response[$nav_id], $problems);
 								}
 							}
 						}
 
 						// Count problems occurred in triggers which are related to the links.
 						foreach ($map['links'] as $link) {
-							foreach (array_unique(array_column($link['linktriggers'], 'triggerid')) as $triggerid) {
+							foreach (array_flip(array_column($link['linktriggers'], 'triggerid')) as $id => $var) {
 								// Skip disabled and inaccessible triggers.
-								if (!array_key_exists($triggerid, $problems_per_trigger)) {
+								if (!array_key_exists($id, $problems_per_trigger)) {
 									continue;
 								}
 
-								$response[$id] = self::sumProblems($response[$id], $problems_per_trigger[$triggerid]);
+								$response[$nav_id] = self::sumProblems($response[$nav_id], $problems_per_trigger[$id]);
 							}
 
 						}
 
-						$response[$id] = $this->filterProblemsByMapSettings($response[$id], $map);
+						$response[$nav_id] = $this->filterProblemsByMapSettings($response[$nav_id], $map);
 					}
 				}
 			}
@@ -372,10 +372,7 @@ class WidgetView extends CControllerDashboardWidgetView {
 				break;
 
 			case SYSMAP_ELEMENT_TYPE_TRIGGER:
-				foreach (array_unique(array_column($selement['elements'], 'triggerid')) as $triggerid) {
-					// Skip disabled and inaccessible triggers.
-					$triggerids = [$triggerid];
-				}
+				$triggerids[] = array_keys(array_flip(array_column($selement['elements'], 'triggerid')));
 				break;
 
 			case SYSMAP_ELEMENT_TYPE_HOST:
@@ -431,11 +428,11 @@ class WidgetView extends CControllerDashboardWidgetView {
 									continue;
 								}
 
-								foreach (array_unique(array_column($link['linktriggers'], 'triggerid')) as $triggerid) {
+								foreach (array_flip(array_column($link['linktriggers'], 'triggerid')) as $id => $var) {
 									// Skip disabled and inaccessible triggers.
-									if (array_key_exists($triggerid, $problems_per_trigger)) {
+									if (array_key_exists($id, $problems_per_trigger)) {
 										$problems = self::sumProblems($problems,
-											$problems_per_trigger[$triggerid]
+											$problems_per_trigger[$id]
 										);
 									}
 								}
