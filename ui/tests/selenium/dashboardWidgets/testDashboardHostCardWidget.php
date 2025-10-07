@@ -1109,7 +1109,7 @@ class testDashboardHostCardWidget extends testWidgets {
 					],
 					'Monitoring' => [
 						'Dashboards' => 8,
-						'Latest data' => 288,
+						'Latest data' => 291,
 						'Graphs' => 29,
 						'Web' => 1
 					],
@@ -1247,7 +1247,7 @@ class testDashboardHostCardWidget extends testWidgets {
 					],
 					'Monitoring' => [
 						'Dashboards' => 4,
-						'Latest data' => 122,
+						'Latest data' => 125,
 						'Graphs' => 8,
 						'Web' => 0
 					]
@@ -1691,8 +1691,7 @@ class testDashboardHostCardWidget extends testWidgets {
 
 	public static function getWidgetName() {
 		return [
-			// TODO: uncomment test cases once issue ZBX-24885 is resolved
-/*			[
+			[
 				[
 					'Name' => 'Fully filled host card widget'
 				]
@@ -1701,7 +1700,7 @@ class testDashboardHostCardWidget extends testWidgets {
 				[
 					'Name' => 'Host card'
 				]
-			],*/
+			],
 			[
 				[
 					'Name' => 'Default host card widget'

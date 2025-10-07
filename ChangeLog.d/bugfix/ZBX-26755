@@ -1,0 +1,1 @@
+...G...... [ZBX-26755] fixed problem with mqtt plugin in Zabbix agent 2 not establishing connection if first call failed. (opucka)
