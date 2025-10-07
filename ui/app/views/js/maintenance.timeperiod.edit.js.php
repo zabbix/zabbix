@@ -14,10 +14,11 @@
 **/
 ?>
 
+
 window.maintenance_timeperiod_edit = new class {
 
 	/**
-	 * @type {HTMLElement}
+	 * @type {HTMLFormElement}
 	 */
 	form_element;
 
@@ -33,7 +34,7 @@ window.maintenance_timeperiod_edit = new class {
 		this.form = new CForm(this.form_element, rules);
 
 		// Update form field state according to the form data.
-		document.querySelectorAll('[name="timeperiod_type"], [name="month_date_type"]').forEach((element) =>
+		this.form_element.querySelectorAll('[name="timeperiod_type"], [name="month_date_type"]').forEach((element) =>
 			element.addEventListener('change', () => this.#update())
 		);
 
@@ -156,4 +157,4 @@ window.maintenance_timeperiod_edit = new class {
 
 		this.form_element.parentNode.insertBefore(message_box, this.form_element);
 	}
-}
+};

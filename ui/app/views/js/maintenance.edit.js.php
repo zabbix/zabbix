@@ -12,17 +12,13 @@
 ** You should have received a copy of the GNU Affero General Public License along with this program.
 ** If not, see <https://www.gnu.org/licenses/>.
 **/
-
-/**
- * @var CView $this
- * @var array $data
- */
 ?>
+
 
 window.maintenance_edit = new class {
 
 	/**
-	 * @type {HTMLElement}
+	 * @type {HTMLFormElement}
 	 */
 	form_element;
 
@@ -98,8 +94,8 @@ window.maintenance_edit = new class {
 
 			const field = this.form.findFieldByName(text_input.name);
 
-			if (text_input.disabled) {
-				field && field.unsetErrors();
+			if (field && text_input.disabled) {
+				field.unsetErrors();
 			}
 		});
 
@@ -145,7 +141,7 @@ window.maintenance_edit = new class {
 		else {
 			let row_index = 0;
 
-			while (document.querySelector(`#timeperiods [data-row_index="${row_index}"]`) !== null) {
+			while (this.form_element.querySelector(`#timeperiods [data-row_index="${row_index}"]`) !== null) {
 				row_index++;
 			}
 
@@ -174,7 +170,7 @@ window.maintenance_edit = new class {
 	#addTimePeriod(timeperiod) {
 		const template = new Template(document.getElementById('timeperiod-row-tmpl').innerHTML);
 
-		document
+		this.form_element
 			.querySelector('#timeperiods tbody')
 			.insertAdjacentHTML('beforeend', template.evaluate(timeperiod));
 	}
@@ -292,4 +288,4 @@ window.maintenance_edit = new class {
 
 		this.form_element.parentNode.insertBefore(message_box, this.form_element);
 	}
-}
+};
