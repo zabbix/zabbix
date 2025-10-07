@@ -76,7 +76,7 @@ class CForm {
 	}
 
 	reload(rules) {
-		this.release();
+		this.#reset();
 
 		this.#rules = rules;
 		this.discoverAllFields();
@@ -90,7 +90,7 @@ class CForm {
 		this.#form_ready = true;
 	}
 
-	release() {
+	#reset() {
 		this.#form_ready = false;
 
 		for (const field of Object.values(this.#fields)) {
@@ -103,6 +103,10 @@ class CForm {
 
 		clearTimeout(this.#validate_changes_timeout);
 		this.#validate_changes_call = null;
+	}
+
+	release() {
+		this.#reset();
 		document.removeEventListener('mousedown', this.#listeners.mousedown);
 		document.removeEventListener('mouseup', this.#listeners.mouseup);
 	}
