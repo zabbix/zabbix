@@ -58,7 +58,7 @@ static void	DBmass_update_trends(const ZBX_DC_TREND *trends, int trends_num,
 		qsort(trends_tmp, trends_num, sizeof(ZBX_DC_TREND), zbx_trend_compare);
 
 		while (0 < trends_num)
-			zbx_db_flush_trends(trends_tmp, &trends_num, trends_diff);
+			zbx_db_flush_trends(trends_tmp, &trends_num, trends_diff, ZBX_DC_SYNC_TREND_MODE_NORMAL);
 
 		zbx_free(trends_tmp);
 	}
@@ -206,6 +206,7 @@ static int	process_trigger(zbx_dc_trigger_t *trigger, zbx_add_event_func_t add_e
 
 		if (0 != (event_flags & ZBX_FLAGS_TRIGGER_CREATE_INTERNAL_EVENT))
 		{
+			/* zbx_add_event() */
 			add_event_cb(EVENT_SOURCE_INTERNAL, EVENT_OBJECT_TRIGGER, trigger->triggerid,
 					&trigger->timespec, new_state, NULL, trigger->expression,
 					trigger->recovery_expression, 0, 0, &trigger->tags, 0, NULL, 0, NULL, NULL,
