@@ -146,6 +146,7 @@ static void	lld_entry_create(zbx_lld_entry_t *entry, const zbx_jsonobj_t *obj,
 	entry->source = obj;
 }
 
+
 /******************************************************************************
  *                                                                            *
  * Purpose: clear lld entry (row)                                             *
@@ -157,6 +158,11 @@ void	lld_entry_clear(zbx_lld_entry_t *entry)
 		lld_macro_clear(&entry->macros.values[i]);
 
 	zbx_vector_lld_macro_destroy(&entry->macros);
+}
+
+void	lld_entry_clear_wrapper(void *data)
+{
+	lld_entry_clear((zbx_lld_entry_t*)data);
 }
 
 /******************************************************************************

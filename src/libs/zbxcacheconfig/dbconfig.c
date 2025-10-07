@@ -14016,6 +14016,11 @@ static void	corr_condition_clean(zbx_corr_condition_t *condition)
 	}
 }
 
+static void	corr_condition_clean_wrapper(void *data)
+{
+	corr_condition_clean((zbx_corr_condition_t*)data);
+}
+
 /******************************************************************************
  *                                                                            *
  * Purpose: frees global correlation rule                                     *
@@ -14197,7 +14202,7 @@ void	zbx_dc_correlation_rules_init(zbx_correlation_rules_t *rules)
 {
 	zbx_vector_correlation_ptr_create(&rules->correlations);
 	zbx_hashset_create_ext(&rules->conditions, 0, ZBX_DEFAULT_UINT64_HASH_FUNC, ZBX_DEFAULT_UINT64_COMPARE_FUNC,
-			(zbx_clean_func_t)corr_condition_clean, ZBX_DEFAULT_MEM_MALLOC_FUNC,
+			corr_condition_clean_wrapper, ZBX_DEFAULT_MEM_MALLOC_FUNC,
 			ZBX_DEFAULT_MEM_REALLOC_FUNC, ZBX_DEFAULT_MEM_FREE_FUNC);
 
 	rules->sync_ts = 0;

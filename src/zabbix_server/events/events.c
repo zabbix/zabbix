@@ -62,13 +62,6 @@ zbx_event_problem_t;
 ZBX_PTR_VECTOR_DECL(event_problem_ptr, zbx_event_problem_t *)
 ZBX_PTR_VECTOR_IMPL(event_problem_ptr, zbx_event_problem_t *)
 
-static int	zbx_event_problem_ptr_compare_func(const zbx_event_problem_t *ep1, const zbx_event_problem_t *ep2)
-{
-	ZBX_RETURN_IF_NOT_EQUAL(ep1->eventid, ep2->eventid);
-
-	return 0;
-}
-
 typedef struct
 {
 	zbx_uint64_t	eventid;
@@ -2678,7 +2671,7 @@ static void	get_open_problems(const zbx_vector_uint64_t *triggerids, zbx_vector_
 			continue;
 
 		event_problem_free(problem);
-		zbx_vector_ptr_remove(problems, i);
+		zbx_vector_event_problem_ptr_remove(problems, i);
 		i--;
 	}
 

@@ -2804,13 +2804,6 @@ static void	zbx_escalation_diff_free(zbx_escalation_diff_t *ed)
 	zbx_free(ed);
 }
 
-static int     zbx_escalation_diff_ptr_compare_func(const zbx_escalation_diff_t *ed1, const zbx_escalation_diff_t *ed2)
-{
-	ZBX_RETURN_IF_NOT_EQUAL(ed1->escalationid, ed2->escalationid);
-
-	return 0;
-}
-
 #define ZBX_DIFF_ESCALATION_UNSET			__UINT64_C(0x0000)
 #define ZBX_DIFF_ESCALATION_UPDATE_NEXTCHECK		__UINT64_C(0x0001)
 #define ZBX_DIFF_ESCALATION_UPDATE_ESC_STEP		__UINT64_C(0x0002)
@@ -3121,6 +3114,11 @@ static void	service_role_clean(zbx_service_role_t *role)
 	zbx_vector_uint64_destroy(&role->serviceids);
 }
 
+static void	service_role_clean_wrapper(void *data)
+{
+	service_role_clean((zbx_service_role_t*)data);
+}
+
 static int	process_db_escalations(int now, int *nextcheck, zbx_vector_db_escalation_ptr_t *escalations,
 		zbx_vector_uint64_t *eventids, zbx_vector_uint64_t *problem_eventids, zbx_vector_uint64_t *actionids,
 		const char *default_timezone, int config_timeout, int config_trapper_timeout,
@@ -3151,7 +3149,7 @@ static int	process_db_escalations(int now, int *nextcheck, zbx_vector_db_escalat
 	zbx_vector_db_service_create(&services);
 
 	zbx_hashset_create_ext(&service_roles, 100, ZBX_DEFAULT_UINT64_HASH_FUNC,
-			ZBX_DEFAULT_UINT64_COMPARE_FUNC, (zbx_clean_func_t)service_role_clean,
+			ZBX_DEFAULT_UINT64_COMPARE_FUNC, service_role_clean_wrapper,
 			ZBX_DEFAULT_MEM_MALLOC_FUNC, ZBX_DEFAULT_MEM_REALLOC_FUNC, ZBX_DEFAULT_MEM_FREE_FUNC);
 
 	add_ack_escalation_r_eventids(escalations, eventids, &event_pairs);

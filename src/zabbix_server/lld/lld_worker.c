@@ -71,7 +71,7 @@ static void	lld_register_worker(zbx_ipc_socket_t *socket)
 static void	lld_value_init(zbx_lld_value_t *lld_value)
 {
 	zbx_hashset_create_ext(&lld_value->entries, 0, lld_entry_hash, lld_entry_compare,
-			(zbx_clean_func_t)lld_entry_clear, ZBX_DEFAULT_MEM_MALLOC_FUNC, ZBX_DEFAULT_MEM_REALLOC_FUNC,
+			lld_entry_clear_wrapper, ZBX_DEFAULT_MEM_MALLOC_FUNC, ZBX_DEFAULT_MEM_REALLOC_FUNC,
 			ZBX_DEFAULT_MEM_FREE_FUNC);
 
 	zbx_vector_lld_entry_ptr_create(&lld_value->entries_sorted);
@@ -260,7 +260,7 @@ static int	lld_compare_value(const zbx_ipc_message_t *message, zbx_lld_value_t *
 	zbx_hashset_t	entries;
 
 	zbx_hashset_create_ext(&entries, (size_t)lld_value->entries.num_data, lld_entry_hash, lld_entry_compare,
-			(zbx_clean_func_t)lld_entry_clear, ZBX_DEFAULT_MEM_MALLOC_FUNC, ZBX_DEFAULT_MEM_REALLOC_FUNC,
+			lld_entry_clear_wrapper, ZBX_DEFAULT_MEM_MALLOC_FUNC, ZBX_DEFAULT_MEM_REALLOC_FUNC,
 			ZBX_DEFAULT_MEM_FREE_FUNC);
 
 	zbx_lld_deserialize_value(message->data, &value);

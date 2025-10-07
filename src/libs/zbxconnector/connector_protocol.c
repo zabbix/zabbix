@@ -59,7 +59,7 @@ void	zbx_connector_deserialize_object(const unsigned char *data, zbx_uint32_t si
 	while (data < end)
 	{
 		zbx_connector_object_t	connector_object;
-		zbx_uint32_t		deserialize_str_len, vector_uint64_len;
+		zbx_uint32_t		deserialize_str_len;
 
 		data += zbx_deserialize_value(data, &connector_object.objectid);
 		data += zbx_deserialize_value(data, &connector_object.ts.sec);
