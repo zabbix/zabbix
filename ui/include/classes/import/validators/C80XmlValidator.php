@@ -3437,7 +3437,7 @@ class C80XmlValidator extends CXmlValidatorGeneral {
 						]]
 					]]
 				]]
-			]],
+			]]
 		]];
 	}
 

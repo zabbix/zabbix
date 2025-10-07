@@ -28,7 +28,7 @@ class CConfiguration extends CApiService {
 	private const IMPORT_ACCESS_RULES = [
 		'dashboards' => [
 			'createMissing' => CDashboard::ACCESS_RULES['create'],
-			'updateExisting' => CDashboard::ACCESS_RULES['update'],
+			'updateExisting' => CDashboard::ACCESS_RULES['update']
 		],
 		'discoveryRules' => [
 			'createMissing' => CDiscoveryRule::ACCESS_RULES['create'],
