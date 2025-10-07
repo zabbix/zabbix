@@ -14,8 +14,7 @@
 
 #include "zbxserialize.h"
 
-#include "string.h"
-#include "zbxtypes.h"
+#include "zbxalgo.h"
 
 /******************************************************************************
  *                                                                            *

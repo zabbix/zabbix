@@ -14,7 +14,6 @@
 
 #include "zbxpreproc.h"
 #include "zbxdiag.h"
-#include "zbxalgo.h"
 #include "zbxtime.h"
 #include "zbxjson.h"
 
