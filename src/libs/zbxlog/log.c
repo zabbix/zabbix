@@ -293,12 +293,13 @@ int	zbx_open_log(const zbx_config_log_t *log_file_cfg, int level, const char *sy
 
 		if (SUCCEED != zbx_mutex_create(&log_access, ZBX_MUTEX_LOG, error))
 			return FAIL;
-
+#ifndef _WINDOWS
 		mode_t	old_umask = umask(0026);
-
+#endif
 		log_file = fopen(filename, "a+");
+#ifndef _WINDOWS
 		umask(old_umask);
-
+#endif
 		if (NULL == log_file)
 		{
 			*error = zbx_dsprintf(*error, "unable to open log file [%s]: %s", filename,
@@ -374,12 +375,13 @@ void	zbx_log_impl(int level, const char *fmt, va_list args)
 		if (0 != get_config_log_file_size())
 			rotate_log(log_filename);
 
-
+#ifndef _WINDOWS
 		mode_t	old_umask = umask(0026);
-
+#endif
 		log_file = fopen(log_filename, "a+");
+#ifndef _WINDOWS
 		umask(old_umask);
-
+#endif
 		if (NULL != log_file)
 		{
 			long		milliseconds;
