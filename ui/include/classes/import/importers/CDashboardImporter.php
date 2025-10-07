@@ -38,8 +38,8 @@ class CDashboardImporter extends CDashboardImporterGeneral {
 					$name, true
 				);
 			}
-			unset($dashboard_page);
 
+			unset($dashboard_page);
 			$db_dashboard = $this->referencer->findDashboardByName($dashboard['name']);
 
 			if ($db_dashboard !== null) {
@@ -53,13 +53,18 @@ class CDashboardImporter extends CDashboardImporterGeneral {
 							$page['dashboard_pageid'] = $db_dashboard['pages'][$page_idx]['dashboard_pageid'];
 
 							if (array_key_exists('widgets', $page)) {
+								$used_widgetids = [];
+								$db_page_widgetsids = $db_dashboard['pages'][$page_idx]['widgetids'];
 
 								foreach ($page['widgets'] as &$widget) {
 									$x = array_key_exists('x', $widget) ? $widget['x'] : '0';
 									$y = array_key_exists('y', $widget) ? $widget['y'] : '0';
+									$widget_key = $x.'_'.$y;
 
-									if (array_key_exists($x.'_'.$y, $db_dashboard['pages'][$page_idx]['widgetids'])) {
-										$widget['widgetid'] = $db_dashboard['pages'][$page_idx]['widgetids'][$x.'_'.$y];
+									if (!array_key_exists($widget_key, $used_widgetids)
+											&& array_key_exists($widget_key, $db_page_widgetsids)) {
+										$widget['widgetid'] = $db_page_widgetsids[$widget_key];
+										$used_widgetids[$widget_key] = true;
 									}
 								}
 							}

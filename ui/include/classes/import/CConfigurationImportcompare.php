@@ -314,7 +314,7 @@ class CConfigurationImportcompare {
 							}
 
 							$sub_field = $field;
-							}
+						}
 					}
 					else {
 						$sub_entities = $entity;

@@ -49,7 +49,6 @@ class CConfigurationImport {
 	 */
 	protected $formattedData = [];
 
-
 	/**
 	 * @var array with missing references during import
 	 */
@@ -658,7 +657,7 @@ class CConfigurationImport {
 							$templates_refs += [$value['host'] => []];
 
 							if (!array_key_exists($value['host'], $items_refs)
-								|| !array_key_exists($value['key'], $items_refs[$value['host']])) {
+									|| !array_key_exists($value['key'], $items_refs[$value['host']])) {
 								$items_refs[$value['host']][$value['key']] = [];
 							}
 							break;
@@ -668,7 +667,7 @@ class CConfigurationImport {
 							$templates_refs += [$value['host'] => []];
 
 							if (!array_key_exists($value['host'], $graphs_refs)
-								|| !array_key_exists($value['name'], $graphs_refs[$value['host']])) {
+									|| !array_key_exists($value['name'], $graphs_refs[$value['host']])) {
 								$graphs_refs[$value['host']][$value['name']] = [];
 							}
 							break;
