@@ -264,16 +264,31 @@ ZBX_SHMEM_FUNC_IMPL(__config, config_mem)
 
 void	dbconfig_shmem_free_func(void *ptr)
 {
+#ifdef ZBX_DEBUG
+	if (0 == zbx_config_wlock_is_locked())
+		THIS_SHOULD_NEVER_HAPPEN;
+#endif
+
 	__config_shmem_free_func(ptr);
 }
 
 void	*dbconfig_shmem_realloc_func(void *old, size_t size)
 {
+#ifdef ZBX_DEBUG
+	if (0 == zbx_config_wlock_is_locked())
+		THIS_SHOULD_NEVER_HAPPEN;
+#endif
+
 	return __config_shmem_realloc_func(old, size);
 }
 
 void	*dbconfig_shmem_malloc_func(void *old, size_t size)
 {
+#ifdef ZBX_DEBUG
+	if (0 == zbx_config_wlock_is_locked())
+		THIS_SHOULD_NEVER_HAPPEN;
+#endif
+
 	return __config_shmem_malloc_func(old, size);
 }
 
