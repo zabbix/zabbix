@@ -2455,6 +2455,20 @@ class CFormValidatorTest extends TestCase {
 			],
 			[
 				['object', 'fields' => [
+					'value' => ['file', 'file-type' => 'image', 'messages' => ['file-type' => 'msg1']]
+				]],
+				[],
+				[],
+				CFormValidator::ERROR,
+				['/value' => [
+					['message' => 'msg1', 'level' => CFormValidator::ERROR_LEVEL_PRIMARY]
+				]],
+				['value' => ['name' => '', 'type' => '', 'tmp_name' => 'phpunit.xml', 'error' => UPLOAD_ERR_OK,
+					'size' => 10
+				]]
+			],
+			[
+				['object', 'fields' => [
 					'value' => ['file']
 				]],
 				[],
