@@ -80,8 +80,9 @@ window.host_prototype_edit_popup = new class {
 						event: CPopupManagerEvent.EVENT_OPEN,
 						action
 					},
-					callback: ({event}) => {
-						if (!this.#isConfirmed()) {
+					callback: ({event, data}) => {
+						const is_confirmed = data.action_parameters.clone == 1 || this.#isConfirmed();
+						if (!is_confirmed) {
 							event.preventDefault();
 							this.overlay.unsetLoading();
 						}
