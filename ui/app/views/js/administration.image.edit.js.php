@@ -99,7 +99,6 @@ window.administration_image_edit = new class {
 		}
 	}
 
-
 	#setLoadingStatus(loading_ids) {
 		document.getElementById('imageFormList').classList.add('is-loading', 'is-loading-fadein');
 		[
