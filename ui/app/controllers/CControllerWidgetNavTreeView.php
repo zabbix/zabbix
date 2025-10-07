@@ -37,7 +37,7 @@ class CControllerWidgetNavTreeView extends CControllerWidget {
 		]);
 	}
 
-	protected function getNumberOfProblemsBySysmap(array $navtree_items = []) {
+	private function getNumberOfProblemsBySysmap(array $navtree_items = []): array {
 		$response = [];
 		$sysmapids = [];
 
@@ -48,7 +48,7 @@ class CControllerWidgetNavTreeView extends CControllerWidget {
 
 		$sysmaps = $sysmapids
 			? API::Map()->get([
-				'output' => ['sysmapid', 'severity_min'],
+				'output' => ['sysmapid', 'severity_min', 'show_suppressed', 'show_unack'],
 				'selectLinks' => ['linktriggers', 'permission'],
 				'selectSelements' => ['elements', 'elementtype', 'permission'],
 				'sysmapids' => array_keys($sysmapids),
@@ -81,7 +81,7 @@ class CControllerWidgetNavTreeView extends CControllerWidget {
 			$sysmaps_resolved = array_keys($sysmaps);
 			while ($diff = array_diff($submaps_found, $sysmaps_resolved)) {
 				$submaps = API::Map()->get([
-					'output' => ['sysmapid', 'severity_min'],
+					'output' => ['sysmapid', 'severity_min', 'show_suppressed', 'show_unack'],
 					'selectLinks' => ['linktriggers', 'permission'],
 					'selectSelements' => ['elements', 'elementtype', 'permission'],
 					'sysmapids' => $diff,
@@ -124,8 +124,8 @@ class CControllerWidgetNavTreeView extends CControllerWidget {
 							break;
 
 						case SYSMAP_ELEMENT_TYPE_TRIGGER:
-							foreach (zbx_objectValues($selement['elements'], 'triggerid') as $triggerid) {
-								$problems_per_trigger[$triggerid] = $this->problems_per_severity_tpl;
+							foreach (array_column($selement['elements'], 'triggerid') as $id) {
+								$problems_per_trigger[$id] = $this->problems_per_severity_tpl;
 							}
 							break;
 
@@ -153,7 +153,7 @@ class CControllerWidgetNavTreeView extends CControllerWidget {
 			}
 
 			// Select lowest severity to reduce amount of data returned by API.
-			$severity_min = min(zbx_objectValues($sysmaps, 'severity_min'));
+			$severity_min = min(array_column($sysmaps, 'severity_min'));
 
 			// Get triggers related to host groups.
 			if ($host_groups) {
@@ -197,7 +197,7 @@ class CControllerWidgetNavTreeView extends CControllerWidget {
 			// Count problems per trigger.
 			if ($problems_per_trigger) {
 				$problems = API::Problem()->get([
-					'output' => ['objectid', 'severity'],
+					'output' => ['objectid', 'severity', 'suppressed', 'acknowledged'],
 					'source' => EVENT_SOURCE_TRIGGERS,
 					'object' => EVENT_OBJECT_TRIGGER,
 					'objectids' => array_keys($problems_per_trigger),
@@ -207,20 +207,19 @@ class CControllerWidgetNavTreeView extends CControllerWidget {
 
 				if ($problems) {
 					foreach ($problems as $problem) {
-						$problems_per_trigger[$problem['objectid']][$problem['severity']]++;
+						$problems_per_trigger[$problem['objectid']][$problem['severity']][] = $problem;
 					}
 				}
 			}
 
 			// Count problems in each submap included in navigation tree:
-			foreach ($navtree_items as $id => $navtree_item) {
+			foreach ($navtree_items as $nav_id => $navtree_item) {
 				$maps_need_to_count_in = $navtree_item['child_sysmapids'];
 				if ($navtree_item['sysmapid'] != 0) {
 					$maps_need_to_count_in[$navtree_item['sysmapid']] = true;
 				}
 
-				$response[$id] = $this->problems_per_severity_tpl;
-				$problems_counted = [];
+				$response[$nav_id] = $this->problems_per_severity_tpl;
 
 				foreach (array_keys($maps_need_to_count_in) as $sysmapid) {
 					if (array_key_exists($sysmapid, $sysmaps)) {
@@ -230,46 +229,29 @@ class CControllerWidgetNavTreeView extends CControllerWidget {
 						foreach ($map['selements'] as $selement) {
 							if ($selement['permission'] >= PERM_READ) {
 								$problems = $this->getElementProblems($selement, $problems_per_trigger, $sysmaps,
-									$submaps_relations, $map['severity_min'], $problems_counted, $triggers_per_hosts,
-									$triggers_per_host_groups
+									$submaps_relations, $triggers_per_hosts, $triggers_per_host_groups
 								);
 
 								if ($problems !== null) {
-									$response[$id] = self::sumArrayValues($response[$id], $problems);
+									$response[$nav_id] = self::sumProblems($response[$nav_id], $problems);
 								}
 							}
 						}
 
-						// Count problems occurred in triggers which are related to links.
+						// Count problems occurred in triggers which are related to the links.
 						foreach ($map['links'] as $link) {
-							$uncounted_problem_triggers = array_diff_key(
-								array_flip(zbx_objectValues($link['linktriggers'], 'triggerid')),
-								$problems_counted
-							);
-
-							foreach ($uncounted_problem_triggers as $triggerid => $var) {
-								$problems_counted[$triggerid] = true;
-
+							foreach (array_flip(array_column($link['linktriggers'], 'triggerid')) as $id => $var) {
 								// Skip disabled and inaccessible triggers.
-								if (!array_key_exists($triggerid, $problems_per_trigger)) {
+								if (!array_key_exists($id, $problems_per_trigger)) {
 									continue;
 								}
 
-								$problems_to_add = $problems_per_trigger[$triggerid];
-
-								// Remove problems which are less important than map's min-severity.
-								if ($map['severity_min'] > 0) {
-									foreach ($problems_to_add as $sev => $probl) {
-										if ($map['severity_min'] > $sev) {
-											$problems_to_add[$sev] = 0;
-										}
-									}
-								}
-
-								$response[$id] = self::sumArrayValues($response[$id], $problems_to_add);
+								$response[$nav_id] = self::sumProblems($response[$nav_id], $problems_per_trigger[$id]);
 							}
-							unset($uncounted_problem_triggers);
+
 						}
+
+						$response[$nav_id] = $this->filterProblemsByMapSettings($response[$nav_id], $map);
 					}
 				}
 			}
@@ -279,87 +261,51 @@ class CControllerWidgetNavTreeView extends CControllerWidget {
 			// Reduce the amount of data transferred over Ajax.
 			if ($row === $this->problems_per_severity_tpl) {
 				$row = 0;
+
+				continue;
 			}
+
+			foreach ($row as &$problems) {
+				$problems = count($problems);
+			}
+			unset($problems);
 		}
 		unset($row);
 
 		return $response;
 	}
 
-	protected function getElementProblems(array $selement, array $problems_per_trigger, array $sysmaps,
-			array $submaps_relations, $severity_min = 0, array &$problems_counted = [], array $triggers_per_hosts = [],
-			array $triggers_per_host_groups = []) {
-		$problems = null;
+	private function getElementProblems(array $selement, array $problems_per_trigger, array $sysmaps,
+		array $submaps_relations, array $triggers_per_hosts = [], array $triggers_per_host_groups = []): ?array {
+		$problems = $this->problems_per_severity_tpl;
+		$triggerids = [];
 
 		switch ($selement['elementtype']) {
 			case SYSMAP_ELEMENT_TYPE_HOST_GROUP:
-				$problems = $this->problems_per_severity_tpl;
-
-				if (($element = reset($selement['elements'])) !== false) {
-					if (array_key_exists($element['groupid'], $triggers_per_host_groups)) {
-						$uncounted_problem_triggers = array_diff_key($triggers_per_host_groups[$element['groupid']],
-							$problems_counted
-						);
-						foreach ($uncounted_problem_triggers as $triggerid => $var) {
-							$problems_counted[$triggerid] = true;
-
-							// Skip disabled and inaccessible triggers.
-							if (array_key_exists($triggerid, $problems_per_trigger)) {
-								$problems = self::sumArrayValues($problems, $problems_per_trigger[$triggerid]);
-							}
-						}
-						unset($uncounted_problem_triggers);
-					}
+				if (($element = reset($selement['elements'])) !== false
+						&& array_key_exists($element['groupid'], $triggers_per_host_groups)) {
+					$triggerids = array_keys($triggers_per_host_groups[$element['groupid']]);
 				}
 				break;
 
 			case SYSMAP_ELEMENT_TYPE_TRIGGER:
-				$problems = $this->problems_per_severity_tpl;
-				$uncounted_problem_triggers = array_diff_key(
-					array_flip(zbx_objectValues($selement['elements'], 'triggerid')),
-					$problems_counted
-				);
-				foreach ($uncounted_problem_triggers as $triggerid => $var) {
-					$problems_counted[$triggerid] = true;
-
-					// Skip disabled and inaccessible triggers.
-					if (array_key_exists($triggerid, $problems_per_trigger)) {
-						$problems = self::sumArrayValues($problems, $problems_per_trigger[$triggerid]);
-					}
-				}
-				unset($uncounted_problem_triggers);
+				$triggerids[] = array_keys(array_flip(array_column($selement['elements'], 'triggerid')));
 				break;
 
 			case SYSMAP_ELEMENT_TYPE_HOST:
-				$problems = $this->problems_per_severity_tpl;
-
-				if (($element = reset($selement['elements'])) !== false) {
-					if (array_key_exists($element['hostid'], $triggers_per_hosts)) {
-						$uncounted_problem_triggers = array_diff_key($triggers_per_hosts[$element['hostid']],
-							$problems_counted
-						);
-						foreach ($uncounted_problem_triggers as $triggerid => $var) {
-							$problems_counted[$triggerid] = true;
-
-							// Skip disabled and inaccessible triggers.
-							if (array_key_exists($triggerid, $problems_per_trigger)) {
-								$problems = self::sumArrayValues($problems, $problems_per_trigger[$triggerid]);
-							}
-						}
-						unset($uncounted_problem_triggers);
-					}
+				if (($element = reset($selement['elements'])) !== false
+						&& array_key_exists($element['hostid'], $triggers_per_hosts)) {
+					$triggerids = array_keys($triggers_per_hosts[$element['hostid']]);
 				}
 				break;
 
 			case SYSMAP_ELEMENT_TYPE_MAP:
-				$problems = $this->problems_per_severity_tpl;
-
 				if (($submap_element = reset($selement['elements'])) !== false) {
 					// Recursively find all submaps in any depth and put them into an array.
 					$maps_to_process[$submap_element['sysmapid']] = false;
 
-					while (array_filter($maps_to_process, function($item) {return !$item;})) {
-						foreach ($maps_to_process as $linked_map => $val) {
+					while (array_filter($maps_to_process, static fn ($item) => !$item)) {
+						foreach (array_keys($maps_to_process) as $linked_map) {
 							$maps_to_process[$linked_map] = true;
 
 							if (array_key_exists($linked_map, $submaps_relations)) {
@@ -373,20 +319,21 @@ class CControllerWidgetNavTreeView extends CControllerWidget {
 					}
 
 					// Count problems in each of selected submap.
-					foreach ($maps_to_process as $sysmapid => $val) {
+					foreach (array_keys($maps_to_process) as $sysmapid) {
 						// Count problems in elements assigned to selements.
 						if (array_key_exists($sysmapid, $sysmaps)) {
 							foreach ($sysmaps[$sysmapid]['selements'] as $submap_selement) {
-								if ($submap_selement['permission'] >= PERM_READ) {
-									$problems_in_submap = $this->getElementProblems($submap_selement,
-										$problems_per_trigger, $sysmaps, $submaps_relations,
-										$sysmaps[$sysmapid]['severity_min'], $problems_counted, $triggers_per_hosts,
-										$triggers_per_host_groups
-									);
+								if ($submap_selement['permission'] < PERM_READ) {
+									continue;
+								}
 
-									if ($problems_in_submap !== null) {
-										$problems = self::sumArrayValues($problems, $problems_in_submap);
-									}
+								$problems_in_submap = $this->getElementProblems($submap_selement,
+									$problems_per_trigger, $sysmaps, $submaps_relations, $triggers_per_hosts,
+									$triggers_per_host_groups
+								);
+
+								if ($problems_in_submap !== null) {
+									$problems = self::sumProblems($problems, $problems_in_submap);
 								}
 							}
 						}
@@ -394,36 +341,32 @@ class CControllerWidgetNavTreeView extends CControllerWidget {
 						// Count problems in triggers assigned to linked.
 						if (array_key_exists($sysmapid, $sysmaps)) {
 							foreach ($sysmaps[$sysmapid]['links'] as $link) {
-								if ($link['permission'] >= PERM_READ) {
-									$uncounted_problem_triggers = array_diff_key(
-										array_flip(zbx_objectValues($link['linktriggers'], 'triggerid')),
-										$problems_counted
-									);
-									foreach ($uncounted_problem_triggers as $triggerid => $var) {
-										$problems_counted[$triggerid] = true;
+								if ($link['permission'] < PERM_READ) {
+									continue;
+								}
 
-										// Skip disabled and inaccessible triggers.
-										if (array_key_exists($triggerid, $problems_per_trigger)) {
-											$problems = self::sumArrayValues($problems,
-												$problems_per_trigger[$triggerid]
-											);
-										}
+								foreach (array_flip(array_column($link['linktriggers'], 'triggerid')) as $id => $var) {
+									// Skip disabled and inaccessible triggers.
+									if (array_key_exists($id, $problems_per_trigger)) {
+										$problems = self::sumProblems($problems,
+											$problems_per_trigger[$id]
+										);
 									}
-									unset($uncounted_problem_triggers);
 								}
 							}
 						}
 					}
 				}
-				break;
+				return $problems;
+
+			default:
+				return null;
 		}
 
-		// Remove problems which are less important than $severity_min.
-		if ($problems !== null && $severity_min > 0) {
-			foreach ($problems as $sev => $probl) {
-				if ($severity_min > $sev) {
-					$problems[$sev] = 0;
-				}
+		foreach ($triggerids as $triggerid) {
+			// Skip disabled and inaccessible triggers.
+			if (array_key_exists($triggerid, $problems_per_trigger)) {
+				$problems = self::sumProblems($problems, $problems_per_trigger[$triggerid]);
 			}
 		}
 
@@ -475,7 +418,7 @@ class CControllerWidgetNavTreeView extends CControllerWidget {
 			: [];
 
 		for ($severity = TRIGGER_SEVERITY_NOT_CLASSIFIED; $severity < TRIGGER_SEVERITY_COUNT; $severity++) {
-			$this->problems_per_severity_tpl[$severity] = 0;
+			$this->problems_per_severity_tpl[$severity] = [];
 			$severity_config[$severity] = [
 				'name' => CSeverityHelper::getName($severity),
 				'style_class' => CSeverityHelper::getStatusStyle($severity)
@@ -516,23 +459,54 @@ class CControllerWidgetNavTreeView extends CControllerWidget {
 	}
 
 	/**
+	 * Filter problems by minimum severity, suppression and acknowledge.
+	 *
+	 * @param array $problems  Array containing severity as key and array of problems as value.
+	 * @param array $map       Map settings
+	 *
+	 * @return array  Filtered array containing severity as key and array of problems as value.
+	 */
+	private function filterProblemsByMapSettings(array $problems, array $map): array {
+		if ($map['severity_min'] == 0 && $map['show_suppressed'] != ZBX_PROBLEM_SUPPRESSED_FALSE
+			&& $map['show_unack'] != EXTACK_OPTION_UNACK) {
+			return $problems;
+		}
+
+		foreach (array_keys($problems) as $severity) {
+			if ($map['severity_min'] > $severity) {
+				$problems[$severity] = [];
+			}
+
+			foreach ($problems[$severity] as $key => $problem) {
+				if (($map['show_unack'] == EXTACK_OPTION_UNACK && $problem['acknowledged'] == ZBX_ACKNOWLEDGE_PROBLEM)
+					|| ($map['show_suppressed'] == ZBX_PROBLEM_SUPPRESSED_FALSE
+						&& $problem['suppressed'] == ZBX_PROBLEM_SUPPRESSED_TRUE)) {
+					unset($problems[$severity][$key]);
+				}
+			}
+		}
+
+		return $problems;
+	}
+
+	/**
 	 * Function is used to sum problems in 2 arrays.
 	 *
-	 * Example:
-	 * $a1 = [1 => 0, 2 => 5, 3 => 10];
-	 * $a2 = [1 => 1, 2 => 2, 3 => 3];
-	 * self::sumArrayValues($a1, $a2); // returns [1 => 1, 2 => 7, 3 => 13]
+	 * @param array $a1  Array containing severity as key and array of problems as value.
+	 * @param array $a2  Array containing severity as key and array of problems as value.
 	 *
-	 * @param array $a1  Array containing severity as key and number of problems as value.
-	 * @param array $a2  Array containing severity as key and number of problems as value.
-	 *
-	 * @return array  Array containing problems in both arrays summed.
+	 * @return array  Array containing unique problems from both arrays.
 	 */
-	protected static function sumArrayValues(array $a1, array $a2) {
-		foreach ($a1 as $key => &$value) {
-			$value += $a2[$key];
+	private static function sumProblems(array $a1, array $a2): array {
+		foreach (array_keys($a1) as $severity) {
+			$seen_problems = array_flip(array_column($a1[$severity], 'objectid'));
+
+			foreach ($a2[$severity] as $problem) {
+				if (!array_key_exists($problem['objectid'], $seen_problems)) {
+					$a1[$severity][] = $problem;
+				}
+			}
 		}
-		unset($value);
 
 		return $a1;
 	}
