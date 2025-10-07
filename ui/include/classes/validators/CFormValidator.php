@@ -87,7 +87,7 @@ class CFormValidator {
 					$result[$value] = true;
 				}
 				elseif (in_array($value, ['id', 'integer', 'float', 'string', 'object', 'objects', 'array', 'file'],
-					true)) {
+						true)) {
 					if (array_key_exists('type', $result)) {
 						// "type" is specified multiple times.
 						throw new Exception('[RULES ERROR] Rule "type" is specified multiple times (Path: '.$rule_path.')');
@@ -1422,14 +1422,14 @@ class CFormValidator {
 				}
 			}
 
-			if ($rules['file-type'] == 'image') {
+			if ($rules['file-type'] === 'image') {
 				try {
 					if (@imageCreateFromString($file_content) === false) {
 						throw new Exception(_('File format is unsupported.'));
 					}
 				}
 				catch (Exception $e) {
-					$error = self::getMessage($rules, 'file.type', $e->getMessage());
+					$error = self::getMessage($rules, 'file-type', $e->getMessage());
 
 					return false;
 				}

@@ -277,10 +277,6 @@ abstract class CController {
 		return $input;
 	}
 
-	/**
-	 * @return array
-	 * @throws Exception
-	 */
 	private static function getFileInput(): array {
 		return $_FILES;
 	}
