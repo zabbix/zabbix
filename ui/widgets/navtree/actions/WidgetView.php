@@ -443,10 +443,10 @@ class WidgetView extends CControllerDashboardWidgetView {
 						}
 					}
 				}
-				break;
+				return $problems;
 
-				default:
-					$problems = null;
+			default:
+				return null;
 		}
 
 		foreach ($triggerids as $triggerid) {
