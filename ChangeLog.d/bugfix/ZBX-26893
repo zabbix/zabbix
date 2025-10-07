@@ -1,0 +1,1 @@
+.......PS. [ZBX-26893] fixed delay when executing tasks through Zabbix proxy such as test item, check now, remote command (vso)

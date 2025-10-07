@@ -572,6 +572,7 @@ class CControllerPopupGeneric extends CController {
 			'monitored_hosts' =>					'in 1',
 			'templated_hosts' =>					'in 1',
 			'real_hosts' =>							'in 1',
+			'with_hosts' =>							'in 1',
 			'normal_only' =>						'in 1',
 			'with_graphs' =>						'in 1',
 			'with_hosts' =>							'in 1',
@@ -808,8 +809,10 @@ class CControllerPopupGeneric extends CController {
 			$host_options['monitored_hosts'] = 1;
 		}
 		elseif ($this->hasInput('real_hosts')) {
-			$group_options['with_hosts'] = 1;
 			$host_options['real_hosts'] = 1;
+		}
+		elseif ($this->hasInput('with_hosts')) {
+			$group_options['with_hosts'] = 1;
 		}
 		elseif ($this->hasInput('templated_hosts')) {
 			$host_options['templated_hosts'] = 1;
@@ -990,7 +993,7 @@ class CControllerPopupGeneric extends CController {
 	 * @return array
 	 */
 	protected function getPageOptions(): array {
-		$option_fields_binary = ['real_hosts', 'with_items', 'writeonly'];
+		$option_fields_binary = ['real_hosts', 'with_hosts', 'with_items', 'writeonly'];
 		$option_fields_value = ['host_templates'];
 
 		$page_options = [
@@ -1362,7 +1365,7 @@ class CControllerPopupGeneric extends CController {
 					'with_triggers' => $this->hasInput('with_triggers')
 				];
 
-				if (array_key_exists('real_hosts', $this->page_options)) {
+				if (array_key_exists('with_hosts', $this->page_options)) {
 					$options['with_hosts'] = true;
 				}
 

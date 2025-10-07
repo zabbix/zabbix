@@ -243,8 +243,10 @@ typedef struct
 	int					evaltype;
 	int					item_flags;
 
+#define ZBX_LLD_ITEM_PROTOTYPE_MACRO_PATH_COLS_NUM	2
+#define ZBX_LLD_ITEM_PROTOTYPE_FILTERS_COLS_NUM		3
 	zbx_sync_rowset_t			macro_paths;
-	zbx_sync_rowset_t                       filters;
+	zbx_sync_rowset_t			filters;
 	zbx_sync_rowset_t			overrides;
 }
 zbx_lld_item_prototype_t;

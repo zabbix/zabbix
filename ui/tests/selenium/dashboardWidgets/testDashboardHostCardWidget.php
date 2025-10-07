@@ -1570,11 +1570,11 @@ class testDashboardHostCardWidget extends testWidgets {
 		$widget = $dashboard->getWidget('Fully filled host card widget');
 
 		if ($data['header'] === 'Problems') {
-			$widget->query('class:sections-header')->query('class:problem-icon-link')->one()->click();
+			$widget->query('class:sections-header')->query('class:problem-icon-link')->one()->click()->waitUntilNotVisible();
 		}
 		else {
 			$section = ($data['link'] == 'Inventory') ? 'section-inventory' : 'section-monitoring';
-			$widget->query('class', $section)->query('link', $data['link'])->one()->click();
+			$widget->query('class', $section)->query('link', $data['link'])->one()->click()->waitUntilNotVisible();
 		}
 		$this->page->waitUntilReady();
 		$this->page->assertHeader($data['header']);

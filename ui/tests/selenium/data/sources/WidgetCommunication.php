@@ -95,8 +95,8 @@ class WidgetCommunication {
 				'status' => HOST_STATUS_MONITORED,
 				'inventory_mode' => HOST_INVENTORY_MANUAL,
 				'inventory' => [
-					'location_lat' => '56.95387',
-					'location_lon' => '24.22067'
+					'location_lat' => '56.97612',
+					'location_lon' => '24.16553'
 				],
 				'tags' => [
 					[
