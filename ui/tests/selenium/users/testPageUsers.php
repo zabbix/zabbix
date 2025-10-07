@@ -123,8 +123,8 @@ class testPageUsers extends CLegacyWebTest {
 		$this->zbxTestTextPresent($alias);
 		$this->zbxTestClickLinkText($alias);
 		$this->zbxTestClickWait('update');
-		$this->zbxTestCheckHeader('Users');
 		$this->zbxTestWaitUntilMessageTextPresent('msg-good', 'User updated');
+		$this->zbxTestCheckHeader('Users');
 		$this->zbxTestTextPresent($alias);
 
 		$this->assertEquals($oldHashUser, CDBHelper::getHash($sqlHashUser));
