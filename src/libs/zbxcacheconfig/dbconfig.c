@@ -8668,7 +8668,9 @@ int	zbx_init_configuration_cache(zbx_get_program_type_f get_program_type, zbx_ge
 	get_config_forks_cb = get_config_forks;
 
 	if (SUCCEED != (ret = zbx_rwlock_create(&config_lock, ZBX_RWLOCK_CONFIG, error)))
-		goto out;
+		goto fail;
+
+	WRLOCK_CACHE;
 
 	if (SUCCEED != (ret = zbx_rwlock_create(&config_history_lock, ZBX_RWLOCK_CONFIG_HISTORY, error)))
 		goto out;
@@ -8883,6 +8885,8 @@ int	zbx_init_configuration_cache(zbx_get_program_type_f get_program_type, zbx_ge
 #undef CREATE_HASHSET
 #undef CREATE_HASHSET_EXT
 out:
+	UNLOCK_CACHE;
+fail:
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 
 	return ret;
