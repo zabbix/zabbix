@@ -356,8 +356,9 @@ class testUserRolesPermissions extends CWebTest {
 				? self::$reportid
 				: self::$dashboardid;
 
-			$this->page->open(array_key_exists('replace_link', $data) ? $data['action_link'].
-				$entity_id : $data['action_link'])->waitUntilReady();
+			$this->page->open(array_key_exists('replace_link', $data)
+				? $data['action_link'].$entity_id
+				: $data['action_link'])->waitUntilReady();
 
 			foreach ($data['form_button'] as $text) {
 				$this->assertTrue($this->query('button', $text)->one()->isEnabled(($text === 'Cancel') ? true : $action_status));
