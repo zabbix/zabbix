@@ -44,8 +44,8 @@ window.maintenance_timeperiod_edit = new class {
 	}
 
 	#update() {
-		const timeperiod_type_value = this.form_element.querySelector('[name="timeperiod_type"]').value,
-			month_date_type_value = this.form_element.querySelector('[name="month_date_type"]:checked').value;
+		const timeperiod_type_value = this.form_element.querySelector('[name="timeperiod_type"]').value;
+		const month_date_type_value = this.form_element.querySelector('[name="month_date_type"]:checked').value;
 
 		this.form_element.querySelectorAll('.js-every-day').forEach((element) =>
 			element.hidden = timeperiod_type_value != <?= TIMEPERIOD_TYPE_DAILY ?>
