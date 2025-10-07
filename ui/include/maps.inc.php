@@ -951,7 +951,9 @@ function getElementHosts($selement, $sysmaps_data, $hosts_by_groupids): array {
 	}
 	elseif ($selement['elementtype'] == SYSMAP_ELEMENT_TYPE_HOST_GROUP) {
 		$groupid = $selement['elements'][0]['groupid'];
-		$host_ids = $hosts_by_groupids[$groupid];
+		if (array_key_exists($groupid, $hosts_by_groupids)) {
+			$host_ids = $hosts_by_groupids[$groupid];
+		}
 	}
 	elseif ($selement['elementtype'] == SYSMAP_ELEMENT_TYPE_MAP) {
 		$sysmapid = $selement['elements'][0]['sysmapid'];
