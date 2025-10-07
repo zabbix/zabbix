@@ -459,6 +459,14 @@ class WidgetView extends CControllerDashboardWidgetView {
 		return $problems;
 	}
 
+	/**
+	 * Filter problems by minimum severity, suppression and acknowledge.
+	 *
+	 * @param array $problems  Array containing severity as key and array of problems as value.
+	 * @param array $map       Map settings
+	 *
+	 * @return array  Filtered array containing severity as key and array of problems as value.
+	 */
 	private function filterProblemsByMapSettings(array $problems, array $map): array {
 		if ($map['severity_min'] == 0 && $map['show_suppressed'] != ZBX_PROBLEM_SUPPRESSED_FALSE
 				&& $map['show_unack'] != EXTACK_OPTION_UNACK) {
