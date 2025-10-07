@@ -210,11 +210,6 @@ static int	zbx_vector_mpoint_ptr_search_fsname(const zbx_vector_mpoint_ptr_t *ve
 	return FAIL;
 }
 
-static void	mpoint_ptr_free(zbx_mpoint_t *m)
-{
-	zbx_free(m);
-}
-
 static int	vfs_fs_get_local(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
 	char				line[MAX_STRING_LEN], *p, *mntopts, *error;
@@ -356,7 +351,7 @@ static int	vfs_fs_get_local(AGENT_REQUEST *request, AGENT_RESULT *result)
 	zbx_json_free(&j);
 	ret = SYSINFO_RET_OK;
 out:
-	zbx_vector_mpoint_ptr_clear_ext(&mpoints, mpoint_ptr_free);
+	zbx_vector_mpoint_ptr_clear_ext(&mpoints, zbx_mpoints_free);
 	zbx_vector_mpoint_ptr_destroy(&mpoints);
 
 	return ret;
