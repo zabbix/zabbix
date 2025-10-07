@@ -507,8 +507,7 @@ class CFormValidator {
 
 				return response;
 			})
-			.catch(exception => {
-				console.error(exception);
+			.catch(() => {
 				return { result: false };
 			});
 	}
