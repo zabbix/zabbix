@@ -128,7 +128,7 @@ class testFormTotpEnroll extends testFormTotp {
 		$totp = CTestArrayHelper::get($data, 'totp_pre', '').$totp.CTestArrayHelper::get($data, 'totp_after', '');
 
 		$form->getField('id:verification_code')->fill($totp);
-		$form->query('button:Sign in')->one()->click();
+		$form->query('button:Sign in')->one()->hoverMouse()->click();
 
 		// Validate a successful login or an expected error.
 		$this->page->waitUntilReady();

@@ -131,12 +131,21 @@ typedef struct
 }
 zbx_history_sync_stats_t;
 
+typedef enum
+{
+	ZBX_DC_SYNC_TREND_MODE_NORMAL,
+	ZBX_DC_SYNC_TREND_MODE_PARALLEL,
+	ZBX_DC_SYNC_TREND_MODE_FULL
+}
+zbx_dc_sync_trend_mode_t;
+
 void	zbx_pp_value_opt_clear(zbx_pp_value_opt_t *opt);
 void	zbx_dc_get_stats_all(zbx_wcache_info_t *wcache_info);
 void	*zbx_dc_get_stats(int request);
 void	zbx_trend_add_new_items(const zbx_vector_uint64_t *itemids);
 void	zbx_dc_update_trends(zbx_vector_uint64_pair_t *trends_diff);
-void	zbx_db_flush_trends(ZBX_DC_TREND *trends, int *trends_num, zbx_vector_uint64_pair_t *trends_diff);
+void	zbx_db_flush_trends(ZBX_DC_TREND *trends, int *trends_num, zbx_vector_uint64_pair_t *trends_diff,
+		zbx_dc_sync_trend_mode_t sync_trend_mode);
 void	zbx_dc_mass_update_trends(const zbx_dc_history_t *history, int history_num, ZBX_DC_TREND **trends,
 		int *trends_num, int compression_age);
 void	zbx_dc_sync_trends(int parallel_num);
@@ -183,6 +192,8 @@ void	zbx_hc_get_diag_stats(zbx_uint64_t *items_num, zbx_uint64_t *values_num);
 void	zbx_hc_get_mem_stats(zbx_shmem_stats_t *data, zbx_shmem_stats_t *index);
 int	zbx_hc_is_itemid_cached(zbx_uint64_t itemid);
 void	zbx_hc_get_items(zbx_vector_uint64_pair_t *items);
+void	zbx_hc_get_items_unlocked(zbx_vector_uint64_pair_t *items);
+int	zbx_hc_check_high_usage_timer(void);
 int	zbx_db_trigger_queue_locked(void);
 void	zbx_db_trigger_queue_unlock(void);
 zbx_uint64_t	zbx_hc_proxyqueue_peek(void);
@@ -201,4 +212,6 @@ int	zbx_dbcache_getproxyqueue_state(void);
 void	zbx_hc_acquire(void);
 int	zbx_hc_release(void);
 int	zbx_hc_refcount_peek(void);
+
+void	zbx_hc_log_high_cache_usage(zbx_vector_uint64_pair_t *items);
 #endif

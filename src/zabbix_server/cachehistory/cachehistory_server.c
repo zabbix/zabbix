@@ -36,6 +36,7 @@
 #include "zbxvariant.h"
 #include "zbxescalations.h"
 #include "zbxprof.h"
+#include "zbxcalc.h"
 
 /******************************************************************************
  *                                                                            *
@@ -58,7 +59,7 @@ static void	DBmass_update_trends(const ZBX_DC_TREND *trends, int trends_num,
 		qsort(trends_tmp, trends_num, sizeof(ZBX_DC_TREND), zbx_trend_compare);
 
 		while (0 < trends_num)
-			zbx_db_flush_trends(trends_tmp, &trends_num, trends_diff);
+			zbx_db_flush_trends(trends_tmp, &trends_num, trends_diff, ZBX_DC_SYNC_TREND_MODE_NORMAL);
 
 		zbx_free(trends_tmp);
 	}
@@ -206,6 +207,7 @@ static int	process_trigger(zbx_dc_trigger_t *trigger, zbx_add_event_func_t add_e
 
 		if (0 != (event_flags & ZBX_FLAGS_TRIGGER_CREATE_INTERNAL_EVENT))
 		{
+			/* zbx_add_event() */
 			add_event_cb(EVENT_SOURCE_INTERNAL, EVENT_OBJECT_TRIGGER, trigger->triggerid,
 					&trigger->timespec, new_state, NULL, trigger->expression,
 					trigger->recovery_expression, 0, 0, &trigger->tags, 0, NULL, 0, NULL, NULL,
@@ -1731,18 +1733,21 @@ void	zbx_sync_history_cache_server(const zbx_events_funcs_t *events_cbs, zbx_ipc
  * Purpose: check status of a history cache usage, enqueue/dequeue proxy      *
  *          from priority list and accordingly enable or disable wait mode    *
  *                                                                            *
- * Parameters: proxyid   - [IN] the proxyid                                   *
+ * Parameters: proxyid           - [IN] the proxyid                           *
+ *             pending_history   - [IN] the "more" flag presence              *
  *                                                                            *
  * Return value: SUCCEED - proxy can be processed now                         *
  *               FAIL    - proxy cannot be processed now, it got enqueued     *
  *                                                                            *
  ******************************************************************************/
-int	zbx_hc_check_proxy(zbx_uint64_t proxyid)
+int	zbx_hc_check_proxy(zbx_uint64_t proxyid, int pending_history)
 {
-	double	hc_pused;
-	int	ret;
+	double				hc_pused;
+	int				ret, stats_retrieved = FAIL;
+	zbx_vector_uint64_pair_t	items;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s() proxyid:"ZBX_FS_UI64, __func__, proxyid);
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s() proxyid:"ZBX_FS_UI64" pending_history:%i",
+			__func__, proxyid, pending_history);
 
 	zbx_dbcache_lock();
 
@@ -1784,14 +1789,32 @@ int	zbx_hc_check_proxy(zbx_uint64_t proxyid)
 
 	if (0 == zbx_hc_proxyqueue_peek())
 	{
-		ret = SUCCEED;
+		if (60 < hc_pused && ZBX_PROXY_PENDING_HISTORY_YES == pending_history)
+		{
+			if (SUCCEED == (stats_retrieved = zbx_hc_check_high_usage_timer()))
+			{
+				zbx_vector_uint64_pair_create(&items);
+				zbx_hc_get_items_unlocked(&items);
+			}
+
+			ret = FAIL;
+		}
+		else
+			ret = SUCCEED;
+
 		goto out;
 	}
 
 	ret = zbx_hc_proxyqueue_dequeue(proxyid);
-
 out:
 	zbx_dbcache_unlock();
+
+	if (SUCCEED == stats_retrieved)
+	{
+		zabbix_log(LOG_LEVEL_WARNING, "Detected heavy usage of history cache (more than 60%% space used).");
+		zbx_hc_log_high_cache_usage(&items);
+		zbx_vector_uint64_pair_destroy(&items);
+	}
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __func__, zbx_result_string(ret));
 

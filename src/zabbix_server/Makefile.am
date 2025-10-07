@@ -39,6 +39,7 @@ zabbix_server_SOURCES = \
 
 zabbix_server_LDADD = \
 	cachehistory/libzbxcachehistory_server.a \
+	$(top_builddir)/src/libs/zbxcalc/libzbxcalc.a \
 	$(top_builddir)/src/libs/zbxdbsyncer/libzbxdbsyncer.a \
 	$(top_builddir)/src/libs/zbxpinger/libzbxpinger.a \
 	dbconfig/libzbxdbconfig.a \

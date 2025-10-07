@@ -61,7 +61,7 @@ class CMessageBehavior extends CBehavior {
 	 * @param CFormElement	$form		form that contains the field with the error
 	 * @param array			$fields		array of field selector and expected inline error string pairs
 	 */
-	public function assertInlineError($form, $fields) {
+	public function assertInlineError($form, array $fields) {
 		foreach ($fields as $selector => $error_text) {
 			$field = $form->getField($selector);
 			$field->waitUntilClassesPresent('has-error');
